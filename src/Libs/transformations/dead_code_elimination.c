@@ -898,6 +898,7 @@ suppress_dead_code(char * mod_name)
   return TRUE;
 }
 
+
 /* Return true if a statement has at least one write effect in the
    effects list. */
 bool
