@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1995/01/02 16:38:10 $, ) version $Revision$,
+# $RCSfile: validate-sequential,v $ ($Date: 1995/03/20 15:35:28 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -59,7 +59,7 @@ unset UNIQDIR pips_version RUNDIR LOCKFILE PERFORMANCE
 usage()
 {
   {
-    echo "Usage: $0 [-uvdsth] [-l file] [-x pips] [-r dir] [modules]"
+    echo "Usage: $0 [-uvdsth] [-l file] [-x pips] [-r dir] [-f file] [modules]"
     echo "  -u: uniq directory to be used"
     echo "  -t: timing"
     echo "  -h: help"
@@ -67,6 +67,7 @@ usage()
     echo "  -s: silent (default)"
     echo "  -d: debug"
     echo "  -l file: lockfile name where to report"
+    echo "  -f file: fortran files"
     echo "  -x pips: pips to be used (dafault . then Production)"
     echo "  -r dir: directory where to run (default .)"
   } >&2
@@ -76,7 +77,9 @@ usage()
 #
 # get options
 
-while getopts tuvsdhx:r:l: opt
+unset FILES
+
+while getopts tuvsdhx:r:f:l: opt
 do
   case $opt in
     t) PERFORMANCE="begin: `date`" ;;
@@ -86,6 +89,7 @@ do
     u) UNIQDIR=".validate_directory.$HOSTNAME.$$" ;;
     x) pips_version="$OPTARG" ;;
     r) RUNDIR="$OPTARG" ;;
+    f) FILES="$FILES $OPTARG" ;;
     l) LOCKFILE="$OPTARG" ;;
     h) usage 0 ;;
     *) usage 1
@@ -202,7 +206,7 @@ test_aspect()
 {
   aspect=$1
   
-  (for file in `ls $aspect/*.f` ; do
+  (for file in ${FILES:-`ls $aspect/*.f`} ; do
      name=`basename $file .f`
      u_name=`echo $name | tr a-z A-Z`
      
@@ -350,7 +354,7 @@ else
   report 1 \
   "Your Validation Suite Test for
 
-$aspects
+$aspects ${FILES:+($FILES)}
   
 $final with $pips_version on $HOSTNAME
 
