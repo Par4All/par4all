@@ -250,36 +250,36 @@ void help_handler(char * line)
 	}
     }
     if (PREFIX_EQUAL_P("make",line)) {
-	printf("make     <[OWNER.]resourcename>\n");
+	printf("make     <resourcename[(OWNER)]>\n");
 	if (*line) {
 	    printf("\tbuild a resource\n");
 	    printf("\n\tExamples:\n\n");
 	    printf("\t\t make PRINTED_FILE\n");
-	    printf("\t\t make my_module.CALLGRAPH_FILE\n");
-	    printf("\t\t make $ALL.DG_FILE\n");
-	    printf("\t\t make $CALLEES.ICFG_FILE\n\n");
+	    printf("\t\t make CALLGRAPH_FILE(my_module)\n");
+	    printf("\t\t make DG_FILE($ALL)\n");
+	    printf("\t\t make ICFG_FILE($CALLEES)\n\n");
 	}
     }
     if (PREFIX_EQUAL_P("apply",line)) {
-	printf("apply    <[OWNER.]rulename>\n");
+	printf("apply    <rulename[(OWNER)]>\n");
 	if (*line) {
 	    printf("\tmake the produced resources of a rule\n");
 	    printf("\n\tExamples:\n\n");
 	    printf("\t\t apply PRINT_SOURCE_WITH_REGIONS\n");
-	    printf("\t\t apply my_module.HPFC_CLOSE");
-	    printf("\t\t apply $ALL.PRINT_CODE\n");
-	    printf("\t\t apply $CALLEES.PRINT_ICFG\n");
+	    printf("\t\t apply HPFC_CLOSE(my_module)");
+	    printf("\t\t apply PRINT_CODE($ALL)\n");
+	    printf("\t\t apply PRINT_ICFG($CALLEES)\n");
 	}
     }
     if (PREFIX_EQUAL_P("display",line)) {
-	printf("display  <[OWNER.]resourcename>\n");
+	printf("display  <resourcename[(OWNER)]>\n");
 	if (*line) {
 	    printf("\tprint a resource\n");
 	    printf("\n\tExamples:\n\n");
 	    printf("\t\t display PRINTED_FILE\n");
-	    printf("\t\t display my_module.CALLGRAPH_FILE\n");
-	    printf("\t\t display $ALL.DG_FILE\n");
-	    printf("\t\t display $CALLEES.ICFG_FILE\n\n");
+	    printf("\t\t display CALLGRAPH_FILE(my_module)\n");
+	    printf("\t\t display DG_FILE($ALL)\n");
+	    printf("\t\t display ICFG_FILE($CALLEES)\n\n");
 	}
     }
     if (PREFIX_EQUAL_P("cd",line)) {
