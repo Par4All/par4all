@@ -4,6 +4,7 @@
 /*LINTLIBRARY*/
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -19,6 +20,9 @@
  * Modifications:
  *  - double changement du signe du terme constant pour le traitement 
  *    des inegalites (Francois Irigoin, 30 octobre 1991) 
+ *  - ajout d'un test pour les egalites du type 0 == k et les
+ *    inegalites 0 <= -k quand k est une constante numerique entiere
+ *    strictement positive (Francois Irigoin, 15 novembre 1995)
  */
 boolean contrainte_normalize(c,is_egalite)
 Pcontrainte c;
@@ -33,7 +37,10 @@ boolean is_egalite;
 
     if(c!=NULL && (c->vecteur != NULL) 
 	&& (a = vect_pgcd_except(c->vecteur,TCST)) != 0) {
+	Pvecteur v;
+
 	nb0 = ABS(vect_coeff(TCST,c->vecteur)) % a;
+
 	if (is_egalite)	{
 	    if (nb0 == 0) {
 		(void) vect_div(c->vecteur,ABS(a));
@@ -59,6 +66,20 @@ boolean is_egalite;
 	     * division a reste toujours positif dont on a besoin
 	     */
 	}
+	v=c->vecteur;
+	if(is_c_norm
+	   && !VECTEUR_NUL_P(v)
+	   && (vect_size(v) == 1)
+	   && term_cst(v)) {
+
+	    if(is_egalite) {
+		assert(vecteur_val(v) != 0);
+		is_c_norm = FALSE;
+	    }
+	    else { /* is_inegalite */
+		is_c_norm = (vecteur_val(v) <= 0) ;
+	    }
+	}
     }
     return (is_c_norm);
 }
@@ -73,18 +94,19 @@ boolean is_egalite;
  *            i
  * eg := eg/k
  *
- * return b % k == 0;
+ * return b % k == 0 || all ai == 0 && b != 0;
  */
 boolean egalite_normalize(eg)
 Pcontrainte eg;
 {
-    return(contrainte_normalize(eg,TRUE));
+    return(contrainte_normalize(eg, TRUE));
 }
 
 /* boolean inegalite_normalize(Pcontrainte ineg): normalisation
  * d'une inegalite a variables entieres; voir contrainte_normalize;
- * retourne toujours TRUE car une inegalite n'ayant qu'un terme
- * constant est toujours faisable
+ * retourne presque toujours TRUE car une inegalite n'ayant qu'un terme
+ * constant est toujours faisable a moins qu'il ne reste qu'un terme 
+ * constant strictement positif.
  *
  * Soit eg == sum ai xi <= b
  *             i
@@ -92,10 +114,10 @@ Pcontrainte eg;
  *            i
  * eg := eg/k
  *
- * return TRUE
+ * return TRUE unless all ai are 0 and b < 0
  */
 boolean inegalite_normalize(ineg)
 Pcontrainte ineg;
 {
-    return(contrainte_normalize(ineg,FALSE));
+    return(contrainte_normalize(ineg ,FALSE));
 }
