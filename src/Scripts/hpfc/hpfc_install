@@ -1,0 +1,58 @@
+#! /bin/sh
+#
+# Installation in directory...
+#
+# $RCSfile: hpfc_install,v $ ($Date: 1994/04/11 11:27:37 $, )
+# version $Revision$
+# got on %D%, %T%
+# $Id$
+#
+
+# defaults
+
+WD=`pwd`
+
+VERBOSE=':'
+DEBUG=':'
+DIRECTORY=$WD
+SRCDIR="$EXTEDIR"
+
+if [ -f .pipsprogram ] 
+then
+  BASEDIR="$WD/`sed -n 's,^PGM=\(.*\)\$,\1,p' .pipsprogram`.database"
+fi
+
+# get options
+
+usage()
+{
+  echo "Usage: $0 [-vd] [-t dir] [-s dir] [-b dir]" 2>&1
+  exit ${1:-1}
+}
+
+while getopts vdt:s:b: OPT
+do
+  case $OPT in
+    v) VERBOSE='echo' ;;
+    d) DEBUG='echo' ;;
+    t) DIRECTORY="$OPTARG" ;;
+    s) SRCDIR="$OPTARG" ;;
+    b) BASEDIR="$OPTARG" ;;
+    *) usage
+  esac
+done
+
+[ $# -eq 0 ] || usage
+[ "$BASEDIR" ] || usage
+
+#
+
+$VERBOSE "copying files in $DIRECTORY"
+
+cp $SRCDIR/hpfc_*.h $SRCDIR/hpfc_*.f $DIRECTORY
+cp $SRCDIR/hpfc_Makefile $DIRECTORY/Makefile
+cp $BASEDIR/parameters.h $BASEDIR/*.f $DIRECTORY
+
+#
+# that is all
+#
