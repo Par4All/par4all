@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initializer.c,v $
+ * Revision 1.15  2003/08/14 08:48:04  irigoin
+ * Compatibility with LINUX for strdup() declaration
+ *
  * Revision 1.14  2003/08/01 06:00:01  irigoin
  * Dummy c_initializer added to fit pipsmake.rc
  *
@@ -15,7 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 
-extern char * strdup(char *);
+extern char * strdup(const char *);
 
 #include "genC.h"
 #include "text.h"
