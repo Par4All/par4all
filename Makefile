@@ -23,7 +23,6 @@ PEXEC = \
 	pp \
 	disjoint_union_sep \
 	disjoint_union_adj \
-	union_convex \
 	ehrhart \
 	verif_ehrhart\
 	Zpolytest\
@@ -40,6 +39,7 @@ CFILES= \
 	param.c \
 	alpha.c \
 	ehrhart.c \
+	ext_ehrhart.c \
 	eval_ehrhart.c \
 	SolveDio.c \
 	Lattice.c \
@@ -366,6 +366,11 @@ $(OBJ_DIR)/ehrhart$(EXEC_EXTRA_SUFFIX): $(POLYLIB_SRC)/ehrhart.c \
 	$(CC) $(LDFLAGS) $(CFLAGS) -DEMAIN -DEP_EVALUATION  -o $@ \
 		$(EHRHART_MP:%=$(POLYLIB_SRC)/%) $(POLYLIB_SRC)/ehrhart.c \
 		$(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
+$(OBJ_DIR)/ext_ehrhart$(EXEC_EXTRA_SUFFIX): $(POLYLIB_SRC)/ext_ehrhart.c \
+				$(LIB) $(PHEADERS)
+	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ \
+		$(EHRHART_MP:%=$(POLYLIB_SRC)/%) $(POLYLIB_SRC)/ehrhart.c \
+		$(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
 
 # verifies the ehrhart polynomial is correct
 $(OBJ_DIR)/verif_ehrhart$(EXEC_EXTRA_SUFFIX): $(POLYLIB_SRC)/verif_ehrhart.c \
@@ -383,10 +388,6 @@ $(OBJ_DIR)/disjoint_union_adj$(EXEC_EXTRA_SUFFIX): $(PHEADERS) $(LIB) \
 			$(POLYLIB_SRC)/disjoint_union_adj.c
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ \
 		$(POLYLIB_SRC)/disjoint_union_adj.c $(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
-$(OBJ_DIR)/union_convex$(EXEC_EXTRA_SUFFIX): $(PHEADERS) $(LIB) \
-			$(POLYLIB_SRC)/union_convex.c
-	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ \
-		$(POLYLIB_SRC)/union_convex.c $(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
 
 # original PolyLib1 tests
 $(OBJ_DIR)/testlib$(EXEC_EXTRA_SUFFIX): $(POLYLIB_SRC)/testlib.c $(LIB)
