@@ -474,8 +474,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
     return new_ps;
 }
 
-/* Psysteme sc_strong_normalize2(Psysteme ps,
- *                               char * (*variable_name)(Variable))
+/* Psysteme sc_strong_normalize2(Psysteme ps)
  *
  * Apply sc_normalize first. Then solve the equations in
  * ps and propagate substitutions in equations and inequations.
@@ -495,7 +494,182 @@ Psysteme sc_strong_normalize_and_check_feasibility
  * for sc_normalize.c... but it's not strong enough to qualify as
  * a normalization procedure.
  */
-Psysteme sc_strong_normalize2(Psysteme ps, char * (*variable_name)(Variable))
+Psysteme sc_strong_normalize2(Psysteme ps)
+{
+
+#define if_debug_sc_strong_normalize_2 if(FALSE)
+
+    Psysteme new_ps = sc_make(NULL, NULL);
+    boolean feasible_p = TRUE;
+
+    if_debug_sc_strong_normalize_2 {
+	fprintf(stderr, "[sc_strong_normalize2]: Begin\n");
+    }
+
+    if(!SC_UNDEFINED_P(ps)) {
+	if(!SC_EMPTY_P(ps = sc_normalize(ps))) {
+	    Pcontrainte eq = CONTRAINTE_UNDEFINED;
+	    Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+	    Pcontrainte next_eq = CONTRAINTE_UNDEFINED;
+	    Pcontrainte new_eq = CONTRAINTE_UNDEFINED;
+
+	    if_debug_sc_strong_normalize_2 {
+		fprintf(stderr,
+			"[sc_strong_normalize2]: After call to sc_normalize\n");
+		fprintf(stderr, "[sc_strong_normalize2]: Input system %x\n",
+			(unsigned int) ps);
+		sc_dump(ps);
+	    }
+
+	    /* Solve the equalities */
+	    for(eq = sc_egalites(ps); 
+		!CONTRAINTE_UNDEFINED_P(eq);
+		eq = next_eq) {
+
+		/* eq might suffer in the substitution... */
+		next_eq = contrainte_succ(eq);
+
+		if(egalite_normalize(eq)) {
+		    if(CONTRAINTE_NULLE_P(eq)) {
+			/* eq is redundant */
+			;
+		    }
+		    else {
+			Pcontrainte def = CONTRAINTE_UNDEFINED;
+			Variable v = TCST;
+			Pvecteur pv;
+
+			/* keep eq */
+			new_eq = contrainte_dup(eq);
+			sc_add_egalite(new_ps, new_eq);
+
+			/* use eq to eliminate a variable */
+
+			/* Let's use a variable with coefficient 1 if
+			 * possible
+			 */
+			for( pv = contrainte_vecteur(eq);
+			    !VECTEUR_NUL_P(pv);
+			    pv = vecteur_succ(pv)) {
+			    if(!term_cst(pv)) {
+				v = vecteur_var(pv);
+				if(vecteur_val(pv)==1) {
+				    break;
+				}
+			    }
+			}
+			assert(v!=TCST);
+
+			/* A softer substitution is used
+			 */ 
+			/*
+			if(sc_empty_p(ps =
+				      sc_variable_substitution_with_eq_ofl_ctrl
+			    (ps, eq, v, OFL_CTRL))) {
+			    feasible_p = FALSE;
+			    break;
+			}
+			else {
+			    ;
+			}
+			*/
+
+			/* eq itself is going to be modified in ps.
+			 * use a copy!
+			 */
+			def = contrainte_dup(eq);
+			ps = 
+			    sc_simple_variable_substitution_with_eq_ofl_ctrl
+			    (ps, def, v, NO_OFL_CTRL);
+			contrainte_rm(def);
+			/*
+			   int contrainte_subst_ofl_ctrl(v,def,c,eq_p, ofl_ctrl)
+			   */
+		    }
+		}
+		else {
+		    /* The system is not feasible. Stop */
+		    feasible_p = FALSE;
+		    break;
+		}
+
+		if_debug_sc_strong_normalize_2 {
+		    fprintf(stderr,
+			    "Print the two systems at each elimination step:\n");
+		    fprintf(stderr, "[sc_strong_normalize2]: Input system %x\n",
+			    (unsigned int) ps);
+		    sc_dump(ps);
+		    fprintf(stderr, "[sc_strong_normalize2]: New system %x\n",
+			    (unsigned int) new_ps);
+		    sc_dump(new_ps);
+		}
+
+	    }
+	    assert(!feasible_p ||
+		   (CONTRAINTE_UNDEFINED_P(eq) && CONTRAINTE_UNDEFINED_P(ineq)));
+
+	    /* Check the inequalities */
+	    feasible_p = !SC_EMPTY_P(ps = sc_normalize(ps));
+
+	    if_debug_sc_strong_normalize_2 {
+		fprintf(stderr,
+			"Print the three systems after inequality normalization:\n");
+		fprintf(stderr, "[sc_strong_normalize2]: Input system %x\n",
+			(unsigned int) ps);
+		sc_dump(ps);
+		fprintf(stderr, "[sc_strong_normalize2]: New system %x\n",
+			(unsigned int) new_ps);
+		sc_dump(new_ps);
+	    }
+	}
+	else {
+	    if_debug_sc_strong_normalize_2 {
+		fprintf(stderr,
+			"[sc_strong_normalize2]:"
+			" Non-feasibility detected by first call to sc_normalize\n");
+	    }
+	    feasible_p = FALSE;
+	}
+    }
+    else {
+	if_debug_sc_strong_normalize_2 {
+	    fprintf(stderr,
+		    "[sc_strong_normalize2]: Empty system as input\n");
+	}
+	feasible_p = FALSE;
+    }
+
+    if(!feasible_p) {
+	sc_rm(new_ps);
+	new_ps = SC_EMPTY;
+    }
+    else {
+	base_rm(sc_base(new_ps));
+	sc_base(new_ps) = base_dup(sc_base(ps));
+	sc_dimension(new_ps) = sc_dimension(ps);
+	/* copy projected inequalities left in ps */
+	new_ps = sc_safe_append(new_ps, ps);
+	/* sc_base(ps) = BASE_UNDEFINED; */
+	assert(sc_weak_consistent_p(new_ps));
+    }
+
+    sc_rm(ps);
+
+    if_debug_sc_strong_normalize_2 {
+	fprintf(stderr,
+		"[sc_strong_normalize2]: Final value of new system %x:\n",
+		(unsigned int) new_ps);
+	sc_dump(new_ps);
+	fprintf(stderr, "[sc_strong_normalize2]: End\n");
+    }
+
+    return new_ps;
+}
+
+/* Psysteme sc_strong_normalize4(Psysteme ps,
+ *                               char * (*variable_name)(Variable))
+ */
+Psysteme sc_strong_normalize4(Psysteme ps, char * (*variable_name)(Variable))
 {
     /*
     Psysteme new_ps =
@@ -510,7 +684,7 @@ Psysteme sc_strong_normalize2(Psysteme ps, char * (*variable_name)(Variable))
     return new_ps;
 }
 
-Psysteme sc_strong_normalize4(Psysteme ps, char * (*variable_name)(Variable))
+Psysteme sc_strong_normalize5(Psysteme ps, char * (*variable_name)(Variable))
 {
     /*
     Psysteme new_ps =
@@ -525,6 +699,25 @@ Psysteme sc_strong_normalize4(Psysteme ps, char * (*variable_name)(Variable))
     return new_ps;
 }
 
+/* Psysteme sc_strong_normalize_and_check_feasibility2
+ * (Psysteme ps,
+ *  Psysteme (*check_feasibility)(Psysteme),
+ *  char * (*variable_name)(Variable),
+ * int level)
+ *
+ * Same as sc_strong_normalize2() but equations are used by increasing
+ * order of their numbers of variables, and, within one equation,
+ * the lexicographic minimal variables is chosen among equivalent variables.
+ *
+ * Equations with more than "level" variables are not used for the 
+ * substitution. Unless level==MAXINT.
+ *
+ * Finally, an additional normalization procedure is applied on the
+ * substituted system. Another stronger normalization can be chosen
+ * to benefit from the system size reduction (e.g. sc_elim_redund).
+ * Or a light one to benefit from the inequality simplifications due
+ * to equation solving (e.g. sc_normalize).
+ */
 Psysteme sc_strong_normalize_and_check_feasibility2
 (Psysteme ps,
  Psysteme (*check_feasibility)(Psysteme),
