@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.66  2002/06/20 15:48:15  irigoin
+ * New handling of DATA, function MakeDataStatement() added
+ *
  * Revision 1.65  2002/03/08 10:19:06  irigoin
  * Support for StackArea added + greater use of PARSER_ACCEPT_ANSI_EXTENSIONS
  *
@@ -253,8 +256,7 @@ SaveEntity(entity e)
     }
 }
 
-void
-ProcessSave(entity v)
+void MakeVariableStatic(entity v, bool force_it)
 {
   if(entity_storage(v) == storage_undefined) {
     SaveEntity(v);
@@ -270,11 +272,16 @@ ProcessSave(entity v)
        */
     }
     else {
+      /* Could be the stack or the heap area or any common */
+      if(force_it) {
       user_warning("ProcessSave", "Variable %s has already been declared static "
 		   "by appearing in Common %s\n",
 		   entity_local_name(v), module_local_name(a));
       ParserError("parser", "SAVE statement incompatible with previous"
 		  " COMMON declaration\n");
+      }
+      else {
+      }
     }
   }
   else {
@@ -282,6 +289,16 @@ ProcessSave(entity v)
 		 "be cause of its storage class (tag=%d)\n",
 		 entity_local_name(v), storage_tag(entity_storage(v)));
   }
+}
+
+void ProcessSave(entity v)
+{
+  MakeVariableStatic(v, TRUE);
+}
+
+void save_initialized_variable(entity v)
+{
+  MakeVariableStatic(v, FALSE);
 }
 
 /* this function transforms a dynamic common into a static one.  */
@@ -506,6 +523,33 @@ AnalyzeData(list ldvr, list ldvl)
 	(datavar_nbelements(DATAVAR(CAR(pcr))) != 0 || CDR(pcr) != NIL)) {
       ParserError("AnalyzeData", "too few initializers\n");
     }
+}
+
+/* Receives as first input an implicit list of references, including
+   implicit DO, and as second input an list of value using
+   pseudo-intrinsic REPEAT_VALUE() to replicate values. Generates a call
+   statement to STATIC-INITIALIZATION(), with a call to DATA_LIST to
+   prefix ldr (unlike IO list). Processes the information as AnalyzeData()
+   used to do it. Add the new data call statement to the initializations
+   field of the current module. */
+
+void MakeDataStatement(list ldr, list ldv)
+{
+  statement ds = statement_undefined;
+  code mc = entity_code(get_current_module_entity());
+  entity dl = global_name_to_entity(TOP_LEVEL_MODULE_NAME, DATA_LIST_FUNCTION_NAME);
+  expression pldr = expression_undefined;
+
+  pips_assert("The static initialization pseudo-intrinsic is defined",
+	      !entity_undefined_p(dl));
+
+  pldr = make_call_expression(dl, ldr);
+  ds = make_call_statement(STATIC_INITIALIZATION_NAME,
+			   gen_nconc(CONS(EXPRESSION, pldr, NIL), ldv),
+			   entity_undefined,
+			   empty_comments);
+  sequence_statements(code_initializations(mc)) = 
+    gen_nconc(sequence_statements(code_initializations(mc)), CONS(STATEMENT, ds, NIL));
 }
 
 void DeclarePointer(entity ptr, entity pointed_array, list decl_dims)
