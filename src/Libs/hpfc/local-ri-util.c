@@ -1,5 +1,5 @@
 /* SCCS Stuff:
- * $RCSfile: local-ri-util.c,v $ ($Date: 1994/12/06 12:07:57 $, )
+ * $RCSfile: local-ri-util.c,v $ ($Date: 1994/12/22 16:52:20 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -57,7 +57,7 @@ expression e;
 
 	/*  must be a call
 	 */
-	pips_assert("suggest_basic_for_expression", syntax_call_p(s));
+	assert(syntax_call_p(s));
 
 	if (ENTITY_RELATIONAL_OPERATOR_P(call_function(syntax_call(s))))
 	    result = is_basic_logical;
