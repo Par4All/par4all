@@ -974,7 +974,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 	
 	if (base_contains_variable_p(sc->base, (Variable) var)) 
 	{
-	    CATCH(overflow_error))
+	    CATCH(overflow_error)
 	    {
 		region reg_tmp = 
 		    reference_whole_region(region_reference(reg),
