@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/12/27 19:46:43 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/12/28 09:17:03 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -33,8 +33,7 @@ extern int fprintf();
 #include "hpfc.h"
 #include "defines-local.h"
 
-/*
- * global variables
+/* global variables
  */
 
 entity 
@@ -82,7 +81,7 @@ statement *hoststatp,*nodestatp;
 
     MAPL(cs,
      {
-	 hpfcompiler(STATEMENT(CAR(cs)),&hostcd,&nodecd);
+	 hpf_compiler(STATEMENT(CAR(cs)),&hostcd,&nodecd);
 	 
 	 lhost = gen_nconc(lhost,CONS(STATEMENT,hostcd,NULL));
 	 lnode = gen_nconc(lnode,CONS(STATEMENT,nodecd,NULL));
@@ -125,8 +124,8 @@ statement *hoststatp,*nodestatp;
     stattrue = test_true(the_test);
     statfalse = test_false(the_test);
 
-    hpfcompiler(stattrue, &stathosttrue, &statnodetrue);
-    hpfcompiler(statfalse, &stathostfalse, &statnodefalse);
+    hpf_compiler(stattrue, &stathosttrue, &statnodetrue);
+    hpf_compiler(statfalse, &stathostfalse, &statnodefalse);
 
     instruction_test(statement_instruction(*hoststatp)) =
 	make_test(UpdateExpressionForModule(host_module,condition),
@@ -177,24 +176,10 @@ statement *hoststatp,*nodestatp;
 
     debug(7,"hpf_compile_call", "function %s\n", entity_name(call_function(c)));
 
-    /*
-     * {"WRITE", (MAXINT)},
-     * {"REWIND", (MAXINT)},
-     * {"OPEN", (MAXINT)},
-     * {"CLOSE", (MAXINT)},
-     * {"READ", (MAXINT)},
-     * {"BUFFERIN", (MAXINT)},
-     * {"BUFFEROUT", (MAXINT)},
-     * {"ENDFILE", (MAXINT)},
-     * {"IMPLIED-DO", (MAXINT)},
-     * {"FORMAT", 1},
+    /* IO functions should be detected earlier, in hpf_compiler
      */
-
     if (IO_CALL_P(c)) 
-    {
-	hpfcompileIO(stat, hoststatp, nodestatp) ;
-	return;
-    }
+	pips_error("hpf_compile_call", "should not be there\n");
 
     /*
      * no reference to distributed arrays...
@@ -320,7 +305,7 @@ statement *hoststatp,*nodestatp;
 	 *
 	 * ??? there may be a problem with the label of the statement, if any.
 	 */
-	hpfcompiler
+	hpf_compiler
 	    (control_statement
 	     (unstructured_control(instruction_unstructured(inst))),
 	     hoststatp,
@@ -355,7 +340,7 @@ statement *hoststatp,*nodestatp;
 	 {
 	     statc=control_statement(c);
 	     
-	     hpfcompiler(statc, &stath, &statn);
+	     hpf_compiler(statc, &stath, &statn);
 	     
 	     ifdebug(7)
 	     {
@@ -488,7 +473,7 @@ statement stat, *hoststatp, *nodestatp;
 	upper=range_upper(r),
 	increment=range_increment(r);
     
-    hpfcompiler(body,&hostbody,&nodebody);
+    hpf_compiler(body,&hostbody,&nodebody);
     
     if (hpfc_empty_statement_p(hostbody))
     {
@@ -682,26 +667,25 @@ statement *hoststatp, *nodestatp;
 }
 
 /*
- * hpfcompiler
+ * hpf_compiler
  *
  * drive the compilation of the statement to the relevant
  * procedure.
  *
  * Recursive calls used in the top-down walk of the program.
  */
-void hpfcompiler(stat, hoststatp, nodestatp)
+void hpf_compiler(stat, hoststatp, nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
-    if (get_bool_property("HPFC_NEW_IO_COMPILATION") &&
-	load_statement_only_io(stat)==TRUE) /* necessary */
-	if (io_efficient_compilable_p(stat))
-	{
-	    io_efficient_compile(stat,  hoststatp, nodestatp);
-	    return;
-	}
+    if (load_statement_only_io(stat)==TRUE) /* necessary */
+    {
+	io_efficient_compile(stat,  hoststatp, nodestatp);
+	return;
+    }
     
-    /* else usual stuff */
+    /* else usual stuff 
+     */
 
     switch(instruction_tag(statement_instruction(stat)))
     {
@@ -724,9 +708,10 @@ statement *hoststatp,*nodestatp;
 	hpf_compile_unstructured(stat, hoststatp, nodestatp);
 	break;
     default:
-	pips_error("hpfcompiler", "unexpected instruction tag\n");
+	pips_error("hpf_compiler", "unexpected instruction tag\n");
 	break;
     }
 }
 
-
+/*   That is all
+ */
