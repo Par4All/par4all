@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/04/10 20:55:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/25 23:08:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/04/10 20:55:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/04/25 23:08:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -422,8 +422,10 @@ take_out_the_entry_node_of_the_unstructured(statement s,
 	list l = CONS(STATEMENT, control_statement(entry_node), NIL);
 	/* Since the unstructured may have a comment on it, we cannot
 	   put the comment on the statement block but on a CONTINUE: */
-	if (! empty_comments_p(statement_comments(s))) {
-	    statement cs = make_continue_statement(entity_empty_label());
+	if (! statement_with_empty_comment_p(s) ||
+	    ! unlabelled_statement_p(s)) {
+	    statement cs = make_continue_statement(statement_label(s));
+	    statement_label(s) = entity_empty_label();
 	    statement_comments(cs) = statement_comments(s);
 	    statement_comments(s) = empty_comments;
 	    l = CONS(STATEMENT, cs, l);
