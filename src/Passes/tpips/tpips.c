@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.109  1998/10/28 18:18:25  coelho
+ * missing \n added fpr jpips.
+ *
  * Revision 1.108  1998/07/21 17:36:20  coelho
  * -v option updated.
  *
@@ -604,6 +607,7 @@ static string tpips_user_request(string fmt, va_list args)
     {
 	jpips_tag(BEGIN_RQ);
 	jpips_string(fmt, & args);
+	jpips_printf("\n");
 	jpips_tag(END_RQ);
     }
     else if (use_readline)
