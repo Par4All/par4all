@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.132  1998/11/04 09:39:26  coelho
+%% props added for eole.
+%%
 %% Revision 1.131  1998/10/07 07:02:45  irigoin
 %% Property PRETTYPRINT_DATA_STATEMENTS added
 %%
@@ -101,7 +104,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/10/07 07:02:45 $~$
+$~$Date: 1998/11/04 09:39:26 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1554,6 +1557,25 @@ Cloning on an argument. If 0, a user request is performed.
 
 \begin{verbatim}
 TRANSFORMATION_CLONE_ON_ARGUMENT 0
+\end{verbatim}
+
+\subsection{Expression Optimizer}
+\index{Optimization}
+\index{EOLE}
+\index{EOLE\_FLAGS}
+\index{EOLE\_OPTIONS}
+
+EOLE: Evaluation Optimization of Loops and Expressions. 
+Julien Zory stuff integrated within pips. It relies on an external tool
+named \texttt{eole}. The version and options set can be controled from
+the following properties. The status is experimental. See the
+\texttt{OPTIMIZE\_EXPRESSION} pass for more details about the advanced
+transformations performed.
+
+\begin{verbatim}
+EOLE            "newgen_eole"
+EOLE_FLAGS      "-nfmd"
+EOLE_OPTIONS    ""
 \end{verbatim}
 
 
