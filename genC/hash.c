@@ -540,7 +540,13 @@ static unsigned int hash_chunk_rank(gen_chunk * key, int size)
 
 static int hash_string_equal(char * key1, char * key2)
 {
-  return strcmp(key1, key2)==0;
+  if (key1==key2)
+    return TRUE;
+  /* else check contents */
+  for(; *key1 && *key2; key1++, key2++)
+    if (*key1!=*key2)
+      return FALSE;
+  return *key1==*key2;
 }
 
 static int hash_int_equal(int key1, int key2)
