@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/11 13:27:07 $ 
+# $Date: 1996/07/18 09:11:28 $ 
 
 CPPFLAGS+=	$(WP65_ADDED_CPPFLAGS)
 
@@ -43,8 +43,9 @@ $(LOCAL_LIB):	$(OFILES)
 	$(AR) $(ARFLAGS) $(LOCAL_LIB) $(OFILES)
 	ranlib $(LOCAL_LIB)
 
+clean-compiled: clean
 clean:
-	-$(RM) *~ *.o
+	-$(RM) *~ *.o $(LOCAL_LIB)
 
 # that is all
 #
