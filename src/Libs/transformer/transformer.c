@@ -3,6 +3,15 @@
   * $Id$
   *
   * $Log: transformer.c,v $
+  * Revision 1.45  2001/10/22 16:00:02  irigoin
+  * New functions added to help with the evaluation of transformers with
+  * respect to preconditions. The transformer library should now be closer to
+  * what's really needed to be generic with respect to the abstraction
+  * used. But additional work is still needed!
+  *
+  * Mostly, transformer_range(), transformer_domain(),
+  * transformer_intersection(),... have been added.
+  *
   * Revision 1.44  2001/07/24 13:08:59  irigoin
   * Function  transformer_safe_combine_with_warnings() added to cope with side
   * effects in expressions. Bug fix in constant_constraint_check() for strings.
@@ -30,6 +39,11 @@
 /* #include "semantics.h" */
 
 #include "transformer.h"
+
+static Psysteme sc_identity(Psysteme sc)
+{
+  return sc;
+}
 
 /* e and f are assumed to be values, Type independent. */
 transformer 
@@ -389,7 +403,7 @@ transformer transformer_safe_combine_with_warnings(transformer tf1, transformer 
 
 /* Allocate a new transformer with constraints in t1 and t2.
  *
- * If t2 has no arguments, it restrains the doamin of t1. This
+ * If t2 has no arguments, it restrains the domain of t1. This
  * is necessary if image_only is true.
  *
  * If not, the two transformers are supposed to be two separate
@@ -483,6 +497,115 @@ transformer transformer_safe_image_intersection(transformer t1, transformer t2)
   return tf;
 }
 
+/* Restrict the domain of the relation tf with pre. pre is assumed to be
+ restricted to a store predicate: its argument list must be empty.
+
+ For a restriction on the image of tf, see transformer_image_intersection
+
+ tf is updated by side effect.
+ */
+transformer transformer_domain_intersection(transformer tf,
+					    transformer pre)
+{
+  transformer dom = transformer_dup(pre);
+
+  pips_assert("pre does not involve old values and has no arguments",
+	      ENDP(transformer_arguments(pre)));
+
+  /* if a value in pre is modified by tf, it must be renamed as an old
+     value */
+  MAP(ENTITY, a, {
+    entity na = entity_to_new_value(a);
+    entity oa = entity_to_old_value(a);
+    Psysteme pre_sc = predicate_system(transformer_relation(dom));
+    pre_sc = sc_variable_rename(pre_sc, (Variable) na, (Variable) oa);
+  }, transformer_arguments(tf));
+
+  /* transformer dom is not consistent since it references old values but
+     has no arguments */
+
+  tf = transformer_image_intersection(tf, dom);
+  free_transformer(dom);
+
+  return tf;
+}
+transformer transformer_safe_domain_intersection(transformer tf,
+						 transformer pre)
+{
+  if(!transformer_undefined_p(pre)) {
+      tf = transformer_undefined_p(tf) ? 
+	transformer_dup(pre) :
+	transformer_domain_intersection(tf, pre);
+  }
+    
+  return tf;
+}
+
+/* Return the range of relation tf in a newly allocated transformer.
+ * Projection of all old values.
+ */
+transformer transformer_range(transformer tf)
+{
+  transformer rtf = transformer_dup(tf);
+  list args = NIL;
+  Psysteme sc = predicate_system(transformer_relation(tf));
+  Pbase b = sc_base(sc);
+
+  MAP(ENTITY, a, {
+    entity ov = entity_to_old_value(a);
+
+    /* A variable may be modified but its old value does not have to
+       appear in the basis. Although the opposite is wrong. */
+    if(base_contains_variable_p(b, (Variable)  ov)) {
+      args = CONS(ENTITY, ov, args);
+    }
+  }, transformer_arguments(rtf));
+
+  /* rtf = transformer_projection(rtf, args); */
+  rtf = transformer_projection_with_redundancy_elimination(rtf, args,
+							   sc_identity);
+
+  gen_free_list(args);
+
+  gen_free_list(transformer_arguments(rtf));
+  transformer_arguments(rtf) = NIL;
+
+  return rtf;
+}
+transformer transformer_safe_range(transformer tf)
+{
+  transformer rtf = transformer_undefined;
+
+  if(!transformer_undefined_p(tf)) {
+    rtf = transformer_range(tf);
+  }
+  return rtf;
+}
+
+/* Restrict the range of relation tf with the range r.
+ *
+ * As a range, r is assumed to have no arguments.
+ */
+transformer transformer_range_intersection(transformer tf, transformer r)
+{
+  pips_assert("r does not involve old values and has no arguments",
+	      ENDP(transformer_arguments(r)));
+  tf = transformer_image_intersection(tf, r);
+
+  return tf;
+}
+
+static bool varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarval2)
+{
+    bool is_inferior = TRUE;
+    
+	is_inferior = (strcmp(generic_value_name((entity) vecteur_var(*pvarval1)), 
+			      generic_value_name((entity) vecteur_var(*pvarval2)))
+		       > 0 );
+
+    return is_inferior; 
+}
+
 /* eliminate (some) redundancy */
 transformer
 transformer_normalize(transformer t, int level)
@@ -509,7 +632,7 @@ transformer_normalize(transformer t, int level)
 	  
 	case 0:
 	  /* Our best choice for accuracy, but damned slow on ocean */
-	  r = sc_elim_redund(r);
+	  r = sc_safe_elim_redund(r);
 	  break;
 		    
 	case 1:
@@ -575,9 +698,7 @@ transformer_normalize(transformer t, int level)
 	  break;
 	  
 	case 4:
-	  /* Pretty lousy: equations are not even used to eliminate redundant 
-	   * inequalities!
-	   */
+	  vect_sort_in_place(&sc_base(r), varval_value_name_is_inferior_p);
 	  r = sc_normalize(r);
 	  break;
 	  
@@ -623,7 +744,9 @@ transformer transformer_temporary_value_projection(transformer tf)
 	tv = CONS(ENTITY, e, tv);
       }
     }
-    tf = transformer_projection(tf, tv);
+    /* tf = transformer_projection(tf, tv); */
+    /* tf = transformer_projection_with_redundancy_elimination(tf, tv, sc_identity); */
+    tf = transformer_projection_with_redundancy_elimination(tf, tv, sc_safe_normalize);
   }
   else ifdebug(9) {
     Psysteme r = (Psysteme) predicate_system(transformer_relation(tf));
@@ -646,7 +769,7 @@ transformer transformer_temporary_value_projection(transformer tf)
 }
 
 /* transformer transformer_projection(transformer t, cons * args):
- * projection of t along the hyperplane defined by entities in args;
+ * projection of t along the hyperplane defined by values in args;
  * this generate a projection and not a cylinder based on the projection
  *
  * use the most complex/complete redundancy elimination in Linear
@@ -654,13 +777,44 @@ transformer transformer_temporary_value_projection(transformer tf)
  * args is not modified. t is modified by side effects.
  */
 transformer 
-transformer_projection(t, args)
-transformer t;
-cons * args;
+transformer_projection(transformer t, list args)
 {
-    t = transformer_projection_with_redundancy_elimination(t, args,
-							   sc_safe_elim_redund);
-    return t;
+  /* sc_safe_elim_redund() may increase the rational generating system */
+  /* t = transformer_projection_with_redundancy_elimination(t, args,
+     sc_safe_elim_redund); */
+  t = transformer_projection_with_redundancy_elimination(t, args,
+							 sc_safe_normalize);
+  return t;
+}
+
+/* transformer transformer_projection(transformer t);
+ * projection of t along the hyperplane defined by values of variables in arguments;
+ * this generate a projection and not a cylinder based on the projection
+ *
+ * use the most complex/complete redundancy elimination in Linear
+ *
+ * args is not modified. t is modified by side effects.
+ */
+transformer 
+transformer_arguments_projection(transformer t)
+{
+  list args = NIL;
+  Psysteme sc = predicate_system(transformer_relation(t));
+  Pbase b = sc_base(sc);
+
+  MAP(ENTITY, a, {
+    entity ov = entity_to_old_value(a);
+    entity nv = entity_to_new_value(a);
+
+    if(base_contains_variable_p(b, (Variable) ov))
+      args = CONS(ENTITY, ov, args);
+    if(base_contains_variable_p(b, (Variable)  nv))
+      args = CONS(ENTITY, nv, args);
+  }, transformer_arguments(t));
+
+  t = transformer_projection(t, args);
+  gen_free_list(args);
+  return t;
 }
 
 Psysteme 
@@ -825,6 +979,15 @@ transformer transformer_apply(transformer tf, transformer pre)
 
     return post;
 }
+transformer transformer_safe_apply(transformer tf, transformer pre)
+{
+  transformer post = transformer_undefined;
+
+  if(!transformer_undefined_p(tf) && !transformer_undefined_p(pre))
+    post = transformer_apply(tf, pre);
+
+  return post;
+}
 
 /* transformer transformer_filter(transformer t, cons * args):
  * projection of t along the hyperplane defined by entities in args;
@@ -835,7 +998,7 @@ transformer transformer_apply(transformer tf, transformer pre)
  * no basis is carried in the current implementation of an empty system,
  * this cannot be performed (FI, 7/12/92).
  *
- * formal argument args is not modified
+ * formal argument args is not modified. t is updated by side effect.
  *
  * Note: this function is almost equal to transformer_projection();
  * however, entities of args do not all have to appear in t's relation;
@@ -1025,6 +1188,7 @@ transformer invariant_wrt_transformer(transformer p, transformer tf)
   transformer inv = transformer_undefined;
   transformer fptf = transformer_undefined;
 
+  if(!transformer_undefined_p(p)) {
   if(FALSE)
   {
     fptf = args_to_transformer(transformer_arguments(tf));
@@ -1039,6 +1203,10 @@ transformer invariant_wrt_transformer(transformer p, transformer tf)
   inv = transformer_apply(fptf, p); /* tf? fptf? */
 
   transformer_free(fptf); /* must be freed, otherwise it is leaked. */
+  }
+  else {
+    inv = transformer_undefined;
+  }
   return inv;
 }
 
