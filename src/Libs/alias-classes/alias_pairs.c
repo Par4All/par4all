@@ -119,7 +119,7 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 		    region real_reg;
 		    list pair;
 
-	     pips_debug(8, "translating region %s\n",region_to_string(callee_region));
+	     pips_debug(8,"transl reg %s\n",region_to_string(callee_region));
 
 		    real_reg =
 			region_translation(
@@ -132,7 +132,7 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 			    VALUE_ZERO,
 			    BACKWARD);
 		    
-		    pips_debug(8, "to %s\n",region_to_string(real_reg));
+		    pips_debug(8,"to %s\n",region_to_string(real_reg));
 
 		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
 		    pair = gen_nconc(pair,CONS(EFFECT,real_reg,NIL));
