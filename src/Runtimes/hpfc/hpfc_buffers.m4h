@@ -2,7 +2,7 @@
 ! COMMON /HPFC BUFFERS/ 
 !
 ! $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-! ($Date: 1996/10/17 14:44:07 $, )
+! ($Date: 1997/01/07 11:14:50 $, )
 !
 ! buffers to avoid small pvmf(un)pack calls...
 ! and to sends buckets of messages if necessary...
@@ -18,7 +18,6 @@
      $     REAL8 BUFFSIZE,
      $     COMPLEX8 BUFFSIZE,
      $     COMPLEX16 BUFFSIZE,
-     $     BUFFER ENCODING,
      $     LAZY SEND,
      $     LAZY RECV,
      $     SEND NOT INITIALIZED,
@@ -32,8 +31,7 @@
      $     REAL4 BUFFSIZE,
      $     REAL8 BUFFSIZE,
      $     COMPLEX8 BUFFSIZE,
-     $     COMPLEX16 BUFFSIZE,
-     $     BUFFER ENCODING
+     $     COMPLEX16 BUFFSIZE
       logical
      $     LAZY SEND,
      $     LAZY RECV,
@@ -41,6 +39,11 @@
      $     RECEIVED NOT PERFORMED
       ifdef(`_HPFC_NO_BYTE1_',character,byte)
      $     DATA BUFFER
+!
+! PVM encoding to use.
+!
+      integer BUFFER ENCODING
+      parameter (BUFFER ENCODING = _HPFC_ENCODING_)
 !
 ! buffer sizes
 !
