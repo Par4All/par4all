@@ -1,13 +1,12 @@
-/*
- * HPFC module by Fabien COELHO
+/* HPFC module by Fabien COELHO
  *
  * This file provides functions used by directives.c to deal with 
  * dynamic mappings (re*). It includes keeping track of variables 
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/08/01 15:02:40 $, )
- * version $Revision$
+ * $RCSfile: dynamic.c,v $ version $Revision$
+ * ($Date: 1995/08/01 17:45:58 $, )
  */
 
 #include "defines-local.h"
@@ -17,17 +16,16 @@
 #include "semantics.h"
 #include "effects.h"
 
-/*--------------------------------------------------
- *
- *        UTILITIES
- */
-
 /*  DYNAMIC MANAGEMENT
  *
  * the synonyms of a given array are stored in a entities.
  * What I intend as a synonym is a version of the array or template
  * which is distributed or aligned in a different way.
  * the renamings are associated to the remapping statements here.
+ * - dynamic_hpf: keeps track of entities declared as dynamic.
+ * - primary_entity: primary entity of an entity, when synonyms are 
+ *   introduced to handle remappings.
+ * - renamings: remappings associated to a statement.
  */
 GENERIC_GLOBAL_FUNCTION(dynamic_hpf, entity_entities);
 GENERIC_GLOBAL_FUNCTION(primary_entity, entitymap);
@@ -35,7 +33,7 @@ GENERIC_GLOBAL_FUNCTION(renamings, statement_renamings);
 
 #define primary_entity_p(a) (a==load_primary_entity(a))
 
-/*   DYNAMIC STATUS
+/*   DYNAMIC STATUS management.
  */
 void init_dynamic_status()
 {
@@ -100,8 +98,7 @@ entity new_e, e;
 {
     entities es = load_dynamic_hpf(e);
 
-    debug(3, "add_dynamic_synonym", "%s added to %s synonyms\n",
-	  entity_name(new_e), entity_name(e));
+    pips_debug(3, "%s as %s synonyms\n", entity_name(new_e), entity_name(e));
 
     assert(dynamic_entity_p(e) && !dynamic_entity_p(new_e));
 
@@ -110,10 +107,7 @@ entity new_e, e;
     store_primary_entity(new_e, load_primary_entity(e));
 }
 
-/*------------------------------------------------------------------
- *
- *   NEW ENTITIES FOR MANAGING DYNAMIC ARRAYS
- *
+/*   NEW ENTITIES FOR MANAGING DYNAMIC ARRAYS
  */
 
 /*  builds a synonym for entity e. The name is based on e, plus
@@ -130,7 +124,7 @@ entity e;
     
     sprintf(new_name, "%s_%x", entity_local_name(primary), (unsigned int) n);
 
-    debug(5, "new_synonym", "building entity %s\n", new_name);
+    pips_debug(5, "building entity %s\n", new_name);
 
     new_e = FindOrCreateEntityLikeModel(module, new_name, primary);
     AddEntityToDeclarations(new_e, get_current_module_entity());
@@ -249,19 +243,15 @@ entity array_synonym_aligned_as(array, a)
 entity array;
 align a;
 {
-    entities es = load_dynamic_hpf(array);
-    list /* of entities */ l = entities_list(es);
-
-    for (; !ENDP(l); POP(l))
+    MAP(ENTITY, ar,
     {
-	entity ar = ENTITY(CAR(l));
-
 	if (same_align_p(load_entity_align(ar), a))
 	{
 	    free_align(a);
 	    return ar;    /* the one found is returned */
 	}
-    }
+    },
+	entities_list(load_dynamic_hpf(array)));
 
     /*  else no compatible array does exist, so one must be created
      */
@@ -293,26 +283,39 @@ entity template_synonym_distributed_as(temp, d)
 entity temp;
 distribute d;
 {
-    entities es = load_dynamic_hpf(temp);
-    list /* of entities */ l = entities_list(es);
-
-    for (; !ENDP(l); POP(l))
+    MAP(ENTITY, t,
     {
-	entity t = ENTITY(CAR(l));
-
 	if (same_distribute_p(load_entity_distribute(t), d))
 	{
 	    free_distribute(d);
 	    return t;    /* the one found is returned */
 	}
-    }
+    },
+	entities_list(load_dynamic_hpf(temp)));
 
     /*  else no compatible template does exist, so one must be created
      */
     return new_synonym_template(temp, d);
 }
 
-/* DYNAMIC LOCALS
+/* DYNAMIC LOCAL DATA
+ *
+ * these static functions are used to store the remapping graph
+ * while it is built, or when optimizations are performed on it.
+ *
+ * - alive_synonym: used when building the remapping graph. synonym of 
+ *   a primary entity that has reached a given remapping statement. Used 
+ *   for both arrays and templates. 
+ * - used_dynamics: from a remapping statement, the remapped arrays that 
+ *   are actually referenced in their new shape.
+ * - remapping_graph: the remapping graph, based on the control domain.
+ *   the control_statement is the remapping statement in the code.
+ *   predecessors and successors are the possible remapping statements 
+ *   for the arrays remapped at that vertex.
+ * - reaching_mappings: the mappings that may reached a vertex.
+ * - leaving_mappings: the mappings that may leave the vertex. 
+ *   (simplification assumption: only one per array)
+ * - remapped: the (primary) arrays remapped at the vertex.
  */
 GENERIC_LOCAL_FUNCTION(alive_synonym, statement_entities);
 GENERIC_LOCAL_FUNCTION(used_dynamics, statement_entities);
@@ -543,23 +546,15 @@ entity old, new;
     close_ctrl_graph_travel();
 }
 
-/*------------------------------------------------------------------
- *
- *              REMAPPING GRAPH REMAPS "SIMPLIFICATION"
- *
+/*   REMAPPING GRAPH REMAPS "SIMPLIFICATION"
  */
 
-/* UNUSED PROPAGATION
- */
 /* for statement s
  * - remapped arrays
- * - reaching mappings (1 per array if static)
- * - leaving mappings (1 per remapped array)
- * - none propagated.
- * C_a = static code (m), extended static code (m*r).
+ * - reaching mappings (1 per array, or more)
+ * - leaving mappings (1 per remapped array, to simplify)
  */
-static void 
-initialize_reaching_propagation(s)
+static void initialize_reaching_propagation(s)
 statement s;
 {
     list /* of entities */ le = NIL, lp = NIL, ll = NIL;
@@ -583,11 +578,7 @@ statement s;
     store_leaving_mappings(s, make_entities(ll));
 }
 
-/* {sh,c}ould be integrated in the mapping propagation phase ?
- * C_d = m
- */
-static void 
-remove_not_remapped_leavings(s)
+static void remove_not_remapped_leavings(s)
 statement s;
 {
     entities leaving  = load_leaving_mappings(s);
@@ -615,8 +606,7 @@ statement s;
     gen_free_list(ll), entities_list(leaving) = ln;
 }
 
-static void
-reinitialize_reaching_mappings(s)
+static void reinitialize_reaching_mappings(s)
 statement s;
 {
     entities er = load_reaching_mappings(s);
@@ -639,8 +629,7 @@ statement s;
     entities_list(er) = newr;
 }
 
-static list /* of statements */
-propagate_used_arrays(s, ls)
+static list /* of statements */ propagate_used_arrays(s, ls)
 statement s;
 list /* of statements */ ls;
 {
@@ -688,9 +677,6 @@ list /* of statements */ ls;
     return ls;
 }
 
-
-/* C_g = r (if tests all the remaps for the primary, but 1 if primaries).
- */
 static void remove_from_entities(primary, es)
 entity primary;
 entities es;
@@ -707,10 +693,7 @@ entities es;
     gen_free_list(le);
 }
 
-/* C_h = m*C_g
- */
-static void 
-remove_unused_remappings(s)
+static void remove_unused_remappings(s)
 statement s;
 {
     entities remapped = load_remapped(s),
@@ -733,7 +716,8 @@ statement s;
     gen_free_list(le);
 }
 
-/* C_j = m*r
+/* regenerate the renaming structures after the optimizations performed on 
+ * the remapping graph. 
  */
 static void regenerate_renamings(s)
 statement s;
@@ -742,13 +726,12 @@ statement s;
 	lr = entities_list(load_reaching_mappings(s)),
 	ll = entities_list(load_leaving_mappings(s)),
 	ln = NIL;
-    entity primary;
     
     what_stat_debug(4, s);
 
     MAP(ENTITY, target,
     {
-	primary = load_primary_entity(target);
+	entity primary = load_primary_entity(target);
 
 	MAP(ENTITY, source,
 	{
@@ -770,10 +753,7 @@ statement s;
     }
 }
 
-/* C_k = n
- */
-static list /* of statements */ 
-list_of_remapping_statements()
+static list /* of statements */ list_of_remapping_statements()
 {
     list /* of statements */ l = NIL;
     CONTROLMAP_MAP(s, c, l = CONS(STATEMENT, s, l), get_remapping_graph());
@@ -828,7 +808,7 @@ statement s;
  *    assumes fast sets instead of lists, with O(1) tests/add/del...
  *    closure: O(n^2*vertex_operation) (if it is a simple propagation...)
  *    map: O(n*vertex_operation)
- *    C = 
+ *    C = n^2 q m r
  */
 void simplify_remapping_graph()
 {
@@ -923,6 +903,7 @@ entity src, trg;
          /* of expressions */ idx_expr,
          /* of dimensions */  dims;
     statement current;
+    entity module;
     int ndims, i;
 
     assert(array_distributed_p(src) &&
@@ -935,11 +916,8 @@ entity src, trg;
     
     /*  builds the set of indexes needed to scan the dimensions.
      */
-    for(i=ndims; i>0; i--)
-	indexes = 
-	    CONS(ENTITY, 
-		 hpfc_new_variable(get_current_module_entity(), is_basic_int),
-		 indexes);
+    for(module=get_current_module_entity(), i=ndims; i>0; i--)
+      indexes = CONS(ENTITY, hpfc_new_variable(module, is_basic_int), indexes);
 
     idx_expr = entity_list_to_expression_list(indexes);
 
@@ -950,7 +928,7 @@ entity src, trg;
 	(reference_to_expression(make_reference(trg, idx_expr)),
 	 reference_to_expression(make_reference(src, gen_copy_seq(idx_expr))));
 
-    /*  builds the loop nest
+    /*  builds the copy loop nest
      */
     for(; ndims>0; POP(dims), POP(indexes), ndims--)
     {
