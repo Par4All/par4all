@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.324  1998/04/16 08:21:51  coelho
+# typo.
+#
 # Revision 1.323  1998/04/16 08:20:18  coelho
 # compilation macros reordered.
 #
@@ -438,7 +441,7 @@ CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
 # a typical interesting example is to put -pg in {C,LD}OPT
 #
 PREPROC=  \$(CC) -E \$(CANSI) \$(CPPOPT) \$(CPPFLAGS)
-COMPILE=  \$(CC) \$(CANSI)\ $(CFLAGS) \$(COPT) \$(CPPOPT) \$(CPPFLAGS) -c
+COMPILE=  \$(CC) \$(CANSI) \$(CFLAGS) \$(COPT) \$(CPPOPT) \$(CPPFLAGS) -c
 F77COMPILE=\$(FC) \$(FFLAGS) \$(FOPT) -c
 LINK=	  \$(LD) \$(LDFLAGS) \$(LDOPT) -o
 SCAN=	  \$(LEX) \$(LFLAGS) \$(LOPT) -t
