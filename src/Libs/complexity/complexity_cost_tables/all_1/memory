@@ -1,0 +1,13 @@
+# cost_memory_1  - Unity cost for memory access intrinsics
+
+#		int	float	double	complex	double-complex    <-- type of argument(s)
+
+MEMORY-READ	1	1	1	1	1
+=		0	0	0	0	0
+# l'assignation "=" n'a que des couts 0 parce que:
+#
+# dans l'instruction "I = N",
+# un acces memoire est compte pour N et aussi un pour I
+# mettre des couts nuls au "=" revient a dire que la
+# lecture et l'ecriture ont le meme cout.
+
