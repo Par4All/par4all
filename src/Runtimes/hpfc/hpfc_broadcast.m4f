@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_broadcast.m4f,v $ (version $Revision$)
-! $Date: 1996/10/17 13:50:38 $, 
+! $Date: 1997/01/02 17:55:46 $, 
 !
 ! management of broadcasts
 ! typical call: hpfc broadcast x(lid, [number, step]*x)
@@ -96,7 +96,7 @@ SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
       debug(print *, "[hpfc remapbrd LEVEL] done")
       end')dnl
 
-forloop(`_D_',1,_HPFC_DIMENSIONS_,`GENERIC_BROADCAST(_D_)')
+forloop(`_D_',0,_HPFC_DIMENSIONS_,`GENERIC_BROADCAST(_D_)')
 !
 ! that is all
 !
