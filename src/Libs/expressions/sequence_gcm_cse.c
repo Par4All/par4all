@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.24  2000/07/29 17:05:24  phamdinh
+   W effects is resolved!
+
    Revision 1.23  2000/07/28 14:12:20  phamdinh
    	* Number of use of every new variable is counted (using the field
    	'comments' of the statement defining it. This value is modified
@@ -231,6 +234,11 @@ GENERIC_LOCAL_FUNCTION(inserted, persistant_statement_to_statement)
 static list current_availables = NIL;
 static statement current_statement = statement_undefined;
 
+/* PDSon: w_effect store all the variables modified 
+ * in the sequence of statement
+ */
+static list *w_effects;
+
 /* keep track of nesting.
  */
 static void push_nesting(statement s)
@@ -428,27 +436,32 @@ assign_statement_p(statement s)
   return FALSE;
 }
 
+/* Return the expression in the left side of an assign statement 
+ */
+static expression
+expr_left_side_of_assign_statement(statement stat)
+{
+  if (assign_statement_p(stat))
+  {
+    call assign = instruction_call(statement_instruction(stat));
+    return EXPRESSION(CAR(call_arguments(assign)));
+  }
+
+  pips_internal_error("It is not an assign statement !");
+
+  return NULL;
+}
+
 /* Return the entity in left side of an assign statement 
  */
 static entity 
 left_side_of_assign_statement(statement stat)
 {
-  instruction i;
-  call assign;
-  expression left_side;
-  // Here, the statement stat is an assignment
-  
-  i = statement_instruction(stat);
-  pips_assert("Instruction is a call", 
-	      instruction_call_p(i));
-  assign = instruction_call(i);
+  expression left_side = expr_left_side_of_assign_statement(stat);
 
-  pips_assert("Call is an assignment!", 
-	      ENTITY_ASSIGN_P(call_function(assign)));
-  left_side = EXPRESSION(CAR(call_arguments(assign)));
-
-  pips_assert("Left side is a reference!", 
+  pips_assert("Left side is not a reference!", 
 	      syntax_reference_p(expression_syntax(left_side)));
+
   return reference_variable(syntax_reference(expression_syntax(left_side)));
 }
 
@@ -1219,6 +1232,9 @@ typedef struct
   statement container; /* statement in which it appears (for atomization) */
   expression contents; /* call or reference... could be a syntax? */
   list available_contents; /* part of which is available */
+
+  /* Added by PDSon*/
+  list *w_effects; /* list of expression */ 
 }
   available_scalar_t, * available_scalar_pt;
 
@@ -1339,15 +1355,15 @@ common_expressions(list args, list avails)
 }
 
 static void 
-dump_common_exp(list common_exp)
+dump_list_of_exp(list l)
 {
-  fprintf(stderr,"\n======\nDUMP COMMON EXPRESSIONS \n");
-  fprintf(stderr,"Length: %d\n", gen_length(common_exp));
+  fprintf(stderr,"\n======\nDUMP LIST OF EXPRESSIONS \n");
+  fprintf(stderr,"Length: %d\n", gen_length(l));
   MAP(EXPRESSION, e, 
   {
     print_expression(e);
   },
-      common_exp);
+      l);
 
   fprintf(stderr,"\n======\nEND DUMP\n");
 }
@@ -1370,7 +1386,17 @@ dump_expresison_nary(expression e)
   fprintf(stderr,"\n===== END DUMP EXPRESSION!! \n");  
 }
 
-static int similarity(expression e, available_scalar_pt aspt)
+static list /* of expression */
+list_diff(list l1, list l2); /* Defined forward */
+
+static bool  /* Defined forward */
+expression_eq_in_list_p(expression e, list l, expression *f);
+
+/* Find the commun sub-expression between e & aspt. 
+ * Attention: Commun expression does't contain any expression in w_effect
+ */
+static int 
+similarity(expression e, available_scalar_pt aspt)
 {
   syntax s = expression_syntax(e), sa = expression_syntax(aspt->contents);
 
@@ -1383,48 +1409,60 @@ static int similarity(expression e, available_scalar_pt aspt)
   if (syntax_tag(s)!=syntax_tag(sa)) return NO_SIMILARITY;
   
   if (syntax_reference_p(s))
+  {
+    reference r = syntax_reference(s), ra = syntax_reference(sa);
+    if (reference_equal_p(r, ra)) 
     {
-      reference r = syntax_reference(s), ra = syntax_reference(sa);
-      if (reference_equal_p(r, ra)) return MAX_SIMILARITY;
+      return MAX_SIMILARITY;
     }
+  }
 
   if (syntax_call_p(s))
+  {
+    call c = syntax_call(s), ca = syntax_call(sa);
+    entity cf = call_function(c);
+    if (cf!=call_function(ca)) return NO_SIMILARITY;
+    
+    /* same function...
+     */
+    if (Is_Associatif_Commutatif(cf))
     {
-      call c = syntax_call(s), ca = syntax_call(sa);
-      entity cf = call_function(c);
-      if (cf!=call_function(ca)) return NO_SIMILARITY;
-
-      /* same function...
-       */
-      if (Is_Associatif_Commutatif(cf))
-	{
-	  /* similarity is the number of args in common.
-	     inversion is not tested at the time.
-	   */
-	  list com = common_expressions(call_arguments(c),
-					aspt->available_contents);
-	  int n = gen_length(com);
-	  gen_free_list(com);
-	  if (n<=1) return NO_SIMILARITY;
-	  return (n == gen_length(call_arguments(ca)) &&
-	          n == gen_length(call_arguments(c))) ? MAX_SIMILARITY: n;
-	}
-      else
-	{
-	  /* any call: must be equal
-	   */
-	  list l = call_arguments(c), la = call_arguments(ca);
-	  pips_assert("same length", gen_length(l)==gen_length(la));
-	  for (; l; l = CDR(l), la = CDR(la))
-	    {
-	      expression el = EXPRESSION(CAR(l)), ela = EXPRESSION(CAR(la));
-	      if (!expression_equal_p(el, ela))
-		return NO_SIMILARITY;
-	    }
-	  return MAX_SIMILARITY;
-	}
+      /* similarity is the number of args in common.
+	 inversion is not tested at the time.
+      */
+      list com = common_expressions(list_diff(call_arguments(c), 
+					      *(aspt->w_effects)),
+				    aspt->available_contents);
+      int n = gen_length(com);
+      gen_free_list(com);
+      if (n<=1) return NO_SIMILARITY;
+      return (n == gen_length(call_arguments(ca)) &&
+	      n == gen_length(call_arguments(c))) ? MAX_SIMILARITY: n;
     }
-
+    else
+    {
+      /* any call: must be equal
+       */
+      list l = call_arguments(c), la = call_arguments(ca);
+      pips_assert("same length", gen_length(l)==gen_length(la));
+      for (; l; l = CDR(l), la = CDR(la))
+      {
+	expression el = EXPRESSION(CAR(l)), ela = EXPRESSION(CAR(la));
+	if (!expression_equal_p(el, ela))
+	{
+	  return NO_SIMILARITY;
+	}
+	
+	if (expression_eq_in_list_p(el, *(aspt->w_effects), &el))
+	{
+	  /* A variable is already modified ! */
+	  return NO_SIMILARITY;
+	}
+      }
+      return MAX_SIMILARITY;
+    }
+  }
+  
   return NO_SIMILARITY;
 }
 
@@ -1440,7 +1478,7 @@ best_similar_expression(expression e, int * best_quality)
     int quality = similarity(e, aspt);
     if (quality==MAX_SIMILARITY) 
     {
-	(*best_quality) = quality;
+      (*best_quality) = quality;
       return aspt;
     }
     if (quality>0 && (*best_quality)<quality)
@@ -1448,8 +1486,7 @@ best_similar_expression(expression e, int * best_quality)
 	best = aspt;
 	(*best_quality) = quality;
       }
-  },
-       current_availables);
+  }, current_availables);
 
   return best;
 }
@@ -1470,6 +1507,8 @@ make_available_scalar(
   aspt->contents = contents;
 
   aspt->depends = get_all_entities(contents);
+
+  aspt->w_effects = w_effects;
 
   if (syntax_call_p(s))
     {
@@ -1492,12 +1531,14 @@ make_available_scalar(
 static bool expression_eq_in_list_p(expression e, list l, expression *f)
 {
   MAP(EXPRESSION, et,
-      if (expression_equal_p(e, et))
-      {
-	*f = et;
-	return TRUE;
-      },
-      l);
+  {
+    if (expression_equal_p(e, et))
+    {
+      *f = et;
+      return TRUE;
+    }
+  }, l);
+
   return FALSE;
 }
 
@@ -1510,18 +1551,18 @@ static list /* of expression */ list_diff(list l1, list l2)
   expression found;
 
   MAP(EXPRESSION, e,
-      if (expression_eq_in_list_p(e, l2bis, &found))
-      {
-	gen_remove(&l2bis, found);
-      }
-      else
-      {
-	diff = CONS(EXPRESSION, e, diff);
-      },
-      l1);
+  {
+    if (expression_eq_in_list_p(e, l2bis, &found))
+    {
+      gen_remove(&l2bis, found);
+    }
+    else
+    {
+      diff = CONS(EXPRESSION, e, diff);
+    }
+  }, l1);
 
-  pips_assert("list should be empty...", !l2bis);
-  /* if (l2bis) gen_free_list(l2bis); */
+  if (l2bis) gen_free_list(l2bis);
 
   return diff;
 }
@@ -1637,10 +1678,11 @@ static void atom_cse_expression(expression e)
 	      there is a common part to build,
 	      and a CSE to substitute in both...
 	    */
-	    in_common = common_expressions(call_arguments(c),
+	    in_common = common_expressions(list_diff(call_arguments(c),
+						     *(aspt->w_effects)),
 					   aspt->available_contents);
 	    /* Test
-	       dump_common_exp(in_common);
+	       dump_list_of_exp(in_common);
 	    */
 	    
 	    /* Case: in_common == aspt->contents 
@@ -1871,6 +1913,18 @@ atomize_cse_this_statement_expressions(statement s, list availables)
   current_statement = statement_undefined;
   current_availables = NIL;
 
+  /* Update w_effects */
+  if (assign_statement_p(s))
+  {
+    /* Update contents */
+    expression var_defined = 
+      copy_expression(expr_left_side_of_assign_statement(s));
+    *w_effects = CONS(EXPRESSION, var_defined, NIL);
+
+    /* Update address */
+    w_effects = &CDR(*w_effects);
+  }
+
   return availables;
 }
 
@@ -1878,15 +1932,28 @@ atomize_cse_this_statement_expressions(statement s, list availables)
 static bool seq_flt(sequence s)
 {
   list availables = NIL;
+  list *top_of_w_effects;
+
+  /* At first, content of w_effects = NIL */
+  w_effects = &CDR(CONS(EXPRESSION, NIL, NIL));
+
+  /* top_of_w_effects points to the top of list, for freeing later */
+  top_of_w_effects = w_effects;
 
   /* fprintf(stderr, "considering sequence %d\n", 
      gen_length(sequence_statements(s))); */
 
   MAP(STATEMENT, ss,
-      /* should clean availables with effects...
-       */
-      availables = atomize_cse_this_statement_expressions(ss, availables),
-      sequence_statements(s));
+  {
+    /* dump_list_of_exp(*w_e); */
+
+    /* should clean availables with effects...
+     */
+    availables = atomize_cse_this_statement_expressions(ss, availables);
+
+  }, sequence_statements(s));
+
+  /* Free top_of_w_effects and availables.... */
 
   return TRUE;
 }
