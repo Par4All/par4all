@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.11  2003/06/20 11:07:38  irigoin
+%% Reformatting to ease the derivation of resources.h
+%%
 %% Revision 1.10  2003/06/20 11:01:26  irigoin
 %% New module resources height and depth added.
 %%
@@ -505,7 +508,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/06/20 11:01:26 $~$
+$~$Date: 2003/06/20 11:07:38 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1210,7 +1213,9 @@ zero if the module has no callers. Else, it it the mazimal depth of the
 callers plus one.
 
 \begin{verbatim}
-callgraph                       > ALL.callers > ALL.height > ALL.depth
+callgraph                       > ALL.callers
+                                > ALL.height
+                                > ALL.depth
         < ALL.callees
 \end{verbatim}
 
