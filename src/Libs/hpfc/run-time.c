@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1996/09/07 16:27:07 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1996/10/18 22:24:33 $, )
  * version $Revision$,
  */
 
@@ -597,7 +597,8 @@ static RunTimeSupportDescriptor RTSTable[] =
     { RECV_CHANNELS, 	1, is_var, no_basic, no_entity },
     { MCASTHOST, 	0, is_var, no_basic, no_entity },
     { HOST_TID, 	0, is_var, no_basic, no_entity },
-    { HOST_CHANNEL, 	0, is_var, no_basic, no_entity },
+    { HOST_SND_CHAN, 	0, is_var, no_basic, no_entity },
+    { HOST_RCV_CHAN, 	0, is_var, no_basic, no_entity },
 
 /* common /hpfc_buffers/
  */
