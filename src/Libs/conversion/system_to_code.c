@@ -4,7 +4,7 @@
  *
  * SCCS stuff:
  * $RCSfile: system_to_code.c,v $ version $Revision$, 
- * ($Date: 1996/07/09 23:15:53 $, ) 
+ * ($Date: 1996/07/22 18:46:29 $, ) 
  */
 
 /* Standard includes
@@ -204,9 +204,9 @@ set_information_for_code_optimizations(
     {
 	if (vect_simple_definition_p(contrainte_vecteur(c), &var, &coe, &cst))
 	{
-	    val = DIVIDE(-cst, coe);
-	    store_an_upper((entity) var, (int) val);
-	    store_a_lower((entity) var, (int) val);
+	    val = value_div(value_uminus(cst), coe);
+	    store_an_upper((entity) var, VALUE_TO_INT(val));
+	    store_a_lower((entity) var, VALUE_TO_INT(val));
 	}
     }
 
@@ -216,12 +216,19 @@ set_information_for_code_optimizations(
     {
 	if (vect_simple_definition_p(contrainte_vecteur(c), &var, &coe, &cst))
 	{
-	    if (coe>0) /* UPPER */
-		store_an_upper((entity) var, 
-			       (int) POSITIVE_DIVIDE(-cst, coe));
+	    if (value_pos_p(coe)) /* UPPER */
+	    {
+		Value n = value_uminus(cst),
+		      r = value_pdiv(n, coe);
+		store_an_upper((entity) var, VALUE_TO_INT(r));
+	    }
 	    else /* LOWER */
-		store_a_lower((entity) var, 
-			      (int) POSITIVE_DIVIDE(cst-coe-1, -coe));
+	    {
+		Value n = value_minus(cst,value_plus(coe,VALUE_ONE)),
+		      d = value_uminus(coe),
+		      r = value_pdiv(n,d);
+		store_a_lower((entity) var, VALUE_TO_INT(r));
+	    }
 	}
     }
 }
@@ -248,8 +255,8 @@ range_of_variable(
     if (!bound_lowers_p(var) || !bound_uppers_p(var))
 	return FALSE;
 
-    *lb = (Value) load_lowers((entity) var);
-    *ub = (Value) load_uppers((entity) var);
+    *lb = int_to_value(load_lowers((entity) var));
+    *ub = int_to_value(load_uppers((entity) var));
 
     return TRUE;
 }
@@ -263,7 +270,7 @@ static Value vecteur_lower_bound(
     Variable var;
 
     if (lowers_undefined_p() || uppers_undefined_p()) 
-	return INT_MIN; /* no information available, that's for sure */
+	return VALUE_MIN; /* no information available, that's for sure */
 
     for(; v; v=v->succ)
     {
@@ -271,19 +278,25 @@ static Value vecteur_lower_bound(
 	val = val_of(v);
 
 	if (var==TCST) 
-	    bound += val ;
+	    value_addto(bound,val) ;
 	else
 	{
-	    if (val>0)
-	    {
-		if (!bound_lowers_p(var)) return INT_MIN;
-		bound += val * load_lowers(var);
-	    }
+	    int il;
+	    Value vl,p;
+	    if (value_pos_p(val))
+		if (!bound_lowers_p(var)) 
+		    return VALUE_MIN;
+		else
+		    il = load_lowers(var);
 	    else /* val < 0, I guess */
-	    {
-		if (!bound_uppers_p(var)) return INT_MIN;
-		bound += val * load_uppers(var);
-	    }
+		if (!bound_uppers_p(var))
+		    return VALUE_MIN;
+		else
+		    il = load_uppers(var);
+	    
+	    vl = int_to_value(il);
+	    p = value_mult(val,vl);
+	    value_addto(bound,p);
 	}
     }
 
@@ -304,22 +317,25 @@ evaluate_divide_if_possible(
 	Value coef = val_of(v), lb, ub;
 
 	if (var==TCST)
-	    min+=coef, max+=coef;
+	    value_addto(min,coef), value_addto(max,coef);
 	else
 	{
+	    Value cu,cl;
 	    if (!range_of_variable(var, &lb, &ub))
 		return FALSE;
-
-	    if (coef>0)
-		min+=coef*lb, max+=coef*ub;
+	    cu = value_mult(coef,ub);
+	    cl = value_mult(coef,lb);
+	    
+	    if (value_pos_p(coef))
+		value_addto(min,cl), value_addto(max,cu);
 	    else
-		min+=coef*ub, max+=coef*lb;
+		value_addto(min,cu), value_addto(max,cl);
 	}
     }
 
-    *result = DIVIDE(min, denominator);
+    *result = value_div(min, denominator);
 
-    return *result==DIVIDE(max, denominator);
+    return value_eq(*result,value_div(max, denominator));
 }
 
 /* expression constraints_to_loop_bound(c, var, is_lower)
@@ -357,7 +373,7 @@ constraints_to_loop_bound(
   s = sc_make(NULL, contraintes_dup(c));
   vect_sort(sc_base(s), compare_Pvecteur);
   sc_sort_constraints(s, sc_base(s));
-
+  
   /*  each constraint is considered in turn to generate a bound
    */
   for(c=sc_inegalites(s); c; c=c->succ)
@@ -366,16 +382,17 @@ constraints_to_loop_bound(
       Pvecteur vdiv = vect_del_var(c->vecteur, var), vadd = VECTEUR_NUL, v;
       expression ediv, eadd, e;
 
-      message_assert("coherent value and sign", sign*val>0);
+      message_assert("coherent value and sign", sign*value_sign(val)>0);
 
-      if (val>0) 
+      if (value_pos_p(val)) 
 	  vect_chg_sgn(vdiv);
       else
 	  /*  ax+b <= 0 and a<0 => x >= (b+(-a-1))/(-a)
 	   */
-	  val=-val, vect_add_elem(&vdiv, TCST, val-1);
+	  value_oppose(val), 
+	  vect_add_elem(&vdiv, TCST, value_minus(val,VALUE_ONE));
 
-      if (val==1)
+      if (value_one_p(val))
       {
 	  le = CONS(EXPRESSION, make_vecteur_expression(vdiv), le);
 	  continue;
@@ -389,7 +406,8 @@ constraints_to_loop_bound(
 	  Variable va = var_of(v);
 	  Value vl = val_of(v);
 
-	  if (vl%val==0) vect_add_elem(&vadd, va, vl/val);
+	  if (value_zero_p(value_mod(vl,val))) 
+	      vect_add_elem(&vadd, va, value_div(vl,val));
       }
 
       for (v=vadd; v; v=v->succ)
@@ -421,9 +439,9 @@ constraints_to_loop_bound(
 
 	  /* use / instead of the provided idiv if operand >=0
 	   */
-	  ediv = MakeBinaryCall(vecteur_lower_bound(vdiv)>=0 ? 
+	  ediv = MakeBinaryCall(value_posz_p(vecteur_lower_bound(vdiv)) ? 
 				entity_intrinsic(DIVIDE_OPERATOR_NAME) : 
-				divide, ediv, int_to_expression(val));
+				divide, ediv, Value_to_expression(val));
 	  
 	  if (vadd)
 	  {
@@ -481,16 +499,18 @@ bounds_equal_p(
     
     /* ??? the arithmetic ppcm version is on int instead of values 
      */
-    the_ppcm = ppcm(-val_lower, val_upper);
+    the_ppcm = ppcm(value_uminus(val_lower), val_upper);
 
     v_lower = vect_dup(lower->vecteur);
-    v_lower = vect_multiply(v_lower, -the_ppcm/val_lower);
+    v_lower = vect_multiply(v_lower, 
+			    value_div(value_uminus(the_ppcm),val_lower));
 
     v_upper = vect_dup(upper->vecteur);
-    v_upper = vect_multiply(v_upper, the_ppcm/val_upper);
+    v_upper = vect_multiply(v_upper, 
+			    value_div(the_ppcm,val_upper));
 
     sum = vect_add(v_lower, v_upper);
-    vect_add_elem(&sum, TCST, the_ppcm-1);
+    vect_add_elem(&sum, TCST, value_minus(the_ppcm,VALUE_ONE));
     vect_normalize(sum);
 
     result = VECTEUR_NUL_P(sum) || 
