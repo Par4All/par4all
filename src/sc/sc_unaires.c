@@ -106,6 +106,9 @@ int (*compare)();
  * is that two calls to this function with the same system (whatever its
  * order) and same sort_base that covers all variables and same compare
  * function should give the same result. 
+ *
+ * the function is quite peculiar and the order is relevant for some
+ * code generation issues... 
  */
 void sc_sort(
     Psysteme sc,
