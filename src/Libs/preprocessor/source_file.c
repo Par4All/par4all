@@ -6,11 +6,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-/*#include <sys/param.h>*/
-/*#include <sys/wait.h>*/
-/*#include <sys/types.h>*/
+
 #include <dirent.h>
-/*#include <sys/timeb.h>*/
+
 #include <sys/stat.h>
 #include <ctype.h>
 #include <setjmp.h>
@@ -49,8 +47,9 @@
 /* Return a sorted arg list of workspace names. (For each name, there
    is a name.database directory in the current directory): */
 void
-pips_get_workspace_list(int * pargc,
-                      char * argv[])
+pips_get_workspace_list(
+    int * pargc,
+    char * argv[])
 {
    int i;
 
@@ -190,7 +189,6 @@ get_dont_build_view_file(char * print_type)
    }
    return NULL;
 }
-
 
 char *read_line(fd)
 FILE *fd;
@@ -208,7 +206,6 @@ FILE *fd;
     return(NULL);
 }
 
-
 bool process_user_file(file)
 string file;
 {
@@ -323,10 +320,11 @@ string file;
            user_warning("process_user_file",
                         "pips-process-module interrupted by control-C\n");
            return FALSE;
-    }
+	}
         else if(err!=0) {
-           pips_error("process_user_file",
-                      "Unexpected return code from pips-process-module: %d\n", err);
+	    pips_error("process_user_file",
+                      "Unexpected return code from pips-process-module: %d\n",
+		       err);
         }
         
     
