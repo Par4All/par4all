@@ -1,11 +1,14 @@
-/**
-  * $Id$
-  * 
-  * $Log: Pawt.java,v $
-  * Revision 1.1  1998/06/30 16:40:14  coelho
-  * Initial revision
-  *
-  */
+/*
+ * $Id$
+ * 
+ * $Log: Pawt.java,v $
+ * Revision 1.2  1998/06/30 17:35:33  coelho
+ * abstarct wt for jpips.
+ *
+ * Revision 1.1  1998/06/30 16:40:14  coelho
+ * Initial revision
+ *
+ */
 
 package JPips;
 
@@ -24,7 +27,10 @@ import java.awt.swing.event.*;
 interface Pawt
 {
   class PComponent extends java.awt.swing.JComponent
-    { public String checking; PComponent(){ super(); } }
+  { 
+    public String checking; 
+    PComponent() { super(); } 
+  }
 
   class PFrame extends java.awt.swing.JFrame
     { 
@@ -37,7 +43,7 @@ interface Pawt
       public void lock(boolean yes)
         {
           for(int i=1; i<optionVector.size(); i++)
-	      ((Option)optionVector.elementAt(i)).setActivated(!yes);
+	      ((Activatable) optionVector.elementAt(i)).setActivated(!yes);
         }
     }
 
