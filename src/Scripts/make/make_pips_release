@@ -4,7 +4,8 @@
 #
 # (c) Fabien COELHO 1996
 
-unset pack what dotar dozip zip name tostrip strip install addpublic tarname
+unset pack what dotar dozip zip name tostrip strip \
+    install addpublic tarname onlyfpips
 
 script=`basename $0`
 tar=${PIPS_TAR:-gtar}
@@ -43,6 +44,7 @@ usage()
 	    -F file: add file content (Validation/exportonly?)
 	    -B arch: add binaries for arch (Runtime Bin/arch)
 	    -L arch: add libraries for arch (Lib/arch)
+	    -X: only export fpips (not pips, tpips and wpips)
 	  software:
 	    -p: Pips
 	    -n: Newgen
@@ -57,7 +59,7 @@ usage()
 #
 # get options
 
-while getopts hvrstzw:CSB:L:D:F:f:pnleP opt
+while getopts hvrstzw:CSB:L:D:F:f:pnlePX opt
 do
     case $opt in
 	h) usage 0 some help ;;
@@ -83,6 +85,7 @@ do
 	l) pack="$pack LINEAR" ; name="${name}l" ;;
 	e) pack="$pack EXTERN" ; name="${name}e" ;;
 	P) addpublic="$TOOLPACK_DIR $DAVINCIHOME" ; name="${name}P" ;;
+	X) onlyfpips=1 ;;
 	*) usage 1 "invalid option -$opt" ;;
     esac
 done
@@ -121,11 +124,27 @@ do
 
     #
     # strip if required
-    test "$tostrip" -a "$strip" &&
+    [ "$tostrip" ] && 
     {
-	$verb stripping binaries
-	for d in $tostrip ; do $strip $trg/$d/* ; done
+	[ "$strip" ] && 
+	{
+	    $verb stripping binaries
+	    for d in $tostrip ; do $strip $trg/$d/* ; done
+	}
+
+	if [ "$onlyfpips" ] 
+	then
+	    $verb keeping fpips only...
+	    for d in $tostrip ; do 
+		rm -f $trg/$d/pips $trg/$d/[tw]pips ; 
+		test -f $trg/$d/fpips || verbose "WARNING, no fpips in $trg/$d"
+	    done
+	else
+	    $verb removing fpips...
+	    for d in $tostrip ; do rm -f $trg/$d/fpips ; done
+	fi
     }
+
 done
 
 
