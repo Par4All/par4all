@@ -182,13 +182,11 @@ print_code_proper_regions(char* module_name)
 {
     bool ok;
     set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_summary_rw_regions;
-    effects_computation_reset_func = reset_convex_summary_rw_regions;
+    effects_computation_init_func = init_convex_rw_prettyprint;
+    effects_computation_reset_func = reset_convex_prettyprint;
 
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
 
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_PROPER_REGIONS,
@@ -203,13 +201,11 @@ print_source_proper_regions(char* module_name)
 {
     bool ok;
     set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_summary_rw_regions;
-    effects_computation_reset_func = reset_convex_summary_rw_regions;
+    effects_computation_init_func = init_convex_rw_prettyprint;
+    effects_computation_reset_func = reset_convex_prettyprint;
 
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
 
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_PROPER_REGIONS,
@@ -225,13 +221,11 @@ print_code_regions(char* module_name)
 {
     bool ok;
     set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_summary_rw_regions;
-    effects_computation_reset_func = reset_convex_summary_rw_regions;
+    effects_computation_init_func = init_convex_rw_prettyprint;
+    effects_computation_reset_func = reset_convex_prettyprint;
 
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
 
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_REGIONS,
@@ -246,13 +240,11 @@ print_source_regions(char* module_name)
 {
     bool ok;
     set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_summary_rw_regions;
-    effects_computation_reset_func = reset_convex_summary_rw_regions;
+    effects_computation_init_func = init_convex_rw_prettyprint;
+    effects_computation_reset_func = reset_convex_prettyprint;
 
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
 
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_REGIONS,
@@ -267,13 +259,11 @@ print_code_in_regions(char* module_name)
 {
     bool ok;
     set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_summary_in_out_regions;
-    effects_computation_reset_func = reset_convex_summary_in_out_regions;
+    effects_computation_init_func = init_convex_inout_prettyprint;
+    effects_computation_reset_func = reset_convex_prettyprint;
 
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_IN, ACTION_OUT);
 
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_IN_REGIONS,
@@ -288,13 +278,11 @@ print_source_in_regions(char* module_name)
 {
     bool ok;
     set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_summary_in_out_regions;
-    effects_computation_reset_func = reset_convex_summary_in_out_regions;
+    effects_computation_init_func = init_convex_inout_prettyprint;
+    effects_computation_reset_func = reset_convex_prettyprint;
 
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_IN, ACTION_OUT);
 
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_IN_REGIONS,
@@ -309,13 +297,11 @@ print_code_out_regions(char* module_name)
 {
     bool ok;
     set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_summary_in_out_regions;
-    effects_computation_reset_func = reset_convex_summary_in_out_regions;
+    effects_computation_init_func = init_convex_inout_prettyprint;
+    effects_computation_reset_func = reset_convex_prettyprint;
 
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_IN, ACTION_OUT);
 
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_OUT_REGIONS,
@@ -330,13 +316,11 @@ print_source_out_regions(char* module_name)
 {
     bool ok;
     set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_summary_in_out_regions;
-    effects_computation_reset_func = reset_convex_summary_in_out_regions;
+    effects_computation_init_func = init_convex_inout_prettyprint;
+    effects_computation_reset_func = reset_convex_prettyprint;
 
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_IN, ACTION_OUT);
 
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_OUT_REGIONS,
