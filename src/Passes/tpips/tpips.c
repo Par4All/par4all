@@ -535,7 +535,7 @@ void process_a_file()
 {
     char *last = NULL;
     char *line;
-    extern jmp_buf pips_top_level;
+    jmp_buf pips_top_level;
     static readline_initialized = FALSE;
 
     if ((use_readline) && (readline_initialized == FALSE))
@@ -550,7 +550,7 @@ void process_a_file()
     while ((line = read_a_line(TPIPS_PROMPT)))
     {
 	if (setjmp(pips_top_level)) {
-	    pop_pips_context();
+	    ;
 	}
 	else {
 	    push_pips_context(&pips_top_level);
