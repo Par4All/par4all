@@ -189,22 +189,11 @@ entity module, common;
     debug_on("HPFC_DEBUG_LEVEL");
 }
 
-void hpfc_print_file(file, file_name)
-FILE* file;
+void hpfc_print_file(file_name)
 string file_name;
 {
-    FILE *source;
-    extern int _filbuf();
-    extern int _flsbuf();
-
-    fprintf(file, "file: %s\n", file_name); 
-
-    source = (FILE *) safe_fopen(file_name, "r");
-    while (!feof(source)) 
-	(void) putc((char) getc(source), file);
-    safe_fclose(source, file_name);
-
-    fprintf(file, "---------------------\n");
+    safe_system(concatenate("echo file: ", file_name, " >&2 ; "
+			    "cat ", file_name, " >&2", NULL));
 }
 
 void fprint_range(file, r)
