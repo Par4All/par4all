@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.127  1997/08/21 08:01:04  coelho
+# cpp is always gcc -E to improve the determinism of the validation at cri.
+#
 # Revision 1.126  1997/08/20 06:49:13  coelho
 # LD_LIBRARY_PATH added.
 #
@@ -167,9 +170,9 @@ LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PIPS_ROOT}/Lib/${PIPS_ARCH}"
 # preprocessor to use:
 # default: PIPS_CPP="cpp"
 #
+# to get some determinism...
 
-test ${uname_s} = Linux && \
-	PIPS_CPP='gcc -E'
+PIPS_CPP='gcc -E'
 
 # Additional options to pass to cpp for .F files:
 # default: PIPS_CPP_FLAGS=""
