@@ -302,6 +302,8 @@ semantic_to_text(
     transformer t;
     text txt;
 
+    pips_assert("To please the compiler", module==module && margin==margin);
+
     if(is_user_view) {
 	statement i = apply_number_to_statement(nts, statement_number(stmt));
 
