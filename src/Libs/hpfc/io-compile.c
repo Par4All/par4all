@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/07/23 15:08:32 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/11/12 10:01:57 $, )
  * version $Revision$
  */
 
@@ -21,6 +21,21 @@
 #include "ricedg.h"      
 
 /************************************************* IO EFFICIENT COMPILATION */
+
+
+/* use def chains are used to verify that a new def chains exist 
+*/
+static bool 
+def_chains()
+{
+    return FALSE;
+}
+
+
+
+
+
+
 
 static Psysteme 
 statement_context(
@@ -119,7 +134,8 @@ generate_distributed_io_system(
 	contxt = statement_context(stat, move);
     
     /* ??? massive memory leak 
-     */
+       polyhedron intersections
+*/
     result = sc_append(sc_rn(NULL), region);
     result = sc_append(result, dist_v);
     result = sc_append(result, sother);
@@ -747,7 +763,7 @@ generate_io_collect_or_update(
 	    *psn = make_continue_statement(entity_undefined);
 	}
     }
-    else
+    else  /* array not distributed */
     {
 	Psysteme row_echelon = SC_UNDEFINED, condition = SC_UNDEFINED;
 	list tmp = NIL, parameters = NIL, scanners = NIL, rebuild = NIL;
@@ -848,7 +864,8 @@ io_efficient_compile(
 
     /* quicker for continue and so...
      */
-    if (hpfc_empty_statement_p(stat))
+    
+    if (hpfc_empty_statement_p(stat))   /* Empty statement */
     {
 	pips_debug(3, "empty statement\n");
 	*hp = copy_statement(stat);
@@ -857,7 +874,8 @@ io_efficient_compile(
 	return;
     }
 
-    MAP(EFFECT, e,
+
+    MAP(EFFECT, e,             /* for each effect e on that statement*/
     {
 	entity array = reference_variable(effect_reference(e));
 	action act = effect_action(e);
@@ -896,8 +914,10 @@ io_efficient_compile(
 	}
 	
 	/* update data if necessary
+	   action = write and data may be used later (def chains notion) 
 	 */
-	if (action_write_p(act))
+	fprintf(stderr, "update data if necessary:\n   ");
+	if (action_write_p(act) && def_chains())
 	{
 	    generate_io_collect_or_update(array, stat, 
 					  is_movement_update, 
