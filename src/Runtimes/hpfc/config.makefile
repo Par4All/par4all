@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:36:18 $, )
+# ($Date: 1996/08/21 17:46:29 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -211,7 +211,8 @@ ifeq ($(PVM_ARCH),CM5)
 all: $(CMMD_F77_H) 
 endif
 
-all: $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_FFILES) $(LIB_OBJECTS) $(LIB_TARGET) 
+all: $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
+		$(LIB_OBJECTS) $(LIB_TARGET) 
 
 #
 # get pvm headers
@@ -238,6 +239,7 @@ $(LIB_TARGET):	$(PVM_HEADERS) $(LIB_HEADERS) $(LIB_OBJECTS)
 	$(RANLIB) $(LIB_TARGET) 
 
 %.h: %.f
+	# building $@ from $<
 	./hpfc_generate_h < $< > $@
 	./hpfc_add_warning $@
 
@@ -248,13 +250,12 @@ $(PVM_ARCH)/%.o: %.f
 	$(F77COMPILE) $< -o $@
 
 hpfc_includes.h: $(LIB_M4FFILES:.m4f=.h) 
-	{\
-	  for i in $(LIB_M4FFILES:.m4f=.h) ;\
-	  do \
-	    echo "      include \"$$i\"" ;\
-	  done;\
-	} > hpfc_includes.h
-	./hpfc_add_warning hpfc_includes.h
+	#
+	# building $@
+	#
+	{ for i in $(LIB_M4FFILES:.m4f=.h) ; do \
+	  echo "      include \"$$i\"" ; done; } > $@
+	./hpfc_add_warning $@
 
 clean: local-clean
 local-clean: 
