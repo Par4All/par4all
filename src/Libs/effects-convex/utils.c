@@ -22,7 +22,7 @@ empty_convex_context_p(transformer context)
     Psysteme sc_context;
 
     if (transformer_undefined_p(context))
-
+    {
 	/* this happens to the CONTINUE statement of the exit node
 	 * even if unreachable. Thus transformer are not computed,
 	 * orderings are not set... however gen_multi_recurse goes there.
@@ -31,7 +31,9 @@ empty_convex_context_p(transformer context)
 	 * I should check that it is indeed the exit node?
 	 * FC.
 	 */
+	pips_debug(3, "undefined contexted found, returned as empty\n");
 	return TRUE;
+    }
 
     /* else 
      */
