@@ -60,7 +60,9 @@ endif
 include $(MAKE.d)/$(ARCH).mk
 include $(MAKE.d)/svn.mk
 
-all: $(ARCH)
+###################################################################### DO STUFF
+
+all:
 
 UTC_DATE = $(shell date -u | tr ' ' '_')
 CPPFLAGS += -DSOFT_ARCH='"$(ARCH)"'
@@ -93,7 +95,6 @@ echo:; @echo $(ECHO)
 
 $(ARCH)/%.o: %.c; $(COMPILE) $< -o $@
 $(ARCH)/%.o: %.f; $(F77CMP) $< -o $@
-$(ARCH)/%.o: $(ARCH)
 
 %.class: %.java; $(JAVAC) $<
 %.h: %.class; $(JNI) $*
@@ -127,7 +128,7 @@ need_depend	= 1
 endif # DERIVED_CFILES
 
 ifdef need_depend
-phase0: depend
+phase0: depend $(ARCH)
 
 DEPEND	= .depend.$(ARCH)
 
@@ -181,8 +182,10 @@ $(INC_TARGET): $(TARGET)-local.h
 endif # INC_TARGET
 
 # ARCH subdirectory
-$(ARCH):; $(MKDIR) $(ARCH)
+$(ARCH):; test -d $(ARCH) || $(MKDIR) $(ARCH)
+
 clean: arch-clean
+
 arch-clean:; -$(RMDIR) $(ARCH)
 
 ####################################################################### INSTALL
@@ -195,9 +198,10 @@ phase3:
 #phase4: install_rtm
 #phase5: install_htm 
 
-ifdef LIB_OBJECTS
-$(LIB_OBJECTS): $(ARCH)
-endif # LIB_OBJECTS
+# NO! otherwise compilation always redone because directory changed
+#ifdef LIB_OBJECTS
+#$(LIB_OBJECTS): $(ARCH)
+#endif # LIB_OBJECTS
 
 # includes
 ifdef INC_TARGET
@@ -210,7 +214,7 @@ phase1: install_inc
 $(INC.d):; $(MKDIR) $(INC.d)
 
 install_inc: $(INSTALL_INC) $(INC.d)
-	$(INSTALL) $(INSTALL_INC) $(INC.d)
+	for f in $(INSTALL_INC) ; do $(INSTALL) $$f $(INC.d) ; done
 
 endif # INSTALL_INC
 
@@ -227,7 +231,7 @@ $(INSTALL_LIB): $(ARCH)
 $(LIB.d):; $(MKDIR) $(LIB.d)
 
 install_lib: $(INSTALL_LIB) $(LIB.d)
-	$(INSTALL) $(INSTALL_LIB) $(LIB.d)
+	for f in $(INSTALL_LIB) ; do $(INSTALL) $$f $(LIB.d) ; done
 endif # INSTALL_LIB
 
 # binaries
@@ -243,7 +247,7 @@ $(INSTALL_BIN): $(ARCH)
 $(BIN.d):; $(MKDIR) $(BIN.d)
 
 install_bin: $(INSTALL_BIN) $(BIN.d)
-	$(INSTALL) $(INSTALL_BIN) $(BIN.d)
+	for f in $(INSTALL_BIN) ; do $(INSTALL) $$f $(BIN.d) ; done
 endif # INSTALL_BIN
 
 # documentation
@@ -253,7 +257,7 @@ phase3: install_doc
 $(DOC.d):; $(MKDIR) $(DOC.d)
 
 install_doc: $(INSTALL_DOC) $(DOC.d)
-	$(INSTALL) $(INSTALL_DOC) $(DOC.d)
+	for f in $(INSTALL_DOC) ; do $(INSTALL) $$f $(DOC.d) ; done
 endif # INSTALL_DOC
 
 # shared
@@ -263,7 +267,7 @@ phase1: install_shr
 $(SHR.d):; $(MKDIR) $(SHR.d)
 
 install_shr: $(INSTALL_SHR) $(SHR.d)
-	$(INSTALL) $(INSTALL_SHR) $(SHR.d)
+	for f in $(INSTALL_SHR) ; do $(INSTALL) $$f $(SHR.d) ; done
 endif # INSTALL_SHR
 
 # utils
@@ -273,7 +277,7 @@ phase1: install_utl
 $(UTL.d):; $(MKDIR) $(UTL.d)
 
 install_utl: $(INSTALL_UTL) $(UTL.d)
-	$(INSTALL) $(INSTALL_UTL) $(UTL.d)
+	for f in $(INSTALL_UTL) ; do $(INSTALL) $$f $(UTL.d) ; done
 endif # INSTALL_UTL
 
 ##################################################################### UNINSTALL
