@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/10 13:55:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/10 13:55:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1997/09/10 13:55:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 1997/09/10 13:55:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -21,7 +21,8 @@ char vcid_syntax_expression[] = "%A% ($Date: 1997/09/10 13:55:17 $, ) version $R
 
   x is an expression that represents the value of e. */
 
-entity MakeParameter(e, x)
+entity 
+MakeParameter(e, x)
 entity e;
 expression x;
 {
@@ -48,7 +49,8 @@ r is the range of the loop.
 l is the list of expressions which are to be read or written according
 to this implied do loop. */
 
-expression MakeImpliedDo(v, r, l)
+expression 
+MakeImpliedDo(v, r, l)
 syntax v;
 range r;
 cons *l;
@@ -107,7 +109,8 @@ cons *l;
  *    See lcart2.f in Validation.
  */
 
-syntax MakeAtom(e, indices, fc, lc, HasParenthesis)
+syntax 
+MakeAtom(e, indices, fc, lc, HasParenthesis)
 entity e;
 cons * indices;
 expression fc, lc;
@@ -263,7 +266,8 @@ expression 'IOLIST=' before each element of the original list
 (i , j , t(i,j)) becomes ('IOLIST=' , i , 'IOLIST=' , j , 'IOLIST=' , t(i,j))
 */
 
-cons *MakeIoList(l)
+cons *
+MakeIoList(l)
 cons *l;
 {
     cons *pc; /* to walk thru l */
