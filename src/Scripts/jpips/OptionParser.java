@@ -1,34 +1,37 @@
 /*
- * $Id$
- *
- * $Log: OptionParser.java,v $
- * Revision 1.9  1998/10/16 14:50:22  coelho
- * import fixed.
- *
- * Revision 1.8  1998/07/03 22:14:50  coelho
- * cleaner.
- *
- * Revision 1.7  1998/07/03 17:42:37  coelho
- * checkbox width fixed.
- *
- * Revision 1.6  1998/07/03 17:32:35  coelho
- * cleaner withMenu stuff...
- *
- * Revision 1.5  1998/07/03 16:36:24  coelho
- * new INDIRECT label and button with choice...
- *
- * Revision 1.4  1998/07/03 08:12:45  coelho
- * tip line added.
- *
- * Revision 1.3  1998/07/01 15:54:45  coelho
- * jpips.menus used for chosing the menus file.
- *
- * Revision 1.2  1998/07/01 07:08:01  coelho
- * cleaner.
- *
- * Revision 1.1  1998/06/30 17:35:33  coelho
- * Initial revision
- */
+  $Id$
+ 
+  $Log: OptionParser.java,v $
+  Revision 1.10  1998/10/17 12:21:22  coelho
+  colors fixed.
+
+  Revision 1.9  1998/10/16 14:50:22  coelho
+  import fixed.
+ 
+  Revision 1.8  1998/07/03 22:14:50  coelho
+  cleaner.
+ 
+  Revision 1.7  1998/07/03 17:42:37  coelho
+  checkbox width fixed.
+ 
+  Revision 1.6  1998/07/03 17:32:35  coelho
+  cleaner withMenu stuff...
+ 
+  Revision 1.5  1998/07/03 16:36:24  coelho
+  new INDIRECT label and button with choice...
+ 
+  Revision 1.4  1998/07/03 08:12:45  coelho
+  tip line added.
+ 
+  Revision 1.3  1998/07/01 15:54:45  coelho
+  jpips.menus used for chosing the menus file.
+ 
+  Revision 1.2  1998/07/01 07:08:01  coelho
+  cleaner.
+ 
+  Revision 1.1  1998/06/30 17:35:33  coelho
+  Initial revision
+*/
 
 package JPips;
 
@@ -129,7 +132,7 @@ public class OptionParser
 	 };
       cbdisplay.addActionListener(a);
       menu.add(cbdisplay);
-      menu.add(new JSeparator());
+      menu.add(new PSeparator());
             
       GridBagLayout opLayout = new GridBagLayout();
       optionPanel = new PPanel(opLayout);
@@ -157,18 +160,13 @@ public class OptionParser
       add(optionPanel,close,
 	  0,position,3,1,1,1,0.0,0.0,0,GridBagConstraints.HORIZONTAL,c);
 
-      WindowListener w = new WindowListener()
-        {
-	  public void windowClosing(WindowEvent e)
-	    { cbdisplay.setSelected(false); }
-	  public void windowOpened(WindowEvent e)
-	    { cbdisplay.setSelected(true); }
-	  public void windowClosed(WindowEvent e) {}
-	  public void windowActivated(WindowEvent e) {}
-	  public void windowDeactivated(WindowEvent e) {}
-	  public void windowIconified(WindowEvent e) {}
-	  public void windowDeiconified(WindowEvent e) {}
-        };
+      WindowListener w = new WindowAdapter()
+      {
+	public void windowClosing(WindowEvent e)
+	{ cbdisplay.setSelected(false); }
+	public void windowOpened(WindowEvent e)
+	{ cbdisplay.setSelected(true); }
+      };
       frame.addWindowListener(w);
 
       Dimension opDim = opLayout.minimumLayoutSize(optionPanel);
@@ -179,7 +177,6 @@ public class OptionParser
 
       Dimension fDim = fLayout.minimumLayoutSize(frame);
       frame.setSize(fDim.width+20, fDim.height+40);
-      
     }
     
 
@@ -489,54 +486,55 @@ public class OptionParser
     * This method can only be called the root of the tree structure.
     */
   public void addLabelWithChoice(boolean direct)
+  {
+    String name, checking, mark, tip;
+    
+    name = p.nextNonEmptyLine();
+    checking = p.nextNonEmptyLine();
+    mark = p.nextNonEmptyLine();
+    tip = p.nextNonEmptyLine();
+    
+    PLabel l = new PLabel(name, tip);
+    add(optionPanel,l,
+	0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
+    
+    PComboBox cob = new PComboBox(checking, mark, direct);
+    state.addElement(cob);
+    
+    PMenu m = new PMenu(name);
+    PButtonGroup bg = new PButtonGroup();
+    
+    name = p.nextNonEmptyLine();
+    while(!name.equals(CLOSE))
     {
-      String name, checking, mark, tip;
-
-      name = p.nextNonEmptyLine();
+      String command = p.nextNonEmptyLine();
       checking = p.nextNonEmptyLine();
-      mark = p.nextNonEmptyLine();
-      tip = p.nextNonEmptyLine();
-
-      PLabel l = new PLabel(name, tip);
-      add(optionPanel,l,
-	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
-
-      PComboBox cob = new PComboBox(checking,mark,direct);
-      state.addElement(cob);
       
-      PMenu m = new PMenu(name);
-      PRadioButtonMenuItem rbmi;
-      ButtonGroup bg = new ButtonGroup();
-
+      cob.addItem(name);
+      cob.vCommand.addElement(command);	  
+      cob.vChecking.addElement(checking);
+      
+      PRadioButtonMenuItem rbmi = new PRadioButtonMenuItem
+	(name, command, cob, cob.getItemAt(cob.getItemCount()-1), checking);
+      rbmi.addActionListener(getComplexRBMIListener());
+      bg.add(rbmi);
+      m.add(rbmi);
+      
+      cob.vRbmi.addElement(rbmi);	  
+      
       name = p.nextNonEmptyLine();
-      while(!name.equals(CLOSE))
-        {
-	  String command = p.nextNonEmptyLine();
-	  checking = p.nextNonEmptyLine();
-	  
-	  cob.addItem(name);
-	  cob.vCommand.addElement(command);	  
-	  cob.vChecking.addElement(checking);
-
-	  rbmi = new PRadioButtonMenuItem(name,command,cob,
-	  	       cob.getItemAt(cob.getItemCount()-1), checking);
-	  rbmi.addActionListener(getComplexRBMIListener());
-	  bg.add(rbmi);
-	  m.add(rbmi);
-	  
-	  cob.vRbmi.addElement(rbmi);	  
-
-	  name = p.nextNonEmptyLine();
-	}
-      rbmi = (PRadioButtonMenuItem)cob.vRbmi.elementAt(0);
-      rbmi.setSelected(true);
-
-      add(optionPanel,cob,
-	  1,position++,2,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
-      cob.addActionListener(getCOBListener());
-
-      menu.add(m);
     }
+
+    // select the first element.
+    ((PRadioButtonMenuItem) cob.vRbmi.elementAt(0)).setSelected(true);
+    
+    add(optionPanel,cob,
+	1,position++,2,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
+
+    cob.addActionListener(getCOBListener());
+    
+    menu.add(m);
+  }
     
 
   /** Adds a label and a combobox to optionPanel.
@@ -562,26 +560,26 @@ public class OptionParser
     */
   public void addGroup(PMenu m1, PMenu m2, PLabel l, 
 		       PButtonGroup bg1, PButtonGroup bg2)
-    {
-      String name, tip;
-
-      name = p.nextNonEmptyLine();
-      tip = p.nextNonEmptyLine();
-
-      PPanel newp = new PPanel(new GridBagLayout());
-      newp.setBorder(BorderFactory.createTitledBorder(name));
-      newp.setToolTipText(tip);
-
-      add(optionPanel, newp, 
-	  0,position++,3,1,1,1,1.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
-
-      PPanel saved = optionPanel;
-      optionPanel = newp;
-
-      parseCommand(m1, m2, l, bg1, bg2);
-
-      optionPanel = saved;
-    }
+  {
+    String name, tip;
+    
+    name = p.nextNonEmptyLine();
+    tip = p.nextNonEmptyLine();
+    
+    PPanel newp = new PPanel(new GridBagLayout());
+    newp.setBorder(Pawt.createTitledBorder(name));
+    newp.setToolTipText(tip);
+    
+    add(optionPanel, newp, 
+	0,position++,3,1,1,1,1.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
+    
+    PPanel saved = optionPanel;
+    optionPanel = newp;
+    
+    parseCommand(m1, m2, l, bg1, bg2);
+    
+    optionPanel = saved;
+  }
 
   /** Sets the beggining of a button group.
     * This method can only be called in a menu of the tree structure.
@@ -600,15 +598,15 @@ public class OptionParser
       PRadioButtonMenuItem rbmi
         = (PRadioButtonMenuItem)(newbg1.getElements().nextElement());
       rbmi.setSelected(true);
-      JPopupMenu pm = (JPopupMenu)rbmi.getParent();
-      PMenu m = (PMenu)pm.getInvoker();
+      JPopupMenu pm = (JPopupMenu) rbmi.getParent();
+      PMenu m = (PMenu) pm.getInvoker();
       rbmi.label.setText(m.getText()+" / "+rbmi.getText());
       
       // also.
       rbmi = (PRadioButtonMenuItem)(newbg2.getElements().nextElement());
       rbmi.setSelected(true);
-      pm = (JPopupMenu)rbmi.getParent();
-      m = (PMenu)pm.getInvoker();
+      pm = (JPopupMenu) rbmi.getParent();
+      m = (PMenu) pm.getInvoker();
       rbmi.label.setText(m.getText()+" / "+rbmi.getText());
     }
     
@@ -658,13 +656,13 @@ public class OptionParser
   /** @return an ActionListener for a button
     */
   public ActionListener getBListener()
-    {
-      return new ActionListener()
-         {
-           public void actionPerformed(ActionEvent e)
-	     { tpips.sendCommand(((PButton)e.getSource()).command); }
-	 };
-    }
+  {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e) { 
+	tpips.sendCommand(((PButton)e.getSource()).command); 
+      }
+    };
+  }
     
   /** an action on a comboboxed button.
     */
@@ -704,167 +702,149 @@ public class OptionParser
   /** @return an ActionListener for a button with a text
     */
   public ActionListener getBTListener()
-    {
-      return new ActionListener()
-         {
-           public void actionPerformed(ActionEvent e)
-	     {
-               PButton b = (PButton)e.getSource();
-	       tpips.sendCommand(b.command+b.tf.getText());
-             }
-	 };
-    }
+  {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	PButton b = (PButton)e.getSource();
+	tpips.sendCommand(b.command+b.tf.getText());
+      }
+    };
+  }
     
 
   /** @return an ActionListener for a menu item
     */
   public ActionListener getMIListener()
-    {
-      return new ActionListener()
-         {
-           public void actionPerformed(ActionEvent e)
-	     { tpips.sendCommand(((PMenuItem)e.getSource()).command); }
-	 };
-    }
+  {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e) { 
+	tpips.sendCommand(((PMenuItem)e.getSource()).command); 
+      }
+    };
+  }
     
 
   /** @return an ActionListener for a menu item with text
     */
   public ActionListener getMITListener()
-    {
-      return new ActionListener()
-         {
-           public void actionPerformed(ActionEvent e)
-	     {
-	       PMenuItem mi = (PMenuItem)e.getSource();
-	       tpips.sendCommand(mi.command+mi.tf.getText());
-             }
-	 };
-    }
+  {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	PMenuItem mi = (PMenuItem)e.getSource();
+	tpips.sendCommand(mi.command+mi.tf.getText());
+      }
+    };
+  }
     
 
   /** @return an ActionListener for a checkbox
     */
   public ActionListener getCBListener()
-    {
-      return new ActionListener()
-         {
-           public void actionPerformed(ActionEvent e)
-	     {
-	       PCheckBox cb = (PCheckBox)e.getSource();
-               cb.cbmi.setSelected(cb.isSelected());
-	       tpips.sendCommand(cb.command);
-	     }
-	 };
-    }
+  {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	PCheckBox cb = (PCheckBox)e.getSource();
+	cb.cbmi.setSelected(cb.isSelected());
+	tpips.sendCommand(cb.command);
+      }
+    };
+  }
     
 
   /** @return an ActionListener for a checkbox menu item
     */
   public ActionListener getCBMIListener()
-    {
-      return new ActionListener()
-         {
-           public void actionPerformed(ActionEvent e)
-	     {
-	       PCheckBoxMenuItem cbmi = (PCheckBoxMenuItem)e.getSource();
-	       tpips.sendCommand(cbmi.command);
-               cbmi.cb.setSelected(cbmi.isSelected());
-	     }
-	 };
-    }
+  {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	PCheckBoxMenuItem cbmi = (PCheckBoxMenuItem)e.getSource();
+	tpips.sendCommand(cbmi.command);
+	cbmi.cb.setSelected(cbmi.isSelected());
+      }
+    };
+  }
     
 
   /** @return an ActionListener for combobox on its own
     */
   public ActionListener getSingleCOBListener()
-    {
-      return new ActionListener()
-         {
-           public void actionPerformed(ActionEvent e)
-	     {
-	       PComboBox cob = (PComboBox)e.getSource();
-	       if (cob.direct) 
-		 {
-		   int selectedIndex = cob.getSelectedIndex();
-		   String command = 
-		     (String)cob.vCommand.elementAt(selectedIndex);
-		   tpips.sendCommand(command);
-		 }
-	     }
-	 };
-    }
+  {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	PComboBox cob = (PComboBox)e.getSource();
+	if (cob.direct) 
+	{
+	  int selectedIndex = cob.getSelectedIndex();
+	  String command = 
+	    (String)cob.vCommand.elementAt(selectedIndex);
+	  tpips.sendCommand(command);
+	}
+      }
+    };
+  }
     
 
   /** @return an ActionListener for a combobox linked to a radiobutton group
     */
   public ActionListener getCOBListener()
-    {
-      return new ActionListener()
-         {
-           public void actionPerformed(ActionEvent e)
-	     {
-	       PComboBox cob = (PComboBox)e.getSource();
-	       int selectedIndex = cob.getSelectedIndex();
-	       PRadioButtonMenuItem rbmi = 
-	         (PRadioButtonMenuItem)cob.vRbmi.elementAt(selectedIndex);
-	       rbmi.setSelected(true);
-	       if (cob.direct)
-		 {
-		   String command = (String)
-		     cob.vCommand.elementAt(selectedIndex);
-		   tpips.sendCommand(command);
-		 }
-	     }
-	 };
-    }
+  {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	PComboBox cob = (PComboBox)e.getSource();
+	int selectedIndex = cob.getSelectedIndex();
+	PRadioButtonMenuItem rbmi = 
+	  (PRadioButtonMenuItem)cob.vRbmi.elementAt(selectedIndex);
+	rbmi.setSelected(true);
+	if (cob.direct)
+	{
+	  String command = (String)
+	    cob.vCommand.elementAt(selectedIndex);
+	  tpips.sendCommand(command);
+	}
+      }
+    };
+  }
 
   /** @return an ActionListener for a radiobuttonmenuitem linked to a combobox
     */
-  public ActionListener getComplexRBMIListener()
-    {
-      return new ActionListener()
-         {
-           public void actionPerformed(ActionEvent e)
-	     {
-	       PRadioButtonMenuItem rbmi = (PRadioButtonMenuItem)e.getSource();
-	       rbmi.cob.setSelectedItem(rbmi.o);
-               tpips.sendCommand(rbmi.command);
-	     }
-	 };
-    }
+  public ActionListener getComplexRBMIListener() {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e)
+	{
+	  PRadioButtonMenuItem rbmi = (PRadioButtonMenuItem)e.getSource();
+	  rbmi.cob.setSelectedItem(rbmi.o);
+	  tpips.sendCommand(rbmi.command);
+	}
+    };
+  }
 
   /** @return an ActionListener for a radiobuttonmenuitem on its own
     */
   public ActionListener getSingleRBMILListener()
-    {
-      return new ActionListener()
-         {
-	   public void actionPerformed(ActionEvent e)
-	     {
-	       PRadioButtonMenuItem rbmi = (PRadioButtonMenuItem)e.getSource();
-	       rbmi.label.setText(rbmi.getText());
-               tpips.sendCommand(rbmi.command);
-             } 
-	 };
-    }
+  {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	PRadioButtonMenuItem rbmi = (PRadioButtonMenuItem)e.getSource();
+	rbmi.label.setText(rbmi.getText());
+	tpips.sendCommand(rbmi.command);
+      } 
+    };
+  }
 
 
   /** @return an ActionListener for a radiobuttonmenuitem linked to another one
     */
   public ActionListener getRBMILListener()
-    {
-      return new ActionListener()
-         {
-	   public void actionPerformed(ActionEvent e)
-	     {
-	       PRadioButtonMenuItem rbmi = (PRadioButtonMenuItem)e.getSource();
-	       rbmi.rbmi.setSelected(true);
-	       JPopupMenu pm = (JPopupMenu)rbmi.getParent();
-	       PMenu m = (PMenu)pm.getInvoker();
-	       rbmi.label.setText(m.getText() + " / " + rbmi.getText());
-               tpips.sendCommand(rbmi.command);
-             } 
-	 };
-    }
+  {
+    return new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	PRadioButtonMenuItem rbmi = (PRadioButtonMenuItem)e.getSource();
+	rbmi.rbmi.setSelected(true);
+	JPopupMenu pm = (JPopupMenu) rbmi.getParent();
+	PMenu m = (PMenu) pm.getInvoker();
+	rbmi.label.setText(m.getText() + " / " + rbmi.getText());
+	tpips.sendCommand(rbmi.command);
+      } 
+    };
+  }
 }
