@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/06/20 16:29:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/10 15:18:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/06/20 16:29:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/07/10 15:18:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -251,6 +251,17 @@ cons *lfp;
 		    "subroutine and/or a function and/or a common\n");
     }
 
+    /* Let's hope cf is not an intrinsic */
+    if( entity_type(cf) != type_undefined
+       && intrinsic_entity_p(cf) ) {
+	user_warning("MakeCurrentFunction",
+		     "Intrinsic %s redefined\n",
+		     entity_local_name(cf));
+	/* Hopefully, the intrinsic can be redefined, just like a user function
+	 * or subroutine after editing.
+	 */
+    }
+
     /* set ghost variable entities to NIL */
     init_ghost_variable_entities();
 
@@ -300,7 +311,8 @@ cons *lfp;
     /* Let's hope cf is not a common */
     if(entity_initial(cf) != value_undefined
        && ! (value_code_p(entity_initial(cf))
-	     || value_unknown_p(entity_initial(cf)))) {
+	     || value_unknown_p(entity_initial(cf))
+	     || value_intrinsic_p(entity_initial(cf)))) {
 	pips_error("MakeCurrentFunction", "Should have been trapped by the first test!\n");
 	user_warning("MakeCurrentFunction",
 		     "Conflict for global name %s\n",
