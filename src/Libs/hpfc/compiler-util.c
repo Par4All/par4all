@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compiler-util.c,v $ ($Date: 1994/04/11 17:01:16 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1994/06/03 14:14:27 $, )
  * got on %D%, %T%
  * $Id$
  *
@@ -23,143 +23,6 @@ extern int fprintf();
 #include "control.h"
 #include "hpfc.h"
 #include "defines-local.h"
-
-/*
- * UpdateExpressionForModule
- *
- * this function creates a new expression using the mapping of
- * old to new variables map.
- *
- * some of the structures generated may be shared...
- */
-expression UpdateExpressionForModule(map, expr)
-entity_mapping map;
-expression expr;
-{
-    syntax
-	s = expression_syntax(expr);
-    expression
-	e = expression_undefined;
-
-    debug(8, "UpdateExpressionForModule", "updating...\n");
-
-    switch(syntax_tag(s))
-    {
-    case is_syntax_reference:
-	/* 
-	 * connect to the new reference given by the mapping 
-	 */
-    {
-	reference 
-	    ref=syntax_reference(s);
-	entity 
-	    var=reference_variable(ref),
-	    newvar=(entity) GET_ENTITY_MAPPING(map,var);
-
-	debug(8, "UpdateExpressionForModule", "reference case\n");
-
-	if (newvar == (entity) HASH_UNDEFINED_VALUE)
-	{
-	    e = reference_to_expression
-		(make_reference(var, lUpdateExpr(map,reference_indices(ref))));
-	}
-	else
-	{
-	    debug(9,"UpdateExpressionForModule",
-		  "updating reference %s to %s\n",
-		  entity_name(var),
-		  entity_name(newvar));
-	    
-	    e = reference_to_expression
-		(make_reference(newvar, lUpdateExpr(map,reference_indices(ref))));
-	}
-	break;
-    }
-    case is_syntax_range:
-    {
-	range r=syntax_range(s);
-	
-	debug(8, "UpdateExpressionForModule", "range case\n");
-	
-	e=make_expression
-	    (make_syntax(is_syntax_range,
-			 make_range(UpdateExpressionForModule(map,range_lower(r)),
-				    UpdateExpressionForModule(map,range_upper(r)),
-				    UpdateExpressionForModule(map,range_increment(r)))),
-	    normalized_undefined); 
-	break;
-    }
-    case is_syntax_call:
-    {
-	call c=syntax_call(s);
-	
-	debug(8, "UpdateExpressionForModule", "call to %s case\n",
-	      entity_name(call_function(c)));
-
-	e=make_expression
-	    (make_syntax(is_syntax_call,
-			 make_call(call_function(c),
-				   lUpdateExpr(map,call_arguments(c)))),
-	    normalized_undefined); 
-	break;
-    }
-    default:
-	pips_error("UpdateExpressionForModule","unexpected syntax tag\n");
-	break;
-    }
-    debug(8, "UpdateExpressionForModule", "end of update.\n");
-    return(e);
-}
-
-/*
- * lUpdateExpr
- */
-list lUpdateExpr(map,lexpr)
-entity_mapping map;
-list lexpr;
-{
-    list 
-	l=NIL;
-
-    debug(8, "lUpdateExpr", "updating %d expressions\n", gen_length(lexpr));
-
-    MAPL(ce,
-     {
-	 expression
-	     etmp = UpdateExpressionForModule(map, EXPRESSION(CAR(ce)));
-
-	 l = gen_nconc(l, CONS(EXPRESSION, etmp, NIL));
-     },
-	 lexpr);
-
-    debug(8, "lUpdateExpr", "end of update\n");
-
-    return(l);
-}
-
-/*
- * lNewVariableForModule
- */
-list lNewVariableForModule(map,le)
-entity_mapping map;
-list le;
-{
-    return((ENDP(le) ?
-	    (NIL) :
-	    CONS(ENTITY,
-		 NewVariableForModule(map,ENTITY(CAR(le))),
-		 lNewVariableForModule(map,CDR(le)))));
-}
-
-/*
- * NewVariableForModule
- */
-entity NewVariableForModule(map,e)
-entity_mapping map;
-entity e;
-{
-    return((entity) GET_ENTITY_MAPPING(map,e));
-}
 
 /*
  * my_empty_statement_p 
@@ -341,7 +204,7 @@ list *lwp, *lrp;
 	control
 	    ct = unstructured_control(u);
 	list
-	    blocks;
+	    blocks=NIL;
 
 	debug(9, "FindRefToDistArrayInStatement", "unstructured\n");
 
@@ -510,11 +373,9 @@ list lsyn;
 		  (EXPRESSION(CAR(call_arguments(instruction_call(inst)))))),
 		 lsyn))
 	    {
-		l = CONS(STATEMENT, mere_statement(inst), NULL);
+		l = CONS(STATEMENT, make_stmt_of_instr(inst), NIL);
 		statement_instruction(stat) = 
-		    make_instruction(is_instruction_call,
-				     make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME),
-					       NULL));
+		    make_continue_instruction();
 	    }
 	}
 	break;
@@ -525,11 +386,13 @@ list lsyn;
 	control
 	    ct = unstructured_control(u);
 	list
-	    blocks;
+	    blocks=NIL;
 
 	CONTROL_MAP(c, 
 		{
-		    l = gen_nconc(FindDefinitionsOf(control_statement(c), lsyn), l);
+		    l = gen_nconc(FindDefinitionsOf(control_statement(c), 
+						    lsyn), 
+				  l);
 		},
 		    ct, 
 		    blocks);
@@ -544,161 +407,6 @@ list lsyn;
     }
     
     return(l);
-}
-
-/* 
- * UpdateStatementForModule
- */
-statement UpdateStatementForModule(map, stat)
-entity_mapping map;
-statement stat;
-{
-    statement
-	updatedstat;
-    instruction 
-	inst = statement_instruction(stat);
-
-    debug(7, "UpdateStatementForModule", "updating...\n");
-
-    switch(instruction_tag(inst))
-    {
-    case is_instruction_block:
-    {
-	list
-	    lstat = NIL;
-	
-	debug(8, "UpdateStatementForModule", "block\n");
-
-	MAPL(cs,
-	 {
-	     statement
-		 stmp = UpdateStatementForModule(map, STATEMENT(CAR(cs)));
-
-	     lstat = 
-		 gen_nconc(lstat, CONS(STATEMENT, stmp, NULL));
-	 },
-	     instruction_block(inst));
-
-	updatedstat = MakeStatementLike(stat, is_instruction_block, nodegotos);
-	instruction_block(statement_instruction(updatedstat)) = lstat;
-	break;
-    }
-    case is_instruction_test:
-    {
-	test
-	    t = instruction_test(inst);
-
-	debug(8, "UpdateStatementForModule", "test\n");
-
-	updatedstat = MakeStatementLike(stat, is_instruction_test, nodegotos);
-	instruction_test(statement_instruction(updatedstat)) = 
-	    make_test(UpdateExpressionForModule(map, test_condition(t)),
-		      UpdateStatementForModule(map, test_true(t)),
-		      UpdateStatementForModule(map, test_false(t)));
-	break;
-    }
-    case is_instruction_loop:
-    {
-	loop
-	    l = instruction_loop(inst);
-	range
-	    r = loop_range(l);
-	entity
-	    nindex = NewVariableForModule(oldtonewnodevar,loop_index(l));
-
-	debug(8, "UpdateStatementForModule", "loop\n");
-
-	updatedstat = MakeStatementLike(stat, is_instruction_loop, nodegotos);
-	instruction_loop(statement_instruction(updatedstat)) = 
-	    make_loop(nindex,
-		      make_range(UpdateExpressionForModule(map, range_lower(r)),
-				 UpdateExpressionForModule(map, range_upper(r)),
-				 UpdateExpressionForModule(map, range_increment(r))),
-		      UpdateStatementForModule(map, loop_body(l)),
-		      loop_label(l),
-		      make_execution(is_execution_sequential,UU),
-		      NULL);
-	break;
-    }
-    case is_instruction_goto:
-    {
-	debug(8, "UpdateStatementForModule", "goto\n");
-
-	updatedstat = MakeStatementLike(stat, is_instruction_goto, nodegotos);
-	instruction_goto(statement_instruction(updatedstat)) = 
-	    instruction_goto(inst);
-
-	break;
-    }
-    case is_instruction_call:
-    {
-	call
-	    c = instruction_call(inst);
-
-	debug(8, "UpdateStatementForModule", 
-	      "call to %s\n", 
-	      entity_name(call_function(c)));
-
-	updatedstat = MakeStatementLike(stat, is_instruction_call, nodegotos);
-	instruction_call(statement_instruction(updatedstat)) = 
-	    make_call(call_function(c), lUpdateExpr(map, call_arguments(c)));
-
-	break;
-    }
-    case is_instruction_unstructured:
-    {
-	control_mapping 
-	    ctrmap = MAKE_CONTROL_MAPPING();
-	unstructured 
-	    u=instruction_unstructured(inst);
-	control 
-	    ct = unstructured_control(u),
-	    ce = unstructured_exit(u);
-	list 
-	    blocks = NIL;
-
-	debug(8, "UpdateStatementForModule", "unstructured\n");
-
-	CONTROL_MAP(c,
-		{
-		    statement
-			statc = control_statement(c);
-		    control
-			ctr;
-
-		    ctr = make_control(UpdateStatementForModule(map, statc),
-				       NULL,
-				       NULL);
-		    SET_CONTROL_MAPPING(ctrmap, c, ctr);
-		},
-		    ct,
-		    blocks);
-
-	MAPL(cc,
-	 {
-	     control
-		 c = CONTROL(CAR(cc));
-
-	     update_control_lists(c, ctrmap);
-	 },
-	     blocks);
-
-	updatedstat = MakeStatementLike(stat,is_instruction_unstructured,nodegotos);
-	statement_instruction(instruction_unstructured(updatedstat)) =
-	    make_unstructured((control) GET_CONTROL_MAPPING(ctrmap, ct),
-			      (control) GET_CONTROL_MAPPING(ctrmap, ce));
-
-	gen_free_list(blocks);
-	FREE_CONTROL_MAPPING(ctrmap);
-	break;
-    }
-    default:
-	pips_error("UpdateStatementForModule","unexpected instruction tag\n");
-	break;
-    }
-    
-    debug(7, "UpdateStatementForModule", "end of update\n");
-    return(updatedstat);
 }
 
 /*
@@ -1049,43 +757,6 @@ statement stat;
     }
 
     return(ll);
-}
-
-/*
- * some little functions needed.
- */
-bool entity_template_p(e)
-entity e;
-{
-    return(gen_find_eq((chunk *) e, templates)==e);
-}
-
-bool entity_processor_p(e)
-entity e;
-{
-    return(gen_find_eq((chunk *) e, processors)==e);
-}
-
-/* ----------------------------------------------------
- *
- * NEW DECLARATIONS
- */
-
-void get_ith_dim_new_declaration(array, i, pmin, pmax)
-entity array;
-int i, *pmin, *pmax;
-{
-    list
-	lnewdecl = (list) GET_ENTITY_MAPPING(newdeclarations, array);
-    dimension
-	d = DIMENSION(CAR(gen_nthcdr(i-1, lnewdecl)));
-
-    pips_assert("get_ith_dim_new_declaration",
-		((array_distributed_p(array)) && 
-		 (entity_variable_p(array))));
-
-    *pmin = HpfcExpressionToInt(dimension_lower(d));
-    *pmax = HpfcExpressionToInt(dimension_upper(d));
 }
 
 /*
