@@ -2,10 +2,8 @@
  * Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1995/03/22 10:57:01 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1995/03/23 16:54:35 $, )
  * version $Revision$
- * got on %D%, %T%
- * $Id$
  */
 
 #include <stdio.h>
@@ -125,7 +123,7 @@ list l;
     MAPL(ce,
      {
 	 oldent = ENTITY(CAR(ce));
-	 ent = load_entity_node_new(oldent);
+	 ent = load_new_node(oldent);
 	 ndim = variable_entity_dimension(ent);
 
 	 assert(type_variable_p(entity_type(ent)));
