@@ -246,8 +246,8 @@ char * argv[];
 	    /* Build resource */
 	    MAPL(crn, {
 		string build_resource_name = STRING(CAR(crn));
-		user_log("Request: build resource %s for module %s.\n", 
-			 build_resource_name, module);
+		/* user_log("Request: build resource %s for module %s.\n", 
+			 build_resource_name, module); */
 		success = safe_make(build_resource_name, module);
 		if (success) {
 		    /* user_log("%s built for %s.\n", 
