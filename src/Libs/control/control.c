@@ -289,6 +289,7 @@ hash_table used_labels;
 	break;
     }
     case is_instruction_call:
+      /* FI: IO calls may have control effects; they should be handled here! */
 	controlized = controlize_call(st, instruction_call(i), 
 				       pred, succ, c_res, used_labels);
 	break;
