@@ -538,6 +538,10 @@ statement sequence_statement_containing (statement root_statement,
   return context.found_sequence_statement;
 }
 
+/**
+ * Replace statement old_stat by statement new_stat, asserting that this
+ * statement is contained in a sequence
+ */
 void replace_in_sequence_statement_with (statement old_stat, 
 					 statement new_stat,
 					 statement root_stat) 
@@ -545,15 +549,41 @@ void replace_in_sequence_statement_with (statement old_stat,
   statement sequence_statement = sequence_statement_containing (root_stat,
 								old_stat);
   list stats_list;
+  list new_stats_list = NIL;
+
+  pips_debug(5, "BEGIN replace_in_sequence_statement_with:\n");
 
   pips_assert("Statement is contained in a sequence", 
 	      sequence_statement != NULL);
 
   stats_list = sequence_statements(instruction_sequence(statement_instruction(sequence_statement)));
 
-  gen_insert_after (new_stat, old_stat, stats_list);
-  gen_remove (&stats_list, old_stat);
+  MAP (STATEMENT, s, {
+    pips_debug(7, "Iterate on statement:\n");
+    print_statement(s);    
+    if (s == old_stat) {
+      pips_debug(7, "Replace this statement:\n");
+      new_stats_list = CONS(STATEMENT,new_stat,new_stats_list);
+    }
+    else {
+      pips_debug(7, "Keep this statement:\n");
+      new_stats_list = CONS(STATEMENT,s,new_stats_list);
+    }
+  }, stats_list);
+
+  sequence_statements(instruction_sequence(statement_instruction(sequence_statement))) = gen_nreverse(new_stats_list);
+
+  /*gen_insert_after (new_stat, old_stat, stats_list);
+    gen_remove (&stats_list, old_stat);*/
   
+  ifdebug(7) {
+    pips_debug(7, "I've got this for the sequence\n");
+    print_statement(sequence_statement);    
+    pips_debug(7, "I've got this for the root statement\n");
+    print_statement(root_stat);    
+  }
+
+  pips_debug(5, "END replace_in_sequence_statement_with:\n");
 }
 
 /**
