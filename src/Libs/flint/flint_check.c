@@ -7,28 +7,7 @@
  * 
  */
 
-#include <stdio.h>
-#include <values.h>
-
-#include "malloc.h"
-
-/* #include <stdlib.h> */
-#include <strings.h>
-
-#include "genC.h"
-#include "linear.h"
-#include "ri.h"
-/* To avoid a global variable to pass the dependence graph in flint.c: */
-#include "graph.h"
-#include "flint.h"
-#include "control.h"
-#include "ri-util.h"
-#include "database.h"
-#include "effects-generic.h"
-#include "effects-simple.h"
-#include "pipsdbm.h"
-#include "resources.h"
-#include "misc.h"
+#include "local.h"
 
 #define FATAL(msg,value) {(void) fprintf(stderr,msg,value); exit(1); }
 
