@@ -8,7 +8,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1995/04/10 18:49:31 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1995/09/15 15:54:06 $, )
  * version $Revision$
  */
 
@@ -27,47 +27,50 @@
  * conditions:
  * - same template
  */
-bool align_check(r1, r2, plvect, plkind)
-reference r1, r2;
-list *plvect, *plkind;
+bool 
+align_check(
+    reference r1,
+    reference r2,
+    list *plvect,
+    list *plkind)
 {
-    int 
-	procdim,
-	i;
-    entity
-	e1 = reference_variable(r1),
-	e2 = reference_variable(r2);
-    align
-	a1 = load_entity_align(e1),
-	a2 = load_entity_align(e2);
-    bool
-	ok = TRUE;
-    list
-	li1 = reference_indices(r1),
-	li2 = reference_indices(r2);
+    int procdim, i, ne2dim;
+    entity e1, e2;
+    align a1, a2;
+    bool ok = TRUE;
+    list li1, li2;
 
-    *plvect = NULL;
-    *plkind = NULL;
+    e1 = reference_variable(r1),
+    e2 = reference_variable(r2);
+    a1 = load_entity_align(e1),
+    a2 = load_entity_align(e2);
+    li1 = reference_indices(r1),
+    li2 = reference_indices(r2);
+    *plvect = NIL;
+    *plkind = NIL;
 
-    debug(7, "align_check",
-	  "with references to %s, %d indices and %s, %d indices\n",
+    pips_debug(7, "with references to %s, %d indices and %s, %d indices\n",
 	  entity_name(e1), gen_length(li1), entity_name(e2), gen_length(li2));
 
-    if (align_template(a1)!=align_template(a2))
+    ne2dim = NumberOfDimension(e2);
+    
+    if (align_template(a1)!=align_template(a2))	
     {
-	for (i=1 ; i<=NumberOfDimension(e2) ; i++)
+	for (i=1 ; i<=ne2dim ; i++)
 	    if (ith_dim_distributed_p(e2, i, &procdim))
 	    {
 		*plkind = gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
-                *plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+                *plvect = gen_nconc(*plvect, CONS(PVECTOR,
+						  (VECTOR) VECTEUR_NUL, NIL));
 	    }
 	    else
 	    {
 		*plkind = gen_nconc(*plkind, CONS(INT, local_star, NIL));
-                *plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+                *plvect = gen_nconc(*plvect, CONS(PVECTOR,
+						  (VECTOR) VECTEUR_NUL, NIL));
 	    }
 	
-	return(ok);
+	return ok;
     }
 
     ifdebug(8)
@@ -79,11 +82,9 @@ list *plvect, *plkind;
 	     fprintf(stderr, "\n");
 	 }
 
-    for (i=1 ; i<=NumberOfDimension(e2) ; i++)
+    for (i=1 ; i<=ne2dim ; i++)
     {
-	expression
-	    indice1,
-	    indice2; 
+	expression indice1, indice2; 
 	int 
 	    affr1 = 1, /* default value, used in the shift case ! */
 	    affr2 = 1,
@@ -130,7 +131,8 @@ list *plvect, *plkind;
 		      entity_name(e2), i, baffin2, bshift2, bconst2);
 
                 *plkind = gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
-                *plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+                *plvect = gen_nconc(*plvect, CONS(PVECTOR, 
+						  (VECTOR) VECTEUR_NUL, NIL));
             }
 	    else
 	    if ((dim1==0) && (bconst2))
@@ -162,10 +164,11 @@ list *plvect, *plkind;
 		 */
 
 		*plkind = gen_nconc(*plkind, CONS(INT, aligned_constant, NIL));
-		*plvect = gen_nconc(*plvect, CONS(PVECTOR, 
-						  vect_add(vect_new(TEMPLATEV, t2),
-							   vect_new(DELTAV, t2-t1)),
-						  NIL));
+		*plvect = gen_nconc(*plvect,
+				    CONS(PVECTOR, (VECTOR)
+					 vect_add(vect_new(TEMPLATEV, t2),
+						  vect_new(DELTAV, t2-t1)),
+					 NIL));
 	    }
 	    else
 	    {
@@ -190,7 +193,8 @@ list *plvect, *plkind;
 		      (baffin2 || bshift2 || bconst2)))
 		{
 		    *plkind = gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
-		    *plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+		    *plvect = gen_nconc(*plvect, CONS(PVECTOR,(VECTOR) 
+						      VECTEUR_NUL, NIL));
 		}
 		else /* something is true! */
 		if (baffin1 || baffin2) /* just check whether aligned or not */
@@ -201,13 +205,15 @@ list *plvect, *plkind;
 			c1 = rate1*shft1+cnst1,
 			c2 = rate2*shft2+cnst2;
 
-		    if ((index1!=index2) ||/* even in the constant case ! not aligned */
+		    /* even in the constant case ! not aligned */
+		    if ((index1!=index2) ||
 			(r1!=r2) || (c1!=c2))
 		    {
 			*plkind = 
 			    gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
 			*plvect = 
-			    gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+			    gen_nconc(*plvect, CONS(PVECTOR, 
+						    (VECTOR) VECTEUR_NUL, NIL));
 		    }    
 		    else /* aligned... ??? 
 			  * bug if not 1: later on, because decl shift
@@ -216,7 +222,8 @@ list *plvect, *plkind;
 			*plkind = 
 			    gen_nconc(*plkind, CONS(INT, aligned_star, NIL));
 			*plvect = 
-			    gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+			    gen_nconc(*plvect, CONS(PVECTOR,
+						    (VECTOR) VECTEUR_NUL, NIL));
 		    }
 		}
 		else /* 4 cases study with bconst and bshift, plus the rates */
@@ -236,7 +243,7 @@ list *plvect, *plkind;
 			gen_nconc(*plkind, CONS(INT, aligned_constant, NIL));
 		    *plvect = 
 			gen_nconc(*plvect, 
-				  CONS(PVECTOR, 
+				  CONS(PVECTOR, (VECTOR)
 				       vect_make(VECTEUR_NUL,
 						 DELTAV, d,
 						 TEMPLATEV, t2,
@@ -248,8 +255,8 @@ list *plvect, *plkind;
 		{
 		    *plkind = gen_nconc(*plkind, 
 					CONS(INT, not_aligned, NIL));
-		    *plvect = gen_nconc(*plvect, 
-					CONS(PVECTOR, VECTEUR_NUL, NIL));
+		    *plvect = gen_nconc(*plvect,
+				CONS(PVECTOR, (VECTOR) VECTEUR_NUL, NIL));
 		}
 		else
 		if (bshift1 && bshift2)
@@ -262,7 +269,7 @@ list *plvect, *plkind;
 
 		    *plkind = gen_nconc(*plkind, CONS(INT, aligned_shift, NIL));
 		    *plvect = gen_nconc(*plvect, 
-					CONS(PVECTOR,
+					CONS(PVECTOR, (VECTOR)
 					     vect_make(VECTEUR_NUL,
 						       TSHIFTV, shift,
 						       (Variable) index1, 1,
@@ -277,7 +284,8 @@ list *plvect, *plkind;
 		    *plkind = 
 			gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
 		    *plvect = 
-			gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+			gen_nconc(*plvect,
+				  CONS(PVECTOR, (VECTOR)  VECTEUR_NUL, NIL));
 		}			  	 
 	    }
 	}
@@ -286,7 +294,8 @@ list *plvect, *plkind;
 	    if (!(baffin2 || bshift2 || bconst2 || blcnst2))
 	    {
 		*plkind = gen_nconc(*plkind, CONS(INT, local_star, NIL));
-		*plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+		*plvect = gen_nconc(*plvect,
+				    CONS(PVECTOR, (VECTOR) VECTEUR_NUL, NIL));
 	    }
 	    else
 	    if (baffin2) /* may be used to generate RSDs */
@@ -294,7 +303,7 @@ list *plvect, *plkind;
 		*plkind = gen_nconc(*plkind, CONS(INT, local_affine, NIL));
 		*plvect = 
 		    gen_nconc(*plvect, 
-			      CONS(PVECTOR, 
+			      CONS(PVECTOR, (VECTOR)
 				   vect_make(VECTEUR_NUL,
 					     (Variable) index2, affr2,
 					     TCST, shft2),
@@ -306,7 +315,7 @@ list *plvect, *plkind;
 		*plkind = gen_nconc(*plkind, CONS(INT, local_shift, NIL));
 		*plvect = 
 		    gen_nconc(*plvect, 
-			      CONS(PVECTOR, 
+			      CONS(PVECTOR, (VECTOR)
 				   vect_make(VECTEUR_NUL,
 					     (Variable) index2, 1,
 					     TCST, shft2),
@@ -316,7 +325,7 @@ list *plvect, *plkind;
 	    if (bconst2)
 	    {
 		*plkind = gen_nconc(*plkind, CONS(INT, local_constant, NIL));
-		*plvect = gen_nconc(*plvect, CONS(PVECTOR, 
+		*plvect = gen_nconc(*plvect, CONS(PVECTOR, (VECTOR)
 						  vect_new(TCST, shft2),
 						  NIL));
 	    }
@@ -327,7 +336,7 @@ list *plvect, *plkind;
 		*plkind = gen_nconc(*plkind, CONS(INT, local_form_cst, NIL));
 		*plvect = 
 		    gen_nconc(*plvect, 
-			      CONS(PVECTOR, 
+			      CONS(PVECTOR,  (VECTOR)
 				   normalized_linear(expression_normalized(indice2)),
 				   NIL));
 	    }
