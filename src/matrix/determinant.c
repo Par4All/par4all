@@ -1,7 +1,6 @@
  /* package matrix */
 
 #include <stdio.h>
-#include <sys/stdtypes.h> /*for debug with dbmalloc */
 #include <malloc.h>
 
 #include "assert.h"
@@ -24,16 +23,16 @@
  *
  * Authors: Francois Irigoin, September 1989, Yi-qing Yang, January 1990
  */
-void  matrix_determinant(a,result)
+void  matrix_determinant(a, result)
 Pmatrix	a;			        /* input */
-int	result[];			/* output */
+Value	result[];			/* output */
 {
 
-    int determinant_gcd;
-    int determinant_p;
-    int determinant_q;
+    Value determinant_gcd;
+    Value determinant_p;
+    Value determinant_q;
     int	n = MATRIX_NB_LINES(a);   
-    int denominator = MATRIX_DENOMINATOR(a);
+    Value denominator = MATRIX_DENOMINATOR(a);
     int i;
     /* cette routine est FAUSSE car la factorisation de Hermite peut
        s'appuyer sur des matrice unimodulaires de determinant 1 ou -1.
@@ -55,18 +54,21 @@ int	result[];			/* output */
 	break;
 
     case 2:
-	result[1] = MATRIX_ELEM(a,1,1)*MATRIX_ELEM(a,2,2) -
-	    MATRIX_ELEM(a,1,2)*MATRIX_ELEM(a,2,1);
-	result[0] = denominator * denominator;
-	break;
+    {
+	Value v1 = value_mult(MATRIX_ELEM(a,1,1),MATRIX_ELEM(a,2,2)),
+	      v2 = value_mult(MATRIX_ELEM(a,1,2),MATRIX_ELEM(a,2,1));
 
+	result[1] = value_minus(v1,v2);
+	result[0] = value_mult(denominator,denominator);
+	break;
+    }
     default: {
 	Pmatrix p = matrix_new(n,n);
 	Pmatrix h = matrix_new(n,n);
 	Pmatrix q = matrix_new(n,n);
 
 	/* matrix_hermite expects an integer matrix */
-	MATRIX_DENOMINATOR(a) = 1;
+	MATRIX_DENOMINATOR(a) = VALUE_ONE;
 	matrix_hermite(a,p,h,q,&determinant_p,&determinant_q);
 	MATRIX_DENOMINATOR(a) = denominator;
 
@@ -74,19 +76,18 @@ int	result[];			/* output */
 	result[1] = MATRIX_ELEM(h,1,1);
 	result[0] = denominator;
 	for(i=2; i <= n && result[1]!=0; i++) {
-	    result[1] *= MATRIX_ELEM(h,i,i);
-	    result[0] *= denominator;
+	    value_prod(result[1],MATRIX_ELEM(h,i,i));
+	    value_prod(result[0],denominator);
 	    determinant_gcd = pgcd_slow(result[0],result[1]);
-	    if(determinant_gcd!=1) {
-		result[0] /= determinant_gcd;
-		result[1] /= determinant_gcd;
+	    if(value_notone_p(determinant_gcd)) {
+		value_division(result[0],determinant_gcd);
+		value_division(result[1],determinant_gcd);
 	    }
 	}
 
 	/* product of determinants of three matrixs P, H, Q */
-	result[1] *= determinant_p * determinant_q;
-	
-	    
+	value_prod(result[1],determinant_p);
+	value_prod(result[1],determinant_q);
 
 	/* free useless matrices */
 	matrix_free(p);
@@ -96,9 +97,9 @@ int	result[];			/* output */
     }
     /* reduce result */
     determinant_gcd = pgcd_slow(result[0],result[1]);
-    if(determinant_gcd!=1) {
-	result[0] /= determinant_gcd;
-	result[1] /= determinant_gcd;
+    if(value_notone_p(determinant_gcd)) {
+	value_division(result[0],determinant_gcd);
+	value_division(result[1],determinant_gcd);
     }   
 }
 
@@ -120,7 +121,7 @@ int	result[];			/* output */
 void matrix_sub_determinant(a,i,j,result)
 Pmatrix	a;		        /* input matrix */
 int	i,j;			/* coords of sub determinant */
-int	result[];		/* output */
+Value	result[];		/* output */
 {
     int n = MATRIX_NB_LINES(a);
     int r; 
@@ -136,9 +137,9 @@ int	result[];		/* output */
     /* save row i, but for the (i,j) elements */
     for(c=1; c <= n; c++) {
 	MATRIX_ELEM(save_row,1,c) = MATRIX_ELEM(a,i,c);
-	MATRIX_ELEM(a,i,c) = 0;
+	MATRIX_ELEM(a,i,c) = VALUE_ZERO;
     }
-    MATRIX_ELEM(a,i,j) = 1;
+    MATRIX_ELEM(a,i,j) = VALUE_ONE;
 
     matrix_determinant(a,result);
 
