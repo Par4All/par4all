@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#include "linear.h"
+
 #include "resources.h"
 
 #include "genC.h"
