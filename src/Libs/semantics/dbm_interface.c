@@ -251,11 +251,15 @@ bool summary_precondition(char * module_name)
       t = update_precondition_with_call_site_preconditions(t, caller, callee);
     }, callees_callees(callers));
 
-    if (!callees_callees(callers) && !entity_main_module_p(callee))
+    if (!callees_callees(callers) && 
+	!entity_main_module_p(callee) && 
+	some_main_entity_p())
     {
       /* no callers => empty precondition (but the main). 
 	 FC. 08/01/1999.
       */
+      pips_user_warning("empty precondition to %s "
+			"because not in call tree from main.\n", module_name);
       t = transformer_empty();
     } else if (transformer_undefined_p(t)) {
 	t = transformer_identity();
