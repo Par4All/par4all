@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.21  1998/10/24 14:33:08  coelho
+ * parser exception added.
+ *
  * Revision 1.20  1998/10/24 14:32:45  coelho
  * simpler macros.
  *
@@ -30,6 +33,7 @@
 extern const unsigned int overflow_error;
 extern const unsigned int simplex_arithmetic_error;
 extern const unsigned int user_exception_error;
+extern const unsigned int parser_exception_error;
 extern const unsigned int any_exception_error;
 
 /* use gnu cpp '__FUNCTION__' extension if possible.
