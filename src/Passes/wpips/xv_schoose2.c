@@ -165,6 +165,7 @@ void create_schoose_window()
     choice = xv_create(schoose_panel, PANEL_TEXT,
 		       PANEL_LABEL_STRING, "Current choice",
 		       PANEL_VALUE_DISPLAY_LENGTH, 8,
+		       PANEL_NOTIFY_PROC, ok_notify,
 		       XV_X, 10,
 		       XV_Y, 10,
 		       NULL);
