@@ -221,9 +221,9 @@ get_property(string name, bool cool)
     property p;
     if (!pl) read_properties(); /* rather lazy... */
     if ((p=(property) hash_get(pl, name)) == (property)HASH_UNDEFINED_VALUE) {
-	if (!cool) pips_internal_error("unknown property : %s\n", name);
+	if (!cool) pips_internal_error("unknown property: --%s--\n", name);
 	/* else */
-	pips_user_warning("unknown property : %s\n", name);
+	pips_user_warning("unknown property: --%s--\n", name);
 	p = property_undefined;
     }
     return p;
