@@ -35,6 +35,8 @@ char *argv[];
     pips_assert("create_workspace",
 		db_get_current_workspace()!=database_undefined);
 
+    open_log_file();
+
     for (i = 0; i < *pargc; i++) {
 	status = process_user_file(argv[i]);
 	if (status == FALSE)
@@ -49,6 +51,13 @@ char *argv[];
 
 	status = open_module_if_unique();
     }
+    else {
+	/* FI: in fact, the whole workspace should be deleted!
+	 The file and the directory should be removed, and the current
+	 database become undefined... */
+	close_log_file();
+    }
+
     return status;
 }
 
@@ -125,11 +134,14 @@ char *name;
 
     if (make_open_workspace(name) == NULL) {
 	/* should be show_message */
+	/* FI: what happens since log_file is not open? */
 	user_log("Cannot open workspace %s\n", name);
 	status = FALSE;
     }
     else {
 	(* pips_update_props_handler)();
+
+	open_log_file();
 
 	user_log("Workspace %s opened\n", name);
 
