@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/12 17:38:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/12 18:51:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/10/12 17:38:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/10/12 18:51:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -205,6 +205,9 @@ bool give_code_p;
 	hash_table_free(nts);
 	nts = hash_table_undefined;
     }
+
+    close_prettyprint();
+
     reset_semantic_map();
     reset_current_module_entity();
     reset_current_module_statement();
