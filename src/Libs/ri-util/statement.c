@@ -824,9 +824,9 @@ string statement_identification(statement s)
     int so = statement_ordering(s);
 
     sprintf(buffer, "%d (%d, %d) at 0x%x\n",
+	    statement_number(s),
 	    ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so),
-	    statement_number(s),
 	    (unsigned int) s);
 
     return buffer;
