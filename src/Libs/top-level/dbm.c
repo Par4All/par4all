@@ -223,6 +223,14 @@ close_workspace(void)
 bool 
 delete_workspace(string wname)
 {
+    int success = check_delete_workspace(wname,TRUE);
+
+    return success;
+}
+
+bool 
+check_delete_workspace(string wname, bool check)
+{
     int failure;
     string current = db_get_current_workspace_name();
 
@@ -230,8 +238,22 @@ delete_workspace(string wname)
        workspace since it will fail on NFS because of the open file
        descriptor (creation of .nfs files). RK */
 
-    if (current && same_string_p(wname, current))
+    if (check)
+    {
+	if (current && same_string_p(wname, current))
 	pips_user_error("Cannot delete current workspace, close it first!\n");
+    }
+    else
+    {
+	string name = strdup(current); 
+        (void) close_makefile(name);
+	free(name);
+	close_log_file();
+	close_processed_include_cache();
+	/* reset_entity_to_size(); */
+	close_warning_file();
+    }
+
 
     if ((failure=safe_system_no_abort(concatenate("Delete ", wname, NULL))))
 	pips_user_warning("exit code for Delete is %d\n", failure);
