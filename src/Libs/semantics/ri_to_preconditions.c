@@ -393,7 +393,7 @@ add_loop_skip_condition(transformer pre, loop l)
 
     if(incr_lb==incr_ub) {
 	if(incr_lb==0) {
-	    user_error("add_loop_skip_condition", "Illegal null increment\n");
+	    user_error("add_loop_skip_condition", "Illegal null loop increment\n");
 	}
 	else
 	    incr = incr_lb;
@@ -420,14 +420,21 @@ add_loop_skip_condition(transformer pre, loop l)
 	/* ub < lb, i.e. ub + lb + 1 <= 0 */
 	Pvecteur v_ub = (Pvecteur) normalized_linear(n_ub);
 	Pvecteur v_lb = (Pvecteur) normalized_linear(n_lb);
-	Pvecteur v = vect_substract(v_ub, v_lb);
 
-	vect_add_elem(&v, TCST, (Value) 1);
-	pre = transformer_inequality_add(pre, v);
+	if(value_mappings_compatible_vector_p(v_lb)
+	   && value_mappings_compatible_vector_p(v_ub)) {
+	    Pvecteur v = vect_substract(v_ub, v_lb);
 
-	ifdebug(8) {
-	    debug(8,"add_loop_skip_condition","Skip condition:\n");
-	    vect_fprint(stderr, v, external_value_name);
+	    vect_add_elem(&v, TCST, (Value) 1);
+	    pre = transformer_inequality_add(pre, v);
+
+	    ifdebug(8) {
+		debug(8,"add_loop_skip_condition","Skip condition:\n");
+		vect_fprint(stderr, v, external_value_name);
+	    }
+	}
+	else {
+	    debug(8,"add_loop_skip_condition","Non-analyzed variable in loop bound(s)\n");
 	}
     }
     else {
@@ -703,7 +710,12 @@ add_loop_index_exit_value(transformer post, /* postcondition of the last iterati
      */
     if(normalized_linear_p(n_incr)) {
 	Pvecteur v_incr = (Pvecteur) normalized_linear(n_incr);
-	t_incr = affine_increment_to_transformer(i, v_incr);
+	if(value_mappings_compatible_vector_p(v_incr)) {
+	    t_incr = affine_increment_to_transformer(i, v_incr);
+	}
+	else {
+	    t_incr = transformer_undefined;
+	}
     }
     else {
 	t_incr = transformer_undefined;
@@ -723,44 +735,53 @@ add_loop_index_exit_value(transformer post, /* postcondition of the last iterati
 	if(lb_inc >= 1 || ub_inc <= -1) {
 	    Pvecteur v_ub = (Pvecteur) normalized_linear(n_ub);
 	    Pvecteur v_incr = (Pvecteur) normalized_linear(n_incr);
-	    Pvecteur v_i = vect_new((Variable) i, (Value) 1);
-	    Pvecteur c1 = VECTEUR_UNDEFINED;
-	    Pvecteur c2 = VECTEUR_UNDEFINED;
 
-	    pips_assert("add_loop_index_exit_value", normalized_linear_p(n_incr));
-	    if(lb_inc>=1) {
-		/* v_i - v_incr <= v_ub < v_i
-		 * or:
-		 * i - v_incr - v_ub <= 0, v_ub - v_i + 1 <= 0
-		 */
-		c1 = vect_substract(v_i, v_incr);
-		c2 = vect_substract(v_ub, v_i);
+	    if(value_mappings_compatible_vector_p(v_ub)
+	       && value_mappings_compatible_vector_p(v_incr)) {
+		Pvecteur v_i = vect_new((Variable) i, (Value) 1);
+		Pvecteur c1 = VECTEUR_UNDEFINED;
+		Pvecteur c2 = VECTEUR_UNDEFINED;
 
-		c1 = vect_cl(c1, (Value) -1, v_ub);
-		vect_add_elem(&c2, (Variable) TCST, (Value) 1);
-	    }
-	    else if(ub_inc<=-1) {
-		/* v_i - v_incr >= v_ub > v_i 
-		 *
-		 * or:
-		 * - i + v_incr + v_ub <= 0, - v_ub + v_i + 1 <= 0
-		 */
-		c1 = vect_substract(v_incr, v_i);
-		c2 = vect_substract(v_i, v_ub);
+		pips_assert("add_loop_index_exit_value", normalized_linear_p(n_incr));
+		if(lb_inc>=1) {
+		    /* v_i - v_incr <= v_ub < v_i
+		     * or:
+		     * i - v_incr - v_ub <= 0, v_ub - v_i + 1 <= 0
+		     */
+		    c1 = vect_substract(v_i, v_incr);
+		    c2 = vect_substract(v_ub, v_i);
 
-		c1 = vect_cl(c1, (Value) 1, v_ub);
-		vect_add_elem(&c2, (Variable) TCST, (Value) 1);
+		    c1 = vect_cl(c1, (Value) -1, v_ub);
+		    vect_add_elem(&c2, (Variable) TCST, (Value) 1);
+		}
+		else if(ub_inc<=-1) {
+		    /* v_i - v_incr >= v_ub > v_i 
+		     *
+		     * or:
+		     * - i + v_incr + v_ub <= 0, - v_ub + v_i + 1 <= 0
+		     */
+		    c1 = vect_substract(v_incr, v_i);
+		    c2 = vect_substract(v_i, v_ub);
+
+		    c1 = vect_cl(c1, (Value) 1, v_ub);
+		    vect_add_elem(&c2, (Variable) TCST, (Value) 1);
+		}
+		else {
+		    /* should never happen! */
+		    pips_assert("add_loop_index_exit_value", TRUE);
+		}
+		transformer_inequality_add(post, c1);
+		transformer_inequality_add(post, c2);
+
+		ifdebug(8) {
+		    debug(8, "add_loop_index_exit_value", "post with exit conditions:\n");
+		    (void) print_transformer(post);
+		}
 	    }
 	    else {
-		/* should never happen! */
-		pips_assert("add_loop_index_exit_value", TRUE);
-	    }
-	    transformer_inequality_add(post, c1);
-	    transformer_inequality_add(post, c2);
-
-	    ifdebug(8) {
-		debug(8, "add_loop_index_exit_value", "post with exit conditions:\n");
-		(void) print_transformer(post);
+		debug(8, "add_loop_index_exit_value",
+		      "post is unchanged because the increment or the upper bound"
+		      " reference unanalyzed variables\n");
 	    }
 	}
 	else {
