@@ -1,0 +1,258 @@
+/*
+ * $Id$
+ * 
+ * Unix wrapper around tpips for jpips, for signal management.
+ * Under special comments on the pipe, signals are sent to tpips.
+ * I could not use popen() because I found no way to access the pid
+ * of the child process. Basically this is a re-implementation of popen().
+ *
+ *
+ * stdin TPIPS -w [stdout -> stdin] TPIPS stdout
+ *
+ *
+ *       -> OutputStream/stdin TPIPS -w stdout/stdin -> TPIPS -> stdout/--+
+ * JPIPS                                                                  |
+ *       <- InputStream/<-------------------------------------------------+
+ *
+ *
+ * @author Fabien Coelho (with some advises from Ronan Keryell)
+ *
+ * $Log: wrapper.c,v $
+ * Revision 1.1  1998/05/27 10:30:50  coelho
+ * Initial revision
+ *
+ */
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <signal.h>
+#include <errno.h>
+
+#include <stdio.h>
+#include <string.h>
+
+#define SIZE		1024				/* buffer size */
+
+#define SIGNAL_TAG	"# jpips send signal to tpips "
+
+/* available tags
+ */
+#define CHECKPOINT	"CHECKPOINT"
+#define INTERRUPT	"INTERRUPT"
+#define KILLNOW		"EXIT"
+#define ABORTIT		"ABORT"
+
+#define WRAPPER		"[tpips_wrapper] "
+
+#define starts_with(s1, s2) (strncmp(s1, s2, strlen(s2))==0) /* a la java */
+
+/* global because needed in tpw_fatal_error.
+ */
+static pid_t tpips_pid = 0;
+
+/* anable log with -DLOG for debug.
+ */
+static void tpw_log(char * message)
+{
+#if defined(LOG)
+    fprintf(stderr, WRAPPER "%s\n", message);
+    fflush(stderr);
+#endif
+}
+
+static void tpw_fatal_error(char * message)
+{
+    fprintf(stderr, WRAPPER "fatal error: %s\n", message);
+    fflush(stderr);
+    kill(tpips_pid, SIGKILL);
+    exit(1);
+}
+
+/* checks returned value for most system commands (-1 and errno set).
+ */
+static void tpw_check_perror(int en, char * message)
+{
+    if (en==-1)
+    {
+	perror(message);
+	tpw_fatal_error(message);
+    }
+}
+
+#define tpw_check(what, comment) \
+	tpw_log(comment), tpw_check_perror(what, comment)
+#define KILL(pid,sig) if (pid!=0) { tpw_check(kill(pid,sig),"kill()"); }
+
+typedef void (*sig_handler_t)(int);
+
+/* signal handler for tpips_wrapper.
+ * basically forwards signals to tpips.
+ * tries to stop tpips before exiting.
+ * stops if tpips is stopped.
+ */
+static void tpw_sig_handler(int sn /* signal number */)
+{
+    /* these signals are traced.
+     */
+    fprintf(stderr, WRAPPER "signal %d caught!\n", sn);
+    fflush(stderr);
+
+    switch (sn)
+    {
+    case SIGHUP:
+    case SIGINT:
+    case SIGTERM:
+    case SIGUSR1:
+    case SIGUSR2:
+	/* forward signals to tpips.
+	 */
+	KILL(tpips_pid, sn); 
+	break;
+    case SIGQUIT:
+    case SIGABRT:
+    case SIGCHLD: /* tpips stopped. */
+    case SIGPIPE: /* idem? */
+	KILL(tpips_pid, SIGKILL);
+	exit(2);
+	break;
+    default:
+	fprintf(stderr, WRAPPER "unexpected signal (%d)\n", sn);
+	tpw_fatal_error("unexpected signal");
+    }
+
+    /* reset signal handler.
+     */
+    (void) signal(sn, tpw_sig_handler);
+}
+
+/* special handlers for tpips wrapper.
+ */
+static void tpw_set_sig_handlers(void)
+{
+    (void) signal(SIGHUP,  tpw_sig_handler);
+    (void) signal(SIGINT,  tpw_sig_handler);
+    (void) signal(SIGTERM, tpw_sig_handler);
+
+    (void) signal(SIGUSR1, tpw_sig_handler);
+    (void) signal(SIGUSR2, tpw_sig_handler);
+
+    (void) signal(SIGQUIT, tpw_sig_handler);
+    (void) signal(SIGABRT, tpw_sig_handler);
+    (void) signal(SIGCHLD, tpw_sig_handler);
+    (void) signal(SIGPIPE, tpw_sig_handler);
+}
+
+/* fork, with stdout-stdin link kept
+ * @return the created pid.
+ * should be in_from_jpips instead of stdin?
+ * what about out_to_jpips and the wrapper???
+ */
+static pid_t tpw_fork_inout(void)
+{
+   int filedes[2];
+   pid_t process;
+   
+   /* create pipe. 
+    */
+   tpw_check(pipe(filedes), "pipe()");
+
+   /* fork 
+    */
+   process = fork();
+   tpw_check(process, "fork()");
+
+   if (process==0)
+   {
+       /* CHILD
+	*/
+       tpw_check(dup2(filedes[0], 0), "dup2()");  /* in -> stdin */
+   }
+   else
+   {
+       /* PARENT 
+	*/
+       tpw_check(dup2(filedes[1], 1), "dup2()"); /* out -> stdout */
+   }
+
+   tpw_log("tpw_fork_inout() done");
+
+   /* if (process) 
+   {
+       fprintf(stdout, WRAPPER "started for tpips (pid=%d)\n", (int) process);
+       fflush(stdout);
+   } */
+
+   return process;
+}
+
+/* @return a line from "in", or NULL of EOF.
+ * @caution a pointer to a static buffer is returned!
+ */
+static char * tpw_readline(FILE * in)
+{
+    static char buffer[SIZE]; 
+    int c=0, i=0;
+
+    while (c != '\n' && i<SIZE-1 && (c = getc(in))!=EOF)
+	buffer[i++] = (char) c;
+
+    if (i==0) return NULL;
+
+    buffer[i++] = '\0';
+    return buffer;
+}
+
+/* fork a tpips to goes on, while the current process acts as a wrapper,
+ * which forwards orders, and perform some special signal handling.
+ */
+void tpips_wrapper(void)
+{
+    char * line;
+
+    tpips_pid = tpw_fork_inout();
+
+    /* the child is a new tpips 
+     * the parent just acts as a wrapper.
+     */
+    if (tpips_pid==0) return; 
+
+    tpw_set_sig_handlers();
+
+    while ((line = tpw_readline(stdin)))
+    {
+	/* forward to tpips.
+	 * how to ensure that tpips is alive?
+	 * SIGCHLD and SIGPIPE caught.
+	 */
+	fputs(line, stdout);
+	fflush(stdout);
+	
+	/* handle signals.
+	 */
+	if (starts_with(line, SIGNAL_TAG))
+	{
+	    line += strlen(SIGNAL_TAG);
+
+	    if (starts_with(line, CHECKPOINT)) {
+		KILL(tpips_pid, SIGUSR1);
+	    } else if (starts_with(line, INTERRUPT)) {
+		KILL(tpips_pid, SIGINT);
+	    } else if (starts_with(line, ABORTIT)) {
+		KILL(tpips_pid, SIGABRT);
+	    } else if (starts_with(line, KILLNOW)) {
+		KILL(tpips_pid, SIGUSR2);
+	    } else {
+		tpw_fatal_error(line);
+	    }
+	}
+    }
+
+    /* stop tpips on EOF.
+     */
+    tpw_log("exiting...");
+    fputs("exit\n", stdout);
+    fclose(stdout);
+    KILL(tpips_pid, SIGKILL);
+
+    exit(0); /* wrapper mission done. */
+}
