@@ -565,6 +565,15 @@ entity v;
 	    debug(8, "translate_global_value",
 		  "No equivalent for %s in %s: project %s\n",
 		  entity_name(v), entity_name(m), entity_name(v));
+	    user_warning("translate_global_value",
+			 "Information about %s lost,\n"
+			 "check structure of common /%s/ in modules %s and %s\n",
+			 entity_name(v), entity_local_name(section), entity_module_name(v),
+			 module_local_name(m));
+	    if(entity_is_argument_p(v, transformer_arguments(tf))) {
+		entity v_old = global_new_value_to_global_old_value(v);
+		transformer_projection(tf, CONS(ENTITY, v_old, NIL));
+	    }
 	    transformer_projection(tf, CONS(ENTITY, v, NIL));
 	    return;
 	}
@@ -574,6 +583,16 @@ entity v;
 	    debug(8, "translate_global_value",
 		  "No equivalent location for %s and %s: project %s\n",
 		  entity_name(v), entity_name(e), entity_name(v));
+	    transformer_projection(tf, CONS(ENTITY, v, NIL));
+	    user_warning("translate_global_value",
+			 "Information about %s lost,\n"
+			 "check structure of common /%s/ in modules %s and %s\n",
+			 entity_name(v), entity_local_name(section), entity_module_name(v),
+			 module_local_name(m));
+	    if(entity_is_argument_p(v, transformer_arguments(tf))) {
+		entity v_old = global_new_value_to_global_old_value(v);
+		transformer_projection(tf, CONS(ENTITY, v_old, NIL));
+	    }
 	    transformer_projection(tf, CONS(ENTITY, v, NIL));
 	    return;
 	}
