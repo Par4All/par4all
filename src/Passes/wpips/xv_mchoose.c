@@ -158,9 +158,7 @@ void create_mchoose_window()
 			 PANEL_LABEL_STRING, "Current choices",
 			 PANEL_VALUE_DISPLAY_LENGTH, 30,
 			 PANEL_VALUE_STORED_LENGTH, 128,
-			 PANEL_NOTIFY_LEVEL,PANEL_SPECIFIED,
-			 PANEL_NOTIFY_STRING,"\n",
-			PANEL_NOTIFY_PROC, ok_notify,
+			 PANEL_NOTIFY_PROC, ok_notify,
 			 XV_X, 10,
 			 XV_Y, 10,
 			 0);
