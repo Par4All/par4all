@@ -1,7 +1,6 @@
  /* package matrice */
 
 #include <stdio.h>
-#include <sys/stdtypes.h> /*for debug with dbmalloc */
 #include <malloc.h>
 
 #include "assert.h"
@@ -37,17 +36,17 @@
  * Note: les determinants des matrices MAT, P, Q et D ne sont pas utilises.
  *
  */
-matrice_smith(MAT,n,m,P,D,Q)
-int *MAT;
+void matrice_smith(MAT,n,m,P,D,Q)
+matrice MAT;
 int n,m;
-int *P;
-int *D;
-int *Q;
+matrice P;
+matrice D;
+matrice Q;
 {
     int n_min,m_min;
     int level = 0;
-    int ALL;        /* le plus petit element sur la diagonale */
-    int x;          /* le rest de la division par ALL */
+    register Value ALL;        /* le plus petit element sur la diagonale */
+    register Value x;          /* le rest de la division par ALL */
     int i;
     
     boolean stop = FALSE;
@@ -56,7 +55,7 @@ int *Q;
     /* precondition sur les parametres */
     assert(m > 0 && n >0);
     matrice_assign(MAT,D,n,m);
-    assert(DENOMINATOR(D)==1);
+    assert(value_one_p(DENOMINATOR(D)));
 
     matrice_identite(P,n,0);
     matrice_identite(Q,m,0);
@@ -81,21 +80,24 @@ int *Q;
 		matrice_swap_columns(Q,m,m,level+1,m_min);
 	    }
 #ifdef TRACE
-	    (void) printf (" apres alignement du plus petit element a la premiere colonne\n");
+	    (void) printf (" apres alignement du plus petit element"
+			   " a la premiere colonne\n");
 	    matrice_print(D,n,m);
 #endif
 	   
 	    ALL = ACC_ELEM(D,n,1,1,level);
 	    if (mat_lig_el(D,n,m,level) != 0) 
 		for (i=level+2; i<=m; i++) {
-		    x = ACCESS(D,n,level+1,i) / ALL;
+		    x = ACCESS(D,n,level+1,i);
+		    value_division(x,ALL);
 		    matrice_soustraction_colonne(D,n,m,i,level+1,x);
 		    matrice_soustraction_colonne(Q,m,m,i,level+1,x);
 		    next = FALSE;
 		}
 	    if (mat_col_el(D,n,m,level) != 0) 
 		for(i=level+2;i<=n;i++) {
-		    x = ACCESS(D,n,i,level+1) / ALL;
+		    x = ACCESS(D,n,i,level+1);
+		    value_division(x,ALL);
 		    matrice_soustraction_ligne(D,n,m,i,level+1,x);
 		    matrice_soustraction_ligne(P,n,n,i,level+1,x);
 		    next = FALSE;
