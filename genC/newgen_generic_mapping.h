@@ -1,5 +1,4 @@
-/* -- generic-mapping.h
- *
+/*
  * These are the functions defined in the Newgen mapping library.
  *
  * This is a temporary implementation used for the Pips Project. The
@@ -28,7 +27,7 @@
  *
  * FC, Feb 21, 1994
  *
- * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1994/12/28 08:58:06 $, )
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1994/12/30 13:58:50 $, )
  * version $Revision$
  * got on %D%, %T%
  */
