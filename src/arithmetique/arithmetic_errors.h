@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.34  2003/09/03 13:59:46  coelho
+ * ++
+ *
  * Revision 1.33  2003/09/03 13:35:34  coelho
  * no more callback.
  *
@@ -63,6 +66,8 @@
 #define linear_arithmetic_error_included
 
 #include <setjmp.h>
+
+typedef void (*exception_callback_t)(char *, char *, int);
 
 /*
 const unsigned int overflow_error = 1;
