@@ -170,7 +170,14 @@ Pbase base_dup(Pbase b)
 
   for (; b!=BASE_NULLE; b=b->succ)
   {
-    n = vect_new(var_of(b), val_of(b));
+    n = (Pvecteur) MALLOC(sizeof(Svecteur),VECTEUR,"base_dup");
+    if (n == NULL) {
+      fprintf(stderr,"[base_dup] out of memory space\n");
+      abort();
+    }
+    var_of(n) = var_of(b);
+    val_of(n) = VALUE_ONE;
+    n->succ = NULL;
     if (r==BASE_NULLE) r = n;
     if (p!=BASE_NULLE) p->succ = n;
     p = n;
