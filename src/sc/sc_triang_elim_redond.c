@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/07/18 19:15:55 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/07/27 15:17:59 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -280,10 +280,8 @@ int info[][2];
 	tc[i] = pc;
 	if (!BASE_NULLE_P(sort_base))
 	{
-	    Value v;
 	    phrank = highest_rank_pvector(pc->vecteur, sort_base, &rank);
-	    v = val_of(phrank);
-	    info[rank==-1?0:rank][rank==-1?0:value_pos_p(v)]++;
+	    info[rank==-1?0:rank][rank==-1?0:value_pos_p(val_of(phrank))]++;
 	}
     }
     
