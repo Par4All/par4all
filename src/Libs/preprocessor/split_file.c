@@ -22,7 +22,7 @@
  * - last line may not be \n'ed.
  */
 
-static void hollerith(char *);
+static void hollerith_and_bangcomments(char *);
 #define LINESIZE 200
 
 /*
@@ -407,7 +407,7 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 	nflag = 0;
 	rv = 0;
 	while (getline() > 0) {
-	    hollerith(buf); /* FC */
+	    hollerith_and_bangcomments(buf); /* FC */
 	    if (nflag == 0) /* if no name yet, try and find one */
 		nflag = lname(name);
 
@@ -537,9 +537,12 @@ static int blank_line_p(char * line)
     return 1;
 }
 
-static void hollerith(char * line)
+static void hollerith_and_bangcomments(char * line)
 {
-    int i,j,initial, touched=0;
+    int i,j,initial, touched=0, bang=0;
+    char bangcomment[BSZ];
+
+    bangcomment[0] = '\0';
     
     if (!line) {
 	in_squotes=0, in_dquotes=0, in_id=0; /* RESET */
@@ -646,10 +649,20 @@ static void hollerith(char * line)
 	    }
 	}
 	
+
+	/* bang comment */
+	if (!in_squotes && !in_dquotes && line[i]=='!')
+	{
+	    strcpy(bangcomment,&line[i]);
+	    line[i]='\n', line[i+1]='\0'; /* stop while loop */
+	    bang=1;
+	}
+
 	i++, initial++;
     }
 
-    if (touched) {
+    if (touched) 
+    {
 	int len = strlen(line); /* the new line may exceed the 72 column */
 	/* caution, len includes cr... */
 	/* the dilatation cannot exceed one line (?) */
@@ -659,5 +672,15 @@ static void hollerith(char * line)
 	    line[72]='\n'; line[73]=' '; line[74]=' ';
 	    line[75]=' '; line[76]=' '; line[77]=' '; line[78]='x';
 	}
+    }
+
+    /* the bang comment is moved to the preceding line.
+     */
+    if (bang) 
+    {
+	char tmp[BSZ];
+	strcpy(tmp,line);
+	strcpy(line,bangcomment);
+	strcat(line,tmp);
     }
 }
