@@ -14,11 +14,12 @@
 
 /******************************************************************** UTILS */
 
+/* the workspace name must be composed of the following characters.
+ */
 #define WORKSPACE_NAME_CHARS \
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
 
-bool
-workspace_name_p(string name)
+bool workspace_name_p(string name)
 {
     return strlen(name)==strspn(name, WORKSPACE_NAME_CHARS);
 }
@@ -32,8 +33,7 @@ workspace_name_p(string name)
  */
 static string current_workspace_name = NULL;
 
-static void 
-db_set_current_workspace_name(string name)
+static void db_set_current_workspace_name(string name)
 {
     if (current_workspace_name)
 	pips_internal_error("current workspace %s not closed\n", 
@@ -42,30 +42,31 @@ db_set_current_workspace_name(string name)
     current_workspace_name = strdup(name);
 }
 
-static void
-db_reset_current_workspace_name(void)
+static void db_reset_current_workspace_name(void)
 {
     pips_assert("some current workspace", current_workspace_name);
     free(current_workspace_name), current_workspace_name = NULL;
 }
 
+static void db_reset_current_workspace_name_if_necessary(void)
+{
+    if (current_workspace_name) db_reset_current_workspace_name();
+}
+
 /* the function is used to check that there is some current workspace...
  */
-string
-db_get_current_workspace_name(void)
+string db_get_current_workspace_name(void)
 {
     return current_workspace_name;
 }
 
 /* returns an allocated string. */
-string 
-db_get_workspace_directory_name(string name)
+string db_get_workspace_directory_name(string name)
 {
     return strdup(concatenate("./", name, ".database", 0)); 
 }
 
-string 
-db_get_current_workspace_directory(void)
+string db_get_current_workspace_directory(void)
 {
     string ws_name = db_get_current_workspace_name();
     pips_assert("some current workspace", ws_name);
@@ -76,23 +77,25 @@ db_get_current_workspace_directory(void)
 
 static int logical_time = 1; /* 0 means not set... */
 
-int 
-db_inc_logical_time(void)
+int db_inc_logical_time(void)
 {
     return logical_time++; 
 }
 
-int 
-db_get_logical_time(void) 
+int db_get_logical_time(void) 
 {
     return logical_time; 
 }
 
-static void 
-db_set_logical_time(int time)
+static void db_set_logical_time(int time)
 {
     pips_assert("positive time set", time>=1);
     logical_time = time;
+}
+
+static void db_reset_logical_time(void)
+{
+    logical_time = 0;
 }
 
 /***************************************************************** META DATA */
@@ -104,22 +107,32 @@ db_set_logical_time(int time)
 #define DATABASE_SYMBOLS	"SYMBOLS"
 #define DATABASE_MISC		"MISC"
 
-string 
-db_get_meta_data_directory()
+string db_get_meta_data_directory()
 {
     return db_get_directory_name_for_module(METADATA);
 }
 
-static string
-meta_data_db_file_name(string data)
+static string meta_data_db_file_name(string data)
 {
     string dir_name = db_get_meta_data_directory(),
 	res = strdup(concatenate(dir_name, "/" MD_DATABASE ".", data, 0));
     free(dir_name); return res;
 }
 
-static void
-save_meta_data(bool do_free)
+/* reset all meta data on failures.
+ */
+static void reset_meta_data(void)
+{
+    db_reset_current_workspace_name_if_necessary();
+    db_reset_logical_time();
+    /* what about db_symbols? */
+    db_reset_pips_database_if_necessary();
+}
+
+/* save (and maybe free) metadata.
+ * @return whether sucessful.
+ */
+static bool save_meta_data(bool do_free)
 {
     string file_name;
     FILE * file;
@@ -151,19 +164,29 @@ save_meta_data(bool do_free)
     free(file_name);
 
     pips_debug(2, "done\n");
+
+    return TRUE;
 }
 
-static void
-load_meta_data(void)
+#define ONERROR(cond, what) \
+  if (cond) { reset_meta_data(); what; return FALSE; }
+
+/* load metadata from workspace.
+ * @return whether successful.
+ */
+static bool load_meta_data(void)
 {
     string file_name, ws_name;
     FILE * file;
     int time, read;
+    bool ok;
     
     pips_debug(2, "loading database misc data\n");
     file_name = meta_data_db_file_name(DATABASE_MISC);
-    file = safe_fopen(file_name, "r");
-    if (fscanf(file, "%d\n", &time)!=1) pips_internal_error("fscanf failed\n");
+    file = check_fopen(file_name, "r");
+    ONERROR(!file,/* nope */)
+    ONERROR(fscanf(file, "%d\n", &time)!=1,
+	    pips_internal_error("fscanf failed\n"))
     db_set_logical_time(time);
     ws_name = safe_readline(file);
     if (!same_string_p(ws_name, db_get_current_workspace_name()))
@@ -175,26 +198,32 @@ load_meta_data(void)
 
     pips_debug(2, "loading database symbols\n");
     file_name = meta_data_db_file_name(DATABASE_SYMBOLS);
-    file = safe_fopen(file_name, "r");
+    file = check_fopen(file_name, "r");
+    ONERROR(!file,/* nope */)
     read = gen_read_tabulated(file, FALSE);
-    pips_assert("db_symbols read", read==db_symbol_domain);
+    ONERROR(read!=db_symbol_domain,
+	    pips_user_error("Invalid symbol domain in metadata!"))
+	    
     safe_fclose(file, file_name);
     free(file_name);
 
     pips_debug(2, "loading database status\n");
     file_name = meta_data_db_file_name(DATABASE_STATUS);
-    file = safe_fopen(file_name, "r");
-    db_open_pips_database(file);
+    file = check_fopen(file_name, "r");
+    ONERROR(!file,/* nope */)
+    ok = db_open_pips_database(file);
+    ONERROR(!ok, pips_user_error("Could not read database content!"))
     safe_fclose(file, file_name);
     free(file_name);
 
     pips_debug(2, "done\n");
+
+    return TRUE;
 }
 
 /**************************************************************** MANAGEMENT */
 
-bool 
-workspace_exists_p(string name)
+bool workspace_exists_p(string name)
 {
     string full_name = db_get_workspace_directory_name(name);
     bool result = directory_exists_p(full_name);
@@ -202,8 +231,7 @@ workspace_exists_p(string name)
     return result;
 }
 
-bool
-workspace_ok_p(string name)
+bool workspace_ok_p(string name)
 {
     string full_name = db_get_workspace_directory_name(name);
     bool result = file_readable_p(full_name);
@@ -211,8 +239,7 @@ workspace_ok_p(string name)
     return result;
 }
 
-bool 
-db_create_workspace(string name)
+bool db_create_workspace(string name)
 {
     bool ok;
     string dir_name;
@@ -223,15 +250,21 @@ db_create_workspace(string name)
     pips_debug(1, "workspace %s in directory %s\n", name, dir_name);
 
     if ((ok = purge_directory(dir_name)))
+    {
 	if ((ok = create_directory(dir_name)))
 	{
 	    db_set_current_workspace_name(name);
 	    db_create_pips_database();
 	}
 	else
+	{
 	    pips_user_warning("could not create directory %s\n", dir_name);
+	}
+    }
     else
+    {
 	pips_user_warning("could not remove old directory %s\n", dir_name);
+    }
 
     debug_off();
     free(dir_name);
@@ -241,8 +274,7 @@ db_create_workspace(string name)
 
 /* stores all resources of module oname.
  */
-static void
-db_close_module(string what, string oname)
+static void db_close_module(string what, string oname)
 {
     /* the download order is retrieved from the methods... */
     int nr = dbll_number_of_resources(), i;
@@ -253,8 +285,7 @@ db_close_module(string what, string oname)
 	    (dbll_get_ith_resource_name(i), oname);
 }
 
-static void
-db_save_workspace(string what, bool do_free)
+static void db_save_workspace(string what, bool do_free)
 {
     gen_array_t a;
 
@@ -270,8 +301,7 @@ db_save_workspace(string what, bool do_free)
     save_meta_data(do_free);
 }
 
-void
-db_checkpoint_workspace(void)
+void db_checkpoint_workspace(void)
 {
     debug_on(PIPSDBM_DEBUG_LEVEL);
     pips_debug(1, "Checkpointing workspace %s\n", 
@@ -286,8 +316,7 @@ db_checkpoint_workspace(void)
     debug_off();
 }
 
-bool
-db_close_workspace(void)
+bool db_close_workspace(void)
 {
     debug_on(PIPSDBM_DEBUG_LEVEL);
     pips_debug(1, "Closing workspace %s\n", db_get_current_workspace_name());
@@ -300,8 +329,7 @@ db_close_workspace(void)
     return TRUE;
 }
 
-bool
-db_open_workspace(string name)
+bool db_open_workspace(string name)
 {
     bool ok = TRUE;
     string dir_name;
@@ -312,10 +340,16 @@ db_open_workspace(string name)
     if (directory_exists_p(dir_name))
     {
 	db_set_current_workspace_name(name);
-	/* should detect failures softly... */
-	load_meta_data();
+	ok = load_meta_data();
+	
+	if (!ok)  /* failure! */
+	{
+	    db_reset_current_workspace_name();
+	    pips_user_error("cannot load workspace metadata for %s.\n", name);
+	}
+
 	/* load ENTITIES (since no one ask for them as they should;-) */
-	if (db_resource_p(DBR_ENTITIES, "")) {
+	if (ok && db_resource_p(DBR_ENTITIES, "")) {
 	    (void) db_get_memory_resource(DBR_ENTITIES, "", TRUE);
 	    /* should touch them somehow to force latter saving? */
 	}
