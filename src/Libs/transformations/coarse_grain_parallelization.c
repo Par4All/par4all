@@ -48,9 +48,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "ricedg.h"
 
-/*********************************************************************************/
-/* USEFUL VARIABLES AND ACCESS FUNCTIONS                                         */
-/*********************************************************************************/
+/************************************* USEFUL VARIABLES AND ACCESS FUNCTIONS */
 /* statement stack */
 DEFINE_LOCAL_STACK(current_stmt, statement)
 
@@ -58,29 +56,25 @@ DEFINE_LOCAL_STACK(current_stmt, statement)
 static list l_parallel_loops = NIL;
 
 /* This list is handled in normal order to allow FIFO (!= stack)*/
-static void
-set_l_parallel_loops()
+static void set_l_parallel_loops()
 {
     pips_assert("l_parallel_loops should be NIL", ENDP(l_parallel_loops));
     l_parallel_loops = NIL;
 }
 
-static void
-reset_l_parallel_loops()
+static void reset_l_parallel_loops()
 {
     pips_assert("l_parallel_loops should be NIL", ENDP(l_parallel_loops));
     l_parallel_loops = NIL;
 }
 
 
-static void
-l_parallel_loops_push(int parallel_p)
+static void l_parallel_loops_push(int parallel_p)
 {
     l_parallel_loops = gen_nconc(l_parallel_loops,CONS(INT, parallel_p, NIL));
 }
 
-static void
-l_parallel_loops_pop()
+static void l_parallel_loops_pop()
 {
     list l_tmp = l_parallel_loops;
     
@@ -89,8 +83,7 @@ l_parallel_loops_pop()
     gen_free_list(l_tmp);
 }
 
-static int 
-l_parallel_loops_head()
+static int l_parallel_loops_head()
 {
     return(INT(CAR(l_parallel_loops)));
 }
@@ -98,14 +91,9 @@ l_parallel_loops_head()
 #define PARALLEL_LOOP 1
 #define SEQUENTIAL_LOOP 0
 
-/*********************************************************************************/
+/********************************************** COARSE GRAIN PARALLELIZATION */
 
-/*********************************************************************************/
-/* COARSE GRAIN PARALLELIZATION                                                  */
-/*********************************************************************************/
-
-static bool
-whole_loop_parallelize(loop l)
+static bool whole_loop_parallelize(loop l)
 {
     int this_loop_tag = l_parallel_loops_head();
 
@@ -117,8 +105,7 @@ whole_loop_parallelize(loop l)
     return(TRUE);
 }
 
-static bool 
-whole_loop_dependence_test(loop l)
+static bool whole_loop_dependence_test(loop l)
 {
     statement inner_stat = loop_body(l);
     statement loop_stat = current_stmt_head();
@@ -298,8 +285,7 @@ whole_loop_dependence_test(loop l)
     return(TRUE);
 }
 
-static bool
-stmt_inward(statement s)
+static bool stmt_inward(statement s)
 {
     pips_debug(3, "entering statement %03d\n", statement_number(s));
     current_stmt_push(s);
@@ -307,17 +293,16 @@ stmt_inward(statement s)
     return(TRUE);
 }
 
-static void 
-stmt_outward(statement s)
+static void stmt_outward(statement s)
 {
     pips_debug(3, "leaving statement %03d\n", statement_number(s));    
     current_stmt_pop();
     pips_debug(3, "end\n");    
 }
 
-static void
-coarse_grain_loop_parallelization(statement module_stat,
-				  statement module_parallelized_stat)
+static void coarse_grain_loop_parallelization(
+    statement module_stat,
+    statement module_parallelized_stat)
 {
     make_current_stmt_stack();
     set_l_parallel_loops();
@@ -337,8 +322,7 @@ coarse_grain_loop_parallelization(statement module_stat,
     reset_l_parallel_loops();
 }
 
-bool 
-coarse_grain_parallelization(string module_name)
+bool coarse_grain_parallelization(string module_name)
 {
     statement module_stat, module_parallelized_stat;
     entity module;
@@ -357,6 +341,8 @@ coarse_grain_parallelization(string module_name)
     set_invariant_rw_effects((statement_effects) 
 	db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE));
 
+    print_parallelization_statistics(module_name, "ante", module_stat);
+
     debug_on("COARSE_GRAIN_PARALLELIZATION_DEBUG_LEVEL");
 
     module_parallelized_stat = copy_statement(module_stat);
@@ -364,17 +350,20 @@ coarse_grain_parallelization(string module_name)
  
     debug_off();    
 
+    /* hey, actually it is not implemented as a transformation...
+     */
     DB_PUT_MEMORY_RESOURCE(DBR_PARALLELIZED_CODE,
-			   strdup(module_name),
+			   module_name,
 			   (char*) module_parallelized_stat);
-	
+
+    print_parallelization_statistics
+	(module_name, "post", module_parallelized_stat);
     
     reset_current_module_entity();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
     reset_invariant_rw_effects();
     free_value_mappings();
-    return(TRUE);
+
+    return TRUE;
 }
-
-
