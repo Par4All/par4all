@@ -17,6 +17,7 @@
 #include "database.h"
 #include "makefile.h"
 
+#include "misc.h"
 #include "ri-util.h"
 #include "transformer.h"
 #include "semantics.h"
