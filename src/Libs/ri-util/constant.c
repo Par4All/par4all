@@ -91,6 +91,7 @@ values of other constants have to be computed with the name, if
 necessary.
 
 name is the name of the constant 12, 123E10, '3I12', ...
+Initial and final quotes are included in the names of string constants.
 
 basic is the basic type of the constant: int, float, ... 
 */
@@ -113,7 +114,7 @@ make_constant_entity(
 	if (bt == is_basic_string) {
 	    be = make_basic(bt, (make_value(is_value_constant, 
 					    (make_constant(is_constant_int, 
-					      (void*) strlen(name))))));
+					      (void*) strlen(name)-2)))));
 	}
 	else {
 	    be = make_basic(bt, (void*) size);
