@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/05 18:23:40 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/05 18:32:05 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -825,7 +825,7 @@ c
       call hpfc_check()
       call pvmfmytid(MYTID)
       call pvmfparent(HOSTTID)
-      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
+c      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
       NBOFTASKS = MAXSIZEOFPROCS
 
       call HPFC_INIT_COMMON_PROCS()
@@ -879,7 +879,7 @@ c
       integer bufid, info, inum
       call hpfc_check()
       call pvmfmytid(MYTID)
-      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
+c      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
       MYLID = 0
       HOSTTID = MYTID
       NBOFTASKS = MAXSIZEOFPROCS
