@@ -101,11 +101,12 @@ add_parameter_aliases_for_this_call_site(call call_site,
     for (r_args = real_args, arg_num = 1; r_args != NIL;
 	 r_args = CDR(r_args), arg_num++) 
     {
-	pips_debug(9,"formal parameter arg_num %d\n",arg_num);
+	pips_debug(9,"formal parameter arg_num %03d\n",arg_num);
 
 	MAP(EFFECT, callee_region,
 	 {
-	     pips_debug(9,"callee_region %s\n",region_to_string(callee_region));
+	     pips_debug(9,"callee_region %s\n",
+			region_to_string(callee_region));
 
 	     entity callee_ent = region_entity(callee_region);
 	     
