@@ -51,29 +51,41 @@ char *n;
 string make_open_program(name)
 string name;
 {
-    if (open_makefile(name) == makefile_undefined)
-	user_warning("make_open_program", 
-		     "No special makefile for this workspace %s/%s.database\n", get_cwd(), name);
-    else
-	debug(7, "make_open_program", "makefile opened\n");
-
-    db_open_program(name);
-
-    return db_get_current_program_name();
+    return make_open_workspace(name);
 }
 
-void make_close_program()
+string make_open_workspace(name)
+string name;
+{
+    if (open_makefile(name) == makefile_undefined)
+	user_warning("make_open_workspace", 
+		     "No special makefile for this workspace %s/%s.database\n", get_cwd(), name);
+    else
+	debug(7, "make_open_workspace", "makefile opened\n");
+
+    db_open_workspace(name);
+
+    return db_get_current_workspace_name();
+}
+
+string make_close_program(name)
+string name;
+{
+    return make_close_workspace(name);
+}
+
+void make_close_workspace()
 {
     string name;
 
 
     db_set_current_module_name(NULL);
 
-    name = db_get_current_program_name();
+    name = db_get_current_workspace_name();
 
     close_makefile(name);
 
-    db_close_program();
+    db_close_workspace();
 
     user_log("Workspace %s closed\n\n", name);
 }
