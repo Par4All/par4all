@@ -403,11 +403,11 @@ i_set:
 		}
 		case is_property_int:
 		{
-		    char **ptr;
+		    char *ptr;
 		    long l;
 		    
-		    l = strtol (yylval.name, ptr, 0);
-		    if (**ptr != '\0') {
+		    l = strtol (yylval.name, &ptr, 10);
+		    if (*ptr != '\0') {
 			yyerror ("type mismatch");
 			status = FALSE;
 		    } else
