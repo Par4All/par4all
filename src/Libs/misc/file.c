@@ -282,10 +282,10 @@ list_files_in_directory(int * pargc,
                                                   re,
                                                   file_name_predicate);
    
-
-   user_error("list_files_in_directory",
-              "opendir() failed on directory \"%s\", %s.\n",
-              dir,  sys_errlist[errno]);
+   if (return_code == -1)
+      user_error("list_files_in_directory",
+                 "opendir() failed on directory \"%s\", %s.\n",
+                 dir,  sys_errlist[errno]);
 }
 
 
