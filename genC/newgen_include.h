@@ -212,6 +212,7 @@ typedef struct
 } 
   gen_type_translation_t, * gen_type_translation_p;
 
+#define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
 
 /* External routines. */
 extern char *alloc() ;
