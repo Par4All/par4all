@@ -384,6 +384,22 @@ system_sorted_text_format(
 {
     bool invert, stop, some_previous = FALSE;
 
+    if (ps==NULL)
+    {
+	add_to_current_line(line, "<null system>", prefix, txt, FALSE);
+	return;
+    }
+    else if (Psysteme_undefined_p(sc))
+    {
+	add_to_current_line(line, "<undefined system>", prefix, txt, FALSE);
+	return;
+    }
+    else if (sc_empty_p(ps))
+    {
+	add_to_current_line(line, "<empty system>", prefix, txt, FALSE);
+	return;
+    }
+
     /* { 
      */
     if (!a_la_fortran) add_to_current_line(line, "{", prefix, txt, FALSE);
