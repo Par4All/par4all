@@ -28,19 +28,21 @@
 /* Top-level functions
  */
 
-bool stf(char *mod_name)
+bool 
+stf(char *mod_name)
 {
 
 #define MAX__LENGTH 256
 
     char tmpfile[MAX__LENGTH];
     char outline[MAX__LENGTH];
-    char tmpmod[MAX__LENGTH];
     FILE *ftmp;
     int status;
+    string wdn = db_get_workspace_directory_name();
 
     extern int system(char*);
     extern int unlink(char*);
+    extern char* mktemp(char*);
 
     debug_on("STF_DEBUG_LEVEL");
 
@@ -49,20 +51,18 @@ bool stf(char *mod_name)
 
     debug (9,"stf", "temporary filename for output %s\n", tmpfile);
 
-    strlower (tmpmod, mod_name);
-
     if (!(*tmpfile))
 	pips_error("stf","unable to make a temporary file\n");
 
-    status = safe_system_no_abort(concatenate("stf-module ",
-				db_get_current_workspace_directory(),
-				"/",
-				tmpmod,
-				".f", 
-				" > ",
-				tmpfile,
-				" 2>&1 ",
-				NULL));
+    status = safe_system_no_abort(concatenate
+				  ("stf-module ",
+				   wdn,
+				   "/",
+				   db_get_memory_resource(DBR_SOURCE_FILE, mod_name, TRUE),
+				   " > ",
+				   tmpfile,
+				   " 2>&1 ",
+				   NULL));
 
     debug (9,"stf","status=%d\n",status);
 
@@ -84,7 +84,11 @@ bool stf(char *mod_name)
 
     if (!status) {
 	debug (1,"stf", "ok for module %s\n", mod_name);
-	db_update_time (DBR_SOURCE_FILE, mod_name);
+	/* Why did GO use a touch instead of a put? */
+	if(!db_update_time (DBR_SOURCE_FILE, mod_name))
+	    user_error ("stf",
+			"Cannot find new source file for module %s\n",
+			mod_name);
     }
     else if (status == 2)
 	user_error ("stf",
@@ -96,6 +100,8 @@ bool stf(char *mod_name)
 		    mod_name);
 
     debug_off ();
+
+    free(wdn);
 
     return TRUE;
 }
