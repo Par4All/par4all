@@ -1,5 +1,8 @@
 /* $Id$
    $Log: splitc.y,v $
+   Revision 1.6  2003/08/12 15:45:09  irigoin
+   Bug fix for Rule 2 type signature
+
    Revision 1.5  2003/08/08 15:59:27  irigoin
    A lot of free_partial_signature added. Rule 4 is now implemented. Symbols
    such as enum elements can now be used to size an array.
@@ -1826,7 +1829,9 @@ direct_old_proto_decl:
 					       $5, NULL);
 			  */
 			  free_partial_signature($3);
-			  $$ = build_signature($1, new_lparen(), new_rparen(), $5, NULL);
+			  free_partial_signature($5);
+			  /* $$ = build_signature($1, new_lparen(), new_rparen(), $5, NULL); */
+			  $$ = build_signature($1, new_lparen(), new_rparen(), NULL);
 			}
 |   direct_decl TK_LPAREN TK_RPAREN
                         {
@@ -2018,7 +2023,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 				     csplit_current_function_name,
 				     csplit_definite_function_signature);
 			}	
-/* (* No return type and old-style parameter list *) */
+/* (* No return type and no old-style parameter list *) */
 |   TK_IDENT TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list
                         { 
 			  pips_debug(5, "TK_IDENT TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list->function_def_start");
