@@ -456,6 +456,15 @@ entity v;
 
 
 bool
+formal_parameter_p(entity v)
+{
+    storage s = entity_storage(v);
+    bool formal_p = storage_formal_p(s);
+
+    return formal_p;
+}
+
+bool
 variable_is_a_module_formal_parameter_p(entity a_variable,
                                         entity a_module)
 {
