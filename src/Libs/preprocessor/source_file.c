@@ -5,6 +5,11 @@
  *
  * problems to use those procedures with wpips: show_message() and 
  * update_props() .
+ *
+ * $Log: source_file.c,v $
+ * Revision 1.84  1998/04/02 10:50:11  coelho
+ * include cache dropped if include file was not found.
+ *
  */
 
 #include <stdlib.h>
@@ -369,10 +374,14 @@ handle_file_name(FILE * out, char * file_name, bool included)
 
     if (!found)
     {
-      /* Do not raise a user_error exception,
-	 because you are not in the right directory */
+	/* Do not raise a user_error exception,
+	   because you are not in the right directory
+	   maybe this is not true anymore? FC 01/04/1998
+	*/
 	pips_user_warning("include file %s not found\n", file_name);
-	fprintf(out, "! include \"%s\" not found\n", file_name);
+	fprintf(out, 
+		"!! ERROR - include \"%s\" was not found\n"
+		"      include \"%s\"\n", file_name, file_name);
 	return FALSE;
     }
 
@@ -401,12 +410,17 @@ handle_include_file(FILE * out, char * file_name)
 	tmp_out = safe_fopen(cached, "w");
 	ok = handle_file_name(tmp_out, file_name, TRUE);
 	safe_fclose(tmp_out, cached);
-	hash_put(processed_cache, strdup(file_name), cached);
+	/* if ok put in the cache, otherwise drop it. */
+	if (ok) hash_put(processed_cache, strdup(file_name), cached);
+	else safe_unlink(cached);
     }
 
-    in = safe_fopen(cached, "r");
-    safe_cat(out, in);
-    safe_fclose(in, cached);
+    if (ok) 
+    {
+	in = safe_fopen(cached, "r");
+	safe_cat(out, in);
+	safe_fclose(in, cached);
+    }
     return ok;
 }
 
@@ -474,6 +488,8 @@ pips_process_file(string file_name, string new_name)
 
 #endif
 
+#define FORTRAN_FILE_SUFFIX ".f"
+
 bool
 filter_file(string mod_name)
 {
@@ -483,7 +499,8 @@ filter_file(string mod_name)
     /* directory is set for finding includes. */
     user_file_directory = 
 	pips_dirname(db_get_memory_resource(DBR_USER_FILE, mod_name, TRUE));
-    new_name = db_build_file_resource_name(DBR_SOURCE_FILE, mod_name, ".f");
+    new_name = db_build_file_resource_name
+	(DBR_SOURCE_FILE, mod_name, FORTRAN_FILE_SUFFIX);
     
     dir_name = db_get_current_workspace_directory();
     abs_name = strdup(concatenate(dir_name, "/", name, 0));
@@ -493,6 +510,7 @@ filter_file(string mod_name)
     if (!pips_process_file(abs_name, abs_new_name)) 
     {
 	pips_user_warning("initial file filtering of %s failed\n", mod_name);
+	safe_unlink(abs_new_name);
 	free(abs_new_name); free(abs_name);
 	return FALSE;
     }
