@@ -22,7 +22,7 @@
 
 %%
 <TEXT>VAR			{ RETURN(VAR); }
-<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { yylval.Variable = strdup(yytext);
+<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { yylval.Variable = (Variable) strdup(yytext);
                                   RETURN(IDENT); }
 <TEXT>[0-9]*			{ sscan_Value(yytext,&yylval.Value);
                                   RETURN(CONSTANTE); }
