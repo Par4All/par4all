@@ -31,7 +31,7 @@ extern int yyinput(void);
 extern void yyerror(char*);
 extern int check_not_keyword(char *); /* in build.c */
 
-#define YYMAXDEPTH 300
+#define YYMAXDEPTH 10000
 
 struct gen_binding Domains[ MAX_DOMAIN ] ;
 int Number_imports ;
