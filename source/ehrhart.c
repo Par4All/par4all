@@ -576,11 +576,15 @@ static void addeliminatedparams_evalue(evalue *e,Matrix *CT) {
 /* returns TRUE on success. Result is in min.                         */
 /* returns FALSE if no integer point is found                         */
 /*--------------------------------------------------------------------*/
+/* This is the maximum number of iterations for a given parameter to find  */
+/* a integer point inside the context. Kind of weird. cherche_min should   */
+/* be rewritten !                                                          */
+#define MAXITER 100
 int cherche_min(Value *min,Polyhedron *D,int pos) {
 	
   Value binf, bsup;	/* upper & lower bound */
   Value i;
-  int j,flag;
+  int j,flag, maxiter;
   
   if(!D)
     return(1);
@@ -619,10 +623,10 @@ int cherche_min(Value *min,Polyhedron *D,int pos) {
     value_set_si(binf,0);
   
   /* Loop from 0 (or binf if positive) to bsup */
-  for(((flag&LB_INFINITY) || value_neg_p(binf)) ? 
+  for(maxiter=0,((flag&LB_INFINITY) || value_neg_p(binf)) ? 
 	value_set_si(i,0) : value_assign(i,binf);
-      (flag&UB_INFINITY) || value_le(i,bsup) ;
-      value_increment(i,i)) {
+      ((flag&UB_INFINITY) || value_le(i,bsup)) && maxiter<MAXITER ;
+      value_increment(i,i),maxiter++) {
     
     value_assign(min[pos],i);
     if(cherche_min(min,D->next,pos+1)) {
@@ -634,11 +638,11 @@ int cherche_min(Value *min,Polyhedron *D,int pos) {
   
   /* Descending loop from -1 (or bsup if negative) to binf */
   if((flag&LB_INFINITY) || value_neg_p(binf))
-    for(((flag&UB_INFINITY) || value_pos_p(bsup))?
+    for(maxiter=0,((flag&UB_INFINITY) || value_pos_p(bsup))?
 	  value_set_si(i,-1)
 	  :value_assign(i,bsup);
-	(flag&LB_INFINITY) || value_ge(i,binf) ;
-	value_decrement(i,i)) {
+	((flag&LB_INFINITY) || value_ge(i,binf)) && maxiter<MAXITER  ;
+	value_decrement(i,i),maxiter++) {
 
       value_assign(min[pos],i);
       if(cherche_min(min,D->next,pos+1)) {
@@ -1518,7 +1522,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
 static Value *Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT) {
   
   Param_Vertices *V;
-  int i, j, ix;
+  int i, j, ix, l;
   unsigned bx;
   Value k,*lcm,m1;
   
@@ -1550,9 +1554,15 @@ static Value *Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT) {
 #endif
       
       for(j=0;j<V->Vertex->NbRows;j++) {
-	
 	/* A matrix */
 	value_assign(k,V->Vertex->p[j][V->Vertex->NbColumns-1]);
+
+	/* Vin100, aug 16, 2001: */
+	/* Do not take into account the constant denominator ! */
+	for( l=0 ; l<V->Vertex->NbColumns-2 ; l++ )
+		value_assign( k, *Gcd(k,V->Vertex->p[j][l]) );
+	value_division(k,V->Vertex->p[j][V->Vertex->NbColumns-1],k);
+
 	if (value_notzero_p(k) && value_notone_p(k)) {
 	  value_assign(m1,*Gcd(*lcm,k));
 	  value_multiply(*lcm,*lcm,k);
