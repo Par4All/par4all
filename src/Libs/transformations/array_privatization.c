@@ -605,7 +605,7 @@ print_code_privatized_regions(string module_name)
 {
     bool ok, blks_tmp, priv_tmp, scal_tmp;
 
-    /* PUSH properties (should be done from the script???)
+    /* PUSH properties (should be done from the script??? ) 
      */
     blks_tmp = get_bool_property("PRETTYPRINT_BLOCKS");
     priv_tmp = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
