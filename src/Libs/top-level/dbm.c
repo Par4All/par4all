@@ -31,8 +31,9 @@ char *argv[];
     string name;
     bool status = FALSE;
 
+    /* since db_create_workspace() must have been called before... */
     pips_assert("create_workspace",
-		db_get_current_workspace()==database_undefined);
+		db_get_current_workspace()!=database_undefined);
 
     for (i = 0; i < *pargc; i++) {
 	status = process_user_file(argv[i]);
@@ -150,10 +151,14 @@ bool delete_workspace(string wname)
 {
     int status;
     
-    if ((status = safe_system_no_abort (concatenate("Delete ", wname, NULL)))) {
-	user_warning("delete_workspace", "exit code for Delete is %d\n", status);
-	return FALSE;
-    } else {
-	return TRUE;
+    /* FI: No check whatsoever about the current workspace, no information
+       about deleting the non-current workspace vs deleting the current
+       workspace... */
+
+    if ((status=safe_system_no_abort (concatenate("Delete ", wname, NULL)))) {
+	user_warning("delete_workspace",
+		     "exit code for Delete is %d\n", status);
     }
+
+    return !status;
 }
