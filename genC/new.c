@@ -8,14 +8,15 @@
 
 	This software is provided as is, and no guarantee whatsoever is
 	provided regarding its appropriate behavior. Any request or comment
-	should be sent to newgen@isatis.ensmp.fr.
+	should be sent to newgen@cri.ensmp.fr.
 
 	(C) Copyright Ecole des Mines de Paris, 1989
 
 */
 
-
-/* new.c */
+/* $RCSfile: new.c,v $ (version $Revision$)
+ * $Date: 1996/08/09 09:15:33 $, 
+ */
 
 #include <stdio.h>
 #include "newgen_include.h"
@@ -24,17 +25,22 @@ extern int build();
 
 /* MAIN is the C entry (in fact a renaming for BUILD). */
 
-#ifdef ZZDEBUG
-extern int zzdebug ;
+#ifdef GENSPEC_DEBUG
+extern int genspec_debug ;
 #endif
 
 int main( argc, argv )
 int argc;
 char *argv[] ;
 {
-#ifdef ZZDEBUG
-    zzdebug = 0 ; 
+#ifdef GENSPEC_DEBUG
+    genspec_debug = 0 ; 
 #endif
     Read_spec_mode = 0 ;
+
+    /* explicit initialization
+     */
+    genspec_in = stdin;
+    genspec_out = stdout;
     return( build( argc, argv )) ;
 }
