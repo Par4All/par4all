@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.17  1998/04/14 21:30:37  coelho
+ * linear.h
+ *
  * Revision 1.16  1997/12/10 14:42:27  coelho
  * leaks--
  *
@@ -63,6 +66,7 @@
 #include "genC.h"
 
 #include "misc.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "resources.h"
