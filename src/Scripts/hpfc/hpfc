@@ -1,7 +1,7 @@
 #! /bin/sh
 # 
 # $RCSfile: hpfc,v $ (version $Revision$)
-# $Date: 1997/01/18 10:32:25 $, 
+# $Date: 1997/01/18 10:32:58 $, 
 #
 # HPFC scripts very front-end.
 # just an easy way not to have to remember the name of some scripts.
@@ -75,7 +75,7 @@ do
     d) HPFC_MODE=debug ;;
     t) TIMING=timing ;;
     o) COPT="-w $OPTARG";;
-    D) PIPS_CPP_FLAGS="$PIPS_CPP_FLAGS -D $OPTARG" ;;
+    D) PIPS_CPP_FLAGS="$PIPS_CPP_FLAGS -D$OPTARG" ;;
     *) usage 4
   esac
 done
