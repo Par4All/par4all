@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/27 16:52:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/29 13:49:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/11/27 16:52:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/11/29 13:49:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -56,9 +56,11 @@ notify_hpfc_file_view(Menu menu,
 {
    char * file_name = (char *) xv_get(menu_item, MENU_STRING);
    char * path_name = hpfc_generate_path_name_of_file_name(file_name);
-    
-   /* Try to allocate an available edit_textsw in non-emacs mode: */
-   (void) alloc_first_initialized_window(FALSE);
+
+   if (! wpips_emacs_mode) {
+      /* Try to allocate an available edit_textsw in non-emacs mode: */
+      (void) alloc_first_initialized_window(FALSE);
+   }
    
    wpips_file_view(path_name, file_name, "HPFC File", -1, "HPFC");
    user_log("HPFC View of \"%s\" done.\n", file_name);
