@@ -70,7 +70,7 @@ entity m;
 						module_local_name(m),
 						TRUE);
     else
-	p = transformer_identity();
+	p = transformer_undefined;
 
     return p;
 }
@@ -115,10 +115,25 @@ transformer p;
     mp = get_module_precondition(m);
 
     ifdebug(8) {
-	debug(8,"add_module_call_site_precondition",
-	      "old module precondition:\n");
-	dump_transformer(mp);
+	if (!transformer_undefined_p(mp)) {
+	    debug(8,"add_module_call_site_precondition",
+		  "old module precondition:\n");
+	    dump_transformer(mp);
+	}
+	else
+	   debug(8,"add_module_call_site_precondition",
+		  "old module precondition undefined\n"); 
     }
+
+
+    translate_global_values(get_current_module_entity(), p);
+    ifdebug(8) {
+	debug(8,"add_module_call_site_precondition",
+	      "new module precondition in current frame:\n");
+	dump_transformer(p);
+    }
+    
+    if (!transformer_undefined_p(mp)) {
 
     /* convert global variables in the summary precondition in the local frame
      * as defined by value mappings (FI, 1 February 1994) */
@@ -136,26 +151,34 @@ transformer p;
      *
      * FI, 9 February 1994
      */
-    translate_global_values(get_current_module_entity(), mp);
-    ifdebug(8) {
-	debug(8,"add_module_call_site_precondition",
-	      "old module precondition in current frame:\n");
-	dump_transformer(mp);
-    }
-    translate_global_values(get_current_module_entity(), p);
-    ifdebug(8) {
-	debug(8,"add_module_call_site_precondition",
-	      "new module precondition in current frame:\n");
-	dump_transformer(p);
-    }
+	translate_global_values(get_current_module_entity(), mp);
+	ifdebug(8) {
+	    debug(8,"add_module_call_site_precondition",
+		  "old module precondition in current frame:\n");
+	    dump_transformer(mp);
+	}
+	
 
-    if(transformer_identity_p(mp)) {
-	transformer_free(mp);
+	if(transformer_identity_p(mp)) {
+	    /* the former precondition represents the entire space :
+	     * the new precondition must also represent the entire space
+	     * BC, november 1994.
+	     */
+	    transformer_free(p);
+	    new_mp = mp;
+	}
+	else	    
+	    new_mp = transformer_convex_hull(mp, p);
+	
+    }
+    else {
+	/* the former precondition is undefined. The new precondition
+	 * is defined by the current call site precondition
+	 * BC, november 1994.
+	 */
 	new_mp = p;
     }
-    else
-	new_mp = transformer_convex_hull(mp, p);
-
+	
     ifdebug(8) {
 	debug(8,"add_module_call_site_precondition",
 	      "new module precondition in current frame:\n");
