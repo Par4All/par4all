@@ -1,5 +1,8 @@
 #! /bin/sh
 #! /bin/sh -vx
+#
+# $M$ ($E$) version $Revision$, got on %D%, %T%
+# %A%
 
 # Automatic generation of Makefile for the PIPS project
 #
@@ -204,7 +207,7 @@ SCAN=		$(LEX) $(LFLAGS) -t
 TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
 PARSE=		$(YACC) $(YFLAGS)
 ARCHIVE=	$(AR) $(ARFLAGS)
-PROTOIZE=	$(PIPS_PROTOIZE) $(CPPFLAGS) $(INC_IFILES)
+PROTOIZE=	$(PIPS_PROTOIZE) $(CPPFLAGS)
 #
 CONFIG_FILE=	$CONFIG_FILE
 MAKEFILE=	$MAKEFILE
@@ -426,7 +429,7 @@ $(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
 		ifile=\`basename \$\$cfile .c\`;\\
 		$(PREPROC) \$\$cfile  > \$\$ifile.i; done
 #	$(UTILDIR)/cproto $(CPPFLAGS) $(INC_IFILES) \\
-	$(PROTOIZE) \\
+	$(PROTOIZE)  $(INC_IFILES) \\
 		| sed -e 's/int __builtin_va_alist//' \\
 		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
 	$(RM) *.i
