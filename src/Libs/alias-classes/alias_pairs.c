@@ -103,6 +103,13 @@ add_parameter_aliases_for_this_call_site(call call_site,
     {
 	pips_debug(9,"formal parameter arg_num %03d\n",arg_num);
 
+	pips_debug(9,"regions:\n");
+
+	MAP(EFFECT, callee_region,
+	 {
+	     pips_debug(9,"%s\n",region_to_string(callee_region));
+		 }, list_regions_callee);
+
 	MAP(EFFECT, callee_region,
 	 {
 	     entity callee_ent = region_entity(callee_region);
