@@ -296,9 +296,8 @@ static void instruction_rwt (instruction i)
 
 	{
 	  list s_list = (list)(instruction_block(i));
-	  statement s;
 	  for(; s_list; POP(s_list)) {
-	    s = STATEMENT(CAR(s_list));
+	    statement s = STATEMENT(CAR(s_list));
 	    {
 	      text _r_ = (t);
 	      text _t_ = load_statement_icfg(s);
