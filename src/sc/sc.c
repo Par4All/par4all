@@ -267,3 +267,58 @@ Psysteme sc;
 
     return consistent;
 }
+
+/* check that sc is well defined, that the
+ * numbers of equalities and inequalities are consistent with the lists of
+ * equalities and inequalities, and that every variable in the constraints is
+ * in the base
+ *
+ * Francois Irigoin, 13 November 1995
+ *
+ * Note: 
+ *  - there is no explicit check of TCST in the basis;
+ * TCST should *not* be in the basis for some use of Psystemes, 
+ * like transformers in PIPS.
+ */
+boolean sc_weak_consistent_p(Psysteme sc)
+{
+    boolean weak_consistent;
+
+    weak_consistent = !SC_UNDEFINED_P(sc);
+
+    if(weak_consistent) {
+	weak_consistent = (sc->nb_eq == nb_elems_list(sc_egalites(sc)))
+	    && 
+		(sc->nb_ineq == nb_elems_list(sc_inegalites(sc)))
+		    &&
+			(sc_dimension(sc) == base_dimension(sc_base(sc)));
+    }
+
+    if(weak_consistent && sc_dimension(sc) != 0) {
+	base_normalized_p(sc_base(sc));
+    }
+					      
+
+    if(weak_consistent) {
+	Pcontrainte eq = CONTRAINTE_UNDEFINED;
+	Pbase diagonale = BASE_UNDEFINED;
+	Pvecteur pv = VECTEUR_UNDEFINED;
+	Pbase diff = BASE_UNDEFINED;
+
+	for(eq = sc->egalites; eq!= NULL; eq=eq->succ) {
+	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
+		if (pv->var != TCST)
+		    vect_chg_coeff(&diagonale,pv->var,1);
+	}
+	for(eq = sc->inegalites; eq!= NULL; eq=eq->succ) {
+	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
+		if (pv->var != TCST)
+		    vect_chg_coeff(&diagonale,pv->var,1);
+	}
+	weak_consistent =  base_included_p(diagonale, sc_base(sc));
+    }
+
+    /* assert(weak_consistent); */
+
+    return weak_consistent;
+}
