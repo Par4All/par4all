@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/10 15:07:06 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/10 17:08:50 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -33,7 +33,8 @@ help()
 	 - passes: TARGET_{CFILES,HEADERS,OBJECTS,LIBS}
 	 - scripts: SCRIPTS, FILES, SFILES, RFILES
 	 - runtime: SOURCES, INSTALL_{FILES,LIBS,EXE}
-	Many default macros and rules are defined and may be overwritten.
+	Many default macros are defined and may be overwritten.
+	Many rules are also defined.
 	END_OF_HELP
 }
 
@@ -359,7 +360,6 @@ check_os:
 	install_pips_sources \\
 		-v -s \`pwd\` -t $(TARGETDIR) -y "\$\$comments" \\
 		$(SOURCES)
-	#@pips_install_file $(TARGETDIR) $(MAKEFILE)
 	-@cd $(TARGETDIR) ; pips-makemake
 	touch .install
 	$(MAKE) quick-install
