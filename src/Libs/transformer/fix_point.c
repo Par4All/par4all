@@ -556,7 +556,7 @@ Pvecteur eq;
 
 
 
-static void 
+void 
 build_transfer_matrix(pa, lteq, n_eq, b_new)
 matrice * pa;
 Pcontrainte lteq;
@@ -681,10 +681,8 @@ transformer tf;
     Pvecteur v_inc = VECTEUR_UNDEFINED;
     int inc = 1;
 
-    debug(8, "transformer_pattern_fix_point", "Begin for transformer:\n");
-
     ifdebug(8) {
-	debug(8, "transformer_pattern_fix_point", "Begin for transformer:\n");
+	debug(8, "transformer_pattern_fix_point", "Begin for transformer %p:\n", tf);
 	fprint_transformer(stderr, tf, external_value_name);
     }
 
@@ -982,4 +980,234 @@ invariant_vector_p(Pvecteur v)
 	  bool_to_string(invariant));
 
     return invariant;
+}
+
+/* Computation of a fix point using constraints on the discrete derivative.
+ *
+ * Intermediate values are used to encode the differences. For instance,
+ * i#int = i#new - i#old
+ */
+
+transformer 
+transformer_derivative_fix_point(transformer tf)
+{
+    transformer fix_tf = transformer_dup(tf);
+    /* sc is going to be modified and destroyed and eventually replaced in fix_tf */
+    Psysteme sc = predicate_system(transformer_relation(fix_tf));
+    Psysteme sc_homo = SC_UNDEFINED;
+    /* Do not handle variable which do not appear explicitly in the constraints */
+    Pbase b = sc_to_minimal_basis(sc);
+    Pbase ib = base_dup(sc_base(sc)); /* initial and final basis */
+    Pbase bv = BASE_NULLE; /* basis vector */
+    Pbase diffb = BASE_NULLE; /* basis of difference vectors */
+    Pcontrainte ceq = CONTRAINTE_UNDEFINED; /* loop index */
+    Pcontrainte cineq = CONTRAINTE_UNDEFINED; /* loop index */
+    Pcontrainte leq = CONTRAINTE_UNDEFINED; /* List of fix point equations */
+    Pcontrainte lineq = CONTRAINTE_UNDEFINED; /* List of fix point inequalities */
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point", "Begin for transformer %p:\n", tf);
+	fprint_transformer(stderr, tf, external_value_name);
+    }
+
+    /* Compute constraints with difference equations */
+
+    for(bv = b; !BASE_NULLE_P(bv); bv = bv->succ) {
+	entity oldv = (entity) vecteur_var(bv);
+
+	/* Only generate difference equations if the old value is used */
+	if(old_value_entity_p(oldv)) {
+	    entity var = value_to_variable(oldv);
+	    entity newv = entity_to_new_value(var);
+	    entity diffv = entity_to_intermediate_value(var);
+	    Pvecteur diff = VECTEUR_NUL;
+	    Pcontrainte eq = CONTRAINTE_UNDEFINED;
+
+	    diff = vect_make(diff, (Variable) diffv, VALUE_ONE, (Variable)
+			     newv,  VALUE_MONE, (Variable) oldv, VALUE_ONE, TCST, VALUE_ZERO);
+
+	    eq = contrainte_make(diff);
+	    sc = sc_equation_add(sc, eq);
+	}
+    }
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point", "with difference equations=\n");
+	sc_fprint(stderr, sc, external_value_name);
+    }
+
+    /* Project all variables but differences */
+
+    sc = sc_projection_ofl_along_variables(sc, b);
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point",
+	      "Non-homogeneous constraints on derivatives=\n");
+	sc_fprint(stderr, sc, external_value_name);
+    }
+
+    /* Eliminate constant terms to get homogeneous constraints.
+     * The constant term elimination is equivalent to a simultaneous
+     * integration of all derivatives: all variables are modified by
+     * the same number of iterations.
+     */
+
+    sc_homo = sc_dup(sc);
+    sc_homo = sc_projection_ofl(sc_homo, TCST);
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point",
+	      "derivative constraints after elimination of constant terms=\n");
+	sc_fprint(stderr, sc_homo, external_value_name);
+    }
+
+    sc = sc_append(sc, sc_homo);
+    sc_rm(sc_homo);
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point",
+	      "All constraints on derivatives=\n");
+	sc_fprint(stderr, sc, external_value_name);
+    }
+
+    /* Generate invariants from the derivative constraints
+     *
+     */
+
+    /* For each equation, keep an equation if the constant term is zero
+     * or transform it in an inequality if not. The constant term of the
+     * inequality must be zero because T* is conputed, not T+
+     */
+    for(ceq = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(ceq); ceq = contrainte_succ(ceq)) {
+	Pvecteur eq = vect_dup(contrainte_vecteur(ceq));
+	Pcontrainte new_c = contrainte_make(eq);
+	Value cst = vect_coeff(TCST, eq);
+
+	if(cst == VALUE_ZERO) {
+	    /* leave the equation as it is and put it in the equation list */
+	    new_c->succ = leq;
+	    leq = new_c;
+	}
+	else {
+	    vect_chg_coeff(&(contrainte_vecteur(new_c)), TCST, VALUE_ZERO);
+	    new_c->succ = lineq;
+	    lineq = new_c;
+
+	    if(cst >= VALUE_ONE) {
+		/* the signs are OK */
+		;
+	    }
+	    else /* cst <= VALUE_MONE */ {
+		vect_chg_sgn(contrainte_vecteur(new_c));
+	    }
+	}
+    }
+
+    /* For each inequality, keep an equality if the constant term is positive
+     * (i.e. the lhs is decreasing). Constant term in
+     * inequality must be zero because T* is conputed, not T+. T+ can be
+     * derived from T* as T o T*.
+     */
+    for(cineq = sc_inegalites(sc); !CONTRAINTE_UNDEFINED_P(cineq); cineq = contrainte_succ(cineq)) {
+	Value cst = vect_coeff(TCST, contrainte_vecteur(cineq));
+
+	if(cst >= VALUE_ZERO) {
+	    /* OK for decreasing derivative (Note: the constant term is in the lhs) */
+	    Pvecteur ineq = vect_dup(contrainte_vecteur(cineq));
+	    Pcontrainte new_c = CONTRAINTE_UNDEFINED;
+
+	    vect_chg_coeff(&ineq, TCST, VALUE_ZERO);
+	    new_c = contrainte_make(ineq);
+	    new_c->succ = lineq;
+	    lineq = new_c;
+	}
+	else {
+	    /* The sign of the derivative is unknown: no invariant can be deduced */
+	    ;
+	}
+    }
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point",
+	      "First set of equality invariants=\n");
+	egalites_fprint(stderr, leq, external_value_name);
+	debug(8, "transformer_derivative_fix_point",
+	      "First set of inequality invariants=\n");
+	inegalites_fprint(stderr, lineq, external_value_name);
+    }
+
+    /* sc is not needed anymore, it can be updated with leq and lineq */
+
+    sc_rm(sc);
+    sc = sc_make(leq, lineq);
+
+    /* Difference variables must substituted back to differences 
+     * between old and new values.
+     */
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point",
+	      "All invariants on derivatives=\n");
+	sc_fprint(stderr, sc, external_value_name);
+    }
+
+    for(bv = b; !BASE_NULLE_P(bv); bv = bv->succ) {
+	entity oldv = (entity) vecteur_var(bv);
+
+	/* Only generate difference equations if the old value is used */
+	if(old_value_entity_p(oldv)) {
+	    entity var = value_to_variable(oldv);
+	    entity newv = entity_to_new_value(var);
+	    entity diffv = entity_to_intermediate_value(var);
+	    Pvecteur diff = VECTEUR_NUL;
+	    Pcontrainte eq = CONTRAINTE_UNDEFINED;
+
+	    diff = vect_make(diff, (Variable) diffv, VALUE_ONE, (Variable)
+			     newv,  VALUE_MONE, (Variable) oldv, VALUE_ONE, TCST, VALUE_ZERO);
+
+	    eq = contrainte_make(diff);
+	    sc = sc_equation_add(sc, eq);
+	    diffb = base_add_variable(diffb, (Variable) diffv);
+	}
+    }
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point",
+	      "All invariants on derivatives with difference variables=\n");
+	sc_fprint(stderr, sc, external_value_name);
+    }
+
+    /* Project all difference variables */
+
+    sc = sc_projection_ofl_along_variables(sc, diffb);
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point",
+	      "All invariants on differences=\n");
+	sc_fprint(stderr, sc, external_value_name);
+    }
+
+    /* The full basis must be used again */
+    base_rm(sc_base(sc));
+    sc_base(sc) = ib;
+    sc_dimension(sc) = vect_size(ib);
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point",
+	      "All invariants with proper basis =\n");
+	sc_fprint(stderr, sc, external_value_name);
+    }
+
+    /* Plug sc back into fix_tf */
+    predicate_system_(transformer_relation(fix_tf)) = sc;
+
+    /* That's all! */
+
+    ifdebug(8) {
+	debug(8, "transformer_derivative_fix_point", "fix-point fix_tf=\n");
+	fprint_transformer(stderr, fix_tf, external_value_name);
+	debug(8, "transformer_pattern_fix_point", "end\n");
+    }
+
+    return fix_tf;
 }
