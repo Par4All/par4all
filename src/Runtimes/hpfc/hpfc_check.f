@@ -1,7 +1,7 @@
 c
 c Checks run-time library version
 c
-c $RCSfile: hpfc_check.f,v $ ($Date: 1994/04/11 10:23:51 $, )
+c $RCSfile: hpfc_check.f,v $ ($Date: 1994/04/12 11:16:41 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -15,7 +15,8 @@ c
      $     REALNBOFPROCESSORS.GT.MAXNBOFPROCESSORS.OR.
      $     REALMAXSIZEOFPROC.GT.MAXMAXSIZEOFPROC) then
          print *, 
-     $        'HPFC run-time library must recompiled with larger parameters'
+     $        'HPFC run-time library',
+     $        '  must recompiled with larger parameters'
          stop
       endif
 c
