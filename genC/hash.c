@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/12/22 10:41:24 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/12/26 16:28:36 $, )
  * version $Revision$
  */
 
@@ -269,7 +269,7 @@ char *key, *val;
 
 /* this function removes from the hash table pointed to by htp the
    couple whose key is equal to key. nothing is done if no such couple
-   exists. */
+   exists. ??? shoudl abort ? (FC) */
 
 char *hash_del(htp, key)
 hash_table htp;
@@ -279,19 +279,19 @@ char *key;
     char *val;
     int rank;
     
-    hep = hash_find_entry(htp, key, &rank, hash_del_op);
-    
-    message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
+    message_assert("legal input key", key!=HASH_ENTRY_FREE &&
 		   key!=HASH_ENTRY_FREE_FOR_PUT);
 
+    hep = hash_find_entry(htp, key, &rank, hash_del_op);
+    
     if (hep->key != HASH_ENTRY_FREE && hep->key != HASH_ENTRY_FREE_FOR_PUT) {
 	val = hep->val;
 	htp->hash_array[rank].key = HASH_ENTRY_FREE_FOR_PUT;
 	htp->hash_entry_number -= 1;
-	return(val);
+	return val;
     }
 
-    return(HASH_UNDEFINED_VALUE);
+    return HASH_UNDEFINED_VALUE;
 }
 
 /* this function retrieves in the hash table pointed to by htp the
@@ -306,7 +306,7 @@ char *key;
     hash_entry_pointer hep;
     int n;
 
-    message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
+    message_assert("legal input key", key!=HASH_ENTRY_FREE &&
 		   key!=HASH_ENTRY_FREE_FOR_PUT);
 
     hep = hash_find_entry(htp, key, &n, hash_get_op);
