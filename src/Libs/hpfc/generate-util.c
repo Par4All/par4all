@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1996/03/11 17:14:52 $, ) 
+ * ($Date: 1996/07/23 15:08:35 $, ) 
  */
 
 #include "defines-local.h"
@@ -339,15 +339,16 @@ hpfc_broadcast_buffers(
 	{
 	    /* ??? possible replication on sections overlooked here */
 	    entity v;
-	    int number, step;
+	    Value step;
+	    int number;
 	    
 	    nreplicated++;
 	    v = get_ith_temporary_dummy(npdim);
-	    step = (int) vect_coeff((Variable) v, contrainte_vecteur(c));
+	    step = vect_coeff((Variable) v, contrainte_vecteur(c));
 	    number = SizeOfIthDimension(proc, npdim);
 
 	    args = CONS(EXPRESSION, int_to_expression(number),
-		   CONS(EXPRESSION, int_to_expression(step),
+		   CONS(EXPRESSION, Value_to_expression(step),
 			args));
 	}
     }
@@ -572,12 +573,16 @@ hpfc_compute_lid(
 		if (processors_dim_replicated_p(proc, array, npdim))
 		{
 		    Variable var = (Variable) creation(npdim);
-		    int low, up, cf;
+		    int low, up;
+		    Value cf, vlow;
 
 		    get_entity_dimensions(proc, npdim, &low, &up);
 		    cf = vect_coeff(var, v);
-		    vect_add_elem(&contrainte_vecteur(c), var, (Value) -cf);
-		    vect_add_elem(&contrainte_vecteur(c), TCST, (Value) cf*low);
+		    vlow = int_to_value(low);
+		    vect_add_elem(&contrainte_vecteur(c), var, 
+				  value_uminus(cf));
+		    vect_add_elem(&contrainte_vecteur(c), TCST, 
+				  value_mult(cf,vlow));
 		}
 	}
 
