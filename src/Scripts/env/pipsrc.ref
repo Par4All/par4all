@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/11 13:16:04 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/11 13:17:57 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -277,7 +277,7 @@ WP65_LIBRARY=$PIPS_EXTEDIR
 LISP=/usr/local/bin/cl
 
 # PVM directory
-PVMDIR="${PIPS_RTSRCDIR}/pvm3.3"
+PVMDIR="${PIPS_PUBLICDIR}/pvm3.3"
 
 #
 # For the daVinci Graph Viewer/Editor :
