@@ -69,12 +69,11 @@ entity create_state_variable (string module_name,
   pips_assert("it is a code", value_code_p(entity_initial(module)));
 
   if (name_identifier == 0) {
-    state_variable_name = strdup (STATE_VARIABLE_NAME);
+    state_variable_name = strdup (STATE_VARIABLE_NAME_NO_REF);
   }
   else {
-    sprintf(buffer, "%d", name_identifier);
-    state_variable_name = strdup(concatenate(STATE_VARIABLE_NAME,
-					     strdup(buffer),
+    sprintf(buffer, STATE_VARIABLE_NAME, name_identifier);
+    state_variable_name = strdup(concatenate(strdup(buffer),
 					     NULL));
   }
   
@@ -145,7 +144,7 @@ int entry_state_variable_value_for_unstructured (statement stat)
 
   u = instruction_unstructured(statement_instruction(stat));
 
-  return statement_ordering(control_statement(unstructured_entry(u))) >> 16;
+  return  beautify_ordering (statement_ordering(control_statement(unstructured_entry(u))));
 }
 
 /**
@@ -199,31 +198,19 @@ statement make_transition_statement(control current_node,
   test new_test;
   expression test_condition;
   int successors_nb;
+  int current_transition_number;
+  string comment;
+  char buffer[50];
 
-  pips_debug(2,"\n\nTRANSITION: Module statement: ###############################\n");
-  ifdebug(2) {
-    print_statement(stat);
-  }
-  pips_debug(2,"domain number = %d\n", statement_domain_number(stat));
-  pips_debug(2,"entity = UNDEFINED\n");
-  pips_debug(2,"statement number = %d\n", statement_number(stat));
-  pips_debug(2,"statement ordering = %d\n", statement_ordering(stat));
-  if (statement_with_empty_comment_p(stat)) {
-    pips_debug(2,"statement comments = EMPTY\n");
-  }
-  else {
-    pips_debug(2,"statement comments = %s\n", statement_comments(stat));
-  }
-  pips_debug(2,"statement instruction = %s\n", statement_type_as_string(stat));
+  debug_control ("TRANSITION: Module statement", current_node, 2);
 
-  pips_debug(2,"\npredecessors = %d\n", gen_length(control_predecessors(current_node)));
-  pips_debug(2,"successors = %d\n", gen_length(control_successors(current_node)));
+  current_transition_number = beautify_ordering (statement_ordering(stat));
 
   test_condition 
     = make_expression_with_state_variable (state_variable,
-					   statement_ordering(stat) >> 16,
-					   EQUIV_OPERATOR_NAME);
-
+					   current_transition_number,
+					   EQUAL_OPERATOR_NAME);
+  
   successors_nb = gen_length(control_successors(current_node));
 
   if ((successors_nb == 0) || (successors_nb == 1)) {
@@ -239,9 +226,9 @@ statement make_transition_statement(control current_node,
       /* This is a "normal" node, ie not a TEST statement, just add 
 	 assignement for state_variable with new value */
       next_value 
-	= statement_ordering
-	(control_statement
-	 (CONTROL(gen_nth(0,control_successors(current_node))))) >> 16;
+	= beautify_ordering (statement_ordering
+			     (control_statement
+			      (CONTROL(gen_nth(0,control_successors(current_node))))));
     }
     
     state_variable_assignement
@@ -269,13 +256,13 @@ statement make_transition_statement(control current_node,
   else if (successors_nb == 2) {
     /* This is a "test" node, ie with a TEST statement, just add 
        assignement for state_variable with new value after each
-       statement in TEST*/
-    int value_if_true = statement_ordering
+       statement in TEST */
+    int value_if_true = beautify_ordering (statement_ordering
       (control_statement
-       (CONTROL(gen_nth(0,control_successors(current_node))))) >> 16;
-    int value_if_false = statement_ordering
+       (CONTROL(gen_nth(0,control_successors(current_node))))));
+    int value_if_false = beautify_ordering (statement_ordering
       (control_statement
-       (CONTROL(gen_nth(1,control_successors(current_node))))) >> 16;
+       (CONTROL(gen_nth(1,control_successors(current_node))))));
     statement transition_statement_if_true;
     statement transition_statement_if_false;
     sequence transition_sequence_if_true;
@@ -360,6 +347,12 @@ statement make_transition_statement(control current_node,
   
   test_instruction = make_instruction (is_instruction_test,new_test);
 
+  /*sprintf (buffer, 
+    FSM_TRANSITION_COMMENT, 
+    entity_local_name(state_variable),
+    current_transition_number);
+    comment = strdup(buffer);*/
+  
   returned_statement = make_statement (entity_empty_label(),
 				       /*statement_label(root_statement),*/
 				       statement_number(root_statement),
@@ -437,6 +430,8 @@ statement make_fsm_from_statement(statement stat,
   instruction loop_instruction;
   instruction sequence_instruction;
   sequence new_sequence;
+  string comment;
+  char buffer[256];
   
   /* Assert that given stat is UNSTRUCTURED */
   pips_assert("Statement is UNSTRUCTURED in FSM_GENERATION", 
@@ -448,7 +443,7 @@ statement make_fsm_from_statement(statement stat,
     = make_expression_with_state_variable 
     (state_variable,
      exit_state_variable_value_for_unstructured(stat),
-     NON_EQUIV_OPERATOR_NAME);
+     NON_EQUAL_OPERATOR_NAME);
   
   /* Evaluation is done BEFORE to enter the loop */
   loop_evaluation = make_evaluation_before();
@@ -468,6 +463,9 @@ statement make_fsm_from_statement(statement stat,
 				 loop_evaluation);
 
   loop_instruction = make_instruction(is_instruction_whileloop,new_whileloop);
+
+  /*sprintf (buffer, FSM_BEGIN_COMMENT, entity_local_name(state_variable));
+    comment = strdup(buffer);*/
 
   loop_statement = make_statement(statement_label(stat),
 				  statement_number(stat),
@@ -588,17 +586,15 @@ statement fsmize_statement (statement stat,
     pips_debug(2, "UNSTRUCTURED\n");  
     if (state_variable == NULL) {
       entity new_state_variable;
-
-      if (statement_ordering(stat) < (1<<16)) {
-	new_state_variable 
-	  = create_state_variable (module_name,
-				   statement_ordering(stat));
-      }
-      else {
-	new_state_variable 
-	  = create_state_variable (module_name,
-				   statement_ordering(stat) >> 16);
-      }
+      int state_variable_identifier
+	/* = beautify_ordering (statement_ordering(stat)); */
+	= statement_ordering(stat);
+      
+      pips_debug(2, "Creating state variable with identifier %d\n",
+		 state_variable_identifier);   
+      new_state_variable 
+	= create_state_variable (module_name,
+				 state_variable_identifier);
       returned_statement = make_fsm_from_statement (stat, 
 						    new_state_variable,
 						    module_name);
@@ -609,7 +605,9 @@ statement fsmize_statement (statement stat,
 						    module_name);
     }
     pips_debug(2, "Displaying statement\n");   
-    print_statement (returned_statement);
+    ifdebug(2) {
+      print_statement (returned_statement);
+    }
     break;
   }
   case is_instruction_goto: {
@@ -623,4 +621,3 @@ statement fsmize_statement (statement stat,
 
   return returned_statement;
 }
-
