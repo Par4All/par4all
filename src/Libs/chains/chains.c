@@ -474,10 +474,22 @@ statement st ;
     }, c, blocs ) ;
     set_assign( KILL( st ), kill ) ;
     set_free( kill ) ;
-    gen_free_list( blocs ) ;
 
-    set_assign( GEN( st ), DEF_OUT( exit )) ;
-    set_difference( REF( st ), REF_OUT( exit ), REF_IN( st )) ;
+    if( set_undefined_p( DEF_OUT( exit ))) {
+	set ref = MAKE_STATEMENT_SET() ;
+
+	CONTROL_MAP( cc, {
+	    set_union( ref, ref, REF( control_statement( cc ))) ;
+	}, c, blocs ) ;
+	set_assign( REF( st ), ref ) ;
+	set_free( ref ) ;
+	set_assign( GEN( st ), MAKE_STATEMENT_SET()) ;
+    }
+    else {
+	set_assign( GEN( st ), DEF_OUT( exit )) ;
+	set_difference( REF( st ), REF_OUT( exit ), REF_IN( st )) ;
+    }
+    gen_free_list( blocs ) ;
 }
 
 /* GENKILL_INSTRUCTION does the dispatch and recursion loop. */
@@ -615,12 +627,29 @@ unstructured u ;
 {
     control c = unstructured_control( u ) ;
     control exit = unstructured_exit( u ) ;
+    statement s_exit =  control_statement( exit ) ;
 
     set_assign( DEF_IN( control_statement( c )), DEF_IN( st )) ;
     set_assign( REF_IN( control_statement( c )), REF_IN( st )) ;
     inout_control( c ) ;
-    set_assign( DEF_OUT( st ), DEF_OUT( control_statement( exit ))) ;
-    set_assign( REF_OUT( st ), REF_OUT( control_statement( exit ))) ;
+
+    if( set_undefined_p( DEF_OUT( s_exit ))) {
+	list blocs = NIL ;
+	set ref = MAKE_STATEMENT_SET() ;
+
+	CONTROL_MAP( cc, {
+	    set_union( ref, ref, REF( control_statement( cc ))) ;
+	}, c, blocs ) ;
+	set_assign( REF_OUT( st ), ref ) ;
+	set_assign( DEF_OUT( st ), MAKE_STATEMENT_SET()) ;
+
+	set_free( ref ) ;
+	gen_free_list( blocs ) ;
+    }
+    else {
+	set_assign( DEF_OUT( st ), DEF_OUT( s_exit )) ;
+	set_assign( REF_OUT( st ), REF_OUT( s_exit )) ;
+    }
 }					
 
 static void inout_statement( st )
