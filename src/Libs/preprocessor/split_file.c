@@ -405,6 +405,7 @@ int fsplit(char * file_name, FILE * out)
 			"! next line added by fsplit() in pips\n"
 			"      PROGRAM ");
 		print_name(ofp, name, 7);
+		putc('\n', ofp);
 		implicit_program = 0; /* now we gave it a name! */
 	    }
 	    
