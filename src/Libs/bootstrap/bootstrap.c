@@ -151,6 +151,7 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"ENDFILE", (MAXINT)},
     {"IMPLIED-DO", (MAXINT)},
     {"FORMAT", 1},
+    {"INQUIRE", (MAXINT)},
 
     {"CONTINUE", 0},
     {"ENDDO", 0},
