@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: macros.c,v $
+ * Revision 1.11  2003/06/25 08:52:15  irigoin
+ * \n added in a warning format
+ *
  * Revision 1.10  1998/12/23 16:43:42  coelho
  * recursive descent to substitute macros in macros...
  *
@@ -136,7 +139,7 @@ void parser_add_a_macro(call c, expression e)
     }
     
     if (find_entity_macro(macro) != NULL) {
-      pips_user_warning("Macro \"%s\" is not yet defined.", 
+      pips_user_warning("Macro \"%s\" is not yet defined.\n", 
 			entity_name(macro));
       ParserError("parser_add_a_macro",
 		  "It may be an undeclared array.\n");
