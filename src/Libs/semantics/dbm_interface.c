@@ -517,9 +517,17 @@ bool module_name_to_preconditions(char *module_name)
     /* Let's assume static initializations (FI, 14 September 1993) */
 
     if(entity_main_module_p(get_current_module_entity())) {
-	if (get_bool_property(SEMANTICS_INTERPROCEDURAL))
+      if (get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
 	    pre = (transformer)
 		db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE);
+	    if(transformer_empty_p(pre)) {
+	      pips_user_warning("Initial preconditions are not consistent.\n"
+				" The Fortran standard rules about variable initialization"
+				" with DATA statements are likely to be violated.\n"
+				"set property PARSER_ACCEPT_ANSI_EXTENSIONS to false\n"
+				"and CHECK_FORTRAN_SYNTAX_BEFORE_PIPS to true.\n");
+	    }
+      }
 	else
 	    pre = data_to_precondition(get_current_module_entity());
     }
