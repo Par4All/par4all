@@ -2,6 +2,10 @@
  * Overlap Analysis Module for HPFC
  * 
  * Fabien Coelho, August 1993
+ *
+ * $RCSfile: o-analysis.c,v $ ($Date: 1994/11/21 15:32:08 $, )
+ * version $Revision$
+ * got on %D%, %T%
  */
 
 /*
@@ -33,6 +37,35 @@ entity CreateIntrinsic(string name); /* in syntax.h */
 static list
     lblocks = NIL,
     lloop  = NIL;
+
+range loop_index_to_range(index)
+entity index;
+{
+    MAPL(cl,
+     {
+	 loop
+	     l = LOOP(CAR(cl));
+
+	 if (loop_index(l)==index)
+	     return(loop_range(l));
+     },
+	 lloop);
+    
+    /* ??? other (sequential) loops may be added, and not only lloop... */
+    return(range_undefined);
+}
+
+bool entity_loop_index_p(e)
+entity e;
+{
+    MAPL(cl,
+     {
+	 if (e == loop_index(LOOP(CAR(cl)))) return(TRUE);
+     },
+	 lloop);
+
+    return(FALSE);
+}
 
 /*
  * Overlap_Analysis
@@ -425,23 +458,6 @@ reference r;
 }
 
 /*
- * loop_index_p
- *
- *
- */
-bool entity_loop_index_p(e)
-entity e;
-{
-    MAPL(cl,
-     {
-	 if (e == loop_index(LOOP(CAR(cl)))) return(TRUE);
-     },
-	 lloop);
-
-    return(FALSE);
-}
-
-/*
  * bool aligned_p(r1, r2, lvref, lkref)
  *
  * true if references are aligned or, for constants, on the same processor...
@@ -637,7 +653,7 @@ expression e;
 
 /*   generate the call to the dynamic loop bounds computation
  */
-statement statement_compute_bounds(newlobnd, newupbnd, oldidxvl, 
+static statement statement_compute_bounds(newlobnd, newupbnd, oldidxvl, 
 				   lb, ub, an, dp)
 entity newlobnd, newupbnd, oldidxvl;
 expression lb, ub;
@@ -656,12 +672,113 @@ int an, dp;
     return(hpfc_make_call_statement(hpfc_name_to_entity(LOOP_BOUNDS), l));
 }
 
-/*
- * bool generate_optimized_code_for_loop_nest(...)
- *
- *
- *
- */
+static statement make_loop_nest_for_overlap(lold, lnew, lbl,
+					    new_indexes, old_indexes, 
+					    innerbody)
+list lold, lnew, lbl;
+entity_mapping new_indexes, old_indexes;
+statement innerbody;
+{
+    entity
+	index, 
+	oldindexvalue;
+    loop
+	oldloop,
+	newloop;
+    list
+	l,
+	lnew_loop = NIL,
+	lnew_body = NIL;
+    bool
+	compute_index = FALSE;
+
+    if (ENDP(lold)) 
+	return(innerbody);
+    
+    oldloop = LOOP(CAR(lold));
+    newloop = LOOP(CAR(lnew));
+
+    index = loop_index(oldloop);
+    oldindexvalue = (entity) GET_ENTITY_MAPPING(old_indexes, index);
+    lnew_body = CONS(STATEMENT,
+		    make_loop_nest_for_overlap(CDR(lold), CDR(lnew), CDR(lbl),
+					       new_indexes, old_indexes, 
+					       innerbody),
+		    NIL);
+
+    /* ??? should also look in lbl */
+    compute_index = (oldindexvalue!=(entity)HASH_UNDEFINED_VALUE) &&
+	variable_used_in_statement_p(index, innerbody);
+    
+    /* if the index value is needed, the increment is added
+     */
+    if (compute_index)
+	lnew_body = CONS(STATEMENT, make_increment_statement(index), 
+			lnew_body);
+
+    loop_body(newloop) = make_block_statement(lnew_body);
+    lnew_loop = CONS(STATEMENT,
+		     make_stmt_of_instr(make_instruction(is_instruction_loop,
+							 newloop)),
+		     NIL);
+
+    /*
+     * i = initial_old_value 
+     * DO i' = ...
+     *   i = i + 1
+     *   body
+     * ENDDO
+     */
+
+    if (compute_index)
+	lnew_loop = 
+	    CONS(STATEMENT,
+		 make_assign_statement(entity_to_expression(index),
+				       entity_to_expression(oldindexvalue)),
+		 lnew_loop);
+
+    /* copy the non perfectly nested parts if needed
+     */
+    l = CONSP(CAR(lbl));
+    if (!ENDP(l))
+    {
+	statement
+	    s;
+	instruction
+	    i;
+	list
+	    lpre = NIL,
+	    lpost = NIL;
+	bool 
+	    pre = TRUE;
+
+	for(; !ENDP(l); l=CDR(l))
+	{
+	    s = STATEMENT(CAR(l));
+	    i = statement_instruction(s);
+	    
+	    /*  switch from pre to post.
+	     */
+	    if (instruction_loop_p(i) && instruction_loop(i)==oldloop)
+		pre = FALSE;
+	    else
+		if (pre)
+		    lpre = CONS(STATEMENT, copy_statement(s), lpre);
+		else
+		    lpost = CONS(STATEMENT, copy_statement(s), lpost);
+	}
+
+	/* the swith must have been encountered */
+	pips_assert("make_loop_nest_for_overlap", !pre);
+	    
+	lnew_loop = gen_nconc(gen_nreverse(lpre),
+		    gen_nconc(lnew_loop,
+			      gen_nreverse(lpost)));
+    }
+
+    return(make_block_statement(lnew_loop));
+}
+
 bool generate_optimized_code_for_loop_nest(innerbody, pstat,
 					   Wa, Ra, Ro, 
 					   lWa, lRa, lRo)
@@ -758,16 +875,17 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
     /*
      * and now generates the code...
      */
-    
-    initialize_variable_used_map_for_statement(innerbody);
+    initialize_variable_used_map_for_current_loop_nest(innerbody);
+    /*initialize_variable_used_map_for_statement(innerbody);*/
 
     if (hpfc_overlap_kill_unused_scalars(innerbody))
     {
 	close_variable_used_map_for_statement();
-	initialize_variable_used_map_for_statement(innerbody);
+	initialize_variable_used_map_for_current_loop_nest(innerbody);
+	/* initialize_variable_used_map_for_statement(innerbody);*/
     }
 
-    newnest = make_loop_nest_for_overlap(lloop, newloops, 
+    newnest = make_loop_nest_for_overlap(lloop, newloops, lblocks,
 					 new_indexes, old_indexes, 
 					 innerbody);
     close_variable_used_map_for_statement();
@@ -1013,72 +1131,6 @@ list Ref, lRef;
 /*
  * statement make_loop_nest_for_overlap(...)
  */
-statement make_loop_nest_for_overlap(lold, lnew, 
-				     new_indexes, old_indexes, 
-				     innerbody)
-list lold, lnew;
-entity_mapping new_indexes, old_indexes;
-statement innerbody;
-{
-    entity
-	index, 
-	oldindexvalue;
-    statement
-	body;
-    loop
-	oldloop,
-	newloop;
-
-    if (ENDP(lold)) 
-	return(innerbody);
-    
-    oldloop = LOOP(CAR(lold));
-    newloop = LOOP(CAR(lnew));
-
-    index = loop_index(oldloop);
-    oldindexvalue = (entity) GET_ENTITY_MAPPING(old_indexes, index);
-    body = make_loop_nest_for_overlap(CDR(lold), CDR(lnew), 
-				      new_indexes, old_indexes, 
-				      innerbody);
-
-    if ((oldindexvalue==(entity)HASH_UNDEFINED_VALUE) ||
-	!variable_used_in_statement_p(index, innerbody)) 
-    {
-	/*
-	 * DO i = ...
-	 *   body
-	 * ENDDO
-	 */
-	loop_body(newloop) = body;
-	return(make_stmt_of_instr(make_instruction(is_instruction_loop,
-						   newloop)));
-    }
-    else /* only when necessary */
-    {
-	/*
-	 * i = initial_old_value 
-	 * DO i' = ...
-	 *   i = i + 1
-	 *   body
-	 * ENDDO
-	 */
-	statement
-	    init = make_assign_statement(entity_to_expression(index),
-					 entity_to_expression(oldindexvalue)),
-	    incr = make_increment_statement(index);
-
-	loop_body(newloop) = make_block_statement(CONS(STATEMENT, incr,
-						  CONS(STATEMENT, body,
-						       NIL)));
-
-	return(make_block_statement
-	       (CONS(STATEMENT, init,
-		CONS(STATEMENT,
-		     make_stmt_of_instr(make_instruction(is_instruction_loop, 
-							 newloop)),
-		     NIL))));	
-    }
-}
 
 /*
  * statement make_increment_statement(index)
@@ -1125,12 +1177,53 @@ void initialize_variable_used_map_for_statement(stat)
 statement stat;
 {
     make_variable_used_map();
+    current_variable_used_statement = stat; 
 
-    current_variable_used_statement = stat;
     gen_recurse(stat,
 		reference_domain,
 		gen_true,
 		variable_used_rewrite);
+}
+
+void initialize_variable_used_map_for_current_loop_nest(inner_body)
+statement inner_body;
+{
+    list
+	ll=lloop, 
+	lb=lblocks;
+    statement
+	s;
+    instruction
+	i;
+    loop
+	l;
+
+    make_variable_used_map();     
+    current_variable_used_statement = inner_body;
+
+    gen_recurse(inner_body,
+		reference_domain,
+		gen_true,
+		variable_used_rewrite);
+
+    for (; !ENDP(ll); ll=CDR(ll), lb=CDR(lb))
+    {
+	l = LOOP(CAR(ll));
+
+	MAPL(cs,
+	 {
+	     s = STATEMENT(CAR(cs));
+	     i = statement_instruction(s);
+	     
+	     if (!(instruction_loop_p(i) && l==i))
+		 gen_recurse(s,
+			     reference_domain,
+			     gen_true,
+			     variable_used_rewrite);
+
+	 },
+	     CONSP(CAR(lb)));
+    }
 }
 
 void close_variable_used_map_for_statement()
@@ -1217,9 +1310,7 @@ entity a;
 	n = 0;
 
     for (i=1 ; i<=ndim ; i++)
-    {
 	if (ith_dim_distributed_p(a, i, &p)) n++;
-    }
    
     return(n);
 }
@@ -1239,26 +1330,6 @@ int dim;
 
     return(processor_number(template, dim, t1, &p) ==
 	   processor_number(template, dim, t2, &p));
-}
-
-/*
- * range loop_index_to_range(index)
- */
-range loop_index_to_range(index)
-entity index;
-{
-    MAPL(cl,
-     {
-	 loop
-	     l = LOOP(CAR(cl));
-
-	 if (loop_index(l)==index)
-	     return(loop_range(l));
-     },
-	 lloop);
-    
-    /* ??? other (sequential) loops may be added, and not only lloop... */
-    return(range_undefined);
 }
 
 
