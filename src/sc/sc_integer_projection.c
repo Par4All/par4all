@@ -27,7 +27,7 @@
 
 
 #include <stdio.h>
-
+#include <stdlib.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -53,39 +53,37 @@ Variable v;
 struct prtri_struct *prtri;
 int *nb_pos,*nb_neg;
 {
-	Pcontrainte ineg=NULL;
-	Pcontrainte ineg1=NULL;
-	int c;
+    Pcontrainte ineg=NULL;
+    Pcontrainte ineg1=NULL;
+    Value c;
 
-	prtri->pos = NULL;
-	prtri->neg = NULL;
-	prtri->cnul = NULL;
-	if (inegs!=NULL) {
-		for(ineg=inegs,ineg1=ineg->succ;ineg!=NULL;) {
-			if ((c = vect_coeff(v,ineg->vecteur)) > 0) {
-				ineg->succ = prtri->pos;
-				prtri->pos = ineg;
-				*nb_pos +=1;
-			}
-			else {
-				if (c < 0) {
-					ineg->succ = prtri->neg;
-					prtri->neg = ineg;
-					*nb_neg+=1;
-				}
-				else {
-					ineg->succ = prtri->cnul;
-					prtri->cnul = ineg;
-				}
-			}
-			ineg=ineg1;
-			if (ineg1!=NULL) ineg1=ineg1->succ;
+    prtri->pos = NULL;
+    prtri->neg = NULL;
+    prtri->cnul = NULL;
+    if (inegs!=NULL) {
+	for(ineg=inegs,ineg1=ineg->succ;ineg!=NULL;) {
+	    c = vect_coeff(v,ineg->vecteur);
+	    if (value_pos_p(c)) {
+		ineg->succ = prtri->pos;
+		prtri->pos = ineg;
+		*nb_pos +=1;
+	    }
+	    else {
+		if (value_neg_p(c)) {
+		    ineg->succ = prtri->neg;
+		    prtri->neg = ineg;
+		    *nb_neg+=1;
 		}
+		else {
+		    ineg->succ = prtri->cnul;
+		    prtri->cnul = ineg;
+		}
+	    }
+	    ineg=ineg1;
+	    if (ineg1!=NULL) ineg1=ineg1->succ;
 	}
+    }
 }
-
-
-
 
 /* dans sc, elimine la Variable v des inegalites par "projections entieres".
  * Si la projection "Fourier-Motzkin" d'une variable n'est pas equivalente 
@@ -94,11 +92,11 @@ int *nb_pos,*nb_neg;
  * suffisante non satisfaite.
  */
 
-
-int sc_integer_fourier_motzkin_variable_elimination(sci,sc,v)	
-Psysteme sci,sc;
-Variable v;
-
+boolean
+sc_integer_fourier_motzkin_variable_elimination(
+    Psysteme sci,
+    Psysteme sc,
+    Variable v)
 {
     struct {
 	Pcontrainte pos,neg,cnul;
@@ -125,7 +123,7 @@ Variable v;
     else {
 	inegs = NULL;
 	free(ineg_stay);
-	return 1;
+	return TRUE;
     }
 
     constraint_sort(inegs,v,&rtri,&nb_pos,&nb_neg);
@@ -139,11 +137,8 @@ Variable v;
 	non_equivalent_projections = FALSE;
 	for( negat=rtri.neg, i1=1; negat!=NULL; i1++) {
 	   
-	    ineg = sc_integer_inequalities_combination_ofl_ctrl(sci, 
-								posit, negat, 
-								v,
-								&integer_comb_p,
-								OFL_CTRL);
+	    ineg = sc_integer_inequalities_combination_ofl_ctrl
+		(sci, posit, negat, v, &integer_comb_p, OFL_CTRL);
 	    ineg_stay[i1] = ineg_stay[i1] && integer_comb_p;
  
 	  
@@ -163,7 +158,7 @@ Variable v;
 		    rtri.cnul = NULL;
 		    posit = NULL;
 		    negat = NULL;
-		    return(NULL);
+		    return FALSE;
 		    /* systeme non faisable */
 		}
 	    }
@@ -206,7 +201,7 @@ Variable v;
     (sc->inegalites) = rtri.cnul;
 
     free(ineg_stay);
-    return(1);
+    return TRUE;
 }
 
 
@@ -224,20 +219,20 @@ Psysteme sc_integer_projection_along_variable(sci,sc,v)
 Psysteme sci,sc;    /* sci est le systeme initial sans les projections  */
 Variable v;
 {
-
-  
     Pcontrainte eq;
-    int coeff;
+    Value coeff;
     if (sc) {
 
 	/* trouver une egalite ou v a un coeff. minimal en valeur absolue */
-
-	if ((eq = contrainte_var_min_coeff(sc->egalites,v,&coeff, FALSE)) != NULL) 
+	
+	if ((eq = contrainte_var_min_coeff(sc->egalites,v,&coeff, FALSE)) 
+	    != NULL) 
 	{		
 	    if(!egalite_normalize(eq))
 		return SC_EMPTY;
 	    
-	    sc = sc_variable_substitution_with_eq_ofl_ctrl(sc,eq,v, NO_OFL_CTRL);
+	    sc = sc_variable_substitution_with_eq_ofl_ctrl
+		(sc, eq, v, NO_OFL_CTRL);
 	    
 	}
 	else {
@@ -245,17 +240,16 @@ Variable v;
 	    /* v n'apparait dans aucune egalite, il faut l'eliminer 
 	       des inegalites   par des combinaisons (fonction combiner)   */
 
-	    if (sc_integer_fourier_motzkin_variable_elimination(sci,sc,v)==NULL 
+	    if (!sc_integer_fourier_motzkin_variable_elimination(sci,sc,v)
 		&& sc) {
 		sc_rm(sc);
-		sc = NULL;
-		return(NULL);
+		return SC_UNDEFINED;
 	    }
 	    sc->nb_ineq = nb_elems_list(sc->inegalites);
 	}
     }
 
-    return(sc);
+    return sc;
 }
 
 
@@ -264,7 +258,8 @@ Variable v;
  * projection of the system sc along all the variables contain in vecteur pv
  */ 
 
-Psysteme sc_integer_projection_along_variables(fsc,sc,index_base,pv,tab_info,dim,n)
+Psysteme sc_integer_projection_along_variables
+  (fsc,sc,index_base,pv,tab_info,dim,n)
 Psysteme fsc,sc;
 Pbase index_base;
 Pvecteur pv;
