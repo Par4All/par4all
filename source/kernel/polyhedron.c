@@ -3585,7 +3585,7 @@ Polyhedron *align_context(Polyhedron *Pol,int align_dimension,int NbMaxRays) {
     }
     if (align_dimension == Pol->Dimension) {
       UNCATCH(any_exception_error);
-      return Pol;
+      return Polyhedron_Copy(Pol);
     }
 
     /* 'k' is the dimension increment */
