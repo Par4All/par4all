@@ -15,7 +15,8 @@
 #include "statistics.h"     
 
 static int depth, nbr_perfectly_nested_loop, nbr_no_perfectly_nested_loop, 
-nbr_interested_loop,cpt, nbr_nested_loop, nbr_depth[100], max_depth ;
+nbr_interested_loop,cpt, nbr_nested_loop, nbr_perf_nest_loop_of_depth[100],
+nbr_no_perf_nest_loop_of_depth[100], max_depth, nbr_loop ;
 static bool perfectly_nested  ;
  
 static bool loop_flt( loop l)
@@ -109,7 +110,7 @@ bool loop_rwt( )
       nbr_nested_loop++;
       if (perfectly_nested){ 
           nbr_perfectly_nested_loop++;
-          nbr_depth[depth]++;
+          nbr_perf_nest_loop_of_depth[depth]++;
           if (depth >max_depth) max_depth =depth;
       }
       else{
@@ -122,30 +123,72 @@ bool loop_rwt( )
   };
   return TRUE;
 }
+ 
+static bool loop_flt1( loop l)
+{
+  instruction lbi = statement_instruction(loop_body(l));
+  int k,position;
+  nbr_loop++;
+  cpt++;
+  printf( "debut \n"); 
+  if ( instruction_loop_p(lbi)) return TRUE;  
+  else {
+         if(instruction_sequence_p(lbi)) { 
+              sequence seq = instruction_sequence(lbi);
+              list l =sequence_statements(seq); 
+              MAP(STATEMENT,s, {k++;if
+              ( instruction_loop_p(statement_instruction(s)))
+              position=k ; };, l); 
+	      if (position!=0 ) return TRUE;
+          
+	 };
+  };   
+  printf(" fon \n");           
+  if (cpt > depth )  {depth =cpt; printf(" lalalalalal %d \n", cpt);};
+
+  return FALSE; 
+  
+}
+bool loop_rwt1( )
+{
+  cpt--;
+  if (cpt==2) {
+     nbr_no_perf_nest_loop_of_depth[depth]++;
+     cpt=0;
+     depth=0;
+  };
+    
+  return TRUE ;
+}
 static void initialize ()
 {
   int i;
   for(i=0; i<=1000;i++)
-   nbr_depth[i]=0;
+   nbr_perf_nest_loop_of_depth[i]=0;
    depth=0;
    nbr_perfectly_nested_loop=0; nbr_no_perfectly_nested_loop=0;
    nbr_interested_loop=0;
    cpt=0; nbr_nested_loop=0 ; perfectly_nested =TRUE, max_depth=0  ;
-  
+   nbr_loop=0;
 } 
 static void put_result(string filename)
 {
   int i;
   FILE * file = safe_fopen(filename, "w");  
   fprintf(file,
+          "loops: %d\n"
 	  "nested loops: %d\n"
 	  "perfectly nested loops: %d\n"
 	  "non perfectly nested loops: %d\n"
 	  "non perfectly nested loops which we ca treat : %d\n",
-	  nbr_nested_loop, nbr_perfectly_nested_loop,
+	  nbr_loop, nbr_nested_loop, nbr_perfectly_nested_loop,
           nbr_no_perfectly_nested_loop, nbr_interested_loop);
   for (i=1; i<= max_depth; i++)
-  fprintf(file," perfectly  nested loops of depth %d: %d \n", i, nbr_depth[i]);
+  fprintf(file," perfectly  nested loops of depth %d: %d \n", i, 
+  nbr_perf_nest_loop_of_depth[i]);
+  for (i=1; i<= 3; i++)
+  fprintf(file,"non  perfectly  nested loops of depth %d: %d \n", i, 
+  nbr_no_perf_nest_loop_of_depth[i]);
   safe_fclose(file, filename);
 }
 
@@ -160,6 +203,8 @@ int loop_statistics(string name)
   stat = (statement) db_get_memory_resource(DBR_CODE, name, TRUE); /* ??? */
   gen_context_multi_recurse
   (stat, NULL,loop_domain, loop_flt, loop_rwt,NULL);
+  gen_context_multi_recurse
+  (stat, NULL,loop_domain, loop_flt1, loop_rwt1,NULL);
   localfilename = db_build_file_resource_name(DBR_STATS_FILE,
 					      name, ".loop_stats");
   filename = strdup(concatenate(db_get_current_workspace_directory(), 
