@@ -250,8 +250,8 @@ transformer pre;
     list formals = entity_to_formal_integer_parameters(f);
     cons * ce;
 
-    ifdebug(8) {
-	debug(8,"add_formal_to_actual_bindings",
+    ifdebug(6) {
+	debug(6,"add_formal_to_actual_bindings",
 	      "begin for call to %s pre=%x\n", module_local_name(f), pre);
 	dump_transformer(pre);
     }
@@ -284,11 +284,11 @@ transformer pre;
 
     free_arguments(formals);
 
-    ifdebug(8) {
-	debug(8,"add_formal_to_actual_bindings",
+    ifdebug(6) {
+	debug(6,"add_formal_to_actual_bindings",
 	      "new pre=%x\n", pre);
 	dump_transformer(pre);
-	debug(8,"add_formal_to_actual_bindings","end for call to %s\n",
+	debug(6,"add_formal_to_actual_bindings","end for call to %s\n",
 	      module_local_name(f));
     }
 
@@ -350,8 +350,10 @@ cons * le;
 	dump_arguments(lost_values);
     }
 
-    /* get rid of them */
-    pre = transformer_projection(pre, lost_values);
+    /* get rid of old_values */
+    pre = transformer_projection_with_redundancy_elimination
+	(pre, lost_values, /* sc_elim_redund */ no_elim);
+
     gen_free_list(lost_values);
 
     
@@ -396,10 +398,10 @@ cons * le;
 	dump_arguments(lost_values);
     }
 
-    /* get rid of them */
-    pre = transformer_projection(pre, lost_values);
+    /* get rid of untouched variables */
+    pre = transformer_projection_with_redundancy_elimination
+	(pre, lost_values, /* sc_elim_redund */ no_elim);
     
-
     /* free the temporary list of entities */
     gen_free_list(lost_values);
     gen_free_list(values);
@@ -433,8 +435,8 @@ transformer tf;
     Pbase b = (Pbase) vect_dup(sc_base(s));
     Pbase bv;
 
-    ifdebug(8) {
-	debug(8, "translate_global_values", "Predicate for tf:\n");
+    ifdebug(6) {
+	debug(6, "translate_global_values", "Predicate for tf:\n");
 	sc_fprint(stderr, s, dump_value_name);
     }
 
@@ -467,10 +469,9 @@ entity v;
     entity rf = entity_undefined;
     entity section = entity_undefined;
 
-    ifdebug(8) {
-	debug(8, "translate_global_value", "begin v = %s and tf =\n",
-	      entity_name(v));
-	dump_transformer(tf);
+    ifdebug(7) {
+	debug(7, "translate_global_value", "begin v = %s and tf = %x\n",
+	      entity_name(v), tf);
     }
 
 
@@ -488,13 +489,13 @@ entity v;
 	/* FI: to be completed later... 3 December 1993
 	entity var = value_to_variable(v);
 
-	    debug(8, "translate_global_value", 
+	    debug(7, "translate_global_value", 
 		  "%s is translated into %s\n",
 		  entity_name(v), entity_name(e));
 	    transformer_value_substitute(tf, v, e);
 	    */
 
-	debug(8, "translate_global_value", "No need to translate %s\n",
+	debug(7, "translate_global_value", "end: No need to translate %s\n",
 	      entity_name(v));
 	return;
     }
@@ -509,19 +510,19 @@ entity v;
      * FI, 26 October 1994
      */
     if(global_old_value_p(v)) {
-	debug(8, "translate_global_value", "No need to translate %s yet\n",
+	debug(7, "translate_global_value", "end: No need to translate %s yet\n",
 	      entity_name(v));
 	return;
     }
 
     store = entity_storage(v);
 
-    debug(8, "translate_global_value", "Trying to translate %s\n",
+    debug(7, "translate_global_value", "Trying to translate %s\n",
 	  entity_name(v));
 
     if(!storage_ram_p(store)) {
 	if(storage_rom_p(store)) {
-	    debug(8, "translate_global_value", "%s is not translatable: store tag %d\n",
+	    debug(7, "translate_global_value", "%s is not translatable: store tag %d\n",
 		  entity_name(v), storage_tag(store));
 	    /* Should it be projected? No, this should occur later for xxxx#init
 	     * variables when the xxxx is translated. Or before if xxxx has been
@@ -531,13 +532,19 @@ entity v;
 	}
 	else 
 	    if(storage_formal_p(store)) {
-		debug(8, "translate_global_value", "formal %s is not translatable\n",
+		debug(7, "translate_global_value", "formal %s is not translatable\n",
 		      entity_name(v));
 		return;
 	    }
 	    else
 		pips_error("translate_global_value", "%s is not translatable: store tag %d\n",
 			   entity_name(v), storage_tag(store));
+    }
+
+    ifdebug(7) {
+	debug(7, "translate_global_value", "let's do it for v = %s and tf =\n",
+	      entity_name(v));
+	dump_transformer(tf);
     }
 
     r = storage_ram(store);
@@ -562,7 +569,7 @@ entity v;
 	e = value_alias(v);
 	if(e == entity_undefined) {
 	    /* no equivalent name found, get rid of v */
-	    debug(8, "translate_global_value",
+	    debug(7, "translate_global_value",
 		  "No equivalent for %s in %s: project %s\n",
 		  entity_name(v), entity_name(m), entity_name(v));
 	    user_warning("translate_global_value",
@@ -581,7 +588,7 @@ entity v;
 
 	if(!same_scalar_location_p(v, e)) {
 	    /* no equivalent location found, get rid of v */
-	    debug(8, "translate_global_value",
+	    debug(7, "translate_global_value",
 		  "No equivalent location for %s and %s: project %s\n",
 		  entity_name(v), entity_name(e), entity_name(v));
 	    transformer_projection(tf, CONS(ENTITY, v, NIL));
@@ -605,13 +612,13 @@ entity v;
 	    /* e has already been introduced and v eliminated;
 	       this happens when a COMMON variable is
 	       also passed as real argument */
-	    debug(8, "translate_global_value", 
+	    debug(7, "translate_global_value", 
 		  "%s has already been translated into %s\n",
 		  entity_name(v), entity_name(e));
 	    sc_base_remove_variable(sc,(Variable) v);
 	}
 	else {
-	    debug(8, "translate_global_value", 
+	    debug(7, "translate_global_value", 
 		  "%s is translated into %s\n",
 		  entity_name(v), entity_name(e));
 	    transformer_value_substitute(tf, v, e);
@@ -659,13 +666,13 @@ entity v;
 		else {
 		    /* forget e_init: there is no v_init in tf */
 		    ;
-		    debug(8, "translate_global_value", 
+		    debug(7, "translate_global_value", 
 		      "%s is not used in tf\n",
 		      entity_name(v_init));
 		}
 	    }
 	    else {
-		debug(8, "translate_global_value", 
+		debug(7, "translate_global_value", 
 		      "%s is translated into %s\n",
 		      entity_name(v), entity_name(e));
 		transformer_value_substitute(tf, v_init, e_init);
@@ -718,14 +725,14 @@ entity e2;
 	if(ram_offset(r1) == ram_offset(r2))
 	    same = TRUE;
 	else {
-	    debug(8, "same_scalar_location_p",
+	    debug(7, "same_scalar_location_p",
 		  "Different offsets %d for %s in section %s and %d for %s in section %s\n",
 		  ram_offset(r1), entity_name(e1), entity_name(s1),
 		  ram_offset(r2), entity_name(e2), entity_name(s2));
 	}
     }
     else {
-	debug(8, "same_scalar_location_p",
+	debug(7, "same_scalar_location_p",
 	      "Disjoint entitites %s in section %s and %s in section %s\n",
 	      entity_name(e1), entity_name(s1),
 	      entity_name(e2), entity_name(s2));
@@ -837,7 +844,7 @@ transformer call_site_to_module_precondition(entity caller,
 		     db_get_memory_resource
 		     (DBR_PRECONDITIONS,
 		      module_local_name(caller),
-		      FALSE) );
+		      TRUE) );
 
     /* load caller preconditions */
     caller_prec = transformer_dup(load_statement_semantic(s));
@@ -854,6 +861,7 @@ transformer call_site_to_module_precondition(entity caller,
     call_site_prec = precondition_intra_to_inter (callee,
 						  caller_prec,
 						  seffects_callee);
+    call_site_prec = transformer_normalize(call_site_prec);
     /* translate_global_values(e_caller, call_site_prec); */
     reset_current_module_entity();
 
@@ -879,6 +887,17 @@ static transformer current_precondition = transformer_undefined;
 static entity current_callee = entity_undefined;
 static list summary_effects_of_callee = list_undefined;
 static transformer current_summary_precondition = transformer_undefined;
+static int number_of_call_sites = -1;
+
+void reset_call_site_number()
+{
+    number_of_call_sites = 0;
+}
+
+int get_call_site_number()
+{
+    return number_of_call_sites;
+}
 
 static bool memorize_precondition(statement s)
 {
@@ -887,8 +906,11 @@ static bool memorize_precondition(statement s)
     return TRUE;
 }
 
+/* Update the current_summary_precondition, if necessary */
 static bool process_call(call c)
 {
+#define PROCESS_CALL_DEBUG_LEVEL 5
+
     transformer caller_prec = transformer_undefined;
     transformer call_site_prec = transformer_undefined;
 
@@ -896,22 +918,31 @@ static bool process_call(call c)
 	return TRUE;
     }
 
-    ifdebug(8) {
-	debug(8,"process_call","begin\n");
-	debug(8,"Process_call","for module %s\n",
-	      module_local_name(current_callee));
-	debug(8,"process_call",
+
+    number_of_call_sites++;
+
+    ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
+	debug(PROCESS_CALL_DEBUG_LEVEL,"process_call","begin\n");
+	debug(PROCESS_CALL_DEBUG_LEVEL,"Process_call","for module %s (call site %d)\n",
+	      module_local_name(current_callee), number_of_call_sites);
+	debug(PROCESS_CALL_DEBUG_LEVEL,"process_call",
 	      "call site precondition %x:\n", current_precondition);
 	/* p might not be printable; it may (should!) contain formal parameters
 	   of module m */
 	dump_transformer(current_precondition);
+	debug(PROCESS_CALL_DEBUG_LEVEL,"process_call",
+	      "current summary precondition %x:\n",
+	      current_summary_precondition);
+	/* p might not be printable; it may (should!) contain formal parameters
+	   of module m */
+	dump_transformer(current_summary_precondition);
     }
 
     /* add to call site preconditions the links to the callee formal params */
     caller_prec = add_formal_to_actual_bindings
 	(c, transformer_dup(current_precondition));
-    ifdebug(8) {
-	debug(8,"process_call",
+    ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
+	debug(PROCESS_CALL_DEBUG_LEVEL,"process_call",
 	      "call site precondition with bindings %x:\n",
 	      caller_prec);
 	/* caller_prec should not be printable; it should contain
@@ -927,16 +958,16 @@ static bool process_call(call c)
 				     caller_prec,
 				     summary_effects_of_callee);
     
-    ifdebug(8) {
-	debug(8,"process_call",
+    ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
+	debug(PROCESS_CALL_DEBUG_LEVEL,"process_call",
 	      "call site precondition with filtered actual parameters:\n");
 	dump_transformer(call_site_prec);
     }
 
     translate_global_values(current_caller, call_site_prec);
 
-    ifdebug(8) {
-	debug(8,"process_call",
+    ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
+	debug(PROCESS_CALL_DEBUG_LEVEL,"process_call",
 	      "new call site precondition in caller's frame:\n");
 	dump_transformer(call_site_prec);
     }
@@ -972,9 +1003,10 @@ static bool process_call(call c)
 	 */
 	translate_global_values(current_caller, 
 				current_summary_precondition);
-	ifdebug(8) {
-	    debug(8,"process_call",
-		  "old module precondition in current frame:\n");
+	ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
+	    debug(PROCESS_CALL_DEBUG_LEVEL,"process_call",
+		  "old module current summary precondition (%x) in current frame:\n",
+		  current_summary_precondition);
 	    dump_transformer(current_summary_precondition);
 	}
 	
@@ -1007,9 +1039,10 @@ static bool process_call(call c)
 	current_summary_precondition = call_site_prec;
     }
 	
-    ifdebug(8) {
-	debug(8,"add_module_call_site_precondition",
-	      "new module precondition in current frame:\n");
+    ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
+	debug(PROCESS_CALL_DEBUG_LEVEL,"process_call: end\n",
+	      "new module current summary precondition %x in current frame:\n",
+	      current_summary_precondition);
 	dump_transformer(current_summary_precondition);
     }
 
@@ -1045,7 +1078,7 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
 		     db_get_memory_resource
 		     (DBR_PRECONDITIONS,
 		      module_local_name(caller),
-		      FALSE) );
+		      TRUE) );
 
     module_to_value_mappings(caller);
 
@@ -1065,11 +1098,20 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
     current_callee = entity_undefined;
     current_precondition = transformer_undefined;
     summary_effects_of_callee = list_undefined;
+    /* FI: I believed that convex hull was performed by side effect only.
+     * The two arguments are potentially modified, but a new transformer
+     * is allocated
+     */
+    /*
     pips_assert("update_precondition_with_call_site_preconditions",
 		t == transformer_undefined || 
 		t == current_summary_precondition);
+		*/
+    /* FI: To be tried when I'm courageous!
+    if(t!=transformer_undefined)
+	free_transformer(t);
+	*/
     t = current_summary_precondition;
     current_summary_precondition = transformer_undefined;
     return t;
 }
-
