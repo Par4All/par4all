@@ -52,18 +52,20 @@ syntax s;
 
 	return(v);
 }
-
-/* only calls to constant, symbolic or intrinsic functions might be
-evaluated. recall that intrinsic functions are not known. */
 
-value EvalCall(c)
-call c;
+/* only calls to constant, symbolic or intrinsic functions might be
+ * evaluated. recall that intrinsic functions are not known.
+ */
+value EvalCall(call c)
 {
     value vout, vin;
     entity f;
 
     f = call_function(c);
     vin = entity_initial(f);
+
+    if (value_undefined_p(vin))
+	pips_internal_error("undefined value for %s\n", entity_name(f));
 	
     switch (value_tag(vin)) {
       case is_value_intrinsic:
@@ -155,14 +157,13 @@ cons *la;
 	return(vout);
 }
 
-value EvalBinaryOp(t, la)
-int t;
-cons *la;
+value EvalBinaryOp(int t, list la)
 {
     value v;
     int argl, argr;
 
-    assert(la != NIL);
+    pips_assert("non empty list", la != NIL);
+
     v = EvalExpression(EXPRESSION(CAR(la)));
     if (value_constant_p(v) && constant_int_p(value_constant(v))) {
 	argl = constant_int(value_constant(v));
@@ -172,8 +173,10 @@ cons *la;
 	return(v);
 
     la = CDR(la);
-    assert(la != NIL);
+
+    pips_assert("non empty list", la != NIL);
     v = EvalExpression(EXPRESSION(CAR(la)));
+
     if (value_constant_p(v) && constant_int_p(value_constant(v))) {
 	argr = constant_int(value_constant(v));
     }
@@ -318,7 +321,9 @@ entity e;
 	else if (strcmp(entity_local_name(e), ".OR.") == 0)
 		token = OR;
 	else if (strcmp(entity_local_name(e), ".AND.") == 0)
-		token = AND;		
+		token = AND;
+	else if (same_string_p(entity_local_name(e), IMPLIED_COMPLEX_NAME))
+	        token = CAST;
 	else
 		token = -1;
 
@@ -340,7 +345,7 @@ entity e;
 	else
 		token = -1;
 
-	return(token);
+	return token;
 }
 
 /* FI: such a function should exist in Linear/arithmetique */
