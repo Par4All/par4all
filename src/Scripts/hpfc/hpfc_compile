@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/10/25 21:11:14 $, 
+# $Date: 1996/10/25 21:16:26 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -167,7 +167,7 @@ fi
 # STUBS directive may specify a stub file...
 #
 
-stubs="`sed -n 's,^[Cc!\*][Ff][Cc][Dd]\$ [ 	]*[Ss][Tt][Uu][Bb][Ss],,p' 
+stubs="`sed -n 's,^[Cc!\*][Ff][Cc][Dd]\$ [ 	]*[Ss][Tt][Uu][Bb][Ss],,p' \
     $HPFFILES | sort -u`"
 stubs="`eval echo $stubs`"
 
