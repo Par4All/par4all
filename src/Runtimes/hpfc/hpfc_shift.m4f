@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-! ($Date: 1997/01/27 18:47:56 $, )
+! ($Date: 1997/05/28 14:17:00 $, )
 !
 !
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -274,12 +274,12 @@ SIMPLE_REPLICATE(LEVEL,`INIT_TABLE')dnl
 !
 ! the SHIFT is to another processor
 !
-            call pvmfinitsend(PVMDATARAW, bufid)
+            call HPFC INIT SEND(PVMDATARAW, bufid)
             call build_name(HPFCPACK,PVMTYPE,LEVEL)
      $           (array, dnl
 COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
-            call pvmfsend(NODETIDS(lid(j)),SENDCHANNELS(lid(j)),info)
+            call HPFC SEND(NODETIDS(lid(j)),SENDCHANNELS(lid(j)),info)
             SENDCHANNELS(lid(j))=SENDCHANNELS(lid(j))+2
          endif
          l(dim)=lp
@@ -326,7 +326,7 @@ SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
 !
 ! the SHIFT is to another processor
 !
-             call pvmfrecv(NODETIDS(lid(j)),RECVCHANNELS(lid(j)),info)
+             call HPFC RECEIVE(NODETIDS(lid(j)),RECVCHANNELS(lid(j)),info)
              RECV CHANNELS(lid(j))=RECV CHANNELS(lid(j))+2
              call build_name(HPFCUNPACK,PVMTYPE,LEVEL)
      $            (array, dnl
