@@ -318,22 +318,18 @@ rproper_effects_of_statement(statement s)
     return;
 }
 
-
 void 
 rcumulated_effects_of_statement(statement s)
 {
     init_invariant_rw_effects();
     set_methods_for_simple_effects();
     rw_effects_of_module_statement(s); 
-    reset_invariant_rw_effects();
+    close_invariant_rw_effects();
 }
-
-
 
 /* called from rice */
 list 
-statement_to_effects(s)
-statement s;
+statement_to_effects(statement s)
 {
     list l_eff;
 
@@ -354,9 +350,9 @@ statement s;
     debug_off();
 
     /* Faudrait faire les free, mais je ne sais pas comment. mail a` fc */
-    reset_proper_rw_effects();
-    reset_rw_effects();
-    reset_invariant_rw_effects();
+    close_proper_rw_effects();
+    close_rw_effects();
+    close_invariant_rw_effects();
     generic_effects_reset_all_methods();
 
     return l_eff;
