@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.53  1997/04/10 08:50:05  coelho
+ * optimizations guarded by properties.
+ *
  * Revision 1.52  1997/04/10 08:21:49  coelho
  * *** empty log message ***
  *
@@ -1045,8 +1048,11 @@ hpf_remapping(
     clean_the_system(&p, &lrm, &lo);
     DEBUG_SYST(4, "cleaned system", p);
 
-    sc_find_equalities(&p);
-    DEBUG_SYST(4, "more equalities", p);
+    if (get_bool_property("HPFC_EXTRACT_EQUALITIES"))
+    {
+	sc_find_equalities(&p);
+	DEBUG_SYST(4, "more equalities", p);
+    }
 
     lddc = simplify_deducable_variables(p, ll, &left);
     gen_free_list(ll);
@@ -1085,7 +1091,7 @@ hpf_remapping(
 	hpfc_warning("lattice extraction not implemented (proc)\n");
 
 
-    if (sc_egalites(enume))
+    if (sc_egalites(enume) && get_bool_property("HPFC_EXTRACT_LATTICE"))
     {
 	list ns = NIL;
 	extract_lattice(enume, scanners, &ns, &lddc);
