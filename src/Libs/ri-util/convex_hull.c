@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Functions which should be in linear.
+ * Functions which should/could be in linear...
  * Here because we're using some newgen stuff.
  */
 
@@ -201,6 +201,7 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
    * if part of the system is separated. Other calls may be considered here?
    */
   sc_transform_ineg_in_eg(sc);
+  sc_project_very_simple_equalities(sc);
 
   /* sc, su: fast union of disjoint */
   sc = sc_fusion(sc, su);
