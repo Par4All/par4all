@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/15 16:48:46 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/21 16:55:01 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -151,6 +151,14 @@ What to do on user errors: go ahead (default) or core dump (debug)
 
 \begin{verbatim}
 ABORT_ON_USER_ERROR     FALSE
+\end{verbatim}
+
+\subsection{Tpips command line interface}
+
+Shall we execute the instructions of just check the syntax
+
+\begin{verbatim}
+TPIPS_NO_EXECUTION_MODE      FALSE
 \end{verbatim}
 
 \section{Analyses}
@@ -743,6 +751,13 @@ Add statement effects as comments in output; not implemented (that way) yet.
 
 \begin{verbatim}
 PRETTYPRINT_EFFECTS FALSE
+\end{verbatim}
+
+Add statement IO-effects as comments in output; They are simulated by
+a read/write action to the array TOP-LEVEL:LUNS()
+
+\begin{verbatim}
+PRETTYPRINT_IO_EFFECTS TRUE
 \end{verbatim}
 
 Transform DOALL loops into sequential loops with an opposed increment
