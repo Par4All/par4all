@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: lattice_extraction.c,v $
+ * Revision 1.6  1997/04/07 17:06:56  coelho
+ * test normalization...
+ *
  * Revision 1.5  1997/04/07 11:39:48  coelho
  * tmp fix...
  *
@@ -21,6 +24,26 @@
 #include "sparse_sc.h"
 
 extern Pbase list_to_base(list); /* paf-utils */
+
+/*
+void normalize_system(Psysteme * ps)
+{
+    Ptsg sg;
+    Psysteme s;
+
+    DEBUG_SYST(1, "entry system", *ps);
+
+    sg = sc_to_sg_chernikova(*ps);
+    sc_rm(*ps);
+
+    s = sg_to_sc_chernikova(sg);
+    sg_rm(sg);
+
+    DEBUG_SYST(1, "exit system", s);
+
+    *ps = s;
+}    
+*/
 
 /* blindly appends b2 after b1
  */
