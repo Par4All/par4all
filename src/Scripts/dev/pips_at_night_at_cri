@@ -22,7 +22,7 @@ function usage()
 
 function verb()
 {
-    echo "[pips_at_night_at_cri]" "$@";
+    echo "[pips_at_night_at_cri]" "$@" `date`;
 }
 
 #
@@ -55,27 +55,35 @@ function doit()
     fi
 }
 
+# COmpile and VAlidate
 # host dir archs
-function onehost()
+function docova()
 {
-    ${verb} "[onehost] compilation $@"
+    ${verb} "[docova] compilation $@"
     doit V "$@" ;
 
-    ${verb} "[onehost] validation $@"
+    ${verb} "[docova] validation $@"
     doit CNLP "$@" &
+}
+
+# COMPile
+# host dir archs
+function docomp()
+{
+    ${verb} "[docomp] compilation $@"
+    doit V "$@" ;
 }
 
 #
 # DO IT!
 
-${verb} Linux
-onehost coulommiers /tmp "LINUXI86"
+docova coulommiers /tmp LINUXI86
+docova recanati /projects/Pips/Experiments2 GNUSOL2LL
+docova chailly ${HOME} .
 
-${verb} Solaris 2
-onehost recanati /projects/Pips/Experiments2 "GNUSOL2LL SOL2LL"
-
-${verb} SunOS 4
-onehost chailly ${HOME} ". GNU SUN4 GPROF"
+# remaining compilations
+docomp recanati /projects/Pips/Experiments2 SOL2LL
+docomp chailly ${HOME} "GNU SUN4 GPROF"
 
 ${verb} waiting
 
