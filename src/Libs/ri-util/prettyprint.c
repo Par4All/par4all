@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.67  1997/08/04 16:56:08  coelho
+ * back to initial, because  declarations are not atomic as I thought.
+ *
  * Revision 1.66  1997/08/04 13:02:08  coelho
  * *** empty log message ***
  *
@@ -17,7 +20,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.66 1997/08/04 13:02:08 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.67 1997/08/04 16:56:08 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1099,7 +1102,7 @@ loop_private_variables(loop obj)
     bool
 	all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"),
 	hpf_private = get_bool_property("PRETTYPRINT_HPF"),
-	some_after = FALSE;
+	some_before = FALSE;
     list l = NIL;
 
     /* comma-separated list of private variables. 
@@ -1109,20 +1112,18 @@ loop_private_variables(loop obj)
     {
 	if((p!=loop_index(obj)) || all_private) 
 	{
-	    if (some_after) 
-		l = CONS(STRING, strdup(","), l);
+	    if (some_before) 
+		l = CHAIN_SWORD(l, ",");
 	    else
-		some_after = TRUE; /* from now on commas, triggered... */
+		some_befire = TRUE; /* from now on commas, triggered... */
 
-	    l = gen_nconc(words_declaration(p,TRUE), l);
+	    l = gen_nconc(l, words_declaration(p,TRUE));
 	}
     }, 
 	loop_locals(obj)) ; /* end of MAP */
     
     pips_debug(5, "#printed %d/%d\n", gen_length(l), 
 	       gen_length(loop_locals(obj)));
-
-    l = gen_nreverse(l);
 
     /* stuff around if not empty
      */
