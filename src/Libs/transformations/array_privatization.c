@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1997/04/28 16:36:02 $, 
+ * $Date: 1997/04/28 16:44:36 $, 
  */
 
 #include <stdio.h>
@@ -14,6 +14,7 @@
 #include "genC.h"
 #include "ri.h"
 #include "database.h"
+#include "makefile.h"
 #include "ri-util.h"
 #include "control.h"
 #include "constants.h"
@@ -24,6 +25,7 @@
 #include "text-util.h"
 #include "text.h"
 #include "properties.h"
+#include "pipsmake.h"
 #include "transformer.h"
 #include "semantics.h"
 #include "effects.h"
