@@ -14,12 +14,15 @@
 
 */
 
+/*  SCCS Stuff
+ *  $RCSfile: genC.h,v $ ($Date: 1994/12/29 18:44:18 $, )
+ *  version $Revision$
+ *  got on %D%, %T%
+ */
+
 
 #ifndef GENC_INCLUDED
 #define GENC_INCLUDED
-
-/* genC.h */
-
 #define NEWGEN
 
 /*
@@ -45,7 +48,7 @@
  * a (CHUNK *) and every inlinable value. To use a union is a trick to enable
  * the assignment opereator and the ability of passing and returning them as
  * values (for function): this requires a sufficiently clever compiler !
-
+ *
  * Note that the field name of inlinable types have to begin with the same
  * letter as the type itself (this can be fixed if necessary but why bother).
  * This characteristic is used by the Newgen code generator.
@@ -62,7 +65,7 @@ typedef union chunk {
 	set t ;
 	hash_table h ;
 	union chunk *p ;
-} chunk ;
+} chunk, *object ;
 
 #define chunk_undefined ((chunk *)(-16))
 #define chunk_undefined_p(c) ((c)==chunk_undefined)
@@ -107,7 +110,7 @@ extern int gen_debug ;
 #define GEN_DBG_TRAV_SIMPLE 2
 #define GEN_DBG_TRAV_OBJECT 4
 #define GEN_DBG_CHECK 8
-#define GEN_DBG_QUICK_RECURSE 16
+#define GEN_DBG_RECURSE 16
 
 #define GEN_DBG_TRAV \
      (GEN_DBG_TRAV_LEAF|GEN_DBG_TRAV_SIMPLE|GEN_DBG_TRAV_OBJECT)
@@ -126,6 +129,8 @@ extern void gen_init_external GEN_PROTO((int,
 					 char *(*)(), void (*)(), 
 					 void (*)(), char *(*)() )) ;
 extern chunk *gen_check GEN_PROTO(( chunk *, int )) ;
+extern int gen_type GEN_PROTO((chunk *)) ;
+extern char *gen_domain_name GEN_PROTO((int)) ;
 extern void gen_clear_tabulated_element GEN_PROTO(( chunk * )) ;
 extern chunk *gen_copy_tree GEN_PROTO(( chunk * )) ;
 extern int gen_consistent_p GEN_PROTO(( chunk * )) ;
