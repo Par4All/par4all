@@ -42,7 +42,6 @@
 #include "contrainte.h"
 #include "sc.h"
 
-/*****duong - set timeout with signal and alarm*****/
 #include <signal.h>
 
 #define EXCEPTION_PRINT_PROJECTION TRUE
@@ -61,11 +60,10 @@ static boolean PROJECTION_timeout = FALSE;
 static void 
 catch_alarm_projection (int sig)
 { 
-  alarm(0); //clear the alarm
+  alarm(0); /*clear the alarm*/
   PROJECTION_timeout = TRUE;
 }
 #endif
-/*****duong*****/
 
 /* void sc_projection_along_variable_ofl_ctrl(Psysteme *psc, Variable v, 
  *                                            int ofl_ctrl)
@@ -573,7 +571,7 @@ int ofl_ctrl;
     CATCH(timeout_error|overflow_error){
 
       ifscdebug(5) {
-	fprintf(stderr,"\nWARNING: LINEAR_SC_PROJECTION: [sc_fourier_motzkin_variable_elimination_ofl_ctr] overflow or timeoutl!!!\n");}
+	fprintf(stderr,"\n[sc_fourier_motzkin_variable_elimination_ofl_ctr] overflow or timeoutl!!!\n");}
       
 #ifdef FILTERING
       alarm(0);
@@ -583,8 +581,8 @@ int ofl_ctrl;
       }
       else {
 	ifscdebug(5) {
-	  fprintf(stderr,"\nWARNING: LINEAR_SC_PROJECTION: [fourier_motzkin_variable_elimination_ofl_ctrl]: ofl_ctrl <> FWD_OFL_CTRL \n");}
-	//return FALSE means system non feasible. return TRUE, mean ok => both wrong		
+	  fprintf(stderr,"\n[fourier_motzkin_variable_elimination_ofl_ctrl]: ofl_ctrl <> FWD_OFL_CTRL \n");}
+	/*return FALSE means system non feasible. return TRUE, mean ok => both wrong		*/
       }
     }
     TRY 
@@ -658,7 +656,7 @@ alarm(0);
 		nnul++;
 	    }
 	}
-    }//of for
+    }/*of for*/
     
     /* apres les combinaisons eliminer les elements devenus inutiles */
     contraintes_free(pos);
@@ -668,11 +666,11 @@ alarm(0);
     sc->inegalites = nul;
     sc->nb_ineq = nnul;
     if (integer_test_p) sc_rm(sc1);
-    }//of TRY
+    }/*of TRY*/
 
 #ifdef FILTERING
 alarm(0);
-//clear the alarm
+/*clear the alarm*/
 #endif
     UNCATCH(timeout_error|overflow_error);
 
@@ -781,7 +779,7 @@ int ofl_ctrl;
 	
 	if (value_gt(cp,VALUE_ONE) && value_gt(cn,VALUE_ONE))/* cp>1 && cn>1 */
 	{
-	    /* tmp = cp*cn - cp - cn + 1 // cp and cn are >0! */ 
+	    /* tmp = cp*cn - cp - cn + 1. Note: cp and cn are >0! */ 
 	    Value tmp = value_mult(cp,cn);
 	    tmp = value_minus(value_plus(tmp, VALUE_ONE), value_plus(cp, cn));
 
@@ -795,9 +793,7 @@ int ofl_ctrl;
 		vect_add_elem(&(ineg_test->vecteur), TCST, tmp);
 		
 		contrainte_reverse(ineg_test);
-
-		//DN: any impact with the differences between _copy and _dup versions ?
- 
+		 
 		sc_add_inegalite(sc_test,ineg_test);
 		
 		if (!sc_rational_feasibility_ofl_ctrl(sc_test, OFL_CTRL, TRUE))
@@ -1067,21 +1063,21 @@ int ofl_ctrl;
     sc_rm(*psc);
     sc_rm(sc);
     *psc = sc_empty(base_saved);	   
-    return;// sc_empty(base_saved) will use memory pointed by base_saved
+    return;
   }
   
   ifscdebug(5) {projection_sc_counter ++;}
 
 
-  //We can put the size filters here! filtering timeout is integrated in the methods themself
-  //size filtering: dimension,number_constraints, density, magnitude
+  /*We can put the size filters here! filtering timeout is integrated in the methods themself */
+  /* size filtering: dimension, number_constraints, density, magnitude */
 
 #ifdef FILTERING
 
   PROJECTION_timeout = FALSE;
-  //Begin size filters 
+  /*Begin size filters */
   
-  if (TRUE) {
+  if (TRUE) { /* all these stuff in a block*/
     Value magnitude;
     int dimens, nb_cont_eq = 0, nb_ref_eq = 0, nb_cont_in = 0, nb_ref_in = 0;
 
@@ -1089,24 +1085,24 @@ int ofl_ctrl;
     decision_data(sc_egalites(sc), &nb_cont_eq, &nb_ref_eq, &magnitude, 1);
     decision_data(sc_inegalites(sc), &nb_cont_in, &nb_ref_in, &magnitude, 1);
   
-    if (dimens>=FILTERING_DIMENSION_PROJECTION) {
+    if ((FILTERING_DIMENSION_PROJECTION>0)&&(dimens>=FILTERING_DIMENSION_PROJECTION)) {
       char *directory_name = "projection_dimension_filtering_SC_OUT";
       sc_default_dump_to_files(sc,projection_sc_counter,directory_name);
     }
-    if ((nb_cont_eq + nb_cont_in) >= FILTERING_NUMBER_CONSTRAINTS_PROJECTION) {
+    if ((FILTERING_NUMBER_CONSTRAINTS_PROJECTION>0)&&((nb_cont_eq + nb_cont_in) >= FILTERING_NUMBER_CONSTRAINTS_PROJECTION)) {
       char *directory_name = "projection_number_constraints_filtering_SC_OUT";
       sc_default_dump_to_files(sc,projection_sc_counter,directory_name);  
     } 
-    if ((nb_ref_eq + nb_ref_in) >= FILTERING_DENSITY_PROJECTION) {
+    if ((FILTERING_DENSITY_PROJECTION>0)&&((nb_ref_eq + nb_ref_in) >= FILTERING_DENSITY_PROJECTION)) {
       char *directory_name = "projection_density_filtering_SC_OUT";
       sc_default_dump_to_files(sc,projection_sc_counter,directory_name);  
     }
-    if (value_gt(magnitude,FILTERING_MAGNITUDE_PROJECTION)) {
+    if ((value_notzero_p(FILTERING_MAGNITUDE_PROJECTION))&&(value_gt(magnitude,FILTERING_MAGNITUDE_PROJECTION))) {
       char *directory_name = "projection_magnitude_filtering_SC_OUT";
       sc_default_dump_to_files(sc,projection_sc_counter,directory_name);
     }
   }
-  //End size filters
+  /*End size filters*/
 #endif
 
   CATCH(overflow_error) {
@@ -1119,68 +1115,24 @@ int ofl_ctrl;
 
     if (ofl_ctrl==FWD_OFL_CTRL) {
       base_rm(base_saved);
-      //The modified sc is returned to the calling function, so we can see why the projection fails
+      /*The modified sc is returned to the calling function, so we can see why the projection fails*/
       RETHROW();
     } else {
       ifscdebug(5) {
-	fprintf(stderr,"\nWARNING: LINEAR_SC_PROJECTION: OFL_CTRL: projection failed, return sc_empty(base_saved)\n");
+	fprintf(stderr,"\n[sc_projection_along_variable_ofl_ctrl_timeout_ctrl]: projection failed, return sc_empty(base_saved)\n");
       }
       sc_rm(*psc);
       *psc = sc_empty(base_saved);
-      return;// sc_empty(base_saved) will use memory pointed by base_saved
+      return;
     }    
   }
-  TRY {
-    //Shouldn't use timeout for sc_fourier_motzkin_variable_elimination_ofl_ctrl, 
-    //but control the size of the sc before and after the projection. 
-    //using a static variable DN may prevent 2 consecutive projections from explosion. 
-    //it's often happned that calls of this function made by a list of variables to project on a
-    //only one system of constraints. That's why the static variable makes sense  DN 19/1/2003
-    //should we define a MAX_nb_constraints that the function can process?
-    ifscdebug(5) {
-      if (DN) {
-	if (sc->nb_ineq>=250) {
-      
-	  //Should be here a test of variable to project??? How it will be projected?
-	  //Should we continue the projection? DN 19/1/2003
+  TRY {   
 
-	  //if the sc contains the variable to project has some characteristics like:
-	  //- the variable only appears in a few inequations
-	  //- the variable appears in many inequations with same sign coefficents
-	  //then we can continue the projection. 
-	  //if the variable appears in many inequations with opposite sign coefficents
-	  //then there's a great possibility of an explosion, we must stop it.
-
-	  int nb_var_pos=0;
-	  int nb_var_neg=0;
-	  Pcontrainte c;
-
-	  for(c=sc->inegalites;c!=NULL;c=c->succ) {
-
-	    if (value_gt(vect_coeff(v, c->vecteur),VALUE_ZERO)) nb_var_pos++;
-	    if (value_lt(vect_coeff(v, c->vecteur),VALUE_ZERO)) nb_var_neg++;
-	  }
-
-	  if ((nb_var_pos==0)||(nb_var_neg==0)) {
-	    //continue the projection with DN=TRUE. There's no explosion for this projection.
-	  }else if ((nb_var_pos <=10)&&(nb_var_neg<=10)) {
-	    //continue the projection with DN=TRUE. Maybe an explosion, but it's worth trying
-	  } else {
-	    DN=FALSE;
-	    fprintf(stderr,"\n DN: Great possibility of an explosion\n");
-	    fprintf(stderr,"\n nb_var_pos=%d nb_var_neg=%d\n",nb_var_pos,nb_var_neg);
-	    THROW(overflow_error);
-	  }
-	} else {
-	  if (sc->nb_ineq<40) {DN=FALSE;}//case of nb_ineq reduced
-	}
-      } else if (sc->nb_ineq>= 40) {
-	DN=TRUE;
-      }
-    }//of ifscdebug(5)
     sc_projection_along_variable_ofl_ctrl(psc, v, ofl_ctrl);
+
     UNCATCH(overflow_error);
   }//of TRY
+
 #ifdef FILTERING
   if (PROJECTION_timeout) {
     char * directory_name = "projection_timeout_filtering_SC_OUT";
