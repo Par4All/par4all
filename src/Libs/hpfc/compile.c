@@ -1,47 +1,18 @@
-/*
- * HPFC
+/* HPFC
  * 
  * Fabien Coelho, May 1993
  *
- * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1995/03/23 16:54:29 $) version $Revision$, got on %D%, %T%
- * %A%
+ * $RCSfile: compile.c,v $ ($Date: 1995/04/10 18:49:30 $) version $Revision$
  */
 
-/*
- * included files, from C libraries, newgen and pips libraries.
- */
+#include "defines-local.h"
 
-#include <stdio.h>
-#include <string.h>
-
-extern int fprintf();
-extern int vfprintf();
-extern int system();
-
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-
-#include "genC.h"
-
-#include "ri.h"
-#include "database.h"
-#include "hpf.h"
-#include "hpf_private.h"
-
-#include "misc.h"
-#include "ri-util.h"
-#include "properties.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "effects.h"
 #include "semantics.h"
 #include "regions.h"
 #include "callgraph.h"
-#include "hpfc.h"
-#include "defines-local.h"
 
 /* external functions */
 extern char *getenv();
