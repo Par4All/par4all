@@ -226,7 +226,12 @@ add_alias_pairs_for_this_caller( entity caller )
     caller_name = module_local_name(caller);
     pips_debug(9, "begin for caller: %s\n", caller_name);
     
-    /* All we need to perform the translation */
+    /* ATTENTION: we must do ALL this before calling 
+     * set_interprocedural_translation_context_sc
+     * (in add_alias_pairs_for_this_call_site
+     * called by the gen_multi_recurse below) !!!
+     */
+
     regions_init();
     get_in_out_regions_properties();
     set_current_module_statement( (statement)
@@ -236,6 +241,9 @@ add_alias_pairs_for_this_caller( entity caller )
     module_to_value_mappings(caller);
     set_precondition_map( (statement_mapping) 
         db_get_memory_resource(DBR_PRECONDITIONS, caller_name, TRUE));
+    /* that's it,
+     * but we musn't forget to reset it all again below !
+     */
 
     caller_statement = get_current_module_statement();
 
@@ -290,6 +298,25 @@ alias_pairs( string module_name, list l_reg )
     callee = get_current_module_entity();
     list_regions_callee = l_reg;
 
+/* may enable us to print regions for debug */
+    set_current_module_statement( (statement)
+	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_precondition_map( (statement_mapping) 
+	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
+
+    set_cumulated_rw_effects((statement_effects)
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+    module_to_value_mappings(callee);
+
+    pips_debug(9,"list_regions_callee is: \n");
+    pips_debug(9,print_regions(list_regions_callee));
+
+    reset_current_module_statement();
+    reset_precondition_map();
+
+    reset_cumulated_rw_effects();
+/* */
+
     /* we need the callers of the current module  */
     callers = (callees) db_get_memory_resource(DBR_CALLERS,
 					       module_name,
@@ -332,7 +359,7 @@ in_alias_pairs( string module_name )
 					  module_name,
 					  TRUE));
 
-/* was
+/* was (but didn't work)
     l_reg = (list) db_get_memory_resource(DBR_IN_SUMMARY_REGIONS,
 					  module_name,
 					  TRUE);
@@ -369,7 +396,7 @@ out_alias_pairs( string module_name )
 					  module_name,
 					  TRUE));
 
-/* was
+/* was (but didn't work)
     l_reg = (list) db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS,
 					  module_name,
 					  TRUE);
