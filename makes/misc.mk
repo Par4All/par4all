@@ -10,4 +10,4 @@ ZIP	= gzip -v9
 DIFF	= gdiff
 M4	= gm4
 M4FLAGS	=
-INSTALL	= install
+INSTALL	= $(MAKE.d)/install.sh
