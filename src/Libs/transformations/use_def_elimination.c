@@ -66,8 +66,8 @@ add_statement_to_the_statement_to_statement_father_mapping(statement s)
    current_statement_rewrite(s);
 
    ifdebug(4)
-      fprintf(stderr, "add_statement_to_the_statement_to_statement_father_mapping statement %#x (%#x), father %#x\n",
-              (int) s, statement_ordering(s), (int) current_statement_head());
+      fprintf(stderr, "add_statement_to_the_statement_to_statement_father_mapping statement %p (%#x), father %p\n",
+              s, statement_ordering(s), current_statement_head());
    
    /* First add the current father for this statement: */
    /* Since statement_undefined == hash_undefined_value, we cannot put
@@ -94,8 +94,8 @@ static void
 build_statement_to_statement_father_mapping(statement s)
 {
    ifdebug(4)
-      fprintf(stderr, "build_statement_to_statement_father_mapping statement %#x (%#x)\n",
-              (int) s, statement_ordering(s));
+      fprintf(stderr, "build_statement_to_statement_father_mapping statement %p (%#x)\n",
+              s, statement_ordering(s));
 
    make_current_statement_stack();
    /* The first statement has no father: */
@@ -128,8 +128,8 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
           statement s1 = vertex_to_statement(a_vertex);
 
           debug(7, "build_statement_to_statement_dependence_mapping",
-                "\tSuccessor list: %#x for statement ordering %#x\n", 
-                (int) vertex_successors(a_vertex),
+                "\tSuccessor list: %p for statement ordering %p\n", 
+                vertex_successors(a_vertex),
                 dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
           MAP(SUCCESSOR, a_successor,
               {
@@ -137,8 +137,7 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                  statement s2 = vertex_to_statement(v2);
                  dg_arc_label an_arc_label = successor_arc_label(a_successor);
                  ifdebug(7)
-                    fprintf(stderr, "\t%#x --> %#x with conflicts\n", 
-                            (int) s1, (int) s2);
+                    fprintf(stderr, "\t%p --> %p with conflicts\n", s1, s2);
                  /* Try to find at least one of the use-def chains between
                     s and a successor: */
                  MAP(CONFLICT, a_conflict,
@@ -197,9 +196,9 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                                            (char *) def);
 
                            ifdebug(6)
-                              fprintf(stderr, "\tUse: statement %#x (%#x). Def: statement %#x (%#x).\n",
-                                      (int) use, statement_ordering(use),
-                                      (int) def, statement_ordering(def));
+                              fprintf(stderr, "\tUse: statement %p (%#x). Def: statement %p (%#x).\n",
+                                      use, statement_ordering(use),
+                                      def, statement_ordering(def));
                         }
                         
                         /* One use-def is enough for this variable
@@ -238,8 +237,8 @@ mark_this_node_and_its_predecessors_in_the_dg_as_useful(set s,
    set_add_element(s, s, (char *) v);
 
    if (get_debug_level() >= 6)
-      fprintf(stderr, "mark_this_node_and_its_predecessors_in_the_dg_as_useful: vertex %#x marked, statement ordering (%#x).\n",
-              (int) v,      
+      fprintf(stderr, "mark_this_node_and_its_predecessors_in_the_dg_as_useful: vertex %p marked, statement ordering (%#x).\n",
+              v,      
               dg_vertex_label_statement(vertex_vertex_label(v)));
   
    MAP(SUCCESSOR, a_successor,
@@ -272,8 +271,8 @@ iterate_through_the_predecessor_graph(statement s,
                                       set elements_to_visit)
 {
    ifdebug(6)
-      fprintf(stderr, "iterate_through_the_predecessor_graph, statement %#x (%#x).\n",
-              (int) s, statement_ordering(s));
+      fprintf(stderr, "iterate_through_the_predecessor_graph, statement %p (%#x).\n",
+              s, statement_ordering(s));
 
    /* Mark the current statement as useful: */
    set_add_element(the_useful_statements, the_useful_statements, (char *) s);
@@ -296,8 +295,8 @@ iterate_through_the_predecessor_graph(statement s,
                                     elements_to_visit,
                                     (char *) s2);
                        ifdebug(6)
-                          fprintf(stderr, "\tstatement %#x (%#x) useful by use-def.\n",
-                                  (int) s2, statement_ordering(s2));
+                          fprintf(stderr, "\tstatement %p (%#x) useful by use-def.\n",
+                                  s2, statement_ordering(s2));
                  },
                     statements_set);
       }
@@ -308,8 +307,8 @@ iterate_through_the_predecessor_graph(statement s,
       statement father = load_statement_father(s);
       set_add_element(elements_to_visit, elements_to_visit, (char *) father);
       ifdebug(6)
-         fprintf(stderr, "\tstatement %#x (%#x) useful as the statement owner.\n",
-                 (int) father, statement_ordering(father));
+         fprintf(stderr, "\tstatement %p (%#x) useful as the statement owner.\n",
+                 father, statement_ordering(father));
    }
 
    {
@@ -324,8 +323,8 @@ iterate_through_the_predecessor_graph(statement s,
                                 elements_to_visit,
                                 (char *) control_statement(a_control));
                 ifdebug(6)
-                   fprintf(stderr, "\tstatement %#x (%#x) useful by control dependence.\n",
-                           (int) control_statement(a_control), statement_ordering(control_statement(a_control)));
+                   fprintf(stderr, "\tstatement %p (%#x) useful by control dependence.\n",
+                           control_statement(a_control), statement_ordering(control_statement(a_control)));
              }, control_predecessors(control_father));
       }
    }            
@@ -354,13 +353,13 @@ use_def_deal_if_useful(statement s)
    bool this_statement_is_a_format;
 
    if (get_debug_level() >= 5) {
-      fprintf(stderr, "use_def_deal_if_useful: statement %#x (%#x)\n",
-              (int) s, statement_ordering(s));
+      fprintf(stderr, "use_def_deal_if_useful: statement %p (%#x)\n",
+              s, statement_ordering(s));
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 
    if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
-      user_warning("use_def_deal_if_useful", "exited since it found a statement without ordering: statement %#x (%#x)\n", (int) s, statement_ordering(s));
+      user_warning("use_def_deal_if_useful", "exited since it found a statement without ordering: statement %p (%#x)\n", s, statement_ordering(s));
       return;
    }
    
@@ -379,11 +378,10 @@ use_def_deal_if_useful(statement s)
    
    if (get_debug_level() >= 6) {
       if (this_statement_has_an_io_effect)
-         fprintf(stderr, "Statement %#x has an io effect.\n", (int) s);
+         fprintf(stderr, "Statement %p has an io effect.\n", s);
       if (this_statement_writes_a_procedure_argument)
          fprintf(stderr,
-                 "Statement %#x writes an argument of its procedure.\n",
-                 (int) s);
+                 "Statement %p writes an argument of its procedure.\n", s);
    }
    
    if (this_statement_has_an_io_effect
@@ -406,7 +404,7 @@ remove_this_statement_if_useless(statement s)
       /* Since the RI need to have no label on instruction block: */
       fix_label_and_comment_in_empty_block(s);
       if (get_debug_level() >= 6)
-         fprintf(stderr, "remove_this_statement_if_useless removes statement %#x (%#x).\n", (int) s, statement_ordering(s));
+         fprintf(stderr, "remove_this_statement_if_useless removes statement %p (%#x).\n", s, statement_ordering(s));
    }
 }
 
