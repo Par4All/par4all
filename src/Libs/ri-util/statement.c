@@ -127,6 +127,9 @@ statement st;
     return(entity_empty_label_p(statement_label(st)));
 }
 
+
+/* The following macros could be a little bit factorized... */
+
 /* Return true if the statement is an empty instruction block without
    label or a continue without label or a recursive combination of
    above. */
@@ -141,20 +144,14 @@ empty_statement_or_labelless_continue_p(statement st)
       return TRUE;
    i = statement_instruction(st);
    if (instruction_block_p(i)) {
-      bool useless = TRUE;
-      MAPL(sts,
+       MAP(STATEMENT, s,
            {
-              statement st = STATEMENT(CAR(sts)) ;
-              if (!empty_statement_p(st))
-                 if (!empty_statement_or_labelless_continue_p(st)) {
-                    /* Well there is at least one possibly usefull thing... */
-                    useless = FALSE;
-                    break;
-                 }
+	       if (!empty_statement_or_labelless_continue_p(s))
+		   /* Well there is at least one possibly usefull thing... */
+		   return FALSE;
            },
-              instruction_block(i));
-      if (useless)
-         return TRUE;
+	   instruction_block(i));
+       return TRUE;
    }
    return FALSE;
 }
@@ -171,21 +168,43 @@ empty_statement_or_continue_p(statement st)
       return TRUE;
    i = statement_instruction(st);
    if (instruction_block_p(i)) {
-      bool useless = TRUE;
-      MAPL(sts,
+       MAP(STATEMENT, s,
            {
-              statement st = STATEMENT(CAR(sts)) ;
-              if (!empty_statement_p(st))
-                 if (!empty_statement_or_continue_p(st)) {
-                    /* Well there is at least one possibly usefull thing... */
-                    useless = FALSE;
-                    break;
-                 }
+	       if (!empty_statement_or_continue_p(s))
+		   /* Well there is at least one possibly usefull thing... */
+		   return FALSE;
            },
               instruction_block(i));
-      if (useless)
-         return TRUE;
+       return TRUE;
    }
+   return FALSE;
+}
+
+
+/* Return true if the statement is an empty instruction block or a
+   continue without comments or a recursive combination of above. */
+bool
+empty_statement_or_continue_without_comment_p(statement st)
+{
+   instruction i;
+   string the_comments = statement_comments(st);
+
+   if (!(the_comments == NULL || string_undefined_p(the_comments)))
+       return FALSE;
+
+   i = statement_instruction(st);
+   if (instruction_block_p(i)) {
+       MAP(STATEMENT, s,
+	   {
+	       if (!empty_statement_or_continue_without_comment_p(s))
+		   return FALSE;
+	   },
+	   instruction_block(i));
+       /* Everything in the block are commentless continue or empty
+          statements: */
+       return TRUE;
+   }
+   /* Everything else useful: */
    return FALSE;
 }
 
@@ -195,6 +214,7 @@ statement s;
 {
     return(instruction_call_p(statement_instruction(s)));
 }
+
 
 bool check_io_statement_p(statement s)
 {
@@ -911,6 +931,15 @@ string statement_identification(statement s)
 	    instrstring);
 
     return buffer;
+}
+
+
+/* Return true if the statement has an empty statement: */
+bool
+statement_with_empty_comment_p(statement s)
+{
+    string the_comments = statement_comments(s);
+    return the_comments == NULL || string_undefined_p(the_comments);
 }
 
 
