@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1994/11/29 08:31:54 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1994/12/21 17:34:52 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -157,7 +157,7 @@ entity divide;
       inegalites_fprint(stderr, c, entity_local_name);
   }
 
-  pips_assert("constraints_to_loop_bound", !CONTRAINTE_UNDEFINED_P(c));
+  assert(!CONTRAINTE_UNDEFINED_P(c));
 
   /*  each contraint is considered in turn to generate the bound
    */
@@ -172,7 +172,7 @@ entity divide;
       expression
 	e = expression_undefined;
 
-      pips_assert("constraints_to_loop_bound", sign*val>0);
+      assert(sign*val>0);
 
       if (val>0) 
 	  vect_chg_sgn(v);
@@ -191,7 +191,7 @@ entity divide;
   /*
    * final operation
    */
-  len = gen_length(le);  pips_assert("contrainte_to_loop_bound", len!=0);
+  len = gen_length(le);  assert(len!=0);
 
   /* NO, MIN and MAX should take any number of arguments in fortran!
    * // result = expression_list_to_binay_operator_call(le, operator); 
@@ -274,7 +274,7 @@ entity divide; /* I have to give the divide entity to be called */
     c = contraintes_dup(sc_inegalites(sc));
     reverse = gen_nreverse(gen_copy_seq(vars));
 
-    pips_assert("Psysteme_to_loop_nest", (sc_nbre_egalites(sc)==0));
+    assert(sc_nbre_egalites(sc)==0);
     
     MAPL(ce,
      {
