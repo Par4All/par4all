@@ -1,5 +1,4 @@
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 
 #include "genC.h"
@@ -19,7 +18,7 @@ extern int fprintf();
  * Argument "name" is not used. It is instantiated as a specific module
  * by make() but this routine process the whole program
  */
-void callgraph(name)
+bool callgraph(name)
 string name;
 {
     int nmodules = 0;
@@ -56,7 +55,9 @@ string name;
 		    break;
 	    }
 	    if(r==nmodules)
-		user_error("callgraph", "no source file for module %s\n", module_called);
+		user_error("callgraph",
+			   "no source file for module %s\n",
+			   module_called);
 	    pips_assert("callgraph",0<=r && r<nmodules);
 
 	    callees_callees(module_callers[r]) =
@@ -73,4 +74,5 @@ string name;
 			       (char*) module_callers[i]);
 
     }
+    return TRUE;
 }
