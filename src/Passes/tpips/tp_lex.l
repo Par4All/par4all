@@ -1,4 +1,4 @@
-EMPTY ("#".*|([ \\t]+("#".*)?))
+EMPTY (("#".*)|([ \\t]+("#".*)?))
 
 %e 100000
 %p 100000
@@ -37,10 +37,22 @@ EMPTY ("#".*|([ \\t]+("#".*)?))
 
 
 /* now get the characters from a string, not from a file */
+#ifndef FLEX_SCANNER
+
 #undef input()
 #define input() tpips_lex_input()
 #undef unput()
 #define unput(c) tpips_lex_unput(c)
+
+#else
+
+#define YY_INPUT(buf,result,max_size) \
+{ \
+ int c = tpips_lex_input(); \
+ result = (c == '\0') ? YY_NULL : (buf[0] = c, 1); \
+}
+
+#endif
 
 %}
 
@@ -74,6 +86,7 @@ EMPTY ("#".*|([ \\t]+("#".*)?))
 <RES,PHASE>"$CALLEES."         {return OWNER_CALLEES;}
 %%%%%%%%%%
 <RES,PHASE>[0-9A-Za-z_-]+      {yylval.name =strdup(yytext);return OWNER_NAME;}
+<KEY,PROP>[a-zA-Z0-9_]+        {return UNKNOW_CHAR; /* actually it is chars ... */}
 <KEY,FNAME,WNAME,RES,PHASE,PROP>.          {return UNKNOW_CHAR;}
 %%
 
@@ -81,7 +94,12 @@ yywrap()
 {return 1;}
 
 void yyinit_lex()
-{BEGIN KEY;}
+{
+	BEGIN KEY;
+#ifdef FLEX_SCANNER
+	yy_init = 1;
+#endif
+}
 
 void yybegin_key()
 {BEGIN KEY;}
