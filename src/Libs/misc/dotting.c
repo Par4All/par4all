@@ -15,12 +15,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-/*
-extern int fflush();
-extern int _flsbuf();
-extern int vfprintf(FILE *stream, char *format, ...);
-extern unsigned int alarm(unsigned int seconds);
-*/
 #include <stdarg.h>
 #include <signal.h>
 
