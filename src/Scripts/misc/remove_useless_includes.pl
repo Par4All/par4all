@@ -3,25 +3,32 @@
 # $Id$
 #
 # HYPOTHESES :
-#
 # - une routine par fichier
 # - syntaxe simple (pas d'espaces dans les noms de variables...)
 # - pas d'include dans les includes...
 # - dependances entre include p'tet ok...
 #
 
+use strict;
+
 use Getopt::Long;
-$verbose = 0;
+
+my $verbose = 0;
+my @includes = ();
+my $modify = 0;
+my $suffix = '.old';
 
 GetOptions("i|include=s" => \@includes,
 	   "v|verbose+" => \$verbose,
 	   "m|modify" => \$modify,
+	   "s|suffix" => \$suffix,
 	   "h|help" => sub {
 	       print STDERR 
-		   "$0 [-i dir] [-vmh] fortran_files\n" .
-		   "\t-i dir: include directory search path\n" .
+		   "$0 [-i dir]* [-vmh] fortran_files\n" .
+		   "\t-i dir: include directory search path, default .\n" .
 		   "\t-v: verbose\n" .
 		   "\t-m: modify by commenting out useless includes\n" .
+		   "\t-s suffix: suffix for old file (default '.old')\n" .
    	           "\t-h: this help\n";
 	       exit 0;
 	   })
@@ -30,9 +37,12 @@ GetOptions("i|include=s" => \@includes,
 # set default include search path
 @includes = ('.') unless @includes;
 
+# identificators found
 my %identificator = ();
 
 # process a line for identificators
+# get_identificators($line_to_process)
+# returns a list of identificators found on the line
 sub get_identificators($)
 {
     my ($line) = @_;
@@ -44,6 +54,9 @@ sub get_identificators($)
     $line =~ s/^([^\']*)\'[^\']*\'/$1/g;
     # numeric constants
     $line =~ s/\b[\+\-]?\d+\.?\d*([de][\+\-]?\d+)?\b//ig;
+    # to lower case
+    $line =~ tr/A-Z/a-z/;
+    # get all identificators
     return grep (!/^(|if|do|end|endif|enddo|print|while||common
 		     |data|dimension|print|read|subroutine|integer
 		     |real|integer|logical|gt|le|lt|ge|eq|ne|\d.*
@@ -59,6 +72,10 @@ sub get_identificators($)
 # detected dependencies between include files
 my %declaration_dependencies = ();
 
+# load_include_file_identificators($include_file_name)
+# use options @includes, $verbose
+# side effects on %identificators and %declaration_dependencies
+# returns nothing
 sub load_include_file_identificators($)
 {
     my ($filename) = @_;
@@ -98,7 +115,7 @@ sub load_include_file_identificators($)
     close INC;
 }
 
-for $file (@ARGV)
+for my $file (@ARGV)
 {
     print "considering file $file\n";
 
@@ -109,15 +126,13 @@ for $file (@ARGV)
     # RESTART ALL FOR EACH FILE
     # sinon des problemes avec les noms de variables reutilises.
     %identificator = ();
-    #%loaded_include_files = ();
     %declaration_dependencies = ();
 
     open FILE, "<$file" or die $!;
 
     print "reading file $file\n";
-    while ($line = <FILE>)
+    while (my $line = <FILE>)
     {
-
 	push @file_content, $line;
 
 	next if $line =~ /^[Cc!\*]/; # comment
@@ -132,7 +147,7 @@ for $file (@ARGV)
 	    next;
 	}
 
-	for $id (get_identificators($line))
+	for my $id (get_identificators($line))
 	{
 	    print "ID=$id\n" if $verbose>2;
 	    if (exists $identificator{$id} and
@@ -173,8 +188,10 @@ for $file (@ARGV)
 	"useful includes ", (join ' ', sort keys %useful_includes), "\n",
 	"all includes ", (join ' ', sort keys %all_includes), "\n";
 
+    # something to be done...
     if ($n_useful<$n_total and $modify)
     {
+	# comment out useless includes
 	map {
 	    if (/^      +include *['"]([^\'\"]*)["']/i) {
 		# comment out not used includes
@@ -185,8 +202,8 @@ for $file (@ARGV)
 	    }
 	} @file_content;
 
-	# save file
-	rename $file, "$file.old";
+	# save new file
+	rename $file, "$file$suffix";
 	open FILE, ">$file" or die $!;
 	print FILE @file_content;
 	close FILE or die $!;
