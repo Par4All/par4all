@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/09/20 19:32:11 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/10/02 08:47:34 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -173,11 +173,13 @@ HPFC_INCLUDE=$PIPS_EXTEDIR
 HPFC_LIBS=$PIPS_EXTEDIR
 HPFC_TOOLS=$PIPS_UTILDIR
 
-HPFC_RUNTIME_M4_PARAMS='-DDEMO -DDIRECT'
+HPFC_RUNTIME_M4_PARAMS='-D DEMO -D DIRECT'
 HPFC_SED='/usr5/gnu/bin-sparc/sed'
 HPFC_TR='/bin/tr'
 HPFC_M4='gm4'
 HPFC_MAKE='gmake'
+HPFC_FC='f77'
+HPFC_FFLAGS='-fast -O3 -u'
 
 # 
 #         #    #     #     ####    ####
