@@ -1,0 +1,18 @@
+\documentstyle{article}
+
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+
+\begin{document}
+\sloppy
+
+\domain{Text = sentences:sentence*}
+{}
+
+\domain{Sentence = formatted:string + unformatted}
+{}
+
+\domain{Unformatted = label:string x number:int x extra\_margin:int x  words:string*}
+{}
+
+\end{document}
+\end
