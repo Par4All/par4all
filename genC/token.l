@@ -130,14 +130,15 @@ x			{return AND ;}
 int yywrap()
 {
 #ifdef FLEX_SCANNER
-    yy_init = 1 ;
+  yy_init = 1;
 #endif
-    return( 1 ) ;
+  message_assert("function not used", yyunput==yyunput);
+  return 1;
 }
 
 #ifdef FLEX_SCANNER
 int yyinput()
 {
-    return( input()) ;
+  return input();
 }
 #endif
