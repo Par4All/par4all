@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/04 15:47:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 16:42:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1997/09/04 15:47:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1997/09/15 16:42:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -272,13 +272,18 @@ chain c;
     }
 }
 
-/* this function computes an address for each variable. all common
-variables already have their own address. if such a variable occurs in
-an equivalence chain, all variables of this chain will have an address
-in this common; the exact address depends on the offset stored in the
-atom. the same kind of processing is done for chains containing a static
-variable. otherwise, all variables of a chain have an address in the
-dynamic area. */
+/* This function computes an address for each variable. All common
+ * variables already have their own addresses. If such a variable occurs in
+ * an equivalence chain, all variables of this chain will have an address
+ * in this common. The exact address depends on the offset stored in the
+ * atom. 
+ * 
+ * The same kind of processing is done for chains containing a static
+ * variable. 
+ * 
+ * Otherwise, all variables of a chain have an address in the
+ * dynamic area.
+ */
 
 void 
 ComputeAddresses()
@@ -310,17 +315,31 @@ ComputeAddresses()
 
 		if (entity_storage(e) != storage_undefined) {
 		    if (storage_ram_p(entity_storage(e))) {
-			ram r;
-			r = storage_ram(entity_storage(e));
+			ram r = storage_ram(entity_storage(e));
 
 			if (sc != ram_section(r)) {
 			    if (sc == DynamicArea) {
 				sc = ram_section(r);
 				ac = ram_offset(r)-o;
-			    }
-			    else
-				    FatalError("ComputeAddresses", 
+			    } 
+			    else if (sc == StaticArea) {
+				/* A variable may be located in a static area because
+				 * of a SAVE or a DATA statement and be equivalenced
+				 * with a variable in a common.
+				 */
+				pips_assert("ComputeAddresses", ram_section(r) != DynamicArea);
+				sc = ram_section(r);
+				ac = ram_offset(r)-o;
+			    } 
+			    else {
+				user_warning("ComputeAddresses",
+					     "Incompatible default area %s and "
+					     "area %s requested by equivalence for %s\n",
+					     entity_name(sc), entity_name(ram_section(r)),
+					     entity_local_name(e));
+				    ParserError("ComputeAddresses",
 					    "incompatible areas\n");
+			    }
 			}
 		    }
 		    else
