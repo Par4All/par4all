@@ -279,36 +279,33 @@ code  ce;
 }
 
 
-/*
- * Calcul des nouvelles bornes des boucles et de la nouvelle fonction d'acces a
+/* Calcul des nouvelles bornes des boucles et de la nouvelle fonction d'acces a
  * une reference d'un tableau permettant d'exprimer l'ensemble des elements
  * references dans une base. Cette base est pour le moment la base de Hermite 
  * associee a la fonction d'acces au tableau
  */
 
 
-statement movement_computation(
-    module,used_def,bank_code,receive_code,private_entity,
-    sc_image,const_base,bank_indices,tile_indices,ppid,loop_body_indices,
-    n,dim_h)
-entity module;
-boolean used_def;
-boolean bank_code;         /* is TRUE if it is the generation of code for bank
-			      FALSE if it is for engine */
-boolean receive_code;      /* is TRUE if the generated code must be a 
-			      RECEIVE, FALSE if it must be a SEND*/
-entity private_entity;       /* local entity */
-Psysteme sc_image;         /* domain of image  */
-Pbase const_base;
-Pbase bank_indices;        /* contains the index describing the bank:
+statement 
+movement_computation(
+    entity module,
+    boolean used_def,
+    boolean bank_code,  /* is TRUE if it is the generation of code for bank
+			   FALSE if it is for engine */
+    boolean receive_code,      /* is TRUE if the generated code must be a 
+				  RECEIVE, FALSE if it must be a SEND*/
+    entity private_entity,       /* local entity */
+    Psysteme sc_image,         /* domain of image  */
+    Pbase const_base,
+    Pbase bank_indices,        /* contains the index describing the bank:
 			      bank_id, L (ligne of bank) and O (offset in 
 			      the ligne) */
-Pbase tile_indices;        /* contains the local indices  LI, LJ,.. of  tile */
-Pbase ppid;             
-Pbase loop_body_indices;   /* contains the loop indices situated in the 
-			      tile*/
-int n;
-int dim_h;
+    Pbase tile_indices, /* contains the local indices  LI, LJ,.. of  tile */
+    Pbase ppid,             
+    Pbase loop_body_indices,   /* contains the loop indices situated in the 
+				  tile*/
+    int n,
+    int dim_h)
 {
     Psysteme	sc_proj,*list_of_systems,sc_proj2,sc_image2,sc_on_constants;
     statement  stat = statement_undefined;
@@ -355,9 +352,9 @@ int dim_h;
     btmp =  variables_in_declaration_list(module,entity_code(module));
     sc_image = sc_variables_rename(sc_image, bank_indices,
 				   btmp,entity_local_name);
-    sc_image =sc_variables_rename(sc_image, const_base,
+    sc_image = sc_variables_rename(sc_image, const_base,
 				  btmp,entity_local_name);
-    sc_image =sc_variables_rename(sc_image,tile_indices,
+    sc_image = sc_variables_rename(sc_image,tile_indices,
 				  btmp,entity_local_name);
     bank_indices= vect_rename(bank_indices,btmp,entity_local_name);
     tile_indices= vect_rename(tile_indices,btmp,entity_local_name);
@@ -385,7 +382,7 @@ int dim_h;
     dim_h2 = vect_size(image_base);
 
     ifdebug(2) {
-	(void) fprintf(stderr,"Domain before Projection :\n");
+	pips_debug(2, "Domain before Projection :\n");
 	sc_fprint(stderr,sc_proj,entity_local_name);    }
 
     /* Projection on each variable having unity coefficients in the system */
@@ -398,14 +395,14 @@ int dim_h;
 	}
     } 
     ifdebug(2) {
-	(void) fprintf(stderr," After FM projection :\n");
+	pips_debug(2," After FM projection :\n");
 	sc_fprint(stderr,sc_proj,entity_local_name);    }
 
     sc_proj->inegalites = contrainte_sort(sc_proj->inegalites, 
 					  sc_proj->base,  index_base,
 					  TRUE,FALSE);
     ifdebug(2) {
-	(void) fprintf(stderr," After FM projection  and sort:\n");
+	pips_debug(2," After FM projection  and sort:\n");
 	sc_fprint(stderr,sc_proj,entity_local_name);    }
 
     /* Projection on the others variables having to be eliminated from 
@@ -414,10 +411,8 @@ int dim_h;
        interger projection algorithm is used.*/
 
     if (!used_def) 	
-	sc_proj = sc_integer_projection_along_variables(sc_image2,sc_proj,
-						  index_base,
-						  lvar_coeff_nunit, 
-						  sc_info,dim_h2,n);
+	sc_proj = sc_integer_projection_along_variables(
+	    sc_image2,sc_proj, index_base, lvar_coeff_nunit, sc_info,dim_h2,n);
     else { 
 	for (pv1 = lvar_coeff_nunit;!VECTEUR_UNDEFINED_P(pv1);pv1=pv1->succ) {
 	    sc_proj = sc_projection(sc_proj,vecteur_var(pv1));
@@ -427,32 +422,34 @@ int dim_h;
     }
     
     ifdebug(2) {
-	(void) fprintf(stderr," Before contrainte sort :\n");
+	pips_debug(2," Before contrainte sort :\n");
 	sc_fprint(stderr,sc_proj,entity_local_name);   
-	(void)fprintf(stderr," Base index :\n");
+	pips_debug(2," Base index :\n");
 	vect_fprint(stderr, index_base,entity_local_name);   
     }
     sc_proj->inegalites = contrainte_sort(sc_proj->inegalites, 
 					  sc_proj->base,  index_base,
 					  TRUE,FALSE); 
     ifdebug(2) {
-	(void) fprintf(stderr," After  contrainte sort:\n");
+	pips_debug(2," After  contrainte sort:\n");
 	sc_fprint(stderr,sc_proj,entity_local_name);    }
 
     build_sc_nredund_1pass(&sc_proj);
     ifdebug(2) {
-	(void) fprintf(stderr,"After Integer Projection :\n");
+	pips_debug(2,"After Integer Projection :\n");
 	sc_fprint(stderr,sc_proj,entity_local_name);
     }
 
-    /* Computation of sample constraints contraining only index variables */
+    /* Computation of sample constraints contraining only index variables 
+     */
     sc_proj2 = sc_dup(sc_proj);
-    if (vect_size(sc_image2->base) <=11) {
-
+    if (vect_size(sc_image2->base) <= 11)  /* why 11? */
+    {
 	for (pv1 = const_base2; pv1 != NULL; pv1 = pv1->succ)
-	    vect_erase_var(&lindex, vecteur_var(pv1)); 
-	sc_proj = sc_projection_on_list_of_variables(sc_image2,
-						     image_base,lindex);
+	    vect_erase_var(&lindex, vecteur_var(pv1));
+ 
+	sc_proj = sc_projection_on_list_of_variables
+	    (sc_image2, image_base, lindex);
 	sc_proj2 = sc_intersection(sc_proj2,sc_proj2,sc_proj);
 	sc_proj2 = sc_normalize(sc_proj2); 
 	sc_minmax_of_variables(sc_image2,sc_proj2,const_base2);
@@ -460,8 +457,13 @@ int dim_h;
     else				/*more restrictive system */
 	sc_minmax_of_variables(sc_image2,sc_proj2,image_base);
 
+    ifdebug(9) {
+	pips_debug(9, "sc_proj = \n");
+	sc_fprint(stderr, sc_proj, entity_local_name);
+    }
+
     ifdebug(2) { 
-	(void) fprintf(stderr,"Iterat. Domain Before redundancy elimin.:\n");
+	pips_debug(2,"Iterat. Domain Before redundancy elimin.:\n");
 	sc_fprint(stderr,sc_proj2,entity_local_name); }
     
     /* Elimination of redundant constraints for integer systems*/
@@ -470,13 +472,13 @@ int dim_h;
 					   sc_proj2->base,  index_base, 
 					   FALSE,FALSE);
     ifdebug(2) { 
-	(void) fprintf(stderr,"Iterat. Domain After 1rst sort:\n");
+	pips_debug(2,"Iterat. Domain After 1rst sort:\n");
 	sc_fprint(stderr,sc_proj2,entity_local_name); }
 
     sc_integer_projection_information(sc_proj2,index_base, sc_info,dim_h2,n);
     sc_proj2=build_integer_sc_nredund(sc_proj2,index_base,sc_info,1,dim_h2,n);  
     ifdebug(2) {
-	(void) fprintf(stderr," After redundancy elimination :\n");
+	pips_debug(2," After redundancy elimination :\n");
 	sc_fprint(stderr,sc_proj2,entity_local_name);
     }
 
@@ -528,8 +530,6 @@ int dim_h;
     debug_off();
 
     return (stat);
-
-
 }
 
 
