@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.33  1999/07/15 13:33:19  coelho
+ * binary to nary stuff added...
+ *
  * Revision 1.32  1999/05/28 12:57:58  coelho
  * missing break fixed.
  *
@@ -714,6 +717,244 @@ static double expression_gravity(expression e)
 static double expression_gravity_inv(expression e)
 {
   return -expression_gravity(e);
+}
+
+/************************************************************* NARY-FICATION */
+/* switch binary to nary expressions where possible.
+   this is normally done in eole anyway.
+*/
+
+typedef enum 
+{ 
+  not_asocom, /* 0 */
+  is_plus, is_mult, 
+  is_max, is_min, 
+  is_and, is_or 
+} 
+  asocom_operator_t;
+
+typedef struct
+{
+  char * binary;
+  char * nary;
+} 
+  binary_to_nary_t;
+
+#define MAX_NAME	"MAX"
+#define MIN_NAME	"MIN"
+
+static binary_to_nary_t bton[] = 
+{
+  { "+", EOLE_SUM_OPERATOR_NAME },
+  { "*", EOLE_PROD_OPERATOR_NAME },
+
+  { "MAX",   MAX_NAME },
+  { "MIN",   MIN_NAME },
+
+  { "MAX0",  MAX_NAME },
+  { "DMAX1", MAX_NAME },
+  { "AMAX1", MAX_NAME },
+  { "AMAX0", MAX_NAME },
+
+  { "MIN0",  MIN_NAME },
+  { "DMIN1", MIN_NAME },
+  { "AMIN1", MIN_NAME },
+  { "AMIN0", MIN_NAME },
+  
+  /* ??? .AND. .OR.
+   */
+  { NULL, NULL }
+};
+
+static entity binary_to_nary(entity e)
+{
+  string lname = entity_local_name(e);
+  binary_to_nary_t * pbn;
+
+  for (pbn = bton; pbn->binary; pbn++)
+    if (same_string_p(pbn->binary, lname))
+      return entity_intrinsic(pbn->nary);
+
+  return e;
+}
+
+static bool nary_operator_p(entity e)
+{
+  binary_to_nary_t * pbn;
+  string lname = entity_local_name(e);
+
+  for (pbn = bton; pbn->nary; pbn++)
+    if (same_string_p(pbn->nary, lname))
+      return TRUE;
+
+  return FALSE;
+}
+
+/* top-down: switch calls to nary form.
+ */
+static bool nary_call_flt(call c)
+{
+  call_function(c) = binary_to_nary(call_function(c));
+  return TRUE;
+}
+
+/* bottom-up: + + -> +
+ */
+static void nary_call_rwt(call c)
+{
+  entity called = call_function(c);
+  list newl = NIL, oldl = call_arguments(c);
+
+  if (nary_operator_p(called))
+    {
+      MAP(EXPRESSION, e, 
+      {
+	syntax s = expression_syntax(e);
+	if (syntax_call_p(s) && call_function(syntax_call(s))==called)
+	  {
+	    newl = gen_nconc(newl, call_arguments(syntax_call(s)));
+	    call_arguments(syntax_call(s)) = NIL;
+	    free_expression(e);
+	  }
+	else
+	  {
+	    newl = gen_nconc(newl, CONS(EXPRESSION, e, NIL));
+	  }
+      },
+          oldl);
+    }
+
+  call_arguments(c) = newl;
+  gen_free_list(oldl);
+}
+
+void naryfication_of_expressions(statement s)
+{
+  gen_recurse(s, call_domain, nary_call_flt, nary_call_rwt);
+}
+
+/*
+  top down...
+
+  -    -> + --
+  /    -> * 1/ [not on integers]
+  -- + -> + -- --
+  1/ * -> * 1/ 1/
+*/
+
+typedef struct 
+{
+  string asym;
+  string syme;
+  string inv;
+  bool not_ints;
+} symetric_opertor_t;
+
+static symetric_opertor_t symop[] =
+{ { "-", "+", "--", FALSE },
+  { "/", "*", "INV", TRUE },
+  { NULL, NULL, NULL, FALSE }
+};
+
+static symetric_opertor_t * what_operator(entity e, int which_one)
+{
+  string lname = entity_local_name(e);
+  symetric_opertor_t * sot;
+  for (sot = symop; sot->asym; sot++)
+    {
+      if ((which_one==1 && same_string_p(lname, sot->asym)) ||
+	  (which_one==0 && same_string_p(lname, sot->inv)) ||
+	  (which_one==2 && same_string_p(lname, sot->syme)))
+	return sot;
+    }
+  return NULL;
+}
+
+entity inverse_operator_of(entity e)
+{
+  symetric_opertor_t * sot = what_operator(e, 2);
+  if (sot) return entity_intrinsic(sot->inv);
+  else return NULL;
+}
+
+static bool inv_call_flt(call c)
+{
+  entity op = call_function(c);
+  symetric_opertor_t * so;
+
+  /* switch asymetric operation if needed */
+  so = what_operator(op, TRUE);
+  if (so)
+    {
+      bool doit = TRUE;
+
+      if (so->not_ints)
+	{
+	  expression tmp = call_to_expression(c);
+	  basic b =  please_give_me_a_basic_for_an_expression(tmp);
+	  if (basic_int_p(b)) doit = FALSE;
+	  syntax_call(expression_syntax(tmp)) = call_undefined;
+	  free_expression(tmp);
+	}
+      
+      if (doit) /* we have to substitute. */
+	{
+	  list largs = call_arguments(c);
+	  expression second;
+	  pips_assert("binary call", gen_length(largs)==2);
+	  second = EXPRESSION(CAR(CDR(largs)));
+
+	  call_function(c) = entity_intrinsic(so->syme);
+	  expression_syntax(second) = 
+	    make_syntax(is_syntax_call,
+			make_call(entity_intrinsic(so->inv),
+		CONS(EXPRESSION, 
+		     make_expression(expression_syntax(second), 
+				     normalized_undefined),
+		     NIL)));
+	}
+    }
+
+  /* push down inverse operators if needed. */     
+  so = what_operator(op, FALSE);
+  if (so)
+    {
+      list largs = call_arguments(c);
+      syntax s;
+      pips_assert("one arg to inverse op", gen_length(largs)==1);
+      s = expression_syntax(EXPRESSION(CAR(largs)));
+      if (syntax_call_p(s))
+	{
+	  call called = syntax_call(s);
+	  if (same_string_p(so->syme, 
+			    entity_local_name(call_function(called))))
+	    {
+	      /* memory leak... */
+	      entity invop = call_function(c);
+	      call_function(c) = call_function(called);
+	      call_arguments(c) = call_arguments(called);
+	      /* now insert invop */
+	      MAP(EXPRESSION, e, 
+	      {
+		expression_syntax(e) = 
+		  make_syntax(is_syntax_call,
+		      make_call(invop, 
+				CONS(EXPRESSION, 
+				     make_expression(expression_syntax(e),
+						     normalized_undefined),
+				     NIL)));
+	      },
+	          call_arguments(called));
+	    }
+	}
+    }
+  
+  return TRUE;
+}
+
+void inverse_normalization_of_expressions(statement s)
+{
+  gen_recurse(s, call_domain, inv_call_flt, gen_null);
 }
 
 /**************************************** HUFFMAN ALGORITHM ON AN EXPRESSION */
