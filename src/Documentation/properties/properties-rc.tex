@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.127  1998/07/27 15:18:43  irigoin
+%% A lot of index entries added
+%%
 %% Revision 1.126  1998/07/24 16:15:35  irigoin
 %% More comments about property PARSER_EXPAND_STATEMENT_FUNCTIONS
 %%
@@ -86,7 +89,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/07/24 16:15:35 $~$
+$~$Date: 1998/07/27 15:18:43 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -206,6 +209,8 @@ ONE_TRIP_DO FALSE
 
 \subsection{Logging}
 \index{Logging}
+\index{LOG_TIMINGS}
+\index{LOG_MEMORY_USAGE}
 
 It is possible to display the amount of real, cpu and system times
 directly spent in each phase as well as the times spent reading/writing data
@@ -253,6 +258,10 @@ This library is external and offers an independent debugging system.
 
 \subsection{PipsMake}
 \index{Pipsmake}
+\index{CHECK\_RESOURCE\_USAGE}
+\index{ACTIVATE\_DEL\_DERIVED\_RES}
+\index{PIPSMAKE\_CHECKPOINTS}
+\index{checkpoint}
 
 It is possible to log and report differences between the set of resources
 actually read and written by the procedures called by pipsmake and the set
@@ -304,6 +313,8 @@ PIPSDBM_RESOURCES_TO_DELETE "obsolete"
 \index{Top Level}
 \index{Logging}
 \index{Abort}
+\index{USER\_LOG\_P}
+\index{ABORT\_ON\_USER\_ERROR}
 
 Print a log of the session
 
@@ -319,6 +330,8 @@ ABORT_ON_USER_ERROR     FALSE
 
 \subsection{Tpips Command Line Interface}
 \index{Tpips}
+\index{TPIPS\_NO\_EXECUTION\_MODE}
+\index{TPIPS\_IS\_A\_SHELL}
 
 \TPIPS{} is one of PIPS user interfaces.
 
@@ -334,12 +347,16 @@ Whether \texttt{tpips} should behave as an extended shell.
 TPIPS_IS_A_SHELL             FALSE
 \end{verbatim}
 
+
 \subsection{Warning Control}
 \index{Warning}
+\index{NO\_USER\_WARNING}
+\index{WARNING\_ON\_STAT\_ERROR}
+\index{WARN\_ABOUT\_EMPTY\_SEQUENCES}
 
 User warnings may be turned off. Definitely, this is not the default
 option! Most warnings {\em must} be read to understand surprising results.
-This porperty is used by library \verb/misc/.
+This property is used by library \verb/misc/.
 
 \begin{verbatim}
 NO_USER_WARNING FALSE
@@ -362,8 +379,12 @@ is enforced by libraries \verb/effects/,
 WARN_ABOUT_EMPTY_SEQUENCES FALSE
 \end{verbatim}
 
+
 \subsection{Preprocessing}
 \index{Preprocessing}
+\index{CHECK\_FORTRAN\_SYNTAX\_BEFORE\_PIPS}
+\index{PREPROCESSOR\_MISSING\_FILE\_HANDLING}
+\index{Missing file}
 
 FC: could you please check the consistency between the next property and the
 preprocessing section in pipsmake-rc.tex?
@@ -403,6 +424,7 @@ PREPROCESSOR_MISSING_FILE_HANDLING "error"
 \index{Parser}
 
 \subsubsection{Input Format}
+\index{PARSER\_WARN\_FOR\_COLUMNS\_73\_80}
 
 Some subtle errors occur because the PIPS parser uses a fixed
 format. Columns 73 to 80 are ignored, but the parser may emit a warning
@@ -414,6 +436,7 @@ PARSER_WARN_FOR_COLUMNS_73_80   TRUE
 
 \subsubsection{Type Checking}
 \index{Type Checking}
+\index{PARSER\_TYPE\_CHECK\_CALL\_SITES}
 
 Each argument list at calls to a function or a subroutine is compared to
 the functional type of the callee. Turn this off if you need to support
@@ -429,6 +452,7 @@ PARSER_TYPE_CHECK_CALL_SITES   FALSE
 \end{verbatim}
 
 \subsubsection{Loop Header with Label}
+\index{PARSER\_SIMPLIFY\_LABELLED\_LOOPS}
 
 The PIPS implementation of Allen\&Kennedy algorithm cannot cope with
 labelled DO loops because the loop, and hence its label, may be
@@ -442,7 +466,8 @@ PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
 \end{verbatim}
 
 \subsubsection{Entry}
-\index{Entry}
+\index{ENTRY}
+index{PARSER\_SUBSTITUTE\_ENTRIES}
 
 The entry construct can be seen as an early attempt at object-oriented
 programming. The same object can be processed by several function. The
@@ -465,6 +490,8 @@ PARSER_SUBSTITUTE_ENTRIES TRUE
 \subsubsection{Alternate Return}
 \index{Alternate Return}
 \index{Return (Alternate)}
+\index{PARSER\_SUBSTITUTE\_ALTERNATE\_RETURNS}
+\index{PARSER\_RETURN\_CODE\_VARIABLE}
 
 Alternate returns are put among the obsolete Fortran features by the
 Fortran~90 standard. It is possible (1) to refuse them (option "NO"), or
@@ -495,6 +522,7 @@ PARSER_RETURN_CODE_VARIABLE "PIPS_RETURN_CODE_"
 \index{GO TO (Assigned)}
 \index{Computed GO TO}
 \index{GO TO (Computed)}
+\index{PARSER\_SUBSTITUTE\_ASSIGNED\_GOTO}
 
 By default, assigned GO TO and ASSIGN statements are not accepted.
 These constructs are obsolete and will not be part of future Fortran
@@ -526,6 +554,7 @@ parser.
 
 \subsubsection{Symbol Table}
 \index{Symbol Table}
+\index{PARSER\_DUMP\_SYMBOL\_TABLE}
 
 For debugging purposes, it is possible to print a summary of the symbol
 table. But this is not the default option.
@@ -536,6 +565,7 @@ PARSER_DUMP_SYMBOL_TABLE FALSE
 
 \subsubsection{Statement Function}
 \index{Statement Function}
+\index{PARSER\_EXPAND\_STATEMENT\_FUNCTIONS}
 
 This property controls the processing of Fortran statement functions by text
 substitution in the parser. No other processing is available and the
@@ -565,6 +595,7 @@ PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
 
 \subsection{Controlizer}
 \index{Controlizer}
+\index{UNSPAGHETTIFY\_IN\_CONTROLIZER}
 
 By unsetting this property \verb|unspaghettify| is not applied
 implicitly in the controlizer phase.
@@ -582,6 +613,7 @@ UNSPAGHETTIFY_IN_CONTROLIZER   TRUE
 \index{Use-Use Chains}
 
 \subsubsection{Add use-use Chains}
+\index{KEEP\_READ\_READ\_DEPENDENCE}
 
 It is possible to put use-use dependence arcs in the dependence graph.
 This is useful for estimation of cache memory traffic and of
@@ -600,6 +632,8 @@ KEEP_READ_READ_DEPENDENCE FALSE
 \end{verbatim}
 
 \subsubsection{Remove Some Chains}
+\index{CHAINS\_MASK\_EFFECTS}
+\index{CHAINS\_DATAFLOW\_DEPENDENCE\_ONLY}
 
 It is possible to mask effects on local variables in loop bodies. This
 is dangerous with current version of Allen \& Kennedy which assumes that
@@ -627,6 +661,8 @@ dependence graph. Phases using the latter should be able to filter out
 irrelevant arcs, e.g. pertaining to privatized variables.
 
 \subsubsection{Disambiguation Test}
+\index{Alias}
+\index{CHAINS\_DISAMBIGUATE\_CONSTANT\_SUBSCRIPTS}
 
 The default disambiguation test is based on variables names. Array and
 scalar variables are handled in the same way. However it is possible to
@@ -639,6 +675,7 @@ CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS FALSE
 \subsection{Effects}
 \index{Effects (Memory)}
 \index{Memory Effects}
+\index{EFFECTS\_PRINT\_SDFI}
 
 Print SDFI just after computation:
 
@@ -654,6 +691,7 @@ EFFECTS_PRINT_SDFI TRUE
 
 \subsubsection{Dependence Test Selection}
 \index{Dependence Test}
+\index{DEPENDENCE\_TEST}
 
 This property seems to be now obsolete. The dependence test choice is
 now controlled directly and only by rules in \PIPSMAKE{}. The procedures
@@ -666,6 +704,10 @@ DEPENDENCE_TEST "full"
 
 
 \subsubsection{Statistics}
+\index{Dependence test statistics}
+\index{Statistics (Dependence test)}
+\index{RICEDG\_PROVIDE\_STATISTICS\ FALSE}
+\index{RICEDG\_STATISTICS\_ALL\_ARRAYS}
 
 Provide the following counts during the dependence test. There are three
 parts: numbers of dependencies and independences (fields 1-10),
@@ -772,6 +814,7 @@ RICEDG_STATISTICS_ALL_ARRAYS FALSE
 
 \subsubsection{Algorithmic Dependences}
 \index{Def-Use Chains}
+\index{RICE\_DATAFLOW\_DEPENDENCE\_ONLY}
 
 Only take into account true flow dependences (Def -- Use) during the
 computation of SCC?  Note that this is different from the
@@ -787,6 +830,11 @@ RICE_DATAFLOW_DEPENDENCE_ONLY FALSE
 \index{Dependence Graph}
 \index{Prettyprinter (DG)}
 \index{DG Prettyprinter}
+\index{PRINT\_DEPENDENCE\_GRAPH}
+\index{PRINT\_DEPENDENCE\_GRAPH\_WITHOUT\_PRIVATIZED\_DEPS}
+\index{PRINT\_DEPENDENCE\_GRAPH\_WITHOUT\_NOLOOPCARRIED\_DEPS}
+\index{PRINT\_DEPENDENCE\_GRAPH\_WITH\_DEPENDENCE\_CONES}
+\index{PRINT\_DEPENDENCE\_GRAPH\_USING\_SRU\_FORMAT}
 
 Here are the properties used to control the printing of dependence
 graphs in a file called {\em module\_name}.{\tt dg}. These properties
@@ -825,6 +873,7 @@ PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT FALSE
 \end{verbatim}
 
 \subsubsection{Optimization}
+\index{COMPUTE\_ALL\_DEPENDENCES}
 
 The default option is to compute the dependence graph only for loops
 which can be parallelized using Allen \& Kennedy algorithm.  However it
