@@ -1,7 +1,8 @@
-/*
- * HPFC module by Fabien COELHO
+/* HPFC module by Fabien COELHO
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/03/24 15:02:14 $, )
+ * this file deals with HPF directives.
+ *
+ * $RCSfile: directives.c,v $ ($Date: 1995/03/24 16:31:02 $, )
  * version $Revision$,
  */
 
@@ -31,11 +32,6 @@ extern system();
 
 #include "hpfc.h"
 #include "defines-local.h"
-
-/*   in Syntax
- */
-extern void MakeExternalFunction();
-extern type MakeTypeVoid();
 
 #define HPF_PREFIX "HPFC"
 #define BLOCK_SUFFIX "K"
@@ -94,15 +90,7 @@ static list expression_list_to_entity_list(l)
 list /* of expressions */ l;
 {
     list /* of entities */ n = NIL;
-
-    MAPL(ce,
-     {
-	 n = CONS(ENTITY, 
-		  expression_to_entity(EXPRESSION(CAR(ce))), 
-		  n);
-     },
-	 l);
-    
+    MAPL(ce, n = CONS(ENTITY, expression_to_entity(EXPRESSION(CAR(ce))), n), l);
     return(n);		 
 }
 
@@ -154,7 +142,7 @@ Value *prate, *pshift;
     if (normalized_complex_p(n))
 	return(FALSE);
 
-    /*  else the subscript is linear
+    /*  else the subscript is affine
      */
     v = normalized_linear(n);
     size = vect_size(v);
@@ -229,14 +217,12 @@ reference alignee, temp;
     {
 	if (alignment_p(align_src, EXPRESSION(CAR(align_sub)),
 			&array_dim, &rate, &shift))
-	{
 	    aligns = CONS(ALIGNMENT, 
 			  make_alignment(array_dim,
 					 template_dim,
 					 Value_to_expression(rate),
 					 Value_to_expression(shift)),
 			  aligns);
-	}
     }
     
     set_array_as_distributed(array);
@@ -304,9 +290,7 @@ reference distributee, proc;
 
     assert(ENDP(reference_indices(proc)));
 
-    for(;
-	!ENDP(lformat);
-	lformat=CDR(lformat))
+    for(; !ENDP(lformat); POP(lformat))
     {
 	format = distribution_format(EXPRESSION(CAR(lformat)), &largs);
 
@@ -344,11 +328,11 @@ reference distributee, proc;
  *
  * each directive is handled by a function here.
  * these handler may use the statement stack to proceed.
- * signature: void HANDLER (instruction i, list args)
+ * signature: void HANDLER (entity f, list args)
  */
 
-static void handle_unexpected_directive(i, args)
-instruction i;
+static void handle_unexpected_directive(f, args)
+entity f;
 list args;
 {
     user_error("handle_hpf_directives", "unexpected hpf directive\n");
@@ -361,16 +345,16 @@ list args;
  * namely TEMPLATE and PROCESSORS directives.
  * 
  */
-static void handle_processors_directive(i, args)
-instruction i;
-list args;
+static void handle_processors_directive(f, args)
+entity f;
+list /* of expressions */ args;
 {
     gen_map(new_processor, args); /* see new_processor */
 }
 
-static void handle_template_directive(i, args)
-instruction i;
-list args;
+static void handle_template_directive(f, args)
+entity f;
+list /* of expressions */ args;
 {
     gen_map(new_template, args); /* see new_template */
 }
@@ -382,8 +366,8 @@ list args;
  * namely ALIGN and DISTRIBUTE directives.
  *
  */
-static void handle_align_directive(i, args)
-instruction i;
+static void handle_align_directive(f, args)
+entity f;
 list args;
 {
     list last=gen_last(args);
@@ -394,16 +378,16 @@ list args;
     assert(gen_length(args)>=2);
     template = expression_to_reference(EXPRESSION(CAR(last)));
 
-    normalize_all_expressions_of(i);
+    gen_map(normalize_all_expressions_of, args);
 
-    for(; args!=last; args=CDR(args))
+    for(; args!=last; POP(args))
 	one_align_directive(expression_to_reference(EXPRESSION(CAR(args))), 
 			    template);
     
 }
 
-static void handle_distribute_directive(i, args)
-instruction i;
+static void handle_distribute_directive(f, args)
+entity f;
 list args;
 {
     list last=gen_last(args);
@@ -414,9 +398,9 @@ list args;
     assert(gen_length(args)>=2);
     proc = expression_to_reference(EXPRESSION(CAR(last)));
 
-    normalize_all_expressions_of(i);
+    gen_map(normalize_all_expressions_of, args);
 
-    for(; args!=last; args=CDR(args))
+    for(; args!=last; POP(args))
        one_distribute_directive(expression_to_reference(EXPRESSION(CAR(args))), 
 				proc);
 }
@@ -431,8 +415,8 @@ list args;
  * should not be necessary. Means I should deal with independent 
  * directives on the PARSED_CODE rather than after the controlized.
  */
-static void handle_independent_directive(i0, args)
-instruction i0;
+static void handle_independent_directive(f, args)
+entity f;
 list /* of expressions */ args;
 {
     list /* of entities */ l = expression_list_to_entity_list(args);
@@ -487,8 +471,8 @@ list /* of expressions */ args;
     close_ctrl_graph_travel();
 }
 
-static void handle_new_directive(i, args)
-instruction i;
+static void handle_new_directive(f, args)
+entity f;
 list args;
 {
     return; /* (that's indeed a first implementation:-) */
@@ -500,25 +484,25 @@ list args;
  *
  * these functions are not yet implemented in hpfc.
  */
-static void handle_dynamic_directive(i, args)
-instruction i;
+static void handle_dynamic_directive(f, args)
+entity f;
 list args;
 {
-    handle_unexpected_directive(i, args);
+    handle_unexpected_directive(f, args);
 }
 
-static void handle_realign_directive(i, args)
-instruction i;
+static void handle_realign_directive(f, args)
+entity f;
 list args;
 {
-    handle_unexpected_directive(i, args);
+    handle_unexpected_directive(f, args);
 }
 
-static void handle_redistribute_directive(i, args)
-instruction i;
+static void handle_redistribute_directive(f, args)
+entity f;
 list args;
 {
-    handle_unexpected_directive(i, args);
+    handle_unexpected_directive(f, args);
 }
 
 /*-----------------------------------------------------------------
@@ -535,6 +519,9 @@ struct DirectiveHandler
 
 static struct DirectiveHandler handlers[] =
 { 
+  {HPF_PREFIX BLOCK_SUFFIX,  handle_unexpected_directive },
+  {HPF_PREFIX CYCLIC_SUFFIX, handle_unexpected_directive },
+  {HPF_PREFIX STAR_SUFFIX,   handle_unexpected_directive },
   {HPF_PREFIX "A", handle_align_directive },
   {HPF_PREFIX "B", handle_realign_directive },
   {HPF_PREFIX "D", handle_distribute_directive },
@@ -544,51 +531,41 @@ static struct DirectiveHandler handlers[] =
   {HPF_PREFIX "P", handle_processors_directive },
   {HPF_PREFIX "T", handle_template_directive },
   {HPF_PREFIX "Y", handle_dynamic_directive },
-  {HPF_PREFIX BLOCK_SUFFIX,  handle_unexpected_directive },
-  {HPF_PREFIX CYCLIC_SUFFIX, handle_unexpected_directive },
-  {HPF_PREFIX STAR_SUFFIX,   handle_unexpected_directive },
-  { (string) 0, handle_unexpected_directive }
+  { (string) NULL, handle_unexpected_directive }
 };
 
+/* returns the handler for directive name.
+ */
 static void (*directive_handler(name))()
 string name;
 {
     struct DirectiveHandler *x=handlers;
-
-    while (x->name!=(string) NULL && strcmp(name,x->name)!=0) 
-	x++;
-
+    while (x->name!=(string) NULL && strcmp(name,x->name)!=0) x++;
     return(x->handler);
 }
 
 /* newgen recursion thru the IR.
  */
-static bool directive_filter(i)
-instruction i;
+static bool directive_filter(c)
+call c;
 {
-    if (instruction_call_p(i))
+    entity e = call_function(c);
+    
+    if (hpf_directive_entity_p(e))
     {
-	call c = instruction_call(i);
-	entity e = call_function(c);
-
-	if (hpf_directive_entity_p(e))
-	{
-	    debug(8, "directive_filter", "hpfc entity is %s\n", entity_name(e));
-	    /*
-	     * call the appropriate handler for the directive
-	     */
-	    (directive_handler(entity_local_name(e)))
-		(i, call_arguments(c));
-
-	    free_call(c);
-	    instruction_call(i) = 
-		make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME), NIL);
-	}
-
-	return(FALSE); /* no instructions within a call! */
+	debug(8, "directive_filter", "hpfc entity is %s\n", entity_name(e));
+	/*
+	 * call the appropriate handler for the directive
+	 */
+	(directive_handler(entity_local_name(e)))
+	    (e, call_arguments(c));
+	
+	free_call(c);
+	instruction_call(statement_instruction(current_stmt_head())) = 
+	    make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME), NIL);
     }
-
-    return(TRUE);
+    
+    return(FALSE); /* no instructions within a call! */
 }
 
 static bool stmt_filter(s)
@@ -610,24 +587,13 @@ statement s;
     make_current_stmt_stack();
 
     gen_multi_recurse(s,
-		      /*
-		       *  STATEMENT
-		       */
-		      statement_domain,
-		      stmt_filter,
-		      stmt_rewrite,
-		      /*
-		       * INSTRUCTION (I don't want the calls in expressions)
-		       */
-		      instruction_domain,
-		      directive_filter,
-		      gen_null,
+        statement_domain, stmt_filter, stmt_rewrite, /* STATEMENT */
+	expression_domain, gen_false, gen_null,      /* EXPRESSION */
+	call_domain, directive_filter, gen_null,     /* CALL */
 		      NULL);
 
     assert(current_stmt_empty_p());
     free_current_stmt_stack();
-
-    DebugPrintCode(5, get_current_module_entity(), s);
 }
 
 /* that is all
