@@ -1744,19 +1744,30 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
         if(value_zero_p(P->Ray[r][0]))
             printf("(line) ");
         printf("[");
-        value_print(stdout,P_VALUE_FMT,P->Ray[r][1]);
+	if (P->Dimension > 0)
+	    value_print(stdout,P_VALUE_FMT,P->Ray[r][1]);
         for(i=1;i<P->Dimension;i++) {
             printf(", ");
             value_print(stdout,P_VALUE_FMT,P->Ray[r][i+1]);
         }  
         printf("]");
-        if(value_notone_p(P->Ray[r][i+1])) {
+        if(value_notone_p(P->Ray[r][P->Dimension+1])) {
             printf("/");
-            value_print(stdout,P_VALUE_FMT, P->Ray[r][i+1]);
+            value_print(stdout,P_VALUE_FMT, P->Ray[r][P->Dimension+1]);
         }
         printf("\n");
     }
 	}
+  if (emptyQ(P)) {
+    res->EP.x.p = new_enode(polynomial,1,0);;
+    value_set_si(res->EP.x.p->arr[0].d, 1);
+    value_set_si(res->EP.x.p->arr[0].x.n, 0);
+  } else if (!L) {
+    /* Non-empty zero-dimensional domain */
+    res->EP.x.p = new_enode(polynomial,1,0);;
+    value_set_si(res->EP.x.p->arr[0].d, 1);
+    value_set_si(res->EP.x.p->arr[0].x.n, 1);
+  } else {
     CATCH(overflow_error) {
         fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
         fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
@@ -1773,6 +1784,7 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
         res->EP.x.p = P_Enum(L,NULL,context,1,0,hdim-1,&tmp,param_name);
         UNCATCH(overflow_error);
     }
+  }
   
     Domain_Free(L);
   
