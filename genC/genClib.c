@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1998/10/27 16:55:53 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 2000/02/29 14:58:38 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2938,6 +2938,7 @@ typedef GenRewriteType GenRewriteTableType[MAX_DOMAIN];
  *   to be walked thru
  * - filters and rewrites store the user decision functions 
  *   for each domain.
+ * - context passed to filters and rewrites functions, as a 2nd arg.
  */
 struct multi_recurse 
 {
@@ -2946,6 +2947,7 @@ struct multi_recurse
     GenDecisionTableType *decisions;
     GenFilterTableType   *filters;
     GenRewriteTableType  *rewrites;
+    void                 *context;
 };
 
 /* the current multi recurse driver.
@@ -3001,7 +3003,7 @@ struct driver *dr;
     /* filter case
      */
     if ((*(current_mrc->domains))[dom]) 
-	return((*((*(current_mrc->filters))[dom]))(obj));
+	return((*((*(current_mrc->filters))[dom]))(obj, current_mrc->context));
 
     /* else, here is the *maybe* intelligent decision to be made.
      */
@@ -3018,7 +3020,7 @@ struct driver *dr;
     check_domain(dom);
 
     if ((*(current_mrc->domains))[dom])
-	(*((*(current_mrc->rewrites))[dom]))(obj);
+	(*((*(current_mrc->rewrites))[dom]))(obj, current_mrc->context);
 }
 
 static int
@@ -3055,9 +3057,9 @@ gen_recurse_stop(void * obj)
 
 /*  MULTI RECURSION FUNCTION
  *
- *  gen_multi_recurse(obj,
- *                   [domain, filter, rewrite,]*
- *                    NULL);
+ *  gen_context_multi_recurse(obj, context,
+ *                           [domain, filter, rewrite,]*
+ *                           NULL);
  *
  *  recurse from object obj,
  *  applies filter_i on encountered domain_i objects,
@@ -3067,10 +3069,10 @@ gen_recurse_stop(void * obj)
  * ??? bug : you can't visit domain 0 if any... 
  * I can't remember what it is used for.
  */
-void gen_multi_recurse(void * o, ...)
+static void 
+gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
 {
     gen_chunk * obj = (gen_chunk*) o;
-    va_list pvar;
     int i, domain;
     GenFilterTableType new_filter_table;
     GenRewriteTableType new_rewrite_table;
@@ -3079,8 +3081,6 @@ void gen_multi_recurse(void * o, ...)
     struct driver dr;
 
     check_read_spec_performed();
-
-    va_start(pvar, o);
 
     /*  the object must be a valid newgen object
      */
@@ -3109,14 +3109,13 @@ void gen_multi_recurse(void * o, ...)
 	for(i=0, p_table=get_decision_table(domain); i<number_of_domains; i++)
 	    new_decision_table[i] |= (*p_table)[i];
     }
-    
-    va_end(pvar);
 
     new_mrc.seen      = hash_table_make(hash_pointer, 0),
     new_mrc.domains   = &new_domain_table,
     new_mrc.decisions = &new_decision_table,
     new_mrc.filters   = &new_filter_table,
-    new_mrc.rewrites  = &new_rewrite_table;
+    new_mrc.rewrites  = &new_rewrite_table,
+    new_mrc.context   = context;
 
     dr.null 		= gen_null,
     dr.leaf_in 		= tabulated_leaf_in,
@@ -3147,6 +3146,22 @@ void gen_multi_recurse(void * o, ...)
  *  could be a define.
  */
 
+void gen_context_multi_recurse(void * o, void * context, ...)
+{
+    va_list pvar;
+    va_start(pvar, context);
+    gen_internal_context_multi_recurse(o, context, pvar);
+    va_end(pvar);  
+}
+
+void gen_multi_recurse(void * o, ...)
+{
+    va_list pvar;
+    va_start(pvar, o);
+    gen_internal_context_multi_recurse(o, NULL, pvar);
+    va_end(pvar);
+}
+
 #ifdef gen_recurse 
 #undef gen_recurse
 #endif
@@ -3158,6 +3173,16 @@ void gen_recurse(
     void (*rewrite)())
 {
     gen_multi_recurse(obj, domain, filter, rewrite, NULL);
+}
+
+void gen_context_recurse(
+    void * obj, /* starting point */
+    void * context,
+    int domain,
+    bool (*filter)(),
+    void (*rewrite)())
+{
+    gen_context_multi_recurse(obj, context, domain, filter, rewrite, NULL);
 }
 
 /*    That is all
