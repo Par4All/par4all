@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1996/08/25 23:00:03 $, 
+%% $Date: 1996/08/27 22:31:15 $, 
 
 \documentstyle[a4,psfig,html,verbatim,newgen_domain]{article}
 
@@ -1129,7 +1129,7 @@ be an empty sequence or a {\tt CONTINUE} statement or... (see Function
 {\tt empty\_statement\_p}). Of course, an empty statement {\em must} have
 an empty label (see Section~\ref{subsection-entity}).
 
-If necessary, Fortran control instructions, but DO loops, are decomposed into
+Fortran control instructions, but DO loops with no internal exits, are decomposed into
 combinations of such {\tt test} instructions and other PIPS instructions
 by the parser, which may add {\tt goto} statements, and by the controlizer.
 
@@ -1150,7 +1150,20 @@ et de \verb/goto/s.
 \index{Loop}
 
 \domain{Loop = index:entity x range x body:statement x label:entity x execution x locals:entity*}
-{
+
+Type {\tt loop} is used to represent Fortran DO loops or Pascal FOR
+loops. Field {\tt index} points to the loop index, an entity. Field {\tt
+range} contains the lower and upper bounds, as well as the step. Field
+{\tt body} points to the loop body, a unique statement which usually is
+a sequence. Field {\tt label} is used for Fortran labelled DO loops. It
+is the label of the last statement in the loop body. Field {\tt
+execution} specifies if the loop should be executed sequentially or
+concurrently. Entities in the {\tt local} field are loop-private
+variables. They can be stack-allocated on body entrance and deallocated
+on exit. The read and write effects on these variables are not visible
+from outside the loop body.
+
+\iffalse
 Le domaine \verb/loop/ permet de représenter les boucles du type DO Fortran
 ou FOR Pascal. Le sous-domaine \verb/index/ contient l'entité indice de
 boucle, le sous-domaine \verb/range/ contient les bornes de la boucle, le
@@ -1160,16 +1173,22 @@ c'est-a`-dire une entité. Le sous-domaine \verb/execution/ définit le
 comportement dynamique d'une boucle. Les entités présentes dans
 \verb/locals/ sont propres au corps de boucle (les effets sur elles sont
 masqués quand on sort de la boucle).
-}
+\fi
 
 \index{Execution}
 \domain{Execution = sequential:unit + parallel:unit}
-{
+
+Type {\tt execution} is used to specify if a loop must be executed
+sequentially ({\tt sequential} or if it may be executed concurrently
+({\tt parallel}). The parser only
+recognizes sequential loops.
+
+\iffalse
 Le domain \verb/execution/ définit la sémantique d'une boucle:
 \verb/sequential/ correspond a` une boucle DO classique, \verb/parallel/
 définit un boucle dont les instances d'itération peuvent être
 exécutées en paralle`le.
-}
+\fi
 
 \label{range}
 \index{Range}
