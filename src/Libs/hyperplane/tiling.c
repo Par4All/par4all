@@ -16,13 +16,16 @@
  * 7. Extensions
  *    - perfectly nested loops (IMPLEMENTED)
  *    - non perfectly nested loops (e.g. matrix multiply)
- *    - general nested loops
- *    - sequence of loop nests (Thomson-CSF)
+ *    - general nested loops (e.g. ADI)
+ *    - sequence of loop nests (signal processing, Thomson-CSF)
  *    - ...
  *
  * $Id$
  * 
  * $Log: tiling.c,v $
+ * Revision 1.7  1999/10/05 11:23:57  irigoin
+ * Some more comments
+ *
  * Revision 1.6  1999/10/05 11:23:17  irigoin
  * Comments about tiling added at the beginning
  *
