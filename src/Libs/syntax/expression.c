@@ -1,8 +1,11 @@
-/* 	%A% ($Date: 1998/11/27 13:55:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+/* 	%A% ($Date: 1998/11/30 20:00:32 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: expression.c,v $
+ * Revision 1.15  1998/11/30 20:00:32  irigoin
+ * Error checking added in MakeParameter()
+ *
  * Revision 1.14  1998/11/27 13:55:34  irigoin
  * MakeAtom() updated to take into account unbounded substrings of unbounded
  * strings. A fornal parameter string may be unbounded and so may be a substring.
@@ -15,7 +18,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1998/11/27 13:55:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 1998/11/30 20:00:32 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -45,8 +48,22 @@ expression x;
 
     tp = (entity_type(e) != type_undefined) ? entity_type(e) : ImplicitType(e);
     entity_type(e) = make_type(is_type_functional, make_functional(NIL, tp));
-    entity_storage(e) = MakeStorageRom();
-    entity_initial(e) = MakeValueSymbolic(x);
+    if(storage_undefined_p(entity_storage(e))) {
+	entity_storage(e) = MakeStorageRom();
+    }
+    else {
+	user_warning("MakeParameter", "Variable %s redefined as parameter\n",
+		     entity_local_name(e));
+	ParserError("MakeParameter", "A variable cannot be redefined as a parameter\n");
+    }
+    if(value_undefined_p(entity_initial(e)) || value_unknown_p(entity_initial(e))) {
+	entity_initial(e) = MakeValueSymbolic(x);
+    }
+    else {
+	user_warning("MakeParameter", "Initial value for variable %s redefined\n",
+		     entity_local_name(e));
+	FatalError("MakeParameter", "An initial value cannot be redefined by parameter\n");
+    }
 
     return(e);
 }
