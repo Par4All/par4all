@@ -653,6 +653,14 @@ int look_for_references_in_statement(statement s, statement (*reference_transfor
 						  reference_predicate);
 	break;
     }
+    case is_instruction_whileloop : {
+	whileloop l = instruction_whileloop(inst);
+	count = look_for_references_in_expression(whileloop_condition(l), reference_transformation,
+						  reference_predicate);
+	count += look_for_references_in_statement(whileloop_body(l), reference_transformation,
+						  reference_predicate);
+	break;
+    }
     case is_instruction_call :
 	count = look_for_references_in_call(instruction_call(inst), reference_transformation,
 					    reference_predicate);
