@@ -4,6 +4,15 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.46  1998/04/16 11:45:07  coelho
+ * new management of inlines...
+ *
+ * Revision 1.45  1998/04/15 11:23:49  coelho
+ * cosmetic changes.
+ *
+ * Revision 1.44  1998/04/15 11:13:49  coelho
+ * tag management fixed again.
+ *
  * Revision 1.43  1998/04/15 10:53:41  coelho
  * compilation fix.
  *
@@ -60,6 +69,8 @@
 #define IS_TAB(x) ((x)==Tabulated_bp)
 #define TYPE(bp) (bp-Domains-Number_imports-Current_start)
 
+#define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
+
 /* GEN_SIZE returns the size (in gen_chunks) of an object of type defined by
  * the BP type.
  */
@@ -111,6 +122,33 @@ static string strup(string s)
     return r;
 }
 
+#define same_size(t) (sizeof(t)==sizeof(gen_chunk))
+
+static bool inline_directly(union domain * dp)
+{
+    if (dp->ba.type==BASIS_DT)
+    {
+	struct gen_binding * bp = dp->ba.constructand;
+	string name = bp->name;
+	if (!IS_INLINABLE(bp)) return FALSE;
+	if ((same_string_p(name, "int") && same_size(int)) ||
+	    (same_string_p(name, "string") && same_size(string)) ||
+	    (same_string_p(name, "unit") && same_size(unit)))
+	    return TRUE;
+    }
+    return FALSE;
+}
+
+static string int_type(void)
+{
+    return (sizeof(int)==sizeof(gen_chunk))? "int": "gen_chunk";
+}
+
+static string int_type_access_complement(void)
+{
+    return (sizeof(int)==sizeof(gen_chunk))? "": ".i";
+}
+
 /* newgen type name for holder.
  * could/should always be gen_chunk?
  */
@@ -119,12 +157,18 @@ static string newgen_type_name(union domain * dp)
     switch (dp->ba.type) {
     case BASIS_DT: {
 	struct gen_binding * bp = dp->ba.constructand;
-	if (IS_INLINABLE(bp)) return "gen_chunk";
-	else return bp->name;
+	if (IS_INLINABLE(bp))
+	    if (!inline_directly(dp))
+		return "gen_chunk";
+	return bp->name;
     }
     case SET_DT: return "set";
     case LIST_DT: return "list";
     case ARRAY_DT: return dp->ar.element->name;
+    case CONSTRUCTED_DT:
+	switch (dp->co.op) {
+	case ARROW_OP: return "hash_table";
+	}
     default: fatal("[newgen_type_name] unexpected domain type %d\n", 
 		   dp->ba.type);
     }
@@ -301,37 +345,38 @@ static void generate_struct_members(
     union domain * dom = bp->domain;
     struct domainlist * dlp;
     string offset = "";
-    int i;
 
     /* generate the structure
      */
     fprintf(out, 
 	    "struct " STRUCT "%s_ {\n"
-	    INDENT "gen_chunk _type_; /* int */\n",
-	    bp->name);
+	    INDENT "%s _type_;\n", 
+	     bp->name, int_type());
  
     /* there is an additionnal field in tabulated domains.
      */
     if (IS_TABULATED(bp))
 	fprintf(out, 
-		INDENT "gen_chunk _%s_index_; /* int */\n", 
-		bp->name);
+		INDENT "%s _%s_index_;\n", 
+		int_type(), bp->name);
 
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
 	fprintf(out, 
-		INDENT "gen_chunk _%s_tag_; /* int */\n" 
+		INDENT "%s _%s_tag_;\n" 
 		INDENT "union {\n",
-		bp->name);
+		int_type(), bp->name);
 	offset = INDENT;
     }
 
     if ((domain_type==CONSTRUCTED_DT && operator==ARROW_OP) ||
 	domain_type==LIST_DT || 
 	domain_type==SET_DT)
-	fprintf(out, INDENT "gen_chunk _%s_holder_;\n", bp->name);
+	fprintf(out, 
+		INDENT "%s _%s_holder_;\n", 
+		newgen_type_name(dom), bp->name);
 
     if (domain_type==CONSTRUCTED_DT && operator!=ARROW_OP)
-	for (i=1, dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr, i++)
+	for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr)
 	    fprintf(out, "%s" INDENT "%s%s _%s_%s_" FIELD "; /* %s:%s%s */\n",
 		    offset,
 		    newgen_type_name(dlp->domain),
@@ -344,8 +389,12 @@ static void generate_struct_members(
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) 
 	fprintf(out, INDENT "} _%s_union_;\n", bp->name);
     
-    fprintf(out, "};\n");
+    fprintf(out, "};\n\n");
 }
+
+/* the current tag. each tag for "or" is different on a per-file basis.
+ */
+static int gen_current_tag = 0;
 
 /* access to members are managed thru macros.
  * cannot be functions because assign would not be possible.
@@ -361,24 +410,26 @@ static void generate_access_members(
     struct domainlist * dlp;
     bool in_between;
     string name=bp->name;
-    int i;
 
-    fprintf(out, "#define %s_domain_number(x) ((x)->_type_.i)\n", name);
+    fprintf(out, 
+	    "#define %s_domain_number(x) ((x)->_type_%s)\n", 
+	    name, int_type_access_complement());
 
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
 	in_between = TRUE;
-	fprintf(out, "#define %s_tag(x) ((x)->_%s_tag_.i)\n", name, name);
+	fprintf(out, 
+		"#define %s_tag(x) ((x)->_%s_tag_%s)\n", 
+		name, name, int_type_access_complement());
     }
     else in_between = FALSE;
     
     if (domain_type==CONSTRUCTED_DT && operator==ARROW_OP) 
-	fprintf(out, "#define %s_hash_table(x) ((x)->_%s_holder_.h)\n", 
+	fprintf(out, "#define %s_hash_table(x) ((x)->_%s_holder_)\n", 
 		name, name);
 
     if (domain_type==LIST_DT || domain_type==SET_DT)
-	fprintf(out, "#define %s_%s(x) ((x)->_%s_holder_.%c)\n",
-		name, dom->ba.constructor, name, 
-		(domain_type==LIST_DT)? 'l': 's');
+	fprintf(out, "#define %s_%s(x) ((x)->_%s_holder_)\n",
+		name, dom->ba.constructor, name);
 
     if (domain_type==ARRAY_DT)
 	fprintf(out, "#define %s_%s(x) ((x)->_%s_%s_" FIELD "\n",
@@ -386,14 +437,15 @@ static void generate_access_members(
 		name, dom->ba.constructor);
     
     if (domain_type==CONSTRUCTED_DT && operator!=ARROW_OP)
-	for (i=0, dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr, i++)
+	for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr)
 	{
 	    char c;
 	    if (operator==OR_OP)
 		fprintf(out, 
 			"#define is_%s_%s (%d)\n"
 			"#define %s_%s_p(x) (%s_tag(x)==is_%s_%s)\n",
-			name, dlp->domain->ba.constructor, i,
+			name, dlp->domain->ba.constructor, 
+			gen_current_tag++,
 			name, dlp->domain->ba.constructor, 
 			name, name, dlp->domain->ba.constructor);
 	    fprintf(out, 
@@ -405,7 +457,8 @@ static void generate_access_members(
 	    if (in_between) fprintf(out, "_%s_union_.", name);
 	    fprintf(out, "_%s_%s_" FIELD, name, dlp->domain->ba.constructor);
 	    c = newgen_access_name(dlp->domain);
-	    if (c) fprintf(out, ".%c", c);
+	    if (c && !inline_directly(dlp->domain)) 
+		fprintf(out, ".%c", c);
 	    fprintf(out, ")\n");
 	}
 }
@@ -419,6 +472,7 @@ static void generate_constructed(
     int operator)
 {
     generate_make(header, code, bp, CONSTRUCTED_DT, operator);
+    fprintf(header, "\n");
     generate_struct_members(header, bp, CONSTRUCTED_DT, operator);
     generate_access_members(header, bp, CONSTRUCTED_DT, operator);
 }
@@ -432,6 +486,7 @@ static void generate_not_constructed(
     int domain_type)
 {
     generate_make(header, code, bp, domain_type, UNDEF_OP);
+    fprintf(header, "\n");
     generate_struct_members(header, bp, domain_type, UNDEF_OP);
     generate_access_members(header, bp, domain_type, UNDEF_OP);
 }
@@ -692,6 +747,9 @@ void gencode(string file)
     /* header = fopen_suffix(file, ".h"); */
     header = stdout;
     code = fopen_suffix(file, ".c");
+
+    /* tag generation is on a per-file basis. */
+    gen_current_tag = 0;
 
     fprintf(header, DONT_TOUCH);
     fprintf(code, DONT_TOUCH);
