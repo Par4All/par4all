@@ -128,7 +128,7 @@ Psysteme (*method)();
 	    b = BASE_NULLE;
 	}
 
-	predicate_system(transformer_relation(t)) = (char *) r;
+	predicate_system_(transformer_relation(t)) = (char *) r;
 
     }
     ifdebug(1) {
