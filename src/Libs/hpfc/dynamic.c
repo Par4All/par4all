@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/02/16 15:02:45 $, )
+ * ($Date: 1996/03/20 13:19:22 $, )
  */
 
 #include "defines-local.h"
@@ -172,6 +172,28 @@ static entity new_synonym_template(
     return new_t;
 }
 
+static bool conformant_entities_p(
+    entity e1,
+    entity e2)
+{
+    int ndim;
+    if (e1==e2) return TRUE;
+
+    ndim = NumberOfDimension(e1);
+
+    if (ndim!=NumberOfDimension(e2)) return FALSE;
+
+    for (; ndim>0; ndim--)
+    {
+	int l1, u1, l2, u2;
+	get_entity_dimensions(e1, ndim, &l1, &u1);
+	get_entity_dimensions(e2, ndim, &l2, &u2);
+	if (l1!=l2 || u1!=u2) return FALSE;
+    }
+
+    return TRUE;
+}
+
 /*  comparison of DISTRIBUTE.
  */
 static bool same_distribute_p(
@@ -181,7 +203,8 @@ static bool same_distribute_p(
     list /* of distributions */ l1 = distribute_distribution(d1),
                                 l2 = distribute_distribution(d2);
 
-    if (distribute_processors(d1)!=distribute_processors(d2)) return FALSE;
+    if (!conformant_entities_p(distribute_processors(d1),
+			       distribute_processors(d2))) return FALSE;
     
     pips_assert("valid distribution", gen_length(l1)==gen_length(l2));
 
@@ -232,10 +255,21 @@ static bool same_align_p(
     list /* of alignments */ l1 = align_alignment(a1),
                              l2 = align_alignment(a2);
 
-    if ((align_template(a1)!=align_template(a2)) ||
+    if (!conformant_entities_p(align_template(a1),align_template(a2)) ||
 	(gen_length(l1)!=gen_length(l2))) 
 	return FALSE;
 
+    /* if the template are different, must check the distribution...
+     */
+    if (align_template(a1)!=align_template(a2)) 
+    {
+	distribution
+	    d1 = load_hpf_distribution(align_template(a1)),
+	    d2 = load_hpf_distribution(align_template(a2));
+
+	if (!same_distribute_p(d1, d2)) return FALSE;
+    }
+    
     MAP(ALIGNMENT, a,
 	if (!same_alignment_in_list_p(a, l2)) return FALSE,
 	l1);
@@ -314,6 +348,47 @@ entity template_synonym_distributed_as(
      */
     return new_synonym_template(temp, d);
 }
+
+/**************************************************** MAPPING OF ARGUMENTS */
+
+/* whether call c inplies a distributed argument 
+ */
+bool 
+hpfc_call_with_distributed_args_p(call c)
+{
+    entity f = call_function(c);
+    int len = gen_length(call_arguments(c));
+
+    /* no intrinsics */
+    if (value_intrinsic_p(entity_initial(f)) ||
+	hpf_directive_entity_p(f)) return FALSE;
+    
+    /* else checks for distributed arguments */
+    for (; len>0; len--)
+    {
+	entity arg = find_ith_parameter(f, len);
+	if (array_distributed_p(arg)) return TRUE;
+    }
+
+    return FALSE;
+}
+
+void
+hpfc_translate_call_with_distributed_args(
+    statement s, /* the statement the call belongs to */
+    call c)      /* the call. (not necessarily an instruction) */
+{
+    entity f;
+    list /* of expression */ args;
+
+    f = call_function(c);
+    args = call_arguments(c);
+
+    pips_debug(1, "considering function %s\n", entity_name(f));
+
+    return;
+}
+
 
 /* DYNAMIC LOCAL DATA
  *
