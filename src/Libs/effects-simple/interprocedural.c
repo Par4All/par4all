@@ -13,10 +13,12 @@
 
 #include "genC.h"
 #include "ri.h"
-#include "ri-util.h"
-#include "properties.h"
 #include "text.h"
+
+#include "misc.h"
+#include "properties.h"
 #include "text-util.h"
+#include "ri-util.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
