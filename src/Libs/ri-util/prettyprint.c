@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/13 19:12:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/13 21:17:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/13 19:12:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/13 21:17:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -466,8 +466,6 @@ list ldecl;
 		 {
 		     int i = constant_int(value_constant(v));
 
-		     /* fprintf(stderr, "character*%d %s\n", 
-			i, entity_name(e)); */
 		     if (i==1)
 		     {
 			 ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
@@ -484,7 +482,15 @@ list ldecl;
 			 ADD_WORD_LIST_TO_TEXT(t_chars, chars);
 		     }
 		 }
-		 else 
+		 else if (value_unknown_p(v))
+		 {
+			 list chars=NIL;
+			 chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
+			 chars = gen_nconc(chars, 
+					   words_declaration(e, !from_hpfc));
+			 ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		 }
+		 else
 		     pips_internal_error("unexpected value\n");
 		 break;
 		 }
