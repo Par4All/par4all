@@ -4,6 +4,9 @@
 %% PIPS faq
 %%
 %% $Log: faq.tex,v $
+%% Revision 1.3  1998/07/27 15:00:21  irigoin
+%% Comments added and section "core dump" added
+%%
 %% Revision 1.2  1998/07/27 13:47:21  irigoin
 %% Latex bugs fixed
 %%
@@ -50,7 +53,7 @@
 
 Welcome to the not so frequently asked questions about PIPS. Not so
 frequently, because the PIPS user population, however growing, still is
-small. Please send more questions to \verb/pips@cri.ensmp.fr/.
+small. Please send more questions to \verb/pips-support@cri.ensmp.fr/.
 
 \section{Some of my source code is missing. What can I do?}
 \index{Source File}
@@ -62,17 +65,54 @@ to answer the user request. For instance, PIPS cannot compute the side
 effects of procedure \verb/P/ without analyzing the code procedure
 \verb/Q/ called by \verb/P/.
 
-Also,
+However, it is possible to write a minimal version of the missing routine,
+called a {\em stub}, with the proper effects on the arguments and possibly
+on global variables in COMMON.
+
+If memory effects are not required, PIPS can generate stubs for the
+missing routines if this option is requested with property
+\verb+PREPROCESSOR_MISSING_FILE_HANDLING+ set to \verb+"generate"+.
+
+This also is useful if some modules are not written in Fortran but in C or
+in another language than is not parsed by PIPS.
 
 \section{Why is PIPS parser so limited?}
 \index{Parser}
 
-Parsing is divided in multiple stages.
+Parsing is divided in multiple stages and extensive preprocessing is
+available to convert Fortran features which are not directly supported by
+PIPS into equivalent forms. For instance, ALTERNATE RETURN, ENTRY and
+ASSIGNED GO TO statements can be converted into equivalent constructs.
+Explicit return code variables and tests of these variables are added to
+mimic the alternate return mechanism. Each entry is converted into a first
+class SUBROUTINE or FUNCTION and a common is added to store static
+variables. ASSIGN statements are converted into standard assignments to an
+integer variable whose value can be tested to control a branch.
+
+Statement functions can also be substituted.
+
+These program transformations modify the user code and most of them are
+not applied by default. The corresponding properties must be set (see \PROPERTIES{}):
+
+\begin{itemize}
+
+\item \verb+PARSER_SUBSTITUTE_ALTERNATE_RETURNS+
+
+\item \verb+PARSER_SUBSTITUTE_ENTRIES+
+
+\item \verb+PARSER_SUBSTITUTE_ASSIGNED_GOTO+
+
+\item \verb+PARSER_EXPAND_STATEMENT_FUNCTIONS+
+
+\end{itemize}
+
+Formal functional are still unsupported ($Date: 1998/07/27 15:00:21 $) and the internal
+representation of DATA statements is unsatisfactory.
 
 \section{My include files are in a different directory}
 \index{Include}
 
-FC: Use the Shell environment variable \verb/PIPS_CPPFLAGS/ and the usual
+Use the Shell environment variable \verb/PIPS_CPPFLAGS/ and the usual
 \verb/-I/ option to specify directories to lookup for include files.
 For instance, assuming that csh is used:
 
@@ -87,7 +127,17 @@ preprocessing sections in \PIPSMAKERC{}.
 
 The transformed code is stored in the current workspace by an explicit
 close or by exiting \PIPS{}. The best way to do it is to open the
-workspace with \TPIPS{}.
+workspace with \TPIPS{} and to type:
+
+\begin{quote}
+{\tt make UNSPLIT}
+\end{quote}
+
+See \PIPSMAKERC for more information about the {\tt UNSPLIT}
+pseudo-resource.
+
+Otherwise, the various files can be retrieved, on a one-by-one basis, from
+the workspace and renamed with a {\tt .f} suffix required by {\tt f77}.
 
 \section{How can I replay a session?}
 \index{logfile\_to\_tpips}
@@ -163,16 +213,24 @@ PIPS developpers. However the property mechanism has been used to extend
 PIPS parser and users should be able to define {\em some} properties (see
 the
 \htmladdnormallink{\emph{property}}{http://www.cri.ensmp.fr/pips/properties-rc}
-documentation.
+documentation).
 
 Default values for properties are defined in file
 \verb+$PIPS_ROOT/Share/properties.rc+. when \PIPS{} is installed. However,
-they can be modified in every directory by creating a file called {\tt
+they can be modified in every directory by creating a local file called {\tt
   properties.rc}. Properties can also be modified dynamically with the
 most recent \PIPS user interfaces, \TPIPS{} and jpips.
 
-\TPIPS users can also modifies the property in their home directory using
+\TPIPS users can also modify the properties in their home directory using
 a file called \verb+.tpipsrc+.
+
+\section{PIPS has just core dumped...}
+\index{core dump}
+
+It is hard to believe but not impossible. The most effective way to
+receive support is to {\tt tar} the current workspace and to mail it to
+{\tt pips-support@cri.ensmp.fr} after compression (e.g. gzip) and encoding
+(e.g. uudencode).
 
 \newpage
 
