@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/02 10:49:55 $, 
+# $Date: 1996/09/02 10:50:18 $, 
 
 SOURCES	= properties-rc.tex
 
@@ -14,7 +14,7 @@ properties.rc: properties-rc.tex
 	#
 	# building properties.rc
 	#
-	{ cat $(PIPS_ROOT)/Include/auto-number.h ;
+	{ cat $(PIPS_ROOT)/Include/auto-number.h ; \
 	  sed 's,	,    ,g;s/ *$$//;/^alias /d' $< | filter_verbatim ; \
 	} > $@
 
