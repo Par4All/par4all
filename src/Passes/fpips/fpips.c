@@ -43,20 +43,27 @@ extern int wpips_main(int, char**);
 
 #define same_string_p(s1, s2) (strcmp((s1),(s2))==0)
 
+
 /******************************************************************** UTILS */
 
 static int
 fpips_usage(int ret)
 {
-    fprintf(stderr, "Usage: fpips [-hPTW] ...\n");
+    fprintf(stderr, 
+	    "Usage: fpips [-hPTW] (other options and arguments...)\n"
+	    "\t-h: help\n"
+	    "\t-P: pips\n"
+	    "\t-T: tpips\n"
+	    "\t-W: wpips\n"
+	    "\t\t(default is to try tpips)\n");
     return ret;
 }
 
 int /* non static to avoid a gcc warning if not called. */
 fpips_error(char * what, int argc, char ** argv)
 {
-    fprintf(stderr, "[fpips] %s not avalable\n", what);
-    return 1;
+    fprintf(stderr, "[fpips] %s not available\n", what);
+    return fpips_usage(1);
 }
 
 /* returns wether name ends with ref 
@@ -75,7 +82,8 @@ name_end_p(char * name, char * ref)
 
 /********************************************************************* MAIN */
 
-int fpips_main(int argc, char **  argv)
+int 
+fpips_main(int argc, char **  argv)
 {
     if (name_end_p(argv[0],  "/pips")) return  PIPS(argc, argv);
     if (name_end_p(argv[0], "/tpips")) return TPIPS(argc, argv);
