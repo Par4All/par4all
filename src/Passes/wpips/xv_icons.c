@@ -1,5 +1,4 @@
 #include <stdio.h>
-extern int fprintf();
 #include <malloc.h>
 
 #include <sys/time.h>
