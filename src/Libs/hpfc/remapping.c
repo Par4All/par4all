@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.62  1997/10/27 17:03:47  coelho
+ * switched to Src
+ *
  * Revision 1.61  1997/07/28 14:30:25  keryell
  * Removed conflict in concatenate().
  *
@@ -1234,7 +1237,7 @@ protected_text_statement(statement s)
 static void
 generate_hpf_remapping_file(renaming r)
 {
-    string file_name;
+    string file_name, dir;
     FILE * f;
     statement remap;
     text t;
@@ -1259,8 +1262,9 @@ generate_hpf_remapping_file(renaming r)
 
     /* put it in a file
      */
-    file_name = strdup(concatenate(db_get_current_workspace_directory(),
-				   "/", remapping_file_name(r), NULL));
+    dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
+    file_name = strdup(concatenate(dir, "/", remapping_file_name(r), 0));
+    free(dir);
 
     f = hpfc_fopen(file_name);
     print_text(f, t); /* frees t as a side effect... */
