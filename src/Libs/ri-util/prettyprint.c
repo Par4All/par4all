@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.236 2003/12/05 17:05:45 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.237 2003/12/09 15:59:56 nguyen Exp $";
 #endif /* lint */
 
  /*
@@ -325,6 +325,7 @@ bool is_fortran = TRUE;
 static list words_cast(cast obj);
 static list words_sizeofexpression(sizeofexpression obj);
 static list words_subscript(subscript s);
+static list words_application(application a);
 static text text_forloop(entity module,string label,int margin,forloop obj,int n);
 
 /******************************************************************* STYLES */
@@ -768,7 +769,7 @@ words_nullary_op(call obj, int precedence, bool leftmost)
     entity func = call_function(obj);
     string fname = entity_local_name(func);
 
-    if(same_string_p(fname,CONTINUE_FUNCTION_NAME))
+    if(!is_fortran && same_string_p(fname,CONTINUE_FUNCTION_NAME))
       fname = "";
 
     if(same_string_p(fname,RETURN_FUNCTION_NAME))
@@ -1364,9 +1365,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     if ( prec < precedence )
       pc = CHAIN_SWORD(pc, "(");
     pc = gen_nconc(pc, we1);
-    pc = CHAIN_SWORD(pc, " ");
     pc = CHAIN_SWORD(pc, strdup(fun));
-    pc = CHAIN_SWORD(pc, " ");
     pc = gen_nconc(pc, we2);
     if ( prec < precedence )
       pc = CHAIN_SWORD(pc, ")");
