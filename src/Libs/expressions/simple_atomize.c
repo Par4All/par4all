@@ -138,8 +138,7 @@ statement s;
     }
 }
 
-static void compute_before_current_statement(pe)
-expression *pe;
+static void compute_before_current_statement(expression *pe)
 {
     entity new_variable;
     statement stat;
@@ -150,33 +149,37 @@ expression *pe;
 
     /*  The index is computed
      */
-
+    /* tmp is assumed to be freshly allocated.
+     */
     tmp = please_give_me_a_basic_for_an_expression(*pe);
     
     /* Atomization is not valid with overloaded expressions */
-    if (!basic_overloaded_p(tmp)) {
-      new_variable = 
-	(*create_new_variable)(get_current_module_entity(), tmp);
-      
-      /*  The normalized field is kept as such, and will be used by
-       *  the overlap analysis! ??? just a horrible hack.
-       *
-       *  stat: Variable = Expression
-       *   *pe: Variable
-       */
-      rhs = make_expression(expression_syntax(*pe), normalized_undefined);
-      normalize_all_expressions_of(rhs);
-
-      stat = make_assign_statement(entity_to_expression(new_variable), rhs);
-
-      *pe = make_expression(make_syntax(is_syntax_reference, 
-					make_reference(new_variable, NIL)),
-			    expression_normalized(*pe));
-      
-      insert_before_current_statement(stat);
-    }
-    free(tmp);
-
+    if (!basic_overloaded_p(tmp)) 
+      {
+	new_variable = 
+	  (*create_new_variable)(get_current_module_entity(), tmp);
+	
+	/*  The normalized field is kept as such, and will be used by
+	 *  the overlap analysis! ??? just a horrible hack.
+	 *
+	 *  stat: Variable = Expression
+	 *   *pe: Variable
+	 */
+	rhs = make_expression(expression_syntax(*pe), normalized_undefined);
+	normalize_all_expressions_of(rhs);
+	
+	stat = make_assign_statement(entity_to_expression(new_variable), rhs);
+	
+	*pe = make_expression(make_syntax(is_syntax_reference, 
+					  make_reference(new_variable, NIL)),
+			      expression_normalized(*pe));
+	
+	insert_before_current_statement(stat);
+      }
+    else 
+      {
+	free(tmp);
+      }
 }
 
 static void ref_rwt(r)
