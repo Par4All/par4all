@@ -1,10 +1,10 @@
 #! /bin/sh
-
+#
 #
 # SCCS stuff:
 #
-# $RCSfile: Pips,v $ (version $Revision$)
-# $Date: 1996/08/22 10:08:41 $, 
+# $Id$
+#
 
 # Test function
 
@@ -286,7 +286,7 @@ check 60
 #
 error () 
 {
-  echo "Exit code for pips: $?; exiting $RCSfile: Pips,v $"
+  echo "Exit code for pips: $?; exiting Pips"
   exit 1;
 }
 
