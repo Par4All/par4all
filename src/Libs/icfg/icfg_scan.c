@@ -397,6 +397,7 @@ static void call_rwt(call c)
 		(e_caller, e_callee, current_stmt_head(), c));
     break;
   case ICFG_DECOR_PROPER_EFFECTS:
+    /*MERGE_TEXTS(r, get_text_proper_effects(callee_name));*/
     MERGE_TEXTS(r, get_text_proper_effects_flt(callee_name, e_filter));
     break;
   case ICFG_DECOR_CUMULATED_EFFECTS:
