@@ -119,8 +119,8 @@ while getopts hvDd:CNLPVc:a: OPT
 do
     case $OPT in
 	h) usage 0 "some help" ;;
-	v) verbose=verb ; vopt="${vopt}v ;;
-	D) debug=deb ; vopt="${vopt}g ;;
+	v) verbose=verb ; vopt="${vopt}v" ;;
+	D) debug=deb ; vopt="${vopt}g" ;;
 	d) cd $OPTARG ; 
 	   validate_dir="-r $OPTARG" ;;
 	a) email=$OPTARG ;;
