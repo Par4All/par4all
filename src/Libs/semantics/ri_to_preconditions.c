@@ -1763,26 +1763,27 @@ statement_to_postcondition(
 	/* FC: if the code is not reachable (thanks to STOP or GOTO), which
 	 * is a structural information, the precondition is just empty.
 	 */
-	Psysteme s = 
-		(Psysteme) predicate_system(transformer_relation(pre));
+      /* Psysteme s = predicate_system(transformer_relation(pre)); */
 
-	free_predicate(transformer_relation(pre));
-	gen_free_list(transformer_arguments(pre));
-	transformer_arguments(pre) = NIL;
-	transformer_relation(pre) = make_predicate(sc_empty(BASE_NULLE));
+      free_predicate(transformer_relation(pre));
+      gen_free_list(transformer_arguments(pre));
+      transformer_arguments(pre) = NIL;
+      transformer_relation(pre) = make_predicate(sc_empty(BASE_NULLE));
     }
 
     if (load_statement_precondition(s) == transformer_undefined) {
 	/* keep only global initial scalar integer values;
 	   else, you might end up giving the same xxx#old name to
 	   two different local values */
-	cons * non_initial_values =
+	list non_initial_values =
 	    arguments_difference(transformer_arguments(pre),
 				 get_module_global_arguments());
 
 	MAPL(cv,
-	 {entity v = ENTITY(CAR(cv));
-	  ENTITY(CAR(cv)) = entity_to_old_value(v);},
+	 {
+	   entity v = ENTITY(CAR(cv));
+	   ENTITY(CAR(cv)) = entity_to_old_value(v);
+	 },
 	     non_initial_values);
 
 	post = instruction_to_postcondition(pre, i, tf);
@@ -1801,17 +1802,19 @@ statement_to_postcondition(
 
 	if(!transformer_consistency_p(pre)) {
 	    int so = statement_ordering(s);
-	    (void) fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
+	    fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
 			   statement_number(s), ORDERING_NUMBER(so),
 			   ORDERING_STATEMENT(so), pre);
-	    (void) print_transformer(pre);
-	    pips_error("statement_to_postcondition", "Non-consistent precondition after update\n");
+	    print_transformer(pre);
+	    pips_internal_error("Non-consistent precondition after update\n");
 	}
 
 	/* store the precondition in the ri */
 	store_statement_precondition(s,
 				     transformer_filter(pre,
 							non_initial_values));
+
+	gen_free_list(non_initial_values);
     }
     else {
 	pips_debug(8,"precondition already available");
