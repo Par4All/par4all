@@ -1,5 +1,5 @@
 /* 
- * $Id: arithmetic_errors.h,v 1.2 2002/10/15 10:02:06 kienhuis Exp $
+ * $Id: arithmetic_errors.h,v 1.3 2004/02/08 21:53:27 kienhuis Exp $
  *
  * managing arithmetic errors...
  * detecting and managing arithmetic errors on Values should be
@@ -9,14 +9,28 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
- * Revision 1.2  2002/10/15 10:02:06  kienhuis
- * version of arith for new release
+ * Revision 1.3  2004/02/08 21:53:27  kienhuis
+ * Update from Fabien Coelho, via Bart Kienhuis
  *
- * Revision 1.2  2002/01/22 16:15:58  olaru
- * cygwin variable added
+ * I've updated here in the C3/Linear library the arithmetic_error
+ * package that I developped (with others) to handle exceptions in C.
+ * It adds a simple callback feature which is needed for pips here.
+ * If you do not use it, it should not harm;-)
  *
- * Revision 1.1.1.1  2001/07/16 15:00:31  risset
- * initial import into CVS
+ * Revision 1.34  2003/09/03 13:59:46  coelho
+ * ++
+ *
+ * Revision 1.33  2003/09/03 13:35:34  coelho
+ * no more callback.
+ *
+ * Revision 1.32  2003/08/18 14:55:38  coelho
+ * callback fix.
+ *
+ * Revision 1.31  2003/08/18 14:16:45  coelho
+ * NULL callback added.
+ *
+ * Revision 1.30  2003/06/13 13:59:55  coelho
+ * hop.
  *
  * Revision 1.29  2000/07/27 15:01:55  coelho
  * hop.
@@ -61,6 +75,8 @@
 
 #include <setjmp.h>
 
+typedef void (*exception_callback_t)(char *, char *, int);
+
 /*
 const unsigned int overflow_error = 1;
 const unsigned int simplex_arithmetic_error = 2;
@@ -77,20 +93,8 @@ const unsigned int any_exception_error = ~0;
 #define __CURRENT_FUNCTION_NAME__ "<unknown>"
 #endif
 
-#define EXCEPTION extern const unsigned int
-
-#ifdef cygwin
-
-#define THROW(what) \
- (fprintf(stdout,"exception thrown %d, function %s, file %s, line %d", \
-  what,__CURRENT_FUNCTION_NAME__,__FILE__,__LINE__))
-
-#define CATCH(what) 	if (0)
-
-#define UNCATCH(what)
-
-#else
-
+/* 'const' out because of cproto 4.6. FC 13/06/2003 */
+#define EXCEPTION extern unsigned int
 
 #define THROW(what) \
    (throw_exception(what, __CURRENT_FUNCTION_NAME__, __FILE__, __LINE__))
@@ -102,8 +106,6 @@ const unsigned int any_exception_error = ~0;
 #define UNCATCH(what)						\
      (pop_exception_from_stack(what, __CURRENT_FUNCTION_NAME__,	\
 			       __FILE__, __LINE__))
-
-#endif 
 
 #define TRY else
 

@@ -1,18 +1,36 @@
 /*
-  $Id: errors.c,v 1.2 2002/10/15 10:02:07 kienhuis Exp $
+  $Id: errors.c,v 1.3 2004/02/08 21:53:27 kienhuis Exp $
 
   Exception management.
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
-  Revision 1.2  2002/10/15 10:02:07  kienhuis
-  version of arith for new release
+  Revision 1.3  2004/02/08 21:53:27  kienhuis
+  Update from Fabien Coelho, via Bart Kienhuis
 
-  Revision 1.2  2002/08/12 13:11:27  loechner
-  union ehrhart, first complete version
+  I've updated here in the C3/Linear library the arithmetic_error
+  package that I developped (with others) to handle exceptions in C.
+  It adds a simple callback feature which is needed for pips here.
+  If you do not use it, it should not harm;-)
 
-  Revision 1.1.1.1  2001/07/16 15:00:31  risset
-  initial import into CVS
+  Revision 1.27  2003/09/04 09:40:37  coelho
+  init added.
+  verbosity mask added.
+
+  Revision 1.26  2003/09/03 14:05:20  coelho
+  push/pop callbacks called.
+
+  Revision 1.20  2003/08/18 09:55:09  coelho
+  get_exception_name added...
+
+  Revision 1.19  2003/06/13 13:59:07  coelho
+  const out.
+
+  Revision 1.18  2003/06/13 13:54:47  coelho
+  hop.
+
+  Revision 1.17  2002/04/02 08:44:54  coelho
+  timeout_error ajoute.
 
   Revision 1.16  2000/10/27 13:26:03  ancourt
   exception_thrown -> linear_number_of_exception_thrown
@@ -53,17 +71,58 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "arithmetique.h"
 
 /* global constants to designate exceptions.
    to be put in the type field bellow.
+   cproto 4.6 does not line 'const'...
 */
 unsigned int overflow_error = 1;
 unsigned int simplex_arithmetic_error = 2;
 unsigned int user_exception_error = 4;
 unsigned int parser_exception_error = 8;
+unsigned int timeout_error = 16;
+
+/* catch all */
 unsigned int any_exception_error = ~0;
+
+
+/*
+ * On a few systems, type boolean and/or its values FALSE, TRUE may appear
+ * in standard header files.  Or you may have conflicts with application-
+ * specific header files that you want to include together with these files.
+ * Defining HAVE_BOOLEAN before including jpeglib.h should make it work.
+ */
+
+#ifndef HAVE_BOOLEAN
+typedef int boolean;
+#endif
+#ifndef FALSE                   /* in case these macros already exist */
+#define FALSE   0               /* values of boolean */
+#endif
+#ifndef TRUE
+#define TRUE    1
+#endif
+
+char * get_exception_name(unsigned int exception)
+{
+  if (exception==overflow_error)
+    return "overflow_error exception";
+  if (exception==simplex_arithmetic_error)
+    return "simplex_arithmetic_error exception";
+  if (exception==user_exception_error)
+    return "user_exception_error exception";
+  if (exception==parser_exception_error)
+    return "parser_exception_error exception";
+  if (exception==timeout_error)
+    return "timeout_error exception";
+  if (exception==any_exception_error)
+    return "all exceptions mask";
+
+  return "unknown or mixed exception";
+}
 
 /* keep track of last thrown exception for RETHROW()
  */
@@ -71,12 +130,13 @@ unsigned int the_last_just_thrown_exception = 0;
 
 /* whether to run in debug mode (that is to trace catch/uncatch/throw)
  */
-static int linear_exception_debug_mode = 0;
-static int linear_exception_verbose_mode = 1;
+static int linear_exception_debug_mode = FALSE;
+static unsigned int linear_exception_verbose = 1 | 2 | 16 ;
 
 /* A structure for the exception stack.
  */
-typedef struct {
+typedef struct 
+{
   /* exception type.
    */
   int what;
@@ -97,9 +157,28 @@ typedef struct {
    maximum extension.
    current index (next available bucket)
  */
-#define MAX_STACKED_CONTEXTS 50
+#define MAX_STACKED_CONTEXTS 64
 static linear_exception_holder exception_stack[MAX_STACKED_CONTEXTS];
 static int exception_index = 0;
+
+/* callbacks...
+ */
+static exception_callback_t push_callback = NULL;
+static exception_callback_t pop_callback = NULL;
+
+void set_exception_callbacks(exception_callback_t push, 
+			     exception_callback_t pop)
+{
+  if (push_callback!=NULL || pop_callback!=NULL)
+  {
+    fprintf(stderr, "exception callbacks already defined! (%p, %p)\n",
+	    push_callback, pop_callback);
+    abort();
+  }
+
+  push_callback = push;
+  pop_callback = pop;
+}
 
 /* total number of exceptions thrown, for statistics.
  */
@@ -156,6 +235,8 @@ push_exception_on_stack(
     abort();
   }
 
+  if (push_callback) push_callback(file, function, line);
+
   the_last_just_thrown_exception = 0;
 
   exception_stack[exception_index].what = what;
@@ -189,6 +270,8 @@ pop_exception_from_stack(
     dump_exception_stack();
     abort();
   }
+
+  if (pop_callback) pop_callback(file, function, line);
 
   exception_index--;
   the_last_just_thrown_exception = 0;
@@ -230,6 +313,12 @@ void throw_exception(
 
   for (i=exception_index-1; i>=0; i--)
   {
+    if (pop_callback) 
+      /* pop with push parameters! */
+      pop_callback(exception_stack[i].file,
+		   exception_stack[i].function,
+		   exception_stack[i].line);
+
     if (exception_stack[i].what & what) 
     {
       exception_index = i;
@@ -243,7 +332,8 @@ void throw_exception(
 		exception_stack[i].what,
 		i);
   
-      if (linear_exception_verbose_mode)
+      /* trace some exceptions... */
+      if (linear_exception_verbose & what)
 	fprintf(stderr, "exception %d/%d: %s(%s:%d) -> %s(%s:%d)\n",
 		what, exception_stack[i].what,
 		function, file, line,
@@ -251,7 +341,7 @@ void throw_exception(
 		exception_stack[i].file,
 		exception_stack[i].line);
 
-      longjmp(exception_stack[i].where,0);
+      longjmp(exception_stack[i].where, 0);
     }
   }
 
@@ -262,4 +352,13 @@ void throw_exception(
 	  "an exception was THROWN without a proper matching CATCH\n");
   dump_exception_stack();
   abort();
+}
+
+void linear_initialize_exception_stack(
+  unsigned int verbose_exceptions,
+  exception_callback_t push, 
+  exception_callback_t pop)
+{
+  linear_exception_verbose = verbose_exceptions;
+  set_exception_callbacks(push, pop);
 }
