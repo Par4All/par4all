@@ -1,3 +1,7 @@
+! testing Xpomp display facilities
+! $RCSfile: fractal.f,v $ (version $Revision$)
+! $Date: 1996/08/30 19:58:48 $, 
+!
       program fractal
 
       implicit none
@@ -42,7 +46,7 @@
 ! Some HPF distributions:
 ! cyclic would make more sense as far as load balancing is concerned
 ! However HPFC would not be very good at it...
-!hpf$ processor pe(2, 2)
+!hpf$ processors pe(2, 2)
 !hpf$ template space(0:x_size - 1, 0:y_size - 1)
 !hpf$ distribute space(block, block) onto pe
 !hpf$ align image with space
@@ -102,3 +106,6 @@ c     Wait for user interaction:
       goto 10
 
       end
+
+! end of $RCSfile: fractal.f,v $
+
