@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1995/12/22 16:06:09 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1995/12/26 16:23:45 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -131,8 +131,7 @@ range r;
 {
     entity newarray = load_new_node(array);
     dimension d = FindIthDimension(newarray, dim);
-    int
-	rlo = HpfcExpressionToInt(range_lower(r)),
+    int	rlo = HpfcExpressionToInt(range_lower(r)),
 	rup = HpfcExpressionToInt(range_upper(r)),
 	rin = HpfcExpressionToInt(range_increment(r)),
 	dlo = HpfcExpressionToInt(dimension_lower(d)),
@@ -162,13 +161,8 @@ list generate_message_from_3_lists(array, lcontent, lneighbour, ldomain)
 entity array;
 list lcontent, lneighbour, ldomain;
 {
-    list
-	lc = lcontent,
-	ln = lneighbour,
-	ld = ldomain,
-	lm = NIL;
-    int
-	len = gen_length(lcontent);
+    list lc = lcontent, ln = lneighbour, ld = ldomain, lm = NIL;
+    int len = gen_length(lcontent);
 
     assert(len==gen_length(lneighbour) && len==gen_length(ldomain));
 
@@ -431,7 +425,7 @@ list lra;
 	}
 	else
 	{
-	    range rg = ith_range(arraydim-1, lra);
+	    range rg = RANGE(gen_nth(arraydim-1, lra));
 	    int
 		a  = HpfcExpressionToInt(alignment_rate(al)),
 		b  = HpfcExpressionToInt(alignment_constant(al)),
@@ -467,7 +461,7 @@ list lrt;
 	int tdim = 0;
 	distribution di = FindDistributionOfProcessorDim(ld, i, &tdim);
 	style s = distribution_style(di);
-	range rg = ith_range(tdim-1, lrt);
+	range rg = RANGE(gen_nth(tdim-1, lrt));
 	int p  = 0,
 	    tl = HpfcExpressionToInt(range_lower(rg)),
 	    tu = HpfcExpressionToInt(range_upper(rg)),
@@ -524,19 +518,6 @@ list lrt;
 	}
     }
     return(lrp);
-}
-
-/* range ith_range(i, l)
- *
- * caution, first range is 0.
- */
-range ith_range(i, l)
-int i;
-list l;
-{
-    return((i<=0)?
-	   (RANGE(CAR(l))):
-	   (ith_range(i-1, CDR(l))));
 }
 
 list array_access_to_array_ranges(r, lkref, lvref)
