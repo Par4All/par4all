@@ -1051,9 +1051,8 @@ char *module_name;
 }
 
 
-bool chains(module_name, use)
-char *module_name;
-int use;
+bool 
+chains(char *module_name, int use)
 {
     statement module_stat;
     instruction module_inst;
@@ -1084,7 +1083,7 @@ int use;
 	mem_spy_begin();
     }
    
-    debug(1, "chains", "finding enclosing loops ...\n");
+    pips_debug(1, "finding enclosing loops ...\n");
     set_enclosing_loops_map( loops_mapping_of_statement(module_stat) );
 
     module_inst = statement_instruction(module_stat);
@@ -1121,10 +1120,10 @@ int use;
 	gen_free( module_inst );
     }
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CHAINS, strdup(module_name),
-	(char*) module_graph);
+    DB_PUT_MEMORY_RESOURCE(DBR_CHAINS, module_name, (char*) module_graph);
+
     reset_effects();
-    reset_enclosing_loops_map();
+    clean_enclosing_loops();
     reset_current_module_statement();
     reset_current_module_entity();
     /* reset_entity_to_size(); */
