@@ -10,7 +10,8 @@ ETEXF =	ri.tex \
 	word_attachment.tex \
 	reductions_private.tex \
 	interval_graph.tex \
-	pipsdbm_private.tex
+	pipsdbm_private.tex \
+	eole.tex
 
 FTEXF =	complexity_ri.ftex \
 	database.ftex \
