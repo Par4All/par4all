@@ -36,11 +36,11 @@ typedef struct
 
 static p_icfgpe_print_stuff ips = NULL;
 
-void create_ips(string resource_name, get_text_function gt, string module_name)
+void create_ips(string module_name, string resource_name, get_text_function gt)
 {
   ips = (p_icfgpe_print_stuff)malloc(sizeof(icfgpe_print_stuff));
   ips->name = resource_name;
-  ips->resource = (gen_chunk*) db_get_memory_resource(ips->name, module_name, TRUE);
+  ips->resource = (gen_chunk*) db_get_memory_resource(resource_name, module_name, TRUE);
   ips->get_text = gt;
 }
 
@@ -106,23 +106,16 @@ static text get_any_effects_text_flt(string module_name)
   return txt;
 }
 
-text get_any_effect_type_text_flt(string module_name, string resource_name)
+text get_text_proper_effects_flt(string module_name)
 {
   text txt;
-  create_ips(resource_name, effects_to_text_func, module_name);
+  set_methods_for_rw_effects_prettyprint(module_name);
+  create_ips(module_name, DBR_PROPER_EFFECTS, effects_to_text_func);
   txt = get_any_effects_text_flt(module_name);
   free(ips);
   ips = NULL;
-  return txt;
-}
-
-text get_text_proper_effects_flt(string module_name)
-{
-  text t;
-  set_methods_for_rw_effects_prettyprint(module_name);
-  t = get_any_effect_type_text_flt(module_name, DBR_PROPER_EFFECTS);
   reset_methods_for_effects_prettyprint(module_name);
-  return t;
+  return txt;
 }
 
 
