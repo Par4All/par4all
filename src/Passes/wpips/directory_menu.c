@@ -2,10 +2,10 @@
    chooser. */
 
 
-/* 	%A% ($Date: 1997/04/01 22:59:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/05/27 12:05:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_directory_menu[] = "%A% ($Date: 1997/04/01 22:59:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_directory_menu[] = "%A% ($Date: 1997/05/27 12:05:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <xview/xview.h>
@@ -14,10 +14,16 @@ char vcid_directory_menu[] = "%A% ($Date: 1997/04/01 22:59:29 $, ) version $Revi
    defined in sys/dirent.h): */
 #include <sys/param.h>
 #include <sys/stat.h>
+
 #include <sys/dirent.h>
+#ifdef __linux
+/* Posix version: */
+#define MAXNAMELEN NAME_MAX
+#else
 /* To have SunOS4 still working: */
 #ifndef MAXNAMELEN
 #define MAXNAMELEN MAXNAMLEN
+#endif
 #endif
 #include "genC.h"
 #include "misc.h"
@@ -66,7 +72,7 @@ directory_gen_pullright(Menu_item menu_item,
                      parent_directory,
                      (char *) xv_get(menu_item, MENU_STRING));
       
-      if ((menu = (Menu) xv_get(menu_item, MENU_PULLRIGHT)) != NULL) {
+      if ((char *)(menu = (Menu) xv_get(menu_item, MENU_PULLRIGHT)) != NULL) {
          /* Well, there is already a menu... we've been already here.
             Free it first: */
          /* Free the associated directory name: */
@@ -108,15 +114,15 @@ generate_a_directory_menu(char * directory)
    int i;
    Menu menu;
    
-   menu = xv_create(NULL, MENU,
-                    /* The string is *not* copied in MENU_TITLE_ITEM: */
-                    MENU_TITLE_ITEM, strdup(directory),
-                    /* and furthermore MENU_TITLE_ITEM is write
-                       only, so add the info somewhere else: */
-                    XV_KEY_DATA, MENU_PATH_DATA_HANDLER, strdup(directory),
-                    /* Add its own notifying procedure: */
-                    MENU_NOTIFY_PROC, generate_a_directory_menu_notify,
-                    NULL);
+   menu = (Menu) xv_create((int) NULL, MENU,
+			   /* The string is *not* copied in MENU_TITLE_ITEM: */
+			   MENU_TITLE_ITEM, strdup(directory),
+			   /* and furthermore MENU_TITLE_ITEM is write
+			      only, so add the info somewhere else: */
+			   XV_KEY_DATA, MENU_PATH_DATA_HANDLER, strdup(directory),
+			   /* Add its own notifying procedure: */
+			   MENU_NOTIFY_PROC, generate_a_directory_menu_notify,
+			   NULL);
    debug(2, "generate_a_directory_menu", "menu = %#x (%s)\n",
          menu, directory);
 
