@@ -526,7 +526,7 @@ bool nth_loop_p(statement ls)
     count++;
     return count == current_loop_depth;
 }
-
+
 int numerical_loop_iteration_count(loop l)
 {
     Pvecteur count = estimate_loop_iteration_count(l);
@@ -536,7 +536,8 @@ int numerical_loop_iteration_count(loop l)
 	c = -1;
     else {
 	if( vect_constant_p(count)) {
-	    c=  vect_coeff(TCST, count);
+	    Value v = vect_coeff(TCST, count);
+	    c = VALUE_TO_INT(v);
 	}
 	else
 	    c = -1;
