@@ -124,8 +124,6 @@ char *mod_name;
  
   mod_inst = statement_instruction(mod_stat);
 
-  if (! instruction_unstructured_p(mod_inst))
-    pips_error("loop_normalize", "unstructured expected\n");
 
   /* Initialization of the NLC counters. It numbers the NLC variables
    * created during the computation.
