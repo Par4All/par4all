@@ -128,6 +128,7 @@ static entity current_mod = entity_undefined;
 static statement module_statement = statement_undefined;
 static int number_of_may_uninitialized_scalar_variables = 0;
 static int number_of_may_uninitialized_array_variables = 0;
+static int number_of_may_uninitialized_array_elements = 0;
 static int number_of_uninitialized_scalar_variables = 0;
 static int number_of_uninitialized_array_variables = 0;
 static int number_of_added_verifications = 0;
@@ -161,6 +162,26 @@ static list entities_to_expressions(list l_ent)
     l_exp = gen_nconc(l_exp, CONS(EXPRESSION,entity_to_expression(ent),NIL));
   },l_ent);
   return(l_exp);
+}
+
+static string print_list_of_entities(list l)
+{
+  string retour = "";
+  MAP(ENTITY, e, 
+  {
+    retour = strdup(concatenate(retour,",",entity_local_name(e),NULL));
+  }, l);
+  return retour;
+}
+
+static string print_list_of_expressions(list l)
+{
+  string retour = "";
+  MAP(EXPRESSION, exp, 
+  {
+    retour = strdup(concatenate(retour,",",words_to_string(words_expression(exp)),NULL));
+  }, l);
+  return retour;
 }
 
 static bool common_variable_in_module_scope_p(entity ent,entity mod)
@@ -262,6 +283,49 @@ static expression make_special_value(entity ent)
   }
 }
 
+/* This function makes a test like X.EQ.100000 or id_nan(A(PHI1)) or ir_nan(A(I,B(J)) */
+static expression make_test_condition(expression exp, entity ent)
+{
+  basic b = entity_basic(ent);
+  expression cond = expression_undefined;
+  switch (basic_tag(b)) {
+  case 1: /*float*/
+    switch (basic_float(b)) {
+    case 4:
+      cond = make_call_expression(make_constant_entity("ir_isnan",is_basic_float,4),
+				  CONS(EXPRESSION,exp,NIL));
+      break;
+    case 8:
+      cond = make_call_expression(make_constant_entity("id_isnan",is_basic_float,8),
+				  CONS(EXPRESSION,exp,NIL));
+      break;
+    default:
+      cond = eq_expression(exp,make_special_value(ent));
+      break;
+    }
+    break;
+  case 4:/*complex*/
+    switch (basic_complex(b)) {
+    case 8:
+      cond = make_call_expression(make_constant_entity("ir_isnan",is_basic_complex,8),
+				  CONS(EXPRESSION,exp,NIL));
+      break;
+    case 16:
+      cond = make_call_expression(make_constant_entity("id_isnan",is_basic_complex,16),
+				  CONS(EXPRESSION,exp,NIL));
+      break;
+    default:
+      cond = eq_expression(exp,make_special_value(ent));
+      break;
+    }
+    break;
+  default:
+    cond = eq_expression(exp,make_special_value(ent));
+    break;
+  }
+  return cond;
+}
+
 /* This function generates an assignment that initializes the scalar variable */
 static void initialize_scalar_variable(entity ent)
 {
@@ -309,54 +373,72 @@ static void initialize_array_variable(entity ent)
 
 static void verify_scalar_variable(entity ent)
 {
-  string message = strdup(concatenate("\'",entity_name(ent)," is used before set\'",NULL));
-  expression cond = expression_undefined;
+  string message = strdup(concatenate("\'Scalar variable ",entity_name(ent)," is used before set\'",NULL));
+  expression cond = make_test_condition(entity_to_expression(ent),ent);
   test t = test_undefined;
   statement smt = statement_undefined;
   basic b = entity_basic(ent);
-  switch (basic_tag(b)) {
-  case 1: /*float*/
-    switch (basic_float(b)) {
-    case 4:
-      cond = make_call_expression(make_constant_entity("ir_isnan",is_basic_float,4),
-				  CONS(EXPRESSION,entity_to_expression(ent),NIL));
-      break;
-    case 8:
-      cond = make_call_expression(make_constant_entity("id_isnan",is_basic_float,8),
-				  CONS(ENTITY,entity_to_expression(ent),NIL));
-      break;
-    default:
-      cond = eq_expression(entity_to_expression(ent),make_special_value(ent));
-      break;
-    }
-    break;
-  case 4:/*complex*/
-    switch (basic_complex(b)) {
-    case 8:
-      cond = make_call_expression(make_constant_entity("ir_isnan",is_basic_complex,8),
-				  CONS(EXPRESSION,entity_to_expression(ent),NIL));
-      break;
-    case 16:
-      cond = make_call_expression(make_constant_entity("id_isnan",is_basic_complex,16),
-				  CONS(ENTITY,entity_to_expression(ent),NIL));
-      break;
-    default:
-      cond = eq_expression(entity_to_expression(ent),make_special_value(ent));
-      break;
-    }
-    break;
-  default:
-    cond = eq_expression(entity_to_expression(ent),make_special_value(ent));
-    break;
-  }
   if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
-    smt = make_print_statement(message); 
+    {
+      smt = make_print_statement(message); 
+      /*To help debugging, reinitialize the integer and real variables by 0 in order to 
+	avoid so much propagated NaN or 1000000 values. By doing this, we cannot
+	detect all uninitialized variables but it helps Corinne, with thousand lines of code */
+      if ((basic_tag(b)==0) || (basic_tag(b)==1))
+	{
+	  statement s = make_assign_statement(entity_to_expression(ent),int_to_expression(0));  
+	  /*insert the assignment after the PRINT statement*/
+	  insert_statement(smt,s,FALSE); 
+	}
+    }
   else
     smt = make_stop_statement(message); 
   t = make_test(cond,smt,make_block_statement(NIL));
   smt = test_to_statement(t);
   print_text(out, text_statement(entity_undefined,0,smt));
   free(message), message = NULL;
+}
+
+static void verify_array_element(entity ent, expression exp)
+{
+  statement smt = statement_undefined;
+  test t = test_undefined;
+  list args = reference_indices(expression_reference(exp));
+  string stop_message  = strdup(concatenate("\'Array ",entity_name(ent)," is used before set\'",NULL));
+  string print_message  = strdup(concatenate("\'Array element ",entity_name(ent),"(\'",
+					     print_list_of_expressions(args),",\') is used before set\'",NULL));
+  expression cond = make_test_condition(exp,ent);
+  basic b = entity_basic(ent);
+  ifdebug(3)
+    {
+      pips_debug(3,"Verify array element:");
+      print_expression(exp);
+    }
+  if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
+    {   
+      smt = make_print_statement(print_message); 
+      /*To help debugging, reinitialize the integer and real array elements by 0 in order to 
+	avoid so much propagated NaN or 1000000 values. By doing this, we cannot
+	detect all uninitialized variables but it helps Corinne, with thousand lines of code */
+      if ((basic_tag(b)==0) || (basic_tag(b)==1))
+	{
+	  statement s = make_assign_statement(exp,int_to_expression(0));  
+	  /*insert the assignment after the PRINT statement*/
+	  insert_statement(smt,s,FALSE); 
+	}
+    }
+  else
+    smt = make_stop_statement(stop_message); 
+  t = make_test(cond,smt,make_block_statement(NIL));
+  smt = test_to_statement(t);
+  ifdebug(3)
+    {
+      fprintf(stderr,"\nGenerated statement:");
+      print_statement(smt);
+    }
+  print_text(out,text_statement(entity_undefined,0,smt));
+  free(print_message), print_message = NULL;
+  free(stop_message), stop_message = NULL;
 }
 
 /* This function generates code that verifies if all array elements in the array region
@@ -385,56 +467,37 @@ static void verify_array_variable(entity ent, region reg)
   Pbase phi_variables = entity_list_to_base(l_phi);
   Psysteme ps = region_system(reg);
   Psysteme row_echelon = SC_UNDEFINED, condition = SC_UNDEFINED;
-  string message  = strdup(concatenate("\'",entity_name(ent)," is used before set\'",NULL));
-  expression cond = expression_undefined;
+  string stop_message  = strdup(concatenate("\'Array ",entity_name(ent)," is used before set\'",NULL));
+  string print_message  = strdup(concatenate("\'Array element ",entity_name(ent),"(\'",
+					     print_list_of_entities(l_phi),",\') is used before set\'",NULL));
+  expression cond = make_test_condition(exp,ent);
   basic b = entity_basic(ent);
   ifdebug(3)
     {
       pips_debug(3,"Verify array region:");
       print_region(reg);
     }
-  switch (basic_tag(b)) {
-  case 1: /*float*/
-    switch (basic_float(b)) {
-    case 4:
-      cond = make_call_expression(make_constant_entity("ir_isnan",is_basic_float,4),
-				  CONS(EXPRESSION,exp,NIL));
-      break;
-    case 8:
-      cond = make_call_expression(make_constant_entity("id_isnan",is_basic_float,8),
-				  CONS(EXPRESSION,exp,NIL));
-      break;
-    default:
-      cond = eq_expression(exp,make_special_value(ent));
-      break;
-    }
-    break;
-  case 4:/*complex*/
-    switch (basic_complex(b)) {
-    case 8:
-      cond = make_call_expression(make_constant_entity("ir_isnan",is_basic_complex,8),
-				  CONS(EXPRESSION,exp,NIL));
-      break;
-    case 16:
-      cond = make_call_expression(make_constant_entity("id_isnan",is_basic_complex,16),
-				  CONS(EXPRESSION,exp,NIL));
-      break;
-    default:
-      cond = eq_expression(exp,make_special_value(ent));
-      break;
-    }
-    break;
-  default:
-    cond = eq_expression(exp,make_special_value(ent));
-    break;
-  }
   if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
-    smt = make_print_statement(message); 
+    {   
+      smt = make_print_statement(print_message); 
+      /*To help debugging, reinitialize the integer and real array elements by 0 in order to 
+	avoid so much propagated NaN or 1000000 values. By doing this, we cannot
+	detect all uninitialized variables but it helps Corinne, with thousand lines of code */
+      if ((basic_tag(b)==0) || (basic_tag(b)==1))
+	{
+	  statement s = make_assign_statement(exp,int_to_expression(0));  
+	  /*insert the assignment after the PRINT statement*/
+	  insert_statement(smt,s,FALSE); 
+	}
+    }
   else
-    smt = make_stop_statement(message); 
+    smt = make_stop_statement(stop_message); 
   t = make_test(cond,smt,make_block_statement(NIL));
   smt = test_to_statement(t);
   ps = remove_temporal_variables_from_system(ps); // remove I#init like variables 
+
+  /*to simplify the test condition, we have to remove preconditions from regions*/
+
   algorithm_row_echelon(ps,phi_variables, &condition, &row_echelon);
   sc_find_equalities(&condition);
   /* If no bound is found for a variable PHIi => it is not the case because the
@@ -447,7 +510,129 @@ static void verify_array_variable(entity ent, region reg)
       print_statement(smt);
     }
   print_text(out,text_statement(entity_undefined,0,smt));
-  free(message), message = NULL;
+  free(print_message), print_message = NULL;
+  free(stop_message), stop_message = NULL;
+}
+
+static void verify_used_before_set_expression(expression exp,statement s);
+static void verify_used_before_set_call(call c,statement s);
+
+static void verify_used_before_set_call(call c,statement s)
+{
+  entity fun = call_function(c);
+  list l_args = call_arguments(c);
+  if (entity_module_p(fun))
+    {
+      /* If c is a procedure call, we have to update UBS resource in order to check 
+	 for the corresponding variables in the frame of the called procedure. 
+	 There are two possibilities: 
+	 - if the current entity is passed as actual arguments 
+	   insert (called procedure,offset of actual argument)
+	 - the current entity is a common variable and it has IN regions in the called 
+	   procedure => insert (called procedure,common variable)*/
+      int i = 0;
+      ifdebug(3)
+	fprintf(stderr,"\nCall to other module\n");
+      if (variable_in_common_p(current_entity))
+	{
+	  /* always add (called procedure,common variable) to ubs resource,
+	     although current_entity may not in the IN regions of the called procedure */
+	  ubs_check fp = make_ubs_check(fun,current_entity);
+	  l_ubs_checks = gen_nconc(CONS(UBS_CHECK,fp,NIL),l_ubs_checks);
+	}
+      ifdebug(3)
+	{
+	  fprintf(stderr,"\nCall to %s with argument list:",entity_local_name(fun));
+	  print_expressions(l_args);
+	}
+      MAP(EXPRESSION,exp,
+      {
+	list l_refs = expression_to_reference_list(exp, NIL);
+	i++;
+	MAP(REFERENCE,ref,
+	{
+	  entity var = reference_variable(ref);
+	  if (same_entity_p(var,current_entity))
+	    {
+	      ubs_check fp = make_ubs_check(fun,make_integer_constant_entity(i));
+	      ifdebug(4)
+		{
+		  fprintf(stderr,"\nFound at %d-th argument:",i);
+		  print_expression(exp);
+		  fprintf(stderr,"\nAdd ubs (%s,%d)\n",entity_local_name(fun),i);
+		}
+	      l_ubs_checks = gen_nconc(CONS(UBS_CHECK,fp,NIL),l_ubs_checks);
+	      break;
+	    }
+	},l_refs);
+      },l_args);		
+    }
+  else
+    {
+      /* The current statement is not a call to another routine, so an assignment, 
+	 or a READ, a WRITE, ...
+	 We have go though the argument list and generate a verification for each 
+	 read (= IN region) of the current entity. This is really a redundant work
+	 with region's computation :-( 
+	 So may be it is better to keep the list of regions, not a convex hull. 
+	 
+	 Examples :  A = C(J) + FOO(C(I)), X(A(I)) = A(J) + A(K)
+	      READ *, A(B(I)), A(B(J)) 
+
+	 SO FOR THE MOMENT, I ONLY TREAT SOME FREQUENT CASES: assignment, WRITE*/
+      ifdebug(3)
+	fprintf(stderr,"\nMAY IN region of elementary statement\n");
+      MAP(EXPRESSION,exp,
+      {
+	verify_used_before_set_expression(exp,s);
+      },l_args);
+    }
+}
+
+static void verify_used_before_set_expression(expression exp,statement s)
+{
+  syntax syn = expression_syntax(exp);
+  tag t = syntax_tag(syn);  
+  ifdebug(4)
+    {
+      fprintf(stderr,"\nVerify expression\n");
+      print_expression(exp);
+    }
+  switch (t){ 
+  case is_syntax_range:  
+    break;
+  case is_syntax_reference:
+    { 
+      reference ref = syntax_reference(syn);
+      entity var = reference_variable(ref);
+      if (same_entity_p(var,current_entity))
+	{
+	  int order = statement_ordering(s);
+	  ifdebug(3)
+	    fprintf(stderr,"\nInsert a VERIFY function before a reference\n");
+	  number_of_added_verifications++;
+	  fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_mod),
+		  ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
+	  if (entity_scalar_p(var))  /*exists ? MAY IN for a MUST IN?*/
+	    verify_scalar_variable(var);
+	  else
+	    verify_array_element(var,exp);
+	  fprintf(out,"%s\n",PREFIX2);
+	}	
+      break;
+    }
+  case is_syntax_call:
+    {
+      call c = syntax_call(syn);
+      verify_used_before_set_call(c,s);
+      break;
+    }
+  default:
+    {
+      pips_error("", "Unexpected expression tag %d \n", t );
+      break;
+    } 
+  }	
 }
 
 static bool verify_used_before_set_statement_flt(statement s)
@@ -462,85 +647,71 @@ static bool verify_used_before_set_statement_flt(statement s)
     }  
   MAP(REGION,reg,
   {
-    entity ent = region_entity(reg);
-    if (same_entity_p(ent,current_entity))
+    /* there are IN regions like IN-EXACT-{0==-1} !!!*/
+    if (!region_empty_p(reg))
       {
-	approximation app = region_approximation(reg);
-	ifdebug(3)
-	  fprintf(stderr,"\nFound variable %s in the IN region list\n",entity_name(ent));
-	if (approximation_must_p(app) && (!variable_in_common_p(current_entity) 
-	    || (variable_in_common_p(current_entity) && 
-		common_variable_in_module_scope_p(current_entity,current_mod))))
-	  {	
-	    int order = statement_ordering(s);
-	    ifdebug(3)
-	      fprintf(stderr,"\nMUST IN region in module scope, insert a VERIFY function\n");
-	    number_of_added_verifications++;
-	    fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_mod),
-		    ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
-	    if (entity_scalar_p(ent))
-	      verify_scalar_variable(ent);
-	    else
-	      verify_array_variable(ent,reg);
-	    fprintf(out,"%s\n",PREFIX2);
-	    return FALSE;
-	  }
-	else 
+	entity ent = region_entity(reg);
+	if (same_entity_p(ent,current_entity))
 	  {
+	    approximation app = region_approximation(reg);
 	    ifdebug(3)
-	      fprintf(stderr,"\nMAY IN region or common variable not in current module scope, continue\n");
-	    if (statement_call_p(s))
-	      {
-		call c = statement_call(s);
-		if (functional_call_p(c))
-		  {
-		    /* If s is a call to other procedure and we have MAY IN region => 
-		       update UBS resource in order to check for the corresponding variables
-		       in the frame of the called procedure. There are two possibilities: 
-		       - if the current entity is passed as actual arguments 
-		       insert (called procedure,offset of actual argument)
-		       - the current entity is a common variable and it has IN regions in the called 
-		       procedure => insert (called procedure,common variable)*/
-		    entity mod = call_function(c);
-		    list l_args = call_arguments(c);
-		    int i = 0;
-		    if (variable_in_common_p(current_entity))
-		      {
-			/* always add (called procedure,common variable) to ubs resource,
-			   although current_entity may not in the IN regions of the called procedure */
-			ubs_check fp = make_ubs_check(mod,current_entity);
-			l_ubs_checks = gen_nconc(CONS(UBS_CHECK,fp,NIL),l_ubs_checks);
-		      }
-		    ifdebug(3)
-		      {
-			fprintf(stderr,"\nCall to %s with argument list:",entity_local_name(mod));
-			print_expressions(l_args);
-		      }
-		    MAP(EXPRESSION,exp,
-		    {
-		      list l_refs = expression_to_reference_list(exp, NIL);
-		      i++;
-		      MAP(REFERENCE,ref,
-		      {
-			entity var = reference_variable(ref);
-			if (same_entity_p(var,current_entity))
-			  {
-			    ubs_check fp = make_ubs_check(mod,make_integer_constant_entity(i));
-			    ifdebug(4)
-			      {
-				fprintf(stderr,"\nFound at %d-th argument:",i);
-				print_expression(exp);
-				fprintf(stderr,"\nAdd ubs (%s,%d)\n",entity_local_name(mod),i);
-			      }
-			    message_assert("ubs formal parameter is consistent",ubs_check_consistent_p(fp));
-			    l_ubs_checks = gen_nconc(CONS(UBS_CHECK,fp,NIL),l_ubs_checks);
-			    break;
-			  }
-		      },l_refs);
-		    },l_args);		
-		  }
+	      fprintf(stderr,"\nFound variable %s in the IN region list\n",entity_name(ent));
+	    if (approximation_must_p(app) && 
+	       (!variable_in_common_p(current_entity) || 
+	       (variable_in_common_p(current_entity) && 
+		common_variable_in_module_scope_p(current_entity,current_mod))))
+	      {	
+		/* MUST IN region and variable belonging to current module scope 
+		   (local, formal and visible global variable)*/
+		int order = statement_ordering(s);
+		ifdebug(3)
+		  fprintf(stderr,"\nMUST IN region, variable in module scope\n");
+		number_of_added_verifications++;
+		fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_mod),
+			ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
+		if (entity_scalar_p(ent))
+		  verify_scalar_variable(ent);
+		else
+		  verify_array_variable(ent,reg);
+		fprintf(out,"%s\n",PREFIX2);
+		return FALSE;
 	      }
-	    return TRUE;
+	    else 
+	      {
+		/* MAY IN region or common variable not in current module scope 
+		   If the current statement is elementary, we have to treat it, 
+		   else, we continue to go down with gen_recurse */
+		instruction i = statement_instruction(s);
+		tag t = instruction_tag(i); 
+		ifdebug(3)
+		  fprintf(stderr,"\nMAY IN region or common variable not in current module scope\n");
+		switch(t)
+		  {
+		  case is_instruction_call:
+		    {	
+		      call c = statement_call(s);
+		      verify_used_before_set_call(c,s);
+		      return FALSE;
+		    } 
+		  case is_instruction_whileloop:
+		    {
+		      whileloop wl = instruction_whileloop(i); 	
+		      expression e = whileloop_condition(wl);	
+		      verify_used_before_set_expression(e,s);
+		    }
+		  case is_instruction_test:
+		    {
+		      test it = instruction_test(i);
+		      expression e = test_condition(it);
+		      verify_used_before_set_expression(e,s);
+		    }
+		  case is_instruction_sequence: 
+		  case is_instruction_loop:
+		    // suppose that there are only MUST IN region in loop's range
+		  case is_instruction_unstructured:
+		    return TRUE;
+		  }  
+	      }
 	  }
       }
   },l_in_regions);
@@ -600,69 +771,6 @@ static void verify_formal_and_common_variables(entity ent,list l_callers)
       verify_used_before_set_statement();
       current_entity = entity_undefined;
     }
-}
-
-static void insert_type_declaration(entity ent)
-{
-  basic b = variable_basic(type_variable(entity_type(ent)));	
-  switch (basic_tag(b)) {
-  case is_basic_int:
-    fprintf(out2,"      INTEGER ");
-    break;
-  case is_basic_float:
-    switch (basic_float(b)){
-    case 4:
-      fprintf(out2,"      REAL*4 ");
-      break;
-    case 8:
-    default:
-      fprintf(out2,"      REAL*8 ");
-      break;
-    }
-    break;			
-  case is_basic_complex:
-    switch (basic_complex(b)) {
-    case 8:
-      fprintf(out2,"      COMPLEX*8 ");
-      break;
-    case 16:
-    default:
-      fprintf(out2,"      COMPLEX*16 ");
-      break;
-    }
-    break;
-  case is_basic_logical:
-    fprintf(out2,"      LOGICAL ");
-    break;
-  case is_basic_overloaded:
-    break; 
-  case is_basic_string:
-    {
-      value v = basic_string(b);
-      if (value_constant_p(v) && constant_int_p(value_constant(v)))
-	{
-	  int i = constant_int(value_constant(v));
-	  if (i==1)
-	    fprintf(out2,"      CHARACTER ");
-	  else
-	    fprintf(out2,"      CHARACTER*%d ",i);
-	}
-      else if (value_unknown_p(v))
-	fprintf(out2,"      CHARACTER*(*) ");
-      else if (value_symbolic_p(v))
-	{
-	  symbolic s = value_symbolic(v);
-	  fprintf(out2,"      CHARACTER*(%s) ",
-		  words_to_string(words_expression(symbolic_expression(s))));
-	}
-      else
-	pips_internal_error("unexpected value\n");
-      break;
-    }
-  default:
-    pips_internal_error("unexpected basic tag (%d)\n",basic_tag(b));
-  }  
-  fprintf(out2,"%s\n",words_to_string(words_declaration(ent,FALSE)));
 }
 
 /* This function prints a common variable with its numerical size, because
@@ -813,12 +921,8 @@ static void initialize_and_verify_common_variable(entity ent, region reg)
 	}
       else 
 	{
-	  /* ent is not in the main module scope, consider the list of modules where ent is 
-	     declared. To simplify the task, we take only those modules which are called by 
-	     the main program. If there exists one module which is the direct or indirect 
-	     caller of all other modules, we insert initialization in this module. 
-	     Otherwise, we insert the initialization in the main program with:
-	     Since there maybe variables in different common blocks with the same name => it is safe
+	  /* ent is not in the main module scope.
+	     Since there may be variables in different common blocks with the same name => it is safe
 	     to add CALL INITIALIZATION_COMMONNAME for each common block, then add in subroutine
 	     INITIALIZATION_COMMONNAME the common, type, parameter declaration + common variable 
 	     initializations */	
@@ -919,7 +1023,6 @@ bool used_before_set(char *module_name)
   /* File instrument.out is used to store ubs checks*/
   string dir_name = db_get_current_workspace_directory();
   string instrument_file = strdup(concatenate(dir_name, "/instrument.out", 0));
-  free(dir_name), dir_name = NULL;
   out = safe_fopen(instrument_file, "a");  
   file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), 
 				 "/",base_name,0));
@@ -946,11 +1049,15 @@ bool used_before_set(char *module_name)
       pips_debug(2,"List of IN regions of module %s:",module_name);
       print_inout_regions(l_in_regions);
     }
+  fprintf(out,"%s\t%s\t%s\t(0,1)\n",PREFIX1,file_name,module_name);
+  fprintf(out,"      EXTERNAL ir_isnan,id_isnan\n");
+  fprintf(out,"      LOGICAL*4 ir_isnan,id_isnan\n");
+  fprintf(out,"%s\n",PREFIX2);
   if (entity_main_module_p(current_mod))
     {
-      string dir_name2 = db_get_current_workspace_directory();
-      initialization_file = strdup(concatenate(dir_name2, "/Src/initialization.f", 0));
-      free(dir_name2), dir_name2 = NULL;
+      /* File xxx.database/Src/initialization.f contains all the initializations of 
+	 global variables */
+      initialization_file = strdup(concatenate(dir_name, "/Src/initialization.f", 0));
       out2 = safe_fopen(initialization_file, "a");  
       MAP(REGION,reg,
       {
@@ -994,13 +1101,14 @@ bool used_before_set(char *module_name)
       },l_in_regions); 
     }
   module_ubs = make_ubs(l_ubs_checks);
-  message_assert("module ubs is consistent",ubs_consistent_p(module_ubs));
+  //  message_assert("module ubs is consistent",ubs_consistent_p(module_ubs));
   /* save to resource */
   DB_PUT_MEMORY_RESOURCE(DBR_UBS,module_name,copy_ubs(module_ubs));  
   display_used_before_set_statistics();
   debug_off(); 
   safe_fclose(out,instrument_file);
   free(instrument_file), instrument_file = NULL;
+  free(dir_name), dir_name = NULL;
   current_mod = entity_undefined;
   reset_ordering_to_statement();
   regions_end();
