@@ -498,6 +498,7 @@ effect regions_must_convex_hull(region r1, region r2)
     {
 	sr = region_sc_convex_hull(s1, s2);
 	sc_nredund(&sr);
+	UNCATCH(overflow_error);
     }
 
     /* to avoid problems in case of overflow error */
@@ -929,6 +930,7 @@ region_intersection(region reg1, region reg2)
     {    
 	 feasible = sc_integer_feasibility_ofl_ctrl(region_system(reg), 
 						    FWD_OFL_CTRL, TRUE);
+	 UNCATCH(overflow_error);
     }
 
     if (feasible)
@@ -1061,6 +1063,7 @@ list region_sup_difference(region reg1, region reg2)
 	    disjonction = sc_difference(sc1,sc2);
 	    l_reg = disjunction_to_list_of_regions
 		(disjonction, reg1, app, SUPER);
+	    UNCATCH(overflow_error);
 	}
 
 	if (op_statistics_p() && app == is_approximation_must &&
@@ -1090,6 +1093,7 @@ list region_sup_difference(region reg1, region reg2)
 	    }
 	    else 
 		app = is_approximation_may;
+	    UNCATCH(overflow_error);
 	}
 	reg = region_dup(reg1);
 	approximation_tag(effect_approximation(reg)) = app;
@@ -1177,6 +1181,7 @@ list region_inf_difference(region reg1, region reg2)
 	Pdisjunct disjonction;
 	disjonction = sc_difference(sc1,sc2);
 	l_res = disjunction_to_list_of_regions(disjonction, reg1, app, SUPER);
+	UNCATCH(overflow_error);
     }    
 
     if (op_statistics_p() && !ENDP(l_res))
