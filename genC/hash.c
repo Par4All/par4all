@@ -497,7 +497,7 @@ static unsigned int hash_string_rank(void * key, int size)
   char * s;
   
   for (s = (char*) key; *s; s++)
-    /* FC: */ v = ((v<<5) | (v>>27)) ^ *s;
+    /* FC: */ v = ((v<<7) | (v>>25)) ^ *s;
     /* GO: v <<= 2, v += *s; */
 
   return v % size;
@@ -590,6 +590,7 @@ hash_find_entry(hash_table htp,
      * FC rationnal: if r_init is perfect, 1 is fine...
      *    if it is not perfect, let us randmize here some more...
      *    I'm not sure the result is any better than 1???
+     *    It does seems to help significantly on some examples...
      */
     r_inc  = inc_prime_list[ RANK(r_init, HASH_INC_SIZE) ] ;
   hash_entry he;
