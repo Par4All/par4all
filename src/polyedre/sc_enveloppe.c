@@ -117,12 +117,6 @@ int ofl_ctrl;
 
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
 
-    ifscdebug(1) {
-	fprintf(stderr, "[sc_enveloppe_chernikova_ofl_ctrl] considering:\n");
-	sc_default_dump(s1);
-	sc_default_dump(s2);
-    }
-
     switch (ofl_ctrl) 
     {
     case OFL_CTRL :
