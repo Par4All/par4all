@@ -572,33 +572,12 @@ static void (*find_handler(char* line))(char *)
 
 /*************************************************************** DO THE JOB */
 
-/* returns an allocated string up to \n or EOF from f
- * returns NULL on EOF as readline.
- */
-static char * tpips_readline(FILE *f)
-{
-    int c, index = 0, size = 20;
-    char * line = (char*) malloc(size);
-    if (!line) pips_exit(1, "memory exhausted\n");
-
-    while ((c=getc(f)), c!=EOF && c!='\n') 
-    {
-	if (index+1>=size) size*=2, line = (char*) realloc(line, size);
-	if (!line) pips_exit(1, "memory exhausted\n");
-	line[index++] = (char) c;
-    }
-
-    if (c==EOF && index==0) { free(line); return NULL; }
-
-    line[index++] = '\0';
-    return line;
-}
-
 /* returns the next line from the input, interactive of file...
+ * the final \n does not appear.
  */
 static char * get_next_line(char * prompt)
 {
-    return use_readline? readline(prompt): tpips_readline(current_file);
+    return use_readline? readline(prompt): safe_readline(current_file);
 }
 
 /* returns an allocated line read, including continuations.
