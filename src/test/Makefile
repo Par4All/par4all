@@ -40,7 +40,7 @@ test_reserv: reserv
 
 clean: 
 	$(RM) hash_test reserv spec.h lieu.h lieu.spec newres.h newres.spec \
-		sortie sortie[234] core
+		sortie sortie[234] core *~
 
 #
 # That is all
