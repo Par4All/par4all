@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.238 2003/12/18 21:41:31 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.239 2003/12/22 15:02:23 nguyen Exp $";
 #endif /* lint */
 
  /*
@@ -1055,7 +1055,10 @@ words_prefix_unary_op(call obj, int precedence, bool leftmost)
 	fun = "--";
       else
 	if (strcmp(fun,"*indirection") == 0) 
-	  fun = "*";
+	  /* Since we put no spaces around an operator (to not change Fortran), the blank 
+	     before '*' is used to avoid the confusion in the case of divide operator, i.e 
+	     d1 = 1.0 / *det  in function inv_j, SPEC2000 quake benchmark. */
+	  fun = " *";
 	else
 	 if (strcmp(fun,"+unary") == 0) 
 	    fun = "+";
@@ -1373,6 +1376,25 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     return(pc);
 }
 
+/* Nga Nguyen : this case is added for comma expression in C, but I am not sure about its precedence
+   => to look more carefully */
+
+static list words_comma_op(call obj, int precedence, bool leftmost)
+{
+  list pc = NIL, args = call_arguments(obj);
+  int prec = words_intrinsic_precedence(obj);
+  
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
+  while (!ENDP(CDR(args)))
+  {
+    pc = CHAIN_SWORD(pc,",");
+    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
+    args = CDR(args);
+  }
+  return(pc);
+}
+
+
 /* precedence needed here
  * According to the Precedence of Operators 
  * Arithmetic > Character > Relational > Logical
@@ -1514,6 +1536,9 @@ multiply-add operators ( JZ - sept 98) */
     {"&=", words_assign_op, 1 },
     {"^=", words_assign_op, 1 },
     {"|=", words_assign_op, 1 },
+
+    {",", words_comma_op, 0},
+ 
     {NULL, null, 0}
 };
 
@@ -2759,7 +2784,7 @@ text_named_module(
 	    ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
 	  
 	  ADD_SENTENCE_TO_TEXT(r, 
-			       attach_head_to_sentence(sentence_head(name), module));
+			       attach_head_to_sentence(sentence_head(name,TRUE), module));
 	  
 	  if (head_hook) 
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
@@ -2787,7 +2812,7 @@ text_named_module(
       if (!compilation_unit_p(entity_name(name)))
 	{
 	  /* Print function header if the current module is not a compilation unit*/
-	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name), module)); 
+	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name,TRUE), module)); 
 	  ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(0,"{"));
 	}
     }
@@ -2998,7 +3023,9 @@ static list words_application(application a)
   expression f = application_function(a);
   list lexp = application_arguments(a);
   bool first = TRUE;
+  pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, words_expression(f));
+  pc = CHAIN_SWORD(pc,")");
   pc = CHAIN_SWORD(pc,"(");
   MAP(EXPRESSION,exp,
   {
