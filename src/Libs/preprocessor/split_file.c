@@ -23,6 +23,9 @@
  * - bang comment management added (to avoid the parser)
  *
  * $Log: split_file.c,v $
+ * Revision 1.37  1998/07/09 18:24:18  coelho
+ * hack for entry: output file names are preceded by their modules...
+ *
  * Revision 1.36  1998/05/29 16:22:27  coelho
  * handler for simply processing files.
  *
@@ -133,8 +136,7 @@ static int saveit(char * name)
     return 1;
 }
 
-static char * 
-full_name(char * dir, char * name)
+static char * full_name(char * dir, char * name)
 {
     char * full = (char*) malloc(sizeof(char)*(strlen(dir)+strlen(name)+2));
     sprintf(full, "%s/%s", dir, name);
@@ -272,6 +274,7 @@ char *s;
 	*iptr = '\n';
 
 	if ((ptr = look(line, "subroutine")) != 0 ||
+	    (ptr = look(line, "entry")) != 0 ||
 	    (ptr = look(line, "function")) != 0 ||
 	    (ptr = functs(line)) != 0) {
 	    if(scan_name(s, ptr)) return(1);
@@ -382,6 +385,11 @@ char *s, *m;
 	return (sp);
 }
 
+static void put_upper_till_dot_or_end(char * what, FILE * where)
+{
+    while (*what && *what!='.') putc(toupper(*what++), where);
+}
+
 static void print_name(FILE * o, char * name, int n, int upper) /* FC */
 {
     name = name + strlen(name) - n - 2;
@@ -394,15 +402,15 @@ static void print_name(FILE * o, char * name, int n, int upper) /* FC */
   if (mainp) free(mainp), mainp = NULL;			\
   if (blkp) free(blkp), blkp = NULL;
 
-int 
-fsplit(char * dir_name, char * file_name, FILE * out)
+int fsplit(char * dir_name, char * file_name, FILE * out)
 {
     register FILE *ofp;	/* output file */
     register int rv;	/* 1 if got card in output file, 0 otherwise */
     int nflag,		/* 1 if got name of subprog., 0 otherwise */
-	retval;
+	retval, someentry, newname;
    /* ??? 20 -> 80 because not checked... smaller than a line is ok ? FC */
     char name[80]; 
+    char tmpname[80];
 
     /* MALLOC STRINGS 
      */
@@ -417,6 +425,7 @@ fsplit(char * dir_name, char * file_name, FILE * out)
     }
 
     for(;;) {
+
 	/* look for a temp file that doesn't correspond to an existing file */
 	get_name(x);
 	ofp = fopen(x, "w");
@@ -425,15 +434,22 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 	    fprintf(stderr, "fopen(\"%s\", ...) failed\n", x);
 	    abort();
 	}
+
 	nflag = 0;
 	rv = 0;
-	while (getline() > 0) {
+	newname = 0;
+	someentry = 0;
+
+	while (getline() > 0)
+	{
 	    hollerith_and_bangcomments(buf); /* FC */
+
 	    if (nflag == 0) /* if no name yet, try and find one */
-		nflag = lname(name);
+		nflag = lname(name), newname=nflag;
+	    else /* FC: some hack to deal with entry... */
+		someentry = lname(tmpname), newname=someentry;
 
 	    if (it_is_a_main) {
-		char * c = name;
 		FILE * fm = fopen(main_list, "a");
 		if (fm==NULL) {
 		    fprintf(stderr, "fopen(\"%s\", ...) failed\n", main_list);
@@ -442,7 +458,7 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 		if (implicit_program_name==1 || implicit_program==1)
 		    print_name(fm, name, 7, 1);
 		else
-		    while (*c && *c!='.') putc(toupper(*c++), fm);
+		    put_upper_till_dot_or_end(name, fm);
 		putc('\n', fm);
 		fclose(fm);
 		it_is_a_main = 0;
@@ -472,11 +488,25 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 	    else
 		fprintf(ofp, "%s", buf);
 
+	    /* a new module name is appended to the current line... */
+	    if (newname)
+	    {
+		if ((someentry && tmpname[0]) || (!someentry && name[0]))
+		{
+		    put_upper_till_dot_or_end(someentry? tmpname: name, out);
+		    putc(' ', out);
+		}
+		newname = 0;
+		someentry = 0;
+		tmpname[0] = '\0';
+	    }
+
 	    rv = 1;
 
 	    if (lend())		/* look for an 'end' statement */
 		break;
-	}
+	} /* while */
+	
 	if (fclose(ofp)) {
 	    fprintf(stderr, "fclose(ofp) failed\n");
 	    exit(2);
@@ -490,17 +520,18 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 	    }
 	    FREE_STRINGS; return ( retval );
 	}
-	if (nflag) {			/* rename the file */
+	if (nflag)			/* rename the file */
+	{
 	    if(saveit(name)) 
 	    {
-		if (strncmp(dir_name, name,strlen(dir_name))!=0) 
+		if (strncmp(dir_name, name, strlen(dir_name))!=0) 
 		{
 		    char * full = full_name(dir_name, name);
 		    strcpy(name, full);
 		    free(full);
 		}
 		if (strcmp(name, x) == 0) {
-		    printf("%s\n", x);
+		    printf(/* out? */ "%s\n", x);
 		}
 		else if (stat(name, &sbuf) < 0 ) 
 		{
@@ -511,12 +542,13 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 		else 
 		    printf("%s already exists, put in %s\n", name, x);
 		continue;
-	    } else
+	    } 
+	    else
 		unlink(x);
 	    continue;
-        }
+	}
 	fprintf(out, "%s\n", x);
-    }
+    } /* for(;;) */
 
     if (fclose(ifp)) {
 	fprintf(stderr, "fclose(ifp) failed\n");
