@@ -37,9 +37,9 @@ extern int  simplex_arithmetic_error;
 #endif
 
 #define exception_debug_push(what) \
-  exception_debug("PUSH", global_exception_index, what)
+  exception_debug("PUSH ", global_exception_index, what)
 #define exception_debug_pop(what) \
-  exception_debug("POP", global_exception_index-1, what)
+  exception_debug("POP  ", global_exception_index-1, what)
 #define exception_debug_throw(what) \
   exception_debug("THROW", global_exception_index-1, what)
 
