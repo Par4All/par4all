@@ -11,6 +11,7 @@
 
 #include "constants.h"
 #include "misc.h"
+#include "ri.h"
 #include "top-level.h"
 #include "database.h"
 #include "pipsdbm.h"
@@ -56,6 +57,9 @@ Menu_item menu_item;
 	else if (strcmp(label, SUPPRESS_DEAD_CODE_TRANSFORM) == 0) {
 	    safe_apply(BUILDER_SUPPRESS_DEAD_CODE, modulename);
 	}
+	else if (strcmp(label, ATOMIZER_TRANSFORM) == 0) {
+	    safe_apply(BUILDER_ATOMIZER, modulename);
+	}
 	else if (strcmp(label, REDUCTIONS_TRANSFORM) == 0) {
 	    safe_apply(BUILDER_REDUCTIONS, modulename);
 	}
@@ -78,6 +82,7 @@ void create_transform_menu()
 		     MENU_ACTION_ITEM, STRIP_MINE_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, LOOP_INTERCHANGE_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, SUPPRESS_DEAD_CODE_TRANSFORM, transform_notify,
+		     MENU_ACTION_ITEM, ATOMIZER_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, REDUCTIONS_TRANSFORM, transform_notify,
 		     NULL);
 
