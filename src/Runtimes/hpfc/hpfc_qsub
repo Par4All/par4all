@@ -1,11 +1,11 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_qsub,v $ (version $Revision$)
-# $Date: 1997/01/16 18:28:32 $, 
+# $Date: 1997/01/16 19:22:55 $, 
 #
 # output a description file for qsub.
 
-npes=`sed -n 's,      parameter(REALMAXSIZEOFPROCS = \(.*\)),\1,p' 
+npes=`sed -n 's,      parameter(REALMAXSIZEOFPROCS = \(.*\)),\1,p' \
 	global_parameters.h`
 npes=`expr $npes + 1`
 
