@@ -1,5 +1,8 @@
 /* $id$
    $Log: c_parser.c,v $
+   Revision 1.7  2004/02/18 10:32:18  nguyen
+   Remove c_parser_tmp
+
    Revision 1.6  2003/12/05 17:16:21  nguyen
    Initialize and free global stacks
 
@@ -41,6 +44,7 @@
 #include "makefile.h"
 
 #include "pipsdbm.h"
+#include "pipsmake.h"
 
 /* To avoid warnings */
 extern char *strdup(const char *s1);
@@ -221,11 +225,6 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 bool c_parser(string module_name)
 {
   return actual_c_parser(module_name,DBR_C_SOURCE_FILE,FALSE);
-}
-
-bool c_parser_tmp(string module_name)
-{
-  return actual_c_parser(module_name,DBR_SOURCE_FILE,FALSE);
 }
 
 bool compilation_unit_parser(string module_name)
