@@ -128,7 +128,23 @@ char *print_type;
 	/* should be show_message */
 	user_log("No current module; select a module\n");
     }
-return NULL;
+    return NULL;
+}
+
+char *get_dont_build_view_file(print_type)
+char *print_type;
+{
+    char *module_name = db_get_current_module_name();
+
+    if(module_name != NULL) {
+	char * file_name = db_get_file_resource(print_type, module_name, TRUE);
+	return file_name;
+    }
+    else {
+	/* should be show_message */
+	user_log("No current module; select a module\n");
+    }
+    return NULL;
 }
 
 
