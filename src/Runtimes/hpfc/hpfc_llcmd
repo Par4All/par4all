@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_llcmd,v $ ($Revision$)
-# ($Date: 1995/09/26 17:52:12 $, )
+# ($Date: 1996/12/27 14:42:36 $, )
 #
 # generation of a command file for loadleveler. 
 #
@@ -46,7 +46,7 @@ shift `expr $OPTIND - 1`
 #
 # default number of processors
 nproc=`sed -n 's,      parameter(REALMAXSIZEOFPROCS = \([0-9]*\)),\1,p' \
-    real_parameters.h`
+    global_parameters.h`
 nproc=`expr $nproc + 1`
 
 #
