@@ -4,6 +4,7 @@
 #include <setjmp.h>
 
 #include "genC.h"       /* chunk is defined there, chunk was used by ri.h  */
+#include "linear.h"
 #include "ri.h"         /* used by ri-util.h */
 #include "complexity_ri.h" /* useful, because PPOLYNOME is defined there */
 #include "resources.h"  /* useful, because make is called directly by main */
