@@ -22,13 +22,15 @@ solpip_scan.o : solpip_scan.c solpip_parse.h
 
 solpip_parse.c solpip_parse.h : solpip_parse.y
 	${YACC} -d solpip_parse.y
-	sed -e '/extern char \*malloc/d;s/YY/QUAYY/g;s/yy/quayy/g' y.tab.c > solpip_parse.c
+	sed -e '/extern char \*malloc/d;s/YY/QUAYY/g;s/yy/quayy/g' \
+		y.tab.c > solpip_parse.c
 	rm y.tab.c
 	sed -e 's/YY/QUAYY/g;s/yy/quayy/g' y.tab.h > solpip_parse.h
 	rm y.tab.h
 
 solpip_scan.c : solpip_scan.l
 	${LEX} solpip_scan.l
-	sed -e 's/YY/QUAYY/g;s/yy/quayy/g' lex.yy.c > solpip_scan.c
+	sed '/^FILE* yyin/s/=[^,;]*//g;s/YY/QUAYY/g;s/yy/quayy/g;' \
+		lex.yy.c > solpip_scan.c
 	rm lex.yy.c
 
