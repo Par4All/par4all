@@ -40,6 +40,8 @@
 #undef abs
 #endif
 
+static int line = 1; /* position in pseudo-file... */
+
 %}
 
 DIG [0-9]
@@ -221,7 +223,7 @@ DCON (({MANT}|{UICON}){DEXP}?)
 				pips_debug(9, "TK_CONCAT\n");
 				return(TK_CONCAT);
 			}
-\n			{
+\n			{       line++;    
 				pips_debug(9, "TK_EOS\n");
 				return(TK_EOS);
 			}
@@ -234,13 +236,26 @@ DCON (({MANT}|{UICON}){DEXP}?)
 			}
 %%
 
-void yyerror_lex_part(char *s)
+void yyerror(char * msg)
 {
-    user_warning("parser","lexical error - %s near %s\n", s, yytext);
+    int c;
+
+    pips_user_warning("Syntax error - %s line $d near %s\n", 
+		      msg, line, yytext);
+
+    /* what does it mean? */
+    pips_user_warning("Non analyzed source text stored in logfile\n");
+    
+    while ((c = getc(yyin)) != EOF)
+	putc(c, stderr);
+	
+    /* pas de recouvrement d'erreurs */
+    ParserError("yyerror", "Syntax error\n");
 }
 
 void yyreset_lex(void)
 {
+    line = 1;
 #ifdef FLEX_SCANNER
     yyrestart(yyin);
 #else
