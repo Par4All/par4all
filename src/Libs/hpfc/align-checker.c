@@ -8,7 +8,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1996/06/08 17:41:13 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1996/06/15 19:15:29 $, )
  * version $Revision$
  */
 
@@ -26,7 +26,7 @@ write_on_entity_p(
 {
     MAP(REGION, r,
 	if (region_entity(r)==e && region_write_p(r)) return TRUE,
-	load_statement_local_regions(hpfc_current_statement));
+	load_statement_local_regions(get_hpfc_current_statement()));
 
     return FALSE;
 }
