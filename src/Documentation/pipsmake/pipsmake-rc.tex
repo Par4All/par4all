@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.21  2003/07/30 15:38:02  irigoin
+%% Temporary debug version for c_parser
+%%
 %% Revision 1.20  2003/07/30 14:41:24  irigoin
 %% Phase/rule c_initializer added. Resource c_source_code added.
 %%
@@ -542,7 +545,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/07/30 14:41:24 $~$
+$~$Date: 2003/07/30 15:38:02 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1173,6 +1176,14 @@ c_parser                        > MODULE.parsed_code
                                 > MODULE.callees
         < PROGRAM.entities
         < MODULE.c_source_file
+\end{verbatim}
+
+To allow Nga and Francois to debug their parts (quite) independently:
+\begin{verbatim}
+c_parser_tmp                        > MODULE.parsed_code
+                                > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.source_file
 \end{verbatim}
 
 \subsection{Controlized Code}
