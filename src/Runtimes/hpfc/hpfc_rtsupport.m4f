@@ -3,7 +3,7 @@ c Runtime Support Functions for the High Performance Fortran Compiler
 c by Fabien COELHO.
 c
 c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-c ($Date: 1996/03/11 17:11:00 $, )
+c ($Date: 1996/03/14 11:12:46 $, )
 c
 c-----------------
 c
@@ -968,6 +968,15 @@ c
       enddo
       debug(write (unit=0,fmt=*) "lid: ", MYLID, " tid: ", MYTID)
 
+c
+c 1 sends node version key to host
+c
+      if (MYLID.eq.1) then
+         call pvmfinitsend(PVMRAW, info)
+         call pvmfpack(STRING, hpfc_key, len(hpfc_key), 1, info)
+         call pvmfsend(HOSTTID, 1, info)
+      endif
+
 _CM5(
 c
 c cm5 related id initializations
@@ -1072,8 +1081,8 @@ c
       _CM5(include "cmmd_fort.h")
       include "fpvm3.h"
       include "hpfc_commons.h"
-      integer bufid, info, inum
-      _CM5(integer i)
+      integer bufid, info, inum, length, i
+      character*64 node_key
 
       call HPFC_CHECK
 
@@ -1124,6 +1133,21 @@ c
 
       call HPFC_INIT_COMMON_PROCS
       call HPFC_INIT_COMMON_BUFFER
+c
+c check version of host and node
+c
+      call pvmfrecv(NODETIDS(1), 1, bufid)
+      call pvmfunpack(STRING, node_key, len(hpfc_key), 1, info)
+      if (node_key.ne.hpfc_key) then
+         print *, "*** incompatible version keys!"
+         print *, "*** host: ", hpfc_key
+         print *, "*** node: ", node_key
+         do i=1, NBOFTASKS
+            call pvmfkill(NODETIDS(i), info)
+         enddo
+         call pvmfexit(info)
+         stop
+      endif
 
 _CM5(
 c
