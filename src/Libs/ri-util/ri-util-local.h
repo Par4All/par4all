@@ -219,5 +219,15 @@ enum remove_a_control_from_a_list_and_relink_direction
 typedef enum remove_a_control_from_a_list_and_relink_direction
 remove_a_control_from_a_list_and_relink_direction;
 
+#define PRIME_LETTER_FOR_VARIABLES	"p"
+
+/* define to build the _dummy and _prime of a variable.
+ */
+#define GET_DUMMY_VARIABLE_ENTITY(MODULE, NAME, lname)\
+entity get_ith_##lname##_dummy(int i)\
+    {return(get_ith_dummy(MODULE, NAME, i));}\
+entity get_ith_##lname##_prime(int i)\
+    {return(get_ith_dummy(MODULE, NAME PRIME_LETTER_FOR_VARIABLES, i));}
+
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
