@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.41  2001/07/19 12:03:31  irigoin
+ * Improvement in string_type_size()
+ *
  * Revision 1.40  2001/07/03 15:28:04  irigoin
  * Bug fix in basic_union(), introduction of basic_maximum(), bug fix in basic_of_intrinsic(),...
  *
@@ -498,11 +501,16 @@ string_type_size(basic b)
       c = value_constant(v);
       if(constant_int_p(c))
 	size = constant_int(c);
-      else
-	pips_error("string_size_type", "Non-integer constant to size a string");
+      else 
+	pips_internal_error("Non-integer constant to size a string\n");
+      break;
+    case is_value_unknown:
+      /* The size may be unknown as in CHARACTER*(*) */
+      /* No way to check it really was a '*'? */
+	size = -1;
       break;
     default:
-	pips_error("string_size_type", "Non-constant value to size a string");
+	pips_internal_error("Non-constant value to size a string\n");
     }
 
     return size;
