@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.5  1997/05/14 15:19:50  zory
+! Insert hpfc init, send, recv, pack, unpack (only in pvm)
+!
 ! Revision 1.4  1997/05/02 16:35:59  coelho
 ! global; buffer id shared with latter unpacking.
 !
@@ -13,6 +16,76 @@
 ! communication routines used by the compiler... could abstract both
 ! pvm and mpi, maybe. The pvm model (separate init/pack/send) is kept.
 !
+
+!
+! Terminate the current task 
+!
+
+      subroutine HPFC TERMINATE TASK
+      include "hpfc_commons.h"
+      integer info
+      debug(print *, "hpfc terminate task")
+      call pvmfexit(info)
+      end
+
+
+!
+! Initialize the current buffer
+!
+      subroutine HPFC INIT SEND
+      include "hpfc_commons.h"
+      integer bufid
+      debug(print *, "initializing current buffer")
+      call pvmfinitsend(PVMRAW, bufid)
+      debug(print *, "current buffer initialized")
+      end 
+
+!
+! Packing count value in the current buffer...
+!
+      subroutine HPFC PACK(what, value, count, stride, info) 
+      include "hpfc_commons.h"
+      integer what, value, count, tag, stride, info
+      debug(print *, "packing count values")
+      call pvmfpack(what, value, count, stride, info)
+      debug(print *, "value packed")
+      end
+
+
+!
+! Sending the current buffer to dest...
+!
+      subroutine HPFC SEND(dest, tag, info)
+      include "hpfc_commons.h"
+      integer dest, tag, info
+      debug(print *, "sending message")
+      call pvmfsend(dest, tag, info)
+      debug(print *, "message sent")
+      end
+
+
+!
+! Unpacking count value from the current buffer
+!
+      subroutine HPFC UNPACK(what, value, count, stride, info) 
+      include "hpfc_commons.h"
+      integer what, value, count, tag, stride, info
+      debug(print *, "unpacking count values")
+      call pvmfunpack(what, value, count, stride, info)
+      debug(print *, "value unpacked")
+      end
+
+!
+! Receiving a message from source
+! 
+      subroutine HPFC RECEIVE(source, tag, bufid)
+      include "hpfc_commons.h"
+      integer source, tag, bufid
+      debug(print *, "receiving a message")
+      call pvmfrecv(source, tag, bufid)
+      debug(print *, "message received")
+      end
+
 !
 ! The host send a message to every node.
 !
