@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.14  1998/05/28 19:05:47  irigoin
+ * Filtering by effects added to avoid spurious variables as in Spec/fppp.f
+ * and data02.f
+ *
  * Revision 1.13  1998/04/14 21:25:21  coelho
  * linear.h
  *
@@ -42,6 +46,19 @@
  *
  * Computation of initial transformers that allow to collect
  * global initializations of BLOCK DATA and so.
+ *
+ * This computation is not safe because pipsmake does not provide a real
+ * link-edit. The set of modules called $ALL may contain modules which
+ * are never called by the main.
+ *
+ * The initial precondition of each module must be filtered with respect
+ * to the effects of the MAIN in order to eliminate information about
+ * unused variables.
+ *
+ * The filtering cannot be performed at the module level because some
+ * modules such as BLOCKDATA do not have any proper effects and because
+ * a module can initialize a variable in a common without using it.
+ *
  */
 
 #include <stdio.h>
@@ -102,7 +119,7 @@ bool
 initial_precondition(string name)
 {
     entity module = local_name_to_top_level_entity(name);
-    transformer t;
+    transformer prec;
 
     debug_on("SEMANTICS_DEBUG_LEVEL");
 
@@ -113,13 +130,18 @@ initial_precondition(string name)
 		   db_get_memory_resource(DBR_CUMULATED_EFFECTS, name, TRUE));
     module_to_value_mappings(module);
 
-    t = all_data_to_precondition(module);
+    prec = all_data_to_precondition(module);
 
     ifdebug(1) 
-	pips_assert("consistent initial precondition", 
-		    transformer_consistency_p(t));
+	pips_assert("consistent initial precondition before filtering", 
+		    transformer_consistency_p(prec));
 
-    DB_PUT_MEMORY_RESOURCE(DBR_INITIAL_PRECONDITION, strdup(name), (char*) t);
+    /* Filter out local and unused variables from the local precondition?
+     * No, because it is not possible to guess what is used or unused at
+     * the program level. Filtering is postponed to program_precondition().
+     */
+
+    DB_PUT_MEMORY_RESOURCE(DBR_INITIAL_PRECONDITION, strdup(name), (char*) prec);
 
     reset_current_module_entity();
     reset_current_module_statement();
@@ -155,6 +177,7 @@ program_precondition(string name)
     entity the_main = get_main_entity();
     int i, nmodules;
     gen_array_t modules;
+    list e_inter = NIL;
 
     pips_assert("main was found", the_main!=entity_undefined);
 
@@ -164,15 +187,26 @@ program_precondition(string name)
 
     set_current_module_entity(the_main);
     set_current_module_statement( (statement) 
-	db_get_memory_resource(DBR_CODE,
-			       module_local_name(the_main),
-			       TRUE));
+				  db_get_memory_resource(DBR_CODE,
+							 module_local_name(the_main),
+							 TRUE));
     set_cumulated_rw_effects((statement_effects) 
-		   db_get_memory_resource(DBR_CUMULATED_EFFECTS,
-					  module_local_name(the_main),
-					  TRUE));
+			     db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+						    module_local_name(the_main),
+						    TRUE));
+
+    /* e_inter = effects_to_list(get_cumulated_rw_effects(get_current_module_statement())); */
+
+    e_inter = effects_to_list( (effects)
+			       db_get_memory_resource(DBR_SUMMARY_EFFECTS,
+						      module_local_name(the_main),
+						      TRUE));
+
     module_to_value_mappings(the_main);
     
+    /* Unavoidable pitfall: initializations in uncalled modules may be
+     * taken into account. It all depends on the "create" command.
+     */
     modules = db_get_module_list();
     nmodules = gen_array_nitems(modules);
     pips_assert("some modules in the program", nmodules>0);
@@ -184,13 +218,22 @@ program_precondition(string name)
 	pips_debug(1, "considering module %s\n", mname);
 	
 	tm = transformer_dup((transformer) /* no dup & FALSE => core */
-	    db_get_memory_resource(DBR_INITIAL_PRECONDITION,  
-				   mname, TRUE));
+			     db_get_memory_resource(DBR_INITIAL_PRECONDITION,  
+						    mname, TRUE));
 
 	pred_debug(3, "current: t =\n", t);
 	pred_debug(2, "to be added: tm =\n", tm);
 	translate_global_values(the_main, tm); /* modifies tm! */
 	pred_debug(3, "to be added after translation:\n", tm);
+	tm = transformer_intra_to_inter(tm, e_inter);
+	/* tm = transformer_normalize(tm, 2); */
+	if(!transformer_consistency_p(tm)) {
+	    (void) print_transformer(tm);
+	    pips_error("program_precondition",
+		       "Non-consistent filtered initial precondition\n");
+	}
+	pred_debug(3, "to be added after filtering:\n", tm);
+
 	intersect(t, tm); 
 	free_transformer(tm);
     }
