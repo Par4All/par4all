@@ -1656,6 +1656,7 @@ typing_buffer_inout(call c, type_context_p context)
 static basic
 typing_implied_do(call c, type_context_p context)
 {
+  basic b_int;
   int count = 0;
 
   MAP(EXPRESSION, e,
@@ -1664,6 +1665,7 @@ typing_implied_do(call c, type_context_p context)
     switch (count)
     {
     case 1:
+      b_int = GET_TYPE(context->types, e);
       if( !basic_int_p(GET_TYPE(context->types, e)) ||
 	  !syntax_reference_p(expression_syntax(e)) )
       {
@@ -1694,7 +1696,7 @@ typing_implied_do(call c, type_context_p context)
 	}
 	else
 	{
-	  type_loop_range(GET_TYPE(context->types, e), r, context);
+	  type_loop_range(b_int, r, context);
 	}
       }
       return basic_undefined;
