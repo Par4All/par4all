@@ -1,0 +1,126 @@
+<html>
+
+<head><title>PIPS: Tpips</title></head>
+
+<body>
+
+<H1><IMG SRC=logo-pips.small.gif> Tpips: command line interpreter</H1>
+
+<HR>
+
+<H2>Contents</H2>
+
+<UL>
+	<LI> <A HREF="#INTRO">1) Introduction</A>
+	<LI> <A HREF="#GRAMMAR">2) Language</A>
+	<LI> <A HREF="#CONCLUSION">3) Conclusion</A>
+</UL>
+
+<HR>
+
+<H2><A NAME="INTRO">1) Introduction</A></H2>
+
+<b>Tpips</b> is a command line interpreter for <a href="/~pips"
+><b>PIPS</b></a>. It allows the user to send elemtary orders to <a
+href="/~pips" ><b>PIPS</b></a>. Using <b>Tpips</b> is more accurate
+than using the convienient scripts like <b>Init</b>, <b>Perform</b>,
+<b>Display</b>, <b>Select</b> or <b>Delete</b>, because it does not
+close the workspace on which you work after each command. Though it is
+quite similar to wpips work.<p>
+
+By processing a logfile from <b>Wpips</b>, it is possible to get the
+corresponding <b>Tpips</b> script. It makes <b>Wpips</b> - and
+<b>Tpips</b> - validation easier.
+
+<HR>
+
+<H2><A NAME="GRAMMAR">2) Language</A></H2>
+
+The allowed instructions and their parameters are the following :<br>
+
+<UL>
+	<LI> <b>create</b> <i>&lt;workspace-name&gt;</i>
+<i>&lt;file-name&gt;...</i><br>
+	creates and opens a new workspace from a specified source file
+
+	<LI> <b>open</b> <i>&lt;workspace-name&gt;</i><br>
+	opens an existing workspace
+
+	<LI> <b>close</b> <i>&lt;workspace-name&gt;</i><br>
+	closes an opened workspace
+
+	<LI> <b>delete</b> <i>&lt;workspace-name&gt;</i><br>
+	deletes a closed workspace
+
+	<LI> <b>module</b> <i>&lt;module-name&gt;</i><br>
+	specifies the default module
+
+	<LI> <b>activate</b> <i>&lt;rule-name&gt;</i><br>
+	activates a rule for generating resources
+
+	<LI> <b>make</b> <i>&lt;resource-descriptor&gt;</i><br>
+	makes a resource according to active rules
+
+	<LI> <b>apply</b> <i>&lt;rule-descriptor&gt;</i><br>
+	applies a specified rule using other active rules
+
+	<LI> <b>display</b> <i>&lt;resource-descriptor&gt;</i><br>
+	makes a printable resource and prints it out
+
+</UL>
+
+The parameters have the following syntax :<br>
+
+<UL>
+	<LI> <b><i>&lt;file-name&gt;</i></b> : Unix path and file name
+	<LI> <b><i>&lt;workspace-name&gt;</i></b>: Unix file name - no
+path
+	<LI> <b><i>&lt;module-name&gt;</i></b> : Fortran function name
+	<LI> <b><i>&lt;rule-name&gt;</i></b> : <a
+href="pipsmake.html#DESCRIP">Pipsmake</a> rule name
+	<LI> <b><i>&lt;resource-descriptor&gt;</i></b> : <a
+href="pipsmake.html#DESCRIP">Pipsmake</a> resource name - format
+<i>owner.resource</i> - , if the owner of the resource is not
+specified then the default module name is used
+	<LI> <b><i>&lt;rule-descriptor&gt;</i></b> : <a
+href="pipsmake.html#DESCRIP">Pipsmake</a> instanciated rule - format
+<i>owner.rulename</i> - , if the owner is not specified then the
+default module name is used
+
+</UL>
+
+The owner of a resource or a rule - it means on which it should be
+applied - is either a module name or a generic owner - <b>PROGRAM</b>,
+<b>MODULE</b>, <b>MAIN</b>, <b>ALL</b>, <b>CALLERS</b>, or
+<b>CALLEES</b>. In this case, in order to avoid confusion with any
+<i>real</i> module name, these generic owner have to be preceded by a
+dollar sign ($).<p>
+
+
+Now let's see an example :<br>
+
+<pre>
+sh&gt; Tpips                      <i>// run tpips</i>
+&gt; create wfoo essai.f          <i>// create a workspace</i>
+&gt; module essai                 <i>// select the default module</i>
+&gt; activate must_regions        <i>// select a rule</i>
+&gt; display callgraph_file       <i>// display the callgraph</i>
+&gt; make $ALL.proper_effects     <i>// make all proper effects maps</i>
+&gt; activate region_chains       <i>// select a rule</i>
+&gt; display $ALL.dg_file         <i>// display all the dependance graphs</i>
+&gt; close wfoo                   <i>// close the workspace</i>
+&gt; delete wfoo                  <i>// delete the workspace</i>
+&gt; exit                         <i>// exit for tpips</i>
+
+</pre>
+
+<HR>
+
+<H2><A NAME="CONCLUSION">3) Conclusion</A></H2>
+
+All this stuff is maybe ok ... the only thing is now to implement it
+;=)<p>
+
+<HR>
+
+</body> </html>
