@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Tags computation for the PIPS project, using the Development version.
+# To be run by cron for user pips on cri
+
+# Remi Triolet
+
+# Modifications:
+#  - add tags for Linear
+#  - add recomputation of TAGS for Linear
+#  - PIPS_ETAGS variable used
+#  - awk -> cut
+#  - NEWGENDIR used
+#  - find removed, to disallow the recursive enumeration of files
+
+
+[ "$HOME" ] || HOME=`ypcat passwd | egrep '^pips:' | cut -d: -f 6`
+
+# . /etc/profile
+[ -r ${HOME}/.profile ] && . ${HOME}/.profile
+
+TAGS=/tmp/PIPS-TAGS
+FILES=/tmp/PIPS-FILES
+
+#
+# only directories in this variable
+#
+
+PATHNAME_LIST="${PIPS_DEVEDIR}/Libs/[a-z]* ${PIPS_DEVEDIR}/Passes/[a-z]* ${PIPS_INCLUDEDIR} ${PIPS_EXTEDIR} ${NEWGEN_DEVEDIR}/genC ${LINEAR_DEVEDIR}/* ${PIPS_ROOT}/Include"
+
+rm -f $FILES $TAGS
+
+# mere files
+# none
+
+# directories
+
+for dir in $PATHNAME_LIST
+do
+  test -d $dir && echo $dir/[!,]*.[chly] 
+done >> $FILES
+
+# tags generation
+
+etags -o ${TAGS} `cat ${FILES}` 2>/dev/null
+cp ${TAGS} ${pips_dir}/Tags/TAGS
+rm -f ${TAGS} ${FILES}
+
+# that's all
+#
