@@ -1,9 +1,14 @@
-/* comp_scan.c */
-/* scan the Abstract Syntax Tree of a program to count operations */
+/* 
+ * $Id$
+ *
+ * scan the Abstract Syntax Tree of a program to count operations
+ *
+ * $Log: comp_scan.c,v $
+ * Revision 1.20  1997/09/11 08:24:09  coelho
+ * better RCS headers.
+ *
+ */
 
-/* Modif:
-  -- entity_local_name is replaced by module_local_name. LZ 230993
-*/
 
 #include <stdio.h>
 #include <string.h>
@@ -136,7 +141,8 @@ char *module_name;
 	fprintf(stderr,"After   ------- COMPLEXITIES; module %s\n",module_name);
     }
 
-    hash_callee_to_complexity = free_callees_complexities(hash_callee_to_complexity);
+    hash_callee_to_complexity =
+	free_callees_complexities(hash_callee_to_complexity);
     reset_precondition_map();
     reset_cumulated_rw_effects();
     reset_complexity_map();
