@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:11:33 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:13:54 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -126,7 +126,7 @@ validate_usage()
 	  -l dir: lock directory (default .)
 	  -f file: what file in a module (use with -n)
 	  -x pips: pips to be used
-	  -y tpips: tpips to be used (same defaults as pips)
+	  -y tpips: tpips to be used 
 	     default {,t}pips: . ./\$PIPS_ARCH \$PIPS_BINDIR/\$PIPS_ARCH type)
 	  modules: if none, from file \$PIPS_VALIDDIR/defaults.\$PIPS_ARCH
 	           else from file \$PIPS_VALIDDIR/defaults
