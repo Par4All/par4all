@@ -2,6 +2,9 @@
   $Id$
  
   $Log: OptionParser.java,v $
+  Revision 1.12  1999/02/15 14:18:12  coelho
+  *** empty log message ***
+
   Revision 1.11  1998/10/30 09:46:02  ancourt
   removes spaces around keywords.
 
@@ -45,7 +48,7 @@ import java.io.*;
 import java.awt.event.*;
 import java.awt.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 import JPips.Pawt.*;
 
