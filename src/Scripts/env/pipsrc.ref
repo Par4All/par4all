@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/13 15:45:26 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/21 18:35:20 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -17,16 +17,19 @@ set -a
 
 # the maximum number of tabulated elements (entities for pips)
 # can be extended by defining this variable.
-# NEWGEN_MAX_TABULATED_ELEMENTS=12007
+# default: NEWGEN_MAX_TABULATED_ELEMENTS=12007
 
+# the localtion of newgen-related files
 NEWGEN_DIR=/projects/Newgen
+
+# the root location of where to find the newgen to use 
 NEWGEN_ROOT=${NEWGEN_DIR}/Production
 
+# development version of newgen
 NEWGEN_DEVEDIR="${NEWGEN_DIR}/Development"
-NEWGEN_ORDERED_LIBS="genC"
-NEWGEN_LIBS='-lgenC'
 
-PATH="${PATH}:${NEWGEN_ROOT}/Share:${NEWGEN_ROOT}/Bin:"
+# PATH update
+PATH="${PATH}:${NEWGEN_ROOT}/Share:${NEWGEN_ROOT}/Bin"
 
 #
 #         #          #    #    #  ######    ##    #####
@@ -37,14 +40,17 @@ PATH="${PATH}:${NEWGEN_ROOT}/Share:${NEWGEN_ROOT}/Bin:"
 #         ######     #    #    #  ######  #    #  #    #
 #
 
+# the location of the C3/Linear files
 LINEAR_DIR=/projects/C3/Linear
+
+# the version to use
 LINEAR_ROOT=${LINEAR_DIR}/Production
 
-
+# where is the development version
 LINEAR_DEVEDIR="${LINEAR_DIR}/Development"
-# removed because not used by pips: plint
-LINEAR_LIBS='-lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique'
-LINEAR_ORDERED_LIBS="arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre plint sparse_sc union"
+
+# PATH update
+PATH="${PATH}:${LINEAR_ROOT}/Share:${LINEAR_ROOT}/Bin"
 
 # 
 #         #####      #    #####    ####
@@ -62,9 +68,13 @@ PIPS_HOME=/users/soft/pips
 PIPS_DIR=/projects/Pips
 
 # space for temporary files
-PIPS_TEMPDIR="/tmp"
+# default: PIPS_TEMPDIR="/tmp"
 
 ################################################################ RUNNING PIPS
+
+# default architecture for building pips
+# the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
+PIPS_ARCH="."
 
 PIPS_ROOT="${PIPS_DIR}/Production"
 
@@ -74,28 +84,15 @@ PATH=${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}
 
 ############################################################## COMPILING PIPS
 
-# default architecture for building pips
-# the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
-PIPS_ARCH="."
-
-# all defined "architectures" (i.e. existing makefile_macro suffixes)
-# this is used by the "full-clean" entry.
-PIPS_ALL_ARCH=". SUN4 GNU GNULL DEFAULT TEST GNUSOL2LL"
-
-# make MUST be gmake...
-PIPS_MAKE='gmake'
+# make MUST be gmake: thus this is the default. 
+# redefine this variable if you wish to change the default path or the name...
+# PIPS_MAKE='gmake'
 
 # libraries which are not part of Pips project
 # note that Newgen and the C3/Linear library are considered part
 # of the pips project, hence should be installed beforehand.
-# the readline library is expected here for instance.
+# the readline library may be expected here for instance.
 PIPS_EXTEDIR="${PIPS_DIR}/Externals"
-
-# static ordering for bootstraping PIPS...
-PIPS_ORDERED_LIBS="text-util properties misc ri-util conversion movements pipsdbm comp_sections transformer bootstrap control hyperplane flint syntax prettyprint static_controlize effects semantics complexity continuation reductions regions callgraph icfg paf-util pip ricedg array_dfg prgm_mapping scheduling reindexing chains rice transformations hpfc atomizer wp65 pipsmake top-level pips tpips wpips"
-
-# all libraires for pips
-PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcomp_sections -lcontrol -lsemantics -lcontinuation -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint ${NEWGEN_LIBS} ${LINEAR_LIBS} -lm"
 
 
 ############################################################ DEVELOPPING PIPS
@@ -104,7 +101,7 @@ PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -l
 PIPS_DEVEDIR="${PIPS_DIR}/Development"
 
 # scripts and programs created to manage the project
-PIPS_UTILDIR="${PIPS_DIR}/Utilities"
+PIPS_UTILDIR="${PIPS_ROOT}/Utils"
 
 # other executables...
 PATH=${PATH}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
@@ -133,26 +130,9 @@ PIPS_RELEASEDIR="${PIPS_DIR}/Release"
 #         #    #  #          #    #        ####
 # 
 # Settings added for WPIPS (used for wpips and wtest)
-
 # home directory for openwin (only used by the XView interface: wpips)
-OPENWINHOME="/usr/openwin"
-
-# should not be in the environment ?
-WPIPS_ADDED_CPPFLAGS='-I$(OPENWINHOME)/include -Iicons'
-WPIPS_ADDED_LIBS='-lxview -lolgx -lX11'
-WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib'
- 
 #
-#         #####  #####      #    #####    ####
-#           #    #    #     #    #    #  #
-#           #    #    #     #    #    #   ####
-#           #    #####      #    #####        #
-#           #    #          #    #       #    #
-#           #    #          #    #        ####
-# 
-# Settings added for TPIPS (used for tpips and ttest)
-
-TPIPS_ADDED_LIBS='-lreadline -ltermcap'
+OPENWINHOME="/usr/openwin"
 
 # 
 #        ######  #####      #    #####    ####
@@ -164,9 +144,15 @@ TPIPS_ADDED_LIBS='-lreadline -ltermcap'
 #
 # Settings added for EPIPS (Emacs PIPS).
 # started with the epips command.
-
+#
+# emacs to be used by epips. 
+# you may change the default by defining this variable
+# EPIPS_EMACS='emacs'
 EPIPS_EMACS='xemacs'
-EPIPS_LISP="${PIPS_SHRDIR}/epips.el" 
+#
+# emacs-lisp code for epips
+# you may change this default by defining this variable
+# EPIPS_LISP="${PIPS_ROOT}/Share/epips.el" 
 
 #
 # 
@@ -178,18 +164,14 @@ EPIPS_LISP="${PIPS_SHRDIR}/epips.el"
 #         #    #  #       #        ####
 # 
 # HPFC environment variables 
-
-HPFC_DIR=$PIPS_DEVEDIR/Lib/hpfc
-
-HPFC_INCLUDE=$PIPS_RUNTIMEDIR/hpfc
-HPFC_LIBS=$PIPS_RUNTIMEDIR/hpfc
-HPFC_TOOLS=$PIPS_SHRDIR
-
-HPFC_RUNTIME_M4_PARAMS='-D HPFC_GNU -D DEMO -D DIRECT'
-HPFC_SED='gsed'
-HPFC_TR='tr'
-HPFC_M4='gm4'
-HPFC_MAKE='gmake'
+#
+# where HPFC runtime can be found
+# default: HPFC_RUNTIME=$PIPS_ROOT/Runtime/hpfc
+# some commands
+# default: HPFC_SED='gsed'
+# default: HPFC_TR='tr'
+# default: HPFC_MAKE='gmake'
+# HPFC_M4='gm4'
 
 #
 #                         #####  #######
@@ -200,15 +182,10 @@ HPFC_MAKE='gmake'
 #         ##  ##  #      #     # #     #
 #         #    #  #       #####   #####
 #
-
-# was:
-# acc -O -g
-# f77 -g -U -u -C 
-
-WP65_ADDED_CPPFLAGS='-D COMPILE_FOR_G77'
-
-# can be changed to $PIPS_DEVEDIR/Runtime/wp65 to link with dev...
-WP65_LIBRARY=$PIPS_EXTEDIR
+#
+# where the WP65 runtime is expected
+# (can be changed to $PIPS_DEVEDIR/Runtime/wp65 to link with dev)
+# default: WP65_LIBRARY=$PIPS_ROOT/Runtime/wp65
 
 # 
 #         #    #     #     ####    ####
@@ -225,12 +202,12 @@ WP65_LIBRARY=$PIPS_EXTEDIR
 LISP=/usr/local/bin/cl
 
 # PVM directory
-PVMDIR="${PIPS_RUNTIMEDIR}/pvm3.3"
+PVMDIR="${PIPS_ROOT}/Runtime/pvm3.3"
 
 #
 # For the daVinci Graph Viewer/Editor :
 
-DAVINCI_DIR=${PIPS_RTSRCDIR}/daVinci/daVinci_V1.4_solaris_1
+DAVINCI_DIR=${PIPS_HOME}/daVinci/daVinci_V1.4_solaris_1
 GRAPHEDITOR_DIRECTORY=${DAVINCI_DIR}/grapheditor
 DAVINCI_ICONDIR=${DAVINCI_DIR}/images
 MANPATH=${MANPATH}:${DAVINCI_DIR}/man
@@ -316,7 +293,7 @@ PIPS_SHRDIR="${PIPS_ROOT}/Share"
 PIPS_BINDIR="${PIPS_ROOT}/Bin"
 
 # documentation
-PIPS_DOCDIR="${PIPS_ROOT}/Documentation"
+PIPS_DOCDIR="${PIPS_ROOT}/Doc"
 
 # headers
 PIPS_INCLUDEDIR="${PIPS_ROOT}/Include"
