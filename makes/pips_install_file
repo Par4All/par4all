@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/06/29 14:31:09 $, )
+# ($Date: 1996/06/29 14:33:40 $, )
 #
 
 RUN=':'
@@ -39,14 +39,15 @@ shift
 
 for file
 do
-  if test -f $file && cmp -s $file $directory/$file
+  target=$directory/`basename $file`
+  if test -f $target && cmp -s $file $target
   then
     echo "$SCRIPT: skipping $file"
   else
     echo "$SCRIPT: copying $file"
-    rm -f $directory/$file
+    rm -f $target
     cp $file $directory
-    eval $RUN $directory/`basename $file`
+    eval $RUN $target
   fi
 done
 
