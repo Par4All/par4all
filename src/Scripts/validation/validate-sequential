@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1995/09/13 15:47:35 $, ) 
+# ($Date: 1995/09/22 11:19:12 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -52,7 +52,9 @@ export program
 VERBOSE=':'
 DEBUG=':'
 MAIL='/usr/ucb/mail'
+MAX_NB_LINES='100'
 
+export MAX_NB_LINES
 unset UNIQDIR pips_version RUNDIR LOCKFILE PERFORMANCE
 
 usage()
@@ -70,6 +72,7 @@ usage()
     echo "  -x pips: pips to be used (dafault . then Production)"
     echo "  -y tpips: tpips to be used (dafault . then Production)"
     echo "  -r dir: directory where to run (default .)"
+    echo "  -i lines: max number of lines for sendig a full message"
   } >&2
   exit ${1:-1}
 }
@@ -79,7 +82,7 @@ usage()
 
 unset FILES
 
-while getopts tuvsdhx:y:r:f:l: opt
+while getopts tuvsdhx:y:r:f:l:i: opt
 do
   case $opt in
     t) PERFORMANCE="begin: `date`" ;;
@@ -93,6 +96,7 @@ do
     f) FILES="$FILES $OPTARG" ;;
     l) LOCKFILE="$OPTARG" ;;
     h) usage 0 ;;
+    i) MAX_NB_LINES="$OPTARG" ;;
     *) usage 1
   esac
 done
@@ -162,7 +166,7 @@ report()
       [ -s "$tmperr" ] && \
       {
         echo "--"
-	[ -s $tmpout ] && cat $tmpout
+	# [ -s $tmpout ] && cat $tmpout
 	echo "--"
 	cat $tmperr
 	echo "--";
@@ -195,16 +199,27 @@ make_diff()
     exit 1
   fi
   cp $tmpout $aspect/$name.result/$module.out
-  diff -e $aspect/$name.result/$module $tmpout > $diffout_e
+  # diff -e $aspect/$name.result/$module $tmpout > $diffout_e
   diff $aspect/$name.result/$module $tmpout > $diffout
-  report $? "`echo Run accept on mail message to resynchronize for $pips_version. ;\
-		    echo Differences for $module in $file : ;\
-		    cat $diffout ;\
-		    echo ;\
-		    echo Diff Commands for $module in $file : ;\
-		    cat $diffout_e | sed -e 's/^/X/' ;\
-		    echo Xw ;\
-		    echo Xq`"
+  status=$?
+  lines=`wc -l $diffout | sed 's,^ *\([0-9][0-9]*\)[^0-9].*,\1,'`
+  debug /$lines/ /$MAX_NB_LINES/
+  if [ $lines -gt $MAX_NB_LINES ] 
+  then 
+    rm -f $diffout ;
+    echo "too many lines ($lines), look by hand" > $diffout ;
+  fi
+
+  report $status \
+  "`echo Run accept on mail message to resynchronize for $pips_version. ;\
+  echo Differences for $module in $file : ;\
+  cat $diffout ;\
+  echo ; `"
+  # echo ;
+  # echo Diff Commands for $module in $file : ;\
+  # cat $diffout_e | sed -e 's/^/X/' ;\
+  # echo Xw ;\
+  # echo Xq`"
 }
 
 test_aspect()
