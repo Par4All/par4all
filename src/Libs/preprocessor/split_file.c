@@ -23,6 +23,9 @@
  * - bang comment management added (to avoid the parser)
  *
  * $Log: split_file.c,v $
+ * Revision 1.45  1999/01/08 16:35:40  coelho
+ * condition fixed...
+ *
  * Revision 1.44  1999/01/08 16:19:03  coelho
  * error on multi-line fsplit.
  *
@@ -748,7 +751,7 @@ static char * hollerith_and_bangcomments(char * line)
 	
 	if (len!=0)	  /* should look for a continuation OR pad. */
 	{
-	  if (line[i]=='\n') 
+	  if (initial==72)
 	  {
 	    char * msg = (char*) malloc((strlen(HOLL_ERROR)+10)*sizeof(char*));
 	    (void) sprintf(msg, HOLL_ERROR, current_line_number);
