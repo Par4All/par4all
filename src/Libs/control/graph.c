@@ -2,12 +2,14 @@
  *
  *  (c) Fabien COELHO - march 1995
  *
- *  $RCSfile: graph.c,v $ ($Date: 1998/03/17 16:01:15 $, )
+ *  $RCSfile: graph.c,v $ ($Date: 1998/04/14 19:36:01 $, )
  *  version $Revision$
  */
 
 #include <stdio.h>
 #include <strings.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "ri.h"
