@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: install_pips_sources,v $ ($Date: 1995/08/10 17:40:58 $, )
+# $RCSfile: install_pips_sources,v $ ($Date: 1995/10/04 11:35:26 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -9,7 +9,7 @@ script=`basename $0`
 VERBOSE=':'
 DEBUG=':'
 
-unset SOURCE_DIR TARGET_DIR COMMENT OPTIONS 
+unset SOURCE_DIR TARGET_DIR COMMENT OPTIONS CLEAN_SCCS FILES
 ONLYDIFF=':'
 
 verbose()
@@ -31,12 +31,13 @@ error()
 usage()
 {
   cat 1>&2 <<-EOM
-	Usage: $script [-hvdaD] [-y comment] [-t dir] [-s dir] files
+	Usage: $script [-hvdaDr] [-y comment] [-t dir] [-s dir] files
 	  version $Revision$
 	  -h: help
 	  -v: verbose
 	  -d: install only if different. (default)
 	  -a: install all files.
+	  -r: clean not installed files from SCCS
 	  -D: debug
 	  -t dir: target directory (default image of source in \$PIPS_SRCDIR)
 	  -s dir: source directory (default .)
@@ -45,7 +46,7 @@ usage()
   exit ${1:-1}
 }
 
-while getopts hvDdat:s:y: OPT
+while getopts hvDdart:s:y: OPT
 do
   case $OPT in
     h) usage 0 ;;
@@ -53,6 +54,7 @@ do
     D) DEBUG='debug' ; OPTIONS="$OPTIONS -D" ;;
     d) ONLYDIFF=':' ; OPTIONS="$OPTIONS -d" ;;
     a) ONLYDIFF= ; OPTIONS="$OPTIONS -a" ;;
+    r) CLEAN_SCCS='yes' ; OPTIONS="$OPTIONS -r" ;;
     t) TARGET_DIR="$OPTARG" ;;
     s) SOURCE_DIR="$OPTARG" ;;
     y) COMMENT="$OPTARG" ;;
@@ -80,6 +82,8 @@ $VERBOSE "entering directory $TARGET_DIR"
 
 [ -d "$TARGET_DIR" ] || mkdir $TARGET_DIR $TARGET_DIR/SCCS
 cd $TARGET_DIR
+[ -d OLD ] || mkdir OLD
+[ -f SCCS ] || mkdir SCCS
 
 [ "$ONLYDIFF" ] ||
 {
@@ -87,7 +91,7 @@ cd $TARGET_DIR
   rm -f `sccs tell`
 }
 
-cd $TARGET_DIR
+# cd $TARGET_DIR
 
 for item
 do
@@ -116,6 +120,9 @@ do
   fi
 
   #else
+  
+  FILES="$FILES $item"
+
   if [ -f $src_item ] 
   then
     if [ "$ONLYDIFF" -a -f $trg_item ]
@@ -145,6 +152,30 @@ LOST_FILES="`sccs tell`"
   $VERBOSE "no more $LOST_FILES"
   sccs unedit $LOST_FILES
   rm -f $LOST_FILES
+
+  #
+  # clean the SCCS directory as well
+
+  for f in $LOST_FILES ; 
+  do 
+    $VERBOSE "moving SCCS/s.$f in OLD"
+    mv SCCS/s.$f OLD
+  done
+}
+
+[ "$CLEAN_SCCS" ] &&
+{
+  [ "`sccs tell`" ] && error "some files being edited!"
+
+  for item in `echo SCCS/s.* | sed 's,SCCS/s\.,,g'` ;
+  do
+    $DEBUG "whether $item was installed"
+    if [ ! "`echo $FILES | grep $item`" ]
+    then
+      $VERBOSE "moving $item SCCS file in OLD"
+      mv SCCS/s.$item OLD
+    fi
+  done
 }
 
 $VERBOSE "done"
