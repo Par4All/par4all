@@ -223,12 +223,23 @@ EndOfProcedure()
      */
     UpdateFunctionalType(FormalParameters);
 
+    check_common_layouts(CurrentFunction);
+
     ComputeEquivalences();
+    /* Use equivalence chains to update storages of equivalenced and
+       implicitly declared variables */
     ComputeAddresses();
 
+    /* Initialize the shared field in ram storage */
     SaveChains();
 
-    check_common_layouts(CurrentFunction);
+    /* Update offsets in commons (and static and dynamic areas?)
+     * according to latest type and dimension declarations
+     */
+    /* check_common_layouts(CurrentFunction); */
+
+    /* Now that retyping and equivalences have been taken into account: */
+    update_common_sizes();
 
     reset_common_size_map();
 
