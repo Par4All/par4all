@@ -175,8 +175,8 @@ boolean eq_p;
     /* l'inegalite 0 <= K est representee par un vecteur a un element */
     v = val_of(ineg->vecteur);
 
-    return (!eq_p && value_negz_p(v) && ineg->vecteur->succ==NULL) 
-	|| ( eq_p && value_zero_p(v) && ineg->vecteur->succ==NULL)
+    return (!eq_p && value_negz_p(v) && ineg->vecteur->succ==NULL)
+	|| ( eq_p && value_zero_p(v) && ineg->vecteur->succ==NULL);
 }
 
 /* boolean contrainte_oppos(Pcontrainte ineg1, Pcontrainte ineg2):
