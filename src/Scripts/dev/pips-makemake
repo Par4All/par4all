@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 18:48:05 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 19:15:42 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -242,8 +242,9 @@ MAIN=		main
 #
 CONFIG_FILE=	${CONFIG_FILE}
 MAKEFILE=	${MAKEFILE}
-SHELL=		/bin/sh
+SHELL	=	/bin/sh
 COPY	=	cp -fa
+MOVE	=	mv -f
 #
 # default targets...
 all: generate_makefile_if_necessary_and_possible
@@ -643,7 +644,7 @@ $(INC_TARGET): $(TARGET)-local.h
 	$(PROTO) $(INC_CFILES);\\
 	echo "#endif /* ${dir_simple_name}_header_included */";\\
 	} > $(INC_TARGET).tmp
-	mv $(INC_TARGET).tmp $(INC_TARGET)
+	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
 	touch .header
 
 # checks for the header file, and build if necessary...
