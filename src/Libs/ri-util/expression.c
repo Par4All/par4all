@@ -26,6 +26,80 @@
 
 #include "ri-util.h"
 
+/**************************************************** FORTRAN STRING COMPARE */
+
+/* quite lazy... 
+ */
+static string actual_fortran_string_to_compare(string fs, int * plength)
+{
+  int len;
+
+  /* skip TOP-LEVEL header */
+  if (strncmp(fs, TOP_LEVEL_MODULE_NAME, strlen(TOP_LEVEL_MODULE_NAME))==0)
+    fs += strlen(TOP_LEVEL_MODULE_NAME);
+
+  /* skip : header */
+  if (strncmp(fs, MODULE_SEP_STRING, strlen(MODULE_SEP_STRING))==0)
+    fs += strlen(MODULE_SEP_STRING);
+
+  len = strlen(fs);
+
+  /* skip surrounding quotes */
+  if (len>=2 &&
+      ((fs[0]=='\'' && fs[len-1]=='\'') || (fs[0]=='"' && fs[len-1]=='"')))
+  {
+    fs++; 
+    len -= 2;
+  }
+
+  /* skip trailing *spaces* (are these blanks?) if any. */
+  while (len>0 && fs[len-1]==' ') 
+    len--;
+
+  *plength = len;
+  return fs;
+}
+
+/* compare pips fortran string constants from the fortran point of view.
+ *
+ * as if 3.1 and 6.3.5 of the Fortran 77 standard, the character order 
+ * is not fully specified. It states:
+ *  - A < B < C ... < Z
+ *  - 0 < 1 < 2 ... < 9
+ *  - blank < 0 
+ *  - blank < A
+ *  - 9 < A  *OR* Z < 0
+ * since these rules are ascii compatible, we'll take ascii.
+ * in practice, this may be implementation dependent?
+ * 
+ * @param fs1 constant fortran string (entity name)
+ * @param fs2 constant fortran string (entity name)
+ * @return -n 0 +n depending on < == >, n first differing char.
+ */
+int fortran_string_compare(string fs1, string fs2)
+{
+  int l1, l2, i, c = 0;
+
+  /* skip headers, trailers... */
+  fs1 = actual_fortran_string_to_compare(fs1, &l1);
+  fs2 = actual_fortran_string_to_compare(fs2, &l2);
+
+  /* collating sequence comparison. */
+  for (i=0; c!=0 && i<l1 && i<l2; i++)
+  {
+    if (fs1[i] < fs2[i]) c = -i-1;
+    if (fs1[i] > fs2[i]) c = i+1;
+  }
+
+  /* equal string header case. */
+  if (c==0 && l1!=l2)
+    c = (l1<l2)? -l1-1: l2+1;
+
+  return c;
+}
+
+/********************************************************************* BASIC */
+
 /*  a BASIC tag is returned for the expression
  *  this is a preliminary version. should be improved.
  *  was in HPFC.
