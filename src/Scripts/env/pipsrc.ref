@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.142  1998/08/22 08:22:40  coelho
+# new Ultra 5  machines added as GNUSOL2LL hosts.
+#
 # Revision 1.141  1998/06/26 06:36:34  coelho
 # just loreto for LINUXI86LL...
 #
@@ -261,7 +264,7 @@ PATH="${PATH}:${PIPS_ROOT}/Utils:/usr5/gnu/bin-sparc"
 
 # hosts for Validate:
 test "${PIPS_ARCH}" = GNUSOL2LL && \
-	PIPS_HOSTS="deauville"
+	PIPS_HOSTS="deauville:rhune:blonville"
 
 test "${PIPS_ARCH}" = . -o "${PIPS_ARCH}" = GNU && \
 	PIPS_HOSTS="chailly:episy:aiguebelette:roazhon"
