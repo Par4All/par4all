@@ -129,6 +129,12 @@ current_memory_size()
 	break;
     case NET_MEASURE: 
 	memory_size = heap_info.uordblks+heap_info.usmblks ;
+/*	fprintf(stderr, 
+		"[current_memory_size] %d (%d/%d/%d) small blocks.\n",
+		heap_info.usmblks,
+		heap_info.mxfast,
+		heap_info.nlblks,
+		heap_info.grain);*/
 	break;
     case GROSS_MEASURE: 
 	memory_size = heap_info.uordbytes+heap_info.usmblks ;
