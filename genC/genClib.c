@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/07/08 16:33:59 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/07/08 16:41:28 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -80,7 +80,7 @@ static int disallow_undefined_tabulated = TRUE ;
  */
 #define check_domain(dom) \
   message_assert("Inconsistant domain number",\
-		 (domain)>=0 && (domain)<MAX_DOMAIN)
+		 (dom)>=0 && (dom)<MAX_DOMAIN)
 
 #define check_read_spec_performed() \
   message_assert("gen_read_spec not performed prior to use", \
