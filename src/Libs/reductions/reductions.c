@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/15 18:09:56 $, 
+ * $Date: 1996/06/15 18:13:56 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -212,8 +212,6 @@ build_reductions_of_statement(
     gen_free_list(le);
 }
 
-/* initialize the reductions of s (?), and push s on stack
- */
 static void cr_sequence_rwt(sequence s)
 {
     build_reductions_of_statement(crt_stat_head(),
