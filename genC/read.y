@@ -383,6 +383,12 @@ int allow_ref ;
     }
     if((hash=(gen_chunk *)hash_get( Gen_tabulated_names, local )) != 
        (gen_chunk *)HASH_UNDEFINED_VALUE ) {
+	
+	fatal("no redefinition of a tabulated");
+
+	/* actually very obscure there... seems that negative domain
+	 * numbers are used to encode something... already used/seen ???
+	 */
 	if( allow_ref && hash->i < 0 ) {
 	    int i, size = gen_size( Domains+domain ) ;
 	    gen_chunk *cp, *gp ;
