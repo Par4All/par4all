@@ -16,7 +16,7 @@ more=
 
 function usage()
 {
-    echo "pips_at_night_at_cri [-gvn] [-a user]";
+    echo "$0 [-gvn] [-a user] (usual|long|short|compile|validate)";
     exit ${1:-1}
 }
 
@@ -39,6 +39,9 @@ do
     esac
 done
 
+shift $(( $OPTIND - 1 ))
+
+#
 # what host dir archs
 function doit()
 {
@@ -46,61 +49,83 @@ function doit()
 
     $verb "[doit $#] ${script} ${mailto}" \""$@"\"
 
-    if [ $(hostname) = ${host} ]
-    then 
+    ${PIPS_PING:-ping} ${host} && ${remote} ${host} \
 	${script} -${what}${more}va ${mailto} -d ${dir} -c \""${archs}"\"
-    else
-	${PIPS_PING:-ping} ${host} && ${remote} ${host} \
-	    ${script} -${what}${more}va ${mailto} -d ${dir} -c \""${archs}"\"
-    fi
 }
 
-# COMPILE host dir archs
+#
+# FUNCTIONS for the various jobs to be performed.
+
+# GENERAL cleaning:  host dir archs
+function general()
+{
+    ${verb} "[general] $@"
+    doit CNLPV "$@" ;
+}
+
+# COMPILE: host dir archs
 function compile()
 {
     ${verb} "[compile] $@"
     doit GV "$@" ;
 }
 
-# VALIDATE host dir archs
+# VALIDATE: host dir archs
 function validate()
 {
     ${verb} "[validate] $@"
     doit GCNLP "$@" ;
 }
 
-# CLEAN host dir archs
-function clean()
+# COmpile and VALIDate: host dir arch
+function covalid()
 {
-    ${verb} "[clean] $@"
-    doit CNLPV "$@" ;
+    ${verb} "[covalid] $@"
+    compile "$@" ;
+    validate "$@" &
 }
 
 #
-# DO IT!
+# DO THE JOB!
 
-#
-# general cleaning (core, database and so)
+job=${1:-usual}
 
-clean    chailly 	/projects/Pips . ;
-
-#
-# compilation/validation pipeline
-
-compile  chailly 	/projects/Pips . ;
-validate chailly 	/projects/Pips . &
-
-compile  recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;
-validate recanati 	/projects/Pips/Experiments2 GNUSOL2LL &
-
-compile  coulommiers 	/tmp LINUXI86 ;
-validate coulommiers 	/tmp LINUXI86 &
-
-#
-# remaining compilations
-
-compile  recanati 	/projects/Pips/Experiments2 SOL2LL ;
-compile  chailly 	/projects/Pips "GNU SUN4 GPROF" ;
+case ${job} in
+    usual)
+	${verb} "USUAL stuff" ;
+	general chailly 	/projects/Pips . ;
+	covalid recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;
+	covalid chailly 	/projects/Pips . ;
+	covalid coulommiers 	/tmp LINUXI86 ;
+	compile recanati 	/projects/Pips/Experiments2 SOL2LL ;
+	compile chailly 	/projects/Pips "GNU SUN4" ;;
+    long)
+	${verb} "LONG stuff (more compilations)" ;
+	general chailly 	/projects/Pips . ;
+	covalid chailly 	/projects/Pips GNU ;
+	covalid recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;
+	covalid coulommiers 	/tmp LINUXI86 ;
+	compile recanati 	/projects/Pips SOL2LL ;
+	compile chailly 	/projects/Pips ". SUN4 GPROF" ;;
+    short)
+	${verb} "SHORT stuff (one validation)" ;
+	covalid chailly 	/projects/Pips . ;
+	compile recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;
+	compile coulommiers 	/tmp LINUXI86 ;;
+    compile)
+	${verb} "COMPILE stuff" ;
+	compile coulommiers 	/tmp LINUXI86 ;
+	compile chailly 	/projects/Pips "GNU . SUN4 GPROF" ;
+	compile recanati 	/projects/Pips "GNUSOL2LL SOL2LL" ;;
+    validate)
+	${verb} "VALIDATE stuff (with necessary compilation)" ;
+	covalid chailly 	/projects/Pips . ;
+	covalid coulommiers 	/tmp LINUXI86 ;
+	covalid recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;;
+    *)
+	${verb} "unexpected job=${job}" ;
+	usage 2 ;;
+esac
 
 ${verb} waiting
 
