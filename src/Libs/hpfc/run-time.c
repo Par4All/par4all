@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1995/12/22 17:44:58 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1996/02/16 12:02:20 $, )
  * version $Revision$,
  */
 
@@ -568,7 +568,8 @@ static RunTimeSupportDescriptor RTSTable[] =
  */
     { MYPOS,		2, is_var, no_basic, no_entity },
     { MYLID,		0, is_var, no_basic, no_entity },
-    { MSTATUS,		0, is_var, no_basic, no_entity },
+    { MSTATUS,		1, is_var, no_basic, no_entity },
+    { LIVEMAPPING,	1, is_var, no_basic, no_entity },
     { INFO,		0, is_var, is_basic_int, 	no_entity },
     { BUFID,		0, is_var, is_basic_int,	no_entity },
     { NBTASKS, 		0, is_var, no_basic, no_entity },
