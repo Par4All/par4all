@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/09/01 15:47:36 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/09/03 15:19:33 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -108,8 +108,9 @@ reset_resources_for_module (string module_name)
 void 
 set_resources_for_module (string module_name)
 {
-    entity 
-	module = local_name_to_top_level_entity(module_name);
+    entity
+	module = local_name_to_top_level_entity(module_name),
+	stop = entity_undefined;
 
     db_set_current_module_name(module_name);
     set_current_module_entity(module);
@@ -170,6 +171,12 @@ set_resources_for_module (string module_name)
 	 the_callees);
 
     hpfc_init_run_time_entities();
+
+    /*   STOP is to be translated into hpfc_{host,node}_end
+     */
+    stop = local_name_to_top_level_entity(STOP_FUNCTION_NAME);
+    store_new_host_variable(hpfc_name_to_entity(HOST_END), stop);
+    store_new_node_variable(hpfc_name_to_entity(NODE_END), stop);
 
     debug(1, "set_resources_for_module", 
 	  "building %s.hpf in %s\n",
