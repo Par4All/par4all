@@ -428,6 +428,7 @@ list vvs;
   return(sc_rational_feasibility_ofl_ctrl(ps, NO_OFL_CTRL, TRUE));
 }
 
+typedef boolean (*argh)(Pvecteur*, Pvecteur*);
 
 /* ======================================================================== */
 /*
@@ -460,7 +461,7 @@ Ppolynome pp;
     return(pp);
   }
 
- used_vars = base_to_list(polynome_used_var(pp, pu_is_inferior_var));
+ used_vars = base_to_list(polynome_used_var(pp, (argh) pu_is_inferior_var));
 
  for(avvs = vvs; !ENDP(avvs) && !ENDP(used_vars); POP(avvs)) {
     var_val vv = VAR_VAL(CAR(avvs));
