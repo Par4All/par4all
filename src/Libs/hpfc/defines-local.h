@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/09/22 14:32:10 $, ) 
+ * ($Date: 1995/09/22 14:39:59 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -249,10 +249,6 @@ void fprint_entity_list(FILE *fp, list l);
 
 /*************************************************************** PROPERTY */
 
-/* property prefix for ignoring FCD directives
- * TIME, SYNCHRO and SET exists.
- */
-#define FCD_IGNORE_PREFIX	"HPFC_IGNORE_FCD_"
 #define LAZY_MESSAGES		"HPFC_LAZY_MESSAGES"
 #define USE_BUFFERS		"HPFC_USE_BUFFERS"
 
