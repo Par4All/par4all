@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.290  1997/08/04 16:12:05  coelho
+# *** empty log message ***
+#
 # Revision 1.289  1997/06/23 09:02:53  coelho
 # info entry for rlog improved.
 #
@@ -796,9 +799,12 @@ check_rcs:
 	#
 	\$(MAKE) check_install check_sccs check_rcs
 	#
-	# installing new source files 
+	# make target directory if necessary
 	#
 	\$(MAKE) \$(GMKNODIR) all \$(TARGET_DIR) 
+	#
+	# installing new source files 
+	#
 	@echo ""; echo; echo -n "Description of changes: " ; \\
 	read x ; \\
 	\$(INSTSRC) -rv -s \`pwd\` -t \$(TARGET_DIR) -y "\$\$x" \$(ALL_SOURCES)
