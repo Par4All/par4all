@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/10 21:15:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 11:59:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/10 21:15:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/15 11:59:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -290,8 +290,10 @@ cons *lfp;
 	    t = make_type(is_type_void, UU);
 	    if(msf == TK_PROGRAM) {
 		extern list arguments_add_entity(list a, entity e);
-		string main_name = strdup(concatenate(MAIN_PREFIX, entity_local_name(cf),NULL));
-		entity fe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, main_name);
+		string main_name = 
+		  strdup(concatenate(MAIN_PREFIX, entity_local_name(cf),NULL));
+		entity fe = 
+		    FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, main_name);
 
 		free(main_name);
 
@@ -317,6 +319,17 @@ cons *lfp;
 				"subroutine or a function or a common\n");
 		}
 	    }
+	    else if (msf == TK_BLOCKDATA)
+	    {
+		string bd_name = 
+		    strdup(concatenate(BLOCKDATA_PREFIX, 
+				       entity_local_name(cf), NULL));
+		/* to be dropped later on */
+		ghost_variable_entities = 
+			arguments_add_entity(ghost_variable_entities, cf);
+		cf = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, bd_name);
+		free(bd_name);
+	    }
 	}
 	else {
 	    FatalError("MakeCurrentFunction", "bad type\n");
@@ -328,7 +341,7 @@ cons *lfp;
        && ! (value_code_p(entity_initial(cf))
 	     || value_unknown_p(entity_initial(cf))
 	     || value_intrinsic_p(entity_initial(cf)))) {
-	pips_error("MakeCurrentFunction", "Should have been trapped by the first test!\n");
+	pips_internal_error("Should have been trapped by the first test!\n");
 	user_warning("MakeCurrentFunction",
 		     "Conflict for global name %s\n",
 		     entity_local_name(cf));
