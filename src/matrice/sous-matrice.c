@@ -7,7 +7,6 @@
     */
 
 #include <stdio.h>
-#include <sys/stdtypes.h> /*for debug with dbmalloc */
 #include <malloc.h>
 
 #include "boolean.h"
@@ -37,7 +36,7 @@
  *		     a prendre en compte les elements de la matrice
  */
 int mat_lig_nnul(MAT,n,m,level)
-int MAT[];
+matrice MAT;
 int n,m;
 int level;
 {
@@ -47,7 +46,7 @@ int level;
 
     /* recherche du premier element non nul de la sous-matrice */
     for (i = level+1; i<=n && !trouve ; i++) {
-	for (j = level+1; j<= m && (ACCESS(MAT,n,i,j) == 0); j++);
+	for (j = level+1; j<= m && value_zero_p(ACCESS(MAT,n,i,j)); j++);
 	if(j <= m) {
 	    /* on dumpe la colonne J... */
 	    trouve = TRUE;
@@ -80,7 +79,7 @@ int level;
  */
 /*ARGSUSED*/
 void mat_perm_col(MAT,n,m,k,level)
-int MAT[];
+matrice MAT;
 int n,m,k;
 int level;
 {
@@ -89,13 +88,13 @@ int level;
     matrice_nulle(MAT,n,n);
     if (level > 0) {
 	for (i=1;i<=level; i++)
-	    ACCESS(MAT,n,i,i) = 1;
+	    ACCESS(MAT,n,i,i) = VALUE_ONE;
     }
 
     for (i=1+level,j=k; i<=n; i++,j++)
     {
 	if (j == n+1) j = 1 + level;
-	ACCESS(MAT,n,i,j)=1;
+	ACCESS(MAT,n,i,j)=VALUE_ONE;
     }
 }
 
@@ -116,7 +115,7 @@ int level;
  */
 /*ARGSUSED*/
 void mat_perm_lig(MAT,n,m,k,level)
-int MAT[];
+matrice MAT;
 int n,m,k;
 int level;
 {
@@ -125,13 +124,13 @@ int level;
     matrice_nulle(MAT,m,m);
     if(level > 0) {
 	for (i = 1; i <= level;i++)
-	    ACCESS(MAT,m,i,i) = 1;
+	    ACCESS(MAT,m,i,i) = VALUE_ONE;
     }
 
     for(j=1,i=k-level; j <= m - level; j++,i++) {
 	if(i == m-level+1)
 	    i = 1;
-	ACC_ELEM(MAT,m,i,j,level) = 1;
+	ACC_ELEM(MAT,m,i,j,level) = VALUE_ONE;
     }
 }
 
@@ -163,7 +162,7 @@ int level;
  *		  element
  */
 void mat_min(MAT,n,m,i_min,j_min,level)
-int MAT[];
+matrice MAT;
 int n,m;
 int *i_min,*j_min;
 int level;
@@ -171,15 +170,15 @@ int level;
     int i,j;
     int vali= 0;
     int valj=0;
-    int min;
-    int val;
+    register Value min=VALUE_ZERO, val;
     boolean trouve = FALSE;
 
 
     /*  initialisation du minimum  car recherche d'un minimum non nul*/
     for (i=1+level;i<=n && !trouve;i++)
 	for(j = level+1; j <= m && !trouve; j++) {
-	    min = ABS(ACCESS(MAT,n,i,j));
+	    min = ACCESS(MAT,n,i,j);
+	    value_absolute(min);
 	    if(min != 0) {
 		trouve = TRUE;
 		vali = i;
@@ -188,8 +187,10 @@ int level;
 	}
 
     for (i=1+level;i<=n;i++)
-	for (j=1+level;j<=m && min >1; j++) {
-	    if (((val = ABS(ACCESS(MAT,n,i,j)))!= 0) && (val < min)) {
+	for (j=1+level;j<=m && value_gt(min,VALUE_ONE); j++) {
+	    val = ACCESS(MAT,n,i,j);
+	    value_absolute(val);
+	    if (value_notzero_p(val) && value_lt(val,min)) {
 		min = val;
 		vali= i;
 		valj =j;
@@ -220,27 +221,29 @@ int level;
  */
 /*ARGSUSED*/
 void mat_maj_col(A,n,m,P,level)
-int A[];
+matrice A;
 int n,m;
-int P[];
+matrice P;
 int level;
 {
-    int A11;
+    register Value A11;
+    register Value x;
     int i;
-    int x;
 
     matrice_identite(P,n,0);
 
     A11 = ACC_ELEM(A,n,1,1,level);
     for (i=2+level; i<=n; i++) {
-	x = ACCESS(A,n,i,1+level)/A11;
-	ACCESS(P,n,i,1+level) = - x;
+	x = ACCESS(A,n,i,1+level);
+	value_division(x,A11);
+	ACCESS(P,n,i,1+level) = value_uminus(x);
     }
 }
 
 /* void mat_maj_lig(matrice A, int n, int m, matrice Q, int level):
  * Calcul de la matrice permettant de remplacer chaque terme de
- * la premiere ligne autre que le premier terme A11=A(level+1,level+1) par le reste de sa
+ * la premiere ligne autre que le premier terme A11=A(level+1,level+1)
+ *  par le reste de sa
  * division entiere par A11
  *
  *
@@ -257,21 +260,22 @@ int level;
  *		     a prendre en compte les elements de la matrice
  *
  */
-mat_maj_lig(A,n,m,Q,level)
-int A[];
+void mat_maj_lig(A,n,m,Q,level)
+matrice A;
 int n,m;
-int Q[];
+matrice Q;
 int level;
 {
-    int A11;
+    register Value A11;
     int j;
-    int x;
+    register Value x;
 
     matrice_identite(Q,m,0);
     A11 = ACC_ELEM(A,n,1,1,level);
     for (j=2+level; j<=m; j++) {
-	x = ACCESS(A,n,1+level,j)/A11;
-	ACCESS(Q,m,1+level,j) = - x;
+	x = ACCESS(A,n,1+level,j);
+	value_division(x,A11);
+	ACCESS(Q,m,1+level,j) = value_uminus(x);
     }
 }
 
@@ -287,7 +291,7 @@ int level;
  *		     a prendre en compte les elements de la matrice
  */
 void matrice_identite(ID,n,level)
-int ID[];
+matrice ID;
 int n;
 int level;
 {
@@ -295,11 +299,11 @@ int level;
 
     for(i = level+1; i <= n; i++) {
 	for(j = level+1; j <= n; j++)
-	    ACCESS(ID,n,i,j) = 0;
-	ACCESS(ID,n,i,i) = 1;
+	    ACCESS(ID,n,i,j) = VALUE_ZERO;
+	ACCESS(ID,n,i,i) = VALUE_ONE;
     }
 
-    DENOMINATOR(ID) = 1;
+    DENOMINATOR(ID) = VALUE_ONE;
 }
 
 /* boolean matrice_identite_p(matrice ID, int n, int level)
@@ -318,7 +322,7 @@ int level;
  *		     a prendre en compte les elements de la matrice
  */
 boolean matrice_identite_p(ID,n,level)
-int ID[];
+matrice ID;
 int n;
 int level;
 {
@@ -327,12 +331,12 @@ int level;
     for(i = level+1; i <= n; i++) {
 	for(j = level+1; j <= n; j++) {
 	    if(i==j)
-		if(	ACCESS(ID,n,i,i) != 1)
+		if(value_notone_p(ACCESS(ID,n,i,i)))
 		    return(FALSE);
 		else
 		    ;
 	    else /* i!=j */
-		if(ACCESS(ID,n,i,j) != 0)
+		if(value_notzero_p(ACCESS(ID,n,i,j)))
 		    return(FALSE);
 		else
 		    ;
@@ -349,7 +353,7 @@ int level;
  */
 /*ARGUSED*/
 int mat_lig_el(MAT,n,m,level)
-int MAT[];
+matrice MAT;
 int n,m;
 int level;
 {
@@ -358,7 +362,7 @@ int level;
 
     /* recherche du premier element non nul de la sous-ligne 
        MAT(level+1,level+2..m) */
-    for(j = level+2; j<=m && (ACCESS(MAT,n,1+level,j)==0) ; j++);
+    for(j = level+2; j<=m && value_zero_p(ACCESS(MAT,n,1+level,j)) ; j++);
     if(j < m+1)
 	j_min = j-1;
     return (j_min);
@@ -372,14 +376,14 @@ int level;
  */
 /*ARGSUSED*/
 int mat_col_el(MAT,n,m,level)
-int MAT[];
+matrice MAT;
 int n,m;
 int level;
 {
     int i;
     int i_min=0;
 
-    for(i = level+2; i <= n && (ACCESS(MAT,n,i,level+1)==0); i++);
+    for(i = level+2; i <= n && value_zero_p(ACCESS(MAT,n,i,level+1)); i++);
     if (i<n+1)
 	i_min = i-1;
     return (i_min);
@@ -388,19 +392,20 @@ int level;
 /* void mat_coeff_nnul(matrice MAT, int n, int m, int * lg_nnul,
  *                     int * cl_nnul, int level)
  * renvoie les coordonnees du plus petit element non-nul de la premiere
- * sous-ligne non nulle 'lg_nnul' de la sous-matrice MAT(level+1..n, level+1..m)
+ * sous-ligne non nulle 'lg_nnul' de la sous-matrice 
+ MAT(level+1..n, level+1..m)
  *
  *
  */
 void mat_coeff_nnul(MAT,n,m,lg_nnul,cl_nnul,level)
-int *MAT;
+matrice MAT;
 int n,m;
 int *lg_nnul,*cl_nnul;
 int level;
 {
     boolean trouve = FALSE;
     int j;
-    int min,val;
+    register Value min=VALUE_ZERO,val;
 
     *lg_nnul = 0;
     *cl_nnul = 0;
@@ -410,17 +415,21 @@ int level;
 
     *lg_nnul= mat_lig_nnul(MAT,n,m,level);
 
-    /* recherche du plus petit (en valeur absolue) element non nul de cette ligne */
+    /* recherche du plus petit (en valeur absolue)
+     * element non nul de cette ligne */
     if (*lg_nnul) {
 	for (j=1+level;j<=m && !trouve; j++) {
-	    min = ABS(ACCESS(MAT,n,*lg_nnul,j));
-	    if (min != 0) {
+	    min = ACCESS(MAT,n,*lg_nnul,j);
+	    value_absolute(min);
+	    if (value_notzero_p(min)) {
 		trouve = TRUE;
 		*cl_nnul=j;
 	    }
 	}
-	for (j=1+level;j<=m && min >1; j++) {
-	    if (((val = ABS(ACCESS(MAT,n,*lg_nnul,j)))!= 0) && (val < min)) {
+	for (j=1+level;j<=m && value_gt(min,VALUE_ONE); j++) {
+	    val = ACCESS(MAT,n,*lg_nnul,j);
+	    value_absolute(val);
+	    if (value_notzero_p(val) && value_lt(val,min)) {
 		min = val;
 		*cl_nnul =j;
 	    }
