@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/10/05 11:32:39 $, )
+ * ($Date: 1995/10/05 13:19:52 $, )
  */
 
 #include "defines-local.h"
@@ -326,7 +326,7 @@ static tag distribution_format(expression e,
     if (same_string_p(name, HPF_PREFIX STAR_SUFFIX))   /* * [star] */
 	return is_style_none;
     else
-	pips_user_error("invalid");
+	pips_user_error("invalid distribution format");
 
     return 0; /* just to avoid a gcc warning */
 }
@@ -459,11 +459,10 @@ handle_distribute_and_redistribute_directive(
 				proc, dynamic);
 }
 
-/*-----------------------------------------------------------------
- *
- *    DIRECTIVE HANDLERS
- *
- * each directive is handled by a function here.
+
+/******************************************************* DIRECTIVE HANDLERS */
+
+/* each directive is handled by a function here.
  * these handlers may use the statement stack to proceed.
  * signature: void handle_(DIRECTIVE NAME)_directive (entity f, list args).
  * I may add some handlers for private directives?
@@ -682,7 +681,7 @@ static struct DirectiveHandler handlers[] =
   {HPF_PREFIX DYNAMIC_SUFFIX,		HANDLER(dynamic) },
   {HPF_PREFIX PURE_SUFFIX,		HANDLER(pure) },
 
-  /* FCD directives
+  /* FC (Fabien Coelho) directives
    */
   {HPF_PREFIX SYNCHRO_SUFFIX,		HANDLER(synchro) },
   {HPF_PREFIX TIMEON_SUFFIX,		HANDLER(time) },
