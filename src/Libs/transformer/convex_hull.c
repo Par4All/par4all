@@ -1,4 +1,7 @@
- /* transformer package - convex hull computation
+ /*
+  * $Id$
+  *
+  * transformer package - convex hull computation
   *
   * Francois Irigoin, 21 April 1990
   */
@@ -129,7 +132,7 @@ Psysteme (*method)();
 	    b = BASE_NULLE;
 	}
 
-	predicate_system_(transformer_relation(t)) = (char *) r;
+	predicate_system(transformer_relation(t)) = r;
 
     }
     ifdebug(5) {
