@@ -615,7 +615,7 @@ bool unroll(char *mod_name)
     }
 
     /* Reorder the module, because new statements have been generated. */
-    module_body_reorder(mod_stmt);
+    module_reorder(mod_stmt);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
 
@@ -680,7 +680,7 @@ bool full_unroll(char *mod_name)
 		 find_loop_and_fully_unroll, gen_null);
 
     /* Reorder the module, because new statements have been generated. */
-    module_body_reorder(mod_stmt);
+    module_reorder(mod_stmt);
 
     searched_loop_label = entity_undefined;
 
