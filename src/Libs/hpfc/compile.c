@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/03/01 12:05:09 $, )
+ * ($Date: 1996/03/19 14:36:49 $, )
  */
 
 #include "defines-local.h"
@@ -95,6 +95,42 @@ make_host_and_node_modules (entity module)
     store_new_node_variable(node, module);
 }
 
+/* kind of a quick hack to remove distributed arguments for the host 
+ */
+static void 
+drop_distributed_arguments(entity module) /* of the host */
+{
+    type t = entity_type(module);
+    functional f;
+    list /* of parameter */ le = NIL, lp;
+    int len, i;
+
+    message_assert("functional", type_functional_p(t));
+    f = type_functional(t);
+    lp = functional_parameters(f);
+    len = gen_length(lp);
+
+    pips_debug(8, "considering %d arg(s) of %s\n", len, entity_name(module));
+
+    for (i=1; i<=len; i++, POP(lp))
+    {
+	entity ent = find_ith_parameter(module, i);
+	
+	if (!entity_undefined_p(ent) && !array_distributed_p(ent))
+	{
+	    le = CONS(PARAMETER, PARAMETER(CAR(lp)), le);
+	    pips_debug(8, "keeping %d argument %s\n", i, entity_name(ent));
+	}
+	else
+	    pips_debug(8, "dropping %d argument %s\n", i, 
+		       entity_undefined_p(ent)? "undefined": entity_name(ent));
+    }
+
+    lp = functional_parameters(f);
+    functional_parameters(f) = gen_nreverse(le);
+    gen_free_list(lp);
+}
+
 /* init_host_and_node_entities
  *
  * both host and node modules are initialized with the same
@@ -152,6 +188,8 @@ init_host_and_node_entities ()
 	 entity_declarations(current_module));
     
     NewDeclarationsOfDistributedArrays();    
+
+    drop_distributed_arguments(host_module);
 
     ifdebug(3)
     {
