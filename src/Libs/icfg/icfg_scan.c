@@ -38,14 +38,16 @@ static int current_margin;
 #define st_THEN	 "then"
 #define st_ELSE	 "else"
 #define st_ENDIF "endif"
+#define st_WHILE "while"
+#define st_ENDWHILE "endwhile"
 
 #define some_text_p(t) (t!=text_undefined && text_sentences(t)!=NIL)
 
 /* We want to keep track of the current statement inside the recurse */
 DEFINE_LOCAL_STACK(current_stmt, statement)
 
-/* We store the text for all statement in a mapping 
-   in order to print afterwards 
+/* We store the text for each statement in a mapping during a code traversal
+   in order to print it afterwards 
 */
 GENERIC_LOCAL_MAPPING(icfg, text, statement)
 
@@ -93,7 +95,8 @@ append_icfg_file(text t, string module_name)
 
 /* STATEMENT
  */
-static bool statement_filter(statement s)
+static bool 
+statement_filter(statement s)
 {
     bool res = TRUE;
     text t = make_text (NIL);
@@ -105,7 +108,8 @@ static bool statement_filter(statement s)
     return res;
 }
 
-static void statement_rewrite(statement s)
+static void 
+statement_rewrite(statement s)
 {
     pips_debug (5,"going up\n");
     ifdebug(9) print_text(stderr,(text) load_statement_icfg (s));
@@ -116,7 +120,8 @@ static void statement_rewrite(statement s)
 
 /* CALL
  */
-static void call_filter(call c)
+static void 
+call_filter(call c)
 {
     entity e_callee = call_function(c);
     string callee_name = module_local_name(e_callee);
@@ -177,14 +182,16 @@ static void call_filter(call c)
 
 /* LOOP
  */
-static bool loop_filter (loop l)
+static bool 
+loop_filter (loop l)
 {
     pips_debug (5, "Loop begin\n");
     if (print_do_loops) current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
-static void loop_rewrite (loop l)
+static void 
+loop_rewrite (loop l)
 {
     text inside_the_loop = text_undefined;
     text inside_the_do = text_undefined;
@@ -244,9 +251,23 @@ static void loop_rewrite (loop l)
 
 /* INSTRUCTION
  */
-static void instruction_rewrite (instruction i)
+static bool
+instruction_filter (instruction i)
+{
+    if(instruction_unstructured_p(i)
+       && unstructured_while_p(instruction_unstructured(i))) {
+	pips_debug (5, "While begin\n");
+	if (print_do_loops) current_margin += ICFG_SCAN_INDENT;
+    }
+    return TRUE;
+}
+
+static void 
+instruction_rewrite (instruction i)
 {
     text t = make_text (NIL);
+    char textbuf[MAX_LINE_LENGTH];
+    bool text_in_unstructured_p = FALSE;
 
     pips_debug (5,"going up\n");
     pips_debug (9,"instruction tag = %d\n", instruction_tag (i));
@@ -269,17 +290,54 @@ static void instruction_rewrite (instruction i)
 	unstructured u = instruction_unstructured (i);
 	list blocs = NIL ;
 	control ct = unstructured_control(u) ;
+	text inside_the_unstructured = make_text(NIL);
+	bool while_p = FALSE;
 
 	pips_debug (5,"dealing with an unstructured, appending texts\n");
 
+	if(unstructured_while_p(u)) {
+	    while_p = TRUE;
+	    pips_debug (5,"dealing with a WHILE\n");
+	}
+
 	/* SHARING! Every statement gets a pointer to the same precondition!
 	   I do not know if it's good or not but beware the bugs!!! */
-	CONTROL_MAP(c, {
+	FORWARD_CONTROL_MAP(c, {
 	    statement st = control_statement(c) ;
-	    MERGE_TEXTS(t, load_statement_icfg (st));
+	    MERGE_TEXTS(inside_the_unstructured, load_statement_icfg (st));
 	}, ct, blocs) ;
 	
 	gen_free_list(blocs) ;
+
+	text_in_unstructured_p = some_text_p(inside_the_unstructured);
+
+	/* Print the WHILE
+	 */
+	if(print_do_loops && while_p) {
+	    current_margin -= ICFG_SCAN_INDENT;
+	    if(text_in_unstructured_p) {
+		sprintf(textbuf, "%*s" st_WHILE "\n", current_margin, "");
+		ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+						      strdup(textbuf)));
+	    }
+	}
+
+	/* Print the text inside the unstructured (possibly the while body)
+	 */
+	if(text_in_unstructured_p) {
+	    pips_debug(9, "something inside_the_loop\n");
+	    MERGE_TEXTS (t, inside_the_unstructured);
+	}
+
+	/* Print the ENDDWHILE
+	 */
+	if (text_in_unstructured_p && print_do_loops && while_p) 
+	{
+	    sprintf(textbuf, "%*s" st_ENDWHILE "\n", current_margin, "");
+	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+						  strdup(textbuf)));
+	}
+
 	update_statement_icfg (current_stmt_head (), t);
 	break;
     }
@@ -289,7 +347,8 @@ static void instruction_rewrite (instruction i)
 /* RANGE
  * functions to avoid the indentation when dealing with DO expressions.
  */
-static bool range_filter(range r)
+static bool 
+range_filter(range r)
 {
     statement s = current_stmt_head();
 
@@ -298,7 +357,8 @@ static bool range_filter(range r)
     return TRUE;
 }
 
-static void range_rewrite(range r)
+static void 
+range_rewrite(range r)
 {
     statement s = current_stmt_head();
 
@@ -308,14 +368,16 @@ static void range_rewrite(range r)
 
 /* TEST
  */
-static bool test_filter (test l)
+static bool 
+test_filter (test l)
 {
     pips_debug (5, "Test begin\n");
     if (print_ifs) current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
-static void test_rewrite (test l)
+static void 
+test_rewrite (test l)
 {
     text inside_then = text_undefined;
     text inside_else = text_undefined;
@@ -383,7 +445,8 @@ static void test_rewrite (test l)
     return;
 }
 
-void print_module_icfg(entity module)
+void 
+print_module_icfg(entity module)
 {
     string module_name = module_local_name(module);
     statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,TRUE);
@@ -410,7 +473,7 @@ void print_module_icfg(entity module)
 	 statement_domain, statement_filter, statement_rewrite,
 	 call_domain     , call_filter     , gen_null,
 	 loop_domain     , loop_filter     , loop_rewrite,
-	 instruction_domain    , gen_null  , instruction_rewrite,
+	 instruction_domain    , instruction_filter  , instruction_rewrite,
 	 test_domain     , test_filter     , test_rewrite,
          range_domain    , range_filter    , range_rewrite,
 	 NULL);
