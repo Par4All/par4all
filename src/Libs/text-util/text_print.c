@@ -174,10 +174,10 @@ print_sentence(FILE * fd,
 		    char * line = w;
 		    int ncar;
 
-		    /* complete the current line */
-		    ncar = MAX_END_COLUMN - col + 1;
+		    /* Complete the current line, but not after :-) */
+		    ncar = MIN(MAX_END_COLUMN - col + 1, strlen(line));;
 		    deal_with_attachments_in_this_string_length
-			(line, position_in_the_output,ncar);
+			(line, position_in_the_output, ncar);
 		    fprintf_sentence(fd, "%.*s", ncar, line);
 		    line += ncar;
 		    col = MAX_END_COLUMN;
