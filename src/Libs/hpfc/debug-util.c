@@ -69,7 +69,7 @@ void print_aligns()
     MAP(ENTITY, a,
      {
 	 (void) fprintf(stderr, "of array %s\n", entity_name(a));
-	 print_align(load_entity_align(a));
+	 print_align(load_hpf_alignment(a));
 	 (void) fprintf(stderr,"\n");
      },
 	list_of_distributed_arrays());
@@ -82,7 +82,7 @@ void print_distributes()
     MAP(ENTITY, t,
      {
 	 (void) fprintf(stderr, "of template %s\n", entity_name(t));
-	 print_distribute(load_entity_distribute(t));
+	 print_distribute(load_hpf_distribution(t));
 	 (void) fprintf(stderr,"\n");
      },
 	 list_of_templates());
