@@ -1,5 +1,5 @@
 dnl
-dnl $RCSfile: hpfc_architecture_m4_macros,v $ ($Date: 1995/09/06 13:59:08 $, )
+dnl $RCSfile: hpfc_architecture_m4_macros,v $ ($Date: 1995/09/06 14:01:35 $, )
 dnl version $Revision$
 dnl got on %D%, %T%
 dnl
@@ -28,7 +28,7 @@ ifelse(ARCHITECTURE,`CM5',`define(`COM_PREFIX',`CM')')dnl
 ifelse(ARCHITECTURE,`SUN4',`define(`_SUN4',`$@')',
        ARCHITECTURE,`PGON',`define(`_PGON',`$@')',
        ARCHITECTURE,`CM5',`define(`_CM5',`$@')',
-       ARCHITECTURE,`RS6K',`define(`_R6K',`$@')')dnl
+       ARCHITECTURE,`RS6K',`define(`_RS6K',`$@')')dnl
 dnl
 dnl THAT IS ALL
 dnl
