@@ -69,7 +69,7 @@ int l ;
 	  stat = rice_loop(stat,l);
 	  ifdebug(7){
 	      fprintf(stderr, "\nparalized loop :");
-	      if (gen_consistent_p((statement)stat))
+	      if (statement_consistent_p((statement)stat))
 		  fprintf(stderr," gen consistent ");
 	  }
 	  break;
@@ -107,8 +107,12 @@ rice_loop(statement stat, int l)
 	int so = statement_ordering(stat);
 	user_warning("rice_loop", 
 		     "Cannot apply Allen & Kennedy's algorithm on "
-		     "Loop %d at Statement %d (%d, %d)\n",
-		     label_local_name(loop_index(instruction_loop(istat))),
+		     "Loop %s with index %s at Statement %d (%d, %d)"
+		     "because it contains either tests or goto statements"
+		     " which prohibit loop distribution. You could activate the"
+		     " coarse_grain_parallelization rule.\n",
+		     label_local_name(loop_label(instruction_loop(istat))),
+		     entity_local_name(loop_index(instruction_loop(istat))),
 		     statement_number(stat),
 		     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
 
@@ -134,7 +138,7 @@ rice_loop(statement stat, int l)
 	
     ifdebug(7){
 	pips_debug(7, "consistency checking for CodeGenerate output: ");
-	if (gen_consistent_p((statement)nstat))
+	if (statement_consistent_p((statement)nstat))
 	    fprintf(stderr," gen consistent\n");
     }
     pips_assert( "nstat is defined", nstat != statement_undefined ) ;
@@ -195,7 +199,7 @@ do_it(
     {
 	fprintf(stderr, "\nTesting NewGen consistency for initial code %s:\n",
 		mod_name);
-	if (gen_consistent_p((statement)mod_stat))
+	if (statement_consistent_p((statement)mod_stat))
 	    fprintf(stderr," NewGen consistent statement\n");
     }
 
@@ -211,7 +215,7 @@ do_it(
 	debug(7, "do_it",
 	      "\nTesting NewGen consistency for copy code %s:",
 		mod_name);
-	if (gen_consistent_p((statement)mod_parallel_stat))
+	if (statement_consistent_p((statement)mod_parallel_stat))
 	    fprintf(stderr," NewGen consistent statement copy\n");
     }
 
@@ -243,7 +247,7 @@ do_it(
     ifdebug(7)
     {
 	fprintf(stderr, "\nparallelized code %s:",mod_name);
-	if (gen_consistent_p((statement)mod_parallel_stat))
+	if (statement_consistent_p((statement)mod_parallel_stat))
 	    fprintf(stderr," gen consistent ");
     }
 
