@@ -1,5 +1,5 @@
 /* $RCSfile: abs.c,v $ (version $Revision$)
- * $Date: 1996/07/26 14:30:44 $, 
+ * $Date: 1996/08/07 13:07:37 $, 
  */
 
 #include <stdio.h>
@@ -18,7 +18,7 @@ Value abs_ofl_ctrl(Value i, int ofl_ctrl)
     extern jmp_buf overflow_error;
     
     if ((ofl_ctrl == 1) && value_eq(i,VALUE_MIN))
-	longjmp(overflow_error, 5);
+	THROW(overflow_error);
         
     assert(value_ne(i,VALUE_MIN));
     return value_pos_p(i)? i: value_uminus(i);
