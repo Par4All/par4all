@@ -92,6 +92,18 @@ Psysteme ps;
     }
 }
 
+/* fix system s for coherency of the base and number of things.
+ */
+void sc_fix(Psysteme s)
+{
+  if (s) {
+    s->nb_eq = nb_elems_list(s->egalites);
+    s->nb_ineq = nb_elems_list(s->inegalites);
+    if (s->base) base_rm(s->base), s->base = NULL;
+    sc_creer_base(s);
+  }
+}
+
 /* Variable * sc_base_dup(int nbv, Variable * b):
  * duplication de la table des variables base, qui contient nbv elements
  *
