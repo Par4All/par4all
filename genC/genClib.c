@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 2000/04/13 14:01:56 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 2000/04/13 17:38:38 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2067,8 +2067,8 @@ gen_read_spec(char * spec, ...)
 
     for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) 
     {
-      /* DEBUG
-	 if (bp->name) fprintf(stderr, "%d: %s\n", bp-Domains, bp->name); */
+      /* DEBUG */
+      /* if (bp->name) fprintf(stderr, "%d: %s\n", bp-Domains, bp->name); */
 
 	if( bp->name != NULL &&
 	   !IS_INLINABLE( bp ) && !IS_EXTERNAL( bp ) &&
