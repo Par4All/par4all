@@ -160,6 +160,9 @@
   * $Id$
   *
   * $Log: value.c,v $
+  * Revision 1.27  2004/01/06 10:09:27  irigoin
+  * Functions number_of_analyzed_values() and aproximate_number_of_analyzed_variables() added for Duong Nguyen
+  *
   * Revision 1.26  2003/07/24 08:54:49  irigoin
   * useless argument used to avoid a useless compiler warning.
   *
@@ -733,6 +736,22 @@ void test_mapping_entry_consistency()
 	      " of new, old and intermediate values",
 	      hash_table_entry_count(hash_value_to_name) >=
 	      nbn + nbo + nbi);
+}
+
+int number_of_analyzed_values()
+{
+  return hash_table_entry_count(hash_value_to_name);
+}
+
+int aproximate_number_of_analyzed_variables()
+{
+  /* FI: I do not know if equivalenced variables are well taken into account*/
+  return hash_table_entry_count(hash_entity_to_new_value);
+}
+
+int number_of_analyzed_variables()
+{
+  return hash_table_entry_count(hash_value_to_name);
 }
 
 void allocate_value_mappings(int n, int o, int i)
