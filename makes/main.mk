@@ -87,7 +87,6 @@ JAVAC	= javac
 JNI	= javah -jni
 MKDIR	= mkdir -p
 RMDIR	= rmdir
-INSTALL	= install
 
 # for easy debugging... e.g. gmake ECHO='something' echo
 echo:; @echo $(ECHO)

@@ -6,3 +6,4 @@ AR	= ar
 RANLIB	= ranlib
 CFLAGS  += -msupersparc
 CANSI	=
+INSTALL	= cp
