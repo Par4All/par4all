@@ -239,10 +239,11 @@ pips_main(int argc, char ** argv)
 	close_workspace(TRUE);
 	/* pop_performance_spy(stderr, "pips"); */
 	/* check debug level if no exception occured */
-	debug_off();
 
 	UNCATCH(any_exception_error);
     }
+
+    debug_off();
 
     return !success;
 }
