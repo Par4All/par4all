@@ -55,6 +55,16 @@ static bool privatize_sections = FALSE;
 static bool copy_in = FALSE;
 static bool copy_out = FALSE;
 
+void array_privatization_error_handler()
+{
+    error_reset_current_stmt_stack();
+    store_as_regions = FALSE;
+    store_as_loop_locals = TRUE;
+    privatize_sections = FALSE;
+    copy_in = FALSE;
+    copy_out = FALSE;
+}
+
 
 /********************************** INTRAPROCEDURAL PRIVATE REGIONS ANALYSIS */
 
