@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "genC.h"
+#include "makefile.h"
+#include "pipsmake.h"
 
 static pipsmake_callback_handler_type callback = (pipsmake_callback_handler_type) NULL ;
 static bool callback_set_p = FALSE;
