@@ -5,7 +5,7 @@
 #
 
 LIB_CFILES	= fpips.c
-LIB_MAIN	= fpips_main.c
+LIB_MAIN	= main_fpips.c
 LIB_OBJECTS	= $(LIB_CFILES:.c=.o)
 
 #
