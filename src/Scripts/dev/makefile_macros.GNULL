@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNULL,v $ (version $Revision$)
-# $Date: 1996/08/21 18:50:48 $, 
+# $Date: 1996/09/02 13:44:24 $, 
 #
 # this file contains macro definitions 
 
@@ -33,6 +33,7 @@ DIFF	= gdiff
 M4	= gm4
 M4FLAGS	=
 LX2HTML	= latex2html
+L2HFLAGS= -link 8 -split 5
 LATEX	= latex
 MAKEIDX	= makeindex
 DVIPS	= dvips
