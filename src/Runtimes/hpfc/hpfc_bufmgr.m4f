@@ -1,6 +1,10 @@
 !
-! $RCSfile: hpfc_bufmgr.m4f,v $ (version $Revision$)
-! $Date: 1997/01/07 11:49:54 $, 
+! $Id$
+!
+! $Log: hpfc_bufmgr.m4f,v $
+! Revision 1.12  1997/04/17 11:55:22  coelho
+! better headers.
+!
 !
 ! First routines to fake the pack/unpack of data.
 ! The issue is to allow quite simply to measure the different
