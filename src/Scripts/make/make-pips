@@ -1,8 +1,8 @@
-#! /bin/sh
+#! /bin/sh -x
 #! /bin/sh -vx
 #
 # SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1995/10/05 09:14:38 $, )
+# $RCSfile: make-pips,v $ ($Date: 1995/10/09 10:46:28 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -78,7 +78,7 @@ PASSES=${PIPS_PASSES}
 #LIBS=`(cd $PIPS_LIBSRCDIR; echo [!M]*)`
 
 echo analyzing libraries ...
-analyze_libraries -p
+#analyze_libraries -p
 
 echo ordering libraries ...
 order_libraries -b
@@ -105,21 +105,32 @@ echo LIBS=$LIBS
 # build .a file for all libraries in Production
 if [ -n "$PRODUCTION" ]
 then
+
+if [ -n "$RECOMPILE" ]
+then
+	echo Cleaning libraries ...
+	for lib in $LIBS ; do
+		(cd ${PIPS_LIBSRCDIR}/${lib}; 
+			eval make $MAKE_OPTION clean $REDIRECT
+			eval make $MAKE_OPTION depend $REDIRECT)
+		if [ $? -ne 0 ] ; then
+			echo "Failed in cleaning library $lib in Production"
+			FAILURES="$FAILURES $lib (clean - P),"
+		fi
+	done
+fi
+
 for lib in $LIBS ; do
-	echo; echo
+	echo
 	(echo cd ${PIPS_LIBSRCDIR}/${lib} ; cd ${PIPS_LIBSRCDIR}/${lib}; 
 		echo "Making ${PIPS_LIBDIR}/lib${lib}.a"
-		if [ -n "$RECOMPILE" ]
-		then
-			eval make $MAKE_OPTION clean $REDIRECT
-			eval make $MAKE_OPTION depend $REDIRECT
-		fi ;
 		eval make $MAKE_OPTION recompile $REDIRECT)
 	if [ $? -ne 0 ] ; then
 		echo "Failed in building library $lib in Production"
 		FAILURES="$FAILURES $lib (P),"
 	fi
 done
+
 fi
 
 # build .a file for all libraries in Development
@@ -144,22 +155,30 @@ then
 	then
 		mkdir ${PIPS_BINDIR}
 	fi
-for pass in $PASSES ; do
-	echo; echo
-#	printenv
-	(echo cd ${PIPS_BINSRCDIR}/${pass}; cd ${PIPS_BINSRCDIR}/${pass}; 
-		echo "Making ${PIPS_BINDIR}/${pass}"
-		if [ -n "$RECOMPILE" ]
-		then
-			eval make $MAKE_OPTION clean $REDIRECT
-			eval make $MAKE_OPTION depend $REDIRECT
-		fi ;
-		eval make $MAKE_OPTION recompile $REDIRECT)
-	if [ $? -ne 0 ] ; then
-		echo " Failed in building ${PIPS_BINDIR}/${pass}"
-		FAILURES="$FAILURES $pass (P),"
+	if [ -n "$RECOMPILE" ]
+	then
+		echo Cleaning passes...
+		for pass in $PASSES ; do
+			(cd ${PIPS_BINSRCDIR}/${pass}; 
+				eval make $MAKE_OPTION clean $REDIRECT
+				eval make $MAKE_OPTION depend $REDIRECT)
+			if [ $? -ne 0 ] ; then
+				echo " Failed in building ${PIPS_BINDIR}/${pass}"
+				FAILURES="$FAILURES $pass (clean - P),"
+			fi
+		done
 	fi
-done
+
+	for pass in $PASSES ; do
+		echo; echo
+		(echo cd ${PIPS_BINSRCDIR}/${pass}; cd ${PIPS_BINSRCDIR}/${pass}; 
+			echo "Making ${PIPS_BINDIR}/${pass}"
+			eval make $MAKE_OPTION recompile $REDIRECT)
+		if [ $? -ne 0 ] ; then
+			echo " Failed in building ${PIPS_BINDIR}/${pass}"
+			FAILURES="$FAILURES $pass (P),"
+		fi
+	done
 fi
 
 # build passes
