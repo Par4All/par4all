@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.83  1998/05/22 14:37:17  coelho
+ * jpips show + error if shell fails in scripts.
+ *
  * Revision 1.82  1998/05/22 13:33:15  coelho
  * fixes for jpips.
  *
@@ -172,7 +175,14 @@ static bool display_a_resource(string rname, string mname)
     fname = build_view_file(rname);
     if (!fname) pips_user_error("Cannot build view file %s\n", rname);
 
-    if (pager)
+    if (jpips_is_running)
+    {
+	/* Should tell about what it is? 
+	 * What about special formats, such as graphs and all?
+	 */
+	jpips_tag2("show", fname); 
+    }
+    else if (pager)
     {
 	safe_system(concatenate(pager, " ", fname, 0));
     }
@@ -266,9 +276,13 @@ static void tp_system(string s)
     user_log("shell%s%s\n", (s[0]==' '|| s[0]=='\t')? "": " ", s);
     status = system(s);
     fflush(stdout);
+
     if (status) 
 	pips_user_warning("shell returned status (%d.%d)\n", 
 			  status%256, status/256);
+
+    if (!tpips_is_interactive)
+	pips_user_error("shell error (%d) in tpips script\n", status);
 }
 
 static bool tp_close_the_workspace(string s)
@@ -310,36 +324,34 @@ static void tp_some_info(string about)
     {
 	string ws = db_get_current_workspace_name();
 	fprintf(stdout, "%s", ws? ws: "");
-	if (jpips_is_running())
-	    jpips_tag2("workspace", ws? ws: "<none>");
+	if (jpips_is_running) jpips_tag2("workspace", ws? ws: "<none>");
     }
     else if (same_string_p(about, "module"))
     {
 	string m = db_get_current_module_name();
 	fprintf(stdout, "%s", m? m: "");
-	if (jpips_is_running())
-	    jpips_tag2("module", m? m: "<none>");
+	if (jpips_is_running) jpips_tag2("module", m? m: "<none>");
     }
     else if (same_string_p(about, "modules") &&
 	     db_get_current_workspace_name())
     {
 	gen_array_t modules = db_get_module_list();
 	int n = gen_array_nitems(modules), i;
-	if (jpips_is_running()) jpips_begin_tag("modules");
+	if (jpips_is_running) jpips_begin_tag("modules");
 	for(i=0; i<n; i++) 
 	{
 	    string m = gen_array_item(modules, i);
 	    fprintf(stdout, "%s ", m);
-	    if (jpips_is_running()) jpips_add_tag(m);
+	    if (jpips_is_running) jpips_add_tag(m);
 	}
-	if (jpips_is_running()) jpips_end_tag();
+	if (jpips_is_running) jpips_end_tag();
 	gen_array_full_free(modules);
     }
     else if (same_string_p(about, "directory"))
     {
 	char pathname[MAXPATHLEN];
 	fprintf(stdout, "%s", (char*) getcwd(pathname, MAXPATHLEN));
-	if (jpips_is_running())
+	if (jpips_is_running)
 	    jpips_tag2("directory", (char*) getcwd(pathname, MAXPATHLEN));
     }
     
@@ -733,7 +745,7 @@ i_get: TK_GET_PROPERTY propname TK_ENDOFLINE
 	    
 	    if (tpips_execution_mode) {
 		fprint_property(stdout, $2);
-		if (jpips_is_running())
+		if (jpips_is_running)
 		{
 		    jpips_begin_tag("property");
 		    jpips_add_tag("");
