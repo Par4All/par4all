@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/10/02 14:57:44 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/10/02 15:15:47 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -230,7 +230,7 @@ all: $ALL_RULE_TARGET
 recompile: depend header all
 # to override sun's default rule
 .SCCS_GET:
-.INIT: $(MAKEFILE)
+.INIT: generate_makefile_if_necessary_and_possible
 check_install:
 #
 # begin of $CONFIG_FILE inclusion
@@ -421,12 +421,12 @@ tar:
 
 quick-install: .quick-install
 
-$MAKEFILE: 
-	-@[ -x $(PIPS_UTILDIR)/pips-makemake ] && $(MAKE) .makefile
-
 .makefile: $(PIPS_UTILDIR)/pips-makemake
 	$(PIPS_UTILDIR)/pips-makemake
 	touch .makefile
+	
+generate_makefile_if_necessary_and_possible:
+	-@[ -x $(PIPS_UTILDIR)/pips-makemake ] && $(MAKE) .makefile
 
 count:
 	@wc -l $(SOURCES)
