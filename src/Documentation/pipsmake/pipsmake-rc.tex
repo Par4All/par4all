@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.25  2003/12/17 17:41:30  guerin
+%% Fixing better locations for PHRASE passes
+%%
 %% Revision 1.24  2003/12/17 16:26:11  guerin
 %% Adding fundations for PHRASE project
 %%
@@ -554,7 +557,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/12/17 16:26:11 $~$
+$~$Date: 2003/12/17 17:41:30 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -3129,54 +3132,6 @@ simdizer                    > MODULE.code
         < MODULE.code MODULE.dg
 \end{verbatim}
 
-\subsubsection{PHRASE: high-level language transformation for partial evaluation in reconfigurable logic}
-
-%%@UserManualDocumentation:  phrase_distributor
-This pass allow to split the code into portions of code delimited 
-by PHRASE-pragmas (written by the programmer) and a control file 
-managing them. Those portions of code are intented, after 
-transformations, to be executed in reconfigurable logic (in PHRASE 
-projects, reconfigurable logic is synthetized with smalltalk code).
-%%ÿUserManualDocumentation
-
-\begin{verbatim}
-alias phrase_distributor 'PHRASE Distributor'
-
-phrase_distributor                      > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-\end{verbatim}
-
-%%@UserManualDocumentation: fsm_generation
-This pass tries to generate finite state machine from arbitrary 
-code by applying rules numeroting branches of a dependance graph 
-and using it as state variable for the finite state machine.
-%%ÿUserManualDocumentation
-
-\begin{verbatim}
-alias fsm_generation 'FSM Generation'
-
-fsm_generation        > MODULE.code
-        < PROGRAM.entities
-        < MODULE.dg
-        < MODULE.code
-\end{verbatim}
-
-%%@UserManualDocumentation: print_code_smalltalk
-This pass is used in context of PHRASE project for 
-synthetisation of reconfigurable logic for a portion of initial 
-code. This function can be viewed as a Smalltalk pretty-printer 
-of a subset of Fortran.
-%%ÿUserManualDocumentation
-
-\begin{verbatim}
-alias print_code_smalltalk 'Smalltalk Pretty-Printer'
-
-print_code_smalltalk        > MODULE.smalltalk_code
-        < PROGRAM.entities
-        < MODULE.code
-\end{verbatim}
-
 
 \subsubsection{Coarse Grain Parallelization}
 \label{subsubsection-coarse-grain-parallelization}
@@ -3385,7 +3340,30 @@ hpfc_run
 
 \end{verbatim}
 
+\subsubsection{PHRASE: high-level language transformation for partial evaluation in reconfigurable logic}
+\label{subsubsection-phrase-code-distribution}
+\index{Code Distribution}
+\index{PHRASE}
 
+The PHRASE project is an attempt to automatically (or semi-automatically) 
+transform high-level language for partial evaluation in reconfigurable 
+logic (such as FPGAs or DataPaths).
+
+%%@UserManualDocumentation:  phrase_distributor
+This pass allow to split the code into portions of code delimited by 
+PHRASE-pragmas (written by the programmer) and a control file managing 
+them. Those portions of code are intented, after transformations, to 
+be executed in reconfigurable logic (in PHRASE projects, reconfigurable 
+logic is synthetized with smalltalk code).
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+alias phrase_distributor 'PHRASE Distributor'
+
+phrase_distributor                      > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
 
 
 \section{Program Transformations}
@@ -3962,6 +3940,31 @@ suppress_trivial_test          > MODULE.code
         < MODULE.code
 \end{verbatim}
 
+\subsubsection{Finite State Machine Generation}
+\label{subsection-fsm-generation}
+\index{Finite State Machine Generation}
+\index{PHRASE}
+
+This pass is used for PHRASE project.
+
+NB: The PHRASE project is an attempt to automatically (or semi-automatically) 
+transform high-level language for partial evaluation in reconfigurable 
+logic (such as FPGAs or DataPaths).
+
+%%@UserManualDocumentation: fsm_generation
+This pass tries to generate finite state machine from arbitrary code by
+applying rules numeroting branches of a dependance graph and using it 
+as state variable for the finite state machine.
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+alias fsm_generation 'FSM Generation'
+
+fsm_generation        > MODULE.code
+        < PROGRAM.entities
+        < MODULE.dg
+        < MODULE.code
+\end{verbatim}
 
 
 %\subsubsection{Declaration Common Addition}
@@ -6554,6 +6557,33 @@ print_crough  > MODULE.crough
 print_c_code  > MODULE.c_printed_file
               < MODULE.crough
 \end{verbatim}
+
+\subsection{Prettyprinters Smalltalk}
+\label{subsection-prettyprinters-smalltalk}
+\index{Prettyprinters Smalltalk}
+\index{PHRASE}
+
+This pass is used for PHRASE project.
+
+NB: The PHRASE project is an attempt to automatically (or semi-automatically) 
+transform high-level language for partial evaluation in reconfigurable 
+logic (such as FPGAs or DataPaths).
+
+%%@UserManualDocumentation: print_code_smalltalk
+This pass is used in context of PHRASE project for synthetisation of 
+reconfigurable logic for a portion of initial code. This function can 
+be viewed as a Smalltalk pretty-printer of a subset of Fortran.
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+alias print_code_smalltalk 'Smalltalk Pretty-Printer'
+
+print_code_smalltalk        > MODULE.smalltalk_code
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
+
+
 
 \section{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
