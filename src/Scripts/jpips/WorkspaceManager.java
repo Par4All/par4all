@@ -2,6 +2,9 @@
   $Id$
   
   $Log: WorkspaceManager.java,v $
+  Revision 1.9  1999/02/15 14:20:51  coelho
+  *** empty log message ***
+
   Revision 1.8  1998/11/20 18:15:46  coelho
   fixed multi-selection...
 
@@ -40,11 +43,11 @@ import java.awt.*;
 import java.awt.event.*;
 
 //import java.awt.swing.preview.*;
-import com.sun.java.swing.*;
-import com.sun.java.swing.filechooser.*;
-import com.sun.java.swing.border.*;
-import com.sun.java.swing.event.*;
-import com.sun.java.swing.text.*;
+import javax.swing.*;
+import javax.swing.filechooser.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
 
 
 /** A workspace file for JPips
