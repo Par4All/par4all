@@ -262,7 +262,6 @@ int *int_p;
 	return(FALSE);
 }
 
-/* END_EOLE */
 
 /* (*int_p) gets integer constant if any */
 bool 
@@ -279,6 +278,8 @@ int *int_p;
     else
 	return(FALSE);
 }
+
+/* END_EOLE */
 
 /* this function creates an character constant and then a call to that
 constant. */
