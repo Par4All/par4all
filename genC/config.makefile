@@ -1,9 +1,10 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/08 16:26:01 $, 
+# $Date: 1996/08/09 21:06:09 $, 
 #
 # Newgen should be quite particular...
 
+# LEX=flex
 YFLAGS+= -d -v
 
 all: $(ARCH)/newC $(ARCH)/libgenC.a
@@ -83,7 +84,8 @@ genread.h genread_yacc.c: read.y
 
 genread_lex.o: genread.h
 genread_lex.c: read.l 
-	$(SCAN) $< | sed 's,YY,GENREAD_,g;s,yy,genread_,g;' > $@
+	$(SCAN) $< | \
+	sed '/^FILE *\*/s,=[^,;]*,,g;s,YY,GENREAD_,g;s,yy,genread_,g;' > $@
 
 genspec.h genspec_yacc.c: gram.y
 	$(PARSE) $< 
@@ -93,7 +95,8 @@ genspec.h genspec_yacc.c: gram.y
 
 genspec_lex.o: genspec.h
 genspec_lex.c: token.l
-	$(SCAN) $< | sed 's,YY,GENSPEC_,g;s,yy,genspec_,g' > $@
+	$(SCAN) $< | \
+	sed '/^FILE *\*/s,=[^,;]*,,g;s,YY,GENSPEC_,g;s,yy,genspec_,g' > $@
 
 $(ARCH)/newC:	$(ARCH)/new.o $(ARCH)/libgenC.a
 	$(LINK) $@ $+
