@@ -1,5 +1,5 @@
 # $RCSfile: Makefile.compile_wp65,v $ (version $Revision$)
-# $Date: 1997/04/03 13:23:15 $, 
+# $Date: 1997/04/03 13:25:18 $, 
 #
 
 # Fait des vérifications exhaustives :
@@ -29,6 +29,7 @@ endif
 
 LD	= $(FC)
 LDFLAGS = -L$(WP65_RUNTIME)/$(PVM_ARCH) \
+	  -L$(NEWGEN_ROOT)/Lib/$(PIPS_ARCH) \
 	  -L$(PIPS_ROOT)/Lib/$(PIPS_ARCH) \
 	  -L$(PVM_ROOT)/lib/$(PVM_ARCH)
 
