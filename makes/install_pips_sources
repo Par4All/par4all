@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: install_pips_sources,v $ ($Date: 1995/10/04 11:35:26 $, )
+# $RCSfile: install_pips_sources,v $ ($Date: 1995/10/04 11:37:05 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -83,7 +83,7 @@ $VERBOSE "entering directory $TARGET_DIR"
 [ -d "$TARGET_DIR" ] || mkdir $TARGET_DIR $TARGET_DIR/SCCS
 cd $TARGET_DIR
 [ -d OLD ] || mkdir OLD
-[ -f SCCS ] || mkdir SCCS
+[ -d SCCS ] || mkdir SCCS
 
 [ "$ONLYDIFF" ] ||
 {
