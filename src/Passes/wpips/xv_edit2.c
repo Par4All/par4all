@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/30 15:17:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/08/26 13:27:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1997/04/30 15:17:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1997/08/26 13:27:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -337,9 +337,12 @@ wpips_display_graph_file_display(wpips_view_menu_layout_line * menu_line)
 						 "/", file_name, NULL));
     }
     else {
-	(void) sprintf(a_buffer, "pips_graph2daVinci -launch_daVinci %s", file_name);
+	(void) sprintf(a_buffer, "pips_graph2daVinci -launch_daVinci %s", 
+		       file_name);
 	system(a_buffer);
     }
+
+    free(file_name);
 }
 
 
@@ -355,10 +358,14 @@ wpips_display_plain_file(wpips_view_menu_layout_line * menu_line)
     
     (void) sprintf(title_module_name, "Module: %s",
 		   db_get_current_module_name());
-    if (wpips_view_marked_busy(title_module_name, label, icon_name, db_get_current_module_name())) {
+    if (wpips_view_marked_busy(title_module_name, label, icon_name, 
+			       db_get_current_module_name())) {
 	char * file_name = build_view_file(print_type);
 
-	wpips_file_view(file_name, title_module_name, label, icon_name, db_get_current_module_name());
+	wpips_file_view(file_name, title_module_name, label, icon_name, 
+			db_get_current_module_name());
+
+	free(file_name);
     }
 }
 
@@ -373,22 +380,32 @@ wpips_display_WP65_file(wpips_view_menu_layout_line * menu_line)
     char * icon_name = menu_line->icon_name;
     char * label = menu_line->menu_entry_string;
 
-    (void) sprintf(title_module_name, "Module: %s", db_get_current_module_name());
-    if (wpips_view_marked_busy(title_module_name, label, icon_name, db_get_current_module_name())) {
+    (void) sprintf(title_module_name, "Module: %s", 
+		   db_get_current_module_name());
+    if (wpips_view_marked_busy(title_module_name, label, icon_name, 
+			       db_get_current_module_name())) 
+    {
 	char bank_view_name[SMALL_BUFFER_LENGTH];
 	
 	char * file_name = build_view_file(print_type);
-	wpips_file_view(file_name, title_module_name, label, icon_name,  db_get_current_module_name());
+	wpips_file_view(file_name, title_module_name, label, icon_name,  
+			db_get_current_module_name());
+	free(file_name);
+
 	/* Now display the other file: */
 	(void) sprintf(bank_view_name, "%s (bank view)", label);
 	if (wpips_view_marked_busy(title_module_name, bank_view_name, 
-				   "WP65_bank", db_get_current_module_name())) {
+				   "WP65_bank", db_get_current_module_name()))
+	{
 	    /* Assume the previous build_view_file built the both
                resources: */
 	    file_name = get_dont_build_view_file(DBR_WP65_BANK_FILE);
       
 	    wpips_file_view(file_name, title_module_name, 
-			    bank_view_name, "WP65_bank", db_get_current_module_name());
+			    bank_view_name, "WP65_bank", 
+			    db_get_current_module_name());
+
+	    free(file_name);
 	}
     }
 }
