@@ -1,0 +1,37 @@
+#! /bin/sh
+
+perl -e '
+$menu_dir = $ENV{"PIPS_INCLUDEDIR"};
+$program_name = $ARGV[0];
+print @ARGV;
+while (<>) {
+    /\\begin{PipsMenu}{Transformations}/ && do {
+	$transformation_menu = 1;
+	open(STDOUT, ">" . $menu_dir . "/wpips_transform_menu_layout.h")
+	    || die("Cannot open new STDOUT"); 
+	print "/* The table that describes the transform menu: */\n";
+	print "/* It has been generated automatically from the pipsmake-rc.tex file with " . $program_name . ". */\n";
+	next;
+    };
+    /\\end{PipsMenu}/ && do {
+	$transformation_menu = 0;
+        close(MENU);
+	next;
+    };
+    if ($transformation_menu == 0) {
+	next;
+    };
+    if ( /\s*(\b.*\b)\s*->\s*(\b.*\b)/ ) {
+	$item = "\"" . $1 . "\"";
+	$function = $2;
+	$function =~tr/a-z/A-Z/;
+	$function = "BUILDER_" . $function;
+    }
+    else {
+	# It is a separator:
+	$item = "WPIPS_MENU_SEPARATOR_ID";
+	$function = "\"\"";
+    }
+    print "{\n\t$item, $function\n\t},\n";
+}
+'
