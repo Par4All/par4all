@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.329  1998/07/21 17:10:41  coelho
+# missing backslash added.
+#
 # Revision 1.328  1998/07/21 17:05:30  coelho
 # UTC_DATE added.
 #
@@ -449,7 +452,7 @@ include \$(CONFIG)
 all: \$(ARCH) $ALL_RULE_TARGET
 #
 # The software architecture (compilers and options...) used.
-UTC_DATE = $(shell date -u)
+UTC_DATE = \$(shell date -u)
 CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
 #
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
