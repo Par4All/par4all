@@ -33,5 +33,6 @@ sed -n \
 -e 's/^User Request.../# user request :/p' \
 -e 's/^"\(.*\)"$/\1/p' \
 $WS.database/LOGFILE
-
+echo quit
+echo \# EOF
 #end
