@@ -35,7 +35,7 @@
 #include "rice.h"
 
 /* the dependence graph of the current loop nest */
-graph dg;
+graph dg = graph_undefined;
 
 /* to know if do loop parallelization must be done */
 bool rice_distribute_only;
@@ -47,9 +47,10 @@ int Nbrdoall = 0;
 
 int enclosing = 0 ;
 
-void distributer(mod_name)
+bool distributer(mod_name)
 char *mod_name;
 {  
+    bool success;
     entity
 	module = local_name_to_top_level_entity(mod_name);
 
@@ -57,45 +58,48 @@ char *mod_name;
 
     debug_on("RICE_DEBUG_LEVEL");
 
-    do_it( mod_name, TRUE, DBR_CODE ) ;
+    success = do_it( mod_name, TRUE, DBR_CODE ) ;
 
     debug_off();  
     reset_current_module_entity();
+
+    return success;
 }
 
-void rice_all_dependence(mod_name)
+bool rice_all_dependence(mod_name)
 char *mod_name;
 {
     set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", TRUE ) ;
     set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", FALSE ) ;
-    rice( mod_name ) ;
+    return rice( mod_name ) ;
 }
 
-void rice_data_dependence(mod_name)
+bool rice_data_dependence(mod_name)
 char *mod_name;
 {
     set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", TRUE ) ;
     set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", TRUE ) ;
-    rice( mod_name ) ;
+    return rice( mod_name ) ;
 }
 
-void rice_cray(mod_name)
+bool rice_cray(mod_name)
 char *mod_name;
 {
     set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", FALSE ) ;
     set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", FALSE ) ;
-    rice( mod_name ) ;
+    return rice( mod_name ) ;
 }
 
-void rice(mod_name)
+bool rice(mod_name)
 char *mod_name;
 { 
+    bool success;
     entity
 	module = local_name_to_top_level_entity(mod_name);
 
     set_current_module_entity(module);
 
-    do_it( mod_name, FALSE, DBR_PARALLELIZED_CODE);
+    success = do_it( mod_name, FALSE, DBR_PARALLELIZED_CODE);
     ifdebug(1)
     {
 	fprintf(stderr,"\nThe number of DOALLs :\n");
@@ -103,12 +107,14 @@ char *mod_name;
     }
 
     reset_current_module_entity();
+
+    return success;
 }
 
 /*
  * RICE_DEBUG_LEVEL (properly?) included, FC 23/09/93
  */
-void do_it(mod_name, distribute_p, what ) 
+bool do_it(mod_name, distribute_p, what ) 
 char *mod_name ;
 bool distribute_p ;
 char *what ;
@@ -139,7 +145,12 @@ char *what ;
     /*(void) db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, FALSE);*/
     mod_inst = statement_instruction(mod_stat);
     pips_assert( "do_it", instruction_unstructured_p(mod_inst)) ;
-    dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+    if (graph_undefined_p(dg)) {
+	dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+    }
+    else {
+	pips_error("do_it", "dg should be undefined\n");
+    }
 
     debug_on("RICE_DEBUG_LEVEL");
     rice_distribute_only = distribute_p ;
@@ -169,10 +180,13 @@ char *what ;
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
+    dg = graph_undefined;
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), (char*) mod_stat);
 
     reset_current_module_statement();
+
+    return TRUE;
 }
 
 void rice_unstructured(u,l)
