@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1994/09/03 17:20:05 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1994/09/05 15:57:01 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -18,6 +18,7 @@ VERBOSE=':'
 DEBUG=':'
 SRCDIR=${HPFC_INCLUDE:-$EXTEDIR}
 MAKE='gmake'
+M4='m4'
 
 #
 
@@ -39,6 +40,7 @@ usage()
 	   -v: verbose
 	   -d: debug
 	   -q: quiet
+           -n name: target name
 	   -t dir: target directory
 	   -b dir: database (default current database)
 	   -s dir: where other sources are (default HPFC_INCLUDE then EXTEDIR)
@@ -47,7 +49,7 @@ usage()
   exit ${1:-1}
 }
 
-while getopts himvdqt:s:b:r: OPT
+while getopts himvdqt:s:b:r:n: OPT
 do
   case $OPT in
     h) usage 0 ;;
@@ -60,6 +62,7 @@ do
     s) SRCDIR="$OPTARG" ;;
     b) BASEDIR="$OPTARG" ;;
     r) REFFILE="$OPTARG" ;;
+    n) NAME="$OPTARG" ;;
     *) usage
   esac
 done
@@ -69,8 +72,10 @@ shift `expr $OPTIND - 1`
 #
 $DEBUG checking
 
-[ $# -eq 0 ] || usage
+[ "$#" -eq 0 ] || usage
 [ "$BASEDIR" ] || usage
+
+NAME=`echo ${NAME:-`basename $BASEDIR .database`} | tr 'A-Z' 'a-z'`
 
 [ "$DIRECTORY" ] ||
 {
@@ -93,6 +98,7 @@ then
   $VERBOSE "copying files in $DIRECTORY"
   cp $SRCDIR/hpfc_*.h \
      $SRCDIR/hpfc_*.f \
+     $SRCDIR/hpfc_Makefile \
      $BASEDIR/param_init.f \
      $BASEDIR/*_host.f \
      $BASEDIR/*_host.h \
@@ -103,18 +109,12 @@ then
      $PVM_ROOT/include/*pvm3.h \
      $DIRECTORY
 
-  if [ "$REFFILE" ]
-  then
-    cp $REFFILE $DIRECTORY
-    echo "REFFILE = "`basename ${REFFILE}` |
-       cat - $SRCDIR/hpfc_Makefile > $DIRECTORY/hpfc_Makefile
-  else
-    cp $SRCDIR/hpfc_Makefile $DIRECTORY
-  fi
+  [ "$REFFILE" ] && cp $REFFILE $DIRECTORY/$NAME.f
 
-  (cd $DIRECTORY; ln -s hpfc_Makefile Makefile;)
+  echo "TARGET = $NAME" > Makefile
+  ${M4} -D ARCHITETURE=`pvmgetarch` hpfc_Makefile >> Makefile
 
-  chmod ug+w $DIRECTORY/*
+  chmod u+w $DIRECTORY/*
 fi
 
 #
