@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/02/29 18:18:40 $, )
+ * ($Date: 1996/04/01 11:36:35 $, )
  */
 
 #include "defines-local.h"
@@ -30,6 +30,25 @@ static statement_mapping
 #define Store(stat, val) \
     (hash_put(stat_bool_map, (char*) (stat), (char*) (val)))
 
+/* true if the first statement of a block is a host section marker.
+ * looks like a hack. should be managed in directives.c...
+ */
+static bool 
+host_section_p(
+    list /* of statement */ ls)
+{
+    if (gen_length(ls)>=1)
+    {
+	instruction one = statement_instruction(STATEMENT(CAR(ls)));
+	if (instruction_call_p(one))
+	    return same_string_p
+		(entity_local_name(call_function(instruction_call(one))), 
+		 HPF_PREFIX HOSTSECTION_SUFFIX);
+    }
+
+    return FALSE;
+}
+
 /* ??? neglect expression side effects...
  */
 static void 
@@ -42,14 +61,14 @@ only_io_rewrite(
     switch (instruction_tag(i))
     {
     case is_instruction_block:
+	if (host_section_p(instruction_block(i))) /* HOST SECTION => TRUE! */
+	    break; 
 	MAP(STATEMENT, s, is_io = (is_io && Load(s)), instruction_block(i));
         break;
     case is_instruction_test:
     {
 	test t = instruction_test(i);
-
 	is_io = (Load(test_true(t)) && Load(test_false(t)));
-
         break;
     }
     case is_instruction_loop:
