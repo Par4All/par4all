@@ -68,7 +68,7 @@ call            flint_call(c)
 {
     list            la = call_arguments(c);
 
-    check_call(c);
+    check_the_call(c);
 
     gen_mapl(flint_cons_expression, la);
 
@@ -101,7 +101,7 @@ reference       flint_reference(r)
 {
     list            pc = reference_indices(r);
 
-    (void) check_reference(r);
+    (void) check_the_reference(r);
 
     gen_mapl(flint_cons_expression, pc);
 
