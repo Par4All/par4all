@@ -570,7 +570,18 @@ static bool parametric_statement_feasible_p(statement s,
 bool statement_weakly_feasible_p(statement s)
 {
     transformer pre = load_statement_precondition(s);
-    bool feasible_p = !transformer_empty_p(pre);
+    /* bool feasible_p = !transformer_empty_p(pre); */
+
+    /* FI: this test is much stronger than I intended. I just wanted
+     * to check that the predicate of pre was exactly sc_empty()!
+     *
+     * Now I'm afraid to change it. suppress_dead_code isn't that slow
+     * on ocean. I'm not sure that I could validate Transformations.
+     */
+
+    Psysteme sc = predicate_system(transformer_relation(pre));
+
+    bool feasible_p = !sc_empty_p(sc);
 
     return feasible_p;
 }
