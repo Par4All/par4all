@@ -112,7 +112,7 @@ char * (*variable_name)(Variable);
 void egalite_fprint(fp,eg,variable_name)
 FILE *fp;
 Pcontrainte eg;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     contrainte_fprint(fp,eg,FALSE,variable_name);
 }
@@ -136,7 +136,7 @@ Pcontrainte c;
 void inegalite_fprint(fp,ineg,variable_name)
 FILE *fp;
 Pcontrainte ineg;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     contrainte_fprint(fp,ineg,TRUE,variable_name);
 }
@@ -159,7 +159,7 @@ Pcontrainte c;
 void egalites_fprint(fp,eg,variable_name)
 FILE *fp;
 Pcontrainte eg;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     for( ; eg != NULL; eg = eg->succ)
 	contrainte_fprint(fp,eg,FALSE,variable_name);
@@ -175,7 +175,7 @@ char * (*variable_name)();
 void inegalites_fprint(fp,ineg,variable_name)
 FILE *fp;
 Pcontrainte ineg;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     for( ; ineg != NULL; ineg = ineg->succ)
 	contrainte_fprint(fp,ineg,TRUE,variable_name);
@@ -390,7 +390,7 @@ contrainte_sprint(s, c, is_inegalite, variable_name)
 char * s;
 Pcontrainte c;
 boolean is_inegalite;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     s = contrainte_sprint_format(s, c, is_inegalite, variable_name, FALSE);
     return s;
@@ -433,7 +433,7 @@ char *
 egalite_sprint(s, eg, variable_name)
 char *s;
 Pcontrainte eg;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     return contrainte_sprint(s, eg, FALSE, variable_name);
 }
@@ -442,7 +442,7 @@ char *
 inegalite_sprint(s, ineg, variable_name)
 char * s;
 Pcontrainte ineg;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     return contrainte_sprint(s, ineg, TRUE, variable_name);
 }
@@ -451,7 +451,7 @@ char *
 egalite_sprint_format(s, eg, variable_name, a_la_fortran)
 char *s;
 Pcontrainte eg;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 boolean a_la_fortran;
 {
     return contrainte_sprint_format
@@ -462,13 +462,9 @@ char *
 inegalite_sprint_format(s, ineg, variable_name, a_la_fortran)
 char * s;
 Pcontrainte ineg;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 boolean a_la_fortran;
 {
     return contrainte_sprint_format
 	(s, ineg, TRUE, variable_name, a_la_fortran);
 }
-
-
-
-
