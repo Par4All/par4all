@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/07/20 18:40:50 $, ) 
+ * ($Date: 1995/08/01 09:13:46 $, ) 
  */
 
 #include "defines-local.h"
@@ -71,7 +71,8 @@ list le;
     return(make_block_statement(ls));
 }
 
-static list hpfc_gen_n_vars_expr(creation, number)
+static list 
+hpfc_gen_n_vars_expr(creation, number)
 entity (*creation)();
 int number;
 {
@@ -85,7 +86,8 @@ int number;
     return(result);
 }
 
-expression make_reference_expression(e, creation)
+expression 
+make_reference_expression(e, creation)
 entity e, (*creation)();
 {
     return(reference_to_expression(make_reference(e,
@@ -95,45 +97,15 @@ entity e, (*creation)();
 /* the following functions generate the statements to appear in
  * the I/O loop nest.
  */
-statement hpfc_initsend()
+statement set_logical(log, val)
+entity log;
+bool val;
 {
-    /* 2 args to pvmfinitsend
-     */
-    return
-	(hpfc_make_call_statement
-	     (hpfc_name_to_entity(PVM_INITSEND), 
-	      CONS(EXPRESSION, MakeCharacterConstantExpression("PVMRAW"),
-	      CONS(EXPRESSION, entity_to_expression(hpfc_name_to_entity(BUFID)),
-		   NIL))));
-}
-
-statement hpfc_packing(array, creation, pack)
-entity array;
-entity (*creation)();
-bool pack;
-{
-    return
-	(hpfc_make_call_statement
-	     (hpfc_name_to_entity(pack ? PVM_PACK : PVM_UNPACK),
-	      CONS(EXPRESSION, pvm_what_option_expression(array),
-	      CONS(EXPRESSION, make_reference_expression(array, creation),
-	      CONS(EXPRESSION, int_to_expression(1),
-	      CONS(EXPRESSION, int_to_expression(1),
-	      CONS(EXPRESSION, entity_to_expression(hpfc_name_to_entity(INFO)),
-		   NIL)))))));
-}
-
-list make_list_of_constant(val, number)
-int val, number;
-{
-    list l=NIL;
-    int i;
-    assert(number>=0);
-
-    for(i=1; i<=number; i++)
-	l = CONS(EXPRESSION, make_integer_constant_expression(val), l);
-
-    return(l);
+    return make_assign_statement
+	(entity_to_expression(log),
+	 make_call_expression(MakeConstant
+	      (val ? ".TRUE." : ".FALSE.", is_basic_logical),
+			      NIL));
 }
 
 /* expr = expr + 2
@@ -164,6 +136,119 @@ bool send;
 					NIL)))),
 	    CONS(STATEMENT, hpfc_add_2(copy_expression(channel)),
 		 NIL))));				    
+}
+
+statement hpfc_lazy_guard(snd, then)
+bool snd;
+statement then;
+{
+    entity decision = hpfc_name_to_entity(snd ? LAZY_SEND : LAZY_RECV);
+    return test_to_statement
+     (make_test(entity_to_expression(decision), then, make_empty_statement()));
+}
+
+/* IF (LAZY_snd) THEN 
+ *   PVMFsnd()
+ *   LAZY_snd = FALSE // if receive
+ * ENDIF
+ */
+static statement hpfc_lazy_message(tid, channel, snd)
+expression tid, channel;
+bool snd;
+{
+    entity decision = hpfc_name_to_entity(snd ? LAZY_SEND : LAZY_RECV);
+    statement 
+	comm = hpfc_message(tid, channel, snd),
+	then = snd ? comm : 
+	    make_block_statement(CONS(STATEMENT, comm,
+				 CONS(STATEMENT, set_logical(decision, FALSE),
+				      NIL))) ;
+    
+    return hpfc_lazy_guard(snd, then);
+}
+
+statement hpfc_generate_message(ld, send, lazy)
+entity ld;
+bool send, lazy;
+{
+    entity nc, nt;
+    expression lid, tid, chn;
+
+    nc = hpfc_name_to_entity(send ? SEND_CHANNELS : RECV_CHANNELS);
+    nt = hpfc_name_to_entity(NODETIDS);
+    lid = entity_to_expression(ld);
+    tid = reference_to_expression
+	(make_reference(nt, CONS(EXPRESSION, lid, NIL)));
+    chn = reference_to_expression
+	(make_reference(nc, CONS(EXPRESSION, copy_expression(lid), NIL)));
+
+    return lazy ? hpfc_lazy_message(tid, chn, send) : 
+	          hpfc_message(tid, chn, send);
+}
+
+statement hpfc_initsend(lazy)
+bool lazy;
+{
+    statement init;
+
+    /* 2 args to pvmfinitsend
+     */
+    init = hpfc_make_call_statement
+	     (hpfc_name_to_entity(PVM_INITSEND), 
+	      CONS(EXPRESSION, MakeCharacterConstantExpression("PVMRAW"),
+	      CONS(EXPRESSION, entity_to_expression(hpfc_name_to_entity(BUFID)),
+		   NIL)));
+
+    return lazy ? make_block_statement
+	(CONS(STATEMENT, init,
+         CONS(STATEMENT, set_logical(hpfc_name_to_entity(LAZY_SEND), FALSE),
+	      NIL))) :
+		  init ;
+}
+
+statement hpfc_packing(array, creation, pack)
+entity array;
+entity (*creation)();
+bool pack;
+{
+    return hpfc_make_call_statement
+	(hpfc_name_to_entity(pack ? PVM_PACK : PVM_UNPACK),
+	 CONS(EXPRESSION, pvm_what_option_expression(array),
+         CONS(EXPRESSION, make_reference_expression(array, creation),
+	 CONS(EXPRESSION, int_to_expression(1),
+	 CONS(EXPRESSION, int_to_expression(1),
+	 CONS(EXPRESSION, entity_to_expression(hpfc_name_to_entity(INFO)),
+		   NIL))))));
+}
+
+statement hpfc_lazy_packing(array, lid, creation, pack, lazy)
+entity array, lid;
+entity (*creation)();
+bool pack, lazy;
+{
+    statement pack_stmt = hpfc_packing(array, creation, pack);
+
+    return lazy ? (pack ? make_block_statement
+       (CONS(STATEMENT, pack_stmt,
+	CONS(STATEMENT, set_logical(hpfc_name_to_entity(LAZY_SEND), TRUE),
+	     NIL))) :
+		   make_block_statement
+       (CONS(STATEMENT, hpfc_generate_message(lid, FALSE, TRUE),
+	CONS(STATEMENT, pack_stmt,
+	     NIL)))) : pack_stmt ;
+}
+
+list make_list_of_constant(val, number)
+int val, number;
+{
+    list l=NIL;
+    int i;
+    assert(number>=0);
+
+    for(i=1; i<=number; i++)
+	l = CONS(EXPRESSION, make_integer_constant_expression(val), l);
+
+    return(l);
 }
 
 #define psi(i) entity_to_expression(creation(i))
