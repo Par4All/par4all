@@ -2,6 +2,9 @@
   * $Id$
   *
   * $Log: module.c,v $
+  * Revision 1.30  1997/12/02 12:18:50  coelho
+  * resort declarations according to initial ones...
+  *
   * Revision 1.29  1997/11/29 13:29:47  coelho
   * fix to close on dependent parameters.
   *
@@ -321,6 +324,34 @@ update_new_declaration_list(
     }
 }
 
+static int 
+gen_find_occurence(list l, gen_chunk* c)
+{
+    int i;
+    for (i=0; l; i++, POP(l))
+	if (CHUNK(CAR(l))==c) return i;
+    return -1;
+}
+
+static list initial_order = NIL;
+static int 
+cmp(const void * x1, const void * x2)
+{
+    entity e1 = * (entity*) x1, e2 = * (entity*) x2;
+    int o1 = gen_find_occurence(initial_order, e1),
+	o2 = gen_find_occurence(initial_order, e2);
+    return (o1==-1 || o2==-1)? 
+	strcmp(entity_name(e1), entity_name(e2)): (o1-o2);
+    
+}
+static void 
+sort_with_initial_order(list l, list old)
+{
+    initial_order = old;
+    gen_sort_list(l, cmp);
+    initial_order = NIL;
+}
+
 /******************************************************** EXTERNAL INTERFACE */
 
 void 
@@ -399,10 +430,11 @@ insure_global_declaration_coherency(
     },
 	referenced_variables_list);
 
-    /* sorted for determinism... however it breaks parameter dependencies,
-     * that will have to be insured latter on.
+
+    /* re-sorted as specified by the initial order...
      */
-    gen_sort_list(new_decl, compare_entities);
+    sort_with_initial_order(new_decl, decl);
+
     entity_declarations(module) = new_decl;
 
     ifdebug(2) {
