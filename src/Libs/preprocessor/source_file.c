@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.89  1998/05/29 16:22:07  coelho
+ * filter includes for bang comments and hollerith.
+ *
  * Revision 1.88  1998/05/22 11:41:11  coelho
  * regex fixed.
  *
@@ -334,8 +337,7 @@ init_processed_include_cache(void)
     processed_cache = hash_table_make(hash_string, 100);
 }
 
-void
-close_processed_include_cache(void)
+void close_processed_include_cache(void)
 {
     if (hash_table_undefined_p(processed_cache)) 
     {
@@ -355,8 +357,7 @@ close_processed_include_cache(void)
 
 /* returns the processed cached file name, or null if none.
  */
-static string
-get_cached(string s)
+static string get_cached(string s)
 {
     string res;
     pips_assert("cache initialized", !hash_table_undefined_p(processed_cache));
@@ -366,8 +367,7 @@ get_cached(string s)
 
 /* return an allocated unique cache file name.
  */
-static string
-get_new_cache_file_name(void)
+static string get_new_tmp_file_name(void)
 {
     static int unique = 0;
     string dir_name, file_name;
@@ -428,13 +428,40 @@ handle_include_file(FILE * out, char * file_name)
     if (!cached)
     {
 	FILE * tmp_out;
-	cached = get_new_cache_file_name();
+
+	cached = get_new_tmp_file_name();
 	tmp_out = safe_fopen(cached, "w");
 	ok = handle_file_name(tmp_out, file_name, TRUE);
 	safe_fclose(tmp_out, cached);
+
+	/* handle bang comments and hollerith with an additionnal
+	 * processing...
+	 */
+	if (ok)
+	{
+	    string filtered;
+	    FILE * tmp_hbc, * tmp_in;
+
+	    filtered = get_new_tmp_file_name();
+	    tmp_hbc = safe_fopen(filtered, "w");
+	    tmp_in = safe_fopen(cached, "r");
+	    
+	    process_bang_comments_and_hollerith(tmp_in, tmp_hbc);
+
+	    safe_fclose(tmp_in, cached);
+	    safe_fclose(tmp_hbc, filtered);
+
+	    safe_unlink(cached);
+	    free(cached);
+	    cached = filtered;
+	}	    
+
 	/* if ok put in the cache, otherwise drop it. */
 	if (ok) hash_put(processed_cache, strdup(file_name), cached);
-	else safe_unlink(cached);
+	else {
+	    safe_unlink(cached);
+	    free(cached), cached = NULL;
+	}
     }
 
     if (ok) 
