@@ -150,3 +150,16 @@ string module_name;
 
     return success;
 }
+
+/*
+ * Print callgrpah with complexities
+ */
+bool print_call_graph_with_complexities(module_name)
+string module_name;
+{
+    bool success = FALSE;
+
+    success = print_decorated_call_graph(module_name,CG_DECOR_COMPLEXITIES);
+
+    return success;
+}
