@@ -298,14 +298,13 @@ char * (*variable_name)();
  *    to screen TCST terms; on top of that, the special variable TCST is not
  *    kept in bases!
  */
-Pvecteur vect_in_basis_p(v, b)
+boolean vect_in_basis_p(v, b)
 Pvecteur v;
 Pbase b;
 {
     Pvecteur coord;
 
     for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
-	Variable var;
 
 	if(VARIABLE_DEFINED_P(vecteur_var(coord))) {
 	    if(!base_contains_variable_p(b, vecteur_var(coord))) {
@@ -317,7 +316,7 @@ Pbase b;
 	    abort();
 	}
     }
-    return (TRUE);
+    return TRUE;
 }
 
 /* Pvecteur vect_variable_rename(Pvecteur v, Variable v_old, Variable v_new):
