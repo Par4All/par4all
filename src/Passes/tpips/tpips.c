@@ -34,6 +34,7 @@ static bool use_readline;
 static FILE *logfile;
 static FILE * current_file;
 extern int tgetnum();
+static char *usage = "Usage: %s [-n] [-h] [-l logfilename] sourcefile...\n";
 
 /*************************************************************** Some Macros */
 
@@ -47,6 +48,7 @@ extern int tgetnum();
 #define CHANGE_DIR   "cd "
 #define QUIT         "quit"
 #define HELP         "help"
+#define ECHO         "echo"
 
 #define SEPARATOR_P(c) (index (" \t", c))
 #define PREFIX_EQUAL_P(str, prf) (strncmp(str, prf, strlen(prf))==0)
@@ -78,6 +80,7 @@ static struct t_handler handlers[] =
   { CHANGE_DIR, 	cdir_handler },
   { SHELL_ESCAPE, 	shell_handler },
   { HELP,		help_handler },
+  { ECHO,		echo_handler },
   { (char *) NULL, 	default_handler}
 };
 
@@ -105,6 +108,7 @@ static struct t_completion_scheme completion_scheme[] =
 { CHANGE_DIR,   COMP_FILENAME,   COMP_NONE },
 { QUIT,         COMP_NONE,       COMP_NONE },
 { HELP,         COMP_HELP_TOPIC, COMP_NONE },
+{ ECHO,         COMP_NONE,       COMP_NONE },
 { "open",       COMP_NONE,       COMP_NONE },
 { "create",     COMP_NONE,       COMP_FILENAME },
 { "close",      COMP_NONE,       COMP_NONE },
@@ -122,7 +126,7 @@ static struct t_completion_scheme completion_scheme[] =
 
 static char *tp_help_topics[] = 
 {
-    "create","close","delete","module","activate",
+    "create","close","delete","echo","module","activate",
     "make","apply","display","set","get",SHELL_ESCAPE,
     CHANGE_DIR,QUIT,HELP,"rule","resource","owner",
     (char*)NULL
@@ -182,6 +186,13 @@ void shell_handler(char * line)
 	system(line);
     else
 	system("sh");
+}
+
+void echo_handler(char * line)
+{
+    /* skip the key word and a blank character */
+    line += strlen(ECHO) + 1;
+    fprintf(stdout,"%s\n",line);
 }
 
 void help_handler(char * line)
@@ -272,9 +283,15 @@ void help_handler(char * line)
 	}
     }
     if (PREFIX_EQUAL_P("cd",line)) {
-	printf("cd <dirname>\n");
+	printf("cd       <dirname>\n");
 	if (*line) {
 	    printf("\tchange directory\n");
+	}
+    }
+    if (PREFIX_EQUAL_P("echo",line)) {
+	printf("echo     <string>\n");
+	if (*line) {
+	    printf("\tprint the string\n");
 	}
     }
     if (PREFIX_EQUAL_P("quit",line)) {
@@ -284,13 +301,13 @@ void help_handler(char * line)
 	}
     }
     if (PREFIX_EQUAL_P("help",line)) {
-	printf("help [<help-item>]\n");
+	printf("help     [<help-item>]\n");
 	if (*line) {
 	    printf("\tprint a list of all the commands or a \"detailled\" description of one\n");
 	}
     }
     if (PREFIX_EQUAL_P("\\",line)) {
-	printf("\\<shell-function>\n");
+	printf("shell   [<shell-function>]\n");
 	if (*line) {
 	    printf("\tallow shell functions call\n");
 	}
@@ -404,8 +421,14 @@ void quit_handler(char * line)
 
 void default_handler(char * line)
 {
+    /* skip blanks */
+    while (((*line) == ' ') ||((*line) == '\t'))
+	line++;
+
+    /* store line pointer */
     line_parsed = line_to_parse = line;
 
+    /* cut line at the beginning of comments */
     while (*line)
     {
 	if ((*line) == TPIPS_COMMENT_PREFIX)
@@ -415,10 +438,14 @@ void default_handler(char * line)
 	}
 	line++;
     }
+
+    /* parse if non-null line */
     if (*line_to_parse) {
 	tp_init_lex ();
 	tp_parse ();
     }
+
+    /* error if some characters are still here */
     if (*line_to_parse) {
  	tp_error("syntax error");
     }
@@ -433,44 +460,53 @@ static void (*find_handler(char* line))(char *)
 
 static void parse_arguments(int argc, char * argv[])
 {
-    if (argc >= 3) {
-	if (same_string_p(argv[1],"-l")) {
-	    logfile = safe_fopen (argv[2],"w");
-	    argc -= 2;
-	}
-    } else if (argc >= 2)
-	if (same_string_p(argv[1],"-h")) {
-	    printf("Usage: %s [-h] [-l logfile] [files...]\n", argv[0]);
+    int c;
+    extern char *optarg;
+    extern int optind;
+
+    while ((c = getopt(argc, argv, "nl:h")) != -1)
+	switch (c)
+	{
+	case 'l':
+	    logfile = safe_fopen (optarg,"w");
+	    break;
+	case 'h':
+	    fprintf (stderr,usage, argv[0]);
 	    return;
+	    break;
+	case 'n':
+	    set_bool_property ("TPIPS_NO_EXECUTION_MODE", TRUE);
+	    break;
 	}
 
-    if (argc == 1)
+    if (argc == optind )
     {
 	use_readline = isatty(0);
 	pips_debug(1, "reading from stdin, which %s a tty\n",
 		   use_readline ? "is" : "is not");
 	current_file = stdin;
 	process_a_file();
-    } else
+    }
+    else
     {
-	int i = 1;
-
-	while (--argc) {
-	    if (same_string_p(argv[i], "-")) {
+	while (optind < argc )
+	{
+	    if (same_string_p(argv[optind], "-"))
+	    {
 		current_file = stdin;
 		use_readline = isatty(0);
 	    } else {
-		current_file = safe_fopen(argv[i], "r");
-		use_readline = FALSE;
-	    }
+		       current_file = safe_fopen(argv[optind], "r");
+		       use_readline = FALSE;
+		   }
 	    
-	    pips_debug(1, "reading from file %s\n",argv[i]);
+	    pips_debug(1, "reading from file %s\n",argv[optind]);
 	    
 	    process_a_file ();
-	    if (!same_string_p(argv[i], "-"))
-		safe_fclose(current_file, argv[i]);
+	    if (!same_string_p(argv[optind], "-"))
+		safe_fclose(current_file, argv[optind]);
 	    
-	    i++;
+	    optind++;
 	}
     }
 }
@@ -484,7 +520,7 @@ static char * read_a_line(char * prompt)
     if (use_readline)
 	logline = readline(prompt);
     else
-	/* GO: Please FC don't put safe_fgets here or Validate it !! */
+	/* GO: Please FC don't put safe_fgets here or Validate it !! :-) */
 	logline = fgets(line, MAX_LINE_LENGTH, current_file);
 
     if (logfile && logline)
@@ -500,9 +536,8 @@ void process_a_file()
     extern jmp_buf pips_top_level;
     static readline_initialized = FALSE;
 
-    (void) setjmp(pips_top_level);
-
-    if ((use_readline) && (readline_initialized == FALSE)) {
+    if ((use_readline) && (readline_initialized == FALSE))
+    {
 	initialize_readline ();
 	last = initialize_tpips_history();
 	readline_initialized = TRUE;
@@ -512,6 +547,9 @@ void process_a_file()
      */
     while ((line = read_a_line(TPIPS_PROMPT)))
     {
+	if (setjmp(pips_top_level))
+	    continue;
+
 	/*   add to history if not the same as the last one.
 	 */
 	if (use_readline &&
@@ -528,6 +566,7 @@ void process_a_file()
 	(find_handler(line))(line);
     }
 }
+
 /* MAIN: interactive loop and history management.
  */
 int main(int argc, char * argv[])
@@ -540,6 +579,7 @@ int main(int argc, char * argv[])
     set_bool_property("ABORT_ON_USER_ERROR",FALSE);
     pips_log_handler = tpips_user_log;
     pips_request_handler = tpips_user_request;
+    pips_error_handler = tpips_user_error;
 
     parse_arguments(argc, argv);
 
@@ -584,7 +624,7 @@ static void initialize_readline ()
     rl_readline_name = "Tpips";
 
     /* allow "." to separate words */
-    rl_basic_word_break_characters = " \t\n\"\\@$><=;|&{(.";
+    rl_basic_word_break_characters = " \t\n\"\\@$><=;|&{(";
 
     /* Tell the completer that we want a crack first. */
     rl_attempted_completion_function = (CPPFunction *)fun_completion;
@@ -791,3 +831,24 @@ va_list args;
     return gets(buf);
 }
 
+/* Tpips user error */
+
+void tpips_user_error(char * calling_function_name,
+			char * a_message_format,
+			va_list *some_arguments)
+{
+   extern jmp_buf pips_top_level;
+
+   /* print name of function causing error */
+   (void) fprintf(stderr, "user error in %s: ", calling_function_name);
+
+   /* print out remainder of message */
+   (void) vfprintf(stderr, a_message_format, * some_arguments);
+
+   /* terminate PIPS request */
+   if (get_bool_property("ABORT_ON_USER_ERROR")) {
+      abort();
+   }
+   else
+      longjmp(pips_top_level, 2);
+}
