@@ -62,15 +62,15 @@ int check_poly(Polyhedron *S,Polyhedron *C,Enumeration *en,
 	       int nparam,int pos,Value *z) {
   
   int cc,k;
-  Value c,tmp;
+  Value c,tmp,*ctmp;
   
   value_init(c); value_init(tmp);
   
   if(pos == nparam) {
     
     /* Computes the ehrhart polynomial */
-    value_assign(c,*compute_poly(en,&z[S->Dimension-nparam+1]));
-    
+    value_assign(c,*(ctmp=compute_poly(en,&z[S->Dimension-nparam+1])));
+    free(ctmp);
     /* if c=0 we may be out of context. */
     /* scanning is useless in this case*/
     if(!in_domain(C,&z[S->Dimension-nparam+1])) {

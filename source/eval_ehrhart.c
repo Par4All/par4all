@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <assert.h>
 
 #include <polylib/polylib.h>
 
@@ -135,6 +136,7 @@ double compute_evalue(evalue *e,Value *list_args) {
 /* function compute_poly :                          */
 /* Check for the good validity domain               */
 /* return the number of point in the Polyhedron     */
+/* in allocated memory                              */
 /* Using the Ehrhart pseudo-polynomial              */
 /****************************************************/
 Value *compute_poly(Enumeration *en,Value *list_args) {
@@ -143,6 +145,7 @@ Value *compute_poly(Enumeration *en,Value *list_args) {
   /*	double d; int i; */
 
   tmp = (Value *) malloc (sizeof(Value));
+  assert(tmp != NULL);
   value_init(*tmp);
   value_set_si(*tmp,0);
   

@@ -59,7 +59,7 @@
 /* Status of last Polyhedron operation */
 extern int Pol_status;
 
-typedef struct vector {
+typedef struct  {
   unsigned Size;
   Value *p;
 } Vector;

@@ -1996,7 +1996,7 @@ int main() {
   Enumeration *en;
   
 #ifdef EP_EVALUATION
-  Value *p;
+  Value *p, *tmp;
   int k;
 #endif
 
@@ -2016,9 +2016,12 @@ int main() {
   en = Polyhedron_Enumerate(P,C,1024);
   
 #ifdef EP_EVALUATION
-  if(!isatty(0))
-    return 0 ;			/* no tty input -> no evaluation. */
-  
+  if(!isatty(0) || C->Dimension == 0)
+  {  /* no tty input or no polyhedron -> no evaluation. */
+     free(param_name);
+     return 0 ;
+  }
+
   printf("Evaluation of the Ehrhart polynomial :\n");
   p = (Value *)malloc(sizeof(Value) * (C->Dimension));
   for(i=0;i<C->Dimension;i++) 
@@ -2037,7 +2040,8 @@ int main() {
       value_print(stdout,VALUE_FMT,p[k]);
     }  
     fprintf(stdout," ) = ");
-    value_print(stdout,VALUE_FMT,*compute_poly(en,p));
+    value_print(stdout,VALUE_FMT,*(tmp=compute_poly(en,p)));
+    free(tmp);
     fprintf(stdout,"\n");  
   }		
 #endif /* EP_EVALUATION */
