@@ -410,6 +410,8 @@ enter_tabulated_def(
 static gen_chunk * make_def(int domain, gen_chunk* String, gen_chunk* gc)
 {
   char * id = String->s;
+  domain = gen_type_translation_old_to_actual(domain);
+  message_assert("domain is tabulated", Domains[domain].index!=-1);
   return enter_tabulated_def(Domains[domain].index, domain, id, gc, 
 			     allow_forward_ref) ;
 }
