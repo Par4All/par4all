@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/29 13:49:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/12 15:25:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/11/29 13:49:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1996/07/12 15:25:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -11,6 +11,7 @@ char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/11/29 13:49:33 $, ) version $
 
 #include "genC.h"
 #include "ri.h"
+#include "ri-util.h"
 #include "makefile.h"
 #include "pipsmake.h"
 #include "phases.h"
