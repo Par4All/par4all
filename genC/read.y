@@ -368,12 +368,12 @@ int which ;
    ID and value CHUNKP. */
 
 gen_chunk *
-enter_tabulated_def( index, domain, id, chunkp, allow_ref )
-int index  ;
-int domain ;
-char *id ;
-gen_chunk *chunkp ;
-int allow_ref ;
+enter_tabulated_def(
+    int index,
+    int domain,
+    char *id,
+    gen_chunk *chunkp,
+    int allow_ref)
 {
     gen_chunk *hash ;
 
@@ -395,7 +395,8 @@ int allow_ref ;
 	/* actually very obscure there... seems that negative domain
 	 * numbers are used to encode something... already used/seen ???
 	 */
-	if( allow_ref && hash->i < 0 ) {
+	if( allow_ref && hash->i < 0 ) 
+	{
 	    int i, size = gen_size( Domains+domain ) ;
 	    gen_chunk *cp, *gp ;
 
