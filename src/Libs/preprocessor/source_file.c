@@ -606,7 +606,7 @@ static string process_thru_cpp(string name)
     string dir_name, new_name, simpler, cpp_options, cpp;
 
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
-    simpler = basename(name, ".F");
+    simpler = pips_basename(name, ".F");
     new_name = 
 	strdup(concatenate(dir_name, "/", simpler, CPP_FILTERED_SUFFIX, 0));
     free(simpler);
