@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: macros.c,v $
+ * Revision 1.5  1997/09/23 15:21:39  coelho
+ * typo:[3~
+ *
  * Revision 1.4  1997/09/20 22:06:58  coelho
  * recurse if necessary only.
  *
@@ -286,7 +289,7 @@ parser_macro_expansion(expression e)
 void 
 parser_substitute_all_macros(statement s)
 {
-    if (current_macros_index>0 &&
+    if (current_macro_index>0 &&
         get_bool_property("PARSER_EXPAND_STATEMENT_FUNCTIONS"))
 	gen_recurse(s, expression_domain, gen_true, parser_macro_expansion);
 }
