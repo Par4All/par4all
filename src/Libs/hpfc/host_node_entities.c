@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: host_node_entities.c,v $
+ * Revision 1.27  1997/10/28 09:36:01  coelho
+ * bug-- (full copy of list of expression necessary...)
+ *
  * Revision 1.26  1997/10/27 16:26:03  coelho
  * referenced entities are not managed here any more...
  *
@@ -34,8 +37,8 @@ GENERIC_GLOBAL_FUNCTION(old_host, entitymap)
 GENERIC_GLOBAL_FUNCTION(new_node, entitymap)
 GENERIC_GLOBAL_FUNCTION(old_node, entitymap)
 
-void store_new_node_variable(new, old)
-entity new, old;
+void 
+store_new_node_variable(entity new, entity old)
 {
     pips_assert("defined", !entity_undefined_p(new)&&!entity_undefined_p(old));
 
@@ -43,14 +46,27 @@ entity new, old;
     store_or_update_old_node(new, old);
 }
 
-void store_new_host_variable(new, old)
-entity new, old;
+void 
+store_new_host_variable(entity new, entity old)
 {
     pips_assert("defined", !entity_undefined_p(new)&&!entity_undefined_p(old));
 
     store_or_update_new_host(old, new);
     store_or_update_old_host(new, old);
 }
+
+void 
+store_new_host_node_variable(
+    entity neh /* host version */, 
+    entity nen /* node version */, 
+    entity old /* initial entity */)
+{
+    store_new_host_variable(neh, old);
+    store_new_host_variable(neh, nen);
+    store_new_node_variable(nen, old);
+    store_new_node_variable(nen, neh);
+}
+
 
 void init_entity_status()
 {
@@ -253,7 +269,7 @@ list lUpdateExpr(module, l)
 entity module;
 list l;
 {
-    list new = gen_copy_seq(l);
+    list new = gen_full_copy_list(l);
     update_list_for_module(new, module);    
     return new;
 }
