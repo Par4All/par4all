@@ -71,13 +71,13 @@ update=10
 
 debug()
 {
-  echo "$@" >&2
+  echo [Validate:${hostname}] "$@" >&2
 }
 
 verbose()
-{
-  echo "$@" >&2
-  echo "$@" >> $MSG
+{ 
+  echo [Validate:${hostname}] "$@" >&2
+  echo [Validate:${hostname}] "$@" >> $MSG
 }
 
 unstammer()
