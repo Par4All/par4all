@@ -96,6 +96,10 @@ boolean new_atomizer(char * mod_name)
 
    ifdebug(1) print_statement(mod_stat);
       
+   /* Reorder the module, because new statements may have been
+      changed. */
+   module_reorder(mod_stat);
+
    /* We save the new CODE. */
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
 
