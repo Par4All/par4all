@@ -3,7 +3,7 @@
  *
  * DECLARATIONS compilation
  *
- * $RCSfile: declarations.c,v $ ($Date: 1995/07/20 18:40:52 $, )
+ * $RCSfile: declarations.c,v $ ($Date: 1995/08/30 14:34:48 $, )
  * version $Revision$
  */
  
@@ -20,13 +20,12 @@
  *
  */
 
-/* ComputeNewSizeOfIthDimension
- *
- * here the new size of the ith dimension of the given array is computed.
+/* here the new size of the ith dimension of the given array is computed.
  * because the declarations are static, there is a majoration of the space
  * required on each processors to held his part of the distributed array.
  */
-static int ComputeNewSizeOfIthDimension(dim, i, array, newdeclp)
+static int 
+ComputeNewSizeOfIthDimension(dim, i, array, newdeclp)
 dimension dim;
 int i;
 entity array;
@@ -37,12 +36,10 @@ tag *newdeclp;
     distribute d = load_entity_distribute(t);
     alignment al = alignment_undefined;
     distribution di = distribution_undefined;
-    int rate, param,
-	pdim = 1, asize = SizeOfDimension(dim);
+    int rate, param, pdim = 1, asize = SizeOfDimension(dim);
     style st;
 
-    debug(9,"ComputeNewSizeOfIthDimension",
-	  "dimension %d of array %s\n",i,entity_name(array));
+    pips_debug(9, "dimension %d of array %s\n", i, entity_name(array));
     ifdebug(9)
     {
 	print_align(a);
@@ -75,7 +72,7 @@ tag *newdeclp;
     {
 	if (!normalized_dimension_p(dim)) 
 	    (*newdeclp) = is_hpf_newdecl_alpha;
-	return(asize);
+	return asize;
     }
     
     /* looking for the matching distribution...
@@ -91,16 +88,14 @@ tag *newdeclp;
      */
     if (style_none_p(st)) 
     {
-	/*
-	 * ???
+	/* ???
 	 * should delete the alignment which is not usefull...
 	 */
-	/*
-	 * alpha case
+	/* alpha case
 	 */
 	if (!normalized_dimension_p(dim)) 
 	    (*newdeclp) = is_hpf_newdecl_alpha;
-	return(asize);
+	return asize;
     }
     
     /* and now, let's look at the different cases.
@@ -125,7 +120,7 @@ tag *newdeclp;
 	else
 	    (*newdeclp) = is_hpf_newdecl_beta;
 
-	return(choice);
+	return choice;
     }
 
     /* gamma case
@@ -149,7 +144,7 @@ tag *newdeclp;
 	else
 	    (*newdeclp) = is_hpf_newdecl_gamma;
 
-	return(choice);
+	return choice;
     }
 
     /* delta case
@@ -173,24 +168,22 @@ tag *newdeclp;
 	else
 	    (*newdeclp) = is_hpf_newdecl_delta;
 
-	return(choice);
+	return choice;
     }
 	
     /* alpha case, if nothing matches, what shouldn't be the case :
      */
     if (!normalized_dimension_p(dim)) 
 	(*newdeclp) = is_hpf_newdecl_alpha;
-    return(asize);
+    return asize;
 }
 
 
-/*
- * NewDeclarationOfDistributedArray
- *
- * for node this are reformated, and for host these variables are
+/* for node this are reformated, and for host these variables are
  * deleted.
  */
-static void NewDeclarationOfDistributedArray(array)
+static void 
+NewDeclarationOfDistributedArray(array)
 entity array;
 {
     entity newarray = load_new_node(array);
@@ -227,13 +220,12 @@ entity array;
 			    CONS(DIMENSION,
 				 make_dimension(int_to_expression(1),
 						int_to_expression(newsize)),
-				 NULL));
+				 NIL));
 	     
 	 }
 	 else
 	 {
-	     debug(8, "NewDeclarationOfDistributedArray",
-		   "dimension %d isn't touched\n", ithdim);
+	     pips_debug(8, "dimension %d isn't touched\n", ithdim);
 
 	     newdecl = is_hpf_newdecl_none;
 	     ld = gen_nconc(ld, CONS(DIMENSION, dim, NIL)); /* sharing ! */
@@ -248,10 +240,7 @@ entity array;
     variable_dimensions(type_variable(entity_type(newarray)))=ld;
 }
 
-/*
- * NewDeclarationsOfDistributedArrays
- *
- * this procedure generate the new declarations of every distributed arrays
+/* this procedure generate the new declarations of every distributed arrays
  * of the program, in order to minimize the amount of memory used.
  * The new declarations have to be suitable for the new index computation
  * which is to be done dynamically...
@@ -259,14 +248,13 @@ entity array;
 void NewDeclarationsOfDistributedArrays()
 {
     MAP(ENTITY, array,
-     {
-	 if (entity_new_declaration_undefined_p(array))
-	     NewDeclarationOfDistributedArray(array);
-	 else
-	     debug(3, "NewDeclarationsOfDistributedArrays",
-		   "skipping array %s\n", entity_name(array));
-     },
-	 list_of_distributed_arrays());
+    {
+	if (entity_new_declaration_undefined_p(array))
+	    NewDeclarationOfDistributedArray(array);
+	else
+	    pips_debug(3, "skipping array %s\n", entity_name(array));
+    },
+	list_of_distributed_arrays());
 }
 
 /* that is all
