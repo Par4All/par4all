@@ -3,7 +3,7 @@
 #
 # SCCS stuff:
 #
-# $RCSfile: Pips,v $ ($Date: 1994/05/20 15:58:08 $) version $Revision$, got on %D%, %T%
+# $RCSfile: Pips,v $ ($Date: 1994/09/28 11:36:12 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 
@@ -196,9 +196,13 @@ rename ()
 	s/^mayreg$/MAY_REGions/; \
 	s/^mustreg$/MUST_REGions/; \
 	s/^ioreg$/In_Out_REGions/; \
+	s/^inreg$/In_REGions/; \
+	s/^outreg$/Out_REGions/; \
 	s/^prcg$/PRint_Call_Graph/; \
 	s/^prcr$/PRint_Code_Regions/; \
 	s/^prcior$/PRint_Code_In_Out_Regions/; \
+	s/^prcir$/PRint_Code_In_Regions/; \
+	s/^prcor$/PRint_Code_Out_Regions/; \
         s/^prct$/PRint_Code_Transformers/; \
 	s/^prcpe$/PRint_Code_Proper_Effects/; \
 	s/^prcce$/PRint_Code_Cumulated_Effects/; \
