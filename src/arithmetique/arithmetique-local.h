@@ -25,6 +25,7 @@
 /* to be included for _MIN and _MAX: #include <limits.h>
  */
 #include <limits.h>
+#include "boolean.h"
 
 /* 
    #        ####   #    #   ####           #        ####   #    #   ####
