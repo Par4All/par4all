@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/03/20 19:09:47 $, )
+ * ($Date: 1996/04/01 11:36:40 $, )
  */
 
 #include "defines-local.h"
@@ -720,6 +720,12 @@ HANDLER_PROTOTYPE(time)
 	add_statement_to_clean(current_stmt_head());
 }
 
+HANDLER_PROTOTYPE(host_section)
+{
+    pips_debug(8, "host section\n");
+    return;
+}
+
 /* for both setbool and setint
  * ??? looks like a hack:-)
  */
@@ -813,6 +819,7 @@ static struct DirectiveHandler handlers[] =
     {HPF_PREFIX SYNCHRO_SUFFIX,		1,	HANDLER(synchro) },
     {HPF_PREFIX TIMEON_SUFFIX,		1,	HANDLER(time) },
     {HPF_PREFIX TIMEOFF_SUFFIX,		1,	HANDLER(time) },
+    {HPF_PREFIX HOSTSECTION_SUFFIX,	1,	HANDLER(host_section) },
     {HPF_PREFIX SETBOOL_SUFFIX,		1,	HANDLER(set) },
     {HPF_PREFIX SETINT_SUFFIX,		1,	HANDLER(set) },
     {HPF_PREFIX HPFCIO_SUFFIX,		1,	HANDLER(io) },
