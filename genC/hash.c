@@ -33,12 +33,10 @@
 #define HASH_ENTRY_FREE ((void *) 0)
 #define HASH_ENTRY_FREE_FOR_PUT ((void *) -1)
 
-typedef struct __hash_entry hash_entry;
-
-struct __hash_entry {
+typedef struct {
   void * key;
   void * val;
-};
+} hash_entry;
 
 struct __hash_table {
   hash_key_type type;               /* the type of keys... */
@@ -69,10 +67,11 @@ typedef enum { hash_get_op , hash_put_op , hash_del_op } hash_operation;
 /* Private functions 
  */
 static void hash_enlarge_table(hash_table htp);
-static hash_entry_pointer hash_find_entry(hash_table htp, void * key, 
-					  unsigned int *prank, 
-					  hash_operation operation,
-					  unsigned int * stats);
+static hash_entry * hash_find_entry(hash_table htp,
+				    void * key, 
+				    unsigned int *prank, 
+				    hash_operation operation,
+				    unsigned int * stats);
 static string hash_print_key(hash_key_type, void*);
 
 static int hash_int_equal(int, int);
@@ -183,7 +182,7 @@ hash_table hash_table_make(hash_key_type key_type, int size)
     htp->size = size;
     htp->n_entry = 0;
     htp->limit = hash_size_limit(size);
-    htp->array = (hash_entry_pointer) alloc(size*sizeof(hash_entry));
+    htp->array = (hash_entry*) alloc(size*sizeof(hash_entry));
 
     /* initialize statistics */
     htp->n_put = 0;
@@ -230,23 +229,22 @@ static int max_size_seen = 0;
 /* Clears all entries of a hash table HTP. [pj] */
 void hash_table_clear(hash_table htp)
 {
-    register hash_entry_pointer p ;
-    register hash_entry_pointer end ;
+  register hash_entry * p, * end ;
 
-    if (htp->size > max_size_seen) {
-	max_size_seen = htp->size;
+  if (htp->size > max_size_seen) {
+    max_size_seen = htp->size;
 #ifdef DBG_HASH
-	fprintf(stderr, "[hash_table_clear] maximum size is %d\n", 
-		max_size_seen);
+    fprintf(stderr, "[hash_table_clear] maximum size is %d\n", 
+	    max_size_seen);
 #endif
-    }
-
-    end = htp->array + htp->size ;
-    htp->n_entry = 0 ;
-
-    for ( p = htp->array ; p < end ; p++ ) {
-	p->key = HASH_ENTRY_FREE ;
-    }
+  }
+  
+  end = htp->array + htp->size ;
+  htp->n_entry = 0 ;
+  
+  for ( p = htp->array ; p < end ; p++ ) {
+    p->key = HASH_ENTRY_FREE ;
+  }
 }
 
 /* this function deletes a hash table that is no longer useful. unused
@@ -273,7 +271,7 @@ void hash_table_free(hash_table htp)
 void hash_put(hash_table htp, void * key, void * val)
 {
   unsigned int rank;
-  hash_entry_pointer hep;
+  hash_entry * hep;
     
   if (htp->n_entry+1 >= (htp->limit)) 
     hash_enlarge_table(htp);
@@ -307,7 +305,7 @@ hash_delget(
     void * key, 
     void ** pkey)
 {
-    hash_entry_pointer hep;
+    hash_entry * hep;
     void *val;
     unsigned int rank;
     
@@ -346,7 +344,7 @@ void * hash_del(hash_table htp, void * key)
 
 void * hash_get(hash_table htp, void * key)
 {
-  hash_entry_pointer hep;
+  hash_entry * hep;
   int n;
   
   message_assert("legal input key", key!=HASH_ENTRY_FREE &&
@@ -374,7 +372,7 @@ bool hash_defined_p(hash_table htp, void * key)
  */
 void hash_update(hash_table htp, void * key, void * val)
 {
-  hash_entry_pointer hep;
+  hash_entry * hep;
   unsigned int n;
   
   message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
@@ -459,7 +457,7 @@ void hash_table_fprintf(
 static void 
 hash_enlarge_table(hash_table htp)
 {
-  hash_entry_pointer old_array;
+  hash_entry * old_array;
   int i, old_size;
   
   old_size = htp->size;
@@ -468,7 +466,7 @@ hash_enlarge_table(hash_table htp)
   htp->size++;
   /* Get the next prime number in the table */
   htp->size = get_next_hash_table_size(htp->size);
-  htp->array = (hash_entry_pointer) alloc(htp->size* sizeof(hash_entry));
+  htp->array = (hash_entry *) alloc(htp->size* sizeof(hash_entry));
   htp->limit = hash_size_limit(htp->size);
   
   for (i = 0; i < htp->size ; i++)
@@ -480,7 +478,7 @@ hash_enlarge_table(hash_table htp)
     he = old_array[i];
     
     if (he.key != HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT) {
-      hash_entry_pointer nhep;
+      hash_entry * nhep;
       unsigned int rank;
       
       htp->n_put++;
@@ -598,7 +596,7 @@ static int inc_prime_list[] = {
 /*  buggy function, the hash table stuff should be made again from scratch.
  *  - FC 02/02/1995
  */
-static hash_entry_pointer 
+static hash_entry * 
 hash_find_entry(hash_table htp, 
 		void * key, 
 		unsigned int *prank, 
@@ -697,30 +695,30 @@ hash_key_type hash_table_type(hash_table htp)
  * at the end NULL is returned
  */
 
-hash_entry_pointer 
+void *
 hash_table_scan(hash_table htp,
-		hash_entry_pointer hentryp,
+		void * hentryp_arg,
 		void ** pkey,
 		void ** pval)
 {
-    hash_entry_pointer hend = htp->array + htp->size;
+  hash_entry * hentryp = (hash_entry *) hentryp_arg;
+  hash_entry * hend = htp->array + htp->size;
+  
+  if (!hentryp)	hentryp = (void*) htp->array;
 
-    if (!hentryp)
-	hentryp = htp->array;
-
-    while (hentryp < hend)
+  while (hentryp < hend)
+  {
+    void *key = hentryp->key;
+    
+    if ((key !=HASH_ENTRY_FREE) && (key !=HASH_ENTRY_FREE_FOR_PUT))
     {
-	void *key = hentryp->key;
-
-	if ((key !=HASH_ENTRY_FREE) && (key !=HASH_ENTRY_FREE_FOR_PUT))
-	{
-	    *pkey = key;
-	    *pval = hentryp->val;
-	    return hentryp + 1;
-	}
-	hentryp++;
+      *pkey = key;
+      *pval = hentryp->val;
+      return hentryp + 1;
     }
-    return NULL;
+    hentryp++;
+  }
+  return NULL;
 }
 
 int hash_table_own_allocated_memory(hash_table htp)
