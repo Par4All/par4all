@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.89  1997/10/28 14:07:55  coelho
+ * prettyprint common together...
+ *
  * Revision 1.88  1997/10/28 10:03:17  irigoin
  * assert added in text_statement() about the statement with label
  * "LABEL_RETURN_NAME"
@@ -82,7 +85,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.88 1997/10/28 10:03:17 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.89 1997/10/28 14:07:55 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -128,6 +131,8 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 #include "text-util.h"
 #include "ri.h"
 #include "ri-util.h"
+
+#include "pipsdbm.h"
 
 #include "misc.h"
 #include "properties.h"
@@ -1258,6 +1263,63 @@ sentence_data(entity e)
 	        make_sentence(is_sentence_unformatted, \
 			      make_unformatted(NULL, 0, 0, l)));
 
+/* if the common is declared similarly in all routines, generate
+ * "include 'COMMON.h'", and the file is put in Src. otherwise
+ * the full local declarations are generated. That's fun.
+ */
+
+static text
+include(string file)
+{
+    return make_text
+	(CONS(SENTENCE, 
+	      make_sentence(is_sentence_formatted,
+		  strdup(concatenate("      include '", file, "'\n", 0))),
+	      NIL));
+}
+
+static text
+text_area_included(
+    entity common /* the common the declaration of which are of interest */,
+    entity module /* hte module dealt with */)
+{
+    string dir, file, local, name;
+    text t;
+
+    dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
+    name = module_local_name(common);
+    if (same_string_p(name, BLANK_COMMON_LOCAL_NAME))
+	name = "blank";
+    local = strdup(concatenate(name, ".h", 0));
+    file = strdup(concatenate(dir, "/", local, 0));
+    free(dir);
+
+    if (file_exists_p(file))
+    {
+	/* the include was generated once before...
+	 */
+	t = include(local);
+    }
+    else 
+    {
+	t = text_common_declaration(common, module);
+	if (check_common_inclusion(common)) 
+	{
+	    /* same declaration, generate the file! */
+	    FILE * f = safe_fopen(file, "w");
+	    fprintf(f, "!!\n!! pips: include file for common %s\n!!\n", name);
+	    print_text(f, t);
+	    safe_fclose(f, file);
+	    t = include(local);	    
+	}
+	/* else not the same... but the information gonna be recomputed... */
+    }
+
+    free(local);
+    free(file);
+    return t;
+}
+
 /* We add this function to cope with the declaration
  * When the user declare sth. there's no need to declare sth. for the user.
  * When nothing is declared ( especially there is no way to know whether it's 
@@ -1702,16 +1764,19 @@ text_data(entity module, list /* of entity */ ldecl)
 }
 
 static text 
-text_entity_declaration(entity module, list ldecl)
+text_entity_declaration(
+    entity module, 
+    list /* of entity */ ldecl,
+    bool force_common)
 {
     string how_common = get_string_property("PRETTYPRINT_COMMONS");
-    bool print_commons = same_string_p(how_common, "declaration");
+    bool print_commons = !same_string_p(how_common, "none");
     list before = NIL, area_decl = NIL, ph = NIL,
 	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, 
 	pc8 = NIL, pc16 = NIL, ps = NIL;
-    text r, t_chars = make_text(NIL); 
+    text r, t_chars = make_text(NIL), t_area = make_text(NIL); 
     string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
-    bool pp_in_type = FALSE, pp_in_common = FALSE;
+    bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
      
     /* where to put the dimensionn information.
      */
@@ -1722,6 +1787,10 @@ text_entity_declaration(entity module, list ldecl)
     else 
 	pips_internal_error("PRETTYPRINT_VARIABLE_DIMENSIONS=\"%s\""
 			    " unexpected value\n", pp_var_dim);
+
+    /* prettyprint common in include if possible... 
+     */
+    pp_cinc = same_string_p(how_common, "include") && !force_common;
 
     MAP(ENTITY, e,
     {
@@ -1740,10 +1809,12 @@ text_entity_declaration(entity module, list ldecl)
 	bool area_p = type_area_p(te);
 	bool var = type_variable_p(te);
 	bool in_ram = storage_ram_p(entity_storage(e));
+	bool in_common = in_ram &&
+	    !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e))));
 	
 	pips_debug(3, "entity name is %s\n", entity_name(e));
 
-	if (!print_commons && area_p && !SPECIAL_COMMON_P(e))
+	if (!print_commons && area_p && !SPECIAL_COMMON_P(e) && !pp_cinc)
 	{
 	    area_decl = 
 		CONS(SENTENCE, make_sentence(is_sentence_formatted,
@@ -1751,9 +1822,7 @@ text_entity_declaration(entity module, list ldecl)
 		     area_decl);
 	}
 	
-	if (!print_commons && 
-	    (area_p || (var && in_ram && 
-	  !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e)))))))
+	if (!print_commons && (area_p || (var && in_common && pp_cinc)))
 	{
 	    pips_debug(5, "skipping entity %s\n", entity_name(e));
 	}
@@ -1777,10 +1846,17 @@ text_entity_declaration(entity module, list ldecl)
 	    /*            AREAS: COMMONS and SAVEs
 	     */	     
 	    pips_debug(7, "considered as a regular common\n");
-	    area_decl = CONS(SENTENCE, sentence_area(e, module, pp_in_common), 
-			     area_decl);
+	    if (pp_cinc && !SPECIAL_COMMON_P(e))
+	    {
+		text t = text_area_included(e, module);
+		MERGE_TEXTS(t_area, t);
+	    }
+	    else
+		area_decl = CONS(SENTENCE, 
+				 sentence_area(e, module, pp_in_common), 
+				 area_decl);
 	}
-	else if (var)
+	else if (var && !(in_common && pp_cinc))
 	{
 	    basic b = variable_basic(type_variable(te));
 	    bool pp_dim = pp_in_type || variable_static_p(e);
@@ -1914,6 +1990,8 @@ text_entity_declaration(entity module, list ldecl)
     attach_declaration_type_to_words(ps, "CHARACTER");
     MERGE_TEXTS(r, t_chars);
 
+    MERGE_TEXTS(r, t_area);
+
     /* all about COMMON and SAVE declarations */
     MERGE_TEXTS(r, make_text(area_decl));
 
@@ -1932,25 +2010,23 @@ text
 text_declaration(entity module)
 {
     return text_entity_declaration
-	(module, code_declarations(entity_code(module)));
+	(module, code_declarations(entity_code(module)), FALSE);
 }
 
 /* needed for hpfc 
  */
 text 
-text_common_declaration(common, module)
-entity common, module;
+text_common_declaration(
+    entity common, 
+    entity module)
 {
     type t = entity_type(common);
-    list ldecl;
+    list l;
     text result;
-
     pips_assert("indeed a common", type_area_p(t));
-
-    ldecl = CONS(ENTITY, common, gen_copy_seq(area_layout(type_area(t))));
-    result = text_entity_declaration(module, ldecl);
-
-    gen_free_list(ldecl);
+    l = CONS(ENTITY, common, gen_copy_seq(area_layout(type_area(t))));
+    result = text_entity_declaration(module, l, TRUE);
+    gen_free_list(l);
     return result;
 }
 
@@ -2644,7 +2720,7 @@ find_last_statement(statement s)
 {
     statement last = statement_undefined;
 
-    pips_assert("statement is defined\n", !statement_undefined_p(s));
+    pips_assert("statement is defined", !statement_undefined_p(s));
 
     if(block_statement_p(s)) {
 	list ls = instruction_block(statement_instruction(s));
@@ -2679,8 +2755,8 @@ find_last_statement(statement s)
 
     /* I had a lot of trouble writing the condition for this assert... */
     pips_assert("Last statement is either undefined or a call to return",
-		statement_undefined_p(last) /* let's give up: it's always safe */
-		|| !block_statement_p(s) /* not a block: any kind of statement can be found */
+	 statement_undefined_p(last) /* let's give up: it's always safe */
+     || !block_statement_p(s) /* not a block: any kind of statement... */
 		|| return_statement_p(last)); /* if a block, then a return */
 
     return last;
@@ -2690,11 +2766,9 @@ void
 set_last_statement(statement s)
 {
     statement ls = statement_undefined;
-
-    pips_assert("last statement is undefined\n", statement_undefined_p(last_statement));
-
+    pips_assert("last statement is undefined", 
+		statement_undefined_p(last_statement));
     ls = find_last_statement(s);
-
     last_statement = ls;
 }
 
@@ -2709,7 +2783,7 @@ last_statement_p(statement s) {
     pips_assert("statement is defined\n", !statement_undefined_p(s));
     return s == last_statement;
 }
-
+
 /* function text text_module(module, stat)
  *
  * carefull! the original text of the declarations is used
