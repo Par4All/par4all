@@ -26,12 +26,12 @@ extern int  simplex_arithmetic_error;
    extern int or extern jmp_buf
 */
 
-#define DEBUG_LINEAR_EXCEPTIONS
+#define DEBUG_GLOBAL_EXCEPTIONS
 
-#if defined(DEBUG_LINEAR_EXCEPTIONS)
+#if defined(DEBUG_GLOBAL_EXCEPTIONS)
 #define exception_debug(msg, what) 			\
-  fprintf(stderr, "%s %d (%s %s %d)\n", 		\
-	  msg, what, __FUNCTION__, __FILE__, __LINE__)
+  fprintf(stderr, "%s %d - %d (%s %s %d)\n", 		\
+	  msg, what, global_exception_index, __FUNCTION__, __FILE__, __LINE__)
 #else
 #define exception_debug(msg, what) 1
 #endif
