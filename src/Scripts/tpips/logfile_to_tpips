@@ -21,8 +21,8 @@ sed -n \
 -e 's/Closing all modules./close/p' \
 -e 's/Workspace [^ ]* opened/open '$WS'/p' \
 -e 's/Directory \(.*\) selected/cd \1/p' \
--e 's/Request: build resource \(.*\) for module \(.*\)./display \2.\1/p' \
--e 's/Request: perform rule \(.*\) on module \(.*\)./apply \2.\1/p' \
+-e 's/Request: build resource \(.*\) for module \(.*\)./display \1(\2)/p' \
+-e 's/Request: perform rule \(.*\) on module \(.*\)./apply \1(\2)/p' \
 -e 's/Options: phase \(.*\) (\(.*\)) set on./activate \2 # \1/p' \
 $WS.database/LOGFILE
 
