@@ -59,15 +59,16 @@ static opcode get_optimal_opcode(int kind, int argc, list* args)
     * how many statements to pack together
     */
    best = NULL;
-   for( l = get_operation(kind)->opcodes; 
+   for( l = opcodeClass_opcodes(get_opcodeClass(kind));
 	l != NIL;
 	l = CDR(l) )
    {
       opcode oc = OPCODE(CAR(l));
 
-      if ( (oc->subwordSize >= max_width) &&
-	   (oc->vectorSize <= argc) &&
-	   ((best == NULL) || (oc->vectorSize > best->vectorSize)) )
+      if ( (opcode_subwordSize(oc) >= max_width) &&
+	   (opcode_vectorSize(oc) <= argc) &&
+	   ((best == NULL) || 
+	    (opcode_vectorSize(oc) > opcode_vectorSize(best))) )
 	 best = oc;
    }
 
@@ -82,21 +83,14 @@ static entity get_function_entity(string name)
    return e;
 }
 
-typedef struct {
-      entity     e;
-      int        nbDimensions;
-      reference  IndexVariable;
-      int        IndexOffset;
-} reference_info;
-
-static bool analyse_reference(reference r, reference_info* i)
+static bool analyse_reference(reference r, referenceInfo i)
 {
    syntax s;
 
-   i->e = reference_variable(r);
-   i->nbDimensions = gen_length(reference_indices(r));
+   referenceInfo_entity(i) = reference_variable(r);
+   referenceInfo_nbDimensions(i) = gen_length(reference_indices(r));
 
-   if (i->nbDimensions == 0)
+   if (referenceInfo_nbDimensions(i) == 0)
       return FALSE;
 
    s = expression_syntax(EXPRESSION(CAR(reference_indices(r))));
@@ -114,11 +108,11 @@ static bool analyse_reference(reference r, reference_info* i)
 	    cn = value_constant(entity_initial(call_function(c)));
 
 	    if (constant_int_p(cn))
-	       i->IndexOffset = constant_int(cn);
+	       referenceInfo_offset(i) = constant_int(cn);
 	    else
 	       return FALSE;
 
-	    i->IndexVariable = reference_undefined;
+	    referenceInfo_index(i) = reference_undefined;
 	 }
 	 else if (ENTITY_PLUS_P(call_function(c)))
 	 {
@@ -140,13 +134,13 @@ static bool analyse_reference(reference r, reference_info* i)
 		     return FALSE;
 
 		  order = FALSE;
-		  i->IndexOffset = constant_int(value_constant(entity_initial(call_function(cc))));
+		  referenceInfo_offset(i) = constant_int(value_constant(entity_initial(call_function(cc))));
 		  break;
 	       }
 
 	       case is_syntax_reference:
 		  order = TRUE;
-		  i->IndexVariable = syntax_reference(e);		 
+		  referenceInfo_index(i) = syntax_reference(e);		 
 		  break;
 		  
 	       default:
@@ -164,14 +158,14 @@ static bool analyse_reference(reference r, reference_info* i)
 		       !call_constant_p(cc) ) //prevent reference+call
 		     return FALSE;
 
-		  i->IndexOffset = constant_int(value_constant(entity_initial(call_function(cc))));
+		  referenceInfo_offset(i) = constant_int(value_constant(entity_initial(call_function(cc))));
 		  break;
 	       }
 
 	       case is_syntax_reference:
 		  if (order == TRUE)  //prevent reference+reference
 		     return FALSE;
-		  i->IndexVariable = syntax_reference(e); 
+		  referenceInfo_index(i) = syntax_reference(e); 
 		  break;
 
 	       default:
@@ -185,8 +179,8 @@ static bool analyse_reference(reference r, reference_info* i)
       }
 	 
       case is_syntax_reference:
-	 i->IndexVariable = syntax_reference(s);
-	 i->IndexOffset = 0;
+	 referenceInfo_index(i) = syntax_reference(s);
+	 referenceInfo_offset(i) = 0;
 	 break;
 	    
       default:
@@ -195,13 +189,22 @@ static bool analyse_reference(reference r, reference_info* i)
    return TRUE;
 }
 
-static bool consecutive_refs_p(reference_info * firstRef, int lastOffset, reference_info * cRef)
+static bool consecutive_refs_p(referenceInfo firstRef, int lastOffset, referenceInfo cRef)
 {
-   return ( same_entity_p(firstRef->e, cRef->e) &&
-	    (firstRef->nbDimensions == cRef->nbDimensions) &&
-	    (same_entity_p(reference_variable(firstRef->IndexVariable),
-			   reference_variable(cRef->IndexVariable))) &&
-	    (lastOffset + 1 == cRef->IndexOffset) );
+   return ( same_entity_p(referenceInfo_entity(firstRef), 
+			  referenceInfo_entity(cRef)) &&
+	    (referenceInfo_nbDimensions(firstRef) == referenceInfo_nbDimensions(cRef)) &&
+	    (same_entity_p(reference_variable(referenceInfo_index(firstRef)),
+			   reference_variable(referenceInfo_index(cRef)))) &&
+	    (lastOffset + 1 == referenceInfo_offset(cRef)) );
+}
+
+static referenceInfo make_empty_referenceInfo()
+{
+   return make_referenceInfo(entity_undefined,
+			     0,
+			     reference_undefined,
+			     0);
 }
 
 static statement make_loadsave_statement(int argc, list args, bool isLoad)
@@ -215,7 +218,8 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
       { "simd_save",          "simd_load"          },
       { "simd_constant_save", "simd_constant_load" },
       { "simd_generic_save",  "simd_generic_load"  } };
-   reference_info firstRef;
+   referenceInfo firstRef = make_empty_referenceInfo();
+   referenceInfo cRef = make_empty_referenceInfo();
    int lastOffset = 0;
    cons * argPtr;
    expression e;
@@ -266,9 +270,9 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
       constantShift = (64 / argc);
    }
    else if ( (expression_reference_p(e)) &&
-	     (analyse_reference(expression_reference(e), &firstRef)) )
+	     (analyse_reference(expression_reference(e), firstRef)) )
    {
-      lastOffset = firstRef.IndexOffset;
+      lastOffset = referenceInfo_offset(firstRef);
       argsType = CONSEC_REFS;
    }
    else
@@ -303,13 +307,11 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
       }
       else if (argsType == CONSEC_REFS)
       {
-	 reference_info cRef;
-
 	 if ( (expression_reference_p(e)) &&
-	      (analyse_reference(expression_reference(e), &cRef)) &&
-	      (consecutive_refs_p(&firstRef, lastOffset, &cRef)) )
+	      (analyse_reference(expression_reference(e), cRef)) &&
+	      (consecutive_refs_p(firstRef, lastOffset, cRef)) )
 	 {
-	    lastOffset = cRef.IndexOffset;
+	    lastOffset = referenceInfo_offset(cRef);
 	 }
 	 else
 	 {
@@ -329,12 +331,12 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 	 /* build a new list of arguments */
 	 args = gen_make_list( expression_domain, 
 			       EXPRESSION(CAR(args)),
+			       entity_to_expression(
+				  referenceInfo_entity(firstRef)),
 			       reference_to_expression(
-				  make_reference(firstRef.e, NIL)),
-			       reference_to_expression(
-				  firstRef.IndexVariable),
+				  referenceInfo_index(firstRef)),
 			       make_integer_constant_expression(
-				  firstRef.IndexOffset),
+				  referenceInfo_offset(firstRef)),
 			       NULL);
 	 break;
       }
@@ -356,6 +358,10 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
       default:
 	 break;
    }
+
+   free_referenceInfo(firstRef);
+   free_referenceInfo(cRef);
+
    sprintf(functionName, "%s%i", funcNames[argsType][isLoad], argc);
    return call_to_statement(make_call(get_function_entity(functionName), 
 				      args));
@@ -374,7 +380,7 @@ static statement make_save_statement(int argc, list args)
 
 static statement make_exec_statement(opcode oc, list args)
 {
-   return call_to_statement(make_call(get_function_entity(oc->name),
+   return call_to_statement(make_call(get_function_entity(opcode_name(oc)),
 				      args));
 }
 
@@ -455,32 +461,7 @@ static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
 
 #define MAX_PACK 16
 
-typedef struct {
-      expression expr;
-      list deps;
-} _simd_statement_arg, * simd_statement_arg;
-
-typedef struct {
-      opcode op;
-      int nbArgs;
-      entity * vectors;
-      simd_statement_arg arguments;    //2 dimensions array.
-      statement s;
-} _statement_info, *statement_info;
-#define STATEMENT_INFO(x) ((statement_info)((x).p))
-
-typedef struct {
-      expression e;
-      list places_available;
-} _argument_info, * argument_info;
-
-typedef struct {
-      entity e;
-      int element; //index of the element in the vector
-} _vector_element, * vector_element;
-#define VECTOR_ELEMENT(x) ((vector_element)((x).p))
-
-static argument_info arguments = NULL;
+static argumentInfo* arguments = NULL;
 static int nbArguments = 0;
 static int nbAllocatedArguments = 0;
 
@@ -494,12 +475,11 @@ void reset_argument_info()
 static int get_argument_id(expression e)
 {
    int id;
-   argument_info ai;
    int i;
 
    //See if the expression has already been seen
    for(i=0; i<nbArguments; i++)
-      if (same_expression_p(arguments[i].e, e))
+      if (same_expression_p(argumentInfo_expression(arguments[i]), e))
 	 return i;
 
    //Find an id for the operation
@@ -510,8 +490,8 @@ static int get_argument_id(expression e)
    {
       nbAllocatedArguments += 10;
 
-      arguments = (argument_info)realloc((void*)arguments, 
-					 sizeof(_argument_info)*nbAllocatedArguments);
+      arguments = (argumentInfo*)realloc((void*)arguments, 
+					 sizeof(argumentInfo)*nbAllocatedArguments);
 
       if (arguments == NULL)
       {
@@ -521,44 +501,24 @@ static int get_argument_id(expression e)
    }
 
    //Initialize members
-   ai = arguments + id;
-   ai->e = e;
-   ai->places_available = NIL;
+   arguments[id] = make_argumentInfo(e, NIL);
 
    return id;
 }
 
 //Get info on argument with specified id
-static argument_info get_argument_info(int id)
+static argumentInfo get_argument_info(int id)
 {
    return ((id>=0) && (id<nbArguments)) ?
-      &arguments[id] : NULL;
+      arguments[id] : argumentInfo_undefined;
 }
 
-static vector_element make_vector_element(statement_info ssi, int vector, int element)
+static statementInfo make_nonsimd_statement_info(statement s)
 {
-   vector_element v = (vector_element)malloc(sizeof(_vector_element));
-   
-   v->e = ssi->vectors[vector];
-   v->element = element;
-
-   return v;
-}
-
-static statement_info make_statement_info(statement s)
-{
-   statement_info ssi;
+   statementInfo ssi;
    int i;
 
-   /* allocate memory */
-   ssi = (statement_info)malloc(sizeof(_statement_info));
-
-   /* initialize members */
-   ssi->op = NULL;
-   ssi->nbArgs = 0;
-   ssi->vectors = NULL;
-   ssi->arguments = NULL;
-   ssi->s = copy_statement(s);
+   ssi = make_statementInfo_nonsimd(s);
 
    /* see if some expressions are modified.
     * If that is the case, invalidate the list of their available places 
@@ -566,50 +526,58 @@ static statement_info make_statement_info(statement s)
    for(i=0; i<nbArguments; i++)
    {
       //for now, reset all...
-      gen_free_list(arguments[i].places_available);
-      arguments[i].places_available = NIL;
+      gen_free_list(argumentInfo_placesAvailable(arguments[i]));
+      argumentInfo_placesAvailable(arguments[i]) = NIL;
    }
 
    return ssi;
 }
 
-static statement_info make_simd_statement_info(int kind, opcode oc, list* args)
+static vectorElement make_vector_element(simdStatementInfo ssi, int i, int j)
 {
-   statement_info ssi;
+   return make_vectorElement(simdStatementInfo_vectors(ssi)[i], j);
+}
+
+static statementInfo make_simd_statement_info(int kind, opcode oc, list* args)
+{
+   statementInfo si;
+   simdStatementInfo ssi;
    int i,j, nbargs;
 
    /* find out the number of arguments needed */
-   nbargs = get_operation(kind)->nbArgs;
+   nbargs = opcodeClass_nbArgs(get_opcodeClass(kind));
 
    /* allocate memory */
-   ssi = (statement_info)malloc(sizeof(_statement_info));
-   ssi->vectors = (entity *)malloc(sizeof(entity)*nbargs);
-   ssi->arguments = (simd_statement_arg)malloc(sizeof(_simd_statement_arg) *
-					       nbargs * oc->vectorSize);
-
-   /* initialize members */
-   ssi->op = oc;
-   ssi->nbArgs = nbargs;
-   ssi->s = NULL;
+   ssi = make_simdStatementInfo(oc, 
+				nbargs,
+				(entity *)malloc(sizeof(entity)*nbargs),
+				(statementArgument*)malloc(
+				   sizeof(statementArgument) *
+				   nbargs * 
+				   opcode_vectorSize(oc)));
+   si = make_statementInfo_simd(ssi);
 
    /* create the simd vector entities */
    for(j=0; j<nbargs; j++)
-      ssi->vectors[j] = make_new_simd_vector(oc->subwordSize,oc->vectorSize,TRUE);
+      simdStatementInfo_vectors(ssi)[j] = 
+	 make_new_simd_vector(opcode_subwordSize(oc),
+			      opcode_vectorSize(oc),
+			      TRUE);
 
    /* Fill the matrix of arguments */
-   for(j=0; j<oc->vectorSize; j++)
+   for(j=0; j<opcode_vectorSize(oc); j++)
    {
       list l = args[j];
 
       for(i=nbargs-1; i>=0; i--)
       {
-	 argument_info ai;
-	 simd_statement_arg ssa;
+	 argumentInfo ai;
+	 statementArgument ssa;
 	 expression e = EXPRESSION(CAR(l));
 	 
 	 //Store it in the argument's matrix
-	 ssa = &(ssi->arguments[j + oc->vectorSize * i]);
-	 ssa->expr = e;
+	 ssa = simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * i];
+	 statementArgument_expression(ssa) = e;
 	 l = CDR(l);
 
 	 //Get the id of the argumet
@@ -621,25 +589,27 @@ static statement_info make_simd_statement_info(int kind, opcode oc, list* args)
 
 	    //Free the list of places available. Those places are
 	    //not relevant any more
-	    gen_free_list(ai->places_available);
-	    ai->places_available = NIL;
+	    gen_free_list(argumentInfo_placesAvailable(ai));
+	    argumentInfo_placesAvailable(ai) = NIL;
 	 }
 	 else
 	 {  //we read this variable
 
 	    //ssa depends on all the places where the expression was
 	    //used before
-	    ssa->deps = gen_copy_seq(ai->places_available);
+	    statementArgument_dependances(ssa) = 
+	       gen_copy_seq(argumentInfo_placesAvailable(ai));
 	 }
 
 	 //Remember that this variable can be found here too
-	 ai->places_available = CONS(VECTOR_ELEMENT,
-				     make_vector_element(ssi, i, j),
-				     ai->places_available);
+	 argumentInfo_placesAvailable(ai) = 
+	    CONS(VECTOR_ELEMENT,
+		 make_vector_element(ssi, i, j),
+		 argumentInfo_placesAvailable(ai));
       }
    }
 
-   return ssi;
+   return si;
 }
 
 list make_simd_statements(list kinds, cons* first, cons* last)
@@ -653,7 +623,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
 
    if (first == last)
       return CONS(STATEMENT_INFO,
-		  make_statement_info(STATEMENT(CAR(first))),
+		  make_nonsimd_statement_info(STATEMENT(CAR(first))),
 		  NIL);
 
    i = first;
@@ -672,7 +642,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
 	   index++, j = CDR(j) )
       {
 	 match m = get_statement_match_of_kind(STATEMENT(CAR(j)), type);
-	 args[index] = m->args;
+	 args[index] = match_args(m);
       }
 
       /* compute the opcode to use */
@@ -686,7 +656,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
 	      index++, j = CDR(j) )
 	 {
 	    CDR(instr) = CONS(STATEMENT_INFO, 
-			      make_statement_info(STATEMENT(CAR(j))),
+			      make_nonsimd_statement_info(STATEMENT(CAR(j))),
 			      NIL);
 	    instr = CDR(instr);
 	 }
@@ -694,7 +664,9 @@ list make_simd_statements(list kinds, cons* first, cons* last)
       else
       {
 	 /* update the pointer to the next statement to be processed */
-	 for(index = 0; (index<oc->vectorSize) && (i!=CDR(last)); index++)
+	 for(index = 0; 
+             (index<opcode_vectorSize(oc)) && (i!=CDR(last)); 
+             index++)
 	    i = CDR(i);
 
          /* generate the statement information */
@@ -712,19 +684,19 @@ list make_simd_statements(list kinds, cons* first, cons* last)
    return instr;
 }
 
-static statement generate_exec_statement(statement_info si)
+static statement generate_exec_statement(simdStatementInfo si)
 {
    list args = NIL;
    int i;
 
-   for(i = 0; i < si->nbArgs; i++)
+   for(i = 0; i < simdStatementInfo_nbArgs(si); i++)
    {
       args = CONS(EXPRESSION,
-		  entity_to_expression(si->vectors[i]),
+		  entity_to_expression(simdStatementInfo_vectors(si)[i]),
 		  args);
    }
 
-   return make_exec_statement(si->op, args);
+   return make_exec_statement(simdStatementInfo_opcode(si), args);
 }
 
 static list merge_available_places(list l1, list l2, int element)
@@ -738,33 +710,38 @@ static list merge_available_places(list l1, list l2, int element)
    {
       for(j = l2; j != NIL; j = CDR(j))
       {
-	 vector_element ei = VECTOR_ELEMENT(CAR(i));
-	 vector_element ej = VECTOR_ELEMENT(CAR(j));
+	 vectorElement ei = VECTORELEMENT(CAR(i));
+	 vectorElement ej = VECTORELEMENT(CAR(j));
 
-	 if ( (ei->e == ej->e) &&
-	      (ei->element == element) )
-	    res = CONS(, ej, NIL);
+	 if ( (vectorElement_vector(ei) == vectorElement_vector(ej)) &&
+	      (vectorElement_element(ei) == element) )
+	    res = CONS(VECTORELEMENT, ej, NIL);
       }
    }
 
    return res;
 }
 
-static statement generate_load_statement(statement_info si, int line)
+static statement generate_load_statement(simdStatementInfo si, int line)
 {
    list args = NIL;
    int i;
-   int offset = si->op->vectorSize * line;
+   int offset = line * opcode_vectorSize(simdStatementInfo_opcode(si));
    list sources;
 
    //try to see if the arguments have not already been loaded
-   sources = gen_copy_seq(si->arguments[offset].deps);
+   sources = gen_copy_seq(statementArgument_dependances(simdStatementInfo_arguments(si)[offset]));
 
-   for(i = 1; (i<si->op->vectorSize) && (sources!=NIL); i++)
+   for(i = 1; 
+       (i<opcode_vectorSize(simdStatementInfo_opcode(si))) && (sources!=NIL); 
+       i++)
    {
       list new_sources;
 
-      new_sources = merge_available_places(si->arguments[i + offset].deps, sources, i);
+      new_sources = merge_available_places(
+	 statementArgument_dependances(simdStatementInfo_arguments(si)[i + offset]), 
+	 sources, 
+	 i);
 
       gen_free_list(sources);
       sources = new_sources;
@@ -772,49 +749,58 @@ static statement generate_load_statement(statement_info si, int line)
 
    if (sources != NIL)
    {
-      vector_element vec = VECTOR_ELEMENT(CAR(sources));
-      si->vectors[line] = vec->e;
-      return NULL;
+      vectorElement vec = VECTORELEMENT(CAR(sources));
+      simdStatementInfo_vectors(si)[line] = vectorElement_vector(vec);
+      return statement_undefined;
    }
    else
    {
       //Build the arguments list
-      for(i = si->op->vectorSize-1; i >= 0; i--)
+      for(i = opcode_vectorSize(simdStatementInfo_opcode(si))-1; 
+	  i >= 0; 
+	  i--)
       {
 	 args = CONS(EXPRESSION,
-		     copy_expression(si->arguments[i + offset].expr),
+		     copy_expression(statementArgument_expression(simdStatementInfo_arguments(si)[i + offset])),
 		     args);
       }
       args = CONS(EXPRESSION,
-		  entity_to_expression(si->vectors[line]),
+		  entity_to_expression(simdStatementInfo_vectors(si)[line]),
 		  args);
       
       //Make a load statement
-      return make_load_statement(si->op->vectorSize, args);
+      return make_load_statement(
+	 opcode_vectorSize(simdStatementInfo_opcode(si)), 
+	 args);
    }
 }
 
-static statement generate_save_statement(statement_info si)
+static statement generate_save_statement(simdStatementInfo si)
 {
    list args = NIL;
    int i;
-   int offset = si->op->vectorSize * (si->nbArgs-1);
+   int offset = opcode_vectorSize(simdStatementInfo_opcode(si)) * 
+      (simdStatementInfo_nbArgs(si)-1);
 
-   for(i = si->op->vectorSize-1; i >= 0; i--)
+   for(i = opcode_vectorSize(simdStatementInfo_opcode(si))-1; 
+       i >= 0; 
+       i--)
    {
       args = CONS(EXPRESSION,
-		  copy_expression(si->arguments[i + offset].expr),
+		  copy_expression(
+		     statementArgument_expression(simdStatementInfo_arguments(si)[i + offset])),
 		  args);
    }
 
    args = CONS(EXPRESSION,
-	       entity_to_expression(si->vectors[si->nbArgs-1]),
+	       entity_to_expression(simdStatementInfo_vectors(si)[simdStatementInfo_nbArgs(si)-1]),
 	       args);
 
-   return make_save_statement(si->op->vectorSize, args);
+   return make_save_statement(opcode_vectorSize(simdStatementInfo_opcode(si)),
+			      args);
 }
 
-list generate_simd_code(list/* <statement_info> */ sil)
+list generate_simd_code(list/* <statementInfo> */ sil)
 {
    list sl_begin; /* <statement> */
    list sl; /* <statement> */
@@ -823,33 +809,34 @@ list generate_simd_code(list/* <statement_info> */ sil)
 
    for(; sil != NIL; sil=CDR(sil))
    {
-      statement_info si = STATEMENT_INFO(CAR(sil));
+      statementInfo si = STATEMENTINFO(CAR(sil));
 
-      if (si->s != NULL)
+      if (statementInfo_nonsimd_p(si))
       {
 	 /* regular (non-SIMD) statement */
-	 sl = CDR(sl) = CONS(STATEMENT, si->s, NIL);
+	 sl = CDR(sl) = CONS(STATEMENT, statementInfo_nonsimd(si), NIL);
       }
       else
       {
 	 /* SIMD statement (will generate more than one statement) */
 	 int i;
+	 simdStatementInfo ssi = statementInfo_simd(si);
 
 	 //First, the load statement(s)
-	 for(i = 0; i < si->nbArgs-1; i++)
+	 for(i = 0; i < simdStatementInfo_nbArgs(ssi)-1; i++)
 	 {
-	    statement s = generate_load_statement(si, i);
+	    statement s = generate_load_statement(ssi, i);
 
 	    if (s != NULL)
 	       sl = CDR(sl) = CONS(STATEMENT, s, NIL);
 	 }
 
 	 //Then, the exec statement
-	 sl = CDR(sl) = CONS(STATEMENT, generate_exec_statement(si), NIL);
+	 sl = CDR(sl) = CONS(STATEMENT, generate_exec_statement(ssi), NIL);
 
 	 //Finally, the save statement (always generated. It is up to 
 	 //latter phases (USE-DEF elimination....) to remove it, if needed
-	 sl = CDR(sl) = CONS(STATEMENT, generate_save_statement(si), NIL);
+	 sl = CDR(sl) = CONS(STATEMENT, generate_save_statement(ssi), NIL);
       }
    }
 
