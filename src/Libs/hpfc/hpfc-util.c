@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: hpfc-util.c,v $
+ * Revision 1.52  1997/03/28 20:41:15  coelho
+ * more memory leak for AIX...
+ *
  * Revision 1.51  1997/03/28 19:16:24  coelho
  * unused i removed.
  *
@@ -816,24 +819,24 @@ static void test_rewrite(test t)
     if (ENTITY_TRUE_P(e))
     {
 	statement s = current_stmt_head();
-	instruction i = statement_instruction(s);
+	/* instruction i = statement_instruction(s); */
 	pips_debug(5, "true test simplified\n");
 
 	statement_instruction(s) = statement_instruction(test_true(t));
 
 	statement_instruction(test_true(t)) = instruction_undefined;
-	free_instruction(i);
+	/* free_instruction(i); */ /* ??? */
     }
     else if (ENTITY_FALSE_P(e))
     {	
 	statement s = current_stmt_head();
-	instruction i = statement_instruction(s);
+	/* instruction i = statement_instruction(s); */
 	pips_debug(5, "false test simplified\n");
 
 	statement_instruction(s) = statement_instruction(test_false(t));
 
 	statement_instruction(test_false(t)) = instruction_undefined;
-	free_instruction(i);
+	/* free_instruction(i); */ /* ??? */
     }
 }
 
