@@ -235,7 +235,7 @@ bool readonly;
 	;
     else
 	pips_error("add_or_kill_equivalenced_variables",
-		   "unproper storage = %s\n", storage_tag(s));
+		   "unproper storage = %d\n", storage_tag(s));
 }
 
 static void allocate_module_value_mappings(m)
