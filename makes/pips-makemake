@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.298  1997/08/18 09:44:09  coelho
+# fixes to ftest.
+#
 # Revision 1.297  1997/08/18 08:47:03  coelho
 # type.
 #
@@ -578,8 +581,9 @@ ftest: all
 	#
 	# building a local Full PIPS
 	#
-	\$(LINK) \$(ARCH)/fpips \$(FPIPS_MAIN) -lpips -ltpips -lwpips \\
-	    \$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS) \$(WPIPS_ADDED_LIBS)
+	\$(LINK) \$(ARCH)/fpips \$(FPIPS_MAIN) \\
+	    -lfpips -lpips -ltpips -lwpips \$(PIPS_LIBS) \\
+	    \$(TPIPS_ADDED_LIBS) \$(WPIPS_ADDED_LIBS) \$(PIPS_X11_ADDED_LIBS)
 	#
 	# creating links
 	#
