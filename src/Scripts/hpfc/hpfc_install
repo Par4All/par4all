@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1994/06/07 19:35:20 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1994/08/30 16:46:38 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -92,11 +92,13 @@ then
   cp $SRCDIR/hpfc_*.h \
      $SRCDIR/hpfc_*.f \
      $SRCDIR/hpfc_Makefile \
-     $PVM_ROOT/include/*.h \
-     $BASEDIR/host.f \
-     $BASEDIR/node.f \
-     $BASEDIR/init_param.f \
-     $BASEDIR/parameters.h \
+     $BASEDIR/param_init.f \
+     $BASEDIR/*_host.f \
+     $BASEDIR/*_host.h \
+     $BASEDIR/*_node.f \
+     $BASEDIR/*_node.h \
+     $BASEDIR/*_parameters.h \
+     $BASEDIR/*_init.h \
      $PVM_ROOT/include/*.h \
      $DIRECTORY
 
