@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/28 13:52:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/28 16:34:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 1995/09/28 13:52:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "%A% ($Date: 1995/09/28 16:34:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -45,6 +45,7 @@ option_type;
 
 static Menu smenu_options;
 static Menu options_menu;
+Menu_item static options_panel_menu_item;
 Panel options_panel;
 
 static hash_table aliases;
@@ -691,10 +692,20 @@ display_or_hide_options_panel(Menu menu,
    }
    else
    {
-      xv_set(options_frame, XV_SHOW, FALSE, NULL);
+      hide_window(options_frame);
       xv_set(menu_item, MENU_STRING, display_options_panel, NULL);
    }
 }
+
+
+/* Hide and restore the menu item to reopen the option panel: */
+void static
+options_frame_done_procedure(Frame frame)
+{
+   hide_window(options_frame);
+   xv_set(options_panel_menu_item, MENU_STRING, display_options_panel, NULL);  
+}
+
 
 void
 create_options_menu_and_window()
@@ -706,13 +717,18 @@ create_options_menu_and_window()
                                      PANEL_ITEM_X_GAP, 0,
                                      NULL);
 
+   /* Trap the FRAME_DONE event: */
+   xv_set(options_frame, FRAME_DONE_PROC, options_frame_done_procedure, NULL);
+
+   options_panel_menu_item =
+      (Menu_item) xv_create(NULL, MENUITEM,
+                            MENU_STRING, display_options_panel,
+                            MENU_NOTIFY_PROC, display_or_hide_options_panel,
+                            NULL);
    options_menu = (Menu) xv_create(XV_NULL, MENU_COMMAND_MENU,
                                    MENU_TITLE_ITEM, "Selecting PIPS Options ",
                                    MENU_GEN_PIN_WINDOW, main_frame, "Options Menu",
-                                   MENU_ITEM,
-                                   MENU_STRING, display_options_panel,
-                                   MENU_NOTIFY_PROC, display_or_hide_options_panel,
-                                   NULL,
+                                   MENU_APPEND_ITEM, options_panel_menu_item,
                                    NULL);
 
    build_aliases();
