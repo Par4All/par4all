@@ -38,11 +38,11 @@ int warn_on_ref_without_def_in_read_tabulated = FALSE;
 
 /* Where the root will be. */
 
-chunk *Read_chunk ;
+gen_chunk *Read_chunk ;
 
-/* The SHARED_TABLE maps a shared pointer number to its chunk pointer value. */
+/* The SHARED_TABLE maps a shared pointer number to its gen_chunk pointer value. */
 
-static chunk **shared_table ;
+static gen_chunk **shared_table ;
 static int shared_number ;
 
 /* The GEN_TABULATED_NAMES hash table maps ids to index in the table of
@@ -57,7 +57,7 @@ hash_table Gen_tabulated_names = (hash_table)NULL ;
 int allow_forward_ref = FALSE ;
 
 static char *read_external() ;
-static chunk *make_def(), *make_ref() ;
+static gen_chunk *make_def(), *make_ref() ;
 %}
 
 %token CHUNK_BEGIN
@@ -86,8 +86,8 @@ static chunk *make_def(), *make_ref() ;
 %term READ_STRING
 
 %union {
-  chunk chunk ;
-  chunk *chunkp ;
+  gen_chunk chunk ;
+  gen_chunk *chunkp ;
   cons *consp ;
   int val ;
 }
@@ -108,7 +108,7 @@ Read	: Nb_of_shared_pointers Chunk {
 
 Nb_of_shared_pointers 
   	: Int 	{
-		shared_table = (chunk **)alloc( $1*sizeof( chunk * )) ;
+		shared_table = (gen_chunk **)alloc( $1*sizeof( gen_chunk * )) ;
 		}
 	;
 
@@ -118,13 +118,13 @@ Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP {
 		int length = gen_length( $4 ) ;
 
 		$$ = ($1) ? shared_table[ $1-1 ]:
-			(chunk *)alloc( (HEADER+length)*sizeof( chunk )) ;
+			(gen_chunk *)alloc( (GEN_HEADER+length)*sizeof( gen_chunk )) ;
 		$$->i = $3 ;
 
 		for( i=0, cp=gen_nreverse( $4 ); i<length ; i++, cp = cp->cdr )
 			*($$+1+i) = cp->car ;
 #ifdef DBG_READ
-		write_chunk( stderr, $$, HEADER+length ) ;
+		write_chunk( stderr, $$, GEN_HEADER+length ) ;
 #endif
 		}
 	;
@@ -140,11 +140,11 @@ Shared_chunk
 
 Type	: Int	{
 		if( shared_number ) {
-			struct binding *bp = &Domains[ $1 ] ;
+			struct gen_binding *bp = &Domains[ $1 ] ;
 
 			shared_table[ shared_number-1 ] = 
-				(chunk *)alloc(gen_size( bp )*
-					       sizeof( chunk )) ;
+				(gen_chunk *)alloc(gen_size( bp )*
+					       sizeof( gen_chunk )) ;
 		}
 		$$ = $1 ;
 		}
@@ -198,14 +198,14 @@ Data	: Basis	{
 	        $$.p = array_undefined ;
 	        }
 	| VECTOR_BEGIN Int Sparse_Datas RP {
-                chunk *kp ;
+                gen_chunk *kp ;
 		cons *cp ;
 		int i ;
 
-		kp = (chunk *)alloc( $2*sizeof( chunk )) ;
+		kp = (gen_chunk *)alloc( $2*sizeof( gen_chunk )) ;
 
 		for( i=0 ; i != $2 ; i++ ) {
-		    kp[ i ].p = chunk_undefined ;
+		    kp[ i ].p = gen_chunk_undefined ;
 		}
 		for( cp=$3 ; cp!=NULL ; cp=cp->cdr ) {
 		    cons *pair = CONSP( CAR( cp )) ;
@@ -220,8 +220,8 @@ Data	: Basis	{
 		cons *cp ;
 
 		for( cp = gen_nreverse($2) ; cp != NULL ; cp=cp->cdr->cdr ) {
-			chunk *k = (chunk *)alloc( sizeof( chunk )) ;
-			chunk *v = (chunk *)alloc( sizeof( chunk )) ;
+			gen_chunk *k = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
+			gen_chunk *v = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
 	
 			*k = CAR(  cp ) ;
 			*v = CAR( CDR( cp )) ;
@@ -266,7 +266,7 @@ Basis	: READ_UNIT 	{
 	        $$.p = make_ref( $2, $3 ) ;
 	        }
 	| READ_NULL {
-		$$.p = chunk_undefined ;
+		$$.p = gen_chunk_undefined ;
 		}
 	;
 
@@ -278,7 +278,7 @@ Int     : READ_INT   {
 String  : READ_STRING {
 		extern char literal[] ;
 		char *p = alloc( strlen( literal ) + 1) ;
-		chunk *obj = (chunk *)alloc( sizeof( chunk )) ;
+		gen_chunk *obj = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
 
 		strcpy( p, literal ) ; 
 		literal[ 0 ] = '\0' ;
@@ -309,7 +309,7 @@ static char *
 read_external( which )
 int which ;
 {
-    struct binding *bp = &Domains[ which ] ;
+    struct gen_binding *bp = &Domains[ which ] ;
     union domain *dp = bp->domain ;
     extern int yyinput() ;
 
@@ -351,20 +351,20 @@ int which ;
    ALLOW_REF) in the INDEX tabulation table of the DOMAIN, with the unique
    ID and value CHUNKP. */
 
-chunk *
+gen_chunk *
 enter_tabulated_def( index, domain, id, chunkp, allow_ref )
 int index  ;
 int domain ;
 char *id ;
-chunk *chunkp ;
+gen_chunk *chunkp ;
 int allow_ref ;
 {
     static char local[ 1024 ] ;
-    chunk *hash ;
+    gen_chunk *hash ;
     
     sprintf( local, "%d%c%s", domain, HASH_SEPAR, id ) ;
 
-    if( Gen_tabulated_[ index ] == (chunk *)NULL ) {
+    if( Gen_tabulated_[ index ] == (gen_chunk *)NULL ) {
 	fatal( "enter_tabulated_def: Uninitialized %s\n", 
 	       Domains[ domain ].name ) ;
     }
@@ -372,11 +372,11 @@ int allow_ref ;
 	fatal( "enter_tabulated_def: Gen_tabulated_names on %s\n", 
 	       Domains[ domain ].name ) ;
     }
-    if((hash=(chunk *)hash_get( Gen_tabulated_names, local )) != 
-       (chunk *)HASH_UNDEFINED_VALUE ) {
+    if((hash=(gen_chunk *)hash_get( Gen_tabulated_names, local )) != 
+       (gen_chunk *)HASH_UNDEFINED_VALUE ) {
 	if( allow_ref && hash->i < 0 ) {
 	    int i, size = gen_size( Domains+domain ) ;
-	    chunk *cp, *gp ;
+	    gen_chunk *cp, *gp ;
 
 	    hash->i = -hash->i ;
 
@@ -400,7 +400,7 @@ int allow_ref ;
 	char *new_key = alloc( strlen( local )+1 ) ;
 
 	strcpy( new_key, local ) ;
-	hash = (chunk *)alloc( sizeof( chunk )) ;
+	hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
 	hash->i = find_free_tabulated( &Domains[ domain ] ) ;
 	hash_put( Gen_tabulated_names, new_key, (char *)hash ) ;
     }
@@ -412,10 +412,10 @@ int allow_ref ;
 /* MAKE_DEF defines the object CHUNK of name STRING to be in the tabulation 
    table INT. */
 
-static chunk *
+static gen_chunk *
 make_def( Int, String, Chunk )
 int Int ;
-chunk *String, *Chunk ;
+gen_chunk *String, *Chunk ;
 {
     int domain ;
     char *id ;
@@ -429,32 +429,32 @@ chunk *String, *Chunk ;
 /* MAKE_REF references the object of hash name STRING in the tabulation table
    INT. Forward references are dealt with here. */
 
-static chunk *
+static gen_chunk *
 make_ref( Int, String )
 int Int ;
-chunk *String ;
+gen_chunk *String ;
 {
-    chunk *hash ;
-    chunk *cp ;
+    gen_chunk *hash ;
+    gen_chunk *cp ;
     int domain ;
 
-    if( Gen_tabulated_[ Int ] == (chunk *)NULL ) {
+    if( Gen_tabulated_[ Int ] == (gen_chunk *)NULL ) {
 	user( "read: Unloaded tabulated domain %s\n", Domains[ Int ].name ) ;
     }
     sscanf( String->s, "%d", &domain ) ;
 
-    if( (hash=(chunk *)hash_get( Gen_tabulated_names, String->s ))
-       == (chunk *)HASH_UNDEFINED_VALUE ) {
+    if( (hash=(gen_chunk *)hash_get( Gen_tabulated_names, String->s ))
+       == (gen_chunk *)HASH_UNDEFINED_VALUE ) {
 	if( allow_forward_ref ) {
-	    hash = (chunk *)alloc( sizeof( chunk )) ;
+	    hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
 	    hash->i = -find_free_tabulated( &Domains[ domain ] ) ;
 	    hash_put( Gen_tabulated_names, String->s, (char *)hash ) ;
 
-	    if((Gen_tabulated_[ Int ]+abs( hash->i ))->p != chunk_undefined) {
+	    if((Gen_tabulated_[ Int ]+abs( hash->i ))->p != gen_chunk_undefined) {
 	        fatal("make_ref: trying to re-allocate for %s\n", String->s) ;
 	    }
 	    (Gen_tabulated_[ Int ]+abs( hash->i ))->p = 
-		(chunk *)alloc( gen_size( Domains+domain )* sizeof( chunk )) ;
+		(gen_chunk *)alloc( gen_size( Domains+domain )* sizeof( gen_chunk )) ;
         }
 	else {
 	    user("make_ref: Forward references to %s prohibited\n",
