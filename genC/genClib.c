@@ -175,147 +175,155 @@ static int array_own_allocated_memory(union domain *dp)
    to the domain DP. */
 
 /*VARARGS2*/
-static void gen_alloc_component( dp, cp, ap, gen_check_p )
-union domain *dp ;
-gen_chunk *cp ;
-va_list *ap ;
-int gen_check_p ;
+static void gen_alloc_component(union domain * dp,
+				gen_chunk * cp,
+				va_list * ap,
+				int gen_check_p)
 {
-    switch( dp->ba.type ) {
-    case ARRAY_DT :
-	if( (cp->p = va_arg( *ap, gen_chunk * )) == NULL )
-	    cp->p =  init_array( dp ) ;
-	break ;
-    case LIST_DT:
-	cp->l = va_arg( *ap, cons * ) ; 
-	break ;
-    case SET_DT:
-	cp->t = va_arg( *ap, set ) ; 
-	break ;
-    case BASIS_DT:
-	if( IS_INLINABLE( dp->ba.constructand )) {
-	    switch( *dp->ba.constructand->name ) {
-	    case 'u': cp->u = va_arg( *ap, unit ) ; break ;
-	    case 'b': cp->b = va_arg( *ap, bool ) ; break ;
-	    case 'c': cp->c = va_arg( *ap, int ) ; break ;
-	    case 'i': cp->i = va_arg( *ap, int ) ; break ;
-	    case 'f': cp->f = va_arg( *ap, double ) ; break ;
-	    case 's': cp->s = va_arg( *ap, string ) ; break ;
-	    default:
-		fatal( "gen_alloc: unknown inlinable %s\n",
-		       dp->ba.constructand->name ) ;
-	    }
-	}
-	else if( IS_EXTERNAL( dp->ba.constructand )) {
-	    cp->s = va_arg( *ap, char * ) ;
-	}
-	else {
-	    cp->p = va_arg( *ap, gen_chunk * ) ;
+  message_assert("gen_check_p parameter value ok", 
+		 gen_check_p==0 || gen_check_p==1);
 
-	    if( gen_debug & GEN_DBG_CHECK || gen_check_p ) {
-		(void) gen_check( cp->p, dp->ba.constructand-Domains ) ;
-	    }
-	}
-	break ;
-    default:
-	fatal( "gen_alloc_component: unknown type %s\n", itoa( dp->ba.type )) ;
+  switch( dp->ba.type ) {
+  case ARRAY_DT :
+    if( (cp->p = va_arg( *ap, gen_chunk * )) == NULL )
+      cp->p =  init_array( dp ) ;
+    break ;
+  case LIST_DT:
+    cp->l = va_arg( *ap, cons * ) ; 
+    break ;
+  case SET_DT:
+    cp->t = va_arg( *ap, set ) ; 
+    break ;
+  case BASIS_DT:
+    if( IS_INLINABLE( dp->ba.constructand )) {
+      switch( *dp->ba.constructand->name ) {
+      case 'u': cp->u = va_arg( *ap, unit ) ; break ;
+      case 'b': cp->b = va_arg( *ap, bool ) ; break ;
+      case 'c': cp->c = va_arg( *ap, int ) ; break ;
+      case 'i': cp->i = va_arg( *ap, int ) ; break ;
+      case 'f': cp->f = va_arg( *ap, double ) ; break ;
+      case 's': cp->s = va_arg( *ap, string ) ; break ;
+      default:
+	fatal( "gen_alloc: unknown inlinable %s\n",
+	       dp->ba.constructand->name ) ;
+      }
     }
+    else if( IS_EXTERNAL( dp->ba.constructand )) {
+      cp->s = va_arg( *ap, char * ) ;
+    }
+    else {
+      cp->p = va_arg( *ap, gen_chunk * ) ;
+      
+      if( gen_debug & GEN_DBG_CHECK || gen_check_p ) {
+	(void) gen_check( cp->p, dp->ba.constructand-Domains ) ;
+      }
+    }
+    break ;
+  default:
+    fatal( "gen_alloc_component: unknown type %s\n", itoa( dp->ba.type )) ;
+  }
 }
 
 /* GEN_ALLOC allocates SIZE bytes to implement an object whose TYPE is
    the index in the Domains table. A fairly sophisticated initialization
    process is run, namely arrays are filled with undefineds. */
 
-static void gen_alloc_constructed( ap, bp, dp, cp, data, gen_check_p )
-va_list ap ;
-struct gen_binding *bp ;
-union domain *dp ;
-gen_chunk *cp ;
-int data ;
-int gen_check_p ;
+static void gen_alloc_constructed(va_list ap, 
+				  struct gen_binding * bp, 
+				  union domain * dp,
+				  gen_chunk * cp,
+				  int data,
+				  int gen_check_p)
 {
-    struct domainlist *dlp ;
+  struct domainlist * dlp;
 
-    switch( dp->co.op ) {
-    case AND_OP : {
-	gen_chunk *cpp ;	
+  message_assert("gen_check_p parameter value ok", 
+		 gen_check_p==0 || gen_check_p==1);
 
-	for( dlp=dp->co.components, cpp=cp+data ;
-	    dlp != NULL ; 
-	    dlp=dlp->cdr, cpp++ ) {
-	    gen_alloc_component( dlp->domain, cpp, &ap, gen_check ) ;
-	}
-	break ;
+  switch( dp->co.op ) {
+  case AND_OP : {
+    gen_chunk *cpp ;	
+    
+    for( dlp=dp->co.components, cpp=cp+data ;
+	 dlp != NULL ; 
+	 dlp=dlp->cdr, cpp++ ) {
+      gen_alloc_component( dlp->domain, cpp, &ap, gen_check ) ;
     }
-    case OR_OP: {
-	int which ;
-
-	(cp+data)->i = va_arg( ap, int ) ;
-	which = (cp+data)->i - dp->co.first ;
-
-	for( dlp=dp->co.components; dlp!=NULL && which ;dlp=dlp->cdr ){
-	    which-- ;
-	}
-	if( dlp == NULL ) {
-	    user( "gen_alloc: unknown tag for type %s\n", bp->name ) ;
-	}
-	gen_alloc_component( dlp->domain, cp+data+1, &ap, gen_check_p ) ;
-	break ;
+    break ;
+  }
+  case OR_OP: {
+    int which ;
+    
+    (cp+data)->i = va_arg( ap, int ) ;
+    which = (cp+data)->i - dp->co.first ;
+    
+    for( dlp=dp->co.components; dlp!=NULL && which ;dlp=dlp->cdr ){
+      which-- ;
     }
-    case ARROW_OP: {
-	(cp+data)->h = hash_table_make( hash_chunk, 0 ) ;
-	break ;
+    if( dlp == NULL ) {
+      user( "gen_alloc: unknown tag for type %s\n", bp->name ) ;
     }
-    default:
-	fatal( "gen_alloc: Unknown op %s\n", itoa( dp->co.op )) ;
-    }
+    gen_alloc_component( dlp->domain, cp+data+1, &ap, gen_check_p ) ;
+    break ;
+  }
+  case ARROW_OP: {
+    (cp+data)->h = hash_table_make( hash_chunk, 0 ) ;
+    break ;
+  }
+  default:
+    fatal( "gen_alloc: Unknown op %s\n", itoa( dp->co.op )) ;
+  }
 }
 
 /* allocates something in newgen.
  */
 gen_chunk * gen_alloc(int size, int gen_check_p, int dom, ...)
 {
-    va_list ap ;
-    union domain *dp ;
-    struct gen_binding *bp ;
-    gen_chunk *cp ;
-    int data ;
-
-    check_read_spec_performed();
-
-    va_start(ap, dom);
-
-    cp = (gen_chunk *) alloc(size) ;
-    cp->i = dom;
-
-    bp = &Domains[dom];
-    data = 1 + IS_TABULATED( bp );
-
-    switch( (dp = bp->domain)->ba.type ) {
-    case LIST_DT: 
-	(cp+data)->l = va_arg( ap, cons *) ;
-	break ;
-    case SET_DT: 
-	(cp+data)->t = va_arg( ap, set) ;
-	break ;
-    case ARRAY_DT: 
-	if( ((cp+data)->p = va_arg( ap, gen_chunk *)) == NULL ) {
-	    (cp+data)->p = init_array( dp ) ;
-	}
-	break ;
-    case CONSTRUCTED_DT:
-	gen_alloc_constructed( ap, bp, dp, cp, data, gen_check_p ) ;
-	break ;
-    default:
-	fatal( "gen_alloc: Unknown type %s\n", itoa( dp->ba.type )) ;
+  va_list ap;
+  union domain * dp;
+  struct gen_binding * bp;
+  gen_chunk * cp;
+  int data;
+  
+  message_assert("gen_check_p parameter value ok", 
+		 gen_check_p==0 || gen_check_p==1);
+  
+  
+  check_read_spec_performed();
+  
+  va_start(ap, dom);
+  
+  cp = (gen_chunk *) alloc(size) ;
+  cp->i = dom;
+  
+  bp = &Domains[dom];
+  data = 1 + IS_TABULATED( bp );
+  
+  switch( (dp = bp->domain)->ba.type ) {
+  case LIST_DT: 
+    (cp+data)->l = va_arg( ap, cons *) ;
+    break ;
+  case SET_DT: 
+    (cp+data)->t = va_arg( ap, set) ;
+    break ;
+  case ARRAY_DT: 
+    if( ((cp+data)->p = va_arg( ap, gen_chunk *)) == NULL ) {
+      (cp+data)->p = init_array( dp ) ;
     }
-
-    if (IS_TABULATED(bp)) 
-      gen_enter_tabulated(dom, (cp+HASH_OFFSET)->s, cp, FALSE);
-
-    va_end( ap ) ;
-
-    return cp;
+    break ;
+  case CONSTRUCTED_DT:
+    gen_alloc_constructed( ap, bp, dp, cp, data, gen_check_p ) ;
+    break ;
+  default:
+    fatal( "gen_alloc: Unknown type %s\n", itoa( dp->ba.type )) ;
+  }
+  
+  if (IS_TABULATED(bp)) 
+    gen_enter_tabulated(dom, (cp+HASH_OFFSET)->s, cp, FALSE);
+  
+  va_end( ap ) ;
+  
+  return cp;
 }
 
 /********************************************************** NEWGEN RECURSION */
