@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/02 19:55:29 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/02 19:59:15 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -155,7 +155,7 @@ PIPS_CFLAGS_SUN4="-fast -Xc -g"
 #
 # CPP FLAGS
 #
-PIPS_CPPFLAGS_SUN4="-I${PIPS_INCLUDEDIR} -I${NEWGEN_INCLUDEDIR} -I${LINEAR_INCLUDEDIR} -I${PIPS_EXTEDIR}"
+PIPS_CPPFLAGS_SUN4="-I${NEWGEN_INCLUDEDIR} -I${LINEAR_INCLUDEDIR} -I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
 PIPS_CPPFLAGS="-D__USE_FIXED_PROTOTYPES__ ${PIPS_CPPFLAGS_SUN4}"
 # 
 # LD
