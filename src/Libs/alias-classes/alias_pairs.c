@@ -29,19 +29,19 @@ static entity callee;
 static list list_regions_callee;
 static statement current_caller_stmt = statement_undefined;
 static list list_pairs;
-static list alias_lists;
+static list l_alias_lists;
 
 /*
 static bool
 no_alias_for(region reg)
 {
-    list rest_alias_lists = alias_lists;
+    list rest_alias_lists = l_alias_lists;
     list alias_list;
     region alias_reg;
     Psysteme reg_sys, alias_reg_sys;
     bool result = TRUE;
 
-    if (alias_lists != NIL)
+    if (l_alias_lists != NIL)
 	do {
 	    alias_list = CAR(rest_alias_lists);
 	    alias_reg = CAR(alias_list);
@@ -78,7 +78,7 @@ make_alias_list_sub_region(region reg, string module_name)
 	    alias_list = gen_nconc(alias_list,CDR(alias_pair));
 	},
 	list_pairs);
-    alias_lists = gen_nconc(alias_lists,CONS(LIST,alias_list,NIL));
+    l_alias_lists = gen_nconc(l_alias_lists,CONS(LIST,alias_list,NIL));
 }
 */
 
@@ -117,7 +117,7 @@ make_alias_list_if_sub_region(region reg, string module_name)
 		    }
 		}
 	    },
-		alias_lists); 
+		l_alias_lists); 
     }
 }
 */
@@ -174,7 +174,7 @@ make_alias_lists_for_sub_regions(string module_name)
 static bool
 add_pair_to_existing_list(alias_pair)
 {
-    list rest_alias_lists = alias_lists;
+    list rest_alias_lists = l_alias_lists;
     list alias_list;
     region reg, trans_reg, alias_reg;
     bool result = FALSE;
@@ -182,7 +182,7 @@ add_pair_to_existing_list(alias_pair)
     reg = CAR(alias_pair);
     trans_reg = CAR(CDR(alias_pair));
 
-    if (alias_lists != NIL)
+    if (l_alias_lists != NIL)
 	do {
 	    alias_list = CAR(rest_alias_lists);
 	    alias_reg = CAR(alias_list);
@@ -190,7 +190,7 @@ add_pair_to_existing_list(alias_pair)
 	    {
 		result = TRUE;
 		alias_list = gen_nconc(alias_list,CDR(alias_pair));
-		alias_lists = CONS(EFFECTS,alias_list,CDR(rest_alias_lists));
+		l_alias_lists = CONS(EFFECTS,alias_list,CDR(rest_alias_lists));
 */
 /* et retrouver les tetes! */
 /*	    }
@@ -202,11 +202,11 @@ add_pair_to_existing_list(alias_pair)
 
 
 bool
-alias_lists( string module-name )
-{
+alias_lists( string module_name )
+    {
 /*    list alias_pairs;
 
-    alias_lists = NIL;
+    l_alias_lists = NIL;
 */
     /* make alias lists from the IN_alias_pairs */
 /* alias_pairs = (list) db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
@@ -235,7 +235,7 @@ alias_lists( string module-name )
 
     DB_PUT_MEMORY_RESOURCE(DBR_ALIAS_LISTS, 
 			   strdup(module_name),
-			   (char*) make_effects_classes(alias_lists));    
+			   (char*) make_effects_classes(l_alias_lists));    
 			   */
     return(TRUE);
 }
