@@ -610,7 +610,7 @@ string
 basic_to_string(b)
 basic b;
 {
-    char char_decl[20];
+    static char char_decl[20]; /* ??? hummm... */
     int lng = 0;
 
     switch (basic_tag(b))
@@ -652,9 +652,9 @@ basic b;
 	    sprintf(&char_decl[0],"CHARACTER*%d", lng);
 	}
 	else if(value_symbolic_p(basic_string(b))
-	   && constant_int_p(symbolic_constant(value_symbolic(basic_string(b))))) {
-	    lng = constant_int(symbolic_constant(value_constant(basic_string(b))));
-	    sprintf(&char_decl[0],"CHARACTER*%d", lng);
+      && constant_int_p(symbolic_constant(value_symbolic(basic_string(b))))) {
+       lng = constant_int(symbolic_constant(value_constant(basic_string(b))));
+	sprintf(&char_decl[0],"CHARACTER*%d", lng);
 	}
 	else {
 	    lng = -1;
