@@ -882,11 +882,22 @@ static void
 check_this_loop(loop l, type_context_p context)
 {
   basic ind = entity_basic(loop_index(l));
+
+  /* ok for F77, but not in F90? */
+  if (!basic_int_p(ind)) 
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats),
+			    "Obsolescent non integer loop index '%s'"
+			    " (R822 ISO/IEC 1539:1991 (E))",
+			    entity_local_name(loop_index(l)));
+    context->number_of_error++;
+  }
+
   if( !(basic_int_p(ind) || basic_float_p(ind)) )
   {
     add_one_line_of_comment((statement) stack_head(context->stats),
 			    "Index '%s' must be Integer, Real or Double!", 
-			    entity_local_name(loop_index(l)));	
+			    entity_local_name(loop_index(l)));
     context->number_of_error++;
   }
   else if (!check_loop_range(loop_range(l), context->types))
@@ -1021,6 +1032,13 @@ static void put_summary(string name, type_context_p context)
 	   context->number_of_error,
 	   context->number_of_conversion,
 	   context->number_of_simplication);
+
+  pips_user_warning("summary of '%s': "
+		    "%d errors, %d convertions., %d simplifications\n",
+		    name, 
+		    context->number_of_error,
+		    context->number_of_conversion,
+		    context->number_of_simplication);
 
   if (name && get_bool_property("TYPE_CHECKER_ADD_SUMMARY"))
   {
