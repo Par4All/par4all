@@ -1600,6 +1600,8 @@ void
 fprint_environment(FILE * fd, entity m)
 {
     list decls = NIL;
+    int nth = 0; /* rank of formal parameter */
+    entity rv = entity_undefined; /* return variable */
 
     pips_assert("fprint_environment", entity_module_p(m));
 
@@ -1633,6 +1635,35 @@ fprint_environment(FILE * fd, entity m)
 	    (void) fprintf(fd, "\n");
 	    },
 	decls);
+
+    /* Formal parameters */
+    nth = 0;
+    MAP(ENTITY, v, {
+	storage vs = entity_storage(v);
+
+	pips_assert("All storages are defined", !storage_undefined_p(vs));
+
+	if(storage_formal_p(vs)) {
+	    nth++;
+	    if(nth==1) {
+		(void) fprintf(fd, "\nLayouts for formal parameters:\n\n");
+	    }
+	    (void) fprintf(fd,
+			   "\tVariable %s,\toffset = %d\n", 
+			   entity_name(v), formal_offset(storage_formal(vs)));
+	}
+	else if(storage_return_p(vs)) {
+	    pips_assert("No more than one return variable", entity_undefined_p(rv));
+	    rv = v;
+	}
+    }, decls);
+
+    /* Return variable */
+    if(!entity_undefined_p(rv)) {
+	(void) fprintf(fd, "\nLayout for return variable:\n\n");
+	(void) fprintf(fd, "\tVariable %s,\tsize = %d\n", 
+			   entity_name(rv), SafeSizeOfArray(rv));
+    }
 
     /* Structure of each area/common */
     if(!ENDP(decls)) {
