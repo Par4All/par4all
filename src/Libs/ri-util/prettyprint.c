@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.124  1998/10/28 16:04:33  zory
+ * prettyrpint for n-ary operators included
+ * bug removed into fma prettyprint
+ *
  * Revision 1.123  1998/09/22 07:25:42  zory
  * create prettyprint for specific operators that are used by the
  * OPTIMIZE_EXPRESSIONS transformation
@@ -208,7 +212,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.123 1998/09/22 07:25:42 zory Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.124 1998/10/28 16:04:33 zory Exp $";
 #endif /* lint */
 
  /*
@@ -858,26 +862,61 @@ words_goto_label(string tlabel)
     return pc;
 }
 
-/* EOLE : prettyprint one argument for eole operators WITH parentheses
-(JZ -sept 98) */
-static list /*of string */
-eole_prettyprint_argument_with_parentheses(list /* of string */ pc,
-					   expression e) {
+/* EOLE : The multiply-add operator is used within the optimize
+   transformation ( JZ - sept 98) - fma(a,b,c) -> (a + (b*c)) */
+list /* of string */ 
+eole_fma_specific_op(call obj, int precedence, bool leftmost){
+  list /* of strings */ pc = NIL;
+  list /* of expressions */ args = call_arguments(obj);
 
-  pc = CHAIN_SWORD(pc,"("); /* open parenthese */
-  /* prettyprint the first arg */
-  pc = gen_nconc(pc, words_expression(e));
-  pc = CHAIN_SWORD(pc,")"); /* close parentese */
+  int prec ;
   
+  /* open parenthese one  */
+  pc = CHAIN_SWORD(pc, "(");
+
+  /* get precedence for add operator */
+  prec = intrinsic_precedence("+");
+
+  /* first argument */
+  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
+  
+  /* add operator */
+  pc = CHAIN_SWORD(pc,"+");
+
+  /* open parenthese two */
+  pc = CHAIN_SWORD(pc, "(");
+
+  /* get precedence for multiply operator */
+  prec = intrinsic_precedence("*");
+
+   /* second argument */
+  args = CDR(args);
+  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)),prec,TRUE));
+
+  /* multiply operator */
+  pc = CHAIN_SWORD(pc,"*");
+
+  /* third argument */
+  args = CDR(args);
+  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)),prec,FALSE));
+
+  /* close parenthese two */
+  pc = CHAIN_SWORD(pc, ")");
+
+  /* close parenthese one  */
+  pc = CHAIN_SWORD(pc,")");
+
   return pc;
 }
- 
-/* EOLE : each eole specific operator is associated with a given
-   prettyprint (JZ - sept 98) */
-static string 
-get_prettyprint_for_eole_operator(call obj){
 
-  static struct eole_operator_prettyprint {
+/* Check if the given operator is associated with a special
+    prettyprint. For instance, n-ary add and multiply operators which are
+    used in the EOLE project use "+" and "*" prettyprints instead of the
+    entity_local_name (JZ - sept 98) */
+static string 
+get_special_prettyprint_for_operator(call obj){
+
+  static struct special_operator_prettyprint {
     char * name;
     char * op_prettyprint;
   } tab_operator_prettyprint[] = {
@@ -897,135 +936,75 @@ get_prettyprint_for_eole_operator(call obj){
     else i++;
   }
   
-  pips_error("get_prettyprint_for_eole_operator","prettyprint for eole operator undefined");
-  return NULL;
+  return op_name;
 }
 
+/* Extension of "words_infix_binary_op" function for nary operators used
+   in the EOLE project - (since "nary" assumes operators with at least 2
+   op)  - JZ (Oct. 98)*/
 
-/* EOLE : prettyprint one argument for n-ary operators. Parentheses are
-used only if the argument is not a reference or a standard function call
-(JZ -sept 98) */
-static list /*of string*/
-eole_prettyprint_argument_for_nary_operator(list /* of string */ pc, 
-					    expression e ){
-
-  switch (syntax_tag(expression_syntax(e))) {
-  case is_syntax_reference : { /* reference */
-    /* prettyprint without parentheses */
-    return gen_nconc(pc, words_expression(e));
-  }
-  case is_syntax_call :{ /* call */
-    entity f = call_function(syntax_call(expression_syntax(e)));
-    if (ENTITY_LOGICAL_OPERATOR_P(f) || 
-	ENTITY_RELATIONAL_OPERATOR_P(f) || 
-	ENTITY_FOUR_OPERATION_P(f) )
-      /* prettyprint with parentheses (+ * - & ...) */
-      return eole_prettyprint_argument_with_parentheses(pc,e);
-    else 
-      /* prettyprint without parentheses */
-      return gen_nconc(pc, words_expression(e));
-  }
-  case is_syntax_range :{  /* range */
-    /* with parentheses */
-    return eole_prettyprint_argument_with_parentheses(pc,e);
-  }
-  default : { /* error */
-    pips_error("eole_prettyprint_argument_for_nary_operator","unknown syntax \n");
-    return NULL;
-  }
-  } /* end switch */
-}
-
-
-/* EOLE : prettyprint for n-ary operators (such as add and multiply).
-   ((a)+(b)+(c)+(d)) - (JZ - sept 98) */
-
-static list /*of string */
-eole_nary_specific_op( call obj, int precedence, bool leftmost) {
-
-  list /* of string */ pc = NIL;
+static list /* of string */
+words_infix_nary_op(call obj, int precedence, bool leftmost)
+{
+  list /*of string*/ pc = NIL;
   list /* of expressions */ args = call_arguments(obj);
-  string op_name ;
-  string op_prettyprint;
-
-  /* get the prettyprint string for this operator */
-  op_prettyprint = get_prettyprint_for_eole_operator(obj);
-
-  /* open outermost parenthese */
-  pc = CHAIN_SWORD(pc,"(");
   
-  /* prettyprint the first argument */
-  pc = eole_prettyprint_argument_for_nary_operator(pc, EXPRESSION(CAR(args)));
+  /* get current operator precedence */
+  int prec = words_intrinsic_precedence(obj);
 
-  /* jump to the next arg */
-  args = CDR(args); 
+  expression exp1 = EXPRESSION(CAR(args));
+  expression exp2;
 
-  while (args) { /* for all arguments */
+  list we1 = words_subexpression(exp1, prec, 
+				 prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: TRUE);
+  list we2;
 
-    /* prettyprint the operator */
-    pc = CHAIN_SWORD(pc,op_prettyprint);
+  /* open parenthese if necessary */
+  if ( prec < precedence )
+    pc = CHAIN_SWORD(pc, "(");
+  pc = gen_nconc(pc, we1);
 
-    /* prettyprint one argument */
-    pc = eole_prettyprint_argument_for_nary_operator(pc, EXPRESSION(CAR(args)));
+  /* reach the second arg */
+  args = CDR(args);
+  
+  for(; args; args=CDR(args)) { /* for all args */
+    exp2 = EXPRESSION(CAR(args));
+    
+    
+    /* 
+     * If the infix operator is either "-" or "/", I prefer not to delete 
+     * the parentheses of the second expression.
+     * Ex: T = X - ( Y - Z ) and T = X / (Y*Z)
+     *
+     * Lei ZHOU       Nov. 4 , 1991
+     */
+    if ( strcmp(entity_local_name(call_function(obj)), "/") == 0 )  /* divide operator */
+      we2 = words_subexpression(exp2, MAXIMAL_PRECEDENCE, FALSE);
+    else if ( strcmp(entity_local_name(call_function(obj)), "-") == 0 ) { /* minus operator */
+      if ( expression_call_p(exp2) &&
+	   words_intrinsic_precedence(syntax_call(expression_syntax(exp2))) >= 
+	   intrinsic_precedence("*") )
+	/* precedence is greater than * or / */
+	we2 = words_subexpression(exp2, prec, FALSE);
+      else
+	we2 = words_subexpression(exp2, MAXIMAL_PRECEDENCE, FALSE);
+    }
+    else {
+      we2 = words_subexpression(exp2, prec,
+				prec<MINIMAL_ARITHMETIC_PRECEDENCE);
+    }
+  
+    /* operator prettyprint */
+    pc = CHAIN_SWORD(pc, get_special_prettyprint_for_operator(obj));
 
-    /* jump to the next arg */
-    args = CDR(args); 
+    pc = gen_nconc(pc, we2);
   }
-
-  /* close the outermost parenthese */
-  pc = CHAIN_SWORD(pc,")");
-
-  return pc; 
-
-}
-
-
-
-/* EOLE : The multiply-add operator is used within the optimize transformation (
-   JZ - sept 98) - fma(a,b,c) -> (a + (b*c)) */
-list /* of string */ 
-eole_fma_specific_op(call obj, int precedence, bool leftmost){
-  list pc = NIL;
-  list args = call_arguments(obj);
-
-
-  /* precedence and leftmost parameters are not used ! We should try to
-     define precedence between a, b and c arguments of the fma */
-
-  /* open parenthese one  */
-  pc = CHAIN_SWORD(pc, "(");
-
-  /* first argument */
-  pc = eole_prettyprint_argument_for_nary_operator(pc, EXPRESSION(CAR(args)));
+  /* close parenthese if necessary */
+  if ( prec < precedence )
+    pc = CHAIN_SWORD(pc, ")");
   
-  /* add operator */
-  pc = CHAIN_SWORD(pc,"+");
-
-  /* open parenthese two */
-  pc = CHAIN_SWORD(pc, "(");
-
-   /* second argument */
-  args = CDR(args);
-  pc = eole_prettyprint_argument_for_nary_operator(pc, EXPRESSION(CAR(args)));
-
-  /* multiply operator */
-  pc = CHAIN_SWORD(pc,"*");
-
-  /* third argument */
-  args = CDR(args);
-  pc = eole_prettyprint_argument_for_nary_operator(pc, EXPRESSION(CAR(args)));
-
-  /* close parenthese two */
-  pc = CHAIN_SWORD(pc, ")");
-
-  /* close parenthese one  */
-  pc = CHAIN_SWORD(pc,")");
-
-
-  return pc;
+  return(pc);
 }
-
-
 
 
 /* 
@@ -1151,9 +1130,9 @@ static struct intrinsic_handler {
     /* These operators are used within the optimize transformation in
 order to manipulate operators such as n-ary add and multiply or
 multiply-add operators ( JZ - sept 98) */
-    {EOLE_FMA_OPERATOR_NAME, eole_fma_specific_op , 0},
-    {EOLE_SUM_OPERATOR_NAME, eole_nary_specific_op, 0},
-    {EOLE_PROD_OPERATOR_NAME, eole_nary_specific_op, 0},
+    {EOLE_FMA_OPERATOR_NAME, eole_fma_specific_op , MINIMAL_ARITHMETIC_PRECEDENCE},
+    {EOLE_SUM_OPERATOR_NAME, words_infix_nary_op, 20},
+    {EOLE_PROD_OPERATOR_NAME, words_infix_nary_op, 21},
     {NULL, null, 0}
 };
 
