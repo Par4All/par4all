@@ -60,7 +60,7 @@ Ppolynome *ppp;
 float term;
 {
     if ((term != 0) && (!POLYNOME_UNDEFINED_P(*ppp))) {
-	Pmonome pmtoadd = make_monome((float) term, TCST, 1);
+	Pmonome pmtoadd = make_monome((float) term, TCST, VALUE_ONE);
 	polynome_monome_add(ppp, pmtoadd);
 	monome_rm(&pmtoadd);
     }
@@ -75,7 +75,7 @@ Ppolynome pp;
 float term;
 {
     if ((term != 0) && (!POLYNOME_UNDEFINED_P(pp))) {
-	Pmonome pmtoadd = make_monome((float) term, TCST, 1);
+	Pmonome pmtoadd = make_monome((float) term, TCST, VALUE_ONE);
 	pp = polynome_monome_addition(pp, pmtoadd);
 	monome_rm(&pmtoadd);
     }
@@ -100,7 +100,7 @@ int n;
 	if(n>0)
 	    return POLYNOME_NUL;
 	else if (n == 0)
-	    return make_polynome(1.0, TCST, 1);
+	    return make_polynome(1.0, TCST, VALUE_ONE);
 	else
 	    return POLYNOME_UNDEFINED;
     }
@@ -114,15 +114,16 @@ int n;
 		polynome_rm(&ppresult);
 		ppresult = pptemp;
 	    }
-	    return(polynome_div(make_polynome(1.0, TCST, 1), ppresult));
-	/*    return(ppresult); */
+	    return(polynome_div(make_polynome(1.0, TCST, VALUE_ONE), 
+				ppresult));
 	}
 	else
 	    polynome_error("polynome_power_n",
-			   "negative power n=%d and polynome is not a monome\n",n);
+			   "negative power n=%d"
+			   " and polynome is not a monome\n",n);
     }
     else if (n == 0) 
-	return(make_polynome(1.0, TCST, 1));
+	return(make_polynome(1.0, TCST, VALUE_ONE));
     else if (n == 1) 
 	return(polynome_dup(pp));
     else if (n > 1) {
@@ -157,7 +158,7 @@ float num;
     if (POLYNOME_UNDEFINED_P(pp)) 
 	return (POLYNOME_UNDEFINED);
     else {
-	pmnum = make_monome(num, TCST, 1);
+	pmnum = make_monome(num, TCST, VALUE_ONE);
 	ppnum = monome_to_new_polynome(pmnum);
 	ppnew = polynome_var_subst(pp, var, ppnum);
 	polynome_rm(&ppnum);		/* removes also the monomial pmnum */
