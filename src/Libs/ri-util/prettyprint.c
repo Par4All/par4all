@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/12 03:01:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/13 17:22:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/12 03:01:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/13 17:22:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -45,10 +45,7 @@ char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/12 03:01:27 $, ) ve
 #define PRETTYPRINT_UNSTRUCTURED_END_MARKER "\201Unstructured End"
 #define PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER "\202Unstructured Item"
 #define PRETTYPRINT_UNSTRUCTURED_SUCCESSOR_MARKER "\203Unstructured Successor ->"
-#define PRETTYPRINT_UNSTRUCTURED_EDGE_MARKER "\201Unstructured Edge"
-#define PRETTYPRINT_UNSTRUCTURED_EDGE_WITH_NODE_MARKER "\206Unstructured Edge With Node"
-#define PRETTYPRINT_UNSTRUCTURED_SONS_BEGIN_MARKER "\204Unstructured Sons Begin"
-#define PRETTYPRINT_UNSTRUCTURED_SONS_END_MARKER "\205Unstructured Sons End"
+#define PRETTYPRINT_UNREACHABLE_EXIT_MARKER "\204Unstructured Unreachable"
 
 
 text empty_text( s )
@@ -992,7 +989,7 @@ output_a_graph_view_of_the_unstructured(text r,
       connex with the entry node and so the code is
       unreachable. Anyway, it has to be displayed as for the classical
       Sequential View: */
-   if (! exit_node_has_been_displayed)
+   if (! exit_node_has_been_displayed) {
       /* Note that since the controlizer adds a dummy successor to the
          exit node, use
          output_a_graph_view_of_the_unstructured_from_a_control()
@@ -1003,7 +1000,16 @@ output_a_graph_view_of_the_unstructured(text r,
                                                              margin,
                                                              end_control,
                                                              end_control);
-
+      /* Even if the code is unreachable, add the fact that the
+         control above is semantically related to the entry node. Add
+         a dash arrow from the entry node to the exit node in daVinci,
+         for example: */
+      add_one_unformated_printf_to_text(r, "%s %#x -> %#x\n",
+                                        PRETTYPRINT_UNREACHABLE_EXIT_MARKER,
+                                        (unsigned int) begin_control,
+                                        (unsigned int) end_control);
+   }
+   
    add_one_unformated_printf_to_text(r, "%s %#x end: %#x\n",
                                      PRETTYPRINT_UNSTRUCTURED_END_MARKER,
                                      (unsigned int) begin_control,
