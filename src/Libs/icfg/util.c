@@ -201,16 +201,14 @@ void print_marged_text_from_starting_node(FILE *fd, int margin, vertex start_ver
 {
     if (!vertex_undefined_p(start_ver)) {
         text txt = (text)vertex_vertex_label(start_ver);
-	/*bool first_sen = TRUE; the name of module is stored in the first sentence */
 	MAP(SENTENCE, sen, {
             string s = sentence_to_string(sen);
 	    string call_mark;
 	    if(call_mark = strstr(s, CALL_MARK)) {
 	        vertex ver_child = get_vertex_by_string(call_mark + strlen(CALL_MARK), l_of_vers);
 		print_marged_text_from_starting_node(fd, margin + (call_mark - s), ver_child, l_of_vers);
-	    } else {
-	      /*if (first_sen) first_sen = FALSE;*/
-		fprintf(fd, "%*s%s", margin, "", s);
+	    } else if (strlen(s)) { /* if s in not empty, ok write out */
+		fprintf(fd, "%*s%s\n", margin, "", remove_newline_of_string(s));
 	    }
 	}, text_sentences(txt));
     }
