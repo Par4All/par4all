@@ -5,6 +5,11 @@
   * $id$
   *
   * $Log: basic.c,v $
+  * Revision 1.23  2003/07/24 08:36:20  irigoin
+  * Functions empty_transformer(), transformer_weak_consistency_p(),
+  * transformer_general_consistency_p(), transformer_add_modified_variable()
+  * and move_transformer() added. Plus some reformatting.
+  *
   * Revision 1.22  2001/10/22 15:54:36  irigoin
   * reformatting + precondition_to_abstract_store() added, although it is
   * redundant with transformer_range()
@@ -97,6 +102,17 @@ transformer_empty()
 {
     return make_transformer(NIL,
 			    make_predicate(sc_empty(BASE_NULLE)));
+}
+
+/* Do not allocate an empty transformer, but transform an allocated
+   transformer into an empty_transformer. */
+transformer empty_transformer(transformer t)
+{
+  free_predicate(transformer_relation(t));
+  gen_free_list(transformer_arguments(t));
+  transformer_arguments(t) = NIL;
+  transformer_relation(t) = make_predicate(sc_empty(BASE_NULLE));
+  return t;
 }
 
 bool 
@@ -241,33 +257,48 @@ transformer_add_identity(transformer tf, entity v)
   return tf;
 }
 
-bool 
-transformer_argument_consistency_p(t)
-transformer t;
+bool transformer_argument_consistency_p(transformer t)
+{
+  return transformer_argument_general_consistency_p(t, FALSE);
+}
+
+bool transformer_argument_weak_consistency_p(transformer t)
+{
+  return transformer_argument_general_consistency_p(t, TRUE);
+}
+
+bool transformer_argument_general_consistency_p(transformer t, bool is_weak)
 {
   list args = transformer_arguments(t);
   bool consistent = TRUE;
   Psysteme sc = (Psysteme) predicate_system(transformer_relation(t));
   Pbase b = sc_base(sc);
 
-  /* If a variable appears as argument, its new value must be in the basis
-   * See for instance, effects_to_transformer()
-   */
+  /* If no final state can be reached, no variable can be changed in between */
+  if(sc_empty_p(sc)) {
+    consistent = ENDP(args);
+    pips_assert("Empty transformer must have no arguments", consistent);
+  }
+  else if(!is_weak) {
+    /* If a variable appears as argument, its new value must be in the basis
+     * See for instance, effects_to_transformer()
+     */
 
-  MAP(ENTITY, e, {
-    entity v = entity_to_new_value(e);
-    /*
-      pips_assert("Argument is in the basis", base_contains_variable_p(b, (Variable) v));
-    */
-    if(!base_contains_variable_p(b, (Variable) v)) {
-      /* pips_user_warning("No value for argument %s in relation basis\n",
-	 entity_name(e)); */
-      pips_internal_error("No value for argument %s in relation basis\n",
-			  entity_name(e));
-      consistent = FALSE;
-    }
-  }, args);
-  pips_assert("Argument variables must have values in basis", consistent);
+    MAP(ENTITY, e, {
+      entity v = entity_to_new_value(e);
+      /*
+	pips_assert("Argument is in the basis", base_contains_variable_p(b, (Variable) v));
+      */
+      if(!base_contains_variable_p(b, (Variable) v)) {
+	/* pips_user_warning("No value for argument %s in relation basis\n",
+	   entity_name(e)); */
+	pips_internal_error("No value for argument %s in relation basis\n",
+			    entity_name(e));
+	consistent = FALSE;
+      }
+    }, args);
+    pips_assert("Argument variables must have values in basis", consistent);
+  }
 
   return consistent;
 }
@@ -287,9 +318,20 @@ transformer t;
  * inconsistency is detected.
  *
  * But, see final comment... In spite of it, I do not always return any longer.  */
-bool 
-transformer_consistency_p(t)
+bool transformer_consistency_p(t)
 transformer t;
+{
+  return transformer_general_consistency_p(t, FALSE);
+}
+
+/* Interprocedural transformers do not meet all conditions. */
+bool transformer_weak_consistency_p(t)
+transformer t;
+{
+  return transformer_general_consistency_p(t, TRUE);
+}
+
+bool transformer_general_consistency_p(transformer t, bool is_weak)
 {
 #define TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL 0
     /* the relation should be consistent 
@@ -427,11 +469,12 @@ transformer t;
 	if(!entity_has_values_p(e)) {
 	    pips_user_warning("No value for argument %s in value mappings\n",
 			      entity_name(e));
-	    consistent = FALSE;
+	    if(!is_weak)
+	      consistent = FALSE;
 	}
     }, args);
 
-    if(consistent)
+    if(consistent && !is_weak)
       consistent = transformer_argument_consistency_p(t);
 
     /* FI: let the user react and print info before core dumping */
@@ -506,4 +549,44 @@ precondition_to_abstract_store(transformer pre)
   transformer_arguments(as) = NIL;
 
   return as;
+}
+
+transformer transformer_add_modified_variable(
+    transformer tf,
+    entity var)
+{
+  /* Should we check that var has values? */
+  Psysteme sc =  (Psysteme) predicate_system(transformer_relation(tf));
+  Pbase b = sc_base(sc);
+
+  transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), var);
+  sc_base(sc) = vect_add_variable(b, (Variable) var);
+  sc_dimension(sc) = base_dimension(sc_base(sc));
+
+  return tf;
+}
+
+/* Move arguments and predicate of t2 into t1, free old arguments and
+   predicate of t1, free what's left of t2. This is used to perform a side
+   effect on an argument when a function allocates a new transformer to
+   return a result. t2 should not be used after a call to move_transformer() */
+transformer move_transformer(transformer t1, transformer t2)
+{
+  pips_assert("t1 is consistent on entry", transformer_consistency_p(t1));
+  pips_assert("t2 is consistent on entry", transformer_consistency_p(t2));
+
+  free_arguments(transformer_arguments(t1));
+  transformer_arguments(t1) = transformer_arguments(t2);
+  transformer_arguments(t2) = NIL;
+
+  sc_rm(predicate_system(transformer_relation(t1)));
+  predicate_system(transformer_relation(t1))
+    = predicate_system(transformer_relation(t2));
+  predicate_system(transformer_relation(t2))= SC_UNDEFINED;
+
+  free_transformer(t2);
+
+  pips_assert("t1 is consistent on exit", transformer_consistency_p(t1));
+
+  return t1;
 }
