@@ -244,7 +244,6 @@ text t;
     print_text(stderr, t);
 }
 
-
 /* Convert a word list into a string and translate the position of
    eventual attachment accordingly: */
 string words_to_string(lw)
