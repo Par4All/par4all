@@ -111,6 +111,12 @@
 				   MULTIPLY_OPERATOR_NAME) == 0)
 #define ENTITY_DIVIDE_P(e) (strcmp(entity_local_name(e), \
 				   DIVIDE_OPERATOR_NAME) == 0)
+#define ENTITY_MIN_P(e) (strcmp(entity_local_name(e), \
+				MIN_OPERATOR_NAME) == 0)
+#define ENTITY_MAX_P(e) (strcmp(entity_local_name(e), \
+				MAX_OPERATOR_NAME) == 0)
+#define ENTITY_MIN_OR_MAX_P(e) (ENTITY_MIN_P(e) || \
+				 ENTITY_MAX_P(e) )
 
 #define ENTITY_AND_P(e) (strcmp(entity_local_name(e), \
 				   AND_OPERATOR_NAME) == 0)
