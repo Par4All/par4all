@@ -1096,14 +1096,14 @@ string phase_n, module_n;
 		     phase_n, module_n);
 	success = FALSE;
     }
-    else 
+/*    else 
     if (rule_use_resource_produced(r) && (! active_phase_p(phase_n))) {
         user_warning("safe_apply",
-		     "Request aborted in pipsmake: "
+		     "Request aborted in pipsmake: " 
 		     "cyclic rule %s not activated.\n",
 		     phase_n);
 	success = FALSE;
-    }
+    } */
     else {
 	push_pips_context(&long_jump_buffer);
 	user_log("Request: perform rule %s on module %s.\n", 
