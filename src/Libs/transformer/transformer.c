@@ -396,7 +396,7 @@ bool statement_feasible_p(statement s)
 
   pre = load_statement_precondition(s);
   if (get_debug_level() >= 7) {
-     (void) printf("Precondition 0x%x\n", pre);
+     (void) printf("Precondition 0x%x\n", (unsigned int) pre);
   }
   
   pred = transformer_relation(pre);
