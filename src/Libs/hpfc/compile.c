@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/10/06 08:56:12 $, )
+ * ($Date: 1995/10/10 11:38:03 $, )
  */
 
 #include "defines-local.h"
@@ -13,8 +13,6 @@
 #include "regions.h"
 #include "callgraph.h"
 
-/* external functions */
-extern char *getenv();
 extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
 
 #define generate_file_name(filename, prefix, suffix)\
@@ -223,10 +221,10 @@ put_generated_resources_for_common (entity common)
 		entity_name(common));
 	fprintf(stderr, "-----------------\n");
 
-	hpfc_print_file(stderr, parm_filename);
-	hpfc_print_file(stderr, init_filename);
-	hpfc_print_file(stderr, host_filename);
-	hpfc_print_file(stderr, node_filename);
+	hpfc_print_file(parm_filename);
+	hpfc_print_file(init_filename);
+	hpfc_print_file(host_filename);
+	hpfc_print_file(node_filename);
     }
 
     free(parm_filename),
@@ -286,10 +284,10 @@ statement stat, host_stat, node_stat;
 		module_local_name(module));
 	fprintf(stderr, "-----------------\n");
 
-	hpfc_print_file(stderr, parm_filename);
-	hpfc_print_file(stderr, init_filename);
-	hpfc_print_file(stderr, host_filename);
-	hpfc_print_file(stderr, node_filename);
+	hpfc_print_file(parm_filename);
+	hpfc_print_file(init_filename);
+	hpfc_print_file(host_filename);
+	hpfc_print_file(node_filename);
     }
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, strdup(prefix), parm_filename);
@@ -332,8 +330,8 @@ string program_name;
 	fprintf(stderr, "Results of HPFC for the program\n");
 	fprintf(stderr, "-----------------\n");
 
-	hpfc_print_file(stderr, comm_filename);
-	hpfc_print_file(stderr, init_filename);
+	hpfc_print_file(comm_filename);
+	hpfc_print_file(init_filename);
     }
 
     free(comm_filename);
