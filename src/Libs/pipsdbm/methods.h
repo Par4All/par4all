@@ -35,6 +35,12 @@
     (FREER)   pipsdbm_free_statement_mapping,	\
     (CHECKER) pipsdbm_check_statement_mapping
 
+#define GENFREE_METHODS \
+	no_read, no_write, (FREER) gen_free, (CHECKER) gen_true
+
+#define STRING_METHODS \
+	safe_readline, writeln_string, (FREER) free, (CHECKER) gen_true
+
 /* EFFECTS
  */
 { DBR_PROPER_REFERENCES,	STATEMENT_FUNCTION_METHODS },
@@ -113,9 +119,6 @@
 
 /* FILE NAMES
  */
-#define STRING_METHODS \
-	safe_readline, writeln_string, (FREER) free, (CHECKER) gen_true
-
 { DBR_USER_FILE,		STRING_METHODS },
 { DBR_SOURCE_FILE,		STRING_METHODS },
 { DBR_PARSED_PRINTED_FILE,	STRING_METHODS },
@@ -139,9 +142,6 @@
 { DBR_HPFC_RTINIT,	 	STRING_METHODS },
 { DBR_HPFC_COMMONS,	 	DONOTHING_METHODS },
 { DBR_HPFC_INSTALLATION, 	DONOTHING_METHODS },
-
-#define GENFREE_METHODS \
-	no_read, no_write, (FREER) gen_free, (CHECKER) gen_true
 
 /* LOST
  */
