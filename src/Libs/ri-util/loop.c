@@ -109,32 +109,6 @@ statement stat;
 
 
 
-/* this functions checks if kennedy's algorithm can be applied on the
-loop passed as argument. If yes, it returns a set containing all
-statements belonging to this loop including the initial loop itself.
-otherwise, it returns an undefined set.
-
-Our version of kennedy's algorithm can only be applied on loops
-containing no test, goto or unstructured control structures. */
-
-set distributable_loop(l)
-statement l;
-{
-    static bool distributable_statement_p();
-    set r;
-
-    pips_assert("distributable_loop", statement_loop_p(l));
-
-    r = set_make(set_pointer);
-
-    if (distributable_statement_p(l, r)) {
-	return(r);
-    }
-
-    set_free(r);
-    return(set_undefined);
-}
-
 static bool distributable_statement_p(stat, region)
 statement stat;
 set region;
@@ -171,6 +145,31 @@ set region;
     }
 
     return((bool) NULL); /* just to avoid a gcc warning */
+}
+
+/* this functions checks if kennedy's algorithm can be applied on the
+loop passed as argument. If yes, it returns a set containing all
+statements belonging to this loop including the initial loop itself.
+otherwise, it returns an undefined set.
+
+Our version of kennedy's algorithm can only be applied on loops
+containing no test, goto or unstructured control structures. */
+
+set distributable_loop(l)
+statement l;
+{
+    set r;
+
+    pips_assert("distributable_loop", statement_loop_p(l));
+
+    r = set_make(set_pointer);
+
+    if (distributable_statement_p(l, r)) {
+	return(r);
+    }
+
+    set_free(r);
+    return(set_undefined);
 }
 
 /* returns TRUE if loop lo's index is private for this loop */
