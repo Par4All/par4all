@@ -4,6 +4,9 @@
   * Prettyprint unstructured
   *
   * $Log: unstructured.c,v $
+  * Revision 1.8  1997/12/11 10:58:46  coelho
+  * missing strdup added.
+  *
   * Revision 1.7  1997/11/11 10:32:47  coelho
   * clearer assert in text_control.
   *
@@ -539,7 +542,7 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	    MERGE_TEXTS(r, init_text_statement(module, margin, st)) ;
 	    if (! string_undefined_p(comments)) {
 		ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
-						      comments));
+						      strdup(comments)));
 	    }
 
 	    pc = CHAIN_SWORD(NIL, "IF (");
