@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.153  2001/09/24 15:13:03  irigoin
+%% Property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT added
+%%
 %% Revision 1.152  2001/06/15 16:17:50  irigoin
 %% Property SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES added
 %%
@@ -166,7 +169,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2001/06/15 16:17:50 $~$
+$~$Date: 2001/09/24 15:13:03 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1099,7 +1102,7 @@ SEMANTICS_FLOW_SENSITIVE FALSE
 \end{verbatim}
 
 
-\subsubsection{Transformers for expressions}
+\subsubsection{Contexte for statement and expression transformers}
 \index{Expression}
 \index{Transformer}
 \index{}
@@ -1123,7 +1126,18 @@ Not implemented yet.
 SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS FALSE
 \end{verbatim}
 
+Intraprocedural preconditions can be computed at the same time as
+transformers and used to improve the accuracy of expression and statement
+transformers. Non-linear expressions can sometimes have linear
+approximations over the subset of all possible stores defined by a
+precondition. In the same way, the number of convex hulls can be reduced
+if a test branch is never used or if a loop is always entered.
 
+\begin{verbatim}
+SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+\end{verbatim}
+
+The default value is false for reverse compatibility and for speed.
 
 \subsubsection{Interprocedural Semantics Analysis}
 \index{Interprocedural}
