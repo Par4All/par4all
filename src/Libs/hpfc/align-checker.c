@@ -10,6 +10,9 @@
  *
  * $Id$
  * $Log: align-checker.c,v $
+ * Revision 1.23  1997/08/04 13:52:10  coelho
+ * *** empty log message ***
+ *
  * Revision 1.22  1997/04/15 16:07:07  coelho
  * headers updated.
  *
@@ -20,8 +23,9 @@
 
 #include "defines-local.h"
 #include "access_description.h"
-#include "effects.h"
-#include "regions.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 
 GENERIC_STATIC_OBJECT(extern, hpfc_current_statement, statement)
 
