@@ -3,7 +3,7 @@
 /*LINTLIBRARY*/
 
 #include <stdio.h>
-#include <varargs.h>
+#include <stdarg.h>
 	
 
 /* void vect_error(va_dcl va_list): 
@@ -19,17 +19,13 @@
  * 
  */
 /*VARARGS0*/
-void vect_error(va_alist)
-va_dcl
+void vect_error(char * name, char * fmt, ...)
 {
     va_list args;
-    char *fmt;
-
-    va_start(args);
+    va_start(args, fmt);
 
     /* print name of function causing error */
-    (void) fprintf(stderr, "vecteur error in %s: ", va_arg(args, char *));
-    fmt = va_arg(args, char *);
+    (void) fprintf(stderr, "vecteur error in %s: ", name);
 
     /* print out remainder of message */
     (void) vfprintf(stderr, fmt, args);
