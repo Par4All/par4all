@@ -1,7 +1,7 @@
 c
 c Checks run-time library version
 c
-c $RCSfile: hpfc_check.f,v $ ($Date: 1994/04/12 11:16:41 $, )
+c $RCSfile: hpfc_check.f,v $ ($Date: 1994/05/13 14:48:29 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -13,7 +13,7 @@ c
       if  (REALNBOFARRAYS.GT.MAXNBOFARRAYS.OR.
      $     REALNBOFTEMPLATES.GT.MAXNBOFTEMPLATES.OR.
      $     REALNBOFPROCESSORS.GT.MAXNBOFPROCESSORS.OR.
-     $     REALMAXSIZEOFPROC.GT.MAXMAXSIZEOFPROC) then
+     $     REALMAXSIZEOFPROCS.GT.MAXMAXSIZEOFPROCS) then
          print *, 
      $        'HPFC run-time library',
      $        '  must recompiled with larger parameters'
