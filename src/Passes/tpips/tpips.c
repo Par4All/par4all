@@ -37,6 +37,8 @@ static char *usage = "Usage: %s [-n] [-h] [-l logfilename] sourcefile...\n";
 /*************************************************************** Some Macros */
 
 #define TPIPS_PROMPT "tpips> " 		/* prompt for readline  */
+#define TPIPS_SECOND_PROMPT "> "
+#define TPIPS_CONTINUATION_CHAR '\\'
 #define TPIPS_HISTENV "TPIPS_HISTORY"	/* history file env variable */
 #define TPIPS_HISTORY_LENGTH 100	/* max length of history file */
 #define TPIPS_COMMENT_PREFIX '#'	/* comment prefix */
@@ -472,14 +474,14 @@ static void quit_handler(char * line)
     exit(0);
 }
 
-static void default_handler(char * line)
+static void set_line_to_parse(char * line)
 {
     /* skip blanks */
     while (((*line) == ' ') ||
 	   ((*line) == '\t') ||
 	   ((*line) == '\n'))
 	line++;
-
+    
     /* store line pointer */
     line_parsed = line_to_parse = line;
 
@@ -493,6 +495,11 @@ static void default_handler(char * line)
 	}
 	line++;
     }
+}
+
+static void default_handler(char * line)
+{
+    set_line_to_parse(line);
 
     /* parse if non-null line */
     if (*line_to_parse) {
@@ -533,17 +540,33 @@ static void (*find_handler(char* line))(char *)
 
 /*********************************************************** DOING THE JOB */
 
-static char * read_a_line(char * prompt)
+static char * get_next_line(char * prompt)
 {
 #define MAX_LINE_LENGTH  1024
     static char line[MAX_LINE_LENGTH];
-    char *logline;
+    
+    return use_readline? 
+	readline(prompt):
+	strdup(fgets(line, MAX_LINE_LENGTH, current_file));
+}
 
-    if (use_readline)
-	logline = readline(prompt);
-    else
-	/* GO: Please FC don't put safe_fgets here or Validate it !! :-) */
-	logline = fgets(line, MAX_LINE_LENGTH, current_file);
+static char * tpips_read_a_line(void)
+{
+    char *logline;
+    int l;
+
+    logline = get_next_line(TPIPS_PROMPT);
+    
+    /* handle backslash-style continuations
+     */
+    while (l=strlen(logline), logline[l-1]==TPIPS_CONTINUATION_CHAR)
+    {
+	char *tmp, *next = get_next_line(TPIPS_SECOND_PROMPT);
+	logline[l-1] = '\0';
+	tmp = strdup(concatenate(logline, next, NULL));
+	free(logline);
+	logline = tmp;
+    }
 
     if (logfile && logline)
 	fprintf(logfile,"%s\n",logline);
@@ -567,7 +590,7 @@ static void process_a_file()
 
     /*  interactive loop
      */
-    while ((line = read_a_line(TPIPS_PROMPT)))
+    while ((line = tpips_read_a_line()))
     {
 	pips_debug(3, "considering line: %s\n", line? line: " --- empty ---");
 	if (setjmp(pips_top_level)) {
@@ -674,8 +697,7 @@ int main(int argc, char * argv[])
 
 int tpips_lex_input ()
 {
-    char c =*line_to_parse;
-
+    char c = *line_to_parse;
     pips_debug(9,"input char '%c'(0x%2x) from input\n", c, c);
     if (c) line_to_parse++;
     return (int) c;
@@ -684,6 +706,8 @@ int tpips_lex_input ()
 void tpips_lex_unput(int c)
 {
     pips_debug(9,"unput char '%c'(0x%2x)\n", c,c);
+    pips_assert("some place to unput a char", line_parsed<line_to_parse);
+
     *(--line_to_parse) = (char) c;
 }
 
