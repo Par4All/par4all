@@ -4,6 +4,9 @@
 # Basic menus for jpips.
 #
 # $Log: jpips_menus.basic,v $
+# Revision 1.4  1998/07/03 22:15:15  coelho
+# new groups added.
+#
 # Revision 1.3  1998/07/03 16:37:29  coelho
 # new menus with ILABEL and IBUTTON _WITH_CHOICE...
 #
@@ -59,6 +62,189 @@ SEPARATOR
 ##
 ## menu for Sequential view
 ##
+
+GROUP
+Parser
+set fortran parser options
+
+LABEL_WITH_CHOICE
+Statement Functions
+getproperty PARSER_EXPAND_STATEMENT_FUNCTIONS
+..
+what to do with statement functions
+
+	Error
+	setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS FALSE
+	FALSE
+
+	Expand
+	setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Missing Files
+getproperty PREPROCESSOR_MISSING_FILE_HANDLING
+..
+what to do if a source is missing
+
+	Error
+	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "error"
+	error
+
+	Generate
+	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+	generate
+
+	Query
+	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "query"
+	query
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Alternate Returns
+getproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS
+..
+what to do with alternate returns
+
+	Error
+	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
+	NO
+
+	Stop
+	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+	STOP
+
+	Substitute
+	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "RC"
+	RC
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Assigned Gotos
+getproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO
+..
+what to do with assigned gotos
+
+	Error
+	setproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO FALSE
+	FALSE
+
+	Substitute
+	setproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO TRUE
+	TRUE
+
+CLOSE
+
+CLOSE
+
+##
+## Restructure
+##
+
+GROUP
+Restructure
+restructuration of the code
+
+# it does not work for several props...
+# should be able to force a set of instructions.
+# maybe with some marker where to insert an eol?
+LABEL_WITH_CHOICE
+Put Formats
+..
+..
+what to do with formats
+
+	In place
+	setproperty GATHER_FORMATS_AT_BEGINNING FALSE
+	..
+
+	At Beginning
+	setproperty GATHER_FORMATS_AT_BEGINNING TRUE
+	..
+
+	At End
+	setproperty GATHER_FORMATS_AT_END TRUE
+	..
+
+CLOSE
+
+IBUTTON_WITH_CHOICE
+Restructure with
+not used here
+..
+apply some restructuration algorithm
+
+	Dead Code Elimination
+	capply SUPPRESS_DEAD_CODE[$MODULES]
+	..
+
+	Clean Declarations
+	capply CLEAN_DECLARATIONS[$MODULES]
+	..
+
+	Use-Def Elimination
+	capply USE_DEF_ELIMINATION[$MODULES]
+	..
+
+	Unspaghettify
+	capply UNSPAGHETTIFY[$MODULES]
+	..
+
+	Controlizer
+	capply RESTRUCTURE_CONTROL[$MODULES]
+	..
+
+	STF
+	capply STF[$MODULES]
+	..
+
+CLOSE
+
+CLOSE
+
+##
+## Prettyprint
+##
+
+GROUP
+Prettyprint
+Code display
+
+LABEL_WITH_CHOICE
+Statement Numbers
+getproperty PRETTYPRINT_STATEMENT_NUMBER
+..
+whether to print statement numbers
+
+	Yes
+	setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+	TRUE
+
+	No
+	setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+	FALSE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Declarations
+getproperty PRETTYPRINT_ALL_DECLARATIONS
+..
+whether to regenerate declarations
+
+	Reuse Initial
+	setproperty PRETTYPRINT_ALL_DECLARATIONS FALSE
+	FALSE
+
+	Regenerate
+	setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+	TRUE
+
+CLOSE
 
 BUTTON_WITH_MENU
 Show Code with
@@ -191,6 +377,8 @@ display sequential code with selected decorations
 
 CLOSE
 
+CLOSE
+
 ## close Sequential
 
 ##
@@ -198,7 +386,7 @@ CLOSE
 ##
 
 BUTTON_WITH_MENU
-Show ICFG View with
+Show ICFG with
 display ICFG_FILE[$MODULES]
 display interprocedural call graph with selected decorations
 
@@ -365,7 +553,7 @@ CLOSE
 
 IBUTTON_WITH_CHOICE
 Privatize
-no used in IBUTTON_WITH_CHOICE
+not used
 ..
 privatization of variables or anything
 
@@ -417,6 +605,30 @@ CLOSE
 ## Semantics stuff
 ##
 
+GROUP
+Semantics
+Semantical analyses
+
+LABEL_WITH_CHOICE
+Fix Point
+getproperty SEMANTICS_FIX_POINT_OPERATOR
+..
+select the fix point version
+
+	Basic
+	setproperty SEMANTICS_FIX_POINT_OPERATOR "transfer"
+	transfer
+
+	Medium
+	setproperty SEMANTICS_FIX_POINT_OPERATOR "pattern"
+	pattern
+
+	Better?
+	setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+	derivative
+
+CLOSE
+
 LABEL_WITH_CHOICE
 Transformers
 check activate TRANSFORMERS
@@ -458,6 +670,43 @@ select preconditions computation algorithm
 	Full Inter-Procedural
 	activate PRECONDITIONS_INTER_FULL
 	PRECONDITIONS_INTER_FULL
+
+CLOSE
+
+## temporary place
+
+LABEL_WITH_CHOICE
+Array Bounds
+getproperty REGIONS_WITH_ARRAY_BOUNDS
+..
+whether to include array bounds when computing regions
+
+	Ignored
+	setproperty REGIONS_WITH_ARRAY_BOUNDS FALSE
+	FALSE
+
+	Included
+	setproperty REGIONS_WITH_ARRAY_BOUNDS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Regions Computation
+check activate REGIONS
+..
+precision of the region computations
+
+	Approximate
+	activate MAY_REGIONS
+	MAY_REGIONS
+
+	Try Exact
+	activate MUST_REGIONS
+	MUST_REGIONS
+
+CLOSE
+
 
 CLOSE
 
