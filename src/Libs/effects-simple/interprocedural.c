@@ -879,7 +879,7 @@ common_simple_effects_forward_translation(
     {
 	entity a = effect_variable(e);
 	storage s = entity_storage(a);
-	if (storage_ram_p(e) && !dynamic_area_p(ram_section(storage_ram(s))))
+	if (storage_ram_p(s) && !dynamic_area_p(ram_section(storage_ram(s))))
 	{
 	    pips_debug(5, "considering common variable %s\n", entity_name(a));
 
