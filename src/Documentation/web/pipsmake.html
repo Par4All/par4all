@@ -94,7 +94,7 @@ called <tt>hpfc_directives</tt>.
 </P>
 
 <P>
-Now take a look at some transforamtions:
+Now take a look at some transformations:
 <pre>
 unroll                 &gt MODULE.code
     &lt PROGRAM.entities
@@ -111,7 +111,7 @@ hpfc_directives        &gt MODULE.code
     &lt MODULE.code
 </pre>
 
-The first transforamtion describes the loop unrolling phase. It needs
+The first transformation describes the loop unrolling phase. It needs
 the entities of the program and it will update the code of the module.
 <br>
 
@@ -256,11 +256,13 @@ to the current resource one
 </P>
 
 <P>
+
 Resources logical dates have been introduced because of the lack of
 precision of Unix files dates. It is a number, incremented by one for
-each set of resources put back to the database. For file resources
-Unix dates are kept, too. So that it is possible to determine whether
-such a resource has been modified - e.g. edited.
+each new phase launched by <i>pipsmake</i>. So that resources built by
+the same rule will have the same logical date. For file resources Unix
+dates are kept, too. It is then possible to determine whether such a
+resource has been modified - e.g. edited.
 
 </P>
 
@@ -306,23 +308,23 @@ produced resources <b>recursively</b> (using activated rules only).
 
 <UL>
 
-	<LI>A.H. Veen and M. de Lange, <b>"Overview of the PREPARE
-Project"</b>, fourth international workshop on compilers for parallel
-computers, Delft, December 1993.
-
-	<LI>D.A. Padua, K.A. Faigin, J.P. Hoeflinger, P.M. Petersen and
-S.A. Weatherford, <b>"The Polaris Internal Representation"</b>, fourth
-international workshop on compilers for parallel computers, Delft,
-December 1993.
+	<LI>F. Irigoin, P. Jouvelot and R. Triolet, <b>"Semantical
+Interprocedural Parallelization: An Overview of the PIPS Project"</b>,
+ACM International Conference on Supercomputing, June 1991.
 
 	<LI>Mary W. Hall, John M. Mellor-Crummey,Alan Carle and René
 G. Rodríguez, <b>"FIAT: A Framework for Interprocedural Analysis and
 Transformation"</b>, sixth workshop on languages and compilers for
 parallel computing, Portland, OR, August 1993.
 
-	<LI>F. Irigoin, P. Jouvelot and R. Triolet, <b>"Semantical
-Interprocedural Parallelization: An Overview of the PIPS Project"</b>,
-ACM International Conference on Supercomputing, June 1991.
+	<LI>D.A. Padua, K.A. Faigin, J.P. Hoeflinger, P.M. Petersen and
+S.A. Weatherford, <b>"The Polaris Internal Representation"</b>, fourth
+international workshop on compilers for parallel computers, Delft,
+December 1993.
+
+	<LI>A.H. Veen and M. de Lange, <b>"Overview of the PREPARE
+Project"</b>, fourth international workshop on compilers for parallel
+computers, Delft, December 1993.
 
 </UL> <HR>
 
