@@ -16,7 +16,7 @@ SCRIPTS = 	pips-makemake \
 		pips_at_night \
 		remove_from_sccs_file
 
-MACROS	=	define_libraries \
+SRC_MACROS =	define_libraries.sh \
 		makefile_macros.. \
 		makefile_macros.DEFAULT \
 		makefile_macros.GNU \
@@ -25,24 +25,31 @@ MACROS	=	define_libraries \
 		makefile_macros.GNULL \
 		makefile_macros.GNUSOL2LL
 
+DDC_MACROS = 	define_libraries.make
+
+MACROS	=	$(SRC_MACROS) $(DDC_MACROS)
+
 COPY	=	cp -f
 
 INSTALL_UTL=	$(SCRIPTS)
 INSTALL_INC=	$(MACROS)
 
-SOURCES	=	$(SCRIPTS) $(MACROS) forward_gnu_makefile config.makefile
+SOURCES	=	$(SCRIPTS) $(SRC_MACROS) forward_gnu_makefile
 
 quick-install: install_forward_makefiles install_macros 
-all: .runable
+all: $(DDC_MACROS)
+
+define_libraries.make: define_libraries.sh
+	sed "s,',,g" $< > $@
 
 # bootstraping temporarily include files if needed...
 $(PIPS_ROOT)/Include/makefile_macros.$(ARCH):
 	touch $@
 
-$(PIPS_ROOT)/Include/define_libraries:
+$(PIPS_ROOT)/Include/define_libraries.make:
 	touch $@	
 
-install_macros:
+install_macros: $(DDC_MACROS)
 	#
 	# installing makefile macros for pips/newgen/linear
 	#
