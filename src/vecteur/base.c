@@ -226,6 +226,37 @@ char * (*variable_name)();
     return v;
 }
 
+/* Pvecteur vect_rename_variables(v, renamed_p, new_variable)
+ * Pvecteur v;
+ * boolean (*renamed_p)(Variable);
+ * Variable (*new_variable)(Variable);
+ *
+ * what: driven renaming of variables in v.
+ * how: scans the vector, decides and replaces.
+ * input: Pvecteur v, decision and replacement functions.
+ * output: v is returned (the same)
+ * side effects:
+ *  - the vector is modified in place.
+ * bugs or features:
+ *  - was written by FC...
+ */
+Pvecteur vect_rename_variables(v, renamed_p, new_variable)
+Pvecteur v;
+boolean (*renamed_p)(/*Variable*/);
+Variable (*new_variable)(/*Variable*/);
+{
+    Pvecteur i=v; /* initial vector is kept */
+    Variable var;
+
+    for(; v!=NULL; v=v->succ)
+    {
+	var = var_of(v);
+	if (renamed_p(var)) var_of(v)=new_variable(var);
+    }
+
+    return(i);
+}
+
 /* Pvecteur vect_translate(Pvecteur v, Pbase b, char * (*variable_name)()):
  * modify vector v so that its coordinates are relative to basis b;
  * each basis vector is defined by a pointer of type Variable, but
