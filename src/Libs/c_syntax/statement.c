@@ -3,6 +3,9 @@
  $Id
  $Log */
 
+/* Attention, the null statement in C is represented as the continue 
+   statement in Fortran (make_continue_statement means make_null_statement)*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -33,31 +36,39 @@ extern statement ModuleStatement;
 stack BlockStack; /* BlockStack is used to handle block scope */
 
 list LabelledStatements; /* list of labelled statements of the current module*/
-int derived_counter; /* to generate unique counter for unnamed struct/union/enum and their members*/
-int loop_counter; /* to generate unique label counter for loop and switch*/
-bool is_loop; /* to distinguish if this is a loop or a switch */
-list CurrentSwitchGotoStatements;
-expression CurrentSwitchController; 
+
+stack SwitchGotoStack = stack_undefined;
+stack SwitchControllerStack = stack_undefined; 
+stack LoopStack = stack_undefined; /* is used for switch statements also, because we do not 
+					distinguish a break in a loop or a switch */
 
 void MakeCurrentModule(entity e)
 {
-  entity_storage(e) = make_storage_return(e); /* This must be changed later, the storage is of type return and we have to create a new entity*/
+  /* This must be changed later, the storage is of type return and we have to create a new entity*/
+  entity_storage(e) = make_storage_return(e); 
   if (value_undefined_p(entity_initial(e)))
     entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL)));
   /* code_declaration to be updated : only need formal parameters, because the others are added in
      block statement declaration ? */
+  pips_debug(4,"Set current module entity %s\n",entity_user_name(e));
   set_current_module_entity(e);
   init_c_areas(); 
   LabelledStatements = NIL;
-  derived_counter = 0;
-  loop_counter = 0;
-  CurrentSwitchGotoStatements = NIL;
-  CurrentSwitchController = expression_undefined; 
+  SwitchGotoStack = stack_make(sequence_domain,0,0);
+  SwitchControllerStack = stack_make(expression_domain,0,0);
+  LoopStack = stack_make(basic_domain,0,0);
 }
 
 void ResetCurrentModule()
 {
+  if (get_bool_property("PARSER_DUMP_SYMBOL_TABLE"))
+    fprint_environment(stderr, get_current_module_entity());
+  pips_debug(4,"Reset current module entity %s\n",get_current_module_name());
   reset_current_module_entity();
+  stack_free(&SwitchGotoStack);
+  stack_free(&SwitchControllerStack);
+  stack_free(&LoopStack);
+  stack_free(&BlockStack);  
 }
 
 void InitializeBlock()
@@ -77,21 +88,6 @@ statement MakeBlock(list decls, list stms)
   return s;
 }
 
-statement MakeNullStatement(entity lab)
-{
-  return make_statement(lab, 
-			STATEMENT_NUMBER_UNDEFINED, 
-			STATEMENT_ORDERING_UNDEFINED, 
-			string_undefined,
-			MakeNullInstruction(),
-			NIL,NULL);
-}
-
-instruction MakeNullInstruction()
-{
-  return make_instruction(is_instruction_call, 
-			  make_call(CreateIntrinsic(NULL_STATEMENT_INTRINSIC),NIL));
-}
 
 statement FindStatementFromLabel(entity l)
 {
@@ -138,9 +134,9 @@ statement MakeGotoStatement(string label)
   if (s == statement_undefined) 
     {
       s = make_statement(l,STATEMENT_NUMBER_UNDEFINED,
-			   STATEMENT_ORDERING_UNDEFINED,
-			   empty_comments, 
-			   MakeNullInstruction(),NIL,NULL);
+			 STATEMENT_ORDERING_UNDEFINED,
+			 empty_comments, 
+			 make_continue_instruction(),NIL,NULL);
       LabelledStatements = CONS(STATEMENT,s,LabelledStatements);
     }
   return instruction_to_statement(make_instruction(is_instruction_goto,s));
@@ -169,9 +165,10 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
 {  
   whileloop w; 
   statement smt;
-  string lab1 = strdup(concatenate("loop_end_",int_to_string(loop_counter),NULL));
+  int i = basic_int((basic) stack_head(LoopStack));
+  string lab1 = strdup(concatenate("loop_end_",int_to_string(i),NULL));
   statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
-  string lab2 = strdup(concatenate("loop_exit_",int_to_string(loop_counter),NULL));
+  string lab2 = strdup(concatenate("break_",int_to_string(i),NULL));
   statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
   if (!statement_undefined_p(s1))
     {
@@ -189,7 +186,7 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
 	 Add the labelled statement after the loop */
       insert_statement(smt,s2,FALSE);
     }
-  pips_assert("While loop is consistent",statement_consistent_p(smt));
+  pips_assert("While loop is consistent",whileloop_consistent_p(w));
   ifdebug(5) 
     {
       printf("While loop statement: \n");
@@ -202,9 +199,10 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
 {								 
   forloop f;
   statement smt;
-  string lab1 = strdup(concatenate("loop_end_",int_to_string(loop_counter),NULL));
+  int i = basic_int((basic) stack_head(LoopStack));
+  string lab1 = strdup(concatenate("loop_end_",int_to_string(i),NULL));
   statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
-  string lab2 = strdup(concatenate("loop_exit_",int_to_string(loop_counter),NULL));
+  string lab2 = strdup(concatenate("break_",int_to_string(i),NULL));
   statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
   if (!statement_undefined_p(s1))
     {
@@ -220,7 +218,7 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
 	 Add the labelled statement after the loop */
       insert_statement(smt,s2,FALSE);
     }
-  pips_assert("For loop is consistent",statement_consistent_p(smt));
+  pips_assert("For loop is consistent",forloop_consistent_p(f));
   ifdebug(5) 
     {
       printf("For loop statement: \n");
@@ -252,9 +250,9 @@ statement MakeSwitchStatement(statement s)
      switch_xxx_default: ;
      sd;
 
-     In si, we can have goto switch_exit_xxx; (which was a break) 
+     In si, we can have goto break_xxx; (which was a break) 
 
-     and switch_exit_xxx: ; is inserted at the end of the switch statement
+     and break_xxx: ; is inserted at the end of the switch statement
 
      The statement s corresponds to the body 
 
@@ -273,10 +271,10 @@ statement MakeSwitchStatement(statement s)
      
 
      before s and return the inserted statement.  */
-
-  string lab = strdup(concatenate("switch_exit_",int_to_string(loop_counter),NULL));
+  int i = basic_int((basic) stack_head(LoopStack));
+  string lab = strdup(concatenate("break_",int_to_string(i),NULL));
   statement smt = FindStatementFromLabel(MakeCLabel(lab));
-  statement seq = instruction_to_statement(make_instruction_sequence(make_sequence(CurrentSwitchGotoStatements)));
+  statement seq = instruction_to_statement(make_instruction_sequence(stack_head(SwitchGotoStack)));
   insert_statement(s,seq,TRUE);
 
   if (!statement_undefined_p(smt))
@@ -299,17 +297,20 @@ statement MakeCaseStatement(expression e)
   /* Tranform 
          case e: 
      to
-         switch_xxx_e: ;
+         switch_xxx_case_e: ;
      and generate 	 
-        if (c == e) goto switch_xxx_e 
-     where c is retrieved from CurrentSwitchController
-           xxx is unique from loop_counter */
-  string lab = strdup(concatenate("switch_",int_to_string(loop_counter),
+        if (c == e) goto switch_xxx_case_e 
+     where c is retrieved from SwitchControllerStack
+           xxx is unique from LoopStack */
+  int i = basic_int((basic) stack_head(LoopStack));
+  string lab = strdup(concatenate("switch_",int_to_string(i),
 				  "_case_",words_to_string(words_expression(e)),NULL));
-  statement s = MakeLabelledStatement(lab,MakeNullStatement(entity_empty_label()));
-  expression cond = eq_expression(CurrentSwitchController,e);
+  statement s = MakeLabelledStatement(lab,make_continue_statement(entity_empty_label()));
+  expression cond = eq_expression(stack_head(SwitchControllerStack),e);
   test t = make_test(cond,MakeGotoStatement(lab),make_continue_statement(entity_undefined));
-  CurrentSwitchGotoStatements = gen_nconc(CurrentSwitchGotoStatements,CONS(STATEMENT,test_to_statement(t),NULL));
+  sequence CurrentSwitchGotoStack = stack_head(SwitchGotoStack);
+  sequence_statements(CurrentSwitchGotoStack) = gen_nconc(sequence_statements(CurrentSwitchGotoStack),
+							       CONS(STATEMENT,test_to_statement(t),NULL));
   return s;
 }
 
@@ -320,32 +321,38 @@ statement MakeDefaultStatement()
      and add 
        goto switch_xxx_default;
      to the switch header */
-  string lab = strdup(concatenate("switch_",int_to_string(loop_counter),"_default",NULL));
-  statement s = MakeLabelledStatement(lab,MakeNullStatement(entity_empty_label()));
-  CurrentSwitchGotoStatements = gen_nconc(CurrentSwitchGotoStatements,CONS(STATEMENT,MakeGotoStatement(lab),NULL));
+  int i = basic_int((basic) stack_head(LoopStack));
+  string lab = strdup(concatenate("switch_",int_to_string(i),"_default",NULL));
+  statement s = MakeLabelledStatement(lab,make_continue_statement(entity_empty_label()));
+  sequence CurrentSwitchGoto = stack_head(SwitchGotoStack);
+  sequence_statements(CurrentSwitchGoto) = gen_nconc(sequence_statements(CurrentSwitchGoto),
+							       CONS(STATEMENT,MakeGotoStatement(lab),NULL));
   return s;
 }
 
 statement MakeBreakStatement()
 {
-  /* Loop or switch statement ?*/
-  string lab;
-  if (is_loop)
-    lab = strdup(concatenate("loop_exit_",int_to_string(loop_counter),NULL));
-  else
-    lab = strdup(concatenate("switch_exit_",int_to_string(loop_counter),NULL));
+  /* NN : I did not add a boolean variable to distinguish between loop and switch statements :-(*/
+  int i = basic_int((basic) stack_head(LoopStack));
+  string lab = strdup(concatenate("break_",int_to_string(i),NULL));
   return MakeGotoStatement(lab);
 }
 
 statement MakeContinueStatement()
 {
-  /* Unique label with the loop_counter */
-  string lab = strdup(concatenate("loop_end_",int_to_string(loop_counter),NULL));
+  /* Unique label with the LoopStack */
+  int i = basic_int((basic) stack_head(LoopStack));
+  string lab = strdup(concatenate("loop_end_",int_to_string(i),NULL));
   return MakeGotoStatement(lab);
 }
 
-
-
+statement ExpressionToStatement(expression e)
+{
+  syntax s = expression_syntax(e);
+  if (syntax_call_p(s))
+    return call_to_statement(syntax_call(s));
+  return instruction_to_statement(make_instruction(is_instruction_expression,e));
+}
 
 
 
