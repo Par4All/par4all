@@ -222,12 +222,14 @@ text
 get_text_proper_effects(string module_name)
 {
     text t;
-    set_is_user_view_p(FALSE);
 
+    set_is_user_view_p(FALSE);
+    set_methods_for_rw_effects_prettyprint(module_name);
     t = get_any_effect_type_text(module_name,
 				 DBR_PROPER_EFFECTS,
 				 string_undefined,
 				 FALSE);
+    reset_methods_for_effects_prettyprint(module_name);
     return t;
 }
 
@@ -236,11 +238,14 @@ text
 get_text_cumulated_effects(string module_name)
 {
     text t;
+
     set_is_user_view_p(FALSE);
+    set_methods_for_rw_effects_prettyprint(module_name);
     t = get_any_effect_type_text(module_name,
 				 DBR_CUMULATED_EFFECTS,
 				 DBR_SUMMARY_EFFECTS,
 				 FALSE);
+    reset_methods_for_effects_prettyprint(module_name);
     return t;
 }
 
