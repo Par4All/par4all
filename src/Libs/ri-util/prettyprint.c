@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/12 23:39:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/13 19:12:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/12 23:39:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/13 19:12:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -353,9 +353,11 @@ list ldecl;
 {
     bool print_commons = get_bool_property("PRETTYPRINT_COMMONS"),
          from_hpfc = get_bool_property("PRETTYPRINT_HPFC");
-    text r = text_undefined;
+    text r, t_chars;
     list before = NIL, after_before = NIL, ph = NIL,
 	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, pc = NIL, ps = NIL;
+
+    t_chars = make_text(NIL);
 
     MAP(ENTITY, e,
      {
@@ -457,9 +459,35 @@ list ldecl;
 		 pc = gen_nconc(pc, words_declaration(e, !from_hpfc));
 		 break;
 	     case is_basic_string:
-		 ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
-		 ps = gen_nconc(ps, words_declaration(e, !from_hpfc));
+	     {
+		 value v = basic_string(b);
+
+		 if (value_constant_p(v) && constant_int_p(value_constant(v)))
+		 {
+		     int i = constant_int(value_constant(v));
+
+		     /* fprintf(stderr, "character*%d %s\n", 
+			i, entity_name(e)); */
+		     if (i==1)
+		     {
+			 ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
+			 ps = gen_nconc(ps, words_declaration(e, !from_hpfc));
+		     }
+		     else
+		     {
+			 list chars=NIL;
+			 chars = CHAIN_SWORD(chars, "CHARACTER*");
+			 chars = CHAIN_IWORD(chars, i);
+			 chars = CHAIN_SWORD(chars, " ");
+			 chars = gen_nconc(chars, 
+					   words_declaration(e, !from_hpfc));
+			 ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		     }
+		 }
+		 else 
+		     pips_internal_error("unexpected value\n");
 		 break;
+		 }
 	     default:
 		 pips_internal_error("unexpected basic tag (%d)\n",
 				     basic_tag(b));
@@ -476,6 +504,7 @@ list ldecl;
     ADD_WORD_LIST_TO_TEXT(r, pl);
     ADD_WORD_LIST_TO_TEXT(r, pc);
     ADD_WORD_LIST_TO_TEXT(r, ps);
+    MERGE_TEXTS(r, t_chars);
 
     return (r);
 }
