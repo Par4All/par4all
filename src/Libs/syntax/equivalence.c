@@ -1,4 +1,10 @@
- /* equivalence.c: contains EQUIVALENCE related routines */
+/* 	%A% ($Date: 1997/02/03 22:26:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_syntax_equivalence[] = "%A% ($Date: 1997/02/03 22:26:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
+/* equivalence.c: contains EQUIVALENCE related routines */
 
 #include <stdio.h>
 
@@ -69,7 +75,7 @@ chain c;
 		maxoff = o;
     }
 
-    debug(9, "", "[StoreEquivChain] maxoff %d\n", maxoff);
+    debug(9, "StoreEquivChain", "maxoff %d\n", maxoff);
 
     if (maxoff > 0) {
 	for (pc = chain_atoms(c); pc != NIL; pc = CDR(pc)) {
@@ -231,15 +237,17 @@ chain c;
     cons *pca;
     atom a;
 
-    debug(9, "", "[PrintChain] ");
+    debug(9, "PrintChain", "Begin: ");
 
     for (pca = chain_atoms(c); pca != NIL; pca = CDR(pca)) {
 	a = ATOM(CAR(pca));
 
-	debug(9, "", "(%s,%d) ; ", entity_name(atom_equivar(a)), atom_equioff(a));
+	ifdebug(9)
+	    (void) fprintf(stderr, "(%s,%d) ; ",
+			   entity_name(atom_equivar(a)), atom_equioff(a));
     }
 
-    debug(9, "", "\n");
+    debug(9, "PrintChain", "\n");
 }
 
 /* this function computes an address for each variable. all common
