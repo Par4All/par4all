@@ -849,7 +849,7 @@ set region;
 	    else 
 	    {
 		successor_vertex(su) = vertex_undefined;
-		successor_arc_label(su) = (char *) dg_arc_label_undefined;
+		successor_arc_label_(su) = (char *) dg_arc_label_undefined;
 		gen_free(su);
 		ps = CDR(ps);
 		if (pss == NIL) 
