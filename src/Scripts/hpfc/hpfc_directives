@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/26 10:52:28 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/29 17:49:30 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -65,6 +65,7 @@
 # _3: timeoff
 # _4: setbool // to change the compiler global behavior...
 # _5: setint  // dangerous and added for validation purposes...
+# _6: io      // declares an io function (host call only...)
 #
 # (_ is hpfc)
 #
@@ -148,11 +149,12 @@ $SED '#
       s, setint,      5,
       s, local\(.*\),      i(I_LOCAL)\1      do I_LOCAL = 0\, 0,
       s, end[ ]*local,      enddo,
+      s, io\(.*\),      6(\1),
       #
       # HPF declaration directives (well, pure is not)
       #
       s, dynamic \(.*\),      y(\1),
-      s, pure \(.*\),      u(\1),
+      s, pure\(.*\),      u(\1),
       s, template \(.*\),      logical \1      t(\1),
       s, processors \(.*\),      logical \1      p(\1),
       #
