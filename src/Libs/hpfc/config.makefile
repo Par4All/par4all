@@ -1,6 +1,9 @@
 #
-# $RCSfile: config.makefile,v $ version $Revision$,
-# ($Date: 1997/03/11 17:55:23 $, )
+# $Id$
+# $Log: config.makefile,v $
+# Revision 1.41  1997/03/19 16:42:32  coelho
+# better RCS headers
+#
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
