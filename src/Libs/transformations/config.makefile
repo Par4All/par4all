@@ -10,6 +10,7 @@ LIB_CFILES=	replace.c \
 		interchange.c \
 		target.c \
 		nest_parallelization.c\
+                coarse_grain_parallelization.c\
 		dead_code_elimination.c \
 		privatize.c \
 		array_privatization.c \
