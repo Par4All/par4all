@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/12/17 16:58:18 $, 
+# $Date: 1997/04/10 17:35:30 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -12,6 +12,7 @@ INSTALL_SHR=	epips_view_menu_layout.el \
 		wpips.rc
 
 DERIVED_INC=	resources.h \
+		printable_resources.h \
 		phases.h \
 		builder_map.h \
 		wpips_transform_menu_layout.h \
@@ -36,14 +37,14 @@ pipsmake.rc: pipsmake-rc.tex
 
 wpips.rc: pipsmake-rc.tex
 	#
-	# buidling wpips.rc
+	# buidling $@
 	#
 	{ cat $(AUTO)-dash.h ;\
 	  sed 's,	,    ,g;s/ *$$//;/^alias /!d' $< ; } > $@
 
 resources.h: pipsmake.rc
 	#
-	# building resources.h
+	# building $@
 	# 
 	cpp $< | \
 	sed '/>/!d;s/^.*MODULE\.//;s/^.*PROGRAM\.//;\
@@ -51,9 +52,15 @@ resources.h: pipsmake.rc
 	tr '[a-z]' '[A-Z]' | sort -u | sed 's/.*/#define DBR_& "&"/' | \
 	cat $(AUTO).h - > $@
 
+printable_resources.h: resources.h
+	#
+	# building $@
+	#
+	sed /FILE/p $< | cat $(AUTO).h - > $@
+
 phases.h: pipsmake.rc
 	#
-	# building phases.h
+	# building $@
 	#
 	cpp $< | sed '/^[a-z]/!d;s/ .*//g;' | tr '[a-z]' '[A-Z]' | sort -u | \
 	sed 's/.*/#define BUILDER_& "&"/' | cat $(AUTO).h - > $@
