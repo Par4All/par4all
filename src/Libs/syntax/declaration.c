@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/03/19 11:55:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/26 10:55:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/03/19 11:55:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/04/26 10:55:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -49,7 +49,8 @@ char vcid_syntax_declaration[] = "%A% ($Date: 1997/03/19 11:55:21 $, ) version $
 
 #define IS_UPPER(c) (isascii(c) && isupper(c))
 
-void InitAreas()
+void 
+InitAreas()
 {
     DynamicArea = FindOrCreateEntity(CurrentPackage, DYNAMIC_AREA_LOCAL_NAME);
     entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
@@ -66,7 +67,8 @@ void InitAreas()
 
 /* functions for the SAVE declaration */
 
-void save_all_entities()
+void 
+save_all_entities()
 {
     entity mod = get_current_module_entity();
     list vars = code_declarations(value_code(entity_initial(mod)));
@@ -97,7 +99,8 @@ void save_all_entities()
 
 /* this function transforms a dynamic variable into a static one.  */
 
-void SaveEntity(e)
+void 
+SaveEntity(e)
 entity e;
 {
     if (entity_type(e) == type_undefined) {
@@ -133,7 +136,8 @@ entity e;
 
 /* this function transforms a dynamic common into a static one.  */
 
-void SaveCommon(c)
+void 
+SaveCommon(c)
 entity c;
 {
     pips_assert("SaveCommon",type_area_p(entity_type(c)));
@@ -147,7 +151,8 @@ entity c;
 
 /* a debugging function, just in case ... */
 
-void PrintData(ldvr, ldvl)
+void 
+PrintData(ldvr, ldvl)
 cons *ldvr, *ldvl;
 {
     cons *pc;
@@ -188,7 +193,8 @@ ldvr is a list of datavar.
 
 ldvl is a list of dataval. */
 
-void AnalyzeData(ldvr, ldvl)
+void 
+AnalyzeData(ldvr, ldvl)
 cons *ldvr, *ldvl;
 {
     cons *pcr, *pcl;
@@ -307,7 +313,8 @@ cons *ldvr, *ldvl;
  * No sharing is introduced between t and et. However d and s are directly
  * used in e fields.
  */
-void DeclareVariable(e, t, d, s, v)
+void 
+DeclareVariable(e, t, d, s, v)
 entity e;
 type t;
 cons *d;
@@ -482,7 +489,8 @@ value v;
  */
 static hash_table common_size_map = hash_table_undefined;
 
-void initialize_common_size_map()
+void 
+initialize_common_size_map()
 {
     pips_assert("initialize_common_size_map", 
 		common_size_map == hash_table_undefined);
@@ -502,7 +510,8 @@ reset_common_size_map()
  * This function creates a common block. pips creates static common
  * blocks. this is not true in the ANSI standard.
  */
-entity MakeCommon(e)
+entity 
+MakeCommon(e)
 entity e;
 {
     if (entity_type(e) == type_undefined) {
@@ -558,7 +567,8 @@ entity e;
  * undefined. c's size is indirectly updated by CurrentOffsetOfArea().
  *
  */ 
-void AddVariableToCommon(c, v)
+void 
+AddVariableToCommon(c, v)
 entity c, v;
 {
     if (entity_storage(v) != storage_undefined) {
@@ -583,7 +593,8 @@ entity c, v;
  * Note FI: this function is called too early because a DIMENSION or a Type
  * statement can modify both the basic type and the dimensions of variable v.
  */
-int CurrentOffsetOfArea(a, v)
+int 
+CurrentOffsetOfArea(a, v)
 entity a, v;
 {
     int OldOffset;
@@ -611,7 +622,8 @@ entity a, v;
     return(OldOffset);
 }
 
-void update_common_sizes()
+void 
+update_common_sizes()
 {
     HASH_MAP(k, v,{
 	entity c = (entity) k;
@@ -655,7 +667,8 @@ static int int_implicit[26];
 /* this function initializes the data structure used to compute implicit
 types */
 
-void InitImplicit()
+void 
+InitImplicit()
 {
     cr_implicit(is_basic_float, DefaultLengthOfBasic(is_basic_float), 'A','H');
     cr_implicit(is_basic_float, DefaultLengthOfBasic(is_basic_float), 'O','Z');
@@ -667,15 +680,19 @@ types. the implicit type for the range of letters defined by lettre_d
 and lettre_f has tag t and length l. tag is_basic_string is temporarely
 forbidden. */
 
-void cr_implicit(t, l, lettre_d, lettre_f)
+void 
+cr_implicit(t, l, lettre_d, lettre_f)
 tag t;
 int l;
 int lettre_d, lettre_f;
 {
     int i;
 
+    /*
     if (t == is_basic_string)
-	    ParserError("cr_implicit", "bad tag\n");
+	    ParserError("cr_implicit",
+			"Unsupported implicit character declaration\n");
+			*/
 
     if ((! IS_UPPER(lettre_d)) || (! IS_UPPER(lettre_f)))
 	    FatalError("cr_implicit", "bad char\n");	
@@ -689,11 +706,14 @@ int lettre_d, lettre_f;
 /* this function computes the implicit type of entity e. the first
 letter of e's name is used. */
 
-type ImplicitType(e)
+type 
+ImplicitType(e)
 entity e;
 {
     int i;
     string s = entity_local_name(e);
+    type t = type_undefined;
+    value v = value_undefined;
 
     if (s[0] == '_')
 	    s++;
@@ -705,7 +725,25 @@ entity e;
 
     i = (int) (s[0] - 'A');
 
+    switch(tag_implicit[i]) {
+    case is_basic_int:
+    case is_basic_float:
+    case is_basic_logical:
+    case is_basic_complex:
+	t = MakeTypeVariable(make_basic(tag_implicit[i], int_implicit[i]), NIL);
+	break;
+    case is_basic_string:
+	v = make_value(is_value_constant,
+		       make_constant(is_constant_int, int_implicit[i]));
+	t = MakeTypeVariable(make_basic(tag_implicit[i], v), NIL);
+	break;
+    case is_basic_overloaded:
+    default:
+    }
+    /*
     return(MakeTypeVariable(make_basic(tag_implicit[i], int_implicit[i]), NIL));
+    */
+    return t;
 }
 
 /* This function checks that entity e has an undefined or an implicit type
@@ -714,7 +752,8 @@ entity e;
  * The implicit type of a functional entity is its result type.
  */
 
-bool implicit_type_p(e)
+bool 
+implicit_type_p(e)
 entity e;
 {
     int i;
@@ -759,7 +798,8 @@ entity e;
     return FALSE; /* to please gcc */
 }
 
-void retype_formal_parameters()
+void 
+retype_formal_parameters()
 {
     entity m = get_current_module_entity();
     list vars = code_declarations(value_code(entity_initial(m)));
@@ -784,7 +824,8 @@ t is a tag, eg: INTEGER, REAL, ...
 
 v is a value that represents the length in bytes of the type. */
 
-type MakeFortranType(t, v)
+type 
+MakeFortranType(t, v)
 tag t;
 value v;
 {
@@ -811,7 +852,8 @@ value v;
 /* this function computes the offset of a variable element from the
 begining of the variable. */
 
-int OffsetOfReference(r)
+int 
+OffsetOfReference(r)
 reference r;
 {
     cons *pi;
@@ -833,7 +875,8 @@ reference r;
 
 /* this function returns the size of the ith lower bound of a variable e. */
 
-int ValueOfIthLowerBound(e, i)
+int 
+ValueOfIthLowerBound(e, i)
 entity e;
 int i;
 {
@@ -855,7 +898,8 @@ int i;
 /* this function computes the size of a range, ie. the number of
 iterations that would be done by a loop with this range. */
 
-int SizeOfRange(r)
+int 
+SizeOfRange(r)
 range r;
 {
     int ir, il, iu, ii;
@@ -882,7 +926,8 @@ range r;
  * type integer
  */
 
-int IsIntegerScalar(e) 
+int 
+IsIntegerScalar(e) 
 entity e; 
 { 
     if (type_variable_p(entity_type(e))) {
@@ -894,8 +939,9 @@ entity e;
 
     return(FALSE);
 }
-
-void check_common_layouts(m)
+
+void 
+check_common_layouts(m)
 entity m;
 {
     list decls = NIL;
@@ -904,13 +950,33 @@ entity m;
 
     decls = code_declarations(value_code(entity_initial(m)));
 
+    ifdebug(1) {
+	(void) fprintf(stderr, "\nDeclarations for module %s\n\n",
+		       module_local_name(m));
+    }
+
+    /* List of implictly and explicitly declared variables, functions and areas */
+    if(ENDP(decls)) {
+	(void) fprintf(stderr, "* empty declaration list *\n\n");
+    }
+    else {
+	(void) fprintf(stderr, "Variable list:\n\n");
+    }
     MAPL(ce, {
 	entity e = ENTITY(CAR(ce));
-	/* */
+
 	ifdebug(1) {
 	    (void) fprintf(stderr, "Declared entity %s\n", entity_name(e));
 	}
-	/* */
+    }, decls);
+
+    /* Structure of each area/common */
+    if(!ENDP(decls)) {
+	(void) fprintf(stderr, "\nLayouts for areas (commons):\n\n");
+    }
+    MAPL(ce, {
+	entity e = ENTITY(CAR(ce));
+
 	if(type_area_p(entity_type(e))) {
 	    ifdebug(1) {
 		print_common_layout(e);
@@ -922,30 +988,45 @@ entity m;
 	    }
 	}
     }, decls);
+
+    ifdebug(1) {
+	(void) fprintf(stderr, "End of declarations for module %s\n\n",
+		       module_local_name(m));
+    }
+
 }
 
-void print_common_layout(c)
+void 
+print_common_layout(c)
 entity c;
 {
     list members = area_layout(type_area(entity_type(c)));
 
     (void) fprintf(stderr,"\nLayout for common %s:\n", entity_name(c));
-    MAPL(cm, 
-     {
-	 entity m = ENTITY(CAR(cm));
+
+    if(ENDP(members)) {
+	(void) fprintf(stderr, "* empty area *\n\n");
+    }
+    else {
+	MAPL(cm, 
+	     {
+		 entity m = ENTITY(CAR(cm));
 	 
-	 pips_assert("print_common_layout",
-		     storage_ram_p(entity_storage(m)));
-	 (void) fprintf(stderr,
-			"\tVariable %s, offset = %d, size = %d\n", 
-			entity_name(m),
-			ram_offset(storage_ram(entity_storage(m))),
-			SizeOfArray(m));
-     }, 
-	 members);
+		 pips_assert("print_common_layout",
+			     storage_ram_p(entity_storage(m)));
+		 (void) fprintf(stderr,
+				"\tVariable %s, offset = %d, size = %d\n", 
+				entity_name(m),
+				ram_offset(storage_ram(entity_storage(m))),
+				SizeOfArray(m));
+	     }, 
+		 members);
+	(void) fprintf(stderr, "\n");
+    }
 }
 
-bool update_common_layout(m, c)
+bool 
+update_common_layout(m, c)
 entity m;
 entity c;
 {
