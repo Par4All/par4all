@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/10 16:52:55 $, 
+ * $Date: 1997/04/10 17:57:45 $, 
  */
 
 #include <stdio.h>
@@ -174,6 +174,7 @@ static void tpips_user_error(char * calling_function_name,
 
    /* terminate PIPS request */
    if (get_bool_property("ABORT_ON_USER_ERROR")) {
+       user_warning("tpips_user_error", "Abort on user error requested!\n");
       abort();
    }
    else
