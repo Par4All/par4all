@@ -25,7 +25,7 @@
 
 #include "graph.h"
 #include "dg.h"
-#include "loop_normalize.h"
+/* #include "loop_normalize.h" */
 #include "atomizer.h"
 
 
