@@ -32,8 +32,6 @@
 #include "property.h"
 #include "reduction.h"
 #include "tiling.h"
-#include "loop_normalize.h"
-
 
 #include "text.h"
 #include "text-util.h"
