@@ -180,8 +180,6 @@ load_list(statement_effects m, statement s)
     return effects_effects(apply_statement_effects(m, s));
 }
 
-/********************************************************************* TEXT */
-
 /* returns the text associated to a specified prettyprint and statement 
  */
 static text
