@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/11/15 10:41:52 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1996/02/16 08:46:31 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -14,7 +14,7 @@
 % Modifications
 
 \batchmode
-\documentstyle[11pt]{article}
+\documentstyle[11pt,html]{article}
 \title{Properties \\
     Low Level Tuning of PIPS}
 \author{Lei Zhou \hspace{2cm} 
@@ -98,13 +98,26 @@ ONE_TRIP_DO FALSE
 \end{verbatim}
 
 It is possible to display the amount of real, cpu and system times
-directly spent in each phase as well as the times spent reading/wirting data
+directly spent in each phase as well as the times spent reading/writing data
 structures from/to PIPS database. The default value of this property is
 \verb+FALSE+. The computation of total time used to complete a
-\verb+pipsmake+ request is not implemented.
+\verb+pipsmake+ request is broken down into global times, a set of phase times
+which is the accumulation of the times spent in each phase, and a set of
+IO times, also accumulated thru phases. 
+
+Note that the IO times are included in the phase times.
 
 \begin{verbatim}
 LOG_TIMINGS FALSE
+\end{verbatim}
+
+It is possible to log the amount of memory used by each phase and by
+each request. This is mainly useful to check if a computation can be
+performed on a given machine. This memory log can also be used to track memory
+leaks.
+
+\begin{verbatim}
+LOG_MEMORY_USAGE FALSE
 \end{verbatim}
 
 \section{PIPS Infrastructure}
@@ -739,6 +752,8 @@ PARTIAL_DISTRIBUTION FALSE
 
 \subsection{Code Prettyprinter}
 
+\subsubsection{Layout}
+
 When prettyprinting semantic information (preconditions, transformers and
 regions) adds a line before and after each piece of information if set to
 \verb+TRUE+. The resulting code is more readable, but is larger.  
@@ -746,6 +761,8 @@ regions) adds a line before and after each piece of information if set to
 \begin{verbatim}
 PRETTYPRINT_LOOSE TRUE 
 \end{verbatim}
+
+\subsubsection{Target Language Selection}
 
 Added for homogeneity reason; could be (easily) reduced to one?  In
 fact, with many target machines in mind, we should have an integer flag
@@ -783,6 +800,8 @@ Adds Cray-T3D CRAFT Fortran prettyprint.
 \begin{verbatim}
 PRETTYPRINT_CRAFT FALSE
 \end{verbatim}
+
+\subsubsection{Display Analysis Results}
 
 Add statement effects as comments in output; not implemented (that way) yet.
 
@@ -828,13 +847,17 @@ Print regions of scalars.
 PRETTYPRINT_SCALAR_REGIONS FALSE
 \end{verbatim}
 
-Print statement blocks
+\subsubsection{Display Iternals for Debugging}
+
+All these debugging options should be set to FALSE for normal operation.
+
+Print block statement.
 
 \begin{verbatim}
 PRETTYPRINT_BLOCKS FALSE
 \end{verbatim}
 
-Print unstructured blocks
+Print unstructured statements.
 
 \begin{verbatim}
 PRETTYPRINT_UNSTRUCTURED FALSE
@@ -876,7 +899,7 @@ PRETTYPRINT_DO_LABEL_AS_COMMENT FALSE
 
 Print private variables without regard for their effective use. By
 default, private variables are shown only for parallel DO loops.
-
+
 \begin{verbatim}
 PRETTYPRINT_ALL_PRIVATE_VARIABLES FALSE
 \end{verbatim}
@@ -890,13 +913,31 @@ declaration {\em text} is used to preserve comments.
 PRETTYPRINT_ALL_DECLARATIONS FALSE
 \end{verbatim}
 
+Whether to regenerate the commons in the declarations or not.
+
+\begin{verbatim}
+PRETTYPRINT_COMMONS TRUE
+\end{verbatim}
+
 Manage internal RETURNs correctly if set to TRUE.  This results in a
 slightly ugly (but correct) prettyprint, compared to a nicer (but
-possibly incorrect) default one.
+possibly incorrect) default one. Internal returns are converted by the
+parser into GO~TO's the final and unique return.
 
 \begin{verbatim}
 PRETTYPRINT_INTERNAL_RETURN TRUE
 \end{verbatim}
+
+Print the final RETURN statement, although this is useless according to
+Fortran standard. Note that comments attached to the final return are
+lost if it is not printed. Note also that the final RETURN may be part
+of an unstructured in which case the previous property is required.
+
+\begin{verbatim}
+PRETTYPRINT_FINAL_RETURN FALSE
+\end{verbatim}
+
+\subsubsection{FORESYS Interface}
 
 Print transformers, preconditions and regions in a format acceptd by
 Foresys and Partita.
@@ -905,17 +946,15 @@ Foresys and Partita.
 PRETTYPRINT_FOR_FORESYS FALSE
 \end{verbatim}
 
-Whether to regenerate the commons in the declarations or not.
-
-\begin{verbatim}
-PRETTYPRINT_COMMONS TRUE
-\end{verbatim}
+\subsubsection{HPFC Prettyprinter}
 
 To deal specifically with the prettyprint for hpfc
 
 \begin{verbatim}
 PRETTYPRINT_HPFC FALSE
 \end{verbatim}
+
+\subsubsection{Interface to Graphics Prettyprinters}
 
 To output a code with a hierarchical view of the control graph with
 markers instead of a flat one. It purposes a display with a graph
