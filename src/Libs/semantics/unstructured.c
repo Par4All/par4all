@@ -49,6 +49,9 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.15  2003/08/13 11:32:37  irigoin
+  * Bug fixed for Validation/Control/unstruc03.f
+  *
   * Revision 1.14  2003/07/24 11:00:17  irigoin
   * Suppression of obsolete code, typedef of recursive_context to avoid
   * useless compiler warnings
@@ -416,12 +419,12 @@ static bool ready_to_be_processed_p(control c,
     else if(!gen_in_list_p(pred, to_be_processed)) {
       /* postcondition must be empty because pred is not reachable */
       /* transformer pre = transformer_empty(); */
-      transformer post = load_control_postcondition(c, control_postcondition_map);
+      transformer post = load_control_postcondition(pred, control_postcondition_map);
 
       if(transformer_undefined_p(post)) {
 	post = transformer_empty();
 	/* transformer post = statement_to_postcondition(pre, stmt); */
-	store_control_postcondition(c, post, control_postcondition_map);
+	store_control_postcondition(pred, post, control_postcondition_map);
       }
       else {
 	pips_assert("Postcondition for unreachable nodes must be empty",
@@ -446,45 +449,57 @@ static bool ready_to_be_processed_p(control c,
 static transformer load_arc_precondition(control pred, control c,
  control_mapping control_postcondition_map)
 {
-  transformer pre =
-    transformer_dup(load_control_postcondition(pred, control_postcondition_map));
+  transformer post = load_control_postcondition(pred, control_postcondition_map);
+  transformer pre = transformer_undefined;
   int i = gen_position(c, control_successors(pred));
   int noo = gen_occurences(c, control_successors(pred));
 
-  pips_assert("c is a successor of pred", i!=0);
-  /* let's assume that Bourdoncle's restructuring does not clutter the
-     successor list too much. */
-  pips_assert("c does not appear more than twice in the successor list",
-	      noo<=2);
+  if(transformer_undefined_p(post)) {
+    /* pred must be unreachable, left over by the controlizer... */
+    /* It would be nice to be able to check that it is unreachable... and
+       that we do not land here because of a bug...*/
+    /* This should never happen. */
+    pips_assert("postconditions of predecessors are assumed initialized"
+		" (see process_ready_node().", FALSE);
+    pre = transformer_empty();
+  }
+  else {
+    pre = transformer_dup(post);
 
-  if(control_test_p(pred)) {
-    statement stmt = control_statement(pred);
+    pips_assert("c is a successor of pred", i!=0);
+    /* let's assume that Bourdoncle's restructuring does not clutter the
+       successor list too much. */
+    pips_assert("c does not appear more than twice in the successor list",
+		noo<=2);
 
-    pips_assert("stmt is a test", statement_test_p(stmt));
+    if(control_test_p(pred)) {
+      statement stmt = control_statement(pred);
 
-    if(noo==2) {
-      /* Assume that the same node is in the true and false successor lists. */
-      /* Do not bother with the test condition... and FI loose the side effects. */
-      /* If side effects can be detected, perform a convex hull of the
-	 true and false branches as nothing else is available. */
-      ;
-    }
-    else {
-      /* add the test condition */
-      expression e = test_condition(statement_test(stmt));
+      pips_assert("stmt is a test", statement_test_p(stmt));
 
-      if(i%2==1) { /* One of the true successors */
-	pre = precondition_add_condition_information(pre, e,
-						     transformer_undefined, TRUE);
-      
+      if(noo==2) {
+	/* Assume that the same node is in the true and false successor lists. */
+	/* Do not bother with the test condition... and FI loose the side effects. */
+	/* If side effects can be detected, perform a convex hull of the
+	   true and false branches as nothing else is available. */
+	;
       }
-      else{ /* One of the false successors */
-	pre = precondition_add_condition_information(pre, e,
-						     transformer_undefined, FALSE);
+      else {
+	/* add the test condition */
+	expression e = test_condition(statement_test(stmt));
+
+	if(i%2==1) { /* One of the true successors */
+	  pre = precondition_add_condition_information(pre, e,
+						       transformer_undefined, TRUE);
+      
+	}
+	else{ /* One of the false successors */
+	  pre = precondition_add_condition_information(pre, e,
+						       transformer_undefined, FALSE);
+	}
       }
     }
   }
-
   ifdebug(2) {
     string msg = control_test_p(pred)? (i%2==1? "true" : "false"): "standard";
     pips_debug(2, "End for %s arc of position %d between predecessor node pred=%p"
