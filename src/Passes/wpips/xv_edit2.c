@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/03/08 16:37:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/04/15 17:11:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1996/03/08 16:37:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1996/04/15 17:11:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -61,6 +61,7 @@ edit_notify(Menu menu,
     char * modulename = db_get_current_module_name();
     char * file_name;
     int win_nb;
+    char * alternate_wpips_editor;
 
     if (modulename == NULL) {
 	prompt_user("No module selected");
@@ -73,41 +74,50 @@ edit_notify(Menu menu,
 	wpips_execute_and_display_something_outside_the_notifyer(label);
     }
     else {
-	/* Is there an available edit_textsw ? */
-	if ( (win_nb=alloc_first_initialized_window(FALSE)) == NO_TEXTSW_AVAILABLE ) {
-	    prompt_user("None of the text-windows is available");
-	    return;
-	}
-
 	file_name = db_get_file_resource(DBR_SOURCE_FILE, modulename, TRUE);
 	sprintf(file_name_in_database, "%s/%s",
 		build_pgmwd(db_get_current_workspace_name()),
 		file_name);
 
-	sprintf(string_filename, "File: %s", file_name);
-	sprintf(string_modulename, "Module: %s", modulename);
+	if ((alternate_wpips_editor = getenv("PIPS_WPIPS_EDITOR")) != NULL) {
+	    char editor_command[MAXPATHLEN*2];
+	    sprintf(editor_command, "%s %s &",
+		    alternate_wpips_editor,
+		    file_name_in_database);
+	    system(editor_command);
+	}
+	else {
+	    /* Is there an available edit_textsw ? */
+	    if ( (win_nb=alloc_first_initialized_window(FALSE)) == NO_TEXTSW_AVAILABLE ) {
+		prompt_user("None of the text-windows is available");
+		return;
+	    }
 
-	/* Display the file name and the module name. RK, 2/06/1993 : */
-	xv_set(edit_frame[win_nb], FRAME_LABEL, "Pips Edit Facility",
-	       FRAME_SHOW_FOOTER, TRUE,
-	       FRAME_LEFT_FOOTER, string_filename,
-	       FRAME_RIGHT_FOOTER, string_modulename,
-	       NULL);
+	    sprintf(string_filename, "File: %s", file_name);
+	    sprintf(string_modulename, "Module: %s", modulename);
 
-	xv_set(edit_textsw[win_nb], 
-	       TEXTSW_FILE, file_name_in_database,
-	       TEXTSW_BROWSING, FALSE,
-	       TEXTSW_FIRST, 0,
-	       NULL);
+	    /* Display the file name and the module name. RK, 2/06/1993 : */
+	    xv_set(edit_frame[win_nb], FRAME_LABEL, "Pips Edit Facility",
+		   FRAME_SHOW_FOOTER, TRUE,
+		   FRAME_LEFT_FOOTER, string_filename,
+		   FRAME_RIGHT_FOOTER, string_modulename,
+		   NULL);
 
-	unhide_window(edit_frame[win_nb]);
+	    xv_set(edit_textsw[win_nb], 
+		   TEXTSW_FILE, file_name_in_database,
+		   TEXTSW_BROWSING, FALSE,
+		   TEXTSW_FIRST, 0,
+		   NULL);
+
+	    unhide_window(edit_frame[win_nb]);
    
-	xv_set(current_selection_mi, 
-	       MENU_STRING, "Lasts",
-	       MENU_INACTIVE, FALSE,
-	       NULL);
+	    xv_set(current_selection_mi, 
+		   MENU_STRING, "Lasts",
+		   MENU_INACTIVE, FALSE,
+		   NULL);
 
-	xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
+	    xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
+	}
     }
 }
 
