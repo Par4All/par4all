@@ -20,7 +20,6 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
-
 /****************************************************** PIPSMAKE INTERFACES */
 
 /* SPECIFIC INTERFACES */
@@ -108,188 +107,105 @@ out_effects(string module_name)
     return TRUE;
 }
 
+/************************************************************* PRETTYPRINTS */
+
+static bool 
+print_code_effects(
+    string module_name,
+    bool is_rw,
+    bool is_user_view,
+    bool is_attached,
+    string resource_name,
+    string summary_resource_name,
+    string suffix)
+{
+    bool ok;
+
+    effects_computation_init_func = is_rw?
+	set_methods_for_rw_effects_prettyprint:
+        set_methods_for_inout_effects_prettyprint;
+    effects_computation_reset_func = 
+	reset_methods_for_effects_prettyprint;
+
+    set_is_user_view_p(is_user_view);
+    set_prettyprint_with_attachments(is_attached);
+
+    ok = print_source_or_code_with_any_effects_engine
+	(module_name, resource_name, summary_resource_name, suffix);
+
+    generic_effects_reset_all_methods();
+    return ok;
+}
 
 bool
 print_code_proper_effects(string module_name)
 {
-    bool ok;
-    set_methods_for_proper_simple_effects();
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(TRUE);
-
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_PROPER_EFFECTS,
-						      string_undefined,
-						      ".prop");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+			      DBR_PROPER_EFFECTS, string_undefined, ".prop");
 }
 
 bool
-print_code_cumulated_effects(char* module_name)
+print_code_cumulated_effects(string module_name)
 {
-    bool ok;
-    set_methods_for_simple_effects();
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(TRUE);
-
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_CUMULATED_EFFECTS,
-						      DBR_SUMMARY_EFFECTS,
-						      ".cumu");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+		      DBR_CUMULATED_EFFECTS, DBR_SUMMARY_EFFECTS, ".cumu");
 }
 
 bool 
-print_code_proper_references(char * module_name)
+print_code_proper_references(string module_name)
 {
-    bool ok;
-    set_methods_for_proper_references();
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(TRUE);
-
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_PROPER_REFERENCES,
-						      string_undefined,
-						      ".propref");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+		      DBR_PROPER_REFERENCES, string_undefined, ".propref");
 }
 
 bool 
-print_code_cumulated_references(char * module_name)
+print_code_cumulated_references(string module_name)
 {
-    bool ok;
-    set_methods_for_cumulated_references();
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(TRUE);
-
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_CUMULATED_REFERENCES,
-						      string_undefined,
-						      ".cumuref");
-    generic_effects_reset_all_methods();
-    return ok;
-  
+    return print_code_effects(module_name, TRUE, FALSE, TRUE, 
+		      DBR_CUMULATED_REFERENCES, string_undefined, ".cumuref");
 }
 
 bool
 print_code_in_effects(string module_name)
 {
-    bool ok;
-    set_methods_for_simple_effects();
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_IN, ACTION_UNDEFINED);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_IN_EFFECTS,
-						      DBR_IN_SUMMARY_EFFECTS,
-						      ".ineff");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_effects(module_name, FALSE, FALSE, FALSE, 
+		      DBR_IN_EFFECTS, DBR_IN_SUMMARY_EFFECTS, ".ineff");
 }
 
 bool
 print_code_out_effects(string module_name)
 {
-    bool ok;
-    set_methods_for_simple_effects();
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_UNDEFINED, ACTION_OUT);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_OUT_EFFECTS,
-						      DBR_OUT_SUMMARY_EFFECTS,
-						      ".uouteff");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_effects(module_name, FALSE, FALSE, FALSE, 
+		      DBR_OUT_EFFECTS, DBR_OUT_SUMMARY_EFFECTS, ".outeff");
 }
-
 
 bool
 print_source_proper_effects(string module_name)
 {
-    bool ok;
-    set_methods_for_proper_simple_effects();
-    set_is_user_view_p(TRUE);
-    set_prettyprint_with_attachments(TRUE);
-
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_PROPER_EFFECTS,
-						      string_undefined,
-						      ".uprop");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_effects(module_name, TRUE, TRUE, TRUE, 
+		      DBR_PROPER_EFFECTS, string_undefined, ".uprop");
 }
 
 bool
-print_source_cumulated_effects(char* module_name)
+print_source_cumulated_effects(string module_name)
 {
-    bool ok;
-    set_methods_for_simple_effects();
-    set_is_user_view_p(TRUE);
-    set_prettyprint_with_attachments(TRUE);
-
-    set_action_interpretation(ACTION_READ, ACTION_WRITE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_CUMULATED_EFFECTS,
-						      DBR_SUMMARY_EFFECTS,
-						      ".ucumu");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_effects(module_name, TRUE, TRUE, TRUE, 
+		      DBR_CUMULATED_EFFECTS, DBR_SUMMARY_EFFECTS, ".ucumu");
 }
 
 
 bool
 print_source_in_effects(string module_name)
 {
-    bool ok;
-    set_methods_for_simple_effects();
-    set_is_user_view_p(TRUE);
-    set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_IN, ACTION_UNDEFINED);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_IN_EFFECTS,
-						      DBR_IN_SUMMARY_EFFECTS,
-						      ".uineff");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_effects(module_name, FALSE, TRUE, FALSE, 
+		      DBR_IN_EFFECTS, DBR_IN_SUMMARY_EFFECTS, ".uineff");
 }
 
 bool
 print_source_out_effects(string module_name)
 {
-    bool ok;
-    set_methods_for_simple_effects();
-    set_is_user_view_p(TRUE);
-    set_prettyprint_with_attachments(FALSE);
-
-    set_action_interpretation(ACTION_UNDEFINED, ACTION_OUT);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_OUT_EFFECTS,
-						      DBR_OUT_SUMMARY_EFFECTS,
-						      ".uouteff");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_effects(module_name, FALSE, TRUE, FALSE, 
+		      DBR_OUT_EFFECTS, DBR_OUT_SUMMARY_EFFECTS, ".uouteff");
 }
 
 
