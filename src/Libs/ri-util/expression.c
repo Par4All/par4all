@@ -184,6 +184,19 @@ expression e ;
     return(FALSE);
 }
 
+bool expression_list_directed_p(e)
+expression e ;
+{
+    if (expression_call_p(e)) {
+	call c = syntax_call(expression_syntax(e));
+	entity e = call_function(c);
+
+	return(strcmp(entity_local_name(e), LIST_DIRECTED_FORMAT_NAME) == 0);
+    }
+
+    return(FALSE);
+}
+
 bool integer_constant_expression_p(e)
 expression e;
 {
