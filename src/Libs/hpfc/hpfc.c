@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.100  1997/09/26 10:29:34  coelho
+ * julien updates.
+ *
  * Revision 1.99  1997/08/04 13:55:59  coelho
  * new generic effects includes.
  *
@@ -306,17 +309,25 @@ static void set_resources_for_module(entity module)
 
     /*IN & OUT Regions are not always used*/
     if (!get_bool_property("HPFC_IGNORE_IN_OUT_REGIONS"))  
-	{
-	    set_bool_property("MUST_REGIONS", TRUE); 
-	    set_bool_property("EXACT_REGIONS", TRUE);	  
-	    get_regions_properties(); 
-	    set_out_effects  /* OUT REGIONS */ 
-		((statement_effects)  
-		 db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE)); 
-	    set_in_effects  /*IN REGIONS*/ 
-		((statement_effects)  
-	         db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE)); 
-	}
+    {
+	
+	set_out_effects
+	    ((statement_effects)  /*OUT EFFECTS*/
+	     db_get_memory_resource(DBR_OUT_EFFECTS, module_name, TRUE));
+	set_in_effects  /*IN EFFECTS*/ 
+	    ((statement_effects)  
+	     db_get_memory_resource(DBR_IN_EFFECTS, module_name, TRUE));
+
+	/*	    set_bool_property("MUST_REGIONS", TRUE); 
+		    set_bool_property("EXACT_REGIONS", TRUE);	  
+		    get_regions_properties();
+		    set_out_effects  
+		    ((statement_effects)  
+		    db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE)); 
+		    set_in_effects
+		    ((statement_effects)  
+		    db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));*/
+    }
 
     /* CUMMULATED REFERENCES
      */
