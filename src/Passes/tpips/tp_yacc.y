@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.64  1997/11/27 13:34:04  coelho
+ * some user errors moved as user warnings in delete...
+ *
  * Revision 1.63  1997/11/27 12:14:52  coelho
  * list of command are ok.
  *
@@ -448,12 +451,12 @@ i_delete: TK_DELETE TK_NAME /* workspace name */ TK_ENDOFLINE
 	    if (tpips_execution_mode) {
 		string wname = db_get_current_workspace_name();
 		if ((wname != NULL) && same_string_p(wname, $2)) {
-		    user_error ("delete",
-				"Close before delete: Workspace %s is open\n",
-				wname);
+		    pips_user_error("Close before delete: "
+				    "Workspace %s is open\n", wname);
 		    $$ = FALSE;
 		} else {
-		    if(workspace_exists_p($2)) {
+		    if(workspace_exists_p($2)) 
+		    {
 			if(delete_workspace ($2)) {
 			    /* In case of problem, user_error() has been
 			       called, so it is OK now !!*/
@@ -461,11 +464,12 @@ i_delete: TK_DELETE TK_NAME /* workspace name */ TK_ENDOFLINE
 			    $$ = TRUE;
 			}
 			else {
-			pips_user_error("Could not delete workspace %s\n", $2);
+			    pips_user_warning(
+				"Could not delete workspace %s\n", $2);
 			}
 		    }
 		    else {
-			pips_user_error("%s: No such workspace\n", $2);
+			pips_user_warning("%s: No such workspace\n", $2);
 		    }
 		}
 	    }
