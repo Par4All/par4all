@@ -21,6 +21,9 @@ interface.
 \domain{import loop from "ri.newgen"}
 \domain{import reference from "ri.newgen"}
 
+I need to store pointer object:
+\domain{External Void_star}
+
 \section{Attachments}
 
 Are only a list of {\tt attachment}s:
@@ -51,7 +54,7 @@ the attachments are freed.
 %\domain{attachment_to_word = attachment->string}
 
 Each word can have a list of attachments:
-\domain{word_to_attachments = word_pointer:int->attachments}
+\domain{word_to_attachments = word_pointer:void_star->attachments}
 
 \verb|word_pointer| is an {\tt int} instead of a {\tt string} since
 the address must be used instead of the string content. So it needs a
