@@ -16,10 +16,21 @@ SCRIPTS = 	pips-makemake \
 		pips_at_night \
 		remove_from_sccs_file
 
-FILES=		forward_gnu_makefile
+MACROS=		makefile_macros.. \
+		makefile_macros.SUN4
+FILES=		forward_gnu_makefile \
+		$(MACROS)
+
 COPY=	cp -f
 
-forward: 
+install: install_forward_makefiles install_macros
+
+install_macros:
+	$(COPY) $(MACROS) $(PIPS_INCLUDEDIR)
+	$(COPY) $(MACROS) $(NEWGEN_INCLUDEDIR)
+	$(COPY) $(MACROS) $(LINEAR_INCLUDEDIR)
+
+install_forward_makefiles: 
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Lib/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Passes/Makefile
