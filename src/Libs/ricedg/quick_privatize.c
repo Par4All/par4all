@@ -163,8 +163,7 @@ list conflicts;
 		   part, ignore this conflict. */
 		l2 = statement_loop(s2);
 		ind2 = loop_index(l2);
-		range_effects = proper_effects_of_range(loop_range(l2), 
-							is_action_read);
+		range_effects = proper_effects_of_range(loop_range(l2));
 
 		MAP(EFFECT, e, 
 		{
