@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/01 18:13:57 $, 
+ * $Date: 1997/04/01 19:19:00 $, 
  */
 
 #include <stdio.h>
@@ -573,6 +573,7 @@ static char * tpips_read_a_line(void)
 }
 
 /* simple direct dynamic buffer management. FC.
+ * it can be used to accumulate chars, one by one of strings by strings.
  */
 static char * sbuffer = NULL;
 static int sbufsize = 0;
@@ -582,6 +583,8 @@ static void init_sbuffer(void)
     sbufsize = 64; 
     sbuffer = (char*) malloc(sbufsize); 
 }
+/* appends a char at pos
+ */
 static int add_sbuffer_char(int pos, char c)
 { 
     if (pos>=sbufsize) { 
@@ -591,6 +594,8 @@ static int add_sbuffer_char(int pos, char c)
     sbuffer[pos] = c;
     return pos+1;
 }
+/* appends a string at pos
+ */
 static int add_sbuffer_string(int pos, char * word)
 {
     while (word && *word) {
@@ -600,6 +605,8 @@ static int add_sbuffer_string(int pos, char * word)
     return pos;
 }
 /* looks for a {} enclosed name from env.
+ * if found, returns a pointer to the name, and the line is skipped.
+ * if not, returns a pointer to the initial position and NULL (for the name)
  */
 static char * skip_env_name(char * line, char** name)
 {
@@ -620,6 +627,9 @@ static char * skip_env_name(char * line, char** name)
 	*name = NULL; return line;
     }
 }
+/* substitute environemnt variables in line. 
+ * returns a newly allocated string
+ */
 static char * substitute_variables(char * line)
 {
     int pos=0;
@@ -693,8 +703,10 @@ static void process_a_file()
 	    pips_debug(2, "restarting tpips scanner\n");
 	    tp_restart(tp_in);
 	    skip_blanks(line);
+
 	    sline = substitute_variables(line);
 	    (find_handler(sline))(sline);
+	    free(sline), sline = (char*) NULL;
 	}
 	pop_pips_context();
     }
