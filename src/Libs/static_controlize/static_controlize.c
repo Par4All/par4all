@@ -395,8 +395,16 @@ char* mod_name;
 
 	mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 	mod_inst = statement_instruction( mod_stat );
+
+
+	/* No unstructured...No static controlization... DB, nov 29th 95*/
 	if (!instruction_unstructured_p(mod_inst))
-		pips_error("static_controlize", "unstructured expected\n");
+	{
+	    if (get_debug_level() > 1) 
+	        user_log("\n\n *** STATIC CONTROLIZE CODE done\n");
+	    debug_off();
+            return( TRUE );
+	    }
 
 	/* HAS TO BE REMOVED AS SOON AS POSSIBLE: as the IOs are not
 	   treated as they would, all the instructions containing IOs are
