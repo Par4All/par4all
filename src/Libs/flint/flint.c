@@ -13,7 +13,7 @@
 /* system includes */
 #include <stdio.h>
 #include <string.h>
-#include <varargs.h>
+#include <stdargs.h>
 extern int      fprintf();
 extern int      vfprintf();
 
@@ -48,10 +48,8 @@ extern char    *getenv();
 void flinter(module_name)
 char *module_name;
 {
-    entity
-	module = local_name_to_top_level_entity(module_name);
-    statement
-	module_stat;
+    entity module = local_name_to_top_level_entity(module_name);
+    statement module_stat;
     
     debug_on("FLINT_DEBUG_LEVEL");
 
@@ -102,14 +100,12 @@ char *module_name;
  * FLINT_MESSAGE(fonction, format [, arg] ... ) string fonction, format;
  */
 
-void flint_message(va_alist) 
-va_dcl
+void flint_message(char *fun, char *fmt, ...) 
 {
     va_list         args;
-    char           *fmt;
     int             order;
 
-    va_start(args);
+    va_start(args, fmt);
 
     /*
      * print name of function causing message, and in which module it
@@ -123,14 +119,12 @@ va_dcl
 
     (void) fprintf(flint_messages_file,
 		   "flint message from %s, in module %s, (%d.%d), line %d\n",
-		   va_arg(args, char *),
-		   flint_current_module_name,
+		   fun, flint_current_module_name,
 		   ORDERING_NUMBER(order), ORDERING_STATEMENT(order),
 		   statement_number(flint_current_statement));
 
 
     /* print out remainder of message */
-    fmt = va_arg(args, char *);
     (void) vfprintf(flint_messages_file, fmt, args);
 
     va_end(args);
@@ -139,25 +133,20 @@ va_dcl
 /*************************************************************/
 /* Same as flint_message but without the function name       */
 
-void flint_message_2(va_alist) 
-va_dcl
+void flint_message_2(char *fun, char *fmt, ...) 
 {
     va_list         args;
-    char           *fmt;
 
-    va_start(args);
+    va_start(args, fmt);
 
     no_message = FALSE;
     number_of_messages++;
 
     (void) fprintf(flint_messages_file,
 		   "flint message from %s, in module %s\n",
-		   va_arg(args, char *),
-		   flint_current_module_name);
-
+		   fun, flint_current_module_name);
 
     /* print out remainder of message */
-    fmt = va_arg(args, char *);
     (void) vfprintf(flint_messages_file, fmt, args);
 
     va_end(args);
