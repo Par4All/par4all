@@ -1,19 +1,17 @@
 /* 
    $Id$
 
-   Try to prettyprint the RI in C.
+   Try to prettyprint the RI in CLAIRE.
    Very basic at the time.
-   Functionnal. 
-   All arguments are assumed newly allocated.
-   It might be really slow, but it should be safe.
-   I should use some kind of string accumulator (array/list...)
 
-   print_crough > MODULE.crough
-                 < PROGRAM.entities
-                 < MODULE.code
+   print_claire_code        > MODULE.claire_printed_file
+                            < PROGRAM.entities
+                            < MODULE.code
 
-   print_c_code  > MODULE.c_printed_file
-                 < MODULE.crough
+   $Log: claire_prettyprinter.c,v $
+   Revision 1.2  2004/03/11 15:09:43  irigoin
+   function print_claire_code() declared for the link but not programmed yet.
+
 */
 
 #include <stdio.h>
@@ -316,7 +314,7 @@ static string c_qualifier_string(list l)
   return strdup(result); 
 }
 
-bool brace_expression_p(expression e)
+static bool brace_expression_p(expression e)
 {
   if (expression_call_p(e))
     {
@@ -1232,7 +1230,7 @@ static string c_code_string(entity module, statement stat)
 #define CROUGH		".crough"
 #define CPRETTY		".c"
 
-bool print_crough(string module_name)
+bool print_claire_rough(string module_name)
 {
   FILE * out;
   string ppt, crough, dir, filename;
@@ -1273,9 +1271,11 @@ bool print_crough(string module_name)
 
 /* C indentation thru indent.
  */
-bool print_c_code(string module_name)
+bool print_claire_code(string module_name)
 {
   string crough, cpretty, dir, cmd;
+
+  pips_internal_error("Not implemented yet\n");
 
   crough = db_get_memory_resource(DBR_CROUGH, module_name, TRUE);
   cpretty = db_build_file_resource_name(DBR_C_PRINTED_FILE, module_name, CPRETTY);
