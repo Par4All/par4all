@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/08/11 21:59:51 $, )
+# ($Date: 1996/08/12 08:41:07 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -44,7 +44,7 @@ rm -f ${report}*
 
 verb()
 {
-    echo "$script: $@ (`date`)" >&2
+    echo "$script: " "$@" "(`date`)" >&2
 }
 
 usage()
@@ -198,7 +198,6 @@ shift `expr $OPTIND - 1`
     test "$no_validation" && {
 	$verbose Skipping Pips validation
     } || {
-        first_arch="`echo $arch | 
 	$verbose "Validating PIPS with $PIPS_ARCH"
 	Validate -vti 50 -a ${email}
     }
