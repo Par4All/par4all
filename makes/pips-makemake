@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.293  1997/08/18 08:22:18  coelho
+# *** empty log message ***
+#
 # Revision 1.292  1997/08/18 08:21:54  coelho
 # forgotten Pass link.
 #
@@ -627,7 +630,7 @@ SOURCES  += 	\$(INCLUDES) \$(CFILES) \$(DOCS)
 	@echo 
 
 clean-compiled:
-	\$(RM) \$(OBJECTS) \$(LIB_TARGET) \$(BIN_TARGET) 
+	\$(RM) \$(OBJECTS) \$(LIB_MAIN:.c=.o) \$(LIB_TARGET) \$(BIN_TARGET) 
 
 clean: clean-compiled
 	-\$(RM) TAGS \$(INC_TARGET) \$(DERIVED_HEADERS) \$(DERIVED_CFILES) \\
