@@ -188,6 +188,16 @@ same_reg(region reg1, region reg2)
 
     pips_debug(4,"begin\n");
 
+/*
+	    ifdebug(9)
+		{
+		    pips_debug(9,"compare:\n\t");
+		    print_region(reg1);
+		    pips_debug(9,"with:\n\t");
+		    print_region(reg2);
+		}
+		*/
+
     if (effect_undefined_p(reg1) || effect_undefined_p(reg2))
 	return result;
 
@@ -220,12 +230,22 @@ member(region reg, list reg_list)
 
 	pips_debug(4,"begin\n");
 
+/*
+	    ifdebug(9)
+		{
+		    pips_debug(9,"test if:\n\t");
+		    print_region(reg);
+		    pips_debug(9,"is in:\n\t");
+		    print_inout_regions(reg_list);
+		}
+		*/
+
 	rest_list = reg_list;
 
 	if (reg_list != NIL)
 
 			do{
-			    elem = EFFECT(CAR(reg_list));
+			    elem = EFFECT(CAR(rest_list));
 			    if (same_reg(elem,reg))
 				{
 				    result = TRUE;
@@ -242,15 +262,33 @@ member(region reg, list reg_list)
     }
 
 
+/* (possibly) modifies parameter reg_list */
 static void
 add_if_not_present(region reg, list reg_list)
     {
+    pips_debug(4,"begin\n");
+
+/*
+	    ifdebug(9)
+		{
+		    pips_debug(9,"add:\n\t");
+		    print_region(reg);
+		    pips_debug(9,"to:\n\t");
+		    print_inout_regions(reg_list);
+		}
+		*/
+
 	if (!member(reg,reg_list))
 	    reg_list = gen_nconc(reg_list,
 				 CONS(EFFECT,region_dup(reg),NIL));
+
+    pips_debug(4,"end\n");
     }
 
 
+/* GLOBAL IN: l_alias_lists
+ * GLOBAL OUT: l_alias_lists
+ */
 static bool
 add_pair_to_existing_list(list alias_pair)
 {
@@ -287,8 +325,10 @@ add_pair_to_existing_list(list alias_pair)
 		    actual_reg_pair = EFFECT(CAR(CDR(alias_pair)));
 		    ifdebug(9)
 			{
-			    pips_debug(9,"add region:\n\t");
+			    pips_debug(9,"add:\n\t");
 			    print_region(actual_reg_pair);
+			    pips_debug(9,"to:\n\t");
+			    print_inout_regions(alias_list);
 			}
 		    add_if_not_present(actual_reg_pair,alias_list);
 		}
@@ -304,15 +344,17 @@ add_pair_to_existing_list(list alias_pair)
     return result;
 }
 
-
+/* GLOBAL OUT: l_alias_lists */
 bool
 alias_lists( string module_name )
     {
+/*    list in_alias_pairs, out_alias_pairs, in_alias_pair, out_alias_pair; */
     list in_alias_pairs, out_alias_pairs;
     entity module;
 
     l_alias_lists = NIL;
 
+    debug_on("ALIAS_DEBUG_LEVEL");
     pips_debug(4,"begin for module %s\n",module_name);
 
     ifdebug(9)
@@ -337,44 +379,83 @@ alias_lists( string module_name )
 	}
 
     /* make alias lists from the IN_alias_pairs */
-    in_alias_pairs = effects_to_list((effects)
-				    db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
-					    module_name,
-					    TRUE));
+
+    /* DBR_IN_ALIAS_PAIRS is a newgen structure of type effects_classes
+     * which has one field called classes
+     * which is a list of newgen structures of type effects
+     * (and each newgen structure of type effects
+     * has one field called effects which is a list of elements
+     * of type effect)
+    in_alias_pairs =
+	effects_classes_classes((effects_classes)
+				db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
+						       module_name,
+						       TRUE));
     MAP(EFFECTS, alias_pair_effects,
 	{
-	    list alias_pair = regions_dup(effects_to_list(alias_pair_effects));
+	    list alias_pair = effects_effects(alias_pair_effects);
 
 	    ifdebug(9)
 		{
-		    pips_debug(9,"IN alias pair: \n");
+		    pips_debug(9,"IN alias pair : \n");
 		    print_inout_regions(alias_pair);
 		}
 
-	    if ( ! add_pair_to_existing_list(alias_pair) )
-	    l_alias_lists = gen_nconc(l_alias_lists,regions_dup(alias_pair));
+	    in_alias_pair = regions_dup(alias_pair);
+
+	    if ( ! add_pair_to_existing_list(in_alias_pair) )
+	    l_alias_lists =
+		gen_nconc(l_alias_lists,CONS(LIST,in_alias_pair,NIL));
+
+	    pips_debug(9,"IN pair added\n");
+		},
+	in_alias_pairs);
+     */
+
+    in_alias_pairs =
+	effects_to_list((effects)
+			db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
+					       module_name,
+					       TRUE));
+
+    MAP(LIST, alias_pair,
+	{
+	    list in_alias_pair = regions_dup(alias_pair);
+
+	    ifdebug(9)
+		{
+		    pips_debug(9,"IN alias pair : \n");
+		    print_inout_regions(in_alias_pair);
+		}
+
+	    if ( ! add_pair_to_existing_list(in_alias_pair) )
+	    l_alias_lists =
+		gen_nconc(l_alias_lists,CONS(LIST,in_alias_pair,NIL));
 
 	    pips_debug(9,"IN pair added\n");
 		},
 	in_alias_pairs);
 
     /* make alias lists from the OUT_alias_pairs */
-    out_alias_pairs = effects_to_list((effects)
-				    db_get_memory_resource(DBR_OUT_ALIAS_PAIRS,
-					    module_name,
-					    TRUE));
-    MAP(EFFECTS, alias_pair_effects,
+    out_alias_pairs =
+	effects_to_list((effects)
+			db_get_memory_resource(DBR_OUT_ALIAS_PAIRS,
+					       module_name,
+					       TRUE));
+
+    MAP(LIST, alias_pair,
 	{
-	    list alias_pair = regions_dup(effects_to_list(alias_pair_effects));
+	    list out_alias_pair = regions_dup(alias_pair);
 
 	    ifdebug(9)
 		{
-		    pips_debug(9,"OUT alias pair: \n");
-		    print_inout_regions(alias_pair);
+		    pips_debug(9,"OUT alias pair : \n");
+		    print_inout_regions(out_alias_pair);
 		}
 
-	    if ( ! add_pair_to_existing_list(alias_pair) )
-	    l_alias_lists = gen_nconc(l_alias_lists,CONS(LIST,alias_pair,NIL));
+	    if ( ! add_pair_to_existing_list(out_alias_pair) )
+	    l_alias_lists =
+		gen_nconc(l_alias_lists,CONS(LIST,out_alias_pair,NIL));
 
 	    pips_debug(9,"OUT pair added\n");
 	},
@@ -395,6 +476,7 @@ alias_lists( string module_name )
 	    reset_current_module_entity();
 	}
     pips_debug(4,"end\n");
+    debug_off();
 
     return(TRUE);
 }
