@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/05/03 16:58:22 $, ) 
+# ($Date: 1997/05/27 08:49:03 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -35,7 +35,7 @@
 # Ok at CRI...
 [ "$PIPS_ROOT" ] || . /projects/Pips/pipsrc.sh
 
-[ "$PIPS_VALIDDIR" ] || PIPS_VALIDDIR=$PIPS_ROOT/Validation
+PIPS_VALIDDIR=${PIPS_VALIDDIR:-${PIPS_ROOT}/Validation}
 export PIPS_VALIDDIR
 
 umask 002
@@ -150,7 +150,7 @@ debug()
 { echo "$@" >&2;}
 
 RUNDIR=${RUNDIR:-$PWD}
-cd $RUNDIR || error 2 "cd $RUNDIR returned $?"
+cd $RUNDIR || error 2 "canot cd $RUNDIR ($?)"
 
 # COMDIR=${COMDIR:-${RUNDIR}}
 # test -d $COMDIR || error 2 "no communication dir $COMDIR"
