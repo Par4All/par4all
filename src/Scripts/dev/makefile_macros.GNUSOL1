@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.GNUSOL1,v $
+# Revision 1.28  1997/04/17 19:24:22  coelho
+# latex2html options changed.
+#
 # Revision 1.27  1997/03/26 17:31:00  coelho
 # cleaner.
 #
@@ -48,7 +51,7 @@ ETAGS	= etags
 #
 # tools for the documentation
 LX2HTML	= latex2html
-L2HFLAGS= -link 8 -split 5
+L2HFLAGS= -link 4 -split 3
 LATEX	= latex
 BIBTEX	= bibtex
 MAKEIDX	= makeindex
