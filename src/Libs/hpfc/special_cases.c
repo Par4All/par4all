@@ -1,7 +1,10 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
- * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1997/03/03 15:25:31 $, 
+ * $Id$
+ * $Log: special_cases.c,v $
+ * Revision 1.22  1997/03/20 10:26:34  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
