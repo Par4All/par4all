@@ -155,5 +155,9 @@ typedef struct Svecteur Sbase, * Pbase;
 #define NO_OFL_CTRL 0  /* overflows are not trapped at all  (dangerous !) */
 #endif /* LINEAR_NO_OVERFLOW_CONTROL */
 
+/* internal hash table for variable sets. */
+struct linear_hashtable_st;
+typedef struct linear_hashtable_st * linear_hashtable_pt;
+
 /* end of $RCSfile: vecteur-local.h,v $
  */
