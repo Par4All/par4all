@@ -443,6 +443,36 @@ static Psysteme array_translation_sc(bool *p_exact_translation_p);
  * output   : a list of regions corresponding to the translation of reg1.
  * modifies : nothing, reg1 is duplicated.
  * comment  : 
+ *
+ * NW:
+ * before calling "region_translation" do
+ * 
+ * call "set_interprocedural_translation_context_sc"
+ * (see comment for "set_interprocedural_translation_context_sc" for what
+ * must be done before that is called)
+ * 
+ * and "set_backward_arguments_to_eliminate" (for translation formals->reals)
+ * or "set_forward_arguments_to_eliminate"
+ *
+ * like this:
+ *
+ * call call_site;
+ * entity callee;
+ * list real_args;
+ * ...
+ * (set up call to "set_interprocedural_translation_context_sc" as
+ * indicated in its comments)
+ * ...
+ * real_args = call_arguments(call_site);
+ * set_interprocedural_translation_context_sc(callee, real_args);
+ * set_backward_arguments_to_eliminate(callee);
+ *
+ * (that's it, but after the call to "region_translation", don't forget to do:)
+ *
+ * reset_translation_context_sc();
+ * reset_arguments_to_eliminate();
+ * (resets after call to "set_interprocedural_translation_context_sc"
+ * as indicated in its comments)
  */
 region region_translation(region reg_1, entity func_1, reference rf_1, 
 			  entity ent_2, entity func_2, reference rf_2,
@@ -657,7 +687,41 @@ void reset_region_interprocedural_translation()
     free_translation_context_stack();
 }
 
-void set_interprocedural_translation_context_sc(entity callee, list real_args)
+/* NW:
+ * before calling 
+ * "set_interprocedural_translation_context_sc"
+ * for (entity) module
+ * do:
+ * (see also comments for "module_to_value_mappings")
+ *
+ * module_name = module_local_name(module);
+ * set_current_module_entity(module);
+ * regions_init();
+ *
+ * (the next call is for IN/OUT regions,
+ * otherwise, do get_regions_properties() )
+ *
+ * get_in_out_regions_properties();
+ * set_current_module_statement( (statement)
+ * db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+ * set_cumulated_rw_effects((statement_effects)
+ * db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+ * module_to_value_mappings(module);
+ * set_precondition_map( (statement_mapping) 
+ *               db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+ *
+ * (that's it,
+ * but we musn't forget to reset it all again 
+ * after the call to set_interprocedural_translation_context_sc
+ * as below)
+ *
+ * reset_current_module_statement();
+ * reset_cumulated_rw_effects();
+ * reset_precondition_map();
+ * reset_current_module_entity();
+ */
+void 
+set_interprocedural_translation_context_sc(entity callee, list real_args)
 {
     list /* of entity */ l_formals = module_formal_parameters(callee);
     int arg_num, n_formals = gen_length(l_formals);
