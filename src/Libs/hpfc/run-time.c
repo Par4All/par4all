@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1995/12/19 15:52:36 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1995/12/22 17:44:58 $, )
  * version $Revision$,
  */
 
@@ -673,13 +673,19 @@ void hpfc_init_run_time_entities()
 	    current->object = MakeRunTimeSupportSubroutine(current->name, 
 							   current->arity);
 	    break;
-	case is_ifn: /* they are declared as variables to avoid redefinitions */
+	case is_ifn: 
+	    /* they are declared as variables to avoid redefinitions 
+	     * ??? this fools pips typing (functions/variables and so)
+	     * just okay for the pretty printer...
+	     */
 	case is_iof:
 	case is_var:
 	    current->object = 
-		make_scalar_entity(current->name,
-				   HPFC_PACKAGE, /* why not */
-				   MakeBasic(current->basic));
+		find_or_create_typed_entity(current->name,
+					    HPFC_PACKAGE, /* why not */
+					    current->basic);
+	    /* dimensions are updated
+	     */
 	    l = NIL;
 	    for(i=1; i<=current->arity; i++)
 		l = CONS(DIMENSION,
