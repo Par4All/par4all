@@ -202,7 +202,10 @@ pips_process_file(string file_name)
 #define DCMPLX2_RX \
     "^......[ \t]*\\((\\)[-+0-9dDeE\\. \t]*,[-+0-9dDeE\\. \t]*)"
 
+#define GOTO_RX "g[ \t]*o[ \t]*t[ \t]*o[ \t]*"
+
 static regex_t 
+    some_goto_rx,
     implicit_none_rx, 
     include_file_rx,
     complex_cst_rx,
@@ -272,6 +275,11 @@ static void
 handle_complex_constants(string * line)
 {
     bool diff = FALSE;
+
+    /* an assigned goto may look like "goto l, (10,20)",
+     * and we wish not to consider (10,20) as a complex constant...
+     */
+    if (!regexec(&some_goto_rx, *line, 0, NULL, 0)) return;
 
     diff |= try_this_one(&complex_cst_rx, line, IMPLIED_COMPLEX_NAME, diff);
     diff |= try_this_one(&complex_cst2_rx, line, IMPLIED_COMPLEX_NAME, diff);
@@ -432,7 +440,8 @@ init_rx(void)
     static bool done=FALSE;
     if (done) return;
     done=TRUE;
-    if (regcomp(&implicit_none_rx, IMPLICIT_NONE_RX, REG_ICASE) ||
+    if (regcomp(&some_goto_rx, GOTO_RX, REG_ICASE)              ||
+	regcomp(&implicit_none_rx, IMPLICIT_NONE_RX, REG_ICASE) ||
 	regcomp(&include_file_rx, INCLUDE_FILE_RX, REG_ICASE)   ||
 	regcomp(&complex_cst_rx, CMPLX_RX, REG_ICASE)           ||
 	regcomp(&complex_cst2_rx, CMPLX2_RX, REG_ICASE)         ||
