@@ -436,15 +436,17 @@ struct gen_binding *bp ;
 		      bp->name, bp->name ) ;
 	(void) printf("#define %s_undefined_p(x) ((x)==%s_undefined)\n", 
 		      bp->name, bp->name ) ;
-	(void) printf("#define copy_%s(x) ((%s)gen_copy_tree((gen_chunk *)x))\n", 
+	(void) printf("#define copy_%s(x) ((%s)gen_copy_tree((gen_chunk *)x))\n",
 		      bp->name, bp->name ) ;
 	(void) printf("#define write_%s(fd,obj) %s\n",
-		      bp->name, "(gen_write(fd,(gen_chunk *)obj))" ) ;
+		      bp->name, "(gen_write(fd,(gen_chunk *)obj))") ;
 	(void) printf("#define read_%s(fd) ((%s)gen_read(fd))\n", 
 		      bp->name, bp->name ) ;
 	(void) printf("#define free_%s(o) (gen_free((gen_chunk *)o))\n", 
 		      bp->name ) ;
-	(void) printf("#define check_%s(o) (gen_check((gen_chunk *)o, %s_domain))\n",
+	(void) printf("#define check_%s(o) ((void) gen_check((gen_chunk *)o, %s_domain))\n",
+		      bp->name, bp->name);
+	(void) printf("#define %s_consistent_p(o) (check_%s(o), gen_consistent_p((gen_chunk *)o))\n",
 		      bp->name, bp->name);
     }
     switch( dp->ba.type ) {
