@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/04/21 14:50:06 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/04/21 15:06:54 $, )
  * version $Revision$
  */
 
@@ -272,7 +272,7 @@ statement stat, *pstat;
 					     CONSP(CAR(CDR(CONSP(CAR(lWa)))))),
 		  NIL)));    
 
-    DEBUG_SYST(8, entity_name(node_module), (*pstat));
+    DEBUG_STAT(8, entity_name(node_module), *pstat);
 
     reset_hpfc_current_statement();
 
