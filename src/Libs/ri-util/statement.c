@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.72  2002/07/22 17:18:52  irigoin
+    Bug fix that implies no serious testing!
+
     Revision 1.71  2002/07/22 17:15:28  irigoin
     Improvements in print_statement() to support debugging better in presence
     of alternate returns.
@@ -1030,7 +1033,7 @@ void print_statement(statement s)
   set_alternate_return_set();
   push_current_module_statement(s);
   print_text(stderr, text_statement(entity_undefined, 0, s));
-  pop_current_module_statement(s);
+  pop_current_module_statement();
   reset_alternate_return_set();
   debug_off();
 }
