@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.86  1998/05/14 11:55:15  coelho
+ * abort quickly if cpp fails (stderr not empty... with gcc -E at least...)
+ *
  * Revision 1.85  1998/04/14 21:22:19  coelho
  * linear.h
  *
@@ -249,7 +252,7 @@ add_continuation_if_needed(string * line)
     /* else let us truncate */
     {
 	int i = 71;
-	while (i>5 && (isalnum((*line)[i]) || (*line)[i]=='_')) 
+	while (i>5 && (isalnum((int) (*line)[i]) || (*line)[i]=='_')) 
 	    i--;
 	pips_assert("still in line", i>5);
 	insert_at(line, i, CONTINUATION);
@@ -322,6 +325,7 @@ init_processed_include_cache(void)
     pips_assert("undefined cache", hash_table_undefined_p(processed_cache));
     processed_cache = hash_table_make(hash_string, 100);
 }
+
 void
 close_processed_include_cache(void)
 {
@@ -329,9 +333,10 @@ close_processed_include_cache(void)
     {
 	/* pips may call this without a prior call to 
 	 * init_processed_include_cache under some error conditions,
-	 * such as a file not found in the initializer.
+	 * such as a file not found in the initializer, or a failed cpp.
 	 */
-	pips_user_warning("no 'processed include cache' to close...");
+	pips_user_warning("no 'processed include cache' to close, "
+			  "skipping...\n");
 	return;
     }
     pips_assert("defined cache", !hash_table_undefined_p(processed_cache));
@@ -350,6 +355,7 @@ get_cached(string s)
     res = hash_get(processed_cache, s);
     return res==HASH_UNDEFINED_VALUE? NULL: res;
 }
+
 /* return an allocated unique cache file name.
  */
 static string
@@ -357,7 +363,7 @@ get_new_cache_file_name(void)
 {
     static int unique = 0;
     string dir_name, file_name;
-    int len;
+    unsigned int len;
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     len = strlen(dir_name)+20;
     file_name = (char*) malloc(sizeof(char)*len);
@@ -368,7 +374,11 @@ get_new_cache_file_name(void)
     return file_name;
 }
 
+/* double recursion (handle_file/handle_file_name) 
+ * => forwarded declaration.
+ */
 static bool handle_file(FILE*, FILE*);
+
 static bool 
 handle_file_name(FILE * out, char * file_name, bool included)
 {
@@ -584,7 +594,11 @@ pips_split_file(string name, string tempfile)
 
 /********************************************** managing .F files with cpp */
 
-#define CPPED		 	".cpp_processed.f"
+/* an issue is that the cpp used must be Fortran 77 aware.
+ */
+
+#define CPP_ED		 	".cpp_processed.f"
+#define CPP_ERR			".stderr"
 
 /* pre-processor and added options from environment
  */
@@ -603,16 +617,17 @@ dot_F_file_p(string name)
     return l>=2 && name[l-1]=='F' && name[l-2]=='.';
 }
 
-/* returns the newly allocated name
+/* returns the newly allocated name.
+ * returns NULL if cpp failed.
  */
-static string 
-process_thru_cpp(string name)
+static string process_thru_cpp(string name)
 {
-    string dir_name, new_name, simpler, cpp_options, cpp;
+    string dir_name, new_name, simpler, cpp_options, cpp, cpp_err;
 
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".F");
-    new_name = strdup(concatenate(dir_name, "/", simpler, CPPED, 0));
+    new_name = strdup(concatenate(dir_name, "/", simpler, CPP_ED, 0));
+    cpp_err  = strdup(concatenate(new_name, CPP_ERR, 0));
     free(dir_name);
     free(simpler);
 
@@ -622,12 +637,15 @@ process_thru_cpp(string name)
     /* Note: the cpp used **must** know somehow about Fortran
      * and its lexical and comment conventions. This is ok with gcc
      * when g77 is included. Otherwise, "'" appearing in Fortran comments
-     * results in errors to be reported. Well, the return code could
-     * be ignored maybe, but I prefer not to.
+     * results in errors to be reported.
+     * Well, the return code could be ignored maybe, but I prefer not to.
      */
     safe_system(concatenate(cpp? cpp: CPP_CPP, 
 			    CPP_CPPFLAGS, cpp_options? cpp_options: "", 
-			    name, " > ", new_name, 0));
+			    name, " > ", new_name, " 2> ", cpp_err, 
+			    " && cat ", cpp_err, 
+			    " && test -z ", cpp_err, 
+			    " && rm -f ", cpp_err, 0));
 
     return new_name;
 }
