@@ -1,4 +1,4 @@
-/*************************************************************** pnome-unaires.c
+/********************************************************** pnome-unaires.c
  *
  * UNARY OPERATIONS ON POLYNOMIALS
  *
@@ -81,7 +81,7 @@ int p;
 			       * ((double) (Bernouilli(i) * factor)));
 		    factor *= - ((double) (p-2*i+1)*(p-2*i)) / ((double) (2*i+1)*(2*i+2));
 		}
-		ppresult = make_polynome((float) result, TCST, 1);
+		ppresult = make_polynome((float) result, TCST, VALUE_ONE);
 	    }
 	} 
 	else {    /* if the upper bound is a non-constant polynomial ... */
