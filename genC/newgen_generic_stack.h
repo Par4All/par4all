@@ -2,7 +2,7 @@
  * Fabien COELHO, 05/12/94
  * 
  * $RCSfile: newgen_generic_stack.h,v $ verison $Revision$
- * $Date: 1996/09/21 15:33:06 $, 
+ * $Date: 1996/09/21 15:38:54 $, 
  * got on %D%, %T%
  */
 
@@ -58,7 +58,7 @@ static void check_##name##_stack()\
 }
 
 #define DEFINE_LOCAL_STACK(name, type) DEFINE_STACK(static, name, type)
-#define DEFINE_GLOBAL_STACK(name, type) DEFINE_STACK(auto, name, type)
+#define DEFINE_GLOBAL_STACK(name, type) DEFINE_STACK(/**/, name, type)
 
 /*  That is all
  */
