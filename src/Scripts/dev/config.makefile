@@ -18,6 +18,7 @@ SCRIPTS = 	pips-makemake \
 
 MACROS=		makefile_macros.. \
 		makefile_macros.SUN4
+
 FILES=		forward_gnu_makefile \
 		$(MACROS)
 
