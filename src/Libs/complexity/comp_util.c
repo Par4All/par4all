@@ -36,6 +36,8 @@
 #include <stdarg.h>
 
 #include "genC.h"
+#include "database.h"
+#include "pipsdbm.h"
 #include "ri.h"
 #include "complexity_ri.h"
 #include "resources.h"
@@ -140,6 +142,7 @@ boolean print_stats_p, print_local_names_p;
 #define COMPLEXITY_BUFFER_SIZE 1024
     static char t[COMPLEXITY_BUFFER_SIZE];
     char *s, *p;
+    extern boolean is_inferior_pvarval(Pvecteur *, Pvecteur *);
 
     s = t;
 
@@ -172,7 +175,7 @@ boolean print_stats_p, print_local_names_p;
 	p = polynome_sprint(complexity_polynome(comp),
 			    (print_local_names_p ? variable_local_name 
 			                         : variable_name),
-			    is_inferior_var);
+			    is_inferior_pvarval);
 	strcpy(s, p);
     }
     pips_assert("complexity_sprint", strlen(s) < COMPLEXITY_BUFFER_SIZE);
@@ -189,6 +192,11 @@ boolean print_stats_p, print_local_names_p;
     fprintf(fd, "%s\n", s);
     free(s);
 }
+
+void complexity_dump(complexity comp)
+{
+    complexity_fprint(stderr, comp, FALSE, TRUE);
+}
 
 void prc(comp)   /* for dbxtool: "print complexity" */
 complexity comp;
@@ -199,7 +207,7 @@ complexity comp;
 void prp(pp)     /* for dbxtool: "print polynome" */
 Ppolynome pp;
 {
-    polynome_fprint(stderr, pp, variable_name, is_inferior_var);
+    polynome_fprint(stderr, pp, variable_name, is_inferior_varval);
     fprintf(stderr, "\n");
 }
 
@@ -1051,8 +1059,8 @@ list effects_list;
 {
     complexity final_comp = complexity_dup(comp);
     Ppolynome pp = complexity_polynome(comp);
-    Pbase pb = vect_dup(polynome_used_var(pp, default_is_inferior_var));
-    extern boolean default_is_inferior_var();
+    extern boolean default_is_inferior_pvarval(Pvecteur *, Pvecteur *);
+    Pbase pb = vect_dup(polynome_used_var(pp, default_is_inferior_pvarval));
 
 
     fprintf(stderr, "Final evaluation\n");
@@ -1098,9 +1106,9 @@ complexity callee_comp;
 string oldname,newname;
 {
     Ppolynome pp = complexity_polynome(callee_comp);
-
-    Pbase pb = polynome_used_var(pp, is_inferior_var);
-    Pbase pbcur;
+    extern boolean is_inferior_pvarval(Pvecteur *, Pvecteur *);
+    Pbase pb = polynome_used_var(pp, is_inferior_pvarval);
+    Pbase pbcur = BASE_UNDEFINED;
     complexity comp = make_zero_complexity();
     complexity old_comp = complexity_dup(callee_comp);
 
