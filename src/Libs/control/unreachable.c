@@ -4,6 +4,9 @@
  * $Id$
  *
  * $Log: unreachable.c,v $
+ * Revision 1.7  1998/04/14 19:55:19  coelho
+ * *** empty log message ***
+ *
  * Revision 1.6  1997/11/14 09:29:50  keryell
  * Removed 2 nasty ";".
  *
@@ -26,6 +29,8 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "misc.h"
