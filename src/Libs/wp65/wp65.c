@@ -24,6 +24,7 @@
 #include "sg.h"
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 
 #include "graph.h"
