@@ -1,5 +1,5 @@
 /* $RCSfile: tpips-local.h,v $ (version $Revision$)
- * $Date: 1997/03/07 14:14:07 $, 
+ * $Date: 1997/04/10 16:41:25 $, 
  */
 
 /* FI: temporary storage of file names could be avoided with better yacc rules
@@ -10,12 +10,12 @@
 typedef struct _t_file_list {
 	int argc;
 	char *argv[FILE_LIST_MAX_LENGTH];
-}t_file_list;
+} t_file_list;
 
 typedef struct _res_or_rule {
 	list the_owners;
 	string the_name;
-}res_or_rule;
+} res_or_rule;
 
 extern int tp_lex();
 extern int tp_parse();
@@ -33,6 +33,7 @@ extern void tp_restart(FILE *);
 #define TPIPS_PRIMARY_PROMPT 	"tpips> " /* prompt for readline  */
 #define TPIPS_SECONDARY_PROMPT 	"> "
 #define TPIPS_CONTINUATION_CHAR '\\'
+#define TPIPS_REQUEST_PROMPT    "tpips-request> "
 
 #define TPIPS_HISTENV "TPIPS_HISTORY"	/* history file env variable */
 #define TPIPS_HISTORY_LENGTH 100	/* max length of history file */
