@@ -799,7 +799,7 @@ string get_first_main_module()
 		   "unable to make a temporary file\n");
 
     system(concatenate
-	   ("sed -n -e \"s;^      program[ \t][ \t]*\\([0-9a-zA-Z-_]*\\).*$;\\1;p\" ",
+	   ("sed -n -e \"s;^[ \t][ \t]*[pP][rR][oO][gG][rR][aA][mM][ \t][ \t]*\\([0-9a-zA-Z-_]*\\).*$;\\1;p\" ",
 	    db_get_current_workspace_directory(),
 	    "/*.f | tr a-z A-Z > ",
 	    tmpfile,
