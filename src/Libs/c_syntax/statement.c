@@ -25,56 +25,30 @@
 #include "text-util.h"
 #include "instrumentation.h"
 
-/* The following global variables will be replaced by functions*/
-string CurrentSourceFile = ""; 
-entity CurrentSourceFileEntity = entity_undefined;
-entity CurrentSourceFileStaticArea;
-int CurrentSourceFileStaticAreaOffset = 0;
-
-int CurrentStaticAreaOffset = 0;
-int CurrentDynamicAreaOffset = 0;
-
-entity TopLevelEntity = entity_undefined;
-entity TopLevelStaticArea = entity_undefined; 
-int TopLevelStaticAreaOffset = 0;
-
-/* BlockStack is used to handle block scope */
-stack BlockStack;
-
-int loop_counter; 
-bool is_loop;
-list CurrentSwitchGotoStatements = NIL;
-expression CurrentSwitchController = expression_undefined; 
-
-list LabelledStatements = NIL; /* list of labelled statements of the current module*/
-
-int derived_counter = 0; /* to generate unique counter for unnamed struct/union/enum and their members*/
+/* To avoid warnings */
+extern char *strdup(const char *s1);
 
 extern statement ModuleStatement;
 
-extern entity DynamicArea;
-extern entity StaticArea;
+stack BlockStack; /* BlockStack is used to handle block scope */
 
-void init_c_areas()
+list LabelledStatements; /* list of labelled statements of the current module*/
+int derived_counter; /* to generate unique counter for unnamed struct/union/enum and their members*/
+int loop_counter; /* to generate unique label counter for loop and switch*/
+bool is_loop; /* to distinguish if this is a loop or a switch */
+list CurrentSwitchGotoStatements;
+expression CurrentSwitchController; 
+
+void MakeCurrentModule(entity e)
 {
-    DynamicArea = FindOrCreateEntity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME);
-    entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
-    entity_storage(DynamicArea) = MakeStorageRom();
-    entity_initial(DynamicArea) = MakeValueUnknown();
-
-    StaticArea = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
-    entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
-    entity_storage(StaticArea) = MakeStorageRom();
-    entity_initial(StaticArea) = MakeValueUnknown();
-}
-
-void CreateCurrentModule(entity e)
-{
-  entity_initial(e) = make_value(is_value_code, make_code(NIL, NULL, make_sequence(NIL)));
+  entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL)));
   set_current_module_entity(e);
   init_c_areas(); 
   LabelledStatements = NIL;
   derived_counter = 0;
+  loop_counter = 0;
+  CurrentSwitchGotoStatements = NIL;
+  CurrentSwitchController = expression_undefined; 
 }
 
 void ResetCurrentModule()
@@ -82,11 +56,9 @@ void ResetCurrentModule()
   reset_current_module_entity();
 }
 
-void InitializeBlock(statement s)
+void InitializeBlock()
 {
-  ModuleStatement = s;
   BlockStack = stack_make(statement_domain,0,0);
-  loop_counter = 0;
 }
 
 statement MakeBlock(list decls, list stms)
@@ -100,9 +72,9 @@ statement MakeBlock(list decls, list stms)
   return s;
 }
 
-statement MakeNullStatement()
+statement MakeNullStatement(entity lab)
 {
-  return make_statement(entity_empty_label(), 
+  return make_statement(lab, 
 			STATEMENT_NUMBER_UNDEFINED, 
 			STATEMENT_ORDERING_UNDEFINED, 
 			string_undefined,
@@ -113,7 +85,7 @@ statement MakeNullStatement()
 instruction MakeNullInstruction()
 {
   return make_instruction(is_instruction_call, 
-			  make_call(CreateIntrinsic(";"),NIL));
+			  make_call(CreateIntrinsic(NULL_STATEMENT_INTRINSIC),NIL));
 }
 
 statement FindStatementFromLabel(entity l)
@@ -141,8 +113,8 @@ statement MakeLabelledStatement(string label, statement s)
       LabelledStatements = gen_nconc(LabelledStatements,CONS(STATEMENT,st,NIL));
     }
   else 
-    /* The statement is already created pseudoly, replace it by the real one*/
     {
+      /* The statement is already created pseudoly, replace it by the real one*/
       statement_instruction(smt) =  statement_instruction(s);
       st = smt;
     }
@@ -329,7 +301,7 @@ statement MakeCaseStatement(expression e)
            xxx is unique from loop_counter */
   string lab = strdup(concatenate("switch_",int_to_string(loop_counter),
 				  "_case_",words_to_string(words_expression(e)),NULL));
-  statement s = MakeLabelledStatement(lab,MakeNullStatement());
+  statement s = MakeLabelledStatement(lab,MakeNullStatement(entity_empty_label()));
   expression cond = eq_expression(CurrentSwitchController,e);
   test t = make_test(cond,MakeGotoStatement(lab),make_continue_statement(entity_undefined));
   CurrentSwitchGotoStatements = gen_nconc(CurrentSwitchGotoStatements,CONS(STATEMENT,test_to_statement(t),NULL));
@@ -344,7 +316,7 @@ statement MakeDefaultStatement()
        goto switch_xxx_default;
      to the switch header */
   string lab = strdup(concatenate("switch_",int_to_string(loop_counter),"_default",NULL));
-  statement s = MakeLabelledStatement(lab,MakeNullStatement());
+  statement s = MakeLabelledStatement(lab,MakeNullStatement(entity_empty_label()));
   CurrentSwitchGotoStatements = gen_nconc(CurrentSwitchGotoStatements,CONS(STATEMENT,MakeGotoStatement(lab),NULL));
   return s;
 }
