@@ -482,9 +482,9 @@ char *key1, *key2;
 }
 
 static int hash_chunk_equal(key1, key2)
-chunk *key1, *key2;
+gen_chunk *key1, *key2;
 {
-    return(memcmp(key1, key2, sizeof(chunk)) == 0) ;
+    return(memcmp(key1, key2, sizeof(gen_chunk)) == 0) ;
 }
 
 static char *hash_print_key(t, key)
@@ -501,7 +501,7 @@ char *key;
     else if (t == hash_pointer)
 	    sprintf(buffer, "%x", (unsigned int) key);
     else if (t == hash_chunk)
-	    sprintf(buffer, "%x", (unsigned int)((chunk *)key)->p);	    
+	    sprintf(buffer, "%x", (unsigned int)((gen_chunk *)key)->p);	    
     else {
 	fprintf(stderr, "[hash_print_key] bad type : %d\n", t);
 	abort();
