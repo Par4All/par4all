@@ -22,9 +22,12 @@
 #define db_resource_loaded_and_stored_p(r) \
         db_status_loaded_and_stored_p(db_resource_db_status(r))
 
-/* Module names must use some characters. Upper case letters and underscore for Fortran, but also lower case letters and the FILE_SEP_STRING
+/* Module names must use some characters.
+ * Upper case letters and underscore for Fortran, 
+ * but also lower case letters and the FILE_SEP_STRING
+ * "@" added for C compilation unit FC 12/08/2003
  */
-#define MODULE_NAME_CHARS ("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdefghijklmnopqrstuvwxyz" FILE_SEP_STRING)
+#define MODULE_NAME_CHARS ("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdefghijklmnopqrstuvwxyz" FILE_SEP_STRING "@")
 
 static bool simple_name_p(string name)
 {
