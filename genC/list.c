@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1996/10/15 13:18:03 $, )
+ * $RCSfile: list.c,v $ ($Date: 1997/04/24 19:29:02 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -73,8 +73,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include "newgen_include.h"
 #include "genC.h"
+#include "newgen_include.h"
 
 int gen_eq( obj1, obj2 )
 gen_chunk *obj1, *obj2 ;
@@ -206,13 +206,10 @@ gen_chunk * gen_find_tabulated( key, domain )
 char *key ;
 int domain ;
 {
-    static char full_key[ 1024 ] ;
     gen_chunk *hash ;
 
-    sprintf( full_key, "%d%c%s", domain, HASH_SEPAR, key ) ;
-
-    if( (hash=(gen_chunk *)hash_get( Gen_tabulated_names, full_key ))
-       == (gen_chunk *)HASH_UNDEFINED_VALUE ) {
+    if( (hash=(gen_chunk *)gen_get_tabulated_name_basic(domain, key))
+	== (gen_chunk *)HASH_UNDEFINED_VALUE ) {
 	return( gen_chunk_undefined ) ;
     }
     return( (Gen_tabulated_[ Domains[ domain ].index ]+abs( hash->i ))->p ) ;
