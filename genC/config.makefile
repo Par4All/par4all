@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/09 21:06:09 $, 
+# $Date: 1996/08/21 14:48:11 $, 
 #
 # Newgen should be quite particular...
 
@@ -110,9 +110,10 @@ $(ARCH)/newSML:	$(ARCH)/new.o $(ARCH)/build.o $(ARCH)/genSML.o
 clean-compiled:
 	$(RM) $(ARCH)/libgenC.a $(ARCH)/*.o $(ARCH)/newC 
 
-clean: clean-compiled
+local-clean: 
 	$(RM) 	$(DERIVED_CFILES) $(DERIVED_HEADERS) \
 		y.tab.c y.tab.h y.output
 
+clean: clean-compiled local-clean
 #
 
