@@ -112,7 +112,7 @@ list  in_l;
     /* Take current vertex and effects links to it */
     ver = VERTEX(CAR( vl ));
     sta = adg_vertex_to_statement( ver );
-    effs = load_statement_proper_effects( sta );
+    effs = load_proper_rw_effects_list( sta );
 
 
     /* Put in ent_l variables readen by ver */
@@ -195,7 +195,7 @@ graph in_dg;
     ver = VERTEX(CAR( vl ));
     sta = adg_vertex_to_statement( ver );
     if (!assignment_statement_p( sta )) continue;
-    effs = load_statement_proper_effects( sta );
+    effs = load_proper_rw_effects_list( sta );
 
     /* Put in ent_l variables readen by ver */
     for(; !ENDP(effs); POP(effs)) {
@@ -741,7 +741,7 @@ graph                   dup_dg;
 
 				
       /* Get all different effects that reads dest_ent */
-      sou_effs = load_statement_proper_effects( sou_s );
+      sou_effs = load_proper_rw_effects_list( sou_s );
 
       /* Put in ent_l variables readen by ver */
       for(; !ENDP(sou_effs); POP(sou_effs)) {
