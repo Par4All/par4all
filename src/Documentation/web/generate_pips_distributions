@@ -9,10 +9,10 @@ move()
 { test -f $1 && mv $1 $1.old ; }
 
 verbose()
-{ echo "$RCSfile$: %@" }
+{ echo "$RCSfile$: $*" ; }
 
 error()
-{ ret=$1; echo "$RCSfile$: $@" >&2 ; exit $ret; }
+{ ret=$1; shift; echo "$RCSfile$ [$ret]: $*" >&2 ; exit $ret; }
 
 #
 # SOURCES
