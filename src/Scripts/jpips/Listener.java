@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: Listener.java,v $
+ * Revision 1.4  1998/07/01 13:55:41  coelho
+ * fixed import.
+ *
  * Revision 1.3  1998/07/01 13:32:25  coelho
  * cleaner.
  *
@@ -32,7 +35,7 @@ public class Listener
 
   public	Resetable	jpips;
   public	DataInputStream	in;		//input stream from tpips
-  public 	PFrame 		frame;
+  public 	Pawt.PFrame	frame;
 
   public Listener(DataInputStream in, Resetable jpips)
     {
