@@ -66,7 +66,6 @@ string name;
 bool make_close_workspace()
 {
     bool res = TRUE;
-    bool tmp_res;
     string name;
 
     res &= db_set_current_module_name(NULL);
