@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "values.h"
+/* #include "values.h" */
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
@@ -275,7 +275,7 @@ int number_of_lower_bounds,number_of_upper_bounds;
     b2 = sc_minmax_of_variable(sctmp, vecteur_var(ofs), &pmin, &pmax);
     ifdebug(4)
 	fprintf(stderr,"borne min %d, borne sup %d\n",pmin,pmax);
-    /* if (pmin == -MAXINT || pmax == MAXINT || pmax > pmin) { */
+    /* if (pmin == INT_MIN || pmax == INT_MAX || pmax > pmin) { */
 	new_ind1=find_entity(module, ofs,SUFFIX_FOR_TEMP_VAR1_IN_INNER_LOOP);
 
 	expr_ind1 = make_vecteur_expression(vect_new((char *) new_ind1,
