@@ -4,7 +4,6 @@
 
 SCRIPTS= 	hpfc \
 		hpfc_directives \
-		hpfc_add_includes \
 		hpfc_filter \
 		hpfc_add_warning \
 		hpfc_generate_h \
