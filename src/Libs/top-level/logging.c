@@ -13,7 +13,7 @@
 /* The log file is closed by default */
 static FILE *log_file = NULL;
 /* Used in information messages */
-char log_file_name[MAXPATHLEN];
+static char log_file_name[MAXPATHLEN];
 
 
 
