@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: ri.tex,v $
+%% Revision 1.70  2003/09/09 10:02:07  nguyen
+%% Add subscript syntax to handle general subscripting array expressions in C.
+%%
 %% Revision 1.69  2003/07/22 11:17:49  nguyen
 %% Remove signed, unsigned and char from basic types.
 %% Add expression to value to handle C initializations
@@ -1631,7 +1634,7 @@ field set to {\tt normalized\_undefined}.
 \label{subsection-syntax}
 \index{Syntax}
 
-\domain{Syntax = reference + range + call + cast + sizeofexpression}
+\domain{Syntax = reference + range + call + cast + sizeofexpression + subscript}
 {}
 
 Type \verb/syntax/ is used to represent expressions as they are
@@ -1644,6 +1647,12 @@ element\footnote{Scalar variables are represented as 0-dimensional
     Instruction} section.}, or a \verb/range/ as in loop
 definitions\footnote{This explains why type \texttt{range} is defined
   in the {\em Instruction} section.} and array declarations.
+
+New kinds of syntax are added to handle C language. They are cast
+expressions, sizeof expressions and subscripting array expressions. The last
+one is an extension of reference expressions, because they include other
+more complicated array objects which can be a pointer, a function, a
+structure or union member, ...   
 
 \begin{comment}
 Le domaine \verb/syntax/ permet de représenter les expressions telles
@@ -1715,6 +1724,12 @@ with side effect. See Section~\ref{subsubsection-call}.
 \domain{Sizeofexpression = type + expression}
 {}
 
+\subsubsection{Subscript}
+\label{subsubsection-subscript}
+\index{Subscript}
+
+\domain{Subscript = array:expression x indices:expression*}
+{}
 \subsection{Affine Representation of an Expression}
 \label{subsection-normalized}
 \index{Normalized}
