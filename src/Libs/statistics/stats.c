@@ -37,12 +37,16 @@ static bool loop_flt( loop l)
         if ( pos !=0) 
         {
 	   i=0;
-	   MAP(STATEMENT,s, {i++; if (i!=pos) 
-                                   {  
-	                             if (instruction_loop_p(statement_instruction(s)) )
-                                      cond1 =FALSE; 
-                                   } 
-                             };, l);
+	   MAP(STATEMENT,s, 
+	   {
+	     i++; 
+	     if (i!=pos) 
+	       {  
+		 if (instruction_loop_p(statement_instruction(s)) )
+		   cond1 =FALSE; 
+	       } 
+	   },
+	       l);
 	   i=0;
 	   MAP(STATEMENT, s, {  i++; if (i!=pos) 
                                      {
