@@ -244,6 +244,9 @@ text t;
     print_text(stderr, t);
 }
 
+
+/* Convert a word list into a string and translate the position of
+   eventual attachment accordingly: */
 string words_to_string(lw)
 cons *lw;
 {
@@ -256,10 +259,10 @@ cons *lw;
 	    fprintf(stderr, "[words_to_string] buffer too small\n");
 	    exit(1);
 	}
-	(void) strcat(buffer, w);
+	(void) strcat_word_and_migrate_attachments(buffer, w);
     }, lw);
 
-    return(strdup(buffer));
+    return(strdup_and_migrate_attachments(buffer));
 }
 
 void dump_words(list lw)
