@@ -588,10 +588,11 @@ typing_arguments_of_user_function(call c, type_context_p context)
  * WARNING: The interpretion of COMPLEX !!!
  */
 static basic 
-type_this_call(call c, type_context_p context)
+type_this_call(expression exp, type_context_p context)
 {
   typing_function_t dotype;
   switch_name_function simplifier;
+  call c = syntax_call(expression_syntax(exp));
   entity function_called = call_function(c);
   basic b;
   b = basic_undefined;
@@ -627,7 +628,8 @@ type_this_call(call c, type_context_p context)
 				   entity_local_name(function_called));
     if (simplifier != 0)
     {
-      simplifier(c, context);
+      //simplifier(c, context);
+      simplifier(exp, context);
     }
   }
   
@@ -642,9 +644,38 @@ type_this_call(call c, type_context_p context)
 static void 
 type_this_instruction(instruction i, type_context_p context)
 {
+  basic b1, b2;
+  list args;
+  call c;
+  
   if (instruction_call_p(i))
   {
-    type_this_call(instruction_call(i), context);
+    c = instruction_call(i);
+    /* Here, we only do typing for assigment statement */
+    if (!ENTITY_ASSIGN_P(call_function(c)))
+    {
+      return;
+    }
+    args = call_arguments(c);
+  
+    if(!arguments_are_compatible(c, context->types))
+    {
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+			   "Arguments of assignement '%s' are not compatible", 
+			      entity_local_name(call_function(c))); 
+      /* Count the number of errors */
+      context->number_of_error++;
+    }
+    else
+    {
+      b1 = GET_TYPE(context->types, EXPRESSION(CAR(args)));
+      b2 = GET_TYPE(context->types, EXPRESSION(CAR(CDR(args))));
+      if (!basic_equal_p(b1, b2))
+      {
+	EXPRESSION(CAR(CDR(args))) = 
+	  insert_cast(b1, b2, EXPRESSION(CAR(CDR(args))), context);
+      }
+    }
   }
 }
 
@@ -759,7 +790,7 @@ type_this_expression(expression e, type_context_p context)
   switch (syntax_tag(s))
   {
   case is_syntax_call:
-    b = type_this_call(syntax_call(s), context);
+    b = type_this_call(e, context);
     break;
     
   case is_syntax_reference:
