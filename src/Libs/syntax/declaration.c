@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/04 15:43:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 09:51:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/04 15:43:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 09:51:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -115,14 +115,22 @@ entity e;
 
 	    r = storage_ram(entity_storage(e));
 
-	    if (ram_section(r) != DynamicArea)
-		    FatalError("SaveEntity", "cannot save non dynamic variables\n");
+	    if (ram_section(r) != DynamicArea) {
+		user_warning("SaveEntity", "Variable %s has already been declared static "
+			     "by SAVE or by appearing in a common declaration\n",
+			     entity_local_name(e));
+		ParserError("SaveEntity", "Cannot save non dynamic variables\n");
+	    }
 
 	    ram_section(r) = StaticArea;
 	    ram_offset(r) = CurrentOffsetOfArea(StaticArea, e);
 	}
 	else {
-	    ParserError("SaveEntity", "cannot save non dynamic variables\n");
+	    user_warning("SaveEntity",
+			 "Cannot save variable %s with non RAM storage (storage tag = %d)\n",
+			 entity_local_name(e),
+			 storage_tag(entity_storage(e)));
+	    ParserError("SaveEntity", "Cannot save this variable");
 	}
     }
     else {
@@ -214,6 +222,32 @@ cons *ldvr, *ldvl;
 	datavar dvr = DATAVAR(CAR(pcr));
 	entity e = datavar_variable(dvr);
 	int i = datavar_nbelements(dvr);
+
+	debug(8, "AnalyzeData", "Storage for entity %s must be static or made static\n",
+	      entity_name(e));
+
+	if(storage_undefined_p(entity_storage(e))) {
+	    entity_storage(e) =
+		make_storage(is_storage_ram,
+			     (make_ram(get_current_module_entity(),
+				       StaticArea, 
+				       CurrentOffsetOfArea(StaticArea ,e),
+				       NIL)));
+	}
+	else if(storage_ram_p(entity_storage(e))) {
+	    if(dynamic_area_p(ram_section(storage_ram(entity_storage(e))))) {
+		SaveEntity(e);
+	    }
+	    else {
+		/* Variable is in static area or in a user declared common */
+	    }
+	}
+	else {
+	    user_warning("AnalyzeData",
+			 "DATA initialization for non RAM variable %s (storage tag = %d)\n",
+			entity_name(e), storage_tag(entity_storage(e)));
+	    ParserError("AnalyzeData", "DATA statement initializes non RAM variable\n");
+	}
 
 	debug(8, "AnalyzeData", "needs %d elements for entity %s\n", 
 	      i, entity_name(e));
