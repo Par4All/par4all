@@ -1,12 +1,9 @@
 #include <stdio.h>
-extern int vfprintf();
-extern int fprintf();
-extern int _filbuf();
 #include <fcntl.h>
 #include <string.h>
 #include <stdarg.h>
 #include <setjmp.h>
-extern int system(char * s);
+#include <stdlib.h>
 
 #include "genC.h"
 #include "ri.h"
