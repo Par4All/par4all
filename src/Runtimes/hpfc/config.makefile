@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/10/19 11:11:16 $, )
+# ($Date: 1997/01/03 15:09:22 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -96,7 +96,8 @@ ifeq ($(PVM_ARCH),RS6K)
 # IBM compilers on RS6K/SPx...
 #
 FC	= xlf
-FFLAGS	= -O2 -u
+# FFLAGS	= -O2 -u
+FFLAGS	= -O2 -qarch=pwr2 -qtune=pwr2 -qhot -u
 CC	= xlc
 CFLAGS	= -O2
 #
