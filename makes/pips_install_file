@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/08/24 09:55:29 $, )
+# ($Date: 1996/08/26 11:39:54 $, )
 #
 
 RUN=':'
@@ -45,12 +45,18 @@ verb "installing in $directory"
 
 for file
 do
-  target=$directory/`basename $file`
+  base=`basename $file`
+  target=$directory/$base
   if [ -d $file ] 
   then
-    verb "recursing for directory $file"
-    test -d $target || { mkdir $target; chmod a+rx,ug+w,o-w $target; }
-    $0 $target $file/*
+    if test $base = OLD -o $base = SCCS
+    then 
+      verb "skipping directory $file"
+    else
+      verb "recursing for directory $file"
+      test -d $target || { mkdir $target; chmod a+rx,ug+w,o-w $target; }
+      $0 $target $file/*
+    fi
   else
     if test -f $target && cmp -s $file $target
     then
