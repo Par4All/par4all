@@ -51,4 +51,4 @@ extern list integer_entities, real_entities, complex_entities, logical_entities,
 	    double_entities, char_entities;
 
 /* Mappings for the cumulated effects of statements. */
-extern statement_mapping cumulated_effects_map;
+/* extern statement_mapping cumulated_effects_map;*/
