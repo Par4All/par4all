@@ -9,62 +9,10 @@
  * Comments :
  */
 
-
-/* Ansi includes 	*/
-#include <stdio.h>
-#include <string.h>
-
-/* Newgen includes 	*/
-#include "genC.h"
-
-/* C3 includes 		*/
-#include "boolean.h"
-#include "arithmetique.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "sc.h"
-#include "polyedre.h"
-#include "matrice.h"
-#include "matrix.h"
-#include "union.h"
-
-/* Pips includes 	*/
-#include "parser_private.h"
-#include "graph.h"
-#include "database.h"
-#include "ri.h"
-#include "paf_ri.h"
-#include "ri-util.h"
-#include "constants.h"
-#include "misc.h"
-#include "control.h"
-#include "text-util.h"
-#include "transformer.h"
-#include "semantics.h"
-
-#include "effects-generic.h"
-#include "effects-simple.h"
-#include "effects-convex.h"
-
-#include "pipsdbm.h"
-#include "resources.h"
-#include "static_controlize.h"
-#include "dg.h"
-#include "ricedg.h"
-#include "paf-util.h"
-#include "syntax.h"
-#include "array_dfg.h"
+#include "local.h"
 
 /* External variables */
 extern	int		Gcount_re;
-
-/* Local defines */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
 
 /*=======================================================================*/
 /*			PREDICATE FUNCTIONS				 */
@@ -106,7 +54,7 @@ list loops;
   if ((new_sc->nb_ineq != 0) || (new_sc->nb_eq != 0)) {
     new_sc->base = NULL;
     sc_creer_base(new_sc);
-    ret_pred = make_predicate((char *) new_sc);
+    ret_pred = make_predicate(new_sc);
   }
     
   if ((get_debug_level() >= 9) && (ret_pred != predicate_undefined))
@@ -211,11 +159,13 @@ expression ndf_exp;
     ADD_ELEMENT_TO_LIST( ps_list, PREDICATE, make_predicate(ps1));
   }
   else if (ENTITY_GREATER_OR_EQUAL_P( call_function(c) ))  {
-    expression 	nexp = NULL;
-    Psysteme	new_sc = NULL;
+      normalized nexp;
+      expression e;
+      Psysteme	new_sc = NULL;
     
     new_sc = sc_new();
-    nexp = NORMALIZE_EXPRESSION( EXPRESSION(CAR( args )) );
+    e = EXPRESSION(CAR( args ));
+    nexp = NORMALIZE_EXPRESSION(e);
     if(expression_to_int(EXPRESSION(CAR(CDR( args )))) != 0)
       RETURN(9, "adg_get_conjonctions", ps_list);
     
@@ -306,10 +256,10 @@ list exp_l;
   }
 
   sc_creer_base(new_sc);
-  new_pred = make_predicate((char *) new_sc);
+  new_pred = make_predicate(new_sc);
   
   if ((get_debug_level() >= 9) && (new_pred != predicate_undefined))
-    adg_fprint_psysteme(stderr, (Psysteme) predicate_system(new_pred) );
+    adg_fprint_psysteme(stderr, predicate_system(new_pred) );
   debug(9, "my_adg_expressions_to_predicate", "end \n");
   return(new_pred);
 }
