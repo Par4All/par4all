@@ -38,15 +38,55 @@
  *       aucun routine ne sait lire ce format
  *       ancien nom eq_print
  */
+
+/* returns the constant */
+static Value 
+fprint_contrainte_vecteur(
+  FILE * fp,
+  Pvecteur v,
+  char * (*variable_name)(Variable))
+{
+    short int debut = 1;
+    Value constante = VALUE_ZERO;
+
+    while (!VECTEUR_NUL_P(v)) {
+	Variable var = var_of(v);
+	Value coeff = val_of(v);
+	if (var!=TCST) {
+	    char signe;
+
+	    if (value_notzero_p(coeff)) {
+		if (value_pos_p(coeff))
+		    signe = (debut) ? ' ' : '+';
+		else {
+		    signe = '-';
+		    coeff = value_uminus(coeff);
+		};
+		debut = 0;
+		(void) fprintf(fp, "%c", signe);
+		if (value_notone_p(coeff))
+		    (void) fprintf(fp, " "), fprint_Value(fp, coeff);
+		(void) fprintf(fp, " %s ", variable_name(var));
+	    }
+	}
+	else
+	    /* on admet plusieurs occurences du terme constant!?! */
+	    value_add(constante, coeff);
+
+	v = v->succ;
+    }
+
+    return constante;
+}
+
 void contrainte_fprint(fp,c,is_inegalite,variable_name)
 FILE *fp;
 Pcontrainte c;
 boolean is_inegalite;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     Pvecteur v;
-    short int debut = 1;
-    long int constante = 0;
+    Value constante = VALUE_ZERO;
 
     if (!CONTRAINTE_UNDEFINED_P(c))
 	v = contrainte_vecteur(c);
@@ -55,36 +95,11 @@ char * (*variable_name)();
 
     assert(vect_check(v));
 
-    while (!VECTEUR_NUL_P(v)) {
-	if (v->var!=TCST) {
-	    char signe;
-	    long int coeff = v->val;
+    constante = fprint_contrainte_vecteur(fp, v, variable_name);
 
-	    if (coeff != 0) {
-		if (coeff > 0)
-		    signe = (debut) ? ' ' : '+';
-		else {
-		    signe = '-';
-		    coeff = -coeff;
-		};
-		debut = 0;
-		if (coeff == 1)
-		    (void) fprintf(fp,"%c %s ", signe, variable_name(v->var));
-		else 
-		    (void) fprintf(fp,"%c %ld %s ", signe, coeff,
-			    variable_name(v->var));
-	    }
-	}
-	else
-	    /* on admet plusieurs occurences du terme constant!?! */
-	    constante += v->val;
-
-	v = v->succ;
-    }
-    if (is_inegalite)
-	(void) fprintf (fp," <= %ld ,\n", -constante);
-    else 
-	(void) fprintf (fp," == %ld ,\n", -constante);
+    (void) fprintf(fp, " %s ", is_inegalite? "<=": "==");
+    fprint_Value(fp, value_uminus(constante));
+    fprintf(fp, " ,\n");
 }
 
 /* void egalite_fprint(FILE * fp, Pcontrainte eg, char * (*variable_name)()):
@@ -165,61 +180,52 @@ char * (*variable_name)();
 	contrainte_fprint(fp,ineg,TRUE,variable_name);
 }
 
+static int
+sprint_operator(char *s, boolean is_inegalite, boolean a_la_fortran)
+{
+    return sprintf(s, "%s",(is_inegalite? (a_la_fortran? ".LE.": "<="):
+		                  (a_la_fortran? ".EQ.": "==")));
+}
+
 static char * heuristique_1(s, v, is_inegalite, variable_name, a_la_fortran)
 char * s;
 Pvecteur v;
 boolean is_inegalite;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 boolean a_la_fortran;
 {
     short int debut = 1;
-    long int constante = 0;
+    Value constante = VALUE_ZERO;
 
     while (!VECTEUR_NUL_P(v)) {
-	if (v->var!=TCST) {
+	Variable var = var_of(v);
+	Value coeff = val_of(v);
+	if (var!=TCST) {
 	    char signe;
-	    long int coeff = v->val;
 
-	    if (coeff != 0) {
-		if (coeff > 0)
+	    if (value_notzero_p(coeff)) {
+		if (value_pos_p(coeff))
 		    signe = (debut) ? ' ' : '+';
 		else {
 		    signe = '-';
-		    coeff = -coeff;
+		    coeff = value_uminus(coeff);
 		};
 		debut = 0;
-		if (coeff == 1)
-		    (void) sprintf(s+strlen(s),"%c%s", 
-				   signe, variable_name(v->var));
-		else 
-		    (void) sprintf(s+strlen(s),"%c%ld%s", signe, coeff,
-			    variable_name(v->var));
+		(void) sprintf(s+strlen(s),"%c", signe);
+		if (value_notone_p(coeff))
+		    (void) sprint_Value(s+strlen(s), coeff);
+		(void) sprintf(s+strlen(s), "%s", variable_name(var));
 	    }
 	}
 	else
 	    /* on admet plusieurs occurences du terme constant!?! */
-	    constante += v->val;
+	    value_add(constante, coeff);
 
 	v = v->succ;
     }
-    if (is_inegalite)	
-	switch (a_la_fortran){
-	case FALSE :
-	    (void) sprintf(s+strlen(s) ,"<=%ld", -constante);
-	    break;
-	case TRUE : 
-	    (void) sprintf(s+strlen(s) ,".LE.%ld", -constante);
-	    break;
-	}
-    else 
-	switch (a_la_fortran){
-	case FALSE :
-	    (void) sprintf(s+strlen(s) ,"==%ld", -constante);
-	    break;
-	case TRUE : 
-	    (void) sprintf(s+strlen(s) ,".EQ.%ld", -constante);
-	    break;
-	}
+
+    (void) sprint_operator(s+strlen(s), is_inegalite, a_la_fortran);
+    (void) sprint_Value(s+strlen(s), value_uminus(constante));
 
     return s;
 }
@@ -228,20 +234,20 @@ static char * heuristique_3(s, v, is_inegalite, variable_name, a_la_fortran)
 char * s;
 Pvecteur v;
 boolean is_inegalite;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 boolean a_la_fortran;
 {
     Pvecteur coord;
     short int debut = TRUE;
     int positive_terms = 0;
     int negative_terms = 0;
-    int const_coeff = 0;
+    Value const_coeff = 0;
     boolean const_coeff_p = FALSE;
 
     if(!is_inegalite) {
 	for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
 	    if(vecteur_var(coord)!= TCST) {
-		if(vecteur_val(coord) >0 )
+		if(value_pos_p(vecteur_val(coord)))
 		    positive_terms++;
 		else
 		    negative_terms++;
@@ -257,30 +263,33 @@ boolean a_la_fortran;
     negative_terms = 0;
 
     for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
-	int coeff = vecteur_val(coord);
+	Value coeff = vecteur_val(coord);
+	Variable var = vecteur_var(coord);
 
-	if (coeff > 0) {
+	if (value_pos_p(coeff)) {
 	    positive_terms++;
-	    if (debut == TRUE) {
+	    if (debut) {
 		debut = FALSE;
-		if (coeff == 1 && vecteur_var(coord) != TCST)
+		if (value_one_p(coeff) && var!=TCST)
 		    (void) sprintf(s+strlen(s),"%s", 
 				   variable_name(vecteur_var(coord)));
-		else if(!term_cst(coord) || is_inegalite)
-		    (void) sprintf(s+strlen(s),"%d%s", coeff,
-			    variable_name(vecteur_var(coord)));
+		else if(!term_cst(coord) || is_inegalite){
+		    (void) sprint_Value(s+strlen(s), coeff);
+		    (void) sprintf(s+strlen(s),"%s", variable_name(var));
+		}
 		else {
 		    debut = TRUE;
 		    positive_terms--;
 		}
 	    }
 	    else
-		if (coeff == 1 && vecteur_var(coord) != TCST)
-		    (void) sprintf(s+strlen(s),"+%s", 
-				   variable_name(vecteur_var(coord)));
-		else if(!term_cst(coord) || is_inegalite)
-		    (void) sprintf(s+strlen(s),"+%d%s", coeff,
-				   variable_name(vecteur_var(coord)));
+		if (value_one_p(coeff) && var!=TCST)
+		    (void) sprintf(s+strlen(s),"+%s", variable_name(var));
+		else if(!term_cst(coord) || is_inegalite) {
+		    (void) sprintf(s+strlen(s),"+");
+		    (void) sprint_Value(s+strlen(s), coeff);
+		    (void) sprintf(s+strlen(s),"%s", variable_name(var));
+		}
 		else
 		    positive_terms--;
 	}
@@ -289,28 +298,12 @@ boolean a_la_fortran;
     if(positive_terms == 0)
 	(void) sprintf(s+strlen(s),"0");
 
-    if (is_inegalite)
-	switch (a_la_fortran){
-	case FALSE :
-	    (void) sprintf(s+strlen(s) ,"<=");
-	    break;
-	case TRUE : 
-	    (void) sprintf(s+strlen(s) ,".LE.");
-	    break;
-	}
-    else 
-	switch (a_la_fortran){
-	case FALSE :
-	    (void) sprintf(s+strlen(s) ,"==");
-	    break;
-	case TRUE : 
-	    (void) sprintf(s+strlen(s) ,".EQ.");
-	    break;
-	}
+    (void) sprint_operator(s+strlen(s), is_inegalite, a_la_fortran);
 
     debut = TRUE;
     for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
-	int coeff = vecteur_val(coord);
+	Value coeff = vecteur_val(coord);
+	Variable var = var_of(coord);
 
 	if(term_cst(coord) && !is_inegalite) {
 	    /* Save the constant term for future use */
@@ -319,24 +312,25 @@ boolean a_la_fortran;
 	    /* And now, a lie... In fact, rhs_terms++ */
 	    negative_terms++;
 	}
-	else if (coeff < 0) {
+	else if (value_neg_p(coeff)) {
 	    negative_terms++;
 	    if (debut == TRUE) {
 		debut = FALSE;
-		if (-coeff == 1 && vecteur_var(coord) != TCST)
-		    (void) sprintf(s+strlen(s),"%s", 
-				   variable_name(vecteur_var(coord)));
-		else 
-		    (void) sprintf(s+strlen(s),"%d%s", -coeff,
-			    variable_name(vecteur_var(coord)));
+		if (value_mone_p(coeff) && var!=TCST)
+		    (void) sprintf(s+strlen(s),"%s", variable_name(var));
+		else {
+		    (void) sprint_Value(s+strlen(s), value_uminus(coeff));
+		    (void) sprintf(s+strlen(s),"%s", variable_name(var));
+		}
 	    }
 	    else
-		if (-coeff == 1 && vecteur_var(coord) != TCST)
-		    (void) sprintf(s+strlen(s),"+%s", 
-				   variable_name(vecteur_var(coord)));
-		else 
-		    (void) sprintf(s+strlen(s),"+%d%s", -coeff,
-			    variable_name(vecteur_var(coord)));
+		if (value_mone_p(coeff) && var!=TCST)
+		    (void) sprintf(s+strlen(s),"+%s", variable_name(var));
+		else {
+		    (void) sprintf(s+strlen(s),"+");
+		    (void) sprint_Value(s+strlen(s), value_uminus(coeff));
+		    (void) sprintf(s+strlen(s),"%s", variable_name(var));
+		}
 	}
 	else
 	    ;
@@ -345,13 +339,12 @@ boolean a_la_fortran;
     if(negative_terms == 0)
 	(void) sprintf(s+strlen(s),"0");
     else if(const_coeff_p) {
-	assert(const_coeff!=0);
-	if(debut)
-	    (void) sprintf(s+strlen(s),"%d", -const_coeff);
-	else if(const_coeff < 0)
-	    (void) sprintf(s+strlen(s),"+%d", -const_coeff);
-	else
-	    (void) sprintf(s+strlen(s),"%d", -const_coeff);
+	assert(value_notzero_p(const_coeff));
+	
+	if(!debut && value_neg_p(const_coeff))
+	    (void) sprintf(s+strlen(s), "+");
+
+	sprint_Value(s+strlen(s), value_uminus(const_coeff));
     }
     else
 	;
@@ -399,12 +392,13 @@ char * (*variable_name)();
     return s;
 }
 
-char * contrainte_sprint_format(s, c, is_inegalite, variable_name, a_la_fortran)
-char * s;
-Pcontrainte c;
-boolean is_inegalite;
-char * (*variable_name)();
-boolean a_la_fortran;
+char * 
+contrainte_sprint_format(
+    char * s,
+    Pcontrainte c,
+    boolean is_inegalite,
+    char * (*variable_name)(Variable),
+    boolean a_la_fortran)
 {
     Pvecteur v;
     int heuristique = 3;
@@ -453,7 +447,8 @@ Pcontrainte eg;
 char * (*variable_name)();
 boolean a_la_fortran;
 {
-    return contrainte_sprint_format(s, eg, FALSE, variable_name, a_la_fortran);
+    return contrainte_sprint_format
+	(s, eg, FALSE, variable_name, a_la_fortran);
 }
 
 char * inegalite_sprint_format(s, ineg, variable_name, a_la_fortran)
@@ -462,5 +457,6 @@ Pcontrainte ineg;
 char * (*variable_name)();
 boolean a_la_fortran;
 {
-    return contrainte_sprint_format(s, ineg, TRUE, variable_name, a_la_fortran);
+    return contrainte_sprint_format
+	(s, ineg, TRUE, variable_name, a_la_fortran);
 }
