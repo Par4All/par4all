@@ -69,7 +69,7 @@ Variable v;
     static char buffer[10];
 
     buffer[0] = 'X';
-    (void) sprintf(&buffer[1],"%x",(unsigned int) v);
+    (void) sprintf(&buffer[1],"%p", v);
     return(buffer);
 }
 
