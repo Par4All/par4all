@@ -4,7 +4,7 @@
 ! Fabien COELHO (HPF version)
 !
 ! $RCSfile: wave.f,v $ (version $Revision$)
-! $Date: 1996/09/03 23:19:56 $, 
+! $Date: 1996/09/03 23:25:12 $, 
 !
 
 !
@@ -49,12 +49,12 @@
       enddo
 
 !hpf$ independent 
-      do i=65, 95
+      do i=(x_size/4)+5, x_size/2
          area(i,y_size/2) = 0.0
       enddo
 
 !hpf$ independent
-      do j=(x_size/4)+5, x_size/2
+      do j=1, y_size/4
 !hpf$    independent
          do i=1, x_size
             depth(i,j) = 2600.0
