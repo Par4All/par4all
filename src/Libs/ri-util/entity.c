@@ -550,13 +550,21 @@ find_or_create_entity(string full_name)
 
 }
 
+/* Problem: A functional global entity may be referenced without
+   parenthesis or CALL keyword in a function or subroutine call.
+   See SafeFindOrCreateEntity().
+*/
+
 entity 
 FindOrCreateEntity(
     string package, /* le nom du package */
     string name /* le nom de l'entite */)
 {
-    return find_or_create_entity
-	(concatenate(package, MODULE_SEP_STRING, name, 0));
+    entity e = entity_undefined;
+
+    e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, 0));
+
+    return e;
 }
 
 /* FIND_MODULE returns entity. Argument is module_name */
