@@ -295,7 +295,7 @@ typedef int Value;
  * I could check ((v*w)/w)==v but a tmp would be useful
  */
 #define value_protected_hard_idiv_multiply(v,w,throw)		\
-  (value_zero_p(w) || value_zero_p(v)? VALUE_ZERO:		\
+  ((value_zero_p(w) || value_zero_p(v))? VALUE_ZERO:		\
    value_lt(value_abs(v),value_div(VALUE_MAX,value_abs(w)))?	\
    value_direct_multiply(v,w): (throw, VALUE_NAN))
 
@@ -303,8 +303,8 @@ typedef int Value;
  */
 #if defined(LINEAR_VALUE_ASSUME_SOFTWARE_IDIV)
 #define value_protected_multiply(v,w,throw)				      \
-  (value_le(v,VALUE_SQRT_MAX) && value_le(w,VALUE_SQRT_MAX) &&		      \
-   value_ge(v,VALUE_SQRT_MIN) && value_ge(w,VALUE_SQRT_MIN)?		      \
+  ((value_le(v,VALUE_SQRT_MAX) && value_le(w,VALUE_SQRT_MAX) &&		      \
+   value_ge(v,VALUE_SQRT_MIN) && value_ge(w,VALUE_SQRT_MIN))?		      \
    value_direct_multiply(v,w): value_protected_hard_idiv_multiply(v,w,throw))
 #else
 #define value_protected_multiply(v,w,throw)		\
@@ -415,7 +415,7 @@ typedef int Value;
 /* valeur absolue
  */
 #ifndef ABS
-#define ABS(x) ((x)>=0 ? (x) : -(x))
+#define ABS(x) (((x)>=0) ? (x) : -(x))
 #endif
 
 /* minimum et maximum 
@@ -423,14 +423,14 @@ typedef int Value;
  * to be defined the same way. Thus the previous def is not overwritten.
  */
 #ifndef MIN
-#define MIN(x,y) ((x)>=(y)?(y):(x))
+#define MIN(x,y) (((x)>=(y))?(y):(x))
 #endif
 #ifndef MAX
-#define MAX(x,y) ((x)>=(y)?(x):(y))
+#define MAX(x,y) (((x)>=(y))?(x):(y))
 #endif
 
 /* signe d'un entier: -1, 0 ou 1 */
-#define SIGN(x) ((x)>0? 1 : ((x)==0? 0 : -1))
+#define SIGN(x) (((x)>0)? 1 : ((x)==0? 0 : -1))
 
 /* division avec reste toujours positif
  * basee sur les equations:
