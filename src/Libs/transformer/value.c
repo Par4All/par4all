@@ -313,8 +313,8 @@ entity e;
 	}
 	else {
 	    /* This should never occur. Please core dump! */
-	    pips_error("external_value_name", "strange value %s for current module %s\n", 
-		       entity_name(e), local_module_name(get_current_module_entity()));
+	    pips_error("external_value_name", "Unexpected value %s for current module %s\n", 
+		       entity_name(e), module_local_name(get_current_module_entity()));
 	}
     }
 	    
