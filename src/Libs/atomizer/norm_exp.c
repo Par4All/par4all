@@ -36,7 +36,7 @@
 #include "text.h"
 #include "text-util.h"
 
-#include "loop_normalize.h"
+/* #include "loop_normalize.h" */
 #include "atomizer.h"
 
 
