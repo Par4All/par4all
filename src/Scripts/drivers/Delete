@@ -12,42 +12,34 @@
 # Delete foo.database
 # Delete foo.database/
 # Delete `pwd`/foo.database
+# Delete = Delete *.database
 #
-# bb, revised: 24.12.91
 
-# check that at least 1 argument is passed 
-if [ $# -lt 1 ]
-then
-echo "Usage: $0 wspace ..." >&2
-exit 1
+if [ $# -eq 0 ] 
+then 
+  echo "$0: deleting all databases in $PWD"
+  set *.database
 fi
 
-while [ $# -gt 0 ]
+for WS 
 do
-	for WS in $1
-	do
-	# bug:	dirname foo.database/   makes:  "."
-	#	basename foo.database/   makes:  ""
-	# donc on supprime l'eventuel / de fin de ligne:
-	WS=`echo $WS | sed 's/\/$//'`
-	# delete .PIPS_CURRENT_PROGRAM
-	rm -f `dirname $WS`/$PIPS_CURRENT_PROGRAM
-	# so that both zzz.database and zzz are good workspace names
-	WS=`dirname $WS`/`basename $WS .database`.database
-	if [ ! -d "$WS" ]
-	then
-		echo $0: No such directory \`$WS\' >&2
-		exit 2
-	else
-		# echo rm -r $WS
-		if /bin/rm -r $WS
-		then
-			true
-		else
-			echo Cannot remove $WS >/dev/tty
-			exit 3
-		fi
-	fi
-	done
-	shift
+  WS=`echo $WS | sed 's/\/$//'`
+  # delete .PIPS_CURRENT_PROGRAM
+  rm -f `dirname $WS`/$PIPS_CURRENT_PROGRAM
+  # so that both zzz.database and zzz are good workspace names
+  WS=`dirname $WS`/`basename $WS .database`.database
+  if [ ! -d "$WS" ]
+  then
+    echo $0: No such directory \`$WS\' >&2
+    exit 2
+  else
+  # echo rm -r $WS
+    if /bin/rm -r $WS
+    then
+      true
+    else
+      echo Cannot remove $WS >/dev/tty
+      exit 3
+    fi
+  fi
 done
