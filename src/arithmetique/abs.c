@@ -1,5 +1,5 @@
 /* $RCSfile: abs.c,v $ (version $Revision$)
- * $Date: 1996/07/16 18:47:44 $, 
+ * $Date: 1996/07/18 19:30:06 $, 
  */
 
 #include <stdio.h>
@@ -10,6 +10,9 @@
 #include "arithmetique.h"
 #include "assert.h"
 
+/* it seems rather stupid to trap arithmetic errors on abs... FC.
+ */
+
 Value abs_ofl_ctrl(Value i, int ofl_ctrl)
 {
     extern jmp_buf overflow_error;
@@ -18,7 +21,7 @@ Value abs_ofl_ctrl(Value i, int ofl_ctrl)
 	longjmp(overflow_error, 5);
         
     assert(i != VALUE_MIN);
-    return VALUE_POS_P(i)? i: value_uminus(i);
+    return value_pos_p(i)? i: value_uminus(i);
 }
 
 /* int absval_ofl(int i): absolute value of i (SUN version)
