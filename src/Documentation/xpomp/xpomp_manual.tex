@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/04 09:11:31 $, 
+%% $Date: 1996/09/04 09:59:39 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html,verbatim}
@@ -670,12 +670,16 @@ not need to care about it. Isn't it marvellous?
 
 The following HPF program computes nice images, eventually in parallel if
 compiled with \HPFC{} and run under PVM, based on Benoit Mandelbrot
-function. At each mouse click, the image is zoomed in or out depending on
-the button pressed. 
+function. At each mouse click, the image is zoomed in or out, or
+recentered, depending on the button pressed. 
 
-{\small
-\verbatiminput{fractal.f}
-}
+%% latex2html does not deal with verbatim input, hence:
+\begin{latexonly}
+{\small\verbatiminput{fractal.f}}
+\end{latexonly}
+\begin{rawhtml}
+<a href=fractal.f>Fractal HPF program</a>
+\end{rawhtml}
 
 %% \section*{Appendix}
 
