@@ -5,6 +5,9 @@
  * moved from misc to top level so as to interact with pipsmake/pipsdbm...
  *
  * $Log: signal.c,v $
+ * Revision 1.3  1998/05/26 16:51:56  coelho
+ * missing break added.
+ *
  * Revision 1.2  1998/05/25 17:24:34  coelho
  * interruption with different behaviors...
  *
@@ -31,6 +34,7 @@ static void pips_signal_handler(int num)
     case SIGTERM:
 	user_log("interrupting pipsmake as soon as possible...\n");
 	interrupt_pipsmake_asap();
+	break;
     case SIGUSR1:
 	user_log("interruption for checkpointing...\n");
 	/* cold blooded. 
