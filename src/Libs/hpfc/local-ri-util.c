@@ -1,5 +1,5 @@
 /* SCCS Stuff:
- * $RCSfile: local-ri-util.c,v $ ($Date: 1995/03/27 16:26:25 $, )
+ * $RCSfile: local-ri-util.c,v $ ($Date: 1995/03/27 17:14:19 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -60,11 +60,13 @@ expression e;
 	if (ENTITY_RELATIONAL_OPERATOR_P(call_function(syntax_call(s))))
 	    result = is_basic_logical;
 	else
+	{
 	    /* else some clever analysis could be done
 	     */
 	    hpfc_warning("suggest_basic_for_expression",
-			 "an overloaded is turned into an int...\n"),
+			 "an overloaded is turned into an int...\n");
 	    result = is_basic_int;
+	}
     }
 
     return(result);
