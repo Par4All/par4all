@@ -23,12 +23,12 @@
 
 #include "arithmetique.h"
 
-/* Il n'y a pas de forme normale pour les systemes qui ne sont pas faisables.
- * Le pointeur (Psysteme) NULL represente tout l'espace, en principe. Mais
- * un certain nombre de fonctions renvoient NULL pour representer un systeme
- * non faisable. Ceci devrait etre progressivement corrige avec l'utilisation
- * des constantes SC_RN pour l'espace entier (de dimension quelquonque) et
- * de SC_EMPTY pour les systemes non faisables (de dimensions quelconque).
+/* Le systeme vide "sc_empty" est represente par l'egalite "0==-1".
+ * le systeme representant l'espace Rn "sc_rn" correspond au  systeme 
+ * ne contenant aucune contrainte. 
+ * Avant ces deux systemes etaient representes par Le pointeur (Psysteme) NULL.
+ * Progressivement, les (Psysteme) NULL sont replaces par des appels aux
+ *  fonctions sc_empty et sc_rn. 
  *
  * Le champ dimension donne le nombre de variables utilisees dans les egalites
  * et les inegalites, ou si l'on prefere, la dimension de l'espace dans
@@ -89,7 +89,7 @@ typedef struct Ssysteme {
                               (p)->inegalites=i_new; (p)->nb_ineq++; }
 #define sc_add_ineg(p,i) { (i)->succ=(p)->inegalites; (p)->inegalites=(i); (p)->nb_ineq += 1; }
 
-/* definition d'un systeme de contraintes infaisable, representant un
+/* ex-definition d'un systeme de contraintes infaisable, representant un
  * polyedre vide.
  *
  * Utiliser sc_empty() et sc_empty_p() plutot que ces macros obsoletes.
@@ -97,8 +97,8 @@ typedef struct Ssysteme {
 #define SC_EMPTY ((Psysteme) NULL)
 #define SC_EMPTY_P(sc) ((sc)==SC_EMPTY)
 
-/* definition d'un systeme de contraintes vide, representant tout l'espace,
- * dont la base se trouve eventuellement dans "base" (quant ce champ est 
+/* ex-definition d'un systeme de contraintes vide, representant tout l'espace,
+ * dont la base se trouve eventuellement dans "base" (quand ce champ est 
  * alloue); quand la base et la dimension ne sont pas definies, cela
  * represente un espace de dimension quelconque.
  *
@@ -115,27 +115,19 @@ typedef struct Ssysteme {
 /* nombre maximum d'inequations que doit comporter un systeme lineaire
 pour que l'elimination des redondances en nombres REELS s'effectue en un
 temps raisonnable */
-#define NB_INEQ_MAX1 40
+#define NB_INEQ_MAX1 100
 
 /* nombre maximum d'inequations que doit comporter un systeme lineaire
 pour que l'elimination des redondances en nombres ENTIERS s'effectue en
 un temps raisonnable */
-#define NB_INEQ_MAX2 7  
+#define NB_INEQ_MAX2  
 
 /*  Nombre de contraintes au dela duquel l'algorithme du simplexe
-    est preferable a l'algorithme de Fourier-Motzkin: 30
-    (I changed it to 20 for Le Fur polyhedrons, FC Sept 94:-)
+    est preferable a l'algorithme de Fourier-Motzkin: 20
     (However, the average optimal is lower, or another decision
     procedure should be investigated)
 */
 #define NB_CONSTRAINTS_MAX_FOR_FM 20
-
-/* nombre maximum d'inequations que doit comporter un systeme lineaire
-pour que le test de faisabilite en nombres RATIONNELS s'effectue en
-un temps raisonnable */
-#define NB_INEQ_MAX3 150
-
-
 
 /* ensemble de macros permettant de compiler les programmes utilisant
 les anciens noms des fonctions */
@@ -170,10 +162,6 @@ les anciens noms des fonctions */
  sc_integer_projection_along_variables((fsc),(sc),(ib),(pv),(ti),(dim),(n))
 #define integer_projection(sci,sc,v) \
  sc_integer_projection_along_variable((sci),(sc),(v))
-
-
-
-
 
 /* structures D'Arnauld Leservot */
 typedef struct Ssyslist	 {
