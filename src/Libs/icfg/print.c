@@ -61,7 +61,7 @@ string module_name;
     debug(1,"module_to_icfg","===%s===\n",module_name);
     debug(1,"module_to_icfg","===%s===\n",entity_name(mod));
 
-    module_to_icfg(0, mod);
+    print_module_icfg(mod);
 
     debug_off();
 }
