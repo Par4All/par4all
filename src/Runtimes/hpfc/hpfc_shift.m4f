@@ -1,5 +1,5 @@
 c
-c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1994/12/22 16:57:34 $, )
+c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1994/12/22 17:01:13 $, )
 c version $Revision$
 c got on %D%, %T% 
 c
@@ -325,7 +325,7 @@ define(`ALL_SHIFT',`dnl
 GENERIC_SHIFT(1,$1,$2)
 GENERIC_SHIFT(2,$1,$2)
 GENERIC_SHIFT(3,$1,$2)
-c G ENERIC_SHIFT(4,$1,$2)
+GENERIC_SHIFT(4,$1,$2)
 c G ENERIC_SHIFT(5,$1,$2)
 c G ENERIC_SHIFT(6,$1,$2)
 c G ENERIC_SHIFT(7,$1,$2)')dnl
