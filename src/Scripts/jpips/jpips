@@ -1,0 +1,110 @@
+#! /bin/sh
+#
+# $Id$
+#
+# a shell wrapper for "JPips", the java-based pips interface.
+#
+# $Log: jpips,v $
+# Revision 1.1  1998/07/01 16:15:32  coelho
+# Initial revision
+#
+#
+
+usage()
+{
+    cat <<-EOF >&2
+	jpips [-m menu] [-h] [-n]
+	-m menu: the type of menu that should be used \(default: test\)
+	-h: some help
+	-n: no console with jpips
+EOF
+}
+
+error()
+{
+    ret=${1}
+    shift
+    echo "jpips: $@" >&2
+    usage
+    exit ${ret}
+}
+
+unset jpips forward menu_type
+
+while getopts m:h opt
+do
+    case ${opt} in
+	m) menu_type=$OPTARG ;;
+	h) usage ;;
+	n) forward="${forward} -n" ;;
+	*) error 1 "unexpected option ${opt}" ;;
+    esac
+done
+
+shift `expr $OPTIND - 1`
+
+forward="${forward} $@"
+
+java_root=${JAVA_ROOT:-/usr/local/jdk1.2beta3}
+
+zip=jpips.zip
+gif=DownArrow.gif
+men=jpips_menus.${menu_type:-test}
+
+props="-Djava.compiler=sunwjit"
+
+#
+# which jpips.zip file
+
+if [ -f ${zip} ]
+then
+    jpips=${zip}
+else
+    if [ -f ${PIPS_ROOT}/Share/${zip} ]
+    then
+	jpips=${PIPS_ROOT}/Share/${zip}
+    fi
+fi
+
+[ "$jpips" ] || error 2 "cannot find jpips.zip"
+
+#
+# which DownArrow.gif file
+
+if [ -f ${gif} ]
+then
+    props="${props} -Djpips.downarrow=${gif}"
+else
+    if [ -f ${PIPS_ROOT}/Share/${gif} ]
+    then
+	props="${props} -Djpips.downarrow=${PIPS_ROOT}/Share/${gif}"
+    fi
+fi
+
+#
+# which menu
+
+if [ -f ${men} ]
+then
+    props="${props} -Djpips.menus=${men}"
+    unset men
+else
+    if [ -f ${PIPS_ROOT}/Share/${men} ]
+    then
+	props="${props} -Djpips.menus=${PIPS_ROOT}/Share/${men}"
+	unset men
+    fi
+fi
+
+[ ! "${men}" ] || error 3 "menu ${men} not found"
+
+PATH="${JAVA_ROOT:-/usr/local/jdk1.2beta3}/bin:${PATH}"
+
+#
+# now do the job
+
+export CLASSPATH
+
+set -x
+CLASSPATH=${jpips}
+exec java ${props} JPips.JPips ${forward}
