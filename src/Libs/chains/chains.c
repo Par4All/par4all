@@ -931,7 +931,7 @@ int use;
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     module_stat = get_current_module_statement();
     set_current_module_entity(local_name_to_top_level_entity(module_name));
-    set_entity_to_size();
+    /* set_entity_to_size(); should be performed at the workspace level */
 
     debug_on("CHAINS_DEBUG_LEVEL");
    
@@ -972,7 +972,7 @@ int use;
     reset_enclosing_loops_map();
     reset_current_module_statement();
     reset_current_module_entity();
-    reset_entity_to_size();
+    /* reset_entity_to_size(); */
 
     return TRUE;
 }
