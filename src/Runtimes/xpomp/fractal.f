@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/09/04 11:31:36 $, 
+! $Date: 1996/09/04 11:33:34 $, 
 !
       program fractal
 
@@ -79,7 +79,7 @@
 
 !!!fcd$ time
 ! Compute a fractal image:
-!hpf$ independent, new(cr,ci,zr,zi,d,zrp)
+!hpf$ independent, new(cr,ci,zr,zi,d,zrp,k)
       do y = 0, y_size - 1      
          ci = ycenter + (y - y_size/2)*zoom/y_size
 !hpf$    independent
