@@ -193,7 +193,7 @@ update_options()
          xv_set(special_prop_m,
                 MENU_DEFAULT_ITEM, special_prop_mi,
                 NULL);
-         debug(1, "update_options", 
+         debug(2, "update_options", 
                "Rule `%s' selected to produce resource `%s'\n",
                phase_alias_n, res_alias_n);
       }
@@ -216,7 +216,7 @@ update_options()
 
                if (verbose_update_options)
                   user_log("Options: phase %s set on.\n", phase_alias_n);
-               debug(1, "update_options", 
+               debug(2, "update_options", 
                      "Rule `%s' selected to produce resource `%s'\n",
                      phase_alias_n, res_alias_n);
             }
