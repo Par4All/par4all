@@ -75,7 +75,7 @@ prettyprint_dependence_graph(FILE * fd,
     bool sru_format_p = get_bool_property("PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT");
     persistant_statement_to_int s_to_l = persistant_statement_to_int_undefined;
     int dl = -1;
-    printf("I AM HERE");
+    printf("I AM HERE OUT");
 
     debug_on("RICEDG_DEBUG_LEVEL");
 
@@ -160,6 +160,7 @@ prettyprint_dependence_graph(FILE * fd,
 
 		if(conflict_cone(c) != cone_undefined){
 		    if(sru_format_p && !statement_undefined_p(mod_stat)) {
+		      printf("I AM HERE IN");
 			fprintf(fd, " levels(");
 			MAPL(pl, {
 			    fprintf(fd, pl==cone_levels(conflict_cone(c))? "%d" : ",%d",
