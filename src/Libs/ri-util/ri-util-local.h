@@ -322,5 +322,13 @@ entity get_ith_##lname##_prime(int i)\
  */
 #define FCD_IGNORE_PREFIX	"HPFC_IGNORE_FCD_"
 
+
+#define ENTITY_FOUR_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
+                                     ENTITY_MINUS_P(e) || \
+				     ENTITY_UNARY_MINUS_P(e) || \
+                                     ENTITY_MULTIPLY_P(e) || \
+                                     ENTITY_DIVIDE_P(e) )
+
+
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
