@@ -28,7 +28,9 @@
 \begin{document}
 \maketitle
 \sloppy
-
+\newpage
+\tableofcontents
+\newpage
 \section*{Introduction}
 
 This document contains the high-level description of data structures
@@ -1167,7 +1169,7 @@ such as \verb|comment|, etc. on it. See~\ref{}
 \label{subsubsection-unstructured}
 \index{Unstructured}\index{HCFG}\index{Control Flow Graph}\index{GO TO}
 
-\domain{Unstructured = control x exit:control}
+\domain{Unstructured = entry:control x exit:control}
 {}
 
 Domain \verb/unstructured/ is used to represent unstructured parts of
