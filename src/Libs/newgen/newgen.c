@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1995/06/28 11:03:57 $, ) version $Revision$, got on %D%, %T% [%P%].
+        Copyright (c) - École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+static char vcid[] = "%A% ($Date: 1995/06/28 11:03:57 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
 #include <stdio.h>
 
 #include "genC.h"
@@ -18,6 +24,7 @@
 #include "hpf_private.h"
 #include "message.h"
 #include "paf_ri.h"
+#include "word_attachment.h"
 
 void initialize_newgen()
 {
