@@ -30,6 +30,8 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
   user_warning(__FUNCTION__, format, ##args)
 #define pips_user_error(format, args...)\
   user_error(__FUNCTION__, format, ##args)
+#define pips_user_irrecoverable_error(format, args...)\
+  user_irrecoverable_error(__FUNCTION__, format, ##args)
 #define pips_internal_error(format, args...)\
   pips_error(__FUNCTION__, "(%s:%d) " format, __FILE__ , __LINE__ , ##args)
 #define pips_assert(what, predicate)\
@@ -55,6 +57,7 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 #define pips_debug pips_debug_function
 #define pips_user_warning pips_user_warning_function
 #define pips_user_error pips_user_error_function
+#define pips_user_irrecoverable_error user_irrecoverable_error_function
 #define pips_internal_error pips_internal_error_function
 #define pips_assert(what, predicate)\
 { if(!(predicate)){\
