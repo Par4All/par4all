@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/12/27 15:37:33 $, )
+# ($Date: 1997/01/16 18:27:24 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -152,9 +152,6 @@ PVM_GLIB	=
 # LIBS_DIR	+= -L/usr/lpp/ssp/css/libus
 LIBS_DIR	+= -L/usr/lpp/ssp/css/libip
 COMMON_LIBS	+= -lmpci -bI:$(pvmlib)/pvm3e.exp
-#
-# LoadLeveller...
-$(TARGET).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(TARGET)
 endif
 
 ifdef MIMD
@@ -181,7 +178,15 @@ pvmlib	= .
 # cannot strip MPP executables?
 #
 STRIP	= :
+#
+# QSUB...
+#
+all:	$(TARGET).qsub
 endif
+
+# LoadLeveller...
+$(TARGET).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(TARGET)
+$(TARGET).qsub:; $(RT_DIR)/hpfc_qsub $(TARGET) > $@
 
 RUNTIME_LIBS	+= -lhpfcruntime
 
