@@ -330,7 +330,7 @@ void db_checkpoint_workspace(void)
     if (db_resource_p(DBR_ENTITIES, "")) 
 	(void) db_get_memory_resource(DBR_ENTITIES, "", TRUE);
 
-    ifdebug(1) dump_all_db_resource_status(stderr);
+    ifdebug(1) dump_all_db_resource_status(stderr, "db_checkpoint_workspace");
     debug_off();
 }
 
