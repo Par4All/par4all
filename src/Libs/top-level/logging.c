@@ -45,10 +45,15 @@ open_log_file()
 }
 
 
+FILE * get_log_file()
+{
+    return log_file;
+}
+
 void
 log_on_file(char chaine[])
 {
-   if (log_file != NULL && get_bool_property("USER_LOG_P") == TRUE) {
+   if (log_file != NULL /* && get_bool_property("USER_LOG_P") == TRUE */) {
       if (fprintf(log_file, "%s", chaine) <= 0) {
          perror("log_on_file");
          abort();
