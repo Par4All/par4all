@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.43  1997/04/15 15:28:37  creusil
+ * statement_effects used for proper effects. bc.
+ *
  * Revision 1.42  1997/03/20 10:14:41  coelho
  * better RCS headers.
  *
@@ -917,7 +920,7 @@ simple_switch_old_to_new(statement s)
     /* whether the array may be written...
      * (caution, was just switched to the new_variable!)
      */
-    if (!array_modified && !statement_proper_effects_undefined_p(s))
+    if (!array_modified && bound_proper_rw_effects_p(s))
     {
 	MAP(EFFECT, e,
 	    {
@@ -928,7 +931,7 @@ simple_switch_old_to_new(statement s)
 		    return;
 		}
 	    },
-	    load_statement_proper_effects(s));
+	    load_proper_rw_effects_list(s));
     }
 }
 
