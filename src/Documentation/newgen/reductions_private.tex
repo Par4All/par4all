@@ -1,5 +1,5 @@
 %% $RCSfile: reductions_private.tex,v $ (version $Revision$)
-%% $Date: 1996/06/15 10:59:29 $, 
+%% $Date: 1996/06/15 11:07:07 $, 
 %%
 
 \documentclass{article}
@@ -9,8 +9,6 @@
 
 \begin{document}
 \maketitle
-
-
 
 \section{Imported domains}
 \label{sec:import}
@@ -26,7 +24,7 @@ Current operators are stored directly.
 We could add user defined operators if required.
 None is used to mark dead reductions. 
 
-\domain{reduction_operator = \{ none , min , max , sum , prod , and , or \}}
+\domain{reduction\_operator = \{ none , min , max , sum , prod , and , or \}}
 
 
 \section{Reduction}
@@ -51,11 +49,11 @@ List of reductions are separated.
 Function from statement to reductions to be used for proper and cumulated
 reductions. 
 
-\domain{statement_reductions = statement -> reductions}
+\domain{statement\_reductions = statement->reductions}
 
 Function from entity to reductions to be used to store callees'
 reductions. 
 
-\domain{entity_reductions = entity -> reductions}
+\domain{entity\_reductions = entity->reductions}
 
 \end{document}
