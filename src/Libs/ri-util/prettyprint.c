@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/02/28 09:19:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/03/21 15:56:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/02/28 09:19:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/03/21 15:56:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -354,7 +354,7 @@ list ldecl;
     bool print_commons = get_bool_property("PRETTYPRINT_COMMONS"),
          from_hpfc = get_bool_property("PRETTYPRINT_HPFC");
     text r = text_undefined;
-    list before = NIL, after_before = NIL,
+    list before = NIL, after_before = NIL, ph = NIL,
 	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, pc = NIL, ps = NIL;
 
     MAP(ENTITY, e,
@@ -417,8 +417,18 @@ list ldecl;
 	     switch (basic_tag(b)) 
 	     {
 	     case is_basic_int:
-		 pi = CHAIN_SWORD(pi, pi==NIL ? "INTEGER " : ",");
-		 pi = gen_nconc(pi, words_declaration(e, !from_hpfc)); 
+		 /* simple integers are moved ahead...
+		  */
+		 if (variable_dimensions(type_variable(te)))
+		 {
+		     pi = CHAIN_SWORD(pi, pi==NIL ? "INTEGER " : ",");
+		     pi = gen_nconc(pi, words_declaration(e, !from_hpfc)); 
+		 }
+		 else
+		 {
+		     ph = CHAIN_SWORD(ph, ph==NIL ? "INTEGER " : ",");
+		     ph = gen_nconc(ph, words_declaration(e, !from_hpfc)); 
+		 }
 		 break;
 	     case is_basic_float:
 		 switch (basic_float(b))
@@ -459,6 +469,7 @@ list ldecl;
 
     r = make_text(gen_nconc(before, after_before));
 
+    ADD_WORD_LIST_TO_TEXT(r, ph);
     ADD_WORD_LIST_TO_TEXT(r, pi);
     ADD_WORD_LIST_TO_TEXT(r, pf4);
     ADD_WORD_LIST_TO_TEXT(r, pf8);
