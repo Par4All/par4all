@@ -2,7 +2,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <values.h>
+/* #include <values.h> */
+#include <limits.h>
 
 #include "genC.h"
 #include "constants.h"
