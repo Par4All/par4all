@@ -80,7 +80,7 @@ complexity clower, cupper;
 		(UNKNOWN_RANGE_NAME,
 		 get_current_module_entity(),
 		 MakeBasic(is_basic_int));
-	    ppsum = make_polynome(1.0, (Variable) ur, 1);
+	    ppsum = make_polynome(1.0, (Variable) ur, VALUE_ONE);
 	    cresult = polynome_to_new_complexity(ppsum); /*stats*/
 	    complexity_mult(&cresult, comp);
 	    
@@ -190,7 +190,7 @@ complexity make_single_var_complexity(f, var)
 float f;
 Variable var;
 {
-    Ppolynome pp = make_polynome(f, var, 1);
+    Ppolynome pp = make_polynome(f, var, VALUE_ONE);
     complexity comp = polynome_to_new_complexity(pp);
     polynome_rm(&pp);
     return(comp);
@@ -442,14 +442,16 @@ float f;
 {
     if ( COMPLEXITY_UNDEFINED_P(*pcomp) ) 
 	pips_error("complexity_float_add", "complexity undefined");
-
-    if ( complexity_zero_p(*pcomp) ) {
-	Ppolynome ppnew = make_polynome(f, TCST, 1);
+    
+    if ( complexity_zero_p(*pcomp) ) 
+    {
+	Ppolynome ppnew = make_polynome(f, TCST, VALUE_ONE);
 	*pcomp = polynome_to_new_complexity(ppnew);
 	polynome_rm(&ppnew);
     }
     else 
-	complexity_eval(*pcomp) = polynome_scalar_addition(complexity_eval(*pcomp), f);
+	complexity_eval(*pcomp) = 
+	    polynome_scalar_addition(complexity_eval(*pcomp), f);
 }
 
 
