@@ -27,6 +27,11 @@
 #define VECTEUR 1006	/* constante associee a un vecteur	*/
 #endif
 
+/* arithmetique is a requirement for vecteur, but I do not want
+ * to inforce it in all pips files... thus here it is
+ */
+#include "arithmetique.h" 
+
 /* le type des variables (ou coordonnees) dans les vecteurs */
 typedef char * Variable;
 
