@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/05 14:25:43 $, 
+ * $Date: 1996/08/05 15:35:31 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -57,6 +57,14 @@ static int NB_INEQ = 0;
 #define DEBUG2(code) code
 #endif
 
+#ifndef DEBUG3
+#define DEBUG3(code)
+#else 
+#undef DEBUG3
+#define DEBUG3(code) code
+#endif
+
+
 /*************************************************************** CONSTANTS */
 #define PTR_NIL ((char*)0xdeadbeef)
 #define INFINI VALUE_MAX
@@ -85,25 +93,6 @@ static int NB_INEQ = 0;
 /* maybe most of them should be functions?
  */
 
-/* SIMPL normalizes rational a/b (b<>0):
- *   divides by gcd(a,b) and returns with b>0
- * note that there should be no arithmetic exceptions within this macro:
- * (well, only uminus may have trouble for VALUE_MIN...)
- */
-#define SIMPL(a,b) 						\
-{tag("SIMPL")							\
-    if (value_notone_p(a) && value_notone_p(b))			\
-    {								\
-	Value i=a, j=b, k;					\
-	while (value_notzero_p(k=value_mod(i,j)))		\
-	{							\
-	    i=j, j=k, value_division(a,k), value_division(b,k);	\
-	}							\
-	if (value_neg_p(b))					\
-	    value_oppose(a), value_oppose(b);			\
-    }								\
-}
-
 /* G computes j=gcd(a,b) assuming b>0 and better with a>b.
  * there can be no artihmetic errors.
  */
@@ -126,6 +115,26 @@ static int NB_INEQ = 0;
       { G(j,a,b); } 				\
     else 					\
       { G(j,b,a); }				\
+}
+
+/* SIMPL normalizes rational a/b (b<>0):
+ *   divides by gcd(a,b) and returns with b>0
+ * note that there should be no arithmetic exceptions within this macro:
+ * (well, only uminus may have trouble for VALUE_MIN...)
+ */
+#define SIMPL(a,b) 							 \
+{tag("SIMPL")								 \
+     if (value_zero_p(a)) b=VALUE_ONE; 					 \
+     else								 \
+	 if (value_notone_p(a) && value_notone_p(b))			 \
+	 {								 \
+	     Value i=a, j=b, k;						 \
+	     while (value_notzero_p(k=value_mod(i,j)))			 \
+		 i=j, j=k;						 \
+	     value_division(a,j), value_division(b,j);			 \
+	     if (value_neg_p(b))					 \
+		 value_oppose(a), value_oppose(b);			 \
+	 }								 \
 }
 
 /* SIMPLIFIE normalizes fraction f
@@ -196,6 +205,7 @@ static int NB_INEQ = 0;
  */
 #define SUB_MACRO(X,A,B,mult)						      \
 { tag("SUB_MACRO")							      \
+    DEBUG3(fprintf(stdout, "sub on: ");	printfrac(A); printfrac(B));	      \
     if (value_zero_p(A.num))						      \
 	X.num = value_uminus(B.num),					      \
 	X.den = B.den;							      \
@@ -212,15 +222,16 @@ static int NB_INEQ = 0;
     {									      \
 	Value ad=A.den, bd=B.den, gd, v;				      \
 	GCD(gd,ad,bd);							      \
+      DEBUG3(fprint_string_Value(stdout," ! ",gd));\
 	if (value_notone_p(gd)) value_division(ad,gd), value_division(bd,gd); \
         X.num = mult(A.num,bd);						      \
         v = mult(B.num,ad);						      \
 	value_substract(X.num,v);					      \
 	X.den = mult(ad,bd);						      \
-	SIMPLIFIE(X);							      \
-	SIMPL(X.num,gd);						      \
 	X.den = mult(X.den,gd);						      \
+	SIMPLIFIE(X);							      \
     }									      \
+    DEBUG3(fprintf(stdout, " = "); printfrac(X); fprintf(stdout, "\n"));      \
 }
 
 #define pivot_debug_macro(what)						\
@@ -267,17 +278,17 @@ static int NB_INEQ = 0;
 /* computes X = A - B*C/D, with a swtich to use SIOUX or DIRECT
  * thae rationale for the actual condition is quite fuzzy.
  */
-#define FULL_PIVOT_MACRO(X,A,B,C,D,mult)		\
-{ tag("FULL_PIVOT")					\
-    if (direct_p(A.den) && direct_p(B.den) &&		\
-	direct_p(C.den) && direct_p(D.num))		\
-    {							\
-	FULL_PIVOT_MACRO_DIRECT(X,A,B,C,D,mult);	\
-    }							\
-    else						\
-    {							\
-	FULL_PIVOT_MACRO_SIOUX(X,A,B,C,D,mult);		\
-    }							\
+#define FULL_PIVOT_MACRO(X,A,B,C,D,mult)				\
+{ tag("FULL_PIVOT")							\
+    if (direct_p(A.den) && direct_p(B.den) &&				\
+	direct_p(C.den) && direct_p(D.num))				\
+    {									\
+	FULL_PIVOT_MACRO_DIRECT(X,A,B,C,D,mult);			\
+    }									\
+    else								\
+    {									\
+	FULL_PIVOT_MACRO_SIOUX(X,A,B,C,D,mult);				\
+    }									\
 } 
 
 /* idem if A==0
@@ -319,6 +330,8 @@ static int NB_INEQ = 0;
  */
 #define PIVOT_MACRO(X,A,B,C,D,mult)					      \
 {									      \
+    DEBUG2(fprintf(stdout, "pivot on: ");				      \
+	   printfrac(A); printfrac(B); printfrac(C); printfrac(D));	      \
    if (value_zero_p(A.num))/* a==0? */					      \
    {									      \
        if (value_zero_p(B.num) || value_zero_p(C.num) || value_zero_p(D.den)) \
@@ -340,6 +353,7 @@ static int NB_INEQ = 0;
 	  }								      \
 	  else /* well, we must compute the full formula! */		      \
 	      { FULL_PIVOT_MACRO(X,A,B,C,D,mult);}			      \
+    DEBUG2(fprintf(stdout, " = "); printfrac(X); fprintf(stdout, "\n"));      \
 }
 
 /* multiplies two Values of no arithmetic overflow, or throw exception.
@@ -1057,6 +1071,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 			AFF(min1,rapport1) ;
 			AFF(min2,rapport2) ;
 			AFF(pivot,t[jj].colonne[i]) ;
+			SIMPLIFIE(pivot);
 			ii=t[jj].colonne[i].numero ;
 		    }
 		} /* POSITIF(t[jj].colonne[i])) */
