@@ -34,26 +34,14 @@ typedef struct
   get_text_function get_text;
 } icfgpe_print_stuff, * p_icfgpe_print_stuff;
 
-static list lp = NIL;
+static p_icfgpe_print_stuff ips = NULL;
 
-
-static
-void reset_icfgpe_print()
+void create_ips(string resource_name, get_text_function gt, string module_name)
 {
-  gen_map(free, lp);
-  gen_free_list(lp);
-  lp = NIL;
-}
-
-static
-void add_a_icfgpe_print(string resource_name, get_text_function gt)
-{
-  p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff)malloc(sizeof(icfgpe_print_stuff));
+  ips = (p_icfgpe_print_stuff)malloc(sizeof(icfgpe_print_stuff));
   ips->name = resource_name;
-  ips->resource = gen_chunk_undefined;
+  ips->resource = (gen_chunk*) db_get_memory_resource(ips->name, module_name, TRUE);
   ips->get_text = gt;
-  
-  lp = CONS(STRING, (char *)ips, lp);
 }
 
 static list
@@ -69,7 +57,6 @@ list /* of effect */ effects_filter(list l_effs, entity e_flt)
     action ac = effect_action(eff);
     reference ref = effect_reference(eff);
     entity ent = reference_variable(ref);
-    fprintf(stderr, entity_local_name(ent));
     if (entity_conflict_p(e_flt, ent) && !action_read_p(ac))
       l_flt = CONS(EFFECT, eff, l_flt);
   }, l_effs);
@@ -77,7 +64,7 @@ list /* of effect */ effects_filter(list l_effs, entity e_flt)
 }
 
 static text
-resource_text_flt(entity module, int margin, statement stat, p_icfgpe_print_stuff ips)
+resource_text_flt(entity module, int margin, statement stat)
 {
   list l_eff = load_list_icfg(ips->resource, stat);
   entity e_flt = global_name_to_entity("MAIN", "KMAX");
@@ -86,48 +73,6 @@ resource_text_flt(entity module, int margin, statement stat, p_icfgpe_print_stuf
   gen_free_list(l_eff_flt);
   return l_eff_text;
 }
-
-static text text_statement_any_effect_type_flt(entity module, int margin, statement stat)
-{
-  text result = make_text(NIL);
-  MAPL(l, {
-    p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff) STRING(CAR(l));
-    MERGE_TEXTS(result, resource_text_flt(module, margin, stat, ips));
-  }, lp);
-  return result;
-}
-
-static void
-load_resources_icfg(string module_name)
-{
-  MAPL(l, {
-    p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff) STRING(CAR(l));
-    ips->resource = (gen_chunk*) db_get_memory_resource(ips->name, module_name, TRUE);
-  }, lp);
-}
-
-/*text text_statement_flt(entity module, int margin, statement stmt)
-{
-  instruction i = statement_instruction(stmt);
-  text r = make_text(NIL);
-  text temp;
-  string label = entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
-  if (same_string_p(label, RETURN_LABEL_NAME))
-    temp = make_text(NIL);
-  else
-    temp = text_instruction(module, label, margin, i, statement_number(stmt));
-  if (!ENDP(text_sentences(temp))) {
-    text t = init_text_statement(module, margin, stmt);
-    if (!ENDP(text_sentences(t))) {
-      MERGE_TEXTS(r, t);
-      MERGE_TEXTS(r, temp);
-    } else {
-      MERGE_TEXTS(r, temp);
-    }
-  } else
-    free_text(temp);
-  return r;
-}*/
 
 static text get_any_effects_text_flt(string module_name)
 {
@@ -145,13 +90,9 @@ static text get_any_effects_text_flt(string module_name)
   set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name, TRUE));
   module_stat = get_current_module_statement();
   
-  /* resources to be printed...
-   */
-  load_resources_icfg(module_name);
-  
   debug_on("EFFECTS_DEBUG_LEVEL");
   
-  init_prettyprint(text_statement_any_effect_type_flt);
+  init_prettyprint(resource_text_flt);
 
   MERGE_TEXTS(txt, text_statement(module, 0, module_stat));
   
@@ -168,9 +109,10 @@ static text get_any_effects_text_flt(string module_name)
 text get_any_effect_type_text_flt(string module_name, string resource_name)
 {
   text txt;
-  add_a_icfgpe_print(resource_name, effects_to_text_func);
+  create_ips(resource_name, effects_to_text_func, module_name);
   txt = get_any_effects_text_flt(module_name);
-  reset_icfgpe_print();
+  free(ips);
+  ips = NULL;
   return txt;
 }
 
@@ -182,3 +124,7 @@ text get_text_proper_effects_flt(string module_name)
   reset_methods_for_effects_prettyprint(module_name);
   return t;
 }
+
+
+
+
