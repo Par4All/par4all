@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: print.c,v $
+ * Revision 1.22  1998/04/14 21:23:57  coelho
+ * linear.h
+ *
  * Revision 1.21  1997/12/10 12:17:23  coelho
  * working free_text().
  *
@@ -23,6 +26,7 @@
 #include <string.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "text.h"
 #include "database.h"
