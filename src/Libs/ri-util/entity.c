@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.38  1998/11/05 09:28:45  zory
+ * EOLE tags for automatic function extraction added
+ *
  * Revision 1.37  1998/10/09 11:31:18  irigoin
  * common_members_of_module() updated because of the new heap area. RCS
  * fields added.
@@ -148,6 +151,10 @@ char *module_name;
 /* predicates and functions for entities 
  */
 
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
 /* entity_local_name modified so that it does not core when used in
  * vect_fprint, since someone thought that it was pertinent to remove the
  * special care of constants there. So I added something here, to deal
@@ -160,6 +167,8 @@ entity_local_name(entity e)
     pips_assert("entity is defined", !entity_undefined_p(e));
     return e==NULL ? null_name : local_name(entity_name(e));
 }
+
+/* END_EOLE */
 
 string 
 module_local_name(entity e)
@@ -597,11 +606,17 @@ MakeConstantLitteral(void)
     return(make_constant(is_constant_litteral, NIL));
 }
 
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
 storage 
 MakeStorageRom(void)
 {
     return((make_storage(is_storage_rom, UU)));
 }
+
+/* END_EOLE */
 
 value 
 MakeValueUnknown(void)
