@@ -376,10 +376,6 @@ complexity *pcomp1, comp2;
 void complexity_div(pcomp1, comp2)
 complexity *pcomp1, comp2;
 {
-/*
-    char *(*variable_name)();
-    boolean (*is_inferior_var)();
-*/
     if ( COMPLEXITY_UNDEFINED_P(comp2) || COMPLEXITY_UNDEFINED_P(*pcomp1) )
 	pips_error("complexity_div", "complexity undefined");
 
