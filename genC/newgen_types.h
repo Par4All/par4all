@@ -18,7 +18,7 @@
 #ifndef TYPES_INCLUDED
 #define TYPES_INCLUDED
 
-/* -- types.h
+/* -- $RCSfile: newgen_types.h,v $ (version $Revision$)
 
    The implementation of the basic types UNIT, BOOL, TAG and STRING. The
    others CHAR, INT and FLOAT are provided by C. 
@@ -68,7 +68,14 @@ struct gen_binding {
 #ifdef __STRICT_ANSI__
 #define GEN_PROTO(x) x
 #else
+#ifdef __STDC__
+#define GEN_PROTO(x) x
+#else
 #define GEN_PROTO(x) ()
-#endif
+#endif /* __STDC__ */
+#endif /* __STRICT_ANSI__ */
 
-#endif
+#endif /* file */
+
+/*  end of $RCSfile: newgen_types.h,v $
+ */
