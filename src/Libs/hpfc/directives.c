@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/09/04 18:10:02 $, )
+ * ($Date: 1995/09/08 13:58:20 $, )
  */
 
 #include "defines-local.h"
@@ -119,10 +119,17 @@ bool fcd_directive_p(entity f)
 /* whether an entity must be kept in the code.
  * if so, a maybe fake source code must be supplied, 
  * and the directive will be kept in the callee list.
+ * not kept if some property tells not to...
  */
 bool keep_directive_in_code_p(string s)
 {
-    return fcd_directive_string_p(s);
+    return fcd_directive_string_p(s) &&
+	!(same_string_p(s, HPF_PREFIX SYNCHRO_SUFFIX) && 
+	  get_bool_property(FCD_IGNORE_PREFIX "SYNCHRO")) &&
+	!(same_string_p(s, HPF_PREFIX TIMEON_SUFFIX) &&
+	  get_bool_property(FCD_IGNORE_PREFIX "TIME")) &&
+	!(same_string_p(s, HPF_PREFIX TIMEOFF_SUFFIX) &&
+	  get_bool_property(FCD_IGNORE_PREFIX "TIME")) ;
 }
 
 /* management of PROCESSORS and TEMPLATE directives.
