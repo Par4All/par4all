@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/08/22 14:32:03 $, 
+# $Date: 1996/08/22 14:32:24 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -139,7 +139,7 @@ done
 
 [ "$HPFFILES" ] || usage 2
 [ "$MODULE" ] || MODULE=`default_module $HPFFILES`
-[ "$WORKSPACE" ] || WORKSPACE=`echo $MODULE | tr 'A-Z' 'a-z'`
+[ "$WORKSPACE" ] || WORKSPACE=`echo $MODULE | tr '[A-Z]' '[a-z]'`
 
 #
 # special file that contains FC special fake subroutines...
