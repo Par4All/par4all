@@ -134,40 +134,55 @@ cons * args;
 
 
 
+static string (*transformer_variable_name)(entity) = NULL;
+
+/* The strange argument type is required by qsort(), deep down in the calls */
+static int is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+{
+    /* The constant term is given the highest weight to push constant
+       terms at the end of the constraints and to make those easy
+       to compare. If not, constant 0 will be handled differently from
+       other constants. However, it would be nice to give constant terms
+       the lowest weight to print simple constraints first...
+
+       Either I define two comparison functions, or I cheat somewhere else.
+       Let's cheat? */
+    int is_equal = 0;
+    
+    if (term_cst(*pvarval1) && !term_cst(*pvarval2))
+	is_equal = 1;
+    else if (term_cst(*pvarval1) && term_cst(*pvarval2))
+	is_equal = 0;
+    else if(term_cst(*pvarval2))
+	is_equal = -1;
+    else
+	is_equal = 
+	    strcmp(transformer_variable_name((entity) vecteur_var(*pvarval1)),
+		   transformer_variable_name((entity) vecteur_var(*pvarval2)));
+
+
+    return is_equal; 
+}
+
 
 
 string relation_to_string(s, ps, variable_name)
 string s;
 Psysteme ps;
-char * (*variable_name)();
+char * (*variable_name)(entity);
 {
     Pcontrainte peq;
     boolean a_la_fortran = get_bool_property("PRETTYPRINT_FOR_FORESYS");
     
+    transformer_variable_name = variable_name;
+
     if (ps != NULL) {
 	bool first = TRUE;
 
+	sc_lexicographic_sort(ps, is_inferior_pvarval);
+
 	if (!a_la_fortran)
 	    (void) strcat(s, "{");
-
-	for (peq = ps->inegalites;peq!=NULL; peq=peq->succ) {
-	    if(first)
-		first = FALSE;
-	    else
-		switch (a_la_fortran) {
-		case FALSE :
-		    (void) sprintf(s+strlen(s),", ");
-		    break;
-		case TRUE : 
-		    (void) sprintf(s+strlen(s),".AND.");
-		    break;
-		}
-	    if (a_la_fortran)
-		(void) sprintf(s+strlen(s),"(");
-	    inegalite_sprint_format(s,peq,variable_name, a_la_fortran);
-	    if (a_la_fortran)
-		(void) sprintf(s+strlen(s),")");
-	}
 
 	for (peq = ps->egalites;peq!=NULL; peq=peq->succ) {
 	    if(first)
@@ -188,11 +203,32 @@ char * (*variable_name)();
 		(void) sprintf(s+strlen(s),")");
 	}
 
+	for (peq = ps->inegalites;peq!=NULL; peq=peq->succ) {
+	    if(first)
+		first = FALSE;
+	    else
+		switch (a_la_fortran) {
+		case FALSE :
+		    (void) sprintf(s+strlen(s),", ");
+		    break;
+		case TRUE : 
+		    (void) sprintf(s+strlen(s),".AND.");
+		    break;
+		}
+	    if (a_la_fortran)
+		(void) sprintf(s+strlen(s),"(");
+	    inegalite_sprint_format(s,peq,variable_name, a_la_fortran);
+	    if (a_la_fortran)
+		(void) sprintf(s+strlen(s),")");
+	}
+
 	if (!a_la_fortran)
 	    (void) strcat(s,"}");
     }
     else
 	(void) strcat(s,"SC_UNDEFINED");
+    
+    transformer_variable_name = NULL;
 
     return s;
 }
@@ -200,10 +236,12 @@ char * (*variable_name)();
 char * pips_user_value_name(e)
 entity e;
 {
-    if(e == (entity) TCST)
-	
+    if(e == (entity) TCST) {
 	return "";
-    else
+    }
+    else {
+	(void) gen_check(e, entity_domain);
 	return entity_has_values_p(e)? entity_minimal_name(e) :
 	    external_value_name(e);
+    }
 }
