@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.120  1997/05/23 12:42:01  coelho
+# *** empty log message ***
+#
 # Revision 1.119  1997/05/23 11:58:39  coelho
 # *** empty log message ***
 #
@@ -152,7 +155,7 @@ PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
 # redefine this variable if you wish to change the default path or the name...
 # PIPS_MAKE='gmake'
 
-# PIPS_DIRECTORY_FOR_BINARIES
+# PIPS_DIRECTORY_FOR_xxx_BINARIES
 # where to put binaries (maybe on some other disk...)
 # default is directly in a subdirectory
 
@@ -160,15 +163,6 @@ PIPS_DIRECTORY_FOR_LINUXI86_BINARIES=/usr/local/misc/pips/LINUXI86
 PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/usr/local/misc/pips/LINUXI86LL
 PIPS_DIRECTORY_FOR_GNUSOL2LL_BINARIES=/home/recanati/baraque1/pips/GNUSOL2LL
 PIPS_DIRECTORY_FOR_SOL2LL_BINARIES=/home/recanati/baraque1/pips/SOL2LL
-
-test "${PIPS_ARCH}" = LINUXI86 && \
-	PIPS_DIRECTORY_FOR_BINARIES=/usr/local/misc/pips/LINUXI86
-
-test "${PIPS_ARCH}" = GNUSOL2LL && \
-	PIPS_DIRECTORY_FOR_BINARIES=/home/recanati/baraque1/pips/GNUSOL2LL
-
-test "${PIPS_ARCH}" = SOL2LL && \
-	PIPS_DIRECTORY_FOR_BINARIES=/home/recanati/baraque1/pips/SOL2LL
 
 ############################################################ DEVELOPPING PIPS
 
