@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.112  1997/05/14 13:14:41  coelho
+# *** empty log message ***
+#
 # Revision 1.111  1997/05/14 12:36:58  coelho
 # *** empty log message ***
 #
@@ -182,6 +185,9 @@ test "${PIPS_ARCH}" = LINUXI86 -o "${PIPS_ARCH}" = LINUXI86LL && \
 
 test ${uname_s} = Linux && \
 	PIPS_PING="ping -c 1"
+
+test ${uname_s} = Linux && \
+	PIPS_FLINT="g77 -c -Wall -Wimplicit"
 
 #
 #         #    #  #####      #    #####    ####
