@@ -1,7 +1,8 @@
 #! /bin/sh
+# for debug, try:
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 15:27:14 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 16:51:23 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -50,11 +51,11 @@ do
     p)	DIRTYPE='Passes' ;;
     s)  DIRTYPE='Scripts' ;;
     r)  DIRTYPE='Runtime' ;;
-    D)	DIRSIDE="$DEVEDIR" ;;
-    P)	DIRSIDE="$PRODDIR/Src" ;;
+    D)	DIRSIDE="$PIPS_DEVEDIR" ;;
+    P)	DIRSIDE="$PIPS_SRCDIR" ;;
     c)	DIRS='.';;
     a)	ALL='1' ;;
-    h)  help ;;
+    h)  help ; exit 0 ;
     *)	usage 2 "invalid option ($opt)" ;;
   esac
 done
@@ -85,21 +86,21 @@ current_directory=`pwd`
 # install_lib_dir for library files
 # install_exe_dir for executable files
 
-install_file_dir=$INCLUDEDIR
-install_lib_dir=$LIBDIR
-install_exe_dir=$BINDIR
+install_file_dir=$PIPS_INCLUDEDIR
+install_lib_dir=$PIPS_LIBDIR
+install_exe_dir=$PIPS_BINDIR
 
 case $DIRTYPE in
   Lib) ALL_RULE_TARGET='lib$(TARGET).a' ;;
   Passes) ALL_RULE_TARGET='$(TARGET)' ;;
   Scripts) ALL_RULE_TARGET='.runable' ;
-           install_file_dir=$UTILDIR ;
-           install_lib_dir=$UTILDIR ;
-           install_exe_dir=$UTILDIR ;;
+           install_file_dir=$PIPS_UTILDIR ;
+           install_lib_dir=$PIPS_UTILDIR ;
+           install_exe_dir=$PIPS_UTILDIR ;;
   Runtime) ALL_RULE_TARGET='' ;
-           install_file_dir=$EXTEDIR ;
-           install_exe_dir=$EXTEDIR ;
-           install_lib_dir=$EXTEDIR ;;
+           install_file_dir=$PIPS_EXTEDIR ;
+           install_exe_dir=$PIPS_EXTEDIR ;
+           install_lib_dir=$PIPS_EXTEDIR ;;
   *) usage 5 "unexpected directory type $DIRTYPE"
 esac
 
@@ -176,8 +177,8 @@ LINT=           $(PIPS_LINT)
 LINTFLAGS=      $(PIPS_LINTFLAGS)
 YACC=           $(PIPS_YACC)
 YFLAGS=         $(PIPS_YFLAGS)
-TAR=		gtar
-ZIP=		gzip -v9
+TAR=		$(PIPS_TAR)
+ZIP=		$(PIPS_ZIP)
 # 
 #
 CONFIG_FILE=	${CONFIG_FILE}
@@ -241,7 +242,6 @@ INSTALL_FILE=	$(FILES)
 INSTALL_LIB=
 INSTALL_EXE=	$(SCRIPTS) $(RFILES)
 
-
 all: .runable
 
 .runable: $(SCRIPTS)
@@ -263,7 +263,7 @@ OBJECTS=	$(MAIN).o $(LIB_OBJECTS)
 INCLUDES=	$(LIB_HEADERS)
 SOURCES= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES)
 #
-# TARGETDIR=	$(LIBSRCDIR)/$(TARGET)
+# TARGETDIR=	$(PIPS_LIBSRCDIR)/$(TARGET)
 #
 all: $(LIB_TARGET)
 
@@ -285,9 +285,9 @@ $(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
 	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS)
 	@echo 
 
-$(LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
-	cp $(LIB_TARGET) $(LIBDIR)
-	ranlib $(LIBDIR)/$(LIB_TARGET)
+$(PIPS_LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
+	cp $(LIB_TARGET) $(PIPS_LIBDIR)
+	ranlib $(PIPS_LIBDIR)/$(LIB_TARGET)
 
 clean:
 	-$(RM) TAGS $(OBJECTS) $(INC_TARGET) $(LIB_TARGET) \\
@@ -304,7 +304,7 @@ OBJECTS=	$(TARGET_OBJECTS)
 INCLUDES=	$(TARGET_HEADERS)
 SOURCES= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES)
 #
-TARGETDIR=	$(BINSRCDIR)/$(TARGET)
+# TARGETDIR=	$(PIPS_BINSRCDIR)/$(TARGET)
 #
 INSTALL_TARGETS=	$(INSTALL_FILE) $(INSTALL_LIB) $(INSTALL_EXE)
 
@@ -363,7 +363,7 @@ tar:
 install:  .install
 quick-install: .quick-install
 
-$MAKEFILE: $(CONFIG_FILE) $(UTILDIR)/pips-makemake
+$MAKEFILE: $(CONFIG_FILE) $(PIPS_UTILDIR)/pips-makemake
 	@pips-makemake
 
 %
@@ -373,10 +373,10 @@ $MAKEFILE: $(CONFIG_FILE) $(UTILDIR)/pips-makemake
 
 [ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<%
 #
-$(BINDIR)/$(BIN_TARGET): $(BIN_TARGET) $(BINDIR)
+$(PIPS_BINDIR)/$(BIN_TARGET): $(BIN_TARGET) $(BINDIR)
 	cp $(BIN_TARGET) $(BINDIR)
 
-$(BINDIR):
+$(PIPS_BINDIR):
 	mkdir $(BINDIR)
 
 lint:
@@ -385,7 +385,7 @@ lint:
 
 TAGS: $(INCLUDES) $(CFILES)
 	etags $(INCLUDES) $(CFILES)
-	ctage $(INCLUDES) $(CFILES)
+	ctags $(INCLUDES) $(CFILES)
 
 $(TARGET)-local.h:
 	[ -f $(TARGET)-local.h ] || touch $(TARGET)-local.h
@@ -435,7 +435,7 @@ production-depend: $(DERIVED_HEADERS) $(EXTERN)
 # Supprime le mode silencieux -s :
 #
 [ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] &&
-if [ $DIRSIDE = $DEVEDIR ]
+if [ $DIRSIDE = $PIPS_DEVEDIR ]
 then 
   make -f $MAKEFILE depend
 else
