@@ -53,6 +53,38 @@ void add_a_icfgpe_print(string resource_name, get_text_function gt)
   lp = CONS(STRING, (char *)ips, lp);
 }
 
+static list
+load_list_icfg(statement_effects m, statement s) {
+  return effects_effects(apply_statement_effects(m, s));
+}
+
+list effects_filter(list l_effs, string str_filter)
+{
+  list l_flt = NIL;
+  MAPL(ce, {
+    effect eff = EFFECT(CAR(ce));
+    action ac = effect_action(eff);
+    reference ref = effect_reference(eff);
+    list ls = effect_word_reference(ref);
+    string t = words_to_string(ls);
+    gen_free_string_list(ls);
+    if (same_string_p(t, str_filter) && !action_read_p(ac))
+      l_flt = CONS(EFFECT, eff, l_flt);
+    free(t);
+  }, l_effs);
+  return l_flt;
+}
+
+static text
+resource_text_flt(entity module. int margin, statement stat, p_icfgpe_print_stuff ips)
+{
+  list l_eff = load_list_icfg(ips->resource, stat);
+  list l_eff_flt = effects_filter(l_eff, "KMAX");
+  text l_eff_text = (*(ips->get_text))(l_eff_flt);
+  gen_free_list(l_eff_flt);
+  return l_eff_text;
+}
+
 static text text_statement_any_effect_type_flt(entity module, int margin, statement stat)
 {
   text result = make_text(NIL);
