@@ -190,7 +190,7 @@ bool readonly;
 	       and in presence of arrays we do nothing here */
 	    if(entity_conflict_p(e, eq) && !integer_scalar_entity_p(eq)) {
 		pips_user_warning("Values for variable %s are not analyzed because "
-				  "%s is aliased with non scalar integer variable %s",
+				  "%s is aliased with non scalar integer variable %s\n",
 				  entity_name(e), entity_name(e), entity_name(eq));
 		array_equivalenced = TRUE;
 		break;
