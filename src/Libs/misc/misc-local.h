@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1995/11/17 11:51:37 $, 
+ * $Date: 1995/11/21 09:16:47 $, 
  */
 
 #ifndef _STDARG_H
@@ -20,7 +20,7 @@
 #define debug_on(env) debug_on_function(env, __FUNCTION__, __FILE__, __LINE__)
 #define debug_off() debug_off_function(__FUNCTION__, __FILE__, __LINE__)
 #define pips_debug(level, format, args...)\
- ifdebug(level) fprintf(stderr, "[%s] " format, __FUNCTION__ , ##args);
+ ifdebug(level) fprintf(stderr, "[%s] " format, __FUNCTION__ , ##args)
 #define pips_user_warning(format, args...)\
   user_warning(__FUNCTION__, format, ##args)
 #define pips_user_error(format, args...)\
