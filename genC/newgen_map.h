@@ -18,7 +18,7 @@
 #ifndef MAP_INCLUDED
 #define MAP_INCLUDED
 
-/* $RCSfile: newgen_map.h,v $ ($Date: 1995/03/20 11:17:56 $, ) 
+/* $RCSfile: newgen_map.h,v $ ($Date: 1995/03/20 13:28:58 $, ) 
  * version $Revision$
  * got on %D%, %T%
  *
