@@ -18,6 +18,9 @@
 #include "genC.h"
 #include "misc.h"
 
+/* CATCH/TRY/UNCATCH/THROW stuff is here. */
+#include "linear.h"
+
 /* pips meta information from pipsmake are made available here...
  * (current phase and module...)
  */
