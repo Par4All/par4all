@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/09/25 18:34:21 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/10/02 13:52:29 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -199,17 +199,17 @@ va_list *ap ;
 int gen_check_p ;
 {
     switch( dp->ba.type ) {
-    case ARRAY :
+    case ARRAY_DT :
 	if( (cp->p = va_arg( *ap, gen_chunk * )) == NULL )
 	    cp->p =  init_array( dp ) ;
 	break ;
-    case LIST:
+    case LIST_DT:
 	cp->l = va_arg( *ap, cons * ) ; 
 	break ;
-    case SET:
+    case SET_DT:
 	cp->t = va_arg( *ap, set ) ; 
 	break ;
-    case BASIS:
+    case BASIS_DT:
 	if( IS_INLINABLE( dp->ba.constructand )) {
 	    switch( *dp->ba.constructand->name ) {
 	    case 'u': cp->u = va_arg( *ap, unit ) ; break ;
@@ -308,18 +308,18 @@ gen_alloc(int size, int gen_check_p, int dom, ...)
     data = 1 + IS_TABULATED( bp );
 
     switch( (dp = bp->domain)->ba.type ) {
-    case LIST: 
+    case LIST_DT: 
 	(cp+data)->l = va_arg( ap, cons *) ;
 	break ;
-    case SET: 
+    case SET_DT: 
 	(cp+data)->t = va_arg( ap, set) ;
 	break ;
-    case ARRAY: 
+    case ARRAY_DT: 
 	if( ((cp+data)->p = va_arg( ap, gen_chunk *)) == NULL ) {
 	    (cp+data)->p = init_array( dp ) ;
 	}
 	break ;
-    case CONSTRUCTED:
+    case CONSTRUCTED_DT:
 	gen_alloc_constructed( ap, bp, dp, cp, data, gen_check_p ) ;
 	break ;
     default:
@@ -433,10 +433,10 @@ struct driver *dr ;
     {
 	switch( dp->ba.type ) 
 	{
-	case BASIS: 
+	case BASIS_DT: 
 	    gen_trav_leaf( dp->ba.constructand, obj, dr ) ;
 	    break ;
-	case LIST: 
+	case LIST_DT: 
 	{
 	    cons *p ;
 
@@ -444,14 +444,14 @@ struct driver *dr ;
 		gen_trav_leaf( dp->li.element, &p->car, dr ) ;
 	    break ;
 	}
-	case SET:
+	case SET_DT:
 	    SET_MAP(elt,
 		{
 		    gen_trav_leaf(dp->se.element, (gen_chunk *)&elt, dr);
 		}, 
 		    obj->t) ;
 	    break ;
-	case ARRAY: 
+	case ARRAY_DT: 
 	{
 	    int i ;
 	    int size = array_size(dp->ar.dimensions) ;
@@ -579,12 +579,12 @@ gen_trav_obj( obj, dr )
 
 	switch( dp->ba.type ) 
 	{
-	case LIST: 
-	case SET:
-	case ARRAY:
+	case LIST_DT: 
+	case SET_DT:
+	case ARRAY_DT:
 	    gen_trav_simple(dp, obj+data, dr);
 	    break ;
-	case CONSTRUCTED: 
+	case CONSTRUCTED_DT: 
 	    gen_trav_obj_constructed(obj, bp, dp, data, dr);
 	    break ;
 	default:
@@ -719,9 +719,9 @@ gen_chunk *obj ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
-    case BASIS:
+    case BASIS_DT:
 	return( !dp->ba.persistant ) ;
-    case LIST: {
+    case LIST_DT: {
 	cons *p ;
 
 	if( obj->l == list_undefined ) {
@@ -736,9 +736,9 @@ union domain *dp ;
 	}
         return( !dp->li.persistant ) ;
     }
-    case SET:
+    case SET_DT:
 	return( !dp->se.persistant ) ;
-    case ARRAY:
+    case ARRAY_DT:
 	return( !dp->ar.persistant ) ;
     }
     fatal( "shared_simple_in: unknown type %s\n", itoa( dp->ba.type )) ;
@@ -865,13 +865,13 @@ free_simple_out( obj, dp )
      union domain *dp ;
 {
     switch( dp->ba.type ) {
-    case LIST:
+    case LIST_DT:
 	gen_free_list( obj->l ) ;
 	break ;
-    case SET:
+    case SET_DT:
 	set_free( obj->t ) ;
 	break ;
-    case ARRAY:
+    case ARRAY_DT:
 	free( (char *) obj->p ) ;
 	break ;
     }
@@ -903,7 +903,7 @@ struct driver *dr ;
 	}
 	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = gen_chunk_undefined; 
     }
-    if((dp=bp->domain)->ba.type == CONSTRUCTED && dp->co.op == ARROW_OP) {
+    if((dp=bp->domain)->ba.type == CONSTRUCTED_DT && dp->co.op == ARROW_OP) {
 	hash_table h = (obj+1 + IS_TABULATED( bp ))->h ;
 
 	HASH_MAP( k, v, {
@@ -924,13 +924,13 @@ gen_chunk *obj ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
-    case BASIS:
+    case BASIS_DT:
 	return( !dp->ba.persistant ) ;
-    case LIST:
+    case LIST_DT:
 	return( !dp->li.persistant && obj->l != list_undefined ) ;
-    case SET:
+    case SET_DT:
 	return( !dp->se.persistant && obj->t != set_undefined ) ;
-    case ARRAY:
+    case ARRAY_DT:
 	return( !dp->ar.persistant && obj->p != array_undefined ) ;
     }
     fatal( "persistant_simple_in: unknown type %s\n", itoa( dp->ba.type )) ;
@@ -1048,13 +1048,13 @@ gen_chunk *obj ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
-    case BASIS:
+    case BASIS_DT:
 	return( GO) ;
-    case LIST:
+    case LIST_DT:
 	return( obj->l != list_undefined ) ;
-    case SET:
+    case SET_DT:
 	return( obj->t != set_undefined ) ;
-    case ARRAY:
+    case ARRAY_DT:
 	return( obj->p != array_undefined ) ;
     }
     fatal( "copy_simple_in: unknown type %s\n", itoa( dp->ba.type )) ;
@@ -1178,17 +1178,17 @@ gen_chunk *obj ;
 union domain *dp ;
 {
     switch (dp->ba.type) {
-    case LIST:
+    case LIST_DT:
 	/* spine of the list is duplicated and  hash table copy_table
 	   is updated */
 	copy_hput(copy_table, (char *) (obj->l), 
 		 (char *) gen_copy_list(obj->l, dp));
 	break ;
-    case SET:
+    case SET_DT:
 	copy_hput(copy_table, (char *) (obj->t), 
 		 (char *) gen_copy_set(obj->t, dp));
 	break ;
-    case ARRAY:
+    case ARRAY_DT:
 	/* array  is duplicated and  hash table copy_table is updated */
 	copy_hput(copy_table, (char *)obj->p,
 		 (char *)gen_copy_array(obj->p, dp));
@@ -1200,7 +1200,7 @@ union domain *dp ;
    once all sub-domains have been recursively copied */
 
 #define COPYABLE_DOMAIN(d) \
-( d->ba.type != BASIS || \
+( d->ba.type != BASIS_DT || \
  (!IS_INLINABLE( d->ba.constructand ) && \
   !IS_TABULATED( d->ba.constructand )))
 
@@ -1268,12 +1268,12 @@ struct driver *dr ;
     gen_chunk *new_obj = copy_hsearch(obj) ;
 
     switch( dp->ba.type ) {
-    case LIST: 
-    case SET:
-    case ARRAY:
+    case LIST_DT: 
+    case SET_DT:
+    case ARRAY_DT:
 	(new_obj+data)->p = copy_hsearch((obj+data)->p);
 	break ;
-    case CONSTRUCTED:
+    case CONSTRUCTED_DT:
 	copy_obj_out_constructed( obj, bp, dp, data, new_obj, dr ) ;
 	break ;
     default:
@@ -1485,11 +1485,11 @@ struct driver *dr ;
 	(void) fprintf( user_file, "%d ", abs( (obj+1)->i )) ;
     }
     switch( dp->ba.type ) {
-    case EXTERNAL:
+    case EXTERNAL_DT:
 	fatal( "write_obj_in: Don't know how to write an EXTERNAL: %s\n", 
 	      bp->name ) ;
 	break ;
-    case CONSTRUCTED:
+    case CONSTRUCTED_DT:
 	if( dp->co.op == OR_OP ) {
 	    (void) fprintf( user_file, "%d ", (obj+data)->i ) ;
 	} 
@@ -1514,7 +1514,7 @@ struct driver *dr ;
     union domain *dp = bp->domain ;
 
     switch( dp->ba.type ) {
-    case CONSTRUCTED:
+    case CONSTRUCTED_DT:
 	if( dp->co.op == ARROW_OP ) {
 	    (void) fprintf(user_file, ")") ;
 	}
@@ -1562,7 +1562,7 @@ struct gen_binding *bp ;
     else if( IS_INLINABLE( bp )) {
 	char *format = bp->inlined->C_format ;
 
-	if( strcmp( bp->name, UNIT_TYPE ) == 0 ) 
+	if( strcmp( bp->name, UNIT_TYPE_NAME ) == 0 ) 
 		(void) fprintf( user_file, format ) ;
 	else if( strcmp( bp->name, "bool" ) == 0 )
 		(void) fprintf( user_file, format, obj->b ) ;
@@ -1596,21 +1596,21 @@ gen_chunk *obj ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
-    case LIST:
+    case LIST_DT:
 	if( obj->l == list_undefined ) {
 	    (void) fprintf( user_file, "#]list " ) ;
 	    return( !GO) ;
 	}
 	(void) fprintf( user_file, "(" ) ;
 	break ;
-    case SET:
+    case SET_DT:
 	if( obj->t == set_undefined ) {
 	    (void) fprintf( user_file, "#]set " ) ;
 	    return( !GO) ;
 	}
 	(void) fprintf( user_file, "{ %d ", dp->se.what ) ;
 	break ;
-    case ARRAY:
+    case ARRAY_DT:
 	if( obj->p == array_undefined ) {
 	    (void) fprintf( user_file, "#]array " ) ;
 	    return( !GO) ;
@@ -1651,11 +1651,11 @@ gen_chunk *obj ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
-    case SET:
+    case SET_DT:
 	(void) fprintf( user_file, "}" ) ;
 	break ;
-    case LIST:
-    case ARRAY:
+    case LIST_DT:
+    case ARRAY_DT:
 	(void) fprintf( user_file, ")" ) ;
 	break ;
     }
@@ -1861,7 +1861,7 @@ gen_read_spec(char * spec, ...)
     for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
 	if( bp->name != NULL &&
 	   !IS_INLINABLE( bp ) && !IS_EXTERNAL( bp ) &&
-	   bp->domain->ba.type == IMPORT ) {
+	   bp->domain->ba.type == IMPORT_DT ) {
 	    user( "Cannot run with imported domains: %s\n", bp->name ) ;
 	    return ;
 	}
@@ -1910,7 +1910,7 @@ char *(*copy)() ;
 	struct gen_binding *bp = &Domains[ which ] ;
 	union domain *dp = bp->domain ;
 
-	if( dp->ba.type != EXTERNAL ) {
+	if( dp->ba.type != EXTERNAL_DT ) {
 		user( "gen_init_external: %s isn't external\n", bp->name ) ;
 		return ;
 	}
@@ -2210,7 +2210,7 @@ union domain *dp ;
   cons *p ;
 
   switch( dp->ba.type ) {
-  case LIST:
+  case LIST_DT:
     if( obj->l == list_undefined ) {
       return( !GO) ;
     }
@@ -2283,14 +2283,14 @@ bool
 gen_true(c)
 gen_chunk *c;
 {
-    return(TRUE);
+    return TRUE;
 }
 
 bool
 gen_false(c)
 gen_chunk *c;
 {
-    return(FALSE);
+    return FALSE;
 }
 
 /*
@@ -2423,12 +2423,12 @@ union domain *dp;
 
     switch(dp->ba.type)
     {
-    case EXTERNAL:
+    case EXTERNAL_DT:
 	break; /* obvious: don't go inside externals! */
-    case BASIS:
-    case LIST:
-    case ARRAY:
-    case SET:
+    case BASIS_DT:
+    case LIST_DT:
+    case ARRAY_DT:
+    case SET_DT:
 	if (gen_debug & GEN_DBG_RECURSE)
 	    fprintf(stderr,
 		    " - setting %s (%d) contains %s (%d)\n",
@@ -2436,16 +2436,16 @@ union domain *dp;
 		    dp->se.element->name, dp->se.element-Domains);
 	DirectDomainsTable[dp->se.element-Domains][target] = TRUE;
 	break;
-    case CONSTRUCTED:
+    case CONSTRUCTED_DT:
     {
 	struct domainlist *l=dp->co.components;
 
 	for (; l!=NULL; l=l->cdr)
 	    initialize_domain_DirectDomainsTable(target, l->domain);
     }
-    case IMPORT:
+    case IMPORT_DT:
 	break; /* abort() ? TRUE (safe) ? */
-    case UNDEF:
+    case UNDEF_DT:
 	break; /* nothing is done */
     default: 
 	fprintf(stderr, "newgen: unexpected domain type (%d)\n", dp->ba.type),
@@ -2508,7 +2508,7 @@ init_gen_quick_recurse_tables()
     /*   number_of_domains is first set
      */
     for (number_of_domains=-1, i=0; i<MAX_DOMAIN; i++) 
-	if (Domains[i].domain!=NULL && Domains[i].domain->ba.type != UNDEF) 
+	if (Domains[i].domain!=NULL && Domains[i].domain->ba.type != UNDEF_DT) 
 	    number_of_domains = i;
     number_of_domains++;
 
@@ -2659,10 +2659,10 @@ union domain *dp ;
 
     return((*(current_mrc->decisions))[dp->se.element-Domains] &&
 	   (!dp->se.persistant) &&               /* stay at a given level */
-	   ((t=dp->ba.type)==BASIS ? TRUE :
-	     t==LIST               ? obj->l != list_undefined :
-	     t==SET                ? obj->t != set_undefined :
-	     t==ARRAY              ? obj->p != array_undefined : 
+	   ((t=dp->ba.type)==BASIS_DT ? TRUE :
+	     t==LIST_DT               ? obj->l != list_undefined :
+	     t==SET_DT                ? obj->t != set_undefined :
+	     t==ARRAY_DT              ? obj->p != array_undefined : 
 	    (fatal("persistant_simple_in: unknown type %s\n", 
 		   itoa(dp->ba.type)), FALSE))); 
 }
