@@ -9,6 +9,10 @@
 
 /**************************************************** METHODS FOR RESOURCES */
 
+/* the current module is expected by some load/save functions...
+ */
+string dbll_current_module = (string) NULL;
+
 typedef char * (* READER)(FILE *);
 typedef void  (* WRITER)(FILE *, char *);
 typedef void  (* FREER) (char *);
@@ -180,6 +184,7 @@ dbll_save_resource(string rname, string oname, char * p)
     FILE * f;
     pips_debug(7, "saving resource %s of %s\n", rname, oname);
 
+    dbll_current_module = oname;
     m = get_methods(rname);
     if (m->write_function==no_write) {
 	pips_user_warning("resource %s of %s lost, no unload function\n", 
@@ -189,6 +194,7 @@ dbll_save_resource(string rname, string oname, char * p)
 	m->write_function(f, p);
 	close_resource_file(f, rname, oname);
     }
+    dbll_current_module = (string) NULL;
 }
 
 char *
@@ -199,6 +205,7 @@ dbll_load_resource(string rname, string oname)
     char * p = NULL;
     pips_debug(7, "loading resource %s of %s\n", rname, oname);
 
+    dbll_current_module = oname;
     m = get_methods(rname);
     if (m->read_function==no_read) 
 	pips_internal_error("cannot load %s of %s, no load function\n",
@@ -206,6 +213,7 @@ dbll_load_resource(string rname, string oname)
     f = open_resource_file(rname, oname, "r");
     p = m->read_function(f);
     close_resource_file(f, rname, oname);
+    dbll_current_module = (string) NULL;
     return p;
 }
 
