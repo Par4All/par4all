@@ -10,7 +10,7 @@
 #include "misc.h"
 
 #include "syntax.h"
-#include "toklex.h"
+#include "syn_yacc.h"
 
 
 
@@ -671,7 +671,7 @@ void MakeEnddoInst()
 						    expression_undefined));*/
     (void) PopBlock();
 }
-
+
 string NameOfToken(token)
 int token;
 {
