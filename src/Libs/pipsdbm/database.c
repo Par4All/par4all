@@ -226,8 +226,7 @@ static void db_clean_db_resources()
       }
       else if (db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) 
       {
-	pips_debug(5, "resource %s[%s] set as stored\n",
-		   db_symbol_name(os), db_symbol_name(rs));
+	pips_debug(5, "resource %s[%s] set as stored\n", rn, on);
 	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
 	db_resource_pointer(r) = NULL;
       }
@@ -305,11 +304,11 @@ void db_clean_all_required_resources(void)
     {
       string rn = db_symbol_name(rs);
       string on = db_symbol_name(os);
-      pips_debug(8, "considering %s of %s (%p)\n", rn, on, (void*) r);
+      pips_debug(8, "considering %s[%s] (%p)\n", rn, on, (void*) r);
 
       if (db_resource_required_p(r))
       {
-	pips_debug(1, "deleting %s of %s\n", rn, on);
+	pips_debug(1, "deleting %s[%s]\n", rn, on);
 	dump_db_resource(rn, on, r);
 	db_delete_resource(rn, on);
       }
@@ -358,66 +357,76 @@ bool db_resource_p(string rname, string oname)
 
 static void db_load_resource(string rname, string oname, db_resource r)
 {
-  pips_debug(7, "loading %s of %s\n", rname, oname);
-  pips_assert("resource stored", db_resource_stored_p(r));
+  pips_debug(7, "loading %s[%s]\n", rname, oname);
+  pips_assert("resource is stored", db_resource_stored_p(r));
+
   db_resource_pointer(r) = dbll_load_resource(rname, oname);
-  db_status_tag(db_resource_db_status(r)) = is_db_status_loaded_and_stored;
+
+  if (dbll_very_special_resource_p(rname, oname))
+    db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
+  else
+    db_status_tag(db_resource_db_status(r)) = is_db_status_loaded_and_stored;
+
+  /* just check for updates */
   if (displayable_file_p(rname))
   {
     int its_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
     if (its_time > db_resource_file_time(r))
       /* should be an internal error? */
-      pips_user_warning("internal resource %s[%s] updated!\n", rname, oname);
+      pips_user_warning("file resource %s[%s] updated!\n", rname, oname);
   }
   else
   {
     int its_time = dbll_stat_resource_file(rname, oname, TRUE);
     if (its_time > db_resource_file_time(r))
-      pips_user_warning("file resource %s[%s] updated!\n", rname, oname);
+      pips_user_warning("internal resource %s[%s] updated!\n", rname, oname);
   }
 }
 
 int db_time_of_resource(string rname, string oname)
 {
-    db_resource r = get_db_resource(rname, oname);
-    if (db_resource_undefined_p(r) || db_resource_required_p(r))
-	return -1;
+  db_resource r;
+  DB_OK;
 
-    /* we load the resource if it is a simple file name...
-     * so as to be able to check it next.
+  r = get_db_resource(rname, oname);
+  
+  if (db_resource_undefined_p(r) || db_resource_required_p(r))
+    return -1;
+  
+  /* we load the resource if it is a simple file name...
+   * so as to be able to check it next.
+   */
+  if (db_resource_stored_p(r) && displayable_file_p(rname)) {
+    db_load_resource(rname, oname, r);
+  }
+  
+  /* loaded */
+  if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) && 
+      displayable_file_p(rname) &&
+      dbll_database_managed_file_p(db_resource_pointer(r)))
+  {
+    /* check time of actual resource... 
      */
-    if (db_resource_stored_p(r) && displayable_file_p(rname)) {
-	db_load_resource(rname, oname, r); /* does it unlink the file? */
-    }
-
-    /* loaded */
-    if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) && 
-	displayable_file_p(rname) &&
-	dbll_database_managed_file_p(db_resource_pointer(r)))
+    int current_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
+    if (current_time > db_resource_file_time(r)) 
     {
-	/* check time of actual resource... 
-	 * note that source files are skipped!
-	 */
-	int current_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
-	if (current_time > db_resource_file_time(r)) 
-	{
-	    pips_user_warning("file '%s' has been edited (%d -> %d)...\n", 
-			      db_resource_pointer(r),
-			      db_resource_file_time(r), current_time);
-	    db_resource_file_time(r) = current_time;
-
-	    db_inc_logical_time();
-	    db_resource_time(r) = db_get_logical_time();
-	    db_inc_logical_time();
-	}
+      pips_user_warning("file '%s' for %s[%s] edited (%d -> %d)\n", 
+			db_resource_pointer(r), rname, oname,
+			db_resource_file_time(r), current_time);
+      db_resource_file_time(r) = current_time;
+      
+      db_inc_logical_time();
+      db_resource_time(r) = db_get_logical_time();
+      db_inc_logical_time();
     }
-
-    return db_resource_time(r);
+  }
+  
+  return db_resource_time(r);
 }
 
 static void db_save_resource(string rname, string oname, db_resource r)
 {
-    pips_debug(7, "saving %s of %s\n", rname, oname);
+    pips_debug(7, "saving %s[%s]\n", rname, oname);
     pips_assert("resource loaded", 
 		db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r));
 
@@ -439,8 +448,9 @@ static void db_save_resource(string rname, string oname, db_resource r)
 static void db_save_and_free_resource(
     string rname, string oname, db_resource r, bool do_free)
 {
-    pips_debug(7, "saving and freeing %s of %s\n", rname, oname);
-    pips_assert("resource loaded", 
+    pips_debug(7, "saving and freeing %s[%s]\n", rname, oname);
+
+    pips_assert("resource is loaded", 
 		db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r));
 
     if (db_resource_loaded_and_stored_p(r))
@@ -460,24 +470,25 @@ static void db_save_and_free_resource(
       {
 	db_resource_pointer(r) = NULL;
 	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
-	db_resource_file_time(r) = 
-	  dbll_stat_resource_file(rname, oname, TRUE);
       }
       else
       {
 	/* ??? manual fix for entities... which are not well integrated. */
-	if (!(same_string_p(rname, DBR_ENTITIES) && same_string_p(oname, "")))
+	if (!dbll_very_special_resource_p(rname, oname))
 	{
 	  db_status_tag(db_resource_db_status(r)) = 
 	    is_db_status_loaded_and_stored;
 	}
-	/* else is loaded */
-	db_resource_file_time(r) = 
-	  dbll_stat_resource_file(rname, oname, TRUE);
+	else /* is loaded */
+	{
+	  db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
+	}
       }
+      
+      db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
     } 
     else 
-    { /* lost.. delete resource. */
+    { /* lost.. just delete the resource. */
       if (do_free)
       {
         dbll_free_resource(rname, oname, db_resource_pointer(r));
@@ -505,7 +516,7 @@ string db_get_memory_resource(string rname, string oname, bool pure)
     DB_OK;
 
     debug_on("PIPSDBM_DEBUG_LEVEL");
-    pips_debug(2, "getting %s of %s (%d)\n", rname, oname, pure);
+    pips_debug(2, "get %s[%s] (%s)\n", rname, oname, pure? "pure": "not pure");
 
     r = get_db_resource(rname, oname);
     debug_db_resource(9, rname, oname, r);
@@ -519,21 +530,21 @@ string db_get_memory_resource(string rname, string oname, bool pure)
 
     result = db_resource_pointer(r);
     
-    if (!pure && dbll_storable_p(rname))
-	db_save_resource(rname, oname, r); /* the pointer is still there... */
-
     if (!pure)
     {
-	if (dbll_storable_p(rname)) {
-            /* make as stored now... */
-	  db_resource_pointer(r) = NULL;
-	  db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
-	} else /* lost */
-	    db_delete_resource(rname, oname);
+      /* save if possible to hide side effects. */
+      if (dbll_storable_p(rname)) {
+	db_save_resource(rname, oname, r); /* the pointer is there... */
+	/* make as stored now... */
+	db_resource_pointer(r) = NULL;
+	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
+      } else /* lost */
+	db_delete_resource(rname, oname);
     }
 
-    ifdebug(7) pips_assert("resource is consistent", 
-			   dbll_check_resource(rname, oname, result));
+    ifdebug(7) 
+      pips_assert("resource is consistent", 
+		  dbll_check_resource(rname, oname, result));
     debug_off();
     return result;
 }
@@ -543,6 +554,10 @@ void db_set_resource_as_required(string rname, string oname)
   db_resource r;
   db_status s;
   DB_OK;
+
+  pips_debug(5, "set %s[%s] as required at %d\n", rname, oname,
+	     db_get_logical_time());
+
   r = find_or_create_db_resource(rname, oname);
   s = db_resource_db_status(r);
   if (db_status_undefined_p(s))
@@ -566,7 +581,7 @@ void db_put_or_update_memory_resource(
     DB_OK;
 
     debug_on("PIPSDBM_DEBUG_LEVEL");
-    pips_debug(2, "putting or updating %s of %s\n", rname, oname);
+    pips_debug(2, "putting or updating %s[%s]\n", rname, oname);
     ifdebug(7) pips_assert("resource is consistent", 
 			   dbll_check_resource(rname, oname, p));
 
@@ -577,12 +592,12 @@ void db_put_or_update_memory_resource(
     else
     {
 	if (!update_is_ok && !db_resource_required_p(r))
-	    pips_internal_error("resource %s of %s already there\n", 
+	    pips_internal_error("resource %s[%s] already there\n", 
 				rname, oname);
     }
     
     /* store data */
-    db_resource_pointer(r) = p; /** ??? memory leak */
+    db_resource_pointer(r) = p; /** ??? memory leak? depends? */
     db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
     db_resource_time(r) = db_get_logical_time();
 
@@ -601,7 +616,7 @@ void db_unput_resources(string rname)
     r = find_or_create_db_symbol(rname);
     DB_RESOURCES_MAP(s, or,
     {
-	pips_debug(7, "deleting %s of %s if any\n", rname, db_symbol_name(s));
+	pips_debug(7, "deleting %s[%s] if any\n", rname, db_symbol_name(s));
 	if (bound_db_owned_resources_p(or, r)) {
 	    db_delete_resource(rname, db_symbol_name(s));
 	    dbll_unlink_resource_file(rname, db_symbol_name(s), FALSE);
@@ -615,6 +630,9 @@ void db_save_and_free_memory_resource_if_any
 {
     db_resource r;
     DB_OK;
+    
+    pips_debug(8, "maybe saving and freeing %s[%s]\n", rname, oname);
+
     r = get_db_resource(rname, oname);
     if (!db_resource_undefined_p(r) && 
 	(db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)))
