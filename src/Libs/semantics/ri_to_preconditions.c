@@ -1539,10 +1539,7 @@ statement_to_postcondition(
 	/* FC: if the code is not reachable (thanks to STOP or GOTO), which
 	 * is a structural information, the precondition is just empty.
 	 */
-	/* pre = transformer_empty(); */
 	free_predicate(transformer_relation(pre));
-	gen_free_list(transformer_arguments(pre));
-	transformer_arguments(pre) = NIL;
 	transformer_relation(pre) = make_predicate(sc_empty(BASE_NULLE));
     }
 
