@@ -8,12 +8,23 @@
 #include "ri-util.h"
 
 
-bool variable_entity_p(e)
-entity e;
+bool 
+variable_entity_p(entity e)
 {
     bool variable = entity_storage(e)!= storage_undefined && storage_ram_p(entity_storage(e));
 
     return variable;
+}
+
+bool 
+symbolic_constant_entity_p(entity e)
+{
+    bool symbolic_constant = entity_storage(e)!= storage_undefined 
+	&& storage_rom_p(entity_storage(e))
+	&& entity_initial(e) != value_undefined
+	&& value_symbolic_p(entity_initial(e));
+
+    return symbolic_constant;
 }
 
 
