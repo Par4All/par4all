@@ -7,6 +7,7 @@
 #include "ri.h"
 #include "graph.h"
 #include "makefile.h"
+#include "properties.h"
 
 #include "misc.h"
 #include "ri-util.h"
@@ -45,7 +46,7 @@ static list build_resource_names = NIL;
 static list source_files = NIL;
 static list selected_rules = NIL;
 
-void parse_arguments(argc, argv)
+static void pips_parse_arguments(argc, argv)
 int argc;
 char * argv[];
 {
@@ -95,7 +96,7 @@ char * argv[];
 	}
     
     if (argc != optind + 1) {
-	user_warning("parse_argument", 
+	user_warning("pips_parse_argument", 
 		     ((argc < (optind + 1)) ?
 		     "Too few arguments\n" : "illegal argument: %s\n"),
 		     argv[optind + 1]);
@@ -117,6 +118,29 @@ char *rule_name;
 	fprint_activated(stderr);
 }
 
+/* Pips user log */
+
+void pips_user_log(char *fmt, va_list args)
+{
+    FILE * log_file = get_log_file();
+
+    if(log_file!=NULL) {
+	if (vfprintf(log_file, fmt, args) <= 0) {
+	    perror("tpips_user_log");
+	    abort();
+	}
+	else
+	    fflush(log_file);
+    }
+
+    if(get_bool_property("USER_LOG_P")==FALSE)
+	return;
+
+    /* It goes to stderr to have only displayed files on stdout */
+    (void) vfprintf(stderr, fmt, args);
+    fflush(stderr);
+}
+
 void main(argc, argv)
 int argc;
 char * argv[];
@@ -126,16 +150,17 @@ char * argv[];
     initialize_newgen();
     initialize_sc((char*(*)(Variable)) entity_local_name); 
 
-    parse_arguments(argc, argv);
+    pips_parse_arguments(argc, argv);
 
     debug_on("PIPS_DEBUG_LEVEL");
 
     initialize_signal_catcher();
+    pips_log_handler = pips_user_log;
 
     if(setjmp(pips_top_level)) {
 	/* no need to pop_pips_context() at top-level */
 	/* FI: are you sure make_close_program() cannot call user_error() ? */
-	make_close_workspace();
+	close_workspace();
 	success = FALSE;
     }
     else {
@@ -148,7 +173,9 @@ char * argv[];
 	if (source_files != NIL) {
 	    /* Workspace must be created */
 	    db_create_workspace(wspace);
-	
+
+	    open_log_file();
+
 	    MAPL(f_cp, {
 		debug(1, "main", "processing file %s\n", STRING(CAR(f_cp)));
 		process_user_file( STRING(CAR(f_cp)) );
@@ -159,12 +186,13 @@ char * argv[];
 	}
 	else {
 	    /* Workspace must be opened */
-	    if (make_open_workspace(wspace) == NULL) {
+	    if (open_workspace(wspace) == NULL) {
 		user_log("Cannot open workspace %s\n", wspace);
 		exit(1);
 	    }
 	    else {
-		user_log("Workspace %s opened\n", wspace);
+		/* user_log("Workspace %s opened\n", wspace); */
+		;
 	    }
 	}
 
@@ -222,8 +250,9 @@ char * argv[];
 			 build_resource_name, module);
 		success = safe_make(build_resource_name, module);
 		if (success) {
-		    user_log("%s built for %s.\n", 
-			     build_resource_name, module);
+		    /* user_log("%s built for %s.\n", 
+			     build_resource_name, module); */
+		    ;
 		}
 		else {
 		    user_log("Cannot build %s for %s.\n", 
