@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.38  2000/04/17 14:49:20  phamdinh
+ * basic_inferior_p types tags fixed.
+ *
  * Revision 1.37  1999/09/02 16:42:29  irigoin
  * Function please_give_me_a_basic_for_an_expression() modified to cope with
  * special expressions such as format label referenced in an IO
@@ -1121,7 +1124,7 @@ basic b1, b2;
 	else
 	    return (TRUE);
     }
-    else if (basic_float(b1)) {
+    else if (basic_float_p(b1)) {
 	if (basic_int_p(b2))
 	    return (FALSE);
 	else if (basic_float_p(b2))
@@ -1132,7 +1135,7 @@ basic b1, b2;
     else if (basic_complex_p(b1)) {
 	if (basic_int_p(b2) || basic_float_p(b2))
 	    return (FALSE);
-	else if (basic_complex(b2))
+	else if (basic_complex_p(b2))
 	    return (basic_complex(b1) <= basic_complex(b2));
 	else
 	    return (TRUE);
