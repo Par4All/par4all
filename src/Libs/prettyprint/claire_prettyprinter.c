@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.21  2004/10/08 13:01:56  irigoin
+   No idea about the changes. Emergency for Isabelle and Nicolas. Sorry.
+
    Revision 1.20  2004/08/06 08:11:33  hurbain
    Debugging of claire_array_in_task. Generates apparently CLAIRE correct code.
 
@@ -199,25 +202,48 @@ int_to_string(int i)
 
 static string claire_reference(reference r);
 
+/* Code duplicated from Newgen build.c */
+static char * itoa(int i)
+{
+  static char buf[ 20 ] ;
+  sprintf( &buf[0], "%d", i ) ;
+  return buf;
+}
+
 static string claire_expression(expression e)
 {
-  string result = "";
+  string result = string_undefined;
   syntax s = expression_syntax(e);
+
   switch (syntax_tag(s))
     {
     case is_syntax_reference:
       result = claire_reference(syntax_reference(s));
       break;
-    case is_syntax_call:
-      result = claire_entity_local_name(call_function(syntax_call(s)));
+    case is_syntax_call: {
+      value ev = EvalExpression(e);
+      constant ec = value_constant(ev);
+      int eiv = 0;
+
+      if(!value_constant_p(ev)) {
+	pips_user_error("Constant expected for CLAIRE loop bounds.\n");
+      }
+      if(!constant_int_p(ec)) {
+	pips_user_error("Integer constant expected for CLAIRE loop bounds.\n");
+      }
+      eiv = constant_int(ec);
+      result = strdup(itoa(eiv));
+
+      /* result = claire_entity_local_name(call_function(syntax_call(s))); */
       break;
+    }
     default:
       pips_internal_error("unexpected syntax tag");
     }
   return result;
 }
 
-/* Attention with Fortran: the indexes are reversed. */
+/* Attention with Fortran: the indices are reversed. */
 static string claire_reference(reference r)
 {
   string result = strdup(EMPTY), old, svar;
@@ -545,6 +571,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   int i;
   int j;
   int is_all_null_2D = 1;
+  int depth = 0;
 
   bool null_fitting_p = TRUE;
   string internal_index_declarations = strdup("");
@@ -569,6 +596,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   result = strdup(concatenate(result, "darray = ", varname, "," NL, TAB, TAB, "accessMode = ", (first?"Wmode,":"Rmode,"),
 			      NL, TAB, TAB, "offset = list<VARTYPE>(", NULL));
   
+  /* Fill in paving, fitting and offset matrices from index expressions. */
   MAP(EXPRESSION, ind, {
     syntax sind = expression_syntax(ind);
     int iterator_nr;
@@ -613,10 +641,9 @@ static string claire_array_in_task(reference r, bool first, int task_number){
     for(j = 0; j<index_of_array; j++){
       is_null_p = is_null_p && (same_string_p(fitting_array[j][i], "0"));
     }
-    /*    result = strdup(concatenate(result, "list(", NULL));*/
     if(!is_null_p){
-      
       null_fitting_p = FALSE;
+      fitting_declaration = strdup(concatenate(fitting_declaration, "list(", NULL));
       for(j = 0; j<index_of_array-1; j++){
 	fitting_declaration = strdup(concatenate(fitting_declaration, "vartype!(", fitting_array[j][i], "), ", NULL));
       }
@@ -630,10 +657,10 @@ static string claire_array_in_task(reference r, bool first, int task_number){
     }
   }
 
-  result = strdup(concatenate(result, "list(", fitting_declaration, NULL));
+  result = strdup(concatenate(result, fitting_declaration, NULL));
 
   if(null_fitting_p){
-    result = strdup(concatenate(result, ")),", NL, TAB, TAB, NULL));
+    result = strdup(concatenate(result, "list()),", NL, TAB, TAB, NULL));
     }
 
   null_fitting_p = TRUE;
@@ -656,13 +683,26 @@ static string claire_array_in_task(reference r, bool first, int task_number){
 #define MONMAX(a, b) ((a<b)?b:a)
   
   /* Definition of the inner loop nest */
-  result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", int_to_string(MONMAX(gen_array_nitems(intern_indices_array), 1)), ",", NL, TAB, TAB, TAB, NULL));
+  /* FI->IH: if some columns are removed, the effective depth is unkown and must be computed here */
+  /* result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", int_to_string(MONMAX(gen_array_nitems(intern_indices_array), 1)), ",", NL, TAB, TAB, TAB, NULL)); */
+
+  for (j = 0; j<intern_nb; j++){
+    bool is_null_p = TRUE;
+    for(i = 0; i < index_of_array; i++){
+      is_null_p = is_null_p && (same_string_p(fitting_array[i][j], "0"));
+    }
+    if(!is_null_p){
+      depth++;
+    }
+  }
+  if(depth==0) depth = 1; /* see comment just below about null fitting matrices. */
+  result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", itoa(depth), ",", NL, TAB, TAB, TAB, NULL));
   result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));
 
   /* 3 cases :
      - the fitting matrix is null : must generate a (0,0) loop with dummy index
-     - the fitting matrix column is null : do not generate anything
-     - the fitting matric column is not null : generate the corresponding loop bound and index name
+     - some fitting matrix column is null : do not generate anything
+     - some fitting matrix column is not null : generate the corresponding loop bound and index name
   */
 
   for (j = 0; j<intern_nb; j++){
@@ -695,32 +735,6 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   else{
     result = strdup(concatenate(result, NL, TAB, "names = list<string>(", internal_index_declarations, NULL));
   }
-
-  /*    is_all_null_2D = is_all_null && !is_all_null(fitting_array[i], (*index_of_array));
-  }
-  
-  if(gen_array_nitems(intern_indices_array) > 0 && !is_all_null_2D){
-    for(i = 0; i<gen_array_nitems(intern_upperbounds_array) - 1; i++){
-      result = strdup(concatenate(result, "vartype!(", *((string *)(gen_array_item(intern_upperbounds_array, i))), "), ", NULL));
-    }
-    
-    result = strdup(concatenate(result, "vartype!(", *((string *)(gen_array_item(intern_upperbounds_array, i))), ")),", NULL));
-    
-    result = strdup(concatenate(result, NL, TAB, TAB, TAB, "names = list<string>(", NULL));
-    
-    for(i = 0; i<gen_array_nitems(intern_indices_array) - 1; i++){
-      if(!is_all_null(fitting_array[i], (*index_of_array))){
-	result = strdup(concatenate(result, QUOTE, *((string *)(gen_array_item(intern_indices_array, i))), QUOTE, ", ", NULL));
-      }
-    }
-    if(!is_all_null(fitting_array[i], (*index_of_array))){
-      result = strdup(concatenate(result, QUOTE, *((string *)(gen_array_item(intern_indices_array, i))), QUOTE, NULL));
-    }
-    result = strdup(concatenate(result, ")", NULL));
-  }
-  else{
-    result = strdup(concatenate(result, "vartype!(1)),", NL, TAB, TAB, TAB, "names = list<string>(\"M_I\")", NULL));
-    }*/
 
   /* Complete CLAIRE reference */
   result = strdup(concatenate(result, "))", (first?")":","), NL, NULL)); 
@@ -811,7 +825,7 @@ static call sequence_call(sequence seq)
 
 static loop sequence_loop(sequence seq)
 {
-  call ml = loop_undefined; /* meaningful loop */
+  loop ml = loop_undefined; /* meaningful loop */
   int nl = 0; /* number of loops */
 
   MAP(STATEMENT, s, {
@@ -840,6 +854,13 @@ static call claire_loop_from_loop(loop l, string * result, int task_number){
   statement s = loop_body(l);
   instruction i = statement_instruction(s);
   int u, low;
+  expression incr_e = range_increment(loop_range(l));
+  syntax incr_s = expression_syntax(incr_e);
+
+  if(!syntax_call_p(incr_s) || 
+     strcmp( entity_local_name(call_function(syntax_call(incr_s))), "1") != 0 ) {
+    pips_user_error("Loop increments must be constant \"1\".\n");
+  }
 
   u = atoi(claire_expression(range_upper(loop_range(l))));
   low = atoi(claire_expression(range_lower(loop_range(l))));
@@ -887,6 +908,14 @@ static string claire_loop_from_sequence(loop l, int task_number){
   call c;
   int i;
   string * taskname = (string *)(malloc(sizeof(string)));
+  expression incr_e = range_increment(loop_range(l));
+  syntax incr_s = expression_syntax(incr_e);
+
+  if(!syntax_call_p(incr_s) || 
+     strcmp( entity_local_name(call_function(syntax_call(incr_s))), "1") != 0 ) {
+    pips_user_error("Loop increments must be constant \"1\".\n");
+  }
+
   *taskname = strdup(concatenate("T_", int_to_string(task_number), NULL));
   gen_array_append(tasks_names, taskname);
   /* (re-)initialize task-scoped arrays*/
@@ -945,13 +974,16 @@ static string claire_loop_from_sequence(loop l, int task_number){
   }
 
   /* External loop nest depth */
-  result = strdup(concatenate(result, int_to_string(gen_array_nitems(extern_indices_array)), ",", NL, TAB, TAB, NULL));
+  result = strdup(concatenate(result, int_to_string(gen_array_nitems(extern_upperbounds_array)), ",", NL, TAB, TAB, NULL));
+
   /* add external upperbounds */
   result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));
+
   for(i=0; i<gen_array_nitems(extern_upperbounds_array) - 1; i++){
     result = strdup(concatenate(result, "vartype!(", *((string *)(gen_array_item(extern_upperbounds_array, i))), "), ", NULL));
   }
   result = strdup(concatenate(result, "vartype!(",*((string *)(gen_array_item(extern_upperbounds_array, i))), ")),",NL, TAB, TAB, NULL));
+
   /* add external indices names*/
   result = strdup(concatenate(result, "names = list<string>(", NULL));
   for(i=0; i<gen_array_nitems(extern_indices_array) - 1; i++){
