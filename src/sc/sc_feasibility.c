@@ -262,6 +262,42 @@ static boolean sc_fm_project_variables
   return faisable;
 }
 
+#define SIMPLEX_METHOD		1
+#define FM_METHOD		0
+#define PROJECT_EQ_METHOD	2
+#define NO_PROJ_METHOD		0
+
+static boolean internal_sc_feasibility
+  (Psysteme sc, int method, boolean integer_p, int ofl_ctrl)
+{
+  Psysteme sw = NULL;
+  boolean ok = TRUE;
+
+  if (method & PROJECT_EQ_METHOD)
+  {
+    sw = sc_dup(sc);
+    ok = sc_fm_project_variables(sw, integer_p, TRUE, ofl_ctrl);
+  }
+
+  /* maybe the S/FM should be chosen again as #ref has changed... */
+  if (ok) 
+  {
+    if (method & SIMPLEX_METHOD)
+    {
+      ok = sc_simplexe_feasibility_ofl_ctrl(sw? sw: sc, ofl_ctrl);
+    }
+    else 
+    {
+      ok = sc_fourier_motzkin_feasibility_ofl_ctrl
+	(sw? sw: sc, integer_p, ofl_ctrl);
+    }
+  }
+  
+  if (sw) sc_rm(sw);
+
+  return ok;
+}
+
 boolean 
 sc_feasibility_ofl_ctrl(sc, integer_p, ofl_ctrl, ofl_res)
 Psysteme sc;
@@ -270,16 +306,15 @@ int ofl_ctrl;
 boolean ofl_res;
 {
   int
+    method = 0,
     n_var = sc->dimension,
     n_cont_eq = 0, n_ref_eq = 0,
     n_cont_in = 0, n_ref_in = 0;
   boolean 
     ok = FALSE,
-    use_simplex = FALSE, 
     catch_performed = FALSE;
-  Psysteme sw = NULL;
 
-  if (sc_rn_p(sc)) 
+  if (sc_rn_p(sc)) /* shortcut */
     return TRUE;
 
   decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, 2);
@@ -295,6 +330,7 @@ boolean ofl_res;
     CATCH(overflow_error) 
       {
 	ok = ofl_res;
+	catch_performed = FALSE;
 	/* 
 	 *   PLEASE do not remove this warning.
 	 *
@@ -302,7 +338,7 @@ boolean ofl_res;
 	 */
 	fprintf(stderr, "[sc_feasibility_ofl_ctrl] "
 		"arithmetic error (%s[%d,%deq/%dref,%din/%dref]) -> %s\n",
-		use_simplex ? "Simplex" : "Fourier-Motzkin", 
+		method&SIMPLEX_METHOD ? "Simplex" : "Fourier-Motzkin", 
 		n_var, n_cont_eq, n_ref_eq, n_cont_in, n_ref_in,
 		ofl_res ? "TRUE" : "FALSE");
 	break;
@@ -326,32 +362,39 @@ boolean ofl_res;
        *     if there are many of them... ???
        *  2/ chose between FM and SIMPLEX **after** that?
        */
-      
-      use_simplex = (n_cont_in >= NB_CONSTRAINTS_MAX_FOR_FM || 
+      /* use_simplex = (n_cont_in >= NB_CONSTRAINTS_MAX_FOR_FM || 
 		     (n_cont_in>=10 && n_ref_in>2*n_cont_in));
-
-      if (use_simplex && n_cont_eq >= 20)
+		     (use_simplex && n_cont_eq >= 20) => proj */
+      
+      if (n_cont_in >= NB_CONSTRAINTS_MAX_FOR_FM ||
+	  (n_cont_in>=10 && n_ref_in>2*n_cont_in))
       {
-	sw = sc_dup(sc);
-	ok = sc_fm_project_variables(sw, integer_p, TRUE, ofl_ctrl);
-	if (!ok) break;
+	method = SIMPLEX_METHOD;
+	if (n_cont_eq >= 20)
+	  method &= PROJECT_EQ_METHOD;
+      }
+      else
+      {
+	method = FM_METHOD;
       }
 
-      if (use_simplex)
-      {
-	ok = sc_simplexe_feasibility_ofl_ctrl(sw? sw: sc, ofl_ctrl);
-      }
-      else 
-      {
-	ok = sc_fourier_motzkin_feasibility_ofl_ctrl
-	  (sw? sw: sc, integer_p, ofl_ctrl);
+      /* STATS
+	 extern void init_log_timers(void);
+	 extern void get_string_timers(char **, char **);
+	 for (method=0; method<4; method++) {
+	 char * t1, * t2;
+	 init_log_timers(); */
+
+      ok = internal_sc_feasibility(sc, method, integer_p, ofl_ctrl);
+
+	/* STATS 
+	   get_string_timers(&t1, &t2);
+	   fprintf(stderr, "FEASIBILITY %d %d %d %d %d %d %s",
+	   n_cont_eq, n_ref_eq, n_cont_in, n_ref_in, method, ok, t1); */
       }
     }
   }
 
-  /* clean-up */
-  if (sw) sc_rm(sw);
-  
   if (catch_performed)
     UNCATCH(overflow_error);
   
