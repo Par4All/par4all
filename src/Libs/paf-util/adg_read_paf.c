@@ -77,6 +77,7 @@
 
 /* Pips includes 	*/
 #include "boolean.h"
+#include "linear.h"
 #include "ri.h"
 #include "constants.h"
 #include "ri-util.h"
