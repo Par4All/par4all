@@ -1,4 +1,8 @@
-/* package arithmetique */
+/* package arithmetique 
+ *
+ * $RCSfile: modulo.c,v $ (version $Revision$)
+ * $Date: 1996/07/13 12:32:09 $, 
+ */
 
 /*LINTLIBRARY*/
 
@@ -16,8 +20,7 @@
  *  3. a>0 && b<0: cf. 1. apres changement de signe de b
  *  4. a<0 && b<0: cf. 2. apres changement de signe de b
  */
-int modulo_fast(a,b)
-int a,b;
+Value modulo_fast(Value a, Value b)
 {
     /* definition d'une look-up table pour les valeurs de a appartenant
        a [-MODULO_MAX_A..MODULO_MAX_A] et pour les valeurs de b
@@ -28,7 +31,8 @@ int a,b;
        */
 #define MODULO_MAX_A 5
 #define MODULO_MAX_B 5
-    static int modulo_look_up[2*MODULO_MAX_A+1][MODULO_MAX_B]= {
+    static Value 
+	modulo_look_up[2*MODULO_MAX_A+1][MODULO_MAX_B]= {
 	/*  b ==        1  2  3  4  5 */
 	{/* a == - 5 */ 0, 1, 1, 3, 0},
         {/* a == - 4 */ 0, 0, 2, 0, 1},
@@ -44,10 +48,10 @@ int a,b;
 	};
     /* translation de a pour acces a la look-up table */
     int la;
-    /* valeur du modulo C */
-    int mod;
+    Value mod;    /* valeur du modulo C */
 
-    assert(b!=0);
+
+    assert(VALUE_NOTZERO_P(b));
 
     /* premier changement de signe, ne changeant pas le resultat */
     b = ABS(b);
@@ -61,7 +65,8 @@ int a,b;
      *     return(0);
      */
 
-    if((la=a+MODULO_MAX_A) >= 0 && a <= MODULO_MAX_A && 
+    if((la=a+MODULO_MAX_A) >= 0 && 
+       a <= MODULO_MAX_A && 
        b <= MODULO_MAX_B) {
 	/* acceleration par une look-up table */
 	mod = modulo_look_up[la][b-1];
@@ -69,8 +74,8 @@ int a,b;
     else {
 	/* calcul effectif du modulo: attention, portabilite douteuse */
 	mod = a % b;
-	mod = mod < 0? b-mod : mod;
+	mod = VALUE_NEG_P(mod)? b-mod: mod;
     }
 
-    return(mod);
+    return mod;
 }
