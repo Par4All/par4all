@@ -96,6 +96,7 @@ install_forward_makefiles:
 	  for s in $(SUBDIRS) ; do \
 	    test ! -d $$d/$$s || \
 	      { echo "copying forward makefile to $$d/$$s"; \
+		$(RM) $$d/$$s/Makefile; \
 		$(COPY) forward_gnu_makefile $$d/$$s/Makefile; } ; done; done;\
 
 # that is all
