@@ -28,6 +28,10 @@ $(ARCH)/$(HFI): $(ARCH)/$(HFI).o
 	$(LD) $(LDFLAGS) -o $@ $< -lrx
 	chmod a+rx-w $@
 
+clean: local-clean
+local-clean:
+	$(RM) $(ARCH)/$(HFI) $(ARCH)/$(HFI).o
+
 all: .runable
 
 # that is all
