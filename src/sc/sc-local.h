@@ -132,6 +132,10 @@ typedef struct Ssysteme {
 void sc_add_egalite(Psysteme, Pcontrainte);
 void sc_add_inegalite(Psysteme, Pcontrainte);
 
+/* old compatible... */
+#define sc_add_eg(p,c) sc_add_egalite(p, c)
+#define sc_add_ineg(p,c) sc_add_inegalite(p, c)
+
 /* ex-definition d'un systeme de contraintes infaisable, representant un
  * polyedre vide.
  *
