@@ -628,7 +628,12 @@ static bool parametric_transformer_empty_p(transformer t,
      * to reduce the problem
      * size, check feasibility on the projected system
      */
-    new_ps = normalize(new_ps, (char * (*)(Variable)) external_value_name);
+    /* new_ps = normalize(new_ps, (char * (*)(Variable)) external_value_name); */
+    /* FI: when dealing with interprocedural preconditions, the value mappings
+     * are initialized for the caller but the convex hull, which calls this function,
+     * must be performed in the calle value space.
+     */
+    new_ps = normalize(new_ps, (char * (*)(Variable)) entity_local_name);
 
     if(SC_EMPTY_P(new_ps)) {
 	empty_p = TRUE;
