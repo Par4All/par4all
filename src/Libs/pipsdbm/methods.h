@@ -163,7 +163,6 @@
 /* CODE...
  */
 { DBR_PARSED_CODE, 		NEWGEN_METHODS },
-{ DBR_DECLARATIONS, 		NEWGEN_METHODS },
 { DBR_PARALLELIZED_CODE, 	NEWGEN_METHODS },
 { DBR_REINDEXED_CODE, 		NEWGEN_METHODS },
 { DBR_CALLEES, 			NEWGEN_METHODS },
@@ -171,6 +170,18 @@
 { DBR_CODE, 			NEWGEN_METHODS },
 { DBR_HEIGHT, 			STRING_METHODS },
 { DBR_DEPTH, 			STRING_METHODS },
+
+  /* DECLARATIONS is a special resource to impose that each compilation unit
+     must be parsed before its functions. It is in fact a hash table 
+     containing C keywords and a compilation unit typedef names.  
+   */
+#define DECLARATIONS_METHODS \
+    (READER) declarations_read, \
+    (WRITER) declarations_write, \
+    (FREER) hash_table_free, \
+    (CHECKER) gen_true
+
+{ DBR_DECLARATIONS, 		DECLARATIONS_METHODS },
 
 /* Misc files.
  */
