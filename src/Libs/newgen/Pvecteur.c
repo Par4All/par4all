@@ -19,80 +19,110 @@
 
 #define TCST_NAME "TERME_CONSTANT"
 
+static void print_token(FILE * fd, string s)
+{
+  for (; *s; s++)
+  {
+    if (*s=='\\' || *s==' ' || *s=='\n' || *s=='\0')
+    {
+      putc('\\', fd);
+    }
+    putc(*s, fd);
+  }
+}
+
+/* as bad as strtok. NULL if empty string? */
+static string read_token(string * ps)
+{
+  string head, r, w;
+  if (!ps || !(*ps) || !(**ps)) return NULL;
+  head = *ps, r=*ps, w=*ps;
+  while (*r && *r!=' ')
+  {
+    if (*r=='\\')
+    {
+      r++;
+      if (!*r) abort();
+    }
+    *w++ = *r++;
+  }
+  if (*r) *ps = r+1; 
+  else *ps = NULL;
+  *w = '\0';
+  return head;
+}
+
 void vect_gen_write(FILE *fd, Pvecteur v)
 {
     Pvecteur p;
 
-    fprintf(fd, "(");
-
     for (p = v; p != NULL; p = p->succ) {
 	fprint_Value(fd, val_of(p));
-	(void) fprintf(fd," %s ", 
-		       (p->var == (Variable) 0) ? TCST_NAME : 
-		       entity_name((entity) p->var));
+	putc(' ', fd);
+	print_token(fd, (p->var == (Variable) 0) ? TCST_NAME : 
+		    entity_name((entity) p->var));
+	putc(' ', fd);
     }
-
-    (void) fprintf(fd, ")");
+    putc('\n', fd);
 }
 
 Pvecteur vect_gen_read(fd, f)
 FILE *fd; /* ignored */
 int (*f)();
 {
-/* VBUFSIZE was increased from 1024 to 2048 for cgg:opmkrnl; FI, 13 March 92 */
-/* VBUFSIZE was increased from 2048 to 4096 for mat:zebulon5; FI, 3 Jan 97 */
-/* VBUFSIZE was increased from 4096 to 8192 for mat:zebulon5; FI, 3 Jan 97 */
-/* VBUFSIZE was increased from 8192 to 16384 for mat:zebulon5; FI, 3 Jan 97 */
-/* VBUFSIZE was increased from 16384 to 32768 for mat:zebulon5; FI, 3 Jan 97 */
-#define VBUFSIZE 32768
+    static char * buffer = NULL;
+    static int buffersize = 1024;
     Value val;
     Variable var;
-    char *varname;
-    char buffer[VBUFSIZE], *pbuffer;
+    char *varname, *sval;
+    char *pbuffer;
     int ibuffer = 0;
     Pvecteur p = NULL;
-    int c;
+    int c, previous=0;
 
-    if ((c = f()) != '(') {
-	fprintf(stderr, "[vect_gen_read] missing '('\n");
-	while ((c = f()) != EOF) {
-	    (void) fprintf(stderr, "%c", c);
-	}	    
-	abort();
+    if (!buffer) 
+    {
+      buffer = (char*) malloc(buffersize*sizeof(char));
+      pips_assert("malloc ok", buffer);
     }
 
-    while ((c = f()) != ')') {
-	if (ibuffer >= VBUFSIZE-1) {
-	  while ((c = f()) != ')')
-	    ibuffer++;
-	    (void) fprintf(stderr,
-			   "[vect_gen_read] buffer[%d] too small for %d bytes\n",
-			   VBUFSIZE-1, ibuffer);
-	    abort();
-	}
-	buffer[ibuffer++] = c;
+    /* read buffer up to new line */
+    while ((c = f()) != -1 && (c!='\n' && previous!='\\'))
+    {
+      if (ibuffer+1>=buffersize)
+      {
+	buffersize*=2;
+	buffer = (char*) realloc(buffer, buffersize*sizeof(char));
+	pips_assert("realloc ok", buffer);
+      }
+      buffer[ibuffer++] = c;
+      previous = (previous=='\\')? 0 : c;
     }
+
     buffer[ibuffer++] = '\0';
 
-    pbuffer = strtok(buffer, " ");
-    while (pbuffer != NULL) {
-	sscan_Value(pbuffer, &val);
-	varname = strtok(NULL, " ");
-	if (strcmp(varname, TCST_NAME) == 0) {
-	    var = (Variable) 0;
+    pbuffer = buffer;
+    sval = read_token(&pbuffer); 
+    while (sval != NULL) 
+    {
+      sscan_Value(sval, &val);
+      varname = read_token(&pbuffer);
+      if (strcmp(varname, TCST_NAME) == 0) {
+	var = (Variable) 0;
+      }
+      else {
+	var = (Variable) gen_find_tabulated(varname, entity_domain);
+	if (var == (Variable) entity_undefined) {
+	  fprintf(stderr, "[vect_gen_read] bad entity name: %s\n",
+		  varname);
+	  abort();
 	}
-	else {
-	    var = (Variable) gen_find_tabulated(varname, entity_domain);
-	    if (var == (Variable) entity_undefined) {
-		fprintf(stderr, "[vect_gen_read] bad entity name: %s\n",
-			varname);
-		abort();
-	    }
-	}
-
-	vect_add_elem(&p, var, val);
-
-	pbuffer = strtok(NULL, " ");
+      }
+      
+      vect_add_elem(&p, var, val);
+      
+      /* pbuffer = strtok(NULL, " "); */
+      sval = read_token(&pbuffer); 
     }
 
     p = vect_reversal(p);
