@@ -898,6 +898,7 @@ whileloop_to_postcondition(
 
 	    ntl = transformer_apply(tf, pre);
 	    /* Let's execute the last iteration since it certainly exists */
+	    ntl = precondition_add_condition_information(ntl, c, TRUE);
 	    post = transformer_apply(tb, ntl);
 	    free_transformer(ntl);
 	    post = precondition_add_condition_information(post, c, FALSE);
