@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/05/05 15:30:02 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/05/05 15:33:08 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -53,7 +53,7 @@ static int name##_hack()\
 { return((int) name##_undefined_p & (int) reset_##name & \
 	 (int) set_##name & (int) get_##name & \
 	 (int) update_##name & (int) load_##name & \
-	 (int) bound_##name##_p & (int) delete_##type & (int) name##_hack);}
+	 (int) bound_##name##_p & (int) delete_##name & (int) name##_hack);}
 
 #define GENERIC_GLOBAL_FUNCTION(name, type)\
         GENERIC_FUNCTION(/**/, name, type)
