@@ -141,9 +141,138 @@ static bool call_flt(call c)
 
 /******written by Dat***********************/
 
+typedef struct 
+{
+    string name;
+    bool is_a_summary;
+    gen_chunk * resource;
+    generic_text_function get_text;
+    generic_prettyprint_function prettyprint;
+    generic_attachment_function attach;
+}
+    prettyprint_stuff, *p_prettyprint_stuff;
+
+void 
+reset_generic_prettyprints(void)
+{
+    gen_map(free, lp);
+    gen_free_list(lp);
+    lp = NIL;
+}
+
+static void 
+load_resources(string module_name)
+{
+    list l;
+    for (l=lp; l; POP(l))
+    {
+	p_prettyprint_stuff pps = (p_prettyprint_stuff) STRING(CAR(l));
+	pps->resource = 
+	    (gen_chunk*) db_get_memory_resource(pps->name, module_name, TRUE);
+    }
+}
+
+static list 
+load_list(statement_effects m, statement s)
+{
+    return effects_effects(apply_statement_effects(m, s));
+}
+
+/********************************************************************* TEXT */
+
+/* returns the text associated to a specified prettyprint and statement 
+ */
+static text
+resource_text(
+    entity module, 
+    int margin, 
+    statement stat,
+    p_prettyprint_stuff pps)
+{
+    list l_eff = NIL;
+    text l_eff_text;
+
+    pips_assert("must not be a summary", !pps->is_a_summary);
+
+    if (is_user_view_p)
+    {
+	statement i;
+
+	if (!statement_undefined_p
+	    (i = apply_number_to_statement(nts, statement_number(stat))))
+	{
+	    l_eff = load_list(pps->resource, i);
+	}
+	else
+	    l_eff = (list) HASH_UNDEFINED_VALUE;
+    }
+    else
+    {
+	l_eff = load_list(pps->resource, stat);
+	ifdebug(1)
+	 {
+	     if (l_eff != (list) HASH_UNDEFINED_VALUE &&
+		 l_eff != list_undefined) 
+	     {
+		 pips_debug(1, "current effects:\n");
+		 (*(pps->prettyprint))(l_eff);
+	     }
+	 }
+    }
+
+    l_eff_text = (*(pps->get_text))(l_eff);
+
+    /* (*attach_effects_decoration_to_text_func)(the_effect_text); */
+
+    return l_eff_text;
+}
+
+/* returns the text of all required summaries
+ */
+static text
+text_summary_any_effect_type(
+    entity module)
+{
+    text result = make_text(NIL);
+    list l;
+    for (l=lp; l; POP(l))
+    {
+	p_prettyprint_stuff pps = (p_prettyprint_stuff) STRING(CAR(l));
+	if (pps->is_a_summary) {
+	    pips_debug(5, "considering resource %s\n", pps->name);
+	    MERGE_TEXTS(result, (*(pps->get_text))
+			(effects_effects( (effects) pps->resource)));
+	}
+    }
+
+    return result;
+}
+
+/* returns the text of all required effects associated to statement stat
+ */
+static text
+text_statement_any_effect_type(
+    entity module,
+    int margin,
+    statement stat)
+{
+    text result = make_text(NIL);
+    list l;
+    for (l=lp; l; POP(l))
+    {
+	p_prettyprint_stuff pps = (p_prettyprint_stuff) STRING(CAR(l));
+	if (!pps->is_a_summary) {
+	    pips_debug(5, "considering resource %s\n", pps->name);
+	    MERGE_TEXTS(result, resource_text(module, margin, stat, pps));
+	}
+    }
+
+    return result;
+}
+
 text my_get_any_effects_text(string module_name)
 {
-entity module;
+    entity module;
     statement module_stat;
     text txt = make_text(NIL);
 
@@ -185,11 +314,11 @@ entity module;
 
 text my_get_any_effect_type_text(string module_name, string resource_name)
 {
-  text txt;
-  push_prettyprints(resource_name, string_undefined);
-  txt = my_get_any_effects_text(module_name);
-  reset_generic_prettyprints();
-  return txt;
+    text txt;
+    push_prettyprints(resource_name, string_undefined);
+    txt = my_get_any_effects_text(module_name);
+    reset_generic_prettyprints();
+    return txt;
 }
 
 text my_get_text_proper_effects(string module_name)
