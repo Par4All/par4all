@@ -79,7 +79,7 @@ static bool catch_user_error(bool (*f)(char *), string oname)
 }
 
 /* Apply an instanciated rule with a given ressource owner 
- */
+*/
 
 static bool apply_a_rule(oname, ru)
 string oname;
@@ -297,6 +297,17 @@ string rname, oname;
     return TRUE;
 }
 
+/*
+ * Apply do NOT activate the rule applied. 
+ * In the case of an interprocedural rule, the rules applied to the
+ * callees of the main will be the default rules. For instance,
+ * "apply PRINT_CALL_GRAPH_WITH_TRANSFORMERS" applies the rule
+ * PRINT_CALL_GRAPH to all callees of the main, leading to a core
+ * dump. 
+ * A solution, suggested by FI, is to create an apply that checks the 
+ * activation of the rule and exits if it is not activated 
+ * else calls a "blind" apply -DB, 03-07-96 
+ */
 static bool apply(pname, oname)
 string pname, oname;
 {
@@ -1136,4 +1147,9 @@ string phase_n, module_n;
 
     return success;
 }
+
+
+
+
+
 
