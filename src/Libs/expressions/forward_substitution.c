@@ -18,8 +18,15 @@
  * a sequence. Things could be performed at the control graph level.
  *
  * An important issue is to only perform the substitution only if correct.
+ * This is not really achieved at the time, because (at least) of the
+ * typing issues: I = pi*2.7 ; Y = I ; results in Y = pi*2.7, and the
+ * integer translation is forgotten.
  *
  * $Log: forward_substitution.c,v $
+ * Revision 1.5  1998/04/01 09:43:43  coelho
+ * fixed a bug that was too optimistic when selectig cool statements...
+ * w/w conflict have to be avoided to allow the transformation.
+ *
  * Revision 1.4  1998/03/31 17:56:25  coelho
  * fixed a bug (free of maybe NULL value).
  *
@@ -104,6 +111,11 @@ substitution_candidate(statement s, bool only_scalar)
 
     if (!ENTITY_ASSIGN_P(fun)) return NULL; /* ASSIGN */
 
+    ifdebug(7) {
+	pips_debug(7, "considering assignment statement:\n");
+	print_statement(s);
+    }
+
     args = call_arguments(c);
     pips_assert("2 args to =", gen_length(args)==2);
     svar = expression_syntax(EXPRESSION(CAR(args)));
@@ -159,39 +171,60 @@ expr_flt(expression e)
 }
 static void
 perform_substitution(
-    entity var, /* variable to be substituted */
-    expression val, /* value of the substitution */
+    p_substitution subs, /* substitution to perform */
     statement s /* where to do this */)
 {
-    the_variable = var;
-    the_value = val;
+    ifdebug(8) {
+	pips_debug(8, "\n");
+	print_statement(subs->source);
+	print_statement(s);
+    }
+    the_variable = subs->var;
+    the_value = subs->val;
+    /* maybe should take care of exit nodes? */
     gen_recurse(s, expression_domain, expr_flt, gen_null);
+    ifdebug(8) {
+	pips_debug(8, "result:\n");
+	print_statement(s);
+    }
 }
 
 /* whether there are some conflicts between W cumulated in s2
  * and any proper of s1: this mean that some variable of s1 have
  * their value modified, hence the substitution cannot be carried on.
+ * if only_written in true, only W/W conflicts are reported.
  * proper and cumulated effects must be available.
  */
 static bool 
-some_conflicts_between(statement s1, statement s2)
+some_conflicts_between(statement s1, statement s2, bool only_written)
 {
     effects efs1, efs2;
     efs1 = load_proper_rw_effects(s1);
     efs2 = load_cumulated_rw_effects(s2);
+
+    pips_debug(8, "looking for conflict %d/%d\n", 
+	       statement_number(s1), statement_number(s2));
 
     MAP(EFFECT, e2,
     {
 	if (effect_write_p(e2))
 	{
 	    entity v2 = effect_variable(e2);
+	    pips_debug(9, "written variable %s\n", entity_name(v2));
 	    MAP(EFFECT, e1,
-		if (entity_conflict_p(effect_variable(e1), v2)) return TRUE,
+		if (entity_conflict_p(effect_variable(e1), v2) &&
+		    (!(only_written && effect_read_p(e1))))
+		{
+		    pips_debug(8, "conflict with %s\n",
+			       entity_name(effect_variable(e1)));
+		    return TRUE;
+		},
 		effects_effects(efs1));
 	}
     },
 	effects_effects(efs2));
 
+    pips_debug(8, "no conflict\n");
     return FALSE;
 }
 
@@ -210,19 +243,20 @@ seq_flt(sequence s)
 	     */
 	    MAP(STATEMENT, anext,
 	    {
-		if (some_conflicts_between(subs->source, anext))
+		if (some_conflicts_between(subs->source, anext, FALSE))
 		{
 		    /* for some special case the substitution is performed.
 		     */
-		    if (cool_enough_for_a_last_substitution(anext))
-			perform_substitution(subs->var, subs->val, anext);
+		    if (cool_enough_for_a_last_substitution(anext) &&
+			!some_conflicts_between(subs->source, anext, TRUE))
+			perform_substitution(subs, anext);
 
 		    /* now STOP propagation!
 		     */
 		    break; 
 		}
 		else
-		    perform_substitution(subs->var, subs->val, anext);
+		    perform_substitution(subs, anext);
 	    },   
 		CDR(ls));
 
