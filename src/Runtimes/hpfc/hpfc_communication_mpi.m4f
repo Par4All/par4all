@@ -2,6 +2,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_mpi.m4f,v $
+! Revision 1.6  1997/07/21 14:27:37  zory
+! Buffered communications inserted (does not work :-( )
+!
 ! Revision 1.5  1997/07/03 11:03:46  zory
 ! communicator manipulation added
 !
@@ -194,7 +197,7 @@
       data HPFC REDFUNC MPI /MPI_SUM, MPI_PROD, MPI_MAX, MPI_MIN/
 
       RECEIVED BY BROADCAST = .FALSE.
-
+      BUFFER ATTACHED = .FALSE.
 
       end
 
@@ -352,16 +355,23 @@
 !
       subroutine HPFC BSEND(dest, tag, info)
       include "hpfc_commons_mpi.h"
-      integer dest, tag, info, size
+      integer dest, tag, info, size, bytesize
       character buffer(MAX MAX SIZE OF BUFFER)
+      
+      if (BUFFER ATTACHED) then 
+       debug(print *, MYLID, "[HPFC BSEND] buffer already allocated")
+       call MPI_BUFFER_DETACH(buffer,size,info)
+       debug(print *, MYLID, "[HPFC BSEND] buffer detached")
+      endif
+
+      call MPI_BUFFER_ATTACH(buffer,MAX MAX SIZE OF BUFFER  , info)
+      debug(print *, MYLID, "[HPFC BSEND] buffer allocated")
+      BUFFER ATTACHED = .TRUE.
+
       debug(`print *, MYLID, "[HPFC BSEND] - sending message to - ",
      $     dest, "tag -", tag, "Comm", HPFC COMMUNICATOR')
-      debug(`print *, MYLID, "[HPFC BSEND] - position ", PACKING 
-     $     BUFFER POSITION, "max -", MAX MAX SIZE OF BUFFER')
-      call MPI_BUFFER_ATTACH(buffer, MAX MAX SIZE OF BUFFER , info)
       call MPI_BSEND(DATA BUFFER, PACKING BUFFER POSITION, 
-     $     MPI_PACKED, dest, tag, HPFC COMMUNICATOR, info)  
-      call MPI_BUFFER_DETACH(buffer,size, info)
+     $     MPI_PACKED, dest, tag, HPFC COMMUNICATOR, info)
       debug(print *, MYLID, "[HPFC BSEND] message sent to - ", dest)
       end
 
