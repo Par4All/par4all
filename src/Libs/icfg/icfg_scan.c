@@ -306,7 +306,6 @@ static void instruction_rwt (instruction i)
 	      text_sentences(_t_) = NIL;
 	      free_text(_t_);
 	    }
-	    MERGE_TEXTS(t, load_statement_icfg(s));
 	  }
 	}
 	
