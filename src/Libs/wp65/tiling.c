@@ -16,6 +16,7 @@
 #include <values.h>
 #include "genC.h"
 #include "misc.h"
+#include "linear.h"
 #include "ri.h"
 #include "tiling.h"
 
