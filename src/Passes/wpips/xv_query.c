@@ -16,34 +16,40 @@
 #include "wpips.h"
 
 static Panel_item query_pad;
+static Panel_item query_cancel_button;
 
 static char *query_help_topic;
 static success (*apply_on_query)();
 
-void start_query(window_title, query_title, help_topic, func)
-char *window_title, *query_title, *help_topic;
-success (*func)();
+void start_query(window_title, query_title, help_topic, ok_func, cancel_func)
+     char *window_title, *query_title, *help_topic;
+     success (*ok_func)();
+     success (*cancel_func)();
 {
-    Display *dpy;
-    Window query_xwindow;
+  Display *dpy;
+  Window query_xwindow;
 
-    xv_set(query_frame, FRAME_LABEL, window_title, NULL);
+  xv_set(query_frame, FRAME_LABEL, window_title, NULL);
+  /*	     PANEL_NOTIFY_PROC, cancel_query_notify, */
 
-    xv_set(query_pad, PANEL_LABEL_STRING, query_title, NULL);
+  xv_set(query_cancel_button, PANEL_NOTIFY_PROC, cancel_func,
+	 NULL);
 
-    xv_set(query_pad, PANEL_VALUE, "", NULL);
+  xv_set(query_pad, PANEL_LABEL_STRING, query_title, NULL);
 
-    query_help_topic = help_topic;
+  xv_set(query_pad, PANEL_VALUE, "", NULL);
 
-    apply_on_query = func;
+  query_help_topic = help_topic;
 
-    unhide_window(query_frame);
+  apply_on_query = ok_func;
 
-    /* move the pointer to the center of the query window */
-    dpy = (Display *)xv_get(main_frame, XV_DISPLAY);
-    query_xwindow = (Window) xv_get(query_frame, XV_XID);
-    XWarpPointer(dpy, None, query_xwindow, None, None, None, None, 
-		 QUERY_WIDTH/2, QUERY_HEIGHT/2);
+  unhide_window(query_frame);
+
+  /* move the pointer to the center of the query window */
+  dpy = (Display *)xv_get(main_frame, XV_DISPLAY);
+  query_xwindow = (Window) xv_get(query_frame, XV_XID);
+  XWarpPointer(dpy, None, query_xwindow, None, None, None, None, 
+	       QUERY_WIDTH/2, QUERY_HEIGHT/2);
 }
 
 void query_canvas_event_proc(window, event)
@@ -120,6 +126,7 @@ Event *event;
     display_help(query_help_topic);
 }
 
+/* Ne fait rien d'autre que de fermer la fene^tre... */
 void cancel_query_notify(item, event)
 Panel_item item;
 Event *event;
@@ -158,8 +165,7 @@ void create_query_window()
 		     PANEL_NOTIFY_PROC, help_query_notify,
 		     NULL);
 
-    (void) xv_create(query_panel, PANEL_BUTTON,
+    query_cancel_button = xv_create(query_panel, PANEL_BUTTON,
 		     PANEL_LABEL_STRING, "Cancel",
-		     PANEL_NOTIFY_PROC, cancel_query_notify,
 		     NULL);
 }
