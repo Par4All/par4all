@@ -2,7 +2,7 @@
 #! /bin/sh -vx
 #
 # SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1995/08/10 14:22:22 $, )
+# $RCSfile: make-pips,v $ ($Date: 1995/09/15 11:15:41 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -89,14 +89,10 @@ for lib in $LIBS ; do
 			make $MAKE_OPTION clean >/dev/null
 			make $MAKE_OPTION production-depend >/dev/null
 		fi ;
-		make $MAKE_OPTION ${PIPS_LIBDIR}/lib${lib}.a >/dev/null)
+		make $MAKE_OPTION recompile >/dev/null)
 	if [ $? -ne 0 ] ; then
 		echo "Failed in building library $lib in Production"
 		FAILURES="$FAILURES $lib (P),"
-#	else
-#	(echo cd ${PIPS_LIBSRCDIR}/${lib} ; cd ${PIPS_LIBSRCDIR}/${lib}; 
-#		echo "Quick-installing ${PIPS_LIBDIR}/lib${lib}.a"
-#		make $MAKE_OPTION quick-install)
 	fi
 done
 fi
@@ -108,23 +104,13 @@ for lib in $LIBS ; do
 	echo; echo
 	(echo cd ${PIPS_DEVEDIR}/Lib/${lib}; cd ${PIPS_DEVEDIR}/Lib/${lib}; 
 		echo "Making lib${lib}.a"
-		make $MAKE_OPTION lib${lib}.a >/dev/null)
+		make $MAKE_OPTION recompile >/dev/null)
 	if [ $? -ne 0 ] ; then
 		echo "Failed in building library $lib in Development"
 		FAILURES="$FAILURES $lib (D),"
 	fi
 done
 fi
-
-# test programs in libraries are now obsolete
-# build test program for all libraries
-# for lib in $LIBS ; do
-#	echo; echo; echo; echo "Making ${lib}"
-#	(cd ${LIBSRCDIR}/${lib} ; pwd; make ${BINDIR}/${lib})
-#	if [ $? -ne 0 ] ; then
-#		echo "Failed in building test program for librairies"
-#	fi
-# done
 
 # build passes
 if [ -n "$PRODUCTION" ]
@@ -143,15 +129,10 @@ for pass in $PASSES ; do
 			make $MAKE_OPTION clean >/dev/null
 			make $MAKE_OPTION production-depend >/dev/null
 		fi ;
-		make $MAKE_OPTION \
-		${PIPS_LIBDIR}/lib${pass}.a ${PIPS_BINDIR}/${pass} >/dev/null)
+		make $MAKE_OPTION recompile >/dev/null)
 	if [ $? -ne 0 ] ; then
 		echo " Failed in building ${PIPS_BINDIR}/${pass}"
 		FAILURES="$FAILURES $pass (P),"
-#	else
-#	(echo cd ${BINSRCDIR}/${pass} ; cd ${BINSRCDIR}/${pass}; 
-#		echo "Quick-installing ${BINDIR}/${pass}"
-#		make $MAKE_OPTION quick-install)
 	fi
 done
 fi
@@ -163,7 +144,7 @@ for pass in $PASSES ; do
 	echo; echo
 	(echo cd ${PIPS_DEVEDIR}/Passes/${pass} ; cd ${PIPS_DEVEDIR}/Passes/${pass};
 		echo "Making ${pass}"
-		make $MAKE_OPTION ${pass} >/dev/null)
+		make $MAKE_OPTION recompile >/dev/null)
 	if [ $? -ne 0 ] ; then
 		echo " Failed in building pass $pass in Development"
 		FAILURES="$FAILURES $pass (D),"
