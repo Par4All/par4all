@@ -12,7 +12,7 @@
 # - uses less instead of more to avoid extra-characters when Display is run in background
 
 USAGE="Usage: Display [-w wspace] [-m module] [-v] [-l] [-s] [pretty-print]"
-AVAILABLE_PRETTY_P="Available Pretty-prints: para77 para90 cray cmf craft adfg bdt plc code tran utran prec uprec comp regi inreg outreg prop cumu cg icfg icfgprec icfgcomp icfgl icfglprec icfglcomp icfgc icfgcprec icfgccomp dg edg lcdg wdg wp65 bank flint dead"
+AVAILABLE_PRETTY_P="Available Pretty-prints: para77 para90 cray cmf craft adfg bdt plc code tran utran prec uprec comp regi inreg outreg prop cumu cg cgcomp cgprec cgtran cgprop cgcumu cgreg cgin cgout icfg icfgprec icfgcomp icfgl icfglprec icfglcomp icfgc icfgcprec icfgccomp dg edg lcdg wdg wp65 bank flint dead"
 
 MORE=less
 
@@ -127,6 +127,30 @@ case $PRETTY_P in
                 EXT=.craft
                 RESOURCE=PARALLELPRINTED_FILE;;
 	cg)	SELECT=PRINT_CALL_GRAPH
+		EXT=.cg
+		RESOURCE=CALLGRAPH_FILE;;
+	cgcomp)	SELECT=PRINT_CALL_GRAPH_WITH_COMPLEXITIES
+		EXT=.cg
+		RESOURCE=CALLGRAPH_FILE;;
+	cgprec)	SELECT=PRINT_CALL_GRAPH_WITH_PRECONDITIONS
+		EXT=.cg
+		RESOURCE=CALLGRAPH_FILE;;
+	cgtran)	SELECT=PRINT_CALL_GRAPH_WITH_TRANSFORMERS
+		EXT=.cg
+		RESOURCE=CALLGRAPH_FILE;;
+	cgprop)	SELECT=PRINT_CALL_GRAPH_WITH_PROPER_EFFECTS
+		EXT=.cg
+		RESOURCE=CALLGRAPH_FILE;;
+	cgcumu)	SELECT=PRINT_CALL_GRAPH_WITH_CUMULATED_EFFECTS
+		EXT=.cg
+		RESOURCE=CALLGRAPH_FILE;;
+	cgreg)	SELECT=PRINT_CALL_GRAPH_WITH_REGIONS
+		EXT=.cg
+		RESOURCE=CALLGRAPH_FILE;;
+	cgin)	SELECT=PRINT_CALL_GRAPH_WITH_IN_REGIONS
+		EXT=.cg
+		RESOURCE=CALLGRAPH_FILE;;
+	cgout)	SELECT=PRINT_CALL_GRAPH_WITH_OUT_REGIONS
 		EXT=.cg
 		RESOURCE=CALLGRAPH_FILE;;
 	icfg)	SELECT=PRINT_ICFG
