@@ -1,0 +1,238 @@
+/* a set a functions to print the host and node status in PVM,
+ * called from a Fortran subroutine. Plus some timer functions.
+ * Portability based on pvm m4 macros.
+ *
+ * $RCSfile: hpfc_misc_pvm.m4c,v $ version $Revision$
+ * ($Date: 1997/06/17 08:56:52 $, )
+ *
+ * Fabien Coelho, 1993-1994-1995-1996
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+
+#include "pvm3.h"
+
+/* PVM 3.2 / PVMe compatibility: managed by m4
+ *  - pvmhostinfo -> hostinfo
+ *  - pvmtaskinfo -> taskinfo (also adds ti_pid)
+ */
+
+ifdef(`_HPFC_NO_PVM_VERSION_',
+char * pvm_version() { return "special pvm on PVM_ARCH";} )
+
+/* quick checking of PVM function returns
+ */
+#define check(var, msg) if(var<0)fprintf(stderr,"Error %d (%s)\n",var,msg);
+
+
+/* returns the host name from its number and the table of hosts.
+ * ??? I guess I should abort if not found...
+ */
+static char *
+host_name(
+    int ti_host, /* the host number we are looking for */
+    int nhost,   /* the number of hosts */
+    struct pvmhostinfo *hostp) /* the struct in which the information is */
+{
+    int i;
+    for(i=0 ; i<nhost ; i++)
+	if (hostp[i].hi_tid==ti_host) return hostp[i].hi_name;
+
+    fprintf(stderr, "[hpfc.host_name] no host tid=0x%x among %d hosts\n",
+	    ti_host, nhost);
+
+    return "name not found";
+}
+
+
+/* returns the task information structure that holds the data 
+ * for a given task. ??? should I abort if not found? I guess so?
+ */
+static struct pvmtaskinfo *
+which_task(
+    int ti_tid, /* the task number we are looking for */
+    int ntask,  /* the number of tasks */
+    struct pvmtaskinfo *taskp)/* the struct in which the information is */
+{
+    int i;
+    
+    for(i=0 ; i<ntask ; i++)
+    {
+	int tid = taskp[i].ti_tid;
+	_getpe(tid=pvm_get_PE(tid);)
+	if (tid==ti_tid) return &taskp[i];
+    }
+
+    fprintf(stderr, "[hpfc.which_task] no task tid=0x%x among %d tasks\n", 
+	    ti_tid, ntask);
+
+    return (struct pvmtaskinfo *) NULL;
+}
+
+/* Function called by the RUNTIME under the DEMO compilation option. 
+ * Prints the hosts that compose the Parallel Virtual Machine.
+ */
+void 
+FUNCTION(printhostinfo) ARGS(`') /* `' */
+{
+    int i, info, nhost, narch;
+    struct pvmhostinfo *hostp;
+
+    info = pvm_config(&nhost, &narch, &hostp);
+    check(info, "pvm_config");
+
+    /* print hosts
+     */
+    fprintf(stderr, "PVM version %s running\n%d machine%s:\n",
+	    pvm_version(), nhost, nhost==1 ? "" : "s");
+
+    for( i=0 ; i<nhost ; i++ )
+	fprintf(stderr, "%s\t(%s)\n", hostp[i].hi_name, hostp[i].hi_arch);
+
+    fprintf(stderr, "\n");
+}
+
+/* Function called by the RUNTIME under the DEMO compilation option.
+ * Called the the host. Prints the tasks and the machine they are running on.
+ */
+void 
+FUNCTION(printtaskinfo) ARGS(`number, tids, hosttid') /* `' */
+int *number, *tids, *hosttid;
+{
+    int i, info, nhost, narch, ntask;
+    struct pvmtaskinfo *taskp, *found;
+    struct pvmhostinfo *hostp;
+    
+    /* get informations from pvm
+     */
+    info = pvm_config(&nhost, &narch, &hostp);
+    check(info, "pvm_config");
+
+    info = pvm_tasks(0, &ntask, &taskp);
+    check(info, "pvm_tacks");
+
+    /* print tasks
+     */
+    found = which_task(*hosttid, ntask, taskp);
+    fprintf(stderr, "host running on %s\n",
+	    found ? host_name(found->ti_host, nhost, hostp) : "not found");
+
+    fprintf(stderr, "%d nodes:\n", (*number));
+
+    for( i=0 ; i<(*number) ; i++ )
+    {
+	found = which_task(tids[i], ntask, taskp);
+	fprintf(stderr, "%d running on %s\n", i+1,
+		found ? host_name(found->ti_host, nhost, hostp) : "not found");
+    }
+
+    fprintf(stderr, "\n");	
+}
+
+
+/******************************************************************** TIME */
+/* functions to measure wall clock time and be called by the rt.
+ * there is a static stack of ten timer starts, thus imbrication is possible.
+ * going too far would result in an abort.
+ */
+#include <sys/time.h>
+
+/* gettimeofday is not declared anywhere! (on sunos at least)
+ */
+/* extern int gettimeofday(struct timeval *, struct timezone *); */
+
+/* static stack of timings...
+ */
+#define TIMER_STACK_SIZE 10
+static struct timeval initial[TIMER_STACK_SIZE];
+static int timer_index=0;
+
+void
+FUNCTION(hpfctimeon) ARGS(`') /* `' */
+{
+    assert(timer_index<TIMER_STACK_SIZE);
+
+    /* push current time
+     */
+    if (gettimeofday(&initial[timer_index++], (struct timezone *) NULL))
+	fprintf(stderr, "gettimeofday error\n");
+
+    /* I could diplay some message, maybe with the level.
+     */
+}
+
+/* to print the micros with leading and trailing 0s if needed.
+ * ??? static buffer... I could not find any way to do that with formats.
+ */
+static char *
+print_micros(long micros)
+{
+    static char buffer[7];
+    int i;
+
+    sprintf(buffer, "%6ld", micros);
+
+    for (i=0; i<6; i++)
+	if (buffer[i]==' ') buffer[i]='0' ;
+
+    return buffer;
+}
+
+#define MAX_COMMENT_LENGTH 63
+
+void
+FUNCTION(hpfctell) ARGS(`STRING_ARG(comment)') /* `' */
+STRING_ARG_DECL(comment);
+{
+    char buffer[ MAX_COMMENT_LENGTH + 1 ];
+    int i;
+    
+    /* copy the comment in the buffer to ensure there is a NULL at the end.
+     */  
+    for (i=0; i<MAX_COMMENT_LENGTH && i<STRING_LEN(comment); i++)
+	buffer[i] = STRING_PTR(comment)[i];
+    buffer[i]='\0';
+
+    fprintf(ifdef(`USE_PVMe',stdout,stderr), "[hpfctell] %s\n", buffer);
+}/* `' */
+
+void 
+FUNCTION(hpfctimeoff) ARGS(`STRING_ARG(comment)') /* `' */
+STRING_ARG_DECL(comment);
+{
+    char buffer[ MAX_COMMENT_LENGTH + 1 ];
+    struct timeval current;
+    long seconds, micros;
+    int i;
+
+    assert(timer_index>0); timer_index--;
+
+    /* copy the comment in the buffer to ensure there is a NULL at the end.
+     */  
+    for (i=0; i<MAX_COMMENT_LENGTH && i<STRING_LEN(comment); i++)
+	buffer[i] = STRING_PTR(comment)[i];
+    buffer[i]='\0';
+
+    /* get current time, and compute the delta.
+     */
+    if (gettimeofday(&current, (struct timezone *) NULL))
+	fprintf(stderr, "gettimeofday error\n");
+
+    seconds = current.tv_sec-initial[timer_index].tv_sec;
+    micros = current.tv_usec-initial[timer_index].tv_usec;
+    if (micros<0) micros+=1000000, seconds--;
+
+    /* display the result, with the associated level.
+     */
+    /* stdout or stderr. stderr! 
+     * but I'm not sure of what is done by loadleveler on the SP2,
+     * so I put, hopefully temporarily, stdout as the output for that machine.
+     */
+    fprintf(ifdef(`USE_PVMe',stdout,stderr), "%s [%d]: %ld.%s s\n", 
+	    buffer, timer_index, seconds, print_micros(micros));
+}
+
+/* that is all
+ */
