@@ -447,7 +447,7 @@ list*	  in_lp;
       if (get_debug_level()>6) {
 	adg_fprint_dataflow(stderr, 
 			    dfg_vertex_label_statement(vertex_vertex_label(in_dest)),
-			    df,0);
+			    df);
       }
       ADD_ELEMENT_TO_LIST( dfl, DATAFLOW, df );
     }
