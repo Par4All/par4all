@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.86  1998/05/25 10:43:38  coelho
+ * more log on errors.
+ *
  * Revision 1.85  1998/05/25 06:45:13  coelho
  * fixed nesting in tp_system.
  * tpips_is_interactive ok in "source".
@@ -600,31 +603,34 @@ i_create: TK_CREATE TK_NAME /* workspace name */
 		    pips_user_error("Close current workspace %s before "
 				    "creating another!\n", 
 				    db_get_current_workspace_name());
-		} else {
-		  if(db_create_workspace ($2))
-		  {
-		      if(!create_workspace ($3))
-		      {
-			  /* string wname = db_get_current_workspace_name();*/
-			  db_close_workspace();
-			  (void) delete_workspace($2);
-			pips_user_error("Could not create workspace %s\n", $2);
-		      }
-
-		      main_module_name = get_first_main_module();
-		      
-		      if (!string_undefined_p(main_module_name)) {
-			  /* Ok, we got it ! Now we select it: */
-			  user_log("Main module PROGRAM \"%s\" selected.\n",
-				   main_module_name);
+		} 
+		else
+		{
+		    if (db_create_workspace($2))
+		    {
+			if (!create_workspace($3))
+			{
+			    db_close_workspace();
+			    user_log("Deleting workspace...\n");
+			    delete_workspace($2);
+			    pips_user_error("Could not create workspace %s\n", 
+					    $2);
+			}
+			
+			main_module_name = get_first_main_module();
+			
+			if (!string_undefined_p(main_module_name)) {
+			    /* Ok, we got it ! Now we select it: */
+			    user_log("Main module PROGRAM \"%s\" selected.\n",
+				     main_module_name);
 			  lazy_open_module(main_module_name);
-		      }
-		      $$ = TRUE;
-		  }
-		  else {
-		      pips_user_error("Cannot create directory for workspace,"
-				      " check rights!\n");
-		  }
+			}
+			$$ = TRUE;
+		    }
+		    else {
+			pips_user_error("Cannot create directory for workspace"
+					", check rights!\n");
+		    }
 		}
 	    }
 	    free($2);
