@@ -7,8 +7,9 @@
 #                /usr/lib/debug/malloc.o
 
 # can't stand bison:-(
-YACC=	yacc
-YFLAGS=	
+# YACC=	yacc
+# YFLAGS=	
+
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
 LIB_CFILES=	pip.c \
@@ -25,12 +26,16 @@ LIB_CFILES=	pip.c \
 DERIVED_CFILES=	solpip_parse.c \
 		solpip_scan.c
 
+PIP_HEADERS=	pip__type.h \
+		pip__tab.h \
+		pip__sol.h
+
 LIB_HEADERS=	pip-local.h \
 		solpip_parse.y \
 		solpip_scan.l \
-		type.h \
-		tab.h \
-		sol.h
+		$(PIP_HEADERS)
+
+INSTALL_INC=	$(PIP_HEADERS)
 
 LIB_OBJECTS=	$(DERIVED_CFILES:.c=.o)  $(LIB_CFILES:.c=.o)
 
