@@ -198,8 +198,7 @@ open_workspace(string name)
     return success;
 }
 
-bool 
-close_workspace(void)
+bool close_workspace(bool is_quit)
 {
     bool success;
 
@@ -209,7 +208,7 @@ close_workspace(void)
     /* It is useless to save on disk some non up to date resources:
      */
     delete_some_resources();
-    success = make_close_workspace();
+    success = make_close_workspace(is_quit);
     close_log_file();
     close_processed_include_cache();
     reset_entity_to_size();
