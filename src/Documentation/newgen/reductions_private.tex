@@ -1,5 +1,5 @@
 %% $RCSfile: reductions_private.tex,v $ (version $Revision$)
-%% $Date: 1996/06/15 11:13:14 $, 
+%% $Date: 1996/06/21 13:44:13 $, 
 %%
 
 \documentclass{article}
@@ -34,9 +34,11 @@ A reduction is a reference describing the object on which the reduction is
 performed. This object may be a scalar, a full array, part of an array,
 and so on. The operator is also specified. The dependences is the list of
 entities the reduction reference depends on, and is used in the
-construction algorithm. 
+construction algorithm. The trusted references are those the effects of
+contribute to the reduction. They are only used and significant in the
+proper reductions construction algorithm.
 
-\domain{reduction = reference x op:reduction_operator x dependences:entity*}
+\domain{reduction = reference x op:reduction_operator x dependences:entity* x persistent trusted:reference*}
 
 List of reductions are separated.
 
@@ -51,9 +53,6 @@ reductions.
 
 \domain{pstatement\_reductions = persistent statement->reductions}
 
-Function from entity to reductions to be used to store callees'
-reductions. 
 
-\domain{entity\_reductions = entity->reductions}
 
 \end{document}
