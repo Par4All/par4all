@@ -182,7 +182,7 @@ void reset_make_cache()
     up_to_date_resources = set_undefined;
 }
 
-bool make(rname, oname)
+static bool make(rname, oname)
 string rname, oname;
 {
     bool status;
@@ -289,7 +289,7 @@ string rname, oname;
     return TRUE;
 }
 
-bool apply(pname, oname)
+static bool apply(pname, oname)
 string pname, oname;
 {
     bool status;
@@ -931,5 +931,79 @@ void do_resource_usage_check(string oname, rule ru)
 
     set_clear(res_read);
     set_clear(res_write);
+}
+
+bool safe_make(res_n, module_n)
+string res_n, module_n;
+{
+    jmp_buf long_jump_buffer;
+    bool success = FALSE;
+
+    if( setjmp(long_jump_buffer) ) {
+	reset_make_cache();
+	user_warning("safe_make",
+		     "Request aborted in pipsmake: "
+		     "build resource %s for module %s.\n", 
+		     res_n, module_n);
+	success = FALSE;
+    }
+    else {
+	push_pips_context(&long_jump_buffer);
+	user_log("Request: build resource %s for module %s.\n", 
+		 res_n, module_n);
+
+	pips_malloc_debug();
+
+	success = make(res_n, module_n);
+	if(success) {
+	    user_log("%s made for %s.\n", res_n, module_n);
+	}
+	else {
+	    user_warning("safe_make",
+			 "Request aborted under pipsmake: "
+			 "build resource %s for module %s.\n", 
+			 res_n, module_n);
+	}
+    }
+    pop_pips_context();
+
+    return success;
+}
+
+bool safe_apply(phase_n, module_n)
+string phase_n, module_n;
+{
+    jmp_buf long_jump_buffer;
+    bool success = FALSE;
+
+    if( setjmp(long_jump_buffer) ) {
+	reset_make_cache();
+	user_warning("safe_apply", 
+		     "Request aborted in pipsmake: "
+		     "perform rule %s on module %s.\n", 
+		     phase_n, module_n);
+	success = FALSE;
+    }
+    else {
+	push_pips_context(&long_jump_buffer);
+	user_log("Request: perform rule %s on module %s.\n", 
+		 phase_n, module_n);
+	pips_malloc_debug();
+
+	success = apply(phase_n, module_n);
+
+	if (success) {
+	    user_log("%s applied on %s.\n", phase_n, module_n);
+	}
+	else {
+	    user_warning("safe_apply", 
+			 "Request aborted under pipsmake: "
+			 "perform rule %s on module %s.\n", 
+			 phase_n, module_n);
+	}
+    }
+    pop_pips_context();
+
+    return success;
 }
 
