@@ -4,14 +4,14 @@
 #include "genC.h"
 #include "parser_private.h"
 #include "ri.h"
-#include "ri-util.h"
 #include "database.h"
-#include "pipsdbm.h"
 #include "resources.h"
 
 #include "misc.h"
 #include "properties.h"
 
+#include "pipsdbm.h"
+#include "ri-util.h"
 #include "syntax.h"
 
 #include "toklex.h"
@@ -117,8 +117,6 @@ void EndOfProcedure()
      */
     if (get_bool_property("HPFC_FILTER_CALLEES"))
     {
-	extern bool hpf_directive_string_p(string);
-	extern bool keep_directive_in_code_p(string);
 	list l = NIL;
 	string s;
 
