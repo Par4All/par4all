@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.93  1997/04/15 10:58:05  creusil
+ * statement_effects used instead of statement mappings for regions. bc.
+ *
  * Revision 1.92  1997/03/20 10:11:38  coelho
  * better RCS headers.
  *
@@ -272,9 +275,9 @@ static void set_resources_for_module(entity module)
      */
    
 
-    set_local_regions_map
-	(effectsmap_to_listmap((statement_mapping)
-	 db_get_memory_resource(DBR_REGIONS, module_name, TRUE)));
+    set_rw_effects
+	((statement_effects)
+	 db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
 
 
 
@@ -284,12 +287,12 @@ static void set_resources_for_module(entity module)
 	    set_bool_property("MUST_REGIONS", TRUE); 
 	    set_bool_property("EXACT_REGIONS", TRUE);	  
 	    get_regions_properties(); 
-	    set_out_regions_map  /* OUT REGIONS */ 
-		(effectsmap_to_listmap( (statement_mapping)  
-		 db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE))); 
-	    set_in_regions_map  /*IN REGIONS*/ 
-		(effectsmap_to_listmap( (statement_mapping)  
-	         db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE))); 
+	    set_out_effects  /* OUT REGIONS */ 
+		((statement_effects)  
+		 db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE)); 
+	    set_in_effects  /*IN REGIONS*/ 
+		((statement_effects)  
+	         db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE)); 
 	}
     /* CUMMULATED REFERENCES*/
 
@@ -343,7 +346,7 @@ static void
 reset_resources_for_module()
 {
     reset_current_module_statement();
-    reset_local_regions_map();
+    reset_rw_effects();
     reset_cumulated_references();
     reset_precondition_map();
 
@@ -356,8 +359,8 @@ reset_resources_for_module()
   /*IN & OUT Regions are not always used*/
     if (!get_bool_property("HPFC_IGNORE_IN_OUT_REGIONS"))  
     {
-	free_in_regions_map();
-	free_out_regions_map();
+	reset_in_effects();
+	reset_out_effects();
     }
 
 }
