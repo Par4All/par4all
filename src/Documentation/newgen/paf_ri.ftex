@@ -1,16 +1,16 @@
 
 \documentstyle{article}
-\input{/java/home1/platonof/Latex/inputs/Dimensions.tex}
+%\input{/java/home1/platonof/Latex/inputs/Dimensions.tex}
 
 \newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
 
 \title{Structures Newgen pour l'int\'egration de PAF dans PIPS}
 
 \author{Fran\c{c}oise Lamour \\
-	Arnauld Leservot \\
-	Alexis Platonoff \\
-	\\
-	DMA/PCP, CEA CEL-V}
+        Arnauld Leservot \\
+        Alexis Platonoff \\
+        \\
+        DMA/PCP, CEA CEL-V}
 
 %\date{29 mars 1993}
 
@@ -197,32 +197,40 @@ variables du syst\`eme (l'ordre de ces deux listes est donc {\em tr\`es}
 important).}
 
 \domain{Leaf\_label = statement:int x depth:int}
-{Le domaine {\tt leaf\_label} est utilis\'e lors du calcul d'une source :
+{}
+
+Le domaine {\tt leaf\_label} est utilis\'e lors du calcul d'une source :
 il informe sur l'origine de cette source ({\tt statement})  
 ainsi que sur la profondeur de la dependance ({\tt depth}).
 Le quast rendu par PIP n'utilise pas ce champ ; il est dans ce cas
-mis \`a {\tt leaf\_label\_undefined}.}
+mis \`a {\tt leaf\_label\_undefined}.
 
 \domain{Var\_val = variable:entity x value:expression}
-{Le domaine {\tt var\_val} est utilis\'e pour sp\'ecifier l'association d'une 
-variable et de sa valeur exprim\'ee en fonction d'autres variables.}
+{}
+
+Le domaine {\tt var\_val} est utilis\'e pour sp\'ecifier l'association d'une 
+variable et de sa valeur exprim\'ee en fonction d'autres variables.
 
 
 \section{Repr\'esentation des expressions Lisp}
 
 \domain{Lisp\_expression = operation:string x args:expression*}
-{Le domaine {\tt lisp\_expression} permet de d\'ecrire les informations 
+{}
+
+Le domaine {\tt lisp\_expression} permet de d\'ecrire les informations 
 contenues dans une expression num\'erique en notation Lisp. Une telle 
 expression est compos\'ee d'un op\'erateur et d'une liste d'arguments (chaque 
 argument \'etant une {\tt expression}). Cette structure est utilis\'ee pour les
 codes r\'ealisants le transfert des structures de PAF depuis les fichiers de 
 sortie \'ecrits en notation Le\_Lisp vers les structures newgen d\'efinies plus
-haut.}
+haut.
 
 \section{Repr\'esentation du contr\^ole statique}
 
 \domain{Static\_control = yes:bool x params:entity* x loops:loop* x tests:expression*}
-{Le domaine {\tt static\_control} d\'efinit la structure de l'information qui 
+{}
+
+Le domaine {\tt static\_control} d\'efinit la structure de l'information qui 
 est associ\'ee \`a une instruction ({\em i.e.} un {\tt statement}). Le 
 sous-domaine {\tt yes} indique si ce statement se trouve dans une zone \`a 
 contr\^ole statique~; si ce n'est pas le cas, les trois sous-domaines suivant 
@@ -230,6 +238,9 @@ sont vides. Le sous-domaine {\tt params} donne la liste des param\`etres de
 structure de la zone \`a contr\^ole statique dans laquelle se trouve ce 
 statement. Le sous-domaine {\tt loops} donne la liste des boucles englobantes 
 de ce statement. Le sous-domaine {\tt tests} donne la liste des conditions 
-trouv\'ees dans les tests englobants de ce statement.}
+trouv\'ees dans les tests englobants de ce statement.
 
 \end{document}
+
+
+
