@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/10 17:08:50 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/30 10:07:40 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -277,7 +277,7 @@ wtest: $(LIB_TARGET)
 	@echo 
 
 ttest: $(LIB_TARGET)
-	$(LINK) tpips -ltpips $(PIPS_LIBS)
+	$(LINK) tpips -ltpips $(PIPS_LIBS) $(TPIPS_ADDED_LIBS)
 	@echo 
 
 # obsolete rule I guess. test is better. FC.
