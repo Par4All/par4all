@@ -698,8 +698,19 @@ unspaghettify_filter(statement s)
 void
 unspaghettify_statement(statement mod_stmt)
 {
+   debug_on("UNSPAGHETTIFY_DEBUG_LEVEL");
+
+   ifdebug (1)
+      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
+
    gen_recurse(mod_stmt, statement_domain,
                unspaghettify_filter, unspaghettify_rewrite);
+
+   ifdebug (1)
+      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
+
+   debug(2,"unspaghettify", "done");
+   debug_off();
 }
 
 
@@ -712,35 +723,22 @@ unspaghettify(char * mod_name)
 {
    statement mod_stmt;
 
-   debug_on("UNSPAGHETTIFY_DEBUG_LEVEL");
-
    /* Get the true ressource, not a copy. */
    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
    set_current_module_statement(mod_stmt);
 
    set_current_module_entity(local_name_to_top_level_entity(mod_name));
   
-   ifdebug (1)
-      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
-
    unspaghettify_statement(mod_stmt);
 
-   ifdebug (1)
-      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
-
-   /* Reorder the module, because new statements have been generated. */
+   /* Reorder the module, because new statementsthe control graph may
+      have been generatchanged. */
    module_reorder(mod_stmt);
-
-   ifdebug (1)
-      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
 
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
 
    reset_current_module_statement();
    reset_current_module_entity();
-
-   debug(2,"unspaghettify", "done for %s\n", mod_name);
-   debug_off();
 
    return TRUE;
 }
