@@ -1,7 +1,11 @@
 /* $RCSfile: tpips-local.h,v $ (version $Revision$)
- * $Date: 1996/12/30 17:52:47 $, 
+ * $Date: 1997/01/01 20:50:39 $, 
  */
-#define FILE_LIST_MAX_LENGTH 200
+
+/* FI: temporary storage of file names could be avoided with better yacc rules
+ * 272 files in Zebulon
+ */
+#define FILE_LIST_MAX_LENGTH 300
 
 typedef struct _t_file_list {
 	int argc;
