@@ -3,6 +3,10 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.25  2003/09/05 14:31:18  nguyen
+ * Handle function prototype declarations for C (words_parameters) and other
+ * improvements
+ *
  * Revision 1.24  2003/08/12 12:37:55  irigoin
  * Declarations cannot be globally sorted. Parameters at least must be
  * declared in an order avoiding forward referencing. Since they are gathered
@@ -105,6 +109,7 @@
 /*===================== Variables and Function prototypes for C ===========*/
 
 extern int is_fortran;
+static text c_text_entity_declaration(entity e, int margin);
 
 /********************************************************************* WORDS */
 
@@ -167,9 +172,22 @@ words_parameters(entity e)
        && formal_label_replacement_p(param))
       pc = CHAIN_SWORD(pc, "*");
     else
-      pc = CHAIN_SWORD(pc, entity_local_name(param));
+      {
+	if(entity_undefined_p(param)) 
+	  {
+	    parameter p = PARAMETER(gen_nth(i-1,functional_parameters(fe)));
+	    type t = parameter_type(p);
+	    /* param can be undefined for C language: void foo(void)
+	       We do not have an entity corresponding to the 1st argument */
+	    pips_user_warning("%dth parameter out of %d parameters not found for function %s\n",
+			      i, nparams, entity_name(e));
+	    pc = gen_nconc(pc,words_type(t));
+	  }
+	else 
+	  pc = CHAIN_SWORD(pc, entity_local_name(param));
+      }
   }
-
+  
   return(pc);
 }
 
@@ -1774,146 +1792,152 @@ static list words_dimensions(list dims)
   return pc; 
 }
  
-text c_text_entity_declaration(list ldecl, int margin)
+text c_text_entities(list ldecl, int margin)
 {
   text r = make_text(NIL);
   MAP(ENTITY,e,
   {
-    string name = entity_user_name(e);
-    type t = entity_type(e);
-    storage s = entity_storage(e);
-    list pc = NIL;
-    pips_debug(5,"Print declaration for entity: %s\n",name);
-    /*  Many possible combinations */
-
-    if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
-      {
-	/* This is a typedef name, what about typedef int myint[5] ??? */
-	pc = CHAIN_SWORD(pc,"typedef ");
-	pc = gen_nconc(pc,words_type(t));
-	pc = CHAIN_SWORD(pc,name);    
-	pc = CHAIN_SWORD(pc,";");
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-					      make_unformatted(NULL,0,margin,pc)));
-      }
-    else 
-      {
-	switch (storage_tag(s)) {
-	case is_storage_rom: 
-	  {
-	    value va = entity_initial(e);
-	    if (!value_undefined_p(va))
-	      {
-		/* prettyprint something like: #define e 50 */
-		pc = CHAIN_SWORD(pc,"#define ");
-		pc = CHAIN_SWORD(pc,name);  
-		pc = gen_nconc(pc,words_value(va));
-		ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-						      make_unformatted(NULL,0,margin,pc)));
-	      }
-	    break;
-	  }
-	case is_storage_ram: 
-	  {
-	    ram r = storage_ram(s);
-	    entity sec = ram_section(r);
-	    if (static_area_p(sec))
-	      pc = CHAIN_SWORD(pc,"static ");
-	    break;
-	  }
-	default: 
-	}
-	
-	switch (type_tag(t)) {
-	case is_type_variable:
-	  {
-	    variable v = type_variable(t);  
-	    value val = entity_initial(e);
-	    
-	    /* problems with order: qualifier, basic, ... !*/
-	    
-	    pc = gen_nconc(pc,words_qualifier(variable_qualifiers(v)));
-	    pc = gen_nconc(pc,words_basic(variable_basic(v)));
-	    pc = CHAIN_SWORD(pc,name);
-	    pc = gen_nconc(pc,words_dimensions(variable_dimensions(v)));
-	    
-	    if (!value_undefined_p(val))
-	      {
-		if (value_expression_p(val))
-		  {
-		    expression exp = value_expression(val);
-		    pc = CHAIN_SWORD(pc," = ");
-		    if (brace_expression_p(exp))
-		      pc = gen_nconc(pc,words_brace_expression(exp));
-		    else 
-		      pc = gen_nconc(pc,words_expression(exp));
-		  }
-	      }
-	    if (basic_bit_p(variable_basic(v)))
-	      {
-		int i = basic_bit(variable_basic(v));
-		pips_debug(7,"Basic bit %d",i);
-		pc = CHAIN_SWORD(pc,":");
-		pc = CHAIN_IWORD(pc,i);
-	      }
-	    pc = CHAIN_SWORD(pc,";");
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-						  make_unformatted(NULL,0,margin,pc)));
-	    break;
-	  }
-	case is_type_struct:
-	  {
-	    list l = type_struct(t);
-	    text fields = c_text_entity_declaration(l,margin+INDENTATION);
-	    pc = CHAIN_SWORD(pc,"struct ");
-	    pc = CHAIN_SWORD(pc,name);
-	    pc = CHAIN_SWORD(pc," {");
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-						  make_unformatted(NULL,0,margin,pc)));
-	    MERGE_TEXTS(r,fields);
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
-	    break;
-	  }
-	case is_type_union:
-	  {
-	    list l = type_union(t);
-	    text fields = c_text_entity_declaration(l,margin+INDENTATION);
-	    pc = CHAIN_SWORD(pc,"union ");
-	    pc = CHAIN_SWORD(pc,name);
-	    pc = CHAIN_SWORD(pc," {");
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-						  make_unformatted(NULL,0,margin,pc)));
-	    MERGE_TEXTS(r,fields);
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
-	    break;
-	  }
-	case is_type_enum:
-	  {
-	    list l = type_enum(t);
-	    bool first = TRUE;
-	    pc = CHAIN_SWORD(pc,"enum ");
-	    pc = CHAIN_SWORD(pc,name);
-	    pc = CHAIN_SWORD(pc," {");
-	    MAP(ENTITY,ent,
-	    { 
-	      pc = CHAIN_SWORD(pc,first?"":", ");
-	      pc = CHAIN_SWORD(pc,entity_user_name(ent));
-	      first = FALSE;
-	    },l);
-	    pc = CHAIN_SWORD(pc,"};");
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-						  make_unformatted(NULL,0,margin,pc)));
-	    break;
-	  }
-	default:
-	}
-      }
+    text tmp = c_text_entity_declaration(e, margin);
+    MERGE_TEXTS(r,tmp);
   },ldecl);
   
   return r; 
 }
 
-
+static text c_text_entity_declaration(entity e, int margin)
+{
+  text r = make_text(NIL);
+  string name = entity_user_name(e);
+  type t = entity_type(e);
+  storage s = entity_storage(e);
+  list pc = NIL;
+  pips_debug(5,"Print declaration for entity: %s\n",name);
+  /*  Many possible combinations */
+  
+  if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
+    {
+      /* This is a typedef name, what about typedef int myint[5] ??? */
+      pc = CHAIN_SWORD(pc,"typedef ");
+      pc = gen_nconc(pc,words_type(t));
+      pc = CHAIN_SWORD(pc,name);    
+      pc = CHAIN_SWORD(pc,";");
+      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+					    make_unformatted(NULL,0,margin,pc)));
+    }
+  else 
+    {
+      switch (storage_tag(s)) {
+	/*      case is_storage_rom: 
+	{
+	  value va = entity_initial(e);
+	  if (!value_undefined_p(va))
+	  {*/
+	      /* prettyprint something like: #define e 50 */
+	/* pc = CHAIN_SWORD(pc,"#define ");
+	      pc = CHAIN_SWORD(pc,name);  
+	      pc = gen_nconc(pc,words_value(va));
+	      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+						    make_unformatted(NULL,0,margin,pc)));
+	    }
+	  break;
+	}*/
+      case is_storage_ram: 
+	{
+	  ram r = storage_ram(s);
+	  entity sec = ram_section(r);
+	  if (static_area_p(sec))
+	    pc = CHAIN_SWORD(pc,"static ");
+	  break;
+	}
+      default: 
+      }
+      
+      switch (type_tag(t)) {
+      case is_type_variable:
+	{
+	  variable v = type_variable(t);  
+	  value val = entity_initial(e);
+	  
+	  /* problems with order: qualifier, basic, ... !*/
+	  
+	  pc = gen_nconc(pc,words_qualifier(variable_qualifiers(v)));
+	  pc = gen_nconc(pc,words_basic(variable_basic(v)));
+	  pc = CHAIN_SWORD(pc,name);
+	  pc = gen_nconc(pc,words_dimensions(variable_dimensions(v)));
+	  
+	  if (!value_undefined_p(val))
+	    {
+	      if (value_expression_p(val))
+		{
+		  expression exp = value_expression(val);
+		  pc = CHAIN_SWORD(pc," = ");
+		  if (brace_expression_p(exp))
+		    pc = gen_nconc(pc,words_brace_expression(exp));
+		  else 
+		    pc = gen_nconc(pc,words_expression(exp));
+		}
+	    }
+	  if (basic_bit_p(variable_basic(v)))
+	    {
+	      int i = basic_bit(variable_basic(v));
+	      pips_debug(7,"Basic bit %d",i);
+	      pc = CHAIN_SWORD(pc,":");
+	      pc = CHAIN_IWORD(pc,i);
+	    }
+	  pc = CHAIN_SWORD(pc,";");
+	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+						make_unformatted(NULL,0,margin,pc)));
+	  break;
+	}
+      case is_type_struct:
+	{
+	  list l = type_struct(t);
+	  text fields = c_text_entities(l,margin+INDENTATION);
+	  pc = CHAIN_SWORD(pc,"struct ");
+	  pc = CHAIN_SWORD(pc,name);
+	  pc = CHAIN_SWORD(pc," {");
+	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+						make_unformatted(NULL,0,margin,pc)));
+	  MERGE_TEXTS(r,fields);
+	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
+	  break;
+	}
+      case is_type_union:
+	{
+	  list l = type_union(t);
+	  text fields = c_text_entities(l,margin+INDENTATION);
+	  pc = CHAIN_SWORD(pc,"union ");
+	  pc = CHAIN_SWORD(pc,name);
+	  pc = CHAIN_SWORD(pc," {");
+	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+						make_unformatted(NULL,0,margin,pc)));
+	  MERGE_TEXTS(r,fields);
+	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
+	  break;
+	}
+      case is_type_enum:
+	{
+	  list l = type_enum(t);
+	  bool first = TRUE;
+	  pc = CHAIN_SWORD(pc,"enum ");
+	  pc = CHAIN_SWORD(pc,name);
+	  pc = CHAIN_SWORD(pc," {");
+	  MAP(ENTITY,ent,
+	  { 
+	    pc = CHAIN_SWORD(pc,first?"":", ");
+	    pc = CHAIN_SWORD(pc,entity_user_name(ent));
+	    first = FALSE;
+	  },l);
+	  pc = CHAIN_SWORD(pc,"};");
+	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+						make_unformatted(NULL,0,margin,pc)));
+	  break;
+	}
+      default:
+      }
+    }
+  return r;
+}
 
 
 
