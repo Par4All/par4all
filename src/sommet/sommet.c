@@ -38,7 +38,7 @@ Psommet sommet_new()
  * utilise directement; ca peut introduire du sharing;
  */
 Psommet sommet_make(d, v)
-int d;
+Value d;
 Pvecteur v;
 {
     Psommet s;
@@ -106,7 +106,9 @@ Psommet s;
 char * (*nom_var)();
 {
     if(s->denominateur!=1) {
-	(void) fprintf(f,"denominator = %d\t",s->denominateur);
+	(void) fprintf(f,"denominator = ");
+	fprint_Value(f,s->denominateur);
+	(void) fprintf(f, "\t");
     }
     vect_fprint(f,s->vecteur,nom_var); 
     /* malgre le clash de type, je kludge... */
@@ -122,7 +124,9 @@ Psommet s;
 Pbase b;
 {
     if(s->denominateur!=1) {
-	(void) fprintf(f,"denominator = %d\t",s->denominateur);
+	(void) fprintf(f,"denominator = ");
+	fprint_Value(f,s->denominateur);
+	(void) fprintf(f, "\t");
     }
     vect_fprint_as_dense(f,s->vecteur, b);
 }
@@ -170,12 +174,12 @@ Pbase b;
 void sommet_normalize(ns)
 Psommet ns;
 {
-    int div = vect_pgcd_all(ns->vecteur);
+    Value div = vect_pgcd_all(ns->vecteur);
 
     assert(div>0);
-    div = pgcd(div,ns->denominateur);
+    div = pgcd(div, ns->denominateur);
     ns->denominateur /= div;
-    (void) vect_div(ns->vecteur,div);
+    (void) vect_div(ns->vecteur, div);
 }
 
 /* boolean som_in_liste(Psommet s, Psommet l): test de l'appartenance
