@@ -3,44 +3,23 @@
 #
 # this file contains macro definitions 
 
-AR	= gar
-ARFLAGS	= rv
+CPPFLAGS += -Dsparc 
+LDFLAGS	+= -fast 
+
+include $(ROOT)/Include/makefile_macros.DEFAULT
+
 CC	= acc -temp=$(pips_home)/tmp
 CFLAGS	= -g -fast -Xc
-CMKDEP	= -M
+
 # The SC3 acc compiler forget to define the sparc flag;
-CPPFLAGS= -Dsparc -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include \
-	  -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC) -bsdmalloc
-LDFLAGS	= -fast -g \
-	  -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) \
-	  -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(EXTERN_ROOT)/Lib/$(ARCH)
+
 RANLIB	= granlib
+
 # lex broken for properties...
-# LEX	= lex
 LEX	= flex
-LFLAGS	=
-FC	= f77
+
 FFLAGS	= -O -g -U -u -C 
-LINT	= lint
-LINTFLAGS= -habxu
-YACC	= yacc
-YFLAGS	=
-PROTO	= cproto
-PRFLAGS	= -evcf2
-ETAGS	= etags
-TAR	= gtar
-ZIP	= gzip -v9
-DIFF	= diff
-M4	= gm4
-M4FLAGS	=
-LX2HTML	= latex2html
-L2HFLAGS= -link 8 -split 5
-LATEX	= latex
-BIBTEX	= bibtex
-MAKEIDX	= makeindex
-DVIPS	= dvips
-RMAN	= rman
 
 # end of it
 #
