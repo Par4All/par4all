@@ -324,8 +324,9 @@ char *module_name;
 
     reset_current_module_entity();
     reset_current_module_statement();
-    reset_proper_effects_map();
-    reset_cumulated_effects_map();
+    /* Two auxiliary hash tables allocated by effectsmap_to_listmap() */
+    free_proper_effects_map();
+    free_cumulated_effects_map();
     reset_transformer_map();
 
     debug_off();
@@ -460,7 +461,8 @@ char *module_name;
     reset_current_module_statement();
     reset_transformer_map();
     reset_precondition_map();
-    reset_cumulated_effects_map();
+    /* auxiliary hash table allocated by effectsmap_to_listmap() */
+    free_cumulated_effects_map();
 
     debug_off();
 
