@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/02/03 17:54:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/17 18:47:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/02/03 17:54:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/02/17 18:47:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -422,48 +422,54 @@ take_out_the_entry_node_of_the_unstructured(statement s,
 {
     instruction i = statement_instruction(s);
     unstructured u = instruction_unstructured(i);
-   control entry_node = unstructured_control(u);
-   list entry_node_successors = control_successors(entry_node);
-   int entry_node_successors_length = gen_length(entry_node_successors);
-   *new_unstructured_statement = s;
+    control entry_node = unstructured_control(u);
+    list entry_node_successors = control_successors(entry_node);
+    int entry_node_successors_length = gen_length(entry_node_successors);
+    *new_unstructured_statement = s;
    
-   if (entry_node_successors_length == 2
-       || gen_length(control_predecessors(entry_node)) > 0)
-      /* Well, this node is useful here since it is an unstructured IF
-         or there is a GOTO on it. */
-      return TRUE;
+    if (entry_node_successors_length == 2
+	|| gen_length(control_predecessors(entry_node)) > 0)
+	/* Well, this node is useful here since it is an unstructured IF
+	   or there is a GOTO on it. */
+	return TRUE;
 
-   if (entry_node_successors_length == 0) {
-      /* In fact the unstructured has only one control node! Transform
-         it in a structured statement: */
-      statement_instruction(s) =
-         make_instruction_block(CONS(STATEMENT,
-                                     control_statement(entry_node),
-                                     NIL));
-      /* Remove the unstructured: */
-      control_statement(entry_node) = statement_undefined;
-      free_instruction(i);
-      /* No longer unstructured: */
-      return FALSE;
-   }
-   else {
-      /* Take out the entry node: */
-      *new_unstructured_statement = make_stmt_of_instr(i);
-      statement_instruction(s) =
-         make_instruction_block(CONS(STATEMENT,
-                                     control_statement(entry_node),
-                                     CONS(STATEMENT,
-                                          *new_unstructured_statement,
-                                          NIL)));
-      /* The entry node is now the second node: */
-      pips_assert("take_out_the_entry_node_of_the_unstructured",
-                  entry_node_successors_length == 1);
-      unstructured_control(u) = CONTROL(CAR(entry_node_successors));
+    if (entry_node_successors_length == 0) {
+	/* In fact the unstructured has only one control node! Transform
+	   it in a structured block of statements: */
+	list l = CONS(STATEMENT, control_statement(entry_node), NIL);
+	/* Since the unstructured may have a comment on it, we cannot
+	   put the comment on the statement block but on a CONTINUE: */
+	if (! empty_comments_p(s)) {
+	    statement cs = make_continue_statement(entity_empty_label());
+	    statement_comments(cs) = statement_comments(s);
+	    statement_comments(s) = empty_comments;
+	    l = CONS(STATEMENT, cs, l);
+	}
+	statement_instruction(s) = make_instruction_block(l);
+	/* Remove the unstructured: */
+	control_statement(entry_node) = statement_undefined;
+	free_instruction(i);
+	/* No longer unstructured: */
+	return FALSE;
+    }
+    else {
+	/* Take out the entry node: */
+	*new_unstructured_statement = make_stmt_of_instr(i);
+	statement_instruction(s) =
+	    make_instruction_block(CONS(STATEMENT,
+					control_statement(entry_node),
+					CONS(STATEMENT,
+					     *new_unstructured_statement,
+					     NIL)));
+	/* The entry node is now the second node: */
+	pips_assert("take_out_the_entry_node_of_the_unstructured",
+		    entry_node_successors_length == 1);
+	unstructured_control(u) = CONTROL(CAR(entry_node_successors));
       
-      discard_a_control_sequence_without_its_statements(entry_node,
-                                                        entry_node);
-      return TRUE;
-   }
+	discard_a_control_sequence_without_its_statements(entry_node,
+							  entry_node);
+	return TRUE;
+    }
 }
 
 
@@ -971,6 +977,11 @@ recursively_restructure_an_unstructured(statement s)
 
     /* Replace control sequences by simple nodes: */
     fuse_sequences_in_unstructured(s);
+    ifdebug(5) {
+	pips_debug(5, "after fuse_sequences_in_unstructured\n");
+	print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+	pips_assert("Statements inconsistants...", gen_consistent_p(s));
+    }
     
     if (take_out_the_entry_node_of_the_unstructured(s, &new_unstructured_statement)) {
 	/* If take_out_the_entry_node_of_the_unstructured() has not been
