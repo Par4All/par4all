@@ -1,0 +1,51 @@
+c
+c $RCSfile: hpfc_bufmgr.m4f,v $ (version $Revision$)
+c $Date: 1995/09/07 11:31:24 $, 
+c
+include(`hpfc_lib_m4_macros') dnl
+define(`GENERIC_BUFFER_SEND',`
+pushdef(`PVMTYPE',$1)dnl
+      subroutine build_name(HPFC,PVMTYPE,BUFSND)(
+     $   lid)
+      integer lid
+      integer info, bufid
+      include "fpvm3.h"
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      call pvmfinitsend(PVMRAW, bufid)
+      call pvmfpack(INTEGER4, BUFINDEX, 1, 1, info)
+      call pvmfpack(PVMTYPE, 
+     $     build_name(PVMTYPE,BUFF),
+     $     BUFINDEX, 1, info)
+      call pvmfsend(NODETIDS(lid), SENDCHANNELS(lid), info)
+      SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
+      end')
+define(`GENERIC_BUFFER_RECV',`
+pushdef(`PVMTYPE',$1)dnl
+      subroutine build_name(HPFC,PVMTYPE,BUFRCV)(
+     $   lid)
+      integer lid
+      integer info, bufid
+      include "fpvm3.h"
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      call pvmfrecv(NODETIDS(lid), RECVCHANNELS(lid), bufid)
+      RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
+      call pvmfunpack(INTEGER4, SIZEOFRECEIVEDBUFFER, 1, 1, info)
+      call pvmfunpack(PVMTYPE, 
+     $     build_name(PVMTYPE,BUFF),
+     $     SIZEOFRECEIVEDBUFFER, 1, info)
+      end')
+define(`GENERIC_BUFFER',`
+GENERIC_BUFFER_SEND($1)
+GENERIC_BUFFER_RECV($1)')
+dnl GENERIC_BUFFER(BYTE1)
+dnl GENERIC_BUFFER(INTEGER2)
+GENERIC_BUFFER(INTEGER4)
+GENERIC_BUFFER(REAL4)
+GENERIC_BUFFER(REAL8)
+dnl GENERIC_BUFFER(COMPLEX8)
+dnl GENERIC_BUFFER(COMPLEX16)
+c
+c that is all
+c
