@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/12/19 15:46:21 $, ) 
+ * ($Date: 1995/12/19 15:55:50 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -269,7 +269,7 @@ void fprint_entity_list(FILE *fp, list l);
     make_assign_statement(entity_to_expression(var), e)
 
 #define local_index_is_different_p(array, dim) \
-  (new_declaration(array, dim)!=is_hpf_newdecl_none)
+  (new_declaration_tag(array, dim)!=is_hpf_newdecl_none)
 
 #define FindArrayDimAlignmentOfArray(array, dim) \
   (FindAlignmentOfDim(align_alignment(load_hpf_alignment(array)), dim))
