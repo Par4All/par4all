@@ -117,6 +117,8 @@ typedef hash_table control_mapping;
 #define IMPLIED_DO_NAME 		"IMPLIED-DO"
 #define RETURN_LABEL_NAME 		"00000"
 
+#define IMPLIED_COMPLEX_NAME		"IMPLIED-CMPLX"
+
 #define ASSIGN_OPERATOR_NAME 		"="
 #define PLUS_OPERATOR_NAME 		"+"
 #define MINUS_OPERATOR_NAME 		"-"
@@ -231,6 +233,7 @@ typedef hash_table control_mapping;
 /* IO Management
  */
 #define ENTITY_NAME_P(e, name)(same_string_p(entity_local_name(e),name))
+
 #define ENTITY_WRITE_P(e) ENTITY_NAME_P(e, "WRITE")
 #define ENTITY_REWIND_P(e) ENTITY_NAME_P(e, "REWIND")
 #define ENTITY_OPEN_P(e) ENTITY_NAME_P(e, "OPEN")
@@ -239,8 +242,10 @@ typedef hash_table control_mapping;
 #define ENTITY_BUFFERIN_P(e) ENTITY_NAME_P(e, "BUFFERIN")
 #define ENTITY_BUFFEROUT_P(e) ENTITY_NAME_P(e, "BUFFEROUT")
 #define ENTITY_ENDFILE_P(e) ENTITY_NAME_P(e, "ENDFILE")
-#define ENTITY_IMPLIEDDO_P(e) ENTITY_NAME_P(e, "IMPLIED-DO")
+#define ENTITY_IMPLIEDDO_P(e) ENTITY_NAME_P(e, IMPLIED_DO_NAME)
 #define ENTITY_FORMAT_P(e) ENTITY_NAME_P(e, "FORMAT")
+
+#define ENTITY_IMPLIED_CMPLX_P(e) ENTITY_NAME_P(e, IMPLIED_COMPLEX_NAME)
 
 #define ENTITY_FOUR_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
                                      ENTITY_MINUS_P(e) || \
