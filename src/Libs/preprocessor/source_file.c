@@ -758,9 +758,9 @@ process_user_file(string file)
 	    (DBR_INITIAL_FILE, mod_name, ".f_initial");
 
 	abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
-	abs_file = strdup(concatenate(dir_name, "/", file_name, 0));
+	/* abs_file = strdup(concatenate(dir_name, "/", file_name, 0)); */
 	
-	if (rename(abs_file, abs_res))
+	if (rename(file_name, abs_res))
 	{
 	    perror("process_user_file");
 	    pips_internal_error("mv %s %s failed\n", file_name, res_name);
@@ -771,7 +771,7 @@ process_user_file(string file)
 	 * absolute path to the file so that db moves should be ok?
 	 */
 	DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
-	free(file_name); free(abs_res); free(abs_file); free(mod_name);
+	free(file_name); free(abs_res); free(mod_name);
     }
     safe_fclose(fd, file_list);
     unlink(file_list); 
