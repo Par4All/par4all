@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.7  2004/03/26 08:03:42  hurbain
+   delock
+
    Revision 1.6  2004/03/25 14:38:18  hurbain
    Debug
 
@@ -1537,24 +1540,26 @@ static string c_code_string(entity module, statement stat)
 #define CPRETTY		".c"
 #define CLAIREPRETTY    ".cl"
 
-bool print_claire_rough(string module_name)
+bool print_claire_code(string module_name)
 {
   FILE * out;
-  string ppt, clairerough, dir, filename;
+  string ppt, clairepretty, dir, filename;
   entity module;
   statement stat;
 
-  clairerough = db_build_file_resource_name(DBR_CROUGH, module_name, CLAIREROUGH);
+  clairepretty = db_build_file_resource_name(DBR_CLAIRE_PRINTED_FILE, module_name, CLAIREPRETTY);
+
+  /*clairerough = db_build_file_resource_name(DBR_CLAIREROUGH, module_name, CLAIREROUGH);*/
   module = local_name_to_top_level_entity(module_name);
   dir = db_get_current_workspace_directory();
-  filename = strdup(concatenate(dir, "/", clairerough, NULL));
+  filename = strdup(concatenate(dir, "/", clairepretty, NULL));
   stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
   set_current_module_entity(module);
   set_current_module_statement(stat);
 
   debug_on("CPRETTYPRINTER_DEBUG_LEVEL");
-  pips_debug(1, "Begin Claire prettyprrinter for %s\n", entity_name(module));
+  pips_debug(1, "Begin Claire prettyprinter for %s\n", entity_name(module));
   ppt = claire_code_string(module, stat);
   pips_debug(1, "end\n");
   debug_off();  
@@ -1568,7 +1573,7 @@ bool print_claire_rough(string module_name)
   free(dir);
   free(filename);
 
-  DB_PUT_FILE_RESOURCE(DBR_CLAIREROUGH, module_name, clairerough);
+  DB_PUT_FILE_RESOURCE(DBR_CLAIRE_PRINTED_FILE, module_name, clairepretty);
 
   reset_current_module_statement();
   reset_current_module_entity();
@@ -1578,26 +1583,26 @@ bool print_claire_rough(string module_name)
 
 /* C indentation thru indent.
  */
-bool print_claire_code(string module_name)
+/*bool print_claire_code(string module_name)
 {
   string clairerough, clairepretty, dir, cmd;
 
   
-  /*pips_internal_error("Not implemented yet\n"); */
+  pips_internal_error("Not implemented yet\n"); 
 
   clairerough = db_get_memory_resource(DBR_CLAIREROUGH, module_name, TRUE);
   clairepretty = db_build_file_resource_name(DBR_CLAIRE_PRINTED_FILE, module_name, CLAIREPRETTY);
   dir = db_get_current_workspace_directory();
 
   cmd = strdup(concatenate(INDENT, " ", 
-			   dir, "/", crough, " -o ", 
-			   dir, "/", cpretty, NULL));
+			   dir, "/", clairerough, " -o ", 
+			   dir, "/", clairepretty, NULL));
 
   safe_system(cmd);
 
-  DB_PUT_FILE_RESOURCE(DBR_CLAIRE_PRINTED_FILE, module_name, cpretty);
+  DB_PUT_FILE_RESOURCE(DBR_CLAIRE_PRINTED_FILE, module_name, clairepretty);
   free(cmd);
   free(dir);
 
   return TRUE;
-}
+}*/
