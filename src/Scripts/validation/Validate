@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1994/03/23 17:41:57 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1994/03/24 20:48:14 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -35,7 +35,7 @@ DATE='/usr/bin/date'
 HOSTNAME=`hostname`
 USER=`whoami`
 PWD=`pwd`
-failed=""
+# failed=""
 
 # defaults
 
@@ -151,7 +151,10 @@ available_host()
   # get the result, hostname and remove the lock files
   #
   ah_file=`echo -n $RESULT.* | tr ' ' '\012' | head -1`
-  failed="$failed-"`cat $ah_file`
+  # failed="$failed-"`cat $ah_file`
+  #
+  # failures append
+  cat $ah_file >> $FAILED
   ah_host=`basename $ah_file | cut -d. -f 5`
   rm -f $WAITING.$ah_host $RESULT.$ah_host
   #
@@ -235,6 +238,7 @@ LOCKDIR=`absolute_name ${LOCKDIR:-$RUNDIR}`
 
 WAITING="$LOCKDIR/.validate_waiting.$HOSTNAME.$$"
 RESULT="$LOCKDIR/.validate_result.$HOSTNAME.$$"
+FAILED="$LOCKDIR/.validate_failed.$HOSTNAME.$$"
 
 #
 # the working directory
@@ -307,6 +311,8 @@ $VERBOSE " - in $RUNDIR"
 
 $VERBOSE "creating initial locks"
 
+touch $FAILED
+
 for h in `echo $VALHOSTS | tr ':' ' '`
 do
   $DEBUG " | initial lock for $h"
@@ -335,11 +341,11 @@ while available_host ; do : ; done > /dev/null
 
 $VERBOSE "generating final report"
 
-$DEBUG2 " | failed 0: +$failed+"
+failed=`tr '\012' '-' < $FAILED`
 
+$DEBUG2 " | failed 0: /$failed/"
 failed=`unstammer "$failed" '-'`
-
-$DEBUG " | failed : +$failed+"
+$DEBUG " | failed : /$failed/"
 
 if [ "$failed" ]
 then
@@ -361,6 +367,8 @@ $PERFORMANCE
 
 In case of problems, contact <jouvelot@cri.ensmp.fr>
 %
+
+rm -f $FAILED
 
 #
 # that's all
