@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/04/12 22:03:23 $, 
+ * $Date: 1997/07/22 13:37:55 $, 
  *
  * adapted from what can be seen by FC 31/12/96
  * 
@@ -66,9 +66,11 @@ char fsplit_copyright[] =
 char fsplit_sccsid[] = "@(#)fsplit.c	5.5 (Berkeley) 3/12/91";
 #endif /* not lint */
 
-#include <ctype.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <unistd.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
