@@ -53,9 +53,11 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
     statement mod_stat;
 
     set_current_module_entity(local_name_to_top_level_entity(mod_name));
-    set_current_module_statement( (statement)
+    mod_stat = (statement)db_get_memory_resource(DBR_CODE,mode_name,TRUE);
+    set_current_module_statement(mod_stat);
+    /*    set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
-    mod_stat = get_current_module_statement();
+	mod_stat = get_current_module_statement();*/
     initialize_ordering_to_statement(mod_stat);
 
     /* get the dg or chains... */
