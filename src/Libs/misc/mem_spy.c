@@ -117,25 +117,36 @@ void mem_spy_reset()
     verbosity = 2;
 }
 
+static int 
+current_memory_size()
+{
+    struct mallinfo heap_info = mallinfo();
+    int memory_size;
+    
+    switch(measurement) {
+    case SBRK_MEASURE: 
+	memory_size = sbrk(0) - etext;
+	break;
+    case NET_MEASURE: 
+	memory_size = heap_info.uordblks+heap_info.usmblks ;
+	break;
+    case GROSS_MEASURE: 
+	memory_size = heap_info.uordbytes+heap_info.usmblks ;
+	break;
+    default:
+	abort();
+    }
+
+    return memory_size;
+}
+
 void mem_spy_begin()
 {
     
     /* Do nothing if not between <mem_spy_init> ... <mem_spy_reset> */
     if (MemSpyUsed == 1)
     {
-	struct mallinfo heap_info = mallinfo();
-	int memory_size = 0;
-
-	switch(measurement) {
-	case SBRK_MEASURE: memory_size = sbrk(0) - etext;
-	    break;
-	case NET_MEASURE: memory_size = heap_info.uordblks;
-	    break;
-	case GROSS_MEASURE: memory_size = heap_info.uordbytes;
-	    break;
-	default:
-	    abort();
-	}
+	int memory_size = current_memory_size();
 
 	/* Do not go beyond stack limits */
 	assert(current_size_stack->index < TailleDeMaPile-1);
@@ -163,25 +174,13 @@ char * s;
     /* Do nothing if not between <mem_spy_init> ... <mem_spy_reset> */
     if (MemSpyUsed == 1)
     {
-	struct mallinfo heap_info = mallinfo();
-	int memory_size = 0;
+	int memory_size = current_memory_size();
 	char * format;
 
 	/* Too many dynamic calls to mem_spy_end()? */
 	if(current_size_stack->index<0) {
 	    fprintf(stderr,
 		    "Too many calls to mem_spy_end(), stack underflow\n");
-	    abort();
-	}
-
-	switch(measurement) {
-	case SBRK_MEASURE: memory_size = sbrk(0) - etext;
-	    break;
-	case NET_MEASURE: memory_size = heap_info.uordblks;
-	    break;
-	case GROSS_MEASURE: memory_size = heap_info.uordbytes;
-	    break;
-	default:
 	    abort();
 	}
 
