@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/03 22:26:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/06/20 16:29:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1997/02/03 22:26:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1997/06/20 16:29:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -347,6 +347,13 @@ void ComputeAddresses()
 	entity e = ENTITY(CAR(pcv));
 
 	if (entity_storage(e) == storage_undefined) {
+	    /* FI: I do not understand how this could work because
+	     * DynamicArea is managed directly and not thru common_size_map
+	     *
+	     * This could be hidden in CurrentOffsetOfArea()...
+	     *
+	     * FI, 16 June 1997
+	     */
 	    entity_storage(e) = 
 		    make_storage(is_storage_ram,
 				 (make_ram(get_current_module_entity(), 
