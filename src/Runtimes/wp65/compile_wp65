@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: compile_wp65,v $ (version $Revision$)
-# $Date: 1995/11/30 14:40:00 $, 
+# $Date: 1996/08/21 18:15:18 $, 
 #
 # from csh to sh, FC 19/09/95
 #
@@ -109,6 +109,12 @@ fi
 
 #
 # Let's compile
+
+WP65_LIBRARY=${WP65_LIBRARY:-${PIPS_ROOT}/Runtime/wp65}
+WP65_FC=${WP65_FC:-g77}
+WP65_FFLAGS=${WP65_FFLAGS:-'-u'}
+
+export WP65_LIBRARY WP65_FC WP65_FFLAGS
 
 TMP=wp65_tmp_$$
 
