@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-! ($Date: 1997/01/02 18:21:59 $, )
+! ($Date: 1997/01/02 18:37:22 $, )
 !
 !
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -294,7 +294,7 @@ COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
 !      
       il(dim)=il(dim)+sh
       iu(dim)=iu(dim)+sh
-      call hpfc shift
+      call hpfcshift
      $     (an, dim, il(dim), iu(dim), -sh,
      $      l(dim), u(dim), lid(1),
      $      lp, up, lid(2))
