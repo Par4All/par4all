@@ -8,6 +8,7 @@
  * Comments :
  */
 
+#define GRAPH_IS_DFG
 #include "local.h"
 
 /* Local defines */
@@ -56,8 +57,8 @@ graph                   dup_dg;
   /* Initialization to have an entry node */
   /* We first put entry node in the return list */
   entry_v = make_vertex(make_dfg_vertex_label(ENTRY_ORDER, 
-					      predicate_undefined,
-					      sccflags_undefined), NIL);
+					     predicate_undefined,
+					     sccflags_undefined), NIL);
   ADD_ELEMENT_TO_LIST( ret_verl, VERTEX, entry_v );
   entry_q = make_quast( make_quast_value(is_quast_value_quast_leaf,
 					 make_quast_leaf( NIL, make_leaf_label(ENTRY_ORDER, 0) )),
