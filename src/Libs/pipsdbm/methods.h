@@ -191,6 +191,9 @@
 
 /* The resource DBR_NEW_DECLARATIONS is used by top_down_array_resizing*/
 
+{ DBR_SMALLTALK_CODE,		STRING_METHODS },
+  /* used for PRINT_CODE_SMALLTALK pass */
+
 /* PROGRAM
  */
 /* entities are tabulated... here are some wrappers that expect
