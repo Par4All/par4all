@@ -12,7 +12,7 @@ default: all
 
 properties.c: properties.l
 	$(SCAN) properties.l | \
-	sed -e '/^FILE \*yyin/s/=[^,;]*//g;s/YY/PROP_/g;s/yy/prop_/g' \
+	sed -e '/^FILE \*yyin/s/=[^,;]*//g;s/YY/PROP_/g;s/yy/prop_/g;s/\(void *\*prop_alloc\)/static \1/;s/\(void *\*prop_realloc\)/static \1/;' \
 		 > properties.c
 
 depend: $(DERIVED_CFILES)
