@@ -33,8 +33,8 @@
 #include "newgen_include.h"
 
 struct inlinable Inline[] = {
-  {UNIT_TYPE_NAME, "#]unit", "#]unit", ":unit", "#]unit"},
-  {"bool", "1", "#]bool %d", "newgen:gen-true", "~S"},
+  {UNIT_TYPE_NAME, "U", "U", ":unit", "U"},
+  {"bool", "1", "B%d", "newgen:gen-true", "~S"},
   {"char", "#\\a", "#\\%c", "#\\space", "~C"},
   {"int", "0", "%d", "0", "~D"},
   {"float", "0.0", "%f", "0.0", "~F"},
