@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/03/23 16:54:39 $, )
+ * $RCSfile: directives.c,v $ ($Date: 1995/03/24 15:02:14 $, )
  * version $Revision$,
  */
 
@@ -156,7 +156,6 @@ Value *prate, *pshift;
 
     /*  else the subscript is linear
      */
-
     v = normalized_linear(n);
     size = vect_size(v);
     *pshift = vect_coeff(TCST, v);
@@ -174,6 +173,8 @@ Value *prate, *pshift;
 	return(TRUE);
     }
 
+    /*   affine alignment case
+     */
     for(array_dim = 1;
 	!ENDP(align_src);
 	align_src=CDR(align_src), array_dim++)
@@ -196,8 +197,10 @@ Value *prate, *pshift;
 	}
     }
 
+    /*   matching array dimension not found, replicated!
+     */
     *padim = 0, *prate = 0;
-    return(TRUE);
+    return(FALSE);
 }
 
 static void one_align_directive(alignee, temp)
