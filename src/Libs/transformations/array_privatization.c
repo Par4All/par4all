@@ -31,7 +31,7 @@
 
 
 /*********************************************************************************/
-/* USEFULL VARIABLESAND ACCESS FUNCTIONS                                         */
+/* USEFUL VARIABLES AND ACCESS FUNCTIONS                                         */
 /*********************************************************************************/
 
 /* global static variable local_regions_map, and its access functions */
@@ -180,14 +180,14 @@ static bool privatizer(char *module_name)
     reset_current_module_statement();
     reset_transformer_map();
     reset_precondition_map();
-    reset_cumulated_effects_map();
-    reset_local_regions_map();
-    reset_in_regions_map();
-    reset_out_regions_map();
+    free_cumulated_effects_map();
+    free_local_regions_map();
+    free_in_regions_map();
+    free_out_regions_map();
     if (store_as_regions)
     {
-	reset_private_regions_map();
-	reset_copy_out_regions_map();
+	free_private_regions_map();
+	free_copy_out_regions_map();
     }
 
     return(TRUE);
@@ -272,9 +272,9 @@ statement s;
 {
     pips_debug(1, "statement %03d\n", statement_number(s));
 
-    if (store_as_regions &&
-	load_statement_private_regions(s) == (list) HASH_UNDEFINED_VALUE)
+    if (store_as_regions && statement_private_regions_undefined_p(s))
     {
+	pips_debug(6, "non-loop body statement, storing NIL regions.\n");
 	store_statement_private_regions(s, NIL);
 	store_statement_copy_out_regions(s,NIL);
     }
@@ -344,7 +344,8 @@ loop l;
     }
     else
     {
-	/* LOC(i) = W(i) - {les re'gions correspondant a` des tableaux dans IN(i)} */
+	/* LOC(i) = W(i) -
+	   {les re'gions correspondant a` des tableaux dans IN(i)}*/
 	l_tmp = regions_dup(l_in);
 	l_loc = RegionsEntitiesInfDifference(l_write, l_tmp, w_w_combinable_p);
 
@@ -381,7 +382,6 @@ loop l;
     /* We keep in Loc(i) only the regions that correspond to arrays in l_loc_i,
      * that is to say arrays that induce false dependences
      */
-    /* La` je garde le contraire */
     l_loc = RegionsEntitiesIntersection(l_loc, l_loc_i, w_w_combinable_p);
 
     ifdebug(3)
@@ -423,7 +423,8 @@ loop l;
     if (copy_out)
     {
 	/* OUT_PRIV(i) = CAND(i) inter OUT(i) */
-	l_out_priv = RegionsIntersection(regions_dup(l_cand), l_out, w_w_combinable_p);
+	l_out_priv = RegionsIntersection(regions_dup(l_cand),
+					 l_out, w_w_combinable_p);
 	
 	ifdebug(3)
 	{
@@ -550,6 +551,9 @@ bool print_code_privatized_regions(string module_name)
 {
     char *file_name, *file_resource_name;
     bool success = TRUE;
+    /* we print all private variables, even when attached to blocks */
+    bool blocks_tmp = get_bool_property("PRETTYPRINT_BLOCKS");
+    bool priv_tmp = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
 
     file_name = strdup(concatenate(".priv_reg",
                                   get_bool_property
@@ -560,10 +564,14 @@ bool print_code_privatized_regions(string module_name)
 	DBR_GRAPH_PRINTED_FILE : 
 	    (is_user_view_p ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE);
 
+    set_bool_property("PRETTYPRINT_BLOCKS", TRUE);
+    set_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES", TRUE);
     success = make_text_resource(module_name, file_resource_name,
 				 file_name,
 				 get_privatized_regions_text(module_name, TRUE));
 
+    set_bool_property("PRETTYPRINT_BLOCKS", blocks_tmp);
+    set_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES", priv_tmp);
     free(file_name);
     return(TRUE);
 }
@@ -578,10 +586,10 @@ static text get_privatized_regions_text(string module_name,
     debug_on("ARRAY_PRIVATIZATION_DEBUG_LEVEL");
 
     set_private_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE) ));
+	db_get_memory_resource(DBR_PRIVATIZED_REGIONS, module_name, TRUE) ));
 
     set_copy_out_regions_map(  effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE) ));
+	db_get_memory_resource(DBR_COPY_OUT_REGIONS, module_name, TRUE) ));
 
 
     set_current_module_entity( local_name_to_top_level_entity(module_name));
@@ -632,11 +640,11 @@ static text get_privatized_regions_text(string module_name,
 
     debug_off();
 
-    reset_private_regions_map();
-    reset_copy_out_regions_map();
+    free_private_regions_map();
+    free_copy_out_regions_map();
     reset_current_module_entity();
     reset_current_module_statement();
-    reset_cumulated_effects_map();
+    free_cumulated_effects_map();
 
     return txt;
 }
@@ -710,8 +718,8 @@ static text text_privatized_array_regions(list l_priv, list l_out)
 					       strdup("\n")));
 	}
 	ADD_SENTENCE_TO_TEXT(reg_text, 
-			     make_pred_commentary_sentence(strdup("PRIVATE REGIONS:"),
-							   PIPS_NORMAL_PREFIX));
+			     make_pred_commentary_sentence
+			     (strdup("PRIVATE REGIONS:"),PIPS_NORMAL_PREFIX));
 	MERGE_TEXTS(reg_text,text_all_regions(l_priv));
 
 	if (loose_p)
@@ -730,8 +738,8 @@ static text text_privatized_array_regions(list l_priv, list l_out)
 					       strdup("\n")));
 	}
 	ADD_SENTENCE_TO_TEXT(reg_text, 
-			     make_pred_commentary_sentence(strdup("COPY-OUT REGIONS:"),
-							   PIPS_NORMAL_PREFIX));
+			     make_pred_commentary_sentence
+			     (strdup("COPY-OUT REGIONS:"),PIPS_NORMAL_PREFIX));
 	MERGE_TEXTS(reg_text,text_all_regions(l_out));
 
 	if (loose_p)
