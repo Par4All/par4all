@@ -7,6 +7,9 @@
  * generated, they should also be stored there. 
  * 
  * $Log: unsplit.c,v $
+ * Revision 1.6  1998/04/14 21:22:00  coelho
+ * linear.h
+ *
  * Revision 1.5  1997/10/28 14:33:05  keryell
  * Renamed basename and dirname as pips_basename and pips_dirname for OSF1.
  *
@@ -29,6 +32,7 @@
 #include "genC.h"
 #include "misc.h"
 #include "resources.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
