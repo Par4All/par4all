@@ -116,8 +116,7 @@ int desired_number;
 char *module_name;
 {
     entity e = make_new_label(module_name);
-
-    return (e);
+    return e;
 }
 
 /* predicates and functions for entities 
@@ -131,22 +130,19 @@ char *module_name;
 string 
 entity_local_name(entity e)
 {
-    static string 
-       null_name = "null";
-    /* undefined_name = "entity_undefined"; */
-
-    assert(!entity_undefined_p(e));
-
-    return(e==NULL ? null_name : 
-	   /* e==entity_undefined ? undefined_name : */
-	   local_name(entity_name(e)));
+    string null_name = "null";
+    pips_assert("entity is defined", !entity_undefined_p(e));
+    return e==NULL ? null_name : local_name(entity_name(e));
 }
 
 string 
 module_local_name(entity e)
 {
     string name = local_name(entity_name(e));
-    return name+strspn(name, MAIN_PREFIX)+strspn(name, BLOCKDATA_PREFIX);
+    return name 
+	+ strspn(name, MAIN_PREFIX)
+	+ strspn(name, BLOCKDATA_PREFIX),
+	+ strspn(name, COMMON_PREFIX);
 }
 
 string 
@@ -224,6 +220,13 @@ entity_blockdata_p(entity e)
 {
     return entity_module_p(e) && 
 	strspn(entity_local_name(e), BLOCKDATA_PREFIX)==1;
+}
+
+bool 
+entity_common_p(entity e)
+{
+    return entity_module_p(e) && 
+	strspn(entity_local_name(e), COMMON_PREFIX)==1;
 }
 
 bool 
@@ -446,42 +449,28 @@ entity_basic_p(entity e, int basictag)
     return (basic_tag(entity_basic(e)) == basictag);
 }
 
-/*
-this function maps a local name, for instance P, to the corresponding
-TOP-LEVEL entity, whose name is TOP-LEVEL:P
+/* this function maps a local name, for instance P, to the corresponding
+ * TOP-LEVEL entity, whose name is TOP-LEVEL:P. n is the local name.
+ */
 
-n is the local name
-*/
+static string prefixes[] = {
+    COMMON_PREFIX,
+    BLOCKDATA_PREFIX,
+    MAIN_PREFIX,
+    ""
+}
 
 entity 
 local_name_to_top_level_entity(string n)
 {
-    entity module;
+    entity module = entity_undefined;
+    int i;
 
-    module = gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
-					    MODULE_SEP_STRING,
-					    BLOCKDATA_PREFIX,
-					    n,
-					    (char *) NULL),
-				entity_domain);
-
-    if (entity_undefined_p(module)) {
-	module = gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
-						MODULE_SEP_STRING,
-						n,
-						(char *) NULL),
+    for(i=0; i<4 && entity_undefined_p(module); i++)
+	module = gen_find_tabulated(concatenate
+	  (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, 0),
 				    entity_domain);
-    }
-
-    if(entity_undefined_p(module)) {
-	module = gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
-						MODULE_SEP_STRING,
-						MAIN_PREFIX,
-						n,
-						(char *) NULL),
-				    entity_domain);
-    }
-	    
+    
     return module;
 }
 
@@ -489,26 +478,8 @@ entity
 global_name_to_entity(string m, string n)
 {
 
-    entity global_name;
-
-    global_name = 
-	gen_find_tabulated(concatenate(m,
-				       MODULE_SEP_STRING,
-				       n,
-				       (char *) NULL),
-			   entity_domain);
-
-    if (entity_undefined_p(global_name)) {
-	global_name = 
-	    gen_find_tabulated(concatenate(MAIN_PREFIX,
-					   m,
-					   MODULE_SEP_STRING,
-					   n,
-					   (char *) NULL),
-			       entity_domain);
-    }
-
-    return(global_name);
+    return gen_find_tabulated(concatenate(m, MODULE_SEP_STRING, n, 0),
+			      entity_domain);
 }
 
 /*
