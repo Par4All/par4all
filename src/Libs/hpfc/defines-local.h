@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/09/15 15:54:33 $, ) 
+ * ($Date: 1995/09/21 15:35:01 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -99,46 +99,6 @@ void fprint_entity_list(FILE *fp, list l);
  */
 #define HOST_NAME "HOST"
 #define NODE_NAME "NODE"
-
-#define HPFINTPREFIX 		"I_"
-#define HPFFLOATPREFIX 		"F_"
-#define HPFLOGICALPREFIX 	"L_"
-#define HPFCOMPLEXPREFIX	"C_"
-
-/* IO Management
- */
-#define WRITE_INTRINSIC_P(call)		\
-	(!strcmp(entity_local_name(call_function(call)), "WRITE"))
-#define REWIND_INTRINSIC_P(call)  	\
-	(!strcmp(entity_local_name(call_function(call)), "REWIND"))
-#define OPEN_INTRINSIC_P(call)	  	\
-	(!strcmp(entity_local_name(call_function(call)), "OPEN"))
-#define CLOSE_INTRINSIC_P(call)	  	\
-	(!strcmp(entity_local_name(call_function(call)), "CLOSE"))
-#define READ_INTRINSIC_P(call)	  	\
-	(!strcmp(entity_local_name(call_function(call)), "READ"))
-#define BUFFERIN_INTRINSIC_P(call) 	\
-	(!strcmp(entity_local_name(call_function(call)), "BUFFERIN"))
-#define BUFFEROUT_INTRINSIC_P(call)	\
-	(!strcmp(entity_local_name(call_function(call)), "BUFFEROUT"))
-#define ENDFILE_INTRINSIC_P(call)  	\
-	(!strcmp(entity_local_name(call_function(call)), "ENDFILE"))
-#define IMPLIEDDO_INTRINSIC_P(call)	\
-	(!strcmp(entity_local_name(call_function(call)), "IMPLIED-DO"))
-#define FORMAT_INTRINSIC_P(call)  	\
-	(!strcmp(entity_local_name(call_function(call)), "FORMAT"))
-
-#define IO_CALL_P(call) 		\
-    (WRITE_INTRINSIC_P(call) 	||	\
-     REWIND_INTRINSIC_P(call) 	||	\
-     OPEN_INTRINSIC_P(call) 	||	\
-     CLOSE_INTRINSIC_P(call) 	||	\
-     READ_INTRINSIC_P(call) 	||	\
-     BUFFERIN_INTRINSIC_P(call) ||	\
-     BUFFEROUT_INTRINSIC_P(call)||	\
-     ENDFILE_INTRINSIC_P(call) 	||	\
-     IMPLIEDDO_INTRINSIC_P(call)||	\
-     FORMAT_INTRINSIC_P(call))
 
 /* Overlap
  */
