@@ -25,6 +25,7 @@
 
 #ifdef VALUE_IS_LONGLONG
 typedef long long Value;
+#define VALUE_FMT "%lld"
 #define VALUE_CONST(val) val##LL
 #define VALUE_MIN LONG_LONG_MIN
 #define VALUE_MAX LONG_LONG_MAX
@@ -33,6 +34,7 @@ typedef long long Value;
 #define VALUE_MONE -1LL
 #else
 typedef long Value;
+#define VALUE_FMT "%ld"
 #define VALUE_CONST(val) val##L
 #define VALUE_MIN LONG_MIN
 #define VALUE_MAX LONG_MAX
