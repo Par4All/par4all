@@ -1,5 +1,5 @@
 /* SCCS Stuff:
- * $RCSfile: local-ri-util.c,v $ ($Date: 1995/03/27 17:14:19 $, )
+ * $RCSfile: local-ri-util.c,v $ ($Date: 1995/04/04 10:47:21 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -38,38 +38,6 @@ type t;
     }
     else
 	return(t); /* !!! means sharing */
-}
-
-/*  a BASIC tag is returned for the expression
- *  this is a preliminary version. should be improved.
- */
-tag suggest_basic_for_expression(e)
-expression e;
-{
-    tag
-	result = basic_tag(expression_basic(e));
-
-    if (result==is_basic_overloaded)
-    {
-	syntax s = expression_syntax(e);
-
-	/*  must be a call
-	 */
-	assert(syntax_call_p(s));
-
-	if (ENTITY_RELATIONAL_OPERATOR_P(call_function(syntax_call(s))))
-	    result = is_basic_logical;
-	else
-	{
-	    /* else some clever analysis could be done
-	     */
-	    hpfc_warning("suggest_basic_for_expression",
-			 "an overloaded is turned into an int...\n");
-	    result = is_basic_int;
-	}
-    }
-
-    return(result);
 }
 
 /*  library functions...
