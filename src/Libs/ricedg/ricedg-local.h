@@ -39,6 +39,13 @@ extern boolean Finds2s1;
 
 extern int Nbrdo;
 
+/* Definition for the dependance_verticies_p function
+ */
+
+#define FLOW_DEPENDANCE 1
+#define ANTI_DEPENDANCE 2
+#define OUTPUT_DEPENDANCE 4
+#define INPUT_DEPENDANCE 8
 
 
 
