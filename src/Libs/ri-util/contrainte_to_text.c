@@ -126,8 +126,7 @@ contrainte_to_text_1(
 						 var, variable_name);
 		debut = 0;
 	    }
-	    first_line = add_to_current_line(aux_line,operation_line,
-					     str_prefix,txt,first_line);
+	    add_to_current_line(aux_line, operation_line, str_prefix, txt);
 	}
 	else
 	    /* on admet plusieurs occurences du terme constant!?! */
@@ -196,8 +195,7 @@ contrainte_to_text_2(
 	    }
 	     else  positive_terms--;
 	       
-	     first_line = add_to_current_line(aux_line,operation_line,
-					     str_prefix,txt,first_line);
+	     add_to_current_line(aux_line, operation_line, str_prefix,txt);
 	}
     }
 
@@ -208,8 +206,7 @@ contrainte_to_text_2(
     (void) sprint_operator(operation_line+strlen(operation_line), 
 			   is_inegalite, a_la_fortran);
     
-    first_line = add_to_current_line(aux_line,operation_line,
-					     str_prefix,txt,first_line);
+    add_to_current_line(aux_line,operation_line, str_prefix,txt);
 
     debut = TRUE;
     for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
@@ -239,14 +236,12 @@ contrainte_to_text_2(
 					     variable_name);
 	    
 	}
-	first_line = add_to_current_line(aux_line, operation_line,
-					 str_prefix,txt,first_line); 
+	add_to_current_line(aux_line, operation_line, str_prefix,txt); 
     }
     operation_line[0]='\0';
     if(negative_terms == 0) {
 	(void) sprintf(operation_line+strlen(operation_line), "0"); 
-        first_line = add_to_current_line(aux_line,operation_line,
-					     str_prefix,txt,first_line);
+        add_to_current_line(aux_line,operation_line, str_prefix,txt);
     }
       else if(const_coeff_p) {
 	assert(value_notzero_p(const_coeff));
@@ -256,10 +251,8 @@ contrainte_to_text_2(
 	(void) sprint_Value(operation_line+strlen(operation_line), 
 			    value_uminus(const_coeff));
 
-	first_line = add_to_current_line(aux_line,operation_line,
-					 str_prefix,txt,first_line);
+	add_to_current_line(aux_line,operation_line, str_prefix,txt);
     }
-   
 
     return aux_line;
 }
@@ -334,7 +327,7 @@ inegalite_text_format(
 static void 
 add_separation(string line, string prefix, text txt, bool a_la_fortran)
 {
-    add_to_current_line(line, a_la_fortran? ".AND.": ", ", prefix, txt, FALSE);
+    add_to_current_line(line, a_la_fortran? ".AND.": ", ", prefix, txt);
 }
 
 static bool
@@ -358,13 +351,13 @@ contraintes_text_format(
 	    else some_previous = TRUE;
 
 	    if (a_la_fortran)
-		add_to_current_line(line, "(", prefix, txt, FALSE);
+		add_to_current_line(line, "(", prefix, txt);
 	    
 	    contrainte_text_format(line, prefix, txt, cs, is_inegalites,
 				   variable_name, FALSE, a_la_fortran);
 	    
 	    if (a_la_fortran) 
-		add_to_current_line(line, ")", prefix, txt, FALSE);
+		add_to_current_line(line, ")", prefix, txt);
 	}
     }
     return some_previous;
@@ -386,23 +379,23 @@ system_sorted_text_format(
 
     if (ps==NULL)
     {
-	add_to_current_line(line, "<null system>", prefix, txt, FALSE);
+	add_to_current_line(line, "<null system>", prefix, txt);
 	return;
     }
     else if (SC_UNDEFINED_P(ps))
     {
-	add_to_current_line(line, "<undefined system>", prefix, txt, FALSE);
+	add_to_current_line(line, "<undefined system>", prefix, txt);
 	return;
     }
     else if (sc_empty_p(ps))
     {
-	add_to_current_line(line, "<empty system>", prefix, txt, FALSE);
+	add_to_current_line(line, "<empty system>", prefix, txt);
 	return;
     }
 
     /* { 
      */
-    if (!a_la_fortran) add_to_current_line(line, "{", prefix, txt, FALSE);
+    if (!a_la_fortran) add_to_current_line(line, "{", prefix, txt);
 
     /* repeat twice: once for first, once for not first.
      */
@@ -428,7 +421,7 @@ system_sorted_text_format(
 
     /* }
      */
-    if (!a_la_fortran) add_to_current_line(line, "}", prefix, txt, FALSE);
+    if (!a_la_fortran) add_to_current_line(line, "}", prefix, txt);
 }
 
 /* appends ps to line/txt with prefix continuations. 
