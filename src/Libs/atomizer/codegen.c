@@ -6,21 +6,7 @@
  * Functions that generates the new instructions.
  */
 
-#include <stdio.h>
-#include <string.h>
-
-#include "genC.h"
-
-#include "ri.h"
-#include "database.h"
-
-#include "ri-util.h"
-#include "constants.h"
-#include "misc.h"
-
-#include "graph.h"
-#include "dg.h"
-#include "atomizer.h"
+#include "local.h"
 
 /* A hash table to map temporary variables (entities)
  * to memory variables (entities).
