@@ -173,12 +173,12 @@ attach_to_character_region(char * begin_char,
 
     /* Attach the begin to the first character: */
     ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
-				   begin_char,
+				   (int) begin_char,
 				   word_to_attachments_begin);
 
     /* Attach the end to the last character: */
     ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
-				   end_char,
+				   (int) end_char,
 				   word_to_attachments_end);
     debug_off();
 }
