@@ -113,14 +113,14 @@ static bool statement_flt(statement s)
 		    MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
 		    /* do not display comments in the decoration */
 		    if (!string_undefined_p(statement_comments(s)))
-		        free(statement_comments(s));
+		        statement_comments(s)[0] = NULL;
 		    MERGE_TEXTS(t, text_statement(entity_undefined, 0, s));
 		}
 	    } else {
 	        MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
 		/* do not display comments in the decoration */
 		if (!string_undefined_p(statement_comments(s)))
-		  free(statement_comments(s));
+		    statement_comments(s)[0] = NULL;
 		MERGE_TEXTS(t, text_statement(entity_undefined, 0, s));
 	    }
 	}
@@ -168,7 +168,7 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
 		        MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
 			/* do not display comments in the decoration */
 			if (!string_undefined_p(statement_comments(current_stmt_head())))
-			    free(statement_comments(current_stmt_head()));
+			    statement_comments(current_stmt_head())[0] = NULL;
 			MERGE_TEXTS(t, text_statement(e_caller, 0, current_stmt_head()));
 			break;
 		    }
