@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/08/09 18:49:58 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/08/09 19:36:16 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1969,7 +1969,7 @@ void
 gen_read_spec(char * spec, ...)
 {
     va_list ap ;
-    extern FILE *genspec_in ;
+    FILE * f;
     gen_chunk **cpp ;
     struct gen_binding *bp ;
     char *mktemp(), *tmp ;
@@ -1982,7 +1982,13 @@ gen_read_spec(char * spec, ...)
     genread_out = stdout;
     genspec_out = stdout;
 
-    /* now let's read the spec files
+    /* now let's read the spec files...
+     * well, indeed, there are no specfile! just spec strings
+     * that are put in a temporary file for parsing! argh! FC:-)
+     * I would rather have suggested to parse the string.
+     * the very same parser is also used in newC and so, thus
+     * thus some carefully designed getchar would allow that?
+     * for some obscure reason it does not work at all with flex???
      */
     va_start(ap, spec) ;
 
@@ -1992,17 +1998,22 @@ gen_read_spec(char * spec, ...)
 
     while(spec)
     {
-	if( (genspec_in = fopen( tmp, "w" )) == NULL ) {
+	if( (f = fopen( tmp, "w" )) == NULL ) {
 	    user( "Cannot open temp spec file in write mode\n" ) ;
 	    return ;
 	}
-	fprintf( genspec_in, "%s", spec ) ;
-	fclose( genspec_in ) ;
+	fprintf( f, "%s", spec ) ;
+	fclose( f ) ;
 
 	if( (genspec_in = fopen( tmp, "r" )) == NULL ) {
 	    user( "Cannot open temp spec file in read mode\n" ) ;
 	    return ;
 	}
+/*
+#ifdef FLEX_SCANNER
+	genspec_restart(genspec_in);
+#endif
+*/
 	genspec_parse() ;
 	fclose( genspec_in ) ;
 
