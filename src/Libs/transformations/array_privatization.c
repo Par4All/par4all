@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1996/10/14 11:35:51 $, 
+ * $Date: 1996/10/17 11:08:42 $, 
  */
 
 #include <stdio.h>
@@ -974,7 +974,6 @@ declarations_privatizer(char *module_name)
     free_local_regions_map();
     free_in_regions_map();
     free_out_regions_map();
-    free_private_regions_map();
     return( TRUE );
 }
 
