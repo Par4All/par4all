@@ -2,7 +2,7 @@
  *
  * these functions deal with HPF directives.
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/04/12 15:49:32 $, )
+ * $RCSfile: directives.c,v $ ($Date: 1995/04/14 15:55:18 $, )
  * version $Revision$,
  */
 
@@ -13,20 +13,41 @@
 #include "bootstrap.h"
 #include "control.h"
 
-#define HPF_PREFIX "HPFC"
-#define BLOCK_SUFFIX "K"
-#define CYCLIC_SUFFIX "C"
-#define STAR_SUFFIX "S"
+/*  directive names encoding
+ */
+#define HPF_PREFIX     "HPFC"
+
+#define BLOCK_SUFFIX   "K"
+#define CYCLIC_SUFFIX  "C"
+#define STAR_SUFFIX    "S"
+
+#define ALIGN_SUFFIX   "A"
+#define REALIGN_SUFFIX "B"
+#define DIST_SUFFIX    "D"
+#define REDIST_SUFFIX  "E"
+#define INDEP_SUFFIX   "I"
+#define NEW_SUFFIX     "N"
+#define PROC_SUFFIX    "P"
+#define TEMPL_SUFFIX   "T"
+#define DYNA_SUFFIX    "Y"
 
 /*-----------------------------------------------------------------
  *
  *   UTILITIES
  *
  */
+/*  the renamings are associated to the remapping statements here.
+ */
+GENERIC_LOCAL_FUNCTION(renamings, statement_renamings);
+
+/*  the local stack is used to retrieve the current statement while 
+ *  scanning the AST with gen_recurse.
+ */
 DEFINE_LOCAL_STACK(current_stmt, statement);
 
 /* recognize an hpf directive special entity.
  * (the prefix of which is HPF_PREFIX, as a convention)
+ * both functions are available, based on the name and on the entity.
  */
 bool hpf_directive_string_p(s)
 string s;
@@ -42,8 +63,19 @@ entity e;
 	   hpf_directive_string_p(entity_local_name(e)));
 }
 
-/* look for hpf directives thru the AST and handle them.
- */
+bool realign_directive_p(f)
+entity f;
+{
+    return(top_level_entity_p(f) && 
+	   strcmp(HPF_PREFIX REALIGN_SUFFIX, entity_local_name(f))==0);
+}
+
+bool redistribute_directive_p(f)
+entity f;
+{
+    return(top_level_entity_p(f) && 
+	   strcmp(HPF_PREFIX REDIST_SUFFIX, entity_local_name(f))==0);
+}
 
 /*-----------------------------------------------------------------
  *
@@ -52,28 +84,6 @@ entity e;
  * just change the basic type to overloaded and 
  * store the entity as a processor or a template.
  */
-static reference expression_to_reference(e)
-expression e;
-{
-    syntax s = expression_syntax(e);
-    message_assert("reference expected", syntax_reference_p(s));
-    return(syntax_reference(s));
-}
-
-static entity expression_to_entity(e)
-expression e;
-{
-    return(reference_variable(expression_to_reference(e)));
-}
-
-static list expression_list_to_entity_list(l)
-list /* of expressions */ l;
-{
-    list /* of entities */ n = NIL;
-    MAPL(ce, n = CONS(ENTITY, expression_to_entity(EXPRESSION(CAR(ce))), n), l);
-    return(n);		 
-}
-
 static void switch_basic_type_to_overloaded(e)
 entity e;
 {
@@ -137,7 +147,7 @@ Value *prate, *pshift;
     size = vect_size(v);
     *pshift = vect_coeff(TCST, v);
 
-    /*  the alignment should be an affine expression
+    /*  the alignment should be a simple affine expression
      */
     message_assert("align subscript is not affine",
 		   *pshift==0 ? size<=1 : size<=2)
@@ -208,7 +218,9 @@ reference alignee, temp;
 			  aligns);
     }
 
-    return(make_align(aligns, template)); /* built align is returned */
+    /* built align is returned. should be normalized?
+     */
+    return(make_align(aligns, template));
 }
 
 static void one_align_directive(alignee, temp, dynamic)
@@ -226,11 +238,17 @@ bool dynamic;
 
     if (dynamic)
     {
-	assert(array_distributed_p(array) && dynamic_entity_p(array));
+	statement current = current_stmt_head();
+	entity new_array;
 
-	/*  existing array? propagation? and so on...
-	 */
-	pips_error("one_align_directive", "dynamic not implemented yet");
+	message_assert("realigning non dynamic array",
+		       array_distributed_p(array) && dynamic_entity_p(array));
+
+	new_array = array_synonym_aligned_as(array, a);
+	propagate_array_synonym(current, array, new_array);
+	update_renamings(current, 
+			 CONS(RENAMING, make_renaming(array, new_array),
+			      load_renamings(current)));
     }
     else
     {
@@ -254,6 +272,8 @@ bool dynamic;
 
     gen_map(normalize_all_expressions_of, args);
 
+    if (dynamic) store_renamings(current_stmt_head(), NIL);
+
     for(; args!=last; POP(args))
 	one_align_directive(expression_to_reference(EXPRESSION(CAR(args))), 
 			    template, dynamic);
@@ -267,7 +287,7 @@ bool dynamic;
  */
 static tag distribution_format(e, pl)
 expression e;
-list *pl;
+list /* of expressions */ *pl;
 {
     syntax s = expression_syntax(e);
     entity function;
@@ -285,13 +305,13 @@ list *pl;
 
     name = entity_local_name(function);
     
-    if (same_string_p(name, HPF_PREFIX BLOCK_SUFFIX))
+    if (same_string_p(name, HPF_PREFIX BLOCK_SUFFIX))  /* BLOCK() */
 	return(is_style_block);
     else 
-    if (same_string_p(name, HPF_PREFIX CYCLIC_SUFFIX))
+    if (same_string_p(name, HPF_PREFIX CYCLIC_SUFFIX)) /* CYCLIC() */
 	return(is_style_cyclic);
     else
-    if (same_string_p(name, HPF_PREFIX STAR_SUFFIX))
+    if (same_string_p(name, HPF_PREFIX STAR_SUFFIX))   /* * [star] */
 	return(is_style_none);
     else
 	user_error("distribution_format", "invalid");
@@ -304,14 +324,12 @@ list *pl;
 static distribute extract_the_distribute(distributee, proc)
 reference distributee, proc;
 {
-    expression 
-	parameter = expression_undefined;
-    entity
-	processor = reference_variable(proc);
+    expression parameter = expression_undefined;
+    entity processor = reference_variable(proc);
     list
-	lformat = reference_indices(distributee),
-	largs,
-	ldist = NIL;
+	/* of expressions */   lformat = reference_indices(distributee),
+	                       largs,
+	/* of distributions */ ldist = NIL;
     tag format;
 
     /* the template arguments are scanned to build the distribution
@@ -327,9 +345,9 @@ reference distributee, proc;
 	    message_assert("invalid distribution", gen_length(largs)<=1);
 
 	    if (ENDP(largs))
-		parameter = expression_undefined;
+		parameter = expression_undefined;   /* implicit size */
 	    else
-		parameter = EXPRESSION(CAR(largs)),
+		parameter = EXPRESSION(CAR(largs)), /* explicit size */
 		EXPRESSION(CAR(largs)) = expression_undefined;
 	    break;
 	case is_style_none:
@@ -347,13 +365,14 @@ reference distributee, proc;
     return(make_distribute(gen_nreverse(ldist), processor));
 }
 
+/*  handles a simple (one template) distribute or redistribute directive.
+ */
 static void one_distribute_directive(distributee, proc, dynamic)
 reference distributee, proc;
 bool dynamic;
 {
-    entity
-	processor = reference_variable(proc),
-	template  = reference_variable(distributee);
+    entity processor = reference_variable(proc),
+           template  = reference_variable(distributee);
     distribute
 	d = extract_the_distribute(distributee, proc);
 
@@ -366,12 +385,14 @@ bool dynamic;
     {
 	/* existing template, and related arrays, renamming, propagation...
 	 */
-	pips_error("one_redistribute_directive", "not implemented yet");
+	pips_error("one_redistribute_directive", "not implemented yet\n");
     }
     else
 	store_entity_distribute(template, d);
 }
 
+/*  handles a full distribute or redistribute directive.
+ */
 static void handle_distribute_and_redistribute_directive(f, args, dynamic)
 entity f;
 list /* of expressions */ args;
@@ -384,9 +405,10 @@ bool dynamic;
      */
     assert(gen_length(args)>=2);
     proc = expression_to_reference(EXPRESSION(CAR(last)));
-
     gen_map(normalize_all_expressions_of, args);
 
+    /*  calls the simple case handler.
+     */
     for(; args!=last; POP(args))
        one_distribute_directive(expression_to_reference(EXPRESSION(CAR(args))), 
 				proc, dynamic);
@@ -401,6 +423,8 @@ bool dynamic;
  * signature: void HANDLER (entity f, list args)
  */
 
+/*  default case issues an error.
+ */
 static void handle_unexpected_directive(f, args)
 entity f;
 list /* of expressions */ args;
@@ -453,6 +477,7 @@ list /* of expressions */ args;
  * HPF PARALLELISM DIRECTIVES
  *
  *   namely INDEPENDENT and NEW directives.
+ *
  */
 /* ??? I wait for the next statements in a particular order, what
  * should not be necessary. Means I should deal with independent 
@@ -484,7 +509,7 @@ list /* of expressions */ args;
 	    o = instruction_loop(i);
 	    index = loop_index(o);
 
-	    if (ENDP(l)) /* simple independent case */
+	    if (ENDP(l)) /* simple independent case, first loop is tagged // */
 	    {
 		debug(3, "handle_independent_directive", "parallel loop\n");
 
@@ -492,7 +517,7 @@ list /* of expressions */ args;
 		close_ctrl_graph_travel();
 		return;
 	    }
-	    /*  else general independent case
+	    /*  else general independent case (with a list of indexes)
 	     */
 	    if (gen_in_list_p(index, l))
 	    {
@@ -512,9 +537,12 @@ list /* of expressions */ args;
     }
     
     close_ctrl_graph_travel();
-    user_error("handle_independent_directive", "no loop found!\n");
+    user_error("handle_independent_directive", "some loop not found!\n");
 }
 
+/* ??? not implemented and not used. The independent directive is trusted
+ * by the compiler to apply its optimizations...
+ */
 static void handle_new_directive(f, args)
 entity f;
 list /* of expressions */ args;
@@ -562,19 +590,19 @@ struct DirectiveHandler
 
 static struct DirectiveHandler handlers[] =
 { 
-  {HPF_PREFIX BLOCK_SUFFIX,  handle_unexpected_directive },
-  {HPF_PREFIX CYCLIC_SUFFIX, handle_unexpected_directive },
-  {HPF_PREFIX STAR_SUFFIX,   handle_unexpected_directive },
-  {HPF_PREFIX "A", handle_align_directive },
-  {HPF_PREFIX "B", handle_realign_directive },
-  {HPF_PREFIX "D", handle_distribute_directive },
-  {HPF_PREFIX "E", handle_redistribute_directive },
-  {HPF_PREFIX "I", handle_independent_directive },
-  {HPF_PREFIX "N", handle_new_directive },
-  {HPF_PREFIX "P", handle_processors_directive },
-  {HPF_PREFIX "T", handle_template_directive },
-  {HPF_PREFIX "Y", handle_dynamic_directive },
-  { (string) NULL, handle_unexpected_directive }
+  {HPF_PREFIX BLOCK_SUFFIX,   handle_unexpected_directive },
+  {HPF_PREFIX CYCLIC_SUFFIX,  handle_unexpected_directive },
+  {HPF_PREFIX STAR_SUFFIX,    handle_unexpected_directive },
+  {HPF_PREFIX ALIGN_SUFFIX,   handle_align_directive },
+  {HPF_PREFIX REALIGN_SUFFIX, handle_realign_directive },
+  {HPF_PREFIX DIST_SUFFIX,    handle_distribute_directive },
+  {HPF_PREFIX REDIST_SUFFIX,  handle_redistribute_directive },
+  {HPF_PREFIX INDEP_SUFFIX,   handle_independent_directive },
+  {HPF_PREFIX NEW_SUFFIX,     handle_new_directive },
+  {HPF_PREFIX PROC_SUFFIX,    handle_processors_directive },
+  {HPF_PREFIX TEMPL_SUFFIX,   handle_template_directive },
+  {HPF_PREFIX DYNA_SUFFIX,    handle_dynamic_directive },
+  { (string) NULL,            handle_unexpected_directive }
 };
 
 /* returns the handler for directive name.
@@ -585,6 +613,53 @@ string name;
     struct DirectiveHandler *x=handlers;
     while (x->name!=(string) NULL && strcmp(name,x->name)!=0) x++;
     return(x->handler);
+}
+
+/* list of statements to be cleaned. the operation is delayed because
+ * the directives are needed in place to stop the dynamic updates.
+ */
+static list /* of statements */ to_be_cleaned = NIL;
+
+/* the directive is freed and replaced by a continue call or
+ * a copy loop nest, depending on the renamings.
+ */
+static void clean_statement(s)
+statement s;
+{
+    instruction i = statement_instruction(s);
+
+    assert(instruction_call_p(i));
+
+    free_call(instruction_call(i));
+    instruction_call(i) = call_undefined;
+
+    if (bound_renamings_p(s))
+    {
+	list /* of renamings */  lr = load_renamings(s),
+	     /* of statements */ block = NIL;
+	
+	debug(4, "clean_statement",
+	      "remapping statement 0x%x\n", (unsigned int) s);
+
+	MAPL(cr,
+	 {
+	     renaming r = RENAMING(CAR(cr));
+	     entity o = renaming_old(r);
+	     entity n = renaming_new(r);
+
+	     debug(5, "clean_statement", 
+		   "%s -> %s\n", entity_name(o), entity_name(n));
+	     block = CONS(STATEMENT, generate_copy_loop_nest(o, n), block);
+	 },
+	     lr);
+
+	free_instruction(i);
+	statement_instruction(s) =
+	    make_instruction(is_instruction_block, block);
+    }
+    else
+	instruction_call(i) =
+	    make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME), NIL);
 }
 
 /* newgen recursion thru the IR.
@@ -598,15 +673,13 @@ call c;
     {
 	debug(8, "directive_filter", "hpfc entity is %s\n", entity_name(f));
 
-	/* call the appropriate handler for the directive
+	/* call the appropriate handler for the directive.
 	 */
 	(directive_handler(entity_local_name(f)))(f, call_arguments(c));
 	
-	/*  the directive is switched to a CONTINUE call.
+	/* the current statement will have to be cleaned.
 	 */
-	free_call(c);
-	instruction_call(statement_instruction(current_stmt_head())) = 
-	    make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME), NIL);
+	to_be_cleaned = CONS(STATEMENT, current_stmt_head(), to_be_cleaned);
     }
     
     return(FALSE); /* no instructions within a call! */
@@ -634,11 +707,11 @@ statement s;
  * input: the code statement s
  * output: none
  * side effects: (many)
- *  - the special calls are freed and replaced by continues.
  *  - the hpfc data structures are set/updated to store the hpf mapping.
  *  - parallel loops are tagged parallel.
  *  - a static stack is used to retrieve the current statement.
  *  - the ctrl_graph travelling is used, so should be initialized.
+ *  - the special calls are freed and replaced by continues.
  * bugs or features:
  *  - the "new" directive is not used to tag private variables.
  */
@@ -646,15 +719,28 @@ void handle_hpf_directives(s)
 statement s;
 {
     make_current_stmt_stack();
+    init_renamings();
+    to_be_cleaned = NIL;
 
     gen_multi_recurse(s,
-        statement_domain, stmt_filter, stmt_rewrite, /* STATEMENT */
-	expression_domain, gen_false, gen_null,      /* EXPRESSION */
-	call_domain, directive_filter, gen_null,     /* CALL */
+        statement_domain,  stmt_filter,      stmt_rewrite, /* STATEMENT */
+	expression_domain, gen_false,        gen_null,     /* EXPRESSION */
+	call_domain,       directive_filter, gen_null,     /* CALL */
 		      NULL);
 
+    gen_map(clean_statement, to_be_cleaned);
+
     assert(current_stmt_empty_p());
+
+    gen_free_list(to_be_cleaned), to_be_cleaned=NIL;
     free_current_stmt_stack();
+    close_renamings();
+
+    ifdebug(5) 
+    {
+	fprintf(stderr, "[handle_hpf_directives] resulting code:\n");
+	hpfc_print_code(stderr, get_current_module_entity(), s);
+    }
 }
 
 /* that is all
