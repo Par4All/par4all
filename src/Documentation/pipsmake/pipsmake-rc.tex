@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.10  2003/06/20 11:01:26  irigoin
+%% New module resources height and depth added.
+%%
 %% Revision 1.9  2003/06/04 13:11:17  ferrand
 %% Add a new atomizer customized for use within the SIMDizing process
 %% with SAC.
@@ -502,7 +505,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/06/04 13:11:17 $~$
+$~$Date: 2003/06/20 11:01:26 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1194,10 +1197,20 @@ complementary regions.
 
 All lists of callees are needed to build the global lists of callers
 for each module. The callers and callees lists are used by {\em
-pipsmake} to control top-down and bottom-up analyses.
+pipsmake} to control top-down and bottom-up analyses. The call graph is
+assumed to be a DAG, i.e. no recursive cycle exists, but it is not
+necessarily connected.
+
+The height of a module can be used to schedule bottom-up analyses. It is
+zero if the module has no callees. Else, it is the maximal height of the
+callees plus one.
+
+The depth of a module can be used to schedule top-down analyses. It is
+zero if the module has no callers. Else, it it the mazimal depth of the
+callers plus one.
 
 \begin{verbatim}
-callgraph                       > ALL.callers
+callgraph                       > ALL.callers > ALL.height > ALL.depth
         < ALL.callees
 \end{verbatim}
 
