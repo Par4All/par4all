@@ -1,11 +1,11 @@
 # $RCSfile: Makefile.compile_wp65,v $ (version $Revision$)
-# $Date: 1995/09/20 10:18:24 $, 
+# $Date: 1995/09/29 22:15:40 $, 
 #
 
 FC	=	f77
 # Fait des vérifications exhaustives :
 # (i.e. not very fast)
-FFLAGS	=	-g -U -u -C -e
+FFLAGS	=	-g -U -u -C 
 
 LD	= $(FC)
 LDFLAGS = $(PIPS_LDFLAGS) -L$(PVM_ROOT)/lib/$(PVM_ARCH)
