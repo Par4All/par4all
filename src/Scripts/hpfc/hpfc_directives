@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/06 17:08:25 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/06 17:26:14 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -218,25 +218,23 @@ $SED "s,hpfc#,$NOP,g;
 # i.e. last line of the declarations.
 #
 # first, find the last declaration line 
-# (program and subroutine needed if none!)
-# (functions added for implicitely typed functions...)
-# (common also appear in the declaration part of the program...)
-# (parameter??? I should check)
+# (program/subroutine/function/parameter/common are also needed...)
 
-LINE=`$SED -n \
-    '/^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
+LINE=`$SED -n '
+     /^[^Cc\*!].... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Ss][Uu][Bb][Rr][Oo][Uu][Tt][Ii][Nn][Ee][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Pp][Aa][Rr][Aa][Mm][Ee][Tt][Ee][Rr][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Rr][Ee][Aa][Ll][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Ss][Tt][Rr][Ii][Nn][Gg][ 	\*]/=
-     /^[^Cc\*!].... [ 	]*[Ss][Uu][Bb][Rr][Oo][Uu][Tt][Ii][Nn][Ee][ 	]/=
-     /^[^Cc\*!].... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	]/=
      /^[^Cc\*!].... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
-     /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\*]/=
-     /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 |
 $SED -n '$p'`
 
-[ "$LINE" ] || LINE=0
+[ "$LINE" ] || LINE=1
 
 #
 # then deal with continuations if any.
@@ -262,7 +260,7 @@ DEFAULT_USED=`$SED -n '/\,hpfcX)/p;/\,hpfcX)/q;' $TMP.0 $TMP.1`
 {
   $SED -n "1,$LINE p" $TMP.0
   #
-  # default processor arrangement is 1D
+  # default processor arrangement is 1D. should be managed elsewhere?
   #
   [ "$DEFAULT_USED" ] &&
   { 
