@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/09/05 14:49:43 $, 
+# $Date: 1995/09/05 15:01:27 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -38,7 +38,7 @@ debug()
 
 default_module()
 {
-  sed -n 's,^       *[Pp][Rr][Oo][Gg][Rr][Aa][Mm] \([^ ]*\),\1,p' "$@" |
+  sed -n 's,^       *[Pp][Rr][Oo][Gg][Rr][Aa][Mm] \([^ ]*\),\1,p' $@ |
   tr 'a-z' 'A-Z'
 }
 
@@ -138,7 +138,7 @@ do
 done
 
 [ "$HPFFILES" ] || usage 2
-[ "$MODULE" ] || MODULE=`default_module $HPFFILES .f`
+[ "$MODULE" ] || MODULE=`default_module $HPFFILES`
 [ "$WORKSPACE" ] || WORKSPACE=`echo $MODULE | tr 'A-Z' 'a-z'`
 
 #
