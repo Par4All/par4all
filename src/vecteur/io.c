@@ -333,7 +333,10 @@ char * (*variable_name)(Variable);
 	(void) fprintf(f,"base vide\n");
     else
 	for ( ; !VECTEUR_NUL_P(b); b = b->succ) {
-	    (void) fprintf(f,"%s ", variable_name(b->var));
+	    (void) fprintf(f,"%s", variable_name(b->var));
+	    if (!VECTEUR_NUL_P(b->succ)) {
+	      (void) fprintf(f,", ");
+	    }
 	}
-		(void) fprintf(f,"\n");
+		(void) fprintf(f," \n");
 }
