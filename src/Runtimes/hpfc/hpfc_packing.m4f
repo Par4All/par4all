@@ -1,13 +1,13 @@
 c
 c everything about packing
 c
-c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/09/08 10:48:25 $, )
+c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/09/21 17:23:09 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
 c
-include(`m4_macros')dnl
+include(`hpfc_lib_m4_macros')dnl
 c
 c macros for code generation
 c
