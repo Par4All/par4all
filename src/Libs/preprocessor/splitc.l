@@ -1,5 +1,9 @@
 /* $Id$
    $Log: splitc.l,v $
+   Revision 1.5  2003/08/08 16:00:29  irigoin
+   LF counted in comments. Lexical problems with floating point constants and
+   C comments fixed.
+
    Revision 1.4  2003/08/04 16:51:35  irigoin
    strdup() declaration updated, bug indicated in comment lexing
 
@@ -137,6 +141,18 @@ int get_csplit_current_beginning()
   return csplit_current_beginning;
 }
 
+static int lf_count(string s)
+{
+  string cs = s;
+  int count = 0;
+
+  while(*cs) {
+    if(*cs=='\n') count++;
+    cs++;
+  }
+  return count;
+}
+
 extern int csplit_is_external;
 extern int csplit_is_function;
 
@@ -154,9 +170,9 @@ hexprefix (0[xX])
 intnum ({decdigit}+{intsuffix}?)
 octnum (0{octdigit}+{intsuffix}?)
 hexnum ({hexprefix}{hexdigit}+{intsuffix}?)
-exponent ([eE]["+""-"]?{decdigit}+)
-fraction ("."{decdigit}+)
-decfloat (({intnum}?{fraction})|({intnum}{exponent})|({intnum}?{fraction}{exponent})|({intnum}'.')|({intnum}'.'{exponent})) 
+exponent ([eE][\+\-]?{decdigit}+)
+fraction (\.{decdigit}+)
+decfloat (({intnum}?{fraction})|({intnum}{exponent})|({intnum}?{fraction}{exponent})|({intnum}\.)|({intnum}\.{exponent})) 
 hexfraction (({hexdigit}*"."{hexdigit}+)|({hexdigit}+))
 binexponent ([pP]["+""-"]?{decdigit}+)
 hexfloat (({hexprefix}{hexfraction}{binexponent})|({hexprefix}{hexdigit}+{binexponent}))
@@ -170,9 +186,12 @@ hex_escape ('\\'[xX]{hexdigit}+)
 oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?) 
 
 %%
-"/*"([^\*]|(\*+[^\/]))*"*/"	{ 
+"/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{ 
+                                /* Difficulties: stars contiguous to the opening 
+                                   or closing parts. */
                                 /* Bug FI: line feed are not counted! */
-                                pips_debug(5,"Comment %s\n",yytext);
+                                csplit_line_number += lf_count(yytext);
+                                pips_debug(5,"Comment \"%s\"\n",yytext);
                         }
 "//"[^\n]*                { 
                                 pips_debug(5,"Comment %s\n",yytext);
