@@ -16,8 +16,6 @@ LD	= $(CC) -bsdmalloc
 
 RANLIB	= granlib
 
-PROTO   = cproto
-
 # lex broken for properties...
 LEX	= flex
 
