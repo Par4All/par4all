@@ -14,6 +14,9 @@
 
 */
 
+/* $RCSfile: genC.c,v $ ($Date: 1995/03/21 13:33:34 $, )
+ * version $Revision$
+ */
 
 /* genC.c
 
@@ -29,7 +32,8 @@
    . An array is a (CHUNK *),
    . Components values of an AND_OR value are stored in the following gen_chunks.
    . An OR_OP value has 2 more gen_chunks. The second on is the OR_TAG
-     (an integer). The third is the component value. */
+     (an integer). The third is the component value.
+     */
 
 #include <stdio.h>
 extern int printf();
@@ -334,9 +338,9 @@ struct gen_binding *bp ;
     (void) printf(",%s,((hash)+%d)->h,(var),(val)))\n",
 		  primitive_field(image), data ) ;
 
-    (void) printf("#define bound_%s_p(hash, var) ", name);
-    (void) printf("(HASH_BOUND_P(%s,", primitive_field(start));
-    (void) printf("%s,(hash+%d)->h, (var)))\n", primitive_field(image), data);
+    (void) printf("#define bound_%s_p(hash, var) "
+		  "(HASH_BOUND_P(%s,%s,(hash+%d)->h, (var)))\n",
+		  name, primitive_field(start), primitive_field(image), data);
 }
 
 
@@ -352,9 +356,9 @@ struct gen_binding *bp ;
     int data = GEN_HEADER + IS_TABULATED( bp ) ;
 
     gen_make( bp, 1, "ar" ) ;
-    (void) printf( "#define %s_%s(li) ", name, dom->li.constructor ) ;
-    (void) printf( "(%s(((li)+%d)->%s))\n",
-	   primitive_cast( dom ), data, primitive_field( dom )) ;
+    (void) printf("#define %s_%s(li) (%s(((li)+%d)->%s))\n", 
+		  name, dom->li.constructor, primitive_cast(dom), 
+		  data, primitive_field(dom));
 }
 
 /* GEN_SET defines the manipulation functions for a set type BP. */
