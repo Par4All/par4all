@@ -1,10 +1,11 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/07/20 18:40:47 $, ) 
+ * ($Date: 1995/07/26 16:52:54 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
+ * ??? should drop the remapping domain.
  */
 
 #include "defines-local.h"
@@ -73,25 +74,6 @@ entity (*create_var)(/* int */);
 
     return(contrainte_make(v));
 }
-
-/* lambda = Psi'_D / |Psi_R|
- */
-/*
-static statement
-compute_lambda(src, trg)
-entity src, trg;
-{
-    entity idiv = hpfc_name_to_entity(HPFC_DIVIDE),
-           lambda = get_ith_temporary_dummy(3);
-    Pcontrainte p1, p2;
-    int s1, s2;
-
-    p1 = partial_linearization(src, FALSE, NULL, &s1, get_ith_processor_dummy);
-    p2 = partial_linearization(src, TRUE, NULL, &s2, get_ith_processor_prime);
-    
-    
-}
-*/
 
 static Psysteme 
 generate_work_sharing_system(src, trg)
@@ -470,12 +452,13 @@ entity lid, src, trg;
     statement_comments(result) = 
 	strdup(concatenate("c - ", 
 	   t==COPY ? "copy" : t==SEND ? "send" : t==RECV ? "receiv" :
-			   t==DIFF ? "diffus" : "?",  "ing\n", NULL));
+			   t==DIFF ? "broadcast" : "?",  "ing\n", NULL));
 
     return(result);
 }
 
-void sc_separate_on_vars(s, b, pwith, pwithout)
+void 
+sc_separate_on_vars(s, b, pwith, pwithout)
 Psysteme s;
 Pbase b;
 Psysteme *pwith, *pwithout;
@@ -540,8 +523,7 @@ bool dist_p; /* true if must take care of lambda */
 	sc_separate_on_vars(procs, b, &sr, &sd);
 	base_rm(b);
 
-	rp_diff = 
-	    remapping_stats(3, locals, sr, ll, ldiff, ld, lid, src, trg);
+	rp_diff = remapping_stats(3, locals, sr, ll, ldiff, ld, lid, src, trg);
 
 	send = processor_loop
 	    (sd, l, lpproc, p_src, p_trg, NULL,
@@ -585,9 +567,45 @@ bool dist_p; /* true if must take care of lambda */
     return(result);
 }
 
+/* IF (current_mapping.eq.src) THEN
+ *   code
+ *   current_mapping = trg
+ * ENDDIF
+ */
+static statement
+generate_remapping_guard(src, trg, the_code)
+entity src, trg;
+statement the_code;
+{
+    int src_n = load_hpf_number(src), /* source, target and primary numbers */
+        trg_n = load_hpf_number(trg),
+        prm_n = load_hpf_number(load_primary_entity(src));
+    entity m_status = hpfc_name_to_entity(MSTATUS);
+    expression m_stat_ref, cond;
+    statement affecte, result;
+
+    m_stat_ref = reference_to_expression
+	(make_reference(m_status, 
+			CONS(EXPRESSION, int_to_expression(prm_n), NIL)));
+    
+    affecte = make_assign_statement(copy_expression(m_stat_ref), 
+				    int_to_expression(trg_n));
+
+    cond = MakeBinaryCall(CreateIntrinsic(EQUAL_OPERATOR_NAME),
+			  m_stat_ref, int_to_expression(src_n));
+
+    result = test_to_statement(make_test(cond, 
+      make_block_statement(CONS(STATEMENT, the_code,
+			   CONS(STATEMENT, affecte, NIL))),
+				make_empty_statement()));
+
+    return result;
+}
+
 /*  remaps src to trg.
  */
-statement hpf_remapping(src, trg)
+statement 
+hpf_remapping(src, trg)
 entity src, trg;
 {
     Psysteme p, proc, enume;
@@ -630,8 +648,8 @@ entity src, trg;
 
     /*   generates the code.
      */
-    s = generate_remapping_code
-	(src, trg, proc, enume, l, lp, scanners, ld, lddc, proc_distribution_p);
+    s = generate_remapping_guard(src, trg, generate_remapping_code
+      (src, trg, proc, enume, l, lp, scanners, ld, lddc, proc_distribution_p));
 
     /*   clean.
      */
