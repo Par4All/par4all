@@ -161,6 +161,7 @@ static text get_continuation_condition_text(char *module_name, bool give_code_p)
     reset_cumulated_rw_effects();
     reset_must_continuation_map();
     reset_may_continuation_map();
+    free_value_mappings();
 
     return txt;
 }
