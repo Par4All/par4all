@@ -1,9 +1,9 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/11 16:43:23 $, 
+# $Date: 1996/12/17 16:56:07 $, 
 #
 
-SCRIPTS	=	Wchangedir
+SCRIPTS	=	Wchangedir generate_all_menu_documentation
 
 SOURCES =	$(SCRIPTS)
 
