@@ -18,7 +18,7 @@
 #ifndef MAP_INCLUDED
 #define MAP_INCLUDED
 
-/* $RCSfile: newgen_map.h,v $ ($Date: 1995/03/20 13:28:58 $, ) 
+/* $RCSfile: newgen_map.h,v $ ($Date: 1995/03/20 14:33:08 $, ) 
  * version $Revision$
  * got on %D%, %T%
  *
@@ -35,6 +35,12 @@ IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 	 ((gen_hash_-1)->start=(k), \
 	  (((gen_chunk *)hash_get((h),(char *)(gen_hash_-- -1)))->image)), \
 	 gen_hash_->image)
+
+#define HASH_BOUND_P(start, image, h, k)\
+IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
+	 ((gen_hash_-1)->start=(k), \
+	  (bool) (hash_defined_p((h), (char *)(gen_hash_-- -1)))), \
+	 (bool) gen_hash_)
 
 #define HASH_UPDATE(start,image,h,k,v) \
 IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
