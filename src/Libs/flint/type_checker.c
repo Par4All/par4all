@@ -729,7 +729,7 @@ type_this_call(expression exp, type_context_p context)
 				   entity_local_name(function_called));
     if (simplifier != 0)
     {
-      simplifier(exp, context);
+      simplifier(c, context);
     }
   }
   else if (value_symbolic_p(entity_initial(function_called)))
