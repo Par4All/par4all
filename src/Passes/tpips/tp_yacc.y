@@ -162,7 +162,7 @@ i_create:
 	sep_list
 	WORKSPACE /* workspace name */
 	{
-	    $$ = yylval.name;
+	    $<name>$ = yylval.name;
 	    the_file_list.argc = 0;
 	}
 	sep_list
