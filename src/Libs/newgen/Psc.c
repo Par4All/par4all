@@ -182,6 +182,16 @@ Psysteme s;
     return(sc_dup(s));
 }
 
+int
+sc_gen_allocated_memory(
+    Psysteme s)
+{
+    return contrainte_gen_allocated_memory(sc_egalites(s)) 
+	 + contrainte_gen_allocated_memory(sc_inegalites(s)) 
+	 + vect_gen_allocated_memory(sc_base(s)) 
+	 + sizeof(Ssysteme) ;
+}
+
 void syst_debug(s)
 Psysteme s;
 {
