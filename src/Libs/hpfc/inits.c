@@ -3,14 +3,15 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1996/12/26 10:23:40 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1996/12/26 16:07:07 $, )
  * version $Revision$,
  */
 
 #include "defines-local.h"
 
-void create_common_parameters_h(file)
-FILE* file;
+void 
+create_common_parameters_h(
+    FILE* file)
 {
     fprintf(file,
 	    "      integer\n"
@@ -37,9 +38,10 @@ FILE* file;
  * to be called after the declaration_with_overlaps() call.
  * it generates the parameters for module.
  */
-void create_parameters_h(file, module)
-FILE* file;
-entity module;
+void 
+create_parameters_h(
+    FILE* file,
+    entity module)
 {
     entity newarray = entity_undefined;
     dimension d = dimension_undefined;
@@ -62,28 +64,30 @@ entity module;
 	/* formal parameters are passed the value by the caller
 	 * as far as overlapable dimensions are concerned.
 	 */
-	for (i=1 ; i<=andim ; i++)
-	{
-	    if (!is_argument || !ith_dim_overlapable_p(array, i))
+	if (!dynamic_entity_p(array) || array==load_similar_mapping(array))
+	    for (i=1 ; i<=andim ; i++)
 	    {
-		d = FindIthDimension(newarray, i);
-		
-		/* ??? memory leak from bound_parameter_name
-		 */
-		fprintf(file,
-			"      integer \n"
-			"     $    %s,\n"
-			"     $    %s\n" 
-			"      parameter(%s = %d)\n"
-			"      parameter(%s = %d)\n",
-			bound_parameter_name(newarray, LOWER, i),
-			bound_parameter_name(newarray, UPPER, i), 
-			bound_parameter_name(newarray, LOWER, i),
+		if (!is_argument || !ith_dim_overlapable_p(array, i))
+		{
+		    d = FindIthDimension(newarray, i);
+		    
+		    /* ??? memory leak from bound_parameter_name
+		     */
+		    fprintf(file,
+			    "      integer \n"
+			    "     $    %s,\n"
+			    "     $    %s\n" 
+			    "      parameter(%s = %d)\n"
+			    "      parameter(%s = %d)\n",
+			    bound_parameter_name(newarray, LOWER, i),
+			    bound_parameter_name(newarray, UPPER, i), 
+			    bound_parameter_name(newarray, LOWER, i),
 			HpfcExpressionToInt(dimension_lower(d)),
-			bound_parameter_name(newarray, UPPER, i),
-			HpfcExpressionToInt(dimension_upper(d)));
+			    bound_parameter_name(newarray, UPPER, i),
+			    HpfcExpressionToInt(dimension_upper(d)));
+		}
 	    }
-	}
+	/* otherwise it is a secondary copy */
     },
 	l);
 
@@ -188,7 +192,7 @@ entity module;
 	    fprintf(file, "\n"
 		    "      RANGEA(%d, %d, 1) = %d\n"
 		    "      RANGEA(%d, %d, 2) = %d\n"
-		    "      RANGEA(%d, %d, 3) = %d\nc\n"
+		    "      RANGEA(%d, %d, 3) = %d\n!\n"
 		    "      RANGEA(%d, %d, 4) = %d\n", 
 		    an, i, lb, an, i, ub, an, i, sz,
 		    an, i, code_number(decl));
