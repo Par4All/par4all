@@ -1,20 +1,38 @@
 #!/bin/sh
+#
+# $RCSfile: make-builder-map,v $ (version $Revision$)
+# $Date: 1996/08/20 08:43:59 $, 
 
 # Derivation of builder_map.h from pipsmake.rc
 
 # By default (no argument), automatic declaration generation
 # Else, retrieve declarations in include files
+# feature removed... automatic generation only.
 
 # Francois Irigoin, 8 October 1993
 
-REAL="$1"
+# REAL="$1"
 
-functions=`/lib/cpp $PIPS_LIBDIR/pipsmake.rc | grep '^[a-z]' | \
+functions=`/lib/cpp $PIPS_ROOT/Share/pipsmake.rc | grep '^[a-z]' | \
 		sed 's/ .*//' |	sort | uniq `
 
 # echo $functions >/dev/tty
 
-cat </dev/null >decl$$
+cat >decl$$ <<EOF
+/*
+ *         --------------------------------------------------------
+ *         --------------------------------------------------------
+ *
+ *                                  WARNING
+ *
+ *                THIS FILE HAS BEEN AUTOMATICALLY GENERATED
+ *
+ *                             DO NOT MODIFY IT
+ *
+ *         --------------------------------------------------------
+ *         --------------------------------------------------------
+ */
+EOF
 
 cat >map$$ <<EOF
 
@@ -27,25 +45,10 @@ EOF
 
 for func in $functions
 do
-#	echo $func
-	FUNC=`echo $func | tr a-z A-Z`
-	if [ -z "$REAL" ]
-	then
-#		echo "simple generation" >/dev/tty
-		echo "extern bool $func(char *);" >>decl$$
-	else
-#		echo "exact generation" >/dev/tty
-#		for include in `/bin/ls $PIPS_DEVEDIR/Lib`
-#		do
-#			echo grep command: >/dev/tty
-#			echo grep $func `echo $include|tr A-Z a-z`.h >/dev/tty
-#			echo grep command to be launched >/dev/tty
-#			grep $func `echo $include|tr A-Z a-z`.h >>decl$$
-#		done
-#		echo grep -w -h $func `/bin/ls $PIPS_DEVEDIR/Lib|tr A-Z a-z|sed -e "s;^;$PIPS_INCLUDEDIR/;;s/$/.h/"`
-		grep -w -h $func `/bin/ls $PIPS_DEVEDIR/Lib|tr A-Z a-z|sed -e "s;^;$PIPS_INCLUDEDIR/;;s/$/.h/"` | grep extern | grep ';$' >>decl$$
-	fi
-	echo "    { BUILDER_$FUNC, $func }," >>map$$
+  # echo $func
+  FUNC=`echo $func | tr a-z A-Z`
+  echo "extern bool $func(char *);" >>decl$$
+  echo "    { BUILDER_$FUNC, $func }," >>map$$
 done
 
 cat >>map$$ <<EOF
@@ -54,10 +57,6 @@ cat >>map$$ <<EOF
 };
 EOF
 
-# echo just before exiting
-
-# exit
-
-cat $PIPS_INCLUDEDIR/auto.h decl$$ map$$ >$PIPS_INCLUDEDIR/builder_map.h
+cat $PIPS_ROOT/Include/auto.h decl$$ map$$ >$PIPS_ROOT/Include/builder_map.h
 
 /bin/rm -f decl$$ map$$
