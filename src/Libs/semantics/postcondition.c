@@ -1,22 +1,18 @@
 /*
  * by Fabien COELHO
  *
- * SCCS stuff:
- * $RCSfile: postcondition.c,v $ ($Date: 1994/03/23 16:53:53 $, ) version $Revision$,
- * got on %D%, %T%
- * $Id$
+ * $RCSfile: postcondition.c,v $ ($Date: 1995/08/10 09:12:05 $, %U)
+ * version $Revision$,
  */
 
-/*
- * Standard includes
+/* Standard includes
  */
  
 #include <stdio.h>
 #include <string.h> 
 extern fprintf();
 
-/*
- * Psystems stuff
+/* Psystems stuff
  */
 
 #include "types.h"
@@ -25,21 +21,20 @@ extern fprintf();
 #include "contrainte.h"
 #include "sc.h"
 
-/*
- * Newgen stuff
+/* Newgen stuff
  */
 
 #include "genC.h"
 #include "ri.h" 
 
-/*
- * PIPS stuff
+/* PIPS stuff
  */
 
 #include "ri-util.h" 
 #include "misc.h" 
 #include "control.h"
 #include "semantics.h"
+#include "transformer.h"
 
 /*-------------------------------------------------------------
  *
@@ -54,16 +49,20 @@ static statement_mapping
   current_postcondition_map = hash_table_undefined;
 
 #define StorePost(stat, val) \
-   (hash_put(current_postcondition_map, (char*) (stat), (char*) (val)))
+   (debug(9, "StorePost", "storing 0x%x, 0x%x\n", stat, val), \
+    hash_put(current_postcondition_map, (char*) (stat), (char*) (val)))
 
 #define StorePre(stat, val) \
-   (hash_put(current_precondition_map, (char*) (stat), (char*) (val)))
+   (debug(9, "StorePre", "storing 0x%x, 0x%x\n", stat, val), \
+    hash_put(current_precondition_map, (char*) (stat), (char*) (val)))
 
 #define LoadPost(stat) \
-    ((transformer) (hash_get(current_postcondition_map, (char*) stat)))
+    (debug(9, "LoadPost", "loading 0x%x\n", stat), \
+     (transformer) (hash_get(current_postcondition_map, (char*) stat)))
 
 #define LoadPre(stat) \
-    ((transformer) (hash_get(current_precondition_map, (char*) stat)))
+    (debug(9, "LoadPre", "loading 0x%x\n", stat), \
+     (transformer) (hash_get(current_precondition_map, (char*) stat)))
 
 /*
  * filter used by gen_recurse:
@@ -76,6 +75,8 @@ statement stat;
 	inst = statement_instruction(stat);
     transformer
 	post = LoadPost(stat);
+
+    debug(5, "postcondition_filter", "statement 0x%x\n", stat);
     
     switch(instruction_tag(inst))
     {
@@ -83,6 +84,8 @@ statement stat;
     {
 	list
 	    ls = gen_nreverse(gen_copy_seq(instruction_block(inst)));
+
+	debug(6, "postcondition_filter", "in block\n");
 
 	MAPL(cs,
 	 {
@@ -102,26 +105,33 @@ statement stat;
 	test
 	    t = instruction_test(inst);
 
+	debug(6, "postcondition_filter", "in test\n");
+
 	StorePost(test_true(t), post);
 	StorePost(test_false(t), post);
 	
         break;
     }
     case is_instruction_loop:
+	debug(6, "postcondition_filter", "in loop\n");
 	StorePost(loop_body(instruction_loop(inst)), post);
         break;
     case is_instruction_goto:
+	/* ??? may be false... */
 	pips_error("postcondition_filter",
 		   "unexpected goto encountered\n");
         break;
     case is_instruction_call:
         break;
     case is_instruction_unstructured:
+	/* ??? may be false... */
     {
 	control
-	    c = unstructured_control(instruction_unstructured(i));
+	    c = unstructured_control(instruction_unstructured(inst));
 	list
 	    blocks = NIL;
+
+	debug(6, "postcondition_filter", "in unstructured\n");
 
 	CONTROL_MAP(ct,	{}, c, blocks);
 
@@ -130,7 +140,7 @@ statement stat;
 	MAPL(cs,
 	 {
 	     statement
-		 s = STATEMENT(CAR(cs));
+		 s = control_statement(CONTROL(CAR(cs)));
 
 	     StorePost(s, post);
 	     post = LoadPre(s);
@@ -153,10 +163,10 @@ statement stat;
 /*
  * Bottom-up pass: nothing to be down
  */
-static statement postcondition_rewrite(stat)
+static void postcondition_rewrite(stat)
 statement stat;
 {
-    return(stat);
+    return;
 }
 
 /*
@@ -175,6 +185,9 @@ statement_mapping compute_postcondition(stat, post_map, pre_map)
 statement stat;
 statement_mapping post_map, pre_map;
 {
+    debug_on("SEMANTICS_POSTCONDITION_DEBUG_LEVEL");
+    debug(1, "compute_postcondition", "computing!\n");
+
     current_postcondition_map = post_map;
     current_precondition_map = pre_map;
 
@@ -189,6 +202,8 @@ statement_mapping post_map, pre_map;
 
     current_precondition_map = hash_table_undefined;
     current_postcondition_map = hash_table_undefined;
+
+    debug_off();
 
     return(post_map);
 }
