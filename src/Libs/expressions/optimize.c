@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.23  1998/11/26 14:26:45  coelho
+ * fixed static variables. more comments.
+ *
  * Revision 1.22  1998/11/26 10:22:26  coelho
  * davinci expression dump into $database/$module directory.
  *
@@ -468,10 +471,15 @@ static void call_simplify_rwt(call c)
 
 static void generate_bminus(statement s)
 {
-  bplus = entity_intrinsic(PLUS_OPERATOR_NAME);
+  bplus  = entity_intrinsic(PLUS_OPERATOR_NAME);
   uminus = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
   bminus = entity_intrinsic(MINUS_OPERATOR_NAME);
+
   gen_recurse(s, call_domain, gen_true, call_simplify_rwt);
+
+  bplus  = NULL;
+  uminus = NULL;
+  bminus = NULL;
 }
 
 static void generate_bdivision(statement s)
@@ -820,6 +828,8 @@ static void reset_current_optimization_strategy(void)
 #define GRAPH_PREFIX "optimize_expressions_"
 #define GRAPH_SUFFIX ".daVinci"
 
+/* dump all expressions in s as davinci graphs. 
+ */
 static void davinci_dump_expressions(
    string module_name, string phase, statement s)
 {
