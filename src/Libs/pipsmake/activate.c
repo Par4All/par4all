@@ -1,3 +1,5 @@
+/* $Id$ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -105,8 +107,7 @@ string phase;
     debug_on("PIPSMAKE_DEBUG_LEVEL");
     debug(1, "activate", "%s - requested\n", phase);
 
-    pips_assert("open_module",
-		db_get_current_workspace()!=database_undefined);
+    pips_assert("open_module", db_get_current_workspace_name());
 
     /* find rule that describes phase */
     r = find_rule_by_phase(phase);
@@ -171,9 +172,9 @@ string phase;
 		    if (get_bool_property("ACTIVATE_DEL_DERIVED_RES"))
 			delete_derived_resources (res);
 		    else
-			if (db_get_current_workspace() != database_undefined) {
-			    /* remove resources with the same name as res to maintain 
-			       consistency in the database */
+			if (db_get_current_workspace_name()) {
+			    /* remove resources with the same name as res 
+			       to maintain consistency in the database */
 			    db_unput_resources(vrn);
 			}
 		}
