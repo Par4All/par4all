@@ -193,7 +193,7 @@ string module_name;
     debug_on(ICFG_DEBUG_LEVEL);
 
     sorted_list = (list) topologically_sorted_module_list(mod);
-    filename = strdup(concatenate(db_get_current_program_directory(), 
+    filename = strdup(concatenate(db_get_current_workspace_directory(), 
 				  "/", module_name, ".topo",NULL));
 
     fp = safe_fopen(filename, "w");
