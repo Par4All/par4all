@@ -65,7 +65,9 @@ int (*f)();
 
     while ((c = f()) != ')') {
 	if (ibuffer >= VBUFSIZE-1) {
-	    (void) fprintf(stderr, "[vect_gen_read] buffer too small\n");
+	    (void) fprintf(stderr,
+			   "[vect_gen_read] buffer[%d] too small for %d bytes\n",
+			   VBUFSIZE-1, ibuffer);
 	    abort();
 	}
 	buffer[ibuffer++] = c;
