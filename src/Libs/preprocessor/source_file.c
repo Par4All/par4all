@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.92  1998/07/10 11:20:46  coelho
+ * more comments about entries.
+ *
  * Revision 1.91  1998/07/10 08:16:41  coelho
  * modules are put in the right order...
  *
@@ -614,7 +617,7 @@ static bool pips_split_file(string name, string tempfile)
     return err;
 }
 
-/********************************************** managing .F files with cpp */
+/********************************************** MANAGING .F FILES WITH CPP */
 
 /* an issue is that the cpp used must be Fortran 77 aware.
  */
@@ -671,7 +674,7 @@ static string process_thru_cpp(string name)
     return new_name;
 }
 
-/*************************************************** managing a user file */
+/*************************************************** MANAGING A USER FILE */
 
 /* Fortran compiler triggerred from the environment (PIPS_CHECK_FORTRAN) 
  * or a property (CHECK_FORTRAN_SYNTAX_BEFORE_PIPS)
@@ -775,7 +778,9 @@ bool process_user_file(string file)
     if (pips_split_file(nfile, file_list))
 	return FALSE;
 
-    /* the newly created module files are registered in the database */
+    /* the newly created module files are registered in the database
+     * The file_list allows split to communicate with this function.
+     */
     fd = safe_fopen(file_list, "r");
     while ((a_line = safe_readline(fd))) 
     {
@@ -783,6 +788,11 @@ bool process_user_file(string file)
 	list modules = NIL;
 	bool renamed=FALSE;
 
+	/* a_line: "MODULE1 ... MODULEn file_name"
+	 *
+	 * the liste modules come from entries that might be included
+	 * in the subroutine. 
+	 */
 	file_name = extract_last_name(a_line);
 	success_p = TRUE;
 	number_of_modules++;
@@ -791,6 +801,8 @@ bool process_user_file(string file)
 	while (mod_name!=a_line && (mod_name = extract_last_name(a_line)))
 	    modules = CONS(STRING, mod_name, modules);
 
+	/* for each module, put the initial_file and user_file resource.
+	 */
 	MAP(STRING, mod_name, 
 	{
 	    user_log("  Module         %s\n", mod_name);
