@@ -227,6 +227,21 @@ static SatMatrix *SMAlloc(int rows,int cols) {
   return result;
 } /* SMAlloc */
 
+static void SMPrint (SatMatrix *matrix) {
+  
+  int *p;
+  int i, j;
+  unsigned NbRows, NbColumns;
+  
+  fprintf(stderr,"%d %d\n",NbRows=matrix->NbRows, NbColumns=matrix->NbColumns);
+  for (i=0;i<NbRows;i++) {
+    p = *(matrix->p+i);
+    for (j=0;j<NbColumns;j++)
+      fprintf(stderr, " %10X ", *p++);
+    fprintf(stderr, "\n");
+  }  
+} /* SMPrint */
+
 
 static void SMFree (SatMatrix *matrix) {
   
@@ -1119,8 +1134,8 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   Sat = Poly2Sat(D1,&mf);
 
 #ifdef DEBUGPP4
-/*  fprintf(stderr,"Sat = ");
-    Matrix_Print(stderr,"%08X ", Sat); */
+    fprintf(stderr,"Sat = ");
+    SMPrint(Sat);
 
   fprintf(stderr,"mf = ");
   for (i=0; i<nr; i++)
