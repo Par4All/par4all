@@ -1,7 +1,20 @@
-/* 	%A% ($Date: 1998/10/07 15:48:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* Support and resolve equivalence chains. Allocate addresses in commons
+ * and in the static area and in the dynamic area. The heap area is left
+ * aside.
+ *
+ * 	%A% ($Date: 1998/10/09 11:44:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+ *
+ * $Id$
+ *
+ * $Log: equivalence.c,v $
+ * Revision 1.18  1998/10/09 11:44:34  irigoin
+ * Support for the *HEAP* area in ComputeAddresses()
+ *
+ *
+ */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1998/10/07 15:48:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1998/10/09 11:44:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -645,13 +658,23 @@ ComputeAddresses()
 	else if(storage_ram_p(entity_storage(e))) {
 	    ram r = storage_ram(entity_storage(e));
 	    if(ram_offset(r)==UNKOWN_RAM_OFFSET) {
-		/* area sa = type_area(entity_type(StaticArea)); */
+		if(ram_section(r)==StaticArea) {
+		    /* area sa = type_area(entity_type(StaticArea)); */
 
-		debug(2, "ComputeAddresses", "Add static non-aliased variable %s\n",
-		      entity_local_name(e));
+		    debug(2, "ComputeAddresses", "Add static non-aliased variable %s\n",
+			  entity_local_name(e));
 
-		ram_offset(r) = CurrentOffsetOfArea(StaticArea, e);
-		/* area_layout(sa) = gen_nconc(area_layout(sa), CONS(ENTITY, e, NIL)); */
+		    ram_offset(r) = CurrentOffsetOfArea(StaticArea, e);
+		    /* area_layout(sa) = gen_nconc(area_layout(sa), CONS(ENTITY, e, NIL)); */
+		}
+		else {
+		    area ha = type_area(entity_type(HeapArea));
+
+		    debug(2, "ComputeAddresses",
+			  "Ignore heap variable %s because its address cannot be computed\n",
+			  entity_local_name(e));
+		    area_layout(ha) = gen_nconc(area_layout(ha), CONS(ENTITY, e, NIL));
+		}
 	    }
 	}
      }
