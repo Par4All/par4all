@@ -262,7 +262,7 @@ statement make_empty_statement()
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED, 
 			  string_undefined,
-			  make_instruction(is_instruction_block, NIL)));
+			  make_instruction_block(NIL)));
 }
 
 statement make_stmt_of_instr(instr)
@@ -327,8 +327,7 @@ statement make_block_statement_with_stop()
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
 			  string_undefined,
-			  make_instruction(is_instruction_block,
-					   CONS(STATEMENT, stop, NIL)));
+			  make_instruction_block(CONS(STATEMENT, stop, NIL)));
 
     ifdebug(8) {
 	fputs("make_block_statement_with_stop",stderr);
@@ -356,7 +355,7 @@ list body;
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
 			  string_undefined,
-			  make_instruction(is_instruction_block, body));
+			  make_instruction_block(body));
 
     return b;
 }
@@ -789,8 +788,7 @@ statement s_old;
 			     instr_l);
     l_body = make_statement(entity_empty_label(), -1,  -1,
 			    string_undefined,
-			    make_instruction(is_instruction_block,
-					     CONS(STATEMENT,state_l,NIL)));
+			make_instruction_block(CONS(STATEMENT,state_l,NIL)));
 
     return(l_body);
 }
