@@ -5,7 +5,7 @@ dnl	Makefile in this directory.
 # Authors: Bart Kienhuis, Vincent Loechner
 # Copyright (c) 2000 The Regents of the University of California.
 # All rights reserved.
-# 
+# g
 # Permission is hereby granted, without written agreement and without
 # license or royalty fees, to use, copy, modify, and distribute this
 # software and its documentation for any purpose, provided that the
@@ -33,7 +33,7 @@ define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_INIT(include/polylib/polylib.h)
 
-VERSION=5.0
+VERSION=5.00
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_CANONICAL_SYSTEM 
@@ -73,12 +73,14 @@ case "$target" in
 	EXEC_SUFFIX=	
 	SHAREDLIB_FLAG="-G"
 	LDCONFIG=
-	INSTALL_LIB="install-static install-shared" ;;
+	prefix="$(PWD)"
+	INSTALL_LIB="install-static" ;;
   i*-pc-cygwin)   
 	LD="ld -r"
 	SHEXT="dll"
 	SHAREDLIB_FLAG=""
 	LIBS="$LIBS -lcygwin -lkernel32 -lcrtdll"
+	prefix="$(PWD)"
 	EXEC_SUFFIX=.exe	
 	LDCONFIG=
 	EXTRA_FLAGS="-DCYGWIN"
@@ -161,34 +163,56 @@ else
 fi
 fi
 
+case "$target" in
+ i*-pc-cygwin)
+	   no_long=yes
+esac
+
 if test "$only_int_lib" = "yes"; then
 	LIBS_TO_BUILD=$INT_BITS
 	EXEC_TO_BUILD=$INT_BITS
+	DEFAULT_INT_BITS=$INT_BITS
+	DEFAULT_AFLAGS=$INT_AFLAGS
 	LONG_BITS=none
 elif test "$only_longint_lib" = "yes"; then
 	LIBS_TO_BUILD=$INT_BITS
 	EXEC_TO_BUILD=$INT_BITS
+	DEFAULT_INT_BITS=$INT_BITS
+	DEFAULT_AFLAGS=$INT_AFLAGS
 	LONG_BITS=none
 elif test "$only_longlongint_lib" = "yes"; then
 	LIBS_TO_BUILD=$LONG_BITS
 	EXEC_TO_BUILD=$LONG_BITS
+	DEFAULT_INT_BITS=$LONG_BITS
+	DEFAULT_AFLAGS=$LONG_AFLAGS
 elif test "$only_gmpint_lib" = "yes"; then
 	LIBS_TO_BUILD=$GMP_BITS
 	EXEC_TO_BUILD=$GMP_BITS
+	DEFAULT_INT_BITS=$GMP_BITS
+	DEFAULT_AFLAGS=$GMP_AFLAGS
 elif test "$no_long" = "yes"; then
 	LIBS_TO_BUILD=$INT_BITS
 	EXEC_TO_BUILD=$INT_BITS
+	DEFAULT_INT_BITS=$INT_BITS
+	DEFAULT_AFLAGS=$INT_AFLAGS
 	LONG_BITS=none
 elif test "$allint_lib" = "yes"; then
 	LIBS_TO_BUILD="$INT_BITS $LONG_BITS $GMP_BITS"
 	EXEC_TO_BUILD="$INT_BITS $LONG_BITS $GMP_BITS"
+	DEFAULT_INT_BITS=$INT_BITS
+	DEFAULT_AFLAGS=$INT_AFLAGS
 else
 	LIBS_TO_BUILD="$LONG_BITS"
 	EXEC_TO_BUILD="$LONG_BITS"
+	DEFAULT_INT_BITS=$LONG_BITS
+	DEFAULT_AFLAGS=$LONG_AFLAGS
 fi
 
 AC_ARG_ENABLE(short-exec,[ --enable-short-exec      Enable that the int library is used by the executables (by default, the long library is used if built)],[ if test "$enableval" = yes; then
 		EXEC_TO_BUILD=$INT_BITS
+		DEFAULT_INT_BITS=$INT_BITS
+		DEFAULT_AFLAGS=$INT_AFLAGS
+
     fi ] )
 
 dnl /*****************************************************************************/
@@ -198,6 +222,8 @@ AC_ARG_ENABLE(extra-suffix,[ --enable-extra-suffix    Enable that the executable
     fi ] )
 AC_ARG_ENABLE(all-exec,[ --enable-all-exec        Enable that the two sized libraries are used to build two executables of each, which take an extra suffix depending on the library (by default, only the long library is used)],[ if test "$enableval" = yes; then
 		EXEC_TO_BUILD="$INT_BITS $LONG_BITS"
+		DEFAULT_INT_BITS=$INT_BITS
+		DEFAULT_AFLAGS=$INT_AFLAGS
 		EXEC_EXTRA_SUFFIX="\$(BITS)$EXEC_SUFFIX"
     fi ] )
 
@@ -256,7 +282,7 @@ GFLAGS="-DGNUMP"
 EHRHART_MP=
 MATRIX_MP=
 EXTRA_LIBS=
-EXTRA_INCLUDES=
+EXTRA_INCLUDE=
 
 if test "x$gmp_package" = "xno"; then
 	AC_MSG_RESULT(no)
@@ -292,13 +318,13 @@ dnl Check if the GMP directory is a valid location
 	fi
 fi
 
-
+echo "Polylib will be built with " $LIBS_TO_BUILD "integer size" 
 echo "---------------------------------------------------"
 echo "You can choose either:"
-echo "make libs:         to build the libraries"
-echo "make install-libs: to install them (if required)"
-echo "make:              to build the libs, install them, and build the executables"
-echo "make install:      to build and install everything"
+echo "make:              to build the libs,  and build the executables"
+echo "make libs:         to build only the libraries"
+echo "make install-libs: to install them somewhere (default /usr/local)"
+echo "make install:      to build and install everything somewhere (default /usr/local)"
 echo "---------------------------------------------------"
 
 
@@ -324,6 +350,10 @@ AC_SUBST(LONG_AFLAGS)
 AC_SUBST(GMP_BITS)
 AC_SUBST(GMP_AFLAGS)
 
+AC_SUBST(DEFAULT_INT_BITS)
+AC_SUBST(DEFAULT_AFLAGS)
+AC_SUBST(BITS)
+AC_SUBST(AFLAGS)
 
 dnl Used with GMP is selected
 AC_SUBST(GFLAGS)
@@ -340,3 +370,13 @@ AC_SUBST(EXTRA_FLAGS)
 
 
 AC_OUTPUT(vars.mk)
+
+
+
+
+
+
+
+
+
+

@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk.in,v 1.2 2002/01/14 13:45:48 loechner Exp $
+# $Id: vars.mk.in,v 1.3 2002/05/24 09:28:25 risset Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -112,4 +112,33 @@ LDCONFIG = @LDCONFIG@
 
 LIBS_TO_BUILD = @LIBS_TO_BUILD@
 EXEC_TO_BUILD = @EXEC_TO_BUILD@
+BITS=@DEFAULT_INT_BITS@
+AFLAGS=@DEFAULT_AFLAGS@
 
+
+OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)
+LIB = $(OBJ_DIR)/$(PSTATIC)
+EXEC_EXTRA_LIBS = $(LIB)
+
+POLYLIB_INC = ./include/polylib
+POLYLIB_SRC = ./source
+ARITH_DIR = ./ArithLib
+CFLAGS +=  $(EXTRA_INCLUDE) $(AFLAGS) $(EXTRA_FLAGS) 
+
+PSTATIC = libpolylib$(BITS).a.$(VERSION)
+PSHARED =  libpolylib$(BITS).$(SHEXT).$(VERSION)
+
+############################################################
+# Variables to be used in a used makefile 
+############################################################
+# POLYLIBDIR must be set by the Makefile calling vars.mk
+#POLYLIBDIR=./
+###########################################################
+CFLAGS += -I $(POLYLIBDIR)/include
+POLYOBJDIR=$(POLYLIBDIR)/$(OBJ_DIR)
+POLYOBJS = $(POLYOBJDIR)/Lattice.o  $(POLYOBJDIR)/Zpolyhedron.o \
+	 $(POLYOBJDIR)/errormsg.o  $(POLYOBJDIR)/Matop.o \
+	     $(POLYOBJDIR)/eval_ehrhart.o  $(POLYOBJDIR)/polyhedron.o \
+	 $(POLYOBJDIR)/vector.o $(POLYOBJDIR)/NormalForms.o \
+	$(POLYOBJDIR)/SolveDio.o      $(POLYOBJDIR)/matrix.o \
+	$(POLYOBJDIR)/errors.o

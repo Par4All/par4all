@@ -7,184 +7,12 @@
 ## 32ln-exec, 64ln-exec (to link executables without the extra suffix)
 ## Other targets : 32, 64, typecheck.
 
+POLYLIBDIR=.
 include vars.mk
 
-############################################################
-### IMPORTANT NOTE : The defines below should no longer be used:
-### They are done by the configure script generating the file vars.mk
-
-############################################################
-### Which variants to build : 32 bits, 64 bits, or both.
-### recommanded: both 32 and 64 libs, 64 executables.
-##LIBS_TO_BUILD=32
-##LIBS_TO_BUILD=64
-#LIBS_TO_BUILD=32 64
-#EXEC_TO_BUILD=32
-##EXEC_TO_BUILD=64
-##EXEC_TO_BUILD=32 64
-#
-### Define one of these to add an extra suffix to the executables
-### This is usefull if you have multiple executables installed
-### (32/64 bits or with/without GNU-MP for example)
-##EXEC_EXTRA_SUFFIX = $(BITS)
-##EXEC_EXTRA_SUFFIX = $(BITS).GMP
-#
-############################################################
-### Type of integer to use (see ./ArithLib/ for details)
-### ------------------64 bits integers----------------------
-#LONG_BITS= 64
-#
-### 1. On most systems, 'long long int' is the 64 bits integer definition.
-### If this is your case define the following :
-#LONG_AFLAGS = -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY \
-# -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
-#
-### 2. On some systems/processors (Alpha 21164 for example) 'long int'
-### is the type for 64 bits integers
-### If this is your case, define the following :
-##LONG_AFLAGS = -DLINEAR_VALUE_IS_LONG -DLINEAR_VALUE_PROTECT_MULTIPLY \
-## -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
-#
-### ------------------32 bits integers----------------------
-#INT_BITS= 32
-#INT_AFLAGS = -DLINEAR_VALUE_IS_INT
-#
-### --------------------------------------------------------
-### For the typechecking tests, this typedefs Value as 'char *' :
-### (the executables won't run, this is just a compilation test)
-#CHECK_BITS= chars
-#CHECK_AFLAGS = -DLINEAR_VALUE_IS_CHARS -DLINEAR_VALUE_PROTECT_MULTIPLY
-#
-#
-############################################################
-### GNU-MP stuff
-#
-### Define these 4 lines if you want to use the GNU-mp (multiple precision)
-### library when there is an overflow in Ehrhart
-#GFLAGS = -DGNUMP
-#EXTRA_LIBS = 
-# 
-### Define these 5 lines if your GNU-MP lib is not in the standard directory
-##GMPDIR=/usr/local
-##GMPLIB=$(GMPDIR)/lib
-##GMPINCLUDE=$(GMPDIR)/include
-##EXTRA_INCLUDES = -I$(GMPINCLUDE)
-##EXTRA_LIBS += -L$(GMPLIB)
-# 
-############################################################
-### Compiler stuff
-#CC = /soft/purify/purify -best-effort -cache-dir=/tmp/purify gcc
-#CC = gcc
-#CFLAGS = -O4 -Wall -g 
-##CFLAGS = -O4
-#LDFLAGS = 
-#EXTRA_LIBS += -lm
-#
-### In modern systems, just define ranlib as 'echo'
-#RANLIB = echo
-#
-### LD flag to generate a shared library.
-### if you use GNU ld define:
-#SHAREDLIB_FLAG = -shared
-### else define:
-##SHAREDLIB_FLAG = -G
-#
-### set this if it is not defined by default (on HPUX for example)
-##OSTYPE = HPUX
-#
-############################################################
-### Installation directories, name of executables.
-#
-### make install puts everything here:
-### (if you choose method 2. 3. or 4. below)
-#INSTALLDIR = /usr/local
-#BINDIR = $(INSTALLDIR)/bin
-#LIBDIR = $(INSTALLDIR)/lib
-#INCLUDEDIR = $(INSTALLDIR)/include
-#MANDIR = $(INSTALLDIR)/man
-#DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
-#
-############################################################
-### Installing the library
-#
-### Choose one of these 4 installation methods:
-### 1. don't install the lib (just test the polylib)
-### 2. install the shared lib
-### 3. install the static lib
-### 4. install both static and shared libs (recommended)
-#
-### 1. don't install polylib anywhere (static linking).
-### define these 3 lines if you just want to test the library.
-### If you choose this, you won't be able to build other packages
-### such as the VisuDomain tool (well indeed you can by making
-### naughty changes in its makefile :-)
-##INSTALL_LIB = 
-##EXEC_EXTRA_LIBS = $(LIB)
-
-### Define this in combination with 2, 3, or 4 below
-### (2. 3. and 4. -needed) general static/shared defines
-### define this to link polylib with the executables:
-##EXEC_EXTRA_LIBS += -lpolylib$(BITS)
-### -optional: if the library is not installed in a standard path, define:
-##EXEC_EXTRA_LIBS += -L$(LIBDIR)
-#
-### 2. (shared)
-### Install the shared library:
-##INSTALL_LIB = install-shared
-### this is in most cases not necessary since it is the default:
-##EXEC_EXTRA_LIBS += -Bdynamic
-### On linux define this to run ldconfig after building the shared library:
-##LDCONFIG = ldconfig
-#
-### 3. (static)
-### Install the static library:
-##INSTALL_LIB = install-static
-#
-### 4. (static AND shared)
-### Install both static and shared libs:
-##INSTALL_LIB = install-static install-shared
-### this is in most cases not necessary since it is the default:
-##EXEC_EXTRA_LIBS += -Bdynamic
-### On linux define this to run ldconfig after building the shared library:
-##LDCONFIG = ldconfig
-#
-#
-### (2. and 4. -optional)
-### Using shared libraries in non-standard paths.
-### It is strongly discouraged to use this directory hard-coding
-### in the executables. Anyway, it's not very usefull to have a
-### shared object in a private directory. This can be used for
-### testing purpose.
-### On SVR4 (solaris, ...) to avoid defining LD_LIBRARY_PATH define:
-##EXEC_LDFLAGS += -R$(LIBDIR)
-### with GNU ld define:
-##EXEC_LDFLAGS += -r$(LIBDIR)
 
 mkinstalldirs = $(SHELL) ./mkinstalldirs
 
-#############################################################
-##-------------------END OF USER DEFINES-------------------##
-#############################################################
-##  you shouldn't need to change anything below this line  ##
-#############################################################
-
-#############################################################
-## more defines
-## where to put intermediate objects and executables:
-OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)
-LIB = $(OBJ_DIR)/$(PSTATIC)
-#INSTALL_LIB = 
-#EXEC_EXTRA_LIBS = -L./$(OBJ_DIR) $(EXEC_EXTRA_LIBS)
-EXEC_EXTRA_LIBS = $(LIB)
-
-POLYLIB_INC = ./include/polylib
-POLYLIB_SRC = ./source
-EXTRA_INCLUDES += -I ./include
-ARITH_DIR = ./ArithLib
-CFLAGS += $(EXTRA_INCLUDES) $(AFLAGS) $(EXTRA_FLAGS) 
-
-PSTATIC = libpolylib$(BITS).a.$(VERSION)
-PSHARED =  libpolylib$(BITS).$(SHEXT).$(VERSION)
 
 PEXEC = \
 	testlib \
@@ -227,7 +55,6 @@ PHEADERS= $(CFILES:%.c=$(POLYLIB_INC)/%.h) \
 
 LIB_OBJECTS= $(CFILES:%.c=$(OBJ_DIR)/%.o) 
 
-
 ##############################################################
 ## default : make $LIBS_TO_BUILD libs and $EXEC_TO_BUILD exec
 ##############################################################
@@ -235,10 +62,10 @@ LIB_OBJECTS= $(CFILES:%.c=$(OBJ_DIR)/%.o)
 all::
 	@echo "---------------------------------------------------"
 	@echo "You can choose either:"
+	@echo "'make [all]' to build the libs,  and build the executables (default)."
 	@echo "'make libs' to build the libraries ($(LIBS_TO_BUILD))."
-	@echo "'make install-libs' to install them (if necessary)."
-	@echo "'make [all]' to build the libs, install them, and build the executables (this is the default)."
-	@echo "'make install' to build and install everything."
+	@echo "'make install-libs' to install  somewhere (in $(prefix))."
+	@echo "'make install' to build and install somewhere (in $(prefix))."
 	@echo "---------------------------------------------------"
 all:: $(LIBS_TO_BUILD:%=%libs)
 all:: $(LIBS_TO_BUILD:%=%install-libs)
@@ -399,6 +226,7 @@ $(OBJ_DIR)/$(PSTATIC): $(PHEADERS) $(LIB_OBJECTS)
 	(cd $(ARITH_DIR) ; $(MAKE) "CFLAGS=$(CFLAGS)" "OBJ_DIR=$(OBJ_DIR)" )
 	$(RM) $(OBJ_DIR)/$(PSTATIC)
 	cp $(ARITH_DIR)/$(OBJ_DIR)/arithmetique.a $(OBJ_DIR)/$(PSTATIC)
+	cp $(ARITH_DIR)/$(OBJ_DIR)/errors.o $(OBJ_DIR)/
 	$(AR) -q $(OBJ_DIR)/$(PSTATIC) $(LIB_OBJECTS)
 	@$(RANLIB) $(OBJ_DIR)/$(PSTATIC)
 
@@ -482,9 +310,6 @@ $(OBJ_DIR):
 $(LIB_OBJECTS): $(OBJ_DIR)/%.o:$(POLYLIB_SRC)/%.c $(PHEADERS)
 	$(CC) -c $(CFLAGS) $(POLYLIB_SRC)/$*.c -o $(OBJ_DIR)/$*.o
 
-#$(PHEADERS): $(LIB_CFILES)
-#	-mv -f $@ $@.old
-#	cextract +a +w72 $(EXTRA_INCLUDES) -H_$*_H_ -o $@ $(@:.h=.c)
 
 ########################################################################
 ## Executables
@@ -579,8 +404,8 @@ $(OBJ_DIR)/example$(EXEC_EXTRA_SUFFIX): $(POLYLIB_SRC)/example.c $(LIB)
 		 $(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
 
 ########################################################################
-vars.mk: vars.mk.in
-	./configure
+#vars.mk: vars.mk.in
+#	./configure
 
 ########################################################################
 ## END

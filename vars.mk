@@ -25,17 +25,17 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.5 2002/01/16 17:51:00 loechner Exp $
+# $Id: vars.mk,v 1.6 2002/05/24 09:28:25 risset Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
-VERSION = 5.0
+VERSION = 5.00
 
 # NOTE: Don't edit this file if it is called vars.mk, instead
 # edit vars.mk.in, which is read by configure
 
 # Default top-level directory.
-prefix =	/usr/local
+prefix =	$(PWD)
 
 # Usually the same as prefix. 
 # exec_prefix is part of the autoconf standard.
@@ -77,27 +77,27 @@ GMP_BITS = gmp
 # Library type to construct
 LIBSTYPE_TO_BUILD = lib-static
 # Library type to install
-INSTALL_LIB = 
+INSTALL_LIB = install-static
 
 # Commands used to install scripts and data
-INSTALL =		/usr/bin/install -c
+INSTALL =		/usr/local/bin/install -c
 INSTALL_PROGRAM =	${INSTALL}
 INSTALL_DATA =		${INSTALL} -m 644
 
 ## GNU-MP stuff
 EXTRA_INCLUDES=
-EXTRA_LIBS=-lgmp 
+EXTRA_LIBS=
 
 # Platform specific variables
-OSTYPE	= linux-gnu
-HOST    = pc
-BUILD   = i686
+OSTYPE	= solaris2.6
+HOST    = sun
+BUILD   = sparc
 
 
 EXEC_EXTRA_SUFFIX = 
 
 ## make install puts everything here: relays on --prefix 
-INSTALLDIR = /usr/local
+INSTALLDIR = $(PWD)
 BINDIR = $(INSTALLDIR)/bin
 LIBDIR = $(INSTALLDIR)/lib
 INCLUDEDIR = $(INSTALLDIR)/include
@@ -106,10 +106,39 @@ DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
-EXEC_EXTRA_LIBS= -L$(OBJ_DIR) -lpolylib$(BITS) $(LIBS)
-SHAREDLIB_FLAG          = -shared
-LDCONFIG = ldconfig
+EXEC_EXTRA_LIBS= -L${exec_prefix}/lib -lpolylib$(BITS) $(LIBS)
+SHAREDLIB_FLAG          = -G
+LDCONFIG = 
 
 LIBS_TO_BUILD = 64
 EXEC_TO_BUILD = 64
+BITS=64
+AFLAGS=-DLINEAR_VALUE_PROTECT_MULTIPLY 		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -DLINEAR_VALUE_IS_LONGLONG
 
+
+OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)
+LIB = $(OBJ_DIR)/$(PSTATIC)
+EXEC_EXTRA_LIBS = $(LIB)
+
+POLYLIB_INC = ./include/polylib
+POLYLIB_SRC = ./source
+ARITH_DIR = ./ArithLib
+CFLAGS +=  $(EXTRA_INCLUDE) $(AFLAGS) $(EXTRA_FLAGS) 
+
+PSTATIC = libpolylib$(BITS).a.$(VERSION)
+PSHARED =  libpolylib$(BITS).$(SHEXT).$(VERSION)
+
+############################################################
+# Variables to be used in a used makefile 
+############################################################
+# POLYLIBDIR must be set by the Makefile calling vars.mk
+#POLYLIBDIR=./
+###########################################################
+CFLAGS += -I $(POLYLIBDIR)/include
+POLYOBJDIR=$(POLYLIBDIR)/$(OBJ_DIR)
+POLYOBJS = $(POLYOBJDIR)/Lattice.o  $(POLYOBJDIR)/Zpolyhedron.o \
+	 $(POLYOBJDIR)/errormsg.o  $(POLYOBJDIR)/Matop.o \
+	     $(POLYOBJDIR)/eval_ehrhart.o  $(POLYOBJDIR)/polyhedron.o \
+	 $(POLYOBJDIR)/vector.o $(POLYOBJDIR)/NormalForms.o \
+	$(POLYOBJDIR)/SolveDio.o      $(POLYOBJDIR)/matrix.o \
+	$(POLYOBJDIR)/errors.o
