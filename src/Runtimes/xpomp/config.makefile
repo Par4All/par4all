@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/09 08:45:09 $ 
+# $Date: 1996/09/09 08:49:20 $ 
 
 CPPFLAGS+=	$(PIPS_X11_ADDED_CPPFLAGS)
 LDFLAGS+=	$(PIPS_X11_ADDED_LDFLAGS)
@@ -21,6 +21,7 @@ SOURCES=	$(LOCAL_HEADERS) \
 		$(CFILES) \
 		$(M4CFILES) \
 		$(DEMO) \
+		$(HPFC) \
 		$(DOC)
 
 OFILES=		$(ARCH)/cgraphic.o
