@@ -1,7 +1,7 @@
 %
 % Documentation de l'environnement de de;veloppement PIPS
 %
-% $RCSfile: dret146.ftex,v $ ($Date: 1994/03/14 17:36:29 $) version $Revision$, got on %D%, %T%
+% $RCSfile: dret146.ftex,v $ ($Date: 1994/03/14 17:40:51 $) version $Revision$, got on %D%, %T%
 % %A%
 %
 
@@ -25,7 +25,7 @@
 		Ronan KERYELL
 }
 %\newcommand{\docdate}{7 octobre 1993}
-\newcommand{\docdate}{18 fe'vrier 1994}
+\newcommand{\docdate}{%D%}
 
 \begin{document}
 
