@@ -5,6 +5,9 @@
  * debug: CLONING_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.2  1997/10/31 16:22:10  coelho
+ * tmp install for corinne.
+ *
  * Revision 1.1  1997/10/31 10:40:46  coelho
  * Initial revision
  *
@@ -22,8 +25,210 @@
 #include "resources.h"
 #include "pipsdbm.h"
 #include "properties.h"
+#include "prettyprint.h"
+#include "semantics.h"
 
-#define ARG_TO_CLONE "TRANSFORMATION_CLONE_ON_ARGUMENT"
+/************************************************** BUILD THE CLONE VERSIONS */
+
+/* returns an allocated new name for a top-level entity.
+ */
+static string
+build_new_top_level_entity_name(string prefix)
+{
+    string name = (string) malloc(sizeof(char)*(strlen(prefix)+20)), res;
+    int version = 0;
+
+    do { sprintf(name, "%s_%d", prefix, version++); }
+    while (local_name_to_top_level_entity(name)!=entity_undefined);
+
+    res = strdup(name); 
+    free(name);
+    return res;
+}
+
+/* create an clone, and returns the corresponding entity, 
+ * which looks like a not yet parsed routine.
+ * it puts the initial_file for the routine, and updates its user_file.
+ */
+static entity
+build_a_clone_for(
+    entity cloned,
+    int argn,
+    int val)
+{
+    string name = entity_local_name(cloned), new_name;
+    entity new_fun;
+    text t;
+
+    pips_debug(2, "building a version of %s with arg %d val=%d\n",
+	       name, argn, val);
+    
+    new_name = build_new_top_level_entity_name(name);
+    new_fun = make_empty_function(new_name, entity_type(cloned));
+    
+    make_text_resource(new_name, DBR_INITIAL_FILE, ".f_initial", t);
+    free(new_name);
+
+    pips_user_error("sorry, not implemented yet\n");
+    return entity_undefined;
+}
+
+/********************************************* STORE ALREADY CLONED VERSIONS */
+
+/* already cloned version are kept in a dynamically allocated structure.
+ * it is provided with init/close/get/set functions.
+ */
+typedef struct 
+{
+    entity the_ref;
+    entity the_clone;
+    int argn;
+    int val;
+} clone_t;
+
+static int clones_index = 0 /* next available */, clones_size = 0;
+static clone_t * clones = (clone_t*) NULL;
+
+#define INITIALIZED pips_assert("clones initialized", clones && clones_size>0)
+
+static void 
+init_clone(void)
+{
+    pips_assert("clones undefined", clones==NULL && clones_size==0);
+    clones_index = 0;
+    clones_size = 10;
+    clones = (clone_t*) malloc(sizeof(clone_t)*clones_size);
+    pips_assert("malloc ok", clones);
+}
+
+static void
+close_clone(void)
+{
+    INITIALIZED;
+    free(clones);
+    clones_size = 0;
+    clones_index = 0;
+}
+
+static entity 
+get_clone(entity the_ref, int argn, int val)
+{
+    int i;
+    INITIALIZED;
+    for (i=0; i<clones_index; i++)
+    {
+	if (clones[i].the_ref==the_ref &&
+	    clones[i].argn == argn &&
+	    clones[i].val == val)
+	    return clones[i].the_clone;
+    }
+    return entity_undefined;
+}
+
+static void
+set_clone(entity the_ref, entity the_clone, int argn, int val)
+{
+    INITIALIZED;
+
+    if (clones_index==clones_size)
+    {
+	clones_size+=10;
+	clones = (clone_t*) realloc(clones, sizeof(clone_t)*clones_size);
+	pips_assert("realloc ok", clones);
+    }
+
+    clones[clones_index].the_ref = the_ref;
+    clones[clones_index].the_clone = the_clone;
+    clones[clones_index].argn = argn;
+    clones[clones_index].val = val;
+
+    clones_index++;
+}
+
+/**************************************************** CLONING TRANSFORMATION */
+
+static void
+do_clone_arg_val(
+    call c, 
+    int argn, 
+    int val)
+{
+    entity cloned = call_function(c), new_clone;
+    pips_debug(3, "%s cloned on argument %d for value %d\n", 
+	       entity_name(cloned), argn, val);
+    
+    /* first check whether the cloning was already performed.
+     */
+    new_clone = get_clone(cloned, argn, val);
+    if (new_clone==entity_undefined)
+    {
+	new_clone = build_a_clone_for(cloned, argn, val);
+	set_clone(cloned, new_clone, argn, val);
+    }
+
+    call_function(c) = new_clone;
+}
+
+DEFINE_LOCAL_STACK(stmt, statement)
+
+/* returns if the expression is a constant, maybe thanks to the declarations.
+ */
+static bool
+this_expression_constant_p(
+    expression e,
+    int * pval)
+{  
+    bool ok = TRUE;
+    if (expression_constant_p(e)) 
+    {
+	*pval = expression_to_int(e);
+    }
+    else if (expression_reference_p(e))
+    {   
+	entity ref;
+	statement current;
+	Psysteme prec;
+	Pbase b;
+	Value val;
+
+	ref = reference_variable(expression_reference(e));
+	if (!entity_integer_scalar_p(ref)) return FALSE;
+
+	/* try with the precondition...
+	 */
+	current = stmt_head();
+	prec = sc_dup(predicate_system(transformer_relation(
+	    load_statement_precondition(current))));
+	b = base_dup(sc_base(prec));
+	vect_erase_var(&b, (Variable) ref);
+	prec = sc_projection_optim_along_vecteur(prec, b);
+	ok = sc_value_of_variable(prec, (Variable) ref, &val);
+	sc_rm(prec);
+	base_rm(b);
+	
+	if (ok) *pval = VALUE_TO_INT(val);
+    }
+
+    return ok;
+}
+
+static entity module_to_clone = entity_undefined;
+static int argument_to_clone = 0;
+
+static void 
+clone_rwt(call c)
+{
+    expression nth_arg;
+    int val;
+
+    if (call_function(c)!=module_to_clone) return;
+    pips_debug(3, "considering call to %s\n", entity_name(module_to_clone));
+
+    nth_arg = EXPRESSION(gen_nth(argument_to_clone-1, call_arguments(c)));
+    
+    if (this_expression_constant_p(nth_arg, &val)) /* yeah! let us clone! */
+	do_clone_arg_val(c, argument_to_clone, val);
+}
 
 /* clone module calls on argument arg in caller.
  * formal parameter of module number argn must be an integer scalar.
@@ -43,8 +248,34 @@ clone_on_argument(
     caller = local_name_to_top_level_entity(caller_name);
     stat = (statement) db_get_memory_resource(DBR_CODE, caller_name, TRUE);
 
-    pips_user_error("sorry, not implemented yet\n");    
+    set_precondition_map((statement_mapping) 
+        db_get_memory_resource(DBR_PRECONDITIONS, caller_name, TRUE));
+
+    make_stmt_stack();
+    module_to_clone = module;
+    argument_to_clone = argn;
+
+    /* perform cloning
+     */
+    gen_multi_recurse(stat,
+		      statement_domain, stmt_filter, stmt_rewrite,
+		      call_domain, gen_true, clone_rwt,
+		      NULL);
+
+    /* update CALLEES
+     */
+    
+
+    module_to_clone = entity_undefined;
+    argument_to_clone = 0;
+    free_stmt_stack();
+    reset_precondition_map();
 }
+
+
+/******************************************************** PIPSMAKE INTERFACE */
+
+#define ARG_TO_CLONE "TRANSFORMATION_CLONE_ON_ARGUMENT"
 
 /* clone module name, on the argument specified by property
  * int TRANSFORMATION_CLONE_ON_ARGUMENT.
@@ -52,6 +283,7 @@ clone_on_argument(
  * clone 	> CALLERS.callees
  *       	> CALLERS.code
  *       < MODULE.code
+ *       < MODULE.callers
  *       < CALLERS.callees
  *       < CALLERS.preconditions
  *       < CALLERS.code
@@ -107,10 +339,13 @@ clone(string name)
 	    pips_user_error("%s: %d formal not a scalar int\n", name, argn);
     }
 
+    init_clone();
+
     MAP(STRING, caller_name, 
 	clone_on_argument(module, caller_name, argn),
 	callees_callees(callers));    
 
+    close_clone();
     reset_current_module_entity();
     reset_current_module_statement();
 
