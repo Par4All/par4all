@@ -10,6 +10,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.9  2001/12/05 17:09:38  irigoin
+ * Modification to handle value names in a safer way
+ *
  * Revision 1.8  2001/10/22 15:57:34  irigoin
  * Temporary values taken into account in generic_value_name()
  *
@@ -87,9 +90,13 @@ char * generic_value_name(entity e)
     if(local_temporary_value_entity_p(e)) {
       n = entity_minimal_name(e);
     }
+    /* else if (entity_has_values_p(e)){ */
+    else if (value_entity_p(e)){
+      /* n = external_value_name(e); */
+      n = pips_user_value_name(e);
+    }
     else {
-      n = entity_has_values_p(e)? entity_minimal_name(e) :
-	external_value_name(e);
+      n = entity_minimal_name(e);
     }
   }
   return n;
