@@ -1,8 +1,9 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1995/12/12 18:31:13 $, )
+# ($Date: 1995/12/27 11:31:03 $, )
 #
 # files:
+
 LIB_CFILES=	debug.c \
 		file.c \
 		message.c \
@@ -13,8 +14,11 @@ LIB_CFILES=	debug.c \
 		system.c \
 		exception.c \
 		mem_spy.c \
+		perf_spy.c \
 		malloc_debug.c 
+
 LIB_HEADERS=	misc-local.h
+
 #
 # should be deduced?
 LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
