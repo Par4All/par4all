@@ -69,61 +69,61 @@ extern Polyhedron *Universe_Polyhedron (unsigned Dimension);
 
 #else /* __STDC__ */
 
-extern Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,
-				   Polyhedron *Pol,unsigned NbMaxRays );
-extern Polyhedron *AddPolyToDomain(Polyhedron *Pol,Polyhedron *PolDomain);
-extern Polyhedron *AddRays (Value *Ray2,unsigned NbRay2,Polyhedron
-			    *Pol1,unsigned NbMaxRays);
-extern Polyhedron *align_context(Polyhedron *Pol,int align_dimension,
-				  int NbMaxRays);
-extern Polyhedron *Constraints2Polyhedron(Matrix *Constraints, unsigned
-					  NbMaxRays);
-extern Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays );
-extern Polyhedron *DomainAddConstraints(Polyhedron *Pol,Matrix *Mat,
-					unsigned NbMaxRays);
-extern Polyhedron *DomainAddRays(Polyhedron *Pol,Matrix *Ray,
-				 unsigned NbMaxConstrs);
-extern Polyhedron *DomainConvex(Polyhedron *Pol,unsigned NbMaxConstrs);
-extern Interval *DomainCost(Polyhedron *Pol,Value *Cost);
-extern Polyhedron *DomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,
-				    unsigned NbMaxRays);
-extern Polyhedron *DomainImage(Polyhedron *Pol,Matrix *Func,unsigned
-			       NbMaxConstrs);
-extern Polyhedron *DomainIntersection(Polyhedron *Pol1,Polyhedron
-				      *Pol2, unsigned NbMaxRays);
-extern Polyhedron *DomainPreimage(Polyhedron *Pol,Matrix *Func,
-				  unsigned NbMaxRays);
-extern Polyhedron *DomainSimplify(Polyhedron *Pol1, Polyhedron *Pol2,
-				  unsigned NbMaxRays);
-extern Polyhedron *DomainUnion(Polyhedron *Pol1,Polyhedron *Pol2,
-			       unsigned NbMaxRays);
-extern Polyhedron *Domain_Copy(Polyhedron *Pol);
-extern void Domain_Free (Polyhedron *Pol);
-extern Polyhedron *Empty_Polyhedron(unsigned Dimension);
-extern int Gauss(Matrix *Mat,int NbEq,int Dimension);
-extern int lower_upper_bounds(int pos,Polyhedron *P,Value *context,
-			      Value *LBp,Value *UBp);
-extern Matrix *Polyhedron2Constraints(Polyhedron *Pol);
-extern Matrix *Polyhedron2Rays(Polyhedron *Pol);
-extern int PolyhedronIncludes(Polyhedron *Pol1,Polyhedron *Pol2);
-extern Polyhedron* Polyhedron_Alloc(unsigned Dimension,unsigned
-				    NbConstraints,unsigned NbRays);
-extern Polyhedron *Polyhedron_Copy(Polyhedron *Pol);
-extern void Polyhedron_Free(Polyhedron *Pol);
-extern Polyhedron *Polyhedron_Image(Polyhedron *Pol,Matrix *Func,
-				    unsigned NbMaxConstrs);
-extern Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,
-				       unsigned NbMaxRays);
-extern void Polyhedron_Print(FILE *Dst,char *Format,Polyhedron *Pol);
-extern void Polyhedron_PrintConstraints(FILE *Dst,char *Format,
-                Polyhedron *Pol);
-extern Polyhedron *Polyhedron_Scan(Polyhedron *D,Polyhedron *C,
-				   unsigned MAXRAYS);
-extern void PolyPrint(Polyhedron *Pol);
-extern Polyhedron *Rays2Polyhedron(Matrix *Ray,unsigned NbMaxConstrs);
-extern Polyhedron *SubConstraint(Value *Con,Polyhedron *Pol,
-				 unsigned NbMaxRays, int Pass);
-extern Polyhedron *Universe_Polyhedron (unsigned Dimension);
+extern Polyhedron *AddConstraints(/*Value *Con,unsigned NbConstraints,
+				   Polyhedron *Pol,unsigned NbMaxRays */);
+extern Polyhedron *AddPolyToDomain(/*Polyhedron *Pol,Polyhedron *PolDomain*/);
+extern Polyhedron *AddRays (/*Value *Ray2,unsigned NbRay2,Polyhedron
+			    *Pol1,unsigned NbMaxRays*/);
+extern Polyhedron *align_context(/*Polyhedron *Pol,int align_dimension,
+				  int NbMaxRays*/);
+extern Polyhedron *Constraints2Polyhedron(/*Matrix *Constraints, unsigned
+					  NbMaxRays*/);
+extern Polyhedron *Disjoint_Domain(/* Polyhedron *Pol, int flag, unsigned NbMaxRays */);
+extern Polyhedron *DomainAddConstraints(/*Polyhedron *Pol,Matrix *Mat,
+					unsigned NbMaxRays*/);
+extern Polyhedron *DomainAddRays(/*Polyhedron *Pol,Matrix *Ray,
+				 unsigned NbMaxConstrs*/);
+extern Polyhedron *DomainConvex(/*Polyhedron *Pol,unsigned NbMaxConstrs*/);
+extern Interval *DomainCost(/*Polyhedron *Pol,Value *Cost*/);
+extern Polyhedron *DomainDifference(/*Polyhedron *Pol1,Polyhedron *Pol2,
+				    unsigned NbMaxRays*/);
+extern Polyhedron *DomainImage(/*Polyhedron *Pol,Matrix *Func,unsigned
+			       NbMaxConstrs*/);
+extern Polyhedron *DomainIntersection(/*Polyhedron *Pol1,Polyhedron
+				      *Pol2, unsigned NbMaxRays*/);
+extern Polyhedron *DomainPreimage(/*Polyhedron *Pol,Matrix *Func,
+				  unsigned NbMaxRays*/);
+extern Polyhedron *DomainSimplify(/*Polyhedron *Pol1, Polyhedron *Pol2,
+				  unsigned NbMaxRays*/);
+extern Polyhedron *DomainUnion(/*Polyhedron *Pol1,Polyhedron *Pol2,
+			       unsigned NbMaxRays*/);
+extern Polyhedron *Domain_Copy(/*Polyhedron *Pol*/);
+extern void Domain_Free (/*Polyhedron *Pol*/);
+extern Polyhedron *Empty_Polyhedron(/*unsigned Dimension*/);
+extern int Gauss(/*Matrix *Mat,int NbEq,int Dimension*/);
+extern int lower_upper_bounds(/*int pos,Polyhedron *P,Value *context,
+			      Value *LBp,Value *UBp*/);
+extern Matrix *Polyhedron2Constraints(/*Polyhedron *Pol*/);
+extern Matrix *Polyhedron2Rays(/*Polyhedron *Pol*/);
+extern int PolyhedronIncludes(/*Polyhedron *Pol1,Polyhedron *Pol2*/);
+extern Polyhedron* Polyhedron_Alloc(/*unsigned Dimension,unsigned
+				    NbConstraints,unsigned NbRays*/);
+extern Polyhedron *Polyhedron_Copy(/*Polyhedron *Pol*/);
+extern void Polyhedron_Free(/*Polyhedron *Pol*/);
+extern Polyhedron *Polyhedron_Image(/*Polyhedron *Pol,Matrix *Func,
+				    unsigned NbMaxConstrs*/);
+extern Polyhedron *Polyhedron_Preimage(/*Polyhedron *Pol,Matrix *Func,
+				       unsigned NbMaxRays*/);
+extern void Polyhedron_Print(/*FILE *Dst,char *Format,Polyhedron *Pol*/);
+extern void Polyhedron_PrintConstraints(/*FILE *Dst,char *Format,
+                Polyhedron *Pol*/);
+extern Polyhedron *Polyhedron_Scan(/*Polyhedron *D,Polyhedron *C,
+				   unsigned MAXRAYS*/);
+extern void PolyPrint(/*Polyhedron *Pol*/);
+extern Polyhedron *Rays2Polyhedron(/*Matrix *Ray,unsigned NbMaxConstrs*/);
+extern Polyhedron *SubConstraint(/*Value *Con,Polyhedron *Pol,
+				 unsigned NbMaxRays, int Pass*/);
+extern Polyhedron *Universe_Polyhedron (/*unsigned Dimension*/);
 
 
 #endif /* __STDC__ */

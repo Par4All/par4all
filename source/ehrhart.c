@@ -348,7 +348,7 @@ static void emul (evalue *e1,evalue *e2,evalue *res) {
     /* Product of two rational numbers */
     value_multiply(res->d,e1->d,e2->d);
     value_multiply(res->x.n,e1->x.n,e2->x.n );
-    value_assign(g,*Gcd(res->x.n, res->d));
+    Gcd(res->x.n, res->d,&g);
     if (value_notone_p(g)) {
       value_division(res->d,res->d,g);
       value_division(res->x.n,res->x.n,g);
@@ -388,7 +388,7 @@ void eadd(evalue *e1,evalue *res) {
     value_multiply(m2,res->x.n,e1->d);
     value_addto(res->x.n,m1,m2);
     value_multiply(res->d,e1->d,res->d);  
-    value_assign(g,*Gcd(res->x.n,res->d));        
+    Gcd(res->x.n,res->d,&g);
     if (value_notone_p(g)) {  
       value_division(res->d,res->d,g);
       value_division(res->x.n,res->x.n,g);
@@ -1010,7 +1010,7 @@ Polyhedron *old_Polyhedron_Preprocess(Polyhedron *D,Value size,unsigned MAXRAYS)
 	value_absolute(abs_b,b);
 
 	/* Create new constraint: b*UB-a*LB >= a*b*size */
-	value_assign(g,*Gcd(abs_a,abs_b));
+	Gcd(abs_a,abs_b,&g);
 	value_division(a1,a,g);
 	value_division(b1,b,g);
 	value_set_si(M->p[new][0],1);
@@ -1462,7 +1462,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       
       /* Set up coefficient vector C from i-th row of inverted matrix */
       for (j=0; j<rank; j++) {
-	value_assign(g,*Gcd(A->p[i][i+1],A->p[i][j+1+hdim]));
+	Gcd(A->p[i][i+1],A->p[i][j+1+hdim],&g);
 	value_division(C->arr[j].d,A->p[i][i+1],g);
 	value_division(C->arr[j].x.n,A->p[i][j+1+hdim],g);
       }
@@ -1521,15 +1521,15 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
 /*    Q : Domain                                                  */
 /*    CT : Context transformation matrix                          */
 /*----------------------------------------------------------------*/
-static Value *Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT) {
+static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
+ Value *lcm) {
   
   Param_Vertices *V;
   int i, j, ix, l;
   unsigned bx;
-  Value k,*lcm,m1;
+  Value k,m1;
   
-  lcm = (Value *)malloc(sizeof(Value));
-  value_init(k); value_init(*lcm); value_init(m1);
+  value_init(k); value_init(m1);
   
   /* Compute the denominator of P */
   /* lcm = Least Common Multiple of the denominators of the vertices of P */
@@ -1562,11 +1562,11 @@ static Value *Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT) {
 	/* Vin100, aug 16, 2001: */
 	/* Do not take into account the constant denominator ! */
 	for( l=0 ; l<V->Vertex->NbColumns-2 ; l++ )
-		value_assign( k, *Gcd(k,V->Vertex->p[j][l]) );
+		Gcd(k,V->Vertex->p[j][l],&k );
 	value_division(k,V->Vertex->p[j][V->Vertex->NbColumns-1],k);
 
 	if (value_notzero_p(k) && value_notone_p(k)) {
-	  value_assign(m1,*Gcd(*lcm,k));
+	  Gcd(*lcm,k,&m1);
 	  value_multiply(*lcm,*lcm,k);
 	  value_division(*lcm,*lcm,m1);
 	}
@@ -1574,7 +1574,7 @@ static Value *Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT) {
     }
     NEXT(ix,bx);
   }  
-  return(lcm);
+  value_clear(k); value_clear(m1);
 } /* Scan_Vertices */
 
 /*----------------------------------------------------------------*/
@@ -1803,7 +1803,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS) 
     overflow_warning_flag = 1;
     
     /* Scan the vertices and compute lcm */
-    value_assign(lcm,*Scan_Vertices(PP,Q,CT));
+    Scan_Vertices(PP,Q,CT,&lcm);
     
 #ifdef EDEBUG2
     fprintf(stderr,"Denominator = ");

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <polylib/polylib.h>
 
 /* nota bene: on stocke les matrices par lignes */
@@ -162,7 +163,7 @@ static void colonne(Value *a,int i,int j,Value x,int n,int p) {
 
 static int petit_l(Value *a,int n,int p,int q) {
   
-  int numero, k, tousnuls;
+  int numero=0, k, tousnuls;
   Value minus, comp;
   Value *c;
 
@@ -214,7 +215,7 @@ static int petit_l(Value *a,int n,int p,int q) {
 
 static int petit_c(Value *a,int n,int p,int q) {
   
-  int numero, k, tousnuls;  
+  int numero=0, k, tousnuls;  
   Value minus, comp;
   Value *c;
   

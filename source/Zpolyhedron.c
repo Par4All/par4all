@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <polylib/polylib.h> 
 
 static ZPolyhedron * ZPolyhedronIntersection(ZPolyhedron *, ZPolyhedron *);

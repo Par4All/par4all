@@ -9,9 +9,9 @@ char s[128];
 
 int main() {
   
-  Matrix *a, *b, *c, *d, *e, *g;
+  Matrix *a=NULL, *b, *c, *d, *e, *g;
   LatticeUnion *l1,*l2,*l3,*l4,*temp;
-  Polyhedron *A, *B, *C, *D;
+  Polyhedron *A=NULL, *B=NULL, *C, *D;
   ZPolyhedron *ZA, *ZB, *ZC, *ZD, *Zlast;
   int  nbPol, nbMat, func, rank ;
   Vector *v=NULL;
@@ -86,6 +86,7 @@ int main() {
   case 2:         
     g = Matrix_Read();
     A = Constraints2Polyhedron(g,2000);
+    Matrix_Free(g);
     g = Matrix_Read();
     B = Constraints2Polyhedron(g,2000);
     Matrix_Free(g);
@@ -94,8 +95,10 @@ int main() {
   case 3:
     g = Matrix_Read();
     A = Constraints2Polyhedron(g,2000);
+    Matrix_Free(g);
     g = Matrix_Read();
     B = Constraints2Polyhedron(g,2000);
+    Matrix_Free(g);
     g = Matrix_Read();
     C = Constraints2Polyhedron(g,2000);
     Matrix_Free(g);

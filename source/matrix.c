@@ -622,7 +622,7 @@ int MatInverse(Matrix *Mat,Matrix *MatInv ) {
       value_assign(x,Mat->p[j][i]);
       if(value_notzero_p(x)) {
 	value_assign(piv,Mat->p[i][i]);
-	value_assign(gcd,*Gcd(x,piv));
+	Gcd(x,piv,&gcd);
 	if (value_notone_p(gcd) ) {
 	  value_division(x,x,gcd);
 	  value_division(piv,piv,gcd);
@@ -640,9 +640,9 @@ int MatInverse(Matrix *Mat,Matrix *MatInv ) {
 	      
 	/* Simplify row(j) of the two matrices 'Mat' and 'MatInv' by */
 	/* dividing the rows with the common GCD.                     */
-	value_assign(m1,*Vector_Gcd(&MatInv->p[j][0],k));
-	value_assign(m2,*Vector_Gcd(&Mat->p[j][0],k));
-	value_assign(gcd,*Gcd(m1,m2));
+	Vector_Gcd(&MatInv->p[j][0],k,&m1);
+	Vector_Gcd(&Mat->p[j][0],k,&m2);
+	Gcd(m1,m2,&gcd);
 	if(value_notone_p(gcd)) {
 	  for(c=0;c<k;++c) {
 	    value_division(Mat->p[j][c],Mat->p[j][c],gcd);
@@ -693,7 +693,7 @@ void rat_prodmat(Matrix *S,Matrix *X,Matrix *P) {
   for(k=1;k<P->NbRows;++k) {
     value_assign(old_lcm,lcm);
     value_assign(last_column_entry,P->p[k][last_column_index]);
-    value_assign(gcd,*Gcd(lcm,last_column_entry));
+    Gcd(lcm,last_column_entry,&gcd);
     value_division(m1,last_column_entry,gcd);
     value_multiply(lcm,lcm,m1);
   }
@@ -940,7 +940,7 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
       value_assign(x,Mat->p[j][i]);
       if(value_notzero_p(x)) {
 	value_assign(piv,Mat->p[i][i]);
-	value_assign(gcd,*Gcd(x,piv));
+	Gcd(x,piv,&gcd);
 	if (value_notone_p(gcd) ) {
 	  value_division(x,x,gcd);
 	  value_division(piv,piv,gcd);
@@ -958,9 +958,9 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
 	      
 	/* Simplify row(j) of the two matrices 'Mat' and 'MatInv' by */
 	/* dividing the rows with the common GCD.                     */
-	value_assign(m1,*Vector_Gcd(&MatInv->p[j][0],k));
-	value_assign(m2,*Vector_Gcd(&Mat->p[j][0],k));
-	value_assign(gcd,*Gcd(m1,m2));
+	Vector_Gcd(&MatInv->p[j][0],k,&m1);
+	Vector_Gcd(&Mat->p[j][0],k,&m2);
+	Gcd(m1,m2,&gcd);
 	if(value_notone_p(gcd)) {
 	  for(c=0;c<k;++c) {
 	    value_division(Mat->p[j][c],Mat->p[j][c],gcd);
@@ -979,8 +979,8 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
      value_assign(den[j],Mat->p[j][j]);
      
      /* gcd is always positive */
-     value_assign(gcd,*Vector_Gcd(&MatInv->p[j][0],k));      
-     value_assign(gcd,*Gcd(gcd,den[j]));
+     Vector_Gcd(&MatInv->p[j][0],k,&gcd);
+     Gcd(gcd,den[j],&gcd);
      if (value_neg_p(den[j])) 
        value_oppose(gcd,gcd); /* make denominator positive */
      if (value_notone_p(gcd)) {
@@ -988,7 +988,7 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
 	 value_division(MatInv->p[j][c],MatInv->p[j][c],gcd); /* normalize */
        value_division(den[j],den[j],gcd);
      }  
-     value_assign(gcd,*Gcd(x,den[j]));
+     Gcd(x,den[j],&gcd);
      value_division(m1,den[j],gcd);
      value_multiply(x,x,m1);
    }

@@ -168,7 +168,7 @@ static int TestRank(Matrix *Mat) {
     for(j=k+1;j<Mat->NbRows;++j) {
       
       /* Make every other entry (below row(k)) in column(k) zero */
-      value_assign(gcd,*Gcd(Mat->p[j][k],Mat->p[k][k]));
+      Gcd(Mat->p[j][k],Mat->p[k][k],&gcd);
       for(i=k+1;i<Mat->NbColumns;++i) {
 	
 	/* pour tous les indices i > k */
@@ -1410,7 +1410,8 @@ void Print_Vertex(FILE *DST,Matrix *V,char **param_names){
     fprintf(DST, " " );
     for(v=0;v < V->NbColumns-2;++v) {
       if(value_notzero_p(V->p[l][v])) {
-	value_absolute(gcd,*Gcd(V->p[l][v],V->p[l][V->NbColumns-1]));
+	Gcd(V->p[l][v],V->p[l][V->NbColumns-1],&gcd);
+	value_absolute(gcd,gcd);
 	value_division(tmp,V->p[l][v],gcd);
 	if(value_posz_p(tmp)) {
 	  if(!first) 
@@ -1443,7 +1444,8 @@ void Print_Vertex(FILE *DST,Matrix *V,char **param_names){
     if(value_notzero_p(V->p[l][v]) || first) {
       if(value_posz_p(V->p[l][v]) && !first)
 	fprintf(DST,"+");
-      value_absolute(gcd,*Gcd(V->p[l][v],V->p[l][V->NbColumns-1]));
+	Gcd(V->p[l][v],V->p[l][V->NbColumns-1],&gcd);
+      value_absolute(gcd,gcd);
       value_division(tmp,V->p[l][v],gcd);
       value_print(DST,VALUE_FMT,tmp);
       value_division(tmp,V->p[l][V->NbColumns-1],gcd);

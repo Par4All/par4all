@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.8 2002/05/31 15:06:07 loechner Exp $
+# $Id: vars.mk,v 1.9 2002/06/04 13:48:12 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -35,7 +35,7 @@ VERSION = 5.06
 # edit vars.mk.in, which is read by configure
 
 # Default top-level directory.
-prefix =	/usr
+prefix =	/usr/local
 
 # Usually the same as prefix. 
 # exec_prefix is part of the autoconf standard.
@@ -49,7 +49,7 @@ BIN_INSTALL_DIR =	$(exec_prefix)/bin
 
 # c compiler flags and defines
 CC	             	= gcc
-CFLAGS                  = -g -O2
+CFLAGS                  = -g -O2 -Wall
 EXTRA_FLAGS             = 
 DEFINES         	=  -DSTDC_HEADERS=1 -DHAVE_LIMITS_H=1 -DHAVE_UNISTD_H=1 -DSIZEOF_INT=4 -DSIZEOF_LONG_INT=4 -DSIZEOF_LONG_LONG_INT=8  
 
@@ -77,7 +77,7 @@ GMP_BITS = gmp
 # Library type to construct
 LIBSTYPE_TO_BUILD = 
 # Library type to install
-INSTALL_LIB = install-static install-shared
+INSTALL_LIB = 
 
 # Commands used to install scripts and data
 INSTALL =		/usr/bin/install -c
@@ -97,7 +97,7 @@ BUILD   = i686
 EXEC_EXTRA_SUFFIX = 
 
 ## make install puts everything here: relays on --prefix 
-INSTALLDIR = /usr
+INSTALLDIR = /usr/local
 BINDIR = $(INSTALLDIR)/bin
 LIBDIR = $(INSTALLDIR)/lib
 INCLUDEDIR = $(INSTALLDIR)/include
@@ -106,7 +106,7 @@ DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
-EXEC_EXTRA_LIBS= -L${exec_prefix}/lib -lpolylib$(BITS) $(LIBS)
+EXEC_EXTRA_LIBS= -L$(OBJ_DIR) -lpolylib$(BITS) $(LIBS)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 

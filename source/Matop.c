@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <polylib/polylib.h>
 
 /*
@@ -10,7 +11,7 @@ Value *Lcm (Value i, Value j) {
   
   tmp = (Value *) malloc (sizeof(Value));
   value_init(aux); value_init(*tmp);
-  value_assign(*tmp,*Gcd(i,j));
+  Gcd(i,j,tmp);
   value_multiply(aux,i,j);
   value_division(*tmp,aux,*tmp);
   value_clear(aux);
@@ -238,7 +239,7 @@ void PutColumnFirst (Matrix *X, int Columnnumber) {
       value_assign(X->p[i][j],X->p[i][j-1]);
   
   for (i = 0; i < X->NbRows ; i ++) {
-    value_assign(X->p[i][j],vector[i]);
+    value_assign(X->p[i][0],vector[i]);
     value_clear(vector[i]);
   }    
   free (vector);
@@ -265,7 +266,7 @@ void PutColumnLast (Matrix *X, int Columnnumber) {
       value_assign(X->p[i][j],X->p[i][j+1]);
   
   for (i = 0; i < X->NbRows ; i++) {
-    value_assign(X->p[i][j],vector[i]);
+    value_assign(X->p[i][X->NbColumns-1],vector[i]);
     value_clear(vector[i]);
   }  
   free (vector);
@@ -303,7 +304,7 @@ Matrix *AddANullColumn(Matrix *M) {
     for (j = 0; j < M->NbColumns ; j++)
       value_assign(Result->p[i][j],M->p[i][j]);
   for (i = 0; i < M->NbRows; i++)
-    value_set_si(Result->p[i][j],0);
+    value_set_si(Result->p[i][M->NbColumns],0);
   return Result;
 } /* AddANullColumn */
 

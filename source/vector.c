@@ -23,13 +23,12 @@
 /* 
  * Compute n! 
  */
-Value *Factorial(int n) {
+void Factorial(int n, Value *fact) {
   
   int i;
-  Value *fact, tmp;
+  Value tmp;
   
-  fact = (Value *)malloc(sizeof(Value));
-  value_init(*fact); value_init(tmp);
+  value_init(tmp);
   
   value_set_si(*fact,1);
   for (i=1;i<=n;i++) {
@@ -37,19 +36,18 @@ Value *Factorial(int n) {
     value_multiply(*fact,*fact,tmp);
   }
   value_clear(tmp);
-  return fact;
 } /* Factorial */
 
 /* 
  * Compute n!/(p!(n-p)!) 
  */
-Value *Binomial(int n, int p) {
+void Binomial(int n, int p, Value *result) {
   
   int i;
-  Value *result,tmp;
+  Value tmp;
+  Value f;
   
-  result = (Value *)malloc(sizeof(Value));
-  value_init(*result); value_init(tmp);
+  value_init(tmp);value_init(f);
   
   if (n-p<p)
     p=n-p;
@@ -58,33 +56,31 @@ Value *Binomial(int n, int p) {
     for (i=n-p+2;i<=n;i++) {
       value_set_si(tmp,i);    
       value_multiply(*result,*result,tmp);
-    }  
-    value_division(*result,*result,*Factorial(p));
+    }
+    Factorial(p,&f);
+    value_division(*result,*result,f);
   }
   else 
     value_set_si(*result,1);
-  value_clear(tmp);
-  return result;
+  value_clear(f);value_clear(tmp);
 } /* Binomial */
   
 /*
  * Return the number of ways to choose 'b' items from 'a' items, that is, 
  * return a!/(b!(a-b)!)
  */
-Value *CNP(int a,int b) {
+void CNP(int a,int b, Value *result) {
   
   int i;
-  Value *result,tmp;
-  
-  result = (Value *)malloc(sizeof(Value));
-  value_init(*result); value_init(tmp);
+  Value tmp;
+  value_init(tmp);
 
   value_set_si(*result,1);
   
   /* If number of items is less than the number to be choosen, return 1 */
   if(a <= b) {
     value_clear(tmp);
-    return result;
+    return;
   }  
   for(i=a;i>b;--i) {
     value_set_si(tmp,i);
@@ -95,25 +91,17 @@ Value *CNP(int a,int b) {
     value_division(*result,*result,tmp);
   }
   value_clear(tmp);
-  return result;
 } /* CNP */
 
 /* 
  * Compute GCD of 'a' and 'b' 
  */
-Value *Gcd(Value a,Value b) {
+void Gcd(Value a,Value b,Value *result) {
 
-  Value *result;
   Value acopy, bcopy;
 
   value_init(acopy);
   value_init(bcopy);
-  result = (Value *)malloc(sizeof(Value));  
-  if (!result) {
-    fprintf(stderr,"Not enough memory\n");
-    exit(0);
-  }  
-  value_init(*result);   
   value_assign(acopy,a);
   value_assign(bcopy,b);
   while(value_notzero_p(acopy)) { 
@@ -124,7 +112,6 @@ Value *Gcd(Value a,Value b) {
   value_absolute(*result,bcopy);
   value_clear(acopy);
   value_clear(bcopy);
-  return(result);                           
 } /* Gcd */
 
 /* 
@@ -372,13 +359,12 @@ void Vector_AntiScale(Value *p1,Value *p2,Value lambda,unsigned length) {
 /* 
  * Return the inner product of the two Vectors 'p1' and 'p2' 
  */
-Value *Inner_Product(Value *p1,Value *p2,unsigned length) {
+void Inner_Product(Value *p1,Value *p2,unsigned length,Value *ip) {
   
-  Value *ip,tmp;
+  Value tmp;
   int i;
 
-  ip = (Value *)malloc(sizeof(Value));
-  value_init(*ip); value_init(tmp);
+  value_init(tmp);
 
   //  if(length==0)
   //  return(VALUE_MAX);  
@@ -391,19 +377,15 @@ Value *Inner_Product(Value *p1,Value *p2,unsigned length) {
     p1++; p2++;
   }
   value_clear(tmp);
-  return ip;
 } /* Inner_Product */
 
 /* 
  * Return the maximum of the components of 'p' 
  */
-Value *Vector_Max(Value *p,unsigned length) {
+void Vector_Max(Value *p,unsigned length, Value *max) {
   
-  Value *cp,*max;
+  Value *cp;
   int i;
-
-  max = (Value *)malloc(sizeof(Value));
-  value_init(*max); 
 
   cp=p;
   value_assign(*max,*cp);
@@ -412,19 +394,15 @@ Value *Vector_Max(Value *p,unsigned length) {
     value_maximum(*max,*max,*cp);
     cp++;
   }
-  return max;
 } /* Vector_Max */
 
 /* 
  * Return the minimum of the components of Vector 'p' 
  */
-Value *Vector_Min(Value *p,unsigned length) {
+void Vector_Min(Value *p,unsigned length,Value *min) {
   
-  Value *cp,*min;
+  Value *cp;
   int i;
-
-  min = (Value *)malloc(sizeof(Value));
-  value_init(*min);
 
   //  if(length==0)
   //  return(VALUE_MAX);
@@ -435,7 +413,7 @@ Value *Vector_Min(Value *p,unsigned length) {
     value_minimum(*min,*min,*cp);
     cp++;
   }
-  return min;
+  return;
 } /* Vector_Min */
 
 /* 
@@ -494,13 +472,12 @@ int Vector_Equal(Value *Vec1,Value *Vec2,unsigned n) {
  * points to the component index that has the minimum value. If no such value
  * and index is found, Value 1 is returned.
  */
-Value *Vector_Min_Not_Zero(Value *p,unsigned length,int *index) {
+void Vector_Min_Not_Zero(Value *p,unsigned length,int *index,Value *min) {
   
-  Value *cp,*min, aux;
+  Value *cp, aux;
   int i,j;
   
-  min = (Value *)malloc(sizeof(Value));
-  value_init(*min); value_init(aux);
+  value_init(aux);
   
   cp=p;
   for(i=0;i<length;i++) {
@@ -515,7 +492,7 @@ Value *Vector_Min_Not_Zero(Value *p,unsigned length,int *index) {
     value_set_si(*min,1);
     value_clear(aux);
     cp = NULL;
-    return min;
+    return;
   }
   ++cp;
   for(j=i+1;j<length;j++) {
@@ -528,24 +505,21 @@ Value *Vector_Min_Not_Zero(Value *p,unsigned length,int *index) {
   }
   value_clear(aux);
   cp = NULL;
-  return min;
 } /* Vector_Min_Not_Zero */
 
 /* 
  * Return the GCD of components of Vector 'p' 
  */
-Value *Vector_Gcd(Value *p,unsigned length) {
+void Vector_Gcd(Value *p,unsigned length,Value *min) {
   
-  Value *q,*cq, *cp, *min;
+  Value *q,*cq, *cp;
   int i, Not_Zero, Index_Min=0;
   
-  min = (Value *)malloc(sizeof(Value));
   q  = (Value *)malloc(length*sizeof(Value));
 
   /* Initialize all the 'Value' variables */
   for(i=0;i<length;i++)
     value_init(q[i]);
-  value_init(*min); 
   
   /* 'cp' points to vector 'p' and cq points to vector 'q' that holds the */
   /* absolute value of elements of vector 'p'.                            */
@@ -556,7 +530,7 @@ Value *Vector_Gcd(Value *p,unsigned length) {
     cp++;
   }
   do {   
-    min = Vector_Min_Not_Zero(q,length,&Index_Min);     
+    Vector_Min_Not_Zero(q,length,&Index_Min,min);
     
     /* if (*min != 1) */
     if (value_notone_p(*min)) {
@@ -579,7 +553,6 @@ Value *Vector_Gcd(Value *p,unsigned length) {
   for(i=0;i<length;i++)
     value_clear(q[i]);
   free(q);
-  return min;
 } /* Vector_Gcd */
 
 /* 
@@ -608,26 +581,25 @@ void Vector_Map(Value *p1,Value *p2,Value *p3,unsigned length,Value *(*f)()) {
  */
 void Vector_Normalize(Value *p,unsigned length) {
   
-  Value *cp, *gcd,tmp;
+  Value *cp, gcd,tmp;
   int i;
   
-  value_init(tmp);
+  value_init(tmp);value_init(gcd);
 
-  gcd = Vector_Gcd(p,length);
+  Vector_Gcd(p,length,&gcd);
   value_set_si(tmp,1);
   
-  if (value_gt(*gcd,tmp)) {
+  if (value_gt(gcd,tmp)) {
     cp = p;    
     for (i=0; i<length; i++) { 
       
       /* *cp /= gcd */
-      value_division(*cp,*cp,*gcd);
+      value_division(*cp,*cp,gcd);
       cp++;
     }
   }
   value_clear(tmp);
-  value_clear(*gcd);
-  free(gcd);
+  value_clear(gcd);
   return;
 } /* Vector_Normalize */
 
@@ -637,38 +609,35 @@ void Vector_Normalize(Value *p,unsigned length) {
  */
 void Vector_Normalize_Positive(Value *p,int length,int pos) {
   
-  Value *gcd;
+  Value gcd;
   int i;
   
-  gcd = Vector_Gcd(p,length);  	
+  value_init(gcd);
+  Vector_Gcd(p,length,&gcd);
   if (value_neg_p(p[pos]))
-    value_oppose(*gcd,*gcd);            
-  if(value_notone_p(*gcd))
+    value_oppose(gcd,gcd);
+  if(value_notone_p(gcd))
     for(i=0; i<length; i++)
-      value_division(p[i],p[i],*gcd);
-  value_clear(*gcd);
-  free(gcd);
+      value_division(p[i],p[i],gcd);
+  value_clear(gcd);
+
   return;
 } /* Vector_Normalize_Positive */
 
 /* 
  * Reduce 'p' by operating binary function on its components successively 
  */
-Value *Vector_Reduce(Value *p,unsigned length,Value *(*f)()) {
+void Vector_Reduce(Value *p,unsigned length,void(*f)(Value,Value *),Value *r) {
   
-  Value *cp,*r;
+  Value *cp;
   int i;
   
-  r = (Value *)malloc(sizeof(Value));
-  value_init(*r);
   cp = p;
   value_assign(*r,*cp);
-  cp++;
   for(i=1;i<length;i++) {
-    value_assign(*r, *(*f)(*r, *cp));
     cp++;
+    (*f)(*cp,r);
   }
-  return r;
 } /* Vector_Reduce */
 
 /* 

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <polylib/polylib.h>
 
 typedef struct {
@@ -112,7 +113,7 @@ Bool isEmptyLattice (Lattice *A) {
       if(value_notzero_p(A->p[i][j])) {
 	return False;
       }
-  if (value_one_p(A->p[i][j])) {
+  if (value_one_p(A->p[i][A->NbColumns-1])) {
     return True ;
   }
   return False ;

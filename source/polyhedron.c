@@ -214,7 +214,7 @@ static void Combine(Value *p1, Value *p2, Value *p3, int pos, unsigned length) {
   value_absolute(abs_a2,a2);
 
   /* gcd  = Gcd(abs(a1), abs(a2)) */
-  value_assign(gcd,*Gcd(abs_a1,abs_a2));
+  Gcd(abs_a1,abs_a2,&gcd);
 
   /* a1 = a1/gcd */
   value_division (a1,a1,gcd);
@@ -734,7 +734,7 @@ int Gauss(Matrix *Mat,int NbEq,int Dimension) {
 	
 	/* Normalize the pivot row by dividing it by the gcd */      
 	/* gcd = Vector_Gcd(Mat->p[Rank]+1,Dimension) */
-	value_assign(gcd,*Vector_Gcd(Mat->p[Rank]+1,Dimension)); 
+	Vector_Gcd(Mat->p[Rank]+1,Dimension,&gcd);
 	
 	/* if (gcd >= 2) */
 	value_set_si(tmp,2);
@@ -3630,7 +3630,8 @@ int lower_upper_bounds(int pos,Polyhedron *P,Value *context,Value *LBp,Value *UB
   for (i=0; i<P->NbConstraints; i++) {
     value_assign(d,P->Constraint[i][pos]);
     if (value_zero_p(d)) continue;    
-    value_oppose(n,*Inner_Product(&context[1],&(P->Constraint[i][1]),P->Dimension+1));
+    Inner_Product(&context[1],&(P->Constraint[i][1]),P->Dimension+1,&n);
+    value_oppose(n,n);
     
     /*---------------------------------------------------*/
     /* Compute n/d        n/d<0              n/d>0       */

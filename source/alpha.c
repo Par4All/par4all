@@ -382,7 +382,7 @@ int GaussSimplify(Matrix *Mat1,Matrix *Mat2) {
 	Vector_Exchange(Mat1->p[Rank],Mat1->p[i],NbCols);
       
       /* Normalize the pivot row */
-      value_assign(gcd,*Vector_Gcd(Mat1->p[Rank],NbCols));
+      Vector_Gcd(Mat1->p[Rank],NbCols,&gcd);
       
       /* If (gcd >= 2) */
       value_set_si(tmp,2);
@@ -408,7 +408,7 @@ int GaussSimplify(Matrix *Mat1,Matrix *Mat2) {
             value_absolute(a1abs,a1);
             value_assign(a2,Mat1->p[Rank][j]); 
             value_absolute(a2abs,a2);
-            value_assign(a,*Gcd(a1abs,a2abs));
+            Gcd(a1abs,a2abs,&a);
 	    value_division(a1,a1,a);
 	    value_division(a2,a2,a);
 	    value_oppose(a1,a1);
@@ -448,7 +448,7 @@ int GaussSimplify(Matrix *Mat1,Matrix *Mat2) {
 	  value_absolute(a1abs,a1);
 	  value_assign(a2,Mat1->p[k][j]);
 	  value_absolute(a2abs,a2);
-	  value_assign(a,*Gcd(a1abs,a2abs));
+	  Gcd(a1abs,a2abs,&a);
 	  value_division(a1,a1,a);
 	  value_division(a2,a2,a);
 	  value_oppose(a1,a1);
