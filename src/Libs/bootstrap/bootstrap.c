@@ -21,6 +21,9 @@
   - intrinsics are not properly typed
 
   $Log: bootstrap.c,v $
+  Revision 1.75  2002/06/20 15:53:41  irigoin
+  New pseudo-intrisics to handle DATA
+
   Revision 1.74  2002/06/13 13:47:26  irigoin
   Pseudo-intrinsic STATIC-INITIALIZATION() added
 
@@ -29,6 +32,9 @@
 
   Revision 1.72  2002/06/10 12:00:37  irigoin
   $Log: bootstrap.c,v $
+  Revision 1.75  2002/06/20 15:53:41  irigoin
+  New pseudo-intrisics to handle DATA
+
   Revision 1.74  2002/06/13 13:47:26  irigoin
   Pseudo-intrinsic STATIC-INITIALIZATION() added
 
@@ -108,6 +114,10 @@ CreateArrays()
   */
   
   entity ent;
+  sequence s = make_sequence(NIL);
+  code c = make_code(NIL, strdup(""), s);
+
+  code_initializations(c) = s;
   
   ent = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
 				     IO_EFFECTS_PACKAGE_NAME),
@@ -115,7 +125,7 @@ CreateArrays()
 			      make_functional(NIL,make_type(is_type_void,
 							    NIL))),
 		    make_storage(is_storage_rom, UU),
-		    make_value(is_value_code,make_code(NIL, strdup(""), make_sequence(NIL))));
+		    make_value(is_value_code, c));
   
   set_current_module_entity(ent);
   
@@ -3575,7 +3585,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"ENDFILE", (INT_MAX), default_intrinsic_type, check_endfile, 0},
   {IMPLIED_DO_NAME, (INT_MAX), default_intrinsic_type, typing_implied_do, 0},
   {REPEAT_VALUE_NAME, 2, default_intrinsic_type, no_typing, 0},
-  {STATIC_INITIALIZATION_NAME, (INT_MAX) , default_intrinsic_type, no_typing, 0},
+  {STATIC_INITIALIZATION_FUNCTION_NAME, (INT_MAX) , default_intrinsic_type, no_typing, 0},
+  {DATA_LIST_FUNCTION_NAME, (INT_MAX) , default_intrinsic_type, no_typing, 0},
   {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type, check_format, 0},
   {"INQUIRE", (INT_MAX), default_intrinsic_type, check_inquire, 0},
   
