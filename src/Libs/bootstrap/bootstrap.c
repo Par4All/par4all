@@ -70,9 +70,59 @@ void CreateArrays()
 
     set_current_module_entity(ent);
 
-    /* GO: entity for io effects : It is an array which*/
+    /* GO: entity for io logical units: It is an array which*/
     make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
 				 IO_EFFECTS_ARRAY_NAME),
+		MakeTypeArray(make_basic(is_basic_int,
+					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
+			      CONS(DIMENSION,
+				   make_dimension
+				   (MakeIntegerConstantExpression("0"),
+				    /*
+				       MakeNullaryCall
+				       (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+				       */
+				    MakeIntegerConstantExpression("2000")
+				    ),
+				   NIL)),
+		/* make_storage(is_storage_ram,
+		   make_ram(entity_undefined, DynamicArea, 0, NIL))
+		   */
+		make_storage(is_storage_ram,
+			     make_ram(ent,
+				      global_name_to_entity(TOP_LEVEL_MODULE_NAME, 
+							    STATIC_AREA_LOCAL_NAME),
+				      0, NIL)),
+		make_value(is_value_unknown, UU));
+
+    /* GO: entity for io logical units: It is an array which*/
+    make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
+				 IO_EOF_ARRAY_NAME),
+		MakeTypeArray(make_basic(is_basic_int,
+					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
+			      CONS(DIMENSION,
+				   make_dimension
+				   (MakeIntegerConstantExpression("0"),
+				    /*
+				       MakeNullaryCall
+				       (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+				       */
+				    MakeIntegerConstantExpression("2000")
+				    ),
+				   NIL)),
+		/* make_storage(is_storage_ram,
+		   make_ram(entity_undefined, DynamicArea, 0, NIL))
+		   */
+		make_storage(is_storage_ram,
+			     make_ram(ent,
+				      global_name_to_entity(TOP_LEVEL_MODULE_NAME, 
+							    STATIC_AREA_LOCAL_NAME),
+				      0, NIL)),
+		make_value(is_value_unknown, UU));
+
+    /* GO: entity for io logical units: It is an array which*/
+    make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
+				 IO_ERROR_ARRAY_NAME),
 		MakeTypeArray(make_basic(is_basic_int,
 					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
 			      CONS(DIMENSION,
@@ -98,12 +148,356 @@ void CreateArrays()
     reset_current_module_entity();
 }
 
+/* The default intrinsic type is a functional type with n overloaded
+ * arguments returning an overloaded result if the arity is known.
+ * If the arity is unknown, the default intrinsic type is a 0-ary
+ * functional type returning an overloaded result.
+ */
+
+static type default_intrinsic_type(int n)
+{
+type t = type_undefined;
+functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeOverloadedResult());
+  t = make_type(is_type_functional, ft);
+
+  if (n < (INT_MAX)) {
+    int i = n;
+    while (i-- > 0) {
+      functional_parameters(ft) = 
+	CONS(PARAMETER, MakeOverloadedParameter(),
+	     functional_parameters(ft));
+    }
+  }
+  return t;
+}
+
+static type overloaded_to_integer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeOverloadedParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type overloaded_to_double_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeOverloadedParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type overloaded_to_complex_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeComplexResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeOverloadedParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type overloaded_to_logical_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  int i = 0;
+
+  ft = make_functional(NIL, MakeLogicalResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeOverloadedParameter(), NIL);
+  for(i=1;i<n;i++) {
+    functional_parameters(ft) = 
+      CONS(PARAMETER, MakeOverloadedParameter(),
+	   functional_parameters(ft));
+  }
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type integer_to_integer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeIntegerParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type integer_to_real_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeRealResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeIntegerParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type integer_to_double_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeDoubleprecisionResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeIntegerParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type real_to_integer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeRealParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type real_to_real_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeRealResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeRealParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type real_to_double_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeDoubleprecisionResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeRealParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type double_to_integer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeDoubleprecisionParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type double_to_real_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeRealResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeDoubleprecisionParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type double_to_double_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeRealResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeDoubleprecisionParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type complex_to_real_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeRealResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeComplexParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type complex_to_complex_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeComplexResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeComplexParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type character_to_integer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  int i = 0;
+
+  ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeCharacterParameter(), NIL);
+  for(i=1; i<n; i++) {
+    functional_parameters(ft) = 
+      CONS(PARAMETER, MakeCharacterParameter(), 
+	   functional_parameters(ft));
+  }
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type character_to_logical_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  int i = 0;
+
+  ft = make_functional(NIL, MakeLogicalResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeCharacterParameter(), NIL);
+  for(i=1; i<n; i++) {
+    functional_parameters(ft) = 
+      CONS(PARAMETER, MakeCharacterParameter(),
+	   functional_parameters(ft));
+  }
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type character_to_character_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  int i = 0;
+
+  ft = make_functional(NIL, MakeCharacterResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeCharacterParameter(), NIL);
+  for(i=1; i<n; i++) {
+    functional_parameters(ft) = 
+      CONS(PARAMETER, MakeCharacterParameter(),
+	   functional_parameters(ft));
+  }
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type substring_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeCharacterResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeIntegerParameter(), NIL);
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeIntegerParameter(),
+	 functional_parameters(ft));
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeCharacterParameter(),
+	 functional_parameters(ft));
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type assign_substring_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeCharacterResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeCharacterParameter(), NIL);
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeIntegerParameter(),
+	 functional_parameters(ft));
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeIntegerParameter(),
+	 functional_parameters(ft));
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeCharacterParameter(),
+	 functional_parameters(ft));
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type logical_to_logical_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  int i = 0;
+
+  ft = make_functional(NIL, MakeLogicalResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeLogicalParameter(), NIL);
+  for(i=1; i<n; i++) {
+    functional_parameters(ft) = 
+      CONS(PARAMETER, MakeLogicalParameter(),
+	 functional_parameters(ft));
+  }
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
 /* the following data structure describes an intrinsic function: its
-name and its arity. */
+name and its arity and its type. */
 
 typedef struct IntrinsicDescriptor {
     string name;
     int nbargs;
+  type (*intrinsic_type)(int);
 } IntrinsicDescriptor;
 
 
@@ -116,149 +510,149 @@ arguments.
 */
 
 LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
-    {"+", 2},
-    {"-", 2},
-    {"/", 2},
-    {"*", 2},
-    {"--", 1},
-    {"**", 2},
+    {"+", 2, default_intrinsic_type},
+    {"-", 2, default_intrinsic_type},
+    {"/", 2, default_intrinsic_type},
+    {"*", 2, default_intrinsic_type},
+    {"--", 1, default_intrinsic_type},
+    {"**", 2, default_intrinsic_type},
 
-    {"=", 2},
+    {"=", 2, default_intrinsic_type},
 
-    {".EQV.", 2},
-    {".NEQV.", 2},
+    {".EQV.", 2, overloaded_to_logical_type},
+    {".NEQV.", 2, overloaded_to_logical_type},
 
-    {".OR.", 2},
-    {".AND.", 2},
+    {".OR.", 2, logical_to_logical_type},
+    {".AND.", 2, logical_to_logical_type},
 
-    {".LT.", 2},
-    {".GT.", 2},
-    {".LE.", 2},
-    {".GE.", 2},
-    {".EQ.", 2},
-    {".NE.", 2},
+    {".LT.", 2, overloaded_to_logical_type},
+    {".GT.", 2, overloaded_to_logical_type},
+    {".LE.", 2, overloaded_to_logical_type},
+    {".GE.", 2, overloaded_to_logical_type},
+    {".EQ.", 2, overloaded_to_logical_type},
+    {".NE.", 2, overloaded_to_logical_type},
 
-    {"//", 2},
+    {"//", 2, character_to_character_type},
 
-    {".NOT.", 1},
+    {".NOT.", 1, logical_to_logical_type},
 
-    {"WRITE", (INT_MAX)},
-    {"REWIND", (INT_MAX)},
-    {"BACKSPACE", (INT_MAX)},
-    {"OPEN", (INT_MAX)},
-    {"CLOSE", (INT_MAX)},
-    {"READ", (INT_MAX)},
-    {"BUFFERIN", (INT_MAX)},
-    {"BUFFEROUT", (INT_MAX)},
-    {"ENDFILE", (INT_MAX)},
-    {"IMPLIED-DO", (INT_MAX)},
-    {FORMAT_FUNCTION_NAME, 1},
-    {"INQUIRE", (INT_MAX)},
+    {"WRITE", (INT_MAX), default_intrinsic_type},
+    {"REWIND", (INT_MAX), default_intrinsic_type},
+    {"BACKSPACE", (INT_MAX), default_intrinsic_type},
+    {"OPEN", (INT_MAX), default_intrinsic_type},
+    {"CLOSE", (INT_MAX), default_intrinsic_type},
+    {"READ", (INT_MAX), default_intrinsic_type},
+    {"BUFFERIN", (INT_MAX), default_intrinsic_type},
+    {"BUFFEROUT", (INT_MAX), default_intrinsic_type},
+    {"ENDFILE", (INT_MAX), default_intrinsic_type},
+    {"IMPLIED-DO", (INT_MAX), default_intrinsic_type},
+    {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type},
+    {"INQUIRE", (INT_MAX), default_intrinsic_type},
 
-    {SUBSTRING_FUNCTION_NAME, (INT_MAX)},
-    {ASSIGN_SUBSTRING_FUNCTION_NAME, (INT_MAX)},
+    {SUBSTRING_FUNCTION_NAME, 3, substring_type},
+    {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type},
 
-    {"CONTINUE", 0},
-    {"ENDDO", 0},
-    {"PAUSE", 1},
-    {"RETURN", 0},
-    {"STOP", 0},
-    {"END", 0},
+    {"CONTINUE", 0, default_intrinsic_type},
+    {"ENDDO", 0, default_intrinsic_type},
+    {"PAUSE", 1, default_intrinsic_type},
+    {"RETURN", 0, default_intrinsic_type},
+    {"STOP", 0, default_intrinsic_type},
+    {"END", 0, default_intrinsic_type},
 
-    {"INT", 1},
-    {"IFIX", 1},
-    {"IDINT", 1},
-    {"REAL", 1},
-    {"FLOAT", 1},
-    {"DFLOAT", 1},
-    {"SNGL", 1},
-    {"DBLE", 1},
-    {"CMPLX", 1},
-    {"ICHAR", 1},
-    {"CHAR", 1},
-    {"AINT", 1},
-    {"DINT", 1},
-    {"ANINT", 1},
-    {"DNINT", 1},
-    {"NINT", 1},
-    {"IDNINT", 1},
-    {"IABS", 1},
-    {"ABS", 1},
-    {"DABS", 1},
-    {"CABS", 1},
+    {"INT", 1, overloaded_to_integer_type},
+    {"IFIX", 1, real_to_integer_type},
+    {"IDINT", 1, double_to_integer_type},
+    {"REAL", 1, integer_to_real_type},
+    {"FLOAT", 1, default_intrinsic_type},
+    {"DFLOAT", 1, default_intrinsic_type},
+    {"SNGL", 1, double_to_real_type},
+    {"DBLE", 1, overloaded_to_double_type},
+    {"CMPLX", 1, overloaded_to_complex_type},
+    {"ICHAR", 1, default_intrinsic_type},
+    {"CHAR", 1, default_intrinsic_type},
+    {"AINT", 1, real_to_real_type},
+    {"DINT", 1, double_to_double_type},
+    {"ANINT", 1, real_to_real_type},
+    {"DNINT", 1, double_to_double_type},
+    {"NINT", 1, real_to_integer_type},
+    {"IDNINT", 1, double_to_integer_type},
+    {"IABS", 1, integer_to_integer_type},
+    {"ABS", 1, real_to_real_type},
+    {"DABS", 1, double_to_double_type},
+    {"CABS", 1, complex_to_real_type},
 
-    {"MOD", 2},
-    {"AMOD", 2},
-    {"DMOD", 2},
-    {"ISIGN", 2},
-    {"SIGN", 2},
-    {"DSIGN", 2},
-    {"IDIM", 2},
-    {"DIM", 2},
-    {"DDIM", 2},
-    {"DPROD", 2},
-    {"MAX", (INT_MAX)},
-    {"MAX0", (INT_MAX)},
-    {"AMAX1", (INT_MAX)},
-    {"DMAX1", (INT_MAX)},
-    {"AMAX0", (INT_MAX)},
-    {"MAX1", (INT_MAX)},
-    {"MIN", (INT_MAX)},
-    {"MIN0", (INT_MAX)},
-    {"AMIN1", (INT_MAX)},
-    {"DMIN1", (INT_MAX)},
-    {"AMIN0", (INT_MAX)},
-    {"MIN1", (INT_MAX)},
-    {"LEN", 1},
-    {"INDEX", 2},
-    {"AIMAG", 1},
-    {"CONJG", 1},
-    {"SQRT", 1},
-    {"DSQRT", 1},
-    {"CSQRT", 1},
+    {"MOD", 2, default_intrinsic_type},
+    {"AMOD", 2, real_to_real_type},
+    {"DMOD", 2, double_to_double_type},
+    {"ISIGN", 2, integer_to_integer_type},
+    {"SIGN", 2, default_intrinsic_type},
+    {"DSIGN", 2, double_to_double_type},
+    {"IDIM", 2, integer_to_integer_type},
+    {"DIM", 2, default_intrinsic_type},
+    {"DDIM", 2, double_to_double_type},
+    {"DPROD", 2, real_to_double_type},
+    {"MAX", (INT_MAX), default_intrinsic_type},
+    {"MAX0", (INT_MAX), default_intrinsic_type},
+    {"AMAX1", (INT_MAX), default_intrinsic_type},
+    {"DMAX1", (INT_MAX), default_intrinsic_type},
+    {"AMAX0", (INT_MAX), default_intrinsic_type},
+    {"MAX1", (INT_MAX), default_intrinsic_type},
+    {"MIN", (INT_MAX), default_intrinsic_type},
+    {"MIN0", (INT_MAX), default_intrinsic_type},
+    {"AMIN1", (INT_MAX), default_intrinsic_type},
+    {"DMIN1", (INT_MAX), default_intrinsic_type},
+    {"AMIN0", (INT_MAX), default_intrinsic_type},
+    {"MIN1", (INT_MAX), default_intrinsic_type},
+    {"LEN", 1, character_to_integer_type},
+    {"INDEX", 2, character_to_integer_type},
+    {"AIMAG", 1, complex_to_real_type},
+    {"CONJG", 1, complex_to_complex_type},
+    {"SQRT", 1, default_intrinsic_type},
+    {"DSQRT", 1, double_to_double_type},
+    {"CSQRT", 1, complex_to_complex_type},
 
-    {"EXP", 1},
-    {"DEXP", 1},
-    {"CEXP", 1},
-    {"LOG", 1},
-    {"ALOG", 1},
-    {"DLOG", 1},
-    {"CLOG", 1},
-    {"LOG10", 1},
-    {"ALOG10", 1},
-    {"DLOG10", 1},
-    {"SIN", 1},
-    {"DSIN", 1},
-    {"CSIN", 1},
-    {"COS", 1},
-    {"DCOS", 1},
-    {"CCOS", 1},
-    {"TAN", 1},
-    {"DTAN", 1},
-    {"ASIN", 1},
-    {"DASIN", 1},
-    {"ACOS", 1},
-    {"DACOS", 1},
-    {"ATAN", 1},
-    {"DATAN", 1},
-    {"ATAN2", 1},
-    {"DATAN2", 1},
-    {"SINH", 1},
-    {"DSINH", 1},
-    {"COSH", 1},
-    {"DCOSH", 1},
-    {"TANH", 1},
-    {"DTANH", 1},
+    {"EXP", 1, default_intrinsic_type},
+    {"DEXP", 1, double_to_double_type},
+    {"CEXP", 1, complex_to_complex_type},
+    {"LOG", 1, default_intrinsic_type},
+    {"ALOG", 1, real_to_real_type},
+    {"DLOG", 1, double_to_double_type},
+    {"CLOG", 1, complex_to_complex_type},
+    {"LOG10", 1, default_intrinsic_type},
+    {"ALOG10", 1, real_to_real_type},
+    {"DLOG10", 1, double_to_double_type},
+    {"SIN", 1, default_intrinsic_type},
+    {"DSIN", 1, double_to_double_type},
+    {"CSIN", 1, complex_to_complex_type},
+    {"COS", 1, default_intrinsic_type},
+    {"DCOS", 1, double_to_double_type},
+    {"CCOS", 1, complex_to_complex_type},
+    {"TAN", 1, default_intrinsic_type},
+    {"DTAN", 1, double_to_double_type},
+    {"ASIN", 1, default_intrinsic_type},
+    {"DASIN", 1, double_to_double_type},
+    {"ACOS", 1, default_intrinsic_type},
+    {"DACOS", 1, double_to_double_type},
+    {"ATAN", 1, default_intrinsic_type},
+    {"DATAN", 1, double_to_double_type},
+    {"ATAN2", 1, default_intrinsic_type},
+    {"DATAN2", 1, double_to_double_type},
+    {"SINH", 1, default_intrinsic_type},
+    {"DSINH", 1, double_to_double_type},
+    {"COSH", 1, default_intrinsic_type},
+    {"DCOSH", 1, double_to_double_type},
+    {"TANH", 1, default_intrinsic_type},
+    {"DTANH", 1, double_to_double_type},
 
-    {"LGE", 2},
-    {"LGT", 2},
-    {"LLE", 2},
-    {"LLT", 2},
+    {"LGE", 2, character_to_logical_type},
+    {"LGT", 2, character_to_logical_type},
+    {"LLE", 2, character_to_logical_type},
+    {"LLT", 2, character_to_logical_type},
 
-    {LIST_DIRECTED_FORMAT_NAME, 0},
-    {UNBOUNDED_DIMENSION_NAME, 0},
+    {LIST_DIRECTED_FORMAT_NAME, 0, default_intrinsic_type},
+    {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type},
 
-    {NULL, 0}
+    {NULL, 0, 0}
 };
 
 
@@ -272,30 +666,19 @@ functional type whose result and arguments have an overloaded basic
 type. The number of arguments is given by the IntrinsicDescriptorTable
 data structure. */
 
-void MakeIntrinsic(name, n)
+void MakeIntrinsic(name, n, intrinsic_type)
 string name;
 int n;
+type (*intrinsic_type)(int);
 {
     entity e;
-    functional ft;
 
     e = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME, name),
-		    make_type(is_type_functional,  
-			      (ft = make_functional(NIL, 
-						    MakeOverloadedResult()))),
+		    intrinsic_type(n),
 		    make_storage(is_storage_rom, UU),
 		    make_value(is_value_intrinsic, NIL));
     
-    if (n < (INT_MAX)) {
-	while (n-- > 0) {
-	    functional_parameters(ft) = 
-		    CONS(PARAMETER, MakeOverloadedParameter(),
-			 functional_parameters(ft));
-	}
-    }
 }
-
-
 
 /* this function is called one time (at the very beginning) to create
 all intrinsic functions. */
@@ -305,7 +688,7 @@ void CreateIntrinsics()
     IntrinsicDescriptor *pid;
 
     for (pid = IntrinsicDescriptorTable; pid->name != NULL; pid++) {
-	MakeIntrinsic(pid->name, pid->nbargs);
+	MakeIntrinsic(pid->name, pid->nbargs, pid->intrinsic_type);
     }
 }
 
