@@ -527,3 +527,26 @@ Pbase b2;
 
     return b;
 }
+
+/* Pbase base_included_p(Pbase b1, Pbase b2):
+ * include_p = b1 is included in b2  -- with the set meaning
+ * return b;
+ */
+boolean base_included_p(b1, b2)
+Pbase b1;
+Pbase b2;
+{
+    Pbase eb = BASE_UNDEFINED;
+    boolean included_p = TRUE;
+
+    for(eb = b1; !BASE_NULLE_P(eb); eb = eb->succ) {
+	Variable v = vecteur_var(eb);
+
+	if(!base_contains_variable_p(b2, v)) {
+	    included_p = FALSE;
+	    break;
+	}
+    }
+
+    return included_p;
+}
