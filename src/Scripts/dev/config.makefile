@@ -21,7 +21,8 @@ MACROS	=	makefile_macros.. \
 		makefile_macros.GNU \
 		makefile_macros.SUN4 \
 		makefile_macros.TEST \
-		makefile_macros.GNULL
+		makefile_macros.GNULL \
+		makefile_macros.GNUSOL2LL
 
 FILES	=	forward_gnu_makefile \
 		$(MACROS)
