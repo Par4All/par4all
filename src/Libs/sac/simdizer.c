@@ -15,6 +15,7 @@
 
 #include "sac.h"
 
+
 /* Tell if the statement is a "simple statement", ie a statement of the form:
  * X = Y oper Z, X = Y or X = -Y, where arguments are all references or 
  * ranges and oper is an operator (+, *, / or -)
@@ -131,49 +132,28 @@ static bool independant_p(statement s1, statement s2)
    return TRUE;
 }
 
-static statement make_load_statement()
+statement make_load_statement()
 {
-   static entity e = entity_undefined;
-   if (e == entity_undefined)
-      e = make_entity("SIMD:SIMD_LOAD", 
-		      make_type_functional(make_functional(NIL, make_type_void())), 
-		      make_storage_rom(), 
-		      make_value_unknown());
-   return make_statement( entity_empty_label(),
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  empty_comments,
-			  make_instruction(is_instruction_call, make_call(e,NIL)));
+    entity res = local_name_to_top_level_entity("SimdLoad");
+    if (entity_undefined_p(res))
+	res = make_empty_subroutine("SimdLoad");
+    return call_to_statement(make_call(res, NIL));
 }
 
-static statement make_exec_statement()
+statement make_exec_statement()
 {
-   static entity e = entity_undefined;
-   if (e == entity_undefined)
-      e = make_entity("SIMD:SIMD_EXEC", 
-		      make_type_functional(make_functional(NIL, make_type_void())), 
-		      make_storage_rom(), 
-		      make_value_unknown());
-   return make_statement( entity_empty_label(),
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  empty_comments,
-			  make_instruction(is_instruction_call, make_call(e,NIL)));
+    entity res = local_name_to_top_level_entity("SimdExec");
+    if (entity_undefined_p(res))
+	res = make_empty_subroutine("SimdExec");
+    return call_to_statement(make_call(res, NIL));
 }
 
-static statement make_save_statement()
+statement make_save_statement()
 {
-   static entity e = entity_undefined;
-   if (e == entity_undefined)
-      e = make_entity("SIMD:SIMD_SAVE", 
-		      make_type_functional(make_functional(NIL, make_type_void())), 
-		      make_storage_rom(), 
-		      make_value_unknown());
-   return make_statement( entity_empty_label(),
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  empty_comments,
-			  make_instruction(is_instruction_call, make_call(e,NIL)));
+    entity res = local_name_to_top_level_entity("SimdSave");
+    if (entity_undefined_p(res))
+	res = make_empty_subroutine("SimdSave");
+    return call_to_statement(make_call(res, NIL));
 }
 
 /* Transform the code to use SIMD instructions. The input statement
