@@ -167,13 +167,20 @@ debug(int the_expected_debug_level,
       ...)
 {
    va_list some_arguments;
+#define MAX_MARGIN (8)
+   static char * margin = "        ";
+   /* margin_length is the length of the part of the margin that is not used */
+   int margin_length;
 
    /* If the current debug level is not high enough, do nothing: */
    if (the_expected_debug_level > the_current_debug_level)
       return;
 
    /* print name of function printing debug message */
-   (void) fprintf(stderr, "[%s] ", calling_function_name);
+   margin_length = MAX_MARGIN+1-the_expected_debug_level;
+   (void) fprintf(stderr, "%s[%s] ",
+		  margin + (margin_length>0 ? margin_length : 0),
+		  calling_function_name);
 
    va_start(some_arguments, a_message_format);
 
