@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.5  1998/07/03 08:28:32  coelho
+# mode fixed for java classes.
+#
 # Revision 1.4  1998/07/02 17:47:01  coelho
 # dependencies updated.
 #
@@ -99,7 +102,10 @@ JDOC	=	$(jdk_bin)/javadoc
 JDFLAGS	=	-author -d $(doc_dir)
 
 # default rule for compiling java files.
-$(d)/%: %.java; $(JENV) $(JAVAC) $(JCFLAGS) $< && touch $@
+$(d)/%: %.java
+	$(JENV) $(JAVAC) $(JCFLAGS) $< \
+		&& touch $@ \
+		&& chmod ug+rw $(pkg_dir)/$(package)/$**
 
 .doc:
 	$(JDOC) $(JDFLAGS) $(J_FILES) && touch $@
