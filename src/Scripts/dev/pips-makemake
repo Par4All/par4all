@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.313  1997/08/19 15:11:04  coelho
+# *** empty log message ***
+#
 # Revision 1.312  1997/08/19 15:00:07  coelho
 # fixes for fpips compilation if no wpips nor tpips.
 #
@@ -533,7 +536,7 @@ quick-install: .runable
 $verbose "common to Libs and Passes"
 
 btrg=''
-[ $DIRTYPE = 'Passes' ] && btrg='\$(BIN_TARGET)'
+[ $DIRTYPE = 'Passes' ] && btrg='$(BIN_TARGET)'
 
 [ $DIRTYPE = 'Libs' -o $DIRTYPE = 'Passes' ] && 
 cat >> $MAKEFILE <<% 
