@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.60  1997/07/25 22:26:16  keryell
+ * Avoid to put comments on sequences.
+ *
  * Revision 1.59  1997/07/21 14:00:08  keryell
  * Replaced %x format by %p.
  *
@@ -656,7 +659,7 @@ remapping_stats(
 
     /* comments are added to help understand the generated code
      */
-    statement_comments(result) = strdup(concatenate
+    insert_comments_to_statement(result, concatenate
 	("! - ", (what & LZY) ? "lazy " : "",
 	       t==CPY ? "copy" : t==SND ? "send" : t==RCV ? "receiv" :
 	       t==BRD ? "broadcast" : "?",  "ing\n", NULL));
@@ -803,10 +806,10 @@ generate_remapping_code(
 		entity_local_name(src), load_hpf_number(src),
 		entity_local_name(trg), load_hpf_number(trg));
 	
-	statement_comments(result) = strdup(buffer);
-	statement_comments(send) = strdup("! send part\n");
-	statement_comments(receive) = strdup("! receive part\n");
-	statement_comments(cont) = strdup("! end of remapping\n");
+	insert_comments_to_statement(result, buffer);
+	insert_comments_to_statement(send, "! send part\n");
+	insert_comments_to_statement(receive, "! receive part\n");
+	insert_comments_to_statement(cont, "! end of remapping\n");
     }
     
     DEBUG_STAT(3, "result", result);
@@ -857,7 +860,7 @@ update_runtime_for_remapping(entity trg)
 {
     statement s = set_live_status(trg, TRUE);
 
-    statement_comments(s) = strdup(concatenate(
+    insert_comments_to_statement(s, concatenate(
 	"! direct remapping for ", 
 	entity_local_name(load_primary_entity(trg)), "\n", NULL));
 
@@ -949,9 +952,8 @@ generate_all_liveness_but(
     /* commented result
      */
     result = make_block_statement(ls);
-    statement_comments(result) = 
-	strdup(concatenate("! all livenesss for ", 
-			   entity_local_name(primary), "\n", NULL));
+    insert_comments_to_statement(result, concatenate("! all livenesss for ", 
+						     entity_local_name(primary), "\n", NULL));
     return result;
 }
 
@@ -991,8 +993,7 @@ generate_dynamic_liveness_for_primary(
      */
     result = make_block_statement(ls);
     if (ls)
-	statement_comments(result) = 
-	    strdup(concatenate("! clean live set for ", 
+	insert_comments_to_statement(result, concatenate("! clean live set for ", 
 			       entity_local_name(primary), "\n", NULL));
     return result;
 }
@@ -1006,8 +1007,7 @@ generate_dynamic_liveness_management(statement s)
          /* of statement */ ls;
     
     result = make_empty_statement();
-    statement_comments(result) = 
-	strdup(concatenate("! end of liveness management\n", NULL));
+    insert_comments_to_statement(result, concatenate("! end of liveness management\n", NULL));
     ls = CONS(STATEMENT, result, NIL);
 
     /* for each primary remapped at s, generate the management code.
@@ -1029,8 +1029,7 @@ generate_dynamic_liveness_management(statement s)
     /* commented result 
      */
     result = make_block_statement(ls);
-    statement_comments(result) = 
-	strdup(concatenate("! liveness management\n", NULL));
+    insert_comments_to_statement(result, concatenate("! liveness management\n", NULL));
     return result;
 }
 
@@ -1252,7 +1251,7 @@ generate_remapping_include(renaming r)
     statement result;
 
     result = make_empty_statement();
-    statement_comments(result) = strdup(concatenate
+    insert_comments_to_statement(result, concatenate
         ("      include '", remapping_file_name(r), "'\n", NULL));
 
     return result;
@@ -1318,7 +1317,7 @@ remapping_compile(
     /* comment at the end
      */
     tmp = make_empty_statement();
-    statement_comments(tmp) = strdup(concatenate("! end remappings\n", NULL));
+    insert_comments_to_statement(tmp, concatenate("! end remappings\n", NULL));
     l = CONS(STATEMENT, tmp, l);
 
     /* dynamic liveness management if required
@@ -1349,7 +1348,7 @@ remapping_compile(
     /* comment at the beginning
      */
     tmp = make_empty_statement();
-    statement_comments(tmp)=strdup(concatenate("! begin remappings\n", NULL));
+    insert_comments_to_statement(tmp, concatenate("! begin remappings\n", NULL));
     l = CONS(STATEMENT, tmp, l);
 
     *nsp = make_block_statement(l); /* block of remaps for the nodes */
