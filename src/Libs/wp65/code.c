@@ -139,8 +139,7 @@ Pbase tile_init_basis,tiling tile)
 	    vect_add_elem(&v, variable_of_rank(tile_basis, c), 
 			  (Value) ACCESS((matrice) tiling_tile(tile), dim, l, c));
 	
-	vect_add_elem(&v, variable_of_rank(tile_init_basis, l),
-		      (Value) -1);
+	vect_add_elem(&v, variable_of_rank(tile_init_basis, l), VALUE_MONE);
 	vect_add_elem(&v, TCST,
 		      vect_coeff(variable_of_rank(initial_basis, l),
 				 (Pvecteur) tiling_origin(tile)));
@@ -486,12 +485,10 @@ int first_parallel_level,last_parallel_level;
     for(l=1; l <= id; l++) {
 	Pcontrainte eq;
 	Pvecteur v = VECTEUR_NUL;
-	vect_add_elem(&v, variable_of_rank(initial_basis, l),
-		      (Value) 1);
+	vect_add_elem(&v, variable_of_rank(initial_basis, l), VALUE_ONE);
 	vect_add_elem(&v, variable_of_rank(tile_basis_in_initial_basis, l),
-		      (Value) -1);
-	vect_add_elem(&v, variable_of_rank(local_basis, l),
-		      (Value) -1);
+		      VALUE_MONE);
+	vect_add_elem(&v, variable_of_rank(local_basis, l), VALUE_MONE);
 	eq = contrainte_make(v);
 	sc_add_egalite(tile_domain, eq);
     }
@@ -788,7 +785,7 @@ list reference_conversion_computation(
 	if((i=rank_of_variable(initial_basis, (Variable) rv)) > 0) {
 	    
 	    entity ent1 = make_new_module_variable(compute_module,200);
-	    Pvecteur pv2 = vect_new((Variable) ent1,1);
+	    Pvecteur pv2 = vect_new((Variable) ent1, VALUE_ONE);
 	    Pvecteur pvt = VECTEUR_NUL;
 	    expression exp1,exp2;
 	    statement stat= statement_undefined;
@@ -1098,7 +1095,7 @@ Pbase *new_index_base;
 	sc_domain->dimension++;
 	*new_index_base = vect_add_variable(*new_index_base,pv->var);
 	pv1 = vect_dup(pv);
-	vect_chg_coeff(&pv1,TCST,-1);
+	vect_chg_coeff(&pv1,TCST,VALUE_MONE);
 	pc1= contrainte_make(pv1);
 	sc_add_ineg(sc_domain,pc1)
 	    pv2 = vect_dup(pv);
@@ -1183,7 +1180,7 @@ int last_parallel_level)
     cons * bst_sb = NIL;
     cons * bst_bsb = NIL;
     Pbase var_id;
-    Pvecteur ppid = vect_new((char *) Proc_id,1);
+    Pvecteur ppid = vect_new((char *) Proc_id, VALUE_ONE);
     Psysteme sc_image2= SC_UNDEFINED;
     Pvecteur pv;
     debug(8,"make_store_blocks",
@@ -1334,7 +1331,7 @@ int first_parallel_level,last_parallel_level;
     cons * bst_lb= NIL;
     cons * bst_blb= NIL;
     Pbase var_id;
-    Pvecteur ppid = vect_new((char *) Proc_id,1);
+    Pvecteur ppid = vect_new((char *) Proc_id, VALUE_ONE);
     Psysteme sc_image2= SC_UNDEFINED;
     debug(8,"make_load_blocks",
 	  "begin variable=%s, shared_variable=%s, local_variable=%s\n",
