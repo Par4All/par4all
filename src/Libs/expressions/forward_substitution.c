@@ -15,13 +15,18 @@
  * both stuff as one... FC. 
  *
  * This information is only implemented to forward substitution within 
- * a sequence. Things could be performed at the control graph level.
+ * a sequence. Things could be performed at the control flow graph level.
  *
  * An important issue is to only perform the substitution only if correct.
  * Thus conversions are inserted and if none is available, the propagation
  * and substitution are not performed.
  *
  * $Log: forward_substitution.c,v $
+ * Revision 1.10  2002/03/18 14:06:56  irigoin
+ * call to free_syntax() commented out in expr_flt(). A little bit of
+ * reformatting. An additional check on effects consistency. See comments in
+ * expr_flt().
+ *
  * Revision 1.9  2000/05/26 15:27:04  coelho
  * hop.
  *
@@ -117,10 +122,10 @@ make_substitution(statement source, entity var, expression val)
 static void 
 free_substitution(p_substitution subs)
 {
-    if (subs) {
-	free_expression(subs->val);
-	free(subs);
-    }
+  if (subs) {
+    free_expression(subs->val);
+    free(subs);
+  }
 }
 
 #define DEBUG_NAME "FORWARD_SUBSTITUTION_DEBUG_LEVEL"
@@ -136,10 +141,10 @@ static bool no_write_effects_on_var(entity var, list le)
 
 static bool functionnal_on_effects(entity var, list /* of effect */ le)
 {
-  MAP(EFFECT, e, 
+  MAP(EFFECT, e, {
       if ((effect_write_p(e) && effect_variable(e)!=var) ||
 	  (effect_read_p(e) && entity_conflict_p(effect_variable(e), var)))
-      return FALSE,
+      return FALSE;},
       le);
   return TRUE;  
 }
@@ -151,6 +156,11 @@ static bool functionnal_on_effects(entity var, list /* of effect */ le)
 static bool functionnal_on(entity var, statement s)
 {
   effects efs = load_proper_rw_effects(s);
+
+  ifdebug(1) {
+    pips_assert("efs is consistent", effects_consistent_p(efs));
+  }
+
   return functionnal_on_effects(var, effects_effects(efs));
 }
 
@@ -249,7 +259,7 @@ static bool other_cool_enough_for_a_last_substitution(statement s, entity v)
   return cool;
 }
 
-/* do perform the substution var -> val everywhere in s
+/* do perform the substitution var -> val everywhere in s
  */
 static bool expr_flt(expression e, p_substitution subs)
 {
@@ -260,7 +270,14 @@ static bool expr_flt(expression e, p_substitution subs)
     if (reference_variable(r) == subs->var)
     {
 	expression_syntax(e) = copy_syntax(expression_syntax(subs->val));
-	free_syntax(s);
+	/* FI->FC: the syntax may be freed but not always the reference it
+contains because it can also be used in effects. The bug showed on
+transformations/Validation/fs01.f, fs02.f, fs04.f. I do not know why the
+effects are still used after the statement has been updated (?). The bug
+can be avoided by closing and opening the workspace which generates
+independent references in statements and in effects. Is there a link with
+the notion of cell = reference+preference? */
+	/* free_syntax(s); */
 	return FALSE;
     }
     return TRUE;
