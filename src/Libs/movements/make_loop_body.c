@@ -503,17 +503,15 @@ entity var_id;
     lexp1= CONS(EXPRESSION,make_expression_1(),NIL);
     expr = make_expression(make_syntax(is_syntax_reference,r
 				       ),normalized_undefined);
-    
     args = CONS(EXPRESSION,expr,lexp1);
     args = CONS(EXPRESSION,
 		make_vecteur_expression(vect_new((Variable)var_id,
 						 VALUE_ONE)),args);
     /* generate the send or the receive call */
-   
+
     lbody =  (receive_code) ? 
 	make_statement_operator(operator_receive,args): 
 	    make_statement_operator(operator_send,args);
-	
     ifdebug(9) {
 	pips_debug(9, "returning :\n");
 	wp65_debug_print_text(entity_undefined, lbody);
