@@ -73,8 +73,8 @@ We have therefore introduced two new types of exact regions: for any
 statement or procedure, IN regions contain its imported array elements, and
 OUT regions represent its set of live array elements. For a massively
 parallel machine, these regions could be used to calculate the
-communications before and after the execution of a piece of code. They can
-also be used to privatize array sections. For a hierarchical memory machine,
+communications before and after the execution of a piece of code. They are
+also used in PIPS to privatize arrays. For a hierarchical memory machine,
 they provide the sets of array elements that are used or reused, and hence
 should be prefetched (IN regions) or kept (OUT regions) in caches or local
 memories; the array elements that do not appear in these sets and that are
@@ -165,7 +165,8 @@ subscript values of the arrays in terms of phi variables. The phi variables
 of the formal array are then eliminated. This can be optimized by
 considering the similar dimensions of both arrays. This method handles array
 reshaping when the partial subscript values of the non similar dimensions
-are affine. 
+are affine. Translation between arrays that do not have the same type of
+elements is also handled.
 
 
 <P>
@@ -208,7 +209,10 @@ of both arrays.
 <P>
 <H2> <A NAME="references">5. References</A> </H2>
 
-<A HREF="/~creusil/references.html#publications">Related publications</A>.
+<A HREF="/~creusil/references.html#publications">Bibliography</A>
+<P>
+
+Related work:
 <P>
 
 <DT> <A NAME="callahan"> David Callahan and Ken Kennedy. </A> <CITE>
