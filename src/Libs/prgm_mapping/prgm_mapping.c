@@ -10,7 +10,9 @@
  */
 
 /* Ansi includes 	*/
-#include<stdio.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include <sys/times.h>          /* performance purpose */
 #include <sys/time.h>           /* performance purpose */
@@ -69,14 +71,6 @@
 #define ENT_HT_SIZE 200		/* hash table max size */
 
 /* Internal variables 	*/
-
-/* Extern prototypes */
-extern int printf();
-extern int fprintf();
-extern int strdup();
-extern int strncmp();
-extern char *getenv();
-extern int atoi(char *nptr);
 
 /* Global variables */
 plc pfunc;		/* The placement function */
