@@ -216,7 +216,8 @@ db_time_of_resource(string rname, string oname)
 	return -1;
     if (db_resource_loaded_p(r) && displayable_file_p(rname)) {
 	int time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
-	if (time!=db_resource_file_time(r)) {
+	if (time!=db_resource_file_time(r)) 
+	{
 	    pips_user_warning("file %s has been edited...\n", 
 			      db_resource_pointer(r));
 	    db_resource_file_time(r) = time;
