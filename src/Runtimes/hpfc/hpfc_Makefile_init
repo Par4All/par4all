@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/09/02 10:40:29 $, )
+# ($Date: 1996/09/07 15:10:12 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -109,25 +109,25 @@ endif
 #
 # Directories... 
 
-PVM_BIN_DIR 	= $(HOME)/pvm3/bin/$(PVM_ARCH)
-PVM_LIB_DIR	= $(PVM_ROOT)/lib/$(PVM_ARCH)
-PVM_INC_DIR	= $(PVM_ROOT)/include
+pvmbin 	= $(HOME)/pvm3/bin/$(PVM_ARCH)
+pvmlib	= $(PVM_ROOT)/lib/$(PVM_ARCH)
+pvminc	= $(PVM_ROOT)/include
 
 ifdef USE_PVMe
-PVM_LIB_DIR	= $(PVM_ROOT)/lib
-PVM_INC_DIR	= $(PVM_ROOT)/lib
+pvmlib	= $(PVM_ROOT)/lib
+pvminc	= $(PVM_ROOT)/lib
 PVMe_DIR	= /usr/lpp/ssp/css/libus)
 
 LIBS_DIR	+= -L$(PVMe_DIR)
 endif
 
-LIBS_DIR	+= -L. -L$(PVM_LIB_DIR) -L$(RT_DIR)/$(RT_ARCH)
+LIBS_DIR	+= -L. -L$(pvmlib) -L$(RT_DIR)/$(RT_ARCH)
 
 #
 # Libraries
 
 ifdef MIMD
-PVMHOST = $(PVM_LIB_DIR)/pvmhost.o
+PVMHOST = $(pvmlib)/pvmhost.o
 endif
 
 PVM_FLIB 	+= -lfpvm3
@@ -136,8 +136,8 @@ PVM_HLIB 	+= -lpvm3
 
 ifdef USE_PVMe
 PVM_GLIB	=
-ALL_NLIBS	+= -lcss -bI:$(PVM_LIB_DIR)/pvm3e.exp
-ALL_HLIBS	+= -lcss -bI:$(PVM_LIB_DIR)/pvm3e.exp
+ALL_NLIBS	+= -lcss -bI:$(pvmlib)/pvm3e.exp
+ALL_HLIBS	+= -lcss -bI:$(pvmlib)/pvm3e.exp
 endif
 
 ifdef NETWORK
@@ -169,11 +169,11 @@ PVM_HEADERS 	= 	pvm3.h fpvm3.h
 HEADERS 	=	$(wildcard hpfc_*.h) $(PVM_HEADERS)
 
 COMMON_FFILES	=	param_init.f hpfc_check.f
-HOST_FFILES 	=	$(wildcard *_host.f)
-NODE_FFILES 	= 	$(wildcard *_node.f)
+HOST_FFILES 	=	$(wildcard [A-Z]*_host.f)
+NODE_FFILES 	= 	$(wildcard [A-Z]*_node.f)
 
 COMMON_OFILES	=	$(COMMON_FFILES:.f=.o) 
-HOST_OFILES 	= 	$(HOST_FFILES:.f=.o)
+HOST_OFILES 	= 	$(HOST_FFILES:.f=.o) 
 NODE_OFILES 	= 	$(NODE_FFILES:.f=.o)
 
 FTEST	=	$(TARGET).f
@@ -185,6 +185,7 @@ OTEST	=	$(TARGET).o
 RTEST	=	$(TARGET)_out
 HOST 	= 	$(TARGET)_host
 NODE 	= 	$(TARGET)_node
+MAIN	=	$(TARGET)_main
 
 RUNABLES = $(HOST) $(NODE) $(RTEST)
 DEDUCED = $(PVM_HEADERS) param_init.f
@@ -224,23 +225,26 @@ $(TARGET).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(TARGET)
 #
 # Installation to run
 
-$(PVM_BIN_DIR):; mkdir -p $(PVM_BIN_DIR)
+$(pvmbin):; mkdir -p $(pvmbin)
 
-$(PVM_BIN_DIR)/$(HOST): $(HOST) $(PVM_BIN_DIR)
-	$(COPY)  $(HOST) $(PVM_BIN_DIR)
+$(pvmbin)/$(HOST): $(HOST) $(pvmbin)
+	$(COPY) $@ $(pvmbin)
 
-$(PVM_BIN_DIR)/$(NODE): $(NODE) $(PVM_BIN_DIR)
-	$(COPY)  $(NODE) $(PVM_BIN_DIR)
+$(pvmbin)/$(MAIN): $(MAIN) $(pvmbin)
+	$(COPY) $@ $(pvmbin)
 
-install: $(PVM_BIN_DIR)/$(HOST) $(PVM_BIN_DIR)/$(NODE)
+$(pvmbin)/$(NODE): $(NODE) $(pvmbin)
+	$(COPY) $@ $(pvmbin)
+
+install: $(pvmbin)/$(HOST) $(pvmbin)/$(NODE) $(pvmbin)/$(MAIN)
 	@echo files installed
 	@echo 
 
 run: install pvm
-	$(PVM_BIN_DIR)/$(HOST)
+	$(pvmbin)/$(HOST)
 
 diff: $(RUNABLES) install pvm
-	$(PVM_BIN_DIR)/$(HOST) > parallel.out 2> parallel.err
+	$(pvmbin)/$(HOST) > parallel.out 2> parallel.err
 	$(RTEST) > sequential.out 2> sequential.err
 	@if cmp -s parallel.out sequential.out ; \
 	then echo "DIFF ON STDOUT: none!" ; \
@@ -254,11 +258,11 @@ diff: $(RUNABLES) install pvm
 hpfc_files:
 	$(COPY) $(RT_DIR)/hpfc_*.h .
 
-pvm3.h:	$(PVM_INC_DIR)/pvm3.h
-	$(COPY) $(PVM_INC_DIR)/pvm3.h .
+pvm3.h:	$(pvminc)/pvm3.h
+	$(COPY) $(pvminc)/pvm3.h .
 
-fpvm3.h:$(PVM_INC_DIR)/fpvm3.h
-	$(COPY) $(PVM_INC_DIR)/fpvm3.h .
+fpvm3.h:$(pvminc)/fpvm3.h
+	$(COPY) $(pvminc)/fpvm3.h .
 
 #
 # Compilation
@@ -287,25 +291,34 @@ LDF:=$(shell echo $(shell \
 LDIO:=$(shell echo $(LDF) | sed -n 's,^ld[ 	]*[Ii][Oo],,p')
 LDPURE:=$(shell echo $(LDF) | sed -n 's,^ld[ 	]*[Pp][Uu][Rr][Ee],,p')
 
-$(HOST):  $(HEADERS) $(COMMON_OFILES) $(HOST_OFILES)
-	$(FC) $(FFLAGS) -o $(HOST) \
+$(HOST):  $(HEADERS) hpfc_main_host.o $(COMMON_OFILES) $(HOST_OFILES)
+	$(FC) $(FFLAGS) -o $@ hpfc_main_host.o \
 		$(HOST_OFILES) \
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
 		$(ALL_HLIBS) \
 		$(LDIO) $(LDPURE)
-	$(STRIP) $(HOST)
+	$(STRIP) $@
 
-$(NODE):  $(HEADERS) $(COMMON_OFILES) $(NODE_OFILES) 
-
-$(NODE):
-	$(FC) $(FFLAGS) $(FOPT) -o $(NODE) \
+$(NODE):  $(HEADERS) hpfc_main_node.o $(COMMON_OFILES) $(NODE_OFILES) 
+	$(FC) $(FFLAGS) $(FOPT) -o $@ hpfc_main_node.o \
 		$(NODE_OFILES) \
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
 		$(ALL_NLIBS)\
 		$(LDPURE)
-	$(STRIP) $(NODE)
+	$(STRIP) $@
+
+$(MAIN): $(HEADERS) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
+	$(FC) $(FFLAGS) -o $@ hpfc_main.o \
+		$(HOST_OFILES) \
+		$(NODE_OFILES) \
+		$(COMMON_OFILES) \
+		$(LIBS_DIR) \
+		$(ALL_HLIBS) \
+		$(ALL_NLIBS)\
+		$(LDIO) $(LDPURE)
+	$(STRIP) $@
 
 ifeq ($(PVM_ARCH),CM5)
 $(NODE): $(HOST_OFILES)
@@ -333,7 +346,7 @@ $(RTEST):  $(FTEST)
 # Cleaning
 
 clean:;	$(RM) *.o *~ *.trace $(DEDUCED) core
-clobber: clean; $(RM) $(RUNABLES) $(PVM_BIN_DIR)/$(HOST) $(PVM_BIN_DIR)/$(NODE)
+clobber: clean; $(RM) $(RUNABLES) $(pvmbin)/$(HOST) $(pvmbin)/$(NODE)
 
 echo:; @echo $(ECHO)
 
