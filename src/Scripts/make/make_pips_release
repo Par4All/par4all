@@ -1,0 +1,79 @@
+#! /bin/sh
+#
+# $RCSfile: make_pips_release,v $ (version $Revision$)
+# $Date: 1996/09/02 17:12:10 $, 
+#
+# (c) Fabien COELHO 1996
+
+unset pack what
+tar=${PIPS_TAR:-gtar}
+verb=:
+
+verbose()
+{ echo "$RCSfile: make_pips_release,v $: $@" >&2;}
+
+error()
+{ ret=$1; shift; verbose "$@"; exit $ret;}
+
+usage()
+{
+    ret=$1
+    shift
+    cat <<-EOF
+	$RCSfile: make_pips_release,v $ (version $Revision$): $@
+	usage: $RCSfile: make_pips_release,v $ [options] name
+	  misc:
+	    -h: this help
+	    -v: verbose
+	  release content:
+	    -S: include sources (Include, Src, Utils)
+	    -E arch: include executables for arch
+	    -D arch: include libraries for this arch
+	  software:
+	    -p: Pips
+	    -n: Newgen
+	    -l: Linear
+	EOF
+    exit $ret
+}
+
+what="-d Share -d Doc -d Runtime" 
+
+while getopts hvSE:pnl opt
+do
+    case $opt in
+	h) usage 0 some help ;;
+	v) verb=verbose ; what="$what -v" ;;
+	S) what="$what -s Src -d Include -d Utils" ;;
+	E) what="$what -d Bin/$OPTARG" ;;
+	D) what="$what -d Lib/$OPTARG" ;;
+	p) pack="$pack PIPS" ;;
+	n) pack="$pack NEWGEN" ;;
+	l) pack="$pack LINEAR" ;;
+	*) usage 1 "invalid option -$opt" ;;
+    esac
+done
+
+shift `expr $OPTIND - 1 `
+
+name=${1:-$PIPS_RELEASE/default_pips_release}
+
+test -d $name || mkdir $name || error 2 "cannot create directory $name"
+
+#
+#
+
+for p in $pack
+do
+    case $p in
+	PIPS) root=$PIPS_ROOT ; trg=$name/Pips ;;
+	NEWGEN) root=$NEWGEN_ROOT ; trg=$name/Newgen ;;
+	LINEAR) root=$LINEAR_ROOT ; trg=$name/Linear ;;
+    esac
+    $verb "packing for $p ($root) in $trg:"
+    $verb "what=$what"
+    make_release -v -r $root -t $trg $what
+done
+
+# end of $RCSfile: make_pips_release,v $
+#
