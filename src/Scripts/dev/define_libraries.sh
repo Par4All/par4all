@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.12  1997/03/27 14:28:14  coelho
+# *** empty log message ***
+#
 # Revision 1.11  1997/03/27 13:51:20  coelho
 # *_DOCS added.
 #
@@ -16,7 +19,7 @@
 # NEWGEN
 
 NEWGEN_DOCS='doc'
-NEWGEN_ORDERED_LIBS='doc scripts genC'
+NEWGEN_ORDERED_LIBS='scripts genC'
 
 NEWGEN_LIBS='-lgenC'
 
