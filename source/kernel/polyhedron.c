@@ -1794,23 +1794,14 @@ void Polyhedron_Free(Polyhedron *Pol) {
 /*
  * Free the memory space occupied by the domain. 
  */
-void Domain_Free(Polyhedron *Pol)  {
-
-  int i,size;
-  Value *p;
+void Domain_Free(Polyhedron *Pol)
+{
+  Polyhedron *Next;
   
-  if(!Pol)
-    return;
-  if (Pol->next) 
-    Domain_Free(Pol->next);
-
-  size = Pol->p_Init_size;
-  p = Pol->p_Init;
-  for(i=0;i<size;i++)
-    value_clear(p[i]);  
-  free(Pol->p_Init);
-  free(Pol->Constraint);
-  free(Pol);
+  for (; Pol; Pol = Next) {
+    Next = Pol->next;
+    Polyhedron_Free(Pol);
+  }
   return;
 } /* Domain_Free */
 
