@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/15 11:47:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/12 18:50:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/09/15 11:47:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/10/12 18:50:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -64,7 +64,16 @@ text (*hook)() ;
 {
     text_statement_hook = hook ;
 }
-
+
+/* because some prettyprint functions may be used for debug, so
+ * the last hook set by somebody may have stayed there although
+ * being non sense...
+ */
+void close_prettyprint()
+{
+    text_statement_hook = empty_text;
+}
+
 /* We have no way to distinguish between the SUBROUTINE and PROGRAM
  * They two have almost the same properties.
  * For the time being, especially for the PUMA project, we have a temporary
