@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/04/14 11:54:26 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/08/10 11:34:05 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -26,9 +26,6 @@
 /*LINTLIBRARY*/
 
 #include <stdio.h>
-extern int fprintf();
-extern int fscanf();
-extern int fclose();
 #include <string.h>
 #include <varargs.h>
 #include <stdlib.h>
