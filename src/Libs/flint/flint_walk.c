@@ -69,7 +69,7 @@ call            flint_call(c)
 
     check_the_call(c);
 
-    gen_mapl(flint_cons_expression, la);
+    gen_mapl(flint_cons_actual_argument, la);
 
     return (c);
 }
@@ -92,8 +92,8 @@ range           flint_range(r)
     return (r);
 }
 /************************************************************/
-/* A reference is used when given a function the adress of  */
-/* an element instead of its value                          */
+/* A reference is used when given a function the address of */
+/* an element instead of its value.                         */
 
 reference       flint_reference(r)
     reference       r;
@@ -142,6 +142,24 @@ void            flint_cons_expression(pc)
     list            pc;
 {
     flint_expression(EXPRESSION(CAR(pc)));
+}
+
+
+void            
+flint_cons_actual_argument(list pc)
+{
+    expression e = EXPRESSION(CAR(pc));
+
+    /* An array actual argument may have no indices */
+    if(expression_reference_p(e)) {
+	reference r = expression_reference(e);
+
+	if(gen_length(reference_indices(r))!=0)
+	    flint_expression(e);
+    }
+    else {
+	flint_expression(e);
+    }
 }
 
 expression      flint_expression(e)
