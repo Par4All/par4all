@@ -1,3 +1,8 @@
+/* 	%A% ($Date: 1995/09/27 17:57:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_xv_help[] = "%A% ($Date: 1995/09/27 17:57:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -143,7 +148,7 @@ create_help_menu()
    (void) xv_create(main_panel, PANEL_BUTTON,
                     PANEL_LABEL_STRING, "Help ",
                     PANEL_ITEM_MENU, menu,
-                    /* Align the Help button with the Quit button: */
-                    XV_X, xv_get(quit_button, XV_X),
-                    0);
+                    /* Align the Help button with the Quit button:
+                    XV_X, xv_get(quit_button, XV_X), */
+                    NULL);
 }
