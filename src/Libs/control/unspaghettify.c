@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/06/11 18:47:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/06/26 11:09:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/06/11 18:47:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/06/26 11:09:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -14,6 +14,13 @@ char vcid_unspaghettify[] = "%A% ($Date: 1997/06/11 18:47:56 $, ) version $Revis
 
 #include "genC.h"
 #include "ri.h"
+#include "graph.h"
+#include "interval_graph.h"
+/* Instantiation of the interval graph: */
+typedef interval_vertex_label vertex_label;
+/* Since the arc are not used, just put a dummy type for arc_label. It
+   will be initialized to interval_vertex_label_undefined anyway: */
+typedef interval_vertex_label arc_label;
 #include "ri-util.h"
 #include "text-util.h"
 #include "database.h"
@@ -649,7 +656,8 @@ take_out_the_exit_node_if_not_a_continue(statement s)
 
     /* Then normalize to have only one non-sequence statement as the
        exit node: */
-    if (instruction_sequence_p(the_exit_instruction)) {
+    if (instruction_sequence_p(the_exit_instruction)
+	&& !nop_statement_p(the_exit_statement)) {
 	list first_statement_list;
 	statement first_statement, last_statements;
 	
@@ -928,66 +936,104 @@ restructure_if_then_else(statement s)
 /* *** Warning ***
 
    We use the NewGen graph structure in reverse order since we need
-   predecessor graph and not successor graph.
+   predecessor graph and not successor graph. Furthermore, we do not
+   use the arc_label.
 
-   Let us lay down this cpp lie for programmer's sake...
+   Let us lay down this cpp and type lies for programmer's sake...
    */
 #define vertex_predecessors vertex_successors
+#define predecessor_vertex successor_vertex
+#define make_predecessor make_successor
+#define PREDECESSOR SUCCESSOR
+typedef successor predecessor;
 
-
-/* Test if a interval node is in another interval: */
-bool
-is_node_in_interval_p(vertex node,
-		      vertex interval)
+/* Add an interval node to an interval, select the node and put it in
+   the intervals_to_be_removed list.  */
+static void
+add_node_to_interval(vertex node,
+		     vertex interval,
+		     graph intervals,
+		     set selected_nodes,
+		     list * intervals_to_be_removed)
 {
+    /* Replace every allusion to node by interval in the interval
+       graph: */
+    MAP(VERTEX, v, {
+	MAPL(ip, {
+	    if (VERTEX(CAR(ip)) == node)
+		VERTEX(CAR(ip)) = interval;
+	}, vertex_predecessors(v));
+    }, graph_vertices(intervals));
+
+    /* Transfer the control nodes to the interval and preserve the
+       order to keep the entry node first: */
+    interval_vertex_label_controls(vertex_vertex_label(interval)) =
+	gen_nconc(interval_vertex_label_controls(vertex_vertex_label(interval)),
+		  interval_vertex_label_controls(vertex_vertex_label(node)));
+    /* Protect the control nodes from later deletion: */
+    gen_free_list(interval_vertex_label_controls(vertex_vertex_label(node)));
+    interval_vertex_label_controls(vertex_vertex_label(node)) = NIL;
+    
+    set_add_element(selected_nodes, selected_nodes, (char *) node);
+
+    *intervals_to_be_removed = CONS(VERTEX, node, *intervals_to_be_removed);
 }
 
 
-/* Add the interval from (node, old_intervals) to interval graph
+/* Add the interval from (node, intervals) to interval graph
    intervals and update selected_nodes accordingly: */
-void
+static void
 add_interval(vertex node,
-	     vertex old_intervals,
-	     vertex intervals,
+	     graph intervals,
 	     set selected_nodes)
 {
     bool a_node_has_been_added;
-    entry_node = VERTEX(CAR(old_intervals));
-    /* Create a new interval: */
-    vertex interval = make_vertex(vertex_label, NIL);
-    /* The entry node will be added by the following line, so we can
-       remove the test against the entry node afterwars: */
-    add_node_to_interval(node, interval, selected_nodes);
+    /* Since we modify in place the current interval graph, do not
+       perturbate the do/MAP loop on intervals below. Just keep the
+       list of interval to be removed later. */
+    list intervals_to_be_removed = NIL;
+    /* The new interval will be the node itself, begin of the new
+       interval. Just select it and keep it: */
+    set_add_element(selected_nodes, selected_nodes, (char *) node);
     do {
 	a_node_has_been_added = FALSE;
+	/* Find a candidate through all the intervals: */
 	MAP(VERTEX, candidate, {
 	    if (!set_belong_p(selected_nodes, (char *) candidate)) {
 		bool all_predecessors_are_in_current_interval = TRUE;
 		/* Test that the candidate has all its predecessors in
 		   the interval we are building: */
 		MAP(VERTEX, predecessor, {
-		    if (!is_node_in_interval_p(predecessor, interval)) {
+		    if (predecessor == node) {
 			all_predecessors_are_in_current_interval = FALSE;
 			break;
 		    }
 		}, vertex_predecessors(candidate));
 		if (all_predecessors_are_in_current_interval) {
 		    /* Ok, this node belong to the new interval: */
-		    add_node_to_interval(candidate, interval, selected_nodes);
+		    add_node_to_interval(candidate,
+					 node,
+					 intervals,
+					 selected_nodes,
+					 &intervals_to_be_removed);
 		    /* Look for the next appliant: */
 		    a_node_has_been_added = TRUE;
 		    break;
 		}
-	    } graph_vertex(old_intervals));
-	} while(a_node_has_been_added);
-    }
-    /* Add the new interval to the graph: */
-    graph_vertices(intervals) = gen_nconc(graph_vertices(intervals),
-					  CONS(VERTEX, interval, NIL));
+	    }
+	}, graph_vertices(intervals));
+    } while(a_node_has_been_added);
+
+    /* Clean up the useless old intervals: */
+    MAP(VERTEX, node, {
+	gen_remove(&graph_vertices(intervals), node);
+    }, intervals_to_be_removed);
+    gen_full_free_list(intervals_to_be_removed);
 }
 
 
-/* Build an interval graph from an other interval graph.
+/* Build an interval graph from an older interval graph and put it in
+   the older one.
 
    Algorithm can be found on page 665 of:
 
@@ -998,12 +1044,11 @@ add_interval(vertex node,
     year = 1986
     }
 */
-bool
-interval_graph(old_intervals,
-	       &intervals,
-	       &intervals_to_control_nodes)
+static bool
+interval_graph(graph intervals)
 {
     bool a_node_has_been_selected;
+    bool the_interval_graph_has_been_modified = FALSE;
     set selected_nodes = set_make(set_pointer);
 
     /* According to the vertex ordering, the algorithm should pick the
@@ -1013,12 +1058,13 @@ interval_graph(old_intervals,
        selected predecessor and build a new interval from it: */
 	a_node_has_been_selected = FALSE;
 	MAP(VERTEX, node, {
-	    if (!set_belong_p(selected_nodes, (char *) nodes)) {
+	    if (!set_belong_p(selected_nodes, (char *) node)) {
 		MAP(VERTEX, predecessor, {
 		    if (set_belong_p(selected_nodes, (char *) predecessor)) {
-			add_interval(node, old_intervals, intervals, selected_nodes);
+			add_interval(node, intervals, selected_nodes);
 			/* Let's go to find a new interval nest: */
 			a_node_has_been_selected = TRUE;
+			the_interval_graph_has_been_modified = TRUE;
 			break;
 		    }
 		}, vertex_predecessors(node));
@@ -1026,41 +1072,97 @@ interval_graph(old_intervals,
 		    /* Begin a new selection process: */
 		    break;
 	    }
-	}, graph_vertices(old_intervals));
+	}, graph_vertices(intervals));
     } while (a_node_has_been_selected);
+
+    set_free(selected_nodes);
+
+    return the_interval_graph_has_been_modified;
+}
+
+
+/* Get the interval node of a control or create it if it does not
+   exist and add it to the interval graph. */
+static vertex
+create_or_get_an_interval_node(control c,
+			       graph intervals,
+			       hash_table control_to_interval_node)
+{
+    vertex interval;
+    if (!hash_defined_p(control_to_interval_node, (char *) c)) {
+	/* This control has never been seen before: allocate the
+	   peering interval node with no successor: */
+	interval =
+	    make_vertex(make_interval_vertex_label(CONS(CONTROL, c, NIL)),
+			NIL);
+	/* Use gen_nconc since the entry interval must be the first
+	   one: */
+	graph_vertices(intervals) = gen_nconc(graph_vertices(intervals),
+					      CONS(VERTEX, interval, NIL));
+	hash_put(control_to_interval_node, (char *) c, (char *) interval);
+    }
+    else
+	interval = (vertex) hash_get(control_to_interval_node, (char *) c);
+
+    return interval;
 }
 
 
 /* Duplicate the control graph in a format suitable to deal with
-   intervals later: */
-control
-control_to_interval_format(control entry_node,
-			   hash_map intervals_to_control_nodes)
+   intervals later.
+
+   The interval graph format is the predecessor control graph in
+   fact. */
+static graph
+control_graph_to_interval_graph_format(control entry_node)
 {
     list blocs = NIL;
-    hash_table intervals_to_control_nodes = hash_table_make(hash_pointer, 0);
-    /* A bovine approach :-( */
-    control new_control = copy_control(entry_node);
+    graph intervals = make_graph(NIL);
+
+    hash_table control_to_interval_node = hash_table_make(hash_pointer, 0);
+    pips_debug(5, "Control entry node %#x:\n", (int) entry_node);   
     CONTROL_MAP(c, {
-	free_statement(control_statement(c));
-	control_statement(c) = statement_undefined;
-	/* The plain initial interval graph is itself: */
-	hash_put(intervals_to_control_nodes...);
-    }, new_control, blocs);
+	vertex interval =
+	    create_or_get_an_interval_node(c,
+					   intervals,
+					   control_to_interval_node);
+	pips_debug(6, "\tControl %#x -> interval %#x\n",
+		   (int) c,  (int) interval);   
+	MAP(CONTROL, p, {
+	    vertex vertex_predecessor =
+		create_or_get_an_interval_node(p,
+					       intervals,
+					       control_to_interval_node);
+	    predecessor v_p = make_predecessor(interval_vertex_label_undefined,
+					       vertex_predecessor);
+	    vertex_predecessors(interval) =
+		CONS(PREDECESSOR, v_p, vertex_predecessors(interval));
+	    pips_debug(7, "\t\tControl predecessor %#x -> interval %#x\n",
+		   (int) p,  (int) vertex_predecessor);   
+	}, control_predecessors(c));
+    }, entry_node, blocs);
     gen_free_list(blocs);
+    
+    hash_table_free(control_to_interval_node);
+
+    return intervals;
 }
 
 
 /* Return the list of control node exiting an interval: */
-list
-interval_exit_nodes(interval_vertex_label interval)
+static list
+interval_exit_nodes(vertex interval)
 {
     list exit_controls = NIL;
     
+    pips_debug(6, "Interval %#x with controls ", (int) interval);
+    display_address_of_control_nodes(interval_vertex_label_controls(vertex_vertex_label(interval)));
     MAP(CONTROL, c, {
+	pips_debug(7, "\n\tControl %#x:\n", (int) c);   
 	MAP(CONTROL, successor, {	    
+	    pips_debug(7, "\t\tControl successor %#x:\n", (int) successor);   
 	    if (!gen_in_list_p(successor,
-			       interval_vertex_label_controls(interval))) {
+			       interval_vertex_label_controls(vertex_vertex_label(interval)))) {
 		/* A successor that is not in the interval is an exit
                    node... Add it to the exit nodes list if not
                    already in it: */
@@ -1068,8 +1170,14 @@ interval_exit_nodes(interval_vertex_label interval)
 		    exit_controls = CONS(CONTROL, successor, exit_controls);
 	    }
 	}, control_successors(c));
-    }, interval_vertex_label_controls(interval));
+    }, interval_vertex_label_controls(vertex_vertex_label(interval)));
 
+    ifdebug(6) {
+	pips_debug(0, "Interval exit node list: ");
+	display_address_of_control_nodes(exit_controls);
+	pips_debug(0, "\n");
+    }
+    
     return exit_controls;
 }
 
@@ -1155,24 +1263,15 @@ replace_control_related_to_a_list(control old_node,
 }
 
 
-/* Detach the controls from the interval to avoid removing them later
-   since they are not persistent... */
-bool
-clean_up_interval_controls(interval_vertex_label i)
-{
-    gen_free_list(interval_vertex_label_controls(i));
-    interval_vertex_label_controls(i) = NIL;
-
-    /* Stop the recursion to avoid leaping in outer space... */
-    return FALSE;
-}
-
-
 /* Put all the controls in their own unstructured to hierarchize the
-   graph and link the unstructured to the outer unstructured: */
-void
+   graph and link the unstructured to the outer unstructured.
+   
+   The exit_node is either a one element control node, either NIL if
+   it there is no exit : it is a true endless loop (assume it is not
+   the exit node). */
+static void
 hierarchize_control_list(list controls,
-			 control exit_node)
+			 list exit_node)
 {
     control entry_node = CONTROL(CAR(controls));
     /* Create the new control nodes with the new unstructured: */
@@ -1185,83 +1284,116 @@ hierarchize_control_list(list controls,
     control_statement(entry_node) =
 	make_stmt_of_instr(make_instruction(is_instruction_unstructured,
 					    new_unstructured));
+    ifdebug(6) {
+	pips_debug(0, "List of controls: ");
+	display_address_of_control_nodes(controls);
+	pips_debug(0, "\nExit node list: ");
+	display_address_of_control_nodes(exit_node);
+	pips_debug(0, "\nnew_entry_node = %#x, new_exit_node = %#x\n",
+		   new_entry_node, new_exit_node);
+    }
     /* Now the hard work: replace carefully the old control nodes by
        new one in the spaghetti plate... */
     replace_control_related_to_a_list(entry_node, new_entry_node, controls);
-    replace_control_related_to_a_list(exit_node, new_exit_node, controls);
+    if (exit_node != NIL)
+	replace_control_related_to_a_list(CONTROL(CAR(exit_node)),
+					  new_exit_node, controls);
 }
 
 
 /* Use an interval graph partitionning method to recursively
    decompose the control graph: */
-void
-control_graph_recursive_decomposition(statement s)
+static void
+control_graph_recursive_decomposition(unstructured u)
 {
     /* An interval graph is represented by a graph with
-       interval_vertex_label decorations. The first interval of the
-       graph is the entry interval of the interval graph and the first
-       control node of an interval is the entry control node of the
-       interval: */
-    graph intervals;
+       interval_vertex_label decorations embedding control nodes. The
+       first interval of the graph is the entry interval of the
+       interval graph and the first control node of an interval is the
+       entry control node of the interval: */
     bool modified;
-    instruction i = statement_instruction(s);
-    unstructured u = instruction_unstructured(i);
-    control entry_node = unstructured_control(u);
+    control entry_node, exit_node;
+    hash_table control_already_hierarchized;
+    graph intervals;
+    
+    debug_on("RECURSIVE_DECOMPOSITION_DEBUG_LEVEL");
+    
+    entry_node = unstructured_control(u);
+    exit_node = unstructured_exit(u);
     /* To record the entry node of intervals that have been
-       hierarchized: */
-    set control_already_hierarchized = set_make(set_pointer);
+       hierarchized. Use an hash_table to store the number of control
+       nodes that have been restructured as a hint to able further
+       hierarchizations if the new number of control nodes for a given
+       entry node is no longer the same du to interval fusion.  */
+    control_already_hierarchized = hash_table_make(hash_int, 0);
 
     /* The seed interval graph is indeed the control graph itself: */
-    graph old_intervals = control_to_interval_format(entry_node);
-    /* To be able to clean up all the interval graphs later: */
-    list all_the_intervals = CONS(GRAPH, old_intervals, NIL);
+    intervals = control_graph_to_interval_graph_format(entry_node);
 
+    pips_debug(3, "Entering with unstructured %#x (%#x, %#x)\n",
+	       (int) u, (int) entry_node, (int) exit_node);
     /* Apply recursively interval graph decomposition: */
     do {
-	list blocs = NIL;
 	/* Construct the interval graph from the previous one: */
-	modified = interval_graph(old_intervals, &intervals);
-	all_the_intervals = CONS(GRAPH, intervals, all_the_intervals);
-
+	modified = interval_graph(intervals);
+	pips_debug(6, "Modified = %d\n", modified);
+	
 	/* For all intervals of the graph: */
-	MAP(interval, {
-	    list interval_exits = interval_exit_nodes(interval);
-	    if (gen_length(interval_exits) == 1) {
-		/* If an interval has only one exit, the underlaying
-                   control graph can be hierachized by an
-                   unstructured: */
-		list controls = interval_vertex_label_controls(interval);
-		if (!set_belong_p(control_already_hierarchized,
-				  (char *) CONTROL(CAR(controls)))) {
+	MAP(VERTEX, interval, {
+	    list controls = interval_vertex_label_controls(vertex_vertex_label(interval));
+	    control interval_entry = CONTROL(CAR(controls));
+	    if (!hash_defined_p(control_already_hierarchized,
+				(char *) interval_entry)
+		|| ((int) hash_get(control_already_hierarchized,
+				   (char *) interval_entry)
+		    != gen_length(controls))) {
+		/* Ok, at least this interval has not been hierarchized: */
+		list interval_exits = interval_exit_nodes(interval);
+		if (gen_length(interval_exits) <= 1
+		    && /* Useless to restructure the exit node... */
+		    interval_entry != exit_node) {
+		    /* If an interval has at most one exit, the
+		       underlaying control graph can be hierachized by
+		       an unstructured. */
 		    /* Put all the controls in their own unstructured
                        to hierarchize the graph: */
 		    hierarchize_control_list(controls,
-					     CONTROL(CAR(interval_exits)));
-		    set_add_element(control_already_hierarchized,
-				    control_already_hierarchized,
-				    (char *) CONTROL(CAR(controls)));
+					     interval_exits);
+		    /* Mark control_already_hierarchized to avoid
+                       restructuring again this interval: */
+		    if (hash_defined_p(control_already_hierarchized,
+				       (char *) interval_entry))
+			hash_update(control_already_hierarchized,
+				    (char *) interval_entry,
+				    (char *) gen_length(controls));
+		    else
+			hash_put(control_already_hierarchized,
+				 (char *) interval_entry,
+				 (char *) gen_length(controls));
 		}
+		gen_free_list(interval_exits);
 	    }
-	    gen_free_list(interval_exits);
-	}, graph_vertices(intervals), blocs);
-	old_intervals = intervals;
+	}, graph_vertices(intervals));
 	/* Stop if the interval graph does no longer changed : it is
            only one node or an irreductible graph: */
     } while (modified);
 
 
-    /* Remove the links from interval to controls to avoid havoc later
-       (in fact I would need a way to express controls:persistent
-       control* but NewGen cannot yet... :-( ) */
-    MAP(GRAPH, intervals, {
-	gen_recurse(intervals,
-		    interval_vertex_label_domain,
-		    clean_up_interval_controls,
-		    gen_null);
-    }, all_the_intervals);
-    gen_full_free_list(all_the_intervals);
-
-    set_free(control_already_hierarchized);
+    /* Delete useless datastructures: */
+    hash_table_free(control_already_hierarchized);
+    /* Do not forget to detach control nodes from interval before
+       sweeping: */
+    MAP(VERTEX, v, {
+	gen_free_list(interval_vertex_label_controls(vertex_vertex_label(v)));
+	interval_vertex_label_controls(vertex_vertex_label(v)) = NIL;
+    }, graph_vertices(intervals));
+    free_graph(intervals);
+    
+    pips_debug(3, "Exiting.\n");
+    ifdebug(1)
+	pips_assert("Unstructured should be consistent here...",
+		    gen_consistent_p(u));
+    debug_off();
 }
 
 
@@ -1386,7 +1518,7 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
    /* First, clean up easy things done by the controlizer: */
    gen_recurse(mod_stmt, statement_domain,
                gen_true, clean_up_control);
-   if (get_bool_property("HIERARCHIZE_CONTROL"))
+/*   if (get_bool_property("HIERARCHIZE_CONTROL")) */
        /* Then try to hierarchize the control flow: */
        gen_recurse(mod_stmt, unstructured_domain,
 		   gen_true, control_graph_recursive_decomposition);
@@ -1394,6 +1526,7 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
       and so on: */
    gen_recurse(mod_stmt, statement_domain,
                gen_true, recursively_restructure_an_unstructured);
+
    display_unspaghettify_statistics();
 
    /* End by removing parasitic sequences: */
