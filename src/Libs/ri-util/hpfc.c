@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc.c,v $ (version $Revision$)
- * $Date: 1995/09/22 14:44:20 $, 
+ * $Date: 1996/04/01 11:22:34 $, 
  *
  * functions to test hpfc-related special entities. needed by syntax.
  * moved here from hpfc to break a cyclic dependence hpfc -> syntax.
@@ -49,7 +49,8 @@ bool fcd_directive_string_p(string s)
 {
     return same_string_p(s, HPF_PREFIX SYNCHRO_SUFFIX) ||
 	   same_string_p(s, HPF_PREFIX TIMEON_SUFFIX) ||
-	   same_string_p(s, HPF_PREFIX TIMEOFF_SUFFIX) ;
+	   same_string_p(s, HPF_PREFIX TIMEOFF_SUFFIX) ||
+	   same_string_p(s, HPF_PREFIX HOSTSECTION_SUFFIX);
 }
 
 bool fcd_directive_p(entity f)
