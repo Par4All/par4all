@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/10/18 18:38:49 $, )
+ * ($Date: 1996/10/18 22:26:21 $, )
  */
 
 #include "defines-local.h"
@@ -173,26 +173,26 @@ boolean send;
 	(CONS(STATEMENT, cmp_lid, CONS(STATEMENT, msg, NIL)));
 }
 
-/*       PVM_RECV(HOST_TID, {HOST_CHANNEL, MCASTHOST}, BUFID)
+/*       PVM_RECV(HOST_TID, {HOST RCV CHANNEL, MCASTHOST}, BUFID)
  *       {} += 2
  */
 static statement hpfc_nrecv(cast) /* from host */
 bool cast;
 {
     entity hosttid = hpfc_name_to_entity(HOST_TID),
-           channel = hpfc_name_to_entity(cast ? MCASTHOST : HOST_CHANNEL);
+           channel = hpfc_name_to_entity(cast ? MCASTHOST : HOST_RCV_CHAN);
     
     return(hpfc_message(entity_to_expression(hosttid),
 			entity_to_expression(channel), FALSE));
 }
 
-/*      PVM_SEND(HOST_TID, HOST_CHANNEL, INFO)
- *      HOST_CHANNEL = HOST_CHANNEL + 2
+/*      PVM_SEND(HOST_TID, HOST SND CHANNEL, INFO)
+ *      HOST SND CHANNEL += 2
  */
 static statement hpfc_nsend()
 {
     expression
-	channel = entity_to_expression(hpfc_name_to_entity(HOST_CHANNEL)),
+	channel = entity_to_expression(hpfc_name_to_entity(HOST_SND_CHAN)),
 	htid = entity_to_expression(hpfc_name_to_entity(HOST_TID));
 
     return(hpfc_message(htid, channel, TRUE));
