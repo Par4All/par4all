@@ -14,10 +14,8 @@
 
 */
 
-/*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1998/04/15 09:54:15 $, )
- *  version $Revision$
- *  got on %D%, %T%
+/* 
+   $Id$
  */
 
 
