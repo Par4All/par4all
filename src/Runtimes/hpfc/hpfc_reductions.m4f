@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/29 15:22:04 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/30 14:45:41 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -39,85 +39,116 @@ c
 c      
 c----------
 c
-define(build_name,`$1_$2_$3')dnl
-define(`LOGICAL_RED_3',`dnl
-pushdef(`TYPE',$1)dnl
-pushdef(`PVMTYPE',$2)dnl
-pushdef(`NAME',$3)dnl
-pushdef(`OPERATOR',$4)dnl
+include(`m4_macros')dnl
 c
-c    LOGICAL REDUCTION NAME FOR TYPE, 3 DIMENSIONS
+c macros to generate the code
+c
+define(`REDUCTION_NODE_DECL',`
+      integer ifelse(REDTYPE, logical, t$1`,') i$1, l$1, u$1, s$1, d$1')dnl
+define(`COMPUTE_LOCALIND',`
+      t$1 = HPFC_LOCALIND(an, $1, lo$1)')dnl
+define(`LIST_DECL_BOUNDS',`
+     & dl$1, du$1')dnl
+define(`LIST_RED_BOUNDS',`
+     & lo$1, up$1')dnl
+define(`ARRAY_DECL',`dl$1:du$1')dnl
+define(`LOWER_REF',`lo$1')dnl
+define(`TEMPO_REF',`t$1')dnl
+define(`INDEX_REF',`i$1')dnl
+define(`ZERO_REF',`0')dnl
+define(`LOOP_BOUNDS_COMPUTATION',`
+      d$1 = HPFC_PROCDIM(an, $1)
+      CALL HPFC_LOOP_BOUNDS(l$1, u$1, s$1, lo$1, up$1, an, d$1)')dnl
+define(`DO_LOOP',`
+      do i$1 = l$1, u$1')dnl
+define(`ENDDO_LOOP',`
+      enddo')dnl
+define(`DISJUNCTION',
+`ifelse(REDTYPE, logical, $1,
+        REDTYPE, cumulate, $2,
+        `errprint(m4: unexpected reduction type)')')dnl
+c
+c Generic reduction
+c
+c REDTYPE may be logical or cumulate
+c NAME may be MIN, MAX, SUM, MULT
+c LEVEL may be 1 to 7
+c
+define(`GENERIC_REDUCTION',`dnl
+pushdef(`REDTYPE',$1)dnl
+pushdef(`LEVEL',$2)dnl
+pushdef(`TYPE',$3)dnl
+pushdef(`PVMTYPE',$4)dnl
+pushdef(`NAME',$5)dnl
+pushdef(`OPERATOR',$6)dnl
+c
+c    REDTYPE REDUCTION NAME FOR TYPE, LEVEL DIMENSIONS
 c
 c     
 c NODE PART
 c
-cdecl      external  build_name(nred3,PVMTYPE,NAME)
-cdecl      TYPE build_name(nred3,PVMTYPE,NAME)
-      TYPE function build_name(nred3,PVMTYPE,NAME)
-     &  (a, an, 
-     &  dl1, du1, dl2, du2, dl3, du3,
-     &  lo1, up1, lo2, up2, lo3, up3)
+cdecl      external  build_name(nred,LEVEL,PVMTYPE,NAME)
+cdecl      TYPE build_name(nred,LEVEL,PVMTYPE,NAME)
+      TYPE function build_name(nred,LEVEL,PVMTYPE,NAME)(a, an, dnl
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
+COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
+     & )
       include ''`fpvm3.h''`
       include ''`hpfc_commons.h''`
       include ''`hpfc_rtsupport.h''`
       external HPFC_PROCDIM
       integer HPFC_PROCDIM
-      TYPE a(dl1:du1, dl2:du2, dl3:du3)
+      TYPE 
+     $ a(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
       integer 
-     &    an, 
-     &    dl1, du1, dl2, du2, dl3, du3,
-     &    lo1, up1, lo2, up2, lo3, up3
+     &    an, dnl
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
+COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
       TYPE result
-      integer t1, i1, l1, u1, s1, d1
-      integer t2, i2, l2, u2, s2, d2
-      integer t3, i3, l3, u3, s3, d3
+SIMPLE_REPLICATE(LEVEL, `REDUCTION_NODE_DECL')
 c
 c initiate with a valid value
 c
-      CALL HPFC_CMPOWNERS(an, lo1, lo2,lo3, 0, 0, 0, 0)
+DISJUNCTION(``
+      'CALL HPFC_CMPOWNERS(an, 
+     $  COMMA_REPLICATE(LEVEL, `LOWER_REF'),
+     $  COMMA_REPLICATE(TO7(LEVEL), `ZERO_REF'))
       if (HPFC_SENDERP()) then
-         t1 = HPFC_LOCALIND(an, 1, lo1)
-         t2 = HPFC_LOCALIND(an, 2, lo2)
-         t3 = HPFC_LOCALIND(an, 3, lo3)
-         CALL HPFC_SNDTO_A(PVMTYPE, a(t1, t2, t3))
-         result = a(t1, t2, t3)
+SIMPLE_REPLICATE(LEVEL, `COMPUTE_LOCALIND')
+         CALL HPFC_SNDTO_A(PVMTYPE, a(COMMA_REPLICATE(LEVEL, `TEMPO_REF')))
+         result = a(COMMA_REPLICATE(LEVEL, `TEMPO_REF'))
       else
          CALL HPFC_RCVFR_mCS(PVMTYPE, result)
-      endif
+      endif',``
+      'result = ifelse(NAME, `SUM', 0, NAME, `MULT', 1, dnl
+                      FATAL_ERROR(`unexpected name'))')
 c
 c compute the loop bounds
 c
-      d1 = HPFC_PROCDIM(an, 1)
-      CALL HPFC_LOOP_BOUNDS(l1, u1, s1, lo1, up1, an, d1)
-      d2 = HPFC_PROCDIM(an, 2)
-      CALL HPFC_LOOP_BOUNDS(l2, u2, s2, lo2, up2, an, d2)
-      d3 = HPFC_PROCDIM(an, 3)
-      CALL HPFC_LOOP_BOUNDS(l3, u3, s3, lo3, up3, an, d3)
+SIMPLE_REPLICATE(LEVEL, `LOOP_BOUNDS_COMPUTATION')
 c
 c local reduction
 c
-      do i1=l1, u1
-         do i2=l2, u2
-            do i3=l3, u3
-               if (a(i1, i2, i3) OPERATOR result) 
-     &              result = a(i1, i2, i3)
-            enddo
-         enddo
-      enddo
+SIMPLE_REPLICATE(LEVEL, `DO_LOOP')
+DISJUNCTION(``
+      'if (a(COMMA_REPLICATE(LEVEL, `INDEX_REF')) OPERATOR result) 
+     &    result = a(COMMA_REPLICATE(LEVEL, `INDEX_REF'))',``
+      'result = result OPERATOR  a(COMMA_REPLICATE(LEVEL, `INDEX_REF'))')
+SIMPLE_REPLICATE(LEVEL, `ENDDO_LOOP')
 c
 c send partial result to host, and get the final result
 c      
       CALL HPFC_SNDTO_H(PVMTYPE, result)
       CALL HPFC_RCVFR_mCH(PVMTYPE, result)
-      build_name(nred3,PVMTYPE,NAME) = result
+      build_name(nred,LEVEL,PVMTYPE,NAME) = result
       return
       end
 c
 c HOST PART
 c
-cdecl      external build_name(hred3,PVMTYPE,NAME)
-cdecl      TYPE build_name(hred3,PVMTYPE,NAME)
-      TYPE function build_name(hred3,PVMTYPE,NAME)()
+cdecl      external build_name(hred,LEVEL,PVMTYPE,NAME)
+cdecl      TYPE build_name(hred,LEVEL,PVMTYPE,NAME)
+      TYPE function build_name(hred,LEVEL,PVMTYPE,NAME)()
       include ''`fpvm3.h''`
       include ''`hpfc_commons.h''`
       TYPE result(MAXMAXSIZEOFPROCS), final
@@ -135,227 +166,45 @@ c compute final result
 c
       final = result(1)
       do i=2, MAXSIZEOFPROCS
-         if (result(i) OPERATOR final) 
-     &        final = result(i)
+DISJUNCTION(``
+      '  if (result(i) OPERATOR final) 
+     &     final = result(i)',``
+      '   final = final OPERATOR result(i)')
       enddo
 c
 c send final result to nodes 
 c      
       CALL HPFC_HSNDTO_A(PVMTYPE, final)
-      build_name(hred3,PVMTYPE,NAME) = final
+      build_name(hred,LEVEL,PVMTYPE,NAME) = final
       return
       end
 c
 c------------
 c
-popdef(`TYPE')dnl
-popdef(`PVMTYPE')dnl
-popdef(`NAME')dnl
-popdef(`OPERATOR')dnl')dnl
-define(`LOGICAL_RED_2',`dnl
-pushdef(`TYPE',$1)dnl
-pushdef(`PVMTYPE',$2)dnl
-pushdef(`NAME',$3)dnl
-pushdef(`OPERATOR',$4)dnl
-c
-c    LOGICAL REDUCTION NAME FOR TYPE, 2 DIMENSIONS
-c
-c     
-c NODE PART
-c
-cdecl      external build_name(nred2,PVMTYPE,NAME)
-cdecl      TYPE build_name(nred2,PVMTYPE,NAME)
-      TYPE function build_name(nred2,PVMTYPE,NAME)
-     & (a, an, dl1, du1, dl2, du2, lo1, up1, lo2, up2)
-      include ''`fpvm3.h''`
-      include ''`hpfc_commons.h''`
-      include ''`hpfc_rtsupport.h''`
-      external HPFC_PROCDIM
-      integer HPFC_PROCDIM
-      TYPE a(dl1:du1, dl2:du2)
-      integer an, dl1, du1, dl2, du2, lo1, up1, lo2, up2
-      TYPE result
-      integer t1, i1, l1, u1, s1, d1
-      integer t2, i2, l2, u2, s2, d2
-c
-c initiate with a valid value
-c
-      CALL HPFC_CMPOWNERS(an, lo1, lo2, 0, 0, 0, 0, 0)
-      if (HPFC_SENDERP()) then
-         t1 = HPFC_LOCALIND(an, 1, lo1)
-         t2 = HPFC_LOCALIND(an, 2, lo2)
-         CALL HPFC_SNDTO_A(PVMTYPE, a(t1, t2))
-         result = a(t1, t2)
-      else
-         CALL HPFC_RCVFR_mCS(PVMTYPE, result)
-      endif
-c
-c compute the loop bounds
-c
-      d1 = HPFC_PROCDIM(an, 1)
-      CALL HPFC_LOOP_BOUNDS(l1, u1, s1, lo1, up1, an, d1)
-      d2 = HPFC_PROCDIM(an, 2)
-      CALL HPFC_LOOP_BOUNDS(l2, u2, s2, lo2, up2, an, d2)
-c
-c local reduction
-c
-      do i1=l1, u1
-         do i2=l2, u2
-            if (a(i1, i2) OPERATOR result) 
-     &           result = a(i1, i2)
-         enddo
-      enddo
-c
-c send partial result to host, and get the final result
-c      
-      CALL HPFC_SNDTO_H(PVMTYPE, result)
-      CALL HPFC_RCVFR_mCH(PVMTYPE, result)
-      build_name(nred2,PVMTYPE,NAME) = result
-      return
-      end
-c
-c HOST PART
-c
-cdecl      external build_name(hred2,PVMTYPE,NAME)
-cdecl      TYPE build_name(hred2,PVMTYPE,NAME)
-      TYPE function build_name(hred2,PVMTYPE,NAME)()
-      include ''`fpvm3.h''`
-      include ''`hpfc_commons.h''`
-      TYPE result(MAXMAXSIZEOFPROCS), final
-      integer i
-c
-c get partial results
-c
-      do i=1, MAXSIZEOFPROCS
-         SENDERTID = NODETIDS(i)
-         SLID = i
-         CALL HPFC_RCVFR_S(PVMTYPE, result(i))
-      enddo
-c
-c compute final result
-c
-      final = result(1)
-      do i=2, MAXSIZEOFPROCS
-         if (result(i) OPERATOR final) 
-     &        final = result(i)
-      enddo
-c
-c send final result to nodes 
-c      
-      CALL HPFC_HSNDTO_A(PVMTYPE, final)
-      build_name(hred2,PVMTYPE,NAME) = final
-      return
-      end
-c
-c------------
-c
-popdef(`TYPE')dnl
-popdef(`PVMTYPE')dnl
-popdef(`NAME')dnl
-popdef(`OPERATOR')dnl')dnl
-define(LOGICAL_RED_1,`dnl
-pushdef(`TYPE',$1)dnl
-pushdef(`PVMTYPE',$2)dnl
-pushdef(`NAME',$3)dnl
-pushdef(`OPERATOR',$4)dnl
-c
-c    LOGICAL REDUCTION NAME FOR TYPE, 1 DIMENSION
-c
-c     
-c NODE PART
-c
-cdecl      external build_name(nred1,PVMTYPE,NAME)
-cdecl      TYPE build_name(nred1,PVMTYPE,NAME)
-      TYPE function build_name(nred1,PVMTYPE,NAME)
-     &   (a, an, dl1, du1, lo1, up1)
-      include ''`fpvm3.h''`
-      include ''`hpfc_commons.h''`
-      include ''`hpfc_rtsupport.h''`
-      external HPFC_PROCDIM
-      integer HPFC_PROCDIM
-      TYPE a(dl1:du1)
-      integer an, dl1, du1, lo1, up1
-      TYPE result
-      integer t1, i1, l1, u1, s1, d1
-c
-c initiate with a valid value
-c
-      CALL HPFC_CMPOWNERS(an, lo1, 0, 0, 0, 0, 0, 0)
-      if (HPFC_SENDERP()) then
-         t1 = HPFC_LOCALIND(an, 1, lo1)
-         CALL HPFC_SNDTO_A(PVMTYPE, a(t1))
-         result = a(t1)
-      else
-         CALL HPFC_RCVFR_mCS(PVMTYPE, result)
-      endif
-c
-c compute the loop bounds
-c
-      d1 = HPFC_PROCDIM(an, 1)
-      CALL HPFC_LOOP_BOUNDS(l1, u1, s1, lo1, up1, an, d1)
-c
-c local reduction
-c
-      do i1=l1, u1
-         if (a(i1) OPERATOR result) 
-     &        result = a(i1)
-      enddo
-c
-c send partial result to host, and get the final result
-c      
-      CALL HPFC_SNDTO_H(PVMTYPE, result)
-      CALL HPFC_RCVFR_mCH(PVMTYPE, result)
-      build_name(nred1,PVMTYPE,NAME) = result
-      return
-      end
-c
-c HOST PART
-c
-cdecl      external build_name(hred1,PVMTYPE,NAME)
-cdecl      TYPE build_name(hred1,PVMTYPE,NAME)
-      TYPE function build_name(hred1,PVMTYPE,NAME)()
-      include ''`fpvm3.h''`
-      include ''`hpfc_commons.h''`
-      TYPE result(MAXMAXSIZEOFPROCS), final
-      integer i
-c
-c get partial results
-c
-      do i=1, MAXSIZEOFPROCS
-         SENDERTID = NODETIDS(i)
-         SLID = i
-         CALL HPFC_RCVFR_S(PVMTYPE, result(i))
-      enddo
-c
-c compute final result
-c
-      final = result(1)
-      do i=2, MAXSIZEOFPROCS
-         if (result(i) OPERATOR final) 
-     &        final = result(i)
-      enddo
-c
-c send final result to nodes 
-c      
-      CALL HPFC_HSNDTO_A(PVMTYPE, final)
-      build_name(hred1,PVMTYPE,NAME) = final
-      return
-      end
-c
-c------------
-c
+popdef(`REDTYPE')dnl
+popdef(`LEVEL')dnl
 popdef(`TYPE')dnl
 popdef(`PVMTYPE')dnl
 popdef(`NAME')dnl
 popdef(`OPERATOR')dnl')dnl
 c
-define(REDUCTIONS,`dnl
-LOGICAL_RED_1($1, $2, MIN, .LT.)
-LOGICAL_RED_1($1, $2, MAX, .GT.)
-LOGICAL_RED_2($1, $2, MIN, .LT.)
-LOGICAL_RED_2($1, $2, MAX, .GT.)
-LOGICAL_RED_3($1, $2, MIN, .LT.)
-LOGICAL_RED_3($1, $2, MAX, .GT.)')dnl
+define(`SEVEN_DIMENSION',`
+GENERIC_REDUCTION($1, 1, $2, $3, $4, $5)
+GENERIC_REDUCTION($1, 2, $2, $3, $4, $5)
+GENERIC_REDUCTION($1, 3, $2, $3, $4, $5)
+GENERIC_REDUCTION($1, 4, $2, $3, $4, $5)
+GENERIC_REDUCTION($1, 5, $2, $3, $4, $5)
+GENERIC_REDUCTION($1, 6, $2, $3, $4, $5)
+GENERIC_REDUCTION($1, 7, $2, $3, $4, $5)')dnl
+define(`LOGICAL_REDUCTION',`SEVEN_DIMENSION(logical, $1, $2, $3, $4)')dnl
+define(`CUMULATE_REDUCTION',`SEVEN_DIMENSION(cumulate, $1, $2, $3, $4)')dnl
+define(`REDUCTIONS',`
+LOGICAL_REDUCTION($1, $2, MIN, .LT.)
+LOGICAL_REDUCTION($1, $2, MAX, .GT.)
+CUMULATE_REDUCTION($1, $2, SUM, +)
+CUMULATE_REDUCTION($1, $2, MULT, *)')dnl
+c
+c All the reductions:
 c
 REDUCTIONS(real*8, REAL8) 
 REDUCTIONS(real*4, REAL4)
