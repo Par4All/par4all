@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.88  2003/08/12 09:14:56  irigoin
+ * COMPILATION_UNIT_PREFIX addded (for Fabien's sake, as a short term solution)
+ *
  * Revision 1.87  2003/08/06 13:44:54  nguyen
  * Add intrinsics for C
  *
@@ -140,6 +143,9 @@ typedef hash_table control_mapping;
 #define ENUM_PREFIX 			"?"
 #define TYPEDEF_PREFIX 			"$"
 
+/* Fabien's kludge: must be a low ASCII character in order to process the
+   C compilation units before the function definitions. */
+#define COMPILATION_UNIT_PREFIX         "#"
 
 /*  constant names
  */
