@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.107  1997/11/22 16:31:51  coelho
+ * init/close referenced variables mapping...
+ *
  * Revision 1.106  1997/10/27 16:48:49  coelho
  * redeclarations cleaned...
  *
@@ -58,6 +61,7 @@
 #include "effects-convex.h"
 
 /*************************************************************** REDUCTIONS */
+
 GENERIC_GLOBAL_FUNCTION(hpf_reductions, statement_entities)
 
 /****************************************************************** COMMONS */
@@ -478,9 +482,9 @@ compile_module(entity module)
     update_object_for_module(host_stat, host_module);
     update_object_for_module(entity_code(host_module), host_module);
     
-    insure_declaration_coherency(host_module, host_stat, NIL);
-    insure_declaration_coherency(node_module, node_stat, 
-				 get_include_entities());
+    insure_global_declaration_coherency(host_module, host_stat, NIL);
+    insure_global_declaration_coherency(node_module, node_stat, 
+					get_include_entities());
 
     /*  MORE CODE CLEANING
      */
@@ -542,6 +546,9 @@ bool hpfc_init(string name)
 
     init_hpfc_status();
     save_hpfc_status();
+
+    /* ??? */
+    init_referenced_variables();
 
     debug_off();
     return TRUE;
@@ -815,6 +822,7 @@ bool hpfc_close(string name)
      * pipsdbm will run into troubles when trying to free the resource...
      */
     save_hpfc_status();
+    close_referenced_variables(); /* ??? hum. */
     
     /* ??? the next function is in pipsmake... (should be in pipsdbm only,
      * but pipsmake manages its own cache which must be destroyed also...
