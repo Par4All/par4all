@@ -73,7 +73,7 @@ Variable var;
 
     /* polynome_degree: polynome is undefined */
     assert(!POLYNOME_UNDEFINED_P(pp));
-    for( ; pp != NIL; pp = polynome_succ(pp)) {
+    for( ; pp != POLYNOME_NUL; pp = polynome_succ(pp)) {
 	power = (int) vect_coeff(var, monome_term(polynome_monome(pp)));
 	if (deg < power) deg = power;
     }
@@ -92,7 +92,7 @@ int polynome_max_degree(Ppolynome pp)
 
     /* polynome_degree: polynome is undefined */
     assert(!POLYNOME_UNDEFINED_P(pp));
-    for(m = pp ; m != NIL; m = polynome_succ(m)) {
+    for(m = pp ; m != POLYNOME_NUL; m = polynome_succ(m)) {
 	power = (int) vect_sum(monome_term(polynome_monome(m)));
 	if (deg < power) deg = power;
     }
@@ -163,7 +163,7 @@ Ppolynome pp;
     else {
 	Pvecteur pvTCST = vect_new((Variable) TCST, VALUE_ONE);
 	boolean b = (vect_equal(pvTCST, monome_term(polynome_monome(pp)))
-		     && (polynome_succ(pp) == NIL));
+		     && (polynome_succ(pp) == POLYNOME_NUL));
 
 	vect_rm(pvTCST);
 	return(b);
@@ -217,7 +217,7 @@ Variable var;
     if ( POLYNOME_UNDEFINED_P(pp) )
 	return (FALSE);
     else {
-	for ( ; pp != NIL; pp = polynome_succ(pp))
+	for ( ; pp != POLYNOME_NUL; pp = polynome_succ(pp))
 	    if (vect_coeff(var, monome_term(polynome_monome(pp))) != 0)
 		return (TRUE);
 	return(FALSE);
