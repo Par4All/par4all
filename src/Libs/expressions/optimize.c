@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.40  2000/05/29 13:39:04  coelho
+ * IA-64 strategy added.
+ * more comments in strategy definitions.
+ *
  * Revision 1.39  2000/05/29 13:27:01  coelho
  * FMA -> FMS for IA64.
  *
@@ -155,6 +159,7 @@ extern void perform_ac_cse(string, statement);
  */
 typedef struct
 {
+  /* NAME of the strategy */
   string name;
 
   /* HUFFMAN.
@@ -1248,97 +1253,106 @@ static optimization_strategy
     /* huff */ TRUE, expression_gravity, TRUE,
     /* eole */ "0", TRUE, "", TRUE, "-m",
     /* simp */ TRUE, TRUE,
-    /* gcm */ TRUE,
-    /* cse */ FALSE
+    /* gcm */  TRUE,
+    /* cse */  FALSE
   },
   {
-    "R10K",
-    TRUE, expression_gravity_inv, FALSE,
-    "1", TRUE, "", TRUE, "-m",
-    TRUE, TRUE,
-    TRUE,
-    FALSE
+    /* name */ "IA-64",
+    /* huff */ TRUE, expression_gravity, TRUE,
+    /* eole */ "0", TRUE, "", TRUE, "-m",
+    /* simp */ TRUE, TRUE,
+    /* gcm */  TRUE,
+    /* cse */  FALSE
   },
-  {  /* EOLE and Huffman and Simplify with gravity - most balanced tree*/
+  {
+    /* name */ "R10K",
+    /* huff */ TRUE, expression_gravity_inv, FALSE,
+    /* eole */ "1", TRUE, "", TRUE, "-m",
+    /* simp */ TRUE, TRUE,
+    /* gcm */  TRUE,
+    /* cse */  FALSE
+  },
+  { /* EOLE and Huffman and Simplify with gravity - most balanced tree*/
     /* WITHOUT FMA EXTRACTION */
-    "ultraIIi",
-    TRUE, expression_gravity, TRUE,
-    "0", TRUE, "", FALSE, "",
-    TRUE, TRUE, 
-    FALSE,
-    FALSE
+    /* name */ "ultraIIi",
+    /* huff */ TRUE, expression_gravity, TRUE,
+    /* eole */ "0", TRUE, "", FALSE, "",
+    /* simp */ TRUE, TRUE, 
+    /* gcm */  FALSE,
+    /* cse */  FALSE
   },
   { /* whatever you want */
-    "test",
-    TRUE, expression_gravity, TRUE,
-    "0", TRUE, "", TRUE, "-m",
-    TRUE, TRUE,
-    TRUE,
-    FALSE
+    /* name */ "test",
+    /* huff */ TRUE, expression_gravity, TRUE,
+    /* eole */ "0", TRUE, "", TRUE, "-m",
+    /* simp */ TRUE, TRUE,
+    /* gcm */  TRUE,
+    /* cse */  FALSE
   },
-  {  /* EOLE with gravity criterion only - most balanced tree !*/
-    "EOLE",
-    FALSE, NULL, FALSE,
-    "0", TRUE, "", TRUE, "-m",
-    FALSE, FALSE, 
-    FALSE,
-    FALSE
+  { /* EOLE with gravity criterion only - most balanced tree ! */
+    /* name */ "EOLE",
+    /* huff */ FALSE, NULL, FALSE,
+    /* eole */ "0", TRUE, "", TRUE, "-m",
+    /* simp */ FALSE, FALSE, 
+    /* gcm */  FALSE,
+    /* cse */  FALSE
   },
-  {  /* EOLE and Huffman and Simplify with gravity - most balanced tree*/
-    "GRAVITY",
-    TRUE, expression_gravity, TRUE,
-    "0", TRUE, "", TRUE, "-m",
-    TRUE, TRUE, 
-    FALSE,
-    FALSE
+  { /* EOLE and Huffman and Simplify with gravity - most balanced tree */
+    /* name */ "GRAVITY",
+    /* huff */ TRUE, expression_gravity, TRUE,
+    /* eole */ "0", TRUE, "", TRUE, "-m",
+    /* simp */ TRUE, TRUE, 
+    /* gcm */  FALSE,
+    /* cse */  FALSE
   },
-  {  /* EOLE and Huffman and Simplify - most UNbalanced tree*/
-    "UNBALANCED",
-    TRUE, expression_gravity_inv, FALSE,
-    "1", TRUE, "", TRUE, "-m",
-    TRUE, TRUE, 
-    FALSE,
-    FALSE
+  { /* EOLE and Huffman and Simplify - most UNbalanced tree */
+    /* name */ "UNBALANCED",
+    /* huff */ TRUE, expression_gravity_inv, FALSE,
+    /* eole */ "1", TRUE, "", TRUE, "-m",
+    /* simp */ TRUE, TRUE, 
+    /* gcm */  FALSE,
+    /* cse */  FALSE
   },
-  {  /* ICM only */
-    "ICM", 
-    FALSE, NULL, FALSE,
-    "0", FALSE, "", FALSE, "",
-    FALSE, FALSE,
-    TRUE,
-    FALSE
+  { /* ICM only */
+    /* name */ "ICM", 
+    /* huff */ FALSE, NULL, FALSE,
+    /* eole */ "0", FALSE, "", FALSE, "",
+    /* simp */ FALSE, FALSE,
+    /* gcm */  TRUE,
+    /* cse */  FALSE
   },
-  {  /* CSE only*/
-    "CSE", 
-    FALSE, NULL, FALSE,
-    "0", FALSE, "", FALSE, "",
-    FALSE, FALSE,
-    FALSE,
-    TRUE
+  { /* CSE only*/
+    /* name */ "CSE", 
+    /* huff */ FALSE, NULL, FALSE,
+    /* eole */ "0", FALSE, "", FALSE, "",
+    /* simp */ FALSE, FALSE,
+    /* gcm */  FALSE,
+    /* cse */  TRUE
   },
-  {  /* both ICM and CSE */
-    "ICMCSE", 
-    FALSE, NULL, FALSE,
-    "0", FALSE, "", FALSE, "",
-    FALSE, FALSE,
-    TRUE,
-    TRUE
+  { /* both ICM and CSE */
+    /* name */ "ICMCSE", 
+    /* huff */ FALSE, NULL, FALSE,
+    /* eole */ "0", FALSE, "", FALSE, "",
+    /* simp */ FALSE, FALSE,
+    /* gcm */  TRUE,
+    /* cse */  TRUE
   },
-  {  /* Everything must be done */
-    "FULL", 
-    TRUE, expression_gravity, TRUE,
-    "0", TRUE, "", TRUE, "-m",
-    TRUE, TRUE,
-    TRUE,
-    TRUE
+  { /* Everything must be done */
+    /* name */ "FULL", 
+    /* huff */ TRUE, expression_gravity, TRUE,
+    /* eole */ "0", TRUE, "", TRUE, "-m",
+    /* simp */ TRUE, TRUE,
+    /* gcm */  TRUE,
+    /* cse */  TRUE
   },
   /* this one MUST be the last one! */
   {
-    NULL, /* default similar to P2SC. */
-    TRUE, expression_gravity, TRUE,
-    "0", TRUE, "", TRUE, "-m",
-    TRUE, TRUE,
-    TRUE
+    /* name */ NULL, /* default similar to P2SC. */
+    /* huff */ TRUE, expression_gravity, TRUE,
+    /* eole */ "0", TRUE, "", TRUE, "-m",
+    /* simp */ TRUE, TRUE,
+    /* gcm */  TRUE,
+    /* cse */  TRUE
   }
 };
 
