@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.71  2003/08/02 14:01:18  irigoin
+ * Cosmetic change to silence gcc
+ *
  * Revision 1.70  2003/05/20 09:03:19  irigoin
  * Update of MakeFortranType() to accomodate Francois Ferrand's needs for his SIMDizer
  *
@@ -108,6 +111,8 @@
 
 #include "syntax.h"
 
+/* Problem with conditional includes, different strands of UNIXes,... */
+extern int isascii(int);
 #define IS_UPPER(c) (isascii(c) && isupper(c))
 
 int
@@ -1996,39 +2001,52 @@ entity c;
 void
 fprint_functional(FILE * fd, functional f)
 {
-    type tr = functional_result(f);
+  type tr = functional_result(f);
 
-    MAPL(cp, {
-	parameter p = PARAMETER(CAR(cp));
-	type ta = parameter_type(p);
+  MAPL(cp, {
+    parameter p = PARAMETER(CAR(cp));
+    type ta = parameter_type(p);
 
-	pips_assert("Argument type is variable or varags:variable", type_variable_p(ta)
-		    || (type_varargs_p(ta) && type_variable_p(type_varargs(ta))));
-	if(type_varargs_p(ta)) {
-	    (void) fprintf(fd, " %s:", type_to_string(ta));
-	    ta = type_varargs(ta);
-	}
-	(void) fprintf(fd, "%s", basic_to_string(variable_basic(type_variable(ta))));
-	if(!ENDP(cp->cdr))
-	    (void) fprintf(fd, " x ");
-    },
-	functional_parameters(f));
+    pips_assert("Argument type is variable or varags:variable or functional",
+		type_variable_p(ta)
+		|| (type_varargs_p(ta) && type_variable_p(type_varargs(ta)))
+		|| type_functional_p(ta));
 
-    if(ENDP(functional_parameters(f))) {
-	(void) fprintf(fd, " ()");
+    if(type_functional_p(ta)) {
+      functional fa = type_functional(ta);
+      /* (void) fprintf(fd, " %s:", type_to_string(ta)); */
+      (void) fprintf(fd, "(");
+      fprint_functional(fd, fa);
+      (void) fprintf(fd, ")");
     }
-    (void) fprintf(fd, " -> ");
-
-    if(type_variable_p(tr))
-	(void) fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(tr))));
-    else if(type_void_p(tr))
-	(void) fprintf(fd, " %s\n", type_to_string(tr));
-    else if(type_varargs_p(tr)) {
-	(void) fprintf(fd, " %s:%s", type_to_string(tr),
-		       basic_to_string(variable_basic(type_variable(type_varargs(tr)))));
+    else {
+      if(type_varargs_p(ta)) {
+	(void) fprintf(fd, " %s:", type_to_string(ta));
+	ta = type_varargs(ta);
+      }
+      (void) fprintf(fd, "%s", basic_to_string(variable_basic(type_variable(ta))));
     }
-    else
-	pips_error("fprint_functional", "Ill. type %d\n", type_tag(tr));
+    if(!ENDP(cp->cdr))
+      (void) fprintf(fd, " x ");
+  },
+       functional_parameters(f));
+
+  if(ENDP(functional_parameters(f))) {
+    (void) fprintf(fd, " ()");
+  }
+  (void) fprintf(fd, " -> ");
+
+  if(type_variable_p(tr))
+    (void) fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(tr))));
+  else if(type_void_p(tr))
+    (void) fprintf(fd, " %s\n", type_to_string(tr));
+  else if(type_varargs_p(tr)) {
+    (void) fprintf(fd, " %s:%s", type_to_string(tr),
+		   basic_to_string(variable_basic(type_variable(type_varargs(tr)))));
+  }
+  else
+    /* An argument can be functional, but not (yet) a result. */
+    pips_error("fprint_functional", "Ill. type %d\n", type_tag(tr));
 }
 
 void 
@@ -2178,8 +2196,9 @@ SafeFindOrCreateEntity(
 				type_undefined, storage_undefined, value_undefined);
 	    }
 	    else {
-		if(entity_is_argument_p(e, 
-					code_declarations(entity_code(get_current_module_entity())))) {
+	      if(!entity_undefined_p(get_current_module_entity())
+		 && entity_is_argument_p(fe, 
+					 code_declarations(entity_code(get_current_module_entity())))) {
 		    /* There is such a global variable and it is in the proper scope */
 		    e = fe;
 		}
