@@ -1,6 +1,9 @@
 #
+# $Id$
+#
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
+#
 
 LIB_CFILES =	replace.c \
 		loop_unroll.c \
@@ -20,7 +23,8 @@ LIB_CFILES =	replace.c \
 		use_def_elimination.c \
 		loop_normalize.c  \
 		declarations.c \
-		clone.c
+		clone.c \
+		forward_substitution.c
 
 LIB_HEADERS =	transformations-local.h
 
