@@ -1,5 +1,5 @@
 /* $RCSfile: prettyprint.c,v $ (version $Revision$)
- * $Date: 1996/06/22 10:32:10 $, 
+ * $Date: 1996/06/22 11:17:41 $, 
  *
  * (pretty)print of reductions.
  *
@@ -71,12 +71,11 @@ string reduction_operator_name(reduction_operator o)
     return strdup(reduction_operator_tag_name(reduction_operator_tag(o)));
 }
 
-/* returns a name of the reduction
+/* returns the name of the reduction (!!! not allocated)
  */
 string reduction_name(reduction r)
 {
-    return 
-	reduction_operator_tag_name(reduction_operator_tag(reduction_op(r)));
+    return reduction_operator_tag_name(reduction_tag(r));
 }
 
 /* allocates and returns a list of strings for reduction r
@@ -189,8 +188,7 @@ print_any_reductions(
 
     (void) make_text_resource(module_name, DBR_PRINTED_FILE, file_suffix, t);
 
-    /* ??? some bug some not investigated yet, memory leak...
-     * free_text(t); results in a coredup much latter on.
+    /* make_text_resource calls print_text which calls free_text on t!
      */
 
     reset_current_module_entity();
