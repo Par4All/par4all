@@ -478,6 +478,7 @@ pips_check_fortran(void)
 }
 
 #define suffix ".pips.o"
+#define DEFAULT_PIPS_FLINT "f77 -c -ansi"
 
 static void 
 check_fortran_syntax_before_pips(
@@ -487,11 +488,12 @@ check_fortran_syntax_before_pips(
     user_log("Checking Fortran syntax of %s\n", file_name);
 
     if (safe_system_no_abort(concatenate(
-	pips_flint? pips_flint: "f77 -c -ansi", " ", file_name, 
-	" -o ", file_name, suffix, " ; rm ", file_name, suffix, NULL)))
+	pips_flint? pips_flint: DEFAULT_PIPS_FLINT, " ", file_name, 
+	" -o ", file_name, suffix, " ; test -f ", file_name, suffix, 
+	" && rm ", file_name, suffix, NULL)))
 
-	/* the error is detected if rm cannot remove the file;-)
-	 * f77 is rather silent on errors...
+	/* f77 is rather silent on errors... which is detected if no
+	 * file was output as expected.
 	 */
 	pips_user_warning("\n\n\tFortran syntax errors in file %s!\007\n\n", 
 			  file_name);
