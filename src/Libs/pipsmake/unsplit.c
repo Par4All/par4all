@@ -7,6 +7,9 @@
  * generated, they should also be stored there. 
  * 
  * $Log: unsplit.c,v $
+ * Revision 1.5  1997/10/28 14:33:05  keryell
+ * Renamed basename and dirname as pips_basename and pips_dirname for OSF1.
+ *
  * Revision 1.4  1997/10/27 09:52:00  coelho
  * basename moved to misc.
  *
@@ -43,7 +46,7 @@ get_new_user_file(string dir_name, string user_file)
     if (s==HASH_UNDEFINED_VALUE) 
     {
 	FILE * tmp;
-	string name = basename(user_file, NULL);
+	string name = pips_basename(user_file, NULL);
 	s = strdup(concatenate(dir_name, "/", name, 0));
 	hash_put(user_files, user_file, s);
 	/* could check that the file does not exist...
