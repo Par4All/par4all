@@ -292,19 +292,11 @@ int ofl_ctrl;
 
 		sc = sc_variable_substitution_with_eq_ofl_ctrl(sc, eq, v, ofl_ctrl);
 		
+		
+		sc = sc_safe_normalize(sc);
 		if (sc_empty_p(sc))
 		    break;
-		
-		sc = sc_normalize(sc);
 
-		if (sc == NULL) { 
-		    /* returned by sc_normalize if sc is unfeasible */
-		    sc = sc_empty(base_sc);
-		    base_sc = NULL;
-		    break;
-		}
-
-		
 		/* v has been eliminated : remove it from pve */
 		if (pvr == NULL) /* v is the fisrt */
 		    pve = current_pv = current_pv->succ;
@@ -334,15 +326,10 @@ int ofl_ctrl;
 		break;
 	    }
 
-	    sc = sc_normalize(sc);
+	    sc = sc_safe_normalize(sc);
+	    if (sc_empty_p(sc))
+		break;
 	    
-	    if (sc == NULL) { 
-		/* returned by sc_normalize if sc is unfeasible */
-		sc = sc_empty(base_sc);
-		base_sc = NULL;
-		    break;
-	    }
-
 	    current_pv = current_pv->succ;
 	    
 
