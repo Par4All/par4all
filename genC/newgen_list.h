@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1995/12/14 17:26:55 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1996/06/22 10:33:51 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -96,6 +96,7 @@ extern gen_chunk *gen_find_if_from_end GEN_PROTO((bool (*)(), list ,
 extern gen_chunk *gen_find_tabulated GEN_PROTO(( char *, int )) ;
 extern list gen_filter_tabulated GEN_PROTO(( int (*)(), int )) ;
 extern void gen_free_list GEN_PROTO(( list )) ;
+extern void gen_full_free_list GEN_PROTO(( list ));
 extern list gen_last GEN_PROTO(( list )) ;
 extern int gen_length GEN_PROTO(( list )) ;
 extern int list_own_allocated_memory GEN_PROTO((list));
