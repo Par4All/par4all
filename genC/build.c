@@ -18,7 +18,11 @@
 /* build.c
 
    This file manages the building of the "data dictionary" (i.e. the Domains
-   table) and the generation of the specification file. */
+   table) and the generation of the specification file. 
+
+   $Id$
+
+*/
 
 #include <stdio.h>
 #include <string.h>
@@ -267,7 +271,7 @@ union domain *val ;
 	     (Read_spec_mode && val->ba.type == EXTERNAL_DT )) {
 	free( (char *)val ) ;
     }
-    else user( "Redeclaration skiped: <%s>\n", name ) ;
+    else user( "Redeclaration skipped: <%s>\n", name ) ;
 
     return( bp ) ;
 }
