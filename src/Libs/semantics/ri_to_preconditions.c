@@ -1516,7 +1516,8 @@ entity m;
 {
     transformer pre = transformer_identity();
     /* cons * effects_ = 
-	load_statement_cumulated_effects(code_statement(value_code(entity_initial(m)))); */
+	load_statement_cumulated_effects(
+           code_statement(value_code(entity_initial(m)))); */
     /* FI: to be recoded using a hash_map on one of value_mappings' hash
        tables or the argument field of m's intraprocedural transformer;
        statement s of module m could be passed as argument */
@@ -1528,12 +1529,13 @@ entity m;
 
     /* assume m is a module and value mappings for m are available */
 
-    /* FI: variables v initialized in a BLOCKDATA foo are not recognized because they
-     * are known as foo:v in the symbole table and not identified in the effects
-     * since a blockdata does not read or write any variable
+    /* FI: variables v initialized in a BLOCKDATA foo are not recognized 
+     * because they are known as foo:v in the symbole table and not 
+     * identified in the effects since a blockdata does not read or write any 
+     * variable 
      */
 
-    debug(8, "data_to_precondition", "begin for %s\n", module_local_name(m));
+    pips_debug(8, "begin for %s\n", module_local_name(m));
 
     /* look for entities with an integer initial value that are analyzed */
     MAPL(cef,
@@ -1556,6 +1558,46 @@ entity m;
     ifdebug(8) {
 	dump_transformer(pre);
 	debug(8, "data_to_precondition", "end for %s\n", module_local_name(m));
+    }
+
+    return pre;
+}
+
+/* a simpler remake of the previous one that wotks in all cases. FC.
+ */
+transformer 
+all_data_to_precondition(entity m)
+{
+    transformer pre = transformer_identity();
+    Pbase b = (Pbase) VECTEUR_NUL;
+
+    pips_debug(8, "begin for %s\n", module_local_name(m));
+
+    /* look for entities with an integer initial value. */
+    MAP(ENTITY, e,
+    {
+	value val = entity_initial(e);
+	if(value_constant_p(val) && constant_int_p(value_constant(val))) 
+	{
+	    int int_val = constant_int(value_constant(val));
+	    if(entity_has_values_p(e)
+	       && !base_contains_variable_p(b, (Variable) e)) 
+	    {
+		Pvecteur v = vect_new((Variable) e, VALUE_ONE);
+		vect_add_elem(&v, TCST, int_to_value(-int_val));
+		pre = transformer_equality_add(pre, v);
+		b = vect_add_variable(b, (Variable) e);
+	    }
+	}
+    },
+	code_declarations(entity_code(m)));
+
+    base_rm(b);
+    pips_assert("some transformer", pre != transformer_undefined);
+
+    ifdebug(8) {
+	dump_transformer(pre);
+	pips_debug(8, "end for %s\n", module_local_name(m));
     }
 
     return pre;
