@@ -36,12 +36,6 @@ transformer pre;
     return string_undefined;
 }
 
-/*
- * Modification : 92 08 26  Arnauld
- *
- * Now, the function also sorts entity_local_name .
- *
- */
 string arguments_to_string(string s, list args)
 {
     pips_internal_error("not implemenented anymore\n");
