@@ -1,0 +1,36 @@
+\documentstyle{article}
+
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\title{HPFC \\ (High Performance Fortran Compiler) \\ datastructure}
+\author{Fabien Coelho\\
+		\\
+        CRI, E'cole des mines de Paris}
+
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{{#2}}}
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section*{Introduction}
+  Ce document pre'sente tre`s bre`vement les domaines Newgen utilise's
+par le prototype de compilateur {\tt hpfc} pour de'crire les motifs de
+messages qui doivent e^tre e'change's.
+
+\domain{import entity from "ri.newgen"}
+\domain{import range from "ri.newgen"}
+
+\domain{external Pvecteur}
+
+\domain{message = array:entity x content:range* x neighbour:Pvecteur x dom:range*}
+
+  Un message concerne un des tableaux du programme ({\tt array:entity})
+et pour ce tableau, un morceau des de'clarations locales, ge'ne'ralement
+un bord ({\tt content:range*}). Le destinataire est de'crit relativement
+sous la forme de la de'signation d'un voisin dans le tableau de {\em
+processors} sur lequel est distribue' le tableau ({\tt
+neighbour:Pvecteur}), et concerne le domaine de {\em template} ({\tt
+domain:range*}). 
+
+\end{document}
