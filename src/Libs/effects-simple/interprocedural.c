@@ -909,7 +909,7 @@ simple_effects_forward_translation(
 
     pips_debug(4, "forward translation of %s call to %s\n",
 	       entity_name(get_current_module_entity()),
-	       callee);
+	       entity_name(callee));
 
     lr = real_simple_effects_forward_translation(callee, real_args, l_eff);
     lc = common_simple_effects_forward_translation(callee, l_eff);
