@@ -3,6 +3,9 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.65  1997/06/10 08:56:30  coelho
+ * *** empty log message ***
+ *
  * Revision 1.64  1997/04/17 11:46:54  coelho
  * io comms pvm -> runtime.
  *
@@ -241,14 +244,14 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* PVM types encoding for packing and unpacking
  */
-#define PVM_BYTE1	"BYTE1"
-#define PVM_INTEGER2	"INTEGER2"
-#define PVM_INTEGER4	"INTEGER4"
-#define PVM_REAL4	"REAL4"
-#define PVM_REAL8	"REAL8"
-#define PVM_COMPLEX8	"COMPLEX8"
-#define PVM_COMPLEX16	"COMPLEX16"
-#define PVM_STRING	"STRING"
+#define PVM_BYTE1	"HPFC BYTE1"
+#define PVM_INTEGER2	"HPFC INTEGER2"
+#define PVM_INTEGER4	"HPFC INTEGER4"
+#define PVM_REAL4	"HPFC REAL4"
+#define PVM_REAL8	"HPFC REAL8"
+#define PVM_COMPLEX8	"HPFC COMPLEX8"
+#define PVM_COMPLEX16	"HPFC COMPLEX16"
+#define PVM_STRING	"HPFC STRING"
 
 /********************************************************* COMMON VARIABLES */
 
