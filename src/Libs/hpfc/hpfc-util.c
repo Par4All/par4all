@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/07/23 19:03:47 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/09/16 15:54:09 $, )
  * version $Revision$
  */
 
@@ -633,6 +633,13 @@ int dim, *ptdim, *pa, *pb;
     pips_assert("distributed array", array_distributed_p(array));
     
     *ptdim = template_dimension_of_array_dimension(array, dim);
+
+    if (*ptdim==-1) /* replication */
+    {
+	*pa=0, *pb=0;
+	return;
+    }
+
     a = FindAlignmentOfTemplateDim(align_alignment(al), *ptdim);
 
     if (a==alignment_undefined)
