@@ -32,6 +32,8 @@
 #include "genC.h"
 #include "newgen_include.h"
 
+/* FC: formats are directly inlined in genClib...
+ */
 struct inlinable Inline[] = {
   {UNIT_TYPE_NAME, "U", "U", ":unit", "U"},
   {"bool", "1", "B%d", "newgen:gen-true", "~S"},
