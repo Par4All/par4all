@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.97  1998/12/30 14:28:41  irigoin
+ * Bug fix in process_thru_cpp()
+ *
  * Revision 1.96  1998/12/24 11:10:11  coelho
  * unlink zzz files.
  *
@@ -651,8 +654,8 @@ static bool pips_split_file(string name, string tempfile)
 
 /* default preprocessor and basic options
  */
-#define CPP_CPP			"cpp" /* alternative value: "gcc -E" */
-#define CPP_CPPFLAGS		" -P -C -D__PIPS__ -D__HPFC__ "
+#define CPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" or "fpp" */
+#define CPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
 
 static bool dot_F_file_p(string name)
 {
@@ -687,7 +690,7 @@ static string process_thru_cpp(string name)
 			    CPP_CPPFLAGS, cpp_options? cpp_options: "", 
 			    name, " > ", new_name, " 2> ", cpp_err, 
 			    " && cat ", cpp_err, 
-			    " && test -z ", cpp_err, 
+			    " && test ! -s ", cpp_err, 
 			    " && rm -f ", cpp_err, 0));
 
     return new_name;
