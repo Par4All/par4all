@@ -514,7 +514,7 @@ graph                   dup_dg;
  * program. The original code is prepared by the static_controlize
  * package. See its comments for more details.
  */
-void 	array_dfg( mod_name )
+boolean	array_dfg( mod_name )
 char* 	mod_name;
 {
   extern int	       	Gcount_re;
@@ -598,6 +598,8 @@ char* 	mod_name;
   reset_proper_effects_map();
   reset_current_module_entity();
   reset_current_module_statement();
+
+  return(TRUE);
 }
 
 /*=======================================================================*/
