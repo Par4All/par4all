@@ -55,7 +55,7 @@ void stf(char *mod_name)
     if (!(*tmpfile))
 	pips_error("stf","unable to make a temporary file\n");
 
-    status = system(concatenate("stf-module ",
+    status = safe_system_no_abort(concatenate("stf-module ",
 				db_get_current_program_directory(),
 				"/",
 				tmpmod,
@@ -65,8 +65,6 @@ void stf(char *mod_name)
 				" 2>&1 ",
 				NULL));
 
-    /* Retrieve the output status */
-    status = (status / 256) & 255;
     debug (9,"stf","status=%d\n",status);
 
     /* Print log info if any */
