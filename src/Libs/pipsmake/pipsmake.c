@@ -53,18 +53,18 @@
  * static functions 
  */
 static void update_preserved_resources();
-static void rmake();
-static void apply_a_rule();
-static void apply_without_reseting_up_to_date_resources();
+static bool rmake();
+static bool apply_a_rule();
+static bool apply_without_reseting_up_to_date_resources();
 static bool up_date_without_reseting_up_to_date_p();
-static void make_pre_transformation();
-static void make_required();
+static bool make_pre_transformation();
+static bool make_required();
 
 /*
  * Apply an instanciated rule with a given ressource owner 
  */
 
-static void apply_a_rule(oname, ru)
+static bool apply_a_rule(oname, ru)
 string oname;
 rule ru;
 {
@@ -76,8 +76,6 @@ rule ru;
     bool is_required;
     bool print_timing_p = get_bool_property("LOG_TIMINGS");
     bool check_res_use_p = get_bool_property("CHECK_RESOURCE_USAGE");
-    if (interrupt_pipsmake_asap_p())
-	return;
 
     MAPL(prr, {
 	rname = real_resource_resource_name(REAL_RESOURCE(CAR(prr)));
@@ -104,6 +102,7 @@ rule ru;
 
     for (pbm = builder_maps; pbm->builder_name != NULL; pbm++) {
 	if (same_string_p(pbm->builder_name, run)) {
+	    bool status;
 
 	    if (check_res_use_p)
 		init_resource_usage_check();
@@ -111,8 +110,10 @@ rule ru;
 	    if (print_timing_p)
 		init_log_timers();
 
-	    (*pbm->builder_func)(oname);
-	    
+	    status = (*pbm->builder_func)(oname);
+	    /* GO to soon ... */
+	    status = TRUE;
+	       
 
 	    if (print_timing_p) {
 		string time_with_io,io_time;
@@ -132,11 +133,15 @@ rule ru;
 
 	    update_preserved_resources(oname, ru);
 
-	    return;
+	    if (interrupt_pipsmake_asap_p())
+		return FALSE;
+
+	    return status;
 	}
     }
 
     pips_error("apply_a_rule", "could not find function %s\n", run);
+    return FALSE;		/* should never be here ... */
 }
 
 /* FI: make is very slow when interprocedural analyzes have been selected;
@@ -152,17 +157,21 @@ rule ru;
  */
 static set up_to_date_resources = set_undefined;
 
-void make(rname, oname)
+bool make(rname, oname)
 string rname, oname;
 {
+    bool status;
+
     debug_on("PIPSMAKE_DEBUG_LEVEL");
     debug(1, "make", "%s(%s) - requested\n", rname, oname);
+
+    pips_assert("make", set_undefined_p(up_to_date_resources));
 
     up_to_date_resources = set_make(set_pointer);
 
     dont_interrupt_pipsmake_asap();
 
-    rmake(rname, oname);
+    status = rmake(rname, oname);
 
     if ( signal_occured() ) {
 	accounting_signal();
@@ -175,18 +184,17 @@ string rname, oname;
 
     debug(1, "make", "%s(%s) - made\n", rname, oname);
     debug_off();
+
+    return status;
 }
 
-static void rmake(rname, oname)
+static bool rmake(rname, oname)
 string rname, oname;
 {
     resource res;
     rule ru;
-    
-    debug(2, "rmake", "%s(%s) - requested\n", rname, oname);
 
-    if (interrupt_pipsmake_asap_p())
-	return;
+    debug(2, "rmake", "%s(%s) - requested\n", rname, oname);
 
     /* do we have this resource in our database ? */
     res = db_find_resource(rname, oname);
@@ -196,7 +204,7 @@ string rname, oname;
 	if(set_belong_p(up_to_date_resources, (char *) res)) {
 	    debug(8, "rmake", "resource %s(%s) found in up_to_date\n",
 		  rname, oname);
-	    return;
+	    return TRUE;
 	}
     }
     
@@ -206,30 +214,24 @@ string rname, oname;
     }
 
     /* we recursively make the pre transformations */
-    (void) make_pre_transformation(oname, ru);
-
-    if (interrupt_pipsmake_asap_p())
-	return;
+    if (!make_pre_transformation(oname, ru))
+	return FALSE;
 
     /* we recursively make required resources */
-    make_required(oname, ru);
-
+    if (!make_required(oname, ru))
+	return FALSE;
 
     if (up_date_without_reseting_up_to_date_p (rname,oname)) {
 	
 	debug (8,"rmake",
-	       "Resource %s(%s) becomes up-to-date after applying pre-transformations and building required resources\n",
+	       "Resource %s(%s) becomes up-to-date after applying"
+	       "pre-transformations and building required resources\n",
 	       rname,oname);
     } else {
 
-	if (interrupt_pipsmake_asap_p())
-	    return;
-
 	/* we build the resource */
-	apply_a_rule(oname, ru);
-
-	if (interrupt_pipsmake_asap_p())
-	    return;
+	if (!apply_a_rule(oname, ru))
+	return FALSE;
 
 	/* set up-to-date all the produced resources for that rule */
 	MAPL(prr, {
@@ -247,57 +249,60 @@ string rname, oname;
 				up_to_date_resources, (char *) res);
 	    }
 	    else {
-		pips_error("rmake", "resource %s(%s) just built is not found!\n", rname, oname );
+		pips_error("rmake", 
+			   "resource %s(%s) just built is not found!\n",
+			   rname,
+			   oname);
 	    }
 	}, build_real_resources(oname, rule_produced(ru)));
     }
+    return TRUE;
 }
 
-void apply(pname, oname)
+bool apply(pname, oname)
 string pname, oname;
 {
+    bool status;
+
     debug_on("PIPSMAKE_DEBUG_LEVEL");
     debug(1, "apply", "%s.%s - requested\n", oname, pname);
+
+    pips_assert("apply", set_undefined_p(up_to_date_resources));
 
     up_to_date_resources = set_make(set_pointer);
 
     dont_interrupt_pipsmake_asap();
 
-    apply_without_reseting_up_to_date_resources (pname,oname);
+    status = apply_without_reseting_up_to_date_resources (pname,oname);
 
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
 
     debug(1, "apply", "%s.%s - done", oname, pname);
     debug_off();
+
+    return status;
 }
 
-static void apply_without_reseting_up_to_date_resources(pname, oname)
+static bool apply_without_reseting_up_to_date_resources(pname, oname)
 string pname, oname;
 {
     rule ru;
-    
+
     debug(2, "apply_without_reseting_up_to_date_resources",
 	  "apply %s on %s\n", pname, oname);
-
-    if (interrupt_pipsmake_asap_p())
-	return;
 
     /* we look for the rule describing this phase */
     if ((ru = find_rule_by_phase(pname)) == rule_undefined)
 	pips_error("apply", "could not find rule %s\n", pname);
 
-    (void) make_pre_transformation(oname, ru);
+    if (!make_pre_transformation(oname, ru))
+	return FALSE;
 
-    if (interrupt_pipsmake_asap_p())
-	return;
+    if (!make_required(oname, ru))
+	return FALSE;
 
-    make_required(oname, ru);
-
-    if (interrupt_pipsmake_asap_p())
-	return;
-
-    apply_a_rule (oname, ru);
+    return apply_a_rule (oname, ru);
 }
 
 /* this function returns the active rule to produce resource rname */
@@ -344,7 +349,8 @@ string rname;
 		    /* is this phase an active one ? */
 		    MAPL(pp, {
 			if (same_string_p(STRING(CAR(pp)), rule_phase(r))) {
-			    debug(5, "find_rule_by_resource", "active phase\n");
+			    debug(5, "find_rule_by_resource",
+				  "active phase\n");
 			    return(r);
 			}
 		    }, makefile_active_phases(m));
@@ -401,10 +407,12 @@ list lvr;
 	    for(i=0; i<nmodules; i++) {
 		string on = module_list[i];
 
-		if (entity_main_module_p(local_name_to_top_level_entity(on)) == TRUE)
+		if (entity_main_module_p
+		    (local_name_to_top_level_entity(on)) == TRUE)
 		{
 		    if (number_of_main)
-			pips_error("build_real_resources", "More the one main\n");
+			pips_error("build_real_resources",
+				   "More the one main\n");
 
 		    number_of_main++;
 		    debug(8, "build_real_resources", "Main is %s\n", on);
@@ -421,11 +429,11 @@ list lvr;
 	    callees called_modules;
 	    list lcallees;
 
-	    rmake(DBR_CALLEES, oname);
-
-	    if (interrupt_pipsmake_asap_p())
-		return result;
-
+	    if (!rmake(DBR_CALLEES, oname))
+		pips_error ("build_real_resources",
+			    "unable to build callees for %s\n",
+			    oname);
+	    
 	    called_modules = (callees) 
 		db_get_memory_resource(DBR_CALLEES, oname, TRUE);
 	    lcallees = callees_callees(called_modules);
@@ -451,10 +459,10 @@ list lvr;
 	    callees caller_modules;
 	    list lcallers;
 
-	    rmake(DBR_CALLERS, oname);
-
-	    if (interrupt_pipsmake_asap_p())
-		return result;
+	    if (!rmake(DBR_CALLERS, oname))
+		pips_error ("build_real_resources",
+			    "unable to build callers for %s\n",
+			    oname);
 
 	    caller_modules = (callees) 
 		db_get_memory_resource(DBR_CALLERS, oname, TRUE);
@@ -503,14 +511,11 @@ list lvr;
 }
 
 /* compute all pre-transformations to apply a rule on an object */
-static void make_pre_transformation(oname, ru)
+static bool make_pre_transformation(oname, ru)
 rule ru;
 string oname;
 {
     list reals;
-
-    if (interrupt_pipsmake_asap_p())
-	return;
 
     /* we build the list of pre transformation real_resources */
     reals = build_real_resources(oname, rule_pre_transformation(ru));
@@ -523,58 +528,57 @@ string oname;
 	/* actually the resource name is a phase name !! */
 	string rrpn = real_resource_resource_name(rr);
 
-	debug(3, "make_pre_transformation", "rule %s : applying %s to %s - recursive call\n",
+	debug(3, "make_pre_transformation",
+	      "rule %s : applying %s to %s - recursive call\n",
 	      rule_phase(ru),
 	      rrpn,
 	      rron);
 
-	apply_without_reseting_up_to_date_resources (rrpn, rron);
-
-	if (interrupt_pipsmake_asap_p())
-	    return;
+	if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
+	    return FALSE;
 
     }, reals);
-
+    return TRUE;
 }
 
 /* compute all resources needed to apply a rule on an object */
-static void make_required(oname, ru)
+static bool make_required(oname, ru)
 rule ru;
 string oname;
 {
     list reals;
+    bool status = TRUE;
 
     /* we build the list of required real_resources */
     reals = build_real_resources(oname, rule_required(ru));
 
-    if (!interrupt_pipsmake_asap_p()) {
-
-	/* we recursively make required resources */
-	MAPL(prr, {
-	    real_resource rr = REAL_RESOURCE(CAR(prr));
-
-	    string rron = real_resource_owner_name(rr);
-	    string rrrn = real_resource_resource_name(rr);
-
-	    debug(3, "make_required", "rule %s : %s(%s) - recursive call\n",
-		  rule_phase(ru),
-		  rrrn,
-		  rron);
-
-	    if (interrupt_pipsmake_asap_p())
-		break;
-
-	    (void) rmake(rrrn, rron);
-
-	    /* ici nous devons  tester si un des regles modified
-	       fait partie des required. Dans ce cas on la fabrique
-	       de suite. */
-
-	}, reals);
-    }
+    /* we recursively make required resources */
+    MAPL(prr, {
+	real_resource rr = REAL_RESOURCE(CAR(prr));
+	
+	string rron = real_resource_owner_name(rr);
+	string rrrn = real_resource_resource_name(rr);
+	
+	debug(3, "make_required", "rule %s : %s(%s) - recursive call\n",
+	      rule_phase(ru),
+	      rrrn,
+	      rron);
+	
+	if (!rmake(rrrn, rron)) {
+	    status = FALSE;
+	    /* Want to free the list ... */
+	    break;
+	}
+	
+	/* In french:
+	   ici nous devons  tester si un des regles modified
+	   fait partie des required. Dans ce cas on la fabrique
+	   de suite. */
+	
+    }, reals);
 
     gen_free_list (reals);
-    return;
+    return status;
 }
 
 static void update_preserved_resources(oname, ru)
@@ -620,6 +624,9 @@ string rname, oname;
     bool result;
 
     debug_on("PIPSMAKE_DEBUG_LEVEL");
+
+    pips_assert("real_resource_up_to_date_p",
+		set_undefined_p(up_to_date_resources));
 
     up_to_date_resources = set_make(set_pointer);
 
@@ -715,7 +722,8 @@ string rname, oname;
 		break;
 	    } else {
 		/* Check if this resource is up to date */
-		if (up_date_without_reseting_up_to_date_p(rrrn, rron) == FALSE) {
+		if (up_date_without_reseting_up_to_date_p(rrrn, rron)
+		    == FALSE) {
 		    debug(5, "up_date_without_reseting_up_to_date_p",
 			  "resource %s(%s) is not up to date", rrrn, rron);
 		    result = FALSE;
@@ -726,7 +734,8 @@ string rname, oname;
 		    debug(5, "up_date_without_reseting_up_to_date_p",
 			  "resource %s(%s) is newer (%ld < %ld)\n",
 			  rrrn, rron,
-			  (long) resource_time(res), (long) resource_time(resp));
+			  (long) resource_time(res),
+			  (long) resource_time(resp));
 		    result = FALSE;
 		    break;
 		}
@@ -821,3 +830,74 @@ string get_first_main_module()
 	return string_undefined;
     return name;
 }
+
+/*
+ * check the usage of resrouuuces 
+ */
+void do_resource_usage_check(string oname, rule ru)
+{
+    list reals;
+    set res_read = set_undefined;
+    set res_write = set_undefined;
+
+    /* Get the dbm sets */
+    get_logged_resources (&res_read, &res_write);
+
+    /* build the real required resrouces */
+    reals = build_real_resources(oname, rule_required (ru));
+
+    /* Delete then from the set of read resources */
+    MAPL(prr, {
+	real_resource rr = REAL_RESOURCE(CAR(prr));
+	string rron = real_resource_owner_name(rr);
+	string rrrn = real_resource_resource_name(rr);
+	string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
+
+	if (set_belong_p (res_read, elem_name)){
+	    debug (5, "do_resource_usage_check",
+		   "resource %s.%s has been read: ok\n",
+		   rron, rrrn);
+	    set_del_element(res_read, res_read, elem_name);
+	} else
+	    user_log ("resource %s.%s has not been read\n",
+		      rron, rrrn);
+    }, reals);
+
+    /* Try to find an illegally read resrouce ... */
+    SET_MAP(re,{
+	user_log ("resource %s has been read\n", re);
+    }, res_read);
+
+    gen_free_list(reals);
+
+    /* build the real produced resources */
+    reals = build_real_resources(oname, rule_produced (ru));
+
+    /* Delete then from the set of write resources */
+    MAPL(prr, {
+	real_resource rr = REAL_RESOURCE(CAR(prr));
+	string rron = real_resource_owner_name(rr);
+	string rrrn = real_resource_resource_name(rr);
+	string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
+
+	if (set_belong_p (res_write, elem_name)){
+	    debug (5, "do_resource_usage_check",
+		   "resource %s.%s has been written: ok\n",
+		   rron, rrrn);
+	    set_del_element(res_write, res_write, elem_name);
+	} else
+	    user_log ("resource %s.%s has not been written\n",
+		      rron, rrrn);
+    }, reals);
+
+    /* Try to find an illegally written resrouce ... */
+    SET_MAP(re,{
+	user_log ("resource %s has been written\n", re);
+    }, res_write);
+
+    gen_free_list(reals);
+
+    set_clear(res_read);
+    set_clear(res_write);
+}
+
