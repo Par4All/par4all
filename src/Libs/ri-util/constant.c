@@ -14,7 +14,8 @@ extern string make_entity_fullname();
   its name is "TOP-LEVEL:1". 
   this entity must exist because it is necessarily created by the parser.
 */
-entity find_entity_1()
+entity 
+find_entity_1()
 {
     entity e_1;
     string n_1 = make_entity_fullname(TOP_LEVEL_MODULE_NAME, "1");
@@ -29,7 +30,8 @@ entity find_entity_1()
 /*
   returns the integer constant expression of value 1.
 */
-expression make_expression_1()
+expression 
+make_expression_1()
 {
     entity e_1 = find_entity_1();
 
@@ -37,7 +39,8 @@ expression make_expression_1()
 			   normalized_undefined));
 }
 
-int DefaultLengthOfBasic(t)
+int 
+DefaultLengthOfBasic(t)
 tag t;
 {
 	int e=-1;
@@ -47,19 +50,19 @@ tag t;
 		e = 0;
 		break;
 	    case is_basic_int:
-		e = 4;
+		e = DEFAULT_INTEGER_TYPE_SIZE;
 		break;
 	    case is_basic_float:
-		e = 4;
+		e = DEFAULT_REAL_TYPE_SIZE;
 		break;
 	    case is_basic_logical:
-		e = 4;
+		e = DEFAULT_LOGICAL_TYPE_SIZE;
 		break;
 	    case is_basic_complex:
-		e = 8;
+		e = DEFAULT_COMPLEX_TYPE_SIZE;
 		break;
 	    case is_basic_string:
-		e = 1;
+		e = DEFAULT_CHARACTER_TYPE_SIZE;
 		break;
 	    default:
 		pips_error("DefaultLengthOfBasic", "case default\n");
@@ -69,23 +72,26 @@ tag t;
 	return(e);
 }
 
-/* this function creates a constant. a constant is represented in our
-internal representation by a function. its name is the name of the
+/* This function creates a constant. a constant is represented in our
+internal representation by a function. Its name is the name of the
 constant, its type is a functional that gives the type of the constant,
 its storage is rom.
 
-its initial value is the value of the constant. in case of integer
+Its initial value is the value of the constant. In case of integer
 constant, the actual value is stored (as an integer) in constant_int.
 values of other constants have to be computed with the name, if
 necessary.
 
 name is the name of the constant 12, 123E10, '3I12', ...
 
-basic is the basic type of the constant: int, float, ...  */
+basic is the basic type of the constant: int, float, ... 
+*/
 
-entity MakeConstant(name, bt)
-string name;
-tag bt;
+entity 
+make_constant_entity(
+    string name,
+    tag bt,
+    int size)
 {
     entity e;
 
@@ -102,7 +108,7 @@ tag bt;
 							   strlen(name))))));
 	}
 	else {
-	    be = make_basic(bt, DefaultLengthOfBasic(bt));
+	    be = make_basic(bt, size);
 	}
 
 	fe = make_functional(NIL, MakeTypeVariable(be, NIL));
@@ -120,8 +126,21 @@ tag bt;
     return(e);
 }
 
+entity 
+MakeConstant(name, bt)
+string name;
+tag bt;
+{
+    entity e;
+
+    e = make_constant_entity(name, bt, DefaultLengthOfBasic(bt));
+
+    return e;
+}
+
 /* make a complex constant from two calls to real or integer constants */
-entity MakeComplexConstant(r, i)
+entity 
+MakeComplexConstant(r, i)
 expression r;
 expression i;
 {
@@ -140,20 +159,23 @@ expression i;
 /* this function creates an integer constant and then a call to that
 constant. */
 
-expression MakeIntegerConstantExpression(s)
+expression 
+MakeIntegerConstantExpression(s)
 string s;
 {
     return(MakeNullaryCall(MakeConstant(s, is_basic_int)));
 }
 
-expression make_constant_boolean_expression(bool b)
+expression 
+make_constant_boolean_expression(bool b)
 {
     return MakeNullaryCall
         (MakeConstant(b ? TRUE_OPERATOR_NAME : FALSE_OPERATOR_NAME,
 		      is_basic_logical));
 }
 
-expression int_expr(i)
+expression 
+int_expr(i)
 int i;
 {
     /* What should be the length of buffer? */
@@ -164,7 +186,8 @@ int i;
 }
 
 /* (*int_p) gets integer constant if any */
-bool integer_constant_p(ent, int_p)
+bool 
+integer_constant_p(ent, int_p)
 entity ent;
 int *int_p;
 {
@@ -179,7 +202,8 @@ int *int_p;
 }
 
 /* (*int_p) gets integer constant if any */
-bool integer_symbolic_constant_p(ent, int_p)
+bool 
+integer_symbolic_constant_p(ent, int_p)
 entity ent;
 int *int_p;
 {
@@ -196,7 +220,8 @@ int *int_p;
 /* this function creates an character constant and then a call to that
 constant. */
 
-expression MakeCharacterConstantExpression(s)
+expression 
+MakeCharacterConstantExpression(s)
 string s;
 {
     return(MakeNullaryCall(MakeConstant(s, is_basic_string)));
@@ -206,7 +231,8 @@ string s;
 /* this function creates a value for a symbolic constant. the expression
 e *must* be evaluable. */
 
-value MakeValueSymbolic(e)
+value 
+MakeValueSymbolic(e)
 expression e;
 {
     symbolic s;
@@ -229,7 +255,8 @@ expression e;
 
 /* whether the given function is a constant expression, whatever the type.
  */
-bool expression_is_constant_p(expression e)
+bool 
+expression_is_constant_p(expression e)
 {
     syntax s = expression_syntax(e);
 
