@@ -1,0 +1,129 @@
+set -a
+# This file is used to set up *environment variables* for Pips.
+# Another set up file (pipsrc.csh) is automaticaly generated from this 
+# one. Thus, you should not do anything else as initializing shell 
+# variables.
+# If you add some variables, see at the end of the file.
+# run "Pips/make-pipsrc.csh" after modifying this file
+# Bug: EOL cannot be back-quoted (ie: definitions of variables on 
+#      more than one line makes errors).
+
+# A restricted version of this file should be defined for pips users.
+# Variables of interest: PIPSDIR (?), UTILDIR, BINDIR, LIBDIR, path and manpath
+
+# space for temporary files
+TEMPDIR="/tmp"
+
+# home directory for openwin (only used by the XView interface: wpips)
+OPENWINHOME="/usr/openwin"
+
+# home directories for external softwares
+LINEARDIR=/home/users/pips/C3/Linear
+NEWGENDIR=/home/users/pips/Newgen
+# An absolute file name is necessary for LISP
+LISP=/usr/local/bin/cl
+# Required by NewGen.
+NEWGEN_MAX_TABULATED_ELEMENTS=12007
+
+# Pips project sources and binaries
+PIPSDIR="/home/users/pips/Pips"
+
+# scripts and programs created to manage the project
+UTILDIR="${PIPSDIR}/Utilities"
+
+# empty string if make can be run in this environment
+# (else: error message)
+PIPS_CHECK_OS="`${UTILDIR}/check_os`"
+
+# current production version - sources and binaries
+PRODDIR="${PIPSDIR}/Production"
+
+# binaries
+BINDIR="${PRODDIR}/Bin"
+
+# libraries
+LIBDIR="${PRODDIR}/Lib"
+
+# complexity cost tables directory
+COSTDIR="${LIBDIR}/complexity"
+
+# sources
+SRCDIR="${PRODDIR}/Src"
+
+# sources of libraries
+LIBSRCDIR="${SRCDIR}/Lib"
+
+# sources of passes
+BINSRCDIR="${SRCDIR}/Passes"
+
+# headers
+INCLUDEDIR="${PRODDIR}/Include"
+
+# current development version - sources and binaries
+DEVEDIR="${PIPSDIR}/Development"
+
+# cri's libraries which are not part of Pips project
+EXTEDIR="${PIPSDIR}/Externals"
+
+# current demo version - binaries only
+RELEDIR="${PIPSDIR}/Release"
+
+# where documents are stored
+DOCDIR="${PIPSDIR}/Documentation"
+
+# where manl directory is (Pb: cannot be derived to cshrc)
+# MANPATH="${MANPATH}${MANPATH:+:}${DOCDIR}"
+MANPATH=`${UTILDIR}/newmanpath`
+
+# new command path
+PATH=${PATH}:${BINDIR}:${UTILDIR}:/usr5/gnu/bin-sparc
+
+#
+# PIPS default options for Unix software development tools
+#
+
+PIPS_AR="ar"
+PIPS_ARFLAGS="rv"
+# PIPS_CC="cc"
+#PIPS_CC="/usr5/gnu/bin-sparc/gcc"
+PIPS_CC="gcc"
+# For SUNOS' cc:
+# PIPS_CFLAGS="-pipe -temp=$TEMPDIR -g"
+# For GNU cc:
+PIPS_CFLAGS="-g -ansi -Wall"
+PIPS_CPPFLAGS="-I${INCLUDEDIR} -I${EXTEDIR}"
+# PIPS_LD="cc"
+# PIPS_LD="/usr5/gnu/bin-sparc/gcc"
+PIPS_LD="gcc"
+PIPS_LDFLAGS="-L. -L${LIBDIR} -L${EXTEDIR} -g"
+PIPS_LEX="lex"
+PIPS_LFLAGS=""
+PIPS_LINT="lint"
+PIPS_LINTFLAGS="-habxu"
+PIPS_YACC="yacc"
+PIPS_YFLAGS=""
+
+# FC 07/03/94
+# protoizer to be used by PIPS:
+PIPS_PROTOIZE="$UTILDIR/cproto"
+# to be switched to /usr5/gnu/bin-sparc/protoize...
+
+# list of PIPS libraries 
+
+# Warning: -lm and /usr/lib/debug/malloc are not given by the 
+# automatic generation
+# PIPS_LIBS=`analyze_libraries ;order_libraries; sed 's/^lib/ -l/;s/.a$//' </tmp/libs.o`
+
+# Dynamic memory allocation (last item in PIPS_LIBS):
+#  - debug malloc for SUNOS: /usr/lib/debug/malloc.o
+#  - public domain debug malloc: -ldbmalloc (implies a special "malloc.h" in
+# EXTEDIR)
+
+PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lgeneration -lprettyprint -lsyntax -latomizer -lpaf-util -lstatic_controlize -lregions -lcontrol -lsdfi -lsemantics -lrice -lricedg -leffects -lpipsdbm -ltransformer -lri-util -lproperties -ltext-util -lmisc -lproperties -lgenC -lplint -lmatrice  -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique -lreductions -lflint -lm /usr/lib/debug/malloc.o"
+		
+# file name in which pips current program is stored (for batch version).
+PIPS_CURRENT_PROGRAM=".pipsprogram"
+
+# To start wpips without problem
+# xhost +`hostname`
+
