@@ -43,7 +43,8 @@ open_log_file()
       
       if ((log_file = fopen(log_file_name, "a")) == NULL) {
          perror("open_log_file");
-         abort();
+	 user_error("open_log_file", "Cannot open log file in workspace %s. "
+		    "Check access rights.");
       }
    }
 }
