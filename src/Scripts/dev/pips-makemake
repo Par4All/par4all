@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/02 15:05:08 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/02 15:27:49 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -182,7 +182,7 @@ do
     echo make $MAKEFILE in $dir
     
     # needed because of f.. - in directory names...
-    dirname=`basename $PWD | sed 's,\-,_,g'`
+    dirname=`basename \`pwd\` | sed 's,\-,_,g'`
     
     if [ -f $MAKEFILE ] ; then
       cp $MAKEFILE $MAKEFILE.old
