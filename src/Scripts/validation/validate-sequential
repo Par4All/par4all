@@ -275,6 +275,17 @@ test_aspect()
 
      test -r $aspect/$name.f -o -r $aspect/$name.F || 
 	echo "! no $aspect/$name.[fF]"
+
+     #
+     # decompose...
+     if test -r $aspect/$name.f 
+     then 
+	ffile=$aspect/$name.f
+     else
+	ffile=$aspect/$name.F
+     endif
+
+     bfile=`basename $ffile`
      
      rm -f $tmpout $tmperr
 
@@ -344,7 +355,7 @@ test_aspect()
      if [ -f $aspect/default_tpips ]
      then
 	echo "testing with default_tpips" >> $tmperr
-	FILE=${file}
+	FILE=${ffile}
 	export FILE
 	WSPACE=${name}
 	export WSPACE
