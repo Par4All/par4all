@@ -1,10 +1,20 @@
+/* ========================================================================= */
+/*                       SIMPLEXE for integer variables                      */
+/*                            ALL-INTEGER METHODS                            */
+/*                             Jean Claude SOGNO                             */
+/*                     Projet CHLOE -- INRIA ROCQUENCOURT                    */
+/*                                Juin 1994                                  */
+/* ========================================================================= */
+
+/* ========================================================================= */
+/*                             Duong NGUYEN QUE                              */
+/*                 Adaption to abstract computation: janusvalue              */
+/*                               CRI-ENSMP                                   */
+/* ========================================================================= */
+
 #include <stdio.h>
 #include "rproblem.h"
-/* ============================================================== */
-/*                     METHODE DU SIMPLEXE                        */
-/*                      Jean Claude SOGNO                         */
-/*              INRIA ROCQUENCOURT  November 1997                 */
-/* ============================================================== */
+
 #define FT RR->ftrace
 #define TRACE RR->ntrace
 #define A(i,j) RR->a[i][j]
