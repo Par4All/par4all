@@ -812,7 +812,7 @@ statement stmt;
 if (instruction_tag(statement_instruction(stmt)) != is_instruction_block)
   {
   /* We create a new statement with an empty block of instructions.
-   * "make_empty_statement() is defined in Lib/ri-util, it creates a statement
+   * "make_empty_statement()" is defined in Lib/ri-util, it creates a statement
    * with a NIL instruction block. */
   statement block_stmt = make_empty_statement();
 
@@ -863,4 +863,78 @@ string statement_identification(statement s)
 	    instrstring);
 
     return buffer;
+}
+
+
+static string gather_all_comments_of_a_statement_string;
+
+
+static bool 
+gather_all_comments_of_a_statement_filter(statement s)
+{
+    string the_comments = statement_comments(s);
+    if (the_comments != NULL && !string_undefined_p(the_comments)) {
+	string old = gather_all_comments_of_a_statement_string;
+	gather_all_comments_of_a_statement_string =
+	    strdup(concatenate(old, the_comments, NULL));
+	free(old);
+    }
+    return TRUE;
+}
+
+
+/* Gather all the comments recursively found in the given statement
+   and return them in a string.
+
+   Do not forget to free the string returned later when no longer
+   used. */
+string
+gather_all_comments_of_a_statement(statement s)
+{
+    gather_all_comments_of_a_statement_string = strdup("");
+    gen_recurse(s, statement_domain,
+		gather_all_comments_of_a_statement_filter, gen_null);
+    return gather_all_comments_of_a_statement_string;
+}
+
+
+/* Append a comment string to the comments of a statement. */
+void
+append_comments_to_statement(statement s,
+			     string the_comments)
+{
+    string old = statement_comments(s);
+    
+    if (the_comments == NULL || string_undefined_p(the_comments))
+	/* Nothing to add... */
+	return;
+    
+    if (old == NULL || string_undefined_p(old))
+	/* There is no comment yet: */
+	statement_comments(s) = strdup(the_comments);
+    else {
+	statement_comments(s) = strdup(concatenate(old, the_comments, NULL));
+	free(old);
+    }
+}
+
+
+/* Insert a comment string at the beginning of the comments of a statement. */
+void
+insert_comments_to_statement(statement s,
+			     string the_comments)
+{
+    string old = statement_comments(s);
+
+    if (the_comments == NULL || string_undefined_p(the_comments))
+	/* Nothing to add... */
+	return;
+    
+    if (old == NULL || string_undefined_p(old))
+	/* There is no comment yet: */
+	statement_comments(s) = strdup(the_comments);
+    else {
+	statement_comments(s) = strdup(concatenate(the_comments, old, NULL));
+	free(old);
+    }
 }
