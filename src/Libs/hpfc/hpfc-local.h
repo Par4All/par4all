@@ -28,18 +28,6 @@
 #define HPFC_PACKAGE "HPFC-PACKAGE"
 
 /*
- * debug macro
- */
-#define IFDBPRINT(n, func, module, stat)                            \
-    ifdebug(n)                                                      \
-    {                                                               \
-       fprintf(stderr,                                              \
-	       "[%s] %s statement:\n",                              \
-	       func,entity_name(module));                           \
-       print_text(stderr,text_statement(module,0,stat));            \
-    }
-
-/*
  * Global variables
  */
 
