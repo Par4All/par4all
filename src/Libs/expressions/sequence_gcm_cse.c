@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.5  1999/05/12 12:24:39  zory
+   level of unknow entities changed !
+
    Revision 1.4  1999/01/08 17:29:45  zory
    level_atomization done
 
@@ -680,7 +683,7 @@ make_new_statement_for_level(entity operator,
 
 }
 
-#define LEVEL_OF_UNKNOWN_ENTITY 100
+#define LEVEL_OF_UNKNOWN_ENTITY 0
 
 /* 
    entity->int mapping...  
