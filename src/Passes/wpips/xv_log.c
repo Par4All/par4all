@@ -17,12 +17,12 @@
 
 #include "wpips.h"
 
-#define LOG_FILE "LOGFILE"
-/* Par de'faut, le fichier est ferme' : */
-FILE *log_file = NULL;
-
 static Textsw log_textsw;
 static Menu_item open_front, clear, close;
+
+#define LOG_FILE "LOGFILE"
+/* Par de'faut, le fichier est ferme' : */
+static FILE *log_file = NULL;
 
 
   void
