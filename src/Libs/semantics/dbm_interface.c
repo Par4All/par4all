@@ -32,6 +32,7 @@
 #include "pipsdbm.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
+#include "control.h"
 
 #include "misc.h"
 
@@ -194,7 +195,7 @@ char * module_name;
     }
 
     DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
-			   strdup(module_name), (char * )t);
+			   module_name, (char * )t);
 
     ifdebug(8) {
 	debug(8, "summary_precondition", 
@@ -252,7 +253,7 @@ char * module_name;
     }
 
     DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
-			   strdup(module_name), (char * )t);
+			   module_name, (char * )t);
 
     ifdebug(1) {
 	debug(1, "summary_precondition", 
@@ -312,8 +313,7 @@ char *module_name;
     /* compute intraprocedural transformer */
     t_intra = statement_to_transformer( get_current_module_statement() );
 
-    DB_PUT_MEMORY_RESOURCE(DBR_TRANSFORMERS, 
-			   strdup(module_name), 
+    DB_PUT_MEMORY_RESOURCE(DBR_TRANSFORMERS, module_name, 
 			   (char*) get_transformer_map() );  
 
     /* FI: side effect; compute and store the summary transformer, because
@@ -328,7 +328,7 @@ char *module_name;
 		   "Non-consistent summary transformer\n");
     }
     DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_TRANSFORMER, 
-			   strdup(module_local_name( get_current_module_entity() )), 
+			   module_local_name(get_current_module_entity()), 
 			   (char*) t_inter);
     debug(8,"module_name_to_transformers","t_inter=%x\n", t_inter);
 
@@ -462,7 +462,9 @@ char *module_name;
     /* debug_on(SEMANTICS_DEBUG_LEVEL); */
 
     /* propagate the module precondition */
+    init_reachable(get_current_module_statement());
     post = statement_to_postcondition(pre, get_current_module_statement() );
+    close_reachable();
 
     /* post could be stored in the ri for later interprocedural uses
        but the ri cannot be modified so early before the DRET demo;
@@ -470,7 +472,7 @@ char *module_name;
        postconditions upwards in the call tree */
 
     DB_PUT_MEMORY_RESOURCE(DBR_PRECONDITIONS, 
-			   strdup(module_name), 
+			   module_name, 
 			   (char*) get_precondition_map() );
 
     pips_debug(8, "postcondition computed for %s\n", 
@@ -573,7 +575,7 @@ transformer t;
     }
 
     DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
-			   strdup(module_local_name(e)), 
+			   module_local_name(e), 
 			   (char*) t_new );
 
     ifdebug(8) {
