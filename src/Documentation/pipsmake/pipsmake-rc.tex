@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.4  2002/09/26 14:55:14  nguyen
+%% Modification of array resizing statistic
+%%
 %% Revision 1.3  2002/07/22 19:09:54  phamdat
 %% MODULE.proper_effects added to input of impact_check
 %%
@@ -480,7 +483,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2002/07/22 19:09:54 $~$
+$~$Date: 2002/09/26 14:55:14 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -3969,6 +3972,7 @@ assumed-size A(,*) array declarators as well as other information.
 alias array_resizing_statistic 'Array Resizing Statistic'
 array_resizing_statistic   > MODULE.code
         < PROGRAM.entities 
+        < MODULE.code
 \end{verbatim}
 
 %-----------End of Declaration Transformations -------------------------
@@ -6148,7 +6152,7 @@ alias   print_whole_dependence_graph        'All arcs'
 alias   print_chains_graph                  'Chains'
 alias   print_filtered_dependence_graph     'Filtered Arcs'
 alias   print_filtered_dependence_daVinci_graph   'Filtered Arcs Output to daVinci'
-alias	impact_check                        'Check alias impact'
+alias   impact_check                        'Check alias impact'
 \end{verbatim}
 
 \subsubsection{Effective Dependence Graph View}
@@ -6228,12 +6232,12 @@ Check impact of alias on the dependance graphe
 %%ÿUserManualDocumentation
 
 \begin{verbatim}
-impact_check	> MODULE.code
+impact_check    > MODULE.code
         < PROGRAM.entities 
         < MODULE.alias_associations
         < MODULE.cumulated_effects
-	< MODULE.dg
-	< MODULE.proper_effects
+        < MODULE.dg
+        < MODULE.proper_effects
         < ALL.code
 \end{verbatim}
 
