@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1997/01/07 11:17:19 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1997/01/14 13:35:48 $, )
  * version $Revision$,
  */
 
@@ -565,6 +565,7 @@ static RunTimeSupportDescriptor RTSTable[] =
     { INIT_NODE, 	0, is_sub, no_basic, no_entity },
     { HOST_END, 	0, is_sub, no_basic, no_entity },
     { NODE_END, 	0, is_sub, no_basic, no_entity },
+    { HPFC_STOP,	0, is_sub, no_basic, no_entity },
     { LOOP_BOUNDS, 	0, is_sub, no_basic, no_entity },
     { SYNCHRO, 		0, is_sub, no_basic, no_entity },
     { SND_TO_N, 	0, is_sub, no_basic, no_entity },
