@@ -2,11 +2,14 @@
  * and in the static area and in the dynamic area. The heap area is left
  * aside.
  *
- * 	%A% ($Date: 1998/10/14 06:47:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+ * 	%A% ($Date: 2001/03/20 14:36:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: equivalence.c,v $
+ * Revision 1.21  2001/03/20 14:36:38  irigoin
+ * Test for user error added in MakeEquivAtom() for Nga
+ *
  * Revision 1.20  1998/10/14 06:47:12  irigoin
  * Same bug again, a bit further down in ComputeAddresses()
  *
@@ -21,7 +24,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1998/10/14 06:47:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 2001/03/20 14:36:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -112,6 +115,12 @@ syntax s;
     }
 
     e = reference_variable(r);
+
+    if(!storage_undefined_p(entity_storage(e)) && formal_parameter_p(e)) {
+      pips_user_warning("Formal parameter %s appears in EQUIVALENCE declaration\n",
+			entity_local_name(e));
+	    ParserError("MakeEquivAtom", "Formal parameter in equivalence chain\n");
+    }
 
     /* what is the offset of this reference ? */
     o = so + OffsetOfReference(r);
