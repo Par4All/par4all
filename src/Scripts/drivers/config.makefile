@@ -15,7 +15,7 @@ SCRIPTS =	Display \
 
 SOURCES =	$(SCRIPTS)
 
-INSTALL_SHR=	$(SCRIPTS)
+INSTALL_SHR =	$(SCRIPTS)
 
 # that is all
 #
