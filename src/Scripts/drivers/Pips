@@ -1,14 +1,13 @@
 #! /bin/sh
 #
-#
-# SCCS stuff:
-#
 # $Id$
 #
 
 # Test function
 
 pips_prgm=${pips_prgm:-.pipsprogram}
+
+unset OPT_PGM SOURCE_FILES SELECT_RULES OPT_MOD USING_RULE BUILD_RES
 
 check () 
 { 
