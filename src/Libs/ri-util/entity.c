@@ -647,7 +647,13 @@ common_members_of_module(
 	if (ram_function(r)==module)
 	{
 	    int offset = ram_offset(r);
-	    int size = SizeOfArray(v);
+	    int size = 0;
+
+	    if(!SizeOfArray(v, &size)) {
+		pips_error("common_members_of_module",
+			   "Varying size array \"%s\"\n", entity_name(v));
+	    }
+
 	    if (cumulated_offset==offset || !only_primary)
 		result = CONS(ENTITY, v, result);
 	    else 
