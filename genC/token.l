@@ -33,7 +33,7 @@
 #undef yywrap
 #endif
 
-extern int Current_start, Current_first, Current_index ;
+extern int Current_start, /* Current_first, */ Current_index ;
 
 #ifdef FLEX_SCANNER
 
@@ -120,10 +120,6 @@ x			{return AND ;}
                         Current_start = 
                              atoi( yytext+strlen( "--NEWGEN-START " )) ;
 			}
-^--NEWGEN-FIRST\ [0-9]*\n {
-                        Current_first = 
-                             atoi( yytext+strlen( "--NEWGEN-FIRST " )) ;
-                        }
 ^--NEWGEN-INDEX\ [0-9]*\n {
                         Current_index = 
                              atoi( yytext+strlen( "--NEWGEN-INDEX " )) ;
