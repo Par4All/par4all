@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/29 14:06:06 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/29 15:05:08 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -150,7 +150,7 @@ WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib -static'
 #           #    #         ###   #        #####
 # Settings added for TPIPS (used for tpips and ttest)
 
-WPIPS_ADDED_LIBS='-lreadline -ltermcap'
+TPIPS_ADDED_LIBS='-lreadline -ltermcap'
 
 #
 # 
