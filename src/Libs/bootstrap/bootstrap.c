@@ -1994,8 +1994,6 @@ typing_function_conversion_to_complex(call c, type_context_p context)
     {
       call_arguments(c) = call_arguments(syntax_call(ss));
       context->number_of_conversion++;
-      return make_basic_complex(8);
-      //return typing_function_conversion_to_complex(c, context);
     }
     else /* Argument is a varibale */
     {
@@ -2030,8 +2028,6 @@ typing_function_conversion_to_dcomplex(call c, type_context_p context)
     {
       call_arguments(c) = call_arguments(syntax_call(ss));
       context->number_of_conversion++;
-      return make_basic_complex(16);
-      //return typing_function_conversion_to_dcomplex(c, context);
     }    
     else /* Argument is a varibale */
     {
@@ -2956,52 +2952,18 @@ check_close(call c, type_context_p context)
 static basic
 check_inquire(call c, type_context_p context)
 {
-  string spec;
   list args = call_arguments(c);
 
-  for (; args; args = CDR(CDR(args)))
-  {
-    expression specifier = EXPRESSION(CAR(args));
-    expression cont = EXPRESSION(CAR(CDR(args)));
-    
-    syntax s = expression_syntax(specifier);
-    pips_assert("Specifier must be a call with arguments", 
-		!syntax_call_p(s) || !call_arguments(syntax_call(s)));
-    
-    spec = entity_local_name(call_function(syntax_call(s)));
-    /* INQUIRE by unit statement */
-    if ((strcmp(spec, "UNIT=") == 0) && cont)
-    {
-      check_io_list(args, context,
-		    /* UNIT FMT REC IOSTAT ERR END IOLIST */
-		    TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
-		    /* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
-		    FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-		    /* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
-		    TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-		    /* UNFORMATTED NEXTREC */
-		    TRUE, TRUE);
-      return basic_undefined;
-    }
-    /* INQUIRE by file statement */
-    else if ((strcmp(spec, "FILE=") == 0) && cont)
-    {
-      check_io_list(args, context,
-		    /* UNIT FMT REC IOSTAT ERR END IOLIST */
-		    FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
-		    /* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
-		    TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-		    /* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
-		    TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-		    /* UNFORMATTED NEXTREC */
-		    TRUE, TRUE);
-      return basic_undefined;
-    }
-  }
+  check_io_list(args, context,
+		/* UNIT FMT REC IOSTAT ERR END IOLIST */
+		TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+		/* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
+		TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+		/* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
+		TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+		/* UNFORMATTED NEXTREC */
+		TRUE, TRUE);
 
-  pips_assert("INQUIRE must contain exactly one unit or one file specifier", 
-	      TRUE);
-    
   return basic_undefined;
 }
 
@@ -3343,6 +3305,7 @@ simplification_conversion(expression exp, basic to_basic,
   call c = syntax_call(expression_syntax(exp));
   arg = EXPRESSION(CAR(call_arguments(c)));
   s_arg = expression_syntax(arg);
+  /* Argument is a variable */
   if (syntax_reference_p(s_arg))
   {
     /* e.g: INT(I) -> I */
@@ -3389,6 +3352,7 @@ simplification_conversion(expression exp, basic to_basic,
       context->number_of_simplication++;
     }
   }
+  /* Argument is a call */
   else if(syntax_call_p(s_arg))
   {
     b = GET_TYPE(context->types, arg);
