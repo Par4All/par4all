@@ -54,6 +54,39 @@ static vertex *Stack;
 static sccs Components;
 
 
+/*
+  list of drivers functions used bt the SCC module 
+*/
+
+static bool (*ignore_this_vertex_drv)(set, vertex) = 0;
+static bool (*ignore_this_successor_drv)(vertex, set, successor, int) = 0;
+
+
+
+/*
+  drivers initialisation 
+*/
+
+void set_sccs_drivers(ignore_this_vertex_fun, ignore_this_successor_fun)
+bool (*ignore_this_vertex_fun)(set, vertex);
+bool (*ignore_this_successor_fun)(vertex, set, successor, int);
+{
+  pips_assert( "ignore_this_vertex_drv is set", ignore_this_vertex_drv == 0 ) ;
+  pips_assert( "ignore_this_successor_drv is set", ignore_this_successor_drv == 0 ) ;
+  
+  ignore_this_vertex_drv = ignore_this_vertex_fun;
+  ignore_this_successor_drv = ignore_this_successor_fun;
+} 
+
+void reset_sccs_drivers()
+{
+  pips_assert( "ignore_this_vertex_drv is not set", ignore_this_vertex_drv != 0 ) ;
+  pips_assert( "ignore_this_successor_drv is not set", ignore_this_successor_drv != 0 ) ;
+  ignore_this_vertex_drv = 0;
+  ignore_this_successor_drv = 0;
+}
+
+
 
 /*
 LowlinkCompute is the main function. its behavior is explained in the
@@ -90,10 +123,10 @@ int level;
     MAPL(ps, {
 	successor su = SUCCESSOR(CAR(ps));
 
-	if (! ignore_this_successor(region, su, level)) {
+	if (! ignore_this_successor_drv(v,region, su, level)) {
 	    vertex s = successor_vertex(su);
 
-	    if (! ignore_this_vertex(region, s)) {
+	    if (! ignore_this_vertex_drv(region, s)) {
 		dg_vertex_label dsl = (dg_vertex_label) vertex_vertex_label(s);
 		sccflags fs = dg_vertex_label_sccflags(dsl);
 		statement ss = 
@@ -160,77 +193,6 @@ vertex v;
 
 
 /* 
-this function checks if a vertex v should be ignored, i.e. does not
-belong to region
-*/
-bool ignore_this_vertex(region, v)
-set region;
-vertex v;
-{
-    dg_vertex_label dvl = (dg_vertex_label) vertex_vertex_label(v);
-    statement st = ordering_to_statement(dg_vertex_label_statement(dvl));
-
-    return(! set_belong_p(region, (char *) st));
-}
-
-
-
-/*
-this function checks if a successoressor su of a vertex should be ignored,
-i.e.  if it is linked through an arc whose level is less than 'level' or
-if it does not belong to region
-*/
-bool ignore_this_successor(region, su, level)
-set region;
-successor su;
-int level;
-{
-    if (ignore_this_vertex(region, successor_vertex(su)))
-	return(TRUE);
-
-    return(ignore_this_level((dg_arc_label) successor_arc_label(su), level));
-}
-
-
-
-/* 
-this function checks if a successor su of a vertex is accessible
-through an arc whose level is less than 'level'
-
-dal is the arc label
-
-level is the minimum level
-*/
-bool ignore_this_level(dal, level)
-dg_arc_label dal;
-int level;
-{
-    bool true_dep = get_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY" ) ;
-
-    MAPL(pc, {
-	conflict c = CONFLICT(CAR(pc));
-
-	if( conflict_cone(c) != cone_undefined ) {
-	    MAPL(pi, {
-		if( INT(CAR(pi)) >= level ) {
-		    if( true_dep ) {
-			action s = effect_action( conflict_source( c )) ;
-			action k = effect_action( conflict_sink( c )) ;
-
-			return( action_write_p( s ) && action_read_p( k )) ;
-		    } 
-		    else {
-			return(FALSE);
-		    }
-		}, cone_levels(conflict_cone(c)));
-	     }
-	}
-    }, dg_arc_label_conflicts(dal));
-    
-    return(TRUE);
-}
-
-/* 
 FindSccs is the interface function to compute the SCCs of a graph. It
 marks all nodes as 'not visited' and then apply the main function
 LowlinkCompute on all vertices. 
@@ -251,6 +213,7 @@ int level;
     cons *vertices = graph_vertices(g);
     cons *pv;
 
+
     Count = 1;
     StackPointer = 0;
     Stack = (vertex *) malloc(sizeof(vertex) * gen_length(vertices));
@@ -258,7 +221,7 @@ int level;
 	
     for (pv = vertices; pv != NIL; pv = CDR(pv)) {
 	vertex v = VERTEX(CAR(pv));
-	if (! ignore_this_vertex(region, v)) {
+	if (! ignore_this_vertex_drv(region, v)) {
 	    dg_vertex_label lv = (dg_vertex_label) vertex_vertex_label(v);
 	    sccflags fv = dg_vertex_label_sccflags(lv);
 	    
@@ -268,7 +231,7 @@ int level;
 
     MAPL(pv, {
 	vertex v = VERTEX(CAR(pv));
-	if (! ignore_this_vertex(region, v))
+	if (! ignore_this_vertex_drv(region, v))
 	    if (MARKED_NEW_P(v)) {
 		LowlinkCompute(g, region, v, level);
 	    }
@@ -295,11 +258,11 @@ int l;
     MAPL(pv, {
 	vertex v = VERTEX(CAR(pv));
 
-	if (! ignore_this_vertex(region, v)) {
+	if (! ignore_this_vertex_drv(region, v)) {
 	    scc sv = VERTEX_ENCLOSING_SCC(v);
 	    MAPL(ps, {
 		successor su = SUCCESSOR(CAR(ps));
-		if (! ignore_this_successor(region, su, l)) {
+		if (! ignore_this_successor_drv(v,region, su, l)) {
 		    vertex s = successor_vertex(su);
 		    scc ss = VERTEX_ENCLOSING_SCC(s);
 		    if (sv != ss)
@@ -339,10 +302,10 @@ int l;
 	    scc sv = VERTEX_ENCLOSING_SCC(v);
 	    MAPL(ps, {
 		successor su = SUCCESSOR(CAR(ps));
-		if (! ignore_this_successor(region, su, l)) {
+		if (! ignore_this_successor_drv(v,region, su, l)) {
 		    vertex s = successor_vertex(su);
 		    scc ss = VERTEX_ENCLOSING_SCC(s);
-		    if (! ignore_this_vertex(region, s)) {
+		    if (! ignore_this_vertex_drv(region, s)) {
 			if (sv != ss) {
 			    if ((scc_indegree(ss) -= 1) == 0) {
 				no_ins = CONS(SCC, ss, no_ins);
@@ -375,6 +338,10 @@ int l;
 
 
 
+/*
+  Don't forget to set the drivers before the call of this function and to
+  reset after!
+ */
 cons *FindAndTopSortSccs(g, region, l)
 graph g;
 set region;
