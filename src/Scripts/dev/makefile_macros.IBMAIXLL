@@ -1,13 +1,20 @@
 #
-# $RCSfile: makefile_macros.IBMAIXLL,v $ (version $Revision$)
-# $Date: 1996/09/21 17:58:46 $, 
+# $Id$
+#
+# $Log: makefile_macros.IBMAIXLL,v $
+# Revision 1.2  1997/03/26 14:12:01  coelho
+# RCS headers and clearer.
+#
 #
 # this file contains macro definitions 
 
 include $(ROOT)/Include/makefilemacros.IBMAIX
 
 CFLAGS	+= -qlonglong 
-CPPFLAGS+= -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
 
-# end of $RCSfile: makefile_macros.IBMAIXLL,v $
+CPPFLAGS+= 	-DLINEAR_VALUE_IS_LONGLONG \
+		-DLINEAR_VALUE_PROTECT_MULTIPLY \
+		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
+
+# end of it!
 #
