@@ -19,7 +19,7 @@
 #include "text-util.h"
 #include "text.h"
 #include "properties.h"
-#include "effects.h"
+#include "effects-generic.h"
 #include "transformer.h"
 #include "semantics.h"
 
