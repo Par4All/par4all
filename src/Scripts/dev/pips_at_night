@@ -100,8 +100,11 @@ makeit()
 
     for a in "$@" ; do
 	${debug} "makeit: Making $targets in $name ARCH=$a (`pwd`)"
+        [ "${debug}" = : ] || set -x
 	make-pips -k${vopt} -$what -o $summary -m $a ARCH=$a $targets \
 		    2>> $detailed > /dev/null
+        [ "${debug}" = : ] || set +x
+     
     done
 
     cat $summary >> $report
