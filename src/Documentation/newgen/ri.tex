@@ -2,6 +2,10 @@
 %% $Id$
 %%
 %% $Log: ri.tex,v $
+%% Revision 1.69  2003/07/22 11:17:49  nguyen
+%% Remove signed, unsigned and char from basic types.
+%% Add expression to value to handle C initializations
+%%
 %% Revision 1.68  2003/06/18 15:39:05  nguyen
 %% Correct the forloop declaration
 %%
@@ -503,7 +507,7 @@ nom '*D*' est utilisée pour les tableaux de taille non définie
 \index{Basic}\index{Integer}\index{Real}\index{Complex}
 \index{Character}\index{Overloaded}\index{Logical}
 
-\domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value + signed:int + unsigned:int + char:int + bit:int + pointer:type + derived:entity + typedef:entity}
+\domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value + bit:int + pointer:type + derived:entity + typedef:entity}
 
 Type {\tt basic} is used to store basic type information such has {\tt
 REAL} or {\tt INTEGER}. Each member includes a precision information,
@@ -766,7 +770,7 @@ Le premier parame`tre a un rang de 1 et non de 0.
 \label{subsection-value}
 \index{Value}
 
-\domain{Value = code + symbolic + constant + intrinsic:unit + unknown:unit}
+\domain{Value = code + symbolic + constant + intrinsic:unit + unknown:unit + expression}
 {}
 
 Type \verb/value/ is used to store initial values of all kinds of
