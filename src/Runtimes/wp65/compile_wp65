@@ -1,69 +1,93 @@
-#! /bin/csh -f
+#! /bin/sh
 #
 # $RCSfile: compile_wp65,v $ (version $Revision$)
-# $Date: 1995/08/09 08:38:13 $, 
+# $Date: 1995/09/19 22:28:02 $, 
+#
+# from csh to sh, FC 19/09/95
 #
 
-if ($#argv == 0) then
-	cat << USAGE
+unset erreur
 
- $0 <fichier1.f> [<fichier2.f>] :
-	Utilisation : compile un (PE & mémoire) ou 2 fichiers (un pour le banc
-	et un pour le PE) générés par PIPS WP65.
+#
+# Ronan checks that everything is okay! (I agree:-)
+# He could have written everything in English instead of French...
+
+[ $# -eq 0 ] &&
+{
+  cat << USAGE
+  
+  $0 <fichier1.f> [<fichier2.f>] :
+
+  Utilisation : compile un (PE & mémoire) ou 2 fichiers (un pour le banc
+  et un pour le PE) générés par PIPS WP65.
+USAGE
+
+  exit 1
+}
+
+[ "$PVM_ROOT" ] ||
+{
+  cat << USAGE
+
+  Penser à initialiser la variable PVM_ROOT avant de lancer
+  le programme compilé...
 
 USAGE
-	exit 1
-endif
+  erreur=1
+}
 
-if ($?PVM_ROOT == 0) then
-	cat << USAGE
+[ "$PVM_ARCH" ] ||
+{
+  cat << USAGE
 
-	Penser à initialiser la variable PVM_ROOT avant de lancer
-	le programme compilé...
-
-USAGE
-	set erreur
-endif
-
-
-if ($?PVM_ARCH == 0) then
-	cat << USAGE
-
-	Avez-vous fait un « source \$PVM_ROOT/lib/cshrc.stub » 
-	dans votre environnement ?
-	Pensez à mettre aussi « \$PVM_ROOT/lib » dans votre chemin d'accès
-	si ce n'est pas déjà fait.
+  Avez-vous fait un « source \$PVM_ROOT/lib/cshrc.stub » 
+  dans votre environnement ?
+  Pensez à mettre aussi « \$PVM_ROOT/lib » dans votre chemin d'accès
+  si ce n'est pas déjà fait.
 
 USAGE
- 	set erreur
-endif
+  erreur=1
+}
 
-if ($?erreur == 1) exit 1
+[ "$erreur" ] && exit 1
 
-make -f $PIPS_EXTEDIR/Makefile.compile_wp65 SOURCES.f="$argv" CIBLE.f="$1"
+#
+# Let's compile
+#
+# stop on errors
 
-if ($status == 0) then
-	cat << USAGE
+TMP=wp65_tmp_$$.f
 
-	Vous pouvez lancer pvm dans une fenêtre si ce n'est pas déjà fait 
-	et lancer votre programme « `echo $1 | sed 's/.f\$//'` ».
+sed 's,DOALL ,DO ,' "$@" > $TMP
+make -f $PIPS_EXTEDIR/Makefile.compile_wp65 SOURCES.f="$TMP" CIBLE.f="$1"
 
-	Dans le shell pvm,
-	- « add » permet de rajouter une liste une machines ;
-	- « conf » affiche les machines utilisées ;
-	- « ps -a » affiche les processus en cours ;
-	- « reset » arrête les processus en cours ;
-	- « quit » sort du shell pvm mais laisse pvmd tourner ainsi que
-		les processus. On y revient en relançant pvm.
-	- « halt » fait le ménage complet.
+# hmmm...
+# it seems that the status does not work, i.e. make does not forward the error?
+status=$?
 
-	Pour mettre au point, utilisez la variable LANCEWP65_DEBUG_LEVEL
-	avec comme valeur :
-	2 : affiche les tids des processus lancés ;
-	3 : ouvre autant de xterm avec gdb que de processus ;
-	4 : affiche les messages échangés entre bancs et PEs ;
-	5 : idem que 4 avec les tids en plus et les morceaux de message.
+rm -f $TMP
+
+[ "$status" -eq 0 ] ||
+{
+  cat << USAGE
+
+Vous pouvez lancer pvm dans une fenêtre si ce n'est pas déjà fait 
+et lancer votre programme « `echo $1 | sed 's/.f\$//'` ».
+
+Dans le shell pvm,
+ - « add » permet de rajouter une liste une machines ;
+ - « conf » affiche les machines utilisées ;
+ - « ps -a » affiche les processus en cours ;
+ - « reset » arrête les processus en cours ;
+ - « quit » sort du shell pvm mais laisse pvmd tourner ainsi que
+   les processus. On y revient en relançant pvm.
+ - « halt » fait le ménage complet.
+
+ Pour mettre au point, utilisez la variable LANCEWP65_DEBUG_LEVEL
+ avec comme valeur :
+   2 : affiche les tids des processus lancés ;
+   3 : ouvre autant de xterm avec gdb que de processus ;
+   4 : affiche les messages échangés entre bancs et PEs ;
+   5 : idem que 4 avec les tids en plus et les morceaux de message.
 USAGE
-endif
-	
-
+}
