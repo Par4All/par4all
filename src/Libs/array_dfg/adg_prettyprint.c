@@ -126,7 +126,7 @@ graph obj;
 
 
 /*============================================================================*/
-void print_array_dfg( module_name )
+boolean print_array_dfg( module_name )
 string module_name;
 {
   FILE    	*fd = NULL;
@@ -149,6 +149,8 @@ string module_name;
   
   DB_PUT_FILE_RESOURCE(DBR_ADFG_FILE, strdup(module_name), filename);
   debug_off();
+
+  return(TRUE);
 }
 
 /*============================================================================*/
