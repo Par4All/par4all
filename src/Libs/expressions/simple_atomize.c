@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1995/05/19 17:23:12 $, 
+ * $Date: 1995/05/19 19:52:25 $, 
  */
 
 #include <stdio.h>
@@ -35,8 +35,7 @@ extern int fprintf();
  *   of which should be t.
  */
 
-static void compute_all_indices_in_statement(statement);
-static void compute_all_indices_in_simple_obj(gen_chunk *);
+static void atomize_object(gen_chunk*);
 
 /* static functions used
  */
@@ -196,7 +195,7 @@ reference r;
 	     syntax saved = expression_syntax(*pe);
 
 	     compute_before_current_statement(pe);
-	     compute_all_indices_in_simple_obj(saved);
+	     atomize_object(saved);
 	 }
      },
 	 reference_indices(r));
@@ -219,42 +218,38 @@ call c;
 	     syntax saved = expression_syntax(*pe);
 
 	     compute_before_current_statement(pe);
-	     compute_all_indices_in_simple_obj(saved);
+	     atomize_object(saved);
 	 }
      },
 	 call_arguments(c));
+
+    return(TRUE);
 }
 
 static bool test_filter(t)
 test t;
 {
     expression *pe = &test_condition(t);
-    syntax saved = expression_syntax(*pe);
 
-    if (!(*test_brk_decision)(*pe)) return(TRUE);
-    
-    /*   else I have to break the condition
-     *   and to complete the recursion.
-     */
-    compute_before_current_statement(pe);
-    compute_all_indices_in_simple_obj(saved);
-    compute_all_indices_in_statement(test_true(t));
-    compute_all_indices_in_statement(test_false(t));
+    if ((*test_brk_decision)(*pe)) 
+    {
+	syntax saved = expression_syntax(*pe);
 
-    return(FALSE);
+	/*   else I have to break the condition
+	 *   and to complete the recursion.
+	 */
+	compute_before_current_statement(pe);
+	atomize_object(saved);
+    }
+
+    return(TRUE);
 }
 
-static void compute_all_indices_in_simple_obj(obj)
+static void atomize_object(obj)
 gen_chunk *obj;
 {
-    gen_recurse(obj, reference_domain, ref_filter, gen_null);
-}
-
-static void compute_all_indices_in_statement(stat)
-statement stat;
-{
     gen_multi_recurse
-	(stat,
+	(obj,
 	 control_domain, cont_filter, cont_rewrite,   /* CONTROL */
 	 statement_domain, stat_filter, stat_rewrite, /* STATEMENT */
 	 reference_domain, ref_filter, gen_null,      /* REFERENCE */
@@ -277,7 +272,7 @@ entity (*new)();
     test_brk_decision = test_decide;
     create_new_variable = new;
     
-    compute_all_indices_in_statement(stat);
+    atomize_object(stat);
 
     expr_breaking_decision = NULL;
     func_breaking_decision = NULL;
