@@ -28,7 +28,7 @@
        text_sentences(_r_) = \
 	   gen_nconc(text_sentences(_r_), text_sentences(_t_)); \
        text_sentences(_t_) = NIL; \
-       gen_free(_t_); \
+       free_text(_t_); \
        }
 
 /* maximum length of a line when prettyprinting...
