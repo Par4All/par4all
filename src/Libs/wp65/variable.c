@@ -31,8 +31,8 @@
 #include "text-util.h"
 #include "transformer.h"
 /* for the phi variable */
-#include "regions.h"
-
+#include "effects-generic.h"
+#include "effects-convex.h"
 #include "arithmetique.h"
 
 #include "matrice.h"
