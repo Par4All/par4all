@@ -114,6 +114,7 @@ static gen_chunk * chunk_for_domain(int);
 %type <chunkp> Chunk String Contents
 %type <consp> Sparse_Datas Datas
 %type <val> Int Shared_chunk Type
+%type <void> Datas2
 
 %%
 Read	: Nb_of_shared_pointers Contents
@@ -137,13 +138,19 @@ Nb_of_shared_pointers
 	;
 
 Contents: Chunk { $$ = $1; }
-	| TABULATED_BEGIN Type Datas RP
+	| TABULATED_BEGIN Type Datas2 RP
         { 
 	   $$ = (gen_chunk*) alloc(sizeof(gen_chunk));
 	   $$->i = $2;
-	   gen_free_list($3); 
+	   /* gen_free_list($3); */
         }
 	;
+
+/* no list is built as it is not needed */
+Datas2 : Datas2 Data { }
+       | Data { }
+       ;
+
 
 Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP 
           {
