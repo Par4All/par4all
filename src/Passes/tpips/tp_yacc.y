@@ -29,6 +29,7 @@
 %token RESOURCENAME
 %token PHASENAME
 %token UNKNOWN_CHAR
+%token SETVALUE
 
 %type <status> line
 %type <status> instruction
@@ -229,7 +230,7 @@ i_delete:
 
 	    if (execution_mode) {
 		if (db_get_current_program_name() == NULL) {
-		    purge_directory (build_pgmwd (t));
+		    delete_program (t);
 		    user_log ("Workspace %s deleted.\n", t);
 		    $$ = TRUE;
 		} else {
@@ -298,7 +299,7 @@ i_apply:
 
 	    if (execution_mode) {
 		MAPL(e, {
-		    safe_apply ($3.the_name, STRING(CAR(e)));
+		    (void) safe_apply ($3.the_name, STRING(CAR(e)));
 		}, $3.the_owners);
 		
 		$$ = TRUE;
@@ -358,9 +359,9 @@ i_set:
 	SET
 	sep_list
 	PROPNAME
-	{ $$ = yylval.name;}
+	{ $$ = (list) yylval.name; /* bof */}
 	sep_list
-	WORKSPACE
+	SETVALUE
 	opt_sep_list
 	{
 	    property p ;
@@ -403,7 +404,12 @@ i_set:
 		}
 		case is_property_string:
 		{
-		    set_string_property($<name>4, yylval.name);
+		    char *q = strrchr(yylval.name, '"');
+		    if (!q)
+			pips_error("yyparse",
+				   "Did not find a quote in the string\n");
+		    *q = '\0';
+		    set_string_property($<name>4, yylval.name + 1);
 		    break;
 		}
 		}
@@ -659,7 +665,7 @@ owner:
 
 list_of_owner_name:
 	OWNER_NAME
-	{ $$ = yylval.name; }
+	{ $$ = (list) yylval.name; }
 	COMMA
 	list_of_owner_name
 	{
@@ -668,13 +674,13 @@ list_of_owner_name:
 
 	    if (execution_mode) {
 		char *c = $<name>2;
-		c[strlen(c) - 1] = '\0'; /* skip the comma */
+		strupper (c, c);
 		$$ = gen_nconc($4,CONS(STRING, c, NIL));
 	    }
 	}
 	|
 	OWNER_NAME
-	{ $$ = yylval.name; }
+	{ $$ = (list) yylval.name; }
 	CLOSEPAREN
 	{
 	    debug(7,"tp_parse","reduce rule owner list(name = %s)\n",$<name>2);
