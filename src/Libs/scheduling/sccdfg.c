@@ -253,7 +253,7 @@ void fprint_sccs(fp, obj)
           sink_stmt = vertex_int_stmt(successor_vertex(su));
           df_l= dfg_arc_label_dataflows((dfg_arc_label)successor_arc_label(su));
           for ( ; df_l != NIL; df_l = CDR(df_l))
-             fprint_dataflow(fp, sink_stmt, DATAFLOW(CAR(df_l)), 0);
+             fprint_dataflow(fp, sink_stmt, DATAFLOW(CAR(df_l)));
          }
       }
    }
