@@ -230,10 +230,14 @@ Variable v;
 	{		
 	    if(!egalite_normalize(eq))
 		return SC_EMPTY;
-	    
+	    CATCH(overflow_error) {
+		sc= sc_elim_var(sc,v);
+	    }
+	    TRY {
 	    sc = sc_variable_substitution_with_eq_ofl_ctrl
 		(sc, eq, v, NO_OFL_CTRL);
-	    
+	    UNCATCH(overflow_error);
+	    }
 	}
 	else {
 
