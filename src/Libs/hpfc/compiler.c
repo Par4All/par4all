@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1995/03/22 10:56:55 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/04/04 10:47:20 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -92,28 +92,27 @@ statement *hoststatp,*nodestatp;
     instruction_block(statement_instruction(*nodestatp)) = gen_nreverse(lnode);
 }
 
-static void hpf_compile_test(stat,hoststatp,nodestatp)
-statement stat;
+static void hpf_compile_test(s,hoststatp,nodestatp)
+statement s;
 statement *hoststatp,*nodestatp;
 {
     statement
-	stattrue,
-	stathosttrue,
-	statnodetrue,
-	statfalse,
-	stathostfalse,
-	statnodefalse;
+	s_true,
+	s_hosttrue,
+	s_nodetrue,
+	s_false,
+	s_hostfalse,
+	s_nodefalse;
     test the_test;
     expression condition;
-	
     
-    assert(instruction_test_p(statement_instruction(stat)));
+    assert(instruction_test_p(statement_instruction(s)));
 
-    the_test = instruction_test(statement_instruction(stat));
+    the_test = instruction_test(statement_instruction(s));
     condition = test_condition(the_test);
     
-    (*hoststatp) = MakeStatementLike(stat, is_instruction_test);
-    (*nodestatp) = MakeStatementLike(stat, is_instruction_test);
+    (*hoststatp) = MakeStatementLike(s, is_instruction_test);
+    (*nodestatp) = MakeStatementLike(s, is_instruction_test);
 
     /*
      * if it may happen that a condition modifies the value
@@ -121,21 +120,21 @@ statement *hoststatp,*nodestatp;
      * put out of the statement, for separate compilation.
      */
 
-    stattrue = test_true(the_test);
-    statfalse = test_false(the_test);
+    s_true = test_true(the_test);
+    s_false = test_false(the_test);
 
-    hpf_compiler(stattrue, &stathosttrue, &statnodetrue);
-    hpf_compiler(statfalse, &stathostfalse, &statnodefalse);
+    hpf_compiler(s_true, &s_hosttrue, &s_nodetrue);
+    hpf_compiler(s_false, &s_hostfalse, &s_nodefalse);
 
     instruction_test(statement_instruction(*hoststatp)) =
-	make_test(UpdateExpressionForModule(host_module,condition),
-		  stathosttrue,
-		  stathostfalse);
+	make_test(UpdateExpressionForModule(host_module, condition),
+		  s_hosttrue,
+		  s_hostfalse);
 
     instruction_test(statement_instruction(*nodestatp))=
-	make_test(UpdateExpressionForModule(node_module,condition),
-		  statnodetrue,
-		  statnodefalse);
+	make_test(UpdateExpressionForModule(node_module, condition),
+		  s_nodetrue,
+		  s_nodefalse);
 
     IFDBPRINT(9,"hpf_compiletest",host_module,(*hoststatp));
     IFDBPRINT(9,"hpf_compiletest",node_module,(*nodestatp));
@@ -154,18 +153,16 @@ statement *hoststatp,*nodestatp;
 
     /* IO functions should be detected earlier, in hpf_compiler
      */
-    if (IO_CALL_P(c)) 
-	pips_error("hpf_compile_call", "should not be there\n");
+    assert(!IO_CALL_P(c));
 
-    /*
-     * no reference to distributed arrays...
+    /* no reference to distributed arrays...
      * the call is just translated into local objects.
      */
     if (!ref_to_dist_array_p(c))
     {
 	list
-	    leh=lUpdateExpr(host_module,call_arguments(c)),
-	    len=lUpdateExpr(node_module,call_arguments(c));
+	    leh=lUpdateExpr(host_module, call_arguments(c)),
+	    len=lUpdateExpr(node_module, call_arguments(c));
 	
 	debug(7,"hpf_compile_call","no reference to distributed variable\n");
 
@@ -173,21 +170,19 @@ statement *hoststatp,*nodestatp;
 	(*nodestatp)=MakeStatementLike(stat, is_instruction_call);
 	
 	instruction_call(statement_instruction((*hoststatp)))=
-	    make_call(call_function(c),leh);
+	    make_call(call_function(c), leh);
 
 	instruction_call(statement_instruction((*nodestatp)))=
-	    make_call(call_function(c),len);
+	    make_call(call_function(c), len);
 
-	IFDBPRINT(8,"hpf_compile_call",host_module,(*hoststatp));
-	IFDBPRINT(8,"hpf_compile_call",node_module,(*nodestatp));
+	IFDBPRINT(8,"hpf_compile_call", host_module, (*hoststatp));
+	IFDBPRINT(8,"hpf_compile_call", node_module, (*nodestatp));
 
 	return;
     }
 
-    /*
-     * should consider read and written variables
+    /* should consider read and written variables
      */    
-    
     if (ENTITY_ASSIGN_P(call_function(c)))
     {
 	list 
@@ -203,24 +198,16 @@ statement *hoststatp,*nodestatp;
 	if (array_distributed_p
 	    (reference_variable(syntax_reference(expression_syntax(w)))))
 	{
-
-	    /* !!! */
-
-	    /*
-	     * c1-alpha
-	     */
 	    debug(8,"hpf_compile_call","c1-alpha\n");
 	    
-	    generate_c1_alpha(stat,&lh,&ln);
+	    generate_c1_alpha(stat, &lh, &ln); /* C1-ALPHA */
 	}
 	else
 	{
-	    syntax 
-		s = expression_syntax(r);
-	    /* 
-	     * reductions are detected here. They are not handled otherwise
+	    syntax s = expression_syntax(r);
+
+	    /* reductions are detected here. They are not handled otherwise
 	     */
-	    
 	    if (syntax_call_p(s) && call_reduction_p(syntax_call(s)))
 	    {
 		statement
@@ -236,12 +223,9 @@ statement *hoststatp,*nodestatp;
 	    }
 	    else
 	    {
-		/*
-		 * c1-beta
-		 */
 		debug(8,"hpf_compile_call","c1-beta\n");
 		
-		generate_c1_beta(stat, &lh, &ln);
+		generate_c1_beta(stat, &lh, &ln); /* C1-BETA */
 	    }
 	}
 
@@ -261,7 +245,7 @@ statement *hoststatp,*nodestatp;
      * assignment. Since I do not use the effects as I should, nothing is
      * done...
      */
-    hpfc_warning("hpf_compile_call","not implemented yet\n");
+    hpfc_warning("hpf_compile_call", "not implemented yet\n");
 }
 
 static void hpf_compile_unstructured(stat,hoststatp,nodestatp)
