@@ -11,13 +11,9 @@
 	should be sent to newgen@isatis.ensmp.fr.
 
 	(C) Copyright Ecole des Mines de Paris, 1989
-
 */
-
-
-/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 15:42:27 $, )
- * version $Revision$
- * got on %D%, %T%
+/*
+ * $Id$
  *
  * The file has all the generic functions to manipulate C objects
  * implemented by gen_chunks (see genC.c).
@@ -1613,170 +1609,180 @@ gen_chunk *obj  ;
     }
 }
 
-/* These functions implements the writing of objects. */
+/********************************************************************* WRITE */
+/* These functions implements the writing of objects.
+ */
 
 /* USER_FILE is used by driver functions (sorry, no closure in C). */
-
 static FILE *user_file ;
+
+/* could be rewritten? */
+static void fputi(int i, FILE * f)
+{
+  fprintf(f, "%d", i);
+  putc(' ', f);
+}
+
+static void fputci(char c, int i, FILE * f)
+{
+  putc(c, f);
+  fputi(i, f);
+}
 
 /* WRITE_DEFINE_SHARED_NODE defines the node whose number is N. */
 
-void
-write_define_shared_node( n )
-     int n ;
+static void write_define_shared_node(int n)
 {
-  (void) fprintf( user_file, "[%d ", n ) ;
+  fputci('[', n, user_file);
 }
 
 /* WRITE_SHARED_NODE references a shared node N. */
 
-void
-write_shared_node( n ) 
-     int n ;
+static void write_shared_node(int n)
 {
-  (void) fprintf( user_file, "#]shared %d ", n ) ;
+  fputci('S', n, user_file);
 }
 
-static void
-write_null( bp )
-struct gen_binding *bp ;
+static void write_null(struct gen_binding *bp)
 {
-    (void) fprintf( user_file, "#]null\n" ) ;
+  putc('N', user_file);
 }
 
 /* WRITE_OBJ_IN writes the OBJect of type BP. We first prints its type
    (its index in the Domains table), its tag (for OR_OP types) and then
    ... let's do the recursion. */
 
-static int
-write_obj_in( obj, dr ) 
-gen_chunk *obj ;
-struct driver *dr ;
+static int write_obj_in(gen_chunk *obj, struct driver *dr)
 {
-    struct gen_binding *bp = &Domains[ quick_domain_index( obj ) ] ;
-    union domain *dp = bp->domain ;
-    int data = 1+IS_TABULATED( bp ) ;
-    int type_number;
-
-    if( shared_obj( obj, write_define_shared_node, write_shared_node ))
-	    return( !GO) ;
-
-    type_number = gen_type_translation_actual_to_old(bp-Domains);
-    (void) fprintf( user_file, "#(#]type %d ", type_number ) ;
-
-    if( IS_TABULATED( bp )) {
-	(void) fprintf( user_file, "%d ", abs( (obj+1)->i )) ;
+  struct gen_binding *bp = &Domains[ quick_domain_index( obj ) ] ;
+  union domain *dp = bp->domain ;
+  int data = 1+IS_TABULATED( bp ) ;
+  int type_number;
+  
+  if( shared_obj( obj, write_define_shared_node, write_shared_node ))
+    return( !GO) ;
+  
+  type_number = gen_type_translation_actual_to_old(bp-Domains);
+  fputci('T', type_number, user_file);
+  
+  if (IS_TABULATED(bp))
+    fputi(abs((obj+1)->i), user_file);
+  
+  switch( dp->ba.type ) {
+  case EXTERNAL_DT:
+    fatal( "write_obj_in: Don't know how to write an EXTERNAL: %s\n", 
+	   bp->name ) ;
+    break ;
+  case CONSTRUCTED_DT:
+    if (dp->co.op == OR_OP)
+      fputi((obj+data)->i, user_file); /* tag... */
+    else if(dp->co.op == ARROW_OP) {
+      putc('%', user_file) ;
     }
-    switch( dp->ba.type ) {
-    case EXTERNAL_DT:
-	fatal( "write_obj_in: Don't know how to write an EXTERNAL: %s\n", 
-	      bp->name ) ;
-	break ;
-    case CONSTRUCTED_DT:
-	if( dp->co.op == OR_OP ) {
-	    (void) fprintf( user_file, "%d ", (obj+data)->i ) ;
-	} 
-	else if( dp->co.op == ARROW_OP ) {
-	    (void) fprintf(user_file, "#]arrow ") ;
-	}
-	break ;
-    }
-    return( GO) ;
+    break ;
+  }
+  return( GO) ;
 }
 
 /* WRITE_OBJ_OUT is done when the OBJect (of type BP) has been printed. Just
    close the opening parenthese. */
 
-static void
-write_obj_out( obj, bp, dr )
-gen_chunk *obj ;
-struct gen_binding *bp ;
-struct driver *dr ;
+static void write_obj_out( obj, bp, dr )
+gen_chunk *obj;
+struct gen_binding *bp;
+struct driver *dr;
 {
-    union domain *dp = bp->domain ;
+    union domain * dp = bp->domain ;
 
     switch( dp->ba.type ) {
     case CONSTRUCTED_DT:
 	if( dp->co.op == ARROW_OP ) {
-	    (void) fprintf(user_file, ")") ;
+	  putc(')', user_file);
 	}
 	break ;
     }
-    (void) fprintf( user_file, ")\n" ) ;
+    putc(')', user_file);
 }
-  
-static void
-write_string( init, s, end )
-string init, s, end ;
+
+static void write_string(init, s, end, ifnull, ifundefined)
+string init, s, end, ifnull, ifundefined;
 {
-    assert(s!=NULL);
-    for( (void) fprintf( user_file, init ) ; *s != '\0' ; s++ ) {
-	(void) fprintf(user_file, (*s=='"' || *s=='\\') ? "\\%c" : "%c", *s );
-    }
-    (void) fprintf( user_file, end ) ;
+  if (!s) 
+  {
+    if (ifnull)
+      fputs(ifnull, user_file);
+    else
+      user("null string not allowed");
+    return;
+  }
+  else if (string_undefined_p(s)) 
+  {
+    fputs(ifundefined, user_file);
+    return;
+  }
+  /* else */
+  fputs(init, user_file);
+  for(; *s != '\0' ; s++) 
+  {
+    if (*s=='"' || *s=='\\') putc('\\', user_file);
+    putc(*s, user_file);
+  }
+  fputs(end, user_file);
 }
 
 /* WRITE_LEAF_IN prints the OBJect of type BP. If it is inlined, prints it
    according to the format, else recurse. */
 
-static int
-write_leaf_in(
-    gen_chunk *obj,
-    struct gen_binding *bp)
+static int write_leaf_in(gen_chunk *obj, struct gen_binding *bp)
 {
-    if( IS_TABULATED( bp )) {
-	if( obj->p == gen_chunk_undefined ) {
-	    if( disallow_undefined_tabulated ) {
-		user("gen_write: writing undefined tabulated object\n",
-		     NULL) ;
-	    }
-	    else {
-		(void) fprintf( user_file, "#]null " ) ;
-	    }
-	}
-	else {
-	  int type_number = gen_type_translation_actual_to_old(bp-Domains);
-	  (void) fprintf( user_file ,"#]ref %d \"%d%c", 
-			  bp->index, type_number, HASH_SEPAR ) ;
-	  write_string( "", (obj->p+HASH_OFFSET)->s, "\" " ) ;
-	}
-	return( !GO) ;
-    }
-    else if( IS_INLINABLE( bp )) {
-	char *format = bp->inlined->C_format ;
-
-	if( strcmp( bp->name, UNIT_TYPE_NAME ) == 0 ) 
-	    (void) fprintf( user_file, format ) ;
-	else if( strcmp( bp->name, "bool" ) == 0 )
-	    (void) fprintf( user_file, format, obj->b ) ;
-	else if( strcmp( bp->name, "int" ) == 0 ) 
-	    (void) fprintf( user_file, format, obj->i ) ;
-	else if( strcmp( bp->name, "float" ) == 0 )
-	    (void) fprintf( user_file, format, obj->f ) ;
-	else if( strcmp( bp->name, "string" ) == 0 )
-	{
-	    /* special management of string_undefined... FC.\
-	     */
-	    string s = obj->s;
-	    write_string( "\"", 
-			 string_undefined_p(s) ? disk_string_undefined : s,
-			 "\"" ) ;
-	}
-	else fatal( "write_leaf_in: Don't know how to print %s\n", bp->name ) ;
-	(void) fprintf( user_file, " " ) ;
-    }
-    else if( IS_EXTERNAL( bp )) {
-      int type_number;
-      if( bp->domain->ex.write == NULL ) {
-	user( "gen_write: uninitialized external type %s (%d)\n",
-	      bp->name, bp-Domains);
-	return( !GO) ;
+  if(IS_TABULATED(bp))
+  {
+    if( obj->p == gen_chunk_undefined ) {
+      if( disallow_undefined_tabulated ) 
+      {
+	user("gen_write: writing undefined tabulated object\n", NULL);
       }
-      type_number = gen_type_translation_actual_to_old(bp-Domains);
-      (void) fprintf(user_file, "#]external %d ", type_number);
-      (*(bp->domain->ex.write))(user_file, obj->s);
+      else 
+      {
+	(void) fputc('N', user_file);
+      }
     }
-    return( GO) ;
+    else {
+      int type_number = gen_type_translation_actual_to_old(bp-Domains);
+      fputci('R', type_number, user_file);
+      write_string("\"", (obj->p+HASH_OFFSET)->s, "\" ", "_", "!") ;
+    }
+    return !GO;
+  }
+  else if( IS_INLINABLE( bp )) {
+    char *format = bp->inlined->C_format ;
+    
+    /* hummm... */
+    if (IS_UNIT_TYPE(bp-Domains))
+      putc('U', user_file);
+    else if (IS_BOOL_TYPE(bp-Domains))
+      fputci('B', obj->b, user_file);
+    else if (IS_INT_TYPE(bp-Domains))
+      fputi(obj->i, user_file);
+    else if (IS_FLOAT_TYPE(bp-Domains))
+      (void) fprintf(user_file, format, obj->f) ;
+    else if (IS_STRING_TYPE(bp-Domains))
+      write_string( "\"", obj->s, "\"", "_", "!") ;
+    else 
+      fatal( "write_leaf_in: Don't know how to print %s\n", bp->name ) ;
+  }
+  else if( IS_EXTERNAL( bp )) {
+    int type_number;
+    if( bp->domain->ex.write == NULL ) {
+      user("gen_write: uninitialized external type %s (%d)\n",
+	   bp->name, bp-Domains);
+      return !GO;
+    }
+    type_number = gen_type_translation_actual_to_old(bp-Domains);
+    fputci('E', type_number, user_file);
+    (*(bp->domain->ex.write))(user_file, obj->s);
+  }
+  return( GO) ;
 }
 
 /* WRITE_SIMPLE_IN is done before printing a simple OBJect of type DP. The
@@ -1789,29 +1795,28 @@ union domain *dp ;
 {
     switch( dp->ba.type ) {
     case LIST_DT:
-	if( obj->l == list_undefined ) {
-	    (void) fprintf( user_file, "#]list " ) ;
-	    return( !GO) ;
-	}
-	(void) fprintf( user_file, "(" ) ;
-	break ;
+      if( obj->l == list_undefined ) {
+	putc('L', user_file);
+	return !GO;
+      }
+      putc('(', user_file);
+      break ;
     case SET_DT:
-	if( obj->t == set_undefined ) {
-	    (void) fprintf( user_file, "#]set " ) ;
-	    return( !GO) ;
-	}
-	(void) fprintf( user_file, "{ %d ", dp->se.what ) ;
-	break ;
+      if( obj->t == set_undefined ) {
+	putc('S', user_file);
+	return( !GO) ;
+      }
+      fputci('{', dp->se.what, user_file);
+      break ;
     case ARRAY_DT:
-	if( obj->p == array_undefined ) {
-	    (void) fprintf( user_file, "#]array " ) ;
-	    return( !GO) ;
-	}
-	(void) fprintf(user_file, "#( %d ", 
-		       array_size( dp->ar.dimensions )) ;
-	break ;
+      if( obj->p == array_undefined ) {
+	putc('A', user_file);
+	return !GO;
+      }
+      (void) fprintf(user_file, "$%d ", array_size(dp->ar.dimensions));
+      break ;
     }
-    return( GO) ;
+    return GO;
 }
 
 /* WRITE_ARRAY_LEAF only writes non-null elements, in a sparse way. */
@@ -1828,8 +1833,8 @@ write_array_leaf(
     }
     else if( obj->p != gen_chunk_undefined ) 
     {
-	fprintf( user_file, "%d ", i ) ;
-	gen_trav_leaf( bp, obj, dr ) ;
+      fputi(i, user_file);
+      gen_trav_leaf( bp, obj, dr ) ;
     }
 }
 
@@ -1844,12 +1849,12 @@ write_simple_out(
 {
     switch( dp->ba.type ) {
     case SET_DT:
-	(void) fprintf( user_file, "}" ) ;
-	break ;
+      putc('}', user_file);
+      break ;
     case LIST_DT:
     case ARRAY_DT:
-	(void) fprintf( user_file, ")" ) ;
-	break ;
+      putc(')', user_file);
+      break ;
     }
 }
 
@@ -1878,12 +1883,11 @@ gen_write(
 
     push_gen_trav_env();
 
-    shared_pointers(obj, FALSE) ;
-    (void) fprintf( fd, "%d ", shared_number ) ;
-    gen_trav_obj( obj, &dr ) ;
+    shared_pointers(obj, FALSE);
+    fputi(shared_number, fd);
+    gen_trav_obj( obj, &dr );
 
     pop_gen_trav_env() ;
-
 }
 
 /* GEN_WRITE_WITHOUT_SHARING writes the OBJect on the stream FD. Sharing
@@ -1916,8 +1920,8 @@ gen_chunk *obj ;
 	obj_table = (hash_table)NULL ;
     }
 
-    (void) fprintf( fd, "0 " ) ;
-    gen_trav_obj( obj, &dr ) ;
+    fputs("0 ", fd);
+    gen_trav_obj(obj, &dr);
 }
 
 /* WRITE_TABULATED_LEAF_IN prints the OBJect of type BP. If it is tabulated,
@@ -1928,46 +1932,43 @@ write_tabulated_leaf_in(
     gen_chunk *obj, 
     struct gen_binding *bp)
 {
-    if( IS_TABULATED( bp )) {
-	int number ;
-
-	if( obj->p == gen_chunk_undefined ) {
-    	    write_null( bp ) ;
-	    return( !GO) ;
-	}
-	if( (number = (obj->p+1)->i) == 0 ) {
-	    fatal( "write_tabulated_leaf_in: Zero index in domain %s\n", 
-		   bp->name ) ;
-	}
-
-	/* fprintf(stderr, "writing %d %s\n", number, (obj->p+HASH_OFFSET)->s);
-	 */
-	if( number >= 0 ) 
-	{
-	  int type_number = gen_type_translation_actual_to_old(bp-Domains);
-	  (void) fprintf( user_file ,"#]def %d \"%d%c", 
-			  bp->index, type_number, HASH_SEPAR);
-	  write_string( "", (obj->p+HASH_OFFSET)->s, "\" " );
-	    
-	    /* once written the domain number sign is inverted,
-	     * to tag the object has been written, so that
-	     * its definition is not written twice on disk. The second
-	     * time a simple reference is written instead. FC.
-	     */ 
-	    (obj->p+1)->i = - (obj->p+1)->i ;
-	    return( GO) ;
-	}
+  if( IS_TABULATED( bp )) {
+    int number ;
+    
+    if( obj->p == gen_chunk_undefined ) {
+      write_null( bp ) ;
+      return !GO;
     }
-    return( write_leaf_in( obj, bp )) ;
+    if( (number = (obj->p+1)->i) == 0 ) {
+      fatal("write_tabulated_leaf_in: Zero index in domain %s\n", 
+	    bp->name ) ;
+    }
+    
+    /* fprintf(stderr, "writing %d %s\n", number, (obj->p+HASH_OFFSET)->s);
+     */
+    if( number >= 0 ) 
+    {
+      int type_number = gen_type_translation_actual_to_old(bp-Domains);
+      fputci('D', type_number, user_file);
+      write_string("\"", (obj->p+HASH_OFFSET)->s, "\" ", "_", "!");
+      
+      /* once written the domain number sign is inverted,
+       * to tag the object has been written, so that
+       * its definition is not written twice on disk. The second
+       * time a simple reference is written instead. FC.
+       */ 
+      (obj->p+1)->i = - (obj->p+1)->i ;
+      return GO;
+    }
+  }
+  return write_leaf_in(obj, bp);
 }
 
 /* GEN_WRITE_TABULATED writes the tabulated object TABLE on FD. Sharing is 
    managed */
 
 int
-gen_write_tabulated( fd, domain )
-FILE *fd ;
-int domain ;
+gen_write_tabulated(FILE * fd, int domain)
 {
     int index =  Domains[ domain ].index, i, size;
     gen_chunk *fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof( gen_chunk ),
@@ -1982,7 +1983,7 @@ int domain ;
     size = max_tabulated_elements();
 
     Tabulated_bp->domain->ar.element = &Domains[ domain ] ;
-    dr.null = write_null ;
+    dr.null = write_null;
     dr.leaf_out = gen_null ;
     dr.leaf_in = write_tabulated_leaf_in ;
     dr.simple_in = write_simple_in ;
@@ -1994,7 +1995,9 @@ int domain ;
 
     push_gen_trav_env() ;
     shared_pointers( fake_obj, FALSE ) ;
-    fprintf(fd, "%d %d %d ", domain, size, shared_number) ;
+    fputi(domain, fd);
+    fputi(size, fd);
+    fputi(shared_number, fd);
     gen_trav_obj( fake_obj, &dr ) ;
     pop_gen_trav_env() ;
 
