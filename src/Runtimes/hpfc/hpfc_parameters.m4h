@@ -1,10 +1,8 @@
 c
 c parameters used to compile 
 c
-c $RCSfile: hpfc_parameters.m4h,v $ ($Date: 1995/09/15 15:57:02 $, )
-c version $Revision$
-c got on %D%, %T%
-c $Id$
+c $RCSfile: hpfc_parameters.m4h,v $ version $Revision$
+c ($Date: 1995/09/27 16:26:34 $, )
 c
 c type declarations
 c
@@ -15,7 +13,6 @@ c
      $     MAXNBOFPROCESSORS,
      $     MAXMAXSIZEOFPROCS,
      $     MAXMAXSIZEOFBUFFER
-
 c
 c parameters
 c
@@ -24,7 +21,10 @@ c
       parameter(MAXNBOFTEMPLATES = 10)
       parameter(MAXNBOFPROCESSORS = 10)
       parameter(MAXMAXSIZEOFPROCS = 32)
-      parameter(MAXMAXSIZEOFBUFFER = 3920)
+c
+c MAXMAXSIZEOFBUFFER is around 1 MB
+c
+      parameter(MAXMAXSIZEOFBUFFER = 1000000)
 c
 c that s all
 c
