@@ -7,6 +7,7 @@
 /* How many display wondows can be opened : */
 #define MAX_NUMBER_OF_WPIPS_WINDOWS 9
 #define INITIAL_NUMBER_OF_WPIPS_WINDOWS 2
+#define NO_TEXTSW_AVAILABLE -1 /* cannot be positive (i.e. a window number. */
 extern int number_of_wpips_windows;
 
 
