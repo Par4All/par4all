@@ -7,10 +7,10 @@
 #include "arithmetique.h"
 #include "assert.h"
 
-/* int pgcd_slow(int a, int b): calcul recursif du pgcd de deux entiers;
- * le pgcd retourne est toujours positif; par extension, pgcd_slow(0,0)==1;
- * il vaudrait peut-etre mieux retourner 0 dans l'espoir de provoquer une
- * exception ulterieure par devision par 0; ou aborter immediatement;
+/* Value pgcd_slow(Value a, Value b) computation of the gcd of a and b.
+ * the result is always positive. standard algorithm in log(max(a,b)).
+ * pgcd_slow(0,0)==1 (maybe should we abort?).
+ * I changed from a recursive for a simple iterative version, FC 07/96.
  */
 Value pgcd_slow(Value a, Value b)
 {
