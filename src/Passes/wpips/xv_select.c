@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/12 01:19:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/27 16:02:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1995/11/12 01:19:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1995/11/27 16:02:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -100,6 +100,13 @@ end_directory_text_notify(Panel_item text_item,
                           Event * event)
 {
    (void) end_directory_notify((char *) xv_get(text_item, PANEL_VALUE));
+}
+
+
+Menu
+generate_directory_menu()
+{
+   return generate_a_directory_menu(get_cwd());
 }
 
 
@@ -623,6 +630,7 @@ close_workspace_notify(Menu menu,
    if (return_value ) {
       /* The close has been successful: */
        /* close_log_file(); */
+      initialize_wpips_hpfc_hack_for_fabien_and_from_fabien();
 
       edit_close_notify(menu, menu_item);
 
@@ -892,6 +900,8 @@ generate_module_menu()
                           MENU_RELEASE,
                           NULL),
                 NULL);
+         user_warning("generate_a_directory_menu",
+                      "Too many modules in this workspace. Click on the Module Chooser\n");
       }
       else {
          for(i = 0; i < module_list_length; i++)
