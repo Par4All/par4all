@@ -1,12 +1,13 @@
-/* $RCSfile: generate.c,v $ ($Date: 1995/09/13 14:14:16 $, )
+/* $RCSfile: generate.c,v $ ($Date: 1995/10/04 10:54:00 $, )
  * version $Revision$
  * 
  * Fabien Coelho, May 1993
  */
 
 #include "defines-local.h"
-
 #include "bootstrap.h" 
+
+extern instruction MakeAssignInst(syntax l, expression r);
 extern entity CreateIntrinsic(string name); /* in syntax.h */
 
 /* ??? this should work (but that is not the case yet),
@@ -744,6 +745,130 @@ list *lhstatp, *lnstatp;
     (*lnstatp) = CONS(STATEMENT,
 		      st_receive_mcast_from_host(make_reference(varn, NIL)),
 		      NIL);
+}
+
+/************************************************************** STATEMENTS */
+
+statement st_get_value_locally_and_send(ref,goal) 
+reference ref,goal;
+{
+    list ls=NIL;
+
+    generate_get_value_locally(ref,goal,&ls);
+    ls=gen_nconc(ls, CONS(STATEMENT, st_send_to_host_and_nodes(ref, goal),
+			  NIL));
+
+    return(make_block_statement(ls));
+}
+
+
+/* the returned expression is translated into variables
+ * of the node module. 
+ */ 
+statement st_compute_ith_local_index(array, i, expr, sp)
+entity array; 
+int i; 
+expression expr; 
+syntax *sp; 
+{ 
+    /* the necessity is not checked, but it could be done,
+     * looking that the new declaration of the given array
+     * is smaller or not on the given dimension... 
+     */
+
+    entity temp = make_new_scalar_variable(node_module,
+					   MakeBasic(is_basic_int));
+    statement stat;
+
+    (*sp)=make_syntax(is_syntax_reference, make_reference(temp, NIL));
+
+    stat=make_stmt_of_instr
+ 	(MakeAssignInst 	
+	 (make_syntax(is_syntax_reference, 		
+		      make_reference(temp, NIL)),
+	  expr_compute_local_index(array,
+				   i, 			
+				   UpdateExpressionForModule(node_module,
+							     expr))));
+
+    return(stat);
+}
+
+statement st_send_to_host_and_nodes(ref,val)
+reference ref,val; 
+{
+    if(replicated_p(reference_variable(ref)))
+ 	return(st_make_nice_test(condition_senderp(),
+				 CONS(STATEMENT,
+				      st_send_to_host_and_not_owners(val),
+				      NIL),
+				 NIL));
+    else
+	return(st_send_to_host_and_all_nodes(val));
+}
+
+statement st_send_to_computer_if_necessary(ref)
+reference ref; 
+{
+    entity
+ 	array = reference_variable(ref),
+	newarray = load_new_node(array);
+    expression
+	condition=((replicated_p(array))? 
+		   (MakeBinaryCall
+		    (CreateIntrinsic(AND_OPERATOR_NAME), 				
+		     condition_senderp(),
+		     condition_not_computer_in_owners())):
+		   (condition_senderp()));
+    list lstat = NIL, lnewinds = NIL;
+
+    generate_compute_local_indices(ref, &lstat, &lnewinds);
+    
+    return(st_make_nice_test(condition,
+			     gen_nconc(lstat,
+				       CONS(STATEMENT,
+					    st_send_to_computer(make_reference(newarray,
+									       lnewinds)),
+					    NIL)),
+			     NIL));
+}
+
+statement st_get_value_for_all(ref,goal)
+reference ref, goal;
+{
+    return(st_make_nice_test(condition_ownerp(),
+			     CONS(STATEMENT,
+				  st_get_value_locally_and_send(ref,goal),
+				  NIL),
+			     CONS(STATEMENT,
+				  st_receive_from(ref,goal),
+				  NIL)));
+}
+
+statement st_get_value_for_computer(ref,goal)
+reference ref, goal;
+{
+    list ltrue=NIL, lfalse=NIL;
+
+    generate_get_value_locally(ref,goal,&ltrue);
+    lfalse=CONS(STATEMENT,st_receive_from_sender(goal),NIL);
+
+    return(st_make_nice_test(condition_ownerp(),ltrue,lfalse));
+}
+
+/* if ref is replicated:
+ * goal = Receive_From_Sender() 
+ *
+ * if ref is not replicated
+ * goal = Receive_Multi_Cast_From_Sender() 
+ */
+statement st_receive_from(ref,goal)
+reference ref,goal;
+{
+    if (replicated_p(reference_variable(ref)))
+	return(st_receive_from_sender(goal));
+    else
+	return(st_receive_mcast_from_sender(goal));
 }
 
 /*   That is all
