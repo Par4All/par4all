@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1997/02/03 22:27:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_syntax_expression[] = "%A% ($Date: 1997/02/03 22:27:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
 #include <stdio.h>
 
 #include "genC.h"
@@ -133,13 +139,13 @@ int HasParenthesis;
 	/* FI: to handle parameterless function calls like t= second() - 11 March 1993 */
 	/* if (indices == NULL) { */
 	if (indices == NULL && !HasParenthesis) {
-	    debug(2, "", "[MakeAtom] implicit declaration: %s\n",
+	    debug(2, "MakeAtom", "implicit declaration: %s\n",
 		  entity_name(e));
 	    DeclareVariable(e, type_undefined, indices, 
 			    storage_undefined, value_undefined);
 	}
 	else {
-	    debug(2, "", "[MakeAtom] new user function: %s\n",
+	    debug(2, "MakeAtom", "new user function: %s\n",
 		  entity_name(e));
 	    e = MakeExternalFunction(e, type_undefined);
 	}
