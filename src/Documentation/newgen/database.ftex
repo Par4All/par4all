@@ -1,5 +1,8 @@
-\documentstyle{article}
-\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+%% $RCSfile: database.ftex,v $ (version $Revision$)
+%% $Date: 1996/08/21 10:40:06 $, 
+
+\documentstyle[newgen_domain]{article}
+
 \begin{document}
 \sloppy
 
@@ -47,12 +50,12 @@ par son nom, \verb+name+, et le nom de son {\em owner}, \verb+owner_name+.
 Nous avons longement discute de l'utilite' d'avoir un owner\_type pour
 preciser ce que de'core la ressource: un programme (cas des entite's),
 un module (cas de toutes les autres ressources), une boucle, une
-instruction, etc... Nous y avons renonce' car a' l'heure actuelle, nous
+instruction, etc. Nous y avons renonce' car à l'heure actuelle, nous
 n'avons que des ressources attachables a` des programmes ou a` des
 modules, et que cette information peut e^tre de'duite du {\tt name} de
 la ressource. En fait, nous n'avons qu'une ressource attachable a` un
-programme, ce sont les entite's (et les \verb+user_file+, mais ils sont
-largement maltraite's pour le moment).}
+programme, ce sont les entite's (et les \verb/user_file/, mais ils sont
+largement maltraités pour le moment).}
 
 \domain{Status = memory:string + file:string}
 { Le domaine {\tt status} est utilise' par pips-db pour savoir si la
