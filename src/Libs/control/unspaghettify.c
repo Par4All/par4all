@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/10/23 11:11:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/10/23 11:59:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/10/23 11:11:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/10/23 11:59:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -226,27 +226,16 @@ fuse_sequences_in_unstructured(statement s)
 
 			number_of_successors_of_the_successor = gen_length(control_successors(the_successor));
 			number_of_predecessors_of_the_successor = gen_length(control_predecessors(the_successor));
-			pips_debug(3, "Control %p: (gen_length(control_successors(c)) == 1), number_of_successors_of_the_successor = %d, number_of_predecessors_of_the_successor = %d, the successor is the entry node: %d, empty_statement_or_continue_p(control_statement(c)) = %d\n",
+			pips_debug(3, "Control %p: (gen_length(control_successors(c)) == 1), number_of_successors_of_the_successor = %d, number_of_predecessors_of_the_successor = %d, the successor is the entry node: %d\n",
 				   c,
 				   number_of_successors_of_the_successor,
 				   number_of_predecessors_of_the_successor,
-				   the_successor == entry_node,
-				   empty_statement_or_continue_p(control_statement(c)));
-			/* Since I use an O(n) algorithm instead of an
-                           O(n^2) all this condition must be checked
-                           again later since these topological and
-                           semantical properties may have changed
-                           during the fusion phase. I think it is true
-                           because the fused graph is included into
-                           the former graph but I am too lazy to write
-                           a proof... :-( Have a look to
-                           Valdation/Control/create.f. */
-			if ((number_of_successors_of_the_successor <= 1
-			     /* ...Accept the exit node */
+				   the_successor == entry_node);
+			if (number_of_successors_of_the_successor <= 1
+			     /* ...Accept the exit node but not the
+                                entry node */
 			     && the_successor != entry_node
-			     && number_of_predecessors_of_the_successor == 1)
-			    ||
-			    empty_statement_or_continue_p(control_statement(c))) {
+			     && number_of_predecessors_of_the_successor == 1) {
 			    /* Ok, we have found a node in a
 			       sequence. Note that we cannot fuse with the
 			       entry node since it must keep this
