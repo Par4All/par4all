@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.85  1998/04/14 21:22:19  coelho
+ * linear.h
+ *
  * Revision 1.84  1998/04/02 10:50:11  coelho
  * include cache dropped if include file was not found.
  *
@@ -25,6 +28,7 @@
 #include <errno.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "database.h"
 #include "makefile.h"
