@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1996/06/03 16:57:56 $, 
+ * date: $Date: 1996/07/18 19:15:52 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -191,7 +191,7 @@ Pbase b;
 	/* find the lowest coeff 
 	 */
 	Variable minvar = TCST;
-	Value minval = 0;
+	Value minval = VALUE_ZERO;
 
 	for (; c; c=c->succ)
 	{
@@ -201,11 +201,12 @@ Pbase b;
 
 		 if (var!=TCST)
 		 {
-		     val = abs(val_of(v));
-		     if ((minval && val<minval) || !minval) 
+		     val = value_abs(val_of(v));
+		     if ((value_notzero_p(minval) && value_lt(val,minval))
+			 || value_zero_p(minval)) 
 			 minval = val, minvar = var;
 		     
-		     if (minval==1) return minvar;
+		     if (value_one_p(minval)) return minvar;
 		 }
 	    }
 	}
@@ -237,13 +238,14 @@ Pbase b;
 		if (var!=TCST)
 		{
 		    ifscdebug(9) 
-			fprintf(stderr, "%s\n", default_variable_to_string(var));
+			fprintf(stderr, "%s\n", 
+				default_variable_to_string(var));
 
 		    for (i=0, tmp=b; tmp && var_of(tmp)!=var; 
 			 i++, tmp=tmp->succ);
 		    assert(tmp);
 		    
-		    t[i][val_of(v)<0?0:1]++;
+		    t[i][value_posz_p(val_of(v))]++;
 		}
 	    }
 	}
@@ -254,8 +256,10 @@ Pbase b;
 
 	for (tmp=b->succ, var=var_of(b), min_new=t[0][0], i=1;
 	     min_new && i<size; 
-	     i++, tmp=tmp->succ)
-	    if (val_of(tmp)<min_new) min_new=val_of(tmp), var=var_of(tmp);
+	     i++, tmp=tmp->succ) {
+	    if (t[i][0]<min_new)
+		min_new = t[i][0], var=var_of(tmp); 
+	}
 
 	free(t);
     }
