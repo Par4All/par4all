@@ -114,10 +114,6 @@ typedef struct Spolynome {
 } Spolynome, *Ppolynome;
 
 
-#ifndef NIL
-#define NIL NULL
-#endif  /* NIL */
-
 /* Macros definitions */
 #define monome_coeff(pm) ((pm)->coeff)
 #define monome_term(pm) ((pm)->term)
@@ -138,7 +134,7 @@ typedef struct Spolynome {
 #define MONOME_UNDEFINED_P(pm) ((pm)==MONOME_UNDEFINED)
 #define MONOME_CONSTANT_P(pm) (term_cst((pm)->term))
 
-#define POLYNOME_NUL ((Ppolynome) NIL)
+#define POLYNOME_NUL ((Ppolynome) NULL)
 #define POLYNOME_NUL_P(pp) ((pp)==POLYNOME_NUL)
 #define POLYNOME_UNDEFINED ((Ppolynome) -248)
 #define POLYNOME_UNDEFINED_P(pp) ((pp)==POLYNOME_UNDEFINED)
