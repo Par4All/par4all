@@ -76,7 +76,7 @@ graph obj;
 {
  list nodes_l, su_l, df_l;
  predicate exec_dom;
- int source_stmt, sink_stmt;
+ int source_stmt, sink_stmt, source_nb, sink_nb;
 
  fprintf(fp,"\n Array Data Flow Graph:\n");
  fprintf(fp,"=======================\n");
@@ -88,16 +88,20 @@ graph obj;
     source_stmt = vertex_int_stmt(crt_v);
     exec_dom = dfg_vertex_label_exec_domain((dfg_vertex_label) vertex_vertex_label(crt_v));
 
-    if(source_stmt == ENTRY_ORDER)
+    if(source_stmt == ENTRY_ORDER) {
+      source_nb = 0;
       fprintf(fp,"\nENTRY:\n******\n");
-    else
-      fprintf(fp,"\nINS_%d:\n********\n", source_stmt-BASE_NODE_NUMBER);
+    }
+    else {
+      source_nb = source_stmt-BASE_NODE_NUMBER;
+      fprintf(fp,"\nINS_%d:\n********\n", source_nb);
+    }
 
     if(exec_dom != predicate_undefined) {
-      fprintf(fp, " Execution Domain:\n");
+      fprintf(fp, " Execution Domain for %d:\n", source_nb);
       fprint_pred(fp, exec_dom);
     }
-    else fprintf(fp, " Execution Domain: Nil\n");	/* AL 15 02 94 */
+    else fprintf(fp, " Execution Domain for %d: Nil\n", source_nb);
     fprintf(fp, "\n");
 
     su_l = vertex_successors(crt_v);
@@ -105,13 +109,24 @@ graph obj;
     for( ; su_l != NIL; su_l = CDR(su_l))
       {
        successor su = SUCCESSOR(CAR(su_l));
+       vertex su_ver = successor_vertex(su);
 
-       sink_stmt = vertex_int_stmt(successor_vertex(su));
+       sink_stmt = vertex_int_stmt(su_ver);
+       sink_nb = sink_stmt-BASE_NODE_NUMBER;
        df_l = dfg_arc_label_dataflows((dfg_arc_label) successor_arc_label(su));
 
        for( ; df_l != NIL; df_l = CDR(df_l))
-          fprint_dataflow(fp, sink_stmt-BASE_NODE_NUMBER,
-			  DATAFLOW(CAR(df_l)));
+          fprint_dataflow(fp, sink_nb, DATAFLOW(CAR(df_l)));
+
+       /* AP, Nov 28th 1995: Ronan asked me to add the execution domain of
+          the destination. Only done if it is not equal to the source. */
+       if(sink_nb != source_nb) {
+	 exec_dom = dfg_vertex_label_exec_domain((dfg_vertex_label) vertex_vertex_label(su_ver));
+	 if(exec_dom != predicate_undefined) {
+	   fprintf(fp, "  Execution Domain for %d:\n", sink_nb);
+	   fprint_pred(fp, exec_dom);
+	 }
+       }
 
        fprintf(fp, "\n");
       }
