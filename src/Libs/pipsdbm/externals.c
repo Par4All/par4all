@@ -16,7 +16,6 @@
 #include "sc.h"
 #include "ri-util.h"
 #include "paf_ri.h"
-#include "compsec.h"
 
 /********************************************************************* UTILS */
 
@@ -116,10 +115,10 @@ pipsdbm_read_statement_mapping(FILE * fd)
     hash_table result = hash_table_make(hash_pointer, 0);
     int n;
 
-    pips_assert("some current module name", db_get_current_module_name());
-    pips_debug(3, "statement -> ??? for %s\n", db_get_current_module_name());
-    stat = (statement) /* hope it is the right module... */
-	db_get_memory_resource(DBR_CODE, db_get_current_module_name(), TRUE);
+    pips_assert("some current module name", dbll_current_module);
+    pips_debug(3, "statement -> ??? for %s\n", dbll_current_module);
+    stat = (statement)
+	db_get_memory_resource(DBR_CODE, dbll_current_module, TRUE);
 
     initialize_ordering_to_statement(stat);
 
@@ -211,10 +210,10 @@ pipsdbm_read_statement_function(FILE * fd /* file to read from */)
     gen_chunkp result;
     hash_table h;
     
-    pips_assert("some current module name", db_get_current_module_name());
-    pips_debug(3, "statement -> ??? for %s\n", db_get_current_module_name());
-    stat = (statement) /* hope it is the right module... */
-	db_get_memory_resource(DBR_CODE, db_get_current_module_name(), TRUE);
+    pips_assert("some current module name", dbll_current_module);
+    pips_debug(3, "statement -> ??? for %s\n", dbll_current_module);
+    stat = (statement)
+	db_get_memory_resource(DBR_CODE, dbll_current_module, TRUE);
 
     initialize_ordering_to_statement(stat);
 
