@@ -19,8 +19,6 @@
 
 #include "ri-util.h"
 
-entity CreateIntrinsic(string name); /* in syntax.h */
-
 /* PREDICATES ON STATEMENTS */
 
 bool empty_statement_p(st)
@@ -726,7 +724,7 @@ list ltrue,lfalse;
     if (notrue) 
     {
 	expression
-	    newcond = MakeUnaryCall(CreateIntrinsic(NOT_OPERATOR_NAME),
+	    newcond = MakeUnaryCall(entity_intrinsic(NOT_OPERATOR_NAME),
 				    condition);
 
 	return
