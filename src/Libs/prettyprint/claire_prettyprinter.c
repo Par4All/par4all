@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.23  2004/12/20 13:12:23  hurbain
+   Still debugging
+
    Revision 1.22  2004/10/20 12:31:43  hurbain
    Added a conditional debug
 
@@ -867,7 +870,7 @@ static call claire_loop_from_loop(loop l, string * result, int task_number){
 
   u = atoi(claire_expression(range_upper(loop_range(l))));
   low = atoi(claire_expression(range_lower(loop_range(l))));
-  *up = strdup(int_to_string(u - low +1));
+  *up = strdup(int_to_string(u - low));
 	       //*up = claire_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
   *claire_name = claire_entity_local_name(loop_index(l));
   if( (*claire_name)[0] == 'M'){
@@ -929,8 +932,8 @@ static string claire_loop_from_sequence(loop l, int task_number){
   
   /* Initialize result string with the declaration of the task */
   string result = strdup(concatenate(*taskname, 
-			      " :: TASK(unitSpentTime = vartype!(1),"
-			      NL, TAB, "exLoopNest = LOOPNEST(deep = ", NULL));
+				     " :: TASK(unitSpentTime = vartype!(1),"
+				     NL, TAB, "exLoopNest = LOOPNEST(deep = ", NULL));
 
   instruction ins = statement_instruction(s);
   list li = statement_declarations(s);
@@ -940,7 +943,7 @@ static string claire_loop_from_sequence(loop l, int task_number){
   *name = claire_entity_local_name(loop_index(l));
   u = atoi(claire_expression(range_upper(loop_range(l))));
   low = atoi(claire_expression(range_lower(loop_range(l))));
-  *up = strdup(int_to_string(u - low +1));
+  *up = strdup(int_to_string(u - low));
   //*up = claire_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
 
   if((*name)[0] == 'M'){
@@ -1065,6 +1068,10 @@ static string claire_sequence_from_task(sequence seq){
 static string claire_tasks(statement stat){
   int j;
   string result = "tasks\n";
+    if(statement_number(stat) < 0)
+    {
+      pips_user_error("statement error");
+    }
   instruction i = statement_instruction(stat);
   tasks_names = gen_array_make(0);
   switch(instruction_tag(i)){
@@ -1094,7 +1101,7 @@ static string claire_tasks(statement stat){
 */
 static string claire_code_string(entity module, statement stat)
 {
-  string decls, tasks, result;
+  string decls="", tasks="", result="";
 
   ifdebug(2)
     {
