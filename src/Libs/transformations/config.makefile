@@ -17,7 +17,7 @@ LIB_CFILES =	replace.c \
 		nest_parallelization.c\
                 coarse_grain_parallelization.c\
 		dead_code_elimination.c \
-                test_vide_elimination.c \
+                trivial_test_elimination.c \
 		privatize.c \
 		array_privatization.c \
 		simple_atomize.c \
