@@ -114,8 +114,10 @@
 ;; and emacs:
 (setq
  epips-array-data-flow-graph-view-command-name "Array data flow graph View"
+ epips-available-modules-command-name "AVAILABLE_MODULES"
  epips-bank-view-command-name "BANK"
  epips-call-graph-view-command-name "Callgraph View"
+ epips-daVinci-view-command-name "VIEW_DAVINCI_GRAPH"
  epips-dependance-graph-view-command-name "Dependence Graph View"
  epips-distributed-view-command-name "Distributed View"
  epips-edit-view-command-name "Edit"
@@ -124,7 +126,7 @@
  epips-hpfc-file-view-command-name "HPFC File"
  epips-ICFG-view-command-name "ICFG View"
  epips-module-command-name "MODULE_NAME"
- epips-available-modules-command-name "AVAILABLE_MODULES"
+ epips-new-daVinci-context-command-name "NEW_DAVINCI_CONTEXT"
  epips-parallel-view-command-name "Parallel View"
  epips-placement-view-command-name "Placement View"
  epips-prompt-user-command-name "PROMPT_USER"
@@ -145,6 +147,35 @@
   (print something (get-buffer "*Messages*"))
   )
 
+
+(defun epips-dispatch-regexp (a-string default-function &rest a-map-list)
+  "Try do find a regexp match in a-map-list (e1 f1 e2 f2 ...)
+ for a-string and if any, call the function dual. 
+If not, call default-function"
+  (catch 'match-has-been-found
+    (let (
+	  (length-of-list (length a-map-list))
+	  (i 0)
+	  )
+      (while (< i length-of-list)
+	;; Try to match a daVinci syntax:
+	(if (string-match (elt a-map-list i) a-string)
+	    (progn
+	      ;; Call the according function with the parameter if any:
+	      (funcall (elt a-map-list (1+ i))
+		       (match-string 1)) ; The parameter
+	      ;; Finished
+	      (throw 'match-has-been-found nil)
+	      )
+	  )
+	(setq i (+ i 2))
+	)
+      ;; Well, nothing has matched, use the default-function:
+      (funcall default-function a-string)
+      )
+    )
+  )
+    
 
 (defun epips-clean-up-fortran-expression (a-string)
   "Remove surrounding blanks, double blanks near to ',', LF, 
@@ -261,9 +292,145 @@ If no buffer can be found, just return nil."
   )
 
 
-; Here are defined the various function to deal with the Pips actions:
+;;;
+;;; The daVinci stuff to display graphs:
+;;;
 
-; Executed from send_module_name_to_emacs() in emacs.c:
+(defvar epips-current-daVinci-context -1
+  "Store the current daVinci context used to display a graph")
+
+(defvar epips-daVinci-process nil
+  "Store the current daVinci process used to display a graph")
+
+(defvar epips-daVinci-selected-nodes nil
+  "Store the current selected nodes")
+
+(defvar epips-daVinci-selected-edge nil
+  "Store the current selected edge")
+
+
+(defun epips-daVinci-clear-state ()
+  "Just put the daVinci variable in a clean state"
+  (setq epips-current-daVinci-context -1
+	epips-daVinci-selected-nodes nil
+	epips-daVinci-selected-edge nil)
+  )
+
+
+(defun epips-daVinci-sentinel (process event)
+  "Handler for daVinci process state change"
+  (epips-debug (format "Process %s had event '%s'." process event))
+  ;; Just consider the daVinci process is no longet usable
+  (setq epips-daVinci-process nil)
+  )
+
+
+(defun epips-daVinci-ignore ()
+  "Do nothing"
+  )
+
+
+(defun epips-daVinci-close-context ()
+  "Close the current context from daVinci"
+  (setq epips-daVinci-curent-context nil)
+  )
+
+
+(defun epips-daVinci-set-curent-context (context)
+  "Set the current context from daVinci"
+  (epips-debug (format "Current context is \"%s\"" context))
+  (setq epips-daVinci-curent-context context)
+  )
+
+
+(defun epips-daVinci-nodes-selection (nodes)
+  "Select the user pointed nodes"
+  (epips-debug (format "Selection of nodes \"%s\"" nodes))
+  (setq epips-daVinci-selected-nodes nodes)
+  )
+
+
+(defun epips-daVinci-node-double-click ()
+  "Action to node double click"
+  (epips-user-warning-command "Node double click\n")
+  )
+
+
+(defun epips-daVinci-edge-selection (edge)
+  "Select the user pointed edge"
+  (epips-debug (format "Selection of edge \"%s\"" edge))
+  (setq epips-daVinci-selected-edge edge)
+  )
+
+
+(defun epips-daVinci-node-selection ()
+  "Action to edge double click"
+  (epips-user-warning-command "Edge double click\n")
+  )
+
+
+(defun epips-daVinci-output-filter (process output)
+  "Accept the daVinci output and displatch functions"
+  (epips-debug (format "Process %s had output '%s'." process output))
+  ;; The daVinci syntax with respective action:
+  (epips-dispatch-regexp output 'epips-user-warning-command
+			 "^ok$" 'epips-daVinci-ignore
+			 "^context(\\(\".*\"\\))$" 'epips-daVinci-set-curent-context
+			 "^close$" 'epips-daVinci-close-context
+			 "^node_selections_labels([\\(.*\\)])$" 'epips-daVinci-nodes-selection
+			 "^node_double_click$" 'epips-daVinci-node-double-click
+			 "^edge_selection_labels([\\(.*\\)])$" 'epips-daVinci-edge-selection
+			 "^edge_double_click$" 'epips-daVinci-edge-double-click
+			 "^quit" 'epips-daVinci-ignore
+			 )
+  )
+
+
+(defun epips-send-command-to-daVinci (some-text)
+  "Send a daVinci command"
+  (process-send-string epips-daVinci-process
+		       ;; Commands end with a '\n':
+		       (format "%s\n" some-text))
+  )
+
+
+(defun epips-new-daVinci-context-user-command (epips-command-content)
+  "Launch a new daVinci window (context)"
+  ;; If there is no running daVinci process yet, launch one:
+  (if (not epips-daVinci-process)
+      (let ((process-connection-type nil))
+	(epips-daVinci-clear-state)
+	(setq epips-daVinci-process
+	      (start-process "DaVinci" "DaVinci" "daVinci" "-pipe"))	
+	(set-process-sentinel epips-daVinci-process 'epips-daVinci-sentinel)
+	(set-process-filter epips-daVinci-process 'epips-daVinci-output-filter)
+	)
+    )
+  ;; Open a new context:
+  (setq epips-current-daVinci-context (1+ epips-current-daVinci-context))
+  (epips-send-command-to-daVinci (format "multi(open_context(\"Context_%d\"))"
+				      epips-current-daVinci-context))
+  )
+
+
+(defun epips-daVinci-view (epips-command-name epips-command-content)
+  "Ask daVinci for displaying a graph in the current daVinci context"
+  ;; Load the "-daVinci" file instead of the "-graph" one:
+  (string-match "-graph$" epips-command-content)
+  (let (
+	(graph-file-name (replace-match "-daVinci" t t epips-command-content))
+	)
+    (epips-send-command-to-daVinci (format "menu(file(open_graph(\"%s\")))"
+					   graph-file-name))
+    )
+  )
+
+
+;;;
+;;; Here are defined the various function to deal with the Pips actions:
+;;;
+
+;; Executed from send_module_name_to_emacs() in emacs.c:
 (defun epips-module-name-command (epips-command-content)
   (epips-debug 'epips-module-name-command)
   (setq epips-current-module-name epips-command-content)
@@ -521,38 +688,41 @@ epips-command-content contains the name of the file to display."
 	(epips-sequential-view-command epips-command-name epips-command-content)
       (if (equal epips-command-name epips-call-graph-view-command-name)
           (epips-ICFG-or-graph-view-command epips-command-name epips-command-content)
-        (if (equal epips-command-name epips-dependance-graph-view-command-name)
-            (epips-sequential-view-command epips-command-name epips-command-content)
-          (if (equal epips-command-name epips-edit-view-command-name)
+	(if (equal epips-command-name epips-daVinci-view-command-name)
+	    (epips-daVinci-view epips-command-name epips-command-content)
+	  (if (equal epips-command-name epips-dependance-graph-view-command-name)
+	      (epips-sequential-view-command epips-command-name epips-command-content)
+	    (if (equal epips-command-name epips-edit-view-command-name)
 					; The .f edit is not something
 					; special:
-              (epips-sequential-view-command epips-command-name epips-command-content)
-	    (if (equal epips-command-name epips-distributed-view-command-name)
 		(epips-sequential-view-command epips-command-name epips-command-content)
-	      (if (equal epips-command-name epips-emacs-sequential-view-command-name)
+	      (if (equal epips-command-name epips-distributed-view-command-name)
 		  (epips-sequential-view-command epips-command-name epips-command-content)
-		(if (equal epips-command-name epips-flint-view-command-name)
+		(if (equal epips-command-name epips-emacs-sequential-view-command-name)
 		    (epips-sequential-view-command epips-command-name epips-command-content)
-		  (if (equal epips-command-name epips-hpfc-file-view-command-name)
+		  (if (equal epips-command-name epips-flint-view-command-name)
 		      (epips-sequential-view-command epips-command-name epips-command-content)
-		    (if (equal epips-command-name epips-ICFG-view-command-name)
-			(epips-ICFG-or-graph-view-command epips-command-name epips-command-content)
-		      (if (equal epips-command-name epips-parallel-view-command-name)
-			  (epips-sequential-view-command epips-command-name epips-command-content)
-			(if (equal epips-command-name epips-placement-view-command-name)
+		    (if (equal epips-command-name epips-hpfc-file-view-command-name)
+			(epips-sequential-view-command epips-command-name epips-command-content)
+		      (if (equal epips-command-name epips-ICFG-view-command-name)
+			  (epips-ICFG-or-graph-view-command epips-command-name epips-command-content)
+			(if (equal epips-command-name epips-parallel-view-command-name)
 			    (epips-sequential-view-command epips-command-name epips-command-content)
-			  (if (equal epips-command-name epips-scheduling-view-command-name)
+			  (if (equal epips-command-name epips-placement-view-command-name)
 			      (epips-sequential-view-command epips-command-name epips-command-content)
-			    (if (equal epips-command-name epips-sequential-view-command-name)
+			    (if (equal epips-command-name epips-scheduling-view-command-name)
 				(epips-sequential-view-command epips-command-name epips-command-content)
-			      (if (equal epips-command-name epips-user-view-command-name)
+			      (if (equal epips-command-name epips-sequential-view-command-name)
 				  (epips-sequential-view-command epips-command-name epips-command-content)
+				(if (equal epips-command-name epips-user-view-command-name)
+				    (epips-sequential-view-command epips-command-name epips-command-content)
 					; Else, command unknown:
-				(epips-user-error-command (concat "\nCommand name \""
-								  epips-command-name
-								  "\" with argument \""
-								  epips-command-content
-								  "\" not implemented !!!\n\n"))
+				  (epips-user-error-command (concat "\nCommand name \""
+								    epips-command-name
+								    "\" with argument \""
+								    epips-command-content
+								    "\" not implemented !!!\n\n"))
+				  )
 				)
 			      )
 			    )
@@ -570,7 +740,8 @@ epips-command-content contains the name of the file to display."
     )
   )
 
-; Executed from send_window_number_to_emacs() in emacs.c:
+
+;; Executed from send_window_number_to_emacs() in emacs.c:
 (defun epips-window-number-command (epips-command-content)
   (epips-debug 'epips-window-number-command)
   (setq epips-window-number (string-to-number epips-command-content))
@@ -607,18 +778,21 @@ epips-command-content contains the name of the file to display."
       (epips-set-available-module-list-command epips-command-content)
     (if (equal epips-command-name epips-module-command-name)
 	(epips-module-name-command epips-command-content)
-      (if (equal epips-command-name epips-prompt-user-command-name)
-	  (epips-prompt-user-command epips-command-content)
-	(if (equal epips-command-name epips-user-error-command-name)
-	    (epips-user-error-command epips-command-content)
-	  (if (equal epips-command-name epips-user-log-command-name)
-	      (epips-user-log-command epips-command-content)
-	    (if (equal epips-command-name epips-user-warning-command-name)
-		(epips-user-warning-command epips-command-content)
-	      (if (equal epips-command-name epips-window-number-command-name)
-		  (epips-window-number-command epips-command-content)
+      (if (equal epips-command-name  epips-new-daVinci-context-command-name)
+	  (epips-new-daVinci-context-user-command epips-command-content)
+	(if (equal epips-command-name epips-prompt-user-command-name)
+	    (epips-prompt-user-command epips-command-content)
+	  (if (equal epips-command-name epips-user-error-command-name)
+	      (epips-user-error-command epips-command-content)
+	    (if (equal epips-command-name epips-user-log-command-name)
+		(epips-user-log-command epips-command-content)
+	      (if (equal epips-command-name epips-user-warning-command-name)
+		  (epips-user-warning-command epips-command-content)
+		(if (equal epips-command-name epips-window-number-command-name)
+		    (epips-window-number-command epips-command-content)
 					; It may be a view command:
-		(epips-view-command epips-command-name epips-command-content)
+		  (epips-view-command epips-command-name epips-command-content)
+		  )
 		)
 	      )
 	    )
@@ -627,7 +801,6 @@ epips-command-content contains the name of the file to display."
       )
     )
   )
-
 
 ; Parse the output of wpips to see if there are some commands inside:
 (defun epips-analyse-output (a-process an-output-string)
