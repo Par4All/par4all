@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/08/31 16:45:32 $, )
+ * ($Date: 1996/09/07 14:27:23 $, )
  */
 
 #include "defines-local.h"
@@ -47,8 +47,10 @@ make_host_and_node_modules (entity module)
 
     if (entity_main_module_p(module))
     {
-	host = make_empty_program(HOST_NAME);
-	node = make_empty_program(NODE_NAME);
+	/* host = make_empty_program(HOST_NAME);
+	   node = make_empty_program(NODE_NAME); */
+	host = make_empty_subroutine(HOST_NAME);
+	node = make_empty_subroutine(NODE_NAME);
     }
     else
     {
