@@ -1,4 +1,16 @@
-/* package matrice */
+/* 
+ * package hyperplane.
+ *
+ * Build a change of basis matrix G compatible with a hyperplane direction h
+ *
+ * $Id$
+ *
+ * $Log: scanning_base.c,v $
+ * Revision 1.8  1998/10/12 10:46:34  irigoin
+ * Comments added, RCS variables added
+ *
+ *
+ */
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -47,7 +59,7 @@ matrice G;
 	/* search the first k / h[k]!=0 */
 	while(k<n && value_zero_p(h[k]))
 	    k++;
-	if (k==n) pips_error("scanning_base_hyperplane","h null");
+	if (k==n) user_error("scanning_base_hyperplane", "h is null vector\n");
 	else{ /* permution de h[0] et h[k] */
 	    h[0] = h[k];
 	    h[k] = VALUE_ZERO;
