@@ -177,6 +177,9 @@ resize_getchar_buffer(void)
 }
 
 
+static int i_getchar = UNDEF, l_getchar = UNDEF;
+
+
 /*************************************************************** STMT BUFFER */
 
 /* le buffer contenant le statement courant, l'indice courant et la longueur.
@@ -206,7 +209,7 @@ resize_stmt_buffer(void)
 
 /* indexes in the buffer...
  */
-static int iStmt, lStmt;
+static int iStmt = 0, lStmt = 0;
 
 /*************************************************************** LINE BUFFER */
 
@@ -236,7 +239,7 @@ resize_line_buffer(void)
     pips_assert("realloc ok", line_buffer);
 }
 
-static int iLine, lLine; 
+static int iLine = 0, lLine = 0; 
 
 void 
 append_data_current_stmt_buffer_to_declarations(void)
@@ -255,6 +258,16 @@ append_data_current_stmt_buffer_to_declarations(void)
     free(odecls);
     free(tmp);
     code_decls_text(c) = ndecls;
+}
+
+void
+parser_reset_all_reader_buffers(void)
+{
+    iLine = 0, lLine = 0;
+    iStmt = 0, lStmt = 0;
+    iComm = 0;
+    iPrevComm = 0;
+    i_getchar = UNDEF, l_getchar = UNDEF;
 }
 
 /*
@@ -289,7 +302,7 @@ append_data_current_stmt_buffer_to_declarations(void)
  *  - les declarations sont relues par un autre analyseur pour en garder
  * le texte et rester fidele au source
  */
-LOCAL int EtatQuotes;
+static int EtatQuotes;
 #define NONINQUOTES 1
 #define INQUOTES 2
 #define INQUOTEQUOTE 3
@@ -528,7 +541,8 @@ PipsGetc(FILE * fp)
 
 /* Routine de lecture physique
  *
- * In case an error occurs, buffer must be emptied. Since ibuffer and lbuffer
+ * In case an error occurs, buffer must be emptied. 
+ * Since i_getchar and l_getchar
  * cannot be touched by the error handling routine, changes of fp are tracked
  * in GetChar() and dynamically tested. Kludge suggested by Fabien Coelho to
  * avoid adding more global variables. (FI)
@@ -541,7 +555,6 @@ int
 GetChar(FILE * fp)
 {
     int c = UNDEF;
-    static int ibuffer = UNDEF, lbuffer = UNDEF;
     static col = 0;
     static FILE * previous_fp = NULL;
 
@@ -549,11 +562,11 @@ GetChar(FILE * fp)
 
     if( previous_fp != fp ) {
 	/* If a file has just been opened */
-	if( ibuffer < lbuffer ) {
+	if( i_getchar < l_getchar ) {
 	    /* if the buffer is not empty, which may never occur if 
 	     * previous_fp == NULL, perform a buffer reset
 	     */
-	    ibuffer = lbuffer;
+	    i_getchar = l_getchar;
 	    user_warning("GetChar", 
 			 "Unexpected buffer reset.\n"
 			 "A parser error must have occured previously.\n");
@@ -564,17 +577,17 @@ GetChar(FILE * fp)
     /* on lit toute une ligne d'un coup pour traiter le cas des
      * tabulations et des lignes vides.
      */
-    while (ibuffer >= lbuffer && c != EOF) {
+    while (i_getchar >= l_getchar && c != EOF) {
 	int EmptyBuffer = TRUE;
 	int LineTooLong = FALSE;
 	bool first_column = TRUE;
 	bool in_comment = FALSE;
 
-	ibuffer = lbuffer = 0;
+	i_getchar = l_getchar = 0;
 
 	while ((c = getc(fp)) != '\n' && c != EOF) {
 
-	    if (lbuffer>getchar_buffer_size-20) /* large for expansion */
+	    if (l_getchar>getchar_buffer_size-20) /* large for expansion */
 		resize_getchar_buffer();
 
 	  if(first_column) {
@@ -601,7 +614,7 @@ GetChar(FILE * fp)
 		/* for (i = 0; i < (8-Column%8); i++) { */
 		for (i = 0; i < nspace; i++) {
 		    col += 1;
-		    getchar_buffer[lbuffer++] = ' ';
+		    getchar_buffer[l_getchar++] = ' ';
 		}
 	    }
 	    else {
@@ -609,17 +622,17 @@ GetChar(FILE * fp)
 		if(col > 72 && !LineTooLong && !in_comment && 
 		   parser_warn_for_columns_73_80 && !(c==' ' || c=='\t')) {
 		    user_warning("GetChar",
-				 "Line %d truncated, col=%d and lbuffer=%d\n",
-				 LineNumber, col, lbuffer);
+				 "Line %d truncated, col=%d and l_getchar=%d\n",
+				 LineNumber, col, l_getchar);
 		    LineTooLong = TRUE;
 		}
-		/* buffer[lbuffer++] = (col > 72) ? ' ' : c; */
-		/* buffer[lbuffer++] = (col > 72) ? '\n' : c; */
+		/* buffer[l_getchar++] = (col > 72) ? ' ' : c; */
+		/* buffer[l_getchar++] = (col > 72) ? '\n' : c; */
 		if(col <= 72 || in_comment) {
 		  /* last columns cannot be copied because we might be 
 		   * inside a character string
 		   */
-		  getchar_buffer[lbuffer++] = c;
+		  getchar_buffer[l_getchar++] = c;
 		}
 		if (c != ' ')
 		    EmptyBuffer = FALSE;
@@ -635,41 +648,41 @@ GetChar(FILE * fp)
 	}
 	else {
 	    if (EmptyBuffer) {
-		/* ibuffer = lbuffer = UNDEF; */
+		/* i_getchar = l_getchar = UNDEF; */
 		debug(8, "GetChar", "An empty line has been detected\n");
-		ibuffer = lbuffer = 0;
-		getchar_buffer[lbuffer++] = '\n';
+		i_getchar = l_getchar = 0;
+		getchar_buffer[l_getchar++] = '\n';
 		col = 0;
 		/* LineNumber += 1; */
 	    }
 	    else {
 		col = 0;
-		getchar_buffer[lbuffer++] = '\n';
+		getchar_buffer[l_getchar++] = '\n';
 	    }
 	}
 	ifdebug(8) {
 	    int i;
 
-	    if(lbuffer==UNDEF) {
+	    if(l_getchar==UNDEF) {
 		debug(8, "GetChar",
 		      "Input line after tab expansion is empty:\n");
 	    }
 	    else {
 		debug(8, "GetChar",
-		      "Input line after tab expansion lbuffer=%d, col=%d:\n",
-		      lbuffer, col);
+		      "Input line after tab expansion l_getchar=%d, col=%d:\n",
+		      l_getchar, col);
 	    }
-	    for (i=0; i < lbuffer; i++) {
+	    for (i=0; i < l_getchar; i++) {
 		(void) putc((char) getchar_buffer[i], stderr);
 	    }
-	    if(lbuffer<=0) {
+	    if(l_getchar<=0) {
 		(void) putc('\n', stderr);
 	    }
 	}
     }
 
     if (c != EOF) {
-	if ((c = getchar_buffer[ibuffer++]) == '\n') {
+	if ((c = getchar_buffer[i_getchar++]) == '\n') {
 	    Column = 1;
 	    LineNumber += 1;
 	}
