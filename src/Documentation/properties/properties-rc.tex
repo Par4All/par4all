@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1996/09/07 14:26:22 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1996/10/01 10:25:43 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -756,6 +756,17 @@ HPFC_USE_BUFFERS TRUE
 \end{verbatim}
 
 \section{Program Transformations}
+
+
+\subsection{Dead code elimination}
+
+Since it is useful to display statistics on what has been found
+useless and removed in a program, this property is used to ask for
+statistics displaying:
+\begin{verbatim}
+DEAD_CODE_DISPLAY_STATISTICS FALSE
+\end{verbatim}
+
 
 \subsection{Array privatization}
 
