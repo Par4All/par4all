@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/06/03 14:14:33 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/09/01 15:47:43 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -356,38 +356,141 @@ basic base;
     return(e);
 }
 
-entity AddEntityToModule(ent, module)
-entity ent, module;
+entity FindOrCreateEntityLikeModel(package, name, model)
+string package, name;
+entity model;
 {
-    entity
-	new = make_entity(copy_string(concatenate(module_local_name(module),
-						  MODULE_SEP_STRING,
-						  entity_local_name(ent),
-						  NULL)),
-			  copy_type(entity_type(ent)),
-			  copy_storage(entity_storage(ent)),
-			  copy_value(entity_initial(ent)));
+    string
+	new_name = concatenate(package, 
+			       MODULE_SEP_STRING, 
+			       name, 
+			       NULL);
+    entity 
+	new = gen_find_tabulated(new_name, entity_domain);
+    area
+	tmp_area = area_undefined;
+
+    debug(3, "FindOrCreateEntityLikeModel",
+	  "entity %s to be made after %s\n",
+	  new_name, entity_name(model));
+
+    pips_assert("FindOrCreateEntityLikeModel", gen_consistent_p(model));
+
+    return(!entity_undefined_p(new) ?
+	   new :
+	   make_entity(copy_string(new_name),
+		       /*
+			* ??? some bug in copy_type disable the possibility
+			* of copying area for instance...
+			*
+			* moreover I do not wish to copy the layout list
+			* for commons.
+			*/
+		       (!type_area_p(entity_type(model)) ?
+			copy_type(entity_type(model)) :
+			make_type(is_type_area,
+				  (tmp_area = type_area(entity_type(model)),
+				   make_area(area_size(tmp_area), NIL)))),
+		       copy_storage(entity_storage(model)),
+		       copy_value(entity_initial(model))));
+}
+
+/*   !!! caution, it may not be a module, but a common...
+ */
+entity AddEntityToModule(e, module)
+entity e, module;
+{
+    entity 
+	new = FindOrCreateEntityLikeModel(module_local_name(module),
+					  entity_local_name(e),
+					  e);
 
     debug(7, "AddEntityToModule", "adding %s to module %s\n",
 	  entity_name(new), entity_name(module));
     
-    AddEntityToDeclarations(new, module);
+    if (entity_module_p(module))
+	AddEntityToDeclarations(new, module);
 
     return(new);
 }
 
-/*
- * AddEntityToHostAndNodeModules
+/*   AddEntityToHostAndNodeModules
  */
 void AddEntityToHostAndNodeModules(e)
 entity e;
 {
-    store_new_node_variable(AddEntityToModule(e, node_module), e);
+    if (entity_node_new_undefined_p(e))
+	store_new_node_variable(AddEntityToModule(e, node_module), e);
+    else
+	AddEntityToDeclarations(load_entity_node_new(e), node_module);
     
     if (!array_distributed_p(e))
     {
-	store_new_host_variable(AddEntityToModule(e, host_module), e);
+	if (entity_host_new_undefined_p(e))
+	    store_new_host_variable(AddEntityToModule(e, host_module), e);
+	else
+	    AddEntityToDeclarations(load_entity_host_new(e), host_module);
     }
+}
+
+/* The common name is changed to distinguish the current, host and
+ * node instances of the common. 
+ */
+void AddCommonToModule(common, module, update, suffix)
+entity common, module;
+void (*update)();
+string suffix;
+{
+    string
+	name = strdup(concatenate(entity_local_name(common),
+				  "_", suffix, NULL));
+    entity
+	new_common = 
+	    FindOrCreateEntityLikeModel(HPFC_PACKAGE,
+					name,
+					common);
+    list 
+	lref = area_layout(type_area(entity_type(common))),
+	lold = area_layout(type_area(entity_type(new_common))),
+	lnew = NIL;
+
+    free(name);
+    update(new_common, common);
+
+    /* The layout list must be updated to the right entities
+     */
+
+    MAPL(ce,
+     {
+	 entity 
+	     e = ENTITY(CAR(ce));
+	 entity
+	     new_e;
+
+	 if (local_entity_of_module_p(e, common)) /* !!! not in current  */
+	 {
+	     new_e = AddEntityToModule(e, new_common);
+
+	     if (gen_find_eq(new_e, lold)==entity_undefined)
+	     {
+		 lnew = CONS(ENTITY, new_e, lnew);
+		 update(new_e, e);
+	     }
+	 }
+     },
+	 lref);
+
+    AddEntityToDeclarations(new_common, module);
+
+    area_layout(type_area(entity_type(new_common))) = 
+	gen_nconc(gen_nreverse(lnew), lold);
+}
+
+void AddCommonToHostAndNodeModules(common)
+entity common;
+{
+    AddCommonToModule(common, node_module, store_new_node_variable, NODE_NAME);
+    AddCommonToModule(common, host_module, store_new_host_variable, HOST_NAME); 
 }
 
 /*
