@@ -386,9 +386,9 @@ FILE *out ;
 	if( bp->name == NULL || bp == Tabulated_bp ) continue ;
 
 	if( !IS_INLINABLE( bp )) {
-	    if( (dp=bp->domain)->ba.type == CONSTRUCTED_DT
-	       && dp->co.op == OR_OP )
-		    (void)fprintf( out, "--NEWGEN-FIRST %d\n", dp->co.first ) ;
+
+	  /* if( (dp=bp->domain)->ba.type==CONSTRUCTED_DT && dp->co.op==OR_OP)
+	     (void)fprintf( out, "--NEWGEN-FIRST %d\n", dp->co.first ) ; */
 
 	    (void)fprintf( out, 
 		    (IS_EXTERNAL( bp ) ? "external %s" : 
