@@ -114,19 +114,12 @@
  * declarations de variables externes locales
  */
 
-/*
- * le buffer contenant le statement courant, l'indice courant et la longueur.
- */
-#define STMTLENGTH (4096)
-LOCAL int Stmt[STMTLENGTH];
-LOCAL int iStmt, lStmt; 
-
 /*********************************************************** COMMENT BUFFER */
 
 /* le buffer contenant le commentaire courant, l'indice courant.
  */
 
-#define INITIAL_COMMENT_BUFFER_SIZE (1024)
+#define INITIAL_BUFFER_SIZE (128)
 char * Comm = NULL, * PrevComm = NULL;
 int iComm = 0, iPrevComm = 0;
 static int CommSize = 0;
@@ -137,8 +130,8 @@ static void
 init_comment_buffers(void)
 {
     if (CommSize!=0) return;
-
-    CommSize = INITIAL_COMMENT_BUFFER_SIZE;
+    pips_debug(9, "allocating comment buffers\n");
+    CommSize = INITIAL_BUFFER_SIZE;
     Comm = (char*) malloc(CommSize);
     PrevComm = (char*) malloc(CommSize);
     pips_assert("malloc ok", Comm && PrevComm);
@@ -147,28 +140,72 @@ init_comment_buffers(void)
 static void
 resize_comment_buffers(void)
 {
-    int NewCommSize = CommSize*2;
-    char * tmp;
-
-    pips_assert("comment buffer is initialized", CommSize!=0);
-    
-    /* Comm */
-    tmp = (char*) malloc(NewCommSize);
-    strncpy(tmp, Comm, CommSize);
-    free(Comm);
-    Comm = tmp;
-
-    /* PrevComm */
-    tmp = (char*) malloc(NewCommSize);
-    strncpy(tmp, PrevComm, CommSize);
-    free(PrevComm);
-    PrevComm = tmp;
-
-    CommSize = NewCommSize;
-
-    pips_assert("malloc ok", Comm && PrevComm);
+    pips_debug(9, "resizing comment buffers\n");
+    pips_assert("comment buffer is initialized", CommSize>0);
+    CommSize*=2;
+    Comm = (char*) realloc(Comm, CommSize);
+    PrevComm = (char*) realloc(PrevComm, CommSize);
+    pips_assert("realloc ok", Comm && PrevComm);
 }
 
+
+/*********************************************************** GETCHAR BUFFER */
+
+static int * getchar_buffer = NULL;
+static int getchar_buffer_size = 0; /* number of elements in the array */
+
+static void
+init_getchar_buffer(void)
+{
+    if (getchar_buffer_size!=0) return; /* lazy */
+    pips_debug(9, "allocating getchar buffer\n");
+    getchar_buffer_size = INITIAL_BUFFER_SIZE;
+    getchar_buffer = (int*) malloc(sizeof(int)*getchar_buffer_size);
+    pips_assert("malloc ok", getchar_buffer);
+}
+
+static void
+resize_getchar_buffer(void)
+{
+    pips_debug(9, "resizing getchar buffer\n");
+    pips_assert("buffer initialized", getchar_buffer_size>0);
+    getchar_buffer_size*=2;
+    getchar_buffer = (int*) realloc(getchar_buffer, 
+				    sizeof(int)*getchar_buffer_size);
+    pips_assert("realloc ok", getchar_buffer);
+}
+
+/*********************************************************** STMT BUFFER */
+
+
+/* le buffer contenant le statement courant, l'indice courant et la longueur.
+ */
+static int * stmt_buffer = NULL;
+static int stmt_buffer_size = 0; 
+
+static void
+init_stmt_buffer(void)
+{
+    if (stmt_buffer_size!=0) return; /* lazy */
+    pips_debug(9, "allocating stmt buffer\n");
+    stmt_buffer_size = INITIAL_BUFFER_SIZE;
+    stmt_buffer = (int*) malloc(sizeof(int)*stmt_buffer_size);
+    pips_assert("malloc ok", stmt_buffer);
+}
+
+static void
+resize_stmt_buffer(void)
+{
+    pips_debug(9, "resizing stmt buffer\n");
+    pips_assert("buffer initialized", stmt_buffer_size>0);
+    stmt_buffer_size*=2;
+    stmt_buffer = (int*) realloc(stmt_buffer, sizeof(int)*stmt_buffer_size);
+    pips_assert("realloc ok", stmt_buffer);
+}
+
+/* indexes in the buffer...
+ */
+static int iStmt, lStmt;
 
 /*
  * Une variable pour traiter les quotes. Petit automate a 3 etats:
@@ -445,7 +482,7 @@ PipsGetc(FILE * fp)
 	}
     }
 
-    c = Stmt[iStmt++];
+    c = stmt_buffer[iStmt++];
     return((eof) ? EOF : UNQUOTE(c));
 }
 
@@ -459,13 +496,16 @@ PipsGetc(FILE * fp)
  * Empty (or rather invisible) lines made of TAB and SPACE characters are 
  * replaced by the string "\n".
  */
+
 int 
 GetChar(FILE * fp)
 {
     int c = UNDEF;
-    static int buffer[LINELENGTH], ibuffer = UNDEF, lbuffer = UNDEF;
+    static int ibuffer = UNDEF, lbuffer = UNDEF;
     static col = 0;
     static FILE * previous_fp = NULL;
+
+    init_getchar_buffer();
 
     if( previous_fp != fp ) {
 	/* If a file has just been opened */
@@ -494,6 +534,9 @@ GetChar(FILE * fp)
 
 	while ((c = getc(fp)) != '\n' && c != EOF) {
 
+	    if (lbuffer>getchar_buffer_size-20) /* large for expansion */
+		resize_getchar_buffer();
+
 	  if(first_column) {
 	    in_comment = (strchr(START_COMMENT_LINE, (char) c)!= NULL);
 	    first_column = FALSE;
@@ -518,7 +561,7 @@ GetChar(FILE * fp)
 		/* for (i = 0; i < (8-Column%8); i++) { */
 		for (i = 0; i < nspace; i++) {
 		    col += 1;
-		    buffer[lbuffer++] = ' ';
+		    getchar_buffer[lbuffer++] = ' ';
 		}
 	    }
 	    else {
@@ -536,7 +579,7 @@ GetChar(FILE * fp)
 		  /* last columns cannot be copied because we might be 
 		   * inside a character string
 		   */
-		  buffer[lbuffer++] = c;
+		  getchar_buffer[lbuffer++] = c;
 		}
 		if (c != ' ')
 		    EmptyBuffer = FALSE;
@@ -555,13 +598,13 @@ GetChar(FILE * fp)
 		/* ibuffer = lbuffer = UNDEF; */
 		debug(8, "GetChar", "An empty line has been detected\n");
 		ibuffer = lbuffer = 0;
-		buffer[lbuffer++] = '\n';
+		getchar_buffer[lbuffer++] = '\n';
 		col = 0;
 		/* LineNumber += 1; */
 	    }
 	    else {
 		col = 0;
-		buffer[lbuffer++] = '\n';
+		getchar_buffer[lbuffer++] = '\n';
 	    }
 	}
 	ifdebug(8) {
@@ -577,7 +620,7 @@ GetChar(FILE * fp)
 		      lbuffer, col);
 	    }
 	    for (i=0; i < lbuffer; i++) {
-		(void) putc((char) buffer[i], stderr);
+		(void) putc((char) getchar_buffer[i], stderr);
 	    }
 	    if(lbuffer<=0) {
 		(void) putc('\n', stderr);
@@ -586,7 +629,7 @@ GetChar(FILE * fp)
     }
 
     if (c != EOF) {
-	if ((c = buffer[ibuffer++]) == '\n') {
+	if ((c = getchar_buffer[ibuffer++]) == '\n') {
 	    Column = 1;
 	    LineNumber += 1;
 	}
@@ -648,8 +691,10 @@ ReadLine(FILE * fp)
 	    if(c=='\n') break;
 	    c = GetChar(fp);
 	}
-
     }
+
+    Comm[iComm] = '\0';
+    pips_debug(7, "comment: (%d) --%s--\n", iComm, Comm);
 
     if (c != EOF) {
 	/*
@@ -748,12 +793,13 @@ ReadLine(FILE * fp)
 
 /* regroupement des lignes du statement en une unique ligne sans continuation */
 int 
-ReadStmt(fp)
-FILE * fp;
+ReadStmt(FILE * fp)
 {
     static int EofSeen = FALSE;
     int TypeOfLine;	
     int result;
+
+    init_stmt_buffer();
 
     if (EofSeen == TRUE) {
 	/*
@@ -792,12 +838,15 @@ FILE * fp;
 	lStmt = 0;
 	do {
 	    iLine = 0;
-	    while (iLine < lLine)
-		Stmt[lStmt++] = Line[iLine++];
+	    while (iLine < lLine) {
+		if (lStmt>stmt_buffer_size-20)
+		    resize_stmt_buffer();
+		stmt_buffer[lStmt++] = Line[iLine++];
+	    }
 	    lLine = 0;
 	} while ((TypeOfLine = ReadLine(fp)) == CONTINUATION_LINE) ;
 
-	Stmt[lStmt++] = '\n';
+	stmt_buffer[lStmt++] = '\n';
 	iStmt = 0;
 
 	line_e_I = (tmp_b_C == UNDEF) ? tmp_b_I-1 : tmp_b_C-1;
@@ -806,6 +855,8 @@ FILE * fp;
 	    EofSeen = TRUE;
 			
 	result = 1;
+
+	/* pips_debug(7, "stmt: (%d) --%s--\n", lStmt, Stmt); */
     }
 
     return(result);
@@ -820,20 +871,20 @@ CheckParenthesis()
     ProfZeroVirg = ProfZeroEgal = FALSE;
 
     for (i = 0; i < lStmt; i++) {
-	if (!IS_QUOTED(Stmt[i])) {
+	if (!IS_QUOTED(stmt_buffer[i])) {
 	    if (parenthese == 0) {
-		if (Stmt[i] == ',')
+		if (stmt_buffer[i] == ',')
 			ProfZeroVirg = TRUE;
-		else if (Stmt[i] == '=')
+		else if (stmt_buffer[i] == '=')
 			ProfZeroEgal = TRUE;
 	    }
-	    if(Stmt[i] == '(') parenthese ++;
-	    if(Stmt[i] == ')') parenthese --;
+	    if(stmt_buffer[i] == '(') parenthese ++;
+	    if(stmt_buffer[i] == ')') parenthese --;
 	}
     }
     if(parenthese < 0) {
 	for (i=0; i < lStmt; i++)
-	    (void) putc((char) Stmt[i], stderr);
+	    (void) putc((char) stmt_buffer[i], stderr);
 	/* Warning("CheckParenthesis", */
 	ParserError("CheckParenthesis",
 		    "unbalanced paranthesis (too many ')')\n"
@@ -841,7 +892,7 @@ CheckParenthesis()
     }
     if(parenthese > 0) {
 	for (i=0; i < lStmt; i++)
-	    (void) putc((char) Stmt[i], stderr);
+	    (void) putc((char) stmt_buffer[i], stderr);
 	ParserError("CheckParenthesis",
 		    "unbalanced paranthesis (too many '(')\n"
 		    "Due to line truncation at column 72?\n");
@@ -888,7 +939,7 @@ FindIfArith()
 
     if (StmtEqualString("IF(", iStmt)) {
 	int i = FindMatchingPar(iStmt+2)+1;
-	if ('0' <= Stmt[i] && Stmt[i] <= '9') {
+	if ('0' <= stmt_buffer[i] && stmt_buffer[i] <= '9') {
 	    (void) CapitalizeStmt("IF", iStmt);
 	    result = TRUE;
 	}
@@ -902,14 +953,14 @@ FindIf()
 {
     if (StmtEqualString("IF(", iStmt)) {
 	int i = FindMatchingPar(iStmt+2)+1;
-	if (Stmt[i] != '=') {
+	if (stmt_buffer[i] != '=') {
 	    (void) CapitalizeStmt("IF", iStmt);
 	    iStmt = i;
 	}
     }
     else if (StmtEqualString("ELSEIF(", iStmt)) {
 	int i = FindMatchingPar(iStmt+6)+1;
-	if (Stmt[i] != '=') {
+	if (stmt_buffer[i] != '=') {
 	    (void) CapitalizeStmt("ELSEIF", iStmt);
 	    iStmt = i;
 	}
@@ -932,9 +983,9 @@ FindAutre()
 	    StmtEqualString("Complex", iStmt) ||
 	    StmtEqualString("Doubleprecision", iStmt) ||
 	    StmtEqualString("Logical", iStmt)) {
-	    if (Stmt[i] == '*' && isdigit(Stmt[i+1])) {
+	    if (stmt_buffer[i] == '*' && isdigit(stmt_buffer[i+1])) {
 		i += 2;
-		while (isdigit(Stmt[i]))
+		while (isdigit(stmt_buffer[i]))
 		    i++;
 	    }
 	    if (StmtEqualString("FUNCTION", i)) {
@@ -952,8 +1003,8 @@ FindAssign()
     if (!ProfZeroEgal && StmtEqualString("ASSIGN", iStmt)) {
 	register int i = iStmt+6;
 
-	if (isdigit(Stmt[i])) {
-	    while (i < lStmt && isdigit(Stmt[i]))
+	if (isdigit(stmt_buffer[i])) {
+	    while (i < lStmt && isdigit(stmt_buffer[i]))
 		i++;
 
 	    if (StmtEqualString("TO", i)) {
@@ -973,14 +1024,14 @@ FindPoints()
     register int i = iStmt;
 
     while (i < lStmt) {
-	if (Stmt[i] == '.' && isalpha(Stmt[i+1])) {
+	if (stmt_buffer[i] == '.' && isalpha(stmt_buffer[i+1])) {
 	    register int j = 0;
 
 	    while (OperateurPoints[j] != NULL) {
 		if (StmtEqualString(OperateurPoints[j], i)) {
-		    Stmt[i] = '%';
+		    stmt_buffer[i] = '%';
 		    i += strlen(OperateurPoints[j]);
-		    Stmt[i-1] = '%';
+		    stmt_buffer[i-1] = '%';
 		    break;
 		}
 		j += 1;
@@ -1003,12 +1054,12 @@ int c;
     int parenthese = 0;
 
     for (i = iStmt; i < lStmt; i++) {
-	if (!IS_QUOTED(Stmt[i])) {
-	    if (parenthese == 0 && Stmt[i] == c)
+	if (!IS_QUOTED(stmt_buffer[i])) {
+	    if (parenthese == 0 && stmt_buffer[i] == c)
 		break;
 
-	    if(Stmt[i] == '(') parenthese ++;
-	    if(Stmt[i] == ')') parenthese --;
+	    if(stmt_buffer[i] == '(') parenthese ++;
+	    if(stmt_buffer[i] == ')') parenthese --;
 	}
     }
 
@@ -1021,15 +1072,16 @@ int i;
 {
     int parenthese;
 
-    pips_assert("FindMatchingPar", Stmt[i] == '(' && !IS_QUOTED(Stmt[i]));
+    pips_assert("FindMatchingPar", 
+		stmt_buffer[i] == '(' && !IS_QUOTED(stmt_buffer[i]));
 
     i += 1;
     parenthese = 1;
 
     while (i < lStmt && parenthese > 0) {
-	if (!IS_QUOTED(Stmt[i])) {
-	    if(Stmt[i] == '(') parenthese ++;
-	    if(Stmt[i] == ')') parenthese --;
+	if (!IS_QUOTED(stmt_buffer[i])) {
+	    if(stmt_buffer[i] == '(') parenthese ++;
+	    if(stmt_buffer[i] == ')') parenthese --;
 	}
 	i += 1;
     }
@@ -1046,7 +1098,7 @@ int i;
 
     if (strlen(s) <= lStmt-i) {
 	while (*s)
-	    if (*s != Stmt[i++])
+	    if (*s != stmt_buffer[i++])
 		break;
 	    else
 		s++;
@@ -1068,7 +1120,7 @@ int i;
 	/* la 1ere lettre n'est pas modifiee */
 	i += 1;
 	while (i < l) {
-	    Stmt[i] = tolower(Stmt[i]);
+	    stmt_buffer[i] = tolower(stmt_buffer[i]);
 	    i += 1;
 	}
     }
@@ -1086,10 +1138,11 @@ NeedKeyword()
     register int i, j;
     char * kwcour;
 
-    i = keywidx[(int) Stmt[iStmt]-'A'];
+    i = keywidx[(int) stmt_buffer[iStmt]-'A'];
 
     if (i != UNDEF) {
-	while ((kwcour = keywtbl[i].keywstr)!=0 && kwcour[0]==Stmt[iStmt]) {
+	while ((kwcour = keywtbl[i].keywstr)!=0 && 
+	       kwcour[0]==stmt_buffer[iStmt]) {
 	    if (StmtEqualString(kwcour, iStmt) != FALSE) {
 		j = CapitalizeStmt(kwcour, iStmt);
 		return(j);
@@ -1098,7 +1151,6 @@ NeedKeyword()
 	}
     }
 
-    /* FatalError("NeedKeyword", "[scanner] keyword expected\n"); */
     ParserError("NeedKeyword", "[scanner] keyword expected\n");
 
     return(-1); /* just to avoid a gcc warning */
