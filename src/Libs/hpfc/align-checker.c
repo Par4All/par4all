@@ -8,6 +8,10 @@
  * this should use use-def chains, vectors and so on
  *
  * Fabien Coelho  August 93
+ *
+ * $RCSfile: align-checker.c,v $ ($Date: 1994/12/22 15:34:59 $, )
+ * version $Revision$
+ * got on %D%, %T%
  */
 
 
@@ -366,8 +370,7 @@ int *pi;
     normalized
 	n = expression_normalized(e);
 
-    pips_assert("shift_expression_of_loop_index_p",
-		(!normalized_undefined_p(n)));
+    assert(!normalized_undefined_p(n));
 
     switch (normalized_tag(n))
     {
@@ -427,8 +430,7 @@ int *pi1, *pi2;
 	    print_expression(e);
 	}
 	    
-    pips_assert("affine_expression_of_loop_index_p",
-		(!normalized_undefined_p(n)));
+    assert(!normalized_undefined_p(n));
 
     switch (normalized_tag(n))
     {
