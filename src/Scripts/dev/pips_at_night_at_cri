@@ -5,6 +5,12 @@
 # what to do at night from the pips account at cri on chailly.
 #
 
+# to get the environment when launched by cron.
+
+test -f ~/.bashrc && source ~/.bashrc
+
+#
+
 script=/projects/Pips/Production/Utils/pips_at_night
 mailto=pips_validation
 remote=rsh
