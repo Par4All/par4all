@@ -19,7 +19,8 @@
 
 #include "ri-util.h" /* linear.h is included in */
 #include "control.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 #include "pipsdbm.h"
 #include "semantics.h"
 
