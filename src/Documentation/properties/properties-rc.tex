@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/06/23 14:13:31 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/08/04 10:56:23 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -667,8 +667,8 @@ PARTIAL_DISTRIBUTION FALSE
 
 \section{HPFC {\em High Performance Fortran Compiler}}
 
-debugging levels considered by HPFC: {\tt HPFC\_DEBUG\_LEVEL}, 
-{\tt HPFC\_PARSER\_DEBUG\_LEVEL}, {\tt HPFC\_IO\_DEBUG\_LEVEL}.
+debugging levels considered by HPFC: 
+{\tt HPFC\_\{,IO,REMAPPING\}\_DEBUG\_LEVEL}.
 
   These booleans decide whether some computations are directly
 generated in the output code, or computed thru calls to dedicated
@@ -697,6 +697,11 @@ HPFC_SYNCHRONIZE_IO FALSE
 HPFC_IGNORE_MAY_IN_IO FALSE
 \end{verbatim}
 
+  Wether to use lazy or non-lazy communications
+
+\begin{verbatim}
+HPFC_LAZY_MESSAGES TRUE
+\end{verbatim}
 
 % \begin{thebibliography}{99}
 
