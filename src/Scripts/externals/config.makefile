@@ -2,16 +2,23 @@
 # $RCSfile: config.makefile,v $ for dev
 #
 
-SCRIPTS = 	fetch-linear \
-		fetch-newgen \
-		recompile-linear \
-		recompile-newgen \
-		stf \
+STF	=	stf \
 		stf-workspace \
-		stf-module \
-		transformer-to-sc \
+		stf-module
+
+OTHERS	=	transformer-to-sc \
 		directory-name \
 		remove-latex-comments
+
+# scripts that must be chmod
+SCRIPTS =	$(STF) $(OTHERS)
+
+# source files of this directory
+SOURCES	=	$(SCRIPTS)
+
+# what to install and where
+INSTALL_SHR=	$(STF)
+INSTALL_UTL=	$(OTHERS)
 
 # that is all
 #
