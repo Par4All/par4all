@@ -112,9 +112,13 @@ typedef struct Ssysteme {
  * L'utilisation d'un test rationel pour "sc_triang_elim_redund" peut conduire 
  * a conserver des contraintes redondantes.
  * 
+ * Note: l'inversion entiere de contrainte peut conduire a une augmentation 
+ * du polyedre correspondant au systeme traite. Le nombre de contraintes est
+ * minimise en entier mais le polyedre rationnel correspondant peut augmenter.
+ * Si une enveloppe convexe est calculee ulterieurement, le resultat peut donc
+ * etre degrade par une elimination de redondance anterieure.
  * 
- * 
-*/
+ */
 
 #define get_sc_debug_level() sc_debug_level
 #define ifscdebug(l) if (get_sc_debug_level()>=l)
