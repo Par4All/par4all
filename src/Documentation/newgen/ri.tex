@@ -1,4 +1,4 @@
-\documentstyle[a4,psfig,html]{article}
+\documentstyle[a4,psfig,html,verbatim]{article}
 
 % \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
@@ -872,7 +872,11 @@ of individual effects are linked to each statements, especially compound
 statements like {\tt blocks}, {\tt tests}, {\tt loops} and {\tt
 unstructured}.
 
-\domain{Effects =  effects:effect*}
+\domain{Effects = effects:effect*}
+
+The next domain can be used to store summary effects of callees.
+
+\domain{entity\_effects = entity->effects}
 {}
 
 \subsection{Effect}
@@ -1028,67 +1032,7 @@ abstraction d'une commande, c'est-a`-dire d'un {\tt transformer}.
 \newpage
 
 \section*{Annexe: NewGen Declarations -- ri.newgen --}
-
-\begin{verbatim}
---         --------------------------------------------------------
---         --------------------------------------------------------
---
---                                  WARNING
---
---                THIS FILE HAS BEEN AUTOMATICALLY GENERATED
---
---                             DO NOT MODIFY IT
---
---         --------------------------------------------------------
---         --------------------------------------------------------
-
--- Imported domains
--- ----------------
-
--- External domains
--- ----------------
-external Psysteme ;
-external Pvecteur ;
-
--- Domains
--- -------
-action = read:unit + write:unit ;
-approximation = may:unit + must:unit ;
-area = size:int x layout:entity* ;
-basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value ;
-call = function:entity x arguments:expression* ;
-callees = callees:string* ;
-code = declarations:entity* x decls_text:string ;
-constant = int + litteral:unit ;
-control = statement x predecessors:control* x successors:control* ;
-dimension = lower:expression x upper:expression ;
-effect =  persistant reference x action x approximation x context:transformer ;
-effects =  effects:effect* ;
-execution = sequential:unit + parallel:unit ;
-expression = syntax x normalized ;
-formal = function:entity x offset:int ;
-functional = parameters:parameter* x result:type ;
-instruction = block:statement* + test + loop + goto:statement + call + unstructured ;
-loop = index:entity x range x body:statement x label:entity x execution x locals:entity* ;
-mode = value:unit + reference:unit ;
-normalized = linear:Pvecteur + complex:unit ;
-parameter = type x mode ;
-predicate = system:Psysteme ;
-ram = function:entity x section:entity x offset:int x shared:entity* ;
-range = lower:expression x upper:expression x increment:expression ;
-reference = variable:entity x indices:expression* ;
-statement = label:entity x number:int x ordering:int x comments:string x instruction ;
-storage = return:entity + ram + formal + rom:unit ;
-symbolic = expression x constant ;
-syntax = reference + range + call ;
-tabulated entity = name:string x type x storage x initial:value ;
-test = condition:expression x true:statement x false:statement ;
-transformer = arguments:entity* x relation:predicate ;
-type = statement:unit + area + variable + functional + unknown:unit + void:unit ;
-unstructured = control x exit:control ;
-value = code + symbolic + constant + intrinsic:unit + unknown:unit ;
-variable = basic x dimensions:dimension* ;
-\end{verbatim}
+\verbatiminput{ri.newgen}
 
 \newpage
 
