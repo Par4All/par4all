@@ -28,9 +28,9 @@ typedef struct Ssolution{
     /* variable du systeme */
     Variable var;
     /* valeur de la variable */
-    int val;
+    Value val;
     /* denominateur de la valeur de la variable */
-    int denominateur;
+    Value denominateur;
     /* pointeur vers la variable suivante */
     struct Ssolution *succ;
 } *Psolution,Ssolution;
