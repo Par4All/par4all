@@ -310,7 +310,7 @@ void loop_unroll(statement loop_statement, int rate)
      * IND = LB + MAX(NUB,0)*INC
      */
     expr = MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
-			  MakeBinaryCall(entity_intrinsic("MAX"), 
+			  MakeBinaryCall(entity_intrinsic(MAX0_OPERATOR_NAME), 
 					 make_ref_expr(nub, NIL),
 					 int_expr(0) ),
 			  gen_copy_tree(inc) );
