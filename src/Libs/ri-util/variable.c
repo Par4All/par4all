@@ -83,6 +83,7 @@ basic base;
 			      (add_variable_to_area(a, e)):(0),
 			      NIL));
 
+    /* FI: I would have expected is_value_unknown, especially with a RAM storage! */
     entity_initial(e) = make_value(is_value_constant,
 				   MakeConstantLitteral());
 
