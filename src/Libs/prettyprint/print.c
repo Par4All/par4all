@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: print.c,v $
+ * Revision 1.23  1998/05/05 14:53:23  coelho
+ * warning added...
+ *
  * Revision 1.22  1998/04/14 21:23:57  coelho
  * linear.h
  *
@@ -225,8 +228,13 @@ print_parallelizedHPF_code(string module_name)
     return print_parallelized_code_common(module_name, "hpf");
 }
 
+#define all_priv "PRETTYPRINT_ALL_PRIVATE_VARIABLES"
+
 bool 
 print_parallelizedOMP_code(string mod_name)
 {
+    if (get_bool_property(all_priv))
+	pips_user_warning("avoid property " all_priv "=TRUE with OMP\n");
+
     return print_parallelized_code_common(mod_name, "omp");
 }
