@@ -18,18 +18,19 @@
 #define db_resource_stored_p(r) db_status_stored_p(db_resource_db_status(r))
 #define db_resource_loaded_p(r) db_status_loaded_p(db_resource_db_status(r))
 
+/* module names must use some characters.
+ */
 #define MODULE_NAME_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
-static bool 
-simple_name_p(string name)
+
+static bool simple_name_p(string name)
 {
     return strlen(name)==strspn(name, MODULE_NAME_CHARS);
 }
 
-static db_symbol
-find_or_create_db_symbol(string name)
+static db_symbol find_or_create_db_symbol(string name)
 {
     db_symbol s = gen_find_tabulated(name, db_symbol_domain);
-    if (!simple_name_p(name)) pips_user_warning("strange name %s\n", name);
+    if (!simple_name_p(name)) pips_user_warning("strange name \"%s\"\n", name);
     return db_symbol_undefined_p(s)? make_db_symbol(strdup(name)): s;
 }
 
@@ -49,34 +50,43 @@ GENERIC_LOCAL_FUNCTION(pips_database, db_resources)
 
 /* exported interface is minimal.
  */
-void
-db_create_pips_database(void)
+void db_create_pips_database(void)
 {
     DB_UNDEF; init_pips_database(); DB_OK;
 }
 
-void
-db_open_pips_database(FILE * fd)
+/* @return whether okay.
+ */
+bool db_open_pips_database(FILE * fd)
 {
-    DB_UNDEF; set_pips_database(read_db_resources(fd)); DB_OK;
+    db_resources rs;
+    DB_UNDEF; 
+    rs = read_db_resources(fd);
+    if (db_resources_undefined_p(rs)) return FALSE;
+    set_pips_database(rs); 
+    DB_OK;
+    return TRUE;
 }
 
-void
-db_save_pips_database(FILE * fd)
+void db_save_pips_database(FILE * fd)
 {
     DB_OK; write_db_resources(fd, get_pips_database());
 }
 
-void
-db_close_pips_database(void)
+void db_close_pips_database(void)
 {
     DB_OK; close_pips_database(); DB_UNDEF;
 }
 
+void db_reset_pips_database_if_necessary(void)
+{
+    /* rough! memory leak... */
+    if (!pips_database_undefined_p()) reset_pips_database();
+}
+
 /******************************************************** LOAD/SAVE RESOURCE */
 
-static void
-dump_db_resource(string rname, string oname, db_resource r)
+static void dump_db_resource(string rname, string oname, db_resource r)
 {
     pips_debug(1, "rname=%s, oname=%s, r=%p\n", rname, oname, r);
     if (!db_resource_undefined_p(r)) {
@@ -90,8 +100,7 @@ dump_db_resource(string rname, string oname, db_resource r)
 
 #define debug_db_resource(l, r, o, p) ifdebug(l) { dump_db_resource(r, o, p);}
 
-static void 
-init_owned_resources_if_necessary(string name)
+static void init_owned_resources_if_necessary(string name)
 {
     db_symbol s = find_or_create_db_symbol(name);
     /* set the owner_resources in the pips_database. */
@@ -99,16 +108,14 @@ init_owned_resources_if_necessary(string name)
 	store_pips_database(s, make_db_owned_resources());;
 }
 
-static db_owned_resources
-get_db_owned_resources(string oname)
+static db_owned_resources get_db_owned_resources(string oname)
 {
     db_symbol o = find_or_create_db_symbol(oname);
     return bound_pips_database_p(o)? 
 	load_pips_database(o): db_owned_resources_undefined;
 }
 
-static db_resource
-get_resource(string rname, db_owned_resources or)
+static db_resource get_resource(string rname, db_owned_resources or)
 {
     db_symbol rs = find_or_create_db_symbol(rname);
     db_resource r = bound_db_owned_resources_p(or, rs)?
@@ -117,8 +124,7 @@ get_resource(string rname, db_owned_resources or)
     return r;
 }
 
-static db_resource
-get_db_resource(string rname, string oname)
+static db_resource get_db_resource(string rname, string oname)
 {
     db_owned_resources or;
     or = get_db_owned_resources(oname);
@@ -130,8 +136,7 @@ get_db_resource(string rname, string oname)
     return get_resource(rname, or);
 }
 
-static db_resource
-get_real_db_resource(string rname, string oname)
+static db_resource get_real_db_resource(string rname, string oname)
 {
     db_resource r = get_db_resource(rname, oname);
     if (db_resource_undefined_p(r))
@@ -139,8 +144,7 @@ get_real_db_resource(string rname, string oname)
     return r;
 }
 
-static db_resource
-find_or_create_db_resource(string rname, string oname)
+static db_resource find_or_create_db_resource(string rname, string oname)
 {
     db_resource r;
     db_owned_resources or;
@@ -161,8 +165,7 @@ find_or_create_db_resource(string rname, string oname)
     return r;
 }
 
-void
-db_delete_resource(string rname, string oname)
+void db_delete_resource(string rname, string oname)
 {
     db_resource r;
     db_owned_resources or;
@@ -185,8 +188,7 @@ db_delete_resource(string rname, string oname)
 
 /* this should really be a put. Just there for upward compatibility.
  */
-bool 
-db_update_time(string rname, string oname)
+bool db_update_time(string rname, string oname)
 {
     db_resource r;
     DB_OK;
@@ -203,14 +205,12 @@ db_update_time(string rname, string oname)
 /* from now on we must not know about the database internals.
  */
 
-bool 
-db_resource_p(string rname, string oname)
+bool db_resource_p(string rname, string oname)
 {
     DB_OK; return !db_resource_undefined_p(get_db_resource(rname, oname));
 }
 
-int
-db_time_of_resource(string rname, string oname)
+int db_time_of_resource(string rname, string oname)
 {
     db_resource r = get_db_resource(rname, oname);
     if (db_resource_undefined_p(r))
@@ -230,8 +230,7 @@ db_time_of_resource(string rname, string oname)
     return db_resource_time(r);
 }
 
-static void
-db_save_resource(string rname, string oname, db_resource r)
+static void db_save_resource(string rname, string oname, db_resource r)
 {
     pips_debug(7, "saving %s of %s\n", rname, oname);
     pips_assert("resource loaded", db_resource_loaded_p(r));
@@ -241,8 +240,8 @@ db_save_resource(string rname, string oname, db_resource r)
     db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
 }
 
-static void
-db_save_and_free_resource(string rname, string oname, db_resource r)
+static void db_save_and_free_resource(
+    string rname, string oname, db_resource r)
 {
     pips_debug(7, "saving and freeing %s of %s\n", rname, oname);
     pips_assert("resource loaded", db_resource_loaded_p(r));
@@ -258,8 +257,7 @@ db_save_and_free_resource(string rname, string oname, db_resource r)
     }
 }
 
-static void
-db_load_resource(string rname, string oname, db_resource r)
+static void db_load_resource(string rname, string oname, db_resource r)
 {
     pips_debug(7, "loading %s of %s\n", rname, oname);
     pips_assert("resource stored", db_resource_stored_p(r));
@@ -273,8 +271,7 @@ db_load_resource(string rname, string oname, db_resource r)
 
 /* some way to identify a resource... count be an id...
  */
-char *
-db_get_resource_id(string rname, string oname)
+string db_get_resource_id(string rname, string oname)
 {
     return (char*) get_real_db_resource(rname, oname);
 }
@@ -283,8 +280,7 @@ db_get_resource_id(string rname, string oname)
  * Assert that the resource is available.
  * If pure is false, then the resource is saved on disk before being returned.
  */
-char *
-db_get_memory_resource(string rname, string oname, bool pure)
+string db_get_memory_resource(string rname, string oname, bool pure)
 {
     db_resource r;
     char * result;
@@ -324,8 +320,7 @@ db_get_memory_resource(string rname, string oname, bool pure)
     return result;
 }
 
-void
-db_put_or_update_memory_resource(
+void db_put_or_update_memory_resource(
     string rname, string oname, char * p, bool update_is_ok)
 {
     db_resource r;
@@ -356,8 +351,7 @@ db_put_or_update_memory_resource(
     debug_off();
 }
 
-void
-db_unput_resources(string rname)
+void db_unput_resources(string rname)
 {
     db_symbol r;
     DB_OK;
@@ -373,8 +367,7 @@ db_unput_resources(string rname)
         get_pips_database());
 }
 
-void
-db_save_and_free_memory_resource_if_any(string rname, string oname)
+void db_save_and_free_memory_resource_if_any(string rname, string oname)
 {
     db_resource r;
     DB_OK;
@@ -386,8 +379,7 @@ db_save_and_free_memory_resource_if_any(string rname, string oname)
 /* FC: I added this function to clean all resources, hence avoiding
  * to save them. This speed up hpfc at low cost;-).
  */
-void
-db_delete_all_resources(void)
+void db_delete_all_resources(void)
 {
     int nr = dbll_number_of_resources(), i;
     DB_OK;
@@ -401,8 +393,7 @@ db_delete_all_resources(void)
  */
 static string current_module_name = NULL;
 
-bool 
-db_set_current_module_name(string name)
+bool db_set_current_module_name(string name)
 {
     bool ok = FALSE;
     DB_OK; pips_assert("no current module", !current_module_name);
@@ -416,14 +407,12 @@ db_set_current_module_name(string name)
 }
 
 /* Also used to check whether set... so no asserts, even DB_OK. */
-string
-db_get_current_module_name(void)
+string db_get_current_module_name(void)
 {
     return current_module_name;
 }
 
-void
-db_reset_current_module_name(void)
+void db_reset_current_module_name(void)
 {
     DB_OK; pips_assert("some current module name", current_module_name);
     free(current_module_name), current_module_name = NULL;
@@ -434,8 +423,7 @@ db_reset_current_module_name(void)
 /* delete all obsolete resources before a close.
  * return the number of resources destroyed.
  */
-int
-db_delete_obsolete_resources(bool (*keep_p)(string, string))
+int db_delete_obsolete_resources(bool (*keep_p)(string, string))
 {
     int ndeleted = 0;
     list /* of string */ lr = NIL, lo = NIL, lrp, lop;
@@ -476,8 +464,7 @@ db_delete_obsolete_resources(bool (*keep_p)(string, string))
 /* returns an allocated array a with the sorted list of modules. 
  * strings are duplicated.
  */
-gen_array_t
-db_get_module_list(void)
+gen_array_t db_get_module_list(void)
 {
     gen_array_t a = gen_array_make(0);
     DB_OK;
