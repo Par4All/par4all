@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1994/09/03 17:17:00 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1994/09/03 17:20:05 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -106,7 +106,7 @@ then
   if [ "$REFFILE" ]
   then
     cp $REFFILE $DIRECTORY
-    echo "REFFILE = ${REFFILE}" |
+    echo "REFFILE = "`basename ${REFFILE}` |
        cat - $SRCDIR/hpfc_Makefile > $DIRECTORY/hpfc_Makefile
   else
     cp $SRCDIR/hpfc_Makefile $DIRECTORY
