@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/23 17:30:00 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/23 17:35:25 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -92,7 +92,7 @@ $SED '/^chpf\$/s,\([ 	\,(]\)[Bb][Ll][Oo][Cc][Kk]\([ 	\,()]\),\1_k\2,g
       /^chpf\$/s,\([ 	\,(]\)[Cc][Yy][Cc][Ll][Ii][Cc]\([ 	\,()]\),\1_c\2,g
       /^chpf\$/s,\([ 	\,(]\)[Cc][Yy][Cc][Ll][Ii][Cc]\([ 	\,()]\),\1_c\2,g
       /^chpf\$/s,_c\([\,)]\),_c(1)\1,g
-      /^chpf\$/s,\*,_s(),g
+      /^chpf\$/s,\*\([\,)]\),_s()\1,g
       s,^chpf\$ [Dd][Yy][Nn][Aa][Mm][Ii][Cc] \(.*\),      _y(\1),
       s,^chpf\$ [Tt][Ee][Mm][Pp][Ll][Aa][Tt][Ee] \(.*\),      _o \1      _t(\1),
       s,^chpf\$ [Pp][Rr][Oo][Cc][Ee][Ss][Ss][Oo][Rr][Ss] \(.*\),      _o \1      _p(\1),
