@@ -1,5 +1,6 @@
 #include <stdio.h>
 extern int fprintf();
+#include <types.h>
 #include <malloc.h>
 
 #include <sys/time.h>
@@ -8,7 +9,6 @@ extern int fprintf();
 #include <xview/panel.h>
 #include <xview/text.h>
 #include <xview/svrimage.h>
-#include <types.h>
 
 #include "genC.h"
 #include "misc.h"
@@ -38,7 +38,7 @@ Frame main_frame,
     edit_frame[MAX_NUMBER_OF_WPIPS_WINDOWS], 
     help_frame, 
     query_frame,
-    properties_frame;
+    options_frame;
 
 Panel main_panel,
     status_panel,
@@ -52,7 +52,7 @@ Panel main_panel,
 void create_menus()
 {
     create_select_menu();
-    create_props_menu_and_window();
+    create_options_menu_and_window();
     create_edit_menu();
 /*    create_analyze_menu();*/
     create_transform_menu();
@@ -195,7 +195,7 @@ char *argv[];
    pips_warning_handler = wpips_user_warning;
    pips_error_handler = wpips_user_error;
    pips_log_handler = wpips_user_log;
-   pips_update_props_handler = update_props;
+   pips_update_props_handler = update_options;
 
    /* Added for debug. RK, 8/06/93. */
    malloc_debug(1);
