@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/09/07 17:10:44 $, )
+# ($Date: 1996/09/07 17:21:14 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -258,7 +258,7 @@ fpvm3.h:$(pvminc)/fpvm3.h
 param_init.m4:;	$(RT_DIR)/hpfc_generate_init -n $(TARGET) .
 
 param_init.f: param_init.m4
-	$(M4) -D PVM_ARCHITECTURE=$(PVM_ARCH) param_init.m4 > param_init.f
+	$(M4) -D PVM_ARCH=$(PVM_ARCH) param_init.m4 > param_init.f
 
 %.o: %.f
 	$(FC) $(FFLAGS) $(FOPT) -c $< 
