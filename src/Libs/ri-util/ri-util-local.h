@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.84  2003/06/19 07:25:04  nguyen
+ * Update calls to make_statement and make_variable with new RI for C
+ *
  * Revision 1.83  2002/10/07 10:00:54  irigoin
  * Macros for operators ABS, DABS and CABS added.
  *
@@ -429,7 +432,7 @@ typedef hash_table control_mapping;
 #define instruction_to_statement(i) \
    make_statement(entity_empty_label(),\
 		  STATEMENT_NUMBER_UNDEFINED, STATEMENT_ORDERING_UNDEFINED,\
-		  empty_comments, i)
+		  empty_comments, i,NIL,NULL)
 
 #define loop_to_instruction(l) make_instruction(is_instruction_loop, l)
 #define test_to_instruction(t) make_instruction(is_instruction_test, t)
