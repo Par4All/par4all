@@ -22,7 +22,7 @@
 #define STRIP_MINE_TRANSFORM "Strip Mining"
 #define LOOP_INTERCHANGE_TRANSFORM "Loop Interchange"
 #define SUPPRESS_DEAD_CODE_TRANSFORM "! Dead Code Elimination"
-#define ATOMIZER_TRANSFORM"! Atomize"
+#define ATOMIZER_TRANSFORM "! Atomize"
 #define REDUCTIONS_TRANSFORM "!! Reductions"
 #define STATIC_CONTROLIZE_TRANSFORM "Static Controlize"
 
