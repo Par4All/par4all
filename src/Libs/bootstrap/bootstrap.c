@@ -21,6 +21,9 @@
   - intrinsics are not properly typed
 
   $Log: bootstrap.c,v $
+  Revision 1.80  2003/12/04 16:00:21  nguyen
+  Add more intrinsics for bootstrap
+
   Revision 1.79  2003/09/05 14:24:58  nguyen
   Add C intrinsics to handle SPEC 2000 benchmarks
 
@@ -44,6 +47,9 @@
 
   Revision 1.72  2002/06/10 12:00:37  irigoin
   $Log: bootstrap.c,v $
+  Revision 1.80  2003/12/04 16:00:21  nguyen
+  Add more intrinsics for bootstrap
+
   Revision 1.79  2003/09/05 14:24:58  nguyen
   Add C intrinsics to handle SPEC 2000 benchmarks
 
@@ -3986,8 +3992,6 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   /* ISO 6.5.17 comma operator */
   {",", (INT_MAX), default_intrinsic_type, 0, 0}, 
 
-  /* null statement*/
-  {NULL_STATEMENT_INTRINSIC, 0, default_intrinsic_type, 0, 0},
   {"break", 0, default_intrinsic_type, 0, 0},
   {"case", 0, default_intrinsic_type, 0, 0},  
   {"default", 0, default_intrinsic_type, 0, 0},
@@ -4131,7 +4135,6 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"ecvt", 4, default_intrinsic_type, 0, 0},  
   {"fcvt", 4, default_intrinsic_type, 0, 0},  
   {"gcvt", 3, default_intrinsic_type, 0, 0},  
-  {"atof", 1, overloaded_to_double_type, 0, 0},  
   {"strtod", 2, overloaded_to_double_type, 0, 0}, 
 
   /*#include <setjmp.h>*/
@@ -4220,6 +4223,91 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
 
 
   /*#include <stdlib.h>*/
+
+  {"abort", 1, default_intrinsic_type, 0, 0},
+  {"abs", 1, integer_to_integer_type, 0, 0},
+  {"atexit", 1, default_intrinsic_type, 0, 0},
+  {"atof", 1, default_intrinsic_type, 0, 0},
+  {"atoi", 1, default_intrinsic_type, 0, 0},
+  {"atol", 1, default_intrinsic_type, 0, 0},
+  {"bsearch", 5, default_intrinsic_type, 0, 0},
+  {"calloc", 2, default_intrinsic_type, 0, 0},
+  {"div", 2, default_intrinsic_type, 0, 0},
+  {"exit", 1, default_intrinsic_type, 0, 0},
+  {"free", 1, default_intrinsic_type, 0, 0},
+  /*  {char *getenv(const char *, 0, 0},
+  {long int labs(long, 0, 0},
+  {ldiv_t ldiv(long, long, 0, 0},*/
+  {"malloc", 1, default_intrinsic_type, 0, 0},
+  /* {int mblen(const char *, size_t, 0, 0},
+  {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
+  {int mbtowc(wchar_t *, const char *, size_t, 0, 0},
+  {void qsort(void *, size_t, size_t,
+	int (*)(const void *, const void *), 0, 0},
+  {int rand(void, 0, 0},
+  {void *realloc(void *, size_t, 0, 0},
+  {void srand(unsigned int, 0, 0},
+  {double strtod(const char *, char **, 0, 0},
+  {long int strtol(const char *, char **, int, 0, 0},
+  {unsigned long int strtoul(const char *, char **, int, 0, 0},
+  {int system(const char *, 0, 0},
+  {int wctomb(char *, wchar_t, 0, 0},
+  {size_t wcstombs(char *, const wchar_t *, size_t, 0, 0},
+  {void _exithandle(void, 0, 0},
+  {double drand48(void, 0, 0},
+  {double erand48(unsigned short *, 0, 0},
+  {long jrand48(unsigned short *, 0, 0},
+  {void lcong48(unsigned short *, 0, 0},
+  {long lrand48(void, 0, 0},
+  {long mrand48(void, 0, 0},
+  {long nrand48(unsigned short *, 0, 0},
+  {unsigned short *seed48(unsigned short *, 0, 0},
+  {void srand48(long, 0, 0},
+  {int putenv(char *, 0, 0},
+  {void setkey(const char *, 0, 0},
+  {void swab(const char *, char *, ssize_t, 0, 0},
+  {int	mkstemp(char *, 0, 0},
+  {int	mkstemp64(char *, 0, 0},
+  {long a64l(const char *, 0, 0},
+  {char *ecvt(double, int, int *, int *, 0, 0},
+  {char *fcvt(double, int, int *, int *, 0, 0},
+  {char *gcvt(double, int, char *, 0, 0},
+  {int getsubopt(char **, char *const *, char **, 0, 0},
+  {int  grantpt(int, 0, 0},
+  {char *initstate(unsigned, char *, size_t, 0, 0},
+  {char *l64a(long, 0, 0},
+  {char *mktemp(char *, 0, 0},
+  {char *ptsname(int, 0, 0},
+  {long random(void, 0, 0},
+  {char *realpath(const char *, char *, 0, 0},
+  {char *setstate(const char *, 0, 0},
+  {void srandom(unsigned, 0, 0},
+  {int ttyslot(void, 0, 0},
+  {int  unlockpt(int, 0, 0},
+  {void *valloc(size_t, 0, 0},
+  {int dup2(int, int, 0, 0},
+  {char *qecvt(long double, int, int *, int *, 0, 0},
+  {char *qfcvt(long double, int, int *, int *, 0, 0},
+  {char *qgcvt(long double, int, char *, 0, 0},
+  {char *getcwd(char *, size_t, 0, 0},
+  {const char *getexecname(void, 0, 0},
+  {char *getlogin(void, 0, 0},
+  {int getopt(int, char *const *, const char *, 0, 0},
+  {char *optarg;
+  {int optind, opterr, optopt;
+  {char *getpass(const char *, 0, 0},
+  {char *getpassphrase(const char *, 0, 0},
+  {int getpw(uid_t, char *, 0, 0},
+  {int isatty(int, 0, 0},
+  {void *memalign(size_t, size_t, 0, 0},
+  {char *ttyname(int, 0, 0},
+  {long long atoll(const char *, 0, 0},
+  {long long llabs(long long, 0, 0},
+  {lldiv_t lldiv(long long, long long, 0, 0},
+  {char *lltostr(long long, char *, 0, 0},
+  {long long strtoll(const char *, char **, int, 0, 0},
+  {unsigned long long strtoull(const char *, char **, int, 0, 0},
+  {char *ulltostr(unsigned long long, char *, 0, 0},*/
 
   /*#include <string.h>*/
 
