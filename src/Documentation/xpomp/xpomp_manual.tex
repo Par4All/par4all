@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
-%% On failure, the value $-1$ is returned.$RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/06 11:21:10 $, 
+%% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
+%% $Date: 1996/09/07 16:51:19 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html,verbatim}
@@ -175,8 +175,8 @@ mouse.
 
 Each library function or procedure has 2 different definition
 templates, one for the C language and another one for the Fortran
-language. C function or procedure names begin with \verb|POMP_| but
-Fortran ones begin with \verb|xpomp_|.
+language. C function or procedure names begin with \verb|XPOMP_| but
+Fortran ones begin with \verb|xpompf|.
 
 To declare the interface functions or procedures, one must include the
 \xPOMP header file with
@@ -207,7 +207,7 @@ Fortran:
 \begin{verbatim}
        integer window
        integer X_window_size, Y_window_size
-       call xpomp_open_display(X_window_size, Y_window_size, window)
+       call xpompf open_display(X_window_size, Y_window_size, window)
 \end{verbatim}
 
 This function open a window with a user area of pixel size
@@ -230,7 +230,7 @@ XPOMP_close_display(window);
 Fortran:
 \begin{verbatim}
        integer window
-       call xpomp_close_display(window)
+       call xpompf close display(window)
 \end{verbatim}
 
 
@@ -252,7 +252,7 @@ old_default_window = XPOMP_set_current_default_display(new_default_window);
 Fortran:
 \begin{verbatim}
        integer new_default_window, old_default_window
-       call xpomp_set_current_default_display
+       call xpompf set current default display
       &    (new_default_window,old_default_window)
 \end{verbatim}
 
@@ -269,7 +269,7 @@ default_window = XPOMP_get_current_default_display();
 Fortran:
 \begin{verbatim}
        integer default_window
-       call xpomp_get_current_default_display(default_window)
+       call xpompf get current default display(default_window)
 \end{verbatim}
 
 
@@ -285,7 +285,7 @@ default_window = XPOMP_get_depth();
 Fortran:
 \begin{verbatim}
        integer depth
-       call xpomp_get_depth(depth)
+       call xpompf get depth(depth)
 \end{verbatim}
 
 On failure, the value $-1$ is returned instead of the depth.
@@ -333,7 +333,7 @@ Fortran:
       integer X_offset, Y_offset
       integer X_zoom_ratio, Y_zoom_ratio
       integer status
-      call xpomp_flash(window, data_array,
+      call xpompf flash(window, data_array,
      &                 X_data_array_size, Y_data_array_size,
      &                 X_offset, Y_offset,
      &                 X_zoom_ratio, Y_zoom_ratio, status)
@@ -387,7 +387,7 @@ Fortran:
       integer status
       real*8 min_value, max_value;
       integer status
-      call xpomp_show_real4(screen, image,
+      call xpompf show real4(screen, image,
      &                      X_data_array_size, Y_data_array_size,
      &                      X_offset, Y_offset,
      &                      X_zoom_ratio, Y_zoom_ratio,
@@ -423,7 +423,7 @@ Fortran:
       integer status
       real*8 min_value, max_value
       integer status
-      call xpomp_show_real8(screen, image,
+      call xpompf show real8(screen, image,
      &                      X_data_array_size, Y_data_array_size,
      &                      X_offset, Y_offset,
      &                      X_zoom_ratio, Y_zoom_ratio,
@@ -471,7 +471,7 @@ Fortran:
       integer window
       integer color_map_type, cycle, start, clip
       integer status
-      call xpomp_set_color_map
+      call xpompf set color map
      &    (window, color_map_type, cycle, start, clip, status)
 \end{verbatim}
 
@@ -498,7 +498,7 @@ Fortran:
       integer window
       character red(256), green(256), blue(256)
       integer status
-      call xpomp_set_user_color_map
+      call xpompf set user color map
      &    (window, red, green, blue, status)
 \end{verbatim}
 
@@ -537,7 +537,7 @@ Fortran:
       integer window
       integer button, state
       integer X, Y
-      call xpomp_wait_mouse(window, X, Y, state, button)
+      call xpompf wait mouse(window, X, Y, state, button)
 \end{verbatim}
 
 
@@ -556,7 +556,7 @@ Fortran:
       integer window
       integer button, state
       integer X, Y
-      call xpomp_is_mouse(window, X, Y, state, button)
+      call xpompf is mouse(window, X, Y, state, button)
 \end{verbatim}
 
 If there is no mouse press down event, the value 0 is returned instead
@@ -578,7 +578,7 @@ status = XPOMP_scroll(window, delta_Y);
 Fortran:
 \begin{verbatim}
       integer window, delta_Y, status
-      call xpomp_scroll(window, delta_Y, status)
+      call xpompf scroll(window, delta_Y, status)
 \end{verbatim}
 
 They returns $0$ on success and $-1$ on failure.
@@ -619,12 +619,9 @@ Fortran:
       integer X1, Y1
       integer color
       integer status
-      call xpomp_draw_frame(window,
+      call xpompf draw frame(window,
      &     title, title_color, background_color,
-     &     X0, Y0,
-     &     X1, Y1,
-     &     color,
-     &     status)
+     &     X0, Y0, X1, Y1, color, status)
 \end{verbatim}
 
 The frame color used is \verb|color|. If $\texttt{color}<0$, the color
@@ -664,7 +661,7 @@ Fortran:
       integer window
       integer button
       integer X, Y
-      call xpomp_is_mouse(window, X, Y, button)
+      call xpompf is mouse(window, X, Y, button)
 \end{verbatim}
 
 
@@ -688,8 +685,8 @@ included by all user HPF functions or subroutines that make use of the
 declares them as I/O routines to the \HPFC{} compiler through the special
 \verb|io| directive:
 \begin{verbatim}
-!fcd$ io xpomp_show_real4
-!fcd$ io xpomp_is_mouse
+!fcd$ io xpompf show real4
+!fcd$ io xpompf is mouse
 \end{verbatim}
 %%
 The effect is that a special compilation scheme is
