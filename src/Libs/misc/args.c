@@ -22,7 +22,7 @@ list_to_array(list l, gen_array_t a)
    array of string must have at least as much as strings as in the
    list. No free is done. */
 void
-update_list_from_arg(list l, gen_array_t a)
+update_list_from_array(list l, gen_array_t a)
 {
     int index = 0;
     MAPL(scons, STRING(CAR(scons)) = gen_array_item(a, index++), l);
