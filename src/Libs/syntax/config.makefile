@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/11 20:41:03 $m 
+# $Date: 1996/08/11 20:48:03 $m 
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
@@ -46,7 +46,8 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 # filtred here.
 
 syn_yacc.c syn_yacc.h: tokyacc.h gram.y
-	cat tokyacc.h gram.y > yacc.in
+	{ echo "# line 1 "tokyacc.h"; cat tokyacc.h ;\
+	  echo "# line 1 "gram.y"; cat gram.y; } > yacc.in
 	$(PARSE) yacc.in
 	sed 's/YY/SYN_/g;s/yy/syn_/g' y.tab.c > syn_yacc.c
 	sed 's/YY/SYN_/g;s/yy/syn_/g' y.tab.h > syn_yacc.h
