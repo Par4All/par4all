@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: OptionParser.java,v $
+ * Revision 1.7  1998/07/03 17:42:37  coelho
+ * checkbox width fixed.
+ *
  * Revision 1.6  1998/07/03 17:32:35  coelho
  * cleaner withMenu stuff...
  *
@@ -292,7 +295,7 @@ public class OptionParser
 
       PCheckBox cb = new PCheckBox(name,command,checking,tip);
       add((Container)optionPanel,cb,
-	  0,position++,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
+	  0,position++,3,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
       PCheckBoxMenuItem cbmi = new PCheckBoxMenuItem(name,command,checking,cb);
       menu.add(cbmi);
