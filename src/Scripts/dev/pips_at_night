@@ -16,7 +16,7 @@ pips_arch="$PIPS_ARCH"
 pips_hosts="$PIPS_HOSTS"
 
 test -r $HOME/.profile && . $HOME/.profile
-test "$PIPS_DIR" || . /projects/Pips/pipsrc.sh
+test "${PIPS_ROOT}" || . /projects/Pips/pipsrc.sh
 
 PIPS_ARCH=${pips_arch:-$PIPS_ARCH}
 PIPS_HOSTS=${pips_hosts:-$PIPS_HOSTS}
@@ -28,10 +28,10 @@ unset no_cleaning no_newgen no_linear no_pips no_validation no_general
 unset validate_dir
 
 # use this mail (not /bin/mail...)
-mail=/usr/ucb/mail
-test -x $mail || mail=mail
+PATH=/usr/ucb:${PATH}
+mail=${PIPS_MAIL:-Mail}
 
-arch=${PIPS_ARCH:-.}
+arch=${PIPS_ARCH:-GNU}
 user=`whoami`
 host=`hostname`
 email=${MAILTO:-${REPLYTO:-$user}}
@@ -171,15 +171,15 @@ $debug "report=$report"
 	$verbose "General cleaning of pips"
 
 	$verbose - Deleting old workspaces...
-	find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +4 -print | 
+	find ${pips_home}/Pips -name '*.database' -type d -mtime +4 -print | 
 	    xargs ${PIPS_ROOT}/Share/Delete
 	    
 	$verbose - Removing core files older than one week
-	find ${PIPS_HOME}/Pips -name core -mtime +4 -print | 
+	find ${pips_home}/Pips -name core -mtime +4 -print | 
 	    xargs rm -f
 
 	$verbose - Deleting forgotten validation directories and files
-	find ${PIPS_HOME}/Pips -name '.validate_*' -mtime +4 -print |
+	find ${pips_home}/Pips -name '.validate_*' -mtime +4 -print |
 	    xargs rm -rf
 
 	$verbose - Removing generated files in Production...
