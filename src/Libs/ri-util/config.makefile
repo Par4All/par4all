@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# ($Date: 1995/09/22 14:38:01 $, )
+# ($Date: 1995/11/14 18:22:00 $, )
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
@@ -34,7 +34,7 @@ LIB_CFILES=	Psc.c \
 		control.c \
 		hpfc.c
 
-LIB_HEADERS=	ri-util-local.h
+LIB_HEADERS=	ri-util-local.h operator.h
 LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
 
 # that is all
