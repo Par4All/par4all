@@ -7,6 +7,9 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.23  2000/07/19 15:33:43  ancourt
+  test linearity of loop range to deal with REAL range type
+
   Revision 1.22  2000/07/05 11:02:28  coelho
   same branches special case handled.
 
@@ -320,23 +323,23 @@ static bool loop_executed_once_p(statement s, loop l)
 
     if (retour) return TRUE;
   }
-
-  /* Teste le signe de l'incrément en fonction des préconditions : */
-  pv3 = vect_dup(normalized_linear(n_m3));
-  pc3 = contrainte_make(pv3);
-  ps = sc_dup(precondition_ps);
-  sc_add_ineg(ps, pc3);
-  m3_negatif = sc_faisabilite(ps);
-
-  (void) vect_chg_sgn(pv3);
-  m3_positif = sc_faisabilite(ps);
-
-  pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
-	     m3_positif, m3_negatif);
-
-  /* Vire aussi pv3 & pc3 : */
-  sc_rm(ps);
-
+  if (normalized_linear_p(n_m3)) { 
+    /* Teste le signe de l'incrément en fonction des préconditions : */
+    pv3 = vect_dup(normalized_linear(n_m3));
+    pc3 = contrainte_make(pv3);
+    ps = sc_dup(precondition_ps);
+    sc_add_ineg(ps, pc3);
+    m3_negatif = sc_faisabilite(ps);
+    
+    (void) vect_chg_sgn(pv3);
+    m3_positif = sc_faisabilite(ps);
+    
+    pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
+	       m3_positif, m3_negatif);
+    
+    /* Vire aussi pv3 & pc3 : */
+    sc_rm(ps);
+  }
   if ((m3_positif ^ m3_negatif) && normalized_linear_p(n_m3) && 
       normalized_linear_p(n_m1) && normalized_linear_p(n_m2))
   {
