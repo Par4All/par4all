@@ -1,4 +1,4 @@
-/* $RCSfile: generate.c,v $ ($Date: 1995/10/10 11:38:08 $, )
+/* $RCSfile: generate.c,v $ ($Date: 1996/06/08 10:54:07 $, )
  * version $Revision$
  * 
  * Fabien Coelho, May 1993
@@ -490,18 +490,16 @@ statement body;
 list *lstatp, lw, lr;
 {
     statement statcc, statbody;
-    list
-	lcomp = NIL,
-	lcompr = NIL,
-	lcompw = NIL,
-	lnotcomp = NIL,
-	lnotcompr = NIL,
-	lnotcompw = NIL;
+    list lcomp = NIL, lcompr = NIL, lcompw = NIL, 
+        lnotcomp = NIL, lnotcompr = NIL, lnotcompw = NIL;
     syntax comp;
 
-    pips_assert("at leat one written", gen_length(lw)>0);
+    pips_assert("at leat one written or read",
+		(gen_length(lw)+gen_length(lr))>0);
 
-    comp = SYNTAX(CAR(lw));
+    /* the first written or read distributed ref is chosen as the computer
+     */
+    comp = lw? SYNTAX(CAR(lw)): SYNTAX(CAR(lr));
     statcc = st_compute_current_computer(syntax_reference(comp));
 
     MAP(SYNTAX, s,
