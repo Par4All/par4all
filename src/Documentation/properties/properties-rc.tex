@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.157  2001/12/07 13:21:39  nguyen
+%% Add new options for ARRAY_RESIZING_TOP_DOWN and BOTTOM_UP
+%%
 %% Revision 1.156  2001/11/30 15:00:56  nguyen
 %% Add new property for alias checking
 %%
@@ -178,7 +181,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2001/11/30 15:00:56 $~$
+$~$Date: 2001/12/07 13:21:39 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1870,24 +1873,71 @@ TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
 Array bounds checking refers to determining whether all array reference
 are within their declared range in all of its uses in a program. Here are
 array bounds checking options for code instrumentation, in order to
-compute the number of bound checks added.
+compute the number of bound checks added. We can use only one property for
+these two case, but the meaning is not clear. To be changed ? 
 
 \begin{verbatim}
 INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
 PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
-
 \end{verbatim}
 
 \subsection{Array Resizing}
-This is a property to tell the array resizing top-down approach to use
-information from MAIN program or not. If the current module is never
-called by the main program, we do no array resizing for the unnormalized
-declarations in this module if the property is on. However, we can 
-do nothing with modules that have no callers at all, because this is a
-top-down approach ! 
+
+This phase is firstly designed to infer automatically new array
+declarations for assumed-size (A(*)) and one (A(1) or also called ugly
+assumed-size) array declarators. But
+it also can be used for all kinds of array : local or formal array
+arguments, unnormalized or all kinds of declarations. There are two
+different approaches that can be combined to have better results. 
+ 
+\subsubsection{Top-down Array Resizing}
+There are three different options: 
+\begin{itemize}
+\item Using information from the MAIN program or not (1 or 0). If you use
+  this option, modules that are never called by the MAIN program are not
+  taken into account. By default, we do not use this information (0).  
+\item Compute new declarations for all kinds of formal array arguments,
+  not only assumed-size and one declarations (1 or 0). By default, we
+  compute for assumed-size and one only (0).
+\item Compute new declarations for assumed-size array only, not for ugly
+  assumed-size (one) array (1 or 0). By default, we compute for both kinds
+  (0).
+\end{itemize}
+So the combination of the three above options gives us a number from 0 to
+7 (binary representation : 000, 001,..., 111). You must pay attention to
+the order of options. For example, if you want to use information from
+MAIN program to compute new declarations for assumed-size and one array
+declarations, both of them, the option is 4 (100). The default option is 0
+(000). 
 
 \begin{verbatim}
-ARRAY_RESIZING_USING_MAIN_PROGRAM FALSE
+ARRAY_RESIZING_TOP_DOWN_OPTION 0
+\end{verbatim}
+
+\subsubsection{Bottom-up Array Resizing}
+
+There are also three different options: 
+\begin{itemize}
+\item Infer new declarations for arrays with declarations created by the
+  top-down approach or not (1 or 0). This is a special option because we
+  want to combine the two approaches: apply top-down first and then
+  bottom-up on the instrumented arrays (their declarations are of from:
+  I\_PIPS\_MODULE\_ARRAY). By default, we do not use this option (0).  
+\item Compute new declarations for all kinds of array arguments,
+  not only assumed-size and one declarations (1 or 0). By default, we
+  compute for assumed-size and one only (0).
+\item Compute new declarations for local array arguments or not (1 or 0). By default, we
+  compute for formal array arguments only (0).
+\end{itemize}
+So the combination of the three above options gives us a number from 0 to
+7 (binary representation : 000, 001,..., 111). You must pay attention to
+the order of options. There are some options that exclude others, such as
+the option to compute new declarations for instrumented array
+(I\_PIPS\_MODULE\_ARRAY). The default option is 0
+(000). 
+
+\begin{verbatim}
+ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 \end{verbatim}
 
 \subsection{Alias Checking}
@@ -1901,8 +1951,6 @@ top-down approach !
 \begin{verbatim}
 ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
 \end{verbatim}
-
-
 
 %%
 %% PRETTYPRINTER
