@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/03/14 17:02:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/10 11:27:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/03/14 17:02:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/04/10 11:27:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -73,109 +73,6 @@ display_unspaghettify_statistics()
 		     number_of_restructured_null_if);
 	}
     }
-}
-
-
-/* Add an edge between 2 control nodes.
-   Assume that this edge does not already exist. */
-void
-link_2_control_nodes(control source,
-		     control target)
-{
-    control_successors(source) = CONS(CONTROL,
-				      target,
-				      control_successors(source));
-    control_predecessors(target) = CONS(CONTROL,
-					source,
-					control_predecessors(target));
-}
-
-
-/* Remove an edge between 2 control nodes.
-   Assume that this edge does already exist. */
-void
-unlink_2_control_nodes(control source,
-		       control target)
-{
-    gen_remove(&control_successors(source), target);
-    gen_remove(&control_predecessors(target), source);
-}
-
-
-/* Fuse a 2 control node and add the statement of the second one to
-   the statement of the first one. Assumes that the second node is the
-   only successor of the first one:\. Do not update the entry or exit
-   field of the unstructured. */
-void
-fuse_2_control_nodes(control first,
-		     control second)
-{
-    if (gen_length(control_successors(second)) == 2) {
-	/* If the second node has 2 successors, it is a test node. The
-	   fused node has 2 successors and must be a test too. So, the
-	   only thing I can do is to remove the first statement, just
-	   keeping its comments: */
-	string first_comment =
-	    gather_all_comments_of_a_statement(control_statement(first));
-	insert_comments_to_statement(control_statement(second),
-				     first_comment);
-	control_statement(first) = control_statement(second);	
-    }
-    else {
-	/* If not, build a block with the 2 statements: */
-	statement st = make_empty_statement();
-	statement_instruction(st) =
-	    make_instruction_block(CONS(STATEMENT,
-					control_statement(first),
-					CONS(STATEMENT,
-					     control_statement(second), NIL)));
-	/* Reconnect the new statement to the node to fuse: */
-	control_statement(first) = st;
-    }
-    control_statement(second) = statement_undefined;
-
-    /* Unlink the second node from the first one: */
-    gen_free_list(control_successors(first));
-    gen_remove(&control_predecessors(second), first);
-	       
-    /* Link the first node with the successors of the second one in
-       the forward direction: */
-    control_successors(first) =
-	control_successors(second);
-    /* Update all the predecessors of the successors: */
-    MAP(CONTROL, c,
-	{
-	    MAPL(cp,
-		 {
-		     if (CONTROL(CAR(cp)) == second)
-			 CONTROL(CAR(cp)) = first;
-		 }, control_predecessors(c));
-	}, control_successors(first));
-	       
-    /* Transfer the predecessors of the second node to the first one.
-       Note that the original second -> first predecessor link has
-       already been removed. But a loop from second to second appear
-       at this point as a link from first to second. Nasty bug... */
-    MAP(CONTROL, c,
-	{
-	    control_predecessors(first) = CONS(CONTROL,
-					       c,
-					       control_predecessors(first));
-	    MAPL(cp,
-		 {
-		     if (CONTROL(CAR(cp)) == second) {
-			 CONTROL(CAR(cp)) = first;
-		     }
-		 }, control_successors(c));
-	}, control_predecessors(second));
-    
-    /* Now we remove the useless intermediate node "second": */
-    /* Do not gen_free_list(control_successors(second)) since it is
-       used as control_successors(first) now: */
-    control_successors(second) = NIL;
-    gen_free_list(control_predecessors(second));
-    control_predecessors(second) = NIL;
-    free_control(second);
 }
 
 
@@ -272,16 +169,20 @@ clean_up_exit_node(unstructured u)
    control exit_node = unstructured_exit(u);
    list l = control_successors(exit_node);
    
-   if (gen_length(l) == 1) {
+   if (gen_length(l) >= 1) {
       control c = CONTROL(CAR(l));
       pips_assert("clean_up_exit_node",
-                  gen_length(control_successors(c)) == 0
-                  && gen_length(control_predecessors(c)) == 1
-                  && empty_statement_or_continue_p(control_statement(c)));
+                  gen_length(control_successors(exit_node)) == 1
+                  && gen_length(control_successors(c)) == 0
+                  && gen_length(control_predecessors(c)) == 1);
+      /* I used to assert
+	 empty_statement_or_continue_p(control_statement(c)) but with
+	 the camat-t.f code and a debugged version of controlize.c it
+	 is no longer the case... */
 
       /* Remove the useless node: */
       CONTROL(CAR(control_predecessors(c))) = control_undefined;
-      free_control(c);
+      gen_free_list(control_successors(exit_node));
       
       /* Now the exit node has no longer a successor: */
       control_successors(exit_node) = NIL;
