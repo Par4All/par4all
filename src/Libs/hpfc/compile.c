@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/10/10 16:33:57 $, )
+ * ($Date: 1995/10/17 11:15:46 $, )
  */
 
 #include "defines-local.h"
@@ -165,7 +165,8 @@ init_host_and_node_entities (void)
 
     ifdebug(3)
     {
-	debug_off();
+	debug_on("PRETTYPRINT_DEBUG_LEVEL");
+
 	fprintf(stderr,"[init_host_and_node_entities]\n old declarations:\n");
 	print_text(stderr, text_declaration(current_module));
 
@@ -177,7 +178,7 @@ init_host_and_node_entities (void)
 	(void) gen_consistent_p(host_module);
 	print_text(stderr, text_declaration(host_module));
 
-	debug_on("HPFC_DEBUG_LEVEL");
+	debug_off();
     }
 }
 
