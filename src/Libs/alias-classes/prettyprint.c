@@ -47,6 +47,8 @@ static text alias_pairs_text(string module_name,string resource_name)
 
     set_current_module_entity( local_name_to_top_level_entity(module_name));
     module = get_current_module_entity();
+    set_current_module_statement((statement) db_get_memory_resource
+				 (DBR_CODE, module_name, TRUE));
     set_cumulated_rw_effects((statement_effects)
 	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings(module);
