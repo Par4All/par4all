@@ -1,4 +1,5 @@
-
+int sol_pgcd();
+int sol_ppcm();
 void sol_init();
 int sol_hwm();
 void sol_reset();
