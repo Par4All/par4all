@@ -40,7 +40,7 @@ remove_useless_continue_or_empty_code_in_unstructured(unstructured u)
 
    CONTROL_MAP(c,
                {
-                  if (get_debug_level() > 0)
+		   ifdebug (1)
                      pips_assert("control inconsistants...",
                                  gen_consistent_p(c));
 
@@ -113,11 +113,12 @@ clean_up_exit_node(unstructured u)
       control c = CONTROL(CAR(l));
       pips_assert("clean_up_exit_node",
                   gen_length(control_successors(c)) == 0
+                  && gen_length(control_predecessors(c)) == 1
                   && empty_statement_or_continue_p(control_statement(c)));
 
       /* Remove the useless node: */
-      control_predecessors(c) = NIL;
-      gen_free(c);
+      CONTROL(CAR(control_predecessors(c))) = control_undefined;
+      free_control(c);
       
       /* Now the exit node has no longer a successor: */
       control_successors(exit_node) = NIL;
@@ -131,9 +132,10 @@ clean_up_exit_node(unstructured u)
 /* Try to transform each sequence in a single statement instead of a
    list of control nodes: */
 static void
-fuse_sequences_in_unstructured(unstructured u)
+fuse_sequences_in_unstructured(statement s)
 {
    control the_successor;
+   unstructured u = instruction_unstructured(statement_instruction(s));
    list blocs = NIL;
 
    /* The entry point of the unstructured: */
@@ -146,15 +148,20 @@ fuse_sequences_in_unstructured(unstructured u)
    hash_table controls_to_fuse_with_their_successors =
       hash_table_make(hash_pointer, 0);
    
+   ifdebug (1)
+       pips_assert("unstructured inconsistants...",
+		   gen_consistent_p(u));
+   pips_debug(5, "Unstructured %x\n", (unsigned int) u);
+   
    CONTROL_MAP(c,
                {
                   int number_of_successors_of_the_successor;
                   int number_of_predecessors_of_the_successor;
    
-                  if (get_debug_level() > 0)
+                  ifdebug (1)
                      pips_assert("control inconsistants...",
                                  gen_consistent_p(c));
-               
+
                   /* Select a node with only one successor: */      
                   if (gen_length(control_successors(c)) == 1) {
                      the_successor = CONTROL(CAR(control_successors(c)));
@@ -187,30 +194,66 @@ fuse_sequences_in_unstructured(unstructured u)
                   blocs);
    gen_free_list(blocs);
 
-   /* Now we have the list of the control nodes to fuse with their
-      successors, do the fusion: */
+   /* Now, since we have the list of the control nodes to fuse with
+      their successors, do the fusion: */
    HASH_MAP(the_original_control,
-            its_adress_now,
+            its_address_now,
             {
                /* Just for fun, the following line gets CPP lost
                   macro `HASH_MAP' used with too many (6) args
-                  control a_control_to_fuse, its_successor, the_third_successor; */
+                  control a_control_to_fuse, its_successor, the_second_successor; */
                control a_control_to_fuse;
                control its_successor;
-               control the_third_successor;
+               control the_second_successor;
                statement st;
-               
-               /* Find the adress of a control node to fuse even if it
-                  has already been fused with a predecessor: */
-               a_control_to_fuse = (control) its_adress_now;
-               if (get_debug_level() > 0)
-                  pips_assert("control inconsistants...",
-                              gen_consistent_p(a_control_to_fuse));
+               char * old_address;
+               /* Find the address of a control node to fuse even if
+                  it has already been fused with predecessors through
+                  a transitive closure: */
+	       for(old_address = the_original_control;;) {
+		   pips_debug(5, "Control %x (originally %x):\n",
+			      (unsigned int) its_address_now,
+			      (unsigned int) the_original_control);
+		   if (old_address == its_address_now
+		       /* ...The control node has not been moved */
+		       || !hash_defined_p(controls_to_fuse_with_their_successors,
+					  (char *) its_address_now)
+		       /* ...or it has not been moved because it is
+                          not a control node to fuse anyway. */
+		       )
+		       /* Ok, the node has been located: */
+		       break;
+		   else {
+		       /* Follow a former control movement: */
+		       old_address = its_address_now;
+		       its_address_now
+			   = hash_get(controls_to_fuse_with_their_successors,
+				      (char *) its_address_now);
+		   }
+	       }
+               a_control_to_fuse = (control) its_address_now;
+	       
+	       ifdebug(5)
+		   print_text(stderr, text_statement(get_current_module_entity(), 0, control_statement(a_control_to_fuse)));
+	       ifdebug(6) {
+		   pips_debug(5, "All the unstructured %x:\n",
+			      (unsigned int) u);
+		   print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+	       }
+	       ifdebug (3)
+		   fprintf(stderr, "Want to fuse control %x",
+			   (unsigned int) a_control_to_fuse);
+               ifdebug (1)
+		   pips_assert("control a_control_to_fuse inconsistants...",
+			       gen_consistent_p(a_control_to_fuse));
                
                its_successor = CONTROL(CAR(control_successors(a_control_to_fuse)));
-               if (get_debug_level() > 0)
-                  pips_assert("control inconsistants...",
-                              gen_consistent_p(its_successor));
+	       ifdebug (3)
+		   fprintf(stderr, " with control %x\n",
+			   (unsigned int) its_successor);
+               ifdebug (1)
+		   pips_assert("control its_successor inconsistants...",
+			       gen_consistent_p(its_successor));
 
                if (a_control_to_fuse == its_successor)
                   debug(3, "fuse_sequences_in_unstructured",
@@ -219,10 +262,12 @@ fuse_sequences_in_unstructured(unstructured u)
                else {
                   /* Well, it seems to be a real sequence, at most a
                      loop with 2 control nodes... */
-                  the_third_successor = CONTROL(CAR(control_successors(its_successor)));
-                  if (get_debug_level() > 0)
-                     pips_assert("control inconsistants...",
-                                 gen_consistent_p(the_third_successor));
+                  the_second_successor = CONTROL(CAR(control_successors(its_successor)));
+		  debug(3, "fuse_sequences_in_unstructured",
+                        "\tOk fuse them.\n");
+		  ifdebug (1)
+                     pips_assert("control the_second_successor inconsistants...",
+                                 gen_consistent_p(the_second_successor));
            
                   /* make st with the statements of 2 following nodes: */
                   st = make_empty_statement();
@@ -237,7 +282,7 @@ fuse_sequences_in_unstructured(unstructured u)
                   /* Link the first node with the third one in the forward
                      direction: */
                   CONTROL(CAR(control_successors(a_control_to_fuse))) =
-                     the_third_successor;
+                     the_second_successor;
                   /* Since the third successor may have more than 1
                      predecessor, we need to update only the link to
                      "its_successor": */
@@ -249,7 +294,7 @@ fuse_sequences_in_unstructured(unstructured u)
                              break;
                           }
                        },
-                          control_predecessors(the_third_successor));
+                          control_predecessors(the_second_successor));
                   /* If the node "its_successor" is in the fuse list, we
                      want to keep track of its new place, that is in fact
                      fused in "a_control_to_fuse", so that an eventual
@@ -275,11 +320,17 @@ fuse_sequences_in_unstructured(unstructured u)
                   
                   /* Now we remove the useless intermediate node
                      "its_successor": */
-                  control_successors(its_successor) = NIL;
-                  control_predecessors(its_successor) = NIL;
-                  control_statement(its_successor) = make_empty_statement();
-                  gen_free(its_successor);
+                  CONTROL(CAR(control_successors(its_successor))) =
+		      control_undefined;
+                  CONTROL(CAR(control_predecessors(its_successor))) =
+		      control_undefined;
+                  control_statement(its_successor) = statement_undefined;
+                  free_control(its_successor);
                }
+	       ifdebug (1)
+		   pips_assert("control after fuse inconsistants...",
+			       gen_consistent_p(a_control_to_fuse));
+
             },
                controls_to_fuse_with_their_successors);
 
@@ -302,10 +353,10 @@ fuse_sequences_in_unstructured(unstructured u)
    returns the new statement that own the unstructured, else s. */
 bool static
 take_out_the_entry_node_of_the_unstructured(statement s,
-                                            instruction i,
-                                            unstructured u,
                                             statement * new_unstructured_statement)
 {
+    instruction i = statement_instruction(s);
+    unstructured u = instruction_unstructured(i);
    control entry_node = unstructured_control(u);
    list entry_node_successors = control_successors(entry_node);
    int entry_node_successors_length = gen_length(entry_node_successors);
@@ -326,7 +377,7 @@ take_out_the_entry_node_of_the_unstructured(statement s,
                                      NIL));
       /* Remove the unstructured: */
       control_statement(entry_node) = statement_undefined;
-      gen_free(i);
+      free_instruction(i);
       /* No longer unstructured: */
       return FALSE;
    }
@@ -362,8 +413,6 @@ take_out_the_entry_node_of_the_unstructured(statement s,
 /* Still buggy. No longer used. */
 static bool
 try_to_structure_the_unstructured(statement s,
-                                  instruction i,
-                                  unstructured u,
                                   statement * new_unstructured_statement)
 {
    control end_of_first_sequence, c;
@@ -371,6 +420,8 @@ try_to_structure_the_unstructured(statement s,
    list begin_statement_list = NIL;
    list end_statement_list = NIL;
    control begin_of_last_sequence = control_undefined /* no gcc warning */;
+    instruction i = statement_instruction(s);
+    unstructured u = instruction_unstructured(i);
    
    /* The entry point of the unstructured: */
    control entry_node = unstructured_control(u);
@@ -516,12 +567,11 @@ try_to_structure_the_unstructured(statement s,
    not a continue, that means that its statement is a sequence at the
    end of the unstructured and we can take it out of the
    unstructured. */
-/* The s, i, u heritage may not be respected at the output. */
 void
-take_out_the_exit_node_if_not_a_continue(statement s,
-                                         instruction i,
-                                         unstructured u)
+take_out_the_exit_node_if_not_a_continue(statement s)
 {   
+    instruction i = statement_instruction(s);
+    unstructured u = instruction_unstructured(i);
    control exit_node = unstructured_exit(u);
    statement the_control_statement = control_statement(exit_node);
    instruction the_control_instruction =
@@ -537,7 +587,7 @@ take_out_the_exit_node_if_not_a_continue(statement s,
       /* Put an empty exit node and keep the statement for the label : */
       statement_instruction(the_control_statement) =
          make_continue_instruction();
-      if (get_debug_level() > 0)
+      ifdebug (1)
          pips_assert("Statements inconsistants...", gen_consistent_p(the_control_statement));
       /* Replace the unstructured by an unstructured followed by the
          out-keeped instruction: */
@@ -547,7 +597,7 @@ take_out_the_exit_node_if_not_a_continue(statement s,
                                      CONS(STATEMENT,
                                           make_stmt_of_instr(the_control_instruction),
                                           NIL)));            
-      if (get_debug_level() > 0)
+      ifdebug (1)
          pips_assert("Statements inconsistants...", gen_consistent_p(s));
    }
 }
@@ -555,10 +605,12 @@ take_out_the_exit_node_if_not_a_continue(statement s,
 
 /* All optimizations for unstructured during the bottom-up phase */
 void
-unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
+unspaghettify_rewrite_unstructured(statement s)
 {
    statement new_unstructured_statement;
-   
+   instruction i = statement_instruction(s);
+   unstructured u = instruction_unstructured(i);
+ 
    clean_up_exit_node(u);
    
    remove_the_unreachable_controls_of_an_unstructured(u);
@@ -577,7 +629,7 @@ unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
    
-   fuse_sequences_in_unstructured(u);
+   fuse_sequences_in_unstructured(s);
 
    ifdebug(9) {
       debug(9, "unspaghettify_rewrite_unstructured",
@@ -585,7 +637,7 @@ unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 
-   if (take_out_the_entry_node_of_the_unstructured(s, i, u, &new_unstructured_statement)) {
+   if (take_out_the_entry_node_of_the_unstructured(s, &new_unstructured_statement)) {
       /* If take_out_the_entry_node_of_the_unstructured() has not been
          able to discard the unstructured, go on with some other
          optimizations: */
@@ -595,7 +647,7 @@ unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
          print_text(stderr, text_statement(get_current_module_entity(), 0, s));
       }
 
-      take_out_the_exit_node_if_not_a_continue(new_unstructured_statement, i, u);
+      take_out_the_exit_node_if_not_a_continue(new_unstructured_statement);
    }
 
    ifdebug(9) {
@@ -616,14 +668,14 @@ unspaghettify_rewrite(statement s)
    instruction i = statement_instruction(s);
 
    debug(2, "unspaghettify_rewrite enter", "\n");
-   if (get_debug_level() >= 3) {
+   ifdebug (3) {
       fprintf(stderr, "[ The current statement : ]\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 
    if (instruction_unstructured_p(i)) {
-      unspaghettify_rewrite_unstructured(s, i, instruction_unstructured(i));
-      if (get_debug_level() >= 9) {
+      unspaghettify_rewrite_unstructured(s);
+      ifdebug (9) {
          fprintf(stderr, "After dead_rewrite_unstructured:\n");
          print_text(stderr, text_statement(get_current_module_entity(), 0, s));
          fprintf(stderr, "-----\n");
@@ -668,18 +720,18 @@ unspaghettify(char * mod_name)
 
    set_current_module_entity(local_name_to_top_level_entity(mod_name));
   
-   if (get_debug_level() > 0)
+   ifdebug (1)
       pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
 
    unspaghettify_statement(mod_stmt);
 
-   if (get_debug_level() > 0)
+   ifdebug (1)
       pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
 
    /* Reorder the module, because new statements have been generated. */
    module_reorder(mod_stmt);
 
-   if (get_debug_level() > 0)
+   ifdebug (1)
       pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
 
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
