@@ -4,7 +4,7 @@
  *
  * SCCS stuff:
  * $RCSfile: system_to_code.c,v $ version $Revision$, 
- * ($Date: 1996/07/22 18:46:29 $, ) 
+ * ($Date: 1996/07/23 16:42:19 $, ) 
  */
 
 /* Standard includes
@@ -333,9 +333,11 @@ evaluate_divide_if_possible(
 	}
     }
 
-    *result = value_div(min, denominator);
+    value_pdivision(min, denominator);
+    value_pdivision(max, denominator);
 
-    return value_eq(*result,value_div(max, denominator));
+    *result = min;
+    return value_eq(min,max);
 }
 
 /* expression constraints_to_loop_bound(c, var, is_lower)
