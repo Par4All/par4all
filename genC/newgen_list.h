@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1998/12/08 09:24:08 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1998/12/30 15:49:55 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -114,8 +114,10 @@ extern char *gen_reduce GEN_PROTO(( char *, char *(*)(), list )) ;
 extern void gen_remove GEN_PROTO(( list *, void * )) ;
 extern list gen_some  GEN_PROTO(( bool(*)(), list )) ;
 extern void gen_insert_after GEN_PROTO((void *, void *, list )) ;
+extern list gen_insert_before GEN_PROTO((void * no, void * o, list l)) ;
 extern list gen_once GEN_PROTO((void *, list));
 extern bool gen_in_list_p GEN_PROTO((void *, list));
+extern int gen_occurences GEN_PROTO((void *, list));
 extern bool gen_once_p GEN_PROTO((list));
 extern void gen_sort_list GEN_PROTO((list, int (*)())) ;
 extern void gen_closure GEN_PROTO((list (*)(), list));
