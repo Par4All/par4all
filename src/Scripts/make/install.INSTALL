@@ -1,23 +1,26 @@
 # $RCSfile: install.INSTALL,v $ (version $Revision$)
-# $Date: 1997/03/26 18:22:02 $, 
+# $Date: 1997/04/16 15:53:36 $, 
 
 INSTALLATION INSTRUCTIONS:
 --------------------------
 
-Run the install_pips script in this directory:
+If you have downloaded several parts of pips (sources, binaries, public
+softwares), you must first merge the different trees together. 
+
+The, run the install_pips script in this directory:
 
          sh install_pips
 
 You may wish to set the PIPS_ARCH variable to a value depending on you
 local architecture. If you have GNU compilers, GNU or GNULL should be a
 good choice. Otherwise, good luck;-) This must be done before sourcing the
-pipsrc file.
+pipsrc file (a default is provided).
 
          export PIPS_ARCH=GNU
 
 The install_pips script first generates "pipsrc.{sh,csh}" files that
 contain reasonnable environment variable settings for using PIPS. You can
-source, and eventually edit this file.
+source, and eventually edit this file, especially with IBM.
 
          source pipsrc.sh
 
@@ -27,14 +30,16 @@ can be found on
 
           http://www.cri.ensmp.fr/pips
 
-Then you can make pips with the make-pips script. This scripts simply
-forwards make commmands in the distribution tree, which is quite large.
-Its location should have been added to the path in the pipsrc file.
+When provided at the source level, you can make pips with the make-pips
+script. This scripts simply forwards make commmands in the distribution
+tree, which is quite large. Its location should have been added to the
+path in the pipsrc file. 
 
           make-pips -iv 
 
 Seems a nice first attempt. This is not yet perfect, because it may fails
-if softs such as latex2html is not installed.
+if softs such as latex2html is not installed. Avoid trying to regenerate
+the documentation.
 
 If you which to use pips permanently, you should add to your shell
 configuration files the setting of PIPS_ARCH and the source of pipsrc.
@@ -42,4 +47,3 @@ configuration files the setting of PIPS_ARCH and the source of pipsrc.
 Good luck. You may find help at pipsgroup@cri.ensmp.fr.
 
 Fabien.
-
