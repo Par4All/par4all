@@ -28,7 +28,8 @@ empty_comments_p(string s)
 
 /* PREDICATES ON STATEMENTS */
 
-bool empty_statement_p(st)
+bool 
+empty_statement_p(st)
 statement st;
 {
     instruction i;
@@ -38,7 +39,8 @@ statement st;
 	    ENDP(instruction_block(i)));
 }
 
-bool assignment_statement_p(s)
+bool 
+assignment_statement_p(s)
 statement s;
 {
     instruction i = statement_instruction(s);
@@ -46,7 +48,8 @@ statement s;
     return (fortran_instruction_p(i, ASSIGN_OPERATOR_NAME));
 }
 
-bool return_statement_p(s)
+bool 
+return_statement_p(s)
 statement s;
 {
     instruction i = statement_instruction(s);
@@ -55,7 +58,8 @@ statement s;
     return return_p;
 }
 
-bool continue_statement_p(s)
+bool 
+continue_statement_p(s)
 statement s;
 {
     instruction i = statement_instruction(s);
@@ -63,7 +67,8 @@ statement s;
     return (fortran_instruction_p(i, CONTINUE_FUNCTION_NAME));
 }
 
-bool stop_statement_p(s)
+bool 
+stop_statement_p(s)
 statement s;
 {
     instruction i = statement_instruction(s);
@@ -71,7 +76,8 @@ statement s;
     return (fortran_instruction_p(i, STOP_FUNCTION_NAME));
 }
 
-bool format_statement_p(s)
+bool 
+format_statement_p(s)
 statement s;
 {
     instruction i = statement_instruction(s);
@@ -79,7 +85,8 @@ statement s;
     return (fortran_instruction_p(i, FORMAT_FUNCTION_NAME));
 }
 
-bool statement_less_p(st1, st2)
+bool 
+statement_less_p(st1, st2)
 statement st1, st2;
 {
     int o1 = statement_ordering( st1 ) ;
@@ -98,7 +105,8 @@ statement st1, st2;
     return( ORDERING_STATEMENT(o1) < ORDERING_STATEMENT(o2)) ;
 }
 
-bool statement_possible_less_p(st1, st2)
+bool 
+statement_possible_less_p(st1, st2)
 statement st1, st2;
 {
     int o1 = statement_ordering( st1 ) ;
@@ -111,13 +119,15 @@ statement st1, st2;
 	return( ORDERING_STATEMENT(o1) < ORDERING_STATEMENT(o2));
 }
 
-bool statement_loop_p(s)
+bool 
+statement_loop_p(s)
 statement s;
 {
     return(instruction_loop_p(statement_instruction(s)));
 }
 
-bool statement_test_p(statement s)
+bool 
+statement_test_p(statement s)
 {
     return(instruction_test_p(statement_instruction(s)));
 }
@@ -250,14 +260,16 @@ empty_statement_or_continue_without_comment_p(statement st)
 }
 
 
-bool statement_call_p(s)
+bool 
+statement_call_p(s)
 statement s;
 {
     return(instruction_call_p(statement_instruction(s)));
 }
 
 
-bool check_io_statement_p(statement s)
+bool 
+check_io_statement_p(statement s)
 {
   bool check_io = FALSE;
   instruction i = statement_instruction(s);
@@ -273,7 +285,8 @@ bool check_io_statement_p(statement s)
   return check_io;
 }
 
-bool perfectly_nested_loop_p(stat)
+bool 
+perfectly_nested_loop_p(stat)
 statement stat;
 {
     instruction ins = statement_instruction(stat);
@@ -320,7 +333,8 @@ statement stat;
 
 /* checks that a block is a list of assignments, possibly followed by
    a continue */
-bool assignment_block_p(i)
+bool 
+assignment_block_p(i)
 instruction i;
 {
     MAPL(cs,
@@ -337,7 +351,8 @@ instruction i;
 
 /* functions to generate statements */
 
-statement make_empty_statement()
+statement 
+make_empty_statement()
 {
     return(make_statement(entity_empty_label(), 
 			  STATEMENT_NUMBER_UNDEFINED,
@@ -348,7 +363,8 @@ statement make_empty_statement()
 
 /* to be compared with instruction_to_statement() which is a macro (thanks to FC?) ! */
 
-statement make_stmt_of_instr(instr)
+statement 
+make_stmt_of_instr(instr)
 instruction instr;
 {
     return(make_statement(entity_empty_label(), 
@@ -384,7 +400,8 @@ make_assign_statement(expression l,
 
 /* FI: make_block_statement_with_stop is obsolete, do not use */
 
-statement make_block_statement_with_stop()
+statement 
+make_block_statement_with_stop()
 {
     statement b;
     statement stop;
@@ -432,7 +449,8 @@ make_nop_statement()
     return s;
 }
 
-statement make_empty_block_statement()
+statement 
+make_empty_block_statement()
 {
     statement b;
 
@@ -441,7 +459,8 @@ statement make_empty_block_statement()
     return b;
 }
 
-statement make_block_statement(body)
+statement 
+make_block_statement(body)
 list body;
 {
     statement b;
@@ -466,7 +485,8 @@ instruction make_instruction_block(list statements)
 #endif
 }
 
-statement make_return_statement()
+statement 
+make_return_statement()
 {
   /* The special RETURN label should be used, shouldn't it? */
     return make_call_statement(RETURN_FUNCTION_NAME, NIL, 
@@ -474,7 +494,8 @@ statement make_return_statement()
 }
 
 
-instruction make_continue_instruction()
+instruction 
+make_continue_instruction()
 {
     entity called_function;
 
@@ -484,7 +505,8 @@ instruction make_continue_instruction()
 }
 
 
-statement make_continue_statement(l)
+statement 
+make_continue_statement(l)
 entity l;
 {
     return make_call_statement(CONTINUE_FUNCTION_NAME, NIL, l, 
@@ -493,7 +515,8 @@ entity l;
 
 
 
-instruction MakeUnaryCallInst(f,e)
+instruction 
+MakeUnaryCallInst(f,e)
 entity f;
 expression e;
 {
@@ -503,7 +526,8 @@ expression e;
 
 /* this function creates a call to a function with zero arguments.  */
 
-expression MakeNullaryCall(f)
+expression 
+MakeNullaryCall(f)
 entity f;
 {
     return(make_expression(make_syntax(is_syntax_call, make_call(f, NIL)),
@@ -513,7 +537,8 @@ entity f;
 
 /* this function creates a call to a function with one argument. */
 
-expression MakeUnaryCall(f, a)
+expression 
+MakeUnaryCall(f, a)
 entity f;
 expression a;
 {
@@ -524,7 +549,8 @@ expression a;
 }
 
 
-statement make_call_statement(function_name, args, l, c)
+statement 
+make_call_statement(function_name, args, l, c)
 string function_name;
 list args;
 entity l; /* label, default entity_undefined */
@@ -553,7 +579,8 @@ string c; /* comments, default empty_comments (was: "" (was: string_undefined)) 
 
 /* */
 
-statement perfectly_nested_loop_to_body(loop_nest)
+statement 
+perfectly_nested_loop_to_body(loop_nest)
 statement loop_nest;
 {
     instruction ins = statement_instruction(loop_nest);
@@ -594,7 +621,8 @@ statement loop_nest;
 
 /* Direct accesses to second level fields */
 
-loop statement_loop(s)
+loop 
+statement_loop(s)
 statement s;
 {
     pips_assert("statement_loop", statement_loop_p(s));
@@ -602,7 +630,17 @@ statement s;
     return(instruction_loop(statement_instruction(s)));
 }
 
-call statement_call(s)
+test 
+statement_test(s)
+statement s;
+{
+    pips_assert("statement_test", statement_test_p(s));
+
+    return(instruction_test(statement_instruction(s)));
+}
+
+call 
+statement_call(s)
 statement s;
 {
     pips_assert("statement_call", statement_call_p(s));
@@ -610,7 +648,8 @@ statement s;
     return(instruction_call(statement_instruction(s)));
 }
 
-list statement_block(s)
+list 
+statement_block(s)
 statement s;
 {
     pips_assert("statement_block", statement_block_p(s));
@@ -620,37 +659,43 @@ statement s;
 
 /* predicates on instructions */
 
-bool instruction_assign_p(i)
+bool 
+instruction_assign_p(i)
 instruction i;
 {
     return fortran_instruction_p(i, ASSIGN_OPERATOR_NAME);
 }
 
-bool instruction_continue_p(i)
+bool 
+instruction_continue_p(i)
 instruction i;
 {
     return fortran_instruction_p(i, CONTINUE_FUNCTION_NAME);
 }
 
-bool instruction_return_p(i)
+bool 
+instruction_return_p(i)
 instruction i;
 {
     return fortran_instruction_p(i, RETURN_FUNCTION_NAME);
 }
 
-bool instruction_stop_p(i)
+bool 
+instruction_stop_p(i)
 instruction i;
 {
     return fortran_instruction_p(i, STOP_FUNCTION_NAME);
 }
 
-bool instruction_format_p(i)
+bool 
+instruction_format_p(i)
 instruction i;
 {
     return fortran_instruction_p(i, FORMAT_FUNCTION_NAME);
 }
 
-bool fortran_instruction_p(i, s)
+bool 
+fortran_instruction_p(i, s)
 instruction i;
 string s;
 {
@@ -674,7 +719,8 @@ string s;
   Y.Q. 19/05/92
 */
 
-int loop_increment_value(l)
+int 
+loop_increment_value(l)
 loop l;
 {
     range r = loop_range(l);
@@ -692,7 +738,8 @@ loop l;
     return(inc);
 }
 
-bool assignment_block_or_statement_p(s)
+bool 
+assignment_block_or_statement_p(s)
 statement s;
 {
     instruction i = statement_instruction(s);
@@ -717,7 +764,8 @@ statement s;
     return FALSE;
 }
 
-void print_statement_set(fd, r)
+void 
+print_statement_set(fd, r)
 FILE *fd;
 set r;
 {
@@ -732,7 +780,8 @@ set r;
 
 /* (the text is not freed, massive memory leak:-) 
  */ 
-void print_statement(statement s)
+void 
+print_statement(statement s)
 {
     debug_on("TEXT_DEBUG_LEVEL");
     print_text(stderr, text_statement(entity_undefined,0,s));
@@ -741,7 +790,8 @@ void print_statement(statement s)
 
 static hash_table number_to_statement = hash_table_undefined;
 
-static void update_number_to_statement(s)
+static void 
+update_number_to_statement(s)
 statement s;
 {
     if(statement_number(s)!=STATEMENT_NUMBER_UNDEFINED) {
@@ -749,7 +799,8 @@ statement s;
     }
 }
 
-hash_table build_number_to_statement(nts, s)
+hash_table 
+build_number_to_statement(nts, s)
 hash_table nts;
 statement s;
 {
@@ -766,7 +817,8 @@ statement s;
     return nts;
 }
 
-void print_number_to_statement(nts)
+void 
+print_number_to_statement(nts)
 hash_table nts;
 {
     HASH_MAP(number, stmt, {
@@ -792,14 +844,16 @@ hash_table allocate_number_to_statement()
  *
  * One caveat: FORMAT statements!
  */
-statement clear_labels(s)
+statement 
+clear_labels(s)
 statement s;
 {
     gen_recurse (s, statement_domain, gen_true, clear_label);
     return s;
 }
 
-void clear_label(s)
+void 
+clear_label(s)
 statement s;
 {
     statement_label(s) = entity_empty_label();
@@ -819,7 +873,8 @@ statement s;
  *
  */
 
-statement list_to_statement(l)
+statement 
+list_to_statement(l)
 list l;
 {
     switch (gen_length(l))
@@ -839,7 +894,8 @@ list l;
     return(statement_undefined);
 }
 
-statement st_make_nice_test(condition, ltrue, lfalse)
+statement 
+st_make_nice_test(condition, ltrue, lfalse)
 expression condition;
 list ltrue,lfalse;
 {
@@ -895,7 +951,8 @@ list ltrue,lfalse;
  *
  * move here from generation... FC 16/05/94
  */
-statement makeloopbody(l,s_old)
+statement 
+makeloopbody(l,s_old)
 loop l;
 statement s_old;
 {
@@ -919,32 +976,33 @@ statement s_old;
 }
 
 
-/*============================================================================*/
 /* statement make_block_with_stmt(statement stmt): makes sure that the given
  * statement "stmt" is a block of instructions. If it is not the case, this
  * function returns a new statement with a block of one statement. This
  * statement is "stmt".
  * If "stmt" is already a block, it is returned unmodified.
  */
-statement make_block_with_stmt(stmt)
+statement 
+make_block_with_stmt(stmt)
 statement stmt;
 {
-if (instruction_tag(statement_instruction(stmt)) != is_instruction_block)
-  {
-  /* We create a new statement with an empty block of instructions.
-   * "make_empty_statement()" is defined in Lib/ri-util, it creates a statement
-   * with a NIL instruction block. */
-  statement block_stmt = make_empty_statement();
+    if (instruction_tag(statement_instruction(stmt)) != is_instruction_block)
+    {
+	/* We create a new statement with an empty block of instructions.
+	 * "make_empty_statement()" is defined in Lib/ri-util, it creates a statement
+	 * with a NIL instruction block. */
+	statement block_stmt = make_empty_statement();
 
-  /* Then, we put the statement "stmt" in the block. */
-  instruction_block(statement_instruction(block_stmt)) = CONS(STATEMENT,
-                                                              stmt, NIL);
-  return (block_stmt);
-  }
-return (stmt);
+	/* Then, we put the statement "stmt" in the block. */
+	instruction_block(statement_instruction(block_stmt)) = CONS(STATEMENT,
+								    stmt, NIL);
+	return (block_stmt);
+    }
+    return (stmt);
 }
 
-string statement_identification(statement s)
+string 
+statement_identification(statement s)
 {
     static char buffer[50];
     char *instrstring = NULL;
