@@ -66,12 +66,24 @@ entity m;
 
     pips_assert("get_module_precondition",entity_module_p(m));
 
+    /*
     if(db_resource_p(DBR_SUMMARY_PRECONDITION, module_local_name(m)))
        p = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION,
 						module_local_name(m),
 						TRUE);
     else
 	p = transformer_undefined;
+	*/
+
+    if(check_resource_up_to_date(DBR_SUMMARY_PRECONDITION,
+				 module_local_name(m))) {
+	p = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION,
+						 module_local_name(m),
+						 TRUE);
+    }
+    else {
+	p = transformer_undefined;
+    }
 
     return p;
 }
