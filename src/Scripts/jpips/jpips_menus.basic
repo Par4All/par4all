@@ -4,6 +4,9 @@
 # Basic menus for jpips.
 #
 # $Log: jpips_menus.basic,v $
+# Revision 1.3  1998/07/03 16:37:29  coelho
+# new menus with ILABEL and IBUTTON _WITH_CHOICE...
+#
 # Revision 1.2  1998/07/03 11:54:58  coelho
 # new attemps with menus...
 #
@@ -35,7 +38,7 @@ Analyses Option Panel
 #
 #CLOSE
 
-LABEL_WITH_CHOICE
+ILABEL_WITH_CHOICE
 Transformation Mode
 checking lc
 c_or_a
@@ -289,6 +292,10 @@ CLOSE
 
 SEPARATOR
 
+GROUP
+Parallelization
+Management of parallelization
+
 LABEL_WITH_CHOICE
 Use-Def Chains
 check activate CHAINS
@@ -356,10 +363,29 @@ select parallelization algorithm
 
 CLOSE
 
-SINGLE_BUTTON
-Privatize Scalars
-$TAGc_or_a PRIVATIZER[$MODULES]
-privatization of scalar variables
+IBUTTON_WITH_CHOICE
+Privatize
+no used in IBUTTON_WITH_CHOICE
+..
+privatization of variables or anything
+
+	Scalars
+	$TAGc_or_a PRIVATIZE_MODULE[$MODULES]
+	..
+
+	Scalars and Arrays
+	$TAGc_or_a ARRAY_PRIVATIZER[$MODULES]
+	..
+
+	Array Sections
+	$TAGc_or_a ARRAY_SECTION_PRIVATIZER[$MODULES]
+	..
+
+	Declarations
+	$TAGc_or_a DECLARATIONS_PRIVATIZER[$MODULES]
+	..
+
+CLOSE
 
 BUTTON_WITH_CHOICE
 Show Parallel Code
@@ -378,6 +404,8 @@ display parallel code using the selected syntax
 	with HPF Directives
 	activate PRINT_PARALLELIZEDHPF_CODE
 	PRINT_PARALLELIZEDHPF_CODE
+
+CLOSE
 
 CLOSE
 
