@@ -25,6 +25,7 @@
 #include "makefile.h"
 #include "ri.h"
 
+#include "properties.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "pipsmake.h"
