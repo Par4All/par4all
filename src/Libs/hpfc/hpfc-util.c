@@ -459,7 +459,7 @@ int dim, *pdim;
  */
 distribution FindDistributionOfProcessorDim(ldi, dim, tdim)
 list ldi;
-int dim, *pdim;
+int dim, *tdim;
 {
     int 
 	i = 1,
