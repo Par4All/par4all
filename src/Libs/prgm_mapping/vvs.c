@@ -652,6 +652,7 @@ Pvecteur v;
    * the following order: first the CONST_COEFF, second the PARAM_COEFF,
    * third the INDEX_COEFF, last the MU_COEFF.
    */
+
   lc = general_merge_sort(vecteur_to_list(v), compare_coeff);
 
   /* We look, in lc, for a variable that we can eliminate in v, i.e. with a
