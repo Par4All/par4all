@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.SOL2LL,v $ (version $Revision$)
-# $Date: 1996/09/19 14:56:14 $, 
+# $Date: 1996/09/19 15:42:23 $, 
 #
 # this file contains macro definitions 
 
@@ -9,7 +9,7 @@ ARFLAGS	= rv
 CC	= cc
 CFLAGS	= -fast -xtarget=ultra1/140 -xarch=v8plusa -g
 CMKDEP	= -xM
-CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
+CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -D__EXTENSIONS__ -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC) 
 LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L/$(EXTERN_ROOT)/Lib/$(ARCH)
 RANLIB	= ranlib
