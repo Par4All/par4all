@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/11/12 13:06:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/03/19 15:53:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/11/12 13:06:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1998/03/19 15:53:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -1006,10 +1006,10 @@ clean_up_control(statement s)
  
 	pips_debug(2, "enter\n");
 	ifdebug (3) {
+	    display_linked_control_nodes(unstructured_control(u));
 	    fprintf(stderr, "[ The current statement : ]\n");
 	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
 	}
-
 	clean_up_exit_node(u);
    
 	remove_the_unreachable_controls_of_an_unstructured(u);
