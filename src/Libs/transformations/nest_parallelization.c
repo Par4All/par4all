@@ -69,7 +69,7 @@ typedef struct transformation_strategy {
     statement (*loop_transformation)();
 } transformation_strategy;
 
-transformation_strategy 
+static transformation_strategy 
     one_loop_transformation_strategies
             [PARALLEL_DIRECTION+1][LARGE_LOOP_COUNT+1] = 
                {
