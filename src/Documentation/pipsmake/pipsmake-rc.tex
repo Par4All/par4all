@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.13  2003/06/30 10:03:48  nguyen
+%% Create C_PRINTED_FILE resource for C prettyprinter
+%%
 %% Revision 1.12  2003/06/23 13:53:27  nguyen
 %% Add a C parser (preliminary version)
 %%
@@ -511,7 +514,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/06/23 13:53:27 $~$
+$~$Date: 2003/06/30 10:03:48 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -6352,7 +6355,18 @@ print_chains_graph      > MODULE.dg_file
 \end{verbatim}
 
 
+\subsection{Prettyprinters for C}
 
+A very basic and experimental C dumper. 
+
+\begin{verbatim}
+print_crough  > MODULE.crough
+              < PROGRAM.entities
+              < MODULE.code
+
+print_c_code  > MODULE.c_printed_file
+              < MODULE.crough
+\end{verbatim}
 
 \section{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
@@ -6533,7 +6547,7 @@ reindexing            > MODULE.reindexed_code
         < MODULE.plc
 \end{verbatim}
 
-\subsection{Prettyprinters for and CM Fortran}
+\subsection{Prettyprinters for CM Fortran}
 
 How to get a pretty-printed version of \verb+reindexed_code+ ? Two
 prettyprinters are available. The first one produces CM Fortran and the
@@ -6575,22 +6589,6 @@ print_parallelizedCRAFT_code     > MODULE.parallelprinted_file
         < MODULE.plc
         < MODULE.reindexed_code
 \end{verbatim}
-
-
-\subsection{Prettyprinters for C}
-
-A very basic and experimental C dumper. This is not f2c!
-
-\begin{verbatim}
-cprinted_file > MODULE.crough
-              < PROGRAM.entities
-              < MODULE.code
-
-cindent_file  > MODULE.c
-              < MODULE.crough
-\end{verbatim}
-
-
 
 
 \section{User Interface Menu Layouts}
