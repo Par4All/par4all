@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/02/17 18:47:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/27 17:06:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/02/17 18:47:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/02/27 17:06:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -233,7 +233,8 @@ fuse_sequences_in_unstructured(statement s)
                            number_of_successors_of_the_successor,
                            number_of_predecessors_of_the_successor,
 			   the_successor == entry_node);
-                     if (number_of_successors_of_the_successor == 1
+                     if (number_of_successors_of_the_successor <= 1 /* Accept
+			 the exit node... */
 			 && number_of_predecessors_of_the_successor == 1
 			 && the_successor != entry_node)
                         /* Ok, we have found a node in a
@@ -269,7 +270,6 @@ fuse_sequences_in_unstructured(statement s)
                   control a_control_to_fuse, its_successor, the_second_successor; */
                control a_control_to_fuse;
                control its_successor;
-               control the_second_successor;
                statement st;
                char * old_address;
                /* Find the address of a control node to fuse even if
@@ -327,12 +327,10 @@ fuse_sequences_in_unstructured(statement s)
                else {
                   /* Well, it seems to be a real sequence, at most a
                      loop with 2 control nodes... */
-                  the_second_successor = CONTROL(CAR(control_successors(its_successor)));
+                  int the_second_successor_number =
+		      gen_length(control_successors(its_successor));
 		  debug(3, "fuse_sequences_in_unstructured",
                         "\tOk fuse them.\n");
-		  ifdebug (1)
-                     pips_assert("control the_second_successor inconsistants...",
-                                 gen_consistent_p(the_second_successor));
            
                   /* make st with the statements of 2 following nodes: */
                   st = make_empty_statement();
@@ -346,25 +344,38 @@ fuse_sequences_in_unstructured(statement s)
 
                   /* Link the first node with the third one in the forward
                      direction: */
-                  CONTROL(CAR(control_successors(a_control_to_fuse))) =
-                     the_second_successor;
-                  /* Since the third successor may have more than 1
-                     predecessor, we need to update only the link to
-                     "its_successor": */
-                  MAPL(another_control_list,
-                       {
-                          if (CONTROL(CAR(another_control_list)) == its_successor) {
-                             CONTROL(CAR(another_control_list)) =
-                                a_control_to_fuse;
-                             break;
-                          }
-                       },
-                          control_predecessors(the_second_successor));
-                  /* If the node "its_successor" is in the fuse list, we
-                     want to keep track of its new place, that is in fact
-                     fused in "a_control_to_fuse", so that an eventual
-                     fusion will use "a_control_to_fuse" instead of
-                     "its_successor": */
+		  gen_free_list(control_successors(a_control_to_fuse));
+                  control_successors(a_control_to_fuse) =
+                     control_successors(its_successor);
+
+		  if (the_second_successor_number == 1) {
+		      /* its_successor is not the exit node... */
+		      /* Since the third successor may have more than
+			 1 predecessor, we need to update only the
+			 link to "its_successor": */
+		      MAPL(another_control_list,
+			   {
+			       if (CONTROL(CAR(another_control_list)) == its_successor) {
+				   CONTROL(CAR(another_control_list)) =
+				       a_control_to_fuse;
+				   break;
+			       }
+			   },
+			   control_predecessors(CONTROL(CAR(control_successors(its_successor)))));
+		  }
+		  else {
+		      /* If the successor is the exit node, then
+			 update exit_node to point to the new one: */
+		      pips_assert("The exit node should be its_successor!",
+				  its_successor == exit_node);
+		      exit_node = a_control_to_fuse;
+                  }
+
+		  /* If the node "its_successor" is in the fuse list,
+                     we want to keep track of its new place, that is
+                     in fact fused in "a_control_to_fuse", so that an
+                     eventual fusion will use "a_control_to_fuse"
+                     instead of "its_successor": */
                   if (hash_defined_p(controls_to_fuse_with_their_successors,
                                      (char *) its_successor)) {
                      /* Ok, "its_successor" is a node to fuse or that has
@@ -376,19 +387,15 @@ fuse_sequences_in_unstructured(statement s)
                                  (char *) a_control_to_fuse);
                   }
 
-                  /* If the successor is the exit node, then update
-                     exit_node to point to the new one: */
-                  if (its_successor == exit_node)
-                     /* Actually I think it cannot happend according to
-                        some previous conditions... */
-                     exit_node = a_control_to_fuse;
-                  
                   /* Now we remove the useless intermediate node
                      "its_successor": */
-                  CONTROL(CAR(control_successors(its_successor))) =
-		      control_undefined;
-                  CONTROL(CAR(control_predecessors(its_successor))) =
-		      control_undefined;
+                  /* Do not
+                     gen_free_list(control_successors(its_successor))
+                     since it is used as
+                     control_successors(a_control_to_fuse) now: */
+		  control_successors(its_successor) = NIL;
+                  gen_free_list(control_predecessors(its_successor));
+		  control_predecessors(its_successor) = NIL;
                   control_statement(its_successor) = statement_undefined;
                   free_control(its_successor);
                }
@@ -400,8 +407,6 @@ fuse_sequences_in_unstructured(statement s)
                controls_to_fuse_with_their_successors);
 
    /* Update the potentially modified exit node: */
-   /* Actually I think it cannot happend according to
-      some previous conditions... */
    unstructured_exit(u)= exit_node;
 
    hash_table_free(controls_to_fuse_with_their_successors);
@@ -439,7 +444,7 @@ take_out_the_entry_node_of_the_unstructured(statement s,
 	list l = CONS(STATEMENT, control_statement(entry_node), NIL);
 	/* Since the unstructured may have a comment on it, we cannot
 	   put the comment on the statement block but on a CONTINUE: */
-	if (! empty_comments_p(s)) {
+	if (! empty_comments_p(statement_comments(s))) {
 	    statement cs = make_continue_statement(entity_empty_label());
 	    statement_comments(cs) = statement_comments(s);
 	    statement_comments(s) = empty_comments;
@@ -822,6 +827,17 @@ restructure_this_test(control c,
 	}
     }
     
+    /* Replace the useless CONTINUE by a NOP to improve the
+       prettyprinted code: */
+    if (t == STRUCTURED_IF_THEN || t == STRUCTURED_NULL_IF) {
+	free_statement(test_false(the_test));
+	test_false(the_test) = make_empty_statement();
+    }
+    if (t == STRUCTURED_IF_ELSE || t == STRUCTURED_NULL_IF) {
+	free_statement(test_true(the_test));
+	test_true(the_test) = make_empty_statement();
+    }
+
     if (t == STRUCTURED_NULL_IF)
 	/* Remove one of the 2 branches, since it is symetrical. In
            fact, since unlink_2_control_nodes() removes all the
