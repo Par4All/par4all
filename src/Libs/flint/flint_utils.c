@@ -17,6 +17,7 @@
 
 /* PiPs specific headers */
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "misc.h"
 /* To avoid a global variable to pass the dependence graph in flint.c: */
