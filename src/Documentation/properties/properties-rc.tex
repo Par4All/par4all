@@ -1,8 +1,5 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/09/11 19:57:43 $, )
-% version $Revision$
-% got on %D%, %T%
 % $Id$
 %
 % Description des enchainements possibles des passes et analyses de PIPS
@@ -40,6 +37,10 @@
 
 % \begin{abstract}
 % \end{abstract}
+
+%%
+%% INTRO
+%%
 
 \section*{Introduction}
 
@@ -96,6 +97,12 @@ dedicated to libraries added by CEA to implement Feautrier's method.
 Virtually every PIPS programmer contributed some lines in this
 report. Inconsistencies are likely. Please report them to the PIPS team!
 
+
+
+%%
+%% GLOBAL
+%%
+
 \section{Global Options}
 
 Are DO loops bodies executed at least once (F-66 style), or not (Fortran~77)?
@@ -128,6 +135,12 @@ leaks.
 \begin{verbatim}
 LOG_MEMORY_USAGE FALSE
 \end{verbatim}
+
+
+
+%%
+%% PIPS META
+%%
 
 \section{PIPS Infrastructure}
 \label{section-pips-infrastructure}
@@ -237,6 +250,12 @@ should then be saved and used to generate a new workspace.
 \begin{verbatim}
 GENERATE_MISSING_SOURCE_FILES FALSE
 \end{verbatim}
+
+
+
+%%
+%% ANALYSES
+%%
 
 \section{Analyses}
 \label{section-analyses}
@@ -359,6 +378,7 @@ set it manually.
 \begin{verbatim}
 DEPENDENCE_TEST "full"
 \end{verbatim}
+
 
 \subsubsection{Statistics}
 
@@ -830,6 +850,9 @@ REGIONS_TRANSLATION_STATISTICS FALSE
 
 
 
+%%
+%% TRANSFORMATIONS
+%%
 
 \section{Transformations, Parallelization, Distribution}
 \label{section-transformations}
@@ -844,6 +867,11 @@ innermost parallel?) code
 
 \begin{verbatim}
 GENERATE_NESTED_PARALLEL_LOOPS TRUE
+\end{verbatim}
+
+Show statistics on the number of loops parallelized by pips.
+\begin{verbatim}
+PARALLELIZATION_STATISTICS FALSE
 \end{verbatim}
 
 \subsection{Code Distribution}
@@ -939,9 +967,7 @@ systems with equalities.
 HPFC_EXTRACT_LATTICE TRUE
 \end{verbatim}
 
-
-\section{Program Transformations}
-
+%% \section{Program Transformations}
 
 \subsection{Dead code elimination}
 
@@ -1038,6 +1064,12 @@ Partial distribution distributes the statements of a loop nest except
 \begin{verbatim}
 PARTIAL_DISTRIBUTION FALSE
 \end{verbatim}
+
+
+
+%%
+%% PRETTYPRINTER
+%%
 
 \section{Prettyprinter Options}
 \label{section-prettyprinters}
@@ -1407,10 +1439,22 @@ of boolean!):
 ICFG_DEBUG FALSE
 \end{verbatim}
 
+
+
+%%
+%% PAF
+%%
+
 \section{Feautrier's Method}
 \label{section-feautrier}
 
 No properties apparently.
+
+
+
+%%
+%% CONCLUSION
+%%
 
 \section*{Conclusion}
 
