@@ -88,7 +88,7 @@ int ofl_ctrl;
     Pvecteur cu;
     extern jmp_buf overflow_error;
 
-    if(lambda==0)
+    if(lambda==VALUE_ZERO)
 	return v;
     else if(v==NULL) {
 	/* ancienne version
@@ -97,8 +97,8 @@ int ofl_ctrl;
 	 */
 	v = vect_dup(u);
 	switch(lambda) {
-	case 1: break;
-	case -1: vect_chg_sgn(v);
+	case VALUE_ONE: break;
+	case VALUE_MONE: vect_chg_sgn(v);
 	    break;
 	default: v = vect_multiply(v, lambda);
 	}
@@ -252,16 +252,16 @@ Pvecteur v2;
 {
     Pvecteur v3;
     /* cv_v1 = coeff de v dans v1 */
-    int cv_v1 = vect_coeff(v,v1);
+    Value cv_v1 = vect_coeff(v,v1);
     /* cv_v2 = coeff de v dans v2 */
-    int cv_v2 = vect_coeff(v,v2);
+    Value cv_v2 = vect_coeff(v,v2);
 
-    if (cv_v2==0) {
+    if (cv_v2==VALUE_ZERO) {
 	/* v2 est solution; i.e., substitution non faite: var absente */
 	v3 = v2;
     }
     else {
-	if (cv_v1<0) {
+	if (cv_v1<VALUE_ZERO) {
 	    v3 = vect_cl2(-cv_v1,v2,cv_v2,v1);
 	    vect_chg_coeff(&v3,v,-cv_v2);
 	}
