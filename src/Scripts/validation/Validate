@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:10:59 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:11:33 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -119,7 +119,7 @@ validate_usage()
 	  -p: parallel (default)
 	  -n: sequential
 	  -t: timing
-	  -a adress: mail sent to (defaut $user for you:-)
+	  -a adress: mail sent to (defaut "$user" for you:-)
 	  -u xx: update time (default 30)
 	  -r dir: run directory (default .)
 	  -i lines: max number of lines for sending a full message
