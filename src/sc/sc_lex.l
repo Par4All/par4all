@@ -7,12 +7,14 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h> /* flex uses isatty */
 
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
-#include "y.tab.h"
+
+#include "sc_gram.h"
 
 #define RETURN(x) /* fprintf(stderr, "lex: %d\n", x); */ return x
 
@@ -20,8 +22,10 @@
 
 %%
 <TEXT>VAR			{ RETURN(VAR); }
-<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { RETURN(IDENT); }
-<TEXT>[0-9]*			{ RETURN(CONSTANTE); }
+<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { yylval.Variable = strdup(yytext);
+                                  RETURN(IDENT); }
+<TEXT>[0-9]*			{ sscan_Value(yytext,&yylval.Value);
+                                  RETURN(CONSTANTE); }
 <TEXT>"=="			{ RETURN(EGAL); }
 <TEXT>","			{ RETURN(VIRG); }
 <TEXT>"+"			{ RETURN(PLUS); }
@@ -45,7 +49,7 @@ int yyinput()
 }
 #endif
  
-yywrap()
+int yywrap(void)
 {
 #ifdef FLEX_SCANNER
     yy_init = 1 ;
@@ -53,7 +57,23 @@ yywrap()
     return( 1 ) ;
 }
  
-void sc_init_lex()
+void sc_init_lex(void)
 {
         BEGIN TEXT;
 }
+
+extern boolean yysyntax_error;
+
+int yyerror(char *s)
+{
+	/* procedure minimun de recouvrement d'erreurs */
+	int c;
+
+	(void) fprintf(stderr,"%s near %s\n",s,yytext);
+	while ((c = getchar()) != EOF)
+		putchar(c);
+
+	yysyntax_error = TRUE;
+	return TRUE;
+}
+
