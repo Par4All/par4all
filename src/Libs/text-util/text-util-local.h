@@ -19,7 +19,8 @@
        }
 
 #define MERGE_TEXTS(r,t) { \
-       text _r_ = (r), _t_ = (t); \
+       text _r_ = (r); \
+       text _t_ = (t); \
        text_sentences(_r_) = \
 	   gen_nconc(text_sentences(_r_), text_sentences(_t_)); \
        text_sentences(_t_) = NIL; \
