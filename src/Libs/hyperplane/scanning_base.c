@@ -68,7 +68,8 @@ matrice G;
 {
     matrice U = matrice_new(n,n);
     matrice G1 = matrice_new(n,n);
-    int det_Ui,det_Ui1;			/* determinant of Ui and Ui-1*/
+    int det_Ui = 0;
+    int det_Ui1 = 0;			/* determinant of Ui and Ui-1*/
     int Xi,Yi;
     int i,j,r;
    
