@@ -8,6 +8,7 @@
 #include "ri-util.h"
 
 #include "misc.h"
+#include "properties.h"
 
 #include "syntax.h"
 #include "syn_yacc.h"
@@ -28,13 +29,34 @@ LOCAL int CurrentStmt = 0;
 
 
 /* to produce statement numbers */
-static int stat_num = -1;
+static int stat_num = 1;
+static bool skip_num = FALSE ;
 
 void reset_statement_number()
 {
     stat_num = 1;
+    skip_num = FALSE;
 }
 
+int
+get_next_statement_number()
+{
+  int next = stat_num;
+
+  stat_num = skip_num? stat_num+2 : stat_num+1;
+  skip_num = FALSE;
+
+  return next;
+}
+
+int
+get_future_statement_number()
+{
+  int next = stat_num+1;
+  pips_assert("skip_num must be false",!skip_num);
+  skip_num = TRUE;
+  return next;
+}
 
 /* this functions looks up in table StmtHeap for the statement s whose
 label is l. */
@@ -200,72 +222,103 @@ string s;
 
 
 /* this function makes a statement. l is the label and i the
-instruction. we make sure that the label is not declared twice. */
-
+ * instruction. we make sure that the label is not declared twice.
+ *
+ * GO TO statement are numbered like other statements although they
+ * are destroyed by the controlizer. To be changed.
+ */
 
 statement MakeStatement(l, i)
 entity l;
 instruction i;
 {
-    statement s;
+  statement s;
 
-    debug(5, "", "[MakeStatement] %s\n", entity_name(l));
+  debug(5, "", "[MakeStatement] %s\n", entity_name(l));
 
-    pips_assert("MakeStatement", type_statement_p(entity_type(l)));
-    pips_assert("MakeStatement", storage_rom_p(entity_storage(l)));
-    pips_assert("MakeStatement", value_constant_p(entity_initial(l)));
-    pips_assert("MakeStatement", 
-	   constant_litteral_p(value_constant(entity_initial(l))));
+  pips_assert("MakeStatement", type_statement_p(entity_type(l)));
+  pips_assert("MakeStatement", storage_rom_p(entity_storage(l)));
+  pips_assert("MakeStatement", value_constant_p(entity_initial(l)));
+  pips_assert("MakeStatement", 
+	      constant_litteral_p(value_constant(entity_initial(l))));
 
-    if (strcmp(entity_local_name(l), EMPTY_LABEL_NAME) != 0) {
-	if (instruction_block_p(i))
-		ParserError("makeStatement", "a block must have no label\n");
+  if (strcmp(entity_local_name(l), EMPTY_LABEL_NAME) != 0) {
+    if (instruction_block_p(i))
+      ParserError("makeStatement", "a block must have no label\n");
 
-	/* FI, PJ: the "rice" phase does not handle labels on DO like 100 in:
-	 *  100 DO 200 I = 1, N
-	 *
-	 * This should be trapped by "rice" when loops are checked to see
-	 * if Allen/Kennedy's algorithm is applicable
-	 */
-	if (instruction_loop_p(i)) {
-	    user_warning("MakeStatement",
-			 "DO loop reachable by GO TO via label %s cannot be parallelized by PIPS\n",
-			 entity_local_name(l));
-	}
-
-	if ((s = LabelToStmt(entity_name(l))) == statement_undefined) {
-	    s = make_statement(l, 
-			       stat_num++, 
-			       STATEMENT_ORDERING_UNDEFINED,
-			       string_undefined, 
-			       i);
-	    NewStmt(l, s);
-	}
-	else {
-	    if(statement_instruction(s) != instruction_undefined) {
-		user_warning("MakeStatement", "Label %s may be used twice\n",
-			     entity_local_name(l));
-		/* FI: commented out to avoid useless user triggered core dumps */
-		/*
-		pips_assert("MakeStatement", 
-			    statement_instruction(s) == instruction_undefined);
-			    */
-		if(statement_instruction(s) != instruction_undefined) {
-		  ParserError("MakeStatement", "Same label used twice\n");
-		}
-	    }
-	    statement_instruction(s) = i;
-	}
+    /* FI, PJ: the "rice" phase does not handle labels on DO like 100 in:
+     *  100 DO 200 I = 1, N
+     *
+     * This should be trapped by "rice" when loops are checked to see
+     * if Allen/Kennedy's algorithm is applicable
+     */
+    if (instruction_loop_p(i)) {
+      if(!get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
+	user_warning("MakeStatement",
+		     "DO loop reachable by GO TO via label %s cannot be parallelized by PIPS\n",
+		     entity_local_name(l));
+      }
     }
-    else {
+
+    if ((s = LabelToStmt(entity_name(l))) == statement_undefined) {
+      if(instruction_loop_p(i) && get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
+	statement c = make_continue_statement(l);
+	statement ls = instruction_to_statement(i);
+
+	statement_number(ls) = get_next_statement_number();
+	NewStmt(l, c);
+	s = make_block_statement(CONS(STATEMENT,c,
+				      CONS(STATEMENT, ls, NIL)));
+      }
+      else {
 	s = make_statement(l, 
-			   stat_num++, 
+			   instruction_goto_p(i)? STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
 			   string_undefined, 
 			   i);
+	NewStmt(l, s);
+      }
     }
+    else {
+      if(statement_instruction(s) != instruction_undefined) {
+	user_warning("MakeStatement", "Label %s may be used twice\n",
+		     entity_local_name(l));
+	/* FI: commented out to avoid useless user triggered core dumps */
+	/*
+	  pips_assert("MakeStatement", 
+	  statement_instruction(s) == instruction_undefined);
+	  */
+	if(statement_instruction(s) != instruction_undefined) {
+	  ParserError("MakeStatement", "Same label used twice\n");
+	}
+      }
+      pips_assert("Should have no number", 
+		  statement_number(s)==STATEMENT_NUMBER_UNDEFINED);
+
+      if(instruction_loop_p(i) && get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
+	statement c = make_continue_statement(l);
+	statement ls = instruction_to_statement(i);
+
+	statement_number(ls) = get_next_statement_number();
+	statement_instruction(s) = make_instruction(is_instruction_sequence,
+						    make_sequence(CONS(STATEMENT,c,
+								       CONS(STATEMENT, ls, NIL))));
+      }
+      else {
+	statement_instruction(s) = i;
+	statement_number(s) = get_next_statement_number();
+      }
+    }
+  }
+  else {
+    s = make_statement(l, 
+		       instruction_goto_p(i)? STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
+		       STATEMENT_ORDERING_UNDEFINED,
+		       string_undefined, 
+		       i);
+  }
 	
-    return(s);
+  return(s);
 }
 
 
@@ -378,7 +431,7 @@ instruction make_goto_instruction(entity l)
 
   if (s == statement_undefined) {
     s = make_statement(l, 
-		       stat_num++,
+		       STATEMENT_NUMBER_UNDEFINED,
 		       STATEMENT_ORDERING_UNDEFINED,
 		       string_undefined, 
 		       instruction_undefined);
@@ -523,7 +576,7 @@ string l;
     dolab = MakeLabel((strcmp(l, "BLOCKDO") == 0) ? "" : l);
 
     instblock_do = MakeEmptyInstructionBlock();
-    stmt_do = MakeStatement(MakeLabel(""), instblock_do);
+    stmt_do = instruction_to_statement(instblock_do);
 
     ido = make_instruction(is_instruction_loop,
 			   make_loop(dovar, r, stmt_do, dolab,
@@ -537,34 +590,33 @@ string l;
 }
 
 /* this function creates a logical if statement. the true part of the
-test is a block with only one instruction (i), and the false part is an
-empty block.  */
+ * test is a block with only one instruction (i), and the false part is an
+ * empty block.  
+ *
+ * Modifications:
+ *  - there is no need for a block in the true branch, any statement can do
+ *  - there is no need for a CONTINUE statement in the false branch, an empty block
+ *    is plenty
+ *  - MakeStatement() cannot be used for the true and false branches because it
+ *    disturbs the statement numering
+ */
 
 instruction MakeLogicalIfInst(e, i)
 expression e;
 instruction i;
 {
-    instruction bt, bf;
-
+  /* It is not easy to number bt because Yacc reduction order does not help... */
+    statement bt = instruction_to_statement(i);
+    statement bf = make_empty_block_statement();
+    instruction ti = make_instruction(is_instruction_test, 
+				      make_test(e, bt, bf));
+				      
     if (i == instruction_undefined)
 	    FatalError("MakeLogicalIfInst", "bad instruction\n");
 
-    bt = MakeEmptyInstructionBlock();
-    instruction_block(bt) = CONS(INSTRUCTION, MakeStatement(MakeLabel(""), i),
-				 instruction_block(bt));
+    statement_number(bt) = get_future_statement_number();
 
-    bf = MakeEmptyInstructionBlock();
-    instruction_block(bf) =
-	    CONS(INSTRUCTION, 
-		 MakeStatement(MakeLabel(""), 
-			       MakeZeroOrOneArgCallInst("CONTINUE",
-							expression_undefined)),
-		 instruction_block(bf));
-
-    return(make_instruction(is_instruction_test, 
-			    make_test(e, 
-				      MakeStatement(MakeLabel(""), bt), 
-				      MakeStatement(MakeLabel(""), bf))));
+    return ti;
 }
 
 /* this function transforms an arithmetic if statement into a set of
@@ -780,16 +832,20 @@ int token;
     return(name);
 }
 
-/* Generate a test to jump to l if flag f is not zero
+/* Generate a test to jump to l if flag f is TRUE
  * Used to implement control effects of IO's due to ERR= and END=.
+ *
+ * Should not use MakeStatement() directly or indirectly to avoid
+ * counting these pseudo-instructions
  */
 statement make_check_io_statement(string n, expression u, entity l)
 {
   entity a = global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, n);
   reference r = make_reference(a, CONS(EXPRESSION, u, NIL));
   expression c = reference_to_expression(r);
-  instruction b = make_goto_instruction(l);
-  instruction t = MakeLogicalIfInst(c, b);
+  statement b = instruction_to_statement(make_goto_instruction(l));
+  instruction t = make_instruction(is_instruction_test,
+				   make_test(c, b, make_empty_block_statement()));
   statement check = instruction_to_statement(t);
 
   gen_consistent_p(check);
@@ -797,7 +853,7 @@ statement make_check_io_statement(string n, expression u, entity l)
   return check;
 }
 
-/* this function creates a io statement. keyword indicates which io
+/* this function creates an IO statement. keyword indicates which io
 statement is to be built (READ, WRITE, ...).
 
 lci is a list of 'control specifications'. its has the following format:
@@ -897,7 +953,7 @@ cons *lio;
       if(!statement_undefined_p(io_end)) {
 	ls = CONS(STATEMENT, io_end, ls);
       }
-      ls = CONS(STATEMENT, instruction_to_statement(io_call), ls);
+      ls = CONS(STATEMENT, MakeStatement(entity_empty_label(), io_call), ls);
       io = make_instruction(is_instruction_sequence, make_sequence(ls));
       gen_consistent_p(io);
     }
