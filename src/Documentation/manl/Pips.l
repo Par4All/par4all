@@ -30,7 +30,7 @@ are available. See
 and
 .B wpips.
 .\"
-.SH DESCRIPTION
+.SH DESCRIPTION 
 The
 .B Pips
 command is not designed to be used directly but as an interface
