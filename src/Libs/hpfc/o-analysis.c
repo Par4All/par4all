@@ -3,7 +3,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1994/12/02 15:01:05 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1994/12/06 14:42:48 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -18,7 +18,6 @@
 extern int      fprintf();
 
 #include "genC.h"
-#include "hash.h"
 
 #include "ri.h"
 #include "hpf.h"
