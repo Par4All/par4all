@@ -3,7 +3,7 @@ c Runtime Support Functions for the High Performance Fortran Compiler
 c by Fabien COELHO.
 c
 c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-c ($Date: 1996/03/14 11:42:22 $, )
+c ($Date: 1996/06/08 13:58:42 $, )
 c
 c-----------------
 c
@@ -994,7 +994,6 @@ c
 c
 c end of cm5 related initializations
 c)
-
       call pvmfjoingroup(HPFC_GROUP_NAME, inum)
       debug(call HPFC_SYNCHRO)
       end
@@ -1091,9 +1090,19 @@ c
       HOSTTID = MYTID
       NBOFTASKS = MAXSIZEOFPROCS
 
-      _direct(call HPFC_DIRECT_ROUTE_IF_POSSIBLE)
-
       call HPFC_INIT_COMMON_PARAM_LIB
+
+c
+c done before the spawn so host is (group, 0)
+c
+      call pvmfjoingroup(HPFC_GROUP_NAME, inum)
+      if (inum.lt.0) then
+         call pvmfperror("while joining group", info)
+         call pvmfexit(info)
+         stop
+      endif
+
+      _direct(call HPFC_DIRECT_ROUTE_IF_POSSIBLE)
 
       debug(write (unit=0,fmt=*) "spawning ", NODE_PROGRAM_NAME
       write (unit=0,fmt=*) "   on ", NBOFTASKS, " ", NODE_ARCHITECTURE)
@@ -1170,12 +1179,6 @@ c
 c end of cm5 related initializations
 c)
 
-      call pvmfjoingroup(HPFC_GROUP_NAME, inum)
-      if (inum.lt.0) then
-         call pvmfperror("while joining group", info)
-         call pvmfexit(info)
-         stop
-      endif
       debug(call HPFC_SYNCHRO)
 
       end
