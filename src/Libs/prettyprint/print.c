@@ -68,11 +68,11 @@ char *mod_name;
 bool print_parallelized_code(mod_name)
 char *mod_name;
 {
+    bool success = FALSE;
     text r = make_text(NIL);
-    char *filename;
-    FILE *fd;
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
+
 
     set_bool_property("PRETTYPRINT_PARALLEL", TRUE);
     set_bool_property("PRETTYPRINT_SEQUENTIAL", FALSE);
@@ -81,23 +81,15 @@ char *mod_name;
 
     mod_stat = (statement)
 	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, TRUE);
-    
-    filename = strdup(concatenate(db_get_current_workspace_directory(), 
-				  "/", mod_name, PARALLEL_FORTRAN_EXT, NULL));
 
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
-
     MERGE_TEXTS(r, text_module(module, mod_stat));
-
-    fd = safe_fopen(filename, "w");
-    print_text(fd, r);
     debug_off();
-    safe_fclose(fd, filename);
 
-    DB_PUT_FILE_RESOURCE(DBR_PARALLELPRINTED_FILE, strdup(mod_name), 
-			 filename);
+    success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
+				  PARALLEL_FORTRAN_EXT, r);
 
-    return TRUE;
+    return success;
 }
 
 bool print_code(mod_name)
@@ -135,52 +127,38 @@ emacs_print_code(char *mod_name)
 bool print_code_or_source(mod_name)
 char *mod_name;
 {
+    bool success = FALSE;
     text r = make_text(NIL);
-    char *filename;
-    FILE *fd;
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
+    string resource_name = strdup
+	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
+	    DBR_GRAPH_PRINTED_FILE
+		: is_emacs_prettyprint ? DBR_EMACS_PRINTED_FILE :
+		    (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE));
+    string file_ext =
+	strdup(concatenate
+	       (is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
+		is_emacs_prettyprint ? EMACS_FILE_EXT : "",
+		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
+		NULL));
 
-    /*set_bool_property("PRETTYPRINT_FORTRAN90", FALSE);*/
 
-    /* PRETTYPRINT_PARALLEL is not used */
     set_bool_property("PRETTYPRINT_PARALLEL", FALSE);
-    /* PRETTYPRINT_SEQUENTIAL is not used */
     set_bool_property("PRETTYPRINT_SEQUENTIAL", TRUE);
 
     init_prettyprint(empty_text);
 
     mod_stat = (statement)
 	db_get_memory_resource(is_user_view?DBR_PARSED_CODE:DBR_CODE, mod_name, TRUE);
-  
-    filename = strdup
-	(concatenate(db_get_current_workspace_directory(), 
-		     "/",
-		     mod_name,
-		     is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
-		     is_emacs_prettyprint ? EMACS_FILE_EXT : "",
-		     get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
-		     NULL));
-
-    MERGE_TEXTS(r, text_module(module,mod_stat));
-
-    fd = safe_fopen(filename, "w");
 
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
-    print_text(fd, r);
+    MERGE_TEXTS(r, text_module(module,mod_stat));
     debug_off();
-
-    safe_fclose(fd, filename);
-
-    DB_PUT_FILE_RESOURCE
-	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
-	 DBR_GRAPH_PRINTED_FILE
-	 : is_emacs_prettyprint ? DBR_EMACS_PRINTED_FILE :
-	 (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE),
-	 strdup(mod_name),
-	 filename);
-
-    return TRUE;
+    success = make_text_resource (mod_name, resource_name, file_ext, r);
+    free(resource_name);
+    free(file_ext);
+    return success;
 }
 
 bool make_text_resource(mod_name, res_name, file_ext, texte)
@@ -190,10 +168,13 @@ char *file_ext;
 text texte;
 {
     char *filename;
+    char *localfilename;
     FILE *fd;
     
+    localfilename = strdup(concatenate(mod_name, file_ext, NULL));
+
     filename = strdup(concatenate(db_get_current_workspace_directory(), 
-				  "/", mod_name, file_ext, NULL));
+				  "/", localfilename, NULL));
 
     fd = safe_fopen(filename, "w");
 
@@ -203,7 +184,7 @@ text texte;
 
     safe_fclose(fd, filename);
 
-    DB_PUT_FILE_RESOURCE(strdup(res_name), strdup(mod_name), filename);
-
+    DB_PUT_FILE_RESOURCE(strdup(res_name), strdup(mod_name), localfilename);
+    free(filename);
     return TRUE;
 }
