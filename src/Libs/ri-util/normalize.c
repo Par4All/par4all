@@ -178,10 +178,10 @@ cons *la;
 	    return(make_normalized(is_normalized_complex, UU));
 	}
     }
-    else if(ENTITY_MIN_P(e) || ENTITY_MIN0_P(e) && gen_length(la) == 2) {
+    else if((ENTITY_MIN_P(e) || ENTITY_MIN0_P(e)) && gen_length(la) == 2) {
 	n = binary_to_normalized(la, MINIMUM);
     }
-    else if(ENTITY_MAX_P(e) || ENTITY_MAX0_P(e) && gen_length(la) == 2) {
+    else if((ENTITY_MAX_P(e) || ENTITY_MAX0_P(e)) && gen_length(la) == 2) {
 	n = binary_to_normalized(la, MAXIMUM);
     }
     else if(ENTITY_MODULO_P(e)) {
