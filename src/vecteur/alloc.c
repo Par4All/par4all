@@ -50,11 +50,20 @@ Pvecteur v_in;
 void vect_rm(v)
 Pvecteur v;
 {
+    Pvecteur elem = NULL;
+    Pvecteur nelem = NULL;
+
+    for(elem = v; elem!=NULL; elem = nelem) {
+	nelem = elem->succ;
+	free((char *)elem);
+    }
+    /*
     while (v != NULL) {
 	Pvecteur nv = v->succ;
 	free((char *) v);
 	v = nv;
     }
+    */
 }
 
 /* Pvecteur vect_new(Variable var,Value coeff): 
