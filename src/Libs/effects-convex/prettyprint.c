@@ -208,8 +208,6 @@ words_region(region reg)
     }
     else /* PIPS prettyprint */
     {
-	string what_action = string_undefined;
-
 	pc = CHAIN_SWORD(pc, "<");
 	pc = gen_nconc(pc, effect_words_reference(r));
 	pc = CHAIN_SWORD(pc, "-");
