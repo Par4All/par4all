@@ -28,7 +28,7 @@ wpips-epips-view-menu.tex \
 wpips-epips-transform-menu.tex \
 wpips-epips-compile-menu.tex \
 wpips-epips-options-menu.tex : $(PIPSMAKERC)
-	generate_all_menu_documentation < $(PIPSMAKERC)
+	perl generate_all_menu_documentation < $(PIPSMAKERC)
 
 
 clean: local-clean
