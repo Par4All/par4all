@@ -95,7 +95,6 @@ last_word_of_sentence(sentence s)
 #define FORESYS_CONTINUATION_PREFIX "C$&"
 
 #define LINE_SUFFIX "\n"
-#define MAX_LINE_LENGTH 70
 
 static int
 last_comma_or_clopar(string s )
