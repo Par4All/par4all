@@ -79,6 +79,10 @@ rloops_mapping_of_statement(
 	rloops_mapping_of_statement(m, loops, test_false(instruction_test(i)));
 	break;
 
+      case is_instruction_whileloop:
+	rloops_mapping_of_statement(m, loops, whileloop_body(instruction_whileloop(i)));
+	break;
+
       case is_instruction_call:
       case is_instruction_goto:
 	break;
@@ -141,6 +145,7 @@ distributable_statement_p(statement stat, set region)
 	region = set_add_element(region, region, (char *) stat);
 	return(TRUE);
 
+    case is_instruction_whileloop:
     case is_instruction_goto:
     case is_instruction_unstructured:
     case is_instruction_test:
@@ -153,12 +158,12 @@ distributable_statement_p(statement stat, set region)
     return((bool) NULL); /* just to avoid a gcc warning */
 }
 
-/* this functions checks if kennedy's algorithm can be applied on the
+/* this functions checks if Kennedy's algorithm can be applied on the
 loop passed as argument. If yes, it returns a set containing all
 statements belonging to this loop including the initial loop itself.
 otherwise, it returns an undefined set.
 
-Our version of kennedy's algorithm can only be applied on loops
+Our version of Kennedy's algorithm can only be applied on loops
 containing no test, goto or unstructured control structures. */
 
 set distributable_loop(l)
