@@ -177,6 +177,7 @@ static void simdize_simple_statements(statement s)
    seq = sequence_statements(instruction_sequence(statement_instruction(s)));
    init_statement_matches_map(seq);
    init_statement_successors_map(seq);
+   reset_argument_info();
 
    sinfo = sinfo_begin = CONS(NULL, NULL, NIL);
 
