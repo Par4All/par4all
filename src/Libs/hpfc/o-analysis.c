@@ -3,7 +3,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1994/12/27 08:53:23 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1994/12/27 19:46:48 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -36,6 +36,8 @@ entity CreateIntrinsic(string name); /* in syntax.h */
 static list
     lblocks = NIL,
     lloop  = NIL;
+
+GENERIC_LOCAL_MAPPING(variable_used, int, entity);
 
 /*
  * Overlap_Analysis
@@ -1123,8 +1125,6 @@ entity index;
 
 static statement 
   current_variable_used_statement = statement_undefined;
-
-GENERIC_CURRENT_MAPPING(variable_used, int, entity);
 
 static void variable_used_rewrite(r)
 reference r;
