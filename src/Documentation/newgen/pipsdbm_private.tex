@@ -2,6 +2,9 @@
 %% $Id$
 %% 
 %% $Log: pipsdbm_private.tex,v $
+%% Revision 1.2  2003/06/05 12:05:46  coelho
+%% required status added.
+%%
 %% Revision 1.1  1997/09/19 14:12:18  coelho
 %% Initial revision
 %%
@@ -55,9 +58,9 @@ A resource is just some pointer to the resource in memory.
 It is associated a logical time and maybe a file time, to check for
 possibly modified files. It may be loaded (the pointer actually points to
 the resource) or unloaded (the pointer may store the name of the
-resource?). 
+resource?), or being required by pipsmake but not yet produced.
 
-\domain{db_status = loaded:unit + stored:unit}
+\domain{db_status = loaded:unit + stored:unit + required:unit}
 
 \domain{db_resource = pointer:string x db_status x time:int x file_time:int}
 
