@@ -352,6 +352,7 @@ use_def_deal_if_useful(statement s)
 {
    bool this_statement_has_an_io_effect;
    bool this_statement_writes_a_procedure_argument;
+   bool this_statement_is_a_format;
    
    if (get_debug_level() >= 5) {
       fprintf(stderr, "use_def_deal_if_useful: statement %#x (%#x)\n",
@@ -375,6 +376,9 @@ use_def_deal_if_useful(statement s)
                                                             get_current_module_entity(),
                                                             the_proper_effects);
 
+   /* Avoid to remove formats in a first approach: */
+   this_statement_is_a_format = instruction_format_p(statement_instruction(s));
+   
    if (get_debug_level() >= 6) {
       if (this_statement_has_an_io_effect)
          fprintf(stderr, "Statement %#x has an io effect.\n", (int) s);
@@ -385,7 +389,8 @@ use_def_deal_if_useful(statement s)
    }
    
    if (this_statement_has_an_io_effect
-      || this_statement_writes_a_procedure_argument)
+      || this_statement_writes_a_procedure_argument
+      || this_statement_is_a_format)
       /* Mark this statement as useful: */
       set_add_element(the_useful_statements, the_useful_statements, (char *) s);
 
