@@ -29,6 +29,8 @@
 #include <malloc.h>
 #include <string.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "complexity_ri.h"
