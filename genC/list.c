@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/12/26 16:26:49 $, )
+ * $RCSfile: list.c,v $ ($Date: 1996/10/15 13:18:03 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -433,6 +433,24 @@ cons *l;
     }
 
     return(nlb);
+}
+
+list gen_full_copy_list(list l)
+{
+    cons *nlb = NIL, *nle = NIL;
+
+    while (! ENDP(l)) {
+	cons *p = CONS(CHUNK, gen_copy_tree(CHUNK(CAR(l))), NIL);
+	
+	if (nle == NIL)
+	    nlb = p;
+	else
+	    CDR(nle) = p;
+	nle = p;
+	l = CDR(l);
+    }
+
+    return nlb;
 }
 
 list gen_last(l)
