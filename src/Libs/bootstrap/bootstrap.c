@@ -948,7 +948,8 @@ typing_arithmetic_operator(call c, hash_table types, statement s)
     {
         // ERROR: Invalide of type
 	add_one_line_of_comment(s, 
-				"Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX",
+				"Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX" \
+				" and not DOUBLE & COMPLEX",
 				entity_local_name(call_function(c)));
 	// Just for return a result
 	return make_basic_float(4); 
@@ -975,7 +976,8 @@ typing_power_operator(call c, hash_table types, statement s)
     {
         // ERROR: Invalide of type
 
-	add_one_line_of_comment(s,"Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX",
+	add_one_line_of_comment(s,"Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX" \
+				" and not DOUBLE & COMPLEX",
 				entity_local_name(call_function(c)));
 	// Just for return a result
 	return make_basic_float(4); 
@@ -1031,7 +1033,8 @@ typing_relational_operator(call c, hash_table types, statement s)
     {
      /* ERROR: Invalide of type */
       add_one_line_of_comment(s, 
-			      "Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX",
+			      "Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX" \
+			      " and not DOUBLE & COMPLEX",
 			      entity_local_name(call_function(c))); 
 	// Just for return a result
 	return make_basic(is_basic_logical, UUINT(4));
@@ -1854,9 +1857,9 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     /* These operators are used within the OPTIMIZE transformation in
 order to manipulate operators such as n-ary add and multiply or
 multiply-add operators ( JZ - sept 98) */
-    {EOLE_SUM_OPERATOR_NAME, (INT_MAX), default_intrinsic_type , 0, 0},
-    {EOLE_PROD_OPERATOR_NAME, (INT_MAX), default_intrinsic_type , 0, 0},
-    {EOLE_FMA_OPERATOR_NAME, 3, default_intrinsic_type , 0, 0},
+    {EOLE_SUM_OPERATOR_NAME, (INT_MAX), default_intrinsic_type , typing_arithmetic_operator, 0},
+    {EOLE_PROD_OPERATOR_NAME, (INT_MAX), default_intrinsic_type , typing_arithmetic_operator, 0},
+    {EOLE_FMA_OPERATOR_NAME, 3, default_intrinsic_type , typing_arithmetic_operator, 0},
 
     {NULL, 0, 0, 0, 0}
 };
