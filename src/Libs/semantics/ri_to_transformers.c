@@ -327,7 +327,7 @@ cons * e; /* effects of loop l */
 	     * new equations...
 	     */
 	    transformer ftf = transformer_equality_fix_point(tfb);
-	    Psysteme fsc = (Psysteme) predicate_system(transformer_relation(ftf));
+	    Psysteme fsc = predicate_system(transformer_relation(ftf));
 	    Psysteme sc = SC_UNDEFINED;
 	    Pcontrainte eq = CONTRAINTE_UNDEFINED;
 	    normalized nlb = NORMALIZE_EXPRESSION(range_lower(r));
@@ -376,13 +376,23 @@ cons * e; /* effects of loop l */
 	     * make sense as soon as i_init is eliminated in the transformer
 	     */
 	    if(entity_has_values_p(i) && normalized_linear_p(nlb)) {
-		Pvecteur v_lb = vect_dup((Pvecteur) normalized_linear(nlb));
+		Pvecteur v_lb = vect_dup(normalized_linear(nlb));
+		Pbase b_tmp, b_lb = make_base_from_vect(v_lb); 
 		entity i_init = entity_to_old_value(i);
 
-		vect_add_elem(&v_lb, (Variable) i_init, -1);
+		vect_add_elem(&v_lb, (Variable) i_init, (Value) -1);
 		eq = contrainte_make(v_lb);
+		/* The new variables in eq must be added to sc; otherwise,
+		 * further consistency checks core dump. bc.
+		 */
 		/* sc_add_egalite(sc, eq); */
+		/* The call to sc_projection_with_eq frees eq */
 		sc = sc_projection_by_eq(sc, eq, (Variable) i_init);
+		b_tmp = sc_base(sc);
+		sc_base(sc) = base_union(b_tmp, b_lb);
+		sc_dimension(sc) = base_dimension(sc_base(sc));
+		base_rm(b_tmp);
+		base_rm(b_lb);
 		if(SC_RN_P(sc)) {
 		    /* FI: a NULL is not acceptable; I assume that we cannot end up
 		     * with a SC_EMPTY...
@@ -390,6 +400,8 @@ cons * e; /* effects of loop l */
 		    predicate_system(transformer_relation(tf)) =
 			sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED);
 		}
+		else
+		    predicate_system(transformer_relation(tf)) = sc;
 	    }
 
 	    ifdebug(8) {
@@ -638,7 +650,7 @@ list ef;
     debug(8, "expression_to_transformer", "begin\n");
 
     if(entity_has_values_p(e)) {
-	Pvecteur ve = vect_new((Variable) e, 1);
+	Pvecteur ve = vect_new((Variable) e, (Value) 1);
 	normalized n = NORMALIZE_EXPRESSION(expr);
 
 	if(normalized_linear_p(n)) {
@@ -754,8 +766,8 @@ transformer user_function_call_to_transformer(entity e, expression expr,
 	/* Build a transformer representing the assignment of
 	 * the function value to e
 	 */
-	eq = vect_make(eq, (Variable) entity_to_new_value(e), 1,
-		       (Variable) rv, -1,
+	eq = vect_make(eq, (Variable) entity_to_new_value(e), (Value) 1,
+		       (Variable) rv, (Value) -1,
 		       0, 0);
 	c = contrainte_make(eq);
 	sc = sc_make(c, CONTRAINTE_UNDEFINED);
@@ -999,7 +1011,7 @@ list ef;
 			/* simple case: formal parameter e is not
 			   modified and can be replaced by actual
 			   argument expression */
-			vect_add_elem(&v, (Variable) e_new, -1);
+			vect_add_elem(&v, (Variable) e_new, (Value) -1);
 			t_caller = transformer_equality_add(t_caller,
 							    v);
 		    }
@@ -1090,14 +1102,14 @@ expression expr;
     if(integer_constant_expression_p(arg2)) {
 	int d = integer_constant_expression_value(arg2);
 	entity e_new = entity_to_new_value(e);
-	Pvecteur ub = vect_new((Variable) e_new, 1);
-	Pvecteur lb = vect_new((Variable) e_new, -1);
+	Pvecteur ub = vect_new((Variable) e_new, (Value) 1);
+	Pvecteur lb = vect_new((Variable) e_new, (Value) -1);
 	Pcontrainte clb = contrainte_make(lb);
 	Pcontrainte cub = CONTRAINTE_UNDEFINED;
 	cons * tf_args = CONS(ENTITY, e_new, NIL);
 
-	vect_add_elem(&ub, TCST, -(d-1));
-	vect_add_elem(&lb, TCST, (d-1));
+	vect_add_elem(&ub, TCST, (Value) -(d-1));
+	vect_add_elem(&lb, TCST, (Value) (d-1));
 	cub = contrainte_make(ub);
 	clb->succ = cub;
 	tf = make_transformer(tf_args,
@@ -1137,8 +1149,9 @@ expression expr;
 	/* must be duplicated right now  because it will be
 	   renamed and checked at the same time by
 	   value_mappings_compatible_vector_p() */
-	Pvecteur vlb = vect_multiply(vect_dup((Pvecteur) normalized_linear(n1)), -1);
-	Pvecteur vub = vect_dup((Pvecteur) normalized_linear(n1));
+	Pvecteur vlb =
+	    vect_multiply(vect_dup(normalized_linear(n1)), (Value) -1); 
+	Pvecteur vub = vect_dup(normalized_linear(n1));
 	Pcontrainte clb = CONTRAINTE_UNDEFINED;
 	Pcontrainte cub = CONTRAINTE_UNDEFINED;
 
