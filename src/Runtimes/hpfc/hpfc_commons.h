@@ -2,11 +2,8 @@
 ! inclusions for run-time support functions
 !
 ! $RCSfile: hpfc_commons.h,v $ version $Revision$
-! ($Date: 1997/01/07 11:45:43 $, )
+! ($Date: 1997/07/03 11:01:35 $, )
 !
-! PVM 3 headers
-!
-      include 'fpvm3.h'
 !
       include 'hpfc_parameters.h'
       include 'hpfc_param.h'
@@ -14,6 +11,7 @@
       include 'hpfc_procs.h'
       include 'hpfc_buffers.h'
       include 'hpfc_misc.h'
+      include 'hpfc_types.h'
 !
 ! parameters value to be defined when starting a program.
 !
