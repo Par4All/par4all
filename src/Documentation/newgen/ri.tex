@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/09/16 11:02:14 $, 
+%% $Date: 1997/09/22 15:16:25 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
@@ -10,7 +10,7 @@
 
 \title{PIPS: Internal Representation of Fortran Code}
 \author{Fabien Coelho\\
-  B\'eatrice Creusillet\\
+  Béatrice Creusillet\\
   Fran\c{c}ois Irigoin \\
   Pierre Jouvelot \\
   Ronan Keryell \\
@@ -1879,8 +1879,8 @@ de'crivent ses dimensions.
 \end{comment}
 
 Field \verb/context/ only is used for effects known as {\em array
-regions}. They were defined by R\'emi Triolet in~\cite{Trio84} and
-extended by B\'eatrice Creusillet in~\cite{Creu96}.
+regions}. They were defined by Rémi Triolet in~\cite{Trio84} and
+extended by Béatrice Creusillet in~\cite{Creu96}.
 
 \begin{comment}
 Le sous-domaine {\tt context} n'est utilise' que pour repre'senter les
@@ -1994,7 +1994,7 @@ Variables in the list \verb/arguments/ are variables whose values {\em
 may} have changed between the two control points. Two values are denoted
 for each variable in the \verb/arguments/ list, the initial value and
 the final value. The initial values are pure values, i.e. entities
-specific to the semantics library. The final values are indentified with
+specific to the semantics library. The final values are identified with
 the variable entities, in order to decrease the total number of pure
 values. Variables that do not appear in the \verb/arguments/ list {\em
 must} have the same initial and final values, by definition. This unique
@@ -2146,8 +2146,8 @@ have been added to NewGen. They are not systematically used.
 
 % pipsmake
 \bibitem{Baro91} B. Baron,
-{\em Construction flexible et coh\'erente pour la compilation
-interproce'durale}, 
+{\em Construction flexible et cohérente pour la compilation
+interprocédurale}, 
 Rapport interne EMP-CRI-E157, juillet 1991
 
 \bibitem{Bern66} A. J. Bernstein, {\em Analysis of Programs for
@@ -2155,8 +2155,8 @@ Parallel Processing}, IEEE Transactions on Electronic Computers,
 Vol.~15, n.~5, pp. 757-763, Oct. 1966.
 
 \bibitem{Creu96} B. Creusillet,
-{\em Analyses de r\'egions de tableaux et applications}, Th\`ese de
-Docteurat, \'Ecole des mines de Paris, D\'ecembre 1996
+{\em Analyses de régions de tableaux et applications}, Thèse de
+Docteurat, École des mines de Paris, Décembre 1996
 
 \bibitem{JT89} P. Jouvelot, R. Triolet,
 {\em NewGen: A Language Independent Program Generator},
@@ -2167,13 +2167,13 @@ Rapport Interne CAII 191, 1989
 Rapport Interne CAII ???, 1990
 
 \bibitem{Trio90} R. Triolet,
-{\em PIPSMAKE and PIPSDBM: Motivations et fonctionalit\'es},
+{\em PIPSMAKE and PIPSDBM: Motivations et fonctionalités},
 Rapport Interne CAII TR~E/133
 
 \bibitem{Trio84} R. Triolet,
-{\em Contribution \`a la parall\'elisation autoamtique de programmes
-Fortran comportant des appels de proc\'edures}, Th\`ese de
-Docteur-Ing\'enieur, Universit\'e Pierre et Marie Curie, d\'ecembre 1984.
+{\em Contribution à la parallélisation automatique de programmes
+Fortran comportant des appels de procédures}, Thèse de
+Docteur-Ingénieur, Université Pierre et Marie Curie, décembre 1984.
 
 \bibitem{TrIr91} R. Triolet,  F. Irigoin,
 {\em PIPS High-Level Software Interface: Pipsmake}
