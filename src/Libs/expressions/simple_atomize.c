@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1996/06/12 17:57:48 $, 
+ * $Date: 1998/04/14 21:31:00 $, 
  */
 
 #include <stdio.h>
@@ -7,6 +7,7 @@
 
 #include "genC.h"
 
+#include "linear.h"
 #include "ri.h"
 
 #include "ri-util.h"
