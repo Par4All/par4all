@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: newgen.c,v $
+ * Revision 1.18  1998/04/14 15:27:23  coelho
+ * includes added.
+ *
  * Revision 1.17  1998/04/11 13:01:09  coelho
  * includes needed newgen generated support functions.
  *
@@ -11,22 +14,22 @@
 #include <stdlib.h>
 
 #include "genC.h"
+
+typedef void * void_star;
+/*typedef void * vertex;*/
+typedef void * arc_label;
+typedef void * vertex_label;
+
+#include "linear.h"
+#include "matrice.h"
+
 #include "specs.h"
 #include "all_newgen_headers.h"
 
 #include "ri-util.h"
 
-/* newgen stuff only at compile time.
- */
-#if !defined(CPROTO_IS_PROTOTYPING)
-#include "newgen_cfiles.h"
-#endif
-
 void initialize_newgen()
 {
-    extern void sg_rm();
-    extern sg_dup();
-
     /* Read NewGen specification file
      */
     gen_read_spec(ALL_SPECS);
