@@ -94,7 +94,7 @@ graph obj;
     }
     else {
       stmt = adg_vertex_to_statement(crt_v);
-      fprintf(fp,"\nins_%d:\n******\n", statement_number(stmt));
+      fprintf(fp,"\nINS_%d:\n******\n", statement_number(stmt));
     }
 
     if(exec_dom != predicate_undefined) {
