@@ -529,6 +529,18 @@ variable_in_module_p(entity v,
    return in_module_1;
 }
 
+bool 
+variable_in_list_p(e, l)
+entity e;
+list l;
+{
+    bool is_in_list = FALSE;
+    for( ; (l != NIL) && (! is_in_list); l = CDR(l))
+	if(same_entity_p(e, ENTITY(CAR(l))))
+	    is_in_list = TRUE;
+    return(is_in_list);
+}
+
 
 /* Discard the decls_text string of the module code to make the
    prettyprinter ignoring the textual declaration and remake all from
