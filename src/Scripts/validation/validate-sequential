@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1994/03/24 20:47:35 $, ) version $Revision$,
+# $RCSfile: validate-sequential,v $ ($Date: 1994/03/28 08:40:27 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -40,7 +40,7 @@
 #    -l file: lock file to report at the end (default: a mail is sent)
 #  - source environment if necessary
 
-[ "$PIPSDIR" ] || . /home/users/pips/Pips/pipsrc.sh
+[ "$PIPSHOME" ] || . /home/users/pips/Pips/pipsrc.sh
 
 pips_test_directory=$PIPSDIR/Tests/Validation
 default_file=defaults
@@ -81,7 +81,7 @@ do
     t) PERFORMANCE="begin: `date`" ;;
     v) VERBOSE='echo' ;;
     s) VERBOSE=':' ;;
-    d) DEBUG='echo' ;;
+    d) DEBUG='debug' ;;
     u) UNIQDIR=".validate_directory.$HOSTNAME.$$" ;;
     x) pips_version="$OPTARG" ;;
     r) RUNDIR="$OPTARG" ;;
@@ -99,6 +99,11 @@ shift `expr $OPTIND - 1`
 # FC, Tue Mar  8 14:19:50 MET 1994
 #
 
+debug()
+{
+  echo "$@" >&2
+}
+
 which_pips()
 {
   if [ -x pips ]
@@ -113,6 +118,7 @@ RUNDIR=${RUNDIR:-$PWD}
 cd $RUNDIR
 
 pips_version=${pips_version:-`which_pips`}
+export pips_version
 
 $VERBOSE "pips to be used: $pips_version"
 
@@ -129,13 +135,15 @@ diffout_e=/tmp/diff_e.$$
 diffout=/tmp/diff.$$
 # global variable...
 errors=/tmp/errors.$$
-shell=/bin/sh
+shell='/bin/sh'
 
 report()
 {
   result=$1
   message=$2
   
+  $DEBUG " || report $1 suggested"
+
   if [ $result -ne 0 ] 
   then
     { 
@@ -201,9 +209,13 @@ test_aspect()
      #
      # .test case
      
-     if [ -f $aspect/$name.test ] ; then
+     if [ -f $aspect/$name.test ] 
+     then
+       $DEBUG " || .test case"
        $shell $aspect/$name.test > $tmpout 2> $tmperr
-       report $? "Execution of $aspect/$name.test failed with $pips_version" || continue
+       report $? \
+         "Execution of $aspect/$name.test failed with $pips_version" || \
+         { $DEBUG " || error"; continue;}
        
        make_diff $aspect $name test
        continue
@@ -212,18 +224,22 @@ test_aspect()
      #
      # default_test case
      
-     if [ -f $aspect/default_test ] ; then
+     if [ -f $aspect/default_test ]
+     then
+       $DEBUG " || default_test case"
        sed "s/tested_file/$name/g;s/TESTED_FILE/$u_name/g" \
        $aspect/default_test > $aspect/$name.test
        $shell $aspect/$name.test > $tmpout 2> $tmperr
-       report $? "Execution of $aspect/default_test on $name.f failed with $pips_version" || continue
+       report $? "Execution of $aspect/default_test on $name.f failed with $pips_version" || { $DEBUG " || error"; rm -f $aspect/$name.test; continue;}
        
+       rm -f $aspect/$name.test
        make_diff $aspect $name test
        continue
      fi
      
      #
      # default case
+     $DEBUG " || default case"
      Init -f $file -d $name > $tmpout 2> $tmperr
      report $? "Cannot initialize $file" || continue
      
