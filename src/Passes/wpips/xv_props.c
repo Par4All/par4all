@@ -38,7 +38,7 @@ option_type;
 
 static Menu smenu_options;
 static Menu options_menu;
-static Panel options_panel;
+Panel options_panel;
 
 static hash_table aliases;
 
@@ -60,6 +60,77 @@ string svp;
     }, htp);
 
     return HASH_UNDEFINED_VALUE;
+}
+
+
+void
+disable_panel_item(Panel_item item)
+{
+   xv_set(item, PANEL_INACTIVE, TRUE, 0);
+}
+
+
+void
+enable_panel_item(Panel_item item)
+{
+   xv_set(item, PANEL_INACTIVE, FALSE, 0);
+}
+
+
+void
+apply_on_each_option_item(void (* function_to_apply_on_each_menu_item)(Menu_item),
+                          void (* function_to_apply_on_each_panel_item)(Panel_item))
+{
+   Menu_item menu_item;
+   int i;
+   
+   /* Walk through items of menu_options */
+   for (i = (int) xv_get(options_menu, MENU_NITEMS); i > 0; i--) {
+      char * res_alias_n;
+      
+      /* find resource corresponding to the item */
+      Menu_item menu_item = (Menu_item) xv_get(options_menu, MENU_NTH_ITEM, i);
+
+      if ((bool) xv_get(menu_item, MENU_TITLE))
+         /* Skip the title item: */
+         break;
+      
+      res_alias_n = (string) xv_get(menu_item, MENU_STRING);
+      if (res_alias_n == NULL
+          || strcmp(res_alias_n, display_options_panel) == 0
+          || strcmp(res_alias_n, hide_options_panel) == 0)
+         /* It must be the pin item, or the item controlling the
+            options panel. */
+         continue;
+
+      function_to_apply_on_each_menu_item(menu_item);
+   }
+
+   /* Now walk through the options panel: */
+   {
+      Panel_item panel_item;
+
+      PANEL_EACH_ITEM(options_panel, panel_item)
+         /* Only on the PANEL_CHOICE_STACK: */
+         if ((Panel_item_type) xv_get(panel_item, PANEL_ITEM_CLASS) ==
+             PANEL_CHOICE_ITEM)
+            function_to_apply_on_each_panel_item(panel_item);
+      PANEL_END_EACH
+         }
+}
+
+
+void
+disable_option_selection()
+{
+   apply_on_each_option_item(disable_menu_item, disable_panel_item);
+}
+
+
+void
+enable_option_selection()
+{
+   apply_on_each_option_item(enable_menu_item, enable_panel_item);
 }
 
 
