@@ -160,18 +160,18 @@ parse_properties(void)
 
 	switch (tok = yylex()) 
 	{
-	  case TTRUE:
-	    pr = make_property(is_property_bool, TRUE);
+	case TTRUE:
+	    pr = make_property(is_property_bool, (void*) TRUE);
 	    break;
-	  case TFALSE:
-	    pr = make_property(is_property_bool, FALSE);
+	case TFALSE:
+	    pr = make_property(is_property_bool, (void*) FALSE);
 	    break;
-	  case TNUMB:
-	    pr = make_property(is_property_int, atoi(yytext));
+	case TNUMB:
+	    pr = make_property(is_property_int, (void*) atoi(yytext));
 	    break;
-	  case TSTRING: {
-	      /* GO: We need to free(s) so the skeep now 
-		 the quote and do not use s+1 anymore*/
+	case TSTRING: {
+	    /* GO: We need to free(s) so the skeep now 
+	       the quote and do not use s+1 anymore*/
             char *s = strdup(yytext + 1);
             char *q = strrchr(s, '"');
             if (q == NULL) {
@@ -182,8 +182,8 @@ parse_properties(void)
             *q = '\0';            
 	    pr = make_property(is_property_string, s);
 	    break;
-          }
-	  default:
+	}
+	default:
 	    fprintf(stderr, "user error in parse_properties: "
 		    "bad value for property %s: %s\n", n, yytext);
 	    return;
