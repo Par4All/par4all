@@ -470,16 +470,8 @@ pips_check_fortran(void)
 {
     string v = getenv("PIPS_CHECK_FORTRAN");
 
-    if (v && (same_string_p(v, "on")   || same_string_p(v, "ON")   ||
-	      same_string_p(v, "yes")  || same_string_p(v, "YES")  || 
-	      same_string_p(v, "y")    || same_string_p(v, "Y")    || 
-	      same_string_p(v, "oui")  || same_string_p(v, "OUI")  || 
-	      same_string_p(v, "o")    || same_string_p(v, "O")    || 
-	      same_string_p(v, "TRUE") || same_string_p(v, "true") ||
-	      same_string_p(v, "T")    || same_string_p(v, "t")    ||
-	      same_string_p(v, "vrai") || same_string_p(v, "VRAI") ||
-	      same_string_p(v, "V")    || same_string_p(v, "v")    ||
-	      same_string_p(v, "1")))
+    if (v && (*v=='o' || *v=='y' || *v=='t' || *v=='v' || *v=='1' ||
+	      *v=='O' || *v=='Y' || *v=='T' || *v=='V'))
 	return TRUE;
 
     return get_bool_property("CHECK_FORTRAN_SYNTAX_BEFORE_PIPS");
