@@ -24,19 +24,18 @@ transformer
 transformer_dup(t_in)
 transformer t_in;
 {
-    /* I should use gen_copy_tree but directly Psysteme is not yet properly
-       interfaced with NewGen */
+    /* FI: I do not reduce transformer_dup() to a macro calling
+       copy_transformer() because I do not want to create problems with
+       the link edit and because I want to keep the assertion */
+
+    Psysteme sc = SC_UNDEFINED;
     transformer t_out;
-    Psysteme sc;
 
     pips_assert("transformer_dup", t_in != transformer_undefined);
 
-    t_out = transformer_identity();
-    transformer_arguments(t_out) = 
-	(cons *) gen_copy_seq(transformer_arguments(t_in));
     sc = (Psysteme) predicate_system(transformer_relation(t_in));
     pips_assert("transformer_dup", !SC_UNDEFINED_P(sc));
-    predicate_system_(transformer_relation(t_out)) = sc_dup(sc);
+    t_out = copy_transformer(t_in);
 
     return t_out;
 }
