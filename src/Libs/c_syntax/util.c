@@ -1,5 +1,9 @@
 /* $Id$ 
    $Log: util.c,v $
+   Revision 1.3  2003/08/06 14:00:08  nguyen
+   Replace global variables such as CurrentSourceFile, static and dynamic
+   ares by function calls
+
    Revision 1.2  2003/08/04 14:19:41  nguyen
    Preliminary version of the C parser
 
@@ -30,17 +34,86 @@
 #include "misc.h"
 #include "pipsdbm.h"
 
+/* To avoid warnings */
+extern char *strdup(const char *s1);
 
 extern hash_table keyword_typedef_table;
 
+entity SourceFileStaticArea;
+
 extern entity StaticArea;
 extern entity DynamicArea;
-extern int CurrentStaticAreaOffset;
-extern int CurrentDynamicAreaOffset;
 
-extern entity TopLevelEntity;
-extern entity TopLevelStaticArea; 
-extern int TopLevelStaticAreaOffset;
+/******************* TOP LEVEL ENTITY  **********************/
+
+entity get_top_level_entity()
+{
+  return FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,TOP_LEVEL_MODULE_NAME);
+}
+
+void MakeTopLevelEntity()
+{
+  /* To be economic, group this top level entity to it areas*/
+  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,TOP_LEVEL_MODULE_NAME);
+  entity_storage(e) = make_storage_rom();
+  entity_type(e) = make_type(is_type_area, make_area(0, NIL));
+  entity_initial(e) = make_value_unknown();
+}
+
+/******************* SOURCE FILE  **********************/
+
+entity get_current_source_file_entity()
+{
+  string input_file_name = db_get_file_resource(DBR_USER_FILE, get_current_module_name(),TRUE);
+  string source_file_name = pips_basename(input_file_name, ".c");
+  string name  = strdup(concatenate(source_file_name, FILE_SEP_STRING, NULL));
+  return FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
+}
+
+string get_current_source_file_name()
+{
+  string input_file_name = db_get_file_resource(DBR_USER_FILE, get_current_module_name(),TRUE);
+  string source_file_name = pips_basename(input_file_name, ".c");
+  return source_file_name;
+}
+
+void init_source_file_areas()
+{
+  SourceFileStaticArea = FindOrCreateEntity(get_current_source_file_name(), STATIC_AREA_LOCAL_NAME);
+  entity_type(SourceFileStaticArea) = make_type(is_type_area, make_area(0, NIL));
+  entity_storage(SourceFileStaticArea) = make_storage_rom();
+  entity_initial(SourceFileStaticArea) = make_value_unknown();
+}
+
+void MakeCurrentSourceFileEntity(string name)
+{
+  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
+  entity_storage(e) = make_storage_rom();
+  entity_type(e) = make_type_functional(make_functional(NIL,make_type_unknown()));
+  entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL)));
+  set_current_module_entity(e);
+  init_source_file_areas(); 
+}
+
+void ResetCurrentSourceFileEntity()
+{
+  reset_current_module_entity();
+}
+
+/******************* CURRENT MODULE **********************/
+
+void init_c_areas()
+{
+  DynamicArea = FindOrCreateEntity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME);
+  entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
+  entity_storage(DynamicArea) = make_storage_rom();
+  entity_initial(DynamicArea) = make_value_unknown();
+  
+  StaticArea = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
+  entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
+  entity_storage(StaticArea) = make_storage_rom();
+  entity_initial(StaticArea) = make_value_unknown();
+}
 
 
 /******************* EXPRESSIONS **********************/
@@ -306,7 +379,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   /* Add block scope case here */
 
   if (static_module_p(get_current_module_entity()))
-    global_name = strdup(concatenate(CurrentSourceFile,FILE_SEP_STRING,
+    global_name = strdup(concatenate(get_current_source_file_name(),FILE_SEP_STRING,
 				     get_current_module_name(),MODULE_SEP_STRING,
 				     prefix,name,NULL));
   else
@@ -316,7 +389,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   if ((ent = gen_find_tabulated(global_name,entity_domain)) != entity_undefined) 
     return ent;
 
-  global_name = strdup(concatenate(CurrentSourceFile,FILE_SEP_STRING,
+  global_name = strdup(concatenate(get_current_source_file_name(),FILE_SEP_STRING,
 				   prefix,name,NULL));
   pips_debug(3,"Entity global name is %s\n",global_name);
   if ((ent = gen_find_tabulated(global_name,entity_domain)) != entity_undefined) 
@@ -343,13 +416,13 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
   entity ent;
   pips_debug(3,"Entity local name is %s with prefix %s\n",name,prefix);
   if (is_external)
-    ent = find_or_create_entity(strdup(concatenate(CurrentSourceFile,FILE_SEP_STRING,
+    ent = find_or_create_entity(strdup(concatenate(get_current_source_file_name(),FILE_SEP_STRING,
 					    prefix,name,NULL)));	
   else
     {
       /* Add block scope here */
       if (static_module_p(get_current_module_entity()))
-	ent = find_or_create_entity(strdup(concatenate(CurrentSourceFile,FILE_SEP_STRING,
+	ent = find_or_create_entity(strdup(concatenate(get_current_source_file_name(),FILE_SEP_STRING,
 						get_current_module_name(),MODULE_SEP_STRING,
 						prefix,name,NULL)));	
       else 
@@ -375,11 +448,11 @@ string CreateMemberScope(string derived, bool is_external)
   string s;
   pips_debug(3,"Struc/union name is %s\n",derived);
   if (is_external)
-    s = concatenate(CurrentSourceFile,FILE_SEP_STRING,derived,MEMBER_SEP_STRING,NULL);	
+    s = concatenate(get_current_source_file_name(),FILE_SEP_STRING,derived,MEMBER_SEP_STRING,NULL);	
   else
     {
       if (static_module_p(get_current_module_entity()))
-	s = concatenate(CurrentSourceFile,FILE_SEP_STRING,
+	s = concatenate(get_current_source_file_name(),FILE_SEP_STRING,
 			get_current_module_name(),MODULE_SEP_STRING,
 			derived,MEMBER_SEP_STRING,NULL);	
       else 
@@ -490,7 +563,7 @@ entity MakeCurrentEntity(string name,
 	  if (is_external)
 	    {
 	      if (is_static) 
-		ent = find_or_create_entity(strdup(concatenate(CurrentSourceFile,FILE_SEP_STRING,
+		ent = find_or_create_entity(strdup(concatenate(get_current_source_file_name(),FILE_SEP_STRING,
 							       name,NULL)));
 	      else 
 		ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
@@ -499,7 +572,7 @@ entity MakeCurrentEntity(string name,
 	    {
 	      /* Add block scope here */
 	      if (static_module_p(get_current_module_entity()))
-		ent = find_or_create_entity(strdup(concatenate(CurrentSourceFile,FILE_SEP_STRING,
+		ent = find_or_create_entity(strdup(concatenate(get_current_source_file_name(),FILE_SEP_STRING,
 							       get_current_module_name(),MODULE_SEP_STRING,
 							       name,NULL)));
 	      else
@@ -509,6 +582,19 @@ entity MakeCurrentEntity(string name,
 	}
     }
   pips_debug(2,"Entity global name: %s\n",entity_name(ent));
+
+
+  /*************************** Type part ***************************************/
+
+  if (!type_undefined_p(CurrentType))
+    {
+      if (type_variable_p(CurrentType))
+	{
+	  variable v = type_variable(CurrentType); 
+	  variable_qualifiers(v) = CurrentQualifiers;
+	}
+      entity_type(ent) = CurrentType;
+    }
   
   /*************************** Storage part ***************************************/
  
@@ -521,9 +607,9 @@ entity MakeCurrentEntity(string name,
 	  ram r; 
 	  if (is_static)
 	    {
-	      r = make_ram(CurrentSourceFileEntity,
-			   CurrentSourceFileStaticArea,
-			   CurrentSourceFileStaticAreaOffset,
+	      r = make_ram(get_current_source_file_entity(),
+			   SourceFileStaticArea,
+			   ComputeAreaOffset(SourceFileStaticArea,ent),
 			   NIL);
 	      /*the offset must be recomputed lately, when we know the size of the variable */
 	    }
@@ -531,9 +617,9 @@ entity MakeCurrentEntity(string name,
 	    {
 	      /* This must be a variable, not a function/typedef/struct/union/enum. 
 		 The variable is declared outside any function, and hence is global */
-	      r = make_ram(TopLevelEntity,
-			   TopLevelStaticArea, 
-			   TopLevelStaticAreaOffset,
+	      r = make_ram(get_top_level_entity(),
+			   get_top_level_entity(), 
+			   ComputeAreaOffset(get_top_level_entity(),ent),
 			   NIL);
 	      /* the offset must be recomputed lately, when we know the size of the variable */
 	    }
@@ -557,7 +643,7 @@ entity MakeCurrentEntity(string name,
 		{
 		  r = make_ram(get_current_module_entity(),
 			       StaticArea,
-			       CurrentStaticAreaOffset,
+			       ComputeAreaOffset(StaticArea,ent),
 			       NIL);
 		  /*the offset must be recomputed lately, when we know the size of the variable */
 		}
@@ -565,7 +651,7 @@ entity MakeCurrentEntity(string name,
 		{
 		  r = make_ram(get_current_module_entity(),
 			       DynamicArea,
-			       CurrentDynamicAreaOffset,
+			       ComputeAreaOffset(DynamicArea,ent),
 			       NIL);
 		  /* the offset must be recomputed lately, when we know the size of the variable */
 		}
@@ -574,16 +660,21 @@ entity MakeCurrentEntity(string name,
 	}
     }
 
-  /*************************** Type part ***************************************/
-
-  if (type_variable_p(CurrentType))
-    {
-      variable v = type_variable(CurrentType); 
-      variable_qualifiers(v) = CurrentQualifiers;
-    }
-  entity_type(ent) = CurrentType;
-  
   return ent;
 }
 
 
+int ComputeAreaOffset(entity a, entity v)
+{
+  type ta = entity_type(a);
+  area aa = type_area(ta);
+  int offset = area_size(aa);
+  
+  /* Update the size and layout of the area aa. 
+     This function is called too earlier, we may not have the size of v.
+     To be changed !!!*/
+
+  area_size(aa) = offset + 0;
+  area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
+  return offset;
+}
