@@ -2,6 +2,9 @@
   $Id$
   
   $Log: Pawt.java,v $
+  Revision 1.10  1999/02/15 14:14:25  coelho
+  *** empty log message ***
+
   Revision 1.9  1998/11/17 22:15:37  ancourt
   new colors
   ,
@@ -41,9 +44,9 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import com.sun.java.swing.*;
-import com.sun.java.swing.border.*;
-import com.sun.java.swing.event.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
 
 /**
    A graphical package for JPips
@@ -63,7 +66,7 @@ public abstract class Pawt
   static public Color comp_fgr = Color.red;
   static public Color comp_fgg = Color.black;
 
-  static class PComponent extends com.sun.java.swing.JComponent
+  static class PComponent extends javax.swing.JComponent
   { 
     public String checking; 
     PComponent() 
@@ -75,7 +78,7 @@ public abstract class Pawt
     } 
   }
   
-  static class PFrame extends com.sun.java.swing.JFrame
+  static class PFrame extends javax.swing.JFrame
   { 
     public Vector optionVector;
     PFrame(String name)
@@ -100,7 +103,7 @@ public abstract class Pawt
     }
   }
 
-  static class PDialog extends com.sun.java.swing.JDialog
+  static class PDialog extends javax.swing.JDialog
   { 
     PDialog(Frame f, String s, boolean b)
     { 
@@ -115,7 +118,7 @@ public abstract class Pawt
     }
   }
   
-  static class PPanel extends com.sun.java.swing.JPanel
+  static class PPanel extends javax.swing.JPanel
   {
     PPanel(LayoutManager l)
     {
@@ -131,7 +134,7 @@ public abstract class Pawt
     }
   }
   
-  static class PMenuBar extends com.sun.java.swing.JMenuBar
+  static class PMenuBar extends javax.swing.JMenuBar
   { 
     PMenuBar()
     { 
@@ -142,7 +145,7 @@ public abstract class Pawt
     } 
   }
   
-  static class PMenu extends com.sun.java.swing.JMenu
+  static class PMenu extends javax.swing.JMenu
   { 
     PMenu(String name)
     { 
@@ -155,7 +158,7 @@ public abstract class Pawt
     PMenu(){ this(null); }
   }
   
-  static  class PMenuItem extends com.sun.java.swing.JMenuItem
+  static  class PMenuItem extends javax.swing.JMenuItem
   {
     public String command;
     public PTextField tf;
@@ -183,7 +186,7 @@ public abstract class Pawt
   }
   
   static class PCheckBox 
-    extends com.sun.java.swing.JCheckBox
+    extends javax.swing.JCheckBox
   {
     public String command,checking;
     public PCheckBoxMenuItem cbmi;
@@ -215,7 +218,7 @@ public abstract class Pawt
     { this(name, null, null, null, null, frame); }
   }
   
-  static class PCheckBoxMenuItem extends com.sun.java.swing.JCheckBoxMenuItem
+  static class PCheckBoxMenuItem extends javax.swing.JCheckBoxMenuItem
   {
     public String command, checking;
     public PCheckBox cb;
@@ -246,7 +249,7 @@ public abstract class Pawt
   }
 
   static class PRadioButtonMenuItem 
-    extends com.sun.java.swing.JRadioButtonMenuItem
+    extends javax.swing.JRadioButtonMenuItem
   {
     public String command, checking;
     public PLabel label;
@@ -321,7 +324,7 @@ public abstract class Pawt
   }
 
   static class PSeparator 
-    extends com.sun.java.swing.JSeparator
+    extends javax.swing.JSeparator
   { 
     PSeparator()
     {
@@ -333,7 +336,7 @@ public abstract class Pawt
   }
 
   static class PButton 
-    extends com.sun.java.swing.JButton
+    extends javax.swing.JButton
   {
     public String 	command;
     public PTextField 	tf;
@@ -366,7 +369,7 @@ public abstract class Pawt
   }
 
   static class PLabel 
-    extends com.sun.java.swing.JLabel
+    extends javax.swing.JLabel
   {
     PLabel(String s, String tip)
     { 
@@ -381,7 +384,7 @@ public abstract class Pawt
     PLabel() { this(null, null); }
   }
     
-  static class PTextField extends com.sun.java.swing.JTextField
+  static class PTextField extends javax.swing.JTextField
   {
     PTextField(String s)
     {
@@ -397,7 +400,7 @@ public abstract class Pawt
     }
   }
     
-  static class PList extends com.sun.java.swing.JList
+  static class PList extends javax.swing.JList
   {
     PList() { super(); }
     PList(Vector v) { super(v); }
@@ -407,7 +410,7 @@ public abstract class Pawt
   /** A PComboBox can send directly its command on selections,
     * or wait for some specific action to do the job (e.g. a button pressed).
     */
-  static class PComboBox extends com.sun.java.swing.JComboBox
+  static class PComboBox extends javax.swing.JComboBox
   {
     public String checking, marker;
     public boolean direct;
@@ -445,7 +448,7 @@ public abstract class Pawt
     }
   }
 
-  static class PScrollPanel extends com.sun.java.swing.JScrollPane
+  static class PScrollPanel extends javax.swing.JScrollPane
   {
     PScrollPanel(Component c)
     {
@@ -461,7 +464,7 @@ public abstract class Pawt
     } 
   }
         
-  static class PButtonGroup extends com.sun.java.swing.ButtonGroup
+  static class PButtonGroup extends javax.swing.ButtonGroup
   {
     public String checking;
 
@@ -493,7 +496,7 @@ public abstract class Pawt
     }
   }
         
-  static class PTextFrame extends com.sun.java.swing.JFrame
+  static class PTextFrame extends javax.swing.JFrame
   {
     boolean locked;
     boolean writable;
