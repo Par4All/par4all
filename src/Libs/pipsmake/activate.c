@@ -87,8 +87,12 @@ string phase;
 		    string vrn2 = virtual_resource_name(vr);
 		    owner vro = virtual_resource_owner(vr);
 
-		    /* We do not check callers and callees */
-		    if ( owner_callers_p(vro) || owner_callees_p(vro) ) {}
+		    /* We do not check callers and callees
+		     * I dropped select also, just in case... FC
+		     */
+		    if ( owner_callers_p(vro) || 
+			 owner_callees_p(vro) || 
+			 owner_select_p(vro)) {}
 		    else if (same_string_p(vrn, vrn2))
 			require_produced_rule_p = TRUE;
 
@@ -113,6 +117,8 @@ string phase;
 			}, makefile_active_phases(current_makefile));
 		    }
 
+		    /* this generates many warnings when called from select...
+		     */
 		    if (get_bool_property("ACTIVATE_DEL_DERIVED_RES"))
 			delete_derived_resources (res);
 		    else
@@ -134,7 +140,7 @@ string phase;
     debug_off();
     return (status);
 }
-
+
 /*
  * get the set of resources being derived from a given one 
  */
