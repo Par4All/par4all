@@ -1,28 +1,63 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * SCCS stuff:
- * $RCSfile: defines-local.h,v $ ($Date: 1995/03/14 18:50:29 $, ) version $Revision$, got on %D%, %T%
- * $Id$
+ * $RCSfile: defines-local.h,v $ version $Revision$
+ * (E%, ) 
  */
 
-/*
- * Functions
+/* Most includes are centralized here.
  */
 
+/*  standard C includes
+ */
+#include <stdio.h>
+#include <values.h>
+#include <ctype.h>
 #include <string.h>
+
+extern int fprintf();
+extern int vfprintf();
+extern int system();
+
+/*  C3/LINEAR
+ */
+#include "boolean.h"
+#include "arithmetique.h"
+#include "vecteur.h"
+#include "contrainte.h"
+#include "sc.h"
+#include "ray_dte.h"
+#include "sommet.h"
+#include "polyedre.h"
+#include "sg.h"
+
+/*  NEWGEN
+ */
+#include "genC.h"
+#include "text.h"
+#include "ri.h"
+#include "database.h"
+#include "hpf.h"
+#include "hpf_private.h"
+#include "message.h"
+#include "properties.h"
+
+/*  PIPS
+ */
+#include "misc.h"
+#include "text-util.h"
+#include "ri-util.h"
+#include "hpfc.h"
 
 #define PVECTOR(v) ((Pvecteur)CHUNK(v))
 
-/*
- * ??? very beurk!
+/* ??? very beurk!
  */
 #define DELTAV        ((Variable) 12)
 #define TEMPLATEV     ((Variable) 13)
 #define TSHIFTV       ((Variable) 14)
 
-/*
- * Newgen short sentences
+/* Newgen short sentences
  */
 
 #define function_mapping(f) (((f)+1)->h)
@@ -53,8 +88,7 @@
 #define int_undefined_p(i) ((i)==int_undefined)
 #endif
 
-/*
- * Constants
+/* Constants
  */
 
 #define HOST_NAME "HOST"
@@ -65,8 +99,7 @@
 #define HPFLOGICALPREFIX 	"L_"
 #define HPFCOMPLEXPREFIX	"C_"
 
-/*
- * IO Management
+/* IO Management
  *
  * {"WRITE", (MAXINT)},
  * {"REWIND", (MAXINT)},
@@ -114,8 +147,7 @@
      FORMAT_INTRINSIC_P(call))
 
 
-/*
- * Overlap
+/* Overlap
  */
 
 #define UPPER "UP"
@@ -124,8 +156,7 @@
 #define SEND	1
 #define RECEIVE 0
 
-/*
- * debug macro
+/* debug macro
  */
 #define IFDBPRINT(n, func, module, stat)                            \
     ifdebug(n)                                                      \
@@ -136,8 +167,7 @@
        print_text(stderr,text_statement(module,0,stat));            \
     }
 
-/*
- * Efficient I/O tags
+/* Efficient I/O tags
  */
 
 #define is_movement_collect 0
@@ -145,8 +175,7 @@
 #define movement_collect_p(t) ((t)==(is_movement_collect))
 #define movement_update_p(t) ((t)==(is_movement_update))
 
-/*
- * Run-time support functions and subroutine names
+/* Run-time support functions and subroutine names
  */
 
 #define SND_TO_C        "HPFC_SNDTO_C"
@@ -192,8 +221,7 @@
 #define SND_TO_N        "HPFC_SNDTO_N"
 #define RCV_FR_N        "HPFC_RCVFR_N"
 
-/*
- * PVM
+/* PVM
  */
 #define PVM_INITSEND	"pvmfinitsend"
 #define PVM_SEND	"pvmfsend"
@@ -202,8 +230,7 @@
 #define PVM_PACK	"pvmfpack"
 #define PVM_UNPACK	"pvmfunpack"
 
-/*
- * Variables
+/* Variables
  */
 #define T_LID		"T_LID"
 #define INFO		"HPFC_INFO"
@@ -327,7 +354,10 @@
 #define st_receive_mcast_from_host(goal) \
   hpfc_name_and_ref_to_stmt(RCV_FR_mCH, goal)
 
-/*
- * that is all
+/*   WARNING
  */
+#define hpfc_warning \
+    if (!get_bool_property("HPFC_NO_WARNING")) user_warning
 
+/* that is all
+ */
