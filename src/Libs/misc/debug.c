@@ -11,14 +11,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-/*
-extern int atoi(char *nptr);
-extern char *getenv();
-extern int fprintf();
-extern int printf();
-extern int vfprintf(FILE *stream, char *format, ...);
-*/
 #include <stdarg.h>
+#include <string.h>
 	
 #include "genC.h"
 #include "misc.h"
