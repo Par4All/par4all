@@ -1,5 +1,5 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/09/02 18:29:26 $, 
+ * $Date: 1996/09/03 11:28:24 $, 
  */
 
 #include <unistd.h>
@@ -406,9 +406,9 @@ int pc_basic_closedisplay(XPOMP_display screen)
 
 
 
-int pc_basic_scroll(screen,y)
-int screen;
-int y;
+static int
+pc_basic_scroll(XPOMP_display screen,
+		int y)
 {
 	struct sh_header *sh;
 
@@ -505,27 +505,6 @@ pc_basic_ismouse(XPOMP_display screen,
     return res;
 }
 
-int pc_basic_drawframe(screen,name,x0,y0,x1,y1)
-int screen;
-char *name;
-int x0,y0,x1,y1;
-{
-	struct sh_header *sh;
-	if(!is_good_desc(&screen)) return -1;
-	sh = sh_h[screen];
-	if(!_NO_PROC) {
-		pc_basic_wait_lock(screen);
-		sh->flag = GR_PUT_FRAME;
-		sh->p1 = x0;
-		sh->p2 = y0;
-		sh->p3 = x1;
-		sh->p4 = y1;
-		strcpy(sh->buf1,name);
-		sh->lock = 1;
-		pc_basic_flush(sh);
-	}
-	return 0;
-}
 
 int pc_basicgetdepth(screen)
 int screen;
@@ -726,6 +705,49 @@ XPOMP_SHOW(float)
 XPOMP_SHOW(double)
 
 
+/* Scroll a window: */
+int
+XPOMP_scroll(XPOMP_display screen,
+	     int delta_Y)
+{
+    return pc_basic_scroll(screen, delta_Y);
+}
+
+
+/* Draw a frame from corner (X0,Y0) to corner (X1,Y1) and add a title: */
+int
+XPOMP_draw_frame(XPOMP_display screen,
+		 char * title,
+		 int title_color,
+		 int X0,
+		 int Y0,
+		 int X1,
+		 int Y1,
+		 int color)
+{
+    struct sh_header *sh;
+    
+    if(!is_good_desc(&screen))
+	return -1;
+    
+    sh = sh_h[screen];
+    if(!_NO_PROC) {
+	pc_basic_wait_lock(screen);
+	sh->flag = GR_PUT_FRAME;
+	sh->p1 = X0;
+	sh->p2 = Y0;
+	sh->p3 = X1;
+	sh->p4 = Y1;
+	sh->p5 = color;
+	sh->p6 = title_color;
+	strcpy(sh->buf1, title);
+	sh->lock = 1;
+	pc_basic_flush(sh);
+    }
+    return 0;
+}
+
+
 /* Print out a small help about keyboard usage in xPOMP: */
 void
 XPOMP_show_usage()
@@ -908,6 +930,44 @@ FUNCTION_(xpomp_show_real8)(XPOMP_display * screen,
 			   *X_offset, *Y_offset,
 			   *X_zoom_ratio, *Y_zoom_ratio,
 			   *min_value, *max_value);
+}
+
+
+void
+FUNCTION_(xpomp_scroll)(XPOMP_display * screen,
+			int * delta_Y,
+			int * return_value)
+{
+    *return_value = XPOMP_scroll(*screen, *delta_Y);
+}
+
+
+/* Deal with nasty conventions with strings between Fortran and C: */
+void
+FUNCTION_(xpomp_draw_frame)ARGS(`screen, STRING_ARG(title),
+				title_color, X0, Y0, X1, Y1, color,
+				return_value')
+XPOMP_display * screen;
+STRING_ARG_DECL(title);
+int * title_color;
+int * X0;
+int * Y0;
+int * X1;
+int * Y1;
+int * color;
+int * return_value;
+{
+    char * c_title = malloc(STRING_LEN(title) + 1);
+    (void) memcpy(c_title, STRING_PTR(title), STRING_LEN(title));
+    c_title[STRING_LEN(title)] = '\0';
+    
+    *return_value = XPOMP_draw_frame(*screen,
+				     c_title, *title_color,
+				     *X0, *Y0,
+				     *X1, *Y1,
+				     *color);
+
+    free(c_title);
 }
 
 
