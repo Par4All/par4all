@@ -66,24 +66,6 @@ static char * line_to_parse;
 static char * line_parsed;
 static char ** current_completion_array;
 
-/***************************************** Handler for trivial functions ... */
-
-struct t_handler 
-{
-    char * name;
-    void (*function)(char *);
-} ;
-
-static struct t_handler handlers[] =
-{
-  { QUIT,		quit_handler },
-  { CHANGE_DIR, 	cdir_handler },
-  { SHELL_ESCAPE, 	shell_handler },
-  { HELP,		help_handler },
-  { ECHO,		echo_handler },
-  { (char *) NULL, 	default_handler}
-};
-
 /****************************************** Parameter Completion definitions */
 
 enum COMPLETION_TYPES {
@@ -132,6 +114,70 @@ static char *tp_help_topics[] =
     (char*)NULL
 };
 
+/************************************************* TPIPS HANDLERS FOR PIPS */
+static void tpips_user_log(char *fmt, va_list args)
+{
+    FILE * log_file = get_log_file();
+
+    if(log_file!=NULL) {
+	if (vfprintf(log_file, fmt, args) <= 0) {
+	    perror("tpips_user_log");
+	    abort();
+	}
+	else
+	    fflush(log_file);
+    }
+
+    if(get_bool_property("USER_LOG_P")==FALSE)
+	return;
+
+    /* It goes to stderr to have only displayed files on stdout */
+    /* if no logfile, nowhere. FC. */
+    (void) vfprintf(stderr, fmt, args); fflush(stderr);
+}
+
+/* Tpips user request */
+
+static string tpips_user_request(fmt, args)
+char *fmt;
+va_list args;
+{
+    static char buf[TPIPS_REQUEST_BUFFER_LENGTH];
+
+    /* GO: Don't print the request if we are in batch mode */
+    if (use_readline) {
+	fprintf(stderr,"\nWaiting for your response: ");
+	(void) vfprintf(stderr, fmt, args);
+	fflush(stderr);
+    }
+    return gets(buf);
+}
+
+/* Tpips user error */
+
+static void tpips_user_error(char * calling_function_name,
+			     char * a_message_format,
+			     va_list *some_arguments)
+{
+    /* extern jmp_buf pips_top_level; */
+    jmp_buf * ljbp = 0;
+
+   /* print name of function causing error */
+   (void) fprintf(stderr, "user error in %s: ", calling_function_name);
+
+   /* print out remainder of message */
+   (void) vfprintf(stderr, a_message_format, * some_arguments);
+
+   /* terminate PIPS request */
+   if (get_bool_property("ABORT_ON_USER_ERROR")) {
+      abort();
+   }
+   else
+       /* longjmp(pips_top_level, 2); */
+      ljbp = top_pips_context_stack();
+      longjmp(*ljbp, 2);
+}
+
 /*  returns the full tpips history file name, i.e.
  *  - $TPIPS_HISTORY (if any)
  *  - $HOME/"HIST"
@@ -171,14 +217,14 @@ static char * initialize_tpips_history()
 
 /* Handlers
  */
-void cdir_handler(char * line)
+static void cdir_handler(char * line)
 {
     user_log("%s\n", line);
     if (chdir(line+strlen(CHANGE_DIR)))
 	fprintf(stderr, "error while changing directory\n");
 }
 
-void shell_handler(char * line)
+static void shell_handler(char * line)
 {
     line += strlen(SHELL_ESCAPE);
     while ((*line ==' ') || (*line == '\t'))
@@ -191,16 +237,16 @@ void shell_handler(char * line)
 	system("sh");
 }
 
-void echo_handler(char * line)
+static void echo_handler(char * line)
 {
     /* skip the key word and a blank character */
-    user_log("%s\n", line);
+    user_log("%s\n", line); 
     line += strlen(ECHO) + 1;
     fprintf(stdout,"%s\n",line);
     fflush(stdout);
 }
 
-void help_handler(char * line)
+static void help_handler(char * line)
 {
     char *tmpline;
     /* skip the help word */
@@ -402,7 +448,7 @@ void help_handler(char * line)
     printf("\n");
 }
 
-void quit_handler(char * line)
+static void quit_handler(char * line)
 {
     /* FI: cannot be done here because debug_on() was called
        in another function. Fortunately, it does not matter. */
@@ -426,7 +472,7 @@ void quit_handler(char * line)
     exit(0);
 }
 
-void default_handler(char * line)
+static void default_handler(char * line)
 {
     /* skip blanks */
     while (((*line) == ' ') ||
@@ -460,11 +506,89 @@ void default_handler(char * line)
     }
 }
 
+/***************************************** Handler for trivial functions ... */
+
+struct t_handler 
+{
+    char * name;
+    void (*function)(char *);
+} ;
+
+static struct t_handler handlers[] =
+{
+  { QUIT,		quit_handler },
+  { CHANGE_DIR, 	cdir_handler },
+  { SHELL_ESCAPE, 	shell_handler },
+  { HELP,		help_handler },
+  { ECHO,		echo_handler },
+  { (char *) NULL, 	default_handler}
+};
+
 static void (*find_handler(char* line))(char *)
 {
     struct t_handler * x = handlers;
     while ((x->name) && !PREFIX_EQUAL_P(line, x->name)) x++;
     return x->function;
+}
+
+/*********************************************************** DOING THE JOB */
+
+static char * read_a_line(char * prompt)
+{
+#define MAX_LINE_LENGTH  1024
+    static char line[MAX_LINE_LENGTH];
+    char *logline;
+
+    if (use_readline)
+	logline = readline(prompt);
+    else
+	/* GO: Please FC don't put safe_fgets here or Validate it !! :-) */
+	logline = fgets(line, MAX_LINE_LENGTH, current_file);
+
+    if (logfile && logline)
+	fprintf(logfile,"%s\n",logline);
+
+    return logline;
+}
+
+static void process_a_file()
+{
+    char *last = NULL;
+    char *line;
+    jmp_buf pips_top_level;
+    static readline_initialized = FALSE;
+
+    if ((use_readline) && (readline_initialized == FALSE))
+    {
+	initialize_readline ();
+	last = initialize_tpips_history();
+	readline_initialized = TRUE;
+    }
+
+    /*  interactive loop
+     */
+    while ((line = read_a_line(TPIPS_PROMPT)))
+    {
+	if (setjmp(pips_top_level)) {
+	    ;
+	}
+	else {
+	    push_pips_context(&pips_top_level);
+	    /*   add to history if not the same as the last one.
+	     */
+	    if (use_readline &&
+	  (line && *line && ((last && strcmp(last, line)!=0) || (!last))) &&
+		(strncmp (line,QUIT,strlen (QUIT))))
+	    {
+		add_history(line);
+		last = strdup(line);
+	    }
+	    /*   calls the appropriate handler.
+	     */
+	    (find_handler(line))(line);
+	}
+	pop_pips_context();
+    }
 }
 
 static void parse_arguments(int argc, char * argv[])
@@ -522,64 +646,6 @@ static void parse_arguments(int argc, char * argv[])
     }
 }
 
-static char * read_a_line(char * prompt)
-{
-#define MAX_LINE_LENGTH  1024
-    static char line[MAX_LINE_LENGTH];
-    char *logline;
-
-    if (use_readline)
-	logline = readline(prompt);
-    else
-	/* GO: Please FC don't put safe_fgets here or Validate it !! :-) */
-	logline = fgets(line, MAX_LINE_LENGTH, current_file);
-
-    if (logfile && logline)
-	fprintf(logfile,"%s\n",logline);
-
-    return logline;
-}
-
-void process_a_file()
-{
-    char *last = NULL;
-    char *line;
-    jmp_buf pips_top_level;
-    static readline_initialized = FALSE;
-
-    if ((use_readline) && (readline_initialized == FALSE))
-    {
-	initialize_readline ();
-	last = initialize_tpips_history();
-	readline_initialized = TRUE;
-    }
-
-    /*  interactive loop
-     */
-    while ((line = read_a_line(TPIPS_PROMPT)))
-    {
-	if (setjmp(pips_top_level)) {
-	    ;
-	}
-	else {
-	    push_pips_context(&pips_top_level);
-	    /*   add to history if not the same as the last one.
-	     */
-	    if (use_readline &&
-		(line && *line && ((last && strcmp(last, line)!=0) || (!last))) &&
-		(strncmp (line,QUIT,strlen (QUIT))))
-	    {
-		add_history(line);
-		last = strdup(line);
-	    }
-	    /*   calls the appropriate handler.
-	     */
-	    (find_handler(line))(line);
-	}
-	pop_pips_context();
-    }
-}
-
 /* MAIN: interactive loop and history management.
  */
 int main(int argc, char * argv[])
@@ -590,7 +656,7 @@ int main(int argc, char * argv[])
     initialize_sc((char*(*)(Variable))entity_local_name);
     initialize_signal_catcher();
 
-    set_bool_property("ABORT_ON_USER_ERROR",FALSE);
+    set_bool_property("ABORT_ON_USER_ERROR", FALSE);
     pips_log_handler = tpips_user_log;
     pips_request_handler = tpips_user_request;
     pips_error_handler = tpips_user_error;
@@ -814,69 +880,4 @@ static char *param_generator(char *texte, int state)
      
     /* If no names matched, then return NULL. */
     return NULL;
-}
-
-/* Tpips user log */
-
-void tpips_user_log(char *fmt, va_list args)
-{
-    FILE * log_file = get_log_file();
-
-    if(log_file!=NULL) {
-	if (vfprintf(log_file, fmt, args) <= 0) {
-	    perror("tpips_user_log");
-	    abort();
-	}
-	else
-	    fflush(log_file);
-    }
-
-    if(get_bool_property("USER_LOG_P")==FALSE)
-	return;
-
-    /* It goes to stderr to have only displayed files on stdout */
-    (void) vfprintf(stderr, fmt, args);
-    fflush(stderr);
-}
-
-/* Tpips user request */
-
-string tpips_user_request(fmt, args)
-char *fmt;
-va_list args;
-{
-    static char buf[TPIPS_REQUEST_BUFFER_LENGTH];
-
-    /* GO: Don't print the request if we are in batch mode */
-    if (use_readline) {
-	fprintf(stderr,"\nWaiting for your response: ");
-	(void) vfprintf(stderr, fmt, args);
-	fflush(stderr);
-    }
-    return gets(buf);
-}
-
-/* Tpips user error */
-
-void tpips_user_error(char * calling_function_name,
-			char * a_message_format,
-			va_list *some_arguments)
-{
-    /* extern jmp_buf pips_top_level; */
-    jmp_buf * ljbp = 0;
-
-   /* print name of function causing error */
-   (void) fprintf(stderr, "user error in %s: ", calling_function_name);
-
-   /* print out remainder of message */
-   (void) vfprintf(stderr, a_message_format, * some_arguments);
-
-   /* terminate PIPS request */
-   if (get_bool_property("ABORT_ON_USER_ERROR")) {
-      abort();
-   }
-   else
-       /* longjmp(pips_top_level, 2); */
-      ljbp = top_pips_context_stack();
-      longjmp(*ljbp, 2);
 }
