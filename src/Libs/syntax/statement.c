@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.59  2003/06/20 07:16:27  irigoin
+ * Keep declaration text, temporarily thrown away for a huge application
+ *
  * Revision 1.58  2003/06/19 07:37:57  nguyen
  * Update calls to make_statement and make_variable with new RI for C
  *
@@ -2056,11 +2059,14 @@ check_first_statement()
 	}
 	safe_fclose(fd, CurrentFN);
 	buffer[ibuffer++] = '\0';
-	code_decls_text(EntityCode(get_current_module_entity())) = 
-	    strdup("");
-	/* strdup(buffer); */
+	code_decls_text(EntityCode(get_current_module_entity())) = buffer;
+	buffer = NULL;
+	/* For Cathare, get rid of 100 MB of declaration text:
+	   code_decls_text(EntityCode(get_current_module_entity())) = strdup("");
+	   free(buffer); */
 
-	free(buffer), buffer=NULL;
+	/* strdup(buffer); */
+	/* free(buffer), buffer=NULL; */
 
 	/* kill the first statement's comment because it's already
 	   included in the declaration text */
