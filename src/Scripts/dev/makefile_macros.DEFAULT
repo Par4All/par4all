@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.DEFAULT,v $ (version $Revision$)
-# $Date: 1996/07/11 10:27:20 $, 
+# $Date: 1996/07/11 13:14:20 $, 
 #
 # this file contains macro definitions 
 
@@ -13,6 +13,8 @@ LD	= $(CC)
 LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)
 LEX	= lex
 LFLAGS	=
+FC	= f77
+FFLAGS	= -O -g
 LINT	= lint
 LINTFLAGS= -habxu
 YACC	= yacc
