@@ -19,19 +19,22 @@
  * declarations of extern variables
  */
 /* name of the current file */
-char *CurrentFN;
+char *CurrentFN = NULL;
 
 /* the current function */
 /* entity CurrentFunction; */
 
 /* list of formal parameters of the current function  */
-cons *FormalParameters; 
+cons *FormalParameters = NIL;
 
-/* the name of the current package */
-char *CurrentPackage; 
+/* the name of the current package, i.e. TOP-LEVEL or a module name? */
+char *CurrentPackage = NULL; 
 
-/* two areas that will be part of variable and common storage */
-entity DynamicArea, StaticArea;
+/* two areas used to allocate variables which are not stored in 
+   a common. These two areas are just like commons, but the dynamic 
+   area is the only non-static area. */
+entity DynamicArea = entity_undefined;
+entity StaticArea = entity_undefined;
 
 /* the current debugging level. see debug.h */
 int debugging_level = 0;
@@ -59,6 +62,12 @@ void ParserError(char * f, char * m)
 
     ResetBlockStack();
     reset_current_module_entity();
+    free(CurrentFN);
+    CurrentFN = NULL;
+    CurrentPackage = NULL;
+    /* Too bad for memory leak... */
+    DynamicArea = entity_undefined;
+    StaticArea = entity_undefined;
 
     debug_off();
     user_error(f,"Parser error between lines %d and %d\n%s\n",
@@ -96,7 +105,7 @@ the_actual_parser(
     /* scanner is initialized */
     ScanNewFile();
 
-    pips_assert("parser", CurrentFN==NULL);
+    pips_assert("the_actual_parser", CurrentFN==NULL);
     CurrentFN = 
 	strdup(concatenate(db_get_current_workspace_directory(),
 			   "/",
