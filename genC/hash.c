@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/08/10 11:35:44 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/09/16 22:10:17 $, )
  * version $Revision$
  */
 
@@ -196,7 +196,6 @@ int size;
 void hash_table_clear(htp)
 hash_table htp;
 {
-    extern int fprintf();
     static int max_size_seen = 0;
     register hash_entry_pointer p ;
     register hash_entry_pointer end ;
@@ -243,7 +242,6 @@ void hash_put(htp, key, val)
 hash_table htp;
 char *key, *val;
 {
-    extern int fprintf();
     int rank;
     hash_entry_pointer hep;
     
@@ -351,8 +349,6 @@ void hash_table_print_header(htp,fout)
 hash_table htp;
 FILE *fout;
 {
-    extern int fprintf();
-
     fprintf(fout, "hash_key_type:     %d\n", htp->hash_type);
     fprintf(fout, "hash_size:         %d\n", htp->hash_size);
     /* to be used by pips, we should not print this
@@ -370,7 +366,6 @@ on stderr. it is mostly useful when debugging programs. */
 void hash_table_print(htp)
 hash_table htp;
 {
-    extern int fprintf();
     int i;
 
     hash_table_print_header (htp,stderr);
@@ -398,7 +393,6 @@ char * (*key_to_string)();
 char * (*value_to_string)();
 hash_table htp;
 {
-    extern int fprintf();
     int i;
 
     hash_table_print_header (htp,f);
@@ -423,7 +417,6 @@ hash_table htp;
 static void hash_enlarge_table(htp)
 hash_table htp;
 {
-    extern int fprintf();
     hash_entry_pointer old_array;
     int i, old_size;
     int *prime_list = &prime_numbers_for_table_size[0];
@@ -543,7 +536,6 @@ static char *hash_print_key(t, key)
 hash_key_type t;
 char *key;
 {
-    extern int fprintf();
     static char buffer[256];
 
     if (t == hash_string)
@@ -571,7 +563,6 @@ char *key;
 int *prank;
 hash_operation operation;
 {
-    extern int fprintf();
     int r;
     hash_entry he;
     int r_init ;
