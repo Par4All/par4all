@@ -1,0 +1,173 @@
+/*
+ * $Id$
+ *
+ * Associated to each resource, the methods to read, write, free or check it.
+ * For some reason the is no significant default, although the gen_* methods
+ * would fit most needs.
+ *
+ * NOTE: this is the unload order...
+ */
+
+#define NEWGEN_METHODS \
+    (READER) gen_read, \
+    (WRITER) gen_write, \
+    (FREER) gen_free, \
+    (CHECKER) gen_consistent_p
+
+#define NEWGENNOCHECK_METHODS \
+    (READER) gen_read, \
+    (WRITER) gen_write, \
+    (FREER) gen_free, \
+    (CHECKER) gen_true
+
+#define DONOTHING_METHODS \
+	no_read, no_write, no_free, (CHECKER) gen_true
+
+{ DBR_HPFC_STATUS, 		NEWGEN_METHODS },
+{ DBR_PARSED_CODE, 		NEWGEN_METHODS },
+{ DBR_CODE, 			NEWGEN_METHODS },
+{ DBR_PARALLELIZED_CODE, 	NEWGEN_METHODS },
+{ DBR_REINDEXED_CODE, 		NEWGEN_METHODS },
+{ DBR_CALLEES, 			NEWGEN_METHODS },
+{ DBR_CALLERS, 			NEWGEN_METHODS },
+
+/* EFFECTS
+ */
+#define STMTEFFECTS_METHODS \
+    (READER) pipsdbm_read_statement_effects, \
+    (WRITER) pipsdbm_write_statement_effects, \
+    (FREER) gen_free, \
+    (CHECKER) gen_consistent_p
+
+{ DBR_PROPER_REFERENCES,	STMTEFFECTS_METHODS },
+{ DBR_CUMULATED_REFERENCES,	STMTEFFECTS_METHODS },
+{ DBR_PROPER_EFFECTS,		STMTEFFECTS_METHODS },
+{ DBR_CUMULATED_EFFECTS,	STMTEFFECTS_METHODS },
+{ DBR_SUMMARY_EFFECTS, 		NEWGEN_METHODS },
+{ DBR_IN_EFFECTS,		STMTEFFECTS_METHODS },
+{ DBR_CUMULATED_IN_EFFECTS,	STMTEFFECTS_METHODS },
+{ DBR_OUT_EFFECTS, 		STMTEFFECTS_METHODS },
+{ DBR_IN_SUMMARY_EFFECTS, 	NEWGEN_METHODS },
+{ DBR_OUT_SUMMARY_EFFECTS, 	NEWGEN_METHODS },
+    
+/* REDUCTIONS:
+ */
+{ DBR_PROPER_REDUCTIONS, 	NEWGEN_METHODS },
+{ DBR_CUMULATED_REDUCTIONS, 	NEWGEN_METHODS },
+{ DBR_SUMMARY_REDUCTIONS, 	NEWGEN_METHODS },
+    
+{ DBR_STATIC_CONTROL, 
+      (READER) read_static_control_mapping,
+      (WRITER) write_static_control_mapping, 
+      (FREER) free_static_control_mapping,
+      (CHECKER) check_static_control_mapping },
+
+{ DBR_ADFG, 			DONOTHING_METHODS },
+{ DBR_ADFG_FILE, 		DONOTHING_METHODS },
+{ DBR_BDT, 			DONOTHING_METHODS },
+{ DBR_BDT_FILE, 		DONOTHING_METHODS },
+{ DBR_PLC, 			DONOTHING_METHODS },
+{ DBR_PLC_FILE, 		DONOTHING_METHODS },
+
+/* REGIONS
+ */    
+{ DBR_REGIONS,			STMTEFFECTS_METHODS },
+{ DBR_INV_REGIONS,		STMTEFFECTS_METHODS },
+{ DBR_PROPER_REGIONS,		STMTEFFECTS_METHODS },
+{ DBR_SUMMARY_REGIONS, 		NEWGEN_METHODS },
+{ DBR_IN_REGIONS,		STMTEFFECTS_METHODS },
+{ DBR_INV_IN_REGIONS,		STMTEFFECTS_METHODS },
+{ DBR_CUMULATED_IN_REGIONS, 	STMTEFFECTS_METHODS },
+{ DBR_IN_SUMMARY_REGIONS, 	NEWGEN_METHODS },
+{ DBR_OUT_REGIONS, 		STMTEFFECTS_METHODS },
+{ DBR_OUT_SUMMARY_REGIONS, 	NEWGEN_METHODS },
+{ DBR_PRIVATIZED_REGIONS, 	STMTEFFECTS_METHODS },
+{ DBR_COPY_OUT_REGIONS, 	STMTEFFECTS_METHODS },
+    
+{ DBR_ALIAS_CLASSES, 		NEWGEN_METHODS },
+{ DBR_ALIAS_LISTS, 		NEWGEN_METHODS },
+{ DBR_IN_ALIAS_PAIRS, 		NEWGEN_METHODS },
+{ DBR_OUT_ALIAS_PAIRS, 		NEWGEN_METHODS },
+    
+{ DBR_COMPSEC,
+      (READER) read_compsec_mapping,
+      (WRITER) write_compsec_mapping, 
+      (FREER) free_compsec_mapping,
+      (CHECKER) check_compsec_mapping },
+
+{ DBR_SUMMARY_COMPSEC, 		NEWGEN_METHODS },
+
+/* SEMANTICS
+ */
+#define TRANSFORMERMAPPING_METHODS \
+    (READER) read_transformer_mapping, \
+    (WRITER) write_transformer_mapping, \
+    (FREER) free_transformer_mapping, \
+    (CHECKER) check_transformer_mapping
+
+{ DBR_TRANSFORMERS, 		TRANSFORMERMAPPING_METHODS },
+{ DBR_PRECONDITIONS,		TRANSFORMERMAPPING_METHODS },
+{ DBR_SUMMARY_TRANSFORMER, 	NEWGENNOCHECK_METHODS },
+{ DBR_SUMMARY_PRECONDITION, 	NEWGENNOCHECK_METHODS },
+{ DBR_INITIAL_PRECONDITION, 	NEWGENNOCHECK_METHODS },
+{ DBR_PROGRAM_PRECONDITION, 	NEWGENNOCHECK_METHODS },
+    
+{ DBR_MUST_CONTINUATION,	TRANSFORMERMAPPING_METHODS },
+{ DBR_MAY_CONTINUATION,		TRANSFORMERMAPPING_METHODS },
+{ DBR_MUST_SUMMARY_CONTINUATION,NEWGENNOCHECK_METHODS },
+{ DBR_MAY_SUMMARY_CONTINUATION, NEWGENNOCHECK_METHODS },
+
+/* COMPLEXITY
+ */
+{ DBR_COMPLEXITIES,
+      (READER) read_complexity_mapping,
+      (WRITER) write_complexity_mapping,
+      (FREER) free_complexity_mapping,
+      (CHECKER) gen_true },
+{ DBR_SUMMARY_COMPLEXITY, 	NEWGENNOCHECK_METHODS },
+
+/* FILE NAMES
+ */
+#define STRING_METHODS \
+	safe_readline, writeln_string, (FREER) free, (CHECKER) gen_true
+
+{ DBR_USER_FILE,		STRING_METHODS },
+{ DBR_SOURCE_FILE,		STRING_METHODS },
+{ DBR_HPFC_FILTERED_FILE,	STRING_METHODS },
+{ DBR_PARSED_PRINTED_FILE,	STRING_METHODS },
+{ DBR_PRINTED_FILE,		STRING_METHODS },
+{ DBR_GRAPH_PRINTED_FILE,	STRING_METHODS },
+{ DBR_FLINTED_FILE,		STRING_METHODS },
+{ DBR_PARALLELPRINTED_FILE,	STRING_METHODS },
+{ DBR_CALLGRAPH_FILE,		STRING_METHODS },
+{ DBR_WP65_BANK_FILE,		STRING_METHODS },
+{ DBR_WP65_COMPUTE_FILE,	STRING_METHODS },
+{ DBR_ICFG_FILE,		STRING_METHODS },
+{ DBR_DG_FILE,			STRING_METHODS },
+{ DBR_DG_FILE,			STRING_METHODS },
+{ DBR_ALIAS_FILE,		STRING_METHODS },
+
+#define GENFREE_METHODS \
+	no_read, no_write, (FREER) gen_free, (CHECKER) gen_true
+
+{ DBR_CHAINS,			GENFREE_METHODS },
+{ DBR_DG,			GENFREE_METHODS },
+
+/* entities are tabulated... here are some wrappers that expect
+ * entity_domain as the pointer value... see bootstrap/bootstrap.c
+ */
+#define ENTITY_METHODS \
+    (READER) pipsdbm_read_entities, \
+    (WRITER) gen_write_tabulated, \
+    (FREER) pipsdbm_free_entities, \
+    (CHECKER) gen_true
+
+{ DBR_ENTITIES,			ENTITY_METHODS },
+
+#define UNEXPECTED_METHODS \
+	(READER) unexpected, (WRITER) unexpected, \
+	(FREER) unexpected, (CHECKER) unexpected
+
+/* this one MUST be the last one.
+ */    
+{ NULL,				UNEXPECTED_METHODS }
