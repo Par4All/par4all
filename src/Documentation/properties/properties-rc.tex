@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.124  1998/07/24 16:01:02  irigoin
+%% property PARSER_SUBSTITUTE_ENTRIES added
+%%
 %% Revision 1.123  1998/06/24 09:20:38  irigoin
 %% String property SEMANTICS_FIX_POINT_OPERATOR added to replace boolean
 %% property SEMANTICS_PATTERN_MATCHING_FIX_POINT
@@ -76,7 +79,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/06/24 09:20:38 $~$
+$~$Date: 1998/07/24 16:01:02 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -429,6 +432,27 @@ output code as close as possible to the user source code.
 
 \begin{verbatim}
 PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
+\end{verbatim}
+
+\subsubsection{Entry}
+\index{Entry}
+
+The entry construct can be seen as an early attempt at object-oriented
+programming. The same object can be processed by several function. The
+object is declared as a standard subroutine or function and entry points
+are placed in the executable code. The entry points have different sets of
+formal parameters, they may share some common pieces of code, they share
+the declared variables, especially the static ones.
+
+The entry mechanism is dangerous because of the flow of control between
+entries. It is now obsolete and is not analyzed directly by PIPS. Instead
+each entry may be converted into a first class function or subroutine and
+static variables are gathered in a specific common. This is the default
+option. If the substitution is not acceptable, the property may be turned
+off and entries results in a parser error.
+
+\begin{verbatim}
+PARSER_SUBSTITUTE_ENTRIES TRUE
 \end{verbatim}
 
 \subsubsection{Alternate Return}
