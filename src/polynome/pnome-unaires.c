@@ -21,7 +21,7 @@ Ppolynome *ppp;
     Ppolynome curpp;
 
     if ( !POLYNOME_UNDEFINED_P(*ppp) && !POLYNOME_NUL_P(*ppp) )
-	for(curpp = *ppp; curpp != NIL; curpp = polynome_succ(curpp))
+	for(curpp = *ppp; curpp != POLYNOME_NUL; curpp = polynome_succ(curpp))
 	    monome_coeff(polynome_monome(curpp)) = - monome_coeff(polynome_monome(curpp));
 }
 
@@ -35,7 +35,7 @@ Ppolynome pp;
     Ppolynome curpp;
 
     if ( !POLYNOME_UNDEFINED_P(pp) && !POLYNOME_NUL_P(pp) )
-	for(curpp = pp; curpp != NIL; curpp = polynome_succ(curpp))
+	for(curpp = pp; curpp != POLYNOME_NUL; curpp = polynome_succ(curpp))
 	    monome_coeff(polynome_monome(curpp)) = - monome_coeff(polynome_monome(curpp));
 
     return pp;
@@ -197,15 +197,15 @@ boolean (*is_inferior_var)(Pvecteur *, Pvecteur *);
     Pmonome pmtemp;
 
     if ((!POLYNOME_NUL_P(*ppp)) && (!POLYNOME_UNDEFINED_P(*ppp))) {
-	for (ppcur = *ppp; ppcur != NIL; ppcur = polynome_succ(ppcur)) {
+	for (ppcur = *ppp; ppcur != POLYNOME_NUL; ppcur = polynome_succ(ppcur)) {
 	    Pmonome pm = polynome_monome(ppcur);
 	    Pvecteur pv = monome_term(pm);
 	    pv = vect_sort(pv, vect_compare);
 	    /* pv = vect_tri(pv, is_inferior_var); */
 	}
-	for (ppcur = *ppp; polynome_succ(ppcur) != NIL; ppcur = polynome_succ(ppcur)) {
+	for (ppcur = *ppp; polynome_succ(ppcur) != POLYNOME_NUL; ppcur = polynome_succ(ppcur)) {
 	    for(ppsearchmin  = polynome_succ(ppcur);
-		ppsearchmin != NIL;
+		ppsearchmin != POLYNOME_NUL;
 		ppsearchmin  = polynome_succ(ppsearchmin)) {
 
 		if (!is_inferior_monome(polynome_monome(ppsearchmin),
@@ -229,9 +229,9 @@ Variable v_old,v_new;
 {
     Ppolynome ppcur;
 
-    for (ppcur = *ppp; ppcur != NIL; ppcur = polynome_succ(ppcur)) {
+    for (ppcur = *ppp; ppcur != POLYNOME_NUL; ppcur = polynome_succ(ppcur)) {
 	Pmonome pmcur = polynome_monome(ppcur);
-	if ( pmcur != NIL ) {
+	if ( pmcur != POLYNOME_NUL ) {
 	    Pvecteur pvcur = monome_term(pmcur);
 
 	    vect_chg_var(&pvcur,v_old,v_new);
