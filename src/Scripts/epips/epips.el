@@ -1339,8 +1339,8 @@ Special commands:
       (
        (process-connection-type nil)	; Use a pipe to communicate
        )
-;;    (setq epips-process (start-process "WPips" "Pips-Log" "wpips" "-emacs"))
-    (setq epips-process (start-process "WPips" "Pips-Log" "/projects/Pips/Development/Lib/ri-util/wpips" "-emacs"))
+    (setq epips-process (start-process "WPips" "Pips-Log" "wpips" "-emacs"))
+    ;;    (setq epips-process (start-process "WPips" "Pips-Log" "/projects/Pips/Development/Lib/ri-util/wpips" "-emacs"))
 					;(goto-char (process-mark epips-process))
     (message "WPips process launched...")
     (setq epips-process-buffer (process-buffer epips-process))
@@ -1422,75 +1422,3 @@ Special commands:
       )
     )
   )
-
-
-(defun print-help-return-message (&optional function)
-  "Display or return message saying how to restore windows after help command.
-Computes a message and applies the optional argument FUNCTION to it.
-If FUNCTION is nil, applies `message' to it, thus printing it."
-  (and (not (get-buffer-window standard-output))
-       (let ((first-message
-	      (cond ((or (member (buffer-name standard-output)
-				 special-display-buffer-names)
-			 (assoc (buffer-name standard-output)
-				special-display-buffer-names)
-			 (let (found
-			       (tail special-display-regexps)
-			       (name (buffer-name standard-output)))
-			   (while (and tail (not found))
-			     (if (or (and (consp (car tail))
-					  (string-match (car (car tail)) name))
-				     (and (stringp (car tail))
-					  (string-match (car tail) name)))
-				 (setq found t))
-			     (setq tail (cdr tail)))
-			   found))
-		     ;; If the help output buffer is a special display buffer,
-		     ;; don't say anything about how to get rid of it.
-		     ;; First of all, the user will do that with the window
-		     ;; manager, not with Emacs.
-		     ;; Secondly, the buffer has not been displayed yet,
-		     ;; so we don't know whether its frame will be selected.
-		     ;; Even the message about scrolling the help
-		     ;; might be wrong, but it seems worth showing it anyway.
-		     nil)
-		    ((not (one-window-p t))
-		     "Type \\[switch-to-buffer-other-window] RET to restore the other window.")
-		    (pop-up-windows
-		     "Type \\[delete-other-windows] to remove help window.")
-		    (t
-		     "Type \\[switch-to-buffer] RET to remove help window."))))
-	 (funcall (or function 'message)
-		  (concat
-		   (if first-message
-		       (substitute-command-keys first-message)
-		     "")
-		   (if first-message "  " "")
-		   ;; If the help buffer will go in a separate frame,
-		   ;; it's no use mentioning a command to scroll, so don't.
-		   (if (or (member (buffer-name standard-output)
-				   special-display-buffer-names)
-			   (assoc (buffer-name standard-output)
-				  special-display-buffer-names)
-			   (memq t (mapcar '(lambda (elt)
-					      (if (consp elt)
-						  (setq elt (car elt)))
-					      (string-match elt (buffer-name standard-output)))
-					   special-display-regexps)))
-		       nil
-		     (if (or (member (buffer-name standard-output)
-				     same-window-buffer-names)
-			     (assoc (buffer-name standard-output)
-				    same-window-buffer-names)
-			     (memq t (mapcar '(lambda (elt)
-						(if (consp elt)
-						    (setq elt (car elt)))
-						(string-match elt (buffer-name standard-output)))
-					     same-window-regexps)))
-			 ;; Say how to scroll this window.
-			 (substitute-command-keys
-			  "\\[scroll-up] to scroll the help.")
-		       ;; Say how to scroll some other window.
-		       (substitute-command-keys
-			"\\[scroll-other-window] to scroll the help."))))))))
-
