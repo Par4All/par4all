@@ -1,8 +1,9 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1994/03/21 15:21:56 $) version $Revision$, got on %D%, %T%
-# %A%
+# $RCSfile: validate-sequential,v $ ($Date: 1994/03/23 11:13:03 $, ) version $Revision$,
+# got on %D%, %T%
+# $Id$
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -30,14 +31,16 @@
 #    into an absolute directory name
 #  - tmperr added
 #  - Options added
-#    uvspdx:r:l:
+#    -h: help
 #    -u: a new directory is used
-#    -p: performance
+#    -t: performance
 #    -v: verbose; -s: silent; -d: debug;
 #    -x pips: pips to be used
 #    -r dir: directory where to run
 #    -l file: lock file to report at the end (default: a mail is sent)
-#
+#  - source environment if necessary
+
+[ "$PIPSDIR" ] || . /home/users/pips/Pips/pipsrc.sh
 
 pips_test_directory=$PIPSDIR/Tests/Validation
 default_file=defaults
@@ -52,13 +55,30 @@ DEBUG=':'
 
 unset UNIQDIR pips_version RUNDIR LOCKFILE PERFORMANCE
 
+usage()
+{
+  {
+    echo "Usage: $0 [-uvdsth] [-l file] [-x pips] [-r dir] [modules]"
+    echo "  -u: uniq directory to be used"
+    echo "  -t: timing"
+    echo "  -h: help"
+    echo "  -v: verbose"
+    echo "  -s: silent (default)"
+    echo "  -d: debug"
+    echo "  -l file: lockfile name where to report"
+    echo "  -x pips: pips to be used (dafault . then Production)"
+    echo "  -r dir: directory where to run (default .)"
+  } >&2
+  exit ${1:-1}
+}
+
 #
 # get options
 
-while getopts puvsdx:r:l: opt
+while getopts tuvsdhx:r:l: opt
 do
   case $opt in
-    p) PERFORMANCE="begin: `date`" ;;
+    t) PERFORMANCE="begin: `date`" ;;
     v) VERBOSE='echo' ;;
     s) VERBOSE=':' ;;
     d) DEBUG='echo' ;;
@@ -66,7 +86,8 @@ do
     x) pips_version="$OPTARG" ;;
     r) RUNDIR="$OPTARG" ;;
     l) LOCKFILE="$OPTARG" ;;
-    *) exit 1
+    h) usage 0 ;;
+    *) usage 1
   esac
 done
 
@@ -106,6 +127,7 @@ tmpout=/tmp/validate.$$
 tmperr=/tmp/validate_err.$$
 diffout_e=/tmp/diff_e.$$
 diffout=/tmp/diff.$$
+# global variable...
 errors=/tmp/errors.$$
 shell=/bin/sh
 
@@ -117,15 +139,22 @@ report()
   if [ $result -ne 0 ] 
   then
     { 
+      # reports errors if any
+      [ -s "$tmperr" ] && \
+      {
+        echo "--"
+	[ -s $tmpout ] && cat $tmpout
+	echo "--"
+	cat $tmperr
+	echo "--";
+      }
       echo "$message" 
-      [ -f "$tmperr" ] && \
-      { echo "--"; cat $tmpout; echo "--"; cat $tmperr;}
     } | mail -s "$subject" $user
 
     # beurk!
     int=`cat $errors`
     echo `expr $int + 1` > $errors
-    
+
     return 1
   fi
 
@@ -141,6 +170,7 @@ make_diff()
   if [ ! -f $aspect/$name.result/$module ] 
   then
     report 1 "Cannot open result file $aspect/$name.result/$module"
+    [ "$LOCKFILE" ] && echo "$aspect:$name:$module" > $LOCKFILE.$HOSTNAME
     exit 1
   fi
   cp $tmpout $aspect/$name.result/$module.out
@@ -192,7 +222,7 @@ test_aspect()
      
      #
      # default case
-     Init -f $file -d $name > $tmperr 2>&1
+     Init -f $file -d $name > $tmpout 2> $tmperr
      report $? "Cannot initialize $file" || continue
      
      for module in `cat $name.database/modules` ; do
@@ -203,7 +233,7 @@ test_aspect()
      done
      
      rm -f $tmpout $tmperr
-     Delete $name > $tmperr 2>&1
+     Delete $name > $tmpout 2> $tmperr
      report $? "Cannot delete workspace $name"
    done)
 }
@@ -218,10 +248,12 @@ esac
 if [ -f pipsmake.rc ] 
 then
   report 2 "validate cannot be run with a local pipsmake.rc."
+  [ "$LOCKFILE" ] && echo "validate:$HOSTNAME" > $LOCKFILE.$HOSTNAME
   exit 4
 elif [ -f properties.rc ]
 then
   report 3 "validate cannot be run with a local properties.rc."
+  [ "$LOCKFILE" ] && echo "validate:$HOSTNAME" > $LOCKFILE.$HOSTNAME
   exit 5
 fi
 
@@ -233,20 +265,28 @@ echo 0 > $errors
 for i in $aspects
 do
   old_errors=`cat $errors`
-  
-  if [ ! -d "$pips_test_directory/$i" ] ; then
-    report 1 "$i is not a directory in $pips_test_directory"
-  elif [ -f $pips_test_directory/$i/pipsmake.rc ] ; then
-    report 2 "validate should not be run with a pipsmake.rc in $pips_test_directory/$i."
-  elif [ -f $pips_test_directory/$i/properties.rc ] ; then
-    report 3 "validate should not be run with a properties.rc in $pips_test_directory/$i."
+
+  if [ ! -d "$pips_test_directory/$i" ]
+  then
+    report 1 \
+      "$i is not a directory in $pips_test_directory"
+  elif [ -f $pips_test_directory/$i/pipsmake.rc ] 
+  then
+    report 2 \
+    "validate should not be run with a pipsmake.rc in $pips_test_directory/$i."
+  elif [ -f $pips_test_directory/$i/properties.rc ]
+  then
+    report 3 \
+  "validate should not be run with a properties.rc in $pips_test_directory/$i."
   else
 
     $VERBOSE "validating $i"
 
     test_aspect $pips_test_directory/$i
   fi
-  if [ `cat $errors` -ne $old_errors ] ; then
+
+  if [ "`cat $errors`" -ne "$old_errors" ] 
+  then
     failed="$i-$failed"
   fi
 done
@@ -254,7 +294,7 @@ done
 #
 # Final situation
 
-if [ `cat $errors` = 0 ] 
+if [ "`cat $errors`" -eq 0 ] 
 then
   final="succeeded"
 else
@@ -275,16 +315,23 @@ rm -f $tmpout $tmperr $diffout $diffout_e
 
 if [ "$LOCKFILE" ]
 then
-  echo $failed > "$LOCKFILE.$HOSTNAME"
+  echo -n $failed > "$LOCKFILE.$HOSTNAME"
 else
-  report	1 \
-	"Your Validation Suite Test for
+  report 1 \
+  "Your Validation Suite Test for
 
 $aspects
+  
+$final with $pips_version on $HOSTNAME
 
-$final with $pips_version.
 $PERFORMANCE
-In case of problems, contact <jouvelot@cri.ensmp.fr>."
+
+in case of problems, contact <jouvelot@cri.ensmp.fr>."
+
 fi
 
 rm -f $errors
+
+#
+# that's all
+#
