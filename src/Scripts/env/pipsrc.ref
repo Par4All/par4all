@@ -2,27 +2,11 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
-# Revision 1.120  1997/05/23 12:42:01  coelho
-# *** empty log message ***
-#
-# Revision 1.119  1997/05/23 11:58:39  coelho
-# *** empty log message ***
-#
-# Revision 1.118  1997/05/23 09:59:36  coelho
-# *** empty log message ***
-#
-# Revision 1.117  1997/05/23 09:50:52  coelho
-# *** empty log message ***
-#
-# Revision 1.116  1997/05/22 17:10:47  coelho
-# improved selection of arch.
-#
-# Revision 1.115  1997/05/22 17:01:34  coelho
+# Revision 1.121  1997/05/23 12:42:58  coelho
 # *** empty log message ***
 #
 # Revision 1.114  1997/05/22 17:01:11  coelho
 # PIPS_DIRECTORY_FOR_BINARIES added.
-#
 #
 # Revision 1.108  1997/05/13 20:30:12  coelho
 # some settings for Linux.
