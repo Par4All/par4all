@@ -15,7 +15,8 @@
 pips_arch="$PIPS_ARCH"
 pips_hosts="$PIPS_HOSTS"
 
-test -r $HOME/.profile && . $HOME/.profile
+# not a good idea, the environment is set thru pips_at_night_at_cri.
+# test -r $HOME/.profile && . $HOME/.profile
 test "${PIPS_ROOT}" || . /projects/Pips/pipsrc.sh
 
 PIPS_ARCH=${pips_arch:-$PIPS_ARCH}
