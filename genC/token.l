@@ -73,7 +73,7 @@ x			{return( AND );}
 [ \t\n]*		;
 %%
 
-yywrap()
+int yywrap()
 {
 #ifdef flex_scanner
     yy_init = 1 ;
@@ -82,7 +82,7 @@ yywrap()
 }
 
 #ifdef flex_scanner
-yyinput()
+int yyinput()
 {
     return( input()) ;
 }
