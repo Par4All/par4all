@@ -60,7 +60,7 @@ sub get_identificators($)
     # to lower case
     $line =~ tr/A-Z/a-z/;
     # get all identificators
-    return grep (!/^(|if|do|end|endif|enddo|print|while||common
+    return grep (!/^(|if|do|end|endif|enddo|print|while|common
 		     |data|dimension|print|read|subroutine|integer
 		     |real|integer|logical|gt|le|lt|ge|eq|ne|\d.*
 		     |character|implicit|none|then|else|or|and|call
