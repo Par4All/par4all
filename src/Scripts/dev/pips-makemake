@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.273  1997/03/19 17:07:30  coelho
+# RCS checking of locked files should work as expected now.
+#
 # Revision 1.272  1997/03/19 16:58:06  coelho
 # rlog options cannot be collated
 #
@@ -745,12 +748,14 @@ $verbose "specific to Development"
 [ ! "$production" ] && cat >> $MAKEFILE <<%
 
 check_sccs:
-	@[ -d SCCS -a ! "\`sccs tell\`" ] || \\
-	{ echo; echo "sccs files being edited, cannot install"; echo; \\
-	  exit 1;}
-	@[ -d RCS -a ! "\`rlog -L -R RCS/*\`" ] || \\
-	{ echo; echo "RCS files being edited, cannot install"; echo; \\
-	  exit 1;}
+	@if [ -d SCCS ] ; then \\
+	    [ ! "\`sccs tell\`" ] || \\
+	    { echo "SCCS files locked, cannot install"; exit 1;} fi ;
+
+check_rcs:
+	@if [ -d RCS ] ; then \\
+	    [ ! "\`rlog -L -R RCS/*\`" ] || \\
+	    { echo "RCS files locked, cannot install"; exit 1;} fi ;
 
 # install installs sources, so depends on sources. FC
 # to insure the library is compiled before hand, a make is added.
@@ -758,7 +763,7 @@ check_sccs:
 	#
 	# first check
 	#
-	\$(MAKE) check_install check_sccs
+	\$(MAKE) check_install check_sccs check_rcs
 	#
 	# installing new source files 
 	#
