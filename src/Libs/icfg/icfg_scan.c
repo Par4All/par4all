@@ -392,6 +392,7 @@ static void call_rwt(call c)
   /* hum... pushes the current entity... */
   entity e_caller = get_current_module_entity();
   reset_current_module_entity();
+  printf(stderr, entity_local_name(e_filter));
 
   switch (get_int_property (ICFG_DECOR)) {
   case ICFG_DECOR_NONE:
