@@ -672,10 +672,9 @@ make_new_module_variable(entity module,int d)
  * FI: this must be wrong. A function to reset count_tmp and count_aux 
  * is needed if tpips or wpips are to work in a consistent way!
  */
-/* gcc complains that they are not used.
+/* gcc complains that they are not used... but they are defined! */
 static int count_tmp = 0;
 static int count_aux = 0;
-*/
 
 
 /*============================================================================*/
