@@ -4,6 +4,9 @@
 %% PIPS faq
 %%
 %% $Log: faq.tex,v $
+%% Revision 1.6  1998/10/21 08:20:12  irigoin
+%% Some information added about the input language
+%%
 %% Revision 1.5  1998/10/20 20:31:01  irigoin
 %% Section about automatic code optimization added after Martin Griebl's visit
 %%
@@ -84,6 +87,8 @@ in another language than is not parsed by PIPS.
 
 \section{Why is PIPS parser so limited?}
 \index{Parser}
+\index{Input Language}
+\index{Fortran PIPS}
 
 Parsing is divided in multiple stages and extensive preprocessing is
 available to convert Fortran features which are not directly supported by
@@ -112,8 +117,10 @@ not applied by default. The corresponding properties must be set (see \PROPERTIE
 
 \end{itemize}
 
-Formal functional are still unsupported ($Date: 1998/10/20 20:31:01 $) and the internal
-representation of DATA statements is unsatisfactory.
+Formal functional are still unsupported ($Date: 1998/10/21 08:20:12 $) and
+the internal representation of DATA statements is unsatisfactory.
+
+Recursivity, which is not in Fortran 77 standard, is not supported.
 
 \section{My include files are in a different directory}
 \index{Include}
