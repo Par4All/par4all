@@ -65,7 +65,12 @@ Le nom du fichier doit e^tre relatif au workspace, s'il se trouve dans
 le workspace, et doit e^tre absolu, s'il se trouve hors du workspace, de
 sorte qu'on puisse faire des \verb+mv+ et des \verb+cp -pr+ sur le workspace.
 Si la ressource est en me'moire, le sous-domaine {\tt memory} contient
-un pointeur vers cette ressource.}
+un pointeur vers cette ressource.
+
+How resources in a file a and file resources differ? It cannot be seen
+from this description! The list of the laters is explicitely managed
+somewhere in pipsdbm! 
+}
 
 \end{document}
 \end
