@@ -7,8 +7,7 @@ LIB_CFILES = \
 	lowlevel.c \
 	workspace.c \
 	externals.c \
-	misc.c \
-	obsolete.c 
+	misc.c
 
 LIB_HEADERS = \
 	pipsdbm-local.h \
