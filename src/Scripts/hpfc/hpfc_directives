@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/19 12:58:18 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/23 13:42:06 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -196,16 +196,18 @@ $SED '#
       # inherit... I am still laughing about it
       s, inherit , distribute ,;
       #
-      s, align \(.*\) with \(.*\),a(\1\,\2),
       s, align with \(.*\)::\(.*\),a(\2\,\1),
-      s, re[ 	]*align \(.*\) with \(.*\),b(\1\,\2),
+      s, align\(.*\) with \(.*\)::\(.*\),a(hpfck\1\,\3\,\2),
+      s, align \(.*\) with \(.*\),a(\1\,\2),
       s, re[ 	]*align with \(.*\)::\(.*\),a(\2\,\1),
+      s, re[ 	]*align\(.*\) with \(.*\)::\(.*\),a(hpfck\1\,\3\,\2),
+      s, re[ 	]*align \(.*\) with \(.*\),b(\1\,\2),
       #
+      s, distribute\(.*\) onto \(.*\)::\(.*\),d(\3\,\2\1),
       s, distribute \(.*\) onto \(.*\),d(\1\,\2),
-      s, distribute onto \(.*\)::\(.*\),d(\2\,\1),
       s, distribute \(.*\),d(\1\,hpfcX),
+      s, re[ 	]*distribute\(.*\) onto \(.*\)::\(.*\),d(\3\,\2\1),
       s, re[ 	]*distribute \(.*\) onto \(.*\),e(\1\,\2),
-      s, re[ 	]*distribute onto \(.*\)::\(.*\),d(\2\,\1),
       s, re[ 	]*distribute \(.*\),e(\1\,hpfcX),
       #
       # HPF parallelism directives
