@@ -56,6 +56,9 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.57  2001/07/19 12:47:57  irigoin
+  * code for pointer_inst: moved from gram.y into declaration.c. New function DeclarePointer().
+  *
   * Revision 1.56  2001/07/19 08:29:48  coelho
   * substring initialization fixed.
   *
@@ -957,57 +960,7 @@ common_name: TK_CONCAT
 
 pointer_inst: TK_POINTER TK_LPAR entity_name TK_COMMA entity_name decl_tableau TK_RPAR
             {
-		/* It is assumed that decl_tableau can be ignored for EDF examples */
-		list dims = list_undefined;
-
-		if(!ENDP($6)) {
-		    /* A varying dimension is impossible in the dynamic area for address
-		     * computation. A heap area must be added.
-		     */
-
-		    dims = CONS(EXPRESSION,
-			 make_dimension(MakeIntegerConstantExpression("1"),
-					MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))),
-			 NIL);
-
-		    /* dims = $6; */
-		}
-		else {
-		    dims = $6;
-		}
-
-		pips_user_warning("SUN pointer declaration detected. Integer type used.\n");
-		/* No specific type for SUN pointers */
-		if(type_undefined_p(entity_type($3))) {
-		  DeclareVariable($3, MakeTypeVariable(MakeBasic(is_basic_int), NIL),
-				  NIL, storage_undefined, value_undefined);
-		}
-		else {
-		  type tp = entity_type($3);
-
-		  if(type_variable_p(tp)
-		     && basic_int_p(variable_basic(type_variable(tp)))) {
-		    /* EDF code contains several declaration for a unique pointer */
-		    pips_user_warning("%s %s between lines %d and % d\n",
-				 "Redefinition of pointer",
-				 entity_local_name($3), line_b_I, line_e_I);
-
-		  }
-		  else {
-		    pips_user_warning("DeclareVariable",
-				 "%s %s between lines %d and % d\n",
-				 "Redefinition of type for entity",
-				 entity_local_name($3), line_b_I, line_e_I);
-		    ParserError("Syntax", "Conflicting type declarations\n");
-		  }
-		}
-		DeclareVariable($5, type_undefined, dims, 
-				make_storage(is_storage_ram,
-					     make_ram(get_current_module_entity(),
-						      HeapArea,
-						      UNKNOWN_RAM_OFFSET,
-						      NIL)),
-				value_undefined);
+	      DeclarePointer($3, $5, $6);
             }
         ;
 
