@@ -143,9 +143,9 @@ case ${job} in
 	${verb} "USUAL stuff" ;
 	general ${sun4} GNUSOL1 ;
 	covalid ${sol2} GNUSOL2LL ;
-	covalid ${i386} LINUXI86 ;
+	covalid ${i586} LINUXI86LL ;
 	compile ${sun4} GNUSOL1 ;
-        compile ${i586} LINUXI86LL ;;
+        compile ${i386} LINUXI86 ;;
 
     long)
 	${verb} "LONG stuff (more compilations and validations)" ;
@@ -159,15 +159,15 @@ case ${job} in
 
     short)
 	${verb} "SHORT stuff (one validation)" ;
-	covalid ${i386} LINUXI86 ;
-	compile ${i586} LINUXI86LL ;
+	covalid ${i586} LINUXI86LL ;
+	compile ${i386} LINUXI86 ;
 	compile ${sol2} GNUSOL2LL ;
 	compile ${sun4} GNUSOL1 ;;
 
     compile)
 	${verb} "COMPILE stuff" ;
-	compile ${i386} "LINUXI86" ;
 	compile ${i586} "LINUXI86LL" ;
+	compile ${i386} "LINUXI86" ;
 	compile ${sun4} "GNU GNUSOL1 SUN4 GPROF" ;
 	compile ${sol2} "GNUSOL2LL SOL2LL" ;;
 
@@ -179,7 +179,7 @@ case ${job} in
 
     debug)
 	${verb} "DEBUG stuff..." ;
-	validate ${i386} LINUXI86 ;;
+	validate ${i586} LINUXI86LL ;;
 
     *)
 	${verb} "unexpected job=${job}" ;
