@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/27 10:59:37 $, 
+ * $Date: 1997/10/27 12:20:28 $, 
  */
 
 #include <unistd.h>
@@ -484,7 +484,7 @@ basename(string fullpath, string suffix)
     }
     for (i=len; i>=0; i--) if (fullpath[i]=='/') break;
     /* fullpath[i+1:len] */
-    result = (char*) malloc(sizeof(char)*(len-i));
+    result = (char*) malloc(sizeof(char)*(len-i+1));
     for (i++, j=0; i<=len; i++, j++) 
 	result[j] = fullpath[i];
     result[j++] = '\0';
