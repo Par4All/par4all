@@ -14,7 +14,6 @@ string mod_name;
 		      FALSE);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES",
 		      TRUE);
-    variable_trace(mod_name);
     return print_dependence_graph(mod_name);
 }
 
@@ -69,6 +68,9 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
     fp = safe_fopen(dg_name, "w");
     
     debug_on("RICEDG_DEBUG_LEVEL");
+
+    /* for tracing variables */
+    variable_trace(mod_name);
 
     if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") || 
 	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS"))
