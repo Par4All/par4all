@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.36  2004/03/26 09:01:48  hurbain
+%% Oops. Debug removal.
+%%
 %% Revision 1.35  2004/03/26 08:34:16  hurbain
 %% Removed claire rough
 %%
@@ -587,7 +590,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2004/03/26 08:34:16 $~$
+$~$Date: 2004/03/26 09:01:48 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -6855,10 +6858,6 @@ a subset of Fortran.
 
 \begin{verbatim}
 alias print_claire_code 'Claire Pretty-Printer'
-
-%print_clairerough  > MODULE.clairerough
-%                   < PROGRAM.entities
-%                   < MODULE.code
 
 print_claire_code        > MODULE.claire_printed_file
         < PROGRAM.entities
