@@ -3,16 +3,16 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1996/09/07 15:24:13 $, )
+! ($Date: 1996/09/07 16:32:59 $, )
 !
 !-----------------
 !
-! HPFC_TEMPLATE
+! HPFC TEMPLATE
 !
 ! this subroutine computes the coordonates of array number an 
 ! on the template tn
 !
-      subroutine HPFC_TEMPLATE(inda, an, indt, tn)
+      subroutine HPFC TEMPLATE(inda, an, indt, tn)
       integer inda(7), an, indt(7), tn
       include "hpfc_commons.h"
       integer i, adim
@@ -42,11 +42,11 @@
 !
 !-----------------
 !
-! HPFC_PROCESSORS
+! HPFC PROCESSORS
 !
 ! this subroutine computes on which processor a template element is mapped
 !
-      subroutine HPFC_PROCESSORS(indt, tn, indp, pn, replicated)
+      subroutine HPFC PROCESSORS(indt, tn, indp, pn, replicated)
       integer indt(7), tn, indp(7), pn
       logical replicated
       include "hpfc_commons.h"
@@ -83,9 +83,9 @@
 !
 !-----------------
 !
-! HPFC_PROCLID
+! HPFC PROCLID
 !
-      subroutine HPFC_PROCLID(indp, pn, lid, replicated)
+      subroutine HPFC PROCLID(indp, pn, lid, replicated)
       integer indp(7), pn, lid
       logical replicated
       include "hpfc_commons.h"
@@ -108,9 +108,9 @@
 !
 !-----------------
 !
-! HPFC_CMPLID
+! HPFC CMPLID
 !
-      integer function HPFC_CMPLID(pn, p1, p2, p3, p4, p5, p6, p7)
+      integer function HPFC CMPLID(pn, p1, p2, p3, p4, p5, p6, p7)
       integer pn, p1, p2, p3, p4, p5, p6, p7
       include "hpfc_commons.h"
       integer lid, indp(7)
@@ -121,8 +121,8 @@
       indp(5)=p5
       indp(6)=p6
       indp(7)=p7
-      call HPFC_PROCLID(indp, pn, lid, .FALSE.)
-      HPFC_CMPLID=lid
+      call HPFC PROCLID(indp, pn, lid, .FALSE.)
+      HPFC CMPLID=lid
       end
 !
 !-----------------
@@ -131,7 +131,7 @@
 !
 ! returns the vector of indices of lid in pn.
 !
-      subroutine HPFC_CMPPOS(pn, lid, indp)
+      subroutine HPFC CMPPOS(pn, lid, indp)
       integer pn, lid, indp(7)
       include "hpfc_commons.h"
       integer ndim, i, t, dim, size
@@ -150,10 +150,10 @@
 ! true if dimension dim of processor arrangement pn 
 ! is a distributed dimension for array an.
 !
-      logical function HPFC_DIST_P(an, dim)
+      logical function HPFC DIST P(an, dim)
       integer an, dim
       include "hpfc_commons.h"
-      HPFC_DIST_P = ALIGN(an, DIST(ATOT(an), dim, 1), 1).ne.INTFLAG 
+      HPFC DIST P = ALIGN(an, DIST(ATOT(an), dim, 1), 1).ne.INTFLAG 
       end
 !
 !-----------------
@@ -163,31 +163,31 @@
 ! most of the information computed here could be precomputed and store
 ! once at the initialization phase of the runtime. 
 !
-      logical function HPFC_TWIN_P(an, lid)
+      logical function HPFC TWIN P(an, lid)
       integer an, lid
       include "hpfc_commons.h"
-      external HPFC_DIST_P
-      logical HPFC_DIST_P
+      external HPFC DIST P
+      logical HPFC DIST P
       integer ip(7), pn, dim
       pn = TTOP(ATOT(an))
-      call HPFC_CMPPOS(pn, lid, ip)
+      call HPFC CMPPOS(pn, lid, ip)
       do dim=1, NODIMP(pn)
-         if (HPFC_DIST_P(an, dim).and.ip(dim).ne.MYPOS(dim,pn)) then
-            HPFC_TWIN_P = .FALSE.
+         if (HPFC DIST P(an, dim).and.ip(dim).ne.MYPOS(dim,pn)) then
+            HPFC TWIN P = .FALSE.
             return
          endif
       enddo
 !
 ! now the pe id on pn maybe differs ONLY on replicated dimensions
 !
-      HPFC_TWIN_P = .TRUE.
+      HPFC TWIN P = .TRUE.
       end
 !
 !-----------------
 !
-! HPFC_CMPOWNERS
+! HPFC CMPOWNERS
 !
-      subroutine HPFC_CMPOWNERS(an, i1, i2, i3, i4, i5, i6, i7)
+      subroutine HPFC CMPOWNERS(an, i1, i2, i3, i4, i5, i6, i7)
       integer an, i1, i2, i3, i4, i5, i6, i7
       include "hpfc_commons.h"
       integer inda(7), indt(7), indp(7), tn, i
@@ -200,8 +200,8 @@
       inda(7) = i7
       tn  = ATOT(an)
       OPN = TTOP(tn)
-      call HPFC_TEMPLATE(inda, an, indt, tn)
-      call HPFC_PROCESSORS(indt, tn, OINDP, OPN, OREPLICATED)
+      call HPFC TEMPLATE(inda, an, indt, tn)
+      call HPFC PROCESSORS(indt, tn, OINDP, OPN, OREPLICATED)
       if (OREPLICATED) then
          OLID = INTFLAG
          OWNERTID = INTFLAG
@@ -212,10 +212,10 @@
                indp(i) = OINDP(i)
             endif
          enddo
-         call HPFC_PROCLID(indp, OPN, SLID, .FALSE.)
+         call HPFC PROCLID(indp, OPN, SLID, .FALSE.)
          SENDERTID  = NODETIDS(SLID)
       else
-         call HPFC_PROCLID(OINDP, OPN, OLID, OREPLICATED)
+         call HPFC PROCLID(OINDP, OPN, OLID, OREPLICATED)
          OWNERTID  = NODETIDS(OLID)
          SENDERTID = OWNERTID
          SLID = OLID
@@ -224,9 +224,9 @@
 !
 !-----------------
 !
-! HPFC_CMPCOMPUTER
+! HPFC CMPCOMPUTER
 !
-      subroutine HPFC_CMPCOMPUTER(an, i1, i2, i3, i4, i5, i6, i7)
+      subroutine HPFC CMPCOMPUTER(an, i1, i2, i3, i4, i5, i6, i7)
       integer an, i1, i2, i3, i4, i5, i6, i7
       include "hpfc_commons.h"
       integer inda(7), indt(7), tn, i
@@ -240,8 +240,8 @@
       inda(7) = i7
       tn  = ATOT(an)
       CPN = TTOP(tn)
-      call HPFC_TEMPLATE(inda, an, indt, tn)
-      call HPFC_PROCESSORS(indt, tn, CINDP, CPN, replicated)
+      call HPFC TEMPLATE(inda, an, indt, tn)
+      call HPFC PROCESSORS(indt, tn, CINDP, CPN, replicated)
       if (replicated) then
          do i=1, NODIMP(CPN)
             if (CINDP(i).EQ.INTFLAG) 
@@ -249,7 +249,7 @@
          enddo
          replicated = .FALSE.
       endif
-      call HPFC_PROCLID(CINDP, CPN, CLID, replicated)
+      call HPFC PROCLID(CINDP, CPN, CLID, replicated)
       COMPUTERTID  = NODETIDS(CLID)
       CPOSCOMPUTED = .FALSE.
       end
@@ -261,7 +261,7 @@
 ! this function computes the neighbour tid of the current process,
 ! given the delta switch in the linearised processors representation.
 !
-      subroutine HPFC_CMPNEIGHBOUR(delta)
+      subroutine HPFC CMPNEIGHBOUR(delta)
       integer delta
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -276,10 +276,10 @@
 !
 !-----------------
 !
-! HPFC_OWNERP
+! HPFC OWNERP
 !
 !
-      logical function HPFC_OWNERP()
+      logical function HPFC OWNERP()
       include "hpfc_commons.h"
       logical result
       integer i
@@ -292,35 +292,35 @@
       else
          result = MYLID.EQ.OLID
       endif
-      HPFC_OWNERP = result
+      HPFC OWNERP = result
       end
 !
 !-----------------
 !
-! HPFC_SENDERP
+! HPFC SENDERP
 !
 !
-      logical function HPFC_SENDERP()
+      logical function HPFC SENDERP()
       include "hpfc_commons.h"
-      HPFC_SENDERP = MYLID.EQ.SLID
+      HPFC SENDERP = MYLID.EQ.SLID
       end
 !
 !-----------------
 !
-! HPFC_COMPUTERP
+! HPFC COMPUTERP
 !
 !
-      logical function HPFC_COMPUTERP()
+      logical function HPFC COMPUTERP()
       include "hpfc_commons.h"
-      HPFC_COMPUTERP = MYLID.EQ.CLID
+      HPFC COMPUTERP = MYLID.EQ.CLID
       end
 !
 !-----------------
 !
-! HPFC_COMPUTERINOWNERSP
+! HPFC COMPUTERINOWNERSP
 !
 !
-      logical function HPFC_COMPUTERINOWNERSP()
+      logical function HPFC COMPUTERINOWNERSP()
       include "hpfc_commons.h"
       logical result
       integer i
@@ -340,7 +340,7 @@
 ! position on the owners processors, if it has not been done.
 !
             if ((.NOT.CPOSCOMPUTED).OR.(CPOSPN.NE.OPN)) then
-               call HPFC_CMPPOS(OPN, CLID, CPOS)
+               call HPFC CMPPOS(OPN, CLID, CPOS)
                CPOSPN = OPN
                CPOSCOMPUTED = .TRUE.
             endif
@@ -352,16 +352,16 @@
       else
          result = CLID.EQ.OLID
       endif
-      HPFC_COMPUTERINOWNERSP = result
+      HPFC COMPUTERINOWNERSP = result
       end
 
 !
 !-----------------
 !
-! HPFC_SNDTO_C
+! HPFC SNDTO C
 ! send to computer
 !
-      subroutine HPFC_SNDTO_C(what, val)
+      subroutine HPFC SNDTO C(what, val)
       integer what, val
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -374,11 +374,11 @@
 !
 !-----------------
 !
-! HPFC_SNDTO_H
+! HPFC SNDTO H
 !
 ! send to host
 !
-      subroutine HPFC_SNDTO_H(what, val)
+      subroutine HPFC SNDTO H(what, val)
       integer what, val
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -391,11 +391,11 @@
 !
 !-----------------
 !
-! HPFC_SNDTO_O
+! HPFC SNDTO O
 !
 ! send to owner, when there is just one
 !
-      subroutine HPFC_SNDTO_O(what, val)
+      subroutine HPFC SNDTO O(what, val)
       integer what, val
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -409,11 +409,11 @@
 !
 !-----------------
 !
-! HPFC_SNDTO_A
+! HPFC SNDTO A
 !
 ! send to all nodes
 !
-      subroutine HPFC_SNDTO_A(what, val)
+      subroutine HPFC SNDTO A(what, val)
       integer what, val
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -437,59 +437,59 @@
 !
 !-----------------
 !
-! HPFC_PVMLENGTH
+! HPFC PVMLENGTH
 !
-      integer function HPFC_PVMLENGTH(what)
+      integer function HPFC PVMLENGTH(what)
       integer what
       include "fpvm3.h"
       if (what.eq.INTEGER4.or.what.eq.REAL4) then
-         HPFC_PVMLENGTH=4
+         HPFC PVMLENGTH=4
          return
       endif
       if (what.eq.REAL8.or.what.eq.COMPLEX8) then
-         HPFC_PVMLENGTH=8
+         HPFC PVMLENGTH=8
          return
       endif
       if (what.eq.BYTE1) then
-         HPFC_PVMLENGTH=1
+         HPFC PVMLENGTH=1
          return
       endif
       if (what.eq.INTEGER2) then
-         HPFC_PVMLENGTH=2
+         HPFC PVMLENGTH=2
          return
       endif
       if (what.eq.COMPLEX16) then
-         HPFC_PVMLENGTH=16
+         HPFC PVMLENGTH=16
          return
       endif
-      write (unit=0,fmt=*) "[HPFC_PVMLENGTH] unexpected tag ", what
+      write (unit=0,fmt=*) "[HPFC PVMLENGTH] unexpected tag ", what
       stop
       end
 !
 _CM5(
 !-----------------
 !
-! CM_SNDTO_A
+! CM SNDTO A
 !
 ! send to all nodes, cmmd version
 !
-      subroutine CM_SNDTO_A(what, val)
+      subroutine CM SNDTO A(what, val)
       integer what, val
       include "cmmd_fort.h"
       include "hpfc_commons.h"
-      external HPFC_PVMLENGTH
-      integer HPFC_PVMLENGTH
+      external HPFC PVMLENGTH
+      integer HPFC PVMLENGTH
       integer i, len
-      len = HPFC_PVMLENGTH(what)
+      len = HPFC PVMLENGTH(what)
       do i=1, NBOFTASKS
          if (i.ne.MYLID) then
             if (0.ne.CMMD_send(
-     $           CM_NODE_IDS(i),
+     $           CM NODE IDS(i),
      $           MCASTNODES,
      $           val,
      $           len)) then
                write (unit=0,fmt=*)
-     $              "[CM_SNDTO_A] send error ", MYLID, " to ", i
+     $              "[CM SNDTO A] send error ", MYLID, " to ", i
             endif
          endif
       enddo
@@ -498,33 +498,33 @@ _CM5(
 !
 !-----------------
 !
-! CM_RCVFR_mCS
+! CM RCVFR mCS
 !
-      subroutine CM_RCVFR_mCS(what, goal)
+      subroutine CM RCVFR mCS(what, goal)
       integer what, goal
       include "cmmd_fort.h"
       include "hpfc_commons.h"
-      external HPFC_PVMLENGTH
-      integer HPFC_PVMLENGTH
+      external HPFC PVMLENGTH
+      integer HPFC PVMLENGTH
       integer len
-      len = HPFC_PVMLENGTH(what)
+      len = HPFC PVMLENGTH(what)
       if (0.ne.CMMD_receive(
-     $     CM_NODE_IDS(SLID),
+     $     CM NODE IDS(SLID),
      $     MCASTNODES,
      $     goal,
      $     len)) then
-         write (unit=0,fmt=*) "[CM_RCVFR_mCS] receive error on ", MYLID
+         write (unit=0,fmt=*) "[CM RCVFR mCS] receive error on ", MYLID
       endif
       MCASTNODES = MCASTNODES + 2
       end
 !)
 !-----------------
 !
-! HPFC_HSNDTO_A
+! HPFC HSNDTO A
 !
 ! host send to all nodes
 !
-      subroutine HPFC_HSNDTO_A(what, val)
+      subroutine HPFC HSNDTO A(what, val)
       integer what, val
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -539,11 +539,11 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_SNDTO_HA
+! HPFC SNDTO HA
 !
 ! send to host and all nodes, but not the sender.
 !
-      subroutine HPFC_SNDTO_HA(what, val)
+      subroutine HPFC SNDTO HA(what, val)
       integer what, val
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -569,11 +569,11 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_SNDTO_OS
+! HPFC SNDTO OS
 !
 ! send to owners, by someone who is not in owners
 !
-      subroutine HPFC_SNDTO_OS(what, val)
+      subroutine HPFC SNDTO OS(what, val)
       integer what, val
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -617,7 +617,7 @@ _CM5(
 ! factorisation could be made out of the inner loop, but I don t
 ! have time for that...
 !
-                              call HPFC_PROCLID(
+                              call HPFC PROCLID(
      $                             indp, OPN, lid, .FALSE.)
                               call pvmfsend(
      $                             NODETIDS(lid), 
@@ -633,17 +633,17 @@ _CM5(
             enddo
          enddo
       else
-         call HPFC_SNDTO_O(what, val)
+         call HPFC SNDTO O(what, val)
       endif
       end
 !
 !-----------------
 !
-! HPFC_SNDTO_OOS
+! HPFC SNDTO OOS
 !
 ! send to other owners, if any
 !
-      subroutine HPFC_SNDTO_OOS(what, val)
+      subroutine HPFC SNDTO OOS(what, val)
       integer what, val
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -686,7 +686,7 @@ _CM5(
 ! factorisation could be made out of the inner loop, but I don t
 ! have time for that...
 !
-                           call HPFC_PROCLID(indp, OPN, lid, .FALSE.)
+                           call HPFC PROCLID(indp, OPN, lid, .FALSE.)
                            if (lid.NE.CLID) then
                               call pvmfsend(
      $                             NODETIDS(lid), 
@@ -705,11 +705,11 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_SNDTO_NO
+! HPFC SNDTO NO
 !
 ! send to not owners, when replicated...
 !
-      subroutine HPFC_SNDTO_NO(what, val)
+      subroutine HPFC SNDTO NO(what, val)
       integer what, val
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -725,7 +725,7 @@ _CM5(
 !
 ! is lid in owners ?
 !         
-         call HPFC_CMPPOS(OPN, lid, indp)
+         call HPFC CMPPOS(OPN, lid, indp)
          result = .TRUE.
          do i=1, ndim
             if (OINDP(i).NE.INTFLAG)
@@ -740,23 +740,23 @@ _CM5(
 !     
 !-----------------
 !
-! HPFC_SNDTO_HNO
+! HPFC SNDTO HNO
 !
 ! send to host and not owners, when replicated
 !
-      subroutine HPFC_SNDTO_HNO(what, val)
+      subroutine HPFC SNDTO HNO(what, val)
       integer what, val
       include "fpvm3.h"
       include "hpfc_commons.h"
-      call HPFC_SNDTO_H(what, val)
-      call HPFC_SNDTO_NO(what, val)
+      call HPFC SNDTO H(what, val)
+      call HPFC SNDTO NO(what, val)
       end
 !
 !-----------------
 !
-! HPFC_RCVFR_S
+! HPFC RCVFR S
 !
-      subroutine HPFC_RCVFR_S(what, goal)
+      subroutine HPFC RCVFR S(what, goal)
       integer what, goal
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -768,9 +768,9 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_RCVFR_C
+! HPFC RCVFR C
 !
-      subroutine HPFC_RCVFR_C(what, goal)
+      subroutine HPFC RCVFR C(what, goal)
       integer what, goal
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -782,9 +782,9 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_RCVFR_H
+! HPFC RCVFR H
 !
-      subroutine HPFC_RCVFR_H(what, goal)
+      subroutine HPFC RCVFR H(what, goal)
       integer what, goal
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -797,9 +797,9 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_RCVFR_mCS
+! HPFC RCVFR mCS
 !
-      subroutine HPFC_RCVFR_mCS(what, goal)
+      subroutine HPFC RCVFR mCS(what, goal)
       integer what, goal
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -811,9 +811,9 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_RCVFR_mCH
+! HPFC RCVFR mCH
 !
-      subroutine HPFC_RCVFR_mCH(what, goal)
+      subroutine HPFC RCVFR mCH(what, goal)
       integer what, goal
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -827,12 +827,12 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_LOCALINDGAMMA
+! HPFC LOCALINDGAMMA
 !
 ! computation of the gamma function for local indice access
 !
 !
-      integer function HPFC_LOCALINDGAMMA(an, dim, indice)
+      integer function HPFC LOCALINDGAMMA(an, dim, indice)
       integer an, dim, indice
       include "hpfc_commons.h"
       integer n, sc, no, bmtm
@@ -850,17 +850,17 @@ _CM5(
       t    = indice + bmtm
       nc   = t / sc
       ni   = MOD(t, n)
-      HPFC_LOCALINDGAMMA = n*(nc-no) + ni + 1
+      HPFC LOCALINDGAMMA = n*(nc-no) + ni + 1
       end
 !
 !-----------------
 !
-! HPFC_LOCALINDDELTA
+! HPFC LOCALINDDELTA
 !
 ! computation of the delta function for local indice access
 !
 !
-      integer function HPFC_LOCALINDDELTA(an, dim, indice)
+      integer function HPFC LOCALINDDELTA(an, dim, indice)
       integer an, dim, indice
       include "hpfc_commons.h"
       integer n, sc, no, bmtm, rate, chsz
@@ -880,51 +880,51 @@ _CM5(
       t    = rate*indice + bmtm
       nc   = t / sc
       ni   = MOD(t, n) / abs(rate)
-      HPFC_LOCALINDDELTA = chsz*(nc - no) + ni + 1
+      HPFC LOCALINDDELTA = chsz*(nc - no) + ni + 1
       end
 !
 !-----------------
 !
-! HPFC_LOCALIND
+! HPFC LOCALIND
 !
 !
-      integer function HPFC_LOCALIND(an, dim, indice)
+      integer function HPFC LOCALIND(an, dim, indice)
       integer an, dim, indice
       include "hpfc_commons.h"
 !
 ! I cannot include the .h because of the external declaration of the 
 ! function itself...
 !
-      external HPFC_LOCALINDGAMMA
-      integer HPFC_LOCALINDGAMMA
-      external HPFC_LOCALINDDELTA
-      integer HPFC_LOCALINDDELTA
+      external HPFC LOCALINDGAMMA
+      integer HPFC LOCALINDGAMMA
+      external HPFC LOCALINDDELTA
+      integer HPFC LOCALINDDELTA
       integer newdecl, rate
       newdecl = RANGEA(an, dim, 4)
       if (newdecl.EQ.0) then
 ! no new declaration
-         HPFC_LOCALIND = indice
+         HPFC LOCALIND = indice
          return
       else
       if (newdecl.EQ.1) then
 ! alpha new declaration
-         HPFC_LOCALIND = indice - RANGEA(an, dim, 5)
+         HPFC LOCALIND = indice - RANGEA(an, dim, 5)
          return
       else
       if (newdecl.EQ.2) then
 ! beta new declaration
          rate = RANGEA(an, dim, 6)
-         HPFC_LOCALIND = 1 +
+         HPFC LOCALIND = 1 +
      &        (MOD(rate*indice+RANGEA(an, dim, 7), 
      &             RANGEA(an, dim, 5)) / ABS(RANGEA(an, dim, 6)))
          return
       else
       if (newdecl.EQ.3) then
 ! gamma new declaration
-         HPFC_LOCALIND = HPFC_LOCALINDGAMMA(an, dim, indice)
+         HPFC LOCALIND = HPFC LOCALINDGAMMA(an, dim, indice)
          return
       else
-         HPFC_LOCALIND = HPFC_LOCALINDDELTA(an, dim, indice)
+         HPFC LOCALIND = HPFC LOCALINDDELTA(an, dim, indice)
          return
       endif
       endif
@@ -934,11 +934,11 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_INIT_MAIN
+! HPFC INIT MAIN
 !
 ! entry point in the library for a non differentiated host/node program.
 ! 
-      subroutine HPFC_INIT_MAIN()
+      subroutine HPFC INIT MAIN()
 
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -950,7 +950,7 @@ _CM5(
 !
 ! GLOBAL INITS
 ! 
-      call HPFC_CHECK
+      call HPFC CHECK
 
       HOST NODE MODEL = .false.
       SPAWN PERFORMED = .false.
@@ -958,7 +958,7 @@ _CM5(
 
       NB OF TASKS = MAX SIZE OF PROCS
 
-      call HPFC_INIT_COMMON_PARAM_LIB
+      call HPFC INIT COMMON PARAM LIB
 
       host known = .false.
 
@@ -975,9 +975,9 @@ _CM5(
          HOST TID = MY TID
       end if)
       
-      call pvmfjoingroup(HPFC_GROUP_NAME, inum)
+      call pvmfjoingroup(HPFC GROUP NAME, inum)
       if (inum.lt.0) then
-         call pvmfperror("while joining group in HPFC_INIT_MAIN", info)
+         call pvmfperror("while joining group in HPFC INIT MAIN", info)
          call pvmfexit(info)
          stop
       end if
@@ -996,12 +996,12 @@ _CM5(
       end if
  
       _spawn(
-      debug(print *, "spawning ", MAIN_PROGRAM_NAME)
+      debug(print *, "spawning ", MAIN PROGRAM NAME)
       if (.not. SPAWN PERFORMED) then
          call pvmfspawn(
-     $        MAIN_PROGRAM_NAME,
+     $        MAIN PROGRAM NAME,
      $        PVM ARCH,
-     $        NODE_ARCHITECTURE,
+     $        NODE ARCHITECTURE,
      $        NB OF TASKS,
      $        NODE TIDS,
      $        info)
@@ -1015,15 +1015,15 @@ _CM5(
 ! 
 !-----------------
 !
-! HPFC_INIT_HOST_NODE
+! HPFC INIT HOST NODE
 !
-      subroutine HPFC_INIT_HOST_NODE
+      subroutine HPFC INIT HOST NODE
       include "fpvm3.h"
       include "hpfc_commons.h"
 
       integer info, inum
 
-      call HPFC_CHECK
+      call HPFC CHECK
 
       HOST NODE MODEL = .true.
       SPAWN PERFORMED = .false.
@@ -1031,14 +1031,14 @@ _CM5(
       
       NB OF TASKS = MAX SIZE OF PROCS
 
-      call HPFC_INIT_COMMON_PARAM_LIB
+      call HPFC INIT COMMON PARAM LIB
 
       call pvmfmytid(MYTID)
 
 !
 ! done before the spawn so host is (group, 0)
 !
-      call pvmfjoingroup(HPFC_GROUP_NAME, inum)
+      call pvmfjoingroup(HPFC GROUP NAME, inum)
       if (inum.lt.0) then
          call pvmfperror("while joining group", info)
          call pvmfexit(info)
@@ -1049,11 +1049,11 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_INIT_NODE
+! HPFC INIT NODE
 !
 ! this is the entry point in the hpfc runtime library for a node.
 !
-      subroutine HPFC_INIT_NODE()
+      subroutine HPFC INIT NODE()
       _CM5(include "cmmd_fort.h")
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -1063,10 +1063,10 @@ _CM5(
          call pvmfparent(HOST TID)
       end if
 
-      _direct(call HPFC_DIRECT_ROUTE_IF_POSSIBLE)
+      _direct(call HPFC DIRECT ROUTE IF POSSIBLE)
 
-      call HPFC_INIT_COMMON_PROCS
-      call HPFC_INIT_COMMON_BUFFER
+      call HPFC INIT COMMON PROCS
+      call HPFC INIT COMMON BUFFER
 
 ! receive from host global informations about the nodes implicated
 ! in this run.
@@ -1078,7 +1078,7 @@ _CM5(
       enddo
 
       do i=1, NB OF PROCESSORS
-         call HPFC_CMPPOS(i, MY LID, MY POS(1, i))
+         call HPFC CMPPOS(i, MY LID, MY POS(1, i))
       enddo
 
       debug(write (unit=0,fmt=*) "lid: ", MYLID, " tid: ", MYTID)
@@ -1088,7 +1088,7 @@ _CM5(
 !
       if (MY LID.eq.1) then
          call pvmfinitsend(PVMRAW, info)
-         call pvmfpack(STRING, hpfc_key, 64, 1, info)
+         call pvmfpack(STRING, hpfc key, 64, 1, info)
          call pvmfsend(HOSTTID, 1, info)
       endif
 
@@ -1096,16 +1096,16 @@ _CM5(
 !
 ! cm5 related id initializations
 !
-      CM_HOST_ID = cmmd_host_node()
-      CM_MY_ID   = cmmd_self_address()
-      CM_SIZE    = cmmd_partition_size()
+      CM HOST ID = cmmd_host_node()
+      CM MY ID   = cmmd_self_address()
+      CM SIZE    = cmmd_partition_size()
 !
       call pvmfinitsend(PVMRAW, info)
-      call pvmfpack(INTEGER4, CM_MY_ID, 1, 1, info)
+      call pvmfpack(INTEGER4, CM MY ID, 1, 1, info)
       call pvmfsend(HOSTTID, 1, info)
 !
       call pvmfrecv(HOSTTID, 1, bufid)
-      call pvmfunpack(INTEGER4, CM_NODE_IDS, NBOFTASKS, 1, info)
+      call pvmfunpack(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
 !
 ! end of cm5 related initializations
 !)
@@ -1113,14 +1113,14 @@ _CM5(
 !
 ! insures that all nodes joined the group and are there
 !
-      call HPFC_SYNCHRO
+      call HPFC SYNCHRO
       end
 !
 !-----------------
 !
-! HPFC_INIT_COMMON_PROCS
+! HPFC INIT COMMON PROCS
 !
-      subroutine HPFC_INIT_COMMON_PROCS()
+      subroutine HPFC INIT COMMON PROCS()
       include "hpfc_commons.h"
       integer i
       do i=1, NBOFTASKS
@@ -1137,25 +1137,25 @@ _CM5(
       end
 !-----------------
 !
-! HPFC_INIT_COMMON_BUFFER
-      subroutine HPFC_INIT_COMMON_BUFFER
+! HPFC INIT COMMON BUFFER
+      subroutine HPFC INIT COMMON BUFFER
       include "hpfc_commons.h"
-      BYTE1_BUFFSIZE = SIZEOFBUFFER
-      INTEGER2_BUFFSIZE = SIZEOFBUFFER/2
-      INTEGER4_BUFFSIZE = SIZEOFBUFFER/4
-      REAL4_BUFFSIZE = SIZEOFBUFFER/4
-      REAL8_BUFFSIZE = SIZEOFBUFFER/8
-      COMPLEX8_BUFFSIZE = SIZEOFBUFFER/8
-      COMPLEX16_BUFFSIZE = SIZEOFBUFFER/16
-      SEND_NOT_INITIALIZED = .TRUE.
-      RECEIVED_NOT_PERFORMED = .TRUE.
+      BYTE1 BUFFSIZE = SIZEOFBUFFER
+      INTEGER2 BUFFSIZE = SIZEOFBUFFER/2
+      INTEGER4 BUFFSIZE = SIZEOFBUFFER/4
+      REAL4 BUFFSIZE = SIZEOFBUFFER/4
+      REAL8 BUFFSIZE = SIZEOFBUFFER/8
+      COMPLEX8 BUFFSIZE = SIZEOFBUFFER/8
+      COMPLEX16 BUFFSIZE = SIZEOFBUFFER/16
+      SEND NOT INITIALIZED = .TRUE.
+      RECEIVED NOT PERFORMED = .TRUE.
       end
 !
 !-----------------
 !
-! HPFC_INIT_COMMON_PARAM_LIB
+! HPFC INIT COMMON PARAM LIB
 !
-      subroutine HPFC_INIT_COMMON_PARAM_LIB
+      subroutine HPFC INIT COMMON PARAM LIB
       include "hpfc_commons.h"
       integer i
       do i=1, MAXNBOFARRAYS
@@ -1164,15 +1164,15 @@ _CM5(
 !
 ! the next routine is compiler generated
 !
-      call HPFC_INIT_COMMON_PARAM
+      call HPFC INIT COMMON PARAM
       end
 !
 !-----------------
 !
-! HPFC_DIRECT_ROUTE_IF_POSSIBLE
+! HPFC DIRECT ROUTE IF POSSIBLE
 !
 _direct(`'
-      subroutine HPFC_DIRECT_ROUTE_IF_POSSIBLE
+      subroutine HPFC DIRECT ROUTE IF POSSIBLE
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer nhost, narch, dtid, speed, info
@@ -1190,30 +1190,30 @@ _direct(`'
 !
 !-----------------
 !
-! HPFC_INIT_HOST
+! HPFC INIT HOST
 !
 ! this is the entry point in the hpfc runtime library for a program.
 !
-      subroutine HPFC_INIT_HOST()
+      subroutine HPFC INIT HOST()
       _CM5(include "cmmd_fort.h")
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info, inum, i
-      character*64 node_key
+      character*64 node key
 
       MYLID = 0
       HOSTTID = MYTID
 
-      _direct(call HPFC_DIRECT_ROUTE_IF_POSSIBLE)
+      _direct(call HPFC DIRECT ROUTE IF POSSIBLE)
 
       _spawn(
-      debug(write (unit=0,fmt=*) "spawning ", NODE_PROGRAM_NAME
-      write (unit=0,fmt=*) "   on ", NBOFTASKS, " ", NODE_ARCHITECTURE)
+      debug(write (unit=0,fmt=*) "spawning ", NODE PROGRAM NAME
+      write (unit=0,fmt=*) "   on ", NBOFTASKS, " ", NODE ARCHITECTURE)
 
       call pvmfspawn(
-     $     NODE_PROGRAM_NAME, 
+     $     NODE PROGRAM NAME, 
      $     PVMARCH, 
-     $     NODE_ARCHITECTURE, 
+     $     NODE ARCHITECTURE, 
      $     NBOFTASKS, 
      $     NODETIDS, 
      $     info)
@@ -1237,13 +1237,13 @@ _direct(`'
       end do)
       
       demo(
-      call print_host_info
+      call print host info
       if (HOST NODE MODEL) then 
          write (unit=0,fmt=*) " -- host node model"
       else
          write (unit=0,fmt=*) " -- single main program"
       end if
-      call print_task_info(NBOFTASKS, NODETIDS, HOSTTID))
+      call print task info(NBOFTASKS, NODETIDS, HOSTTID))
 
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
@@ -1255,18 +1255,18 @@ _direct(`'
          stop
       endif)
 
-      call HPFC_INIT_COMMON_PROCS
-      call HPFC_INIT_COMMON_BUFFER
+      call HPFC INIT COMMON PROCS
+      call HPFC INIT COMMON BUFFER
 !
 ! check version of host and node
 ! to insure that both host and node where generated together...
 !
       call pvmfrecv(NODETIDS(1), 1, bufid)
-      call pvmfunpack(STRING, node_key, 64, 1, info)
-      if (node_key.ne.hpfc_key) then
+      call pvmfunpack(STRING, node key, 64, 1, info)
+      if (node key.ne.hpfc key) then
          print *, "*** incompatible version keys!"
-         print *, "*** host: ", hpfc_key
-         print *, "*** node: ", node_key
+         print *, "*** host: ", hpfc key
+         print *, "*** node: ", node key
          do i=1, NBOFTASKS
             call pvmfkill(NODETIDS(i), info)
          enddo
@@ -1278,17 +1278,17 @@ _CM5(
 !
 ! cm5 related id initializations
 !
-      CM_HOST_ID = cmmd_self_address()
-      CM_MY_ID   = CM_HOST_ID
-      CM_SIZE    = cmmd_partition_size()
+      CM HOST ID = cmmd_self_address()
+      CM MY ID   = CM HOST ID
+      CM SIZE    = cmmd_partition_size()
 !
       do i=1, NBOFTASKS
          call pvmfrecv(NODETIDS(i), 1, info)
-         call pvmfunpack(INTEGER4, CM_NODE_IDS(i), 1, 1, info)
+         call pvmfunpack(INTEGER4, CM NODE IDS(i), 1, 1, info)
       enddo
 !
       call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(INTEGER4, CM_NODE_IDS, NBOFTASKS, 1, info)
+      call pvmfpack(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
       call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
 !
 ! end of cm5 related initializations
@@ -1297,37 +1297,37 @@ _CM5(
 !
 ! insures that all nodes joined the group...
 !
-      call HPFC_SYNCHRO
+      call HPFC SYNCHRO
 
       end
 !
 !-----------------
 !
-! HPFC_HOST_END
+! HPFC HOST END
 !
-      subroutine HPFC_HOST_END()
+      subroutine HPFC HOST END()
       integer info
-      sync_exit(call HPFC_SYNCHRO)
+      sync_exit(call HPFC SYNCHRO)
       call pvmfexit(info)
       stop
       end
 !
 !-----------------
 !
-! HPFC_NODE_END
+! HPFC NODE END
 !
-      subroutine HPFC_NODE_END()
+      subroutine HPFC NODE END()
       integer info
-      sync_exit(call HPFC_SYNCHRO)
+      sync_exit(call HPFC SYNCHRO)
       call pvmfexit(info)
       stop
       end
 !
 !-----------------
 !
-! HPFC_RCVFR_N
+! HPFC RCVFR N
 !
-      subroutine HPFC_RCVFR_N()
+      subroutine HPFC RCVFR N()
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
@@ -1336,9 +1336,9 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_SNDTO_N
+! HPFC SNDTO N
 !
-      subroutine HPFC_SNDTO_N()
+      subroutine HPFC SNDTO N()
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
@@ -1347,9 +1347,9 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_REMOTE_LOOP_BOUNDS
+! HPFC REMOTE LOOP BOUNDS
 !
-      subroutine HPFC_REMOTE_LOOP_BOUNDS
+      subroutine HPFC REMOTE LOOP BOUNDS
      $     (nlb, nub, llb, lb, ub, an, dp, pos)
       integer nlb, nub, llb, lb, ub, an, dp, pos
       include "hpfc_commons.h"
@@ -1379,7 +1379,7 @@ _CM5(
 !-----------------
 !
 !
-! HPFC_LOOP_BOUNDS
+! HPFC LOOP BOUNDS
 !
 ! Computation of the local loop bounds:
 ! nlb (new lower bound) and nub (new upper bound)
@@ -1388,12 +1388,12 @@ _CM5(
 ! that access dimension of array da of array number an, mapped
 ! onto dimension of processors dp of processors number pn.
 ! 
-      subroutine HPFC_LOOP_BOUNDS(nlb, nub, llb, lb, ub, an, dp)
+      subroutine HPFC LOOP BOUNDS(nlb, nub, llb, lb, ub, an, dp)
       integer nlb, nub, llb, lb, ub, an, dp
       include "hpfc_commons.h"
       debug(write (unit=0,fmt=*) 
-     $     "HPFC_LOOP_BOUNDS ", lb, ub, " array ", an, dp)
-      call HPFC_REMOTE_LOOP_BOUNDS
+     $     "HPFC LOOP BOUNDS ", lb, ub, " array ", an, dp)
+      call HPFC REMOTE LOOP BOUNDS
      $     (nlb, nub, llb, lb, ub, an, dp, MYPOS(dp, TTOP(ATOT(an))))
       debug(write (unit=0,fmt=*) 
      $     "init lb: ", llb, " new lb: ", nlb, " new ub: ", nub)
@@ -1401,82 +1401,82 @@ _CM5(
 !
 !-----------------
 !
-! HPFC_SYNCHRO
+! HPFC SYNCHRO
 !
-      subroutine HPFC_SYNCHRO()
+      subroutine HPFC SYNCHRO()
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
       debug(write (unit=0,fmt=*) 
-     $     "[hpfc_synchro] ", MYLID, " waiting ", NBOFTASKS+1)
-      call pvmfbarrier(HPFC_GROUP_NAME, NBOFTASKS+1, info)
+     $     "[hpfc synchro] ", MYLID, " waiting ", NBOFTASKS+1)
+      call pvmfbarrier(HPFC GROUP NAME, NBOFTASKS+1, info)
       if (info.lt.0) then
-         call pvmfperror("hpfc_synchro", info)
+         call pvmfperror("hpfc synchro", info)
          call pvmfexit(info)
          stop
       endif
-      debug(write (unit=0,fmt=*) "[hpfc_synchro] done")
+      debug(write (unit=0,fmt=*) "[hpfc synchro] done")
       end
 !
 !-----------------
 !
-! HPFC_HTIMEON
+! HPFC HTIMEON
 !
-      subroutine HPFC_HTIMEON()
-      call HPFC_SYNCHRO()
-      call HPFC_TIMEON()
-      call HPFC_SYNCHRO()
+      subroutine HPFC HTIMEON()
+      call HPFC SYNCHRO()
+      call HPFC TIMEON()
+      call HPFC SYNCHRO()
       end
 !
 !-----------------
 !
-! HPFC_NTIMEON
+! HPFC NTIMEON
 !
-      subroutine HPFC_NTIMEON()
-      call HPFC_SYNCHRO()
-      call HPFC_SYNCHRO()
+      subroutine HPFC NTIMEON()
+      call HPFC SYNCHRO()
+      call HPFC SYNCHRO()
       end
 !
 !-----------------
 !
-! HPFC_HTIMEOFF
+! HPFC HTIMEOFF
 !
-      subroutine HPFC_HTIMEOFF(comment)
+      subroutine HPFC HTIMEOFF(comment)
       character comment*(*)
-      call HPFC_SYNCHRO()
-      call HPFC_TIMEOFF(comment)
+      call HPFC SYNCHRO()
+      call HPFC TIMEOFF(comment)
       end
 !
 !-----------------
 !
-! HPFC_NTIMEOFF
+! HPFC NTIMEOFF
 !
-      subroutine HPFC_NTIMEOFF(comment)
+      subroutine HPFC NTIMEOFF(comment)
       character comment*(*)
-      call HPFC_SYNCHRO()
+      call HPFC SYNCHRO()
       end
 !
 !-----------------
 !
-! HPFC_DIVIDE
+! HPFC DIVIDE
 !
-      integer function HPFC_DIVIDE(i, j)
+      integer function HPFC DIVIDE(i, j)
       integer i,j
       if (i.ge.0) then
-         HPFC_DIVIDE = i/j
+         HPFC DIVIDE = i/j
       else
-         HPFC_DIVIDE = -(-i+j-1)/j
+         HPFC DIVIDE = -(-i+j-1)/j
       endif
       end
 !
 !----------
 !
-! HPFC_PROCDIM
+! HPFC PROCESSOR DIM
 !
 ! this could be computed statically, where it is used...
 ! used for the reductions...
 !
-      integer function HPFC_PROCDIM(an, ad)
+      integer function HPFC PROCESSOR DIM(an, ad)
       include "hpfc_commons.h"
       integer an, ad
       integer tn, pn, i, it, ip
@@ -1492,7 +1492,7 @@ _CM5(
             if (DIST(tn, i, 1).EQ.it) ip = i
          enddo
       endif
-      HPFC_PROCDIM = ip
+      HPFC PROCESSOR DIM = ip
       return
       end
 !
