@@ -65,6 +65,18 @@ char *mod_name;
     return print_parallelized_code(mod_name);
 }
 
+bool print_parallelizedHPF_code(string module_name)
+{
+    bool ok, init;
+
+    init = get_bool_property("PRETTYPRINT_HPF");
+    set_bool_property("PRETTYPRINT_HPF", TRUE);
+    ok = print_parallelized_code(module_name);
+    set_bool_property("PRETTYPRINT_HPF", init);
+    
+    return ok;
+}
+
 bool print_parallelized_code(mod_name)
 char *mod_name;
 {
