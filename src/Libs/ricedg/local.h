@@ -12,12 +12,9 @@
 
 #include "text.h"
 #include "ri.h"
-#include "dg.h"
 
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
+#include "icfg.h"
 
-#include "graph.h"
 #include "database.h"
 #include "makefile.h"
 
@@ -39,4 +36,10 @@ typedef dg_vertex_label vertex_label;
 #include "polyedre.h"
 
 #include "ricedg.h" 
+
+
+
+
+
+
 
