@@ -4,7 +4,8 @@
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
-		make-builder-map
+		make-builder-map \
+		generate_all_menu_documentation
 
 INSTALL_SHR=	epips_view_menu_layout.el \
 		epips_transform_menu_layout.el \
@@ -47,7 +48,7 @@ resources.h: pipsmake.rc
 	# building $@
 	# 
 	sed '/>/!d;s/^.*MODULE\.//;s/^.*PROGRAM\.//;\
-		s/^.*ALL\.//;s/^.*MAIN\.//;' | \
+		s/^.*ALL\.//;s/^.*MAIN\.//;' $< | \
 	tr '[a-z]' '[A-Z]' | sort -u | sed 's/.*/#define DBR_& "&"/' | \
 	cat $(AUTO).h - > $@
 
@@ -61,7 +62,7 @@ phases.h: pipsmake.rc
 	#
 	# building $@
 	#
-	sed '/^[a-z]/!d;s/ .*//g;' | tr '[a-z]' '[A-Z]' | sort -u | \
+	sed '/^[a-z]/!d;s/ .*//g;' $< | tr '[a-z]' '[A-Z]' | sort -u | \
 	sed 's/.*/#define BUILDER_& "&"/' | cat $(AUTO).h - > $@
 
 builder_map.h: pipsmake.rc
@@ -75,7 +76,7 @@ epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_lay
 	# 
 	# building menu layout files:
 	#
-	generate_all_menu_documentation -layout < $<
+	perl ./generate_all_menu_documentation -layout < $<
 
 headers: $(DERIVED_INC)
 
