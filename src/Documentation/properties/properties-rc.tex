@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.117  1998/03/05 14:32:24  irigoin
+%% New property added: PARSER_SUBSTITUTE_ASSIGNED_GOTO FALSE
+%%
 %% Revision 1.116  1998/02/03 09:50:29  ancourt
 %% PRETTYPRINT_WITH_COMMON_NAMES property
 %%
@@ -52,7 +55,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/02/03 09:50:29 $~$
+$~$Date: 1998/03/05 14:32:24 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -433,6 +436,40 @@ be exact when exceptions and errors are ignored.
 PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
 PARSER_RETURN_CODE_VARIABLE "PIPS_RETURN_CODE_"
 \end{verbatim}
+
+\subsubsection{Assigned GO TO}
+\index{Assigned GO TO}
+\index{GO TO (Assigned)}
+\index{Computed GO TO}
+\index{GO TO (Computed)}
+
+By default, assigned GO TO and ASSIGN statements are not accepted.
+These constructs are obsolete and will not be part of future Fortran
+standards.
+
+However, it is possible to replace them automatically in a way similar to
+computed GO TO. Each ASSIGN statement is replaced by a standard integer
+assignment. The label is converted to its numerical value. When an
+assigned GO TO with its optional list of labels is encountered, it is
+transformed into a sequence of logical IF statement with appropriate tests
+and GO TO's. According to Fortran 77 Standard, Section 11.3, Page 11-2,
+the control variable must be set to one of the labels in the optional
+list. Hence a STOP statement is generated to interrupt the execution in case
+this happens, but note that compilers such as SUN f77 and g77 do not check
+this condition at run-time (it is undecidable statically).
+
+\begin{verbatim}
+PARSER_SUBSTITUTE_ASSIGNED_GOTO FALSE
+\end{verbatim}
+
+Assigned GO TO without the optional list of labels are not processed. In
+other words, PIPS make the optional list mandatory for substitution. It
+usually is quite easy to add manually the list of potential targets.
+
+Also, ASSIGN statements cannot be used to define a FORMAT label. If the
+desugaring option is selected, an illegal program is produced by PIPS
+parser.
+
 
 \subsubsection{Symbol Table}
 \index{Symbol Table}
