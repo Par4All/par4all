@@ -44,12 +44,14 @@ typedef struct linear_hashtable_st
  */
 static int key_location(linear_hashtable_pt h, void * k, boolean toget)
 {
-  register int index = ((((int)k)&(0x7fffffff))%(h->size));
+  register int index = ((((int)k)&(0x7fffffff))%(h->size)), loop = h->size;
 
-  while (!(h->keys[index]==FREE_CHUNK ||
-	   h->keys[index]==k ||
-	   (toget && h->keys[index]==EMPTIED_CHUNK)))
+  while (loop-- && !(h->keys[index]==FREE_CHUNK ||
+		   h->keys[index]==k ||
+		   (toget && h->keys[index]==EMPTIED_CHUNK)))
     index = (index+1) % h->size;
+
+  assert(!(!loop && !toget)); /* should not loop to put! */
 
   debug_assert(index>=0 && index<h->size &&
 	       (h->keys[index]==FREE_CHUNK ||
@@ -259,7 +261,8 @@ boolean linear_hashtable_remove(linear_hashtable_pt h, void * k)
 
 void * linear_hashtable_get(linear_hashtable_pt h, void * k)
 {
-  return h->keys[key_location(h, k, true)];
+  register int index = key_location(h, k, true);
+  return h->keys[index]==k ? h->vals[index]: FREE_CHUNK;
 }
 
 int linear_hashtable_nitems(linear_hashtable_pt h)
