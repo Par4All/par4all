@@ -101,7 +101,8 @@ static int
     unique_integer_number = 0,
     unique_float_number = 0,
     unique_logical_number = 0,
-    unique_complex_number = 0;
+    unique_complex_number = 0,
+    unique_string_number = 0;
 
 void 
 reset_unique_variable_numbers()
@@ -113,10 +114,11 @@ reset_unique_variable_numbers()
 }
 
 /* Default prefixes */
-#define DEFAULTINTPREFIX 	"I_"
-#define DEFAULTFLOATPREFIX 	"F_"
-#define DEFAULTLOGICALPREFIX 	"L_"
-#define DEFAULTCOMPLEXPREFIX	"C_"
+#define DEFAULT_INT_PREFIX 	"I_"
+#define DEFAULT_FLOAT_PREFIX 	"F_"
+#define DEFAULT_LOGICAL_PREFIX 	"L_"
+#define DEFAULT_COMPLEX_PREFIX	"C_"
+#define DEFAULT_STRING_PREFIX	"S_"
 
 entity
 make_new_scalar_variable_with_prefix(string prefix,
@@ -136,20 +138,24 @@ make_new_scalar_variable_with_prefix(string prefix,
        if (empty_prefix) {
 	   switch(basic_tag(b)) {
 	   case is_basic_int:
-	       sprintf(buffer,"%s%d", DEFAULTINTPREFIX, 
+	       sprintf(buffer,"%s%d", DEFAULT_INT_PREFIX,
 		       unique_integer_number++);
 	       break;
 	   case is_basic_float:
-	       sprintf(buffer,"%s%d", DEFAULTFLOATPREFIX, 
+	       sprintf(buffer,"%s%d", DEFAULT_FLOAT_PREFIX, 
 		       unique_float_number++);
 	       break;
 	   case is_basic_logical:
-	       sprintf(buffer,"%s%d", DEFAULTLOGICALPREFIX, 
+	       sprintf(buffer,"%s%d", DEFAULT_LOGICAL_PREFIX,
 		       unique_logical_number++);
 	       break;
 	   case is_basic_complex:
-	       sprintf(buffer,"%s%d", DEFAULTCOMPLEXPREFIX, 
+	       sprintf(buffer,"%s%d", DEFAULT_COMPLEX_PREFIX,
 		       unique_complex_number++);
+	       break;
+	   case is_basic_string:
+	       sprintf(buffer, "%s%d", DEFAULT_STRING_PREFIX,
+		       unique_string_number++);
 	       break;
 	   default:
 	       pips_error("make_new_scalar_variable_with_prefix", 
