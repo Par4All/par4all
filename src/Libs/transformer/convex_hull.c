@@ -71,12 +71,12 @@ Psysteme (*method)();
     transformer t = transformer_undefined;
 
 
-    debug(1,"transformer_convex_hulls","begin\n");
-    ifdebug(1) {
+    debug(5,"transformer_convex_hulls","begin\n");
+    ifdebug(5) {
 	(void) fprintf(stderr, "convex hull t1 (%p):\n", t1);
 	dump_transformer(t1) ;
     }
-    ifdebug(1) {
+    ifdebug(5) {
 	(void) fprintf(stderr, "convex hull t2 (%p):\n", t2);
 	dump_transformer(t2) ;
     }
@@ -131,12 +131,12 @@ Psysteme (*method)();
 	predicate_system_(transformer_relation(t)) = (char *) r;
 
     }
-    ifdebug(1) {
+    ifdebug(5) {
 	(void) fprintf(stderr, "convex hull, t (%p):\n", t);
 	dump_transformer(t) ;
     }
 
-    debug(1,"transformer_convex_hulls","end\n");
+    debug(5,"transformer_convex_hulls","end\n");
 
     return t;
 }
