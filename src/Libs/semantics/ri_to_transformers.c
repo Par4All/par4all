@@ -17,6 +17,7 @@
 
 #include "genC.h"
 #include "database.h"
+#include "linear.h"
 #include "ri.h"
 #include "text.h"
 #include "text-util.h"
