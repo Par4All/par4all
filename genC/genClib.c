@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/12/10 10:26:43 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/12/10 13:52:49 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1534,7 +1534,10 @@ gen_chunk *
 gen_copy_tree(
     gen_chunk *obj)
 {
-    return gen_local_copy_tree(obj, FALSE);
+    if (gen_chunk_undefined_p(obj))
+	return gen_chunk_undefined;
+    else
+	return gen_local_copy_tree(obj, FALSE);
 }
 
 /* for re-entry only in gen_copy_tree... 
