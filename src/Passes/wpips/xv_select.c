@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/05 11:01:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/05 12:56:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1995/10/05 11:01:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1995/10/05 12:56:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -279,8 +279,8 @@ end_delete_program_notify(char * name)
 {
    schoose_close();
 
-   if (db_get_current_program_name() != NULL
-       && strcmp(db_get_current_program_name(), name) == 0)
+   if (db_get_current_workspace_name() != NULL
+       && strcmp(db_get_current_workspace_name(), name) == 0)
    {
       int result;
       /* Send to emacs if we are in the emacs mode: */
@@ -309,7 +309,7 @@ end_delete_program_notify(char * name)
       close_program_notify(NULL, NULL);
    }
 
-   (void) delete_program(name);
+   (void) delete_workspace(name);
 
   do_not_delete_the_workspace:
    enable_workspace_delete_or_open();
@@ -354,7 +354,7 @@ start_delete_program_notify(Menu menu,
               program_list_length, program_list,
               /* Choix initial sur le workspace courant si
                  possible : */
-              db_get_current_program_name(),
+              db_get_current_workspace_name(),
               end_delete_program_notify,
               cancel_delete_program_notify);
    }
@@ -368,7 +368,7 @@ start_create_program_notify(Menu menu,
    /* It is not coherent to change directory while creating a program. 
     * Here should the menu item be set to MENU_INACTIVE
     */
-   if (db_get_current_program_name() != NULL)
+   if (db_get_current_workspace_name() != NULL)
       /* There is an open workspace: close it first: */
       /* if close_program_notify((Menu) NULL, (Menu_item) NULL); */
       close_program_notify((Menu) NULL, (Menu_item) NULL);
@@ -502,7 +502,7 @@ end_create_program_notify(int * pargc,
          display_memory_usage();
          
          /* if (create_program(pargc, argv)) { */
-         create_program(pargc, argv);
+         create_workspace(pargc, argv);
          if (TRUE) {
             /* The processing of user files has been successful: */
             enable_workspace_close();
@@ -546,7 +546,7 @@ end_open_program_notify(string name)
        && strcmp(db_get_current_program_name(), name) == 0)
       return;
       */
-   if ( open_program(name) ) {
+   if ( open_workspace(name) ) {
       open_log_file();
       enable_workspace_close();
       show_program();
@@ -612,7 +612,7 @@ close_program_notify(Menu menu,
    success return_value;
    
    /* if (close_program()) { */
-   close_program();
+   close_workspace();
    if (TRUE) {
       /* The close has been successful: */
       close_log_file();
@@ -667,7 +667,7 @@ open_or_create_workspace(char * workspace_name_original)
       return;
    }
       
-   if (db_get_current_program_name() != NULL)
+   if (db_get_current_workspace_name() != NULL)
       /* There is an open workspace: close it first: */
       /* if close_program_notify((Menu) NULL, (Menu_item) NULL); */
       close_program_notify((Menu) NULL, (Menu_item) NULL);
@@ -833,7 +833,7 @@ generate_module_menu()
                     MENU_TITLE_ITEM, " Select in the module list: ",
                     NULL);
 
-   if (db_get_current_program_name() == NULL) {
+   if (db_get_current_workspace_name() == NULL) {
       xv_set(menu, MENU_APPEND_ITEM,
              xv_create(XV_NULL, MENUITEM,
                        MENU_STRING, "* No workspace yet! *",
