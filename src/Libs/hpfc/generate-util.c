@@ -1,11 +1,10 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/10/05 11:32:41 $, ) 
+ * ($Date: 1995/10/10 11:38:24 $, ) 
  */
 
 #include "defines-local.h"
-entity CreateIntrinsic(string); /* in syntax */
 
 /* builds a statement
  *   VAR_i = MYPOS(i, proc_number) // i=1 to proc dimension
@@ -120,7 +119,7 @@ hpfc_add_n(
 {
     return make_assign_statement
 	(entity_to_expression(var),
-	 MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME),
+	 MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 			entity_to_expression(var), int_to_expression(n)));
 }
 
@@ -130,7 +129,7 @@ statement
 hpfc_add_2(
     expression exp)
 {
-    entity plus = CreateIntrinsic(PLUS_OPERATOR_NAME);
+    entity plus = entity_intrinsic(PLUS_OPERATOR_NAME);
     return(make_assign_statement
 	   (expression_dup(exp), 
 	    MakeBinaryCall(plus, exp, int_to_expression(2))));
@@ -276,8 +275,8 @@ buffer_full_condition(
 
     index = hpfc_name_to_entity(BUFFER_INDEX);
     opera = is_full ? 
-	CreateIntrinsic(EQUAL_OPERATOR_NAME) :
-	CreateIntrinsic(NON_EQUAL_OPERATOR_NAME) ;
+	entity_intrinsic(EQUAL_OPERATOR_NAME) :
+	entity_intrinsic(NON_EQUAL_OPERATOR_NAME) ;
     bsize = is_send ? is_full ?
 	hpfc_buffer_entity(array, BUFSZ) :
         MakeConstant("0", is_basic_int) :
