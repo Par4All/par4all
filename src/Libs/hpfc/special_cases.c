@@ -196,7 +196,7 @@ statement initial, *phost, *pnode;
 	 (reference_variable(syntax_reference(expression_syntax(ref))))))
 	return(FALSE);
 
-    arraynum = (int) GET_ENTITY_MAPPING(hpfnumber, array);
+    arraynum = get_hpf_number(array);
 
     hostfunction = make_reduction_function("H", dim, red->kind, b, 0);
     nodefunction = make_reduction_function("N", dim, red->kind, b, 4*dim+2);
