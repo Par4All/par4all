@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/11/16 18:06:40 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/11/17 12:00:56 $, )
  * version $Revision$
  */
  
@@ -378,7 +378,7 @@ bool hpfc_filter(string name)
 
     dir_name = db_get_current_workspace_directory();
     file_name = db_get_file_resource(DBR_SOURCE_FILE, name, TRUE);
-    new_name = catdup(name, HPFC_FILTERED_SUFFIX, NULL);
+    new_name = strdup(concatenate(name, HPFC_FILTERED_SUFFIX, NULL));
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
