@@ -2,6 +2,9 @@
   $Id$
  
   $Log: DirectoryManager.java,v $
+  Revision 1.5  1998/10/17 12:20:50  coelho
+  border++.
+
   Revision 1.4  1998/10/16 17:16:20  coelho
   nope.
 
@@ -70,7 +73,7 @@ public class DirectoryManager implements JPipsComponent
     c.gridwidth = 1; c.gridheight = 1;
     c.ipadx = 1; c.ipady = 1;
     c.anchor = GridBagConstraints.WEST;
-    panel.setBorder(new TitledBorder("Current directory"));
+    panel.setBorder(Pawt.createTitledBorder("Current directory"));
     tf = new PTextField();
     tf.setFont(new Font("Monospaced", Font.PLAIN, 12));
     ActionListener a = new ActionListener() {
@@ -114,7 +117,7 @@ public class DirectoryManager implements JPipsComponent
     */  
   public Component getComponent()
   {
-    return (Component)panel;
+    return (Component) panel;
   }
   
   /** Opens the specified directory in tpips.
@@ -142,7 +145,7 @@ public class DirectoryManager implements JPipsComponent
     */
   public void choose()
   {
-    JFileChooser chooser = new JFileChooser(directory.getAbsolutePath());
+    JFileChooser chooser = Pawt.createFileChooser(directory.getAbsolutePath());
     if(chooser.showOpenDialog(frame) == 0)
     {
       File f = chooser.getSelectedFile();
