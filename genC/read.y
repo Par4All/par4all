@@ -67,7 +67,7 @@ static int shared_number ;
 int allow_forward_ref = FALSE ;
 
 static char * read_external(int);
-static gen_chunk * make_def(int, gen_chunk*, gen_chunk *);
+static gen_chunk * make_def(gen_chunk *);
 static gen_chunk * make_ref(int, gen_chunk *);
 
 %}
@@ -113,77 +113,64 @@ static gen_chunk * make_ref(int, gen_chunk *);
 %type <val> Int Shared_chunk Type
 
 %%
-Read	: Nb_of_shared_pointers Chunk {
-		Read_chunk = $2 ;
-		free( shared_table ) ;
-		YYACCEPT ;
-                /*NOTREACHED*/
-		}
+Read	: Nb_of_shared_pointers Chunk
+          { 
+	    Read_chunk = $2;
+	    free(shared_table);
+	    YYACCEPT ;
+	    /*NOTREACHED*/
+	  }
 	;
 
 Nb_of_shared_pointers 
-  	: Int 	{
-		shared_table = (gen_chunk **)alloc( $1*sizeof( gen_chunk * )) ;
-		}
+  	: Int { shared_table = (gen_chunk **)alloc($1*sizeof(gen_chunk*)); }
 	;
 
-Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP {
-  		int i ;
-		cons *cp ;
-		int length = gen_length( $4 ) ;
-
-		$$ = ($1) ? shared_table[ $1-1 ]:
-			(gen_chunk *)alloc( (GEN_HEADER+length)*sizeof( gen_chunk )) ;
-		$$->i = $3 ;
-
-		for( i=0, cp=gen_nreverse( $4 ); i<length ; i++, cp = cp->cdr )
-			*($$+1+i) = cp->car ;
-#ifdef DBG_READ
-		write_chunk( stderr, $$, GEN_HEADER+length ) ;
-#endif
-		}
+Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP 
+          {
+	    int i ;
+	    cons *cp ;
+	    int length = gen_length($4);
+	    
+	    $$ = ($1) ? shared_table[$1-1]:
+	      (gen_chunk *)alloc((GEN_HEADER+length)*sizeof(gen_chunk));
+	    $$->i = $3;
+	    
+	    for(i=0, cp=gen_nreverse($4); i<length; i++, cp=cp->cdr)
+	      *($$+1+i) = cp->car;
+	    /*
+	    if (!gen_consistent_p($$)) {
+	      fprintf(stderr, "inconsistent type=%d...\n", $3);
+	      }*/
+	  }
 	;
 
 Shared_chunk
-	: LB Int {
-		$$ = shared_number = $2 ;
-		}
-	|	{
-		$$ = shared_number = 0 ;
-		}
+	: LB Int { $$ = shared_number = $2; }
+	|        { $$ = shared_number = 0; }
 	;
 
 Type	: Int 
 	{
 	  int type_number = gen_type_translation_old_to_actual($1);
-	  if( shared_number ) {
+	  if (shared_number)
+	  {
 	    struct gen_binding *bp = &Domains[ type_number ] ;
-	    
-	    shared_table[ shared_number-1 ] = 
-	      (gen_chunk *)alloc(gen_size( bp )*
-				 sizeof( gen_chunk )) ;
+	    shared_table[shared_number-1] = 
+	      (gen_chunk *)alloc(gen_size(bp)*sizeof(gen_chunk)) ;
 	  }
 	  $$ = type_number ;
 	}
 	;
 
-Datas	: Datas Data {	
-	        $$ = CONS( CHUNK, $2.p, $1 ) ;
-		}
-	| 	{
-		$$ = NIL ;
-		}
+Datas	: Datas Data { $$ = CONS( CHUNK, $2.p, $1 ); }
+	| { $$ = NIL; }
 	;
 
-Sparse_Datas	
-	: Sparse_Datas Int Data {	
-	        $$ = CONS(CONSP, 
-			  CONS( INT, $2, CONS( CHUNK, $3.p, NIL)), 
-			  $1 ) ;
+Sparse_Datas: Sparse_Datas Int Data {
+	        $$ = CONS(CONSP, CONS(INT, $2, CONS(CHUNK, $3.p, NIL)), $1);
 		}
-	| 	{
-		$$ = NIL ;
-		}
+	| { $$ = NIL; }
 	;
 
 Data	: Basis	{ $$ = $1; }
@@ -204,24 +191,25 @@ Data	: Basis	{ $$ = $1; }
 		gen_free_list( $3 ) ;
 	        }
         | READ_ARRAY_UNDEFINED { $$.p = array_undefined ; }
-	| VECTOR_BEGIN Int Sparse_Datas RP {
-                gen_chunk *kp ;
-		cons *cp ;
-		int i ;
-
-		kp = (gen_chunk *)alloc( $2*sizeof( gen_chunk )) ;
-
-		for( i=0 ; i != $2 ; i++ ) {
-		    kp[ i ].p = gen_chunk_undefined ;
-		}
-		for( cp=$3 ; cp!=NULL ; cp=cp->cdr ) {
-		    cons *pair = CONSP( CAR( cp )) ;
-		    
-		    kp[ INT(CAR(pair)) ] = CAR(CDR(pair)) ;
-		}
-		gen_free_list( $3 ) ;
-                $$.p = kp ;
-		}
+	| VECTOR_BEGIN Int Sparse_Datas RP 
+          {
+	    gen_chunk *kp ;
+	    cons *cp ;
+	    int i ;
+	    
+	    kp = (gen_chunk *)alloc( $2*sizeof( gen_chunk )) ;
+	    
+	    for( i=0 ; i != $2 ; i++ ) {
+	      kp[ i ].p = gen_chunk_undefined ;
+	    }
+	    for( cp=$3 ; cp!=NULL ; cp=cp->cdr ) {
+	      cons *pair = CONSP( CAR( cp )) ;
+	      
+	      kp[ INT(CAR(pair)) ] = CAR(CDR(pair)) ;
+	    }
+	    gen_free_list($3);
+	    $$.p = kp ;
+	  }
 	| ARROW_BEGIN Datas RP {
 		hash_table h = hash_table_make( hash_chunk, 0 )	;
 		cons *cp ;
@@ -238,7 +226,7 @@ Data	: Basis	{ $$ = $1; }
 		$$.h = h ;
 		}
 	| Chunk { $$.p = $1 ; }
-	| SHARED_POINTER Int { $$.p = shared_table[ $2-1 ]; }
+	| SHARED_POINTER Int { $$.p = shared_table[$2-1]; }
 	;
   
 Basis	: READ_UNIT { $$.u = 1; }
@@ -248,7 +236,7 @@ Basis	: READ_UNIT { $$.u = 1; }
 	| READ_FLOAT { $$.f = $1; }
 	| String { $$ = *$1 ; }
  	| READ_EXTERNAL Int { $$.s = read_external($2); }
-	| READ_DEF Int String Chunk { $$.p = make_def($2,$3,$4); }
+	| READ_DEF Chunk { $$.p = make_def($2); }
 	| READ_REF Int String { $$.p = make_ref($2, $3) ; }
 	| READ_NULL { $$.p = gen_chunk_undefined ; }
 	;
@@ -396,15 +384,12 @@ enter_tabulated_def(
 /* MAKE_DEF defines the object CHUNK of name STRING to be in the tabulation 
    table INT.
  */
-static gen_chunk * make_def(int domain, gen_chunk* String, gen_chunk* gc)
+static gen_chunk * make_def(gen_chunk * gc)
 {
-  char * id = String->s;
+  int domain = gc->i;
+  char * id = strdup((gc+2)->s);
   domain = gen_type_translation_old_to_actual(domain);
   message_assert("domain is tabulated", Domains[domain].index!=-1);
-
-  /* this redundancy could be avoided in the format... */
-  message_assert("same type", domain==gc->i && !strcmp(id, (gc+2)->s));
-
   return enter_tabulated_def(Domains[domain].index, domain, id, gc, 
 			     allow_forward_ref) ;
 }
