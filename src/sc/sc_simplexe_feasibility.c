@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/07/19 10:21:53 $, 
+ * $Date: 1996/07/19 18:28:05 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -79,7 +79,7 @@ static int NB_INEQ = 0;
 	    i=j, j=k, value_division(a,k), value_division(b,k);	\
 	}							\
 	if (value_neg_p(b))					\
-	    a=value_uminus(a), b=value_uminus(b);		\
+	    value_oppose(a), value_oppose(b);			\
     }								\
 }
 
@@ -96,7 +96,7 @@ static int NB_INEQ = 0;
 	    i=j, j=k;					\
     }							\
     if (value_neg_p(j))					\
-	j=value_uminus(j);				\
+	value_oppose(j);				\
 }
 
 #define GCD(j,a,b)				\
@@ -194,7 +194,7 @@ static int NB_INEQ = 0;
 	if (value_notone_p(gd)) value_division(ad,gd), value_division(bd,gd); \
         X.num = mult(A.num,bd);						      \
         v = mult(B.num,ad);						      \
-	value_sub(X.num,v);						      \
+	value_substract(X.num,v);					      \
 	X.den = mult(ad,bd);						      \
 	SIMPLIFIE(X);							      \
 	SIMPL(X.num,gd);						      \
@@ -234,7 +234,7 @@ static int NB_INEQ = 0;
     v = mult(A.den,B.num);						  \
     v = mult(v,C.num);							  \
     v = mult(v,D.den);							  \
-    value_sub(X.num,v);							  \
+    value_substract(X.num,v);						  \
     X.den = mult(A.den,B.den);						  \
     X.den = mult(X.den,C.den);						  \
     X.den = mult(X.den,D.num);						  \
@@ -266,7 +266,7 @@ static int NB_INEQ = 0;
     frac u;						\
     MUL_MACRO(u,B,C,mult); /* u=simplify(b*c) */	\
     DIV_MACRO(X,u,D,mult); /* x=simplify(u/d) */	\
-    X.num=value_uminus(X.num);/* x=-x */		\
+    value_oppose(X.num);   /* x=-x */			\
     pivot_debug_macro("++ ");				\
 }
 
@@ -274,7 +274,7 @@ static int NB_INEQ = 0;
 { tag("PARTIAL_PIVOT_DIRECT")				\
     X.num = mult(B.num,C.num);				\
     X.num = mult(X.num,D.den);				\
-    X.num = value_uminus(X.num);			\
+    value_oppose(X.num);			\
     X.den = mult(B.den,C.den);				\
     X.den = mult(X.den,D.num);				\
     SIMPLIFIE(X);					\
@@ -635,7 +635,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    poidsM = VALUE_ZERO ;
 	    for(; pv !=0 ; pv=pv->succ) 
 		if(vect_coeff(pv->var,sc_base(sc)))
-		    value_add(poidsM,pv->val) ;
+		    value_addto(poidsM,pv->val) ;
 		else valeur = value_uminus(pv->val) ; /* val terme const */
 
 	    for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
@@ -659,7 +659,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 		    assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
 		    if(value_neg_p(poidsM) || 
 		       (value_zero_p(poidsM) && value_neg_p(valeur)))
-			value_add(t[NUMERO].colonne[0].num,pv->val),
+			value_addto(t[NUMERO].colonne[0].num,pv->val),
 			t[NUMERO].colonne[0].den = VALUE_ONE ;
 		    t[NUMERO].existe = 1 ;
 		    t[NUMERO].colonne[t[NUMERO].taille].numero=ligne ;
@@ -685,10 +685,10 @@ sc_simplexe_feasibility_ofl_ctrl(
 		t[i].colonne[1].numero = ligne ;
 		t[i].colonne[1].num = VALUE_MONE ;
 		t[i].colonne[1].den = VALUE_ONE ;
-		poidsM = value_uminus(poidsM), 
-		valeur = value_uminus(valeur) ;
-		value_add(objectif[0].num,valeur) ; 
-		value_add(objectif[1].num,poidsM) ;
+		value_oppose(poidsM), 
+		value_oppose(valeur) ;
+		value_addto(objectif[0].num,valeur) ; 
+		value_addto(objectif[1].num,poidsM) ;
 	    }
 	    /* Mise a jour des colonnes 0 et 1 */
 	    t[0].colonne[t[0].taille].numero = ligne ;
@@ -785,10 +785,10 @@ sc_simplexe_feasibility_ofl_ctrl(
             t[i].colonne[1].numero = ligne ;
             t[i].colonne[1].num = VALUE_MONE ;
             t[i].colonne[1].den = VALUE_ONE ;
-            poidsM = value_uminus(poidsM), 
-	    valeur = value_uminus(valeur);
-            value_add(objectif[0].num,valeur) ;
-            value_add(objectif[1].num,poidsM) ;
+            value_oppose(poidsM), 
+	    value_oppose(valeur);
+            value_addto(objectif[0].num,valeur) ;
+            value_addto(objectif[1].num,poidsM) ;
         }
 	/* Mise a jour des colonnes 0 et 1 */
         t[0].colonne[t[0].taille].numero = ligne ;
@@ -817,7 +817,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         poidsM = VALUE_ZERO ;
         for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ)
             if(vect_coeff(pv->var,sc_base(sc)))
-                value_sub(poidsM, pv->val) ;
+                value_substract(poidsM, pv->val) ;
             else valeur = pv->val ; /* val terme const */
         for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
             if (vect_coeff(pv->var,sc_base(sc))) {
@@ -840,7 +840,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 		assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
                 if(value_neg_p(poidsM) || 
 		   (value_zero_p(poidsM) && value_neg_p(valeur)))
-                    value_sub(t[NUMERO].colonne[0].num,pv->val),
+                    value_substract(t[NUMERO].colonne[0].num,pv->val),
                     t[NUMERO].colonne[0].den = VALUE_ONE ;
                 t[NUMERO].existe = 1 ;
                 t[NUMERO].colonne[t[NUMERO].taille].numero=ligne ;
@@ -864,10 +864,10 @@ sc_simplexe_feasibility_ofl_ctrl(
             t[i].colonne[1].numero = ligne ;
             t[i].colonne[1].num = VALUE_MONE ;
             t[i].colonne[1].den = VALUE_ONE ;
-            poidsM = value_uminus(poidsM), 
-	    valeur = value_uminus(valeur);
-            value_add(objectif[0].num,valeur) ;
-            value_add(objectif[1].num,poidsM) ;
+            value_oppose(poidsM), 
+	    value_oppose(valeur);
+            value_addto(objectif[0].num,valeur) ;
+            value_addto(objectif[1].num,poidsM) ;
         }
 	/* Mise a jour des colonnes 0 et 1 */
         t[0].colonne[t[0].taille].numero = ligne ;
