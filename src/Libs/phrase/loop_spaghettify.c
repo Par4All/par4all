@@ -279,33 +279,39 @@ static control make_exit_from_loop ()
  * of the unstructured loop 
  */
 static control make_body_from_loop (loop the_loop, 
+				    string module_name, 
 				    statement stat,
 				    entity index_variable,
 				    entity increment_variable)
 {
+  statement assignement_statement 
+    = make_assignement_statement (loop_index(the_loop),
+				  make_expression_from_entity (index_variable),
+				  stat);
+  statement spaghettified_body 
+    = spaghettify_statement(loop_body(the_loop),
+			    module_name);
+  statement increment_statement
+    = make_assignement_statement 
+    (index_variable,
+     MakeBinaryCall (entity_intrinsic(PLUS_OPERATOR_NAME),
+		     make_expression_from_entity (index_variable),
+		     make_expression_from_entity (increment_variable)),
+     stat);
+
   sequence body_sequence 
-    = make_sequence (CONS(STATEMENT,
-			  make_assignement_statement 
-			  (loop_index(the_loop),
-			   make_expression_from_entity (index_variable),
-			   stat),
-			  CONS(STATEMENT,
-			       loop_body(the_loop),
-			       CONS(STATEMENT,
-				    make_assignement_statement 
-				    (index_variable,
-				     MakeBinaryCall (entity_intrinsic(PLUS_OPERATOR_NAME),
-						     make_expression_from_entity (index_variable),
-						     make_expression_from_entity (increment_variable)),
-				     stat), NIL))));
-				    				      
-  statement body_statement = make_statement(entity_empty_label(),
-					    statement_number(stat),
-					    statement_ordering(stat),
-					    empty_comments,
-					    make_instruction (is_instruction_sequence,
-							      body_sequence),
-					    NIL,NULL);  
+    = make_sequence (CONS(STATEMENT, assignement_statement,
+			  CONS(STATEMENT, spaghettified_body,
+			       CONS(STATEMENT, increment_statement, NIL))));
+  
+  statement body_statement 
+    = make_statement(entity_empty_label(),
+		     statement_number(stat),
+		     statement_ordering(stat),
+		     empty_comments,
+		     make_instruction (is_instruction_sequence,
+				       body_sequence),
+		     NIL,NULL);  
   return make_control (body_statement, NIL, NIL);
 }
 
@@ -335,33 +341,17 @@ static unstructured make_unstructured_from_loop (loop the_loop,
 						increment_variable);
   control exit = make_exit_from_loop ();
   control body = make_body_from_loop (the_loop, 
+				      module_name,
 				      stat,
 				      index_variable,
 				      increment_variable);
 
-  pips_debug(2,"initialization: &&&&&&&&&&&&&&&\n");
-  ifdebug(2) {
-    print_statement(control_statement(initialization));
-  }
-
-  pips_debug(2,"condition: &&&&&&&&&&&&&&&\n");
-  ifdebug(2) {
-    print_statement(control_statement(condition));
-  }
-
-  pips_debug(2,"exit: &&&&&&&&&&&&&&&\n");
-  ifdebug(2) {
-    print_statement(control_statement(exit));
-  }
-
-  pips_debug(2,"body: &&&&&&&&&&&&&&&\n");
-  ifdebug(2) {
-    print_statement(control_statement(body));
-  }
-
   link_2_control_nodes (initialization, condition); /* after init, we test */
-  link_2_control_nodes (condition, body); /* true condition, we go to body */
+
+  /* The first connexion is the FALSE one */
   link_2_control_nodes (condition, exit); /* false condition, we exit from loop */
+  link_2_control_nodes (condition, body); /* true condition, we go to body */
+
   link_2_control_nodes (body, condition); /* after body, we go back to condition */
   
   return make_unstructured (initialization, exit);
