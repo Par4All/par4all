@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1995/08/08 17:50:03 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1995/08/10 13:02:36 $, )
 # version $Revision$
 #
 
@@ -10,7 +10,7 @@
 
 SCRIPT=`basename $0`
 
-unset DIRECTORY SRCDIR BASEDIR REFFILE TOINSTALL TOMAKE
+unset DIRECTORY SRCDIR BASEDIR REFFILE TOINSTALL TOMAKE ORIGIN
 
 VERBOSE=':'
 DEBUG=':'
@@ -38,8 +38,9 @@ usage()
 	   -v: verbose
 	   -d: debug
 	   -q: quiet
+	   -o: use *.origin as origin file
 	   -n name: target name
-	   -t dir: target directory
+	   -t dir: target directory (default hpfc)
 	   -b dir: database (default current database)
 	   -s dir: where other sources are (default HPFC_INCLUDE then EXTEDIR)
 	   -f file: reference file (default none)
@@ -47,7 +48,7 @@ usage()
   exit ${1:-1}
 }
 
-while getopts himvdqt:s:b:f:n: OPT
+while getopts himvdqot:s:b:f:n: OPT
 do
   case $OPT in
     h) usage 0 ;;
@@ -56,6 +57,7 @@ do
     v) VERBOSE='echo' ;;
     d) DEBUG='echo' ;;
     q) VERBOSE=':' ;;
+    o) ORIGIN=':' ;;
     t) DIRECTORY="$OPTARG" ;;
     s) SRCDIR="$OPTARG" ;;
     b) BASEDIR="$OPTARG" ;;
@@ -114,7 +116,8 @@ then
      $DIRECTORY
 
   $DEBUG "$REFFILE"
-  [ "$REFFILE" ] && cp `echo "$REFFILE" | cut -d " " -f 2` $DIRECTORY/$NAME.f
+  [ "$ORIGIN" ] && cat $BASEDIR/*.origin > $DIRECTORY/$NAME.f
+  [ "$REFFILE" ] && cat `echo "$REFFILE" | cut -d " " -f 2` > $DIRECTORY/$NAME.f
 
   touch $DIRECTORY/hpfc_Makefile
 
