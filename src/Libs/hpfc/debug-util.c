@@ -48,14 +48,14 @@ entity e;
     v = type_variable(entity_type(e));
 
     fprintf(stderr,"basic %s\n",flint_print_basic(variable_basic(v)));
-    MAPL(cd,{print_dimension(DIMENSION(CAR(cd)));},variable_dimensions(v));
+    gen_map(print_dimension, variable_dimensions(v));
 }
 
 void print_align(a)
 align a;
 {
     (void) fprintf(stderr,"aligned\n");
-    MAPL(ca,{print_alignment(ALIGNMENT(CAR(ca)));},align_alignment(a));
+    gen_map(print_alignment, align_alignment(a));
     (void) fprintf(stderr, "to template %s\n\n", entity_name(align_template(a)));
 }
 
@@ -109,11 +109,7 @@ distribute d;
 {
     (void) fprintf(stderr,"distributed\n");
 
-    MAPL(cd,
-     {
-	 print_distribution(DISTRIBUTION(CAR(cd)));
-     }, 
-	 distribute_distribution(d));
+    gen_map(print_distribution, distribute_distribution(d));
 
     (void) fprintf(stderr, "to processors %s\n\n", 
 		   entity_name(distribute_processors(d)));    
@@ -163,33 +159,21 @@ void print_templates()
 {
     (void) fprintf(stderr,"Templates:\n");
 
-    MAPL(ce,
-     {
-	 print_entity_variable(ENTITY(CAR(ce)));
-     },
-	 list_of_templates());
+    gen_map(print_entity_variable, list_of_templates());
 }
 
 void print_processors()
 {
     (void) fprintf(stderr,"Processors:\n");
 
-    MAPL(ce,
-     {
-	 print_entity_variable(ENTITY(CAR(ce)));
-     },
-	 list_of_processors());
+    gen_map(print_entity_variable, list_of_processors());
 }
 
 void print_distributed_arrays()
 {
     (void) fprintf(stderr,"Distributed Arrays:\n");
 
-    MAPL(ce,
-     {
-	 print_entity_variable(ENTITY(CAR(ce)));
-     },
-	 list_of_distributed_arrays());
+    gen_map(print_entity_variable, list_of_distributed_arrays());
 }
 
 
