@@ -1,9 +1,9 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/03 18:55:24 $, 
+%% $Date: 1996/09/04 09:11:31 $, 
 
 \documentclass[a4paper]{article}
-\usepackage{psfig,xspace,html}
+\usepackage{psfig,xspace,html,verbatim}
 \begin{document}
 
 \newcommand{\HPFC}{\htmladdnormallink{\texttt{HPFC}}
@@ -444,7 +444,8 @@ color map parameter values are not taken into account.
 
 These functions return 0 on success and $-1$ otherwise.
 
-\subsubsection{Selecting a color map}
+
+\subsubsection{Setting a color map}
 
 The application can defined each color of all the 256 level by giving
 three array values for the red, green and blue component.\\
@@ -511,7 +512,7 @@ C:
 XPOMP_display window;
 int button, state;
 int X, Y;
-button = XPOMP_is_mouse(window, &X, &state, &Y);
+button = XPOMP_is_mouse(window, &X, &Y, &state);
 \end{verbatim}
 Fortran:
 \begin{verbatim}
@@ -633,7 +634,7 @@ the HPF program through \PIPS{} in order to provide the compiler with the
 necessary information for using the \xPOMP{} display facilities. All
 \xPOMP{} functions are annoted
 as \verb|io| and \verb|fake| with special \verb|!fcd$| %% $
-(\FC directives). The first directive tells that the function or
+(\FC{} directives). The first directive tells that the function or
 subroutine performs only I/O. 
 The second directive tells that the source provided are fake. The effect is
 that the compiler will not generate code by compiling the functions, but
@@ -664,6 +665,19 @@ variable, then the desired effect is achieved with:
 Note that the variables are interpreted by a shell. This directive
 is incorporated in the header file for \xPOMP{} so that the user should
 not need to care about it. Isn't it marvellous?
+
+\subsection{Example}
+
+The following HPF program computes nice images, eventually in parallel if
+compiled with \HPFC{} and run under PVM, based on Benoit Mandelbrot
+function. At each mouse click, the image is zoomed in or out depending on
+the button pressed. 
+
+{\small
+\verbatiminput{fractal.f}
+}
+
+%% \section*{Appendix}
 
 \newpage
 \tableofcontents
