@@ -58,6 +58,9 @@
 # - add calls to SCCS to maintain a version history in Production; the return code
 #   for "sccs deledit" is -1 although evrything works fine; this is corrected via
 #   a dummy shell IF; FI, RK, 28.06.93
+#	RK, 9/07/1993 :
+#		Passage d'un Sed (?) en sed.
+#		Rajout des tags pour vi aussi... :-)
 #
 # wish:
 #
@@ -354,6 +357,7 @@ lint:
 
 TAGS: $(INCLUDES) $(CFILES)
 	etags $(INCLUDES) $(CFILES)
+	ctage $(INCLUDES) $(CFILES)
 
 depend: $(INC_TARGET) production-depend
 
