@@ -245,17 +245,18 @@ bool
 db_close_workspace(void)
 {
     string name = db_get_current_workspace_name();
-    char * modules_list[ARGS_LENGTH];
-    int nmodules = 0, i;
-    
+    int nmodules, i;
+    gen_array_t a;
+
     debug_on("PIPSDBM_DEBUG_LEVEL");
     pips_debug(1, "closing workspace %s\n", name);
 
     user_log("Closing all modules.\n");
-    db_get_module_list(&nmodules, modules_list);
+    a = db_get_module_list();
+    nmodules = gen_array_nitems(a);
     for (i=0; i<nmodules; i++)
-	db_close_module(modules_list[i]);
-    args_free(&nmodules, modules_list);
+	db_close_module(gen_array_item(a, i));
+    gen_array_full_free(a);
     
     user_log("Closing program.\n");
     db_close_module(""); /* ENTITIES are saved here... */
