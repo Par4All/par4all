@@ -3,6 +3,10 @@
  * $Id$
  *
  * $Log: constant.c,v $
+ * Revision 1.24  2003/05/20 08:59:43  irigoin
+ * Handling of unknown constants in MakeValueSymbolic(). Added for Corinne
+ * and EDF code to handle concatenation operator // in DATA constant strings.
+ *
  * Revision 1.23  2002/06/27 14:39:17  irigoin
  * Function complex_constant_expression_p() added.
  *
@@ -319,26 +323,28 @@ string s;
 /* this function creates a value for a symbolic constant. the expression
 e *must* be evaluable. */
 
-value 
-MakeValueSymbolic(e)
-expression e;
+value MakeValueSymbolic(expression e)
 {
-    symbolic s;
-    value v;
+  symbolic s;
+  value v;
 
-    if (value_unknown_p(v = EvalExpression(e))) {
-	pips_error("MakeValueSymbolic", 
-		   "value of parameter must be constant\n");
-    }
-
+  if (value_unknown_p(v = EvalExpression(e))) {
+    /* pips_error("MakeValueSymbolic", 
+       "value of parameter must be constant\n"); */
+    free_value(v);
+    s = make_symbolic(e, make_constant_unknown());
+    /* s = make_symbolic(e, make_constant(is_constant_unknown, UU)); */
+  }
+  else {
     pips_assert("MakeValueSymbolic", value_constant_p(v));
 
     s = make_symbolic(e, value_constant(v));
 
     value_constant(v) = constant_undefined;
     free_value(v);
+  }
 
-    return make_value(is_value_symbolic, s);
+  return make_value(is_value_symbolic, s);
 }
 
 bool
