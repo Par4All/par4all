@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: install_pips_sources,v $ ($Date: 1996/08/26 11:50:57 $, )
+# $RCSfile: install_pips_sources,v $ ($Date: 1996/08/26 11:58:37 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -8,6 +8,9 @@
 script=`basename $0`
 VERBOSE=':'
 DEBUG=':'
+
+VERBOSE='verbose'
+DEBUG='debug'
 
 unset SOURCE_DIR TARGET_DIR COMMENT OPTIONS CLEAN_SCCS FILES
 ONLYDIFF=':'
@@ -31,7 +34,7 @@ error()
 usage()
 {
   cat 1>&2 <<-EOM
-	Usage: $script [-hvdaDr] [-y comment] [-t dir] [-s dir] files
+	Usage: $RCSfile: install_pips_sources,v $ [-hvdaDr] [-y comment] [-t dir] [-s dir] files
 	  version $Revision$
 	  -h: help
 	  -v: verbose
@@ -78,7 +81,7 @@ $DEBUG "target directory is $TARGET_DIR"
 #
 # main loop
 
-$VERBOSE "entering directory $TARGET_DIR"
+$VERBOSE "entering directory $TARGET_DIR [$@]"
 
 [ -d "$TARGET_DIR" ] || mkdir $TARGET_DIR 
 cd $TARGET_DIR
@@ -113,8 +116,8 @@ do
   if [ -d "$src_item" ]
   then
     $VERBOSE "directory, recursing"
-    $0 $OPTIONS -y "$COMMENT" -s "$src_item" -t "$trg_item" \
-    	`cd $src_item ; ls * | sed '/~/d;/SCCS/d;/OLD/d'`
+    $0 $OPTIONS -vd -y "$COMMENT" -s "$src_item" -t "$trg_item" \
+    	`cd $src_item ; ls -d * | sed '/~/d;/SCCS/d;/OLD/d'`
     $DEBUG "end of recursion"
     continue
   fi
