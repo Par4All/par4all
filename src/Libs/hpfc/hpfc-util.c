@@ -5,6 +5,11 @@
  *
  * $Id$
  * $Log: hpfc-util.c,v $
+ * Revision 1.57  1998/09/10 06:31:01  irigoin
+ * Improvement/bug fix in HpfcExpressionToInt() because negative integer
+ * constants are not stored. They are represented by a positive constant and
+ * a unary minus.
+ *
  * Revision 1.56  1998/04/14 20:42:55  coelho
  * *** empty log message ***
  *
@@ -617,6 +622,7 @@ int HpfcExpressionToInt(e)
 expression e;
 {
     normalized n = expression_normalized(e);
+    int val = 0;
 
     ifdebug(8) print_expression(e);
 
@@ -631,8 +637,12 @@ expression e;
 	if ((s==1) && (val!=0)) return val;
     }
     
+    /*
     if (expression_integer_constant_p(e))
 	return ExpressionToInt(e);
+    */
+    if(expression_integer_value(e, &val))
+	return val;
     else
 	pips_internal_error("can't return anything, sorry\n");
 
