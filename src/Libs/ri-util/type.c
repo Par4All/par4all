@@ -2,6 +2,12 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.37  1999/09/02 16:42:29  irigoin
+ * Function please_give_me_a_basic_for_an_expression() modified to cope with
+ * special expressions such as format label referenced in an IO
+ * instruction. The problem was raised by the simple atomizer used by
+ * ATOMIZE_EXPRESSION.
+ *
  * Revision 1.36  1999/05/12 14:40:38  zory
  * please_give_me_a_basic_for_an_expression added...
  *
@@ -528,7 +534,10 @@ basic_type_size(basic b)
  * See basic_of_expression() which is much more comprehensive
  * Intrinsic overloading is not resolved!
  *
- * WARNING: a pointer to an existing data structure is returned.
+ * IO statements contain call to labels of type statement. An
+ * undefined_basic is returned for such expressions.
+ *
+ * WARNING: a pointer to an existing data structure is returned. 
  */
 basic 
 expression_basic(expression expr)
@@ -567,10 +576,12 @@ basic
 please_give_me_a_basic_for_an_expression(expression e)
 {
   basic r = expression_basic(e);
-  if (basic_overloaded_p(r)) 
-    r = basic_of_expression(e); /* try something else... */
-  else
-    r = copy_basic(r);
+  if(!basic_undefined_p(r)) {
+    if (basic_overloaded_p(r)) 
+      r = basic_of_expression(e); /* try something else... */
+    else
+      r = copy_basic(r);
+  }
   return r;
 }
 
