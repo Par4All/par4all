@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/11 08:49:29 $, 
+ * $Date: 1997/04/11 16:30:17 $, 
  */
 
 #include <stdio.h>
@@ -106,6 +106,7 @@ static struct t_completion_scheme completion_scheme[] =
 { "display",    COMP_FILE_RSC,   COMP_NONE },
 { "activate",   COMP_RULE,       COMP_NONE },
 { SET_ENV,	COMP_NONE,	 COMP_NONE },
+{ GET_ENV, 	COMP_NONE, 	 COMP_NONE },
 { SET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { GET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { "info",       COMP_PROPERTY,   COMP_NONE },
@@ -257,6 +258,17 @@ static void setenv_handler(char * line)
 	fprintf(stderr, "error while changing environment\n");
 }
 
+static void getenv_handler(char * line)
+{
+    char *var = skip_first_word(line), *val = getenv(var);
+    user_log("%s\n", line);
+    if (val)
+	fprintf(stdout, "%s=%s\n", var, val);
+    else
+	fprintf(stdout, "%s is not defined\n", var);
+    
+}
+
 /* was set in the grammar, moved here as setenv.
  * motivation: the property lexer can be reused directly here.
  * from the gramar, it must be reimplemented by hand...
@@ -349,6 +361,9 @@ static void help_handler(char * line)
     TP_HELP("setenv",
 	 "setenv    <name>=<value>\n",
 	 "\tchange environment\n");
+    TP_HELP("getenv",
+	  "getenv   <name>\n",
+	    "\tprint from environment (echo ${<name>} also ok)\n");
     TP_HELP("setproperty",
 	 "setproperty <name>=<value>\n",
 	 "\tchange property\n");
@@ -523,6 +538,7 @@ static struct t_handler handlers[] =
   { QUIT,		quit_handler },
   { CHANGE_DIR, 	cdir_handler },
   { SET_ENV,		setenv_handler },
+  { GET_ENV, 		getenv_handler },
   { SET_PROP,   	setproperty_handler },
   { "set ",		setproperty_handler }, /* compatibility */
   { SHELL_ESCAPE, 	shell_handler },
