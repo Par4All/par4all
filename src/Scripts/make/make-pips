@@ -2,7 +2,7 @@
 #! /bin/sh -vx
 #
 # SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1995/09/15 11:15:41 $, )
+# $RCSfile: make-pips,v $ ($Date: 1995/09/19 08:49:00 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -87,7 +87,7 @@ for lib in $LIBS ; do
 		if [ -n "$RECOMPILE" ]
 		then
 			make $MAKE_OPTION clean >/dev/null
-			make $MAKE_OPTION production-depend >/dev/null
+			make $MAKE_OPTION depend >/dev/null
 		fi ;
 		make $MAKE_OPTION recompile >/dev/null)
 	if [ $? -ne 0 ] ; then
@@ -127,7 +127,7 @@ for pass in $PASSES ; do
 		if [ -n "$RECOMPILE" ]
 		then
 			make $MAKE_OPTION clean >/dev/null
-			make $MAKE_OPTION production-depend >/dev/null
+			make $MAKE_OPTION depend >/dev/null
 		fi ;
 		make $MAKE_OPTION recompile >/dev/null)
 	if [ $? -ne 0 ] ; then
