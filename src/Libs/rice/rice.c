@@ -187,10 +187,6 @@ rice_loop(statement stat, int l)
     /* StatementToContext should be freed here. but it is not easy. */
     set_free(region);
 
-    STATEMENT_MAPPING_MAP(ignore, val, {
-	gen_free_list( (list) val ) ;
-    }, get_enclosing_loops_map()) ;
-
     clean_enclosing_loops();
 
     return nstat;
