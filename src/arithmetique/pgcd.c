@@ -167,12 +167,12 @@ Value gcd_subtract(Value a, Value b)
     }
 
     if (value_zero_p(a)) {
-	assert(b!=VALUE_ZERO);
+	assert(value_notzero_p(b));
 	return b;
     }
     else {
 	/* b == 0 */
-	assert(a!=VALUE_ZERO);
+	assert(value_notzero_p(a));
 	return a; 
     }
 }
@@ -249,7 +249,7 @@ Value bezout(Value a, Value b, Value *x, Value *y)
     }
 	
     r = value_mod(a0,a1);
-    while (r!=0)
+    while (value_notzero_p(r))
     {
 	q = value_div(a0,a1);
 	u = value_mult(u1,q);
@@ -264,7 +264,7 @@ Value bezout(Value a, Value b, Value *x, Value *y)
 	r = value_mod(a0,a1);
     }
   
-    if (c==0) {
+    if (value_zero_p(c)) {
 	*x = u1;
 	*y = v1;
     }
@@ -323,7 +323,7 @@ Value bezout_grl(Value a, Value b, Value *x, Value *y)
     }
     else{
 
-	if (a>=b)
+	if (value_ge(a,b))
 	{
 	    a0 = a;
 	    a1 = b;
