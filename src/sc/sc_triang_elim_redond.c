@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/07/27 18:54:23 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/07/29 09:04:42 $, )
   * version $Revision$
   * got on %D%, %T%
   */
