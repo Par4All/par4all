@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/30 15:46:16 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/30 15:59:58 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -191,12 +191,16 @@ GENERIC_REDUCTION($1, 5, $2, $3, $4, $5)
 GENERIC_REDUCTION($1, 6, $2, $3, $4, $5)
 GENERIC_REDUCTION($1, 7, $2, $3, $4, $5)')dnl
 define(`LOGICAL_REDUCTION',`SEVEN_DIMENSION(logical, $1, $2, $3, $4)')dnl
-define(`CUMULATE_REDUCTION',`SEVEN_DIMENSION(cumulate, $1, $2, $3, $4)')dnl
-define(`REDUCTIONS',`
+define(`LOGICAL_REDUCTIONS',`
 LOGICAL_REDUCTION($1, $2, MIN, .LT.)
-LOGICAL_REDUCTION($1, $2, MAX, .GT.)
+LOGICAL_REDUCTION($1, $2, MAX, .GT.)')dnl
+define(`CUMULATE_REDUCTION',`SEVEN_DIMENSION(cumulate, $1, $2, $3, $4)')dnl
+define(`CUMULATE_REDUCTIONS',`
 CUMULATE_REDUCTION($1, $2, SUM, +)
 CUMULATE_REDUCTION($1, $2, MULT, *)')dnl
+define(`REDUCTIONS',`
+LOGICAL_REDUCTIONS($1, $2)
+CUMULATE_REDUCTIONS($1, $2)')dnl
 c
 c All the reductions:
 c
@@ -205,8 +209,8 @@ REDUCTIONS(integer*2, INTEGER2)
 REDUCTIONS(integer*4, INTEGER4)
 REDUCTIONS(real*4, REAL4)
 REDUCTIONS(real*8, REAL8) 
-REDUCTIONS(complex*8, COMPLEX8)
-REDUCTIONS(complex*16, COMPLEX16)
+CUMULATE_REDUCTIONS(complex*8, COMPLEX8)
+CUMULATE_REDUCTIONS(complex*16, COMPLEX16)
 c
 c that is all
 c
