@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1995/10/03 11:36:30 $, )
+# ($Date: 1995/12/12 18:31:13 $, )
 #
 # files:
 LIB_CFILES=	debug.c \
@@ -12,6 +12,7 @@ LIB_CFILES=	debug.c \
 		signal.c \
 		system.c \
 		exception.c \
+		mem_spy.c \
 		malloc_debug.c 
 LIB_HEADERS=	misc-local.h
 #
