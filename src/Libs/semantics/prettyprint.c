@@ -1,7 +1,6 @@
  /* package semantics - prettyprint interface */
 
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 /* #include <stdlib.h> */
 
@@ -42,6 +41,7 @@ static bool is_transformer;
 static bool is_user_view;
 static hash_table nts = hash_table_undefined;
 
+static text text_transformer(transformer tran);
 static void print_code_semantics();
 static text get_semantic_text();
 
@@ -98,10 +98,7 @@ char *module_name;
 {
     char *filename;
     FILE *fd;
-    entity mod;
-    text r = make_text(NIL);
 
-    mod = local_name_to_top_level_entity(module_name);
     /* prepare the prettyprintting */
     filename = strdup(concatenate(db_get_current_program_directory(), 
 				  "/",
@@ -114,9 +111,7 @@ char *module_name;
 				  NULL));
     fd = safe_fopen(filename, "w");
 
-    MERGE_TEXTS(r,get_semantic_text(module_name,TRUE));
-
-    print_text(fd, r);
+    print_text(fd, get_semantic_text(module_name,TRUE));
 
     safe_fclose(fd, filename);
 
@@ -126,7 +121,6 @@ char *module_name;
 			  DBR_PRINTED_FILE),
 			 strdup(module_name),
  			 filename);
-
 }
 
 static text get_semantic_text(module_name,give_code_p)
@@ -142,9 +136,16 @@ bool give_code_p;
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     mod = get_current_module_entity();
 
-    set_current_module_statement((statement)
-				 db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_current_module_statement
+	((statement)db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     mod_stat = get_current_module_statement();
+
+    /* To set up the hash table to translate value into value names */
+    set_cumulated_effects_map( effectsmap_to_listmap
+			      ((statement_mapping)
+			       db_get_memory_resource
+			       (DBR_CUMULATED_EFFECTS, module_name, TRUE)));
+    module_to_value_mappings(mod);
 
     debug_on("SEMANTICS_DEBUG_LEVEL");
 
@@ -161,10 +162,6 @@ bool give_code_p;
 	debug_off();
     }
 
-    /* to set up the hash table to translate value into value names */
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
-						     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
-    module_to_value_mappings(mod);
 
     /* semantic information to print */
     set_semantic_map( (statement_mapping)
@@ -179,13 +176,6 @@ bool give_code_p;
 			       : DBR_SUMMARY_PRECONDITION,
 			       module_name,
 			       TRUE);
-
-    if(string_undefined_p((string) summary)) {
-	pips_error("get_code_semantics",
-		   "Summary information %s unavailable\n",
-		   is_transformer? "DBR_SUMMARY_TRANSFORMER"
-		   : "DBR_SUMMARY_PRECONDITION");
-    }
 
     init_prettyprint(semantic_to_text);
 
@@ -210,10 +200,10 @@ bool give_code_p;
 	hash_table_free(nts);
 	nts = hash_table_undefined;
     }
-    reset_cumulated_effects_map();
     reset_semantic_map();
     reset_current_module_entity();
     reset_current_module_statement();
+    reset_cumulated_effects_map();
 
     return r;
 }
@@ -249,14 +239,14 @@ statement stmt;
  * output   : a text containing commentaries representing the transformer
  * modifies : nothing.
  */
-static text text_transformer(tran)
-transformer tran;
+static text text_transformer(transformer tran)
 {
     text txt = make_text(NIL);
     boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
     string str_tran, str_prefix;
 
-    if(tran != (transformer) HASH_UNDEFINED_VALUE) {
+    if(tran != (transformer) HASH_UNDEFINED_VALUE && 
+       tran != (transformer) list_undefined) {
 	if (is_transformer){
 	    str_tran = transformer_to_string(tran);
 	    if (foresys) 
