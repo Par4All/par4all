@@ -181,6 +181,14 @@ init()
     Current_first = -1 ;
 }
 
+static int max_domain = -1 ;
+
+int
+max_domain_index()
+{
+    return( max_domain ) ;
+}
+
 /* LOOKUP checks whether a given NAME is in the Domains table. If not, the
    ACTION says whether this is an error or it should be introduced. If this
    is for a new gen_binding, look in the current allocation range, else from
@@ -215,6 +223,9 @@ int action ;
 	break ;
     default:
 	fatal( "lookup: Unknown type %s\n", itoa( action )) ;
+    }
+    if( max_domain < bp-Domains ) {
+	max_domain = bp-Domains ;
     }
     return( bp ) ;
 }
