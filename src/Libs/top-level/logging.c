@@ -10,15 +10,17 @@
 #include "properties.h"
 
 #define LOG_FILE "LOGFILE"
-/* The log file is closed by default */
+/* The log file is closed by default
+ */
 static FILE *log_file = NULL;
-/* Used in information messages */
-static char log_file_name[MAXPATHLEN];
 
-
+FILE * get_log_file()
+{
+    return log_file;
+}
 
 void
-close_log_file()
+close_log_file(void)
 {
    if (log_file != NULL && get_bool_property("USER_LOG_P") == TRUE)
       if (fclose(log_file) != 0) {
@@ -31,29 +33,29 @@ close_log_file()
 
 
 void
-open_log_file()
+open_log_file(void)
 {
-   if (log_file != NULL)
-      close_log_file();
 
-   if (get_bool_property("USER_LOG_P") == TRUE) {
-      sprintf(log_file_name, "%s/%s",
-              db_get_current_workspace_directory(),
-              LOG_FILE);
-      
-      if ((log_file = fopen(log_file_name, "a")) == NULL) {
-         perror("open_log_file");
-	 user_error("open_log_file", "Cannot open log file in workspace %s. "
-		    "Check access rights.");
-      }
-   }
+    if (log_file != NULL)
+	close_log_file();
+
+    if (get_bool_property("USER_LOG_P") == TRUE) 
+    {
+	char * log_file_name =
+	    strdup(concatenate(
+		db_get_current_workspace_directory(), "/", LOG_FILE, NULL));
+	
+	if ((log_file = fopen(log_file_name, "a")) == NULL) {
+	    perror("open_log_file");
+	    user_error("open_log_file", 
+		       "Cannot open log file in workspace %s. "
+		       "Check access rights.");
+	}
+
+	free(log_file_name);
+    }
 }
 
-
-FILE * get_log_file()
-{
-    return log_file;
-}
 
 void
 log_on_file(char chaine[])
