@@ -133,20 +133,16 @@ extern char *alloc GEN_PROTO ((int )) ;
 extern bool gen_true GEN_PROTO((chunk *)) ; /* instead of previous ... */
 extern void gen_null GEN_PROTO((chunk *)) ; /* was ... */
 
-extern void gen_slow_recurse GEN_PROTO((chunk *,
-					int, 
-					bool (*)( chunk * ), 
-					void (*)( chunk * ))) ;
+extern void gen_recurse_stop GEN_PROTO((chunk *));
+extern void gen_multi_recurse GEN_PROTO(()); /* was ... */
 extern void gen_recurse GEN_PROTO((chunk *,
 				   int, 
 				   bool (*)( chunk * ), 
 				   void (*)( chunk * ))) ;
 
-extern void gen_recurse_stop GEN_PROTO((chunk *));
-extern void gen_multi_recurse GEN_PROTO(()); /* was ... */
-
-/* Since C is not-orthogonal (chunk1 == chunk2 is prohibited), this one is
-   needed. */
+/* Since C is not-orthogonal (chunk1 == chunk2 is prohibited),
+ * this one is needed.
+ */
 
 #ifndef MEMORY_INCLUDED
 #include <memory.h>
@@ -155,7 +151,8 @@ extern void gen_multi_recurse GEN_PROTO(()); /* was ... */
 
 #define gen_equal(lhs,rhs) (memcmp((lhs),(rhs))==0)
 
-/* GEN_CHECK can be used to test run-time coherence of Newgen values. */
+/* GEN_CHECK can be used to test run-time coherence of Newgen values.
+ */
 
 #ifdef GEN_CHECK
 #undef GEN_CHECK
