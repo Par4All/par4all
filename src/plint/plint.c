@@ -54,7 +54,7 @@ Pbase *b;
 
     double d1;
     int no_som =0;
-    int var2 = 0;
+    Variable var2 = 0;
     int in1;
     boolean non_fin = TRUE;
     boolean non_stop = TRUE;
