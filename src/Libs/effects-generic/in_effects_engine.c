@@ -585,7 +585,8 @@ static void
 in_effects_of_module_statement(statement module_stat)
 {    
     make_effects_private_current_stmt_stack();
-    pips_debug(1,"begin\n");
+  
+     pips_debug(1,"begin\n");
     
     gen_multi_recurse(
 	module_stat, 
@@ -616,7 +617,7 @@ bool
 in_effects_engine(char *module_name)
 {
     statement module_stat;
-
+    make_effects_private_current_context_stack();
     set_current_module_entity(local_name_to_top_level_entity(module_name)); 
 
     /* Get the code of the module. */
@@ -666,6 +667,8 @@ in_effects_engine(char *module_name)
     reset_cumulated_in_effects();
 
     (*effects_computation_reset_func)(module_name);
+
+    free_effects_private_current_context_stack();
 
     return TRUE;
 }
