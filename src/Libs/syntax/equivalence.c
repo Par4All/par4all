@@ -1,7 +1,6 @@
  /* equivalence.c: contains EQUIVALENCE related routines */
 
 #include <stdio.h>
-extern int fprintf();
 
 #include "genC.h"
 #include "ri.h"
@@ -15,14 +14,13 @@ extern int fprintf();
 #define EQUIADD 0
 #define EQUIMER 1
 
-
-/* external variables used by functions from equivalence.c */
+/* external variables used by functions from equivalence.c
+ */
 static equivalences TempoEquivSet = equivalences_undefined;
 static equivalences FinalEquivSet = equivalences_undefined;
 
-
-
-/* re-initialize chains between two successives calls to parser */
+/* re-initialize chains between two successives calls to parser
+ */
 void ResetChains()
 {
     TempoEquivSet = equivalences_undefined;
