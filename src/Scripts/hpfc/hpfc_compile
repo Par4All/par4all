@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/03/24 14:59:41 $, 
+# $Date: 1995/03/24 15:36:28 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -65,14 +65,14 @@ usage()
 	  -w W: workspace W is used for pips and hpfc
 	  -m M: module M is compiled (should be the main)
 	  -n N: source number n
-	  -k K: keyword control (demo, validate)
+	  -k K: keyword control (demo|full,validate)
 	  file: source file
 	EOF
   exit ${1:-1}
 }
 
 #
-# the keyword control enables a global control of tyhe switches
+# the keyword control enables a global control of the switches
 
 while getopts rtivxDdMqsn:hm:w:p:k: OPT
 do
@@ -92,7 +92,7 @@ do
     m) MODULE="$OPTARG" ;;
     w) WORKSPACE="$OPTARG" ;;
     k) case $OPTARG in
-	 demo) 
+	 demo|full)
 	     DELETE=Delete ;
 	     STDERR='/dev/null' ;
 	     VERBOSE='verbose' ;
