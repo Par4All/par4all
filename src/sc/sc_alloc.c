@@ -138,62 +138,27 @@ Pbase b;
 {
     assert(nbv==base_dimension(b));
 
-    return((Pbase) base_dup(b));
+    return((Pbase) base_copy(b));
 }
 
-/* Psystem sc_dup(Psysteme ps): duplication d'un systeme (allocation et copie
- * complete des champs sans sharing)
- *
- * allocate cp;
- * cp := ps;
+/* Psysteme sc_dup(Psysteme ps): should becomes a link
  *
  * Ancien nom (obsolete): cp_sc()
  *
- * Modification: la base est maintenant recopiee dans le meme ordre que la
- * base initiale. (CA, 28/08/91) 
  */
 Psysteme sc_dup(Psysteme ps)
 {
-  Psysteme cp = SC_UNDEFINED;
-
-  if (!SC_UNDEFINED_P(ps)) {
-    Pcontrainte eq, eq_cp;
-    cp = sc_new();
-    
-    for (eq = ps->egalites; eq != NULL; eq = eq->succ) {
-      eq_cp = contrainte_new();
-      contrainte_vecteur(eq_cp) = vect_dup(contrainte_vecteur(eq));
-      sc_add_egalite(cp, eq_cp);
-    }
-    
-    for(eq=ps->inegalites;eq!=NULL;eq=eq->succ) {
-      eq_cp = contrainte_new();
-      contrainte_vecteur(eq_cp) = vect_dup(contrainte_vecteur(eq));
-      sc_add_inegalite(cp, eq_cp);
-    }
-    
-    if(ps->dimension==0) {
-      assert(VECTEUR_UNDEFINED_P(ps->base));
-      cp->dimension = 0;
-      cp->base = VECTEUR_UNDEFINED;
-    }
-    else {
-      assert(ps->dimension==vect_size(ps->base));
-      cp->dimension = ps->dimension;
-      cp->base = base_dup(ps->base);
-    }
-  }
-
-  return cp;
+  return sc_copy(ps);
 }
-/* Psystem sc_copy(Psysteme ps): duplication d'un systeme 
+
+/* Psysteme sc_copy(Psysteme ps): duplication d'un systeme 
  * (allocation et copie complete des champs sans sharing)
- * Voir sc_dup()
- * Modification: la base est maintenant recopiee dans le meme ordre que la
- * base initiale. (CA, 28/08/91)
+ * replace sc_dup(ps), which now becomes a link
  *
- * Modification: L'ordre des egalites et inegalites et des variables dans 
- * le syteme est recopie egalement. (DN,24/6/02)
+ * Ancien nom (obsolete): cp_sc()
+ *
+ * Modification: L'ordre des egalites, inegalites, la base et des variables dans 
+ * le syteme est recopie egalement. (CA, 28/08/91),(DN,24/6/02)
  * 
  */
 Psysteme sc_copy(Psysteme ps)
@@ -204,10 +169,6 @@ Psysteme sc_copy(Psysteme ps)
   if (!SC_UNDEFINED_P(ps)) {
     Pcontrainte eq, eq_cp;
     cp = sc_new();
-    
-    assert(ps->nb_eq == nb_elems_list(ps->egalites));
-    assert(ps->nb_ineq == nb_elems_list(ps->inegalites));
-    //We might ignore nb_eg and nb_ineg here, like sc_dup. DN
 
     //We can use contrainte_copy, contraintes_copy here, 
 
@@ -224,14 +185,18 @@ Psysteme sc_copy(Psysteme ps)
       contrainte_vecteur(eq_cp) = vect_copy(contrainte_vecteur(eq));
       sc_add_inegalite(cp, eq_cp);
     }
-    
+
     if(ps->dimension==0) {
-      assert(VECTEUR_UNDEFINED_P(ps->base));
+      /*ifscdebug(5){//This costs much time
+	assert(VECTEUR_UNDEFINED_P(ps->base));
+	}*/
       cp->dimension = 0;
       cp->base = VECTEUR_UNDEFINED;
     }
     else {
-      assert(ps->dimension==vect_size(ps->base));
+      /*ifscdebug(5){//This costs much time
+	assert(ps->dimension==vect_size(ps->base));
+	}*/
       cp->dimension = ps->dimension;
       cp->base = base_copy(ps->base);
     }
@@ -283,7 +248,7 @@ Psysteme sc;
 
     Psysteme sc1= sc_new();
     sc1->dimension = sc->dimension;
-    sc1->base =base_dup(sc->base); 
+    sc1->base = base_copy(sc->base); 
     return(sc1);
 } 
 
