@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/13 21:17:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/15 09:33:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/13 21:17:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/15 09:33:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1644,11 +1644,14 @@ range obj;
     return(pc);
 }
 
-cons *words_range(obj)
-range obj;
+list /* of string */ words_range(range obj)
 {
     cons *pc = NIL ;
 
+    /* if undefined I print a star, why not!? */
+    if (expression_undefined_p(range_lower(obj)))
+	return CONS(STRING, MAKE_SWORD("*"), NIL);
+    /* else */
     pc = CHAIN_SWORD(pc,"(/I,I=");
     pc = gen_nconc(pc, words_expression(range_lower(obj)));
     pc = CHAIN_SWORD(pc,",");
