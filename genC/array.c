@@ -93,6 +93,13 @@ gen_array_size(gen_array_t a)
     return a->size;
 }
 
+char *
+gen_array_item(gen_array_t a, int i)
+{
+    message_assert("valid index", 0<=i && i<a->size);
+    return a->array[i];
+}
+
 /* Sort: assumes that the items are the first ones.
  */
 static int 
