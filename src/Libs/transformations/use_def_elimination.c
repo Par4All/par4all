@@ -1,3 +1,6 @@
+/* $Id$
+ */
+
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <string.h> 
@@ -8,7 +11,8 @@
 #include "text-util.h"
 #include "misc.h"
 #include "control.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
