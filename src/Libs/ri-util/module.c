@@ -22,7 +22,8 @@ bool variable_in_module_p2(v,m)
 entity v;
 entity m;
 {
-    bool in_module_1 = strcmp(module_local_name(m), entity_module_name(v)) == 0;
+    bool in_module_1 = 
+	same_string_p(module_local_name(m), entity_module_name(v));
     list decl =  code_declarations (value_code(entity_initial (m)));
 
     bool in_module_2 = entity_is_argument_p(v,decl);
@@ -63,34 +64,34 @@ void symbolic_constant_declaration_verify(call c)
 }
 
 void add_non_declared_reference_to_declaration(reference ref)
-{     
-    if (!variable_in_module_p2(reference_variable(ref),checked_module))
+{
+    entity var = reference_variable(ref);
+    type t = entity_type(var);
+
+    if (!variable_in_module_p2(var,checked_module))
     { 
 	value val = entity_initial(checked_module);
 	code ce = value_code(val);
 	list decl =  code_declarations (ce);
 	entity ent= entity_undefined;
 	string name=strdup(concatenate(
-				       module_local_name(checked_module), 
-				       MODULE_SEP_STRING,
-				       entity_local_name(
-
-							 reference_variable(ref)), 
-				       NULL));
-	if ((ent = gen_find_tabulated(name,entity_domain)) == entity_undefined) {
+	    module_local_name(checked_module), 
+	    MODULE_SEP_STRING,
+	    entity_local_name(
+		reference_variable(ref)), 
+	    NULL));
+	if ((ent = gen_find_tabulated(name,entity_domain)) ==entity_undefined)
+	{
 	    ifdebug(8) 
 		(void) fprintf(stderr,
 			       "ajout de la variable symbolique %s au module %s\n",
-			       entity_name(reference_variable(ref)), 
+			       entity_name(var), 
 			       entity_name(checked_module)); 
 
-	    ent =  make_entity( name,
-			       gen_copy_tree(entity_type(
-							 reference_variable(ref))),
-			       gen_copy_tree(entity_storage(
-							    reference_variable(ref))),
-			       gen_copy_tree(entity_initial(
-							    reference_variable(ref))));
+	    ent =  make_entity(name,
+			       gen_copy_tree(entity_type(var)),
+			       gen_copy_tree(entity_storage(var)),
+			       gen_copy_tree(entity_initial(var)));
 
 	    code_declarations(ce) = gen_nconc(decl,
 					      CONS(ENTITY, ent, NIL));
