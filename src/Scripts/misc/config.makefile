@@ -7,14 +7,13 @@ INSTALL_SHR=	pips-deal-with-include \
 		pips-split \
 		pips-unsplit-workspace 
 
-UTL_SCRIPTS = 	check_os \
+UTL_SCRIPTS = \
 		filter_verbatim \
 		job-make \
 		job-receive \
-		trunc \
 		unjustify
 
-FILES =		trunc.awk \
+FILES =	 \
 		extract-doc.awk \
 		accent.sed
 
