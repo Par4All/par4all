@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/10/21 22:35:06 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/23 20:08:06 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -12,11 +12,12 @@
 # ??? I do not deal with "R E A L" like Fortran lexical problems.
 # ??? There may be problems with if and do instructions...
 #     that is IF () & DO with a directive comment would not work.
-# Ctr-L and C-G are used as intermediate characters, that should 
-# not appear in the program, otherwise troubles...
+# independent, new and reduction are orthogonal.
+# Ctrl-L, Ctrl-G and Ctrl-V are used as intermediate characters, 
+# thus should not appear in the program, otherwise troubles...
 # some default value is assigned to number of processors...
 #
-# (c) Fabien Coelho 02/95.
+# (c) Fabien Coelho February 95 and later.
 #
 # F77 and HPF directives -> 
 # calls to HPFC special subroutines and functions -> 
@@ -36,13 +37,15 @@
 # _k: block 
 # _n: new
 # _p: processors
-# _r: number_of_processors()
+# _r: reduction
 # _s: *
 # _t: template
 # _u: pure
 # _y: dynamic
+# _#: number_of_processors()
 #
 # _o: temporary for logical
+# _X: special default processor arrangement
 #
 # missing: inherit
 #
@@ -56,7 +59,7 @@
 # _2: timeon
 # _3: timeoff
 # _4: setbool // to change the compiler global behavior...
-# _5: setint  // dangerous and added to validation purposes...
+# _5: setint  // dangerous and added for validation purposes...
 #
 # (_ is hpfc)
 #
@@ -65,99 +68,105 @@
 # commands:
 #
 # the sed version should be able to handle very large lines... 
-# gnu sed is okay. idem tr.
+# gnu sed is okay. idem tr. SUN sed is not ok.
 
 SED=${HPFC_SED:-sed}
 TR=${HPFC_TR:-tr}
 RM=rm
 BASENAME=basename
 
-# number of processors...
-
+# number of processors:
 NOP=${1:-${HPFC_NUMBER_OF_PROCESSORS:-8}}
 
-#
-# temporary files prefix
-
+# temporary files prefix:
 SCRIPT=`$BASENAME $0`
-
 TMP=/tmp/$SCRIPT.$$
 $RM -f $TMP.*
 
 #
 # directive normalization.
 # FCD are simply translated into hpf-like prefixed directives
+# ??? maybe should I add some option to avoid this translation?
+# directive-origin are switched to ctrl-V
 #
-$SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,chpf$\1,;
-      s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,chpf$\1,' |
+$SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,\1,;
+      s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,' |
 #
 # lower case letters for directives *only*
+# normalization of spaces
 #
-$SED '/^chpf\$/s,A,a,g;/^chpf\$/s,B,b,g;/^chpf\$/s,C,c,g;/^chpf\$/s,D,d,g;
-      /^chpf\$/s,E,e,g;/^chpf\$/s,F,f,g;/^chpf\$/s,G,g,g;/^chpf\$/s,H,h,g;
-      /^chpf\$/s,I,i,g;/^chpf\$/s,J,j,g;/^chpf\$/s,K,k,g;/^chpf\$/s,L,l,g;
-      /^chpf\$/s,M,m,g;/^chpf\$/s,N,n,g;/^chpf\$/s,O,o,g;/^chpf\$/s,P,p,g;
-      /^chpf\$/s,Q,q,g;/^chpf\$/s,R,r,g;/^chpf\$/s,S,s,g;/^chpf\$/s,T,t,g;
-      /^chpf\$/s,U,u,g;/^chpf\$/s,V,v,g;/^chpf\$/s,W,w,g;/^chpf\$/s,X,x,g;
-      /^chpf\$/s,Y,y,g;/^chpf\$/s,Z,z,g;' |
+$SED '//s,A,a,g;//s,B,b,g;//s,C,c,g;//s,D,d,g;
+      //s,E,e,g;//s,F,f,g;//s,G,g,g;//s,H,h,g;
+      //s,I,i,g;//s,J,j,g;//s,K,k,g;//s,L,l,g;
+      //s,M,m,g;//s,N,n,g;//s,O,o,g;//s,P,p,g;
+      //s,Q,q,g;//s,R,r,g;//s,S,s,g;//s,T,t,g;
+      //s,U,u,g;//s,V,v,g;//s,W,w,g;//s,X,x,g;
+      //s,Y,y,g;//s,Z,z,g;//s,[ 	][ 	]*, ,g' |
 #
 # and continuation handling:
-# put on one line
+# put the whole file on one line:-)
 #
 $TR '\012' '' | 
 #
+# then we can pattern-match on carriage returns!
 # remove not desired cr (& and 6 column styles)
 #
-$SED 's,&[ 	]*chpf\$., ,g;
-      s,chpf\$[^ ], ,g' | 
+$SED 's,&[ ]*., ,g;
+      s,[^ ], ,g' | 
 #
 # and back to a normal file
 #
 $TR '' '\012' | 
 #
-# massive transformations.
+# massive pattern-matching transformations.
 # directives are switched to hpfc specials calls.
 #
-$SED '/^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1k\2,g
-      /^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1k\2,g
-      /^chpf\$/s,k\([\,)]\),k()\1,g
-      /^chpf\$/s,\([ 	\,(]\)cyclic\([ 	\,()]\),\1c\2,g
-      /^chpf\$/s,\([ 	\,(]\)cyclic\([ 	\,()]\),\1c\2,g
-      /^chpf\$/s,c\([\,)]\),c(1)\1,g
-      /^chpf\$/s,\*\([\,)]\),s()\1,g
-      s,number_of_processors(),r,g
-      s,^chpf\$ synchro,      1,
-      s,^chpf\$ timeon,      2,
-      s,^chpf\$ timeoff,      3,
-      s,^chpf\$ setbool,      4,
-      s,^chpf\$ setint,      5,
-      s,^chpf\$ local,      i(I_LOCAL)      do I_LOCAL = 0\, 0,
-      s,^chpf\$ endlocal,      enddo,
-      s,^chpf\$ dynamic \(.*\),      y(\1),
-      s,^chpf\$ pure \(.*\),      u(\1),
-      s,^chpf\$ template \(.*\),      o \1      t(\1),
-      s,^chpf\$ processors \(.*\),      o \1      p(\1),
-      s,^chpf\$ align \(.*\) with \(.*\),      a(\1\,\2),
-      s,^chpf\$ realign \(.*\) with \(.*\),      b(\1\,\2),
-      s,^chpf\$ distribute \(.*\) onto \(.*\),      d(\1\,\2),
-      s,^chpf\$ distribute \(.*\),      d(\1\,hpf_default_procs),
-      s,^chpf\$ redistribute \(.*\) onto \(.*\),      e(\1\,\2),
-      s,^chpf\$ redistribute \(.*\),      e(\1\,hpf_default_procs),
-      s,^chpf\$ independent[ 	]*\([^( ,][^()\,]*\),      i(\1),
-      s,^chpf\$ independent[ 	]*\(.*\),      i\1,
-      s,^      i\,,      i()\,,
-      s,^      i(\([^)]*\))[ 	]*\,[ 	]*new[ 	]*(\([^)]*\)),      i(\1)      n(\2),
-      s,\([12345abdeintpyou]\),call hpfc\1,g
-      s,\([ckrs]\),hpfc\1,g' |
+$SED '//s,\([ \,(]\)block\([ \,()]\),\1k\2,g
+      //s,\([ \,(]\)block\([ \,()]\),\1k\2,g
+      //s,k\([\,)]\),k()\1,g
+      //s,\([ \,(]\)cyclic\([ \,()]\),\1c\2,g
+      //s,\([ \,(]\)cyclic\([ \,()]\),\1c\2,g
+      //s,c\([\,)]\),c(1)\1,g
+      //s,\*\([\,)]\),s()\1,g
+      s,number_of_processors(),#,g
+      s, synchro,      1,
+      s, timeon,      2,
+      s, timeoff,      3,
+      s, setbool,      4,
+      s, setint,      5,
+      s, local,      i(I_LOCAL)      do I_LOCAL = 0\, 0,
+      s, endlocal,      enddo,
+      s, dynamic \(.*\),      y(\1),
+      s, pure \(.*\),      u(\1),
+      s, template \(.*\),      o \1      t(\1),
+      s, processors \(.*\),      o \1      p(\1),
+      s, align \(.*\) with \(.*\),      a(\1\,\2),
+      s, align with \(.*\)::\(.*\),      a(\2\,\1),
+      s, realign \(.*\) with \(.*\),      b(\1\,\2),
+      s, realign with \(.*\)::\(.*\),      a(\2\,\1),
+      s, distribute \(.*\) onto \(.*\),      d(\1\,\2),
+      s, distribute onto \(.*\)::\(.*\),      d(\2\,\1),
+      s, distribute \(.*\),      d(\1\,hpfcX),
+      s, redistribute \(.*\) onto \(.*\),      e(\1\,\2),
+      s, redistribute onto \(.*\)::\(.*\),      d(\2\,\1),
+      s, redistribute \(.*\),      e(\1\,hpfcX),
+      s, \(.*\)\,[ ]*new[ ]*\((.*\), \1 new\2,
+      s, \(.*\)\,[ ]*reduction[ ]*\((.*\), \1 reduction\2,
+      s, \(.*\)\,[ ]*independent[ ]*\((.*\), \1 independent\2,
+      s, new[ ]*(,      n(,
+      s, reduction[ ]*(,      r(,
+      s, independent[ ]*\(.*\),      i\1,
+      s,\([12345abdeintpryou]\),call hpfc\1,g
+      s,\([ck#s]\),hpfc\1,g' | 
 #
 # handles multi lines breaking (independent with new...)
 #
-$TR '' '\012' | 
+$TR '' '\012' |
 #
 # number_of_processors substitution.
 # separates static directives from others.
 #
-$SED "s,hpfcr,$NOP,g;
+$SED "s,hpfc#,$NOP,g;
       /^      call hpfc[adptuy45]/w $TMP.1
       /^      call hpfc[adptuy45]/d" > $TMP.0
 
@@ -184,6 +193,8 @@ $SED -n '/^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
          /^[^Cc\*!].... call hpfco /=' $TMP.0 | 
 $SED -n '$p'`
 
+[ "$LINE" ] || LINE=0
+
 #
 # then deal with continuations if any.
 # comments and blank lines are also skipped, or why should I not ?
@@ -201,7 +212,8 @@ $SED -n '$p'`
 
 LINE=${LAST_LINE:-$LINE}
 
-DEFAULT_USED=`grep ',hpf_default_procs)' $TMP.0 $TMP.1`
+DEFAULT_USED=`$SED -n '/\,hpfcX)/p;/\,hpfcX)/q;' $TMP.0 $TMP.1`
+STILL_SOME_DIRECTIVES=`$SED -n '//p;//q;' $TMP.0 $TMP.1`
 
 #
 # final output
@@ -213,8 +225,8 @@ DEFAULT_USED=`grep ',hpf_default_procs)' $TMP.0 $TMP.1`
   #
   [ "$DEFAULT_USED" ] &&
   { 
-    echo "      logical hpf_default_procs($NOP)"
-    echo "      call hpfcp(hpf_default_procs($NOP))"
+    echo "      logical hpfcX($NOP)"
+    echo "      call hpfcp(hpfcX($NOP))"
   }
   $SED -n p $TMP.1
   $SED "1,$LINE d" $TMP.0
@@ -231,9 +243,15 @@ $SED '/^[^Cc\*!].... call hpfc.[( ].\{50,\}$/s/\([^]\{55\}[^,()]*[,()]\)/\1   
 #
 $TR '' '\012'
 
+#
 # clean temporary files
 
 $RM -f $TMP.*
+
+#
+# error if some directives where not analyzed
+
+[ "$STILL_SOME_DIRECTIVES" ] && exit 1 ;
 
 # That is all
 #
