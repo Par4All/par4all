@@ -187,6 +187,10 @@ static bool privatizer(char *module_name)
 	
     }
 
+    /* sort locals
+     */
+    sort_all_loop_locals(module_stat);
+
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
 
     reset_current_module_entity();
@@ -622,8 +626,7 @@ bool print_code_privatized_regions(string module_name)
     set_bool_property("PRETTYPRINT_BLOCKS", TRUE);
     set_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES", TRUE);
 
-    set_read_action_interpretation(READ_IS_IN);
-    set_write_action_interpretation(WRITE_IS_OUT);
+    /* set_action_interpretation(ACTION_IN, ACTION_OUT); */
 
     success = make_text_resource
 	(module_name, file_resource_name, file_name,
