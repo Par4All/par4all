@@ -55,11 +55,6 @@ extern int Nbrdo;
 
 
 
-/* trace.c */
-bool print_filtered_dg_or_dvdg(string /*mod_name*/, bool /*is_dv*/);
-vertex get_vertex_in_list(list /*in_l*/, string /*in_s*/);
-void prettyprint_graph_text(FILE * /*out_f*/, list /*l_of_vers*/);
-void prettyprint_graph_daVinci(FILE * /*out_f*/, list /*l_of_vers/);
 /* util.c */
 extern statement vertex_to_statement(vertex /*v*/);
 extern int vertex_to_ordering(vertex /*v*/);
