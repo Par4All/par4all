@@ -1,9 +1,9 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1995/11/30 14:42:53 $ 
+# $Date: 1995/11/30 14:59:20 $ 
 
 CC	=	$(WP65_CC)
 CFLAGS	=	$(WP65_CFLAGS)
-CPPFLAGS=	$(WP65_CPPFLAGS) $(PIPS_CPPFLAGS) 
+CPPFLAGS=	$(WP65_CPPFLAGS)
 
 LOCAL_LIB=	libwp65runtime.a
 CFILES=		lance_wp65.c
