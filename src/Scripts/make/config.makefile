@@ -15,7 +15,15 @@ SCRIPTS = 	MakeExtern \
 		tape-pips \
 		make-gdbinit
 
+SFILES=		mkextern.l
+RFILES=		mkextern
 FILES =		ctags2extern.awk
+
+mkextern: mkextern.l
+	$(LEX) mkextern.l
+	$(CC) $(CFLAGS) -o mkextern lex.yy.c
+	strip mkextern
+	$(RM) lex.yy.c
 
 # that is all
 #
