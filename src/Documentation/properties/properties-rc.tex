@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.113  1997/12/05 17:34:26  coelho
+%% PIPSMAKE_CHECKPOINTS...
+%%
 %% Revision 1.112  1997/12/05 11:34:18  coelho
 %% PIPSMAKE_SAVE_RESOURCES added.
 %% GENERATE_MISSING_SOURCE_FILE dropped.
@@ -40,7 +43,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1997/12/05 11:34:18 $~$
+$~$Date: 1997/12/05 17:34:26 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -225,10 +228,10 @@ ACTIVATE_DEL_DERIVED_RES TRUE
 \end{verbatim}
 
 How often resources should be saved and freed. $0$ means never, and 
-a positive value means every $n$ requests. 
+a positive value means every $n$ applications of a rule.
 
 \begin{verbatim}
-PIPSMAKE_SAVE_RESOURCES 0
+PIPSMAKE_CHECKPOINTS 0
 \end{verbatim}
 
 \subsection{PipsBDM}
