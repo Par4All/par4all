@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/07/19 18:28:05 $, 
+ * $Date: 1996/07/24 11:22:33 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -460,7 +460,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 {
     Pcontrainte pc, pc_tmp ;
     Pvecteur pv ;
-    int premier_hash = PTR_NIL ; /* tete de liste des noms de variables */
+    int premier_hash = (int) PTR_NIL; /* tete de liste des noms de variables */
     /* Necessaire de declarer "hashtable" static 
      *  pour initialiser tout automatiquement a` 0.
      * Necessaire de chainer les enregistrements
@@ -738,7 +738,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         poidsM = VALUE_ZERO ;
         for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ)
             if(vect_coeff(pv->var,sc_base(sc)))
-                value_add(poidsM,pv->val) ;
+                value_addto(poidsM,pv->val) ;
             else valeur = value_uminus(pv->val); /* val terme const */
         for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
             if(vect_coeff(pv->var,sc_base(sc))) {
@@ -761,7 +761,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 		assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
                 if(value_neg_p(poidsM) || 
 		   (value_zero_p(poidsM) && value_neg_p(valeur)))
-                    value_add(t[NUMERO].colonne[0].num,pv->val),
+                    value_addto(t[NUMERO].colonne[0].num,pv->val),
                     t[NUMERO].colonne[0].den = VALUE_ONE ;
                 t[NUMERO].existe = 1 ;
                 t[NUMERO].colonne[t[NUMERO].taille].numero=ligne ;
@@ -1197,7 +1197,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 
     /* Restauration des entrees vides de la table hashee  */
     FINSIMPLEX :
-	for(i=premier_hash ; i!=PTR_NIL; i=hashtable[i].succ)
+	for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
 	    hashtable[i].nom = 0 ;
     DEBUG2(dump_tableau(t, compteur));
 
