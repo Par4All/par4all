@@ -50,7 +50,7 @@ static statement_mapping 	Gsc_map;
 /* void print_code_static_control((char*) module_name)		AL 05/93
  * Prettyprints a static_control mapping attached to a module_name.
  */
-void print_code_static_control(module_name)
+boolean print_code_static_control(module_name)
 string module_name;
 {
     FILE 	*fd;
@@ -82,6 +82,8 @@ string module_name;
     DB_PUT_FILE_RESOURCE(DBR_PRINTED_FILE, strdup(module_name), 
 			 	filename);
     debug_off();
+
+    return(TRUE);
 }
 
 
