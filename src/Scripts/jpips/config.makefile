@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.3  1998/07/02 15:02:01  coelho
+# also cleans jar and zip files.
+#
 # Revision 1.2  1998/07/02 14:57:40  coelho
 # jpips.jar entry added.
 #
@@ -117,7 +120,7 @@ jrun: $(JJAR)
 	CLASSPATH=$(JJAR) $(JAVA) $(JFLAGS) $(package).JPips
 
 clean:local-clean
-local-clean:; $(RM) $(OJ_FILES) ; $(RM) -rf $(pkg_dir) $(d)
+local-clean:; $(RM) $(OJ_FILES) $(JJAR) $(JZIP); $(RM) -rf $(pkg_dir) $(d)
 
 #
 # java module dependencies (set manually)
