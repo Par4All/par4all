@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.158  2002/04/25 08:30:38  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.157  2002/04/24 15:33:02  phamdat
  * *** empty log message ***
  *
@@ -313,7 +316,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.157 2002/04/24 15:33:02 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.158 2002/04/25 08:30:38 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2484,6 +2487,44 @@ text_named_module(
     debug_off();
     return(r);
 }
+
+/***************written by Dat********************/
+text my_text_named_module(entity module, statement stat)
+{
+    text r = make_text(NIL);
+    code c = entity_code(module);
+    string s = code_decls_text(c);
+
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+
+    /* This guard is correct but could be removed if find_last_statement()
+     * were robust and/or if the internal representations were always "correct".
+     * See also the guard for reset_last_statement()
+     */
+    if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
+	set_last_statement(stat);
+
+    precedence_p = !get_bool_property("PRETTYPRINT_ALL_PARENTHESES");
+
+    if (!same_string_p(s, ""))
+        ADD_SENTENCE_TO_TEXT(r, 
+            attach_head_to_sentence(make_sentence(is_sentence_formatted, 
+						  strdup(s)),
+				    module));
+
+    if (stat != statement_undefined) {
+        MERGE_TEXTS(r, text_statement(module, 0, stat));
+    }
+
+    ADD_SENTENCE_TO_TEXT(r, sentence_tail());
+
+    if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
+	reset_last_statement();
+
+    debug_off();
+    return(r);
+}
+/*************************************************/
 
 text
 text_module(
