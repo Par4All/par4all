@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/27 09:58:08 $, 
+ * $Date: 1997/10/27 10:59:37 $, 
  */
 
 #include <unistd.h>
@@ -332,7 +332,7 @@ nth_path(string path_list, int n)
 static string 
 relative_name_if_necessary(string name)
 {
-    if (name[0]=='/') return strdup(name);
+    if (name[0]=='/' || name[0]=='.') return strdup(name);
     else return strdup(concatenate("./", name, 0));
 }
 
