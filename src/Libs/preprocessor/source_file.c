@@ -351,23 +351,23 @@ static bool zzz_file_p(string s) /* zzz???.f */
 { return strlen(s)==9 && s[0]=='z' && s[1]=='z' && s[2]=='z' &&
       s[6]=='.' && s[7]=='f' && s[8]=='\n'; }
 #define MAX_NLINES 1000
-#define MAX_LENGTH 100
 static int cmp(char**x1, char**x2)
 { return strcmp(*x1, *x2);}
 static void sort_file(string name)
 {
     FILE *f;
     char * lines[MAX_NLINES];
-    char line[MAX_LENGTH];
+    char line[LINE_LENGTH];
     int i=0;
 
     f=safe_fopen(name, "r");
-    while (!feof(f))
+    while (fgets(line, LINE_LENGTH, f))
     {
-	string sg = fgets(line, MAX_LENGTH, f);
-	pips_assert("not too many lines", i<MAX_NLINES);
-	if (sg && !zzz_file_p(sg)) /* drop zzz* files */
+	if (!zzz_file_p(sg)) /* drop zzz* files */
+	{
+	    pips_assert("not too many lines", i<MAX_NLINES);
             lines[i++]=strdup(sg);
+	}
     }
     safe_fclose(f, name);
 
