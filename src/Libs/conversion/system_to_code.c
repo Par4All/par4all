@@ -3,9 +3,8 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1995/11/30 14:44:01 $, ) version $Revision$, 
- * got on %D%, %T%
- * $Id$
+ * $RCSfile: system_to_code.c,v $ version $Revision$, 
+ * ($Date: 1995/12/01 10:32:23 $, ) 
  */
 
 /* Standard includes
@@ -13,9 +12,7 @@
  
 #include <stdio.h>
 #include <string.h> 
-#include <values.h>
-
-#define MININT (-MAXINT) 
+#include <limits.h>
 
 /* Psystems stuff
  */
@@ -258,7 +255,7 @@ range_of_variable(
     return TRUE;
 }
 
-/* returns v lower bound if found, or MININT.
+/* returns v lower bound if found, or INT_MIN.
  */
 static Value vecteur_lower_bound(
     Pvecteur v)
@@ -267,7 +264,7 @@ static Value vecteur_lower_bound(
     Variable var;
 
     if (lowers_undefined_p() || uppers_undefined_p()) 
-	return MININT; /* no information available, that's for sure */
+	return INT_MIN; /* no information available, that's for sure */
 
     for(; v; v=v->succ)
     {
@@ -280,12 +277,12 @@ static Value vecteur_lower_bound(
 	{
 	    if (val>0)
 	    {
-		if (!bound_lowers_p(var)) return MININT;
+		if (!bound_lowers_p(var)) return INT_MIN;
 		bound += val * load_lowers(var);
 	    }
 	    else /* val < 0, I guess */
 	    {
-		if (!bound_uppers_p(var)) return MININT;
+		if (!bound_uppers_p(var)) return INT_MIN;
 		bound += val * load_uppers(var);
 	    }
 	}
