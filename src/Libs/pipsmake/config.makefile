@@ -1,6 +1,6 @@
 #
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1997/10/21 06:29:24 $, 
+# $Id$
+#
 
 YFLAGS+=	-d
 
@@ -9,7 +9,6 @@ YFLAGS+=	-d
 
 LIB_CFILES=	pipsmake.c \
 		activate.c \
-		initializer.c \
 		callgraph.c \
 		openclose.c \
 		callback.c \
