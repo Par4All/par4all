@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/12/26 11:29:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/12/26 15:12:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/26 11:29:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/26 15:12:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -611,7 +611,10 @@ text_entity_declaration(entity module, list ldecl)
 	 }
      }, ldecl);
 
-    r = make_text(before);
+    /* parameters must be kept in order
+     * because that may depend one from the other, hence the reversion.
+     */ 
+    r = make_text(gen_nreverse(before));
 
     ADD_WORD_LIST_TO_TEXT(r, ph);
     attach_declaration_type_to_words(ph, "INTEGER");
@@ -634,7 +637,7 @@ text_entity_declaration(entity module, list ldecl)
     /* And lastly, equivalence statements... - BC -*/
     /* MERGE_TEXTS(r, text_equivalences(module, ldecl)); */
 
-    return (r);
+    return r;
 }
 
 text text_declaration(module)
