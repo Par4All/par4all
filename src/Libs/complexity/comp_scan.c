@@ -168,6 +168,7 @@ char *module_name;
     reset_complexity_map();
     reset_current_module_statement();
 
+    return TRUE;
 }
 
 /* starting point of Abstract Syntax Tree */
