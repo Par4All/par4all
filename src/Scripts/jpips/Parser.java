@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: Parser.java,v $
+ * Revision 1.3  1998/07/02 18:31:24  coelho
+ * simpler parser.
+ *
  * Revision 1.2  1998/07/01 07:06:22  coelho
  * cleaner.
  *
@@ -23,57 +26,21 @@ public class Parser
     extends StreamTokenizer
 {
   /** Defines a StreamTokenizer.
+    * basically it is readLine()... (FC)
     */
   public Parser(FileReader f)
     {
       super(f);
-      
-      wordChars('0', '0');
-      wordChars('1', '1');
-      wordChars('2', '2');
-      wordChars('3', '3');
-      wordChars('4', '4');
-      wordChars('5', '5');
-      wordChars('6', '6');
-      wordChars('7', '7');
-      wordChars('8', '8');
-      wordChars('9', '9');
-      wordChars('_', '_');
-      wordChars('<', '<');
-      wordChars('>', '>');
-      wordChars('[', '[');
-      wordChars(']', ']');
-      wordChars('/', '/');
-      wordChars('.', '.');
-      wordChars('+', '+');
-      wordChars('-', '-');
-      wordChars('(', '(');
-      wordChars(')', ')');
-      wordChars(':', ':');
-      wordChars(' ', ' ');
-      wordChars('!', '!');
-      wordChars('@', '@');
-      wordChars('$', '$');
-      wordChars('%', '%');
-      wordChars('^', '^');
-      wordChars('&', '&');
-      wordChars('*', '*');
-      wordChars(';', ';');
-      wordChars('\'', '\'');
-      wordChars('`', '`');
-      wordChars('~', '~');
-      wordChars('?', '?');
-      wordChars('/', '/');
-      wordChars('\\', '\\');
-      wordChars('|', '|');
-      wordChars('.', '.');
-      wordChars(',', ',');
-      wordChars('"', '"');
- 
-      commentChar('#');
+      resetSyntax();
+
       eolIsSignificant(false);
+
+      wordChars(' ','~'); // from 32 to 126
+
       whitespaceChars(this.TT_EOL,this.TT_EOL);      
       whitespaceChars('\t','\t');      
+
+      commentChar('#');
     }
     
   /** @return the next line which is not null or null if EOF is reached
@@ -89,6 +56,8 @@ public class Parser
 	  System.out.println(e);
 	  System.out.flush();
 	}
+
+      // System.err.println("ret: " + this.sval);
       return this.sval;
     }
 }
