@@ -69,7 +69,7 @@ all::
 	@echo "'make install' to build and install somewhere (in $(prefix))."
 	@echo "---------------------------------------------------"
 all:: $(LIBS_TO_BUILD:%=%libs)
-all:: $(LIBS_TO_BUILD:%=%install-libs)
+#all:: $(LIBS_TO_BUILD:%=%install-libs)
 all:: $(EXEC_TO_BUILD:%=%exec)
 	@echo "---------------------------------------------------"
 	@echo "Type 'make install' to install everything"
@@ -93,12 +93,11 @@ typecheck:
 default:: libs
 	@echo "---------------------------------------------------"
 	@echo "Successfully built Library."
-	@echo "The lib now needs to be installed in order to build executables"
 	@echo "---------------------------------------------------"
-default:: $(INSTALL_LIB)
-	@echo "---------------------------------------------------"
-	@echo "Successfully installed Library."
-	@echo "---------------------------------------------------"
+#default:: $(INSTALL_LIB)
+#	@echo "---------------------------------------------------"
+#	@echo "Successfully installed Library."
+#	@echo "---------------------------------------------------"
 default:: allexec
 
 ###########################################################
@@ -106,7 +105,7 @@ default:: allexec
 ###########################################################
 # main target
 install:: $(LIBS_TO_BUILD:%=%install-libs) \
-	install-include install-man install-docs
+	 install-include install-man install-docs
 install:: $(EXEC_TO_BUILD:%=%install-exec) \
 
 # main target
