@@ -7,15 +7,18 @@
  * pips_assert()
  */
 
+#include <stdlib.h>
 #include <stdio.h>
+/*
 extern int fprintf();
 extern int printf();
 extern int fflush();
 extern int vfprintf(FILE *stream, char *format, ...);
 extern int _flsbuf();
 extern int _filbuf();
-#include <varargs.h>
+*/
 #include <setjmp.h>
+#include <stdarg.h>
 #include <ctype.h>
 
 #include "types.h"
@@ -34,9 +37,7 @@ extern bool get_bool_property(string);
  * where format and arg-list are passed as arguments to vprintf.  
  */
 
-void default_user_log(fmt, args)
-char *fmt;
-va_list args;
+void default_user_log(char *fmt, va_list args)
 {
     if(get_bool_property("USER_LOG_P")==FALSE)
 	return;
@@ -58,16 +59,15 @@ void (* pips_log_handler)(char * fmt, va_list args) = default_user_log;
 
 /* USER_LOG(format [, arg] ... ) */
 /*VARARGS1*/
-void user_log(va_alist)
-va_dcl
+void user_log(char * a_message_format, ...)
 {
-    char *fmt;
-    va_list args;
+    va_list some_arguments;
 
-    va_start(args);
-    fmt=va_arg(args, char *);
-    (* pips_log_handler)(fmt, args);
-    va_end(args);
+    va_start(some_arguments, a_message_format);
+
+    (* pips_log_handler)(a_message_format, some_arguments);
+
+    va_end(some_arguments);
 }
 
 /* USER_REQUEST is a function that should be called to request some data 
@@ -103,18 +103,15 @@ string (* pips_request_handler)() = default_user_request;
 
 /* USER_REQUEST(format [, arg] ... ) */
 /*VARARGS1*/
-string user_request(va_alist)
-va_dcl
+string user_request(char * a_message_format, ...)
 {
-    char *fmt;
-    va_list args;
-    string str;
+   string str;
+   va_list some_arguments;
 
-    va_start(args);
-    fmt=va_arg(args, char *);
-    str = (* pips_request_handler)(fmt, args);
-    va_end(args);
-    return(str);
+   va_start(some_arguments, a_message_format);
+   str = (* pips_request_handler)(a_message_format, some_arguments);
+   va_end(args);
+   return(str);
 }
 
 
@@ -122,19 +119,16 @@ va_dcl
  * for infos.) 
  */
 
-void default_user_warning(args)
-va_list * args;
+void
+default_user_warning(char * calling_function_name,
+                     char * a_message_format,
+                     va_list *some_arguments)
 {
-    char *fmt, *fct;
+   /* print name of function causing warning */
+   (void) fprintf(stderr, "user warning in %s: ", calling_function_name);
 
-    fct=va_arg(* args, char *);
-    fmt=va_arg(* args, char *);
-
-    /* print name of function causing warning */
-    (void) fprintf(stderr, "user warning in %s: ", fct);
-
-    /* print out remainder of message */
-    (void) vfprintf(stderr, fmt, * args);
+   /* print out remainder of message */
+   (void) vfprintf(stderr, a_message_format, *some_arguments);
 }
 
 /* default assignment of pips_warning_handler is default_user_warning. Some 
@@ -147,16 +141,22 @@ void (* pips_warning_handler)() = default_user_warning;
  * string fonction, format;
  */
 /*VARARGS2*/
-void user_warning(va_alist)
-va_dcl
+void
+user_warning(char * calling_function_name,
+             char * a_message_format,
+             ...)
 {
-    va_list args;
+   va_list some_arguments;
 
-    if (get_bool_property("NO_USER_WARNING")) return; /* FC */
+   if (get_bool_property("NO_USER_WARNING")) return; /* FC */
 
-    va_start(args);
-    (* pips_warning_handler)(& args);
-    va_end(args);
+   va_start(some_arguments, a_message_format);
+
+   (* pips_warning_handler)(calling_function_name,
+                            a_message_format,
+                            &some_arguments);
+
+   va_end(some_arguments);
 }
 
 /* make sure the user has noticed something */
@@ -199,40 +199,38 @@ Modifications:
    But each user_error function should have the same functionalities.
 */
 
-void default_user_error(args)
-va_list * args;
+void
+default_user_error(char * calling_function_name,
+                   char * a_message_format,
+                   va_list *some_arguments)
 {
-    extern jmp_buf pips_top_level;
-    string fonction, fmt;
+   extern jmp_buf pips_top_level;
 
-    fonction=va_arg(* args, char *);
-    fmt=va_arg(* args, char *);
+   /* print name of function causing error */
+   (void) fprintf(stderr, "user error in %s: ", calling_function_name);
 
-    /* print name of function causing error */
-    (void) fprintf(stderr, "user error in %s: ", fonction);
+   /* print out remainder of message */
+   (void) vfprintf(stderr, a_message_format, * some_arguments);
 
-    /* print out remainder of message */
-    (void) vfprintf(stderr, fmt, * args);
+   /* terminate PIPS request */
+   if (get_bool_property("ABORT_ON_USER_ERROR")) {
+      abort();
+   }
+   else {
+      static bool user_error_called = FALSE;
 
-    /* terminate PIPS request */
-    if(get_bool_property("ABORT_ON_USER_ERROR")) {
-	abort();
-    }
-    else {
-	static bool user_error_called= FALSE;
+      if (user_error_called) {
+         (void) fprintf(stderr, "This user_error is too much! Exiting.\n");
+         exit(1);
+      }
+      else {
+         user_error_called = TRUE;
+      }
 
-	if (user_error_called) {
-	    (void) fprintf(stderr, "This user_error is too much! Exiting.\n");
-	    exit(1);
-	}
-	else {
-	    user_error_called= TRUE;
-	}
-
-	/*prompt_user schould be used... if it were implemented!*/
-	/*prompt_user("Something went wrong. Flash back to top_level.");*/
-	longjmp(pips_top_level, 2);
-    }
+      /*prompt_user schould be used... if it were implemented!*/
+      /*prompt_user("Something went wrong. Flash back to top_level.");*/
+      longjmp(pips_top_level, 2);
+   }
 }
 
 /* default assignment of pips_error_handler is default_user_error. Some 
@@ -245,16 +243,20 @@ void (* pips_error_handler)() = default_user_error;
  * string fonction, format;
  */
 /*VARARGS2*/
-void user_error(va_alist)
-va_dcl
+void
+user_error(char * calling_function_name,
+           char * a_message_format,
+           ...)
 {
-    va_list args;
+   va_list some_arguments;
 
-    va_start(args);
+   va_start(some_arguments, a_message_format);
 
-    (* pips_error_handler)(&args);
+   (* pips_error_handler)(calling_function_name,
+                          a_message_format,
+                          &some_arguments);
 
-    va_end(args)
+   va_end(some_arguments);
 }
 
 
@@ -271,24 +273,25 @@ arguments to vprintf. PIPS_ERROR terminates execution with abort.
  * string fonction, format;
  */
 /*VARARGS2*/
-void pips_error(va_alist)
-va_dcl
+void
+pips_error(char * calling_function_name,
+           char * a_message_format,
+           ...)
 {
-    va_list args;
-    char *fmt;
+   va_list some_arguments;
 
-    va_start(args);
+   /* print name of function causing error */
+   (void) fprintf(stderr, "pips error in %s: ", calling_function_name);
 
-    /* print name of function causing error */
-    (void) fprintf(stderr, "pips error in %s: ", va_arg(args, char *));
-    fmt = va_arg(args, char *);
+   va_start(some_arguments, a_message_format);
 
-    /* print out remainder of message */
-    (void) vfprintf(stderr, fmt, args);
-    va_end(args);
+   /* print out remainder of message */
+   (void) vfprintf(stderr, a_message_format, some_arguments);
 
-    /* create a core file for debug */
-    (void) abort();
+   va_end(some_arguments);
+
+   /* create a core file for debug */
+   (void) abort();
 }
 
 /* PIPS_ASSERT tests whether the second argument is true. If not, message
