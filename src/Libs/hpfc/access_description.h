@@ -1,3 +1,7 @@
+/* $Id$
+ * $log$
+ */
+
 #ifndef ACCESS_DESCRIPTION_H
 #define ACCESS_DESCRIPTION_H
 
