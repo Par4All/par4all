@@ -9,6 +9,8 @@
 
 %token PROGRAM
 %token MODULE
+%token MAIN
+%token COMMON
 %token CALLEES
 %token CALLERS
 %token ALL
@@ -16,6 +18,7 @@
 %token PRODUCED
 %token MODIFIED
 %token PRESERVED
+%token PRE_TRANSFORMATION
 %token DOT
 %token NAME
 
@@ -98,6 +101,11 @@ deps:		deps dir virtuals
 					gen_nconc(rule_modified($1), $3);
 							 
 			}
+			else if ($2 == PRE_TRANSFORMATION) {
+				rule_pre_transformation($1) = 
+					gen_nconc(rule_pre_transformation($1), $3);
+							 
+			}
 			else {	
 				fprintf(stderr, 
 				        "[readmakefile] unknown dir: %d\n", $2);
@@ -108,7 +116,7 @@ deps:		deps dir virtuals
 		}
 				
 	|
-		{ $$ = make_rule(string_undefined, NIL, NIL, NIL, NIL); }
+		{ $$ = make_rule(string_undefined, NIL, NIL, NIL, NIL, NIL); }
 	;
 
 dir:		REQUIRED
@@ -119,6 +127,8 @@ dir:		REQUIRED
 		{ $$ = MODIFIED; }
 	|	PRESERVED
 		{ $$ = PRESERVED; }
+	|	PRE_TRANSFORMATION
+		{ $$ = PRE_TRANSFORMATION; }
 	;
 
 virtuals:	virtuals virtual
@@ -135,6 +145,13 @@ owner:		PROGRAM
 		{ $$ = make_owner(is_owner_program, UU); }
 	|	MODULE
 		{ $$ = make_owner(is_owner_module, UU); }
+	|	MAIN
+		{ $$ = make_owner(is_owner_main, UU); }
+	|	COMMON
+		{
+		    /*$$ = make_owner(is_owner_common, UU);*/
+		    YYERROR;
+		}
 	|	CALLEES
 		{ $$ = make_owner(is_owner_callees, UU); }
 	|	CALLERS
@@ -181,6 +198,9 @@ list lrv;
 	  case is_owner_module:
 	    fprintf(fd, "    %s module.%s\n", dir, n);
 	    break;
+	  case is_owner_main:
+	    fprintf(fd, "    %s main.%s\n", dir, n);
+	    break;
 	  case is_owner_callees:
 	    fprintf(fd, "    %s callees.%s\n", dir, n);
 	    break;
@@ -204,6 +224,7 @@ makefile m;
 	rule r = RULE(CAR(pr));
 
 	fprintf(fd, "%s\n", rule_phase(r));
+	fprint_virtual_resources(fd, "\t!", rule_pre_transformation(r));
 	fprint_virtual_resources(fd, "\t<", rule_required(r));
 	fprint_virtual_resources(fd, "\t>", rule_produced(r));
 	fprint_virtual_resources(fd, "\t=", rule_preserved(r));
@@ -213,10 +234,16 @@ makefile m;
 		
 makefile parse_makefile()
 {
+    string default_pipsmake_rc_file;
 
     if (pipsmakefile == makefile_undefined) {
-	if ((yyin = fopen(PIPSMAKE_RC, "r")) == (FILE *) NULL)
-	    yyin = safe_fopen(DEFAULT_PIPSMAKE_RC, "r");
+
+	if (((default_pipsmake_rc_file = getenv("DEFAULT_PIPSMAKE_RC_FILE")) == NULL) ||
+	    ((yyin = fopen(default_pipsmake_rc_file, "r")) == (FILE *) NULL))
+
+	    if ((yyin = fopen(PIPSMAKE_RC, "r")) == (FILE *) NULL)
+		yyin = safe_fopen(DEFAULT_PIPSMAKE_RC, "r");
+
 	init_lex();
 	yyparse();
 	safe_fclose(yyin, "");
