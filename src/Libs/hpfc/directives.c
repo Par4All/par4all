@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/04/19 15:53:28 $, )
+ * ($Date: 1996/04/23 13:42:14 $, )
  */
 
 #include "defines-local.h"
@@ -217,8 +217,10 @@ alignment_p(list /* of expressions */ align_src,
  *  used by both align and realign management.
  */
 static align 
-extract_the_align(reference alignee,
-		  reference temp)
+extract_the_align(
+    reference alignee,
+    reference temp,
+    list /* of expression */ lopt)
 {
     list/* of alignments  */ aligns    = NIL,
 	/* of expressions */ align_src = reference_indices(alignee),
@@ -232,6 +234,10 @@ extract_the_align(reference alignee,
         array_as_template(template);
 
     pips_user_assert("align with a template", entity_template_p(template));
+    pips_user_assert("one set of indices", !(lopt && align_src));
+
+    if (lopt) align_src = lopt;
+
     tndim = NumberOfDimension(template);
     andim = NumberOfDimension(array);
     
@@ -306,6 +312,7 @@ static void
 one_align_directive(
     reference alignee,/* the array */
     reference temp,   /* the template */
+    list /* of expressions */ lopt,
     bool dynamic)     /* realign or align */
 {
     entity template = reference_variable(temp),
@@ -315,7 +322,7 @@ one_align_directive(
     pips_debug(3, "%s %saligned with %s\n", entity_name(array),
 	       dynamic ? "re" : "", entity_name(template));
 
-    a = extract_the_align(alignee, temp);
+    a = extract_the_align(alignee, temp, lopt);
     normalize_align(array, a);
 
     ifdebug(8) print_align(a);
@@ -341,6 +348,14 @@ one_align_directive(
     }       
 }
 
+/* hack, the common indices of a free form align is stored in a BLOCK()
+ */
+static bool 
+align_indices_p(entity f)
+{
+    return same_string_p(entity_local_name(f), HPF_PREFIX BLOCK_SUFFIX);
+}
+
 /* handle a full (re)align directive. 
  * just decompose into simple alignments...
  */
@@ -349,8 +364,9 @@ handle_align_and_realign_directive(entity f,
 				   list /* of expressions */ args,
 				   bool dynamic)
 {
-    list last = gen_last(args);
+    list /* of expression */ last = gen_last(args), lopt=NIL;
     reference template;
+    expression first;
 
     /* last points to the last item of args, which should be the template
      */
@@ -361,9 +377,17 @@ handle_align_and_realign_directive(entity f,
 
     if (dynamic) store_renamings(current_stmt_head(), NIL);
 
+    first = EXPRESSION(CAR(args));
+    if (align_indices_p(expression_to_entity(first)))
+    {
+	pips_debug(5, "external align indices\n");
+	lopt = call_arguments(syntax_call(expression_syntax(first)));
+	POP(args);
+    }
+
     for(; args!=last; POP(args))
 	one_align_directive(expression_to_reference(EXPRESSION(CAR(args))), 
-			    template, dynamic);
+			    template, lopt, dynamic);
 }
 
 /* one DISTRIBUTE directive management
@@ -411,8 +435,9 @@ extract_the_distribute(reference distributee, reference proc)
     expression parameter = expression_undefined;
     entity processor = reference_variable(proc),
            template = reference_variable(distributee);
-    list/* of expressions */   lformat = reference_indices(distributee),
-	                       largs,
+    list/* of expressions */   largs,
+        lformat = reference_indices(distributee)? /* keep the non empty one */
+	    reference_indices(distributee): reference_indices(proc),
 	/* of distributions */ ldist = NIL;
     int npdim, ntdim;
     tag format;
@@ -482,7 +507,8 @@ one_distribute_directive(
            template  = reference_variable(distributee);
     distribute d = extract_the_distribute(distributee, proc);
 
-    pips_user_assert("no indices to processor", ENDP(reference_indices(proc)));
+    pips_user_assert("no indices to processor or :: syntax", 
+      ENDP(reference_indices(proc)) || ENDP(reference_indices(distributee)));
     
     normalize_distribute(template, d);
 
