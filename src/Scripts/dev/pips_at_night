@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/07/21 14:46:46 $, )
+# ($Date: 1996/07/22 18:53:37 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -105,18 +105,25 @@ rm -f ${report}*
 
     test "$no_cleaning" ||
     {
-	$verbose deleting old workspaces...
+	$verbose cleaning pips
 	$verbose date: `date`
+
+	$verbose - deleting old workspaces...
 	find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +7 -print | 
 	    xargs ${PIPS_UTILDIR}/Delete
 	    
-	$verbose removing core files older than one week
+	$verbose - removing core files older than one week
 	find ${PIPS_HOME}/Pips -name core -mtime +7 -print | 
-	xargs rm -f
+	    xargs rm -f
+
+	$verbose - deleting forgotten validation directories and files
+	find ${PIPS_HOME}/Pips -name '.validate_*' -mtime +7 -print |
+	    xargs rm -rf
     }
 
     #
     # COMPILE
+    $verbose recompiling Production
     msg=""
 
     # 1: NEWGEN
