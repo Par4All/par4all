@@ -1035,6 +1035,20 @@ retype_formal_parameters()
 		      entity_local_name(v));
 	    }
 	}
+	else if(storage_undefined_p(entity_storage(v))
+		|| (storage_ram_p(v) && variable_entity_p(v))
+		|| (storage_rom_p(v) && entity_function_p(v))) {
+		debug(8, "retype_formal_parameters", "Cannot retype entity %s: warning!!!\n",
+		      entity_local_name(v));
+		user_warning("retype_formal_parameters",
+			     "Cannot retype variable or function %s."
+			     " Move up the implicit statement at the beginning of declarations.\n",
+			     entity_local_name(v));
+	}
+	else {
+	    debug(8, "retype_formal_parameters", "Ignore entity %s\n",
+		  entity_local_name(v));
+	}
     }, vars);
 
     /* If the current module is a function, its type should be updated. */
