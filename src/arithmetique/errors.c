@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.10  1998/10/26 14:35:47  coelho
+  constants in .h.
+
   Revision 1.9  1998/10/24 15:36:22  coelho
   better exception error messages...
 
@@ -29,12 +32,12 @@
 
 /* global constants to designate exceptions.
    to be put in the type field bellow.
- */
 unsigned int overflow_error = 1;
 unsigned int simplex_arithmetic_error = 2;
 unsigned int user_exception_error = 4;
 unsigned int parser_exception_error = 8;
 unsigned int any_exception_error = ~0;
+ */
 
 /* whether to run in debug mode (that is to trace catch/uncatch/throw)
  */
