@@ -21,18 +21,18 @@ bool
 print_filtered_dependence_graph(mod_name)
 string mod_name;
 {
-    fprintf(stderr, "print_filtered_dependence_graph worked");
-
-    return TRUE;
+    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES",
+		      TRUE);
+    return print_filtered_dg_or_dvdg(mod_name, FALSE);
 }
 
 bool
 print_filtered_dependence_daVinci_graph(mod_name)
 string mod_name;
 {
-    fprintf(stderr, "print_filtered_depedence_daVinci_graph worked");
-    
-    return TRUE;
+    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES",
+		      TRUE);
+    return print_filtered_dg_or_dvdg(mod_name, TRUE);
 }
 
 bool 
