@@ -14,8 +14,6 @@
   * Idem for type Psysteme (FI 3 November 1990)
   */
 
-#ifndef _ri_util_h_has_been_read
-
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
@@ -223,7 +221,3 @@ remove_a_control_from_a_list_and_relink_direction;
 
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
-
-#define _ri_util_h_has_been_read
-#endif /* _ri_util_h_has_been_read */
-
