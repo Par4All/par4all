@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.104  1998/06/25 22:05:54  keryell
+ * Added an "&" in tpips_user_requestfor DEC/OSF1. It was wrong anyway...
+ *
  * Revision 1.103  1998/06/24 07:29:53  coelho
  * jpips_printf added.
  *
@@ -595,7 +598,7 @@ tpips_user_request(string fmt, va_list args)
     if (jpips_is_running)
     {
 	jpips_tag(BEGIN_RQ);
-	jpips_string(fmt, args);
+	jpips_string(fmt, & args);
 	jpips_tag(END_RQ);
     }
     else if (use_readline)
