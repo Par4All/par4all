@@ -66,6 +66,9 @@ ValueSizeOfArray(entity e)
 }
     
 
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
 
 /* this function returns the length in bytes of the fortran type
 represented by a basic. */
@@ -117,7 +120,7 @@ basic b;
   return e;
 }
 
-
+/* END_EOLE */
 
 
 /* this function computes the number of elements of a variable. ld is the
