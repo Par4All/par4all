@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/07/22 12:04:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/04 15:46:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_statement[] = "%A% ($Date: 1997/07/22 12:04:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_statement[] = "%A% ($Date: 1997/09/04 15:46:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -35,12 +35,13 @@ LOCAL stmt StmtHeap[MAXSTMT];
 LOCAL int CurrentStmt = 0;
 
 
-
+
 /* to produce statement numbers */
 static int stat_num = 1;
 static bool skip_num = FALSE ;
 
-void reset_statement_number()
+void 
+reset_statement_number()
 {
     stat_num = 1;
     skip_num = FALSE;
@@ -81,7 +82,8 @@ decrement_statement_number()
 /* this functions looks up in table StmtHeap for the statement s whose
 label is l. */
 
-statement LabelToStmt(l)
+statement 
+LabelToStmt(l)
 string l;
 {
     int i;
@@ -99,7 +101,8 @@ string l;
 goto to that label has been encountered and if no statement with this
 label has been parsed. */
 
-void CheckAndInitializeStmt()
+void 
+CheckAndInitializeStmt()
 {
     int i;
     int MustStop = FALSE;
@@ -125,7 +128,8 @@ void CheckAndInitializeStmt()
 /* this function stores a new association in table StmtHeap: the label
 of statement s is e. */
 
-void NewStmt(e, s)
+void 
+NewStmt(e, s)
 entity e;
 statement s;
 {
@@ -143,7 +147,7 @@ statement s;
 }
 
 
-
+
 /* The purpose of the following data structure is to build the control
 structure of the procedure being analyzed. each time a control statement
 (do loop, block if, ...) is analyzed, a new block is created and pushed
@@ -167,22 +171,26 @@ typedef struct block {
 LOCAL block BlockStack[MAXBLOCK];
 LOCAL int CurrentBlock = 0;
 
-void ResetBlockStack()
+void 
+ResetBlockStack()
 {
     CurrentBlock = 0;
 }
 
-bool IsBlockStackEmpty()
+bool 
+IsBlockStackEmpty()
 {
 	return(CurrentBlock == 0);
 }
 
-bool IsBlockStackFull()
+bool 
+IsBlockStackFull()
 {
 	return(CurrentBlock == MAXBLOCK);
 }
 
-void PushBlock(i, l)
+void 
+PushBlock(i, l)
 instruction i;
 string l;
 {
@@ -198,7 +206,8 @@ string l;
 	CurrentBlock += 1;
 }
 
-instruction PopBlock()
+instruction 
+PopBlock()
 {
 	if (IsBlockStackEmpty())
 		ParserError("PopBlock", "bottom of stack reached\n");
@@ -207,11 +216,12 @@ instruction PopBlock()
 }
 
 
-
+
 /* this functions creates a label. LABEL_PREFIX is added to its name, for
 integer constants and labels not to have the name space. */
 
-entity MakeLabel(s)
+entity 
+MakeLabel(s)
 string s;
 {
 	entity l;
@@ -248,7 +258,8 @@ string s;
  * are destroyed by the controlizer. To be changed.
  */
 
-statement MakeStatement(l, i)
+statement 
+MakeStatement(l, i)
 entity l;
 instruction i;
 {
@@ -356,7 +367,8 @@ statements. if i is the last instruction of the block (i and the block
 have the same label), the current block is popped from the stack. in
 fortran, one instruction migth end more than one block. */
 
-void LinkInstToCurrentBlock(i, number_it)
+void 
+LinkInstToCurrentBlock(i, number_it)
 instruction i;
 bool number_it;
 {
@@ -434,7 +446,8 @@ s is the name of the intrinsic function.
 
 e is one optional argument (might be equal to expression_undefined). */
 
-instruction MakeZeroOrOneArgCallInst(s, e)
+instruction 
+MakeZeroOrOneArgCallInst(s, e)
 char *s;
 expression e;
 {
@@ -450,7 +463,8 @@ expression e;
 
 /* this function creates a goto instruction. n is the target label. */
 
-instruction MakeGotoInst(n)
+instruction 
+MakeGotoInst(n)
 string n;
 {
     entity l = entity_undefined;
@@ -469,7 +483,8 @@ string n;
  * everything is fine. Else the target statement has to be synthesized
  * blindly ahead of time.
  */
-instruction make_goto_instruction(entity l)
+instruction 
+make_goto_instruction(entity l)
 {
   statement s = LabelToStmt(entity_name(l));
   instruction g = instruction_undefined;
@@ -489,7 +504,8 @@ instruction make_goto_instruction(entity l)
 }
 
 
-instruction MakeComputedGotoInst(ll, i)
+instruction 
+MakeComputedGotoInst(ll, i)
 list ll;
 entity i;
 {
@@ -575,7 +591,8 @@ l is a reference (the left hand side).
 
 e is an expression (the right hand side). */
 
-instruction MakeAssignInst(l, e)
+instruction 
+MakeAssignInst(l, e)
 syntax l;
 expression e;
 {
@@ -601,10 +618,17 @@ expression e;
 				      gen_append(asub, lexpr)));
      }
      else
-       /* FI: we stumble here when a Fortran macro is used */
-       ParserError("MakeAssignInst",
-		   "bad lhs (function call or undeclared array) or "
-		   "unsupported Fortran macro\n");
+	 if(syntax_call_p(l)) {
+	     /* FI: we stumble here when a Fortran macro is used */
+	     user_warning("MakeAssignInst", "%s() appears as lhs\n",
+			  entity_local_name(call_function(syntax_call(l))));
+	     ParserError("MakeAssignInst",
+			 "bad lhs (function call or undeclared array) or "
+			 "PIPS unsupported Fortran macro\n");
+	 }
+	 else {
+	     FatalError("MakeAssignInst", "Unexpected syntax tag\n");
+	 }
    }
 
    return i;
@@ -615,7 +639,8 @@ expression e;
 /* this function creates a call statement. e is the called function. l
 is the argument list. */
 
-instruction MakeCallInst(e, l)
+instruction 
+MakeCallInst(e, l)
 entity e;
 cons * l;
 {
@@ -636,7 +661,8 @@ r is the range of the do loop.
 
 l is the label of the last statement of the loop. */
 
-void MakeDoInst(s, r, l)
+void 
+MakeDoInst(s, r, l)
 syntax s;
 range r;
 string l;
@@ -683,7 +709,8 @@ string l;
  *    disturbs the statement numering
  */
 
-instruction MakeLogicalIfInst(e, i)
+instruction 
+MakeLogicalIfInst(e, i)
 expression e;
 instruction i;
 {
@@ -724,7 +751,8 @@ becomes
 
 */
 
-instruction MakeArithmIfInst(e, l1, l2, l3)
+instruction 
+MakeArithmIfInst(e, l1, l2, l3)
 expression e;
 string l1, l2, l3;
 {
@@ -822,7 +850,8 @@ block is pushed to gather the false part statements. if no else
 statement is found, the true block will be popped with the endif
 statement and the false block will remain empty. */
 
-void MakeBlockIfInst(e,elsif)
+void 
+MakeBlockIfInst(e,elsif)
 expression e;
 int elsif;
 {  
@@ -842,7 +871,8 @@ int elsif;
     BlockStack[CurrentBlock-1].elsifs = elsif ;
 }
 
-int MakeElseInst()
+int 
+MakeElseInst()
 {
     statement if_stmt;
     test if_test;
@@ -875,7 +905,8 @@ int MakeElseInst()
     return( BlockStack[CurrentBlock-1].elsifs = elsifs ) ;
 }
 
-void MakeEndifInst()
+void 
+MakeEndifInst()
 {
     int elsifs = -1;
 
@@ -907,7 +938,8 @@ void MakeEndifInst()
     } while( elsifs-- != 0 ) ;
 }
 
-void MakeEnddoInst()
+void 
+MakeEnddoInst()
 {
     if(CurrentBlock<=1) {
 	ParserError("MakeEnddoInst", "Unexpected ENDDO statement\n");
@@ -926,7 +958,8 @@ void MakeEnddoInst()
     (void) PopBlock();
 }
 
-string NameOfToken(token)
+string 
+NameOfToken(token)
 int token;
 {
     string name;
@@ -980,7 +1013,8 @@ int token;
  * Should not use MakeStatement() directly or indirectly to avoid
  * counting these pseudo-instructions
  */
-statement make_check_io_statement(string n, expression u, entity l)
+statement 
+make_check_io_statement(string n, expression u, entity l)
 {
   entity a = global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, n);
   reference r = make_reference(a, CONS(EXPRESSION, u, NIL));
@@ -1004,7 +1038,8 @@ lci is a list of 'control specifications'. its has the following format:
 
 lio is the list of expressions to write or references to read. */
 
-instruction MakeIoInstA(keyword, lci, lio)
+instruction 
+MakeIoInstA(keyword, lci, lio)
 int keyword;
 cons *lci;
 cons *lio;
@@ -1115,7 +1150,8 @@ nobody known the exact meaning of e2
 e3 et e4 are references that indicate which variable elements are to be
 buffered in or out. */
 
-instruction MakeIoInstB(keyword, e1, e2, e3, e4)
+instruction 
+MakeIoInstB(keyword, e1, e2, e3, e4)
 int keyword;
 expression e1, e2, e3, e4;
 {
@@ -1130,10 +1166,11 @@ expression e1, e2, e3, e4;
 			    make_call(CreateIntrinsic(NameOfToken(keyword)),
 				      l)));
 }
-
+
 static int seen = FALSE;
 
-void reset_first_statement()
+void 
+reset_first_statement()
 {
     seen = FALSE;
 }
@@ -1154,7 +1191,8 @@ check_in_declarations()
 
 /* This function is called when the first executable statement is encountered */
 #define SIZE 32384
-void check_first_statement()
+void 
+check_first_statement()
 {
     int line_start = TRUE;
     int in_comment = FALSE;
@@ -1252,18 +1290,18 @@ void check_first_statement()
 
 	/* It might seem logical to perform these calls from EndOfProcedure()
 	 * here. But at least ComputeAddresses() is useful for implictly 
-	 * declared variables.
+	 * declared variables. These calls are better located in EndOfProcedure().
 	 */
 	/*
-	UpdateFunctionalType(FormalParameters);
-	
-	ComputeEquivalences();
-	ComputeAddresses();
-
-	check_common_layouts(get_current_module_entity());
-
-	SaveChains();
-	*/
+	 * UpdateFunctionalType(FormalParameters);
+	 *
+	 * ComputeEquivalences();
+	 * ComputeAddresses();
+	 *
+	 * check_common_layouts(get_current_module_entity());
+	 *
+	 * SaveChains();
+	 */
 
 	reset_statement_number();
     }
