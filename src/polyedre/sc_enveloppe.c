@@ -489,7 +489,7 @@ Psysteme sc_common_projection_convex_hull(Psysteme s1, Psysteme s2)
 			pv = vecteur_succ(pv)) {
 			if(!term_cst(pv)) {
 			    v = vecteur_var(pv);
-			    if(vecteur_val(pv)==1) {
+			    if(vecteur_val(pv)==VALUE_ONE) {
 				break;
 			    }
 			}
