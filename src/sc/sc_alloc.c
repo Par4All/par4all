@@ -41,6 +41,31 @@ Psysteme sc_new()
     return(p);
 }
 
+/* creation d'une base contenant toutes les variables
+ * apparaissant avec des coefficients non-nuls
+ *  dans les egalites ou les inegalites de ps
+ */
+Pbase sc_to_minimal_basis(Psysteme ps)
+{
+    Pbase b = BASE_NULLE;
+    Pcontrainte eq;
+    Pvecteur pv;
+
+	for(eq = ps->egalites; eq!= NULL; eq=eq->succ) {
+	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
+		if (pv->var != TCST)
+		    vect_chg_coeff(&b,pv->var,1);
+	}
+
+	for(eq = ps->inegalites; eq!= NULL; eq=eq->succ) {
+	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
+		if (pv->var != TCST)
+		    vect_chg_coeff(&b,pv->var,1);
+	}
+
+    return b;
+}
+
 /* void sc_creer_base(Psysteme ps): initialisation des parametres dimension
  * et base d'un systeme lineaire en nombres entiers ps, i.e. de la
  * base implicite correspondant aux egalites et inegalites du systeme;
@@ -59,28 +84,10 @@ Psysteme sc_new()
 void sc_creer_base(ps)
 Psysteme ps;
 {
-    Pcontrainte eq;
-    Pvecteur pv;
-    Pvecteur diagonale=NULL;
-
     if (ps) {
 	assert(ps->base == (Pbase) NULL);
-
-	/* creation d'un vecteur contenant toutes les variables
-	   apparaissant dans les egalites ou les inegalites de ps,
-	   i.e. d'une diagonale de la base */
-	for(eq = ps->egalites; eq!= NULL; eq=eq->succ) {
-	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
-		if (pv->var != TCST)
-		    vect_chg_coeff(&diagonale,pv->var,1);
-	}
-	for(eq = ps->inegalites; eq!= NULL; eq=eq->succ) {
-	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
-		if (pv->var != TCST)
-		    vect_chg_coeff(&diagonale,pv->var,1);
-	}
-	ps->dimension = vect_size(diagonale);
-	ps->base = (Pbase) diagonale;
+	ps->base = sc_to_minimal_basis(ps);
+	ps->dimension = vect_size(ps->base);
     }
 }
 
