@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "genC.h"
-#include "z.tab.h"
+#include "genspec.h"
 
 #ifdef FLEX_SCANNER
 #undef yywrap
