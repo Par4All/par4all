@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/10/04 19:29:38 $, )
+ * ($Date: 1995/10/04 19:30:11 $, )
  */
 
 #include "defines-local.h"
@@ -559,7 +559,7 @@ HANDLER_PROTOTYPE(independent)
  */
 HANDLER_PROTOTYPE(new)
 {
-    pips_user_warning("not implemented\n");
+    hpfc_warning("not implemented\n");
     return; /* (that's indeed a first implementation:-) */
 }
 
