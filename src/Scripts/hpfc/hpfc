@@ -2,6 +2,9 @@
 # 
 # $Id$
 # $Log: hpfc,v $
+# Revision 1.25  1997/04/15 09:46:54  coelho
+# -E option (not tested...)
+#
 # Revision 1.24  1997/03/19 17:48:49  coelho
 # better RCS headers.
 #
@@ -31,6 +34,7 @@ usage()
 	    -t: timings
 	    -o name: name for the generated file (forwarded to compiler)
 	    -D macro: additionnal cpp macros
+	    -E var=val: additional environment variables
 	  function among (3 significant characters):
 	  COMPILATION:
 	    i|interactive: (thanks to GNU readline library) (\,cd)
@@ -70,7 +74,7 @@ TIMING=void
 
 # options
 
-while getopts vdqto:D: OPT
+while getopts vdqto:D:E: OPT
 do
   case $OPT in
     v) HPFC_MODE=void ;;
@@ -79,6 +83,7 @@ do
     t) TIMING=timing ;;
     o) COPT="-w $OPTARG";;
     D) PIPS_CPP_FLAGS="$PIPS_CPP_FLAGS -D$OPTARG" ;;
+    E) export $OPTARG ;;
     *) usage 4
   esac
 done
