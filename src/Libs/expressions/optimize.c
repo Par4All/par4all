@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.41  2000/07/03 12:27:01  phamdinh
+ * Pour changer repertoire a travailler
+ *
  * Revision 1.40  2000/05/29 13:39:04  coelho
  * IA-64 strategy added.
  * more comments in strategy definitions.
@@ -1433,6 +1436,7 @@ bool optimize_expressions(string module_name)
 
     /* EOLE Stuff
      */
+
     if (strategy->apply_eole1)
       apply_eole_on_statement(module_name, s, get_string_property(EOLE_FLAGS));
 
