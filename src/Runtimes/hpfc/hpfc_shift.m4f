@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-! ($Date: 1996/10/17 13:44:51 $, )
+! ($Date: 1996/10/17 13:49:21 $, )
 !
 !
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -324,7 +324,6 @@ popdef(`PVMTYPE')')dnl
 !
 !
 forloop(`_D_',1,_HPFC_DIMENSIONS_,`
-ifdef(`_HPFC_NO_REAL4_',,`GENERIC_SHIFT(_D_,REAL4)')
 ifdef(`_HPFC_NO_BYTE1_',,`GENERIC_SHIFT(_D_,BYTE1)')
 ifdef(`_HPFC_NO_INTEGER2_',,`GENERIC_SHIFT(_D_,INTEGER2)')
 ifdef(`_HPFC_NO_INTEGER4_',,`GENERIC_SHIFT(_D_,INTEGER4)')
