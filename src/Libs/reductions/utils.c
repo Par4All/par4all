@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1997/07/18 15:25:37 $, 
+ * $Date: 1997/07/21 12:40:34 $, 
  *
  * utilities for reductions.
  *
@@ -548,7 +548,7 @@ call_proper_reduction_p(
     tag op;
     bool comm;
 
-    pips_debug(7, "call to %s (%#p)\n", entity_name(call_function(c)), s);
+    pips_debug(7, "call to %s (%p)\n", entity_name(call_function(c)), s);
 
     if (!ENTITY_ASSIGN_P(call_function(c))) 
 	return FALSE;
@@ -579,7 +579,7 @@ call_proper_reduction_p(
      */
     if (!equal_reference_in_expression_p(lhs, erhs, op, &other))
 	return FALSE;
-    pips_debug(8, "matching reference found (%#p)\n", other);
+    pips_debug(8, "matching reference found (%p)\n", other);
     
     /* there should be no extract effects on the reduced variable
      */
