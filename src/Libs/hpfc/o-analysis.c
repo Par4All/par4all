@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/12/22 16:06:11 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/12/26 16:23:32 $, )
  * version $Revision$
  */
 
@@ -826,17 +826,14 @@ generate_optimized_code_for_loop_nest(
     update_indices_for_local_computation(new_indexes, Ra, lRa);
     update_indices_for_local_computation(new_indexes, Ro, lRo);
     
-    /*
-     * and now generates the code...
+    /* and now generates the code...
      */
     initialize_variable_used_map_for_current_loop_nest(innerbody);
-    /*initialize_variable_used_map_for_statement(innerbody);*/
 
     if (hpfc_overlap_kill_unused_scalars(innerbody))
     {
 	close_variable_used_map_for_statement();
 	initialize_variable_used_map_for_current_loop_nest(innerbody);
-	/* initialize_variable_used_map_for_statement(innerbody);*/
     }
 
     newnest = make_loop_nest_for_overlap(lloop, newloops, lblocks,
@@ -953,9 +950,8 @@ statement stat, *pstat;
 
     gen_free_list(W);
     
-    debug(5, "Overlap_Analysis",
-	  "Wa length is %d (%d), Wrt lenght is %d\n",
-	  gen_length(Wa), gen_length(lWa), gen_length(Wrt));
+    pips_debug(5, "Wa length is %d (%d), Wrt lenght is %d\n",
+	       gen_length(Wa), gen_length(lWa), gen_length(Wrt));
 
     if (gen_length(Wrt)!=0) 
 	RETURN(FALSE);
@@ -1051,6 +1047,8 @@ statement stat, *pstat;
     if (!generate_optimized_code_for_loop_nest
 	(innerbody, &newloopnest, Wa, Ra, Ro, lWa, lRa, lRo))
 	RETURN(FALSE);
+
+    DEBUG_STAT(9, entity_name(node_module), newloopnest);
 
     (*pstat) = 
 	make_block_statement
