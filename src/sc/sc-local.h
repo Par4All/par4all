@@ -120,7 +120,7 @@ temps raisonnable */
 /* nombre maximum d'inequations que doit comporter un systeme lineaire
 pour que l'elimination des redondances en nombres ENTIERS s'effectue en
 un temps raisonnable */
-#define NB_INEQ_MAX2  
+#define NB_INEQ_MAX2  50
 
 /*  Nombre de contraintes au dela duquel l'algorithme du simplexe
     est preferable a l'algorithme de Fourier-Motzkin: 20
