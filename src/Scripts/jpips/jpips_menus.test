@@ -1,0 +1,158 @@
+#
+# $Id$
+#
+# Test menus for jpips.
+#
+# $Log: jpips_menus.test,v $
+# Revision 1.1  1998/07/01 16:48:34  coelho
+# Initial revision
+#
+#
+
+TOP_MENU
+Analyses
+Analyses+...
+
+LABEL_WITH_CHOICE
+Mode
+checking lc
+marker
+Display
+display
+cb
+Make
+make
+cb
+CLOSE
+
+SEPARATOR
+
+BUTTON_WITH_CHOICE
+Sequential View
+$TAGmarker PRINTED_FILE[$MODULES]
+checking bc
+Basic
+activate PRINT_CODE
+cb
+Transformers
+activate PRINT_CODE_TRANSFORMERS
+cb
+Preconditions
+activate PRINT_CODE_PRECONDITIONS
+cb
+Regions
+activate PRINT_CODE_REGIONS
+cb
+CLOSE
+
+BUTTON_WITH_CHOICE
+Parallel View
+$TAGmarker PARALLELPRINTED_FILE[$MODULES]
+checking bc
+FORTRAN Code
+activate PRINT_PARALLELIZED77_CODE
+cb
+HPF Code
+activate PRINT_PARALLELIZEDHPF_CODE
+cb
+OMP Code
+activate PRINT_PARALLELIZEDOMP_CODE
+cb
+CLOSE
+
+BUTTON_WITH_MENU
+ICFG View
+$TAGmarker ICFG_FILE[$MODULES]
+
+RADIOBUTTONGROUP
+checking rb
+
+MENU
+basic
+RADIOBUTTON
+preconditions
+activate PRINT_ICFG_WITH_PRECONDITIONS
+cb
+RADIOBUTTON
+transformers
+activate PRINT_ICFG_WITH_TRANSFORMERS
+cb
+RADIOBUTTON
+regions
+activate PRINT_ICFG_WITH_REGIONS
+cb
+CLOSE
+
+MENU
+loops
+RADIOBUTTON
+preconditions
+activate PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
+cb
+RADIOBUTTON
+transformers
+activate PRINT_ICFG_WITH_LOOPS_TRANSFORMERS
+cb
+RADIOBUTTON
+regions
+activate PRINT_ICFG_WITH_LOOPS_REGIONS
+cb
+CLOSE
+
+MENU
+control
+RADIOBUTTON
+preconditions
+activate PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
+cb
+RADIOBUTTON
+transformers
+activate PRINT_ICFG_WITH_CONTROL_TRANSFORMERS
+cb
+RADIOBUTTON
+regions
+activate PRINT_ICFG_WITH_CONTROL_REGIONS
+cb
+CLOSE
+
+CLOSE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Parallel Prettyprint
+checking lc
+tag
+Do
+setproperty PRETTYPRINT_PARALLEL "do"
+cb
+Doall
+setproperty PRETTYPRINT_PARALLEL "doall"
+cb
+Fortran 90
+setproperty PRETTYPRINT_PARALLEL "f90"
+cb
+Cray
+setproperty PRETTYPRINT_PARALLEL "cray"
+cb
+Craft
+setproperty PRETTYPRINT_PARALLEL "craft"
+cb
+Cmf
+setproperty PRETTYPRINT_PARALLEL "cmf"
+cb
+OMP
+setproperty PRETTYPRINT_PARALLEL "omp"
+cb
+HPF
+setproperty PRETTYPRINT_PARALLEL "hpf"
+cb
+CLOSE
+
+CLOSE
+
+TOP_MENU
+Transformations
+Transformations+...
+CLOSE
+
