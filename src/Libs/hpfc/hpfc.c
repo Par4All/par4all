@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/10/23 14:19:09 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/11/16 18:06:40 $, )
  * version $Revision$
  */
  
@@ -346,6 +346,7 @@ bool hpfc_init(string name)
     set_bool_property("WARNING_ON_STAT_ERROR", FALSE); /* for my fake files */
     set_bool_property("PRETTYPRINT_IO_EFFECTS", FALSE); /* no LUNS(*) ! */
 
+    /* where the specials dummy/variables are stored... ??? */
     (void) make_empty_program(HPFC_PACKAGE);
 
     init_hpfc_status();
@@ -369,7 +370,6 @@ bool hpfc_init(string name)
  * bugs or features:
  *  - ??? not all hpf syntaxes are managable this way.
  */
-
 #define HPFC_FILTERED_SUFFIX ".hpfc_filtered"
 
 bool hpfc_filter(string name)
@@ -378,7 +378,7 @@ bool hpfc_filter(string name)
 
     dir_name = db_get_current_workspace_directory();
     file_name = db_get_file_resource(DBR_SOURCE_FILE, name, TRUE);
-    new_name = strdup(concatenate(name, HPFC_FILTERED_SUFFIX, NULL));
+    new_name = catdup(name, HPFC_FILTERED_SUFFIX, NULL);
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
@@ -408,7 +408,6 @@ bool hpfc_filter(string name)
 bool hpfc_directives(string name)
 {
     entity module = local_name_to_top_level_entity(name);
-    statement s = (statement) db_get_memory_resource(DBR_CODE, name, FALSE);
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
@@ -418,24 +417,26 @@ bool hpfc_directives(string name)
 	!hpf_directive_entity_p(module) &&
 	!fortran_library_entity_p(module))
     {
+	statement s = (statement)
+	    db_get_memory_resource(DBR_CODE, name, FALSE);
+
 	set_current_module_entity(module);
 	set_current_module_statement(s);
 	load_hpfc_status();
 	make_update_common_map(); 
-	
-	NormalizeCommonVariables(module, s);
 	build_full_ctrl_graph(s);
-	handle_hpf_directives(s);
+
+	NormalizeCommonVariables(module, s);
+	handle_hpf_directives(s); /* do the job... */
 
 	clean_ctrl_graph();
 	free_update_common_map(); 
-	reset_current_module_entity();
+	save_hpfc_status();
 	reset_current_module_statement();
+	reset_current_module_entity();
 	
 	db_unput_a_resource(DBR_CODE, name);
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(name), s);
-
-	save_hpfc_status();
     }
 
     debug_off(); 
@@ -476,7 +477,7 @@ bool hpfc_compile(string name)
 	reset_current_module_entity();
 	save_hpfc_status();
     }
-    else /* fake */
+    else /* just fake for pipsmake... */
     {
 	DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, strdup(name), NO_FILE);
 	DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, strdup(name), NO_FILE);
