@@ -168,6 +168,15 @@ typedef hash_table control_mapping;
 
 #define MOD_INTRINSIC_NAME 		"MOD"
 
+     /* These operators are used within the optimize transformation in
+	order to manipulate operators such as n-ary add and multiply or
+	multiply-add operators ( JZ - sept 98) */
+#define EOLE_FMA_OPERATOR_NAME          "EOLE-FMA-OP"
+#define EOLE_PROD_OPERATOR_NAME         "EOLE-PROD-OP"
+#define EOLE_SUM_OPERATOR_NAME          "EOLE-SUM-OP"
+
+
+
 /* moved from ricedg-local.h */
 #define LOOP_COUNTER_MODULE_NAME 	"LOOP-COUNTER"
 #define DI_VAR_MODULE_NAME 		"DI-VAR"
