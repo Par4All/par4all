@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.13  1997/11/07 16:40:31  coelho
+ * parameters where not considered...
+ *
  * Revision 1.12  1997/11/04 20:35:43  coelho
  * more comments added to clonee, when cloning on an argument.
  *
@@ -332,10 +335,12 @@ this_expression_constant_p(
     expression e, /* expression to be tested */
     int * pval    /* returned integer value if one was found */)
 {  
-    bool ok = TRUE;
+    bool ok = FALSE;
     if (expression_constant_p(e)) 
     {
+	pips_debug(7, "constant expression\n");
 	*pval = expression_to_int(e);
+	ok = TRUE;
     }
     else if (expression_reference_p(e))
     {   
@@ -346,23 +351,43 @@ this_expression_constant_p(
 	Value val;
 
 	ref = reference_variable(expression_reference(e));
-	if (!entity_integer_scalar_p(ref)) return FALSE;
-
-	/* try with the precondition...
-	 */
-	current = stmt_head();
-	prec = sc_dup(predicate_system(transformer_relation(
-	    load_statement_precondition(current))));
-	b = base_dup(sc_base(prec));
-	vect_erase_var(&b, (Variable) ref);
-	prec = sc_projection_optim_along_vecteur(prec, b);
-	ok = sc_value_of_variable(prec, (Variable) ref, &val);
-	sc_rm(prec);
-	base_rm(b);
-	
-	if (ok) *pval = VALUE_TO_INT(val);
+	if (entity_integer_scalar_p(ref)) 
+	{
+	    pips_debug(7, "integer scalar reference\n");
+	    
+	    /* try with the precondition...
+	     */
+	    current = stmt_head();
+	    prec = sc_dup(predicate_system(transformer_relation(
+		load_statement_precondition(current))));
+	    b = base_dup(sc_base(prec));
+	    vect_erase_var(&b, (Variable) ref);
+	    prec = sc_projection_optim_along_vecteur(prec, b);
+	    ok = sc_value_of_variable(prec, (Variable) ref, &val);
+	    sc_rm(prec), base_rm(b);
+	    
+	    if (ok) *pval = VALUE_TO_INT(val);
+	}
+	else pips_debug(7, "not an integer scalar reference\n");
     }
+    else if (expression_call_p(e))
+    {
+	call c = syntax_call(expression_syntax(e));
+	entity fun = call_function(c);
+	value v = entity_initial(fun);
+	
+	if (value_symbolic_p(v) &&
+	    constant_int_p(symbolic_constant(value_symbolic(v)))) 
+	{
+	    pips_debug(7, "is an int PARAMETER\n");
+	    ok = TRUE;
+	    *pval = constant_int(symbolic_constant(value_symbolic(v)));
+	}
+	else pips_debug(7, "not a symbolic integer constant\n");
+    }
+    else pips_debug(7, "not a constant nor a reference not a parameter\n");
 
+    pips_debug(5, "ok = %s, val = %d\n", ok? "TRUE": "FALSE", ok? *pval: 0);
     return ok;
 }
 
