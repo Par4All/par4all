@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/21 10:18:06 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/02 08:39:38 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -166,10 +166,10 @@ $SED '#
       s, io\(.*\),      6(\1),
       s, host\(.*\),      6(\1),
       # io/host section: hack to build a block 
-      s, begin *io,      do I_IO = 0\, 0      7,
-      s, begin *host,      do I_IO = 0\, 0      7,
-      s, end *io,      enddo,
-      s, end *host,      enddo,
+      s, begin *io,      if (.true.) then      7,
+      s, begin *host,      if (.true.) then      7,
+      s, end *io,      endif,
+      s, end *host,      endif,
       # io args shoud look like calls for pips
       /6(/s,\,,()\,,g;
       /6(/s,\([a-z0-9]\))$,\1()),;
