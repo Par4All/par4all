@@ -4,7 +4,7 @@
  *
  * SCCS stuff:
  * $RCSfile: system_to_code.c,v $ version $Revision$, 
- * ($Date: 1996/07/23 16:42:19 $, ) 
+ * ($Date: 1996/11/20 13:59:20 $, ) 
  */
 
 /* Standard includes
@@ -496,7 +496,7 @@ bounds_equal_p(
 
     if (nb_elems_list(lower)!=1 || nb_elems_list(upper)!=1) return(FALSE);
 
-    val_upper = vect_coeff(var, upper->vecteur);
+    val_upper = vect_coeff(var, upper->vecteur); /*coeff for var in the constraint*/
     val_lower = vect_coeff(var, lower->vecteur);
     
     /* ??? the arithmetic ppcm version is on int instead of values 
@@ -512,7 +512,7 @@ bounds_equal_p(
 			    value_div(the_ppcm,val_upper));
 
     sum = vect_add(v_lower, v_upper);
-    vect_add_elem(&sum, TCST, value_minus(the_ppcm,VALUE_ONE));
+    vect_add_ele m(&sum, TCST, value_minus(the_ppcm,VALUE_ONE));
     vect_normalize(sum);
 
     result = VECTEUR_NUL_P(sum) || 
@@ -543,11 +543,11 @@ systeme_to_loop_nest(
     
     if (ENDP(vars)) return body;
 
-    s = sc_dup(sc);
+    s = sc_dup(sc);   /* duplicate sc*/
     sc_transform_eg_in_ineg(s);  /* ??? could do a better job with = */
-    c = sc_inegalites(s);
+    c = sc_inegalites(s);    
 
-    reverse = gen_nreverse(gen_copy_seq(vars));
+    reverse = gen_nreverse(gen_copy_seq(vars));  /* reverse the list of vars*/
 
     message_assert("no equalities, now", sc_nbre_egalites(s)==0);
     
