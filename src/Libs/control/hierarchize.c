@@ -61,8 +61,9 @@ remove_interval_predecessors(vertex interval)
 }
 
 
-/* Remove a predecessor pred of an interval. Return TRUE if pred was
-   really in the predecessor list: */
+/* Remove all the instances of a predecessor pred of an interval.
+
+   Return TRUE if pred was really in the predecessor list: */
 static bool
 remove_interval_predecessor(vertex interval,
 			    vertex pred)
@@ -182,8 +183,10 @@ display_interval_graph(graph intervals)
 }
 
 
-/* Build an interval graph from an older interval graph and put it in
-   the older one.
+/* Build an interval graph from an older interval graph and put it in the
+   older one. An interval is a subgraph whose header dominate all its
+   nodes. It can be seen as a natural loop plus an acyclic structure that
+   dangles from the nodes of that loop.
 
    Algorithm use the T1/T2 analysis that can be found from pages 665
    to 670 of:
@@ -306,7 +309,7 @@ control_graph_to_interval_graph_format(control entry_node)
 
 /* Return the list of control node exiting an interval. Note that if a
    node of the control list is in fact the exit_note of a unstructure,
-   it is really an exit node at an upper level., */
+   it is really an exit node at an upper level. */
 static list
 interval_exit_nodes(vertex interval, control exit_node)
 {
@@ -345,84 +348,12 @@ interval_exit_nodes(vertex interval, control exit_node)
 }
 
 
-/* Compute A = A inter B: */
-void
-gen_list_and(list * a,
-	     list b)
-{
-    if (ENDP(*a))
-	return ;
-
-    if (!gen_in_list_p(CHUNK(CAR(*a)), b)) {
-	/* This element of a is not in list b: delete it: */
-	cons *aux = *a;
-
-	*a = CDR(*a);
-	free(aux);
-	gen_list_and(a, b);
-    }
-    else
-	gen_list_and(&CDR(*a), b);
-}
-
-
-/* Compute A = A inter non B: */
-void
-gen_list_and_not(list * a,
-		 list b)
-{
-    if (ENDP(*a))
-	return ;
-
-    if (gen_in_list_p(CHUNK(CAR(*a)), b)) {
-	/* This element of a is in list b: delete it: */
-	cons *aux = *a;
-
-	*a = CDR(*a);
-	free(aux);
-	gen_list_and_not(a, b);
-    }
-    else
-	gen_list_and_not(&CDR(*a), b);
-}
-
-
-/* Replace all the reference to x in list l by a reference to y: */
-void
-gen_list_patch(list l,
-	       gen_chunk * x,
-	       gen_chunk * y)
-{
-    MAPL(pc, {
-	 if (CAR(pc).p == x)
-	     CAR(pc).p = y;
-     }, l);
-}
-
 void
 control_list_patch(list l,
-	       control c_old,
-	       control c_new)
+		   control c_old,
+		   control c_new)
 {
     gen_list_patch(l, (gen_chunk *) c_old, (gen_chunk *) c_new);
-}
-
-/* Remove the first occurence of obj in list l: */
-void
-gen_remove_first(list * l,
-		 gen_chunk * obj)
-{
-    if (ENDP(*l))
-	return ;
-    if (obj == CHUNK(CAR(*l))) {
-	cons *aux = *l ;
-
-	*l = CDR(*l) ;
-	free(aux) ;
-	gen_remove(l, obj);
-    }
-    else
-	gen_remove(&CDR(*l), obj);
 }
 
 
@@ -505,11 +436,11 @@ replace_control_related_to_a_list(control old_node,
 	    control_predecessors(new_node) =
 		gen_nconc(control_predecessors(new_node),
 			  CONS(CONTROL, new_node, NIL));
-	    /* Delete the old one. Use gen_remove_first() instead of
+	    /* Delete the old one. Use gen_remove_once() instead of
                gen_remove() to deal with double loops around a node
                (See hierarchy02.f in validation): */
-	    gen_remove_first(&control_successors(old_node), (gen_chunk *) old_node);
-	    gen_remove_first(&control_predecessors(old_node), (gen_chunk *) old_node);
+	    gen_remove_once(&control_successors(old_node), (gen_chunk *) old_node);
+	    gen_remove_once(&control_predecessors(old_node), (gen_chunk *) old_node);
 	}
     }, controls_to_change);
     gen_free_list(controls_to_change);
