@@ -81,7 +81,7 @@ $(addprefix $(ARCH)/,$(OTHER_CFILES:.c=.o)) $(LIB_OBJECTS): $(DERIVED_HEADERS)
 # local rules
 
 newgen_%.h: %.c
-	$(PROTOIZE) $< > $@
+	$(RM) $@ ; $(PROTOIZE) $< > $@
 
 $(ARCH)/libgenC.a: $(LIB_OBJECTS)
 	$(RM) $@
