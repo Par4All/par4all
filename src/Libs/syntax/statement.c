@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/06/20 16:31:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/05 20:22:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_statement[] = "%A% ($Date: 1997/06/20 16:31:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_statement[] = "%A% ($Date: 1997/07/05 20:22:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -916,6 +916,11 @@ void MakeEnddoInst()
 
     /*LinkInstToCurrentBlock(MakeZeroOrOneArgCallInst("ENDDO", 
 						    expression_undefined));*/
+    /* Although it is not really an instruction, the ENDDO statement may 
+     * carry comments
+     */
+    LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+
     (void) PopBlock();
 }
 
