@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 2002/06/27 14:52:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2002/07/09 14:58:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2002/06/27 14:52:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2002/07/09 14:58:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -28,7 +28,14 @@ char vcid_control_control[] = "%A% ($Date: 2002/06/27 14:52:00 $, ) version $Rev
 */
 
 /*
+ * $Id$
+ *
  * $Log: control.c,v $
+ * Revision 1.34  2002/07/09 14:58:20  irigoin
+ * Function add_proper_successor_to_predecessor() added. Reformatting,
+ * comments improved, debugging improved, bug fix in handling of IF
+ * destructuration (to develop bourdoncle.c).
+ *
  * Revision 1.33  2002/06/27 14:52:00  irigoin
  * Page breaks added.
  *
@@ -231,7 +238,7 @@ hash_table used_labels;
 	    }, stats);
 
 	    if(!found) {
-		pips_debug(5, "doesn't cover label %s\n", name);
+		pips_debug(5, "does not cover label %s\n", (char *) name);
 		return(FALSE);
 	    }
 	}, (cons *)hash_get_default_empty_list(Label_statements, name));
@@ -242,13 +249,73 @@ hash_table used_labels;
     }
     return(TRUE);
 }
+
+static void add_proper_successor_to_predecessor(control pred, control c_res)
+{
+  /* Replaces the following statement: */
+  /* control_successors(pred) = ADD_SUCC(c_res, pred); */
 
+  /* Usually, too much of a mess: do not try to be too strict! */
+  /*
+  if(statement_test_p(control_statement(pred))) {
+    control_successors(pred) = gen_nconc(control_successors(pred),
+					 CONS(CONTROL, c_res, NIL));
+    pips_assert("While building the CFG, "
+		"a test control node may have one or two successors",
+		gen_length(control_successors(pred))<=2);
+  }
+  else {
+    if(gen_length(control_successors(pred))==0) {
+      control_successors(pred) = CONS(CONTROL, c_res, NIL);
+    }
+    else if(gen_length(control_successors(pred))==1) {
+      if(gen_in_list_p(succ,control_successors(pred))) {
+	;
+      }
+      else {
+	pips_internal_error("Two or more candidate successors "
+			    "for a standard statement: %p and %p\n",
+			    succ, CONTROL(CAR(control_successors(pred))));
+      }
+    }
+    else {
+      pips_internal_error("Two or more successors for non-test node %p\n",
+			  pred);
+    }
+  }
+  */
+
+  if(statement_test_p(control_statement(pred))) {
+    if(!gen_in_list_p(c_res, control_successors(pred))) {
+      control_successors(pred) = gen_nconc(control_successors(pred),
+					   CONS(CONTROL, c_res, NIL));
+    }
+    pips_assert("While building the CFG, "
+		"a test control node may have one or two successors",
+		gen_length(control_successors(pred))<=2);
+  }
+  else {
+    /* Do whatever was done before and let memory leak! */
+    control_successors(pred) = ADD_SUCC(c_res, pred);
+  }
+}
+
 /* CONTROLIZE computes in C_RES the control node of the statement ST
    whose predecessor control node is PRED and successor SUCC. The
    USED_LABELS is modified to deal with local use of labels. Returns TRUE
    if the current statement isn't a structured control. The invariant is
    that CONTROLIZE links predecessors and successors of C_RES, updates the
-   successors of PRED and the predecessors of SUCC. */
+   successors of PRED and the predecessors of SUCC.
+
+   In fact, it cannot update the successors of PRED because it cannot know
+   which successor of PRED C_RES is when PRED is associated to a
+   test. PRED and C_RES must be linked together when you enter
+   controlize(), or they must be linked later by the caller. But they
+   cannot be linked here thru the successor list of PRED and, if the consistency
+   is true here, they cannot be linked either by the predecessor list of
+   SUCC. If they are linked later, it is useless to pass PRED down. If
+   they are linked earlier, they might have to be unlinked when structured
+   code is found. */
 
 bool controlize(
     statement st,
@@ -268,6 +335,12 @@ bool controlize(
 	   "(st = %p, pred = %p, succ = %p, c_res = %p)\nst at entry:\n",
 		   st, pred, succ, c_res);
 	print_statement(st);
+	/*
+	pips_assert("pred is a predecessor of c_res",
+		    gen_in_list_p(pred, control_predecessors(c_res)));
+	pips_assert("c_res is a successor of pred",
+		    gen_in_list_p(c_res, control_successors(pred)));
+	*/
 	pips_debug(1, "Successors of c_res %p:\n", c_res);
 	display_linked_control_nodes(c_res);
 	check_control_coherency(pred);
@@ -302,7 +375,8 @@ bool controlize(
 	succ = get_label_control(name);
 	/* Memory leak in CONS(CONTROL, pred, NIL). Also forgot to
            unlink the predecessor of the former successor of pred. RK */
-	control_successors(pred) = ADD_SUCC(c_res, pred);
+	/* control_successors(pred) = ADD_SUCC(c_res, pred); */
+	add_proper_successor_to_predecessor(pred, c_res);
 	UPDATE_CONTROL(c_res, nop, 
 		       CONS(CONTROL, pred, NIL), 
 		       ADD_SUCC(succ, c_res )) ;
@@ -348,9 +422,14 @@ bool controlize(
     return(controlized);
 }
 
+
 /* CONTROLIZE_CALL controlizes the call C of statement ST in C_RES. The deal
    is to correctly manage STOP; since we don't know how to do it, so we
-   assume this is a usual call !! */
+   assume this is a usual call with a continuation !!
+
+   To avoid non-standard successors, IO statement with multiple
+   continuations are not dealt with here. The END= and ERR= clauses are
+   simulated by hidden tests. */
 
 bool controlize_call(st, c, pred, succ, c_res, used_labels)
 statement st;
@@ -359,23 +438,18 @@ control pred, succ;
 control c_res;
 hash_table used_labels;
 {
-    bool stop = 
-	    (strcmp(entity_local_name(call_function(c)), "STOP") == 0);
-
-    stop = FALSE ;
-
-    pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
-	       st, pred, succ, c_res);
+  pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
+	     st, pred, succ, c_res);
         
-    UPDATE_CONTROL(c_res, st,
-		    ADD_PRED(pred, c_res), 
-		    (stop ? NIL : CONS(CONTROL, succ, NIL)));
-    control_successors(pred) = ADD_SUCC(c_res, pred);
+  UPDATE_CONTROL(c_res, st,
+		 ADD_PRED(pred, c_res), 
+		 CONS(CONTROL, succ, NIL));
+
+  /* control_successors(pred) = ADD_SUCC(c_res, pred); */
+  add_proper_successor_to_predecessor(pred, c_res);
    
-    if( !stop ) {
-	control_predecessors(succ) = ADD_PRED(c_res, succ);
-    }
-    return(FALSE);
+  control_predecessors(succ) = ADD_PRED(c_res, succ);
+  return(FALSE);
 }
 
 /* LOOP_HEADER, LOOP_TEST and LOOP_INC build the desugaring phases of a
@@ -512,7 +586,8 @@ hash_table used_labels;
 	controlized = TRUE ;
 	control_predecessors(succ) = ADD_PRED(c_test, succ);
     }
-    control_successors(pred) = ADD_SUCC(c_res, pred);
+    add_proper_successor_to_predecessor(pred, c_res);
+    /* control_successors(pred) = ADD_SUCC(c_res, pred); */
 
     union_used_labels( used_labels, loop_used_labels);
     hash_table_free(loop_used_labels);
@@ -622,7 +697,8 @@ hash_table used_labels;
 	ifdebug(5) check_control_coherency(c_res);
     }
     control_predecessors(succ) = ADD_PRED(c_res, succ);
-    control_successors(pred) = ADD_SUCC(c_res, pred);
+    add_proper_successor_to_predecessor(pred, c_res);
+    /* control_successors(pred) = ADD_SUCC(c_res, pred); */
 
     union_used_labels( used_labels, loop_used_labels);
     hash_table_free(loop_used_labels);
@@ -904,7 +980,8 @@ hash_table used_labels;
 		        ADD_PRED(pred, c_res),
 		        CONS(CONTROL, succ, NIL));
 	control_predecessors(succ) = ADD_PRED(c_res, succ);
-	control_successors(pred) = CONS(CONTROL, c_res, NIL);
+	add_proper_successor_to_predecessor(pred, c_res);
+	/* control_successors(pred) = CONS(CONTROL, c_res, NIL); */
 #endif
 	controlized = FALSE;
     }
@@ -947,76 +1024,97 @@ control pred, succ;
 control c_res;
 hash_table used_labels;
 {
-    hash_table 
-	t_used_labels = hash_table_make(hash_string, 0), 
-	f_used_labels = hash_table_make(hash_string, 0);
-    control c1 = make_conditional_control(test_true(t));
-    control c2 = make_conditional_control(test_false(t));
-    control c_join = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
-    statement s_t = test_true(t);
-    statement s_f = test_false(t);
-    bool controlized;
+  hash_table 
+    t_used_labels = hash_table_make(hash_string, 0), 
+    f_used_labels = hash_table_make(hash_string, 0);
+  control c1 = make_conditional_control(test_true(t));
+  control c2 = make_conditional_control(test_false(t));
+  control c_join = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+  statement s_t = test_true(t);
+  statement s_f = test_false(t);
+  bool controlized;
 
-    pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
-	       st, pred, succ, c_res);
+  pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
+	     st, pred, succ, c_res);
     
-    ifdebug(5) {
-	pips_debug(1, "THEN at entry:\n");
-	print_statement(s_t);
-	pips_debug(1, "c1 at entry:\n");
-	print_statement(control_statement(c1));
-	pips_debug(1, "ELSE at entry:\n");
-	print_statement(s_f);
-	pips_debug(1, "c2 at entry:\n");
-	print_statement(control_statement(c2));
-    }
+  ifdebug(5) {
+    pips_debug(1, "THEN at entry:\n");
+    print_statement(s_t);
+    pips_debug(1, "c1 at entry:\n");
+    print_statement(control_statement(c1));
+    pips_debug(1, "ELSE at entry:\n");
+    print_statement(s_f);
+    pips_debug(1, "c2 at entry:\n");
+    print_statement(control_statement(c2));
+    check_control_coherency(pred);
+    check_control_coherency(succ);
+    check_control_coherency(c_res);
+  }
 
-    controlize(s_t, c_res, c_join, c1, t_used_labels);	
-    controlize(s_f, c_res, c_join, c2, f_used_labels);
+  controlize(s_t, c_res, c_join, c1, t_used_labels);	
+  controlize(s_f, c_res, c_join, c2, f_used_labels);
 
-    if(covers_labels_p(s_t, t_used_labels) && 
-       covers_labels_p(s_f, f_used_labels)) {
-	test it = make_test(test_condition(t), 
-			    control_statement(c1),
-			    control_statement(c2));
+  if(covers_labels_p(s_t, t_used_labels) && 
+     covers_labels_p(s_f, f_used_labels)) {
+    test it = make_test(test_condition(t), 
+			control_statement(c1),
+			control_statement(c2));
 
-	UPDATE_CONTROL(c_res, 
-		       make_statement(statement_label(st), 
-				      statement_number(st),
-				      STATEMENT_ORDERING_UNDEFINED,
-				      statement_comments(st),
-				      make_instruction(is_instruction_test, 
-						       it)),
-		       ADD_PRED(pred, c_res),
-		       CONS(CONTROL, succ, NIL));
-	control_predecessors(succ) = ADD_PRED(c_res, succ);
-	controlized = FALSE;
-    }
-    else {
-	UPDATE_CONTROL(c_res, st, 
-		       ADD_PRED(pred, c_res),
-		       CONS(CONTROL, c1, CONS(CONTROL, c2, NIL)));
-	test_true(t) = MAKE_CONTINUE_STATEMENT();
-	test_false(t) = MAKE_CONTINUE_STATEMENT();
-	control_predecessors(succ) = ADD_PRED(c_join, succ);
-	control_successors(c_join) = CONS(CONTROL, succ, NIL);
-	controlized = TRUE;
-    }
-    control_successors(pred) = ADD_SUCC(c_res, pred);
-    union_used_labels(used_labels, 
-		      union_used_labels(t_used_labels, f_used_labels));
+    UPDATE_CONTROL(c_res, 
+		   make_statement(statement_label(st), 
+				  statement_number(st),
+				  STATEMENT_ORDERING_UNDEFINED,
+				  statement_comments(st),
+				  make_instruction(is_instruction_test, 
+						   it)),
+		   ADD_PRED(pred, c_res),
+		   CONS(CONTROL, succ, NIL));
+    control_predecessors(succ) = ADD_PRED(c_res, succ);
+    controlized = FALSE;
+  }
+  else {
+    UPDATE_CONTROL(c_res, st, 
+		   ADD_PRED(pred, c_res),
+		   CONS(CONTROL, c1, CONS(CONTROL, c2, NIL)));
+    test_true(t) = MAKE_CONTINUE_STATEMENT();
+    test_false(t) = MAKE_CONTINUE_STATEMENT();
+    control_predecessors(succ) = ADD_PRED(c_join, succ);
+    control_successors(c_join) = CONS(CONTROL, succ, NIL);
+    controlized = TRUE;
+  }
 
-    hash_table_free(t_used_labels);
-    hash_table_free(f_used_labels);
+  /* Be very careful when chaining c_res as successor of pred: if pred is
+     associated to a test, the position of c_res as first or second
+     successor of c_res is unknown. It should have been set by the
+     caller.
 
-    ifdebug(5) {
-	pips_debug(1, "IF at exit:\n");
-	print_statement(st);
-	display_linked_control_nodes(c_res);
-    }    
-    pips_debug(5, "Exiting\n");
+     You might survive, using the fact that the TRUE branch has been
+     processed first because of the order of the two recursive calls to
+     controlize(). The FALSE branch whill be linked as second
+     successor. But another controlize_xxx might have decided to link pred
+     and c_res before calling controlize() and controlize_test(). Too much
+     guessing IMHO (FI). */
+
+  /* control_successors(pred) = ADD_SUCC(c_res, pred); */
+  add_proper_successor_to_predecessor(pred, c_res);
+
+  union_used_labels(used_labels, 
+		    union_used_labels(t_used_labels, f_used_labels));
+
+  hash_table_free(t_used_labels);
+  hash_table_free(f_used_labels);
+
+  ifdebug(5) {
+    pips_debug(1, "IF at exit:\n");
+    print_statement(st);
+    display_linked_control_nodes(c_res);
+    check_control_coherency(pred);
+    check_control_coherency(succ);
+    check_control_coherency(c_res);
+  }    
+  pips_debug(5, "Exiting\n");
     
-    return(controlized);
+  return(controlized);
 }
 
 /* INIT_LABEL puts the reference in the statement ST to the label NAME
