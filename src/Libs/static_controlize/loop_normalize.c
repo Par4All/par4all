@@ -277,7 +277,7 @@ int *Gcount_nlc;
 	list insert_stmts;
 
 	debug(2, "loop_normalize_of_unstructured", "begin UNSTRUCTURED\n");
-	get_blocs(unstructured_control(u), &blocs ) ;
+	control_map_get_blocs(unstructured_control(u), &blocs ) ;
 	blocs = gen_nreverse( blocs ) ;
 
 	for(lc = blocs; lc != NIL; lc = CDR(lc)) {
