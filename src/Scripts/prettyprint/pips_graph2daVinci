@@ -319,8 +319,12 @@ while (<INPUT>) {
 	&output_a_statement_end();
 	next;
     };
+    
+    /^\204Unstructured Unreachable (.*) -> (.*)$/ && next;
+    # This information has already been used previously. */
 
-    # By default, put the statement with a an explicit \ n for daVinci:
+
+    # By default, put the statement with an explicit \ n for daVinci:
     &keep_for_output($_);
 }
 close INPUT || die "Cannot close \"$input_file_name\".";
