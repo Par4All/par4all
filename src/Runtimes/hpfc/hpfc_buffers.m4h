@@ -2,7 +2,7 @@ c
 c COMMON /HPFC_BUFFERS/ 
 c
 c $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-c ($Date: 1995/11/21 23:05:25 $, )
+c ($Date: 1995/11/21 23:09:40 $, )
 c
 c buffers to avoid small pvmf(un)pack calls...
 c and to sends buckets of messages if necessary...
@@ -39,7 +39,8 @@ c
      $     LAZY_RECV,
      $     SEND_NOT_INITIALIZED,
      $     RECEIVED_NOT_PERFORMED
-      _NOGNU(byte)_GNU(character) DATA_BUFFER
+      _NOGNU(byte)_GNU(character)
+     $     DATA_BUFFER
 c
 c buffer sizes
 c
@@ -61,7 +62,6 @@ c
 c
 c the buffer must be seen differently somehow...
 c
-c      byte BYTE1_BUFF(BYTE1_MAXBUFFSIZE)
       _GNU(character)_NOGNU(byte) BYTE1_BUFF(BYTE1_MAXBUFFSIZE)
 _NOGNU(`      integer*2 INTEGER2_BUFF(INTEGER2_MAXBUFFSIZE)')
       integer*4 INTEGER4_BUFF(INTEGER4_MAXBUFFSIZE)
