@@ -1,7 +1,7 @@
 /*
  * STRIP_MINING()
  *
- *  Bruno Baron - Corinne Ancourt - francois Irigoin
+ *  Bruno Baron - Corinne Ancourt - Francois Irigoin
  */
 #include <stdio.h>
 #include <string.h>
@@ -140,49 +140,69 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
 
 
 
+/* Hmmm... I am not sure it is a good idea to put the user_request()s
+   here. Did the author want to be able to apply
+   loop_chunk_size_and_strip_mine() several times on different loops
+   with different strip mining parameters? */
 statement loop_chunk_size_and_strip_mine(cons *lls)
 {
 
     string resp;
-    int kind,factor;
-    int chunk_size,chunk_number;
-    statement stmt,new_s;
+    int kind, factor;
+    statement stmt, new_s;
+    bool cancel_status;
+    int chunk_size = -1;
+    int chunk_number = -1;
 
 
     for (; CDR(lls) != NIL; lls = CDR(lls));
     stmt = STATEMENT(CAR(lls));
 
     /* Get the strip_mining kind from the user */
-    resp = user_request("Do you want to strip-mine in fixed-size chunks or in a fixed number of chunks (0/1)?) ");
-
-    /* CA(15/1/93):if(sscanf(resp, "%d", &kind)!=1 || kind !=1) { 
-       replaced by */
-    if(sscanf(resp, "%d", &kind)!=1 || (kind!= 0 && kind !=1)) {
-	user_error("strip_mine", 
-		   "strip_mining king should be either 0 or 1\n");
-    }
-
-    /* Get the strip_mining factor from the user */
-    resp= user_request("What's the stripe size or number?\n(choose integer greater or egal to 2): ");
-    if(sscanf(resp, "%d", &factor)!=1 || factor <= 1) {
-	user_error("strip_mine", 
-		   "stripe size or number should be greater than 2\n");
-    }
-
-    if(kind==0) {
-	chunk_size = factor;
-	chunk_number = -1;
+    resp = user_request("Type of strip-mining:\n - in fixed-size chunks (enter 0)\n - in a fixed number of chunks (enter 1)");
+    if (resp[0] == '\0') {
+	cancel_status = TRUE;
     }
     else {
-	chunk_size = -1;
-	chunk_number = factor;
+	/* CA(15/1/93):if(sscanf(resp, "%d", &kind)!=1 || kind !=1) { 
+	   replaced by */
+	if(sscanf(resp, "%d", &kind)!=1 || (kind!= 0 && kind !=1)) {
+	    user_error("strip_mine", 
+		       "strip_mining kind should be either 0 or 1!\n");
+	}
+
+	/* Get the strip_mining factor from the user */
+	resp = user_request("What's the stripe %s?\n(choose integer greater or egal to 2): ", kind ? "number" : "size");
+	if (resp[0] == '\0') {
+	    cancel_status = TRUE;
+	}
+	else {
+	    if(sscanf(resp, "%d", &factor)!=1 || factor <= 1) {
+		user_error("strip_mine", 
+			   "stripe size or number should be greater than 2\n");
+	    }
+
+	    if(kind==0) {
+		chunk_size = factor;
+		chunk_number = -1;
+	    }
+	    else {
+		chunk_size = -1;
+		chunk_number = factor;
+	    }
+
+	    debug(1,"strip_mine","strip mine in %d chunks of size %d \n",
+		  chunk_number, chunk_size);
+	}
     }
-
-    debug(1,"strip_mine","strip mine in %d chunks of size %d \n",
-	  chunk_number, chunk_size);
-    new_s= loop_strip_mine(stmt,chunk_size,chunk_number);
-    return(new_s);
-
+    if (cancel_status) {
+	user_log("Strip mining has been cancelled.\n");
+	/* Return the statement unchanged: */
+	new_s = stmt;
+    }
+    else
+	new_s = loop_strip_mine(stmt,chunk_size,chunk_number);
+   return(new_s);
 }
 
 /* Top-level function
@@ -193,34 +213,42 @@ bool strip_mine(char *mod_name)
     statement mod_stmt;
     char lp_label[6];
     string resp;
+    bool return_status;
 
     debug_on("STRIP_MINE_DEBUG_LEVEL");
 
     /* Get the loop label form the user */
     resp = user_request("Which loop do you want to strip_mine?\n"
 			"(give its label): ");
-    sscanf(resp, "%s", lp_label);
-    selected_label = find_label_entity(mod_name, lp_label);
-    if (selected_label==entity_undefined) {
-	user_error("strip_mine", "loop label `%s' does not exist\n", lp_label);
+    if (resp[0] == '\0') {
+	user_log("Strip mining has been cancelled.\n");
+	return_status = FALSE;
     }
+    else {
+	sscanf(resp, "%s", lp_label);
+	selected_label = find_label_entity(mod_name, lp_label);
+	if (selected_label==entity_undefined) {
+	    user_error("strip_mine", "loop label `%s' does not exist\n", lp_label);
+	}
 
-    /* DBR_CODE will be changed: argument "pure" should take FALSE but
-       this would be useless since there is only *one* version of code;
-       a new version will be put back in the data base after
-       strip_mineing */
-    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+	/* DBR_CODE will be changed: argument "pure" should take FALSE but
+	   this would be useless since there is only *one* version of code;
+	   a new version will be put back in the data base after
+	   strip_mineing */
+	mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
-    look_for_nested_loop_statements(mod_stmt,loop_chunk_size_and_strip_mine,
-				    selected_loop_p);
+	look_for_nested_loop_statements(mod_stmt,loop_chunk_size_and_strip_mine,
+					selected_loop_p);
 
-    /* Reorder the module, because new statements have been generated. */
-    module_reorder(mod_stmt);
+	/* Reorder the module, because new statements have been generated. */
+	module_reorder(mod_stmt);
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
-
+	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+	return_status = TRUE;
+    }
+    
     debug(2,"strip_mine","done for %s\n", mod_name);
     debug_off();
 
-    return TRUE;
+    return return_status;
 }
