@@ -1,4 +1,6 @@
-\documentstyle[12pt]{article}
+
+\documentclass[12pt]{article}
+
 % \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
 \title{RAPPORT D'AVANCEMENT No 2 \\
@@ -16,43 +18,11 @@ RT EMP 105}
 %\newcommand{\docdate}{Mars 1988}
 %\newcommand{\numero}{E105}
 
-\newcommand{\SEC}[1]{\section{#1}}
-\newcommand{\SSE}[1]{\subsection{#1}}
-\newcommand{\SSS}[1]{\subsubsection{#1}}
-\newcommand{\PAR}[1]{\paragraph{#1}}
-\newcommand{\SPA}[1]{\subparagraph{#1}}
-\newcommand{\BQU}{\begin{quote}}
-\newcommand{\EQU}{\end{quote}}
-\newcommand{\BIT}{\begin{itemize}}
-\newcommand{\EIT}{\end{itemize}}
-\newcommand{\BDE}{\begin{description}}
-\newcommand{\EDE}{\end{description}}
-\newcommand{\BEQ}{\begin{equation}}
-\newcommand{\EEQ}{\end{equation}}
-\newcommand{\BAR}{\begin{array}}
-\newcommand{\EAR}{\end{array}}
-\newcommand{\BDO}{\begin{document}}
-\newcommand{\EDO}{\end{document}}
-\newcommand{\BCE}{\begin{center}}
-\newcommand{\ECE}{\end{center}}
-\newcommand{\BTG}{\begin{tabbing}}
-\newcommand{\ETG}{\end{tabbing}}
-\newcommand{\BTR}{\begin{tabular}}
-\newcommand{\ETR}{\end{tabular}}
-\newcommand{\BAB}{\begin{abstract}}
-\newcommand{\EAB}{\end{abstract}}
-\newcommand{\BEN}{\begin{enumerate}}
-\newcommand{\EEN}{\end{enumerate}}
-\newcommand{\BFI}{\begin{figure}}
-\newcommand{\EFI}{\end{figure}}
-\newcommand{\VSP}{\vspace*{\baselineskip}}
-
-\setlength{\parindent}{0cm}
+%\setlength{\parindent}{0cm}
 
 \begin{document}
 %\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
 \maketitle
-\sloppy
 
 \section{Introduction}
 
@@ -231,8 +201,8 @@ ensembles de valeurs des sous-domaines \verb/SDi/.
 
 \subsubsection{L'union}
 
-Un domaine \verb/D/ est l'union de \verb/n/ domaines \verb/SD1, SD2,
-..., SDn/ si \verb/D/ est de'fini par:
+Un domaine \verb/D/ est l'union de \verb/n/ domaines 
+\verb/SD1, SD2,..., SDn/ si \verb/D/ est de'fini par:
 
 \begin{verbatim}
 D = SD1 + SD2 + ... + SDn ;
@@ -410,7 +380,7 @@ Les fonctions que nous de'crivons dans la suite sont ge'ne're'es par
 NewGen-C lors de la compilation d'un fichier de spe'cifications. Ces
 fonctions sont accessibles depuis un programme C a` la condition
 d'inclure un fichier header nomme' \verb/file.C_adt/ si \verb/file/
-contient les spe'cifications\footnote{si l'ordre \verb/import/ est
+contient les spe'cifications\footnote{si l'ordre \texttt{import} est
 utilise', il faut inclure plusieurs fichiers header; la liste des
 fichiers a` inclure et l'ordre dans lequel ils doivent e^tre inclus sont
 donne's par NewGen-C au moment de la compilation.}. Il faut en outre
