@@ -7,6 +7,7 @@
 YFLAGS+= -d -v
 
 all: $(ARCH)/newC $(ARCH)/libgenC.a
+
 recompile: all quick-install
 
 LIB_HEADERS=\
@@ -67,11 +68,14 @@ LIB_OBJECTS= $(addprefix $(ARCH)/,$(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o))
 
 SOURCES= $(LIB_HEADERS) $(LIB_CFILES) $(OTHER_HEADERS) $(OTHER_CFILES) 
 
-INSTALL_INC= $(LIB_HEADERS) $(DERIVED_LIB_HEADERS)
-INSTALL_LIB= $(ARCH)/libgenC.a
-INSTALL_BIN= $(ARCH)/newC
+INSTALL_INC	= $(LIB_HEADERS) $(DERIVED_LIB_HEADERS)
+INSTALL_LIB	= $(ARCH)/libgenC.a
+INSTALL_BIN	= $(ARCH)/newC
 
-$(LIB_OBJECTS): $(DERIVED_HEADERS)
+#
+# dependences.
+
+$(addprefix $(ARCH)/,$(OTHER_CFILES:.c=.o)) $(LIB_OBJECTS): $(DERIVED_HEADERS)
 
 #
 # local rules
