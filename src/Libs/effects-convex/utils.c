@@ -1000,23 +1000,38 @@ effect make_reference_region(reference ref, tag tac)
     {
 	int idim;
 	list ind = reference_indices(ref);
+       
+	/* Nga Nguyen 04 June 2002 . Bug for regions, see Validation/Regions/incr3.f
+	   If the whole array is accessed (ind = NIL), for example 
+	   DIMENSION DECOUP(2)
+	   WRITE *,DECOUP
+	   all array elements must be added in the region
 
-	for (idim = 1; ind != NIL; idim++, ind = CDR(ind))
-	{
-	    /* For equalities. */
-	    expression exp_ind = EXPRESSION(CAR(ind));
-	    boolean dim_linear_p;
+	   They can be added later by function 
+	   append_declaration_sc_if_exact_without_constraints 
+	   but if the current region is used, it is not consistent => core dumped*/
 
-	    ifdebug(3) {
-		pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
-			   idim, words_to_string(words_expression(exp_ind)));
-	    }
-	    
-	    dim_linear_p = 
-		sc_add_phi_equation(sc, exp_ind, idim, IS_EG, PHI_FIRST);
-	    pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
-	    linear_p = linear_p && dim_linear_p;	    
-	} /* for */
+	if (ENDP(ind))
+	  sc = entity_declaration_sc(e);
+	else
+	  {
+	    for (idim = 1; ind != NIL; idim++, ind = CDR(ind))
+	      {
+		/* For equalities. */
+		expression exp_ind = EXPRESSION(CAR(ind));
+		boolean dim_linear_p;
+		
+		ifdebug(3) {
+		  pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
+			     idim, words_to_string(words_expression(exp_ind)));
+		}
+		
+		dim_linear_p = 
+		  sc_add_phi_equation(sc, exp_ind, idim, IS_EG, PHI_FIRST);
+		pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
+		linear_p = linear_p && dim_linear_p;	    
+	      } /* for */
+	  }
     } /* if */
     
     reg = make_region(reference_dup(make_regions_reference(e)),
@@ -1025,7 +1040,6 @@ effect make_reference_region(reference ref, tag tac)
 		      (linear_p? is_approximation_must : is_approximation_may,
 		       UU),
 		      sc);
-
     return(reg);
 }    
 
@@ -1208,8 +1222,14 @@ bool sc_add_phi_equation(Psysteme sc, expression expr, int dim, bool is_eg,
 			 bool is_phi_first)
 {
     normalized nexpr = NORMALIZE_EXPRESSION(expr);
-    
-    if (normalized_linear_p(nexpr)) 
+  
+    /* Nga Nguyen: 29 August 2001 
+       Add  a value mapping test => filter variables that are not analysed by semantics analyses 
+       such as equivalenced variables. If not, the regions will be false (see bugregion.f)
+       Attention: value hash table may not be defined */
+
+    if (normalized_linear_p(nexpr))
+      // if (normalized_linear_p(nexpr) && value_mappings_compatible_vector_p(normalized_linear(nexpr)))
     {
 	entity phi = make_phi_entity(dim);	
 	Pvecteur v1 = vect_new((Variable) phi, VALUE_ONE);
@@ -1247,8 +1267,30 @@ bool sc_add_phi_equation(Psysteme sc, expression expr, int dim, bool is_eg,
 
 	return(TRUE);
     }
-    
-    /* the expression is not linear */
+    else
+      /* the expression is not linear */
+      { 
+	/* Nga Nguyen: 29 August 2001  
+	   If the expression expr is not a linear expression, we try to retrieve more 
+	   information by using function any_expression_to_transformer, for cases like:
+	   
+	   ITAB(I/2) => {2*PHI1 <= I <= 2*PHI1+1}
+	   ITAB(MOD(I,3)) => {0 <= PHI1 <= 2}, ...
+	   
+	   The function any_expression_to_transformer() returns a transformer that may 
+	   contain temporary variables so we have to project these variables.
+	   
+	   The approximation will become MAY (although in some cases, it is MUST) */
+	
+	entity phi = make_phi_entity(dim);	
+	transformer trans = any_expression_to_transformer(phi,expr,transformer_identity(),TRUE);
+	if (!transformer_undefined_p(trans))
+	  {
+	    transformer new_trans = transformer_temporary_value_projection(trans);
+	    Psysteme p_trans = predicate_system(transformer_relation(new_trans));
+	    sc = sc_safe_append(sc,p_trans);
+	  }
+      }
     return(FALSE);
 }
 
@@ -1678,7 +1720,8 @@ region_constraints_sort(
 {
     set_bases_for_compare(sorted_base);    
     c = constraints_sort_with_compare
-	(c, BASE_NULLE, equality_p? 
+      //	(c, BASE_NULLE, equality_p? 
+      (c, sorted_base, equality_p? 
 	 compare_region_equalities: compare_region_inequalities);
     reset_bases_for_compare();
     return(c);           
