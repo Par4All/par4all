@@ -40,7 +40,6 @@ void set_clear(), set_free();
 set set_make( type )
 set_type type ;
 {
-    extern int fprintf();
     set hp = (set)malloc( sizeof( struct set )) ;
 
     if( hp == (set)NULL ) {
