@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.6  1998/09/17 12:08:43  zory
+ * taking into account new entity from eole
+ *
  * Revision 1.5  1998/09/14 12:50:15  coelho
  * more comments.
  *
@@ -112,6 +115,52 @@ static void write_to_eole(string module, list le, string file_name)
     safe_fclose(toeole, file_name);
 }
 
+/* import a list of entity that have been created during the eole
+ * transformations and create them
+ */
+static void 
+read_new_entities_from_eole(FILE * file, string module){
+  int num = 0;
+  int i;
+  int ent_int_value;
+  int test;
+  float ent_float_value;
+  entity e; 
+  string ent_type = (char *) malloc(100) ;
+
+  /* read the number of new entities to create */
+  test = fscanf(file,"%d\n",&num);
+  pips_assert("fscanf failed : read number of entity \n",(test==1));
+  pips_debug(3,"reading %d new entity from module %s\n", num, module);
+  for (i=0;i<num;i++){
+    
+    test = fscanf(file,"%s",ent_type);
+    pips_assert("fscanf failed : read entity type \n",(test==1));
+    
+    if (!strcmp(ent_type,"int")) {/* int */
+      test = fscanf(file," %d\n", &ent_int_value);
+      pips_assert("fscanf failed : read entity int value \n",(test==1));
+      
+      /* create integer entity */
+      e = make_integer_constant_entity(ent_int_value);
+      pips_assert("error with integer constant entity\n",
+		  entity_consistent_p(e));  
+    }
+    else 
+      if (!strcmp(ent_type,"float")) {/* float */
+	test = fscanf(file," %f\n", &ent_float_value);
+	pips_assert("fscanf failed : read entity float value \n",(test==1));
+	/* create float entity */
+	e = make_float_constant_entity(ent_float_value);
+	pips_assert("error with float constant entity\n",
+		    entity_consistent_p(e));  
+      }
+      else
+	pips_assert("unknown type of entity",0);    
+  } /* end for */
+}
+
+
 /* import expressions from eole.
  */
 static list /* of expression */
@@ -128,6 +177,7 @@ read_from_eole(string module, string file_name)
     /* read entities to create... 
      * should use some newgen type to do so (to share buffers...)
      */
+    read_new_entities_from_eole(fromeole, module);
 
     astuce = read_reference(fromeole);
     result = reference_indices(astuce);
@@ -140,22 +190,22 @@ read_from_eole(string module, string file_name)
 /* swap term to term syntax field in expression list, as a side effect...
  */
 static void 
-swap_syntax_in_expression(
-    list /* of expression */ lcode,
-    list /* of expression */ lnew)
+swap_syntax_in_expression(  list /* of expression */ lcode,
+			    list /* of expression */ lnew)
 {
-    pips_assert("equal length lists", gen_length(lcode)==gen_length(lnew));
-
-    for(; lcode; lcode=CDR(lcode), lnew=CDR(lnew))
+  pips_assert("equal length lists", gen_length(lcode)==gen_length(lnew));
+  
+  for(; lcode; lcode=CDR(lcode), lnew=CDR(lnew))
     {
-	expression old, new;
-
-	old = EXPRESSION(CAR(lcode));
-	new = EXPRESSION(CAR(lnew));
-
-	syntax tmp = expression_syntax(old);
-	expression_syntax(old) = expression_syntax(new);
-	expression_syntax(new) = tmp;	
+      expression old, new;
+      syntax tmp;
+      
+      old = EXPRESSION(CAR(lcode));
+      new = EXPRESSION(CAR(lnew));
+      
+      tmp = expression_syntax(old);
+      expression_syntax(old) = expression_syntax(new);
+      expression_syntax(new) = tmp;	
     }
 }
 
@@ -194,29 +244,36 @@ bool optimize_expressions(string module_name)
 
     /* begin EOLE stuff
      */
-    in = safe_new_tmp_file(IN_FILE_NAME);
-    out = safe_new_tmp_file(OUT_FILE_NAME);
-
     le = get_list_of_rhs(s);
-    write_to_eole(module_name, le, out);
+    if (gen_length(le)) { /* not empty list */
+      
+      in = safe_new_tmp_file(IN_FILE_NAME);
+      out = safe_new_tmp_file(OUT_FILE_NAME);
+      
+      write_to_eole(module_name, le, out);
 
-    /* run eole (Evaluation Optimization for Loops and Expressions) 
-     * as a separate process.
-     */
-    cmd = strdup(concatenate(
-	PIPS_EOLE " " PIPS_EOLE_FLAGS " -o ", in, " ", out, NULL));
+      /* run eole (Evaluation Optimization for Loops and Expressions) 
+       * as a separate process.
+       */
+      cmd = strdup(concatenate(
+			       PIPS_EOLE " " PIPS_EOLE_FLAGS
+			       " -o ", in, " ", out, NULL));
 
-    pips_debug(2, "executing: %s\n", cmd);
+      pips_debug(2, "executing: %s\n", cmd);
+      
+      safe_system(cmd);
+      
+      ln = read_from_eole(module_name, in);
+      swap_syntax_in_expression(le, ln);
 
-    safe_system(cmd);
+      /* remove temorary files and free allocated memory.
+       */
+      safe_unlink(out);
+      safe_unlink(in);
 
-    ln = read_from_eole(module_name, in);
-    swap_syntax_in_expression(le, ln);
-
-    /* remove temorary files and free allocated memory.
-     */
-    safe_unlink(out);
-    safe_unlink(in);
+    }
+    else 
+      pips_debug(3,"no expression for module %s \n", module_name);
 
     gen_free_list(ln), ln=NIL;
     free(out), out = NULL;
