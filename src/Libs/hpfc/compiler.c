@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/03/19 14:36:50 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/03/20 20:32:34 $, )
  * version $Revision$
  *
  * Compiler
@@ -212,20 +212,24 @@ hpf_compile_call(
      */
     if (TRUE)
     {
+	entity fun = call_function(c);
 	list /* of expressions */
-	    leh=lUpdateExpr_but_distributed(host_module, call_arguments(c)),
-	    len=lUpdateExpr(node_module, call_arguments(c));
+            args = call_arguments(c),
+	    leh=lUpdateExpr_but_distributed(host_module, args),
+	    len=lUpdateExpr(node_module, args);
 	
+	update_overlaps_in_caller(fun, args);
+
 	pips_debug(7, "some references to distributed variable\n");
 
 	(*hoststatp)=MakeStatementLike(stat, is_instruction_call);
 	(*nodestatp)=MakeStatementLike(stat, is_instruction_call);
 	
 	instruction_call(statement_instruction((*hoststatp)))=
-	    make_call(call_function(c), leh);
+	    make_call(fun, leh);
 
 	instruction_call(statement_instruction((*nodestatp)))=
-	    make_call(call_function(c), len);
+	    make_call(fun, len);
 
 	DEBUG_STAT(8, entity_name(host_module), *hoststatp);
 	DEBUG_STAT(8, entity_name(node_module), *nodestatp);
