@@ -716,6 +716,7 @@ void reset_region_interprocedural_translation()
  * reset_current_module_statement();
  * reset_cumulated_rw_effects();
  * reset_precondition_map();
+ * regions_end();
  * reset_current_module_entity();
  */
 void 
