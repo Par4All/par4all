@@ -722,3 +722,31 @@ check_common_inclusion(entity common)
     gen_free_list(lref);
     return ok;
 }
+
+#define declaration_formal_p(E) storage_formal_p(entity_storage(E))
+#define entity_to_offset(E) formal_offset(storage_formal(entity_storage(E)))
+
+/* This function gives back the ith formal parameter, which is found in the
+ * declarations of a call or a subroutine.
+ */
+entity 
+find_ith_formal_parameter(
+    entity the_fnct,
+    int    rank)
+{
+    list ldecl = code_declarations(value_code(entity_initial(the_fnct)));
+    entity current = entity_undefined;
+
+    while (ldecl != NULL) 
+    {
+	current = ENTITY(CAR(ldecl));
+	ldecl = CDR(ldecl);
+	if (declaration_formal_p(current) && (entity_to_offset(current)==rank))
+	    return current;
+    }
+
+    pips_internal_error("cannot find the %d dummy argument of %s",
+			rank, entity_name(the_fnct));
+
+    return entity_undefined;
+}
