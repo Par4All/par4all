@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.112  2000/02/29 10:30:16  coelho
+ * typo--
+ *
  * Revision 1.111  2000/02/29 10:28:36  coelho
  * hop !
  *
@@ -1015,7 +1018,7 @@ void tpips_exec(char * line)
 	if (!tpips_init_done &&
 	    strncmp(line, SET_ENV, strlen(SET_ENV))!=0 &&
 	    strncmp(line, GET_ENV, strlen(GET_ENV))!=0 &&
-	    strncmp(line, TPIPS_SOURCE, strncmp(TPIPS_SOURCE))!=0 &&
+	    strncmp(line, TPIPS_SOURCE, strlen(TPIPS_SOURCE))!=0 &&
 	    !blank_or_comment_line_p(line))
 	    tpips_init();
 	
