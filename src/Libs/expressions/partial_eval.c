@@ -28,8 +28,6 @@ Des que l'evaluation n'est plus possible, il faut regenerer l'expression
  */
 
 #include <stdio.h>
-extern int fprintf(FILE *, const char *, ...);
-extern int printf(const char *, ...);
 #include <string.h>
 
 #include "genC.h"
