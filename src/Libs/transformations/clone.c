@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.7  1997/11/04 10:36:58  coelho
+ * more comments, plus assert to check coherency in perform...
+ *
  * Revision 1.6  1997/11/04 10:12:12  coelho
  * clone_substitute interface added...
  *
@@ -44,6 +47,7 @@
 #define DEBUG_ON   debug_on("CLONE_DEBUG_LEVEL")
 #define ALL_DECLS  "PRETTYPRINT_ALL_DECLARATIONS"
 #define STAT_ORDER "PRETTYPRINT_STATEMENT_NUMBER"
+#define undefined_number_p(n) ((n)==STATEMENT_NUMBER_UNDEFINED)
 
 /************************************************************ UPDATE CALLEES */
 
@@ -274,10 +278,9 @@ set_clone(entity the_ref, entity the_clone, int argn, int val)
 
 static void
 do_clone(
-    call c, 
-    int argn, 
-    int val,
-    entity clonee /* if provided */)
+    call c,            /* call to be replaced */
+    int argn, int val, /* arg number and associated value */
+    entity clonee      /* if provided */)
 {
     entity cloned = call_function(c);
     pips_debug(3, "%s cloned on argument %d for value %d\n", 
@@ -300,12 +303,12 @@ do_clone(
 
 DEFINE_LOCAL_STACK(stmt, statement)
 
-/* returns if the expression is a constant, maybe thanks to the declarations.
+/* returns if the expression is a constant, maybe thanks to the preconditions.
  */
 static bool
 this_expression_constant_p(
-    expression e,
-    int * pval)
+    expression e, /* expression to be tested */
+    int * pval    /* returned integer value if one was found */)
 {  
     bool ok = TRUE;
     if (expression_constant_p(e)) 
@@ -361,7 +364,7 @@ clone_rwt(call c)
 	if (this_expression_constant_p(nth_arg, &val)) /* yeah! */
 	    do_clone(c, argument_to_clone, val, entity_undefined);
     }
-    else if (statement_to_clone!=STATEMENT_NUMBER_UNDEFINED &&
+    else if (!undefined_number_p(statement_to_clone) &&
 	     statement_to_clone==statement_number(stmt_head()))
     {
 	do_clone(c, 0, 0, clonee_to_substitute);
@@ -382,6 +385,11 @@ perform_clone(
     entity caller;
     statement stat;
 
+    pips_assert("coherent arguments",
+		(argn!=0 && undefined_number_p(number) && 
+		 entity_undefined_p(substitute)) ||
+		(argn==0 && !undefined_number_p(number)));
+
     pips_debug(2, "cloning %s in %s on %d\n", 
 	       entity_local_name(module), caller_name, argn);
 
@@ -392,6 +400,8 @@ perform_clone(
 	set_precondition_map((statement_mapping) 
 	    db_get_memory_resource(DBR_PRECONDITIONS, caller_name, TRUE));
 
+    /* init 
+     */
     make_stmt_stack();
     module_to_clone = module;
     argument_to_clone = argn;
@@ -405,12 +415,14 @@ perform_clone(
 		      call_domain, gen_true, clone_rwt,
 		      NULL);
 
-    /* update CALLEES
+    /* update CALLEES and CODE
      */
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name, stat);
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name,
 			   (char *) compute_callees(stat));
 
+    /* close 
+     */
     module_to_clone = entity_undefined;
     argument_to_clone = 0;
     statement_to_clone = STATEMENT_NUMBER_UNDEFINED;
@@ -422,6 +434,8 @@ perform_clone(
 
 /********************************************************************* UTILS */
 
+/* global initializations needed 
+ */
 static void
 set_currents(string name)
 {
@@ -440,6 +454,8 @@ set_currents(string name)
     set_current_module_statement(stat);
 }
 
+/* global resets
+ */
 static void
 reset_currents(string name)
 {
@@ -587,7 +603,6 @@ clone_or_clone_substitute(
     reset_currents(name);
     debug_off();
     return TRUE;
-    
 }
 
 bool
