@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/02/15 14:18:02 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/04/02 15:24:02 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -439,8 +439,7 @@ Pbase base_index;
 	    else
 	    {
 		eq_set_vect_nul(ineq),		
-		info[abs(level)][level<0?0:1]--;
-		ps->nb_ineq--;
+		info[abs(level)][level<0?0:1]--;		
 	    }
 	}
     }
