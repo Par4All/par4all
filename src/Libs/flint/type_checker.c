@@ -32,6 +32,12 @@
 #define ENTITY_CONCAT_P(e) (entity_an_operator_p(e, CONCAT))
 #define ENTITY_EXTERNAL_P(e) (value_code_p(entity_initial(e)))
 #define ENTITY_INTRINSIC_P(e) (value_intrinsic_p(entity_initial(e)))
+
+#define ENTITY_CONVERSION_P(e,name) \
+  (strcmp(entity_local_name(e), name##_GENERIC_CONVERSION_NAME)==0)
+#define ENTITY_CONVERSION_CMPLX_P(e) ENTITY_CONVERSION_P(e, CMPLX)
+#define ENTITY_CONVERSION_DCMPLX_P(e) ENTITY_CONVERSION_P(e, DCMPLX)
+
 #define INT_LENGTH 4
 #define REAL_LENGTH 4
 #define DOUBLE_LENGTH 8
@@ -164,6 +170,12 @@ convert_constant_from_real_to_complex(call c)
   exp_imag = make_expression(make_syntax(is_syntax_call, c_imag), 
 			     normalized_undefined);
   args = CONS(EXPRESSION, exp_real, CONS(EXPRESSION, exp_imag, NIL));
+  /* Conversion explicit */
+  if (get_bool_property("TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS"))
+  {
+    return make_call(CreateIntrinsic(CMPLX_GENERIC_CONVERSION_NAME), args);
+  }
+  /* Conversion inplicit */
   return make_call(CreateIntrinsic(IMPLIED_COMPLEX_NAME), args);
 }
 /* DOUBLE -> COMPLEX
@@ -206,6 +218,12 @@ convert_constant_from_double_to_dcomplex(call c)
 			     normalized_undefined);
   args = CONS(EXPRESSION, exp_real, CONS(EXPRESSION, exp_imag, NIL));
   
+  /* Conversion explicit */
+  if (get_bool_property("TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS"))
+  {
+    return make_call(CreateIntrinsic(DCMPLX_GENERIC_CONVERSION_NAME), args);
+  }
+  /* Conversion inplicit */
   return make_call(CreateIntrinsic(IMPLIED_DCOMPLEX_NAME), args);
 }
 /* REAL -> DCOMPLEX
@@ -244,6 +262,7 @@ convert_constant(call c, basic to_basic)
     b = entity_basic(function_called);
     if(basic_equal_p(b, to_basic))
     {
+      //return NULL;
       return copy_call(c);
     }
     else if (basic_int_p(b))
@@ -328,6 +347,7 @@ cast_constant(expression exp_constant, basic to_basic, type_context_p context)
 {
   entity function_called;
   call c;
+  basic b = NULL;
   expression exp, exp_real, exp_imag, exp_real2, exp_imag2;
   syntax s = expression_syntax(exp_constant);
   if(syntax_call_p(s))
@@ -335,6 +355,7 @@ cast_constant(expression exp_constant, basic to_basic, type_context_p context)
     function_called = call_function(syntax_call(s));
     if(entity_constant_p(function_called))
     {
+      /* Convert if necessary */
       c = convert_constant(syntax_call(s), to_basic);
       if (c != NULL)
       {	
@@ -356,48 +377,112 @@ cast_constant(expression exp_constant, basic to_basic, type_context_p context)
       }
     }
     else if(ENTITY_IMPLIED_CMPLX_P(function_called) ||
-	    ENTITY_IMPLIED_DCMPLX_P(function_called))
+	    ENTITY_CONVERSION_CMPLX_P(function_called) ||
+	    ENTITY_IMPLIED_DCMPLX_P(function_called) ||
+	    ENTITY_CONVERSION_DCMPLX_P(function_called))
     {
       exp_real = EXPRESSION(CAR(call_arguments(syntax_call(s))));
+      /* Two arguments, with imagine party */
+      if (CDR(call_arguments(syntax_call(s))) != NIL )
+      {
+	exp_imag = EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
+      }
+      /* One argument, no imagine party */
+      else
+      {
+	exp_imag = NULL;
+      }
       if (!basic_complex_p(to_basic))
       {
 	return cast_constant(exp_real, to_basic, context);
       }
       /* DCOMPLEX -> COMPLEX */
       else if (basic_complex(to_basic) == 8 &&
-	  ENTITY_IMPLIED_DCMPLX_P(function_called))
+	       (ENTITY_IMPLIED_DCMPLX_P(function_called) ||
+		ENTITY_CONVERSION_DCMPLX_P(function_called)))
       {
-	exp_imag = EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-	exp_real2 = cast_constant(exp_real, make_basic_float(4), context);
-	exp_imag2 = cast_constant(exp_imag, make_basic_float(4), context);
+	b = make_basic_float(4);
+	exp_real2 = cast_constant(exp_real, b, context);
+	if (exp_imag != NULL)
+	{
+	  exp_imag2 = cast_constant(exp_imag, b, context);
+	}
+	else
+	{
+	  c =  make_call(make_constant_entity("0.0E0", is_basic_float, 
+					      REAL_LENGTH),
+			 NIL);
+	  exp_imag2 = make_expression(make_syntax(is_syntax_call, c),
+				      normalized_undefined);
+	}
 	if ( exp_real2 == NULL || exp_imag2 == NULL)
 	{
 	  pips_internal_error("Real and imagine party are not constants!\n");
 	}
-	c = make_call(CreateIntrinsic(IMPLIED_COMPLEX_NAME),
-		      CONS(EXPRESSION, exp_real2,
-			   CONS(EXPRESSION, exp_imag2, NIL)));	
+	/* Conversion implicit */
+	if (!get_bool_property("TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS") &&
+	    ENTITY_IMPLIED_DCMPLX_P(function_called))
+	{
+	  c = make_call(CreateIntrinsic(IMPLIED_COMPLEX_NAME),
+			CONS(EXPRESSION, exp_real2,
+			     CONS(EXPRESSION, exp_imag2, NIL)));	
+	}
+	/* Conversion explicit */
+	else
+	{
+	  c = make_call(CreateIntrinsic(CMPLX_GENERIC_CONVERSION_NAME),
+			CONS(EXPRESSION, exp_real2,
+			     CONS(EXPRESSION, exp_imag2, NIL)));	
+	}
 	return make_expression(make_syntax(is_syntax_call, c),
 			       normalized_undefined);
       }
       /* COMPLEX -> DCOMPLEX */
       else if (basic_complex(to_basic) == 16 &&
-	  ENTITY_IMPLIED_CMPLX_P(function_called))
+	       (ENTITY_IMPLIED_CMPLX_P(function_called) ||
+		ENTITY_CONVERSION_CMPLX_P(function_called)))
       {
-	exp_imag = EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-	exp_real2 = cast_constant(exp_real, make_basic_float(8), context);
-	exp_imag2 = cast_constant(exp_imag, make_basic_float(8), context);
+	b = make_basic_float(8);
+	exp_real2 = cast_constant(exp_real, b, context);
+	if (exp_imag != NULL)
+	{
+	  exp_imag2 = cast_constant(exp_imag, b, context);
+	}
+	else
+	{
+	  c =  make_call(make_constant_entity("0.0D0", is_basic_float, 
+					      DOUBLE_LENGTH),
+			 NIL);
+	  exp_imag2 = make_expression(make_syntax(is_syntax_call, c),
+				      normalized_undefined);
+	}
 	if ( exp_real2 == NULL || exp_imag2 == NULL)
 	{
 	  pips_internal_error("Real and imagine party are not constants!\n");
 	}
-	c = make_call(CreateIntrinsic(IMPLIED_DCOMPLEX_NAME),
-		      CONS(EXPRESSION, exp_real2,
-			   CONS(EXPRESSION, exp_imag2, NIL)));	
+	/* Conversion implicit */
+	if (!get_bool_property("TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS") &&
+	    ENTITY_IMPLIED_CMPLX_P(function_called))
+	{
+	  c = make_call(CreateIntrinsic(IMPLIED_DCOMPLEX_NAME),
+			CONS(EXPRESSION, exp_real2,
+			     CONS(EXPRESSION, exp_imag2, NIL)));	
+	}
+	/* Conversion explicit */
+	else
+	{
+	  c = make_call(CreateIntrinsic(DCMPLX_GENERIC_CONVERSION_NAME),
+			CONS(EXPRESSION, exp_real2,
+			     CONS(EXPRESSION, exp_imag2, NIL)));	
+	}
 	return make_expression(make_syntax(is_syntax_call, c),
 			       normalized_undefined);
       }
     }
+  }
+  if (b != NULL)
+  {
+    free_basic(b);
   }
   return NULL;
 }
@@ -664,6 +749,9 @@ type_this_instruction(instruction i, type_context_p context)
   if (instruction_call_p(i))
   {
     c = instruction_call(i);
+    pips_debug(1, "Call to %s; Its type is %s \n", 
+	       entity_name(call_function(c)), 
+	       type_to_string(entity_type(call_function(c))));
 
     /* type check a SUBROUTINE call. */
     if (ENTITY_EXTERNAL_P(call_function(c)))
@@ -892,11 +980,36 @@ static void type_this_entity_if_needed(entity e, type_context_p context)
   value v = entity_initial(e);
   if (value_symbolic_p(v))
   {
-    expression s = symbolic_expression(value_symbolic(v));
+    symbolic sy = value_symbolic(v);
+    expression s = symbolic_expression(sy);
+    basic b1, b2;
 
-    if (!hash_defined_p(context->types, s))
-      type_this_chunk((void *) s, context);
-  }
+    if (hash_defined_p(context->types, s))
+      return;
+
+    type_this_chunk((void *) s, context);
+
+    /* type as "e = s" */
+    b1 = entity_basic(e);
+    b2 = GET_TYPE(context->types, s);
+
+    if (!basic_compatible_p(b1, b2))
+    {
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+		   "%s parameter '%s' definition from incompatible type %s", 
+			      basic_to_string(b1),
+			      entity_local_name(e),
+			      basic_to_string(b2)); 
+      context->number_of_error++;
+      return;
+    }
+
+    if (!basic_equal_p(b1, b2))
+    {
+      symbolic_expression(sy) = insert_cast(b1, b2, s, context);
+      PUT_TYPE(context->types, symbolic_expression(sy), copy_basic(b1));
+    }
+}
 }
 
 static void put_summary(string name, type_context_p context)
