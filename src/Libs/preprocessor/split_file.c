@@ -368,7 +368,6 @@ static void print_name(FILE * o, char * name, int n) /* FC */
     while (n-->0) putc(*name++, o);
 }
 
-static void drop_end_of_line_blanks(char *);
 
 int fsplit(char * file_name, FILE * out)
 {
