@@ -5,6 +5,9 @@
  * preprocessed.
  *
  * $Log: csplit_file.c,v $
+ * Revision 1.6  2003/08/12 15:44:46  irigoin
+ * Mostly, implementation of Fabien's (useless) kludge, COMPILATION_UNIT_PREFIX
+ *
  * Revision 1.5  2003/08/08 15:57:52  irigoin
  * reset added to process a set of files and not only one file at a tine
  *
@@ -34,7 +37,7 @@ extern char * strdup(char *);
 
 #include "misc.h"
 
-/* To import FILE_SEP_STRING... */
+/* To import FILE_SEP_STRING... and COMPILATION_UNIT_PREFIX... */
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
@@ -74,7 +77,7 @@ current_input_line = 0;
 }
 
 static string current_compilation_unit_file_name = string_undefined;
-static string current_compilation_unit_name = string_undefined; /* includes FILE_SEP_STRING as a suffix. */
+static string current_compilation_unit_name = string_undefined; /* includes FILE_SEP_STRING as a suffix and COMPILATION_UNIT_PREFIX as a prefix. */
 static FILE * compilation_unit_file = NULL; /* Compilation unit*/
 
 static FILE * module_list_file = NULL;
@@ -108,14 +111,19 @@ void csplit_open_compilation_unit(string input_file_name)
 
   /* Step 1: Define the compilation unit name from the input file name. */
   unambiguous_file_name = strdup(concatenate(current_workspace_name,
-					"/", simpler_file_name,
-					FILE_SEP_STRING,
-					".c",
-					NULL));
-  compilation_unit_file = safe_fopen(unambiguous_file_name, "w");
+					     "/", COMPILATION_UNIT_PREFIX,
+					     simpler_file_name,
+					     FILE_SEP_STRING,
+					     ".c",
+					     NULL));
 
   /* Loop with a counter until the open is OK. Two or more files with the
      same local names may be imported from different directories. */
+  if(fopen(unambiguous_file_name, "r")!=NULL) {
+    pips_internal_error("Two source files (at least) with same name: \"%s\"\n",
+			simpler_file_name);
+  }
+  compilation_unit_file = safe_fopen(unambiguous_file_name, "w");
 
   /* Loop over counter not implemented. */
 
@@ -124,7 +132,7 @@ void csplit_open_compilation_unit(string input_file_name)
 
   current_compilation_unit_file_name = unambiguous_file_name;
   current_compilation_unit_name
-    = strdup(concatenate(simpler_file_name, FILE_SEP_STRING, NULL));
+    = strdup(concatenate(COMPILATION_UNIT_PREFIX, simpler_file_name, FILE_SEP_STRING, NULL));
 
   /* Keep track of the new compilation unit as a "module" stored in a file */
 
@@ -246,7 +254,7 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
 
   pips_assert("Current position is OK", current_input_line==first_line-1);
 
-  /* Step 3: Copy the function declaration in the compilation unit */
+  /* Step 3: Copy the function declaration in the compilation unit. */
   while(current_input_line<last_line) {
     char c = fgetc(splitc_in_append);
 
@@ -256,6 +264,8 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
   }
 
   /* Step 4: Copy the function definition */
+  /* Fabien: you could add here anything you might want to unsplit the
+     file later. */
   fprintf(compilation_unit_file, "extern %s;\n", signature);
 
   /* Step 5: Keep track of the new module */
@@ -321,7 +331,12 @@ string  csplit(
   module_list_file = out;
   csplit_open_compilation_unit(file_name);
 
+  /* CATCH(user_error) {*/ 
+  /* error_message = "" */
+  /*} TRY {*/
   splitc_parse();
+  /* error_message = NULL; */
+  /* UNCATCH(user_error); } */
 
   csplit_close_compilation_unit(file_name);
   safe_fclose(splitc_in, file_name);
