@@ -28,6 +28,7 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
+#include "text-util.h"
 
 #define EMPTY         ""
 #define NL            "\n"
@@ -54,6 +55,44 @@ static string c_expression(expression);
 #define current_module_is_a_function() \
   (entity_function_p(get_current_module_entity()))
 
+
+#define RESULT_NAME	"result"
+
+static string c_entity_local_name(entity var)
+{
+  string name;
+  char * car;
+
+  if (current_module_is_a_function() &&
+      var != get_current_module_entity() &&
+      same_string_p(entity_local_name(var), 
+		    entity_local_name(get_current_module_entity())))
+    name = RESULT_NAME;
+  else
+    {
+      name = entity_local_name(var);
+  
+      /* Delete all the prefixes */
+
+      if (strstr(name,STRUCT_PREFIX) != NULL)
+	name = strstr(name,STRUCT_PREFIX) + 1;
+      if (strstr(name,UNION_PREFIX) != NULL)
+	name = strstr(name,UNION_PREFIX) + 1;
+      if (strstr(name,ENUM_PREFIX) != NULL)
+	name = strstr(name,ENUM_PREFIX) + 1;      
+      if (strstr(name,TYPEDEF_PREFIX) != NULL)
+	name = strstr(name,TYPEDEF_PREFIX) + 1;
+      if (strstr(name,MEMBER_SEP_STRING) != NULL)
+	name = strstr(name,MEMBER_SEP_STRING) + 1;
+    }
+
+  /* switch to lower cases... */
+  for (car = name; *car; car++)
+    *car = (char) tolower(*car);
+  
+  return name;
+}
+
 /************************************************************** DECLARATIONS */
 
 /* 
@@ -61,26 +100,86 @@ static string c_expression(expression);
    parameter (n=4) -> #define n 4
  */
 
-static string
-c_basic_string(basic b)
-{
-  string result = "UNKNOWN_BASIC_TYPE" SPACE;
+static string c_basic_string(basic b);
 
+static string c_type_string(type t)
+{
+  string result = "UNKNOWN_TYPE" SPACE;
+  switch (type_tag(t))
+    {
+    case is_type_variable:
+      {
+	basic b = variable_basic(type_variable(t));
+	result = c_basic_string(b);
+	break;
+      }
+    case is_type_void:
+      {
+	result = "void" SPACE;
+	break;
+      }
+    case is_type_struct:
+      {
+	result = "struct" SPACE;
+	break;
+      }
+    case is_type_union:
+      {
+	result = "union" SPACE;
+	break;
+      }
+    case is_type_enum:
+      {
+	result = "enum" SPACE;
+	break;
+      }
+    }
+  return strdup(result);
+}
+
+static string c_basic_string(basic b)
+{
+  string result = "UNKNOWN_BASIC" SPACE;
   switch (basic_tag(b))
     {
     case is_basic_int:
-      switch (basic_int(b))
-	{
-	case 2: result = "short" SPACE; 
-	  break;
-	case 4: result = "int" SPACE; 
-	  break;
-	case 6: result = "long" SPACE; 
-	  break;
-	case 8: result = "long long" SPACE; 
-	  break;
-	}
-      break;
+      {
+	pips_debug(2,"Basic int\n");
+	switch (basic_int(b))
+	  {
+	  case 1: result = "char" SPACE; 
+	    break;
+	  case 2: result = "short" SPACE; 
+	    break;
+	  case 4: result = "int" SPACE; 
+	    break;
+	  case 6: result = "long" SPACE; 
+	    break;
+	  case 8: result = "long long" SPACE; 
+	    break;
+	  case 11: result = "unsigned char" SPACE;
+	    break;
+	  case 12: result = "unsigned short" SPACE;
+	    break;
+	  case 14: result = "unsigned int" SPACE;
+	    break;
+	  case 16: result = "unsigned long" SPACE;
+	    break;
+	  case 18: result = "unsigned long long" SPACE;
+	    break;
+	  case 21: result = "signed char" SPACE;
+	    break;
+	  case 22: result = "signed short" SPACE;
+	    break;
+	  case 24: result = "signed int" SPACE;
+	    break;
+	  case 26: result = "signed long" SPACE;
+	    break;
+	  case 28: result = "signed long long" SPACE;
+	    break;
+	  }
+	break;
+      }
     case is_basic_float:
       switch (basic_float(b))
 	{
@@ -96,10 +195,35 @@ c_basic_string(basic b)
     case is_basic_string:
       result = "char" SPACE;
       break;
-
-      /* add (short, long, long long) signed, unsigned, bit, pointer, derived, typedef*/
+    case is_basic_bit:
+      {
+	int i = basic_bit(b);
+	pips_debug(2,"Bit field basic: %d\n",i);
+	result = "int" SPACE; /* ignore if it is signed or unsigned */
+	break;
+      }
+    case is_basic_pointer:
+      {
+	type t = basic_pointer(b);
+	pips_debug(2,"Basic pointer\n");
+	result = concatenate(c_type_string(t),"* ",NULL);
+	break;
+      }
+    case is_basic_derived:
+      {
+	entity ent = basic_derived(b);
+	type t = entity_type(ent);
+	string name = c_entity_local_name(ent);
+	result = concatenate(c_type_string(t),name,NULL);
+	break;
+      }
+    case is_basic_typedef:
+      {
+	entity ent = basic_typedef(b);
+	result = c_entity_local_name(ent);
+	break;
+      }  
     }
-
   return strdup(result);
 }
 
@@ -111,13 +235,9 @@ int_to_string(int i)
   return strdup(buffer);
 }
 
-/* returns a string for dimension list dim.
-   lower is assumed to be 0 in references.
-   Caution: the dimension order is reversed! I want it!
- */
 static string c_dim_string(list ldim)
 {
-  string result = strdup("");
+  string result = "";
   if (ldim) 
     {
       MAP(DIMENSION, dim,
@@ -130,25 +250,31 @@ static string c_dim_string(list ldim)
 	string sup;
 
 	/* In fact, the lower bound of array in C is always equal to 0, 
-	   we only need to print the upper dimension 
-	   but in order to handle Fortran code, we check all other possibilities.
-
-
-	NHAM ROI, X[N] TUONG DUONG VOI X[0] DEN X[N-1], nen khong phai tru 1*/
+	   we only need to print (upper dimension + 1) 
+	   but in order to handle Fortran code, we check all other possibilities
+	   and print (upper - lower + 1). Problem : the order of dimensions is reversed !!!! */
 
 	if (expression_integer_value(elow, &low))
 	  {
 	    if (low == 0)
-	      result = strdup(concatenate(OPENBRACKET,words_to_string(words_expression(eup)),
-					  CLOSEBRACKET,result,NULL));
+	      {
+		if (expression_integer_value(eup, &up))
+		  result = strdup(concatenate(result,OPENBRACKET,int_to_string(up+1),CLOSEBRACKET,NULL));
+		else
+		  /* to be refined here to make more beautiful expression */
+		  result = strdup(concatenate(result,OPENBRACKET,
+				       words_to_string(words_expression(MakeBinaryCall(CreateIntrinsic("+"),
+										       eup,int_to_expression(1)))),
+				       CLOSEBRACKET,NULL));
+	      }
 	    else 
 	      {
 		if (expression_integer_value(eup, &up))
-		  result = strdup(concatenate(OPENBRACKET,int_to_string(up-low),CLOSEBRACKET,result,NULL));
+		  result = strdup(concatenate(result,OPENBRACKET,int_to_string(up-low+1),CLOSEBRACKET,NULL));
 		else
 		  {
 		    sup = words_to_string(words_expression(eup));
-		    result = strdup(concatenate(OPENBRACKET,sup,"-",int_to_string(low),CLOSEBRACKET,result,NULL));
+		    result = strdup(concatenate(result,OPENBRACKET,sup,"-",int_to_string(low-1),CLOSEBRACKET,NULL)); 
 		    free(sup);
 		  }
 	      }
@@ -157,103 +283,196 @@ static string c_dim_string(list ldim)
 	  {
 	    slow = words_to_string(words_expression(elow));
 	    sup = words_to_string(words_expression(eup));
-	    result = strdup(concatenate(OPENBRACKET,sup,"-",slow,CLOSEBRACKET,result,NULL));
+	    result = strdup(concatenate(result,OPENBRACKET,sup,"-",slow,"+ 1",CLOSEBRACKET,NULL));
 	    free(slow);
 	    free(sup);
 	  }
-      },
-	  ldim);
+      }, ldim);
     }
   /* otherwise the list is empty, no dimension to declare */
   return result;
 }
 
-#define RESULT_NAME	"result"
-
-/* the local name in C: lower case, special handling possible...
- */
-static string 
-c_entity_local_name(entity var)
+static string c_qualifier_string(list l)
 {
-  string name;
-  char * car;
-
-  if (current_module_is_a_function() &&
-      var != get_current_module_entity() &&
-      same_string_p(entity_local_name(var), 
-		    entity_local_name(get_current_module_entity())))
-    {
-      name = strdup(RESULT_NAME);
+  string result="";
+  MAP(QUALIFIER,q,
+  {
+    switch (qualifier_tag(q)) {
+    case is_qualifier_register:
+      result = concatenate(result,"register ",NULL);
+      break; 
+    case is_qualifier_const:
+      result = concatenate(result,"const ",NULL);
+      break;
+    case is_qualifier_restrict:
+      result = concatenate(result,"restrict ",NULL);
+      break;  
+    case is_qualifier_volatile:
+      result = concatenate(result,"volatile ",NULL);
+      break; 
     }
-  else
-    {
-      name = strdup(entity_local_name(var));
-    }
-
-  /* switch to lower cases... */
-  for (car = name; *car; car++)
-    *car = (char) tolower(*car);
-
-  return name;
+  },l);
+  return strdup(result); 
 }
 
-static string 
-this_entity_cdeclaration(entity var)
+static bool brace_expression_p(expression e)
+{
+  if (expression_call_p(e))
+    {
+      entity f = call_function(syntax_call(expression_syntax(e)));
+      if (ENTITY_BRACE_INTRINSIC_P(f))
+	return TRUE;
+    }
+  return FALSE;
+}
+
+static string c_brace_expression_string(expression exp)
+{
+  string result = "{";
+  list args = call_arguments(syntax_call(expression_syntax(exp)));
+  
+  bool first = TRUE;
+  MAP(EXPRESSION,e,
+  {
+    if (brace_expression_p(e))
+      result = strdup(concatenate(result,first?"":",",c_brace_expression_string(e),NULL));
+    else
+      result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e)),NULL));
+    first = FALSE;
+  },args);
+  result = strdup(concatenate(result,"}",NULL));
+  return result;
+}
+
+static string this_entity_cdeclaration(entity var)
 {
   string result = NULL;
+  string name = entity_local_name(var);
+  type t = entity_type(var);
   storage s = entity_storage(var);
+  pips_debug(2,"Entity name : %s\n",entity_name(var));
+  /*  Many possible combinations */
+
+  if (strstr(name,TYPEDEF_PREFIX) != NULL)
+    /* This is a typedef name, what about typedef int myint[5] ???  */
+    return strdup(concatenate("typedef ", c_type_string(t),SPACE,c_entity_local_name(var),NULL));
   
-  if (storage_rom_p(s))
+  switch (storage_tag(s)) {
+  case is_storage_rom: 
     {
       value va = entity_initial(var);
-      constant c = NULL;
-
-      if (value_constant_p(va))
-	c = value_constant(va);
-      else if (value_symbolic_p(va))
-	c = symbolic_constant(value_symbolic(va));
-      
-      if (c)
+      if (!value_undefined_p(va))
 	{
-	  if (constant_int_p(c))
+	  constant c = NULL;
+	  if (value_constant_p(va))
+	    c = value_constant(va);
+	  else if (value_symbolic_p(va))
+	    c = symbolic_constant(value_symbolic(va));
+	  if (c)
 	    {
-	      string sval = int_to_string(constant_int(c));
-	      string svar = c_entity_local_name(var);
-
-	      result = strdup(concatenate(SHARPDEF, SPACE, svar,
-					  SPACE, sval, NL, NULL));
-
-	      free(svar);
-	      free(sval);
+	      if (constant_int_p(c))
+		{
+		  string sval = int_to_string(constant_int(c));
+		  string svar = c_entity_local_name(var);
+		  result = strdup(concatenate(SHARPDEF, SPACE, svar,
+					      SPACE, sval, NL, NULL));
+		  
+		  free(svar);
+		  free(sval);
+		  return result;
+		}
+	      /*What about real, double, string, ... ?*/
 	    }
-	  /* What about real, double, string, ... ?*/
 	}
+      break;
     }
-  else
+  case is_storage_ram: 
     {
-      type t;
-      variable v;
-      string st, sd, svar;
-      
-      t = entity_type(var);
+      /*     ram r = storage_ram(s);
+      entity sec = ram_section(r);
+      if ((sec == CurrentSourceFileStaticArea) || (sec == CurrentStaticArea))
+      result = "static ";*/
+      break;
+    }
+  default: 
+  }
 
-      /* add other types here : functional, struct, union, enum */
-
-      pips_assert("it is a variable", type_variable_p(t));
-      v = type_variable(t);
-  
+  switch (type_tag(t)) {
+  case is_type_variable:
+    {
+      variable v = type_variable(t);  
+      string st, sd, svar, sq;
+      value val = entity_initial(var);
       st = c_basic_string(variable_basic(v));
       sd = c_dim_string(variable_dimensions(v));
-
-      /* add variable qualifiers here */
-
+      sq = c_qualifier_string(variable_qualifiers(v));
       svar = c_entity_local_name(var);
-      
-      result= strdup(concatenate(st, SPACE, svar, sd, NULL));
-
+     
+      /* problems with order !*/
+      result = strdup(concatenate(sq, st, SPACE, svar, sd, NULL));
+      if (!value_undefined_p(val))
+	{
+	  if (value_expression_p(val))
+	    {
+	      expression exp = value_expression(val);
+	      if (brace_expression_p(exp))
+		result = strdup(concatenate(result,"=",c_brace_expression_string(exp),NULL));
+	      else 
+		result = strdup(concatenate(result,"=",words_to_string(words_expression(exp)),NULL));
+	    }
+	}
+      if (basic_bit_p(variable_basic(v)))
+	{
+	  int i = basic_bit(variable_basic(v));
+	  pips_debug(2,"Basic bit %d",i);
+	  result = strdup(concatenate(result,":",int_to_string(i),NULL));
+	}
       free(st); free(sd); free(svar);
+      break;
     }
-
+  case is_type_struct:
+    {
+      list l = type_struct(t);
+      result = strdup(concatenate("struct ",c_entity_local_name(var), "{", NL,NULL));
+      MAP(ENTITY,ent,
+      {
+	string s = this_entity_cdeclaration(ent);	    
+	result = strdup(concatenate(result, s, SEMICOLON, NULL));
+	free(s);
+      },l);
+      result = strdup(concatenate(result,"}", NULL));
+      break;
+    }
+  case is_type_union:
+    {
+      list l = type_union(t);
+      result = strdup(concatenate("union ",c_entity_local_name(var), "{", NL,NULL));
+      MAP(ENTITY,ent,
+      {
+	string s = this_entity_cdeclaration(ent);	    
+	result = strdup(concatenate(result, s, SEMICOLON, NULL));
+	free(s);
+      },l);
+      result = strdup(concatenate(result,"}", NULL));
+      break;
+    }
+  case is_type_enum:
+    {
+      list l = type_enum(t);
+      bool first = TRUE;
+      result = strdup(concatenate("enum ",c_entity_local_name(var), " {",NULL));
+      MAP(ENTITY,ent,
+      { 
+	result = strdup(concatenate(result,first?"":",",c_entity_local_name(ent),NULL));
+	first = FALSE;
+      },l);
+      result = strdup(concatenate(result,"}", NULL));
+      break;
+    }
+  default:
+  }
+ 
   return result? result: strdup("");
 }
 
@@ -294,7 +513,7 @@ c_declarations(entity module,
   c = value_code(entity_initial(module));
   MAP(ENTITY, var,
   {
-    debug(2, "\n Prettyprinter declaration for variable :",entity_local_name(var));   
+    debug(2, "\n Prettyprinter declaration for variable :",c_entity_local_name(var));   
     if (consider_this_entity(var))
       {
 	string old = result;
@@ -378,7 +597,7 @@ typedef string (*prettyprinter)(string, list);
 
 struct s_ppt
 {
-  char * fortran;
+  char * intrinsic;
   char * c;
   prettyprinter ppt;
 };
@@ -423,6 +642,16 @@ static string ppt_unary(string in_c, list le)
   return result;
 }
 
+static string ppt_unary_post(string in_c, list le)
+{
+  string e, result;
+  pips_assert("one arg to unary call", gen_length(le)==1);
+  e = c_expression(EXPRESSION(CAR(le)));
+  result = strdup(concatenate(e, SPACE, in_c, NULL));
+  free(e);
+  return result;
+}
+
 static string ppt_call(string in_c, list le)
 {
   string scall, old;
@@ -453,41 +682,76 @@ static string ppt_call(string in_c, list le)
   return scall;
 }
 
-static struct s_ppt fortran_to_c[] = 
+static struct s_ppt intrinsic_to_c[] = 
 {
-  { "=", "=", ppt_binary },
-  { "*", "*", ppt_binary },
   { "+", "+", ppt_binary  },
   { "-", "-", ppt_binary },
   { "/", "/", ppt_binary },
+  { "*", "*", ppt_binary },
+  { "--", "-", ppt_unary },
+  { "**", "**", ppt_binary },
+  { "=", "=", ppt_binary },
+  { ".OR.", "||", ppt_binary },
+  { ".AND.", "&&", ppt_binary },
+  { ".NOT.", "!", ppt_unary },
+  { ".LT.", "<", ppt_binary },
+  { ".GT.", ">", ppt_binary },
+  { ".LE.", "<=", ppt_binary },
+  { ".GE.", ">=", ppt_binary },
   { ".EQ.", "==", ppt_binary },
   { ".NE.", "!=", ppt_binary },
-  { ".LE.", "<=", ppt_binary },
-  { ".LT.", "<", ppt_binary },
-  { ".GE.", ">=", ppt_binary },
-  { ".GT.", ">", ppt_binary },
-  { ".AND.", "&&", ppt_binary },
-  { ".OR.", "||", ppt_binary },
-  { ".NOT.", "!", ppt_unary },
+  { ".", ".", ppt_binary },
+  { "->", "->", ppt_binary},
+  { "post++", "++", ppt_unary_post },
+  {"post--", "--" , ppt_unary_post },
+  {"++pre", "++" , ppt_unary },
+  {"--pre", "--" , ppt_unary },
+  {"&", "&" , ppt_unary },
+  {"*indirection", "*" , ppt_unary },
+  {"+unary", "+", ppt_unary },
+  {"-unary", "-", ppt_unary },
+  {"~", "~", ppt_unary },
+  {"!", "!", ppt_unary },  
+  {"%", "%" , ppt_binary },  
+  {"+C", "+" , ppt_binary },
+  {"-C", "-", ppt_binary }, 
+  {"<<", "<<", ppt_binary },
+  {">>", ">>", ppt_binary }, 
+  {"<", "<" , ppt_binary },
+  {">", ">" , ppt_binary },
+  {"<=", "<=", ppt_binary },
+  {">=", ">=", ppt_binary }, 
+  {"==", "==", ppt_binary },
+  {"!=", "!=", ppt_binary },  
+  {"&bitand", "&", ppt_binary}, 
+  {"^", "^", ppt_binary },
+  {"|", "|", ppt_binary },
+  {"&&", "&&", ppt_binary }, 
+  {"||", "||", ppt_binary },  
+  {"*=", "*=", ppt_binary },
+  {"/=", "/=", ppt_binary },
+  {"%=", "%=", ppt_binary },
+  {"+=", "+=", ppt_binary },
+  {"-=", "-=", ppt_binary },
+  {"<<=", "<<=" , ppt_binary },
+  {">>=", ">>=", ppt_binary },
+  {"&=", "&=", ppt_binary },
+  {"^=", "^=", ppt_binary },
+  {"|=","|=" , ppt_binary },
   { NULL, NULL, ppt_call }
-  /* add things here ? */
 };
 
-/* return the prettyprinter structure for c.
- 
-Not only from Fortran ?*/
+/* return the prettyprinter structure for c.*/
+
 static struct s_ppt * get_ppt(entity f)
 {
   string called = entity_local_name(f);
-  struct s_ppt * table = fortran_to_c;
-  while (table->fortran && !same_string_p(called, table->fortran))
+  struct s_ppt * table = intrinsic_to_c;
+  while (table->intrinsic && !same_string_p(called, table->intrinsic))
     table++;
   return table;
 }
 
-
-/*
- */
 static bool expression_needs_parenthesis_p(expression e)
 {
   syntax s = expression_syntax(e);
@@ -537,16 +801,16 @@ static string c_call(call c)
   return result;
 }
 
-/* the indexes are reversed.
- */
+/* Attention with Fortran: the indexes are reversed. */
 static string c_reference(reference r)
 {
   string result = strdup(EMPTY), old, svar;
   MAP(EXPRESSION, e, 
   {
     string s = c_expression(e);
+    
     old = result;
-    result = strdup(concatenate(OPENBRACKET, s, CLOSEBRACKET, old, NULL));
+    result = strdup(concatenate(old, OPENBRACKET, s, CLOSEBRACKET, NULL));
     free(old);
     free(s);
   }, reference_indices(r));
@@ -585,30 +849,40 @@ static string c_statement(statement s);
 
 static string c_unstructured(unstructured u)
 {
-  string result =  strdup(EMPTY);
+  string result = "";
   /* build an arbitrary reverse trail of control nodes */
   list trail = unstructured_to_trail(u);
   list cc = NIL;
   trail = gen_nreverse(trail);
-  dump_trail(trail);
-  
+  ifdebug(3)
+    {
+      printf("Print trail: \n");
+      dump_trail(trail);
+    }
+  /* Copy from text_trail ...*/
   for(cc=trail; !ENDP(cc); POP(cc)) 
     {
       control c = CONTROL(CAR(cc));
+      string l = string_undefined;
       int nsucc = gen_length(control_successors(c));
       statement st = control_statement(c);
-      string oldresult = result;   
+      ifdebug(3)
+	{
+	  printf("Processing statement:\n");
+	  print_statement(st);
+	}
       switch(nsucc) 
 	{
 	case 0:
-	  {	       
-	    result = strdup(concatenate(oldresult,c_statement(st),NULL));
-	    fprintf(stderr, "Where 0 \n");
+	  {	  
+	    printf("nsucc = 0 \n");
+	    result = strdup(concatenate(result,c_statement(st),NULL));
 	    break;
 	  }
 	case 1: 
 	  {
 	    control succ = CONTROL(CAR(control_successors(c)));
+	    printf("nsucc = 1 \n");
 	    if(check_io_statement_p(control_statement(succ)) &&
 	       !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) 
 	       {
@@ -623,17 +897,23 @@ static string c_unstructured(unstructured u)
 			     !check_io_statement_p(control_statement(succ)));
 	       }
 	   
-	    result = strdup(concatenate(oldresult,c_statement(st),NULL));
-	    if(statement_does_return(st)) {
-	      if(!ENDP(CDR(cc))) {
-		control tsucc = CONTROL(CAR(CDR(cc)));
-		if(tsucc==succ) 
+	    result = strdup(concatenate(result,c_statement(st),NULL));
+	    if(statement_does_return(st))
+	      {
+		if(!ENDP(CDR(cc)))
 		  {
-		    break;
+		    control tsucc = CONTROL(CAR(CDR(cc)));
+		    if(tsucc==succ) 
+		      {
+			break;
+		      }
 		  }
+		/* A GOTO must be generated to reach the control successor */
+		
+		l = label_local_name(statement_label(control_statement(succ)));
+		pips_assert("Must be labelled", l!= string_undefined);
+		result = strdup(concatenate(result,"goto ",l,SEMICOLON,NULL));
 	      }
-	    }
-	    fprintf(stderr, "Where 1 \n");
 	    break;
 	  }
 	case 2: 
@@ -642,15 +922,91 @@ static string c_unstructured(unstructured u)
 	    control succ2 = CONTROL(CAR(CDR(control_successors(c))));
 	    instruction i = statement_instruction(st);
 	    test t = instruction_test(i);
+	    bool no_endif = FALSE;
+	    string str = NULL;
+	    printf("nsucc = 2 \n");
 	    pips_assert("must be a test", instruction_test_p(i));
-	    fprintf(stderr, "Where 2 \n");
-	    result = strdup(concatenate(oldresult,c_statement(st),NULL));
+
+	    result = strdup(concatenate(result,"if (",c_expression(test_condition(t)), ") {", NL, NULL));
+	    printf("Result = %s\n",result);
+	 
+	    /* Is there a textual successor? */
+	    if(!ENDP(CDR(cc)))
+	      {
+		control tsucc = CONTROL(CAR(CDR(cc)));
+		if(tsucc==succ1)
+		  {
+		    if(tsucc==succ2)
+		      {
+			/* This may happen after restructuring */
+			printf("This may happen after restructuring\n");
+			;
+		      }
+		    else 
+		      {
+			/* succ2 must be reached by GOTO */
+			printf("succ2 must be reached by GOTO\n");
+			l = label_local_name(statement_label(control_statement(succ2)));
+			pips_assert("Must be labelled", l!= string_undefined);
+			str = strdup(concatenate("}",NL, "else {",NL,"goto ", l, SEMICOLON,"}",NL,NULL));
+			printf("str = %s\n",str);
+		      }
+		  }
+		else 
+		  {
+		    if(tsucc==succ2)
+		      {
+			/* succ1 must be reached by GOTO */
+			printf("succ1 must be reached by GOTO\n");
+			l = label_local_name(statement_label(control_statement(succ1)));
+			pips_assert("Must be labelled", l!= string_undefined);
+			no_endif = TRUE;
+		      }
+		    else
+		      {
+			/* Both successors must be labelled */
+			printf("Both successors must be labelled\n");
+			l = label_local_name(statement_label(control_statement(succ1)));
+			pips_assert("Must be labelled", l!= string_undefined);
+			str = strdup(concatenate("goto ", l, SEMICOLON, "}", NL,"else {",NL,NULL));
+			l = label_local_name(statement_label(control_statement(succ2)));
+			pips_assert("Must be labelled", l!= string_undefined);	      
+			str = strdup(concatenate(str,"goto ", l, SEMICOLON, NULL));
+			printf("str = %s\n",str);
+		      }
+		  }
+	      }
+	    else
+	      {
+		/* Both successors must be textual predecessors */
+		printf("Both successors must be textual predecessors \n");
+		l = label_local_name(statement_label(control_statement(succ1)));
+		pips_assert("Must be labelled", l!= string_undefined);
+		str = strdup(concatenate("goto ", l, SEMICOLON, "}",NL,"else {",NL,NULL));
+		l = label_local_name(statement_label(control_statement(succ2)));
+		pips_assert("Must be labelled", l!= string_undefined);
+		str = strdup(concatenate(str,"goto ", l, SEMICOLON, "}",NL, NULL));
+		printf("str = %s\n",str);
+	      }
+	    
+	    if(no_endif)
+	      {
+		printf("No endif\n");
+		result = strdup(concatenate(result," goto ", l, SEMICOLON, "}",NL,NULL));
+		printf("Result = %s\n",result);
+	      }
+	    printf("Result before = %s\n",result);
+	    if (str != NULL)
+	      {
+		printf("str before = %s\n",str);
+		result = strdup(concatenate(result,str,NULL));
+	      }
+	    printf("Result after = %s\n",result);
 	    break;
 	  }
 	default:
 	  pips_internal_error("Too many successors for a control node\n");
 	}
-      free(oldresult);
     }   
   
   gen_free_list(trail);
@@ -714,17 +1070,40 @@ static string c_loop(loop l)
   return result;
 }
 
+
 static string c_whileloop(whileloop w)
 {
   /* partial implementation... */
   string result;
   string body = c_statement(whileloop_body(w));
   string cond = c_expression(whileloop_condition(w));
+  evaluation eval = whileloop_evaluation(w);
   /*do while and while do loops */
-  result = strdup(concatenate("while (", cond, ") {" NL, 
+  if (evaluation_before_p(eval))
+    result = strdup(concatenate("while (", cond, ") {" NL, 
+				body, "}" NL, NULL));
+  else   
+    result = strdup(concatenate("do " NL, "{" NL, 
+				body, "}" NL,"while (", cond, ");" NL, NULL));
+  free(cond);
+  free(body);
+  return result;
+}
+
+static string c_forloop(forloop f)
+{
+  /* partial implementation... */
+  string result;
+  string body = c_statement(forloop_body(f));
+  string init = c_expression(forloop_initialization(f));
+  string cond = c_expression(forloop_condition(f));
+  string inc = c_expression(forloop_increment(f));
+  result = strdup(concatenate("for (", init, ";",cond,";",inc,") {" NL, 
 			      body, "}" NL, NULL));
   
+  free(inc);
   free(cond);
+  free(init);
   free(body);
   return result;
 }
@@ -734,6 +1113,9 @@ static string c_statement(statement s)
 {
   string result;
   instruction i = statement_instruction(s);
+  list l = statement_declarations(s);
+  printf("\nCurrent statement : \n");
+  print_statement(s);
   switch (instruction_tag(i))
     {
     case is_instruction_test:
@@ -758,6 +1140,12 @@ static string c_statement(statement s)
       {
 	whileloop w = instruction_whileloop(i);
 	result = c_whileloop(w);
+	break;
+      }
+    case is_instruction_forloop:
+      {
+	forloop f = instruction_forloop(i);
+	result = c_forloop(f);
 	break;
       }
     case is_instruction_call:
@@ -786,6 +1174,20 @@ static string c_statement(statement s)
       break;
     }
 
+  if (!ENDP(l))
+    {
+      string decl = ""; 
+      MAP(ENTITY, var,
+      {
+	string svar;
+	debug(2, "\n In block declaration for variable :",c_entity_local_name(var));   
+	svar = this_entity_cdeclaration(var);
+	decl = strdup(concatenate(decl, svar, SEMICOLON, NULL));
+	free(svar);
+      },l);
+      result = strdup(concatenate(decl,result,NULL));
+    }
+
   return result;
 }
 
@@ -798,6 +1200,13 @@ static string c_code_string(entity module, statement stat)
      (external static + TOP-LEVEL) */
 
   /* before_head only generates the constant declarations, such as #define*/
+  ifdebug(2)
+    {
+      printf("Module statement: \n");
+      print_statement(stat);
+      printf("and declarations: \n");
+      print_entities(statement_declarations(stat));
+    }
 
   before_head = c_declarations(module, parameter_p, NL, TRUE);
   head        = c_head(module);
