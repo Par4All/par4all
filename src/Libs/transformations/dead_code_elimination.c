@@ -7,6 +7,9 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.27  2000/12/11 15:41:45  ancourt
+  call to compute_callees at the end of suppress_dead_code
+
   Revision 1.26  2000/12/11 13:39:55  nguyen
   Modified function remove_dead_loop to deal with bug caused by nested loops
   with same labels
@@ -962,7 +965,8 @@ suppress_dead_code_statement(statement mod_stmt)
     dead_statement_filter(mod_stmt);
     gen_recurse(mod_stmt, statement_domain,
 		dead_statement_filter, dead_statement_rewrite);
-    dead_statement_rewrite(mod_stmt);
+    dead_statement_rewrite(mod_stmt);	
+
 }
 
 
@@ -1020,7 +1024,9 @@ suppress_dead_code(char * mod_name)
   module_reorder(mod_stmt);
 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
-
+  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name,
+			 (char *) compute_callees(mod_stmt));
+  
   reset_current_module_statement();
   reset_current_module_entity();
   reset_precondition_map();
