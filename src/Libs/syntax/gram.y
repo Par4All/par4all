@@ -268,6 +268,7 @@ range r;
 
 lprg_exec: prg_exec
 	| lprg_exec prg_exec
+            { FatalError("parser", "Multiple modules in one file! Check fsplit!");}
 	;
 
 prg_exec: begin_inst {reset_first_statement();} linstruction { check_first_statement();} end_inst
