@@ -99,9 +99,13 @@ print_in_alias_pairs( string module_name )
 {
     bool success = TRUE;
 
+    debug_on("ALIAS_DEBUG_LEVEL");
     pips_debug(8,"module %s\n",module_name);
 
     success = print_alias_pairs(module_name,DBR_IN_ALIAS_PAIRS,".in_alias");
+
+    debug_off();
+
     return(TRUE);
 }
 
