@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/06/09 16:53:17 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1995/07/20 18:40:36 $, ) 
  * version $Revision$
  */
 
@@ -213,9 +213,8 @@ string suffix, prefix;
 	  "entity %s, [%s,%s]\n",
 	  entity_name(ent), prefix, suffix);
     
-    MAPL(cd,
+    MAP(DIMENSION, dim,
      {
-	 dimension dim = DIMENSION(CAR(cd));
 	 entity dummy = get_ith_dummy(prefix, suffix, dim_number);
 	 int ilower;
 	 int iupper;
@@ -516,16 +515,10 @@ tag act;
     list
 	l = load_statement_local_regions(stat);
 
-    MAPL(ce,
-     {
-	 effect 
-	     e = EFFECT(CAR(ce));
-
-	 if ((reference_variable(effect_reference(e))==ent) &&
-	     (action_tag(effect_action(e))==act))
-	     return(e);
-     },
-	 l);
+    MAP(EFFECT, e,
+	if ((reference_variable(effect_reference(e))==ent) &&
+	    (action_tag(effect_action(e))==act)) return(e),
+	l);
 
     return(effect_undefined);
 }
