@@ -164,10 +164,6 @@ void fprint_entity_list(FILE *fp, list l);
    GEN_DEBUG(D, W, base_fprint(stderr, B, entity_local_name);\
 	           fprintf(stderr, "\n"))
 
-#define pips_debug(level, format, args...)\
- ifdebug(level) { fprintf(stderr, "[%s] ", __FUNCTION__); \
-		  fprintf(stderr, format, ##args); }
-
 #define what_stat_debug(level, stat)\
  ifdebug(level) { int so_ = statement_ordering(stat);\
 		  fprintf(stderr,  "[%s] statement (%d,%d)\n", __FUNCTION__,\
