@@ -255,7 +255,7 @@ les versions antérieures.
 
 
 /* FOR BACKWARD COMPATIBILITY */
-#define sc_difference(ps1, ps2)      pa_system_difference_ofl_ctrl((ps1),(ps2),NO_OFL_CTRL)
+#define sc_difference(ps1, ps2)      pa_system_difference_ofl_ctrl((ps1),(ps2),FWD_OFL_CTRL)
 #define sc_inclusion_p(ps1, ps2)     pa_inclusion_p_ofl_ctrl((ps1), (ps2), NO_OFL_CTRL)
 #define sc_inclusion_p_ofl(ps1, ps2) pa_inclusion_p_ofl_ctrl((ps1), (ps2), FWD_OFL_CTRL)
 #define sc_inclusion_p_ofl_ctrl(ps1, ps2, ofl) pa_inclusion_p_ofl_ctrl((ps1), (ps2), (ofl))
