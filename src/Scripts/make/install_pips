@@ -1,12 +1,22 @@
 #! /bin/sh
 #
 # $RCSfile: install_pips,v $ (version $Revision$)
-# $Date: 1996/12/04 23:43:00 $, 
+# $Date: 1997/03/27 11:18:04 $, 
 #
 # installation for pips softwares and automatic generation of pipsrc
 #
 
 unset archdir
+
+
+## Whether we have a working echo -n
+
+if [ "`echo -n`" ] 
+then
+  echon="echo"
+else
+  echon="echo -n"
+fi
 
 ################################################################# FUNCTIONS
 
@@ -22,7 +32,7 @@ error()
 question()
 {
     echo
-    echo -n "$RCSfile: install_pips,v $:" "$@" "[y/n]: "
+    $echon "$RCSfile: install_pips,v $:" "$@" "[y/n]: "
     read answer
     if [ ${answer:-y} = n ]
     then
@@ -48,7 +58,7 @@ verb()
 
 verbn()
 {
-    echo -n "$RCSfile: install_pips,v $:" "$@"
+    $echon "$RCSfile: install_pips,v $:" "$@"
 }
 
 warning()
@@ -80,7 +90,7 @@ environment()
     shift 2
     verbn "looking for ""$""$var ($comment): "
     # Hum... echo -n "" print '-n'!
-    if test "." = "`eval echo -n .\\$$var`"
+    if test "." = "`echo .\\$$var`"
     then
 	echo "ok!"
     else
