@@ -31,6 +31,7 @@ Des que l'evaluation n'est plus possible, il faut regenerer l'expression
 #include <string.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "text.h"
 
