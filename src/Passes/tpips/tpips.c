@@ -388,7 +388,10 @@ static void help_handler(char * line)
 	 "\tprint the string\n");
     TP_HELP("quit",
 	 "quit\n",
-	 "\texit from tpips (you should close the workspace before\n");
+	 "\texit tpips (you should close the workspace before\n");
+    TP_HELP("exit",
+	 "exit\n",
+	 "\texit tpips quickly (rhough!)\n");
     TP_HELP("help",
 	 "help     [<help-item>]\n",
 	 "\tprint a list of all the commands or a \"detailled\""
@@ -507,6 +510,14 @@ static void quit_handler(char * line)
     exit(0);
 }
 
+/* fast exit...
+ */
+static void exit_handler(char * line)
+{
+    /* tpips_close(); */
+    exit(0); 
+}
+
 /* in lex file
  */
 extern void tpips_set_line_to_parse(char*);
@@ -539,7 +550,7 @@ struct t_handler
 static struct t_handler handlers[] =
 {
   { QUIT,		quit_handler },
-  { "exit",		quit_handler }, /* exit is a synonymous for quit */
+  { "exit",		exit_handler }, /* exit is a synonymous for quit */
   { CHANGE_DIR, 	cdir_handler },
   { SET_ENV,		setenv_handler },
   { GET_ENV, 		getenv_handler },
