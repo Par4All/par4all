@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1996/07/27 15:52:46 $, ) 
+# ($Date: 1996/08/10 16:24:03 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -58,6 +58,19 @@ MAX_NB_LINES='100'
 export MAX_NB_LINES
 unset UNIQDIR pips_version RUNDIR LOCKFILE PERFORMANCE
 
+#
+# echos the pips to be run
+
+which_executable()
+{
+  for x in $PWD/$1 $PWD/$PIPS_ARCH/$1 $PIPS_BINDIR/$PIPS_ARCH/$1
+  do
+    test -x $x && echo $x
+  done
+  # default:
+  type $1 | sed "s,^$1 is ,,"
+}
+
 usage()
 {
   {
@@ -71,8 +84,8 @@ usage()
     echo "  -a address: mail destination"
     echo "  -l file: lockfile name where to report"
     echo "  -f file: fortran files"
-    echo "  -x pips: pips to be used (dafault . then Production)"
-    echo "  -y tpips: tpips to be used (dafault . then Production)"
+    echo "  -x pips: pips to be used (default as Validate)"
+    echo "  -y tpips: tpips to be used (idem)"
     echo "  -r dir: directory where to run (default .)"
     echo "  -i lines: max number of lines for sendig a full message"
   } >&2
@@ -115,16 +128,6 @@ shift `expr $OPTIND - 1`
 debug()
 {
   echo "$@" >&2
-}
-
-which_executable()
-{
-  if [ -x $1 ]
-  then 
-    echo $PWD/$1
-  else
-    type $1 | sed "s,^$1 is ,,"
-  fi
 }
 
 RUNDIR=${RUNDIR:-$PWD}
