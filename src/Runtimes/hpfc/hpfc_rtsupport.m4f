@@ -3,7 +3,7 @@ c Runtime Support Functions for the High Performance Fortran Compiler
 c by Fabien COELHO.
 c
 c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-c ($Date: 1996/02/16 12:00:05 $, )
+c ($Date: 1996/03/11 17:11:00 $, )
 c
 c-----------------
 c
@@ -129,6 +129,8 @@ c-----------------
 c
 c HPFC_CMPPOS
 c
+c returns the vector of indices of lid in pn.
+c
       subroutine HPFC_CMPPOS(pn, lid, indp)
       integer pn, lid, indp(7)
       include "hpfc_commons.h"
@@ -141,6 +143,44 @@ c
          indp(dim) = MOD(t, size) + RANGEP(pn, dim, 1)
          t = t / size
       enddo
+      end
+c
+c-----------------
+c
+c true if dimension dim of processor arrangement pn 
+c is a distributed dimension for array an.
+c
+      logical function HPFC_DIST_P(an, dim)
+      integer an, dim
+      include "hpfc_commons.h"
+      HPFC_DIST_P = ALIGN(an, DIST(ATOT(an), dim, 1), 1).ne.INTFLAG 
+      end
+c
+c-----------------
+c
+c true if lid and the current pe are twins (hold same data) 
+c on processor arrangement of array an.
+c most of the information computed here could be precomputed and store
+c once at the initialization phase of the runtime. 
+c
+      logical function HPFC_TWIN_P(an, lid)
+      integer an, lid
+      include "hpfc_commons.h"
+      external HPFC_DIST_P
+      logical HPFC_DIST_P
+      integer ip(7), pn, dim
+      pn = TTOP(ATOT(an))
+      call HPFC_CMPPOS(pn, lid, ip)
+      do dim=1, NODIMP(pn)
+         if (HPFC_DIST_P(an, dim).and.ip(dim).ne.MYPOS(dim,pn)) then
+            HPFC_TWIN_P = .FALSE.
+            return
+         endif
+      enddo
+c
+c now the pe id on pn maybe differs ONLY on replicated dimensions
+c
+      HPFC_TWIN_P = .TRUE.
       end
 c
 c-----------------
