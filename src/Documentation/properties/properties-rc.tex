@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.129  1998/07/28 16:44:41  irigoin
+%% More indexing on property names
+%%
 %% Revision 1.128  1998/07/27 15:22:44  irigoin
 %% Latex bugs fixed.
 %%
@@ -92,7 +95,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/07/27 15:22:44 $~$
+$~$Date: 1998/07/28 16:44:41 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -249,6 +252,7 @@ LOG_MEMORY_USAGE FALSE
 
 \subsection{Newgen}
 \index{NewGen}
+\index{Debugging}
 
 Newgen offers some debugging support to check object consistency
 (\verb+gen_consistent_p+ and \verb+gen_defined_p+), and for dynamic type
@@ -297,16 +301,21 @@ beginning to more often latter.
 PIPSMAKE_CHECKPOINTS 0
 \end{verbatim}
 
-\subsection{PipsBDM}
+\subsection{PipsDBM}
 \index{Pipsdbm}
+\index{PIPSDBM\_RESOURCES\_TO\_DELETE}
 
 Shell environment variables \verb+PIPSDBM_DEBUG_LEVEL+ can be set to ?
 to check object consistency when they are stored in the database, and to
 ? to check object consistency when they are stored or retrieved (in case
 an intermediate phase has corrupted some data structure unwillingly).
 
-what to do at the end when saving resources: It can also be set to "all".
-Note that it is managed from pipsmake.
+You can control what is done when a workspace is closed and resources are
+save. The property can be set to to "obsolete" (default option) or to "all".
+
+Note that it is not managed from pipsdbm but from pipsmake which knows
+what is obsolete or not.
+
 \begin{verbatim}
 PIPSDBM_RESOURCES_TO_DELETE "obsolete"
 \end{verbatim}
@@ -897,14 +906,17 @@ COMPUTE_ALL_DEPENDENCES FALSE
 
 No property for this library.
 
+
 \subsection{Semantic Analysis}
 \label{subsection-semantic-analysis}
 \index{Semantics}
 \index{Precondition}
 \index{Transformer}
 
+
 \subsubsection{Flow Sensitivity}
 \index{Flow Sensitivity}
+\index{SEMANTICS\_FLOW\_SENSITIVE}
 
 Perform ``meet'' operations for semantics analysis. This property is
 managed by \PIPSMAKE{}.
@@ -913,8 +925,10 @@ managed by \PIPSMAKE{}.
 SEMANTICS_FLOW_SENSITIVE FALSE
 \end{verbatim}
 
+
 \subsubsection{Interprocedural Semantics Analysis}
 \index{Interprocedural}
+\index{SEMANTICS\_INTERPROCEDURAL}
 
 To be refined later; basically, use callee\'s transformers instead of
 callee\'s effects when computing transformers bottom-up in the call graph;
@@ -929,6 +943,9 @@ This property is used internally and is not user selectable.
 
 \subsubsection{Fix Point Operators}
 \index{Fix Point}
+\index{SEMANTICS\_FIX\_POINT}
+\index{SEMANTICS\_FIX\_POINT\_OPERATOR}
+\index{SEMANTICS_INEQUALITY\_INVARIANT}
 
 CPU time and memory space are cheap enough to compute loop fix points for
 {\em transformers}. This property implies SEMANTICS\_FLOW\_SENSITIVE and is not
@@ -964,6 +981,7 @@ Unlike Cousot-Halbwachs fix point (see below), it does not use Chernikova
 steps and it should not slow down analyses.
 
 This property is user selectable and its default value is {\em transfer}.
+The default value is the only one which has been seriously validated.
 
 \begin{verbatim}
 SEMANTICS_FIX_POINT_OPERATOR "transfer"
@@ -988,6 +1006,7 @@ SEMANTICS_INEQUALITY_INVARIANT FALSE
 \end{verbatim}
 
 \subsubsection{Prettyprint}
+\index{SEMANTICS\_FILTERED\_PRECONDITIONS}
 
 Preconditions reflect by default all knowledge gathered about the current
 state (i.e. store). However, it is possible to restrict the information to
@@ -998,8 +1017,10 @@ statement following the precondition.
 SEMANTICS_FILTERED_PRECONDITIONS FALSE
 \end{verbatim}
 
+
 \subsubsection{Debugging}
 \index{Debug (Semantics)}
+\index{SEMANTICS\_STDOUT}
 
 Output semantics results on stdout
 
@@ -1007,7 +1028,8 @@ Output semantics results on stdout
 SEMANTICS_STDOUT FALSE
 \end{verbatim}
 
-Debug level for semantics
+Debug level for semantics ued to be controled by a property. A Shell
+variable, \verb/SEMANTICS_DEBUG_LEVEL/, is used instead.
 
 \subsection{Static Complexity Evaluation}
 \index{Complexity}
@@ -1017,6 +1039,9 @@ execution time.
 
 \subsubsection{Debugging}
 \index{Debug (Complexity)}
+\index{COMPLEXITY\_TRACE\_CALLS}
+\index{COMPLEXITY\_INTERMEDIATES}
+\index{COMPLEXITY\_PRINT\_COST\_TABLE}
 
 Trace the walk across a module's internal representation:
 
@@ -1040,6 +1065,8 @@ The cost table(s) contain machine and compiler dependent information
 about basic execution times, e.g. time for a load or a store.
 
 \subsubsection{Fine Tuning}
+\index{COMPLEXITY\_PARAMETERS}
+\index{COMPLEXITY\_PRINT\_STATISTICS}
 
 It is possible to specify a list of variables which must remain
 litterally in the complexity formula, although their numerical values
@@ -1080,6 +1107,7 @@ COMPLEXITY_PRINT_STATISTICS 0
 \end{verbatim}
 
 \subsubsection{Target Machine and Compiler Selection}
+\index{COMPLEXITY\_COST\_TABLE}
 
 This property is used to select a set of basic execution times. These
 times depend on the target machine, the compiler and the compilation
@@ -1120,6 +1148,7 @@ COMPLEXITY_COST_TABLE "all_1"
 \end{verbatim}
 
 \subsubsection{Evaluation Strategy}
+\index{COMPLEXITY\_EARLY\_EVALUATION}
 
 For the moment, we have designed two ways to solve the complexity
 combination problem. Since symbolic complexity formulae use program
@@ -1175,6 +1204,13 @@ COMPLEXITY_EARLY_EVALUATION FALSE
 \label{subsection-regions}
 \index{Array Region}
 \index{Region (Array)}
+\index{EXACT\_REGIONS}
+\index{MUST\_REGIONS}
+\index{REGIONS\_WITH\_ARRAY\_BOUNDS}
+\index{DISJUNCT\_REGIONS}
+\index{DISJUNCT\_IN\_OUT\_REGIONS}
+\index{REGIONS\_OP\_STATISTICS}
+\index{REGIONS\_TRANSLATION\_STATISTICS}
 
 if {\tt MUST\_REGIONS} is true, then it computes regions using the
 algorithm described in report E/181/CRI, called {\em $T^{-1}$
@@ -1241,6 +1277,8 @@ REGIONS_TRANSLATION_STATISTICS FALSE
 
 \subsubsection{Rice (Parallelization)}
 \index{Allen\&Kennedy}
+\index{GENERATE\_NESTED\_PARALLEL\_LOOPS}
+\index{PARALLELIZATION\_STATISTICS}
 
 TRUE to show all parallel loops, FALSE to generate real (vector,
 innermost parallel?) code
@@ -1271,6 +1309,29 @@ No property.
 
 \subsubsection{HPFC {\em High Performance Fortran Compiler}}
 \index{HPF}
+\index{HPFC\_EXPAND\_COMPUTE\_LOCAL\_INDEX}
+\index{HPFC\_EXPAND\_COMPUTE\_COMPUTER}
+\index{HPFC\_EXPAND\_COMPUTE\_OWNER}
+\index{HPFC\_EXPAND\_CMPLID}
+\index{HPFC\_NO\_WARNING}
+\index{HPFC\_FILTER\_CALLEES}
+\index{GLOBAL\_EFFECTS\_TRANSLATION}
+\index{HPFC\_SYNCHRONIZE\_IO}
+\index{HPFC\_IGNORE\_MAY\_IN\_IO}
+\index{HPFC\_LAZY\_MESSAGES}
+\index{HPFC\_IGNORE\_FCD\_SYNCHRO}
+\index{HPFC\_IGNORE\_FCD\_TIME}
+\index{HPFC\_IGNORE\_FCD\_SET}
+\index{HPFC\_TIME\_REMAPPINGS}
+\index{HPFC\_REDUNDANT\_SYSTEMS\_FOR\_REMAPS}
+\index{HPFC\_OPTIMIZE\_REMAPPINGS}
+\index{HPFC\_DYNAMIC\_LIVENESS}
+\index{HPFC\_GUARDED\_TWINS}
+\index{HPFC\_BUFFER\_SIZE}
+\index{HPFC\_USE\_BUFFERS}
+\index{HPFC\_IGNORE\_IN\_OUT\_REGIONS}
+\index{HPFC\_EXTRACT\_EQUALITIES}
+\index{HPFC\_EXTRACT\_LATTICE}
 
 Debugging levels considered by HPFC: 
 \verb+HPFC_{,DIRECTIVES,IO,REMAPPING}_DEBUG_LEVEL+.
@@ -1360,6 +1421,7 @@ HPFC_EXTRACT_LATTICE TRUE
 
 \subsection{Dead Code Elimination}
 \index{Dead Code}
+\index{DEAD\_CODE\_DISPLAY\_STATISTICS}
 
 Since it is useful to display statistics on what has been found
 useless and removed in a program, this property is used to ask for
@@ -1378,6 +1440,9 @@ DEAD_CODE_DISPLAY_STATISTICS TRUE
 
 
 \subsubsection{Unspaghettify \& Restructurer}
+\index{UNSPAGHETTIFY\_DISPLAY\_STATISTICS}
+\index{UNSPAGHETTIFY\_TEST\_RESTRUCTURING}
+\index{UNSPAGHETTIFY\_RECURSIVE\_DECOMPOSITION}
 
 
 To display the statistics about unspaghettify and control graph
@@ -1400,7 +1465,7 @@ UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION FALSE
 
 
 \subsubsection{Clean Up Sequences}
-
+\index{CLEAN\_UP\_SEQUENCES\_DISPLAY\_STATISTICS}
 
 To display the statistics about cleaning-up sequences and removing
 useless CONTINUE or empty statement.
@@ -1411,6 +1476,8 @@ CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS FALSE
 
 \subsubsection{FORMAT Restructuring}
 \index{Format (Fortran)}
+\index{GATHER\_FORMATS\_AT\_BEGINNING}
+\index{GATHER\_FORMATS\_AT\_END}
 
 To able deeper code transformation, FORMATs can be gathered at the
 very beginning of the code or at the very end according to the
@@ -1425,6 +1492,8 @@ GATHER_FORMATS_AT_END FALSE
 \index{Privatization}
 \index{Privationzation (Array)}
 \index{Array Privatization}
+\index{ARRAY\_PRIV\_FALSE\_DEP\_ONLY}
+\index{ARRAY\_SECTION\_PRIV\_COPY\_OUT}
 
 This transfomation privatizes array sections. Several privitizability
 criterions could be applied, and its not clear which one should be used. The
@@ -1443,9 +1512,11 @@ ARRAY_PRIV_FALSE_DEP_ONLY TRUE
 ARRAY_SECTION_PRIV_COPY_OUT TRUE
 \end{verbatim}
 
+
 \subsubsection{Partial Atomizer}
 \index{Atomization}
 \index{Three Address Code}
+\index{ATOMIZE\_INDIRECT\_REF\_ONLY}
 
 This transformation only atomizes indirect references of array access
 functions.
@@ -1454,9 +1525,11 @@ functions.
 ATOMIZE_INDIRECT_REF_ONLY FALSE
 \end{verbatim}
 
+
 \subsubsection{Loop Distribution}
 \index{Loop Distribution}
 \index{Distribution (Loop)}
+\index{PARTIAL\_DISTRIBUTION}
 
 Partial distribution distributes the statements of a loop nest except
  the isolated statements,that have no dependences at the common level l,
@@ -1468,6 +1541,8 @@ PARTIAL_DISTRIBUTION FALSE
 
 
 \subsection{Cloning}
+\index{Cloning}
+\index{TRANSFORMATION\_CLONE\_ON\_ARGUMENT}
 
 Cloning on an argument. If 0, a user request is performed.
 
@@ -1484,12 +1559,17 @@ TRANSFORMATION_CLONE_ON_ARGUMENT 0
 \label{section-prettyprinters}
 \index{Prettyprinter}
 
+
 \subsection{Code Prettyprinter}
 \index{Prettyprinter (Code)}
 \index{Code Prettyprinter}
 
+
 \subsubsection{Layout}
 \index{Analysis}
+\index{PRETTYPRINT\_LOOSE}
+\index{PRETTYPRINT\_STATEMENT\_NUMBER}
+\index{Statement number}
 
 When prettyprinting semantic information (preconditions, transformers and
 regions), add a line before and after each piece of information if set to
@@ -1515,6 +1595,7 @@ numbers. A multiline statement only has one number. See \Pri{}.
 PRETTYPRINT_STATEMENT_NUMBER TRUE 
 \end{verbatim}
 
+
 \subsubsection{Target Language Selection}
 \index{HPF}
 \index{Fortran 90}
@@ -1522,6 +1603,7 @@ PRETTYPRINT_STATEMENT_NUMBER TRUE
 \index{Cray Fortran}
 \index{Fortran (Cray)}
 \index{Craft}
+\index{PRETTYPRINT\_PARALLEL}
 
 How to print, from a syntactic point of view, a parallel do loop. Possible
 values are: \texttt{do doall f90 hpf cray craft cmf omp}. 
@@ -1531,6 +1613,13 @@ PRETTYPRINT_PARALLEL    "do"
 \end{verbatim}
 
 \subsubsection{Display Analysis Results}
+\index{PRETTYPRINT\_EFFECTS}
+\index{PRETTYPRINT\_IO\_EFFECTS}
+\index{PRETTYPRINT\_REVERSE\_DOALL}
+\index{PRETTYPRINT\_TRANSFORMER}
+\index{PRETTYPRINT\_EXECUTION\_CONTEXT}
+\index{PRETTYPRINT\_REGION}
+\index{PRETTYPRINT\_SCALAR\_REGIONS}
 
 Add statement effects as comments in output; not implemented (that way) yet.
 
@@ -1576,8 +1665,23 @@ Print regions of scalars.
 PRETTYPRINT_SCALAR_REGIONS FALSE
 \end{verbatim}
 
+
 \subsubsection{Display Internals for Debugging}
 \index{Debug}
+\index{PRETTYPRINT\_BLOCKS}
+\index{PRETTYPRINT\_UNSTRUCTURED}
+\index{PRETTYPRINT\_ALL\_EFFECTS}
+\index{PRETTYPRINT\_EMPTY\_BLOCKS}
+\index{PRETTYPRINT\_STATEMENT\_ORDERING}
+\index{PRETTYPRINT\_ALL\_LABELS}
+\index{PRETTYPRINT\_DO\_LABEL\_AS\_COMMENT}
+\index{PRETTYPRINT\_ALL\_PRIVATE\_VARIABLES}
+\index{PRETTYPRINT\_CHECK\_IO\_STATEMENTS}
+\index{PRETTYPRINT\_INTERNAL\_RETURN}
+\index{PRETTYPRINT\_FINAL\_RETURN}
+\index{PRETTYPRINT\_BLOCK\_IF\_ONLY}
+\index{PRETTYPRINT\_WITH\_COMMON\_NAMES}
+\index{PRETTYPRINT\_ALL\_PARENTHESES}
 
 All these debugging options should be set to FALSE for normal operation,
 when the prettyprinter is expected to produce code as close as possible to
@@ -1713,6 +1817,10 @@ PRETTYPRINT_ALL_PARENTHESES FALSE
 \subsubsection{Declarations}
 \label{subsubsection-declarations}
 \index{Declaration}
+\index{PRETTYPRINT\_ALL\_DECLARATIONS}
+\index{PRETTYPRINT\_HEADER\_COMMENTS}
+\index{PRETTYPRINT\_COMMONS}
+\index{PRETTYPRINT\_VARIABLE\_DIMENSIONS}
 
 By default, module declarations are preserved as huge strings to produce
 an output as close as possible to the input (see field \verb/decls_text/
@@ -1754,8 +1862,10 @@ statement, which is not implemented.
 PRETTYPRINT_VARIABLE_DIMENSIONS "type"
 \end{verbatim}
 
+
 \subsubsection{FORESYS Interface}
 \index{Foresys}
+\index{PRETTYPRINT\_FOR\_FORESYS}
 
 Print transformers, preconditions and regions in a format accepted by
 Foresys and Partita. Not maintained.
@@ -1764,9 +1874,11 @@ Foresys and Partita. Not maintained.
 PRETTYPRINT_FOR_FORESYS FALSE
 \end{verbatim}
 
+
 \subsubsection{HPFC Prettyprinter}
 \index{HPF}
 \index{Prettyprinter (HPF)}
+\index{PRETTYPRINT\_HPFC}
 
 To deal specifically with the prettyprint for hpfc
 
@@ -1777,6 +1889,7 @@ PRETTYPRINT_HPFC FALSE
 
 \subsubsection{Interface to Emacs}
 \index{Emacs}
+\index{PRETTYPRINT\_ADD\_EMACS\_PROPERTIES}
 
 The following property tells PIPS to attach various Emacs properties
 for interactive purpose. Used internally by the Emacs pretyyprinter and
@@ -1787,6 +1900,9 @@ PRETTYPRINT_ADD_EMACS_PROPERTIES FALSE
 
 
 \subsubsection{Interface to Graphics Prettyprinters}
+\index{DaVinci}
+\index{PRETTYPRINT\_UNSTRUCTURED\_AS\_A\_GRAPH}
+\index{PRETTYPRINT\_UNSTRUCTURED\_AS\_A\_GRAPH\_VERBOSE}
 
 To output a code with a hierarchical view of the control graph with
 markers instead of a flat one. It purposes a display with a graph
@@ -1805,6 +1921,7 @@ PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE FALSE
 \subsection{Call Graph}
 \label{subsection-call-graph}
 \index{Call Graph}
+\index{CALLGRAPH\_DEBUG}
 
 This library is used to display the calling relationship between modules.
 It is different from the interprocedural call flow graph, ICFG (see
@@ -1833,6 +1950,12 @@ CALLGRAPH_DEBUG FALSE
 \subsection{Interprocedural Control Flow Graph}
 \label{subsection-interprocedural-control-flow-graph}
 \index{ICFG}
+\index{ICFG\_IFs}
+\index{ICFG\_DOs}
+\index{ICFG\_CALLEES\_TOPO\_SORT}
+\index{ICFG\_DECOR}
+\index{ICFG\_DRAW}
+\index{ICFG\_DEBUG}
 
 This prettyprinter is NOT a call graph prettyprinter (see
 Section~\ref{subsection-call-graph}). Control flow information can be
