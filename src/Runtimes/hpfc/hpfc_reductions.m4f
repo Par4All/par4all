@@ -2,7 +2,7 @@ c
 c     Reductions management 
 c
 c $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-c ($Date: 1996/09/07 16:06:57 $, )
+c ($Date: 1996/09/07 16:11:59 $, )
 c
 c     it is supposed that the reduction is computed on a full
 c     array, which is nor replicated anyway. If used on a part,
@@ -80,7 +80,7 @@ DISJUNCTION(``
       'CALL HPFC CMPOWNERS(an, 
      $  COMMA_REPLICATE(LEVEL, `LOWER_REF'),
      $  COMMA_REPLICATE(TO7(LEVEL), `ZERO_REF'))
-      if (HPFC_SENDERP()) then
+      if (HPFC SENDERP()) then
 SIMPLE_REPLICATE(LEVEL, `COMPUTE_LOCALIND')
          result = a(COMMA_REPLICATE(LEVEL, `TEMPO_REF'))
          call COM_PREFIX SNDTO A(PVMTYPE, result)
