@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/08 13:29:43 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/11 11:05:00 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -50,6 +50,7 @@
 # _1: synchro
 # _2: timeon
 # _3: timeoff
+#     local/endlocal (hack for localized computations)
 #
 # (_ is hpfc)
 #
@@ -116,6 +117,8 @@ $SED '/^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1_k\2,g
       s,^chpf\$ synchro,      _1,
       s,^chpf\$ timeon,      _2,
       s,^chpf\$ timeoff,      _3,
+      s,^chpf\$ local,      _i(I_LOCAL)      do I_LOCAL = 0\, 0,
+      s,^chpf\$ endlocal,      enddo,
       s,^chpf\$ dynamic \(.*\),      _y(\1),
       s,^chpf\$ pure \(.*\),      _u(\1),
       s,^chpf\$ template \(.*\),      _o \1      _t(\1),
