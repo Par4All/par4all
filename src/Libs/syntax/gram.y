@@ -200,11 +200,23 @@ static datavar MakeDataVar(syntax s, range r)
     entity e; 
     reference ref;
     datavar d;
+    syntax s2 = syntax_undefined;
 
-    if (! syntax_reference_p(s))
+    if (! syntax_reference_p(s)) {
+	if(syntax_call_p(s)
+	   && call_function(syntax_call(s))==entity_intrinsic(SUBSTRING_FUNCTION_NAME)) {
+	    pips_debug(8, "Substring initialization\n");
+	    s2 = expression_syntax(EXPRESSION(CAR(call_arguments(syntax_call(s)))));
+	}
+	else {
 	    FatalError("MakeDataVar", "bad variable\n");
+	}
+    }
+    else {
+	s2 = s;
+    }
 
-    ref = syntax_reference(s);
+    ref = syntax_reference(s2);
     e = reference_variable(ref);
 
     if (r == range_undefined) {
@@ -223,10 +235,10 @@ static datavar MakeDataVar(syntax s, range r)
 	    d = make_datavar(e, 1);
     }
     else {
-	int s;
+	int c;
 
-	if(range_count(r, &s)) {
-	    d = make_datavar(e, s);
+	if(range_count(r, &c)) {
+	    d = make_datavar(e, c);
 	}
 	else {
 	    ParserError("MakeDataVar",
@@ -553,12 +565,12 @@ io_inst:  io_keyword io_f_u_id
 	    { $$ = MakeIoInstB($1, $3, $5, $8, $10); }
 	;
 
-io_f_u_id: atom 
+io_f_u_id: atom
         /* Should be an expression, but a conflict results for parentheses 
 	 * which may be
 	 * part of the expression or part of the IO statement (FI, 1/1/97)
 	 */
-	    { $$ = make_expression($1, normalized_undefined); }
+            { $$ = make_expression($1, normalized_undefined); }
         | const_simple
 	    { $$ = $1; }
 	| TK_STAR
