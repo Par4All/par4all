@@ -20,60 +20,59 @@
  * Argument "name" is not used. It is instantiated as a specific module
  * by make() but this routine process the whole program
  */
-bool callgraph(name)
-string name;
+bool callgraph(string name)
 {
-    int nmodules = 0;
-    char *module_list[ARGS_LENGTH];
-    callees module_callers[ARGS_LENGTH];
-    int i;
+    gen_array_t modules = db_get_module_list();
+    int nmodules = gen_array_nitems(modules), i;
+    gen_array_t module_callers = gen_array_make(nmodules);
 
-    db_get_module_list(&nmodules, module_list);
-    pips_assert("callgraph", nmodules>0);
+    pips_assert("some modules", nmodules>0);
+
+    for(i=0; i<nmodules; i++)
+	gen_array_addto(module_callers, i, (char*) make_callees(NIL));
 
     for(i=0; i<nmodules; i++) {
-	module_callers[i] = make_callees(NIL);
+	callees c = (callees)gen_array_item(module_callers, i);
+	pips_assert("no callees", callees_callees(c)==NIL);
     }
 
     for(i=0; i<nmodules; i++) {
-	pips_assert("callgraph",
-		    callees_callees(module_callers[i])==NIL);
-    }
-
-    for(i=0; i<nmodules; i++) {
-	string module_name = module_list[i];
+	string module_name = gen_array_item(modules, i);
 	callees module_callees = callees_undefined;
 	list cm;
 
 	module_callees = (callees)
 	    db_get_memory_resource(DBR_CALLEES, module_name, TRUE);
 
-	for(cm=callees_callees(module_callees); cm!=NIL; POP(cm)) {
+	for(cm=callees_callees(module_callees); cm!=NIL; POP(cm))
+	{
 	    string module_called = STRING(CAR(cm));
+	    callees c;
 	    int r;
 
 	    for(r=0; r<nmodules; r++) {
-		if(strcmp(module_called, module_list[r])==0)
+		string rname = gen_array_item(modules, r);
+		if(strcmp(module_called, rname)==0)
 		    break;
 	    }
 	    if(r==nmodules)
 		user_error("callgraph",
 			   "no source file for module %s\n",
 			   module_called);
-	    pips_assert("callgraph",0<=r && r<nmodules);
+	    pips_assert("valid module",0<=r && r<nmodules);
 
-	    callees_callees(module_callers[r]) =
-		gen_nconc(callees_callees(module_callers[r]), 
+	    c = (callees) gen_array_item(module_callers, r);
+	    callees_callees(c) =
+		gen_nconc(callees_callees(c), 
 			  CONS(STRING,strdup(module_name), NIL));
 	}
     }
     
-    for(i=0; i<nmodules; i++) {
-	string module_name = module_list[i];
-
-	DB_PUT_MEMORY_RESOURCE(DBR_CALLERS,
-			       strdup(module_name), 
-			       (char*) module_callers[i]);
+    for(i=0; i<nmodules; i++) 
+    {
+	string module_name = gen_array_item(modules, i);
+	DB_PUT_MEMORY_RESOURCE(DBR_CALLERS, module_name,
+			       (char*) gen_array_item(module_callers,i));
 
     }
     return TRUE;
