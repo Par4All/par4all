@@ -807,6 +807,13 @@ arguments_are_something(
 }
 
 static bool 
+arguments_are_IRDCS(call c, type_context_p context)
+{
+  return arguments_are_something
+    (c, context, TRUE, TRUE, TRUE, TRUE, TC_DCOMPLEX, FALSE, TRUE);
+}
+
+static bool 
 arguments_are_IRDC(call c, type_context_p context)
 {
   return arguments_are_something
@@ -988,7 +995,7 @@ typing_relational_operator(call c, type_context_p context)
 {
   basic b;
   
-  if(!arguments_are_IRDC(c, context))
+  if(!arguments_are_IRDCS(c, context))
   {
     /* Just for return a result */
     return make_basic_logical(4);
