@@ -30,15 +30,6 @@
 #define INTERMEDIATE_BOUND_NAME "LU_IB"
 #define INDEX_NAME "LU_IND"
 
-/*
- * LU_NUB: loop unrolling normalized upper bound
- * This entity is used for each loop unroling in the programme. We
- * assume that loop unrolling can't be nested.
- */
-entity lu_nub_find(void)
-{
-}
-
 /* voir make_factor_expression() */
 expression make_ref_expr(entity ent, cons *args)
 {
@@ -97,9 +88,15 @@ void loop_unroll(statement loop_statement, int rate)
     /* Entity LU_NUB is created and initializing statement is created
      * LU_NUB = ((UB - LB) + INC)/INC 
      */
+    /* 
     nub = make_scalar_integer_entity(NORMALIZED_UPPER_BOUND_NAME, 
 				     module_name);
     add_variable_declaration_to_module( mod_ent, nub);
+    */
+    nub = make_new_scalar_variable_with_prefix(NORMALIZED_UPPER_BOUND_NAME, 
+					       mod_ent,
+					       MakeBasic(is_basic_int));
+
     if (expression_integer_value(lb, &lbval) 
 	&& expression_integer_value(ub, &ubval) 
 	&& expression_integer_value(inc, &incval)) {
@@ -131,9 +128,14 @@ void loop_unroll(statement loop_statement, int rate)
     /* Entity LU_IB is created and initializing statement is created 
      * LU_IB = MOD(LU_NUB, rate)
      */
+    /*
     ib = make_scalar_integer_entity(INTERMEDIATE_BOUND_NAME,
 				    module_name);
     add_variable_declaration_to_module( mod_ent, ib);
+    */
+    ib = make_new_scalar_variable_with_prefix(INTERMEDIATE_BOUND_NAME, 
+					      mod_ent,
+					      MakeBasic(is_basic_int));
 
     if (numeric_range_p) {
 	rhs_expr = int_expr(FORTRAN_MOD(FORTRAN_DIV(ubval-lbval+incval, 
@@ -158,8 +160,13 @@ void loop_unroll(statement loop_statement, int rate)
      * ENDDO
      */
     /* Entity LU_IND is created */
+    /*
     lu_ind = make_scalar_integer_entity(INDEX_NAME,module_name);
     add_variable_declaration_to_module( mod_ent, lu_ind);
+    */
+    lu_ind = make_new_scalar_variable_with_prefix(INDEX_NAME, 
+						  mod_ent,
+						  MakeBasic(is_basic_int));
 
     /* Loop range is created */
     rg = make_range(MakeIntegerConstantExpression("0"),
