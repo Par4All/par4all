@@ -286,14 +286,14 @@ test_aspect()
   (
    for file in ${FILES:-`ls $aspect/*.[cfF]`} ; do
      if [ "$OSTYPE" = "solaris2.8" ]; then
-	 name=`basename $file '\.f'`
-	 name=`basename $name '\.F'`
-	 name=`basename $name '\.c'`
+	 name=`${PIPS_BASENAME:-basename} $file '\.f'`
+	 name=`${PIPS_BASENAME:-basename} $name '\.F'`
+	 name=`${PIPS_BASENAME:-basename} $name '\.c'`
      else 
      #linux-gnu
-	 name=`basename $file '.f'`
-	 name=`basename $name '.F'`
-	 name=`basename $name '.c'`
+	 name=`${PIPS_BASENAME:-basename} $file '.f'`
+	 name=`${PIPS_BASENAME:-basename} $name '.F'`
+	 name=`${PIPS_BASENAME:-basename} $name '.c'`
      fi     
      u_name=`echo $name | tr [a-z] [A-Z]`
      program=$name
@@ -317,11 +317,11 @@ test_aspect()
 	ffile=$aspect/$name.c
      fi
 
-     bfile=`basename $ffile`
+     bfile=`${PIPS_BASENAME:-basename} $ffile`
      
      rm -f $tmpout $tmperr
 
-     echo "considering directory `basename $aspect` file $name.[cfF]" > $tmperr
+     echo "considering directory `${PIPS_BASENAME:-basename} $aspect` file $name.[cfF]" > $tmperr
 
      #
      # .test case
