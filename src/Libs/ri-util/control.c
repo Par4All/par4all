@@ -6,10 +6,16 @@
 
 /* 
  * $Id$
+ *
+ * $Log: control.c,v $
+ * Revision 1.29  2002/07/03 09:22:12  irigoin
+ * Updates in check_control_coherency() and in debugging messages
+ *
+ *
  */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 2002/06/27 14:36:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 2002/07/03 09:22:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -190,16 +196,22 @@ check_control_coherency(control c)
 	    /* if (!is_control_in_list_p(ctl, control_successors(cc))) { */
 	    if ((i1=occurences_in_control_list(ctl, control_successors(cc)))
 		!= (i2=occurences_in_control_list(cc, control_predecessors(ctl)))) {
+	      bool consistent_p = FALSE;
 		if(i1==0) {
 		    pips_debug(0, "Control node %p not in the successor list of %p\n", ctl, cc);
 		}
 		else {
+		  if(statement_test_p(control_statement(cc)) && i1>=2 && i2==1) {
+		    consistent_p = TRUE;
+		  }
+		  else {
 		    pips_debug(0, "Control %p occurs %d times in the successor list of %p"
 			       " while control %p occurs %d times in the predecessor list of %p\n",
 			       ctl, i1, cc, cc, i2, ctl);
+		  }
 		}
 		ifdebug(8)
-		    pips_assert("Control is correct", FALSE);
+		    pips_assert("Control is correct", consistent_p);
 	    }
 	}, control_predecessors(ctl));
     }, c, blocs);
@@ -230,6 +242,7 @@ display_linked_control_nodes(control c) {
 	display_address_of_control_nodes(control_successors(ctl));
 	fprintf(stderr, "), ");
 	ifdebug(8) {
+	  fprintf(stderr, "\n");
 	    pips_debug(0, "Statement of control %p:\n", ctl);
 	    safe_print_statement(control_statement(ctl));
 	}
