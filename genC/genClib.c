@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1998/07/08 13:39:11 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1998/10/27 16:55:53 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -35,9 +35,12 @@
 #include "newgen_include.h"
 #include "genread.h"
 
+/* starting the scanner.
+ */
+extern void newgen_start_lexer(FILE*);
+
 /* lex files
  */
-extern FILE *genread_in, *genread_out;
 extern FILE *genspec_in, *genspec_out;
 
 #define GO (1)
@@ -2034,9 +2037,8 @@ gen_read_spec(char * spec, ...)
 
     /* default initialization of newgen lexers files:
      */
-    genread_in = stdin;
+    newgen_start_lexer(stdin);
     genspec_in = stdin;
-    genread_out = stdout;
     genspec_out = stdout;
 
     /* now let's read the spec strings...
@@ -2147,7 +2149,7 @@ gen_make_array( num )
 gen_chunk * gen_read(FILE * file)
 {
   Read_chunk = gen_chunk_undefined;
-  genread_in = file ;
+  newgen_start_lexer(file);
   genread_parse() ;
   return Read_chunk;
 }
@@ -2162,7 +2164,7 @@ int gen_read_tabulated(FILE * file, int create_p)
     int i ;
     extern int allow_forward_ref ;
 
-    genread_in = file ;
+    newgen_start_lexer(file);
     if( (i=genread_lex()) != READ_INT ) {
 	user( "Incorrect data for gen_read_tabulated: %d\n", i ) ;
 	exit( 1 ) ;
