@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/22 10:46:45 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/22 11:31:53 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -925,7 +925,6 @@ free_simple_out( obj, dp )
 /* FREE_OBJ_OUT just frees the object OBJ. */
 /* static gen_chunk freed_gen_chunk ; */
 
-/*ARGSUSED*/
 static void
 free_obj_out( obj, bp, dr )
 gen_chunk *obj ;
@@ -1003,9 +1002,9 @@ gen_free(
      */
     bool first_in_stack = (free_already_seen==(hash_table)NULL);
     struct driver dr ;
-
+    
     check_read_spec_performed();
-
+    
     dr.null = gen_null ;
     dr.leaf_out = free_leaf_out ;
     dr.leaf_in = free_leaf_in ;
@@ -1014,12 +1013,12 @@ gen_free(
     dr.array_leaf = gen_array_leaf ;
     dr.simple_out = free_simple_out ;
     dr.obj_out = free_obj_out ;
-
+    
     if (first_in_stack)
-	free_already_seen = hash_table_make(hash_pointer, 0);
-
+      free_already_seen = hash_table_make(hash_pointer, 0);
+    
     gen_trav_obj( obj, &dr ) ;
-
+    
     if (first_in_stack)
     {
 	hash_table_free(free_already_seen);
@@ -1029,20 +1028,20 @@ gen_free(
 
 void 
 gen_full_free_list(
-    list l)
+		   list l)
 {
     list p, nextp ;
     bool first_in_stack = (free_already_seen==(hash_table)NULL);
-
+    
     if (first_in_stack)
 	free_already_seen = hash_table_make(hash_pointer, 0);
-
+    
     for( p = l ; p != NIL ; p = nextp ) {
 	nextp = p->cdr ;
 	gen_free( CAR(p).p ) ;
 	free( p ) ;
     }
-
+    
     if (first_in_stack)
     {
 	hash_table_free(free_already_seen);
