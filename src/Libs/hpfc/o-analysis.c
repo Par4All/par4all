@@ -3,7 +3,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/03/14 14:43:17 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/03/22 10:57:01 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -759,7 +759,7 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
     entity
 	array = reference_variable(the_written_reference);
     int
-	an = load_entity_hpf_number(array);
+	an = load_hpf_number(array);
     entity_mapping
 	new_indexes = MAKE_ENTITY_MAPPING(),
 	old_indexes = MAKE_ENTITY_MAPPING();
