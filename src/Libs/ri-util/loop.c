@@ -12,7 +12,8 @@ DEFINE_CURRENT_MAPPING(enclosing_loops, list)
 
 void clean_enclosing_loops(void)
 {
-    STATEMENT_MAPPING_MAP(s, l, gen_free_list(l), get_enclosing_loops_map());
+    STATEMENT_MAPPING_MAP(s, l, gen_free_list((list)l), 
+			  get_enclosing_loops_map());
     free_enclosing_loops_map();
 }
 
