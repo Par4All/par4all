@@ -53,7 +53,7 @@ void add_a_icfgpe_print(string resource_name, get_text_function gt)
   lp = CONS(STRING, (char *)ips, lp);
 }
 
-static text text_statement_any_effect_type(entity module, int margin, statement stat)
+static text text_statement_any_effect_type_flt(entity module, int margin, statement stat)
 {
   text result = make_text(NIL);
   MAPL(l, {
@@ -94,7 +94,7 @@ static text get_any_effects_text_flt(string module_name)
   
   debug_on("EFFECTS_DEBUG_LEVEL");
   
-  init_pretty_print(text_statement_any_effect_type);
+  init_pretty_print(text_statement_any_effect_type_flt);
 
   MERGE_TEXTS(txt, text_module(module, module_stat));
   
