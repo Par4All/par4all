@@ -99,5 +99,7 @@ extern list gen_make_list GEN_PROTO((int, ...));
 extern list gen_copy_string_list GEN_PROTO((list));
 extern void gen_free_string_list GEN_PROTO((list));
 extern list gen_cons GEN_PROTO((void *, list));
+extern void gen_list_and GEN_PROTO((list *), (list));
+extern void gen_list_and_not GEN_PROTO((list *), (list));
 
 #endif /* newgen_list_included */
