@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: host_node_entities.c,v $
+ * Revision 1.28  1997/10/30 17:09:41  coelho
+ * nope
+ *
  * Revision 1.27  1997/10/28 09:36:01  coelho
  * bug-- (full copy of list of expression necessary...)
  *
@@ -265,9 +268,8 @@ lUpdateExpr_but_distributed(
     return new;
 }
 
-list lUpdateExpr(module, l)
-entity module;
-list l;
+list 
+lUpdateExpr(entity module, list /* of anything */ l)
 {
     list new = gen_full_copy_list(l);
     update_list_for_module(new, module);    
