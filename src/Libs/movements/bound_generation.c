@@ -5,7 +5,9 @@
  */
 
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
@@ -345,7 +347,6 @@ bound_generation(
     int space = (n+1) * sizeof(Ssysteme);
     boolean debut = TRUE;
     entity mod;
-    text t;
     int j;
     debug_on("MOVEMENT_DEBUG_LEVEL");
     debug(8,"bound_generation","begin\n");
