@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.88  1997/12/15 14:04:44  coelho
+ * help updated.
+ *
  * Revision 1.87  1997/12/15 13:50:01  coelho
  * does not substitute shell and comments...
  *
@@ -530,33 +533,33 @@ tpips_help(string line)
 	 "\tselect a module from an opened workspace\n");
     TP_HELP("activate", "activate <rule-name>\n",
 	 "\ttell a rule to be active\n");
-    TP_HELP("make", "make     <resourcename[(OWNER)]>\n",
+    TP_HELP("make", "make     <resourcename([OWNER])>\n",
 	 "\tbuild a resource\n"
 	 "\n\tExamples:\n\n"
 	 "\t\t make PRINTED_FILE\n"
-	 "\t\t make CALLGRAPH_FILE(my_module)\n"
-	 "\t\t make DG_FILE($ALL)\n"
-	 "\t\t make ICFG_FILE($CALLEES)\n\n");
+	 "\t\t make CALLGRAPH_FILE[my_module]\n"
+	 "\t\t make DG_FILE[%ALL]\n"
+	 "\t\t make ICFG_FILE[%CALLEES]\n\n");
     TP_HELP("apply", "apply    <rulename[(OWNER)]>\n",
 	 "\tmake the produced resources of a rule\n"
 	 "\n\tExamples:\n\n"
 	 "\t\t apply PRINT_SOURCE_WITH_REGIONS\n"
-	 "\t\t apply HPFC_CLOSE(my_module)"
-	 "\t\t apply PRINT_CODE($ALL)\n"
-	 "\t\t apply PRINT_ICFG($CALLEES)\n");
+	 "\t\t apply HPFC_CLOSE[my_module]"
+	 "\t\t apply PRINT_CODE[%ALL]\n"
+	 "\t\t apply PRINT_ICFG[%CALLEES]\n");
     TP_HELP("capply", "capply    <rulename[(OWNER)]>\n",
 	 "\tconcurrently apply a transformation rule\n"
 	 "\n\tExamples:\n\n"
-	 "\t\t apply SUPPRESS_DEAD_CODE($ALL)\n"
-	 "\t\t apply PARTIAL_EVAL($CALLEES)\n");
-    TP_HELP("display", "display  <resourcename[(OWNER)]>\n",
+	 "\t\t apply SUPPRESS_DEAD_CODE[%ALL]\n"
+	 "\t\t apply PARTIAL_EVAL[%CALLEES]\n");
+    TP_HELP("display", "display  <resourcename([OWNER])>\n",
 	 "\tprint a resource\n"
 	 "\n\tExamples:\n\n"
 	 "\t\t display PRINTED_FILE\n"
-	 "\t\t display CALLGRAPH_FILE(my_module)\n"
-	 "\t\t display DG_FILE($ALL)\n"
-	 "\t\t display ICFG_FILE($CALLEES)\n\n");
-    TP_HELP("remove", "remove	<resourcename[(OWNER)]>\n",
+	 "\t\t display CALLGRAPH_FILE[my_module]\n"
+	 "\t\t display DG_FILE[%ALL]\n"
+	 "\t\t display ICFG_FILE[%CALLEES]\n\n");
+    TP_HELP("remove", "remove	<resourcename([OWNER])>\n",
 	    "\tremove a resource from the database.\n");
     TP_HELP("cd", "cd       <dirname>\n",
 	 "\tchange directory\n");
@@ -577,18 +580,18 @@ tpips_help(string line)
 	 "\texit tpips quickly (rhough!)\n");
     TP_HELP("source", "source <filenames...>\n",
 	    "\tread tpips commands from files.\n");
-    TP_HELP("help", "help     [<help-item>]\n",
+    TP_HELP("help", "help     (<help-item>)\n",
 	 "\tprint a list of all the commands or a \"detailled\""
 	 " description of one\n");
     TP_HELP("shell", "shell   [<shell-function>]\n",
 	 "\tallow shell functions call\n");
     TP_HELP("owner", "- owner : variable*\n",
 	 "\tList of available owners:\n"
-	 "\t\t$MODULE\n"
-	 "\t\t$ALL\n"
-	 "\t\t$PROGRAM\n"
-	 "\t\t$CALLEES\n"
-	 "\t\t$CALLERS\n"
+	 "\t\t%MODULE\n"
+	 "\t\t%ALL\n"
+	 "\t\t%PROGRAM\n"
+	 "\t\t%CALLEES\n"
+	 "\t\t%CALLERS\n"
 	 "\t\t<module_name>\n");
     TP_HELP("*", "* default rule...\n",
 	    "\tan implicit \"shell\" is assumed.\n");
@@ -708,6 +711,7 @@ handle(string line)
 /*************************************************************** DO THE JOB */
 
 /* whether some substitutions are needed...
+ * variables are restricted to the ${xxx} syntax.
  */
 static bool
 line_with_substitutions(string line)
