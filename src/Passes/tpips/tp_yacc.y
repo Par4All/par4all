@@ -133,7 +133,7 @@ i_open:
 	{
 	    string main_module_name;
 
-	    debug(7,"tp_parse","reduce rule i_open\n");
+	    debug(7,"yyparse","reduce rule i_open\n");
 
 	    if (execution_mode) {
 		if (db_get_current_program_name() != NULL)
@@ -169,11 +169,11 @@ i_create:
 	{
 	    string main_module_name;
 	    
-	    debug(7,"tp_parse","reduce rule i_create\n");
+	    debug(7,"yyparse","reduce rule i_create\n");
 	    
 	    if (execution_mode) {
 		if (workspace_exists_p($<name>4))
-		    user_error ("tp_parse",
+		    user_error ("yyparse",
 				"the workspace %s exists\n",
 				$<name>4);
 		else {
@@ -203,14 +203,14 @@ i_close:
 	CLOSE
 	opt_sep_list
 	{
-	    debug(7,"tp_parse","reduce rule i_close\n");
+	    debug(7,"yyparse","reduce rule i_close\n");
 
 	    if (execution_mode) {
 		if (db_get_current_program_name() != NULL) {
 		    close_program ();
 		    $$ = TRUE;
 		} else {
-		    user_warning ("tp_parse","No workspace to close\n");
+		    user_error ("yyparse","No workspace to close\n");
 		    $$ = FALSE;
 		}	
 		$$ = TRUE;
@@ -226,21 +226,21 @@ i_delete:
 	{
 	    char *t = yylval.name;
 
-	    debug(7,"tp_parse","reduce rule i_delete\n");
+	    debug(7,"yyparse","reduce rule i_delete\n");
 
 	    if (execution_mode) {
-		if (db_get_current_program_name() == NULL) {
+		string wname = db_get_current_workspace_name();
+		if ((wname != NULL) && same_string_p(wname, t)) {
+		    user_error ("yyparse","Workspace opened\n");
+		    $$ = FALSE;
+		} else {
 		    delete_program (t);
+		    /* In case of problem, user_error() has been
+		       called, so it is OK now !!*/
 		    user_log ("Workspace %s deleted.\n", t);
 		    $$ = TRUE;
-		} else {
-		    user_warning ("tp_parse","Workspace opened\n");
-		    $$ = FALSE;
 		}
 	    }
-/*
-	    free(t);
-*/
 	}
 	;
 
@@ -252,16 +252,17 @@ i_module:
 	{
 	    char *t = yylval.name;
 
-	    debug(7,"tp_parse","reduce rule i_module\n");
+	    debug(7,"yyparse","reduce rule i_module\n");
 
 	    if (execution_mode) {
-		debug(7,"tp_parse","reduce rule i_module\n");
-		lazy_open_module (strupper(t,t));
-		$$ = TRUE;
+		if (db_get_current_workspace_name()) {
+		    lazy_open_module (strupper(t,t));
+		    $$ = TRUE;
+		} else {
+		    user_error ("yyparse", "No workspace opened\n");
+		    $$ = FALSE;
+		}
 	    }
-/*
-	    free(t);
-*/
 	}
 	;
 
@@ -271,18 +272,19 @@ i_make:
 	resource_id
 	opt_sep_list
 	{
-	    debug(7,"tp_parse","reduce rule i_make\n");
+	    bool result = TRUE;
+
+	    debug(7,"yyparse","reduce rule i_make\n");
 
 	    if (execution_mode) {
 		MAPL(e, {
 		    if (safe_make ($3.the_name, STRING(CAR(e))) == FALSE) {
-			$$ = FALSE;
+			result = FALSE;
 			break;
 		    }
 		}, $3.the_owners);
-		
-		$$ = TRUE;
 	    }
+	    $$ = result;
 /*	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
 */
@@ -295,15 +297,19 @@ i_apply:
 	rule_id
 	opt_sep_list
 	{
-	    debug(7,"tp_parse","reduce rule i_apply\n");
+	    bool result = TRUE;
+
+	    debug(7,"yyparse","reduce rule i_apply\n");
 
 	    if (execution_mode) {
 		MAPL(e, {
-		    (void) safe_apply ($3.the_name, STRING(CAR(e)));
+		    if (safe_apply ($3.the_name, STRING(CAR(e))) == FALSE) {
+			result = FALSE;
+			break;
+		    }
 		}, $3.the_owners);
-		
-		$$ = TRUE;
 	    }
+	    $$ = result;
 /*	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
 */
@@ -316,7 +322,7 @@ i_display:
 	resource_id
 	opt_sep_list
 	{
-	    debug(7,"tp_parse","reduce rule i_display\n");
+	    debug(7,"yyparse","reduce rule i_display\n");
 
 	    if (execution_mode) {
 		string pager;
@@ -325,11 +331,17 @@ i_display:
 		    pager = CAT_COMMAND;
 		
 		MAPL(e, {
+		    string file;
+
 		    lazy_open_module (STRING(CAR(e)));
-		    system(concatenate(pager,
-				       " ",
-				       build_view_file($3.the_name),
-				       NULL));
+		    file = build_view_file($3.the_name);
+		    if (file == NULL)
+			user_error("yyparse",
+				   "Cannot build view file %s\n",
+				   $3.the_name);
+		    
+		    safe_system(concatenate(pager, " ", file, NULL));
+
 		}, $3.the_owners);
 		$$ = TRUE;
 	    }
@@ -346,7 +358,7 @@ i_activate:
 	rulename
 	opt_sep_list
 	{
-	    debug(7,"tp_parse","reduce rule i_activate\n");
+	    debug(7,"yyparse","reduce rule i_activate\n");
 
 	    if (execution_mode) {
 		activate ($3);
@@ -367,7 +379,7 @@ i_set:
 	    property p ;
 	    bool status = TRUE;
 	    
-	    debug(7,"tp_parse","reduce rule i_set(%s,%s)\n",
+	    debug(7,"yyparse","reduce rule i_set(%s,%s)\n",
 		  $<name>4,yylval.name);
 
 	    if (execution_mode) {
@@ -406,7 +418,7 @@ i_set:
 		{
 		    char *q = strrchr(yylval.name, '"');
 		    if (!q)
-			pips_error("yyparse",
+			user_error("yyparse",
 				   "Did not find a quote in the string\n");
 		    *q = '\0';
 		    set_string_property($<name>4, yylval.name + 1);
@@ -435,7 +447,7 @@ i_get:
 	{
 	    property p;
 
-	    debug(7,"tp_parse","reduce rule i_get (%s)\n",
+	    debug(7,"yyparse","reduce rule i_get (%s)\n",
 		  yylval.name);
 	    
 	    if (execution_mode) {
@@ -453,7 +465,7 @@ i_get:
 rulename:
 	PHASENAME
 	{
-	    debug(7,"tp_parse","reduce rule rulename (%s)\n",yylval.name);
+	    debug(7,"yyparse","reduce rule rulename (%s)\n",yylval.name);
 	    $$ = yylval.name;
 	}
 	;
@@ -463,7 +475,7 @@ filename_list:
 	sep_list
 	filename_list
 	{
-	    debug(7,"tp_parse","reduce rule filename_list (%s)\n", $1);
+	    debug(7,"yyparse","reduce rule filename_list (%s)\n", $1);
 
 	    if (the_file_list.argc < FILE_LIST_MAX_LENGTH) {
 		the_file_list.argv[the_file_list.argc] = $1;
@@ -476,7 +488,7 @@ filename_list:
 	filename
 	opt_sep_list
 	{
-	    debug(7,"tp_parse","reduce rule filename_list (%s)\n", $1);
+	    debug(7,"yyparse","reduce rule filename_list (%s)\n", $1);
 
 	    if (the_file_list.argc < FILE_LIST_MAX_LENGTH) {
 		the_file_list.argv[the_file_list.argc] = $1;
@@ -496,7 +508,7 @@ resource_id:
 	{ $<name>$ = yylval.name;}
 	owner
 	{
-	    debug(7,"tp_parse","reduce rule resource_id (%s)\n",$<name>2);
+	    debug(7,"yyparse","reduce rule resource_id (%s)\n",$<name>2);
 
 	    $$.the_name = $<name>2;
 	    $$.the_owners = $3;
@@ -508,7 +520,7 @@ rule_id:
 	{ $<name>$ = yylval.name;}
 	owner
 	{
-	    debug(7,"tp_parse","reduce rule rule_id (%s)\n",$<name>2);
+	    debug(7,"yyparse","reduce rule rule_id (%s)\n",$<name>2);
 
 	    $$.the_name = $<name>2;
 	    $$.the_owners = $3;
@@ -525,11 +537,11 @@ owner:
 	    int i;
 	    list result = NIL;
 
-	    debug(7,"tp_parse","reduce rule owner (ALL)\n");
+	    debug(7,"yyparse","reduce rule owner (ALL)\n");
 
 	    if (execution_mode) {
 		db_get_module_list(&nmodules, module_list);
-		pips_assert("yyparse", nmodules>0);
+		message_assert("yyparse", nmodules>0);
 		for(i=0; i<nmodules; i++) {
 		    string on = module_list[i];
 
@@ -544,7 +556,7 @@ owner:
 	OWNER_PROGRAM
 	CLOSEPAREN
 	{
-	    debug(7,"tp_parse","reduce rule owner (PROGRAM)\n");
+	    debug(7,"yyparse","reduce rule owner (PROGRAM)\n");
 
 	    if (execution_mode) {
 		$$ = CONS(STRING, db_get_current_program_name (), NIL);
@@ -560,11 +572,11 @@ owner:
 	    int i;
 	    int number_of_main = 0;
 
-	    debug(7,"tp_parse","reduce rule owner (MAIN)\n");
+	    debug(7,"yyparse","reduce rule owner (MAIN)\n");
 
 	    if (execution_mode) {
 		db_get_module_list(&nmodules, module_list);
-		pips_assert("yyparse", nmodules>0);
+		message_assert("yyparse", nmodules>0);
 		for(i=0; i<nmodules; i++) {
 		    string on = module_list[i];
 
@@ -586,7 +598,7 @@ owner:
 	OWNER_MODULE
 	CLOSEPAREN
 	{
-	    debug(7,"tp_parse","reduce rule owner (MODULE)\n");
+	    debug(7,"yyparse","reduce rule owner (MODULE)\n");
 
 	    if (execution_mode) {
 		$$ = CONS(STRING, db_get_current_module_name (), NIL);
@@ -602,7 +614,7 @@ owner:
 	    list ps;
 	    list result = NIL;
 
-	    debug(7,"tp_parse","reduce rule owner (CALLEES)\n");
+	    debug(7,"yyparse","reduce rule owner (CALLEES)\n");
 
 	    if (execution_mode) {
 		if (safe_make(DBR_CALLEES, db_get_current_module_name())
@@ -631,7 +643,7 @@ owner:
 	    list ps;
 	    list result = NIL;
 
-	    debug(7,"tp_parse","reduce rule owner (CALLERS)\n");
+	    debug(7,"yyparse","reduce rule owner (CALLERS)\n");
 	    if (execution_mode) {
 		if (safe_make(DBR_CALLERS, db_get_current_module_name())
 		    == FALSE)
@@ -655,7 +667,7 @@ owner:
 	{ $$ = $2; }
 	|
 	{
-	    debug(7,"tp_parse","reduce rule owner (none)\n");
+	    debug(7,"yyparse","reduce rule owner (none)\n");
 
 	    if (execution_mode) {
 			$$ = CONS(STRING, db_get_current_module_name (), NIL);
@@ -669,7 +681,7 @@ list_of_owner_name:
 	COMMA
 	list_of_owner_name
 	{
-	    debug(7,"tp_parse",
+	    debug(7,"yyparse",
 		  "reduce rule owner list (name = %s)\n",$<name>2);
 
 	    if (execution_mode) {
@@ -683,7 +695,7 @@ list_of_owner_name:
 	{ $$ = (list) yylval.name; }
 	CLOSEPAREN
 	{
-	    debug(7,"tp_parse","reduce rule owner list(name = %s)\n",$<name>2);
+	    debug(7,"yyparse","reduce rule owner list(name = %s)\n",$<name>2);
 
 	    if (execution_mode) {
 		char *c = $<name>2;
@@ -707,7 +719,7 @@ sep_list:
 	|
 	SEPARATOR 
 	{
-	    debug(7,"tp_parse","reduce separator list\n");
+	    debug(7,"yyparse","reduce separator list\n");
 	    $$ = 0;
 	}
 	;
@@ -718,7 +730,7 @@ void yyerror(s)
 char * s;
 {
     tpips_lex_print_pos(stderr);
-    user_error("[yyparse]"," %s\n", s);
+    user_error("yyparse"," %s\n", s);
 }
 
 void close_workspace_if_opened()
