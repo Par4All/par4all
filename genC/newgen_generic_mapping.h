@@ -27,7 +27,7 @@
  *
  * FC, Feb 21, 1994
  *
- * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1995/05/05 15:30:04 $, )
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1995/05/05 15:40:00 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -81,9 +81,9 @@ PREFIX void store_##type##_##name(s,t) type s; result t;\
 #define GENERIC_LOCAL_MAPPING(name, result, type) \
         GENERIC_MAPPING(static, name, result, type)\
 static int name##_hack_to_avoid_warnings()\
-{ return((int) set_##name##_map & (int) get_##name##_map() &\
-	 (int) reset_##name##_map() & (int) free_##name##_map &\
-	 (int) make_##name##_map() & (int) load_##type##_##name &\
+{ return((int) set_##name##_map & (int) get_##name##_map &\
+	 (int) reset_##name##_map & (int) free_##name##_map &\
+	 (int) make_##name##_map & (int) load_##type##_##name &\
 	 (int) type##_##name##_undefined_p & (int) store_##type##_##name &\
 	 (int) name##_hack_to_avoid_warnings);}
 
