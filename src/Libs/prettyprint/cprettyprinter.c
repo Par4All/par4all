@@ -8,7 +8,7 @@
    It might be really slow, but it should be safe.
    I should use some kind of string accumulator (array/list...)
 
-   print_c_rough > MODULE.crough
+   print_crough > MODULE.crough
                  < PROGRAM.entities
                  < MODULE.code
 
@@ -823,7 +823,7 @@ static string c_code_string(entity module, statement stat)
 #define CROUGH		".crough"
 #define CPRETTY		".c"
 
-bool print_c_rough(string module_name)
+bool print_crough(string module_name)
 {
   FILE * out;
   string ppt, crough, dir, filename;
