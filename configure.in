@@ -184,4 +184,6 @@ AC_OUTPUT(Makefile
 	  Test/ehrhart/Makefile
 	  Test/ehrhart_union/Makefile
 	  Test/general/Makefile
-	  Test/pp/Makefile)
+	  Test/pp/Makefile
+	  polylib.doxygen
+	)
