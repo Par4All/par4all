@@ -328,6 +328,7 @@ entity get_ith_##lname##_prime(int i)\
 #define REDISTRIBUTE_SUFFIX	"E"
 #define INDEPENDENT_SUFFIX	"I"
 #define NEW_SUFFIX		"N"
+#define REDUCTION_SUFFIX	"R"
 #define PROCESSORS_SUFFIX	"P"
 #define TEMPLATE_SUFFIX		"T"
 #define PURE_SUFFIX		"U"
