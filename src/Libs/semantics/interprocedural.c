@@ -413,7 +413,7 @@ entity v;
 	return;
     }
 
-
+    /* Filter out values *local* to the current module */
     if(value_entity_p(v)) {
 	/* FI: to be modified to account for global values that have a name
 	 * but that should nevertheless be translated on their canonical
@@ -429,6 +429,21 @@ entity v;
 	    */
 
 	debug(8, "translate_global_value", "No need to translate %s\n",
+	      entity_name(v));
+	return;
+    }
+
+    /* Filter out old values: they are translated when the new value is
+     * encountered, and the new value has to appear if the old value does
+     * appear.
+     *
+     * Instead, old values could be translated into new values and processing
+     * could go on...
+     *
+     * FI, 26 October 1994
+     */
+    if(global_old_value_p(v)) {
+	debug(8, "translate_global_value", "No need to translate %s yet\n",
 	      entity_name(v));
 	return;
     }
