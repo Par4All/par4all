@@ -851,6 +851,123 @@ loop_to_postcondition(
 }
 
 static transformer 
+whileloop_to_postcondition(
+    transformer pre,
+    whileloop l,
+    transformer tf)
+{
+    transformer post = transformer_undefined;
+    statement s = whileloop_body(l);
+    expression c = whileloop_condition(l);
+
+    debug(8,"whileloop_to_postcondition","begin\n");
+
+    if(pips_flag_p(SEMANTICS_FIX_POINT) && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
+	pips_error("whileloop_to_postcondition","Halbwachs not implemented\n");
+    }
+    else {
+	transformer preb = transformer_dup(pre);
+
+	/* Apply the loop fix point transformer T* to obtain the set of stores
+	 * for any number of iteration, including 0.
+	 */
+	preb = transformer_combine(preb, tf);
+
+	if(false_condition_wrt_precondition_p(c, pre)) {
+	    debug(8, "whileloop_to_postcondition", "The loop is never executed\n");
+
+	    /* propagate an impossible precondition in the loop body */
+	    (void) statement_to_postcondition(transformer_empty(), s);
+	    /* The loop body precondition is not useful any longer */
+	    free_transformer(preb);
+	    /* do not add the exit condition since it is redundant with pre */
+	    post = transformer_dup(pre);
+	}
+	else if(true_condition_wrt_precondition_p(c, pre)) {
+	    /* At least one iteration is executed. The transformer of
+	     * the loop body is useful.
+	     */
+	    transformer tb = load_statement_transformer(s);
+	    transformer ntl = transformer_undefined;
+
+	    debug(8, "whileloop_to_postcondition", "The loop certainly is executed\n");
+
+	    /* propagate preconditions in the loop body */
+	    precondition_add_condition_information(preb, c, TRUE);
+	    (void) statement_to_postcondition(preb, s);
+
+	    ntl = transformer_apply(tf, pre);
+	    /* Let's execute the last iteration since it certainly exists */
+	    post = transformer_apply(tb, ntl);
+	    free_transformer(ntl);
+	    precondition_add_condition_information(post, c, FALSE);
+	}
+	else {
+	    /* Assume the loop is entered or not and perform
+	     * the convex hull of both
+	     */
+	    transformer post_ne = transformer_dup(pre);
+	    transformer post_al = transformer_undefined;
+
+	    debug(8, "whileloop_to_postcondition", "The loop may be executed or not\n");
+
+	    /* propagate preconditions in the loop body */
+	    precondition_add_condition_information(preb, c, TRUE);
+	    (void) statement_to_postcondition(preb, s);
+
+	    post_al = transformer_apply(tf, preb);
+	    post = transformer_convex_hull(post_ne, post_al);
+	    precondition_add_condition_information(post, c, FALSE);
+	    transformer_free(post_ne);
+	    transformer_free(post_al);
+	}
+    }
+
+    ifdebug(8) {
+	(void) fprintf(stderr,"%s: %s\n","[whileloop_to_postcondition]",
+		       "resultat post =");
+	(void) print_transformer(post);
+    }
+    debug(8,"whileloop_to_postcondition","end\n");
+    return post;
+}
+
+bool false_condition_wrt_precondition_p(expression c, transformer pre)
+{
+    bool result = FALSE;
+
+    result = eval_condition_wrt_precondition_p(c, pre, FALSE);
+
+    return result;
+}
+
+bool true_condition_wrt_precondition_p(expression c, transformer pre)
+{
+    bool result = FALSE;
+
+    result = eval_condition_wrt_precondition_p(c, pre, TRUE);
+
+    return result;
+}
+
+bool eval_condition_wrt_precondition_p(expression c, transformer pre, bool veracity)
+{
+    bool result = FALSE;
+    transformer f = transformer_dup(pre);
+
+    if(veracity) {
+	precondition_add_condition_information(f, c, FALSE);
+    }
+    else {
+	precondition_add_condition_information(f, c, TRUE);
+    }
+
+    result = transformer_empty_p(f);
+
+    return result;
+}
+
+static transformer 
 test_to_postcondition(
     transformer pre,
     test t,
@@ -1464,6 +1581,7 @@ instruction_to_postcondition(
     transformer post = transformer_undefined;
     test t;
     loop l;
+    whileloop wl;
     call c;
 
     debug(8,"instruction_to_postcondition","begin pre=%x tf=%x\n", pre, tf);
@@ -1479,6 +1597,10 @@ instruction_to_postcondition(
       case is_instruction_loop:
 	l = instruction_loop(i);
 	post = loop_to_postcondition(pre, l, tf);
+	break;
+      case is_instruction_whileloop:
+	wl = instruction_whileloop(i);
+	post = whileloop_to_postcondition(pre, wl, tf);
 	break;
       case is_instruction_goto:
 	pips_error("instruction_to_postcondition",
