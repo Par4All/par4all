@@ -18,6 +18,8 @@
 #include <assert.h>
 #include <string.h>
 
+extern char *strdup(char *);
+
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
@@ -211,7 +213,7 @@ char *mult_symbol;
     else if (VECTEUR_NUL_P(b)) {
 	/* si la base est vide: affiche comme ca vient */
 	for (p = v; p != NULL; p = p->succ) {
-	    if (p->val==1) {
+	    if (value_one_p(p->val)) {
 		(void) sprintf(r, "%s", variable_name(p->var));
 		r = strchr(r, '\0');
 	    }
@@ -243,8 +245,8 @@ char *mult_symbol;
 		else 
 		    first_var = FALSE;
 	    
-		if (exp > 0) {
-		    if (exp==1) {
+		if (value_pos_p(exp)) {
+		    if (value_one_p(exp)) {
 			(void) sprintf(r, "%s", variable_name(b->var));
 			r = strchr(r, '\0');
 		    }
@@ -269,7 +271,7 @@ char *mult_symbol;
 	    }
 	}
     }
-    s = strdup(t);
+    s = (char*) strdup(t);
     assert(strlen(s)<99); /* (un peu tard:-) */
     return s;
 }
