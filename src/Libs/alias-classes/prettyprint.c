@@ -1,3 +1,5 @@
+/* $Id$
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -15,8 +17,10 @@
 #include "text.h"
 #include "text-util.h"
 
-#include "effects.h"
-#include "regions.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
+
 #include "semantics.h"
 
 #include "pipsdbm.h"
