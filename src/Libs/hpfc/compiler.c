@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/12/28 09:17:03 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/12/28 18:14:51 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -83,13 +83,13 @@ statement *hoststatp,*nodestatp;
      {
 	 hpf_compiler(STATEMENT(CAR(cs)),&hostcd,&nodecd);
 	 
-	 lhost = gen_nconc(lhost,CONS(STATEMENT,hostcd,NULL));
-	 lnode = gen_nconc(lnode,CONS(STATEMENT,nodecd,NULL));
+	 lhost = CONS(STATEMENT, hostcd, lhost);
+	 lnode = CONS(STATEMENT, nodecd, lnode);
      },
 	 instruction_block(statement_instruction(stat)));
 
-    instruction_block(statement_instruction(*hoststatp)) = lhost;
-    instruction_block(statement_instruction(*nodestatp)) = lnode;
+    instruction_block(statement_instruction(*hoststatp)) = gen_nreverse(lhost);
+    instruction_block(statement_instruction(*nodestatp)) = gen_nreverse(lnode);
 }
 
 static void hpf_compile_test(stat,hoststatp,nodestatp)
@@ -528,13 +528,13 @@ static void hpf_compile_parallel_body(body, hoststatp, nodestatp)
 statement body, *hoststatp, *nodestatp;
 {
     list
-	lw = NULL,
-	lr = NULL,
-	li = NULL,
-	ls = NULL,
-	lbs = NULL;
-    /*
-     * ???
+	lw = NIL,
+	lr = NIL,
+	li = NIL,
+	ls = NIL,
+	lbs = NIL;
+
+    /* ???
      * dependances are not surely respected respected in the definitions list...
      * should check that only locals variables, that are not replicated,
      * may be defined during the body of the loop...
@@ -542,11 +542,26 @@ statement body, *hoststatp, *nodestatp;
     FindRefToDistArrayInStatement(body, &lw, &lr);
     li = AddOnceToIndicesList(lIndicesOfRef(lw), lIndicesOfRef(lr));
     ls = FindDefinitionsOf(body, li);
+    gen_free_list(li), li=NIL;
 
-    generate_parallel_body(body, &lbs, lw, lr);
+    if (gen_length(lw)==0) /* very partial */
+    {
+	message_assert("parallel body with only read distributed arrays",
+		       gen_length(lr)==0);
 
-    (*hoststatp) = NULL;
-    (*nodestatp) = make_block_statement(gen_nconc(ls, lbs));
+	(*hoststatp) = copy_statement(body);
+	(*nodestatp) = copy_statement(body);
+    }
+    else
+    {
+	generate_parallel_body(body, &lbs, lw, lr);
+	
+	(*hoststatp) = NULL;
+	(*nodestatp) = make_block_statement(gen_nconc(ls, lbs));
+    }
+
+    gen_free_list(lw), lw=NIL;
+    gen_free_list(lr), lr=NIL;
 }
 
 static void hpf_compile_parallel_loop(stat, hoststatp, nodestatp)
