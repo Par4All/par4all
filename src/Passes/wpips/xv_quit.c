@@ -17,62 +17,65 @@
 #include "wpips.h"
 
 #define QUICK_QUIT "Quit without saving"
-#define CLOSE_QUIT "Close & Quit"
+#define CLOSE_QUIT "Close (save) the Workspace & Quit"
+#define DELETE_QUIT "Delete the Workspace & Quit"
 
 
 Panel_item quit_button;
 
 
 
-void quit_notify(menu, menu_item)
-Menu menu;
-Menu_item menu_item;
+void
+quit_notify(Menu menu,
+            Menu_item menu_item)
 {
-    Event e;
-    int result;
-    database p;
+   Event e;
+   int result;
+   database p;
 
-    if ((p=db_get_current_program()) != database_undefined ) {
-	string pn = database_name(p);
-	string fmt="Workspace %s not closed";
-	char str[SMALL_BUFFER_LENGTH];
-	string str1, str2, menu_string;
+   if ((p = db_get_current_program()) != database_undefined ) {
+      string pn = database_name(p);
+      string fmt="Workspace %s not closed";
+      char str[SMALL_BUFFER_LENGTH];
+      string str1, str2, menu_string;
 
-	str2="Do you really want to quit PIPS?";
-	menu_string=(string) xv_get(menu_item, MENU_STRING);
-	if (strcmp(menu_string,CLOSE_QUIT)==0)
-	    str1=" ";
-	else 
-	    str1="-=< Resources can get lost! >=-";
+      str2 = "Do you really want to quit PIPS?";
+      menu_string=(string) xv_get(menu_item, MENU_STRING);
+      if (strcmp(menu_string,CLOSE_QUIT)==0)
+         str1=" ";
+      else 
+         str1="-=< Resources can get lost! >=-";
 
-	sprintf(str, fmt , pn);
+      sprintf(str, fmt , pn);
 
-        /* Send to emacs if we are in the emacs mode: */
-        if (wpips_emacs_mode)
-           send_notice_prompt_to_emacs(str, str1, str2, NULL);
-	result =  notice_prompt(xv_find(main_frame, WINDOW, 0), 
-				&e,
-				NOTICE_MESSAGE_STRINGS,
-				str, str1, str2,
-				NULL,
-				NOTICE_BUTTON_YES,	menu_string,
-				NOTICE_BUTTON_NO,	"Cancel",
-				NULL);
-	if (result == NOTICE_NO)
-	    return;
-	else if (strcmp(menu_string,CLOSE_QUIT)==0)
-	    close_program();
-    }
+      /* Send to emacs if we are in the emacs mode: */
+      if (wpips_emacs_mode)
+         send_notice_prompt_to_emacs(str, str1, str2, NULL);
+      result =  notice_prompt(xv_find(main_frame, WINDOW, 0), 
+                              &e,
+                              NOTICE_MESSAGE_STRINGS,
+                              str, str1, str2,
+                              NULL,
+                              NOTICE_BUTTON_YES,	menu_string,
+                              NOTICE_BUTTON_NO,	"Cancel",
+                              NULL);
+      if (result == NOTICE_NO)
+         return;
+      else if (strcmp(menu_string, CLOSE_QUIT) == 0)
+         close_program();
+      else if (strcmp(menu_string, DELETE_QUIT) == 0)
+         delete_program(pn);
+   }
 
-    /* Clear the log window to avoid the message about the edited
-       state: 
-    clear_log_subwindow(NULL, NULL);
-    Does not work...
-    Quit:
-    xv_destroy[_safe](main_frame);
-    */
-    /* Exit xv_main_loop() at top level: */
-    notify_stop();
+   /* Clear the log window to avoid the message about the edited
+      state: 
+      clear_log_subwindow(NULL, NULL);
+      Does not work...
+      Quit:
+      xv_destroy[_safe](main_frame);
+      */
+   /* Exit xv_main_loop() at top level: */
+   notify_stop();
 }
 
 
@@ -84,6 +87,7 @@ create_quit_button()
    menu = xv_create(XV_NULL, MENU_COMMAND_MENU, 
                     MENU_ACTION_ITEM, CLOSE_QUIT, quit_notify,
                     MENU_ACTION_ITEM, QUICK_QUIT, quit_notify,
+                    MENU_ACTION_ITEM, DELETE_QUIT, quit_notify,
                     NULL);
 
    quit_button = xv_create(main_panel, PANEL_BUTTON,
