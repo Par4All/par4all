@@ -28,13 +28,22 @@ TARGET= 	transformations
 # Name of the main program to test or use the library
 MAIN=		transformations
 #
-
 #		/usr/lib/debug/malloc.o 
 
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
-LIB_CFILES=	replace.c loop_unroll.c partial_eval.c prettyprintcray.c strip_mine.c \
-		loop_interchange.c interchange.c target.c nest_parallelization.c
+LIB_CFILES=	replace.c \
+		loop_unroll.c \
+		partial_eval.c \
+		prettyprintcray.c \
+		strip_mine.c \
+		loop_interchange.c \
+		interchange.c \
+		target.c \
+		nest_parallelization.c\
+		dead_code_elimination.c \
+		privatize.c \
+		simple_atomize.c
 LIB_HEADERS=	transformations-local.h
-LIB_OBJECTS=	replace.o loop_unroll.o partial_eval.o prettyprintcray.o strip_mine.o \
-		loop_interchange.o interchange.o target.o nest_parallelization.o
+LIB_OBJECTS=	$(LIB_CFILES:%.c=%.o)
+#
