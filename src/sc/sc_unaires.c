@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -91,7 +92,7 @@ Variable v_old, v_new;
  */
 void sc_vect_sort(s, compare)
 Psysteme s;
-int (*compare)();
+int (*compare)(Pvecteur *, Pvecteur *);
 {
     if (s==NULL || sc_empty_p(s) || sc_rn_p(s)) 
 	return;
@@ -126,6 +127,55 @@ void sc_sort(
 	contrainte_sort(sc->egalites, sc->base, sort_base, TRUE, TRUE);
 }
 
+static boolean vect_printout_order_decided_p(Pvecteur v)
+{
+  boolean decided_p = FALSE;
+  int positive_terms = 0;
+  int negative_terms = 0;
+  Pvecteur coord = VECTEUR_UNDEFINED;
+
+  for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
+    if(vecteur_var(coord)!= TCST) 
+      (value_pos_p(vecteur_val(coord))) ? 
+	positive_terms++ :  negative_terms++;   
+  }
+  /* constant vectors are considered decided */
+  decided_p = ((positive_terms!=negative_terms) ||
+	       (positive_terms==0 && negative_terms==0));
+
+  return decided_p;
+}
+
+/* Try to guess the print out order for an equality already
+   lexicographically sorted */
+Pvecteur vect_printout_order(Pvecteur v, int (*compare)(Pvecteur *, Pvecteur *))
+{
+  Pvecteur v_neg = VECTEUR_NUL;
+  Pvecteur cc = VECTEUR_UNDEFINED;
+  Pvecteur succ = VECTEUR_UNDEFINED;
+
+  for(cc = v; !VECTEUR_NUL_P(cc); cc = succ) {
+    succ = vecteur_succ(cc); /* before cc might be freed */
+    if(vecteur_val(cc) < 0 || vecteur_var(cc)==TCST) {
+      vect_add_elem(&v_neg, vecteur_var(cc), vecteur_val(cc));
+      vect_erase_var(&v, vecteur_var(cc));
+    }
+  }
+
+  vect_sort_in_place(&v, compare);
+  vect_sort_in_place(&v_neg, compare);
+
+  /* append v_neg to v */
+  for(cc=v; !VECTEUR_NUL_P(cc); cc = vecteur_succ(cc)) {
+    if(VECTEUR_NUL_P(vecteur_succ(cc))) {
+      vecteur_succ(cc) = v_neg;
+      break; /* do not follow v_neg for ever */
+    }
+  }
+
+  return v;
+}
+
 /* Minimize first the lexico-graphic weight of each constraint according to
  * the comparison function "compare", and then sort the list of equalities
  * and inequalities by increasing lexico-graphic weight.
@@ -137,17 +187,53 @@ sc_lexicographic_sort(
     Psysteme sc,
     int (*compare)(Pvecteur*, Pvecteur*))
 {
-    if (sc==NULL || sc_empty_p(sc) || sc_rn_p(sc)) 
-	return;
+  Pcontrainte c = CONTRAINTE_UNDEFINED;
 
-    /* sort the system basis and each constraint */
-    vect_sort_in_place(&(sc->base), compare);
-    contrainte_vect_sort(sc_egalites(sc), compare);
-    contrainte_vect_sort(sc_inegalites(sc), compare);
+  if (sc==NULL || sc_empty_p(sc) || sc_rn_p(sc)) 
+    return;
 
-    /* sort equalities and inequalities */
-    sc->egalites = equations_lexicographic_sort(sc->egalites, compare);
-    sc->inegalites = inequalities_lexicographic_sort(sc->inegalites, compare);
+  /* sort the system basis */
+  vect_sort_in_place(&(sc->base), compare);
+
+  /* sort each constraint */
+  contrainte_vect_sort(sc_egalites(sc), compare);
+  contrainte_vect_sort(sc_inegalites(sc), compare);
+
+  /* minimize equations: when equations are printed out, terms are moved
+     to eliminate negative coefficients and the inner lexicographic
+     order is broken. Furthermore, an equation can be multiplied by -1
+     and stay the same but be printed out differently. */
+  for(c = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(c); c = contrainte_succ(c)) {
+    Pvecteur v = contrainte_vecteur(c);
+
+    if(!VECTEUR_NUL_P(v) && !vect_printout_order_decided_p(v)) {
+      int cmp = 0;
+      Pvecteur v1 = vect_dup(v);
+      Pvecteur v2 = vect_multiply(vect_dup(v), VALUE_MONE);
+
+      v1 = vect_printout_order(v1, compare);
+      v2 = vect_printout_order(v2, compare);
+      cmp = vect_lexicographic_compare(v1, v2, compare);
+      if(cmp>0) {
+	contrainte_vecteur(c) = vect_multiply(contrainte_vecteur(c),
+					      VALUE_MONE);
+	vect_rm(v1);
+	vect_rm(v2);
+      }
+      else if(cmp<0) {
+	vect_rm(v1);
+	vect_rm(v2);
+      }
+      else {
+	/* we are in trouble: v1 and v2 are different but not comparable */
+	assert(FALSE);
+      }
+    }
+  }
+
+  /* sort equalities and inequalities */
+  sc->egalites = equations_lexicographic_sort(sc->egalites, compare);
+  sc->inegalites = inequalities_lexicographic_sort(sc->inegalites, compare);
 }
 
 /*   That is all
