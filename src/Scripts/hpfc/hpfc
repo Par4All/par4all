@@ -1,7 +1,10 @@
 #! /bin/sh
 # 
-# $RCSfile: hpfc,v $ (version $Revision$)
-# $Date: 1997/01/18 10:32:58 $, 
+# $Id$
+# $Log: hpfc,v $
+# Revision 1.24  1997/03/19 17:48:49  coelho
+# better RCS headers.
+#
 #
 # HPFC scripts very front-end.
 # just an easy way not to have to remember the name of some scripts.
