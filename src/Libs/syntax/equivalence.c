@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/04/14 21:28:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/05/05 15:43:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1998/04/14 21:28:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1998/05/05 15:43:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -134,7 +134,7 @@ ComputeEquivalences()
 	for (pc = equivalences_chains(TempoEquivSet); pc != NIL; pc = CDR(pc))
 		again = (AddOrMergeChain(CHAIN(CAR(pc))) == EQUIMER);
 
-	gen_free(TempoEquivSet);
+	free_equivalences(TempoEquivSet);
 
 	if (again) {
 	    TempoEquivSet = FinalEquivSet;
