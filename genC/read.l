@@ -32,24 +32,41 @@
 #undef yywrap
 #endif
 
-#define LITERAL_SIZE 30000
+static string literal = (char*) NULL;
+static int literal_size = 0;
+static void append_to_literal(string s)
+{
+    int total = strlen(literal)+strlen(s);
 
-char literal[ LITERAL_SIZE ] = { '\0' } ;
+    if (literal_size == 0) {
+	literal_size = 50;
+	literal = (char*) malloc(sizeof(char)*literal_size);
+	message_assert("malloc ok", literal);
+    }
 
-static void append_to_literal() ;
+    if (total > literal_size) {
+	literal_size = total+10;
+	literal = (char*) realloc(literal, sizeof(char)*literal_size);
+	message_assert("realloc ok", literal);
+    }
+
+    strcat(literal, s);
+}
 
 %}
 
 %Start a_string
 
 %%
-<a_string>\\\\            {strcat( literal, "\\" );}
-<a_string>\\\"		{strcat( literal, "\"" );}
-<a_string>[^\\"\n]*       {append_to_literal();}
-<a_string>[ \t\n]*        {append_to_literal();}
+<a_string>\\\\          {append_to_literal("\\");}
+<a_string>\\\"		{append_to_literal("\"");}
+<a_string>[^\\"\n]*     {append_to_literal(yytext);}
+<a_string>[ \t\n]*      {append_to_literal(yytext);}
 <a_string>\"		{
-			BEGIN 0 ;
-			return READ_STRING ;
+			  BEGIN 0 ;
+			  yylval.s = strdup(literal);
+			  free(literal); literal=(char*)NULL; literal_size=0;
+			  return READ_STRING ;
 			}
 
 \[                      {return LB ;}
@@ -75,8 +92,8 @@ static void append_to_literal() ;
 [+-]?[ \t]*[0-9]+\.[0-9]+ { yylval.d=atof(yytext);
                         return READ_FLOAT ;}
 \"			{
-			BEGIN a_string ;
-                        literal[0] = '\0';
+			  BEGIN a_string ;
+			  append_to_literal("");
 			}
 [ \t\n]*	        ;
 .                       {fatal( "gen_read: Unknown character %x\n", 
@@ -96,17 +113,4 @@ int yywrap(void)
     yy_init = 1 ;
 #endif
     return( 1 ) ;
-}
-
-static void append_to_literal()
-{
-    int total = strlen( literal )+strlen( yytext ) ;
-
-    if( total < LITERAL_SIZE ) {
-        strcat( literal, yytext );
-    }
-    else { 
-        fatal( "read: Not enough space %s\n", 
-              itoa( total )) ;
-    }
 }
