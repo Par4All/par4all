@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1995/07/20 18:40:40 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1995/07/26 16:52:52 $, )
  * version $Revision$,
  */
 
@@ -12,24 +12,20 @@
 void create_common_parameters_h(file)
 FILE* file;
 {
-    fprintf(file, "      integer\n");
-    fprintf(file, "     $     REALNBOFARRAYS,\n");
-    fprintf(file, "     $     REALNBOFTEMPLATES,\n");
-    fprintf(file, "     $     REALNBOFPROCESSORS,\n");
-    fprintf(file, "     $     REALMAXSIZEOFPROCS\n\n");
-
-    fprintf(file, "c\nc parameters\nc\n");
-
-    fprintf(file, "      parameter(REALNBOFARRAYS = %d)\n", 
-	    number_of_distributed_arrays());
-
-    fprintf(file, "      parameter(REALNBOFTEMPLATES = %d)\n", 
-	    number_of_templates());
-
-    fprintf(file, "      parameter(REALNBOFPROCESSORS = %d)\n", 
-	    number_of_processors());
-
-    fprintf(file, "      parameter(REALMAXSIZEOFPROCS = %d)\n", 
+    fprintf(file,
+	    "      integer\n"
+	    "     $     REALNBOFARRAYS,\n"
+	    "     $     REALNBOFTEMPLATES,\n"
+	    "     $     REALNBOFPROCESSORS,\n"
+	    "     $     REALMAXSIZEOFPROCS\n\n"
+	    "c\nc parameters\nc\n"
+	    "      parameter(REALNBOFARRAYS = %d)\n"
+	    "      parameter(REALNBOFTEMPLATES = %d)\n"
+	    "      parameter(REALNBOFPROCESSORS = %d)\n"
+	    "      parameter(REALMAXSIZEOFPROCS = %d)\n",
+	    number_of_distributed_arrays(),
+	    number_of_templates(),
+	    number_of_processors(),
 	    max_size_of_processors());
 }
 
@@ -47,8 +43,7 @@ entity module;
     int i;
     list l = list_of_distributed_arrays_for_module(module);
 
-    fprintf(file, 
-	    "c\nc parameters generated for %s\nc\n",
+    fprintf(file, "c\nc parameters generated for %s\nc\n",
 	    module_local_name(module));
 
     MAP(ENTITY, array,
@@ -141,15 +136,20 @@ entity module;
 	fprintf(file, "c\nc initializing array %s, number %d\nc\n",
 		entity_local_name(array), an);
 	
-	/*
-	 * NODIMA: Number Of  DIMensions of an Array
+	/* NODIMA: Number Of  DIMensions of an Array
 	 * ATOT: Array TO Template
 	 */
 	fprintf(file, "      NODIMA(%d) = %d\n", an, nd);
 	fprintf(file, "      ATOT(%d) = %d\n", an, tn);
+
+	if (dynamic_entity_p(array) && array==load_primary_entity(array))
+	{
+	    /* The primary entity is the initial mapping ???
+	     */
+	    fprintf(file, "      MSTATUS(%d) = %d\n", an, an);
+	}
 	
-	/*
-	 * RANGEA: lower, upper, size and declaration, aso
+	/* RANGEA: lower, upper, size and declaration, aso
 	 */
 	i = 1;
 	for (i=1; i<=nd; i++)
@@ -206,8 +206,8 @@ entity module;
 		 rate = HpfcExpressionToInt(alignment_rate(a));
 		 shift = (HpfcExpressionToInt(alignment_constant(a)) -
 			  HpfcExpressionToInt(dimension_lower(dim)));
-		 /*
-		  * 5: distribution parameter n, 
+
+		 /* 5: distribution parameter n, 
 		  * 6: alignment rate a,
 		  * 7: alignment shift, b-t_{m}
 		  */
@@ -241,8 +241,7 @@ entity module;
 			  HpfcExpressionToInt(dimension_lower(dim)));
 		 no = (lb + shift) / sc ;
 		 
-		 /*
-		  * 5: distribution parameter n,
+		 /* 5: distribution parameter n,
 		  * 6: cycle length n*p,
 		  * 7: initial cycle number,
 		  * 8: alignment shift, b-t_{m}
@@ -281,8 +280,7 @@ entity module;
 		 no = (rate*lb + shift) / sc ;
 		 chck = iceil(param, abs(rate));
 		 
-		 /*
-		  *  5: distribution parameter n
+		 /*  5: distribution parameter n
 		  *  6: cycle length n*p,
 		  *  7: initial cycle number,
 		  *  8: alignment shift, b-t_{m}
@@ -307,8 +305,7 @@ entity module;
 
 	 fprintf(file, "\n");
 
-	 /*
-	  * ALIGN
+	 /* ALIGN
 	  */
 
 	 for(i=1 ; i<=NumberOfDimension(template) ; i++)
@@ -361,15 +358,13 @@ FILE* file;
 	 fprintf(file, "c\nc initializing template %s, number %d\nc\n",
 		 entity_local_name(template), tn);
 
-	 /*
-	  * NODIMT: Number Of  DIMensions of a Template
+	 /* NODIMT: Number Of  DIMensions of a Template
 	  * TTOP: Template TO Processors arrangement
 	  */
 	 fprintf(file, "      NODIMT(%d) = %d\n", tn, nd);
 	 fprintf(file, "      TTOP(%d) = %d\n", tn, pn);
 	 
-	 /*
-	  * RANGET: lower, upper, size 
+	 /* RANGET: lower, upper, size 
 	  */
 	 MAP(DIMENSION, d,
 	 {
@@ -386,8 +381,7 @@ FILE* file;
 	  },
 	      variable_dimensions(type_variable(entity_type(template))));
 
-	 /*
-	  * DIST
+	 /* DIST
 	  */
 	 tempdim = 1;
 	 fprintf(file, "\n");
@@ -438,13 +432,11 @@ FILE* file;
 	 fprintf(file, "c\nc initializing processors %s, number %d\nc\n",
 		 entity_local_name(proc), pn);
 
-	 /*
-	  * NODIMP: Number Of  DIMensions of a Processors arrangement
+	 /* NODIMP: Number Of  DIMensions of a Processors arrangement
 	  */
 	 fprintf(file, "      NODIMP(%d) = %d\n", pn, nd);
 	 
-	 /*
-	  * RANGEP: lower, upper, size 
+	 /* RANGEP: lower, upper, size 
 	  */
 	 MAP(DIMENSION, d,
 	 {
