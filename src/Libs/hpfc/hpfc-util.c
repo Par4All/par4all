@@ -4,7 +4,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/23 16:54:31 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/24 15:02:10 $, )
  * version $Revision$,
  */
 
@@ -87,13 +87,10 @@ expression expr;
     return(FALSE);
 }
 
-
-/*
- * replicated_p
+/* replicated_p
  *
  * check whether the distributed array e
  * is replicated or not.
- * if not sure, say yes.
  */
 bool replicated_p(e)
 entity e;
@@ -122,8 +119,10 @@ entity e;
     return(FALSE);
 }
 
-/*
- * ith_dim_replicated_p
+/* bool ith_dim_replicated_p(template, i, la, dist)
+ *
+ * TRUE if template dimension i distributed with dist leads to 
+ * a replication for array align al.
  */
 bool ith_dim_replicated_p(template, i, la, dist)
 entity template;
@@ -133,22 +132,20 @@ distribution dist;
 {
     if (style_none_p(distribution_style(dist))) return(FALSE);
 
-    /*
-     * select the relevent alignment if exists.
+    /* select the relevent alignment if exists.
      * could be some kind of gen_find_if()...
      */
     MAPL(ca,
      {
-	 alignment ali=ALIGNMENT(CAR(ca));
-	 if(alignment_templatedim(ali)==i) return(FALSE);
+	 if (alignment_templatedim(ALIGNMENT(CAR(ca)))==i)
+	     return(FALSE);
      },
 	 la);
 
     return(TRUE);
 }
 
-/*
- * bool ith_dim_distributed_p(array, i)
+/* bool ith_dim_distributed_p(array, i)
  *
  * whether a dimension is distributed or not.
  */
@@ -156,25 +153,16 @@ bool ith_dim_distributed_p(array, i, pprocdim)
 entity array;
 int i, *pprocdim;
 {
-    align
-	al = load_entity_align(array);
-    list
-	lal = align_alignment(al);
-    alignment
-	alt = FindAlignmentOfDim(lal, i);
-    entity
-	template = align_template(al);
-    distribute
-	dis = load_entity_distribute(template);
-    list
-	ld = distribute_distribution(dis);
-    distribution
-	d;
+    align       al = load_entity_align(array);
+    list       lal = align_alignment(al);
+    alignment  alt = FindAlignmentOfDim(lal, i);
+    entity template = align_template(al);
+    distribute dis = load_entity_distribute(template);
+    list ld = distribute_distribution(dis);
+    distribution d;
 
     if (alignment_undefined_p(alt)) return(FALSE);
-    
     d = FindDistributionOfDim(ld, alignment_templatedim(alt), pprocdim);
-
     return(!style_none_p(distribution_style(d)));
 }
 
@@ -187,15 +175,11 @@ statement MakeStatementLike(stat, the_tag)
 statement stat;
 int the_tag;
 {
-    statement 
-	newstat =
-	    make_statement(statement_label(stat),
-			   STATEMENT_NUMBER_UNDEFINED,
-			   STATEMENT_ORDERING_UNDEFINED,
-			   statement_comments(stat),     /* sharing! */
-			   make_instruction(the_tag, instruction_undefined));
-
-    return(newstat);
+    return(make_statement(statement_label(stat),
+			  STATEMENT_NUMBER_UNDEFINED,
+			  STATEMENT_ORDERING_UNDEFINED,
+			  statement_comments(stat),     /* sharing! */
+			  make_instruction(the_tag, instruction_undefined)));
 }
 
 static void stmt_rwt(s)
@@ -233,8 +217,7 @@ expression expr;
     return(lde);
 }
 
-/*
- * FindRefToDistArrayFromList
+/* FindRefToDistArrayFromList
  *
  * these functions compute the list of syntax that are
  * references to a distributed variable.
@@ -242,15 +225,12 @@ expression expr;
 list FindRefToDistArrayFromList(lexpr)
 list lexpr;
 {
-    list l=NULL;
-
+    list l=NIL;
     MAPL(ce,{l=gen_nconc(FindRefToDistArray(EXPRESSION(CAR(ce))),l);},lexpr);
-
     return(l);
 }
 
-static list
-    found_syntaxes = NIL;
+static list found_syntaxes = NIL;
 
 static void FindRefToDistArray_syntax_rewrite(s)
 syntax s;
@@ -265,9 +245,8 @@ syntax s;
 list FindRefToDistArray(obj)
 gen_chunk* obj;
 {
-    list
-	result = NIL,
-	saved = found_syntaxes;
+    list result = NIL,
+	 saved = found_syntaxes;
 
     found_syntaxes = NIL;
 
@@ -494,19 +473,6 @@ entity common;
     AddCommonToModule(common, host_module, store_new_host_variable, HOST_NAME); 
 }
 
-/*
- * nextline
- */
-string nextline(line)
-string line;
-{
-    while (((*line)!='\n') && ((*line)!='\0')) line++;
-    return(((*line)=='\n')?(line+1):(line));
-}
-
-/*
- * FindAlignmentOfDim
- */
 alignment FindAlignmentOfDim(lal, dim)
 list lal;
 int dim;
@@ -520,10 +486,6 @@ int dim;
     return ((l==NULL)?(alignment_undefined):(ALIGNMENT(CAR(l))));
 }
 
-
-/*
- * FindAlignmentOfTemplateDim
- */
 alignment FindAlignmentOfTemplateDim(lal, dim)
 list lal;
 int dim;
@@ -537,9 +499,6 @@ int dim;
     return ((l==NULL)?(alignment_undefined):(ALIGNMENT(CAR(l))));
 }
 
-/*
- * FindDistributionOfDim
- */
 distribution FindDistributionOfDim(ldi, dim, pdim)
 list ldi;
 int dim, *pdim;
@@ -563,9 +522,6 @@ int dim, *pdim;
     return(DISTRIBUTION(CAR(l)));
 }
 
-/*
- * distribution FindDistributionOfProcessorDim(ldi, dim, tdim)
- */
 distribution FindDistributionOfProcessorDim(ldi, dim, tdim)
 list ldi;
 int dim, *tdim;
@@ -598,8 +554,7 @@ int dim, *tdim;
     return(distribution_undefined);
 }    
 
-/*
- * int template_dimension_of_array_dimension(array, dim)
+/* int template_dimension_of_array_dimension(array, dim)
  *
  * the matching dimension of a distributed
  */
@@ -617,11 +572,6 @@ int dim;
 	   (alignment_templatedim(al)));
 }
 
-/*
- * int DistributionParameterOfArrayDim(array, dim, pprocdim)
- *
- *
- */
 int DistributionParameterOfArrayDim(array, dim, pprocdim)
 entity array;
 int dim, *pprocdim;
@@ -639,9 +589,7 @@ int dim, *pprocdim;
     return(HpfcExpressionToInt(distribution_parameter(di)));
 }
 
-
-/*
- * int processor_number(template, tdim, tcell, pprocdim)
+/* int processor_number(template, tdim, tcell, pprocdim)
  *
  * the processor number of a template cell, on dimension *pprocdim
  */
@@ -684,8 +632,7 @@ int tdim, tcell, *pprocdim; /* template dimension, template cell */
 }    
 
 
-/*
- * int template_cell_local_mapping(array, dim, tc)
+/* int template_cell_local_mapping(array, dim, tc)
  *
  * ??? should check that it is indeed block distributed !
  * or should implement all the formulas...
@@ -709,8 +656,7 @@ int dim, tc;
     return((tc-tmin)%n+1);
 }
 	
-/*
- * int global_array_cell_to_local_array_cell(array, dim, acell)
+/* int global_array_cell_to_local_array_cell(array, dim, acell)
  *
  * ??? not enough general a function
  */
@@ -731,8 +677,7 @@ int dim, acell;
     return(template_cell_local_mapping(array, dim, rate*acell+constant));	
 }
 
-/*
- * HpfcExpressionToInt(e)
+/* HpfcExpressionToInt(e)
  *
  * uses the normalized value if possible. 
  */
