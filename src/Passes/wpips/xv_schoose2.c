@@ -201,29 +201,15 @@ schoose_abbrev_menu_with_text_text_notify(Panel_item text_item,
    
    char * text = (char *) xv_get(text_item, PANEL_VALUE);
 
+   debug_on("WPIPS_DEBUG_LEVEL");
+   debug(9, "schoose_abbrev_menu_with_text_text_notify", "Entering ...\n");
+   
    real_user_notify_function =
       (void (*)(char *)) xv_get(text_item, XV_KEY_DATA,
                                 ABBREV_MENU_WITH_TEXT_AFTER_SELECTION);
    real_user_notify_function(text);
    
-#if 0
-   Panel_item abbrev_menu = (Panel_item) xv_get(text_item,
-                                                PANEL_CLIENT_DATA);
-
-   Menu menu = (Menu) xv_get(abbrev_menu,
-                             PANEL_ITEM_MENU);
-
-   bool found = FALSE;
-   
-   for(i = (int) xv_get(menu, MENU_NITEMS); i >= 0; i--)
-      if (strcmp(text, (char *) xv_get(menu, MENU_NTH_ITEM, i)) == 0) {
-         found = TRUE;
-         break;
-      }
-   
-   if (found)
-      *(void (* )(char *))(text);
-#endif
+   debug_off();
 }
 
 
@@ -234,10 +220,15 @@ abbrev_menu_with_text_menu_notify(Menu menu, Menu_item menu_item)
    void (* real_user_notify_function)(char *);
    char * menu_choice = (char *) xv_get(menu_item, MENU_STRING);
 
+   debug_on("WPIPS_DEBUG_LEVEL");
+   debug(9, "abbrev_menu_with_text_menu_notify", "Entering...\n");
+   
    real_user_notify_function =
       (void (*)(char *)) xv_get(menu, MENU_CLIENT_DATA);
    
    real_user_notify_function(menu_choice);
+
+   debug_off();
 }
 
 
@@ -251,6 +242,9 @@ abbrev_menu_event_filter_proc(Panel panel,
    Rect * rect;
    Menu (* generate_menu)(void);
    
+   debug_on("WPIPS_DEBUG_LEVEL");
+   debug(9, "abbrev_menu_event_filter_proc", "Entering ...\n");
+   
    /* See example p. 675 in the XView Programming Manual: */
    if (event_is_down(event)) {
       /* Find the Panel_item */
@@ -262,16 +256,19 @@ abbrev_menu_event_filter_proc(Panel panel,
                                    event->ie_locy)) {
                generate_menu =
                   (Menu (* )()) xv_get(item,
-                                           XV_KEY_DATA,
-                                           ABBREV_MENU_WITH_TEXT_GENERATE_MENU);
+				       XV_KEY_DATA,
+				       ABBREV_MENU_WITH_TEXT_GENERATE_MENU);
 
                if (generate_menu != NULL) {
-                  /* OK, we clicked on a abbrev_menu_with_text menu: */
-                  Menu new_menu;
-                  void (* a_menu_notify_procedure)(Menu, Menu_item);
-                  
-                  /* If there is an old menu, remove it: */
+		   /* OK, we clicked on a abbrev_menu_with_text menu: */
+		   Menu new_menu;
+		   void (* a_menu_notify_procedure)(Menu, Menu_item);
+		   /* If there is an old menu, remove it: */
                   Menu old_menu = xv_get(item, PANEL_ITEM_MENU);
+
+		  debug(9, "abbrev_menu_event_filter_proc",
+			"OK, we clicked on a abbrev_menu_with_text menu.\n");
+		  
                   if (old_menu != NULL)
                      xv_destroy(old_menu);
 
@@ -282,13 +279,25 @@ abbrev_menu_event_filter_proc(Panel panel,
                   /* menu_return_value() seems to be the default
                      MENU_NOTIFY_PROC in XView... Hum, internal
                      details... */
-                  if (a_menu_notify_procedure == menu_return_value)
+		   /* Quite strange: with gcc without -static on
+                      SunOS4.1.4, this test is never true... :-( Well,
+                      remove this micro-optimization and always
+                      reinstall the MENU_NOTIFY_PROC: */
+		   /*
+		      if (a_menu_notify_procedure == menu_return_value) {
+		      */
                      /* The new_menu has not attached a notify
                         procedure. Get the one given at creation time
                         of the panel: */
                      xv_set(new_menu, MENU_NOTIFY_PROC,
                             abbrev_menu_with_text_menu_notify,
                             NULL);
+		     debug(9, "abbrev_menu_event_filter_proc",
+			   "Attaching abbrev_menu_with_text_menu_notify...\n");
+		   /*
+		      }
+		      */
+		  
 
                   {
                      /* Associate the real notify function to the menu too: */
@@ -310,6 +319,7 @@ abbrev_menu_event_filter_proc(Panel panel,
          }
       PANEL_END_EACH
          }
+   debug_off();
    
    /* Now call the normal event procedure: */
    return notify_next_event_func(panel, (Notify_event) event, arg, type);
