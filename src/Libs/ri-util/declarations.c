@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.10  1998/10/07 15:32:10  irigoin
+ * Guard added so as not always print DATA statements. Required for ENTRY processing.
+ *
  * Revision 1.9  1998/04/14 13:04:24  coelho
  * linear.h
  *
@@ -1215,7 +1218,9 @@ text_entity_declaration(
 
     /* what about DATA statements! FC 
      */
-    MERGE_TEXTS(r, text_data(module, ldecl));
+    if(get_bool_property("PRETTYPRINT_DATA_STATEMENTS")) {
+	MERGE_TEXTS(r, text_data(module, ldecl));
+    }
 
     return r;
 }
