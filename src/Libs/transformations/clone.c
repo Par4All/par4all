@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.16  1997/12/10 14:42:27  coelho
+ * leaks--
+ *
  * Revision 1.15  1997/11/08 17:28:42  coelho
  * fix with prettyprint, to include commons in redeclarations...
  *
@@ -232,8 +235,7 @@ build_a_clone_for(
 	CONS(SENTENCE, make_sentence(is_sentence_formatted, comments),
 	     text_sentences(t));
 
-    make_text_resource(new_name, DBR_INITIAL_FILE, ".f_initial", t);
-    /* free_text(t); */
+    make_text_resource_and_free(new_name, DBR_INITIAL_FILE, ".f_initial", t);
     free_statement(stat);
 
     /* give the clonee a user file.
