@@ -91,7 +91,8 @@ text my_get_text_proper_effects(string module_name)
 
   set_is_user_view_p(FALSE);
   set_methods_for_rw_effects_prettyprint(module_name);
-  add_a_generic_prettyprint(DBR_PROPER_EFFECTS, FALSE, effects_to_text_func, effects_prettyprint_func, attach_effects_decoration_to_text_func);
+  push_prettyprints(resource_name, summary_resource_name);
+  /*add_a_generic_prettyprint(DBR_PROPER_EFFECTS, FALSE, effects_to_text_func, effects_prettyprint_func, attach_effects_decoration_to_text_func);*/
   t = my_get_any_effects_text(module_name);
   reset_generic_prettyprints();
   reset_methods_for_effects_prettyprint(module_name);
