@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1996/06/17 10:01:03 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1996/07/02 16:48:57 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1996/06/17 10:01:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1996/07/02 16:48:57 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -454,6 +454,9 @@ initialize_emacs_mode()
       send_window_number_to_emacs(INITIAL_NUMBER_OF_WPIPS_WINDOWS);
       
       /* Ask for Emacs prettyprinting: */
-      set_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES", TRUE);	
+      set_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES", TRUE);
+      /* Ask Pips to display the declarations from the RI to have
+         hypertext functions on the declarations: */
+      set_bool_property("PRETTYPRINT_ALL_DECLARATIONS", TRUE);
    }
 }
