@@ -44,6 +44,7 @@
 #include "text-util.h"
 #include "misc.h"
 #include "paf-util.h"
+#include "array_dfg.h"
 
 /* Macro functions  	*/
 
