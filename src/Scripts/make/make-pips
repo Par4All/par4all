@@ -2,7 +2,7 @@
 #! /bin/sh -vx
 #
 # SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1995/08/09 13:21:30 $, )
+# $RCSfile: make-pips,v $ ($Date: 1995/08/10 11:26:30 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -69,9 +69,9 @@ LIBS=`(cd $PIPS_LIBSRCDIR; echo [!M]*)`
 echo LIBS=$LIBS
 
 # Pips project passes
-# PASSES="pips wpips tpips parser linker parallelize "
 # Explicit definition of passes to avoid obsolete ones
-PASSES="pips wpips"
+
+PASSES=${PIPS_PASSES}
 
 # build internal representation
 # echo "Making internal representation"
