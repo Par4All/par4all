@@ -1,9 +1,9 @@
-/* %A% ($Date: 1995/12/15 16:33:41 $, ) 
+/* %A% ($Date: 1995/12/15 18:17:56 $, ) 
     version $Revision$, got on %D%, %T% [%P%].
    Copyright (c) - École des Mines de Paris Proprietary.  */
 
 #ifndef lint
-char top_level_newgen_c_vcid[] = "%A% ($Date: 1995/12/15 16:33:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char top_level_newgen_c_vcid[] = "%A% ($Date: 1995/12/15 18:17:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 #include <stdio.h>
 
@@ -27,8 +27,18 @@ char top_level_newgen_c_vcid[] = "%A% ($Date: 1995/12/15 16:33:41 $, ) version $
 #include "paf_ri.h"
 #include "word_attachment.h"
 
+#include <malloc.h> /* for mallopt */
+
 void initialize_newgen()
 {
+/* use mallopt if possible...
+ * not define for System V I guess.
+ */
+#ifdef M_MXFAST
+    mallopt(M_MXFAST, 32);
+    mallopt(M_GRAIN, 4);
+#endif    
+
     /* lecture specifications NewGen */
     gen_read_spec(ALL_SPECS);
       
