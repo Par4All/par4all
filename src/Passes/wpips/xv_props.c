@@ -1,6 +1,5 @@
+#include <stdlib.h>
 #include <stdio.h>
-extern char *getenv();
-extern int sscanf();
 
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -243,11 +242,11 @@ Panel props_panel;
 		MAPL(pvr, {
 			virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
 			string vrn = virtual_resource_name(vr);
-			cons *p = CONS(STRING, rule_phase(r), NIL);
-			cons* l = (cons *) hash_get(phase_by_made_htp, vrn);
+			list p = CONS(STRING, rule_phase(r), NIL);
+			list l = (list) hash_get(phase_by_made_htp, vrn);
 
 			if ( l == (list) HASH_UNDEFINED_VALUE ) {
-				hash_put(phase_by_made_htp, vrn, p);
+				hash_put(phase_by_made_htp, vrn, (char *)p);
 			}
 			else {
 				(void) gen_nconc(l, p);
@@ -259,7 +258,7 @@ Panel props_panel;
     /* walking thru phase_by_made_htp */
     HASH_MAP(k, v, {
 		string alias1 = hash_get_key_by_value(aliases, k);
-		list l = (cons*) v;
+		list l = (list) v;
 
 		if ((alias1 != HASH_UNDEFINED_VALUE) && (gen_length(l) >= 2)) {
 
