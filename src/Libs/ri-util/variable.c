@@ -516,7 +516,7 @@ variable_is_a_module_formal_parameter_p(entity a_variable,
    MAP(ENTITY, e,
        {
           storage s = entity_storage(e);
-          if (e == a_variable)
+          if (e == a_variable) {
              if (storage_formal_p(s))
                 /* Well, the variable is a formal parameter of the
                    module: */
@@ -525,6 +525,7 @@ variable_is_a_module_formal_parameter_p(entity a_variable,
                 /* The variable is in the declaration of the module
                    but is not a formal parameter: */
                 return FALSE;
+	  }
        },
           code_declarations(value_code(entity_initial(a_module))));
 
@@ -671,8 +672,10 @@ make_new_module_variable(entity module,int d)
  * FI: this must be wrong. A function to reset count_tmp and count_aux 
  * is needed if tpips or wpips are to work in a consistent way!
  */
+/* gcc complains that they are not used.
 static int count_tmp = 0;
 static int count_aux = 0;
+*/
 
 
 /*============================================================================*/
