@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.49  2002/05/02 15:32:54  coelho
+ * module_local_name needed by eole.
+ *
  * Revision 1.48  2002/03/08 10:12:35  irigoin
  * StackArea management adedd in common_members_of_module()
  *
@@ -198,8 +201,6 @@ entity_local_name(entity e)
     return e==NULL ? null_name : local_name(entity_name(e));
 }
 
-/* END_EOLE */
-
 string 
 module_local_name(entity e)
 {
@@ -209,6 +210,8 @@ module_local_name(entity e)
 	+ strspn(name, BLOCKDATA_PREFIX)
 	+ strspn(name, COMMON_PREFIX);
 }
+
+/* END_EOLE */
 
 string 
 label_local_name(entity e)
