@@ -36,7 +36,7 @@
 
 #define FUNCTION_MAP(typename, start, image, k, v, code, fun) \
     { hash_table _map_hash_h = ((gen_chunk*)fun+1)->h ;\
-      hash_entry_pointer _map_hash_p = NULL; \
+      void * _map_hash_p = NULL; \
       void * _map_k; void * _map_v; \
       while ((_map_hash_p = \
 	hash_table_scan(_map_hash_h,_map_hash_p,&_map_k,&_map_v))) { \
