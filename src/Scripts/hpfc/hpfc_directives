@@ -1,17 +1,17 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/02/28 11:29:29 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/02/28 15:49:58 $, )
 # version $Revision$
 # got on %D%, %T%
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
-# by a Fortran 77 parser. I guess some perl or awk might be much more nice 
-# and efficient, but I'm not very good at it:-)
+# by a Fortran 77 parser. I guess some perl or awk might be much nicer
+# and more efficient, but I'm not very good at it:-)
 #
 # FC 02/95.
 #
-# HPF -> 
-# calls to HPFC subroutines and functions -> 
+# F77 and HPF directives -> 
+# calls to HPFC special subroutines and functions -> 
 # HPFC subs and functs analyzed and removed -> 
 # analyzes on the correct transformed code
 #
@@ -44,8 +44,6 @@
 SED=sed
 TR=tr
 RM=rm
-CAT=cat
-EXPR=expr
 
 #
 # temporary files prefix
@@ -113,8 +111,8 @@ ENDLINE=`$SED -n "/ .... [ 	]*[Ee][ 	]*[Nn][ 	]*[Dd]/=" $TMP.0 |
 #
 # final output
 
-$SED -n "1,`$EXPR $ENDLINE - 1`p" $TMP.0
-$CAT $TMP.1
+$SED "$ENDLINE,\$d" $TMP.0
+$SED -n p $TMP.1
 $SED -n "$ENDLINE,\$p" $TMP.0
 
 #
