@@ -40,10 +40,6 @@ char vcid_semantics_prettyprint[] = "$Id$";
 
 #define PREC_FORESYS_PREFIX "C$PREC"
 #define TRAN_FORESYS_PREFIX "C$TRAN"
-#define FORESYS_CONTINUATION_PREFIX "C$&"
-#define PIPS_NORMAL_PREFIX "C"
-
-#define LINE_SUFFIX "\n"
 
 DEFINE_CURRENT_MAPPING(semantic, transformer)
 
@@ -274,15 +270,6 @@ statement stmt;
     return txt; 
 }
 
-
-/* It is used to sort arguments preconditions in text_transformer(). */
-static int 
-wordcmp(s1,s2)
-char **s1, **s2;
-{
-    return strcmp(*s1,*s2);
-}
-
 /* The strange argument type is required by qsort(), deep down in the calls */
 static int 
 is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
@@ -311,6 +298,8 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
     return is_equal; 
 }
 
+#define append(s) add_to_current_line(crt_line, s, str_prefix, txt)
+
 /* text text_transformer(transformer tran) 
  * input    : a transformer representing a transformer or a precondition 
  * output   : a text containing commentaries representing the transformer
@@ -326,276 +315,78 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 text 
 text_transformer(transformer tran)
 {
-  text txt = make_text(NIL);
-  boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-  string str_prefix;
-  char crt_line[MAX_LINE_LENGTH];
-  char aux_line[MAX_LINE_LENGTH];
-  Pcontrainte peq;
-  Psysteme ps;
-  boolean first_line = TRUE;
+    text txt = make_text(NIL);
+    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+    string str_prefix;
+    char crt_line[MAX_LINE_LENGTH];
 
-  if (is_transformer) {
-    if (foresys) 
-      str_prefix = TRAN_FORESYS_PREFIX;
-    else 
-      str_prefix = PIPS_NORMAL_PREFIX;
-  }
-  else {
-    if (foresys) 
-      str_prefix = PREC_FORESYS_PREFIX;
-    else 
-      str_prefix = PIPS_NORMAL_PREFIX;
-  }
+    /* If in EMACS mode, does not add any separator line: */
+    if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+						strdup("\n")));
 
-  /* If in EMACS mode, does not add any separator line: */
-  if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
-      ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					      strdup("\n")));
+    str_prefix = foresys? 
+	FORESYS_CONTINUATION_PREFIX: PIPS_COMMENT_CONTINUATION;
+    
+    crt_line[0] = '\0';
+    
+    if (foresys)
+	append(is_transformer? TRAN_FORESYS_PREFIX: PREC_FORESYS_PREFIX);
+    else
+	append(PIPS_COMMENT_PREFIX);
 
-  crt_line[0] = '\0';
-  (void) strcat(crt_line, str_prefix);
-  (void) strcat(crt_line, " ");
+    if(tran != (transformer) HASH_UNDEFINED_VALUE && 
+       tran != (transformer) list_undefined)
+    {
+	if(tran==transformer_undefined)
+	{
+	    if (is_transformer)
+		append(" TRANSFORMER: TRANSFORMER_UNDEFINED");
+	    else
+		append(" PRECONDITION: TRANSFORMER_UNDEFINED");
+	}
+	else
+	{
+	    Psysteme ps;
+	    list args = transformer_arguments(tran);
 
-  if(tran != (transformer) HASH_UNDEFINED_VALUE && 
-     tran != (transformer) list_undefined)
-  {
-      if(tran==transformer_undefined)
-      {
-	  if (is_transformer)
-	      (void) strcat(crt_line, " TRANSFORMER: TRANSFORMER_UNDEFINED");
-	  else
-	      (void) strcat(crt_line, " PRECONDITION: TRANSFORMER_UNDEFINED");
-      }
-      else
-      {
-	  list args;
-	  int j=0, provi_length = 1;
-	  char **provi;
+	    append(is_transformer? "  T(": "  P(");
+
+	    entity_list_text_format(crt_line, str_prefix, txt, 
+				    args, entity_minimal_name);
+
+	    append(")");
+	    if (foresys) append(",");
+	    append(" ");
 	  
-	  aux_line[0] = '\0';
-	  if (is_transformer)
-	      (void) strcat(aux_line, " T(");
-	  else
-	      (void) strcat(aux_line, " P(");
-	  if(strlen(crt_line) + strlen(aux_line) > MAX_LINE_LENGTH - 2)
-	      pips_error("text_transformer", "line buffer too small\n");
-	  
-	  (void) strcat(crt_line, aux_line);
-	  
-	  args = transformer_arguments(tran);
-	  pips_debug(6, "Number of arguments = %d\n", gen_length(args));
+	    ps = predicate_system(transformer_relation(tran));
+	    sc_lexicographic_sort(ps, is_inferior_pvarval);              
 
-	  if(!ENDP(args))
-	  {
-	      provi = (char **) malloc(sizeof(char *) * gen_length(args));
-	      j = 0;
-	      MAP(ENTITY, e,
-		   {
-		       if (entity_undefined_p(e)) 
-		       {
-			   pips_debug(7, "undefined entity\n");
-			   provi[j] = (char*) "entity_undefined";
-		       }
-		       else
-			   provi[j] = (char*) entity_minimal_name(e); 
-		       j++;
-		   },
-		       args);
-	      provi_length = j;
-	      
-	      qsort(provi, provi_length, sizeof provi[0], wordcmp);
-	      pips_debug(7, "Building text for arguments\n");
-	      if ( provi_length > 1 )
-	      {
-		  for (j=0; j < provi_length-1; j++)
-		  {
-		      aux_line[0] = '\0';
-		      (void) strcat(aux_line, provi[j]);
-		      strcat(aux_line,",");
-		      first_line = add_to_current_line(crt_line, aux_line,
-						       str_prefix, txt, first_line);
-		      ifdebug(8){
-			  pips_debug(8, "%d-th argument %s\n current txt"
-				     " (consistent? %s): \n",
-				     j+1, provi[j],
-				     text_consistent_p(txt)? "YES":"NO");
-			  dump_text(txt);
-		      }
-			  
-		  }
-	      }
-	      aux_line[0] = '\0';
-	      (void) strcat(aux_line, provi[provi_length-1]);
-	      strcat(aux_line, ")");
-	      if (foresys)
-		  (void) strcat(aux_line, ",");
-	      first_line = add_to_current_line(crt_line, aux_line,
-					       str_prefix, txt, first_line);
-	      ifdebug(8){
-		  pips_debug(8, "%d-th argument %s\n current txt: \n",
-			     provi_length-1, provi[provi_length-1]);
-		  dump_text(txt);
-	      }
-	      free(provi);
-	  }
-	  else
-	      strcat(crt_line, ")");
+	    ifdebug(7) {
+		pips_debug(7, "sys %p\n", ps);
+		sc_syst_debug(ps);
+	    }
 	  
-	  if(strlen(crt_line)+1 > MAX_LINE_LENGTH-2) {
-	      (void) strcat(crt_line, LINE_SUFFIX);
-	      ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-						      strdup(crt_line)));
-	      if(first_line) {
-		  first_line = FALSE;
-		  if(foresys) {
-		      str_prefix = strdup(str_prefix);
-		      str_prefix[0] = '\0';
-		      (void) strcat(str_prefix, FORESYS_CONTINUATION_PREFIX);
-		  }
-	      }
-	      
-	      crt_line[0] = '\0';
-	      (void) strcat(crt_line, str_prefix); 
-	      (void) strcat(crt_line, "    ");
-	  }
-	  else 
-	      (void) strcat(crt_line, " ");
-	  ifdebug(7){
-	      pips_debug(7, "current txt before dealing with system: \n");
-	      dump_text(txt);
-	  }	  
-	  ps = (Psysteme) predicate_system(transformer_relation(tran));
-	  
-	  ifdebug(7) {
-	      pips_debug(7, "sys %p\n", ps);
-	      sc_syst_debug(ps);
-	  }
-	  
-	  if (ps != NULL) {
-	      boolean first_constraint = TRUE, last_constraint = FALSE;
-	      
-	      sc_lexicographic_sort(ps, is_inferior_pvarval);
-	      
-	      pips_debug(7, " equalities first\n");
+	    system_text_format(crt_line, str_prefix, txt, ps, 
+			       pips_user_value_name, foresys);
 
-	      for (peq = ps->egalites, j=1; peq!=NULL; peq=peq->succ, j=j+1)
-	      {
-		
-		  last_constraint = ((peq->succ == NULL) &&
-				     (ps->inegalites == NULL));
-		  aux_line[0] = '\0';
-		  if (foresys)
-		  {
-		      (void) strcat(aux_line, "(");
-		      (void) egalite_sprint_format(aux_line, peq,
-						   pips_user_value_name, foresys);
-		      (void) strcat(aux_line, ")");
-		      if(! last_constraint)
-			  (void) strcat(aux_line, ".AND."); 
-		  }
-		  else
-		  {
-		      if(first_constraint)
-		      {  
-			  first_line = add_to_current_line(crt_line,"{", 
-							   str_prefix,txt,first_line);
-			  first_constraint = FALSE;
-		      }
-		      egalite_text_format(crt_line,str_prefix,txt,peq,
-					  pips_user_value_name, foresys,
-					  first_line);
-
-		      if(! last_constraint)
-			  first_line = add_to_current_line(crt_line,", ", 
-							   str_prefix,txt,first_line);
-		      else
-			  first_line = add_to_current_line(crt_line,"}", 
-							   str_prefix,txt,first_line);
-		  }
-		  
-		 
-		  ifdebug(7){
-		      pips_debug(7, "%d-th equality\n current txt: \n", j);
-		      dump_text(txt);
-		  }  
-	      }
-	      
-	      pips_debug(7, " inequalities \n");
-	      
-	      for (peq = ps->inegalites, j=1; peq!=NULL; peq=peq->succ,j=j+1)
-	      {
-		  last_constraint = (peq->succ == NULL);
-		  aux_line[0] = '\0';
-		  if (foresys)
-		  {
-		      (void) strcat(aux_line, "(");
-		      (void) inegalite_sprint_format(aux_line, peq,
-						     pips_user_value_name, foresys);
-		      (void) strcat(aux_line, ")");
-		      if(! last_constraint)
-			  (void) strcat(aux_line, ".AND."); 
-		  }
-		  else {
-		      if(first_constraint)
-		      {
-			  first_line = add_to_current_line(crt_line,"{", str_prefix,
-						   txt, first_line);
-
-			  first_constraint = FALSE;
-		      }
-		     
-		      inegalite_text_format(crt_line,str_prefix,txt,peq,
-					    pips_user_value_name, foresys,
-					    first_line);
-		      if(! last_constraint)
-			 first_line = add_to_current_line(crt_line,", ", str_prefix,
-						   txt, first_line);
-		      else
-			 first_line = add_to_current_line(crt_line,"}", str_prefix,
-						   txt, first_line);
-		  }
-		  
-		  ifdebug(7){
-		      pips_debug(7, "%d-th inequality\n current txt: \n", j);
-		      dump_text(txt);
-		  }  
-	      }
-	      
-	      /* If there is no constraint */
-	      if((ps->egalites == NULL) && (ps->inegalites == NULL))
-	      {
-		 
-		  first_line = add_to_current_line(crt_line,"{}", str_prefix,
-					   txt, first_line);
-	      }
-	  }
-	  else
-	      first_line = add_to_current_line(crt_line, "SC_UNDEFINED", str_prefix,
-					       txt, first_line);
-	  
-      }
+	}
       
-      /* Save last line */
-      (void) strcat(crt_line, LINE_SUFFIX);
-      ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					    strdup(crt_line)));
-  }
-  
-  if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
-      ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					      strdup("\n")));  
+	close_current_line(crt_line, txt);
+    }
+    
+    if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+						strdup("\n")));  
 
-  
-  ifdebug(7){
-      pips_debug(7, "final txt: \n");
-      dump_text(txt);
-  }  
+    ifdebug(7){
+	pips_debug(7, "final txt: \n");
+	dump_text(txt);
+    }  
 
-  return(txt); 
+    return txt; 
 }
 
-
 /* ---------------------------------------------------------------- */
 /* to convert strings containing predicates to text of commentaries */
 /* BA, april 1994                                                   */
