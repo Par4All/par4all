@@ -245,14 +245,14 @@ default_user_error(char * calling_function_name,
       abort();
    }
    else {
-      static bool user_error_called = FALSE;
+      static int user_error_called = 0;
 
-      if (user_error_called) {
+      if (user_error_called > 2) {
          (void) fprintf(stderr, "This user_error is too much! Exiting.\n");
          exit(1);
       }
       else {
-         user_error_called = TRUE;
+         user_error_called++;
       }
 
       ljbp = top_pips_context_stack();
