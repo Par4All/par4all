@@ -66,9 +66,11 @@ Event *event;
 			}
 		if (item_is_in_the_list == FALSE)
 			prompt_user("You have to choose one item of the list!");
-		else
+		else {
 				/* Normal case : */
     		(*apply_on_choice)(curchoice);
+                schoose_close();
+                }
 	}
 
     free(curchoice);
@@ -76,64 +78,74 @@ Event *event;
 
 /* schoose_close() can be called even when schoose window is already closed.
  */
-void schoose_close()
+void
+schoose_close()
 {
-    int i, nchoices;
+   int nchoices;
 
-    hide_window(schoose_frame);
+   hide_window(schoose_frame);
 
-    nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, NULL);
+   nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, NULL);
 
-    for (i = 0; i < nchoices; i++) {
-	xv_set(choices, PANEL_LIST_DELETE, 0, NULL);
-    }
+   /* Delete all the rows, ie nchoices rows from row 0: */
+   xv_set(choices,
+          PANEL_LIST_DELETE_ROWS, 0, nchoices,
+          NULL);
 
-    xv_set(choice, PANEL_VALUE, "", NULL);
+   xv_set(choice, PANEL_VALUE, "", NULL);
 }
 
-void schoose_cancel_notify(item, event)
-Panel_item item;
-Event *event;
-{
-    schoose_close();
 
-    (*apply_on_cancel)();
+void
+schoose_cancel_notify(Panel_item item,
+                      Event * event)
+{
+   schoose_close();
+
+   (*apply_on_cancel)();
 }
 
-/* This function was rewritten bellow
-static void choice_notify(item, op, event)
-Panel_item item;
-Panel_list_op op;
-Event *event;
+/* Function used to update the text panel according to the list panel: */
+int static
+schoose_choice_notify(Panel_item item,
+                      char * item_string,
+                      Xv_opaque client_data,
+                      Panel_list_op op,
+                      Event * event,
+                      int row)
 {
-    if (op == PANEL_LIST_OP_SELECT) {
-	char *s  = (char *) xv_get(item, PANEL_LABEL_STRING, NULL);
+   switch (op) {    
+     case PANEL_LIST_OP_SELECT:
+       xv_set(choice,
+              PANEL_VALUE, item_string,
+              NULL);
+       break;
+     
+     /* Avoid deletion and insertion with the edit menu of button 3: */
+     case PANEL_LIST_OP_DELETE:
+     case PANEL_LIST_OP_VALIDATE:
+        return XV_ERROR;
+     
+     case PANEL_LIST_OP_DESELECT:
+       break;
+       
+     default:
+       pips_assert("schoose_choice_notify: unknown operation !", 0);
+     }
 
-	xv_set(choice, PANEL_VALUE, s, NULL);
-    }
+   /* Accept the operation by default: */
+   return XV_OK;
 }
-*/
 
-/* replaced previous implementation on 92.04.22, as we shifted to xview.3 */
-static void schoose_choice_notify(item, op, event)
-Panel_item item;
-Panel_list_op op;
-Event *event;
+
+/* Avoid the schoose_frame destruction and act as cancel: */
+void static
+schoose_frame_done_proc(Frame frame)
 {
-    int nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, NULL);
-
-    while (nchoices--) {
-	if ((int) xv_get(choices, PANEL_LIST_SELECTED, nchoices) == TRUE) {
-	    xv_set(choice, PANEL_VALUE, 
-		   (char *)xv_get(choices, PANEL_LIST_STRING, nchoices),
-		   NULL);
-	}
-    }
-
-    /* Ça y est, les choix sont faits ! */
-    schoose_ok_notify((Panel_item) NULL, (Event *) NULL);
-    /* De toute manière les arguments sont inutilisés. */
+   (*apply_on_cancel)();
+   hide_window(frame);
 }
+
 
 void schoose(title, argc, argv, initial_choice, f, g)
 char *title;
@@ -348,53 +360,58 @@ schoose_create_abbrev_menu_with_text(Panel main_panel,
 void
 create_schoose_window()
 {
-    schoose_frame = xv_create(main_frame, FRAME,
-			      XV_SHOW, FALSE,
-			      FRAME_DONE_PROC, hide_window,
-			      NULL);
+   schoose_frame = xv_create(main_frame, FRAME,
+                             XV_SHOW, FALSE,
+                             FRAME_DONE_PROC, hide_window,
+                             NULL);
 
-    schoose_panel = xv_create(schoose_frame, PANEL, NULL);
+   schoose_panel = xv_create(schoose_frame, PANEL, NULL);
 
-    choice = xv_create(schoose_panel, PANEL_TEXT,
-		       PANEL_LABEL_STRING, "Current choice",
-		       PANEL_VALUE_DISPLAY_LENGTH, 8,
-		       PANEL_NOTIFY_PROC, schoose_ok_notify,
-		       XV_X, 10,
-		       XV_Y, 10,
-		       NULL);
+   choice = xv_create(schoose_panel, PANEL_TEXT,
+                      PANEL_LABEL_STRING, "Current choice",
+                      PANEL_VALUE_DISPLAY_LENGTH, 8,
+                      PANEL_NOTIFY_PROC, schoose_ok_notify,
+                      XV_X, 10,
+                      XV_Y, 10,
+                      NULL);
 
-    choices = xv_create(schoose_panel, PANEL_LIST,
-			PANEL_LABEL_STRING, "Available choices",
-			PANEL_LIST_DISPLAY_ROWS, 5,
-			PANEL_NOTIFY_PROC, schoose_choice_notify,
-			PANEL_CHOOSE_ONE, TRUE,
-			XV_X, 10,
-			XV_Y, 40,
-			NULL);
+   choices = xv_create(schoose_panel, PANEL_LIST,
+                       PANEL_LABEL_STRING, "Available choices",
+                       PANEL_LIST_DISPLAY_ROWS, 5,
+                       PANEL_NOTIFY_PROC, schoose_choice_notify,
+                       PANEL_CHOOSE_ONE, TRUE,
+                       XV_X, 10,
+                       XV_Y, 40,
+                       NULL);
 
-    help = xv_create(schoose_panel, PANEL_BUTTON,
-		     PANEL_LABEL_STRING, "Help",
-		     PANEL_NOTIFY_PROC, schoose_help_notify,
-		     XV_X, 250,
-		     XV_Y, 40,
-		     NULL);
+   help = xv_create(schoose_panel, PANEL_BUTTON,
+                    PANEL_LABEL_STRING, "Help",
+                    PANEL_NOTIFY_PROC, schoose_help_notify,
+                    XV_X, 250,
+                    XV_Y, 40,
+                    NULL);
 
-    cancel = xv_create(schoose_panel, PANEL_BUTTON,
-		     PANEL_LABEL_STRING, "Cancel",
-		   PANEL_NOTIFY_PROC, schoose_cancel_notify,
-		   XV_X, 250,
-		   XV_Y, 70,
-		   NULL);
+   cancel = xv_create(schoose_panel, PANEL_BUTTON,
+                      PANEL_LABEL_STRING, "Cancel",
+                      PANEL_NOTIFY_PROC, schoose_cancel_notify,
+                      XV_X, 250,
+                      XV_Y, 70,
+                      NULL);
 
-    ok = xv_create(schoose_panel, PANEL_BUTTON,
-		   PANEL_LABEL_STRING, "OK",
-		   PANEL_NOTIFY_PROC, schoose_ok_notify,
-		   XV_X, 250,
-		   XV_Y, 100,
-		   NULL);
+   ok = xv_create(schoose_panel, PANEL_BUTTON,
+                  PANEL_LABEL_STRING, "OK",
+                  PANEL_NOTIFY_PROC, schoose_ok_notify,
+                  XV_X, 250,
+                  XV_Y, 100,
+                  NULL);
 
-	(void) xv_set(schoose_panel, PANEL_DEFAULT_ITEM, ok, NULL);
+   (void) xv_set(schoose_panel, PANEL_DEFAULT_ITEM, ok, NULL);
 
-    window_fit(schoose_panel);
-    window_fit(schoose_frame);
+   window_fit(schoose_panel);
+   window_fit(schoose_frame);
+   
+   /* Avoid the schoose_frame destruction: */
+   xv_set(schoose_frame,
+          FRAME_DONE_PROC, schoose_frame_done_proc,
+          NULL);
 }
