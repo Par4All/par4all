@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.144  2000/08/25 14:03:35  quoc
+%% New property DECLARATION_COMMON_DISPLAY_STATISTICS added
+%%
 %% Revision 1.143  2000/08/22 10:09:42  nguyen
 %% Modify properties for array bound check instrumentation
 %%
@@ -137,7 +140,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2000/08/22 10:09:42 $~$
+$~$Date: 2000/08/25 14:03:35 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1487,6 +1490,19 @@ useless and removed in a program, this property is used to ask for
 statistics displaying:
 \begin{verbatim}
 TRIVIAL_TEST_DISPLAY_STATISTICS TRUE
+\end{verbatim}
+
+
+
+\subsection{Declaration Common Adding}
+\index{Declaration Common}
+\index{DECLARATION\_COMMON\_DISPLAY\_STATISTICS}
+
+Since it is useful to display statistics on what has been found
+useless and removed in a program, this property is used to ask for
+statistics displaying:
+\begin{verbatim}
+DECLARATION_COMMON_DISPLAY_STATISTICS TRUE
 \end{verbatim}
 
 
