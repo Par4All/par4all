@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/09 15:01:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/10 15:22:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1995/10/09 15:01:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1995/10/10 15:22:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -611,7 +611,10 @@ close_workspace_notify(Menu menu,
 {
    success return_value;
    
-   if (close_workspace()) {
+   return_value = close_workspace();
+   debug(1, "close_workspace_notify", "return_value = %d\n", return_value);
+
+   if (return_value ) {
       /* The close has been successful: */
       close_log_file();
 
@@ -625,11 +628,7 @@ close_workspace_notify(Menu menu,
       enable_change_directory();
 
       disable_module_selection();
-
-      return_value = TRUE;
    }
-   else
-      return_value = FALSE;
   
    hide_window(schoose_frame);
    show_workspace();
