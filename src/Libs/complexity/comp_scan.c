@@ -125,8 +125,8 @@ char *module_name;
 void summary_complexity(module_name)
 char *module_name;
 {
-    complexity summary_comp;
-    complexity summary_comp_dup;
+    complexity summary_comp = complexity_undefined;
+    complexity summary_comp_dup = complexity_undefined;
 
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE ) );
@@ -220,7 +220,7 @@ instruction instr;
 transformer precond;
 list effects_list;
 {
-    complexity comp;
+    complexity comp = complexity_undefined;
 
     trace_on("instruction");
 
@@ -423,7 +423,7 @@ list effects_list;
 				    intrinsic_cost(LOOP_INIT_OVERHEAD, &ibioh));
     cboh = make_constant_complexity((float)
 				    intrinsic_cost(LOOP_BRANCH_OVERHEAD, &ibboh));
-    /* cioh cboh are directed to overhead file "overhead" LZ, 280993 */
+    /* cioh cboh are derived from overhead file "overhead" LZ, 280993 */
 
     complexity_polynome_add(&cbody, complexity_polynome(cboh));
 
@@ -475,8 +475,25 @@ list effects_list;
 	}
     }
 
-    comp = complexity_sigma(cbody, (Variable)index, clower, cupper);
-/*
+    if ( complexity_constant_p(clower) && complexity_constant_p(cupper)) {
+	float lower = complexity_TCST(clower);
+	float upper = complexity_TCST(cupper);
+	if (lower>upper) {
+	    /* zero iteration for sure */
+	    comp = make_zero_complexity();
+	}
+	else {
+	    /* at least one iteration */
+	    comp = complexity_sigma(cbody, (Variable)index, clower, cupper);
+	}
+    }
+    else {
+	/* maybe some iteration */
+	comp = complexity_sigma(cbody, (Variable)index, clower, cupper);
+	/* an intermediate test based on preconditions would give better
+	   result with affine loop bounds */
+    }
+    /*
     if ( !complexity_constant_p(cincr) 
 	|| complexity_constant_p(clower) || complexity_constant_p(cupper) ) {
 	complexity_div(&comp, cincr);
@@ -674,7 +691,7 @@ transformer precond;
 list effects_list;
 {
     syntax s = expression_syntax(expr);
-    complexity comp;
+    complexity comp = complexity_undefined;
 
     trace_on("expression");
 
@@ -696,7 +713,7 @@ basic *pbasic;
 transformer precond;
 list effects_list;
 {
-    complexity comp;
+    complexity comp = complexity_undefined;
 
     trace_on("syntax");
 
