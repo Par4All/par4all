@@ -293,6 +293,9 @@ static void call_flt(call c)
 	case ICFG_DECOR_FILTERED_PROPER_EFFECTS:
 	    MERGE_TEXTS(r, get_real_call_filtered_proper_effects(c, e_caller));
 	    break;
+	case DVICFG_DECOR_FILTERED_PROPER_EFFECTS:
+	    fprintf(stderr, "hello");
+	    break;
 	case ICFG_DECOR_CUMULATED_EFFECTS:
 	    MERGE_TEXTS(r,get_text_cumulated_effects(callee_name));
 	    break;
@@ -583,6 +586,8 @@ void print_module_icfg(entity module)
     /* allocate the mapping  */
     make_icfg_map();
     make_current_stmt_stack();
+
+    fprintf(stderr, "%d", get_int_property(ICFG_DECOR));
 
     current_margin = ICFG_SCAN_INDENT;
 
