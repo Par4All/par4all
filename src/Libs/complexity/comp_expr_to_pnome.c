@@ -532,7 +532,7 @@ int maximize;
 {
     predicate pred = transformer_relation(precond);
     Psysteme psyst = (Psysteme) predicate_system(pred);
-#define MAXINT ((~( (1 << 30) -1 )) + (~( (1 << 30) -1 )) + 1)
+/* #define MAXINT ((~( (1 << 30) -1 )) + (~( (1 << 30) -1 )) + 1) */
     int min = (INT_MAX);     /*  2^31 - 1 */
     int max = (INT_MIN);
     boolean faisable;
