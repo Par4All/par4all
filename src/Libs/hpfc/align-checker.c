@@ -8,7 +8,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1995/12/26 15:57:54 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1996/06/08 17:41:13 $, )
  * version $Revision$
  */
 
@@ -185,9 +185,9 @@ align_check(
 
     ne2dim = NumberOfDimension(e2);
     
-    if (align_template(a1)!=align_template(a2))	
+    if (!conformant_templates_p(align_template(a1),align_template(a2)))
     {
-	pips_debug(5, "different templates");
+	pips_debug(5, "different templates\n");
 
 	for (i=1 ; i<=ne2dim ; i++)
 	    if (ith_dim_distributed_p(e2, i, &procdim))
