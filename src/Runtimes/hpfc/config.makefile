@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:13:45 $, )
+# ($Date: 1996/08/21 17:14:39 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -175,16 +175,15 @@ DOCS		= hpfc_runtime_library.README
 #
 # the files to install
 
-SOURCES = 	config.makefile \
-		Makefile.m4 \
-		$(M4_MACROS) \
+SOURCES = 	$(M4_MACROS) \
 		$(M4_HEADERS) \
 		$(LIB_FFILES) \
 		$(LIB_M4FFILES) \
 		$(LIB_M4CFILES) \
 		$(HPFC_MAKEFILES) \
 		$(CORE_HEADERS) \
-		$(DOCS)
+		$(DOCS) \
+		$(SCRIPTS)
 
 LIB_TARGET = $(PVM_ARCH)/libhpfcruntime.a
 
