@@ -200,7 +200,10 @@ Menu_item menu_item;
 		xv_set(open_pgm, MENU_INACTIVE, TRUE, 0);
 
 		schoose("Select Workspace", 
-			program_list_length, program_list, 
+			program_list_length, program_list,
+			/* Choix initial sur le workspace courant si
+                           possible : */
+			db_get_current_program_name(),
 			end_open_program_notify,
 			cancel_open_program_notify);
 
@@ -263,7 +266,12 @@ Menu_item menu_item;
 	}
 	else
 		schoose("Select Module", 
-			module_list_length, module_list, 
+			module_list_length,
+			module_list,
+			/* Affiche comme choix courant le module
+			   courant (c'est utile si on ferme la fenêtre
+			   module entre temps) : */
+			db_get_current_module_name(),
 			end_select_module_notify,
 			cancel_select_module_notify);
 
