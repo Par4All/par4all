@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.93  1997/11/03 14:27:38  coelho
+ * debug on/off prettyprint debug level.
+ *
  * Revision 1.92  1997/11/01 09:09:41  irigoin
  * assert transformed into a warning in find_last_statement() because people
  * do not have enough time to fix the problemes in Transformations and in the
@@ -97,7 +100,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.92 1997/11/01 09:09:41 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.93 1997/11/03 14:27:38 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1669,6 +1672,8 @@ text_module(entity module,
     code c = entity_code(module);
     string s = code_decls_text(c);
 
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+
     /* This guard is correct but could be removed if find_last_statement()
      * were robust and/or if the internal representations were always "correct".
      * See also the guard for reset_last_statement()
@@ -1710,6 +1715,7 @@ text_module(entity module,
     if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
 	reset_last_statement();
 
+    debug_off();
     return(r);
 }
 
