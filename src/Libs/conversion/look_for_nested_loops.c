@@ -14,7 +14,6 @@
 #include "constants.h"
 
 #include "boolean.h"
-#include "types.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
