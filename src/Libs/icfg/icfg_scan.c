@@ -79,7 +79,7 @@ text my_text_statement_any_effect_type(entity module, int margin, statement stat
 text my_get_any_effects_text(string module_name)
 {
   entity module;
-  statement module_stat, user_stat = statement_undefined;
+  statement module_stat;
   text txt = make_text(NIL);
 
   /* current entity
