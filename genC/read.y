@@ -425,7 +425,7 @@ int allow_ref ;
     }
     else {
 	hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
-	hash->i = find_free_tabulated( &Domains[ domain ] ) ;
+	hash->i = gen_find_free_tabulated( &Domains[ domain ] ) ;
 	gen_put_tabulated_name(domain, id, (char *)hash);
     }
     (Gen_tabulated_[ index ]+hash->i)->p = chunkp ;
@@ -471,7 +471,7 @@ gen_chunk *String ;
        == (gen_chunk *)HASH_UNDEFINED_VALUE ) {
 	if( allow_forward_ref ) {
 	    hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
-	    hash->i = -find_free_tabulated( &Domains[ domain ] ) ;
+	    hash->i = -gen_find_free_tabulated( &Domains[ domain ] ) ;
 	    hash_put( Gen_tabulated_names, String->s, (char *)hash ) ;
 
 	    if((Gen_tabulated_[ Int ]+abs( hash->i ))->p != gen_chunk_undefined) {
