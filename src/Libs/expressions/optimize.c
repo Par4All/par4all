@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.42  2000/08/21 14:10:05  phamdinh
+ * hop... it should work...
+ *
  * Revision 1.41  2000/07/03 12:27:01  phamdinh
  * Pour changer repertoire a travailler
  *
@@ -1154,7 +1157,14 @@ static void call_rwt(call c)
     pips_debug(4, "dealing with operator %s\n", 
 	       entity_name(huffman_nary_operator));
 
-    pips_assert("several arguments to nary operator", nargs>=2);
+    //pips_assert("several arguments to nary operator", nargs>=2);
+    if (nargs < 2)
+    {
+      fprintf(stderr,"\n[call_rwt] --- (nargs=%d) < 2; Call = %s \n",
+	      nargs, entity_name(call_function(c)));
+      print_expression(EXPRESSION(CAR(args)));
+      return;
+    }
 
     if (nargs==2) /* the call is already binary. */
     {
@@ -1289,8 +1299,24 @@ static optimization_strategy
     /* huff */ TRUE, expression_gravity, TRUE,
     /* eole */ "0", TRUE, "", TRUE, "-m",
     /* simp */ TRUE, TRUE,
+    /* gcm */  FALSE,
+    /* cse */  TRUE
+  },
+  { /* whatever you want */
+    /* name */ "test_icm",
+    /* huff */ TRUE, expression_gravity, TRUE,
+    /* eole */ "0", TRUE, "", TRUE, "-m",
+    /* simp */ TRUE, TRUE,
     /* gcm */  TRUE,
     /* cse */  FALSE
+  },
+  { /* whatever you want */
+    /* name */ "test_cse",
+    /* huff */ TRUE, expression_gravity, TRUE,
+    /* eole */ "0", TRUE, "", TRUE, "-m",
+    /* simp */ TRUE, TRUE,
+    /* gcm */  FALSE,
+    /* cse */  TRUE
   },
   { /* EOLE with gravity criterion only - most balanced tree ! */
     /* name */ "EOLE",
