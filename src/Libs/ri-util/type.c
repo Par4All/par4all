@@ -319,8 +319,13 @@ basic b2;
     case is_basic_complex:
 	return basic_complex(b1) == basic_complex(b2);
     case is_basic_string:
+      /* Do we want string types to be equal only if lengths are equal?
+       * I do not think so
+       */
+      /*
 	pips_error("basic_equal_p",
 		   "string type comparison not implemented\n");
+		   */
 	/* could be a star or an expression; a value_equal_p() is needed! */
 	return TRUE;
     default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(b1));
