@@ -142,3 +142,20 @@ Ppolynome pp;
 {
     return(polynome_dup(pp));
 }
+
+int 
+monome_gen_allocated_memory(
+    Pmonome m)
+{
+    return sizeof(Smonome) + vect_gen_allocated_memory(m->term);
+}
+
+int
+polynome_gen_allocated_memory(
+    Ppolynome p)
+{
+    int result = 0;
+    for(; p; p=p->succ)
+	result += monome_gen_allocated_memory(p->monome) + sizeof(Spolynome);
+    return result;
+}
