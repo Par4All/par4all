@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.52  2002/06/27 14:44:07  irigoin
+ * Function label_string_defined_in_statement_p() added
+ *
  * Revision 1.51  2002/06/14 15:01:56  irigoin
  * Mostly new functions added to deal with labels and alternate return labels
  *
@@ -186,7 +189,7 @@ char *module_name;
     entity e = make_new_label(module_name);
     return e;
 }
-
+
 static bool label_defined_in_statement = FALSE;
 static entity label_searched_in_statement = entity_undefined;
 
@@ -221,6 +224,15 @@ bool label_string_defined_in_current_module_p(string ls)
 {
   entity l = find_label_entity(get_current_module_name(), ls);
   statement s = get_current_module_statement();
+  bool defined_p = label_defined_in_statement_p(l, s);
+
+  return defined_p;
+}
+
+bool label_string_defined_in_statement_p(string ls, statement s)
+{
+  entity l = find_label_entity(get_current_module_name(), ls);
+
   bool defined_p = label_defined_in_statement_p(l, s);
 
   return defined_p;
