@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/07/20 18:40:45 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/09/13 14:22:30 $, )
  * version $Revision$
  */
 
@@ -730,13 +730,13 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
 	     lb = copy_expression(range_lower(rg));
 	     ub = copy_expression(range_upper(rg));
 	     
-	     newindex = NewTemporaryVariable(node_module, 
+	     newindex = make_new_scalar_variable(node_module, 
 					     MakeBasic(is_basic_int));
-	     newlobnd = NewTemporaryVariable(node_module, 
+	     newlobnd = make_new_scalar_variable(node_module, 
 					     MakeBasic(is_basic_int));
-	     newupbnd = NewTemporaryVariable(node_module, 
+	     newupbnd = make_new_scalar_variable(node_module, 
 					     MakeBasic(is_basic_int));
-	     oldidxvl = NewTemporaryVariable(node_module, 
+	     oldidxvl = make_new_scalar_variable(node_module, 
 					     MakeBasic(is_basic_int));
 
 	     boundcomp = 
