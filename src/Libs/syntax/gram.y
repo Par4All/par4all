@@ -70,6 +70,8 @@
 %type <expression>	const_simple
 %type <expression>	sous_expression
 %type <expression>	expression
+%type <expression>	io_expr
+%type <expression>	unpar_io_expr
 %type <expression>	io_elem
 %type <expression>	io_f_u_id
 %type <expression>	opt_expression
@@ -295,6 +297,8 @@ range r;
 %left TK_STAR TK_SLASH
 %right TK_POWER
 
+%token TK_IOLPAR
+
 %union {
 	basic basic;
 	chain chain;
@@ -482,97 +486,22 @@ arguments: expression
 	;
 
 
-io_inst:  io_keyword io_f_u_id
+io_inst:  io_keyword io_f_u_id /* io_keyword io_f_u_id */
 	    { 
-		expression std, format, unite;
-		cons * lci;
-
-		switch($1) {
-		case TK_WRITE:
-		    FatalError("Syntax","Illegal use of WRITE");
-		case TK_READ:
-		case TK_PRINT:
-		    std = MakeNullaryCall(CreateIntrinsic
-					  (LIST_DIRECTED_FORMAT_NAME));
-		    unite = MakeCharacterConstantExpression("UNIT=");
-		    format = MakeCharacterConstantExpression("FMT=");
-
-		    lci = CONS(EXPRESSION, unite,
-			       CONS(EXPRESSION, std,
-				    CONS(EXPRESSION, format,
-					 CONS(EXPRESSION, $2, NULL))));
-		    /* Functionally PRINT is a special case of WRITE */
-		    $$ = MakeIoInstA(($1==TK_PRINT)?TK_WRITE:TK_READ,
-				     lci, NIL);
-		    break;
-		case TK_OPEN:
-		case TK_CLOSE:
-		case TK_INQUIRE:
-		    ParserError("Syntax",
-				"Illegal syntax in IO statement, "
-				"Parentheses and arguments required");
-		case TK_BACKSPACE:
-		case TK_REWIND:
-		case TK_ENDFILE:
-		    unite = MakeCharacterConstantExpression("UNIT=");
-		    lci = CONS(EXPRESSION, unite,
-			       CONS(EXPRESSION, $2, NULL));
-		    $$ = MakeIoInstA($1, lci, NIL);
-		    break;
-		default:
-		    ParserError("Syntax","Unexpected token in IO statement");
-		}
+                $$ = MakeSimpleIoInst1($1, $2);
 	    }
         | io_keyword io_f_u_id TK_COMMA opt_lio_elem
             {
-		expression std, format, unite;
-		cons * lci;
-
-		switch($1) {
-		case TK_WRITE:
-		    FatalError("Syntax","Illegal use of WRITE");
-		case TK_READ:
-		case TK_PRINT:
-		    std = MakeNullaryCall(CreateIntrinsic
-					  (LIST_DIRECTED_FORMAT_NAME));
-		    unite = MakeCharacterConstantExpression("UNIT=");
-		    format = MakeCharacterConstantExpression("FMT=");
-
-		    lci = CONS(EXPRESSION, unite,
-			       CONS(EXPRESSION, std,
-				    CONS(EXPRESSION, format,
-					 CONS(EXPRESSION, $2, NULL))));
-		    $$ = MakeIoInstA(($1==TK_PRINT)?TK_WRITE:TK_READ,
-				     lci, $4);
-		    break;
-		case TK_OPEN:
-		case TK_CLOSE:
-		case TK_INQUIRE:
-		case TK_BACKSPACE:
-		case TK_REWIND:
-		case TK_ENDFILE:
-		  ParserError("Syntax",
-		  "Illegal syntax in IO statement, Parentheses are required");
-		default:
-		    ParserError("Syntax","Unexpected token in IO statement");
-		}
+		$$ = MakeSimpleIoInst2($1, $2, $4);
 	    }
-    
 	| io_keyword TK_LPAR lci TK_RPAR opt_virgule opt_lio_elem
 	    { $$ = MakeIoInstA($1, $3, $6); }
         | iobuf_keyword TK_LPAR io_f_u_id TK_COMMA io_f_u_id TK_RPAR 
-                        TK_LPAR expression TK_COMMA expression TK_RPAR
+                        TK_LPAR unpar_io_expr TK_COMMA unpar_io_expr TK_RPAR
 	    { $$ = MakeIoInstB($1, $3, $5, $8, $10); }
 	;
 
-io_f_u_id: atom
-        /* Should be an expression, but a conflict results for parentheses 
-	 * which may be
-	 * part of the expression or part of the IO statement (FI, 1/1/97)
-	 */
-            { $$ = make_expression($1, normalized_undefined); }
-        | const_simple
-	    { $$ = $1; }
+io_f_u_id: unpar_io_expr
 	| TK_STAR
 	    { $$ = MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME)); }
 	;
@@ -590,7 +519,7 @@ lci: ci
 	;
 
 /* ci: name TK_EQUALS io_f_u_id */
-ci: name TK_EQUALS expression
+ci: name TK_EQUALS unpar_io_expr
 	    {
 		char buffer[20];
 		(void) strcpy(buffer, $1);
@@ -605,7 +534,7 @@ ci: name TK_EQUALS expression
 		$$ = CONS(EXPRESSION, 
 			  MakeCharacterConstantExpression(buffer),
 			  CONS(EXPRESSION, $3, NULL));
-		ici += 1;
+		ici += 2;
 	    }
         | name TK_EQUALS TK_STAR
             {
@@ -625,15 +554,21 @@ ci: name TK_EQUALS expression
 			  CONS(EXPRESSION,
 		 MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME))
 			       , NULL));
-		ici += 1;
+		ici += 2;
 	    }
         | io_f_u_id
 	    {
+		if(ici==1 || ici==2) {
 		$$ = CONS(EXPRESSION,
 			  MakeCharacterConstantExpression(ici == 1 ? 
 			                                  "UNIT=" : 
 			                                  "FMT="),
 			  CONS(EXPRESSION, $1, NULL));
+		}
+		else {
+		    ParserError("Syntax", "The unit identifier and the format identifier"
+			" must be first and second in the control info list (standard Page F-12)");
+		}
 		ici += 1;
 	    }
 
@@ -1523,6 +1458,55 @@ sous_expression: atom
 		    $$ = MakeFortranUnaryCall(CreateIntrinsic(".NOT."), $2);
 	    }
 	| expression TK_CONCAT expression
+            {
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("//"), 
+					      $1, $3);    
+	    }
+	;
+
+io_expr:	  unpar_io_expr
+	| TK_LPAR io_expr TK_RPAR
+		{ $$ = $2; }
+	;
+
+unpar_io_expr:	  atom
+	    {
+		    $$ = make_expression($1, normalized_undefined);
+	    }
+/*	| const_simple */
+	| unsigned_const_simple
+	    {
+		    $$ = MakeNullaryCall($1);    
+	    }
+	| signe io_expr  %prec TK_STAR
+	    {
+		    if ($1 == -1)
+			$$ = MakeFortranUnaryCall(CreateIntrinsic("--"), $2);
+		    else
+			$$ = $2;
+	    }
+	| io_expr TK_PLUS io_expr
+	    {
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("+"), $1, $3);
+	    }
+	| io_expr TK_MINUS io_expr
+	    {
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("-"), $1, $3);
+	    }
+	| io_expr TK_STAR io_expr
+	    {
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("*"), $1, $3);
+	    }
+	| io_expr TK_SLASH io_expr
+	    {
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("/"), $1, $3);
+	    }
+	| io_expr TK_POWER io_expr
+	    {
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("**"), 
+					      $1, $3);
+	    }
+	| io_expr TK_CONCAT io_expr
             {
 		    $$ = MakeFortranBinaryCall(CreateIntrinsic("//"), 
 					      $1, $3);    
