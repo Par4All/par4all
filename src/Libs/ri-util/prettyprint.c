@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.152  2002/04/24 07:53:39  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.151  2002/04/24 07:02:20  phamdat
  * *** empty log message ***
  *
@@ -295,7 +298,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.151 2002/04/24 07:02:20 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.152 2002/04/24 07:53:39 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2285,7 +2288,16 @@ text_statement(
      * sure that the free is NEVER performed as it should. FC.
      */
     if(!ENDP(text_sentences(temp))) {
-	MERGE_TEXTS(r, init_text_statement(module, margin, stmt)) ;
+      text t = init_text_statement(module, margin, stmt);
+    {
+      string filename = "/users/tmp/phamdat/textout";
+      FILE * my_file = safe_fopen(filename, "w");
+      print_text(my_file, t);
+      safe_fclose(my_file, filename);
+      free(filename);
+    }
+
+	MERGE_TEXTS(r, t) ;
 	if (! string_undefined_p(comments)) {
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
 						  strdup(comments)));
