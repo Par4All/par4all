@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.78  1997/12/02 17:47:13  coelho
+ * don't initialize of blank or comment line...
+ *
  * Revision 1.77  1997/11/27 13:16:18  coelho
  * initialization of toprocess.
  *
@@ -592,6 +595,13 @@ tpips_init(void)
     tpips_init_done = TRUE;
 }
 
+static bool
+blank_or_comment_line_p(string line)
+{
+    skip_blanks(line);
+    return line[0]==TPIPS_COMMENT_PREFIX || line[0]=='\0';
+}
+
 void 
 tpips_exec(char * line)
 {
@@ -636,7 +646,8 @@ tpips_exec(char * line)
 	 */
 	if (!tpips_init_done &&
 	    strncmp(line, SET_ENV, strlen(SET_ENV))!=0 &&
-	    strncmp(line, GET_ENV, strlen(GET_ENV))!=0)
+	    strncmp(line, GET_ENV, strlen(GET_ENV))!=0 &&
+	    !blank_or_comment_line_p(line))
 	    tpips_init();
 	
 	sline = substitute_variables(line);
