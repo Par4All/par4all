@@ -319,7 +319,7 @@ text text_cray(entity module, int margin, statement stat)
 }
 
 
-void print_parallelizedcray_code(char *mod_name)
+bool print_parallelizedcray_code(char *mod_name)
 {
     entity 
 	module = local_name_to_top_level_entity(mod_name);
@@ -371,6 +371,8 @@ void print_parallelizedcray_code(char *mod_name)
     set_bool_property("PRETTYPRINT_CRAY", prettyprint_cray_p);
 
     debug_off();
+
+    return TRUE;
 }
 
 
