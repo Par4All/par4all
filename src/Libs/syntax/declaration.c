@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.63  2001/07/19 09:44:11  coelho
+ * entity_undefined is used as a tag not to handle data substring initialisations.
+ *
  * Revision 1.62  2001/07/13 13:07:44  coelho
  * non integer DATA are considered when setting the initial value.
  *
@@ -166,8 +169,7 @@ save_all_entities()
  */
 
 void 
-SaveEntity(e)
-entity e;
+SaveEntity(entity e)
 {
     entity g = local_name_to_top_level_entity(entity_local_name(e));
 
@@ -238,32 +240,32 @@ entity e;
 void
 ProcessSave(entity v)
 {
-    if(entity_storage(v) == storage_undefined) {
-	SaveEntity(v);
+  if(entity_storage(v) == storage_undefined) {
+    SaveEntity(v);
+  }
+  else if(storage_ram_p(entity_storage(v))) {
+    entity a = ram_section(storage_ram(entity_storage(v)));
+    if(a==DynamicArea) {
+      SaveEntity(v);
     }
-    else if(storage_ram_p(entity_storage(v))) {
-	entity a = ram_section(storage_ram(entity_storage(v)));
-	    if(a==DynamicArea) {
-		SaveEntity(v);
-	    }
-	    else if(a==StaticArea) {
-		/* v may have become static because of a DATA statement (OK)
-		 * or because of another SAVE (NOK)
-		 */
-	    }
-	    else {
-		user_warning("ProcessSave", "Variable %s has already been declared static "
-			     "by appearing in Common %s\n",
-			     entity_local_name(v), module_local_name(a));
-		ParserError("parser", "SAVE statement incompatible with previous"
-			    " COMMON declaration\n");
-	    }
+    else if(a==StaticArea) {
+      /* v may have become static because of a DATA statement (OK)
+       * or because of another SAVE (NOK)
+       */
     }
     else {
-	user_warning("parser", "Variable %s cannot be declared static "
-		     "be cause of its storage class (tag=%d)\n",
-		     entity_local_name(v), storage_tag(entity_storage(v)));
+      user_warning("ProcessSave", "Variable %s has already been declared static "
+		   "by appearing in Common %s\n",
+		   entity_local_name(v), module_local_name(a));
+      ParserError("parser", "SAVE statement incompatible with previous"
+		  " COMMON declaration\n");
     }
+  }
+  else {
+    user_warning("parser", "Variable %s cannot be declared static "
+		 "be cause of its storage class (tag=%d)\n",
+		 entity_local_name(v), storage_tag(entity_storage(v)));
+  }
 }
 
 /* this function transforms a dynamic common into a static one.  */
@@ -345,6 +347,9 @@ AnalyzeData(list ldvr, list ldvl)
       entity e = datavar_variable(dvr);
       int i = datavar_nbelements(dvr);
       
+      if (!entity_undefined_p(e))
+      {
+
       pips_debug(8, "Storage for entity %s must be static or made static\n",
 		 entity_name(e));
       
@@ -448,6 +453,8 @@ AnalyzeData(list ldvr, list ldvl)
 		  "with non-integer constant");
 	}
       }
+
+      } /* if (entity_defined_p(e)) */
       
       while (i > 0 && pcl != NIL) 
       {
