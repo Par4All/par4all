@@ -393,23 +393,34 @@ loop loop_instr;
 transformer precond;
 list effects_list;
 {
+    entity ll = loop_label (loop_instr);
     entity index = loop_index(loop_instr);
     range rng = loop_range(loop_instr);
     statement s = loop_body(loop_instr);
     execution ex = loop_execution(loop_instr);
     complexity comp, cbody, crange, clower, cupper, cincr, cioh, cboh;
-/*    Ppolynome pploop; */
-    char sl[20],su[20],en[20];
+    char sl[9],su[9];
+    /* FI: Lei chose to allocate the UL and UU entities in the current
+       module... Maybe, we are ready fo some dynamic profiling... */
+    /* string mod_name = entity_module_name(ll); */
     basic ibioh = MAKE_INT_BASIC; 
     basic ibboh = MAKE_INT_BASIC;
 
     trace_on("loop %s label %s",entity_name(index),
 	                        entity_name(loop_label(loop_instr)));
 
-    /*  In order to get rid of at-sign , LZ 010492 */
-    sprintf(sl,"UL_%s",module_local_name(loop_label(loop_instr))+1);
-    sprintf(su,"UU_%s",module_local_name(loop_label(loop_instr))+1);
-    sprintf(en,"%s",entity_module_name(loop_label(loop_instr)));
+    if ( empty_label_p(entity_name(ll)) ) {
+	/* if the statement were still reachable, we could try to use the
+	 * statement nunber...
+	 */
+	(void) strcpy(sl, "UL_");
+	(void) strcpy(su, "UU_");
+    }
+    else {
+	/*  In order to get rid of at-sign, add 1 , LZ 010492 */
+	sprintf(sl,"UL_%s",entity_local_name(loop_label(loop_instr))+1);
+	sprintf(su,"UU_%s",entity_local_name(loop_label(loop_instr))+1);
+    }
 
     /* tell callees that they mustn't try to evaluate the loop index */
 
@@ -434,16 +445,30 @@ list effects_list;
     clower = expression_to_polynome(range_lower(rng),
 				    precond, effects_list, 
 				    KEEP_SYMBOLS, MINIMUM_VALUE);
-    if ( complexity_unknown_p(clower) )
+    if ( complexity_unknown_p(clower) ) {
+	/*
 	clower = make_single_var_complexity(1.0,
-                 (Variable)FindOrCreateEntity(en, sl));
+                 (Variable)FindOrCreateEntity(mod_name, sl));
+		 */
+	clower = make_single_var_complexity(1.0,
+                 (Variable)make_new_scalar_variable_with_prefix(sl,
+								get_current_module_entity(),
+								MakeBasic(is_basic_int)));
+    }
 
     cupper = expression_to_polynome(range_upper(rng),
 				    precond, effects_list, 
 				    KEEP_SYMBOLS, MAXIMUM_VALUE);
-    if ( complexity_unknown_p(cupper) )
+    if ( complexity_unknown_p(cupper) ) {
+	/*
 	cupper = make_single_var_complexity(1.0,
-                 (Variable)FindOrCreateEntity(en, su));
+                 (Variable)FindOrCreateEntity(mod_name, su));
+		 */
+	cupper = make_single_var_complexity(1.0,
+                 (Variable)make_new_scalar_variable_with_prefix(su,
+								get_current_module_entity(),
+								MakeBasic(is_basic_int)));
+    }
 
     cincr  = expression_to_polynome(range_increment(rng),
 				    precond, effects_list, 
