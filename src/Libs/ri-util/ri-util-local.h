@@ -366,6 +366,7 @@ entity get_ith_##lname##_prime(int i)\
 #define SETINT_SUFFIX		"5"
 #define HPFCIO_SUFFIX		"6"
 #define HOSTSECTION_SUFFIX	"7"
+#define DEAD_SUFFIX		"8"
 
 /* property prefix for ignoring FCD directives
  * TIME, SYNCHRO and SET exists.
