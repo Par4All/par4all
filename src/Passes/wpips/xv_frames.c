@@ -4,6 +4,7 @@
 #include <sys/resource.h>
 #include <xview/xview.h>
 #include <xview/panel.h>
+#include <xview/defaults.h>
 #include <types.h>
 
 #include "genC.h"
@@ -88,8 +89,8 @@ void create_frames()
   log_frame = xv_create(main_frame, FRAME, 
 			XV_SHOW, FALSE,
 			FRAME_DONE_PROC, close_log_subwindow,
-			XV_WIDTH, DIALOG_WIDTH, 
-			XV_HEIGHT, DIALOG_HEIGHT, 
+			XV_WIDTH, defaults_get_integer(WPIPS_LOG_WINDOW_WIDTH_RESSOURCE_NAME, WPIPS_LOG_WINDOW_WIDTH_RESSOURCE_CLASS, WPIPS_LOG_WINDOW_WIDTH_DEFAULT), 
+			XV_HEIGHT, defaults_get_integer(WPIPS_LOG_WINDOW_HEIGHT_RESSOURCE_NAME, WPIPS_LOG_WINDOW_HEIGHT_RESSOURCE_CLASS, WPIPS_LOG_WINDOW_HEIGHT_DEFAULT), 
 			NULL);
   install_event_procedure(log_frame);
 
