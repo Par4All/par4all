@@ -7,6 +7,9 @@
  * generated, they should also be stored there. 
  * 
  * $Log: unsplit.c,v $
+ * Revision 1.7  2000/03/24 11:37:35  coelho
+ * use initial order.
+ *
  * Revision 1.6  1998/04/14 21:22:00  coelho
  * linear.h
  *
@@ -71,7 +74,7 @@ get_new_user_file(string dir_name, string user_file)
 bool
 unsplit(string name)
 {
-    gen_array_t modules = db_get_module_list();
+    gen_array_t modules = db_get_module_list_initial_order();
     int n = gen_array_nitems(modules), i;
     string src_dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE),
 	summary_name = db_build_file_resource_name
