@@ -3,7 +3,7 @@
 #
 # updates to GNU for LINUX.
 
-CFLAGS	+=	-m486
+# CFLAGS	+=	-march=pentium -mwide-multiply -malign-double
 
 CPPFLAGS += \
 	-D_POSIX_SOURCE \
