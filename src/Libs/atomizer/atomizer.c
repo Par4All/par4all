@@ -52,8 +52,9 @@
 #include "pipsdbm.h"
 #include "resources.h"
 
-#include "effects.h"
+#include "effects-generic.h"
 #include "transformations.h"
+
 /* #include "loop_normalize.h" */
 #include "atomizer.h"
 
