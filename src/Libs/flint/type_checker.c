@@ -651,13 +651,25 @@ type_this_instruction(instruction i, type_context_p context)
   if (instruction_call_p(i))
   {
     c = instruction_call(i);
+
+    /* type check a SUBROUTINE call. */
+    if (ENTITY_EXTERNAL_P(call_function(c)))
+    {
+      b1 = typing_arguments_of_user_function(c, context);
+      /* b1 should be void??? */
+      free_basic(b1);
+      return;
+    }
+
     /* Here, we only do typing for assigment statement */
     if (!ENTITY_ASSIGN_P(call_function(c)))
     {
       return;
     }
+
+    /* handle ASSIGN special case? */
     args = call_arguments(c);
-  
+    
     if(!arguments_are_compatible(c, context->types))
     {
       add_one_line_of_comment((statement) stack_head(context->stats), 
