@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/04 11:45:59 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/08 16:22:50 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -67,22 +67,22 @@ while getopts lpsrinDPcah opt
 do
   case $opt in
     l) DIRTYPE='Lib';
-       PIPSMKMK_OPTION='-l $PIPSMKMK_OPTION' ;;
+       PIPSMKMK_OPTION="-l $PIPSMKMK_OPTION" ;;
     p) DIRTYPE='Passes';
-       PIPSMKMK_OPTION='-p $PIPSMKMK_OPTION' ;;
+       PIPSMKMK_OPTION="-p $PIPSMKMK_OPTION" ;;
     s) DIRTYPE='Scripts';
-       PIPSMKMK_OPTION='-s $PIPSMKMK_OPTION' ;;
+       PIPSMKMK_OPTION="-s $PIPSMKMK_OPTION" ;;
     r) DIRTYPE='Runtime';
-       PIPSMKMK_OPTION='-r $PIPSMKMK_OPTION' ;;
+       PIPSMKMK_OPTION="-r $PIPSMKMK_OPTION" ;;
     i) DIRTYPE='Linear';
-       PIPSMKMK_OPTION='-i $PIPSMKMK_OPTION' ;;
+       PIPSMKMK_OPTION="-i $PIPSMKMK_OPTION" ;;
     n) DIRTYPE='Newgen';
-       PIPSMKMK_OPTION='-n $PIPSMKMK_OPTION' ;;
+       PIPSMKMK_OPTION="-n $PIPSMKMK_OPTION" ;;
     D) DIRSIDE="$PIPS_DEVEDIR" ;
-       PIPSMKMK_OPTION='-D $PIPSMKMK_OPTION';;
+       PIPSMKMK_OPTION="-D $PIPSMKMK_OPTION";;
     P) DIRSIDE="$PIPS_SRCDIR"; 
        production='yes' ;
-       PIPSMKMK_OPTION='-P $PIPSMKMK_OPTION' ;;
+       PIPSMKMK_OPTION="-P $PIPSMKMK_OPTION" ;;
     c) DIRS='.';;
     a) ALL='1' ;;
     h) help ; exit 0 ;;
