@@ -1301,20 +1301,24 @@ fix_label_and_comment_in_empty_block(statement s)
     list instructions;
     statement continue_s;
    
-    pips_assert("Should be an empty  instruction block...",
+    pips_assert("Should be an instruction block...",
 		instruction_block_p(statement_instruction(s)));
 
-    if (unlabelled_statement_p(s) && empty_comments_p(statement_comments(s)))
+    if (unlabelled_statement_p(s) && empty_comments_p(statement_comments(s))) {
 	/* The statement block has no label and no comment: just do
            nothing. */
+	statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
 	return;
-   
+    }
+    /* There are some informations we need to keep: just add a
+       CONTINUE to keep them: */
     instructions = instruction_block(statement_instruction(s));
 
     continue_s = make_continue_statement(statement_label(s));
     statement_label(s) = entity_empty_label();
     statement_comments(continue_s) = statement_comments(s);
     statement_comments(s) = string_undefined;
+    statement_number(continue_s) = statement_number(s);
     statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
 
     instructions = CONS(STATEMENT, continue_s, instructions);
