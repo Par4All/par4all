@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1996/09/07 14:53:36 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1996/09/09 16:56:46 $, )
 # version $Revision$
 #
 
@@ -124,7 +124,7 @@ then
   for f 
   do
      $debug "considering $f"
-     [ "`grep '^[!cC\*][Ff][Cc][Dd]\$[ 	]*[Ff][Aa][Kk][Ee][ 	]*$' $f`" ] ||
+     [ "`egrep '(^[!cC\*][Ff][Cc][Dd]\$[ 	]*[Ff][Aa][Kk][Ee][ 	]*$|hpfc9)' $f`" ] ||
 	cat $f
   done > $tdir/$name.f
 
