@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/12/05 11:00:19 $, 
+# $Date: 1997/03/25 23:05:12 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -110,7 +110,8 @@ do
     # copy directories
     $verb "packing for $p ($root) in $trg:"
     $verb "what=$what"
-    make_release -v -r $root -t $trg $what
+    make_release -v -r $root -t $trg $what || 
+	error 3 "make_release returned $?"
 
     #
     # strip if required
@@ -148,8 +149,8 @@ test "$tz" &&
 {
     cd $cwd
     $verb "taring ($tar $taropt) and zipping ($zip)"
-    $tar $taropt $name.tar $name
-    $zip $name.tar
+    $tar $taropt $name.tar $name || error 3 "$tar returned $?"
+    $zip $name.tar || error 4 "$zip returned $?"
     rm -rf $name
 }
 
