@@ -23,10 +23,11 @@
 
 #include "misc.h"
 #include "ri-util.h"
+#include "graph.h"
 #include "flint.h"
+#include "effects-generic.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "flint-local.h"
 
 /* internal variables */
 static FILE    *flint_messages_file = NULL;
@@ -40,9 +41,10 @@ static char *flint_current_module_name;
 /*************************************************************/
 /* Routine of  global module verification                    */
 
-bool flinter(module_name)
-char *module_name;
+bool
+flinter(char * module_name)
 {
+    graph dependence_graph;
     entity module = local_name_to_top_level_entity(module_name);
     statement module_stat;
     string localfilename = NULL;
@@ -64,16 +66,30 @@ char *module_name;
     module_stat = (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
-    localfilename = 
-	strdup(concatenate(module_name, ".flinted", NULL));
+    /* Resource to trace uninitialized variables: */
+    dependence_graph =
+	(graph) db_get_memory_resource(DBR_CHAINS, module_name, TRUE);
+    initialize_ordering_to_statement(module_stat);
 
-    filename = 
-	strdup(concatenate(db_get_current_workspace_directory(),
-			   "/", localfilename, NULL));
+    set_proper_rw_effects((statement_effects)
+			  db_get_memory_resource(DBR_PROPER_EFFECTS,
+						 module_name,
+						 TRUE)); 
+    set_current_module_statement(module_stat);
+    set_current_module_entity(local_name_to_top_level_entity(module_name));
+
+    localfilename = db_build_file_resource_name(DBR_FLINTED_FILE,
+						module_name,
+						".flinted");
+    filename = strdup(concatenate(db_get_current_workspace_directory(), 
+				  "/", localfilename, NULL));
     flint_messages_file = 
 	(FILE *) safe_fopen(filename, "w");
 
     /* what is  done */
+    pips_debug(3, "checking uninitialized variables\n");
+    flint_uninitialized_variables(dependence_graph, module_stat);
+
     debug(3, "flinter", "checking commons\n");
     check_commons(module);	         /* checking commons */
 
@@ -100,10 +116,16 @@ char *module_name;
     number_of_messages = 0;
     no_message = TRUE;
 
+    reset_proper_rw_effects();
+    reset_current_module_statement();
+    reset_current_module_entity();
+
     debug_off();
 
+    /* Should have worked: */
     return TRUE;
 }
+
 
 /*************************************************************/
 
@@ -111,7 +133,10 @@ char *module_name;
  * FLINT_MESSAGE(fonction, format [, arg] ... ) string fonction, format;
  */
 
-void flint_message(char *fun, char *fmt, ...) 
+void
+flint_message(char *fun,
+	      char *fmt,
+	      ...) 
 {
     va_list         args;
     int             order;
@@ -144,7 +169,10 @@ void flint_message(char *fun, char *fmt, ...)
 /*************************************************************/
 /* Same as flint_message but without the function name       */
 
-void flint_message_2(char *fun, char *fmt, ...) 
+void
+flint_message_2(char *fun,
+		char *fmt,
+		...) 
 {
     va_list         args;
 
@@ -163,5 +191,29 @@ void flint_message_2(char *fun, char *fmt, ...)
     va_end(args);
 
 }
+
+
+/*************************************************************/
+/* Same as flint_message but a bare bones version            */
+/* count is used to decide if we count tjis message or not.  */
+
+void
+raw_flint_message(bool count,
+		  char *fmt,
+		  ...) 
+{
+    va_list         args;
+
+    va_start(args, fmt);
+
+    no_message = FALSE;
+    if (count)
+	number_of_messages++;
+
+    (void) vfprintf(flint_messages_file, fmt, args);
+
+    va_end(args);
+}
+
 /*************************************************************/
 /* End of File */
