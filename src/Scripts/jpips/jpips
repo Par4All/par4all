@@ -5,6 +5,9 @@
 # a shell wrapper for "JPips", the java-based pips interface.
 #
 # $Log: jpips,v $
+# Revision 1.3  1998/07/02 17:10:34  coelho
+# -d option added.
+#
 # Revision 1.2  1998/07/02 15:46:47  coelho
 # fix for -n option.
 #
@@ -16,10 +19,11 @@
 usage()
 {
     cat <<-EOF >&2
-	jpips [-m menu] [-h] [-n]
+	jpips [-m menu] [-h] [-n] [d]
 	-m menu: the type of menu that should be used (default: test)
 	-h: some help
 	-n: no console with jpips
+	-d: debug
 EOF
 }
 
@@ -34,12 +38,18 @@ error()
 
 unset jpips forward menu_type
 
-while getopts m:hn opt
+props="-Djava.compiler=sunwjit"
+java_root=${JAVA_ROOT:-/usr/local/jdk1.2beta3}
+zip=jpips.zip
+gif=DownArrow.gif
+
+while getopts m:hnd opt
 do
     case ${opt} in
 	m) menu_type=$OPTARG ;;
 	h) usage ;;
 	n) forward="${forward} -n" ;;
+	d) props="";;
 	*) error 1 "unexpected option ${opt}" ;;
     esac
 done
@@ -48,13 +58,7 @@ shift `expr $OPTIND - 1`
 
 forward="${forward} $@"
 
-java_root=${JAVA_ROOT:-/usr/local/jdk1.2beta3}
-
-zip=jpips.zip
-gif=DownArrow.gif
 men=jpips_menus.${menu_type:-test}
-
-props="-Djava.compiler=sunwjit"
 
 #
 # which jpips.zip file
