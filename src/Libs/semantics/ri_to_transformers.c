@@ -39,9 +39,19 @@ extern int fprintf();
 
 #include "semantics.h"
 
+extern Psysteme sc_projection_by_eq(Psysteme sc, Pcontrainte eq, Variable v);
+
+
 
 /* Recursive Descent in Data Structure Statement */
 
+
+/* SHARING : returns the transformer stored in the database. Make a copy 
+ * before using it. The copy is not made here because the result is not always used
+ * after a call to this function, and itwould create non reachable structures. Another
+ * solution would be to store a copy and free the unused result in the calling function
+ * but transformer_free does not really free the transformer. Not very clean. 
+ * BC, oct. 94 */
 transformer statement_to_transformer(s)
 statement s;
 {
@@ -79,7 +89,7 @@ transformer instruction_to_transformer(i, e)
 instruction i;
 cons * e; /* effects associated to instruction i */
 {
-    transformer tf;
+    transformer tf = transformer_undefined;
     test t;
     loop l;
     call c;
@@ -242,6 +252,8 @@ unstructured u ;
     debug(8,"unstructured_to_transformers","end\n");
 }
 
+
+
 transformer loop_to_transformer(l, e)
 loop l;
 cons * e; /* effects of loop l */
@@ -261,7 +273,7 @@ cons * e; /* effects of loop l */
 
     if(pips_flag_p(SEMANTICS_FIX_POINT)) {
 	/* compute the loop body transformer */
-	tfb = statement_to_transformer(s);
+	tfb = transformer_dup(statement_to_transformer(s));
 	/* it does not contain the loop index update
 	   the loop increment expression must be linear to find inductive 
 	   variables related to the loop index */
@@ -319,7 +331,7 @@ cons * e; /* effects of loop l */
 		vect_add_elem(&v_lb, (Variable) i_init, -1);
 		eq = contrainte_make(v_lb);
 		/* sc_add_egalite(sc, eq); */
-		sc = sc_projection_by_eq(sc, eq, i_init);
+		sc = sc_projection_by_eq(sc, eq, (Variable) i_init);
 		if(SC_RN_P(sc)) {
 		    /* FI: a NULL is not acceptable; I assume that we cannot end up
 		     * with a SC_EMPTY...
@@ -367,8 +379,6 @@ cons * ef; /* effects of t */
 {
     statement st = test_true(t);
     statement sf = test_false(t);
-    transformer tft;
-    transformer tff;
     transformer tf;
 
     debug(8,"test_to_transformer","begin\n");
@@ -390,13 +400,11 @@ cons * ef; /* effects of t */
 	transformer tftwc;
 	transformer tffwc;
 
-	tft = statement_to_transformer(st);
-	tff = statement_to_transformer(sf);
+	tftwc = transformer_dup(statement_to_transformer(st));
+	tffwc = transformer_dup(statement_to_transformer(sf));
 
-	tftwc = transformer_add_condition_information(transformer_dup(tft),e,
-						      TRUE);
-	tffwc = transformer_add_condition_information(transformer_dup(tff),e,
-						      FALSE);
+	tftwc = transformer_add_condition_information(tftwc,e,TRUE);
+	tffwc = transformer_add_condition_information(tffwc,e,FALSE);
 
 	tf = transformer_convex_hull(tftwc, tffwc);
 	transformer_free(tftwc);
@@ -416,7 +424,7 @@ transformer call_to_transformer(c, ef)
 call c;
 cons * ef; /* effects of call c */
 {
-    transformer tf;
+    transformer tf = transformer_undefined;
     entity e = call_function(c);
     cons *pc = call_arguments(c);
     tag tt;
