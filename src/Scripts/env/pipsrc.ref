@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/13 21:33:30 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/28 19:14:04 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -27,6 +27,10 @@ PIPS_DIR=/projects/Pips
 
 # scripts and programs created to manage the project
 PIPS_UTILDIR="${PIPS_DIR}/Utilities"
+
+# 
+PIPS_EXPERIMENTSDIR="${PIPS_DIR}/Experiments"
+PIPS_TESTSDIR="${PIPS_DIR}/Tests"
 
 # empty string if make can be run in this environment
 # (else: error message)
@@ -83,6 +87,8 @@ PATH=${PATH}:${PIPS_BINDIR}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
 #
 # PIPS default options for Unix software development tools
 #
+
+PIPS_ARCH="SUN4"
 
 PIPS_AR="/usr5/gnu/bin-sparc/ar"
 PIPS_ARFLAGS="rv"
