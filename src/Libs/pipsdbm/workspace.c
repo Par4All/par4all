@@ -227,19 +227,18 @@ db_create_workspace(string name)
     return ok;
 }
 
-/* stores all resources of module
+/* stores all resources of module oname.
  */
 static void
 db_close_module(string oname)
 {
     /* the download order is retrieved from the methods... */
     int nr = dbll_number_of_resources(), i;
-    user_log("  Closing module %s.\n", oname);
+    if (!same_string_p(oname, "")) /* log if necessary. */
+	user_log("  Closing module %s.\n", oname);
     for (i=0; i<nr; i++)
-    {
-	string rname = dbll_get_ith_resource_name(i);
-	db_save_and_free_memory_resource_if_any(rname, oname);
-    }    
+	db_save_and_free_memory_resource_if_any
+	    (dbll_get_ith_resource_name(i), oname);
 }
 
 bool
