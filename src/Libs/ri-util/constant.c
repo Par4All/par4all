@@ -1,3 +1,13 @@
+/* Deals with constant expressions and constant entities
+ *
+ * $Id$
+ *
+ * $Log: constant.c,v $
+ * Revision 1.23  2002/06/27 14:39:17  irigoin
+ * Function complex_constant_expression_p() added.
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -155,13 +165,15 @@ tag bt;
 
     return e;
 }
-
+
 /* make a complex constant from two calls to real or integer constants
  *
  * Problem: does not work if either of the components is negative because
  * negative constants are stored as expressions. For instance, (0, -1) is
  * not a complex constant for PIPS but an expression:
  * cmplx(0,unary_minus(1)).
+ *
+ * Note: I might have changed that to store DATA statements... (FI)
  */
 entity 
 MakeComplexConstant(r, i)
@@ -211,6 +223,20 @@ MakeComplexConstantExpression(
     return cce;
 }
 
+bool complex_constant_expression_p(expression cce)
+{
+  bool is_complex_constant_p = FALSE;
+  if(expression_call_p(cce)) {
+    entity f = call_function(syntax_call(expression_syntax(cce)));
+    string fn = entity_local_name(f);
+
+    is_complex_constant_p = (strcmp(fn, IMPLIED_COMPLEX_NAME)==0 
+			     || strcmp(fn, IMPLIED_DCOMPLEX_NAME)==0);
+  }
+
+  return is_complex_constant_p;
+}
+
 /* this function creates an integer constant and then a call to that
 constant. */
 
