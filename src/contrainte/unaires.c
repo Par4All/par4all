@@ -41,7 +41,7 @@ void contrainte_reverse(c)
 Pcontrainte c;
 {
     contrainte_chg_sgn(c);
-    vect_add_elem(&(c->vecteur),TCST,1);
+    vect_add_elem(&(c->vecteur), TCST, VALUE_ONE);
 }
 
 /* void_eq_set_vect_nul(Pcontrainte c): transformation d'une contrainte
@@ -164,9 +164,9 @@ Pcontrainte *pinit, *plower, *pupper;
     {
 	v = vect_coeff(var, c->vecteur);
 
-	if (v>0)
+	if (value_pos_p(v))
 	    c->succ = upper, upper = c;
-	else if (v<0)
+	else if (value_neg_p(v))
 	    c->succ = lower, lower = c;
 	else /* v==0 */
 	    c->succ = remain, remain = c;
@@ -284,7 +284,7 @@ Pbase base_index;
 	    {
 		trouve = TRUE;
 		if (i>level)
-		    level = i, sign = (pv->val<0) ? -1 : 1 ;
+		    level = i, sign = value_sign(pv->val);
 	    }
     }
     return(sign*level);
@@ -316,12 +316,10 @@ int (*compare)();
 Pcontrainte contrainte_var_min_coeff(contraintes, v, coeff, rm_if_not_first_p) 
 Pcontrainte contraintes;
 Variable v;
-int *coeff;
+Value *coeff;
 boolean rm_if_not_first_p;
 {
-    int sc = 0,
-        c,
-        cv = 0;
+    Value sc = VALUE_ZERO, cv = VALUE_ZERO;
     Pcontrainte result, eq, pred, eq1;
 
     if (contraintes == NULL) 
@@ -330,16 +328,19 @@ boolean rm_if_not_first_p;
     result = pred = eq1 = NULL;
     
     for (eq = contraintes; eq != NULL; eq = eq->succ) {
+	Value c, ca;
 	c = vect_coeff(v, eq->vecteur);
-	if ((ABS(c) < cv && ABS(c) > 0) || (cv == 0 && c != 0)) {
-	    cv = ABS(c);
+	ca = value_abs(c);
+	if ((value_lt(ca,cv) && value_pos_p(ca)) || 
+	    (value_zero_p(cv) && value_notzero_p(c))) {
+	    cv = ca;
 	    sc = c;
 	    result = eq;
 	    pred = eq1;
 	}
     }
 
-    if (sc < 0) 
+    if (value_neg_p(sc))
 	contrainte_chg_sgn(result);
     
     if (rm_if_not_first_p && pred != NULL) {
@@ -348,7 +349,7 @@ boolean rm_if_not_first_p;
     }
   
     *coeff = cv;
-    return(result);
+    return result;
 }
 
 
