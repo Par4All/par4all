@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.13  2000/07/26 08:41:23  coelho
+  the_last_just_thrown_exception management added.
+
   Revision 1.12  1998/10/26 18:48:34  coelho
   message++.
 
@@ -45,6 +48,10 @@ unsigned int user_exception_error = 4;
 unsigned int parser_exception_error = 8;
 unsigned int any_exception_error = ~0;
 
+/* keep track of last thrown exception for RETHROW()
+ */
+unsigned int the_last_just_thrown_exception = 0;
+
 /* whether to run in debug mode (that is to trace catch/uncatch/throw)
  */
 int linear_exception_debug_mode = 0;
@@ -77,7 +84,7 @@ typedef struct
 static linear_exception_holder exception_stack[MAX_STACKED_CONTEXTS];
 static int exception_index = 0;
 
-/* total number of exceptions thrown.
+/* total number of exceptions thrown, for statistics.
  */
 static int exception_thrown = 0;
 
@@ -113,7 +120,6 @@ void dump_exception_stack()
     if (linear_exception_debug_mode) { exception_debug_message(type); }
 
 
-
 /* push a what exception on stack.
  */
 jmp_buf * 
@@ -132,6 +138,8 @@ push_exception_on_stack(
     dump_exception_stack();
     abort();
   }
+
+  the_last_just_thrown_exception = 0;
 
   exception_stack[exception_index].what = what;
   exception_stack[exception_index].function = function;
@@ -166,6 +174,7 @@ pop_exception_from_stack(
   }
 
   exception_index--;
+  the_last_just_thrown_exception = 0;
 
   if ((exception_stack[exception_index].what != what) ||
       !same_string_p(exception_stack[exception_index].file, file) ||
@@ -199,6 +208,8 @@ void throw_exception(
   int i;
   
   exception_debug_trace("THROW");
+
+  the_last_just_thrown_exception = what; /* for rethrow */
 
   for (i=exception_index-1; i>=0; i--)
   {
