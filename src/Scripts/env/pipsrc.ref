@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/09 12:58:38 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/10 11:25:37 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -119,6 +119,8 @@ PIPS_CURRENT_PROGRAM=".pipsprogram"
 #   (implies a special "malloc.h" in PIPS_EXTEDIR)
 #
 
+PIPS_PASSES='pips wpips tpips'
+
 PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcontrol -lsemantics -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lgenC -lplint -lmatrice  -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique -lreductions -lflint -lm /usr/lib/debug/malloc.o"
 
 #
@@ -182,12 +184,12 @@ PVMDIR="${PIPS_RTSRCDIR}/pvm3.3"
 # For the daVinci Graph Viewer/Editor :
 #
 
-DAVINCI_DIR=$PIPS_RTSRCDIR/daVinci/daVinci_V1.4_solaris_1
-GRAPHEDITOR_DIRECTORY=$DAVINCI_DIR/grapheditor
-DAVINCI_ICONDIR=$DAVINCI_DIR/images
+DAVINCI_DIR=${PIPS_RTSRCDIR}/daVinci/daVinci_V1.4_solaris_1
+GRAPHEDITOR_DIRECTORY=${DAVINCI_DIR}/grapheditor
+DAVINCI_ICONDIR=${DAVINCI_DIR}/images
 
-MANPATH=${MANPATH}:$DAVINCI_DIR/man
-PATH=${PATH}:$DAVINCI_DIR
+MANPATH=${MANPATH}:${DAVINCI_DIR}/man
+PATH=${PATH}:${DAVINCI_DIR}
 
 #
 #          ####   #       #####
