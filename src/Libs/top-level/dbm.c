@@ -99,7 +99,7 @@ bool lazy_open_module(name)
 char *name;
 {
     bool status = TRUE;
-    char *current_name = NULL:
+    char *current_name = NULL;
 
     pips_assert("lazy_open_module",
 		db_get_current_workspace()!=database_undefined);
