@@ -104,7 +104,7 @@ Psysteme ps;
  * Les equations de trois variables ou plus ne sont pas utilisees pour ne
  * pas rendre les inegalites trop complexes.
  *
- * Verification de la non redondance de chaque contrainte avec les autres
+ * Verification de la non redondance de chaque contrainte avec les autres.
  *
  * Les contraintes sont normalisees par leurs PGCDs.  Les constantes sont
  * propagees dans les inegalites.  Les paires de variables equivalentes
@@ -208,7 +208,7 @@ Psysteme ps;
 	Value a = term_cst(veq)? vecteur_val(vecteur_succ(veq)) : vecteur_val(veq);
 
 	if(value_one_p(a) || value_mone_p(a) || vect_coeff(TCST,veq)==VALUE_ZERO
-	   || value_mod(a,vect_coeff(TCST,veq))==VALUE_ZERO) {
+	   || value_mod(vect_coeff(TCST,veq), a)==VALUE_ZERO) {
 	  /* An overflow is unlikely... but it should be handled here
 	     I guess rather than be subcontracted. */
 	  sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
