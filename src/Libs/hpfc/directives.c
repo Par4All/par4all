@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/03/22 10:57:05 $, )
+ * $RCSfile: directives.c,v $ ($Date: 1995/03/23 16:54:39 $, )
  * version $Revision$,
  */
 
@@ -238,6 +238,9 @@ reference alignee, temp;
     
     set_array_as_distributed(array);
     store_entity_align(array, make_align(aligns, template));
+
+    debug(3, "one_align_directive", "%s aligned with %s\n",
+	  entity_name(array), entity_name(template));
 }
 
 
@@ -620,6 +623,8 @@ statement s;
 
     assert(current_stmt_empty_p());
     free_current_stmt_stack();
+
+    DebugPrintCode(5, get_current_module_entity(), s);
 }
 
 /* that is all
