@@ -316,6 +316,15 @@ init_processed_include_cache(void)
 void
 close_processed_include_cache(void)
 {
+    if (hash_table_undefined_p(processed_cache)) 
+    {
+	/* pips may call this without a prior call to 
+	 * init_processed_include_cache under some error conditions,
+	 * such as a file not found in the initializer.
+	 */
+	pips_user_warning("no 'processed include cache' to close...");
+	return;
+    }
     pips_assert("defined cache", !hash_table_undefined_p(processed_cache));
     HASH_MAP(k, v, { unlink(v); free(v); free(k); }, processed_cache);
     hash_table_free(processed_cache);
