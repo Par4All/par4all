@@ -41,7 +41,8 @@ extern FILE * yyin;
 
 /* set to 10000 by BC - necessary in PIPS for DYNA */
 /* Should be a compilation option ? */
-/* #define YYMAXDEPTH 100000 */
+/* CA: pb avec COX si a 10000... p'tet mauvaise recursion dans le parser de newgen? */
+#define YYMAXDEPTH 100000
 
 /* User selectable options. */
 
