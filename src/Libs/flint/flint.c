@@ -91,7 +91,7 @@ char *module_name;
 	      number_of_messages);
     
     safe_fclose(flint_messages_file, filename);
-    DB_PUT_FILE_RESOURCE(DBR_FLINTED, strdup(module_name),
+    DB_PUT_FILE_RESOURCE(DBR_FLINTED_FILE, strdup(module_name),
 			 localfilename);
     free(filename);
 
