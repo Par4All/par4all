@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.11  1999/05/27 16:51:01  ancourt
+   also ICM direct expressions such as conditions and bounds.
+
    Revision 1.10  1999/05/27 16:09:44  ancourt
    code cleaned up...
 
@@ -127,23 +130,6 @@ static void pop_nesting(statement s)
   nesting = CDR(nesting);
   CDR(old) = NIL;
   gen_free_list(old);
-}
-
-static bool loop_flt(loop l)
-{
-  statement sofl = current_statement_head();
-  pips_assert("statement of loop", 
-	      instruction_loop(statement_instruction(sofl))==l)
-  push_nesting(sofl);
-  return TRUE;
-}
-
-static void loop_rwt(loop l)
-{
-  statement sofl = current_statement_head();
-  pips_assert("statement of loop", 
-	      instruction_loop(statement_instruction(sofl))==l)
-  pop_nesting(sofl);
 }
 
 /* there is a side effect if there is a W effect in the expression.
@@ -346,6 +332,28 @@ group_expr_by_level(int nlevels, list le)
   return result;
 }
 
+/* atomize sub expressions with 
+   - lower level
+   - not simple (references or constants)
+   - no side effects.
+*/
+static void do_atomize_if_different_level(expression e, int level)
+{
+  int elevel = expr_level_of(e);
+
+  /* fprintf(stderr, "ATOM %d/%d\n", elevel, level); print_expression(e); */
+
+  if (elevel!=-1 && 
+      elevel<level &&
+      atomizable_sub_expression_p(e) &&
+      !side_effects_p(e))
+    {
+      statement atom = atomize_this_expression(hpfc_new_variable, e);
+      if (atom)
+	insert_before_statement(atom, statement_of_level(elevel));
+    }
+}
+
 static void atomize_call(call c, int level)
 {
   list /* of expression */ args;
@@ -356,51 +364,17 @@ static void atomize_call(call c, int level)
 
   if (lenargs>=2)
     {
-      /* atomize sub expressions with 
-	 - lower level
-	 - not simple (references or constants)
-	 - no side effects.
-      */
-      
-      MAP(EXPRESSION, sube,
-      {
-	int subelevel = expr_level_of(sube);
-	if (subelevel != -1 &&
-	    subelevel < level &&
-	    atomizable_sub_expression_p(sube) &&
-	    !side_effects_p(sube))
-	  {
-	    statement atom = 
-	      atomize_this_expression(hpfc_new_variable, sube);
-	    if (atom)
-	      {
-		/* add a comment... */
-		/*statement_comments(atom) = 
-		  strdup(concatenate("! level: ", itoa(subelevel), "\n",
-		  NULL));*/
-		  insert_before_statement(atom, statement_of_level(subelevel));
-	      }
-	  }
-      },
-	args);
+      MAP(EXPRESSION, sube, do_atomize_if_different_level(sube, level), args);
     }
 }
 
-static void atomize_instruction(instruction i)
-{
-  if (!currently_nested_p()) return;
-  if (!instruction_call_p(i)) return;
-
-  atomize_call(instruction_call(i), stat_level_of(current_statement_head()));
-}
-
-static void atomize_or_associate(expression e)
+static void atomize_or_associate_for_level(expression e, int level)
 {
   syntax syn;
   call c;
   entity func;
   list /* of expression */ args;
-  int lenargs;
+  int lenargs, exprlevel;
 
   /* some depth, otherwise no ICM needed!
    * should be fixed if root statement is pushed?
@@ -424,13 +398,13 @@ static void atomize_or_associate(expression e)
   func = call_function(c);
   args = call_arguments(c);
   lenargs = gen_length(args);
+  exprlevel = expr_level_of(e);
 
   if (Is_Associatif_Commutatif(func) && lenargs>2)
     {
       /* reassociation + atomization maybe needed.
 	 code taken from JZ.
        */
-      /* int exprlevel = expr_level_of(e); */
       int i, nlevels = current_level();
       gen_array_t groups = group_expr_by_level(nlevels, args);
       list lenl;
@@ -481,8 +455,59 @@ static void atomize_or_associate(expression e)
     }
   else
     {
-      atomize_call(c, expr_level_of(e));
+      atomize_call(c, level);
     }
+}
+
+/* maybe I could consider moving the call as a whole?
+ */
+static void atomize_instruction(instruction i)
+{
+  if (!currently_nested_p()) return;
+  if (!instruction_call_p(i)) return;
+  /* stat_level_of(current_statement_head())); */
+  atomize_call(instruction_call(i), current_level());
+}
+
+static void atomize_test(test t)
+{
+  if (!currently_nested_p()) return;
+  do_atomize_if_different_level(test_condition(t), current_level());
+}
+
+static void atomize_whileloop(whileloop w)
+{
+  if (!currently_nested_p()) return;
+  do_atomize_if_different_level(whileloop_condition(w), current_level());
+}
+
+static void atomize_or_associate(expression e)
+{
+  atomize_or_associate_for_level(e, expr_level_of(e));
+}
+
+static bool loop_flt(loop l)
+{
+  statement sofl = current_statement_head();
+  pips_assert("statement of loop", 
+	      instruction_loop(statement_instruction(sofl))==l)
+  push_nesting(sofl);
+  return TRUE;
+}
+
+static void loop_rwt(loop l)
+{
+  range bounds;
+  int level;
+  statement sofl = current_statement_head();
+  pop_nesting(sofl);
+
+  if (!currently_nested_p()) return;
+  bounds = loop_range(l);
+  level = current_level();
+  do_atomize_if_different_level(range_lower(bounds), level);
+  do_atomize_if_different_level(range_upper(bounds), level);
+  do_atomize_if_different_level(range_increment(bounds), level);
 }
 
 /* insert in front if some inserted.
@@ -545,8 +570,10 @@ perform_icm_association(
   gen_multi_recurse(s,
       statement_domain, current_statement_filter, current_statement_rewrite,
       instruction_domain, gen_true, atomize_instruction,
+      test_domain, gen_true, atomize_test,
       loop_domain, loop_flt, loop_rwt,
-       /* could also push while loops... */
+      whileloop_domain, gen_true, atomize_whileloop,
+      /* could also push while loops... */
       expression_domain, gen_true, atomize_or_associate,
       /* do not atomize index computations at the time... */     
       reference_domain, gen_false, gen_null,
