@@ -1,11 +1,11 @@
 /* comp_unstr.c */
 /* evaluate the complexity of unstructured graphs of statements */
-#define _POSIX_SOURCE
 
 #include <stdio.h>
 #include <math.h>
 
 #include "genC.h"
+
 #include "ri.h"
 #include "complexity_ri.h"
 #include "ri-util.h"
