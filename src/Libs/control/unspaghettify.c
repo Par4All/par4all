@@ -3,10 +3,10 @@
    Ronan Keryell, 1995.
    */
 
-/* 	%A% ($Date: 1995/09/19 17:04:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/20 14:48:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
- char vcid_unspaghettify[] = "%A% ($Date: 1995/09/19 17:04:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+ char vcid_unspaghettify[] = "%A% ($Date: 1995/09/20 14:48:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -44,8 +44,13 @@ remove_useless_continue_or_empty_code_in_unstructured(unstructured u)
                      pips_assert("control inconsistants...",
                                  gen_consistent_p(c));
 
-                  /* Do not remove the exit node (yet): */
-                  if (c != exit_node)
+                  /* Do not remove the exit nor the entry node node
+                     since it is boring to relink the entry and exit
+                     node... That is not important since there is
+                     another pass that fuse the sequences. Dead code
+                     elimination should remove these structured
+                     CONTINUE afterward... */
+                  if (c != exit_node && c != entry_node)
                      if (gen_length(control_successors(c)) == 1) {
                         /* Deal any number of predecessor.
 
