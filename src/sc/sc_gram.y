@@ -46,7 +46,7 @@ short int operat;    /* dernier operateur rencontre                 */
 #define OPSUP 5
 #define DROIT 1
 #define GAUCHE 2
-#define NULL 0
+/* #define NULL 0 */
 %}
 
 %union {
