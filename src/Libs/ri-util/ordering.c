@@ -146,6 +146,12 @@ int o;
     pips_assert("apply_ordering_to_statement", 
 		ots != NULL && ots != hash_table_undefined);
 
+    if(o == STATEMENT_ORDERING_UNDEFINED) {
+	pips_error("ordering_to_statement",
+		   "Illegal ordering %d\n",
+		   o);
+    }
+
     s = (statement) hash_get(ots, (char *) o);
 
     if(s == statement_undefined) {
