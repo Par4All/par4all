@@ -91,6 +91,7 @@ void hpfcompiler(stat, hoststatp, nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
+#ifdef HPFC_NEW_IO_COMPILATION
     bool
 	only_io = (load_statement_only_io(stat)==TRUE);
 
@@ -100,8 +101,8 @@ statement *hoststatp,*nodestatp;
 	    io_efficient_compile(stat,  hoststatp, nodestatp);
 	    return;
 	}
-    
     /* else usual stuff */
+#endif
 
     switch(instruction_tag(statement_instruction(stat)))
     {
