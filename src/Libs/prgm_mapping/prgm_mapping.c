@@ -97,7 +97,7 @@ typedef dfg_vertex_label vertex_label;
 typedef dfg_arc_label arc_label;
 
 /* ======================================================================== */
-void print_plc(module_name)
+boolean print_plc(module_name)
 string module_name;
 {
   FILE        *fd;
@@ -123,6 +123,8 @@ string module_name;
     fprintf(stderr, "\n\n *** PRINT_PLC DONE\n");
 
   debug_off();
+
+  return(TRUE);
 }
 
 
@@ -2174,7 +2176,7 @@ list sigma;
  * 3. The valuation consists in determining the coefficients not yet
  * valuated and in building the dimensions of the placement function.
  */
-void prgm_mapping(module_name)
+boolean prgm_mapping(module_name)
 char*   module_name;
 {
   extern plc pfunc;		/* The placement function */
@@ -2618,4 +2620,6 @@ fprint_plc_pp_dims(stderr, pfunc);
   reset_current_module_entity();
 
   debug_off();
+
+  return(TRUE);
 }
