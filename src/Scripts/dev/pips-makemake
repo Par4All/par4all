@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/30 10:07:40 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/31 08:58:25 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -76,7 +76,15 @@ cd_dirname=`dirname $current_directory`
 # set defaults if necessary
 
 [ "${DIRTYPE}" ] || DIRTYPE=`basename $cd_dirname`
-[ "${DIRSIDE}" ] || DIRSIDE=`dirname $cd_dirname`
+[ "${DIRSIDE}" ] || 
+{
+  if expr $cd_dirname : '*/Development/*' > /dev/null
+  then
+    DIRSIDE="$PIPS_DEVEDIR" 
+  else
+    DIRSIDE="$PIPS_SRCDIR"
+  fi
+}
 
 # delayed here to ensure that DIRTYPE is available
 
