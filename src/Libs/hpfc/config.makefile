@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1995/04/19 10:47:37 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1995/04/20 18:27:09 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -42,7 +42,6 @@ MAIN=		main
 
 LIB_CFILES=	directives.c \
 		dynamic.c \
-		remapping.c \
 		hpfc.c \
 		debug-util.c \
 		hpfc-util.c \
@@ -68,7 +67,9 @@ LIB_CFILES=	directives.c \
 		build-system.c \
 		only-io.c \
 		io-compile.c \
+		generate-util.c \
 		generate-io.c \
+		remapping.c \
 		run-time-functions.c \
 		host_node_entities.c \
 		hpf_objects.c \
