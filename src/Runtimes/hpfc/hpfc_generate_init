@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_generate_init,v $ ($Date: 1994/09/05 19:33:00 $, )
+# $RCSfile: hpfc_generate_init,v $ ($Date: 1994/09/07 11:05:58 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -35,18 +35,19 @@ NAME="${NAME:-`basename $dirname .database`}"
 NAME=`echo $NAME | tr 'A-Z' 'a-z'`
 
 {
-  echo "      SUBROUTINE HPFC_INIT_COMMON_PARAM()"
-  echo "      include 'hpfc_commons.h'"
+  echo "      subroutine HPFC_INIT_COMMON_PARAM()"
+  echo "      include \"hpfc_commons.h\""
   for file in $dirname/*_parameters.h
   do
-    echo "      include '`basename $file`'"
+    echo "      include \"`basename $file`\""
   done
   for file in $dirname/*_init.h
   do
-    echo "      include '`basename $file`'"
+    echo "      include \"`basename $file`\""
   done
-  echo "      NODE_PROGRAM_NAME='${NAME}_node'"
-  echo "      NODE_ARCHITECTURE='PVM_ARCHITECTURE'"
+  echo "      NODE_PROGRAM_NAME=\"${NAME}_node\""
+  echo "      NODE_ARCHITECTURE=\"PVM_ARCHITECTURE\""
+  echo "      HPFC_GROUP_NAME=\"${NAME}_group\""
   echo "      end"
 } > $init
 
