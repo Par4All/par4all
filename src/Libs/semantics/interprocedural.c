@@ -991,7 +991,7 @@ static bool memorize_precondition(statement s)
      */
     current_precondition = load_statement_semantic(s);
 
-    pips_assert("memorize_precondition",
+    pips_assert("current precondition is defined",
 		current_precondition!=transformer_undefined);
 
     go_down = TRUE;
