@@ -1029,7 +1029,12 @@ statement_to_label(statement s)
 
     case is_instruction_sequence:
       /* The initial statement may be an unlabelled CONTINUE... */
-      l = statement_to_label(STATEMENT(CAR(sequence_statements(instruction_sequence(i)))));
+      MAPL(cs, {
+	statement stmt = STATEMENT(CAR(cs));
+	l = statement_to_label(stmt);
+	if(!empty_label_p(l)||!continue_statement_p(stmt))
+	  break;
+      }, sequence_statements(instruction_sequence(i)));
       break;    
     case is_instruction_unstructured:
       l = statement_to_label(unstructured_control(instruction_unstructured(i)));
