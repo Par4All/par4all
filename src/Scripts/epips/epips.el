@@ -807,6 +807,7 @@ If no buffer can be found, just return nil."
   "Keymap for the menu of the Emacs PIPS mode.")
 ;(define-key epips-keymap "\C-C\C-K" 'epips-kill-the-buffers)
 (define-key epips-keymap "\C-C\C-L" 'epips-clear-log-buffer)
+(define-key epips-keymap "\C-C\C-P" 'epips)
 (define-key epips-keymap "\C-C\C-Q" 'epips-kill-the-buffers)
 (define-key epips-keymap "\C-C\C-S" 'epips-save-to-seminal-file)
 (fset 'epips-main-menu epips-menu-keymap)
@@ -815,6 +816,8 @@ If no buffer can be found, just return nil."
   '("Save the file after edit in the seminal .f" . epips-save-to-seminal-file))
 (define-key epips-menu-keymap [epips-kill-the-buffers-menu-item]
   '("Quit and kill the Pips buffers" . epips-kill-the-buffers))
+(define-key epips-menu-keymap [epips-another-pips-process-menu-item]
+  '("Launch another Pips process" . epips))
 (define-key epips-menu-keymap [epips-clear-log-buffer-menu-item]
   '("Clear log buffer" . epips-clear-log-buffer))
 (define-key epips-keymap [S-down-mouse-1]
@@ -828,25 +831,6 @@ If no buffer can be found, just return nil."
   (use-local-map epips-keymap)
   )
 
-(defun epips-add-keymaps-and-menu-in-the-current-buffer2 ()
-  "This function add the menus and define some keyboard accelerators
- to the current buffer"
-  (local-set-key [menu-bar epips] (cons "Pips" (make-sparse-keymap "Pips")))
-  (local-set-key [menu-bar epips epips-kill-the-log-buffer]
-		 '("Kill the Pips Log buffer" . epips-kill-the-log-buffer))
-  (local-set-key [menu-bar epips epips-kill-the-buffers]
-		 '("Kill the Pips buffers" . epips-kill-the-buffers))
-  (local-set-key [menu-bar epips epips-clear-log-buffer]
-		 '("Clear log buffer" . epips-clear-log-buffer))
-  (local-set-key [menu-bar epips epips-save-to-seminal-file]
-		 '("Save the file after edit in the seminal .f" . epips-save-to-seminal-file))
-  (local-set-key [S-down-mouse-1]
-		 '("Go to module" . epips-mouse-module-select))
-  (local-set-key [S-mouse-1]
-		 '("Nothing..." . ignore))
-  (local-set-key "\C-C\C-C"
-		 '("Save the file after edit in the seminal .f" . epips-save-to-seminal-file))
-  )
 
 (defun epips-add-keymaps-and-menu ()
   "This function add the menus and define some keyboard accelerators"
