@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.52  1997/04/10 08:21:49  coelho
+ * *** empty log message ***
+ *
  * Revision 1.51  1997/04/07 17:06:35  coelho
  * test normalization...
  *
@@ -1034,21 +1037,26 @@ hpf_remapping(
     set_information_for_code_optimizations(p);
 
     remapping_variables(p, src, trg, &l, &lp, &ll, &lrm, &ld, &lo);
-    clean_the_system(&p, &lrm, &lo);
-    lddc = simplify_deducable_variables(p, ll, &left);
 
+    /* it is not obvious to decide where to place
+     * the cleaning, the equalities detection and the deducables...
+     */
+
+    clean_the_system(&p, &lrm, &lo);
+    DEBUG_SYST(4, "cleaned system", p);
+
+    sc_find_equalities(&p);
+    DEBUG_SYST(4, "more equalities", p);
+
+    lddc = simplify_deducable_variables(p, ll, &left);
     gen_free_list(ll);
+    DEBUG_SYST(4, "without deducables system", p);
     
     /* the P cycle ?
      */
     proc_distribution_p = gen_in_list_p(lambda, lo);
     if (proc_distribution_p) gen_remove(&lo, lambda);
     scanners = gen_nconc(lo, left);
-
-    DEBUG_SYST(4, "cleaned system", p);
-
-    /* normalize_system(&p);
-       DEBUG_SYST(4, "normalized system", p); */
 
     DEBUG_ELST(4, "scanners", scanners);
 
