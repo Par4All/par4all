@@ -610,6 +610,7 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"ABS", 1, real_to_real_type},
     {"DABS", 1, double_to_double_type},
     {"CABS", 1, complex_to_real_type},
+    {"CDABS", 1, doublecomplex_to_double_type},
 
     {"MOD", 2, default_intrinsic_type},
     {"AMOD", 2, real_to_real_type},
