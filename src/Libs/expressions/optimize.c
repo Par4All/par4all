@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.20  1998/11/25 14:52:19  coelho
+ * test/R10K...
+ *
  * Revision 1.19  1998/11/24 17:22:37  coelho
  * simplify implemented.
  *
@@ -486,6 +489,10 @@ static double expression_gravity(expression e)
   return expression_gravity_rc(e, 0.0E0);
 }
 
+static double expression_gravity_inv(expression e)
+{
+  return -expression_gravity(e);
+}
 
 /**************************************** HUFFMAN ALGORITHM ON AN EXPRESSION */
 
@@ -704,8 +711,14 @@ static optimization_strategy
     /* simp */ TRUE
   },
   {
-    "R10K",
+    "test",
     TRUE, expression_gravity, FALSE,
+    TRUE, "1",
+    TRUE
+  },
+  {
+    "R10K",
+    TRUE, expression_gravity_inv, FALSE,
     TRUE, "1",
     TRUE
   },
