@@ -1,6 +1,6 @@
 c
 c $RCSfile: hpfc_broadcast.m4f,v $ (version $Revision$)
-c $Date: 1995/09/07 13:58:28 $, 
+c $Date: 1995/09/11 17:36:18 $, 
 c
 c management of broadcasts
 c typical call: hpfc_broadcast_x(lid, [number, step]*x)
@@ -34,6 +34,7 @@ SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
       endif
 SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
       end')dnl
+GENERIC_BROADCAST(0)
 GENERIC_BROADCAST(1)
 GENERIC_BROADCAST(2)
 GENERIC_BROADCAST(3)
