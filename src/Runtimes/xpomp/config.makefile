@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/30 18:42:54 $ 
+# $Date: 1996/08/30 18:43:09 $ 
 
 ifeq ($(FC),g77)
 CPPFLAGS+=	-DCOMPILE_FOR_G77
@@ -14,7 +14,7 @@ BIN=		$(ARCH)/xpomp
 LOCAL_HEADERS=	gr.h rasterfile.h 
 EXPORT_HEADERS=	xpomp_graphic.h xpomp_graphic_F.h
 CFILES=		cgraphic.c xpomp.c 
-DEMO=		test_xpomp.c fratal.f 
+DEMO=		test_xpomp.c fractal.f 
 HPFC=		xpomp_fake.f
 DOC=		xpomp_manual.tex xPOMP_window_explained.eps
 SOURCES=	$(LOCAL_HEADERS) \
