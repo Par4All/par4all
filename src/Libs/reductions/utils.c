@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1996/06/19 13:56:40 $, 
+ * $Date: 1996/06/19 16:31:59 $, 
  *
  * utilities for reductions.
  *
@@ -220,8 +220,7 @@ merge_two_reductions(reduction first, reduction second)
 
 /* what to do with reduction *pr for variable var 
  * under effects le and reductions reds.
- * - *pr==NULL => no candidates found yet.
- * returns whether woth to go on.
+ * returns whether worth to go on.
  * conditions:
  */   
 bool 
