@@ -275,7 +275,7 @@ i_make:
 
 	    if (execution_mode) {
 		MAPL(e, {
-		    if (safe_make_p ($3.the_name, STRING(CAR(e))) == FALSE) {
+		    if (safe_make ($3.the_name, STRING(CAR(e))) == FALSE) {
 			$$ = FALSE;
 			break;
 		    }
@@ -605,7 +605,7 @@ owner:
 	    debug(7,"tp_parse","reduce rule owner (CALLEES)\n");
 
 	    if (execution_mode) {
-		if (safe_make_p(DBR_CALLEES, db_get_current_module_name())
+		if (safe_make(DBR_CALLEES, db_get_current_module_name())
 		    == FALSE)
 		    YYERROR;	
 
@@ -633,7 +633,7 @@ owner:
 
 	    debug(7,"tp_parse","reduce rule owner (CALLERS)\n");
 	    if (execution_mode) {
-		if (safe_make_p(DBR_CALLERS, db_get_current_module_name())
+		if (safe_make(DBR_CALLERS, db_get_current_module_name())
 		    == FALSE)
 		    YYERROR;	
 
