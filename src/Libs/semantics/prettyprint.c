@@ -109,6 +109,7 @@ print_code_semantics(module_name)
 char *module_name;
 {
     bool success = TRUE;
+    text t;
 
     char * file_ext = strdup(concatenate(is_transformer?
 		     (is_user_view? USER_TRANSFORMER_SUFFIX :
@@ -127,22 +128,19 @@ char *module_name;
 		 DBR_PRINTED_FILE);
 
     begin_attachment_prettyprint();
-    
-    success = make_text_resource(module_name,
-				 resource_name,
-				 file_ext,
-				 get_semantic_text(module_name,TRUE));
-
+    t = get_semantic_text(module_name,TRUE);
+    success = make_text_resource(module_name, resource_name, file_ext, t);
     end_attachment_prettyprint();
- 
+
+    free_text(t);
     free(file_ext);
     return success;
 }
 
 static text 
-get_semantic_text(module_name,give_code_p)
-char *module_name;
-bool give_code_p;
+get_semantic_text(
+    string module_name,
+    bool give_code_p)
 {
     text r = make_text(NIL), txt_summary;
     entity mod;
