@@ -25,17 +25,17 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.7 2002/05/31 14:54:31 loechner Exp $
+# $Id: vars.mk,v 1.8 2002/05/31 15:06:07 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
-VERSION = 5.00
+VERSION = 5.06
 
 # NOTE: Don't edit this file if it is called vars.mk, instead
 # edit vars.mk.in, which is read by configure
 
 # Default top-level directory.
-prefix =	/usr/local
+prefix =	/usr
 
 # Usually the same as prefix. 
 # exec_prefix is part of the autoconf standard.
@@ -75,9 +75,9 @@ LONG_BITS = 64
 GMP_BITS = gmp
 
 # Library type to construct
-LIBSTYPE_TO_BUILD = lib-static
+LIBSTYPE_TO_BUILD = 
 # Library type to install
-INSTALL_LIB = 
+INSTALL_LIB = install-static install-shared
 
 # Commands used to install scripts and data
 INSTALL =		/usr/bin/install -c
@@ -97,7 +97,7 @@ BUILD   = i686
 EXEC_EXTRA_SUFFIX = 
 
 ## make install puts everything here: relays on --prefix 
-INSTALLDIR = /usr/local
+INSTALLDIR = /usr
 BINDIR = $(INSTALLDIR)/bin
 LIBDIR = $(INSTALLDIR)/lib
 INCLUDEDIR = $(INSTALLDIR)/include
@@ -106,7 +106,7 @@ DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
-EXEC_EXTRA_LIBS= -L$(OBJ_DIR) -lpolylib$(BITS) $(LIBS)
+EXEC_EXTRA_LIBS= -L${exec_prefix}/lib -lpolylib$(BITS) $(LIBS)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 
