@@ -5,6 +5,9 @@
  * preprocessed.
  *
  * $Log: csplit_file.c,v $
+ * Revision 1.5  2003/08/08 15:57:52  irigoin
+ * reset added to process a set of files and not only one file at a tine
+ *
  * Revision 1.4  2003/08/04 16:49:48  irigoin
  * Reset keyword and typedef table added
  *
@@ -63,7 +66,12 @@ void error_reset_module_name_list()
 
 static string splitc_input_file_name = string_undefined;
 static FILE * splitc_in_append = NULL; /* Used to generate the compilation unit */
-static int current_input_line = 0; /* In previous file */
+static int current_input_line = 0; /* In file just above */
+
+void reset_current_input_line()
+{
+current_input_line = 0;
+}
 
 static string current_compilation_unit_file_name = string_undefined;
 static string current_compilation_unit_name = string_undefined; /* includes FILE_SEP_STRING as a suffix. */
@@ -263,6 +271,8 @@ void csplit_error_handler()
   /* Reset keyword table */
   extern void reset_keyword_typedef_table();
 
+  reset_current_input_line();
+  reset_csplit_line_number();
   reset_keyword_typedef_table();
 }
 
@@ -271,6 +281,8 @@ void csplit_reset()
   /* Reset keyword table */
   extern void reset_keyword_typedef_table();
 
+  reset_current_input_line();
+  reset_csplit_line_number();
   reset_keyword_typedef_table();
 }
 
