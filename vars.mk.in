@@ -1,0 +1,113 @@
+# Modified by Vincent Loechner, may 2000.
+
+# Copyright (c) 2000 The Regents of the University of California.
+# All rights reserved.
+# Permission is hereby granted, without written agreement and without
+# license or royalty fees, to use, copy, modify, and distribute this
+# software and its documentation for any purpose, provided that the above
+# copyright notice and the following two paragraphs appear in all copies
+# of this software.
+#
+# IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY
+# FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+# ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
+# THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+#
+# THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE
+# PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+# CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
+# ENHANCEMENTS, OR MODIFICATIONS.
+#
+#                                        PT_COPYRIGHT_VERSION_2
+#                                        COPYRIGHTENDKEY
+#
+# Version identification:
+# $Id: vars.mk.in,v 1.1 2001/07/16 15:00:31 risset Exp $
+# Date of creation: 7/31/96
+# Author: Bart Kienhuis
+
+VERSION = @VERSION@
+
+# NOTE: Don't edit this file if it is called vars.mk, instead
+# edit vars.mk.in, which is read by configure
+
+# Default top-level directory.
+prefix =	@prefix@
+
+# Usually the same as prefix. 
+# exec_prefix is part of the autoconf standard.
+exec_prefix =	${prefix}
+
+# Source directory we are building from.
+srcdir =	@srcdir@
+
+# Directory in which to install scripts
+BIN_INSTALL_DIR =	$(exec_prefix)/bin
+
+# c compiler flags and defines
+CC	             	= @CC@
+CFLAGS                  = @CFLAGS@
+EXTRA_FLAGS             = @EXTRA_FLAGS@
+DEFINES         	= @DEFS@ 
+
+# Linker flags and defines, both static and shared lib
+LD 	        	= @LD@
+LDFLAGS                 = @LDFLAGS@
+
+# Additional libraries that need to be linked
+LIBS                    = @LIBS@
+
+# Additional tools needed when making libraries
+LN_S			= @LN_S@
+RANLIB			= @RANLIB@
+
+SHEXT  			= @SHEXT@
+
+# defines needed for arithmetic lib
+INT_AFLAGS = @INT_AFLAGS@
+LONG_AFLAGS = @LONG_AFLAGS@
+GMP_AFLAGS = @GMP_AFLAGS@
+INT_BITS = @INT_BITS@
+LONG_BITS = @LONG_BITS@
+GMP_BITS = @GMP_BITS@
+
+# Library type to construct
+INSTALL_LIB = @INSTALL_LIB@
+
+# Commands used to install scripts and data
+INSTALL =		@INSTALL@
+INSTALL_PROGRAM =	${INSTALL}
+INSTALL_DATA =		${INSTALL} -m 644
+
+## GNU-MP stuff
+EXTRA_INCLUDES=@EXTRA_INCLUDES@
+EXTRA_LIBS=@EXTRA_LIBS@
+
+# Platform specific variables
+OSTYPE	= @target_os@
+HOST    = @target_vendor@
+BUILD   = @target_cpu@
+
+
+EXEC_EXTRA_SUFFIX = @EXEC_EXTRA_SUFFIX@
+
+## make install puts everything here: relays on --prefix 
+INSTALLDIR = @prefix@
+BINDIR = $(INSTALLDIR)/bin
+LIBDIR = $(INSTALLDIR)/lib
+INCLUDEDIR = $(INSTALLDIR)/include
+MANDIR = $(INSTALLDIR)/man
+DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
+
+# When compiling the tests, we need to link additional libraries
+# include polylib
+EXEC_EXTRA_LIBS= @EXEC_EXTRA_LIBS@ $(LIBS)
+SHAREDLIB_FLAG          = @SHAREDLIB_FLAG@
+LDCONFIG = @LDCONFIG@
+
+LIBS_TO_BUILD = @LIBS_TO_BUILD@
+EXEC_TO_BUILD = @EXEC_TO_BUILD@
+
