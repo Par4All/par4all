@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/10 14:38:20 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/10 14:54:19 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -321,8 +321,8 @@ INC_CFILES = $(TARGET_CFILES)
 [ \( $DIRTYPE = 'Passes' -o $DIRTYPE = 'Lib' \) -a $DIRSIDE = $PIPS_SRCDIR ] &&
 cat >> $MAKEFILE <<%
 
-$(PIPS_BINDIR)/$(BIN_TARGET): $(BIN_TARGET) $(BINDIR)
-	cp $(BIN_TARGET) $(BINDIR)
+$(PIPS_BINDIR)/$(BIN_TARGET): $(BIN_TARGET) $(PIPS_BINDIR)
+	cp $(BIN_TARGET) $(PIPS_BINDIR)
 
 $(PIPS_LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
 	cp $(LIB_TARGET) $(PIPS_LIBDIR)
@@ -383,6 +383,9 @@ $MAKEFILE: $(CONFIG_FILE) $(PIPS_UTILDIR)/pips-makemake
 
 [ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<%
 #
+
+$(PIPS_LIBDIR):
+	mkdir $(PIPS_LIBDIR)
 
 lint:
 	$(TYPECHECK) $(CFILES) | 
