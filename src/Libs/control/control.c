@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/09 18:23:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/10 10:17:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/04/09 18:23:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/04/10 10:17:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -62,76 +62,6 @@ static hash_table Label_control;
 #define MAKE_CONTINUE_STATEMENT() make_continue_statement(entity_undefined) 
 
 
-/* Test if a control node is in a list of control nodes: */
-bool
-is_control_in_list_p(control c,
-		     list cs)
-{
-    MAP(CONTROL, cc, {
-	if (cc == c)
-	    return TRUE;
-    }, cs);
-    return FALSE;
-}
-
-
-/* Test the coherency of a control network.
-
-   Do not verify the fact that nodes could appear twice in the case of
-   unstructured tests. */
-void
-check_control_coherency(control c)
-{
-    list blocs = NIL;
-    CONTROL_MAP(ctl, {
-	/* Test the coherency of the successors: */
-	MAP(CONTROL, cc, {	    
-	    if (!is_control_in_list_p(ctl, control_predecessors(cc))) {
-		pips_debug(0, "Control node %#x not in the predecessor list of %#x\n", (unsigned int) ctl, (unsigned int) cc);
-		/* pips_assert("Control incorrect", 0); */
-	    }
-	}, control_successors(ctl));
-	MAP(CONTROL, cc, {
-	    if (!is_control_in_list_p(ctl, control_successors(cc))) {
-		pips_debug(0, "Control node %#x not in the successor list of %#x\n", (unsigned int) ctl, (unsigned int) cc);
-		/* pips_assert("Control incorrect", 0); */
-	    }
-	}, control_predecessors(ctl));
-    }, c, blocs);
-    gen_free_list(blocs);  
-}
-
-
-/* Display a list of control: */
-void
-display_address_of_nodes(list cs)
-{
-	MAP(CONTROL, cc,
-	    {
-		fprintf(stderr, "%#x,", cc);
-	    }, cs);
-}
-
-
-/* Display all the control nodes from c for debugging purpose: */
-void
-display_linked_control_nodes(control c) {
-    list blocs = NIL;
-    CONTROL_MAP(ctl, {
-	fprintf(stderr, "%#x (pred (#%d)=", (unsigned int) ctl,
-		gen_length(control_predecessors(ctl)));
-	display_address_of_nodes(control_predecessors(ctl));
-	fprintf(stderr, " succ (#%d)=", gen_length(control_successors(ctl)));
-	display_address_of_nodes(control_successors(ctl));
-	fprintf(stderr, "), ");
-	ifdebug(8) {
-	    pips_debug(0, "Statement of control %#x:\n", (unsigned int) ctl);
-	    print_statement(control_statement(ctl));
-	}
-    }, c, blocs);
-    gen_free_list(blocs);
-    fprintf(stderr, "---\n");
-}
 
 /* HASH_GET_DEFAULT_EMPTY_LIST: returns an empty list instead of
    HASH_UNDEFINED_VALUE when a key is not found */
@@ -574,6 +504,9 @@ hash_table used_labels;
 }
 
 
+/* This procedure is disabled and rely on unspaghettify later since
+   there is a remaining bug about camat-t.f. RK. */
+
 /* COMPACT_LIST takes a list of controls CTLS coming from a
    CONTROLIZE_LIST and compacts the successive assignments,
    i.e. concatenates (i=1) followed by (j=2) in a single control with
@@ -592,6 +525,16 @@ compact_list(list ctls,
     control c_res;
     set processed_nodes;
     control c_last = c_end ;
+
+    ifdebug(5) {
+	pips_debug(0, "List ctls:");
+	display_address_of_control_nodes(ctls);
+	fprintf(stderr, "\n");
+    }
+
+    /* There is a bug if ctls order is incoherent with c_res order
+       later. Problem in controlize_list_1() ? */
+    return c_end;
 
     if( ENDP( ctls )) {
 	return( c_last ) ;
@@ -735,6 +678,15 @@ hash_table used_labels;
 	check_control_coherency(pred);
 	check_control_coherency(succ);
 	check_control_coherency(c_res);
+	pips_debug(0, "(pred = %#x, succ = %#x, c_res = %#x)\n",
+		   (unsigned int) pred,
+		   (unsigned int) succ, (unsigned int) c_res);
+	pips_debug(0, "Nodes from pred %#x\n", (unsigned int) pred);
+	display_linked_control_nodes(pred);
+	pips_debug(0, "Nodes from succ %#x\n", (unsigned int) succ);
+	display_linked_control_nodes(succ);
+	pips_debug(0, "Nodes from c_res %#x\n", (unsigned int) c_res);
+	display_linked_control_nodes(c_res);
     }
     
     return(gen_nreverse(ctls));
