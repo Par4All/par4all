@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/30 14:18:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/03/08 16:37:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1995/11/30 14:18:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1996/03/08 16:37:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -55,61 +55,60 @@ void
 edit_notify(Menu menu,
             Menu_item menu_item)
 {
-   char string_filename[SMALL_BUFFER_LENGTH],
-      string_modulename[SMALL_BUFFER_LENGTH];
-   char file_name_in_database[MAXPATHLEN*2];
-   char * modulename = db_get_current_module_name();
-   char * file_name;
-   int win_nb;
+    char string_filename[SMALL_BUFFER_LENGTH],
+    string_modulename[SMALL_BUFFER_LENGTH];
+    char file_name_in_database[MAXPATHLEN*2];
+    char * modulename = db_get_current_module_name();
+    char * file_name;
+    int win_nb;
 
-   if (modulename == NULL) {
-      prompt_user("No module selected");
-      return;
-   }
+    if (modulename == NULL) {
+	prompt_user("No module selected");
+	return;
+    }
 
-   if (wpips_emacs_mode) {
-      char * label = (char *) xv_get(menu_item, MENU_STRING);
-      /* Rely on the standard EPips viewer: */
-      wpips_execute_and_display_something_outside_the_notifyer(label);
-   }
-   else {
-      /* Is there an available edit_textsw ? */
-      if ( (win_nb=alloc_first_initialized_window(FALSE)) == NO_TEXTSW_AVAILABLE ) {
-         prompt_user("None of the text-windows is available");
-         return;
-      }
+    if (wpips_emacs_mode) {
+	char * label = (char *) xv_get(menu_item, MENU_STRING);
+	/* Rely on the standard EPips viewer: */
+	wpips_execute_and_display_something_outside_the_notifyer(label);
+    }
+    else {
+	/* Is there an available edit_textsw ? */
+	if ( (win_nb=alloc_first_initialized_window(FALSE)) == NO_TEXTSW_AVAILABLE ) {
+	    prompt_user("None of the text-windows is available");
+	    return;
+	}
 
-      file_name = db_get_file_resource(DBR_SOURCE_FILE, modulename, TRUE);
-      sprintf(file_name_in_database, "%s/%s",
-              build_pgmwd(db_get_current_workspace_name()),
-              file_name);
+	file_name = db_get_file_resource(DBR_SOURCE_FILE, modulename, TRUE);
+	sprintf(file_name_in_database, "%s/%s",
+		build_pgmwd(db_get_current_workspace_name()),
+		file_name);
 
-      sprintf(string_filename, "File: %s", file_name);
-      sprintf(string_modulename, "Module: %s", modulename);
+	sprintf(string_filename, "File: %s", file_name);
+	sprintf(string_modulename, "Module: %s", modulename);
 
-      /* Display the file name and the module name. RK, 2/06/1993 : */
-      xv_set(edit_frame[win_nb], FRAME_LABEL, "Pips Edit Facility",
-             FRAME_SHOW_FOOTER, TRUE,
-             FRAME_LEFT_FOOTER, string_filename,
-             FRAME_RIGHT_FOOTER, string_modulename,
-             NULL);
+	/* Display the file name and the module name. RK, 2/06/1993 : */
+	xv_set(edit_frame[win_nb], FRAME_LABEL, "Pips Edit Facility",
+	       FRAME_SHOW_FOOTER, TRUE,
+	       FRAME_LEFT_FOOTER, string_filename,
+	       FRAME_RIGHT_FOOTER, string_modulename,
+	       NULL);
 
-      xv_set(edit_textsw[win_nb], 
-             TEXTSW_FILE, file_name_in_database,
-             TEXTSW_BROWSING, FALSE,
-             TEXTSW_FIRST, 0,
-             NULL);
+	xv_set(edit_textsw[win_nb], 
+	       TEXTSW_FILE, file_name_in_database,
+	       TEXTSW_BROWSING, FALSE,
+	       TEXTSW_FIRST, 0,
+	       NULL);
 
-      unhide_window(edit_frame[win_nb]);
-   }
+	unhide_window(edit_frame[win_nb]);
    
-   xv_set(current_selection_mi, 
-          MENU_STRING, "Lasts",
-          MENU_INACTIVE, FALSE,
-          NULL);
+	xv_set(current_selection_mi, 
+	       MENU_STRING, "Lasts",
+	       MENU_INACTIVE, FALSE,
+	       NULL);
 
-   xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
-
+	xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
+    }
 }
 
 
@@ -260,6 +259,11 @@ wpips_file_view(char * file_name,
              NULL);
       
       unhide_window(edit_frame[window_number]);
+   
+      xv_set(current_selection_mi, 
+	     MENU_STRING, "Lasts",
+	     MENU_INACTIVE, FALSE, NULL);
+      xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
    }
    else {
       /* The Emacs mode equivalent: */
@@ -267,12 +271,6 @@ wpips_file_view(char * file_name,
       /* send_icon_name_to_emacs(icon_number); */
       send_view_to_emacs(title_label, file_name);
    }
-   
-   xv_set(current_selection_mi, 
-          MENU_STRING, "Lasts",
-          MENU_INACTIVE, FALSE, NULL);
-   xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
-   
    display_memory_usage();
 }
 
@@ -449,14 +447,13 @@ edit_close_notify(Menu menu,
   
       for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
          hide_window(edit_frame[i]);
-   }
    
-   xv_set(current_selection_mi, 
-          MENU_STRING, "No Selection",
-          MENU_INACTIVE, TRUE, NULL);
+      xv_set(current_selection_mi, 
+	     MENU_STRING, "No Selection",
+	     MENU_INACTIVE, TRUE, NULL);
 
-   xv_set(close_menu_item, MENU_INACTIVE, TRUE, NULL);
-
+      xv_set(close_menu_item, MENU_INACTIVE, TRUE, NULL);
+   }
    display_memory_usage();
 }
 
@@ -482,7 +479,7 @@ apply_on_each_view_item(void (* function_to_apply_on_each_menu_item)(Menu_item),
    int i;
 
    /* Skip the "current_selection_mi" and "close" Menu_items: */
-   for(i = (int) xv_get(view_menu, MENU_NITEMS) - 1; i > 0; i--) {
+   for(i = (int) xv_get(view_menu, MENU_NITEMS); i > 0; i--) {
       Menu_item menu_item = (Menu_item) xv_get(view_menu, MENU_NTH_ITEM, i);
       /* Skip the title item: */
       if (!(bool) xv_get(menu_item, MENU_TITLE)
@@ -576,41 +573,51 @@ create_edit_menu()
                 MENU_STRING, SEQUENTIAL_VIEW,
                 MENU_NOTIFY_PROC, view_notify,
                 NULL);
-  
+
    view_menu = 
-      xv_create(XV_NULL, MENU_COMMAND_MENU, 
-                MENU_GEN_PIN_WINDOW, main_frame, "View & Edit Menu",
-                MENU_TITLE_ITEM, "Viewing or editing a module ",
-                MENU_APPEND_ITEM, current_selection_mi,
-                MENU_APPEND_ITEM, sequential_view_menu_item,
-                /* The sequential_view_menu_item is the default item: */
-                MENU_DEFAULT_ITEM, sequential_view_menu_item,
-                MENU_ACTION_ITEM, USER_VIEW, view_notify,
-                /* MENU_ACTION_ITEM, SEQUENTIAL_EMACS_VIEW, view_notify, */
-                MENU_ACTION_ITEM, SEQUENTIAL_GRAPH_VIEW, view_notify,
-                                /* Just a separator: */
-                WPIPS_MENU_SEPARATOR,
-                MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
-                                /* Just a separator: */
-                WPIPS_MENU_SEPARATOR,
-                MENU_ACTION_ITEM, ARRAY_DFG_VIEW, view_notify,
-                MENU_ACTION_ITEM, TIME_BASE_VIEW, view_notify,
-                MENU_ACTION_ITEM, PLACEMENT_VIEW, view_notify,
-                                 /* Just a separator: */
-                WPIPS_MENU_SEPARATOR,
-                MENU_ACTION_ITEM, CALLGRAPH_VIEW, view_notify,
-                MENU_ACTION_ITEM, ICFG_VIEW, view_notify,
-                                 /* Just a separator: */
-                WPIPS_MENU_SEPARATOR,
-                MENU_ACTION_ITEM, DISTRIBUTED_VIEW, view_notify,
-                MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
-                                 /* Just a separator: */
-                WPIPS_MENU_SEPARATOR,
-                MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
-                                 /* Just a separator: */
-                WPIPS_MENU_SEPARATOR,
-                MENU_APPEND_ITEM, close_menu_item,
-                NULL);
+       xv_create(XV_NULL, MENU_COMMAND_MENU, 
+		 MENU_GEN_PIN_WINDOW, main_frame, "View & Edit Menu",
+		 MENU_TITLE_ITEM, "Viewing or editing a module ",
+		 NULL);
+   
+   if (! wpips_emacs_mode) {
+       /* Make sense only if we have XView edit windows: */
+       xv_set(view_menu, MENU_APPEND_ITEM, current_selection_mi,
+	      NULL);
+   }
+   xv_set(view_menu, MENU_APPEND_ITEM, sequential_view_menu_item,
+	  /* The sequential_view_menu_item is the default item: */
+	  MENU_DEFAULT_ITEM, sequential_view_menu_item,
+	  MENU_ACTION_ITEM, USER_VIEW, view_notify,
+	  /* MENU_ACTION_ITEM, SEQUENTIAL_EMACS_VIEW, view_notify, */
+	  MENU_ACTION_ITEM, SEQUENTIAL_GRAPH_VIEW, view_notify,
+	  /* Just a separator: */
+	  WPIPS_MENU_SEPARATOR,
+	  MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
+	  /* Just a separator: */
+	  WPIPS_MENU_SEPARATOR,
+	  MENU_ACTION_ITEM, ARRAY_DFG_VIEW, view_notify,
+	  MENU_ACTION_ITEM, TIME_BASE_VIEW, view_notify,
+	  MENU_ACTION_ITEM, PLACEMENT_VIEW, view_notify,
+	  /* Just a separator: */
+	  WPIPS_MENU_SEPARATOR,
+	  MENU_ACTION_ITEM, CALLGRAPH_VIEW, view_notify,
+	  MENU_ACTION_ITEM, ICFG_VIEW, view_notify,
+	  /* Just a separator: */
+	  WPIPS_MENU_SEPARATOR,
+	  MENU_ACTION_ITEM, DISTRIBUTED_VIEW, view_notify,
+	  MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
+	  /* Just a separator: */
+	  WPIPS_MENU_SEPARATOR,
+	  MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
+	  NULL);   
+   if (! wpips_emacs_mode) {
+       /* Make sense only if we have XView edit windows: */
+       xv_set(view_menu, 	  /* Just a separator: */
+	      WPIPS_MENU_SEPARATOR,
+	      MENU_APPEND_ITEM, close_menu_item,
+	      NULL);
+   }
 
    (void) xv_create(main_panel, PANEL_BUTTON,
                     PANEL_LABEL_STRING, "View",
