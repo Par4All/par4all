@@ -990,21 +990,32 @@ list ef;
 		    
 		    if(entity_is_argument_p(e_new, 
 					    transformer_arguments(t_caller))) {
-			/* e_new and e_old must be replaced by the
-			   actual entity argument */
-			entity e_old = external_entity_to_old_value(e);
+		      /* e_new and e_old must be replaced by the
+			 actual entity argument */
+		      entity e_old = external_entity_to_old_value(e);
 
-			if(vect_size(v) != 1 || vecteur_var(v) == TCST)
-			    /* should be a user error! */
-			    user_error("user_call_to_transformer",
-				       "value (!) modifed by call to %s\n",
-				       entity_local_name(f));
+		      if(vect_size(v) != 1 || vecteur_var(v) == TCST) {
+			/* Actual argument is not a reference: it might be a user error!
+			 * Transformers do not carry the may/must information.
+			 * A check with effect list ef should be performed...
+			 *
+			 * FI: does effect computation emit a warning?
+			 */
+			list args = arguments_add_entity(arguments_add_entity(NIL, e_new), e_old);
+			user_warning("user_call_to_transformer",
+				     "value (!) might be modified by call to %s\n%dth formal parameter %s\n",
+				     entity_local_name(f), r, entity_local_name(e));
+			t_caller = transformer_filter(t_caller, args);
+			free_arguments(args);
+		      }
+		      else {
 			a_new = entity_to_new_value((entity) vecteur_var(v));
 			a_old = entity_to_old_value((entity) vecteur_var(v));
 			t_caller = transformer_value_substitute
-			    (t_caller, e_new, a_new);
+			  (t_caller, e_new, a_new);
 			t_caller = transformer_value_substitute
-			    (t_caller, e_old, a_old);
+			  (t_caller, e_old, a_old);
+		      }
 		    }
 		    else {
 			/* simple case: formal parameter e is not
