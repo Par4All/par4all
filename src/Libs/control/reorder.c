@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <strings.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 /*
