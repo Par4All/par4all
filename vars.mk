@@ -25,11 +25,11 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.14 2002/08/23 14:32:28 loechner Exp $
+# $Id: vars.mk,v 1.15 2002/08/23 14:39:15 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
-VERSION = 5.08
+VERSION = 5.09
 
 # NOTE: Don't edit this file if it is called vars.mk, instead
 # edit vars.mk.in, which is read by configure
@@ -67,8 +67,8 @@ RANLIB			= ranlib
 SHEXT  			= so
 
 # defines needed for arithmetic lib
-INT_AFLAGS = 
-LONG_AFLAGS = -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
+INT_AFLAGS = -DLINEAR_VALUE_IS_INT
+LONG_AFLAGS = -DLINEAR_VALUE_PROTECT_MULTIPLY 		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -DLINEAR_VALUE_IS_LONGLONG
 GMP_AFLAGS = -DGNUMP
 INT_BITS = 32
 LONG_BITS = 64
@@ -110,10 +110,10 @@ EXEC_EXTRA_LIBS= -L${exec_prefix}/lib -lpolylib$(BITS) $(LIBS)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 
-LIBS_TO_BUILD = gmp
-EXEC_TO_BUILD = gmp
-BITS=gmp
-AFLAGS=-DGNUMP
+LIBS_TO_BUILD = 64
+EXEC_TO_BUILD = 64
+BITS=64
+AFLAGS=-DLINEAR_VALUE_PROTECT_MULTIPLY 		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -DLINEAR_VALUE_IS_LONGLONG
 
 
 OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)
