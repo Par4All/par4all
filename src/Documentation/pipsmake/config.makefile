@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/02 09:50:39 $, 
+# $Date: 1996/09/02 09:54:34 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -18,8 +18,7 @@ INSTALL_INC=	$(DERIVED_INC)
 INSTALL_DOC=	pipsmake-rc.ps
 INSTALL_HTM=	pipsmake-rc 
 
-DERIVED_FILES=	$(INSTALL_SHR) $(DERIVED_INC) $(INSTALL_DOC) $(INSTALL_HTM) \
-		pipsmake-rc.html
+DERIVED_FILES=	$(INSTALL_SHR) $(DERIVED_INC) $(INSTALL_DOC) pipsmake-rc.html
 
 AUTO =	$(PIPS_ROOT)/Include/auto
 
