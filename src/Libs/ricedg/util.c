@@ -146,8 +146,7 @@ prettyprint_dependence_graph(FILE * fd,
 			else  fprintf(fd, " %d",statement_number(s2));
 		    }
 		    
-		}	
-		
+		}
 		else {
 		    fprintf(fd, "\t\tfrom ");
 		    print_words(fd, words_effect(conflict_source(c)));
@@ -156,7 +155,7 @@ prettyprint_dependence_graph(FILE * fd,
 		    print_words(fd, words_effect(conflict_sink(c)));
 		}
 
-		if(conflict_cone(c) != cone_undefined){
+		if(conflict_cone(c) != cone_undefined) {
 		    if(sru_format_p && !statement_undefined_p(mod_stat)) {
 			fprintf(fd, " levels(");
 			MAPL(pl, {
