@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/27 13:28:06 $, 
+ * $Date: 1997/10/28 14:11:35 $, 
  */
 
 #include <unistd.h>
@@ -480,10 +480,13 @@ safe_copy(string source, string target)
     safe_fclose(in, source);
 }
 
+
+/* Some OS do not define basename and dirname. Others like DEC OSF1
+   do. So define them and use another name for them: */
 /* /some/path/to/file.suffix -> file
  */
 string 
-basename(string fullpath, string suffix)
+pips_basename(string fullpath, string suffix)
 {
     int len = strlen(fullpath)-1, i, j;
     string result;
@@ -505,7 +508,7 @@ basename(string fullpath, string suffix)
 /* /some/path/to/file.suffix -> /some/path/to
  */
 string 
-dirname(string fullpath)
+pips_dirname(string fullpath)
 {
     string result = strdup(fullpath);
     int len = strlen(result);
