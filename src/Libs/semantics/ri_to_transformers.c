@@ -420,6 +420,79 @@ loop_to_transformer(loop l, list e) /* effects of loop l */
 }
 
 static transformer 
+whileloop_to_transformer(whileloop l, list e) /* effects of whileloop l */
+{
+    /* loop transformer tf = tfb* or tf = tfb+ or ... */
+    transformer tf;
+    /* loop body transformer */
+    transformer tfb;
+    expression cond = whileloop_condition(l);
+    statement s = whileloop_body(l);
+
+    debug(8,"whileloop_to_transformer","begin\n");
+
+    if(pips_flag_p(SEMANTICS_FIX_POINT)) {
+	/* compute the whileloop body transformer */
+	tfb = transformer_dup(statement_to_transformer(s));
+
+	/* If the while entry condition is usable, it must be added
+	 * on the old values
+	 */
+	tfb = transformer_add_condition_information(tfb, cond, FALSE);
+
+	/* translation function? */
+
+	/* compute tfb's fix point according to pips flags */
+	if(pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
+	    tf = transformer_halbwachs_fix_point(tfb);
+	}
+	else {
+	    transformer ftf = 
+		get_bool_property("SEMANTICS_PATTERN_MATCHING_FIX_POINT")? 
+		transformer_pattern_fix_point(tfb)
+		: transformer_equality_fix_point(tfb);
+	    Psysteme fsc = predicate_system(transformer_relation(ftf));
+	    Psysteme sc = SC_UNDEFINED;
+	    
+	    tf = effects_to_transformer(e);
+	    sc = (Psysteme) predicate_system(transformer_relation(tf));
+
+	    sc = sc_append(sc, fsc);
+
+	    free_transformer(ftf);
+
+	    ifdebug(8) {
+		pips_debug(8, "intermediate fix-point tf=\n");
+		fprint_transformer(stderr, tf, external_value_name);
+	    }
+
+	}
+	/* we have a problem here: to compute preconditions within the
+	   whileloop body we need a tf using private variables; to return
+	   the loop transformer, we need a filtered out tf; only
+	   one hook is available in the ri..; let'a assume there
+	   are no private variables and that if they are privatizable
+	   they are not going to get in our way */
+    }
+    else {
+	/* basic cheap version: do not use the whileloop body transformer and
+	   avoid fix-points; local variables do not have to be filtered out
+	   because this was already done while computing effects */
+
+	(void) statement_to_transformer(s);
+	tf = effects_to_transformer(e);
+    }
+
+    ifdebug(8) {
+	(void) fprintf(stderr,"%s: %s\n","whileloop_to_transformer",
+		       "resultat tf =");
+	(void) (void) print_transformer(tf);
+    }
+    debug(8,"whileloop_to_transformer","end\n");
+    return tf;
+}
+
+static transformer 
 test_to_transformer(test t, list ef) /* effects of t */
 {
     statement st = test_true(t);
@@ -1372,6 +1445,7 @@ cons * e; /* effects associated to instruction i */
     test t;
     loop l;
     call c;
+    whileloop wl;
 
     debug(8,"instruction_to_transformer","begin\n");
 
@@ -1386,6 +1460,10 @@ cons * e; /* effects associated to instruction i */
       case is_instruction_loop:
 	l = instruction_loop(i);
 	tf = loop_to_transformer(l, e);
+	break;
+      case is_instruction_whileloop:
+	wl = instruction_whileloop(i);
+	tf = whileloop_to_transformer(wl, e);
 	break;
       case is_instruction_goto:
 	pips_error("instruction_to_transformer",
@@ -1439,8 +1517,12 @@ statement s;
 	}
 	store_statement_transformer(s, t);
     }
-    else 
+    else {
+	user_warning("statement_to_transformer","redefinition for statement %03d (%d,%d)\n",
+		     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
+		     ORDERING_STATEMENT(statement_ordering(s)));
 	pips_internal_error("transformer redefinition");
+    }
 
     ifdebug(1) {
 	int so = statement_ordering(s);
