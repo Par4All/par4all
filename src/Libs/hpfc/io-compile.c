@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-compile.c,v $
+ * Revision 1.48  1997/08/04 13:56:52  coelho
+ * new generic effects includes.
+ *
  * Revision 1.47  1997/07/21 13:56:44  keryell
  * Replaced %x format by %p.
  *
@@ -20,11 +23,11 @@
 
 #include "control.h"
 #include "transformer.h"
-#include "regions.h"
 #include "semantics.h"
-#include "effects.h"
 #include "conversion.h"
-#include "regions.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 
 /* Yi-Qing stuff
  */
