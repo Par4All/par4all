@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1997/04/15 11:50:44 $, 
+ * $Date: 1997/04/15 17:30:16 $, 
  */
 
 #include <stdio.h>
@@ -150,8 +150,8 @@ static bool privatizer(char *module_name)
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     module = get_current_module_entity();
 
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)) );
+    set_cumulated_rw_effects((statement_effects)
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE) );
     module_to_value_mappings(module);
 
 
@@ -190,7 +190,7 @@ static bool privatizer(char *module_name)
     reset_current_module_statement();
     reset_transformer_map();
     reset_precondition_map();
-    free_cumulated_effects_map();
+    reset_cumulated_rw_effects();
     reset_rw_effects();
     reset_invariant_rw_effects();
     reset_in_effects();
@@ -655,10 +655,8 @@ static text get_privatized_regions_text(string module_name,
     module_stat = get_current_module_statement();
 
     /* To set up the hash table to translate value into value names */       
-    set_cumulated_effects_map
-	(effectsmap_to_listmap
-	 ((statement_mapping)
-	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)) );
+    set_cumulated_rw_effects((statement_effects)
+	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings(module);
 
 
@@ -698,7 +696,7 @@ static text get_privatized_regions_text(string module_name,
     reset_copy_out_effects();
     reset_current_module_entity();
     reset_current_module_statement();
-    free_cumulated_effects_map();
+    reset_cumulated_rw_effects();
 
     return txt;
 }
@@ -919,8 +917,8 @@ declarations_privatizer(char *mod_name)
     module_stat = get_current_module_statement();
     set_current_module_entity( local_name_to_top_level_entity(mod_name) );
     module = get_current_module_entity();
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE)) );
+    set_cumulated_rw_effects((statement_effects)
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE));
     module_to_value_mappings(module);
     
     /* sets dynamic_area */
@@ -989,7 +987,7 @@ declarations_privatizer(char *mod_name)
     dynamic_area = entity_undefined;
     reset_current_module_entity();
     reset_current_module_statement();
-    free_cumulated_effects_map();
+    reset_cumulated_rw_effects();
     reset_rw_effects();
     reset_in_effects();
     reset_out_effects();
