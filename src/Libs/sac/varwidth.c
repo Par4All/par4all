@@ -52,17 +52,12 @@ static bool variables_width_filter(reference r)
    return FALSE; /* do not search recursively */
 }
 
-static void variables_width_rewrite(reference r)
-{
-   return;
-}
-
 int effective_variables_width(instruction i)
 {
    g_varwidth = 0;
 
    gen_recurse( i, reference_domain, 
-		variables_width_filter, variables_width_rewrite);
+		variables_width_filter, gen_null);
 
    return g_varwidth;
 }
