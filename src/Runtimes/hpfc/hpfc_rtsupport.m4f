@@ -747,8 +747,8 @@ _CM5(
       subroutine HPFC RCVFR S(what, goal)
       integer what, goal
       include "hpfc_commons.h"
-      integer bufid, info
-      call HPFC RECEIVE(SENDERLID, RECVCHANNELS(SENDERLID), bufid)
+      integer info
+      call HPFC RECEIVE(SENDERLID, RECVCHANNELS(SENDERLID))
       call HPFC UNPACK(what, goal, 1, 1, info)
       RECVCHANNELS(SENDERLID) = RECVCHANNELS(SENDERLID) + 2
       end
@@ -760,8 +760,8 @@ _CM5(
       subroutine HPFC RCVFR C(what, goal)
       integer what, goal
       include "hpfc_commons.h"
-      integer bufid, info
-      call HPFC RECEIVE(COMPUTERLID, RECVCHANNELS(COMPUTERLID), bufid)
+      integer info
+      call HPFC RECEIVE(COMPUTERLID, RECVCHANNELS(COMPUTERLID))
       call HPFC UNPACK(what, goal, 1, 1, info)
       RECVCHANNELS(COMPUTERLID) = RECVCHANNELS(COMPUTERLID) + 2
       end
@@ -773,8 +773,8 @@ _CM5(
       subroutine HPFC RCVFR H(what, goal)
       integer what, goal
       include "hpfc_commons.h"
-      integer bufid, info
-      call HPFC RECEIVE(HOSTLID, HOST RCV CHANNEL, bufid)
+      integer info
+      call HPFC RECEIVE(HOSTLID, HOST RCV CHANNEL)
       call HPFC UNPACK(what, goal, 1, 1, info)
       HOST RCV CHANNEL = HOST RCV CHANNEL + 2
       debug(print *, MYLID, " receiving from host")
@@ -787,8 +787,8 @@ _CM5(
       subroutine HPFC RCVFR mCS(what, goal)
       integer what, goal
       include "hpfc_commons.h"
-      integer bufid, info
-      call HPFC BCAST RECV(SENDERLID, MCASTNODES, bufid)
+      integer info
+      call HPFC BCAST RECV(SENDERLID, MCASTNODES)
       call HPFC UNPACK(what, goal, 1, 1, info)
       MCASTNODES = MCASTNODES + 2
       end
@@ -800,9 +800,9 @@ _CM5(
       subroutine HPFC RCVFR mCH(what, goal)
       integer what, goal
       include "hpfc_commons.h"
-      integer bufid, info
+      integer info
       debug(print *, "receiving from host")
-      call HPFC BCAST RECV(HOSTLID, MCASTHOST, bufid)
+      call HPFC BCAST RECV(HOSTLID, MCASTHOST)
       call HPFC UNPACK(what, goal, 1, 1, info)
       MCASTHOST = MCASTHOST + 2
       debug(print *, "received!")
@@ -1067,8 +1067,7 @@ _direct(`'
 !
       subroutine HPFC RCVFR N
       include "hpfc_commons.h"
-      integer bufid
-      call HPFC RECEIVE(NEIGHBORLID, RECVCHANNELS(NEIGHBORLID), bufid)
+      call HPFC RECEIVE(NEIGHBORLID, RECVCHANNELS(NEIGHBORLID))
       end
 !
 !-----------------
@@ -1270,7 +1269,7 @@ _direct(`'
       subroutine HPFC NCAST
       include "hpfc_commons.h"
       debug(print *, "ncast ", MY LID, " - ", MCAST HOST)
-      call HPFC BCAST RECV(HOST LID, MCAST HOST, BUFFER ID)
+      call HPFC BCAST RECV(HOST LID, MCAST HOST)
       MCAST HOST = MCAST HOST + 2
       debug(print *, "ncast done")
       end
@@ -1295,8 +1294,7 @@ _direct(`'
       subroutine HPFC RCV FROM HOST
       include "hpfc_commons.h"
       debug(print *, "rcv from host ", MY LID, " - ", HOST RCV CHANNEL)
-      call HPFC RECEIVE(HOST LID, HOST RCV CHANNEL, 
-     $     BUFFER ID)
+      call HPFC RECEIVE(HOST LID, HOST RCV CHANNEL)
       HOST RCV CHANNEL = HOST RCV CHANNEL+2
       debug(print *, "rcv from host done")
       end
@@ -1323,7 +1321,7 @@ _direct(`'
       include "hpfc_commons.h"
       integer lid
       debug(print *, "rcv from node ", lid, " - ", RECV CHANNELS(lid))
-      call HPFC RECEIVE(lid, RECV CHANNELS(lid), BUFFER ID)
+      call HPFC RECEIVE(lid, RECV CHANNELS(lid))
       RECV CHANNELS(lid) = RECV CHANNELS(lid)+2
       debug(print *, "rcv from node done")
       end
