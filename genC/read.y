@@ -60,8 +60,6 @@ static int shared_number ;
    value is negative, then it came from a REF (by READ_TABULATED) and
    no error is reported. */
 
-extern hash_table Gen_tabulated_names;
-
 /* Management of forward references in read */
 
 int allow_forward_ref = FALSE ;
@@ -467,14 +465,16 @@ gen_chunk *String ;
     }
     sscanf( String->s, "%d", &domain ) ;
 
-    if( (hash=(gen_chunk *)hash_get( Gen_tabulated_names, String->s ))
-       == (gen_chunk *)HASH_UNDEFINED_VALUE ) {
+    if( (hash=(gen_chunk *)gen_get_tabulated_name_direct(String->s))
+	== (gen_chunk *)HASH_UNDEFINED_VALUE ) {
 	if( allow_forward_ref ) {
 	    hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
 	    hash->i = -gen_find_free_tabulated( &Domains[ domain ] ) ;
-	    hash_put( Gen_tabulated_names, String->s, (char *)hash ) ;
 
-	    if((Gen_tabulated_[ Int ]+abs( hash->i ))->p != gen_chunk_undefined) {
+	    gen_put_tabulated_name_direct(String->s, (char *)hash) ;
+
+	    if((Gen_tabulated_[ Int ]+abs( hash->i ))->p != 
+	       gen_chunk_undefined) {
 	        fatal("make_ref: trying to re-allocate for %s\n", String->s) ;
 	    }
 	    (Gen_tabulated_[ Int ]+abs( hash->i ))->p = 
