@@ -50,6 +50,10 @@ ifdebug(1){regions_consistent_p(l_reg);}
 #define debug_region_consistency(reg)\
 ifdebug(1){region_consistent_p(reg);}
 
+/* convenient debug messages */
+#define debug_print_region(level, message, region) \
+  ifdebug(level) { pips_debug(level, "%s\n", message); print_region(region);}
+
 /* other things */
 
 #define PHI_PREFIX "PHI"
