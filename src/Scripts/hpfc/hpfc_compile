@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log: hpfc_compile,v $
+# Revision 1.55  1997/10/27 15:53:28  coelho
+# *** empty log message ***
+#
 # Revision 1.54  1997/10/27 15:49:37  coelho
 # dump of generated files.
 #
@@ -256,7 +259,7 @@ set +x
 [ "$DUMPFILES" ] &&
 {
   $verbose "dumping generated files"
-  car $WORKSPACE.database/Src/*.[fh]
+  cat $WORKSPACE.database/Src/*.[fh]
 }
   
 [ "$DELETE" = : ] ||
