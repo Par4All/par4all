@@ -1,5 +1,4 @@
-\documentstyle{article}
-\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\documentstyle[a4]{article}
 
 \newcommand{\domain}[2]{\paragraph{{#1}}{{#2}}}
 
