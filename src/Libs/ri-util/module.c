@@ -349,7 +349,7 @@ get_header_comments(entity module)
     end_of_comment = get_end_of_header_comments(the_comments);
     /* Keep room for the trailing '\0': */
     length = end_of_comment - the_comments;
-    extracted_comment = malloc(length + 1);
+    extracted_comment = (string) malloc(length + 1);
     (void) strncpy(extracted_comment, the_comments, length);
     extracted_comment[length] = '\0';
     return make_sentence(is_sentence_formatted, extracted_comment);  
@@ -383,7 +383,7 @@ get_declaration_comments(entity module)
 		the_comment = strdup(comment);
 	    else {
 		/* Build a string that holds the comment: */
-		the_comment = malloc(next_line - comment + 2);
+		the_comment = (string) malloc(next_line - comment + 2);
 		(void) strncpy(the_comment, comment, next_line - comment + 1);
 		the_comment[next_line - comment + 1] = '\0';
 	    }
