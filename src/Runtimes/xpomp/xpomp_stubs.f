@@ -1,5 +1,5 @@
 ! $RCSfile: xpomp_stubs.f,v $ (version $Revision$)
-! $Date: 1996/08/31 16:48:48 $, 
+! $Date: 1996/09/02 18:33:02 $, 
 !
 ! List of fake functions to have PIPS happy with 
 ! the same « effects » as the xPOMP graphical library.
@@ -69,20 +69,20 @@
       read *, r
       end
 
-      subroutine xpomp_wait_mouse(screen, X, Y, r)
-      integer screen, X, Y, r
+      subroutine xpomp_wait_mouse(screen, X, Y, state, r)
+      integer screen, X, Y, state, r
 !fcd$ io
 !fcd$ fake
       print *, screen
-      read *, X, Y, r
+      read *, X, Y, state, r
       end
 
-      subroutine xpomp_is_mouse(screen, X, Y, r)
-      integer screen, X, Y, r
+      subroutine xpomp_is_mouse(screen, X, Y, state, r)
+      integer screen, X, Y, state, r
 !fcd$ io
 !fcd$ fake
       print *, screen
-      read *, X, Y, r
+      read *, X, Y, state, r
       end
       
       subroutine xpomp_flash(window,
