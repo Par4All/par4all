@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNU,v $ (version $Revision$)
-# $Date: 1996/08/10 11:32:34 $, 
+# $Date: 1996/08/10 15:46:07 $, 
 #
 # this file contains macro definitions 
 
@@ -19,7 +19,7 @@ FFLAGS	= -O2 -g -Wimplicit -pipe
 LINT	= lint
 LINTFLAGS= -habxu
 YACC	= bison
-YFLAGS	= 
+YFLAGS	= -y
 PROTO	= cproto
 PRFLAGS	= -evcf2
 ETAGS	= etags
