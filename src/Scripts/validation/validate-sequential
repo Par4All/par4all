@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/02/05 11:52:32 $, ) 
+# ($Date: 1997/03/27 18:57:03 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -32,6 +32,7 @@
 #  - tmperr added
 #  - source environment if necessary
 
+# Ok at CRI...
 [ "$PIPS_ROOT" ] || . /projects/Pips/pipsrc.sh
 
 [ "$PIPS_VALIDDIR" ] || PIPS_VALIDDIR=$PIPS_ROOT/Validation
@@ -105,6 +106,9 @@ usage()
   exit ${1:-1}
 }
 
+error()
+{ ret=$1; shift; echo "$RCSfile: validate-sequential,v $:" "$@" >&2 ; exit $ret; }
+
 #
 # get options
 
@@ -146,7 +150,7 @@ debug()
 }
 
 RUNDIR=${RUNDIR:-$PWD}
-cd $RUNDIR
+cd $RUNDIR || error 2 "cd $RUNDIR returned $?"
 
 pips_version=${pips_version:-`which_executable pips`}
 tpips_version=${tpips_version:=`which_executable tpips`}
