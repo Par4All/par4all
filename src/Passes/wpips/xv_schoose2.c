@@ -149,14 +149,14 @@ schoose_frame_done_proc(Frame frame)
 
 void
 schoose(char * title,
-        int argc,
-        char * argv[],
+	gen_array_t array,
         char * initial_choice,
         void (*function_for_ok)(char *),
         void (*function_for_cancel)(void))
 {
    int i;
    int nchoices;
+   int argc = gen_array_nitems(array);
 
    apply_on_choice = function_for_ok;
    apply_on_cancel = function_for_cancel;
@@ -172,19 +172,25 @@ schoose(char * title,
           NULL);
 
    for (i = 0; i < argc; i++) {
-      xv_set(choices, PANEL_LIST_STRING, i, argv[i], NULL);
+       string name = gen_array_item(array, i);
+       xv_set(choices, PANEL_LIST_STRING, i, name, NULL);
    }
 
    /* Initialise au choix initial ou à défaut le premier : */
-   xv_set(choice, PANEL_VALUE, argv[0], NULL);
+   xv_set(choice, PANEL_VALUE, gen_array_item(array, 0), NULL);
    if (initial_choice != NULL)
-      for (i = 0; i < argc; i++)
-         if (strcmp(initial_choice, argv[i]) == 0) {
-            xv_set(choice, PANEL_VALUE, argv[i], NULL);
-            xv_set(choices, PANEL_LIST_SELECT, i, TRUE, NULL);
-            break;
-         }
-  
+   {
+       for (i = 0; i < argc; i++) 
+       {
+	   string name = gen_array_item(array, i);
+	   if (strcmp(initial_choice, name) == 0) {
+	       xv_set(choice, PANEL_VALUE, name, NULL);
+	       xv_set(choices, PANEL_LIST_SELECT, i, TRUE, NULL);
+	       break;
+	   }
+       }
+   }
+
    unhide_window(schoose_frame);
    /* move the pointer to the center of the query window */
    pointer_in_center_of_frame(schoose_frame);
