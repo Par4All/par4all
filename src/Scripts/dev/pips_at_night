@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/07/12 10:52:17 $, )
+# ($Date: 1996/07/12 10:54:37 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -33,7 +33,7 @@ usage()
 	  -h: this help
 	  -v: verbose
 	  -c arch: compile for arch (may be a list, default is .)
-	  -a email : address to report (default: \$REPLYTO else \`whoami\`)
+	  -a email: address to report (default: \$REPLYTO else \`whoami\`)
 	  -C: skip cleaning
 	  -N: skip newgen
 	  -L: skip linear
