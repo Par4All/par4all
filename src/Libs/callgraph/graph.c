@@ -6,6 +6,11 @@
  * Code by Corinne Ancourt and Fabien Coelho.
  *
  * $Log: graph.c,v $
+ * Revision 1.3  1998/03/19 20:18:49  coelho
+ * graph_of_calls moved to full_graph_of_calls.
+ * new graph_of_calls deal with a module.
+ * improve output.
+ *
  * Revision 1.2  1998/03/19 17:45:46  coelho
  * this version seems ok.
  *
@@ -24,6 +29,15 @@
 #include "pipsdbm.h"
 
 #define DV_SUFFIX ".daVinci"
+
+static hash_table seen = hash_table_undefined;
+static bool first_seen = FALSE;
+static void init_seen(void) { first_seen = FALSE;
+    seen = hash_table_make(hash_string, 0); }
+static void close_seen(void) { 
+    hash_table_free(seen); seen = hash_table_undefined; }
+static void set_as_seen(string m) { hash_put(seen, (char*) m, (char*) 1); }
+static bool seen_p(string m){ return hash_defined_p(seen, (char*)m); }
 
 /* Build for module name a node and link to its successors.
  * It could be a per module resource, however the callgraph
@@ -46,7 +60,7 @@ node(FILE * out, string name)
     {
 	if (!first) fprintf(out, ",\n");
 	first=FALSE;
-	fprintf(out, "l(\"%s->%s\",e(\"\",[],r(\"%s\")))\n", 
+	fprintf(out, "l(\"%s->%s\",e(\"\",[],r(\"%s\")))", 
 		name, module_called, module_called);
     },
         callees_callees(module_callees));
@@ -55,11 +69,50 @@ node(FILE * out, string name)
     fprintf(out, "\n]))");
 }
 
+static void
+recursive_append(FILE* out, string name)
+{
+    callees l;
+    if (seen_p(name)) return;
+    /* else */
+    if (first_seen) fprintf(out, ",\n");
+    else first_seen = TRUE;
+    node(out, name);
+    set_as_seen(name);
+    l = (callees) db_get_memory_resource(DBR_CALLEES, name, TRUE);
+    MAP(STRING, c, recursive_append(out, c), callees_callees(l));
+}
+
+bool
+graph_of_calls(string name)
+{
+    FILE * out;
+    string dir_name, file_name, full_name;
+    dir_name = db_get_current_workspace_directory();
+    file_name = db_build_file_resource_name(DBR_DVCG_FILE, name, DV_SUFFIX);
+    full_name = strdup(concatenate(dir_name, "/", file_name, 0));
+    free(dir_name), dir_name = NULL;
+    out = safe_fopen(full_name, "w");
+    init_seen();
+    
+    /* do the job here. */
+    fprintf(out, "[\n");
+    recursive_append(out, name);
+    fprintf(out, "]\n");
+		     
+    close_seen();
+    safe_fclose(out, full_name);
+    free(full_name), full_name = NULL;
+    DB_PUT_FILE_RESOURCE(DBR_DVCG_FILE, name, file_name);
+
+    return TRUE;
+}
+
 /* To be called by pipsmake.
  * Generate a global resource, hence name is ignored.
  */
 bool
-graph_of_calls(string name)
+full_graph_of_calls(string name)
 {
     gen_array_t modules = db_get_module_list();
     int n = gen_array_nitems(modules), i;
