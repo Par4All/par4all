@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/06/03 14:14:26 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/06/08 09:07:24 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -138,7 +138,7 @@ char *module_name;
 	  db_get_current_module_name(),
 	  db_get_current_program_directory());
 
-    system(concatenate("$UTILDIR/hpfc_filter < ",
+    system(concatenate("$HPFC_TOOLS/hpfc_filter < ",
 		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
 		       " > ",
 		       db_get_current_program_directory(),
@@ -202,7 +202,7 @@ char *module_name;
     hostfile = (FILE *) safe_fopen(hostfilename, "w");
     hpfc_print_code(hostfile, host_module, hoststat);
     safe_fclose(hostfile, hostfilename);
-    system(concatenate("$UTILDIR/hpfc_add_includes ", 
+    system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
 		       hostfilename, 
 		       " ", 
 		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
@@ -211,7 +211,7 @@ char *module_name;
     nodefile = (FILE *) safe_fopen(nodefilename, "w");
     hpfc_print_code(nodefile, node_module, nodestat);
     safe_fclose(nodefile, nodefilename);
-    system(concatenate("$UTILDIR/hpfc_add_includes ", 
+    system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
 		       nodefilename,
 		       " ", 
 		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
