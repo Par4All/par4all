@@ -166,6 +166,7 @@ typedef int Value;
  * they are switched to some other operation here...
  */
 #if defined(LINEAR_VALUE_IS_CHARS)
+#undef float_to_value
 #define float_to_value(f) ((Value)(int)f)
 #define value_fake_binary(v1,v2) ((char*)((int)(v1)^(int)(v2)))
 #define value_bool_binary(v1,v2) (((int)(v1)^(int)(v2)))
