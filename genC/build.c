@@ -32,9 +32,22 @@
 #include "genC.h"
 #include "newgen_include.h"
 
+
+/* INLINE[] gives, for each inlinable (i.e., unboxed) type, its NAME,
+   its initial VALUE and its printing FORMAT (for each language which can
+   be a target. */
+
+struct inlinable {
+  string name;
+  string C_value;
+  string C_format;
+  string Lisp_value;
+  string Lisp_format;
+};
+
 /* FC: formats are directly inlined in genClib...
  */
-struct inlinable Inline[] = {
+static struct inlinable Inline[] = {
   {UNIT_TYPE_NAME, "U", "U", ":unit", "U"},
   {"bool", "1", "B%d", "newgen:gen-true", "~S"},
   {"char", "#\\a", "#\\%c", "#\\space", "~C"},
@@ -44,7 +57,7 @@ struct inlinable Inline[] = {
   {NULL, "-- HELP --", "-- HELP --", "-- HELP --", "-- HELP --"},
 } ;
 
-char *keywords[] = {
+static char *keywords[] = {
     "external",
     "import",
     "tabulated",
@@ -58,7 +71,7 @@ int Current_index, Current_op, Current_start ;
 /* Warning: this table knows about the actual values used for AND_OP 
    and OR_OP. */
 
-char *Op_names[] = {
+static char *Op_names[] = {
   "-- shouldn't appear --",
   "x",
   "+",
@@ -101,21 +114,16 @@ void user(char * fmt, ...)
 
 /* ITOA (Integer TO Ascii) yields a string for a given Integer. */
 
-char *
-itoa( i )
-     int i ;
+char * itoa(int i)
 {
   static char buf[ 20 ] ;
-
   sprintf( &buf[0], "%d", i ) ;
-  return( buf ) ;
+  return buf;
 }
 
 /* CHECK_NOT_KEYWORD checks if S isn't a reserved word. */
 
-void
-check_not_keyword( s )
-char *s ;
+void check_not_keyword(char *s)
 {
     char **sp ;
 
@@ -126,32 +134,9 @@ char *s ;
     }
 }
 
-/* MAX_TABULATED_ELEMENTS returns the maximum number of elements for 
-   tabulated domains. */
-
-#define DEFAULT_MTE 12000
-
-int max_tabulated_elements(void)
-{
-  static int max = -1 ;
-
-  if(max<0) /* then initialization needed */
-  {
-      char *s = getenv("NEWGEN_MAX_TABULATED_ELEMENTS");
-
-      if (s) 
-	  max = atoi(s); /* value taken from the environment */
-      else
-	  max = DEFAULT_MTE; /* default value assume if nothing specified */
-  }
-
-  return max;
-}
-
 /* INIT initializes global data structures. */
 
-void
-init()
+void init(void)
 {
     struct gen_binding *bp ;
     struct inlinable *ip ;
@@ -163,39 +148,41 @@ init()
 	bp->domain = NULL ;
 	bp->inlined = NULL ;
     }
+
     for( ip = Inline, bp = Domains ; ip->name != NULL ; ip++, bp++ ) {
 	bp->name = ip->name ;
 	bp->compiled = 1 ;
 	bp->inlined = ip ;
     }
-{
-    static union domain d ;
-    static struct intlist il ;
 
-    il.val = max_tabulated_elements() ;
-    il.cdr = (struct intlist *)NULL ;
-
-    bp->name = "Name for tabulated domain" ;
-    bp->domain = &d ;
-    d.ba.type = ARRAY_DT ;
-    d.ar.constructor = "Constructor for tabulated domain" ;
-    d.ar.element = (struct gen_binding *)NULL ;
-    d.ar.dimensions = &il ;
-    Tabulated_bp = bp ;
-}
+    /* Tabulated_bp hack is statically allocated here. */
+    {
+      static union domain d ;
+      static struct intlist il ;
+      
+      il.val = -1; /* max_tabulated_elements() */
+      il.cdr = (struct intlist *) NULL ;
+      
+      bp->name = "Name for tabulated domain" ;
+      bp->domain = &d ;
+      d.ba.type = ARRAY_DT ;
+      d.ar.constructor = "Constructor for tabulated domain" ;
+      d.ar.element = (struct gen_binding *)NULL ;
+      d.ar.dimensions = &il ;
+      Tabulated_bp = bp ;
+    }
+    
     Current_op = UNDEF_OP ;
     error_seen = 0 ;
     Current_index = 0 ;
     Current_start = -1 ;
-    /* Current_first = -1 ; */
 }
 
 static int max_domain = -1 ;
 
-int
-max_domain_index()
+int max_domain_index()
 {
-    return( max_domain ) ;
+  return max_domain;
 }
 
 /* LOOKUP checks whether a given NAME is in the Domains table. If not, the
@@ -203,10 +190,7 @@ max_domain_index()
    is for a new gen_binding, look in the current allocation range, else from
    beginning */
 
-struct gen_binding *
-lookup( name, action )
-char *name ;
-int action ;
+struct gen_binding * lookup(char * name, int action)
 {
     struct gen_binding *bp ;
 
