@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.DEFAULT,v $ (version $Revision$)
-# $Date: 1996/08/13 15:38:00 $, 
+# $Date: 1996/08/20 17:23:48 $, 
 #
 # this file contains macro definitions 
 
@@ -27,6 +27,10 @@ TAR	= tar
 ZIP	= compress
 DIFF	= diff
 M4	= m4
+LX2HTML	= latex2html
+LATEX	= latex
+MAKEIDX	= makeindex
+DVIPS	= dvips
 
 # end of $RCSfile: makefile_macros.DEFAULT,v $
 #
