@@ -1,0 +1,41 @@
+c
+c COMMON /HPFC_BUFFERS/ 
+c
+c $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
+c ($Date: 1995/09/06 18:00:10 $, )
+c
+c buffers to avoid small pvmf(un)pack calls...
+c and to sends buckets of messages if necessary...
+c
+      common /HPFC_BUFFERS/
+     $     BUFINDEX,
+     $     SIZEOFBUFFER,
+     $     BYTE1BUFF(MAXSIZEOFBUFFER),
+     $     LAZYSEND,
+     $     LAZYRECEIVE
+      integer
+     $     BUFINDEX,
+     $     BUFSIZE
+      byte
+     $     BYTE1BUFF
+      logical
+     $     LAZYSEND,
+     $     LAZYRECEIVE
+c
+c buffer to be seen differently somehow...
+c
+      integer*2 INTEGER2BUFF(MAXSIZEOFBUFFER/2)
+      equivalence (BYTE1BUFF, INTEGER2BUFF)
+      integer*4 INTEGER4BUFF(MAXSIZEOFBUFFER/4)
+      equivalence (BYTE1BUFF, INTEGER4BUFF)
+      real*4 REAL4BUFF(MAXSIZEOFBUFFER/4)
+      equivalence (BYTE1BUFF, REAL4BUFF)
+      real*8 REAL8BUFF(MAXSIZEOFBUFFER/8)
+      equivalence (BYTE1BUFF, REAL8BUFF)
+      complex*8 COMPLEX8BUFF(MAXSIZEOFBUFFER/8)
+      equivalence (BYTE1BUFF, COMPLEX8BUFF)
+      complex*16 COMPLEX16BUFF(MAXSIZEOFBUFFER/16)
+      equivalence (BYTE1BUFF, COMPLEX16BUFF)
+c
+c that is all
+c
