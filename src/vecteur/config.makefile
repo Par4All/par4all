@@ -1,6 +1,6 @@
 #
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/08 19:20:14 $, 
+# $Id$
+#
 
 LIB_CFILES=	alloc.c \
 		binaires.c \
@@ -11,11 +11,12 @@ LIB_CFILES=	alloc.c \
 		error.c \
 		private.c \
 		scalaires.c \
-		variable.c
+		variable.c \
+		hashpointer.c
 
 LIB_HEADERS=	vecteur-local.h
 
 LIB_OBJECTS= $(LIB_CFILES:.c=.o) 
- 
+
 # end of $RCSfile: config.makefile,v $
 #
