@@ -31,6 +31,9 @@ char *argv[];
     string name;
     bool status = FALSE;
 
+    pips_assert("create_workspace",
+		db_get_current_workspace()==database_undefined);
+
     for (i = 0; i < *pargc; i++) {
 	status = process_user_file(argv[i]);
 	if (status == FALSE)
@@ -54,6 +57,9 @@ bool open_module_if_unique()
     int  module_list_length = 0;
     bool status = TRUE;
 
+    pips_assert("open_module_if_unique",
+		db_get_current_workspace()!=database_undefined);
+
     /* First parse the makefile to avoid writing
        an empty one */
     (void) parse_makefile();
@@ -73,6 +79,9 @@ char *name;
 {
     bool status;
 
+    pips_assert("open_module",
+		db_get_current_workspace()!=database_undefined);
+
     status = db_set_current_module_name(name);
     reset_unique_variable_numbers();
 
@@ -90,9 +99,14 @@ bool lazy_open_module(name)
 char *name;
 {
     bool status = TRUE;
-    char *current_name = db_get_current_module_name();
+    char *current_name = NULL:
+
+    pips_assert("lazy_open_module",
+		db_get_current_workspace()!=database_undefined);
 
     message_assert("cannot lazy_open no module", name != NULL);
+
+    current_name = db_get_current_module_name();
 
     if (current_name == NULL || strcmp(current_name, name) != 0)
 	status = open_module(name);
