@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1997/02/03 22:26:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_syntax_eval[] = "%A% ($Date: 1997/02/03 22:26:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
 /* This file contains a set of functions to evaluate integer constant
 expressions. The algorithm is built on a recursive analysis of the
 expression structure. Lower level functions are called until basic atoms
@@ -203,7 +209,7 @@ cons *la;
 	}
 	break;
       default:
-	debug(9, "", "[EvalBinaryOp] pas encore d'evaluation\n");
+	debug(9, "EvalBinaryOp", "pas encore d'evaluation\n");
 	gen_free(v);
 	v = MakeValueUnknown();
     }
