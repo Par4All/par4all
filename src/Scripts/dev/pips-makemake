@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 21:51:40 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 21:53:40 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -646,7 +646,7 @@ build-header-file:
 
 # .header carrie all dependencies for INC_TARGET:
 .header: $(TARGET)-local.h $(DERIVED_HEADERS) $(INC_CFILES) 
-	$(MAKE) --no-print-directory build-header-file
+	$(MAKE) --no-print-directory $(HEADER_ARCH) build-header-file
 	touch .header
 
 # checks for the header file, and build if necessary...
@@ -656,7 +656,7 @@ build-header-file:
 header: .header
 
 $(INC_TARGET): $(TARGET)-local.h 
-	$(MAKE) --no-print-directory build-header-file
+	$(MAKE) --no-print-directory $(HEADER_ARCH) build-header-file
 
 %
 
