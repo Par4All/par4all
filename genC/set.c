@@ -39,7 +39,7 @@ void set_clear(), set_free();
 set set_make( typ )
 set_type typ ;
 {
-    set hp = (set)malloc( sizeof( set_chunk )) ;
+    set hp = (set) alloc(sizeof(set_chunk));
 
     if( hp == (set)NULL ) {
 	(void) fprintf( stderr, "set_make: cannot allocate\n" ) ;
