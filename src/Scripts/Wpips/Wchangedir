@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/12 12:51:18 $, 
+# $Date: 1996/09/12 14:37:10 $, 
 #
 # (c) FC September 1996
 #
@@ -67,20 +67,6 @@ proc appenddir { dir newdir } {
 }
 
 #
-# scrolls the entry so that the end is displayed
-#  - entry: the entry window to be dealt with
-#
-# ??? its quite approximative because the width is fixed but the
-#     real # of characters depends on the (not) chosen font.
-#     also it uses a feature of xview which does not add blanks
-#     when trying to scrool to far on the right...
-#
-proc seeentryend { entry } {
-    set i [$entry index end]
-    $entry xview [expr $i<[$entry cget -width]? 0: $i]
-}
-
-#
 # interactive directory choice.
 #  - root: root of the window to create ("" for main window)
 #  - currentdir: default startpoint (may be absolute or relative)
@@ -109,36 +95,36 @@ proc changedir { root currentdir } {
     # top buttons: "/" "Home" "Ok" "Quit"
     #
     frame $root.top 
-    button $root.top.root -text "/" -command {
+    button $root.top.root -text "/" -borderwidth 3 -command {
 	set changedir_dir / 
 	filldirlist $changedir_root.list.dirs $changedir_dir
-        seeentryend $changedir_root.direct.entry
+        $changedir_root.direct.entry xview end
     }
-    button $root.top.home -text "Home" -command {
+    button $root.top.home -text "Home" -borderwidth 3  -command {
 	set changedir_dir $changedir_home; 
 	filldirlist $changedir_root.list.dirs $changedir_dir
-        seeentryend $changedir_root.direct.entry
+        $changedir_root.direct.entry xview end
     }
-    button $root.top.okay -text "Ok" -command {
+    button $root.top.okay -text "Ok" -borderwidth 3 -command {
 	set changedir_result $changedir_dir
         if {$changedir_root == ""} {
 	    puts $changedir_result
 	    exit
 	} 
     }
-    button $root.top.quit -text "Quit" -command {
+    button $root.top.quit -text "Quit" -borderwidth 3 -command {
 	set changedir_dir $changedir_home
 	$changedir_root.top.okay invoke
     }
     pack $root.top.root $root.top.home $root.top.okay $root.top.quit \
-	-side left -expand true -fill x -padx 1m -pady 1m -ipadx 2 -ipady 2
+	-side left -expand true -fill x -padx 2 -pady 2 -ipadx 2 -ipady 2
 
     #
     # direct entry in the middle 
     #
     frame $root.direct
     label $root.direct.lab -text "Directory: "
-    entry $root.direct.entry -width 30 -relief sunken \
+    entry $root.direct.entry -width 30 -relief sunken -borderwidth 3 \
 	-textvariable changedir_dir 
     # <Return> is okay
     bind  $root.direct.entry <Return> {
@@ -154,17 +140,17 @@ proc changedir { root currentdir } {
         set d [winfo width $changedir_root.direct]
 	# ??? well, the next formula is not convincing...
 	# it is not sure to be stable if sg is changed...
-	set n [expr ($d-$l-24)/7]
+	set n [expr ($d-$l-18)/7]
 	set w [%W cget -width]
 	if {$n!=$w} {
 	    %W configure -width $n
-	    seeentryend %W
+	    %W xview end
 	}
     }
 
-    pack  $root.direct.lab -side left -padx 1m -pady 1m -ipadx 2 -ipady 2 
+    pack  $root.direct.lab -side left -padx 2 -pady 2 -ipadx 2 -ipady 2 
     pack  $root.direct.entry -side left \
-	-padx 1m -pady 1m -ipadx 2 -ipady 2 -fill y -expand true
+	-padx 2 -pady 2 -ipadx 2 -ipady 2 -fill y -expand true
 
     #
     # choice from the list
@@ -180,7 +166,7 @@ proc changedir { root currentdir } {
 	    set changedir_dir [appenddir $changedir_dir [%W get $i]]
 	    # update display
 	    filldirlist %W $changedir_dir
-	    seeentryend $changedir_root.direct.entry
+	    $changedir_root.direct.entry xview end
 	}
     }
     pack $root.list.dirs -side left -fill both -expand true \
@@ -195,7 +181,7 @@ proc changedir { root currentdir } {
 
     # set initial display
     filldirlist $root.list.dirs $changedir_dir
-    seeentryend $root.direct.entry
+    $root.direct.entry xview end
 
     if {$root != ""} {
 	# focus and interaction...
