@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/08 16:39:48 $, 
+# $Date: 1996/07/08 16:50:56 $, 
 #
 # Newgen should be quite particular...
 
@@ -68,8 +68,6 @@ INSTALL_EXE= $(ARCH)/newC
 
 #
 # local rules
-
-$(ARCH)/libgenC.a: $(DERIVED_CFILES) $(DERIVED_HEADERS)
 
 $(ARCH)/libgenC.a: $(LIB_OBJECTS)
 	$(RM) $@
