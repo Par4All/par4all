@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/10/05 11:53:47 $, ) 
+ * ($Date: 1995/10/07 22:51:55 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -784,7 +784,10 @@ print_rusage_delta(FILE * buffer,
 
     va_list args;
     va_start(args, format);
-    vfprintf(buffer, format, args);
+    if (buffer)
+        vfprintf(buffer, format, args);
+    else
+        user_log(format, args);
     va_end(args);
 
     u_seconds = out->ru_utime.tv_sec - in->ru_utime.tv_sec;
@@ -795,8 +798,16 @@ print_rusage_delta(FILE * buffer,
     s_micros = out->ru_stime.tv_usec - in->ru_stime.tv_usec;
     if (s_micros<0) s_seconds--, s_micros+=1000000;
 
-    fprintf(buffer, "%ld.%suser ",  u_seconds, string_micros(u_micros));
-    fprintf(buffer, "%ld.%ssystem\n", s_seconds, string_micros(s_micros));
+    if (buffer)
+    {
+        fprintf(buffer, "%ld.%suser ",  u_seconds, string_micros(u_micros));
+        fprintf(buffer, "%ld.%ssystem\n", s_seconds, string_micros(s_micros));
+    }
+    else
+    {
+        user_log("%ld.%suser ", u_seconds, string_micros(u_micros));
+        user_log("%ld.%ssystem\n", s_seconds, string_micros(s_micros));
+    }
 }
 
 /*  remaps src to trg.
@@ -886,7 +897,7 @@ hpf_remapping(
     if (time_remapping)
     {
 	getrusage(RUSAGE_SELF, &stop);
-	print_rusage_delta(stderr, &start, &stop, 
+	print_rusage_delta((FILE*)NULL, &start, &stop, 
 	    "remapping %s -> %s: ", entity_name(src), entity_name(trg));
     }
 
