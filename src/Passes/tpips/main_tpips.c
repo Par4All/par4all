@@ -7,7 +7,7 @@
  * FC.
  */
 
-extern char * pips_thanks(char *);
+extern char * pips_thanks(char *, char *);
 extern int tpips_main(int, char**);
 
 int main(int argc, char ** argv)
