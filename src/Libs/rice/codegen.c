@@ -6,6 +6,82 @@
 
 extern entity current_module_entity;
 
+
+
+/* 
+this function checks if a successor su of a vertex is accessible
+through an arc whose level is less than 'level'
+
+dal is the arc label
+
+level is the minimum level
+*/
+static bool AK_ignore_this_level(dal, level)
+dg_arc_label dal;
+int level;
+{
+    bool true_dep = get_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY" ) ;
+
+    MAPL(pc, {
+	conflict c = CONFLICT(CAR(pc));
+
+	if( conflict_cone(c) != cone_undefined ) {
+	    MAPL(pi, {
+		if( INT(CAR(pi)) >= level ) {
+		    if( true_dep ) {
+			action s = effect_action( conflict_source( c )) ;
+			action k = effect_action( conflict_sink( c )) ;
+
+			return( action_write_p( s ) && action_read_p( k )) ;
+		    } 
+		    else {
+			return(FALSE);
+		    }
+		}, cone_levels(conflict_cone(c)));
+	     }
+	}
+    }, dg_arc_label_conflicts(dal));
+    
+    return(TRUE);
+}
+
+
+
+/* 
+this function checks if a vertex v should be ignored, i.e. does not
+belong to region
+*/
+static bool AK_ignore_this_vertex(region, v)
+set region;
+vertex v;
+{
+    dg_vertex_label dvl = (dg_vertex_label) vertex_vertex_label(v);
+    statement st = ordering_to_statement(dg_vertex_label_statement(dvl));
+
+    return(! set_belong_p(region, (char *) st));
+}
+
+
+
+/*
+this function checks if a successoressor su of a vertex should be ignored,
+i.e.  if it is linked through an arc whose level is less than 'level' or
+if it does not belong to region
+*/
+static bool AK_ignore_this_successor(v, region, su, level)
+vertex v;
+set region;
+successor su;
+int level;
+{
+    if (AK_ignore_this_vertex(region, successor_vertex(su)))
+	return(TRUE);
+
+    return(AK_ignore_this_level((dg_arc_label) successor_arc_label(su), level));
+}
+
+
+
 /* This function checks if conflict c between vertices v1 and v2 should
 be ignored at level l. 
 
@@ -148,7 +224,7 @@ int level;
 	    vertex vs = successor_vertex(su);
 	    statement s2 = vertex_to_statement(vs);
 
-	    if (! ignore_this_vertex(region, vs)) {
+	    if (! AK_ignore_this_vertex(region, vs)) {
 		dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
 		MAPL(pc, {
 		    conflict c = CONFLICT(CAR(pc));
@@ -199,7 +275,7 @@ int l;
     /* if there is a dependence from v to v, s is strongly connected */
     MAPL(ps, {
 	successor s = SUCCESSOR(CAR(ps));
-	if (!ignore_this_level((dg_arc_label) successor_arc_label(s), l) && 
+	if (!AK_ignore_this_level((dg_arc_label) successor_arc_label(s), l) && 
 	    successor_vertex(s) == v)
 	    return(TRUE);
     }, vertex_successors(v));
@@ -286,7 +362,8 @@ statement MakeNestOfStatementList(int l, int nbl,list *lst, list loops, list * b
 /* this function implements Kennedy's algorithm. */
 /* bb: task_parallelize_p is TRUE when we want to parallelize the loop, 
 FALSE when we only want to vectorize it */
-statement CodeGenerate(g, region, l, task_parallelize_p)
+statement CodeGenerate(stat, g, region, l, task_parallelize_p)
+statement stat; /* Not used in this function */
 graph g;
 set region;
 int l;
@@ -309,7 +386,10 @@ bool task_parallelize_p;
 	print_statement_set(stderr, region);
  
     debug(9, "CodeGenerate", "finding and top-sorting sccs ...\n");
+    set_sccs_drivers(&AK_ignore_this_vertex, &AK_ignore_this_successor);
     lsccs = FindAndTopSortSccs(g, region, l);
+    reset_sccs_drivers();
+
 
     debug(9, "CodeGenerate", "generating code ...\n");
     for (ps = lsccs; ps != NULL; ps = CDR(ps)) {
@@ -544,7 +624,8 @@ bool task_parallelize_p;
 	 && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?
 	FALSE : task_parallelize_p;
 
-    inner_stat = CodeGenerate(g, inner_region, l+1, task_parallelize_inner);
+    /* CodeGenerate don't use the first parameter... */
+    inner_stat = CodeGenerate(/* big hack */ statement_undefined, g, inner_region, l+1, task_parallelize_inner);
 
     set_free(inner_region);
 
