@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.22  2003/08/18 14:35:30  coelho
+  callback commented out.
+
   Revision 1.21  2003/08/18 14:15:17  coelho
   callback added.
 
@@ -192,7 +195,7 @@ push_exception_on_stack(
   exception_stack[exception_index].file = file;
   exception_stack[exception_index].line = line;
 
-  if (callback) callback(exception_index);
+  /* if (callback) callback(exception_index); */
 
   return & exception_stack[exception_index++].where;
 }
@@ -244,7 +247,7 @@ pop_exception_from_stack(
     abort();
   }
 
-  if (callback) callback(exception_index);
+  /* if (callback) callback(exception_index); */
 }
 
 /* throws an exception of a given type by searching for 
@@ -286,7 +289,7 @@ void throw_exception(
 		exception_stack[i].file,
 		exception_stack[i].line);
 
-      if (callback) callback(i);
+      /* if (callback) callback(i); */
 
       longjmp(exception_stack[i].where, 0);
     }
