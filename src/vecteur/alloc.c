@@ -4,9 +4,8 @@
 
 /*LINTLIBRARY*/
 
-#include <sys/types.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdarg.h>
 
 #include "boolean.h"
@@ -85,13 +84,13 @@ Variable var;
 Value coeff;
 {
     Pvecteur v;
-    extern int etext;
 
     if(coeff!=0) {
 	v = (Pvecteur) MALLOC(sizeof(Svecteur),VECTEUR,"vect_new");
 	if (v == NULL) {
 	    (void) fprintf(stderr,"vect_new: Out of memory space\n");
-	    fprintf(stderr, "%10.3f MB", (sbrk(0) - etext)/(double)(1 << 20));
+	    /* fprintf(stderr, "%10.3f MB", 
+	       (sbrk(0) - etext)/(double)(1 << 20)); // not portable */
    	    abort();
 	    /*exit(-1);*/
 	}
