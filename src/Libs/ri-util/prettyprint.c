@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/12/17 10:35:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/12/26 11:29:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/17 10:35:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/26 11:29:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1993,6 +1993,55 @@ int precedence;
     return(pc);
 }
 
+cons *words_substring_op(obj, precedence)
+call obj;
+int precedence;
+{
+  /* The substring function call is reduced to a syntactic construct */
+    cons *pc = NIL;
+    expression r = expression_undefined;
+    expression l = expression_undefined;
+    expression u = expression_undefined;
+    /* expression e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj)))))); */
+    int prec = words_intrinsic_precedence(obj);
+
+    pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 3 || 
+		gen_length(call_arguments(obj)) == 4);
+
+    r = EXPRESSION(CAR(call_arguments(obj)));
+    l = EXPRESSION(CAR(CDR(call_arguments(obj))));
+    u = EXPRESSION(CAR(CDR(CDR(call_arguments(obj)))));
+
+    pc = gen_nconc(pc, words_subexpression(r,  prec));
+    pc = CHAIN_SWORD(pc, "(");
+    pc = gen_nconc(pc, words_subexpression(l, prec));
+    pc = CHAIN_SWORD(pc, ":");
+    pc = gen_nconc(pc, words_subexpression(u, prec));
+    pc = CHAIN_SWORD(pc, ")");
+
+    return(pc);
+}
+
+cons *words_assign_substring_op(obj, precedence)
+call obj;
+int precedence;
+{
+  /* The assign substring function call is reduced to a syntactic construct */
+    cons *pc = NIL;
+    expression e = expression_undefined;
+    int prec = words_intrinsic_precedence(obj);
+
+    pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 4);
+
+    e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj))))));
+
+    pc = gen_nconc(pc, words_substring_op(obj,  prec));
+    pc = CHAIN_SWORD(pc, " = ");
+    pc = gen_nconc(pc, words_subexpression(e, prec));
+
+    return(pc);
+}
+
 cons *words_nullary_op(obj, precedence)
 call obj;
 int precedence;
@@ -2247,9 +2296,12 @@ struct intrinsic_handler {
     {"STOP", words_nullary_op, 0},
     {"CONTINUE", words_nullary_op, 0},
     {"END", words_nullary_op, 0},
-    {"FORMAT", words_prefix_unary_op, 0},
+    {FORMAT_FUNCTION_NAME, words_prefix_unary_op, 0},
     {UNBOUNDED_DIMENSION_NAME, words_unbounded_dimension, 0},
     {LIST_DIRECTED_FORMAT_NAME, words_list_directed, 0},
+
+    {SUBSTRING_FUNCTION_NAME, words_substring_op, 0},
+    {ASSIGN_SUBSTRING_FUNCTION_NAME, words_assign_substring_op, 0},
 
     {NULL, null, 0}
 };
