@@ -112,11 +112,9 @@ dead_test_filter(statement true, statement false)
     debug(5, "dead_test_filter", "Begin\n");
 
    ifdebug(9) {
-      fprintf(stderr, "dead_test_filter, then branch: 0x%x\n",
-              (unsigned int) true);
+      fprintf(stderr, "dead_test_filter, then branch: %p\n", true);
       print_text(stderr, text_statement(get_current_module_entity(), 0, true));
-      fprintf(stderr, "dead_test_filter, false branch: 0x%x\n",
-              (unsigned int) false);
+      fprintf(stderr, "dead_test_filter, false branch: %p\n", false);
       print_text(stderr, text_statement(get_current_module_entity(), 0, false));
    }
 
