@@ -6,6 +6,9 @@
  * Code by Corinne Ancourt and Fabien Coelho.
  *
  * $Log: graph.c,v $
+ * Revision 1.4  1998/03/20 08:28:29  coelho
+ * prettier, and more comments.
+ *
  * Revision 1.3  1998/03/19 20:18:49  coelho
  * graph_of_calls moved to full_graph_of_calls.
  * new graph_of_calls deal with a module.
@@ -30,15 +33,6 @@
 
 #define DV_SUFFIX ".daVinci"
 
-static hash_table seen = hash_table_undefined;
-static bool first_seen = FALSE;
-static void init_seen(void) { first_seen = FALSE;
-    seen = hash_table_make(hash_string, 0); }
-static void close_seen(void) { 
-    hash_table_free(seen); seen = hash_table_undefined; }
-static void set_as_seen(string m) { hash_put(seen, (char*) m, (char*) 1); }
-static bool seen_p(string m){ return hash_defined_p(seen, (char*)m); }
-
 /* Build for module name a node and link to its successors.
  * It could be a per module resource, however the callgraph
  * is not expected to change often, and we can avoid to manipulate
@@ -53,22 +47,37 @@ node(FILE * out, string name)
     module_callees = (callees) db_get_memory_resource(DBR_CALLEES, name, TRUE);
 
     /* daVinci node prolog. */
-    fprintf(out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"%s\")],[\n", name, name);
+    fprintf(out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"%s\")],[", name, name);
 
     /* one edge per callee */
     MAP(STRING, module_called, 
     {
 	if (!first) fprintf(out, ",\n");
-	first=FALSE;
-	fprintf(out, "l(\"%s->%s\",e(\"\",[],r(\"%s\")))", 
+	else { fprintf(out, "\n"); first=FALSE; }
+	fprintf(out, " l(\"%s->%s\",e(\"\",[],r(\"%s\")))", 
 		name, module_called, module_called);
     },
         callees_callees(module_callees));
 
     /* node epilog */
-    fprintf(out, "\n]))");
+    fprintf(out, "]))");
 }
 
+/* static function to store whether a module has been seen during the 
+ * recursive generation of the daVinci file.
+ */
+static hash_table seen = hash_table_undefined;
+static bool first_seen = FALSE;
+static void init_seen(void) { first_seen = FALSE;
+    seen = hash_table_make(hash_string, 0); }
+static void close_seen(void) { 
+    hash_table_free(seen); seen = hash_table_undefined; }
+static void set_as_seen(string m) { hash_put(seen, (char*) m, (char*) 1); }
+static bool seen_p(string m){ return hash_defined_p(seen, (char*)m); }
+
+/* generates into "out" a davinci node for module "name", 
+ * and recurse to its not yet seen callees.
+ */
 static void
 recursive_append(FILE* out, string name)
 {
@@ -83,6 +92,9 @@ recursive_append(FILE* out, string name)
     MAP(STRING, c, recursive_append(out, c), callees_callees(l));
 }
 
+/* to be called by pipsmake.
+ * builds the daVinci file for module "name".
+ */
 bool
 graph_of_calls(string name)
 {
