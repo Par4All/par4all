@@ -22,6 +22,7 @@
 
 /* to be included for _MIN and _MAX: #include <limits.h>
  */
+#include <limits.h>
 
 /* gnu and sun do not have the same conventions for "long long"
  */
