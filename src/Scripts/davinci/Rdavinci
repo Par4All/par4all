@@ -1,0 +1,9 @@
+# petit filtre pour afficher les Use-Def d'un workspace $1 
+# et d'une procedure $2
+# Pour plus de clarete sont filtres les noms des procedures et les effects Read-Write
+# Sont affiches les noms des commons et des variables pour lesquelles il y a dependance
+
+sort -u $1.database/$2/$2.dg | sed '/^\([0-9]*\) \1 /d;/IO_EFFECTS/d;s/[RW] [RW]/O N/;s/<\([^:]*\):\([^:]*\):\([^:>]*\)>/<\1:\3>/g' | sort -u > tmpdavinci2
+
+perl filtre.pl tmpdavinci2 > cg2.daVinci
+
