@@ -17,6 +17,7 @@
 #include "sg.h"
 #include "polyedre.h"
 
+
 /* IRISA/POLYLIB data structures.
  */
 #include "polylib/polylib.h"
@@ -39,6 +40,27 @@
 
 #define VALUE_TO_IRINT(val) (val)
 #define IRINT_TO_VALUE(i) (i)
+
+/*****duong - set timeout with signal and alarm*****/
+#include <signal.h>
+#define SC_CONVEX_HULL_TIMEOUT 180 //3 minutes
+
+boolean SC_CONVEX_HULL_timeout = FALSE;
+
+void 
+catch_alarm_SC_CONVEX_HULL (int sig)
+{  
+  fprintf(stderr,"CATCH ALARM sc_convex_hull !!!\n");
+  //put inside CATCH(any_exception_error) alarm(0); //clear the alarm
+  SC_CONVEX_HULL_timeout = TRUE;
+
+  THROW(timeout_error);
+}
+
+EXCEPTION timeout_error; // needed for sc_convex_hull
+// I saw a CATCH(any_exception_error) inside sc_convex_hull, 
+// That's why I put the timeout here.
+/*****duong*****/
 
 static void my_Matrix_Free(Matrix ** m)
 {
@@ -429,7 +451,8 @@ Ptsg  sc_to_sg_chernikova(Psysteme sc)
       sg = sg_new();
       nbrows = sc->nb_eq + sc->nb_ineq + 1;
       nbcolumns = sc->dimension +2;
-      sg->base = base_dup(sc->base);
+      sg->base = base_copy(sc->base);
+      //replace base_dup, which changes the pointer given as parameter
       a = Matrix_Alloc(nbrows, nbcolumns);
       sc_to_matrix(sc,a);
       
@@ -468,7 +491,8 @@ Psysteme sg_to_sc_chernikova(Ptsg sg)
     {
 
     sc = sc_new();
-    sc->base = base_dup(sg->base);
+    sc->base = base_copy(sg->base);
+    //replace base_dup, which changes the pointer given as parameter
     sc->dimension = vect_size(sc->base);
 
     if (sg_nbre_droites(sg)+sg_nbre_rayons(sg)+sg_nbre_sommets(sg)) {
@@ -490,7 +514,8 @@ Psysteme sg_to_sc_chernikova(Ptsg sg)
 	if (sc == NULL) {
 	    Pcontrainte pc = contrainte_make(vect_new(TCST, VALUE_ONE));
 	    sc = sc_make(pc, CONTRAINTE_UNDEFINED);
-	    sc->base = base_dup(sg->base);
+	    sc->base = base_copy(sg->base);
+	    //replace base_dup, which changes the pointer given as parameter
 	    sc->dimension = vect_size(sc->base);	}
 
     }
@@ -520,8 +545,12 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     unsigned int i1,i2,j;
     int Dimension,cp;
 
+    char * filename;
+    char * label;
+
     CATCH(any_exception_error)
     {
+
       if (a) my_Matrix_Free(&a);
       if (a1) my_Matrix_Free(&a1);
       if (a2) my_Matrix_Free(&a2);
@@ -530,6 +559,34 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
       if (A2) my_Polyhedron_Free(&A2);
       if (sc) sc_rm(sc);
       
+      alarm(0);//clear the alarm. 
+      //There's maybe exceptions rethrown by polylib. 
+      //So clear alarm in catch_alarm_sc_convex_hull is not enough
+      
+      if (SC_CONVEX_HULL_timeout) {
+
+	SC_CONVEX_HULL_timeout = FALSE;
+
+	fprintf(stderr,"\n *** * *** Timeout from polyedre/chernikova : sc_convex_hull !!! \n");
+	
+	//We can change to print to stderr by using sc_default_dump(sc). duong
+
+	/* need to install sc before to run, because of Production/Include/sc.h
+        ifscprint(4) {
+	  // if  print to stderr
+	  //fprintf(stderr, "Timeout [sc_convex_hull] considering:\n");
+	  //sc_default_dump(sc1) 
+	  //sc_default_dump(sc2)	  
+	  filename = "convex_hull_fail_sc_dump.out";
+	  label = "LABEL - Timeout with sc_convex_hull considering: *** * *** SC ";
+	  sc_default_dump_to_file(sc1,label,1,filename);
+	  label = "                                                 *** * *** SC ";
+	  sc_default_dump_to_file(sc2,label,2,filename);	
+	}
+	*/
+      }
+
+      fprintf(stderr,"\nThis is an exception rethrown from sc_convex_hull(): \n ");
       RETHROW();
     }
     TRY 
@@ -537,7 +594,13 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 
     assert(!SC_UNDEFINED_P(sc1) && (sc_dimension(sc1) != 0));
     assert(!SC_UNDEFINED_P(sc2) && (sc_dimension(sc2) != 0));
-    
+
+   
+
+    //start the alarm
+    signal(SIGALRM, catch_alarm_SC_CONVEX_HULL);   
+    alarm(SC_CONVEX_HULL_TIMEOUT);
+
     ifscdebug(7) {
 	fprintf(stderr, "[sc_convex_hull] considering:\n");
 	sc_default_dump(sc1);
@@ -558,7 +621,12 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     nbcolumns2 = sc2->dimension +2;
     a2 = Matrix_Alloc(nbrows2, nbcolumns2);
     sc_to_matrix(sc2,a2);
-
+    /*duong
+    fprintf(stderr, "[sc_convex_hull]\na1 =");
+	Matrix_Print(stderr, "%4d",a1);
+	fprintf(stderr, "\na2 =");
+	Matrix_Print(stderr, "%4d",a2);
+    */
     ifscdebug(8) {
 	fprintf(stderr, "[sc_convex_hull]\na1 =");
 	Matrix_Print(stderr, "%4d",a1);
@@ -567,8 +635,19 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     }
 
     A1 = Constraints2Polyhedron(a1, MAX_NB_RAYS);
+   
+    /*duong
+    fprintf(stderr, "[sc_convex_hull]\nA1 (%p %p)=", A1, a1);
+	Polyhedron_Print(stderr, "%4d",A1);	
+    */
     my_Matrix_Free(&a1); 
+
     A2 = Constraints2Polyhedron(a2, MAX_NB_RAYS);
+   
+    /*duong
+    fprintf(stderr, "[sc_convex_hull]\nA2 (%p %p)=", A2, a2);
+	Polyhedron_Print(stderr, "%4d",A2);
+    */
     my_Matrix_Free(&a2);
 
     ifscdebug(8) {
@@ -579,7 +658,8 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     }
     
     sc = sc_new();
-    sc->base = base_dup(sc1->base);
+    sc->base = base_copy(sc1->base);
+    //replace base_dup, which changes the pointer given as parameter
     sc->dimension = vect_size(sc->base);
 
     if (A1->NbRays == 0) {
@@ -661,14 +741,16 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     if (sc == NULL) {
 	Pcontrainte pc = contrainte_make(vect_new(TCST, VALUE_ONE));
 	sc = sc_make(pc, CONTRAINTE_UNDEFINED);
-	sc->base = base_dup(sc1->base);
+	sc->base = base_copy(sc1->base);
+	//replace base_dup, which changes the pointer given as parameter
 	sc->dimension = vect_size(sc->base);
     }
 
     } /* end TRY */
+    
+    alarm(0); //clear the alarm
 
     UNCATCH(any_exception_error);
 
     return sc;
 }
-
