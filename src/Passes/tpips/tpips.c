@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.120  2003/08/18 09:42:09  coelho
+ * exception handling with linear stuff.
+ *
  * Revision 1.119  2003/08/04 09:33:53  irigoin
  * Warning amplified to provide a possibly useful clue to the user
  *
@@ -150,7 +153,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
-#include <setjmp.h>
 #include <strings.h>
 #include <sys/param.h>
 
@@ -669,9 +671,6 @@ static void tpips_user_error(
     string a_message_format,
     va_list *some_arguments)
 {
-    /* extern jmp_buf pips_top_level; */
-    jmp_buf * ljbp = 0;
-
    /* print name of function causing error and
     * print out remainder of message 
     */
@@ -680,22 +679,20 @@ static void tpips_user_error(
 
     if (jpips_is_running)
     {
-	jpips_tag(BEGIN_UE);
-	jpips_printf("%s\n", calling_function_name);
-	jpips_string(a_message_format, some_arguments);
-	jpips_tag(END_UE);
+      jpips_tag(BEGIN_UE);
+      jpips_printf("%s\n", calling_function_name);
+      jpips_string(a_message_format, some_arguments);
+      jpips_tag(END_UE);
     }
     
     /* terminate PIPS request */
-    if (get_bool_property("ABORT_ON_USER_ERROR")) {
-	pips_user_warning("Abort on user error requested!\n");
-	abort();
+    if (get_bool_property("ABORT_ON_USER_ERROR")) 
+    {
+      pips_user_warning("Abort on user error requested!\n");
+      abort();
     }
-    else
-	/* longjmp(pips_top_level, 2); */
-	ljbp = top_pips_context_stack();
 
-    longjmp(*ljbp, 2);
+    THROW(user_exception_error);
 }
 
 /*  returns the allocated full tpips history file name, i.e.
@@ -1022,8 +1019,6 @@ static bool blank_or_comment_line_p(string line)
 
 static void tpips_exec(char * line)
 {
-    jmp_buf pips_top_level;
-
     pips_debug(3, "considering line: %s\n", line? line: " --- empty ---");
 
     /* does not make much sense here... FC. 
@@ -1034,17 +1029,15 @@ static void tpips_exec(char * line)
     }
     */
 
-    if (setjmp(pips_top_level)) 
+    CATCH(any_exception_error)
     {
 	pips_debug(2, "restating tpips scanner\n");
 	tp_restart(tp_in);
     }
-    else 
+    TRY
     {
 	char * sline; /* after environment variable substitution */
 	
-	push_pips_context(&pips_top_level);
-
 	if (use_readline && line)
 	    add_history(strdup(line));
 
@@ -1066,9 +1059,9 @@ static void tpips_exec(char * line)
 	sline = tp_substitutions(line);
 	handle(sline);
 	free(sline), sline = (char*) NULL;
-    }
 
-    pop_pips_context();
+	UNCATCH(any_exception_error);
+    }
 }
 
 /* processing command line per line. 
