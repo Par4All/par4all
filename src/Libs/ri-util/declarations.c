@@ -3,6 +3,12 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.24  2003/08/12 12:37:55  irigoin
+ * Declarations cannot be globally sorted. Parameters at least must be
+ * declared in an order avoiding forward referencing. Since they are gathered
+ * by the same loop as the other declarations, all of them are not sorted. To
+ * make some progress in sorting, the loop should be distributed.
+ *
  * Revision 1.23  2003/08/11 16:21:44  irigoin
  * Sort added before declarations are regenerated.
  *
@@ -1298,9 +1304,16 @@ text_entity_declaration(
   text r, t_chars = make_text(NIL), t_area = make_text(NIL); 
   string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
   bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
+  /* Declarations cannot be sorted out because Fortran standard impose at
+  least an order on parameters. Fortunately here, PARAMETER are mostly
+  integers, defined from other integer parameters... I assume that PIPS
+  would fail with an ENTRY areferencing an integer array dimensionned with
+  a real parameter. But real parameters are not really well processed by
+  PIPS...
+
   list sorted_ldecl = gen_copy_seq(ldecl);
 
-  gen_sort_list(sorted_ldecl, compare_entities);
+  gen_sort_list(sorted_ldecl, compare_entities); */
      
   /* where to put the dimension information.
    */
@@ -1551,7 +1564,7 @@ text_entity_declaration(
 				basic_tag(b));
 	  }
       }
-  }, sorted_ldecl);
+  }, /* sorted_ */ ldecl);
     
   /* usually they are sorted in order, and appended backwards,
    * hence the reversion.
@@ -1598,7 +1611,7 @@ text_entity_declaration(
 
   /* and EQUIVALENCE statements... - BC 
    */
-  MERGE_TEXTS(r, text_equivalences(module, sorted_ldecl, 
+  MERGE_TEXTS(r, text_equivalences(module, /* sorted_ */ ldecl, 
 				   pp_cinc || !print_commons));
 
   /* what about DATA statements! FC 
@@ -1611,7 +1624,7 @@ text_entity_declaration(
   }
   */
 
-  gen_free_list(sorted_ldecl);
+  /* gen_free_list(sorted_ldecl); */
 
   return r;
 }
