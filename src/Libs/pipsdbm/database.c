@@ -22,9 +22,9 @@
 #define db_resource_loaded_and_stored_p(r) \
         db_status_loaded_and_stored_p(db_resource_db_status(r))
 
-/* module names must use some characters.
+/* Module names must use some characters. Upper case letters and underscore for Fortran, but also lower case letters and the FILE_SEP_STRING
  */
-#define MODULE_NAME_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
+#define MODULE_NAME_CHARS ("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdefghijklmnopqrstuvwxyz" FILE_SEP_STRING)
 
 static bool simple_name_p(string name)
 {
@@ -792,7 +792,7 @@ bool db_set_current_module_name(string name)
 	init_owned_resources_if_necessary(name);
 	ok = TRUE;
     } else /* can be rejected softly */
-	pips_user_warning("invalid module name %s\n", name);
+	pips_user_warning("invalid module name \"%s\"\n", name);
     return ok;
 }
 
