@@ -77,8 +77,9 @@ void print_pips_context_stack()
 
     (void) printf("Debug stack (last debug_on first): ");
     for(i=pcsp;i>=0;i--) {
-	(void) printf("Debug stack pointer: %d ",
-		      pips_context_stack[i].debug_stack_pointer);
+	(void) printf("Debug stack pointer %d: debug level %d, long jump %p\n ", i,
+		      pips_context_stack[i].debug_stack_pointer,
+		      pips_context_stack[i].long_jump_buffer);
     }
 }
 
