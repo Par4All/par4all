@@ -62,6 +62,7 @@
 #define UNARY_MINUS_OPERATOR_NAME "--"
 #define MULTIPLY_OPERATOR_NAME "*"
 #define DIVIDE_OPERATOR_NAME "/"
+#define POWER_OPERATOR_NAME "**"
 #define MODULO_OPERATOR_NAME "MOD"
 #define MIN_OPERATOR_NAME "MIN"
 #define MIN0_OPERATOR_NAME "MIN0"
@@ -112,12 +113,20 @@
 				   UNARY_MINUS_OPERATOR_NAME) == 0)
 #define ENTITY_MULTIPLY_P(e) (strcmp(entity_local_name(e), \
 				   MULTIPLY_OPERATOR_NAME) == 0)
+#define ENTITY_MODULO_P(e) (strcmp(entity_local_name(e), \
+				   MODULO_OPERATOR_NAME) == 0)
+#define ENTITY_POWER_P(e) (strcmp(entity_local_name(e), \
+				   POWER_OPERATOR_NAME) == 0)
 #define ENTITY_DIVIDE_P(e) (strcmp(entity_local_name(e), \
 				   DIVIDE_OPERATOR_NAME) == 0)
 #define ENTITY_MIN_P(e) (strcmp(entity_local_name(e), \
 				MIN_OPERATOR_NAME) == 0)
 #define ENTITY_MAX_P(e) (strcmp(entity_local_name(e), \
 				MAX_OPERATOR_NAME) == 0)
+#define ENTITY_MIN0_P(e) (strcmp(entity_local_name(e), \
+				MIN0_OPERATOR_NAME) == 0)
+#define ENTITY_MAX0_P(e) (strcmp(entity_local_name(e), \
+				MAX0_OPERATOR_NAME) == 0)
 #define ENTITY_MIN_OR_MAX_P(e) (ENTITY_MIN_P(e) || \
 				 ENTITY_MAX_P(e) )
 
