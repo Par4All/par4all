@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.50  1997/04/07 09:27:33  coelho
+ * lattice extraction for the basic enumeration.
+ *
  * Revision 1.49  1997/03/20 10:25:44  coelho
  * RCS headers.
  *
@@ -1063,8 +1066,16 @@ hpf_remapping(
     sc_transform_ineg_in_eg(proc);
     sc_transform_ineg_in_eg(enume);
 
-    if (sc_egalites(proc) || sc_egalites(enume))
-	hpfc_warning("lattice extraction not implemented\n");
+    if (sc_egalites(proc))
+	hpfc_warning("lattice extraction not implemented (proc)\n");
+
+
+    if (sc_egalites(enume))
+    {
+	list ns = NIL;
+	extract_lattice(enume, scanners, &ns, &lddc);
+	gen_free_list(scanners), scanners=ns;
+    }
 
     DEBUG_SYST(3, "proc", proc);
     DEBUG_SYST(3, "enum", enume);
