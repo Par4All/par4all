@@ -179,7 +179,7 @@ add_to_current_line(
     stmp = continuation[0];
     comment = stmp == 'c'|| stmp == 'C'	|| stmp == '!'|| stmp == '*';
     
-    if (strlen(buffer) + lappend + 2 > MAX_LINE_LENGTH)
+    if (strlen(buffer) + lappend + 2 > MAX_LINE_LENGTH) {
 	/* this shouldn't happen. 
 	 * it can occur if lappend+lcontinuation is too large.
 	 */
@@ -196,7 +196,7 @@ add_to_current_line(
 	}
 	else 
 	    pips_internal_error("line code too large...\n");
-
+    }
     else if (! same_string_p(append, " ") 
 	     || ! same_string_p(buffer, continuation))
 	strcat(buffer, append);
