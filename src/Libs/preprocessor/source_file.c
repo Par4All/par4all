@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.107  2003/09/04 11:16:33  coelho
+ * test return status of fpp...
+ *
  * Revision 1.106  2003/09/03 16:26:42  irigoin
  * return code added to signal error in compilation
  *
@@ -809,8 +812,7 @@ static string process_thru_C_cpp(string name)
 		   name, " > ", new_name, " 2> ", cpp_err, 0));
 
     if(status) {
-      (void) safe_system_no_abort
-	(concatenate("cat ", cpp_err, 0));
+      (void) safe_system_no_abort(concatenate("cat ", cpp_err, 0));
 
       /* check "test" could be performed before "cat" but not after, and
 	 the error file may be useful for the user. Why should we remove
@@ -828,6 +830,7 @@ static string process_thru_C_cpp(string name)
 static string process_thru_fortran_cpp(string name)
 {
     string dir_name, new_name, simpler, cpp_options, cpp, cpp_err;
+    int status;
 
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".F");
@@ -854,12 +857,21 @@ static string process_thru_fortran_cpp(string name)
 
        See preprocessor/Validation/csplit09.tpips */
 
-    safe_system(concatenate(cpp? cpp: CPP_CPP, 
-			    CPP_CPPFLAGS, cpp_options? cpp_options: "", 
-			    name, " > ", new_name, " 2> ", cpp_err, 
-			    " && cat ", cpp_err, 
-			    " && test ! -s ", cpp_err, 
-			    " && rm -f ", cpp_err, 0));
+    status = safe_system_no_abort(concatenate(cpp? cpp: CPP_CPP, 
+				 CPP_CPPFLAGS, cpp_options? cpp_options: "", 
+				 name, " > ", new_name, " 2> ", cpp_err, 
+				 " && cat ", cpp_err, 
+         			 " && test ! -s ", cpp_err, 
+			         " && rm -f ", cpp_err, 0));
+
+    /* fpp was wrong... */
+    if (status)
+    {
+      /* show errors */
+      (void) safe_system_no_abort(concatenate("cat ", cpp_err, 0));
+      free(new_name);
+      new_name = NULL;
+    }
 
     return new_name;
 }
