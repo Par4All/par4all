@@ -180,15 +180,13 @@ extern void gen_core GEN_PROTO((void *)) ;
 
 extern void gen_recurse_stop GEN_PROTO((void *));
 extern void gen_multi_recurse GEN_PROTO((void *, ...));
+extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
 
-#define gen_recurse(s,d,f,r) gen_multi_recurse(s,d,f,r,NULL)
+#define gen_recurse(s,d,f,r) \
+        gen_multi_recurse(s,d,f,r,NULL)
 
-/*
-extern void gen_recurse GEN_PROTO((void *,
-				   int, 
-				   bool (*)(void *), 
-				   void (*)(void *))) ;
-				   */
+#define gen_context_recurse(s,c,d,f,r) \
+        gen_context_multi_recurse(s,c,d,f,r,NULL)
 
 /* Since C is not-orthogonal (chunk1 == chunk2 is prohibited),
  * this one is needed.
