@@ -182,9 +182,9 @@ static bool call_flt(call c)
 	/* retrieve the caller entity */
 	set_current_module_entity(e_caller);
 	/* append the callee' icfg */
-	/*append_icfg_file (r, callee_name);*/
+	append_icfg_file (r, callee_name);
 	/* store it to the statement mapping */
-	/*update_statement_icfg (current_stmt_head(), r);*/
+	update_statement_icfg (current_stmt_head(), r);
     }
     return value_code_p(entity_initial(e_callee));
 }
@@ -194,9 +194,9 @@ static void call_rwt(call c)
   /*entity e_caller = get_current_module_entity();
   reset_current_module_entity();
   set_current_module_entity(e_caller);*/
-  text r = (text) load_statement_icfg(current_stmt_head());
+  /*text r = (text) load_statement_icfg(current_stmt_head());
   append_marged_text(r, current_margin, "CALL ", module_local_name(call_function(c)));
-  update_statement_icfg(current_stmt_head(), r);
+  update_statement_icfg(current_stmt_head(), r);*/
   return;
 }
 
