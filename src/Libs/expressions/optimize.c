@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.43  2000/08/22 08:36:40  coelho
+ * comments added.
+ *
  * Revision 1.42  2000/08/21 14:10:05  phamdinh
  * hop... it should work...
  *
@@ -977,6 +980,12 @@ static bool inv_call_flt(call c)
 
       if (so->not_ints)
 	{
+	  /* should use the type_checker results...
+	   * maybe it could be implemented also as an analyses
+	   * and not only a transformation? Well, I don't know
+	   * how to store expression to type data, as expressions
+	   * cannot be shared and are not "named" as statements are. FC.
+	   */
 	  expression tmp = call_to_expression(c);
 	  basic b =  please_give_me_a_basic_for_an_expression(tmp);
 	  if (basic_int_p(b)) doit = FALSE;
