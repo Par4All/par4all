@@ -2,7 +2,7 @@
  *
  * these functions deal with HPF directives.
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/04/14 15:55:18 $, )
+ * $RCSfile: directives.c,v $ ($Date: 1995/04/18 12:08:28 $, )
  * version $Revision$,
  */
 
@@ -29,6 +29,7 @@
 #define NEW_SUFFIX     "N"
 #define PROC_SUFFIX    "P"
 #define TEMPL_SUFFIX   "T"
+#define PURE_SUFFIX    "U"
 #define DYNA_SUFFIX    "Y"
 
 /*-----------------------------------------------------------------
@@ -36,9 +37,6 @@
  *   UTILITIES
  *
  */
-/*  the renamings are associated to the remapping statements here.
- */
-GENERIC_LOCAL_FUNCTION(renamings, statement_renamings);
 
 /*  the local stack is used to retrieve the current statement while 
  *  scanning the AST with gen_recurse.
@@ -119,6 +117,15 @@ expression e;
     set_entity_as_dynamic(a);
 
     debug(3, "new_dynamic", "entity is %s\n", entity_name(a));
+}
+
+static void new_pure(e)
+expression e;
+{
+    entity f = expression_to_entity(e);
+    add_a_pure(f);
+
+    debug(3, "new_pure", "entity is %s\n", entity_name(f));
 }
 
 /*-----------------------------------------------------------------
@@ -562,6 +569,14 @@ list /* of expressions */ args;
     gen_map(new_dynamic, args); /* see new_dynamic */
 }
 
+static void handle_pure_directive(f, args)
+entity f;
+list /* of expressions */ args;
+{
+    gen_map(new_pure, args); /* see new_pure */
+}
+
+
 static void handle_realign_directive(f, args)
 entity f;
 list /* of expressions */ args;
@@ -602,6 +617,7 @@ static struct DirectiveHandler handlers[] =
   {HPF_PREFIX PROC_SUFFIX,    handle_processors_directive },
   {HPF_PREFIX TEMPL_SUFFIX,   handle_template_directive },
   {HPF_PREFIX DYNA_SUFFIX,    handle_dynamic_directive },
+  {HPF_PREFIX PURE_SUFFIX,    handle_pure_directive },
   { (string) NULL,            handle_unexpected_directive }
 };
 
@@ -719,7 +735,8 @@ void handle_hpf_directives(s)
 statement s;
 {
     make_current_stmt_stack();
-    init_renamings();
+    init_alive_synonym();
+
     to_be_cleaned = NIL;
 
     gen_multi_recurse(s,
@@ -734,7 +751,7 @@ statement s;
 
     gen_free_list(to_be_cleaned), to_be_cleaned=NIL;
     free_current_stmt_stack();
-    close_renamings();
+    close_alive_synonym();
 
     ifdebug(5) 
     {
