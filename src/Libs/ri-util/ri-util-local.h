@@ -133,6 +133,16 @@ typedef hash_table control_mapping;
 #define MAX_OPERATOR_NAME 		"MAX"
 #define MAX0_OPERATOR_NAME 		"MAX0"
 
+/* generic conversion names.
+ */
+#define INT_GENERIC_CONVERSION_NAME	"INT"
+#define REAL_GENERIC_CONVERSION_NAME	"REAL"
+#define DBLE_GENERIC_CONVERSION_NAME	"DBLE"
+#define CMPLX_GENERIC_CONVERSION_NAME	"CMPLX"
+#define DCMPLX_GENERIC_CONVERSION_NAME	"DCMPLX"
+
+#define INT_TO_CHAR_CONVERSION_NAME	"CHAR"
+#define CHAR_TO_INT_CONVERSION_NAME	"ICHAR"
 
 /* FI: intrinsics are defined at a third place after bootstrap and effects!
  *     I guess the name should be defined here and used in table(s) there
