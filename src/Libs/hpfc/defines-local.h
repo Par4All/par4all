@@ -3,6 +3,9 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.64  1997/04/17 11:46:54  coelho
+ * io comms pvm -> runtime.
+ *
  * Revision 1.63  1997/04/07 09:46:40  coelho
  * DEBUG_MTRX macro added
  *
@@ -204,6 +207,15 @@ void fprint_entity_list(FILE *fp, list l);
 
 #define BROADCAST	"HPFC BROADCAST "
 #define GUARDED_BRD	"HPFC REMAPBRD "
+
+/* host/node communications
+ */
+#define HPFC_HCAST	"HPFC HCAST"
+#define HPFC_NCAST	"HPFC NCAST"
+#define HPFC_sN2H	"HPFC SND TO HOST"
+#define HPFC_sH2N	"HPFC SND TO NODE"
+#define HPFC_rH2N	"HPFC RCV FROM HOST"
+#define HPFC_rN2H	"HPFC RCV FROM NODE"
 
 /* special FCD calls.
  */
