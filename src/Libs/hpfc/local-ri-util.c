@@ -1,4 +1,4 @@
-/* $RCSfile: local-ri-util.c,v $ ($Date: 1995/04/10 18:49:37 $, )
+/* $RCSfile: local-ri-util.c,v $ ($Date: 1995/04/14 15:54:53 $, )
  * version $Revision$
  *
  * HPFC (c) Fabien Coelho May 1993
@@ -40,6 +40,37 @@ entity e;
 
     return(FALSE); /* else not found */
 }
+
+reference expression_to_reference(e)
+expression e;
+{
+    syntax s = expression_syntax(e);
+    message_assert("reference expected", syntax_reference_p(s));
+    return(syntax_reference(s));
+}
+
+entity expression_to_entity(e)
+expression e;
+{
+    return(reference_variable(expression_to_reference(e)));
+}
+
+list expression_list_to_entity_list(l)
+list /* of expressions */ l;
+{
+    list /* of entities */ n = NIL;
+    MAPL(ce, n = CONS(ENTITY, expression_to_entity(EXPRESSION(CAR(ce))), n), l);
+    return(gen_nreverse(n));		 
+}
+
+list entity_list_to_expression_list(l)
+list /* of entities */ l;
+{
+    list /* of expressions */ n = NIL;
+    MAPL(ce, n = CONS(EXPRESSION, entity_to_expression(ENTITY(CAR(ce))), n), l);
+    return(gen_nreverse(n));
+}
+
 
 /* that is all
  */
