@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1998/04/14 21:31:00 $, 
+ * $Date: 1998/04/14 21:49:59 $, 
  */
 
 #include <stdio.h>
@@ -186,8 +186,8 @@ reference r;
 {
     MAPL(ce, 
      {
-	 expression *pe = &EXPRESSION(CAR(ce));
-
+	 expression *pe = (expression*) REFCAR(ce);
+	 
 	 if ((*expr_atomize_decision)(r, *pe))
 	 {
 	     syntax saved = expression_syntax(*pe);
@@ -209,7 +209,7 @@ call c;
 
     MAPL(ce, 
      {
-	 expression *pe = &EXPRESSION(CAR(ce));
+	 expression *pe = (expression*) REFCAR(ce);
 
 	 if ((*func_atomize_decision)(c, *pe))
 	 {
