@@ -50,7 +50,7 @@ Psysteme sys;
      * respectivement la valeur de la constante de l'equation
      * et la valeur de la constante de la fonction economique
      */
-    int b0,f0;
+    Value b0,f0;
 
     sys = sc_elim_redond(sys);
     if (sys != (Psysteme) NULL) {
@@ -71,10 +71,10 @@ Psysteme sys;
 		 * membre gauche de l'inequation
 		 *  fonct->vecteur = A.x
 		 */
-		fonct->denominateur = 1;
+		fonct->denominateur = VALUE_ONE;
 		fonct->vecteur = vect_dup(som->vecteur);
-		vect_chg_coeff(&(fonct->vecteur),TCST,0);
-		b0 = - vect_coeff(TCST,som->vecteur);
+		vect_chg_coeff(&(fonct->vecteur),TCST,VALUE_ZERO);
+		b0 = value_uminus(vect_coeff(TCST,som->vecteur));
 		pv = vect_dup(som->vecteur);
 
 		/*
@@ -100,8 +100,10 @@ Psysteme sys;
 		 * etre transformee en egalite
 		 */
 		if (sys3 != NULL && fonct != NULL) {
-		    f0 =  vect_coeff(TCST,fonct->vecteur)/fonct->denominateur;
-		    if (b0 == f0)
+		    Value x = fonct->denominateur;
+		    f0 =  vect_coeff(TCST,fonct->vecteur);
+		    value_division(f0,x);
+		    if (value_eq(b0,f0))
 			*(som->eq_sat) = 1;
 		}
 
