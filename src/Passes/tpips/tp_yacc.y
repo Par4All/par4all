@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.67  1997/12/10 12:28:57  coelho
+ * internal cat for display.
+ *
  * Revision 1.66  1997/12/05 16:50:03  coelho
  * i_checkpoint added.
  *
@@ -127,20 +130,28 @@ set_env_log_and_free(string var, string val)
     free(var); free(val);
 }
 
-/* Default comand to print a file (if $PAGER is not set) */
-#define CAT_COMMAND "cat"
-
+/* display a resource using $PAGER if defined and stdout on a tty.
+ */
 static bool
 display_a_resource(string rname, string mname)
 {
-    string pager, fname;
-    if ((isatty(0)) || (!(pager = getenv("PAGER"))))
-	pager = CAT_COMMAND;
+    string fname, pager = getenv("PAGER");
+    if (!isatty(fileno(stdout))) pager = NULL;
+
     lazy_open_module (mname);
     fname = build_view_file(rname);
-    if (fname == NULL)
-	pips_user_error("Cannot build view file %s\n", rname);
-    safe_system(concatenate(pager, " ", fname, 0));
+    if (!fname) pips_user_error("Cannot build view file %s\n", rname);
+
+    if (pager)
+    {
+	safe_system(concatenate(pager, " ", fname, 0));
+    }
+    else
+    {
+	FILE * in = safe_fopen(fname, "r");
+	safe_cat(stdout, in);
+	safe_fclose(in, fname);
+    }
     free(fname);
     return TRUE;
 }
