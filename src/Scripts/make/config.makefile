@@ -2,29 +2,13 @@
 # $RCSfile: config.makefile,v $ for make
 #
 
-SCRIPTS = 	MakeExtern \
-		make-builder-map \
-		make-extern \
-		make-extern.etags \
-		make-includes \
-		make-install-pips \
-		make-pips \
-		make-pips-menu \
-		makedep \
-		makemake \
-		install-pips-src \
+SCRIPTS = 	make-pips \
 		tape-pips \
 		make-gdbinit
 
-SFILES=		mkextern.l
-RFILES=		mkextern
-FILES =		ctags2extern.awk
+SOURCES	=	$(SCRIPTS)
 
-mkextern: mkextern.l
-	$(LEX) mkextern.l
-	$(CC) $(CFLAGS) -o mkextern lex.yy.c
-	strip mkextern
-	$(RM) lex.yy.c
+INSTALL_UTL=	$(SCRIPTS)
 
 # that is all
 #
