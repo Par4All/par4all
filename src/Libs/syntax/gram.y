@@ -87,6 +87,7 @@
 %type <instruction>	enddo_inst
 %type <instruction>	do_inst
 %type <instruction>	bdo_inst
+%type <instruction>	wdo_inst
 %type <instruction>	continue_inst
 %type <instruction>	stop_inst
 %type <instruction>	pause_inst
@@ -373,6 +374,8 @@ inst_exec: assignment_inst
 	    { $$ = instruction_undefined; }
 	| bdo_inst
 	    { $$ = instruction_undefined; }
+	| wdo_inst
+	    { $$ = instruction_undefined; }
 	| continue_inst
 	    { $$ = $1; }
 	| stop_inst
@@ -625,6 +628,18 @@ do_inst: TK_DO label opt_virgule atom TK_EQUALS do_plage
 bdo_inst: TK_DO atom TK_EQUALS do_plage
 	    { 
 		MakeDoInst($2, $4, "BLOCKDO"); 
+		$$ = instruction_undefined;
+	    }
+	;
+
+wdo_inst: TK_DO TK_WHILE TK_LPAR expression TK_RPAR
+	    { 
+		MakeWhileDoInst($4, "BLOCKDO");
+		$$ = instruction_undefined;
+	    }
+        | TK_DO label TK_WHILE TK_LPAR expression TK_RPAR
+	    { 
+		MakeWhileDoInst($5, $2);
 		$$ = instruction_undefined;
 	    }
 	;
