@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/06/20 16:29:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/04 15:47:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1997/06/20 16:29:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1997/09/04 15:47:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -37,7 +37,8 @@ void ResetChains()
 /* this function creates an atom of an equivalence chain. s is a
 reference to a variable. */
 
-atom MakeEquivAtom(s)
+atom 
+MakeEquivAtom(s)
 syntax s;
 {
     reference r;
@@ -53,6 +54,9 @@ syntax s;
     /* what is the offset of this reference ? */
     o = OffsetOfReference(r);
 
+    debug(8, "MakeEquivAtom", "Offset %d for reference to %s\n",
+	  o, entity_local_name(e));
+
     return(make_atom(e, o));
 }
 
@@ -61,7 +65,8 @@ parsed. it looks for the atom with the biggest offset, and then
 substracts this maximum offset from all atoms. The result is that each
 atom has its offset from the begining of the chain. */
 
-void StoreEquivChain(c)
+void 
+StoreEquivChain(c)
 chain c;
 {
     cons * pc;
@@ -96,17 +101,24 @@ chain c;
 /* this function merges all the equivalence chains to take into account
 equivalences due to transitivity. it is called at the end of the parsing. */
 
-void ComputeEquivalences()
+void 
+ComputeEquivalences()
 {
     cons *pc;
     int again = TRUE;
 
-    if (TempoEquivSet == equivalences_undefined)
+    debug(8, "ComputeEquivalences", "Begin\n");
+
+    if (TempoEquivSet == equivalences_undefined) {
+	debug(8, "ComputeEquivalences", "Useless call, end\n");
 	    return;
+    }
 
     if (FinalEquivSet == equivalences_undefined) {
 	FinalEquivSet = make_equivalences(NIL);
     }
+
+    debug(8, "ComputeEquivalences", "Initial equivalence chains\n");
 
     PrintChains(TempoEquivSet);
 
@@ -122,14 +134,19 @@ void ComputeEquivalences()
 	}
     }
 
+    debug(8, "ComputeEquivalences", "Resulting equivalence chains\n");
+
     PrintChains(FinalEquivSet);
+
+    debug(8, "ComputeEquivalences", "End\n");
 }
 
 /* this function adds a chain ct to the set of equivalences. if the
 intersection with all other chains is empty, ct is just added to the
 set.  Otherwise ct is merged with the chain that intersects ct. */
 
-int AddOrMergeChain(ct)
+int 
+AddOrMergeChain(ct)
 chain ct;
 {
     cons *pcl, *pcf, *pct;
@@ -161,7 +178,8 @@ chain ct;
 /* this function returns TRUE if the there is a variable that occurs in 
 both atom lists. */
 
-int ChainIntersection(opc1, opc2)
+int 
+ChainIntersection(opc1, opc2)
 cons *opc1, *opc2;
 {
     cons *pc1, *pc2;
@@ -180,7 +198,8 @@ cons *opc1, *opc2;
 /* this function merges two equivalence chains whose intersection is not
 empty, ie. one variable occurs in both chains. */
 
-cons * MergeTwoChains(opc1, opc2)
+cons * 
+MergeTwoChains(opc1, opc2)
 cons *opc1, *opc2;
 {
     int deltaoff;
@@ -221,7 +240,8 @@ cons *opc1, *opc2;
 
 /* two debugging functions, just in case ... */
 
-void PrintChains(e)
+void 
+PrintChains(e)
 equivalences e;
 {
     cons *pcc;
@@ -231,23 +251,25 @@ equivalences e;
     }
 }
 
-void PrintChain(c)
+void 
+PrintChain(c)
 chain c;
 {
     cons *pca;
     atom a;
 
-    debug(9, "PrintChain", "Begin: ");
+    ifdebug(9) {
+	debug(9, "PrintChain", "Begin: ");
 
-    for (pca = chain_atoms(c); pca != NIL; pca = CDR(pca)) {
-	a = ATOM(CAR(pca));
+	for (pca = chain_atoms(c); pca != NIL; pca = CDR(pca)) {
+	    a = ATOM(CAR(pca));
 
-	ifdebug(9)
 	    (void) fprintf(stderr, "(%s,%d) ; ",
 			   entity_name(atom_equivar(a)), atom_equioff(a));
+	}
+	(void) fprintf(stderr, "\n");
+	debug(9, "PrintChain", "\n");
     }
-
-    debug(9, "PrintChain", "\n");
 }
 
 /* this function computes an address for each variable. all common
@@ -258,7 +280,8 @@ atom. the same kind of processing is done for chains containing a static
 variable. otherwise, all variables of a chain have an address in the
 dynamic area. */
 
-void ComputeAddresses()
+void 
+ComputeAddresses()
 {
     cons *pcc, *pca, *pcv;
     entity sc;
@@ -316,8 +339,13 @@ void ComputeAddresses()
 		    ac = area_size(type_area(entity_type(sc)));
 		}
 
-		if ((adr = ac+o) < 0)
-			FatalError("ComputeAddresses", "negative address\n");
+		if ((adr = ac+o) < 0) {
+		    user_warning("ComputeAddresses", "Offset %d for %s in common /%s/.\n",
+				 ac+o, entity_local_name(e), entity_local_name(sc));
+		    ParserError("ComputeAddresses", 
+				"Attempt to extend common backwards. "
+				"Have you checked the code with a Fortran compiler?\n");
+		}
 
 		if ((entity_storage(e)) != storage_undefined) {
 		    ram r;
@@ -364,28 +392,42 @@ void ComputeAddresses()
     }
 }
 
-void SaveChains()
+/* Initialize the shared fields of aliased variables */
+void 
+SaveChains()
 {
-    if (FinalEquivSet == equivalences_undefined)
+    debug(8, "SaveChains", "Begin\n");
+
+    if (FinalEquivSet == equivalences_undefined) {
+    debug(8, "SaveChains", "No equivalence to process. End\n");
 	return;
+    }
 
     MAPL(pc, {
 	cons *shared = NIL;
 	chain c = CHAIN(CAR(pc));
 
+	debug(8, "SaveChains", "Process an equivalence chain:\n");
+
 	MAPL(pa, {
 	    shared = CONS(ENTITY, atom_equivar(ATOM(CAR(pa))), shared);
 	}, chain_atoms(c));
 	
+	pips_assert("SaveChains", !ENDP(shared));
+
 	MAPL(pa, {
 	    atom a = ATOM(CAR(pa));
 	    entity e = atom_equivar(a);
 	    storage se = entity_storage(e);
 	    ram re = storage_ram(se);
 
+	    debug(8, "SaveChains", "\talias %s\n", entity_name(e));
+
 	    ram_shared(re) = gen_copy_seq(shared);
 
 	}, chain_atoms(c));
 	
     }, equivalences_chains(FinalEquivSet));
+
+    debug(8, "SaveChains", "End\n");
 }
