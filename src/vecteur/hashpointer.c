@@ -52,41 +52,6 @@ void linear_hashtable_free(linear_hashtable_pt h)
   free(h);
 }
 
-void linear_hashtable_put(linear_hashtable_pt, void *, void *);
-
-static void linear_hashtable_extend(linear_hashtable_pt h)
-{
-  void ** oldkeys, ** oldvals;
-  register int i, oldsize, oldnitems;
-
-  oldnitems = h->nitems;
-  oldsize = h->size;
-  oldkeys = h->keys;
-  oldvals = h->vals;
-
-  h->nitems = 0;
-  h->size = 2*oldsize + 1;
-  h->keys = (void**) malloc(sizeof(void *)*h->size);
-  h->vals = (void**) malloc(sizeof(void *)*h->size);
-  assert(h->keys && h->vals);
-
-  for (i=0; i<h->size; i++)
-    h->keys[i] = FREE_CHUNK,
-      h->vals[i] = FREE_CHUNK;
-
-  for (i=0; i<oldsize; i++)
-  {
-    if (oldkeys[i]!=FREE_CHUNK && oldkeys[i]!=EMPTIED_CHUNK)
-    {
-      linear_hashtable_put(h, oldkeys[i], oldvals[i]);
-      oldnitems--;
-    }
-  }
-
-  assert(oldnitems==0);
-  free(oldkeys);
-  free(oldvals);
-}
 
 /* returns the location to put or get k in h.
  */
@@ -102,9 +67,45 @@ static int key_location(linear_hashtable_pt h, void * k, boolean toget)
   return hashed;
 }
 
+static void linear_hashtable_extend(linear_hashtable_pt h)
+{
+  void ** oldkeys, ** oldvals;
+  register int i, oldsize, moved_nitems;
+
+  moved_nitems = h->nitems;
+  oldsize = h->size;
+  oldkeys = h->keys;
+  oldvals = h->vals;
+
+  h->size = 2*oldsize + 1;
+  h->keys = (void**) malloc(sizeof(void *)*h->size);
+  h->vals = (void**) malloc(sizeof(void *)*h->size);
+  assert(h->keys && h->vals);
+
+  for (i=0; i<h->size; i++)
+    h->keys[i] = FREE_CHUNK,
+      h->vals[i] = FREE_CHUNK;
+
+  for (i=0; i<oldsize; i++)
+  {
+    register void * k = oldkeys[i];
+    if (k!=FREE_CHUNK && k!=EMPTIED_CHUNK)
+    {
+      h->keys[key_location(h, k, false)] = oldvals[i];
+      moved_nitems--;
+    }
+  }
+
+  assert(moved_nitems==0);
+  free(oldkeys);
+  free(oldvals);
+}
+
 void linear_hashtable_put(linear_hashtable_pt h, void * k, void * v)
 {
   register int hashed;
+
+  assert(k!=FREE_CHUNK && k!=EMPTIED_CHUNK);
 
   if ((h->nitems<<2) > h->size) {
     linear_hashtable_extend(h);
