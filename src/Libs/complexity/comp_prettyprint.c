@@ -11,9 +11,9 @@
 #include "ri.h"
 #include "complexity_ri.h"
 #include "database.h"     /* useful */
-#include "pipsdbm.h"      /* useful */
 #include "resources.h"    /* useful  */
 #include "ri-util.h"
+#include "pipsdbm.h"      /* useful */
 #include "text.h"
 #include "matrice.h"      /* useful */
 #include "complexity.h"
