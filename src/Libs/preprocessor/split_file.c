@@ -16,6 +16,8 @@
  * - hollerith constants conversion;-)
  * - LINESIZE 80 -> 200...
  * - "PROGRAM MAIN..." added if implicit program name.
+ * - extr* stuff dropped.
+ * - dir_name for localizing files...
  */
 
 static void hollerith(char *);
@@ -103,18 +105,10 @@ char fsplit_sccsid[] = "@(#)fsplit.c	5.5 (Berkeley) 3/12/91";
 #define BSZ 512
 static char buf[BSZ];
 static FILE *ifp;
-static char
- 	x[]="zzz000.f",
-	mainp[]="main000.f",
-	blkp[]="data000.f";
+static char *x, *mainp, *blkp;
 
 #define TRUE 1
 #define FALSE 0
-static int
-	extr = FALSE,
-	extrknt = -1,
-	extrfnd[100];
-static char *extrnames[100];
 static struct stat sbuf;
 
 static char *look(), *skiplab(), *functs();
@@ -126,20 +120,15 @@ static void get_name();
 static int saveit(name)
 char *name;
 {
-	int i;
-	char	fname[50],
-		*fptr = fname;
+    return(1);
+}
 
-	if(!extr) return(1);
-	while(*name) *fptr++ = *name++;
-	*--fptr = 0;
-	*--fptr = 0;
-	for ( i=0 ; i<=extrknt; i++ ) 
-		if( strcmp(fname, extrnames[i]) == 0 ) {
-			extrfnd[i] = TRUE;
-			return(1);
-		}
-	return(0);
+static char * 
+full_name(char * dir, char * name)
+{
+    char * full = (char*) malloc(sizeof(char)*(strlen(dir)+strlen(name)+2));
+    sprintf(full, "%s/%s", dir, name);
+    return full;
 }
 
 static void get_name(name, letters)
@@ -370,16 +359,19 @@ static void print_name(FILE * o, char * name, int n) /* FC */
     while (n-->0) putc(*name++, o);
 }
 
-
-int fsplit(char * file_name, FILE * out)
+int 
+fsplit(char * dir_name, char * file_name, FILE * out)
 {
     register FILE *ofp;	/* output file */
     register rv;	/* 1 if got card in output file, 0 otherwise */
     int nflag,		/* 1 if got name of subprog., 0 otherwise */
-	retval,
-	i;
+	retval;
    /* ??? 20 -> 80 because not checked... smaller than a line is ok ? FC */
     char name[80]; 
+    char * main_list = full_name(dir_name, ".fsplit_main_list");
+    x = full_name(dir_name, "zzz000.f");
+    mainp = full_name(dir_name, "main000.f");
+    blkp = full_name(dir_name, "data000.f");
 	
     if ((ifp = fopen(file_name, "r")) == NULL) {
 	fprintf(stderr, "fsplit: cannot open %s\n", file_name);
@@ -390,8 +382,8 @@ int fsplit(char * file_name, FILE * out)
 	/* look for a temp file that doesn't correspond to an existing file */
 	get_name(x, 3);
 	ofp = fopen(x, "w");
-	if (!ofp) {
-	    fprintf(stderr, "fopen(\"%s\") failed\n", x);
+	if (ofp==NULL) {
+	    fprintf(stderr, "fopen(\"%s\", ...) failed\n", x);
 	    exit(2);
 	}
 	nflag = 0;
@@ -401,8 +393,12 @@ int fsplit(char * file_name, FILE * out)
 	    if (nflag == 0) /* if no name yet, try and find one */
 		nflag = lname(name);
 	    if (it_is_a_main) {
-		FILE * fm = fopen(".fsplit_main_list", "a");
 		char * c = name;
+		FILE * fm = fopen(main_list, "a");
+		if (fm==NULL) {
+		    fprintf(stderr, "fopen(\"%s\", ...) failed\n", main_list);
+		    exit(2);
+		}
 		while (*c && *c!='.') putc(toupper(*c++), fm);
 		putc('\n', fm);
 		fclose(fm);
@@ -444,12 +440,6 @@ int fsplit(char * file_name, FILE * out)
 	if (rv == 0) {			/* no lines in file, forget the file */
 		unlink(x);
 		retval = 0;
-		for ( i = 0; i <= extrknt; i++ )
-			if(!extrfnd[i]) {
-				retval = 1;
-				fprintf( stderr, "fsplit: %s not found\n",
-					extrnames[i]);
-			}
 		if (fclose(ifp)) {
 		    fprintf(stderr, "fclose(ifp) failed\n");
 		    exit(2);
@@ -458,31 +448,30 @@ int fsplit(char * file_name, FILE * out)
 	}
 	if (nflag) {			/* rename the file */
 		if(saveit(name)) {
-			if (stat(name, &sbuf) < 0 ) {
-				link(x, name);
-				unlink(x);
-				fprintf(out, "%s\n", name);
-				continue;
-			} else if (strcmp(name, x) == 0) {
-				printf("%s\n", x);
-				continue;
-			}
-			printf("%s already exists, put in %s\n", name, x);
-			continue;
-		} else
+		    char * nname = full_name(dir_name, name);
+		    if (stat(nname, &sbuf) < 0 ) {
+			link(x, nname);
 			unlink(x);
-			continue;
+			fprintf(out, "%s\n", name);
+		    } else if (strcmp(nname, x) == 0) {
+				printf("%s\n", x);
+		    }
+		    else 
+			printf("%s already exists, put in %s\n", nname, x);
+		    free(nname);
+		    continue;
+		} else
+		    unlink(x);
+		continue;
 	}
-	if(!extr) 
-		fprintf(out, "%s\n", x);
-	else
-		unlink(x);
+	fprintf(out, "%s\n", x);
     }
 
     if (fclose(ifp)) {
 	fprintf(stderr, "fclose(ifp) failed\n");
 	exit(2);
     }
+    free(main_list), free(x), free(mainp), free(blkp);
     return 1;
 }
 
