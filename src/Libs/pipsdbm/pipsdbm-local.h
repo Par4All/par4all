@@ -2,6 +2,8 @@
  * $Id$
  */
 
+#define PIPSDBM_DEBUG_LEVEL "PIPSDBM_DEBUG_LEVEL"
+
 #define PROGRAM_RESOURCE_OWNER ""
 
 #define WORKSPACE_TMP_SPACE 		"Tmp"
