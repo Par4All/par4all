@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1995/08/10 11:32:51 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1995/09/16 22:10:16 $, )
  * version $Revision$
  */
 
@@ -218,7 +218,6 @@ char *name ;
 union domain *dp ;
 int offset ;
 {
-    extern int printf();
     char *cast = primitive_cast( dp ) ;
     char *field = primitive_field( dp ) ;
 
@@ -314,7 +313,6 @@ void
 gen_or( bp )
      struct gen_binding *bp ;
 {
-    extern int printf();
     char *name = bp->name ;
     union domain *dom = bp->domain ;
     struct domainlist *dlp ;
@@ -401,7 +399,6 @@ void
 gen_list( bp )
 struct gen_binding *bp ;
 {
-    extern int printf();
     char *name = bp->name ;
     union domain *dom = bp->domain ;
     int data = GEN_HEADER + IS_TABULATED( bp ) ;
@@ -418,7 +415,6 @@ void
 gen_set( bp )
 struct gen_binding *bp ;
 {
-    extern int printf();
     char *name = bp->name ;
     union domain *dom = bp->domain ;
     int data = GEN_HEADER + IS_TABULATED( bp ) ;
@@ -435,7 +431,6 @@ void
 gen_array( bp )
      struct gen_binding *bp ;
 {
-    extern int printf();
     char *name = bp->name ;
     union domain *dom = bp->domain ;
     int data = GEN_HEADER + IS_TABULATED( bp ) ;
@@ -454,7 +449,6 @@ void
 gen_external( bp )
 struct gen_binding *bp ;
 {
-    extern int printf();
     char *s = bp->name ;
 
     (void) printf( "#ifndef _newgen_%s_defined\n", s ) ;
@@ -474,7 +468,6 @@ void
 gen_domain( bp )
 struct gen_binding *bp ;
 {
-    extern int printf();
     union domain *dp = bp->domain ;
     char *s = bp->name ;
 
