@@ -1,14 +1,14 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/12 08:41:57 $, 
+# $Date: 1996/09/12 08:47:37 $, 
 #
 # (c) FC September 1996
 #
 # this script allow to chose a directory interactively. 
-#
-# wish is started by sh without its path:-) 
-sed '1,/###/d' $0 | `type wish | sed 's,wish is ,,'` "$@" ; exit
+# wish is started without assumption on its location.
+sed '1,/###/d' $0 | wish "$@" 
+exit $?
 #
 ###
 #
