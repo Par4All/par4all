@@ -78,11 +78,13 @@ void stop_dotting()
 {
 /*    alarm(0);
     (void) signal(SIGALRM, SIG_DFL);
-*/
+
+    Vire le "\n" qui interfère... RK.
     if (dotting_file == stdout) 
 	user_log("\n");
     else {
 	(void) putc('\n', dotting_file);
 	if(dotting_file!=stderr) fflush(dotting_file);
     }
+*/
 }
