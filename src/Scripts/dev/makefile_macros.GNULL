@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNULL,v $ (version $Revision$)
-# $Date: 1996/08/07 11:57:50 $, 
+# $Date: 1996/08/08 16:24:23 $, 
 #
 # this file contains macro definitions 
 
@@ -17,7 +17,7 @@ LD	= $(CC)
 LDFLAGS	= -g -nostdlib $(GLIBC)/lib/crt0.o -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(PIPS_EXTEDIR) -L$(GLIBC)/lib -L$(GCCDIR)/lib -L/usr/lib -lc -lgcc
 RANLIB	= granlib
 LEX	= flex
-LFLAGS	= -l
+LFLAGS	= 
 FC	= g77
 FFLAGS	= -O2 -g -Wimplicit -pipe
 LINT	= lint
