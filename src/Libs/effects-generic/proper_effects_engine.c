@@ -35,6 +35,23 @@
 
 #include "effects-generic.h"
 
+/* For debuging
+
+static void debug_ctxt(string s, transformer t)
+{
+  Psysteme p;
+  fprintf(stderr, "context %p at %s\n", t, s);
+  if (transformer_undefined_p(t))
+    fprintf(stderr, "UNDEFINED...");
+  else
+    {
+      p = predicate_system(transformer_relation(t));
+      fprintf(stderr, "%p: %d/%d\n", p, sc_nbre_egalites(p), sc_nbre_inegalites(p));
+      sc_syst_debug(p);
+      assert(sc_weak_consistent_p(p));
+    }
+}
+*/
 
 /************************************************ TO CONTRACT PROPER EFFECTS */
 
@@ -123,6 +140,7 @@ generic_proper_effects_of_lhs(reference ref)
     list inds = reference_indices(ref);
     transformer context = effects_private_current_context_head();
 
+
     pips_debug(3, "begin\n");
 
     if (! (*empty_context_test)(context))
@@ -137,6 +155,7 @@ generic_proper_effects_of_lhs(reference ref)
 
 	(*effects_precondition_composition_op)(le, context);
     } 
+
   
     pips_debug(3, "end\n");
     return(le);
@@ -162,7 +181,10 @@ generic_proper_effects_of_reference(reference ref)
     if (effects_private_current_context_empty_p())
 	context = transformer_undefined;
     else
+      {
 	context = effects_private_current_context_head();
+      }
+
 
     pips_debug(3, "begin\n");
     
@@ -175,6 +197,7 @@ generic_proper_effects_of_reference(reference ref)
 
 	if (! ENDP(inds)) 
 	    le = gen_nconc(le, generic_proper_effects_of_expressions(inds));
+
 
 	(*effects_precondition_composition_op)(le, context);
     }
@@ -503,10 +526,10 @@ static void proper_effects_of_sequence(sequence block)
 
 static bool stmt_filter(statement s)
 {
-    pips_debug(1, "Entering statement %03d :\n", statement_ordering(s));
-    effects_private_current_stmt_push(s);
-    effects_private_current_context_push((*load_context_func)(s));
-    return(TRUE);
+  pips_debug(1, "Entering statement %03d :\n", statement_ordering(s));
+  effects_private_current_stmt_push(s);
+  effects_private_current_context_push((*load_context_func)(s));
+  return(TRUE);
 }
 
 static void proper_effects_of_statement(statement s)
