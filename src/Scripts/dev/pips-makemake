@@ -3,11 +3,11 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.295  1997/08/18 08:29:40  coelho
+# cleaner.
+#
 # Revision 1.294  1997/08/18 08:28:05  coelho
 # more fixes for MAIN.
-#
-# Revision 1.293  1997/08/18 08:22:18  coelho
-# *** empty log message ***
 #
 # Revision 1.292  1997/08/18 08:21:54  coelho
 # forgotten Pass link.
@@ -291,10 +291,6 @@ INSTALL_UTL_DIR= ${install_utl_dir}
 INSTALL_RTM_DIR= ${install_rtm_dir}
 INSTALL_LIB_DIR= ${install_lib_dir}/\$(ARCH)
 INSTALL_BIN_DIR= ${install_bin_dir}/\$(ARCH)
-# (obsolete?)
-# MAIN=		main
-#
-# 
 #
 CONFIG	= ${CONFIG_FILE}
 MAKEFILE= ${MAKEFILE}
@@ -530,8 +526,8 @@ SOURCES+= 	\$(INCLUDES) \$(CFILES) \$(DOCS) \$(LIB_MAIN)
 #
 
 clean-compiled:
-	\$(RM) \$(OBJECTS) \$(LIB_TARGET) \$(BIN_TARGET)  \$(LIB_MAIN:.c=.o) \\
-		\$(ARCH)/pips \$(ARCH)/[tw]pips
+	\$(RM) \$(OBJECTS) \$(LIB_TARGET) \$(BIN_TARGET) \\
+		$(ARCH)/\$(LIB_MAIN:.c=.o) \$(ARCH)/pips \$(ARCH)/[tw]pips
 
 clean: generate_makefile_if_necessary_and_possible clean-compiled
 	-\$(RM) TAGS \$(BIN_TARGET) \$(DERIVED_HEADERS) \$(DERIVED_CFILES) \\
@@ -547,9 +543,6 @@ INC_CFILES += \$(LIB_CFILES)
 $verbose "specific to Libs for PIPS"
 
 [ $DIRTYPE = 'Libs' -a $PART = PIPS ] && cat >> $MAKEFILE <<% 
-#
-# CFILES+=	\$(MAIN).c 
-# OBJECTS+=	\$(MAIN).o 
 #
 
 test: all
