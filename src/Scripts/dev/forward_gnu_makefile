@@ -1,12 +1,12 @@
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/07/11 14:35:16 $, 
-# (c) Fabien COELHO 1996
+# $Date: 1996/07/11 18:28:29 $, 
+# (c) Fabien COELHO July 1996
 #
 # this makefile forwards make targets to sub-directories...
 # it must be used with GNU make.
 #
 # these variables may be overwritten on the command line
-# gmake FWD_DIRS="foo blah" FWD_MSG="argh!" FWD_REPORT="> /dev/null"
+# gmake FWD_DIRS="foo" FWD_MSG="argh!" FWD_REPORT="> /dev/null" FWD_ROOT=$PWD
 #
 
 # the list of sub directories for forwarding commands:
@@ -21,20 +21,25 @@ FWD_MSG=
 # default is stdout
 FWD_REPORT=
 
+# current directory as seen by the launched make
+# default is curent directory
+FWD_ROOT=.
+
 # forward any command to the specified directories
 %::
 	@echo Forwarding $@ to $(FWD_DIRS)
 	-@for d in $(FWD_DIRS) ; do \
 	  if test -d $$d ; then \
-	    if $(MAKE) -C $$d FWD_MSG="$(FWD_MSG)/$$d" $@ ;\
-	    then echo "$(FWD_MSG)/$$d: $@ succeeded" $(FWD_REPORT) ;\
-	    else echo "$(FWD_MSG)/$$d: $@ failed" $(FWD_REPORT) ;\
+	  if $(MAKE) -C $$d FWD_ROOT="$(FWD_ROOT)/$$d" $@ ;\
+	  then echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ succeeded" $(FWD_REPORT);\
+	  else echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ failed" $(FWD_REPORT) ;\
 	fi ; fi ; done
 
 debug:
 	@echo "FWD_DIRS=$(FWD_DIRS)"
 	@echo "FWD_MSG=$(FWD_MSG)"
 	@echo "FWD_REPORT=$(FWD_REPORT)"
+	@echi "FWD_ROOT=$(FWD_ROOT)"
 
 # end of $RCSfile: forward_gnu_makefile,v $
 #
