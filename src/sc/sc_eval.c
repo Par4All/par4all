@@ -1,6 +1,6 @@
 /* package sc
  * $RCSfile: sc_eval.c,v $ (version $Revision$)
- * $Date: 1996/07/23 16:58:01 $, 
+ * $Date: 1996/08/06 13:00:46 $, 
  */
 
 #include <string.h>
@@ -177,28 +177,28 @@ Psysteme ps1,ps2;
 Pbase b; 
 {
     Pvecteur pv;
+    boolean faisable = TRUE;
 
-    for (pv = b; !VECTEUR_NUL_P(pv); pv = pv->succ) {
+    assert(ps2);
+
+    for (pv = b; !VECTEUR_NUL_P(pv) && faisable; pv = pv->succ) {
 	Variable var1 = vecteur_var(pv);
 	Psysteme sc = sc_dup(ps1);
-	Value min,max;
-	Pvecteur pv2;
-	Pcontrainte pc;
-	boolean faisable =  sc_minmax_of_variable(sc,var1, &min, &max);
+	Value min, max;
+	
+	faisable = sc_minmax_of_variable(sc, var1, &min, &max);
 
-	if (faisable ) {
-	    if (value_ne(min,VALUE_MIN)) {
-		pv2 = vect_new(var1, VALUE_MONE);
-		pv2 = vect_add(pv2,vect_new(TCST, min));
-		pc = contrainte_make(pv2);
-		sc_add_ineg(ps2,pc);
-	    }
-	    if (value_ne(max,VALUE_MAX)) {
-		pv2 = vect_new(var1,VALUE_ONE);
-		pv2 = vect_add(pv2,vect_new(TCST, value_uminus(max)));
-		pc = contrainte_make(pv2);
-		sc_add_ineg(ps2,pc);
-	    }
+	if (faisable) {
+	    if (value_ne(min,VALUE_MIN)) 
+		sc_add_ineg(ps2, contrainte_make(
+		    vect_make(VECTEUR_NUL, var1, 
+			      VALUE_MONE, 
+			      TCST, min)));
+	    if (value_ne(max,VALUE_MAX)) 
+		sc_add_ineg(ps2, contrainte_make(
+		    vect_make(VECTEUR_NUL, 
+			      var1, VALUE_ONE,
+			      TCST, value_uminus(max))));
 	}
     }
 }
