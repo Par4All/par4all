@@ -254,42 +254,42 @@ static bool
 add_pair_to_existing_list(list alias_pair)
 {
     list rest_alias_lists, alias_list;
-    region reg, alias_reg, trans_reg;
+    region formal_reg_pair, formal_reg_list, actual_reg_pair;
     bool result = FALSE;
 
     pips_debug(4,"begin\n");
 
-    reg = EFFECT( CAR(alias_pair) );
+    formal_reg_pair = EFFECT( CAR(alias_pair) );
 
     ifdebug(9)
 	{
 	    set_action_interpretation(ACTION_IN,ACTION_OUT);
 	    pips_debug(9,"compare:\n\t");
-	    print_region(reg);
+	    print_region(formal_reg_pair);
 	}
     
     rest_alias_lists = l_alias_lists;
     if (l_alias_lists != NIL)
 	do {
 	    alias_list = LIST( CAR(rest_alias_lists) );
-	    alias_reg = EFFECT( CAR(alias_list) );
+	    formal_reg_list = EFFECT( CAR(alias_list) );
 
 	    ifdebug(9)
 		{
 		    pips_debug(9,"with:\n\t");
-		    print_region(alias_reg);
+		    print_region(formal_reg_list);
 		}
 
-	    if ( same_reg(reg,alias_reg) )
+	    if ( same_reg(formal_reg_pair,formal_reg_list) )
 	    {
 		    result = TRUE;
-		    trans_reg = EFFECT(CAR(CDR(alias_pair)));
+		    actual_reg_pair = EFFECT(CAR(CDR(alias_pair)));
 		    ifdebug(9)
 			{
 			    pips_debug(9,"add region:\n\t");
-			    print_region(trans_reg);
+			    print_region(actual_reg_pair);
 			}
-		    add_if_not_present(trans_reg,alias_list);
+		    add_if_not_present(actual_reg_pair,alias_list);
 		}
 	    rest_alias_lists = CDR(rest_alias_lists);
 	} while (rest_alias_lists != NIL && result == FALSE);
