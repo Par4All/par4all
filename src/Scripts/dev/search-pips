@@ -106,13 +106,13 @@ then
 fi
 
 # set OUTPUT to a file in $TEMPDIR
-if [ ! -d $TEMPDIR ]
+if [ ! -d $PIPS_TEMPDIR ]
 then 
-echo "\$TEMPDIR=$TEMPDIR is not a directory" >&2
+echo "\$PIPS_TEMPDIR=$PIPS_TEMPDIR is not a directory" >&2
 exit 1
 else 
   WHOAMI=`whoami`
-  OUTPUT=$TEMPDIR/`date +"search.%y%m%d"`.$WHOAMI
+  OUTPUT=$PIPS_TEMPDIR/`date +"search.%y%m%d"`.$WHOAMI
   # touch $OUTPUT
   #
   # clean old searches
