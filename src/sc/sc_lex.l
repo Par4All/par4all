@@ -25,7 +25,13 @@ static char * sc_symbol_table(char *);
 
 %%
 <TEXT>VAR			{ RETURN(VAR); } 
-<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
+<TEXT>[.A-Za-z_]['A-Za-z0-9_:#.]* { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
+                                  RETURN(IDENT); }
+<TEXT>[']['A-Za-z0-9_:#?. ]*['] { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
+                                  RETURN(IDENT); }
+<TEXT>[0-9]*[.DEe][0-9DEe\-]* { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
+                                  RETURN(IDENT); }
+<TEXT>[0-9]*[.] { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
                                   RETURN(IDENT); }
 <TEXT>[0-9]*			{ sscan_Value(yytext,&yylval.Value);
                                   RETURN(CONSTANTE); }
@@ -39,7 +45,7 @@ static char * sc_symbol_table(char *);
 <TEXT>"<="			{ RETURN(INFEGAL); }
 <TEXT>"{"			{ RETURN(ACCOUVR); }
 <TEXT>"}"			{ RETURN(ACCFERM); }
-<TEXT>[ \t\n]*		;
+<TEXT>[\t\n]*		;
 <TEXT>"#"                       {BEGIN COMMENT;}
 <COMMENT>\n                     {BEGIN TEXT;}
 <COMMENT>[^\n]*         ;
@@ -99,9 +105,9 @@ int yyerror(char *s)
 	int c;
 
 	(void) fprintf(stderr,"%s near %s\n",s,yytext);
-	while ((c = getchar()) != EOF)
+/*	while ((c = getchar()) != EOF)
 		putchar(c);
-
+*/
 	yysyntax_error = TRUE;
 	return TRUE;
 }
