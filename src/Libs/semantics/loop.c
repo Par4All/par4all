@@ -3,6 +3,9 @@
   * $Id$
   *
   * $Log: loop.c,v $
+  * Revision 1.5  2002/03/21 09:36:32  irigoin
+  * debug() replaced by pips_debug() and similar cosmetic modifications
+  *
   * Revision 1.4  2001/12/05 17:16:24  irigoin
   * Reformatting + additions to compute total preconditions
   *
@@ -233,7 +236,7 @@ add_index_range_conditions(
   int incr_lb = 0;
   int incr_ub = 0;
 
-  debug(8,"add_index_range_conditions","begin\n");
+  pips_debug(8, "begin\n");
 
   if(entity_has_values_p(i)) {
 
@@ -242,7 +245,7 @@ add_index_range_conditions(
 
     if(incr_lb==incr_ub) {
       if(incr_lb==0) {
-	user_error("add_index_range_conditions", "Illegal null increment\n");
+	pips_user_error("Illegal null increment\n");
       }
       else
 	incr = incr_lb;
@@ -282,7 +285,7 @@ add_index_range_conditions(
 
   }
 
-  debug(8,"add_index_range_conditions","end\n");
+  pips_debug(8, "end\n");
   return pre;
 }
 
@@ -304,11 +307,11 @@ add_good_loop_conditions(
   list eb = load_cumulated_rw_effects_list(b);
   transformer tfb = effects_to_transformer(eb);
 
-  debug(8,"add_good_loop_conditions","begin\n");
+  pips_debug(8, "begin\n");
 
   pre = add_index_range_conditions(pre, i, r, tfb);
 
-  debug(8,"add_good_loop_conditions","end\n");
+  pips_debug(8, "end\n");
   return(pre);
 }
 
@@ -691,7 +694,7 @@ transformer loop_bound_evaluation_to_transformer(loop l, transformer pre)
   transformer r = transformer_undefined;
   entity i = loop_index(l);
 
-  pips_assert("No temprorary variables are allocated",
+  pips_assert("No temporary variables are allocated",
 	      number_of_temporary_values()==0);
 
   if(entity_has_values_p(i)) {
