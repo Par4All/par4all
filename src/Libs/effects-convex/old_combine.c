@@ -800,64 +800,6 @@ static effect regions_may_convex_hull(region r1, region r2)
     return(reg);
 }
 
-
-static Psysteme my_sc_check_after_chernikova(Psysteme sc)
-{
-#define MY_MAX_CHECK VALUE_CONST(100000000)
-    Pcontrainte c;
-    
-    if (sc_empty_p(sc) || sc_rn_p(sc))
-	return(sc);
-
-    debug_on("REGIONS_CHERNIKOVA_DEBUG_LEVEL");
-    
-    c = sc_egalites(sc);
-    while (c != (Pcontrainte) NULL)
-    {
-	Pvecteur v;
-	for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ) 
-	{ 
-	    if (value_ge(vecteur_val(v),MY_MAX_CHECK))
-	    {
-		Psysteme sc_tmp = sc_rn(base_dup(sc->base));
-		ifdebug(1)
-		{
-		    pips_debug(1, "\tBUG CHERNIKOVA: RETURNING sc_rn.\n");
-		    sc_syst_debug(sc);
-		}
-		sc_rm(sc);
-		debug_off();
-		return(sc_tmp);
-	    }
-	} 
-	c = c->succ;
-    } 
-    c = sc_inegalites(sc);
-    while (c != (Pcontrainte) NULL)
-    {
-	Pvecteur v;
-	for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ) 
-	{ 
-	    if (value_ge(vecteur_val(v),MY_MAX_CHECK))
-	    {
-		Psysteme sc_tmp = sc_rn(base_dup(sc->base));
-		ifdebug(1)
-		{
-		    pips_debug(1, "\tBUG CHERNIKOVA: RETURNING sc_rn.\n");
-		    sc_syst_debug(sc);
-		}
-		sc_rm(sc);
-		debug_off();
-		return(sc_tmp);
-	    }
-	} 
-	c = c->succ;
-    } 
-
-    debug_off();
-    return(sc);
-}
-
 /*static  Psysteme region_sc_convex_hull(Psysteme ps1, ps2)
  * input    : two systems of constraints
  * output   : another system of constraints representing their convex
