@@ -1,7 +1,7 @@
 !
 ! everything about packing
 !
-! $RCSfile: hpfc_packing.m4f,v $ ($Date: 1996/10/17 13:49:14 $, )
+! $RCSfile: hpfc_packing.m4f,v $ ($Date: 1997/01/07 11:50:17 $, )
 ! version $Revision$
 ! got on %D%, %T%
 ! $Id$
@@ -37,7 +37,6 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_SECTION')
       TYPE
      $ array(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer info, nitem
       integer COMMA_REPLICATE(LEVEL, `INDEX_REF')
