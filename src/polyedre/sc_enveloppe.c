@@ -197,6 +197,11 @@ Psysteme s1, s2;
  * Return h
  *
  * Francois Irigoin, 9 August 1992
+ *
+ * Note: This algorithm is simply wrong. Let s1 = {i==1, i==2} and s2 = {i==3, i==2}.
+ * Constraint i==2 can be removed. The convex hull of i==1 and i==3 is 1 <= i <= 3.
+ * Its intersection with i == 2 is i == 2.
+ * 
  */
 Psysteme sc_fast_convex_hull(s1, s2)
 Psysteme s1;
@@ -428,6 +433,211 @@ int ofl_ctrl;
     (void) fprintf(stderr, "sc_fast_enveloppe_chernikova: end\nreturn hp:\n");
     sc_fprint(stderr, hp, dump_value_name);
     */
+
+    return hp;
+}
+
+
+/* Psysteme sc_common_projection_convex_hull(Psysteme s1, Psysteme s2):
+ *
+ * exploits equalities shared by s1 and s2 to decrease the space
+ * dimension and the number of constraints before calling the
+ * effective convex hull function.
+ *
+ * Simplified view of the algorithm:
+ *
+ * Let s1 and s2 be sets of constraints, eq1 and eq2 their sets of equalities
+ * Build eq0 = intersection(eq1, eq2)
+ * Build s1' = projection of s1 along eq0
+ * Build s2' = projection of s2 along eq0
+ * Compute h' = convex_hull(s1', s2')
+ * Build h = intersection(h', s0)
+ * Free h', s1', s2'
+ * Return h
+ *
+ * Francois Irigoin, 20 November 1995
+ *
+ * Note:  it would be better to compute the convex hull of eq1 and eq2 using 
+ * an Hermite form
+ * 
+ */
+Psysteme sc_common_projection_convex_hull(Psysteme s1, Psysteme s2)
+{
+#define ifdebug if(FALSE)
+    Psysteme s0 = sc_new();
+    Psysteme s1p = sc_dup(s1);
+    Psysteme s2p = sc_dup(s2);
+    Psysteme hp = SC_UNDEFINED;
+    Pcontrainte eq;
+    Pbase b;
+    int d;
+    boolean feasible_p = TRUE;
+    boolean feasible_p1 = TRUE;
+    boolean feasible_p2 = TRUE;
+
+    assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
+
+    /* */
+    ifdebug {
+    (void) fprintf(stderr, "sc_common_projection_convex_hull: begin\ns1:\n");
+    sc_dump(s1);
+    (void) fprintf(stderr, "s2:\n");
+    sc_dump(s2);
+    }
+    /* */
+
+    for(eq = sc_egalites(s1p); !CONTRAINTE_UNDEFINED_P(eq) && feasible_p; eq = eq->succ) {
+	if(egalite_in_liste(eq, sc_egalites(s2p))) {
+	    if(egalite_normalize(eq)) {
+		if(CONTRAINTE_NULLE_P(eq)) {
+		    /* eq is redundant in s1, ignore it */
+		    ;
+		}
+		else {
+		    Pcontrainte def = CONTRAINTE_UNDEFINED;
+		    Pcontrainte new_eq = CONTRAINTE_UNDEFINED;
+		    Variable v = TCST;
+		    Pvecteur pv;
+
+		    /* Keep eq in s0 */
+
+		    new_eq = contrainte_dup(eq);
+		    sc_add_egalite(s0, new_eq);
+
+		    /* Use eq to eliminate a variable */
+
+		    /* Let's use a variable with coefficient 1 if
+		     * possible.
+		     */
+		    for( pv = contrainte_vecteur(eq);
+			!VECTEUR_NUL_P(pv);
+			pv = vecteur_succ(pv)) {
+			if(!term_cst(pv)) {
+			    v = vecteur_var(pv);
+			    if(vecteur_val(pv)==1) {
+				break;
+			    }
+			}
+		    }
+		    assert(v!=TCST);
+
+		    /* eq itself is going to be modified in proj_ps.
+		     * use a copy!
+		     */
+		    def = contrainte_dup(eq);
+		    s1p = 
+			sc_simple_variable_substitution_with_eq_ofl_ctrl
+			    (s1p, def, v, NO_OFL_CTRL);
+		    s2p = 
+			sc_simple_variable_substitution_with_eq_ofl_ctrl
+			    (s2p, def, v, NO_OFL_CTRL);
+		    contrainte_rm(def);
+		}
+	    }
+	    else {
+		/* The system is not feasible. Stop */
+		feasible_p = FALSE;
+		break;
+	    }
+	}
+    }
+
+    /* Keep track of the full bases for the convex hull */
+    sc_base(s0) = base_union(sc_base(s1), sc_base(s2));
+    sc_dimension(s0) = vect_size(s0->base);
+
+    /* */
+    ifdebug {
+    (void) fprintf(stderr, "sc_common_projection_convex_hull: common equalities\ns1p:\n");
+    sc_dump(s0);
+    }
+    /* */
+
+    feasible_p1 = feasible_p && !SC_EMPTY_P(s1p = sc_normalize(s1p));
+    feasible_p2= !SC_EMPTY_P(s2p = sc_normalize(s2p));
+
+    if(feasible_p1 && feasible_p2) {
+	/* Perform a convex hull */
+
+	/* reduce the dimension of s1p and s2p as much as possible */
+	base_rm(sc_base(s1p));
+	sc_base(s1p) = BASE_UNDEFINED;
+	base_rm(sc_base(s2p));
+	sc_base(s2p) = BASE_UNDEFINED;
+	sc_creer_base(s1p);
+	sc_creer_base(s2p);
+	b = base_union(sc_base(s1p), sc_base(s2p));
+	d = base_dimension(b);
+	vect_rm(sc_base(s1p));
+	vect_rm(sc_base(s2p));
+	sc_base(s1p) = base_dup(b);
+	sc_dimension(s1p) = d;
+	sc_base(s2p) = b;
+	sc_dimension(s2p) = d;
+
+	/* */
+	ifdebug {
+	(void) fprintf(stderr, "sc_common_projection_convex_hull: new systems\ns1p:\n");
+	sc_dump(s1p);
+	(void) fprintf(stderr, "s2p:\n");
+	sc_dump(s2p);
+        }
+	/* */
+
+	hp = sc_enveloppe_chernikova_ofl_ctrl(s1p, s2p, OFL_CTRL);
+
+	/* */
+	ifdebug {
+	(void) fprintf(stderr, "sc_common_projection_convex_hull: small enveloppe\nhp:\n");
+	sc_dump(hp);
+        }
+	/* */
+
+	hp = sc_safe_append(hp, s0);
+
+    }
+    else if (feasible_p2) {
+	/* if(sc_feasible_p(s2p)) { */
+	if(sc_rational_feasibility_ofl_ctrl(s2p, OFL_CTRL, TRUE)) {
+	    hp = s2p;
+	    s2p = SC_UNDEFINED;
+	    sc_base(hp) = sc_base(s0);
+	}
+	else {
+	    hp = sc_empty(sc_base(s0));
+	}
+	sc_dimension(hp) = sc_dimension(s0);
+	sc_base(s0) = BASE_UNDEFINED;
+    }
+    else if (feasible_p1) {
+	/* if(sc_feasible_p(s1p)) { */
+	if(sc_rational_feasibility_ofl_ctrl(s1p, OFL_CTRL, TRUE)) {
+	    hp = s1p;
+	    s1p = SC_UNDEFINED;
+	    sc_base(hp) = sc_base(s0);
+	}
+	else {
+	    hp = sc_empty(sc_base(s0));
+	}
+	sc_dimension(hp) = sc_dimension(s0);
+	sc_base(s0) = BASE_UNDEFINED;
+    }
+    else {
+	hp = sc_empty(sc_base(s0));
+	sc_dimension(hp) = sc_dimension(s0);
+	sc_base(s0) = BASE_UNDEFINED;
+    }
+
+    sc_rm(s0);
+    sc_rm(s1p);
+    sc_rm(s2p);
+
+    /* */
+    ifdebug {
+    (void) fprintf(stderr, "sc_common_projection_convex_hull: end\nreturn hp:\n");
+    sc_dump(hp);
+    }
+    /* */
 
     return hp;
 }
