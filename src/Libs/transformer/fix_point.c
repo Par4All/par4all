@@ -367,7 +367,7 @@ transformer tf;
 
     ifdebug(8) {
 	debug(8, "transformer_equality_fix_point", "fix-point sc_inv=\n");
-	sc_fprint(stderr, sc_inv, external_value_name);
+	sc_fprint(stderr, sc_inv, (char * (*)(Variable)) external_value_name);
 	debug(8, "transformer_equality_fix_point", "end\n");
     }
 
@@ -417,7 +417,7 @@ Pbase * pb_new;
 
     ifdebug(8) {
 	debug(8, "build_transfer_equations", "begin\ninput equations:\n");
-	egalites_fprint(stderr, leq, external_value_name);
+	egalites_fprint(stderr, leq, (char * (*)(Variable)) external_value_name);
     }
 
     /* FI: this is the simplest version;
@@ -440,7 +440,7 @@ Pbase * pb_new;
 
     ifdebug(8) {
 	debug(8, "build_transfer_equations", "preliminary transfer equations:\n");
-	egalites_fprint(stderr, lteq, external_value_name);
+	egalites_fprint(stderr, lteq, (char * (*)(Variable)) external_value_name);
     }
 
     /* derive the new basis and the old basis */
@@ -449,9 +449,9 @@ Pbase * pb_new;
     /* check that the old basis is included in the new basis (else no fix-point!) */
     ifdebug(8) {
 	debug(8, "build_transfer_equations", "old basis:\n");
-	base_fprint(stderr, b_old, external_value_name);
+	base_fprint(stderr, b_old, (char * (*)(Variable)) external_value_name);
 	debug(8, "build_transfer_equations", "new basis:\n");
-	base_fprint(stderr, b_new, external_value_name);
+	base_fprint(stderr, b_new, (char * (*)(Variable)) external_value_name);
     }
 
     /* Remove equations as long b_old is not included in b_new */
@@ -484,11 +484,11 @@ Pbase * pb_new;
 
     ifdebug(8) {
 	debug(8, "build_transfer_equations", "final transfer equations:\n");
-	egalites_fprint(stderr, lteq, external_value_name);
+	egalites_fprint(stderr, lteq, (char * (*)(Variable)) external_value_name);
 	debug(8, "build_transfer_equations", "old basis:\n");
-	base_fprint(stderr, b_old, external_value_name);
+	base_fprint(stderr, b_old, (char * (*)(Variable)) external_value_name);
 	debug(8, "build_transfer_equations", "new basis:\n");
-	base_fprint(stderr, b_new, external_value_name);
+	base_fprint(stderr, b_new, (char * (*)(Variable)) external_value_name);
     }
 
     if(!sub_basis_p(b_old, b_new)) {
@@ -501,9 +501,9 @@ Pbase * pb_new;
 
     ifdebug(8) {
 	debug(8, "build_transfer_equations", "results\ntransfer equations:\n");
-	egalites_fprint(stderr, lteq, external_value_name);
+	egalites_fprint(stderr, lteq, (char * (*)(Variable)) external_value_name);
 	debug(8, "build_transfer_equations", "results\ntransfer basis:\n");
-	base_fprint(stderr, b_new, external_value_name);
+	base_fprint(stderr, b_new, (char * (*)(Variable)) external_value_name);
 	debug(8, "build_transfer_equations", "end\n");
     }
 }
@@ -708,7 +708,7 @@ transformer tf;
 
 	ifdebug(8) {
 	    debug(8, "transformer_pattern_fix_point", "incrementation vector=\n");
-	    vect_fprint(stderr, v_inc, external_value_name);
+	    vect_fprint(stderr, v_inc, (char * (*)(Variable)) external_value_name);
 	}
 
 	/* eliminate sharing between v_inc and fix_sc */
@@ -724,28 +724,28 @@ transformer tf;
 
 	ifdebug(8) {
 	    debug(8, "transformer_pattern_fix_point", "after constant term elimination=\n");
-	    sc_fprint(stderr, fix_sc, external_value_name);
+	    sc_fprint(stderr, fix_sc, (char * (*)(Variable)) external_value_name);
 	}
 
 	fix_sc = sc_elim_redund(fix_sc);
 
 	ifdebug(8) {
 	    debug(8, "transformer_pattern_fix_point", "after normalization=\n");
-	    sc_fprint(stderr, fix_sc, external_value_name);
+	    sc_fprint(stderr, fix_sc, (char * (*)(Variable)) external_value_name);
 	}
 
 	fix_sc = sc_keep_invariants_only(fix_sc);
 
 	ifdebug(8) {
 	    debug(8, "transformer_pattern_fix_point", "after non-invariant elimination=\n");
-	    sc_fprint(stderr, fix_sc, external_value_name);
+	    sc_fprint(stderr, fix_sc, (char * (*)(Variable)) external_value_name);
 	}
 
 	fix_sc = sc_elim_redund(fix_sc);
 
 	ifdebug(8) {
 	    debug(8, "transformer_pattern_fix_point", "after 2nd normalization=\n");
-	    sc_fprint(stderr, fix_sc, external_value_name);
+	    sc_fprint(stderr, fix_sc, (char * (*)(Variable)) external_value_name);
 	}
     }
     else {
@@ -936,7 +936,7 @@ invariant_vector_p(Pvecteur v)
 
     ifdebug(8) {
 	debug(8, "invariant_vector_p", "begin for vector: ");
-	vect_fprint(stderr, v, external_value_name);
+	vect_fprint(stderr, v, (char * (*)(Variable)) external_value_name);
     }
 
     for(cv=v; !VECTEUR_UNDEFINED_P(cv); cv = vecteur_succ(cv)) {
@@ -970,11 +970,11 @@ invariant_vector_p(Pvecteur v)
 
     ifdebug(8) {
 	debug(8, "invariant_vector_p", "vector v_new: ");
-	vect_fprint(stderr, v_new, external_value_name);
+	vect_fprint(stderr, v_new, (char * (*)(Variable)) external_value_name);
 	debug(8, "invariant_vector_p", "vector v_old: ");
-	vect_fprint(stderr, v_old, external_value_name);
+	vect_fprint(stderr, v_old, (char * (*)(Variable)) external_value_name);
 	debug(8, "invariant_vector_p", "vector v_sum: ");
-	vect_fprint(stderr, v_sum, external_value_name);
+	vect_fprint(stderr, v_sum, (char * (*)(Variable)) external_value_name);
     }
 
     if(VECTEUR_NUL_P(v_sum)) {
@@ -1050,7 +1050,7 @@ transformer transformer_derivative_fix_point(transformer tf)
 
   ifdebug(8) {
     pips_debug(8, "with difference equations=\n");
-    sc_fprint(stderr, sc, external_value_name);
+    sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
   }
 
   /* Project all variables but differences */
@@ -1059,7 +1059,7 @@ transformer transformer_derivative_fix_point(transformer tf)
   
   ifdebug(8) {
     pips_debug(8, "Non-homogeneous constraints on derivatives=\n");
-    sc_fprint(stderr, sc, external_value_name);
+    sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
   }
 
   /* Eliminate constant terms to get homogeneous constraints.
@@ -1074,7 +1074,7 @@ transformer transformer_derivative_fix_point(transformer tf)
   ifdebug(8) {
     pips_debug(8, 
           "derivative constraints after elimination of constant terms=\n");
-    sc_fprint(stderr, sc_homo, external_value_name);
+    sc_fprint(stderr, sc_homo, (char * (*)(Variable)) external_value_name);
   }
   
   sc = sc_append(sc, sc_homo);
@@ -1082,7 +1082,7 @@ transformer transformer_derivative_fix_point(transformer tf)
   
   ifdebug(8) {
     pips_debug(8, "All constraints on derivatives=\n");
-    sc_fprint(stderr, sc, external_value_name);
+    sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
   }
 
   /* Generate invariants from the derivative constraints */
@@ -1146,9 +1146,9 @@ transformer transformer_derivative_fix_point(transformer tf)
   
   ifdebug(8) {
     pips_debug(8, "First set of equality invariants=\n");
-    egalites_fprint(stderr, leq, external_value_name);
+    egalites_fprint(stderr, leq, (char * (*)(Variable)) external_value_name);
     pips_debug(8, "First set of inequality invariants=\n");
-    inegalites_fprint(stderr, lineq, external_value_name);
+    inegalites_fprint(stderr, lineq, (char * (*)(Variable)) external_value_name);
   }
   
   /* sc is not needed anymore, it can be updated with leq and lineq */
@@ -1162,7 +1162,7 @@ transformer transformer_derivative_fix_point(transformer tf)
   
   ifdebug(8) {
     pips_debug(8, "All invariants on derivatives=\n");
-    sc_fprint(stderr, sc, external_value_name);
+    sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
   }
 
   for(bv = b; !BASE_NULLE_P(bv); bv = bv->succ) {
@@ -1191,7 +1191,7 @@ transformer transformer_derivative_fix_point(transformer tf)
   ifdebug(8) {
     pips_debug(8, 
 		 "All invariants on derivatives with difference variables=\n");
-    sc_fprint(stderr, sc, external_value_name);
+    sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
   }
   
   /* Project all difference variables */
@@ -1200,7 +1200,7 @@ transformer transformer_derivative_fix_point(transformer tf)
   
   ifdebug(8) {
     pips_debug(8, "All invariants on differences=\n");
-    sc_fprint(stderr, sc, external_value_name);
+    sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
   }
   
   /* The full basis must be used again */
@@ -1211,7 +1211,7 @@ transformer transformer_derivative_fix_point(transformer tf)
 
   ifdebug(8) {
     pips_debug(8, "All invariants with proper basis =\n");
-    sc_fprint(stderr, sc, external_value_name);
+    sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
   }
 
   /* Plug sc back into fix_tf */
