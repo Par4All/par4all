@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/10 19:42:43 $, 
+# $Date: 1996/07/16 09:17:40 $, 
 #
 # Newgen should be quite particular...
 
@@ -82,7 +82,7 @@ x.tab.h x.tab.c: read.y
 
 lex.xx.o: x.tab.h
 lex.xx.c: read.l 
-	$(SCAN) $< | sed 's,YY,XX,g;s,yy,xx,g' > $@
+	$(SCAN) $< | sed 's,YY,XX,g;s,yy,xx,g;s,\([^<]string\),\1_flex,' > $@
 
 z.tab.h z.tab.c: gram.y
 	$(PARSE) $< 
