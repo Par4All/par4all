@@ -1,8 +1,6 @@
-/* 	%A% ($Date: 1997/03/20 18:02:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* $Id$
+ */
 
-#ifndef lint
-char vcid_xv_help[] = "%A% ($Date: 1997/03/20 18:02:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -24,28 +22,28 @@ char vcid_xv_help[] = "%A% ($Date: 1997/03/20 18:02:53 $, ) version $Revision$, 
 #define HELP_LINES 32
 
 /* The URL of the PIPS documentation at the École des Mines de Paris: */
-#define PIPS_DOCUMENTATION_URL "http://www.cri.ensmp.fr/~pips"
+#define PIPS_DOCUMENTATION_URL "http://www.cri.ensmp.fr/pips"
 
-static Panel_item lines[HELP_LINES];
-static char *help_list[ARGS_LENGTH];
-static int help_list_length;
+static Panel_item lines[HELP_LINES]; /* GRRRRRRRR FC. */
+static gen_array_t help_list = (gen_array_t) NULL;
 
 void
 display_help(char * topic)
 {
-   int i;
+   int i, n;
 
-   if (help_list_length != 0)
-      /* help window is already opened */
-      args_free(&help_list_length, help_list);
+   if (!help_list) /* lazy */
+       help_list = gen_array_make(0);
 
-   get_help_topic(topic, &help_list_length, help_list);
+   get_help_topic(topic, help_list);
+   n = gen_array_nitems(help_list);
 
-   for (i = 0; i < min(HELP_LINES, help_list_length); i++) {
-      xv_set(lines[i], PANEL_LABEL_STRING, help_list[i], 0);
+   for (i = 0; i < min(HELP_LINES, n); i++) {
+      xv_set(lines[i], PANEL_LABEL_STRING, 
+	     gen_array_item(help_list, i), 0);
    }
 
-   for (i = min(HELP_LINES, help_list_length); i < HELP_LINES; i++) {
+   for (i = min(HELP_LINES, n); i < HELP_LINES; i++) {
       xv_set(lines[i], PANEL_LABEL_STRING, "", 0);
    }
 
@@ -58,9 +56,8 @@ static void
 close_help_notify(Panel_item item,
                   Event * event)
 {
-   args_free(&help_list_length, help_list);
-
-   hide_window(help_frame);
+    gen_array_full_free(help_list), help_list = (gen_array_t) NULL;
+    hide_window(help_frame);
 }
 
 
