@@ -1,5 +1,4 @@
 #!/bin/sh
-
 #
 # Display [-w wspace] [-m module] [-v] [pretty-print]
 #
@@ -7,12 +6,28 @@
 #
 
 # Modifications
-# - uses less instead of more to avoid extra-characters when Display is run in background
+# - uses less instead of more to avoid extra-characters 
+#   when Display is run in background
 
 USAGE="Usage: Display [-h] [-w wspace] [-m module] [-v] [-l] [pretty-print]"
 AVAILABLE_PRETTY_P="Available Pretty-prints: para77 para90 cray cmf craft adfg bdt plc code tran utran prec uprec comp regi inreg outreg prop cumu cg cgcomp cgprec cgtran cgprop cgcumu cgreg cgin cgout icfg icfgprec icfgcomp icfgl icfglprec icfglcomp icfgc icfgcprec icfgccomp dg edg lcdg wdg wp65 bank flint dead"
 
-MORE=${PIPS_MORE:-less}
+more=${PIPS_MORE:-less}
+
+show()
+{
+    echo Display of file ${1} >&2
+    ${more} ${1}
+}
+
+# display workspace module extension
+display()
+{
+    file="${1}/${2}${3}"
+    test -f ${file} && show $file
+    file="${1}/${2}/${2}${3}" 
+    test -f ${file} && show $file
+}
 
 #if [ $# -eq 0 ]
 #then	echo $USAGE >&2
@@ -212,15 +227,8 @@ case $PRETTY_P in
 		exit 1;;
 esac
 
-if [ "$SELECT" ]
-then
-	SELECT="-s $SELECT"
-fi
-
-if [ "$PERFORM" ]
-then 
-	PERFORM="-p $PERFORM"
-fi
+[ "$SELECT" ] && SELECT="-s $SELECT"
+[ "$PERFORM" ] && PERFORM="-p $PERFORM"
 
 if [ -z "$LAST" ]
 then
@@ -253,11 +261,5 @@ then
 fi
 fi
 
-echo Display of file $PGM.database/$MOD$EXT >&2
-$MORE $PGM.database/$MOD$EXT
-
-if [ "$ASSOC_EXT" ]
-then
-	echo Display of file $PGM.database/$MOD$ASSOC_EXT >&2
-	$MORE $PGM.database/$MOD$ASSOC_EXT
-fi
+display $PGM.database $MOD $EXT
+[ "$ASSOC_EXT" ] display $PGM.database $MOD $ASSOC_EXT
