@@ -110,7 +110,7 @@ string module_name;
       user_log("\n\n *** PRINTING PLC for %s\n", module_name);
 
   the_plc = (plc) db_get_memory_resource(DBR_PLC, module_name, TRUE);
-  filename = (string) strdup(concatenate(db_get_current_program_directory(),
+  filename = (string) strdup(concatenate(db_get_current_workspace_directory(),
                     	     "/", module_name, ".plc_file", (string) NULL));
 
   fd = safe_fopen(filename, "w");
