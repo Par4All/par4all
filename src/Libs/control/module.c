@@ -34,6 +34,15 @@ string module_name;
 			 control_graph(module_stat));
     statement_ordering(module_stat) = MAKE_ORDERING(0,1) ;
 
+    /* By setting this property, we try to unspaghettify the control
+       graph of the module: */
+    if (get_bool_property("UNSPAGHETTIFY_IN_CONTROLIZER")) {
+	unspaghettify_statement(module_stat);
+	/* Reorder the module, because new statementsthe control graph
+	   may have been generatchanged. */
+	   module_reorder(module_stat);
+    }
+    
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, 
 			   strdup(module_name), 
 			   module_stat);
