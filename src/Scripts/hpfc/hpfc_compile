@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/08/22 14:53:32 $, 
+# $Date: 1996/09/13 17:32:26 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -20,7 +20,8 @@ HPFC='-p HPFC_INSTALL'
 TIMEPROP=
 PIPSPROP=
 
-unset MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR REDIRECT FILES HPFFILES
+unset MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR \
+	REDIRECT FILES HPFFILES
 rm -f $TMP.*
 
 #
@@ -147,14 +148,16 @@ done
 
 FAKES="`egrep '^[Cc!\*][Ff][Cc][Dd]\\\$ [ 	]*([Ss][Yy][Nn][Cc][Hh][Rr][Oo]|[Tt][Ii][Mm][Ee]|[Hh][Oo][Ss][Tt]|[Kk][Ii][Ll][Ll])' $HPFFILES`"
 
+dir=${HPFC_RUNTIME:-${PIPS_ROOT}/Share}
+
 if [ "$FAKES" ] 
 then
    $debug "adding needed fake file"
-   if [ -f ${HPFC_RUNTIME}/hpfc_fake.f ]
+   if [ -f $dir/hpfc_stubs.direct ]
    then 
-      fake="${HPFC_RUNTIME}/hpfc_fake.f"
+      fake="$dir/hpfc_stubs.direct"
    else
-      fake="${PIPS_ROOT}/Share/hpfc_fake.f"
+      fake="$dir/hpfc_stubs.f"
    fi
    HPFFILES="$HPFFILES $fake"
 else
