@@ -153,7 +153,7 @@ transformer_combine(
     /* update t1 */
     transformer_arguments(t1) = a1;
     /* predicate_system(transformer_relation(t1)) = (Psysteme) r1; */
-    predicate_system_(transformer_relation(t1)) = (char *) r1;
+    predicate_system_(transformer_relation(t1)) = r1;
 
      
     debug(8,"transformer_combine","res. t1=%x\n",t1);
@@ -534,7 +534,7 @@ list le; /* list of entities */
     transformer_arguments(tf) = args;
     s->base = b;
     s->dimension = vect_size(b);
-    predicate_system_(transformer_relation(tf)) = (char *) s;
+    predicate_system_(transformer_relation(tf)) = s;
     return tf;
 }
 
