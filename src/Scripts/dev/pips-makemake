@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.296  1997/08/18 08:45:42  coelho
+# new source file forgotten.
+#
 # Revision 1.295  1997/08/18 08:29:40  coelho
 # cleaner.
 #
@@ -614,7 +617,7 @@ CFILES	 =	\$(LIB_CFILES)
 OBJECTS	 =	\$(LIB_OBJECTS)
 INCLUDES =	\$(LIB_HEADERS)
 MAIN	 =      \$(ARCH)/\$(LIB_MAIN:.c=.o)
-SOURCES  += 	\$(INCLUDES) \$(CFILES) \$(DOCS)
+SOURCES  += 	\$(INCLUDES) \$(CFILES) \$(DOCS) $(LIB_MAIN)
 #
 INSTALL_LIB +=	\$(MAIN)
 #
