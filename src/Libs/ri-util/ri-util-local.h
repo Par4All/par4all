@@ -318,7 +318,7 @@ typedef hash_table control_mapping;
 /*  constant sizes
  */
 #define LABEL_SIZE 5
-#define INDENTATION 3
+#define INDENTATION (get_int_property("PRETTYPRINT_INDENTATION"))
 #define MAXIMAL_MODULE_NAME_SIZE 36
 
 /*   default values
