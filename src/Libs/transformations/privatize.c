@@ -181,7 +181,7 @@ static bool expression_implied_do_index_p(expression exp,entity e)
 	    "%s implied do index ? index: %s\n",
 		entity_name(e),entity_name(index));
 
-      range_effects = proper_effects_of_range(r, is_action_read);
+      range_effects = proper_effects_of_range(r);
 
       MAP(EFFECT, eff, 
 	  {
