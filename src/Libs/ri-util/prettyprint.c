@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.240 2004/02/18 10:09:28 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.241 2004/02/19 14:02:41 nguyen Exp $";
 #endif /* lint */
 
  /*
@@ -1385,7 +1385,7 @@ static list words_comma_op(call obj, int precedence, bool leftmost)
 {
   list pc = NIL, args = call_arguments(obj);
   int prec = words_intrinsic_precedence(obj);
-  
+  pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
   while (!ENDP(CDR(args)))
   {
@@ -1393,6 +1393,21 @@ static list words_comma_op(call obj, int precedence, bool leftmost)
     pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
     args = CDR(args);
   }
+  pc = CHAIN_SWORD(pc,")");
+  return(pc);
+}
+
+static list words_conditional_op(call obj, int precedence, bool leftmost)
+{
+  list pc = NIL, args = call_arguments(obj);
+  int prec = words_intrinsic_precedence(obj);
+  pc = CHAIN_SWORD(pc,"(");
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
+  pc = CHAIN_SWORD(pc,"?");
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
+  pc = CHAIN_SWORD(pc,":");
+  pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(CDR(args)))), prec, TRUE));
+  pc = CHAIN_SWORD(pc,")");
   return(pc);
 }
 
@@ -1538,6 +1553,9 @@ multiply-add operators ( JZ - sept 98) */
     {"&=", words_assign_op, 1 },
     {"^=", words_assign_op, 1 },
     {"|=", words_assign_op, 1 },
+
+    /* which precedence ?*/
+    {"?", words_conditional_op, 0},
 
     {",", words_comma_op, 0},
  
@@ -2985,7 +3003,7 @@ static list words_cast(cast obj)
   type t = cast_type(obj);
   expression exp = cast_expression(obj);
   pc = CHAIN_SWORD(pc,"(");
-  pc = gen_nconc(pc, words_type(t));
+  pc = gen_nconc(pc, c_words_entity(t,NIL));
   pc = CHAIN_SWORD(pc,")");
   pc = gen_nconc(pc, words_expression(exp));
   return pc;
