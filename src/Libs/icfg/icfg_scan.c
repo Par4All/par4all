@@ -97,59 +97,16 @@ static void call_filter(call c)
 	    break;
 	case ICFG_DECOR_PRECONDITIONS:
 	{
-	    /* summary effects for the callee */
-	    list seffects_callee = load_summary_effects(e_callee);
-	    /* caller preconditions */
-	    transformer caller_prec;
-	    /* callee preconditions */
-	    transformer call_site_prec;
-
-
-	    
-	    set_cumulated_effects_map
-		(effectsmap_to_listmap((statement_mapping)
-				       db_get_memory_resource
-				       (DBR_CUMULATED_EFFECTS,
-					module_local_name(e_caller), TRUE)));
-	    set_semantic_map((statement_mapping)
-			     db_get_memory_resource
-			     (DBR_PRECONDITIONS,
-			      module_local_name(e_caller),
-			      FALSE) );
-
-	    /* load caller preconditions */
-	    caller_prec = load_statement_semantic(current_stmt_head());
-
-	    set_current_module_statement (current_stmt_head());
-
-	    /* first, we deal with the caller */
-	    set_current_module_entity(e_caller);
-	    /* create htable for old_values ... */
-	    module_to_value_mappings(e_caller);
-	    /* add to preconditions the links to the callee formal params */
-	    caller_prec = add_formal_to_actual_bindings (c, caller_prec);
-	    /* transform the preconditions */
-	    call_site_prec = precondition_intra_to_inter (e_callee,
-						caller_prec,
-						seffects_callee);
-	    /* translate_global_values(e_caller, call_site_prec); */
-	    reset_current_module_entity();
-
-	    /* Now deal with the callee */
-	    set_current_module_entity(e_callee);
-	    /* Set the htable with its varaibles because now we work
-	       in tis referential*/
-	    module_to_value_mappings(e_callee); 
-	    reset_current_module_entity();
+	    transformer call_site_prec = 
+		call_site_to_module_precondition(e_caller,
+						 e_callee,
+						 current_stmt_head(),
+						 c);
 
 	    /* Then print the text for the caller preconditions */
 	    set_current_module_entity(e_caller);
 	    MERGE_TEXTS(r,text_transformer(call_site_prec));
 	    reset_current_module_entity();
-
-	    reset_current_module_statement();
-	    reset_cumulated_effects_map();
-	    reset_semantic_map();
 
 	    break;
 	}
