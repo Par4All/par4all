@@ -85,7 +85,6 @@ free_cumu_range_effects()
 
 /************************************************************** EXPRESSSIONS */
 
-
 /* list generic_proper_effects_of_range(range r, context)
  * input    : a loop range (bounds and stride) and the context.
  * output   : the corresponding list of effects.
@@ -232,7 +231,16 @@ generic_proper_effects_of_syntax(syntax s)
 list 
 generic_proper_effects_of_expression(expression e)
 {
-    return(generic_proper_effects_of_syntax(expression_syntax(e)));
+  list le = generic_proper_effects_of_syntax(expression_syntax(e));
+
+  /* keep track of proper effects associated to sub-expressions if required.
+   */
+  if (!expr_prw_effects_undefined_p())
+    {
+      store_expr_prw_effects(e, make_effects(gen_full_copy_list(le)));
+    }
+
+  return le;
 }
 
 /* list generic_proper_effects_of_expressions(list exprs)
@@ -542,7 +550,6 @@ void proper_effects_of_module_statement(statement module_stat)
 
 bool proper_effects_engine(char *module_name)
 {    
-
     /* Get the code of the module. */
     set_current_module_statement( (statement)
 		      db_get_memory_resource(DBR_CODE, module_name, TRUE) );
@@ -573,3 +580,26 @@ bool proper_effects_engine(char *module_name)
     return(TRUE);
 }
 
+/* compute proper effects for both expressions and statements
+   WARNING: the functions are set as a side effect.
+ */
+void 
+expression_proper_effects_engine(
+    string module_name,
+    statement current)
+{    
+    (*effects_computation_init_func)(module_name);
+
+    init_proper_rw_effects();
+    init_expr_prw_effects();
+  
+    debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
+    pips_debug(1, "begin\n");
+
+    proper_effects_of_module_statement(current); 
+
+    pips_debug(1, "end\n");
+    debug_off();
+
+    (*effects_computation_reset_func)(module_name);
+}
