@@ -21,7 +21,9 @@
 #include "misc.h"
 #include "list.h"
 
-#include "loop_normalize.h"
+/* AP: I removed this include because it no longer exists
+#include "loop_normalize.h" */
+
 #include "atomizer.h"
 
 /* FI: I moved these procedures in ri-util/variable.c and ri-util/type.c */
