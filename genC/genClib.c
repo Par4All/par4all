@@ -132,6 +132,8 @@ void gen_close_Gen_tabulated_names(void)
 #define check_Gen_tabulated_names() \
   message_assert("Gen_tabulated_names defined", Gen_tabulated_names)
 
+/* returns a pointer to a static string "number|name"
+ */
 char * gen_build_unique_tabulated_name(int domain, char * name)
 {
     int len = strlen(name);
