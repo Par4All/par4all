@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #include <stdio.h>
 
 #include "genC.h"
@@ -20,48 +24,48 @@ void default_update_props() {}
  */
 void (* pips_update_props_handler)() = default_update_props;
 
-/* FI: should be called "initialize_workspace()"; a previous call to
- * db_create_workspace() is useful to create the log file between
- * the two calls says RK
+/* PIPS SRCPATH before openining the workspace, for restauration.
  */
-bool 
-create_workspace(gen_array_t files)
+static string saved_pips_src_path = NULL;
+
+static void 
+push_path(void)
 {
-    int i, argc = gen_array_nitems(files);
-    string name;
-    bool success = FALSE;
+    string dir;
+    pips_assert("not set", !saved_pips_src_path);
+    dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
+    saved_pips_src_path = pips_srcpath_append(dir);
+    free(dir);
+}
 
-    /* since db_create_workspace() must have been called before... */
-    pips_assert("some current workspace", db_get_current_workspace_name());
+static void
+pop_path(void)
+{
+    pips_assert("set", saved_pips_src_path);
+    pips_srcpath_set(saved_pips_src_path);
+    free(saved_pips_src_path), saved_pips_src_path = NULL;
+}
 
-    open_log_file();
-    set_entity_to_size();
 
-    for (i = 0; i < argc; i++) {
-	success = process_user_file(gen_array_item(files, i));
-	if (success == FALSE)
-	    break;
-    }
+bool 
+open_module(string name)
+{
+    bool success;
+    if (!db_get_current_workspace_name())
+	pips_user_error("No current workspace, open or create one first!\n");
 
-    if (success) {
-	(* pips_update_props_handler)();
-	name = db_get_current_workspace_name();
-	user_log("Workspace %s created and opened.\n", name);
-	success = open_module_if_unique();
-	if (success) init_processed_include_cache();
-    }
-    else {
-	/* FI: in fact, the whole workspace should be deleted!
-	 The file and the directory should be removed, and the current
-	 database become undefined... */
-        /* DB: free the hash_table, otherwise core dump during the next
-         call to create_workspace */
-        reset_entity_to_size();
-	close_log_file();
-    }
+    if (db_get_current_module_name()) /* reset if needed */
+	db_reset_current_module_name();
+
+    success = db_set_current_module_name(name);
+    reset_unique_variable_numbers();
+
+    if (success) user_log("Module %s selected\n", name);
+    else pips_user_warning("Could not open module %s\n", name);
 
     return success;
 }
+
 
 bool 
 open_module_if_unique()
@@ -83,25 +87,52 @@ open_module_if_unique()
     return success;
 }
 
+/* FI: should be called "initialize_workspace()"; a previous call to
+ * db_create_workspace() is useful to create the log file between
+ * the two calls says RK
+ */
 bool 
-open_module(string name)
+create_workspace(gen_array_t files)
 {
-    bool success;
-    if (!db_get_current_workspace_name())
-	pips_user_error("No current workspace, open or create one first!\n");
+    int i, argc = gen_array_nitems(files);
+    string name;
+    bool success = FALSE;
 
-    if (db_get_current_module_name()) /* reset if needed */
-	db_reset_current_module_name();
+    /* since db_create_workspace() must have been called before... */
+    pips_assert("some current workspace", db_get_current_workspace_name());
 
-    success = db_set_current_module_name(name);
-    reset_unique_variable_numbers();
+    open_log_file();
+    set_entity_to_size();
 
-    if (success) user_log("Module %s selected\n", name);
-    else pips_user_warning("Could not open module %s\n", name);
+    for (i = 0; i < argc; i++) 
+    {
+	success = process_user_file(gen_array_item(files, i));
+	if (success == FALSE)
+	    break;
+    }
+
+    if (success) 
+    {
+	(* pips_update_props_handler)();
+	name = db_get_current_workspace_name();
+	user_log("Workspace %s created and opened.\n", name);
+	success = open_module_if_unique();
+	if (success) init_processed_include_cache();
+	push_path();
+    }
+    else
+    {
+	/* FI: in fact, the whole workspace should be deleted!
+	 The file and the directory should be removed, and the current
+	 database become undefined... */
+        /* DB: free the hash_table, otherwise core dump during the next
+         call to create_workspace */
+        reset_entity_to_size();
+	close_log_file();
+    }
 
     return success;
 }
-
 
 /* Do not open a module already opened : */
 bool 
@@ -153,7 +184,7 @@ open_workspace(string name)
 	user_log("Workspace %s opened.\n", name);
 	success = open_module_if_unique();
 	if (success) init_processed_include_cache();
-	
+	push_path();	
     }
     return success;
 }
@@ -173,6 +204,7 @@ close_workspace(void)
     close_log_file();
     close_processed_include_cache();
     reset_entity_to_size();
+    pop_path();
     return success;
     /*clear_props();*/
 }
