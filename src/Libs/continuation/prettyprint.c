@@ -284,10 +284,11 @@ print_continuation_conditions(char *module_name)
 	(is_user_view_p ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE);
 
     success = 
-	make_text_resource(module_name,
-			   file_resource_name,
-			   file_name,
-			   get_continuation_condition_text(module_name,TRUE));
+	make_text_resource_and_free(
+	    module_name,
+	    file_resource_name,
+	    file_name,
+	    get_continuation_condition_text(module_name,TRUE));
 
     free(file_name);
     return(success);
