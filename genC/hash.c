@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1996/08/31 16:36:06 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1996/09/20 16:19:33 $, )
  * version $Revision$
  */
 
@@ -51,7 +51,9 @@ struct __hash_table {
     int hash_size_limit;
 };
 
+#ifndef abs
 #define abs(v) (((v) > 0) ? (v) : (-(v)))
+#endif
 
 /* Constant to find the end of the prime numbers table 
  */
