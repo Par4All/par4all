@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.135  1998/01/27 14:38:55  coelho
+# recanati moved out.
+#
 # Revision 1.134  1998/01/26 09:49:06  coelho
 # hop.
 #
@@ -211,10 +214,13 @@ PIPS_CPP='gcc -E'
 # where to put binaries (maybe on some other disk...)
 # default is directly in a subdirectory
 
+# should be links...
 PIPS_DIRECTORY_FOR_LINUXI86_BINARIES=/home/tirnanog/calice1/pips/LINUXI86
 PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/home/loreto/burette2/pips/LINUXI86LL
-PIPS_DIRECTORY_FOR_GNUSOL2LL_BINARIES=/home/recanati/baraque1/pips/GNUSOL2LL
-PIPS_DIRECTORY_FOR_SOL2LL_BINARIES=/home/recanati/baraque1/pips/SOL2LL
+
+# see in /home/deauville/flacon2
+PIPS_DIRECTORY_FOR_GNUSOL2LL_BINARIES=/projects/Pips/Links/GNUSOL2LL
+PIPS_DIRECTORY_FOR_SOL2LL_BINARIES=/projects/Pips/Links/SOL2LL
 
 
 ############################################################ DEVELOPPING PIPS
@@ -236,7 +242,7 @@ PATH="${PATH}:${PIPS_ROOT}/Utils:/usr5/gnu/bin-sparc"
 
 # hosts for Validate:
 test "${PIPS_ARCH}" = GNUSOL2LL && \
-	PIPS_HOSTS="recanati:deauville"
+	PIPS_HOSTS="deauville"
 
 test "${PIPS_ARCH}" = . -o "${PIPS_ARCH}" = GNU && \
 	PIPS_HOSTS="chailly:episy:aiguebelette:roazhon"
