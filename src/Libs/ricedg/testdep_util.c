@@ -8,36 +8,7 @@
  written by Remi, Yi-Qing; reorganized by Yi-Qing (18/09/91)
  */
 
-#include <stdio.h>
-#include <string.h>
-/* #include <values.h> */
-#include <limits.h>
-
-#include <setjmp.h>
-
-
-#include "arithmetique.h"
-
-#include "genC.h"
-#include "text.h"
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-#include "database.h"
-
-#include "misc.h"
-#include "text-util.h"
-#include "ri-util.h"
-#include "rice.h"
-
-/* includes pour system generateur */
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "polyedre.h"
-
-#include "ricedg.h"
-
+#include "local.h"
  
 /* to deal with overflow errors occuring during the projection 
  * of a Psysteme along a variable */
