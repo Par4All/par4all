@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1996/06/17 18:11:28 $, 
+ * $Date: 1996/06/17 22:11:34 $, 
  *
  * utilities for reductions.
  *
@@ -262,7 +262,6 @@ update_compatible_reduction(
 		pips_debug(8, "under effect to %s\n", 
 			   entity_name(effect_variable(e)));
 
-		free_reduction(*pr); *pr=NULL;
 		return FALSE;
 	    },
 	    le);
