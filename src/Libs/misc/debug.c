@@ -59,14 +59,17 @@ int get_debug_stack_pointer()
 void set_debug_stack_pointer(i)
 {
     if(i >= 0 && i <= idls) {
-	user_warning("set-debug_stack_pointer",
-		     "debug level stack is set\n");
-	idls = i;
-	if(idls>1) {
-	    set_debug_level(debug_level_stack[idls-1]);
+	if (i!=idls) {
+	    user_warning("set_debug_stack_pointer",
+			 "debug level stack is set to %d\n", i);
+	    idls = i;
+	    if(idls>1) {
+		set_debug_level(debug_level_stack[idls-1]);
+	    }
+	    else {
+		set_debug_level(0);
 	}
-	else
-	    set_debug_level(0);
+    }
     }
     else
 	pips_error("set-debug_stack_pointer", 
