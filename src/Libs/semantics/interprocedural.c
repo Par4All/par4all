@@ -643,7 +643,7 @@ entity v;
 	    user_warning("translate_global_value",
 			 "Information about %s lost,\n"
 			 "check structure of common /%s/ in modules %s and %s\n",
-			 entity_name(v), entity_local_name(section), entity_module_name(v),
+			 entity_name(v), module_local_name(section), entity_module_name(v),
 			 module_local_name(m));
 	    if(entity_is_argument_p(v, transformer_arguments(tf))) {
 		entity v_old = global_new_value_to_global_old_value(v);
