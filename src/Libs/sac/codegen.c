@@ -216,8 +216,10 @@ static bool consecutive_refs_p(referenceInfo firstRef, int lastOffset, reference
    return ( same_entity_p(referenceInfo_entity(firstRef), 
 			  referenceInfo_entity(cRef)) &&
 	    (referenceInfo_nbDimensions(firstRef) == referenceInfo_nbDimensions(cRef)) &&
-	    (same_entity_p(reference_variable(referenceInfo_index(firstRef)),
-			   reference_variable(referenceInfo_index(cRef)))) &&
+	    (( (referenceInfo_index(firstRef) == reference_undefined) &&
+	       (referenceInfo_index(cRef) == reference_undefined) ) ||
+	     (same_entity_p(reference_variable(referenceInfo_index(firstRef)),
+			   reference_variable(referenceInfo_index(cRef))))) &&
 	    (lastOffset + 1 == referenceInfo_offset(cRef)) );
 }
 
@@ -362,10 +364,11 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 			       EXPRESSION(CAR(args)),
 			       entity_to_expression(
 				  referenceInfo_entity(firstRef)),
-			       reference_to_expression(
-				  referenceInfo_index(firstRef)),
 			       make_integer_constant_expression(
 				  referenceInfo_offset(firstRef)),
+			       referenceInfo_index(firstRef) == reference_undefined ?
+			          make_integer_constant_expression(0) : 
+			          reference_to_expression(referenceInfo_index(firstRef)),
 			       NULL);
 	 break;
       }
@@ -439,7 +442,7 @@ static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
       prefix[3] = 'i';
    else
       prefix[3] = 'f';
-   prefix[5] = 0;
+   prefix[4] = 0;
 
    mod_ent = get_current_module_entity();
    num = (char*) malloc(32);
@@ -491,6 +494,10 @@ static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
 
 void reset_argument_info()
 {
+   int i;
+   
+  for(i=0; i<nbArguments; i++)
+     free_argumentInfo(arguments[i]);
    nbArguments = 0;
 }
 
@@ -537,7 +544,7 @@ static argumentInfo get_argument_info(int id)
       arguments[id] : argumentInfo_undefined;
 }
 
-static statementInfo make_nonsimd_statement_info(statement s)
+statementInfo make_nonsimd_statement_info(statement s)
 {
    statementInfo ssi;
    int i;
@@ -650,7 +657,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
       argumentInfo_placesAvailable(ai) = 
 	 CONS(VECTORELEMENT,
 	      make_vector_element(ssi, i, j),
-	      argumentInfo_placesAvailable(ai));
+	      NIL);
    }
 
    return si;
@@ -695,12 +702,12 @@ list make_simd_statements(list kinds, cons* first, cons* last)
       if (oc == opcode_undefined)
       {
 	 /* No optimized opcode found... */
-	 for( index = 0, j = i;
-	      (index < MAX_PACK) && (j != CDR(last));
-	      index++, j = CDR(j) )
+	 for( index = 0;
+	      (index < MAX_PACK) && (i != CDR(last));
+	      index++, i = CDR(i) )
 	 {
 	    CDR(instr) = CONS(STATEMENT_INFO, 
-			      make_nonsimd_statement_info(STATEMENT(CAR(j))),
+			      make_nonsimd_statement_info(STATEMENT(CAR(i))),
 			      NIL);
 	    instr = CDR(instr);
 	 }
