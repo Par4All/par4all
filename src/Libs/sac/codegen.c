@@ -598,47 +598,59 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
    /* Fill the matrix of arguments */
    for(j=0; j<opcode_vectorSize(oc); j++)
    {
+      argumentInfo ai;
+      expression e;
+      statementArgument ssa;
+
       list l = args[j];
 
       for(i=nbargs-1; i>=0; i--)
       {
-	 argumentInfo ai;
-	 statementArgument ssa;
-	 expression e = EXPRESSION(CAR(l));
+	 e = EXPRESSION(CAR(l));
 	 
 	 //Store it in the argument's matrix
 	 ssa = make_statementArgument(e, NIL);
 	 simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * i] = ssa;
 	 
 	 l = CDR(l);
+      }
+
+      //Build the dependance tree
+      for(i=0; i<nbargs-1; i++)
+      {
+	 //we read this variable
+	 ssa = simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * i];
+	 e = statementArgument_expression(ssa);
 
 	 //Get the id of the argumet
-	 //Build the dependance tree
 	 ai = get_argument_info(get_argument_id(e));
 
-	 if (i == nbargs-1)
-	 {  //we write to this variable
-
-	    //Free the list of places available. Those places are
-	    //not relevant any more
-	    gen_free_list(argumentInfo_placesAvailable(ai));
-	    argumentInfo_placesAvailable(ai) = NIL;
-	 }
-	 else
-	 {  //we read this variable
-
-	    //ssa depends on all the places where the expression was
-	    //used before
-	    statementArgument_dependances(ssa) = 
-	       gen_copy_seq(argumentInfo_placesAvailable(ai));
-	 }
+	 //ssa depends on all the places where the expression was
+	 //used before
+	 statementArgument_dependances(ssa) = 
+	    gen_copy_seq(argumentInfo_placesAvailable(ai));
 
 	 //Remember that this variable can be found here too
 	 argumentInfo_placesAvailable(ai) = 
-	    CONS(VECTOR_ELEMENT,
+	    CONS(VECTORELEMENT,
 		 make_vector_element(ssi, i, j),
 		 argumentInfo_placesAvailable(ai));
       }
+
+      //Get the id of the last argument
+      ssa = simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * (nbargs-1)];
+      e = statementArgument_expression(ssa);
+
+      ai = get_argument_info(get_argument_id(e));
+
+      //we write to this variable -->
+      //Free the list of places available. Those places are
+      //not relevant any more
+      gen_free_list(argumentInfo_placesAvailable(ai));
+      argumentInfo_placesAvailable(ai) = 
+	 CONS(VECTORELEMENT,
+	      make_vector_element(ssi, i, j),
+	      argumentInfo_placesAvailable(ai));
    }
 
    return si;
