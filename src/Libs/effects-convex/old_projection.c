@@ -976,8 +976,9 @@ void region_exact_projection_along_variable(region reg, entity var)
 	{
 	    if (setjmp(overflow_error))
 	    {
-		region reg_tmp = reference_whole_region(region_reference(reg),
-							region_action_tag(reg));
+		region reg_tmp = 
+		    reference_whole_region(region_reference(reg),
+					   region_action_tag(reg));
 		
 		region_system_(reg) = region_system_(reg_tmp);
 		region_reference(reg_tmp) = reference_undefined;
@@ -999,7 +1000,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 		    region_system_(reg) = newgen_Psysteme(sc);
 		    
 		    if (op_statistics_p() &&
-			(region_approximation_tag(reg) == is_approximation_must) )
+			(region_approximation_tag(reg)==is_approximation_must))
 			nb_proj_var_must++;
 		}
 		else 
@@ -1008,8 +1009,8 @@ void region_exact_projection_along_variable(region reg, entity var)
 		    boolean is_proj_exact = TRUE;
 		    
 		    vect_add_elem(&pv_var, (Variable) var, VALUE_ONE);
-		    sc = sc_projection_ofl_along_variables_with_test(sc, pv_var, 
-								     &is_proj_exact);
+		    sc = sc_projection_ofl_along_variables_with_test
+			(sc, pv_var,  &is_proj_exact);
 		    vect_rm(pv_var);
 		    sc = region_sc_normalize(sc,2);	
 		    region_system_(reg)= newgen_Psysteme(sc);
