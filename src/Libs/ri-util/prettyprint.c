@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/13 17:22:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/17 23:32:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/13 17:22:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/17 23:32:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -848,8 +848,12 @@ int n;
     if(statement_undefined_p(test_false_obj)){
       pips_error("text_test","undefined statement\n");
     }
-    if ((!empty_statement_p(test_false_obj)) &&
-	(!statement_continue_p(test_false_obj))) {
+    if (((!empty_statement_p(test_false_obj)) &&
+	(!statement_continue_p(test_false_obj))) ||
+	(empty_statement_p(test_false_obj) &&
+	 (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS"))) ||
+	(statement_continue_p(test_false_obj) &&
+	 (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
 	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
 				      test_false_obj));
