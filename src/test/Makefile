@@ -37,7 +37,8 @@ run_test: reserv
 	diff sortie sortie2;
 
 clean: 
-	$(RM) hash_test reserv spec.h lieu.h lieu.spec newres.h newres.spec 
+	$(RM) hash_test reserv spec.h lieu.h lieu.spec newres.h newres.spec \
+		sortie sortie[234] core
 
 #
 # That is all
