@@ -62,6 +62,16 @@ void add_a_icfgpe_print(string resource_name, get_text_function gt)
   }, lp);
 }
 */
+
+static void
+load_resources(string module_name)
+{
+  MAPL(l, {
+    p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff) STRING(CAR(l));
+    ips->resource = (gen_chunk*) db_get_memory_resource(ips->name, module_name, TRUE);
+  }, lp);
+}
+
 static text get_any_effects_text_flt(string module_name)
 {
   entity module;
