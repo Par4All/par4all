@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNULL,v $ (version $Revision$) 
-# $Date: 1996/07/14 13:30:39 $, 
+# $Date: 1996/07/15 11:45:09 $, 
 #
 # this file contains macro definitions 
 
@@ -8,9 +8,10 @@ AR	= gar
 ARFLAGS	= rv
 CC	= gcc
 CFLAGS	= -O2 -g -Wall -mv8 -pipe
-CPPFLAGS= -DLINEAR_VALUE=LONGLONG -D__USE_FIXED_PROTOTYPES__ -I$(NEWGEN_INCDIR) -I$(LINEAR_INCDIR) -I$(PIPS_INCDIR) -I$(PIPS_EXTEDIR)
+CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -D__USE_FIXED_PROTOTYPES__ -I$(NEWGEN_INCDIR) -I$(LINEAR_INCDIR) -I$(PIPS_INCDIR) -I$(PIPS_EXTEDIR)
 LD	= $(CC) 
 LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)
+RANLIB	= granlib
 LEX	= flex
 LFLAGS	= -l
 FC	= g77
