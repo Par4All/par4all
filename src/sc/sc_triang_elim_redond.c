@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1997/10/23 13:54:19 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1997/12/11 14:26:09 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -105,14 +105,16 @@ Pvecteur v;
  *  - invariant code motion
  *  - induction variables recognized
  */
-#define RESULT(e)\
-{ \
-      int result = (e);\
-      fprintf(stderr, "[compare_the_constraints]\n");\
-      vect_debug(v1); vect_debug(v2);\
+#define DB_RESULT(e)							 \
+{									 \
+      int result = (e);							 \
+      fprintf(stderr, "[compare_the_constraints]\n");			 \
+      vect_debug(v1); vect_debug(v2);					 \
       fprintf(stderr, "%s\n", result==0 ? "=" : (result>0 ? ">" : "<")); \
-      return(result);\
+      return(result);							 \
 }
+
+#define RESULT(e) { return (e); }
 
 #define RETURN_HARDER(b) RESULT(complex_for_compare ? (b) : -(b))
 #define RETURN_ORDER(b) RESULT(inner_for_compare ? (b) : -(b))
