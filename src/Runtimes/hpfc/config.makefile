@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:26:16 $, )
+# ($Date: 1996/08/21 17:26:40 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -260,7 +260,7 @@ clean: local-clean
 local-clean: 
 	$(RM) *~ $(LIB_OBJECTS) $(PVM_HEADERS) \
 		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) $(LIB_TARGET)
-	test -d ! $(PVM_ARCH) || rmdir $(PVM_ARCH)
+	test ! -d $(PVM_ARCH) || rmdir $(PVM_ARCH)
 
 # that is all
 #
