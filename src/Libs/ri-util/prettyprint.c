@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.68  1997/08/04 16:56:49  coelho
+ * *** empty log message ***
+ *
  * Revision 1.67  1997/08/04 16:56:08  coelho
  * back to initial, because  declarations are not atomic as I thought.
  *
@@ -20,7 +23,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.67 1997/08/04 16:56:08 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.68 1997/08/04 16:56:49 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1115,7 +1118,7 @@ loop_private_variables(loop obj)
 	    if (some_before) 
 		l = CHAIN_SWORD(l, ",");
 	    else
-		some_befire = TRUE; /* from now on commas, triggered... */
+		some_before = TRUE; /* from now on commas, triggered... */
 
 	    l = gen_nconc(l, words_declaration(p,TRUE));
 	}
