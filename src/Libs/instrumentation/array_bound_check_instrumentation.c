@@ -439,6 +439,7 @@ bool array_bound_check_instrumentation(char *module_name)
 	"      COMMON /ARRAY_BOUND_CHECK/ ARRAY_BOUND_CHECK_COUNT\n";
       string new_decl_init = 
 	"      DATA ARRAY_BOUND_CHECK_COUNT /0/\n";
+      string old_decl;
 
       basic b = make_basic_int(4);
 
@@ -446,20 +447,27 @@ bool array_bound_check_instrumentation(char *module_name)
 
       abccount = make_scalar_entity(ABC_COUNT,module_name,copy_basic(b));
       
+      old_decl = code_decls_text(entity_code(mod_ent));
+
+      fprintf(stderr, "OLD = %s\n", old_decl);
+
       if (entity_main_module_p(mod_ent))
 	// MAIN PROGRAM 
 	code_decls_text(entity_code(mod_ent))
-          = strdup(concatenate(code_decls_text(entity_code(mod_ent)),
-			       new_decl,new_decl_init,NULL));
+          = strdup(concatenate(old_decl, new_decl, new_decl_init,NULL));
       else 
 	code_decls_text(entity_code(mod_ent)) 
-	  = strdup(concatenate(code_decls_text(entity_code(mod_ent)),
-			       new_decl, NULL));
+	  = strdup(concatenate(old_decl, new_decl, NULL));
+
+      free(old_decl), old_decl = NULL;
+
+      fprintf(stderr, "NEW = %s\n", code_decls_text(entity_code(mod_ent)));
       
       /* Begin the array bound check instrumentation phase. 
        * Get the code from dbm (true resource) */
   
-      module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+      module_statement= (statement) 
+	db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
       set_current_module_statement(module_statement);
  
