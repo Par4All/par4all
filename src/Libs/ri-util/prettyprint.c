@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/10/25 17:14:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/11/13 13:54:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/10/25 17:14:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/11/13 13:54:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -360,15 +360,110 @@ static string (*common_hook)(entity, entity) = default_common_hook;
 void set_prettyprinter_common_hook(string(*f)(entity,entity)){ common_hook=f;}
 void reset_prettyprinter_common_hook(){ common_hook=default_common_hook;}
 
-static text text_entity_declaration(module, ldecl)
-entity module;
-list ldecl;
+static text
+text_equivalence_class(list /* of entities */ l_equiv)
+{
+    text t_equiv = make_text(NIL);
+
+    /* FIRST, sort the list by increasing offset from the beginning of
+       the memory suite. If two variables have the same offset, the longest 
+       one comes first; if they have the same lenght, use a lexicographic
+       ordering */
+
+    /* THEN, prettyprint the sorted list*/
+
+    return t_equiv;
+}
+
+text 
+text_equivalences(entity module, list ldecl)
+{
+    list equiv_classes = NIL;
+    text t_equiv_class;
+
+    /* FIRST BUILD EQUIVALENCE CLASSES */
+    /* consider each entity in the declaration */
+    MAP(ENTITY, e,
+	{
+	    /* but only variables which have a ram storage must be considered */
+	    if (type_variable_p(entity_type(e)) &&
+		storage_ram_p(entity_storage(e)))
+	    {
+		list shared = ram_shared(storage_ram(entity_storage(e)));
+		
+		/* If this variable is statically aliased */
+		if (!ENDP(shared))
+		{
+		    bool found = FALSE;
+		    list found_equiv_class = NIL;
+
+		    shared = CONS(ENTITY, e, shared);
+
+		    /* We first look in already found equivalence classes
+		     * if there is already a class in which one of the
+		     * aliased variables appears 
+		     */
+		    MAP(LIST, equiv_class,
+			{
+			    MAP(ENTITY, ent,
+				{
+				    if (variable_in_list_p(ent, equiv_class))
+				    {
+					found = TRUE;
+					break;
+				    }
+				},
+				shared);
+			    if (found)
+			    {
+				found_equiv_class = equiv_class;
+				break;
+			    }
+			}, 
+			equiv_classes);
+
+		    if (found)
+		    {
+			/* add the entities of shared which are not already in 
+			 * the existing equivalence class
+			 */
+			MAP(ENTITY, ent,
+			    {
+				if(!variable_in_list_p(ent, found_equiv_class))
+				    found_equiv_class =
+					gen_nconc(found_equiv_class,
+						  CONS(ENTITY, ent, NIL));
+			    },
+			    shared)
+		    }
+		    else
+		    {
+			equiv_classes = gen_nconc(equiv_classes, shared);
+		    }
+		}
+	    }
+	},
+	ldecl);
+
+    /* SECOND, PRETTYPRINT THEM */
+    t_equiv_class = make_text(NIL); 
+    MAP(LIST, equiv_class,
+	{
+	   MERGE_TEXTS(t_equiv_class, text_equivalence_class(equiv_class));
+	},
+	equiv_classes);
+    return(t_equiv_class);
+}
+
+static text 
+text_entity_declaration(entity module, list ldecl)
 {
     bool print_commons = get_bool_property("PRETTYPRINT_COMMONS"),
          from_hpfc = get_bool_property("PRETTYPRINT_HPFC");
     text r, t_chars;
     list before = NIL, area_decl = NIL, ph = NIL,
-	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, pc = NIL, ps = NIL;
+	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, pc = NIL, ps = NIL,
+	equivalence_decl = NIL;
 
     t_chars = make_text(NIL); 
 
@@ -536,8 +631,9 @@ list ldecl;
     MERGE_TEXTS(r, t_chars);
     MERGE_TEXTS(r, make_text(area_decl));
 
-    /* And lastly, equivalence statements... Euhhhhh???? - BC -*/
-    
+    /* And lastly, equivalence statements... - BC -*/
+    MERGE_TEXTS(r, text_equivalences(module, ldecl));
+
     return (r);
 }
 
@@ -704,7 +800,7 @@ loop_private_variables(loop obj)
 	    else
 		some_before = TRUE; /* from now on commas... */
 
-	    l = CHAIN_SWORD(l, entity_local_name(p));
+	    l = gen_nconc(l, words_declaration(p,TRUE));
 	}
     }, 
 	loop_locals(obj)) ; /* end of MAP */
