@@ -66,20 +66,30 @@ align=middle> You can get a beta version of the
 <a name="new-features"><h2>What's new?</h2></a>
 <P>
 <ul>
-  <li> WHILE loops are parsed and analyzed, as well as multiple RETURNs; ENTRY statements are on their way into the parser...
+  <li> ENTRY statements are parsed and transformed into independent
+       subroutines or functions sharing static variables thru a common
+  <li> WHILE loops are parsed and analyzed
+  <li> Multiple RETURNs are parsed and transformed using either an
+       explicit return code and explicit testing by the caller, or a STOP if
+       alternate returns only are used to report errors. The behavior is
+       user-selectable
   <li> Cloning
   <li> Forward substitution
-  <li> OpenMP output
+  <li> First OpenMP output
   <li> Graph representation of large call graphs (with DaVinci)
-  <li> A Java-based user interface (jpips)
+  <li> A Java-based user interface, jpips; still in its infancy!
   <li> Perfect Club benchmarks:
-  <li> Spec-CFP95 benchmarks: applu, apsi , fpppp, hydro2d, mgrid, su2cor, swim, tomcatv, turb3d (wave5 is missing because of its ENTRY number)
+  <li> Spec-CFP95 benchmarks: applu, apsi , fpppp, hydro2d, mgrid, su2cor,
+       swim, tomcatv, turb3d, wave5
+  <li> Number of simultaneously analyzed modules above 200!
+  <li> Concurrent apply of transformations such as partial evaluation to avoid
+       too many intermediate interprocedural analyses
 </ul>
 
 <hr>
 
 <b>Last update: </b>
-$Date: 1998/06/26 15:54:42 $
+$Date: 1998/07/24 15:37:45 $
 
 <b>URL: </b>http://www.cri.ensmp.fr/pips
 
