@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.80  1997/12/05 16:50:31  coelho
+ * checkpoint added.
+ *
  * Revision 1.79  1997/12/05 13:28:37  coelho
  * capply stuff added.
  *
@@ -111,6 +114,7 @@ static struct t_completion_scheme completion_scheme[] =
 { "source",	COMP_FILENAME,   COMP_FILENAME },
 { CHANGE_DIR,   COMP_FILENAME,   COMP_NONE },
 { QUIT,         COMP_NONE,       COMP_NONE },
+{ "checkpoint", COMP_NONE,       COMP_NONE },
 { HELP,         COMP_HELP_TOPIC, COMP_NONE },
 { ECHO,         COMP_NONE,       COMP_NONE },
 { "open",       COMP_NONE,       COMP_NONE },
@@ -134,9 +138,9 @@ static struct t_completion_scheme completion_scheme[] =
 static char *tp_help_topics[] = 
 {
     "readline", "create","close","delete","echo","module","activate",
-    "make","apply","display",SET_ENV, SET_PROP,GET_PROP,SHELL_ESCAPE,
+    "make","apply","capply","display",SET_ENV, SET_PROP,GET_PROP,SHELL_ESCAPE,
     CHANGE_DIR,QUIT,"source", HELP,"rule","resource","owner", "remove",
-    (char*)NULL
+    "checkpoint", (char*)NULL
 };
 
 /************************************************* TPIPS HANDLERS FOR PIPS */
@@ -271,6 +275,8 @@ tpips_help(string line)
 	 "\tfirst delete the workspace if it exists\n");
     TP_HELP("open", "open     <workspace-name>\n",
 	 "\topen an existing workspace\n");
+    TP_HELP("checkpoint", "checkpoint\n",
+	 "\tcheckpoint the current workspace\n");
     TP_HELP("close", "close\n",
 	 "\tclose the current opened workspace\n");
     TP_HELP("delete", "delete   <workspace-name>\n",
