@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.279  1997/04/28 16:03:50  coelho
+# *** empty log message ***
+#
 # Revision 1.278  1997/04/28 08:37:05  coelho
 # *** empty log message ***
 #
@@ -328,7 +331,7 @@ check_install:
 # is this appropriate?
 # .DEFAULT:; @echo "$MAKEFILE [\$(FWD_ROOT)] *** no rule for target $@!" >&2
 #
-\$(ARCH):; mkdir \$(ARCH)
+\$(ARCH):; test -d \$(ARCH) || mkdir \$(ARCH)
 #
 include \$(ROOT)/Include/define_libraries.make
 include \$(ROOT)/Include/makefile_macros.\$(ARCH)
@@ -645,8 +648,7 @@ cat >> $MAKEFILE <<%
 
 \$(TARGET_OBJECTS): \$(TARGET).h
 
-\$(PIPS_ROOT)/Bin/\$(ARCH):
-	mkdir \$@
+\$(PIPS_ROOT)/Bin/\$(ARCH):; mkdir \$@
 
 \$(PIPS_ROOT)/Bin/\$(BIN_TARGET): \$(BIN_TARGET) \$(PIPS_ROOT)/Bin/\$(ARCH)
 	@\$(INSTALL) -x \$(PIPS_ROOT)/Bin/\$(ARCH) \$(BIN_TARGET)
@@ -869,6 +871,10 @@ header: .header \$(INC_TARGET)
 
 \$(INC_TARGET): \$(TARGET)-local.h 
 	\$(RM) .header; \$(MAKE) \$(GMKNODIR) .header
+
+ifneq (\$(ARCH),.)
+lib\$(TARGET).a: \$(ARCH) \$(ARCH)/lib\$(TARGET).a
+endif
 
 %
 
