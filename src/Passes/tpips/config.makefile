@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/08 17:33:47 $, 
+# $Date: 1996/08/08 18:22:36 $, 
 
 LEX=		flex
 CPPFLAGS+=	-DFLEX_SCANNER
@@ -41,3 +41,6 @@ completion_list.h :	$(PIPS_INCLUDEDIR)/resources.h \
 
 # for bootstraping the dependences...
 tpips.h: completion_list.h
+
+#
+#
