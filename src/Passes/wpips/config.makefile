@@ -1,4 +1,4 @@
-# $RCSfile: config.makefile,v $ ($Date: 1996/07/02 16:28:40 $, ) 
+# $RCSfile: config.makefile,v $ ($Date: 1996/07/03 16:46:43 $, ) 
 # version $Revision$
 # got on %D%, %T%
 # [%P%].
@@ -46,7 +46,7 @@ LIB_CFILES=	emacs.c \
 LIB_HEADERS=	xv_sizes.h wpips-local.h wpips-labels.h pips.icon icons
 #
 #
-LIB_OBJECTS=	$(TARGET_CFILES:.c=.o)
+LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
 #
 # List of libraries used to build the target
 #
