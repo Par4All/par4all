@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1997/01/04 14:46:07 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1997/01/14 13:42:03 $, )
  * version $Revision$
  */
  
@@ -315,8 +315,8 @@ static void set_resources_for_module(entity module)
      *   the special FCD calls.
      */
     automatic_translation(local_name_to_top_level_entity(STOP_FUNCTION_NAME),
-			  hpfc_name_to_entity(HOST_END),
-			  hpfc_name_to_entity(NODE_END));
+			  hpfc_name_to_entity(HPFC_STOP),
+			  hpfc_name_to_entity(HPFC_STOP));
     automatic_translation(hpfc_name_to_entity(HPF_PREFIX SYNCHRO_SUFFIX),
 			  hpfc_name_to_entity(SYNCHRO),
 			  hpfc_name_to_entity(SYNCHRO));
