@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1996/09/20 18:08:59 $, 
+ * date: $Date: 1997/07/17 20:32:19 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -28,6 +28,7 @@
  * Last modified by Beatrice Creusillet, 13/12/94.
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
