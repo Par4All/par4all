@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.86  1997/10/24 16:29:11  coelho
+ * bug-- : external declaration if not yet parsed.
+ *
  * Revision 1.85  1997/10/23 11:37:58  irigoin
  * Detection of last statement added.
  *
@@ -72,7 +75,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.85 1997/10/23 11:37:58 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.86 1997/10/24 16:29:11 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1717,10 +1720,11 @@ text_entity_declaration(entity module, list ldecl)
 	type te = entity_type(e);
 	bool func = 
 	    type_functional_p(te) && storage_rom_p(entity_storage(e));
-	bool param = func && value_symbolic_p(entity_initial(e));
+	value v = entity_initial(e);
+	bool param = func && value_symbolic_p(v);
 	bool external =     /* subroutines won't be declared */
 	    (func && 
-	     value_code_p(entity_initial(e)) &&
+	     (value_code_p(v) || value_unknown_p(v) /* not parsed callee */) &&
 	     !type_void_p(functional_result(type_functional(te))));
 	bool area_p = type_area_p(te);
 	bool var = type_variable_p(te);
