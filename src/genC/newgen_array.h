@@ -1,29 +1,4 @@
-/*
- * $Id$
- *
- * $Log: newgen_array.h,v $
- * Revision 1.10  1999/05/27 15:19:05  zory
- * gen_array_remove added !
- *
- * Revision 1.9  1998/12/29 16:10:05  coelho
- * sort with a cmp.
- *
- * Revision 1.8  1998/12/29 16:03:53  coelho
- * fixed type in map.
- *
- * Revision 1.7  1998/12/29 16:01:43  coelho
- * *** empty log message ***
- *
- * Revision 1.6  1998/12/29 16:00:21  coelho
- * char * -> void *
- *
- * Revision 1.5  1997/12/05 12:18:32  coelho
- * list <-> array
- *
- * Revision 1.4  1997/12/04 17:24:14  coelho
- * GEN_ARRAY_MAP added.
- *
- */
+/* $Id$ */
 
 struct _gen_array_chunk_t;
 typedef struct _gen_array_chunk_t * gen_array_t;

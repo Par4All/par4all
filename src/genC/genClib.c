@@ -17,18 +17,6 @@
  *
  * The file has all the generic functions to manipulate C objects
  * implemented by gen_chunks (see genC.c).
- *
- * $Log: genClib.c,v $
- * Revision 1.122  2003/07/25 12:30:14  coelho
- * check for undefined first.
- *
- * Revision 1.121  2003/06/19 16:22:02  coelho
- * all warnings out.
- *
- * Revision 1.120  2003/06/19 14:42:16  irigoin
- * Bug fix line 250, call to gen_alloc_component() in gen_alloc_constructed()
- *
- *
  */
 
 #include <stdio.h>

@@ -4,13 +4,6 @@
 
   $Id$
   
-  $Log: string.c,v $
-  Revision 1.16  1998/09/16 14:36:28  coelho
-  added cast.
-
-  Revision 1.15  1998/09/16 14:27:24  coelho
-  header added.
-
 */
 
 /*
