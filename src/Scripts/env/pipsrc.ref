@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/29 10:31:06 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/29 10:33:05 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -120,7 +120,7 @@ PIPS_LD_SUN4=${PIPS_CC_SUN4}
 #
 # LD FLAGS
 #
-PIPS_LDFLAGS="-g -L$(ARCH) -L${PIPS_LIBDIR}/$(ARCH) -L${PIPS_EXTEDIR}/$(ARCH)"
+PIPS_LDFLAGS="-g -L\$(ARCH) -L${PIPS_LIBDIR}/\$(ARCH) -L${PIPS_EXTEDIR}/\$(ARCH)"
 PIPS_LDFLAGS_SUN4="-fast ${PIPS_LDFLAGS}"
 #
 # others
