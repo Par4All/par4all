@@ -336,7 +336,7 @@ char *mod_name;
 
     /* FI: this is not a proper way to do it */
     if (get_bool_property("PRINT_DEPENDENCE_GRAPH") || PRINT_RSDG) {
-	dg_name = strdup(concatenate(db_get_current_program_directory(), 
+	dg_name = strdup(concatenate(db_get_current_workspace_directory(), 
 			             "/", mod_name, ".dg", NULL));
 	fp = safe_fopen(dg_name, "w");
 	print_graph(fp, mod_stat, dg);
@@ -2135,7 +2135,7 @@ string mod_name;
 
     debug_on("RICEDG_DEBUG_LEVEL");
 
-    dg_name = (string) strdup(concatenate(db_get_current_program_directory(), "/", mod_name, ".dg", NULL));
+    dg_name = (string) strdup(concatenate(db_get_current_workspace_directory(), "/", mod_name, ".dg", NULL));
     fp = safe_fopen(dg_name, "w");
     if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") || 
 	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS")) {
@@ -2179,7 +2179,7 @@ char *mod_name;
 	return; /* to avoid warnings from compiler */
     }
 
-    filename = strdup(concatenate(db_get_current_program_directory(), "/", 
+    filename = strdup(concatenate(db_get_current_workspace_directory(), "/", 
 				  mod_name, ".", filename, 0));
 
     fp = safe_fopen(filename, "w");
