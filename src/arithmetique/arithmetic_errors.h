@@ -1,5 +1,5 @@
 /* $RCSfile: arithmetic_errors.h,v $ (version $Revision$)
- * $Date: 1997/09/08 15:13:33 $, 
+ * $Date: 1997/09/08 19:51:03 $, 
  *
  * managing arithmetic errors...
  * detecting and managing arithmetic errors on Values should be
@@ -10,21 +10,17 @@
  */
 #include <setjmp.h>
 
-extern void throw_exception();
-
 /* the index points to the first available chunck for a new context...
  */
 
-extern void print_exception_stack_error();
-
 #define MAX_STACKED_CONTEXTS 20
-jmp_buf global_exception_stack[MAX_STACKED_CONTEXTS];
-int     global_exception_type[MAX_STACKED_CONTEXTS];
-int     global_exception_index = 0;
-int     global_exception_thrown = 0;
+extern jmp_buf global_exception_stack[MAX_STACKED_CONTEXTS];
+extern int     global_exception_type[MAX_STACKED_CONTEXTS];
+extern int     global_exception_index = 0;
+extern int     global_exception_thrown = 0;
 
-int overflow_error = 1;
-int  simplex_arithmetic_error=2;
+extern int overflow_error = 1;
+extern int  simplex_arithmetic_error=2;
 
 /* declaration of "exception"  to keep  2 potential types:
    extern int or extern jmp_buf
