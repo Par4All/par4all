@@ -899,11 +899,48 @@ static void type_this_entity_if_needed(entity e, type_context_p context)
   }
 }
 
+static void put_summary(string name, type_context_p context)
+{
+  user_log("Type Checker Summary\n"
+	   "\t%d errors found\n"
+	   "\t%d conversions inserted\n"
+	   "\t%d simplifications performed\n",
+	   context->number_of_error,
+	   context->number_of_conversion,
+	   context->number_of_simplication);
+
+  if (name && get_bool_property("TYPE_CHECKER_ADD_SUMMARY"))
+  {
+    entity module = local_name_to_top_level_entity(name);
+    code c;
+    char buf[100];
+
+    pips_assert("entity is a module", entity_module_p(module));
+
+    c = value_code(entity_initial(module));
+
+    sprintf(buf, 
+	    "!PIPS TYPER: %d errors, %d conversions, %d simplifications\n",
+	    context->number_of_error,
+	    context->number_of_conversion,
+	    context->number_of_simplication);
+
+    if (!code_decls_text(c) || string_undefined_p(code_decls_text(c)))
+      code_decls_text(c) = strdup(buf);
+    else
+    {
+      string tmp = code_decls_text(c);
+      code_decls_text(c) = strdup(concatenate(buf, tmp, NULL));
+      free(tmp);
+    }
+  }
+}
+
 /************************************************************************** 
  * Type check all expressions in statements.
  * Returns false if type errors are detected.
  */
-void typing_of_expressions(statement s)
+void typing_of_expressions(string name, statement s)
 {
   type_context_t context;
   
@@ -917,13 +954,7 @@ void typing_of_expressions(statement s)
   type_this_chunk((void *) s, &context);
   
   /* Summary */
-  user_log("Type Checker Summary\n"
-	   "\t%d errors found\n"
-	   "\t%d conversions inserted\n"
-	   "\t%d simplifications performed\n",
-	   context.number_of_error,
-	   context.number_of_conversion,
-	   context.number_of_simplication);
+  put_summary(name, &context);
   
   /* Type checking ... */
   HASH_MAP(st, ba, free_basic(ba), context.types);
@@ -941,7 +972,7 @@ type_checker(string name)
   stat = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
   set_current_module_statement(stat);
 
-  typing_of_expressions(stat);
+  typing_of_expressions(name, stat);
 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, stat);
   reset_current_module_statement();
