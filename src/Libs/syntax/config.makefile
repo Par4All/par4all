@@ -50,7 +50,8 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 y.tab.c: tokyacc.h gram.y
 	cat tokyacc.h gram.y > yacc.in
 	$(PARSE) yacc.in
-	sed -e '/extern char \*malloc/d;s/YY/MM/g;s/yy/ss/g' y.tab.c > s.tab.c
+	sed -e '/extern char \*malloc/d;s/YY/SYN_/g;s/yy/syn_/g' \
+		y.tab.c > s.tab.c
 	mv s.tab.c y.tab.c
 
 
@@ -59,9 +60,10 @@ y.tab.c: tokyacc.h gram.y
 #
 
 scanner.c: scanner.l toklex.h
-	$(SCAN) scanner.l | sed -e 's/YY/MM/g;s/yy/ss/g' | \
-	sed -e '/sscrank\[\]/,/^0,0};/s/^/{/;/sscrank\[\]/,/^{0,0};$$/s/,$$/},/;/sscrank\[\]/,/^{0,0};$$/s/,	$$/},/;/sscrank\[\]/,/^{0,0};$$/s/,	/},	{/g;s/^{0,0};$$/{0,0}};/;/sscrank\[\]/s/{//' | \
-	sed -e 's/^0,	0,	0,/{0,	0,	0},/;s/^0,	0,	0};/{0,	0,	0}};/;/^sscrank+/s/^/{/;/^{sscrank+/s/,$$/},/;/^{sscrank+/s/,	$$/},/' > scanner.c
+	$(SCAN) scanner.l | \
+	sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/SYN_/g;s/yy/syn_/g' | \
+	sed '/syn_crank\[\]/,/^0,0};/s/^/{/;/syn_crank\[\]/,/^{0,0};$$/s/,$$/},/;/syn_crank\[\]/,/^{0,0};$$/s/,	$$/},/;/syn_crank\[\]/,/^{0,0};$$/s/,	/},	{/g;s/^{0,0};$$/{0,0}};/;/syn_crank\[\]/s/{//' | \
+	sed 's/^0,	0,	0,/{0,	0,	0},/;s/^0,	0,	0};/{0,	0,	0}};/;/^syn_crank+/s/^/{/;/^{syn_crank+/s/,$$/},/;/^{syn_crank+/s/,	$$/},/' > scanner.c
 
 keywtbl.h: toklex.h f77keywords
 	cp toklex.h keywtbl.h
