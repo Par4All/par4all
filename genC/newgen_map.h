@@ -18,7 +18,7 @@
 #ifndef MAP_INCLUDED
 #define MAP_INCLUDED
 
-/* $RCSfile: newgen_map.h,v $ ($Date: 1995/03/28 15:06:42 $, ) 
+/* $RCSfile: newgen_map.h,v $ ($Date: 1995/04/06 17:12:56 $, ) 
  * version $Revision$
  * got on %D%, %T%
  *
@@ -75,13 +75,14 @@ IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 #define FUNCTION_MAP(typename, start, image, k, v, code, fun) \
     {\
     hash_table _map_hash_h = (fun+1)->h ;\
-    register hash_entry *_map_hash_p = _map_hash_h->hash_array ;\
-    hash_entry *_map_hash_end = \
-	    _map_hash_h->hash_array+_map_hash_h->hash_size ;\
+    register hash_entry_pointer _map_hash_p = hash_table_array(_map_hash_h) ;\
+    hash_entry_pointer _map_hash_end = \
+	    hash_table_array(_map_hash_h)+hash_table_size(_map_hash_h) ;\
     for( ; _map_hash_p<_map_hash_end ; _map_hash_p++ ) { \
-	if( _map_hash_p->key!=(char *)0 && _map_hash_p->key!=(char *)-1) { \
-	    typename##_key_type k = ((gen_chunk*)(_map_hash_p->key))->start ; \
-	    typename##_value_type v = ((gen_chunk*)(_map_hash_p->val))->image;\
+	if( hash_entry_key(_map_hash_p) !=HASH_ENTRY_FREE && \
+            hash_entry_key(_map_hash_p) !=HASH_ENTRY_FREE_FOR_PUT) { \
+	    typename##_key_type k = ((gen_chunk*)hash_entry_key(_map_hash_p))->start ; \
+	    typename##_value_type v = ((gen_chunk*)hash_entry_val(_map_hash_p))->image;\
             code ; }}}
 
 #endif
