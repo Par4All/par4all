@@ -1,3 +1,4 @@
+/* 	$Id$	 */
 /* header file built by cproto */
 #ifndef icfg_header_included
 #define icfg_header_included
