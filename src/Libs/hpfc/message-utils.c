@@ -1,7 +1,7 @@
 /*
  * Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1994/12/22 16:52:19 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1995/03/23 16:54:33 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -187,7 +187,7 @@ int dim;
 range r;
 {
     entity
-	newarray = load_entity_node_new(array);
+	newarray = load_new_node(array);
     dimension
 	d = FindIthDimension(newarray, dim);
     int
@@ -364,7 +364,7 @@ Pvecteur v;
 	if (neighbour!=0)
 	{
 	    entity
-		newarray = load_entity_node_new(array);
+		newarray = load_new_node(array);
 	    dimension
 		nadim = FindIthDimension(newarray, i);
 	    expression
