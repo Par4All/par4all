@@ -2,6 +2,10 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.63  1997/07/03 10:51:41  zory
+# MPI runtime version is now available
+# The pvm one can be examinated with the paradyn performance tool
+#
 # Revision 1.62  1997/06/09 09:53:06  coelho
 # *** empty log message ***
 #
@@ -23,11 +27,11 @@ SHELL=/bin/sh
 
 #
 # usual default target is to build and install the seq and par versions
-all: out main install
+all: out mainpvm mainmpi install
 	#
 	# $(NAME)_out sequential version compiled
-	# $(NAME)_main parallel version compiled and installed
-	#
+	# $(NAME)_mainpvm parallel pvm version compiled and installed
+	# $(NAME)_mainmpi parallel mpi version compiled
 
 #
 # help target
@@ -37,33 +41,39 @@ help:
 	#
 	# NOTE: this make file should be run with GNU make (gmake)
 	#
-	# Possible targets of high interest: out main install run
+	# Possible targets of high interest: out mainpvm mainmpi install run
 	#
 	# COMPILATION and INSTALLATION
 	#
 	#   out: generates $(NAME)_out sequential executable 
-	#   main: generates $(NAME)_main paralle PVM executable 
+	#   mainpvm: generates $(NAME)_mainpvm paralle PVM executable 
 	#     (one SPMD executable which insures both I/O and computations)
-	#   install: insures that $(NAME)_main is copied in the PVM directory
+	#   mainmpi: generates $(NAME)_mainmpi parallel MPI executable
+	#   install: insures that $(NAME)_mainpvm is copied in the PVM directory
 	#   hostnode: generates $(NAME)_{host,node} PVM executables
 	#     (two executables, one for I/Os and a SPMD one for the nodes)
 	#
 	# OTHERS
 	#
-	#   all: out main install
-	#   diff: compares sequential and parallel stdouts!
+	#   all: out mainpvm mainmpi install
+	#   diffpvm: compares sequential and parallel pvm stdouts!
+	#   diffmpi: compares sequential and parallel mpi stdouts!
+	#	(not yet implemented)
 	#   clean: removes deducable files
 	#   clobber: also removes executables files.
 	#   reset: reset pvm
-	#   install_{main,hostnode}: 
+	#   restart: restart pvm (useful when debugging) 
+	#   install_{mainpvm,hostnode}: 
 	#     copies executables to the pvm directory (where spawn find them)
-	#
+	#   paradyn: in order to link with the paradyn object files
+	#	
 
 #
 # Other tools
 
 STRIP	=	strip
 COPY 	= 	cp
+
 
 #
 # PVM interactive command
@@ -123,6 +133,9 @@ endif
 ifeq ($(PVM_ARCH),SUN4SOL2)
 NETWORK = 1
 RUNTIME_LIBS	+= -lnsl -lsocket
+#FFLAGS		+= -lbsd
+FLINKER 	= 	hf77
+LAMHF77		= 	$(FC)
 endif
 
 ifeq ($(PVM_ARCH),SUNMP)
@@ -138,6 +151,7 @@ ifeq ($(PVM_ARCH),RS6K)
 NETWORK = 1
 # bsd helps with signals (e.g. if xpomp is used)
 FFLAGS	+= -lbsd
+FLINKER 	= mpxlf
 endif
 
 ifeq ($(PVM_ARCH),LINUX)
@@ -151,12 +165,22 @@ endif
 pvmbin 	= $(HOME)/pvm3/bin/$(PVM_ARCH)
 pvmlib	= $(PVM_ROOT)/lib/$(PVM_ARCH)
 pvminc	= $(PVM_ROOT)/include
+mpibin	= $(MPI_ROOT)/bin
+mpilib  = $(MPI_ROOT)/lib
+mpiinc	= $(MPI_ROOT)/h
+
+
 
 LIBS_DIR	+= -L. -L$(pvmlib) -L$(RT_DIR)/$(RT_ARCH)
+LIBS_MPI_DIR	+= -L. -L$(mpilib) -L$(RT_DIR)/$(RT_ARCH)
 
 PVM_FLIB 	+= -lfpvm3
 PVM_GLIB 	+= -lgpvm3
 PVM_HLIB 	+= -lpvm3
+
+MPI_LIB	+= -lmpi
+
+PARADYN_DIR	= $(PARADYN_ROOT)/lib/$(PLATFORM)
 
 ifdef _HPFC_USE_PVMe_
 # we're using pvme, that's sure!
@@ -169,6 +193,10 @@ all:	$(NAME).cmd
 pvmlib		= $(PVM_ROOT)/lib
 pvminc		= $(PVM_ROOT)/lib
 PVM_GLIB	=
+
+mpiinc		= $(MPI_ROOT)/include
+mpilib  	= $(MPI_ROOT)/lib/rs6000/ch_eui/
+
 #
 # two possible protocols: less efficient one used by default:-)
 # US (dedicated, 40MB/s) or IP (sharable, 15MB/s)
@@ -219,7 +247,7 @@ HPFC_PMI_LIB	+= -lhpfcmpi
 
 COMMON_LIBS	+= $(RUNTIME_LIBS) 
 COMMON_PVM_LIBS	+= $(HPFC_PVM_LIB) $(PVM_FLIB) $(PVM_GLIB) 
-
+COMMON_MPI_LIBS += $(HPFC_PMI_LIB) $(MPI_LIB)
 HOST_LIBS	+= $(PVM_HLIB)
 NODE_LIBS 	+= $(PVM_NLIB) 
 
@@ -227,8 +255,9 @@ NODE_LIBS 	+= $(PVM_NLIB)
 # Files (the wildcards are GNU make extensions:-)
 
 PVM_HEADERS 	= 	pvm3.h fpvm3.h
-HEADERS 	=	$(wildcard hpfc_*.h) $(PVM_HEADERS)
-
+MPI_HEADERS	= 	mpif.h
+HEADERS_PVM 	=	$(wildcard hpfc_*.h) $(PVM_HEADERS)
+HEADERS_MPI 	=	$(wildcard hpfc_*.h) $(MPI_HEADERS)
 RT_INIT		= 	hpfc_initialize_runtime.f
 
 COMMON_FFILES	=	$(RT_INIT) hpfc_check.f $(wildcard [A-Z]*_both.f)
@@ -238,9 +267,14 @@ NODE_FFILES 	= 	$(wildcard [A-Z]*_node.f)
 COMMON_OFILES	=	$(COMMON_FFILES:.f=.o) 
 HOST_OFILES 	= 	$(HOST_FFILES:.f=.o) 
 NODE_OFILES 	= 	$(NODE_FFILES:.f=.o)
+PARADYN_START_OFILE	= $(PARADYN_DIR)/DYNINSTstartCode.o 
+PARADYN_END_OFILE	= $(PARADYN_DIR)/DYNINSTendCode.o
+PARADYN_LIB_OFILE	= $(PARADYN_DIR)/libdyninstRT.o
 
 FTEST	=	$(NAME).f
 OTEST	=	$(NAME).o
+
+
 
 #
 # Executables
@@ -248,10 +282,12 @@ OTEST	=	$(NAME).o
 RTEST	=	$(NAME)_out
 HOST 	= 	$(NAME)_host
 NODE 	= 	$(NAME)_node
-MAIN	=	$(NAME)_main
+MAINPVM	=	$(NAME)_mainpvm
+MAINMPI =	$(NAME)_mainmpi
+MAINPARADYN = 	$(NAME)_mainpvm
 
-RUNABLES = $(HOST) $(NODE) $(RTEST) $(MAIN)
-DEDUCED = $(PVM_HEADERS) $(RT_INIT) $(RT_SRC_FILES)
+RUNABLES = $(HOST) $(NODE) $(RTEST) $(MAINPVM) $(MAINMPI)
+DEDUCED = $(PVM_HEADERS) $(MPI_HEADERS) $(RT_INIT) $(RT_SRC_FILES)
 
 #
 # Rules
@@ -277,6 +313,11 @@ pvm:
 reset:
 	@echo "resetting PVM"
 	@echo reset | $(PVM)
+restart:
+	@echo  "PVM halt"
+	@echo halt | $(PVM)
+	@echo  "PVM start"
+	@echo quit | $(PVM)
 
 #
 # Installation to run
@@ -287,32 +328,36 @@ $(pvmbin)/%: % $(pvmbin); $(COPY) $< $@
 hostnode: host node
 host: $(HOST) 
 node: $(NODE)
-main: $(MAIN)
+mainpvm: $(MAINPVM)
 out: $(RTEST)
+mainmpi: $(MAINMPI)
+paradyn: $(MAINPARADYN)
 
-install_main: $(pvmbin)/$(MAIN)
+install_main: $(pvmbin)/$(MAINPVM)
 install_hostnode: install_node install_host
 install_host: $(pvmbin)/$(HOST)
 install_node: $(pvmbin)/$(NODE)
 
-install_main_forced:; $(RM) $(pvmbin)/$(MAIN); $(MAKE) install_main;
+
+install_main_forced:; $(RM) $(pvmbin)/$(MAINPVM); $(MAKE) install_main;
 
 # install in PVM directory what can be
 install:
-	-test -f $(MAIN) && $(MAKE) install_main_forced
+	-test -f $(MAINPVM) && $(MAKE) install_main_forced
 	-test -f $(HOST) && $(MAKE) install_hostnode
 
 run: install pvm
 	$(pvmbin)/$(HOST)
 
-diff: $(MAIN) $(RTEST) install pvm
-	$(pvmbin)/$(MAIN) > parallel.out 2> parallel.err
+diffpvm: $(MAINPVM) $(RTEST) install pvm
+	$(pvmbin)/$(MAINPVM) > parallel.out 2> parallel.err
 	$(RTEST) > sequential.out 2> sequential.err
 	@if cmp -s parallel.out sequential.out ; \
 	then echo "DIFF ON STDOUT: none!" ; \
 	else echo "DIFF ON STDOUT:" ; diff parallel.out sequential.out ; fi
 	@# make is stopped at the diff if different...
 	$(RM) parallel.out parallel.err sequential.out sequential.err
+
 
 #
 # Headers
@@ -325,6 +370,11 @@ pvm3.h:	$(pvminc)/pvm3.h
 
 fpvm3.h:$(pvminc)/fpvm3.h
 	$(COPY) $(pvminc)/fpvm3.h .
+
+mpif.h:	$(mpiinc)/mpif.h
+	$(COPY) $(mpiinc)/mpif.h .
+
+
 
 #
 # Compilation
@@ -352,7 +402,7 @@ LDPURE:=$(shell \
   sed -n 's,^[Cc!\*][Ff][Cc][Dd]$$[ 	][ 	]*[Ll][Dd][ 	]*[Pp][Uu][Rr][Ee],,p'\
 		$(NAME).f | sort -u)
 
-$(HOST):  $(HEADERS) hpfc_main_host.o $(COMMON_OFILES) $(HOST_OFILES)
+$(HOST):  $(HEADERS_PVM) hpfc_main_host.o $(COMMON_OFILES) $(HOST_OFILES)
 	$(FC) $(FFLAGS) -o $@ hpfc_main_host.o \
 		$(HOST_OFILES) \
 		$(COMMON_OFILES) \
@@ -363,7 +413,7 @@ $(HOST):  $(HEADERS) hpfc_main_host.o $(COMMON_OFILES) $(HOST_OFILES)
 		$(LDIO) $(LDPURE)
 	$(STRIP) $@
 
-$(NODE):  $(HEADERS) hpfc_main_node.o $(COMMON_OFILES) $(NODE_OFILES) 
+$(NODE):  $(HEADERS_PVM) hpfc_main_node.o $(COMMON_OFILES) $(NODE_OFILES) 
 	$(FC) $(FFLAGS) $(FOPT) -o $@ hpfc_main_node.o \
 		$(NODE_OFILES) \
 		$(COMMON_OFILES) \
@@ -374,8 +424,8 @@ $(NODE):  $(HEADERS) hpfc_main_node.o $(COMMON_OFILES) $(NODE_OFILES)
 		$(LDPURE)
 	$(STRIP) $@
 
-$(MAIN): $(HEADERS) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
-	$(FC) $(FFLAGS) -o $@ hpfc_main.o \
+$(MAINPVM): $(HEADERS_PVM) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
+	$(FC) $(FFLAGS) $(FOPT) -o $@ hpfc_main.o \
 		$(HOST_OFILES) \
 		$(NODE_OFILES) \
 		$(COMMON_OFILES) \
@@ -385,6 +435,32 @@ $(MAIN): $(HEADERS) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
 		$(NODE_LIBS)\
 		$(LDIO) $(LDPURE)
 	$(STRIP) $@
+
+$(MAINMPI): $(HEADERS_MPI) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
+	$(FLINKER) $(FFLAGS) $(FOPT) -o $@ hpfc_main.o \
+		$(HOST_OFILES) \
+		$(NODE_OFILES) \
+		$(COMMON_OFILES) \
+		$(LIBS_MPI_DIR) \
+		$(COMMON_LIBS) \
+		$(COMMON_MPI_LIBS) \
+		$(LDIO) $(LDPURE)
+	$(STRIP) $@
+
+$(MAINPARADYN):  $(HEADERS_PVM) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
+	$(FC) $(FFLAGS) -static -g $(FOPT) -o $@ \
+		$(PARADYN_START_OFILE) \
+		hpfc_main.o \
+		$(HOST_OFILES) \
+		$(NODE_OFILES) \
+		$(COMMON_OFILES) \
+		$(PARADYN_END_OFILE) \
+		$(PARADYN_LIB_OFILE) \
+		$(LIBS_DIR) \
+		$(COMMON_LIBS) \
+		$(COMMON_PVM_LIBS) \
+		$(NODE_LIBS)\
+		$(LDIO) $(LDPURE)
 
 ifeq ($(PVM_ARCH),CM5)
 $(NODE): $(HOST_OFILES)
