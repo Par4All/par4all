@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/01/14 13:33:36 $, )
+! ($Date: 1997/01/18 16:37:20 $, )
 !
 !-----------------
 !
@@ -1514,6 +1514,20 @@ _CM5(
 ! HPFC NTIMEOFF
 !
       subroutine HPFC NTIMEOFF(comment)
+      character comment*(*)
+      call HPFC SYNCHRO
+      end
+!
+!--------------
+! HPFC H/NTELL
+!
+      subroutine HPFC HTELL(comment)
+      character comment*(*)
+      call HPFC SYNCHRO
+      call HPFC TELL(comment)
+      end
+!
+      subroutine HPFC NTELL(comment)
       character comment*(*)
       call HPFC SYNCHRO
       end
