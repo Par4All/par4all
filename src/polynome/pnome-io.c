@@ -4,6 +4,7 @@
  *
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -205,7 +206,7 @@ boolean (*is_inferior_var)();
 
 /* char *default_variable_name(Variable var)
  *  returns for variable var the name "Vxxxx" where xxxx are
- *  four letters computed form (int) var.
+ *  four letters computed from (int) var.
  */
 char *default_variable_name(var)
 Variable var;
