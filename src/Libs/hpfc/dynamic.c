@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.53  1998/03/17 16:51:48  coelho
+ * bug when arrays are template in continue_propagation_p fixed.
+ *
  * Revision 1.52  1997/10/28 09:36:59  coelho
  * nope.
  *
@@ -994,6 +997,9 @@ rename_directive_p(entity f)
 /*  TRUE if not a remapping for old. 
  *  if it is a remapping, operates the switch.
  */
+#define ret(why, what) \
+  { pips_debug(9, "ret %d because %s\n", what, why); return what; }
+
 static bool 
 continue_propagation_p(statement s)
 {
@@ -1004,7 +1010,7 @@ continue_propagation_p(statement s)
 
     if (!instruction_call_p(i)) 
     {
-	pips_debug(8, "not a call\n"); return TRUE;
+	ret("not a call", TRUE);
     }
     else
     {
@@ -1025,24 +1031,26 @@ continue_propagation_p(statement s)
 	    {
 		add_alive_synonym(s, new_variable);
 		add_as_a_closing_statement(s);
-		return FALSE;
+		ret("rename to the same", FALSE);
 	    }
 	}
 	else if (realign_directive_p(fun) && array_propagation)
 	{
 	    entity primary = safe_load_primary_entity(old_variable);
+	    int nbofargs = gen_length(call_arguments(c));
 
 	    DEBUG_STAT(8, "realign directive", s);
 
 	    MAP(EXPRESSION, e,
 	    {
+		nbofargs--;
 		if (expression_reference_p(e)) 
 		{
 		    reference r = expression_to_reference(e);
 		    entity var = reference_variable(r);
 		    
-		    if (entity_template_p(var)) /* up to the template, stop */
-			return TRUE;
+		    if (nbofargs==0) /* up to the template! */
+			ret("template of realign", TRUE);
 		
 		    if (safe_load_primary_entity(var)==primary)
 		    {
@@ -1050,7 +1058,7 @@ continue_propagation_p(statement s)
 			 */
 			add_alive_synonym(s, new_variable);
 			add_as_a_closing_statement(s);
-			return FALSE;
+			ret("realign array",  FALSE);
 		    }
 		}
 		/* else it may be a call because of ALIGN () WITH T()::X...
@@ -1070,7 +1078,7 @@ continue_propagation_p(statement s)
 		entity v = expression_to_entity(e);
 
 		if (!entity_template_p(v)) /* up to the processor, stop */
-		    return TRUE;
+		    ret("processors of distribute", TRUE);
 
 		/*   if template t is redistributed...
 		 */
@@ -1080,7 +1088,7 @@ continue_propagation_p(statement s)
 			add_alive_synonym(s, new_variable);
 		    add_as_a_closing_statement(s);
 
-		    return FALSE;
+		    ret("redistribute template", FALSE);
 		}
 	    },
 		call_arguments(c));
@@ -1090,11 +1098,11 @@ continue_propagation_p(statement s)
 	    entity primary = safe_load_primary_entity(old_variable);
 	    
 	    MAP(EXPRESSION, e, 
-		if (primary==expression_to_entity(e)) return FALSE,
+		if (primary==expression_to_entity(e)) ret("dead array", FALSE),
 		call_arguments(c)); 
 	}
 
-	return TRUE;
+	ret("default", TRUE);
     }
 }
 
@@ -1103,7 +1111,7 @@ propagate_synonym(
     statement s,   /* starting statement for the propagation */
     entity old,    /* entity to be replaced */
     entity new,    /* replacement for the entity */
-    bool is_array) /* TRUE if array, FALSE if template */
+    bool is_array  /* TRUE if array, FALSE if template */)
 {
     statement current;
 
@@ -1371,7 +1379,10 @@ static void regenerate_renamings(statement s)
 	 * which may be necessary, for instance if KILL was used.
 	 */
 	if (!some_source_found)
+	{
+	    pips_debug(7, "no source found for %s\n", entity_name(target));
 	    ln = CONS(RENAMING, make_renaming(target, target), ln);
+	}
     },
 	ll);
 
@@ -1399,9 +1410,16 @@ list_of_remapping_statements()
  */
 static void print_control_ordering(control c)
 {
-    register int so = statement_ordering(control_statement(c));
-    fprintf(stderr, "(%d,%d), ", ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
+    statement s = control_statement(c);
+    int so = statement_ordering(s);
+    fprintf(stderr, "(%d,%d:%d), ", 
+	    ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
+	    statement_number(s));
 }
+
+#define elst_ifdef(what, name, s) \
+ if (bound_##name##_p(s)){DEBUG_ELST(1, what, entities_list(load_##name(s)));}\
+ else pips_debug(1, "no " what "\n");
 
 static void dump_remapping_graph_info(statement s)
 {
@@ -1415,12 +1433,27 @@ static void dump_remapping_graph_info(statement s)
     gen_map(print_control_ordering, control_successors(c));
     fprintf(stderr, "\n");
 
-    DEBUG_ELST(1, "remapped", entities_list(load_remapped(s)));
-    DEBUG_ELST(1, "used", entities_list(load_used_dynamics(s)));
-    DEBUG_ELST(1, "modified", entities_list(load_modified_dynamics(s)));
-    DEBUG_ELST(1, "reaching", entities_list(load_reaching_mappings(s)));
-    DEBUG_ELST(1, "leaving", entities_list(load_leaving_mappings(s)));
-    DEBUG_ELST(1, "maybeuseful", entities_list(load_maybeuseful_mappings(s)));
+    elst_ifdef("remapped", remapped, s);
+    elst_ifdef("used", used_dynamics, s);
+    elst_ifdef("modified", modified_dynamics, s);
+    elst_ifdef("reaching", reaching_mappings, s);
+    elst_ifdef("leaving", leaving_mappings, s);
+    elst_ifdef("maybe useful", maybeuseful_mappings, s);
+}
+
+static void 
+dump_remapping_graph(
+    string when,
+    list /* of statement */ ls)
+{
+    fprintf(stderr, "[dump_remapping_graph] for %s\n", when);
+    gen_map(dump_remapping_graph_info, ls);
+    fprintf(stderr, "[dump_remapping_graph] done\n");
+}
+
+void dump_current_remapping_graph(string when)
+{
+    dump_remapping_graph(when, list_of_remapping_statements());
 }
 
 /* void simplify_remapping_graph()
@@ -1451,12 +1484,14 @@ void simplify_remapping_graph(void)
     statement root = get_current_module_statement();
     what_stat_debug(4, root);
 
+    ifdebug(8) dump_remapping_graph("0", ls);
+
     gen_map(initialize_reaching_propagation, ls);
     gen_map(remove_not_remapped_leavings, ls);
     gen_map(initialize_maybeuseful_mappings, ls);
     gen_map(reinitialize_reaching_mappings, ls);
 
-    ifdebug(4) gen_map(dump_remapping_graph_info, ls);
+    ifdebug(4) dump_remapping_graph("1", ls);
 
     pips_debug(4, "used array propagation\n");
     gen_closure(propagate_used_arrays, ls);
@@ -1464,7 +1499,7 @@ void simplify_remapping_graph(void)
     pips_debug(4, "may be useful mapping propagation\n");
     gen_closure(propagate_maybeuseful_mappings, ls);
 
-    ifdebug(4) gen_map(dump_remapping_graph_info, ls);
+    ifdebug(4) dump_remapping_graph("2", ls);
 
     if (bound_remapped_p(root))	remove_unused_remappings(root);
 
