@@ -534,9 +534,9 @@ normalized n;
     else
 	/* should be replaced by a call to expression_fprint() if it's
 	   ever added to linear library */
-	vect_dump((Pvecteur)normalized_linear(n));
+	vect_debug((Pvecteur)normalized_linear(n));
 }
-
+
 bool expression_equal_p(e1, e2)
 expression e1;
 expression e2;
