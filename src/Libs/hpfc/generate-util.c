@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/08/01 09:13:46 $, ) 
+ * ($Date: 1995/08/30 14:34:34 $, ) 
  */
 
 #include "defines-local.h"
@@ -71,10 +71,8 @@ list le;
     return(make_block_statement(ls));
 }
 
-static list 
-hpfc_gen_n_vars_expr(creation, number)
-entity (*creation)();
-int number;
+list /* of expression */
+hpfc_gen_n_vars_expr(entity (*creation)(), int number)
 {
     list result = NIL;
     assert(number>=0 && number<=7);
