@@ -2,7 +2,7 @@
 #! /bin/sh -vx
 #
 # SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1995/10/11 10:00:16 $, )
+# $RCSfile: make-pips,v $ ($Date: 1995/10/12 13:57:08 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -26,8 +26,9 @@ umask 2
 # Modifications:
 #  - variable FAILURES is added to check the happy ending (FI, 18/07/92)
 
-USAGE="Usage: $0 [-p|d|a|r] [-n] [-o]"
+USAGE="Usage: $0 [-p|d|a|r|b] [-n] [-o]"
 
+BOOTSTRAP=""
 MAKE_OPTION=""
 DEVELOPMENT=""
 PRODUCTION=TRUE
@@ -35,9 +36,11 @@ RECOMPILE=""
 FAILURES=""
 KEEP_STDOUT=""
 
-while getopts odnpar opt
+while getopts odnparb opt
 do
 	case $opt in
+	b)	BOOTSTRAP=TRUE
+		RECOMPILE=TRUE;;
 	o)	KEEP_STDOUT=TRUE;;
 	d)	DEVELOPMENT=TRUE
 		PRODUCTION="";;
@@ -75,26 +78,33 @@ PASSES=${PIPS_PASSES}
 # Library order does usualy not matter. In order not to forget any:
 # GO : ordering allow making of the .h files - if there where no cycles ... :-(
 #
-#LIBS=`(cd $PIPS_LIBSRCDIR; echo [!M]*)`
+#
 
-echo analyzing libraries ...
-analyze_libraries -p
+if [ -n "$BOOTSTRAP" ]
+then
 
-echo ordering libraries ...
-order_libraries -b
+	LIBS=`(cd $PIPS_LIBSRCDIR; echo [!M]*)`
 
-#build a regexp to avoid passes in libs
+else
 
-AVOID_PASSES='(^'
-for lib in $PASSES ; do
-	AVOID_PASSES="${AVOID_PASSES}${lib}\$|^"
-done
-AVOID_PASSES="${AVOID_PASSES}\$)"
+	echo analyzing libraries ...
+	analyze_libraries -p
 
-#echo AVOID_PASSES=${AVOID_PASSES}
+	echo ordering libraries ...
+	order_libraries -b
 
-# Get the lib list
-LIBS=`sed 's/^lib//;s/.a$//' ${PIPS_TEMPDIR}/libs.b | egrep -v ${AVOID_PASSES}`
+	#build a regexp to avoid passes in libs
+
+	AVOID_PASSES='(^'
+	for lib in $PASSES ; do
+		AVOID_PASSES="${AVOID_PASSES}${lib}\$|^"
+	done
+	AVOID_PASSES="${AVOID_PASSES}\$)"
+
+	# Get the lib list
+	LIBS=`sed 's/^lib//;s/.a$//' ${PIPS_TEMPDIR}/libs.b | egrep -v ${AVOID_PASSES}`
+
+fi
 
 echo LIBS=$LIBS
 
