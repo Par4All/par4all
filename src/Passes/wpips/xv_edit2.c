@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/04/15 17:11:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/12 08:01:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1996/04/15 17:11:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1996/06/12 08:01:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -324,10 +324,6 @@ execute_wpips_execute_and_display_something_outside_the_notifyer()
          print_type = DBR_PRINTED_FILE;
          icon_number = sequential_ICON;
       }
-      else if (strcmp(label, SEQUENTIAL_EMACS_VIEW) == 0) {
-         print_type = DBR_EMACS_PRINTED_FILE;
-         icon_number = sequential_ICON;
-      }
       else if (strcmp(label, PARALLEL_VIEW) == 0) {
          print_type = DBR_PARALLELPRINTED_FILE;
          icon_number = parallel_ICON;
@@ -599,7 +595,6 @@ create_edit_menu()
 	  /* The sequential_view_menu_item is the default item: */
 	  MENU_DEFAULT_ITEM, sequential_view_menu_item,
 	  MENU_ACTION_ITEM, USER_VIEW, view_notify,
-	  /* MENU_ACTION_ITEM, SEQUENTIAL_EMACS_VIEW, view_notify, */
 	  MENU_ACTION_ITEM, SEQUENTIAL_GRAPH_VIEW, view_notify,
 	  /* Just a separator: */
 	  WPIPS_MENU_SEPARATOR,
