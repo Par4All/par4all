@@ -777,7 +777,7 @@ list	ent_l1, ent_l2;
 	
   sta  = adg_vertex_to_statement( ver );
   debug( 7, "read_reference_list", "statement number : %02d\n", statement_number(sta) );
-  effs = load_statement_proper_effects( sta );
+  effs = load_proper_rw_effects_list( sta );
 
   /* Put in rl effects readen by ver and remove from it 
    * effect whose variable are in ent_l1 or in ent_l2.
