@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-compile.c,v $
+ * Revision 1.52  1998/11/18 13:24:00  coelho
+ * row echelon with option.
+ *
  * Revision 1.51  1998/04/14 20:38:05  coelho
  * useless includes removed.
  *
@@ -134,7 +137,8 @@ hpfc_algorithm_row_echelon(
     Psysteme *penum)
 {
     Pbase base = entity_list_to_base(scanners);
-    algorithm_row_echelon(syst, base, pcond, penum);
+    algorithm_row_echelon_generic(syst, base, pcond, penum,
+	get_bool_property("HPFC_REDUNDANT_SYSTEMS_FOR_REMAPS"));
     base_rm(base);
 }
 
