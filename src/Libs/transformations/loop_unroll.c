@@ -335,7 +335,7 @@ void loop_unroll(statement loop_statement, int rate)
     statement_instruction(loop_statement) = block;
     /* Do not forget to move forbidden information associated with
        block: */
-    fix_label_and_comment_in_empty_block(loop_statement);
+    fix_sequence_statement_attributes(loop_statement);
     
     ifdebug(9) {
 	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
@@ -450,7 +450,7 @@ void full_loop_unroll(statement loop_statement)
     statement_instruction(loop_statement) = block;    
     /* Do not forget to move forbidden information associated with
        block: */
-    fix_label_and_comment_in_empty_block(loop_statement);
+    fix_sequence_statement_attributes(loop_statement);
     
     ifdebug(9) {
 	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
