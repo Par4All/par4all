@@ -114,7 +114,8 @@ return
 			      string_undefined,
 			      make_instruction(is_instruction_call,
 					       make_call(oper,
-							 args)));
+							 args))
+		,NIL,NULL);
 }
 
 
