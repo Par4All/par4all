@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/10 09:42:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/13 16:13:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/09/10 09:42:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/09/13 16:13:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -218,12 +218,7 @@ bool give_code_p;
 	attach_preconditions_decoration_to_text(r);
  
     if (give_code_p == TRUE) {
-	/* then code with the corresponding information */
-	ADD_SENTENCE_TO_TEXT(r, 
-			     make_sentence(is_sentence_formatted, 
-					   code_decls_text(entity_code(mod))));
-	MERGE_TEXTS(r, text_statement(mod, 0, is_user_view? user_stat:mod_stat));
-	ADD_SENTENCE_TO_TEXT(r, sentence_tail());
+	MERGE_TEXTS(r, text_module(mod, is_user_view? user_stat:mod_stat));
     }
 
     debug_off();
