@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.39  1998/11/05 13:50:57  zory
+ * new EOLE automatic inclusion tags added
+ *
  * Revision 1.38  1998/11/05 09:28:45  zory
  * EOLE tags for automatic function extraction added
  *
@@ -529,6 +532,10 @@ global_name_to_entity(string m, string n)
 			      entity_domain);
 }
 
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
 /*
  * Cette fonction est appelee chaque fois qu'on rencontre un nom dans le texte
  * du pgm Fortran.  Ce nom est celui d'une entite; si celle-ci existe deja on
@@ -605,10 +612,6 @@ MakeConstantLitteral(void)
 {
     return(make_constant(is_constant_litteral, NIL));
 }
-
-/* BEGIN_EOLE */ /* - please do not remove this line */
-/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
-   in the EOLE project (JZ - 11/98) */
 
 storage 
 MakeStorageRom(void)
