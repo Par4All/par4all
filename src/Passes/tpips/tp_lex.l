@@ -75,20 +75,19 @@ OPTEMPTY (([ \\t\\n])*)
 <KEY,FNAME,WNAME,RES,PHASE,PROP>{EMPTY}  {return SEPARATOR;}
 <FNAME>[/\\.0-9A-Za-z_-]+       {yylval.name = strdup(yytext);return FILE_NAME;}
 <WNAME>[0-9A-Za-z_-]+   {BEGIN FNAME;yylval.name =strdup(yytext);return WORKSPACE;}
-<RES,PHASE>\\{    {return OPENBRACE;}
-<RES,PHASE>\\.    {return DOT;}
+<RES,PHASE>\\)    {return CLOSEPAREN;}
+<RES,PHASE>\\(    {return OPENPAREN;}
 <RES,PHASE>\\,    {return COMMA;}
-<RES,PHASE>\\}    {return CLOSEBRACE;}
-<RES,PHASE>"$ALL."             {return OWNER_ALL;}
-<RES,PHASE>"$PROGRAM."         {return OWNER_PROGRAM;}
-<RES,PHASE>"$MAIN."            {return OWNER_MAIN;}
-<RES,PHASE>"$MODULE."          {return OWNER_MODULE;}
-<RES,PHASE>"$CALLERS."         {return OWNER_CALLERS;}
-<RES,PHASE>"$CALLEES."         {return OWNER_CALLEES;}
+<RES,PHASE>"$ALL"             {return OWNER_ALL;}
+<RES,PHASE>"$PROGRAM"         {return OWNER_PROGRAM;}
+<RES,PHASE>"$MAIN"            {return OWNER_MAIN;}
+<RES,PHASE>"$MODULE"          {return OWNER_MODULE;}
+<RES,PHASE>"$CALLERS"         {return OWNER_CALLERS;}
+<RES,PHASE>"$CALLEES"         {return OWNER_CALLEES;}
 %%%%%%%%%%
 <RES,PHASE>[0-9A-Za-z_-]+      {yylval.name =strdup(yytext);return OWNER_NAME;}
-<KEY,PROP>[a-zA-Z0-9_]+        {return UNKNOW_CHAR; /* actually it is chars ... */}
-<KEY,FNAME,WNAME,RES,PHASE,PROP>.          {return UNKNOW_CHAR;}
+<KEY,PROP>[a-zA-Z0-9_]+        {return UNKNOWN_CHAR; /* actually it is chars ... */}
+<KEY,FNAME,WNAME,RES,PHASE,PROP>.          {return UNKNOWN_CHAR;}
 %%
 
 yywrap()
