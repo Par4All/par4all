@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/12/26 11:41:14 $, )
+ * ($Date: 1996/12/26 16:07:56 $, )
  */
 
 #include "defines-local.h"
@@ -444,15 +444,15 @@ same_alignment_p(entity e1, entity t1, alignment a1,
     int b1, l1, b2, l2;
     bool b;
 
+    if (alignment_undefined_p(a1) || alignment_undefined_p(a2))
+    {
+        b=alignment_undefined_p(a1) && alignment_undefined_p(a2);
+	RETAL("some undefined", b);
+    }
+
     pips_debug(7, "considering %s[dim=%d] and %s[dim=%d]\n",
 	       entity_name(e1), alignment_arraydim(a1),
 	       entity_name(e2), alignment_arraydim(a2));
-
-    if (alignment_undefined_p(a1) || alignment_undefined_p(a1))
-    {
-        b=alignment_undefined_p(a1) && alignment_undefined_p(a1);
-	RETAL("some undefined", b);
-    }
 
     /* compares the alignments if any 
      */
