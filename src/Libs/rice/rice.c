@@ -124,8 +124,13 @@ rice_loop(statement stat, int l)
     }
 
     set_enclosing_loops_map( loops_mapping_of_statement(stat) );
-
-    nstat = CodeGenerate(dg, region, l, TRUE);
+    /* to deal with empty loop */
+    if (instruction_loop_p(istat) 
+	&& instruction_continue_p(statement_instruction(loop_body(instruction_loop(istat))))) 
+	    nstat = copy_statement(stat); 
+	else 
+	    nstat = CodeGenerate(dg, region, l, TRUE);
+	
     ifdebug(7){
 	pips_debug(7, "consistency checking for CodeGenerate output: ");
 	if (gen_consistent_p((statement)nstat))
