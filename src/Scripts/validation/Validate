@@ -392,10 +392,10 @@ export pips_version
 export tpips_version
 
 test "${pips_version}" -a -x "${pips_version}" || \
-    mailfinal "${user}" failed "" "no pips found!" ""
+    mailfinal "${user}" failed "" "no pips found! ($PIPS_ARCH on $hostname)" ""
 
 test "${tpips_version}" -a -x "${tpips_version}" || \
-    mailfinal "${user}" failed "" "no tpips found!" ""
+   mailfinal "${user}" failed "" "no tpips found! ($PIPS_ARCH on $hostname)" ""
 
 $deb1 " | $user on $hostname"
 $deb2 " | real PIPSHOME: $REAL_PIPSHOME"
