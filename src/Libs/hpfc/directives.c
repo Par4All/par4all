@@ -3,7 +3,7 @@
  * these functions deal with HPF directives.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/07/20 18:40:49 $, )
+ * ($Date: 1995/07/21 16:32:47 $, )
  */
 
 #include "defines-local.h"
@@ -237,8 +237,6 @@ reference alignee, temp;
 static void initial_alignment(s)
 statement s;
 {
-    entity array;
-
     MAP(ENTITY, array,
     {
 	if (array_distributed_p(array))
