@@ -182,9 +182,9 @@ struct binding *bp ;
     }
 }
 
-/* GEN_TYPE generates the type member for potentially tabulated BP domain. */
-
-static gen_type( bp )
+/* GEN_TYPE generates the type member for potentially tabulated BP domain. 
+ */
+static generate_type_member( bp )
 struct binding *bp ;
 {
     printf( " (-type- `(:newgen ,(lisp:+ %s %d)))\n", start, TYPE( bp ) ) ;
@@ -207,7 +207,7 @@ struct binding *bp ;
 
     gen_prelude( bp ) ;
     printf( "(lisp:defstruct (%s (:type %s))\n", bp->name, NEWGEN_IMPL ) ;
-    gen_type( bp ) ;
+    generate_type_member( bp ) ;
 
     for( ; dlp != NULL ; dlp=dlp->cdr ) {
 	union domain *dp = dlp->domain ;
@@ -284,7 +284,7 @@ gen_list( bp )
 {
     gen_prelude( bp ) ;
     printf( "(lisp:defstruct (%s (:type %s))\n", bp->name, NEWGEN_IMPL ) ;
-    gen_type( bp ) ;
+    generate_type_member( bp ) ;
     printf( " (%s '()))\n", bp->domain->li.constructor ) ;
     gen_postlude( bp ) ;
 }
@@ -299,7 +299,7 @@ gen_array( bp )
 
     gen_prelude( bp ) ;
     printf( "(lisp:defstruct (%s (:type %s))\n", bp->name, NEWGEN_IMPL ) ;
-    gen_type( bp ) ;
+    generate_type_member( bp ) ;
     printf( " (%s %))\n", 
 	   dom->ar.constructor, init_member( dom->ar.element->domain )) ;
     gen_postlude( bp ) ;
@@ -315,7 +315,7 @@ gen_set( bp )
 
     gen_prelude( bp ) ;
     printf( "(lisp:defstruct (%s (:type %s))\n", bp->name, NEWGEN_IMPL ) ;
-    gen_type( bp ) ;
+    generate_type_member( bp ) ;
     printf( " (%s %))\n", 
 	   dom->se.constructor, init_member( dom->se.element->domain )) ;
     gen_postlude( bp ) ;
