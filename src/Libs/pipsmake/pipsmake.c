@@ -1020,6 +1020,12 @@ string phase_n, module_n;
     jmp_buf long_jump_buffer;
     bool success = FALSE;
 
+    if (find_rule_by_phase(phase_n) == rule_undefined) {
+	user_warning("safe_apply", "Unkown phase/rule \"%s\"\n", phase_n);
+	success = FALSE;
+	return success;
+    }
+
     if( setjmp(long_jump_buffer) ) {
 	reset_make_cache();
 	user_warning("safe_apply", 
