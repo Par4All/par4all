@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/03/24 16:46:50 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/04/19 20:48:32 $, )
  * version $Revision$
  * got on %D%, %T%
  */
