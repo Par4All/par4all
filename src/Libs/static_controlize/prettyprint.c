@@ -71,7 +71,7 @@ string module_name;
     Gsc_map = (statement_mapping) 
 	db_get_memory_resource( DBR_STATIC_CONTROL, module_name, TRUE); 
     init_prettyprint(text_static_control);
-    filename = strdup(concatenate(db_get_current_program_directory(), 
+    filename = strdup(concatenate(db_get_current_workspace_directory(), 
 				  "/", module_name, ".stco", NULL));
 
     fd = safe_fopen(filename, "w");
