@@ -23,6 +23,13 @@
 /* to be included for _MIN and _MAX: #include <limits.h>
  */
 
+/* gnu and sun do not have the same conventions for "long long"
+ */
+#ifndef LONG_LONG_MAX
+#define LONG_LONG_MAX LLONG_MAX
+#define LONG_LONG_MIN LLONG_MIN
+#endif
+
 #if defined(LINEAR_VALUE_IS_LONGLONG)
 typedef long long Value;
 #define VALUE_FMT "%lld"
