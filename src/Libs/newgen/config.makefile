@@ -3,8 +3,8 @@
 #
 
 # where to find newgen generated files...
-#inc_dir = $(PIPS_ROOT)/Include
-inc_dir = $(PIPS_DEVEDIR)/Documentation/newgen
+inc_dir = $(PIPS_ROOT)/Include
+#inc_dir = $(PIPS_DEVEDIR)/Documentation/newgen
 CPPOPT = -I$(inc_dir) -I$(NEWGEN_DEVEDIR)/genC
 
 LIB_CFILES = \
