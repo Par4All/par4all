@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.61  1998/04/14 21:21:20  coelho
+ * linear.h
+ *
  * Revision 1.60  1997/12/05 19:39:03  coelho
  * cleaned a lot.
  * automatic checkpoints added for CA.
@@ -59,6 +62,7 @@
 
 #include "genC.h"
 
+#include "linear.h"
 #include "ri.h"
 #include "database.h"
 #include "makefile.h"
