@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1997/01/14 18:38:40 $, )
+# ($Date: 1997/01/16 18:29:36 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -45,6 +45,7 @@ endif
 #############################################################################
 
 SCRIPTS =	hpfc_llcmd \
+		hpfc_qsub \
 		hpfc_add_warning \
 		hpfc_generate_h \
 		hpfc_generate_init
