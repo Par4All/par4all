@@ -16,11 +16,12 @@
 #include "genC.h"
 #include "ri.h"
 #include "text.h"
+
 #include "constants.h"
 #include "control.h"
 #include "properties.h"
-#include "prettyprint.h"
 #include "ri-util.h"
+#include "prettyprint.h"
 #include "misc.h"
 
 
