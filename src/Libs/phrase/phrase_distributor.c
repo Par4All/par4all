@@ -35,12 +35,12 @@ typedef dg_vertex_label vertex_label;
 #include "effects-simple.h"
 #include "effects-convex.h"
 
-#define EXTERNALIZED_CODE_PRAGMA_BEGIN "BEGIN_FPGA_%s"
-#define EXTERNALIZED_CODE_PRAGMA_END "END_FPGA_%s"
-#define EXTERNALIZED_CODE_PRAGMA_ANALYZED "ANALYZED_FPGA_%s (%d statements)"
+#include "phrase_distribution.h"
 
 static entity create_module_with_statement (statement stat, 
-					    string new_module_name);
+					    string new_module_name,
+					    entity root_module,
+					    list params);
 
 /**
  * Return the identified function name of the externalized portion of code
@@ -124,6 +124,32 @@ static string get_externalized_and_analyzed_function_name(statement stat,
   return function_name;
 }
 
+/**
+ * Remove begin tag for statement stat and function function_name
+ */
+static void remove_begin_tag (statement stat, string function_name) 
+{
+  char* removed_tag = malloc(256);
+  sprintf (removed_tag,EXTERNALIZED_CODE_PRAGMA_BEGIN,function_name);
+  pips_debug(2, "REMOVE %s from\n", removed_tag);
+  print_statement (stat);
+  clean_statement_from_tags (removed_tag, stat);
+}
+
+/**
+ * Remove end tag for statement stat and function function_name
+ */
+static void remove_end_tag (statement stat, string function_name) 
+{
+  char* removed_tag = malloc(256);
+  sprintf (removed_tag,EXTERNALIZED_CODE_PRAGMA_END,function_name);
+  pips_debug(2, "REMOVE %s from\n", removed_tag);
+  print_statement (stat);
+  clean_statement_from_tags (removed_tag, stat);
+}
+
+
+
 /** At this point, we have a sequence statement sequence_statement which
  * contains a statement with a begin tag and a statement with a end
  * tag. The goal is to transform this statement in a sequence statement
@@ -148,12 +174,14 @@ static statement isolate_code_portion (statement begin_tag_statement,
   pips_assert ("sequence_statement is a sequence",
 	       instruction_tag(i) == is_instruction_sequence);
 
+  pips_assert ("function_name is not NULL",
+	       function_name != NULL);
+
   /* First, count the number of statements to isolate in a single statement */
   statement_to_isolate = FALSE;
   nb_of_statements_to_isolate = 0;
   MAP (STATEMENT, s, {
-    clean_statement_from_tags (EXTERNALIZED_CODE_PRAGMA_BEGIN,s);
-    clean_statement_from_tags (EXTERNALIZED_CODE_PRAGMA_END,s);
+
     if ((statement_to_isolate && (s != end_tag_statement))
 	|| ((!statement_to_isolate) && (s == begin_tag_statement))) {
       nb_of_statements_to_isolate++;
@@ -167,6 +195,9 @@ static statement isolate_code_portion (statement begin_tag_statement,
     }
     
   }, seq_stats);
+
+  remove_begin_tag (begin_tag_statement, function_name);
+  remove_end_tag (end_tag_statement, function_name);
 
   /* Insert an analyzed tag */
   {
@@ -277,16 +308,29 @@ static list identify_statements_to_distribute (statement stat,
   list statements_contained_in_a_sequence = NIL;
   list statements_to_distribute = NIL;
   
-  /* First, we need to restructure the code to avoid imbricated sequences */
-  simple_restructure_statement(stat);
-
   /* We identify all the statement containing a begin tag */
+  statements_containing_begin_tag 
+    = get_statements_with_comments_containing(EXTERNALIZED_CODE_PRAGMA_BEGIN,
+					      stat); 
+  /* We restructure the code to avoid imbricated sequences only if
+   * some portions are found (to allow more than one INIT) */
+  if (gen_length(statements_containing_begin_tag) > 0) {
+    simple_restructure_statement(stat);
+  }
+
+  /* We identify again (after code restructuration) all the statement
+   * containing a begin tag */
+  statements_containing_begin_tag = NIL;
   statements_containing_begin_tag 
     = get_statements_with_comments_containing(EXTERNALIZED_CODE_PRAGMA_BEGIN,
 					      stat); 
   
   /* We check that all those statements are contained in a sequence */
   MAP (STATEMENT, s, {
+    ifdebug(5) {
+      pips_debug(5, "Potential externalizable statement:\n");
+      print_statement(s);
+    }
     if (statement_is_contained_in_a_sequence_p (stat,s)) {
       statements_contained_in_a_sequence 
 	= CONS (STATEMENT,
@@ -306,8 +350,11 @@ static list identify_statements_to_distribute (statement stat,
     list potential_end_statement = NIL;
     sequence_statement = 
       sequence_statement_containing (stat,s);
+    pips_debug(5, "Potential externalizable statement contained in a sequence \n");
+    print_statement(s);
     function_name = get_externalized_function_name(s);
     if (function_name != NULL) {
+      pips_debug(5, "Name: [%s] \n", function_name);
       end_tag = malloc(256);
       sprintf (end_tag, EXTERNALIZED_CODE_PRAGMA_END,function_name);
       potential_end_statement
@@ -346,13 +393,78 @@ static list identify_statements_to_distribute (statement stat,
 }
 					      
 /**
- * 
+ * Return list of entities which need to be passed as parameters (IN or OUT)
  */
-static void compute_parameters (statement externalized_code, 
+static list compute_parameters (statement externalized_code, 
 				statement module_stat, 
 				entity module,
 				string module_name) 
 {
+  list l_read, l_write, l_in, l_out;
+  list l_priv = NIL;
+  list l_get_refs = NIL;
+  list l_set_refs = NIL;
+  list l_params = NIL;
+
+  pips_debug(3, "Compute regions\n");
+  
+  l_write = regions_dup
+    (regions_write_regions(load_statement_local_regions(externalized_code))); 
+  l_read = regions_dup
+    (regions_read_regions(load_statement_local_regions(externalized_code))); 
+  l_in = regions_dup(load_statement_in_regions(externalized_code));
+  l_out = regions_dup(load_statement_out_regions(externalized_code));
+  
+  ifdebug(2)
+    {
+      pips_debug(3, "READ regions: \n");
+      print_regions(l_read);
+      pips_debug(3, "WRITE regions: \n");
+      print_regions(l_write);
+      pips_debug(3, "IN regions: \n");
+      print_regions(l_in);
+      pips_debug(3, "OUT regions: \n");
+      print_regions(l_out);
+      }
+  
+  /*pips_debug(3, "HOP1\n");*/
+  l_get_refs = references_for_regions (l_read);
+  /*pips_debug(3, "HOP2\n");*/
+  
+  l_priv = RegionsEntitiesInfDifference(l_write, l_in, w_r_combinable_p);
+  l_priv = RegionsEntitiesInfDifference(l_priv, l_out, w_w_combinable_p);
+  
+  ifdebug(2)
+    {
+      pips_debug(3, "Private regions: \n");
+	print_regions(l_priv);
+    }
+    
+    /*    pips_debug(3, "HOP1\n");
+	  l_priv = NIL;
+	  l_priv = RegionsEntitiesInfDifference(l_write, l_in, w_r_combinable_p);
+	  l_priv = RegionsEntitiesInfDifference(l_priv, l_out, w_w_combinable_p);
+	  l_get_params = RegionsEntitiesInfDifference(l_read, l_priv, w_r_combinable_p);
+	  pips_debug(3, "HOP2\n");
+	  l_priv = NIL;
+	  l_priv = RegionsEntitiesInfDifference(l_write, l_in, w_r_combinable_p);
+	  l_priv = RegionsEntitiesInfDifference(l_priv, l_out, w_w_combinable_p);
+	  l_set_params = RegionsEntitiesInfDifference(l_write, l_priv, w_w_combinable_p);
+	  pips_debug(3, "HOP3\n");
+	  l_params = RegionsEntitiesIntersection(l_get_params, l_set_params, w_r_combinable_p);
+	  pips_debug(3, "HOP4\n");
+	  
+	  ifdebug(2)
+	  {
+	  pips_debug(3, "GET_PARAMS regions: \n");
+	  print_regions(l_get_params);
+	  pips_debug(3, "SET_PARAMS regions: \n");
+	  print_regions(l_set_params);
+	  pips_debug(3, "PARAMS regions: \n");
+	  print_regions(l_params);
+	  }
+    */
+  return l_get_refs;
 }
 
 /**
@@ -371,6 +483,8 @@ static void distribute_code (statement analyzed_code,
   entity new_module;
   statement call_statement;
   int stats_nb;
+  list params;
+  list call_params;
 
   function_name = get_externalized_and_analyzed_function_name(analyzed_code, &stats_nb);
   
@@ -386,23 +500,39 @@ static void distribute_code (statement analyzed_code,
     pips_internal_error("Strange externalized code\n");
   }
 
-  compute_parameters (externalized_code, module_stat, module, module_name);
+  params = compute_parameters (externalized_code, module_stat, module, module_name);
 
   new_module 
     = create_module_with_statement (externalized_code, 
-				    function_name);
+				    function_name,
+				    module,
+				    params);
+
+  call_params = NIL;
+  MAP (REFERENCE, ref, {
+    call_params = CONS(EXPRESSION, make_expression_from_entity(reference_variable(ref)), call_params);
+  }, params);
 
   call_statement = make_statement(entity_empty_label(),
 				  statement_number(externalized_code),
 				  statement_ordering(externalized_code),
 				  empty_comments,
 				  make_instruction(is_instruction_call,
-						   make_call(new_module,NIL)),
+						   make_call(new_module,call_params)),
 				  NIL,NULL);
 
   replace_in_sequence_statement_with (externalized_code,
 				      call_statement, 
 				      module_stat);
+  
+  pips_assert("Module structure is consistent after DISTRIBUTE_CODE", 
+	      gen_consistent_p((gen_chunk*)new_module));
+	      
+  pips_assert("Statement structure is consistent after DISTRIBUTE_CODE", 
+	      gen_consistent_p((gen_chunk*)externalized_code));
+	      
+  pips_assert("Statement is consistent after DISTRIBUTE_CODE", 
+	      statement_consistent_p(externalized_code));
   
   pips_debug(5, "Code distribution for : [%s] is DONE\n", function_name);
 }
@@ -441,17 +571,112 @@ static void prepare_distribute (statement module_stat,
   
 }
 
+static entity create_variable_for_new_module (entity a_variable,
+					      string new_name, 
+					      string new_module_name,
+					      entity module,
+					      int param_nb)
+{
+  entity new_variable;
+  
+  if ((gen_find_tabulated(concatenate(new_module_name, 
+				      MODULE_SEP_STRING, 
+				      new_name, 
+				      NULL),
+			  entity_domain)) == entity_undefined) 
+    { 
+      /* This entity does not exist, we can safely create it */
+      
+      new_variable = make_entity (strdup(concatenate(new_module_name, 
+						     MODULE_SEP_STRING, 
+						     new_name, NULL)),
+				  copy_type (entity_type(a_variable)),
+				  make_storage_formal (make_formal(module, param_nb)),
+				  copy_value (entity_initial(a_variable)));
+      return new_variable;
+    }
+  else 
+    {
+      pips_error("Entity already exist: %s\n", new_name);
+      return NULL;
+    }
+}
+
+static void add_parameter_to_module (reference ref,
+				     entity module,
+				     statement stat, /* Statement of the new module */
+				     string new_module_name,
+				     entity root_module,
+				     int param_nb)
+{
+  parameter new_parameter;
+  list module_declarations;
+  list module_parameters;
+  entity new_variable;
+  string variable_name;
+  string base_name;
+  char buffer[50];
+  expression new_expression;
+
+  pips_debug(2, "Registering parameter: %s\n", entity_local_name(reference_variable(ref)));
+
+  pips_debug(2, "Indices (%d)\n", reference_indices(ref));
+
+  /* Assert that entity represent a value code */
+  pips_assert("It is a module", entity_module_p(module));
+
+  base_name = strdup("%s_PARAM_%d");
+  
+  sprintf(buffer, base_name, entity_local_name(reference_variable(ref)), param_nb);
+  variable_name = strdup(buffer);
+  new_variable = create_variable_for_new_module(reference_variable(ref),
+						/*variable_name,*/
+						entity_local_name(reference_variable(ref)),
+						new_module_name,
+						module,
+						param_nb);  
+  
+  StatementReplaceReference(stat, ref, make_expression_from_entity(new_variable));
+
+  /*propagate_synonym (stat, reference_variable(ref), new_variable, FALSE);*/
+
+  module_declarations = code_declarations(value_code(entity_initial(module)));
+
+  code_declarations(value_code(entity_initial(module)))
+    = CONS (ENTITY, new_variable, module_declarations);
+  
+  new_parameter = make_parameter (entity_type(new_variable),
+				  make_mode(is_mode_reference, UU));
+  
+  module_parameters = functional_parameters(type_functional(entity_type(module)));
+
+  functional_parameters(type_functional(entity_type(module))) 
+    = CONS(PARAMETER, new_parameter, module_parameters);
+
+}
+
 /**
  * Dynamically build a new module with specified statement.
  * After creation, return it.
  */
 static entity create_module_with_statement (statement stat, 
-					    string new_module_name) 
+					    string new_module_name,
+					    entity root_module,
+					    list params) 
 {
   entity new_module;
   string source_file;
+  list params_l = NIL;
+  int param_nb = 0;
 
   new_module = make_empty_subroutine(new_module_name);
+  
+  param_nb = gen_length(params);
+
+  MAP (REFERENCE, ref, {
+    add_parameter_to_module (ref, new_module, stat, new_module_name, root_module, param_nb);
+    param_nb--;
+  },params);
   
   /*functional_parameters(type_functional(entity_type(new_module)))
     = CONS(PARAMETER, make_parameter(MakeTypeVariable(make_basic(is_basic_int,4), NIL),
@@ -508,8 +733,12 @@ bool phrase_distributor_init(string module_name)
   prepare_distribute (stat, module, module_name);
   pips_debug(2, "END of PHRASE_DISTRIBUTOR_INIT\n");
 
+  pips_assert("Statement structure is consistent after PHRASE_DISTRIBUTOR_INIT", 
+	      gen_consistent_p((gen_chunk*)stat));
+	      
   pips_assert("Statement is consistent after PHRASE_DISTRIBUTOR_INIT", 
 	       statement_consistent_p(stat));
+
   
   /* Reorder the module, because new statements have been added */  
   module_reorder(stat);
@@ -574,7 +803,7 @@ bool phrase_distributor(string module_name)
     set_out_effects((statement_effects) 
 	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
    
-    l_write = regions_dup
+    /*l_write = regions_dup
 	(regions_write_regions(load_statement_local_regions(module_stat))); 
     l_in = regions_dup(load_statement_in_regions(module_stat));
     l_out = regions_dup(load_statement_out_regions(module_stat));
@@ -598,6 +827,7 @@ bool phrase_distributor(string module_name)
 	pips_debug(3, "Private regions: \n");
 	print_regions(l_priv);
     }
+    */
 
   /* Now do the job */
 
@@ -605,8 +835,11 @@ bool phrase_distributor(string module_name)
   distribute (module_stat, module, module_name);
   pips_debug(2, "END of PHRASE_DISTRIBUTOR\n");
 
+  pips_assert("Statement structure is consistent after PHRASE_DISTRIBUTOR", 
+	      gen_consistent_p((gen_chunk*)module_stat));
+	      
   pips_assert("Statement is consistent after PHRASE_DISTRIBUTOR", 
-	       statement_consistent_p(module_stat));
+	      statement_consistent_p(module_stat));
   
   /* Reorder the module, because new statements have been added */  
   module_reorder(module_stat);
