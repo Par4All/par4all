@@ -1,8 +1,12 @@
-/* 	%A% ($Date: 1998/12/18 19:44:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+/* 	%A% ($Date: 1999/01/05 12:35:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: expression.c,v $
+ * Revision 1.17  1999/01/05 12:35:47  irigoin
+ * MakeAtom() updated so as not to declare every single variable: formal
+ * parameters of entries must not be declared in the current module
+ *
  * Revision 1.16  1998/12/18 19:44:13  irigoin
  * Improved error messages in MakeParameter(): follow-up of adventures at EDF
  *
@@ -21,7 +25,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1998/12/18 19:44:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 1999/01/05 12:35:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -195,11 +199,37 @@ int HasParenthesis;
 	/* FI: to handle parameterless function calls like t= second() - 11 March 1993 */
 	/* if (indices == NULL) { */
 	if (indices == NULL && !HasParenthesis) {
-	    debug(2, "MakeAtom", "implicit declaration of scalar variable or "
-		  "reference to a functional parameter: %s\n",
+	    if(storage_undefined_p(entity_storage(e))) {
+		debug(2, "MakeAtom", "implicit declaration of scalar variable: %s\n",
 		  entity_name(e));
-	    DeclareVariable(e, type_undefined, indices, 
-			    storage_undefined, value_undefined);
+		DeclareVariable(e, type_undefined, indices, 
+				storage_undefined, value_undefined);
+	    }
+	    else if(storage_formal_p(entity_storage(e))) {
+		debug(2, "MakeAtom", "reference to a functional parameter: %s\n",
+		      entity_name(e));
+		/* It has already been declared and should not be
+                   redeclared because it may be an entry formal parameter
+                   which is not declared in the current module. If e
+                   represents an entry formal parameter (although its
+                   top-level name is the current module), it does not
+                   belong to the declarations of the current
+                   module. Hence, it is hard to assert something here.
+
+		   However, e has to be typed and valued. */
+		if(type_undefined_p(entity_type(e))) {
+		    entity_type(e) = ImplicitType(e);
+		}
+		if (value_undefined_p(entity_initial(e))) {
+		    entity_initial(e) = MakeValueUnknown();
+		}
+	    }
+	    else {
+		debug(2, "MakeAtom", "implicit type declaration of scalar variable: %s\n",
+		      entity_name(e));
+		DeclareVariable(e, type_undefined, indices, 
+				storage_undefined, value_undefined);
+	    }
 	}
 	else {
 	    type tr = ImplicitType(e);
