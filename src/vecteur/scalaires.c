@@ -21,8 +21,6 @@
  *                                                           ->
  * Attention, si x ne divise pas le pgcd des coefficients de v, la valeur
  * retournee n'est pas colineaire a la valeur initiale
- * 
- * 
  */
 Pvecteur vect_div(v,x)
 Pvecteur v;
@@ -31,18 +29,18 @@ Value x;
     if(x==0) {
 	vect_error("vect_div","vector zero divide\n");
     }
-    else if (x==1)
+    else if (value_one_p(x))
 	;
-    else if(x==-1)
+    else if(value_mone_p(x))
 	vect_chg_sgn(v);
     else {
 	Pvecteur coord;
 
 	for (coord = v ;coord!=NULL;coord=coord->succ) {
-	    val_of(coord) = DIVIDE(val_of(coord),x);
+	    val_of(coord) = value_div(val_of(coord),x);
 	}
     }
-return (vect_clean(v));
+    return vect_clean(v);
 }
 
 /* Pvecteur vect_clean(Pvecteur v): elimination de tous les couples dont le
@@ -101,21 +99,19 @@ Value x;
 {
     Pvecteur coord;
 
-    switch(x) {
-    case 0:
+    if (value_zero_p(x))
+    {
 	vect_rm(v);
-	v=NULL;
-	break;
-    case 1:
-	break;
-    case -1:
-	vect_chg_sgn(v);
-	break;
-    default:
-	for(coord = v; coord!=NULL; coord=coord->succ) {
-	    val_of(coord) = x * val_of(coord);
-	}
+	return VECTEUR_NUL;
     }
+    else if (value_one_p(x))
+	return v;
+    else if (value_mone_p(x))
+	vect_chg_sgn(v);
+    else
+	for(coord = v; coord!=NULL; coord=coord->succ) 
+	    value_prod(val_of(coord), x);
+
     return v;
 }
 
@@ -129,5 +125,5 @@ void vect_chg_sgn(v)
 Pvecteur v;
 {
     for( ;v != NULL; v = v->succ)
-	val_of(v) = -val_of(v);
+	value_inv(val_of(v));
 }
