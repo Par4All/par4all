@@ -45,7 +45,7 @@ static bool is_user_view;	/* print_code or print_source */
 /* Are we working for emacs or not ? */
 extern bool is_emacs_prettyprint;
 
-void print_parallelized90_code(mod_name)
+bool print_parallelized90_code(mod_name)
 char *mod_name;
 {
     bool f90_property = get_bool_property("PRETTYPRINT_FORTRAN90");
@@ -55,14 +55,14 @@ char *mod_name;
     set_bool_property("PRETTYPRINT_FORTRAN90", f90_property);
 }
 
-void print_parallelized77_code(mod_name)
+bool print_parallelized77_code(mod_name)
 char *mod_name;
 {
     /* set_bool_property("PRETTYPRINT_FORTRAN90", FALSE); */
     print_parallelized_code(mod_name);
 }
 
-void print_parallelized_code(mod_name)
+bool print_parallelized_code(mod_name)
 char *mod_name;
 {
     text r = make_text(NIL);
@@ -70,8 +70,6 @@ char *mod_name;
     FILE *fd;
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
-
-    debug_on("PRETTYPRINT_DEBUG_LEVEL");
 
     set_bool_property("PRETTYPRINT_PARALLEL", TRUE);
     set_bool_property("PRETTYPRINT_SEQUENTIAL", FALSE);
@@ -84,47 +82,54 @@ char *mod_name;
     filename = strdup(concatenate(db_get_current_program_directory(), 
 				  "/", mod_name, PARALLEL_FORTRAN_EXT, NULL));
 
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+
     MERGE_TEXTS(r, text_module(module, mod_stat));
 
     fd = safe_fopen(filename, "w");
     print_text(fd, r);
+    debug_off();
     safe_fclose(fd, filename);
 
     DB_PUT_FILE_RESOURCE(DBR_PARALLELPRINTED_FILE, strdup(mod_name), 
 			 filename);
 
-    debug_off();
+    return TRUE;
 }
 
-void print_code(mod_name)
+bool print_code(mod_name)
 char *mod_name;
 {
   is_user_view = FALSE;
-  print_code_or_source(mod_name);
+  return print_code_or_source(mod_name);
 }
 
-void print_source(mod_name)
+bool print_source(mod_name)
 char *mod_name;
 {
   is_user_view = TRUE;
-  print_code_or_source(mod_name);
+  return print_code_or_source(mod_name);
 }
 
 
 /* Idem as print_code but add some emacs properties in the output.
    RK, 21/06/1995 */
-void
+bool
 emacs_print_code(char *mod_name)
 {
+  bool success;
+
   is_emacs_prettyprint = TRUE;
   is_attachment_prettyprint = TRUE;
   print_code(mod_name);
   is_emacs_prettyprint = FALSE;  
   is_attachment_prettyprint = FALSE;  
+
+  return success;
 }
 
 
-void print_code_or_source(mod_name)
+bool print_code_or_source(mod_name)
 char *mod_name;
 {
     text r = make_text(NIL);
@@ -132,8 +137,6 @@ char *mod_name;
     FILE *fd;
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
-
-    debug_on("PRETTYPRINT_DEBUG_LEVEL");
 
     /*set_bool_property("PRETTYPRINT_FORTRAN90", FALSE);*/
 
@@ -147,29 +150,37 @@ char *mod_name;
     mod_stat = (statement)
 	db_get_memory_resource(is_user_view?DBR_PARSED_CODE:DBR_CODE, mod_name, TRUE);
   
-    filename = strdup(concatenate(db_get_current_program_directory(), 
-				  "/",
-				  mod_name,
-				  is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
-                                  is_emacs_prettyprint ? EMACS_FILE_EXT : "",
-                                  get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
-				  NULL));
+    filename = strdup
+	(concatenate(db_get_current_program_directory(), 
+		     "/",
+		     mod_name,
+		     is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
+		     is_emacs_prettyprint ? EMACS_FILE_EXT : "",
+		     get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
+		     NULL));
 
     MERGE_TEXTS(r, text_module(module,mod_stat));
 
     fd = safe_fopen(filename, "w");
+
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
     print_text(fd, r);
+    debug_off();
+
     safe_fclose(fd, filename);
 
-    DB_PUT_FILE_RESOURCE(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? DBR_GRAPH_PRINTED_FILE
-                         : is_emacs_prettyprint ? DBR_EMACS_PRINTED_FILE :
-                         (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE),
-			 strdup(mod_name),
-			 filename);
-    debug_off();
+    DB_PUT_FILE_RESOURCE
+	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
+	 DBR_GRAPH_PRINTED_FILE
+	 : is_emacs_prettyprint ? DBR_EMACS_PRINTED_FILE :
+	 (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE),
+	 strdup(mod_name),
+	 filename);
+
+    return TRUE;
 }
 
-void make_text_resource(mod_name, res_name, file_ext, texte)
+bool make_text_resource(mod_name, res_name, file_ext, texte)
 char *mod_name;
 char *res_name;
 char *file_ext;
@@ -177,17 +188,19 @@ text texte;
 {
     char *filename;
     FILE *fd;
-
-    debug_on("PRETTYPRINT_DEBUG_LEVEL");
     
     filename = strdup(concatenate(db_get_current_program_directory(), 
 				  "/", mod_name, file_ext, NULL));
 
     fd = safe_fopen(filename, "w");
+
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
     print_text(fd, texte);
+    debug_off();
+
     safe_fclose(fd, filename);
 
     DB_PUT_FILE_RESOURCE(strdup(res_name), strdup(mod_name), filename);
 
-    debug_off();
+    return TRUE;
 }
