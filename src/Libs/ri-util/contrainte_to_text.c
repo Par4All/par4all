@@ -6,6 +6,7 @@
  */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "boolean.h"
 #include "vecteur.h"
@@ -91,7 +92,7 @@ signed_operation_to_textline(
 static char * 
 contrainte_to_text_1(
     string aux_line,
-    string str_prefix,
+    string continuation,
     text txt,
     Pvecteur v,
     boolean is_inegalite,
@@ -126,7 +127,7 @@ contrainte_to_text_1(
 						 var, variable_name);
 		debut = 0;
 	    }
-	    add_to_current_line(aux_line, operation_line, str_prefix, txt);
+	    add_to_current_line(aux_line, operation_line, continuation, txt);
 	}
 	else
 	    /* on admet plusieurs occurences du terme constant!?! */
@@ -136,14 +137,14 @@ contrainte_to_text_1(
     }
     constante_to_textline(operation_line,value_uminus(constante),is_inegalite,
 			  a_la_fortran);
-    add_to_current_line(aux_line, operation_line, str_prefix, txt);
+    add_to_current_line(aux_line, operation_line, continuation, txt);
     return aux_line;
 }
 
 static char * 
 contrainte_to_text_2(
     string aux_line,
-    string str_prefix,
+    string continuation,
     text txt,
     Pvecteur v,
     boolean is_inegalite,
@@ -194,7 +195,7 @@ contrainte_to_text_2(
 	    }
 	     else  positive_terms--;
 	       
-	     add_to_current_line(aux_line, operation_line, str_prefix,txt);
+	     add_to_current_line(aux_line, operation_line, continuation,txt);
 	}
     }
 
@@ -205,7 +206,7 @@ contrainte_to_text_2(
     (void) sprint_operator(operation_line+strlen(operation_line), 
 			   is_inegalite, a_la_fortran);
     
-    add_to_current_line(aux_line,operation_line, str_prefix,txt);
+    add_to_current_line(aux_line,operation_line, continuation,txt);
 
     debut = TRUE;
     for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
@@ -235,12 +236,12 @@ contrainte_to_text_2(
 					     variable_name);
 	    
 	}
-	add_to_current_line(aux_line, operation_line, str_prefix,txt); 
+	add_to_current_line(aux_line, operation_line, continuation,txt); 
     }
     operation_line[0]='\0';
     if(negative_terms == 0) {
 	(void) sprintf(operation_line+strlen(operation_line), "0"); 
-        add_to_current_line(aux_line,operation_line, str_prefix,txt);
+        add_to_current_line(aux_line,operation_line, continuation,txt);
     }
       else if(const_coeff_p) {
 	assert(value_notzero_p(const_coeff));
@@ -250,7 +251,7 @@ contrainte_to_text_2(
 	(void) sprint_Value(operation_line+strlen(operation_line), 
 			    value_uminus(const_coeff));
 
-	add_to_current_line(aux_line,operation_line, str_prefix,txt);
+	add_to_current_line(aux_line,operation_line, continuation,txt);
     }
 
     return aux_line;
@@ -260,7 +261,7 @@ contrainte_to_text_2(
 char * 
 contrainte_text_format(
     char * aux_line,
-    char * str_prefix,
+    char * continuation,
     text txt,
     Pcontrainte c,
     boolean is_inegalite,
@@ -279,11 +280,11 @@ contrainte_text_format(
     assert(vect_check(v));
 
     switch(heuristique) {
-    case 1: aux_line = contrainte_to_text_1(aux_line,str_prefix,txt,
+    case 1: aux_line = contrainte_to_text_1(aux_line,continuation,txt,
 					    v,is_inegalite, variable_name, 
 					    a_la_fortran, first_line);
 	break;
-    case 2:aux_line = contrainte_to_text_2(aux_line,str_prefix,txt,v,
+    case 2:aux_line = contrainte_to_text_2(aux_line,continuation,txt,v,
 					   is_inegalite, variable_name, 
 					    a_la_fortran, first_line);
 	
@@ -297,28 +298,28 @@ contrainte_text_format(
 char  * 
 egalite_text_format(
     char * aux_line,
-    char * str_prefix,
+    char * continuation,
     text txt,
     Pcontrainte eg,
     char * (*variable_name)(),
     bool  a_la_fortran, 
     bool first_line)
 {
-    return contrainte_text_format(aux_line,str_prefix,txt,eg,FALSE,
+    return contrainte_text_format(aux_line,continuation,txt,eg,FALSE,
 				  variable_name,a_la_fortran,first_line);
 }
 
 char * 
 inegalite_text_format(
     char *aux_line,
-    char * str_prefix,
+    char * continuation,
     text txt,
     Pcontrainte ineg,
     char * (*variable_name)(),
     boolean a_la_fortran,
     boolean first_line)
 {
-    return contrainte_text_format(aux_line,str_prefix,txt,ineg,TRUE, 
+    return contrainte_text_format(aux_line,continuation,txt,ineg,TRUE, 
 				  variable_name,a_la_fortran,first_line);
 }
 
@@ -388,7 +389,7 @@ system_sorted_text_format(
     }
     else if (sc_empty_p(ps))
     {
-	add_to_current_line(line, "<empty system>", prefix, txt);
+	add_to_current_line(line, "{0==-1}", prefix, txt);
 	return;
     }
 
@@ -436,6 +437,45 @@ system_text_format(
 {
     system_sorted_text_format
 	(line, prefix, txt, ps, variable_name, NULL, a_la_fortran);
+}
+
+static int 
+wordcmp(char **s1, char **s2)
+{
+    return strcmp(*s1,*s2);
+}
+
+/* appends the list of entity...
+ */
+void
+entity_list_text_format(
+    string line,
+    string continuation,
+    text t,
+    list /* of entity */ le,
+    string (*var_name)(entity))
+{
+    if (le)
+    {
+	int j=0, len = gen_length(le);
+	char ** provi = (char **) malloc(sizeof(char *) * len);
+	bool some_previous = FALSE;
+	
+	MAP(ENTITY, e, 
+	    provi[j++] = entity_undefined_p(e)? "undefined...": var_name(e),
+	    le);
+	
+	qsort(provi, len, sizeof(char**), wordcmp);
+	
+	for(j=0; j<len; j++)
+	{
+	    if (some_previous) add_to_current_line(line, ",", continuation, t);
+	    else some_previous = TRUE;
+	    add_to_current_line(line, provi[j], continuation, t);
+	}
+	
+	free(provi);
+    }
 }
 
 /*   That is all
