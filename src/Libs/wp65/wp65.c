@@ -161,7 +161,7 @@ wp65(string input_module_name)
 
     debug(8, "wp65", "end\n");
 
-    reset_current_module_statement();
+    /* reset_current_module_statement(); */
     reset_current_module_entity();
     set_string_property(PRETTYPRINT_PARALLEL, ppp); free(ppp);
     debug_off();
