@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/31 11:53:21 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/09/02 08:51:07 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -361,6 +361,7 @@ echo:; @echo $(ECHO)
 #?cd \$*; for f in *.html ; do \\
 # sed 's,^<BODY,<BODY background="http://www.cri.ensmp.fr/pips/images/logo-pips-embossed-bright-small.jpg" ,' $$f > $$f.bg; \\
 # mv $$f.bg $$f; done
+# the .html file is not a real one, it is just used as a dependency.
 %.html: %.tex
 	# building \$@ from \$<
 	\$(RM) -r \$* \$@
@@ -368,7 +369,9 @@ echo:; @echo $(ECHO)
 	\$(LX2HTML) -link 8 \$<
 	chmod -R a+r-wx \$*/*
 	chmod a+rx,ug+w,o-w \$*
-	ln -s \$*/\$@ \$@
+	$(RM) \$*/\$*.aux \$*/\$*.idx \$*/\$*.log \$*/\$*.pl \
+	    \$*/\$*.tex \$*/\$*.ccs
+	touch \$@
 #
 %.newgen: %.tex
 	# building \$@ from \$<
