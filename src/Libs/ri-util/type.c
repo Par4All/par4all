@@ -135,6 +135,12 @@ MakeComplexParameter()
 }
 
 parameter 
+MakeDoublecomplexParameter()
+{
+  return MakeAnyScalarParameter(is_basic_complex, DEFAULT_DOUBLECOMPLEX_TYPE_SIZE);
+}
+
+parameter 
 MakeCharacterParameter()
 {
   return make_parameter(MakeTypeArray(make_basic(is_basic_string, 
