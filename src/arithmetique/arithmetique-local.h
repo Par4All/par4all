@@ -33,7 +33,7 @@
 #if defined(LINEAR_VALUE_IS_LONGLONG)
 typedef long long Value;
 #define VALUE_FMT "%lld"
-#define VALUE_CONST(val) val##LL
+#define VALUE_CONST(val) (val##LL)
 #define VALUE_MIN LONG_LONG_MIN
 #define VALUE_MAX LONG_LONG_MAX
 #define VALUE_ZERO 0LL
@@ -51,7 +51,7 @@ typedef long long Value;
 #elif defined(LINEAR_VALUE_IS_LONG)
 typedef long Value;
 #define VALUE_FMT "%ld"
-#define VALUE_CONST(val) val##L
+#define VALUE_CONST(val) (val##L)
 #define VALUE_MIN LONG_MIN
 #define VALUE_MAX LONG_MAX
 #define VALUE_ZERO 0L
@@ -64,7 +64,7 @@ typedef long Value;
 #elif defined(LINEAR_VALUE_IS_FLOAT)
 typedef float Value;
 #define VALUE_FMT "%f"
-#define VALUE_CONST(val) val
+#define VALUE_CONST(val) (val)
 #define VALUE_MIN FLOAT_MIN
 #define VALUE_MAX FLOAT_MAX
 #define VALUE_ZERO 0
@@ -78,8 +78,8 @@ typedef float Value;
  */
 #elif defined(LINEAR_VALUE_IS_CHARS)
 typedef char * Value;
-#define VALUE_FMT "0x%x"
-#define VALUE_CONST(val) (char*)val
+#define VALUE_FMT "%s"
+#define VALUE_CONST(val) ((char*)val)
 #define VALUE_MIN (char*)INT_MIN
 #define VALUE_MAX (char*)INT_MAX
 #define VALUE_ZERO (char*)0
@@ -92,7 +92,7 @@ typedef char * Value;
 #else /* default: LINEAR_VALUE_IS_INT */
 typedef int Value;
 #define VALUE_FMT "%d"
-#define VALUE_CONST(val) val
+#define VALUE_CONST(val) (val)
 #define VALUE_MIN INT_MIN
 #define VALUE_MAX INT_MAX
 #define VALUE_ZERO 0
@@ -104,16 +104,100 @@ typedef int Value;
  */
 #endif 
 
-#define VALUE_POS_P(val) (val>VALUE_ZERO)
-#define VALUE_NEG_P(val) (val<VALUE_ZERO)
-#define VALUE_POSZ_P(val) (val>=VALUE_ZERO)
-#define VALUE_NEGZ_P(val) (val<=VALUE_ZERO)
-#define VALUE_ZERO_P(val) (val==VALUE_ZERO)
-#define VALUE_NOTZERO_P(val) (val!=VALUE_ZERO)
-#define VALUE_ONE_P(val) (val==VALUE_ONE)
-#define VALUE_MONE_P(val) (val==VALUE_MONE)
+#define VALUE_NAN value_uminus(VALUE_ZERO)
 
-/* valeur absolue */
+/* boolean (or more) operators on values
+ */
+#define value_eq(v1,v2) ((v1)==(v2))
+#define value_ne(v1,v2) ((v1)!=(v2))
+#define value_gt(v1,v2) ((v1)>(v2))
+#define value_ge(v1,v2) ((v1)>=(v2))
+#define value_lt(v1,v2) ((v1)<(v2))
+#define value_le(v1,v2) ((v1)<=(v2))
+#define value_sign(v) (value_eq(v,VALUE_ZERO)?0:value_lt(v,VALUE_ZERO)?-1:1)
+
+/* binary operators on values
+ */
+#define value_plus(v1,v2)  ((v1)+(v2))
+#define value_div(v1,v2)   ((v1)/(v2))
+#define value_mod(v1,v2)   ((v1)%(v2))
+#define value_mult(v1,v2)  ((v1)*(v2))
+#define value_minus(v1,v2) ((v1)-(v2))
+#define value_pdiv(v1,v2)  (divide(v1,v2))
+#define value_pmod(v1,v2)  (modulo(v1,v2))
+#define value_min(v1,v2)   (value_le(v1,v2)? v1: v2)
+#define value_max(v1,v2)   (value_ge(v1,v2)? v1: v2)
+
+/* assigments
+ */
+#define value_assign(ref,val) ref=(val)
+#define value_add(ref,val) ref+=(val)
+#define value_prod(ref,val) ref*=(val)
+#define value_sub(ref,val) ref-=(val)
+
+/* unary operators on values
+ */
+#define value_uminus(val)  (-(val))
+#define value_abs(val)     (value_ge(val,VALUE_ZERO)? val: value_uminus(val))
+
+#define VALUE_POS_P(val)      value_gt(val,VALUE_ZERO)
+#define VALUE_NEG_P(val)      value_lt(val,VALUE_ZERO)
+#define VALUE_POSZ_P(val)     value_ge(val,VALUE_ZERO)
+#define VALUE_NEGZ_P(val)     value_le(val,VALUE_ZERO)
+#define VALUE_ZERO_P(val)     value_eq(val,VALUE_ZERO)
+#define VALUE_NOTZERO_P(val)  value_ne(val,VALUE_ZERO)
+#define VALUE_ONE_P(val)      value_eq(val,VALUE_ONE)
+#define VALUE_NOTONE_P(val)   value_ne(val,VALUE_ONE)
+#define VALUE_MONE_P(val)     value_eq(val,VALUE_MONE)
+
+#define value_pos_p(val)      value_gt(val,VALUE_ZERO)
+#define value_neg_p(val)      value_lt(val,VALUE_ZERO)
+#define value_posz_p(val)     value_ge(val,VALUE_ZERO)
+#define value_negz_p(val)     value_le(val,VALUE_ZERO)
+#define value_zero_p(val)     value_eq(val,VALUE_ZERO)
+#define value_notzero_p(val)  value_ne(val,VALUE_ZERO)
+#define value_one_p(val)      value_eq(val,VALUE_ONE)
+#define value_notone_p(val)   value_ne(val,VALUE_ONE)
+#define value_mone_p(val)     value_eq(val,VALUE_MONE)
+
+/* LINEAR_VALUE_IS_CHARS is used for type checking.
+ * some operations are not allowed on (char*), thus
+ * they are switched to some other operation here...
+ */
+#if defined(LINEAR_VALUE_IS_CHARS)
+#define value_fake_binary(v1,v2) ((char*)((int)(v1)&(int)(v2)))
+#undef value_uminus
+#define value_uminus(v) (v)
+#undef value_mult
+#define value_mult(v1,v2) value_fake_binary(v1,v2)
+#undef value_ge
+#define value_ge(v1,v2) value_fake_binary(v1,v2)
+#undef value_gt
+#define value_gt(v1,v2) value_fake_binary(v1,v2)
+#undef value_le
+#define value_le(v1,v2) value_fake_binary(v1,v2)
+#undef value_lt
+#define value_lt(v1,v2) value_fake_binary(v1,v2)
+#undef value_plus
+#define value_plus(v1,v2) value_fake_binary(v1,v2)
+#undef value_minus
+#define value_minus(v1,v2) value_fake_binary(v1,v2)
+#undef value_pdiv
+#define value_pdiv(v1,v2) value_fake_binary(v1,v2)
+#undef value_div
+#define value_div(v1,v2) value_fake_binary(v1,v2)
+#undef value_mod
+#define value_mod(v1,v2) value_fake_binary(v1,v2)
+#undef value_add
+#define value_add(v1,v2) value_assign(v1,value_plus(v1,v2))
+#undef value_sub
+#define value_sub(v1,v2) value_add(v1,v2)
+#undef value_prod
+#define value_prod(v1,v2) value_add(v1,v2)
+#endif
+
+/* valeur absolue
+ */
 #ifndef ABS
 #define ABS(x) ((x)>=0 ? (x) : -(x))
 #endif
