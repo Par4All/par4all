@@ -1124,6 +1124,9 @@ functional_entity_name: name
 		    (concatenate(CurrentPackage, MODULE_SEP_STRING, $1, 0),
 		     entity_domain);
 
+		/* Ignore ghost variables, they are *not* in the current scope */
+		f = ghost_variable_entity_p(f)? entity_undefined : f;
+
 		if(entity_undefined_p(f)) {
 		    $$ = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, $1);
 		}
