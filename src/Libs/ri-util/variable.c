@@ -429,9 +429,9 @@ int c;
     if (ce==entity_undefined) {		/* make entity for the constant c */ 
 	functional cf = 
 	    make_functional(NIL, 
-			    make_type(is_type_variable, 
-				      make_variable(make_basic(is_basic_int, sizeof(int)),
-						    NIL)));
+	          make_type(is_type_variable, 
+			    make_variable(make_basic(is_basic_int, (void*)sizeof(int)),
+					  NIL)));
 	type ct = make_type(is_type_functional, cf);
 	ce = make_entity(strdup(cn), ct, MakeStorageRom(),
 			 make_value(is_value_constant, 
@@ -451,28 +451,28 @@ entity
 make_float_constant_entity(float c)
 {
   entity ce;
-  char *num = (char*) malloc(sizeof(float));
+  char buffer[100];
   string cn;
+  sprintf(buffer, "%f", c);
 
-  sprintf(num, "%f", c);
-  cn = concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,num,NULL);
+  cn = strdup(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, buffer, NULL));
   ce = gen_find_entity(cn);
+
   if (ce==entity_undefined) {		/* make entity for the constant c */ 
     functional cf = 
       make_functional(NIL, 
 		      make_type(is_type_variable, 
-				make_variable(make_basic(is_basic_float,(void *)sizeof(float)),
+				make_variable(make_basic(is_basic_float,(void*)sizeof(float)),
 					      NIL)));
     type ct = make_type(is_type_functional, cf);
-    ce = make_entity(strdup(cn), ct, MakeStorageRom(),
+    ce = make_entity(cn, ct, MakeStorageRom(),
 		     make_value(is_value_constant, 
 				make_constant(is_constant_litteral, UU)));
   }
-    
   else 
-    free(num);
+    free(cn);
   
-  return(ce);
+  return ce;
 }
 
 
