@@ -1,11 +1,10 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/03/24 12:28:53 $, 
-# got on %D%, %T%
-#
+# $Date: 1995/03/24 14:19:18 $, 
 
 script=`basename $0`
+STATUS='0'
 VERBOSE=':'
 DEBUG=':'
 DELETE=':'
@@ -63,33 +62,35 @@ default_module()
 usage()
 {
   cat <<-EOF
-	Usage: $script [-vDdhMqsti] [-p pips] [-w ws] [-m mod] [-n n | file[.f]]
+	Usage: $script [-vxDdhMqsti] [-p P] [-w W] [-m M] [-n n | file[.f]]
 	  version is $Revision$
-	  -t: test (used by the validation)
-	  -i: no installation (used by the validation)
-	  -p pips: pips version to be used (used by the validation)
+	  -t: test (dump the resulting files)
+	  -i: no installation
+	  -p P: P pips version to be used
 	  -v: verbose about what is being done
+	  -x: not verbose
 	  -D: debug messages
 	  -d: delete the pips database
 	  -h: help, this help is displayed
 	  -M: make (compile and link) the generated codes
 	  -q: quiet  (stdout=/dev/null)
 	  -s: silent (stderr=/dev/null - for demonstations:-)
-	  -w ws: workspace ws is used for pips and hpfc
-	  -m mod: module mod is compiled (should be the main)
+	  -w W: workspace W is used for pips and hpfc
+	  -m M: module M is compiled (should be the main)
 	  -n n: source number n
 	  file: source file
 	EOF
   exit ${1:-1}
 }
 
-while getopts tivDdMqsn:hm:w:p: OPT
+while getopts tivxDdMqsn:hm:w:p: OPT
 do
   case $OPT in
     t) DUMPFILES="1" ;;
     i) NOINSTALL="1" ;;
     p) PIPS="$OPTARG" ;;
     v) VERBOSE='verbose' ;;
+    x) VERBOSE=':' ;;
     D) DEBUG='debug' ; 
        STDOUT=`output_tty` ; 
        STDERR="$STDOUT" ;;
@@ -115,9 +116,8 @@ shift `expr $OPTIND - 1`
 $VERBOSE "applying hpfc on file $HPFFILE"
 $DEBUG "`type $PIPS`"
 
-set -e
 $PIPS -f $HPFFILE $PIPSARGS -m $MODULE $WORKSPACE > $STDOUT 2> $STDERR
-set +e
+STATUS=$?
 
 [ "$NOINSTALL" ] ||
 {
@@ -169,6 +169,7 @@ set +e
 
 $VERBOSE "done"
 
-#
+exit $STATUS
+
 # that is all
 #
