@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: macros.c,v $
+ * Revision 1.9  1998/11/20 17:19:16  keryell
+ * Added a call to ParserError when a macro is not yet defined.
+ *
  * Revision 1.8  1998/07/24 09:22:30  coelho
  * added ref to standard about macro expansion within a macro.
  *
@@ -129,8 +132,11 @@ void parser_add_a_macro(call c, expression e)
 	pips_assert("realloc ok", current_macros);
     }
     
-    pips_assert("macro not already defined", 
-		find_entity_macro(macro) == NULL);
+    if (find_entity_macro(macro) != NULL) {
+      pips_user_warning("Macro \"%s\" is not yet defined.", entity_name(macro));
+      ParserError("parser_add_a_macro",
+		  "It may be an undeclared array.\n");
+    }
 
     /* expand macros in the macro! It is ok, because
      * referenced macros must appear in preceding lines (F77 15-5, line 3-5).
