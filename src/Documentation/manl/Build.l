@@ -23,7 +23,7 @@ and
 .B wpips.
 .\"
 .SH DESCRIPTION
-
+ 
 .B Build
 is one of the Shell scripts which provide a minimal batch-style 
 user interface to PIPS.
