@@ -152,22 +152,15 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* debug macro
  */
-#define DEBUG_STAT(D, W, S)\
- ifdebug(D) fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W),\
-            print_statement(S);
+#define GEN_DEBUG(D, W, P)\
+ ifdebug(D) {fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W);P;}
 
-#define DEBUG_SYST(D, W, S)\
- ifdebug(D) fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W),\
-            syst_debug(S);
-
-#define DEBUG_ELST(D, W, L)\
- ifdebug(D) fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W),\
-            fprint_entity_list(stderr, L);
-
+#define DEBUG_STAT(D, W, S) GEN_DEBUG(D, W, print_statement(S))
+#define DEBUG_SYST(D, W, S) GEN_DEBUG(D, W, syst_debug(S))
+#define DEBUG_ELST(D, W, L) GEN_DEBUG(D, W, fprint_entity_list(stderr, L))
 #define DEBUG_BASE(D, W, B)\
- ifdebug(D) fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W),\
-            base_fprint(stderr, B, entity_local_name); fprintf(stderr, "\n");
-
+   GEN_DEBUG(D, W, base_fprint(stderr, B, entity_local_name);\
+	           fprintf(stderr, "\n"))
 
 /* Efficient I/O tags
  */
