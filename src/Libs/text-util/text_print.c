@@ -73,6 +73,10 @@ print_sentence(FILE * fd,
 {
     if (sentence_formatted_p(s)) {
 	string ps = sentence_formatted(s);
+	string ps_begin = ps;
+	
+	deal_with_sentence_word_begin(ps_begin,
+				      position_in_the_output);
 	while (*ps) {
 	    char c = *ps++;
 	    /* FI/FC: Why on earth?!?
@@ -80,6 +84,8 @@ print_sentence(FILE * fd,
 	       */
 	    putc_sentence( c, fd);
 	}
+	deal_with_sentence_word_end(ps_begin,
+				    position_in_the_output);
     }
     else {
 	unformatted u = sentence_unformatted(s);
