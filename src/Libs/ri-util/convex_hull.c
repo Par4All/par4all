@@ -2,15 +2,20 @@
  * $Id$
  *
  * Functions which should/could be in linear...
- * Here because we're using some newgen stuff.
  */
 
 #include <stdio.h>
-
 #include "linear.h"
-#include "genC.h"   /* for set */
 
-/*************************************** NEWGEN SET BASED TRANSITIVE CLOSURE */
+/******************************************** NEWGEN SET -> LINEAR HASHTABLE */
+
+#define set linear_hashtable_pt
+#define set_belong_p(s, v) linear_hashtable_isin(s, v)
+#define set_add_element(s, old, v) linear_hashtable_put(s, v, v)
+#define set_make(t) linear_hashtable_make()
+#define set_free(s) linear_hashtable_free(s)
+
+/********************************************** SET BASED TRANSITIVE CLOSURE */
 
 /* put base variables in set.
    returns whether something was put.
@@ -216,6 +221,13 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
 
 /********************************************************************** PIPS */
 
+#undef set
+#undef set_belong_p
+#undef set_add_element
+#undef set_make
+#undef set_free
+
+#include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "misc.h"
