@@ -28,7 +28,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <varargs.h>
 
 #include "genC.h"
 #include "ri.h"
