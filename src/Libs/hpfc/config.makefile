@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/03/31 11:29:21 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/04/11 17:00:42 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -51,8 +51,7 @@ LIB_CFILES=	parser.c parser-util.c debug-util.c hpfc-util.c \
 
 LIB_HEADERS=	f77keywords f77symboles hpfkeywords gram.y scanner.l \
 		warning.h hpfc-local.h defines-local.h compiler_parameters.h \
-		access_description.h \
-		add-includes filter-hpf
+		access_description.h 
 
 # headers made by some rule (except $INC_TARGET)
 DERIVED_HEADERS=toklex.h keywtbl.h tokyacc.h
