@@ -84,7 +84,7 @@ extern FILE * yyin;
 #define CAT_COMMAND "cat"
 
 /********************************************************** static variables */
-static t_file_list the_file_list;
+static gen_array_t the_file_list = gen_array_undefined;
 extern bool tpips_execution_mode;
 
 #define YYERROR_VERBOSE 1 /* MUCH better error messages with bison */
@@ -99,7 +99,7 @@ extern void yyerror(char *);
     string name;
     res_or_rule rn;
     list owner;
-    t_file_list *args;
+    gen_array_t *args;
 }
 
 %%
@@ -148,9 +148,6 @@ i_open:
 		    }
 		}
 	    }
-/*
-	    free (yylval.name);
-*/
 	}
 	;
 
@@ -160,7 +157,9 @@ i_create:
 	WORKSPACE /* workspace name */
 	{
 	    $<name>$ = yylval.name;
-	    the_file_list.argc = 0;
+	    if (!gen_array_undefined_p(the_file_list)) 
+		gen_array_full_free(the_file_list);
+	    the_file_list = gen_array_make(0);
 	}
 	sep_list
 	filename_list /* list of fortran files */
@@ -172,19 +171,18 @@ i_create:
 	    
 	    if (tpips_execution_mode) {
 		if (workspace_exists_p($<name>4))
-		    user_error
-			("create", "Workspace %s already exists. Delete it!\n",
+		    pips_user_error
+			("Workspace %s already exists. Delete it!\n",
 			 $<name>4);
 		else {
 		  if(db_create_workspace ((string) $<name>4))
 		  {
-		    if(!create_workspace (&the_file_list.argc, 
-					  the_file_list.argv)) 
+		    if(!create_workspace (the_file_list))
 		    {
 			/* string wname = db_get_current_workspace_name();*/
 			db_close_workspace();
 			(void) delete_workspace($<name>4);
-			user_error("create", "Could not create workspace"
+			pips_user_error("Could not create workspace"
 					" %s\n", $<name>4);
 		    }
 
@@ -200,16 +198,15 @@ i_create:
 		    $$ = TRUE;
 		  }
 		  else {
-		    user_error("create", "Cannot create directory for workspace,"
-				    " check rights!\n");
+		      pips_user_error("Cannot create directory for workspace,"
+				      " check rights!\n");
 		  }
 		}
 	    }
-/*
-	    while (the_file_list.argc--)
-		free (the_file_list.argv[the_file_list.argc]);
-	    free ($<name>4);
-*/
+	    if (!gen_array_undefined_p(the_file_list)) {
+		gen_array_full_free(the_file_list);
+		the_file_list = gen_array_undefined;
+	    }
 	}
 	;
 
@@ -225,8 +222,8 @@ i_close:
 		    $$ = TRUE;
 		}
 		else {
-		    user_error ("close",
-				"No workspace to close. Open or create one!\n");
+		    pips_user_error("No workspace to close. "
+				    "Open or create one!\n");
 		    $$ = FALSE;
 		}	
 		$$ = TRUE;
@@ -281,15 +278,15 @@ i_module:
 	{
 	    char *t = yylval.name;
 
-	    debug(7,"yyparse","reduce rule i_module\n");
+	    pips_debug(7,"reduce rule i_module\n");
 
 	    if (tpips_execution_mode) {
 		if (db_get_current_workspace_name()) {
 		    lazy_open_module (strupper(t,t));
 		    $$ = TRUE;
 		} else {
-		    user_error ("module",
-				"No workspace open. Open or create one!\n");
+		    pips_user_error("No workspace open. "
+				    "Open or create one!\n");
 		    $$ = FALSE;
 		}
 	    }
@@ -322,9 +319,7 @@ i_make:
 			}
 		    }
 		    else
-		    {
 			user_warning("make", "Select a module first!\n");
-		    }
 		}, $3.the_owners);
 
 		/* restore the initial current module, if there was one */
@@ -372,9 +367,7 @@ i_apply:
 			}
 		    }
 		    else
-		    {
-			user_warning("apply", "Select a module first!\n");
-		    }
+			pips_user_warning("Select a module first!\n");
 		}, $3.the_owners);
 
 		/* restore the initial current module, if there was one */
@@ -431,9 +424,7 @@ i_display:
 			free(fname);
 		    }
 		    else
-		    {
-			user_warning("display", "Select a module first!\n");
-		    }
+			pips_user_warning("Select a module first!\n");
 
 		}, $3.the_owners);
 
@@ -503,30 +494,15 @@ filename_list:
 	sep_list
 	filename
 	{
-	    debug(7,"yyparse","reduce rule filename_list (%s)\n", $1);
-
-	    if (the_file_list.argc < FILE_LIST_MAX_LENGTH) {
-		the_file_list.argv[the_file_list.argc] = $3;
-		the_file_list.argc++;
-	    } else {
-	      pips_error("tpips",
-			 "Too many files - Resize FILE_LIST_MAX_LENGTH\n");
-	    }
-	    
+	    pips_debug(7,"reduce rule filename_list\n");
+	    gen_array_append(the_file_list, $3);
 	}
 	|
 	filename
 	/* opt_sep_list */
 	{ /* the opt_sep_list enables trailing blanks... */
-	    debug(7,"yyparse","reduce rule filename_list (%s)\n", $1);
-
-	    if (the_file_list.argc < FILE_LIST_MAX_LENGTH) {
-		the_file_list.argv[the_file_list.argc] = $1;
-		the_file_list.argc++;
-	    } else {
-	      pips_error("tpips",
-			 "Too many files (2) - Resize FILE_LIST_MAX_LENGTH\n");
-	    }
+	    pips_debug(7,"reduce rule filename_list (%s)\n", $1);
+	    gen_array_append(the_file_list, $1);
 	}
 	;
 
@@ -540,7 +516,7 @@ resource_id:
 	{ $<name>$ = yylval.name;}
 	owner
 	{
-	    debug(7,"yyparse","reduce rule resource_id (%s)\n",$<name>2);
+	    pips_debug(7,"reduce rule resource_id (%s)\n",$<name>2);
 
 	    $$.the_name = $<name>2;
 	    $$.the_owners = $3;
@@ -552,7 +528,7 @@ rule_id:
 	{ $<name>$ = yylval.name;}
 	owner
 	{
-	    debug(7,"yyparse","reduce rule rule_id (%s)\n",$<name>2);
+	    pips_debug(7,"reduce rule rule_id (%s)\n",$<name>2);
 
 	    $$.the_name = $<name>2;
 	    $$.the_owners = $3;
@@ -564,22 +540,20 @@ owner:
 	OWNER_ALL
 	CLOSEPAREN
 	{
-	    int nmodules = 0;
-	    char *module_list[ARGS_LENGTH];
 	    int i;
 	    list result = NIL;
-
-	    debug(7,"yyparse","reduce rule owner (ALL)\n");
+	    pips_debug(7,"reduce rule owner (ALL)\n");
 
 	    if (tpips_execution_mode) {
-		db_get_module_list(&nmodules, module_list);
-		message_assert("yyparse", nmodules>0);
+		gen_array_t modules = db_get_module_list();
+		int nmodules = gen_array_nitems(modules);
+		message_assert("some modules", nmodules>0);
 		for(i=0; i<nmodules; i++) {
-		    string on = module_list[i];
-
-		    result = gen_nconc(result, 
-				       CONS(STRING, on, NIL));
+		    string n =  gen_array_item(modules, i);
+		    result = CONS(STRING, strdup(n), result);
 		}
+		gen_array_full_free(modules);
+		pips_assert("length ok", nmodules==gen_length(result));
 		$$ = result;
 	    }
 	}
@@ -588,10 +562,9 @@ owner:
 	OWNER_PROGRAM
 	CLOSEPAREN
 	{
-	    debug(7,"yyparse","reduce rule owner (PROGRAM)\n");
-
+	    pips_debug(7,"reduce rule owner (PROGRAM)\n");
 	    if (tpips_execution_mode) {
-		$$ = CONS(STRING, db_get_current_workspace_name (), NIL);
+		$$ =CONS(STRING, strdup(db_get_current_workspace_name()), NIL);
 	    }
 	}
 	|
@@ -599,30 +572,31 @@ owner:
 	OWNER_MAIN
 	CLOSEPAREN
 	{
-	    int nmodules = 0;
-	    char *module_list[ARGS_LENGTH];
 	    int i;
 	    int number_of_main = 0;
-
-	    debug(7,"yyparse","reduce rule owner (MAIN)\n");
+	    
+	    pips_debug(7,"reduce rule owner (MAIN)\n");
+	    $$ = NIL;
 
 	    if (tpips_execution_mode) {
-		db_get_module_list(&nmodules, module_list);
-		message_assert("yyparse", nmodules>0);
-		for(i=0; i<nmodules; i++) {
-		    string on = module_list[i];
+		gen_array_t modules = db_get_module_list();
+		int nmodules = gen_array_nitems(modules);
+		message_assert("some modules", nmodules>0);
 
-		    if (entity_main_module_p
-			(local_name_to_top_level_entity(on)) == TRUE)
+		for(i=0; i<nmodules; i++) {
+		    string on = gen_array_item(modules, i);
+		    entity mod = local_name_to_top_level_entity(on);
+
+		    if (!entity_undefined_p(mod) && entity_main_module_p(mod))
 		    {
 			if (number_of_main)
-			    pips_error("build_real_resources",
-				       "More the one main\n");
+			    pips_internal_error("More the one main\n");
 			
 			number_of_main++;
-			$$ = CONS(STRING, on, NIL);
+			$$ = CONS(STRING, strdup(on), NIL);
 		    }
 		}
+		gen_array_full_free(modules);
 	    }
 	}
 	|
@@ -633,7 +607,7 @@ owner:
 	    debug(7,"yyparse","reduce rule owner (MODULE)\n");
 
 	    if (tpips_execution_mode) {
-		$$ = CONS(STRING, db_get_current_module_name (), NIL);
+		$$ = CONS(STRING, strdup(db_get_current_module_name()), NIL);
 	    }
 	}
 	|
@@ -723,7 +697,7 @@ list_of_owner_name:
 	    if (tpips_execution_mode) {
 		char *c = $<name>2;
 		strupper (c, c);
-		$$ = gen_nconc($4,CONS(STRING, c, NIL));
+		$$ = CONS(STRING, c, $4);
 	    }
 	}
 	|
@@ -731,7 +705,7 @@ list_of_owner_name:
 	{ $$ = (list) yylval.name; }
 	CLOSEPAREN
 	{
-	    debug(7,"yyparse","reduce rule owner list(name = %s)\n",$<name>2);
+	    pips_debug(7,"reduce rule owner list(name = %s)\n",$<name>2);
 
 	    if (tpips_execution_mode) {
 		char *c = $<name>2;
