@@ -1,5 +1,5 @@
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/07/10 20:06:08 $, 
+# $Date: 1996/07/10 20:12:31 $, 
 # (c) Fabien COELHO 1996
 #
 # this makefile forwards make targets to subdirectories...
@@ -23,7 +23,7 @@ MAKE_REPORT=/dev/tty
 	-for d in $(DIRS) ; do \
 	  if test -d $$d ; then \
 	    $(MAKE) -C $$d $@ || \
-	    echo "$@ failed [$(MAKE_MESSAGE)] in $$d" > $(MAKE_REPORT) ;\
+	    echo "$@ failed [$(MAKE_MESSAGE)] in $$d" >> $(MAKE_REPORT) ;\
 	fi ; done
 
 # end of $RCSfile: forward_gnu_makefile,v $
