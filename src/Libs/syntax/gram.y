@@ -56,6 +56,10 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.62  2002/06/20 15:49:59  irigoin
+  * New handling of DATA, replacement of datavar and dataval by
+  * expression. Complex constants are now lost as in regular expressions.
+  *
   * Revision 1.61  2002/06/12 10:40:39  irigoin
   * Small comments to recuperate user source code of data statement
   *
@@ -157,9 +161,9 @@
 %type <value>		lg_fortran_type
 %type <character>       letter
 %type <expression>      dataconst
-%type <dataval>         dataval
-%type <datavar>         datavar
-%type <datavar>         dataidl
+%type <expression>      dataval
+%type <expression>      datavar
+%type <expression>      dataidl
 
 %{
 #include <stdio.h>
@@ -214,6 +218,29 @@ static dataval MakeDataVal(expression n, expression c)
     free_value(vc);
 
     return make_dataval(cc, in);
+}
+
+static expression MakeDataValueSet(expression n, expression c)
+{
+    expression repeat_factor = expression_undefined;
+    expression value_set = expression_undefined;
+    entity repeat_value = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+						REPEAT_VALUE_NAME);
+    value vc = value_undefined;
+
+    pips_assert("Function repeat value is defined", !entity_undefined_p(repeat_value));
+
+    vc = EvalExpression(c);
+    if (! value_constant_p(vc)) {
+	ParserError("MakeDataValueSet", "data value must be a constant\n");
+    }
+
+    repeat_factor = (n == expression_undefined) ? int_to_expression(1) : n;
+    value_set = make_call_expression(repeat_value,
+				     CONS(EXPRESSION, repeat_factor,
+					  CONS(EXPRESSION, c, NIL)));
+
+    return value_set;
 }
 
 
@@ -1025,42 +1052,44 @@ dimension: TK_DIMENSION
 
 data_inst: TK_DATA ldatavar TK_SLASH ldataval TK_SLASH
 	    {
-		AnalyzeData($2, $4);
+	      /* AnalyzeData($2, $4); */
+	      MakeDataStatement($2, $4);
 	    }
 	| data_inst opt_virgule ldatavar TK_SLASH ldataval TK_SLASH
 	    {
-		AnalyzeData($3, $5);
+	      /* AnalyzeData($3, $5); */
+	      MakeDataStatement($3, $5);
 	    }
 	;
 
 ldatavar: datavar
 	    {
-		$$ = CONS(DATAVAR, $1, NIL);
+		$$ = CONS(EXPRESSION, $1, NIL);
 	    }
-	| datavar TK_COMMA ldatavar
+	| ldatavar TK_COMMA datavar
 	    {
-		$$ = CONS(DATAVAR, $1, $3);
+		$$ = gen_nconc($1, CONS(EXPRESSION, $3, NIL));
 	    }
 	;
 
 /* rule reversal because of a stack overflow; bug hit.f */
 ldataval: dataval
 	    {
-		$$ = CONS(DATAVAL, $1, NIL);
+		$$ = CONS(EXPRESSION, $1, NIL);
 	    }
 	| ldataval TK_COMMA dataval
 	    {
-		$$ = gen_nconc($1, CONS(DATAVAL, $3, NIL));
+		$$ = gen_nconc($1, CONS(EXPRESSION, $3, NIL));
 	    }
 	;
 
 dataval: dataconst
 	    {
-		$$ = MakeDataVal(expression_undefined, $1);
+		$$ = MakeDataValueSet(expression_undefined, $1);
 	    }
 	| dataconst TK_STAR dataconst
 	    {
-		$$ = MakeDataVal($1, $3);
+		$$ = MakeDataValueSet($1, $3);
 	    }
 	;
 
@@ -1108,19 +1137,18 @@ dataconst: const_simple /* expression -> shift/reduce conflicts */
 
 datavar: atom
 	    {
-		$$ = MakeDataVar($1, range_undefined);
+	      $$ = make_expression($1, normalized_undefined);
 	    }
 	| dataidl
 	    { $$ = $1; }
 	;
 
-dataidl: TK_LPAR atom TK_COMMA entity_name do_plage TK_RPAR
+dataidl: TK_LPAR ldatavar TK_COMMA entity_name do_plage TK_RPAR
 	    {
-		$$ = MakeDataVar($2, $5);
-	    }
-	| TK_LPAR dataidl TK_COMMA entity_name do_plage TK_RPAR
-	    {
-		$$ = ExpandDataVar($2, $5);
+	      /* $$ = MakeDataVar($2, $5); */
+	      reference r = make_reference($4, NIL);
+	      syntax s = make_syntax(is_syntax_reference, r);
+	      $$ = MakeImpliedDo(s, $5, $2);
 	    }
 	;
 
@@ -1258,7 +1286,10 @@ lformalparameter: entity_name
         | TK_STAR
             {
 		uses_alternate_return(TRUE);
-		$$ = CONS(ENTITY, generate_pseudo_formal_variable_for_formal_label(), NIL);
+		$$ = CONS(ENTITY, 
+			  generate_pseudo_formal_variable_for_formal_label
+			  (CurrentPackage, get_current_number_of_alternate_returns()),
+			  NIL);
             }
 	| lformalparameter TK_COMMA entity_name
 	    {
@@ -1268,7 +1299,8 @@ lformalparameter: entity_name
             {
 		uses_alternate_return(TRUE);
 		$$ = gen_nconc($1, CONS(ENTITY,
-					generate_pseudo_formal_variable_for_formal_label(),
+					generate_pseudo_formal_variable_for_formal_label
+					(CurrentPackage, get_current_number_of_alternate_returns()),
 					NIL));
             }
 	;
