@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:46:29 $, )
+# ($Date: 1996/08/21 17:54:44 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -186,7 +186,7 @@ SOURCES = 	$(M4_MACROS) \
 
 LIB_TARGET = $(PVM_ARCH)/libhpfcruntime.a
 
-$(LIB_OBJECTS) $(LIB_TARGET): $(PVM_ARCH)
+# $(LIB_OBJECTS) $(LIB_TARGET): $(PVM_ARCH)
 
 $(PVM_ARCH):; mkdir $@
 
@@ -211,7 +211,7 @@ ifeq ($(PVM_ARCH),CM5)
 all: $(CMMD_F77_H) 
 endif
 
-all: $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
+all: $(PVM_ARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
 		$(LIB_OBJECTS) $(LIB_TARGET) 
 
 #
