@@ -32,9 +32,9 @@ extern int  simplex_arithmetic_error;
 #if defined(DEBUG_GLOBAL_EXCEPTIONS)
 #define exception_debug(msg, n, what) 			\
   fprintf(stderr, "%s %d - %d (%s %s %d)\n", 		\
-	  msg, what, n, __FUNCTION__, __FILE__, __LINE__)
+      msg, what, n, __FUNCTION__, __FILE__, __LINE__),
 #else
-#define exception_debug(msg, n, what) 1
+#define exception_debug(msg, n, what) 
 #endif
 
 #define exception_debug_push(what) \
@@ -51,10 +51,10 @@ extern int  simplex_arithmetic_error;
      (print_exception_stack_error(0),1))
 
 #define THROW(what) \
-    (exception_debug_throw(what), throw_exception(what))
+    (exception_debug_throw(what) throw_exception(what))
 
 #define PUSH_AND_FORWARD_EXCEPTION(what)				\
-    (exception_debug_push(what), 					\
+    (exception_debug_push(what) 					\
       global_exception_index==MAX_STACKED_CONTEXTS?			\
      (print_exception_stack_error(1),1):	                        \
      (global_exception_type[global_exception_index]=what,		\
@@ -63,7 +63,7 @@ extern int  simplex_arithmetic_error;
 #define CATCH(what) if PUSH_AND_FORWARD_EXCEPTION(what)
 
 #define UNCATCH(what)						\
-    (exception_debug_pop(what), 				\
+    (exception_debug_pop(what) 					\
      global_exception_type[global_exception_index_decr]!=what?	\
 	(print_exception_stack_error(2), 0): 1)
 
