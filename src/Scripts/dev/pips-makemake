@@ -1,8 +1,11 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1997/01/14 08:48:34 $, )
-# version $Revision$
+# $Id$
+# $Log: pips-makemake,v $
+# Revision 1.269  1997/03/11 18:32:15  coelho
+# *** empty log message ***
+#
 #
 # Automatic generation of Makefile for the PIPS project
 #
@@ -291,7 +294,10 @@ clean-all-compiled:
 #
 OLD:; mkdir OLD
 SCCS:; mkdir SCCS
-get:; sccs get SCCS
+RCS:; mkdir RCS
+get: 
+	-test -d SCCS && sccs get SCCS
+	-test -d RCS && co RCS/*
 # .PHONY is a gnu extension...
 .PHONY: install all depend header recompile clobber count info delta
 .PHONY: generate_makefile_if_necessary_and_possible
@@ -699,10 +705,14 @@ count:;	@wc -l \$(ALL_SOURCES)
 
 #
 # some quick entries for SCCS:
-info:; @sccs info
+info:
+	-test -d SCCS && sccs info
+	-test -d RCS && rlog -LR RCS/*
 
 # try to delta all checked out files
-delta:;	@test ! "\`sccs tell\`" || sccs delget \`sccs tell\`
+delta:
+	-test -d SCCS && test ! "\`sccs tell\`" || sccs delget \`sccs tell\`
+	-test -d RCS && ci -u \`rlog -LR RCS/*\``
 
 %
 
