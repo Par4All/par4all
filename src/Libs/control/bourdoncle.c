@@ -25,6 +25,9 @@
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.12  2003/07/23 14:29:01  irigoin
+ Bug fix in bourdoncle_unstructured_free()
+
  Revision 1.11  2003/07/23 13:50:02  irigoin
  Bug fix in bourdoncle_unstructured_free()
 
@@ -2321,7 +2324,7 @@ static void bourdoncle_unstructured_free(unstructured u)
      into nested unstructured. */
   gen_multi_recurse(u,
 		    statement_domain, gen_false, gen_null,
-		    control_domain, gen_true, suppress_statement_reference);
+		    control_domain, gen_true, suppress_statement_reference, NULL);
 
   free_unstructured(u);
 }
