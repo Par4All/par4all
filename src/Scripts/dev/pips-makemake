@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/22 17:17:57 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/22 18:32:16 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -129,39 +129,25 @@ esac
 #
 # Where to install files:
 
+install_inc_dir='$(ROOT)/Include';
+install_lib_dir='$(ROOT)/Lib';
+install_bin_dir='$(ROOT)/Bin';
+install_src_dir='$(ROOT)/Src';
+install_shr_dir='$(ROOT)/Share';
+install_doc_dir='$(ROOT)/Doc';
+install_htm_dir='$(ROOT)/Doc/Html';
+install_rtm_dir='$(ROOT)/Runtime' ;
+install_utl_dir='$(ROOT)/Utils';
+
 case $PART in
-  PIPS) 
-    install_inc_dir='$(PIPS_ROOT)/Include';
-    install_lib_dir='$(PIPS_ROOT)/Lib';
-    install_bin_dir='$(PIPS_ROOT)/Bin';
-    install_src_dir='$(PIPS_ROOT)/Src';
-    install_shr_dir='$(PIPS_ROOT)/Share';
-    install_doc_dir='$(PIPS_ROOT)/Doc';
-    install_htm_dir='$(PIPS_ROOT)/Doc/Html';
-    install_rtm_dir='$(PIPS_ROOT)/Runtime' ;
-    install_utl_dir='$(PIPS_ROOT)/Utils';;
+  PIPS) ;;
   NEWGEN)
-    install_src_dir='$(NEWGEN_ROOT)/Src';
-    install_inc_dir='$(NEWGEN_ROOT)/Include' ;
-    install_bin_dir='$(NEWGEN_ROOT)/Bin' ;
-    install_doc_dir='$(NEWGEN_ROOT)/Doc' ;
-    # install_htm_dir='$(NEWGEN_ROOT)/Doc/Html' ;
+    # ??? the html doc is installed with pips
     install_htm_dir='$(PIPS_ROOT)/Doc/Html';
-    install_utl_dir='$(NEWGEN_ROOT)/Share' ;
-    install_lib_dir='$(NEWGEN_ROOT)/Lib' ;
-    install_shr_dir='$(NEWGEN_ROOT)/Share' ;
-    install_rtm_dir='$(NEWGEN_ROOT)/Runtime' ;;
+    install_utl_dir='$(ROOT)/Share' ;;
   LINEAR)
-    install_src_dir='$(LINEAR_ROOT)/Src';
-    install_inc_dir='$(LINEAR_ROOT)/Include' ;
-    install_bin_dir='$(LINEAR_ROOT)/Bin' ;
-    install_lib_dir='$(LINEAR_ROOT)/Lib' ;
-    install_doc_dir='$(LINEAR_ROOT)/Doc' ;
-    # install_htm_dir='$(LINEAR_ROOT)/Doc/Html' ;
     install_htm_dir='$(PIPS_ROOT)/Doc/Html';
-    install_utl_dir='$(LINEAR_ROOT)/Share' ;
-    install_shr_dir='$(LINEAR_ROOT)/Share';
-    install_rtm_dir='$(LINEAR_ROOT)/Runtime' ;;
+    install_utl_dir='$(ROOT)/Share' ;;
   *) usage 6 "unexpected PART=$PART" ;;
 esac
 
@@ -230,6 +216,9 @@ cat >> $MAKEFILE <<%
 #
 # DEFAULTS, may be overwritten by the $CONFIG_FILE content.
 #
+# the root file of the soft which is being compiled
+ROOT= \$(${PART}_ROOT)
+#
 TARGET=		${dir_real_name}
 TARGET_DIR=	${install_src_dir}/${target_dir}
 #
@@ -272,7 +261,7 @@ recompile: generate_makefile_if_necessary_and_possible
 #
 full-clean: clean clean-all-compiled
 clean-all-compiled: 
-	-for d in \`echo \$(PIPS_ROOT)/Include/makefile_macros.* | \\
+	-for d in \`echo \$(ROOT)/Include/makefile_macros.* | \\
 		sed 's,[-_a-zA-z0-9/]*/makefile_macros\.,,g'\`; do \\
 	  test -d \$\$d && { \\
 	    echo "cleaning \$\$d"; \\
@@ -298,8 +287,8 @@ check_install:
 #
 \$(ARCH):; mkdir \$(ARCH)
 #
-include \$(${PART}_ROOT)/Include/define_libraries.make
-include \$(${PART}_ROOT)/Include/makefile_macros.\$(ARCH)
+include \$(ROOT)/Include/define_libraries.make
+include \$(ROOT)/Include/makefile_macros.\$(ARCH)
 include $CONFIG_FILE
 #
 # prefixed objects:
@@ -564,17 +553,17 @@ $verbose "specific to Production/Lib and Passes"
 [ \( $DIRTYPE = 'Passes' -o $DIRTYPE = 'Lib' \) -a "$production" ] &&
 cat >> $MAKEFILE <<%
 
-.PRECIOUS: \$(${PART}_ROOT)/Lib/\$(LIB_TARGET) \$(${PART}_ROOT)/Bin/\$(BIN_TARGET)
+.PRECIOUS: \$(ROOT)/Lib/\$(LIB_TARGET) \$(ROOT)/Bin/\$(BIN_TARGET)
 
-\$(${PART}_ROOT)/Include/\$(TARGET).h: header
+\$(ROOT)/Include/\$(TARGET).h: header
 	@\$(INSTALL) -f \$(${PART}_INCLUDEDIR) \$(TARGET).h
 
-\$(${PART}_ROOT)/Lib/\$(LIB_TARGET): \$(LIB_TARGET) 
+\$(ROOT)/Lib/\$(LIB_TARGET): \$(LIB_TARGET) 
 	@\$(INSTALL) -r \$(RANLIB) \$(${PART}_LIBDIR)/\$(ARCH) \$(LIB_TARGET)
 
 \$(LIB_OBJECTS): \$(TARGET).h
 
-recompile: \$(${PART}_ROOT)/Include/\$(TARGET).h \$(${PART}_ROOT)/Lib/\$(LIB_TARGET) 
+recompile: \$(ROOT)/Include/\$(TARGET).h \$(ROOT)/Lib/\$(LIB_TARGET) 
 
 %
 
