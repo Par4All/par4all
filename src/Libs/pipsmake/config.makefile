@@ -12,7 +12,8 @@ LIB_CFILES=	pipsmake.c \
 		callgraph.c \
 		openclose.c \
 		callback.c \
-		unsplit.c
+		unsplit.c \
+		stubs.c
 
 LIB_HEADERS=	readmakefile.l \
 		readmakefile.y \
