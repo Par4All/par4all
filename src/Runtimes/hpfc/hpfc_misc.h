@@ -1,17 +1,17 @@
 c
 c $RCSfile: hpfc_misc.h,v $ (version $Revision$)
-c $Date: 1996/03/14 11:10:31 $, 
+c $Date: 1996/09/07 16:21:28 $, 
 c
-      character*64 hpfc_key
-      common /HPFC_MISC/ hpfc_key
+      character*64 hpfc key
+      common /HPFC MISC/ hpfc key
       integer 
-     $     hpfc_fake_bufpck, 
-     $     hpfc_fake_bufupk,
-     $     hpfc_fake_bcasts
-      common /hpfc_counts/ 
-     $     hpfc_fake_bufpck, 
-     $     hpfc_fake_bufupk,
-     $     hpfc_fake_bcasts
+     $     hpfc fake bufpck, 
+     $     hpfc fake bufupk,
+     $     hpfc fake bcasts
+      common /hpfc counts/ 
+     $     hpfc fake bufpck, 
+     $     hpfc fake bufupk,
+     $     hpfc fake bcasts
 c
 c that is all
 c
