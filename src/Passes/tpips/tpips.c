@@ -403,19 +403,6 @@ void default_handler(char * line)
     tp_parse ();
 }
 
-static char * read_a_line(char * prompt)
-{
-
-#define MAX_LINE_LENGTH  1024
-
-    static char line[MAX_LINE_LENGTH];
-
-    if (use_readline)
-	return readline(prompt);
-
-    return gets(line);
-}
-
 static void (*find_handler(char* line))(char *)
 {
     struct t_handler * x = handlers;
@@ -423,9 +410,38 @@ static void (*find_handler(char* line))(char *)
     return x->function;
 }
 
+/* where to read characters from
+ */
+char * current_file_name = (char *) NULL;
+
+static void 
+parse_arguments(int argc, char * argv[])
+{
+    if (!argc) return;
+    current_file_name = argv[1];
+    safe_fclose(stdin, "stdin !");
+    (void) safe_freopen(argv[1], "r", 0);
+    use_readline = FALSE;
+
+    pips_debug(1, "reading from file %s\n", current_file_name);
+}
+
+static char * 
+read_a_line(char * prompt)
+{
+#define MAX_LINE_LENGTH  1024
+    static char line[MAX_LINE_LENGTH];
+
+    if (use_readline)
+	return readline(prompt);
+    
+    return safe_fgets(line, MAX_LINE_LENGTH, 
+		      stdin, current_file_name);
+}
+
 /* MAIN: interactive loop and history management.
  */
-int main()
+int main(int argc, char * argv[])
 {
     char *last = NULL;
     char *line;
@@ -434,10 +450,13 @@ int main()
 
     debug_on("PIPS_DEBUG_LEVEL");
 
-    initialize_newgen();
-    (void) setjmp(pips_top_level);
+    use_readline = isatty(0);
+    parse_arguments(argc, argv);
 
-    use_readline = isatty(0) ? TRUE : FALSE;
+    initialize_newgen();
+    initialize_sc(entity_local_name);
+
+    (void) setjmp(pips_top_level);
 
     set_bool_property("ABORT_ON_USER_ERROR",FALSE);
     pips_log_handler = tpips_user_log;
@@ -522,7 +541,7 @@ static void initialize_readline ()
  * entire line in case we want to do some simple parsing.  Return the
  * array of matches, or NULL if there aren't any. 
  */
-static char **fun_completion(char *text, int start, int end)
+static char **fun_completion(char *texte, int start, int end)
 {
 
     char **matches;
@@ -537,7 +556,7 @@ static char **fun_completion(char *text, int start, int end)
 	debug (9,"fun_completion",
 	       "completing function (START = %d, END= %d)\n\n",
 	       start, end);
-	matches = completion_matches (text , fun_generator);
+	matches = completion_matches (texte , fun_generator);
     }
     return (matches);
 }
@@ -547,7 +566,7 @@ static char **fun_completion(char *text, int start, int end)
  * to start from scratch; without any state (i.e. STATE == 0), then we
  * start at the top of the list. 
  */
-static char *fun_generator(char *text, int state)
+static char *fun_generator(char *texte, int state)
 {
     static int list_index, len;
     char *name;
@@ -558,7 +577,7 @@ static char *fun_generator(char *text, int state)
     if (!state)
     {
 	list_index = 0;
-	len = strlen (text);
+	len = strlen (texte);
     }
      
     /* Return the next name which partially matches from the command list. */
@@ -566,7 +585,7 @@ static char *fun_generator(char *text, int state)
     {
 	list_index++;
      
-	if (strncmp (name, text, len) == 0)
+	if (strncmp (name, texte, len) == 0)
 	    return (strdup(name));
     }
      
@@ -579,7 +598,7 @@ static char *fun_generator(char *text, int state)
  * to start from scratch; without any state (i.e. STATE == 0), then we
  * start at the top of the list. 
  */
-static char *param_generator(char *text, int state)
+static char *param_generator(char *texte, int state)
 {
     static int list_index, len;
     char *name;
@@ -665,20 +684,20 @@ static char *param_generator(char *text, int state)
 	    current_completion_array = NULL;
 	}
 	list_index = 0;
-	len = strlen (text);
+	len = strlen (texte);
     }
 
     if (current_completion_array == NULL)
 	return NULL;
     else if (current_completion_array == RESERVED_FOR_FILENAME)
-	return filename_completion_function(text,state);
+	return filename_completion_function(texte,state);
     
     /* Return the next name which partially matches from the command list. */
     while ((name = current_completion_array[list_index]))
     {
 	list_index++;
      
-	if (strncmp (name, text, len) == 0)
+	if (strncmp (name, texte, len) == 0)
 	    return (strdup(name));
     }
      
