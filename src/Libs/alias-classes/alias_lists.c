@@ -39,11 +39,11 @@ static list matched_alias_pairs;
 
 
 /* tests if reg1 and reg2 are the same,
- * ignoring their action_tags (read/write)
- * but checking their precision (may/exact)
+ * including same action_tags (IN/OUT)
+ * and precision (may/exact)
  */
-bool
-same_reg_ignore_action(region reg1, region reg2)
+static bool
+same_reg(region reg1, region reg2)
     {
     Psysteme reg1_sys, reg2_sys;
     bool result = FALSE;
@@ -61,112 +61,38 @@ same_reg_ignore_action(region reg1, region reg2)
 	    {
 /*		pips_debug(1,"same approx\n"); */
 
-	    ifdebug(1)
+		if (effect_action_tag(reg1) == 
+		    effect_action_tag(reg2))
 		{
-		    set_action_interpretation(ACTION_IN,ACTION_OUT);
-		    pips_debug(1,"compare:\n\t");
-		    print_region(reg1);
-		    pips_debug(1,"with:\n\t");
-		    print_region(reg2);
-		    reset_action_interpretation();
-		}
+/*		pips_debug(1,"same action\n"); */
 
-		reg1_sys = region_system(reg1);
-		reg2_sys = region_system(reg2);
-		if ( sc_equal_p_ofl(reg1_sys,reg2_sys) )
-		{
-		    result = TRUE;
-
-		    pips_debug(1,"same region\n");
+		    ifdebug(1)
+			{
+			    set_action_interpretation(ACTION_IN,ACTION_OUT);
+			    pips_debug(1,"compare:\n\t");
+			    print_region(reg1);
+			    pips_debug(1,"with:\n\t");
+			    print_region(reg2);
+			    reset_action_interpretation();
+			}
+		    
+		    reg1_sys = region_system(reg1);
+		    reg2_sys = region_system(reg2);
+		    if ( sc_equal_p_ofl(reg1_sys,reg2_sys) )
+		    {
+			result = TRUE;
+			
+			pips_debug(1,"same region\n");
+		    }
+		    else
+			pips_debug(1,"not same region\n");
 		}
-		else
-		    pips_debug(1,"not same region\n");
 	    }
 	}
     pips_debug(4,"end\n");
 
     return result;
     }
-
-
-/* tests if reg and any member of reg_list
- * are same_reg_ignore_action
- */
-static bool
-member(region reg, list reg_list)
-    {
-	region elem;
-	list rest_list;
-	bool result = FALSE;
-
-	pips_debug(4,"begin\n");
-
-/*
-	    ifdebug(9)
-		{
-		    set_action_interpretation(ACTION_IN,ACTION_OUT);
-		    pips_debug(9,"test if:\n\t");
-		    print_region(reg);
-		    pips_debug(9,"is in:\n\t");
-		    print_inout_regions(reg_list);
-		    reset_action_interpretation();
-		}
-		*/
-
-	rest_list = reg_list;
-
-	if (reg_list != NIL)
-
-			do{
-			    elem = EFFECT(CAR(rest_list));
-			    if (same_reg_ignore_action(elem,reg))
-				{
-				    result = TRUE;
-
-				    pips_debug(4,"is member\n");
-				}
-
-			    rest_list = CDR(rest_list);
-			}while (rest_list != NIL && result == FALSE);
-
-	pips_debug(4,"end\n");
-
-	return result;
-    }
-
-/* adds reg as final element on the end of reg_list
- * unless reg is already present in reg_list */
-list
-append_reg_if_not_present(list reg_list, region reg)
-{
-    list new_reg_list;
-
-    pips_debug(4,"begin\n");
-
-
-/*
-  ifdebug(9)
-  {
-		    set_action_interpretation(ACTION_IN,ACTION_OUT);
-  pips_debug(9,"add:\n\t");
-  print_region(reg);
-  pips_debug(9,"to:\n\t");
-  print_inout_regions(reg_list);
-		    reset_action_interpretation();
-  }
-*/
-
-    if (!member(reg,reg_list))
-	new_reg_list = gen_nconc(reg_list,CONS(EFFECT,reg,NIL));
-    else
-	new_reg_list = reg_list;
-
-    pips_debug(4,"end\n");
-
-    return new_reg_list;
-}
-
-
 
 
 /* global variables IN: unmatched_alias_pairs, l_alias_lists
@@ -213,7 +139,11 @@ compare_matched_alias_pairs(bool result,
 		    reset_action_interpretation();
 		}
 
-	    if ( same_reg_ignore_action(formal_reg,alias_list_reg) )
+/* must take the action of the regions into account here because
+ * we are checking whether formal_reg is the result of the
+ * propagation of alias_list_reg
+ */
+	    if ( same_reg(formal_reg,alias_list_reg) )
 	    {
 		pips_debug(9,"match\n");
 
@@ -268,7 +198,11 @@ compare_unmatched_alias_pairs(region alias_list_reg, list callee_alias_list)
 		    reset_action_interpretation();
 		}
 
-	    if ( same_reg_ignore_action(formal_reg,alias_list_reg) )
+/* must take the action of the regions into account here because
+ * we are checking whether formal_reg is the result of the
+ * propagation of alias_list_reg
+ */
+	    if ( same_reg(formal_reg,alias_list_reg) )
 	    {
 		pips_debug(9,"match\n");
 
