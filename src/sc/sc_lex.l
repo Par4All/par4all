@@ -19,11 +19,13 @@
 
 #define RETURN(x) /* fprintf(stderr, "lex: %d\n", x); */ return x
 
+static char * sc_symbol_table(char *);
+
 %}
 
 %%
 <TEXT>VAR			{ RETURN(VAR); } 
-<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { yylval.Variable = (Variable) strdup(yytext); /*'*/
+<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
                                   RETURN(IDENT); }
 <TEXT>[0-9]*			{ sscan_Value(yytext,&yylval.Value);
                                   RETURN(CONSTANTE); }
@@ -42,6 +44,31 @@
 <COMMENT>\n                     {BEGIN TEXT;}
 <COMMENT>[^\n]*         ;
 %% 
+
+#define SYMBOLS_SIZE (10)
+
+static char * sc_symbol_table(char * name)
+{
+  static int size = 0;
+  static int index = 0; /* next available chunk */
+  static char ** symbols = NULL;
+
+  int i;
+  
+  if (index==size) {
+    size += SYMBOLS_SIZE;
+    if (symbols) symbols = (char**) realloc(symbols, sizeof(char*) * size);
+    else symbols = (char**) malloc(sizeof(char*) * size);
+  }
+
+  for (i=0; i<index; i++) 
+    if (!strcmp(name, symbols[i])) 
+      return symbols[i];
+
+  /* not found, i==index */
+  symbols[index++] = strdup(name);
+  return symbols[i];
+}
 
 #ifdef FLEX_SCANNER
 int yyinput()
@@ -78,4 +105,6 @@ int yyerror(char *s)
 	yysyntax_error = TRUE;
 	return TRUE;
 }
+
+
 
