@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1995/08/07 13:54:34 $, )
+# ($Date: 1995/08/08 08:40:56 $, )
 #
 
 RUN=':'
@@ -42,6 +42,7 @@ do
     echo "$file was not modified" 
   else
     echo "copying $file"
+    rm -f $directory/$file
     cp $file $directory
     eval $RUN $directory/$file
   fi
