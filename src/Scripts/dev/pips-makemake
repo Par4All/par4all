@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/03 16:27:34 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/03 20:24:40 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -126,72 +126,56 @@
 # wish:
 #
 
-USAGE="Usage: $0 -l|p [-D|P] [-c|a] (default -D -c)"
+usage()
+{
+  echo "usage: `basename $0` -l|p|s|r [-D|P] [-c|a] (default -D -c)" >&2
+  [ "$2" ] && echo "error: $2" >&2
+  exit ${1:-1}
+}
 
 MAKEFILE=Makefile
 CONFIG_FILE=config.makefile
 
-LIBRARY=""
-PASS=""
-PRODUCTION=""
-ALL=""
 PIPSMAKEMAKE_OPTION=''
+DIRSIDE="$DEVEDIR"
+DIRTYPE=''
+DIRS='.'
 
-while getopts lpDPca opt
+while getopts lpsrDPca opt
 do
   case $opt in
-    l)	LIBRARY=TRUE; PIPSMAKEMAKE_OPTION='-l';;
-    p)	PASS=Passes; PIPSMAKEMAKE_OPTION='-p';;
-    D)	PRODUCTION="";;
-    P)	PRODUCTION=$PRODDIR/Src;;
-    c)	ALL="";;
-    a)	ALL=TRUE;;
-    \?)	echo $USAGE >&2
-	exit 2;;
+    l)	DIRTYPE='Lib' ; PIPSMAKEMAKE_OPTION='-l';;
+    p)	DIRTYPE='Passes' ; PIPSMAKEMAKE_OPTION='-p';;
+    s)  DIRTYPE='Scripts' ; PIPSMAKEMAKE_OPTION='-s';;
+    r)  DIRTYPE='Runtime' ; PIPSMAKEMAKE_OPTION='-r';;
+    D)	DIRSIDE="$DEVEDIR" ;;
+    P)	DIRSIDE="$PRODDIR/Src" ;;
+    c)	DIRS='.';;
+    a)	DIRS=${DIRSIDE}/${DIRTYPE}/* ;;
+    *)	usage 2 "invalid option ($opt)" ;;
   esac
 done
 shift `expr $OPTIND - 1`
-if [ $# -ge 1 ]
-then
-  echo $USAGE >&2
-  exit 2
-fi
 
-if [ \( -n "$LIBRARY" -a -n "$PASS" \) \
-  -o \( -z "$LIBRARY" -a -z "$PASS" \) ]
-then
-  echo $USAGE >&2
-  exit 2
-fi
-
-if [ -z "$ALL" ]
-then
-  DIRS="."
-else
-  DIRS="${PRODUCTION:-$DEVEDIR}/${PASS:-Lib}/*"
-fi
-
+[ $# -eq 0 ] || usage 3 "$# remaining parameters"
+[ "$DIRTYPE" ] || usage 4 "must specify -l|p|s|r"
 
 ### main loop
 for dir in $DIRS
 do
   ( cd $dir
   
-  if [ ! -f $CONFIG_FILE ] ; then
-    echo "Error $0: cannot find $CONFIG_FILE in $dir; abandon" >&2
-  else
-    ### good case
-    echo make $MAKEFILE in $dir
+  [ -f $CONFIG_FILE ] || usage 5 "no $CONFIG_FILE in $dir" ;
+
+  echo make $MAKEFILE in $dir
+
+  # needed because of f.. - in directory names...
+  dirnom=`basename \`pwd\``
+  dirname=`echo $dirnom | tr '-' '_'`
     
-    # needed because of f.. - in directory names...
-    dirname=`basename \`pwd\` | tr '-' '_'`
+  [ -f $MAKEFILE ] && mv $MAKEFILE $MAKEFILE.old
     
-    if [ -f $MAKEFILE ] ; then
-      cp $MAKEFILE $MAKEFILE.old
-      rm -f $MAKEFILE
-    fi
-    
-    cat >> $MAKEFILE <<%
+  cat >> $MAKEFILE <<%
 #	---------------------------------------------------------------
 #	---------------------------------------------------------------
 #
@@ -218,10 +202,21 @@ do
 # purpose or works at all, unless he says so in writing.
 %
 
+cat $CONFIG_FILE >> $MAKEFILE 
 
-cat >> $MAKEFILE $CONFIG_FILE 
+cat >> $MAKEFILE <<%
+#
+TARGET = $dirnom
+CONFIG_FILE=	$CONFIG_FILE
+MAKEFILE=	$MAKEFILE
+TARGETDIR=	$(SRCDIR)/$DIRTYPE/$(TARGET)
+#
 
-cat >> $MAKEFILE <<% 
+$(TARGETDIR):
+	mkdir $(TARGETDIR)
+%
+
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<% 
 #
 PREPROC=	$(CC) -E $(CPPFLAGS) $(TARGET_ARCH)
 COMPILE=	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
@@ -232,33 +227,46 @@ PARSE=		$(YACC) $(YFLAGS)
 ARCHIVE=	$(AR) $(ARFLAGS)
 PROTOIZE=	$(PIPS_PROTOIZE) -e -E "$(PREPROC)"
 #
-CONFIG_FILE=	$CONFIG_FILE
-MAKEFILE=	$MAKEFILE
-#
 LIB_TARGET=	lib$(TARGET).a
 BIN_TARGET=	$(TARGET)
 INC_TARGET=	$(TARGET).h
 #
-%
-
-if [ "$LIBRARY" ] ;
-then
-  cat >> $MAKEFILE <<% 
-#
-CFILES=		$(MAIN).c $(LIB_CFILES)
-OBJECTS=	$(MAIN).o $(LIB_OBJECTS)
-INCLUDES=	$(LIB_HEADERS)
-SOURCES= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES)
-#
-TARGETDIR=	$(LIBSRCDIR)/$(TARGET)
-#
-all: $(LIB_TARGET)
 
 .INIT: $MAKEFILE 
 	@if test -n "$(PIPS_CHECK_OS)"; \\
 	then echo "Cannot run make under this OS release"; \\
 	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
 	fi
+
+%
+
+[ $DIRTYPE = 'Scripts' ] && cat >> $MAKEFILE <<%
+
+SOURCES=	$(SCRIPTS) $(FILES) $(CONFIG_FILE)
+
+.runable: $(SCRIPTS)
+	chmod a+x $(SCRIPTS)
+	touch .runable
+
+.quick-install: .runable
+	( cd $(UTILDIR) ; $(RM) $(SCRIPTS) $(FILES); )
+	cp $(SCRIPTS) $(FILES) $(UTILDIR)
+	touch .quick-install
+
+.INIT: $(MAKEFILE)
+
+%
+
+[ $DIRTYPE = 'Lib' ] && cat >> $MAKEFILE <<% 
+#
+CFILES=		$(MAIN).c $(LIB_CFILES)
+OBJECTS=	$(MAIN).o $(LIB_OBJECTS)
+INCLUDES=	$(LIB_HEADERS)
+SOURCES= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES)
+#
+# TARGETDIR=	$(LIBSRCDIR)/$(TARGET)
+#
+all: $(LIB_TARGET)
 
 test: all $(DEVEDIR)/Passes/pips/pips.o
 	$(LINK) pips $(DEVEDIR)/Passes/pips/pips.o $(PIPS_LIBS)
@@ -290,24 +298,14 @@ $(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
 	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS)
 	@echo 
 
-# install installs sources, so depends on sources. FC
-# to insure the library is compiled before hand, a make is added.
-.install: $(SOURCES)
-	$(MAKE) $(INC_TARGET) $(LIB_TARGET)
+INSTALL_TARGETS= $(INC_TARGET) $(LIB_TARGET)
+
+check_install:
 	@if test \`echo *.a | wc -w\` -gt 1 ; \\
 	then \\
 	  echo "install failed: additional local libraries prevent it" >&2;\\
 	  exit 1;\\
 	fi
-	@echo ""; echo; echo -n "Description of changes: " ; \\
-	read comments ;
-	install_pips_sources \
-		-v -s \`pwd\` -t $(TARGETDIR) -y "\$\$comments" \
-		$(SOURCES)
-	@pips_install_file $(MAKEFILE) $(TARGETDIR)/Makefile
-	cd $(TARGETDIR) ; $(MAKE) depend
-	touch .install
-	$(MAKE) quick-install
 
 # quick-install installs lib and so, so depends on these. FC
 # header installed only if different.
@@ -330,10 +328,7 @@ INC_CFILES = $(LIB_CFILES)
 
 %
 
-else
-# ie. for Passes 
-
-  cat >> $MAKEFILE <<% 
+[ $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<% 
 #
 CFILES=		$(TARGET_CFILES)
 OBJECTS=	$(TARGET_OBJECTS)
@@ -344,16 +339,12 @@ TARGETDIR=	$(BINSRCDIR)/$(TARGET)
 #
 TARGET_IFILES=	$(TARGET_CFILES:.c=.i)
 #
-.INIT:
-	@if test -n "$(PIPS_CHECK_OS)"; \
-	then echo "Cannot run make under this OS release"; \
-	     echo "$(PIPS_CHECK_OS)"; exit 1; \
-	fi
+INSTALL_TARGETS=	$(INC_TARGET) $(BIN_TARGET)
 
 $(BIN_TARGET): $(OBJECTS) $(INC_TARGET)
 	$(LINK) $(BIN_TARGET) $(OBJECTS) $(TARGET_LIBS)
 
-.install: $(SOURCES) 
+check_install:
 	@touch _tmp_hack.a
 	@test \`echo *.a | wc -w\` -eq 1 || \\
 	{ \\
@@ -362,18 +353,8 @@ $(BIN_TARGET): $(OBJECTS) $(INC_TARGET)
 	  exit 1;\\
 	}
 	@$(RM) _tmp_hack.a
-	$(MAKE) $(INC_TARGET) $(BIN_TARGET)
-	@echo ""; echo; echo -n "Description of changes: " ; \\
-	read comments ; 
-	install_pips_sources \
-		-v -s \`pwd\` -t $(TARGETDIR) -y "\$\$comments" \
-		$(SOURCES)
-	@pips_install_file $(MAKEFILE) $(TARGETDIR)/Makefile
-	cd $(TARGETDIR) ; $(MAKE) depend
-	touch .install
-	$(MAKE) quick-install
 
-.quick-install: $(INC_TARGET) $(BIN_TARGET) $(BINDIR)
+.quick-install: $(INSTALL_TARGETS) $(BINDIR)
 	@pips_install_file $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
 	@pips_install_file $(BIN_TARGET) $(BINDIR)/$(BIN_TARGET)
 	touch .quick-install
@@ -386,12 +367,40 @@ INC_CFILES = $(TARGET_CFILES)
 
 %
 
-fi
+
+
+###
+#
+# Common to all: installation and Makefile generation
+#
+
+cat >> $MAKEFILE <<%
+
+# install installs sources, so depends on sources. FC
+# to insure the library is compiled before hand, a make is added.
+.install: $(SOURCES) 
+	$(MAKE) check_install $(INSTALL_TARGETS) $(TARGETDIR)
+	@echo ""; echo; echo -n "Description of changes: " ; \\
+	read comments ; \\
+	install_pips_sources \\
+		-v -s \`pwd\` -t $(TARGETDIR) -y "\$\$comments" \\
+		$(SOURCES)
+	@pips_install_file $(MAKEFILE) $(TARGETDIR)/Makefile
+	touch .install
+	$(MAKE) quick-install
+
+install:  .install
+quick-install: .quick-install
+
+$MAKEFILE: $(CONFIG_FILE) $(UTILDIR)/pips-makemake
+	pips-makemake $PIPSMAKEMAKE_OPTION
+
+%
 
 #
 # La partie commune aux bibliotheques et aux passes :
 
-cat >> $MAKEFILE <<%
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<%
 #
 $(BINDIR)/$(BIN_TARGET): $(BIN_TARGET) $(BINDIR)
 	cp $(BIN_TARGET) $(BINDIR)
@@ -411,9 +420,6 @@ $(TARGET)-local.h:
 	[ -f $(TARGET)-local.h ] || touch $(TARGET)-local.h
 
 # Ici commence la partie parametree en lib/passe :
-
-$MAKEFILE: $(CONFIG_FILE) $(UTILDIR)/pips-makemake
-	pips-makemake $PIPSMAKEMAKE_OPTION
 
 # Pour eviter trop de compilations, $(INC_TARGET) ne depend pas 
 #	de $(TARGET_CFILES) tout le temps :
@@ -451,17 +457,14 @@ production-depend: $(DERIVED_HEADERS) $(EXTERN)
 	@pips_install_file $(MAKEFILE).new $(MAKEFILE)
 	$(RM) $(MAKEFILE).new
 
-install: .install
-quick-install: .quick-install
-
 ### DO NOT DELETE THIS LINE. USED FOR MAKE DEPEND
 %
 
 # Supprime le mode silencieux -s :
-make -f $MAKEFILE ${PRODUCTION:+production-}depend
+[ $DIRTYPE = 'Lib' ] && make -f $MAKEFILE depend
+[ $DIRTYPE = 'Passes' ] && make -f $MAKEFILE production-depend
 
 ### end good case
-fi	# [ ! -f $CONFIG_FILE ]
 
 echo
 
