@@ -58,13 +58,13 @@ pips_get_workspace_list(
 }
 
 
-/* Select the true file with names ending in ".f" and return a sorted
+/* Select the true file with names ending in ".[fF]" and return a sorted
    arg list: */
 void
 pips_get_fortran_list(int * pargc,
                       char * argv[])
 {
-    list_files_in_directory(pargc, argv, ".", "^.*\\.f$", file_exists_p);
+    list_files_in_directory(pargc, argv, ".", "^.*\\.[fF]$", file_exists_p);
 }
 
 
