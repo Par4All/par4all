@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.19  1997/08/18 12:29:02  coelho
+# X11 added explicitely to wpips for linux.
+#
 # Revision 1.18  1997/08/18 09:56:23  coelho
 # *** empty log message ***
 #
@@ -75,9 +78,9 @@ PIPS_MAIN='main_pips.o'
 #
 # WPIPS
 
-WPIPS_ADDED_CPPFLAGS='-I$(OPENWINHOME)/include -Iicons'
+WPIPS_ADDED_CPPFLAGS='-I$(OPENWINHOME)/include -I$(X11_ROOT)/include -Iicons'
+WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib -L$(X11_ROOT)/lib'
 WPIPS_ADDED_LIBS='-lxview -lolgx -lX11'
-WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib'
 
 WPIPS_MAIN='main_wpips.o'
 
