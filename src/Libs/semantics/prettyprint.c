@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/10/16 17:57:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/03/31 16:24:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/10/16 17:57:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/03/31 16:24:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -244,10 +244,9 @@ statement stmt;
     text txt;
 
     if(is_user_view) {
-	statement i = (statement) 
-	    hash_get(nts, (char *) statement_number(stmt));
+	statement i = apply_number_to_statement(nts, statement_number(stmt));
 
-	if(i!=(statement) HASH_UNDEFINED_VALUE) {
+	if(!statement_undefined_p(i)) {
 	    t = load_statement_semantic(i);
 	}
 	else
