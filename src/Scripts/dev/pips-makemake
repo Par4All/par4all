@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/09/19 11:43:03 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/09/19 11:50:03 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -474,7 +474,7 @@ $(INC_TARGET): $(TARGET)-local.h
 	mv $(INC_TARGET).tmp $(INC_TARGET)
 	touch .header
 
-header: . header
+header: .header
 	# checks for the header file, and build if necessary...
 	-[ -f $(TARGET).h ] || { $(RM) .header ; $(MAKE) .header ; }
 
