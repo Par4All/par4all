@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/11/13 13:54:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/11/22 22:22:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/11/13 13:54:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/11/22 22:22:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1803,7 +1803,7 @@ reference obj;
     entity e = reference_variable(obj);
 
     pc = CHAIN_SWORD(pc, entity_local_name(e));
-    begin_attachment = STRING(CAR(gen_last(pc)));
+    begin_attachment = STRING(CAR(pc));
     
     if (reference_indices(obj) != NIL) {
 	pc = CHAIN_SWORD(pc,"(");
