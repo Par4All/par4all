@@ -440,9 +440,9 @@ system_text_format(
 }
 
 static int 
-wordcmp(char **s1, char **s2)
+wordcmp(const void * s1, const void * s2)
 {
-    return strcmp(*s1,*s2);
+    return strcmp(*(char**)s1,*(char**)s2);
 }
 
 /* appends the list of entity...
