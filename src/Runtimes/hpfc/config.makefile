@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/22 11:03:08 $, )
+# ($Date: 1996/08/22 11:08:10 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -8,10 +8,23 @@
 # + USE_PVMe
 # + USE_GNU
 
-SCRIPTS=hpfc_llcmd \
-	hpfc_add_warning \
-	hpfc_generate_h \
-	hpfc_generate_init
+# this settings may be edited
+# I prefer to use free gnu compilers...
+USE_GNU=1
+
+# additional defs for m4
+M4FLAGS	+= -D DEMO
+M4FLAGS	+= -D DIRECT
+M4FLAGS	+= -D USE_GNU
+# M4FLAGS	+= -D DEBUG
+# M4FLAGS	+= -D USE_PVMe
+
+#############################################################################
+
+SCRIPTS =	hpfc_llcmd \
+		hpfc_add_warning \
+		hpfc_generate_h \
+		hpfc_generate_init
 
 #
 # Default compilers and options
@@ -117,13 +130,6 @@ M4FLAGS	+= -D SYNC_EXIT
 endif
 
 M4FLAGS += -D ARCHITECTURE=$(PVM_ARCH) hpfc_lib_m4_macros
-
-# additional defs for m4
-M4FLAGS	+= -D DEMO
-M4FLAGS	+= -D DIRECT
-M4FLAGS	+= -D USE_GNU
-# M4FLAGS	+= -D DEBUG
-# M4FLAGS	+= -D USE_PVMe
 
 COPY		= cp
 MOVE 		= mv
