@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ for hpfc scripts
-# (version $Revision$, $Date: 1996/09/13 17:35:50 $, )
+# (version $Revision$, $Date: 1997/03/10 08:52:48 $, )
 #
 
 SCRIPTS = 	hpfc \
@@ -34,7 +34,8 @@ hpfc_stubs.direct: hpfc_stubs.f
 clean: local-clean
 
 local-clean:
-	$(RM) $(ARCH)/hpfc_interactive.o $(ARCH)/hpfc_interactive *~
+	$(RM) $(ARCH)/hpfc_interactive.o $(ARCH)/hpfc_interactive \
+		*~ hpfc_stubs.direct
 
 FC_HTML= /users/cri/coelho/public_html
 
