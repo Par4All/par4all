@@ -163,6 +163,11 @@ statement s;
 {
     init_StmtHeap_buffer();
 
+    pips_assert("The empty label is not associated to a statement",
+		!entity_empty_label_p(e));
+
+    pips_assert("Label e is the label of statement s", e==statement_label(s));
+
     if (LabelToStmt(entity_name(e)) != statement_undefined) {
 	user_log("NewStmt: duplicate label: %s\n", entity_name(e));
 	ParserError("NewStmt", "duplicate label\n");
@@ -247,44 +252,181 @@ PopBlock()
 
 
 
-/* this functions creates a label. LABEL_PREFIX is added to its name, for
-integer constants and labels not to have the name space. */
+/* This functions creates a label. LABEL_PREFIX is added to its name, for
+ * integer constants and labels not to have the same name space.
+ *
+ * If an empty string is passed, the empty label seems to be returned
+ * since EMPTY_LABEL_NAME is defined as LABEL_PREFIX in ri-util-local.h
+ * (FI, 5 March 1998)
+ */
 
 entity 
 MakeLabel(s)
 string s;
 {
-	entity l;
-	static char *name = NULL ;
+    entity l;
+    static char *name = NULL ;
 
-	if( name == NULL ) {
-	    name = (char *)malloc( LABEL_SIZE+strlen(LABEL_PREFIX)+1 ) ;
-	}
-	debug(5, "MakeLabel", "%s\n", s);
+    if( name == NULL ) {
+	name = (char *)malloc( LABEL_SIZE+strlen(LABEL_PREFIX)+1 ) ;
+    }
+    debug(5, "MakeLabel", "\"%s\"\n", s);
 
-	strcpy(name, LABEL_PREFIX);
-	strcat(name, s);	
+    strcpy(name, LABEL_PREFIX);
+    strcat(name, s);	
 
-	l = FindOrCreateEntity( (strcmp( name, LABEL_PREFIX )==0) ? 
-		        TOP_LEVEL_MODULE_NAME :
-		        CurrentPackage, name);
+    l = FindOrCreateEntity( (strcmp( name, LABEL_PREFIX )==0) ? 
+			    TOP_LEVEL_MODULE_NAME :
+			    CurrentPackage, name);
 
-	if (entity_type(l) == type_undefined) {
-	    debug(5, "MakeLabel", "%s\n", name);
-	    entity_type(l) = MakeTypeStatement();
-	    entity_storage(l) = MakeStorageRom();
-	    entity_initial(l) = make_value(is_value_constant,
-					   MakeConstantLitteral());
-	}
-	return(l);
+    if (entity_type(l) == type_undefined) {
+	debug(5, "MakeLabel", "%s\n", name);
+	entity_type(l) = MakeTypeStatement();
+	entity_storage(l) = MakeStorageRom();
+	entity_initial(l) = make_value(is_value_constant,
+				       MakeConstantLitteral());
+    }
+    else {
+	debug(5, "MakeLabel", "%s already exists\n", name);
+    }
+    return(l);
 }
 
+statement 
+MakeNewLabelledStatement(l, i)
+entity l;
+instruction i;
+{
+    statement s;
 
+    debug(9, "MakeNewLabelledStatement", "begin for label \"%s\"\n",
+	  label_local_name(l));
+
+    if(instruction_loop_p(i) && get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
+	statement c = make_continue_statement(l);
+	statement ls = instruction_to_statement(i);
+
+	statement_number(ls) = get_next_statement_number();
+	NewStmt(l, c);
+	s = make_block_statement(CONS(STATEMENT,c,
+				      CONS(STATEMENT, ls, NIL)));
+    }
+    else if(instruction_block_p(i)) {
+	/* Associate label to the first statement in the block because
+	 * block cannot be labelled.
+	 */
+	statement s1 = STATEMENT(CAR(instruction_block(i)));
+
+	statement_label(s1) = l;
+	NewStmt(l, s1);
+	s = make_statement(entity_empty_label(),
+			   STATEMENT_NUMBER_UNDEFINED,
+			   STATEMENT_ORDERING_UNDEFINED,
+			   empty_comments,
+			   i);
+    }
+    else {
+	s = make_statement(l,
+			   (instruction_goto_p(i))?
+			   STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
+			   STATEMENT_ORDERING_UNDEFINED,
+			   empty_comments,
+			   i);
+	NewStmt(l, s);
+    }
+
+    debug(9, "MakeNewLabelledStatement", "end for label \"%s\"\n",
+	  label_local_name(l));
+
+    return s;
+}
+
+statement 
+ReuseLabelledStatement(s, i)
+statement s;
+instruction i;
+{
+    statement new_s = statement_undefined;
+
+    debug(9, "ReuseLabelledStatement", "begin for label \"%s\"\n",
+	  label_local_name(statement_label(s)));
+
+    pips_assert("Should have no number", 
+		statement_number(s)==STATEMENT_NUMBER_UNDEFINED);
+
+    if(instruction_loop_p(i) && get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
+	/* Comments probably are lost... */
+	instruction c = make_continue_instruction();
+	statement ls = instruction_to_statement(i);
+
+	statement_number(ls) = get_next_statement_number();
+	statement_instruction(s) = c;
+
+	new_s = instruction_to_statement(
+	    make_instruction(is_instruction_sequence,
+			     make_sequence(CONS(STATEMENT,s,
+						CONS(STATEMENT, ls, NIL)))));
+    }
+    else if(instruction_block_p(i)) {
+	/* Here, you are in trouble because the label cannot be carried 
+	 * by the block. It should be carried by the first statement of
+	 * the block... which has already been allocated.
+	 * This only should occur with desugared constructs because they
+	 * must bypass the MakeStatement() module to handle statement
+	 * numbering properly.
+	 *
+	 * Reuse s1, the first statement of the block, to contain the
+	 * whole block. Reuse s to contain the first instruction of the
+	 * block.
+	 */
+	statement s1 = STATEMENT(CAR(instruction_block(i)));
+
+	pips_assert("The first statement of the block is not a block",
+		    !statement_block_p(s1));
+
+	/* s only has got a label */
+	statement_number(s) = statement_number(s1);
+	statement_ordering(s) = statement_ordering(s1);
+	statement_comments(s) = statement_comments(s1);
+	statement_instruction(s) = statement_instruction(s1);
+
+	statement_label(s1) = entity_empty_label();
+	statement_number(s1) = STATEMENT_NUMBER_UNDEFINED;
+	statement_ordering(s1) = STATEMENT_ORDERING_UNDEFINED;
+	statement_comments(s1) = empty_comments;
+	statement_instruction(s1) = i;
+
+	instruction_block(i) = CONS(STATEMENT, s,
+				    CDR(instruction_block(i)));
+
+	pips_assert("The first statement of block s1 must be s\n",
+		    STATEMENT(CAR(instruction_block(statement_instruction(s1))))
+		    == s);
+
+	new_s = s1;
+    }
+    else {
+	statement_instruction(s) = i;
+	/* 
+	   statement_number(s) = (instruction_goto_p(i))?
+	   STATEMENT_NUMBER_UNDEFINED : get_next_statement_number();
+	*/
+	/* Let's number labelled GOTO because a CONTINUE is derived later from them */
+	statement_number(s) = get_next_statement_number();
+	new_s = s;
+    }
+
+    debug(9, "ReuseLabelledStatement", "end for label \"%s\"\n",
+	  label_local_name(statement_label(s)));
+
+    return new_s;
+}
 
 /* This function makes a statement. l is the label and i the
- * instruction. we make sure that the label is not declared twice.
+ * instruction. We make sure that the label is not declared twice.
  *
- * Comments are added by LinkInstToCurrentBlock().
+ * Comments are added by LinkInstToCurrentBlock() which calls MakeStatement()
+ * because it links the instruction by linking its statement..
  *
  * GO TO statements are numbered like other statements although they
  * are destroyed by the controlizer. To be changed.
@@ -295,101 +437,74 @@ MakeStatement(l, i)
 entity l;
 instruction i;
 {
-  statement s;
+    statement s;
 
-  debug(5, "MakeStatement", "%s\n", entity_name(l));
+    debug(5, "MakeStatement", "%s\n", entity_name(l));
 
-  pips_assert("MakeStatement", type_statement_p(entity_type(l)));
-  pips_assert("MakeStatement", storage_rom_p(entity_storage(l)));
-  pips_assert("MakeStatement", value_constant_p(entity_initial(l)));
-  pips_assert("MakeStatement", 
-	      constant_litteral_p(value_constant(entity_initial(l))));
+    pips_assert("MakeStatement", type_statement_p(entity_type(l)));
+    pips_assert("MakeStatement", storage_rom_p(entity_storage(l)));
+    pips_assert("MakeStatement", value_constant_p(entity_initial(l)));
+    pips_assert("MakeStatement", 
+		constant_litteral_p(value_constant(entity_initial(l))));
 
-  if (!entity_empty_label_p(l)) {
-    if (instruction_block_p(i))
-      ParserError("makeStatement", "a block must have no label\n");
+    if (!entity_empty_label_p(l)) {
+	/* There is an actual label */
 
-    /* FI, PJ: the "rice" phase does not handle labels on DO like 100 in:
-     *  100 DO 200 I = 1, N
-     *
-     * This should be trapped by "rice" when loops are checked to see
-     * if Allen/Kennedy's algorithm is applicable
-     */
-    if (instruction_loop_p(i)) {
-      if(!get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
-	user_warning("MakeStatement",
-		     "DO loop reachable by GO TO via label %s cannot be parallelized by PIPS\n",
-		     entity_local_name(l));
-      }
+	/* Well, there is no easy solution to handle labels when Fortran 
+	 * constructs such as alternate returns, computed gotos and 
+	 * assigned gotos are desugared because they may be part of a 
+	 * logical IF, unknowingly.
+	 */
+	/*
+	if (instruction_block_p(i))
+	    ParserError("makeStatement", "a block must have no label\n");
+	*/
+
+	/* FI, PJ: the "rice" phase does not handle labels on DO like 100 in:
+	 *  100 DO 200 I = 1, N
+	 *
+	 * This should be trapped by "rice" when loops are checked to see
+	 * if Allen/Kennedy's algorithm is applicable
+	 */
+	if (instruction_loop_p(i)) {
+	    if(!get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
+		user_warning("MakeStatement",
+			     "DO loop reachable by GO TO via label %s cannot be parallelized by PIPS\n",
+			     entity_local_name(l));
+	    }
+	}
+
+	if ((s = LabelToStmt(entity_name(l))) == statement_undefined) {
+	    /* There is not forward reference to the this label. A new statement 
+	     * can be safely allocated.
+	     */
+	    s = MakeNewLabelledStatement(l,i);
+	}
+	else {
+	    /* A forward reference has been encountered and the corresponding
+	     * statement has been allocated and has been referenced by at least
+	     * one go to statement.
+	     */
+
+	    if(statement_instruction(s) != instruction_undefined) {
+		user_warning("MakeStatement", "Label %s may be used twice\n",
+			     entity_local_name(l));
+		ParserError("MakeStatement", "Same label used twice\n");
+	    }
+	    s = ReuseLabelledStatement(s, i);
+	}
     }
-
-    if ((s = LabelToStmt(entity_name(l))) == statement_undefined) {
-      if(instruction_loop_p(i) && get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
-	statement c = make_continue_statement(l);
-	statement ls = instruction_to_statement(i);
-
-	statement_number(ls) = get_next_statement_number();
-	NewStmt(l, c);
-	s = make_block_statement(CONS(STATEMENT,c,
-				      CONS(STATEMENT, ls, NIL)));
-      }
-      else {
+    else {
+	/* No actual label, no problem */
 	s = make_statement(l, 
 			   (instruction_goto_p(i)||instruction_block_p(i))?
 			   STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
-			   empty_comments,
+			   empty_comments, 
 			   i);
-	NewStmt(l, s);
-      }
     }
-    else {
-      if(statement_instruction(s) != instruction_undefined) {
-	user_warning("MakeStatement", "Label %s may be used twice\n",
-		     entity_local_name(l));
-	/* FI: commented out to avoid useless user triggered core dumps */
-	/*
-	  pips_assert("MakeStatement", 
-	  statement_instruction(s) == instruction_undefined);
-	  */
-	if(statement_instruction(s) != instruction_undefined) {
-	  ParserError("MakeStatement", "Same label used twice\n");
-	}
-      }
-      pips_assert("Should have no number", 
-		  statement_number(s)==STATEMENT_NUMBER_UNDEFINED);
-
-      if(instruction_loop_p(i) && get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
-	statement c = make_continue_statement(l);
-	statement ls = instruction_to_statement(i);
-
-	statement_number(ls) = get_next_statement_number();
-	statement_instruction(s) = make_instruction(is_instruction_sequence,
-						    make_sequence(CONS(STATEMENT,c,
-								       CONS(STATEMENT, ls, NIL))));
-      }
-      else {
-	statement_instruction(s) = i;
-	/* 
-	statement_number(s) = (instruction_goto_p(i)||instruction_block_p(i))?
-	  STATEMENT_NUMBER_UNDEFINED : get_next_statement_number();
-	  */
-	/* Let's number labelled GOTO because a CONTINUE is derived later from them */
-	statement_number(s) = (instruction_block_p(i))?
-	  STATEMENT_NUMBER_UNDEFINED : get_next_statement_number();
-      }
-    }
-  }
-  else {
-    s = make_statement(l, 
-		       (instruction_goto_p(i)||instruction_block_p(i))?
-		         STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
-		       STATEMENT_ORDERING_UNDEFINED,
-		       empty_comments, 
-		       i);
-  }
 	
-  return(s);
+    return(s);
 }
 
 
@@ -414,22 +529,27 @@ bool number_it;
     if(instruction_block_p(i) && !entity_empty_label_p(l)) {
       /* a CONTINUE instruction must be added to carry the label,
          because blocks cannot be labelled */
+	/*
       list ls = instruction_block(i);
       statement c = MakeStatement(l, make_continue_instruction());
-
+      */
       /* The above continue is not a user statement an should not be numbered */
       /* OK, an argument could be added to MakeStatement()... */
-      decrement_statement_number();
+	/* decrement_statement_number(); */
 
-      instruction_block(i) = CONS (STATEMENT, c, ls);
+	/* instruction_block(i) = CONS (STATEMENT, c, ls); */
       if(number_it) {
 	/* pips_assert("Why do you want to number a block?!?", FALSE); */
 	/* OK, let's be cool and ignore this request to save the caller a test */
 	/* s = MakeStatement(entity_empty_label(), i); */
-	s = instruction_to_statement(i);
+	  /* s = instruction_to_statement(i); */
+	  ;
       }
-      else
-	s = instruction_to_statement(i);
+      else{
+	  /* s = instruction_to_statement(i); */
+	  ;
+      }
+      s = MakeStatement(l, i);
     }
     else {
       s = MakeStatement(MakeLabel(strdup(lab_I)), i);
@@ -439,19 +559,33 @@ bool number_it;
     }
 
     if (iPrevComm != 0) {
-	if(instruction_block_p(i)) {
+	/* Because of labelled loop desugaring, new_i may be different from i */
+	instruction new_i = statement_instruction(s);
+	if(instruction_block_p(new_i)) {
 	    statement fs = statement_undefined;
 
 	    /* Only desugared constructs such as computed go to or IO with
 	     * error handling should produce blocks. Such blocks should be
 	     * non-empty and not commented.
 	     */
-	    pips_assert("The block is non empty", !ENDP(instruction_block(i)));
+	    pips_assert("The block is non empty", !ENDP(instruction_block(new_i)));
+	    fs = STATEMENT(CAR(instruction_block(new_i)));
 
-	    fs = STATEMENT(CAR(instruction_block(i)));
-
+	    /*
 	    pips_assert("The first statement has no comments",
 			statement_comments(fs) == empty_comments);
+			*/
+	    if(statement_comments(fs) != empty_comments) {
+		user_log("Current comment of first statement: \"%s\"\n",
+			 statement_comments(fs));
+		user_log("Block comment to be carried by first statement: \"%s\"\n",
+			 PrevComm);
+		pips_error("LinkInstToCurrentBlock", 
+			   "The first statement of the block should have no comments\n");
+	    }
+
+	    pips_assert("The first statement is not a block",
+			!instruction_block_p(statement_instruction(fs)));
 
 	    statement_comments(fs) = strdup(PrevComm);
 	}
@@ -555,23 +689,42 @@ make_goto_instruction(entity l)
 
 
 instruction 
-MakeComputedGotoInst(ll, i)
+MakeComputedGotoInst(ll, e)
+list ll;
+expression e;
+{
+    /* It is assumed that e has no side effects */
+
+    instruction inst = MakeAssignedOrComputedGotoInst(ll, e, FALSE);
+
+    return inst;
+}
+
+instruction 
+MakeAssignedGotoInst(ll, i)
 list ll;
 entity i;
+{
+    instruction inst;
+    expression expr = entity_to_expression(i);
+
+    DeclareVariable(i, type_undefined, NIL, storage_undefined, value_undefined);
+
+    inst = MakeAssignedOrComputedGotoInst(ll, expr, TRUE);
+
+    return inst;
+}
+
+instruction 
+MakeAssignedOrComputedGotoInst(ll, e, assigned)
+list ll;
+expression e;
+bool assigned;
 {
     instruction ins = instruction_undefined;
     list cs = NIL;
     int l = 0;
     list cl = list_undefined;
-
-    /* Warning: the desugaring of a computed goto generates a
-     * block... wich cannot be labelled when a stament is made later
-     *
-     * But a CONTINUE is added by MakeStatement a first block statements...
-     * although the first statement of the block could carry the label.
-     */
-
-    DeclareVariable(i, type_undefined, NIL, storage_undefined, value_undefined);
 
     for(l = gen_length(ll), cl = ll; !ENDP(cl); l--, POP(cl)) {
 	string ln = STRING(CAR(cl));
@@ -582,45 +735,33 @@ entity i;
 					      make_entity_fullname(TOP_LEVEL_MODULE_NAME,
 								   EQUAL_OPERATOR_NAME), 
 					      entity_domain),
-			   entity_to_expression(i),
-			   int_to_expression(l));
-	instruction iif = make_instruction(is_instruction_test,
-					  make_test(cond,
-						    instruction_to_statement(g),
-						    make_empty_statement()));
+			   e,
+			   int_to_expression(assigned? atoi(ln):l));
+	/* Assigned GO TO: if the current label is not in the list, this is an error
+	 * in Fortran 90. ISO/IEC 1539 Section 8.2.4 page 108. Same in Fortran 77
+	 * standard, Section 11-2.
+	 */
+	statement may_stop = (assigned && (cl==ll)) ?
+	    instruction_to_statement(MakeZeroOrOneArgCallInst(STOP_FUNCTION_NAME,
+							      expression_undefined))
+	    :
+	    make_empty_statement();
+	instruction iif = 
+	    make_instruction(is_instruction_test,
+			     make_test(cond,
+				       instruction_to_statement(g),
+				       may_stop));
 	statement s = statement_undefined;
 
-	if(ENDP(CDR(cl)) && strcmp(lab_I,"")) {
-	    /* If this is the last generated test (i.e. the first one since they are
-	     * generated backwards) and if the computed GO TO has a label, do something
-	     * about it
-	     */
-	    entity lab = MakeLabel(strdup(lab_I));
+	s = instruction_to_statement(iif);
 
-	    if ((s = LabelToStmt(entity_name(lab))) == statement_undefined) {
-		s = instruction_to_statement(iif);
-		NewStmt(lab, s);
-	    }
-	    else {
-		pips_assert("Instruction field must be undefined", 
-			    instruction_undefined_p(statement_instruction(s)));
-		statement_instruction(s) = iif;
-	    }
-	    lab_I[0] = '\0';
-	}
-	else {
-	    s = instruction_to_statement(iif);
-	}
-
+	/* Update the statement numbers of all possibly allocated statements */
 	statement_number(s) = look_at_next_statement_number();
+	if(stop_statement_p(may_stop))
+	statement_number(may_stop) = look_at_next_statement_number();
+
 	cs = CONS(STATEMENT, s, cs);
     }
-    /* Add a label on first statement */
-    /* This is not possible because the corresponding statement may already exist. */
-    /* Hence (at least one reason for) the spurious CONTINUE added in MakeStatement... */
-    /*
-    statement_label(STATEMENT(CAR(cs))) = MakeLabel(strdup(lab_I));
-    */
 
     /* MakeStatement won't increment the current statement number
      * because this is a block... so it has to be done here
@@ -890,19 +1031,27 @@ instruction i;
     if (i == instruction_undefined)
 	    FatalError("MakeLogicalIfInst", "bad instruction\n");
 
-    /* instruction i should not be ablock, unless an alternate return is being processed */
+    /* Instruction i should not be a block, unless:
+     * - an alternate return 
+     * - a computed GO TO
+     * - an assigned GO TO
+     * has been desugared.
+     *
+     * If the logical IF is labelled, the label has been stolen by the
+     * first statement in the block. This shows that label should only
+     * be affected by MakeStatement and not by desugaring routines.
+     */
     if(instruction_block_p(i)) {
-	/* There should be two statements in the sequence.
-	 * They have to be re-numbered.
-	 */
 	list l = instruction_block(i);
-	statement first = STATEMENT(CAR(l));
+	/* statement first = STATEMENT(CAR(l)); */
 	int sn = get_future_statement_number();
+	/* Only the alternate return case assert:
 	pips_assert("Block of two instructions or call with return code checks",
 		    (gen_length(l)==2 && assignment_statement_p(first))
 		    ||
 		    (statement_call_p(first))
 	    );
+	    */
 	MAP(STATEMENT, s, {
 	    statement_number(s) = sn;
 	}, l);
