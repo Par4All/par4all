@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/02/26 10:10:30 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/07/27 12:03:09 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -266,7 +266,7 @@ cd $RUNDIR
 
 default_file="$VALDIR/defaults"
 default_test="default_test"
-subject="PIPS Validation Suite Report"
+subject="PIPS Validation"
 
 pips_version=`absolute_name ${pips_version:-\`which_executable pips\`}`
 tpips_version=`absolute_name ${tpips_version:-\`which_executable tpips\`}`
