@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.212  2002/04/29 15:57:49  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.211  2002/04/29 15:57:07  phamdat
  * *** empty log message ***
  *
@@ -475,7 +478,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.211 2002/04/29 15:57:07 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.212 2002/04/29 15:57:49 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2692,7 +2695,6 @@ text_named_module(
     }
 
     if (stat != statement_undefined) {
-      /*******written by Dat************/
         MERGE_TEXTS(r, text_statement(module, 0, stat));
     }
     
