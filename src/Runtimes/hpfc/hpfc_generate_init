@@ -1,9 +1,7 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_generate_init,v $ ($Date: 1996/08/30 14:29:41 $, )
+# $RCSfile: hpfc_generate_init,v $ ($Date: 1996/09/07 16:29:45 $, )
 # version $Revision$
-# got on %D%, %T%
-# $Id$
 #
 # generate the initialization file
 #
@@ -33,14 +31,14 @@ dirname=$1
 init=$dirname/param_init.m4
 
 NAME="${NAME:-`basename $dirname .database`}"
-NAME=`echo $NAME | tr 'A-Z' 'a-z'`
+NAME=`echo $NAME | tr '[A-Z]' '[a-z]'`
 
 # the key is used to check that the nodes and host do match...
 
 key="${NAME}.`hostname`.`whoami`.`date +"%H.%M.%S.%j.%y"`"
 
 {
-  echo "      subroutine HPFC_INIT_COMMON_PARAM()"
+  echo "      subroutine HPFC INIT COMMON PARAM()"
   echo "      include \"hpfc_commons.h\""
   #
   # must avoid the hpfc_ version. 
@@ -54,12 +52,15 @@ key="${NAME}.`hostname`.`whoami`.`date +"%H.%M.%S.%j.%y"`"
   do
     echo "      include \"`basename $file`\""
   done
-  echo "c other initializations"
-  echo "      NODE_PROGRAM_NAME=\"${NAME}_node\""
-  echo "      NODE_ARCHITECTURE=\"PVM_ARCHITECTURE\""
-  echo "      HPFC_GROUP_NAME=\"${NAME}_group\""
-  echo "      HPFC_KEY=\"$key\""
+  echo "! other initializations"
+  echo "      MAIN PROGRAM NAME=\"${NAME}_main\""
+  echo "      NODE PROGRAM NAME=\"${NAME}_node\""
+  echo "      NODE ARCHITECTURE=\"PVM_ARCHITECTURE\""
+  echo "      HPFC GROUP NAME=\"${NAME}_group\""
+  echo "      HPFC KEY=\"$key\""
   echo "      end"
 } > $init
 
 hpfc_add_warning $init
+
+# end of $RCSfile: hpfc_generate_init,v $
