@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/11 11:07:33 $, 
+# $Date: 1996/09/11 15:44:23 $, 
 #
 # this script allow to chose a directory in interactively
 #
@@ -41,17 +41,22 @@ proc filldirlist { list dir } {
 }
 
 #
-# appends newdir to dir with managing especially ..
+# appends newdir to dir with managing especially .. and /
 #
 proc appenddir { dir newdir } {
     if {$newdir != ".."} {
-	return $dir/$newdir
+	if {$dir != "/"} {
+	    return $dir/$newdir
+	} else {
+	    return /$newdir
+	}
     } else {
 	set ldir [split $dir /]
 	set len [llength $ldir]
 	set last [lindex $ldir [expr $len-1]]
 	if {($last != "..") && ($last != ".") } {
 	    set ldir [lrange $ldir 0 [expr $len-2]]
+	    if {$len == 2 && [lindex $ldir 0] == {}} { return / }
 	} else {
 	    lappend ldir $newdir
 	}
