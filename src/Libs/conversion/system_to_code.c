@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/03 09:05:40 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/03 14:36:08 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -107,6 +107,192 @@ Pcontrainte_to_expression_list(
     return result;
 }
 
+/************************************************ BOUNDS FOR OPTIMIZATIONS */
+
+/* here I store simple bounds on variables appearing in the systems
+ * to allow the code generation phase to use them to improve the code.
+ */
+/* returns the lower and upper bounds of var if available
+ * the concept could be transfered to SC ?
+ */
+static boolean
+vect_simple_definition_p(
+    Pvecteur v,
+    Variable *pvar,
+    Value *pcoe,
+    Value *pcst)
+{
+    Variable var;
+    int size = vect_size(v);
+    if (size>2 || size<1) return FALSE;
+
+    var = var_of(v);
+    if (var==TCST && size<=1) return FALSE;
+
+    if (var==TCST) /* size == 2 */
+    {
+	*pvar = var_of(v->succ);
+	*pcoe = val_of(v->succ);
+	*pcst = val_of(v);
+	return TRUE;
+    }
+    else
+    {
+	*pvar = var;
+	*pcoe = val_of(v);
+	if (!v->succ) 
+	{
+	    *pcst = 0;
+	    return TRUE;
+	}
+
+	if (var_of(v->succ)!=TCST) return FALSE;
+	*pcst = val_of(v->succ);
+	return TRUE;
+    }
+}
+
+GENERIC_LOCAL_FUNCTION(lowers, entity_int)
+GENERIC_LOCAL_FUNCTION(uppers, entity_int)
+
+static void
+store_an_upper(
+    entity var,
+    int val)
+{
+    pips_debug(5, "%s <= %d\n", entity_local_name(var), val);
+
+    if (bound_uppers_p(var))
+    {
+	int old = load_uppers(var);
+	if (old>val) update_uppers(var, val);
+    }
+    else
+	store_uppers(var, val);
+}
+
+static void
+store_a_lower(
+    entity var,
+    int val)
+{
+    pips_debug(5, "%s >= %d\n", entity_local_name(var), val);
+
+    if (bound_lowers_p(var))
+    {
+	int old = load_lowers(var);
+	if (old<val) update_lowers(var, val);
+    }
+    else
+	store_lowers(var, val);
+}
+
+/* I could keep the system for further optimizations...
+ * Here, only direct lower and upper bounds are extracted and kept.
+ */
+void
+set_information_for_code_optimizations(
+    Psysteme s)
+{
+    Pcontrainte c;
+    Variable var; 
+    Value coe, cst, val;
+
+    init_lowers();
+    init_uppers();
+
+    /* first look thru equalities
+     */
+    for (c=sc_egalites(s); c; c=c->succ)
+    {
+	if (vect_simple_definition_p(contrainte_vecteur(c), &var, &coe, &cst))
+	{
+	    val = DIVIDE(cst, coe);
+	    store_an_upper((entity) var, (int) val);
+	    store_a_lower((entity) var, (int) val);
+	}
+    }
+
+    /* then thru inequalities
+     */
+    for (c=sc_inegalites(s); c; c=c->succ)
+    {
+	if (vect_simple_definition_p(contrainte_vecteur(c), &var, &coe, &cst))
+	{
+	    if (coe>0) /* UPPER */
+		store_an_upper((entity) var, 
+			       (int) POSITIVE_DIVIDE(-cst, coe));
+	    else /* LOWER */
+		store_a_lower((entity) var, 
+			      (int) POSITIVE_DIVIDE(cst-coe-1, -coe));
+	}
+    }
+}
+
+void
+reset_information_for_code_optimizations()
+{
+    close_lowers();
+    close_uppers();
+}
+
+
+/* this functions returns bounds for variable var if both are available.
+ * used thru a hook provided in Psysteme_to_code. This allows to provide
+ * the code generation with some information that allow to improve the
+ * generated code.
+ * ??? Whether this should be here or not is another question. 
+ */
+static boolean
+range_of_variable(
+    Variable var, 
+    Value * lb,
+    Value * ub)
+{
+    if (lowers_undefined_p() || uppers_undefined_p()) 
+	return FALSE; /* no information available, that's for sure */
+
+    if (!bound_lowers_p(var) || !bound_uppers_p(var))
+	return FALSE;
+
+    *lb = (Value) load_lowers((entity) var);
+    *ub = (Value) load_uppers((entity) var);
+
+    return TRUE;
+}
+
+static boolean
+evaluate_divide_if_possible(
+    Pvecteur v,
+    Value denominator,
+    Value *result)
+{
+    Value min=0, max=0;
+
+    for(; v; v=v->succ)
+    {
+	Variable var = var_of(v);
+	Value coef = val_of(v), lb, ub;
+
+	if (var==TCST)
+	    min+=coef, max+=coef;
+	else
+	{
+	    if (range_of_variable(var, &lb, &ub))
+		return FALSE;
+
+	    if (coef>0)
+		min+=coef*lb, max+=coef*ub;
+	    else
+		min+=coef*ub, max+=coef*lb;
+	}
+    }
+
+    *result = DIVIDE(min, denominator);
+
+    return *result==DIVIDE(max, denominator);
+}
+
 /* expression constraints_to_loop_bound(c, var, is_lower)
  * 
  * the is_lower (lower/upper) loop bound for variable var relative
@@ -147,7 +333,7 @@ constraints_to_loop_bound(
    */
   for(c=sc_inegalites(s); c; c=c->succ)
   {
-      Value val = vect_coeff(var, c->vecteur);
+      Value val = vect_coeff(var, c->vecteur), computed;
       Pvecteur vdiv = vect_del_var(c->vecteur, var), vadd = VECTEUR_NUL, v;
       expression ediv, eadd, e;
 
@@ -159,6 +345,12 @@ constraints_to_loop_bound(
 	  /*  ax+b <= 0 and a<0 => x >= (b+(-a-1))/(-a)
 	   */
 	  val=-val, vect_add_elem(&vdiv, TCST, val-1);
+
+      if (val==1)
+      {
+	  le = CONS(EXPRESSION, make_vecteur_expression(vdiv), le);
+	  continue;
+      }
 
       /* extract coefficients that are dividable by val...
        * x = (ay+bz)/a -> x = y + bz/a
@@ -174,24 +366,30 @@ constraints_to_loop_bound(
       for (v=vadd; v; v=v->succ)
 	  vect_erase_var(&vdiv, var_of(v));
 
-      /* assert. no 2i=0 should have reached this function...
+      /* assert. no a.i=0 should have reached this point...
        */
       message_assert("some expression", vdiv || vadd);
 
-      /* I should perform some other optimizations here, by looking at
+      /* I perform some other optimizations here, by looking at
        * the extent of the numerator, that may result in a constant after
        * division by the denominator. For instance, x = y/a and 0 <= y < a
-       * would lead to x = 0, which is quite simpler... I would need a hook
+       * would lead to x = 0, which is quite simpler... I need a hook
        * from the callers of this function to retrieve the constant lower
        * and upper bounds of each variable in order to perform this.
+       * ??? this optimizations should/could be perform earlier on 
+       * the original system... but the implementation in a general context
+       * does not seems obvious to me...
        */
+      if (evaluate_divide_if_possible(vdiv, val, &computed))
+      {
+	  vect_rm(vdiv), vdiv=VECTEUR_NUL;
+	  vect_add_elem(&vadd, TCST, computed);
+      }
 
       if (vdiv)
       {
 	  ediv = make_vecteur_expression(vdiv);
-	  
-	  if (val!=1) /* (I guess I should notice this case earlier:-) */
-	      ediv = MakeBinaryCall(divide, ediv, int_to_expression(val));
+	  ediv = MakeBinaryCall(divide, ediv, int_to_expression(val));	  
 	  
 	  if (vadd)
 	  {
@@ -205,6 +403,7 @@ constraints_to_loop_bound(
       else 
 	  e = make_vecteur_expression(vadd);
 
+      vect_rm(vdiv), vect_rm(vadd);
       le = CONS(EXPRESSION, e, le);
   }
 
@@ -226,6 +425,7 @@ constraints_to_loop_bound(
   }
 
   sc_rm(s);
+
   return result;
 }
 
