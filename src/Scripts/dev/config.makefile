@@ -28,7 +28,8 @@ SRC_MACROS =	auto.h \
 		makefile_macros.GNULL \
 		makefile_macros.GNUSOL2LL \
 		makefile_macros.SOL2LL \
-		makefile_macros.GPROF
+		makefile_macros.GPROF \
+		makefile_macros.IBMAIX4
 
 DDC_MACROS = 	define_libraries.make \
 		auto-dash.h \
