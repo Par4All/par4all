@@ -30,6 +30,12 @@
  *  - layout for commons are wrong if type and/or dimension declarations
  *    follow the COMMON declaration; PIPS Fortran syntax should be modified
  *    to prevent this;
+ *
+ * $Log: declaration.c,v $
+ * Revision 1.53  1998/10/09 11:46:03  irigoin
+ * Support for the *HEAP* area added in InitAreas() and in print_common_layout().
+ *
+ *
  */
 
 #include <stdlib.h>
@@ -78,6 +84,13 @@ InitAreas()
     entity_initial(StaticArea) = MakeValueUnknown();
     AddEntityToDeclarations(StaticArea, get_current_module_entity());
     set_common_to_size(StaticArea, 0);
+
+    HeapArea = FindOrCreateEntity(CurrentPackage, HEAP_AREA_LOCAL_NAME);
+    entity_type(HeapArea) = make_type(is_type_area, make_area(0, NIL));
+    entity_storage(HeapArea) = MakeStorageRom();
+    entity_initial(HeapArea) = MakeValueUnknown();
+    AddEntityToDeclarations(HeapArea, get_current_module_entity());
+    set_common_to_size(HeapArea, 0);
 }
 
 /* functions for the SAVE declaration */
@@ -1446,7 +1459,8 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
     }
     else {
 	if(area_size(type_area(entity_type(c)))==0
-	   && common_to_size(c)==0) {
+	   && common_to_size(c)==0
+	   && !heap_area_p(c)) {
 	    if(debug_p) {
 		user_warning("print_common_layout",
 			     "Non-empty area %s should have a final size greater than 0\n",
@@ -1467,12 +1481,28 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
 	    {
 		pips_assert("RAM storage",
 			    storage_ram_p(entity_storage(m)));
-		if(ram_function(storage_ram(entity_storage(m)))==mod)
+		if(ram_function(storage_ram(entity_storage(m)))==mod) {
+		    int s;
+
+		    if(!SizeOfArray(m, &s)) {
+			if(ram_section(storage_ram(entity_storage(m)))==HeapArea) {
+			    s = -1;
+			}
+			else {
+			    user_warning("print_common_layout",
+					 "Varying size of array \"%s\"\n", entity_name(m));
+			    ParserError("print_common_layout",
+					"Fortran standard prohibit varying size array\n");
+			}
+		    }
+
 		    (void) fprintf(fd,
 				   "\tVariable %s,\toffset = %d,\tsize = %d\n", 
 				   entity_name(m),
 				   ram_offset(storage_ram(entity_storage(m))),
-				   SafeSizeOfArray(m));
+				   s);
+
+		}
 	    }, 
 		members);
 	(void) fprintf(fd, "\n");
