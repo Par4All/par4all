@@ -154,6 +154,7 @@ pips_main(int argc, char ** argv)
 
     initialize_newgen();
     initialize_sc((char*(*)(Variable)) entity_local_name); 
+    set_exception_callbacks(push_pips_context, pop_pips_context);
 
     pips_parse_arguments(argc, argv);
 
