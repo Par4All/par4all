@@ -543,15 +543,27 @@ list lvr;
 	    }
 	    break;
 	}
+	case is_owner_select:
+	{
+	    /* ??? I put the activation right here.
+	     * I guess I should make a real resource, but I do not 
+	     * want to trace what is done with the real resources.
+	     * FC.
+	     */
+	    pips_debug(2, "automatic selection of %s\n", vrn);
+	    activate(vrn);
+	    break;
+	}
 	default:
-	    pips_error("build_real_resources", "unknown tag : %d\n", vrt);
+	    pips_internal_error("unknown tag : %d\n", vrt);
 	}
     }
 
     return(result);
 }
-
-/* compute all pre-transformations to apply a rule on an object */
+
+/* compute all pre-transformations to apply a rule on an object 
+ */
 static bool make_pre_transformation(oname, ru)
 rule ru;
 string oname;
