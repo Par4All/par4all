@@ -34,8 +34,8 @@ entity e;
 void CleanLocalEntities(function)
 entity function;
 {
-    list function_local_entities;
-    list pe;
+    list function_local_entities = NIL;
+    list pe = NIL;
 
     set_current_function(function);
 
@@ -69,18 +69,31 @@ entity function;
 
 	/* for a FUNCTION XX, variable XX:XX has already been redefined
 	 * when this piece of code is run; see previous comment (FI, 14/12/94)
+	 *
+	 * Not true anymore (FI, 03/06/03)
 	 */
+	/*
 	if(!(!storage_undefined_p(s) && storage_return_p(s))) {
 	    entity_type(e) = type_undefined;
 	    entity_storage(e) = storage_undefined;
 	    entity_initial(e) = value_undefined;
 	}
+	*/
 
 	if(!type_undefined_p(entity_type(e))) {
-	  free_type(entity_type(e));
+	  /* free_type(entity_type(e)); */
 	  entity_type(e) = type_undefined;
 	}
+	if(!storage_undefined_p(entity_storage(e))) {
+	  /* free_storage(entity_storage(e)); */
+	  entity_storage(e) = storage_undefined;
+	}
+	if(!value_undefined_p(entity_initial(e))) {
+	  /* free_value(entity_initial(e)); */
+	  entity_initial(e) = value_undefined;
+	}
     }
+    gen_free_list(function_local_entities);
 }
 
 /* Useful for ParserError()? */
