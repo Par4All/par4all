@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/09/22 15:16:25 $, 
+%% $Date: 1997/10/15 17:58:20 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
@@ -328,7 +328,7 @@ etc.
 \label{subsection-type}
 \index{Type}
 
-\domain{Type = statement:unit + area + variable + functional + unknown:unit + void:unit}
+\domain{Type = statement:unit + area + variable + functional + varargs:parameter + unknown:unit + void:unit}
 
 Obviously, type {\tt type} is used to represent the type of an
 entity. This type is defined as union to cover the needs of different
@@ -338,11 +338,12 @@ labels\index{Label}, since a label points towards a statement. Member
 defined as implicit common, the static and the dynamic areas associated
 to a module. Their specific names are defined in {\tt ri-util.h}.
 
-Member {\tt variable} is used for all variables and symbolic
-constants. It also is used for formal parameters and for results of
-functions. Member {\tt functional} is used for modules which are
-functions, subroutines and main programs. Member {\tt void} is used to
-declare the functional types of subroutines and programs.
+Member {\tt variable} is used for all variables and symbolic constants. It
+also is used for formal parameters and for results of functions. Member
+{\tt functional} is used for modules which are functions, subroutines and
+main programs. Member {\tt varargs} is used to declare intrinsics with
+varying number of arguments such as \verb/MAX/. Member {\tt void} is used
+to declare the functional types of subroutines and programs.
 
 \begin{comment}
 Le domaine \verb/type/ représente le type d'une entité.  Le
