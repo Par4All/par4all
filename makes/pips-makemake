@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/02 08:32:58 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/02 14:00:25 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -241,11 +241,11 @@ SHELL=		/bin/sh
 
 #
 # default targets...
-recompile: generate_makefile_if_necessary_and_possible
 all: generate_makefile_if_necessary_and_possible
-#
 all: $(ARCH) $ALL_RULE_TARGET
+#
 recompile: depend header all
+recompile: generate_makefile_if_necessary_and_possible
 # .PHONY is a gnu extension...
 .PHONY: install all depend header recompile clobber count info delta
 .PHONY: generate_makefile_if_necessary_and_possible
