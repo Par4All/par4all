@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 11:59:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 15:01:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/15 11:59:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/15 15:01:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -27,11 +27,46 @@ char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/15 11:59:08 $, ) version $Re
 /* list of called subroutines or functions */
 static list called_modules = list_undefined;
 
-/* list of potential local variables that turned out to be useless */
-static list ghost_variable_entities = list_undefined;
-
 /* statement of current function */
 static statement function_body = statement_undefined;
+
+/*********************************************************** GHOST VARIABLES */
+
+/* list of potential local variables that turned out to be useless.
+ */
+static list ghost_variable_entities = list_undefined;
+
+void
+init_ghost_variable_entities()
+{
+    pips_assert("undefined list", list_undefined_p(ghost_variable_entities));
+    ghost_variable_entities = NIL;
+}
+
+void 
+remove_ghost_variable_entities()
+{
+    pips_assert("defined list", !list_undefined_p(ghost_variable_entities));
+    MAP(ENTITY, e, 
+    {
+	/* The debugging message must use the variable name before it is freed
+	 */
+	pips_debug(1, "entity '%s'\n", entity_name(e));
+	remove_variable_entity(e);
+	pips_debug(1, "destroyed\n");
+    }, 
+	ghost_variable_entities);
+
+    ghost_variable_entities = list_undefined;
+}
+
+void
+add_ghost_variable_entities(entity e)
+{
+    pips_assert("defined list",	!list_undefined_p(ghost_variable_entities));
+    ghost_variable_entities = arguments_add_entity(ghost_variable_entities, e);
+}
+
 
 /* this function is called each time a new procedure is encountered. */
 void 
@@ -53,9 +88,10 @@ entity e;
 
     /* Self recursive calls are not allowed */
     if(e==cm) {
-	user_warning("update_called_modules", "Recursive call from %s to %s\n",
+	pips_user_warning("Recursive call from %s to %s\n",
 		     entity_local_name(cm), entity_local_name(e));
-	ParserError("update_called_modules", "Recursive call are not supported\n");
+	ParserError("update_called_modules", 
+		    "Recursive call are not supported\n");
     }
 
     /* do not count intrinsics; user function should not be named
@@ -80,17 +116,17 @@ entity e;
     }, called_modules);
 
     if (! already_here) {
-	debug(1, "update_called_modules", "addind %s\n", n);
+	pips_debug(1, "adding %s\n", n);
 	called_modules = CONS(STRING, strdup(n), called_modules);
     }
 }
-
 
 void 
 AbortOfProcedure()
 {
     /* get rid of ghost variable entities */
-    remove_ghost_variable_entities();
+    if (!list_undefined_p(ghost_variable_entities))
+	remove_ghost_variable_entities();
 
     (void) ResetBlockStack() ;
 }
@@ -303,8 +339,7 @@ cons *lfp;
 		    debug(1, "MakeCurrentFunction",
 			  "current function %s re-declared as %s\n",
 			  entity_name(cf), entity_name(fe));
-		    ghost_variable_entities = 
-			arguments_add_entity(ghost_variable_entities, cf);
+		    add_ghost_variable_entities(cf);
 		    debug(1, "MakeCurrentFunction",
 			  "entity %s to be destroyed\n",
 			  entity_name(cf));
@@ -325,8 +360,7 @@ cons *lfp;
 		    strdup(concatenate(BLOCKDATA_PREFIX, 
 				       entity_local_name(cf), NULL));
 		/* to be dropped later on */
-		ghost_variable_entities = 
-			arguments_add_entity(ghost_variable_entities, cf);
+		add_ghost_variable_entities(cf);
 		cf = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, bd_name);
 		free(bd_name);
 	    }
@@ -478,8 +512,7 @@ type r; /* type of result */
 	     * PIPS also core dumps with ALOG(ALOG(X))... (8 July 1993) 
 	     */
 	    /* remove_variable_entity(e); */
-	    ghost_variable_entities = 
-		arguments_add_entity(ghost_variable_entities, e);
+	    add_ghost_variable_entities(e);
 	    debug(1, "MakeExternalFunction",
 		  "entity %s to be destroyed\n",
 		  entity_name(e));
@@ -589,15 +622,14 @@ type r; /* type of result */
 its rank in the formal parameter list. */
 
 void 
-MakeFormalParameter(fp, nfp)
-entity fp;
-int nfp;
+MakeFormalParameter(entity fp, int nfp)
 {
-    pips_assert("MakeFormalParameter", entity_type(fp) == type_undefined);
+    pips_assert("type is undefined", entity_type(fp) == type_undefined);
 
     entity_type(fp) = ImplicitType(fp);
-    entity_storage(fp) = make_storage(is_storage_formal, 
-				      make_formal(get_current_module_entity(), nfp));
+    entity_storage(fp) = 
+	make_storage(is_storage_formal, 
+		     make_formal(get_current_module_entity(), nfp));
     entity_initial(fp) = MakeValueUnknown();
 }
 
@@ -607,10 +639,9 @@ int nfp;
 is created with an implicit type, and then is added to CurrentFunction's
 declarations. */
 void 
-ScanFormalParameters(l)
-cons * l;
+ScanFormalParameters(list l)
 {
-	cons *pc;
+	list pc;
 	entity fp; /* le parametre formel */
 	int nfp; /* son rang dans la liste */
 
@@ -630,42 +661,9 @@ cons * l;
 /* this function creates an intrinsic function. */
 
 entity 
-CreateIntrinsic(name)
-string name;
+CreateIntrinsic(string name)
 {
-    /* entity e = FindOrCreateEntity(CurrentPackage, name); */
     entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
-
-    /*
-    pips_assert("CreateIntrinsic",
-		MakeExternalFunction(e, MakeOverloadedResult()) == e);
-		*/
-
-    pips_assert("CreateIntrinsic", e!=entity_undefined);
-
+    pips_assert("entity is defined", e!=entity_undefined);
     return(e);
-}
-
-void 
-init_ghost_variable_entities()
-{
-    ghost_variable_entities = NIL;
-}
-
-void 
-remove_ghost_variable_entities()
-{
-    MAPL(ce, {
-	entity e = ENTITY(CAR(ce));
-
-	/* The debugging message must use the variable name before it is freed */
-	debug(1, "remove_ghost_variable_entities",
-	      "entity '%s'\n",
-	      entity_name(e));
-	remove_variable_entity(e);
-	debug(1, "remove_ghost_variable_entities",
-	      "destroyed\n");
-	}, ghost_variable_entities);
-
-    ghost_variable_entities = list_undefined;
 }
