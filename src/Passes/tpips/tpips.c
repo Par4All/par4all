@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.85  1997/12/12 17:33:41  coelho
+ * leaks--
+ *
  * Revision 1.84  1997/12/12 13:56:21  coelho
  * typo fixed.
  *
@@ -800,6 +803,7 @@ tpips_exec(char * line)
 	    tpips_init();
 	
 	sline = tp_substitutions(line);
+	if (!use_readline && line) free(line), line=NULL;
 	handle(sline);
 	free(sline), sline = (char*) NULL;
     }
