@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.22  2003/08/12 15:49:45  irigoin
+%% compilation unit concept added
+%%
 %% Revision 1.21  2003/07/30 15:38:02  irigoin
 %% Temporary debug version for c_parser
 %%
@@ -545,7 +548,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/07/30 15:38:02 $~$
+$~$Date: 2003/08/12 15:49:45 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1167,7 +1170,16 @@ hpfc_parser                     > MODULE.parsed_code
         < MODULE.hpfc_filtered_file
 \end{verbatim}
 
-\paragraph{Declaration of the C parser:}
+\paragraph{Declaration of the C parsers:}
+
+The compilation unit does not contain any function definitions after the
+workspace creation. The compilation units must be parsed before the
+function definitions can be parsed.
+
+\begin{verbatim}
+compilation_unit_parser         > COMPILATION_UNIT.declarations
+        < COMPILATION_UNIT.c_source_file
+\end{verbatim}
 
 This draft parser is used to parse C code.  
 
@@ -1176,6 +1188,7 @@ c_parser                        > MODULE.parsed_code
                                 > MODULE.callees
         < PROGRAM.entities
         < MODULE.c_source_file
+        < COMPILATION_UNIT.declarations
 \end{verbatim}
 
 To allow Nga and Francois to debug their parts (quite) independently:
