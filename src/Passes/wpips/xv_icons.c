@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <malloc.h>
 
-#include <types.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <xview/xview.h>
