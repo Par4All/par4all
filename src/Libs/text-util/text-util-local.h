@@ -1,3 +1,6 @@
+/*
+ * $Id$
+ */
 #define PIPS_COMMENT_PREFIX "C$PIPS"
 
 #define MAKE_SWORD(s) strdup(s)
@@ -26,3 +29,7 @@
        text_sentences(_t_) = NIL; \
        gen_free(_t_); \
        }
+
+/* maximum length of a line when prettyprinting...
+ */
+#define MAX_LINE_LENGTH 70
