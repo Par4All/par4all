@@ -294,42 +294,58 @@ area a2;
 	return (area_size(a1) == area_size(a2));
 }
 
+bool
+dimension_equal_p(
+    dimension d1, 
+    dimension d2)
+{
+    return expression_equal_p(dimension_lower(d1), dimension_lower(d2)) &&
+	expression_equal_p(dimension_upper(d1), dimension_upper(d2));
+}
+
 bool 
 variable_equal_p(v1, v2)
 variable v1;
 variable v2;
 {
-  bool vtequal = FALSE;
+  if(v1 == v2)
+      return TRUE;
+  else if (v1 == variable_undefined && v2 != variable_undefined)
+      return FALSE;
+  else if (v1 != variable_undefined && v2 == variable_undefined)
+      return FALSE;
+  else if (!basic_equal_p(variable_basic(v1), variable_basic(v2)))
+      return FALSE;
+  else {
+      list ld1 = variable_dimensions(v1);
+      list ld2 = variable_dimensions(v2);
+      
+      if(ld1==NIL && ld2==NIL)
+	  return TRUE;
+      else 
+      {
+	  /* dimensions should be checked, but it's hard: the only
+	     Fortran requirement is that the space allocated in
+	     the callers is bigger than the space used in the
+	     callee; stars represent any strictly positive integer;
+	     we do not know if v1 is the caller type or the callee type;
+	  I do not know what should be done; FI */
+	  /* FI: I return FALSE because the exact test should never be useful
+	     in the parser; 1 February 1994 */
+	  /* FC: I need this in the prettyprinter... */
 
-    if(v1 == v2)
-	return TRUE;
-    else if (v1 == variable_undefined && v2 != variable_undefined)
-	return FALSE;
-    else if (v1 != variable_undefined && v2 == variable_undefined)
-	return FALSE;
-    else if (!(vtequal = basic_equal_p(variable_basic(v1), variable_basic(v2))))
-	return FALSE;
-    else {
-	list ld1 = variable_dimensions(v1);
-	list ld2 = variable_dimensions(v2);
-
-	if(ld1==NIL && ld2==NIL)
-	    return vtequal;
-	else {
-	    /* dimensions should be checked, but it's hard: the only
-	       Fortran requirement is that the space allocated in
-	       the callers is bigger than the space used in the
-	       callee; stars represent any strictly positive integer;
-	       we do not know if v1 is the caller type or the callee type;
-	       I do not know what should be done; FI */
-	    /* FI: I return FALSE because the exact test should never be useful
-	       in the parser; 1 February 1994 */
-	    return FALSE;
-	    pips_error("variable_equal_p", "dimension check not implemented\n");
-	}
-    }
-  /* Should never be executed */
-  return vtequal;
+	  int l1 = gen_length(ld1), l2 = gen_length(ld2);
+	  if (l1!=l2) 
+	      return FALSE;
+	  for (; ld1; POP(ld1), POP(ld2))
+	  {
+	      dimension d1 = DIMENSION(CAR(ld1)), d2 = DIMENSION(CAR(ld2));
+	      if (!dimension_equal_p(d1, d2))
+		  return FALSE;
+	  }
+      }
+  }
+  return TRUE;
 }
 
 bool 
