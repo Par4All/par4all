@@ -1,4 +1,5 @@
-EMPTY (("#".*)|([ \\t]+("#".*)?))
+EMPTY (([ \\t\\n])+)
+OPTEMPTY (([ \\t\\n])*)
 
 %e 100000
 %p 100000
@@ -59,19 +60,19 @@ EMPTY (("#".*)|([ \\t]+("#".*)?))
 %s KEY FNAME WNAME RES PHASE PROP
 
 %%
+<KEY>{OPTEMPTY}"open"     {BEGIN WNAME;return OPEN;}
+<KEY>{OPTEMPTY}"create"   {BEGIN WNAME;return CREATE;}
+<KEY>{OPTEMPTY}"close"    {BEGIN WNAME;return CLOSE;}
+<KEY>{OPTEMPTY}"delete"   {BEGIN WNAME;return DELETE;}
+<KEY>{OPTEMPTY}"module"   {BEGIN WNAME;return MODULE;}
+<KEY>{OPTEMPTY}"make"     {BEGIN RES;return MAKE;}
+<KEY>{OPTEMPTY}"apply"    {BEGIN PHASE;return APPLY;}
+<KEY>{OPTEMPTY}"display"  {BEGIN RES;return DISPLAY;}
+<KEY>{OPTEMPTY}"activate" {BEGIN PHASE;return ACTIVATE;}
+<KEY>{OPTEMPTY}"set"      {BEGIN PROP;return SET;}
+<KEY>{OPTEMPTY}"get"      {BEGIN PROP;return GET;}
+<KEY>{OPTEMPTY}"info"     {BEGIN WNAME;return INFO;}
 <KEY,FNAME,WNAME,RES,PHASE,PROP>{EMPTY}  {return SEPARATOR;}
-<KEY>"open"     {BEGIN WNAME;return OPEN;}
-<KEY>"create"   {BEGIN WNAME;return CREATE;}
-<KEY>"close"    {BEGIN WNAME;return CLOSE;}
-<KEY>"delete"   {BEGIN WNAME;return DELETE;}
-<KEY>"module"   {BEGIN WNAME;return MODULE;}
-<KEY>"make"     {BEGIN RES;return MAKE;}
-<KEY>"apply"    {BEGIN PHASE;return APPLY;}
-<KEY>"display"  {BEGIN RES;return DISPLAY;}
-<KEY>"activate" {BEGIN PHASE;return ACTIVATE;}
-<KEY>"set"      {BEGIN PROP;return SET;}
-<KEY>"get"      {BEGIN PROP;return GET;}
-<KEY>"info"     {BEGIN WNAME;return INFO;}
 <FNAME>[/\\.0-9A-Za-z_-]+       {yylval.name = strdup(yytext);return FILE_NAME;}
 <WNAME>[0-9A-Za-z_-]+   {BEGIN FNAME;yylval.name =strdup(yytext);return WORKSPACE;}
 <RES,PHASE>\\{    {return OPENBRACE;}
