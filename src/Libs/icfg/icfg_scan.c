@@ -141,9 +141,9 @@ static bool call_flt(call c)
 
 static void call_rwt(call c)
 {
-  entity e_filter = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, "KMAX");
   entity e_callee = call_function(c);
   string callee_name = module_local_name(e_callee);
+  entity e_filter = FindOrCreateEntity(callee_name, "KMAX");
 
   text r = (text) load_statement_icfg (current_stmt_head());
 
