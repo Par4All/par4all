@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/08 08:37:17 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/08 08:52:56 $, )
 # version $Revision$, 
 #
 
@@ -129,7 +129,7 @@ PIPS_CFLAGS="-O2 -g -ansi -Wall -mv8 -pipe"
 PIPS_CPPFLAGS="-I${INCLUDEDIR} -I${EXTEDIR}"
 # PIPS_LD="cc"
 PIPS_LD="gcc"
-PIPS_LDFLAGS="-L. -L${LIBDIR} -L${EXTEDIR} -g"
+PIPS_LDFLAGS='-L. -L${LIBDIR} -L${EXTEDIR} -g'
 PIPS_LEX="lex"
 PIPS_LFLAGS=""
 PIPS_LINT="lint"
@@ -160,9 +160,9 @@ PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -l
 # home directory for openwin (only used by the XView interface: wpips)
 OPENWINHOME="/usr/openwin"
 
-WPIPS_ADDED_CPPFLAGS="-I$(OPENWINHOME)/include -Iicons"
-WPIPS_ADDED_LIBS="-lxview -lolgx -lX11"
-WPIPS_ADDED_LDFLAGS="-L$(OPENWINHOME)/lib -static"
+WPIPS_ADDED_CPPFLAGS='-I$(OPENWINHOME)/include -Iicons'
+WPIPS_ADDED_LIBS='-lxview -lolgx -lX11'
+WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib -static'
 
 #
 # HPFC environment variables 
