@@ -1,5 +1,5 @@
 # $RCSfile: Makefile.compile_wp65,v $ (version $Revision$)
-# $Date: 1996/09/03 14:40:25 $, 
+# $Date: 1997/04/03 13:23:15 $, 
 #
 
 # Fait des vérifications exhaustives :
@@ -16,7 +16,11 @@ endif
 ifdef WP65_FFLAGS
 FFLAGS	= $(WP65_FFLAGS)
 else
-FFLAGS	= -u
+ifeq ($(FC),g77)
+FFLAGS	+= -Wimplicit
+else
+FFLAGS	+= -u
+endif
 endif
 
 ifndef WP65_RUNTIME
