@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1996/09/21 11:59:44 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1997/04/24 19:28:59 $, )
  * version $Revision$
  */
 
@@ -39,8 +39,8 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "newgen_include.h"
 #include "genC.h"
+#include "newgen_include.h"
 
 #define IS_NON_INLINABLE_BASIS(c,f) (strcmp(c,"")==0&&strcmp(f,"p")==0)
 #define UPPER(c) ((islower( c )) ? toupper( c ) : c )
@@ -476,7 +476,7 @@ struct gen_binding *bp ;
 
     (void) printf("#define ");
     fprint_upper(stdout, s);
-    (void) printf( " (%s+%d)\n", start, TYPE( bp )) ;
+    (void) printf("_NEWGEN_EXTERNAL (%s+%d)\n", start, TYPE( bp )) ;
 
     /* for externals, a cast macro is added to char* 
      */
