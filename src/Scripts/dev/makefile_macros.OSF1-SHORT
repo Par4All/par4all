@@ -5,7 +5,7 @@
 AR	= ar
 ARFLAGS	= -rv
 CC	= cc -xtaso_short
-CFLAGS	= -O3
+CFLAGS	= -O3 -DSYST_DEBUG=0
 CMKDEP	= -M
 CPPFLAGS= -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC)
