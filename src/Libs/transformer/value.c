@@ -160,6 +160,9 @@
   * $Id$
   *
   * $Log: value.c,v $
+  * Revision 1.24  2003/06/20 07:20:21  nguyen
+  * Update calls to make_statement and make_variable with new RI for C
+  *
   * Revision 1.23  2002/07/22 17:21:26  irigoin
   * Function readable_value_name() added to cope with temporary values
   *
@@ -405,7 +408,7 @@ entity make_local_temporary_value_entity(type t)
 
 entity make_local_temporary_value_entity_with_basic(basic b)
 {
-  type t = make_type(is_type_variable, make_variable(copy_basic(b), NIL));
+  type t = make_type(is_type_variable, make_variable(copy_basic(b), NIL,NIL));
   entity tmp = make_local_value_entity(local_temporary_value_counter++, 2, t);
 
   free_type(t);
@@ -415,7 +418,7 @@ entity make_local_temporary_value_entity_with_basic(basic b)
 entity make_local_temporary_integer_value_entity()
 {
   basic b = make_basic(is_basic_int, (void *) 4);
-  type t = make_type(is_type_variable, make_variable(b, NIL));
+  type t = make_type(is_type_variable, make_variable(b, NIL,NIL));
   entity tmp = make_local_value_entity(local_temporary_value_counter++, 2, t);
 
   free_type(t);
