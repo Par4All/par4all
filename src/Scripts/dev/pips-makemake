@@ -66,6 +66,7 @@
 #	on a des proble`mes de droit d'utilisateur. RK, 22/07/1993.
 #
 #	delta devient delget. RK.
+# - add a bell at the end of the link, FC 23.07.93
 #
 # wish:
 #
@@ -206,6 +207,7 @@ $(LIB_TARGET): $(LIB_OBJECTS)
 
 $(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
 	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS)
+	echo 
 
 install: $(INC_TARGET) $(LIB_TARGET)
 	@if test \`ls *.a | wc -w\` -gt 1 ; then echo install failed: additional local libraries prevent it >&2; exit 1; fi
