@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.43  1999/05/21 12:10:29  irigoin
+ * Comment refined for CreateIntrinsic()
+ *
  * Revision 1.42  1999/01/08 15:30:12  coelho
  * *** empty log message ***
  *
@@ -441,7 +444,9 @@ entity_intrinsic(string name)
 
 
 
-/* this function creates an intrinsic function. */
+/* this function does not create an intrinsic function because they must
+   all be created beforehand by the bootstrap hase (see
+   bootstrap/bootstrap.c). */
 
 entity 
 CreateIntrinsic(string name)
