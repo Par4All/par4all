@@ -123,5 +123,15 @@ Pvecteur *pv1, *pv2;
 			    (entity*)&var_of(*pv2)));
 }
 
+int 
+vect_gen_allocated_memory(
+    Pvecteur v)
+{
+    int result = 0;
+    for (; v; v=v->succ)
+	result += sizeof(Svecteur);
+    return result;
+}
+
 /*   That is all
  */
