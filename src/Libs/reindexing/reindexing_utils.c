@@ -631,31 +631,35 @@ void matrix_add(a, b, c)
  Pmatrix  a;      /* output */
  Pmatrix  b, c;   /* input */
 {
- Value     d1, d2;   /* denominators of b, c */
- Value     lcm;     /* ppcm of b,c */
- int     i, j;
-
- /* precondition */
- int n= MATRIX_NB_LINES(a);
- int m = MATRIX_NB_COLUMNS(a);
-
- d1 = MATRIX_DENOMINATOR(b);
- d2 = MATRIX_DENOMINATOR(c);
-
- if (value_eq(d1,d2))
+    Value     d1, d2;   /* denominators of b, c */
+    Value     lcm;     /* ppcm of b,c */
+    int     i, j;
+    
+    /* precondition */
+    int n= MATRIX_NB_LINES(a);
+    int m = MATRIX_NB_COLUMNS(a);
+    
+    d1 = MATRIX_DENOMINATOR(b);
+    d2 = MATRIX_DENOMINATOR(c);
+    
+    if (value_eq(d1,d2))
     {
-     for (i = 1; i <= n; i++)
-       for (j = 1; j <= m; j++)
-         MATRIX_ELEM(a,i,j)= value_plus(MATRIX_ELEM(b,i,j),MATRIX_ELEM(c,i,j));
-     MATRIX_DENOMINATOR(a) = d1;
+	for (i = 1; i <= n; i++)
+	    for (j = 1; j <= m; j++) 
+	    {
+		Value t1 = MATRIX_ELEM(c,i,j), t2=MATRIX_ELEM(b,i,j);
+		MATRIX_ELEM(a,i,j) = t1+t2;
+	    }
+
+	MATRIX_DENOMINATOR(a) = d1;
     }
- else
+    else
     {
      lcm = ppcm(d1,d2);
      d1 = value_div(lcm,d1);
      d2 = value_div(lcm,d2);
      for (i = 1; i <= n; i++)
-       for (j = 1; j <= m; j++)
+       for (j = 1; j <= m; j++) 
          MATRIX_ELEM(a,i,j)=
 	     value_plus(value_mult(MATRIX_ELEM(b,i,j),d1),
 			value_mult(MATRIX_ELEM(c,i,j),d2));
