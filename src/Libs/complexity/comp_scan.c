@@ -83,8 +83,8 @@ char *module_name;
     /* we may need to print preconditions for debugging purposes */
     set_precondition_map( (statement_mapping)
 	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping)
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
+    set_cumulated_rw_effects((statement_effects)
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE ) );
@@ -95,7 +95,7 @@ char *module_name;
     module_to_value_mappings(module_entity);
 
     precond = load_statement_precondition(module_stat);
-    effects_list = load_statement_cumulated_effects(module_stat);
+    effects_list = load_cumulated_rw_effects_list(module_stat);
 
     init_cost_table();
 
@@ -138,7 +138,7 @@ char *module_name;
 
     hash_callee_to_complexity = free_callees_complexities(hash_callee_to_complexity);
     reset_precondition_map();
-    reset_cumulated_effects_map();
+    reset_cumulated_rw_effects();
     reset_complexity_map();
     reset_current_module_entity();
     reset_current_module_statement();
@@ -204,7 +204,7 @@ list eff_list;
     instruction instr = statement_instruction(stat);
     int so = statement_ordering(stat);
     transformer precond = load_statement_precondition(stat);
-    list effects_list = load_statement_cumulated_effects(stat);
+    list effects_list = load_cumulated_rw_effects_list(stat);
     complexity comp = make_zero_complexity();
 
     trace_on("statement %s, ordering (%d %d)", 
@@ -327,13 +327,13 @@ list effects_list;
 						       precond, effects_list);
 	    transformer prec = load_statement_precondition(stat);
 	    
-	    list cumu_list = load_statement_cumulated_effects(stat);
+	    list cumu_list = load_cumulated_rw_effects_list(stat);
 	    
 	    Pbase pb = VECTEUR_NUL;
 	    
 	    if ( i > 1 ) {
 		up_stat = STATEMENT(CAR(gen_nthcdr( i-2, block )));
-		cumu_list = load_statement_cumulated_effects(up_stat);
+		cumu_list = load_cumulated_rw_effects_list(up_stat);
 	    }
 	    complexity_add(&comp, ctemp);
 	    
