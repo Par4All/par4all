@@ -2,14 +2,11 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <setjmp.h>
 #include "arithmetique.h"
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-
-
 
 /* Psysteme sc_elim_redund(Psysteme ps):
  * elimination des contraintes lineaires redondantes dans le systeme par test
