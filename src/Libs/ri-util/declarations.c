@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.2  1997/10/30 13:09:14  coelho
+ * prettyprint of common/equiv with PRETTYPRINT_COMMONS="include" seems ok.
+ *
  * Revision 1.1  1997/10/28 15:01:23  coelho
  * Initial revision
  *
@@ -277,17 +280,17 @@ sentence_area(entity e, entity module, bool pp_dimensions)
     if (!ENDP(area_layout(type_area(te))))
     {
 	bool pp_hpfc = get_bool_property("PRETTYPRINT_HPFC");
-	MAP(ENTITY, ee,
-	    if (local_entity_of_module_p(ee, module) || pp_hpfc)
-	        entities = CONS(ENTITY, ee, entities),
-	    area_layout(type_area(te)));
+
+	if (pp_hpfc)
+	    entities = gen_copy_seq(area_layout(type_area(te)));
+	else
+	    entities = common_members_of_module(e, module, TRUE);
 
 	/*  the common is not output if it is empty
 	 */
 	if (!ENDP(entities))
 	{
-	    bool comma = FALSE;
-	    bool is_save = static_area_p(e);
+	    bool comma = FALSE, is_save = static_area_p(e);
 
 	    if (is_save)
 	    {
@@ -303,16 +306,11 @@ sentence_area(entity e, entity module, bool pp_dimensions)
 		    pc = CHAIN_SWORD(pc, "/ ");
 		}
 	    }
-	    entities = gen_nreverse(entities);
 	    
 	    MAP(ENTITY, ee, 
 	     {
 		 if (comma) pc = CHAIN_SWORD(pc, ",");
 		 else comma = TRUE;
-		 /* hpfc: dimension of common variables are specified
-		  * within the COMMON, not with the type. this is just
-		  * a personnal taste. FC.
-		  */
 		 pc = gen_nconc(pc, 
 			words_declaration(ee, !is_save && pp_dimensions));
 	     },
@@ -437,27 +435,40 @@ text_area_included(
 
     if (file_exists_p(file))
     {
-	/* the include was generated once before...
-	 */
+	/* the include was generated once before... */
 	t = include(local);
     }
     else 
     {
+	string nofile = 
+	    strdup(concatenate(file, ".sorry_common_not_homogeneous", 0));
 	t = text_common_declaration(common, module);
-	if (check_common_inclusion(common)) 
+	if (!file_exists_p(nofile))
 	{
-	    /* same declaration, generate the file! */
-	    FILE * f = safe_fopen(file, "w");
-	    fprintf(f, "!!\n!! pips: include file for common %s\n!!\n", name);
-	    print_text(f, t);
-	    safe_fclose(f, file);
-	    t = include(local);	    
+	    if (check_common_inclusion(common))
+	    {
+		/* same declaration, generate the file! */
+		FILE * f = safe_fopen(file, "w");
+		fprintf(f, "!!\n!! pips: include file for common %s\n!!\n",
+			name);
+		print_text(f, t);
+		safe_fclose(f, file);
+		t = include(local);	    
+	    }
+	    else
+	    {
+		/* touch the nofile to avoid the inclusion check latter on. */
+		FILE * f = safe_fopen(nofile, "w");
+		fprintf(f, 
+			"!!\n!! pips: sorry,  cannot include common %s\n!!\n",
+			name);
+		safe_fclose(f, nofile);
+	    }
+	    free(nofile);
 	}
-	/* else not the same... but the information gonna be recomputed... */
     }
 
-    free(local);
-    free(file);
+    free(local); free(file); 
     return t;
 }
 
@@ -750,14 +761,16 @@ text_equivalence_class(list /* of entities */ l_equiv)
 }
 
 
-/* text text_equivalences(entity module, list ldecl)
- * input    : the current module, and the list of declarations.
+/* input    : the current module, and the list of declarations.
  * output   : a text for all the equivalences.
  * modifies : nothing
  * comment  :
  */
 static text 
-text_equivalences(entity module, list ldecl)
+text_equivalences(
+    entity module     /* the module dealt with */, 
+    list ldecl        /* the list of declarations to consider */, 
+    bool no_commons /* whether to print common equivivalences */)
 {
     list equiv_classes = NIL, l_tmp;
     text t_equiv_class;
@@ -770,13 +783,18 @@ text_equivalences(entity module, list ldecl)
     /* consider each entity in the declaration */
     MAP(ENTITY, e,
     {
+	storage s = entity_storage(e);
 	/* but only variables which have a ram storage must be considered
 	 */
-	if (type_variable_p(entity_type(e)) && 
-	    storage_ram_p(entity_storage(e)))
+	if (type_variable_p(entity_type(e)) && storage_ram_p(s))
 	{
-	    list l_shared = ram_shared(storage_ram(entity_storage(e)));
+	    ram r = storage_ram(s);
+	    entity common = ram_section(r);
+	    list l_shared = ram_shared(r);
 	    
+	    if (no_commons && !SPECIAL_COMMON_P(common))
+		break;
+
 	    ifdebug(EQUIV_DEBUG)
 	    {
 		pips_debug(1, "considering entity: %s\n", 
@@ -1131,13 +1149,14 @@ text_entity_declaration(
     attach_declaration_type_to_words(ps, "CHARACTER");
     MERGE_TEXTS(r, t_chars);
 
-    MERGE_TEXTS(r, t_area);
-
     /* all about COMMON and SAVE declarations */
     MERGE_TEXTS(r, make_text(area_decl));
 
+    MERGE_TEXTS(r, t_area);
+
     /* and EQUIVALENCE statements... - BC -*/
-    MERGE_TEXTS(r, text_equivalences(module, ldecl)); 
+    MERGE_TEXTS(r, text_equivalences(module, ldecl, 
+				     pp_cinc || !print_commons));
 
     /* what about DATA statements! FC */
     MERGE_TEXTS(r, text_data(module, ldecl));
@@ -1165,7 +1184,7 @@ text_common_declaration(
     list l;
     text result;
     pips_assert("indeed a common", type_area_p(t));
-    l = CONS(ENTITY, common, gen_copy_seq(area_layout(type_area(t))));
+    l = CONS(ENTITY, common, common_members_of_module(common, module, FALSE));
     result = text_entity_declaration(module, l, TRUE);
     gen_free_list(l);
     return result;
