@@ -14,7 +14,6 @@ string mod_name;
 		      FALSE);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES",
 		      TRUE);
-    printf("HERE");
     return print_dependence_graph(mod_name);
 }
 
