@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1996/09/02 10:27:34 $, 
+# $Date: 1996/10/15 22:21:33 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -128,6 +128,10 @@ $SED "#
       s,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,\1,;
       s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,;
       #
+      # for yes/endyes parts:
+      s,^[Cc!\*][Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,!\1,;
+      s,^[Cc!\*][Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,!\1,;
+      #
       # ! style comments are removed. 
       #
       /[]/s,^\([^'\"]*\)!.*,\1,;
@@ -167,6 +171,13 @@ $SED "#
       #
       /[][^'\"]*$/s,[ 	][ 	]*,\1,g;
       /[]/s,\([]\),\1 ,;
+      #
+      # NO/END NO: to remove part of the code
+      / no/,/ endno/d;
+      # YES/END YES to enable part of the code (which is uncommented)
+      / yes/,/ endyes/s,^[!Cc\*],,;
+      / yes/d;
+      / endyes/d;
       #
       # simple 1D FORALL instruction without continuation... 
       s,^\([^Cc!\*].... \)[ 	]*[Ff][Oo][Rr][Aa][Ll][Ll][ 	]*(\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\))\(.*\),\1do \2=\3\,\4\5enddo,
