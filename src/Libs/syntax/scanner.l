@@ -1,6 +1,16 @@
 %{
 
-#ifndef FLEX_SCANNER
+#ifdef FLEX_SCANNER
+
+/* flex incompatible way of playing with input characters:-)
+ */
+
+#define YY_INPUT(buf,result,max_size) \
+{ int c = PipsGetc(yyin);\
+  result = (c == EOF)? YY_NULL: (buf[0] = c, 1);}
+
+#else /* we're not using flex... let us assume some very peculiar lex... */
+
 /* the portability of the following macro makes many (:-) assumptions
  * about lex internals hence should not be very portable...
  * POSIX states that input cannot be redefined.
@@ -10,18 +20,8 @@
 #undef input()
 #define input() (((yytchar=yysptr>yysbuf?U(*--yysptr):PipsGetc(yyin))==10?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
 
-#else
+#endif /* FLEX_SCANNER */
 
-/* now flex incompatible way of playing with input characters:-)
- */
-#define YY_INPUT(buf,result,max_size) \
-{ \
- int c = PipsGetc(yyin); \
- result = (c == EOF)? YY_NULL: (buf[0] = c, 1); \
-}
-#endif
-
-/* les definitions des valeurs des tokens */
 #include <stdio.h>
 
 #include "genC.h"
@@ -29,14 +29,19 @@
 #include "ri.h"
 
 #include "misc.h"
-
 #include "syntax.h"
 
 /* yacc generated header file
  */
 #include "syn_yacc.h"
 
+/* stdlib defines abs on solaris 2 */
+#ifdef abs
+#undef abs
+#endif
+
 %}
+
 DIG [0-9]
 ULET [A-Z_]
 LLET [a-z_]
@@ -48,6 +53,7 @@ REXP (E{ICON})
 DEXP (D{ICON})
 RCON (({MANT}|{UICON}){REXP}?)
 DCON (({MANT}|{UICON}){DEXP}?)
+
 %%
 %AND%			{
 				pips_debug(9, "TK_AND\n");
@@ -229,7 +235,9 @@ void yyerror_lex_part(char *s)
 
 void yyreset_lex(void)
 {
-#ifndef FLEX_SCANNER
+#ifdef FLEX_SCANNER
+    yyrestart(yyin);
+#else
     extern char syn_sbuf[];
     extern char * syn_sptr;
     extern int syn_previous;
@@ -237,7 +245,7 @@ void yyreset_lex(void)
     syn_sptr = syn_sbuf;
 # define MMNEWLINE 10
     syn_previous = MMNEWLINE;
-#else
-    yyrestart(yyin);
 #endif
 }
+
+/* end of $RCSfile: scanner.l,v $ */
