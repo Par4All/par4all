@@ -2,7 +2,7 @@
 ! COMMON /HPFC BUFFERS/ 
 !
 ! $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-! ($Date: 1997/01/07 11:14:50 $, )
+! ($Date: 1997/04/17 13:15:41 $, )
 !
 ! buffers to avoid small pvmf(un)pack calls...
 ! and to sends buckets of messages if necessary...
@@ -11,6 +11,7 @@
      $     DATA BUFFER(MAX MAX SIZE OF BUFFER),
      $     BUFINDEX,
      $     SIZE OF RECEIVED BUFFER,
+     $     STRING BUFFSIZE,
      $     BYTE1 BUFFSIZE,
      $     INTEGER2 BUFFSIZE,
      $     INTEGER4 BUFFSIZE,
@@ -52,6 +53,12 @@ ifdef(`_HPFC_NO_BYTE1_',,`
       parameter (BYTE1 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER)
       byte BYTE1 BUFF(BYTE1 MAXBUFFSIZE)
       equivalence (DATA BUFFER, BYTE1 BUFF)')dnl
+
+ifdef(`_HPFC_NO_STRING_',,`
+      integer STRING MAXBUFFSIZE
+      parameter (STRING MAXBUFFSIZE=MAXMAXSIZEOFBUFFER)
+      character STRING BUFF(BYTE1 MAXBUFFSIZE)
+      equivalence (DATA BUFFER, STRING BUFF)')dnl
 
 ifdef(`_HPFC_NO_INTEGER2_',,`
       integer INTEGER2 MAXBUFFSIZE
