@@ -1,4 +1,5 @@
 #include "matrix.h"
+#include "matrice.h"
 
 #define PIP_SOLVE_MIN 0
 #define PIP_SOLVE_MAX 1
