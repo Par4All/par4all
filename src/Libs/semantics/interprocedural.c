@@ -1,7 +1,6 @@
  /* package semantics */
 
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 /* #include <stdlib.h> */
 
