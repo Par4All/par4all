@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.48  1997/07/21 15:24:53  keryell
+ * Forgotten '"'.
+ *
  * Revision 1.47  1997/07/21 15:20:26  keryell
  * Replaced %x format by %p.
  *
@@ -1356,7 +1359,7 @@ list_of_remapping_statements()
     list /* of statements */ l = NIL;
     CONTROLMAP_MAP(s, c,
     {
-	pips_debug(9, %p -> %p\n", s, c);
+	pips_debug(9, "%p -> %p\n", s, c);
 	l = CONS(STATEMENT, s, l);
     },
 		   get_remapping_graph());
