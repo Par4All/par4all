@@ -256,7 +256,7 @@ get_text_cumulated_effects(string module_name)
 
 /* list proper_effects_of_expression(expression e)
  * input    : an expression and the current context
- * output   : the correpsonding list of effects.
+ * output   : the corresponding list of effects.
  * modifies : nothing.
  * comment  :	
  */
@@ -280,6 +280,21 @@ proper_effects_of_expression(expression e)
     {
 	free_effects_private_current_context_stack();
     }
+
+    return(le);
+}
+
+/* Same as above, but with debug control. Used by semantics. */
+list 
+expression_to_proper_effects(expression e)
+{
+    list le;
+
+    debug_on("EFFECTS_DEBUG_LEVEL");
+
+    le = proper_effects_of_expression(e);
+
+    debug_off();
 
     return(le);
 }
