@@ -408,19 +408,12 @@ system_sorted_text_format(
      */
     for(invert = FALSE, stop = FALSE; !stop; )
     {
-	/* , / .AND.
-	 */
-	if (some_previous) add_separation(line, prefix, txt, a_la_fortran);
-	
 	/* == / .EQ.
 	 */
 	some_previous = 
 	    contraintes_text_format(line, prefix, txt, sc_egalites(ps), 
 				    variable_name, invert, put_first,
 				    some_previous, FALSE, a_la_fortran);
-	/* , / .AND.
-	 */
-	if (some_previous) add_separation(line, prefix, txt, a_la_fortran);
 	
 	/* <= / .LE.
 	 */
