@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/12 18:46:03 $, 
+# $Date: 1996/09/13 14:04:20 $, 
 #
 # (c) FC September 1996
 #
@@ -14,6 +14,9 @@ exit $?
 #
 # Wish script
 #
+
+set dirfont -*-courier-*-r-*-*-14-*-*-*-*-*-*-*
+
 # fills the list listbox with directories. links are followed...
 #  - list: the listbox window to be dealt with
 #  - dir: the considered directory
@@ -75,6 +78,7 @@ proc changedir { root currentdir } {
     #
     # the global local variables:-)
     #
+    global dirfont
     global changedir_result changedir_dir changedir_root changedir_home
 
     set changedir_dir  $currentdir
@@ -124,8 +128,8 @@ proc changedir { root currentdir } {
     #
     frame $root.direct
     label $root.direct.lab -text " Directory: "
-    entry $root.direct.entry -width 25 -relief sunken -borderwidth 3 \
-	-textvariable changedir_dir 
+    entry $root.direct.entry -width 30 -relief sunken -borderwidth 3 \
+	-textvariable changedir_dir -font $dirfont
     # <Return> is okay
     bind  $root.direct.entry <Return> {
 	$changedir_root.top.okay invoke
@@ -140,7 +144,7 @@ proc changedir { root currentdir } {
         set d [winfo width $changedir_root.direct]
 	# ??? well, the next formula is not convincing...
 	# it is not sure to be stable if sg is changed...
-	set n [expr ($d-$l-18)/7]
+	set n [expr ($d-$l-18)/9]
 	set w [%W cget -width]
 	if {$n!=$w} {
 	    %W configure -width $n
@@ -157,7 +161,7 @@ proc changedir { root currentdir } {
     #
     frame $root.list
     listbox $root.list.dirs -relief raised -height 15 \
-	-yscrollcommand "$root.list.scroll set"
+	-yscrollcommand "$root.list.scroll set" -font $dirfont
     scrollbar $root.list.scroll -command "$root.list.dirs yview"
     bind $root.list.dirs <Double-1> { 
 	# update dir according to the clicked item
