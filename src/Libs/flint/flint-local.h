@@ -1,0 +1,1 @@
+extern statement flint_current_statement;
