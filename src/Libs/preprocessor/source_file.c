@@ -254,14 +254,23 @@ pips_process_file(string file_name)
 #define CMPLX_RX \
 "^......[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-+0-9eE\\. \t]*,[-+0-9eE\\. \t]*)"
 
+#define CMPLX2_RX \
+"^......[ \t]*\\((\\)[-+0-9eE\\. \t]*,[-+0-9eE\\. \t]*)"
+
 #define DCMPLX_RX \
-"^......[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-+0-9dD\\. \t]*,[-+0-9dD\\. \t]*)"
+    "^......[^\"']*[^a-zA-Z0-9_ \t][ \t]*" \
+    "\\((\\)[-+0-9dDeE\\. \t]*,[-+0-9dDeE\\. \t]*)"
+
+#define DCMPLX2_RX \
+    "^......[ \t]*\\((\\)[-+0-9dDeE\\. \t]*,[-+0-9dDeE\\. \t]*)"
 
 static regex_t 
     implicit_none_rx, 
     include_file_rx,
     complex_cst_rx,
-    dcomplex_cst_rx;
+    complex_cst2_rx,
+    dcomplex_cst_rx,
+    dcomplex_cst2_rx;
 static FILE * output_file;
 
 static void
@@ -289,8 +298,16 @@ handle_complex_constants(string line)
     while (!regexec(&complex_cst_rx, line, 2, matches, 0))
 	insert_at(line, matches[1].rm_so, IMPLIED_COMPLEX_NAME);
 
+    /* implied complex 2 */
+    while (!regexec(&complex_cst2_rx, line, 2, matches, 0))
+	insert_at(line, matches[1].rm_so, IMPLIED_COMPLEX_NAME);
+
     /* implied double complex */
     while (!regexec(&dcomplex_cst_rx, line, 2, matches, 0))
+	insert_at(line, matches[1].rm_so, IMPLIED_DCOMPLEX_NAME);
+
+    /* implied double complex */
+    while (!regexec(&dcomplex_cst2_rx, line, 2, matches, 0))
 	insert_at(line, matches[1].rm_so, IMPLIED_DCOMPLEX_NAME);
 }
 
@@ -391,7 +408,9 @@ init_rx(void)
     if (regcomp(&implicit_none_rx, IMPLICIT_NONE_RX, REG_ICASE) ||
 	regcomp(&include_file_rx, INCLUDE_FILE_RX, REG_ICASE)   ||
 	regcomp(&complex_cst_rx, CMPLX_RX, REG_ICASE)           ||
-	regcomp(&dcomplex_cst_rx, DCMPLX_RX, REG_ICASE))
+	regcomp(&complex_cst2_rx, CMPLX2_RX, REG_ICASE)         ||
+	regcomp(&dcomplex_cst_rx, DCMPLX_RX, REG_ICASE)         ||
+	regcomp(&dcomplex_cst2_rx, DCMPLX2_RX, REG_ICASE))
 	pips_internal_error("invalid regular expression\n");
 }
 
