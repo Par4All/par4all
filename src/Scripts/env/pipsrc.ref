@@ -1,8 +1,10 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1994/03/09 15:56:41 $) version $Revision$, got on %D%, %T%
-# %A%
+# $RCSfile: pipsrc.ref,v $ ($Date: 1994/03/22 09:53:32 $, ) version $Revision$, 
+# got on %D%, %T%
+# $Id$
 #
 
 set -a
+
 # This file is used to set up *environment variables* for Pips.
 # Another set up file (pipsrc.csh) is automaticaly generated from this 
 # one. Thus, you should not do anything else as initializing shell 
@@ -30,7 +32,8 @@ LISP=/usr/local/bin/cl
 NEWGEN_MAX_TABULATED_ELEMENTS=12007
 
 # Pips project sources and binaries
-PIPSDIR="/home/users/pips/Pips"
+PIPSHOME='/home/users/pips'
+PIPSDIR="$PIPSHOME/Pips"
 
 # scripts and programs created to manage the project
 UTILDIR="${PIPSDIR}/Utilities"
