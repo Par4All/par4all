@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/10/04 19:28:48 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/10/05 11:32:33 $, )
  * version $Revision$
  */
 
@@ -60,8 +60,8 @@ io_efficient_compile(
 	
 	pips_debug(3, "array %s\n", entity_name(array));
 	
-	message_assert("avoid replicated array I/O", /* not implemented */
-		       !(array_distributed_p(array) && replicated_p(array)));
+	pips_assert("avoid replicated array I/O", /* not implemented */
+		    !(array_distributed_p(array) && replicated_p(array)));
 	
 	if ((!array_distributed_p(array)) && action_read_p(act)) 
 	{
@@ -153,7 +153,8 @@ generate_io_collect_or_update(
     Psysteme syst = generate_io_system(array, stat, move, act);
     set_information_for_code_optimizations(syst);
 
-    assert(entity_variable_p(array) && syst!=SC_UNDEFINED);
+    pips_assert("variable and syst",
+		entity_variable_p(array) && syst!=SC_UNDEFINED);
 
     if (array_distributed_p(array))
     {
@@ -204,12 +205,12 @@ generate_io_collect_or_update(
 	Psysteme row_echelon = SC_UNDEFINED, condition = SC_UNDEFINED;
 	list tmp = NIL, parameters = NIL, scanners = NIL, rebuild = NIL;
 
-	assert(movement_update_p(move));
+	pips_assert("update", movement_update_p(move));
 
 	put_variables_in_ordered_lists
 	    (&syst, array, &parameters, &tmp, &scanners, &rebuild);
 
-	assert(ENDP(tmp));
+	pips_assert("empty list", ENDP(tmp));
 
 	hpfc_algorithm_row_echelon(syst, scanners, &condition, &row_echelon);
 	hpfc_simplify_condition(&condition, stat, move);
@@ -254,7 +255,7 @@ generate_io_system(
 {
     Psysteme result = SC_UNDEFINED;
 
-    assert(entity_variable_p(array));
+    pips_assert("variable", entity_variable_p(array));
 
     if (array_distributed_p(array))
     {
@@ -301,7 +302,7 @@ generate_shared_io_system(
 	stamme = hpfc_unstutter_dummies(array),
 	contxt = statement_context(stat, move); 
     
-    assert(!array_distributed_p(array));
+    pips_assert("distributed array", !array_distributed_p(array));
 
     result = sc_append(sc_rn(NULL), region);
     result = sc_append(result, a_decl);
@@ -401,7 +402,7 @@ remove_variables_if_possible(
 	    sc_projection_along_variables_with_test_ofl_ctrl
 		(&syst, v, &exact, NO_OFL_CTRL);
 
-	    assert(exact);
+	    pips_assert("exact projection", exact);
 	    vect_rm(v);
 	}
 	else
@@ -534,7 +535,7 @@ clean_distributed_io_system(
     pips_debug(5, "array %s, movement %s\n", entity_local_name(array), 
 	       (movement_collect_p(move))?"collect":"update");
 
-    assert(array_distributed_p(array));
+    pips_assert("distributed array", array_distributed_p(array));
     
     /* THETA_i's
      * PHI_i's
@@ -810,7 +811,7 @@ hpfc_order_variables(
 	gen_nconc(result,
 		  hpfc_order_specific_variables(le, get_ith_local_dummy));
 
-    assert(gen_length(result)==gen_length(le));
+    pips_assert("same length", gen_length(result)==gen_length(le));
     
     return(result);
 }
