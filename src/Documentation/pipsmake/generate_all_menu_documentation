@@ -7,7 +7,7 @@
 #
 # $debug = 8;
 
-$generate_menu_layout == 0;
+$generate_menu_layout = 0;
 if ($ARGV[0] eq "-layout") {
     shift;
     # Used to generate wpips_transform_menu_layout.h
