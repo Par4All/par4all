@@ -259,7 +259,7 @@ struct eformat partial_eval_expression_and_copy(expression expr, Psysteme ps, ef
     ef= partial_eval_expression(expr, ps, fx);
 
     if(eformat_equivalent_p(ef,eformat_undefined)) {
-	ef.expr= gen_copy_tree(expr);
+	ef.expr = copy_expression(expr);
     }
 
     return(ef);
@@ -496,7 +496,7 @@ struct eformat partial_eval_unary_operator(entity func, cons *la, Psysteme ps, e
     expression *sub_ep;
 
     pips_assert("partial_eval_unary_operator", gen_length(la)==1);
-    sub_ep=&EXPRESSION(CAR(la));
+    sub_ep = /*&EXPRESSION(CAR(la));*/ (expression*) REFCAR(la);
 
     if (strcmp(entity_local_name(func), UNARY_MINUS_OPERATOR_NAME) == 0) {
 	ef = partial_eval_expression_and_copy(*sub_ep, ps, fx);
@@ -891,8 +891,8 @@ struct eformat partial_eval_binary_operator(entity func,
 				      effects) = 0;
 
     pips_assert("partial_eval_binary_operator", gen_length(la)==2);
-    ep1= &EXPRESSION(CAR(la));
-    ep2= &EXPRESSION(CAR(CDR(la)));
+    ep1= (expression*) REFCAR(la);
+    ep2= (expression*) REFCAR(CDR(la));
 
     while (binary_operator_switch[i].operator_name!=NULL) {
 	if (strcmp(binary_operator_switch[i].operator_name,
@@ -925,8 +925,8 @@ struct eformat partial_eval_binary_operator_old(entity func,
     int token= -1;
 
     pips_assert("partial_eval_binary_operator", gen_length(la)==2);
-    ep1= &EXPRESSION(CAR(la));
-    ep2= &EXPRESSION(CAR(CDR(la)));
+    ep1= (expression*) REFCAR(la);
+    ep2= (expression*) REFCAR(CDR(la));
 
     if (strcmp(entity_local_name(func), MINUS_OPERATOR_NAME) == 0) {
 	token = PERFORM_SUBTRACTION;
