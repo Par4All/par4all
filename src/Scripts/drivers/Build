@@ -11,7 +11,7 @@ then	echo $USAGE >&2
 	exit 2
 fi
 
-while getopts w:m: opt
+while getopts v:w:m: opt
 do
 	case $opt in
 	v)	VERBOSE=TRUE;;
