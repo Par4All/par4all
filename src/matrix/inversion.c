@@ -30,7 +30,7 @@ Pmatrix inv_u;
 boolean infer;
 {
     int i, j;
-    int x;
+    Value x;
     int n = MATRIX_NB_LINES(u);
     /* test de l'unimodularite et de la trangularite de u */
     assert(matrix_triangular_unimodular_p(u,infer));
@@ -40,15 +40,15 @@ boolean infer;
 	for (i=n; i>=1;i--)
 	    for (j=i-1; j>=1; j--){
 		x = MATRIX_ELEM(u,i,j);
-		if (x != 0)
-		   matrix_subtraction_column(inv_u,j,i,x); 
+		if (value_notzero_p(x))
+		    matrix_subtraction_column(inv_u,j,i,x); 
 	    }
     }
     else{
 	for (i=1; i<=n; i++)
 	    for(j=i+1; j<=n; j++){
 		x = MATRIX_ELEM(u,i,j);
-		if (x != 0)
+		if (value_notzero_p(x))
 		    matrix_subtraction_column(inv_u,j,i,x);
 	    }
     }
@@ -68,14 +68,14 @@ void matrix_diagonal_inversion(s,inv_s)
 Pmatrix s;
 Pmatrix inv_s;
 {
-    int d, d1; 
-    int gcd, lcm;
+    Value d, d1; 
+    Value gcd, lcm;
     int i;
     int n = MATRIX_NB_LINES(s);
     /* tests des preconditions */
     assert(matrix_diagonal_p(s));
     assert(matrix_hermite_rank(s)==n);
-    assert(MATRIX_DENOMINATOR(s)>0);
+    assert(value_pos_p(MATRIX_DENOMINATOR(s)));
 
     matrix_nulle(inv_s);
     /* calcul de la ppcm(s[1,1],s[2,2],...s[n,n]) */
@@ -84,11 +84,13 @@ Pmatrix inv_s;
 	lcm = ppcm(lcm,MATRIX_ELEM(s,i,i));
     
     d = MATRIX_DENOMINATOR(s);
-    gcd = pgcd_slow(lcm,d);
-    d1 = d / gcd;
-    for (i=1; i<=n; i++)
-	MATRIX_ELEM(inv_s,i,i) = d1 * (lcm / MATRIX_ELEM(s,i,i));
-    MATRIX_DENOMINATOR(inv_s) = lcm / gcd;
+    gcd = pgcd(lcm,d);
+    d1 = value_div(d,gcd);
+    for (i=1; i<=n; i++) {
+	Value tmp = value_div(lcm,MATRIX_ELEM(s,i,i));
+	MATRIX_ELEM(inv_s,i,i) = value_mult(d1,tmp);
+    }
+    MATRIX_DENOMINATOR(inv_s) = value_div(lcm,gcd);
 }
     
 /* void matrix_triangular_inversion(Pmatrix h, Pmatrix inv_h,boolean infer)
@@ -111,44 +113,45 @@ Pmatrix h;
 Pmatrix inv_h;
 boolean infer;
 {
-    int deno,deno1;                    /* denominateur */
-    int determinant,sub_determinant;  /* determinant */
-    int gcd;
+    Value deno,deno1;                    /* denominateur */
+    Value determinant,sub_determinant;  /* determinant */
+    Value gcd;
     int i,j;
-    int aij[2];
+    Value aij[2];
     
     /* tests des preconditions */
     int n = MATRIX_NB_LINES(h);
     assert(matrix_triangular_p(h,infer));
     assert(matrix_hermite_rank(h)==n);
-    assert(MATRIX_DENOMINATOR(h)>0);
+    assert(value_pos_p(MATRIX_DENOMINATOR(h)));
 
     matrix_nulle(inv_h);
     deno = MATRIX_DENOMINATOR(h);
     deno1 = deno;
-    MATRIX_DENOMINATOR(h) = 1;
+    MATRIX_DENOMINATOR(h) = VALUE_ONE;
     /* calcul du determinant de h */
-    determinant = 1;
+    determinant = VALUE_ONE;
     for (i= 1; i<=n; i++)
-	determinant *= MATRIX_ELEM(h,i,i);
+	value_prod(determinant, MATRIX_ELEM(h,i,i));
+
     /* calcul du denominateur de inv_h */
-    gcd = pgcd_slow(deno1,determinant);
-    if (gcd !=1){
-	deno1 /= gcd;
-	determinant /= gcd;
+    gcd = pgcd(deno1,determinant);
+    if (value_notone_p(gcd)){
+	value_division(deno1,gcd);
+	value_division(determinant,gcd);
     }
-    if (determinant<0){
-	deno1 *= -1; 
-	determinant *= -1;
+    if (value_neg_p(determinant)){
+	deno1 = value_uminus(deno1); 
+	determinant = value_uminus(determinant);
     }
     MATRIX_DENOMINATOR(inv_h) = determinant;
     /* calcul des sub_determinants des Aii */
     for (i=1; i<=n; i++){
-	sub_determinant = 1;
+	sub_determinant = VALUE_ONE;
 	for (j=1; j<=n; j++)
 	    if (j != i)
-	    sub_determinant *= MATRIX_ELEM(h,j,j);
-	MATRIX_ELEM(inv_h,i,i) = sub_determinant * deno1;
+		value_prod(sub_determinant, MATRIX_ELEM(h,j,j));
+	MATRIX_ELEM(inv_h,i,i) = value_mult(sub_determinant,deno1);
     }
     /* calcul des sub_determinants des Aij (i<j) */
     switch(infer) {
@@ -156,16 +159,16 @@ boolean infer;
 	for (i=1; i<=n; i++)
 	    for(j=i+1; j<=n;j++){
 		matrix_sub_determinant(h,i,j,aij);
-		assert(aij[0] == 1);
-		MATRIX_ELEM(inv_h,j,i) = aij[1] * deno1;
+		assert(value_one_p(aij[0]));
+		MATRIX_ELEM(inv_h,j,i) = value_mult(aij[1],deno1);
 	    }
 	break;
     case FALSE:
 	for (i=1; i<=n; i++)
 	    for(j=1; j<i; j++){
 		matrix_sub_determinant(h,i,j,aij);
-		assert(aij[0] == 1);
-		MATRIX_ELEM(inv_h,j,i) = aij[1] * deno1;
+		assert(value_one_p(aij[0]));
+		MATRIX_ELEM(inv_h,j,i) = value_mult(aij[1],deno1);
 	    }
 	break;
    }
@@ -194,14 +197,14 @@ Pmatrix inv_a;
     Pmatrix h = matrix_new(n,n);
     Pmatrix inv_h = matrix_new(n,n);
     Pmatrix temp = matrix_new(n,n);
-    int deno;
-    int det_p, det_q;			/* ne utilise pas */
+    Value deno;
+    Value det_p, det_q;			/* ne utilise pas */
 
     /* test */
-    assert(MATRIX_DENOMINATOR(a)>0);
+    assert(value_pos_p(MATRIX_DENOMINATOR(a)));
 
     deno = MATRIX_DENOMINATOR(a);
-    MATRIX_DENOMINATOR(a) = 1;
+    MATRIX_DENOMINATOR(a) = VALUE_ONE;
     matrix_hermite(a,p,h,q,&det_p,&det_q);
     MATRIX_DENOMINATOR(a) = deno;
     if ( matrix_hermite_rank(h) == n){
@@ -240,10 +243,10 @@ Pmatrix inv_u;
     Pmatrix h_u = matrix_new(n,n);
     Pmatrix inv_h_u = matrix_new(n,n);
     Pmatrix temp = matrix_new(n,n);
-    int det_p,det_q;  /* ne utilise pas */
+    Value det_p,det_q;  /* ne utilise pas */
    
     /* test */
-    assert(MATRIX_DENOMINATOR(u)==1);
+    assert(value_one_p(MATRIX_DENOMINATOR(u)));
 
     matrix_hermite(u,p,h_u,q,&det_p,&det_q);
     assert(matrix_triangular_unimodular_p(h_u,TRUE));
