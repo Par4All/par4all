@@ -139,7 +139,8 @@ for my $module (sort(sub { $vertex_count{$a} <=> $vertex_count{$b}; },
 }
 
 print "\nEDGE COUNT\n";
-for my $edge (sort({ $edge_count{$a} <=> $edge_count{$b}; }, keys %edge_count))
+for my $edge (sort(sub { $edge_count{$a} <=> $edge_count{$b}; }, 
+                   keys %edge_count))
 {
     print "$edge: $edge_count{$edge}\n";
 }
