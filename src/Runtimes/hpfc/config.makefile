@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/22 15:00:05 $, )
+# ($Date: 1996/08/30 14:29:33 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -10,14 +10,20 @@
 
 # this settings may be edited
 # I prefer to use free gnu compilers...
-USE_GNU=1
+# USE_GNU=1
 
 # additional defs for m4
+
+ifeq ($(FC),g77)
+M4FLAGS	+= -D USE_GNU
+USE_GNU = 1
+endif
+
 M4FLAGS	+= -D DEMO
 M4FLAGS	+= -D DIRECT
-M4FLAGS	+= -D USE_GNU
 # M4FLAGS	+= -D DEBUG
 # M4FLAGS	+= -D USE_PVMe
+
 
 #############################################################################
 
@@ -28,12 +34,12 @@ SCRIPTS =	hpfc_llcmd \
 
 #
 # Default compilers and options
-
-CC		= gcc
-CFLAGS		= -O2 -pipe -ansi -pedantic -Wall
-CPPFLAGS	= -D__USE_FIXED_PROTOTYPES__
-FC 		= f77
-FFLAGS		= -O2 -u
+#
+#CC		= gcc
+#CFLAGS		= -O2 -pipe -ansi -pedantic -Wall
+#CPPFLAGS	= -D__USE_FIXED_PROTOTYPES__
+#FC 		= f77
+#FFLAGS		= -O2 -u
 
 #
 # others
@@ -186,7 +192,7 @@ LIB_HEADERS	= $(CORE_HEADERS) \
 LIB_OBJECTS= $(addprefix $(PVM_ARCH)/, $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
 
 M4_MACROS 	= hpfc_lib_m4_macros hpfc_architecture_m4_macros
-HPFC_MAKEFILES 	= hpfc_Makefile hpfc_Makefile_init 
+HPFC_MAKEFILES 	= hpfc_Makefile_init 
 DOCS		= hpfc_runtime_library.README
 
 #
@@ -203,6 +209,7 @@ SOURCES = 	$(M4_MACROS) \
 		$(SCRIPTS)
 
 LIB_TARGET = $(PVM_ARCH)/libhpfcruntime.a
+MKI_TARGET = $(PVM_ARCH)/compilers.make
 
 # $(LIB_OBJECTS) $(LIB_TARGET): $(PVM_ARCH)
 
@@ -221,7 +228,7 @@ INSTALL_INC =	$(CORE_HEADERS) \
 		$(SCRIPTS) \
 		$(LIB_FFILES)
 
-INSTALL_LIB=	$(LIB_TARGET)
+INSTALL_LIB=	$(LIB_TARGET) $(MKI_TARGET)
 
 #
 # rules
@@ -229,10 +236,13 @@ INSTALL_LIB=	$(LIB_TARGET)
 
 ifeq ($(PVM_ARCH),CM5)
 all: $(CMMD_F77_H) 
+#
+$(CMMD_F77_H):	$(CMMD_INDIR)/cm/$(CMMD_F77_H)
+	$(COPY) $(CMMD_INDIR)/cm/$(CMMD_F77_H) .
 endif
 
 all: $(PVM_ARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
-		$(LIB_OBJECTS) $(LIB_TARGET) 
+		$(LIB_OBJECTS) $(LIB_TARGET) $(MKI_TARGET)
 
 #
 # get pvm headers
@@ -243,13 +253,6 @@ pvm3.h:	$(PVM_INC)/pvm3.h
 
 fpvm3.h:$(PVM_INC)/fpvm3.h
 	$(COPY) $(PVM_INC)/fpvm3.h .
-
-ifeq ($(PVM_ARCH),CM5)
-#
-$(CMMD_F77_H):	$(CMMD_INDIR)/cm/$(CMMD_F77_H)
-	$(COPY) $(CMMD_INDIR)/cm/$(CMMD_F77_H) .
-#
-endif
 
 #
 
@@ -269,6 +272,15 @@ $(PVM_ARCH)/%.o: %.c
 $(PVM_ARCH)/%.o: %.f
 	$(F77COMPILE) $< -o $@
 
+$(PVM_ARCH)/compilers.make:
+	{ echo "FC=$(FC)"; \
+	  echo "FFLAGS=$(FFLAGS)";\
+	  echo "CC=$(CC)";\
+	  echo "CFLAGS=$(CFLAGS)";\
+	  echo "CPPFLAGS=$(CPPFLAGS)";\
+	  echo "USE_GNU=$(USE_GNU)";\
+	  echo "USE_PVMe=$(USE_PVMe)";} > $@
+
 hpfc_includes.h: $(LIB_M4FFILES:.m4f=.h) 
 	#
 	# building $@
@@ -280,7 +292,8 @@ hpfc_includes.h: $(LIB_M4FFILES:.m4f=.h)
 clean: local-clean
 local-clean: 
 	$(RM) *~ $(LIB_OBJECTS) $(PVM_HEADERS) \
-		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) $(LIB_TARGET)
+		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) \
+		$(LIB_TARGET)   $(MKI_TARGET)
 	test ! -d $(PVM_ARCH) || rmdir $(PVM_ARCH)
 
 # that is all
