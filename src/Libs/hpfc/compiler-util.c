@@ -8,7 +8,6 @@
 extern int fprintf();
 
 #include "genC.h"
-#include "hash.h"
 
 #include "ri.h"
 #include "hpf.h"
