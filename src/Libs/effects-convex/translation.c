@@ -1378,7 +1378,7 @@ reference_last_indices_offset(reference ref, int ind, bool *p_linear_p)
     Pvecteur pv_ind = (Pvecteur) NULL;
     Pvecteur pv_ind_plus_1 = VECTEUR_UNDEFINED;
 
-    pips_assert("feasible index\n", 0 < ind && ind <=dim);
+    pips_assert("feasible index", 0 < ind && ind <=dim);
 
     /* offset of the last dimensions beginning at ind + 1 */
     if (ind < dim)
@@ -1388,7 +1388,7 @@ reference_last_indices_offset(reference ref, int ind, bool *p_linear_p)
 	if (!*p_linear_p) return(VECTEUR_UNDEFINED);
     }
     
-    pips_debug(8, "ind = %d, dim = %d\n", ind, dim);
+    pips_debug(8, "ind = %d, dim = %d", ind, dim);
     
     ni = NORMALIZE_EXPRESSION(reference_ith_index(ref, ind));
     nlb = NORMALIZE_EXPRESSION(dimension_lower(dims[ind-1]));
@@ -1466,43 +1466,54 @@ reference_last_indices_offset(reference ref, int ind, bool *p_linear_p)
     return(pv_ind);    
 }
 
-
-
-
-/* on entry, offset != 0 */
+/* on entry, offset != 0
+ * recursive build of a pvecteur.
+ */
 static Pvecteur global_to_last_dims_offset(int dim_min, bool *p_linear_p)
 {
-    Pvecteur pv_offset;
+    Pvecteur pv_offset = VECTEUR_UNDEFINED;
  
+    pips_assert("feasible index", 0 < dim_min && dim_min <=dim_1);
+
     if (dim_min == 1)
-	return(vect_make(VECTEUR_NUL, TCST, offset));
+      return vect_make(VECTEUR_NUL, TCST, offset);
 
     /* here to avoid assert in case of a scalar entity */
-    /* pips_assert("feasible index\n", 0 < dim_min && dim_min <=dim_1);*/
 
     pv_offset = global_to_last_dims_offset(dim_min - 1, p_linear_p);
 
     if (*p_linear_p)
     {
-	normalized nlb = NORMALIZE_EXPRESSION(dimension_lower(dims_1[dim_min-1]));
-	normalized nub = NORMALIZE_EXPRESSION(dimension_upper(dims_1[dim_min-1]));
-	Pvecteur vlb = normalized_linear(nlb);
-	Pvecteur vub = normalized_linear(nub);
+	normalized nlb, nub;
+	Pvecteur vlb, vub;
+
+	nlb = NORMALIZE_EXPRESSION(dimension_lower(dims_1[dim_min-1]));
+	nub = NORMALIZE_EXPRESSION(dimension_upper(dims_1[dim_min-1]));
+	
+	pips_assert("linear expressions", 
+		    normalized_linear_p(nlb) && normalized_linear_p(nub))
+
+	vlb = normalized_linear(nlb);
+	vub = normalized_linear(nub);
 	
 	if (vect_constant_p(vlb) && vect_constant_p(vub))
 	{
-	    Value dim_size = 
-		value_plus(VALUE_ONE, value_minus(vub->val,vlb->val));
-	    pv_offset = vect_div(pv_offset, dim_size);    
+	  Value dim_size = 
+	    value_plus(VALUE_ONE, value_minus(vub->val,vlb->val));
+	  pv_offset = vect_div(pv_offset, dim_size);    
 	}
 	else
 	{
-	    *p_linear_p = FALSE;
+	  *p_linear_p = FALSE;
+	  if (!VECTEUR_UNDEFINED_P(pv_offset))
+	  {
+	    vect_rm(pv_offset);
 	    pv_offset = VECTEUR_UNDEFINED;
-	    if (statistics_p) linearization_stat.non_linear_system++;
+	  }
+	  if (statistics_p) linearization_stat.non_linear_system++;
 	}		
     }
-    return(pv_offset);
+    return pv_offset;
 }
 
 static Pvecteur last_dims_offset(int dim_min, bool *p_linear_p)
@@ -1513,20 +1524,31 @@ static Pvecteur last_dims_offset(int dim_min, bool *p_linear_p)
 
     if(reference_p)
     {		
-	reference ref = reference_undefined_p(ref_1)? ref_2:ref_1;
-	
-	if (reference_indices(ref) != NIL)
-	    pv_offset = reference_last_indices_offset(ref, dim_min, p_linear_p);
+      reference ref = reference_undefined_p(ref_1)? ref_2: ref_1;
+      
+      if (reference_indices(ref) != NIL)
+	pv_offset = reference_last_indices_offset(ref, dim_min, p_linear_p);
     }
     else
     {
-	if (value_notzero_p(offset))
-	    pv_offset = global_to_last_dims_offset(dim_min, p_linear_p);
+      if (value_notzero_p(offset))
+      {
+	/* FC hack around a bug:
+	   this function deal with dims_1[], although dim_min may not be a 
+	   valid index... It is not obvious to guess what is actually expected.
+	 */
+	if (dim_min > dim_1) {
+	  pips_user_warning("tmp hack, fix me please\n!");
+	  *p_linear_p = FALSE;
+	  return VECTEUR_NUL;
+	}
+
+	pv_offset = global_to_last_dims_offset(dim_min, p_linear_p);
+      }
     }
-    return(pv_offset);
+    return pv_offset;
 }
 
-
 /* static Pvecteur array_partial_subscript_value(entity array, int dim_min, dim_max
  *                                               entity (*make_region_entity)(int))
  * input    : an array entity, a dimension, and a function which returns
