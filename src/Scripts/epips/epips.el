@@ -1,6 +1,3 @@
-; To store the EPips minor mode state in a buffer:
-(make-variable-buffer-local 'epips-mode)
-
 ; To store the module name in a buffer:
 (make-variable-buffer-local 'epips-local-module-name)
 
@@ -28,8 +25,11 @@
      (copy-face 'default 'epips-face-parallel-loop)
      (set-face-background 'epips-face-parallel-loop "lemonchiffon")
 
+     (copy-face 'epips-face-user-warning 'epips-face-declaration)
+
      (make-face 'epips-face-reference)
      (set-face-underline-p 'epips-face-reference t)
+     (copy-face 'highlight 'epips-mouse-face-reference)
 
      (copy-face (hilit-lookup-face-create 'black/lightblue)
 		'epips-face-preconditions)
@@ -80,9 +80,10 @@
    `("EPips-[37]" (top - 0) (left . 0) (height . ,epips-frame-height)))
   )
 
-; To print some messages during the epips debugging:
+
 (defun epips-debug (something)
-  ;(print something (current-buffer))
+  "To print some messages during the epips debugging"
+  (print something (get-buffer "*Messages*"))
   )
 
 					; The token to mark the begin
@@ -149,7 +150,7 @@ If no buffer can be found, just return nil."
 					; all the Pips buffers:
       (while do-not-exit-loop
 	(let* (
-	       (a-buffer (get-buffer
+	       (a-buffer (get-buffer-create
 			  (aref epips-buffers
 				epips-new-current-window-number))
 			 )
@@ -439,6 +440,8 @@ epips-command-content contains the name of the file to display."
 					; "Emacs-PIPS-<n>" name
 					; instead of the file name:
 	   (rename-buffer old-buffer-name)
+	   
+	   (epips-initialize-current-buffer-stuff)
 					; No modification yet:
 	   (set-buffer-modified-p nil)
 					; Change the window and icon headers:
@@ -725,15 +728,21 @@ epips-command-content contains the name of the file to display."
   (let
       (
        (old-buffer (current-buffer))
+       (old-window (selected-window))
        (inhibit-quit nil)		; Allow interruption inside the filter
+       ;;(debug-on-error t)
        )
     (unwind-protect
-	(let (moving)
+	(let ((moving)
+	      (old-point))
 					; By default, go to the end of
 					; the buffer controling the
 					; process:
 	  (set-buffer (process-buffer a-process))
-	  (setq moving (= (point) (process-mark a-process)))
+	  ;; To be sure we always insert at the end of the buffer:
+	  (set-marker (process-mark a-process) (point-max))
+	  (setq old-point (point))
+	  (setq moving (= (point) (point-max)))
 	  (save-excursion
 	    (goto-char (process-mark a-process))
 					; Parse the output of wpips to
@@ -745,22 +754,34 @@ epips-command-content contains the name of the file to display."
 		     (setq an-output-string (epips-analyse-output
 					     a-process
 					     an-output-string))
-		     (epips-debug "Return of epips-analyse-output:")
+		
 		     (epips-debug an-output-string)
 					; Until it returns an empty
 					; string:
 		     (not (equal an-output-string ""))))
 
-	    (set-marker (process-mark a-process) (point))
+	    (set-marker (process-mark a-process) (point-max))
 	    )
-	  (if moving (goto-char (process-mark a-process)))
-	  (set-buffer old-buffer)
+	  (if moving
+	      ;; Align the text on the window bottom:
+	      (progn
+		(goto-char (point-max))
+		;; Recenter the Pips-Log window:
+		(select-window (get-buffer-window (current-buffer) t))
+		(recenter -1)
+		)
+	    ;; Else, go back where the user was before:
+	    (goto-char old-point))
 	  )
+      ;; When the unwind-protect exits:
+      (progn
+	(set-buffer old-buffer)
+	(select-window old-window)
+	)
       )
     )
   )
-
-
+  
 ; Here are the functions used to send a command to Pips:
 
 (defun epips-send-a-command-to-pips (command-name &optional command-content)
@@ -869,10 +890,148 @@ such as the preconditions, the regions, etc."
 (define-key epips-keymap [S-down-mouse-3] 'epips-main-menu)
 
 
-(defun epips-add-keymaps-and-menu-in-the-current-buffer ()
-  "This function add the menus and define some keyboard accelerators
- to the current buffer"
-  (use-local-map epips-keymap)
+;;(defun epips-add-keymaps-and-menu-in-the-current-buffer ()
+;;  "This function add the menus and define some keyboard accelerators
+;; to the current buffer"
+;;  (use-local-map epips-keymap)
+;;  )
+
+(defvar epips-reference-keymap (make-sparse-keymap "The PIPS keymap for references")
+  "Keymap active when the mouse is on a reference.")
+
+(define-key epips-reference-keymap [down-mouse-2] 'epips-click-on-a-reference)
+(define-key epips-keymap "\C-C\C-C" 'epips-click-on-a-reference)
+(define-key epips-keymap "\C-C\C-A" 'epips-show-property)
+
+
+
+;;; The property stuff:
+
+
+(defun epips-relative-insert-properties (offset some-properties)
+  "Put some properties relative to offset. Properties are a list of
+\"begin end (property-list)\" like with the #(\"...\" ...) format"
+  (if some-properties
+      (let ((begin (+ (nth 0 some-properties) offset))
+	    (end (+ (nth 1 some-properties) offset))
+	    (properties (nth 2 some-properties)))
+	;; Insert the property list:
+	(add-text-properties begin end properties)
+	;; Deal with the next property set:
+	(epips-relative-insert-properties offset (nthcdr 3 some-properties))
+	)
+    )
+  )
+
+
+(defun epips-insert-with-properties (a-string-with-some-properties)
+  "Insert a string with some properties.
+The properties can merge (that is not the case for read symtax '#(...)').
+The format is
+(\"the string\" b1 e1 p1 b2 e2 b3 ...)"
+  (let ((old-point (point)))
+    (insert (car a-string-with-some-properties))
+    (epips-relative-insert-properties old-point
+                                      (cdr a-string-with-some-properties))
+    )
+  )
+
+
+
+(defun epips-show-property ()
+  "Display the properties"
+  (interactive)
+  (print (text-properties-at (point)) (current-buffer))
+  )
+
+
+(defun epips-look-for-property-with-value (a-property a-value)
+  "Find in the current buffer the first occurrence of a-property
+with the value a-value. Return '(min-pos max-pos) if found, nil else"
+  (catch 'the-success
+    (save-excursion
+      (goto-char (point-min))
+      (while (not (eobp))
+	(let ((next-change
+	       (or (next-single-property-change (point) a-property)
+		   (point-max))))
+	  (epips-debug next-change)
+	  (let ((value-here (get-text-property next-change
+					       a-property)))
+	    (epips-debug value-here)
+	    (if value-here
+		(if (string= value-here a-value)
+		    ;; Give back the position of the correct
+		    ;; property:
+		    (throw 'the-success
+			   (list next-change
+				 (or (next-single-property-change
+				      next-change
+				      a-property)
+				     (point-max))))))
+	    )
+	  (goto-char next-change)
+	  )
+	)
+      ;; If we cannot find the property with the correct value, return
+      ;; nil:
+      nil
+      )
+    )
+  )
+
+  
+
+(defun epips-click-on-a-reference ()
+  "Deal with clicking on a reference"
+  (interactive)
+  ;; First, do as usual
+  ;;(mouse-save-then-kill)
+  (let ((property-reference-variable
+	 (get-text-property (point)
+			    'epips-property-reference-variable)))
+    (if property-reference-variable
+	(let ((property-place (epips-look-for-property-with-value
+			       'epips-property-declaration
+			       property-reference-variable)))
+	  (if property-place
+	      (progn
+		;; Modify the mark to be able to come back later:
+		(push-mark (point) nil nil)
+		(message (substitute-command-keys
+			  "Jumped to \"%s %s\". To go back to the reference, type \\[exchange-point-and-mark]")
+			 ;; Get the type of the variable:
+			 (get-text-property (car property-place)
+					    'epips-property-type)
+			 ;; And its name:
+			 (buffer-substring (car property-place)
+					   (car (cdr property-place))))
+		;; Go to the variable declaration:
+		(goto-char (car property-place)))
+	    (epips-user-warning "Cannot find the declaration here!")
+	    )
+	  )
+      )
+    )
+  )
+
+
+(defun epips-initialize-current-buffer-stuff ()
+  "Initialize mode, local variables, etc."
+  ;; Use the EPips minor mode:
+  (epips-mode 1)
+  ;; To store the module name in a buffer:
+  (make-variable-buffer-local 'epips-local-module-name)
+  ;; Set the active area mouse pointer:
+  (make-variable-buffer-local 'x-sensitive-text-pointer-shape)
+  ;;(setq x-sensitive-text-pointer-shape x-pointer-question-arrow)
+  ;;(setq x-sensitive-text-pointer-shape x-pointer-target)
+  ;;(setq x-sensitive-text-pointer-shape x-pointer-rtl-logo)
+  ;;(setq x-sensitive-text-pointer-shape x-pointer-sizing)
+  (setq x-sensitive-text-pointer-shape x-pointer-hand2)
+  (modify-frame-parameters (selected-frame)
+			   (list (assoc 'mouse-color (frame-parameters (selected-frame))))
+			   )
   )
 
 
@@ -908,8 +1067,10 @@ such as the preconditions, the regions, etc."
   (setq i 0)
   (while (< i epips-buffer-number)
 					; Create each window:
-    (aset epips-buffers i (get-buffer-create
-			   (format "EPips-%d" i)))
+    ;;(aset epips-buffers i (get-buffer-create
+	;;		   (format "EPips-%d" i)))
+    ;; Just create a buffer name. Buffer creation will be dynamic.
+    (aset epips-buffers i (format "EPips-%d" i))
     (setq i (1+ i))
     )		     
   )
@@ -936,8 +1097,14 @@ such as the preconditions, the regions, etc."
 (defun epips-kill-the-buffers ()
   "The function to kill all the EPips buffers"
   (interactive)
-  (mapcar 'kill-buffer (epips-all-the-buffers))
-)
+  (mapcar '(lambda (a-buffer)
+	     ;; Kill a buffer only if it exists:
+	     (if (get-buffer a-buffer)
+		 (kill-buffer a-buffer)
+	       ))
+	  (epips-all-the-buffers)
+	  )
+  )
 
 
 (defun epips-kill-the-local-variables (a-buffer)
@@ -1000,7 +1167,7 @@ for example... :-)
 By the way, EPips assumes the use of hilit19...
 
 Special commands: 
-\\{epips-mode-keymap}
+\\{epips-keymap}
 "
 					; Just to have the function
 					; for the user :
@@ -1024,13 +1191,14 @@ Special commands:
       (
        (process-connection-type nil)	; Use a pipe to communicate
        )
-    (setq epips-process (start-process "WPips" "Pips-Log" "wpips" "-emacs"))
+;;    (setq epips-process (start-process "WPips" "Pips-Log" "wpips" "-emacs"))
+    (setq epips-process (start-process "WPips" "Pips-Log" "/projects/Pips/Development/Lib/ri-util/wpips" "-emacs"))
 					;(goto-char (process-mark epips-process))
     (setq epips-process-buffer (process-buffer epips-process))
     (set-process-filter epips-process 'epips-output-filter)
     (epips-select-and-display-a-buffer epips-process-buffer)
 					; Clean up the environment :
-    (epips-kill-the-local-variables-in-the-buffers)
+    ;; (epips-kill-the-local-variables-in-the-buffers)
 					;(switch-to-buffer
 					; epips-process-buffer) Hum, I
 					; do not know why I need to
@@ -1040,7 +1208,12 @@ Special commands:
 					; buffer>. It used to work, but...
     (goto-char (point-max))
     (set-marker (process-mark epips-process) (point))
-    (epips-add-keymaps-and-menu)
+    ;;    (epips-add-keymaps-and-menu)
+    ;; Enter EPips mode:
+    (save-excursion
+      (set-buffer epips-process-buffer)
+      (epips-mode 1)
+      )
     )
 					; The command loop display the
 					; returned value...
@@ -1059,20 +1232,26 @@ Used by the epips shell script to run EPips as a stand alone Emacs."
   )
 
 
-(defun epips-mode (no-possible-disable-yet)
-  "For EPips acting as a minor mode, add this function.
-But since I cannot see what quitting the minor mode epips means,
-the epips-mode cannot be quited.
+(defun epips-mode (&optional enable)
+  "For EPips acting as a minor mode, add this function mainly to enable
+EPips keymap.
 
 See the documentation about epips with
 \C-h f epips
 
 Special commands: 
-\\{epips-mode-keymap}"
-  (or (assq 'epips-mode minor-mode-alist)
-      (setq minor-mode-alist
-	    (cons '(epips-mode " Pips") minor-mode-alist)))
-  minor-mode-alist
+\\{epips-keymap}"
+  (interactive)
+  ;; To store the EPips minor mode state in a buffer:
+  (make-variable-buffer-local 'epips-mode)
+  ;; Add the EPips minor mode in the minor mode list:
+  (add-to-list 'minor-mode-alist '(epips-mode " EPips"))
+  ;; Add the EPips keymap in the minor mode keymap list:
+  (add-to-list 'minor-mode-map-alist (cons 'epips-mode epips-keymap))
+  ;; Enter Epips minor mode if asked or toggle:
+  (setq epips-mode (if (null enable)
+		       (not epips-mode)
+		     (> (prefix-numeric-value enable) 0)))
   )
 
 
