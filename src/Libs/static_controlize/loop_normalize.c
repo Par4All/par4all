@@ -13,7 +13,6 @@
 
 /* Newgen includes	*/
 #include "genC.h"
-#include "hash.h"
 
 #include "boolean.h"
 #include "arithmetique.h"
