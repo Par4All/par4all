@@ -348,6 +348,36 @@ Variable v_new;
     return v;
 }
 
+/* appends b2 to b1. modifies b1. b2 is not modified.
+ */
+void base_append(Pbase * pb1, Pbase b2)
+{
+  if (BASE_NULLE_P(*pb1))
+    *pb1 = base_dup(b2);
+  else
+  {
+    Pvecteur v;
+    linear_hashtable_pt seen = linear_hashtable_make();
+    for (v=*pb1; v; v=v->succ)
+    {
+      Variable var = var_of(v);
+      if (var!=TCST) linear_hashtable_put_once(seen, var, var);
+    }
+
+    for (v=b2; v; v=v->succ)
+    {
+      Variable var = var_of(v);
+      if (var!=TCST && !linear_hashtable_isin(seen, var))
+      {
+	linear_hashtable_put_once(seen, var, var);
+	*pb1 = vect_chain(*pb1, var, VALUE_ONE);
+      }
+    }
+
+    linear_hashtable_free(seen);
+  }
+}
+
 /* Pbase base_union(Pbase b1, Pbase b2): compute a new basis containing
  * all elements of b1 and all elements of b2, in an unkown order
  *
