@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/08 16:48:13 $, 
+# $Date: 2003/06/13 16:07:14 $, 
 
 # profiling for BC
 # PROFILING=-pg -DNDEBUG -O3
@@ -37,11 +37,11 @@ LIB_OBJECTS= $(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o)
 
 sl_lex.c: sl_lex.l y.tab.h
 	$(SCAN) $< | \
-	sed '/^FILE *\*/s,=[^,;]*,,g;s/YY/SL_/g;s/yy/sl_/g;'  > sl_lex.c
+	sed '/^FILE *\*/s,=[^,;]*,,g;s/YY/SL_/g;s/yy/slx_/g;'  > sl_lex.c
 
 y.tab.h sl_gram.c: sl_gram.y
 	$(PARSE) -d $< 
-	sed 's/YY/SL_/g;s/yy/sl_/g' < y.tab.c > sl_gram.c
+	sed 's/YY/SL_/g;s/yy/slx_/g' < y.tab.c > sl_gram.c
 	$(RM) y.tab.c
 
 # cancel rule
