@@ -27,4 +27,5 @@
 #define CONCAT     84
 #define MINIMUM 85
 #define MAXIMUM 86
-#define CAST 87
+#define CAST_OP 87
+
