@@ -5,7 +5,6 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <setjmp.h>
 
 /*VARARGS0*/
 void dialogue(char* fmt, ...)
