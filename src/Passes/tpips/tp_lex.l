@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.30  1997/12/05 13:29:21  coelho
+ * CAPPLY keyword added.
+ *
  * Revision 1.29  1997/11/27 12:12:59  coelho
  * ; as valid separator.
  *
@@ -91,6 +94,7 @@ static int tpips_lex_input (void)
 <KEY>module		{ KEYWORD(TK_MODULE); }
 <KEY>make		{ KEYWORD(TK_MAKE); }
 <KEY>apply		{ KEYWORD(TK_APPLY); }
+<KEY>capply		{ KEYWORD(TK_CAPPLY); }
 <KEY>display 		{ KEYWORD(TK_DISPLAY); }
 <KEY>activate 		{ KEYWORD(TK_ACTIVATE); }
 <KEY>getproperty	{ KEYWORD(TK_GET_PROPERTY); }
