@@ -8,6 +8,31 @@
 string statement_type_as_string (statement stat);
 
 /**
+ * DEBUG FUNCTION: print debugging informations for
+ * a statement stat
+ */
+void debug_statement (string comments, statement stat, int debug_level);
+
+/**
+ * DEBUG FUNCTION: print debugging informations for
+ * a control a_control
+ */
+void debug_control (string comments, control a_control, int debug_level);
+
+/**
+ * DEBUG FUNCTION: print debugging informations for
+ * an unstructured an_unstructured
+ */
+void debug_unstructured (unstructured an_unstructured, 
+			 int debug_level);
+/**
+ * DEBUG FUNCTION: print debugging informations for
+ * an unstructured an_unstructured (short version)
+ */
+void short_debug_unstructured (unstructured an_unstructured, 
+			       int debug_level);
+
+/**
  * This function build and return an expression given
  * an entity an_entity
  */
@@ -45,4 +70,13 @@ entity make_variable_from_name_and_entity (entity cloned_variable,
 statement make_assignement_statement (entity a_variable,
 				      expression an_expression,
 				      statement stat);
+
+unstructured statement_unstructured (statement stat);
+				     
+/**
+ * Special function made for Ronan Keryell who likes a lot
+ * when a integer number is coded on 3 bits :-)
+ */
+int beautify_ordering (int an_ordering);
+
 #endif
