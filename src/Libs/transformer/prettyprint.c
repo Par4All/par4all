@@ -10,6 +10,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.8  2001/10/22 15:57:34  irigoin
+ * Temporary values taken into account in generic_value_name()
+ *
  * Revision 1.7  2001/07/19 18:06:02  irigoin
  * Better type casting somewhere. Minor change.
  *
@@ -70,4 +73,24 @@ char * pips_user_value_name(entity e)
 	return entity_has_values_p(e)? entity_minimal_name(e) :
 	    external_value_name(e);
     }
+}
+
+char * generic_value_name(entity e)
+{
+  string n = string_undefined;
+
+  if(e == (entity) TCST) {
+    n = "";
+  }
+  else {
+    (void) gen_check((gen_chunk *) e, entity_domain);
+    if(local_temporary_value_entity_p(e)) {
+      n = entity_minimal_name(e);
+    }
+    else {
+      n = entity_has_values_p(e)? entity_minimal_name(e) :
+	external_value_name(e);
+    }
+  }
+  return n;
 }
