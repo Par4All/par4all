@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.26  2003/12/19 10:30:43  guerin
+%% Fixing bad name for smalltalk code resource name in PRINT_CODE_SMALLTALK phase
+%%
 %% Revision 1.25  2003/12/17 17:41:30  guerin
 %% Fixing better locations for PHRASE passes
 %%
@@ -557,7 +560,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/12/17 17:41:30 $~$
+$~$Date: 2003/12/19 10:30:43 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -6578,7 +6581,7 @@ be viewed as a Smalltalk pretty-printer of a subset of Fortran.
 \begin{verbatim}
 alias print_code_smalltalk 'Smalltalk Pretty-Printer'
 
-print_code_smalltalk        > MODULE.smalltalk_code
+print_code_smalltalk        > MODULE.smalltalk_code_file
         < PROGRAM.entities
         < MODULE.code
 \end{verbatim}
