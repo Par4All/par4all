@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.102  1997/11/21 13:33:38  coelho
+ * type fixed.
+ *
  * Revision 1.101  1997/11/21 13:19:23  coelho
  * string property driven prettyprint of parallel code.
  *
@@ -126,7 +129,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.101 1997/11/21 13:19:23 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.102 1997/11/21 13:33:38 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -1167,7 +1170,7 @@ text_loop(
             return(r);
           }
         }
-	if (pp_f90_style_p()) && 
+	if (pp_f90_style_p() && 
 	    instruction_assign_p(statement_instruction(body)) ) {
 	    MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
 	    return(r) ;
