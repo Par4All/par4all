@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/07/23 15:08:20 $, )
+ * ($Date: 1996/08/31 16:45:32 $, )
  */
 
 #include "defines-local.h"
@@ -404,10 +404,6 @@ compile_a_special_io_function(entity module)
     DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, NO_FILE);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, prefix, NO_FILE);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, prefix, NO_FILE);
-
-    /* for callers */
-    store_new_host_variable(module, module);
-    store_new_node_variable(entity_intrinsic(CONTINUE_FUNCTION_NAME), module);
 }
 
 /* simply copied for both host and node... 
@@ -431,10 +427,6 @@ compile_a_pure_function(entity module)
     DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, n_name);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, prefix, NO_FILE);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, prefix, NO_FILE);
-
-    /* for callers */
-    store_new_host_variable(module, module);
-    store_new_node_variable(module, module);
 }
 
 void 
