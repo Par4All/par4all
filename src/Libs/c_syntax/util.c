@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: util.c,v $
+   Revision 1.8  2004/02/18 10:33:07  nguyen
+   Rewrite declarators (parenthese, array and function)
+
    Revision 1.7  2003/12/18 22:41:55  nguyen
    Change FILE_SEP_STRING from % to !
 
@@ -413,10 +416,10 @@ bool long_type_p(type t)
 
 bool bit_type_p(type t)
 {
-  if (type_variable_p(t))
+  if (!type_undefined_p(t) && type_variable_p(t))
     {
       basic b = variable_basic(type_variable(t));
-      if (basic_bit_p(b))
+      if (!basic_undefined_p(b) && basic_bit_p(b))
 	return TRUE;
     }
   return FALSE;
@@ -707,18 +710,22 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
 void UpdateParenEntity(entity e, list lq)
 {
   type t = entity_type(e);
-  if (type_undefined_p(t))
-    t = make_type_variable(make_variable(basic_undefined,list_undefined,lq));
-  else 
+  pips_debug(3,"Update entity in parentheses %s\n",entity_name(e));
+  if (lq != NIL)
     {
-      if (type_variable_p(t))
-	{
-	  variable v = type_variable(t);
-	  variable_qualifiers(v) = gen_nconc(variable_qualifiers(v),lq);
-	}
+      if (type_undefined_p(t))
+	t = make_type_variable(make_variable(basic_undefined,list_undefined,lq));
       else 
 	{
-	  CParserError("Attributes for not variable type\n");
+	  if (type_variable_p(t))
+	    {
+	      variable v = type_variable(t);
+	      variable_qualifiers(v) = gen_nconc(variable_qualifiers(v),lq);
+	    }
+	  else 
+	    {
+	      CParserError("Attributes for not variable type\n");
+	    }
 	}
     }
 }
@@ -751,282 +758,353 @@ dimension MakeDimension(list le)
   return d;
 }
 
-
-void UpdateArrayEntity(entity e, list lq, list le, stack ContextStack, int number_dimensions)
+type UpdateFinalPointer(type pt, type t)
 {
-  type t = entity_type(e);
-  
-  if (!type_undefined_p(t))
-    {
-      /* The variable is partially or totally defined */
-      if (type_variable_p(t))
-	{
-	  variable v = type_variable(t);
-	  int ndims = gen_length(variable_dimensions(v));
-	  if (number_dimensions > ndims)
-	    {
-	      /* The array is not already defined earlier*/
-	      variable_qualifiers(v) = gen_nconc(variable_qualifiers(v),lq);
-	      variable_dimensions(v) = gen_nconc(variable_dimensions(v),CONS(DIMENSION,MakeDimension(le),NIL));
-	    }
-	}
-      else 
-	{
-	  CParserError("Dimension for not variable type\n");
-	}
-    }
-  else 
-    {
-      c_parser_context context = stack_head(ContextStack);
-      type t1 = c_parser_context_type(context);
-      if (type_variable_p(t1))
-	{
-	  basic b = variable_basic(type_variable(t1)); 
-	  entity_type(e) = make_type_variable(make_variable(b,CONS(DIMENSION,MakeDimension(le),NIL),lq));
-	}
-      else
-	{
-	  CParserError("Dimension for not variable type with context\n");
-	}
-    }
-}
-
-void UpdateFinalType(type p, list la)
-{
-  /* This function replaces the type pointed by the current pointer
+  /* This function replaces the type pointed by the pointer pt
      (this can be a pointer of pointer,... so we have to go until the last one)
-     by a functional type (with the list of arguments and the result 
-     type is the pointed type)*/
-  if (type_variable_p(p) && basic_pointer_p(variable_basic(type_variable(p))))
+     by the type t*/
+  pips_debug(3,"Update final pointer type %d and %d\n",type_tag(pt),type_tag(t));
+  if (type_variable_p(pt) && basic_pointer_p(variable_basic(type_variable(pt))))
     {
-      type pp = basic_pointer(variable_basic(type_variable(p)));
-      UpdateFinalType(pp,la);
+      type ppt = basic_pointer(variable_basic(type_variable(pt)));
+      if (type_undefined_p(ppt))
+	return make_type_variable(make_variable(make_basic_pointer(t),NIL,variable_qualifiers(type_variable(pt))));
+      return UpdateFinalPointer(ppt,t);
     }
-  else
-    p = make_type_functional(make_functional(la,copy_type(p)));
+  CParserError("pt is not a pointer\n");
+  return type_undefined;
 }
 
-void UpdateFunctionEntity(entity e, list la, stack ContextStack,
-			  stack FormalStack, stack FunctionStack,
-			  stack OffsetStack, bool is_external)
+void UpdatePointerEntity(entity e, type pt, list lq)
 {
-  c_parser_context context = stack_head(ContextStack);
   type t = entity_type(e);
-
-  /****************INITIAL VALUE ***************************
-
-   Initial value of this entity (a function, a formal function, 
-   a pointer to a function, ...) is always code */
-  if (value_undefined_p(entity_initial(e)))
-    entity_initial(e) = make_value(is_value_code,
-				   make_code(NIL,strdup(""),make_sequence(NIL)));
+  pips_debug(3,"Update pointer entity %s\n",entity_name(e));
   
-  /**************** STORAGE PART ***************************/
-  
-  if (storage_undefined_p(entity_storage(e)))
-    {
-      if (!stack_undefined_p(FormalStack) && !stack_empty_p(FormalStack))
-	{
-	  entity function = stack_head(FunctionStack);
-	  int offset = basic_int((basic) stack_head(OffsetStack));
-	  pips_debug(3,"Create formal storage for function %s\n",entity_name(e));
-	  entity_storage(e) = make_storage_formal(make_formal(function,offset));
-	}
-      else
-	{
-	  if (type_undefined_p(t))
-	    {
-	      pips_debug(3,"Create normal function with storage rom %s\n",entity_name(e));
-	      entity_storage(e) = make_storage_rom();
-	    }
-	  else
-	    {
-	      pips_debug(3,"Create pointer to function with storage ram %s\n",entity_name(e));
-	      entity_storage(e) = MakeStorageRam(e,is_external,c_parser_context_static(context));
-	    }
-	}
-    }
-
-  /**************** TYPE PART ***************************/
-
   if (type_undefined_p(t))
     {
-      /* Make functional type for the entity */
-      type t1 = c_parser_context_type(context);
-      if (type_undefined_p(t1))
-	entity_type(e) = make_type_functional(make_functional(la,make_type_unknown()));
-      else 
-	entity_type(e) = make_type_functional(make_functional(la,t1)); 
+      pips_debug(3,"Undefined type entity\n");
+      entity_type(e) = pt;
+      variable_qualifiers(type_variable(entity_type(e))) = gen_nconc(variable_qualifiers(type_variable(entity_type(e))),lq);
     }
   else
     {
-      if (type_variable_p(t))
+      switch (type_tag(t)) {
+      case is_type_variable:
 	{
-	  /* Only pointer to function is permitted */
+	  /* Make e an array of pointers whose type is this of pt */
 	  variable v = type_variable(t);
-	  basic b = variable_basic(v);
-	  if (basic_pointer_p(b))
-	    UpdateFinalType(basic_pointer(b),la);
-	  else 
-	    CParserError("Function for not basic pointer\n");
+	  pips_debug(3,"Array of pointers\n");
+	  entity_type(e) = make_type_variable(make_variable(variable_basic(type_variable(pt)),
+							    variable_dimensions(v),
+							    gen_nconc(variable_qualifiers(v),lq)));
+	  break;
 	}
+      case is_type_functional:
+	{
+	  /* Make e a function returns a pointer */
+	  functional f = type_functional(t);
+	  pips_debug(3,"Function returns a pointer \n");
+	  entity_type(e) = make_type_functional(make_functional(functional_parameters(f),pt));
+	  break;
+	}
+      default:
+	{
+	  CParserError("Entity is neither an array of pointers nor a pointer to a function?\n");
+	}
+      }
     }
 }
 
-/* This function fills out the undefined fields of an entity*/
-void UpdateEntity(entity e, stack ContextStack, 
-		  stack FormalStack, stack FunctionStack,
-		  stack OffsetStack, bool is_external)
+void UpdateArrayEntity(entity e, list lq, list le)
 {
-  c_parser_context context = stack_head(ContextStack);
-
-  pips_debug(3,"Update entity %s\n",entity_name(e));
-
-  if (type_undefined_p(entity_type(e)))
-    {
-      pips_debug(3,"Type undefined \n");
-      if (!type_undefined_p(c_parser_context_type(context)))
-	{
-	  if (type_variable_p(c_parser_context_type(context)))
-	    {
-	      variable v = type_variable(c_parser_context_type(context)); 
-	      pips_debug(3,"context with basic tag %d\n",basic_tag(variable_basic(v)));
-	      variable_qualifiers(v) = c_parser_context_qualifiers(context);
-	    }
-	  entity_type(e) = c_parser_context_type(context);
-	}
-      else 
-	CParserError("This entity has which type ?\n");
-    }
-
-  if (storage_undefined_p(entity_storage(e)))
-    {
-      if (!storage_undefined_p(c_parser_context_storage(context)))
-	{
-	  pips_debug(3,"Current storage context is %d\n",
-		     storage_tag(c_parser_context_storage(context)));
-	  entity_storage(e) = c_parser_context_storage(context);
-	}
-      else
-	{
-	  if (!stack_undefined_p(FormalStack) && (FormalStack != NULL) && !stack_empty_p(FormalStack))
-	    {
-	      entity function = stack_head(FunctionStack);
-	      int offset = basic_int((basic) stack_head(OffsetStack));
-	      pips_debug(3,"Create formal variable %s for function %s with offset %d\n",
-			 entity_name(e),entity_name(function),offset);
-	      entity_storage(e) = make_storage_formal(make_formal(function,offset));
-	      AddToDeclarations(e,function);
-	    }
-	  else
-	    {
-	      entity_storage(e) = MakeStorageRam(e,is_external,c_parser_context_static(context));
-	    }
-	}
-    }
-  pips_debug(3,"with type tag %d\n",type_tag(entity_type(e)));
-  if (type_variable_p(entity_type(e))) 
-    pips_debug(3,"with basic tag %d\n",basic_tag(variable_basic(type_variable(entity_type(e)))));
-}     
-
-void UpdateParenAbstractType(type t, list lq)
-{
+  type t = entity_type(e);
+  pips_debug(3,"Update array entity %s\n",entity_name(e));
   if (type_undefined_p(t))
-    t = make_type_variable(make_variable(basic_undefined,list_undefined,lq));
+    {
+      pips_debug(3,"First array dimension\n");
+      entity_type(e) = make_type_variable(make_variable(basic_undefined,CONS(DIMENSION,MakeDimension(le),NIL),lq));
+    }
   else 
     {
+      pips_debug(3,"Next array dimension\n");
       if (type_variable_p(t))
 	{
 	  variable v = type_variable(t);
 	  variable_qualifiers(v) = gen_nconc(variable_qualifiers(v),lq);
+	  variable_dimensions(v) = gen_nconc(variable_dimensions(v),CONS(DIMENSION,MakeDimension(le),NIL));
 	}
       else 
 	{
-	  CParserError("Attributes for not variable type\n");
-	}
+	  CParserError("Dimension for not variable type\n");
+	} 
     }
 }
 
-void UpdateArrayAbstractType(type t, list le, stack ContextStack)
+void UpdateFunctionEntity(entity e, list la)
 {
-  c_parser_context context = stack_head(ContextStack);
-  dimension d; 
-  type t1 = c_parser_context_type(context);
-
-  if (le == NIL)
-    {
-      d = make_dimension(int_to_expression(0),make_unbounded_expression());
-      pips_debug(5,"Unbounded dimension\n");
-    }
-  else 
-    {
-      /* Take only the first expression of le, do not know why it can be a list ?*/
-      expression e = EXPRESSION(CAR(le));
-      int up;
-      if (expression_integer_value(e,&up))
-	d = make_dimension(int_to_expression(0),int_to_expression(up-1));
-      else 
-	d = make_dimension(int_to_expression(0),MakeBinaryCall(CreateIntrinsic("-C"),e,
-							       int_to_expression(1)));
-      ifdebug(5) 
-	{
-	  pips_debug(5,"Array dimension:\n");
-	  print_expression(e);
-	}
-    }
-
-  if (type_variable_p(t1))
-    {
-      basic b = variable_basic(type_variable(t1)); 
-      if (type_undefined_p(t))
-	t = make_type_variable(make_variable(b,CONS(DIMENSION,d,NIL),NIL));
-      else 
-	{
-	  if (type_variable_p(t))
-	    {
-	      variable v = type_variable(t);
-	      variable_dimensions(v) = gen_nconc(variable_dimensions(v),CONS(DIMENSION,d,NIL));
-	    }
-	  else 
-	    {
-	      CParserError("Dimension for not variable type\n");
-	    }
-	}
-    }
-  else
-    {
-      CParserError("Dimension for not variable type with context\n");
-    }
-}
-
-
-void UpdateFunctionAbstractType(type t, list la, stack ContextStack)
-{
-  c_parser_context context = stack_head(ContextStack);
-
-  /**************** TYPE PART ***************************/
-
+  type t = entity_type(e);
+  pips_debug(3,"Update function entity %s\n",entity_name(e));
   if (type_undefined_p(t))
+    entity_type(e) = make_type_functional(make_functional(la,type_undefined));
+  else
+    CParserError("This entity must have undefined type\n");
+}
+
+/* This function replaces the undefined field in t1 by t2. 
+   If t1 is an array type and the basic of t1 is undefined, it is replaced by the basic of t2.
+   If t1 is a pointer type, if the pointed type is undefined it is replaced by t2. 
+   If t1 is a functional type, if the result type of t1 is undefined, it is replaced by t2.
+   The function is recursive */
+
+type UpdateType(type t1, type t2)
+{
+  if (type_undefined_p(t1))
+    return t2;
+  switch (type_tag(t1)) 
     {
-      /* Make functional type for the entity */
-      t = make_type_functional(make_functional(la,c_parser_context_type(context))); 
+    case is_type_variable: 
+      {
+	variable v = type_variable(t1);
+	if (basic_undefined_p(variable_basic(v)))
+	  {
+	    if (type_variable_p(t2))
+	      return make_type_variable(make_variable(variable_basic(type_variable(t2)),
+						      variable_dimensions(v),
+						      variable_qualifiers(v)));
+	    CParserError("t1 is a variable type but not t2\n");
+	  }
+	else 
+	  {
+	    /* Basic pointer */
+	    if (basic_pointer_p(variable_basic(v)))
+	      {
+		type pt = basic_pointer(variable_basic(v));
+		return make_type_variable(make_variable(make_basic_pointer(UpdateType(pt,t2)),
+							variable_dimensions(v),
+							variable_qualifiers(v)));
+	      }
+	    CParserError("This basic has which field undefined ?\n");
+	  }
+	break;
+      }
+    case is_type_functional:
+      {
+	functional f = type_functional(t1);
+	if (type_undefined_p(functional_result(f)))
+	  {
+	    if (type_undefined_p(t2))
+	      t2 = make_type_unknown();
+	    return make_type_functional(make_functional(functional_parameters(f),t2));
+	  }
+	return make_type_functional(make_functional(functional_parameters(f),UpdateType(functional_result(f),t2)));
+      }
+    default:
+      {
+	CParserError("t1 has which kind of type?\n");
+      }
+    } 
+  return type_undefined;
+}
+
+void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack FunctionStack,
+		  stack OffsetStack, bool is_external)
+{
+  /* Update the entity with final type, storage, initial value */
+  
+  stack s = (stack) entity_storage(e); 
+  type t = entity_type(e);
+  c_parser_context context = stack_head(ContextStack);
+  type tc = c_parser_context_type(context);
+  type t1,t2;
+
+  /* what about context qualifiers ? */
+  
+  pips_debug(3,"Update entity %s\n",entity_name(e));
+  
+  /************************* TYPE PART *******************************************/
+ 
+  /* Use the type stack in entity_storage to create the final type for the entity*/
+  t2 = UpdateType(t,tc);
+
+  while (stack_size(s) > 1)
+    {
+      t1 = stack_pop(s);
+      t2 = UpdateType(t1,t2);
+    }
+  entity_type(e) = t2;
+   
+  /************************* STORAGE PART *******************************************/
+
+  if (!storage_undefined_p(c_parser_context_storage(context)))
+    {
+      pips_debug(3,"Current storage context is %d\n",
+		 storage_tag(c_parser_context_storage(context)));
+      entity_storage(e) = c_parser_context_storage(context);
     }
   else
     {
-      if (type_variable_p(t))
+      if (!stack_undefined_p(FormalStack) && (FormalStack != NULL) && !stack_empty_p(FormalStack))
 	{
-	  /* Only pointer to function is permitted */
-	  variable v = type_variable(t);
-	  basic b = variable_basic(v);
-	  if (basic_pointer_p(b))
-	    UpdateFinalType(basic_pointer(b),la);
-	  else 
-	    CParserError("Abstract function for not basic pointer\n");
+	  entity function = stack_head(FunctionStack);
+	  int offset = basic_int((basic) stack_head(OffsetStack));
+	  pips_debug(3,"Create formal variable %s for function %s with offset %d\n",
+		     entity_name(e),entity_name(function),offset);
+	  AddToDeclarations(e,function);
+	  entity_storage(e) = make_storage_formal(make_formal(function,offset));
 	}
       else
-	CParserError("Abstract function for not variable type\n");
+	{
+	  entity_storage(e) = MakeStorageRam(e,is_external,c_parser_context_static(context));
+	}
+    }
+  
+  pips_assert("Current entity is consistent",entity_consistent_p(e));
+}
+
+
+void UpdateEntities(list le, stack ContextStack, stack FormalStack, stack FunctionStack,
+		    stack OffsetStack, bool is_external)
+{
+  MAP(ENTITY, e,
+  {
+    UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
+  },le);
+}
+
+
+/******************* ABSTRACT TYPE DECLARATION ***************************/
+
+void UpdateAbstractEntity(entity e, stack ContextStack)
+{
+  /* Update the entity with final type, storage */
+ 
+  stack s = (stack) entity_storage(e); 
+  type t = entity_type(e);
+  c_parser_context context = stack_head(ContextStack);
+  type tc = c_parser_context_type(context);
+  type t1,t2;
+
+  /* what about context qualifiers ? */
+  
+  pips_debug(3,"Update abstract entity %s\n",entity_name(e));
+  
+  /************************* TYPE PART *******************************************/
+ 
+  /* Use the type stack in entity_storage to create the final type for the entity*/
+  t2 = UpdateType(t,tc);
+
+  while (stack_size(s) > 1)
+    {
+      t1 = stack_pop(s);
+      t2 = UpdateType(t1,t2);
+    }
+  entity_type(e) = t2;
+   
+  /************************* STORAGE PART *******************************************/
+  
+  entity_storage(e) = storage_undefined;
+}
+
+
+bool entity_in_list_p(entity e, list le)
+{
+  MAP(ENTITY, f, if (e==f) return TRUE, le);
+  return FALSE;
+}
+
+void AddToDeclarations(entity e, entity mod)
+{
+  if (!gen_in_list_p(e,code_declarations(value_code(entity_initial(mod)))))
+    {
+      pips_debug(5,"Add entity %s to module %s\n",entity_user_name(e),entity_user_name(mod));
+      code_declarations(value_code(entity_initial(mod))) = gen_nconc(code_declarations(value_code(entity_initial(mod))),
+								     CONS(ENTITY,e,NIL));
     }
 }
+/************************* STRUCT/UNION ENTITY*********************/
+
+void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
+{
+  /* Update the derived entity with final type and rom storage. 
+     If the entity has bit type, do not need to update its type*/
+  type t = entity_type(e);
+  pips_debug(3,"Update derived entity %s\n",entity_name(e));
+  if (!bit_type_p(t))
+    {
+      stack s = (stack) entity_storage(e); 
+      c_parser_context context = stack_head(ContextStack);
+      type tc = c_parser_context_type(context);
+      type t1,t2;
+      
+      /* what about context qualifiers ? */
+      t2 = UpdateType(t,tc);
+      
+      while (stack_size(s) > 1)
+	{
+	  t1 = stack_pop(s);
+	  t2 = UpdateType(t1,t2);
+	}
+      entity_type(e) = t2;
+    }
+  entity_storage(e) = make_storage_rom(); 
+  
+  /* Temporally put the list of struct/union entities defined in decl_psec_list to 
+     initial value of ent*/
+  entity_initial(e) = (value) ld;
+  
+}
+
+list TakeDeriveEntities(list le)
+{
+  list lres = NIL;
+  MAP(ENTITY, e, 
+  {
+    list ltmp = (list) entity_initial(e);
+    if (ltmp != NIL)
+      lres = gen_nconc(lres,ltmp);
+    entity_initial(e) = value_undefined;
+  },le);
+  return lres;
+}
+
+void UpdateDerivedEntities(list ld, list le, stack ContextStack)
+{
+  MAP(ENTITY, e,
+  {
+    UpdateDerivedEntity(ld,e,ContextStack);
+  },le);
+
+} 
+entity MakeDerivedEntity(string name, list members, bool is_external, int i)
+{
+  entity ent;  
+  switch (i) {
+  case is_type_struct: 
+    {
+      ent = CreateEntityFromLocalNameAndPrefix(name,STRUCT_PREFIX,is_external);	
+      entity_type(ent) = make_type_struct(members);
+      break;
+    }
+  case is_type_union: 
+    {
+      ent = CreateEntityFromLocalNameAndPrefix(name,UNION_PREFIX,is_external);	
+      entity_type(ent) = make_type_union(members);
+      break;
+    }
+  case is_type_enum:
+    {
+      ent = CreateEntityFromLocalNameAndPrefix(name,ENUM_PREFIX,is_external);	
+      entity_type(ent) = make_type_enum(members);
+      break;
+    }
+  }
+  entity_storage(ent) = make_storage_rom();
+
+  return ent;
+}
+
+/*******************  MISC *******************/
+
 
 storage MakeStorageRam(entity e, bool is_external, bool is_static)
 {
@@ -1075,51 +1153,6 @@ storage MakeStorageRam(entity e, bool is_external, bool is_static)
   return make_storage_ram(r);
 }
 
-bool entity_in_list_p(entity e, list le)
-{
-  MAP(ENTITY, f, if (e==f) return TRUE, le);
-  return FALSE;
-}
-
-void AddToDeclarations(entity e, entity mod)
-{
-  if (!gen_in_list_p(e,code_declarations(value_code(entity_initial(mod)))))
-    {
-      pips_debug(5,"Add entity %s to module %s\n",entity_user_name(e),entity_user_name(mod));
-      code_declarations(value_code(entity_initial(mod))) = gen_nconc(code_declarations(value_code(entity_initial(mod))),
-								     CONS(ENTITY,e,NIL));
-    }
-}
-
-entity MakeDerivedEntity(string name, list members, bool is_external, int i)
-{
-  entity ent;  
-  switch (i) {
-  case is_type_struct: 
-    {
-      ent = CreateEntityFromLocalNameAndPrefix(name,STRUCT_PREFIX,is_external);	
-      entity_type(ent) = make_type_struct(members);
-      break;
-    }
-  case is_type_union: 
-    {
-      ent = CreateEntityFromLocalNameAndPrefix(name,UNION_PREFIX,is_external);	
-      entity_type(ent) = make_type_union(members);
-      break;
-    }
-  case is_type_enum:
-    {
-      ent = CreateEntityFromLocalNameAndPrefix(name,ENUM_PREFIX,is_external);	
-      entity_type(ent) = make_type_enum(members);
-      break;
-    }
-  }
-  entity_storage(ent) = make_storage_rom();
-  return ent;
-}
-
-/*******************  MISC *******************/
-
 string CreateMemberScope(string derived, bool is_external)
 {
   /* We have to know the context : 
@@ -1155,6 +1188,7 @@ string CreateMemberScope(string derived, bool is_external)
 string list_to_string(list l)
 {
   string result = NULL;
+  if (l==NIL) return "";
   MAP(STRING,s, 
   {
     if (result==NULL)
@@ -1206,7 +1240,7 @@ int ComputeAreaOffset(entity a, entity v)
   return offset;
 }
 
-list MakeParameterList(list l1, list l2)
+list MakeParameterList(list l1, list l2, stack FunctionStack)
 {
   /* l1 is a list of parameter names and it represents the exact order in the parameter list
      l2 is a list of entities with their type, storage,... and the order can be different from l1
@@ -1219,19 +1253,22 @@ list MakeParameterList(list l1, list l2)
      Since the offset of formal argument in l2 can be false, we have to update it here by using l1 */
   list l = NIL;
   int offset = 1;
+  entity function = stack_head(FunctionStack);
   MAP(STRING, s,
   {
     parameter p = FindParameterEntity(s,offset,l2);
     if (parameter_undefined_p(p))
       {
-	/* s is not declared in l2, create the corresponding entity/ formal variable */
-	entity ent = FindOrCreateEntity(get_current_module_name(),s);
+	/* s is not declared in l2, create the corresponding entity/ formal variable
+	 and add it to the declaration list, because it cannot be added with par_def in l2*/
+	entity ent = FindOrCreateEntity(entity_user_name(function),s);
 	variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
 	entity_type(ent) = make_type_variable(v);
-	entity_storage(ent) = make_storage_formal(make_formal(get_current_module_entity(),offset));
+	entity_storage(ent) = make_storage_formal(make_formal(function,offset));
+	AddToDeclarations(ent,function);
 	p = make_parameter(entity_type(ent),make_mode_reference());
       }
-    l = CONS(PARAMETER,p,l);
+    l = gen_nconc(l,CONS(PARAMETER,p,NIL));
     offset++;
   },l1);
   return l;
@@ -1288,6 +1325,8 @@ void AddToCalledModules(entity e)
 	}
     }
 }
+
+/******************** STACK *******************************/
 
 /* Pop n times the stack s*/
 void NStackPop(stack s, int n)
