@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/06/06 18:26:19 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/06/15 19:15:29 $, )
  * version $Revision$
  */
  
@@ -21,9 +21,7 @@ GENERIC_GLOBAL_FUNCTION(hpf_reductions, statement_entities)
 GENERIC_STATIC_STATUS(static, the_commons, list, NIL, gen_free_list)
 
 void add_a_common(entity c)
-{
-    the_commons = gen_once(c, the_commons);
-}
+{ the_commons_object = gen_once(c, the_commons_object);}
 
 static void compile_common(entity c)
 {
@@ -37,30 +35,22 @@ static void compile_common(entity c)
 GENERIC_STATIC_STATUS(static, the_pures, list, NIL, gen_free_list)
 
 void add_a_pure(entity f)
-{
-    the_pures = gen_once(f, the_pures);
-}
+{ the_pures_object = gen_once(f, the_pures_object);}
 
 /* ??? some intrinsics should also be considered as pure. all of them ?
  */
 bool hpf_pure_p(entity f)
-{
-    return gen_in_list_p(f, the_pures);
-}
+{ return gen_in_list_p(f, the_pures_object);}
 
 /********************************************************************** IOS */
 
 GENERIC_STATIC_STATUS(static, the_ios, list, NIL, gen_free_list)
 
 void add_an_io_function(entity f)
-{
-    the_ios = gen_once(f, the_ios);
-}
+{ the_ios_object = gen_once(f, the_ios_object);}
 
 bool hpfc_special_io(entity f)
-{
-    return gen_in_list_p(f, the_ios);
-}
+{ return gen_in_list_p(f, the_ios_object);}
 
 /*************************************************************** REMAPPINGS */
 
@@ -92,9 +82,9 @@ add_remapping_as_computed(
     renaming r,                /* old -> new remapping */
     list /* of entity */ vars) /* variables to be declared */
 {
-    computed_remaps = CONS(REMAPPING, 
+    computed_remaps_object = CONS(REMAPPING, 
         make_remapping(copy_renaming(r), gen_copy_seq(vars)),
-			   computed_remaps);
+			   computed_remaps_object);
 }
 
 /***************************************************** ENTITIES IN INCLUDES */
@@ -121,7 +111,8 @@ add_remapping_as_used(renaming x)
 
     pips_assert("defined remapping", !remapping_undefined_p(p));
 
-    MAP(ENTITY, e, include_entities = gen_once(e, include_entities), 
+    MAP(ENTITY, e, 
+	include_entities_object = gen_once(e, include_entities_object), 
 	remapping_referenced(p));
 }
 
