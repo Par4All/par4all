@@ -1,17 +1,17 @@
-/* 	%A% ($Date: 1997/09/13 16:13:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/*
+ * $Id$
+ * 
+ * package semantics - prettyprint interface 
+ */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/09/13 16:13:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "$Id$";
 #endif /* lint */
-
- /* package semantics - prettyprint interface */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
-/* #include <stdlib.h> */
-
 
 #include "genC.h"
 
@@ -42,6 +42,9 @@ char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/09/13 16:13:00 $, ) versio
 #define TRAN_FORESYS_PREFIX "C$TRAN"
 #define FORESYS_CONTINUATION_PREFIX "C$&"
 #define PIPS_NORMAL_PREFIX "C"
+
+#define LINE_SUFFIX "\n"
+#define MAX_LINE_LENGTH 70
 
 DEFINE_CURRENT_MAPPING(semantic, transformer)
 
@@ -306,57 +309,7 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 	    strcmp(pips_user_value_name((entity) vecteur_var(*pvarval1)),
 		   pips_user_value_name((entity) vecteur_var(*pvarval2)));
 
-
     return is_equal; 
-}
-
-
-#define LINE_SUFFIX "\n"
-/* standard value: 70 */
-#define MAX_LINE_LENGTH 70
-
-/* add_to_current_line core dumps for long transformers
- * Maybe the coder assumed that no transformer would ever be
- * longer than 60 characters. FI, 6 June 1997
- *
- * #define MAX_LINE_LENGTH 200
- */
-
-
-boolean 
-add_to_current_line(crt_line, add_string, str_prefix, txt, first_line)
-string crt_line, add_string, str_prefix;
-text txt;
-boolean first_line;
-{
-    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-    
-    if(strlen(crt_line) + strlen(add_string) > MAX_LINE_LENGTH-2)
-    {
-	(void) strcat(crt_line, LINE_SUFFIX);
-	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-						strdup(crt_line)));
-	
-	if(first_line)
-	{
-	    first_line = FALSE;
-	    if(foresys)
-	    {
-		str_prefix = strdup(str_prefix);
-		str_prefix[0] = '\0';
-		(void) strcat(str_prefix, FORESYS_CONTINUATION_PREFIX);
-	    }
-	}
-	
-	crt_line[0] = '\0'; 
-	(void) strcat(crt_line, str_prefix); 
-	(void) strcat(crt_line, "    ");
-	if(strlen(crt_line) + strlen(add_string) > MAX_LINE_LENGTH-2)
-	    pips_error("text_transformer", "line buffer too small");
-    }
-    (void) strcat(crt_line, add_string);
-    
-  return(first_line);
 }
 
 /* text text_transformer(transformer tran) 
@@ -427,7 +380,7 @@ text_transformer(transformer tran)
 	  else
 	      (void) strcat(aux_line, " P(");
 	  if(strlen(crt_line) + strlen(aux_line) > MAX_LINE_LENGTH - 2)
-	      pips_error("text_transformer", "line buffer too small");
+	      pips_error("text_transformer", "line buffer too small\n");
 	  
 	  (void) strcat(crt_line, aux_line);
 	  
@@ -437,7 +390,6 @@ text_transformer(transformer tran)
 	  if(!ENDP(args))
 	  {
 	      provi = (char **) malloc(sizeof(char *) * gen_length(args));
-		  
 	      j = 0;
 	      MAP(ENTITY, e,
 		   {
@@ -447,9 +399,7 @@ text_transformer(transformer tran)
 			   provi[j] = (char*) "entity_undefined";
 		       }
 		       else
-		       {
 			   provi[j] = (char*) entity_minimal_name(e); 
-		       }
 		       j++;
 		   },
 		       args);
@@ -497,8 +447,6 @@ text_transformer(transformer tran)
 	      (void) strcat(crt_line, LINE_SUFFIX);
 	      ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
 						      strdup(crt_line)));
-	      
-	      
 	      if(first_line) {
 		  first_line = FALSE;
 		  if(foresys) {
@@ -534,6 +482,7 @@ text_transformer(transformer tran)
 
 	      for (peq = ps->egalites, j=1; peq!=NULL; peq=peq->succ, j=j+1)
 	      {
+		
 		  last_constraint = ((peq->succ == NULL) &&
 				     (ps->inegalites == NULL));
 		  aux_line[0] = '\0';
@@ -549,21 +498,24 @@ text_transformer(transformer tran)
 		  else
 		  {
 		      if(first_constraint)
-		      {
-			  (void) strcat(aux_line, "{");
+		      {  
+			  first_line = add_to_current_line(crt_line,"{", 
+							   str_prefix,txt,first_line);
 			  first_constraint = FALSE;
 		      }
-		      (void) egalite_sprint_format(aux_line, peq,
-						   pips_user_value_name, foresys);
+		      egalite_text_format(crt_line,str_prefix,txt,peq,
+					  pips_user_value_name, foresys,
+					  first_line);
+
 		      if(! last_constraint)
-			  (void) strcat(aux_line, ", ");
+			  first_line = add_to_current_line(crt_line,", ", 
+							   str_prefix,txt,first_line);
 		      else
-			  (void) strcat(aux_line, "}");
+			  first_line = add_to_current_line(crt_line,"}", 
+							   str_prefix,txt,first_line);
 		  }
 		  
-		  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
-						   txt, first_line);
-
+		 
 		  ifdebug(7){
 		      pips_debug(7, "%d-th equality\n current txt: \n", j);
 		      dump_text(txt);
@@ -588,20 +540,23 @@ text_transformer(transformer tran)
 		  else {
 		      if(first_constraint)
 		      {
-			  (void) strcat(aux_line, "{");
-			  first_constraint = FALSE;
-		      }
-		      (void) inegalite_sprint_format(aux_line, peq,
-						     pips_user_value_name, foresys);
-		      if(! last_constraint)
-			  (void) strcat(aux_line, ", ");
-		      else
-			  (void) strcat(aux_line, "}");
-		  }
-		  
-		  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+			  first_line = add_to_current_line(crt_line,"{", str_prefix,
 						   txt, first_line);
 
+			  first_constraint = FALSE;
+		      }
+		     
+		      inegalite_text_format(crt_line,str_prefix,txt,peq,
+					    pips_user_value_name, foresys,
+					    first_line);
+		      if(! last_constraint)
+			 first_line = add_to_current_line(crt_line,", ", str_prefix,
+						   txt, first_line);
+		      else
+			 first_line = add_to_current_line(crt_line,"}", str_prefix,
+						   txt, first_line);
+		  }
+		  
 		  ifdebug(7){
 		      pips_debug(7, "%d-th inequality\n current txt: \n", j);
 		      dump_text(txt);
@@ -611,19 +566,15 @@ text_transformer(transformer tran)
 	      /* If there is no constraint */
 	      if((ps->egalites == NULL) && (ps->inegalites == NULL))
 	      {
-		  aux_line[0] = '\0';
-		  (void) strcat(aux_line, "{}");
-		  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+		 
+		  first_line = add_to_current_line(crt_line,"{}", str_prefix,
 					   txt, first_line);
 	      }
 	  }
 	  else
-	  {
-	      aux_line[0] = '\0';
-	      (void) strcat(aux_line, "SC_UNDEFINED");
-	      first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+	      first_line = add_to_current_line(crt_line, "SC_UNDEFINED", str_prefix,
 					       txt, first_line);
-	  }
+	  
       }
       
       /* Save last line */
@@ -792,3 +743,295 @@ string comment_prefix;
     return(sent_pred);
 }
 
+
+
+
+void 
+constante_to_textline(
+    char * operation_line,
+    Value constante,
+    boolean is_inegalite, 
+    boolean a_la_fortran)
+{
+    operation_line[0]='\0';
+    (void) sprint_operator(operation_line+strlen(operation_line), 
+			   is_inegalite, a_la_fortran);
+    (void) sprint_Value(operation_line+strlen(operation_line), 
+			constante);
+}
+
+
+void
+signed_operation_to_textline(
+char * operation_line,
+char signe,
+Value coeff,
+Variable var,
+char * (*variable_name)(Variable))
+{
+   
+    (void) sprintf(operation_line+strlen(operation_line),"%c",signe);
+    unsigned_operation_to_textline(operation_line,coeff,var,variable_name);
+
+}
+void
+unsigned_operation_to_textline(
+char * operation_line,
+Value coeff,
+Variable var,
+char * (*variable_name)(Variable))
+{
+    if (value_notone_p(ABS(coeff)) || var==TCST)
+	(void) sprint_Value(operation_line+strlen(operation_line), coeff);
+    (void) sprintf(operation_line+strlen(operation_line),"%s", 
+		   variable_name(var));
+
+}
+
+
+static char * 
+contrainte_to_text_1(
+string aux_line,
+string str_prefix,
+text txt,
+Pvecteur v,
+boolean is_inegalite,
+char * (*variable_name)(Variable),
+boolean a_la_fortran,
+boolean first_line
+)
+{
+    short int debut = 1;
+    Value constante = VALUE_ZERO;
+    char operation_line[MAX_LINE_LENGTH];
+	
+    while (!VECTEUR_NUL_P(v)) {
+	Variable var = var_of(v);
+	Value coeff = val_of(v);
+	operation_line[0]='\0';
+
+	if (var!=TCST) {
+	    char signe;
+
+	    if (value_notzero_p(coeff)) {
+		if (value_pos_p(coeff))
+		    signe =  '+';
+		else {
+		    signe = '-';
+		    coeff = value_uminus(coeff);
+		};
+		if (value_pos_p(coeff) && debut)
+		    unsigned_operation_to_textline(operation_line,coeff,var,
+						   variable_name);
+		else 
+		    signed_operation_to_textline(operation_line,signe,coeff,
+						 var, variable_name);
+		debut = 0;
+	    }
+	    first_line = add_to_current_line(aux_line,operation_line,
+					     str_prefix,txt,first_line);
+	}
+	else
+	    /* on admet plusieurs occurences du terme constant!?! */
+	    value_addto(constante, coeff);
+
+	v = v->succ;
+    }
+    constante_to_textline(operation_line,value_uminus(constante),is_inegalite,
+			  a_la_fortran);
+    first_line = add_to_current_line(aux_line, operation_line,
+				     str_prefix,txt,first_line);
+    return aux_line;
+}
+
+
+static char * 
+contrainte_to_text_2(
+string aux_line,
+string str_prefix,
+text txt,
+Pvecteur v,
+boolean is_inegalite,
+char * (*variable_name)(Variable),
+boolean a_la_fortran,
+boolean first_line
+)
+{
+    Pvecteur coord;
+    short int debut = TRUE;
+    int positive_terms = 0;
+    int negative_terms = 0;
+    Value const_coeff = 0;
+    boolean const_coeff_p = FALSE;
+    char signe;
+    char operation_line[MAX_LINE_LENGTH];
+   
+    if(!is_inegalite) {
+	for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
+	    if(vecteur_var(coord)!= TCST) 
+		(value_pos_p(vecteur_val(coord))) ? 
+		    positive_terms++ :  negative_terms++;   
+	}
+
+	if(negative_terms > positive_terms) 
+	    vect_chg_sgn(v);
+    }
+
+    positive_terms = 0;
+    negative_terms = 0;
+
+    for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
+	Value coeff = vecteur_val(coord);
+	Variable var = vecteur_var(coord);
+	operation_line[0]='\0';
+
+	if (value_pos_p(coeff)) {
+	    positive_terms++;
+	     if(!term_cst(coord)|| is_inegalite) {
+		 signe =  '+';
+		 if (debut)
+		     unsigned_operation_to_textline(operation_line,coeff,var,
+				       variable_name);
+		 else 
+		     signed_operation_to_textline(operation_line,signe,
+						  coeff,var,variable_name);
+		 debut=FALSE;
+
+	    }
+	     else  positive_terms--;
+	       
+	     first_line = add_to_current_line(aux_line,operation_line,
+					     str_prefix,txt,first_line);
+	}
+    }
+
+    operation_line[0]='\0';
+    if(positive_terms == 0) 	
+	(void) sprintf(operation_line+strlen(operation_line), "0"); 
+    
+    (void) sprint_operator(operation_line+strlen(operation_line), 
+			   is_inegalite, a_la_fortran);
+    
+    first_line = add_to_current_line(aux_line,operation_line,
+					     str_prefix,txt,first_line);
+
+    debut = TRUE;
+    for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
+	Value coeff = vecteur_val(coord);
+	Variable var = var_of(coord);
+	operation_line[0]='\0';
+
+	if(term_cst(coord) && !is_inegalite) {
+	    /* Save the constant term for future use */
+	    const_coeff_p = TRUE;
+	    const_coeff = coeff;
+	    /* And now, a lie... In fact, rhs_terms++ */
+	    negative_terms++;
+	}
+	else if (value_neg_p(coeff)) {
+	    negative_terms++;
+	    signe = '+';
+	    if (debut) {
+		unsigned_operation_to_textline(operation_line, 
+					       value_uminus(coeff),var,
+					       variable_name);
+		debut=FALSE;
+	    }
+	    else 
+		signed_operation_to_textline(operation_line,signe,
+					     value_uminus(coeff),var,
+					     variable_name);
+	    
+	}
+	first_line = add_to_current_line(aux_line, operation_line,
+					 str_prefix,txt,first_line); 
+    }
+    operation_line[0]='\0';
+    if(negative_terms == 0) {
+	(void) sprintf(operation_line+strlen(operation_line), "0"); 
+        first_line = add_to_current_line(aux_line,operation_line,
+					     str_prefix,txt,first_line);
+    }
+      else if(const_coeff_p) {
+	assert(value_notzero_p(const_coeff));
+	
+	if  (!debut && value_neg_p(const_coeff))
+	    (void) sprintf(operation_line+strlen(operation_line), "+"); 
+	(void) sprint_Value(operation_line+strlen(operation_line), 
+			    value_uminus(const_coeff));
+
+	first_line = add_to_current_line(aux_line,operation_line,
+					 str_prefix,txt,first_line);
+    }
+   
+
+    return aux_line;
+}
+
+
+char * 
+contrainte_text_format(
+char * aux_line,
+char * str_prefix,
+text txt,
+Pcontrainte c,
+boolean is_inegalite,
+char * (*variable_name)(Variable),
+boolean a_la_fortran,
+boolean first_line
+)
+{
+    Pvecteur v;
+    int heuristique = 2;
+
+    if (!CONTRAINTE_UNDEFINED_P(c))
+	v = contrainte_vecteur(c);
+    else
+	v = VECTEUR_NUL;
+
+    assert(vect_check(v));
+
+    switch(heuristique) {
+    case 1: aux_line = contrainte_to_text_1(aux_line,str_prefix,txt,
+					    v,is_inegalite, variable_name, 
+					    a_la_fortran, first_line);
+	break;
+    case 2:aux_line = contrainte_to_text_2(aux_line,str_prefix,txt,v,
+					   is_inegalite, variable_name, 
+					    a_la_fortran, first_line);
+	
+	break;
+    default: contrainte_error("contrainte_sprint", "unknown heuristics\n");
+    }
+
+    return aux_line;
+}
+
+char  * 
+egalite_text_format(aux_line,str_prefix,txt,eg,variable_name,
+		    a_la_fortran,first_line)
+char *aux_line;
+char * str_prefix;
+text txt;
+Pcontrainte eg;
+char * (*variable_name)();
+boolean  a_la_fortran, first_line;
+{
+    return contrainte_text_format(aux_line,str_prefix,txt,eg,FALSE,
+				  variable_name,a_la_fortran,first_line);
+}
+
+char * 
+inegalite_text_format(
+char *aux_line,
+char * str_prefix,
+text txt,
+Pcontrainte ineg,
+char * (*variable_name)(),
+boolean a_la_fortran,
+boolean first_line
+)
+{
+    return contrainte_text_format(aux_line,str_prefix,txt,ineg,TRUE, 
+				  variable_name,a_la_fortran,first_line);
+}
