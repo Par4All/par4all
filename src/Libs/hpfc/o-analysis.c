@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: o-analysis.c,v $
+ * Revision 1.39  1997/05/03 11:48:58  coelho
+ * *** empty log message ***
+ *
  * Revision 1.38  1997/04/17 18:48:30  coelho
  * hash_put warnings--
  *
@@ -892,12 +895,11 @@ statement stat, *pstat;
     lloop = NIL;
     innerbody = parallel_loop_nest_to_body(stat, &lblocks, &lloop);
 
-    FindRefToDistArrayInStatement(innerbody, &lw, &lr);
+    FindRefToDistArrayInStatement(stat, &lw, &lr);
 
     /* keeps only written references of which dimensions are block distributed,
      * and indices simple enough (=> normalization of loops may be usefull).
      * ??? bug: should also search for A(i,i) things that are forbidden...
-     * ??? what if no dist vars are written??? 
      */
     MAP(SYNTAX, s,
     {
@@ -920,9 +922,8 @@ statement stat, *pstat;
 	the_computer_reference = syntax_reference(the_computer_syntax);
 	Wa = CONS(SYNTAX, the_computer_syntax, NIL);
     }
-    else
+    else  /* must chose the computer among read references! */
     {
-	/* must chose the computer among read references! */
 	computer_is_written = FALSE;
 
 	MAP(SYNTAX, s,
