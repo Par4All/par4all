@@ -776,7 +776,7 @@ process_user_file(string file)
     fd = safe_fopen(file_list, "r");
     while ((file_name=safe_readline(fd))) 
     {
-	string mod_name, res_name, abs_res, abs_file;
+	string mod_name, res_name, abs_res;
 
 	success_p = TRUE;
 	number_of_modules++;
