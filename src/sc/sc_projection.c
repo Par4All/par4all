@@ -375,21 +375,24 @@ int ofl_ctrl;
   
     pr = NULL;
     current_eq = sc->egalites;
-    while(current_eq != NULL) {
-	
-	/* eq must be removed from the list of equalities of sc */
-	if(current_eq == eq) 
-	    if (pr == NULL){ /* eq is at the head of the list */
-		sc->egalites = current_eq = current_eq->succ;
-	    }
-	    else
-		pr->succ = current_eq = current_eq->succ;
-	
-	else {
-	    
-	    switch (contrainte_subst_ofl_ctrl(v, eq, current_eq, TRUE, ofl_ctrl)) {
-		
-	    case 0 : 
+    while(current_eq != NULL) 
+    {
+      /* eq must be removed from the list of equalities of sc */
+      if(current_eq == eq) 
+      {
+	if (pr == NULL){ /* eq is at the head of the list */
+	  sc->egalites = current_eq = current_eq->succ;
+	}
+	else
+	{
+	  pr->succ = current_eq = current_eq->succ;
+	}
+      }
+      else 
+      {
+	switch (contrainte_subst_ofl_ctrl(v, eq, current_eq, TRUE, ofl_ctrl)) 
+	{
+	case 0 : 
 		/* the substitution found that the system is not feasible */
 		sc_rm(sc);
 		sc = sc_empty(b_dup);
@@ -397,8 +400,8 @@ int ofl_ctrl;
 		return(sc); 
 		break;
 
-	    case -1 : { 
-		/* the substitution created a trivial equation (0==0)
+	case -1 : { 
+	  /* the substitution created a trivial equation (0==0)
 		 * which must be eliminated */
 		Pcontrainte pc = current_eq;
 		if (pr == NULL)
@@ -408,14 +411,14 @@ int ofl_ctrl;
 		contrainte_free(pc);
 		pc = NULL;
 		break;
-	    }
-
-	    case 1 :
-		pr = current_eq;
-		current_eq = current_eq->succ;
-		break;
-	    }
 	}
+	
+	case 1 :
+	  pr = current_eq;
+	  current_eq = current_eq->succ;
+	  break;
+	}
+      }
     }
 
     pr = NULL;
@@ -872,7 +875,7 @@ Variable v;
     if (!var_in_lcontrainte_p(sc->egalites,v) 
 	 &&  sc->nb_ineq > NB_CONSTRAINTS_MAX_FOR_FM) {
 	Pcontrainte ineg;
-	int nb_pvar, nb_nvar =0;
+	int nb_pvar = 0, nb_nvar = 0;
 	for (ineg=sc->inegalites;!CONTRAINTE_UNDEFINED_P(ineg);
 	     ineg=ineg->succ) {
 	    int coeff= vect_coeff(v,ineg->vecteur);
