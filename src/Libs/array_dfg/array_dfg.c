@@ -32,10 +32,14 @@
 
 /* Pips includes 	*/
 #include "database.h"
+
+#include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
 #include "graph.h"
 #include "ri.h"
 #include "paf_ri.h"
-#include "dg.h"
 #include "ri-util.h"
 #include "constants.h"
 #include "misc.h"
@@ -56,8 +60,6 @@
 
 /* Local defines */
 #define NEXT(cp) (((cp) == NIL) ? NIL : (cp)->cdr)
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
 
 /* Global variables */
 extern			hash_table	Gvertex_number_to_statement;
