@@ -40,6 +40,34 @@
 #define VALUE_TO_IRINT(val) (val)
 #define IRINT_TO_VALUE(i) (i)
 
+static void my_Matrix_Free(Matrix ** m)
+{
+  ifscdebug(9) {
+    fprintf(stderr, "[my_Matrix_Free] in %p\n", *m);
+  }
+
+  Matrix_Free(*m);
+  *m = NULL;
+
+  ifscdebug(9) {
+    fprintf(stderr, "[my_Matrix_Free] out %p\n", *m);
+  }
+}
+
+static void my_Polyhedron_Free(Polyhedron ** p)
+{
+  ifscdebug(9) {
+    fprintf(stderr, "[my_Polyhedron_Free] in %p\n", *p);
+  }
+
+  Polyhedron_Free(*p);
+  *p = NULL;
+
+  ifscdebug(9) {
+    fprintf(stderr, "[my_Polyhedron_Free] out %p\n", *p);
+  }  
+}
+
 /* Fonctions de conversion traduisant une ligne de la structure 
  * Matrix de l'IRISA en un Pvecteur
  */
@@ -388,8 +416,8 @@ Ptsg  sc_to_sg_chernikova(Psysteme sc)
 
     CATCH(any_exception_error)
     {
-      if (A) Polyhedron_Free(A);
-      if (a) Matrix_Free(a);
+      if (A) my_Polyhedron_Free(&A);
+      if (a) my_Matrix_Free(&a);
       if (sg) sg_rm(sg);
 
       RETHROW();
@@ -406,10 +434,10 @@ Ptsg  sc_to_sg_chernikova(Psysteme sc)
       sc_to_matrix(sc,a);
       
       A = Constraints2Polyhedron(a, MAX_NB_RAYS);
-      Matrix_Free(a), a = NULL;
+      my_Matrix_Free(&a);
       
       polyhedron_to_sg(A,sg);
-      Polyhedron_Free(A), A = NULL;
+      my_Polyhedron_Free(&A);
     } /* end TRY */
 
     UNCATCH(any_exception_error);
@@ -431,8 +459,8 @@ Psysteme sg_to_sc_chernikova(Ptsg sg)
     CATCH(any_exception_error)
     {
       if (sc) sc_rm(sc);
-      if (a) Matrix_Free(a);
-      if (A) Polyhedron_Free(A);
+      if (a) my_Matrix_Free(&a);
+      if (A) my_Polyhedron_Free(&A);
 
       RETHROW();
     }
@@ -449,14 +477,16 @@ Psysteme sg_to_sc_chernikova(Ptsg sg)
 	sg_to_polyhedron(sg,a);	 
    
 	A = Rays2Polyhedron(a, MAX_NB_RAYS);
-	Matrix_Free(a), a = NULL;
+	my_Matrix_Free(&a); 
 
-	a= Polyhedron2Constraints(A);
-	Polyhedron_Free(A), A = NULL;
+	a = Polyhedron2Constraints(A);
+	my_Polyhedron_Free(&A);
 
 	matrix_to_sc(a,sc);
-	Matrix_Free(a), a = NULL;
+	my_Matrix_Free(&a);
+
 	sc=sc_normalize(sc);
+
 	if (sc == NULL) {
 	    Pcontrainte pc = contrainte_make(vect_new(TCST, VALUE_ONE));
 	    sc = sc_make(pc, CONTRAINTE_UNDEFINED);
@@ -492,12 +522,12 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 
     CATCH(any_exception_error)
     {
-      if (a) Matrix_Free(a);
-      if (a1) Matrix_Free(a1);
-      if (a2) Matrix_Free(a2);
-      if (A) Polyhedron_Free(A);
-      if (A1) Polyhedron_Free(A1);
-      if (A2) Polyhedron_Free(A2);
+      if (a) my_Matrix_Free(&a);
+      if (a1) my_Matrix_Free(&a1);
+      if (a2) my_Matrix_Free(&a2);
+      if (A) my_Polyhedron_Free(&A);
+      if (A1) my_Polyhedron_Free(&A1);
+      if (A2) my_Polyhedron_Free(&A2);
       if (sc) sc_rm(sc);
       
       RETHROW();
@@ -537,14 +567,14 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     }
 
     A1 = Constraints2Polyhedron(a1, MAX_NB_RAYS);
-    Matrix_Free(a1), a1 = NULL; 
+    my_Matrix_Free(&a1); 
     A2 = Constraints2Polyhedron(a2, MAX_NB_RAYS);
-    Matrix_Free(a2), a2 = NULL;
+    my_Matrix_Free(&a2);
 
     ifscdebug(8) {
-	fprintf(stderr, "[sc_convex_hull]\nA1 =");
+	fprintf(stderr, "[sc_convex_hull]\nA1 (%p %p)=", A1, a1);
 	Polyhedron_Print(stderr, "%4d",A1);
-	fprintf(stderr, "\nA2 =");
+	fprintf(stderr, "\nA2 (%p %p) =", A2, a2);
 	Polyhedron_Print(stderr, "%4d",A2);
     }
     
@@ -613,18 +643,18 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	    cp++;  i2++;
 	}
   
-	Polyhedron_Free(A1), A1 = NULL;
-	Polyhedron_Free(A2), A2 = NULL;
+	my_Polyhedron_Free(&A1);
+	my_Polyhedron_Free(&A2);
 	
 	A = Rays2Polyhedron(a, MAX_NB_RAYS);
-	Matrix_Free(a), a = NULL;
+	my_Matrix_Free(&a);
 
 	a = Polyhedron2Constraints(A);    
-	Polyhedron_Free(A), A = NULL;
+	my_Polyhedron_Free(A);
     }
 
     matrix_to_sc(a,sc);
-    Matrix_Free(a), a = NULL;
+    my_Matrix_Free(&a);
 
     sc = sc_normalize(sc);
 
