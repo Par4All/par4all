@@ -1987,7 +1987,7 @@ write_tabulated_leaf_in(
 int
 gen_write_tabulated(FILE * fd, int domain)
 {
-    int index =  Domains[ domain ].index, i, size;
+    int index =  Domains[ domain ].index, i, size, wdomain;
     gen_chunk *fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof( gen_chunk ),
 				0, 
 				Tabulated_bp-Domains,
@@ -2012,7 +2012,8 @@ gen_write_tabulated(FILE * fd, int domain)
 
     push_gen_trav_env() ;
     shared_pointers( fake_obj, FALSE ) ;
-    fputi(domain, fd);
+    wdomain = gen_type_translation_actual_to_old(domain);
+    fputi(wdomain, fd);
     fputi(size, fd);
     fputi(shared_number, fd);
     gen_trav_obj( fake_obj, &dr ) ;
@@ -2184,24 +2185,28 @@ static gtt_p gtt_read(string filename)
   /* quick check for identity */
   for (i=0, same=TRUE; i<MAX_DOMAIN && same; i++)
   {
-    same = items[i].number!=-1 && items[i].name && 
-      same_string_p(Domains[i].name, items[i].name) && 
-      (Domains[i].index==items[i].number);
+    if (items[i].number!=-1 && items[i].name)
+      same = same_string_p(Domains[i].name, items[i].name) && 
+	(items[i].number==i);
   }
 
   /* identical stuff, ok! */
   if (same) 
   {
+    /* fprintf(stderr, "same table...\n"); */
     gtt_table_identity(table);
     return table;
   }
+  /* else fprintf(stderr, "not same at %d: '%s':%d vs '%s':%d\n", 
+     i, items[i].name, items[i].number, Domains[i].name, i); */
 
   fprintf(stderr, "warning: newgen compatibility mode\n");
   gtt_table_init(table);
 
   /* ELSE build conversion table...
+   * order is reversed so that dubbed externals are given the least number.
    */
-  for (i=0; i<MAX_DOMAIN; i++)
+  for (i=MAX_DOMAIN-1; i>=0; i--)
   {
     if (items[i].name && items[i].number!=-1)
     {
@@ -2236,13 +2241,13 @@ static gtt_p gtt_read(string filename)
   }
 
   /* debug */
+  /*
   fprintf(stderr, "type translation table:\n");
   for (i=0; i<MAX_DOMAIN; i++) 
-  {
     fprintf(stderr, "%s %d <- %d\n",
 	    Domains[i].name? Domains[i].name: "<null>",
 	    i, table->actual_to_old[i]);
-  }
+  */
 
   return table;
 }
@@ -2257,7 +2262,7 @@ static void gtt_write(string filename, gtt_p table)
 
   for (i=0; i<MAX_DOMAIN; i++)
     if (table->actual_to_old[i]!=-1 && Domains[i].name)
-      fprintf(file, "%s %d *\n", Domains[i].name, table->actual_to_old[i]);
+      fprintf(file, "%s\t%d\t*\n", Domains[i].name, table->actual_to_old[i]);
   
   fclose(file);
 }
@@ -2476,20 +2481,22 @@ int gen_read_tabulated(FILE * file, int create_p)
     extern int allow_forward_ref ;
 
     newgen_start_lexer(file);
-    if( (i=genread_lex()) != READ_INT ) {
-	user( "Incorrect data for gen_read_tabulated: %d\n", i ) ;
-	exit( 1 ) ;
-    }
-    domain = genread_lval.val ;
 
-    if( (i=genread_lex()) != READ_INT ) {
-	user( "Incorrect second data for gen_read_tabulated: %d\n", i ) ;
-	exit( 1 ) ;
+    if ((i=genread_lex()) != READ_INT ) {
+	user("Incorrect data for gen_read_tabulated: %d\n", i);
+	exit(1);
     }
 
-    max = genread_lval.val ;
+    domain = gen_type_translation_old_to_actual(genread_lval.val);
 
-    if( max > max_tabulated_elements()) {
+    if ((i=genread_lex()) != READ_INT) {
+	user("Incorrect second data for gen_read_tabulated: %d\n", i);
+	exit(1);
+    }
+
+    max = genread_lval.val;
+
+    if (max > max_tabulated_elements()) {
 	/* the file was created with more elements, maybe... */
 	user("Current limit (%d) can be redefined by setting environment "
 	     "variable NEWGEN_MAX_TABULATED_ELEMENTS\n",
@@ -2497,24 +2504,25 @@ int gen_read_tabulated(FILE * file, int create_p)
 	exit(1);
     }
 
-    if( create_p ) {
-	if( Gen_tabulated_[ index = Domains[ domain ].index ] == NULL ) {
+    if (create_p) {
+	if( Gen_tabulated_[ index = Domains[domain].index ] == NULL ) {
 	    user( "gen_read_tabulated: Trying to read untabulated domain %s\n",
-		  Domains[ domain ].name ) ;
+		  Domains[domain].name);
 	}
-	Domains[ domain ].alloc = 1 ;
+	Domains[domain].alloc = 1 ;
 
 	for( i = 0 ; i < max_tabulated_elements() ; i++ ) {
 	    (Gen_tabulated_[ index ]+i)->p = gen_chunk_undefined ;
 	}
     }
-    allow_forward_ref = TRUE ;
-    genread_parse() ;
-    allow_forward_ref = FALSE ;
+    allow_forward_ref = TRUE;
+    genread_parse();
+    allow_forward_ref = FALSE;
 
     newgen_free((char *) ((Read_chunk+1)->p) ) ;
     newgen_free((char *) Read_chunk ) ;
-    return( domain ) ;
+
+    return domain;
 }
 
 int
