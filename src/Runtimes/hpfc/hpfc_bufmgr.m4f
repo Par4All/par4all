@@ -2,6 +2,9 @@
 ! $Id$
 !
 ! $Log: hpfc_bufmgr.m4f,v $
+! Revision 1.17  1997/05/30 09:14:56  zory
+! more debug messages
+!
 ! Revision 1.16  1997/05/29 16:11:11  coelho
 ! *** empty log message ***
 !
@@ -72,18 +75,20 @@ fake_buffers(dnl
       integer info, length, tag, tid
       include "hpfc_commons.h"
       include "hpfc_includes.h"
-      if (RECEIVED NOT PERFORMED.or.lid.eq.0) then
-         debug(write (unit=0, fmt=*) 
-     $        "RCV from ", lid, RECVCHANNELS(lid))
+      debug(print *, MYLID, " [hpfc bufupk] in ", RECEIVED NOT PERFORMED)
+      if (RECEIVED NOT PERFORMED) then
+         debug(print *, "RCV from ", lid, RECVCHANNELS(lid))
          call HPFC RECEIVE(NODETIDS(lid), RECVCHANNELS(lid), BUFFER ID)
          RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
          RECEIVED NOT PERFORMED = .FALSE.
-         debug(write (unit=0, fmt=*) "RCV done")
+         debug(print *, "RCV done")
       endif
+      debug(print *,"hpfc bufupk",MYLID,"before message info") 
       call HPFC MESSAGE INFO(BUFFER ID, length, tag, tid, info)
       SIZEOFRECEIVEDBUFFER = length / M4_PVM_LENGTH(PVMTYPE)
       call HPFC UNPACK(PVMTYPE, build_name(PVMTYPE,BUFF),
      $     SIZEOFRECEIVEDBUFFER, 1, info)
+      debug(print *,MYLID, " [hpfc bufupk] done")
       end
 popdef(`PVMTYPE')')dnl
 define(`GENERIC_BUFFER',`
