@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/05 18:22:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/08 12:47:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/05 18:22:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/09/08 12:47:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -894,7 +894,7 @@ output_a_graph_view_of_the_unstructured_successors(text r,
                                      PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER,
                                      (unsigned int) c);
 
-   if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH")) {
+   if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE")) {
       add_one_unformated_printf_to_text(r, "C Unstructured node %#x ->",
                                         (unsigned int) c);
       MAP(CONTROL, a_successor,
