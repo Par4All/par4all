@@ -98,7 +98,7 @@ Pmonome pm;
     else {
 	Ppolynome pp = new_polynome();
 	polynome_monome(pp) = pm;
-	polynome_succ(pp) = NIL;
+	polynome_succ(pp) = POLYNOME_NUL;
 	return (pp);
     }
 }
@@ -151,7 +151,7 @@ Ppolynome *ppp;
     Ppolynome pp1 = *ppp, pp2;
 
     if (!POLYNOME_UNDEFINED_P(*ppp)) {
-	while (pp1 != NIL) {
+	while (pp1 != POLYNOME_NUL) {
 	    pp2 = polynome_succ(pp1);
 	    monome_rm(&polynome_monome(pp1));
 	    free((char *) pp1);               /* correct? */
@@ -172,7 +172,7 @@ Ppolynome pp;
     Ppolynome pp1 = pp, pp2;
 
     if (!POLYNOME_UNDEFINED_P(pp)) {
-	while (pp1 != NIL) {
+	while (pp1 != POLYNOME_NUL) {
 	    pp2 = polynome_succ(pp1);
 	    monome_rm(&polynome_monome(pp1));
 	    free((char *) pp1);               /* correct? */
@@ -198,7 +198,7 @@ Ppolynome pp;
     else {
 	ppdup = monome_to_new_polynome(monome_dup(polynome_monome(pp)));
 	curpp = ppdup;
-	while ((pp = polynome_succ(pp)) != NIL) {
+	while ((pp = polynome_succ(pp)) != POLYNOME_NUL) {
 	    polynome_succ(curpp) =
 		monome_to_new_polynome(monome_dup(polynome_monome(pp)));
 	    curpp = polynome_succ(curpp);
