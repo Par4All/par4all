@@ -1433,3 +1433,164 @@ unstructured_does_return(unstructured u)
   bool returns = TRUE;
   return returns;
 }
+
+
+/* Insert some statements at the very beginning of another statement: */
+void
+insert_a_statement_list_in_a_statement(statement target,
+				       list s_list)
+{
+    if (statement_block_p(target)) {
+	sequence seq = instruction_sequence(statement_instruction(target));
+	sequence_statements(seq) = gen_nconc(s_list, sequence_statements(seq));
+    }
+    else {
+	statement new_statement = make_stmt_of_instr(statement_instruction(target));
+	/* Create the new statement sequence with s_list first: */
+	statement_instruction(target) =
+	    make_instruction_block(gen_nconc(s_list, CONS(STATEMENT,
+							  new_statement,
+							  NIL)));
+	statement_label(new_statement) = statement_label(target);
+	statement_label(target) = entity_empty_label();
+	statement_number(new_statement) = statement_number(target);
+	statement_number(target) = STATEMENT_NUMBER_UNDEFINED;
+	statement_ordering(target) = STATEMENT_ORDERING_UNDEFINED;
+	statement_comments(new_statement) = statement_comments(target);
+	statement_comments(target) = string_undefined;
+    }
+}
+
+
+/* Insert some statements at the very beginning of another statement: */
+void
+append_a_statement_list_to_a_statement(statement target,
+				       list s_list)
+{
+    if (statement_block_p(target)) {
+	sequence seq = instruction_sequence(statement_instruction(target));
+	sequence_statements(seq) = gen_nconc(sequence_statements(seq), s_list);
+    }
+    else {
+	statement new_statement = make_stmt_of_instr(statement_instruction(target));
+	/* Create the new statement sequence with s_list first: */
+	statement_instruction(target) =
+	    make_instruction_block(CONS(STATEMENT,
+					new_statement,
+					s_list));
+	statement_label(new_statement) = statement_label(target);
+	statement_label(target) = entity_empty_label();
+	statement_number(new_statement) = statement_number(target);
+	statement_number(target) = STATEMENT_NUMBER_UNDEFINED;
+	statement_ordering(target) = STATEMENT_ORDERING_UNDEFINED;
+	statement_comments(new_statement) = statement_comments(target);
+	statement_comments(target) = string_undefined;
+    }
+}
+
+
+static list gather_and_remove_all_format_statements_list;
+
+
+void
+gather_and_remove_all_format_statements_rewrite(statement s)
+{
+    instruction i = statement_instruction(s);
+    if (instruction_format_p(i)) {
+	/* Put the instruction with the statement attributes in
+           new_format. */
+	statement new_format = make_stmt_of_instr(i);
+	statement_label(new_format) = statement_label(s);
+	statement_number(new_format) = statement_number(s);
+	statement_comments(new_format) = statement_comments(s);
+	/* Replace the old FORMAT with a NOP: */
+	statement_instruction(s) = make_instruction_block(NIL);
+	statement_label(s) = entity_empty_label();
+	statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+	statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
+	statement_comments(s) = empty_comments;
+
+	gather_and_remove_all_format_statements_list = CONS(STATEMENT,
+							    new_format,
+							    gather_and_remove_all_format_statements_list);
+    }
+}
+
+
+/* Used to keep aside the FORMAT before many code transformation that
+   could remove them either. It just return a list of all the FORMAT
+   statement and replace them with NOP. */
+list
+gather_and_remove_all_format_statements(statement s)
+{
+    gather_and_remove_all_format_statements_list = NIL;
+    
+    gen_recurse(s, statement_domain,
+		gen_true,
+		gather_and_remove_all_format_statements_rewrite);
+    
+    gather_and_remove_all_format_statements_list =
+	gen_nreverse(gather_and_remove_all_format_statements_list);
+    
+    return gather_and_remove_all_format_statements_list;
+}
+
+
+/* Transfer all the FORMATs at the very beginning of a module: */
+void
+put_formats_at_module_beginning(statement s)
+{
+    /* Pick up all the FORMATs of the module: */
+    list formats = gather_and_remove_all_format_statements(s);
+    ifdebug (1)
+	pips_assert("Incorrect statements...", gen_consistent_p(s));
+    /* And put them at the very beginning of the module: */
+    insert_a_statement_list_in_a_statement(s, formats);
+    ifdebug (1)
+	pips_assert("Incorrect statements...", gen_consistent_p(s));
+}
+
+
+/* Transfer all the FORMATs at the very end of a module: */
+void
+put_formats_at_module_end(statement s)
+{
+    /* Pick up all the FORMATs of the module: */
+    list formats = gather_and_remove_all_format_statements(s);
+    ifdebug (1)
+	pips_assert("Incorrect statements...", gen_consistent_p(s));
+    /* And put them at the very beginning of the module: */
+    append_a_statement_list_to_a_statement(s, formats);
+    ifdebug (1)
+	pips_assert("Incorrect statements...", gen_consistent_p(s));
+}
+
+
+static bool format_inside_statement_has_been_found;
+
+
+bool
+figure_out_if_it_is_a_format(instruction i)
+{
+    if (instruction_format_p(i)) {
+	format_inside_statement_has_been_found = TRUE;
+	/* Useless to go on further: */
+	gen_recurse_stop(NULL);
+	return FALSE;
+    }
+    return TRUE;
+}
+
+
+/* Return TRUE only if there is a FORMAT inside the statement: */
+bool
+format_inside_statement_p(statement s)
+{
+    format_inside_statement_has_been_found = FALSE;
+    
+    gen_recurse(s, instruction_domain,
+		figure_out_if_it_is_a_format,
+		gen_null);
+
+    return format_inside_statement_has_been_found;
+}
