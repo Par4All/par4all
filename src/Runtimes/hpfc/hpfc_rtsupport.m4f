@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1996/09/07 16:32:59 $, )
+! ($Date: 1996/09/07 16:39:33 $, )
 !
 !-----------------
 !
@@ -108,9 +108,9 @@
 !
 !-----------------
 !
-! HPFC CMPLID
+! HPFC COMPLID
 !
-      integer function HPFC CMPLID(pn, p1, p2, p3, p4, p5, p6, p7)
+      integer function HPFC COMPLID(pn, p1, p2, p3, p4, p5, p6, p7)
       integer pn, p1, p2, p3, p4, p5, p6, p7
       include "hpfc_commons.h"
       integer lid, indp(7)
@@ -122,7 +122,7 @@
       indp(6)=p6
       indp(7)=p7
       call HPFC PROCLID(indp, pn, lid, .FALSE.)
-      HPFC CMPLID=lid
+      HPFC COMPLID=lid
       end
 !
 !-----------------
