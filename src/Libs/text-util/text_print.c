@@ -4,11 +4,12 @@
 #include <string.h>
 
 #include "genC.h"
-/* #include "ri.h" */
+#include "ri.h"
 #include "text.h"
 
 #include "misc.h"
-/* #include "ri-util.h" */
+#include "ri-util.h"
+#include "properties.h"
 
 #include "arithmetique.h"
 
@@ -18,6 +19,43 @@
 /* FI: just to make sure that text.h is built; pips-makemake -l does not
    tale into account a library whose modules do not use the library header */
 #include "text-util.h"
+
+
+static int position_in_the_output = 0;
+
+/* Before using print_sentence: */
+static void
+print_sentence_init()
+{
+    position_in_the_output = 0;
+}
+
+
+/* Output functions that tracks the number of output characters: */
+static char
+putc_sentence(char c,
+	      FILE * fd)
+{
+    position_in_the_output ++;
+    return putc(c, fd);
+}
+
+static int
+fprintf_sentence(FILE * fd,
+		 char * a_format,
+		 ...)
+{
+    va_list some_arguments;
+    int number_of_printed_char;
+    
+    va_start(some_arguments, a_format);
+    number_of_printed_char = vfprintf(fd, a_format, some_arguments);
+    va_end(some_arguments);
+    
+    position_in_the_output += number_of_printed_char;    
+    return number_of_printed_char;
+}
+
 
 /* print_sentence:
  *
@@ -29,9 +67,9 @@
  * RK: the print_sentence could print lower case letter according to
  * a property... 17/12/1993.
  */
-void print_sentence(fd, s)
-FILE *fd;
-sentence s;
+void
+print_sentence(FILE * fd,
+	       sentence s)
 {
     if (sentence_formatted_p(s)) {
 	string ps = sentence_formatted(s);
@@ -40,7 +78,7 @@ sentence s;
 	    /* FI/FC: Why on earth?!?
 	       (void) putc((islower((int) c) ? (char) toupper((int) c) : c), fd);
 	       */
-	    (void) putc( c, fd);
+	    putc_sentence( c, fd);
 	}
     }
     else {
@@ -54,119 +92,128 @@ sentence s;
 	cons *lw = unformatted_words(u);
 
 	if (label != (char *) NULL) {
-	    fprintf(fd, "%-5s ", label);
+	    deal_with_sentence_word_begin(label,
+					  position_in_the_output);
+	    fprintf_sentence(fd, "%-5s ", label);
+	    deal_with_sentence_word_end(label,
+					position_in_the_output);
 	}
 	else {
-	    fputs("      ", fd);
+	    fprintf_sentence(fd, "      ");
 	}
 
 	/* FI: do not indent too much (9 June 1995)*/
 	em = em > 42 ? 42 : em;
 
 	for (i = 0; i < em; i++) 
-	    putc(' ', fd);
+	    putc_sentence(' ', fd);
 	col = 7+em;
 
 	pips_assert("print_sentence", col <= 72);
 
 	while (lw) {
 	    string w = STRING(CAR(lw));
+	    deal_with_sentence_word_begin(w,
+					  position_in_the_output);
 
 	    STRING(CAR(lw)) = NULL;
 	    lw = CDR(lw);
 
 	    /* if the string fits on the current line: no problem */
 	    if (col + strlen(w) <= 70) {
-		(void) fprintf(fd, "%s", w);
-		col += strlen(w);
+		col += fprintf_sentence(fd, "%s", w);
 	    }
 	    /* if the string fits on one line: 
 	     * use the 88 algorithm to break as few
 	     * syntactic constructs as possible */
-	    else if(strlen(w) < 70-7-em) {
-		if (col + strlen(w) > 70) {
-		    /* complete current line */
-		    if (n > 0) {
-			for (i = col; i <= 72; i++) putc(' ', fd);
-			fprintf(fd, "%04d", n);
+	    else
+		if(strlen(w) < 70-7-em) {
+		    if (col + strlen(w) > 70) {
+			/* Complete current line with the statement
+                           line number: */
+			if (n > 0) {
+			    for (i = col; i <= 72; i++) putc_sentence(' ', fd);
+			    fprintf_sentence(fd, "%04d", n);
+			}
+
+			/* start a new line with its prefix */
+			putc_sentence('\n', fd);
+
+			if(label != (char *) NULL 
+			   && (strcmp(label,"CDIR$")==0
+			       || strcmp(label,"CDIR@")==0
+			       || strcmp(label,"CMIC$")==0)) {
+			    /* Special label for Cray directives */
+			    fprintf_sentence(fd, "%s%d", label, (++line_num)%10);
+			}
+			else
+			    fprintf_sentence(fd, "     &");
+
+			for (i = 0; i < em; i++)
+			    putc_sentence(' ', fd);
+
+			col = 7+em;
 		    }
-
-		    /* start a new line with its prefix */
-		    putc('\n', fd);
-
-		    if(label != (char *) NULL 
-		       && (strcmp(label,"CDIR$")==0
-			   || strcmp(label,"CDIR@")==0
-			   || strcmp(label,"CMIC$")==0)) {
-			/* Special label for Cray directives */
-			fputs(label, fd);
-			fprintf(fd, "%d", (++line_num)%10);
-		    }
-		    else
-			fputs("     &", fd);
-
-		    for (i = 0; i < em; i++)
-			putc(' ', fd);
-
-		    col = 7+em;
+		    col += fprintf_sentence(fd, "%s", w);
 		}
-		(void) fprintf(fd, "%s", w);
-		col += strlen(w);
-	    }
 	    /* if the string has to be broken in at least two lines: 
 	     * new algorithmic part
 	     * to avoid line overflow (FI, March 1993) */
-	    else {
-		char * line = w;
-		int ncar;
+		else {
+		    char * line = w;
+		    int ncar;
 
-		/* complete the current line */
-		ncar = 72 - col + 1;
-		fprintf(fd,"%.*s", ncar, line);
-		line += ncar;
-		col = 73;
-
-		/*
-		if (n > 0) {
-		    for (i = col; i <= 72; i++) putc(' ', fd);
-		    fprintf(fd, "%04d", n);
-		}
-		*/
-
-		while(strlen(line)!=0) {
-		    ncar = MIN(72 - 7 +1, strlen(line));
-
-		    /* start a new line with its prefix but no indentation
-		     * since string constants may be broken onto two lines */
-		    putc('\n', fd);
-
-		    if(label != (char *) NULL 
-		       && (strcmp(label,"CDIR$")==0
-			   || strcmp(label,"CDIR@")==0
-			   || strcmp(label,"CMIC$")==0)) {
-			/* Special label for Cray directives */
-			fputs(label, fd);
-			(void) fprintf(fd, "%d", (++line_num)%10);
-		    }
-		    else
-			fputs("     &", fd);
-
-		    col = 7 ;
-		    (void) fprintf(fd,"%.*s", ncar, line);
+		    /* complete the current line */
+		    ncar = 72 - col + 1;
+		    fprintf_sentence(fd,"%.*s", ncar, line);
 		    line += ncar;
-		    col += ncar;
+		    col = 73;
+
+		    /*
+		       if (n > 0) {
+		       for (i = col; i <= 72; i++) putc(' ', fd);
+		       fprintf(fd, "%04d", n);
+		       }
+		       */
+
+		    while(strlen(line)!=0) {
+			ncar = MIN(72 - 7 +1, strlen(line));
+
+			/* start a new line with its prefix but no indentation
+			 * since string constants may be broken onto two lines */
+			putc_sentence('\n', fd);
+
+			if(label != (char *) NULL 
+			   && (strcmp(label,"CDIR$")==0
+			       || strcmp(label,"CDIR@")==0
+			       || strcmp(label,"CMIC$")==0)) {
+			    /* Special label for Cray directives */
+			    (void) fprintf_sentence(fd, "%s%d", label, (++line_num)%10);
+			}
+			else
+			    (void) fprintf_sentence(fd, "     &");
+
+			col = 7 ;
+			(void) fprintf_sentence(fd, "%.*s", ncar, line);
+			line += ncar;
+			col += ncar;
+		    }
 		}
-	    }
+	    deal_with_sentence_word_end(w,
+					position_in_the_output);
+
 	    free(w);
 	}
 
 	pips_assert("print_sentence", col <= 72);
 
+	/* Output the statement line number on the right end of the
+           line: */
 	if (n > 0) {
-	    for (i = col; i <= 72; i++) putc(' ', fd);
-	    fprintf(fd, "%04d", n);
+	    for (i = col; i <= 72; i++) putc_sentence(' ', fd);
+	    fprintf_sentence(fd, "%04d", n);
 	}
-	putc('\n', fd);
+	putc_sentence('\n', fd);
     }
 }
 
@@ -179,6 +226,7 @@ void print_text(fd, t)
 FILE *fd;
 text t;
 {
+    print_sentence_init();
     MAPL(cs, 
 	 print_sentence(fd, SENTENCE(CAR(cs))), 
 	 text_sentences(t));
