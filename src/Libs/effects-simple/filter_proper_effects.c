@@ -151,7 +151,7 @@ static bool stmt_flt(statement s)
       {
 	int order = statement_ordering(s);
 	int on; int os;
-	if (order==STATEMENT_ORDERING_UNDEFINED)
+	if (order!=STATEMENT_ORDERING_UNDEFINED)
 	{
 	  on = ORDERING_NUMBER(order);
 	  os = ORDERING_STATEMENT(order);
