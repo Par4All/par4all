@@ -25,7 +25,7 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 #define debug_on(env) debug_on_function(env, __FUNCTION__, __FILE__, __LINE__)
 #define debug_off() debug_off_function(__FUNCTION__, __FILE__, __LINE__)
 #define pips_debug(level, format, args...)\
-{ ifdebug(level) fprintf(stderr, "[%s] " format, __FUNCTION__ , ##args) }
+{ ifdebug(level) fprintf(stderr, "[%s] " format, __FUNCTION__ , ##args); }
 #define pips_user_warning(format, args...)\
   user_warning(__FUNCTION__, format, ##args)
 #define pips_user_error(format, args...)\
@@ -42,7 +42,7 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
     (void) fprintf(stderr, \
 		   "[%s] (%s:%d) assertion failed\n\n '%s' not verified\n\n", \
 		   __FUNCTION__ , __FILE__ , __LINE__ , what); \
-	   pips_user_error("this is a USER ERROR, I guess\n");} }
+	   pips_user_error("this is a USER ERROR, I guess\n");}; }
 #define pips_exit(code, format, args...)\
    pips_user_warning(format, ##args), exit(code)
 #else
@@ -52,7 +52,7 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
   debug_on_function(env, pips_unknown_function, __FILE__, __LINE__)
 #define debug_off() \
   debug_off_function(pips_unknown_function, __FILE__, __LINE__)
-#define pips_debug ifdebug(1) pips_debug_function
+#define pips_debug pips_debug_function
 #define pips_user_warning pips_user_warning_function
 #define pips_user_error pips_user_error_function
 #define pips_internal_error pips_internal_error_function
@@ -60,7 +60,7 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 { if(!(predicate)){\
     (void) fprintf(stderr, \
 		   "(%s:%d) assertion failed\n\n '%s' not verified\n\n", \
-		   __FILE__ , __LINE__ , what); abort();} }
+		   __FILE__ , __LINE__ , what); abort();}}
 #define pips_user_assert(what, predicate)\
 { if(!(predicate)){\
     (void) fprintf(stderr, \
