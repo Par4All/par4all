@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.97  2000/11/29 09:10:56  coelho
+ * hop.
+ *
  * Revision 1.96  2000/02/29 10:29:11  coelho
  * fixed if file does not exist.
  *
@@ -941,6 +944,8 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 		if (!sourced) {
 		    perror("while sourcing");
 		    gen_array_full_free($2);
+		    /* just in case, it may have been skipped... */
+		    tpips_init();
 		    pips_user_error("cannot source file %s\n", name);
 		}
 		else {
