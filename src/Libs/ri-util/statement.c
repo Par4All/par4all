@@ -821,13 +821,40 @@ return (stmt);
 string statement_identification(statement s)
 {
     static char buffer[50];
+    char *instrstring;
     int so = statement_ordering(s);
 
-    sprintf(buffer, "%d (%d, %d) at 0x%x\n",
+    switch (instruction_tag(statement_instruction(s)))
+    {
+    case is_instruction_loop:
+	instrstring="LOOP";
+	break;
+    case is_instruction_test:
+	instrstring="TEST";
+	break;
+    case is_instruction_goto:
+	instrstring="GOTO";
+	break;
+    case is_instruction_call:
+	instrstring="CALL";
+	break;
+    case is_instruction_block:
+	instrstring="BLOCK";
+	break;
+    case is_instruction_unstructured:
+	instrstring="UNSTRUCTURED";
+	break;
+    default: pips_error("assignment_block_or_statement_p",
+			"ill. instruction tag %d\n", 
+			instruction_tag(statement_instruction(s)));
+    }
+
+    sprintf(buffer, "%d (%d, %d) at 0x%x:%s\n",
 	    statement_number(s),
 	    ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so),
-	    (unsigned int) s);
+	    (unsigned int) s,
+	    instrstring);
 
     return buffer;
 }
