@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/11 20:51:03 $m 
+# $Date: 1996/08/11 21:26:09 $m 
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
@@ -33,7 +33,7 @@ LIB_HEADERS=	f77keywords \
 
 # headers made by some rule (except $INC_TARGET)
 
-DERIVED_HEADERS= keywtbl.h tokyacc.h syn_yacc.h
+DERIVED_HEADERS= keywtbl.h tokyacc.h syn_yacc.h yacc.in
 DERIVED_CFILES= syn_yacc.c scanner.c
 
 LIB_OBJECTS=	$(DERIVED_CFILES:.c=.o)  $(LIB_CFILES:.c=.o) 
