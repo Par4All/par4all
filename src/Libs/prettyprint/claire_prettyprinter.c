@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.5  2004/03/25 14:35:11  hurbain
+   *** empty log message ***
+
    Revision 1.4  2004/03/25 09:09:29  pips
    Removed pips error "not implemented yet." Hard to test with it ;)
 
@@ -249,15 +252,15 @@ static string claire_dim_string(list ldim)
 
   if (ldim)
     {
-      result = strdup(contatenate("A_A", " :: ", "DATA_ARRAY(",
+      result = strdup(concatenate("A_A", " :: ", "DATA_ARRAY(",
 				  "name = symbol!(" "\"A_A\"", ")", ",", NL));
-      result = strdup(concatenate(result, TAB, "dim = ");
+      result = strdup(concatenate(result, TAB, "dim = "));
       MAP(DIMENSION, dim, {
-	nbdim++;
 	expression elow = dimension_lower(dim);
 	expression eup = dimension_upper(dim);
 	int low;
 	int up;
+	nbdim++;
 	if (expression_integer_value(elow, &low)){
 	  if(nbdim != 1)
 	    origins = strdup(concatenate(origins, ",",int_to_string(low)));
@@ -266,18 +269,18 @@ static string claire_dim_string(list ldim)
 	}
 	else pips_user_error("Array origins must be integer");
 
-	if (expression_integer_value(esup, &sup)){
+	if (expression_integer_value(eup, &up)){
 	  if(nbdim != 1)
-	    dimensions = strdup(concatenate(dimensions, ", ",int_to_string(sup-low+1)));
+	    dimensions = strdup(concatenate(dimensions, ", ",int_to_string(up-low+1)));
 	  else
-	    dimensions = strdup(concatenate(dimensions, int_to_string(sup-low+1)));
+	    dimensions = strdup(concatenate(dimensions, int_to_string(up-low+1)));
 	}
 	else pips_user_error("Array dimensions must be integer");
       }, ldim);
       result = strdup(concatenate(result, int_to_string(nbdim), ",", NL));
       result = strdup(concatenate(result, TAB, origins, "),", NL));
       result = strdup(concatenate(result, TAB, dimensions, "),", NL));
-      result = strdup(concatenate(result, TAB, "dataType = INTEGER)", NL, NL);
+      result = strdup(concatenate(result, TAB, "dataType = INTEGER)", NL, NL));
     }
   return result;
 }
@@ -1527,19 +1530,21 @@ static string c_code_string(entity module, statement stat)
 
 #define INDENT		"indent"
 #define CROUGH		".crough"
+#define CLAIREROUGH     ".clairerough"
 #define CPRETTY		".c"
+#define CLAIREPRETTY    ".cl"
 
 bool print_claire_rough(string module_name)
 {
   FILE * out;
-  string ppt, crough, dir, filename;
+  string ppt, clairerough, dir, filename;
   entity module;
   statement stat;
 
-  crough = db_build_file_resource_name(DBR_CROUGH, module_name, CROUGH);
+  clairerough = db_build_file_resource_name(DBR_CROUGH, module_name, CLAIREROUGH);
   module = local_name_to_top_level_entity(module_name);
   dir = db_get_current_workspace_directory();
-  filename = strdup(concatenate(dir, "/", crough, NULL));
+  filename = strdup(concatenate(dir, "/", clairerough, NULL));
   stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
   set_current_module_entity(module);
@@ -1560,7 +1565,7 @@ bool print_claire_rough(string module_name)
   free(dir);
   free(filename);
 
-  DB_PUT_FILE_RESOURCE(DBR_CROUGH, module_name, crough);
+  DB_PUT_FILE_RESOURCE(DBR_CLAIREROUGH, module_name, clairerough);
 
   reset_current_module_statement();
   reset_current_module_entity();
@@ -1572,13 +1577,13 @@ bool print_claire_rough(string module_name)
  */
 bool print_claire_code(string module_name)
 {
-  string crough, cpretty, dir, cmd;
+  string clairerough, clairepretty, dir, cmd;
 
   
   /*pips_internal_error("Not implemented yet\n"); */
 
-  crough = db_get_memory_resource(DBR_CROUGH, module_name, TRUE);
-  cpretty = db_build_file_resource_name(DBR_C_PRINTED_FILE, module_name, CPRETTY);
+  crough = db_get_memory_resource(DBR_CLAIREROUGH, module_name, TRUE);
+  cpretty = db_build_file_resource_name(DBR_CLAIRE_PRINTED_FILE, module_name, CLAIREPRETTY);
   dir = db_get_current_workspace_directory();
 
   cmd = strdup(concatenate(INDENT, " ", 
@@ -1587,7 +1592,7 @@ bool print_claire_code(string module_name)
 
   safe_system(cmd);
 
-  DB_PUT_FILE_RESOURCE(DBR_C_PRINTED_FILE, module_name, cpretty);
+  DB_PUT_FILE_RESOURCE(DBR_CLAIRE_PRINTED_FILE, module_name, cpretty);
   free(cmd);
   free(dir);
 
