@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 15:01:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 16:39:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/15 15:01:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/15 16:39:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -275,21 +275,24 @@ cf is the current function
 lfp is the list of formal parameters
 */
 void 
-MakeCurrentFunction(t, msf, cf, lfp)
-type t;
-int msf;
-entity cf;
-cons *lfp;
+MakeCurrentFunction(
+    type t,
+    int msf,
+    entity cf,
+    list lfp)
 {
     instruction icf; /* the body of the current function */
     entity result; /* the second entity */
 
-    /* Let's hope cf is not a common */
-    if(entity_type(cf) != type_undefined
-       && type_area_p(entity_type(cf))) {
-	user_warning("MakeCurrentFunction",
-		     "Conflict for global name %s\n",
-		     entity_local_name(cf));
+    /* checks that there is no such common
+     */
+    if (gen_find_tabulated(concatenate
+	   (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+	    COMMON_PREFIX, entity_local_name(cf), 0), 
+			   entity_domain) != entity_undefined)
+    {
+	pips_user_warning("Conflict for global name %s\n",
+			  entity_local_name(cf));
 	ParserError("MakeCurrentFunction",
 		    "Name conflict between a "
 		    "subroutine and/or a function and/or a common\n");
