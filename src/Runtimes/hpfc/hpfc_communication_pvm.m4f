@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.12  1997/06/03 15:12:18  zory
+! *** empty log message ***
+!
 ! Revision 1.11  1997/05/30 09:15:04  zory
 ! *** empty log message ***
 !
@@ -43,29 +46,21 @@
 ! call MPI_REDUCE(sendbuf,recvbuf,count,datatype,op,root,comm,ierror)
 !
 
-!      subroutine HPFC REDUCE(function, data, count, msgtag, group, root, info)
-!      include "hpfc_commons.h"
-!    integer count, msgtag, group, root, info 
-!      
-!    call pvmfreduce(func, data, count, datatype, 
-!     $     msgtag, group, rootginst, info) 
-!
-!      end
 
-
+!--------------------  HPFC MESSAGE INFO -----------------
 !
-! Return information about the received message (or buffer) 
+! Give informations about the received message (or buffer) 
 ! (length, tag, source, info) 
 !
 ! in mpi status(messageid) is an array of integers
 ! INTEGER STATUS(MPI_STATUS_SIZE) 
-
+!
       subroutine HPFC MESSAGE INFO(messageid, length, tag, source, info)
       include "hpfc_commons.h"
       integer messageid, length, tag, source, info
       call pvmfbufinfo(messageid, length, tag, source, info)
-      debug(`print *,"hpfc debug info", info, "length = ", length,  
-     $ "tag =", tag , "source = ", source ')
+      debug(`print *, MYLID, "HPFC DEBUG INFO ", info, " length = ", 
+     $  length, " tag = ", tag , " source = ", source ')
       if (info.lt.0) then
          call pvmfperror("hpfc message info", info)
          call HPFC TERMINATE TASK(info)
@@ -73,22 +68,28 @@
       endif
       end 
 
+
+!--------------------  HPFC PRINT ERROR MSG  -----------------
 !
 ! Return an error string associated with the error code 
 ! plus additional information to the error message 
 !
-
+! MPI_ERROR_STRING(integer errorcode,charcter string(*),
+!                     integer resultlen,integer ierror)
+!
       subroutine HPFC PRINT ERROR MSG(message, error code)
       include "hpfc_commons.h"
       integer error code
       character*(*) message
       call pvmfperror(message, error code)
-! in mpi MPI_ERROR_STRING
       end
 
+!-------------------- HPFC JOIN GROUP   -----------------
 !
 ! Create a group of tasks called HPFC GROUP NAME
 !
+! MPI_COMM_DUP(integer comm,integer newcomm,integer ierror)
+! 
       subroutine HPFC JOIN GROUP(inum)
       include "hpfc_commons.h"
       integer inum,info
@@ -98,24 +99,27 @@
          call pvmfexit(info)
          stop
       end if
-
-! in mpi we only have to duplicate MPI_COMM_WORLD
-
+      debug(print *, MYLID, "[HPFC JOIN GROUP] ", HPFC GROUP NAME, inum)
       end
 
+!-------------------- HPFC TERMINATE TASK   -----------------
 !
 ! Terminate the current task 
 !
-
+! MPI_FINALIZE(integer ierror)
+!
       subroutine HPFC TERMINATE TASK
       include "hpfc_commons.h"
       integer info
-      debug(print *, "hpfc terminate task")
+      debug(print *, MYLID , "hpfc terminate task")
       call pvmfexit(info)
       end
 
+!--------------------  HPFC KILL ALLTASKS  -----------------
 !
 ! Kill all the tasks
+!
+! MPI_ABORT(integer comm,integer errorcode,integer ierror)
 !
       subroutine HPFC KILL ALLTASKS
       include "hpfc_commons.h"
@@ -123,65 +127,70 @@
       do i=1, NBOFTASKS
          call pvmfkill(NODETIDS(i), info)
       enddo
-
-! in mpi call MPI_Abort          
-
       end
 
-
+!-------------------- HPFC SYNCHRO  -----------------
 !
-! HPFC SYNCHRO
+! add a synchronisation step 
+!
+! MPI_BARRIER(HPFC GROUP NAME)
 !
       subroutine HPFC SYNCHRO
       include "hpfc_commons.h"
       integer info
-      debug(print *, "[hpfc synchro] ", MYLID, " waiting ", NBOFTASKS+1)
+      debug(print *, MYLID, "[hpfc synchro] waiting ", NBOFTASKS+1, "tasks")
       call pvmfbarrier(HPFC GROUP NAME, NBOFTASKS+1, info)
       if (info.lt.0) then
          call pvmfperror("hpfc synchro", info)
          call HPFC TERMINATE TASK(info)
          stop
       endif
-      debug(print *, "[hpfc synchro] done")
+      debug(print *, MYLID, "[hpfc synchro] done")
       end
 
 
-
+!--------------------  HPFC GET PE -----------------
 !
 ! Give the processor rank (only useful for MPI and PVM/CRAY T3D)
 !
-      subroutine HPFC GET PE(the tid, the rank)
+! MPI_COMM_RANK(integer comm, integer rank, integer ierror)
+!
+      subroutine HPFC GET PE (the tid, the rank)
       include "hpfc_commons.h"
       integer the tid, the rank
       debug(print *, "HPFC GET PE - asking rank")
-      _getpe(call pvmfgetpe(the tid, the rank))
+      _getpe(
+      call pvmfgetpe(the tid, the rank))
       debug(print *, "HPFC GET PE rank", the rank)
       end
 
-      
+
+!--------------------  HPFC ENROLL COMMUNICATION -----------------
+!       
+! Enroll the communication space (mpi/pvm) and return an id  
+! 
+! MPI_INIT(integer ierror)
+! MPI_COMM_RANK(integer comm,integer rank,integer ierror)
+! MPI_COMM_SIZE(integer comm,integer size,integer ierror)
 !
-! Return the processor id 
-!
-      subroutine HPFC GET MYTID(the tid)
-      include "hpfc_commons.h"
-      integer the tid
-      debug(print *, "hpfc get mytid - asking tid")
-      call pvmfmytid(MY TID)
-      debug(print *, "hpfc get mytid - ", the tid)
-      end
+!      subroutine HPFC ENROLL COMMUNICATION(thetid)
 
 
+!-------------------- HPFC INIT SEND  -----------------
 !
 ! Initialize the current buffer
+!
+! set position to 0 in mpi
 !
       subroutine HPFC INIT SEND(encoding,bufid)
       include "hpfc_commons.h"
       integer bufid,encoding
-      debug(print *, "initializing current buffer")
+      debug(print *, MYLID, "initializing current buffer")
       call pvmfinitsend(encoding, bufid)
-      debug(print *, "current buffer initialized")
+      debug(print *, MYLID, "current buffer initialized")
       end 
 
+!-------------------- HPFC PACK  -----------------
 !
 ! Packing count value in the current buffer...
 ! pvm syntax
@@ -190,37 +199,37 @@
 ! MPI_PACK(choice inbuf,integer incount,integer datatype, choice outbuf,
 !         integer outsize,integer position,integer comm, integer ierror) 
 ! MPI_PACKED(value,count,what,HPFC BUFFER,HPFC MAX BUFFER, HPFC POSITION, 
-!             HPFC COMM GROUP, info)
+!             HPFC GROUP NAME, info)
 
       subroutine HPFC PACK(what, value, count, stride, info) 
       include "hpfc_commons.h"
       integer what, value, count, stride, info
-      debug(print *, "packing count values")
+      debug(print *, MYLID, "packing count values", count)
       call pvmfpack(what, value, count, stride, info)
-      debug(print *, "value packed")
+      debug(print *, MYLID, "value packed")
       end
 
-
+!-------------------- HPFC SEND  -----------------
 !
 ! Sending the current buffer to dest...
 !
 ! pvm syntax
-! pvmfsend( dest, msgtag, info ) 
+! pvmfsend(dest, msgtag, info) 
 ! mpi syntax
 ! MPI_SEND(choice buf,integer count,integer datatype,integer dest,
 !             integer tag, integer comm,integer ierror)
 ! MPI_SEND(HPFC BUFFER, HPFC POSITION, MPI_PACKED, dest, tag, 
-!            HPFC COMM GROUP, info)  
+!            HPFC GROUP NAME, info)  
 
       subroutine HPFC SEND(dest, tag, info)
       include "hpfc_commons.h"
       integer dest, tag, info
-      debug(print *, "sending message")
-      call pvmfsend(dest, tag, info)
-      debug(print *, "message sent")
+      debug(print *, MYLID, "sending message to - ", dest)
+      call pvmfsend(NODE TIDS(dest), tag, info)
+      debug(print *, MYLID, "message sent to - ", dest )
       end
 
-
+!-------------------- HPFC UNPACK  -----------------
 !
 ! Unpacking count value from the current buffer
 ! pvm syntax
@@ -233,11 +242,12 @@
       subroutine HPFC UNPACK(what, value, count, stride, info) 
       include "hpfc_commons.h"
       integer what, value, count, stride, info
-      debug(print *, "unpacking count values")
+      debug(print *, MYLID, "unpacking count values")
       call pvmfunpack(what, value, count, stride, info)
-      debug(print *, "value unpacked")
+      debug(print *, MYLID, "value unpacked")
       end
 
+!--------------------  HPFC RECEIVE -----------------
 !
 ! Receiving a message from source
 ! pvm syntax
@@ -249,34 +259,41 @@
       subroutine HPFC RECEIVE(source, tag, bufid)
       include "hpfc_commons.h"
       integer source, tag, bufid
-      debug(print *, "receiving a message")
-      call pvmfrecv(source, tag, bufid)
-      debug(print *, "message received")
+      debug(print *, MYLID, "receiving a message from - ", source)
+      call pvmfrecv(NODE TIDS(source), tag, bufid)
+      debug(print *, MYLID, "message received from - ", source)
       end
 
+!-------------------- HPFC BCAST ROOT  -----------------
 !
 ! Root initiate a broadcast communication 
 !
+! MPI_BCAST (choice buffer,integer count,integer datatype,integer root,
+!              integer comm,integer ierror)
+
       subroutine HPFC BCAST ROOT(ntask, listoftids, tag, info )
       include "hpfc_commons.h"
       integer ntask, tag, info
       integer listoftids(MAX MAX SIZE OF PROCS)
-      debug(print *, "broadcast a message (root)")
+      debug(print *, MY LID, "broadcast a message (root)")
       call pvmfmcast(ntask, listoftids, tag, info)
-      debug(print *, "broadcast performed (root)")
+      debug(print *, MY LID, "broadcast performed (root)")
       end
+
+!-------------------- HPFC BCAST RECV  -----------------
 !
 ! Receive from a broadcast communication 
 !
+! MPI_BCAST 
       subroutine HPFC BCAST RECV(source, tag, bufid)
       include "hpfc_commons.h"
       integer source, tag, bufid
-      debug(print *, "broadcast a message (recv)")
-      call pvmfrecv(source, tag, bufid)
-      debug(print *, "broadcast performed (recv)")
+      debug(print *, MYLID, "Receive broadcast from", source )
+      call pvmfrecv(NODETIDS(source), tag, bufid)
+      debug(print *, MYLID, "Receive broadcast performed from", source )
       end 
 
-
+!--------------------  HPFC HCAST  -----------------
 !
 ! The host send a message to every node.
 !
@@ -284,20 +301,24 @@
       include "hpfc_commons.h"
       integer info
       debug(print *, "hcast - ", MCAST HOST)
-      call pvmfmcast(MAX SIZE OF PROCS, NODE TIDS, MCAST HOST, info)
+      call pvmfmcast(MAX SIZE OF PROCS, NODE TIDS(1), MCAST HOST, info)
       MCAST HOST = MCAST HOST + 2
       debug(print *, "hcast done")
       end
+
+!--------------------  HPFC NCAST  -----------------
 !
 ! every node receive a broadcast from host.
 !
       subroutine HPFC NCAST
       include "hpfc_commons.h"
       debug(print *, "ncast ", MY LID, " - ", MCAST HOST)
-      call pvmfrecv(HOST TID, MCAST HOST, BUFFER ID)
+      call pvmfrecv(NODETIDS(HOST LID), MCAST HOST, BUFFER ID)
       MCAST HOST = MCAST HOST + 2
       debug(print *, "ncast done")
       end
+
+!-------------------- HPFC SND TO HOST   -----------------
 !
 ! a node sends a message to host
 !
@@ -305,20 +326,24 @@
       include "hpfc_commons.h"
       integer info
       debug(print *, "snd to host ", MYLID, " - ", HOST SND CHANNEL)
-      call pvmfsend(HOST TID, HOST SND CHANNEL, info)
+      call pvmfsend(NODETIDS(HOST LID), HOST SND CHANNEL, info)
       HOST SND CHANNEL = HOST SND CHANNEL+2
       debug(print *, "snd to host done")
       end
+
+!-------------------- HPFC RCV FROM HOST  -----------------
 !
 ! a node receive a message from host
 !
       subroutine HPFC RCV FROM HOST
       include "hpfc_commons.h"
       debug(print *, "rcv from host ", MY LID, " - ", HOST RCV CHANNEL)
-      call pvmfrecv(HOST TID, HOST RCV CHANNEL, BUFFER ID)
+      call pvmfrecv(NODE TIDS(HOST LID), HOST RCV CHANNEL, BUFFER ID)
       HOST RCV CHANNEL = HOST RCV CHANNEL+2
       debug(print *, "rcv from host done")
       end
+
+!--------------------  HPFC SND TO NODE  -----------------
 !
 ! the host sends a message from a node
 !
@@ -331,6 +356,8 @@
       SEND CHANNELS(lid) = SEND CHANNELS(lid)+2
       debug(print *, "snd to node done")
       end
+
+!--------------------  HPFC RCV FROM NODE  -----------------
 !
 ! the host receive a message from a node
 !
