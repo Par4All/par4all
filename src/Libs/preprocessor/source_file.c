@@ -620,7 +620,6 @@ bool process_user_file(
 {
     bool success_p = FALSE;
     bool cpp_processed_p;
-    database pgm;
     FILE *fd;
     char *cwd;
     char buffer[MAXNAMLEN];
@@ -660,8 +659,6 @@ bool process_user_file(
 	tempfile = tmpnam(NULL);
     }
 
-    pgm = db_get_current_workspace();
-
     /* the absolute path of file is calculated
      */
     abspath = strdup((*file == '/') ? file : 
@@ -675,9 +672,7 @@ bool process_user_file(
 
     /* FI: two problems here
        - the successive calls to DB_PUT_FILE_RESOURCE erase each other...
-       - the wiring of the database_name prevents mv of the database (fixed)
-       */
-    /* DB_PUT_FILE_RESOURCE(DBR_USER_FILE, database_name(pgm), abspath); */
+    */
     DB_PUT_FILE_RESOURCE(DBR_USER_FILE, "", abspath);
 
     /* the new file is splitted according to Fortran standard */
