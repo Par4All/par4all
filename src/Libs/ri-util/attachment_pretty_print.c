@@ -10,6 +10,8 @@
 #include "misc.h"
 #include "properties.h"
 #include "word_attachment.h"
+/* Used in word_to_attachments: */
+typedef char * void_star;
 #include "top-level.h"
 
 /* To store the fact a prettyprinter ask for Emacs attachments: */
@@ -407,11 +409,11 @@ attach_transformers_decoration_to_text(text t)
 /* Try to find some attachments in the given character. If any, note
    the boundary position, that is a start or an end according to the
    functions given in parameters: */
-void
+static void
 deal_with_attachment_boundary(char * a_character,
 			      int position_in_the_output,
-			      attachments (* load_word_to_attachments_boundary)(int),
-			      bool (* bound_word_to_attachments_boundary_p)(int))
+			      attachments (* load_word_to_attachments_boundary)(void_star),
+			      bool (* bound_word_to_attachments_boundary_p)(void_star))
 {
     debug(8, "deal_with_attachment_boundary",
 	  "Looking for \"%c\" (%p) at %d\n",
