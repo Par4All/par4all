@@ -22,7 +22,9 @@
 	latex $<
 
 .dvi.printed:
-	lpr -P imagen -d $<
+	# lpr -P imagen -d $<
+	# remplace' par dvips, FC:02/08/93
+	dvips $<
 	touch $@
 
 # debugging
@@ -265,6 +267,8 @@ $(LIBDIR)/pipsmake.rc: pipsmake-rc
 		sed 's/ .*//' |	sort | uniq | tr a-z A-Z | \
 		sed 's/.*/#define BUILDER_& "&"/' | \
 		cat $(INCLUDEDIR)/auto.h - > $(INCLUDEDIR)/phases.h
+	@echo 'building builder_map.h'
+	@$(UTILDIR)/make-builder-map
 
 $(LIBDIR)/properties.rc: properties-rc
 	@echo 'building properties.rc'
