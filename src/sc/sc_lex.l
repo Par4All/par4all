@@ -31,8 +31,6 @@ static char * sc_symbol_table(char *);
                                   RETURN(IDENT); }
 <TEXT>[0-9]*[.DEe][0-9DEe\-]* { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
                                   RETURN(IDENT); }
-<TEXT>[0-9]*[.] { yylval.Variable = (Variable) sc_symbol_table(yytext); /*'*/
-                                  RETURN(IDENT); }
 <TEXT>[0-9]*			{ sscan_Value(yytext,&yylval.Value);
                                   RETURN(CONSTANTE); }
 <TEXT>"=="			{ RETURN(EGAL); }
@@ -102,7 +100,7 @@ extern boolean yysyntax_error;
 int yyerror(char *s)
 {
 	/* procedure minimun de recouvrement d'erreurs */
-	int c;
+//	int c;
 
 	(void) fprintf(stderr,"%s near %s\n",s,yytext);
 /*	while ((c = getchar()) != EOF)
