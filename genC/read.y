@@ -75,6 +75,7 @@ static gen_chunk * make_ref(int, gen_chunk *);
 %token VECTOR_BEGIN
 %token ARROW_BEGIN
 %token READ_BOOL
+%token TABULATED_BEGIN
 %token LP
 %token RP
 %token LC
@@ -107,12 +108,12 @@ static gen_chunk * make_ref(int, gen_chunk *);
 %term <d> READ_FLOAT
 %type <s> READ_STRING
 %type <chunk> Data Basis 
-%type <chunkp> Chunk String
+%type <chunkp> Chunk String Contents
 %type <consp> Sparse_Datas Datas
 %type <val> Int Shared_chunk Type
 
 %%
-Read	: Nb_of_shared_pointers Chunk
+Read	: Nb_of_shared_pointers Contents
           { 
 	    Read_chunk = $2;
 	    free(shared_table);
@@ -122,6 +123,15 @@ Read	: Nb_of_shared_pointers Chunk
 
 Nb_of_shared_pointers 
   	: Int { shared_table = (gen_chunk **)alloc($1*sizeof(gen_chunk*)); }
+	;
+
+Contents: Chunk { $$ = $1; }
+	| TABULATED_BEGIN Type Datas RP
+        { 
+	   $$ = (gen_chunk*) alloc(sizeof(gen_chunk));
+	   $$->i = $2;
+	   gen_free_list($3); 
+        }
 	;
 
 Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP 
