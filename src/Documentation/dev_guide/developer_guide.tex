@@ -2,49 +2,34 @@
 % PIPS development environment documentation; translated and updated from 
 % dret146.f.tex
 %
-\documentstyle[a4,titlepage,psfig,amstext,alltt,html]{article}
 
-% pour importer des structures de donnees NewGen
-\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+%% titlepage,
+\documentclass[a4paper]{article}
 
-\title{\bf {\Huge PIPS} \\
-                DEVELOPMENT ENVIRONMENT
-}
+\usepackage{psfig,amstext,alltt,html}
 
-%\author{
-%  François IRIGOIN \\ 
-%  Pierre JOUVELOT \\
-%  Rémi TRIOLET \\
-%  Arnauld LESERVOT \\
-%  Alexis PLATONOFF \\
-%  Ronan KERYELL \\
-%  Fabien COELHO \\
-%  Béatrice CREUSILLET \\
-%  Corinne ANCOURT
-%}
+\title{\bf {\Huge PIPS} \\ Development Environment}
+
 \author{
 \begin{tabular}{rl}
-  François &IRIGOIN \\ 
-  Pierre &JOUVELOT \\
-  Rémi &TRIOLET \\
-  Arnauld &LESERVOT \\
-  Alexis &PLATONOFF \\
-  Ronan &KERYELL \\
-  Fabien &COELHO \\
-  Béatrice &CREUSILLET \\
-  Corinne &ANCOURT
+  François & IRIGOIN \\ 
+  Pierre & JOUVELOT \\
+  Rémi & TRIOLET \\
+  Arnauld & LESERVOT \\
+  Alexis & PLATONOFF \\
+  Ronan & KERYELL \\
+  Fabien & COELHO \\
+  Béatrice & CREUSILLET \\
+  Corinne & ANCOURT
 \end{tabular}
 }
 
-\date{May 1996}
+\date{August 1996}
 
 \renewcommand{\indexname}{Index}
-
 \makeindex
 
 \begin{document}
-
-
 \maketitle
 
 \begin{latexonly}
@@ -74,305 +59,346 @@ The reader is supposed to be a PIPS user~\cite{Pips:96a}, and to have read
 the reports about NewGen~\cite{Jouv:89,Jouv:90}. A good understanding of {\tt
   pipsmake} mechanisms would also be helpful.
 
-\section{Shell environment (sh, csh, ksh, tcsh)}
+\section{Shell environment (sh, ksh, bash, csh, tcsh)}
 \label{sec:shell}
 
 Many environment variables are used by PIPS executables and utilities. They
 mainly describe PIPS directory hierarchy, and compilation options. All
 these variables are initialized by the script
-\verb+/projects/Pips/pipsrc.sh+ for \verb+sh+ and \verb+ksh+, and by
-\verb+/projects/Pips/pipsrc.csh+ for \verb+csh+ and \verb+tcsh+. Both
-scripts are automatically derived from a reference file \verb+pipsrc.ref+.
+\verb+/projects/Pips/pipsrc.sh+ for \verb+sh+, \verb+ksh+ and \verb+bash+,
+and by \verb+/projects/Pips/pipsrc.csh+ for \verb+csh+ and \verb+tcsh+. Both
+scripts are automatically derived from a reference file \verb+pipsrc.ref+
+maintained in the \verb+Scripts/env+ directory of the sources.
+
+Two variables are of special interest: \verb+$PIPS_ROOT+ which stores the
+root of PIPS current version, and \verb+$PIPS_ARCH+.
+
+\subsection{PIPS architecture (\texttt{PIPS\_ARCH})}
+
+It holds the current architecture. if not set \verb+.+ (dot) is
+assumed. A PIPS
+architecture is to be understand not as strictly as a computer
+architecture. It simply a set of tools (compilers, linkers, but also
+compiler options\ldots) to be used for compiling PIPS. Thus you can have
+several pips architectures that compile and run on a very same machine.
+
+This set of tools is defined in the corresponding
+\begin{quote}
+  \verb+$PIPS_ROOT/Include/makefile_macros.$PIPS_ARCH+
+\end{quote}
+ configuration file,
+where usual \verb+CC+, \verb+CFLAGS+ and so make macros are defined.
+This configuration file is automatically included by all makefiles, hence
+changing this variable results in different compilers and options to be
+used when compiling or running pips. Object files, libraries
+and binaries related to different pips architecture cannot be mixed and
+overwritten one by the other: they are stored in a subdirectory depending
+on the architecture, \emph{à la} PVM. Thus pips versions are always
+compiled and linked with libraries compiled for the same architecture.
+
+Here are examples of pips architectures (distinct \verb+$PIPS_ARCH+
+values) used: %%$
+\begin{description}
+\item[.]: default version used locally, so as to be compatible with the
+ past. \verb+gcc+, \verb+lex+ and \verb+yacc+.
+\item[DEFAULT]: default compilers and options expected to run on any
+  machine (\verb+CC=cc+, and so on).
+\item[GNU]: prefer gnu tools, as \verb+gcc+, \verb+flex+, \verb+bison+,
+  \verb+g77+.
+\item[SUN4]: SUN SUNOS 4 compilers \verb+acc+, \verb+f77+\ldots
+\item[GNUSOL2LL]: version for SUN Solaris 2 compiled with gnu softwares and
+  using ``long long'' (64 bits) integers in the mathematical computations
+  of the C3/Linear library.
+\item[GPROF]: a gnu version compiled with -pg (which generates a trace
+  file that can be exploited by \verb+gprof+ for extracting profiling
+  information)
+\end{description}
 
 \section{PIPS directories}
 \label{sec:directories}
 
-This section describes the directory hierarchy of PIPS\@.
-The root directory is \verb+/projects/Pips+. It is owned by the user \verb+pips+.
+This section describes the directory hierarchy of PIPS\@.  Pips resides in
+\verb+/projects/Pips+ (\verb|$PIPS_DIR|). %% $
+This directory is owned by the \verb+pips+ user.
+From this directory, several sub directories can be found. The most
+important is the \verb+Production+ directory which contains the main copy
+of Pips, including \emph{all} sources, compiled libraries and executables,
+documentation, include files, and so on. In the \verb+Development+
+directory you can find a development copy of the sources in which new
+codes are developped. Once correct, they are installed in the main
+(Production) hierarchy and will become the reference version.
 
 The sub-directories are described below. Almost at each level,
 \verb+Makefile+s ensure the coherency of the system, and facilitate the
 installation of developments into the production hierarchy.
 
+The \verb+Bin+, \verb+Share+, \verb+Runtime+ and \verb+Doc+ directories
+should offer a working pips \emph{running} environment.
+
+The organisation of the Newgen (\verb+/projects/Newgen+) and C3/Linear 
+(\verb+/projects/C3/Linear+) is very similar to this one.
+
+\subsection{Production (\texttt{PIPS\_ROOT})}
+
+This directory contains the current reference versions of library and
+passes. You can find the following subdirectories:
+
+\subsubsection{Bin}
+
+Pips current binaries that can be executed. These binaries include
+\texttt+pips+ (the main program), \texttt+tpips+ (the same program with a
+interactive interface based on the readline library) and \texttt+wpips+
+(the window interface). It also includes other architecture-dependent
+executables. Binaries for different architectures can be stored in
+different sub-directories depending on the value of \verb+$PIPS_ARCH+ %%$
+which describes the current architecture, as discussed in
+Section~\ref{sec:shell}. 
+    
+\subsubsection{Share}
+
+non architecture-dependent executables needed or used by pips. They
+include shell (sh and csh), sed, awk, perl and lisp scripts! Examples:
 \begin{itemize}
-
-\item {\tt \bf Development.}\verb+$PIPS_DEVEDIR+.
-
-  This directory contains the version of PIPS currently being developed. 
-
-  \begin{itemize}
-    
-  \item {\tt \bf Passes.} 
+\item  \verb+Init, Select, Perform, Display, Pips+:
+  \index{Init}\index{Select}\index{Perform}\index{Display}\index{Pips}
+  batch interface for PIPS; it is described in ???
   
-    This directory contains the sources of the different passes, in
-    several sub-directories named from the passes (\verb+pips+, \verb+tpips+,
-    \verb+wpips+).
-    
-  \item {\tt \bf Lib.} 
+\item \verb+epips+: a shell to launch the emacs pips interface (which
+  uses \verb+wpips+ and \verb+emacs+)
   
-    This directory contains the source of the several libraries of PIPS\@.
-    It is divided into sub-directories named from the libraries. It also
-    contains a \verb+Makefile+ to recompile all the development libraries.
-    This \verb+Makefile+ is not automatically generated, and it thus not
-    always up-to-date.
-
-  \item {\tt \bf Runtime.} 
+\item \verb+stf-workspace+: \index{stf-workspace} calls Toolpack
+  restructurer \verb+stf+ on each Fortran file in a workspace; also
+  directly available as a PIPS transformation.
   
-    This directory contains the sources of the libraries used when executing
-    codes generated by PIPS; in fact, there are only two libraries: The
-    first for the HPF compiler \verb+hpfc+, and the second one for the WP65
-    project.
-
-  \item {\tt \bf Scripts.} 
-  
-    This directory contains the source of the shell scripts which are useful
-    for PIPS, the linear library and NewGen. It is further divided into
-    several directories. In each sub-directory a local \verb+Makefile+
-    performs automatic tasks such as the installation of the sources in the
-    \verb+$PIPS_UTILDIR+ directory.
-
-  \end{itemize}
-
-\item {\tt \bf Documentation.} \verb+$PIPS_DOCDIR+. 
-  
-  This directory contains the documentation: Reports for DRET contracts,
-  reports from discussions or analyses, manuals, etc\dots. But also the
-  description of some internal representations (for instance in the
-  \verb+Newgen+ sub-directory), or configuration files, such as
-  \verb+pipsmake-rc.tex+.  Some configuration files are automatically
-  derived from others, as well as some documentation (see the
-  \verb+Makefile+).
-
-  \begin{itemize}
-  \item {\tt \bf Newgen.}
-    
-    This directory contains the description (in \LaTeX{}) of the internal
-    data structures used in the project, as they are sued in the development
-    and production hierarchies, but not in the release environment. This is
-    due to the lack of modularity induced by NewGen: it is not possible to
-    link without major risks with independent passes of NewGen.
-
-    The local makefile transforms the \verb+*.f.tex+ files describing PIPS
-    data structures into NewGen and header files, and exports them to the
-    directory \verb+PIPS_INCLUDEDIR+.
-    
-  \item {\tt \bf wpips-epips-user-manual.}
-    
-    This directory contains the user manual.
-  \end{itemize}
-
-
-\item {\tt \bf Production.} \verb+$PIPS_PRODDIR+.
-  
-  This  directory  contains the versions of   library and passes temporarily
-  declared as being ready.
-
-  \begin{itemize}
-    
-  \item {\tt \bf Src/Passes.}
-    
-    This directory contains the sources of the different passes, in
-    several sub-directories named from the passes (\verb+pips+, \verb+tpips+,
-    \verb+wpips+).
-
-
-  \item {\tt \bf Src/Lib.} 
-    
-    This directory contains the source of the several libraries of PIPS\@.
-    It is divided into sub-directories named from the libraries.
-
-  \item  {\tt \bf Src/Runtime.} 
-    
-    This directory contains the sources of the libraries used when executing
-    codes generated by PIPS; in fact, there are only two libraries: The
-    first for the HPF compiler \verb+hpfc+, and the second one for the WP65
-    project.
-
-  \item {\tt \bf Bin.} \verb+$PIPS_BINDIR+. 
-
-    This directory contains PIPS executables: \verb+pips+, \verb+tpips+ and
-    \verb+wpips+. 
-
-
-  \item {\tt \bf Lib.} \verb+$PIPS_LIBDIR+. 
-    
-    This directory contains the libraries ({\tt lib*.a}), and some
-    configuration files, automatically generated from their \LaTeX{}
-    versions in \verb+$PIPS_DOCDIR+: \verb+wpips.rc+, \verb+pipsmake.rc+,
-    and \verb+properties.rc+, .
-    
-  \item {\tt \bf Include.} \verb+$PIPS_INCLUDEDIR+.  
-    
-    This directory contains PIPS header files. They are automatically
-    generated from NewGen specifications, from the linear libraries, from
-    PIPS libraries, and from some files in \verb+$PIPS_DOCDIR+.
-
-
-  \end{itemize}
-
-\item {\tt \bf Release.} \verb+$PIPS_RELEDIR+.
-  
-  This directory contains the binary executables of a coherent version of
-  PIPS. This version is used for demonstrations and installations.
-
-  {\em Not used since 1990! }
-
-  \begin{itemize}
-  \item {\tt \bf Config.}
-    
-    This directory contains the file to set the environment variables. Some
-    of these variables are used by PIPS or by X or NeWS servers.
-
-  \item {\tt \bf Spec.}
-    
-    This directory contains the specification files for PIPS internal
-    representation. These files are dynamically read by PIPS passes.
-
-  \item {\tt \bf Bin.}
-
-    This directory contains the executables.
-
-  \item {\tt \bf Lib.}
-    
-    This directory contains\verb+properties.rc+, \verb+pips_help.txt+ and
-    \verb+pips.icon+. Maybe we should add \verb+makefile.rc+.
-
-  \item {\tt \bf OpenWindow.}
-    
-    This directory contains OpenWindows fonts used by PIPS graphical
-    interface.
-
-  \end{itemize}
-
-\item {\tt \bf Externals.} \verb+$PIPS_EXTEDIR+. 
-  
-  This directory contains the executable versions and the header files of
-  libraries developed at CRI and used by PIPS, that is to say the
-  \verb+Newgen+ and \verb+Linear+ libraries (which are installed here using
-  the {\tt fetch-linear} and {\tt fetch-newgen} libraries), as well as some
-  run-time support files. .
-
-\item {\tt \bf Utilities.}  \verb+$PIPS_UTILDIR+.
-  
-  This directory contains all the tools and scripts which facilitate the
-  management of PIPS and the compilation of \verb+Linear+, \verb+Newgen+ and
-  PIPS. Most of them are installed from the {\tt Development/Scripts}
-  sub-directories. 
-
-  \begin{itemize}
-
-  \item \verb+clean-pips+: \index{clean-pips}Removal of unuseful or obsolete
-    files.
-    
-  \item \verb+make-pips+: \label{make-pips}\index{make-pips} Runs {\tt make}
-    in all the libraries and passes of PIPS. The {\tt -d} option recompiles
-    {\bf\tt Development}, while the {\tt -p} option recompiles in {\bf\tt
-      Production} and installs the libraries in {\tt \$PIPS\_LIBDIR} (this
-    is the default option). The {\tt -n} option, similar to the {\tt -n}
-    option of {\tt make}, shows what is not up-to-date. The {\tt -r} option
-    (for recompile), in combination with {\tt -p}, successively executes
-    {\tt make clean}, {\tt make production-depend} and {\tt make}; this
-    achieves a global recompilation.
-
-    It is necessary to recompute the dependences which are automaticcally
-    generated in each Makefile when PIPS is installed on a new system,
-    because the directory hierarchy might be the same (dependences are
-    almost always expressed unsing absolute paths). Destroying derived files
-    is also necessary when changing the compilation options (for instance
-    when trying {\tt -O3} to achieve better performances, of {\tt -p} to do
-    some profiling).
-
-  \item \verb+pips-makemake+: \index{pips-makemake}Automatic derivation of
-    library and pass {\tt Makefile}s from  local {\tt
-    config.makefile}s\index{config.makefile}.
-    
-  \item \verb+search-pips+: \index{search-pips} Search, and possibly
-    removal, of auxilliary files such as {\tt databases}; for instance,
-    destruction of all databases not used since one month:
-    \begin{quote}
-      \verb+search-pips -w -m -D+
-    \end{quote}
-        
-  \item \verb+fetch-linear+: \index{fetch-linear}put in {\bf \tt Externals}
-    the linear library and the related headers.See also
-    Section~\ref{sec:linear}.
-    
-  \item \verb+fetch-newgen+: \index{fetch-newgen} put in {\bf \tt Externals}
-    the NewGen library and its related headers. See also
-    Section~\ref{sec:newgen}.
-    
-  \item \verb+analyze_libraries+: cf. section Dependance entre Bibliotheques
-    
-  \item \verb+order_libraries+: cf. section Dependance entre Bibliotheques
-
-  \item \verb+tape-pips+: partial extraction of PIPS files for an external
-    installation or demonstration; the failes are taken in
-    \verb+$PIPS_PRODDIR+; do not forget to install your library before! See
-    also \verb+bar+, \verb+eject+, \verb+fdformat+ and \verb+tar+. To use
-    the floppy driver: \verb+/dev/rfd0+.
-
-
-  \item \verb+Validate+: \index{Validate} Non-regression test; see ?!?;
-    
-    The arguments are names of subdirectories in
-    \verb+Pips/Tests/Validation+.
-    
-    Tests are organized on a library basis in \verb+Pips/Tests/Validation+
-    while bugs are reported in the same way in \verb+Pips/Tests/Bugs+.  Bugs
-    and non-regression tests are characterized by one or more Fortran
-    programs which either core dump (for bugs) or must have a known result
-    (tests).
-    
-    Set \verb+PIPSDBM_DEBUG_LEVEL+ to 5 to check data structures when they
-    are stored and to 9 to check them when they are delivered; some data
-    structures are not checked, among them, all that contain external types;
-    
-    use \verb+accept+ to update reference files for validation; can be used
-    with \verb+/usr/ucb/mail+: \verb+| xx accept+ where \verb+xx+ is the
-    message number;
-    
-    To run it in background, redirect {\tt stderr} on /dev/null. Example:
-    \begin{quote}
-      \verb+Validate DemoStd 2>/dev/null &+
-    \end{quote}
-        
-  \item \verb+bug-to-validate+: \index{bug-to-validate}When a bug is
-    corrected, run \verb+bug-to-validate+ to move the bug case from
-    \verb+Bugs/xxx+ to \verb+Validation/xxx+.
-    
-    Do not forget to update \verb+Documentation/pips-bugs.f.tex+.
-    
-  \item \verb+Init, Select, Perform, Display, Pips+:
-    \index{Init}\index{Select}\index{Perform}\index{Display}\index{Pips}
-    batch interface for PIPS; it is described in ???
-    
-  \item \verb+stf-workspace+: \index{stf-workspace}calls Toolpack
-    restructurer \verb+stf+ on each Fortran file in a workspace; also
-    directly available as a PIPS transformation.
-    
-  \item \verb+pips-experiment+: \index{pips-experiment}runs the same
-    analyses and transformations on each module in a workspace.
-    
-  \item \verb+print-dg-statistics+: \index{print-dg-statistics}exploits some
-    of the statistics generated by the dependence graph computation when a
-    specific property is set to {\tt TRUE} (\verb+RICE_DG_PROVIDE_STATISTICS+).
-
-  \item there many other things in this directory; volunteers to write their
-    documentation here are welcomed!
-
-  \end{itemize}
-
-\item \verb+Experiments+ 
-  
-  This directory is a large piece of disk space to be used temporarily to
-  analyze large programs and to core dump large {\tt pips} processes; no
-  permanent, non-deductible information should be stored there;
-
+\item and others.
 \end{itemize}
+
+Also some configuration files, automatically generated from
+the \LaTeX{} documentation in \verb+$PIPS_ROOT/Src/Documentation+. %% $
+Important files are \verb+pipsmake.rc+, \verb+properties.rc+ and
+\verb+wpips.rc+. 
+
+\subsubsection{Doc}
+
+Pips documentation, namely many postscript files describing various
+aspects of PIPS, the internal data structures and so on.  Important
+documents: pipsmake-rc (the dependence rules between pips interprocedural
+analyses), developper\_guide (this document!), ri (the description of the
+pips Intermediate Representation).
+
+\begin{description}
+\item[Doc/manl]: local (obsolete?) man pages. 
+  \verb+$PIPS_ROOT/Doc+ can be added to user MANPATH variables. %%$
+  
+\item[Doc/Html]: Html documentation of PIPS. Some real html files, and
+  some generated from \LaTeX{} files.
+\end{description}
+    
+\subsubsection{Runtime}
+
+Environments needed for executing pips-compiled files.  Namely
+\texttt{hpfc} and \texttt{wp65} use a PVM-based runtime.  This directory
+includes the files needed for executing the generated files (as header and
+make files or compiled libraries), but not necessarily the corresponding
+sources.
+
+\subsubsection{Src}
+
+PIPS Sources. Having a copy of the \verb+Src+ subtree is enough for fully
+recompiling PIPS, including the documentation, configuration files and
+various scripts used for running and developping the PIPS sofware.
+
+\begin{description}
+\item[Src/Documentation]:
+  This directory contains the sources of the documentation of
+  PIPS. From some of these are derived automatically header and
+  configuration files. 
+  
+  The \verb+newgen+ sub-directory contains the description (in \LaTeX{})
+  of the internal data structures used in the project, as they are used
+  in the development and production hierarchies. 
+  %%
+  The local makefile transforms the \verb+*.ftex+ or \verb+*.tex+ files
+  describing PIPS data structures into NewGen and header files, and
+  exports them to the \verb+$PIPS_ROOT/Include+ directory. %%$
+  Thus the documentation actually \emph{is} the sources for the data
+  structures. 
+  
+  The \verb|wpips-epips-user-manual| sub-directory contains the user
+  manual. 
+  
+  The \verb|pipsmake| sub-directory contains the definition of the
+  dependences between the different interprocedural analyses as a
+  \LaTeX{} file, from which are derived the \verb+pipsmake.rc+
+  configuration file used by PIPS at runtime.
+  
+\item[Src/Passes]: This directory contains the sources of the
+  different passes, in several sub-directories named from the passes
+  (\verb+pips+, \verb+tpips+, \verb+wpips+). If you add a pass, it is
+  mandatory that the name of the directory is the name of the pass (or
+  redefine the TARGET macro in the config.makefile).
+  
+\item[Src/Lib]: This directory contains the source of the several
+  libraries of PIPS\@.  It is divided into sub-directories named from
+  the libraries. The name of the subdirectory must be the name of the
+  library.
+  
+\item[Src/Scripts]:
+  This directory contains the source of the shell scripts which are
+  useful for PIPS, the linear library and NewGen. It is further
+  divided into several directories. In each sub-directory a local
+  \verb+Makefile+ performs automatic tasks such as the installation of
+  the sources where expected (usually \verb+$PIPS_ROOT/Share+ or
+  \verb+$PIPS_ROOT/Utils+, depending whether the scripts is used for
+  \emph{running} or \emph{developping} PIPS.
+  
+\item[Src/Runtime]: This directory contains the sources of the
+  libraries used when executing codes generated by PIPS; in fact,
+  there are only two libraries: The first for the HPF compiler
+  \verb+hpfc+, and the second one for the WP65 project.
+
+\end{description}
+
+\subsubsection{Utils}
+
+Other architecture independent tools and files used for \emph{developping}
+pips (as opposed to \emph{running} it).
+    
+\begin{description}
+\item[make-pips]: \label{make-pips}\index{make-pips} Runs {\tt gmake}
+  in all the libraries and passes of PIPS, Newgen and Linear. See
+  \verb+make-pips -h+ for a full description of the available options. 
+  This shell-scripts simply forwards the targets specified on its
+  command line to the many directories of PIPS. Since all these
+  directories contain similar automatically generated makefiles, 
+  one can rely on the same targets to be defined everywhere for 
+  cleaning or recompiling the PIPS software.
+  
+  Intermediate node directories in the Pips tree contain a special 
+  Makefile which just forward targets to its sub-directories or a
+  subset of these. It also reports success or failures. 
+  the \verb|make-pips| scripts uses this feature to perform its task. 
+      
+  
+\item[pips-makemake]: \index{pips-makemake}Automatic derivation of
+  Makefiles. See \verb+pips-makemake -h+ for help.  
+  
+  This shell-script generates a makefiles which includes the local
+  \verb+config.makefile+ file for additionnal macros and rules
+  definitions. The generated makefile defines \emph{many} rules and
+  macros. It redefines itself when the \verb|pips-makemake| script is
+  updated, easing a lot the global maintainance. This very same
+  shell-script is used for generating makefiles in the Pips, Newgen
+  and Linear sofwares.
+      
+  Typical services automatically provided includes \verb|clean|,
+  \verb|full-clean|, \verb|recompile| targets, generating dependence
+  files, deriving automatically header files for libraries, installing
+  files where needed, building local pips binaries with a local
+  library and so on. It MUST be used with gmake (GNU make).
+  
+  It is very important that \emph{all} source directories conform to
+  the use of \verb+pips-makemake+, so as to provide an homogeneous
+  environment for PIPS developpers all over the PIPS, Newgen and
+  Linear, Thus developping in these environments is an easier task.
+  
+  The documentation of this script is in the script. Well, it is the
+  script. Without any option the script derives what to generate
+  depending on the context (namelly, the current working directory),
+  so that you do not need to worry about it. See examples around 
+  your library for writing proper \verb+config.makefile+ files.
+  Some hints are given in Section~\ref{sec:makefiles}.
+      
+\item[Validate]: \index{Validate} Non-regression tests; see ?!?;
+  
+  The arguments are names of subdirectories in
+  \verb+Pips/Tests/Validation+ (\verb|$PIPS_VALIDDIR|). %%$
+  See \verb+Validate -h+ for some help and a list of options.
+  
+  Tests are organized on a library basis in \verb+Pips/Tests/Validation+
+  while bugs are reported in the same way in \verb+Pips/Tests/Bugs+.  Bugs
+  and non-regression tests are characterized by one or more Fortran
+  programs which either core dump (for bugs) or must have a known result
+  (tests).
+      
+  Set \verb+PIPSDBM_DEBUG_LEVEL+ to 5 to check data structures when
+  they are stored and to 9 to check them when they are delivered; some
+  data structures are not checked, among them, all that contain
+  external types;
+      
+  Use \verb+accept+ to update reference files for validation; can be used
+  with \verb+/usr/ucb/mail+: \verb+| xx accept+ where \verb+xx+ is the
+  message number;
+\end{description}
+
+
+\begin{itemize}
+\item \verb+bug-to-validate+: \index{bug-to-validate}When a bug is
+  corrected, run \verb+bug-to-validate+ to move the bug case from
+  \verb+Bugs/xxx+ to \verb+Validation/xxx+.
+  
+  Do not forget to update \verb+Documentation/pips-bugs.ftex+.
+  
+\item \verb+pips-experiment+: \index{pips-experiment}runs the same
+  analyses and transformations on each module in a workspace.
+  
+\item \verb+print-dg-statistics+: \index{print-dg-statistics}exploits some
+  of the statistics generated by the dependence graph computation when a
+  specific property is set to {\tt TRUE}
+  (\verb+RICE_DG_PROVIDE_STATISTICS+). 
+  
+\item there many other things in this directory; volunteers to write their
+  documentation here are welcome!
+  
+\end{itemize}
+    
+\subsubsection{Include}
+
+This directory contains all shared files needed for building PIPS.  It
+includes C header files automatically generated from NewGen specifications
+and for each library, and from some file in the documentation. Also pips
+architecture configuration file that define makefile macros are there.
+
+\subsubsection{Lib}
+
+This directory contains PIPS compiled libraries ({\tt lib*.a}) ready
+to be linked. They are stored under their \verb|$PIPS_ARCH| %% $
+subdirectory.
+
+\subsection{Development (\texttt{PIPS\_DEVEDIR})}
+
+This directory contains the version of PIPS currently being developed. 
+It is a mirror of the organization under \verb+$PIPS_ROOT/Src+. %%$
+Each library is developped and tested under this subtree, linking by
+default with the \emph{installed} libraries in
+\verb+$PIPS_ROOT/Lib+. %%$
+
+Thus new versions can be developped without interfering with other
+developments. Once a new version of a library (or pass, or script, or
+anything) is okay and validated, it is installed under the
+\verb+$PIPS_ROOT/Src+ subtree and becomes the reference. %%$
+
+When developping or debugging several related libraries at the same
+time, you can used the development version of these libraries by
+using unix links (\texttt{ln -s}) to one of the directory under the
+corresponding \verb|$PIPS_ARCH| subdirectory. When building %%$
+a new binary, the linker takes these local libraries first. 
+
+\subsection{Externals}
+  
+This directory contains libraries and headers external to the PIPS
+software but that are used for building it. Namely, it consists of 
+the GNU readline library with its headers and of malloc versions used
+for debugging purposes. 
+
+\subsection{Experiments}
+  
+This directory is a large piece of disk space to be used temporarily to
+analyze large programs and to core dump large {\tt pips} processes; no
+permanent, non-deductible information should be stored there;
 
 A directory {\tt \bf Backup} would also be useful to save a version which
 has been installed, but is less ready than its developer have thought.
-
 
 
 
@@ -383,15 +409,17 @@ NewGen is a software engineering tool, from which almost all PIPS data
 structures are generated. It is described in ???. It is considered as an
 external tool, and is independent from the PIPS project.
 
-However, since this tool still needs some tuning, its internal libraries,
-{\tt genC.a, hash.a, set.a,...}, are just copied (instead of being linked
-using {\tt ln} or {\tt ln -s}) in the \verb+$PIPS_EXTEDIR+ directory, using
-the {\tt fetch-newgen} utility each time they are modified. The
-corresponding header files are also copied in  \verb+$PIPS_EXTEDIR+ by this
-command. 
+NewGen sources are in the directory \verb+$NEWGEN_DIR+. %% $
+The global organization is similar to the PIPS organization.
+(Production and Development, then under Production one can find Include,
+Lib, Bin, Share, Doc\ldots). 
+\verb+$NEWGEN_ROOT+ and \verb+$NEWGEN_ARCH+ refer to the current version
+and architecture to be used. If \verb+$NEWGEN_ARCH+ is not defined, is
+defaults to \verb+$PIPS_ARCH+ and then to \verb+.+ (dot), so that if one
+develop or update Newgen as part of PIPS there is no trouble.
 
-NewGen sources are in the directory \verb+$NEWGEN_DIR+. It may sometimes be
-useful to consult them. Several functionalities are useful when debugging:
+It may (alas!) sometimes be useful to consult them. Several
+functionalities are useful when debugging: 
 \begin{itemize}
   
 \item \verb+gen_consistent_p()+ \index{gen\_consistent\_p}checks whether an
@@ -440,9 +468,12 @@ useful to consult them. Several functionalities are useful when debugging:
   
 \end{itemize}
 
-In the future, {\tt gdb} macros compatible with C macros will be provided.
+In the future, {\tt gdb} macros compatible with Newgen generated C macros
+will be provided. (Well, we just need GNU people to add interactive macros
+to gdb and then we will provide the macros:-)
 
-  
+
+
 \section{Linear library}
 \label{sec:linear}
 
@@ -451,31 +482,14 @@ by the French organization CNRS.
 
 
 Its root directory is \verb+/projects/C3/Linear/+ (\verb+$LINEAR_DIR+). This
-directory is further divided into two sub-directories:
-\begin{itemize}
-\item {\bf\tt Development.}
+directory is further divided into similarily to Pips and Newgen.
+Thus there are Production (\verb+$LINEAR_ROOT+) and Development directories. 
+\verb+$LINEAR_ARCH+ (which defaults to \verb+$PIPS_ARCH+ and \verb|.|
+(dot)) can be used for building the library.
 
-This directory contains the sources of each sub-library, in separated
-directories named after these sub-libraries. Sources can be modified in this
-hierarchy. They can be locally compiled using the command {\tt make
-  compile}. To install them in the production hierarchy (see the next item),
-you must use {\tt make install}.
 
-\item {\bf\tt Production.}
 
-This directory contains the installed sources of the linear library. The
-sub-division of directories is identical to {\bf\tt Development}, but for an
-additional directory (\verb+include.dir+), which gathers all the header
-files from the sub-libraries.
-\end{itemize}
 
-The statute of this library is the same as \verb+libC+, which means that it
-is considered as an external library. However, since it still requires some
-tuning, its constituents {\tt arithmetique.a, vecteur.a, ...} are copied
-(instead of being linked) in the \verb+$PIPS_EXTEDIR+ directory. This
-operation is performed by the {\tt fetch-linear} utility after each
-installation.  This command also copies the corresponding header files in
-\verb+$PIPS_EXTEDIR+.
 
 \section{Makefiles}
 \label{sec:makefiles}
@@ -490,8 +504,8 @@ installation procedures are respected.
 {\tt make depend}\index{make!depend} must be used regularly to keep file
 dependencies up-to-date. The local header file corresponding to the current
 pass or library must have been created before, otherwise {\tt make depend}
-selects the header file from \verb+$PIPS_INCLUDEDIR+, and the local header
-will never be created.
+selects the header file from \verb+$PIPS_ROOT/Include+, and the local header
+will never be created. %% $
 
 {\tt make test}\index{make!test}, {\tt make ttest}\index{make!ttest} and
 {\tt make wtest}\index{make!wtest} generate local versions of PIPS
@@ -514,32 +528,17 @@ file is provided in Figure~\ref{fig:config_makefile}.
   \begin{center}
     \leavevmode
     \begin{verbatim}
-...
-AR=             $(PIPS_AR)
-ARFLAGS=        $(PIPS_ARFLAGS)
-CC=             $(PIPS_CC)
-CFLAGS=         $(PIPS_CFLAGS)
-CPPFLAGS=       $(PIPS_CPPFLAGS)
-LD=             $(PIPS_LD)
-LDFLAGS=        $(PIPS_LDFLAGS)
-LEX=            $(PIPS_LEX)
-LFLAGS=         $(PIPS_LFLAGS)
-LINT=           $(PIPS_LINT)
-LINTFLAGS=      $(PIPS_LINTFLAGS)
-YACC=           $(PIPS_YACC)
-YFLAGS=         $(PIPS_YFLAGS)
 #
 # The following macros define your pass.
 #
-# Name of the target
-TARGET=         parallelize
+# Name of the target (default is the name of directory)
+# TARGET=         parallelize
 #
 # Source, header and object files used to build the target
-TARGET_CFILES=  kennedy.c scan.c util.c dependence.c algebre.c \
+LIB_CFILES=  kennedy.c scan.c util.c dependence.c algebre.c \
                 divar.c debug.c codegen.c scc.c
-TARGET_HEADERS= includes.h
-TARGET_OBJECTS= kennedy.o scan.o util.o dependence.o algebre.o \
-                divar.o debug.o codegen.o scc.o
+LIB_HEADERS= parallelize-local.h
+LIB_OBJECTS= $(LIB_CFILES:.c=.o)
 #
 # List of libraries used to build the target
 TARGET_LIBS=    -lprivatize -lusedef -lprettyprint -lsemantics \
@@ -547,15 +546,14 @@ TARGET_LIBS=    -lprivatize -lusedef -lprettyprint -lsemantics \
                 -lcontrol -leffects -lnormalize \
                 -lsc -lcontrainte -lvecteur -larithmetique \
                 -lri-util -lmisc -lproperties \
-                -lgenC /usr/lib/debug/malloc.o \
-                -lproperties
+                -lgenC -lproperties
 
 \end{verbatim}
 
     \caption{Example of {\tt config.makefile}.}
     \label{fig:config_makefile}
   \end{center}
-\end{figure}
+\end{figure} %% $
 
 \section{Library internal organization}
 \label{sec:library_internal_organization}
@@ -661,7 +659,7 @@ several values:
 
 Some libraries implement functionalities which are accessible by the users
 via the \verb+pipsmake+ mechanism. For a good comprehension of the material
-contained in this subsection ,the reader is referred to the corresponding
+contained in this subsection, the reader is referred to the corresponding
 documentation.
 
 A PIPS phase {\em myphase} is implemented as a C function named {\tt
@@ -884,11 +882,14 @@ DBR_MYRES,
   pipsmake-rc.tex} can lead to inconsistencies which only appear at run time
   (the database cannot be created for instance). 
 
+
+
 \subsection{Modification or addition of a new NewGen data structure}
 
 NewGen data strutures for PIPS are defined in \LaTeX{} files which are in
-the directory {\tt \$PIPS\_DOCDIR/Newgen}. These files include both the
-NewGen specifications, and the comments in \LaTeX{} format.
+the directory \verb+$PIPS_DEVEDIR/Documentation/newgen+. 
+These files include both the NewGen specifications, and the comments in
+\LaTeX{} format. 
 DDL\footnote{Newgen types are called {\em domains\/} and are defined using a
   high level specification language called DDL for {\em Domain Definition
     Language}.} files are automatically generated from the previous \LaTeX{}
@@ -897,7 +898,7 @@ files. When declaring a new data structure, two cases may arise:
 \begin{enumerate}
   
 \item The new data strucutre is defined in a {\em new\/} file {\tt
-    mysd.f.tex}:
+    mysd.ftex}:
   
   This file has to be declared in the local {\tt Makefile} (in {\tt
     \$PIPS\_DOCDIR/Newgen}) for its further installation in the {\bf\tt
@@ -941,6 +942,7 @@ Then, in both cases, the next steps have to be performed:
   achieves the global recompilation of PIPS. It is in the directory {\tt
   \$PIPS\_UTILDIR} (Cf Page~\pageref{make-pips}). 
 \end{itemize}
+
 
 
 \subsection{Changing the dynamic allocation library}
@@ -1246,6 +1248,3 @@ which are updated every hour.
 
 \end{document}
 \end
-
-
-
