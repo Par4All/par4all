@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/21 14:48:11 $, 
+# $Date: 1996/08/24 11:20:03 $, 
 #
 # Newgen should be quite particular...
 
@@ -59,14 +59,11 @@ DERIVED_FILES=
 CFILES=  $(LIB_CFILES) $(DERIVED_CFILES) $(OTHER_CFILES)
 LIB_OBJECTS= $(addprefix $(ARCH)/,$(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o))
 
-SOURCES= $(LIB_HEADERS) $(LIB_CFILES) \
-	$(OTHER_HEADERS) $(OTHER_CFILES) \
-	config.makefile
+SOURCES= $(LIB_HEADERS) $(LIB_CFILES) $(OTHER_HEADERS) $(OTHER_CFILES) 
 
-INSTALL_FILE= $(LIB_HEADERS)
+INSTALL_INC= $(LIB_HEADERS)
 INSTALL_LIB= $(ARCH)/libgenC.a
-INSTALL_SHR= 
-INSTALL_EXE= $(ARCH)/newC
+INSTALL_Bin= $(ARCH)/newC
 
 #
 # local rules
