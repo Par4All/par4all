@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/20 17:07:14 $, 
+# $Date: 1996/08/20 17:09:28 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -76,7 +76,7 @@ wpips_transform_menu_layout.h:  pipsmake-rc.tex
 clean: local-clean
 
 local-clean:
-	$(RM) -r $(DERIVED_FILES) *.aux *.log *.ind *.idx *.toc *.ilg
+	$(RM) -r $(DERIVED_FILES) *.aux *.log *.ind *.idx *.toc *.ilg *.dvi
 
 # end of $RCSfile: config.makefile,v $
 #
