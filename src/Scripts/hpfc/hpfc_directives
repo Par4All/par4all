@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/19 12:51:37 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/21 10:18:06 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -27,6 +27,7 @@
 # - some specific directives for HPFC.
 # - simple management of descriptive interfaces: 
 #   they are switched to prescriptive ones!:-)
+# - ! style comments in directives are okay.
 #
 # (c) Fabien Coelho, February 95 and later.
 # don't expect anything from this script.
@@ -95,10 +96,14 @@ $RM -f $TMP.*
 # ??? maybe should I add some option to avoid this translation?
 #
 $SED '#
-      # HPF and FC directive origins to Ctrl-V
+      # switch HPF and FC directive origins to Ctrl-V
       #
       s,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,\1,;
       s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,;
+      #
+      # ! style comments are removed. There should be none in time messages...
+      #
+      //s,!.*,,;
       #
       # switch to lower case letters the directives *only*
       #
