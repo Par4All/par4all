@@ -17,11 +17,9 @@
 #include "contrainte.h"
 #include "sc.h"
 
-/*
 #include "sommet.h"
 #include "ray_dte.h"
 #include "sg.h"
-*/
 
 #include "polyedre.h"
 
