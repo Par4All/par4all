@@ -18,6 +18,11 @@
 
 enum {ICON_TEXT_HEIGHT = 20};
 
+/* To store the negative image for a blinking icon in the interrupt
+   button: */
+Server_image wpips_positive_server_image,
+wpips_negative_server_image;
+
 static Server_image pips_icon_server_image[LAST_ICON];
 
 static unsigned short int pips_icons_data[LAST_ICON][256] = {
@@ -65,29 +70,45 @@ void create_icons()
 Server_image
 create_status_window_pips_image()
 {
-   Server_image image;
+   /* To store the negative image for a blinking icon in the interrupt
+      button: */
+   char * inverted_pips_icon;
+   int i;
    /*  Pixmap logo_pips_small_pixmap;
    
-   logo_pips_small_pixmap = XCreatePixmap((Display *) xv_get(main_frame,
-                                                             XV_DISPLAY),
-                                          (Window) xv_get(main_frame,
-                                                          XV_ID),
-                                                          */                                     
-   image = (Server_image) xv_create(NULL, SERVER_IMAGE,
+       logo_pips_small_pixmap = XCreatePixmap((Display *) xv_get(main_frame,
+       XV_DISPLAY),
+       (Window) xv_get(main_frame,
+       XV_ID),
+       */                                     
+   wpips_positive_server_image =
+      (Server_image) xv_create(NULL, SERVER_IMAGE,
                                 /*SERVER_IMAGE_PIXMAP,
-                                    logo_pips_small,
-                                    SERVER_IMAGE_X_BITS,
-                                    logo_pips_small,
-                                    SERVER_IMAGE_DEPTH, 8,
-                                    XV_WIDTH, 56,
-                                    XV_HEIGHT, 51,*/
-                                    SERVER_IMAGE_X_BITS,
-                                    logo_pips_small_bits,
-                                    XV_WIDTH, logo_pips_small_width,
-                                    XV_HEIGHT, logo_pips_small_height,
-                                    NULL);
+                                  logo_pips_small,
+                                  SERVER_IMAGE_X_BITS,
+                                  logo_pips_small,
+                                  SERVER_IMAGE_DEPTH, 8,
+                                  XV_WIDTH, 56,
+                                  XV_HEIGHT, 51,*/
+                               SERVER_IMAGE_X_BITS,
+                               logo_pips_small_bits,
+                               XV_WIDTH, logo_pips_small_width,
+                               XV_HEIGHT, logo_pips_small_height,
+                               NULL);
+
+   inverted_pips_icon = (char *) malloc(sizeof(logo_pips_small_bits));
+   for (i = 0; i < sizeof(logo_pips_small_bits); i++)
+      inverted_pips_icon[i] = ~logo_pips_small_bits[i];
+   wpips_negative_server_image =
+      (Server_image) xv_create(NULL, SERVER_IMAGE,
+                               SERVER_IMAGE_X_BITS,
+                               inverted_pips_icon,
+                               XV_WIDTH, logo_pips_small_width,
+                               XV_HEIGHT, logo_pips_small_height,
+                               NULL); 
+   free(inverted_pips_icon);
    
-   return image;
+   return wpips_positive_server_image;
 }
 
 
