@@ -57,7 +57,6 @@ extern int fflush();
 extern int printf();*/
 extern sccs dfg_find_sccs();
 extern bdt search_graph_bdt();
-extern 	 int fprintf();
 
 jmp_buf overflow_error;
 jmp_buf pips_top_level;
