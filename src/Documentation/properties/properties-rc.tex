@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/10/13 08:43:32 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/10/16 08:39:07 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -376,6 +376,7 @@ COMPUTE_ALL_DEPENDENCES FALSE
 No property for this library.
 
 \subsection{Semantic Analysis}
+\label{subsection-semantic-analysis}
 
 Perform ``meet'' operations for semantics analysis.
 
@@ -528,18 +529,17 @@ COMPLEXITY_COST_TABLE "all_1"
 
 \subsubsection{Evaluation Strategy}
 
-For the moment, we have designed two ways to to solve the complexity
-combination problem.Since symbolic complexity formulae use program
-variable it is necessary to specify in which store they are
+For the moment, we have designed two ways to solve the complexity
+combination problem. Since symbolic complexity formulae use program
+variables it is necessary to specify in which store they are
 evaluated. If two complexity formulae are computed relatively to two
 different stores, they cannot be directly added.
 
-First approach, which is implemented, uses the module initial store as
-universal store for all formulae (but possibly for the complexity of
-elementary statements).
-In some way, symbolic variable are evaluated as early as possible as
-soon as it is known that they won't make it in the module summary
-complexity.
+The first approach, which is implemented, uses the module initial store
+as universal store for all formulae (but possibly for the complexity of
+elementary statements).  In some way, symbolic variable are evaluated as
+early as possible as soon as it is known that they won't make it in the
+module summary complexity.
 
 This first method is easy to implement when the preconditions are available
 but it has at least two drawbacks:
@@ -558,12 +558,29 @@ with interprocedural constant propagation.
 
 \end{itemize}
 
+The second approach, which is not implemented, delay variable evaluation
+as late as possible. Complexities are computed and given relatively to
+the stores used by each statements. Two elementary complexities are combined
+together using the earliest store. The two stores are related by a {\em
+transformer} (see Section~\ref{subsection-semantic-analysis}). Such an
+approach is used to compute {\tt MUST} regions as precisely as possible
+(see Section~\ref{subsection-regions}).
+
+A simplified version of the late evaluation was implemented. The initial
+store of the procedure is the only reference store used as with the
+early evaluation, but variables are not evaluated right away. They only
+are evaluated when it is necessary to do so. This not an ideal solution,
+but it is easy to implement and reduces considerably the number of
+unknown values which have to be put in the formulae to have correct
+results.
+
 
 \begin{verbatim}
-COMPLEXITY_EARLY_EVALUATION TRUE
+COMPLEXITY_EARLY_EVALUATION FALSE
 \end{verbatim}
 
 \subsection{Regions}
+\label{subsection-regions}
 
 if {\tt MUST\_REGIONS} is true, then it computes regions using the
 algorithm described in report E/181/CRI, called {\em $T^{-1}$
