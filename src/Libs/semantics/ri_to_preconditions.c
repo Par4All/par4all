@@ -83,7 +83,7 @@ transformer statement_to_postcondition(pre, s)
 transformer pre;
 statement s;
 {
-    transformer post;
+    transformer post = transformer_undefined;
     instruction i = statement_instruction(s);
     transformer tf = load_statement_transformer(s);
 
@@ -170,7 +170,7 @@ transformer pre;
 instruction i;
 transformer tf;
 {
-    transformer post;
+    transformer post = transformer_undefined;
     test t;
     loop l;
     call c;
@@ -459,7 +459,7 @@ transformer pre;
 loop l;
 transformer tf;
 {
-    transformer post;
+    transformer post = transformer_undefined;
     statement s = loop_body(l);
 
     debug(8,"loop_to_postcondition","begin\n");
@@ -589,7 +589,7 @@ transformer pre;
 call c;
 transformer tf;
 {
-    transformer post;
+    transformer post = transformer_undefined;
     entity e = call_function(c);
     tag tt;
 
