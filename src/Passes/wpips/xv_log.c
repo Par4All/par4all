@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/13 18:06:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/15 15:58:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/13 18:06:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/09/15 15:58:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -40,46 +40,45 @@ static char log_file_name[MAXPATHLEN];
 void
 close_log_file()
 {
-  if (log_file != NULL && get_bool_property("USER_LOG_P")==TRUE)
-    if (fclose(log_file) != 0) {
-      perror("close_log_file");
-      abort();
-    }
-  log_file = NULL;
+   if (log_file != NULL && get_bool_property("USER_LOG_P") == TRUE)
+      if (fclose(log_file) != 0) {
+         perror("close_log_file");
+         abort();
+      }
+   log_file = NULL;
 }
 
 
 void
 open_log_file()
 {
-  if (log_file != NULL)
-    close_log_file();
+   if (log_file != NULL)
+      close_log_file();
 
-  if (get_bool_property("USER_LOG_P")==TRUE) {
-    (void) strcpy(log_file_name,
-		  concatenate(database_directory(db_get_current_workspace()),
-			      "/",
-			      LOG_FILE,
-			      NULL));
-    if ((log_file = fopen(log_file_name, "w")) == NULL) {
-      perror("open_log_file");
-      abort();
-    }
-  }
+   if (get_bool_property("USER_LOG_P") == TRUE) {
+      sprintf(log_file_name, "%s/%s",
+              database_directory(db_get_current_workspace()),
+              LOG_FILE);
+      
+      if ((log_file = fopen(log_file_name, "a")) == NULL) {
+         perror("open_log_file");
+         abort();
+      }
+   }
 }
 
 
 static void
 log_on_file(char chaine[])
 {
-  if (log_file != NULL && get_bool_property("USER_LOG_P")==TRUE) {
-    if (fprintf(log_file, "%s", chaine) <= 0) {
-      perror("log_on_file");
-      abort();
-    }
-    else
-      fflush(log_file);
-  }
+   if (log_file != NULL && get_bool_property("USER_LOG_P") == TRUE) {
+      if (fprintf(log_file, "%s", chaine) <= 0) {
+         perror("log_on_file");
+         abort();
+      }
+      else
+         fflush(log_file);
+   }
 }
 
 
