@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: special_cases.c,v $
+ * Revision 1.24  1997/07/21 15:13:58  keryell
+ * Replaced %x format by %p.
+ *
  * Revision 1.23  1997/07/21 14:23:29  zory
  * HPFC header is now inserted in the type
  *
@@ -252,8 +255,7 @@ static reduction_operator get_operator(entity e, statement s)
  */
 static hpfc_reductions reduction_of_in(entity e, statement s)
 {
-    pips_debug(5, "considering %s in 0x%x\n", 
-	       entity_name(e), (unsigned int) s);
+    pips_debug(5, "considering %s in %p\n", entity_name(e), s);
 
     return make_hpfc_reductions(e, entity_undefined, get_operator(e, s));
 }
