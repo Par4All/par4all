@@ -318,6 +318,8 @@ bool simdizer(char * mod_name)
    /* Reorder the module, because new statements have been added */  
    module_reorder(mod_stmt);
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+   DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name, 
+			  compute_callees(mod_stmt));
  
    /* update/release resources */
    reset_current_module_statement();
