@@ -124,8 +124,6 @@ save_meta_data(bool do_free)
     string file_name;
     FILE * file;
 
-    fprintf(stderr, "save_meta_data %d\n", do_free);
-
     pips_debug(2, "saving database status\n");
     file_name = meta_data_db_file_name(DATABASE_STATUS);
     file = safe_fopen(file_name, "w");
