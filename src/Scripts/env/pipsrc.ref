@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/04/19 15:38:10 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/13 21:33:30 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -261,37 +261,7 @@ DAVINCI_ICONDIR=${DAVINCI_DIR}/images
 MANPATH=${MANPATH}:${DAVINCI_DIR}/man
 PATH=${PATH}:${DAVINCI_DIR}
 
-#
-#          ####   #       #####
-#         #    #  #       #    #
-#         #    #  #       #    #
-#         #    #  #       #    #
-#         #    #  #       #    #
-#          ####   ######  #####
-#
-# obsolete environment variables
-
-[ `logname` != coelho ] && 
-{
-PIPSHOME=$PIPS_HOME
-PIPSDIR=$PIPS_DIR
-UTILDIR=$PIPS_UTILDIR
-PRODDIR=$PIPS_PRODDIR
-BINDIR=$PIPS_BINDIR
-LIBDIR=$PIPS_LIBDIR
-COSTDIR=$PIPS_COSTDIR
-SRCDIR=$PIPS_SRCDIR
-LIBSRCDIR=$PIPS_LIBSRCDIR
-BINSRCDIR=$PIPS_BINSRCDIR
-RTSRCDIR=$PIPS_RTSRCDIR
-DEVEDIR=$PIPS_DEVEDIR
-EXTEDIR=$PIPS_EXTEDIR
-TEMPDIR=$PIPS_TEMPDIR
-RELEDIR=$PIPS_RELEDIR
-INCLUDEDIR=$PIPS_INCLUDEDIR
-DOCDIR=$PIPS_DOCDIR
-}
-
+# OLD???
 LINEARDIR=$LINEAR_DIR
 NEWGENDIR=$NEWGEN_DIR
 
