@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1997/01/16 18:27:24 $, )
+# ($Date: 1997/01/17 09:32:33 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -259,7 +259,7 @@ $(pvmbin)/%: % $(pvmbin); $(COPY) $< $@
 hostnode: host node
 host: $(HOST) 
 node: $(NODE)
-main: $(MAIN)
+main: $(MAIN) $(TARGET).qsub
 out: $(RTEST)
 
 install_main: $(pvmbin)/$(MAIN)
@@ -376,7 +376,8 @@ $(RTEST):  $(FTEST)
 # Cleaning
 
 clean:;	$(RM) *.o *~ *.trace $(RT_INIT:.f=.m4) $(DEDUCED) core
-clobber: clean; $(RM) $(RUNABLES) $(pvmbin)/$(HOST) $(pvmbin)/$(NODE)
+clobber: clean; $(RM) $(RUNABLES) $(pvmbin)/$(HOST) $(pvmbin)/$(NODE) \
+	run.out run.err $(TARGET).qsub 
 
 echo:; @echo $(ECHO)
 
