@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/26 19:02:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/26 20:22:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/07/26 19:02:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/07/26 20:22:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -435,7 +435,7 @@ text text_transformer(transformer tran)
       if(strlen(crt_line)+1 > MAX_LINE_LENGTH-2) {
 	(void) strcat(crt_line, LINE_SUFFIX);
 	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-q						strdup(crt_line)));
+						strdup(crt_line)));
 
 	if(first_line) {
 	  first_line = FALSE;
