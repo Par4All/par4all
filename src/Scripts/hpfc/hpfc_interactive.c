@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/08/01 11:21:41 $, 
+ * $Date: 1995/08/01 11:22:10 $, 
  *
  * interactive interface to hpfc, based on the GNU realine library.
  */
@@ -19,7 +19,7 @@ extern int chdir();
 #define HPFC_PREFIX "hpfc"   /* forked shell script  */
 #define HIST ".hpfc.history" /* default history file */
 
-#define SHELL_ESCAPE "\"
+#define SHELL_ESCAPE "\\"
 #define CHANGE_DIR   "cd "
 #define QUIT         "quit"
 
