@@ -4,6 +4,21 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.42  1998/04/15 10:51:58  coelho
+ * tag numbering fixed.
+ *
+ * Revision 1.41  1998/04/15 08:58:58  coelho
+ * fixes for array.
+ *
+ * Revision 1.40  1998/04/14 22:37:57  coelho
+ * even better;-)
+ *
+ * Revision 1.39  1998/04/14 22:23:10  coelho
+ * even more homogeneous.
+ *
+ * Revision 1.38  1998/04/14 22:16:04  coelho
+ * more homogeneous hidden names.
+ *
  * Revision 1.37  1998/04/14 22:05:56  coelho
  * more named fields (tag and index).
  *
@@ -36,6 +51,8 @@
 #define INDENT "  "
 #define FIELD  "field_"
 #define STRUCT "_newgen_struct_"
+
+#define OPTIMIZE_NEWGEN "OPTIMIZE_NEWGEN"
 
 #define IS_TAB(x) ((x)==Tabulated_bp)
 #define TYPE(bp) (bp-Domains-Number_imports-Current_start)
@@ -73,6 +90,15 @@ int gen_size(struct gen_binding * bp)
     }
 }
 
+static void sharp_ifopt(FILE * out)
+{ fprintf(out, "#if defined(" OPTIMIZE_NEWGEN ")\n"); }
+
+static void sharp_else(FILE * out)
+{ fprintf(out, "#else\n"); }
+
+static void sharp_endif(FILE * out)
+{ fprintf(out, "#endif /* " OPTIMIZE_NEWGEN " */\n"); }
+
 /* returns s duplicated and case-uppered.
  */
 static string strup(string s)
@@ -95,20 +121,32 @@ static string newgen_type_name(union domain * dp)
     }
     case SET_DT: return "set";
     case LIST_DT: return "list";
+    case ARRAY_DT: return dp->ar.element->name;
+    default: fatal("[newgen_type_name] unexpected domain type %d\n", 
+		   dp->ba.type);
     }
-    return "";
+    return NULL;
 }
 
+/* type for generated function arguments.
+ */
 static string newgen_argument_type_name(union domain * dp)
 {
     switch (dp->ba.type) {
     case BASIS_DT: return dp->ba.constructand->name;
     case LIST_DT: return "list";
     case SET_DT: return "set";
-    default: fatal("[newgen_argument_type] unexpected domain type %d\n", 
+    case ARRAY_DT: return dp->ar.element->name;
+    default: fatal("[newgen_argument_type_name] unexpected domain type %d\n", 
 		   dp->ba.type);
     }    
     return NULL;
+}
+
+static string newgen_type_name_close(union domain * dp)
+{
+    if (dp->ba.type==ARRAY_DT) return " *"; /* pointer */
+    return "";
 }
 
 /* what to add to the field to access a given primitive type,
@@ -123,6 +161,8 @@ static char newgen_access_name(union domain * dp)
 	return '\0';
 }
 
+/* just to generate comprehensive comments.
+ */
 static string newgen_kind_label(union domain * dp)
 {
     switch (dp->ba.type) {
@@ -133,6 +173,8 @@ static string newgen_kind_label(union domain * dp)
     }
 }
 
+/* make is bigger, thus I put it in a separate function.
+ */
 static void generate_make(
     FILE * header,
     FILE * code,
@@ -156,8 +198,9 @@ static void generate_make(
 	{
 	case AND_OP:
 	    for (i=1, dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr, i++)
-		fprintf(header, "%s%s", i==1? "": ", ",
-			newgen_argument_type_name(dlp->domain));
+		fprintf(header, "%s%s%s", i==1? "": ", ",
+			newgen_argument_type_name(dlp->domain),
+			newgen_type_name_close(dlp->domain));
 	    break;
 	case OR_OP:
 	    fprintf(header, "int, void *");
@@ -170,7 +213,9 @@ static void generate_make(
     case LIST_DT:
     case SET_DT:
     case ARRAY_DT:
-	fprintf(header, "%s", newgen_argument_type_name(dom));
+	fprintf(header, "%s%s", 
+		newgen_argument_type_name(dom),
+		newgen_type_name_close(dom));
 	break;
     default: 
 	fatal("[generate_make] unexpected domain type tag %d\n", domain_type);
@@ -189,8 +234,9 @@ static void generate_make(
 	{
 	case AND_OP:
 	    for (i=1, dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr, i++)
-		fprintf(code, "%s%s a%d", i==1? "": ", ",
-			newgen_argument_type_name(dlp->domain), i);
+		fprintf(code, "%s%s%s a%d", i==1? "": ", ",
+			newgen_argument_type_name(dlp->domain),
+			newgen_type_name_close(dlp->domain), i);
 	    break;
 	case OR_OP:
 	    fprintf(code, "int tag, void * val");
@@ -203,7 +249,9 @@ static void generate_make(
     case LIST_DT:
     case SET_DT:
     case ARRAY_DT:
-	fprintf(code, "%s a", newgen_argument_type_name(dom));
+	fprintf(code, "%s%s a", 
+		newgen_argument_type_name(dom),
+		newgen_type_name_close(dom));
 	break;
     }
 
@@ -239,6 +287,8 @@ static void generate_make(
     fprintf(code, "); }\n");
 }
 
+/* generate the struct for bp.
+ */
 static void generate_struct_members(
     FILE * out,  
     struct gen_binding * bp,
@@ -253,7 +303,7 @@ static void generate_struct_members(
     /* generate the structure
      */
     fprintf(out, 
-	    "struct " STRUCT "%s {\n"
+	    "struct " STRUCT "%s_ {\n"
 	    INDENT "gen_chunk _type_; /* int */\n",
 	    bp->name);
  
@@ -274,22 +324,22 @@ static void generate_struct_members(
 
     if ((domain_type==CONSTRUCTED_DT && operator==ARROW_OP) ||
 	domain_type==LIST_DT || 
-	domain_type==ARRAY_DT || 
 	domain_type==SET_DT)
-	fprintf(out, INDENT "gen_chunk h; /* holder */\n");
+	fprintf(out, INDENT "gen_chunk _%s_holder_;\n", bp->name);
 
     if (domain_type==CONSTRUCTED_DT && operator!=ARROW_OP)
 	for (i=1, dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr, i++)
-	    fprintf(out, "%s" INDENT "%s _%s_%s_" FIELD "; /* %s:%s%s */\n", 
+	    fprintf(out, "%s" INDENT "%s%s _%s_%s_" FIELD "; /* %s:%s%s */\n",
 		    offset,
 		    newgen_type_name(dlp->domain),
+		    newgen_type_name_close(dlp->domain),
 		    bp->name, dlp->domain->ba.constructor,
 		    dlp->domain->ba.constructor,
 		    dlp->domain->ba.constructand->name,
 		    newgen_kind_label(dlp->domain));
 
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) 
-	fprintf(out, INDENT "} u;\n");
+	fprintf(out, INDENT "} _%s_union_;\n", bp->name);
     
     fprintf(out, "};\n");
 }
@@ -306,28 +356,34 @@ static void generate_access_members(
 {
     union domain * dom = bp->domain;
     struct domainlist * dlp;
-    string in_between, name=bp->name;
+    bool in_between;
+    string name=bp->name;
     int i;
 
     fprintf(out, "#define %s_domain_number(x) ((x)->_type_.i)\n", name);
 
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
-	in_between = "u.";
+	in_between = TRUE;
 	fprintf(out, "#define %s_tag(x) ((x)->_%s_tag_.i)\n", name, name);
     }
-    else in_between = "";
+    else in_between = FALSE;
     
     if (domain_type==CONSTRUCTED_DT && operator==ARROW_OP) 
-	fprintf(out, "#define %s_hash_table(x) ((x)->h.h)\n", name);
+	fprintf(out, "#define %s_hash_table(x) ((x)->_%s_holder_.h)\n", 
+		name, name);
 
-    if (domain_type==LIST_DT || domain_type==ARRAY_DT || domain_type==SET_DT)
-	fprintf(out, "#define %s_%s(x) ((x)->h.%c)\n",
-		name, dom->ba.constructor, 
-		(domain_type==LIST_DT)? 'l':
-		(domain_type==SET_DT)? 's': 'a');
+    if (domain_type==LIST_DT || domain_type==SET_DT)
+	fprintf(out, "#define %s_%s(x) ((x)->_%s_holder_.%c)\n",
+		name, dom->ba.constructor, name, 
+		(domain_type==LIST_DT)? 'l': 's');
+
+    if (domain_type==ARRAY_DT)
+	fprintf(out, "#define %s_%s(x) ((x)->_%s_%s_" FIELD "\n",
+		name, dlp->domain.ba.constructor,
+		name, dlp->domain.ba.constructor);
     
     if (domain_type==CONSTRUCTED_DT && operator!=ARROW_OP)
-	for (i=1, dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr, i++)
+	for (i=0, dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr, i++)
 	{
 	    char c;
 	    if (operator==OR_OP)
@@ -338,18 +394,21 @@ static void generate_access_members(
 			name, dlp->domain->ba.constructor, 
 			name, name, dlp->domain->ba.constructor);
 	    fprintf(out, 
-		    "#define %s_%s_(x) %s_%s(x)\n" /* hack compatible */
-		    "#define %s_%s(x) ((x)->%s_%s_%s_" FIELD,
+		    "#define %s_%s_(x) %s_%s(x) /* old hack compatible */\n"
+		    "#define %s_%s(x) ((x)->",
 		    name, dlp->domain->ba.constructor, 
 		    name, dlp->domain->ba.constructor, 
-		    name, dlp->domain->ba.constructor, in_between, 
 		    name, dlp->domain->ba.constructor);
+	    if (in_between) fprintf(out, "_%s_union_.", name);
+	    fprintf(out, "_%s_%s_" FIELD, name, dlp->domain->ba.constructor);
 	    c = newgen_access_name(dlp->domain);
 	    if (c) fprintf(out, ".%c", c);
 	    fprintf(out, ")\n");
 	}
 }
 
+/* constructed types: + x (and ->...)
+ */
 static void generate_constructed(
     FILE * header, 
     FILE * code,
@@ -361,6 +420,8 @@ static void generate_constructed(
     generate_access_members(header, bp, CONSTRUCTED_DT, operator);
 }
 
+/* other types (direct * {} [])
+ */
 static void generate_not_constructed(
     FILE * header,
     FILE * code,
@@ -471,7 +532,7 @@ generate_safe_definition(
 		Name, file, index);
     else
 	fprintf(out, 
-		"typedef struct " STRUCT "%s * %s;\n", 
+		"typedef struct " STRUCT "%s_ * %s;\n", 
 		name, name);
     
     fprintf(out, "#endif /* _newgen_%s_domain_defined_ */\n\n", name);
@@ -590,6 +651,8 @@ generate_domain(
     free(Name);
 }
 
+/* fopen prefix + suffix.
+ */
 static FILE * fopen_suffix(string prefix, string suffix)
 {
     FILE * f;
