@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/01 19:19:00 $, 
+ * $Date: 1997/04/09 13:06:49 $, 
  */
 
 #include <stdio.h>
@@ -40,7 +40,16 @@ static FILE *logfile;
 static FILE * current_file;
 extern int tgetnum();
 static char *usage = 
-    "Usage: %s [-n] [-h/?] [-v] [-l logfilename] sourcefile...\n";
+  "Usage: %s [-n] [-h/?] [-v] [-l logfilename] tpips-scripts\n";
+
+#define before_initial_prompt \
+  "tpips (ARCH=" SOFT_ARCH ")\n\n" \
+  "  (c) 1988-1997 Centre de Recherche en Informatique,\n" \
+  "                École des mines de Paris, France.\n\n" \
+  "  URL: http://www.cri.ensmp.fr/pips\n" \
+  "  MAIL: pipsgroup@cri.ensmp.fr\n\n" \
+  "  This software is provided as is, under the terms of the GPL.\n" \
+  "  It includes software from GNU and Berkeley.\n\n"
 
 /*************************************************************** Some Macros */
 
@@ -674,6 +683,8 @@ static void process_a_file()
 	initialize_readline ();
 	last = initialize_tpips_history();
 	readline_initialized = TRUE;
+
+	fprintf(stdout, before_initial_prompt);
     }
 
     /*  interactive loop
