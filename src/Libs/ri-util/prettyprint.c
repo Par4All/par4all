@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.162  2002/04/25 12:13:18  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.161  2002/04/25 12:03:46  phamdat
  * *** empty log message ***
  *
@@ -325,7 +328,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.161 2002/04/25 12:03:46 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.162 2002/04/25 12:13:18 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2515,18 +2518,18 @@ text my_text_named_module(entity module, statement stat)
 
     precedence_p = !get_bool_property("PRETTYPRINT_ALL_PARENTHESES");
 
-    if (!same_string_p(s, "")) {
-      text t = attach_head_to_sentence(make_sentence(is_sentence_formatted, strdup(s)),
-				       module);
-      {
+    if (!same_string_p(s, ""))
+        ADD_SENTENCE_TO_TEXT(r, 
+            attach_head_to_sentence(make_sentence(is_sentence_formatted, 
+						  strdup(s)),
+				    module));
+    {
 	string filename = "/users/tmp/phamdat/textout";
 	FILE * my_file = safe_fopen(filename, "w");
-	print_text(my_file, t);
+	print_text(my_file, r);
 	safe_fclose(my_file, filename);
 	free(filename);
 	}
-      ADD_SENTENCE_TO_TEXT(r, t);
-    }
 
     if (stat != statement_undefined) {
         MERGE_TEXTS(r, text_statement(module, 0, stat));
