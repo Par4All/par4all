@@ -361,10 +361,10 @@ graph                   dup_dg;
 
       ind = adg_get_integer_entity( ie );
       pv = vect_substract(EXPRESSION_PVECTEUR(dimension_lower( dim )),
-			  vect_new((Variable) ind , 1) );
+			  vect_new((Variable) ind , VALUE_ONE) );
       pss = sc_make(CONTRAINTE_UNDEFINED,contrainte_make(pv));
       dest_context = sc_append(dest_context, sc_dup(pss));
-      pv = vect_substract( vect_new((Variable) ind , 1),
+      pv = vect_substract( vect_new((Variable) ind , VALUE_ONE),
 			  EXPRESSION_PVECTEUR(dimension_upper( dim )) );
       pss = sc_make(CONTRAINTE_UNDEFINED,contrainte_make(pv));
       dest_context = sc_append(dest_context, sc_dup(pss));
@@ -461,7 +461,7 @@ graph                   dup_dg;
 	Pvecteur   pvec = NULL, exit_pv = NULL;
 	Psysteme   pss = NULL;
 	
-	exit_pv = vect_new((Variable) adg_get_integer_entity(ie),1);
+	exit_pv = vect_new((Variable) adg_get_integer_entity(ie),VALUE_ONE);
 	sou_e = copy_expression(EXPRESSION(CAR(sou_args)));
 	pvec = vect_substract( exit_pv, EXPRESSION_PVECTEUR( sou_e ));
 	if (pvec != NULL) {
@@ -659,10 +659,10 @@ graph                   dup_dg;
 
       ind = adg_get_integer_entity( ie );
       pv = vect_substract( EXPRESSION_PVECTEUR(dimension_lower( dim )),
-			  vect_new((Variable) ind , 1) );
+			  vect_new((Variable) ind , VALUE_ONE) );
       pss = sc_make(CONTRAINTE_UNDEFINED,contrainte_make(pv));
       dest_context = sc_append(dest_context, sc_dup(pss));
-      pv = vect_substract( vect_new((Variable) ind , 1),
+      pv = vect_substract( vect_new((Variable) ind , VALUE_ONE),
 			  EXPRESSION_PVECTEUR(dimension_upper( dim )) );
       pss = sc_make(CONTRAINTE_UNDEFINED,contrainte_make(pv));
       dest_context = sc_append(dest_context, sc_dup(pss));
@@ -789,7 +789,7 @@ graph                   dup_dg;
 	  Pvecteur   pvec = NULL, exit_v = NULL;
 	  Psysteme   pss = NULL;
 	  
-	  exit_v = vect_new((Variable) adg_get_integer_entity(ie),1);
+	  exit_v = vect_new((Variable) adg_get_integer_entity(ie),VALUE_ONE);
 	  sou_e = copy_expression(EXPRESSION(CAR(sou_args)));
 	  pvec = vect_substract( exit_v,EXPRESSION_PVECTEUR( sou_e ));
 	  if (pvec != NULL) {
