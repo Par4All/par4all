@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/09/15 15:54:24 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/10/10 11:38:15 $, )
  * version $Revision$
  */
 
@@ -10,8 +10,6 @@
 #include "access_description.h"
 
 #include "effects.h"
-
-entity CreateIntrinsic(string name); /* in syntax.h */
 
 static list lblocks = NIL, lloop  = NIL;
 
@@ -935,7 +933,7 @@ list Ref, lRef;
 			gen_nconc(li2,
 				  CONS(EXPRESSION,
 				       MakeBinaryCall
-				       (CreateIntrinsic((shift>0)?
+				       (entity_intrinsic((shift>0)?
 							(PLUS_OPERATOR_NAME):
 							(MINUS_OPERATOR_NAME)),
 					entity_to_expression(newindex),
@@ -990,7 +988,7 @@ entity index;
 {
     return(make_assign_statement
 	   (entity_to_expression(index),
-	    MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME),
+	    MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 			   entity_to_expression(index),
 			   int_to_expression(1))));
 }
