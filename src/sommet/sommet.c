@@ -104,7 +104,7 @@ FILE * f;
 Psommet s;
 char * (*nom_var)();
 {
-    if(s->denominateur!=1) {
+    if(value_notone_p(s->denominateur)) {
 	(void) fprintf(f,"denominator = ");
 	fprint_Value(f,s->denominateur);
 	(void) fprintf(f, "\t");
@@ -122,7 +122,7 @@ FILE * f;
 Psommet s;
 Pbase b;
 {
-    if(s->denominateur!=1) {
+    if(value_notone_p(s->denominateur)) {
 	(void) fprintf(f,"denominator = ");
 	fprint_Value(f,s->denominateur);
 	(void) fprintf(f, "\t");
@@ -175,9 +175,9 @@ Psommet ns;
 {
     Value div = vect_pgcd_all(ns->vecteur);
 
-    assert(div>0);
+    assert(value_pos_p(div));
     div = pgcd(div, ns->denominateur);
-    ns->denominateur /= div;
+    value_division(ns->denominateur,div);
     (void) vect_div(ns->vecteur, div);
 }
 
