@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/10/10 11:38:03 $, )
+ * ($Date: 1995/10/10 16:33:57 $, )
  */
 
 #include "defines-local.h"
@@ -12,6 +12,7 @@
 #include "semantics.h"
 #include "regions.h"
 #include "callgraph.h"
+#include "transformations.h"
 
 extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
 
@@ -341,12 +342,173 @@ string program_name;
 /* Compiler call, obsole. left here for allowing linking
  */
 void 
-hpfcompile (char *module_name)
+hpfcompile (string module_name)
 {
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "module: %s\n", module_name);
     pips_internal_error("obsolete\n");
     debug_off();
+}
+
+
+/******************************************************* HPFC ATOMIZATION */
+
+/*  drivers for atomize_as_required in transformations
+ */
+static bool expression_simple_nondist_p(expression e)
+{
+    reference r;
+
+    if (!expression_reference_p(e)) return(FALSE);
+
+    r = syntax_reference(expression_syntax(e));
+
+    return !array_distributed_p(reference_variable(r)) &&
+	    ENDP(reference_indices(r));
+}
+
+/* break expression e in reference r if ...
+ */
+static bool hpfc_decision(reference r, expression e)
+{
+    return array_distributed_p(reference_variable(r)) &&
+	   !expression_integer_constant_p(e) && 
+	   !expression_simple_nondist_p(e);
+}
+
+entity hpfc_new_variable(module, t)
+entity module;
+tag t;
+{
+    return make_new_scalar_variable(module, MakeBasic(t));
+}
+
+void NormalizeCodeForHpfc(statement s)
+{
+    normalize_all_expressions_of(s);
+    atomize_as_required(s, 
+			hpfc_decision,      /* reference test */
+			gen_false,          /* function call test */
+			ref_to_dist_array_p,/* test condition test */
+			hpfc_new_variable);
+}
+
+/*************************************************************** COMMONS */
+
+/* To manage the common entities, I decided arbitrarilly that all
+ * commons will have to be declared exactly the same way (name and so),
+ * so I can safely unify the entities among the modules.
+ * The rational for this stupid ugly transformation is that it is much
+ * easier to manage the common overlaps for instance if they are
+ * simply linked to the same entity.
+ * 
+ * ??? very ugly, indeed.
+ */
+
+GENERIC_CURRENT_MAPPING(update_common, entity, entity)
+
+static void update_common_rewrite(reference r)
+{
+    entity var = reference_variable(r),
+	new_var = load_entity_update_common(var);
+
+    pips_debug(7, "%s to %s\n", entity_name(var), 
+	  entity_undefined_p(new_var) ? "undefined" : entity_name(new_var));
+
+    if (!entity_undefined_p(new_var))
+	reference_variable(r) = new_var;    
+}
+
+static void update_loop_rewrite(l)
+loop l;
+{
+     entity var = loop_index(l),
+	new_var = load_entity_update_common(var);
+
+    if (!entity_undefined_p(new_var))
+	loop_index(l) = new_var;       
+}
+
+static void debug_ref_rwt(reference r)
+{
+    entity var = reference_variable(r);
+
+    if (entity_in_common_p(var))
+	fprintf(stderr, "[debug_ref_rwt] reference to %s\n", 
+		entity_name(var));
+}
+
+void debug_print_referenced_entities(obj)
+gen_chunk *obj;
+{
+    gen_recurse(obj, reference_domain, gen_true, debug_ref_rwt);
+}
+
+void update_common_references_in_obj(obj)
+gen_chunk *obj;
+{
+    gen_multi_recurse(obj, 
+		      loop_domain, gen_true, update_loop_rewrite,
+		      reference_domain, gen_true, update_common_rewrite,
+		      NULL);
+
+    ifdebug(8)
+	debug_print_referenced_entities(obj);
+}
+
+void update_common_references_in_regions()
+{
+    HASH_MAP(stat, lef,
+	 {
+	     debug(3, "update_common_references_in_regions",
+		   "statement 0x%x (%d effects)\n", 
+		   (unsigned int) stat, gen_length((list) lef));
+	     
+	     MAP(EFFECT, e, update_common_rewrite(effect_reference(e)), 
+		 (list) lef);
+	 },
+	     get_local_regions_map());
+}
+
+void 
+NormalizeCommonVariables(
+    entity module,
+    statement stat)
+{
+    list ldecl = code_declarations(entity_code(module)), lnewdecl = NIL, ltmp;
+    entity common, new_e;
+
+    /* the new entities for the common variables are created and
+     * inserted in the common. The declarations are updated.
+     */
+    MAP(ENTITY, e,
+    {
+	if (entity_in_common_p(e))
+	{
+	    common = ram_section(storage_ram(entity_storage(e)));
+	    new_e = AddEntityToModule(e, common);
+	    ltmp = area_layout(type_area(entity_type(common)));
+	    
+	    if (gen_find_eq(new_e, ltmp)==entity_undefined)
+		gen_insert_after(new_e, e, ltmp);
+	    
+	    lnewdecl = CONS(ENTITY, new_e, lnewdecl);
+	    store_entity_update_common(e, new_e);
+	    
+	    pips_debug(8, "module %s: %s -> %s\n",
+		  entity_name(module), entity_name(e), entity_name(new_e));
+	}
+	else
+	    lnewdecl = CONS(ENTITY, e, lnewdecl);
+    },
+	ldecl);
+
+    gen_free_list(ldecl);
+    code_declarations(entity_code(module)) = lnewdecl;
+
+    /* the references within the program are updated with the new entities
+     */
+    update_common_references_in_obj(stat);
 }
 
 /*   That is all
