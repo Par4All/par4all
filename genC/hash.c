@@ -14,19 +14,18 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/05/18 10:20:33 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/08/10 11:35:07 $, )
  * version $Revision$
  */
 
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 #include <stdlib.h>
+
 #include "newgen_types.h"
 #include "genC.h"
 #include "newgen_include.h"
 #include "newgen_hash.h"
-extern int cfree();
 
 /* Some predefined values for the key 
  */
