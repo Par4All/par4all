@@ -160,6 +160,8 @@ int SolveDiophantine(Matrix *M, Matrix **U, Vector **X) {
       value_addto(sum,sum,tmp);
     }  
     if (value_ne(sum,C[i])) {
+      *U = Matrix_Alloc(0,0);
+      *X = Vector_Alloc (0);
       value_clear(sum); value_clear(tmp);
       for (i = 0; i < k1; i++) 
 	value_clear(C[i]);
