@@ -505,12 +505,12 @@ transformer tfb;
 	if(value_mappings_compatible_vector_p(v) &&
 	   !transformer_affect_linear_p(tfb,v)) {
 	    if (lower_or_upper == IS_LOWER_BOUND)
-		vect_add_elem(&v, (Variable) entity_to_new_value(index),
-			      (Value) -1);
+		vect_add_elem(&v,
+		    (Variable) entity_to_new_value(index), VALUE_MONE);
 	    else{
 		vect_chg_sgn(v);
-		vect_add_elem(&v, (Variable) entity_to_new_value(index),
-			      (Value) 1);
+		vect_add_elem(&v, 
+		    (Variable) entity_to_new_value(index), VALUE_ONE);
 	    }
 	    pre = transformer_inequality_add(pre, v);
 	}
