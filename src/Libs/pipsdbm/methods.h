@@ -159,6 +159,11 @@
 { DBR_CALLERS, 			NEWGEN_METHODS },
 { DBR_CODE, 			NEWGEN_METHODS },
 
+/* Misc files.
+ */
+{ DBR_CROUGH,			STRING_METHODS },
+{ DBR_C,			STRING_METHODS },
+
 /* PROGRAM
  */
 /* entities are tabulated... here are some wrappers that expect
