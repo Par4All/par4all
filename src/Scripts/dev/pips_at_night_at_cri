@@ -1,0 +1,86 @@
+#! /usr/local/bin/bash
+#
+# $Id$
+#
+# what to do at night from the pips account at cri on chailly.
+#
+
+script=/projects/Pips/Utilities/pips_at_night
+mailto=pips_validation
+remote=rsh
+verb=:
+more=
+
+#
+# FUNCTIONS
+
+function usage()
+{
+    echo "pips_at_night_at_cri [-gGv]";
+    exit ${1}
+}
+
+function verb()
+{
+    echo "[pips_at_night_at_cri]" "$@";
+}
+
+#
+# OPTIONS
+
+while getopts Ggv opt
+do
+    case ${opt} in
+        g) mailto=coelho ; more=CNLPV;;
+	G) script=echo ;;
+	v) verb=verb ;;
+	*) usage 1;;
+    esac
+done
+
+# what host dir archs
+function doit()
+{
+    local what=$1 host=$2 dir=$3 archs=$4
+
+    $verb "[doit $#] ${script} ${mailto}" \""$@"\"
+
+    if [ $(hostname) = ${host} ]
+    then 
+	${script} -${what}${more}va ${mailto} -d ${dir} -c \""${archs}"\"
+    else
+	${PIPS_PING:-ping} ${host} && ${remote} ${host} \
+	    ${script} -${what}${more}va ${mailto} -d ${dir} -c \""${archs}"\"
+    fi
+}
+
+# host dir archs
+function onehost()
+{
+    ${verb} "[onehost] compilation $@"
+    doit V "$@" ;
+
+    ${verb} "[onehost] validation $@"
+    doit CNLP "$@" &
+}
+
+#
+# DO IT!
+
+${verb} Linux
+onehost coulommiers /tmp "LINUXI86"
+
+${verb} Solaris 2
+onehost recanati /projects/Pips/Experiments2 "GNUSOL2LL SOL2LL"
+
+${verb} SunOS 4
+onehost chailly ${HOME} ". GNU SUN4 GPROF"
+
+${verb} waiting
+
+wait
+
+${verb} done
+
+# DONE
+#
