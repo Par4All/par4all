@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Delete,v $ (version $Revision$)
-# $Date: 1996/08/22 08:41:59 $, 
+# $Date: 1997/03/27 17:16:05 $, 
 #
 # Delete removes a list of workspaces whose names are provided
 # after the command, no matter which the current workspace is.
@@ -42,7 +42,7 @@ do
     exit 2
   else
     [ "$DEFAULT" ] && verb "Deleting $WS"
-    /bin/rm -r $WS || {
+    rm -r $WS || {
       verb "Cannot remove $WS"
       exit 3
     }
