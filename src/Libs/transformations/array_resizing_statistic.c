@@ -18,7 +18,7 @@
 #include "properties.h"
 #include "semantics.h"
 #include "instrumentation.h"
-
+#include "transformations.h"
 
 static int number_of_one_and_formal_array_declarators = 0;
 static int number_of_assumed_size_and_formal_array_declarators = 0;
@@ -27,7 +27,7 @@ static int number_of_one_array_declarators = 0;
 static int number_of_assumed_size_array_declarators = 0;
 static int number_of_array_declarators = 0;
 
-bool adn_instrumentation(char *module_name)
+bool array_resizing_statistic(char *module_name)
 {
   entity module_ent = local_name_to_top_level_entity(module_name);
   list l_decl = code_declarations(entity_code(module_ent));
