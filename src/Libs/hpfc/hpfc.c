@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.104  1997/10/08 08:41:07  coelho
+ * hop. cleaner common prettyprint control.
+ *
  * Revision 1.103  1997/10/08 06:06:47  coelho
  * PRETTYPRINT_VARIABLE_DIMENSIONS in use.
  *
@@ -21,12 +24,6 @@
  * #include "makefile.h"
  * #include "pipsmake.h"
  * added.
- *
- * Revision 1.97  1997/05/03 14:11:00  coelho
- * *** empty log message ***
- *
- * Revision 1.96  1997/04/17 18:46:11  coelho
- * *** empty log message ***
  *
  * Revision 1.95  1997/04/16 13:14:56  coelho
  * cleaner...
@@ -508,6 +505,7 @@ bool hpfc_init(string name)
     pips_debug(1, "considering program %s\n", name);
 
     set_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS", "common");
+    set_bool_property("PRETTYPRINT_HPFC", TRUE); /* vars local to commons */
     set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
     set_bool_property("GLOBAL_EFFECTS_TRANSLATION", FALSE);
     set_bool_property("WARNING_ON_STAT_ERROR", FALSE); /* for my fake files */
