@@ -1,5 +1,4 @@
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 #include <sys/types.h>
 
@@ -8,6 +7,7 @@ extern int fprintf();
 #include "database.h"
 #include "makefile.h"
 #include "ri.h"
+#include "properties.h"
 #include "pipsdbm.h"
 #include "pipsmake.h"
 
@@ -115,7 +115,7 @@ string phase;
 		}, makefile_active_phases(current_makefile));
 	    }
 
-	    if (activate_del_derived_ressources_p() == TRUE)
+	    if (get_bool_property("ACTIVATE_DEL_DERIVED_RES"))
 		delete_derived_resources (res);
 	    else
 		if (db_get_current_program() != database_undefined) {
