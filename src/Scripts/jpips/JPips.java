@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: JPips.java,v $
+ * Revision 1.9  1999/02/15 14:12:51  coelho
+ * javax.
+ *
  * Revision 1.8  1998/11/14 13:37:48  ancourt
  * emacs jpips prop may be empty.
  *
@@ -40,10 +43,10 @@ import java.applet.*;
 import java.awt.*;
 
 //import java.awt.swing.preview.*;
-import com.sun.java.swing.*;
-import com.sun.java.swing.event.*;
-import com.sun.java.swing.text.*;
-import com.sun.java.swing.border.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
+import javax.swing.border.*;
 
 import JPips.Pawt.*;
 
