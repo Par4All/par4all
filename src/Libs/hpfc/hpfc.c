@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: hpfc.c,v $ ($Date: 1995/03/14 14:43:18 $, ) version $Revision$,
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/03/14 18:50:29 $, ) version $Revision$,
  * got on %D%, %T%
  */
  
@@ -37,9 +37,64 @@ extern system();
 
 #define NO_FILE "no file name"
 
-/*  COMPILER STATUS MANAGEMENT
+
+/*---------------------------------------------------------------------
+ *
+ *  COMMONS
+ *
  */
-static void save_hpfc_status()
+static list the_commons = NIL;
+
+static void reset_commons()
+{
+    the_commons = NIL;
+}
+
+static void init_commons_management()
+{
+    the_commons = NIL;
+}
+
+static void close_commons_management()
+{
+    gen_free_list(the_commons);
+    the_commons = NIL;
+}
+
+list get_commons()
+{
+    return(the_commons);
+}
+
+void set_commons(l)
+list l;
+{
+    assert(ENDP(the_commons));
+    the_commons = l;
+}
+
+void add_a_common(c)
+entity c;
+{
+    if (gen_find_eq(c, the_commons)!=c)
+	the_commons = CONS(ENTITY, c, the_commons);
+}
+
+/*---------------------------------------------------------------------
+ *
+ *  COMPILER STATUS MANAGEMENT
+ */
+/* initialization of data that belongs to the hpf compiler status
+ */
+static void init_hpfc_management()
+{
+    init_data_management();
+    init_hpf_number_management();
+    init_overlap_management();
+    init_commons_management();
+}
+
+static void save_hpfc_status() /* GET them */
 {
     string name = db_get_current_program_name();
     hpfc_status s = hpfc_status_undefined;
@@ -47,11 +102,31 @@ static void save_hpfc_status()
     DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, strdup(name), s);
 }
 
-static void load_hpfc_status()
+static void reset_hpfc_status()
+{
+    reset_data_status();
+    reset_hpf_number_status();
+    reset_overlaps_map();
+    reset_commons();
+}
+
+static void load_hpfc_status() /* SET them */
 {
     string name = db_get_current_program_name();
-    hpfc_status s = (hpfc_status) db_get_resource(DBR_HPFC_STATUS, name, TRUE);
+    hpfc_status
+	s = (hpfc_status) db_get_resource(DBR_HPFC_STATUS, name, TRUE);
+
+    
 }
+
+static void close_hpfc_management()
+{
+    close_data_management();
+    close_hpf_number_management();
+    close_overlap_management();
+    close_commons_management();
+}
+
 
 /* the source code is transformed with hpfc_directives
  * into something that can be parsed with a standard f77 compiler.
