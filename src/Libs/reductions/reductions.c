@@ -1,5 +1,5 @@
-/* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1997/07/21 12:39:52 $, 
+/* 
+ * $Id$
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -8,10 +8,19 @@
  */
 
 #include "local-header.h"
-#include "control.h" /* for CONTROL_MAP() */
-#include "semantics.h" /* for load_summary_effects() */
+#include "control.h"      /* for CONTROL_MAP() */
+#include "semantics.h"    /* for load_summary_effects() */
+
+/******************************************** SETTINGS IN GENERIC EFFECTS */
+
+static void 
+set_generic_effects_as_needed(void)
+{
+    effect_dup_func = simple_effect_dup;
+}
 
 /****************************************************** SUMMARY REDUCTIONS */
+
 /* Fortran 77 anti aliasing rules implies that sg that 
  * looks like a reduction within a subroutine can be perceived as so
  * from outside because no aliasing may cause the accumulator to be
@@ -26,7 +35,7 @@ reductions load_summary_reductions(entity f)
 	(DBR_SUMMARY_REDUCTIONS, module_local_name(f), TRUE);
 }
 
-/* should rather check conflicts ? */
+/* ??? should rather check conflicts? (what about equivalences?) */
 static bool entity_in_effect_list_p(entity v, list /* of effect */ le)
 {
     MAP(EFFECT, e, if (effect_variable(e)==v) return TRUE, le);
@@ -88,6 +97,7 @@ bool summary_reductions(string module_name)
     pips_debug(1, "considering module %s\n", module_name);
     pips_user_warning("not implemented yet\n");
 
+    set_generic_effects_as_needed();
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     set_current_module_statement((statement)
         db_get_memory_resource(DBR_CODE, module_name, TRUE));
@@ -101,12 +111,14 @@ bool summary_reductions(string module_name)
     reset_cumulated_reductions();
     reset_current_module_statement();
     reset_current_module_entity();
+    generic_effects_reset_all_methods();
 
     debug_off();
     return TRUE;
 }
 
 /******************************************************* PROPER REDUCTIONS */
+
 /* Function storing Proper Reductions
  */
 GENERIC_GLOBAL_FUNCTION(proper_reductions, pstatement_reductions)
@@ -333,6 +345,7 @@ bool proper_reductions(string module_name)
     pips_user_warning("being implemented, keep cool...\n");
 
     init_proper_reductions();
+    set_generic_effects_as_needed();
 
     /* gets what is needed from PIPS DBM
      */
@@ -351,10 +364,12 @@ bool proper_reductions(string module_name)
      */
     DB_PUT_MEMORY_RESOURCE
 	(DBR_PROPER_REDUCTIONS, module_name, get_proper_reductions());
+
     reset_proper_reductions();
     reset_proper_references();
     reset_current_module_entity();
     reset_current_module_statement();
+    generic_effects_reset_all_methods();
 
     debug_off();
     return TRUE;
@@ -517,6 +532,7 @@ bool cumulated_reductions(string module_name)
     pips_user_warning("being implemented, keep cool\n");
 
     init_cumulated_reductions();
+    set_generic_effects_as_needed();
 
     /* gets what is needed from PIPS DBM
      */
@@ -538,16 +554,18 @@ bool cumulated_reductions(string module_name)
      */
     DB_PUT_MEMORY_RESOURCE
 	(DBR_CUMULATED_REDUCTIONS, module_name, get_cumulated_reductions());
+
     reset_cumulated_reductions();
     reset_proper_reductions();
     reset_proper_references();
     reset_rw_effects();
     reset_current_module_entity();
     reset_current_module_statement();
+    generic_effects_reset_all_methods();
     
     debug_off();
     return TRUE;
 }
 
-/* end of $RCSfile: reductions.c,v $
+/* end of it!
  */
