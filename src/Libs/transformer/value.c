@@ -108,7 +108,9 @@
   * Francois Irigoin, 13 January 1994
   */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 
 #include "genC.h"
