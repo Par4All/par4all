@@ -82,9 +82,10 @@ bool
 in_summary_effects(string module_name)
 {
     bool ok;
-    set_methods_for_simple_effects();
+    set_methods_for_inout_effects(module_name);
     ok = summary_in_effects_engine(module_name);
     generic_effects_reset_all_methods();
+    reset_methods_for_inout_effects();
     return ok;
 }
 
@@ -92,9 +93,10 @@ bool
 out_summary_effects(string module_name)
 {
     bool ok;
-    set_methods_for_simple_effects();
+    set_methods_for_inout_effects(module_name);
     ok = summary_out_effects_engine(module_name);
     generic_effects_reset_all_methods();
+    reset_methods_for_inout_effects();
     return ok;
 }
 
@@ -103,9 +105,10 @@ bool
 in_effects(string module_name)
 {
     bool ok;
-    set_methods_for_simple_effects();
+    set_methods_for_inout_effects(module_name);
     ok = in_effects_engine(module_name);
     generic_effects_reset_all_methods();
+    reset_methods_for_inout_effects();
     return ok;
 }
 
@@ -113,9 +116,10 @@ bool
 out_effects(string module_name)
 {
     bool ok;
-    set_methods_for_simple_effects();
+    set_methods_for_inout_effects(module_name);
     ok = out_effects_engine(module_name);
     generic_effects_reset_all_methods();
+    reset_methods_for_inout_effects();
     return ok;
 }
 
