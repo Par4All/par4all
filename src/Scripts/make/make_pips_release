@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/02 17:12:10 $, 
+# $Date: 1996/09/02 18:05:11 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -33,13 +33,14 @@ usage()
 	    -p: Pips
 	    -n: Newgen
 	    -l: Linear
+	    -e: Extern (other softs...)
 	EOF
     exit $ret
 }
 
 what="-d Share -d Doc -d Runtime" 
 
-while getopts hvSE:pnl opt
+while getopts hvSE:D:pnle opt
 do
     case $opt in
 	h) usage 0 some help ;;
@@ -50,6 +51,7 @@ do
 	p) pack="$pack PIPS" ;;
 	n) pack="$pack NEWGEN" ;;
 	l) pack="$pack LINEAR" ;;
+	e) pack="$pack EXTERN" ;;
 	*) usage 1 "invalid option -$opt" ;;
     esac
 done
@@ -69,6 +71,7 @@ do
 	PIPS) root=$PIPS_ROOT ; trg=$name/Pips ;;
 	NEWGEN) root=$NEWGEN_ROOT ; trg=$name/Newgen ;;
 	LINEAR) root=$LINEAR_ROOT ; trg=$name/Linear ;;
+	EXTERN) root=$LINEAR_ROOT ; trg=$name/Extern ;;
     esac
     $verb "packing for $p ($root) in $trg:"
     $verb "what=$what"
