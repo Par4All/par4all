@@ -21,6 +21,8 @@
 
 #include "ri-util.h"
 
+/* To avoid a global variable to pass the dependence graph in flint.c: */
+#include "graph.h"
 
 /* Flint specific header */
 #include "flint.h"
