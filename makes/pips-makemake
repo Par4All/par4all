@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/09/20 17:15:32 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/09/20 17:22:54 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -591,10 +591,10 @@ cat >> $MAKEFILE <<%
 .PRECIOUS: \$(ROOT)/Lib/\$(LIB_TARGET) \$(ROOT)/Bin/\$(BIN_TARGET)
 
 \$(ROOT)/Include/\$(TARGET).h: header
-	@\$(INSTALL) -f \$(${PART}_INCLUDEDIR) \$(TARGET).h
+	@\$(INSTALL) -f \$(ROOT)/Include \$(TARGET).h
 
 \$(ROOT)/Lib/\$(LIB_TARGET): \$(LIB_TARGET) 
-	@\$(INSTALL) -r \$(RANLIB) \$(${PART}_LIBDIR)/\$(ARCH) \$(LIB_TARGET)
+	@\$(INSTALL) -r \$(RANLIB) \$(ROOT)/Lib/\$(ARCH) \$(LIB_TARGET)
 
 \$(LIB_OBJECTS): \$(TARGET).h
 
@@ -770,7 +770,7 @@ $verbose "common to Libs and Passes"
 cat >> $MAKEFILE <<%
 #
 
-\$(${PART}_LIBDIR):; mkdir \$(${PART}_LIBDIR)
+\$(ROOT)/Lib:; mkdir \$@
 
 lint:; \$(TYPECHECK) \$(CFILES)|sed '/possible pointer alignm/d;/gen_alloc/d'
 
