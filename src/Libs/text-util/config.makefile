@@ -4,4 +4,4 @@
 #
 LIB_CFILES=	text_print.c util.c
 LIB_HEADERS=	text-util-local.h
-LIB_OBJECTS=	$(LIB_OBJECTS:.c=.o)
+LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
