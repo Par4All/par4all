@@ -251,26 +251,29 @@ static bool loop_executed_once_p(statement s, loop l)
   }
 
   /* Teste le signe de l'incrément en fonction des préconditions : */
-  ps = sc_dup(precondition_ps);
   pv3 = vect_dup(normalized_linear(n_m3));
   pc3 = contrainte_make(pv3);
+  ps = sc_dup(precondition_ps);
   sc_add_ineg(ps, pc3);
   m3_negatif = sc_faisabilite(ps);
+
   (void) vect_chg_sgn(pv3);
   m3_positif = sc_faisabilite(ps);
+
   pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
 	     m3_positif, m3_negatif);
+
   /* Vire aussi pv3 & pc3 : */
   sc_rm(ps);
 
-  if ((m3_positif ^ m3_negatif) && normalized_linear_p(n_m3)
-      && normalized_linear_p(n_m1) && normalized_linear_p(n_m2))
+  if ((m3_positif ^ m3_negatif) && normalized_linear_p(n_m3) && 
+      normalized_linear_p(n_m1) && normalized_linear_p(n_m2))
   {
     /* Si l'incrément a un signe « connu » et différent de 0 et que
        les bornes sont connues : */
     Pvecteur pv1, pv2, pv3, pvx, pv;
+    Pcontrainte ca, cb;
 
-    ps = sc_dup(precondition_ps);
     pv1 = normalized_linear(n_m1);
     pv2 = normalized_linear(n_m2);
     pv3 = normalized_linear(n_m3);
@@ -294,24 +297,17 @@ static bool loop_executed_once_p(statement s, loop l)
 
     vect_add_elem(&pvx, TCST, VALUE_ONE);
 
-    sc_add_ineg(ps, contrainte_make(pvx));
-    sc_add_ineg(ps, contrainte_make(pv));
+    ca = contrainte_make(pvx);
+    cb = contrainte_make(pv);
 
     /* ??? on overflows, should assume FALSE...
      */
-    retour = sc_faisabilite(ps);
-
-    ifdebug(2) {
-      sc_fprint(stderr, ps, entity_local_name);
-      print_statement(s);
-      pips_debug(2, "boucle exécutée une seule fois = %d\n\n", retour);
-      /*    vect_fprint(stderr, pv, entity_local_name);
-            vect_fprint(stderr, normalized_linear(n_m1)); */
-    }
+    retour = ineq_redund_with_sc_p(precondition_ps, ca) &&
+             ineq_redund_with_sc_p(precondition_ps, cb);
 
     /* Vire du même coup pv et pvx : */
-    sc_rm(ps);
-   }
+    contrainte_free(ca), contrainte_free(cb);
+  }
 
   return retour;
 }
