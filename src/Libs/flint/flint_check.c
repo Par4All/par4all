@@ -748,7 +748,7 @@ entity local, module;
 		    flint_message("check common",
 				  "%s used twice in common %s\n",
 				  entity_name(current_variable),
-				  entity_local_name(local));
+				  module_local_name(local));
 		synonymous++;
 		continue;
 	    }
@@ -811,7 +811,7 @@ bool check_overlap_in_common(the_common, e1, inf1, sup1, e2, inf2, sup2)
 		"overlap of incompatible variables (%s, %s) in common %s\n",
 		    entity_name(e1),
 		    entity_name(e2),
-		    entity_local_name(the_common));
+		    module_local_name(the_common));
     return (FALSE);
 }
 
