@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/03/24 14:33:48 $, 
+# $Date: 1995/03/24 14:47:56 $, 
 
 script=`basename $0`
 STATUS='0'
@@ -48,7 +48,7 @@ default_module()
 usage()
 {
   cat <<-EOF
-	Usage: $script [-vxDdhMqsti] [-p P] [-w W] [-m M] [-n n | file[.f]]
+	Usage: $script [-vxDdhMqsti] [-k K] [-p P] [-w W] [-m M] [-n N|file[.f]]
 	  version is $Revision$
 	  -t: test (dump the resulting files)
 	  -i: no installation
@@ -63,13 +63,17 @@ usage()
 	  -s: silent (stderr=/dev/null - for demonstations:-)
 	  -w W: workspace W is used for pips and hpfc
 	  -m M: module M is compiled (should be the main)
-	  -n n: source number n
+	  -n N: source number n
+	  -k K: keyword control (demo, validate)
 	  file: source file
 	EOF
   exit ${1:-1}
 }
 
-while getopts tivxDdMqsn:hm:w:p: OPT
+#
+# the keyword control enables a global control of tyhe switches
+
+while getopts tivxDdMqsn:hm:w:p:k: OPT
 do
   case $OPT in
     t) DUMPFILES="1" ;;
@@ -85,6 +89,20 @@ do
     n) HPFFILE="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
     m) MODULE="$OPTARG" ;;
     w) WORKSPACE="$OPTARG" ;;
+    k) case $OPTARG in
+	 demo) 
+	     DELETE=Delete ;
+	     STDERR='/dev/null' ;
+	     VERBOSE='verbose' ;
+	     MAKE='gmake' ;;
+	 validate) 
+	     DUMPFILES="1" ;
+	     NOINSTALL="1" ;
+	     VERBOSE=':' ;
+	     DELETE='Delete' ;;
+	 *)  echo "no $OPTARG keyword" ;
+	     usage 3 ;;
+       esac ;;
     h|*) usage 1 ;;
   esac
 done
