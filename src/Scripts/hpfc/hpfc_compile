@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/03/23 17:29:58 $, 
+# $Date: 1995/03/24 12:28:53 $, 
 # got on %D%, %T%
 #
 
@@ -15,15 +15,8 @@ TMP="/tmp/hpfc_tmp.`hostname`.$$"
 INSTALL="$HPFC_TOOLS/hpfc_install"
 PIPSARGS='-s MUST_REGIONS -p HPFC_CLOSE'
 
-unset HPFFILE MODULE WORKSPACE
+unset HPFFILE MODULE WORKSPACE DUMPFILES NOINSTALL
 rm -f $TMP.*
-
-# for suff in a b c d e i k n p s t y ;
-# do 
-#   echo "      subroutine hpfc$suff"
-#   echo "      print *, 'hpfc$suff'"
-#   echo "      end"
-# done > $TMP.1
 
 #
 # functions
@@ -70,8 +63,11 @@ default_module()
 usage()
 {
   cat <<-EOF
-	Usage: $script [-vDdhMqs] [ -w ws ] [ -m mod ] [-n n | file[.f]]
+	Usage: $script [-vDdhMqsti] [-p pips] [-w ws] [-m mod] [-n n | file[.f]]
 	  version is $Revision$
+	  -t: test (used by the validation)
+	  -i: no installation (used by the validation)
+	  -p pips: pips version to be used (used by the validation)
 	  -v: verbose about what is being done
 	  -D: debug messages
 	  -d: delete the pips database
@@ -87,9 +83,12 @@ usage()
   exit ${1:-1}
 }
 
-while getopts vDdMqsn:hm:w: OPT
+while getopts tivDdMqsn:hm:w:p: OPT
 do
   case $OPT in
+    t) DUMPFILES="1" ;;
+    i) NOINSTALL="1" ;;
+    p) PIPS="$OPTARG" ;;
     v) VERBOSE='verbose' ;;
     D) DEBUG='debug' ; 
        STDOUT=`output_tty` ; 
@@ -120,11 +119,42 @@ set -e
 $PIPS -f $HPFFILE $PIPSARGS -m $MODULE $WORKSPACE > $STDOUT 2> $STDERR
 set +e
 
-$VERBOSE "installing generated codes"
+[ "$NOINSTALL" ] ||
+{
+  $VERBOSE "installing generated codes"
+  
+  [ -d "$WORKSPACE.hpfc" ] || mkdir $WORKSPACE.hpfc
+  ${INSTALL} -b $WORKSPACE.database -r $HPFFILE -i -t $WORKSPACE.hpfc -n $MODULE
+}
 
-[ -d "$WORKSPACE.hpfc" ] || mkdir $WORKSPACE.hpfc
-${INSTALL} -b $WORKSPACE.database -r $HPFFILE -i -t $WORKSPACE.hpfc -n $MODULE
+[ "$DUMPFILES" ] &&
+{
+  $VERBOSE "dumping generated files"
 
+  DBDIR=$WORKSPACE.database
+
+  #
+  # stupid hack to ease the dump
+
+  touch $DBDIR/_host.h $DBDIR/_node.h 
+  [ -f $DBDIR/host.f ] &&
+  {
+    touch $DBDIR/_init.h 
+    mv $DBDIR/host.f $DBDIR/_host.f
+    mv $DBDIR/node.f $DBDIR/_node.f
+    mv $DBDIR/init_param.f $DBDIR/_init.f
+    mv $DBDIR/parameters.h $DBDIR/_parameters.h
+  }
+
+  cat 	$DBDIR/*_host.f \
+	$DBDIR/*_node.f \
+	$DBDIR/*_parameters.h \
+        $DBDIR/*_init.h \
+        $DBDIR/*_init.m4 \
+ 	$DBDIR/*_host.h \
+	$DBDIR/*_node.h 
+}
+  
 [ "$DELETE" = : ] ||
 {
   $VERBOSE "deleting $WORKSPACE workspace"
