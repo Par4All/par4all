@@ -86,15 +86,10 @@ static bool simd_unroll_loop_filter(statement s)
    return FALSE;
 }
 
-static void simd_unroll_loop_rewrite(statement s)
-{
-   return;
-}
-
 void simd_unroll_as_needed(statement module_stmt)
 {
    gen_recurse(module_stmt, statement_domain, 
-	       simd_unroll_loop_filter, simd_unroll_loop_rewrite);
+	       simd_unroll_loop_filter, gen_null);
 }
 
 bool simdizer_auto_unroll(char * mod_name)
