@@ -1,5 +1,5 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/08/30 17:21:33 $, 
+ * $Date: 1996/08/30 17:24:41 $, 
  */
 
 #include <stdlib.h>
@@ -141,7 +141,7 @@ static char * path_of(char * binary)
 
     if (len>NAME_MAX_LENGTH) 
     {
-	fprintf(stderr, "[path_of] %s path name length too large (%l)\n",
+	fprintf(stderr, "[path_of] %s path name length too large (%d)\n",
 		binary, len);
 	exit(1);
     }
