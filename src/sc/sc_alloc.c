@@ -149,6 +149,39 @@ Pbase b;
 Psysteme sc_dup(Psysteme ps)
 {
   return sc_copy(ps);
+  /*
+  Psysteme cp = SC_UNDEFINED;
+
+  if (!SC_UNDEFINED_P(ps)) {
+    Pcontrainte eq, eq_cp;
+    cp = sc_new();
+    
+    for (eq = ps->egalites; eq != NULL; eq = eq->succ) {
+      eq_cp = contrainte_new();
+      contrainte_vecteur(eq_cp) = vect_dup(contrainte_vecteur(eq));
+      sc_add_egalite(cp, eq_cp);
+    }
+    
+    for(eq=ps->inegalites;eq!=NULL;eq=eq->succ) {
+      eq_cp = contrainte_new();
+      contrainte_vecteur(eq_cp) = vect_dup(contrainte_vecteur(eq));
+      sc_add_inegalite(cp, eq_cp);
+    }
+    
+    if(ps->dimension==0) {
+      assert(VECTEUR_UNDEFINED_P(ps->base));
+      cp->dimension = 0;
+      cp->base = VECTEUR_UNDEFINED;
+    }
+    else {
+      assert(ps->dimension==vect_size(ps->base));
+      cp->dimension = ps->dimension;
+      cp->base = base_dup(ps->base);
+    }
+  }
+
+  return cp;
+  */
 }
 
 /* Psysteme sc_copy(Psysteme ps): duplication d'un systeme 
@@ -159,6 +192,8 @@ Psysteme sc_dup(Psysteme ps)
  *
  * Modification: L'ordre des egalites, inegalites, la base et des variables dans 
  * le syteme est recopie egalement. (CA, 28/08/91),(DN,24/6/02)
+ * We can use contrainte_copy, contraintes_copy here
+ * If we test the size of system here for debugging purposes, il may cost more time ...
  * 
  */
 Psysteme sc_copy(Psysteme ps)
@@ -169,8 +204,6 @@ Psysteme sc_copy(Psysteme ps)
   if (!SC_UNDEFINED_P(ps)) {
     Pcontrainte eq, eq_cp;
     cp = sc_new();
-
-    //We can use contrainte_copy, contraintes_copy here, 
 
     for (j=ps->nb_eq;j>0;j--) {      
       for (eq = ps->egalites,i=1;i<j; eq = eq->succ,i++) {/**/}
@@ -187,16 +220,10 @@ Psysteme sc_copy(Psysteme ps)
     }
 
     if(ps->dimension==0) {
-      /*ifscdebug(5){//This costs much time
-	assert(VECTEUR_UNDEFINED_P(ps->base));
-	}*/
       cp->dimension = 0;
       cp->base = VECTEUR_UNDEFINED;
     }
     else {
-      /*ifscdebug(5){//This costs much time
-	assert(ps->dimension==vect_size(ps->base));
-	}*/
       cp->dimension = ps->dimension;
       cp->base = base_copy(ps->base);
     }
