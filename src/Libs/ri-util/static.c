@@ -22,7 +22,8 @@
 
 static entity current_module_entity = entity_undefined;
 
-void set_current_module_entity(e)
+void 
+set_current_module_entity(e)
 entity e;
 {
     pips_assert("entity is a module", entity_module_p(e));
@@ -36,12 +37,14 @@ entity e;
     current_module_entity = e;
 }
 
-entity get_current_module_entity()
+entity 
+get_current_module_entity()
 {
     return current_module_entity;
 }
 
-void reset_current_module_entity()
+void 
+reset_current_module_entity()
 {
     /* pips_assert("current entity defined", 
        !entity_undefined_p(current_module_entity)); */ /* too risky ;-) */
@@ -55,31 +58,29 @@ void reset_current_module_entity()
 
 static statement current_module_statement = statement_undefined;
 
-void set_current_module_statement(s)
+void 
+set_current_module_statement(s)
 statement s;
 {
-    pips_assert("set_current_module_statement", 
+    pips_assert("The current module statement is undefined", 
 		current_module_statement == statement_undefined);
+    pips_assert("The new module statement is not undefined", 
+		s != statement_undefined);
     current_module_statement = s;
 }
 
 
-statement get_current_module_statement()
+statement 
+get_current_module_statement()
 {
+    pips_assert("The current module statement is defined", 
+		current_module_statement != statement_undefined);
     return current_module_statement;
 }
 
 
-void reset_current_module_statement()
+void 
+reset_current_module_statement()
 {
     current_module_statement = statement_undefined;
 }
-
-
-
-
-
-
-
-
-
