@@ -1260,7 +1260,9 @@ print_common_layout(FILE * fd, entity c)
 {
     entity mod = get_current_module_entity();
     /* list members = area_layout(type_area(entity_type(c))); */
-    list members = common_members_of_module(c, mod , TRUE);
+    /* list members = common_members_of_module(c, mod , TRUE); */
+    /* for debugging only */
+    list members = common_members_of_module(c, mod , FALSE);
     list equiv_members = NIL;
 
     (void) fprintf(fd,"\nLayout for common /%s/ of size %d:\n",
