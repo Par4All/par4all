@@ -700,7 +700,7 @@ void make_array_bounds(cv)
   mod_entity = get_current_module_entity();
 
   /* Find the array entity */
-  num = malloc(32);
+  num = (string) malloc(32);
   (void) sprintf(num, "%d", cn-BASE_NODE_NUMBER);
   name = strdup(concatenate(SA_MODULE_NAME, MODULE_SEP_STRING,
 			    SAI, num, (char *) NULL));
