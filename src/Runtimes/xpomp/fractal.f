@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/09/07 17:07:13 $, 
+! $Date: 1996/10/10 20:39:59 $, 
 !
       program fractal
 
@@ -78,7 +78,7 @@
       counter = 0
  10   continue
 
-!!!fcd$ time
+!fcd$ time
 ! Compute a fractal image:
 !hpf$ independent, new(cr,ci,zr,zi,d,zrp,k)
       do y = 0, y_size - 1      
@@ -99,11 +99,12 @@
             image(x, y) = CHAR(k)
          enddo
       enddo
-!!!fcd$ end time ('Computation of one image')
 
 ! Display the image:
       call xpompf flash(display, image, x_size, y_size, 
      &     0, 0, x_display_zoom, y_display_zoom, status)
+
+!fcd$ end time ('Computation of one image')
 
 ! Wait for user interaction:
       call xpompf wait mouse(display, x, y, state, button)
