@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/11 11:05:00 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/11 11:57:53 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -149,6 +149,8 @@ $SED "/^      call hpfc[adptuy]/w $TMP.1
 #
 # first, find the last declaration line 
 # (program and subroutine needed if none!)
+# (functions added for implicitely typed functions...)
+# (common also appear in the declaration part of the program...)
 
 LINE=`
 $SED -n '/^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
