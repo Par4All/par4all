@@ -129,7 +129,7 @@ static int CommSize = 0;
 static void 
 init_comment_buffers(void)
 {
-    if (CommSize!=0) return;
+    if (CommSize!=0) return; /* if needed */
     pips_debug(9, "allocating comment buffers\n");
     CommSize = INITIAL_BUFFER_SIZE;
     Comm = (char*) malloc(CommSize);
@@ -157,7 +157,7 @@ static int getchar_buffer_size = 0; /* number of elements in the array */
 static void
 init_getchar_buffer(void)
 {
-    if (getchar_buffer_size!=0) return; /* lazy */
+    if (getchar_buffer_size!=0) return; /* if needed */
     pips_debug(9, "allocating getchar buffer\n");
     getchar_buffer_size = INITIAL_BUFFER_SIZE;
     getchar_buffer = (int*) malloc(sizeof(int)*getchar_buffer_size);
@@ -175,8 +175,8 @@ resize_getchar_buffer(void)
     pips_assert("realloc ok", getchar_buffer);
 }
 
-/*********************************************************** STMT BUFFER */
 
+/*************************************************************** STMT BUFFER */
 
 /* le buffer contenant le statement courant, l'indice courant et la longueur.
  */
@@ -186,7 +186,7 @@ static int stmt_buffer_size = 0;
 static void
 init_stmt_buffer(void)
 {
-    if (stmt_buffer_size!=0) return; /* lazy */
+    if (stmt_buffer_size!=0) return; /* if needed */
     pips_debug(9, "allocating stmt buffer\n");
     stmt_buffer_size = INITIAL_BUFFER_SIZE;
     stmt_buffer = (int*) malloc(sizeof(int)*stmt_buffer_size);
@@ -206,6 +206,37 @@ resize_stmt_buffer(void)
 /* indexes in the buffer...
  */
 static int iStmt, lStmt;
+
+
+/*************************************************************** LINE BUFFER */
+
+/* le buffer contenant la ligne que l'on doit lire en avance pour se rendre
+ * compte qu'on a finit de lire un statement, l'indice courant et la longueur.
+ */
+static int * line_buffer = NULL;
+static int line_buffer_size = 0;
+
+static void
+init_line_buffer(void)
+{
+    if (line_buffer_size!=0) return; /* if needed */
+    pips_debug(9, "allocating line buffer\n");
+    line_buffer_size = INITIAL_BUFFER_SIZE;
+    line_buffer = (int*) malloc(sizeof(int)*line_buffer_size);
+    pips_assert("malloc ok", line_buffer);
+}
+
+static void
+resize_line_buffer(void)
+{
+    pips_debug(9, "resizing line buffer\n");
+    pips_assert("buffer initialized", line_buffer_size>0);
+    line_buffer_size*=2;
+    line_buffer = (int*) realloc(line_buffer, sizeof(int)*line_buffer_size);
+    pips_assert("realloc ok", line_buffer);
+}
+
+static int iLine, lLine; 
 
 /*
  * Une variable pour traiter les quotes. Petit automate a 3 etats:
@@ -227,7 +258,8 @@ static int iStmt, lStmt;
  *      x est un caractere quelconque different de '
  *
  * Modifications: 
- *  - la quote peut-etre simple-quote ou double-quote pour faire plaisir a Fabien Coelho.
+ *  - la quote peut-etre simple-quote ou double-quote pour faire plaisir a 
+ *    Fabien Coelho.
  * L'information est stockee lors de la rentree dans une constante chaine
  * de caracteres (variable QuoteChar).
  *  - ajout de l'etat INQUOTEBACKSLASH pour traiter les extensions 
@@ -245,14 +277,6 @@ LOCAL int EtatQuotes;
 #define INQUOTEBACKSLASH 4
 
 /*
- * le buffer contenant la ligne que l'on doit lire en avance pour se rendre
- * compte qu'on a finit de lire un statement, l'indice courant et la longueur.
- */
-#define LINELENGTH (128)
-LOCAL int Line[LINELENGTH];
-LOCAL int iLine, lLine; 
-
-/*
  * Numero de ligne et de colonne du fichier d'entree courant.
  */
 LOCAL int LineNumber, Column;
@@ -262,10 +286,9 @@ LOCAL int LineNumber, Column;
  */
 LOCAL int ProfZeroVirg, ProfZeroEgal;
 
-/*
- * La table des operateurs du type '.XX.'.
+/* La table des operateurs du type '.XX.'.
  */
-char * OperateurPoints[] = {
+static char * OperateurPoints[] = {
 		".NOT.",
 		".AND.",
 		".OR.",
@@ -299,19 +322,17 @@ struct Skeyword {
 extern struct Skeyword keywtbl[];
 #include "keywtbl.h"
 
-/*
- * Une table pour accelerer les recherche des keywords. keywidx[X] indique le
+/* Une table pour accelerer les recherche des keywords. keywidx[X] indique le
  * rang dans keywtbl du premier mot clef commencant par X.
  */
-int keywidx[26];
+static int keywidx[26];
 
-/*
- * Variables qui serviront a mettre a jour les numeros de la premiere et de la
+/* Variables qui serviront a mettre a jour les numeros de la premiere et de la
  * derniere ligne de commentaire, et les numeros de la premiere et de la
  * derniere ligne du statement.
  */
-LOCAL int tmp_b_I, tmp_e_I, tmp_b_C, tmp_e_C;
-LOCAL char tmp_lab_I[6];
+static int tmp_b_I, tmp_e_I, tmp_b_C, tmp_e_C;
+static char tmp_lab_I[6];
 
 /* memoization des properties */
 
@@ -656,6 +677,8 @@ ReadLine(FILE * fp)
     /* on entre dans ReadLine avec Column = 1 */
     pips_assert("ReadLine", Column == 1);
 
+    init_line_buffer();
+
     /* on lit le label et le caractere de continuation de la premiere
      * ligne non vide et non ligne de commentaire.
      *
@@ -765,13 +788,16 @@ ReadLine(FILE * fp)
 		    EtatQuotes = INQUOTES;
 	    }
 
+	    if (lLine>line_buffer_size-5)
+		resize_line_buffer();
+
 	    if (EtatQuotes == NONINQUOTES) {
 		if (c != ' ') {
-		    Line[lLine++] = islower(c)? toupper(c) : c;
+		    line_buffer[lLine++] = islower(c)? toupper(c) : c;
 		}
 	    }
 	    else {
-		Line[lLine++] = QUOTE(c);
+		line_buffer[lLine++] = QUOTE(c);
 	    }
 				
 	}
@@ -841,7 +867,7 @@ ReadStmt(FILE * fp)
 	    while (iLine < lLine) {
 		if (lStmt>stmt_buffer_size-20)
 		    resize_stmt_buffer();
-		stmt_buffer[lStmt++] = Line[iLine++];
+		stmt_buffer[lStmt++] = line_buffer[iLine++];
 	    }
 	    lLine = 0;
 	} while ((TypeOfLine = ReadLine(fp)) == CONTINUATION_LINE) ;
@@ -863,7 +889,7 @@ ReadStmt(FILE * fp)
 }
 
 void 
-CheckParenthesis()
+CheckParenthesis(void)
 {
     register int i;
     int parenthese = 0;
@@ -900,7 +926,7 @@ CheckParenthesis()
 }
 
 int 
-FindDo()
+FindDo(void)
 {
     int result = FALSE;
 
@@ -913,7 +939,7 @@ FindDo()
 }
 
 int 
-FindImplicit()
+FindImplicit(void)
 {
     int result = FALSE;
 
@@ -933,7 +959,7 @@ FindImplicit()
 }
 
 int 
-FindIfArith()
+FindIfArith(void)
 {
     int result = FALSE;
 
@@ -949,7 +975,7 @@ FindIfArith()
 }
 
 void 
-FindIf()
+FindIf(void)
 {
     if (StmtEqualString("IF(", iStmt)) {
 	int i = FindMatchingPar(iStmt+2)+1;
@@ -968,7 +994,7 @@ FindIf()
 }
 
 void 
-FindAutre()
+FindAutre(void)
 {
     if (!ProfZeroEgal) {
 	int i = NeedKeyword();
@@ -996,7 +1022,7 @@ FindAutre()
 }
 
 int 
-FindAssign()
+FindAssign(void)
 {
     int result = FALSE;
 
@@ -1019,7 +1045,7 @@ FindAssign()
 }
 
 void 
-FindPoints()
+FindPoints(void)
 {
     register int i = iStmt;
 
@@ -1047,8 +1073,7 @@ FindPoints()
 }
 
 int 
-FindProfZero(c)
-int c;
+FindProfZero(int c)
 {
     register int i;
     int parenthese = 0;
@@ -1067,8 +1092,7 @@ int c;
 }
 
 int 
-FindMatchingPar(i)
-int i;
+FindMatchingPar(int i)
 {
     int parenthese;
 
@@ -1090,9 +1114,7 @@ int i;
 }
 
 int 
-StmtEqualString(s, i)
-char *s;
-int i;
+StmtEqualString(char *s, int i)
 {
     int result = FALSE;
 
@@ -1110,9 +1132,7 @@ int i;
 }
 
 int 
-CapitalizeStmt(s, i)
-char s[];
-int i;
+CapitalizeStmt(char s[], int i)
 {
     int l = i+strlen(s);
 
@@ -1133,7 +1153,7 @@ int i;
 }
 
 int 
-NeedKeyword()
+NeedKeyword(void)
 {
     register int i, j;
     char * kwcour;
