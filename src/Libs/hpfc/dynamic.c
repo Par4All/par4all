@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/12/24 15:24:25 $, )
+ * ($Date: 1996/12/26 10:41:29 $, )
  */
 
 #include "defines-local.h"
@@ -131,6 +131,27 @@ static void add_dynamic_synonym(
 
 }
 
+void 
+set_similar_mappings_for_updates(void)
+{
+    /* ??? for final update after compilation! hummm....
+     */
+
+    MAP(ENTITY, array,
+    {
+	if (dynamic_entity_p(array))
+	{
+	    entity n = load_new_node(array);
+	    entity s = load_similar_mapping(array);
+	    entity ns = load_new_node(s);
+	    
+	    store_new_node_variable(ns, n);
+	    store_new_node_variable(ns, array);
+	}
+    },
+        list_of_distributed_arrays());
+}
+
 /******************************** NEW ENTITIES FOR MANAGING DYNAMIC ARRAYS */
 
 /*  builds a synonym for entity e. The name is based on e, plus
@@ -186,9 +207,6 @@ static entity new_synonym_array(
 
     if (!similar_found) store_similar_mapping(new_a, new_a);
 
-    /* ??? for final update after compilation! hummm....
-     */
-    store_new_node_variable(load_similar_mapping(new_a), new_a);
     return new_a;
 }
 
@@ -495,7 +513,9 @@ array_distribution_similar_p(entity a1, entity a2)
 	if (!same_distribution_p(x1, x2)) 
 	    RET("different distribution", FALSE);
 
-	/* conformant alignments 
+	/* conformant alignments for that pe dim
+	 * !!! the HPF mapping "semantics" insure that the corresponding 
+	 * dimension is distributed!
 	 */
 	at1 = FindAlignmentOfTemplateDim(align_alignment(al1), td1);
 	at2 = FindAlignmentOfTemplateDim(align_alignment(al2), td2);
