@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/12/26 10:41:29 $, )
+ * ($Date: 1996/12/26 11:14:21 $, )
  */
 
 #include "defines-local.h"
@@ -128,7 +128,6 @@ static void add_dynamic_synonym(
     entities_list(es) = CONS(ENTITY, new_e, entities_list(es));
     store_dynamic_hpf(new_e, es);
     store_primary_entity(new_e, load_primary_entity(e));
-
 }
 
 void 
@@ -139,11 +138,13 @@ set_similar_mappings_for_updates(void)
 
     MAP(ENTITY, array,
     {
-	if (dynamic_entity_p(array))
+	if (dynamic_entity_p(array) && bound_similar_mapping_p(array))
 	{
 	    entity n = load_new_node(array);
 	    entity s = load_similar_mapping(array);
 	    entity ns = load_new_node(s);
+
+	    pips_debug(7, "array %s\n", entity_name(array));
 	    
 	    store_new_node_variable(ns, n);
 	    store_new_node_variable(ns, array);
