@@ -1,13 +1,15 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/20 18:27:40 $, 
+# $Date: 1996/08/20 18:29:16 $, 
 
 SOURCES	= properties-rc.tex
 
 INSTALL_DOC =	properties-rc.ps
 INSTALL_HTM =	properties-rc.html \
 		properties-rc 
-INSTALL_SHT = 	properties.rc
+INSTALL_SHR = 	properties.rc
+
+all: $(INSTALL_SHR) $(INSTALL_DOC) $(INSTALL_HTM)
 
 properties.rc: properties-rc.tex
 	#
