@@ -2,7 +2,8 @@
 # $Id$
 #
 
-YFLAGS+=	-v -d
+YFLAGS		+=	-v -d
+CPPFLAGS 	+=	-DUTC_DATE='"$(UTC_DATE)"'
 
 #
 LIB_MAIN	=	main_tpips.c
