@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/09/12 10:03:01 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/09/12 14:09:26 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -196,6 +196,8 @@ ZIP=		$(PIPS_ZIP)
 CONFIG_FILE=	${CONFIG_FILE}
 MAKEFILE=	${MAKEFILE}
 SHELL=		/bin/sh
+DIFF= 		diff
+
 #
 all: $ALL_RULE_TARGET
 # to override sun's default rule
@@ -386,6 +388,22 @@ quick-install: .quick-install
 
 $MAKEFILE:  $(PIPS_UTILDIR)/pips-makemake
 	@pips-makemake
+
+%
+
+#
+# partie specifique a Development
+
+[ $DIRSIDE = $PIPS_DEVEDIR ] && cat >> $MAKEFILE <<%
+#
+# diff between dev and prod sources:
+
+diff:
+	@for f in $(SOURCES) ; \\
+	do \\
+	  echo "DIFFERENCES BETWEEN DEV AND PROD FOR \$\$f:" ; \\
+	  $(DIFF) \$\$f $(TARGETDIR)/\$\$f ; \\
+	done
 
 %
 
