@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.99  1997/11/20 14:11:45  keryell
+ * Modified words_io_inst() to avoid using unnecessary word builders that
+ * leads to memory leaks and Epips core dumps...
+ *
  * Revision 1.98  1997/11/18 23:42:26  keryell
  * Fixed a memory leak in words_io_inst() with a nasty side effect that
  * leads to fail in Epips attacments...
@@ -116,7 +120,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.98 1997/11/18 23:42:26 keryell Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.99 1997/11/20 14:11:45 keryell Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -484,7 +488,8 @@ words_list_directed(call obj, int precedence)
 }
 
 static list 
-words_io_inst(call obj, int precedence)
+words_io_inst(call obj,
+	      int precedence)
 {
     list pc = NIL;
     list pcio = call_arguments(obj);
@@ -493,7 +498,7 @@ words_io_inst(call obj, int precedence)
     bool good_unit = FALSE;
     bool iolist_reached = FALSE;
     bool complex_io_control_list = FALSE;
-    list fmt_words = NIL;
+    expression fmt_arg = expression_undefined;
     expression unit_arg = expression_undefined;
     string called = entity_local_name(call_function(obj));
     
@@ -503,7 +508,7 @@ words_io_inst(call obj, int precedence)
        "UNIT" has to be equal either to "*" or "6".  In such case,
        "WRITE(*,*)" is replaced by "PRINT *,". */
     /* GO: Not anymore for UNIT=6 leave it ... */
-      while ((pio_write != NIL) && (!iolist_reached)) {
+    while ((pio_write != NIL) && (!iolist_reached)) {
 	syntax s = expression_syntax(EXPRESSION(CAR(pio_write)));
 	call c;
 	expression arg = EXPRESSION(CAR(CDR(pio_write)));
@@ -514,82 +519,96 @@ words_io_inst(call obj, int precedence)
 
 	c = syntax_call(s);
 	if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
-	   good_fmt = strcmp
-	       (STRING(CAR(fmt_words = words_expression(arg))), "*")==0;
-	   pio_write = CDR(CDR(pio_write));
+	    /* Avoid to use words_expression(arg) because it set some
+               attachments and unit_words may not be used
+               later... RK. */
+	    entity f;
+	    /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
+	    good_fmt = syntax_call_p(expression_syntax(arg))
+		&& value_intrinsic_p(entity_initial(f = call_function(syntax_call(expression_syntax(arg)))))
+		    && (strcmp(entity_local_name(f),
+			       LIST_DIRECTED_FORMAT_NAME)==0);
+	    pio_write = CDR(CDR(pio_write));
+	    /* To display the format later: */
+	    fmt_arg = arg;
 	}
 	else if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
 	    /* Avoid to use words_expression(arg) because it set some
                attachments and unit_words may not be used
                later... RK. */
-	    good_unit = syntax_reference_p(expression_syntax(arg))
-		&& (strcmp(entity_local_name(reference_variable(syntax_reference(expression_syntax(arg)))), "*")==0);
+	    entity f;
+	    /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
+	    good_unit = syntax_call_p(expression_syntax(arg))
+		&& value_intrinsic_p(entity_initial(f = call_function(syntax_call(expression_syntax(arg)))))
+		    && (strcmp(entity_local_name(f),
+			       LIST_DIRECTED_FORMAT_NAME)==0);
 	    /* To display the unit later: */
 	    unit_arg = arg;
 	    pio_write = CDR(CDR(pio_write));
 	}
 	else if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
-	  iolist_reached = TRUE;
-	  pio_write = CDR(pio_write);
+	    iolist_reached = TRUE;
+	    pio_write = CDR(pio_write);
 	}
 	else {
 	    complex_io_control_list = TRUE;
-	  pio_write = CDR(CDR(pio_write));
+	    pio_write = CDR(CDR(pio_write));
 	}
-      }
+    }
 
     if (good_fmt && good_unit && same_string_p(called, "WRITE"))
     {
 	/* WRITE (*,*) -> PRINT * */
 
-       if (pio_write != NIL) /* WRITE (*,*) pio -> PRINT *, pio */
-       {
-          pc = CHAIN_SWORD(pc, "PRINT *, ");
-       }
-       else     /* WRITE (*,*)  -> PRINT *  */
-       {
-          pc = CHAIN_SWORD(pc, "PRINT * ");
-       }
+	if (pio_write != NIL)	/* WRITE (*,*) pio -> PRINT *, pio */
+	{
+	    pc = CHAIN_SWORD(pc, "PRINT *, ");
+	}
+	else			/* WRITE (*,*)  -> PRINT *  */
+	{
+	    pc = CHAIN_SWORD(pc, "PRINT * ");
+	}
        
-       pcio = pio_write;
+	pcio = pio_write;
     }
     else if (good_fmt && good_unit && same_string_p(called, "READ"))
     {
-       /* READ (*,*) -> READ * */
+	/* READ (*,*) -> READ * */
 	
-       if (pio_write != NIL) /* READ (*,*) pio -> READ *, pio */
-       {
-          pc = CHAIN_SWORD(pc, "READ *, ");
-       }
-       else   /* READ (*,*)  -> READ *  */
-       {
-          pc = CHAIN_SWORD(pc, "READ * ");
-       }
-       pcio = pio_write;
+	if (pio_write != NIL)	/* READ (*,*) pio -> READ *, pio */
+	{
+	    pc = CHAIN_SWORD(pc, "READ *, ");
+	}
+	else			/* READ (*,*)  -> READ *  */
+	{
+	    pc = CHAIN_SWORD(pc, "READ * ");
+	}
+	pcio = pio_write;
     }	
     else if(!complex_io_control_list) {
+	list fmt_words = words_expression(fmt_arg);
 	list unit_words = words_expression(unit_arg);
 	pips_assert("A unit must be defined", !ENDP(unit_words));
-      pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-      pc = CHAIN_SWORD(pc, " (");
-      pc = gen_nconc(pc, unit_words);
-      if(!ENDP(fmt_words)) {
-	  pc = CHAIN_SWORD(pc, ", ");
-	  pc = gen_nconc(pc, fmt_words);
-      }
-      pc = CHAIN_SWORD(pc, ") ");
-      pcio = pio_write;
+	pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+	pc = CHAIN_SWORD(pc, " (");
+	pc = gen_nconc(pc, unit_words);
+	if(!ENDP(fmt_words)) {
+	    pc = CHAIN_SWORD(pc, ", ");
+	    pc = gen_nconc(pc, fmt_words);
+	}
+	pc = CHAIN_SWORD(pc, ") ");
+	pcio = pio_write;
     }
     else {
-      pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-      pc = CHAIN_SWORD(pc, " (");
-      /* FI: missing argument; I use "precedence" because I've no clue;
-         see LZ */
-      pc = gen_nconc(pc, words_io_control(&pcio, precedence));
-      pc = CHAIN_SWORD(pc, ") ");
-      /* 
-	free_words(fmt_words);
-      */
+	pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+	pc = CHAIN_SWORD(pc, " (");
+	/* FI: missing argument; I use "precedence" because I've no clue;
+	   see LZ */
+	pc = gen_nconc(pc, words_io_control(&pcio, precedence));
+	pc = CHAIN_SWORD(pc, ") ");
+	/* 
+	   free_words(fmt_words);
+	   */
     }
 
     /* because the "IOLIST=" keyword is embedded in the list
