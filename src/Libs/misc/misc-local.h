@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1996/07/27 11:51:27 $, 
+ * $Date: 1997/04/08 11:58:11 $, 
  */
 
 #ifndef _STDARG_H
@@ -47,7 +47,7 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
   debug_on_function(env, pips_unknown_function, __FILE__, __LINE__)
 #define debug_off() \
   debug_off_function(pips_unknown_function, __FILE__, __LINE__)
-#define pips_debug pips_debug_function
+#define pips_debug ifdebug(1) pips_debug_function
 #define pips_user_warning pips_user_warning_function
 #define pips_user_error pips_user_error_function
 #define pips_internal_error pips_internal_error_function
