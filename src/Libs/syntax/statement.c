@@ -304,7 +304,7 @@ instruction i;
 
 instruction MakeEmptyInstructionBlock()
 {
-    return(make_instruction(is_instruction_block, NIL));
+    return(make_instruction_block(NIL));
 }
 
 
@@ -384,7 +384,7 @@ entity i;
 
 	cs = CONS(STATEMENT, s, cs);
     }
-    ins = make_instruction(is_instruction_block, cs);
+    ins = make_instruction_block(cs);
 
     (void) gen_consistent_p(ins);
 
