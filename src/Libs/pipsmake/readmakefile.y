@@ -46,7 +46,8 @@
 
 #include <sys/stdtypes.h>  /* for debug with dbmalloc */
 #include "malloc.h"
-/* extern char *strdup(); */
+
+extern void add_rule(rule);
 
 extern char yytext[];
 extern FILE * yyin; 
