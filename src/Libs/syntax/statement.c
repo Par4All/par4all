@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.57  2003/06/17 11:06:38  nguyen
+ * Update functions with new RI
+ *
  * Revision 1.56  2003/06/05 09:23:03  irigoin
  * MAXBLOCK redefined to accomodate higher levels of nesting due to IF/ELSEIF
  * representation as nested IFs.
@@ -2051,7 +2054,8 @@ check_first_statement()
 	safe_fclose(fd, CurrentFN);
 	buffer[ibuffer++] = '\0';
 	code_decls_text(EntityCode(get_current_module_entity())) = 
-	    strdup(buffer);
+	    strdup("");
+	/* strdup(buffer); */
 
 	free(buffer), buffer=NULL;
 
