@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "database.h"
 
