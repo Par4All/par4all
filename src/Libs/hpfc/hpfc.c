@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/08/21 16:02:38 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/08/22 08:31:01 $, )
  * version $Revision$
  */
  
@@ -422,10 +422,11 @@ bool hpfc_filter(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
 
-    safe_system(concatenate(hpf_directive_string_p(name) ?
-                            "cat" : "$HPFC_TOOLS/hpfc_directives", " < ",
-			    dir_name, "/", file_name, " > ",
-			    dir_name, "/", new_name, NULL));
+    safe_system(concatenate(
+	"PATH=${PATH}:${PIPS_ROOT}/Share ",
+	hpf_directive_string_p(name)? "cat" : "hpfc_directives", 
+	" < ", dir_name, "/", file_name, 
+	" > ", dir_name, "/", new_name, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_FILTERED_FILE, name, new_name);
 
@@ -459,8 +460,8 @@ static bool hpfc_directives_handler(string name, bool dyn)
 	s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
 
 	if (dyn)
-	set_proper_effects_map(effectsmap_to_listmap((statement_mapping) 
-            db_get_memory_resource(DBR_PROPER_EFFECTS, name, TRUE)));
+	    set_proper_effects_map(effectsmap_to_listmap((statement_mapping) 
+		db_get_memory_resource(DBR_PROPER_EFFECTS, name, TRUE)));
 
 	set_current_module_entity(module);
 	set_current_module_statement(s);
@@ -468,8 +469,7 @@ static bool hpfc_directives_handler(string name, bool dyn)
 	make_update_common_map(); 
 	hpfc_init_run_time_entities();
 
-	if (!dyn)
-	    NormalizeCommonVariables(module, s);
+	if (!dyn) NormalizeCommonVariables(module, s);
 	handle_hpf_directives(s, dyn); /* do the job... */
 
 	free_update_common_map(); 
@@ -477,8 +477,7 @@ static bool hpfc_directives_handler(string name, bool dyn)
 	reset_current_module_statement();
 	reset_current_module_entity();
 
-	if (dyn)
-	free_proper_effects_map();
+	if (dyn) free_proper_effects_map();
 	
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, s);
 
@@ -648,8 +647,8 @@ bool hpfc_install(string name)
     dir = db_get_current_workspace_directory();
     wks = db_get_current_workspace_name();
 
-    safe_system(concatenate("$HPFC_TOOLS/hpfc_install -iob ", dir, 
-			    " -n ", wks, NULL));
+    safe_system(concatenate("PATH=${PATH}:${PIPS_ROOT}/Share "
+			    "hpfc_install -iob ", dir, " -n ", wks, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, name, NO_FILE);
 
@@ -673,8 +672,8 @@ bool hpfc_make(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
 
-    safe_system(concatenate("cd ", dir, 
-			    "/hpfc ; ${HPFC_MAKE:-gmake} make &", NULL));
+    safe_system(concatenate("cd ", dir, "/hpfc ; " 
+			    "${HPFC_MAKE:-gmake} make &", NULL));
 
     debug_off();
     return TRUE;
@@ -698,8 +697,8 @@ bool hpfc_run(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
 
-    safe_system(concatenate("cd ", dir, 
-			    "/hpfc ; ${HPFC_MAKE:-gmake} run &", NULL));
+    safe_system(concatenate("cd ", dir, "/hpfc ; "
+			    "${HPFC_MAKE:-gmake} run &", NULL));
 
     debug_off();
     return TRUE;
