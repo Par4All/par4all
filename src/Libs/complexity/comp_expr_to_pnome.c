@@ -68,6 +68,9 @@ entity e;
  * effects_list is added on 10 Nov 92 to pass the effects
  * which can be used to determine the "must-be-written"
  * effects to delay the variable evaluation. LZ 10 Nov 92
+ *
+ * FI:
+ * - better symbol generation for unknown complexities
  */
 complexity expression_to_polynome(expr, precond, effects_list, keep_symbols, maximize)
 expression expr;
@@ -97,8 +100,14 @@ int maximize;
 	comp = syntax_to_polynome(sy, precond, effects_list, keep_symbols, maximize);
     }
 
-    if ( complexity_unknown_p(comp) )
+    if ( complexity_unknown_p(comp) ) {
+	pips_error("complexity expression_to_polynome",
+		   "Better unknown value name generation required!\n");
+	/*
 	return(make_single_var_complexity(1.0,UNKNOWN_RANGE));
+	*/
+	return complexity_undefined;
+    }
 
     /* The following line is merely for debugging */
     
@@ -119,7 +128,7 @@ list effects_list;
 boolean keep_symbols;
 int maximize;
 {
-    complexity comp;
+    complexity comp = complexity_undefined;
 
     trace_on("syntax -> pnome");
    
@@ -533,15 +542,17 @@ int maximize;
     trace_on("variable %s -> pnome, maximize %d ", entity_name(var), maximize);
 
     /* This is the only case that we use the precondition */
-    if (precond != transformer_undefined &&
-	pred != predicate_undefined && !SC_UNDEFINED_P(psyst) ) {
+    if (entity_integer_scalar_p(var) &&
+	precond != transformer_undefined &&
+	pred != predicate_undefined && 
+	!SC_UNDEFINED_P(psyst) ) {
 	Psysteme ps = sc_dup(psyst);
 	Psysteme ps1;
 	Pvecteur pv;
 	char *precondition_to_string();
 
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	    sc_fprint(stdout,ps,noms_var);
+	    sc_fprint(stderr,ps,noms_var);
 	}
 
 	for ( pv=ps->base; !VECTEUR_NUL_P(pv); pv=pv->succ) {
@@ -566,7 +577,7 @@ int maximize;
 
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	    fprintf(stderr, "Prec=%s", precondition_to_string(precond));
-	    sc_fprint(stdout,ps,noms_var);
+	    sc_fprint(stderr,ps,noms_var);
 
 	    if ( !SC_UNDEFINED_P(ps) )
 		fprintf(stderr,"ps OK\n");
@@ -575,7 +586,8 @@ int maximize;
 	}
 
 	/* added by LZ 18/02/92 */
-	if ( hash_contains_user_var_p(hash_complexity_parameters, var) ) {
+	if ( hash_contains_user_var_p(hash_complexity_parameters,
+				      (char *) var) ) {
 	    if (get_bool_property("COMPLEXITY_INTERMEDIATES"))
 		fprintf(stderr,"Don't evaluate %s------\n", noms_var(var));
 	    return(make_single_var_complexity(1.0, (Variable)var));
@@ -662,7 +674,7 @@ int maximize;
  * This function returns M2 = M1 - 1 packed in the polynomial of the complexity
  * the statistics of this complexity should be all zero.
  */
-complexity simplify_sc_to_complexity(ps,var)
+complexity simplify_sc_to_complexity(ps, var)
 Psysteme ps;
 Variable var;
 {
@@ -670,7 +682,7 @@ Variable var;
     int var_coeff=1; 
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	sc_fprint(stdout,ps,noms_var);
+	sc_fprint(stderr,ps,noms_var);
     }
 
     if ( !SC_UNDEFINED_P(ps) && !CONTRAINTE_UNDEFINED_P(ps->egalites) ) {
@@ -701,11 +713,17 @@ Variable var;
 	if ( b )
 	    comp = make_single_var_complexity(1.0, (Variable)var);
 	else {
-/*
-	    Variable v = (Variable)FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
-						      UNKNOWN_RANGE_NAME);
-*/
-	    comp = make_single_var_complexity(1.0,UNKNOWN_RANGE); 
+	    string v_prefix = strdup
+		(concatenate(UNKNOWN_VARIABLE_VALUE_PREFIX,
+			     entity_local_name((entity) var),
+			     "_", 0));
+	    Variable v = (Variable)
+		make_new_scalar_variable_with_prefix
+		    (v_prefix,
+		     get_current_module_entity(),
+		     MakeBasic (is_basic_int));
+	    free(v_prefix);
+	    comp = make_single_var_complexity(1.0, v); 
 	}
     }
 
