@@ -8,37 +8,44 @@
 
 /* generation of types */
 
-basic MakeBasicOverloaded()
+basic 
+MakeBasicOverloaded()
 {
     return(make_basic(is_basic_overloaded, NIL));
 }
 
-mode MakeModeReference()
+mode 
+MakeModeReference()
 {
     return(make_mode(is_mode_reference, NIL));
 }
 
-mode MakeModeValue()
+mode 
+MakeModeValue()
 {
     return(make_mode(is_mode_value, NIL));
 }
 
-type MakeTypeStatement()
+type 
+MakeTypeStatement()
 {
     return(make_type(is_type_statement, NIL));
 }
 
-type MakeTypeUnknown()
+type 
+MakeTypeUnknown()
 {
     return(make_type(is_type_unknown, NIL));
 }
 
-type MakeTypeVoid()
+type 
+MakeTypeVoid()
 {
     return(make_type(is_type_void, NIL));
 }
 
-type MakeTypeVariable(b, ld)
+type 
+MakeTypeVariable(b, ld)
 basic b;
 cons * ld;
 {
@@ -48,7 +55,8 @@ cons * ld;
 /*
  *
  */
-basic MakeBasic(the_tag)
+basic 
+MakeBasic(the_tag)
 int the_tag;
 {
     switch(the_tag)
@@ -82,44 +90,52 @@ int the_tag;
 
 /* functions on types */
 
-type MakeTypeArray(b, ld)
+type 
+MakeTypeArray(b, ld)
 basic b;
 cons * ld;
 {
     return(make_type(is_type_variable, make_variable(b, ld)));
 }
 
-parameter MakeOverloadedParameter()
+parameter 
+MakeOverloadedParameter()
 {
   return MakeAnyScalarParameter(is_basic_overloaded, UU);
 }
 
-parameter MakeIntegerParameter()
+parameter 
+MakeIntegerParameter()
 {
   return MakeAnyScalarParameter(is_basic_int, DEFAULT_REAL_TYPE_SIZE);
 }
 
-parameter MakeRealParameter()
+parameter 
+MakeRealParameter()
 {
   return MakeAnyScalarParameter(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
 }
 
-parameter MakeDoubleprecisionParameter()
+parameter 
+MakeDoubleprecisionParameter()
 {
   return MakeAnyScalarParameter(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
 }
 
-parameter MakeLogicalParameter()
+parameter 
+MakeLogicalParameter()
 {
   return MakeAnyScalarParameter(is_basic_logical, DEFAULT_LOGICAL_TYPE_SIZE);
 }
 
-parameter MakeComplexParameter()
+parameter 
+MakeComplexParameter()
 {
   return MakeAnyScalarParameter(is_basic_complex, DEFAULT_COMPLEX_TYPE_SIZE);
 }
 
-parameter MakeCharacterParameter()
+parameter 
+MakeCharacterParameter()
 {
   return make_parameter(MakeTypeArray(make_basic(is_basic_string, 
 						 make_value(is_value_constant,
@@ -129,7 +145,8 @@ parameter MakeCharacterParameter()
 			make_mode(is_mode_value, UU));
 }
 
-parameter MakeAnyScalarParameter(tag t, int size)
+parameter 
+MakeAnyScalarParameter(tag t, int size)
 {
     return(make_parameter((MakeTypeArray(make_basic(t, 
 						    size), NIL)),
@@ -139,37 +156,44 @@ parameter MakeAnyScalarParameter(tag t, int size)
 /* this function creates a default fortran operator result, i.e. a zero
  * dimension variable with an overloaded basic type.
  */
-type MakeOverloadedResult()
+type 
+MakeOverloadedResult()
 {
     return MakeAnyScalarResult(is_basic_overloaded, UU);
 }
 
-type MakeIntegerResult()
+type 
+MakeIntegerResult()
 {
     return MakeAnyScalarResult(is_basic_int, DEFAULT_INTEGER_TYPE_SIZE);
 }
 
-type MakeRealResult()
+type 
+MakeRealResult()
 {
     return MakeAnyScalarResult(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
 }
 
-type MakeDoubleprecisionResult()
+type 
+MakeDoubleprecisionResult()
 {
     return MakeAnyScalarResult(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
 }
 
-type MakeLogicalResult()
+type 
+MakeLogicalResult()
 {
     return MakeAnyScalarResult(is_basic_logical, DEFAULT_LOGICAL_TYPE_SIZE);
 }
 
-type MakeComplexResult()
+type 
+MakeComplexResult()
 {
     return MakeAnyScalarResult(is_basic_complex, DEFAULT_COMPLEX_TYPE_SIZE);
 }
 
-type MakeCharacterResult()
+type 
+MakeCharacterResult()
 {
   return MakeTypeArray(make_basic(is_basic_string, 
 				  make_value(is_value_constant,
@@ -178,13 +202,15 @@ type MakeCharacterResult()
 		       NIL);
 }
 
-type MakeAnyScalarResult(tag t, int size)
+type 
+MakeAnyScalarResult(tag t, int size)
 {
     return(MakeTypeArray(make_basic(t, size), NIL));
 }
 
 
-bool type_equal_p(t1, t2)
+bool 
+type_equal_p(t1, t2)
 type t1;
 type t2;
 {
@@ -231,7 +257,8 @@ type t2;
     return FALSE; /* just to avoid a warning */
 }
 
-type make_scalar_integer_type(n)
+type 
+make_scalar_integer_type(n)
 int n;
 {
     type t = make_type(is_type_variable,
@@ -239,7 +266,8 @@ int n;
     return t;
 }
 
-bool area_equal_p(a1, a2)
+bool 
+area_equal_p(a1, a2)
 area a1;
 area a2;
 {
@@ -254,7 +282,8 @@ area a2;
 	return (area_size(a1) == area_size(a2));
 }
 
-bool variable_equal_p(v1, v2)
+bool 
+variable_equal_p(v1, v2)
 variable v1;
 variable v2;
 {
@@ -291,7 +320,8 @@ variable v2;
   return vtequal;
 }
 
-bool basic_equal_p(b1, b2)
+bool 
+basic_equal_p(b1, b2)
 basic b1;
 basic b2;
 {
@@ -333,7 +363,8 @@ basic b2;
     return FALSE; /* just to avoid a warning */
 }
 
-bool functional_equal_p(f1, f2)
+bool 
+functional_equal_p(f1, f2)
 functional f1;
 functional f2;
 {
@@ -362,7 +393,8 @@ functional f2;
     }
 }
 
-bool parameter_equal_p(p1, p2)
+bool 
+parameter_equal_p(p1, p2)
 parameter p1;
 parameter p2;
 {
@@ -377,7 +409,8 @@ parameter p2;
 	    && mode_equal_p(parameter_mode(p1), parameter_mode(p2));
 }
 
-bool mode_equal_p(m1, m2)
+bool 
+mode_equal_p(m1, m2)
 mode m1;
 mode m2;
 {
@@ -391,7 +424,8 @@ mode m2;
 	return mode_tag(m1) == mode_tag(m2);
 }
 
-int string_type_size(b)
+int 
+string_type_size(b)
 basic b;
 {
     int size = -1;
@@ -414,7 +448,8 @@ basic b;
 }
 
 /* See also SizeOfElements() */
-int basic_type_size(b)
+int 
+basic_type_size(b)
 basic b;
 {
     int size = -1;
@@ -450,7 +485,8 @@ basic b;
  *
  * WARNING: a pointer to an existing data structure is returned.
  */
-basic expression_basic(expr)
+basic 
+expression_basic(expr)
 expression expr;
 {
     syntax the_syntax=expression_syntax(expr);
@@ -481,14 +517,16 @@ expression expr;
     return b;
 }
 
-dimension dimension_dup(d)
+dimension 
+dimension_dup(d)
 dimension d;
 {
     return(make_dimension(expression_dup(dimension_lower(d)),
 			  expression_dup(dimension_upper(d))));
 }
 
-list ldimensions_dup(l)
+list 
+ldimensions_dup(l)
 list l;
 {
     list 
@@ -504,7 +542,8 @@ list l;
     return(gen_nreverse(result));
 }
 
-dimension FindIthDimension(e, i)
+dimension 
+FindIthDimension(e, i)
 entity e;
 int i;
 {
@@ -528,9 +567,41 @@ int i;
 }
 
 /*
+ * returns a string defining a type.
+ */
+string 
+type_to_string(type t)
+{
+    switch (type_tag(t))
+    {
+    case is_type_statement:
+	return "statement";
+    case is_type_area:
+	return "area";
+    case is_type_variable:
+	return "variable";
+    case is_type_functional:
+	return "functional";
+    case is_type_unknown:
+	return "unknow";
+    case is_type_void:
+	return "void";
+    default: break;
+    }
+
+    pips_error("type_to_string", 
+	       "unexpected type: 0x%x (tag=%d)",
+	       t,
+	       type_tag(t));
+
+    return(string_undefined); /* just to avoid a gcc warning */
+}
+
+/*
  * returns the string to declare a basic type.
  */
-string basic_to_string(b)
+string 
+basic_to_string(b)
 basic b;
 {
     switch (basic_tag(b))
@@ -586,7 +657,8 @@ basic b;
  *
  * WARNING: a new basic object is allocated
  */
-basic basic_of_expression(exp)
+basic 
+basic_of_expression(exp)
 expression exp;
 {
   syntax sy = expression_syntax(exp);
@@ -624,7 +696,8 @@ expression exp;
  *
  * WARNING: a new basic is allocated
  */
-basic basic_of_call(c)
+basic 
+basic_of_call(c)
 call c;
 {
   entity e = call_function(c);
@@ -661,7 +734,8 @@ call c;
  *
  * WARNING: returns a pointer
  */
-basic basic_of_external(c)
+basic 
+basic_of_external(c)
 call c;
 {
   type call_type, return_type;
@@ -685,7 +759,8 @@ call c;
  *
  * WARNING: returns a newly allocated basic object
  */
-basic basic_of_intrinsic(c)
+basic 
+basic_of_intrinsic(c)
 call c;
 {
   basic rb;
@@ -731,7 +806,8 @@ call c;
  *
  * WARNING: returns a pointer towards an existing data structure
  */
-basic basic_of_constant(c)
+basic 
+basic_of_constant(c)
 call c;
 {
   type call_type, return_type;
@@ -760,7 +836,8 @@ call c;
  * WARNING: a new basic data structure is allocated (because you cannot
  * always find a proper data structure to return simply a pointer
  */
-basic basic_union(exp1, exp2)
+basic 
+basic_union(exp1, exp2)
 expression exp1, exp2;
 {
   basic b1 = basic_of_expression(exp1);
@@ -883,18 +960,15 @@ expression exp1, exp2;
     */
 }
 
-/*
- *  that is all
- */
-
-bool overloaded_type_p(type t)
+bool 
+overloaded_type_p(type t)
 {
   pips_assert("overloaded_type_p", type_variable_p(t));
 
   return basic_overloaded_p(variable_basic(type_variable(t)));
 }
 
-/* boolean is_inferior_basic(basic1, basic2)
+/* bool is_inferior_basic(basic1, basic2)
  * return TRUE if basic1 is less complex than basic2
  * ex:  int is less complex than float*4,
  *      float*4 is less complex than float*8, ...
@@ -904,7 +978,8 @@ bool overloaded_type_p(type t)
  * Used to decide that the sum of an int and a float
  * is a floating-point addition (for ex.)
  */
-boolean is_inferior_basic(b1, b2)
+bool
+is_inferior_basic(b1, b2)
 basic b1, b2;
 {
     if ( b1 == basic_undefined ) 
@@ -951,7 +1026,8 @@ basic b1, b2;
     return (TRUE);
 }
 
-basic simple_basic_dup(b)
+basic 
+simple_basic_dup(b)
 basic b;
 {
     /* basic_int, basic_float, basic_logical, basic_complex are all int's */
@@ -970,3 +1046,7 @@ basic b;
 	return (make_basic(basic_tag(b), basic_int(b))); 
     }
 }
+
+/*
+ *  that is all
+ */
