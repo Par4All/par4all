@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/03 11:51:29 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/03 12:02:17 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -183,7 +183,7 @@ do
     echo make $MAKEFILE in $dir
     
     # needed because of f.. - in directory names...
-    dirname=`basename \`pwd\` | sed 's,\-,_,g'`
+    dirname=`basename \`pwd\` | tr '-' '_'`
     
     if [ -f $MAKEFILE ] ; then
       cp $MAKEFILE $MAKEFILE.old
@@ -303,7 +303,7 @@ install: $(SOURCES)
 	install_pips_sources \
 		-v -s \`pwd\` -t $(TARGETDIR) -y "\$\$comments" \
 		$(SOURCES)
-	cp $(MAKEFILE) $(TARGETDIR)/Makefile
+	@pips_install_file $(MAKEFILE) $(TARGETDIR)/Makefile
 	cd $(TARGETDIR) ; $(MAKE) depend
 	touch install
 	$(MAKE) quick-install
@@ -367,7 +367,7 @@ install: $(SOURCES)
 	install_pips_sources \
 		-v -s \`pwd\` -t $(TARGETDIR) -y "\$\$comments" \
 		$(SOURCES)
-	cp $(MAKEFILE) $(TARGETDIR)/Makefile
+	@pips_install_file $(MAKEFILE) $(TARGETDIR)/Makefile
 	cd $(TARGETDIR) ; $(MAKE) depend
 	touch install
 	$(MAKE) quick-install
@@ -407,7 +407,7 @@ TAGS: $(INCLUDES) $(CFILES)
 	ctage $(INCLUDES) $(CFILES)
 
 $(TARGET)-local.h:
-	if [ ! -f $(TARGET)-local.h ] ; then touch $(TARGET)-local.h ; fi
+	[ -f $(TARGET)-local.h ] || touch $(TARGET)-local.h
 
 # Ici commence la partie parametree en lib/passe :
 
@@ -447,7 +447,7 @@ production-depend: $(DERIVED_HEADERS) $(EXTERN)
 		$(MAKEFILE) ;\\
 	$(PREPROC) -M $(CFILES) ;\\
 	} > $(MAKEFILE).new
-	cp $(MAKEFILE).new $(MAKEFILE)
+	@pips_install_file $(MAKEFILE).new $(MAKEFILE)
 	$(RM) $(MAKEFILE).new
 
 ### DO NOT DELETE THIS LINE. USED FOR MAKE DEPEND
