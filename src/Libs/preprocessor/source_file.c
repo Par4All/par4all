@@ -248,14 +248,20 @@ pips_process_file(string file_name)
  * to avoid modifying a character constant...
  * this stuff should be done by hand in split...
  * also the generated lines may be too long...
+ *
+ * Well, the regex can be improved if necessary.
  */
-#define COMPLEX_CST_RX \
-    "^[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-0-9\\. \t]*,[-0-9\\. \t]*)"
+#define CMPLX_RX \
+    "^[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-+0-9eE\\. \t]*,[-+0-9eE\\. \t]*)"
+
+#define DCMPLX_RX \
+    "^[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-+0-9dD\\. \t]*,[-+0-9dD\\. \t]*)"
 
 static regex_t 
     implicit_none_rx, 
     include_file_rx,
-    complex_cst_rx;
+    complex_cst_rx,
+    dcomplex_cst_rx;
 static FILE * output_file;
 
 static void
@@ -278,9 +284,14 @@ static void
 handle_complex_constants(string line)
 {
     regmatch_t matches[2]; /* matched strings */
-    
+
+    /* implied complex */
     while (!regexec(&complex_cst_rx, line, 2, matches, 0))
 	insert_at(line, matches[1].rm_so, IMPLIED_COMPLEX_NAME);
+
+    /* implied double complex */
+    while (!regexec(&dcomplex_cst_rx, line, 2, matches, 0))
+	insert_at(line, matches[1].rm_so, IMPLIED_DCOMPLEX_NAME);
 }
 
 /* tries several path for a file to include...
@@ -379,7 +390,8 @@ init_rx(void)
     done=TRUE;
     if (regcomp(&implicit_none_rx, IMPLICIT_NONE_RX, REG_ICASE) ||
 	regcomp(&include_file_rx, INCLUDE_FILE_RX, REG_ICASE)   ||
-	regcomp(&complex_cst_rx, COMPLEX_CST_RX, REG_ICASE))
+	regcomp(&complex_cst_rx, CMPLX_RX, REG_ICASE)           ||
+	regcomp(&dcomplex_cst_rx, DCMPLX_RX, REG_ICASE))
 	pips_internal_error("invalid regular expression\n");
 }
 
