@@ -1,5 +1,5 @@
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/07/20 14:30:58 $, 
+# $Date: 1996/08/12 19:15:44 $, 
 # (c) Fabien COELHO July 1996
 #
 # This makefile forwards make targets to sub-directories...
@@ -47,7 +47,7 @@ FWD_REPORT	= >&2
 FWD_ROOT	= .
 FWD_OUT		=
 
-la_cibe_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
+la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 
 # Forward any command to the specified directories (if any).
 # Report the result of the forward.
