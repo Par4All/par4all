@@ -302,8 +302,8 @@ static void instruction_rwt (instruction i)
 	    {
 	      text _r_ = (t);
 	      text _t_ = load_statement_icfg(s);
-	      text_sentence(_r_) = gen_nconc(text_sentences(_r_), text_sentences(_t_));
-	      text_sentence(_t_) = NIL;
+	      text_sentences(_r_) = gen_nconc(text_sentences(_r_), text_sentences(_t_));
+	      text_sentences(_t_) = NIL;
 	      free_text(_t_);
 	    }
 	    MERGE_TEXTS(t, load_statement_icfg(s));
