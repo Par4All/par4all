@@ -66,7 +66,7 @@ void symbolic_constant_declaration_verify(call c)
 void add_non_declared_reference_to_declaration(reference ref)
 {
     entity var = reference_variable(ref);
-    type t = entity_type(var);
+    /* type t = entity_type(var); */
 
     if (!variable_in_module_p2(var,checked_module))
     { 
@@ -219,7 +219,7 @@ void insure_declaration_coherency(
     statement stat,
     list /* of entity */ le) /* added entities, for includes... */
 {
-    list decl = entity_declarations(module), new_decl = NIL;
+    list decl = entity_declarations(module), new_decl = NIL, added = NIL;
 
     debug_on("RI_UTIL_DEBUG_LEVEL");
 
@@ -231,7 +231,7 @@ void insure_declaration_coherency(
     referenced_variables_list = NIL;
     
     MAP(ENTITY, e, store_this_variable(e), le);
-    MAP(ENTITY, e, store_declared_variables(e, TRUE), decl);
+    /* MAP(ENTITY, e, store_declared_variables(e, TRUE), decl); */
 
     gen_multi_recurse(stat,
 		      /*   Direct References   
@@ -253,11 +253,12 @@ void insure_declaration_coherency(
 	     storage_formal_p(entity_storage(var)) ||
 	     value_symbolic_p(entity_initial(var)) ||
 	     (bound_referenced_variables_p(var) &&
-	      !gen_in_list_p(var, new_decl)))
+	      !bound_declared_variables_p(var)))
 	 {
 	     pips_debug(7, "declared variable %s is referenced, kept\n",
 			entity_name(var));
 	     new_decl = CONS(ENTITY, var, new_decl);
+	     store_declared_variables(var, TRUE);
 	 }
 	 else
 	 {
@@ -276,27 +277,27 @@ void insure_declaration_coherency(
 	 if (!bound_declared_variables_p(var) &&
 	     !basic_overloaded_p(entity_basic(var)))
 	 {
-	     pips_debug(7, "referenced variable %s not declared, added\n",
-			entity_name(var));
-	     new_decl=CONS(ENTITY, var, new_decl);
+	     pips_debug(7, "referenced var %s added\n", entity_name(var));
+	     added = CONS(ENTITY, var, added);
 	     store_declared_variables(var, TRUE);
 	 }
 	 else
 	 {
-	     pips_debug(7, "referenced variable %s declared\n",
-			entity_name(var));
+	     pips_debug(7, "referenced var %s declared\n", entity_name(var));
 	 }
      },
 	 referenced_variables_list);
 
+    new_decl = gen_nreverse(new_decl); /* back to initial order */
+    new_decl = gen_nconc(new_decl, added);
 
     /*  More determinism: the declarations are sorted
+     * ??? bug: parameters cannot be sorted...
      */
-    gen_sort_list(new_decl, compare_entities);
+    /* gen_sort_list(new_decl, compare_entities); */
     entity_declarations(module) = new_decl; /* rough! */
 
-    /*
-     * the temporaries are cleaned
+    /* the temporaries are cleaned
      */
     close_declared_variables();
     gen_free_list(decl);
