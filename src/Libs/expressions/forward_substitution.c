@@ -20,6 +20,9 @@
  * An important issue is to only perform the substitution only if correct.
  *
  * $Log: forward_substitution.c,v $
+ * Revision 1.2  1998/03/31 17:17:45  coelho
+ * cleaner + debug level.
+ *
  * Revision 1.1  1998/03/31 16:08:25  coelho
  * Initial revision
  *
@@ -47,6 +50,8 @@ typedef struct {
     entity var;
     expression val;
 } t_substitution, * p_substitution;
+
+#define DEBUG_NAME "FORWARD_SUBSTITUTION_DEBUG_LEVEL"
 
 /* returns whether there is other write proper effect than on var
  * or if some variable conflicting with var is read... (?) 
@@ -144,7 +149,7 @@ perform_substitution(
  * proper and cumulated effects must be available.
  */
 static bool 
-some_conflicts_beetwen(statement s1, statement s2)
+some_conflicts_between(statement s1, statement s2)
 {
     effects efs1, efs2;
     efs1 = load_proper_rw_effects(s1);
@@ -177,10 +182,11 @@ seq_flt(sequence s)
 	p_substitution subs = substitution_candidate(first);
 	if (subs)
 	{
-	    MAPL(lsn,
+	    /* scan following statements and substitute while no conflicts.
+	     */
+	    MAP(STATEMENT, anext,
 	    {
-		statement anext = STATEMENT(CAR(lsn));
-		if (some_conflicts_beetwen(subs->source, anext))
+		if (some_conflicts_between(subs->source, anext))
 		    break; /* stop propagation */
 		else
 		    perform_substitution(subs->var, subs->val, anext);
@@ -197,9 +203,12 @@ seq_flt(sequence s)
 /* interface to pipsmake.
  * should have proper and cumulated effects...
  */
-bool forward_substitute(string module_name)
+bool 
+forward_substitute(string module_name)
 {
     statement stat;
+
+    debug_on(DEBUG_NAME);
 
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     set_current_module_statement((statement)
@@ -219,6 +228,8 @@ bool forward_substitute(string module_name)
     reset_proper_rw_effects();
     reset_current_module_entity();
     reset_current_module_statement();
+
+    debug_off();
 
     return TRUE;
 }
