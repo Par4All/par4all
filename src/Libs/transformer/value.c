@@ -350,10 +350,10 @@ entity e;
 {
     /* is e variable whose value(s) (already) are analyzed?
      */
-    bool has = hash_table_undefined_p(hash_entity_to_new_value)?
-	       TRUE:  /* ??? reasonnable default for the prettyprinter. FC */
-               hash_defined_p(hash_entity_to_new_value, (char *) e);
-    return has;
+    pips_assert("value hash table is defined", 
+		!hash_table_undefined_p(hash_entity_to_new_value));
+
+    return hash_defined_p(hash_entity_to_new_value, (char *) e);
 }
 
 /* the following three functions are directly or indirectly relative
