@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/07/24 12:53:04 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/07/24 13:00:50 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -232,18 +232,6 @@ implicitly in the controlizer phase.
 
 \begin{verbatim}
 UNSPAGHETTIFY_IN_CONTROLIZER   TRUE
-\end{verbatim}
-
-The following option enables the use of IF/THEN/ELSE restructuring
-when applying the controlizer:
-\begin{verbatim}
-UNSPAGHETTIFY_TEST_RESTRUCTURING FALSE
-\end{verbatim}
-
-The following option enables the use of control graph hierarchisation
-when applying the controlizer:
-\begin{verbatim}
-UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION FALSE
 \end{verbatim}
 
 
@@ -920,6 +908,18 @@ To display the statistics about unspaghettify and control graph
 restructuring.
 \begin{verbatim}
 UNSPAGHETTIFY_DISPLAY_STATISTICS TRUE
+\end{verbatim}
+
+The following option enables the use of IF/THEN/ELSE restructuring
+when applying unspaghettify:
+\begin{verbatim}
+UNSPAGHETTIFY_TEST_RESTRUCTURING FALSE
+\end{verbatim}
+
+The following option enables the use of control graph hierarchisation
+when applying unspaghettify:
+\begin{verbatim}
+UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION FALSE
 \end{verbatim}
 
 
