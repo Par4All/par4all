@@ -38,6 +38,7 @@
 #define ENTITY_CONVERSION_CMPLX_P(e) ENTITY_CONVERSION_P(e, CMPLX)
 #define ENTITY_CONVERSION_DCMPLX_P(e) ENTITY_CONVERSION_P(e, DCMPLX)
 
+/* should be some properties to accomodate cray codes?? */
 #define INT_LENGTH 4
 #define REAL_LENGTH 4
 #define DOUBLE_LENGTH 8
