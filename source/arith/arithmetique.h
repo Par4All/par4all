@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.3 2004/02/11 10:19:54 verdoolaege Exp $
+ * $Id: arithmetique.h,v 1.4 2004/08/22 21:11:52 verdoolaege Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -286,6 +286,7 @@ typedef mpz_t Value;
 #define value_division(ref,val1,val2)  (mpz_tdiv_q((ref),(val1),(val2)))
 #define value_modulus(ref,val1,val2)   (mpz_tdiv_r((ref),(val1),(val2)))
 #define value_pdivision(ref,val1,val2) (mpz_fdiv_q((ref),(val1),(val2)))
+#define value_pmodulus(ref,val1,val2)  (mpz_fdiv_r((ref),(val1),(val2)))
 #define value_oppose(ref,val)          (mpz_neg((ref),(val)))
 #define value_absolute(ref,val)        (mpz_abs((ref),(val)))
 #define value_minimum(ref,val1,val2)   (value_le((val1),(val2)) ?  \
@@ -375,6 +376,7 @@ typedef mpz_t Value;
 #define value_division(ref,val1,val2) 	((ref) = (val1)/(val2))
 #define value_modulus(ref,val1,val2) 	((ref) = (val1)%(val2))
 #define value_pdivision(ref,val1,val2)	((ref) = value_pdiv((val1),(val2)))
+#define value_pmodulus(ref,val1,val2)	((ref) = value_pmod((val1),(val2)))
 #define value_oppose(ref,val)    	((ref) = value_uminus((val)))
 #define value_absolute(ref,val)		((ref) = value_abs((val)))
 #define value_minimum(ref,val1,val2)	((ref) = value_min((val1),(val2)))
