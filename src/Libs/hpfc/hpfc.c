@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/02/24 23:21:04 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/02/29 19:05:21 $, )
  * version $Revision$
  */
  
@@ -12,10 +12,6 @@
 #include "resources.h"
 #include "pipsdbm.h"
 #include "control.h"
-
-/* fake resources...
- */
-#define NO_FILE (strdup("fake file name"))
 
 /****************************************************************** COMMONS */
 
@@ -46,7 +42,21 @@ void add_a_pure(entity f)
  */
 bool hpf_pure_p(entity f)
 {
-    return(gen_in_list_p(f, the_pures));
+    return gen_in_list_p(f, the_pures);
+}
+
+/********************************************************************** IOS */
+
+GENERIC_STATIC_STATUS(static, the_ios, list, NIL, gen_free_list)
+
+void add_an_io_function(entity f)
+{
+    the_ios = gen_once(f, the_ios);
+}
+
+bool hpfc_special_io(entity f)
+{
+    return gen_in_list_p(f, the_ios);
 }
 
 /*************************************************************** REMAPPINGS */
@@ -80,7 +90,7 @@ add_remapping_as_computed(
     list /* of entity */ vars) /* variables to be declared */
 {
     computed_remaps = CONS(REMAPPING, 
-			   make_remapping(copy_renaming(r), gen_copy_seq(vars)),
+        make_remapping(copy_renaming(r), gen_copy_seq(vars)),
 			   computed_remaps);
 }
 
@@ -89,8 +99,7 @@ add_remapping_as_computed(
 GENERIC_STATIC_STATUS(static, include_entities, list, NIL, gen_free_list)
 
 void
-add_remapping_as_used(
-   renaming x)
+add_remapping_as_used(renaming x)
 {
     entity src = renaming_old(x), trg = renaming_new(x);
     remapping p = remapping_undefined;
@@ -131,6 +140,7 @@ static void init_hpfc_status()
     init_the_commons();
     init_dynamic_status();
     init_the_pures();
+    init_the_ios();
     init_computed_remaps();
 
     chs = make_hpfc_status(get_overlap_status(),
@@ -140,6 +150,7 @@ static void init_hpfc_status()
 			   get_the_commons(),
 			   get_dynamic_status(),
 			   get_the_pures(),
+			   get_the_ios(),
 			   get_computed_remaps());    
 }
 
@@ -152,6 +163,7 @@ static void reset_hpfc_status()
     reset_the_commons();
     reset_dynamic_status();
     reset_the_pures();
+    reset_the_ios();
     reset_computed_remaps();
 
     chs = (hpfc_status) NULL;
@@ -168,6 +180,7 @@ static void save_hpfc_status() /* GET them */
     hpfc_status_commons(chs) = get_the_commons() ;
     hpfc_status_dynamic_status(chs) = get_dynamic_status();
     hpfc_status_pures(chs) = get_the_pures();
+    hpfc_status_ios(chs) = get_the_ios();
     hpfc_status_computed(chs) = get_computed_remaps();
 
     DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, "", chs);
@@ -186,6 +199,7 @@ static void load_hpfc_status() /* SET them */
     set_the_commons(hpfc_status_commons(chs));
     set_dynamic_status(hpfc_status_dynamic_status(chs));
     set_the_pures(hpfc_status_pures(chs));
+    set_the_ios(hpfc_status_ios(chs));
     set_computed_remaps(hpfc_status_computed(chs));
 }
 
@@ -202,6 +216,7 @@ static void close_hpfc_status()
     close_the_commons();
     close_dynamic_status();
     close_the_pures();
+    close_the_ios();
     close_computed_remaps();
 }
 
@@ -323,7 +338,7 @@ compile_module(entity module)
 
     update_object_for_module(node_stat, node_module);
     update_object_for_module(entity_code(node_module), node_module);
-    insure_declaration_coherency(node_module, node_stat, 
+    insure_declaration_coherency(node_module, node_stat,
 				 get_include_entities());
     kill_statement_number_and_ordering(node_stat);
     
@@ -341,7 +356,6 @@ compile_module(entity module)
     hpfc_close_dummy_to_prime();
     reset_resources_for_module();
 }
-
 
 /********************************************* FUNCTIONS CALLED BY PIPSMAKE */
 
@@ -488,20 +502,27 @@ bool hpfc_directives(string name)
 bool hpfc_compile(string name)
 {
     entity module = local_name_to_top_level_entity(name);
+    bool do_compile = 
+	!hpfc_entity_reduction_p(module) &&
+	!hpf_directive_entity_p(module) &&
+	!fortran_library_entity_p(module);
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
 
-    if (!hpfc_entity_reduction_p(module) &&
-	!hpf_directive_entity_p(module) &&
-	!fortran_library_entity_p(module))
+    if (do_compile)
     {
 	load_hpfc_status();
 	set_current_module_entity(module);
 
 	set_bool_property("PRETTYPRINT_COMMONS", FALSE); 
 
-	compile_module(module);
+	if (hpfc_special_io(module))
+	    compile_a_special_io_function(module);
+	else if (hpf_pure_p(module))
+	    compile_a_pure_function(module);
+	else
+	    compile_module(module);
 
 	reset_current_module_entity();
 	save_hpfc_status();
