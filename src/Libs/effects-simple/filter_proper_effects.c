@@ -149,11 +149,21 @@ static bool stmt_flt(statement s)
     {
       if (direct_written_reference(s, var))
       {
-	user_log("## %s %s o=%d/n=%d\n", 
-		 entity_name(get_current_module_entity()),
-		 entity_name(var),
-		 statement_ordering(s),
-		 statement_number(s));
+	int order = statement_ordering(s);
+	int on; int os;
+	if (order==STATEMENT_ORDERING_UNDEFINED)
+	{
+	  on = ORDERING_NUMBER(order);
+	  os = ORDERING_STATEMENT(order);
+	}
+	else
+	{
+	  on = -1;
+	  os = -1;
+	}
+
+	user_log("## %s o=(%d,%d)/n=%d\n", 
+		 entity_name(var), on, os, statement_number(s));
       }
     }
   },
