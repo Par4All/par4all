@@ -912,7 +912,7 @@ typing_arguments(call c, type_context_p context, basic b)
       EXPRESSION(CAR(args)) =
 	insert_cast(b, b1, EXPRESSION(CAR(args)), context);
       /* Update hash table */
-      PUT_TYPE(context->types, EXPRESSION(CAR(args)), b);
+      PUT_TYPE(context->types, EXPRESSION(CAR(args)), copy_basic(b));
     }
     args = CDR(args);
   }
@@ -946,7 +946,7 @@ typing_arithmetic_operator(call c, type_context_p context)
   /* Typing all arguments to b if necessary */
   typing_arguments(c, context, b);
   
-  return copy_basic(b);    
+  return b;    
 }
 /***************************************************************************** 
  * Typing power operator (**)
@@ -1027,6 +1027,7 @@ typing_relational_operator(call c, type_context_p context)
   /* Typing all arguments to b if necessary */
   typing_arguments(c, context, b);
   
+  free_basic(b);
   return make_basic(is_basic_logical, UUINT(4));
 }
 /***************************************************************************** 
@@ -1305,7 +1306,7 @@ typing_function_RealDouble_to_RealDouble(call c, type_context_p context)
   /* Typing all arguments to b if necessary */
   typing_arguments(c, context, b);
   
-  return copy_basic(b);    
+  return b;    
 }
 static basic
 typing_function_RealDouble_to_Integer(call c, type_context_p context)
@@ -1329,6 +1330,7 @@ typing_function_RealDouble_to_Integer(call c, type_context_p context)
   /* Typing all arguments to b if necessary */
   typing_arguments(c, context, b);
 
+  free_basic(b);
   return make_basic_int(4);
 }
 static basic
@@ -1354,7 +1356,7 @@ typing_function_RealDoubleComplex_to_RealDoubleComplex(call c,
   /* Typing all arguments to b if necessary */
   typing_arguments(c, context, b);
   
-  return copy_basic(b);
+  return b;
 }
 static basic
 typing_function_IntegerRealDouble_to_IntegerRealDouble(call c, 
@@ -1379,7 +1381,7 @@ typing_function_IntegerRealDouble_to_IntegerRealDouble(call c,
   // Typing all arguments to b if necessary
   typing_arguments(c, context, b);
   
-  return copy_basic(b);    
+  return b;    
 }
 /***************************************************************************** 
  * The arguments are INT, REAL, DOUBLE or COMPLEX. The return is the same 
@@ -1412,9 +1414,10 @@ typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c,
 
   if (basic_complex_p(b))
   {
+    free_basic(b);
     b = make_basic_float(4); /* CMPLX --> REAL */
   }
-  return copy_basic(b);
+  return b;
 }
 
 /***************************************************************************** 
@@ -1481,6 +1484,7 @@ typing_function_conversion_to_dcomplex(call c, type_context_p context)
 static basic
 typing_function_constant_complex(call c, type_context_p context)
 {
+  basic b;
   if(!arguments_are_IR(c, context->types))
   {
     /* ERROR: Invalide of type  */
@@ -1493,7 +1497,9 @@ typing_function_constant_complex(call c, type_context_p context)
     return make_basic_float(4); /* Just for return result */
   }
   /* Typing all arguments to REAL if necessary */
-  typing_arguments(c, context, make_basic_float(4));
+  b = make_basic_float(4);
+  typing_arguments(c, context, b);
+  free_basic(b);
   
   return make_basic_complex(8);
 }
@@ -1501,6 +1507,7 @@ typing_function_constant_complex(call c, type_context_p context)
 static basic
 typing_function_constant_dcomplex(call c, type_context_p context)
 {
+  basic b;
   if(!arguments_are_IRD(c, context->types))
   {
     /* ERROR: Invalide of type */
@@ -1513,7 +1520,9 @@ typing_function_constant_dcomplex(call c, type_context_p context)
     return make_basic_float(4); /* Just for return result */
   }
   /* Typing all arguments to DOUBLE if necessary */
-  typing_arguments(c, context, make_basic_float(8));
+  b = make_basic_float(8);
+  typing_arguments(c, context, b);
+  free_basic(b);
   
   return make_basic_complex(16);
 }
