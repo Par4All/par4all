@@ -190,14 +190,9 @@ char *key, *val;
     if (htp->hash_entry_number+1 >= (htp->hash_size_limit)) 
 	hash_enlarge_table(htp);
 
-    if( key == FREE || key == FREE_FOR_PUT ) {
-	user( "hash_put: illegal input key\n", "" ) ;
-	abort() ;
-    }
-    if( val == HASH_UNDEFINED_VALUE ) {
-	user( "hash_put: illegal input value\n", "" ) ;
-	abort() ;
-    }
+    message_assert("illegal input key", key!=FREE && key!=FREE_FOR_PUT);
+    message_assert("illegal input value", val!=HASH_UNDEFINED_VALUE);
+
     hep = hash_find_entry(htp, key, &rank, hash_put_op);
     
     if (hep->key != FREE && hep->key != FREE_FOR_PUT) {
@@ -228,10 +223,8 @@ char *key;
     
     hep = hash_find_entry(htp, key, &rank, hash_del_op);
     
-    if( key == FREE || key == FREE_FOR_PUT ) {
-	user( "hash_del: illegal input key\n", "" ) ;
-	abort() ;
-    }
+    message_assert("illegal input key", key!=FREE && key!=FREE_FOR_PUT);
+
     if (hep->key != FREE && hep->key != FREE_FOR_PUT) {
 	val = hep->val;
 	htp->hash_array[rank].key = FREE_FOR_PUT;
@@ -251,46 +244,31 @@ char *hash_get(htp, key)
 hash_table htp;
 char *key;
 {
-    int n;
     hash_entry_pointer hep;
+    int n;
 
-    if( key == FREE || key == FREE_FOR_PUT ) {
-	user( "hash_get: illegal input key\n", "" ) ;
-	abort() ;
-    }
+    message_assert("illegal input key", key!=FREE && key!=FREE_FOR_PUT);
+
     hep = hash_find_entry(htp, key, &n, hash_get_op);
     
-    if (hep->key != FREE && hep->key != FREE_FOR_PUT) {
-	return(hep->val);
-    }
-    else {
-	return(HASH_UNDEFINED_VALUE);
-    }
+    return(hep->key!=FREE && hep->key!=FREE_FOR_PUT ? 
+	   hep->val : HASH_UNDEFINED_VALUE);
 }
 
-/* this function updates in the hash table pointed to by htp the
-   couple whose key is equal to key with val (which is returned). */
-
-char *hash_update(htp, key, val)
+/* update key->val in htp, that MUST be pre-existent.
+ */
+void hash_update(htp, key, val)
 hash_table htp;
 char *key, *val;
 {
-    int n;
     hash_entry_pointer hep;
+    int n;
 
-    if( key == FREE || key == FREE_FOR_PUT ) {
-	user( "hash_update: illegal input key\n", "" ) ;
-	abort() ;
-    }
+    message_assert("illegal input key", key!=FREE && key!=FREE_FOR_PUT);
     hep = hash_find_entry(htp, key, &n, hash_get_op);
+    message_assert("no previous entry", htp->hash_equal(hep->key, key));
     
-    if (hep->key != FREE && hep->key != FREE_FOR_PUT) {
-	hep->val = val ;
-    }
-    else {
-	user( "hash_update: input key not in hash table\n", "" ) ;
-    }
-    return( val );
+    hep->val = val ;
 }
 
 /* this function prints the content of the hash_table pointed to by htp
