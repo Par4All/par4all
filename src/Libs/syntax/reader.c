@@ -47,7 +47,8 @@ extern char tolower(char c);
  *
  * Lorsqu'un operateur .XX. est detecte, il est remplace dans  le  source  par
  * '_XX_'.  Ainsi,  lex peut faire la difference entre une constante reelle et
- * un operateur, comme dans '(X+1._EQ_5)'.
+ * un operateur, comme dans '(X+1._EQ_5)'. Modification: underscore is replaced
+ * by percent to allow safely underscore in identifiers.
  *
  * Nullary operators .TRUE. and .FALSE. are also converted but are later
  * seen as constants instead.
@@ -804,9 +805,9 @@ void FindPoints()
 
 	    while (OperateurPoints[j] != NULL) {
 		if (StmtEqualString(OperateurPoints[j], i)) {
-		    Stmt[i] = '_';
+		    Stmt[i] = '%';
 		    i += strlen(OperateurPoints[j]);
-		    Stmt[i-1] = '_';
+		    Stmt[i-1] = '%';
 		    break;
 		}
 		j += 1;
