@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/01 10:26:13 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/04 16:33:23 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -11,6 +11,7 @@
 # Only one subroutine or function should be put in the pipe. 
 # ??? I do not deal with "R E A L" like Fortran lexical problems.
 # ??? There may be problems with if and do instructions...
+#     that is IF () & DO with a directive comment would not work.
 #
 # (c) Fabien Coelho 02/95.
 #
@@ -79,7 +80,7 @@ $RM -f $TMP.*
 $SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,chpf$\1,;
       s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,chpf$\1,' |
 #
-# lower case letters for directives
+# lower case letters for directives *only*
 #
 $SED '/^chpf$/s,A,a,g;/^chpf$/s,B,b,g;/^chpf$/s,C,c,g;/^chpf$/s,D,d,g;
       /^chpf$/s,E,e,g;/^chpf$/s,F,f,g;/^chpf$/s,G,g,g;/^chpf$/s,H,h,g;
