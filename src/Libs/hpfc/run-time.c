@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1996/03/11 17:15:19 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1996/03/20 19:09:46 $, )
  * version $Revision$,
  */
 
@@ -513,6 +513,8 @@ typedef struct
     entity  object;
 } RunTimeSupportDescriptor;
 
+static bool RTSTable_initialized_p = FALSE;
+
 static RunTimeSupportDescriptor RTSTable[] =
 {
     { SND_TO_C,		2, is_sub, no_basic, no_entity },
@@ -644,6 +646,7 @@ static RunTimeSupportDescriptor RTSTable[] =
     { HPF_PREFIX SYNCHRO_SUFFIX, 0, is_sub, no_basic, no_entity },
     { HPF_PREFIX TIMEON_SUFFIX,  0, is_sub, no_basic, no_entity },
     { HPF_PREFIX TIMEOFF_SUFFIX, 0, is_sub, no_basic, no_entity },
+    { HPF_PREFIX RENAME_SUFFIX,  0, is_sub, no_basic, no_entity },
 
 /* End
  */
@@ -657,6 +660,9 @@ void hpfc_init_run_time_entities()
     RunTimeSupportDescriptor *current;
     int i=0;
     list l=NIL;
+
+    if (RTSTable_initialized_p) return;
+    RTSTable_initialized_p = TRUE;
 
     for(current=RTSTable;
 	current->what!=is_end;
