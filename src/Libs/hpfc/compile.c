@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/12/28 09:17:01 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/12/30 16:49:10 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -58,19 +58,19 @@ static list the_modules = NIL;
 
 GENERIC_LOCAL_MAPPING(hpfc_already_compiled, bool, entity);
 
-static string 
-hpfc_find_a_not_compiled_module (void)
+static string
+hpfc_find_a_not_compiled_module()
 {
     entity module;
     
     MAPL(ce,
      {
-	 module = ENTITY(CAR(ce));
-	 
-	 if (entity_hpfc_already_compiled_undefined_p(module))
-	     return(module_local_name(module));
+         module = ENTITY(CAR(ce));
+         
+         if (entity_hpfc_already_compiled_undefined_p(module))
+             return(module_local_name(module));
      },
-	 the_modules);
+         the_modules);
 
     return(string_undefined);
 }
@@ -583,11 +583,9 @@ close_hpfc_for_program (void)
 }
 
 static void 
-hpfcompile_common (string common_name)
+hpfcompile_common (common)
+entity common;
 {
-    entity 
-	common = local_name_to_top_level_entity(common_name);
-
     declaration_with_overlaps_for_module(common);
     clean_common_declaration(load_entity_host_new(common));
     put_generated_resources_for_common(common);
@@ -611,7 +609,8 @@ hpfcompile_module (string module_name)
 	module_stat,
 	host_stat,
 	node_stat;
-
+    
+    db_set_current_module_name(module_name);
     set_resources_for_module(module_name);
 
     module = get_current_module_entity();
@@ -688,25 +687,22 @@ hpfcompile (char *module_name)
 
     init_hpfc_for_program();
 
+    /*    MAIN
+     */
     hpfcompile_module(module_name);
 
+    /*    FUNCTIONS AND SUBROUTINES
+     */
     while(!string_undefined_p(name=hpfc_find_a_not_compiled_module()))
     {
-	db_set_current_module_name(name);
-	hpfcompile_module(name);
+        hpfcompile_module(name);
     }
 
     /*    COMMONS
      */
     set_bool_property("PRETTYPRINT_COMMONS", TRUE); 
     db_set_current_module_name(module_name);
-
-    MAPL(ce,
-     {
-	 hpfcompile_common(entity_local_name(ENTITY(CAR(ce))));
-     },
-	 the_commons);
-    
+    gen_map(hpfcompile_common, the_commons);
     put_generated_resources_for_program(module_name);
 
     close_hpfc_for_program();
