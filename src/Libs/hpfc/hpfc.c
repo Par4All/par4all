@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/12/26 16:17:20 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/12/27 11:26:20 $, )
  * version $Revision$
  */
  
@@ -407,7 +407,7 @@ bool hpfc_filter(string name)
 			    dir_name, "/", file_name, " ",
 			    dir_name, "/", new_name, NULL));
 
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_FILTERED_FILE, strdup(name), new_name);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_FILTERED_FILE, name, new_name);
 
     debug_off();
     return TRUE;
@@ -455,7 +455,7 @@ bool hpfc_directives(string name)
 	reset_current_module_statement();
 	reset_current_module_entity();
 	
-	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(name), s);
+	DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, s);
     }
 
     debug_off(); 
@@ -498,10 +498,10 @@ bool hpfc_compile(string name)
     }
     else /* just fake for pipsmake... */
     {
-	DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, strdup(name), NO_FILE);
-	DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, strdup(name), NO_FILE);
-	DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, strdup(name), NO_FILE);
-	DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, strdup(name), NO_FILE);
+	DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, name, NO_FILE);
+	DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, name, NO_FILE);
+	DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, name, NO_FILE);
+	DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, name, NO_FILE);
     }
 
     debug_off();
@@ -564,7 +564,7 @@ bool hpfc_close(string name)
      */
     save_hpfc_status();
     
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_COMMONS, strdup(name), NO_FILE); /* fake */
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_COMMONS, name, NO_FILE); /* fake */
 
     debug_off();
     return TRUE;
@@ -594,7 +594,7 @@ bool hpfc_install(string name)
     safe_system(concatenate("$HPFC_TOOLS/hpfc_install -iob ", dir, 
 			    " -n ", wks, NULL));
 
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, strdup(name), NO_FILE);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, name, NO_FILE);
 
     debug_off();
     return TRUE;
