@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: host_node_entities.c,v $ ($Date: 1996/03/29 18:21:46 $, ) 
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1996/12/24 15:24:26 $, ) 
  * version $Revision$
  */
 
@@ -21,7 +21,7 @@ GENERIC_GLOBAL_FUNCTION(old_node, entitymap)
 void store_new_node_variable(new, old)
 entity new, old;
 {
-    pips_assert("defined",!entity_undefined_p(new) && !entity_undefined_p(old));
+    pips_assert("defined",!entity_undefined_p(new)&&!entity_undefined_p(old));
     store_new_node(old, new), store_old_node(new, old);
 }
 
@@ -90,8 +90,7 @@ entity module;
 }
   
 
-/* UPDATES
- */
+/****************************************************************** UPDATES */
 
 static bool (*bound_p)(entity) = gen_false;
 static entity (*load)(entity) = gen_identity;
