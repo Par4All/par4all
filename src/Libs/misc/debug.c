@@ -10,12 +10,15 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+/*
 extern int atoi(char *nptr);
 extern char *getenv();
 extern int fprintf();
 extern int printf();
 extern int vfprintf(FILE *stream, char *format, ...);
-#include <varargs.h>
+*/
+#include <stdarg.h>
 	
 #include "genC.h"
 #include "misc.h"
@@ -96,32 +99,27 @@ string containing the name of the function calling DEBUG, and format and
 expression_list are passed as arguments to vprintf.
 */
 /*VARARGS0*/
-void debug(va_alist)
-va_dcl
+void
+debug(int the_expected_debug_level,
+      char * calling_function_name,
+      char * a_message_format,
+      ...)
 {
-    va_list args;
-    char *fmt;
-    int l;
+   va_list some_arguments;
 
-    if (the_current_debug_level == 0)
-	    return;
+   /* If the current debug level is not high enough, do nothing: */
+   if (the_expected_debug_level > the_current_debug_level)
+      return;
 
-    va_start(args);
+   /* print name of function printing debug message */
+   (void) fprintf(stderr, "[%s] ", calling_function_name);
 
-    /* get wanted debuging level */
-    l = va_arg(args, int);
+   va_start(some_arguments, a_message_format);
 
-    if (l > the_current_debug_level)
-	    return;
+   /* print out remainder of message */
+   (void) vfprintf(stderr, a_message_format, some_arguments);
 
-    /* print name of function printing debug message */
-    (void) fprintf(stderr, "[%s] ", va_arg(args, char *));
-    fmt = va_arg(args, char *);
-
-    /* print out remainder of message */
-    (void) vfprintf(stderr, fmt, args);
-
-    va_end(args);
+   va_end(some_arguments);
 }
 
 /* pips_debug is a nice macro that depends on gcc to generate the
@@ -129,25 +127,25 @@ va_dcl
  * if these feature are not available, it will be this function.
  * the function name won't be available. FC May 95.
  */
-void pips_debug_function(va_alist)
-va_dcl
+void
+pips_debug_function(int the_expected_debug_level,
+                    char * a_message_format,
+                    ...)
 {
-    va_list args;
-    char *fmt;
-    int l;
+   va_list some_arguments;
 
-    if (the_current_debug_level == 0)
-	    return;
+   /* If the current debug level is not high enough, do nothing: */
+   if (the_expected_debug_level > the_current_debug_level)
+      return;
 
-    va_start(args);
-    l = va_arg(args, int);
-    if (l > the_current_debug_level) return;
+   (void) fprintf(stderr, "[unknown] ");
 
-    (void) fprintf(stderr, "[unknown] ");
-    fmt = va_arg(args, char *);
-    (void) vfprintf(stderr, fmt, args);
+   va_start(some_arguments, a_message_format);
 
-    va_end(args);
+   /* print out remainder of message */
+   (void) vfprintf(stderr, a_message_format, some_arguments);
+
+   va_end(some_arguments);
 }
 
 /* is that all? :-)
