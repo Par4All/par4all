@@ -123,8 +123,8 @@ char *module_name;
     }
 
     /* still necessary ? BA, September 1993 */
-    set_cumulated_effects_map( (statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
     
     filename = strdup(concatenate(db_get_current_program_directory(), 
 				  "/",
