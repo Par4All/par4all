@@ -179,6 +179,12 @@ entity e;
     return(empty_label_p(entity_name(e)));
 }
 
+bool entity_return_label_p(e)
+entity e;
+{
+    return(return_label_p(entity_name(e)));
+}
+
 bool entity_label_p(e)
 entity e;
 {
