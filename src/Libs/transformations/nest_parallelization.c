@@ -206,7 +206,7 @@ static bool always_select_p(loop l)
     return TRUE;
 }
 
-void nest_parallelization(string module_name)
+bool nest_parallelization(string module_name)
 {
     entity module;
     statement mod_stat;
@@ -247,6 +247,7 @@ void nest_parallelization(string module_name)
     reset_current_module_entity();
     reset_current_module_statement();
 
+    return TRUE;
 }
 
 statement parallelization(list lls, bool (*loop_predicate) (/* ??? */))
