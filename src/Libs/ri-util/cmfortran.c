@@ -78,7 +78,7 @@ text text_loop_cmf(module, label, margin, obj, n, lr, lidx)
 	pc = CHAIN_SWORD(pc, ", ");
     }
     pc = CHAIN_SWORD(pc, ") ");
-    pc = gen_nconc(pc, words_call(instruction_call(i), 0, TRUE));
+    pc = gen_nconc(pc, words_call(instruction_call(i), 0, TRUE, TRUE));
     u = make_unformatted(strdup(label), n, margin, pc) ;
     result_text = make_text(CONS(SENTENCE,
 				 make_sentence(is_sentence_unformatted,
