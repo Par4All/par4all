@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.70  2002/07/03 09:19:50  irigoin
+    Function statement_to_text() added + bug fixes due to alternate return handling
+
     Revision 1.69  2002/06/27 14:42:51  irigoin
     Function safe_print_statement() added, make_call_statement() reformatted.
 
@@ -998,7 +1001,7 @@ statement s;
     }
     return FALSE;
 }
-
+
 void 
 print_statement_set(fd, r)
 FILE *fd;
@@ -1014,16 +1017,38 @@ set r;
 }
 
 /* (the text is not freed, massive memory leak:-) 
+ *
+ * See text_named_module() for improvements.
  */ 
 void print_statement(statement s)
 {
   debug_on("TEXT_DEBUG_LEVEL");
-  print_text(stderr, text_statement(entity_undefined,0,s));
+  set_alternate_return_set();
+  print_text(stderr, text_statement(entity_undefined, 0, s));
+  reset_alternate_return_set();
   debug_off();
 }
+
+text statement_to_text(statement s)
+{
+  text t = text_undefined;
+  
+  debug_on("PRETTYPRINT_DEBUG_LEVEL");
+  set_alternate_return_set();
+  t = text_statement(entity_undefined, 0, s);
+  reset_alternate_return_set();
+  debug_off();
+
+  return t;
+}
+
 void safe_print_statement(statement s)
 {
-  if(continue_statement_p(s)
+  if(statement_undefined_p(s)) {
+    fprintf(stderr, "Statement undefined: %s\n",
+	    statement_identification(s));
+  }
+  else if(continue_statement_p(s)
      && entity_return_label_p(statement_label(s))) {
     /* The return label only can be associated to a RETURN call,
        however the controlizer does not follow this consistency
