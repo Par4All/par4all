@@ -248,6 +248,20 @@ overloaded_to_complex_type(int n)
 }
 
 static type 
+overloaded_to_doublecomplex_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeDoubleComplexResult());
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeOverloadedParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
+}
+
+static type 
 overloaded_to_logical_type(int n)
 {
     type t = type_undefined;
@@ -606,10 +620,12 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"SNGL", 1, overloaded_to_real_type},
     {"DBLE", 1, overloaded_to_double_type},
     {"CMPLX", (INT_MAX), overloaded_to_complex_type},
+    {"DCMPLX", (INT_MAX), overloaded_to_doublecomplex_type},
 
     /* (0.,1.) -> switched to a function call...
      */
     { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type},
+    { IMPLIED_DCOMPLEX_NAME, 2, overloaded_to_doublecomplex_type},
 
     {"ICHAR", 1, default_intrinsic_type},
     {"CHAR", 1, default_intrinsic_type},
