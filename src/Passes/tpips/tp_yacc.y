@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.89  1998/06/18 12:38:35  coelho
+ * missing \n added.
+ *
  * Revision 1.88  1998/05/29 12:42:17  coelho
  * bug--
  *
@@ -344,13 +347,13 @@ static void tp_some_info(string about)
     if (same_string_p(about, "workspace"))
     {
 	string ws = db_get_current_workspace_name();
-	fprintf(stdout, "%s", ws? ws: "");
+	fprintf(stdout, "%s\n", ws? ws: "");
 	if (jpips_is_running) jpips_tag2("workspace", ws? ws: "<none>");
     }
     else if (same_string_p(about, "module"))
     {
 	string m = db_get_current_module_name();
-	fprintf(stdout, "%s", m? m: "");
+	fprintf(stdout, "%s\n", m? m: "");
 	if (jpips_is_running) jpips_tag2("module", m? m: "<none>");
     }
     else if (same_string_p(about, "modules") &&
