@@ -661,20 +661,21 @@ expression e;
     normalized n = normalized_undefined;
     int val = 0;
 
-    pips_assert("integer_constant_expression_value", integer_constant_expression_p(e));
+    pips_assert("is constant", integer_constant_expression_p(e));
 
     n = NORMALIZE_EXPRESSION(e);
     if(normalized_linear_p(n)) {
 	Pvecteur v = (Pvecteur) normalized_linear(n);
 
 	if(vect_constant_p(v)) {
-	    val = (int) vect_coeff(TCST, v);
+	    Value x = vect_coeff(TCST, v);
+	    val = VALUE_TO_INT(x);
 	    }
 	else
-	    pips_error("integer_constant_expression_value", "non constant expression\n");
+	    pips_internal_error("non constant expression\n");
     }
     else
-	pips_error("integer_constant_expression_value", "non affine expression\n");
+	pips_internal_error("non affine expression\n");
 
     return val;
 }
@@ -783,9 +784,9 @@ Pvecteur_to_assign_statement(
     assert(value_le(value_abs(coef),VALUE_ONE));
 
     vcopy = vect_dup(v);
-	
-    if (coef) vect_erase_var(&vcopy, (Variable) var);
-    if (coef==1) vect_chg_sgn(vcopy);
+    
+    if (value_notzero_p(coef)) vect_erase_var(&vcopy, (Variable) var);
+    if (value_one_p(coef)) vect_chg_sgn(vcopy);
 	
     result = make_assign_statement(entity_to_expression(var),
 				   make_vecteur_expression(vcopy));
@@ -918,22 +919,23 @@ call c;
  * "expression_undefined", not an expression equal to zero.
  *
  */
+/* rather use make_vecteur_expression which was already there */
 expression Pvecteur_to_expression(vect)
 Pvecteur vect;
 {
-Pvecteur Vs;
-expression aux_exp, new_exp;
-entity plus_ent, mult_ent, minus_ent, unary_minus_ent, op_ent;
-
-new_exp = expression_undefined;
-Vs = vect;
-
-debug( 7, "Pvecteur_to_expression", "doing\n");
-if(!VECTEUR_NUL_P(Vs))
-  {
-  entity var = (entity) Vs->var;
-  int val = (int) Vs->val;
-
+    Pvecteur Vs;
+    expression aux_exp, new_exp;
+    entity plus_ent, mult_ent, minus_ent, unary_minus_ent, op_ent;
+    
+    new_exp = expression_undefined;
+    Vs = vect;
+    
+    debug( 7, "Pvecteur_to_expression", "doing\n");
+    if(!VECTEUR_NUL_P(Vs))
+    {
+	entity var = (entity) Vs->var;
+	int val = VALUE_TO_INT(Vs->val);
+	
   /* We get the entities corresponding to the three operations +, - and *. */
   plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
                                                      PLUS_OPERATOR_NAME),
@@ -967,7 +969,7 @@ if(!VECTEUR_NUL_P(Vs))
   for(Vs = vect->succ; !VECTEUR_NUL_P(Vs); Vs = Vs->succ)
     {
     var = (entity) Vs->var;
-    val = (int) Vs->val;
+    val = VALUE_TO_INT(Vs->val);
 
     if (val < 0)
       {
