@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: inits.c,v $
+ * Revision 1.25  1998/04/02 20:36:09  irigoin
+ * Call to NumberOfElements() replaced by call to element_number()
+ *
  * Revision 1.24  1997/12/13 09:17:05  coelho
  * leaks--
  *
@@ -112,7 +115,7 @@ int max_size_of_processors()
 	a = type_variable(entity_type(e));
 	
 	current_max = max(current_max,
-			  NumberOfElements(variable_dimensions(a)));
+			  element_number(variable_dimensions(a)));
     }, 
 	list_of_processors());
 
