@@ -145,15 +145,16 @@ cancel_query_notify(Panel_item item,
 }
 
 
-#if 0
-/* Do nothing since it cannot be interrupted... */
+/* Cancel clear the string value and return: */
 void
 cancel_user_request_notify(Panel_item item,
                            Event * event)
 {
+   xv_set(query_pad, PANEL_VALUE, "", NULL);
    hide_window(query_frame);
+   /* Just return the "": */
+   xv_window_return((Xv_opaque) xv_get(query_pad, PANEL_VALUE));
 }
-#endif
 
 
 success
@@ -180,8 +181,7 @@ wpips_user_request(char * a_printf_format,
                message_buffer, 
                "UserQuery",
                end_user_request_notify,
-               /* It is not possible to interrupt wpips_user_request: */
-               NULL);
+               cancel_user_request_notify);
 
    user_log("User Request...\n");
 
