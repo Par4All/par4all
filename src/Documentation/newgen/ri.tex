@@ -39,8 +39,20 @@ used in PIPS as internal representations of programs. These data
 structures are declared using the NewGen Data Definition Language, which
 insulates them from a particular programming language. They currently
 are translated into C or Common Lisp declarations and basic run-time
-support routines, such as \verb+make+, \verb+free+,... For more
-information about NewGen see \cite{}\cite{}.
+support routines, such as \verb+make+, \verb+free+,... A basic
+understanding of Newgen declarations is assumed throughout this
+document, but the notation is close enough to standard programming
+language to be interpreted by newcommers. For more information about
+NewGen see \cite{}\cite{}.
+
+This document is part of PIPS documentation and is located in
+\verb+$PIPS_DOCDIR/Newgen/ri.f.tex+ (\verb+ri+ stands for {\em
+repre'sentation interne} in French). It is used to generate a PIPS
+include file located in \verb+$PIPS_INCLUDEDIR/ri.h+. The functions
+available to manipulate these data structures are grouped in
+\verb+$PIPS_DEVEDIR/Lib/ri-util+. These functions are grouped in files
+according to the {\em main} type in their signatures. The partial order
+between types is described in ???.
 
 \iffalse
 Ce document est utilise' directement et automatiquement par l'outil
@@ -141,7 +153,10 @@ e'ventuelle variable {\tt TCST}.}.
 \fi
 
 Expressions in programs are stored as affine integer expressions,
-wherever possible.
+wherever possible. This affine storage does not preclude the standard
+storage and simply is a second representation. The consistency between
+the two representations is hard to maintain, especially during program
+transformations.
 
 \iffalse
 Les expressions apparaissant dans le programme analyse' sont mises
@@ -165,13 +180,36 @@ line'aire en nombres entiers du CRI.
 \domain{External Psysteme}
 {}
 
+Type {\tt Psystem} is used to store systems of affine equalities and
+inequalities. They are used in many areas of PIPS such as semantics
+analysis, region analysis, dependence testing, code generation,... They
+appear here for the semantics analysis and are used by the {\tt
+predicate} type (see Section~\ref{semantics}).
+
+\iffalse
 Le domaine {\tt Psysteme} est utilise' pour repre'senter les syste`mes
 d'e'quations et d'ine'quations line'aires qui apparaissent lors
 de la phase d'analyse se'mantique (voir le domaine {\tt predicate}).
 
 Les Psystemes sont aussi implicitement utilise's pour effectuer le
 calcul de de'pendance.
+\fi
 
+Objects of type {\tt Psysteme} contain six fields:
+
+\begin{itemize}
+  \item a list of equalities,
+  \item the number of equalities,
+  \item a list of inequalities,
+  \item the number of inequalities,
+  \item the dimension of the vector space,
+  \item a basis of the vector space.
+\end{itemize}
+
+Redundant information is stored to accelerate frequent tests and
+consistency must be insured carefully.
+
+\iffalse
 Un Psysteme est forme' de six champs:
 \begin{itemize}
   \item une liste d'e'galite's,
@@ -181,10 +219,17 @@ Un Psysteme est forme' de six champs:
   \item la dimension de l'espace de re'fe'rence,
   \item une base de l'espace de re'fe'rence.
 \end{itemize}
+\fi
 
+Like the {\tt Pvecteur} type, data structure {\tt Psysteme} is imported
+from our Integer Linear Algebra Library. This library contains an
+extensive set of functions on Psystems. See ??? for more details.
+
+\iffalse
 Comme le domaine Pvecteur, la structure de donne'es Psysteme est
 importe'e de la bibliothe`que d'alge`bre line'aire en nombres entiers du
 CRI.
+\fi
 
 \section{Entities: Variables, Functions, Operators, Constants, Labels...}
 \label{entity}
@@ -203,6 +248,29 @@ accessed by name.
 
 \domain{tabulated entity = name:string x type x storage x initial:value}
 
+Any named object in a Fortran program is represented by an object of
+type {\tt entity}. Such object could be a module (function or subroutine
+or program), a variable, a common, an operator, an intrinsic, a
+constant, a label,... Field {\tt name} contains the name of the object,
+more or less as it appears in the source code, concatenated to a prefix
+string and a special separator. The prefix string is the name of the
+package defining the scope of the object. The package name may be a
+module name, the reserved name {\tt TOP-LEVEL} for global objects, or
+some other reserved names for objects specific to some analysis,
+e.g. \verb+*SEMANTICS*+ for value names used in the semantics
+analysis. Note the use of star, \verb+*+, to avoid name collision with user
+defined name.
+
+As expected, field {\tt type} specifies the type of the object (see
+Section~\ref{subsection-type}), field {\tt storage} defines the memory
+allocation class (see Section~\ref{subsection-storage}) for the object
+(e.g. dynamic, static,...).
+
+The last field, {\tt initial}, contains the initial {\tt value} of the
+object, it is known. A value can be anything that makes sense. For
+instance, the value of a module is its {\tt code}.
+
+\iffalse
 Tout objet ayant un nom dans un programme Fortran est repre'sente' par
 une \verb/entity/. Un tel objet peut e^tre un module, une variable, un
 common, un ope'rateur, une constante, un label, etc. Pour chaque objet,
@@ -215,12 +283,14 @@ le sous-domaine \verb/initial/ donne la valeur initiale, si elle est
 connue, de l'entite'. Le terme valeur initiale a ici un sens assez
 large, puisqu'il s'agit par exemple du code pour les entite's
 repre'sentant des modules.
+\fi
 
 \domain{entity_int = entity->int}
 
 This domain is used to map entities towards integer. Any interpretation
 of this integer is possible. It could be the value of a scalar integer
-variable, the offset of a variable in a common, the lengths of commons, etc...
+variable, the offset of a variable in a common, the lengths of commons,
+etc...
 
 \subsection{Type}
 \label{subsection-type}
@@ -228,6 +298,21 @@ variable, the offset of a variable in a common, the lengths of commons, etc...
 
 \domain{Type = statement:unit + area + variable + functional + unknown:unit + void:unit}
 
+Obviously, type {\tt type} is used to represent the type of an
+entity. This type is defined as union to cover the needs of different
+kinds of entities. Member {\tt statement} is used for statement
+labels\index{label}, since a label points towards a statement. Member
+{\tt area} is used for commons\index{common}. Two additional areas are
+defined as implicit common, the static and the dynamic areas associated
+to a module. Their specific names are defined in {\tt ri-util.h}.
+
+Member {\tt variable} is used for all variables and symbolic
+constants. It also is used for formal parameters and for results of
+functions. Member {\tt functional} is used for modules which are
+functions, subroutines and main programs. Member {\tt void} is used to
+declare the functional types of subroutines and programs.
+
+\iffalse
 Le domaine \verb/type/ repre'sente le type d'une entite'.  Le
 sous-domaine \verb/statement/ est utilise' pour les labels
 d'instruction.  Le sous-domaine \verb/area/ est utilise' pour les
@@ -238,6 +323,7 @@ fonction.  Le sous-domaine \verb/functional/ est utilise' pour les
 fonctions, pour les subroutines et pour le programme principal.  Le
 sous-domaine \verb/void/ est utilise' pour le re'sultat d'une subroutine
 ou d'un programme principal.
+\fi
 
 \subsubsection{Area Type}
 \label{subsubsection-area}
