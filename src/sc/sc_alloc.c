@@ -46,9 +46,6 @@ Psysteme sc_new()
  * et base d'un systeme lineaire en nombres entiers ps, i.e. de la
  * base implicite correspondant aux egalites et inegalites du systeme;
  *
- * On ajoute comme derniere variable de la base la pseudo-variable TCST
- * qui representent les termes constants.
- *
  * Attention, cette base ne reste pas coherente apres un ajout de nouvelles
  * egalites ou inegalites (risque d'ajout de nouvelles variables), ni apres
  * des suppressions (certaines variables de la base risque de n'apparaitre
@@ -56,12 +53,7 @@ Psysteme sc_new()
  *
  * dimension : nombre de variables du systeme (i.e. differentes de TCST, le
  *          terme constant)
- * base[] : tableau associant a chaque vecteur de base une variable, y
- *          compris le terme constant; ce tableau a dimension+1 elements
- *          et base[dimension] = TCST
- *
- * Ancien nom: syst_init()
- *
+ *       
  * Modifications:
  *  - passage de num_var a base (FI, 13/12/89)
  */
@@ -95,7 +87,6 @@ Psysteme ps;
 
 /* Variable * sc_base_dup(int nbv, Variable * b):
  * duplication de la table des variables base, qui contient nbv elements
- * (y compris la variable correspondant au terme constant)
  *
  * Modifications:
  *  - on renvoie un pointeur NULL si le nombre de variables nbv est nul
