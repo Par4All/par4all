@@ -129,6 +129,7 @@ typedef hash_table control_mapping;
 #define MIN0_OPERATOR_NAME 		"MIN0"
 #define MAX_OPERATOR_NAME 		"MAX"
 #define MAX0_OPERATOR_NAME 		"MAX0"
+#define IABS_OPERATOR_NAME 		"IABS"
 
 /* generic conversion names.
  */
