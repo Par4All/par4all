@@ -291,10 +291,11 @@ set_methods_for_proper_references()
     proper_to_summary_effect_func = effect_nop; /* FC */
 
     db_get_summary_rw_effects_func = db_get_summary_references;
+
     db_get_proper_rw_effects_func = db_get_proper_references;
     db_put_proper_rw_effects_func = db_put_proper_references;
 
-    set_contracted_proper_effects(!PROPER_EFFECTS_CONTRACT);
+    set_contracted_proper_effects(FALSE);
     set_descriptor_range_p(FALSE);
 }
 
@@ -359,7 +360,8 @@ set_methods_for_cumulated_references()
     db_get_rw_effects_func = db_get_cumulated_references;
     db_put_rw_effects_func = db_put_cumulated_references;
 
-    set_contracted_proper_effects(!PROPER_EFFECTS_CONTRACT);
+    /* FC: rm set_contracted_proper_effects(!PROPER_EFFECTS_CONTRACT); */
+    set_contracted_rw_effects(FALSE);
     set_descriptor_range_p(FALSE);
 }
 
@@ -487,7 +489,7 @@ set_methods_for_simple_effects()
     db_get_summary_in_effects_func = db_get_simple_summary_in_effects;
     db_put_summary_in_effects_func = db_put_simple_summary_in_effects;
 
-    set_contracted_proper_effects(PROPER_EFFECTS_CONTRACT);
+    set_contracted_rw_effects(FALSE);
     set_descriptor_range_p(FALSE);
 }
 
