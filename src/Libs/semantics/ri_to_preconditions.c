@@ -731,7 +731,8 @@ add_loop_index_exit_value(transformer post, /* postcondition of the last iterati
 	(void) print_transformer(post);
     }
 
-    if(normalized_linear_p(n_ub)) {
+    if(normalized_linear_p(n_ub)
+       && !transformer_affect_linear_p(t_body, (Pvecteur) normalized_linear(n_ub))) {
 	if(lb_inc >= 1 || ub_inc <= -1) {
 	    Pvecteur v_ub = (Pvecteur) normalized_linear(n_ub);
 	    Pvecteur v_incr = (Pvecteur) normalized_linear(n_incr);
@@ -743,35 +744,43 @@ add_loop_index_exit_value(transformer post, /* postcondition of the last iterati
 		Pvecteur c2 = VECTEUR_UNDEFINED;
 
 		pips_assert("add_loop_index_exit_value", normalized_linear_p(n_incr));
-		if(lb_inc>=1) {
-		    /* v_i - v_incr <= v_ub < v_i
-		     * or:
-		     * i - v_incr - v_ub <= 0, v_ub - v_i + 1 <= 0
-		     */
+		if(lb_inc==ub_inc && ABS(lb_inc)==1) {
+		    /* v_i - v_incr == v_ub, regardless of the sign */
 		    c1 = vect_substract(v_i, v_incr);
-		    c2 = vect_substract(v_ub, v_i);
-
 		    c1 = vect_cl(c1, (Value) -1, v_ub);
-		    vect_add_elem(&c2, (Variable) TCST, (Value) 1);
-		}
-		else if(ub_inc<=-1) {
-		    /* v_i - v_incr >= v_ub > v_i 
-		     *
-		     * or:
-		     * - i + v_incr + v_ub <= 0, - v_ub + v_i + 1 <= 0
-		     */
-		    c1 = vect_substract(v_incr, v_i);
-		    c2 = vect_substract(v_i, v_ub);
-
-		    c1 = vect_cl(c1, (Value) 1, v_ub);
-		    vect_add_elem(&c2, (Variable) TCST, (Value) 1);
+		    transformer_equality_add(post, c1);
 		}
 		else {
-		    /* should never happen! */
-		    pips_assert("add_loop_index_exit_value", TRUE);
+		    if(lb_inc>=1) {
+			/* v_i - v_incr <= v_ub < v_i
+			 * or:
+			 * v_i - v_incr - v_ub <= 0, v_ub - v_i + 1 <= 0
+			 */
+			c1 = vect_substract(v_i, v_incr);
+			c2 = vect_substract(v_ub, v_i);
+
+			c1 = vect_cl(c1, (Value) -1, v_ub);
+			vect_add_elem(&c2, (Variable) TCST, (Value) 1);
+		    }
+		    else if(ub_inc<=-1) {
+			/* v_i - v_incr >= v_ub > v_i 
+			 *
+			 * or:
+			 * - v_i + v_incr + v_ub <= 0, - v_ub + v_i + 1 <= 0
+			 */
+			c1 = vect_substract(v_incr, v_i);
+			c2 = vect_substract(v_i, v_ub);
+
+			c1 = vect_cl(c1, (Value) 1, v_ub);
+			vect_add_elem(&c2, (Variable) TCST, (Value) 1);
+		    }
+		    else {
+			/* should never happen! */
+			pips_assert("add_loop_index_exit_value", TRUE);
+		    }
+		    transformer_inequality_add(post, c1);
+		    transformer_inequality_add(post, c2);
 		}
-		transformer_inequality_add(post, c1);
-		transformer_inequality_add(post, c2);
 
 		ifdebug(8) {
 		    debug(8, "add_loop_index_exit_value", "post with exit conditions:\n");
