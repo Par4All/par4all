@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1994/11/30 14:32:36 $, 
+# $Date: 1994/11/30 14:49:43 $, 
 # got on %D%, %T%
 #
 
@@ -15,6 +15,19 @@ INSTALL="$HPFC_TOOLS/hpfc_install"
 PIPSARGS='-s MUST_REGIONS -p HPFCOMPILE'
 
 unset HPFFILE MODULE WORKSPACE
+
+#
+# functions
+
+verbose()
+{
+  echo "$script: $@"
+}
+
+debug()
+{
+  echo "$script: $@" 1>&2
+}
 
 #
 # not very convincing. stdin is taken as stdout and stderr...
@@ -44,29 +57,19 @@ usage()
   cat <<-EOF
 	Usage: $script [-vDdhMqs] [ -w ws ] [ -m mod ] [-n n | file[.f]]
 	  version is $Revision$
-	  -v: verbose
-	  -D: debug
-	  -d: delete
-	  -h: help
-	  -M: make
-	  -q: quiet (stdout redirected)
-	  -s: silent (stderr redirected)
-	  -w ws: workspace ws
-	  -m mod: module mod
+	  -v: verbose about what is being done
+	  -D: debug messages
+	  -d: delete the pips database
+	  -h: help, this help is displayed
+	  -M: make (compile and link) the generated codes
+	  -q: quiet  (stdout=/dev/null)
+	  -s: silent (stderr=/dev/null - for demonstations:-)
+	  -w ws: workspace ws is used for pips and hpfc
+	  -m mod: module mod is compiled (should be the main)
 	  -n n: source number n
 	  file: source file
 	EOF
   exit ${1:-1}
-}
-
-verbose()
-{
-  echo "$script: $@"
-}
-
-debug()
-{
-  echo "$script: $@" 1>&2
 }
 
 while getopts vDdMqsn:hm:w: OPT
