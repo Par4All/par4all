@@ -27,7 +27,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1997/09/29 09:15:45 $~$
+$~$Date: 1997/09/29 09:20:46 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -370,7 +370,9 @@ values. To produce an executable code, the declarations must be
 regenerated: see property \verb/PRETTYPRINT_ALL_DECLARATIONS/ in
 Section~\ref{subsubsection-declarations}. By default, they are ignored.
 The code can still be executed if alternate returns are used only for
-errors and if no errors occur.
+errors and if no errors occur. It can also be analyzed to understand what
+the {\em normal} behavior is. For instance, OUT regions are more likely to
+be exact when exceptions and errors are ignored.
 
 \begin{verbatim}
 PARSER_SUBSTITUTE_ALTERNATE_RETURNS FALSE
