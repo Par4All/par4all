@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.285  1997/05/23 12:41:11  coelho
+# *** empty log message ***
+#
 # Revision 1.284  1997/05/23 12:20:45  coelho
 # *** empty log message ***
 #
@@ -327,14 +330,13 @@ check_install:
 # is this appropriate?
 # .DEFAULT:; @echo "$MAKEFILE [\$(FWD_ROOT)] *** no rule for target $@!" >&2
 #
-ifdef PIPS_DIRECTORY_FOR_\$(ARCH)_BINARIES
-\$(ARCH):
-	# creating remote \$(ARCH) directory...
-	rdir=\$(PIPS_DIRECTORY_FOR_\$(ARCH)_BINARIES)/${SIDE}/${PART}/${target_dir};\\
-	test -d \$\$rdir || mkdir \$\$rdir ; \\
-	ln -s \$\$rdir \$(ARCH);
-else
-ifdef PIPS_DIRECTORY_FOR_BINARIES
+# Directory redirection to \$(PIPS_DIRECTORY_FOR_\$(ARCH)_BINARIES)
+# if defined: a link is created there... enabling to store binaries
+# somewhere else even if it looks like a local subdirectory.
+# else the default is simply to make a subdir.
+#
+PIPS_DIRECTORY_FOR_BINARIES=\$(PIPS_DIRECTORY_FOR_\$(ARCH)_BINARIES)
+ifneq (\$(PIPS_DIRECTORY_FOR_BINARIES),)
 \$(ARCH):
 	# creating remote \$(ARCH) directory...
 	rdir=\$(PIPS_DIRECTORY_FOR_BINARIES)/${SIDE}/${PART}/${target_dir};\\
@@ -342,7 +344,6 @@ ifdef PIPS_DIRECTORY_FOR_BINARIES
 	ln -s \$\$rdir \$(ARCH);
 else
 \$(ARCH):; test -d \$(ARCH) || mkdir \$(ARCH)
-endif
 endif
 #
 include \$(ROOT)/Include/define_libraries.make
