@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/01/04 18:53:35 $, 
+ * $Date: 1997/01/04 19:01:11 $, 
  *
  * adapted from whta can be seen by FC 31/12/96
  * 
@@ -176,7 +176,13 @@ static int lend()
 	    return (0) ; */ 
 
 	if (buf[0]!=' ') return 0;
-	p = (buf[1]=='\t')? &buf[2]: &buf[6];
+	if (buf[1]=='\t')
+	    p = &buf[2];
+	else
+	    if (buf[1] && buf[2] && buf[3] && buf[4] && buf[5])
+		p = &buf[6];
+	    else
+		return 0;
 	    
 	trim(p);
 	if (*p != 'e' && *p != 'E') return(0);
