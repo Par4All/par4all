@@ -1,6 +1,6 @@
 /* Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1995/10/04 19:28:34 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1995/10/10 11:38:13 $, )
  * version $Revision$
  * 
  * Fabien Coelho, August 1993
@@ -8,8 +8,6 @@
 
 #include "defines-local.h"
 #include "access_description.h"
-
-entity CreateIntrinsic(string name); /* in syntax.h */
 
 /*  ????
  */
