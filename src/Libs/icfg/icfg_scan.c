@@ -139,6 +139,17 @@ static bool call_flt(call c)
     return value_code_p(entity_initial(e_callee));
 }
 
+/**************written by Dat*********************/
+void my_print(text t)
+{
+  string filename = "/users/tmp/phamdat/textout";
+  FILE * my_file = safe_fopen(filename, "w");
+  print_text(my_file, t);
+  safe_fclose(my_file, filename);
+  free(filename);
+}
+/*************************************************/
+
 static void call_rwt(call c)
 {
   entity e_callee = call_function(c);
