@@ -7,18 +7,24 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "misc.h"
-#include "arithmetique.h"
 #include "ri-util.h"
 #include "constants.h"
 #include "ri.h"
+
+#include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
 #include "graph.h"
+
+#include "matrice.h"
 #include "tiling.h"
 #include "database.h"
 #include "text.h"
-#include "dg.h"
 #include "properties.h"
 #include "prettyprint.h"
 #include "text-util.h"
