@@ -7,6 +7,7 @@
 #include "genC.h"
 
 
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 
