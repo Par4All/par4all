@@ -5,7 +5,6 @@
 
 #include "misc.h"
 #include "ri-util.h"
-#include "control.h"
 
 /* a hash table to map orderings (integer) to statements (pointers)
  * assumed to be valid for the current module returned by
