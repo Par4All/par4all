@@ -3,13 +3,14 @@
 # This takes a PIPS output file in the GRAPH format in stdin
 # and generates a new one in the daVinci format on stdout.
 
-# 	%A% ($Date: 1995/09/08 12:42:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+# 	%A% ($Date: 1995/09/08 14:29:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
 
 # Ronan.Keryell@cri.ensmp.fr, 5/09/1995.
 
 $statement_number = 0;
 $indent_level = 0;
 $output_statement_buffer = "";
+$this_is_the_unstructured_entry_p = 0;
 @node_attribute_to_add = ();
 @edge_attribute_to_add = ();
 
@@ -47,6 +48,9 @@ sub output_a_statement_begin {
     chop $output_statement_buffer;
     print "[\n";
     &indent_plus;
+    if ($this_is_the_unstructured_entry_p == 1) {
+	&add_a_node_attribute("_GO", "ellipse");
+    }
     &add_a_node_attribute("OBJECT", $output_statement_buffer);
     &add_a_node_attribute("FONTFAMILY", "courier");
     $output_statement_buffer = "";
@@ -80,6 +84,7 @@ sub output_a_statement_end {
     &indent_minus;
     &output_indent;
     print " ),\n";
+    $this_is_the_unstructured_entry_p = 0;
 }
 
 
@@ -178,7 +183,9 @@ while (<>) {
 	# Keep track of the number of the statement that should follow
 	# this unstructured at its exit:
 	push(@statement_number_stack, $statement_number);
-	&add_a_node_attribute("_GO", "ellipse");
+	# Since the first node could be an IF, delay the _GO
+	$this_is_the_unstructured_entry_p = 1;
+	#&add_a_node_attribute("_GO", "ellipse");
 	&add_a_node_attribute("COLOR", "lightgreen");
 	next;
     };
@@ -214,7 +221,13 @@ while (<>) {
 	elsif ($#successors == 2) {
 	    # 2 successors, that is an "if then else":
 	    &add_a_node_attribute("_GO", "rhombus");
-	    &add_a_node_attribute("COLOR", "cyan");
+	    if ($this_is_the_unstructured_entry_p == 0) {
+		&add_a_node_attribute("COLOR", "cyan");
+	    }
+	    else {
+		# Display a lightgreen rhombus to mark the IF at the unstructured entry:
+		$this_is_the_unstructured_entry_p = 0;
+	    }
 	    &output_a_statement_begin($control, $a_command_line);
 	    &add_an_edge_attribute("EDGECOLOR", "red");
 	    &output_a_successor("then_$statement_number", $a_command_line);
