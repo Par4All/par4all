@@ -107,16 +107,11 @@ Psysteme scn;
 Pbase base_index;
 Psysteme *pcondition, *penumeration;
 {
-    int 
-	i, dimension = vect_size(base_index);
-    Psysteme 
-	ps_interm, ps_project;
-    Pbase
-	reverse_base;
-    Pvecteur
-	pb;
-    Pcontrainte
-	ineq = NULL,
+    int i, dimension = vect_size(base_index);
+    Psysteme ps_interm, ps_project;
+    Pbase reverse_base;
+    Pvecteur pb;
+    Pcontrainte	ineq = NULL,
 	*c = (Pcontrainte*) malloc(sizeof(Pcontrainte)*(dimension+1));
 
     if (VECTEUR_NUL_P(base_index)) 
@@ -225,14 +220,10 @@ Psysteme syst;
 Pbase outer, inner;
 Psysteme *pcondition, *ptile_enum, *piter_enum;
 {
-    Psysteme
-	sc = SC_UNDEFINED,
-	transfer = SC_UNDEFINED;
-    Pbase
-	b = BASE_NULLE;
+    Psysteme sc = SC_UNDEFINED,	transfer = SC_UNDEFINED;
+    Pbase b = BASE_NULLE;
 
-    /*
-     * tiles iterations enumeration row echelon
+    /* tiles iterations enumeration row echelon
      */
     algorithm_row_echelon(syst, inner, &transfer, piter_enum);
 
@@ -245,8 +236,7 @@ Psysteme *pcondition, *ptile_enum, *piter_enum;
 	return;
     }
 
-    /*
-     * project variables
+    /* project variables
      */
     for(b=inner, sc=sc_safe_intersection(sc_rn(BASE_NULLE), syst, transfer); 
 	b!=BASE_NULLE; 
@@ -255,8 +245,7 @@ Psysteme *pcondition, *ptile_enum, *piter_enum;
     sc_rm(transfer);
     sc_nredund(&sc);
 
-    /*
-     * tiles enumeration row echelon
+    /* tiles enumeration row echelon
      */
     algorithm_row_echelon(sc, outer, pcondition, ptile_enum);
 
@@ -268,8 +257,7 @@ Psysteme *pcondition, *ptile_enum, *piter_enum;
 	return;
     }
 
-    /*
-     * clean bases
+    /* clean bases
      */
     sc_base(*ptile_enum)=(base_rm(sc_base(*ptile_enum)), BASE_NULLE),
     sc_creer_base(*ptile_enum);
