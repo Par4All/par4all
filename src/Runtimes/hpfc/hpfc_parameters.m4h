@@ -2,7 +2,7 @@
 ! parameters used to compile 
 !
 ! $RCSfile: hpfc_parameters.m4h,v $ version $Revision$
-! ($Date: 1997/06/09 12:58:55 $, )
+! ($Date: 1997/06/09 13:03:04 $, )
 !
 ! type declarations
 !
@@ -13,6 +13,7 @@
      $     MAX NB OF PROCESSORS,
      $     MAX MAX SIZE OF PROCS,
      $     MAX MAX SIZE OF BUFFER
+     $     MAX SIZE OF STATUS
 !
 ! parameters
 !
