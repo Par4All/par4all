@@ -40,7 +40,7 @@ workspace=${1}
 
 [ "$delete" ] && \
 {
-    Delete "${workspace}"
+    Delete -s "${workspace}"
     [ $? -eq 3 ] && exit 3
 }
 
