@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.75  1997/12/12 17:22:26  coelho
+ * leaks--
+ *
  * Revision 1.74  1997/12/12 15:42:34  coelho
  * leaks--
  *
@@ -452,6 +455,7 @@ i_open:	TK_OPEN TK_NAME TK_ENDOFLINE
 			user_log("Main module PROGRAM \"%s\" selected.\n",
 				 main_module_name);
 			lazy_open_module(main_module_name);
+			free(main_module_name);
 		    }
 		}
 	    }
