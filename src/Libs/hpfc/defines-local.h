@@ -59,8 +59,12 @@ extern int system();
 
 /* Newgen short sentences
  */
-
 #define function_mapping(f) (((f)+1)->h)
+
+/* list of variables...
+ */
+#define add_to_list_of_vars(l, fun, n)\
+  l = gen_nconc(make_list_of_dummy_variables(fun, n), l);
 
 #define one_statement_unstructured(u) \
     ((control_predecessors(unstructured_control(u)) == NIL) && \
@@ -90,7 +94,6 @@ extern int system();
 
 /* Constants
  */
-
 #define HOST_NAME "HOST"
 #define NODE_NAME "NODE"
 
@@ -100,19 +103,7 @@ extern int system();
 #define HPFCOMPLEXPREFIX	"C_"
 
 /* IO Management
- *
- * {"WRITE", (MAXINT)},
- * {"REWIND", (MAXINT)},
- * {"OPEN", (MAXINT)},
- * {"CLOSE", (MAXINT)},
- * {"READ", (MAXINT)},
- * {"BUFFERIN", (MAXINT)},
- * {"BUFFEROUT", (MAXINT)},
- * {"ENDFILE", (MAXINT)},
- * {"IMPLIED-DO", (MAXINT)},
- * {"FORMAT", 1},
  */
-
 #define WRITE_INTRINSIC_P(call)		\
 	(!strcmp(entity_local_name(call_function(call)), "WRITE"))
 #define REWIND_INTRINSIC_P(call)  	\
@@ -146,10 +137,8 @@ extern int system();
      IMPLIEDDO_INTRINSIC_P(call)||	\
      FORMAT_INTRINSIC_P(call))
 
-
 /* Overlap
  */
-
 #define UPPER "UP"
 #define LOWER "LO"
 
@@ -169,7 +158,6 @@ extern int system();
 
 /* Efficient I/O tags
  */
-
 #define is_movement_collect 0
 #define is_movement_update 1
 #define movement_collect_p(t) ((t)==(is_movement_collect))
@@ -177,7 +165,6 @@ extern int system();
 
 /* Run-time support functions and subroutine names
  */
-
 #define SND_TO_C        "HPFC_SNDTO_C"
 #define SND_TO_H        "HPFC_SNDTO_H"
 #define SND_TO_A        "HPFC_SNDTO_A"
@@ -244,12 +231,9 @@ extern int system();
 #define NODE_CHANNELS	"NODECHANNELS"
 #define HOST_CHANNEL	"HOSTCHANNEL"
 
-/*
- *  Very Short and very local functions
+/*  Very Short and very local functions
  *    moved to macros, FC 17/05/94
- *
  */
-
 #define local_index_is_different_p(array, dim) \
   (new_declaration(array, dim)!=is_hpf_newdecl_none)
 
