@@ -94,7 +94,13 @@ static void scan_statement(statement s, list loops)
 	scan_statement( test_false( t ), loops ) ;	
 	break ;
     }
-    case is_instruction_unstructured: 
+    case is_instruction_whileloop: {
+	whileloop l = instruction_whileloop(i);
+	statement b = whileloop_body(l);
+	scan_statement(b, loops ) ;
+	break;
+    }
+   case is_instruction_unstructured: 
 	scan_unstructured( instruction_unstructured( i ), loops ) ;
 	break ;
     case is_instruction_call:
