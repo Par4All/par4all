@@ -1,3 +1,10 @@
+/* 	%A% ($Date: 1995/09/06 14:25:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+static char vcid[] = "%A% ($Date: 1995/09/06 14:25:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+#endif /* lint */
+
+#include <stdlib.h>
 #include <stdio.h>
 #include <sys/param.h>
 
@@ -25,18 +32,66 @@
 /* Include the label names: */
 #include "wpips-labels.h"
 
-#define NO_TEXTSW_AVAILABLE -1 /* cannot be positive (i.e. a window number. */
 static Textsw edit_textsw[MAX_NUMBER_OF_WPIPS_WINDOWS];
 static Panel_item check_box[MAX_NUMBER_OF_WPIPS_WINDOWS];
 static bool dont_touch_window[MAX_NUMBER_OF_WPIPS_WINDOWS];
 int number_of_wpips_windows = INITIAL_NUMBER_OF_WPIPS_WINDOWS;
 
 static Menu_item current_selection_mi, 
-                 edit, 
-                 close;
+                 close_menu_item;
+Menu_item edit_menu_item;
 
 /* The menu "View" on the main panel: */
 Menu view_menu;
+
+
+void
+edit_notify(Menu menu,
+            Menu_item menu_item)
+{
+   char string_filename[SMALL_BUFFER_LENGTH],
+      string_modulename[SMALL_BUFFER_LENGTH];
+   char *modulename = db_get_current_module_name();
+   char *filename;
+   int win_nb;
+
+   if (modulename == NULL) {
+      prompt_user("No module selected");
+      return;
+   }
+
+   /* Is there an available edit_textsw ? */
+   if ( (win_nb=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
+      prompt_user("None of the text-windows is available");
+      return;
+   }
+
+   filename = db_get_file_resource(DBR_SOURCE_FILE, modulename, TRUE);
+   sprintf(string_filename, "File: %s", filename);
+   sprintf(string_modulename, "Module: %s", modulename);
+
+   /* Display the file name and the module name. RK, 2/06/1993 : */
+   xv_set(edit_frame[win_nb], FRAME_LABEL, "Pips Edit Facility",
+          FRAME_SHOW_FOOTER, TRUE,
+          FRAME_LEFT_FOOTER, string_filename,
+          FRAME_RIGHT_FOOTER, string_modulename,
+          NULL);
+
+   xv_set(edit_textsw[win_nb], 
+          TEXTSW_FILE, filename,
+          TEXTSW_BROWSING, FALSE,
+          TEXTSW_FIRST, 0,
+          NULL);
+
+   xv_set(current_selection_mi, 
+          MENU_STRING, "Lasts",
+          MENU_INACTIVE, FALSE,
+          NULL);
+
+   xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
+
+   unhide_window(edit_frame[win_nb]);
+}
 
 
 void current_selection_notify(menu, menu_item)
@@ -57,6 +112,19 @@ void dont_touch_window_notify(Panel_item item, int value, Event *event)
   bool *dont_touch_window = (bool *) xv_get(item, XV_KEY_DATA,
 					    DONT_TOUCH_WINDOW_ADDRESS);
   *dont_touch_window = (bool) xv_get(item, PANEL_VALUE);
+}
+
+
+char *
+compute_title_string(int window_number)
+{
+  char title_string_beginning[] = "Xview Pips Display Facility # ";
+  static char title_string[sizeof(title_string_beginning) + 4];
+
+  (void) sprintf(title_string, "%s%d",
+		 title_string_beginning, window_number + 1);
+  /* xv_set will copy the string. */
+  return title_string;
 }
 
 
@@ -88,65 +156,6 @@ int alloc_first_initialized_window()
    return(NO_TEXTSW_AVAILABLE);
 }    
 
-void edit_notify(menu, menu_item)
-Menu menu;
-Menu_item menu_item;
-{
-	char string_filename[SMALL_BUFFER_LENGTH], string_modulename[SMALL_BUFFER_LENGTH];
-    char *modulename = db_get_current_module_name();
-    char *filename;
-    int win_nb;
-
-    if (modulename == NULL) {
-		prompt_user("No module selected");
-		return;
-    }
-
-    /* Is there an available edit_textsw ? */
-    if ( (win_nb=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
-		prompt_user("None of the text-windows is available");
-		return;
-    }
-
-    filename = db_get_file_resource(DBR_SOURCE_FILE, modulename, TRUE);
-	sprintf(string_filename, "File: %s", filename);
-	sprintf(string_modulename, "Module: %s", modulename);
-
-		/* Display the file name and the module name. RK, 2/06/1993 : */
-    xv_set(edit_frame[win_nb], FRAME_LABEL, "Pips Edit Facility",
-		FRAME_SHOW_FOOTER, TRUE,
-		FRAME_LEFT_FOOTER, string_filename,
-		FRAME_RIGHT_FOOTER, string_modulename,
-		NULL);
-
-    xv_set(edit_textsw[win_nb], 
-	   TEXTSW_FILE, filename,
-	   TEXTSW_BROWSING, FALSE,
-	   TEXTSW_FIRST, 0,
-	   NULL);
-
-    xv_set(current_selection_mi, 
-	   MENU_STRING, "Lasts",
-	   MENU_INACTIVE, FALSE,
-	   NULL);
-
-    xv_set(close, MENU_INACTIVE, FALSE, NULL);
-
-    unhide_window(edit_frame[win_nb]);
-}
-
-
-char *compute_title_string(int window_number)
-{
-  char title_string_beginning[] = "Xview Pips Display Facility # ";
-  static char title_string[sizeof(title_string_beginning) + 4];
-
-  (void) sprintf(title_string, "%s%d",
-		 title_string_beginning, window_number + 1);
-  /* xv_set will copy the string. */
-  return title_string;
-}
-
 
 /* To display some Pips output with wpips or epips: */
 void
@@ -165,6 +174,18 @@ wpips_execute_and_display_something(char * label)
       prompt_user("No module selected");
       return;
    }
+
+   if (strcmp(label, SEQUENTIAL_GRAPH_VIEW) == 0) {
+      /* Use some graph viewer to display the resource: */
+      char system_buffer[300];
+      
+      file_name1 = build_view_file(DBR_GRAPH_PRINTED_FILE);
+      user_log("Launching a \"daVinci\" process...\n");
+      (void) sprintf(system_buffer, "display_pips_daVinci %s &", file_name1);
+      system(system_buffer);
+   }
+   else {
+      /* Use some text viewer to display the resource: */
 
    /* Is there an available edit_textsw ? */
    if ( (win1=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
@@ -307,7 +328,7 @@ wpips_execute_and_display_something(char * label)
    xv_set(current_selection_mi, 
           MENU_STRING, "Lasts",
           MENU_INACTIVE, FALSE, NULL);
-   xv_set(close, MENU_INACTIVE, FALSE, NULL);
+   xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
 
    if (! wpips_emacs_mode) {
       unhide_window(edit_frame[win1]);
@@ -315,6 +336,8 @@ wpips_execute_and_display_something(char * label)
          unhide_window(edit_frame[win2]);
       }
    }
+   
+}
 
    display_memory_usage();
 }
@@ -350,7 +373,7 @@ edit_close_notify(Menu menu,
           MENU_STRING, "No Selection",
           MENU_INACTIVE, TRUE, NULL);
 
-   xv_set(close, MENU_INACTIVE, TRUE, NULL);
+   xv_set(close_menu_item, MENU_INACTIVE, TRUE, NULL);
 
    for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
       hide_window(edit_frame[i]);
@@ -381,8 +404,13 @@ apply_on_each_view_item(void (* function_to_apply_on_each_menu_item)(Menu_item),
 
    /* Skip the "current_selection_mi" and "close" Menu_items: */
    for(i = (int) xv_get(view_menu, MENU_NITEMS) - 1; i > 0; i--) {
-      Menu_item item = (Menu_item) xv_get(view_menu, MENU_NTH_ITEM, i);
-      function_to_apply_on_each_menu_item(item);
+      Menu_item menu_item = (Menu_item) xv_get(view_menu, MENU_NTH_ITEM, i);
+      /* Skip the title item: */
+      if (!(bool) xv_get(menu_item, MENU_TITLE)
+          && menu_item != current_selection_mi
+          && menu_item != close_menu_item
+          && xv_get(menu_item, MENU_NOTIFY_PROC) != NULL)
+         function_to_apply_on_each_menu_item(menu_item);
    }
 
   /* Now walk through the options panel: */
@@ -455,14 +483,8 @@ create_edit_menu()
                 MENU_INACTIVE, TRUE,
                 MENU_RELEASE,
                 NULL);
-   edit = 
-      xv_create(NULL, MENUITEM, 
-                MENU_STRING, "Edit",
-                MENU_NOTIFY_PROC, edit_notify,
-                MENU_RELEASE,
-                NULL);
 
-   close = 
+   close_menu_item = 
       xv_create(NULL, MENUITEM, 
                 MENU_STRING, "Close",
                 MENU_NOTIFY_PROC, edit_close_notify,
@@ -473,26 +495,43 @@ create_edit_menu()
    view_menu = 
       xv_create(XV_NULL, MENU_COMMAND_MENU, 
                 MENU_GEN_PIN_WINDOW, main_frame, "View & Edit Menu",
+                MENU_TITLE_ITEM, "Viewing or editing a module ",
                 MENU_APPEND_ITEM, current_selection_mi,
-                MENU_ACTION_ITEM, ARRAY_DFG_VIEW, view_notify,
-                MENU_ACTION_ITEM, CALLGRAPH_VIEW, view_notify,
-                MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
-                MENU_ACTION_ITEM, DISTRIBUTED_VIEW, view_notify,
-                MENU_APPEND_ITEM, edit,
-                MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
-                MENU_ACTION_ITEM, ICFG_VIEW, view_notify,
-                MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
-                MENU_ACTION_ITEM, PLACEMENT_VIEW, view_notify,
+
                 MENU_ACTION_ITEM, SEQUENTIAL_VIEW, view_notify,
-                MENU_ACTION_ITEM, TIME_BASE_VIEW, view_notify,
                 MENU_ACTION_ITEM, USER_VIEW, view_notify,
-                /* MENU_ACTION_ITEM, HPFC_VIEW, view_notify,*/
                 MENU_ACTION_ITEM, SEQUENTIAL_EMACS_VIEW, view_notify,
-                MENU_APPEND_ITEM, close,
+                MENU_ACTION_ITEM, SEQUENTIAL_GRAPH_VIEW, view_notify,
+                                /* Just a separator: */
+                MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
+                NULL,
+
+                MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
+                                 /* Just a separator: */
+                MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
+                NULL,
+
+                MENU_ACTION_ITEM, ARRAY_DFG_VIEW, view_notify,
+                MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
+                MENU_ACTION_ITEM, PLACEMENT_VIEW, view_notify,
+                MENU_ACTION_ITEM, TIME_BASE_VIEW, view_notify,
+                                 /* Just a separator: */
+                MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
+                NULL,
+
+                MENU_ACTION_ITEM, CALLGRAPH_VIEW, view_notify,
+                MENU_ACTION_ITEM, ICFG_VIEW, view_notify,
+                                 /* Just a separator: */
+                MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
+                NULL,
+
+                MENU_ACTION_ITEM, DISTRIBUTED_VIEW, view_notify,
+                MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
+                MENU_APPEND_ITEM, close_menu_item,
                 NULL);
 
    (void) xv_create(main_panel, PANEL_BUTTON,
-                    PANEL_LABEL_STRING, "Edit/View",
+                    PANEL_LABEL_STRING, "View",
                     PANEL_ITEM_MENU, view_menu,
                     NULL);
 
