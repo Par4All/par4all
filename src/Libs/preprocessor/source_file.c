@@ -197,8 +197,8 @@ string file;
     FILE *fd;
     char *cwd;
     static char buffer[MAXNAMLEN];
-    char *abspath;
-
+    string abspath = NULL;
+    /* string relpath = NULL; */
     static char *tempfile = NULL;
 
     if (! file_exists_p(file)) {
@@ -210,12 +210,18 @@ string file;
 	tempfile = tmpnam(NULL);
     }
 
-    /* the current program is retrieved */
     pgm = db_get_current_workspace();
 
-    /* the full path of file is calculated */
+    /* the absolute path of file is calculated */
     abspath = strdup((*file == '/') ? file : 
 		     concatenate(get_cwd(), "/", file, NULL));
+    /* Well, databases are even more relocatable if the absolute name of 
+       the user file names are stored in the database
+       */
+    /*
+    relpath = strdup((*file == '/') ? file : 
+		     concatenate("../", file, NULL));
+		     */
 
     /* the new file is registered in the database */
     user_log("Registering file %s\n", file);
@@ -236,17 +242,20 @@ string file;
     fd = safe_fopen(tempfile, "r");
     while (fscanf(fd, "%s", buffer) != EOF) {
 	char *modname;
-	char *modfullfilename;
+	/* char *modfullfilename; */
+	char * modrelfilename = NULL;
 
+	/*
 	modfullfilename = strdup(concatenate(database_directory(pgm), 
-					     "/", buffer, NULL));
+					     "/", buffer, NULL)); */
+	modrelfilename = strdup(buffer);
 
 	*strchr(buffer, '.') = '\0';
 	(void) strupper(buffer, buffer);
 	modname = strdup(buffer);
 
 	user_log("  Module         %s\n", modname);
-	DB_PUT_FILE_RESOURCE(DBR_SOURCE_FILE, modname, modfullfilename);
+	DB_PUT_FILE_RESOURCE(DBR_SOURCE_FILE, modname, modrelfilename);
     }
     safe_fclose(fd, tempfile);
 
