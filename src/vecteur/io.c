@@ -55,7 +55,7 @@ Pbase * b;
 	(void) printf ("valeur de variable :");
 	(void) scanf("%9s",buffer);
 	(void) printf ("valeur du coefficient de la variable :");
-	(void) scanf("%d",&val);
+	(void) scan_Value(&val);
 	if(!base_contains_variable_p(*b, (Variable) buffer)) {
 	    var = variable_make(buffer);
 	    *b = vect_add_variable(*b,var);
@@ -66,7 +66,8 @@ Pbase * b;
 	v1 = vect_new(var, val);
 	v1->succ = v;
 	v = v1;
-	(void) printf ("'1' -->rentrer d'autres valeurs,(0-2..9) sinon. votre choix:");
+	(void) printf ("'1' -->rentrer d'autres valeurs,(0-2..9)"
+		       "sinon. votre choix:");
 	(void) scanf("%d",&c);
     }
     return(v);
@@ -109,10 +110,12 @@ char * (*variable_name)();
 	for (p = v; p != NULL; p = p->succ)
 	{
 	    if (p->var != TCST) {
-		(void) fprintf(f,"%d * %s ", p->val, variable_name(p->var));
+		fprint_Value(f, p->val);
+		(void) fprintf(f," * %s ", variable_name(p->var));
 	    }
 	    else {
-		(void) fprintf(f,"%d ", p->val);
+		(void) fprint_Value(f, p->val);
+		fprintf(f, " ");
 	    }
 
 	    if (p->succ != NULL) {
@@ -147,7 +150,7 @@ Pbase b;
 	    Variable var = vecteur_var(coord);
 
 	    if(VARIABLE_DEFINED_P(var)) {
-		fprintf(f, "%d", vect_coeff(var, v));
+		fprint_Value(f, vect_coeff(var, v));
 		if(VECTEUR_NUL_P(coord->succ)) {
 		    fputc(')', f);
 		}
@@ -214,8 +217,10 @@ char *mult_symbol;
 		r = strchr(r, NULL);
 	    }
 	    else {
-		(void) sprintf(r, "%s^%d", variable_name(p->var), p->val);
-		    r = strchr(r, NULL);
+		(void) sprintf(r, "%s^", variable_name(p->var));
+		r = strchr(r, NULL);
+		sprint_Value(r, p->val);
+		r = strchr(r, NULL);
 	    }
 	    if (p->succ != NULL) {
 		(void) sprintf(r, "%s", mult_symbol);
@@ -245,21 +250,28 @@ char *mult_symbol;
 			r = strchr(r, NULL);
 		    }
 		    else {
-			(void) sprintf(r,"%s^%d", variable_name(b->var), exp);
+			(void) sprintf(r,"%s^", variable_name(b->var));
+			r = strchr(r, NULL);
+			sprint_Value(r, exp);
 			r = strchr(r, NULL);
 		    }
 		}
 		else /* exp < 0 */ {
 		    /* inutile pour les polynomes */ 
-		    (void) sprintf(r, "%s^(%d)", variable_name(b->var), exp);
 		    first_var = FALSE;
+
+		    (void) sprintf(r, "%s^(", variable_name(b->var));
+		    r = strchr(r, NULL);
+		    sprint_Value(r, exp);
+		    r = strchr(r, NULL);
+		    (void) sprintf(r, ")");
 		    r = strchr(r, NULL);
 		}
 	    }
 	}
     }
     s = strdup(t);
-    assert(strlen(s)<99);
+    assert(strlen(s)<99); /* (un peu tard:-) */
     return s;
 }
 
