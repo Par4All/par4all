@@ -50,15 +50,8 @@ struct __hash_table {
   int hash_size_limit;         /* number of entry for which to reallocate */
 
   /* keep statistics on the life time of the hash table... FC 04/06/2003 */
-  unsigned int n_put;
-  unsigned int n_get;
-  unsigned int n_del;
-  unsigned int n_upd;
-
-  unsigned int n_put_iter;
-  unsigned int n_get_iter;
-  unsigned int n_del_iter;
-  unsigned int n_upd_iter;
+  unsigned int n_put, n_get, n_del, n_upd;
+  unsigned int n_put_iter, n_get_iter, n_del_iter, n_upd_iter;
 };
 
 /* Constant to find the end of the prime numbers table 
@@ -72,17 +65,7 @@ struct __hash_table {
 
 /* Hash function to get the index of the array from the key 
  */
-#define RANK(key, size) (((unsigned int)(key))%(size))
-
-/* define the increment of the hash_function in case of a hit (heat;-)
- * The old version can be achieved by setting this macro to ((int) 1)
- */
-#define HASH_FUNCTION_INCREMENT(key, size) \
-    (1 + (((unsigned int)(key)&0x7fffffff)%((size) - 1))) 
-
-/* (1+(((unsigned int)(key))%91)) */
-
-
+#define RANK(key, size) ((((unsigned int)(key))^0xc0e1fab1)%(size))
 
 /* Set of the different operations 
  */
@@ -106,14 +89,50 @@ static unsigned int hash_string_rank(void*, int);
 static int hash_chunk_equal(gen_chunk*, gen_chunk*) ;
 static unsigned int hash_chunk_rank(gen_chunk*, int);
 
-/* List of the prime numbers from 17 to 2^31-1 
+/* list of the prime numbers from 17 to 2^31-1 
+ * used as allocated size
  */
 static int prime_list[] = {
-    7,17,37,71,137,277,547,1091,2179,4357,8707,17417,
-    34819,69653,139267,278543,557057,1114117,2228243,
-    4456451,8912921,17825803,35651593,71303171,
-    142606357,285212677,570425377,1140850699,
-    END_OF_SIZE_TABLE};
+    7,
+    17,
+    37,
+    71,
+    137,
+    277,
+    547,
+    1091,
+    2179,
+    4357,
+    8707,
+    17417,
+    34819,
+    69653,
+    139267,
+    278543,
+    557057,
+    1114117,
+    2228243,
+    4456451,
+    8912921,
+    17825803,
+    35651593,
+    71303171,
+    142606357,
+    285212677,
+    570425377,
+    1140850699,
+    END_OF_SIZE_TABLE
+};
+
+/* distinct primes for long cycle incremental search */
+static int inc_prime_list[] = {
+    2,   3,   5,  11,  13,  19,  23,  29,  31,  41, 
+   43,  47,  53,  59,  61,  67,  73,  79,  83,  89,
+   97, 101, 103, 107, 109, 113, 127, 131, 139, 149,
+  151
+};
+
+#define HASH_INC_SIZE (31) /* (yes, this one is prime;-) */
 
 /* Now we need the table size to be a prime number.
  * So we need to retrieve the next prime number in a list.
@@ -559,16 +578,32 @@ hash_find_entry(hash_table htp,
 		hash_operation operation,
 		unsigned int * stats)
 {
-  int r;
+  unsigned int
+    r_init = (*(htp->hash_rank))(key, htp->hash_size),
+    r = r_init,
+    /* history of r_inc value
+     * RT: 1
+     * GO: 1 + abs(r_init)%(size-1)
+     */
+    r_inc  = inc_prime_list[ RANK(r_init, HASH_INC_SIZE) ];
   hash_entry he;
-  int r_init ;
-  int r_increment;
-  
-  r_init = r = (*(htp->hash_rank))(key, htp->hash_size);
-  r_increment = HASH_FUNCTION_INCREMENT(r_init, htp->hash_size);
-  
+
   while (1) 
   {
+    /* FC 05/06/2003
+     * if r_init is randomized (i.e. perfect hash function)
+     * and r_inc does not kill everything, 
+     * if p is the filled proportion for the table, 0<=p<1
+     * we should have number_of_iterations 
+     *        = \Sigma_{i=1}{\infinity} i*(1-p)p^{i-1}
+     * this formula must simplify somehow... = 1/(1-p) ?
+     * 0.20   => 1.25
+     * 0.25   => 1.33..
+     * 0.33.. => 1.50
+     * 0.50   => 2.00
+     * 0.66.. => 3.00
+     * 0.70   => 3.33
+     */
     if (stats) (*stats)++;
     
     he = htp->hash_array[r];
@@ -590,12 +625,12 @@ hash_find_entry(hash_table htp,
     /* GO: it is not anymore the next slot, we skip some of them depending
      * on the reckonned increment 
      */
-    r = (r + r_increment) % htp->hash_size;
+    r = (r + r_inc) % htp->hash_size;
     
     /* FC: ??? this may happen in a hash_get after many put and del,
      * if the table contains no FREE, but many FREE_FOR_PUT instead!
      */
-    if( r == r_init ) {
+    if(r == r_init) {
       fprintf(stderr,"[hash_find_entry] cannot find entry\n") ;
       abort() ;
     }
