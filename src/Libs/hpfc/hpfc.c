@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.95  1997/04/16 13:14:56  coelho
+ * cleaner...
+ *
  * Revision 1.94  1997/04/16 09:07:44  creusil
  * statement_effects used for effects. bc.
  *
@@ -297,8 +300,9 @@ static void set_resources_for_module(entity module)
 		((statement_effects)  
 	         db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE)); 
 	}
-    /* CUMMULATED REFERENCES*/
 
+    /* CUMMULATED REFERENCES
+     */
     set_cumulated_references(
 	(statement_effects)
 	db_get_memory_resource(DBR_CUMULATED_REFERENCES, module_name, TRUE));
@@ -590,10 +594,6 @@ static bool hpfc_directives_handler(string name, bool dyn)
 	if (dyn) reset_proper_rw_effects();
 	
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, s);
-
-	/* ??? should not be necessary, some bug in pipsmake
-	 */
-	if (dyn) db_unput_a_resource(DBR_PROPER_EFFECTS, name);
     }
 
     debug_off(); 
@@ -675,10 +675,6 @@ bool hpfc_compile(string name)
 	store_new_host_variable(module, module);
 	store_new_node_variable(module, module);
     }
-
-    /* ??? */
-    /* db_unput_a_resource(DBR_PROPER_REFERENCES, name); */
-    db_unput_a_resource(DBR_CUMULATED_REFERENCES, name);
 
     reset_current_module_entity();
     save_hpfc_status();
