@@ -1,5 +1,8 @@
 /* $Id$
    $Log: splitc.y,v $
+   Revision 1.7  2003/08/14 08:58:28  coelho
+   { YYACCEPT; } instead of { YYACCEPT }
+
    Revision 1.6  2003/08/12 15:45:09  irigoin
    Bug fix for Rule 2 type signature
 
@@ -498,28 +501,30 @@ static string new_ellipsis()
 
 /* Non-terminals informations */
 %start interpret
-%type <> file interpret globals
-%type <> global
+
+%type <void> interpret 
+%type <void> file globals
+%type <void> global
 %type <string> attributes
 %type <string> attributes_with_asm
-%type <> asmattr
+%type <void> asmattr
 %type <string> attribute
-%type <> statement
+%type <void> statement
 %type <string> constant
-%type <> string_constant
+%type <void> string_constant
 %type <string> expression /* Required for bit fields, and maybe for enumerators. */
-%type <> opt_expression
-%type <> init_expression
+%type <void> opt_expression
+%type <void> init_expression
 %type <string> comma_expression
 %type <string> paren_comma_expression
-%type <> arguments
-%type <> bracket_comma_expression
-%type <> string_list 
-%type <> wstring_list
+%type <void> arguments
+%type <void> bracket_comma_expression
+%type <void> string_list 
+%type <void> wstring_list
 
-%type <> initializer
-%type <> initializer_list
-%type <> init_designators init_designators_opt
+%type <void> initializer
+%type <void> initializer_list
+%type <void> init_designators init_designators_opt
 
 %type <string> type_spec
 %type <string> struct_decl_list
@@ -530,11 +535,11 @@ static string new_ellipsis()
 %type <string> enumerator
 %type <string> enum_list
 %type <string> declaration
-%type <> function_def
-%type <> function_def_start
+%type <void> function_def
+%type <void> function_def_start
 %type <string> type_name
-%type <> block
-%type <> local_labels local_label_names
+%type <void> block
+%type <void> local_labels local_label_names
 %type <string> old_parameter_list_ne
 
 %type <string> init_declarator
@@ -547,18 +552,18 @@ static string new_ellipsis()
 %type <string> abs_direct_decl_opt
 %type <string> abstract_decl
 %type <string> pointer pointer_opt 
-%type <> location
+%type <void> location
 
 %type <string> id_or_typename
 %type <string> comma_expression_opt
-%type <> initializer_list_opt
+%type <void> initializer_list_opt
 %type <string> one_string_constant
 %type <string> one_string
 
 %type <string> rest_par_list rest_par_list1
-%type <> declaration_list
-%type <> statement_list
-%type <> for_clause
+%type <void> declaration_list
+%type <void> statement_list
+%type <void> for_clause
 %type <string> decl_spec_list 
 %type <string> decl_spec_list_opt_no_named
 %type <string> decl_spec_list_opt 
@@ -571,7 +576,7 @@ static string new_ellipsis()
 %%
 
 interpret: file TK_EOF
-                        {YYACCEPT};
+                        { YYACCEPT; };
 file: globals			 /* do nothing */	
 ;
 globals:
