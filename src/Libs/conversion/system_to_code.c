@@ -4,7 +4,7 @@
  *
  * SCCS stuff:
  * $RCSfile: system_to_code.c,v $ version $Revision$, 
- * ($Date: 1997/04/10 22:22:56 $, ) 
+ * ($Date: 1997/04/19 12:08:28 $, ) 
  */
 
 /* Standard includes
@@ -252,7 +252,7 @@ range_of_variable(
     if (lowers_undefined_p() || uppers_undefined_p()) 
 	return FALSE; /* no information available, that's for sure */
 
-    if (!bound_lowers_p(var) || !bound_uppers_p(var))
+    if (!bound_lowers_p((entity) var) || !bound_uppers_p((entity) var))
 	return FALSE;
 
     *lb = int_to_value(load_lowers((entity) var));
@@ -284,15 +284,15 @@ static Value vecteur_lower_bound(
 	    int il;
 	    Value vl,p;
 	    if (value_pos_p(val))
-		if (!bound_lowers_p(var)) 
+		if (!bound_lowers_p((entity) var)) 
 		    return VALUE_MIN;
 		else
-		    il = load_lowers(var);
+		    il = load_lowers((entity) var);
 	    else /* val < 0, I guess */
-		if (!bound_uppers_p(var))
+		if (!bound_uppers_p((entity) var))
 		    return VALUE_MIN;
 		else
-		    il = load_uppers(var);
+		    il = load_uppers((entity) var);
 	    
 	    vl = int_to_value(il);
 	    p = value_mult(val,vl);
