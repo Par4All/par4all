@@ -2,7 +2,7 @@
  *
  *  (c) Fabien COELHO - march 1995
  *
- *  $RCSfile: graph.c,v $ ($Date: 1998/04/14 19:36:01 $, )
+ *  $RCSfile: graph.c,v $ ($Date: 1998/06/03 08:47:16 $, )
  *  version $Revision$
  */
 
@@ -151,12 +151,21 @@ list /* of statements */ next;
 
 	break;
     }
+    case is_instruction_whileloop:
     case is_instruction_loop:
     {
-	loop l = instruction_loop(i);
-	statement b = loop_body(l);
+	statement b;
 	list /* of statements */ just_next = 
 	    gen_nconc(gen_copy_seq(next), CONS(STATEMENT, s, NIL));
+
+	if(instruction_loop_p(i)) {
+	    loop l = instruction_loop(i);
+	    b = loop_body(l);
+	}
+	else {
+	    whileloop l = instruction_whileloop(i);
+	    b = whileloop_body(l);
+	}
 	
 	add_arrows_in_ctrl_graph(s, next); /* no iteration */
 	add_arrow_in_ctrl_graph(s, b);     /* some iterations, first */
