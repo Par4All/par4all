@@ -23,7 +23,7 @@ FILES=		forward_gnu_makefile \
 
 COPY=	cp -f
 
-install: install_forward_makefiles install_macros
+quick-install: install_forward_makefiles install_macros
 
 install_macros:
 	$(COPY) $(MACROS) $(PIPS_INCLUDEDIR)
