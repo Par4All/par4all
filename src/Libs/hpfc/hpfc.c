@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.108  1998/12/26 21:21:01  irigoin
+ * error_handler added
+ *
  * Revision 1.107  1997/11/22 16:31:51  coelho
  * init/close referenced variables mapping...
  *
@@ -281,6 +284,16 @@ static void close_hpfc_status()
     close_the_ios();
     close_computed_remaps();
     close_hpf_reductions();
+}
+
+void hpfc_error_handler()
+{
+    reset_hpfc_status();
+    hpfc_compile_error_handler();
+    hpfc_directives_error_handler();
+    hpfc_util_error_handler();
+    hpfc_io_util_error_handler();
+    hpfc_special_cases_error_handler();
 }
 
 /************************************************************** COMPILATION */
