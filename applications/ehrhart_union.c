@@ -82,11 +82,11 @@ void Union_Read( Polyhedron **P, Polyhedron **C, char ***param_name )
 		if( i != (*C)->Dimension )
 		{
 			free( *param_name );
-			*param_name = NULL;
+			*param_name = Read_ParamNames(NULL,(*C)->Dimension);
 		}
 	}
 	else
-		*param_name = NULL;
+		*param_name = Read_ParamNames(NULL,(*C)->Dimension);
 
 }
 

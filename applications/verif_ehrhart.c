@@ -229,7 +229,7 @@ int main(int argc,char *argv[]) {
   C = CC;
 
   /******* Compute EP *********/
-  en = Polyhedron_Enumerate(P,C,MAXRAYS);
+  en = Polyhedron_Enumerate(P,C,MAXRAYS,NULL);
   
   /******* Initializations for check *********/
   p = (Value *)malloc(sizeof(Value) * (P->Dimension+2));

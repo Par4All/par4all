@@ -726,7 +726,7 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
 	{
 		lp1next = lp1->next;
 		lp1->next = NULL;
-		en= Polyhedron_Enumerate(lp1, C, MAXRAYS);
+		en= Polyhedron_Enumerate(lp1, C, MAXRAYS,NULL);
 		lp1->next = lp1next;
 		sen= NULL;
 		for(e=en;e;e=e->next)

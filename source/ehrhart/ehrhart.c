@@ -75,34 +75,9 @@ overflows should no longer happen since version 4.20
 */
 #define ALL_OVERFLOW_WARNINGS
 
-/**
-EPRINT : print results while computing the ehrhart polynomial.  this
-is done by default if you build the executable ehrhart.  (If EMAIN is
-defined).  Don't define EMAIN here, it is defined when necessary in
-the makefile.  
-
-<p>
-
-Notice: you may however define EPRINT without defining EMAIN, but in
-this case, you have to initialize the global variable param_name by
-calling Read_ParamNames before any call to ehrhart.  This is NOT
-recommanded, unless you know what you do.  EPRINT causes more debug
-messages to be printed.
-
-*/
-/* #define EPRINT */
-
 /******************* -----------END USER #DEFS-------- *********************/
 
 int overflow_warning_flag = 1;
-
-//#ifdef EMAIN
-/* print enumeration results while computing */
-#define EPRINT
-//#endif
-#ifdef EPRINT
-char **param_name;	/* global variable to print parameter names */
-#endif
 
 /*-------------------------------------------------------------------*/
 /* EHRHART POLYNOMIAL SYMBOLIC ALGEBRA SYSTEM                        */
@@ -1221,19 +1196,20 @@ int count_points (int pos,Polyhedron *P,Value *context) {
     return CNT;
 } /* count_points */
 
-/*------------------------------------------------------------*/
-/* enode *P_Enum(L, LQ, context, pos, nb_param, dim, lcm)     */
-/*     L : list of polyhedra for the loop nest                */
-/*     LQ : list of polyhedra for the parameter loop nest     */
-/*     pos : 1..nb_param, position of the parameter           */
-/*     nb_param : number of parameters total                  */
-/*     dim : total dimension of the polyhedron, param incl.   */
-/*     lcm : denominator array [0..dim-1] of the polyhedron   */
-/* Returns an enode tree representing the pseudo polynomial   */
-/*   expression for the enumeration of the polyhedron.        */
-/* A recursive procedure.                                     */
-/*------------------------------------------------------------*/
-static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_param,int dim,Value *lcm) {
+/*-------------------------------------------------------------------*/
+/* enode *P_Enum(L, LQ, context, pos, nb_param, dim, lcm,param_name) */
+/*     L : list of polyhedra for the loop nest                       */
+/*     LQ : list of polyhedra for the parameter loop nest            */
+/*     pos : 1..nb_param, position of the parameter                  */
+/*     nb_param : number of parameters total                         */
+/*     dim : total dimension of the polyhedron, param incl.          */
+/*     lcm : denominator array [0..dim-1] of the polyhedron          */
+/*     param_name : name of the parameters                           */
+/* Returns an enode tree representing the pseudo polynomial          */
+/*   expression for the enumeration of the polyhedron.               */
+/* A recursive procedure.                                            */
+/*-------------------------------------------------------------------*/
+static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_param,int dim,Value *lcm,char **param_name) {
 
   enode *res,*B,*C;
   int hdim,i,j,rank,flag;
@@ -1439,19 +1415,22 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       value_assign(context[dim-nb_param+pos],n);
       
 #ifdef EDEBUG1
-#ifdef EPRINT
+	if( param_name )
+	{
       fprintf(stderr,"%s = ",param_name[pos-1]);
       value_print(stderr,VALUE_FMT,n);
       fprintf(stderr," (hdim=%d, lcm[%d]=",hdim,pos-1);
       value_print(stderr,VALUE_FMT,lcm_copy);
       fprintf(stderr,")\n");
-#else
+	}
+	else
+	{
       fprintf(stderr,"P%d = ",pos);
       value_print(stderr,VALUE_FMT,n);
       fprintf(stderr," (hdim=%d, lcm[%d]=",hdim,pos-1);
       value_print(stderr,VALUE_FMT,lcm_copy);
       fprintf(stderr,")\n");      
-#endif
+	}
 #endif
       
       /* Setup B vector */
@@ -1483,24 +1462,24 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       else {    /* count is a function of other parameters */
 	/* call P_Enum recursively */
 	value_set_si(B->arr[i].d,0);
-	B->arr[i].x.p = P_Enum(L,LQ->next,context,pos+1,nb_param,dim,lcm);
+	B->arr[i].x.p = P_Enum(L,LQ->next,context,pos+1,nb_param,dim,lcm,param_name);
 	
 #ifdef EDEBUG3
-#ifdef EPRINT
-	
-	for (j=1; j<pos; j++)
-	  fputs("   ", stdout);
-	fprintf(stdout, "E(");
-	for (j=1; j<=pos; j++) {
-	  value_print(stdout,VALUE_FMT,context[dim-nb_param+j]);
-	  fprintf(stdout,",");
-	}	  
-	for (j=pos+1; j<nb_param; j++)
-	  fprintf(stdout,"%s,",param_name[j]);
-	fprintf(stdout,"%s) = ",param_name[j]);
-	print_enode(stdout,B->arr[i].x.p,param_name);
-	fprintf(stdout," =");
-#endif
+	if( param_name )
+	{
+		for (j=1; j<pos; j++)
+		  fputs("   ", stdout);
+		fprintf(stdout, "E(");
+		for (j=1; j<=pos; j++) {
+		  value_print(stdout,VALUE_FMT,context[dim-nb_param+j]);
+		  fprintf(stdout,",");
+		}	  
+		for (j=pos+1; j<nb_param; j++)
+		  fprintf(stdout,"%s,",param_name[j]);
+		fprintf(stdout,"%s) = ",param_name[j]);
+		print_enode(stdout,B->arr[i].x.p,param_name);
+		fprintf(stdout," =");
+	}
 #endif
 	
       }
@@ -1534,10 +1513,11 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       fprintf(stderr, "P_Enum: ?expecting i==hdim\n");
     
 #ifdef EDEBUG
-#ifdef EPRINT
+	if( param_name )
+	{
     fprintf(stderr,"B (enode) =\n");
     print_enode(stderr,B,param_name);
-#endif
+	}
     fprintf(stderr,"A (Before Gauss) =\n");
     Matrix_Print(stderr,P_VALUE_FMT,A);
 #endif
@@ -1573,21 +1553,23 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       }
       
 #ifdef EDEBUG
-#ifdef EPRINT
+	if( param_name )
+	{
       fprintf(stderr, "C (enode) =\n");
       print_enode(stderr, C, param_name);
-#endif
+	}
 #endif
       
       /* The i-th enode is the lcm-periodic coefficient of term n**i */
       edot(B,C,&(res->arr[i].x.p->arr[VALUE_TO_INT(k1)]));
       
 #ifdef EDEBUG
-#ifdef EPRINT
+	if( param_name )
+	{
       fprintf(stderr, "B.C (evalue)=\n");
       print_evalue(stderr,&(res->arr[i].x.p->arr[VALUE_TO_INT(k1)]),param_name );
       fprintf(stderr,"\n");
-#endif
+	}
 #endif
       
     }
@@ -1595,11 +1577,11 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   }
   
 #ifdef EDEBUG
-#ifdef EPRINT
-  fprintf(stderr,"res (enode) =\n");
-  print_enode(stderr,res,param_name);
-  
-#endif
+	if( param_name )
+	{
+	  fprintf(stderr,"res (enode) =\n");
+	  print_enode(stderr,res,param_name);
+	}
   fprintf(stderr, "-------------------- end P_Enum -----------------------\n");
 #endif
   
@@ -1625,9 +1607,12 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
 /*    PP : ParamPolyhedron                                        */
 /*    Q : Domain                                                  */
 /*    CT : Context transformation matrix                          */
+/*    lcm : lcm array (output)                                    */
+/*    nbp : number of parameters                                  */
+/*    param_name : name of the parameters                         */
 /*----------------------------------------------------------------*/
 static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
-   Value *lcm, int nbp )
+   Value *lcm, int nbp, char **param_name )
 {
   Param_Vertices *V;
   int i, j, ix, l, np;
@@ -1642,23 +1627,23 @@ static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
   for( np=0 ; np<nbp ; np++ )
     value_set_si( lcm[np], 0 );
 
-#ifdef EPRINT
-  fprintf(stdout,"Vertices:\n");
-#endif
+	if( param_name )
+	  fprintf(stdout,"Vertices:\n");
 
   for(i=0,ix=0,bx=MSB,V=PP->V; V && i<PP->nbV; i++,V=V->next) {
     if (Q->F[ix] & bx) {
-#ifdef EPRINT
-      if(CT) {
-	Matrix *v;
-	v = VertexCT(V->Vertex,CT);
-	Print_Vertex(stdout,v,param_name);
-	Matrix_Free(v);
-      }
-      else
-	Print_Vertex(stdout,V->Vertex,param_name);
-      fprintf(stdout,"\n");
-#endif
+		if( param_name )
+		{
+      	if(CT) {
+				Matrix *v;
+				v = VertexCT(V->Vertex,CT);
+				Print_Vertex(stdout,v,param_name);
+				Matrix_Free(v);
+      	}
+      	else
+				Print_Vertex(stdout,V->Vertex,param_name);
+     		fprintf(stdout,"\n");
+		}
 
       for(j=0;j<V->Vertex->NbRows;j++) {
 			/* A matrix */
@@ -1700,19 +1685,17 @@ Procedure to count points in a non-parameterized polytope.
 @param CT      Matrix to transform context to original
 @parma CEq     additionnal equalities in context
 @param MAXRAYS workspace size
+@param param_name parameter names
 
 */
-Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyhedron *CEq,unsigned MAXRAYS) {
+Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyhedron *CEq,unsigned MAXRAYS,char **param_name) {
   
     Polyhedron *L;
     Enumeration *res;
     Value *context,tmp;
     int j;
     int hdim = P->Dimension + 1;
-  
-#ifdef EPRINT
     int r,i;
-#endif
   
     /* Create a context vector size dim+2 */
     context = (Value *) malloc((hdim+1)*sizeof(Value));
@@ -1742,7 +1725,8 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
         Polyhedron_Free(Dt);
     }
   
-#ifdef EPRINT 
+	if( param_name )
+	{
     fprintf(stdout,"---------------------------------------\n");
     fprintf(stdout,"Domain:\n");
     Print_Domain(stdout,res->ValidityDomain, param_name);
@@ -1765,7 +1749,7 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
         }
         printf("\n");
     }
-#endif    
+	}
     CATCH(overflow_error) {
         fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
         fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
@@ -1779,7 +1763,7 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
         /* Set context[hdim] = 1  (the constant) */
         value_set_si(context[hdim],1);
         value_set_si(tmp,1);
-        res->EP.x.p = P_Enum(L,NULL,context,1,0,hdim-1,&tmp);
+        res->EP.x.p = P_Enum(L,NULL,context,1,0,hdim-1,&tmp,param_name);
         UNCATCH(overflow_error);
     }
   
@@ -1790,12 +1774,13 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
 	addeliminatedparams_evalue(&res->EP, CT);
     */
   
-#ifdef EPRINT
+	if( param_name )
+	{
     fprintf(stdout,"\nEhrhart Polynomial:\n");
     print_evalue(stdout,&res->EP,param_name);
     fprintf(stdout, "\n");
-#endif
-  
+	}
+
     value_clear(tmp);
     for (j=0;j<= hdim;j++) 
         value_clear(context[j]);  
@@ -1807,10 +1792,11 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
 @param P Polyhedron to enumerate
 @param C Context Domain
 @param MAXRAYS size of workspace
+@param param_name parameter names (array of strings), may be NULL
 @return a list of validity domains + evalues EP
 
 */
-Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS)
+Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,char **param_name)
 {
   Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P;
   Matrix *CT;
@@ -1838,13 +1824,12 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS)
   /* Don't call Polyhedron2Param_Domain if there are no parameters */
   if(nb_param == 0) {
     
-    return(Enumerate_NoParameters(P,C,NULL,NULL,MAXRAYS));  
+    return(Enumerate_NoParameters(P,C,NULL,NULL,MAXRAYS,param_name));  
   }
   PP = Polyhedron2Param_SimplifiedDomain(&P,C,MAXRAYS,&CEq,&CT);
   if(!PP) {
-#ifdef EPRINT
+	if( param_name )
     fprintf(stdout, "\nEhrhart Polynomial:\nNULL\n");
-#endif
 
     return(NULL);
   }
@@ -1858,7 +1843,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS)
     /* Don't call Polyhedron2Param_Domain if there are no parameters */
     if(nb_param == 0)
     {
-	    res = Enumerate_NoParameters(P,C,CT,CEq,MAXRAYS);
+	    res = Enumerate_NoParameters(P,C,CT,CEq,MAXRAYS,param_name);
 	    if( P != Pi )
 		    Polyhedron_Free( P );
 	    return( res );
@@ -1899,8 +1884,9 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS)
     res = en;
     res->ValidityDomain = rVD;
     
-#ifdef EPRINT
-    fprintf(stdout,"---------------------------------------\n");
+	if( param_name )
+   {
+	 fprintf(stdout,"---------------------------------------\n");
     fprintf(stdout,"Domain:\n");
     
 #ifdef EPRINT_ALL_VALIDITY_CONSTRAINTS
@@ -1913,12 +1899,12 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS)
       Domain_Free(VD);
     }
 #endif /* EPRINT_ALL_VALIDITY_CONSTRAINTS */
-#endif /* EPRINT */
+	}
     
     overflow_warning_flag = 1;
     
     /* Scan the vertices and compute lcm */
-    Scan_Vertices(PP,Q,CT,lcm,nb_param);
+    Scan_Vertices(PP,Q,CT,lcm,nb_param,param_name);
     
 #ifdef EDEBUG2
     fprintf(stderr,"Denominator = ");
@@ -2057,7 +2043,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS)
 	
       }
       TRY {
-			res->EP.x.p = P_Enum(L,LQ,context,1,nb_param,dim,lcm);
+			res->EP.x.p = P_Enum(L,LQ,context,1,nb_param,dim,lcm,param_name);
 			UNCATCH(overflow_error);	
       }
       
@@ -2068,12 +2054,13 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS)
       Domain_Free(LQ);
       
 #ifdef EDEBUG5
-#ifdef EPRINT
+	if( param_name )
+   {
       fprintf(stdout,"\nEhrhart Polynomial (before simplification):\n");
       print_evalue(stdout,&res->EP,param_name);
+	}
 #endif
-#endif
-      
+
       /* Try to simplify the result */
       reduce_evalue(&res->EP);
       
@@ -2082,12 +2069,13 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS)
       if(CT) 
           addeliminatedparams_evalue(&res->EP,CT);
       
-#ifdef EPRINT
+	if( param_name )
+	{
       fprintf(stdout,"\nEhrhart Polynomial:\n");
       print_evalue(stdout,&res->EP, param_name);
       fprintf(stdout,"\n");
       /* sometimes the final \n lacks (when a single constant is printed) */
-#endif	
+	}
       
     }
   }

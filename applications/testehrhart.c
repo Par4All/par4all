@@ -95,8 +95,6 @@ messages to be printed.
 */
 /* #define EPRINT */
 
-extern char **param_name;	/* global variable to print parameter names */
-
 int main() {
   
     int i;
@@ -104,6 +102,7 @@ int main() {
     Matrix *C1, *P1;
     Polyhedron *C, *P;
     Enumeration *en, *ee;
+    char **param_name;
   
 #ifdef EP_EVALUATION
     Value *p, *tmp;
@@ -123,7 +122,7 @@ int main() {
   
     /* Read the name of the parameters */
     param_name = Read_ParamNames(stdin,C->Dimension);
-    en = Polyhedron_Enumerate(P,C,1024);
+    en = Polyhedron_Enumerate(P,C,1024,param_name);
 
 #ifdef EP_EVALUATION
     if( isatty(0) && C->Dimension != 0)

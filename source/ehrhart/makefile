@@ -1,5 +1,5 @@
 #
-# $Id: makefile,v 1.1 2002/10/14 15:07:16 olaru Exp $
+# $Id: makefile,v 1.2 2002/10/16 15:18:18 loechner Exp $
 #
 
 ROOT  = ../..
@@ -11,8 +11,7 @@ SRCS = \
 	ehrhart.c \
 	ext_ehrhart.c \
 	eval_ehrhart.c
-	
-#ehrhart_union.c \
+
 
 # Include the shared compilation rules
 include $(ROOT)/vars.mk

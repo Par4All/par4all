@@ -1,5 +1,5 @@
 #
-# $Id: makefile,v 1.1 2002/10/15 07:38:40 kienhuis Exp $
+# $Id: makefile,v 1.2 2002/10/16 15:18:18 loechner Exp $
 #
 
 ROOT  = ..
@@ -15,6 +15,7 @@ SRCS = \
 	disjoint_union_sep.c \
 	disjoint_union_adj.c \
 	testehrhart.c \
+	ehrhart_union.c \
 	verif_ehrhart.c \
 	Zpolytest.c \
 	example.c
