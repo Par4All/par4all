@@ -252,10 +252,10 @@ pips_process_file(string file_name)
  * Well, the regex can be improved if necessary.
  */
 #define CMPLX_RX \
-    "^[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-+0-9eE\\. \t]*,[-+0-9eE\\. \t]*)"
+"^......[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-+0-9eE\\. \t]*,[-+0-9eE\\. \t]*)"
 
 #define DCMPLX_RX \
-    "^[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-+0-9dD\\. \t]*,[-+0-9dD\\. \t]*)"
+"^......[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-+0-9dD\\. \t]*,[-+0-9dD\\. \t]*)"
 
 static regex_t 
     implicit_none_rx, 
