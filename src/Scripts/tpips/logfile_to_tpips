@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # $RCSfile: logfile_to_tpips,v $ (version $Revision$)
-# $Date: 1997/04/01 10:43:40 $, 
+# $Date: 1997/04/01 11:19:48 $, 
 #
 # Usage: logfile_to_tpips <workspacename>
 #
@@ -65,7 +65,7 @@ $sed -n \
      s,^User Request...,# user request :,p;
      s,^\"\(.*\)\"\$,\1,p" $WS.database/LOGFILE |
 { tr '\012' '' ; echo ; } | 
-$sed "s,create $WS,,g;s,,,g;" | 
+$sed "s,create $WS,,g;s,,,g;s,\$,,;" | 
 tr '' '\012'
 echo quit
 echo \# EOF
