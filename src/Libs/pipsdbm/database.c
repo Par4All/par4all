@@ -439,20 +439,21 @@ int db_delete_obsolete_resources(bool (*keep_p)(string, string))
     /* builds the lists to delete. */
     DB_RESOURCES_MAP(os, or,
     {
-	DB_OWNED_RESOURCES_MAP(rs, r,
-        {
-	    string rn = db_symbol_name(rs);
-	    string on = db_symbol_name(os);
-	    pips_debug(8, "considering %s of %s (%p)\n", rn, on, (char*) r);
-	    if (!keep_p(rn, on)) {
-		ndeleted++;
-		lr = CONS(STRING, rn, lr);
-		lo = CONS(STRING, on, lo);
-	    }
-	},
-	    or);
+      DB_OWNED_RESOURCES_MAP(rs, r,
+      {
+	string rn = db_symbol_name(rs);
+	string on = db_symbol_name(os);
+	pips_debug(8, "considering %s of %s (%p)\n", rn, on, (char*) r);
+	if (!keep_p(rn, on)) {
+	  pips_debug(8, "to be destroyed: %s of %s\n", rn, on);
+	  ndeleted++;
+	  lr = CONS(STRING, rn, lr);
+	  lo = CONS(STRING, on, lo);
+	}
+      },
+			     or);
     },
-	get_pips_database());
+		     get_pips_database());
 
     /* delete the resources. */
     for(lrp=lr, lop=lo; !ENDP(lrp); POP(lrp), POP(lop)) {
