@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: host_node_entities.c,v $ ($Date: 1996/03/19 14:36:51 $, ) 
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1996/03/21 08:51:32 $, ) 
  * version $Revision$
  */
 
@@ -223,8 +223,8 @@ lUpdateExpr_but_distributed(
     },
 	l);
 
+    new = gen_nreverse(new);
     update_list_for_module(new, module);    
-
     return new;
 }
 
@@ -232,12 +232,8 @@ list lUpdateExpr(module, l)
 entity module;
 list l;
 {
-    list new;
-
-    new = gen_copy_seq(l);
-    new = gen_nreverse(new); 
+    list new = gen_copy_seq(l);
     update_list_for_module(new, module);    
-
     return new;
 }
 
