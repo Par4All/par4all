@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/08/09 19:36:16 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/08/10 11:24:26 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1963,16 +1963,17 @@ char *s ;
 /* GEN_READ_SPEC reads the specifications. This has to be used
    -- before -- any utilization of manipulation functions. */
 
-static void init_gen_quick_recurse_tables();
+static void init_gen_quick_recurse_tables(void);
+
+extern void genspec_set_string_to_parse(char*);
+extern void genspec_reset_string_to_parse(void);
 
 void
 gen_read_spec(char * spec, ...)
 {
     va_list ap ;
-    FILE * f;
     gen_chunk **cpp ;
     struct gen_binding *bp ;
-    char *mktemp(), *tmp ;
     extern int unlink();
 
     /* default initialization of newgen lexers files:
@@ -1982,46 +1983,22 @@ gen_read_spec(char * spec, ...)
     genread_out = stdout;
     genspec_out = stdout;
 
-    /* now let's read the spec files...
-     * well, indeed, there are no specfile! just spec strings
-     * that are put in a temporary file for parsing! argh! FC:-)
-     * I would rather have suggested to parse the string.
-     * the very same parser is also used in newC and so, thus
-     * thus some carefully designed getchar would allow that?
-     * for some obscure reason it does not work at all with flex???
+    /* now let's read the spec strings...
      */
     va_start(ap, spec) ;
 
     init() ;
     Read_spec_mode = 1 ;
-    tmp = mktemp(strdup("/tmp/newgen.XXXXXX")) ;
 
     while(spec)
     {
-	if( (f = fopen( tmp, "w" )) == NULL ) {
-	    user( "Cannot open temp spec file in write mode\n" ) ;
-	    return ;
-	}
-	fprintf( f, "%s", spec ) ;
-	fclose( f ) ;
-
-	if( (genspec_in = fopen( tmp, "r" )) == NULL ) {
-	    user( "Cannot open temp spec file in read mode\n" ) ;
-	    return ;
-	}
-/*
-#ifdef FLEX_SCANNER
-	genspec_restart(genspec_in);
-#endif
-*/
+	genspec_set_string_to_parse(spec);
 	genspec_parse() ;
-	fclose( genspec_in ) ;
+	genspec_reset_string_to_parse();
 
 	spec = va_arg( ap, char *);
     }
-    if( unlink( tmp )) {
-	fatal( "Cannot unlink tmp file %s\n", tmp ) ;
-    }
+
     compile() ;
 
     for( cpp= &Gen_tabulated_[0] ; 
@@ -2145,14 +2122,14 @@ int create_p ;
 	user( "Incorrect data for gen_read_tabulated: %s\n", buffer ) ;
 	exit( 1 ) ;
     }
-    domain = atoi( genread_text ) ;
+    domain = genread_lval.val ;
 
     if( (i=genread_lex()) != READ_INT ) {
 	(void) sprintf( buffer, "%d", i ) ;
 	user( "Incorrect second data for gen_read_tabulated: %s\n", buffer ) ;
 	exit( 1 ) ;
     }
-    max = atoi( genread_text ) ;
+    max = genread_lval.val ;
 #else
     (void) fscanf( file, "%d %d", &domain, &max ) ;
 #endif
