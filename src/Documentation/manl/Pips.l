@@ -4,15 +4,12 @@
 .SH NAME
 Pips \- PIPS Shell script to interface pips
 .SH SYNOPSIS
-Pips [\q] [\-w 
+Pips [\-q] [\-w 
 .I wspace
 ] [\-f 
-.IR source_file[,source_file]... ].\|.\|. 
+.IR source_file[,source_file]... ]
 [\-s
-.IR selected_rule[,selected_rule]... ].\|.\|.
-[\-m 
-.I module
-]
+.IR selected_rule[,selected_rule]... ]
 [\-m
 .IR module ]
 [\-p
@@ -49,11 +46,36 @@ and the executable
 
 .B Pips
 can nevertheless be used directly to write Shell scripts based on PIPS.
+Like
+.B Display(1),
+.B Pips
+uses shorthand notations for rules and resources. For instance,
+a
+.B CALLGRAPH_FILE
+can be required as
+.B CGF.
+
+The
+.B Pips
+based interface uses files in the current user directory to memorize 
+the current workspace and the current module.
+
+On-line html documentation about the batch interface built on top of
+.B Pips
+is available at
+
+.B <http://www.cri.ensmp.fr/pips/batch-interface.html>.
+
+The PIPS project as a whole is presented at
+
+.B <http://www.cri.ensmp.fr/pips>.
+
 .\"
 .SH OPTIONS
 .TP
 .B \-q
-controls the verbosity.
+selects the verbose mode for debugging the Pips Shell script.
+.TP
 .B \-w
 .I wspace
 is the name of the selected workspace. 
@@ -81,7 +103,8 @@ is the name of the module which is used.
 See
 .B Perform(1)
 .TP
-.B \-b resource
+.B \-b 
+.I resource
 is one of many resources, such as 
 .B CALLGRAPH,
 .B PRECONDITIONS,
@@ -94,18 +117,23 @@ and
 .RS
 .RE
 .\"
-.\" .SH FILES
+.\" 
+.SH FILES
+
+.B .pipsprogram
+contains the workspace name and the current module name.
+
 .\"
 .SH "SEE ALSO"
 .BR epips (l),
 .BR pips (l),
 .BR tpips (l),
 .BR wpips (l),
+.BR Build (l),
 .BR Delete (l),
 .BR Display (l),
 .BR Init (l),
 .BR Perform (l),
-.BR Pips (l),
 .BR Select (l).
 .\"
 .SH BUGS
