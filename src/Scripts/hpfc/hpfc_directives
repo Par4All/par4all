@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/28 08:54:08 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/04/18 12:02:29 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -35,11 +35,12 @@
 # _p: processors
 # _s: *
 # _t: template
+# _u: pure
 # _y: dynamic
 #
 # _o: temporary for logical
 #
-# missing: inherit, pure
+# missing: inherit
 #
 # move static directives AFTER declarations, since I need to parse them
 # as statements.
@@ -68,21 +69,21 @@ $RM -f $TMP.*
 #
 # directive normalization
 #
-$SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,chpf$\1,
-      s,^chpf\$[^ ], ,' | 
+$SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,chpf$\1,' |
 #
 # and continuation handling:
 # put on one line
 #
 $TR '\012' '' | 
 #
-# remove not needed cr
+# remove not desired cr (& and 6 column styles)
 #
-$SED 's,,,g' | 
+$SED 's,&[ 	]*chpf\$., ,g
+      s,chpf\$[^ ], ,g' | 
 #
 # and back to a normal file
 #
-$TR '' '\012' |
+$TR '' '\012' | 
 #
 # massive transformations
 #
@@ -94,6 +95,7 @@ $SED '/^chpf\$/s,\([ 	\,(]\)[Bb][Ll][Oo][Cc][Kk]\([ 	\,()]\),\1_k\2,g
       /^chpf\$/s,_c\([\,)]\),_c(1)\1,g
       /^chpf\$/s,\*\([\,)]\),_s()\1,g
       s,^chpf\$ [Dd][Yy][Nn][Aa][Mm][Ii][Cc] \(.*\),      _y(\1),
+      s,^chpf\$ [Pp][Uu][Rr][Ee] \(.*\),      _u(\1),
       s,^chpf\$ [Tt][Ee][Mm][Pp][Ll][Aa][Tt][Ee] \(.*\),      _o \1      _t(\1),
       s,^chpf\$ [Pp][Rr][Oo][Cc][Ee][Ss][Ss][Oo][Rr][Ss] \(.*\),      _o \1      _p(\1),
       s,^chpf\$ [Aa][Ll][Ii][Gg][Nn] \(.*\) [Ww][Ii][Tt][Hh] \(.*\),      _a(\1\,\2),
@@ -104,7 +106,7 @@ $SED '/^chpf\$/s,\([ 	\,(]\)[Bb][Ll][Oo][Cc][Kk]\([ 	\,()]\),\1_k\2,g
       s,^chpf\$ [Ii][Nn][Dd][Ee][Pp][Ee][Nn][Dd][Ee][Nn][Tt][ 	]*\(.*\),      _i\1,
       s,^      _i\,,      _i()\,,
       s,^      _i(\([^)]*\))[ 	]*\,[ 	]*[Nn][Ee][Ww][ 	]*(\([^)]*\)),      _i(\1)      _n(\2),
-      s,_\([abdeintpyo]\),call hpfc\1,g
+      s,_\([abdeintpyou]\),call hpfc\1,g
       s,_\([cks]\),hpfc\1,g' |
 #
 # handles multi lines breaking (independent with new...)
@@ -113,8 +115,8 @@ $TR '' '\012' |
 #
 # separates static directives from others
 #
-$SED "/^      call hpfc[adptdy]/w $TMP.1
-      /^      call hpfc[adptdy]/d" > $TMP.0
+$SED "/^      call hpfc[adptuy]/w $TMP.1
+      /^      call hpfc[adptuy]/d" > $TMP.0
 
 #
 # line before which the static directives will be inserted
