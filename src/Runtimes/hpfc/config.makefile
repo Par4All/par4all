@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:12:13 $, )
+# ($Date: 1996/08/21 17:13:45 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -76,7 +76,7 @@ CFLAGS	= -O4
 #
 endif
 
-ifdef HPFC_GNU
+ifdef USE_GNU
 #
 # GNU Compilers
 # if set, overwrites the architecture dependent defaults...
