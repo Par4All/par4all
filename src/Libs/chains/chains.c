@@ -17,10 +17,16 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "text.h"
 #include "database.h"
+
+typedef void * arc_label;
+typedef void * vertex_label;
+
 #include "graph.h"
 #include "dg.h"
 
@@ -648,9 +654,7 @@ loop lo ;
     }
 }
 
-static void inout_call( st, c )
-statement st ;
-call c ;
+static void inout_call(statement st, call c)
 {
     set diff = MAKE_STATEMENT_SET() ;
 
@@ -1121,7 +1125,7 @@ chains(char *module_name, int use)
 
     if( !control_undefined_p( module_cont )) {
 	control_statement (module_cont) = statement_undefined;
-	gen_free( module_inst );
+	free_instruction( module_inst );
     }
 
     DB_PUT_MEMORY_RESOURCE(DBR_CHAINS, module_name, (char*) module_graph);
