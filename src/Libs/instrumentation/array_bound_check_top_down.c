@@ -85,7 +85,7 @@ static string read_or_write(bool a)
   return ", WRITING, ";  
 }
 
-static string bool_to_bound(bool b)
+string bool_to_bound(bool b)
 {
   if (b)
     return ", lower bound, ";
@@ -609,15 +609,20 @@ static bool max_statement_write_flt(statement s)
       {
 	reference r = effect_reference(eff);
 	entity e = reference_variable(r);
-	//fprintf(stderr,"\n MAX Write on entity %s :\n",entity_name(e));
-	//fprintf(stderr,"\n MAX Current entity %s :\n",entity_name(current_entity));
-	//if (same_entity_p(e,current_entity))
+	ifdebug(4)
+	  {
+	    fprintf(stderr,"\n MAX Write on entity %s :\n",entity_name(e));
+	    fprintf(stderr,"\n MAX Current entity %s :\n",entity_name(current_entity));
+	  }
 	if (strcmp(entity_name(e),entity_name(current_entity))==0)
 	  {
 	    int n = statement_ordering(s);
-	    //fprintf(stderr,"a variable = current entity !!");
-	    //fprintf(stderr,"This statement writes on %s with max ordering %d", 
-	    //    entity_name(current_entity),n);
+	    ifdebug(4)
+	      {
+		fprintf(stderr,"a variable = current entity !!");
+		fprintf(stderr,"This statement writes on %s with max ordering %d", 
+			entity_name(current_entity),n);
+	      }
 	    if (n>current_max) current_max = n; 
 	    break;
 	  }
@@ -633,8 +638,9 @@ static int maximum_ordering(entity a, statement s)
   current_entity = a;
   current_max = 0;
   gen_recurse(s, statement_domain, max_statement_write_flt, gen_null);
-  //  fprintf(stderr, " return current_max = %d of current entity %s ", 
-  //  current_max, entity_name(current_entity));
+  ifdebug(4)
+    fprintf(stderr, " return current_max = %d of current entity %s ", 
+	    current_max, entity_name(current_entity));
   current_entity = entity_undefined;
   return current_max;
 }
@@ -649,15 +655,20 @@ static bool min_statement_write_flt(statement s)
       {
 	reference r = effect_reference(eff);
 	entity e = reference_variable(r);
-	//fprintf(stderr,"\n MIN Write on entity %s :\n",entity_name(e));
-	//fprintf(stderr,"\n MIN Current entity %s :\n",entity_name(current_entity));
-	//if (same_entity_p(e,current_entity))
+	ifdebug(4)
+	  {
+	    fprintf(stderr,"\n MIN Write on entity %s :\n",entity_name(e));
+	    fprintf(stderr,"\n MIN Current entity %s :\n",entity_name(current_entity));
+	  }
 	if (strcmp(entity_name(e),entity_name(current_entity))==0)
 	  {
 	    current_min = statement_ordering(s);
-	    // fprintf(stderr,"a variable = current entity !!");
-	    // fprintf(stderr, " This statement writes on %s with min ordering %d", 
-	    //    entity_name(current_entity),current_min);
+	    ifdebug(4)
+	      {
+		fprintf(stderr,"a variable = current entity !!");
+		fprintf(stderr, " This statement writes on %s with min ordering %d", 
+			entity_name(current_entity),current_min);
+	      }
 	    return FALSE;
 	  }
       }
@@ -672,8 +683,9 @@ static int minimum_ordering(entity a, statement s)
   current_entity = a;
   current_min = 0;
   gen_recurse(s, statement_domain, min_statement_write_flt, gen_null);
-  // fprintf(stderr, " return current_min = %d of current entity %s", 
-  //  current_min, entity_name(current_entity));
+  ifdebug(4)
+    fprintf(stderr, " return current_min = %d of current entity %s", 
+	    current_min, entity_name(current_entity));
   current_entity = entity_undefined;
   return current_min;
 }
@@ -681,74 +693,210 @@ static int minimum_ordering(entity a, statement s)
 static bool is_first_written_array_p(entity a, list l, statement s)
 {
   int max = maximum_ordering(a,s);
-  //  fprintf(stderr, " max of %s = %d ", entity_name(a), max);
-  while (!ENDP(l))
-    {
-      entity other = ENTITY(CAR(l));
-      //  if (!same_entity_p(a,other))
-      if (strcmp(entity_name(a),entity_name(other))!=0)
-	{
-	  int min = minimum_ordering(other,s);
-	  //  fprintf(stderr, " min of other %s  = %d ", entity_name(other), min);
-	  if (max >= min) return FALSE;
-	}
-      l = CDR(l);
-    }
+  ifdebug(4)
+    fprintf(stderr, " max of %s = %d ", entity_name(a), max);
+  MAP(ENTITY,other,
+  {
+    if (strcmp(entity_name(a),entity_name(other))!=0)
+      {
+	int min = minimum_ordering(other,s);
+	ifdebug(4)
+	  fprintf(stderr, " min of other %s  = %d ", entity_name(other), min);
+	if (max >= min) return FALSE;
+      }
+  },l);
   return TRUE;
 }
+
+/*
+  - For each write region, find list of statements (down from s) that write on the array
+  - Find order between these written arrays : A <= B <= (C,D,E,F)
+    (A <= B if and only if maximum{statement orderings A} < minimum{statement orderings B})
+  - Apply algorithm for read and write regions on A and then B at this level (tests inserted 
+    before s, tests on A before on B)
+  - Go down to substatement of s for the other unordered arrays (C,D,E,F)*/
 
 static entity find_first_written_array(list l,statement s)
 {
   list l_tmp = gen_full_copy_list(l);
-  while (!ENDP(l_tmp))
-    {
-      entity a = ENTITY(CAR(l_tmp));
-      if (is_first_written_array_p(a,l,s))
-	// gen_free_list(l_tmp);
-	return a;
-      l_tmp = CDR(l_tmp);
-    }
-  // gen_free_list(l_tmp);
+  MAP(ENTITY,a,
+  {
+    if (is_first_written_array_p(a,l,s))
+      return a;
+  },l_tmp);
   return entity_undefined;
 }
 
-static void my_gen_remove(list * pl, entity e)
+static statement test_sequence = statement_undefined;;
+static bool godown = FALSE;
+static list lexp = NIL;
+
+static void top_down_abc_array(entity array, region re,statement s, top_down_abc_context_p context)
 {
-  list * pc = pl;
-  while (*pc)
+  list marked_list = NIL; 
+  list dc_list = NIL;	
+  bool action = region_read_p(re);
+  if (action)
+    marked_list = abc_checked_list(context->read_marked_list);
+  else
+    marked_list = abc_checked_list(context->write_marked_list);
+  MAP(ARRAY_DIMENSION_CHECKED,adc,
   {
-    if (strcmp(entity_name(e),entity_name(ENTITY(CAR(*pc))))==0)
+    if (same_entity_p(array_dimension_checked_array(adc),array))
       {
-	list tmp = *pc;
-	*pc = CDR(*pc);
-	free(tmp);
-	return;
+	dc_list = array_dimension_checked_dims(adc);
+	break;
       }
-    else 
-      pc = &CDR(*pc);
+  },
+      marked_list); 
+  // traverse each dimension
+  while (!ENDP(dc_list))  {	
+    dimension_checked dc = DIMENSION_CHECKED(CAR(dc_list));
+    int i = dimension_checked_dim(dc);
+    Bound_test lower, upper;
+    lower.test = expression_undefined;
+    upper.test = expression_undefined;
+    lower.bound = TRUE;
+    upper.bound = TRUE;
+    
+    /* if we have a region like: <A(PHI)-EXACT-{}>
+     * it means that all *declared* elements are touched, although
+     * this is implicit. this occurs with io effects of "PRINT *, A".
+     * in such a case, the declaration constraints MUST be appended
+     * before the translation, otherwise the result might be false.
+     *
+     * potential bug : if the declaration system cannot be generated,
+     *   the region should be turned to MAY for the translation? */
+    append_declaration_sc_if_exact_without_constraints(re);
+    if (!dimension_checked_upper(dc))
+      {
+	/* The upper bound of the dimension i is not marked TRUE*/
+	upper = top_down_abc_dimension(s,context,re,action,array,i,FALSE);
+	if (!expression_undefined_p(upper.test))
+	  {
+	    statement sta;
+	    test t;
+	    string message = 
+	      strdup(concatenate("\'Bound violation:",
+				 read_or_write(action), " array ",
+				 entity_name(array),
+				 bool_to_bound(FALSE),
+				 int_to_dimension(i),"\'",NULL));
+	    
+	    if (true_expression_p(upper.test))
+	      {
+		/* There is bounds violation ! 
+		   Insert a STOP before s (bug in Examples/perma.f if replace s by STOP*/
+		number_of_bound_violations ++;
+		user_log("\n Bound violation !!! \n");
+		if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
+		  sta  = make_print_statement(message);
+		else
+		  sta  = make_stop_statement(message);
+		// top_down_abc_insert_before_statement(s,sta,context);
+		if (statement_undefined_p(test_sequence))
+		  test_sequence = copy_statement(sta);
+		else 
+		  insert_statement(test_sequence,copy_statement(sta),FALSE);	
+		//return FALSE;  // follow the first strategy
+	      }
+	    // test if expression upper.test exists already in test_sequence
+	    else
+	      if (!same_expression_in_list_p(upper.test,lexp))
+		{
+		  ifdebug(2) 
+		    {	  
+		      fprintf(stderr, "\n The upper test");    
+		      print_expression(upper.test);			 
+		    }
+		  number_of_added_tests++;
+		  lexp = gen_nconc(lexp,CONS(EXPRESSION,upper.test,NIL));
+		  if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
+		    t = make_test(upper.test, 
+				  make_print_statement(message),
+				  make_block_statement(NIL));
+		  else
+		    t = make_test(upper.test, 
+				  make_stop_statement(message),
+				  make_block_statement(NIL));
+		  sta  = test_to_statement(t);
+		  if (statement_undefined_p(test_sequence))
+		    test_sequence = copy_statement(sta);
+		  else 
+		    insert_statement(test_sequence,copy_statement(sta),FALSE);	
+		}
+	  }
+      }
+    if (!dimension_checked_lower(dc))  
+      {
+	/* The lower bound of the dimension i is not marked TRUE*/
+	lower = top_down_abc_dimension(s,context,re,action,array,i,TRUE);	
+	if (!expression_undefined_p(lower.test))
+	  {
+	    statement sta;
+	    test t;
+	    string message = 
+	      strdup(concatenate("\'Bound violation:",
+				 read_or_write(action)," array ",
+				 entity_name(array),
+				 bool_to_bound(TRUE),
+				 int_to_dimension(i),"\'",NULL));
+	    
+	    if (true_expression_p(lower.test))
+	      {
+		/* There is bounds violation ! 
+		   Insert a STOP before s (bug in Examples/perma.f if replace s by STOP*/
+		number_of_bound_violations ++;
+		user_log("\n Bound violation !!! \n");
+		if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
+		  sta =  make_print_statement(message);  
+		else 
+		  sta = make_stop_statement(message);
+		// top_down_abc_insert_before_statement(s,sta,context);
+		if (statement_undefined_p(test_sequence))
+		  test_sequence = copy_statement(sta);
+		else 
+		  /* insert the test after the generated tests, the order of tests
+		     is important */
+		  insert_statement(test_sequence,copy_statement(sta),FALSE);	
+		// return FALSE;  // follow the first strategy
+	      }
+	    else
+	      // test if expression lower.test exists already in test_sequence
+	      if (!same_expression_in_list_p(lower.test,lexp))  
+		{
+		  ifdebug(2) 
+		    {	  
+		      fprintf(stderr, "\n The lower test");    
+		      print_expression(lower.test);			 
+		    }
+		  number_of_added_tests ++;
+		  lexp = gen_nconc(lexp,CONS(EXPRESSION,lower.test,NIL));
+		  if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
+		    t = make_test(lower.test, 
+				  make_print_statement(message),
+				  make_block_statement(NIL));
+		  else 
+		    t = make_test(lower.test, 
+				  make_stop_statement(message),
+				  make_block_statement(NIL));
+		  sta  = test_to_statement(t);
+		  if (statement_undefined_p(test_sequence))
+		    test_sequence = copy_statement(sta);
+		  else 
+		    insert_statement(test_sequence,copy_statement(sta),FALSE);
+		}
+	  }
+      }
+	/* If one bound of the dimension is marked FALSE, 
+	   we have to go down*/
+    if ((!lower.bound) || (!upper.bound)) godown = TRUE;	
+    dc_list = CDR(dc_list);
   }
 }
-	
-static bool top_down_abc_flt(statement s, 
-			     top_down_abc_context_p context)
-{
-  list l_regions = regions_dup(load_statement_local_regions(s));
-  list l_copy = gen_full_copy_list(l_regions);
-  list l_written_arrays = NIL;
-  statement test_sequence = statement_undefined;
-  bool retour = FALSE;
-  list lexp = NIL; 	
-  ifdebug(3) 
-    {	  
-      fprintf(stderr, "\n list of regions ");    
-      print_effects(l_regions);
-      fprintf(stderr, "\n for the statement");    
-      print_statement(s);      
-    }
-  hash_put(context->read_saved_list,s,copy_abc_checked(context->read_marked_list));
-  hash_put(context->write_saved_list,s,copy_abc_checked(context->write_marked_list));
-  /* The current algorithm is false in the case of incorrect code, because regions are 
-     computed with hypotheses that the code is correct. Here is an anti-example:
+
+ /* The old algorithm is false in the case of incorrect code, because regions are 
+     computed with the assumption that the code is correct. Here is an anti-example:
       
      COMMON ITAB(10),J
      REAL A(10)
@@ -766,12 +914,12 @@ C  <A(PHI1)-W-EXACT-{PHI1==J, J==11, 1+M<=I, 1<=I}>
 
       The region for array A can be false if there is a bound violation in ITAB
       for example with M=12, ITAB(11)=1=J, there will be no violation on A but on ITAB. 
-      Based on this false region, the algorithm will tell that there is an overflow on A.
+      Based on this false region, the algorithm will tell that there is a violation on A.
 
-  To keep the safety of the algorithm, we must take into account the order in which 
-  the arrays are writen (overflows on read arrays do not make transformers and array regions false). 
-  If bound checks of ITAB are inserted before checks on A, tests are checked earlier, so the 
-  region of A is not false any more. The tests must be as: 
+  To keep the algorithm safe, we must take into account the order in which 
+  arrays are writen (bound violations on read arrays do not make transformers and array regions false). 
+  If bound checks on ITAB are inserted before checks on A, tests are checked earlier, so the 
+  region of A is not false any more. The tests must be: 
     
      COMMON ITAB(10),J
      REAL A(10)
@@ -786,14 +934,32 @@ C  <A(PHI1)-W-EXACT-{PHI1==J, J==11, 1+M<=I, 1<=I}>
 
   Modify the algorithm: 
   At each statement s, take its list of regions:
-  - For each write region, find list of statements (down from s) that write on the array
-  - Find order between these written arrays : A <= B <= (C,D,E,F)
-  (A <= B if and only if maximum{statement orderings A} < minimum{statement orderings B})
-  - Apply algorithm for read and write regions on A and then B at this level (tests inserted before s, tests on A before on B)
-  - Go down to substatement of s for the other unordered arrays (C,D,E,F) */
+  - If no array is written => apply the algorithm normally
+  - Else 
+     - Find the writing order 
+     - Apply the algorithm for the first written array, and then the second, ... 
+     - If the order is not found at s, go to the substatements of s */
 
-  // Compute the list of written arrays, and then to order them 
-  while (!ENDP(l_copy))
+static bool top_down_abc_flt(statement s,top_down_abc_context_p context)
+{
+  list l_regions = regions_dup(load_statement_local_regions(s));
+  list l_copy = gen_full_copy_list(l_regions);
+  list l_written_arrays = NIL;
+  lexp = NIL; 	
+  test_sequence = statement_undefined;
+  godown = FALSE;
+  ifdebug(3) 
+    {	  
+      fprintf(stderr, "\n list of regions ");    
+      print_effects(l_regions);
+      fprintf(stderr, "\n for the statement");    
+      print_statement(s);      
+    }
+  hash_put(context->read_saved_list,s,copy_abc_checked(context->read_marked_list));
+  hash_put(context->write_saved_list,s,copy_abc_checked(context->write_marked_list));
+
+  /* Compute the list of written arrays */
+  /*  while (!ENDP(l_copy))
     {
       region re = REGION(CAR(l_copy));
       reference ref = region_reference(re);
@@ -806,183 +972,57 @@ C  <A(PHI1)-W-EXACT-{PHI1==J, J==11, 1+M<=I, 1<=I}>
     {
       fprintf(stderr, "\n List of written arrays : \n ");    
       print_list_entities(l_written_arrays);
-    }
-  /* Choose the first written array and then generate checks for the read and write regions 
-     of this array. We can continue the second array only when all dimensions of the written 
-     regions of the first array are checked */
+      }*/
 
-  while (!ENDP(l_written_arrays) && !retour)
+  /* If no array is written */
+  if (ENDP(l_written_arrays))
     {
-      entity first_array = find_first_written_array(l_written_arrays,s);
-      /* if there is no array that is always written before the others, 
-	 we have to go down to substatements of s*/
-      if (entity_undefined_p(first_array)) 
-	retour = TRUE;
-      else {
-      ifdebug(3)
-	{
-	  fprintf(stderr, "\n First array: ");    
-	  fprintf(stderr, "%s ", entity_name(first_array));
-	}
-      my_gen_remove(&l_written_arrays,first_array);
-      // check for the first array here
+      /* check all arrays in l_regions*/
       l_copy = gen_full_copy_list(l_regions);
       while (!ENDP(l_copy))
 	{
 	  region re = REGION(CAR(l_copy));
 	  reference ref = region_reference(re);
 	  entity array = reference_variable(ref); 
-	  //  if (same_entity_p(array,first_array))
-	  if (strcmp(entity_name(array),entity_name(first_array))==0) 
-	    {	  
-	      list marked_list = NIL; 
-	      list dc_list = NIL;	
-	      bool action = region_read_p(re);
-	      if (action)
-		marked_list = abc_checked_list(context->read_marked_list);
-	      else
-		marked_list = abc_checked_list(context->write_marked_list);
-	      MAP(ARRAY_DIMENSION_CHECKED,adc,
-	      {
-		if (same_entity_p(array_dimension_checked_array(adc),array))
-		  {
-		    dc_list = array_dimension_checked_dims(adc);
-		    break;
-		  }
-	      },
-		  marked_list); 
-	      // traverse each dimension
-	      while (!ENDP(dc_list))  {	
-		dimension_checked dc = DIMENSION_CHECKED(CAR(dc_list));
-		int i = dimension_checked_dim(dc);
-		Bound_test lower, upper;
-		lower.test = expression_undefined;
-		upper.test = expression_undefined;
-		lower.bound = TRUE;
-		upper.bound = TRUE;
-		
-		/* if we have a region like: <A(PHI)-EXACT-{}>
-		 * it means that all *declared* elements are touched, although
-		 * this is implicit. this occurs with io effects of "PRINT *, A".
-		 * in such a case, the declaration constraints MUST be appended
-		 * before the translation, otherwise the result might be false.
-		 *
-		 * potential bug : if the declaration system cannot be generated,
-		 *   the region should be turned to MAY for the translation? */
-		append_declaration_sc_if_exact_without_constraints(re);
-		if (!dimension_checked_lower(dc))  
-		  {
-		    /* The lower bound of the dimension i is not marked TRUE*/
-		    lower = top_down_abc_dimension(s,context,re,action,array,i,TRUE);	
-		    if (!expression_undefined_p(lower.test))
-		      {
-			statement sta;
-			test t;
-			string message = 
-			  strdup(concatenate("\"Bound violation:",
-					     read_or_write(action)," array ",
-					     entity_name(array),
-					     bool_to_bound(TRUE),
-					     int_to_dimension(i),"\"",NULL));
-			
-			if (true_expression_p(lower.test))
-			  {
-			    /* There is bounds violation ! 
-			       Insert a STOP before s (bug in Examples/perma.f if replace s by STOP*/
-			    number_of_bound_violations ++;
-			    user_log("\n Bound violation !!! \n");
-			    sta = make_stop_statement(message);
-			    // top_down_abc_insert_before_statement(s,sta,context);
-			    if (statement_undefined_p(test_sequence))
-			      test_sequence = copy_statement(sta);
-			    else 
-			      /* insert the test after hte generated tests, the order of tests
-			         is important */
-			      insert_statement(test_sequence,copy_statement(sta),FALSE);	
-			    // return FALSE;  // follow the first strategy
-			  }
-			else
-			// test if expression lower.test exists already in test_sequence
-			if (!same_expression_in_list_p(lower.test,lexp))  
-			  {
-			    ifdebug(2) 
-			      {	  
-				fprintf(stderr, "\n The lower test");    
-				print_expression(lower.test);			 
-			      }
-			    number_of_added_tests ++;
-			    lexp = gen_nconc(lexp,CONS(EXPRESSION,lower.test,NIL));
-			    t = make_test(lower.test, 
-					  make_stop_statement(message),
-					  make_block_statement(NIL));
-			    sta  = test_to_statement(t);
-			    if (statement_undefined_p(test_sequence))
-			      test_sequence = copy_statement(sta);
-			    else 
-			      insert_statement(test_sequence,copy_statement(sta),FALSE);
-			  }
-		      }
-		  }
-		if (!dimension_checked_upper(dc))
-		  {
-		    /* The upper bound of the dimension i is not marked TRUE*/
-		    upper = top_down_abc_dimension(s,context,re,action,array,i,FALSE);
-		    if (!expression_undefined_p(upper.test))
-		      {
-			statement sta;
-			test t;
-			string message = 
-			  strdup(concatenate("\"Bound violation:",
-					     read_or_write(action), " array ",
-					     entity_name(array),
-					     bool_to_bound(FALSE),
-					     int_to_dimension(i),"\"",NULL));
-			
-			if (true_expression_p(upper.test))
-			  {
-			    /* There is bounds violation ! 
-			       Insert a STOP before s (bug in Examples/perma.f if replace s by STOP*/
-			    number_of_bound_violations ++;
-			    user_log("\n Bound violation !!! \n");
-			    sta  = make_stop_statement(message);
-			    // top_down_abc_insert_before_statement(s,sta,context);
-			    if (statement_undefined_p(test_sequence))
-			      test_sequence = copy_statement(sta);
-			    else 
-			      insert_statement(test_sequence,copy_statement(sta),FALSE);	
-			    //return FALSE;  // follow the first strategy
-			  }
-			// test if expression upper.test exists already in test_sequence
-			else
-			  if (!same_expression_in_list_p(upper.test,lexp))
-			    {
-			      ifdebug(2) 
-				{	  
-				  fprintf(stderr, "\n The upper test");    
-				  print_expression(upper.test);			 
-				}
-			      number_of_added_tests++;
-			      lexp = gen_nconc(lexp,CONS(EXPRESSION,upper.test,NIL));
-			      t = make_test(upper.test, 
-					    make_stop_statement(message),
-					    make_block_statement(NIL));
-			      sta  = test_to_statement(t);
-			      if (statement_undefined_p(test_sequence))
-				test_sequence = copy_statement(sta);
-			      else 
-				insert_statement(test_sequence,copy_statement(sta),FALSE);	
-			    }
-		      }
-		  }
-		/* If one bound of the dimension is marked FALSE, 
-		   we have to go down*/
-		if ((!lower.bound) || (!upper.bound)) retour = TRUE;	
-		dc_list = CDR(dc_list);
-	      }
-	    } 
-	  l_copy = CDR(l_copy);
+	  if (array_reference_p(ref) && array_need_bound_check_p(array))
+	    top_down_abc_array(array,re,s,context);
+	  l_copy = CDR(l_copy); 
 	}
-      }
+    }
+  else 
+    {
+      /* Choose the first written array and then generate checks for the read and write regions 
+	 of this array. We can check the second array only when all dimensions of the written 
+	 regions of the first array are checked */
+      while (!ENDP(l_written_arrays) && !godown)
+	{
+	  entity first_array = find_first_written_array(l_written_arrays,s);
+	  /* if there is no array that is always written before the others, 
+	     we have to go down to substatements of s*/
+	  if (entity_undefined_p(first_array)) 
+	    godown = TRUE;
+	  else 
+	    {
+	      ifdebug(3)
+		{
+		  fprintf(stderr, "\n First array: ");    
+		  fprintf(stderr, "%s ", entity_name(first_array));
+		}
+	      gen_remove_once(&l_written_arrays,first_array);
+	      // check for the first array here
+	      l_copy = gen_full_copy_list(l_regions);
+	      while (!ENDP(l_copy))
+		{
+		  region re = REGION(CAR(l_copy));
+		  reference ref = region_reference(re);
+		  entity array = reference_variable(ref); 
+		  //  if (same_entity_p(array,first_array))
+		  if (strcmp(entity_name(array),entity_name(first_array))==0) 
+		    top_down_abc_array(array,re,s,context);
+		  l_copy = CDR(l_copy);
+		}
+	    }
+	}
     }
   if (!statement_undefined_p(test_sequence))
     {
@@ -991,21 +1031,23 @@ C  <A(PHI1)-W-EXACT-{PHI1==J, J==11, 1+M<=I, 1<=I}>
 	  fprintf(stderr, "\n The sequence of test");    
 	  print_statement(test_sequence);
 	}
-      if (!retour) 
-	// retour = FALSE, insert new tests for the statement s here
+      if (!godown) 
+	// godown = FALSE, insert new tests for the statement s here
 	top_down_abc_insert_before_statement(s,test_sequence,context); 
       else 
 	// insert new tests in function rwt
 	hash_put(context->statement_check_list,s,test_sequence);
     }    
-  if (!retour)
+  if (!godown)
     {
       context->read_marked_list = (abc_checked) hash_get(context->read_saved_list,s); 
       context->write_marked_list = (abc_checked) hash_get(context->write_saved_list,s);
     }
   gen_free_list(l_regions);
   gen_free_list(lexp);
-  return retour;
+  lexp = NIL;
+  test_sequence = statement_undefined;
+  return godown;
 }
 
 static void top_down_abc_rwt(statement s,
@@ -1109,7 +1151,7 @@ bool array_bound_check_top_down(char *module_name)
   module_reorder(module_statement);  
   pips_debug(1, "end\n");
   debug_off();  
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_statement);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE,module_name, module_statement);
   reset_ordering_to_statement();
   reset_current_module_entity();
   reset_current_module_statement();  
