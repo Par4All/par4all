@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/28 10:25:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/12 01:46:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_mchoose[] = "%A% ($Date: 1995/09/28 10:25:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_mchoose[] = "%A% ($Date: 1995/11/12 01:46:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* Multiple choices handling */
@@ -46,12 +46,6 @@ mchoose_ok_notify(Panel_item item,
    int item_is_in_the_list = FALSE;
    char *p;
 
-   hide_window(mchoose_frame);
-
-   /* The OK button becomes inactive through RETURN: */
-   xv_set(mchoose_panel, PANEL_DEFAULT_ITEM, NULL, NULL);
-   xv_set(mchoices, PANEL_NOTIFY_PROC, NULL);
-
    nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, NULL);
    mchoices_length = 0;
 
@@ -91,6 +85,12 @@ mchoose_ok_notify(Panel_item item,
       prompt_user(s);
       return;
    }
+
+   hide_window(mchoose_frame);
+
+   /* The OK button becomes inactive through RETURN: */
+   xv_set(mchoose_panel, PANEL_DEFAULT_ITEM, NULL, NULL);
+   xv_set(mchoices, PANEL_NOTIFY_PROC, NULL);
 
    (*apply_on_mchoices)(&mchoices_length, mchoices_args);
 
