@@ -1,9 +1,11 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/11 21:33:55 $, 
+# $Date: 1996/09/12 08:26:11 $, 
 #
-# this script allow to chose a directory interactively
+# (c) FC September 1996
+#
+# this script allow to chose a directory interactively. 
 #
 # wish is started by sh without its path:-) 
 sed '1,/###/d' $0 | `type wish | sed 's,wish is ,,'` "$@" ; exit
@@ -14,8 +16,9 @@ sed '1,/###/d' $0 | `type wish | sed 's,wish is ,,'` "$@" ; exit
 #
 
 #
-# fills the list listbox 'list' with the directories in 'dir'
-# links are followed...
+# fills the list listbox with directories. links are followed...
+#  - list: the listbox window to be dealt with
+#  - dir: the considered directory
 #
 proc filldirlist { list dir } {
     $list delete 0 end
@@ -28,6 +31,7 @@ proc filldirlist { list dir } {
 	    while {[file type $d] == "link"} {
 		set d [file readlink $d]
 	    }
+	    # then append if is a directory
 	    if {[file isdirectory $d]} {
 		$list insert end $name
 	    }		
@@ -38,7 +42,9 @@ proc filldirlist { list dir } {
 }
 
 #
-# appends newdir to dir with managing especially .. and /
+# appends newdir to dir with managing especially .., / and .
+#  - dir: the current directory
+#  - newdir: the incremental adjuntion to be appended
 #
 proc appenddir { dir newdir } {
     if {$newdir != ".."} {
@@ -62,7 +68,11 @@ proc appenddir { dir newdir } {
 }
 
 #
-# scrolls the entry so that the end can is displayed
+# scrolls the entry so that the end is displayed
+#  - entry: the entry window to be dealt with
+#
+# ??? its quite approximative because the width is fixed but the
+#     real # of characters depends on the (not) chosen font.
 #
 proc seeentryend { entry } {
     set i [$entry index end]
@@ -76,10 +86,13 @@ proc seeentryend { entry } {
 
 #
 # interactive directory choice.
+#  - root: root of the window to create ("" for main window)
+#  - currentdir: default startpoint (may be absolute or relative)
 #
 proc changedir { root currentdir } {
     #
     # the global local variables:-)
+    #
     global changedir_result changedir_dir changedir_root changedir_home
 
     set changedir_dir  $currentdir
@@ -88,6 +101,7 @@ proc changedir { root currentdir } {
 
     #
     # creates the window if needed
+    #
     if {$root == ""} {
 	wm title . "Change Directory"
     } else {
@@ -97,6 +111,7 @@ proc changedir { root currentdir } {
 
     #
     # top buttons: "/" "Home" "Ok" "Quit"
+    #
     frame $root.top 
     button $root.top.root -text "/" -command {
 	set changedir_dir / 
@@ -121,37 +136,41 @@ proc changedir { root currentdir } {
     }
     pack $root.top.root $root.top.home $root.top.okay $root.top.quit \
 	-side left -expand 1 -fill x \
-	-padx 1m -pady 1m -ipadx 1m -ipady 1m
+	-padx 1m -pady 1m -ipadx 2 -ipady 2
 
     #
-    # Direct entry in the middle 
+    # direct entry in the middle 
+    #
     frame $root.direct
     label $root.direct.lab -text "Directory: "
     entry $root.direct.entry -width 30 -relief sunken \
 	-textvariable changedir_dir 
     bind  $root.direct.entry <Return> "$root.top.okay invoke"
     pack  $root.direct.lab $root.direct.entry -side left \
-	-padx 1m -pady 1m -ipadx 1m -ipady 1m
+	-padx 1m -pady 1m -ipadx 2 -ipady 2
 
     #
     # choice from the list
+    #
     frame $root.list
     listbox $root.list.dirs -relief raised -bd 2 \
 	-yscrollcommand "$root.list.scroll set"
     scrollbar $root.list.scroll -command "$root.list.dirs yview"
     bind $root.list.dirs <Double-1> { 
-	set newdir [$changedir_root.list.dirs \
-	    get [$changedir_root.list.dirs curselection ]]
+	# update dir according to the clicked item
+	set newdir [%W get [%W curselection ]]
 	set changedir_dir [appenddir $changedir_dir $newdir]
-	filldirlist $changedir_root.list.dirs $changedir_dir
+	# update display
+	filldirlist %W $changedir_dir
         seeentryend $changedir_root.direct.entry
     }
     pack $root.list.dirs -side left -fill both -expand true \
-	-padx 1m -pady 1m -ipadx 1m -ipady 1m
-    pack $root.list.scroll -side left -fill both \
-	-padx 1m -pady 1m 
+	-padx 1m -pady 1m -ipadx 2 -ipady 2
+    pack $root.list.scroll -side left -fill both -padx 1m -pady 1m 
 
+    #
     # full window
+    #
     pack $root.top $root.direct $root.list -fill both
     filldirlist $root.list.dirs $changedir_dir
     seeentryend $changedir_root.direct.entry
@@ -172,7 +191,9 @@ proc changedir { root currentdir } {
 }
 
 #
-# first 
+# default startpoint directory is .
+# may be specifyed by invoking "$RCSfile: Wchangedir,v $ -- some/directory"
+#
 
 if {$argc == 0} {
     set dir .
@@ -180,4 +201,10 @@ if {$argc == 0} {
     set dir [lindex $argv 0]
 }
 
+#
+# print out the result
+#
 puts [changedir "" $dir ]
+
+# end of $RCSfile: Wchangedir,v $
+#
