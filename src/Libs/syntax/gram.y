@@ -56,6 +56,9 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.64  2002/06/27 15:01:39  irigoin
+  * Bug fix in MakeDataValueSet() to deal with complex constant in DATA statements
+  *
   * Revision 1.63  2002/06/21 13:48:42  irigoin
   * Complexification of DATA handling. The repeat function is no longer
   * systematically called when the repeat factor is 1.
@@ -236,7 +239,9 @@ static expression MakeDataValueSet(expression n, expression c)
 
     vc = EvalExpression(c);
     if (! value_constant_p(vc)) {
-      ParserError("MakeDataValueSet", "data value must be a constant\n");
+      if(!complex_constant_expression_p(c)) {
+	ParserError("MakeDataValueSet", "data value must be a constant\n");
+      }
     }
 
     if(expression_undefined_p(n)) {
