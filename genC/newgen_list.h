@@ -14,6 +14,10 @@
 
 */
 
+/* $RCSfile: newgen_list.h,v $ ($Date: 1995/02/16 10:03:43 $, )
+ * version $Revision$
+ * got on %D%, %T%
+ */
 
 #ifndef LIST_INCLUDED
 #define LIST_INCLUDED
@@ -75,6 +79,8 @@ extern cons *gen_concatenate GEN_PROTO(( cons *, cons * )) ;
 extern void gen_copy GEN_PROTO(( gen_chunk *, gen_chunk *)) ;
 extern cons *gen_copy_seq GEN_PROTO(( cons * )) ;
 extern int gen_eq GEN_PROTO(( gen_chunk *, gen_chunk * )) ;
+extern gen_chunk *gen_car GEN_PROTO((list));
+extern gen_chunk *gen_identity GEN_PROTO((gen_chunk*));
 extern gen_chunk *gen_find GEN_PROTO((gen_chunk *, cons *, 
 				  bool (*)(), gen_chunk *(*)() )) ;
 extern gen_chunk *gen_find_from_end GEN_PROTO((gen_chunk *, cons *, 
@@ -90,8 +96,8 @@ extern void gen_free_list GEN_PROTO(( cons *)) ;
 extern cons *gen_last GEN_PROTO(( cons * )) ;
 extern int gen_length GEN_PROTO(( cons * )) ;
 extern void gen_map GEN_PROTO(( void (*)(), list )) ;
-extern void gen_mapc_tabulated GEN_PROTO(( void (*)(), int )) ;
 extern void gen_mapl GEN_PROTO(( void (*)(), cons * )) ;
+extern void gen_mapc_tabulated GEN_PROTO(( void (*)(), int )) ;
 extern cons *gen_nconc GEN_PROTO(( cons *, cons * )) ;
 extern cons *gen_nreverse GEN_PROTO(( cons * )) ;
 extern gen_chunk gen_nth GEN_PROTO(( int, list )) ;
