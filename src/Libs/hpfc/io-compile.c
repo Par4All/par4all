@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/03/15 13:57:12 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/03/18 08:45:52 $, )
  * version $Revision$
  */
 
@@ -22,7 +22,7 @@
 
 /************************************************* IO EFFICIENT COMPILATION */
 
-Psysteme 
+static Psysteme 
 statement_context(
     statement stat,
     tag move)
@@ -31,102 +31,6 @@ statement_context(
 			    ((movement_collect_p(move)) ? 
 			     load_statement_precondition(stat) :
 			     load_statement_postcondition(stat))); 
-}
-
-/*   compile an io statement
- */
-void 
-io_efficient_compile(
-    statement stat, /* statement to compile */
-    statement *hp,  /* returned Host code */
-    statement *np)  /* returned Node code */ 
-{
-    list
-	/* of effect */ entities = load_statement_local_regions(stat),
-	lh_collect = NIL, lh_io = NIL, lh_update = NIL,
-	ln_collect = NIL, ln_io = NIL, ln_update = NIL;
-    statement sh, sn;
-
-    debug_on("HPFC_IO_DEBUG_LEVEL");
-    pips_debug(1, "compiling!\n");
-    pips_debug(2, "statement 0x%x, %d arrays\n", (unsigned int) stat, 
-	       gen_length(entities));
-
-    MAP(EFFECT, e,
-    {
-	entity array = reference_variable(effect_reference(e));
-	action act = effect_action(e);
-	approximation apr = effect_approximation(e);
-	
-	pips_debug(3, "array %s\n", entity_name(array));
-	
-	pips_assert("avoid replicated array I/O", /* not implemented */
-		    !(array_distributed_p(array) && replicated_p(array)));
-	
-	if ((!array_distributed_p(array)) && action_read_p(act)) 
-	{
-	    pips_debug(7, "skipping array %s movements - none needed\n", 
-		       entity_name(array));
-	    continue;
-	}
-	
-	/* add array declaration on host if necessary
-	 */
-	if (array_distributed_p(array) && !bound_new_host_p(array))
-	    store_new_host_variable(AddEntityToModule(array, host_module), 
-				    array);
-	
-	/* collect data if necessary
-	 */
-	if (array_distributed_p(array) && 
-	    (action_read_p(act) || 
-	     (action_write_p(act) && 
-	      approximation_may_p(apr) && 
-	      !get_bool_property("HPFC_IGNORE_MAY_IN_IO"))))
-	{
-	    generate_io_collect_or_update(array, stat, 
-					  is_movement_collect, 
-					  action_tag(act), &sh, &sn);
-	    lh_collect = CONS(STATEMENT, sh, lh_collect);
-	    ln_collect = CONS(STATEMENT, sn, ln_collect);
-	}
-	
-	/* update data if necessary
-	 */
-	if (action_write_p(act))
-	{
-	    generate_io_collect_or_update(array, stat, 
-					  is_movement_update, 
-					   action_tag(act), &sh, &sn);
-	    lh_update = CONS(STATEMENT, sh, lh_update);
-	    ln_update = CONS(STATEMENT, sn, ln_update);
-	}
-    },
-	entities);
-
-    lh_io =  CONS(STATEMENT, copy_statement(stat), NIL);
-    
-    if (get_bool_property("HPFC_SYNCHRONIZE_IO"))
-    {
-	/* could do it only for write statements
-	 */
-	entity synchro = hpfc_name_to_entity(SYNCHRO);
-	
-	lh_io = CONS(STATEMENT, hpfc_make_call_statement(synchro, NIL), lh_io);
-	ln_io = CONS(STATEMENT, hpfc_make_call_statement(synchro, NIL), ln_io);
-    }
-
-    *hp = make_block_statement(gen_nconc(lh_collect,
-			       gen_nconc(lh_io,
-			                 lh_update)));
-    *np = make_block_statement(gen_nconc(ln_collect,
-			       gen_nconc(ln_io,
-					 ln_update)));
-
-    DEBUG_STAT(9, "Host", *hp);
-    DEBUG_STAT(9, "Node", *np);
-
-    debug_off();
 }
 
 void
@@ -141,139 +45,6 @@ hpfc_algorithm_row_echelon(
     base_rm(base);
 }
 
-void 
-generate_io_collect_or_update(
-    entity array,
-    statement stat,
-    tag move, 
-    tag act,
-    statement *psh,
-    statement *psn)
-{
-    Psysteme syst = generate_io_system(array, stat, move, act);
-    set_information_for_code_optimizations(syst);
-
-    pips_assert("variable and syst",
-		entity_variable_p(array) && syst!=SC_UNDEFINED);
-
-    if (array_distributed_p(array))
-    {
-	/* SCANNING: Variables must be classified as:
-	 *   - parameters 
-	 *   - processors
-	 *   - scanner
-	 *   - deducable
-	 */
-	Psysteme proc_echelon, tile_echelon, condition;
-	list parameters = NIL, processors = NIL, scanners = NIL, rebuild = NIL;
-
-	/* Now we have a set of equations and inequations, and we are going
-	 * to organise a scanning of the data and the communications that 
-	 * are needed
-	 */
-	put_variables_in_ordered_lists
-	    (&syst, array, &parameters, &processors, &scanners, &rebuild); 
-
-	hpfc_algorithm_tiling(syst, processors, scanners, 
-			      &condition, &proc_echelon, &tile_echelon);
-	hpfc_simplify_condition(&condition, stat, move);
-
-	/*  the sorting is done again at the code generation,
-	 *  but this phase will ensure more determinism in the debug messages
-	 */
-	sc_vect_sort(condition, compare_Pvecteur);
-	sc_vect_sort(proc_echelon, compare_Pvecteur);
-	sc_vect_sort(tile_echelon, compare_Pvecteur);
-
-	if (!sc_empty_p(proc_echelon) && !sc_empty_p(tile_echelon))
-	{
-	    generate_io_statements_for_distributed_arrays
-		(array, move, 
-		 condition, proc_echelon, tile_echelon,
-		 parameters, processors, scanners, rebuild,
-		 psh, psn);
-	}
-	else
-	{
-	    hpfc_warning("empty io for %s\n", entity_name(array));
-	    *psh = make_continue_statement(entity_undefined);
-	    *psn = make_continue_statement(entity_undefined);
-	}
-    }
-    else
-    {
-	Psysteme row_echelon = SC_UNDEFINED, condition = SC_UNDEFINED;
-	list tmp = NIL, parameters = NIL, scanners = NIL, rebuild = NIL;
-
-	pips_assert("update", movement_update_p(move));
-
-	put_variables_in_ordered_lists
-	    (&syst, array, &parameters, &tmp, &scanners, &rebuild);
-
-	pips_assert("empty list", ENDP(tmp));
-
-	hpfc_algorithm_row_echelon(syst, scanners, &condition, &row_echelon);
-	hpfc_simplify_condition(&condition, stat, move);
-
-	/*  the sorting is done again at the code generation,
-	 *  but this phase will ensure more determinism in the debug messages
-	 */
-	sc_vect_sort(condition, compare_Pvecteur);
-	sc_vect_sort(row_echelon, compare_Pvecteur);
-
-	if (!sc_empty_p(row_echelon))
-	{
-	    generate_io_statements_for_shared_arrays
-		(array, move,
-		 condition, row_echelon,
-		 parameters, scanners, rebuild,
-		 psh, psn);
-	}
-	else
-	{
-	    hpfc_warning("empty io for %s\n", entity_name(array));
-	    *psh = make_continue_statement(entity_undefined);
-	    *psn = make_continue_statement(entity_undefined);
-	}
-    }
-
-    reset_information_for_code_optimizations();
-
-    DEBUG_STAT(8, "Host", *psh);
-    DEBUG_STAT(8, "Node", *psn);
-}
-
-/* generates the Psystem for IOs inside the statement stat,
- * that use entity ent which should be a variable.
- */
-Psysteme 
-generate_io_system(
-    entity array,
-    statement stat,
-    tag move,
-    tag act)
-{
-    Psysteme result = SC_UNDEFINED;
-
-    pips_assert("variable", entity_variable_p(array));
-
-    if (array_distributed_p(array))
-    {
-	result = generate_distributed_io_system(array, stat, move, act);
-	result = clean_distributed_io_system(result, array, move);
-    }
-    else
-    {
-	result = generate_shared_io_system(array, stat, move, act);
-	result = clean_shared_io_system(result, array, move);
-    }
-
-    sc_vect_sort(result, compare_Pvecteur);
-
-    DEBUG_SYST(2, concatenate("array ", entity_name(array), NULL), result);
-
-    return result;
-}
 
 list /* of entity */
 make_list_of_dummy_variables(
@@ -288,7 +59,7 @@ make_list_of_dummy_variables(
     return result;
 }
 
-Psysteme 
+static Psysteme 
 generate_shared_io_system(
     entity array,
     statement stat,
@@ -329,7 +100,8 @@ generate_shared_io_system(
     return result;
 }
 
-Psysteme generate_distributed_io_system(
+static Psysteme 
+generate_distributed_io_system(
     entity array,
     statement stat,
     tag move, 
@@ -416,7 +188,7 @@ remove_variables_if_possible(
     gen_free_list(*plvars), *plvars=kept;
 }
 
-Psysteme
+static Psysteme
 clean_shared_io_system(
     Psysteme syst,
     entity array,
@@ -504,7 +276,7 @@ clean_the_system(
     base_rm(sc_base(*ps)), sc_base(*ps) = BASE_NULLE, sc_creer_base(*ps);
 }
 
-Psysteme 
+static Psysteme 
 clean_distributed_io_system(
     Psysteme syst, /* system to be cleaned */
     entity array,  /* io on array */
@@ -561,8 +333,12 @@ clean_distributed_io_system(
 	string s = entity_module_name(e);
 	
 	if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
-	    /* keep = CONS(ENTITY, e, keep); */
-	    try_remove = CONS(ENTITY, e, try_remove);
+	    keep = CONS(ENTITY, e, keep);
+	/* should try to remove only variables that can be eliminated
+	 * using the preconditions. Otherwise: ph1=old, 1<=old<=2,
+	 * projecting old loses the right dimension...
+	 */
+	/* try_remove = CONS(ENTITY, e, try_remove); */
     },
 	try_remove);
 
@@ -589,13 +365,7 @@ clean_distributed_io_system(
     return(syst);
 }
 
-/* void put_variables_in_ordered_lists
- * Psysteme syst;
- * entity array;
- * entities* plparam, plproc, plscan;
- * expression* plrebuild;
- *
- * Variables of Psysteme syst are ordered and put in different
+/* Variables of Psysteme syst are ordered and put in different
  * lists. Especially, deducable variables are listed, the equalities
  * that allow to rebuild them are also listed, and they are removed
  * from the original system by *exact* integer projection.
@@ -603,7 +373,7 @@ clean_distributed_io_system(
  * Other variables are (should be) the parameters, the processors,
  * and the variables to be used to scan polyhedron.
  */
-void 
+static void 
 put_variables_in_ordered_lists(
     Psysteme *psyst,
     entity array,
@@ -885,6 +655,236 @@ hpfc_simplify_condition(
 	cleared = extract_nredund_subsystem(*psc, true);
 
     *psc = (sc_rm(*psc), cleared);
+}
+
+/* generates the Psystem for IOs inside the statement stat,
+ * that use entity ent which should be a variable.
+ */
+static Psysteme 
+generate_io_system(
+    entity array,
+    statement stat,
+    tag move,
+    tag act)
+{
+    Psysteme result = SC_UNDEFINED;
+
+    pips_assert("variable", entity_variable_p(array));
+
+    if (array_distributed_p(array))
+    {
+	result = generate_distributed_io_system(array, stat, move, act);
+	result = clean_distributed_io_system(result, array, move);
+    }
+    else
+    {
+	result = generate_shared_io_system(array, stat, move, act);
+	result = clean_shared_io_system(result, array, move);
+    }
+
+    sc_vect_sort(result, compare_Pvecteur);
+
+    DEBUG_SYST(2, concatenate("array ", entity_name(array), NULL), result);
+
+    return result;
+}
+
+static void 
+generate_io_collect_or_update(
+    entity array,
+    statement stat,
+    tag move, 
+    tag act,
+    statement *psh,
+    statement *psn)
+{
+    Psysteme syst = generate_io_system(array, stat, move, act);
+    set_information_for_code_optimizations(syst);
+
+    pips_assert("variable and syst",
+		entity_variable_p(array) && syst!=SC_UNDEFINED);
+
+    if (array_distributed_p(array))
+    {
+	/* SCANNING: Variables must be classified as:
+	 *   - parameters 
+	 *   - processors
+	 *   - scanner
+	 *   - deducable
+	 */
+	Psysteme proc_echelon, tile_echelon, condition;
+	list parameters = NIL, processors = NIL, scanners = NIL, rebuild = NIL;
+
+	/* Now we have a set of equations and inequations, and we are going
+	 * to organise a scanning of the data and the communications that 
+	 * are needed
+	 */
+	put_variables_in_ordered_lists
+	    (&syst, array, &parameters, &processors, &scanners, &rebuild); 
+
+	hpfc_algorithm_tiling(syst, processors, scanners, 
+			      &condition, &proc_echelon, &tile_echelon);
+	hpfc_simplify_condition(&condition, stat, move);
+
+	/*  the sorting is done again at the code generation,
+	 *  but this phase will ensure more determinism in the debug messages
+	 */
+	sc_vect_sort(condition, compare_Pvecteur);
+	sc_vect_sort(proc_echelon, compare_Pvecteur);
+	sc_vect_sort(tile_echelon, compare_Pvecteur);
+
+	if (!sc_empty_p(proc_echelon) && !sc_empty_p(tile_echelon))
+	{
+	    generate_io_statements_for_distributed_arrays
+		(array, move, 
+		 condition, proc_echelon, tile_echelon,
+		 parameters, processors, scanners, rebuild,
+		 psh, psn);
+	}
+	else
+	{
+	    hpfc_warning("empty io for %s\n", entity_name(array));
+	    *psh = make_continue_statement(entity_undefined);
+	    *psn = make_continue_statement(entity_undefined);
+	}
+    }
+    else
+    {
+	Psysteme row_echelon = SC_UNDEFINED, condition = SC_UNDEFINED;
+	list tmp = NIL, parameters = NIL, scanners = NIL, rebuild = NIL;
+
+	pips_assert("update", movement_update_p(move));
+
+	put_variables_in_ordered_lists
+	    (&syst, array, &parameters, &tmp, &scanners, &rebuild);
+
+	pips_assert("empty list", ENDP(tmp));
+
+	hpfc_algorithm_row_echelon(syst, scanners, &condition, &row_echelon);
+	hpfc_simplify_condition(&condition, stat, move);
+
+	/*  the sorting is done again at the code generation,
+	 *  but this phase will ensure more determinism in the debug messages
+	 */
+	sc_vect_sort(condition, compare_Pvecteur);
+	sc_vect_sort(row_echelon, compare_Pvecteur);
+
+	if (!sc_empty_p(row_echelon))
+	{
+	    generate_io_statements_for_shared_arrays
+		(array, move,
+		 condition, row_echelon,
+		 parameters, scanners, rebuild,
+		 psh, psn);
+	}
+	else
+	{
+	    hpfc_warning("empty io for %s\n", entity_name(array));
+	    *psh = make_continue_statement(entity_undefined);
+	    *psn = make_continue_statement(entity_undefined);
+	}
+    }
+
+    reset_information_for_code_optimizations();
+
+    DEBUG_STAT(8, "Host", *psh);
+    DEBUG_STAT(8, "Node", *psn);
+}
+
+/*   compile an io statement
+ */
+void 
+io_efficient_compile(
+    statement stat, /* statement to compile */
+    statement *hp,  /* returned Host code */
+    statement *np)  /* returned Node code */ 
+{
+    list
+	/* of effect */ entities = load_statement_local_regions(stat),
+	lh_collect = NIL, lh_io = NIL, lh_update = NIL,
+	ln_collect = NIL, ln_io = NIL, ln_update = NIL;
+    statement sh, sn;
+
+    debug_on("HPFC_IO_DEBUG_LEVEL");
+    pips_debug(1, "compiling!\n");
+    pips_debug(2, "statement 0x%x, %d arrays\n", (unsigned int) stat, 
+	       gen_length(entities));
+
+    MAP(EFFECT, e,
+    {
+	entity array = reference_variable(effect_reference(e));
+	action act = effect_action(e);
+	approximation apr = effect_approximation(e);
+	
+	pips_debug(3, "array %s\n", entity_name(array));
+	
+	pips_assert("avoid replicated array I/O", /* not implemented */
+		    !(array_distributed_p(array) && replicated_p(array)));
+	
+	if ((!array_distributed_p(array)) && action_read_p(act)) 
+	{
+	    pips_debug(7, "skipping array %s movements - none needed\n", 
+		       entity_name(array));
+	    continue;
+	}
+	
+	/* add array declaration on host if necessary
+	 */
+	if (array_distributed_p(array) && !bound_new_host_p(array))
+	    store_new_host_variable(AddEntityToModule(array, host_module), 
+				    array);
+	
+	/* collect data if necessary
+	 */
+	if (array_distributed_p(array) && 
+	    (action_read_p(act) || 
+	     (action_write_p(act) && 
+	      approximation_may_p(apr) && 
+	      !get_bool_property("HPFC_IGNORE_MAY_IN_IO"))))
+	{
+	    generate_io_collect_or_update(array, stat, 
+					  is_movement_collect, 
+					  action_tag(act), &sh, &sn);
+	    lh_collect = CONS(STATEMENT, sh, lh_collect);
+	    ln_collect = CONS(STATEMENT, sn, ln_collect);
+	}
+	
+	/* update data if necessary
+	 */
+	if (action_write_p(act))
+	{
+	    generate_io_collect_or_update(array, stat, 
+					  is_movement_update, 
+					   action_tag(act), &sh, &sn);
+	    lh_update = CONS(STATEMENT, sh, lh_update);
+	    ln_update = CONS(STATEMENT, sn, ln_update);
+	}
+    },
+	entities);
+
+    lh_io =  CONS(STATEMENT, copy_statement(stat), NIL);
+    
+    if (get_bool_property("HPFC_SYNCHRONIZE_IO"))
+    {
+	/* could do it only for write statements
+	 */
+	entity synchro = hpfc_name_to_entity(SYNCHRO);
+	
+	lh_io = CONS(STATEMENT, hpfc_make_call_statement(synchro, NIL), lh_io);
+	ln_io = CONS(STATEMENT, hpfc_make_call_statement(synchro, NIL), ln_io);
+    }
+
+    *hp = make_block_statement(gen_nconc(lh_collect,
+			       gen_nconc(lh_io,
+			                 lh_update)));
+    *np = make_block_statement(gen_nconc(ln_collect,
+			       gen_nconc(ln_io,
+					 ln_update)));
+
+    DEBUG_STAT(9, "Host", *hp);
+    DEBUG_STAT(9, "Node", *np);
+
+    debug_off();
 }
 
 /* that is all
