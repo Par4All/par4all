@@ -1,0 +1,149 @@
+#! /bin/sh
+#
+# $RCSfile: Wchangedir,v $ (version $Revision$)
+# $Date: 1996/09/11 11:07:33 $, 
+#
+# this script allow to chose a directory in interactively
+#
+# wish is started by sh without its path:-) 
+sed '1,/###/d' $0 | `type wish | sed 's,wish is ,,'` ; exit
+#
+###
+#
+# Wish script
+#
+
+#
+# fills the list listbox 'list' with the directories in 'dir'
+# links are followed...
+#
+proc filldirlist { list dir } {
+    $list delete 0 end
+    set pwd [pwd]
+    cd $dir
+    if {$dir != "/"} {
+	$list insert end ".."
+    }
+    foreach d [lsort [glob *]] {
+	if {[file readable $d]} {
+	    set name $d
+	    # follows link...
+	    while {[file type $d] == "link"} {
+		set d [file readlink $d]
+	    }
+	    if {[file isdirectory $d]} {
+		$list insert end $name
+	    }		
+	}
+    }
+    cd $pwd
+    $list select clear
+}
+
+#
+# appends newdir to dir with managing especially ..
+#
+proc appenddir { dir newdir } {
+    if {$newdir != ".."} {
+	return $dir/$newdir
+    } else {
+	set ldir [split $dir /]
+	set len [llength $ldir]
+	set last [lindex $ldir [expr $len-1]]
+	if {($last != "..") && ($last != ".") } {
+	    set ldir [lrange $ldir 0 [expr $len-2]]
+	} else {
+	    lappend ldir $newdir
+	}
+	return [join $ldir /]
+    }
+}
+
+#
+# interactive directory choice.
+#
+proc changedir { root currentdir } {
+    # the global local variables:-)
+    global changedir_result changedir_dir changedir_root changedir_home
+
+    set changedir_dir  $currentdir
+    set changedir_root $root
+    set changedir_home $currentdir
+
+    # creates the window if needed
+    if {$root == ""} {
+	wm title . "Change Directory"
+    } else {
+	toplevel $root
+	wm title $root "Change Directory"
+    }
+
+    # top buttons: "/" "." "Ok" "Quit"
+    frame $root.top 
+    button $root.top.root -text "/" -bd 3 -command {
+	set changedir_dir /; 
+	filldirlist $changedir_root.list.dirs $changedir_dir
+    }
+    button $root.top.home -bd 3 -text "Home" -command {
+	set changedir_dir "."; 
+	filldirlist $changedir_root.list.dirs $changedir_dir
+    }
+    button $root.top.okay -bd 3 -text "Ok" -command {
+	set changedir_result $changedir_dir
+        if {$changedir_root == ""} {
+	    puts $changedir_result
+	    exit
+	} 
+    }
+    button $root.top.quit -bd 3 -text "Quit" -command {
+	set changedir_dir $changedir_home
+	$changedir_root.top.okay invoke
+    }
+    pack $root.top.root $root.top.home $root.top.okay $root.top.quit \
+	-side left -expand 1 -fill x \
+	-padx 1m -pady 1m -ipadx 1m -ipady 1m
+
+    # Direct entry in the middle 
+    frame $root.direct
+    label $root.direct.lab -text "Directory: "
+    entry $root.direct.entry -bd 3 -width 30 -relief sunken \
+	-textvariable changedir_dir 
+    bind  $root.direct.entry <Return> "$root.top.okay invoke"
+    pack  $root.direct.lab $root.direct.entry -side left \
+	-padx 1m -pady 1m -ipadx 1m -ipady 1m
+
+    # choice from the list
+    frame $root.list
+    listbox $root.list.dirs -relief raised -bd 2 \
+	-yscrollcommand "$root.list.scroll set"
+    scrollbar $root.list.scroll -command "$root.list.dirs yview"
+    bind $root.list.dirs <Double-1> { 
+	set newdir [$changedir_root.list.dirs \
+	    get [$changedir_root.list.dirs curselection ]]
+	set changedir_dir [appenddir $changedir_dir $newdir]
+	filldirlist $changedir_root.list.dirs $changedir_dir
+    }
+    pack $root.list.dirs -side left -fill both -expand true \
+	-padx 1m -pady 1m -ipadx 1m -ipady 1m
+    pack $root.list.scroll -side left -fill both \
+	-padx 1m -pady 1m 
+
+    # full window
+    pack $root.top $root.direct $root.list -fill both
+    filldirlist $root.list.dirs $changedir_dir
+
+    if {$root != ""} {
+	# focus and interaction...
+	set old [focus]
+	grab set $root
+	focus $root
+    }
+  
+    # waits for changedir_result to be set, the returns...
+    tkwait variable changedir_result
+    destroy $root
+    focus $old
+    return $changedir_result
+}
+
+puts [changedir "" . ]
