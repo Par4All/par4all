@@ -108,9 +108,8 @@ enode *new_enode(enode_type type,int size,int pos) {
   res->pos = pos;
   for(i=0; i<size; i++) {
     value_init(res->arr[i].d);
-    value_init(res->arr[i].x.n);
     value_set_si(res->arr[i].d,0);
-    value_set_si(res->arr[i].x.n,0);
+    res->arr[i].x.p = 0;
   }
   return res;
 } /* new_enode */
@@ -157,8 +156,10 @@ enode *ecopy(enode *e) {
     value_assign(res->arr[i].d,e->arr[i].d);
     if(value_zero_p(res->arr[i].d))
       res->arr[i].x.p = ecopy(e->arr[i].x.p);
-    else
+    else {
+      value_init(res->arr[i].x.n);
       value_assign(res->arr[i].x.n,e->arr[i].x.n);
+    }
   }
   return(res);
 } /* ecopy */
@@ -360,6 +361,7 @@ static void emul (evalue *e1,evalue *e2,evalue *res) {
     value_init(g);
     if (value_notzero_p(e1->d)) {
     
+	value_init(res->x.n);
         /* Product of two rational numbers */
         value_multiply(res->d,e1->d,e2->d);
         value_multiply(res->x.n,e1->x.n,e2->x.n );
@@ -519,6 +521,7 @@ void edot(enode *v1,enode *v2,evalue *res) {
     }
     if (v1->size<=0) {
         value_set_si(res->d,1);	/* set result to 0/1 */
+	value_init(res->x.n);
         value_set_si(res->x.n,0);
         return;
     }
@@ -1235,6 +1238,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   if(nb_param==0) {
     res=new_enode(polynomial,1,0);
     value_set_si(res->arr[0].d,1);
+    value_init(res->arr[0].x.n);
     count_points(1,L,context,&res->arr[0].x.n);
     return res;
   }
@@ -1452,6 +1456,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
 	/* call count */
 	/* count can only be called when the context is fully specified */
 	value_set_si(B->arr[i].d,1);
+	value_init(B->arr[i].x.n);
 	count_points(1,L,context,&B->arr[i].x.n);
 	
 #ifdef EDEBUG3
@@ -1558,6 +1563,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       for (j=0; j<rank; j++) {
 	Gcd(A->p[i][i+1],A->p[i][j+1+hdim],&g);
 	value_division(C->arr[j].d,A->p[i][i+1],g);
+	value_init(C->arr[j].x.n);
 	value_division(C->arr[j].x.n,A->p[i][j+1+hdim],g);
       }
       
@@ -1763,11 +1769,13 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
   if (emptyQ(P)) {
     res->EP.x.p = new_enode(polynomial,1,0);;
     value_set_si(res->EP.x.p->arr[0].d, 1);
+    value_init(res->EP.x.p->arr[0].x.n);
     value_set_si(res->EP.x.p->arr[0].x.n, 0);
   } else if (!L) {
     /* Non-empty zero-dimensional domain */
     res->EP.x.p = new_enode(polynomial,1,0);;
     value_set_si(res->EP.x.p->arr[0].d, 1);
+    value_init(res->EP.x.p->arr[0].x.n);
     value_set_si(res->EP.x.p->arr[0].x.n, 1);
   } else {
     CATCH(overflow_error) {

@@ -476,6 +476,7 @@ Value g,m1,m2;
 	               for(i=0;i<p;i++)  {
 		              value_assign(ne->x.p->arr[i].d, res->x.p->arr[i%y].d);
 		              if (value_notzero_p(ne->x.p->arr[i].d))   {
+			    value_init(ne->x.p->arr[i].x.n);
 			    value_assign(ne->x.p->arr[i].x.n, res->x.p->arr[i%y].x.n);
 		              }
 		              else { 
