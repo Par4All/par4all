@@ -10,6 +10,10 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.56  2001/07/13 15:02:58  irigoin
+  * Restructured version with separate processing of loops and
+  * expressions. Multitype version.
+  *
   * Revision 1.55  2001/02/07 18:14:21  irigoin
   * New C format + support for recomputing loop fixpoints with precondition information
   *
@@ -75,7 +79,7 @@ extern Psysteme sc_projection_by_eq(Psysteme sc, Pcontrainte eq, Variable v);
 
 transformer effects_to_transformer(list e) /* list of effects */
 {
-  /* algorithm: keep only write effects on integer scalar variable */
+  /* algorithm: keep only write effects on variables with values */
   list args = NIL;
   Pbase b = VECTEUR_NUL;
   Psysteme s = sc_new();
@@ -103,7 +107,7 @@ transformer effects_to_transformer(list e) /* list of effects */
 
 transformer filter_transformer(transformer t, list e) 
 {
-  /* algorithm: keep only information about integer scalar variables
+  /* algorithm: keep only information about scalar variables with values
    * appearing in effects e and store it into a newly allocated transformer
    */
   Pbase b = VECTEUR_NUL;
@@ -236,7 +240,7 @@ unstructured_to_transformer(unstructured u, list e) /* effects */
 list 
 effects_to_arguments(list fx) /* list of effects */
 {
-    /* algorithm: keep only write effects on integer scalar variable */
+    /* algorithm: keep only write effects on scalar variable with values */
     list args = NIL;
 
     MAP(EFFECT, ef, 
@@ -245,7 +249,7 @@ effects_to_arguments(list fx) /* list of effects */
 	action a = effect_action(ef);
 	entity e = reference_variable(r);
 	
-	if(action_write_p(a) && entity_integer_scalar_p(e)) {
+	if(action_write_p(a) && entity_has_values_p(e)) {
 	    args = arguments_add_entity(args, e);
 	}
     },
@@ -586,7 +590,7 @@ whileloop_to_transformer(whileloop l, list e) /* effects of whileloop l */
     debug(8,"whileloop_to_transformer","end\n");
     return tf;
 }
-
+
 static transformer 
 test_to_transformer(test t, list ef) /* effects of t */
 {
@@ -626,6 +630,7 @@ test_to_transformer(test t, list ef) /* effects of t */
 	tffwc = transformer_dup(statement_to_transformer(sf));
 
 	/* Look for variables modified in one branch only */
+	/* This is performed in transformer_convex_hull
 	ta = arguments_difference(transformer_arguments(tftwc),
 				  transformer_arguments(tffwc));
 	fa = arguments_difference(transformer_arguments(tffwc),
@@ -642,6 +647,7 @@ test_to_transformer(test t, list ef) /* effects of t */
 
 	    tftwc = transformer_add_identity(tftwc, v);
 	}, fa);
+	*/
 
 	tftwc = transformer_add_condition_information(tftwc, e, TRUE);
 	tffwc = transformer_add_condition_information(tffwc, e, FALSE);
@@ -662,18 +668,19 @@ test_to_transformer(test t, list ef) /* effects of t */
     return tf;
 }
 
-static transformer assign_to_transformer(list, list);
-
 static transformer 
 intrinsic_to_transformer(
     entity e, list pc, list ef) /* effects of intrinsic call */
 {
     transformer tf;
+    /* should become a parameter, but one thing at a time */
+    transformer pre = transformer_undefined;
 
     debug(8,"intrinsic_to_transformer","begin\n");
 
-    if(ENTITY_ASSIGN_P(e))
-	tf = assign_to_transformer(pc, ef);
+    if(ENTITY_ASSIGN_P(e)) {
+	tf = any_assign_to_transformer(pc, ef, pre);
+    }
     else if(ENTITY_STOP_P(e))
 	tf = transformer_empty();
     else
@@ -701,8 +708,10 @@ call_to_transformer(call c, list ef) /* effects of call c */
 	/* call to an external function; preliminary version:
 	   rely on effects */
 	pips_debug(5, "external function %s\n", entity_name(e));
-	if(get_bool_property(SEMANTICS_INTERPROCEDURAL))
+	if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
 	    tf = user_call_to_transformer(e, pc, ef);
+	    reset_temporary_value_counter();
+	}
 	else
 	    tf = effects_to_transformer(ef);
 	break;
@@ -728,17 +737,11 @@ call_to_transformer(call c, list ef) /* effects of call c */
 
     return(tf);
 }
-
-/* Effects ef re needed here to use user_call_to_transformer()
- * although the general idea is to return an undefined transformer
- * on failure rather than a transformer derived from effects
- */
-
-static transformer 
+
+transformer 
 user_function_call_to_transformer(
-    entity e, 
-    expression expr,
-    list ef)
+				  entity e, /* a value */
+				  expression expr) /* a call to a function */
 {
     syntax s = expression_syntax(expr);
     call c = syntax_call(s);
@@ -746,22 +749,21 @@ user_function_call_to_transformer(
     list pc = call_arguments(c);
     transformer t_caller = transformer_undefined;
     basic rbt = basic_of_call(c);
+    list ef = expression_to_proper_effects(expr);
 
     pips_debug(8, "begin\n");
-    pips_assert("user_function_call_to_transformer", syntax_call_p(s));
+    pips_assert("s is a call", syntax_call_p(s));
 
     if(basic_int_p(rbt)) {
 	string fn = module_local_name(f);
 	entity rv = global_name_to_entity(fn, fn);
 	entity orv = entity_undefined;
-	entity e_new = entity_to_new_value(e);
-	cons * tf_args = CONS(ENTITY, e_new, NIL);
 	Psysteme sc = SC_UNDEFINED;
 	Pcontrainte c = CONTRAINTE_UNDEFINED;
 	Pvecteur eq = VECTEUR_NUL;
-	transformer t_assign = transformer_undefined;
+	transformer t_equal = transformer_undefined;
 
-	pips_assert("user_function_call_to_transformer",
+	pips_assert("rv is defined",
 		    !entity_undefined_p(rv));
 
 	/* Build a transformer reflecting the call site */
@@ -773,39 +775,32 @@ user_function_call_to_transformer(
 	    dump_transformer(t_caller);
 	}
 
-	/* Build a transformer representing the assignment of
+	/* Build a transformer representing the equality of
 	 * the function value to e
 	 */
 	eq = vect_make(eq,
-		       (Variable) entity_to_new_value(e), VALUE_ONE,
+		       (Variable) e, VALUE_ONE,
 		       (Variable) rv, VALUE_MONE,
 		       TCST, VALUE_ZERO);
 	c = contrainte_make(eq);
 	sc = sc_make(c, CONTRAINTE_UNDEFINED);
-	/* FI: I do not understand why this is useful since the basis
-	 * does not have to have old values that do not appear in
-	 * predicates... See transformer_consistency_p()
-	 *
-	 * But it proved useful for the call to foo3 in funcside.f
-	 */
-	sc_base_add_variable(sc, (Variable) entity_to_old_value(e));
-	t_assign = make_transformer(tf_args,
+	t_equal = make_transformer(NIL,
 				    make_predicate(sc));
 
 	/* Consistency cannot be checked on a non-local transformer */
-	/* pips_assert("user_function_call_to_transformer",
-	   transformer_consistency_p(t_assign)); */
+	/* pips_assert("t_equal is consistent",
+	   transformer_consistency_p(t_equal)); */
 
 	ifdebug(8) {
-	    debug(8, "user_function_call_to_transformer", 
-		  "Transformer %p for assignment of %s with %s:\n",
-		  t_assign, entity_local_name(e), entity_name (rv));
-	    dump_transformer(t_assign);
+	    pips_debug(8,
+		  "Transformer %p for equality of %s with %s:\n",
+		  t_equal, entity_local_name(e), entity_name (rv));
+	    dump_transformer(t_equal);
 	}
 
-	/* Combine the effect of the function call and of the assignment */
-	t_caller = transformer_combine(t_caller, t_assign);
-	free_transformer(t_assign);
+	/* Combine the effect of the function call and of the equality */
+	t_caller = transformer_combine(t_caller, t_equal);
+	free_transformer(t_equal);
 
 	/* Get rid of the temporary representing the function's value */
 	orv = global_new_value_to_global_old_value(rv);
@@ -814,7 +809,7 @@ user_function_call_to_transformer(
 
 
 	ifdebug(8) {
-	    debug(8, "user_function_call_to_transformer", 
+	    pips_debug(8,
 		  "Final transformer %p for assignment of %s with %s:\n",
 		  t_caller, entity_local_name(e), entity_name(rv));
 	    dump_transformer(t_caller);
@@ -840,20 +835,24 @@ user_function_call_to_transformer(
 	    t_caller = transformer_value_substitute(t_caller, rv, e);
 	}
 	*/
+	/* Not checkable with temporary variables
 	pips_assert("transformer t_caller is consistent", 
 		    transformer_consistency_p(t_caller));
+	*/
     }
     else {
 	pips_assert("transformer t_caller is undefined", 
 		    transformer_undefined_p(t_caller));
     }
 
+    gen_free_list(ef);
+
     pips_debug(8, "end with t_caller=%p\n", t_caller);
 
     
     return t_caller;
 }
-
+
 /* transformer translation
  */
 transformer 
@@ -869,8 +868,8 @@ transformer_intra_to_inter(
     Pbase b = BASE_UNDEFINED;
     Pbase eb = BASE_UNDEFINED;
 
-    debug(8,"transformer_intra_to_inter","begin\n");
-    debug(8,"transformer_intra_to_inter","argument tf=%x\n",ftf);
+    pips_debug(8,"begin\n");
+    pips_debug(8,"argument tf=%p\n",ftf);
     ifdebug(8) (void) dump_transformer(ftf);
 
     /* get rid of tf's arguments that do not appear in effects le */
@@ -915,7 +914,8 @@ transformer_intra_to_inter(
 	     * However, the return value associated to a function is preserved.
 	     */
 	    if( ! effects_read_or_write_entity_p(le, v) &&
-	       !storage_return_p(entity_storage(v))) {
+		!storage_return_p(entity_storage(v)) &&
+		!entity_constant_p(v)) {
 		lost_args = arguments_add_entity(lost_args, e);
 	    }
 	}
@@ -934,6 +934,12 @@ transformer_intra_to_inter(
 
     return ftf;
 }
+
+/* Effects are necessary to clean up the transformer t_caller. For
+   instance, an effect on variable X may not be taken into account in
+   t_callee but it may be equivalenced thru a common to a variable i which
+   is analyzed in the caller. If X is written, I value is lost. See
+   Validation/equiv02.f. */
 
 static transformer 
 user_call_to_transformer(
@@ -941,221 +947,233 @@ user_call_to_transformer(
     list pc,
     list ef)
 {
-    transformer t_callee = transformer_undefined;
-    transformer t_caller = transformer_undefined;
-    transformer t_effects = transformer_undefined;
-    entity caller = entity_undefined;
-    list all_args = list_undefined;
+  transformer t_callee = transformer_undefined;
+  transformer t_caller = transformer_undefined;
+  transformer t_effects = transformer_undefined;
+  entity caller = entity_undefined;
+  list all_args = list_undefined;
 
-    pips_debug(8, "begin\n");
-    pips_assert("f is a module", entity_module_p(f));
+  pips_debug(8, "begin\n");
+  pips_assert("f is a module", entity_module_p(f));
 
-    if(!get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	/*
-	user_warning("user_call_to_transformer",
-		     "unknown interprocedural transformer for %s\n",
-		     entity_local_name(f));
-		     */
-	t_caller = effects_to_transformer(ef);
-    }
-    else {
-	/* add equations linking formal parameters to argument expressions
-	   to transformer t_callee and project along the formal parameters */
-	/* for performance, it  would be better to avoid building formals
-	   and to inline entity_to_formal_parameters */
-	/* it wouls also be useful to distinguish between in and out
-	   parameters; I'm not sure the information is really available
-	   in a field ??? */
-	list formals = entity_to_formal_integer_parameters(f);
-	list formals_new = NIL;
-	cons * ce;
-
-	t_callee = load_summary_transformer(f);
-
-	ifdebug(8) {
-	    Psysteme s = 
-		(Psysteme) predicate_system(transformer_relation(t_callee));
-	    pips_debug(8, "Transformer for callee %s:\n", 
-		       entity_local_name(f));
-	    dump_transformer(t_callee);
-	    sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
-	}
-
-	t_caller = transformer_dup(t_callee);
-
-	/* take care of formal parameters */
-	/* let's start a long, long, long MAPL, so long that MAPL is a pain */
-	for( ce = formals; !ENDP(ce); POP(ce)) {
-	    entity e = ENTITY(CAR(ce));
-	    int r = formal_offset(storage_formal(entity_storage(e)));
-	    expression expr;
-	    normalized n;
-
-	    if((expr = find_ith_argument(pc, r)) == expression_undefined)
-		pips_user_error("not enough args for %d formal parm."
-				" %s in call to %s from %s\n",
-				r, entity_local_name(e), entity_local_name(f),
-				get_current_module_entity());
-
-	    n = NORMALIZE_EXPRESSION(expr);
-	    if(normalized_linear_p(n)) {
-		Pvecteur v = vect_dup((Pvecteur) normalized_linear(n));
-		if(value_mappings_compatible_vector_p(v)) {
-		    entity e_new = external_entity_to_new_value(e);
-		    entity a_new = entity_undefined;
-		    entity a_old = entity_undefined;
-		    
-		    if(entity_is_argument_p(e_new, 
-					    transformer_arguments(t_caller))) {
-		      /* e_new and e_old must be replaced by the
-			 actual entity argument */
-		      entity e_old = external_entity_to_old_value(e);
- ifdebug(8) {
-	debug(8, "user_call_to_transformer", 
-	      "entity=%s entity_old_value= %s\n",entity_local_name(e),entity_local_name(e_old));
-	
-	
-    }
-		      if(vect_size(v) != 1 || vecteur_var(v) == TCST) {
-			/* Actual argument is not a reference: it might be a user error!
-			 * Transformers do not carry the may/must information.
-			 * A check with effect list ef should be performed...
-			 *
-			 * FI: does effect computation emit a warning?
-			 */
-			list args = arguments_add_entity(arguments_add_entity(NIL, e_new), e_old);
-			
-			user_warning("user_call_to_transformer",
-				     "value (!) might be modified by call to %s\n%dth formal parameter %s\n",
-				     entity_local_name(f), r, entity_local_name(e));
-			t_caller = transformer_filter(t_caller, args);
-			free_arguments(args);
-			
-		      }
-		      else {
-			  Psysteme s = (Psysteme) predicate_system(transformer_relation(t_caller));
-			  a_new = entity_to_new_value((entity) vecteur_var(v));
-			  a_old = entity_to_old_value((entity) vecteur_var(v));
-
-			  if(base_contains_variable_p(s->base, (Variable) a_new)) {
-			      user_error("user_call_to_transformer",
-					 "Variable %s seems to be aliased thru variable %s"
-					 " at a call site to %s in %s\n"
-					 "PIPS semantics analysis assumes no aliasing as"
-					 " imposed by the Fortran standard.\n",
-					 entity_name(e),
-					 entity_name((entity) vecteur_var(v)),
-					 module_local_name(f),
-					 get_current_module_name());
-			  }
-			  else {
-			      t_caller = transformer_value_substitute
-				  (t_caller, e_new, a_new);
-			      t_caller = transformer_value_substitute
-				  (t_caller, e_old, a_old);
-			  }
-			
-		      }
-		    }
-		    else { 
-			/* simple case: formal parameter e is not
-			   modified and can be replaced by actual
-			   argument expression */
-			vect_add_elem(&v, (Variable) e_new, VALUE_MONE);
-			t_caller = transformer_equality_add(t_caller,
-							    v);
-		    }
-		}
-		else { 
-		    /* formal parameter e has to be eliminated:
-		       e_new and e_old will be eliminated */
-		    vect_rm(v);
-		}
-	    }
-	}
-
-   ifdebug(8) {
-	debug(8, "user_call_to_transformer", 
-	      "Before formal new values left over are eliminated\n");
-	dump_transformer(t_caller);
-	
-    }
-
-	/* formal new and old values left over are eliminated */
-	MAPL(ce,{entity e = ENTITY(CAR(ce));
-		 entity e_new = external_entity_to_new_value(e); 
-		 formals_new = CONS(ENTITY, e_new, formals_new);
-		 /* test to insure that entity_to_old_value exists */
-		 if(entity_is_argument_p(e_new, 
-					 transformer_arguments(t_caller))) {
-		     entity e_old = external_entity_to_old_value(e);
-		     formals_new = CONS(ENTITY, e_old, formals_new);
-		 }},
-	     formals);
-		 
-	t_caller = transformer_filter(t_caller, formals_new);
-		 
-	free_arguments(formals_new);
-	free_arguments(formals);
-    }
-
-    ifdebug(8) {
-	Psysteme s = predicate_system(transformer_relation(t_caller));
-	debug(8, "user_call_to_transformer", 
-	      "After binding formal/real parameters\n");
-	dump_transformer(t_caller);
-	sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
-    }
-
-    /* take care of global variables */
-    caller = get_current_module_entity();
-    translate_global_values(caller, t_caller);
-
-    /* FI: are invisible variables taken care of by translate_global_values()? 
-     * Yes, now...
-     * A variable may be invisible because its location is reached
-     * thru an array or thru a non-integer scalar variable in the
-     * current module, for instance because a COMMON is defined
-     * differently. A variable whose location is not reachable
-     * in the current module environment is considered visible.
-     */
-
-    ifdebug(8) {
-	debug(8, "user_call_to_transformer", 
-	      "After replacing global variables\n");
-	dump_transformer(t_caller);
-    }
-
-    /* Callee f may have read/write effects on caller's scalar
-     * integer variables thru an array and/or non-integer variables.
-     */
-    t_effects = effects_to_transformer(ef);
-    all_args = arguments_union(transformer_arguments(t_caller),
-			       transformer_arguments(t_effects));
+  if(!get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
     /*
+      pips_user_warning(
+      "unknown interprocedural transformer for %s\n",
+      entity_local_name(f));
+    */
+    t_caller = effects_to_transformer(ef);
+  }
+  else {
+    /* add equations linking formal parameters to argument expressions
+       to transformer t_callee and project along the formal parameters */
+    /* for performance, it  would be better to avoid building formals
+       and to inline entity_to_formal_parameters */
+    /* it wouls also be useful to distinguish between in and out
+       parameters; I'm not sure the information is really available
+       in a field ??? */
+    list formals = module_to_formal_analyzable_parameters(f);
+    list formals_new = NIL;
+    cons * ce;
+
+    t_callee = load_summary_transformer(f);
+
+    ifdebug(8) {
+      Psysteme s = 
+	(Psysteme) predicate_system(transformer_relation(t_callee));
+      pips_debug(8, "Transformer for callee %s:\n", 
+		 entity_local_name(f));
+      dump_transformer(t_callee);
+      sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
+    }
+
+    t_caller = transformer_dup(t_callee);
+
+    /* take care of analyzable formal parameters */
+
+    for( ce = formals; !ENDP(ce); POP(ce)) {
+      entity fp = ENTITY(CAR(ce));
+      int r = formal_offset(storage_formal(entity_storage(fp)));
+      expression expr = find_ith_argument(pc, r);
+
+      if(expr == expression_undefined)
+	pips_user_error("not enough args for %d formal parm."
+			" %s in call to %s from %s\n",
+			r, entity_local_name(fp), entity_local_name(f),
+			get_current_module_entity());
+      else {
+	/* type checking. You already know that fp is a scalar variable */
+	type tfp = entity_type(fp);
+	basic bfp = variable_basic(type_variable(tfp));
+	basic bexpr = basic_of_expression(expr);
+
+	if(!basic_equal_p(bfp, bexpr)) {
+	  pips_user_warning("Type incompatibility (formal %s/ actual %s)"
+			    " for formal parameter %s (rank %d)"
+			    " in call to %s from %s\n",
+			    basic_to_string(bfp), basic_to_string(bexpr),
+			    entity_local_name(fp), r, module_local_name(f),
+			    get_current_module_entity());
+	  continue;
+	}
+      }
+
+      if(entity_is_argument_p(fp, transformer_arguments(t_callee))) {
+	/* formal parameter e is modified. expr must be a reference */
+	syntax sexpr = expression_syntax(expr);
+
+	if(syntax_reference_p(sexpr)) {
+	  entity ap = reference_variable(syntax_reference(sexpr));
+
+	  if(entity_has_values_p(ap)) {
+	    Psysteme s = (Psysteme) predicate_system(transformer_relation(t_caller));
+	    entity ap_new = entity_to_new_value(ap);
+	    entity ap_old = entity_to_old_value(ap);
+
+	    if(base_contains_variable_p(s->base, (Variable) ap_new)) {
+	      pips_user_error(
+			      "Variable %s seems to be aliased thru variable %s"
+			      " at a call site to %s in %s\n"
+			      "PIPS semantics analysis assumes no aliasing as"
+			      " imposed by the Fortran standard.\n",
+			      entity_name(fp),
+			      entity_name(value_to_variable(ap_new)),
+			      module_local_name(f),
+			      get_current_module_name());
+	    }
+	    else { /* normal case: ap_new==fp_new, ap_old==fp_old */
+	      entity fp_new = external_entity_to_new_value(fp);
+	      entity fp_old = external_entity_to_old_value(fp);
+
+	      t_caller = transformer_value_substitute
+		(t_caller, fp_new, ap_new);
+	      t_caller = transformer_value_substitute
+		(t_caller, fp_old, ap_old);
+	    }
+	  }
+	  else { /* Variable ap is not analyzed. The information about fp
+                    will be lost. */
+	    ;
+	  }
+	}
+	else {
+	  /* Attemps at modifying a value: expr is call, fp is modified */
+	  /* Actual argument is not a reference: it might be a user error!
+	   * Transformers do not carry the may/must information.
+	   * A check with effect list ef should be performed...
+	   *
+	   * FI: does effect computation emit a MUST/MAYwarning?
+	   */
+	  entity fp_new = external_entity_to_new_value(fp);
+	  entity fp_old = external_entity_to_old_value(fp);
+	  list args = arguments_add_entity(arguments_add_entity(NIL, fp_new), fp_old);
+			
+	  pips_user_warning("value (!) might be modified by call to %s\n"
+			    "%dth formal parameter %s\n",
+			    entity_local_name(f), r, entity_local_name(fp));
+	  t_caller = transformer_filter(t_caller, args);
+	  free_arguments(args);
+	}
+      }
+      else {
+	/* Formal parameter fp is not modified. Add fp == expr, if possible. */
+	/* We should evaluate expr under a precondition pre... which has
+	   not been passed down. We set pre==tf_undefined. */
+	entity fp_new = external_entity_to_new_value(fp);
+	transformer t_expr = any_expression_to_transformer(fp_new, expr,
+							   transformer_undefined,
+							   FALSE);
+
+	if(!transformer_undefined_p(t_expr)) {
+	  t_expr = transformer_temporary_value_projection(t_expr);
+	  /* temporary value counter cannot be reset because other
+             temporary values may be in use in a case the user call is a
+             user function call */
+	  /* reset_temporary_value_counter(); */
+	  t_caller = transformer_safe_image_intersection(t_caller, t_expr);
+	  free_transformer(t_expr);
+	}
+      }
+    }
+  
+    pips_debug(8, "Before formal new values left over are eliminated\n");
+    ifdebug(8)   dump_transformer(t_caller);
+	
+
+    /* formal new and old values left over are eliminated */
+    MAPL(ce,{entity e = ENTITY(CAR(ce));
+    entity e_new = external_entity_to_new_value(e); 
+    formals_new = CONS(ENTITY, e_new, formals_new);
+    /* test to insure that entity_to_old_value exists */
+    if(entity_is_argument_p(e_new, 
+			    transformer_arguments(t_caller))) {
+      entity e_old = external_entity_to_old_value(e);
+      formals_new = CONS(ENTITY, e_old, formals_new);
+    }},
+	 formals);
+		 
+    t_caller = transformer_filter(t_caller, formals_new);
+		 
+    free_arguments(formals_new);
+    free_arguments(formals);
+  }
+
+  ifdebug(8) {
+    Psysteme s = predicate_system(transformer_relation(t_caller));
+    pips_debug(8,
+	       "After binding formal/real parameters and eliminating formals\n");
+    dump_transformer(t_caller);
+    sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
+  }
+
+  /* take care of global variables */
+  caller = get_current_module_entity();
+  translate_global_values(caller, t_caller);
+
+  /* FI: are invisible variables taken care of by translate_global_values()? 
+   * Yes, now...
+   * A variable may be invisible because its location is reached
+   * thru an array or thru a non-integer scalar variable in the
+   * current module, for instance because a COMMON is defined
+   * differently. A variable whose location is not reachable
+   * in the current module environment is considered visible.
+   */
+
+  ifdebug(8) {
+    pips_debug(8, "After replacing global variables\n");
+    dump_transformer(t_caller);
+  }
+
+  /* Callee f may have read/write effects on caller's scalar
+   * integer variables thru an array and/or non-integer variables.
+   */
+  t_effects = effects_to_transformer(ef);
+  all_args = arguments_union(transformer_arguments(t_caller),
+			     transformer_arguments(t_effects));
+  /*
     free_transformer(t_effects);
     gen_free_list(transformer_arguments(t_caller));
-    */
-    transformer_arguments(t_caller) = all_args;
-    /* The relation basis must be updated too */
-    MAP(ENTITY, v, {
-	Psysteme sc = (Psysteme) predicate_system(transformer_relation(t_caller));
-	sc_base_add_variable(sc, (Variable) v);
-    }, transformer_arguments(t_effects));
+  */
+  transformer_arguments(t_caller) = all_args;
+  /* The relation basis must be updated too */
+  MAP(ENTITY, v, {
+    Psysteme sc = (Psysteme) predicate_system(transformer_relation(t_caller));
+    sc_base_add_variable(sc, (Variable) v);
+  }, transformer_arguments(t_effects));
     
 
-    ifdebug(8) {
-	debug(8, "user_call_to_transformer", 
-	      "End: after taking non-integer scalar effects %p\n",
-	      t_caller);
-	dump_transformer(t_caller);
-    }
+  ifdebug(8) {
+    pips_debug(8,
+	       "End: after taking all scalar effects in consideration %p\n",
+	       t_caller);
+    dump_transformer(t_caller);
+  }
 
-    /* pips_assert("transformer t_caller is consistent", transformer_consistency_p(t_caller)); 
-     */
+  /* pips_assert("transformer t_caller is consistent", transformer_consistency_p(t_caller)); 
+   */
 
 
-    return t_caller;
+  return t_caller;
 }
 
 transformer
@@ -1172,552 +1190,44 @@ transformer_add_identity(transformer tf, entity v)
 
     return tf;
 }
-
-static transformer 
-affine_to_transformer(entity e, Pvecteur a, bool assignment)
-{
-    transformer tf = transformer_undefined;
-    Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
-    entity e_new = entity_to_new_value(e);
-    entity e_old = entity_to_old_value(e);
-    cons * tf_args = CONS(ENTITY, e_new, NIL);
-    /* must be duplicated right now  because it will be
-       renamed and checked at the same time by
-       value_mappings_compatible_vector_p() */
-    Pvecteur vexpr = vect_dup(a);
-    Pcontrainte c;
-    Pvecteur eq = VECTEUR_NUL;
-
-    debug(8, "affine_to_transformer", "begin\n");
-
-    ifdebug(9) {
-	pips_debug(9, "\nLinearized expression:\n");
-	vect_dump(vexpr);
-    }
-
-    if(!assignment) {
-	vect_add_elem(&vexpr, (Variable) e, (Value) 1);
-
-	ifdebug(8) {
-	    pips_debug(8, "\nLinearized expression for incrementation:\n");
-	    vect_dump(vexpr);
-	}
-    }
-
-    if(value_mappings_compatible_vector_p(ve) &&
-       value_mappings_compatible_vector_p(vexpr)) {
-	ve = vect_variable_rename(ve,
-				  (Variable) e,
-				  (Variable) e_new);
-	(void) vect_variable_rename(vexpr,
-				    (Variable) e_new,
-				    (Variable) e_old);
-	eq = vect_substract(ve, vexpr);
-	vect_rm(ve);
-	vect_rm(vexpr);
-	c = contrainte_make(eq);
-	tf = make_transformer(tf_args,
-		      make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
-    }
-    else {
-	vect_rm(eq);
-	vect_rm(ve);
-	vect_rm(vexpr);
-	tf = transformer_undefined;
-    }
-
-    debug(8, "affine_to_transformer", "end\n");
-
-    return tf;
-}
-
-static transformer 
-affine_assignment_to_transformer(entity e, Pvecteur a)
-{
-    transformer tf = transformer_undefined;
-
-    tf = affine_to_transformer(e, a, TRUE);
-
-    return tf;
-}
-
-transformer 
-affine_increment_to_transformer(entity e, Pvecteur a)
-{
-    transformer tf = transformer_undefined;
-
-    tf = affine_to_transformer(e, a, FALSE);
-
-    return tf;
-}
-
-static transformer 
-modulo_to_transformer(e, expr)
-entity e;
-expression expr;
-{
-    transformer tf = transformer_undefined;
-    expression arg2 = expression_undefined;
-    call c = syntax_call(expression_syntax(expr));
-
-    debug(8, "modulo_to_transformer", "begin\n");
-    
-    arg2 = find_ith_argument(call_arguments(c), 2);
-
-    if(integer_constant_expression_p(arg2)) {
-	int d = integer_constant_expression_value(arg2);
-	entity e_new = entity_to_new_value(e);
-	Pvecteur ub = vect_new((Variable) e_new, VALUE_ONE);
-	Pvecteur lb = vect_new((Variable) e_new, VALUE_MONE);
-	Pcontrainte clb = contrainte_make(lb);
-	Pcontrainte cub = CONTRAINTE_UNDEFINED;
-	cons * tf_args = CONS(ENTITY, e_new, NIL);
-
-	vect_add_elem(&ub, TCST, int_to_value(1-d));
-	vect_add_elem(&lb, TCST, int_to_value(d-1));
-	cub = contrainte_make(ub);
-	clb->succ = cub;
-	tf = make_transformer(tf_args,
-		make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
-    }
-
-    ifdebug(8) {
-	debug(8, "modulo_to_transformer", "result:\n");
-	print_transformer(tf);
-	debug(8, "modulo_to_transformer", "end\n");
-    }
-
-   return tf;
-}
-
-static transformer 
-iabs_to_transformer(e, expr)
-entity e;
-expression expr;
-{
-    transformer tf = transformer_undefined;
-    call c = syntax_call(expression_syntax(expr));
-    expression arg = EXPRESSION(CAR(call_arguments(c)));
-    normalized n = NORMALIZE_EXPRESSION(arg);
-
-    debug(8, "iabs_to_transformer", "begin\n");
-
-    if(normalized_linear_p(n)) {
-	entity e_new = entity_to_new_value(e);
-	entity e_old = entity_to_old_value(e);
-	Pvecteur vlb1 = vect_dup((Pvecteur) normalized_linear(n));
-	Pvecteur vlb2 = vect_multiply(vect_dup((Pvecteur) normalized_linear(n)), VALUE_MONE);
-	Pcontrainte clb1 = CONTRAINTE_UNDEFINED;
-	Pcontrainte clb2 = CONTRAINTE_UNDEFINED;
-	cons * tf_args = CONS(ENTITY, e_new, NIL);
-
-	(void) vect_variable_rename(vlb1,
-				    (Variable) e_new,
-				    (Variable) e_old);
-
-	(void) vect_variable_rename(vlb2,
-				    (Variable) e_new,
-				    (Variable) e_old);
-
-	vect_add_elem(&vlb1, (Variable) e_new, VALUE_MONE);
-	vect_add_elem(&vlb2, (Variable) e_new, VALUE_MONE);
-	clb1 = contrainte_make(vlb1);
-	clb2 = contrainte_make(vlb2);
-	clb1->succ = clb2;
-	tf = make_transformer(tf_args,
-		make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb1)));
-    }
-
-    ifdebug(8) {
-	debug(8, "iabs_to_transformer", "result:\n");
-	print_transformer(tf);
-	debug(8, "iabs_to_transformer", "end\n");
-    }
-
-   return tf;
-}
-
-static transformer 
-integer_divide_to_transformer(e, expr)
-entity e;
-expression expr;
-{
-    transformer tf = transformer_undefined;
-    call c = syntax_call(expression_syntax(expr));
-    expression arg1 = expression_undefined;
-    normalized n1 = normalized_undefined;
-    expression arg2 = expression_undefined;
-
-    debug(8, "integer_divide_to_transformer", "begin\n");
-    
-    arg1 = find_ith_argument(call_arguments(c), 1);
-    n1 = NORMALIZE_EXPRESSION(arg1);
-    arg2 = find_ith_argument(call_arguments(c), 2);
-
-    if(integer_constant_expression_p(arg2) && normalized_linear_p(n1)) {
-	int d = integer_constant_expression_value(arg2);
-	entity e_new = entity_to_new_value(e);
-	entity e_old = entity_to_old_value(e);
-	cons * tf_args = CONS(ENTITY, e, NIL);
-	/* must be duplicated right now  because it will be
-	   renamed and checked at the same time by
-	   value_mappings_compatible_vector_p() */
-	Pvecteur vlb =
-	    vect_multiply(vect_dup(normalized_linear(n1)), VALUE_MONE); 
-	Pvecteur vub = vect_dup(normalized_linear(n1));
-	Pcontrainte clb = CONTRAINTE_UNDEFINED;
-	Pcontrainte cub = CONTRAINTE_UNDEFINED;
-
-	(void) vect_variable_rename(vlb,
-				    (Variable) e_new,
-				    (Variable) e_old);
-	(void) vect_variable_rename(vub,
-				    (Variable) e_new,
-				    (Variable) e_old);
-
-	vect_add_elem(&vlb, (Variable) e_new, int_to_value(d));
-	vect_add_elem(&vub, (Variable) e_new, int_to_value(-d));
-	vect_add_elem(&vub, TCST, int_to_value(1-d));
-	clb = contrainte_make(vlb);
-	cub = contrainte_make(vub);
-	clb->succ = cub;
-	tf = make_transformer(tf_args,
-	       make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
-    }
-
-    ifdebug(8) {
-	debug(8, "integer_divide_to_transformer", "result:\n");
-	print_transformer(tf);
-	debug(8, "integer_divide_to_transformer", "end\n");
-    }
-
-    return tf;
-}
-
-static transformer 
-integer_power_to_transformer(e, expr)
-entity e;
-expression expr;
-{
-  transformer tf = transformer_undefined;
-  call c = syntax_call(expression_syntax(expr));
-  expression arg1 = expression_undefined;
-  normalized n1 = normalized_undefined;
-  expression arg2 = expression_undefined;
-  normalized n2 = normalized_undefined;
-
-  debug(8, "integer_power_to_transformer", "begin\n");
-    
-  arg1 = find_ith_argument(call_arguments(c), 1);
-  n1 = NORMALIZE_EXPRESSION(arg1);
-  arg2 = find_ith_argument(call_arguments(c), 2);
-  n2 = NORMALIZE_EXPRESSION(arg2);
-
-  if(signed_integer_constant_expression_p(arg2) && normalized_linear_p(n1)) {
-    int d = signed_integer_constant_expression_value(arg2);
-
-    if(d%2==0) {
-      entity e_new = entity_to_new_value(e);
-      entity e_old = entity_to_old_value(e);
-      cons * tf_args = CONS(ENTITY, e, NIL);
-
-      if(d==0) {
-	/* 1 is assigned unless arg1 equals 0... which is neglected */
-	Pvecteur v = vect_new((Variable) e_new, VALUE_ONE);
-
-	vect_add_elem(&v, TCST, VALUE_MONE);
-	tf = make_transformer(tf_args,
-			      make_predicate(sc_make(contrainte_make(v),
-						     CONTRAINTE_UNDEFINED)));
-      }
-      else if(d>0) {
-	/* Does not work because unary minus is not seen as part of a constant */
-	/* The expression value must be greater or equal to arg2 and positive */
-	/* must be duplicated right now  because it will be
-	   renamed and checked at the same time by
-	   value_mappings_compatible_vector_p() */
-	Pvecteur vlb1 = vect_dup(normalized_linear(n1));
-	Pvecteur vlb2 = vect_multiply(vect_dup(normalized_linear(n1)), VALUE_MONE);
-	Pcontrainte clb1 = CONTRAINTE_UNDEFINED;
-	Pcontrainte clb2 = CONTRAINTE_UNDEFINED;
-
-	(void) vect_variable_rename(vlb1,
-				    (Variable) e_new,
-				    (Variable) e_old);
-
-	vect_add_elem(&vlb1, (Variable) e_new, VALUE_MONE);
-	vect_add_elem(&vlb2, (Variable) e_new, VALUE_MONE);
-	clb1 = contrainte_make(vlb1);
-	clb2 = contrainte_make(vlb2);
-	clb1->succ = clb2;
-	tf = make_transformer(tf_args,
-			      make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb1)));
-      }
-      else {
-	/* d is negative and even */
-	entity e_new = entity_to_new_value(e);
-	cons * tf_args = CONS(ENTITY, e, NIL);
-	Pvecteur vub = vect_new((Variable) e_new, VALUE_ONE);
-	Pvecteur vlb = vect_new((Variable) e_new, VALUE_MONE);
-	Pcontrainte clb = CONTRAINTE_UNDEFINED;
-	Pcontrainte cub = CONTRAINTE_UNDEFINED;
-
-	vect_add_elem(&vub, TCST, VALUE_MONE);
-	clb = contrainte_make(vlb);
-	cub = contrainte_make(vub);
-	clb->succ = cub;
-	tf = make_transformer(tf_args,
-			      make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
-      }
-    }
-    else if(d<0) {
-      /* d is negative, arg1 cannot be 0, expression value is -1, 0
-	 or 1 */
-      entity e_new = entity_to_new_value(e);
-      cons * tf_args = CONS(ENTITY, e, NIL);
-      Pvecteur vub = vect_new((Variable) e_new, VALUE_MONE);
-      Pvecteur vlb = vect_new((Variable) e_new, VALUE_ONE);
-      Pcontrainte clb = CONTRAINTE_UNDEFINED;
-      Pcontrainte cub = CONTRAINTE_UNDEFINED;
-
-      vect_add_elem(&vub, TCST, VALUE_MONE);
-      vect_add_elem(&vlb, TCST, VALUE_MONE);
-      clb = contrainte_make(vlb);
-      cub = contrainte_make(vub);
-      clb->succ = cub;
-      tf = make_transformer(tf_args,
-			    make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
-    }
-    else if(d==1) {
-	entity e_new = entity_to_new_value(e);
-	cons * tf_args = CONS(ENTITY, e, NIL);
-	Pvecteur v = vect_dup(normalized_linear(n1));
-
-	vect_add_elem(&v, (Variable) e_new, VALUE_MONE);
-	tf = make_transformer(tf_args,
-			      make_predicate(sc_make(contrainte_make(v),
-						     CONTRAINTE_UNDEFINED)));
-    }
-  }
-  else if(signed_integer_constant_expression_p(arg1)) {
-    int d = signed_integer_constant_expression_value(arg1);
-    entity e_new = entity_to_new_value(e);
-
-    if(d==0||d==1) {
-      /* 0 or 1 is assigned unless arg2 equals 0... which is neglected */
-      cons * tf_args = CONS(ENTITY, e, NIL);
-      Pvecteur v = vect_new((Variable) e_new, VALUE_ONE);
-
-      vect_add_elem(&v, TCST, int_to_value(-d));
-      tf = make_transformer(tf_args,
-			    make_predicate(sc_make(contrainte_make(v),
-						   CONTRAINTE_UNDEFINED)));
-    }
-    else if(d > 1) {
-      /* the assigned value is positive */
-      cons * tf_args = CONS(ENTITY, e, NIL);
-      Pvecteur v1 = vect_new((Variable) e_new, VALUE_MONE);
-      Pcontrainte c1 = contrainte_make(v1);
-
-      if(normalized_linear_p(n2)) {
-	Pvecteur v2 = vect_dup(normalized_linear(n2));
-	Pcontrainte c2 = CONTRAINTE_UNDEFINED;
-	Pvecteur v3 = vect_multiply(vect_dup(normalized_linear(n2)), (Value) d);
-	Pcontrainte c3 = CONTRAINTE_UNDEFINED;
-
-	vect_add_elem(&v2, TCST, VALUE_ONE);
-	vect_add_elem(&v2, (Variable) e_new, VALUE_MONE);
-	c2 = contrainte_make(v2);
-	contrainte_succ(c1) = c2;
-	vect_add_elem(&v3, (Variable) e_new, VALUE_MONE);
-	c3 = contrainte_make(v3);
-	contrainte_succ(c2) = c3;
-      }
-
-      tf = make_transformer(tf_args,
-			    make_predicate(sc_make(CONTRAINTE_UNDEFINED, c1)));
-    }
-    else if(d == -1) {
-      /* The assigned value is 1 or -1 */
-      entity e_new = entity_to_new_value(e);
-      cons * tf_args = CONS(ENTITY, e, NIL);
-      Pvecteur vub = vect_new((Variable) e_new, VALUE_MONE);
-      Pvecteur vlb = vect_new((Variable) e_new, VALUE_ONE);
-      Pcontrainte clb = CONTRAINTE_UNDEFINED;
-      Pcontrainte cub = CONTRAINTE_UNDEFINED;
-
-      vect_add_elem(&vub, TCST, VALUE_MONE);
-      vect_add_elem(&vlb, TCST, VALUE_MONE);
-      clb = contrainte_make(vlb);
-      cub = contrainte_make(vub);
-      clb->succ = cub;
-      tf = make_transformer(tf_args,
-			    make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
-    }
-  }
-
-  ifdebug(8) {
-    debug(8, "integer_power_to_transformer", "result:\n");
-    print_transformer(tf);
-    debug(8, "integer_power_to_transformer", "end\n");
-  }
-
-  return tf;
-}
-
-static transformer 
-minmax_to_transformer(e, expr, minmax)
-entity e;
-expression expr;
-bool minmax;
-{
-    transformer tf = transformer_undefined;
-    call c = syntax_call(expression_syntax(expr));
-    expression arg = expression_undefined;
-    normalized n = normalized_undefined;
-    list cexpr;
-    cons * tf_args = CONS(ENTITY, e, NIL);
-    Pcontrainte cl = CONTRAINTE_UNDEFINED;
-
-    debug(8, "minmax_to_transformer", "begin\n");
-
-    for(cexpr = call_arguments(c); !ENDP(cexpr); POP(cexpr)) {
-	arg = EXPRESSION(CAR(cexpr));
-	n = NORMALIZE_EXPRESSION(arg);
-
-	if(normalized_linear_p(n)) {
-	    Pvecteur v = vect_dup((Pvecteur) normalized_linear(n));
-	    Pcontrainte cv = CONTRAINTE_UNDEFINED;
-	    entity e_new = entity_to_new_value(e);
-	    entity e_old = entity_to_old_value(e);
-
-	    (void) vect_variable_rename(v,
-					(Variable) e,
-					(Variable) e_old);
-	    vect_add_elem(&v, (Variable) e_new, VALUE_MONE);
-
-	    if(minmax) {
-		v = vect_multiply(v, VALUE_MONE);
-	    }
-
-	    cv = contrainte_make(v);
-	    cv->succ = cl;
-	    cl = cv;
-
-	}
-    }
-
-    if(CONTRAINTE_UNDEFINED_P(cl) || CONTRAINTE_NULLE_P(cl)) {
-	Psysteme sc = sc_make(CONTRAINTE_UNDEFINED, cl);
-	entity oldv = entity_to_old_value(e);
-	entity newv = entity_to_new_value(e);
-
-	sc_base(sc) = base_add_variable(base_add_variable(BASE_NULLE,
-							  (Variable) oldv),
-					(Variable) newv);
-	sc_dimension(sc) = 2;
-	tf = make_transformer(tf_args,
-			      make_predicate(sc));
-    }
-    else {
-	/* A miracle occurs and the proper basis is derived from the
-	   constraints ( I do not understand why the new and the old value
-	   of e both appear... so it may not be necessary for the
-	   consistency check... I'm lost, FI, 6 Jan. 1999) */
-	tf = make_transformer(tf_args,
-			      make_predicate(sc_make(CONTRAINTE_UNDEFINED, cl)));
-    }
-
-
-    ifdebug(8) {
-	debug(8, "minmax_to_transformer", "result:\n");
-	print_transformer(tf);
-	debug(8, "minmax_to_transformer", "end\n");
-    }
-
-    return tf;
-}
-
-static transformer 
-min0_to_transformer(e, expr)
-entity e;
-expression expr;
-{
-    return minmax_to_transformer(e, expr, TRUE);
-}
-
-static transformer 
-max0_to_transformer(e, expr)
-entity e;
-expression expr;
-{
-    return minmax_to_transformer(e, expr, FALSE);
-}
-
-/* transformer expression_to_transformer(entity e, expression expr, list ef):
- * returns a transformer abstracting the effect of assignment e = expr
- * if entity e and entities referenced in expr are accepted for
- * semantics analysis anf if expr is affine; else returns
- * transformer_undefined
+
+
+/* transformer assigned_expression_to_transformer(entity e, expression
+ * expr, list ef): returns a transformer abstracting the effect of
+ * assignment e = expr when possible, transformer_undefined otherwise.
  *
  * Note: it might be better to distinguish further between e and expr
  * and to return a transformer stating that e is modified when e
  * is accepted for semantics analysis.
  *
- * Bugs:
- *  - core dumps if entities referenced in expr are not accepted for
- *    semantics analysis
- *
- * Modifications:
- *  - MOD and / added for very special cases (but not as general as it should be)
- *    FI, 25/05/93
- *  - MIN, MAX and use function call added (for simple cases)
- *    FI, 16/11/95
  */
 transformer 
-expression_to_transformer(
-    entity e,
-    expression expr,
-    list ef)
+assigned_expression_to_transformer(
+    entity v,
+    expression expr)
 {
     transformer tf = transformer_undefined;
 
     pips_debug(8, "begin\n");
 
-    if(entity_has_values_p(e)) {
-        /* Pvecteur ve = vect_new((Variable) e, VALUE_ONE); */
-	normalized n = NORMALIZE_EXPRESSION(expr);
+    if(entity_has_values_p(v)) {
+      entity v_new = entity_to_new_value(v);
+      entity v_old = entity_to_old_value(v);
+      entity tmp = make_local_temporary_value_entity(entity_type(v));
+      list tf_args = CONS(ENTITY, v, NIL);
 
-	if(normalized_linear_p(n)) {
-	    tf = affine_assignment_to_transformer(e,
-		       (Pvecteur) normalized_linear(n));
-	}
-	else if(modulo_expression_p(expr)) {
-	    tf = modulo_to_transformer(e, expr);
-	}
-	else if(divide_expression_p(expr)) {
-	    tf = integer_divide_to_transformer(e, expr);
-	}
-	else if(power_expression_p(expr)) {
-	    tf = integer_power_to_transformer(e, expr);
-	}
-	else if(iabs_expression_p(expr)) {
-	    tf = iabs_to_transformer(e, expr);
-	}
-	else if(min0_expression_p(expr)) {
-	    tf = min0_to_transformer(e, expr);
-	}
-	else if(max0_expression_p(expr)) {
-	    tf = max0_to_transformer(e, expr);
-	}
-	else if(user_function_call_p(expr) 
-		&& get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	    tf = user_function_call_to_transformer(e, expr, ef);
-	}
-	else {
-	    /* vect_rm(ve); */
-	    tf = transformer_undefined;
-	}
+      tf = any_expression_to_transformer(tmp, expr, transformer_undefined, TRUE);
+      reset_temporary_value_counter();
+      if(!transformer_undefined_p(tf)) {
+	tf = transformer_value_substitute(tf, v_new, v_old);
+	tf = transformer_value_substitute(tf, tmp, v_new);
+	tf = transformer_temporary_value_projection(tf);
+	transformer_arguments(tf) = tf_args;
+      }
+    }
+    else {
+      /* vect_rm(ve); */
+      tf = transformer_undefined;
     }
 
     pips_debug(8, "end with tf=%p\n", tf);
@@ -1725,67 +1235,152 @@ expression_to_transformer(
     return tf;
 }
 
-static transformer 
-assign_to_transformer(list args, /* arguments for assign */
-		      list ef) /* effects of assign */
+transformer integer_assign_to_transformer(expression lhs,
+					  expression rhs,
+					  list ef) /* effects of assign */
 {
-    /* algorithm: if lhs and rhs are linear expressions on scalar integer
-       variables, build the corresponding equation; else, use effects ef
+  /* algorithm: if lhs and rhs are linear expressions on scalar integer
+     variables, build the corresponding equation; else, use effects ef
        
-       should be extended to cope with constant integer division as in
-       N2 = N/2
-       because it is used in real program; inequalities should be
-       generated in that case 2*N2 <= N <= 2*N2+1
+     should be extended to cope with constant integer division as in
+     N2 = N/2
+     because it is used in real program; inequalities should be
+     generated in that case 2*N2 <= N <= 2*N2+1
        
-       same remark for MOD operator
+     same remark for MOD operator
        
-       implementation: part of this function should be moved into
-       transformer.c
+     implementation: part of this function should be moved into
+     transformer.c
+  */
+
+  transformer tf = transformer_undefined;
+  normalized n = NORMALIZE_EXPRESSION(lhs);
+
+  pips_debug(8,"begin\n");
+
+  if(normalized_linear_p(n)) {
+    Pvecteur vlhs = (Pvecteur) normalized_linear(n);
+    entity e = (entity) vecteur_var(vlhs);
+
+    if(entity_has_values_p(e) /* && integer_scalar_entity_p(e) */) {
+      /* FI: the initial version was conservative because
+       * only affine scalar integer assignments were processed
+       * precisely. But non-affine operators and calls to user defined
+       * functions can also bring some information as soon as
+       * *some* integer read or write effect exists
        */
-
-    expression lhs = EXPRESSION(CAR(args));
-    expression rhs = EXPRESSION(CAR(CDR(args)));
-    transformer tf = transformer_undefined;
-    normalized n = NORMALIZE_EXPRESSION(lhs);
-
-    pips_debug(8,"begin\n");
-    pips_assert("2 args to assign", CDR(CDR(args))==NIL);
-
-    if(normalized_linear_p(n)) {
-	Pvecteur vlhs = (Pvecteur) normalized_linear(n);
-	entity e = (entity) vecteur_var(vlhs);
-
-	if(entity_has_values_p(e) && integer_scalar_entity_p(e)) {
-	    /* FI: the initial version was conservative because
-	     * only affine scalar integer assignments were processed
-	     * precisely. But non-affine operators and calls to user defined
-	     * functions can also bring some information as soon as
-	     * *some* integer read or write effect exists
-	     */
-	    /* check that *all* read effects are on integer scalar entities */
-	    /*
-	    if(integer_scalar_read_effects_p(ef)) {
-		tf = expression_to_transformer(e, rhs, ef);
-	    }
-	    */
-	    /* Check that *some* read or write effects are on integer 
-	     * scalar entities. This is almost always true... Let's hope
-	     * expression_to_transformer() returns quickly for array
-	     * expressions used to initialize a scalar integer entity.
-	     */
-	    if(some_integer_scalar_read_or_write_effects_p(ef)) {
-		tf = expression_to_transformer(e, rhs, ef);
-	    }
+      /* check that *all* read effects are on integer scalar entities */
+      /*
+	if(integer_scalar_read_effects_p(ef)) {
+	tf = assigned_expression_to_transformer(e, rhs, ef);
 	}
+      */
+      /* Check that *some* read or write effects are on integer 
+       * scalar entities. This is almost always true... Let's hope
+       * assigned_expression_to_transformer() returns quickly for array
+       * expressions used to initialize a scalar integer entity.
+       */
+      if(some_integer_scalar_read_or_write_effects_p(ef)) {
+	tf = assigned_expression_to_transformer(e, rhs);
+      }
     }
-    /* if some condition was not met and transformer derivation failed */
-    if(tf==transformer_undefined)
-	tf = effects_to_transformer(ef);
+  }
+  /* if some condition was not met and transformer derivation failed */
+  if(tf==transformer_undefined)
+    tf = effects_to_transformer(ef);
 
-    pips_debug(6,"return tf=%lx\n", (unsigned long)tf);
-    ifdebug(6) (void) print_transformer(tf);
-    pips_debug(8,"end\n");
-    return tf;
+  pips_debug(6,"return tf=%lx\n", (unsigned long)tf);
+  ifdebug(6) (void) print_transformer(tf);
+  pips_debug(8,"end\n");
+  return tf;
+}
+
+transformer any_scalar_assign_to_transformer(entity v,
+					     expression rhs,
+					     list ef, /* effects of assign */
+					     transformer pre) /* precondition */
+{
+  transformer tf = transformer_undefined;
+
+  if(entity_has_values_p(v)) {
+    entity v_new = entity_to_new_value(v);
+    entity v_old = entity_to_old_value(v);
+    entity tmp = make_local_temporary_value_entity(entity_type(v));
+
+    tf = any_expression_to_transformer(tmp, rhs, pre, TRUE);
+
+    if(!transformer_undefined_p(tf)) {
+
+      pips_debug(9, "A transformer has been obtained:\n");
+      ifdebug(9) dump_transformer(tf);
+
+      if(entity_is_argument_p(v, transformer_arguments(tf))) {
+	/* Is it standard compliant? The assigned variable is modified by the rhs. */
+	transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
+
+	tf = transformer_combine(tf, teq);
+	free_transformer(teq);
+      }
+      else {
+	/* Take care of aliasing */
+	entity v_repr = value_to_variable(v_new);
+
+	/* tf = transformer_value_substitute(tf, v_new, v_old); */
+	tf = transformer_value_substitute(tf, v_new, v_old);
+
+	pips_debug(9,"After substitution v_new=%s -> v_old=%s\n",
+	      entity_local_name(v_new), entity_local_name(v_old));
+
+	tf = transformer_value_substitute(tf, tmp, v_new);
+
+	pips_debug(9,"After substitution tmp=%s -> v_new=%s\n",
+	      entity_local_name(tmp), entity_local_name(v_new));
+
+	transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), v_repr);
+      }
+    }
+    if(!transformer_undefined_p(tf)) {
+      tf = transformer_temporary_value_projection(tf);
+      pips_debug(9, "After temporary value projection, tf=%p:\n", tf);
+      ifdebug(9) dump_transformer(tf);
+    }
+    reset_temporary_value_counter();
+  }
+
+  if(transformer_undefined_p(tf))
+    tf = effects_to_transformer(ef);
+
+  return tf;
+}
+
+transformer any_assign_to_transformer(list args, /* arguments for assign */
+				      list ef, /* effects of assign */
+				      transformer pre) /* precondition */
+{
+  transformer tf = transformer_undefined;
+  expression lhs = EXPRESSION(CAR(args));
+  expression rhs = EXPRESSION(CAR(CDR(args)));
+  syntax slhs = expression_syntax(lhs);
+
+  pips_assert("2 args to assign", CDR(CDR(args))==NIL);
+
+  /* The lhs must be a scalar reference to perform an interesting analysis */
+  if(syntax_reference_p(slhs)) {
+    reference rlhs = syntax_reference(slhs);
+    if(ENDP(reference_indices(rlhs))) {
+      entity v = reference_variable(rlhs);
+      tf = any_scalar_assign_to_transformer(v, rhs, ef, pre); 
+    }
+  }
+
+  /* if some condition was not met and transformer derivation failed */
+  if(tf==transformer_undefined)
+    tf = effects_to_transformer(ef);
+
+  pips_debug(6,"return tf=%p\n", tf);
+  ifdebug(6) (void) print_transformer(tf);
+  pips_debug(8,"end\n");
+  return tf;
 }
 
 static transformer 
