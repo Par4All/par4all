@@ -1,182 +1,354 @@
 #! /bin/sh
-#! /bin/sh -vx
+# for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1994/06/17 14:08:15 $) version $Revision$, got on %D%, %T%
-# %A%
-
+# $Id$
+#
+# $Log: pips-makemake,v $
+# Revision 1.335  1999/03/30 09:19:55  coelho
+# umask fi fixed;-)
+#
+# Revision 1.334  1998/09/28 15:42:18  ancourt
+# add css files to the kept file list
+#
+# Revision 1.333  1998/09/16 11:16:28  coelho
+# .quick-install dependencies fixed?
+#
+# Revision 1.332  1998/08/06 15:57:48  coelho
+# UMASK added to cooperate with SHELL.
+#
+# Revision 1.331  1998/08/06 09:55:48  coelho
+# umask fixed within the SHELL macro.
+#
+# Revision 1.330  1998/07/21 17:33:07  coelho
+# fixed UTC_DATE to work within CPROTO...
+#
+# Revision 1.329  1998/07/21 17:10:41  coelho
+# missing backslash added.
+#
+# Revision 1.328  1998/07/21 17:05:30  coelho
+# UTC_DATE added.
+#
+# Revision 1.327  1998/07/02 10:57:16  coelho
+# fixes for jpips are useless, and buggy for properties which does not have
+# any c file...
+#
+# Revision 1.326  1998/07/01 17:06:01  coelho
+# attempt to debug...
+#
+# Revision 1.325  1998/07/01 16:35:45  coelho
+# if no C files, does not attempt to generate an executable (for jpips).
+#
+# Revision 1.324  1998/04/16 08:21:51  coelho
+# typo.
+#
+# Revision 1.323  1998/04/16 08:20:18  coelho
+# compilation macros reordered.
+#
+# Revision 1.322  1998/04/14 13:51:08  coelho
+# reordering of C* macros.
+#
+# Revision 1.321  1998/01/23 11:46:32  coelho
+# __inline__ dropped out of cproto.
+#
+# Revision 1.320  1997/10/09 14:17:20  coelho
+# rm file before linking.
+#
+# Revision 1.319  1997/09/25 09:32:55  coelho
+# typos again...
+#
+# Revision 1.318  1997/09/25 09:29:02  coelho
+# typo.
+#
+# Revision 1.317  1997/09/25 09:00:16  coelho
+# CPROTO guards possibles...
+#
+# Revision 1.316  1997/09/24 15:23:58  coelho
+# XXX -> $(ARCH)/XXX if necessary for FI.
+#
+# Revision 1.312  1997/08/19 15:00:07  coelho
+# fixes for fpips compilation if no wpips nor tpips.
+#
+# Revision 1.311  1997/08/19 11:17:39  coelho
+# forgotten protections.
+#
+# Revision 1.310  1997/08/19 11:03:06  coelho
+# also clean .so.
+#
+# Revision 1.309  1997/08/19 10:49:53  coelho
+# preliminary java rules added.
+#
+# Revision 1.308  1997/08/19 07:29:25  coelho
+# binary links to be ok for relative links.
+#
+# Revision 1.307  1997/08/18 13:11:46  coelho
+# fixes for main_ in Production/Passes.
+#
+# Revision 1.306  1997/08/18 12:39:03  coelho
+# added clean of fpips in libs.
+#
+# Revision 1.305  1997/08/18 12:36:45  coelho
+# fixed main clean for Libs.
+#
+# Revision 1.304  1997/08/18 12:31:07  coelho
+# end of fixes for ftest, I hope;-)
+#
+# Revision 1.302  1997/08/18 10:41:48  coelho
+# fixed ftest, again;-) (wpips LD added args...)
+#
+# Revision 1.301  1997/08/18 10:38:07  coelho
+# Am I tired?;-)
+#
+# Revision 1.300  1997/08/18 10:35:34  coelho
+# full path to main object file is needed for linking.
+#
+# Revision 1.299  1997/08/18 09:48:52  coelho
+# forgotten protection.
+#
+# Revision 1.298  1997/08/18 09:44:09  coelho
+# fixes to ftest.
+#
+# Revision 1.297  1997/08/18 08:47:03  coelho
+# type.
+#
+# Revision 1.296  1997/08/18 08:45:42  coelho
+# new source file forgotten.
+#
+# Revision 1.295  1997/08/18 08:29:40  coelho
+# cleaner.
+#
+# Revision 1.294  1997/08/18 08:28:05  coelho
+# more fixes for MAIN.
+#
+# Revision 1.292  1997/08/18 08:21:54  coelho
+# forgotten Pass link.
+#
+# Revision 1.291  1997/08/18 07:45:26  coelho
+# ftest/fpips additions.
+#
+# Revision 1.289  1997/06/23 09:02:53  coelho
+# info entry for rlog improved.
+#
+# Revision 1.276  1997/03/28 07:13:52  coelho
+# SOFT_ARCH better defined?
+#
+# Revision 1.275  1997/03/26 13:49:18  coelho
+# $(ECHO) in comments interpretaed on AIX.
+#
+# Revision 1.274  1997/03/19 17:25:47  coelho
+# again rlog -LR -> rlog -L -R...
+#
+# Revision 1.273  1997/03/19 17:07:30  coelho
+# RCS checking of locked files should work as expected now.
+#
+# Revision 1.272  1997/03/19 16:58:06  coelho
+# rlog options cannot be collated
+#
+# Revision 1.271  1997/03/11 19:11:30  coelho
+# RCS and SCCS compatible as a transition...
+#
+#
 # Automatic generation of Makefile for the PIPS project
 #
-# Options:
-#  -l: makes makefile(s) for *library(ies)*
-#  -p: makes makefile(s) for *pass(es)*
-#  -D: makes makefile(s) for *development*
-#  -P: makes makefile(s) for *production*
-#  -c: makes a makefile in *current* directory
-#  -a: makes one makefile in *all* possible directories according to other 
-#      options (ie. with options -lDa: all libraries in development)
-#
 # Remi Triolet, Bruno Baron
-
-# Modifications:
-#   bb, 3.7.91:
-# - MAIN_LIBS -> PIPS_LIBS
-#   bb, 23.10.91:
-# - entry "all" for libraries no more depends on $(BIN_TARGET)
-# - entry $(TARGET)-local.h was created
-# - $(INC_TARGET) now depends on $(TARGET)-local.h
-# - install now depends on $(INC_TARGET). Corresponding building commands 
-#   were suppressed. install for libraries no more depends on $(BIN_TARGET).
-#   $(INC_TARGET), $(OBJECTS), $(LIB_TARGET) and $(BIN_TARGET) are no more
-#   copied to $(TARGETDIR). 
-# - quick-install: $(INC_TARGET) is now simply copied in $INCLUDEDIR . 
-#   $BIN_TARGET is no more copied in $BINDIR for libraries.
-# - entry "depend" now depends on $(INC_TARGET), in order to make sure that 
-#   dependences are computed toward local $(INC_TARGET) (in contrary to 
-#   $INCLUDEDIR/$(INC_TARGET) ).
-#   bb, 4.02.91:
-# - entry "depend": added "s/^		*\$\$//;" (double TAB) in front of
-#   sed string. This way, lines only consisting of TABs are replaced by 
-#   an empty line (for RS6000).
-#   bb, 11.02.92:
-# - impossible to install when redundant libraries in current directory,
-#   to force people to remove symbolic links.
-# - $CONFIG_FILE installed
-# - "production-depend" created and "depend" changed to use production-depend.
-# - at the end, make depend or make production-depend, depending on -D or -P
-#   bb, 17.04.92
-# - added entry $(BINDIR) for installation on new systems.
-#   bb, 22.04.92
-# - added entry .INIT
-# - $(INC_TARGET) uses $(LIB_CFILES) instead of $(CFILES) to avoid
-#   multiple declaration of main(), one per library; this is not to
-#   good, because this part of pips-makemake is used by option -l and -p
-#   fi, 18.07.92
-# - $(INC_TARGET) uses $(TARGET_CFILES) instead of $(LIB_CFILES) with option -p
-#   fi, rk, 18.01.93
-# - use "cproto $(CPPFLAGS)" instead of "make-extern"; fi, 19.01.93
-# - pipe cproto with sed command because cproto does not seem to handle varargs properly
-#   fi, 20.01.93
-# - use $(INC_TARGET).tmp as a temporary file because $(INC_TARGET) is used as an input
-#   for itself via the inclde; this problem did not show up before because the pipes
-#   introduce a long enough delay but for huge libraries like ri-util; fi, 02/02/93
-# - add calls to SCCS to maintain a version history in Production; the return code
-#   for "sccs deledit" is -1 although evrything works fine; this is corrected via
-#   a dummy shell IF; FI, RK, 28.06.93
-#	RK, 9/07/1993 :
-#		Passage d'un Sed (?) en sed.
-#		Rajout des tags pour vi aussi... :-)
-#
-#	Transformation des << cp deledit >> en << edit cp delta >> car sinon
-#	on a des proble`mes de droit d'utilisateur. RK, 22/07/1993.
-#
-#	delta devient delget. RK.
-# - add a bell at the end of the link, FC 23/07/93
-# - $(INC_TARGET) for LIBRARY is now updated with the preprocessed versions of the 
-#   files in $(LIB_CFILES), to take into account functions generated by macros.
-#   for that purpose, I added two macro definitions : PREPROC and LIB_IFILES.
-#   clean now removes $(LIB_IFILES).
-#   BA, August 31, 1993.
-# - $(INC_TARGET) for passes is now updated in the same way as $(INC_TARGET) 
-#   for LIBRARY. For that purpose, I added one macro definition : TARGET_IFILES.
-#   BA, september 1, 1993
-# - add a bell at the end of the test link, FC 17/09/93
-#
-#	RK, 9/11/93 :
-#	modification de make depend pour que $(INC_TARGET) de'pende des
-#	$(TARGET_CFILES). E'vite ainsi de faire un touch a` la main...
-#	De`s qu'on touche a` $(TARGET)-local.h, $(INC_TARGET) est refait.
-#	Pour ne pas utiliser les macros conditionnelles spe'cifiques
-#	a` Sun (RS/6000 au CEA :-) ) je suis oblige' de relancer un $(MAKE).
-#	Mais ce n'est pas ge^nant !
-#
-#	RK, 12/11/93 :
-#	suppression de :
-#	# Pas necessaire, mais bon...
-#	$(MAKEFILE): $(DERIVED_HEADERS) $(EXTERN)
-#		$(MAKE) production-depend
-#
-# 	Par contre on pourrait rajouter une de'pendance entre Makefile et
-#	config.makefile, non ?
-#	Correction d'un nug dans make depend dans le cas des bibliothe`ques.
-# - rajout d'un wtest. RK, 112/1994.
-# - "/lib/cpp $(CFLAGS)" moved to "$(PREPROC)" in production-depend target
-#   FC 21/02/94
-# - rm -f -> $(RM) or -$(RM) FC 22/02/94
-# - PROTOIZE macro added, but this should be in config.makefile... FC 07/03/94
-#
-# - rajout d' un -r à cp pour l'installation. Permet ainsi de copier des
-#	directories. Reste à voir comment rendre ça compatible avec SCCS...
-#	Bon, le rajout d'un find dans le do a amélioré les choses.
-#	RK 17/06/1994.
-# wish:
+# Fabien Coelho, 08/95
 #
 
-USAGE="Usage: $0 -l|p [-D|P] [-c|a] (default -D -c)"
+script=`basename $0`
+USAGE="$script [-hv] [-L|N|P] [-l|p|c|d] [-D|S]"
+verbose=':'
 
 MAKEFILE=Makefile
 CONFIG_FILE=config.makefile
 
-LIBRARY=""
-PASS=""
-PRODUCTION=""
-ALL=""
+PIPSMKMK_OPTION=''
 
-while getopts lpDPca opt
+help()
+{
+  cat <<-END_OF_HELP
+	$USAGE
+	version $Revision$
+	Builds $MAKEFILE using $CONFIG_FILE for the PIPS softwares.
+	The $CONFIG_FILE can define macros and additional rules. It is
+	simply included by the $MAKEFILE. Automatically generated makefiles
+	allow to provide an homogeneous programming environment all over the
+	PIPS softwares. The very same targets are available everywhere.
+	Customizing the makefiles for the different directories is obtained
+	by defining standard macros within the configuration part as described
+	bellow. 
+	Options:
+	  -L|N|P:   part is Linear, Newgen or Pips. (default is automagic:-)
+	    The part is just the software for which the makefile is to be
+	    generated. The impact is to use the corresponding _ROOT and _ARCH
+	    variables for finding includes libraries and so. Within the 
+	    makefile, the ARCH and ROOT macros holds the expected values.
+	    The definition of ARCH first relies on the parts _ARCH variable
+	    (for instance \$NEWGEN_ARCH), then if not set the \$PIPS_ARCH
+	    variable is used, and finally . (dot) is used as a default.
+	    The ROOT and ARCH macros are used for installing files: for 
+	    instance libraires are installed to \$(ROOT)/Lib/\$(ARCH).
+	  -l|p|c|d: type is library|pass|compile|default
+	  -D|S:     side is Development|Source
+	  contextual defaults for all these first options...
+	  -h: this help
+	  -v: verbose
+	Useful macros in $CONFIG_FILE: 
+	 - libraries/passes: LIB_{CFILES,HEADERS,OBJECTS,MAIN}
+	   and maybe DERIVED_{HEADERS,CFILES,FILES}
+	 - default:
+	   SOURCES (config.makefile need not be included)
+	   SCRIPTS (runable files as shell scripts that must be chmoded)
+	   INSTALL_{INC,LIB,BIN,RTM,DOC,HTM,SHR,UTL} files to be installed
+	Many default macros are defined and may be overwritten.
+	Many rules are also defined.
+	END_OF_HELP
+}
+
+verb()
+{ echo "$script" "$@";}
+
+usage()
+{
+  echo "usage: $USAGE" >&2
+  [ "$2" ] && echo "error: $2" >&2
+  exit ${1:-1}
+}
+
+warning()
+{ echo "$script: warning, $@" >&2 ;}
+
+#
+# what is to be done...
+
+DIRSIDE=''
+DIRTYPE=''
+PART=''
+ALL=''
+ALL_RULE_TARGET=''
+
+while getopts PLNlpcdDShv opt
 do
-	case $opt in
-	l)	LIBRARY=TRUE;;
-	p)	PASS=Passes;;
-	D)	PRODUCTION="";;
-	P)	PRODUCTION=$PRODDIR/Src;;
-	c)	ALL="";;
-	a)	ALL=TRUE;;
-	\?)	echo $USAGE >&2
-		exit 2;;
-	esac
+  PIPSMKMK_OPTION="$PIPSMKMK_OPTION -$opt"
+  case $opt in
+    P) PART=PIPS ;;
+    L) PART=LINEAR ;;
+    N) PART=NEWGEN ;;
+    l) DIRTYPE='Libs' ;;
+    p) DIRTYPE='Passes' ;;
+    c) DIRTYPE='Compiled' ;;
+    d) DIRTYPE='Default' ;;
+    D) unset production ;;
+    S) production='yes' ;;
+    h) help ; exit 0 ;;
+    v) verbose=verb ;;
+    *) usage 2 "invalid option ($opt)" ;;
+  esac
 done
 shift `expr $OPTIND - 1`
-if [ $# -ge 1 ]
-then
-	echo $USAGE >&2
-	exit 2
-fi
 
-if [ \( -n "$LIBRARY" -a -n "$PASS" \) \
-    -o \( -z "$LIBRARY" -a -z "$PASS" \) ]
-then
-	echo $USAGE >&2
-	exit 2
-fi
+[ $# -eq 0 ] || usage 3 "$# remaining parameters"
 
-if [ -z "$ALL" ]
-then
-	DIRS="."
-else
-	DIRS="${PRODUCTION:-$DEVEDIR}/${PASS:-Lib}/*"
-fi
+current_directory=`pwd`
+cd_dirname=`dirname $current_directory`
+
+# set defaults if necessary
+
+[ "${PART}" ] ||
+{
+    PART=PIPS
+    [ "`echo $current_directory | grep Linear`" ] && PART=LINEAR 
+    [ "`echo $current_directory | grep Newgen`" ] && PART=NEWGEN
+    $verbose "default PART computed: $PART"
+}
+
+[ "${DIRTYPE}" ] || 
+{
+    DIRTYPE=Default
+
+    if [ $PART = LINEAR ] ;
+    then 
+	DIRTYPE=Libs ;
+    else
+        for f in Libs Passes ; do
+	    [ "`echo $current_directory | grep $f`" ] && DIRTYPE=$f
+        done
+    fi
+
+    $verbose "defaults DIRTYPE computed: $DIRTYPE"
+}
+
+$verbose "defining vars..."
+
+case $DIRTYPE in
+  Libs) ALL_RULE_TARGET='$(ARCH)/lib$(TARGET).a' ;;
+  Passes)  ALL_RULE_TARGET='$(ARCH)/$(TARGET)' ;;
+  Compiled) ALL_RULE_TARGET='' ;;
+  Default) ALL_RULE_TARGET='.runable';;
+  *) usage 5 "unexpected directory type $DIRTYPE"
+esac
+
+#
+# Where to install files:
+
+install_inc_dir='$(ROOT)/Include';
+install_lib_dir='$(ROOT)/Lib';
+install_bin_dir='$(ROOT)/Bin';
+install_src_dir='$(ROOT)/Src';
+install_shr_dir='$(ROOT)/Share';
+install_doc_dir='$(ROOT)/Doc';
+install_htm_dir='$(ROOT)/Html';
+install_rtm_dir='$(ROOT)/Runtime' ;
+install_utl_dir='$(ROOT)/Utils';
+
+case $PART in
+  PIPS) ;;
+  NEWGEN) ;;
+  LINEAR) ;;
+  *) usage 6 "unexpected PART=$PART" ;;
+esac
+
+[ "${DIRSIDE}" ] || 
+{
+  if [ "`echo $current_directory | grep Development`" ]
+  then
+    DIRSIDE=`eval echo '$'"${PART}_DEVEDIR"` ;
+    SIDE=Deve
+  else
+    production='yes' ;
+    DIRSIDE=`eval echo '$'"${PART}_ROOT/Src"`;
+    SIDE=Prod
+  fi
+  $verbose "default DIRSIDE computed: $DIRSIDE"
+}
+
+$verbose "PART: ${PART}"
+$verbose "DIRSIDE: $DIRSIDE"
+$verbose "DIRTYPE: $DIRTYPE"
+$verbose "pwd: $current_directory"
+
+[ -f $CONFIG_FILE ] || usage 6 "no $CONFIG_FILE in $current_directory" ;
+
+# needed because of f.. - in directory names...
+dir_real_name=`basename $current_directory`
+dir_simple_name=`echo $dir_real_name | tr '-' '_'`
+
+# type sed
+target_dir=`echo "$current_directory" | 
+    sed 's,.*/Development/,,;s,.*/Src/,,;'`
+
+echo "Making $DIRTYPE $PART $MAKEFILE in $dir_real_name ($DIRSIDE $target_dir)"
+
+rm -f $MAKEFILE
 
 
-### main loop
-for dir in $DIRS
-do
-( cd $dir
+##############################################################################
 
-if [ ! -f $CONFIG_FILE ] ; then
-   echo "Error $0: cannot find $CONFIG_FILE in $dir; abandon" >&2
-else
-### good case
-echo make $MAKEFILE in $dir
-
-if [ -f $MAKEFILE ] ; then
-   cp $MAKEFILE $MAKEFILE.old
-   rm -f $MAKEFILE
-fi
+$verbose "common part"
 
 cat >> $MAKEFILE <<%
 #	---------------------------------------------------------------
 #	---------------------------------------------------------------
 #
-#				    Warning
+#				    WARNING
 #
 #		  This makefile has been automatically generated
 #
@@ -188,283 +360,759 @@ cat >> $MAKEFILE <<%
 #	---------------------------------------------------------------
 #
 # Copyright (C) Ecole des Mines De Paris
-#               Centre d'Automatique et Informatique
-#               Section Informatique
+#               Centre de Recherche en Informatique
 #
 # This file is part of PIPS
+#
+# $Id$
 #
 # PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
 # WARRANTY.  No author or distributor accepts responsibility to anyone for
 # the consequences of using it or for whether it serves any particular
-# purpose or works at all, unless he says so in writing.
-%
-
-
-cat >> $MAKEFILE $CONFIG_FILE 
-
-cat >> $MAKEFILE <<% 
+# purpose or works at all, unless he/she says so in writing.
 #
-PREPROC=	$(CC) -E $(CPPFLAGS) $(TARGET_ARCH)
-COMPILE=	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
-LINK=		$(LD) $(LDFLAGS) -o
-SCAN=		$(LEX) $(LFLAGS) -t
-TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
-PARSE=		$(YACC) $(YFLAGS)
-ARCHIVE=	$(AR) $(ARFLAGS)
-PROTOIZE=	$(PIPS_PROTOIZE) $(CPPFLAGS)
+# DEFAULTS, may be overwritten by the $CONFIG_FILE content.
 #
-CONFIG_FILE=	$CONFIG_FILE
-MAKEFILE=	$MAKEFILE
+# the root file of the soft which is being compiled
+ROOT= \$(${PART}_ROOT)
 #
-LIB_TARGET=	lib$(TARGET).a
-BIN_TARGET=	$(TARGET)
-INC_TARGET=	$(TARGET).h
+TARGET=		${dir_real_name}
+TARGET_DIR=	${install_src_dir}/${target_dir}
 #
-%
-
-if [ "$LIBRARY" ] ; then
-cat >> $MAKEFILE <<% 
-#
-CFILES=		$(MAIN).c $(LIB_CFILES)
-OBJECTS=	$(MAIN).o $(LIB_OBJECTS)
-INCLUDES=	$(LIB_HEADERS)
-SOURCES= 	$(MAKEFILE) $(CONFIG_FILE) $(INCLUDES) $(CFILES)
-#
-TARGETDIR=	$(LIBSRCDIR)/$(TARGET)
-#
-all: $(LIB_TARGET)
-
-.INIT:
-	@if test -n "$(PIPS_CHECK_OS)"; \\
-	then echo "Cannot run make under this OS release"; \\
-	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
-	fi
-
-test: all $(DEVEDIR)/Passes/pips/pips.o
-	$(LINK) pips $(DEVEDIR)/Passes/pips/pips.o $(PIPS_LIBS)
-	@echo 
-
-WPIPS_DEVEDIR=$(DEVEDIR)/Passes/wpips
-# Extrait ici le noms des .o et des bibliothèques necessaires à wpips. 
-# C'est très crado :-) ! RK.
-# Probablement que ce serait mieux de faire un make -n dans wpips pour
-# avoir l'instruction exacate à utiliser...
-wtest: all $(WPIPS_DEVEDIR)/wpips.o
-	$(LINK) wpips -L$(WPIPS_DEVEDIR) -L$(OPENWINHOME)/lib \\
-	\`perl -ne 'chop; if (\$\$trouve != 1) \\
-		{ /TARGET_OBJECTS/ && do {\$\$trouve = 1; print;}} \\
-		else { s/\x5c// && print || print && exit(0);};' \\
-		$(WPIPS_DEVEDIR)/config.makefile \\
-	| perl -ne 's/.*=//; s/[\\t\\r\\n \x5c]+/ /g; \\
-		s,([^ ]+),$(WPIPS_DEVEDIR)/\$\$1,g; print' \` \\
-	\`grep '^TARGET_LIB' $(WPIPS_DEVEDIR)/config.makefile \\
-		| sed -e 's/.*=/echo /' -e 's/[()]//g' | sh \`
-	@echo 
-
-$(LIB_TARGET): $(LIB_OBJECTS)
-	$(RM) $(LIB_TARGET)
-	$(ARCHIVE) $(LIB_TARGET) \`lorder $(LIB_OBJECTS) | tsort\`
-	ranlib $(LIB_TARGET)
-
-$(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
-	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS)
-	@echo 
-
-install: $(INC_TARGET) $(LIB_TARGET)
-	@if test \`ls *.a | wc -w\` -gt 1 ; then echo install failed: additional local libraries prevent it >&2; exit 1; fi
-	if [ ! -d $(TARGETDIR) ] ; \\
-	then mkdir $(TARGETDIR) ; \\
-	fi
-	-cd $(TARGETDIR) ; sccs edit SCCS
-	-$(RM) $(TARGETDIR)/* pips
-	cp $(SOURCES) $(TARGETDIR)
-	echo ""; echo; \\
-	echo -n "Description of changes: " ; \\
-	read comments ;\\
-	cd $(TARGETDIR) ; \\
-	for module in $(SOURCES) ;\\
-	do \\
-		if [ ! -f SCCS/s.\$\$module ] ;\\
-		then \\
-			echo sccs create \$\$module;  \\
-			sccs create \$\$module;  \\
-			if cmp -s ,\$\$module \$\$module ; \\
-			then echo sccs properly initialized for \$\$module ; \\
-				rm ,\$\$module ; \\
-			else echo sccs failed with \$\$module ; \\
-				exit 1; \\
-			fi ; \\
-		else \\
-			echo sccs -y\"\$\$comments\" delget \$\$module; \\
-			if sccs delget -y"\$\$comments" \$\$module; \\
-			then echo sccs delget succeeded; \\
-			else status=\$\$? ; \\
-				if [ \$\$status -eq 255 ] ; \\
-					then echo sccs delget return code \$\$status ; \\
-					else echo sccs delget unusual return code \$\$status ; \\
-						exit 1; \\
-				fi ; \\
-			fi ; \\
-		fi ;\\
-	done
-	$(MAKE) quick-install
-
-quick-install:
-	cp -r $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
-	cp $(LIB_TARGET) $(LIBDIR)
-	ranlib $(LIBDIR)/$(LIB_TARGET)
-
-$(LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
-	cp $(LIB_TARGET) $(LIBDIR)
-	ranlib $(LIBDIR)/$(LIB_TARGET)
-
-clean:
-	-$(RM) TAGS $(OBJECTS) $(INC_TARGET) $(LIB_TARGET) $(BIN_TARGET) $(DERIVED_HEADERS) *.~[0-9]~\\
-		$(LIB_IFILES)
-
-INC_CFILES = $(LIB_CFILES)
-
-%
-
+# default architecture is taken from ${PART}_ARCH then from PIPS_ARCH 
+# environment variable, else the default is "." (dot). 
+ifdef ${PART}_ARCH
+ARCH =	\$(${PART}_ARCH)
 else
-# ie. for Passes 
+ifdef PIPS_ARCH
+ARCH =	\$(PIPS_ARCH)
+else
+ARCH =	.
+endif
+endif
+#
+# installation directories for quick-install
+#
+INSTALL_INC_DIR= ${install_inc_dir}
+INSTALL_SHR_DIR= ${install_shr_dir}
+INSTALL_DOC_DIR= ${install_doc_dir}
+INSTALL_HTM_DIR= ${install_htm_dir}
+INSTALL_UTL_DIR= ${install_utl_dir}
+INSTALL_RTM_DIR= ${install_rtm_dir}
+INSTALL_LIB_DIR= ${install_lib_dir}/\$(ARCH)
+INSTALL_BIN_DIR= ${install_bin_dir}/\$(ARCH)
+#
+CONFIG	= ${CONFIG_FILE}
+MAKEFILE= ${MAKEFILE}
+# the umask within pips is fixed here!
+# however I cannot fix the group at this level.
+UMASK   = 002
+SHELL	= umask \$(UMASK) ; exec /bin/sh
+COPY	= cp
+MOVE	= mv -f
+GMKNODIR= --no-print-directory
+INSTALL = pips_install_file
+INSTSRC = install_pips_sources
+TMPFILE = .tmp
+DEPFILE = \$(TMPFILE)
+#
+# default targets...
+all: generate_makefile_if_necessary_and_possible
+#
+recompile: depend header all
+recompile: generate_makefile_if_necessary_and_possible
+#
+full-clean: clean clean-all-compiled
+clean-all-compiled: 
+	-for d in \`echo \$(ROOT)/Include/makefile_macros.* | \\
+		sed 's,[-_a-zA-z0-9/]*/makefile_macros\.,,g'\`; do \\
+	  test -d \$\$d && { \\
+	    echo "cleaning \$\$d"; \\
+	    \$(RM) \$\$d/*.[oa] \$\$d/*pips Makefile.depend.\$\$d; \\
+	    test "\`ls -A \$\$d\`" || rmdir \$\$d; } ; \\
+	done
+#
+OLD:; mkdir OLD
+RCS:; mkdir RCS
+# .PHONY is a gnu extension...
+.PHONY: install all depend header recompile clobber count info delta
+.PHONY: generate_makefile_if_necessary_and_possible
+# to override SUN/GNU default rule
+.SCCS_GET:
+# %:SCCS/s.%:
+.SUFFIXED: .tex .dvi .ps .c .h .o .w .a .html .ftex .newgen .m4h .m4c .m4f
+# .INIT is a SUN extension...
+.INIT: 
+check_install:
+# is this appropriate?
+# .DEFAULT:; @echo "$MAKEFILE [\$(FWD_ROOT)] *** no rule for target $@!" >&2
+#
+# Directory redirection to \$(PIPS_DIRECTORY_FOR_\$(ARCH)_BINARIES)
+# if defined: a link is created there... enabling to store binaries
+# somewhere else even if it looks like a local subdirectory.
+# else the default is simply to make a subdir.
+#
+BIN_DIRECTORIES=\$(PIPS_DIRECTORY_FOR_\$(ARCH)_BINARIES)
+ifeq (\$(BIN_DIRECTORIES),)
+# nowhere to link
+\$(ARCH):; test -d \$(ARCH) || mkdir \$(ARCH)
+else
+# somewhere to link!
+\$(ARCH):
+	# creating remote \$(ARCH) directory... (arch added for relative links)
+	rdir=\$(BIN_DIRECTORIES)/${SIDE}/${PART}/${target_dir}/\$(ARCH);\\
+	test -d \$\$rdir || mkdir -p \$\$rdir ; \\
+	ln -s \$\$rdir \$(ARCH);
+endif
+#
+include \$(ROOT)/Include/define_libraries.make
+include \$(ROOT)/Include/makefile_macros.\$(ARCH)
+include \$(CONFIG)
+#
+# if some C files, there is a executable target to build.
+all: \$(ARCH) $ALL_RULE_TARGET
+#
+# The software architecture (compilers and options...) used.
+UTC_DATE = \$(shell date -u | tr ' ' '_')
+CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
+#
+# {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
+# as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
+# a typical interesting example is to put -pg in {C,LD}OPT
+#
+PREPROC=  \$(CC) -E \$(CANSI) \$(CPPOPT) \$(CPPFLAGS)
+COMPILE=  \$(CC) \$(CANSI) \$(CFLAGS) \$(COPT) \$(CPPOPT) \$(CPPFLAGS) -c
+F77COMPILE=\$(FC) \$(FFLAGS) \$(FOPT) -c
+LINK=	  \$(LD) \$(LDFLAGS) \$(LDOPT) -o
+SCAN=	  \$(LEX) \$(LFLAGS) \$(LOPT) -t
+TYPECHECK=\$(LINT) \$(LINTFLAGS) \$(CPPFLAGS) \$(LINT_LIBS)
+PARSE=	  \$(YACC) \$(YFLAGS) \$(YOPT)
+ARCHIVE=  \$(AR) \$(ARFLAGS)
+PROTOIZE= \$(PROTO) \$(PRFLAGS) -E "\$(PREPROC) -DCPROTO_IS_PROTOTYPING"
+M4FILTER= \$(M4) \$(M4OPT) \$(M4FLAGS)
+MAKEDEP=  \$(CC) \$(CMKDEP) \$(CANSI) \$(CFLAGS) \$(COPT) \$(CPPOPT) \$(CPPFLAGS)
+#
+# for easy debugging... e.g. gmake ECHO='something' echo
+echo:; @echo \$(ECHO)
+#
+# Default rules
+ifneq (\$(ARCH),.)
+%: \$(ARCH)/%
+%.o: \$(ARCH)/%.o
+%.a: \$(ARCH)/%.a
+endif
+# Java:
+%.class: %.java; javac \$<
+%.h: %.class; javah -jni \$*
+# C:
+\$(ARCH)/%.o: %.c ; \$(COMPILE) \$< -o \$@
+# Fortran 77:
+\$(ARCH)/%.o: %.f ; \$(F77COMPILE) \$< -o \$@
 
+# if LATEX, MAKEIDX, LX2HTML, DVIPS RMAN and so are not avaible, 
+# the following rules would not prevent compilation...
+%.tex: %.ftex
+	# building \$@ from \$<
+	sed -f \$(PIPS_ROOT)/Utils/accent.sed \$< > \$@
+#
+%.dvi: %.tex
+	# building \$@ from \$<
+	-grep '\\\\makeindex' \$*.tex && touch \$*.ind
+	\$(LATEX) \$<
+	-grep '\\\\bibdata{' \$*.aux && { \$(BIBTEX) \$* ; \$(LATEX) \$< ;}
+	test ! -f \$*.idx || { \$(MAKEIDX) \$*.idx ; \$(LATEX) \$< ;}
+	\$(LATEX) \$<
+	touch \$@
+#
+%.ps: %.dvi
+	# building \$@ from \$<
+	\$(DVIPS) -o \$@ \$<
+	touch \$@
+#
+%.html: %.l
+	# building \$@ from \$<
+	\$(NROFF) -man \$< | \$(RMAN) -f html > \$@
+	touch \$@
+#
+%.ps: %.l
+	# building \$@ from \$<
+	\$(GROFF) -tpe -man \$< > \$@
+#
+# Add the PIPS icon in the background of every page:
+#?cd \$*; for f in *.html ; do \\
+# sed 's,^<BODY,<BODY background="http://www.cri.ensmp.fr/pips/images/logo-pips-embossed-bright-small.jpg" ,' $$f > $$f.bg; \\
+# mv $$f.bg $$f; done
+# the .html file is not a real one, it is just used as a dependency.
+%.html: %.tex
+	# building \$@ from \$<
+	\$(RM) -r \$* \$@ ; \
+	mkdir \$* ;\
+	\$(LX2HTML) \$(L2HFLAGS) \$< ;\
+	# Does not removed the .pl files since it is used
+	# for cross-referencing between HTML articles:
+	# Does not removed the .css files since it is included 
+	# in the generated HTML articles:
+	\$(RM) \$*/*.aux \$*/*.idx \$*/*.log \$*/*.tex \
+	    \$*/.[A-Z]* ;
+	# local .ps.gz if available
+	test ! -f \$*.ps || { cp \$*.ps \$* ; \$(ZIP) \$*/\$*.ps ; }
+	# index.html
+	{ cd \$* ; \
+	  ln -s \$@ index.html ; \
+	  chmod -R a+r-wx * ; \
+	  chmod a+rx,ug+w,o-w . ; } 
+	echo "<html><a href=\$*/index.html>index</a></html>" > \$@
+#
+%.newgen: %.tex
+	# building \$@ from \$<
+	\$(RM) \$@
+	remove-latex-comments \$<
+	chmod a-w \$@
+#
+%.o: %.f
+	\$(F77COMPILE) \$< -o \$@
+#
+%.f: %.m4f
+	# building \$@ from \$<
+	\$(M4FILTER) \$(M4FOPT) \$< > \$@
+#
+%.c: %.m4c
+	# building \$@ from \$<
+	\$(M4FILTER) \$(M4COPT) \$< > \$@
+#
+%.h: %.m4h
+	# building \$@ from \$<
+	\$(M4FILTER) \$(M4HOPT) \$< > \$@
+# MISC
+.runable: \$(SCRIPTS)
+	# protected because only the owner can chmod files
+	-[ ! "\$(SCRIPTS)" ] || chmod a+rx \$(SCRIPTS)
+	touch .runable
+#
+quick-install: .runable
+#
+%
+
+
+
+##############################################################################
+
+$verbose "common to Libs and Passes"
+
+btrg=''
+[ $DIRTYPE = 'Passes' ] && btrg='$(BIN_TARGET)'
+
+[ $DIRTYPE = 'Libs' -o $DIRTYPE = 'Passes' ] && 
 cat >> $MAKEFILE <<% 
 #
-CFILES=		$(TARGET_CFILES)
-OBJECTS=	$(TARGET_OBJECTS)
-INCLUDES=	$(TARGET_HEADERS)
-SOURCES= 	$(MAKEFILE) $(CONFIG_FILE) $(INCLUDES) $(CFILES)
+# prefixed objects:
+LIB_OBJECTS:=\$(addprefix \$(ARCH)/, \$(LIB_OBJECTS))
 #
-TARGETDIR=	$(BINSRCDIR)/$(TARGET)
+# if some C files...
+LIB_TARGET=	\$(ARCH)/lib\$(TARGET).a
+ifneq (\$(ARCH),.)
+lib\$(TARGET).a: \$(LIB_TARGET)
+endif
+BIN_TARGET=	\$(ARCH)/\$(TARGET)
+INC_TARGET=	\$(TARGET).h
 #
-TARGET_IFILES=	$(TARGET_CFILES:.c=.i)
+INSTALL_INC+=	\$(INC_TARGET)
+INSTALL_LIB+=	\$(LIB_TARGET)
+INSTALL_BIN+=	${btrg}
 #
-.INIT:
-	@if test -n "$(PIPS_CHECK_OS)"; \
-	then echo "Cannot run make under this OS release"; \
-	     echo "$(PIPS_CHECK_OS)"; exit 1; \
+
+.PRECIOUS: \$(LIB_TARGET) \$(BIN_TARGET)
+
+\$(LIB_TARGET): \$(INC_TARGET) \$(DERIVED_CFILES) \$(DERIVED_HEADERS)
+
+\$(LIB_TARGET): \$(LIB_OBJECTS) \$(TARGET_OBJECTS)
+	\$(RM) \$(LIB_TARGET)
+	\$(ARCHIVE) \$(LIB_TARGET) \$(LIB_OBJECTS) \$(TARGET_OBJECTS)
+	-\$(RANLIB) \$(LIB_TARGET)
+
+check_install:
+	@if test \`echo *.a | wc -w\` -gt 1 ; \\
+	then \\
+	  echo "install failed: additional local libraries prevented it" >&2;\\
+	  exit 1;\\
 	fi
-
-$(BIN_TARGET): $(OBJECTS) $(INC_TARGET)
-	$(LINK) $(BIN_TARGET) $(OBJECTS) $(TARGET_LIBS)
-
-install: $(INC_TARGET) $(BIN_TARGET)
-	@if test \`ls *.a | wc -w\` -gt 1 ; then echo install failed: additional local libraries prevent it >&2; exit 1; fi
-	if [ ! -d $(TARGETDIR) ] ; \\
-	then mkdir $(TARGETDIR) ; \\
-	fi
-	-cd $(TARGETDIR) ; sccs edit SCCS
-	-$(RM) $(TARGETDIR)/*
-	cp -r $(SOURCES) $(TARGETDIR)
-	echo ""; echo; \\
-	echo -n "Description of changes: " ; \\
-	read comments ;\\
-	cd $(TARGETDIR) ; \\
-	for module in `find $(SOURCES) -print` ;\\
-	do \\
-		if [ ! -f SCCS/s.\$\$module ] ;\\
-		then \\
-			echo sccs create \$\$module;  \\
-			sccs create \$\$module;  \\
-			if cmp -s ,\$\$module \$\$module ; \\
-			then echo sccs properly initialized for \$\$module ; \\
-				rm ,\$\$module ; \\
-			else echo sccs failed with \$\$mocule ; \\
-				exit 1; \\
-			fi ; \\
-		else \\
-			echo sccs -y\"\$\$comments\" delget \$\$module; \\
-			if sccs delget -y"\$\$comments" \$\$module; \\
-			then echo sccs delget succeeded; \\
-			else status=\$\$? ; \\
-				if [ \$\$status -eq 255 ] ; \\
-					then echo sccs delget return code \$\$status ; \\
-					else echo sccs delget unusual return code \$\$status ; \\
-						exit 1; \\
-				fi ; \\
-			fi ; \\
-		fi ;\\
-	done
-	$(MAKE) quick-install
-
-quick-install: $(BINDIR)
-	cp $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
-	cp $(BIN_TARGET) $(BINDIR)
-
-clean:
-	-$(RM) TAGS $(OBJECTS) $(BIN_TARGET) $(INC_TARGET) $(DERIVED_HEADERS) *.~[0-9]~
-
-INC_CFILES = $(TARGET_CFILES)
 
 %
 
-fi
+
+##############################################################################
+
+$verbose "specific to Libs"
+
+[ $DIRTYPE = 'Libs' ] && cat >> $MAKEFILE <<% 
+
+CFILES=		\$(LIB_CFILES)
+OBJECTS=	\$(LIB_OBJECTS)
+INCLUDES=	\$(LIB_HEADERS)
+SOURCES+= 	\$(INCLUDES) \$(CFILES) \$(DOCS) \$(LIB_MAIN)
+#
+
+clean-compiled:
+	\$(RM) \$(OBJECTS) \$(LIB_TARGET) \$(BIN_TARGET) \\
+		\$(ARCH)/pips \$(ARCH)/[ftw]pips \$(LIB_TARGET:.a=.so)
+
+clean: generate_makefile_if_necessary_and_possible clean-compiled
+	-\$(RM) TAGS \$(BIN_TARGET) \$(DERIVED_HEADERS) \$(DERIVED_CFILES) \\
+	       \$(DERIVED_FILES) *.~[0-9]~ \$(LIB_IFILES) \$(INC_TARGET) core
+
+INC_CFILES += \$(LIB_CFILES)
+
+%
 
 
-# La partie commune aux bibliotheques et aux passes :
+##############################################################################
+
+$verbose "specific to Libs for PIPS"
+
+[ $DIRTYPE = 'Libs' -a $PART = PIPS ] && cat >> $MAKEFILE <<% 
+#
+
+test: all
+	#
+	# building a local PIPS
+	#
+	\$(RM) \$(ARCH)/pips
+	\$(LINK) \$(ARCH)/pips \$(ROOT)/Lib/\$(ARCH)/\$(PIPS_MAIN) \\
+	    -lpips \$(PIPS_LIBS) 
+	@echo 
+
+ttest: all
+	#
+	# building a local TPIPS
+	#
+	\$(RM) \$(ARCH)/tpips
+	\$(LINK) \$(ARCH)/tpips \$(ROOT)/Lib/\$(ARCH)/\$(TPIPS_MAIN) \\
+	    -ltpips \$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS)
+	@echo 
+
+wtest: all
+	#
+	# building a local WPIPS
+	#
+	\$(RM) \$(ARCH)/wpips
+	\$(LINK) \$(ARCH)/wpips \$(WPIPS_ADDED_LDFLAGS) \\
+	    \$(ROOT)/Lib/\$(ARCH)/\$(WPIPS_MAIN) \\
+	    -lwpips \$(PIPS_LIBS) \$(WPIPS_ADDED_LIBS)
+	@echo 
+
+ftest: all
+	#
+	# building a local Full PIPS
+	#
+	\$(RM) \$(ARCH)/fpips
+	\$(LINK) \$(ARCH)/fpips \$(FPIPS_ADDED_LDFLAGS) \\
+	    \$(ROOT)/Lib/\$(ARCH)/\$(FPIPS_MAIN) \\
+	    -lfpips \$(FPIPS_ADDED_LIBS) \\
+	    \$(PIPS_LIBS) 
+	#
+	# creating links
+	#
+	\$(RM) \$(ARCH)/pips \$(ARCH)/[tw]pips
+	ln \$(ARCH)/fpips \$(ARCH)/pips 
+	ln \$(ARCH)/fpips \$(ARCH)/tpips 
+	ln \$(ARCH)/fpips \$(ARCH)/wpips 
+	#
+	@echo 
+
+# obsolete rule I guess. test is better. FC.
+\$(BIN_TARGET): \$(ARCH)/\$(LIB_MAIN:.c=.o) \$(LIB_TARGET)
+	#
+	# building \$@
+	#
+	\$(LINK) \$(BIN_TARGET) \$< \$(PIPS_LIBS)
+	@echo 
+
+clobber: clean ; -Delete
+
+%
+
+
+##############################################################################
+
+$verbose "specific to Passes"
+
+[ $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<% 
+#
+# a little bit rough...
+#
+\$(ARCH)/\$(TARGET): \$(ARCH)/lib\$(TARGET).a \\
+	\$(PIPS_ROOT)/Lib/\$(ARCH)/*.a \\
+	\$(LINEAR_ROOT)/Lib/\$(ARCH)/*.a \\
+	\$(NEWGEN_ROOT)/Lib/\$(ARCH)/*.a
+#
+CFILES	 =	\$(LIB_CFILES)
+OBJECTS	 =	\$(LIB_OBJECTS)
+INCLUDES =	\$(LIB_HEADERS)
+SOURCES  += 	\$(INCLUDES) \$(CFILES) \$(DOCS) \$(LIB_MAIN)
+
+# jpips does not have a C main.
+ifneq (\$(LIB_MAIN),)
+MAIN	 =      \$(ARCH)/\$(LIB_MAIN:.c=.o)
+INSTALL_LIB +=	\$(MAIN)
+
+\$(BIN_TARGET): \$(INC_TARGET) \$(MAIN) \$(LIB_TARGET)
+	\$(LINK) \$(BIN_TARGET) \$(MAIN) \$(LIB_TARGET) \$(TARGET_LIBS)
+	@echo 
+endif
+
+\$(PIPS_BINDIR):; mkdir \$(PIPS_BINDIR)
+
+clean-compiled:
+	\$(RM) \$(OBJECTS) \$(MAIN) \$(LIB_TARGET) \$(LIB_TARGET:.a=.so) \\
+	    \$(BIN_TARGET) 
+
+clean: clean-compiled
+	-\$(RM) TAGS \$(INC_TARGET) \$(DERIVED_HEADERS) \$(DERIVED_CFILES) \\
+		\$(DERIVED_FILES) *.~[0-9]~ core
+
+INC_CFILES += \$(LIB_CFILES)
+
+ifneq (\$(ARCH),.)
+\$(TARGET): \$(ARCH)/\$(TARGET)
+endif
+
+%
+
+
+##############################################################################
+
+$verbose "specific to Default"
+
+[ $DIRTYPE = 'Default' ] && cat >> $MAKEFILE <<% 
+
+clean:
+	\$(RM) core *~ \
+	    *.aux *.log *.toc *.idx *.ind *.ilg *.lof *.lot *.bbl *.blg
+
+%
+
+
+
+##############################################################################
+
+$verbose "specific to Production/Lib and Passes"
+
+[ \( $DIRTYPE = 'Passes' -o $DIRTYPE = 'Libs' \) -a "$production" ] &&
+cat >> $MAKEFILE <<%
+
+.PRECIOUS: \$(ROOT)/Lib/\$(LIB_TARGET) \$(ROOT)/Bin/\$(BIN_TARGET)
+
+\$(ROOT)/Include/\$(TARGET).h: header
+	@\$(INSTALL) -f \$(ROOT)/Include \$(TARGET).h
+
+\$(ROOT)/Lib/\$(LIB_TARGET): \$(LIB_TARGET) 
+	@\$(INSTALL) -r \$(RANLIB) \$(ROOT)/Lib/\$(ARCH) \$(LIB_TARGET)
+
+\$(LIB_OBJECTS): \$(TARGET).h
+
+recompile: \$(ROOT)/Include/\$(TARGET).h \$(ROOT)/Lib/\$(LIB_TARGET) 
+
+%
+
+
+
+##############################################################################
+
+$verbose "specific to PIPS/Production/Passes"
+
+[ $DIRTYPE = 'Passes' -a "$production" -a $PART = PIPS ] &&
+cat >> $MAKEFILE <<%
+
+\$(TARGET_OBJECTS): \$(TARGET).h
+
+\$(PIPS_ROOT)/Bin/\$(ARCH):; mkdir \$@
+
+\$(ROOT)/Lib/\$(MAIN): \$(MAIN) 
+	@\$(INSTALL) \$(ROOT)/Lib/\$(ARCH) \$(MAIN)
+
+\$(PIPS_ROOT)/Bin/\$(BIN_TARGET): \$(BIN_TARGET) \$(PIPS_ROOT)/Bin/\$(ARCH)
+	@\$(INSTALL) -x \$(PIPS_ROOT)/Bin/\$(ARCH) \$(BIN_TARGET)
+
+recompile: \$(ROOT)/Lib/\$(MAIN) \$(PIPS_ROOT)/Bin/\$(BIN_TARGET)
+
+%
+
+
+
+##############################################################################
+#
+# Common to all: installation and Makefile generation
+#
+
+$verbose "common to all again"
 
 cat >> $MAKEFILE <<%
+
+ALL_SOURCES =	\$(SOURCES) \$(CONFIG)
+
+\$(TARGET_DIR):;	mkdir \$(TARGET_DIR)
+
+.quick-install: all
+	#
+	# installing files 
+	# 
+	# plain files
+	@test ! "\$(INSTALL_INC)" || \\
+	    \$(INSTALL) -f \$(INSTALL_INC_DIR) \$(INSTALL_INC) 
+	@test ! "\$(INSTALL_DOC)" || \\
+	    \$(INSTALL) -f \$(INSTALL_DOC_DIR) \$(INSTALL_DOC) 
+	@test ! "\$(INSTALL_HTM)" || \\
+	    \$(INSTALL) -f \$(INSTALL_HTM_DIR) \$(INSTALL_HTM) 
+	@test ! "\$(INSTALL_UTL)" || \\
+	    \$(INSTALL) -f \$(INSTALL_UTL_DIR) \$(INSTALL_UTL) 
+	@test ! "\$(INSTALL_SHR)" || \\
+	    \$(INSTALL) -f \$(INSTALL_SHR_DIR) \$(INSTALL_SHR)
+	@test ! "\$(INSTALL_RTM)" || \\
+	    \$(INSTALL) -f \$(INSTALL_RTM_DIR) \$(INSTALL_RTM)
+	# libs...
+	@test ! "\$(INSTALL_LIB)" || \\
+	    \$(INSTALL) -r \$(RANLIB) \$(INSTALL_LIB_DIR) \$(INSTALL_LIB)
+	# executables...
+	@test ! "\$(INSTALL_BIN)" || \\
+	    \$(INSTALL) -x \$(INSTALL_BIN_DIR) \$(INSTALL_BIN)
+	touch .quick-install
+
+tar:
+	# taring \$(TARGET)
+	cd ..; \\
+	    \$(TAR) cf \$(TARGET).tar \\
+		\$(addprefix \$(TARGET)/,\$(ALL_SOURCES) Makefile) ; \\
+	    \$(ZIP) \$(TARGET).tar
+
+quick-install: .quick-install
+
+.makefile: \$(ROOT)/Utils/pips-makemake
+	# 
+	# regenerating Makefile
+	#
+	pips-makemake ${PIPSMKMK_OPTION}; touch .makefile
+
+generate_makefile_if_necessary_and_possible:
+	@[ ! -x \$(ROOT)/Utils/pips-makemake ] || \\
+	    \$(MAKE) \$(GMKNODIR) .makefile 
+
+count:;	@wc -l \$(ALL_SOURCES)
+
 #
-$(BINDIR)/$(BIN_TARGET): $(BIN_TARGET) $(BINDIR)
-	cp $(BIN_TARGET) $(BINDIR)
+# some quick entries for SCCS:
+info:
+	-test -d SCCS && sccs info
+	-test -d RCS && rlog -L -l RCS/*
 
-$(BINDIR):
-	mkdir $(BINDIR)
+# try to delta all checked out files
+delta:
+	-test -d SCCS && test ! "\`sccs tell\`" || sccs delget \`sccs tell\`
+	-test -d RCS && ci -u \`rlog -L -R RCS/*\``
 
-lint:
-	$(TYPECHECK) $(CFILES) | sed '/possible pointer alignment/d;/gen_alloc/d'
-
-TAGS: $(INCLUDES) $(CFILES)
-	etags $(INCLUDES) $(CFILES)
-	ctage $(INCLUDES) $(CFILES)
-
-$(TARGET)-local.h:
-	if [ ! -f $(TARGET)-local.h ] ; then touch $(TARGET)-local.h ; fi
-
-# Ici commence la partie parametree en lib/passe :
-INC_IFILES=	$(INC_CFILES:.c=.i)
-
-#
-# Pour eviter trop de compilations, $(INC_TARGET) ne depend pas 
-#	de $(TARGET_CFILES) tout le temps :
-$(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
-	for cfile in $(INC_CFILES) ; do \\
-		ifile=\`basename \$\$cfile .c\`;\\
-		$(PREPROC) \$\$cfile  > \$\$ifile.i; done
-#	$(UTILDIR)/cproto $(CPPFLAGS) $(INC_IFILES)
-	$(PROTOIZE)  $(INC_IFILES) \\
-		| sed -e 's/int __builtin_va_alist//' \\
-		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
-	$(RM) *.i
-	mv $(INC_TARGET).tmp $(INC_TARGET)
-
-depend: $(INC_TARGET) production-depend $(MAKEFILE)
-# Relance une compilation de $(INC_TARGET) en rajoutant la dependance sur les
-#	fichiers C :
-	PIPS_MAKE_DEPEND_CFILES="$(INC_CFILES)" $(MAKE) $(INC_TARGET)
-
-
-# Quand on cree le Makefile, il faut toujours le completer avec
-#	les dependances d''include :
-production-depend: $(DERIVED_HEADERS) $(EXTERN)
-	sed -n -e 's/^		*\$\$//; 1,/^### DO NOT DELETE THIS LINE./p;' < $(MAKEFILE) > $(MAKEFILE).new
-	-for file in $(CFILES) ; do $(PREPROC) -M \$\$file >> $(MAKEFILE).new; done;
-	cp $(MAKEFILE).new $(MAKEFILE)
-	$(RM) $(MAKEFILE).new
-
-### DO NOT DELETE THIS LINE. USED FOR MAKE DEPEND
 %
 
-# Supprime le mode silencieux -s :
-make -f $MAKEFILE ${PRODUCTION:+production-}depend
+
+##############################################################################
+#
+
+$verbose "specific to Production"
+
+[ "$production" ] && cat >> $MAKEFILE <<%
+#
+# print out the files for a release...
+FWD_ROOT=.
+RELEASE+= \$(ALL_SOURCES) \$(DEDUCED_CFILES) \$(DEDUCED_HEADERS) Makefile
+
+release:
+	@for f in \$(RELEASE) ; \\
+	do echo \$(FWD_ROOT)/\$\$f ; done \$(RELEASE_OUT)
+	    
+%
+
+
+##############################################################################
+#
+# partie specifique a Development
+#
+
+$verbose "specific to Development"
+
+[ ! "$production" ] && cat >> $MAKEFILE <<%
+
+check_sccs:
+	@if [ -d SCCS ] ; then \\
+	    [ ! "\`sccs tell\`" ] || \\
+	    { echo "SCCS files locked, cannot install"; exit 1;} fi ;
+
+check_rcs:
+	@if [ -d RCS ] ; then \\
+	    [ ! "\`rlog -L -R RCS/*\`" ] || \\
+	    { echo "RCS files locked, cannot install"; exit 1;} fi ;
+
+# install installs sources, so depends on sources. FC
+# to insure the library is compiled before hand, a make is added.
+.install: \$(ALL_SOURCES) 
+	#
+	# first check
+	#
+	\$(MAKE) check_install check_sccs check_rcs
+	#
+	# make target directory if necessary
+	#
+	\$(MAKE) \$(GMKNODIR) all \$(TARGET_DIR) 
+	#
+	# installing new source files 
+	#
+	@echo ""; echo; echo -n "Description of changes: " ; \\
+	read x ; \\
+	\$(INSTSRC) -rv -s \`pwd\` -t \$(TARGET_DIR) -y "\$\$x" \$(ALL_SOURCES)
+	-@cd \$(TARGET_DIR) ; pips-makemake $PIPSMKMK_OPTION -S
+	touch .install
+	\$(MAKE) quick-install
+
+install:  .install
+
+# diff between dev and prod sources:
+diff:
+	#
+	# showing diff between the local and installed versions
+	#
+	-@for f in \$(ALL_SOURCES) ; do \\
+	  echo "DIFFERENCES BETWEEN DEV AND PROD FOR \$\$f:" ; \\
+	  \$(DIFF) \$\$f \$(TARGET_DIR)/\$\$f ; \\
+	done
+
+%
+
+
+
+##############################################################################
+#
+# La partie commune aux bibliotheques et aux passes :
+
+$verbose "common to Libs and Passes"
+
+[ $DIRTYPE = 'Libs' -o $DIRTYPE = 'Passes' ] && 
+cat >> $MAKEFILE <<%
+#
+
+\$(ROOT)/Lib:; mkdir \$@
+
+lint:; \$(TYPECHECK) \$(CFILES)|sed '/possible pointer alignm/d;/gen_alloc/d'
+
+TAGS: \$(INCLUDES) \$(CFILES)
+	etags \$(INCLUDES) \$(CFILES)
+	ctags \$(INCLUDES) \$(CFILES)
+
+\$(TARGET)-local.h:
+	[ -f \$(TARGET)-local.h ] || { \\
+	    test -f RCS/\$(TARGET)-local.h,v && co \$(TARGET)-local.h ; \\
+	    touch \$(TARGET)-local.h ; }
+
+# headers are not generated automatically, bacause it should be
+# done each time a c file is touched, which is too much...
+# thus it does depend only of the -local.h.
+# header file reconstruction should be required explicitely
+# with the header rule.
+# some filtering is performed to avoid variations that depends on
+# includes...
+
+build-header-file:
+	# 
+	# building the header file...
+	#
+	\$(COPY) \$(TARGET)-local.h \$(INC_TARGET);\\
+	{ \\
+	echo "/* header file built by \$(PROTO) */";\\
+	echo "#ifndef ${dir_simple_name}_header_included";\\
+	echo "#define ${dir_simple_name}_header_included";\\
+	cat \$(TARGET)-local.h;\\
+	\$(PROTOIZE) \$(INC_CFILES) | \\
+	  sed 's/struct _iobuf/FILE/g;s/__const/const/g;/_BUFFER_STATE/d;/__inline__/d;' ;\\
+	echo "#endif /* ${dir_simple_name}_header_included */";\\
+	} > \$(INC_TARGET).tmp
+	\$(MOVE) \$(INC_TARGET).tmp \$(INC_TARGET)
+
+# .header carrie all dependencies for INC_TARGET:
+.header: \$(TARGET)-local.h \$(DERIVED_HEADERS) \$(INC_CFILES) 
+	\$(MAKE) \$(GMKNODIR) build-header-file ; touch .header
+
+# checks for the header file, and build if necessary...
+
+# header: checks for INC_TARGET dependencies (.header) and for
+# INC_TARGET existance !
+header: .header \$(INC_TARGET)
+
+\$(INC_TARGET): \$(TARGET)-local.h 
+	\$(RM) .header; \$(MAKE) \$(GMKNODIR) .header
+
+ifneq (\$(ARCH),.)
+lib\$(TARGET).a: \$(ARCH) \$(ARCH)/lib\$(TARGET).a
+endif
+
+%
+
+
+
+##############################################################################
+
+$verbose "all but Default"
+
+[ $DIRTYPE = 'Libs' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Compiled' ] && 
+cat >> $MAKEFILE <<%
+#
+
+# indirect depend bacause I do not trust make for the inclusion of
+# Makefile.depend if that very file does not exist.
+
+.depend: \$(CFILES) \$(DERIVED_CFILES) $MAKEFILE.depend.\$(ARCH)
+	touch \$@
+
+depend: .depend
+
+# default rule if the dependence file is not there...
+# forces the regeneration:
+# - the dependences' generation needs the headers
+# - the headers are generated thru the Makefile.
+# - the Makefile needs the dependences.
+# how to get out of this?
+$MAKEFILE.depend.\$(ARCH):
+	#
+	# generating the dependences for \$(ARCH)
+	#
+	# creates an empty dependence file, it is ok for going on and
+	# will prevent any recursion for generating the same dependences.
+	touch \$@ 
+	# the headers are needed. 
+	test ! "\$(INC_TARGET)" -o -f "\$(INC_TARGET)" || \\
+	    \$(MAKE) \$(GMKNODIR) \$(INC_TARGET)
+	# may need the derived files
+	test ! "\$(DERIVED_CFILES)" || \$(MAKE) \$(GMKNODIR) \$(DERIVED_CFILES)
+	# now it's okay fo building all the dependences.
+	# well, the how depends on the compiler...:-(
+	test ! "\$(CFILES)\$(DERIVED_CFILES)" || \\
+	{ \$(MAKEDEP) \$(CFILES) \$(DERIVED_CFILES) > \$(TMPFILE) ; \\
+	  sed 's,^\(.*\.o:\),\$\$(ARCH)/\1,' \$(DEPFILE) > \$@ ; \\
+	  \$(RM) \$(TMPFILE) \$(DEPFILE) ; }
+
+#
+# dependences are stored in another file which is simply included.
+# the file differs for each "architectures"
+include $MAKEFILE.depend.\$(ARCH)
+%
+
+
+
+##############################################################################
+
+touch .makefile
+
+### force dependence list generation, later on...
+rm -f $MAKEFILE.depend* .depend
+# ${PIPS_MAKE:-gmake} depend
 
 ### end good case
-fi	# [ ! -f $CONFIG_FILE ]
-
 echo
 
-)
-
-### end main loop
-done
+# end of pips-makemake
+#
