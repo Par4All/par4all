@@ -212,7 +212,10 @@ pipsdbm_write_statement_function(
 	    fprintf(fd, "%d\n", order);
 	    gen_write(fd, x);
 	} 
-	else pips_user_warning("Statement with illegal ordering, lost data\n");
+	else {
+	  pips_user_warning("Statement with illegal ordering, lost data: %s\n",
+			    statement_identification(s));
+	}
     },
 	h);
 }
