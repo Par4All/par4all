@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/30 19:19:18 $, )
+# ($Date: 1996/08/31 11:48:26 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -191,7 +191,7 @@ DDC_HEADERS 	= $(LIB_M4FFILES:.m4f=.h) \
 LIB_HEADERS	= $(CORE_HEADERS) \
 		  $(DDC_HEADERS)
 
-LIB_OBJECTS= $(addprefix $(RT_ARCH)/, $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
+LIBOBJECTS:= $(addprefix $(RT_ARCH)/, $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
 
 M4_MACROS 	= hpfc_lib_m4_macros hpfc_architecture_m4_macros
 HPFC_MAKEFILES 	= hpfc_Makefile_init 
@@ -213,7 +213,7 @@ SOURCES = 	$(M4_MACROS) \
 LIB_TARGET = $(RT_ARCH)/libhpfcruntime.a
 MKI_TARGET = $(RT_ARCH)/compilers.make
 
-# $(LIB_OBJECTS) $(LIB_TARGET): $(RT_ARCH)
+# $(LIBOBJECTS) $(LIB_TARGET): $(RT_ARCH)
 
 $(RT_ARCH):; mkdir $@
 
@@ -244,7 +244,7 @@ $(CMMD_F77_H):	$(CMMD_INDIR)/cm/$(CMMD_F77_H)
 endif
 
 all: $(RT_ARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
-		$(LIB_OBJECTS) $(LIB_TARGET) $(MKI_TARGET)
+		$(LIBOBJECTS) $(LIB_TARGET) $(MKI_TARGET)
 
 #
 # get pvm headers
@@ -258,9 +258,9 @@ fpvm3.h:$(PVM_INC)/fpvm3.h
 
 #
 
-$(LIB_TARGET):	$(PVM_HEADERS) $(LIB_HEADERS) $(LIB_OBJECTS) 
+$(LIB_TARGET):	$(PVM_HEADERS) $(LIB_HEADERS) $(LIBOBJECTS) 
 	$(RM) $(LIB_TARGET) 
-	$(AR) $(ARFLAGS) $(LIB_TARGET) $(LIB_OBJECTS) 
+	$(ARCHIVE) $(LIB_TARGET) $(LIBOBJECTS) 
 	$(RANLIB) $(LIB_TARGET) 
 
 %.h: %.f
@@ -296,7 +296,7 @@ hpfc_includes.h: $(LIB_M4FFILES:.m4f=.h)
 
 clean: local-clean
 local-clean: 
-	$(RM) *~ $(LIB_OBJECTS) $(PVM_HEADERS) \
+	$(RM) *~ $(LIBOBJECTS) $(PVM_HEADERS) \
 		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) \
 		$(LIB_TARGET)   $(MKI_TARGET)
 	test ! -d $(RT_ARCH) || rmdir $(RT_ARCH)
