@@ -29,7 +29,7 @@ char *argv[];
 {
     int i;
     string name;
-    bool status = FALSE;
+    bool success = FALSE;
 
     /* since db_create_workspace() must have been called before... */
     pips_assert("create_workspace",
@@ -38,18 +38,18 @@ char *argv[];
     open_log_file();
 
     for (i = 0; i < *pargc; i++) {
-	status = process_user_file(argv[i]);
-	if (status == FALSE)
+	success = process_user_file(argv[i]);
+	if (success == FALSE)
 	    break;
     }
 
-    if (status) {
+    if (success) {
 	(* pips_update_props_handler)();
 
 	name = database_name(db_get_current_workspace());
 	user_log("Workspace %s created and opened\n", name);
 
-	status = open_module_if_unique();
+	success = open_module_if_unique();
     }
     else {
 	/* FI: in fact, the whole workspace should be deleted!
@@ -58,14 +58,14 @@ char *argv[];
 	close_log_file();
     }
 
-    return status;
+    return success;
 }
 
 bool open_module_if_unique()
 {
     char *module_list[ARGS_LENGTH];
     int  module_list_length = 0;
-    bool status = TRUE;
+    bool success = TRUE;
 
     pips_assert("open_module_if_unique",
 		db_get_current_workspace()!=database_undefined);
@@ -74,33 +74,36 @@ bool open_module_if_unique()
        an empty one */
     (void) parse_makefile();
 
-    status = db_get_module_list(&module_list_length, module_list);
-    if (status) {
+    success = db_get_module_list(&module_list_length, module_list);
+    if (success) {
 	if (module_list_length == 1) {
-	    status = open_module(module_list[0]);
+	    success = open_module(module_list[0]);
 	}
 	args_free(&module_list_length, module_list);
     }
-    return status;
+    return success;
 }
 
 bool open_module(name)
 char *name;
 {
-    bool status;
+    bool success;
+    string current_name = NULL;
 
     pips_assert("open_module",
 		db_get_current_workspace()!=database_undefined);
 
-    status = db_set_current_module_name(name);
+    current_name = db_get_current_module_name();
+
+    success = db_set_current_module_name(name);
     reset_unique_variable_numbers();
 
-    if (status)
+    if (success)
 	user_log("Module %s selected\n", name);
     else
 	user_warning("open_module", "Could not open module %s\n", name);
 
-    return status;
+    return success;
 }
 
 
@@ -108,7 +111,7 @@ char *name;
 bool lazy_open_module(name)
 char *name;
 {
-    bool status = TRUE;
+    bool success = TRUE;
     char *current_name = NULL;
 
     pips_assert("lazy_open_module",
@@ -119,24 +122,24 @@ char *name;
     current_name = db_get_current_module_name();
 
     if (current_name == NULL || strcmp(current_name, name) != 0)
-	status = open_module(name);
+	success = open_module(name);
     else if (current_name != NULL)
 	user_log ("Module %s already active\n", name);
 
-    return status;
+    return success;
 }
      
 /* should be: success (cf wpips.h) */
 bool open_workspace(name)
 char *name;
 {
-    bool status;
+    bool success;
 
     if (make_open_workspace(name) == NULL) {
 	/* should be show_message */
 	/* FI: what happens since log_file is not open? */
 	user_log("Cannot open workspace %s\n", name);
-	status = FALSE;
+	success = FALSE;
     }
     else {
 	(* pips_update_props_handler)();
@@ -145,32 +148,33 @@ char *name;
 
 	user_log("Workspace %s opened\n", name);
 
-	status = open_module_if_unique();
+	success = open_module_if_unique();
     }
-    return status;
+    return success;
 }
 
 bool close_workspace()
 {
-    bool status;
+    bool success;
 
-    status = make_close_workspace();
-    return status;
+    success = make_close_workspace();
+    close_log_file();
+    return success;
     /*clear_props();*/
 }
 
 bool delete_workspace(string wname)
 {
-    int status;
+    int success;
     
     /* FI: No check whatsoever about the current workspace, no information
        about deleting the non-current workspace vs deleting the current
        workspace... */
 
-    if ((status=safe_system_no_abort (concatenate("Delete ", wname, NULL)))) {
+    if ((success=safe_system_no_abort (concatenate("Delete ", wname, NULL)))) {
 	user_warning("delete_workspace",
-		     "exit code for Delete is %d\n", status);
+		     "exit code for Delete is %d\n", success);
     }
 
-    return !status;
+    return !success;
 }
