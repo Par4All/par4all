@@ -324,6 +324,10 @@ i_display:
 	{
 	    debug(7,"yyparse","reduce rule i_display\n");
 
+	    if(db_get_current_workspace()==database_undefined) {
+		user_error("tp_parse", "Open or create a workspace first!\n");
+	    }
+
 	    if (execution_mode) {
 		string pager;
 
