@@ -130,11 +130,7 @@ char            *mod_name;
    */
   ent = local_name_to_top_level_entity(mod_name);
   
-  if (ent != get_current_module_entity()) 
-  {
-    reset_current_module_entity();
-    set_current_module_entity(ent);
-  }
+  set_current_module_entity(ent);
   
   mod_stat = (statement)db_get_memory_resource(DBR_CODE, mod_name, TRUE);
   STS = (statement_mapping) db_get_memory_resource(DBR_STATIC_CONTROL,
@@ -171,6 +167,7 @@ char            *mod_name;
   DB_PUT_MEMORY_RESOURCE(DBR_BDT, strdup(mod_name), bdt_list);
   
   reset_current_stco_map();
+  reset_current_module_entity();
 
   debug_off();
 }
