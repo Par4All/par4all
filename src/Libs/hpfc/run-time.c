@@ -4,7 +4,7 @@
  * Fabien Coelho, May and June 1993
  *
  * SCCS stuff:
- * $RCSfile: run-time.c,v $ ($Date: 1995/03/14 14:43:17 $, ) version $Revision$,
+ * $RCSfile: run-time.c,v $ ($Date: 1995/03/22 10:57:03 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -168,7 +168,7 @@ reference ref;
 	    linds = reference_indices(ref),
 	    largs = make_list_of_constant(0, 7-gen_length(linds));
 	int
-	    narray = load_entity_hpf_number(reference_variable(ref));
+	    narray = load_hpf_number(reference_variable(ref));
 	
 	largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), 
 			       NIL),
@@ -195,7 +195,7 @@ reference ref;
 	    linds = reference_indices(ref),
 	    largs = make_list_of_constant(0, 7-gen_length(linds));
 	int
-	    narray = load_entity_hpf_number(reference_variable(ref));
+	    narray = load_hpf_number(reference_variable(ref));
 	
 	largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), NIL),
 			  gen_nconc(lUpdateExpr(node_module,  linds), largs));
@@ -306,7 +306,7 @@ expression expr;
 	{
 	    expression
 		expr1 = 
-		    int_to_expression(load_entity_hpf_number(array)),
+		    int_to_expression(load_hpf_number(array)),
 		    expr2 = int_to_expression(dim);
 	    
 	    return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND_GAMMA), 
@@ -315,7 +315,7 @@ expression expr;
 	case is_hpf_newdecl_delta:
 	{
 	    expression
-		expr1 = int_to_expression(load_entity_hpf_number(array)),
+		expr1 = int_to_expression(load_hpf_number(array)),
 		expr2 = int_to_expression(dim);
 	    
 	    return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND_DELTA), 
@@ -330,7 +330,7 @@ expression expr;
     else
     {
 	expression
-	    expr1 = int_to_expression(load_entity_hpf_number(array)),
+	    expr1 = int_to_expression(load_hpf_number(array)),
 	    expr2 = int_to_expression(dim);
 	
 	return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND), 
