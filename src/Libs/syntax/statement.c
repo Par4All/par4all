@@ -816,10 +816,22 @@ MakeAssignInst(syntax l, expression e)
 	   {
 	       if (get_bool_property("PARSER_EXPAND_STATEMENT_FUNCTIONS"))
 	       {
-		   /* Let us keep it somewhere. */
+		   /* Let us keep the statement function definition somewhere. */
+		   /* Preserve the current comments as well as the information
+		      about the macro substitution */
+		   statement stmt1 = make_continue_statement(entity_empty_label());
+		   statement stmt2 = make_continue_statement(entity_empty_label());
+
 		   pips_debug(5, "considering %s as a macro\n", 
 			      entity_name(call_function(syntax_call(l))));
+
 		   parser_add_a_macro(syntax_call(l), e);
+		   statement_comments(stmt2) =
+		       strdup(concatenate("C$PIPS STATEMENT FUNCTION ",
+					  entity_local_name(call_function(syntax_call(l))),
+					  " SUBSTITUTED\n", 0));
+		   i = make_instruction_block(CONS(STATEMENT, stmt1,
+						   CONS(STATEMENT, stmt2, NIL)));
 	       }
 	       else
 	       {
