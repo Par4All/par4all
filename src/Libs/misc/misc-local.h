@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1995/11/02 17:07:03 $, 
+ * $Date: 1995/11/02 17:10:26 $, 
  */
 
 /* hmmm...
@@ -62,7 +62,6 @@
 #endif
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
-#define cat concatenate
 
 /* Constant used to dimension arrays in wpips and pipsmake */
 #define ARGS_LENGTH 512
