@@ -76,7 +76,7 @@ log_on_file(char chaine[])
 
 #define PIPS_THANKS_STRING						\
   "%s (ARCH=" SOFT_ARCH ")\n  running as %s\n\n"			\
-  "  (c) 1988-200 Centre de Recherche en Informatique,\n"		\
+  "  (c) 1988-2000 Centre de Recherche en Informatique,\n"		\
   "                École des mines de Paris, France.\n\n"		\
   "  URL: http://www.cri.ensmp.fr/pips/\n"				\
   "  E-MAIL: pipsgroup@cri.ensmp.fr\n\n"				\
