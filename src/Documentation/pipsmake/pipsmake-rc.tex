@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.2  2002/07/18 12:16:51  phamdat
+%% impact_check added
+%%
 %% Revision 1.1  2002/06/05 11:27:05  nguyen
 %% Initial revision
 %%
@@ -474,7 +477,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2002/06/05 11:27:05 $~$
+$~$Date: 2002/07/18 12:16:51 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -6142,6 +6145,7 @@ alias   print_whole_dependence_graph        'All arcs'
 alias   print_chains_graph                  'Chains'
 alias   print_filtered_dependence_graph     'Filtered Arcs'
 alias   print_filtered_dependence_daVinci_graph   'Filtered Arcs Output to daVinci'
+alias	impact_check                        'Check alias impact'
 \end{verbatim}
 
 \subsubsection{Effective Dependence Graph View}
@@ -6212,6 +6216,21 @@ print_filtered_dependence_daVinci_graph          > MODULE.dvdg_file
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.dg
+\end{verbatim}
+
+\subsubsection{Filtered Dependence Graph View}
+
+%%@UserManualDocumentation: impact_check
+Check impact of alias on the dependance graphe
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+impact_check	> MODULE.code
+        < PROGRAM.entities 
+        < MODULE.alias_associations
+        < MODULE.cumulated_effects
+	< MODULE.dg
+        < ALL.code
 \end{verbatim}
 
 \subsubsection{Chains Graph View}
