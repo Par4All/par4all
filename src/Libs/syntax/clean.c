@@ -101,7 +101,6 @@ void RemoveLocalEntities(function)
 entity function;
 {
     list function_local_entities;
-    list pe;
 
     set_current_function(function);
 
