@@ -1,14 +1,14 @@
-
- /* package ri-util
-  */
+/*
+ * $Id$
+ */
 
 #include <stdio.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "misc.h" 
 #include "ri.h"
-
-#include "arithmetique.h"
 
 #include "ri-util.h"
 
@@ -16,8 +16,8 @@
 string 
 nom_de_variable(string e)
 {
-    if (e!=NULL) return(entity_name((entity) e));
-    else return("TCST");
+    if (e!=NULL) return entity_name((entity) e);
+    else return "TCST";
 }
 
 /* expression make_contrainte_expression(Pcontrainte pc, variable index)
