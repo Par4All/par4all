@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/08/21 14:59:51 $, )
+# ($Date: 1996/08/23 22:25:18 $, )
 #
 
 RUN=':'
@@ -49,8 +49,7 @@ do
   if [ -d $file ] 
   then
     verb "recursing for directory $file"
-    test -d $target || mkdir $target
-    chmod a+rx,ug+w,o-w $target
+    test -d $target || { mkdir $target; chmod a+rx,ug+w,o-w $target; }
     $0 $target $file/*
   else
     if test -f $target && cmp -s $file $target
@@ -61,7 +60,8 @@ do
 	test -f $target && rm -f $target
 	cp $file $directory
 	eval "$RUN $target"
-	test -x $file && chmod a+rx-w $target || chmod a+r-w $target
+	chmod a+r-w $target
+	test -x $file && chmod a+x $target
     fi
   fi
 done
