@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/07/20 16:55:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/07/21 11:32:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1998/07/20 16:55:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1998/07/21 11:32:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -83,7 +83,7 @@ syntax s;
     e = reference_variable(r);
 
     /* what is the offset of this reference ? */
-    o = OffsetOfReference(r);
+    o = so + OffsetOfReference(r);
 
     debug(8, "MakeEquivAtom", "Offset %d for reference to %s\n",
 	  o, entity_local_name(e));
