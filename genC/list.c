@@ -60,7 +60,7 @@
      CDR(L) = GEN_NTHCDR(1,L).
    . GEN_NTH returns the N-th (beginning at 0) car of L.
      CAR(L) = GEN_NTH(0,L).
-     
+   . GEN_SORT_LIST(L, compare) sorts L in place with compare (see man qsort)
 */
 
 #include <stdio.h>
@@ -464,3 +464,35 @@ list l ;
     }
     return( CAR( gen_nthcdr( n, l ))) ;
 }
+
+/* sorts a list of chunks in place.
+ * see man qsort about the compare function.
+ * FC 27/12/94
+ */
+void gen_sort_list(l, compare)
+list l;
+int (*compare)();
+{
+    list c;
+    int n = gen_length(l);
+    chunk 
+	**table = (chunk**) malloc(sizeof(chunk*)*n),
+	**point;
+
+    for (c=l, point=table; 
+	 !ENDP(c); 
+	 c=CDR(c), point++)
+	*point = CHUNK(CAR(c));
+    
+    qsort(table, n, sizeof(chunk*), compare);
+
+    for (c=l, point=table; 
+	 !ENDP(c); 
+	 c=CDR(c), point++)
+	CHUNK(CAR(c)) = *point;
+
+    free(table); 
+}
+
+/*   That is all
+ */
