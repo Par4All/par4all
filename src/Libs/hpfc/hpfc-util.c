@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: hpfc-util.c,v $
+ * Revision 1.53  1997/07/24 14:21:44  keryell
+ * Added a call to fix_sequence_statement_attributes().
+ *
  * Revision 1.52  1997/03/28 20:41:15  coelho
  * more memory leak for AIX...
  *
@@ -855,7 +858,10 @@ static void loop_rewrite(loop l)
 		   (entity_to_expression(loop_index(l)),
 		    copy_expression(range_lower(r))),
 	      CONS(STATEMENT, loop_body(l), NIL)));
-
+	/* Do not forget to move forbidden information associated with
+	   block: */
+	fix_sequence_statement_attributes(s);
+    
 	loop_body(l) = statement_undefined;
 	/* free_instruction(i); */ /* ??? memory leak, cores on AIX */
     }
