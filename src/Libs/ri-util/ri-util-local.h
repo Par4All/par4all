@@ -343,6 +343,7 @@ entity get_ith_##lname##_prime(int i)\
 #define TIMEOFF_SUFFIX		"3"
 #define SETBOOL_SUFFIX		"4"
 #define SETINT_SUFFIX		"5"
+#define HPFCIO_SUFFIX		"6"
 
 /* property prefix for ignoring FCD directives
  * TIME, SYNCHRO and SET exists.
