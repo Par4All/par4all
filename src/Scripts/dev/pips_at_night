@@ -1,14 +1,14 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/07/12 10:26:04 $, )
+# ($Date: 1996/07/12 10:33:29 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
 #
 
 # source environment if needed (as from cron)
-test -d $HOME/.profile && . $HOME/.profile
+test -r $HOME/.profile && . $HOME/.profile
 test "$PIPS_DIR" || . /projects/Pips/pipsrc.sh
 
 echo $PATH
