@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.101  1997/11/21 13:19:23  coelho
+ * string property driven prettyprint of parallel code.
+ *
  * Revision 1.100  1997/11/20 16:05:44  keryell
  * Forgotten that there is IO instruction without any format...
  *
@@ -123,8 +126,9 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.100 1997/11/20 16:05:44 keryell Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.101 1997/11/21 13:19:23 coelho Exp $";
 #endif /* lint */
+
  /*
   * Prettyprint all kinds of ri related data structures
   *
@@ -185,6 +189,22 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 #define PRETTYPRINT_UNREACHABLE_EXIT_MARKER "\204Unstructured Unreachable"
 
 
+/******************************************************************* STYLES */
+
+static bool 
+pp_style_p(string s)
+{
+    return same_string_p(get_string_property(PRETTYPRINT_PARALLEL), s);
+}
+
+#define pp_hpf_style_p() 	pp_style_p("hpf")
+#define pp_f90_style_p() 	pp_style_p("f90")
+#define pp_craft_style_p() 	pp_style_p("craft")
+#define pp_cray_style_p() 	pp_style_p("cray")
+#define pp_cmf_style_p()	pp_style_p("cmf")
+#define pp_doall_style_p()	pp_style_p("doall")
+#define pp_do_style_p()		pp_style_p("do")
+#define pp_omp_style_p()	pp_style_p("omp")
 
 /********************************************************************* MISC */
 
@@ -1005,7 +1025,7 @@ loop_private_variables(loop obj)
 {
     bool
 	all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"),
-	hpf_private = get_bool_property("PRETTYPRINT_HPF"),
+	hpf_private = pp_hpf_style_p(),
 	some_before = FALSE;
     list l = NIL;
 
@@ -1112,7 +1132,7 @@ text_loop(
     string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
     bool structured_do = empty_local_label_name_p(do_label),
          doall_loop_p = FALSE,
-         hpf_prettyprint = get_bool_property("PRETTYPRINT_HPF"),
+         hpf_prettyprint = pp_hpf_style_p(),
          do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT"),
          all_private =  get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
 
@@ -1131,7 +1151,7 @@ text_loop(
 	doall_loop_p = FALSE;
 	break ;
     case is_execution_parallel:
-        if (get_bool_property("PRETTYPRINT_CMFORTRAN")) {
+        if (pp_cmf_style_p()) {
           text aux_r;
           if((aux_r = text_loop_cmf(module, label, margin, obj, n, NIL, NIL))
              != text_undefined) {
@@ -1139,7 +1159,7 @@ text_loop(
             return(r) ;
           }
         }
-        if (get_bool_property("PRETTYPRINT_CRAFT")) {
+        if (pp_craft_style_p()) {
           text aux_r;
           if((aux_r = text_loop_craft(module, label, margin, obj, n, NIL, NIL))
              != text_undefined) {
@@ -1147,14 +1167,12 @@ text_loop(
             return(r);
           }
         }
-	if (get_bool_property("PRETTYPRINT_FORTRAN90") && 
+	if (pp_f90_style_p()) && 
 	    instruction_assign_p(statement_instruction(body)) ) {
 	    MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
 	    return(r) ;
 	}
-	doall_loop_p = !get_bool_property("PRETTYPRINT_CRAY") &&
-	    !get_bool_property("PRETTYPRINT_CMFORTRAN") &&
-		!get_bool_property("PRETTYPRINT_CRAFT") && !hpf_prettyprint;
+	doall_loop_p = pp_doall_style_p();
 	break ;
     default:
 	pips_error("text_loop", "Unknown tag\n") ;
@@ -1197,10 +1215,8 @@ text_loop(
 
     /* LOOP postlogue
      */
-    if(structured_do || doall_loop_p || do_enddo_p ||
-       get_bool_property("PRETTYPRINT_CRAY") ||
-       get_bool_property("PRETTYPRINT_CRAFT") ||
-       get_bool_property("PRETTYPRINT_CMFORTRAN"))
+    if (structured_do || doall_loop_p || do_enddo_p ||
+	pp_cray_style_p() || pp_craft_style_p() || pp_cmf_style_p())
     {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
     }
