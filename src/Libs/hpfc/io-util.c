@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/04/02 08:56:46 $, )
+ * ($Date: 1996/04/02 10:51:53 $, )
  */
 
 #include "defines-local.h"
@@ -17,6 +17,10 @@
 /* this is enough for the distribution purpose, because more clever
  * analysis would be as checking for the distributablity of the enclosed
  * code. A distribution code dedicated to IO will be implemented later on.
+ * only io encoding:
+ * 0 - not an IO
+ * 1 - is an IO
+ * 3 - may be considered as an IO along real IO functions...
  */
 
 GENERIC_CURRENT_MAPPING(only_io, bool, statement)
@@ -61,18 +65,24 @@ only_io_rewrite(
     switch (instruction_tag(i))
     {
     case is_instruction_block:
-	if (host_section_p(instruction_block(i))) /* HOST SECTION => TRUE! */
-	    break; 
-	MAP(STATEMENT, s, is_io = (is_io && Load(s)), instruction_block(i));
+	if (!host_section_p(instruction_block(i))) /* HOST SECTION => TRUE! */
+	{
+	    MAP(STATEMENT, s, 
+		is_io = (is_io & Load(s)), 
+		instruction_block(i));
+	}
+	pips_debug(5, "block 0x%x: %d\n", (unsigned int) st, is_io);
         break;
     case is_instruction_test:
     {
 	test t = instruction_test(i);
-	is_io = (Load(test_true(t)) && Load(test_false(t)));
+	is_io = (Load(test_true(t)) & Load(test_false(t)));
+	pips_debug(5, "test 0x%x: %d\n", (unsigned int) st, is_io);
         break;
     }
     case is_instruction_loop:
 	is_io = Load(loop_body(instruction_loop(i)));
+	pips_debug(5, "loop 0x%x: %d\n", (unsigned int) st, is_io);
         break;
     case is_instruction_goto:
 	pips_internal_error("unexpected goto encountered");
@@ -84,10 +94,15 @@ only_io_rewrite(
 	/* ??? something else should be done?
 	 * other kind of statements should not modify this status?
 	 */
-	is_io = entity_continue_p(f) ||  /* CONTINUE */
-	        io_intrinsic_p(f) ||     /* Fortran IO intrinsics */
-	        hpfc_special_io(f) ||    /* declared with FCD */
-		hpfc_io_like_function(f);/* runtime managed */
+	if (entity_continue_p(f))
+	    is_io = 3;
+	else
+	    is_io = io_intrinsic_p(f) ||     /* Fortran IO intrinsics */
+	            hpfc_special_io(f) ||    /* declared with FCD */
+		    hpfc_io_like_function(f);/* runtime managed */
+
+	pips_debug(5, "call 0x%x (%s): %d\n", (unsigned int) st, 
+		   entity_name(f), is_io);
         break;
     }
     case is_instruction_unstructured:
@@ -95,10 +110,11 @@ only_io_rewrite(
 	control c = unstructured_control(instruction_unstructured(i));
 	list blocks = NIL;
 
-	CONTROL_MAP(ct, is_io=is_io && Load(control_statement(ct)), c, blocks);
-
+	CONTROL_MAP(ct, 
+		    is_io = is_io & Load(control_statement(ct)), 
+		    c, blocks);
 	gen_free_list(blocks);
-
+	pips_debug(5, "unstructured 0x%x: %d\n", (unsigned int) st, is_io);
         break;
     }
     default:
@@ -109,7 +125,7 @@ only_io_rewrite(
     Store(st, is_io);
 }
 
-statement_mapping 
+static statement_mapping 
 only_io_mapping(
     statement program,
     statement_mapping map)
@@ -123,7 +139,9 @@ void
 only_io_mapping_initialize(
     statement program)
 {
+    debug_on("HPFC_IO_DEBUG_LEVEL");
     set_only_io_map(only_io_mapping(program, MAKE_STATEMENT_MAPPING()));
+    debug_off();
 }
 
 
