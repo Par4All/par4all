@@ -1,16 +1,15 @@
 #!/bin/sh
 
-grep define $PIPS_INCLUDEDIR/phases.h | \
-nawk 'BEGIN{print "static char *tp_phase_names[]={";}
-{print "\t",$3,",";}
-END{print "(char*)NULL};"}'
+echo "static char *tp_phase_names[]={"
+sed '/define/!d;s|.*\(".*"\).*|	\1 ,|;' $PIPS_ROOT/Include/phases.h
+echo "(char*)NULL};"
 
-grep define $PIPS_INCLUDEDIR/resources.h | \
-nawk 'BEGIN{print "static char *tp_resource_names[]={";}
-{print "\t",$3,",";}
-END{print "(char*)NULL};"}'
+echo "static char *tp_resource_names[]={"
+sed '/define/!d;s|.*\(".*"\).*|	\1 ,|;' $PIPS_ROOT/Include/resources.h
+echo "(char*)NULL};"
 
-grep -v \# $PIPS_LIBDIR/properties.rc | \
-nawk 'BEGIN{print "static char *tp_property_names[]={";}
-{if ($1) printf "\t\"%s\",\n",$1;}
-END{print "(char*)NULL};"}'
+echo "static char *tp_property_names[]={"
+sed '/#/d;/^[ 	]*$/d;s|^[ ]*\([^ ][^ ]*\).*|	"\1" ,|;' \
+    $PIPS_ROOT/Share/properties.rc
+echo "(char*)NULL};"
+
