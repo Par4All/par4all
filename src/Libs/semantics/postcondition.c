@@ -1,7 +1,5 @@
-/* by Fabien COELHO
- *
- * $RCSfile: postcondition.c,v $ ($Date: 1998/04/14 21:25:27 $, )
- * version $Revision$,
+/*
+ * $Id$
  */
 
 /* Standard includes
