@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/18 11:47:51 $, 
+ * $Date: 1996/06/18 14:44:44 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -140,14 +140,29 @@ static bool pr_statement_flt(statement s)
 static void pr_call_rwt(call c)
 {
     statement head = crt_stat_head();
+    reductions reds = load_proper_reductions(head);
     reduction red;
 
     if (call_proper_reduction_p(head, c, &red))
     {
-	reductions reds = load_proper_reductions(head);
 	pips_debug(6, "stat 0x%x -> reduction on %s\n",
 		   (unsigned int) head, entity_name(reduction_variable(red)));
 	reductions_list(reds) = CONS(REDUCTION, red, reductions_list(reds));
+    }
+    else
+    {
+	/* very basic and false (commons forgotten) 
+	 * at the time, just to test it 
+	 * should be for all local calls inside, plus
+	 * to be checked afterwards... (references, compatibilities)
+	 */
+	list lr = translate_reductions(c);
+
+	if (lr)
+	{
+	    pips_user_warning("reduction translation basic and false!\n");
+	    reductions_list(reds) = gen_nconc(lr, reductions_list(reds));
+	}
     }
 }
 
