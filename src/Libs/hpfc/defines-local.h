@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/08/31 11:46:08 $, ) 
+ * ($Date: 1995/08/31 13:45:02 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -162,7 +162,7 @@ void fprint_entity_list(FILE *fp, list l);
 
 #define what_stat_debug(level, stat)\
  ifdebug(level) { int so_ = statement_ordering(stat);\
-		  fprintf(stderr,  "[%s] statement (%d,%d)\n", __FUNCTION__,\
+		  pips_debug(level, "statement (%d,%d)\n",\
 			  ORDERING_NUMBER(so_), ORDERING_STATEMENT(so_));}
 
 /* Efficient I/O tags
