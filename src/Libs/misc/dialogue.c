@@ -4,37 +4,25 @@
 */
 
 #include <stdio.h>
-#include <varargs.h>
+#include <stdarg.h>
 #include <setjmp.h>
 
 /*VARARGS0*/
-void dialogue(va_alist)
-va_dcl
+void dialogue(char* fmt, ...)
 {
     va_list args;
-    char *fmt;
 
-    va_start(args);
-
-    fmt = va_arg(args, char *);
-
+    va_start(args, fmt);
     (void) vfprintf(stderr, fmt, args);
-
     va_end(args);
 }
 
 /*VARARGS0*/
-void show_message(va_alist)
-va_dcl
+void show_message(char *fmt, ...)
 {
     va_list args;
-    char *fmt;
 
-    va_start(args);
-
-    fmt = va_arg(args, char *);
-
+    va_start(args, fmt);
     (void) vfprintf(stderr, fmt, args);
-
     va_end(args);
 }
