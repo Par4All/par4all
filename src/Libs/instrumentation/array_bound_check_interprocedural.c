@@ -35,6 +35,14 @@
   rule , so we have to multiply the array size by its element size in order to compare 
   2 arrays*/
 
+/* ATTENTION : depend on the debugging need, we can chose make_print_statement(msg)
+   or make_stop_statement(msg) 
+   
+   IF (I.LT.1) PRINT *,"Array bound violation ...."
+
+   IF (I.LT.1) STOP "Array bound violation ...." */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,6 +69,8 @@
  * The functions interprocedural_abc_call,
  * interprocedural_abc_expression return results of type 
  * array_test */
+
+#define PREFIX "$IABC"
 
 typedef struct array_test 
 {
@@ -160,8 +170,6 @@ static expression size_of_dummy_array(entity dummy_array,int i)
   variable dummy_var = type_variable(entity_type(dummy_array));
   list l_dummy_dims = variable_dimensions(dummy_var);
   int num_dim = gen_length(l_dummy_dims),j;
-  basic b = variable_basic(type_variable(entity_type(dummy_array)));
-  expression e_size = int_to_expression(SizeOfElements(b));
   expression e = expression_undefined;
   for (j=i+1; j<= num_dim; j++)
     {
@@ -182,10 +190,6 @@ static expression size_of_dummy_array(entity dummy_array,int i)
       else
 	e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,e,size_j);  
     }
-  if (!expression_undefined_p(e))
-    e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(e),e_size);
-  else 
-    e = copy_expression(e_size);
   ifdebug(2)
     {
       fprintf(stderr, "\n Size of dummy array: \n");
@@ -349,7 +353,6 @@ static expression interprocedural_abc_arrays(call c, entity actual_array,
 	}
       /* translate the size of dummy array from the current callee to the 
 	 frame of current module */
-      // dummy_array_size = iabc_translate_to_module_frame(c,dummy_array_size);
       dummy_array_size = translate_to_module_frame(current_callee,get_current_module_entity(),
 						   dummy_array_size,c);
       ifdebug(2)
@@ -363,20 +366,53 @@ static expression interprocedural_abc_arrays(call c, entity actual_array,
 	  expression actual_array_size = size_of_actual_array(actual_array,l_actual_ref,same_dim); 
 	  /* As the size of the dummy array is translated, we need only precondition of the call
 	     in the current context*/
+	  /* Now, compare the element size of actual and dummy arrays*/
+	  basic b_dummy = variable_basic(type_variable(entity_type(dummy_array)));
+	  basic b_actual = variable_basic(type_variable(entity_type(actual_array)));
+	  int i_dummy = SizeOfElements(b_dummy);
+	  int i_actual = SizeOfElements(b_actual);
 	  if (!expression_undefined_p(actual_array_size))
 	    {
 	      /* same_dim < number of dimension of the actual array*/
+	      if (i_dummy != i_actual)
+		{
+		  /* Actual and formal arguments have different types*/
+		  actual_array_size = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,actual_array_size,
+								  int_to_expression(i_actual));
+		  dummy_array_size = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,dummy_array_size,
+								 int_to_expression(i_dummy));
+		}
 	      if (!same_expression_p(dummy_array_size,actual_array_size))
 		retour = expression_less_than_in_context(actual_array_size,dummy_array_size,prec);
+	      /* Add to Logfile some information:*/
+	      if (!expression_undefined_p(retour))
+		user_log("%s\t%s\t%s\t%s\t%s\t%s\t%s\n",PREFIX,
+			 entity_module_name(actual_array),
+			 entity_local_name(actual_array),
+			 words_to_string(words_expression(actual_array_size)),
+			 entity_module_name(dummy_array),
+			 entity_local_name(dummy_array),
+			 words_to_string(words_expression(dummy_array_size)));
 	    }
-	  else 
-	    /* same_dim == number of dimension of the actual array
-	     * If the size of the dummy array is greater than 1 => violation
-	     * For example : actual array A(M,N), dummy array D(M,N,K) or D(M,N,1,K) */
-	    retour = expression_less_than_in_context(int_to_expression(1),dummy_array_size,prec);
+	  else
+	    {
+	      /* same_dim == number of dimension of the actual array
+	       * If the size of the dummy array is greater than 1 => violation
+	       * For example : actual array A(M,N), dummy array D(M,N,K) or D(M,N,1,K) */
+	      if (i_dummy != i_actual)
+		{
+		  /* Actual and formal arguments have different types*/
+		  dummy_array_size = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,dummy_array_size,
+								 int_to_expression(i_dummy));
+		  retour = expression_less_than_in_context(int_to_expression(i_actual),dummy_array_size,prec);
+		}
+	      else 
+		retour = expression_less_than_in_context(int_to_expression(1),dummy_array_size,prec);
+	    }
 	}
       else 
-	user_log("\n Warning: cannot translate the size of dummy array into module's frame \n");
+	pips_user_warning("Cannot translate the size of dummy array %s into module %s's frame\n", 
+			  entity_local_name(dummy_array),entity_local_name(current_callee));
         /* This case is rare, because size of dummy array = constants or formal parameters or commons*/
     }
   /* else, dummy_array_size == expression_undefined because same_dim == number of 
@@ -446,7 +482,8 @@ static array_test interprocedural_abc_call(call c, statement s)
 			    }
 			  else 
 			    /* Formal parameter is an assumed-size array => what to do ?*/
-			    user_log("\n  Warning: formal parameter is an assumed-size array \n");
+			    pips_user_warning("Formal parameter %s is an assumed-size array\n",
+					      entity_local_name(dummy_array));
 			  break;
 			}
 		    }
@@ -455,7 +492,8 @@ static array_test interprocedural_abc_call(call c, statement s)
 	      }
 	    else 
 	      /* Actual argument is an assumed-size array => what to do ?*/
-	      user_log("\n  Warning: actual argument is an assumed-size array \n");
+	      pips_user_warning("Actual argument %s is an assumed-size array\n",
+				entity_local_name(actual_array));
 	  }
 	i++;
       },  
@@ -487,10 +525,10 @@ static statement make_interprocedural_abc_tests(array_test at)
 	{
 	  // There exists bound violation, we put a stop statement 
 	  number_of_bound_violations++;
-	  return make_stop_statement(message);	  
+	  return make_print_statement(message);	  
 	}
       number_of_added_tests++;
-      smt = test_to_statement(make_test(e, make_stop_statement(message),
+      smt = test_to_statement(make_test(e, make_print_statement(message),
 					make_block_statement(NIL)));
       if (statement_undefined_p(retour))
 	retour = copy_statement(smt);
@@ -586,7 +624,7 @@ static void interprocedural_abc_statement_rwt(statement s, interprocedural_abc_c
 	  {
 	    statement seq = make_interprocedural_abc_tests(retour);	    
 	    if (stop_statement_p(seq))	
-	      user_log("\n Bound violation !!!! \n");
+	      user_log("Bound violation !!!!\n");
 	    // insert the STOP or the new sequence of tests before the current statement
 	    interprocedural_abc_insert_before_statement(s,seq,context);	
 	  }
@@ -602,7 +640,7 @@ static void interprocedural_abc_statement_rwt(statement s, interprocedural_abc_c
 	  {
 	    statement seq = make_interprocedural_abc_tests(retour);	    
 	    if (stop_statement_p(seq))	
-	      user_log("\n Bound violation !!!! \n");
+	      user_log("Bound violation !!!!\n");
 	    // insert the STOP or the new sequence of tests before the current statement
 	    interprocedural_abc_insert_before_statement(s,seq,context);	
 	  } 
@@ -618,7 +656,7 @@ static void interprocedural_abc_statement_rwt(statement s, interprocedural_abc_c
 	  {
 	    statement seq = make_interprocedural_abc_tests(retour);	
 	    if (stop_statement_p(seq))
-	      user_log("Bound violation !!! \n");
+	      user_log("Bound violation !!!!\n");
 	    // insert the STOP statement or the new sequence of tests before the current statement
 	    interprocedural_abc_insert_before_statement(s,seq,context);	
 	  } 
