@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/10 21:21:52 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/11 08:49:31 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -237,36 +237,6 @@ INSTALL_EXE_DIR=  ${install_exe_dir}/$(ARCH)
 # (obsolete?)
 MAIN=		main
 #
-%
-
-
-
-##############################################################################
-#
-# macros default and architecture dependent values...
-
-    $VERBOSE "all macros"
-
-for m in AR ARFLAGS CC CFLAGS CPPFLAGS LD LDFLAGS LEX LFLAGS LINT LINTFLAGS \
-		YACC YFLAGS TAR ZIP DIFF M4 PROTOIZE
-do
-    echo "#"
-    echo "# defining ${m} with \$(ARCH) or default"
-    echo "ifneq (\$(PIPS_${m}_\$(ARCH)),)"
-    echo "${m}=	$(PIPS_${m}_\$(ARCH))"
-    echo "else"
-    echo "${m}=	$(PIPS_${m})"
-    echo "endif"
-done >> $MAKEFILE
-
-
-
-##############################################################################
-
-    $VERBOSE "common 2"
-
-    cat >> $MAKEFILE <<%
-#
 # 
 #
 CONFIG_FILE=	${CONFIG_FILE}
@@ -296,6 +266,7 @@ $(ARCH)/%.o:	%.c
 #
 $(ARCH):;mkdir $(ARCH)
 #
+include $({PART}_INCLUDEDIR)/makefile_macros.$(ARCH)
 include $CONFIG_FILE
 #
 # prefixed objects:
