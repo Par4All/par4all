@@ -1,6 +1,6 @@
 /* package sc
  * $RCSfile: sc_eval.c,v $ (version $Revision$)
- * $Date: 1996/07/18 19:15:53 $, 
+ * $Date: 1996/07/23 16:58:01 $, 
  */
 
 #include <string.h>
@@ -148,13 +148,13 @@ Value *pmin, *pmax;
 
 	if (value_pos_p(cv)) {
 	    /* cette contrainte nous donne une borne max */
-	    Value bs = value_div(cc,cv);
+	    Value bs = value_pdiv(cc,cv);
 	    if (value_lt(bs,*pmax))
 		*pmax = bs;
 	}
 	else if (value_neg_p(cv)) {
 	    /* cette contrainte nous donne une borne min */
-	    Value bi = value_div(cc,cv);
+	    Value bi = value_pdiv(cc,cv);
 	    if (value_gt(bi,*pmin))
 		*pmin = bi;
 	}
