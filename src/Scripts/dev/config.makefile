@@ -9,9 +9,7 @@ UTILS=		pips-makemake \
 SCRIPTS = 	$(UTILS) \
 		make-tags \
 		analyze_libraries \
-		clean-pips \
 		grep_libraries \
-		search-pips \
 		checked-out \
 		order_libraries \
 		pips-experiment \
@@ -31,7 +29,8 @@ SRC_MACROS =	auto.h \
 		makefile_macros.GPROF \
 		makefile_macros.IBMAIX \
 		makefile_macros.IBMAIXLL \
-		makefile_macros.CRAY-T3D
+		makefile_macros.CRAY-T3D \
+		makefile_macros.CRAY-T3D-F90
 
 DDC_MACROS = 	define_libraries.make \
 		auto-dash.h \
