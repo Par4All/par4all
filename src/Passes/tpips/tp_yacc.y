@@ -291,7 +291,10 @@ i_make:
 	opt_sep_list
 	{
 	    bool result = TRUE;
-	    string save_current_module_name = strdup(db_get_current_module_name());
+	    string save_current_module_name = 
+	      db_get_current_module_name() == NULL? 
+	      NULL : 
+	      strdup(db_get_current_module_name());
 
 	    debug(7,"yyparse","reduce rule i_make\n");
 
@@ -304,7 +307,8 @@ i_make:
 		}, $3.the_owners);
 	    }
 	    db_set_current_module_name(save_current_module_name);
-	    free(save_current_module_name);
+	    if(save_current_module_name!=NULL)
+	      free(save_current_module_name);
 	    $$ = result;
 /*	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
@@ -319,7 +323,11 @@ i_apply:
 	opt_sep_list
 	{
 	    bool result = TRUE;
-	    string save_current_module_name = strdup(db_get_current_module_name());
+	    /* keep track of the current module, if there is one */
+	    string save_current_module_name = 
+	      db_get_current_module_name() == NULL? 
+	      NULL : 
+	      strdup(db_get_current_module_name());
 
 	    debug(7,"yyparse","reduce rule i_apply\n");
 
@@ -335,8 +343,10 @@ i_apply:
 		    }
 		}, $3.the_owners);
 	    }
+	    /* restore the initial current module, if there was one */
 	    db_set_current_module_name(save_current_module_name);
-	    free(save_current_module_name);
+	    if(save_current_module_name!=NULL)
+	      free(save_current_module_name);
 	    $$ = result;
 /*	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
@@ -350,7 +360,10 @@ i_display:
 	resource_id
 	opt_sep_list
 	{
-	    string save_current_module_name = strdup(db_get_current_module_name());
+	    string save_current_module_name = 
+	      db_get_current_module_name() == NULL? 
+	      NULL : 
+	      strdup(db_get_current_module_name());
 
 	    debug(7,"yyparse","reduce rule i_display\n");
 
@@ -380,7 +393,8 @@ i_display:
 		$$ = TRUE;
 	    }
 	    db_set_current_module_name(save_current_module_name);
-	    free(save_current_module_name);
+	    if(save_current_module_name!=NULL)
+	      free(save_current_module_name);
 /*
 	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
