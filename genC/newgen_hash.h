@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 1997/04/24 18:56:11 $, )
+/* $RCSfile: newgen_hash.h,v $ ($Date: 1997/08/01 11:17:00 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -46,6 +46,7 @@ typedef struct __hash_table *hash_table;
  */
 
 #define hash_table_undefined ((hash_table)gen_chunk_undefined)  
+#define hash_table_undefined_p(h) ((h)==hash_table_undefined)
 
 /* value returned by hash_get() when the key is not found; could also be
    called HASH_KEY_NOT_FOUND, but it's semantically a value; this bottom
@@ -94,6 +95,7 @@ extern void hash_table_print GEN_PROTO((hash_table));
 extern void hash_table_fprintf GEN_PROTO((FILE *, char *(*)(), 
 					  char *(*)(), hash_table));
 extern void hash_update GEN_PROTO((hash_table, char*, char*));
+extern bool hash_warn_on_redefinition_p GEN_PROTO((void));
 
 extern int hash_table_entry_count GEN_PROTO((hash_table));
 extern int hash_table_size GEN_PROTO((hash_table));
