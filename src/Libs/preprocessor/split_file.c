@@ -23,6 +23,9 @@
  * - bang comment management added (to avoid the parser)
  *
  * $Log: split_file.c,v $
+ * Revision 1.46  2001/04/09 15:55:46  coelho
+ * in_hollerith stuff?
+ *
  * Revision 1.45  1999/01/08 16:35:40  coelho
  * condition fixed...
  *
@@ -650,7 +653,7 @@ char * fsplit(char * dir_name, char * file_name, FILE * out)
 
 /* global state
  */
-static int in_squotes=0, in_dquotes=0, in_id=0;
+static int in_squotes=0, in_dquotes=0, in_id=0, in_hollerith=0;
 
 static int blank_line_p(char * line)
 {
@@ -673,7 +676,7 @@ static char * hollerith_and_bangcomments(char * line)
   bangcomment[0] = '\0';
   
   if (!line) {
-    in_squotes=0, in_dquotes=0, in_id=0; /* RESET */
+    in_squotes=0, in_dquotes=0, in_id=0, in_hollerith=0; /* RESET */
     return NULL;
   }
   
@@ -689,7 +692,7 @@ static char * hollerith_and_bangcomments(char * line)
     if (!line[j]) return NULL;
   
   if (isspace((int) line[i-1]))
-    in_squotes=0, in_dquotes=0, in_id=0; /* RESET */
+    in_squotes=0, in_dquotes=0, in_id=0, in_hollerith=0; /* RESET */
   
   initial=i;
   
@@ -732,8 +735,8 @@ static char * hollerith_and_bangcomments(char * line)
 	
 	if (!touched) { /* rm potential 73-80 text */
 	  touched=1;
-	  line[72]='\n'; 
-	  line[73]='\0';			
+	  line[72]='\n';
+	  line[73]='\0';
 	}
 	
 	j=1;
