@@ -12,7 +12,7 @@
  * char *variable_local_name(Variable var)
  *      return the abbreviated, local name of var
  *
- * boolean is_inferior_var(Variable var1, var2)
+ * bool is_inferior_var(Variable var1, var2)
  *      return TRUE if the complete name of var1
  *      is lexicographically before var2's one.
  *
@@ -57,7 +57,7 @@ Variable var;
 char *variable_local_name(var)
 Variable var;
 {
-    string s;
+    string s = NULL;
 
     if (var == TCST) 
 	s = strdup(TCST_NAME);
@@ -73,10 +73,52 @@ Variable var;
     return (s);
 }
 
-boolean is_inferior_var(var1, var2)
+bool is_inferior_var(var1, var2)
 Variable var1, var2;
 {
-    return (strcmp(variable_local_name(var1), variable_local_name(var2)) <= 0 );
+    bool is_inferior = TRUE;
+    
+    if (var1 == TCST)
+	is_inferior = TRUE;
+    else if(var2 == TCST)
+	is_inferior = FALSE;
+    else
+	is_inferior = (strcmp(variable_local_name(var1), 
+			     variable_local_name(var2)) <= 0 );
+
+    return is_inferior; 
+}
+
+bool is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
+{
+    bool is_inferior = TRUE;
+    
+    if (term_cst(varval1))
+	is_inferior = TRUE;
+    else if(term_cst(varval2))
+	is_inferior = FALSE;
+    else
+	is_inferior = (strcmp(variable_local_name(vecteur_var(varval1)), 
+			      variable_local_name(vecteur_var(varval2)))
+		       <= 0 );
+
+    return is_inferior; 
+}
+
+bool is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+{
+    bool is_inferior = TRUE;
+    
+    if (term_cst(*pvarval1))
+	is_inferior = TRUE;
+    else if(term_cst(*pvarval2))
+	is_inferior = FALSE;
+    else
+	is_inferior = (strcmp(variable_local_name(vecteur_var(*pvarval1)), 
+			      variable_local_name(vecteur_var(*pvarval2)))
+		       <= 0 );
+
+    return is_inferior; 
 }
 
 Variable name_to_variable(name)
