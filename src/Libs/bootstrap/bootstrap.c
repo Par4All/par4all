@@ -66,7 +66,7 @@ void CreateArrays()
 		      make_type(is_type_functional,
 				make_functional(NIL,make_type(is_type_void,NIL))),
 		      make_storage(is_storage_rom, UU),
-		      make_value(is_value_code,make_code(NIL, "")));
+		      make_value(is_value_code,make_code(NIL, strdup(""))));
 
     set_current_module_entity(ent);
 
