@@ -22,6 +22,7 @@
 #include "polyedre.h"
 #include "union.h"
 #include "matrix.h"
+#include "sparse_sc.h"
 
 /* Pips includes        */
 #include "complexity_ri.h"
@@ -47,6 +48,8 @@
 #include "resources.h"
 #include "array_dfg.h"
 #include "pip.h"
+#include "static_controlize.h"
+#include "scheduling.h"
 
 /* Local defines */
 typedef dfg_arc_label arc_label;
@@ -829,57 +832,58 @@ Ppolynome include_trans_in_poly(s, p, l, d)
  Ppolynome       p;
  list            l;
 {
- list            lindice, lexp, lind, lvar, lv;
- static_control  stct;
- char            *name;
- expression      exp;
- Ppolynome       poly_trans;
- int             count = 0, den = 1;
- Variable        var, v;
- entity          ent;
+  list            lindice, lexp, lind, lvar, lv;
+  static_control  stct;
+  char            *name;
+  expression      exp;
+  Ppolynome       poly_trans;
+  int             count = 0, den = 1;
+  Variable        var, v;
+  entity          ent;
 
- if ((p != (Ppolynome)NIL)||(l != NIL))
+  if ((p != (Ppolynome)NIL)||(l != NIL))
+  {
+    /* we get the list of the englobing loop of the studied node */
+    stct = get_stco_from_current_map(adg_number_to_statement(s));
+    lindice = static_control_to_indices(stct);
+
+    lvar = NIL;
+    name = malloc(100);
+
+    /* replace all variables by a local one */
+    for (lind = lindice; lind != NIL; lind = CDR(lind))
     {
-     /* we get the list of the englobing loop of the studied node */
-     stct = get_stco_from_current_map(adg_number_to_statement(s));
-     lindice = static_control_to_indices(stct);
-
-     lvar = NIL;
-     name = malloc(100);
-
-     /* replace all variables by a local one */
-     for (lind = lindice; lind != NIL; lind = CDR(lind))
-        {
-         var = (Variable)ENTITY(CAR(lind));
-         sprintf(name, "myownprivatevariable_%d", count);
-         ent = create_named_entity(name);
-
-         if (polynome_contains_var(p, var))  poly_chg_var(p,var,ent);
-         ADD_ELEMENT_TO_LIST(lvar, ENTITY, ent);
-         count++;
-        }
-
-     /* replace all local variables by the transformation */
-     lexp = l;
-
-     for (lv = lvar; lv != NIL; lv = CDR(lv))
-        {
-         exp = EXPRESSION(CAR(lexp));
-	 analyze_expression(&exp, &den);
-         poly_trans = pu_expression_to_polynome(exp);
-         v = (Variable)ENTITY(CAR(lv));
-         if (polynome_contains_var(p, v))
-             p = prototype_var_subst(p, v, poly_trans); 
-         lexp = CDR(lexp);
-        }
-
-     gen_free_list(lindice);
-     gen_free_list(lvar);
+      var = (Variable)ENTITY(CAR(lind));
+      sprintf(name, "myownprivatevariable_%d", count);
+      ent = create_named_entity(name);
+      
+      if (polynome_contains_var(p, var))
+	poly_chg_var(p, var, (Variable)ent);
+      ADD_ELEMENT_TO_LIST(lvar, ENTITY, ent);
+      count++;
     }
 
- *d = den;
+    /* replace all local variables by the transformation */
+    lexp = l;
 
- return(p);
+    for (lv = lvar; lv != NIL; lv = CDR(lv))
+    {
+      exp = EXPRESSION(CAR(lexp));
+      analyze_expression(&exp, &den);
+      poly_trans = pu_expression_to_polynome(exp);
+      v = (Variable)ENTITY(CAR(lv));
+      if (polynome_contains_var(p, v))
+	p = prototype_var_subst(p, v, poly_trans); 
+      lexp = CDR(lexp);
+    }
+
+    gen_free_list(lindice);
+    gen_free_list(lvar);
+  }
+
+  *d = den;
+
+  return(p);
 }
 
 /*==================================================================*/
