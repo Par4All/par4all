@@ -10,18 +10,23 @@
 #include <xview/svrimage.h>
 
 #include "genC.h"
-#include "misc.h"
-
 #include "ri.h"
 #include "database.h"
+#include "graph.h"
+#include "makefile.h"
+
+#include "misc.h"
+#include "ri-util.h"
 #include "pipsdbm.h"
+#include "properties.h"
+#include "constants.h"
+#include "resources.h"
+#include "pipsmake.h"
+
+#include "top-level.h"
 
 #include "wpips.h"
 #include "xv_sizes.h"
-
-#include "constants.h"
-
-#include "top-level.h"
 
 /*
 extern void(* pips_error_handler)();
@@ -45,8 +50,6 @@ Panel main_panel,
     mchoose_panel,
     schoose_panel,
     help_panel;
-
-
 
 void
 create_menus()
@@ -196,8 +199,6 @@ char *argv[];
 	}
     }
 }
-
-
 
 int main(argc,argv)
 int argc;
