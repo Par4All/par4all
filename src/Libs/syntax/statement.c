@@ -123,6 +123,11 @@ typedef struct block {
 LOCAL block BlockStack[MAXBLOCK];
 LOCAL int CurrentBlock = 0;
 
+void ResetBlockStack()
+{
+    CurrentBlock = 0;
+}
+
 bool IsBlockStackEmpty()
 {
 	return(CurrentBlock == 0);
@@ -602,7 +607,7 @@ int MakeElseInst()
     int elsifs;
 
     if(CurrentBlock==0) {
-	FatalError("MakeElseInst", "unexpected ELSE statement\n");
+	ParserError("MakeElseInst", "unexpected ELSE statement\n");
     }
 
     elsifs = BlockStack[CurrentBlock-1].elsifs ;
@@ -628,16 +633,18 @@ void MakeEndifInst()
     int elsifs = -1;
 
     if(CurrentBlock==0) {
-	FatalError("MakeEndifInst", "unexpected ENDIF statement\n");
+	ParserError("MakeEndifInst", "unexpected ENDIF statement\n");
     }
 
-    if (strcmp("ELSE", BlockStack[CurrentBlock-1].l) == 0) {
+    if (BlockStack[CurrentBlock-1].l != NULL &&
+	strcmp("ELSE", BlockStack[CurrentBlock-1].l) == 0) {
 	elsifs = MakeElseInst();
 	LinkInstToCurrentBlock(MakeZeroOrOneArgCallInst("CONTINUE",
 							expression_undefined));
     }
-    if (strcmp("ENDIF", BlockStack[CurrentBlock-1].l)) {
-	FatalError("MakeEndifInst", "block if statement badly nested\n");
+    if (BlockStack[CurrentBlock-1].l == NULL ||
+	strcmp("ENDIF", BlockStack[CurrentBlock-1].l)) {
+	ParserError("MakeEndifInst", "block if statement badly nested\n");
     }
     else {
 	elsifs = BlockStack[CurrentBlock-1].elsifs ;
@@ -652,7 +659,7 @@ void MakeEndifInst()
 void MakeEnddoInst()
 {
     if (strcmp("BLOCKDO", BlockStack[CurrentBlock-1].l))
-	    FatalError("MakeEnddoInst", "block do statement badly nested\n");
+	    ParserError("MakeEnddoInst", "block do statement badly nested\n");
 
     /*LinkInstToCurrentBlock(MakeZeroOrOneArgCallInst("ENDDO", 
 						    expression_undefined));*/
