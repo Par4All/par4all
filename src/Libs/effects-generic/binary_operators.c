@@ -206,7 +206,6 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
 	    {
 		list tmp;
 		effect new_eff_base;
-				
 
 		/* compute their union */
 		new_eff_base = (*effect_union_op)
