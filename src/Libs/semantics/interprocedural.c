@@ -16,8 +16,8 @@
 
 #include "misc.h"
 
-#include "effects.h"
-
+#include "effects-generic.h"
+#include "effects-simple.h"
 
 #include "transformer.h"
 
