@@ -1251,8 +1251,11 @@ int i;
     return(ExpressionToInt((dimension_lower(DIMENSION(CAR(pc))))));
 }
 
-/* this function computes the size of a range, ie. the number of
-iterations that would be done by a loop with this range. */
+/* This function computes the size of a range, ie. the number of
+ * iterations that would be done by a loop with this range.
+ *
+ * See also range_count().
+ */
 
 int 
 SizeOfRange(r)
