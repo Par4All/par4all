@@ -2,6 +2,10 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.138  1998/04/15 13:10:09  coelho
+# -x c with gcc does not work properly.
+# the cpp must know about the fortran language lexical properties.
+#
 # Revision 1.137  1998/04/02 14:38:58  coelho
 # PIPS_CPP fixed for gcc-2.8.0 if g77 is not installed.
 #
@@ -204,7 +208,7 @@ LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PIPS_ROOT}/Lib/${PIPS_ARCH}"
 #
 # to get some determinism...
 
-PIPS_CPP='gcc -E -x c'
+PIPS_CPP='gcc -E'
 
 # Additional options to pass to cpp for .F files:
 # default: PIPS_CPP_FLAGS=""
