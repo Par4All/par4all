@@ -1657,7 +1657,7 @@ static void write_define_shared_node(int n)
 
 static void write_shared_node(int n)
 {
-  fputci('S', n, user_file);
+  fputci('H', n, user_file);
 }
 
 static void write_null(struct gen_binding *bp)
@@ -1765,6 +1765,10 @@ static int write_leaf_in(gen_chunk *obj, struct gen_binding *bp)
       }
     }
     else {
+      /* references are by name.
+	 I don't think that a number is allowed to change, so
+	 the number should be okay.
+       */
       int type_number = gen_type_translation_actual_to_old(bp-Domains);
       fputci('R', type_number, user_file);
       write_string("\"", (obj->p+HASH_OFFSET)->s, "\" ", "_", "!") ;
@@ -1965,15 +1969,16 @@ write_tabulated_leaf_in(
      */
     if( number >= 0 ) 
     {
+      putc('D', user_file);
+      /*
       int type_number = gen_type_translation_actual_to_old(bp-Domains);
-      /* putc('D', user_file); */
-       fputci('D', type_number, user_file);
-       write_string("\"", (obj->p+HASH_OFFSET)->s, "\" ", "_", "!"); 
+      fputci('D', type_number, user_file);
+      write_string("\"", (obj->p+HASH_OFFSET)->s, "\" ", "_", "!"); */
       
       /* once written the domain number sign is inverted,
        * to tag the object has been written, so that
-       * its definition is not written twice on disk. The second
-       * time a simple reference is written instead. FC.
+       * its definition is not written twice on disk.
+       * The second time a simple reference is written instead. FC.
        */ 
       (obj->p+1)->i = - (obj->p+1)->i ;
       return GO;
