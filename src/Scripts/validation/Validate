@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1994/03/23 11:13:25 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1994/03/23 11:27:46 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -100,7 +100,7 @@ which_pips()
 validate_usage()
 {
   {
-    echo "Usage: $0 [-dsvpnhtuVD] [-r dir] [-l dir] [-x pips] [Modules]"
+    echo "Usage: $0 [-dsvpnhtVD] [-u xx] [-r dir] [-l dir] [-x pips] [Modules]"
     echo "   -d: debug"
     echo "   -D: more debug"
     echo "   -s: silent (default)"
@@ -110,7 +110,7 @@ validate_usage()
     echo "   -n: sequential"
     echo "   -h: help"
     echo "   -t: timing"
-    echo "   -u: update (default 30)"
+    echo "   -u xx: update time (default 30)"
     echo "   -r dir: run directory (default .)"
     echo "   -l dir: lock directory (default .)"
     echo "   -x pips: pips to be used (default . then Production)"
@@ -308,7 +308,7 @@ done
 
 $VERBOSE "waiting for reports"
 
-while available_host ; do : ; done
+while available_host ; do : ; done > /dev/null
 
 #
 #
