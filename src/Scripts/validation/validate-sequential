@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1995/07/25 11:28:51 $, ) version $Revision$,
+# $RCSfile: validate-sequential,v $ ($Date: 1995/08/30 12:58:55 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -148,6 +148,8 @@ diffout=/tmp/diff.$$
 # global variable...
 errors=/tmp/errors.$$
 shell='/bin/sh'
+
+echo 0 > $errors
 
 report()
 {
