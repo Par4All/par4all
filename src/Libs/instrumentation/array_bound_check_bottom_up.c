@@ -19,6 +19,14 @@
  * Add statistics 
  * Version : Modify the Implied-DO process*/
 
+
+/* ATTENTION : depend on the debugging need, we can chose make_print_statement(msg)
+   or make_stop_statement(msg) 
+   
+   IF (I.LT.1) PRINT *,"Array bound violation ...."
+
+   IF (I.LT.1) STOP "Array bound violation ...." */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -748,9 +756,9 @@ static statement make_bottom_up_abc_tests(array_dimension_test adt)
 	{
 	  number_of_statements_having_bound_violation++;
 	  // There exists bound violation, we put a stop statement 
-	  return make_stop_statement(message);  
+	  return make_print_statement(message);  
 	}
-      tes =  make_test(e, make_stop_statement(message),
+      tes =  make_test(e, make_print_statement(message),
 		       make_block_statement(NIL));
       temp = test_to_statement(tes);
       if (statement_undefined_p(retour))
@@ -821,8 +829,8 @@ static void bottom_up_abc_insert_before_statement(statement s, statement s1,
 	  control_predecessors(c) = CONS(CONTROL,newc,NIL);
 	  /* if c is the entry node of the correspond unstructured u, 
 	     the newc will become the new entry node of u */	      
-	  if (unstructured_control(u)==c) 
-	    unstructured_control(u) = newc;	 
+	  if (unstructured_entry(u)==c) 
+	    unstructured_entry(u) = newc;	 
 	}
       else
 	// there is no unstructured (?)
