@@ -1227,11 +1227,11 @@ entity m;
     MAP(ENTITY, e, {
 	if(type_area_p(entity_type(e))) {
 	    ifdebug(1) {
-		print_common_layout(e);
+		print_common_layout(stderr, e);
 	    }
 	    if(update_common_layout(m, e)) {
 		ifdebug(1) {
-		    print_common_layout(e);
+		    print_common_layout(stderr, e);
 		}
 	    }
 	}
@@ -1244,16 +1244,15 @@ entity m;
 }
 
 void 
-print_common_layout(c)
-entity c;
+print_common_layout(FILE * fd, entity c)
 {
     list members = area_layout(type_area(entity_type(c)));
     list equiv_members = NIL;
 
-    (void) fprintf(stderr,"\nLayout for common /%s/:\n", module_local_name(c));
+    (void) fprintf(fd,"\nLayout for common /%s/:\n", module_local_name(c));
 
     if(ENDP(members)) {
-	(void) fprintf(stderr, "\t* empty area *\n\n");
+	(void) fprintf(fd, "\t* empty area *\n\n");
     }
     else {
 	/* Look for variables declared in this common by *some* procedures
@@ -1265,14 +1264,14 @@ entity c;
 	    {
 		pips_assert("RAM storage",
 			    storage_ram_p(entity_storage(m)));
-		(void) fprintf(stderr,
+		(void) fprintf(fd,
 			       "\tVariable %s,\toffset = %d,\tsize = %d\n", 
 			       entity_name(m),
 			       ram_offset(storage_ram(entity_storage(m))),
 			       SizeOfArray(m));
 	    }, 
 		members);
-	(void) fprintf(stderr, "\n");
+	(void) fprintf(fd, "\n");
 
 	/* Look for variables aliased with a variable in this common */
 	MAP(ENTITY, m, 
@@ -1288,20 +1287,20 @@ entity c;
 	    equiv_members = arguments_difference(equiv_members, members);
 	    sort_list_of_entities(equiv_members);
 
-	    (void) fprintf(stderr, "\tVariables aliased to this common:\n");
+	    (void) fprintf(fd, "\tVariables aliased to this common:\n");
 
 	    MAP(ENTITY, m, 
 		{
 		    pips_assert("RAM storage",
 				storage_ram_p(entity_storage(m)));
-		    (void) fprintf(stderr,
+		    (void) fprintf(fd,
 				   "\tVariable %s,\toffset = %d,\tsize = %d\n", 
 				   entity_name(m),
 				   ram_offset(storage_ram(entity_storage(m))),
 				   SizeOfArray(m));
 		}, 
 		    equiv_members);
-	    (void) fprintf(stderr, "\n");
+	    (void) fprintf(fd, "\n");
 	    gen_free_list(equiv_members);
 	}
     }
@@ -1374,7 +1373,7 @@ fprint_environment(FILE * fd, entity m)
 
     decls = code_declarations(value_code(entity_initial(m)));
 
-    (void) fprintf(fd, "\nDeclarations for module %s\n", 
+    (void) fprintf(fd, "\nDeclarations for module %s\n\n", 
 		   module_local_name(m));
 
     /* List of implicitly and explicitly declared variables, 
@@ -1429,7 +1428,7 @@ fprint_environment(FILE * fd, entity m)
 
     MAP(ENTITY, e, {
 	if(type_area_p(entity_type(e))) {
-	    print_common_layout(e);
+	    print_common_layout(fd, e);
 	}
     }, 
 	decls);
