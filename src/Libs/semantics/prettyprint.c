@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/05 16:45:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/02 17:12:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/05 16:45:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/10/02 17:12:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -48,39 +48,39 @@ static bool is_user_view;
 static hash_table nts = hash_table_undefined;
 
 static text text_transformer(transformer tran);
-static void print_code_semantics();
+static bool print_code_semantics();
 static text get_semantic_text();
 
-void print_code_transformers(module_name)
+bool print_code_transformers(module_name)
 char *module_name;
 {
     is_user_view = FALSE;
     is_transformer = TRUE;
-    print_code_semantics(module_name);
+    return print_code_semantics(module_name);
 }
 
-void print_code_preconditions(module_name)
+bool print_code_preconditions(module_name)
 char *module_name;
 {
     is_user_view = FALSE;
     is_transformer = FALSE;
-    print_code_semantics(module_name);
+    return print_code_semantics(module_name);
 }
 
-void print_source_transformers(module_name)
+bool print_source_transformers(module_name)
 char *module_name;
 {
     is_user_view = TRUE;
     is_transformer = TRUE;
-    print_code_semantics(module_name);
+    return print_code_semantics(module_name);
 }
 
-void print_source_preconditions(module_name)
+bool print_source_preconditions(module_name)
 char *module_name;
 {
     is_user_view = TRUE;
     is_transformer = FALSE;
-    print_code_semantics(module_name);
+    return print_code_semantics(module_name);
 }
 
 text get_text_transformers(module_name)
@@ -99,23 +99,26 @@ char *module_name;
     return get_semantic_text(module_name,FALSE);
 }
 
-static void print_code_semantics(module_name)
+static bool print_code_semantics(module_name)
 char *module_name;
 {
     char *filename;
     FILE *fd;
 
     /* prepare the prettyprintting */
-    filename = strdup(concatenate(db_get_current_program_directory(), 
-				  "/",
-				  module_name,
-				  is_transformer?
-				  (is_user_view? USER_TRANSFORMER_SUFFIX :
-				   SEQUENTIAL_TRANSFORMER_SUFFIX ) :
-				  (is_user_view? USER_PRECONDITION_SUFFIX :
-				   SEQUENTIAL_PRECONDITION_SUFFIX),
-				  get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
-                                  NULL));
+    filename = strdup
+	(concatenate(db_get_current_program_directory(), 
+		     "/",
+		     module_name,
+		     is_transformer?
+		     (is_user_view? USER_TRANSFORMER_SUFFIX :
+		      SEQUENTIAL_TRANSFORMER_SUFFIX ) :
+		     (is_user_view? USER_PRECONDITION_SUFFIX :
+		      SEQUENTIAL_PRECONDITION_SUFFIX),
+		     get_bool_property
+		     ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
+		     GRAPH_FILE_EXT : "",
+		     NULL));
     fd = safe_fopen(filename, "w");
 
     print_text(fd, get_semantic_text(module_name,TRUE));
@@ -129,6 +132,8 @@ char *module_name;
                           DBR_PRINTED_FILE),
 			 strdup(module_name),
  			 filename);
+
+    return TRUE;
 }
 
 static text get_semantic_text(module_name,give_code_p)
