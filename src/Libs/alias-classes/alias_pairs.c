@@ -169,7 +169,7 @@ add_alias_pairs_for_this_call_site(call call_site)
 
     pips_debug(9,"for statement %03d\n",statement_number(current_caller_stmt));
     
-    pips_debug(9,"\tgot context:\n\t%s\n",tranformer_to_string(context));
+    pips_debug(9,"\tgot context:\n\t%s\n",transformer_to_string(context));
 
     real_args = call_arguments(call_site);
 
