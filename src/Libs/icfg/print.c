@@ -124,6 +124,7 @@ bool print_icfg_with_filtered_proper_effects(string module_name)
 
 bool print_dvicfg_with_filtered_proper_effects(string module_name)
 {
+    set_bool_property(ICFG_DV, TRUE);
     return print_any_icfg(module_name, ICFG_DECOR_FILTERED_PROPER_EFFECTS);
 }
 
