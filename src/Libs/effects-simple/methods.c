@@ -25,221 +25,21 @@
 
 /******************************************************* PIPSDBM INTERFACES */
 
-static statement_effects
-db_get_proper_references(char *mod_name)
-{
-    statement_effects eff_map =
-	(statement_effects) db_get_memory_resource(DBR_PROPER_REFERENCES,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_proper_references(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_PROPER_REFERENCES,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-static list
-db_get_summary_references(char *mod_name)
-{
-    list l_res = effects_to_list(
-	(effects) db_get_memory_resource(DBR_SUMMARY_EFFECTS, mod_name, TRUE));
-    return l_res;
-}
-
-/* summary references are never computed */
-static void
-db_put_summary_references(char *mod_name, list l_eff)
-{
-    return;
-}
-
-static statement_effects
-db_get_cumulated_references(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_REFERENCES,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_cumulated_references(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_REFERENCES,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-static statement_effects
-db_get_invariant_references(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_REFERENCES,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_invariant_references(char *mod_name, statement_effects eff_map)
-{
-    return;
-}
-
-static statement_effects
-db_get_simple_proper_rw_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_PROPER_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_simple_proper_rw_effects(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_PROPER_EFFECTS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-static statement_effects
-db_get_simple_invariant_rw_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_simple_invariant_rw_effects(char *mod_name, statement_effects eff_map)
-{
-   return;
-}
-
-static statement_effects
-db_get_simple_rw_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_simple_rw_effects(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_EFFECTS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-static list
-db_get_simple_summary_rw_effects(char *mod_name)
-{
-    list l_res = NIL;
-    
-    l_res = effects_to_list(
-	(effects) db_get_memory_resource(DBR_SUMMARY_EFFECTS, mod_name, TRUE));
-    return l_res;
-}
-
-static void
-db_put_simple_summary_rw_effects(char *mod_name, list l_eff)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_EFFECTS,
-			   strdup(mod_name),
-			   (char *) list_to_effects(l_eff));
-}
-
-static statement_effects
-db_get_simple_in_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_IN_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_simple_in_effects(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_IN_EFFECTS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-static statement_effects
-db_get_simple_cumulated_in_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_IN_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_simple_cumulated_in_effects(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_IN_EFFECTS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-static statement_effects
-db_get_simple_invariant_in_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_IN_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_simple_invariant_in_effects(char *mod_name, statement_effects eff_map)
-{
-    return;
-}
-
-
-static list
-db_get_simple_summary_in_effects(char* mod_name)
-{
-    list l_res = NIL;
-    
-    l_res = effects_to_list(
-    (effects) db_get_memory_resource(DBR_IN_SUMMARY_EFFECTS, mod_name, TRUE));
-    return l_res;
-}
-
-static void
-db_put_simple_summary_in_effects(char *mod_name, list l_eff)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_IN_SUMMARY_EFFECTS,
-			   strdup(mod_name),
-			   (char *) list_to_effects(l_eff));
-}
-
+DB_GETPUT_SE(proper_references, PROPER_REFERENCES)
+DB_GETNOPUT_LS(summary_references, SUMMARY_EFFECTS)
+DB_GETPUT_SE(cumulated_references, CUMULATED_REFERENCES)
+DB_GETNOPUT_SE(invariant_references, CUMULATED_REFERENCES)
+DB_GETPUT_SE(simple_proper_rw_effects, PROPER_EFFECTS)
+DB_GETNOPUT_SE(simple_invariant_rw_effects, CUMULATED_EFFECTS)
+DB_GETPUT_SE(simple_rw_effects, CUMULATED_EFFECTS)
+DB_GETPUT_LS(simple_summary_rw_effects, SUMMARY_EFFECTS)
+DB_GETPUT_SE(simple_in_effects, IN_EFFECTS)
+DB_GETPUT_SE(simple_out_effects, OUT_EFFECTS)
+DB_GETPUT_SE(simple_cumulated_in_effects, CUMULATED_IN_EFFECTS)
+DB_GET_SE(simple_invariant_in_effects, IN_EFFECTS)
+DB_NOPUT_SE(simple_invariant_in_effects)
+DB_GETPUT_LS(simple_summary_in_effects, IN_SUMMARY_EFFECTS)
+DB_GETPUT_LS(simple_summary_out_effects, OUT_SUMMARY_EFFECTS)
 
 void
 set_methods_for_proper_references()
@@ -468,6 +268,9 @@ set_methods_for_simple_effects()
     db_get_in_effects_func = db_get_simple_in_effects;
     db_put_in_effects_func = db_put_simple_in_effects;
     
+    db_get_out_effects_func = db_get_simple_out_effects;
+    db_put_out_effects_func = db_put_simple_out_effects;
+    
     db_get_cumulated_in_effects_func = db_get_simple_cumulated_in_effects;
     db_put_cumulated_in_effects_func = db_put_simple_cumulated_in_effects;
     
@@ -476,6 +279,9 @@ set_methods_for_simple_effects()
 
     db_get_summary_in_effects_func = db_get_simple_summary_in_effects;
     db_put_summary_in_effects_func = db_put_simple_summary_in_effects;
+
+    db_get_summary_out_effects_func = db_get_simple_summary_out_effects;
+    db_put_summary_out_effects_func = db_put_simple_summary_out_effects;
 
     set_contracted_rw_effects(TRUE);
     set_descriptor_range_p(FALSE);
