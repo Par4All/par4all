@@ -1,3 +1,6 @@
+#	%A% ($Date: 1995/07/19 15:19:09 $, ) version $Revision$, got on %D%, %T% [%P%].
+#	Copyright (c) École des Mines de Paris Proprietary.
+#
 # Copyright (C) Ecole des Mines De Paris
 #               Centre d'Automatique et Informatique
 #               Section Informatique
@@ -53,7 +56,7 @@ TARGET= 	wpips
 	# Source, header and object files used to build the target
 # xv_icons.c
 TARGET_CFILES=	emacs.c wpips.c \
-		xv_analyze.c xv_log.c \
+		xv_log.c \
 		xv_edit2.c xv_frames.c xv_help.c xv_icons.c xv_mchoose.c \
 		xv_props.c xv_query.c xv_quit.c \
 		xv_schoose2.c xv_select.c xv_status.c \
@@ -62,7 +65,7 @@ TARGET_CFILES=	emacs.c wpips.c \
 TARGET_HEADERS=	xv_sizes.h wpips-local.h wpips-labels.h pips.icon icons
 # xv_icons.o
 TARGET_OBJECTS=	emacs.o wpips.o \
-		xv_analyze.o xv_log.o \
+		xv_log.o \
 		xv_edit2.o xv_frames.o xv_help.o xv_icons.o xv_mchoose.o \
 		xv_props.o xv_query.o xv_quit.o \
 		xv_schoose2.o xv_select.o xv_status.o \
