@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.80  2003/08/14 10:56:05  irigoin
+ * COMPILATION_UNIT_PREFIX removed
+ *
  * Revision 1.79  2003/08/12 16:27:40  irigoin
  * COMPILATION_UNIT added
  *
@@ -277,7 +280,7 @@ string compilation_unit_of_module(string module_name)
 
   /* It is not clear how robust it is going to be when file name conflicts occur. */
   compilation_unit_name
-    = strdup(concatenate(COMPILATION_UNIT_PREFIX, simpler_file_name, FILE_SEP_STRING, NULL));
+    = strdup(concatenate(simpler_file_name, FILE_SEP_STRING, NULL));
 
   return compilation_unit_name;
 }
