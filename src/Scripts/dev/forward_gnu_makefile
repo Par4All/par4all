@@ -1,0 +1,9 @@
+#
+# $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
+# $Date: 1996/07/10 18:26:32 $, 
+
+%::
+	for d in * ; do test -d $$d && $(MAKE) -C $$d $@ ; done
+
+# end of $RCSfile: forward_gnu_makefile,v $
+#
