@@ -13,7 +13,8 @@ LIB_CFILES = \
 	reorder.c \
 	unspaghettify.c \
 	cfg.c \
-	unreachable.c
+	unreachable.c \
+	typing.c
 
 LIB_HEADERS =	control-local.h
 
