@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "assert.h"
 
@@ -13,8 +14,6 @@
 
 #define MALLOC(s,t,f) malloc(s)
 #define FREE(p,t,f) free(p)
-
-extern char * malloc();
 
 /* char * noms_var(int i):
  * cette fonction convertit un numero de variable en chaine de caracteres
