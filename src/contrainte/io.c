@@ -3,9 +3,9 @@
 
 
 /* modifications :  
- *  - ajout du parame`tre a_la_fortran pour une impression compatible avec Fortran
- *    (permet a` certains logiciels externes de re'cupe'rer les syste`mes sous un
- *    format compatible au leur. BA, avril 1994.
+ *  - ajout du parame`tre a_la_fortran pour une impression compatible avec 
+ *    Fortran (permet a` certains logiciels externes de re'cupe'rer les 
+ *    syste`mes sous un format compatible au leur. BA, avril 1994.
  */
 
 /*LINTLIBRARY*/
@@ -14,6 +14,7 @@
 #include <assert.h>
 
 #include "boolean.h"
+#include "arithmetique.h"
 #include "vecteur.h"
 #include "contrainte.h"
 
