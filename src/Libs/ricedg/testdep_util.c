@@ -667,7 +667,7 @@ Pvecteur pv;
 			v = pv1->var;
 			sc_base_remove_variable(sc,v);
 		    }
-			
+		    base_rm(base_sc);
 		    return(sc);
 		}		
 		sc = sc_normalize(sc);
@@ -739,7 +739,7 @@ Pvecteur pv;
 			    v = pv1->var;
 			    sc_base_remove_variable(sc,v);
 			}
-			
+			base_rm(base_sc);
 			return(sc);
 		    }
 		    
@@ -855,7 +855,7 @@ Pvecteur pv;
     }
 
     vect_rm(pve);
-
+    base_rm(base_sc);
     debug(7, "sc_projection_optim_along_vecteur_ofl", "faisable\n");
     return(sc); 
 }
