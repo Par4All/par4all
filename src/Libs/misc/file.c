@@ -646,10 +646,12 @@ safe_system_substitute(char * what)
  * file descriptor, not a character string. 
  *
  */
-char * 
-safe_new_tmp_file(char * prefix)
+char * safe_new_tmp_file(char * prefix)
 {
-    string name = strdup(concatenate(prefix, ".XXXXXX", NULL));
-    pips_assert("Dubious cast of int to char *", FALSE);
-    return mkstemp(name);
+  int desc;
+  string name = strdup(concatenate(prefix, ".XXXXXX", NULL));
+  desc = mkstemp(name);
+  free(name);
+  pips_assert("Dubious cast of int to char *", FALSE); /* STOP */
+  return (char*) desc;
 }
