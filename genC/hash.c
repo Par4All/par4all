@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/04/06 17:11:56 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/04/06 17:54:39 $, )
  * version $Revision$
  */
 
@@ -328,7 +328,12 @@ FILE *fout;
 
     fprintf(fout, "hash_key_type:     %d\n", htp->hash_type);
     fprintf(fout, "hash_size:         %d\n", htp->hash_size);
-    fprintf(fout, "hash_size_limit    %d\n", htp->hash_size_limit);
+    /* to be used by pips, we should not print this
+       as it is only for debugging NewGen and it is not important data
+       I (go) comment it.
+       
+       fprintf(fout, "hash_size_limit    %d\n", htp->hash_size_limit);
+       */
     fprintf(fout, "hash_entry_number: %d\n", htp->hash_entry_number);
 }
  
