@@ -8,16 +8,19 @@
  *
  * $Id$
  * $Log: build-system.c,v $
+ * Revision 1.33  1997/08/04 13:52:40  coelho
+ * *** empty log message ***
+ *
  * Revision 1.32  1997/03/20 10:23:58  coelho
  * RCS headers.
  *
  */
 
 #include "defines-local.h"
-
-#include "regions.h"
 #include "semantics.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 
 #define ALPHA_PREFIX	"ALPHA"
 #define LALPHA_PREFIX	"LALPHA"
