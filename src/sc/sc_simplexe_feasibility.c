@@ -23,19 +23,24 @@
 
 extern jmp_buf overflow_error;
 
-
+/* To replace #define NB_EQ and #define NB_INEQ - BC, 2/4/96 - 
+ * NB_EQ and NB_INEQ are initialized at the beginning of the main subroutine.
+ * they represent the number of non-NULL constraints in sc. This is useful
+ * to allocate the minimum amount of memory necessary.  */
+static int NB_EQ = 0;
+static int NB_INEQ = 0;
 
 #define DEBUG 0
 #define DEBUG1 0
 #define DEBUG2 0
 #define PTR_NIL -32001
 #define INFINI 32700
-#define NB_INEQ sc->nb_ineq
+/* #define NB_INEQ sc->nb_ineq */
+/* #define NB_EQ sc->nb_eq */
+#define DIMENSION sc->dimension
 #define SIMPL(A,B) {if(A!=1 && B!=1){long I1,J1,K;I1=A,J1=B;while((K=I1%J1)!=0)I1=J1,J1=K;A=A/J1;B=B/J1;if(B<0)A=-A,B=-B;}}
 #define G(J1,A,B) {long I1,K;if(B>1){I1=A,J1=B;while((K=I1%J1)!=0)I1=J1,J1=K;if(J1<0)J1=-J1;}else J1=B;}
 #define SIMPLIFIE(FRAC) SIMPL(FRAC.num,FRAC.den)
-#define NB_EQ sc->nb_eq
-#define DIMENSION sc->dimension
 #define NUMERO hashtable[h].numero
 /*#define MAX_VAR 197 nombre max de variables */
 #define MAX_VAR 1971 /* nombre max de variables */
@@ -176,7 +181,6 @@ int hash(Variable s) /* calcule le hashcode d'un pointeur
 }
 
                  
-int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 /* fonction de calcul de la faisabilite' d'un systeme
  * d'equations et d'inequations
  * Auteur : Robert Mahl, Date : janvier 1994
@@ -191,17 +195,24 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
  *           => overflow control is made (longjmp(overflow_error,5))
  * BC, 13/12/94
  */
-    Pcontrainte pc ;
+int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
+    Pcontrainte pc, pc_tmp ;
     Pvecteur pv ;
     int premier_hash = PTR_NIL ; /* tete de liste des noms de variables */
-    static struct { Variable nom; int numero; int hash ; int val ; int succ ; } hashtable[MAX_VAR] ;
-    jmp_buf overflow_error3;
     /* Necessaire de declarer "hashtable" static 
      *  pour initialiser tout automatiquement a` 0.
      * Necessaire de chainer les enregistrements
      *  pour reinitialiser a 0
      *  en sortie de la procedure.
      */
+    static struct
+    {
+	Variable nom;
+	int numero; int hash ;
+	int val ;
+	int succ ;
+    } hashtable[MAX_VAR] ;
+    jmp_buf overflow_error3;
     tableau *eg ; /* tableau des egalite's  */
     tableau *t ; /* tableau des inegalite's  */
     /* les colonnes 0 et 1 sont reservees au terme const: */
@@ -220,7 +231,28 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
     
     long tp,tp1;
 
-    if ((ofl_ctrl == FWD_OFL_CTRL) && setjmp(overflow_error3)) {
+    /* the input Psysteme must be consistent; this is not the best way to
+     * do this; array bound checks should be added instead in proper places;
+     * no time to do it properly for the moment. BC.
+     */
+    assert(sc_weak_consistent_p(sc));
+    
+    /* Do not allocate place for NULL constraints */
+    NB_EQ = 0;
+    NB_INEQ = 0;
+    for(pc_tmp = sc->egalites; pc_tmp!= NULL; pc_tmp=pc_tmp->succ) 
+    {
+	if (pc_tmp->vecteur != NULL)
+	    NB_EQ++;
+    }
+    for(pc_tmp = sc->inegalites; pc_tmp!= NULL; pc_tmp=pc_tmp->succ) 
+    {
+	if (pc_tmp->vecteur != NULL)
+	    NB_INEQ++;
+    }
+    
+    if ((ofl_ctrl == FWD_OFL_CTRL) && setjmp(overflow_error3))
+    {
 	for(i=premier_hash ; i!=PTR_NIL; i=hashtable[i].succ)
 	    hashtable[i].nom = 0 ;
 	if(NB_EQ > 0) {
@@ -235,15 +267,18 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 	free(nlle_colonne);
 	longjmp(overflow_error,5);
     }
-    else {
+    else
+    {
 	if(NB_EQ != 0)
-	{   eg=(tableau*)malloc((3+DIMENSION)*sizeof(tableau)) ;
-        for(i=0 ; i<(3+DIMENSION) ; i++) {
-            eg[i].colonne=(frac*)malloc(NB_EQ*sizeof(frac)) ;
-            eg[i].existe = 0 ;
-            eg[i].taille = 0 ;
-        }
-    }
+	{
+	    eg=(tableau*)malloc((3+DIMENSION)*sizeof(tableau)) ;
+	    for(i=0 ; i<(3+DIMENSION) ; i++)
+	    {
+		eg[i].colonne=(frac*)malloc(NB_EQ*sizeof(frac)) ;
+		eg[i].existe = 0 ;
+		eg[i].taille = 0 ;
+	    }
+	}
     /* Determination d'un numero pour chaque variable */
     
     for(pc=sc->egalites, ligne=1 ; pc!=0; pc=pc->succ, ligne++)
