@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+
 #include "genC.h"
 #include "genspec.h"
 
@@ -32,6 +34,63 @@
 #endif
 
 extern int Current_start, Current_first, Current_index ;
+
+#ifdef FLEX_SCANNER
+
+/* We may parse strings or files...
+ */
+static char * string_to_parse = (char*) 0; /* shared pointer! */
+
+#define YY_INPUT(buffer, result, max_size)		\
+{							\
+    int i=0;						\
+    if (string_to_parse) /* we're parsing a string */	\
+    {							\
+	while(i<max_size && *string_to_parse)		\
+	    buffer[i++]=*string_to_parse++;		\
+    }							\
+    else /* it's a file */				\
+    {							\
+	int c;						\
+	while (i<max_size && (c=getc(yyin))!=EOF)	\
+	    buffer[i++]=(char) c;			\
+    }							\
+    result = i==0? YY_NULL: i;				\
+}
+
+void yyset_string_to_parse(char *s) { string_to_parse = s;}
+void yyreset_string_to_parse() { string_to_parse = (char *) 0;}
+
+#else /* ATT/POSIX just seem to like parsing yyin... */
+
+extern char *mktemp();
+char * tmp_spec_file_name = (char *) 0;
+void yyset_string_to_parse(char *s)
+{
+    tmp_spec_file_name = mktemp(strdup("/tmp/newgen.XXXXXX"));
+
+    if( (yyin = fopen( tmp_spec_file_name, "w" )) == NULL ) {
+	user( "Cannot open temp spec file in write mode\n" ) ;
+	return ;
+    }
+    fprintf( yyin , "%s", s ) ;
+    fclose( yyin  ) ;
+    
+    if( (yyin = fopen( tmp_spec_file_name, "r" )) == NULL ) {
+	user( "Cannot open temp spec file in read mode\n" ) ;
+	return ;
+    }
+}
+
+void yyreset_string_to_parse()
+{
+    fclose(yyin);
+    if( unlink( tmp_spec_file_name )) {
+        fatal( "Cannot unlink tmp file %s\n", tmp_spec_file_name ) ;
+    }
+}
+
+#endif
 
 %}
 
