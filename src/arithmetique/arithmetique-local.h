@@ -79,7 +79,7 @@ typedef float Value;
 #elif defined(LINEAR_VALUE_IS_CHARS)
 typedef char * Value;
 #define VALUE_FMT "0x%x"
-#define VALUE_CONST(val) val
+#define VALUE_CONST(val) (char*)val
 #define VALUE_MIN (char*)INT_MIN
 #define VALUE_MAX (char*)INT_MAX
 #define VALUE_ZERO (char*)0
