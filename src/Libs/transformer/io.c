@@ -18,16 +18,17 @@
 #include "transformer.h"
 
 /* print_transformer(tf): not a macro because of dbx */
-int print_transformer(tf)
-transformer tf;
+transformer
+print_transformer(transformer tf)
 {
     return fprint_transformer(stderr, tf, external_value_name);
 }
 
-int fprint_transformer(fd, tf, value_name)
-char * (*value_name)();
-FILE * fd;
-transformer tf;
+
+transformer
+fprint_transformer(FILE * fd,
+		   transformer tf,
+		   char * (*value_name)())
 {
     /* print_transformer returns an int to be compatible with the debug()
        function; however, debug being a function and not a macro, its
@@ -53,7 +54,7 @@ transformer tf;
     }
     else 
 	(void) fprintf(fd, "TRANSFORMER_UNDEFINED\n");
-    return (int) tf;
+    return tf;
 }
 
 /* char * dump_value_name(e): used as functional argument because
