@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/09/02 14:52:51 $, 
+%% $Date: 1997/09/16 11:02:14 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
@@ -653,13 +653,20 @@ are different. They have different global names
 
 Member {\tt section} contains the {\em area} in which the variable is
 stored. It is an entity of type area (see
-Section~\ref{subsubsection-area}). For each module, there is one area
-for each declared common\footnote{Note that a module may have effects on
-variables beyond its scope via procedure calls and common variables.}
+Section~\ref{subsubsection-area}). For each module, there is one area for
+each declared common\footnote{Note that a module may have effects on
+  variables beyond its scope via procedure calls and common variables.}
 and two specific areas called \verb/*STATIC*/ and \verb/*DYNAMIC*/ used
-for local variables. Static variables are explictly declared in a {\tt
-SAVE} statement. By default, variables can be stack allocated and are
-called dynamic variables.
+for local variables. Static variables are explicitly declared in a {\tt
+  SAVE} statement or implicitly made static by a {\tt DATA}
+statement\footnote{See Fortran standard Section~(8-11) about SAVE and
+  Section~(9-1) about DATA.} unless they are explicitly declared in a {\tt
+  COMMON} because PIPS sets all commons as static. In other words, dynamic
+commons are not handled by PIPS\footnote{The decision not to handle
+  dynamic commons was based on two remarks: (1) no Fortran compiler in
+  1988 handled dynamic commons and (2) dynamic commons are not lexically
+  scoped which make static analyses very difficult or even impossible.}. By default, variables
+can be stack allocated and are called dynamic variables.
 
 Member {\tt offset} is the variable address in its area. Addresses are
 allocated according to the declaration or occurence order. Increasing
