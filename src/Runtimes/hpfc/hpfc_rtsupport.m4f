@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/05/13 14:25:15 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/05/13 14:33:02 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -227,6 +227,7 @@ c given the delta switch in the linearised processors representation.
 c
       subroutine HPFC_CMPNEIGHBOUR(delta)
       integer delta
+      include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid
       NLID = MYLID + DELTA
@@ -333,7 +334,7 @@ c HPFC_SNDTO_C
 c send to computer
 c
       subroutine HPFC_SNDTO_C(what, val)
-      integer what
+      integer what, val
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
@@ -350,7 +351,7 @@ c
 c send to host
 c
       subroutine HPFC_SNDTO_H(what, val)
-      integer what
+      integer what, val
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
@@ -367,7 +368,7 @@ c
 c send to owner, when there is just one
 c
       subroutine HPFC_SNDTO_O(what, val)
-      integer what
+      integer what, val
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
@@ -391,7 +392,7 @@ c
 c send to all nodes
 c
       subroutine HPFC_SNDTO_A(what, val)
-      integer what
+      integer what, val
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
@@ -419,7 +420,7 @@ c
 c host send to all nodes
 c
       subroutine HPFC_HSNDTO_A(what, val)
-      integer what
+      integer what, val
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
@@ -450,7 +451,7 @@ c
 c send to host and all nodes, but not the sender.
 c
       subroutine HPFC_SNDTO_HA(what, val)
-      integer what
+      integer what, val
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
@@ -480,7 +481,7 @@ c
 c send to owners, by someone who is not in owners
 c
       subroutine HPFC_SNDTO_OS(what, val)
-      integer what
+      integer what, val
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info, i
@@ -568,7 +569,7 @@ c
 c send to other owners, if any
 c
       subroutine HPFC_SNDTO_OOS(what, val)
-      integer what
+      integer what, val
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info,  i
@@ -646,10 +647,10 @@ c
 c send to not owners, when replicated...
 c
       subroutine HPFC_SNDTO_NO(what, val)
-      integer what
+      integer what, val
       include 'fpvm3.h'
       include 'hpfc_commons.h'
-      integer bufid, info, i, indp(7), ndim
+      integer bufid, info, i, indp(7), ndim, lid
       logical result
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
@@ -681,7 +682,7 @@ c
 c send to host and not owners, when replicated
 c
       subroutine HPFC_SNDTO_HNO(what, val)
-      integer what
+      integer what, val
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       call HPFC_SNDTO_H(what, val)
@@ -693,7 +694,7 @@ c
 c HPFC_RCVFR_S
 c
       subroutine HPFC_RCVFR_S(what, goal)
-      integer what
+      integer what, goal
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
@@ -707,7 +708,7 @@ c
 c HPFC_RCVFR_C
 c
       subroutine HPFC_RCVFR_C(what, goal)
-      integer what
+      integer what, goal
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
@@ -721,7 +722,7 @@ c
 c HPFC_RCVFR_H
 c
       subroutine HPFC_RCVFR_H(what, goal)
-      integer what
+      integer what, goal
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
@@ -742,7 +743,7 @@ c
 c HPFC_RCVFR_mCS
 c
       subroutine HPFC_RCVFR_mCS(what, goal)
-      integer what
+      integer what, goal
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
@@ -756,7 +757,7 @@ c
 c HPFC_RCVFR_mCH
 c
       subroutine HPFC_RCVFR_mCH(what, goal)
-      integer what
+      integer what, goal
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
