@@ -290,7 +290,8 @@ struct eformat partial_eval_reference(expression e, Psysteme ps, effects fx)
 	    feasible = sc_minmax_of_variable(ps1, (Variable)var, &min, &max);
 	    if (! feasible) {
 		user_warning("partial_eval_reference", 
-			     "Not feasable system: there is probably some dead code.\n");
+			     "Not feasible system:"
+			     " module contains some dead code.\n");
 	    }
 	    if ( min == max ) {
 		struct eformat ef;
