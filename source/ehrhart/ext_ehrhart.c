@@ -364,6 +364,7 @@ Value g,m1,m2;
 	      evalue x;
 	      x=*res;
 	      tmp= ecopy(e1->x.p);
+	      value_init(res->d);
 	      value_set_si( res->d, 0 );
 	      res->x.p=tmp;
 
