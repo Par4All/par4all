@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1994/03/24 19:11:19 $, ) version $Revision$,
+# $RCSfile: validate-sequential,v $ ($Date: 1994/03/24 20:47:35 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -317,7 +317,7 @@ rm -f $tmpout $tmperr $diffout $diffout_e
 
 if [ "$LOCKFILE" ]
 then
-  echo -n $failed > "$LOCKFILE.$HOSTNAME"
+  echo $failed > "$LOCKFILE.$HOSTNAME"
 else
   report 1 \
   "Your Validation Suite Test for
