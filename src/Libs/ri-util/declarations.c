@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.20  2002/06/21 13:42:10  irigoin
+ * Improvements and bug fixes when prettyprinting DATA statements
+ *
  * Revision 1.19  2002/06/20 15:43:55  irigoin
  * New handling of DATA thru the initializations field in code.
  *
@@ -975,7 +978,7 @@ static sentence sentence_data_statement(statement is)
 {
   unformatted u =
     make_unformatted
-    (strdup(""),
+    (NULL,
      STATEMENT_NUMBER_UNDEFINED, 0, 
      CONS(STRING, strdup("DATA "), NIL));
   sentence s = make_sentence(is_sentence_unformatted, u);
@@ -1047,13 +1050,13 @@ static sentence sentence_data_statement(statement is)
       }
       iwl = words_expression(rve);
       wl = gen_nconc(wl, iwl);
-      if(!ENDP(CDR(al))) {
-	wl = gen_nconc(wl, CONS(STRING, strdup(", "), NIL));
-      }
     }
     else {
       iwl = words_expression(ve);
       wl = gen_nconc(wl, iwl);
+    }
+    if(!ENDP(CDR(al))) {
+      wl = gen_nconc(wl, CONS(STRING, strdup(", "), NIL));
     }
   }
 
@@ -1072,6 +1075,10 @@ text text_initializations(entity m)
   il = sequence_statements(code_initializations(value_code(entity_initial(m))));
 
   MAP(STATEMENT, is, {
+    if(!empty_comments_p(statement_comments(is))) {
+      ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted, 
+					    strdup(statement_comments(is))));
+    }
     ADD_SENTENCE_TO_TEXT(t, sentence_data_statement(is));
   }, il);
 
