@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/07/18 19:15:52 $, 
+ * $Date: 1996/07/18 19:42:05 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -53,7 +53,7 @@ static int NB_INEQ = 0;
 
 /* for tracing macros after expansion: 
  */
-#define tag(x) /* printf(x) */
+#define tag(x) /* printf(x); */
 
 /*************************************************** MACROS FOR FRACTIONS */
 /* maybe most of them should be functions?
@@ -64,8 +64,8 @@ static int NB_INEQ = 0;
  * note that there should be no arithmetic exceptions within this macro:
  * (well, only uminus may have trouble for VALUE_MIN...)
  */
-#define SIMPL(a,b) tag("SIMPL");				\
-{								\
+#define SIMPL(a,b) 						\
+{tag("SIMPL")							\
     if (value_notone_p(a) && value_notone_p(b))			\
     {								\
 	Value i=a, j=b, k;					\
@@ -82,7 +82,7 @@ static int NB_INEQ = 0;
  * there can be no artihmetic errors.
  */
 #define G(j,a,b)					\
-{tag("G");						\
+{tag("G")						\
     j=b;						\
     if (value_gt(b,VALUE_ONE))				\
     {							\
@@ -95,7 +95,7 @@ static int NB_INEQ = 0;
 }
 
 #define GCD(j,a,b)				\
-{tag("GCD");					\
+{tag("GCD")					\
     if (value_gt(a,b)) 				\
       { G(j,a,b); } 				\
     else 					\
@@ -104,7 +104,7 @@ static int NB_INEQ = 0;
 
 /* SIMPLIFIE normalizes fraction f
  */
-#define SIMPLIFIE(f) { tag("SIMPLIFIE"); SIMPL(f.num,f.den)}
+#define SIMPLIFIE(f) { tag("SIMPLIFIE") SIMPL(f.num,f.den)}
 
 #define AFF(x,y) {x.num=y.num; x.den=y.den;} /* x=y should be ok:-) */
 #define INV(x,y) {x.num=y.den; x.den=y.num;} /* x=1/y */
@@ -139,7 +139,7 @@ static int NB_INEQ = 0;
 /* computes x = simplify(y/z)
  */
 #define DIV_MACRO(x,y,z,mult)			\
-{tag("DIV_MACRO");				\
+{tag("DIV_MACRO")				\
     if (value_zero_p(y.num))			\
     {						\
 	MET_ZERO(x);				\
@@ -155,7 +155,7 @@ static int NB_INEQ = 0;
 /* computes x = simplify(y*z)
  */
 #define MUL_MACRO(x,y,z,mult) 				\
-{tag("MUL_MACRO");					\
+{tag("MUL_MACRO")					\
     if(value_zero_p(y.num) || value_zero_p(z.num))	\
 	MET_ZERO(x)					\
     else 						\
@@ -169,7 +169,7 @@ static int NB_INEQ = 0;
 /* computes X = simplify(A-B)
  */
 #define SUB_MACRO(X,A,B,mult)						      \
-{ tag("SUB_MACRO");							      \
+{ tag("SUB_MACRO")							      \
     if (value_zero_p(A.num))						      \
 	X.num = value_uminus(B.num),					      \
 	X.den = B.den;							      \
@@ -203,9 +203,9 @@ static int NB_INEQ = 0;
 
 /* computes X = A - B*C/D, trying to avoid arithmetic exceptions...
  */
-#define FULL_PIVOT_MACRO_SIOUX(X,A,B,C,D,mult) tag("FULL_PIVOT_SIOUX");	\
+#define FULL_PIVOT_MACRO_SIOUX(X,A,B,C,D,mult) 				\
 {									\
-    frac u,v,w;								\
+    frac u,v,w; tag("FULL_PIVOT_SIOUX")					\
     AFF(u,B); AFF(v,C); INV(w,D); /* u*v*w == B*C/D */			\
     SIMPL(u.num,v.den); SIMPL(u.num,w.den);				\
     SIMPL(v.num,u.den); SIMPL(v.num,w.den);				\
@@ -220,9 +220,9 @@ static int NB_INEQ = 0;
 
 /* computes X = A - B*C/D, but does not try to avoid arithmetic exceptions
  */
-#define FULL_PIVOT_MACRO_DIRECT(X,A,B,C,D,mult)	tag("FULL_PIVOT_DIRECT"); \
+#define FULL_PIVOT_MACRO_DIRECT(X,A,B,C,D,mult)				  \
 {									  \
-    Value v;								  \
+    Value v; tag("FULL_PIVOT_DIRECT")					  \
     X.num = mult(A.num,B.den);						  \
     X.num = mult(X.den,C.den);						  \
     X.num = mult(X.den,D.num);						  \
@@ -241,38 +241,38 @@ static int NB_INEQ = 0;
 /* computes X = A - B*C/D, with a swtich to use SIOUX or DIRECT
  * thae rationale for the actual condition is quite fuzzy.
  */
-#define FULL_PIVOT_MACRO(X,A,B,C,D,mult) tag("FULL_PIVOT");	\
-{								\
-    if (direct_p(A.den) && direct_p(B.den) &&			\
-	direct_p(C.den) && direct_p(D.num))			\
-    {								\
-	FULL_PIVOT_MACRO_DIRECT(X,A,B,C,D,mult);		\
-    }								\
-    else							\
-    {								\
-	FULL_PIVOT_MACRO_SIOUX(X,A,B,C,D,mult);			\
-    }								\
+#define FULL_PIVOT_MACRO(X,A,B,C,D,mult)		\
+{ tag("FULL_PIVOT")					\
+    if (direct_p(A.den) && direct_p(B.den) &&		\
+	direct_p(C.den) && direct_p(D.num))		\
+    {							\
+	FULL_PIVOT_MACRO_DIRECT(X,A,B,C,D,mult);	\
+    }							\
+    else						\
+    {							\
+	FULL_PIVOT_MACRO_SIOUX(X,A,B,C,D,mult);		\
+    }							\
 } 
 
 /* idem if A==0
  */
-#define PARTIAL_PIVOT_MACRO_SIOUX(X,B,C,D,mult)	tag("PARTIAL_PIVOT_SIOUX"); \
-{									    \
-    frac u;								    \
-    MUL_MACRO(u,B,C,mult); /* u=simplify(b*c) */			    \
-    DIV_MACRO(X,u,D,mult); /* x=simplify(u/d) */			    \
-    X.num=value_uminus(X.num);/* x=-x */				    \
-    pivot_debug_macro("++ ");						    \
+#define PARTIAL_PIVOT_MACRO_SIOUX(X,B,C,D,mult)		\
+{ tag("PARTIAL_PIVOT_SIOUX")				\
+    frac u;						\
+    MUL_MACRO(u,B,C,mult); /* u=simplify(b*c) */	\
+    DIV_MACRO(X,u,D,mult); /* x=simplify(u/d) */	\
+    X.num=value_uminus(X.num);/* x=-x */		\
+    pivot_debug_macro("++ ");				\
 }
 
-#define PARTIAL_PIVOT_MACRO_DIRECT(X,B,C,D,mult) tag("PARTIAL_PIVOT_DIRECT"); \
-{									      \
-    X.num = mult(B.num,C.num);						      \
-    X.num = mult(X.num,D.den);						      \
-    X.num = value_uminus(X.num);					      \
-    X.den = mult(B.den,C.den);						      \
-    X.den = mult(X.den,D.num);						      \
-    SIMPLIFIE(X);							      \
+#define PARTIAL_PIVOT_MACRO_DIRECT(X,B,C,D,mult)	\
+{ tag("PARTIAL_PIVOT_DIRECT")				\
+    X.num = mult(B.num,C.num);				\
+    X.num = mult(X.num,D.den);				\
+    X.num = value_uminus(X.num);			\
+    X.den = mult(B.den,C.den);				\
+    X.den = mult(X.den,D.num);				\
+    SIMPLIFIE(X);					\
 }
 
 #define PARTIAL_PIVOT_MACRO(X,B,C,D,mult)			\
