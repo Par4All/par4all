@@ -14,7 +14,7 @@
 #include "pipsdbm.h"
 #include "syntax.h"
 
-#include "toklex.h"
+#include "syn_yacc.h"
 
 /* list of called subroutines or functions */
 static list called_modules = list_undefined;
