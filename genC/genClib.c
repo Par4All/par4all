@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/03/28 21:51:23 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/22 11:42:47 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -90,6 +90,8 @@ static int disallow_undefined_tabulated = TRUE ;
 #define check_read_spec_performed() \
   message_assert("gen_read_spec not performed prior to use", \
 		 Read_spec_performed);
+
+#define newgen_free(p) (*(char*)(p)='\0', free(p))
 
 /* DOMAIN_INDEX returns the index in the Domain table for object OBJ.
  */
@@ -709,8 +711,8 @@ static void pop_gen_trav_env()
 
     message_assert("Too many pops", gen_trav_env_top >= 0);
 
-    free( first_seen ) ;
-    free( seen_once ) ;
+    newgen_free( first_seen ) ;
+    newgen_free( seen_once ) ;
     hash_table_free( obj_table ) ;
 
     first_seen = (env = &gen_trav_envs[--gen_trav_env_top])->first_seen ;
@@ -896,7 +898,7 @@ struct gen_binding *bp ;
 {
     if( IS_INLINABLE(bp )) {
 	if( *bp->name == 's' && obj->s && !string_undefined_p(obj->s))
-	    free(obj->s); 
+		newgen_free(obj->s); 
 	return ;
     }
     else
@@ -927,7 +929,7 @@ free_simple_out( obj, dp )
 	set_free( obj->t ) ;
 	break ;
     case ARRAY_DT:
-	free( (char *) obj->p ) ;
+	newgen_free( (char *) obj->p ) ;
 	break ;
     }
 }
@@ -963,13 +965,13 @@ struct driver *dr ;
 	hash_table h = (obj+1 + IS_TABULATED( bp ))->h ;
 
 	HASH_MAP( k, v, {
-	    free( (void *)k ) ;
-	    free( (void *)v ) ;
+	    newgen_free( (void *)k ) ;
+	    newgen_free( (void *)v ) ;
 	}, h ) ;
 	hash_table_free( h ) ;
     }
     obj->p = (gen_chunk *)0 ;
-    free((void *) obj) ;
+    newgen_free((void *) obj) ;
 }
 
 /* GEN_LOCAL_FREE frees the object OBJ with or withou KEEPing the sharing. */ 
@@ -1050,7 +1052,7 @@ gen_full_free_list(
     for( p = l ; p != NIL ; p = nextp ) {
 	nextp = p->cdr ;
 	gen_free( CAR(p).p ) ;
-	free( p ) ;
+	newgen_free( p ) ;
     }
     
     if (first_in_stack)
@@ -1948,7 +1950,7 @@ int domain ;
 
     pop_gen_trav_env() ;
 
-    free((char *) fake_obj ) ;
+    newgen_free((char *) fake_obj ) ;
     return( domain ) ;
 }
 
@@ -2161,8 +2163,8 @@ int create_p ;
     genread_parse() ;
     allow_forward_ref = FALSE ;
 
-    free((char *) ((Read_chunk+1)->p) ) ;
-    free((char *) Read_chunk ) ;
+    newgen_free((char *) ((Read_chunk+1)->p) ) ;
+    newgen_free((char *) Read_chunk ) ;
     return( domain ) ;
 }
 
