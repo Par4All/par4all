@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL2LL,v $ (version $Revision$)
-# $Date: 1996/08/20 17:23:24 $, 
+# $Date: 1996/08/20 18:50:02 $, 
 #
 # this file contains macro definitions 
 
@@ -30,6 +30,7 @@ DIFF	= gdiff
 M4	= gm4
 LX2HTML	= latex2html
 LATEX	= latex
+BIBTEX	= bibtex
 MAKEIDX	= makeindex
 DVIPS	= dvips
 
