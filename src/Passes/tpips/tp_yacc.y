@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.90  1998/06/30 15:19:39  coelho
+ * property -> result for jpips checks.
+ *
  * Revision 1.89  1998/06/18 12:38:35  coelho
  * missing \n added.
  *
@@ -781,7 +784,7 @@ i_get: TK_GET_PROPERTY propname TK_ENDOFLINE
 		fprint_property(stdout, $2);
 		if (jpips_is_running)
 		{
-		    jpips_begin_tag("property");
+		    jpips_begin_tag("result");
 		    jpips_add_tag("");
 		    fprint_property_direct(jpips_out_file(), $2);
 		    jpips_end_tag();
