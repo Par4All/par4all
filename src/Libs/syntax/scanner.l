@@ -242,7 +242,7 @@ void yyerror(char * msg)
 
     /* Do not use pips_user_warning() to avoid portability issues */
 
-    user_warning("syn_error", "Syntax error - %s line %d near %s\n", 
+    user_warning("syn_error", "Syntax error - %s line %d near \"%s\"\n", 
 		      msg, line, yytext);
 
     /* what does it mean? */
