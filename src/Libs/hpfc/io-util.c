@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/06/11 13:53:38 $, )
+ * ($Date: 1996/06/12 21:42:19 $, )
  */
 
 #include "defines-local.h"
@@ -55,72 +55,56 @@ host_section_p(
 
 /* ??? neglect expression side effects...
  */
-static void 
-only_io_rewrite(
-    statement st)
+DEFINE_LOCAL_STACK(current_statement, statement)
+
+static void only_io_sequence(sequence q)
 {
-    instruction i = statement_instruction(st);
-    tag t = instruction_tag(i);
+    int is_io=3;
+    if (!host_section_p(sequence_statements(q)))
+	MAP(STATEMENT, s, is_io = (is_io & Load(s)), sequence_statements(q));
+
+    pips_debug(5, "block 0x%x: %d\n", (unsigned int) q, is_io);
+    Store(current_statement_head(), is_io);
+}
+
+static void only_io_test(test t)
+{
+    int is_io=3;
+    is_io = (Load(test_true(t)) & Load(test_false(t)));
+    pips_debug(5, "test 0x%x: %d\n", (unsigned int) t, is_io);
+    Store(current_statement_head(), is_io);
+}
+
+static void only_io_loop(loop l)
+{
+    int is_io = Load(loop_body(l));
+    pips_debug(5, "loop 0x%x: %d\n", (unsigned int) l, is_io);
+    Store(current_statement_head(), is_io);
+}
+
+static void only_io_call(call c)
+{
+    entity f = call_function(c);
+    int is_io = entity_continue_p(f)? 3:
+                io_intrinsic_p(f) ||     /* Fortran IO intrinsics */
+		    hpfc_special_io(f) ||    /* declared with FCD */
+			hpfc_io_like_function(f);/* runtime managed */
+
+    pips_debug(5, "call 0x%x (%s): %d\n", (unsigned int) c, 
+	       entity_name(f), is_io);
+    Store(current_statement_head(), is_io);
+}
+
+static void only_io_unstructured(unstructured u)
+{
     int is_io = 3;
+    control c = unstructured_control(u);
+    list blocks = NIL;
 
-    switch (t)
-    {
-    case is_instruction_block:
-	if (!host_section_p(instruction_block(i))) /* HOST SECTION => TRUE! */
-	{
-	    MAP(STATEMENT, s, 
-		is_io = (is_io & Load(s)), 
-		instruction_block(i));
-	}
-	pips_debug(5, "block 0x%x: %d\n", (unsigned int) st, is_io);
-        break;
-    case is_instruction_test:
-    {
-	test t = instruction_test(i);
-	is_io = (Load(test_true(t)) & Load(test_false(t)));
-	pips_debug(5, "test 0x%x: %d\n", (unsigned int) st, is_io);
-        break;
-    }
-    case is_instruction_loop:
-	is_io = Load(loop_body(instruction_loop(i)));
-	pips_debug(5, "loop 0x%x: %d\n", (unsigned int) st, is_io);
-        break;
-    case is_instruction_call:
-    {
-	entity f = call_function(instruction_call(i));
-
-	/* ??? something else should be done?
-	 * other kind of statements should not modify this status?
-	 */
-	if (entity_continue_p(f))
-	    is_io = 3;
-	else
-	    is_io = io_intrinsic_p(f) ||     /* Fortran IO intrinsics */
-	            hpfc_special_io(f) ||    /* declared with FCD */
-		    hpfc_io_like_function(f);/* runtime managed */
-
-	pips_debug(5, "call 0x%x (%s): %d\n", (unsigned int) st, 
-		   entity_name(f), is_io);
-        break;
-    }
-    case is_instruction_unstructured:
-    {
-	control c = unstructured_control(instruction_unstructured(i));
-	list blocks = NIL;
-
-	CONTROL_MAP(ct, is_io = is_io & Load(control_statement(ct)), 
-		    c, blocks);
-	gen_free_list(blocks);
-	pips_debug(5, "unstructured 0x%x: %d\n", (unsigned int) st, is_io);
-        break;
-    }
-    case is_instruction_goto:
-    default:
-        pips_internal_error("unexpected instruction tag (%d)\n");
-        break;
-    }
-
-    Store(st, is_io);
+    CONTROL_MAP(ct, is_io = is_io & Load(control_statement(ct)), c, blocks);
+    gen_free_list(blocks);
+    pips_debug(5, "unstructured 0x%x: %d\n", (unsigned int) u, is_io);
+    Store(current_statement_head(), is_io);
 }
 
 static statement_mapping 
@@ -129,7 +113,15 @@ only_io_mapping(
     statement_mapping map)
 {
     stat_bool_map = map;
-    gen_recurse(program, statement_domain, gen_true, only_io_rewrite);
+    gen_multi_recurse(program, 
+       statement_domain, current_statement_filter, current_statement_rewrite,
+       loop_domain, gen_true, only_io_loop,
+       test_domain, gen_true, only_io_test,
+       sequence_domain, gen_true, only_io_sequence,
+       call_domain, gen_true, only_io_call,
+       unstructured_domain, gen_true, only_io_unstructured,
+       expression_domain, gen_false, gen_null,
+       NULL);
     return stat_bool_map;
 }
 
