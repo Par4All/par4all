@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/12/14 17:26:52 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/12/18 14:06:38 $, )
  * version $Revision$
  */
 
@@ -663,5 +663,6 @@ int
 hash_table_own_allocated_memory(
     hash_table htp)
 {
-    return sizeof(struct __hash_table) + sizeof(hash_entry)*(htp->hash_size);
+    return htp ? 
+      sizeof(struct __hash_table) + sizeof(hash_entry)*(htp->hash_size) : 0 ;
 }
