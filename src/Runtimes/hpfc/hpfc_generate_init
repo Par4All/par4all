@@ -1,0 +1,38 @@
+#! /bin/sh
+#
+# $RCSfile: hpfc_generate_init,v $ ($Date: 1994/08/30 16:47:06 $, )
+# version $Revision$
+# got on %D%, %T%
+# $Id$
+#
+# generate the initialization file
+#
+
+script=`basename $0`
+
+[ $# -eq 1 ] ||
+{
+  echo "Usage: $script dirname" 1>&2
+  exit 1
+}
+
+dirname=$1
+init=$dirname/param_init.f
+
+{
+  echo "      SUBROUTINE HPFC_INIT_COMMON_PARAM()"
+#  echo "      include 'real_parameters.h'"
+  echo "      include 'hpfc_parameters.h'"
+  echo "      include 'hpfc_param.h'"
+  for file in $dirname/*_parameters.h
+  do
+    echo "      include '`basename $file`'"
+  done
+  for file in $dirname/*_init.h
+  do
+    echo "      include '`basename $file`'"
+  done
+  echo "      end"
+} > $init
+
+$HPFC_TOOLS/hpfc_add_warning $init
