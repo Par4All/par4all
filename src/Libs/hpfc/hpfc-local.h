@@ -13,12 +13,6 @@
 #include "hpf_private.h"
 #include "message.h"
 
-/* added because of mapping.h 
-#include "database.h"
-#include "resources.h"
-#include "pipsdbm.h"
- */
-
 /*
  * prefixes to be used for the variables used in the Psystems
  *
