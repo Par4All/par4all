@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/03/03 11:13:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/03/13 11:14:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/03/03 11:13:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/03/13 11:14:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -2410,14 +2410,31 @@ int precedence;
     if (good_fmt && good_unit && same_string_p(called, "WRITE"))
     {
 	/* WRITE (*,*) -> PRINT * */
-	pc = CHAIN_SWORD(pc, "PRINT *, ");
-	pcio = pio_write;
+
+       if (pio_write != NIL) /* WRITE (*,*) pio -> PRINT *, pio */
+       {
+          pc = CHAIN_SWORD(pc, "PRINT *, ");
+       }
+       else     /* WRITE (*,*)  -> PRINT *  */
+       {
+          pc = CHAIN_SWORD(pc, "PRINT * ");
+       }
+       
+       pcio = pio_write;
     }
     else if (good_fmt && good_unit && same_string_p(called, "READ"))
     {
-	/* READ (*,*) -> READ * */
-	pc = CHAIN_SWORD(pc, "READ *, ");
-	pcio = pio_write;
+       /* READ (*,*) -> READ * */
+	
+       if (pio_write != NIL) /* READ (*,*) pio -> READ *, pio */
+       {
+          pc = CHAIN_SWORD(pc, "READ *, ");
+       }
+       else   /* READ (*,*)  -> READ *  */
+       {
+          pc = CHAIN_SWORD(pc, "READ * ");
+       }
+       pcio = pio_write;
     }	
     else if(!complex_io_control_list) {
 	pips_assert("A unit must be defined", !ENDP(unit_words));
