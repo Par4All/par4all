@@ -6,6 +6,9 @@
  * Code by Corinne Ancourt and Fabien Coelho.
  *
  * $Log: graph.c,v $
+ * Revision 1.5  1998/04/14 19:01:52  coelho
+ * linear.h
+ *
  * Revision 1.4  1998/03/20 08:28:29  coelho
  * prettier, and more comments.
  *
@@ -23,6 +26,8 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "misc.h"
