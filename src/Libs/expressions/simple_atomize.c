@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1998/04/14 21:49:59 $, 
+ * $Date: 1998/12/26 20:25:01 $, 
  */
 
 #include <stdio.h>
@@ -55,6 +55,12 @@ static entity (*create_new_variable)(/* entity m, tag t */) = NULL;
  */
 DEFINE_LOCAL_STACK(current_statement, statement)
 DEFINE_LOCAL_STACK(current_control, control)
+
+void simple_atomize_error_handler()
+{
+    error_reset_current_statement_stack();
+    error_reset_current_control_stack();
+}
 
 static bool cont_filter(c)
 control c;
