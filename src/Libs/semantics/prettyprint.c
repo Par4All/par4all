@@ -316,8 +316,7 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
  * buffer to build each constraint; we are restricted to constraints of
  * lengths smaller than the line length.
  */
-text 
-text_transformer(transformer tran)
+text text_transformer(transformer tran)
 {
     text txt = make_text(NIL);
     boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
@@ -390,6 +389,19 @@ text_transformer(transformer tran)
 
     return txt; 
 }
+
+/* call this one from outside.
+ */
+text text_for_a_transformer(transformer tran, bool is_a_transformer)
+{
+  bool save_is = is_transformer;
+  text t;
+  is_transformer = is_a_transformer;
+  t = text_transformer(tran);
+  is_transformer = save_is;
+  return t;
+}
+
 
 /* ---------------------------------------------------------------- */
 /* to convert strings containing predicates to text of commentaries */
