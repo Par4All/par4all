@@ -346,7 +346,7 @@ statement st;
 	  statement_instruction(st) = make_instruction_block(lstat);
 	  /* Do not forget to move forbidden information associated with
 	     block: */
-	  fix_sequence_statement_attributes(loop_statement);
+	  fix_sequence_statement_attributes(st);
 
 	  found = TRUE;
 	}
