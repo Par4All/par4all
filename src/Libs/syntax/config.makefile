@@ -1,18 +1,18 @@
+# $RCSfile: config.makefile,v $ (version $Revision$)
+# $Date: 1996/08/10 14:23:18 $m 
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
-ifeq ($(ARCH),SUN4)
-CFLAGS=	-g
-else
+ifeq ($(CC),gcc)
 CFLAGS=	-g -Wall -ansi
+else
+CFLAGS=	-g
 endif
 
 # bison does not like this pips grammar for Fortran, it reports errors:-)
 # idem flex:-)
-LEX=lex
-LFLAGS=
 YACC=yacc
-YFLAGS=
+YFLAGS+=-d
 
 PARSER_SRC= 
 
@@ -37,8 +37,8 @@ LIB_HEADERS=	f77keywords \
 
 # headers made by some rule (except $INC_TARGET)
 
-DERIVED_HEADERS=toklex.h keywtbl.h tokyacc.h yacc.in 
-DERIVED_CFILES= y.tab.c scanner.c
+DERIVED_HEADERS= keywtbl.h tokyacc.h syn_yacc.h
+DERIVED_CFILES= syn_yacc.c scanner.c
 
 LIB_OBJECTS=	$(DERIVED_CFILES:.c=.o)  $(LIB_CFILES:.c=.o) 
 
@@ -47,43 +47,33 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
 # filtred here.
 
-y.tab.c: tokyacc.h gram.y
+syn_yacc.c syn_yacc.h: tokyacc.h gram.y
 	cat tokyacc.h gram.y > yacc.in
 	$(PARSE) yacc.in
-	sed -e '/extern char \*malloc/d;s/YY/SYN_/g;s/yy/syn_/g' \
-		y.tab.c > s.tab.c
-	mv s.tab.c y.tab.c
+	sed 's/YY/SYN_/g;s/yy/syn_/g' y.tab.c > syn_yacc.c
+	sed 's/YY/SYN_/g;s/yy/syn_/g' y.tab.h > syn_yacc.h
+	$(RM) y.tab.c y.tab.h yacc.in
 
 
 # For gcc: lex generated array initializations are reformatted with sed to
 # avoid lots of gcc warnings; the two calls to sed are *not* mandatory;
 #
 
-scanner.c: scanner.l toklex.h
+scanner.c: scanner.l 
 	$(SCAN) scanner.l | \
-	sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/SYN_/g;s/yy/syn_/g' | \
-	sed '/syn_crank\[\]/,/^0,0};/s/^/{/;/syn_crank\[\]/,/^{0,0};$$/s/,$$/},/;/syn_crank\[\]/,/^{0,0};$$/s/,	$$/},/;/syn_crank\[\]/,/^{0,0};$$/s/,	/},	{/g;s/^{0,0};$$/{0,0}};/;/syn_crank\[\]/s/{//' | \
-	sed 's/^0,	0,	0,/{0,	0,	0},/;s/^0,	0,	0};/{0,	0,	0}};/;/^syn_crank+/s/^/{/;/^{syn_crank+/s/,$$/},/;/^{syn_crank+/s/,	$$/},/' > scanner.c
+	sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/SYN_/g;s/yy/syn_/g' > $@
 
-keywtbl.h: toklex.h f77keywords
-	cp toklex.h keywtbl.h
-	echo "struct Skeyword keywtbl[] = {"	>> keywtbl.h
-	sed "s/^.*/{\"&\", TK_&},/" f77keywords	>> keywtbl.h
-	echo "{0, 0}"				>> keywtbl.h
-	echo "};"				>> keywtbl.h
-
-toklex.h: warning.h f77keywords f77symboles
-	cat f77keywords f77symboles | nl -s: | cat warning.h - | sed "s/\([^:]*\):\(.*\)/#define TK_\2 \1/" > toklex.h
+keywtbl.h: warning.h f77keywords
+	@echo "Generating $@"
+	{ cat warning.h ; \
+	echo "#include \"syn_yacc.h\"" ; \
+	echo "struct Skeyword keywtbl[] = {" ;\
+	sed "s/^.*/{\"&\", TK_&},/" f77keywords ;\
+	echo "{0, 0}" ;\
+	echo "};" ; } > keywtbl.h
 
 tokyacc.h: warning.h f77keywords f77symboles
 	cat f77keywords f77symboles | nl -s: | cat warning.h - | sed "s/\([^:]*\):\(.*\)/%token TK_\2 \1/" > tokyacc.h
 
-depend: scanner.c y.tab.c
-
-CLEAN: clean
-	-rm -f keywtbl.h toklex.h tokyacc.h scanner.c yacc.in y.tab.c \
-	y.output y.tab.h lex.yy.c 
-
-#
-# end of config.makefile
+# end of $RCSfile: config.makefile,v $
 #
