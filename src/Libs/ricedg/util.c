@@ -162,7 +162,7 @@ prettyprint_dependence_graph(FILE * fd,
 		    
 		    /* Additional information for EDF prettyprint. 
 		       Instruction calls are given with  statement numbers
-		       /*
+		       */
 		    if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")) {
 			if (instruction_call_p(statement_instruction(s1)))
 			    fprintf(fd, " %d-%s",statement_number(s1),
