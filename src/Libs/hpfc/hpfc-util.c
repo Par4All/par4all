@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: hpfc-util.c,v $
+ * Revision 1.56  1998/04/14 20:42:55  coelho
+ * *** empty log message ***
+ *
  * Revision 1.55  1997/08/04 14:03:01  coelho
  * new generic effects includes.
  *
@@ -40,7 +43,7 @@
  * ??? not very intelligent, should use the regions, the problem is
  * that I should normalize the code *before* the pips analysis...
  */
-bool ref_to_dist_array_p(gen_chunk* obj)
+bool ref_to_dist_array_p(void * obj)
 {
     list l = FindRefToDistArray(obj);
     bool b = (l!=NIL);
@@ -269,17 +272,14 @@ syntax s;
 		CONS(SYNTAX, s, found_syntaxes);
 }
 
-list FindRefToDistArray(obj)
-gen_chunk* obj;
+list FindRefToDistArray(void * obj)
 {
     list result = NIL, saved = found_syntaxes;
-
     found_syntaxes = NIL;
-
-    gen_recurse(obj,
-		syntax_domain,
-		gen_true,
-		FindRefToDistArray_syntax_rewrite);
+    gen_multi_recurse(obj,
+		      syntax_domain,
+		      gen_true,
+		      FindRefToDistArray_syntax_rewrite, NULL);
 
     result = found_syntaxes, found_syntaxes = saved;
 
