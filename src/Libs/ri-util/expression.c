@@ -299,6 +299,19 @@ expression e;
 	operator_expression_p(e, MAX_OPERATOR_NAME);
 }
 
+bool user_function_call_p(e)
+expression e;
+{
+    syntax s = expression_syntax(e);
+    call c = syntax_call(s);
+    entity f = call_function(c);
+    value v = entity_initial(f);
+
+    pips_assert("user_function_call_p", syntax_call_p(s));
+
+    return value_code_p(v);
+}
+
 bool operator_expression_p(e, op_name)
 expression e;
 string op_name;
