@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/03/28 08:47:15 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/04/14 12:04:26 $, )
 # version $Revision$, 
 # got on %D%, %T%
 # $Id$
@@ -121,7 +121,7 @@ PIPS_YFLAGS=""
 
 # FC 07/03/94
 # protoizer to be used by PIPS:
-PIPS_PROTOIZE="$UTILDIR/cproto -cf2"
+PIPS_PROTOIZE="$UTILDIR/cproto -vcf2"
 # to be switched to /usr5/gnu/bin-sparc/protoize...
 
 PIPS_ETAGS='/usr5/gnu/bin-sparc/etags'
