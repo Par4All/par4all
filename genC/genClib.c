@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/15 10:28:14 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/15 16:30:26 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -692,11 +692,10 @@ static void pop_gen_trav_env()
     shared_number = env->shared_number ;
 }
 
-static int shared_obj_in() ;
-
 /* SHARED_OBJ_IN introduces an object OBJ in the OBJ_TABLE. If it is
    already in the table, don't recurse (at least, if you want to avoid an
-   infinite loop) and give it a number. Else recurse. */
+   infinite loop) and give it a number. Else recurse.
+ */
 
 static int
 shared_obj_in( obj, dr )
@@ -774,17 +773,19 @@ bool keep ;
   dr.array_leaf = gen_array_leaf ;
   dr.leaf_in = tabulated_leaf_in ;
 
-  if( obj_table == (hash_table)NULL ) {
+  if (obj_table == (hash_table)NULL) {
     fatal( "shared_pointers: NULL obj_table\n" ) ;
   }
-  if( !keep ) {
-      hash_table_clear( obj_table ) ;
+  if(!keep) {
+      hash_table_clear(obj_table) ;
       shared_number = 0 ;
   } 
   else {
     fatal( "shared_pointers: keep = TRUE, not implemented\n" ) ;
   }
   gen_trav_obj( obj, &dr ) ;
+
+  if (!keep) hash_table_clear(obj_table);
 }
 
 /* SHARED_OBJ manages the OBJect modulo sharing (the OBJ_TABLE has to be
@@ -853,7 +854,12 @@ gen_chunk *obj ;
 struct gen_binding *bp ;
 {
     if( IS_INLINABLE(bp )) {
-	if( *bp->name == 's' ) {
+	if( *bp->name == 's' && obj->s) {
+
+	    /* some side effect: constants are not freed...
+	     * thus no core dump with the shared use of string_undefined...
+	     * ??? hmmm... neither portable nor clean:-(
+	     */
 	    free( obj->s ) ; 
 	}
 	return ;
@@ -970,10 +976,16 @@ bool keep ;
     dr.simple_out = free_simple_out ;
     dr.obj_out = free_obj_out ;
 
-    push_gen_trav_env() ;
-    if (!keep) shared_pointers( obj, FALSE ) ;
+    if (!keep) 
+    {
+	push_gen_trav_env() ;
+	shared_pointers( obj, FALSE ) ;
+    }
+
     gen_trav_obj( obj, &dr ) ;
-    pop_gen_trav_env() ;
+
+    if (!keep)
+	pop_gen_trav_env() ;
 }
 
 /* GEN_FREE frees the object OBJ. */ 
@@ -982,13 +994,16 @@ void
 gen_free( obj )
 gen_chunk *obj ;
 {
-    gen_local_free( obj, FALSE ) ;
+    gen_local_free(obj, FALSE) ;
 }
 
 /* GEN_FREE_WITH_SHARING frees the object OBJ. */ 
 
+/* Should be used when freeing a newgen_object declared
+ * as external, I guess. FC.
+ */
 void
-gen_free_with_sharing( obj )
+gen_free_with_sharing(obj)
 gen_chunk *obj ;
 {
     gen_local_free( obj, TRUE ) ;
@@ -1042,7 +1057,8 @@ struct driver *dr ;
 	    return 0;
 
     /* FI: hash_get() theoretically is useless because shared_obj()
-     * should be enough to avoid duplicate copies
+     * should be enough to avoid duplicate copies.
+     * Also shared_obj is useless because of the copy table kept?...
      */
     if ((gen_chunk *)hash_get( copy_table, (char *)obj )==
 	(gen_chunk *)HASH_UNDEFINED_VALUE) {
@@ -1051,16 +1067,18 @@ struct driver *dr ;
 	new_obj = (gen_chunk *)alloc(size);
 
 	/* the object obj is copied into the new one
+	 * ??? what should be done about the approximate use
+	 * of string_undefined defined as a value is not clear...
 	 */
 	if (IS_INLINABLE(bp) && strcmp(bp->name, "string")==0)
 	{
-	    new_obj->s = strdup(obj->s);
+	    new_obj->s = obj->s ? strdup(obj->s) : (char *) 0 ;
 	}
 	else /* the value is copied */
 	{
 	    (void) memcpy((char *) new_obj, (char *) obj, size);
 	}
-
+	
 	/* hash table copy_table is updated */
 	copy_hput(copy_table, (char *)obj, (char *)new_obj);
 	return 1;
@@ -2378,7 +2396,7 @@ allocated_memory_obj_in(
 
     /* gen size is quite slow. should precompute sizes...
      */
-    current_size += gen_size(bp); 
+    current_size += sizeof(gen_chunk*)*gen_size(bp); 
 
     return GO;
 }
