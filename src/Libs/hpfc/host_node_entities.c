@@ -2,41 +2,23 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1994/12/30 16:49:15 $, ) version $Revision$,
- * got on %D%, %T%
- * $Id$
- */
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1995/03/23 16:54:40 $, ) version $Revision$,
+*/
 
-/*
- * Standard includes
- */
- 
 #include <stdio.h>
 #include <string.h> 
 extern fprintf();
-
-/*
- * Psystems stuff
- */
 
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
 
-/*
- * Newgen stuff
- */
-
 #include "genC.h"
 
 #include "ri.h" 
 #include "hpf.h" 
 #include "hpf_private.h"
-
-/*
- * PIPS stuff
- */
 
 #include "ri-util.h" 
 #include "misc.h" 
@@ -45,56 +27,75 @@ extern fprintf();
 #include "semantics.h"
 #include "effects.h"
 
-/* 
- * my own local includes
- */
-
 #include "hpfc.h"
 #include "defines-local.h"
 
 
-/*
- * Host and Node Entities Management
- *
+/*      HOST AND NODE ENTITIES MANAGEMENT
  */
-
-GENERIC_CURRENT_MAPPING(host_new, entity, entity);
-GENERIC_CURRENT_MAPPING(host_old, entity, entity);
-GENERIC_CURRENT_MAPPING(node_new, entity, entity);
-GENERIC_CURRENT_MAPPING(node_old, entity, entity);
+GENERIC_GLOBAL_FUNCTION(new_host, entitymap, entity, entity);
+GENERIC_GLOBAL_FUNCTION(old_host, entitymap, entity, entity);
+GENERIC_GLOBAL_FUNCTION(new_node, entitymap, entity, entity);
+GENERIC_GLOBAL_FUNCTION(old_node, entitymap, entity, entity);
 
 void store_new_node_variable(new, old)
 entity new, old;
 {
-    assert(!entity_undefined_p(new) || !entity_undefined_p(old));
-
-    store_entity_node_new(old, new);
-    store_entity_node_old(new, old);
+    assert(!entity_undefined_p(new) && !entity_undefined_p(old));
+    store_new_node(old, new), store_old_node(new, old);
 }
 
 void store_new_host_variable(new, old)
 entity new, old;
 {
-    assert(!entity_undefined_p(new) || !entity_undefined_p(old));
-
-    store_entity_host_new(old, new);
-    store_entity_host_old(new, old);
+    assert(!entity_undefined_p(new) && !entity_undefined_p(old));
+    store_new_host(old, new), store_old_host(new, old);
 }
 
-void make_host_node_maps()
+void init_entity_status()
 {
-    make_host_new_map();
-    make_host_old_map();
-    make_node_new_map();
-    make_node_old_map();
+    init_new_host();
+    init_old_host();
+    init_new_node();
+    init_old_node();
+    init_referenced_variables(); /* in ri-util/module.x */
 }
 
-void free_host_node_maps()
+entity_status get_entity_status()
 {
-    free_host_new_map();
-    free_host_old_map();
-    free_node_new_map();
-    free_node_old_map();
+    return(make_entity_status(get_new_host(),
+			      get_new_node(),
+			      get_old_host(),
+			      get_old_node(),
+			      get_referenced_variables()));
+}
+
+void set_entity_status(s)
+entity_status s;
+{
+    set_new_host(entity_status_new_host(s));
+    set_new_node(entity_status_new_node(s));
+    set_old_host(entity_status_old_host(s));
+    set_old_node(entity_status_old_node(s));
+    set_referenced_variables(entity_status_referenced(s));
+}
+
+void reset_entity_status()
+{
+    reset_new_host();
+    reset_old_host();
+    reset_new_node();
+    reset_old_node();
+    reset_referenced_variables();
+}
+
+void close_entity_status()
+{
+    close_new_host();
+    close_old_host();
+    close_new_node();
+    close_old_node();
+    close_referenced_variables();
 }
 
 string hpfc_module_suffix(module)
@@ -102,40 +103,45 @@ entity module;
 {
     if (module==node_module) return(NODE_NAME);
     if (module==host_module) return(HOST_NAME);
-
-    /* else */
-
+    /* else
+     */
     pips_error("hpfc_module_suffix", "unexpected module\n");
-    return(string_undefined);
+    return(string_undefined); /* to avoid a gcc warning */
 }
   
 
-/*
- * updates
+/* UPDATES
  */
 
-static entity_mapping
-    current_entity_map = hash_table_undefined;
+static entity current_updated_module = entity_undefined;
 
-entity_mapping hpfc_map_of_module(module)
-entity module;
+static bool bound_p(e)
+entity e;
 {
-    if (module==node_module) return(get_node_new_map());
-    if (module==host_module) return(get_host_new_map());
+    if (current_updated_module==node_module) return(bound_new_node_p(e));
+    if (current_updated_module==host_module) return(bound_new_host_p(e));
+    /* else
+     */
+    pips_error("bound_p", "invalid current module\n");
+    return(FALSE);
+}
 
-    /* else */
-
-    pips_error("hpfc_map_of_module", "unexpected module\n");
-    return(hash_table_undefined);
+static entity load(e)
+entity e;
+{
+    
+    if (current_updated_module==node_module) return(load_new_node(e));
+    if (current_updated_module==host_module) return(load_new_host(e));
+    /* else
+     */
+    pips_error("load", "invalid current module\n");
+    return(FALSE);
 }
 
 static void update_for_module_rewrite(pe)
 entity *pe;
 {
-    entity
-	new = (entity) GET_ENTITY_MAPPING(current_entity_map, *pe);
-
-    if (new != (entity) HASH_UNDEFINED_VALUE) *pe = new;
+    if (bound_p(*pe)) *pe = load(*pe);
 }
 
 /* shift the references to the right variable, in the module
@@ -158,10 +164,8 @@ static void update_code_for_module_rewrite(c)
 code c;
 {
     MAPL(ce,
-     {
-	 update_for_module_rewrite(&ENTITY(CAR(ce)));
-     },
-	 code_declarations(c));
+ 	 update_for_module_rewrite(&ENTITY(CAR(ce))),
+ 	 code_declarations(c));
 }
 
 static void update_loop_for_module_rewrite(l)
@@ -174,13 +178,12 @@ void update_object_for_module(obj, module)
 gen_chunk *obj; /* loosely typed, indeed */
 entity module;
 {
-    entity_mapping
-	saved = current_entity_map;
+    entity saved = current_updated_module;
 
     debug(8, "update_object_for_module", "updating (%s) 0x%x\n",
 	  gen_domain_name(gen_type(obj)), (unsigned int) obj);
 
-    current_entity_map = hpfc_map_of_module(module);
+    current_updated_module = module;
 
     gen_multi_recurse(obj, 
 		      /* 
@@ -209,7 +212,7 @@ entity module;
 		      update_code_for_module_rewrite,
 		      NULL);
 
-    current_entity_map = saved;
+    current_updated_module = saved;
 }
 
 void update_list_for_module(l, module)
@@ -217,9 +220,7 @@ list l;
 entity module;
 {
     MAPL(cx,
-     {
-	 update_object_for_module(CHUNK(CAR(cx)), module);
-     },
+	 update_object_for_module(CHUNK(CAR(cx)), module),
 	 l);
 }
 
@@ -246,7 +247,7 @@ entity common;
      {
 	 var = ENTITY(CAR(ce));
 
-	 if (load_entity_referenced_variables(var)==TRUE &&
+	 if (bound_referenced_variables_p(var) &&
 	     local_entity_of_module_p(var, common))
 	     lnew = CONS(ENTITY, var, lnew);
      },
@@ -269,11 +270,8 @@ expression UpdateExpressionForModule(module, ex)
 entity module;
 expression ex;
 {
-    expression
-	new = copy_expression(ex);
-
+    expression new = copy_expression(ex);
     update_object_for_module(new, module);
-
     return(new);
 }
 
@@ -282,9 +280,7 @@ list lUpdateExpr(module, l)
 entity module;
 list l;
 {
-    list
-	new = NIL,
-	rev = NIL;
+    list new = NIL, rev = NIL;
 
     MAPL(cx,
      {
@@ -295,8 +291,7 @@ list l;
 	 l);
 
     new = gen_nreverse(rev); 
-    update_list_for_module(new, module);
-    
+    update_list_for_module(new, module);    
     return(new);
 }
 
@@ -324,21 +319,20 @@ entity NewVariableForModule(module,e)
 entity module;
 entity e;
 {
-    entity_mapping
-	map = hpfc_map_of_module(module);
-
-    return((entity) GET_ENTITY_MAPPING(map,e));
+    entity saved = current_updated_module, result;
+    current_updated_module = module;
+    assert(bound_p(e));
+    result = load(e);
+    current_updated_module = saved;
+    return(result);
 }
 
 statement UpdateStatementForModule(module, stat)
 entity module;
 statement stat;
 {
-    statement 
-	new_stat = copy_statement(stat);
-    
+    statement new_stat = copy_statement(stat);
     update_object_for_module(new_stat, module);
-
     return(new_stat);
 }
 
