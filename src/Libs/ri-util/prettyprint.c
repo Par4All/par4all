@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/12 18:50:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/13 09:58:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/10/12 18:50:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/10/13 09:58:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -62,6 +62,9 @@ static text (*text_statement_hook)() = empty_text ;
 void init_prettyprint( hook )
 text (*hook)() ;
 {
+    /* checks that the prettyprint hook was actually reset...
+     */
+    pips_assert("prettyprint hook not set", text_statement_hook==empty_text);
     text_statement_hook = hook ;
 }
 
