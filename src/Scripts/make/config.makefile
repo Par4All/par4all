@@ -11,9 +11,11 @@ SCRIPTS = 	MakeExtern \
 		make-pips \
 		make-pipsrc.csh \
 		make-pipsrc.sh \
-		make_all_specs \
 		makedep \
-		makemake
+		makemake \
+		install-pips-src \
+		tape-pips \
+		make-gdbinit
 
 FILES =		
 
