@@ -36,6 +36,20 @@
 #include "rice.h"
 
 
+void wp65_debug_print_text(entity m, statement s)
+{
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+    print_text(stderr, text_statement(m, 0, s));
+    debug_off();
+}
+
+void wp65_debug_print_module(entity m, statement s)
+{
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+    print_text(stderr, text_module(m, s));
+    debug_off();
+}
+
 extern Value offset_dim1;
 extern Value offset_dim2;
 
@@ -437,7 +451,7 @@ Pbase var_id;              /* corresponds to the Pvecteur belonging Prod_id
     return (lbody);
 
 }
-
+
 /* statement make_movement_scalar_wp65(receive_code,r)
  *
  * This  function generates the loop body of the movement code. In the case of 
@@ -472,9 +486,8 @@ entity var_id;
     char str1[64];
 
     debug_on("MOVEMENT_DEBUG_LEVEL");
-    debug(8,"make_movement_scalar_wp65","begin\n");
-    debug(8, "make_movement_scalar_wp65", "considering %s\n",
-	  entity_local_name(var));
+    pips_debug(8, "begin\n");
+    pips_debug(8, "considering %s\n", entity_local_name(var));
 
     t = entity_type(var);
 
@@ -504,7 +517,12 @@ entity var_id;
 	make_statement_operator(operator_receive,args): 
 	    make_statement_operator(operator_send,args);
 	
-    debug(8,"make_movement_scalar_wp65","end\n");
+    ifdebug(9) {
+	pips_debug(9, "returning :\n");
+	wp65_debug_print_text(entity_undefined, lbody);
+    }
+
+    pips_debug(8,"end\n");
     debug_off();
     return (lbody);
 
