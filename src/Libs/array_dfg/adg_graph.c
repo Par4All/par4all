@@ -8,13 +8,14 @@
  * Comments :
  */
 
-#define GRAPH_IS_DG
+#define GRAPH_IS_DFG
 #include "local.h"
 
 /* External variables */
 extern	int		Gcount_re;
 hash_table 		Gvertex_number_to_statement;
 extern  hash_table	Gstco_map;
+
 
 /*=======================================================================*/
 /* 			GRAPH FUNCTIONS					 */
@@ -40,7 +41,7 @@ graph	in_gr;
     int		or;
     
     ve = VERTEX(CAR(ver_ptr));
-    or = dg_vertex_label_statement(vertex_vertex_label(ve));
+    or = dfg_vertex_label_statement(vertex_vertex_label(ve));
     if (or == ENTRY_ORDER) { v_entry = ve; continue; }
     if (or == EXIT_ORDER)  { v_exit = ve; continue; }
   }
@@ -55,7 +56,7 @@ graph	in_gr;
     ver  = VERTEX(CAR( ver_ptr ));
     if ((ver == v_entry) || (ver == v_exit)) continue;
     
-    or   = dg_vertex_label_statement(vertex_vertex_label(ver));
+    or   = dfg_vertex_label_statement(vertex_vertex_label(ver));
     ver2 = adg_same_dfg_vertex_number( verlist, or );
     if ( ver2 == vertex_undefined ) {
 	ver2 = make_vertex(vertex_vertex_label(ver),NIL);
@@ -72,7 +73,7 @@ graph	in_gr;
       /* If this succ is an extremity, continue */
       if ((ver3 == v_entry) || (ver3 == v_exit)) continue;
       
-      ord   = dg_vertex_label_statement(vertex_vertex_label(ver3));
+      ord   = dfg_vertex_label_statement(vertex_vertex_label(ver3));
       ver5  = adg_same_dfg_vertex_number( verlist, ord );
       if ( ver5 == vertex_undefined ) {
 	  ver5 = make_vertex(vertex_vertex_label(ver3),NIL);
@@ -107,7 +108,7 @@ graph	in_gr;
     int		or = (int) NULL;
     
     ve = VERTEX(CAR(vl));
-    or = dg_vertex_label_statement(vertex_vertex_label(ve));
+    or = dfg_vertex_label_statement(vertex_vertex_label(ve));
     if (or == ENTRY_ORDER) v_entry = ve;
     if (or == EXIT_ORDER)  v_exit = ve;
   }
@@ -400,10 +401,10 @@ list*	  in_lp;
 
     /* Build the new dataflows list of data flow */
     dj       = pa_path_to_disjunct( in_pa );
-    dest_vls = dg_vertex_label_statement(vertex_vertex_label(in_dest));
+    dest_vls = dfg_vertex_label_statement(vertex_vertex_label(in_dest));
     if ((dest_vls != ENTRY_ORDER) && (dest_vls != EXIT_ORDER)) {
       dest_system = predicate_system
-	  (dg_vertex_label_exec_domain(vertex_vertex_label(in_dest)));
+	(dfg_vertex_label_exec_domain(vertex_vertex_label(in_dest)));
     }
 
     for(; dj != NULL; dj = dj->succ) {
@@ -420,7 +421,7 @@ list*	  in_lp;
       df = make_dataflow( in_ref, qls, make_predicate( prov_ps ), communication_undefined );
       if (get_debug_level()>6) {
 	adg_fprint_dataflow(stderr, 
-			    dg_vertex_label_statement(vertex_vertex_label(in_dest)),
+			    dfg_vertex_label_statement(vertex_vertex_label(in_dest)),
 			    df);
       }
       ADD_ELEMENT_TO_LIST( dfl, DATAFLOW, df );
@@ -430,8 +431,8 @@ list*	  in_lp;
     /* Update graph */
     pred_v = adg_same_dfg_vertex_number( (list) *in_lp, sou_nb );
     if (pred_v == vertex_undefined) {
-      successor	su = make_successor( make_dg_arc_label( dfl ), in_dest);
-      pred_v       = make_vertex(make_dg_vertex_label(sou_nb,
+      successor	su = make_successor( make_dfg_arc_label( dfl ), in_dest);
+      pred_v       = make_vertex(make_dfg_vertex_label(sou_nb,
 						 predicate_undefined,
 						 sccflags_undefined),
 				 CONS(SUCCESSOR, su, NIL));
@@ -450,7 +451,7 @@ list*	  in_lp;
       }
       /* If not, add to it the correct successor */
       if (!(get_it)) {
-	successor su =  make_successor( make_dg_arc_label(dfl), in_dest);
+	successor su =  make_successor( make_dfg_arc_label(dfl), in_dest);
 	ADD_ELEMENT_TO_LIST(  vertex_successors(pred_v), SUCCESSOR, su );
       }
     }
@@ -638,7 +639,7 @@ statement_mapping 	stco_map;
       
       for(; !ENDP(sl); POP(sl)) 
 	{ ADD_ELEMENT_TO_LIST( new_succ_list, SUCCESSOR,
-	 make_successor(copy_dfg_arc_label( dal ), VERTEX(CAR(sl)) ) ); }
+	  make_successor( copy_dfg_arc_label( dal ), VERTEX(CAR(sl)) ) ); }
     }
     
     /*Associate a duplicated successor list to each new vertex */
@@ -770,8 +771,9 @@ graph	g;
     
     ver = VERTEX(CAR( l ));
     /* We only keep call statement */
-    if (!assignment_statement_p( ordering_to_statement(dfg_vertex_label_statement(
-                                   vertex_vertex_label( ver )))) )  continue;
+    if (!assignment_statement_p(ordering_to_statement
+				(dfg_vertex_label_statement(
+	vertex_vertex_label( ver )))) )  continue;
 
     succ_list = vertex_successors( ver );
     if (adg_same_order_in_dg(new_vertices,ver)==vertex_undefined){
@@ -787,7 +789,7 @@ graph	g;
       
       s        = SUCCESSOR(CAR( succ_list ));
       succ_ver = successor_vertex( s );
-      conflist = dg_arc_label_conflicts(successor_arc_label(s) );
+      conflist = dg_arc_label_conflicts((dg_arc_label) successor_arc_label( s ) );
       
       for(;!ENDP( conflist ); POP( conflist )) {
 	conflict 	conf = NULL;
@@ -804,11 +806,11 @@ graph	g;
       if (new_conflist != NIL) {
 	new_succver = adg_same_order_in_dg( new_vertices, succ_ver );
 	if (new_succver == vertex_undefined) {
-	    vl          = vertex_vertex_label(succ_ver);
-	    new_succver = make_vertex(vl, (list) NIL);
+	    vl          = (dg_arc_label) vertex_vertex_label(succ_ver);
+	    new_succver = make_vertex((dfg_arc_label) vl, (list) NIL);
 	}
 	dgal     = make_dg_arc_label( new_conflist );
-	new_succ = make_successor( dgal, new_succver );
+	new_succ = make_successor( (dfg_arc_label) dgal, new_succver );
 	ADD_ELEMENT_TO_LIST( new_succ_list, SUCCESSOR, new_succ );
       }
     }
@@ -827,14 +829,15 @@ graph	g;
  * output   : a copy of the input effect (no sharing).
  * modifies : 
  */
-static effect effect_dup(eff)
-effect eff;
-{
   /* FI: the meaning of effect_dup() is unclear; should any syntactically
      correct effect by duplicable? Or this function be restricted
      to semantically correct effects? I do not understand why
      SC_UNDEFINED was used instead of transformer_undefined in
      contexts for scalar variables (8 August 1992) */
+/*
+static effect effect_dup(eff)
+effect eff;
+{
   effect ne;
   Psysteme sc = effect_system(eff);
   
@@ -852,7 +855,7 @@ effect eff;
   }
   return ne;
 }
-
+*/
 
 /*=======================================================================*/
 /* conflict conflict_dup( (conflict) conf ) 			AL 06/07/93
@@ -918,7 +921,7 @@ dg_vertex_label dg_vl;
 {
   debug(9, "dg_vertex_label_dup", "doing for statement n. : %d\n",
 	(int) dg_vertex_label_statement( dg_vl ) );
-  return( make_dg_vertex_label((int) dg_vertex_label_statement(dg_vl),(list) NIL));
+  return( make_dg_vertex_label(dg_vertex_label_statement(dg_vl),NULL));
 }
 
 /*=======================================================================*/
