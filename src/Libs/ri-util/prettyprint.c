@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.130  1999/01/29 16:42:39  ancourt
+ * to deal with io in block IF
+ *
  * Revision 1.129  1999/01/05 12:15:44  irigoin
  * painful user_warning() in text_statement() transformed into a pips_debug()
  * because it is OK for parsed code, before the controlizer is applied.
@@ -229,7 +232,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.129 1999/01/05 12:15:44 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.130 1999/01/29 16:42:39 ancourt Exp $";
 #endif /* lint */
 
  /*
@@ -1862,6 +1865,39 @@ text_block_if(
 }
 
 static text 
+text_io_block_if(
+    entity module,
+    string label,
+    int margin,
+    test obj,
+    int n)
+{
+    text r = make_text(NIL);
+    list pc = NIL;
+    string strglab= local_name(new_label_name(module))+1;
+ 
+    pips_assert("empty else in io block IF", empty_statement_p(test_false(obj)));
+   r = make_text(CONS(SENTENCE, 
+			   sentence_goto_label(module, label, margin,
+					 strglab, n), 
+			   NIL));
+    
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, 
+				       make_unformatted(strdup(label), n, 
+							margin, pc)));
+    MERGE_TEXTS(r, text_statement(module, margin, 
+				  test_true(obj)));
+
+ 
+    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, 
+					  make_unformatted(strdup(strglab), n, margin, 
+							   CONS(STRING, strdup("CONTINUE"), NIL))));
+
+    return(r);
+}
+
+static text 
 text_block_ifthen(
     entity module,
     string label,
@@ -1978,6 +2014,8 @@ text_test(
 	    && empty_comments_p(statement_comments(fb))
 	    && entity_empty_label_p(statement_label(fb))
 	    && !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")) {
+
+
 	r = text_block_ifthen(module, label, margin, obj, n);
 	MERGE_TEXTS(r, text_block_elseif
 		    (module, label, margin, statement_test(fb), n));
@@ -1985,10 +2023,17 @@ text_test(
 
 	/* r = text_block_if(module, label, margin, obj, n); */
     }
-    else {
-	r = text_block_if(module, label, margin, obj, n);
+    else {   
+	syntax c = expression_syntax(test_condition(obj));
+	
+	if (syntax_reference_p(c) 
+	    && io_entity_p(reference_variable(syntax_reference(c)))
+		&&  !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS"))
+	    r = text_io_block_if(module, label, margin, obj, n);
+	else 
+	    r = text_block_if(module, label, margin, obj, n);
     }
-
+    
     return r;
 }
 
