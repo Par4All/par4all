@@ -18,6 +18,8 @@ range: a range is not evaluated.
 #include <string.h>
 #include <ctype.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "misc.h"
@@ -98,7 +100,7 @@ EvalConstant(constant c)
 {
     return((constant_int_p(c)) ?
 	   make_value(is_value_constant, make_constant(is_constant_int,
-						       constant_int(c))) :
+						   (void*) constant_int(c))) :
 	   make_value(is_value_constant, 
 		      make_constant(is_constant_litteral, NIL)));
 
@@ -140,17 +142,17 @@ EvalUnaryOp(int t, list la)
 	assert(la != NIL);
 	v = EvalExpression(EXPRESSION(CAR(la)));
 	if (value_constant_p(v) && constant_int_p(value_constant(v)))
-		arg = constant_int(value_constant(v));
+	    arg = constant_int(value_constant(v));
 	else
 		return(v);
 
 	if (t == MINUS) {
-		constant_int(value_constant(v)) = -arg;
-		vout = v;
+	    constant_int(value_constant(v)) = -arg;
+	    vout = v;
 	}
 	else {
-		gen_free(v);
-		vout = make_value(is_value_unknown, NIL);
+	    free_value(v);
+	    vout = make_value(is_value_unknown, NIL);
 	}
 
 	return(vout);
@@ -167,7 +169,7 @@ EvalBinaryOp(int t, list la)
     v = EvalExpression(EXPRESSION(CAR(la)));
     if (value_constant_p(v) && constant_int_p(value_constant(v))) {
 	argl = constant_int(value_constant(v));
-	gen_free(v);
+	free_value(v);
     }
     else
 	return(v);
@@ -213,12 +215,12 @@ EvalBinaryOp(int t, list la)
 	if (argr >= 0)
 	    constant_int(value_constant(v)) = ipow(argl,argr);
 	else {
-	    gen_free(v);
+	    free_value(v);
 	    v = make_value(is_value_unknown, NIL);
 	}
 	break;
       default:
-	gen_free(v);
+	free_value(v);
 	v = make_value(is_value_unknown, NIL);
     }
 
@@ -257,7 +259,7 @@ EvalNaryOp(int t, list la)
 		default:
 		    return v;
 		}
-		gen_free(v);
+		free_value(v);
 	    }
 	}
 	else
@@ -379,7 +381,7 @@ expression_integer_value(expression e, int * pval)
         is_int = TRUE;
     }
 
-    gen_free(v);
+    free_value(v);
     return is_int;
 }
 
