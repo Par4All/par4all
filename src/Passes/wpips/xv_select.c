@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/27 16:02:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/12 15:34:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1995/11/27 16:02:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1996/07/12 15:34:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -532,7 +532,10 @@ end_create_workspace_notify(int * pargc,
             
             enable_workspace_create_or_open();
             enable_workspace_delete_or_open();
-            
+
+	    /* Tell Emacs the new module list: */
+	    send_the_names_of_the_available_modules_to_emacs();
+
             display_memory_usage();
          
             return;
@@ -566,6 +569,8 @@ end_open_workspace_notify(string name)
       select_a_module_by_default();
       enable_module_selection();
       disable_change_directory();
+      /* Tell Emacs the new module list: */
+      send_the_names_of_the_available_modules_to_emacs();
    }
 
    enable_workspace_create_or_open();
@@ -642,6 +647,8 @@ close_workspace_notify(Menu menu,
       enable_change_directory();
 
       disable_module_selection();
+      /* Tell Emacs the new module list, that is nothing in fact: */
+      send_the_names_of_the_available_modules_to_emacs();
    }
   
    hide_window(schoose_frame);
