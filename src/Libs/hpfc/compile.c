@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/12/27 11:56:48 $, )
+ * ($Date: 1995/12/28 18:21:18 $, )
  */
 
 #include "defines-local.h"
@@ -175,7 +175,7 @@ init_host_and_node_entities (void)
     }
 }
 
-static FILE *
+FILE *
 hpfc_fopen(
     string name)
 {
@@ -185,7 +185,7 @@ hpfc_fopen(
     return f;
 }
 
-static void
+void
 hpfc_fclose(
     FILE *f,
     string name)
