@@ -1,0 +1,110 @@
+<html>
+
+<head> <title>PIPS: Automatic Parallelizer</title> </head>
+
+<body>
+
+<center>
+
+<IMG SRC=logo-pips.half-size.gif> <H1>PIPS</H1>
+
+<h2>Parall&eacute;liseur Interproc&eacute;dural de Programmes
+Scientifiques</h2>
+
+<h2>(Interprocedural Parallelizer for Scientific Programs)</h2>
+
+</center>
+
+<hr>
+
+<br><center>
+
+<STRONG><a href="http://www.lifl.fr:80/~marquet/sc95.paradigme">PIPS and
+Paradigme at SuperComputing '95 </a></STRONG>
+
+</center><br>
+
+<hr>
+
+<h2> Content </h2>
+
+<ul>
+  <li> <a href="index.html#introduction">introduction</a>
+  <li> <a href="index.html#tech">technical pages</a>
+  <li> <a href="index.html#team"><b>PIPS</b> team</a>
+  <li> <a href="index.html#rwork">related work</a>
+</ul>
+
+<hr>
+
+<a name="introduction"><h2>Introduction</h2></a>
+
+<b>PIPS</b> is an automatic parallelizer for scientific programs. It
+takes as input Fortran 77 codes. It emphasizes interprocedural
+techniques. The analyses are driven by a make system
+<em>(pipsmake)</em> and stored in a database <em>(pipsdbm)</em>. The
+compiler is made of phases that are called on demand to perform the
+analyses or transformations required by the user. There is a shell
+interface <em>(Pips)</em> and a window interface <em>(wpips)</em> to
+the parallelizer.
+<p>
+
+<b>PIPS</b> is being developped at <a href="/index-english.html"
+>CRI</a> since 1988. The initial design was made by R&eacute;mi
+TRIOLET, Fran&ccedil;ois IRIGOIN and Pierre JOUVELOT. <b>PIPS</b> is
+built on top of two tools. The first one is <em>Newgen</em> which
+manages data structures. It builds manipulation functions from a
+declaration file. It allows to deal with persistent data and a
+hierachie of types. All <b>PIPS</b> data-types are based on
+<em>Newgen</em>. The second tool is the <em>Linear C3</em> library
+which handles linear formula and structures based on these such as
+polyhedrons.
+<p>
+
+<hr>
+
+<a name="tech"><h2>Technical pages</h2></a>
+
+<ul>
+  <li> <a href="outline.html">Outline</a> of <b>PIPS</b>
+       <a href="outline.html#analyses">analyses</a> and
+       <a href="outline.html#transformations">transformations</a>,
+  <li> <a href="/~creusil/regions.html">Regions</a>: Array region analyses,
+  <li> <a href="/~coelho/hpfc.html"><b>HPFC</b></a>: A prototype HPF compiler,
+  <li> <a href="/~platonof/poly_meth.html">Polyhedric method</a>,
+  <li> <a href="pipsmake.html">Pipsmake resource manager</a>.
+</ul>
+
+<hr>
+
+<a name="team"><h2>PIPS Team</h2></a>
+
+<ul>
+  <li> <a href="/~ancourt">Corinne ANCOURT</a> (Researcher)
+  <li> <a href="/~coelho">Fabien COELHO</a> (PhD Student)
+  <li> <a href="/~creusil">B&eacute;atrice CREUSILLET</a> (PhD Student)
+  <li> <a href="/~irigoin">Fran&ccedil;ois IRIGOIN</a> (The Chief)
+  <li> <a href="/~keryell">Ronan KERYELL</a> (Researcher)
+  <li> Arnauld LESERVOT (PhD Student)
+  <li> <a href="/~oget">Guillaume OGET</a> (Military period researcher)
+  <li> <a href="/~platonof">Alexis PLATONOFF</a> (PostDoc Student)
+</ul>
+
+
+<hr>
+
+<a name="rwork"><h2> Related Work </h2></a>
+
+<ul>
+  <li> D System
+  <li> VFCS
+  <li> Pandore
+  <li> SUIF
+  <li> Omega
+  <li> ...
+</ul>
+
+<hr>
+
+</body>
+</html>
