@@ -31,9 +31,9 @@ COPY	=	cp -f
 quick-install: install_forward_makefiles install_macros
 
 install_macros:
-	$(COPY) $(MACROS) $(PIPS_SHRDIR)
-	$(COPY) $(MACROS) $(NEWGEN_SHRDIR)
-	$(COPY) $(MACROS) $(LINEAR_SHRDIR)
+	$(COPY) $(MACROS) $(PIPS_INCLUDEDIR)
+	$(COPY) $(MACROS) $(NEWGEN_INCLUDEDIR)
+	$(COPY) $(MACROS) $(LINEAR_INCLUDEDIR)
 
 install_forward_makefiles: 
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Makefile
