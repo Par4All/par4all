@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/27 17:57:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/03/08 16:39:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_help[] = "%A% ($Date: 1995/09/27 17:57:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_help[] = "%A% ($Date: 1996/03/08 16:39:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 #include <stdlib.h>
 #include <stdio.h>
@@ -137,8 +137,7 @@ create_help_menu()
                     MENU_NOTIFY_PROC, help_notify,
                     NULL,
                     /* Just a separator: */
-                    MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
-                    NULL,
+                    WPIPS_MENU_SEPARATOR,
                     MENU_ACTION_ITEM, "The PIPS documentation on Internet with Netscape...",
                     help_launch_pips_netscape,
                     MENU_ACTION_ITEM, "The PIPS documentation on Internet with XMosaic...",
