@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/03/14 14:43:14 $, ) version $Revision$,
+ * $RCSfile: build-system.c,v $ ($Date: 1995/03/24 15:02:09 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -281,27 +281,21 @@ GET_DUMMY(HPFC_PACKAGE, SIGMA_PREFIX, auxiliary_dummy);
 static Psysteme hpfc_compute_align_constraints(e)
 entity e;
 {
-    align
-	al = load_entity_align(e);
-    entity
-	template = align_template(al);
-    Psysteme
-	new_system = sc_new();
+    align al = load_entity_align(e);
+    entity template = align_template(al);
+    Psysteme new_system = sc_new();
     int i;
 
     assert(array_distributed_p(e));
 
     for(i=1 ; i<=NumberOfDimension(template) ; i++)
     {
-	entity
-	    theta = get_ith_template_dummy(i);
-	alignment
-	    a = FindAlignmentOfTemplateDim(align_alignment(al), i);
+	entity theta = get_ith_template_dummy(i);
+	alignment a = FindAlignmentOfTemplateDim(align_alignment(al), i);
 	
 	if (a!=alignment_undefined)
 	{
-	    int 
-		adim = alignment_arraydim(a),
+	    int adim = alignment_arraydim(a),
 		constant = HpfcExpressionToInt(alignment_constant(a));
 	    Pvecteur
 		v = vect_make(VECTEUR_NUL,
@@ -314,13 +308,10 @@ entity e;
 	    }
 	    else
 	    {
-		entity
-		    phi = get_ith_array_dummy(adim);
-		int
-		    rate = HpfcExpressionToInt(alignment_rate(a));
+		entity phi = get_ith_array_dummy(adim);
+		int rate = HpfcExpressionToInt(alignment_rate(a));
 
 		v = vect_make(v, phi, -rate, TCST, 0);
-		
 		sc_add_egalite(new_system, contrainte_make(v));
 	    }
 	}
@@ -498,7 +489,7 @@ entity e;
     Psysteme 
 	p = load_entity_hpf_constraints(e);
 
-    assert(entity_variable_p(e) && 
+    assert(entity_variable_p(e) &&
 	   (array_distributed_p(e) || entity_template_p(e)));
 
     if (Psysteme_undefined_p(p))
