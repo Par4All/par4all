@@ -27,7 +27,7 @@
  *
  * FC, Feb 21, 1994
  *
- * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1994/12/30 14:50:29 $, )
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1995/05/05 15:30:04 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -35,8 +35,7 @@
 #ifndef GENERIC_MAPPING_INCLUDED
 #define GENERIC_MAPPING_INCLUDED
 
-/*
- * PIPS level:
+/* PIPS level:
  *
  * GENERIC_MAPPING(PREFIX, name, result, type)
  *
@@ -52,70 +51,25 @@
  */
 #define GENERIC_MAPPING(PREFIX, name, result, type)\
 static type##_mapping name##_map = hash_table_undefined;\
-\
-PREFIX void set_##name##_map(m) \
-type##_mapping m;\
-{\
-    assert(name##_map == hash_table_undefined);\
-    name##_map = m;\
-}\
-\
+PREFIX void set_##name##_map(m) type##_mapping m;\
+{ assert(name##_map == hash_table_undefined); name##_map = m;}\
 PREFIX type##_mapping get_##name##_map() \
-{\
-    return name##_map;\
-}\
-\
+{ return name##_map;}\
 PREFIX void reset_##name##_map()\
-{\
-     name##_map = hash_table_undefined;\
-}\
+{ name##_map = hash_table_undefined;}\
 PREFIX void free_##name##_map() \
-{\
-     hash_table_free(name##_map);\
-     name##_map = hash_table_undefined;\
-}\
+{ hash_table_free(name##_map); name##_map = hash_table_undefined;}\
 PREFIX void make_##name##_map() \
-{\
-     name##_map = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);\
-}\
-PREFIX result load_##type##_##name(s)\
-type s;\
-{\
-     result t;\
-     assert(s != type##_undefined);\
-     t = (result) hash_get((hash_table) (name##_map), (char*) (s));\
-     if (t ==(result) HASH_UNDEFINED_VALUE) t = result##_undefined;\
-     return t;\
-}\
-PREFIX bool type##_##name##_undefined_p(s)\
-type s;\
-{\
-    return(load_##type##_##name(s)==result##_undefined);\
-}\
-\
-PREFIX void store_##type##_##name(s,t)\
-type s;\
-result t;\
-{\
-    assert(s != type##_undefined && t != result##_undefined);\
-    hash_put((hash_table) (name##_map), (char *)(s), (char *)(t));\
-}\
-\
-static void check_##name##_mapping()\
-{\
-  type item = (type) check_##name##_mapping;\
-  result r = (result)check_##name##_mapping;\
-  type##_mapping saved = get_##name##_map();\
-\
-  reset_##name##_map();\
-  make_##name##_map(); \
-  assert(type##_##name##_undefined_p(item));\
-  store_##type##_##name(item,r);\
-  assert(load_##type##_##name(item)==r);\
-  free_##name##_map();\
-  reset_##name##_map();\
-  set_##name##_map(saved);\
-}
+{ name##_map = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);}\
+PREFIX result load_##type##_##name(s)type s;\
+{ result t; assert(s != type##_undefined);\
+  t = (result) hash_get((hash_table) (name##_map), (char*) (s));\
+  if (t ==(result) HASH_UNDEFINED_VALUE) t = result##_undefined; return t;}\
+PREFIX bool type##_##name##_undefined_p(s) type s;\
+{ return(load_##type##_##name(s)==result##_undefined);}\
+PREFIX void store_##type##_##name(s,t) type s; result t;\
+{ assert(s != type##_undefined && t != result##_undefined);\
+  hash_put((hash_table) (name##_map), (char *)(s), (char *)(t));}
 
 #define GENERIC_CURRENT_MAPPING(name, result, type) \
         GENERIC_MAPPING(/**/, name, result, type)
@@ -125,7 +79,13 @@ static void check_##name##_mapping()\
  *  FC 27/12/94
  */
 #define GENERIC_LOCAL_MAPPING(name, result, type) \
-        GENERIC_MAPPING(static, name, result, type)
+        GENERIC_MAPPING(static, name, result, type)\
+static int name##_hack_to_avoid_warnings()\
+{ return((int) set_##name##_map & (int) get_##name##_map() &\
+	 (int) reset_##name##_map() & (int) free_##name##_map &\
+	 (int) make_##name##_map() & (int) load_##type##_##name &\
+	 (int) type##_##name##_undefined_p & (int) store_##type##_##name &\
+	 (int) name##_hack_to_avoid_warnings);}
 
 /* end GENERIC_MAPPING_INCLUDED */
 #endif
