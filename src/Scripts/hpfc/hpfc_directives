@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1996/08/30 21:56:24 $, 
+# $Date: 1996/08/31 14:35:34 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -92,6 +92,7 @@
 # _6: io      // declares an io function (host call only...)
 # _7: host/end host // host section...
 # _8: kill // tell that the values of an array are dead...
+# _9: fake // tells that the function is fake.
 #
 # (_ is hpfc)
 #
@@ -200,6 +201,7 @@ $SED "#
       s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
       s, endlocal,      enddo,
       s, io\(.*\),6(\1),
+      s, fake\(.*\),9(\1),
       s, kill\(.*\),8(\1),
       #
       # host section: hack to build blocks...
@@ -207,9 +209,6 @@ $SED "#
       #
       s, host,      if (.true.) then7if (.true.) then,
       s, endhost,      endifendif,
-      # io args shoud look like calls for pips
-      /6(/s,\,,()\,,g;
-      /6(/s,\([a-z0-9]\))\$,\1()),;
       #
       # HPF declaration directives (well, pure is not)
       #
@@ -217,9 +216,10 @@ $SED "#
       s, template\(.*\),      logical \1t(\1),
       s, processors\(.*\),      logical \1p(\1),
       s, pure\(.*\),u(\1),
-      # pure treated as io above.
-      /u(/s,\,,()\,,g;
-      /u(/s,\([a-z0-9]\))\$,\1()),;
+      #
+      # pure/io/fake args should look like calls for pips
+      /[69u](/s,\,,()\,,g;
+      /[69u](/s,\([a-z0-9]\))\$,\1()),;
       #
       # HPF static and dynamic mapping directives
       #  - some simple free style is parsed.
@@ -264,7 +264,7 @@ $SED "#
       #
       # SWITCH to special hpfc functions...
       #
-      s,\([12345678abdeintpryu]\),      call hpfc\1,g
+      s,\([123456789abdeintpryu]\),      call hpfc\1,g
       s,\([ck#s]\),hpfc\1,g" | 
 #
 # handles multi lines breaking (independent/new/reduction...)
@@ -278,9 +278,9 @@ $SED "s,hpfc#,$NOP,g;
       # clean template and processors declaration call (must not be scalar!)
       /^      call hpfc[pt]/s/([-+*0-9a-z_:\,]*)//g
       # separation
-      /^      call hpfc[ptu6]/w $TMP.1
+      /^      call hpfc[ptu69]/w $TMP.1
       /^      call hpfc[ady45]/w $TMP.2
-      /^      call hpfc[adptuy456]/d" > $TMP.0
+      /^      call hpfc[adptuy4569]/d" > $TMP.0
 
 #
 # line before which the static directives will be inserted
