@@ -1,0 +1,184 @@
+%% 
+%% $Id$
+%%
+%% PIPS faq
+%%
+%% $Log: faq.tex,v $
+%% Revision 1.1  1998/07/27 11:21:48  irigoin
+%% Initial revision
+%%
+%
+
+%% titlepage,
+\documentclass[a4paper]{article}
+
+\usepackage{psfig,amstext,alltt,html}
+
+\title{\bf {\Huge PIPS} \\ Frequently Asked Questions}
+
+\author{
+\begin{tabular}{rl}
+  François & IRIGOIN
+\end{tabular}
+}
+
+\date{September 1997}
+
+\renewcommand{\indexname}{Index}
+\makeindex
+
+\newcommand{\PIPSMAKERC}{\htmladdnormallink{\texttt{pipsmake-rc}}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}}
+
+\newcommand{\PIPS}{\htmladdnormallink{{\em PIPS}}{http://www.cri.ensmp.fr/pips}}
+\newcommand{\WPIPS}{\htmladdnormallink{{\em WPIPS}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
+\newcommand{\TPIPS}{\htmladdnormallink{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}}
+\newcommand{\PROPERTIES}{\htmladdnormallink{\emph{properties}}{http://www.cri.ensmp.fr/pips/properties-rc}}
+
+\begin{document}
+\maketitle
+
+\begin{latexonly}
+  \clearpage
+  \tableofcontents  
+\end{latexonly}
+
+\newpage
+\section*{Welcome}
+
+Welcome to the not so frequently asked questions about PIPS. Not so
+frequently, because the PIPS user population, however growing, still is
+small. Please send more questions to \verb/pips@cri.ensmp.fr/.
+
+\section{Some of my source code is missing. What can I do?}
+\index{Source File}
+
+PIPS is designed as a whole application compiler and it complains about
+missing source code for leaf modules in the call graph. In fact PIPS may
+even generate a user error and stop if the missing piece of code is needed
+to answer the user request. For instance, PIPS cannot compute the side
+effects of procedure \verb/P/ without analyzing the code procedure
+\verb/Q/ called by \verb/P/.
+
+Also,
+
+\section{Why is PIPS parser so limited?}
+\index{Parser}
+
+Parsing is divided in multiple stages.
+
+\section{My include files are in a different directory}
+\index{Include}
+
+FC: Use the Shell environment variable \verb/PIPS_CPPFLAGS/ and the usual
+\verb/-I/ option to specify directories to lookup for include files.
+For instance, assuming that csh is used:
+
+\begin{quote}
+\verb|setenv PIPS_CPP_FLAGS "-I ../includes -I ../../generic/includes"|
+\end{quote}
+
+The current directory is searched first. For more information, see the
+preprocessing sections in \PIPSMAKERC{}.
+
+\section{How can I execute the transformed code?}
+
+The transformed code is stored in the current workspace by an explicit
+close or by exiting \PIPS{}. The best way to do it is to open the
+workspace with \TPIPS{}
+
+\section{How can I replay a session?}
+
+Each PIPS workspace contains a log. This log can be processed using the
+{\tt logfile_to_tpips} Shell script. The output is a {\tt tpips} script
+which can be replayed with the {\tt tpips} interface.
+
+Some commands, such as {\tt cd}, {\tt open}, {\tt close}, {\tt delete},
+may destroy the log file or change the current workspace. It is not
+possible to recreate a global log from different workspaces.
+
+\section{What should I read to use \PIPS{}?}
+
+You might decide to get started using the \WPIPS{} X-Window interface and a
+small Fortran program. On-line help is available.
+
+\section{How can I process several Fortran files?}
+
+The answer depends on the PIPS interface used. With the basic Shell
+interface, the argument of the {\tt -f} option can be quoted to use Shell
+filename expansion. For instance, the command
+
+\begin{quote}
+{\tt Init -d -f "*.f Src/*.f" foo}
+\end{quote}
+
+deletes a possibly existing {\tt foo} workspace and creates a new one with
+all Fortran files in the current directory and in the {\tt Src}
+subdirectory.
+
+The window interface, {\tt wpips}, let you select a number of Fortran
+files when you create a workspace but these files must all belong to the
+current directory.
+
+The script interface, {\tt tpips}, let you select any number of Fortran
+files using the standard Shell syntax. For instance, the above {\tt Init}
+command would be:
+
+\begin{quote}
+{\tt delete foo}\\
+{\tt create foo *.f}
+\end{quote}
+
+The standard convention is used for include files.
+
+\section{How can I get the dependence graphs of several modules in one command?}
+\index{Dependence Graph}
+\index{DG}
+
+The script interface, {\tt tpips}, let you require several data structures
+in one command. For instance, you can compute the dependence graphs for
+all modules in the current workspace with:
+
+\begin{quote}
+{\tt display DG\_FILE[\%ALL]}
+\end{quote}
+
+It also is possible to specify a list of relevant modules:
+
+\begin{quote}
+{\tt display DG\_FILE[A B C]}
+\end{quote}
+
+It is not possible to submit such requests with the other PIPS user interfaces.
+
+\section{PIPS tells me to set a property? What is it? How can I do it}
+\index{Property}
+
+Properties are used to encapsulate global variables and to fine tune the
+behavior of PIPS. This fine tuning was not intended for PIPS users but for
+PIPS developpers. However the property mechanism has been used to extend
+PIPS parser and users should be able to define {\em some} properties (see
+the
+\htmladdnormallink{\emph{property}}{http://www.cri.ensmp.fr/pips/properties-rc}}
+documentation.
+
+Default values for properties are defined in file
+\verb+$PIPS_ROOT/Share/properties.rc+. when \PIPS is installed. However,
+they can be modified in every directory by creating a file called {\tt
+  properties.rc}. Properties can also be modified dynamically with the
+most recent \PIPS user interfaces, \TPIPS and jpips.
+
+\TPIPS users can also modifies the property in their home directory using
+a file called \verb+.tpipsrc+.
+
+\newpage
+
+
+{\small
+\bibliographystyle{plain}
+\bibliography{faq}
+}
+
+\input{faq.ind}
+
+\end{document}
+\end
