@@ -273,7 +273,8 @@ range r;
 
 lprg_exec: prg_exec
 	| lprg_exec prg_exec
-            { FatalError("parser", "Multiple modules in one file! Check fsplit!");}
+            { FatalError("parser", 
+			 "Multiple modules in one file! Check fsplit!");}
 	;
 
 prg_exec: begin_inst {reset_first_statement();} linstruction { check_first_statement();} end_inst
@@ -294,7 +295,24 @@ linstruction: TK_EOS
 	| linstruction instruction TK_EOS
 	;
 
-instruction: {check_in_declarations();} inst_spec
+instruction: 
+	    data_inst 
+	{ /* can appear anywhere in specs and execs! */ 
+	    if (first_executable_statement_seen())
+	    {
+		/* the DATA string to be added to declarations...
+		 * however, the information is not really available.
+		 * as a hack, I'll try to append the Stmt buffer, but it
+		 * has already been processed, thus it is quite far
+		 * from the initial statement, and may be incorrect.
+		 * I think that this parser is a mess;-) FC.
+		 */
+		pips_user_warning(
+		    "DATA as an executable statement, moved up...\n");
+		append_data_current_stmt_buffer_to_declarations();
+	    }
+	}
+        | { check_in_declarations();} inst_spec
 	| { check_first_statement();} inst_exec
 	    { 
 		if ($2 != instruction_undefined)
@@ -311,7 +329,6 @@ inst_spec: parameter_inst
 	| external_inst
 	| intrinsic_inst
 	| save_inst
-	| data_inst {}
 	;
 
 inst_exec: format_inst
@@ -390,7 +407,8 @@ io_inst:  io_keyword io_f_u_id
 		case TK_CLOSE:
 		case TK_INQUIRE:
 		    ParserError("Syntax",
-			       "Illegal syntax in IO statement, Parentheses and arguments required");
+				"Illegal syntax in IO statement, "
+				"Parentheses and arguments required");
 		case TK_BACKSPACE:
 		case TK_REWIND:
 		case TK_ENDFILE:
