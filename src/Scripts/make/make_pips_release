@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/21 13:36:34 $, 
+# $Date: 1996/10/22 20:29:57 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -36,8 +36,8 @@ usage()
 	        (e.g. -w -e to enable manual editing of the list of files)
 	  release content:
 	    -C: common (Share Doc Examples)
-	    -S: add sources (Include, Src [but not Public], Utils, Validation)
-	    -D dir: add directory dir
+	    -S: add sources (Include, Src [but not Public], Utils)
+	    -D dir: add directory dir (Validation?)
 	    -B arch: add binaries for arch (Runtime Bin/arch)
 	    -L arch: add libraries for arch (Lib/arch)
 	  software:
@@ -64,7 +64,7 @@ do
 	w) what="$what $OPTARG" ;;
 	C) what="$what -d Share -d Doc -d Examples" ;
 	   name="${name}C" ;;
-	S) what="$what -s Src -d Include -d Utils -d Validation" ; 
+	S) what="$what -s Src -d Include -d Utils" ; 
 	   name="${name}S" ;;
 	B) what="$what  -d Runtime -d Bin/$OPTARG" ;
 	   name="${name}B$OPTARG" ;
