@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1995/11/24 15:01:42 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1995/11/30 14:44:01 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -13,6 +13,9 @@
  
 #include <stdio.h>
 #include <string.h> 
+#include <values.h>
+
+#define MININT (-MAXINT) 
 
 /* Psystems stuff
  */
@@ -255,6 +258,42 @@ range_of_variable(
     return TRUE;
 }
 
+/* returns v lower bound if found, or MININT.
+ */
+static Value vecteur_lower_bound(
+    Pvecteur v)
+{
+    Value bound = 0, val;
+    Variable var;
+
+    if (lowers_undefined_p() || uppers_undefined_p()) 
+	return MININT; /* no information available, that's for sure */
+
+    for(; v; v=v->succ)
+    {
+	var = var_of(v);
+	val = val_of(v);
+
+	if (var==TCST) 
+	    bound += val ;
+	else
+	{
+	    if (val>0)
+	    {
+		if (!bound_lowers_p(var)) return MININT;
+		bound += val * load_lowers(var);
+	    }
+	    else /* val < 0, I guess */
+	    {
+		if (!bound_uppers_p(var)) return MININT;
+		bound += val * load_uppers(var);
+	    }
+	}
+    }
+
+    return bound;
+}
+
 static boolean
 evaluate_divide_if_possible(
     Pvecteur v,
@@ -383,7 +422,12 @@ constraints_to_loop_bound(
       if (vdiv)
       {
 	  ediv = make_vecteur_expression(vdiv);
-	  ediv = MakeBinaryCall(divide, ediv, int_to_expression(val));	  
+
+	  /* use / instead of the provided idiv if operand >=0
+	   */
+	  ediv = MakeBinaryCall(vecteur_lower_bound(vdiv)>=0 ? 
+				entity_intrinsic(DIVIDE_OPERATOR_NAME) : 
+				divide, ediv, int_to_expression(val));
 	  
 	  if (vadd)
 	  {
