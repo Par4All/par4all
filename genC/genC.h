@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1998/04/14 13:27:06 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1998/04/15 09:54:15 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -181,10 +181,15 @@ extern void gen_core GEN_PROTO((void *)) ;
 
 extern void gen_recurse_stop GEN_PROTO((void *));
 extern void gen_multi_recurse GEN_PROTO((void *, ...));
+
+#define gen_recurse(s,d,f,r) gen_multi_recurse(s,d,f,r,NULL)
+
+/*
 extern void gen_recurse GEN_PROTO((void *,
 				   int, 
 				   bool (*)(void *), 
 				   void (*)(void *))) ;
+				   */
 
 /* Since C is not-orthogonal (chunk1 == chunk2 is prohibited),
  * this one is needed.
