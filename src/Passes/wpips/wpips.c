@@ -212,6 +212,7 @@ char *argv[];
    malloc_debug(1);
 
    initialize_newgen();
+   initialize_sc((char*(*)(Variable))entity_local_name);
 
    debug_on("WPIPS_DEBUG_LEVEL");
 
