@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.68  1998/11/18 13:24:20  coelho
+ * row echlon option moved.
+ *
  * Revision 1.67  1998/04/14 20:55:06  coelho
  * casts.
  *
@@ -1345,9 +1348,6 @@ remapping_compile(
     
     debug_on("HPFC_REMAPPING_DEBUG_LEVEL");
     what_stat_debug(1, s);
-
-    sc_set_row_echelon_redundancy
-	(get_bool_property("HPFC_REDUNDANT_SYSTEMS_FOR_REMAPS"));
 
     *hsp = make_empty_statement(); /* nothing for host */
 
