@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/05/05 16:42:38 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/05/15 10:39:52 $, )
  * version $Revision$
  */
  
@@ -181,7 +181,6 @@ entity module;
     stop = local_name_to_top_level_entity(STOP_FUNCTION_NAME);
     store_new_host_variable(hpfc_name_to_entity(HOST_END), stop);
     store_new_node_variable(hpfc_name_to_entity(NODE_END), stop);
-
 }
 
 static void 
@@ -263,13 +262,12 @@ entity module;
  *  - the hpfc status is initialized and stored in the pips dbm.
  * bugs or features:
  *  - some callees are filtered out with a property, to deal with pipsmake.
- *  - ??? not all is in the hpfc status. common entities problem.
  */
 void hpfc_init(name)
 string name;
 {
     debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfc_init", "considering program %s\n", name);
+    pips_debug(1, "considering program %s\n", name);
 
     set_bool_property("PRETTYPRINT_HPFC", TRUE);
     set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
@@ -304,7 +302,7 @@ string name;
     string file_name = db_get_resource(DBR_SOURCE_FILE, name, TRUE);
 
     debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfc_filter", "considering module %s\n", name);
+    pips_debug(1, "considering module %s\n", name);
 
     system(concatenate("mv ", file_name, " ", file_name, "- ; ",
 		       "$HPFC_TOOLS/hpfc_directives", 
@@ -312,10 +310,9 @@ string name;
 		       " > ", file_name, " ;",
 		       NULL));
 
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_FILTERED, strdup(name), NO_FILE); /* fake */
     DB_PUT_FILE_RESOURCE(DBR_SOURCE_FILE, strdup(name), file_name);
 
-    debug_off();
+    debug_off(); 
 }
 
 /* void hpfc_directives(name)
@@ -338,7 +335,7 @@ string name;
     statement s = (statement) db_get_resource(DBR_CODE, name, FALSE);
 
     debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfc_directives", "considering module %s\n", name);
+    pips_debug(1, "considering module %s\n", name);
     debug_on("HPFC_DIRECTIVES_DEBUG_LEVEL");
 
     if (!hpfc_entity_reduction_p(module) &&
@@ -366,8 +363,6 @@ string name;
 	save_hpfc_status();
     }
 
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_DIRECTIVES, strdup(name), NO_FILE);/* fake */
-
     debug_off(); debug_off();
 }
 
@@ -390,7 +385,7 @@ string name;
     entity module = local_name_to_top_level_entity(name);
 
     debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfc_compile", "considering module %s\n", name);
+    pips_debug(1, "considering module %s\n", name);
 
     if (!hpfc_entity_reduction_p(module) &&
 	!hpf_directive_entity_p(module) &&
@@ -408,7 +403,7 @@ string name;
     }
     else
     {
-	DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, strdup(name), NO_FILE); /* fake */
+	DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, strdup(name), NO_FILE);/* fake */
     }
 
     debug_off();
@@ -431,12 +426,10 @@ void hpfc_common(name)
 string name;
 {
     debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfc_common", "considering common %s\n", name);
+    pips_debug(1, "considering common %s\n", name);
 
     load_hpfc_status();
 
-    /* commons compilation
-     */
     set_bool_property("PRETTYPRINT_COMMONS", TRUE);
     compile_common(local_name_to_top_level_entity(name));
 
@@ -461,7 +454,7 @@ void hpfc_close(name)
 string name;
 {
     debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfc_close", "considering program %s\n", name);
+    pips_debug(1, "considering program %s\n", name);
  
     load_hpfc_status();
     
