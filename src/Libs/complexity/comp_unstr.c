@@ -145,7 +145,7 @@ list effects_list;
 	    float f = FA(0,i-1);
 
 	    if ( get_debug_level() >= 5 ) {
-		fprintf(stderr, "control $%#p:f=%f, compl.=", conti, f);
+		fprintf(stderr, "control $%p:f=%f, compl.=", conti, f);
 		complexity_fprint(stderr, compi, TRUE, FALSE);
 	    }
 
@@ -198,10 +198,10 @@ list effects_list;
     complexity_check_and_warn("control_to_complexity", comp);
 
     if (get_debug_level() >= 5) {
-	fprintf(stderr, "this control($%#p) has:", cont);
+	fprintf(stderr, "this control($%p) has:", cont);
 	complexity_fprint(stderr, comp, TRUE, TRUE);
 	MAPL(pc, {
-	    fprintf(stderr, "successor: $%#p\n", CONTROL(CAR(pc)));
+	    fprintf(stderr, "successor: $%p\n", CONTROL(CAR(pc)));
 	    }, control_successors(cont));
 	if ( control_successors(cont) == NIL )
 	    fprintf(stderr, "NO successor at all!\n");
@@ -334,7 +334,7 @@ boolean already_examined[];
     already_examined[i] = TRUE;
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	fprintf(stderr, "CONTROL ($%#p)  CONTROL_NUMBER %d\n", cont, i);
+	fprintf(stderr, "CONTROL ($%p)  CONTROL_NUMBER %d\n", cont, i);
     }
 
     MAPL(pc, {
@@ -343,7 +343,7 @@ boolean already_examined[];
 							  n_controls);
 
 	if ( get_debug_level() >= 5 ) {
-	    fprintf(stderr,"Control ($%#p) %d  -->  Control ($%#p) %d\n",
+	    fprintf(stderr,"Control ($%p) %d  -->  Control ($%p) %d\n",
 		    cont, i, succ, j);
 	}
 
