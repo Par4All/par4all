@@ -204,10 +204,10 @@ extern int Current_index ;
 
 /* External routines. */
 extern char *alloc() ;
-extern void user() ;
+extern void user(char *, ...) ;
 
 extern void gencode() ;
-extern void fatal() ;
+extern void fatal(char*, ...) ;
 extern char *itoa() ;
 extern void print_domains() ;
 extern void init() ;
@@ -215,9 +215,9 @@ extern void compile() ;
 extern int gen_size();
 extern void print_domain();
 
-extern int genspec_parse();
+extern int genspec_parse(void);
 extern int genspec_lex(void);
-extern int genread_parse();
+extern int genread_parse(void);
 extern int genread_lex(void);
 
 extern void gen_init_Gen_tabulated_names(void);
