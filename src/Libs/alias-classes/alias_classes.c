@@ -21,8 +21,10 @@
 #include "resources.h"
 
 
+
 bool
-in_alias_equivalence_classes ( string name )
+alias_equivalence_classes ( string name )
 {
 return TRUE;
 }
+
