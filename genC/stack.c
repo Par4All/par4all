@@ -11,7 +11,7 @@
  * More thoughts needed. 
  *
  * $RCSfile: stack.c,v $ version $Revision$
- * $Date: 1995/02/03 10:11:36 $, 
+ * $Date: 1995/02/03 11:42:40 $, 
  * got on %D%, %T%
  */
 
@@ -79,25 +79,24 @@ stack_iterator i;
     while(!STACK_PTR_NULL_P(x) && x->succ!=i->bulk) 
 	x=x->succ;
 
-    i->bulk=x;
-    i->index=0;
+    i->bulk=x, i->index=0;
+
+    if (x && i->bulk->n_item==0) i->bulk = STACK_PTR_NULL;
 }
 
 #define STACK_ITERATOR_END_P(i) STACK_PTR_NULL_P(i->bulk)
 #define DEFINE_ITERATOR(i,blk,idx,dwn,lst) \
-    i->bulk=(blk), i->index=(idx), i->list=lst, i->downward=dwn;
-#define UPDATE_ITERATOR(i) \
-  if (i->downward) \
-  {\
-    if (i->index==-1) \
-      i->bulk = i->bulk->succ,\
-      i->index = (i->bulk) ? (i->bulk->n_item)-1 : -1;\
-  }\
+    { i->bulk=(blk), i->index=(idx), i->list=lst, i->downward=dwn;}
+#define UPDATE_ITERATOR_DOWNWARD(i)\
+ if (i->index==-1) \
+ { i->bulk = i->bulk->succ, i->index = (i->bulk) ? (i->bulk->n_item)-1 : -1; }
+#define UPDATE_ITERATOR_UPWARD(i)\
+ if (i->index==i->bulk->n_item) update_iterator_upward(i);
+#define NEXT_ITERATION(i) \
+  if (i->downward)\
+  { i->index--; UPDATE_ITERATOR_DOWNWARD(i);}\
   else\
-  {\
-    if (i->index==i->bulk->n_item)\
-      update_iterator_upward(i);\
-  }
+  { i->index++; UPDATE_ITERATOR_UPWARD(i); }
 
 stack_iterator stack_iterator_init(s, down)
 stack s;
@@ -114,12 +113,12 @@ int down;
 	if (down)
 	{
 	    DEFINE_ITERATOR(i, s->stack, (s->stack->n_item)-1, down, s->stack);
-	    UPDATE_ITERATOR(i);
+	    UPDATE_ITERATOR_DOWNWARD(i);
 	}
 	else
 	{
 	    DEFINE_ITERATOR(i, STACK_PTR_NULL, 0, down, s->stack);
-	    update_iterator_upward(i);
+	    update_iterator_upward(i); /* NOT the define! */
 	}
     }
     
@@ -138,8 +137,7 @@ char **pitem;
     else
     {
 	*pitem = (i->bulk->items)[i->index];
-	i->index += i->downward ? -1 : 1;
-	UPDATE_ITERATOR(i);
+	NEXT_ITERATION(i);
 	return(1);
     }
 }
@@ -153,7 +151,7 @@ stack_iterator i;
 void stack_iterator_end(pi)
 stack_iterator *pi;
 {
-    free(*pi), *pi=(stack_iterator)NULL;
+    free(*pi), *pi=(stack_iterator) NULL;
 }
 
 /*
