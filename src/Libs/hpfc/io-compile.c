@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-compile.c,v $
+ * Revision 1.46  1997/05/24 09:44:50  coelho
+ * more determinism when sorting conditions.
+ *
  * Revision 1.45  1997/04/17 11:47:45  coelho
  * *** empty log message ***
  *
@@ -807,7 +810,8 @@ generate_io_collect_or_update(
 	/*  the sorting is done again at the code generation,
 	 *  but this phase will ensure more determinism in the debug messages
 	 */
-	sc_vect_sort(condition, compare_Pvecteur);
+	/* sc_vect_sort(condition, compare_Pvecteur); */
+	sc_sort(condition, sc_base(condition), compare_Pvecteur);
 	sc_vect_sort(proc_echelon, compare_Pvecteur);
 	sc_vect_sort(tile_echelon, compare_Pvecteur);
 
@@ -844,7 +848,8 @@ generate_io_collect_or_update(
 	/*  the sorting is done again at the code generation,
 	 *  but this phase will ensure more determinism in the debug messages
 	 */
-	sc_vect_sort(condition, compare_Pvecteur);
+	/* sc_vect_sort(condition, compare_Pvecteur); */
+	sc_sort(condition, sc_base(condition), compare_Pvecteur);
 	sc_vect_sort(row_echelon, compare_Pvecteur);
 
 	if (!sc_empty_p(row_echelon))
