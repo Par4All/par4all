@@ -457,7 +457,6 @@ pips_process_file(string file_name, string new_name)
     init_rx();
     out = safe_fopen(new_name, "w");
     ok = handle_file_name(out, file_name, FALSE);
-    fflush(out);
     safe_fclose(out, new_name);
     return ok;
 }
