@@ -40,6 +40,17 @@ expression make_expression_from_entity(entity an_entity);
 
 
 /**
+ * Build and return new statement which is a binary call with
+ * the 2 expressions expression1 and expression2, with empty
+ * label, statement number and ordering of statement stat, 
+ * and empty comments
+ */
+statement make_binary_call_statement (string operator_name,
+				      expression expression1,
+				      expression expression2,
+				      statement stat);
+ 
+/**
  * This function build and return new variable from
  * a variable a_variable, with name new_name. If an entity
  * called new_name already exists, return NULL.
@@ -97,10 +108,6 @@ void replace_in_sequence_statement_with (statement old_stat,
 
 list references_for_regions (list l_regions);
 
-list union_references_for_regions (list l1, list l2);
-
-list intersection_references_for_regions (list l1, list l2);
-
-list differences_references_for_regions (list l1, list l2);
+reference region_reference (effect reg);
 
 #endif
