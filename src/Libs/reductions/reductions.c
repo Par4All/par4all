@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1997/04/16 11:08:42 $, 
+ * $Date: 1997/04/16 11:45:26 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -207,7 +207,7 @@ static list list_of_trusted_references(reductions rs)
  */
 static bool safe_effects_for_reductions(statement s, reductions rs)
 {
-    list /* of effect */ le = load_statement_proper_references(s),
+    list /* of effect */ le = effects_effects(load_proper_references(s)),
          /* of reference */ lr = list_of_trusted_references(rs);
 
     MAP(EFFECT, e,
@@ -340,8 +340,8 @@ bool proper_reductions(string module_name)
     set_current_module_entity(module);
     set_current_module_statement
 	((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
-    set_proper_references_map(effectsmap_to_listmap((statement_mapping) 
-        db_get_memory_resource(DBR_PROPER_REFERENCES, module_name, TRUE)));
+    set_proper_references((statement_effects) 
+        db_get_memory_resource(DBR_PROPER_REFERENCES, module_name, TRUE));
 
     /* do the job 
      */
@@ -352,7 +352,7 @@ bool proper_reductions(string module_name)
     DB_PUT_MEMORY_RESOURCE
 	(DBR_PROPER_REDUCTIONS, module_name, get_proper_reductions());
     reset_proper_reductions();
-    reset_proper_references_map();
+    reset_proper_references();
     reset_current_module_entity();
     reset_current_module_statement();
 
@@ -385,7 +385,7 @@ build_reduction_of_variable(
 	 NIL, NIL);
 
     if (!update_compatible_reduction
-	(pr, var, load_statement_proper_references(node),
+	(pr, var, effects_effects(load_proper_references(node)),
 	 load_proper_reductions(node)))
     {
 	free_reduction(*pr);
@@ -523,8 +523,8 @@ bool cumulated_reductions(string module_name)
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     set_current_module_statement((statement)
         db_get_memory_resource(DBR_CODE, module_name, TRUE));
-    set_proper_references_map(effectsmap_to_listmap((statement_mapping) 
-        db_get_memory_resource(DBR_PROPER_REFERENCES, module_name, TRUE)));
+    set_proper_references((statement_effects) 
+        db_get_memory_resource(DBR_PROPER_REFERENCES, module_name, TRUE));
     set_rw_effects((statement_effects) 
         db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     set_proper_reductions((pstatement_reductions)
@@ -540,7 +540,7 @@ bool cumulated_reductions(string module_name)
 	(DBR_CUMULATED_REDUCTIONS, module_name, get_cumulated_reductions());
     reset_cumulated_reductions();
     reset_proper_reductions();
-    reset_proper_references_map();
+    reset_proper_references();
     reset_rw_effects();
     reset_current_module_entity();
     reset_current_module_statement();
