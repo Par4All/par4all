@@ -51,13 +51,13 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
     FILE *fp;
     graph dg;
     statement mod_stat;
+    printf("HERE");
 
     set_current_module_entity(local_name_to_top_level_entity(mod_name));
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
     initialize_ordering_to_statement(mod_stat);
-    printf("HERE");
 
     /* get the dg or chains... */
     dg = (graph) db_get_memory_resource(
@@ -101,3 +101,13 @@ bool print_chains_graph(string name)
 }
 
 /* That's all */
+
+
+
+
+
+
+
+
+
+
