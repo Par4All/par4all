@@ -57,6 +57,12 @@ resize_StmtHeap_buffer(void)
     pips_assert("realloc ok", StmtHeap_buffer);
 }
 
+void
+parser_reset_StmtHeap_buffer(void)
+{
+    CurrentStmt = 0;
+}
+
 /* to produce statement numbers */
 static int stat_num = 1;
 static bool skip_num = FALSE ;
@@ -123,7 +129,7 @@ goto to that label has been encountered and if no statement with this
 label has been parsed. */
 
 void 
-CheckAndInitializeStmt()
+CheckAndInitializeStmt(void)
 {
     int i;
     int MustStop = FALSE;
