@@ -405,24 +405,19 @@ char *mod_name;
 
     debug_off();
 
-    DB_PUT_MEMORY_RESOURCE(DBR_DG, strdup(mod_name), (char*) dg);
+    DB_PUT_MEMORY_RESOURCE(DBR_DG, mod_name, (char*) dg);
 
     reset_current_module_entity();
     reset_current_module_statement();
     reset_precondition_map();
     reset_cumulated_rw_effects();
-    reset_enclosing_loops_map();
+    clean_enclosing_loops();
 
     return TRUE;
 }
 
-
-
-
-
 static void 
-rdg_unstructured(u)
-unstructured u ;
+rdg_unstructured(unstructured u)
 {
     list blocs = NIL ;
 
@@ -433,20 +428,15 @@ unstructured u ;
     gen_free_list( blocs );
 }
 
-
-
 static void 
-rdg_statement(stat)
-statement stat;
+rdg_statement(statement stat)
 {
     instruction istat = statement_instruction(stat);
 
     switch (instruction_tag(istat)) {
 
       case is_instruction_block:
-	MAPL(pc, {
-	    rdg_statement(STATEMENT(CAR(pc)));
-	}, instruction_block(istat));
+	MAP(STATEMENT, s, rdg_statement(s), instruction_block(istat));
 	break;
 
       case is_instruction_test:
