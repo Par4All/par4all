@@ -2,7 +2,7 @@
 # for debug, try:
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 16:51:23 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 17:24:37 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -292,6 +292,9 @@ $(PIPS_LIBDIR)/$(LIB_TARGET): $(LIB_TARGET)
 clean:
 	-$(RM) TAGS $(OBJECTS) $(INC_TARGET) $(LIB_TARGET) \\
 		 $(BIN_TARGET) $(DERIVED_HEADERS) *.~[0-9]~ $(LIB_IFILES)
+
+clobber: clean
+	-Delete *.database
 
 INC_CFILES = $(LIB_CFILES)
 
