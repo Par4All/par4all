@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/12/21 16:20:13 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1995/04/21 17:01:52 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -167,12 +167,12 @@ c
 ifelse(ARCHITECTURE,`CM5',`dnl
          if (0.ne.CMMD_receive(
      $     CM_NODE_IDS(i),
-     $     NODECHANNELS(i),
+     $     RECVCHANNELS(i),
      $     result(i),
      $     M4_PVM_LENGTH(PVMTYPE))) then
             print *, "hpfc reduction: reveive failed"
          endif
-         NODECHANNELS(i) = NODECHANNELS(i)+2',`dnl
+         RECVCHANNELS(i) = RECVCHANNELS(i)+2',`dnl
          SENDERTID = NODETIDS(i)
          SLID = i
          CALL HPFC_RCVFR_S(PVMTYPE, result(i))')
