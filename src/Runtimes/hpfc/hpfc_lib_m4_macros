@@ -1,7 +1,7 @@
 dnl
 dnl GENERAL M4 MACROS
 dnl
-dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1995/09/11 18:04:09 $, )
+dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1995/09/27 18:19:32 $, )
 dnl version $Revision$
 dnl got on %D%, %T%
 dnl
@@ -43,6 +43,7 @@ ifdef(`DEBUG',`define(`debug',`$@')',`define(`debug')')dnl
 ifdef(`DEMO',`define(`demo',`$@')',`define(`demo')')dnl
 ifdef(`DIRECT',`define(`direct',`$@')',`define(`direct')')dnl
 ifdef(`SYNC_EXIT',`define(`sync_exit',`$@')',`define(`sync_exit')')dnl
+ifdef(`FAKE_BUFFERS',`define(`fake_buffers',`$@')',`define(`fake_buffers')')dnl
 dnl
 dnl ARCHITECTURES
 dnl
@@ -54,7 +55,7 @@ define(`M4_PVM_LENGTH',`dnl
 ifelse($1,`BYTE1',1,$1,`INTEGER2',2,$1,`INTEGER4',4,dnl
 $1,`REAL4',4,$1,`REAL8',8,$1,`COMPLEX8',8,$1,`COMPLEX16',16)')dnl
 define(`m4_type_name',`dnl
-ifelse($1,`BYTE1',byte*1,dnl
+ifelse($1,`BYTE1',byte,dnl
 $1,`INTEGER2',integer*2,dnl
 $1,`INTEGER4',integer*4,dnl
 $1,`REAL4',real*4,dnl
