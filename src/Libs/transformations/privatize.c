@@ -159,6 +159,55 @@ static void update_locals(list prefix, list ls, entity e)
     }
 }
 
+/* expression_implied_do_index_p
+   return true if the given entity is the index of an implied do
+   contained in the given expression. --DB
+*/
+static bool expression_implied_do_index_p(expression exp,entity e)
+{
+  bool li=FALSE;
+  if (expression_implied_do_p(exp))
+    {
+      list args = call_arguments(syntax_call(expression_syntax(exp)));
+      expression arg1 = EXPRESSION(CAR(args)); /* loop index */
+      entity index = reference_variable(syntax_reference(expression_syntax(arg1)));
+
+      debug(5,"expression_implied_do_index_p","begin\n");
+      debug(7,"expression_implied_do_index_p",
+	    "%s implied do index ? index: %s\n",
+		entity_name(e),entity_name(index));
+
+  if (same_entity_p(e,index)) li=TRUE;
+  else 
+    MAP(EXPRESSION,expr,{
+      syntax s = expression_syntax(expr);
+      if(syntax_call_p(s))
+	{
+	  debug(5,"expression_implied_do_index_p","Nested implied do\n");
+	  if (expression_implied_do_index_p(expr,e))
+	    li=TRUE;
+	}
+    },CDR(CDR(args)));
+  debug(5,"expression_implied_do_index_p","end\n");
+}
+  return li;
+}
+
+/* is_implied_do_index
+   returns true if the given entity is the index of one of the
+   implied do loops of the given instruction. --DB
+*/
+bool is_implied_do_index(entity e, instruction ins)
+{
+  bool li = FALSE;
+  debug(5,"is_implied_do_index","entity name: %s\n", entity_name( e )) ;
+  if(instruction_call_p(ins))
+    MAP(EXPRESSION,exp,{
+      if (expression_implied_do_index_p(exp,e)) li=TRUE;
+    },call_arguments( instruction_call( ins ) ));
+  return li;
+}
+
 /* TRY_PRIVATIZE knows that the effect F on entity E is performed in the
    statement ST of the vertex V of the dependency graph. Arrays are not 
    privatized. */
@@ -201,10 +250,13 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 	       action_write_p( effect_action( sk))) {
 		continue ;
 	    }
+	    /* PC dependance and the sink is a loop index */
 	    if(action_read_p( effect_action( sk )) &&
-	       instruction_loop_p( succ_i )) {
+	       (instruction_loop_p( succ_i ) || 
+		 is_implied_do_index(e,succ_i ))) {
 		continue ;
 	    }
+
 	    prefix = loop_prefix( ls, succ_ls ) ;
 	    update_locals( prefix, ls, e ) ;
 	    update_locals( prefix, succ_ls, e ) ;
