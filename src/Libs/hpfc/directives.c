@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/07/23 11:55:00 $, )
+ * ($Date: 1996/08/31 16:45:34 $, )
  */
 
 #include "defines-local.h"
@@ -124,6 +124,11 @@ static void new_dynamic(expression e)
 static void new_io_function(expression e)
 {
     add_an_io_function(expression_to_entity(e)); 
+}
+
+static void new_fake_function(expression e)
+{
+    add_a_fake_function(expression_to_entity(e)); 
 }
 
 static void new_pure_function(expression e)
@@ -753,6 +758,15 @@ HANDLER_PROTOTYPE(io)
 	gen_map(new_io_function, args);
 }
 
+HANDLER_PROTOTYPE(fake)
+{
+    entity module = get_current_module_entity();
+    if (ENDP(args))
+	add_a_fake_function(module);
+    else
+	gen_map(new_fake_function, args);
+}
+
 HANDLER_PROTOTYPE(realign)
 {
     handle_align_and_realign_directive(f, args, TRUE);
@@ -893,6 +907,7 @@ static struct DirectiveHandler handlers[] =
     {HPF_PREFIX SETBOOL_SUFFIX,		1,	HANDLER(set) },
     {HPF_PREFIX SETINT_SUFFIX,		1,	HANDLER(set) },
     {HPF_PREFIX HPFCIO_SUFFIX,		1,	HANDLER(io) },
+    {HPF_PREFIX FAKE_SUFFIX,		1,	HANDLER(fake) },
 
     /* HPF directives
      */
