@@ -5,7 +5,7 @@
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
 
-\title{PIPS: Dependence Graph}
+\title{PIPS: Use-Def Chains and Dependence Graph}
 \author{Fran\c{c}ois Irigoin \\
     Pierre Jouvelot \\
     R\'emi Triolet\\
@@ -24,11 +24,20 @@ The dependence graph specific data structures, as well as auxiliary data
 structures used to compute it, are described in this report. The graph
 itself is a generic graph defined in \verb/Newgen/graph.f.tex/. It is
 specialized into a dependence graph by using specific arc and vertex
-labels. 
+labels. The standard use-def, def-use and def-def chains are encoded with
+this data structure, as well as non-standard use-use chains useful for
+cache and locality management. The dependence graph data structure is used
+in libraries \verb/chains/ which computes the use-def chains,
+\verb/ricedg/ which refines the use-def chains into a dependence graph
+using various dependence tests\footnote{The dependence tests used were not
+  all designed at Rice university but the dependence levels defined at
+  Rice are used.}, and \verb/rice/ which uses the dependence
+graph to compute strongly connected components according to the
+Allen\&Kennedy algorithm~\cite{AK87}.
 
 The genericity is not supported explicitly by NewGen\cite{JT89,JT90}. Although the arc
 and vertex labels are NewGen objects, they are seen as {\em external}
-types. Specific procedures are specified in calls to
+types when used in C code. Specific procedures are specified in calls to
 \verb/gen_init_external/ (see \verb/initialize_newgen/ in Library
 \verb/top-level/). C modules using these labels must use explicit
 casts to convert the generic labels into dependence graph labels.
@@ -37,7 +46,7 @@ Auxiliary data structures are used to compute the strongly connected
 components (SCC) of the dependence graph. The SCC routines are not as
 generic as could be hoped. They take into account the graph hierarchy
 implied by the dependence levels of the Allen \& Kennedy parallelization
-algorithm. This explains why the SCC related data structures are declared
+algorithm~\cite{AK87}. This explains why the SCC related data structures are declared
 here and not with data structure
 \htmladdnormallink{{\tt graph}}{http://www.cri.ensmp.fr/pips/graph}.
 
@@ -268,7 +277,7 @@ des composantes fortement connexes d'un graphe. Il s'agit d'une liste de
 
 A strongly connected component is a set of vertices, represented as a
 list, and an integer field, \verb/indegree/, used for their topological
-sort. Allen \& Kennedy algorithm is based on topological sorts of the
+sort. Allen \& Kennedy algorithm~\cite{AK87} is based on topological sorts of the
 dependence graph SCC's.
 
 \begin{comment}
@@ -281,10 +290,9 @@ sous-domaine {\tt indegree} utilise' par l'algorithme de tri topologique.
 
 % pipsmake
 
-\bibitem{YAI95} Y. Yang, C. Ancourt, F. Irigoin,
-{\em Minimal Data Dependence Abstractions for Loop Transformations}, 
-International Journal of Parallel Programming,
-v. 23, n. 4, Aug. 1995, pp.~359-388
+\bibitem{AK87} J. Allen, K. Kennedy,
+{\em Automatic Translation of {FORTRAN} Programs to Vector Form},
+TOPLAS, V. 9, n. 4, 1987
 
 \bibitem{JT89} P. Jouvelot, R. Triolet,
 {\em NewGen: A Language Independent Program Generator},
@@ -293,6 +301,11 @@ Rapport Interne CAII 191, 1989
 \bibitem{JT90} P. Jouvelot, R. Triolet,
 {\em NewGen User Manual},
 Rapport Interne CAII ???, 1990
+
+\bibitem{YAI95} Y. Yang, C. Ancourt, F. Irigoin,
+{\em Minimal Data Dependence Abstractions for Loop Transformations}, 
+International Journal of Parallel Programming,
+v. 23, n. 4, Aug. 1995, pp.~359-388
 
 \end{thebibliography}
 
