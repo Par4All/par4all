@@ -142,12 +142,12 @@ Pbase base;
 {
     Pvecteur pv;
     int j;
-
+    
     for (pv=base,j=1;!VECTEUR_NUL_P(pv);
 	 mat->p[i][j]= 
-	     VALUE_TO_IRINT(-vect_coeff(vecteur_var(pv),pc->vecteur)),
+	 VALUE_TO_IRINT(value_uminus(vect_coeff(vecteur_var(pv),pc->vecteur))),
 	 pv=pv->succ,j++);
-    mat->p[i][j]= VALUE_TO_IRINT(-vect_coeff(TCST,pc->vecteur));
+    mat->p[i][j]= VALUE_TO_IRINT(value_uminus(vect_coeff(TCST,pc->vecteur)));
 }
 
 
@@ -248,7 +248,7 @@ Psysteme sc;
 {
     Pcontrainte pce=NULL;
     Pcontrainte pci=NULL;
-    Pcontrainte pc_tmp;
+    Pcontrainte pc_tmp=NULL;
     boolean neweq = TRUE;
     boolean newineq = TRUE;
     int i,nbrows;
@@ -306,9 +306,9 @@ Polyhedron  *pol;
 Ptsg sg;
 {
 
-    Pray_dte ldtes_tmp,ldtes = NULL;
-    Pray_dte lray_tmp,lray = NULL;
-    Psommet lsommet_tmp,lsommet=NULL;
+    Pray_dte ldtes_tmp=NULL,ldtes = NULL;
+    Pray_dte lray_tmp=NULL,lray = NULL;
+    Psommet lsommet_tmp=NULL,lsommet=NULL;
     Stsg_vects dtes,rays;
     Stsg_soms sommets;
     Pvecteur pvnew;
@@ -351,12 +351,14 @@ Ptsg sg;
 		nbsommets ++;
 		pvnew = polyhedron_ligne_to_vecteur(pol,i,sg->base,dim);
 		if (newsommet) {
-		    lsommet_tmp=lsommet=sommet_make(pol->Ray[i][dim],
-						    pvnew);
+		    lsommet_tmp=lsommet=
+			sommet_make(IRINT_TO_VALUE(pol->Ray[i][dim]),
+				    pvnew);
 		    newsommet = FALSE;
 		} else {
-		    lsommet_tmp->succ=sommet_make(pol->Ray[i][dim],
-						  pvnew);
+		    lsommet_tmp->succ=
+			sommet_make(IRINT_TO_VALUE(pol->Ray[i][dim]),
+				    pvnew);
 		    lsommet_tmp = lsommet_tmp->succ;
 		}
 		break;
@@ -463,14 +465,14 @@ Ptsg sg;
 	Matrix_Free(a);
 	sc=sc_normalize(sc);
 	if (sc == NULL) {
-	    Pcontrainte pc = contrainte_make(vect_new(TCST, 1));
+	    Pcontrainte pc = contrainte_make(vect_new(TCST, VALUE_ONE));
 	    sc = sc_make(pc, CONTRAINTE_UNDEFINED);
 	    sc->base = base_dup(sg->base);
 	    sc->dimension = vect_size(sc->base);	}
 
     }
     else {
-	sc->egalites = contrainte_make(vect_new(TCST,1));
+	sc->egalites = contrainte_make(vect_new(TCST,VALUE_ONE));
 	sc->nb_eq ++;
     }	
 
@@ -672,7 +674,7 @@ Psysteme sc1,sc2;
 
 
     if (sc == NULL) {
-	Pcontrainte pc = contrainte_make(vect_new(TCST, 1));
+	Pcontrainte pc = contrainte_make(vect_new(TCST, VALUE_ONE));
 	sc = sc_make(pc, CONTRAINTE_UNDEFINED);
 	sc->base = base_dup(sc1->base);
 	sc->dimension = vect_size(sc->base);
