@@ -96,7 +96,7 @@ bool set_belong_p(set s, void * e)
        return( hash_get(s->table, (char *) e) == (char *) e) ;
        */
 
-    return hash_get(s->table, (char *) e) != HASH_UNDEFINED_VALUE;
+    return hash_get(s->table, e) != HASH_UNDEFINED_VALUE;
 }
 
 set set_union(set s1, set s2, set s3)
@@ -116,7 +116,7 @@ set set_intersection(set s1, set s2, set s3)
     if( s1 != s2 && s1 != s3 ) {
 	set_clear( s1 ) ;
 	HASH_MAP( k, v, {if( hash_get( s2->table, k )
-			    != (char *)HASH_UNDEFINED_VALUE ) 
+			    != HASH_UNDEFINED_VALUE ) 
 				 hash_put( s1->table, k, v ) ;}, 
 		 s3->table ) ;
 	return( s1 ) ;
@@ -125,7 +125,7 @@ set set_intersection(set s1, set s2, set s3)
 	set tmp = set_make( s1->type ) ;
 
 	HASH_MAP( k, v, {if( hash_get( s1->table, k ) 
-			    != (char *)HASH_UNDEFINED_VALUE ) 
+			    != HASH_UNDEFINED_VALUE ) 
 				 hash_put( tmp->table, k, v ) ;}, 
 		 (s1 == s2) ? s3->table : s2->table ) ;
 	set_assign( s1, tmp ) ;
@@ -145,6 +145,17 @@ set set_del_element(set s1, set s2, void * e)
 {
     set_assign( s1, s2 ) ;
     hash_del( s1->table, e );
+    return( s1 ) ;
+}
+
+/* May be useful for string sets ... NOT TESTED*/
+set set_delfree_element(set s1, set s2, void * e)
+{
+  void * pe;
+
+    set_assign( s1, s2 ) ;
+    (void) hash_delget( s1->table, e ,&pe);
+    free(*pe);
     return( s1 ) ;
 }
 
