@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/28 18:05:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/28 22:07:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/04/28 18:05:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/04/28 22:07:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -1102,10 +1102,10 @@ fprint_environment(FILE * fd, entity m)
     MAP(ENTITY, e, {
 	type t = entity_type(e);
 
-	fprintf(fd, "Declared entity %s\twith type %s", entity_name(e), type_to_string(t));
+	fprintf(fd, "Declared entity %s\twith type %s ", entity_name(e), type_to_string(t));
 
 	if(type_variable_p(t))
-	    fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(t))));
+	    fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(t))));
 	else if(type_functional_p(t)) {
 	    functional f = type_functional(t);
 	    type tr = functional_result(f);
@@ -1115,7 +1115,7 @@ fprint_environment(FILE * fd, entity m)
 		type ta = parameter_type(p);
 
 		pips_assert("fprint_environment", type_variable_p(ta));
-		(void) fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(ta))));
+		(void) fprintf(fd, "%s", basic_to_string(variable_basic(type_variable(ta))));
 		if(!ENDP(cp->cdr))
 		    (void) fprintf(fd, " x ");
 	    },
