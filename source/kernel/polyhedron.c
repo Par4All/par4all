@@ -2104,6 +2104,9 @@ Polyhedron *Rays2Polyhedron(Matrix *Ray,unsigned NbMaxConstrs) {
     Pol = Empty_Polyhedron(Dimension-1);
     return(Pol);
   }
+
+  if (Dimension > NbMaxConstrs)
+    NbMaxConstrs = Dimension;
   
   /* Allocate space for constraint matrix 'Mat' */
   Mat = Matrix_Alloc(NbMaxConstrs,Dimension+1);
