@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.101  1998/05/27 14:53:06  coelho
+ * -x option added (but not yet implemented...).
+ *
  * Revision 1.100  1998/05/27 10:31:20  coelho
  * -w option added.
  *
@@ -1033,7 +1036,7 @@ parse_arguments(int argc, char * argv[])
     int c;
     string tpipsrc = default_tpipsrc();
 
-    while ((c = getopt(argc, argv, "ne:l:h?vscr:jw")) != -1) {
+    while ((c = getopt(argc, argv, "ne:l:h?vscr:jwx")) != -1) {
 	switch (c)
 	{
 	case 's':
@@ -1063,10 +1066,15 @@ parse_arguments(int argc, char * argv[])
 	    free(tpipsrc);
 	    tpipsrc = strdup(optarg);
 	    break;
-	case 'w':            /* -w => -j */
+	case 'w':            /* -w => -j ??? */
 	    tpips_wrapper(); /* the wrapper process will never return */
 	case 'j':
 	    jpips_is_running = TRUE;
+	    break;
+	case 'x':
+	    /* tpips could start an xterm and redirect its stdin/stdout
+	     * on it under this option. not implemented yet.
+	     */
 	    break;
 	default: 
 	    fprintf(stderr, tpips_usage, argv[0]);
