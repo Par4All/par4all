@@ -21,8 +21,6 @@
 #include "text-util.h"
 #include "ri-util.h"
 
-#include "flint.h" /* for find_ith_formal_parameter() */
-
 #include "effects-generic.h"
 #include "effects-simple.h"
 
@@ -55,7 +53,6 @@ list
 effects_dynamic_elim(list l_eff)
 {
     list l_res = NIL;
-
 
     MAP(EFFECT, eff, 
      {
