@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 2003/06/19 07:30:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2003/07/21 12:19:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2003/06/19 07:30:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2003/07/21 12:19:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -31,6 +31,9 @@ char vcid_control_control[] = "%A% ($Date: 2003/06/19 07:30:13 $, ) version $Rev
  * $Id$
  *
  * $Log: control.c,v $
+ * Revision 1.37  2003/07/21 12:19:41  nguyen
+ * Add new control structures for C language (for loop, switch, ...), preliminary version
+ *
  * Revision 1.36  2003/06/19 07:30:13  nguyen
  * Update calls to make_statement and make_variable with new RI for C
  *
@@ -408,6 +411,18 @@ bool controlize(
 	controlized = controlize_call(st, instruction_call(i), 
 				      pred, succ, c_res, used_labels);
 	break;
+    case is_instruction_forloop:
+      /* NN : Don't know what to do.
+	 Just to make controlizer pass for these kinds of statements*/
+      controlized = controlize_forloop(st, instruction_forloop(i), 
+				       pred, succ, c_res, used_labels);
+      break;
+    case is_instruction_return:
+      controlized =  TRUE;
+      break;
+    case is_instruction_multitest:
+      controlized = TRUE;
+      break;
     default:
 	pips_error("controlize", 
 		   "Unknown instruction tag %d\n", instruction_tag(i));
@@ -675,7 +690,7 @@ hash_table used_labels;
 	whileloop new_l = make_whileloop(whileloop_condition(l),
 					 control_statement(c_body),
 					 whileloop_label(l),
-					 make_evaluation_before());
+					 whileloop_evaluation(l));
 
 	/* The edges between c_res and c_body, created by the above call to 
 	 * controlize are useless. The edge succ
@@ -709,6 +724,65 @@ hash_table used_labels;
 	/* Cannot be consistent yet! */
 	/* ifdebug(5) check_control_coherency(c_res); */
     }
+    control_predecessors(succ) = ADD_PRED(c_res, succ);
+    add_proper_successor_to_predecessor(pred, c_res);
+    /* control_successors(pred) = ADD_SUCC(c_res, pred); */
+
+    ifdebug(5) check_control_coherency(c_res);
+
+    union_used_labels( used_labels, loop_used_labels);
+    hash_table_free(loop_used_labels);
+    
+    pips_debug(5, "Exiting\n");
+    
+    return(controlized);
+}
+
+
+bool controlize_forloop(st, l, pred, succ, c_res, used_labels)
+statement st;
+forloop l;
+control pred, succ;
+control c_res;
+hash_table used_labels;
+{
+    hash_table loop_used_labels = hash_table_make(hash_string, 0);
+    control c_body = make_conditional_control(forloop_body(l));
+    bool controlized;
+
+    pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
+	       st, pred, succ, c_res);
+    
+    controlize(forloop_body(l), c_res, c_res, c_body, loop_used_labels);
+
+    if(covers_labels_p(forloop_body(l),loop_used_labels)) {
+      forloop new_l = make_forloop(forloop_initialization(l),
+				   forloop_condition(l),
+				   forloop_increment(l),
+				   control_statement(c_body));
+	
+	/* The edges between c_res and c_body, created by the above call to 
+	 * controlize are useless. The edge succ
+	 * from c_res to c_body is erased by the UPDATE_CONTROL macro.
+	 */
+	gen_remove(&control_successors(c_body), c_res);
+	gen_remove(&control_predecessors(c_body), c_res);
+	gen_remove(&control_predecessors(c_res), c_body);
+
+	UPDATE_CONTROL(c_res,
+		       make_statement(statement_label(st),
+				      statement_number(st),
+				      STATEMENT_ORDERING_UNDEFINED,
+				      statement_comments(st),
+				      make_instruction(is_instruction_forloop, 
+						       new_l),NIL,NULL),
+		       ADD_PRED(pred, c_res),
+		       ADD_SUCC(succ, c_res )) ;
+	controlized = FALSE;
+    }
+    else 
+      pips_internal_error("Forloop with goto not implemented yet\n");
+    
     control_predecessors(succ) = ADD_PRED(c_res, succ);
     add_proper_successor_to_predecessor(pred, c_res);
     /* control_successors(pred) = ADD_SUCC(c_res, pred); */
