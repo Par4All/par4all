@@ -76,6 +76,7 @@
 #include "matrix.h"
 
 /* Pips includes	*/
+#include "linear.h"
 #include "ri.h"
 #include "graph.h"
 #include "paf_ri.h"
