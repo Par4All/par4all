@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.57  1997/05/24 10:25:33  coelho
+ * *** empty log message ***
+ *
  * Revision 1.56  1997/04/17 11:47:21  coelho
  * *** empty log message ***
  *
@@ -143,7 +146,7 @@ generate_work_sharing_system(
 	              delta, int_to_value(size_r), 
 	              TCST, VALUE_ZERO)));
 
-    if (size_d >= size_r)
+    if (size_d > size_r)
     {
 	/* 0 <= delta (there are cycles)
 	 */
