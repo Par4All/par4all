@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.47  1997/07/21 15:20:26  keryell
+ * Replaced %x format by %p.
+ *
  * Revision 1.46  1997/05/28 13:48:22  coelho
  * more debug messages.
  *
@@ -1353,7 +1356,7 @@ list_of_remapping_statements()
     list /* of statements */ l = NIL;
     CONTROLMAP_MAP(s, c,
     {
-	pips_debug(9, "0x%x -> 0x%x\n", (unsigned int) s, (unsigned int) c);
+	pips_debug(9, %p -> %p\n", s, c);
 	l = CONS(STATEMENT, s, l);
     },
 		   get_remapping_graph());
