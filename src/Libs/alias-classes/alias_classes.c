@@ -1,3 +1,5 @@
+/* $Id$
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -14,17 +16,16 @@
 #include "misc.h"
 #include "text.h"
 
-#include "effects.h"
-#include "regions.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 
 #include "pipsdbm.h"
 #include "resources.h"
 
-
-
 bool
 alias_equivalence_classes ( string name )
 {
-return TRUE;
+    return TRUE;
 }
 
