@@ -154,6 +154,7 @@ char * (*nom_var)(Variable);
     Pcontrainte peq;
 
     if (ps != NULL) {
+      int count = 0;
 	if (ps->dimension >=1) {
 	    (void)fprintf(fp,"VAR %s",(*nom_var)(vecteur_var(ps->base)));
 
@@ -162,11 +163,16 @@ char * (*nom_var)(Variable);
 	}
 	(void) fprintf(fp," \n { \n");
 
-	for (peq = ps->inegalites;peq!=NULL;
-	     inegalite_fprint(fp,peq,nom_var),peq=peq->succ);
+	for (peq = ps->inegalites, count=0; peq!=NULL;
+	     inegalite_fprint(fp,peq,nom_var),peq=peq->succ, count++);
 
-	for (peq = ps->egalites;peq!=NULL;
-	     egalite_fprint(fp,peq,nom_var),peq=peq->succ);
+	assert(count==ps->nb_ineq);
+
+	for (peq = ps->egalites, count=0; peq!=NULL;
+	     egalite_fprint(fp,peq,nom_var),peq=peq->succ, count++);
+
+	assert(count==ps->nb_eq);
+
 	(void) fprintf(fp," } \n");
     }
     else
