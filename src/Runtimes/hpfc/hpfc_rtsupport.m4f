@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1996/10/18 22:19:07 $, )
+! ($Date: 1997/01/07 11:44:29 $, )
 !
 !-----------------
 !
@@ -263,7 +263,6 @@
 !
       subroutine HPFC CMPNEIGHBOUR(delta)
       integer delta
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid
       NLID = MYLID + DELTA
@@ -363,7 +362,6 @@
 !
       subroutine HPFC SNDTO C(what, val)
       integer what, val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       call pvmfinitsend(PVMRAW, bufid)
@@ -380,7 +378,6 @@
 !
       subroutine HPFC SNDTO H(what, val)
       integer what, val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       call pvmfinitsend(PVMRAW, bufid)
@@ -397,7 +394,6 @@
 !
       subroutine HPFC SNDTO O(what, val)
       integer what, val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "sending to ", OLID)
@@ -415,7 +411,6 @@
 !
       subroutine HPFC SNDTO A(what, val)
       integer what, val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       call pvmfinitsend(PVMRAW, bufid)
@@ -441,7 +436,6 @@
 !
       integer function HPFC PVMLENGTH(what)
       integer what
-      include "fpvm3.h"
       if (what.eq.INTEGER4.or.what.eq.REAL4) then
          HPFC PVMLENGTH=4
          return
@@ -526,7 +520,6 @@ _CM5(
 !
       subroutine HPFC HSNDTO A(what, val)
       integer what, val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "sending to all nodes")
@@ -545,7 +538,6 @@ _CM5(
 !
       subroutine HPFC SNDTO HA(what, val)
       integer what, val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       call pvmfinitsend(PVMRAW, bufid)
@@ -575,7 +567,6 @@ _CM5(
 !
       subroutine HPFC SNDTO OS(what, val)
       integer what, val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info, i
       integer i1, i2, i3, i4, i5, i6, i7
@@ -645,7 +636,6 @@ _CM5(
 !
       subroutine HPFC SNDTO OOS(what, val)
       integer what, val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info,  i
       integer i1, i2, i3, i4, i5, i6, i7
@@ -711,7 +701,6 @@ _CM5(
 !
       subroutine HPFC SNDTO NO(what, val)
       integer what, val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info, i, indp(7), ndim, lid
       logical result
@@ -746,7 +735,6 @@ _CM5(
 !
       subroutine HPFC SNDTO HNO(what, val)
       integer what, val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       call HPFC SNDTO H(what, val)
       call HPFC SNDTO NO(what, val)
@@ -758,7 +746,6 @@ _CM5(
 !
       subroutine HPFC RCVFR S(what, goal)
       integer what, goal
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       call pvmfrecv(SENDERTID, RECVCHANNELS(SLID), bufid)
@@ -772,7 +759,6 @@ _CM5(
 !
       subroutine HPFC RCVFR C(what, goal)
       integer what, goal
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       call pvmfrecv(COMPUTERTID, RECVCHANNELS(CLID), bufid)
@@ -786,7 +772,6 @@ _CM5(
 !
       subroutine HPFC RCVFR H(what, goal)
       integer what, goal
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       call pvmfrecv(HOSTTID, HOST RCV CHANNEL, bufid)
@@ -801,7 +786,6 @@ _CM5(
 !
       subroutine HPFC RCVFR mCS(what, goal)
       integer what, goal
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       call pvmfrecv(SENDERTID, MCASTNODES, bufid)
@@ -815,7 +799,6 @@ _CM5(
 !
       subroutine HPFC RCVFR mCH(what, goal)
       integer what, goal
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "receiving from host")
@@ -940,7 +923,6 @@ _CM5(
 ! 
       subroutine HPFC INIT MAIN
 
-      include "fpvm3.h"
       include "hpfc_commons.h"
       
       _CRAY(integer my rank)
@@ -1020,7 +1002,6 @@ _CM5(
 ! HPFC INIT HOST NODE
 !
       subroutine HPFC INIT HOST NODE
-      include "fpvm3.h"
       include "hpfc_commons.h"
 
       integer info, inum
@@ -1061,7 +1042,6 @@ _CM5(
 !
       subroutine HPFC INIT NODE
       _CM5(include "cmmd_fort.h")
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer i, bufid, info, inum
 
@@ -1180,7 +1160,6 @@ _CM5(
 !
 _direct(`'
       subroutine HPFC DIRECTROUTE IF POSSIBLE
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer nhost, narch, dtid, speed, info
       character host(50), arch(20)
@@ -1203,7 +1182,6 @@ _direct(`'
 !
       subroutine HPFC INIT HOST
       _CM5(include "cmmd_fort.h")
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info, inum, i
       character*64 node key
@@ -1341,7 +1319,6 @@ _CM5(
 ! HPFC RCVFR N
 !
       subroutine HPFC RCVFR N
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
       call pvmfrecv(NTID, RECVCHANNELS(NLID), info)
@@ -1352,7 +1329,6 @@ _CM5(
 ! HPFC SNDTO N
 !
       subroutine HPFC SNDTO N
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
       call pvmfsend(NTID, SENDCHANNELS(NLID), info)
@@ -1415,7 +1391,6 @@ _CM5(
 ! HPFC SYNCHRO
 !
       subroutine HPFC SYNCHRO
-      include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
       debug(print *, "[hpfc synchro] ", MYLID, " waiting ", NBOFTASKS+1)
