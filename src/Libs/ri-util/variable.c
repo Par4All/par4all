@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "misc.h"
 #include "ri.h"
@@ -12,7 +14,9 @@
 bool 
 variable_entity_p(entity e)
 {
-    bool variable = entity_storage(e)!= storage_undefined && storage_ram_p(entity_storage(e));
+    bool variable = 
+	(entity_storage(e)!=storage_undefined) && 
+	storage_ram_p(entity_storage(e));
 
     return variable;
 }
@@ -253,7 +257,7 @@ char *module_name;
 		    storage_undefined, 
 		    value_undefined);
 
-    b = make_basic(is_basic_int, 4); 
+    b = make_basic(is_basic_int, (void*) 4); 
 
     entity_type(e) = (type) MakeTypeVariable(b, NIL);
 
@@ -426,12 +430,12 @@ int c;
 	functional cf = 
 	    make_functional(NIL, 
 			    make_type(is_type_variable, 
-				      make_variable(make_basic(is_basic_int,c),
+				      make_variable(make_basic(is_basic_int, (void*)c),
 						    NIL)));
 	type ct = make_type(is_type_functional, cf);
 	ce = make_entity(strdup(cn), ct, MakeStorageRom(),
 			 make_value(is_value_constant, 
-				    make_constant(is_constant_int, c)));
+				    make_constant(is_constant_int, (void*)c)));
     }
     
     else 
@@ -703,8 +707,8 @@ make_new_entity(ba, kind)
 basic ba;
 int kind;
 {
-    extern int count_tmp, count_aux;
-    extern list integer_entities, real_entities, logical_entities, complex_entities,
+    extern list integer_entities, 
+	real_entities, logical_entities, complex_entities,
 	double_entities, char_entities;
 
     entity new_ent, mod_ent;
