@@ -148,7 +148,7 @@ MakeCharacterParameter()
 							    make_constant(is_constant_int,
 									  DEFAULT_CHARACTER_TYPE_SIZE))),
 				      NIL),
-			make_mode(is_mode_value, UU));
+			make_mode(is_mode_reference, UU));
 }
 
 parameter 
@@ -156,7 +156,7 @@ MakeAnyScalarParameter(tag t, int size)
 {
     return(make_parameter((MakeTypeArray(make_basic(t, 
 						    size), NIL)),
-			  make_mode(is_mode_value, UU)));
+			  make_mode(is_mode_reference, UU)));
 }
 
 /* this function creates a default fortran operator result, i.e. a zero
