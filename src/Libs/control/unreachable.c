@@ -1,10 +1,12 @@
 /*
- * Detection of unreachable code.
- * Should move formats if necessary.
+ * Detection of unreachable code, from the control flow point of view.
  *
  * $Id$
  *
  * $Log: unreachable.c,v $
+ * Revision 1.5  1997/11/13 08:07:05  coelho
+ * statement_continued_p added...
+ *
  * Revision 1.4  1997/11/12 17:06:51  coelho
  * 1 go to 1 fixed...
  *
@@ -37,14 +39,26 @@ GENERIC_LOCAL_FUNCTION(continued, persistant_statement_to_int);
 
 static bool propagate(statement);
 
+#define check_recursion(s)					\
+    if (reached_p(s))						\
+    {								\
+	if (bound_continued_p(s))				\
+	    return continued_p(s); /* already computed */	\
+	else							\
+	    return FALSE; /* avoids an infinite recursion... */	\
+    }								\
+    else store_reached(s, TRUE);
+
+
 static bool
 control_propagate(control c)
 {
     bool continued = propagate(control_statement(c));
     list lc = control_successors(c);
     int len = gen_length(lc);
-
     pips_assert("max 2 successors", len<=2);
+
+    check_recursion(c);
 
     if (len==2)
     {
@@ -60,6 +74,7 @@ control_propagate(control c)
 	else continued = FALSE; /* 1 GO TO 1 */
     }
 
+    store_continued(c, continued);
     return continued;
 }
 
@@ -72,16 +87,7 @@ propagate(statement s)
     bool continued = TRUE;
     instruction i;
     pips_assert("defined statement", !statement_undefined_p(s));
-
-    if (reached_p(s))
-    {
-	if (bound_continued_p(s))
-	    return continued_p(s); /* already computed */
-	else
-	    return TRUE; /* avoids an infinite recursion... */
-    }
-    else store_reached(s, TRUE);
-
+    check_recursion(s);
 
     i = statement_instruction(s);
     switch (instruction_tag(i))
@@ -143,7 +149,6 @@ init_reachable(statement start)
     init_reached();
     init_continued();
     propagate(start);
-    close_continued();
 }
 
 bool
@@ -152,28 +157,18 @@ statement_reachable_p(statement s)
     return reached_p(s);
 }
 
+bool
+statement_continued_p(statement s)
+{
+    if (bound_continued_p(s))
+	return continued_p(s);
+    else
+	return FALSE;
+}
+
 void 
 close_reachable(void)
 {
     close_reached();
+    close_continued();
 }
-
-/*
-static void 
-drop_code_rwt(statement s)
-{
-    if (!reached_p(s)) 
-    {
-	free_instruction(statement_instruction(s)); 
-	statement_instruction(s) = make_continue_instruction();
-    }
-}
-
-void 
-drop_unreachable_code(statement start)
-{
-    init_reachable(start);
-    gen_recurse(start, statement_domain, gen_true, drop_code_rwt);
-    close_reachable();
-}
-*/
