@@ -195,8 +195,10 @@ bool entity_conflict_p(e1, e2)
 entity e1, e2;
 {
     /* a hash table to map entities to their number of elements */
-    static hash_table entity_to_size = (hash_table) NULL;
+    /* FI: how do you reset this table when a workspace is closed? */
+    /* static hash_table entity_to_size = (hash_table) NULL; */
 
+    bool intersect_p = FALSE;
     storage s1, s2;
     ram r1 = ram_undefined, r2 = ram_undefined;
     int o1, o2, l1, l2;
@@ -208,26 +210,36 @@ entity e1, e2;
     s2 = entity_storage(e2);
 
     if (! (storage_ram_p(s1) && storage_ram_p(s2)))
-	return(FALSE);
+	return intersect_p;
 
+    /*
     if (entity_to_size == (hash_table) NULL)
 	entity_to_size = hash_table_make(hash_pointer, 0);
+	*/
 
+    /*
     if ((l1 = (int) hash_get(entity_to_size, (char *) e1)) == (int) HASH_UNDEFINED_VALUE) {
 	l1 = SizeOfArray(e1);
 	hash_put(entity_to_size, (char *) e1, (char *) l1);
     }
+    */
+
+    l1 = SizeOfArray(e1);
 
     r1 = storage_ram(s1);
     f1 = ram_function(r1);
     a1 = ram_section(r1);
     o1 = ram_offset(r1);
     l1 = l1+o1-1;
-	    
+
+    /*
     if ((l2 = (int) hash_get(entity_to_size, (char *) e2)) == (int) HASH_UNDEFINED_VALUE) {
 	l2 = SizeOfArray(e2);
 	hash_put(entity_to_size, (char *) e2, (char *) l2);
     }
+    */
+
+    l2 = SizeOfArray(e2);
 
     r2 = storage_ram(s2);
     f2 = ram_function(r2);
@@ -239,8 +251,13 @@ entity e1, e2;
 	   f1 == f2 && a1 == a2 &&
 	   INTERVAL_INTERSECTION(o1, l1, o2, l2)); */
 
-    /* FI: it's too late to check if r1 and r2 are defined: you already have core dumped!
-     * also, f1 and f2 are not relevant since location are governed by area a1 and a2
+    /* FI: it's too late to check if r1 and r2 are defined:
+     * you already have core dumped!
+     * also, f1 and f2 are not relevant since location are governed
+     * by area a1 and a2
      */
-    return( a1 == a2 && INTERVAL_INTERSECTION(o1, l1, o2, l2));
+
+    intersect_p = ( a1 == a2 && INTERVAL_INTERSECTION(o1, l1, o2, l2));
+
+    return intersect_p;
 }
