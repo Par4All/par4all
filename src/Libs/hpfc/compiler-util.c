@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compiler-util.c,v $ ($Date: 1994/09/03 15:19:34 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1994/11/17 14:19:11 $, )
  * got on %D%, %T%
  * $Id$
  *
@@ -25,30 +25,30 @@ extern int fprintf();
 #include "defines-local.h"
 
 /*
- * my_empty_statement_p 
+ * hpfc_empty_statement_p 
  */
-bool my_empty_statement_p(stat)
+bool hpfc_empty_statement_p(stat)
 statement stat;
 {
     return((stat==statement_undefined) ||
 	   (stat==NULL) ||
 	   (statement_continue_p(stat)) ||
 	   ((statement_block_p(stat)) && 
-	    (my_empty_statement_list_p
+	    (hpfc_empty_statement_list_p
 	      (instruction_block(statement_instruction(stat))))) ||
 	   (empty_statement_p(stat)));
 }
 
 /*
- * bool my_empty_statement_list_p(l)
+ * bool hpfc_empty_statement_list_p(l)
  */
-bool my_empty_statement_list_p(l)
+bool hpfc_empty_statement_list_p(l)
 list l;
 {
     return(ENDP(l) ?
 	   TRUE :
-	   my_empty_statement_p(STATEMENT(CAR(l))) && 
-	   my_empty_statement_list_p(CDR(l)));
+	   hpfc_empty_statement_p(STATEMENT(CAR(l))) && 
+	   hpfc_empty_statement_list_p(CDR(l)));
 }
 
 /*
@@ -436,21 +436,23 @@ list lsyn;
  * checks that only atomic accesses to distributed variables are made
  * inside a parallel loop nest, for every iterations.
  *
- * partially implemented, and the conclusions may be false...
+ * ??? partially implemented, and the conclusions may be false...
  */
 bool atomic_accesses_only_p(stat)
 statement stat;
 {
     bool
-	result;
+	result = TRUE;
     list
-	lloop = NULL;
+	lloop = NIL;
 
     user_warning("atomic_accesses_only_p", 
 		 "only partially implemented\n");
 
+/*
     result = (!sequential_loop_in_statement_p
 	      (perfectly_nested_parallel_loop_to_body(stat, &lloop)));
+*/
 
     gen_free_list(lloop);
 
@@ -781,5 +783,110 @@ statement stat;
 }
 
 /*
- * that's all
+ * statement parallel_loop_nest_to_body(loop_nest, pblocks, ploops)
+ * statement loop_nest;
+ * list *pblocks, *ploops;
+ *
+ * What I want is to extract the parallel loops from loop_nest,
+ * while keeping track of the structure if the loop nest is not
+ * perfectly nested. Only a very simple structure is recognized.
+ *
+ * it returns the inner statement of the loop nest,
+ * a list of pointers to the loops, and a list of pointers
+ * to the blocks containing these loops if any.
+ *
+ * we may discuss the implementation based on static global variables...
+ * but I cannot see how to do it otherwise with a gen_recurse.
+ */
+
+static list 
+    loops, /* lisp of loops */
+    blocks;/* list of lists, may be NIL if none */
+static int 
+    n_loops, n_levels;
+static statement 
+    inner_body;
+
+static bool inst_filter(i)
+instruction i;
+{
+    /* descend only thru blocks and parallel loops 
+     */
+    switch(instruction_tag(i))
+    {
+    case is_instruction_block:
+	return(TRUE);
+    case is_instruction_loop:
+	return(execution_parallel_p(loop_execution(instruction_loop(i))));
+    }
+
+    return(FALSE);
+}
+
+static void inst_rewrite(i)
+instruction i;
+{
+    switch(instruction_tag(i))
+    {
+    case is_instruction_block:
+    {
+	if (n_loops==0 && n_levels==0) /* there was no doall inside */
+	    return;
+
+	if (n_loops-n_levels!=1)
+	    pips_error("inst_rewrite",
+		       "block within a block encountered\n");
+
+	n_levels++, blocks = CONS(CONSP, instruction_block(i), blocks);
+
+	break;
+    }
+    case is_instruction_loop:
+    {
+	loop l = instruction_loop(i);
+
+	if (n_loops!=n_levels) /* a loop was found directly as a body */
+	    n_levels++, 
+	    blocks = CONS(CONSP, NIL, blocks);
+	
+	if (n_loops==0) inner_body=loop_body(l);
+	loops = CONS(LOOP, l, loops);
+	n_loops++;
+
+	break;
+    }
+    default: /* consistent with inst_filter */
+	pips_error("inst_rewrite",
+		   "unexpected instruction tag (%d)\n",
+		   instruction_tag(i));
+    }
+}
+
+statement parallel_loop_nest_to_body(loop_nest, pblocks, ploops)
+statement loop_nest;
+list *pblocks, *ploops;
+{
+    loops=NIL, n_loops=0;
+    blocks=NIL, n_levels=0;
+    inner_body=statement_undefined;
+
+    pips_assert("parallel_loop_nest_to_body",
+		instruction_loop_p(statement_instruction(loop_nest)));
+
+    gen_recurse(loop_nest,
+		instruction_domain,
+		inst_filter,
+		inst_rewrite);
+    
+    pips_assert("parallel_loop_nest_to_body",
+		n_loops!=0 && (n_loops-n_levels==1));
+
+    *pblocks=CONS(CONSP, NIL, blocks); /* nothing was done for the first ! */
+    *ploops=loops;
+
+    return(inner_body);
+}
+
+/*
+ * that is all
  */
