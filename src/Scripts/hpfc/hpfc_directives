@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/23 17:35:25 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/28 08:54:08 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -52,8 +52,8 @@
 # gnu sed is okay.
 # idem tr.
 
-SED=sed
-TR=tr
+SED=${HPFC_SED:-sed}
+TR=${HPFC_TR:-tr}
 RM=rm
 BASENAME=basename
 
