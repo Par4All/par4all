@@ -464,7 +464,8 @@ void init_cost_table()
     char *cost_data = strdup(COST_DATA);
     char *tmp=malloc(20);
 
-    pips_assert("some directory", cost_dir!=NULL);
+    pips_assert("some directory and table",
+		cost_dir!=NULL && cost_table!=NULL);
     token = strtok(cost_data, sep_chars);
 
     while (token != NULL) {
