@@ -72,7 +72,7 @@ void set_debug_stack_pointer(i)
     }
     }
     else
-	pips_error("set-debug_stack_pointer", 
+	pips_error("set_debug_stack_pointer", 
 		   "value %d out of range [0..%d]\n", i, idls);
 }
 
