@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/12/14 11:30:03 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/12/14 17:26:52 $, )
  * version $Revision$
  */
 
@@ -657,4 +657,11 @@ char **pval;
 	hentryp++;
     }
     return NULL;
+}
+
+int
+hash_table_own_allocated_memory(
+    hash_table htp)
+{
+    return sizeof(struct __hash_table) + sizeof(hash_entry)*(htp->hash_size);
 }
