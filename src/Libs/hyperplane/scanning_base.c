@@ -1,5 +1,7 @@
 /* package matrice */
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 /* #include <sys/stdtypes.h> */ /* for debug with dbmalloc */
 /* #include "malloc.h" */
 
