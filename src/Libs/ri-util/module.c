@@ -2,6 +2,9 @@
   * $Id$
   *
   * $Log: module.c,v $
+  * Revision 1.24  1997/11/10 10:24:43  coelho
+  * clean declarations : do not include equiv of commons if not used...
+  *
   * Revision 1.23  1997/11/04 12:50:02  coelho
   * bug--: cleaning declarations must not drop data of common...
   *
@@ -186,20 +189,22 @@ store_this_entity(entity var)
 	    CONS(ENTITY, var, referenced_variables_list);
 	store_referenced_variables(var, TRUE);
 
-	if (storage_ram_p(s)) 
+	if (storage_ram_p(s) && 
+            !bound_referenced_variables_p(ram_section(storage_ram(s)))) 
 	{
 	    /* the COMMON is also marqued as referenced...
-	     * as well as its variables: one => all
+	     * as well as its variables: one => all primary members...
 	     */
 	    entity
 		common = ram_section(storage_ram(s)),
 		module = get_current_module_entity();
 	    store_this_entity(common);
-	    if (!SPECIAL_COMMON_P(common)) {
-		MAP(ENTITY, e,
-		    if (local_entity_of_module_p(e, module))
-		        store_this_entity(e),
-		    area_layout(type_area(entity_type(common))));
+	    if (!SPECIAL_COMMON_P(common)) 
+            {
+                list /* of entity */ lc = 
+                    common_members_of_module(common, module, TRUE);
+		MAP(ENTITY, e, store_this_entity(e), lc);
+                gen_free_list(lc);
 	    }
 	}
     }
