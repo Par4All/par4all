@@ -34,6 +34,8 @@ typedef dg_vertex_label vertex_label;
 #include "properties.h"
 #include "atomizer.h"
 
+#include "expressions.h"
+
 extern entity hpfc_new_variable(entity, basic);
 //extern bool expression_constant_p(expression);
 
@@ -136,9 +138,9 @@ boolean simd_atomizer(char * mod_name)
    atomize_as_required(mod_stat,
                        simd_atomizer_expr_decide,
                        simd_atomizer_func_decide,
-                       gen_false,
-		       gen_false, /* range */
-		       gen_false, /* whileloop */
+                       (bool (*)(test, expression))gen_false,
+		       (bool (*)(range, expression))gen_false, /* range */
+		       (bool (*)(whileloop, expression))gen_false, /* whileloop */
                        /*new_atomizer_create_a_new_entity*/
                        hpfc_new_variable);
 
