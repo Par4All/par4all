@@ -106,7 +106,7 @@ entity e;
     /* do not count intrinsics; user function should not be named
        like intrinsics */
     nom = concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, n, NULL);
-    if ((e = gen_find_tabulated(nom, entity_domain)) != entity_undefined) 
+    if ((e = gen_find_tabulated(nom, entity_domain)) != entity_undefined) {
 	if(entity_initial(e) == value_undefined) {
 	    /* FI, 20/01/92: maybe, initializations of global entities
 	       should be more precise (storage, initial value, etc...);
@@ -116,6 +116,7 @@ entity e;
 	}
 	else if(value_intrinsic_p(entity_initial(e)))
 	    return;
+    }
 
     MAPL(ps, {
 	if (strcmp(n, STRING(CAR(ps))) == 0) {
