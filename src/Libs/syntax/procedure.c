@@ -9,6 +9,7 @@
 
 #include "genC.h"
 #include "parser_private.h"
+#include "linear.h"
 #include "ri.h"
 #include "database.h"
 #include "resources.h"
