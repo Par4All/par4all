@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/04/14 21:28:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/07/13 19:40:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1998/04/14 21:28:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 1998/07/13 19:40:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -288,4 +288,49 @@ cons *l;
     }
 
     return(lr);
+}
+
+/* Make sure that no call to implied do is in l */
+
+list
+FortranExpressionList(list l)
+{
+    MAP(EXPRESSION, e, {
+	if(expression_implied_do_p(e))
+	    ParserError("FortranExpressionList", "Unexpected implied DO\n");
+    }, l);
+    return l;
+}
+
+expression
+MakeFortranBinaryCall(
+    entity op,
+    expression e1,
+    expression e2)
+{
+    expression e = expression_undefined;
+
+    if(expression_implied_do_p(e1) || expression_implied_do_p(e2)) {
+	    ParserError("MakeFortranBinaryCall", "Unexpected implied DO\n");
+    }
+
+    e = MakeBinaryCall(op, e1, e2);
+
+    return e;
+}
+
+expression
+MakeFortranUnaryCall(
+    entity op,
+    expression e1)
+{
+    expression e = expression_undefined;
+
+    if(expression_implied_do_p(e1)) {
+	    ParserError("MakeFortranUnaryCall", "Unexpected implied DO\n");
+    }
+
+    e = MakeUnaryCall(op, e1);
+
+    return e;
 }
