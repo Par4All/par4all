@@ -218,10 +218,21 @@ pips_debug_function(int the_expected_debug_level,
 
 double get_process_memory_size()
 {
+    /* This is about the always increasing swap space */
     extern etext;
     double memory_size = (sbrk(0) - etext)/(double)(1 << 20);
 
-	return memory_size;
+    return memory_size;
+}
+
+double get_process_gross_heap_size()
+{
+    /* This is *used* part of the heap, but it may be bigger */
+    struct mallinfo heap_info = mallinfo();
+    /* double memory_size = (heap_info.uordbytes)/(double)(1 << 20); */
+    double memory_size = ((double) heap_info.uordblks)/(double)(1 << 20);
+
+    return memory_size;
 }
 
 /* is that all? :-)
