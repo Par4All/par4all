@@ -1,5 +1,7 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/04/25 10:33:22 $, 
+ * $Date: 1995/04/26 14:03:58 $, 
+ *
+ * interactive interface to hpfc, based on the GNU realine library.
  */
 
 #include <stdio.h>
@@ -15,26 +17,34 @@ extern void free();
 #include "readline/history.h"
 
 #define HPFC_PROMPT "hpfc> "
-#define BUFFER_SIZE 1024
-#define DEFAULT_FILE_NAME ".hpfc.history"
+#define HPFC_PREFIX "hpfc"
+#define DEFAULT_HIST ".hpfc.history"
 
 #define QUIT "qui"
 
-static char * default_full_file_name()
+/*  returns the full hpfc history file name, i.e.
+ *  - $HPFC_HISTORY (if any)
+ *  - $HOME/.hpfc.history
+ */
+static char * default_hist_file_name()
 {
     char *home = getenv("HOME");
-    int    len = strlen(home) + strlen(DEFAULT_FILE_NAME) + 2;
-    char *name = (char*) malloc(sizeof(char)*len);
+    char *hist = getenv("HPFC_HISTORY");
+    int    len = strlen(home) + strlen(DEFAULT_HIST) + 2;
 
-    return(sprintf(name, "%s/%s", home, DEFAULT_FILE_NAME));
+    return(hist ? hist : sprintf((char*) malloc(sizeof(char)*len),
+				 "%s/%s", home, DEFAULT_HIST));
 }
 
+/* main: interactive loop and history management.
+ */
 int main()
 {
     char 
-	*line,
-	buffer[BUFFER_SIZE],
-	*file_name = default_full_file_name();
+	*file_name = default_hist_file_name(),
+	*shll = NULL,
+	*last = NULL,
+	*line = NULL;
     
     /*  initialize history
      */
@@ -45,24 +55,27 @@ int main()
      */
     while ((line=readline(HPFC_PROMPT)))
     {
-	if ((strlen(line)+strlen(HPFC_PROMPT))>=BUFFER_SIZE) /* woh! */
-	{
-	    fprintf(stderr, "line too long\n");
-	    continue;
-	}	    
-
-	if (strncmp(line, QUIT, 3)==0) /* quit! */
+	if (strncmp(line, QUIT, strlen(QUIT))==0) /* quit! */
 	    break;
 
 	/*   calls a script:-)
 	 *   All this stuff could be taken care of in the C, but shell
 	 *   scripts are much easier to develop. 
 	 */
-	system(sprintf(buffer, "hpfc %s", line));
+	shll = (char*) 
+	    malloc(sizeof(char)*(strlen(HPFC_PREFIX)+strlen(line)+2));
 
-	/*   maybe a memory leak? I guess not.
+	system(sprintf(shll, "%s %s", HPFC_PREFIX, line));
+
+	free(shll), shll = NULL;
+
+	/*   add to history if not the same as the last one (in this session)
 	 */
-	add_history(line); 
+	if ((last && line && strcmp(last, line)!=0) || (line && !last))
+	    add_history(line),  last = line; 
+	else
+	    free(line), line = NULL;
+	    
     }
 
     /*   close history
@@ -70,7 +83,7 @@ int main()
     write_history(file_name);
     history_truncate_file(file_name, 100);
 
-    fprintf(stdout, "\n"); /* usefull for Ctrl-D terminations */
+    if (!line) fprintf(stdout, "\n"); /* for Ctrl-D terminations */
     free(file_name);
     return(0);
 }
