@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:24:48 $, )
+# ($Date: 1996/08/21 17:25:28 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -165,7 +165,7 @@ DDC_HEADERS 	= $(LIB_M4FFILES:.m4f=.h) \
 LIB_HEADERS	= $(CORE_HEADERS) \
 		  $(DDC_HEADERS)
 
-LIB_OBJECTS = $(addprefix $(PVM_ARCH), $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
+LIB_OBJECTS= $(addprefix $(PVM_ARCH)/, $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
 
 M4_MACROS 	= hpfc_lib_m4_macros hpfc_architecture_m4_macros
 HPFC_MAKEFILES 	= hpfc_Makefile hpfc_Makefile_init 
