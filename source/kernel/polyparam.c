@@ -657,7 +657,7 @@ fprintf(stderr,"new_mf = ");
 		    int i, c, j;
 
 		    for (i = 0, c = 0; i < D->NbConstraints; ++i) {
-			if (egalite[i] == 0)
+			if (egalite[i] == 0 || egalite[i] == -1)
 			    continue;
 			for (j = 0; j < D->Dimension+1; ++j)
 			    value_assign(CTest->p[j][c], 
@@ -674,6 +674,8 @@ fprintf(stderr,"new_mf = ");
 		/* Do not decrement nb_un if equality is redundant. */
 		if( redundant )
 		{
+		   egalite[pos]=-1;	/* Don't use in further redundance test
+					 */
 		   scan_m_face(pos+1,nb_un,D,new_mf);
 		}
 		else
