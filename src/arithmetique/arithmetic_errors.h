@@ -46,7 +46,7 @@ extern unsigned int any_exception_error;
 #define exception_debug_throw(what) \
   exception_debug("THROW", global_exception_index-1, what)
 
-#define EXCEPTION extern int
+#define EXCEPTION extern unsigned int
 
 #define global_exception_index_decr                                     \
     (global_exception_index > 0 ? --global_exception_index:             \
