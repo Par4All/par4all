@@ -2,7 +2,7 @@
 !     Reductions management 
 !
 ! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1996/10/17 14:46:34 $, )
+! ($Date: 1996/10/17 15:29:18 $, )
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -202,8 +202,8 @@ ifdef(`_HPFC_NO_INTEGER2_',,`REDUCTIONS(INTEGER2)')
 ifdef(`_HPFC_NO_INTEGER4_',,`REDUCTIONS(INTEGER4)')
 ifdef(`_HPFC_NO_REAL4_',,`REDUCTIONS(REAL4)')
 ifdef(`_HPFC_NO_REAL8_',,`REDUCTIONS(REAL8)')
-ifdef(`_HPFC_NO_COMPLEX8_',,`REDUCTIONS(COMPLEX8)')
-ifdef(`_HPFC_NO_COMPLEX16_',,`REDUCTIONS(COMPLEX16)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`CUMULATE_REDUCTIONS(COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`CUMULATE_REDUCTIONS(COMPLEX16)')
 
 dnl 
 dnl Runtime for the REDUCTION DIRECTIVE
