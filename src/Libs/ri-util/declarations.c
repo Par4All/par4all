@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.6  1997/11/29 13:30:16  coelho
+ * (heavy) fix to insure a deterministic prettyprint of dependent parameters.
+ *
  * Revision 1.5  1997/11/28 14:35:24  coelho
  * fixed empty EQUIVALENCE statement that could come out after code cleaning.
  *
@@ -585,7 +588,7 @@ equivalent_entity_compare(entity *ent1, entity *ent2)
 
     return(result);
 }
-
+ 
 /* static text text_equivalence_class(list  l_equiv)
  * input    : a list of entities representing an equivalence class.
  * output   : a text, which is the prettyprint of this class.
@@ -933,6 +936,183 @@ text_data(entity module, list /* of entity */ ldecl)
     return make_text(ls);
 }
 
+/*************************************************************** PARAMETERS */
+
+/* dependences: entity -> set of entity
+ * this should really be a framework for sorting things according
+ * to some local partial order that can be given.
+ * I'm quite unhappy with this, it's too complex.
+ */
+static hash_table preds = hash_table_undefined, succs = hash_table_undefined;
+static void init_P(list /* of key */ le)
+{
+    pips_assert("undefined hashs", 
+		hash_table_undefined_p(preds) &&
+		hash_table_undefined_p(succs));
+    preds = hash_table_make(hash_pointer, 0);
+    succs = hash_table_make(hash_pointer, 0);
+    MAP(STRING, p, hash_put(preds, p, (char*) set_make(hash_pointer)), le);
+    MAP(STRING, p, hash_put(succs, p, (char*) set_make(hash_pointer)), le);
+}
+static void close_P(void)
+{
+    pips_assert("defined hashs", 
+		!hash_table_undefined_p(preds) &&
+		!hash_table_undefined_p(succs));
+    HASH_MAP(p, s, set_free((set) s), preds);
+    HASH_MAP(p, s, set_free((set) s), succs);
+    hash_table_free(preds), preds = hash_table_undefined;
+    hash_table_free(succs), succs = hash_table_undefined;
+}
+static void dump_for_p(char * prefix, char * p)
+{
+    fprintf(stderr, "%s %s {", prefix, entity_name((entity)p));
+    SET_MAP(e, fprintf(stderr, " %s", entity_name((entity)e)), 
+	    (set) hash_get(preds, p));
+    fprintf(stderr, " } / {");
+    SET_MAP(e, fprintf(stderr, " %s", entity_name((entity)e)), 
+	    (set) hash_get(succs, p));
+    fprintf(stderr, " }\n");
+}
+static void dump_P(string what)
+{
+    fprintf(stderr, "\n[P] dumping order (%s):\n", what);
+    HASH_MAP(p, s, dump_for_p("[P]", p), preds);
+    fprintf(stderr, "\n");
+}
+static void add_arrow_P(const entity before, const entity after)
+{
+    /* before -> after */
+    set as = (set) hash_get(preds, (char*) after),
+	bs = (set) hash_get(succs, (char*) before);
+    set_add_element(as, as, (char*) before);
+    set_add_element(bs, bs, (char*) after);
+}
+static int cmp_P(const void * e1, const void * e2) /* e1 before e2 ? */
+{
+    int cmp;
+    set x = (set) hash_get(preds, (char*) e1);
+    if (set_belong_p(x, (char*) e2))
+	cmp=-1; /* e2 -> e1 */
+    else {
+	x = (set) hash_get(succs, (char*) e1);
+	if (set_belong_p(x, (char*) e2))
+	    cmp=1; /* e1 -> e2 */
+	else cmp = 0;
+    }
+    return cmp;
+}
+static int cmp_for_qsort(const void * e1, const void * e2)
+{
+    return cmp_P(*(void**)e1, *(void**)e2);
+}
+static void update_direction(hash_table lefts, set left, set right, set nexts)
+{
+    set nleft = set_make(hash_pointer);
+    set_assign(nleft, left);
+    SET_MAP(l_of_l, 
+	    set_union(nleft, (set) hash_get(lefts, l_of_l), nleft),
+	    left);
+    if (!set_equal(nleft, left)) {
+	set_assign(left, nleft);
+	set_union(nexts, right, nexts);
+    }
+    set_free(nleft);
+}
+/* function to compute the transitive closure of predecessors/successors.
+ */
+static void iterate(char * p, set nexts)
+{
+    set pr = (set) hash_get(preds, p), su = (set) hash_get(succs, p);
+    ifdebug(9) dump_for_p("[I in]", p);
+    update_direction(preds, pr, su, nexts);
+    update_direction(succs, su, pr, nexts);
+    ifdebug(9) { 
+	dump_for_p("[I out]", p); fprintf(stderr, "[I nexts] ");
+	SET_MAP(s, fprintf(stderr, " %s", entity_name((entity)s)), nexts);
+	fprintf(stderr, "\n");
+    }
+}
+
+static entity current_parameter = entity_undefined;
+static void add_call_arrow(call c)
+{
+    entity f = call_function(c);
+    if (hash_defined_p(preds, (char*)f))
+	add_arrow_P(f, current_parameter);
+}
+static void
+put_initial_arrows(entity e)
+{
+    value v = entity_initial(e);
+    current_parameter = e;
+    pips_assert("is symbolic", value_symbolic_p(v));
+    gen_recurse(value_symbolic(v), call_domain, gen_true, add_call_arrow);
+    current_parameter = entity_undefined;
+}
+
+static void 
+generate_order_data(list lp)
+{
+    set initial = set_make(hash_pointer);
+    init_P(lp);
+    MAP(ENTITY, e, put_initial_arrows(e), lp);
+
+    ifdebug(8) dump_P("initial arrows");
+
+    MAP(STRING, s, set_add_element(initial, initial, s), lp);
+    gen_set_closure_iterate(iterate, initial, FALSE);
+
+    /* this is just a partial order, invalid for qsort. 
+     * it must be completed as deteministically as possible.
+     * the method here seems quite poor from the complexity pov. O(n^4)...
+     */
+    ifdebug(8) dump_P("after dependences closure");
+
+    gen_sort_list(lp, compare_entities); /* for determinism. */
+
+    MAP(ENTITY, e1, 
+	MAP(ENTITY, e2,
+	    if ((e1!=e2) && cmp_P(e1, e2)==0)
+	    {
+		/* adds an artificial e1 < e2 and close on it. */
+		add_arrow_P(e1, e2);
+		gen_set_closure_iterate(iterate, initial, FALSE);
+	    },
+	    lp),
+	lp);		
+
+    /* now we should have a full order that suits qsort.
+     */
+
+    set_free(initial);
+    ifdebug(8) dump_P("after completion");
+}
+
+static text
+text_of_parameters(
+    list /* of entity that are parameters */ lp)
+{
+    list /* of sentence */ ls = NIL;
+
+    /* sort the parameters according to their dependences
+     */
+    generate_order_data(lp);
+    gen_sort_list(lp, cmp_for_qsort);
+    close_P();
+    
+    /* generate the sentences
+     */
+    MAP(ENTITY, e,
+	ls = CONS(SENTENCE, sentence_basic_declaration(e),
+	     CONS(SENTENCE, sentence_symbolic(e), ls)),
+	lp);
+
+    return make_text(ls);
+}
+
+/********************************************************** ALL DECLARATIONS */
+
 static text 
 text_entity_declaration(
     entity module, 
@@ -943,7 +1123,7 @@ text_entity_declaration(
     bool print_commons = !same_string_p(how_common, "none");
     list before = NIL, area_decl = NIL, ph = NIL,
 	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, 
-	pc8 = NIL, pc16 = NIL, ps = NIL;
+	pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL;
     text r, t_chars = make_text(NIL), t_area = make_text(NIL); 
     string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
     bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
@@ -996,21 +1176,21 @@ text_entity_declaration(
 	{
 	    pips_debug(5, "skipping entity %s\n", entity_name(e));
 	}
-	else if (param || external)
+	else if (param)
 	{
+	    /*        PARAMETER
+	     */
+	    pips_debug(7, "considered as a parameter\n");
+	    lparam = CONS(ENTITY, e, lparam);
+	} 
+	else if (external)
+	{
+	    /*        EXTERNAL
+	     */
+	    pips_debug(7, "considered as an external\n");
 	    before = CONS(SENTENCE, sentence_basic_declaration(e), before);
-	    if (param) {
-		/*        PARAMETER
-		 */
-		pips_debug(7, "considered as a parameter\n");
-		before = CONS(SENTENCE, sentence_symbolic(e), before);
-	    } else {
-		/*        EXTERNAL
-		 */
-		pips_debug(7, "considered as an external\n");
-		before = CONS(SENTENCE, sentence_external(e), before);
-	    }
-	 }
+	    before = CONS(SENTENCE, sentence_external(e), before);
+	}
 	else if (area_p && !dynamic_area_p(e) && !empty_static_area_p(e))
 	{
 	    /*            AREAS: COMMONS and SAVEs
@@ -1137,10 +1317,13 @@ text_entity_declaration(
 	}
     }, ldecl);
     
-    /* parameters must be kept in order
-     * because that may depend one from the other, hence the reversion.
-     */ 
+    /* usually they are sorted in order, and appended backwards,
+     * hence the reversion.
+     */
     r = make_text(gen_nreverse(before));
+
+    MERGE_TEXTS(r, text_of_parameters(lparam));
+    gen_free_list(lparam), lparam = NIL;
 
     ADD_WORD_LIST_TO_TEXT(r, ph);
     attach_declaration_type_to_words(ph, "INTEGER");
@@ -1160,16 +1343,18 @@ text_entity_declaration(
     attach_declaration_type_to_words(ps, "CHARACTER");
     MERGE_TEXTS(r, t_chars);
 
-    /* all about COMMON and SAVE declarations */
+    /* all about COMMON and SAVE declarations
+     */
     MERGE_TEXTS(r, make_text(area_decl));
-
     MERGE_TEXTS(r, t_area);
 
-    /* and EQUIVALENCE statements... - BC -*/
+    /* and EQUIVALENCE statements... - BC 
+     */
     MERGE_TEXTS(r, text_equivalences(module, ldecl, 
 				     pp_cinc || !print_commons));
 
-    /* what about DATA statements! FC */
+    /* what about DATA statements! FC 
+     */
     MERGE_TEXTS(r, text_data(module, ldecl));
 
     return r;
