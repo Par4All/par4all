@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/10/17 14:27:25 $, )
+# ($Date: 1996/10/17 15:40:36 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -164,7 +164,7 @@ endif
 #
 # pvm3 portability macros for Fortran calls to C functions:
 
-M4CFLAGS	+=	$(PVM_ARCH).m4
+M4COPT	+=	$(PVM_ARCH).m4
 
 PVM_HEADERS	= pvm3.h fpvm3.h
 LIB_M4FFILES = 	hpfc_packing.m4f \
