@@ -9,13 +9,14 @@ LIB_CFILES	= \
 	rw_effects_engine.c \
 	in_effects_engine.c \
 	out_effects_engine.c \
-	interprocedural.c \
 	mappings.c \
 	unary_operators.c \
 	binary_operators.c \
 	utils.c \
 	prettyprint.c \
 	intrinsics.c
+
+# 	interprocedural.c
 
 LIB_HEADERS	= effects-generic-local.h
 
