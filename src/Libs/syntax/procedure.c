@@ -50,7 +50,21 @@ remove_ghost_variable_entities()
 	/* The debugging message must use the variable name before it is freed
 	 */
 	pips_debug(1, "entity '%s'\n", entity_name(e));
-	remove_variable_entity(e);
+	if(entity_in_equivalence_chains_p(e)) {
+	    user_warning("remove_ghost_variable_entities",
+		     "Entity \"%s\" does not really exist but appears"
+		     " in an equivalence chain!\n",
+		     entity_name(e));
+	    if(!ParserError("remove_ghost_variable_entities",
+			    "Cannot remove still accessible ghost variable\n")) {
+		/* We already are in ParserError()! Too bad for the memory leak */
+		ghost_variable_entities = list_undefined;
+		return;
+	    }
+	}
+	else {
+	    remove_variable_entity(e);
+	}
 	pips_debug(1, "destroyed\n");
     }, 
 	ghost_variable_entities);
