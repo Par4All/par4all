@@ -34,7 +34,7 @@ static statement current_caller_stmt = statement_undefined;
 static list list_pairs = NIL;
 
 
-/* modifies global var current_caller_statement */
+/* modifies global var current_caller_stmt */
 static bool stmt_filter(s)
 statement s;
 {
@@ -160,7 +160,7 @@ add_parameter_aliases_for_this_call_site(call call_site,
 }
 
 /* constructs the alias pairs for this call site and adds them to the list
- * global vars IN: callee, list_regions_callee, current_caller_statement
+ * global vars IN: callee, list_regions_callee, current_caller_stmt
  * and list_pairs
  * modifies global var: list_pairs
  */
@@ -211,7 +211,7 @@ add_alias_pairs_for_this_call_site(call call_site)
 
 /* constructs the alias pairs for this caller and adds them to the list
  * global vars IN: callee, list_regions_callee and list_pairs
- * modifies global vars: list_pairs and current_caller_statement
+ * modifies global vars: list_pairs and current_caller_stmt
  */
 static void
 add_alias_pairs_for_this_caller( entity caller )
@@ -282,7 +282,7 @@ add_alias_pairs_for_this_caller( entity caller )
  * the list of alias pairs for this module
  * parameters: module name and list of regions
  * global vars IN: none
- * modifies global vars: callee, list_regions_callee, current_caller_statement
+ * modifies global vars: callee, list_regions_callee, current_caller_stmt
  * and list_pairs
  */
 static list
