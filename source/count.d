@@ -1,1 +1,0 @@
-count.o: count.c
