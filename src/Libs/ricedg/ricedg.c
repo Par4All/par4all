@@ -242,6 +242,12 @@ char *mod_name;
     debug(1,"rice_dependence_graph", 
 	  "Computing Rice dependence graph for %s\n", mod_name);
 
+    ifdebug(1) {
+	mem_spy_init(2, 0.000001, NET_MEASURE, 0);
+    }
+
+    debug_off();
+
     set_current_module_entity(module);
 
     set_current_module_statement( (statement)
@@ -253,17 +259,76 @@ char *mod_name;
     chains = (graph)
 	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
 
-    ifdebug(1) {
+    debug_on("RICEDG_DEBUG_LEVEL");
+
+    ifdebug(2) {
+	hash_warn_on_redefinition();
 	gen_consistent_p (chains);
     }
+
+    ifdebug(1) {
+	fprintf(stderr, "Space for chains: %d bytes\n", 
+		gen_allocated_memory(chains));
+	mem_spy_begin();
+    }
     
+    hash_warn_on_redefinition();
     dg = gen_copy_tree (chains);
+
+    ifdebug(1) {
+	mem_spy_end("After DG copy 1");
+	fprintf(stderr, "Space for chains's copy: %d bytes\n", 
+		gen_allocated_memory(dg)); 
+    	mem_spy_begin();
+    }
+
+    debug(8,"rice_dependence_graph","original graph\n");
+    ifdebug(8) {  	
+	print_graph(stderr, mod_stat, dg);
+    }
+
+    free_graph(dg);
+    dg =  graph_undefined;
+
+    ifdebug(1) {
+	mem_spy_end("After DG copy 1 and free 1");
+	fprintf(stderr, "Space for chains's copy: %d bytes\n", 
+		gen_allocated_memory(dg));
+	mem_spy_begin();
+    }
+    dg = gen_copy_tree (chains);
+
+    ifdebug(1) {
+	mem_spy_end("After DG copy 2");
+	fprintf(stderr, "Space for chains's copy: %d bytes\n", 
+		gen_allocated_memory(dg));
+	mem_spy_begin();
+    }
+
+    free_graph(dg);
+    dg =  graph_undefined;
+
+    ifdebug(1) {
+	mem_spy_end("After DG copy 2 and free 2");
+	fprintf(stderr, "Space for chains's copy: %d bytes\n", 
+		gen_allocated_memory(dg));
+	mem_spy_begin();
+    }
+    dg = gen_copy_tree (chains);
+
+    ifdebug(1) {
+	mem_spy_end("After DG copy 3");
+	fprintf(stderr, "Space for chains's copy: %d bytes\n", 
+		gen_allocated_memory(dg));
+    }
 
     debug(8,"rice_dependence_graph","original graph\n");
     ifdebug(8) {  	
 	print_graph(stderr, mod_stat, dg);
     }
     
+    debug_off();
+
     if(dg_type == DG_SEMANTICS)
 	set_precondition_map( (statement_mapping)
 	    db_get_memory_resource(DBR_PRECONDITIONS, mod_name, TRUE) );
@@ -271,6 +336,7 @@ char *mod_name;
     set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
 	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE)) );
 
+    debug_on("RICEDG_DEBUG_LEVEL");
     debug(1, "rice_dependence_graph", "finding enclosing loops ...\n");
 
     set_enclosing_loops_map( loops_mapping_of_statement(mod_stat));
@@ -292,7 +358,16 @@ char *mod_name;
 	    
     /* walk thru mod_stat to find well structured loops.
        update dependence graph for these loops. */
+
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+
     rdg_statement(mod_stat);
+
+    ifdebug(1) {
+	mem_spy_end("After DG computation");
+    }
   
     ifdebug(3) {
 	printf("\nThe results of statistique of test of dependence are:\n");
@@ -335,7 +410,7 @@ char *mod_name;
     if (get_bool_property(RICEDG_PROVIDE_STATISTICS))
 	writeresult(mod_name);
 
-    ifdebug(1) {
+    ifdebug(2) {
 	fprintf(stderr, "updated graph\n");
 	print_graph(stderr, mod_stat, dg);
     }
@@ -350,6 +425,10 @@ char *mod_name;
     }
     
 
+    ifdebug(1) {
+	mem_spy_reset();
+    }
+
     debug_off();
 
     DB_PUT_MEMORY_RESOURCE(DBR_DG, strdup(mod_name), (char*) dg);
@@ -357,7 +436,8 @@ char *mod_name;
     reset_current_module_entity();
     reset_current_module_statement();
     reset_precondition_map();
-    reset_cumulated_effects_map();
+    /* An auxiliary hash table was allocated by effects_to_list_map */
+    free_cumulated_effects_map();
     reset_enclosing_loops_map();
 
     return TRUE;
@@ -538,7 +618,7 @@ set region;
 		    true_conflicts = gen_nconc(true_conflicts, 
 					       CONS(CONFLICT, c, NIL));
 		}
-		else  /*Compute this conflit and it's opposite*/
+		else  /*Compute this conflit and the opposite one */
 		{
 		    list ps2su = NIL, ps2sus = NIL, pcs2s1 = NIL, pchead1 = NIL;
 		    successor s2su = successor_undefined;
@@ -628,7 +708,7 @@ set region;
 
 		    llv1 = gen_copy_seq(llv);
 		
-		    levels = TestCoupleOfEffects(s1, e1, s2, e2,llv1,&gs,
+		    levels = TestCoupleOfEffects(s1, e1, s2, e2, llv1, &gs,
 						 &levelsop, &gsop);
 		    
 		    /* updating DG for the dependence (s1,e1)-->(s2,e2)*/
@@ -826,16 +906,17 @@ Ptsg *gs,*gsop;
 
 
 /* 
-this function checks if two references have memory locations in common.
-
-the problem is obvious for references to the same scalar variable.
-
-the problem is also obvious if the references are not of the same
-variable, except if the two variables have memory locations in common,
-in which case we assume there are common locations.
-
-when both references are of the same array variable, the function
-TestDependence is called.
+ * This function checks if two references have memory locations in common.
+ *
+ * The problem is obvious for references to the same scalar variable.
+ *
+ * The problem is also obvious if the references are not to the same
+ * variable, except if the two variables have memory locations in common,
+ * in which case we assume there are common locations and all kind of
+ * dependences (although offsets in COMMON could be taken into account).
+ *
+ * When both references are to the same array variable, the function
+ * TestDependence() is called.
 */
 
 static list TestCoupleOfReferences(n1, sc1, s1, ef1, r1, n2, sc2, s2, ef2, r2,llv,gs,levelsop, gsop)
@@ -858,6 +939,9 @@ Ptsg *gs, *gsop;
     list b1 = reference_indices(r1),
          b2 = reference_indices(r2);
 
+    ifdebug(1) {
+	mem_spy_begin();
+    }
 
     if(e1 != e2) 
     {
@@ -970,6 +1054,10 @@ Ptsg *gs, *gsop;
 				"non-exact elimination of F-M!");
 	    }
 	}
+
+	ifdebug(1) {
+	    mem_spy_end("TestCoupleOfReferences-1");
+	}
 	
 	return(levels);
     } 
@@ -1014,6 +1102,10 @@ Ptsg *gs, *gsop;
 	    }
 	}
 	
+
+	ifdebug(1) {
+	    mem_spy_end("TestCoupleOfReferences-2");
+	}
 	return(levels);
     }
 }
@@ -1024,21 +1116,52 @@ Ptsg *gs, *gsop;
  *                             reference r1, r2, list llv,
  *                             list *levelsop, Ptsg *gs,*gsop)
  * input    : 
- *      list n1, n2    : enclosing loops for statements s1 and s2;
+ *      list n1, n2      : enclosing loops for statements s1 and s2;
  *      Psysteme sc1, sc2: current context for each statement;
  *      statement s1, s2 : currently analyzed statements;
  *      effect ef1, ef2  : effects of each statement upon the current variable;
  *                         (maybe array regions)
  *      reference r1, r2 : current variables references;
- *      list llv        : loop variant list (variables that vary in loop nests);
- *      list *levelsop  : ? ( dependence levels from s2 to s1?);
- *      Ptsg *gs,*gsop   : depedence cone and ? (idem from s2 to s1 ?).
- * output   : dependence levels.
- * modifies : levelsop, gsop;
- * comment  : 
- * modification : l'ajout des tests de fasabilites pour le systeme initial
- * avant la projection.  
- * Yi-Qing (18/10/91)
+ *      list llv         : loop variant list
+ *                         (variables that vary in loop nests n1 and n2?);
+ *      list *levelsop   : dependence levels from s2 to s1
+ *      Ptsg *gs,*gsop   : dependence cones from s1 to s2 and from s2 to s1
+ * output   : dependence levels from s1 to s2
+ * modifies : levelsop, gsop, gs and returns levels
+ *
+ * Comments :
+ *
+ * This procedure has been amplified twice. The initial procedure
+ * only computed the dependence levels, "levels", for conflict s1->s2.
+ * The dependence cone computation was added by Yi-Qing Yang. She later
+ * added the computation of the dependence levels and the dependence cone
+ * for symetrical conflict, s2 -> s1, because both conflicts share the
+ * same dependence system and because a set of tests can be shared.
+ *
+ * For her PhD, Yi-Qing Yang also added intermediate tests and instrumentation.
+ *
+ * This much too long procedure is made of three parts:
+ *  0. The initialization of the dependence system
+ *  1. A set of feasibility tests applied to the dependence system
+ *  2. The computation of levels and cone for s1->s2
+ *  3. The very same computation for s2->s1
+ *
+ * Modification : 
+ *
+ * - ajout des tests de faisabilites pour le systeme initial,
+ * avant la projection. Yi-Qing (18/10/91)
+ *
+ * - decoupage de la procedure par Beatrice Creusillet
+ *
+ * - (indirect) build_and_test_dependence_context(), in fact system, no
+ *   longer has side effects on sc1 and sc2 thru sc_normalize(); FI (12/12/95)
+ *
+ * - sc_rm() uncommented out after call to gcd_and_constant_dependence_test()
+ *
+ * - base_rm(tmp_base) added after call to sc_proj_optim_on_di_ofl() just
+ *   before returning with levels==NIL
+ *
+ * - sc_rm() added for dep_syst, dep_syst1, dep_syst_op and dep_syst2
  */
 static list TestDependence(n1, sc1, s1, ef1, r1, n2, sc2, s2, ef2, r2, llv, gs,levelsop,gsop)
 list n1, n2;
@@ -1061,6 +1184,11 @@ Ptsg *gs,*gsop;
     list levels;
     Pvecteur DiIncNonCons = NULL;
 
+    ifdebug(1) {
+	mem_spy_begin();
+	mem_spy_begin();
+    }
+
     /* Elimination of loop indices from loop variants llv */
     /* We use n2 because we take care of variables modified in 
        an iteration only for the second system. */
@@ -1073,8 +1201,14 @@ Ptsg *gs,*gsop;
 
     ifdebug(6) 
     {
-	debug(6, "", "loop variants after removing loop indices :\n");
+	debug(6, "TestDependence",
+	      "loop variants after removing loop indices :\n");
 	print_arguments(llv);
+    }
+
+    ifdebug(1) {
+	mem_spy_end("TestDependence: Step 1.a");
+	mem_spy_begin();
     }
     
     /* Build the dependence context system from the two initial context systems
@@ -1083,12 +1217,24 @@ Ptsg *gs,*gsop;
     if (!build_and_test_dependence_context(r1, r2, sc1, sc2, &dep_syst, llv, n2)) 
     {
 	/* the context system is not feasible : no dependence. BC */
+	/* No dep_syst() to deallocate either, FI */
 	NbrIndepFind++;
 	debug(4, "TestDependence", "context system not feasible\n");
 	*levelsop = NIL;
+
+	ifdebug(1) {
+	    mem_spy_end("TestDependence: Step 1.b.a");
+	    mem_spy_end("TestDependence-1");
+	}
+
 	return(NIL);
     }
     
+
+    ifdebug(1) {
+	mem_spy_end("TestDependence: Step 1.b.b");
+	mem_spy_begin();
+    }
 
     /* Further construction of the dependence system; Constant and GCD tests
      * at the same time. 
@@ -1096,12 +1242,24 @@ Ptsg *gs,*gsop;
     if (gcd_and_constant_dependence_test(r1,r2,llv,n2,&dep_syst)) 
     {
 	/* independence proved */
-	/* sc_rm(dep_syst); */
+	/* FI: the next statement was commented out... */
+	sc_rm(dep_syst);
 	NbrIndepFind++;
 	*levelsop = NIL;
+
+	ifdebug(1) {
+	    mem_spy_end("TestDependence: Step 1.c.a");
+	    mem_spy_end("TestDependence-2");
+	}
+
 	return(NIL);
     }
-    
+
+    ifdebug(1) {
+	mem_spy_end("TestDependence: Step 1.c.b");
+	mem_spy_begin();
+    }
+
     dependence_system_add_lci_and_di(&dep_syst, n1, &DiIncNonCons);
 
     ifdebug(6)  
@@ -1110,26 +1268,63 @@ Ptsg *gs,*gsop;
 	syst_debug(dep_syst);
     }
 
-    /* Consistance Test */
-    if ((dep_syst = sc_normalize(dep_syst)) == NULL) 
+    ifdebug(1) {
+	mem_spy_end("TestDependence: Step 1.d");
+	mem_spy_begin();
+    }
+
+    /* Consistency Test */
+    if ((dep_syst = sc_normalize(dep_syst)) == SC_EMPTY)
     {
+	/* dep_syst has already been deallocated */
 	NbrTestSimple++;	
 	NbrIndepFind++;
 	debug(4, "TestDependence", "initial normalized system not feasible\n");
 	*levelsop = NIL;
+
+	ifdebug(1) {
+	    mem_spy_end("TestDependence: Step 1.e.a");
+	    mem_spy_end("TestDependence-3");
+	}
+
 	return(NIL);
+    }
+
+    ifdebug(1) {
+	mem_spy_end("TestDependence: Step 1.e.b");
+	mem_spy_begin();
     }
 
     cl = FindMaximumCommonLevel(n1, n2);
 
+    ifdebug(1) {
+	mem_spy_end("TestDependence: Step 1.f");
+	mem_spy_begin();
+    }
+
     if (TestDiCnst(dep_syst, cl, s1, ef1, s2, ef2) == TRUE ) 
     {
-	/*find independences (no loop carried dependence at the same statement).*/
+	/* find independences (non loop carried dependence, intra-statement).*/
+	/* Such dependences are counted here as independence, but other
+	 * parallelizer preserve them because they are useful for
+	 * (assembly) instructon level scheduling
+	 */
 	NbrTestDiCnst++;
 	NbrIndepFind++;
-	debug(4,"TestDependence","\nTestDiCnst successed!\n");
+	debug(4,"TestDependence","\nTestDiCnst succeeded!\n");
 	*levelsop = NIL;
+
+	ifdebug(1) {
+	    mem_spy_end("TestDependence: Step 1.g.a");
+	    mem_spy_end("TestDependence-4");
+	}
+
 	return(NIL);
+    }
+
+    ifdebug(1) {
+	mem_spy_end("TestDependence: Step 1.g.b");
+	mem_spy_begin();
     }
 	
     is_test_exact = TRUE;
@@ -1141,8 +1336,14 @@ Ptsg *gs,*gsop;
 
     if (setjmp(overflow_error)) 
     {
+	/* Some kind of arithmetic error, e.g. an integer overflow
+	 * has occured. Assume dependence to be conservative.
+	 */
 	Pbase dep_syst_base = BASE_UNDEFINED;
 
+	/* FI: wouldn't it be simpler to enumerate the useful di
+	 * variables?!?
+	 */
 	/* eliminate non di variables from the basis */
 	for (coord = tmp_base; !VECTEUR_NUL_P(coord); coord = coord->succ) 
 	{
@@ -1152,16 +1353,21 @@ Ptsg *gs,*gsop;
 		base_add_variable(dep_syst_base, v);		
 	}
 	dep_syst = sc_rn(dep_syst_base);
-
     }
-    else 
-    {
-	if (sc_proj_optim_on_di_ofl(cl, &dep_syst) == INFAISABLE) 
-	{	
+    else {
+	if (sc_proj_optim_on_di_ofl(cl, &dep_syst) == FALSE) {	
 	    debug(4,"TestDependence",
 		  "projected system by sc_proj_optim_on_di() is not feasible\n");
+	    sc_rm(dep_syst);
 	    NbrIndepFind++;
 	    *levelsop = NIL;
+
+	    ifdebug(1) {
+		mem_spy_end("TestDependence: Step 1.h.a");
+		mem_spy_end("TestDependence-5");
+	    }
+
+	    base_rm(tmp_base);
 	    return(NIL);
 	}
     }
@@ -1173,13 +1379,24 @@ Ptsg *gs,*gsop;
 	fprintf(stderr, "projected system is:\n");
 	syst_debug(dep_syst);
     }
-    
 
-    if (! sc_faisabilite_optim(dep_syst)) 
+    ifdebug(1) {
+	mem_spy_end("TestDependence: Step 1.h.b");
+	mem_spy_begin();
+    }
+
+    if (!sc_faisabilite_optim(dep_syst)) 
     {
+	/* Here, the long jump overflow buffer is handled at a lower level! */
 	debug(4,"TestDependence", "projected system not feasible\n");
 	NbrIndepFind++;
 	*levelsop = NIL;
+
+	ifdebug(1) {
+	    mem_spy_end("TestDependence: Step 1.i.a");
+	    mem_spy_end("TestDependence-6");
+	}
+
 	return(NIL);
     }
     
@@ -1190,9 +1407,18 @@ Ptsg *gs,*gsop;
 	fprintf(stderr, "The list of DiIncNonCons is :\n");
 	vect_debug(DiIncNonCons);
     }
-    
 
-    /* keep DiIncNonCons variable if it's zero, otherwise move it in the dep_syst*/
+    ifdebug(1) {
+	mem_spy_end("TestDependence: Step 1.i.b");
+	mem_spy_begin();
+    }
+
+    /* keep DiIncNonCons variables if their value is unknown or different
+     * from zero. Otherwise eliminate them from the dep_syst
+     *
+     * FI: I'm lost for this step. My guess DiIncNonCons==VECTEUR_NUL
+     * in 99.99 % of all cases...
+     */
     if (dep_syst != NULL) 
     {
 	while (DiIncNonCons != NULL){
@@ -1202,7 +1428,7 @@ Ptsg *gs,*gsop;
 	    di = DiIncNonCons->var;
 	    if (sc_value_of_variable(dep_syst, di, &val) ==  TRUE)
 		if (val != 0){
-		    sc_elim_var(dep_syst,di);
+		    sc_elim_var(dep_syst, di);
 		}
 	    DiIncNonCons = DiIncNonCons->succ;
 	}
@@ -1211,16 +1437,43 @@ Ptsg *gs,*gsop;
     ifdebug(4) 
     {
 	fprintf(stderr, 
-		"normalised projected system after kill DiIncNonCons is:\n");
+		"normalised projected system after DiIncNonCons elimination is:\n");
 	syst_debug(dep_syst);
     }
+
+    ifdebug(1) {
+	mem_spy_end("TestDependence: Step 1.j");
+	mem_spy_begin();
+    }
+
+    ifdebug(1) {
+	mem_spy_end("TestDependence: first phase");
+	mem_spy_begin();
+    }
     
-    /* compute the levels of dep from s1 to s2 and of the opposite
-       dep from s2 to s1 if it exists*/  
+    /* Compute the levels for dependence arc s1 to s2 and of the opposite
+     * dependence arc s2 to s1. Also compute the dependence cones if some
+     * level exists (FI: shouldn't it be a loop-carried level?).
+     *
+     * For both cases, two systems are allocated, one is used to find the
+     * dependence levels, the other one to compute the dependence cone.
+     *
+     * For s1->s2, dep_syst is used to compute the levels and dep_syst1 
+     * the cone.
+     *
+     * For s2->s1, dep_syst_op (op==oppposite) is used to find the dependence
+     * levels, and dep_syst2 the dependence cone.
+     */  
     
+    /* Build the dependence system for the opposite arc s2->s1
+     * before dep_syst is modified
+     */
+
     *levelsop = NIL;
     if (Finds2s1) dep_syst_op = sc_invers(sc_dup(dep_syst));
 
+
+    /* Start processing for arc s1->s2 */
 
     ifdebug(4) 
     {
@@ -1229,23 +1482,46 @@ Ptsg *gs,*gsop;
 	syst_debug(dep_syst);
     }
     
+    /* Make a proper copy of dep_syst before it is destroyed to compute
+     * dependence levels. The basis must be in a specific order to check
+     * lexico-positivity.
+     */
     dep_syst1 = sc_dup(dep_syst);
     b = MakeDibaseinorder(cl);
     base_rm(dep_syst1->base);
     dep_syst1->base = b; 
     dep_syst1->dimension = cl;
-    
+
     if (dep_syst1->dimension == dep_syst1->nb_eq)
 	is_dep_cnst = TRUE;
 
+    /* Compute dependence levels for s1->s2 */
     levels = TestDiVariables(dep_syst, cl, s1, ef1, s2, ef2);
+    /* dep_syst is unfeasible or almost empty, and now useless */
+    sc_rm(dep_syst);
+
     /* if (levels == NIL) NbrTestDiVar++;  Qui l'a enleve', pourquoi ? */
+
     if (levels != NIL) 
     {
+
+	ifdebug(1) {
+	    mem_spy_begin();
+	}
 	*gs = dependence_cone_positive(dep_syst1);
-	/* if the cone is not feasible, there are no loop-carried dependences;
-	 * this was not found by the previous test when computing levels;
-	 * but the dependence cone construction does not consider non-loop
+	sc_rm(dep_syst1);
+
+	ifdebug(1) {
+	    mem_spy_end("After dependence cone positive s1->s2");
+	}
+
+	/* If the cone is not feasible, there are no loop-carried dependences.
+	 * (FI: the cone is strictly positive then...)
+	 *
+	 * This might not havebeen found by the previous test when computing
+	 * levels.
+	 *
+	 * But the dependence cone construction does not consider non-loop
 	 * carried dependences; so we can only remove those levels that are
 	 * smaller than the number of common levels
 	 */
@@ -1273,6 +1549,8 @@ Ptsg *gs,*gsop;
 	}
     }
 
+    /* print results for arc s1->s2 */
+
     ifdebug(4) 
     {	
 	fprintf(stderr, "\nThe levels for dep (s1,s2) are:");
@@ -1294,6 +1572,13 @@ Ptsg *gs,*gsop;
     }
 
 
+    ifdebug(1) {
+	mem_spy_end("TestDependence: second phase");
+	mem_spy_begin();
+    }
+
+    /* Start the processing for arc s2->s1 */
+
     if (Finds2s1) 
     {
 	
@@ -1311,10 +1596,21 @@ Ptsg *gs,*gsop;
 	dep_syst2->dimension = cl;
 
 	*levelsop = TestDiVariables(dep_syst_op, cl, s2, ef2, s1, ef1);
+	sc_rm(dep_syst_op);
 	if (*levelsop != NIL)
 	{
 	    /* if (*levelsop == NIL) NbrTestDiVar++;  Pourquoi? */
-	    *gsop = dependence_cone_positive(dep_syst2);	    
+
+	    ifdebug(1) {
+		mem_spy_begin();
+	    }
+	    *gs = dependence_cone_positive(dep_syst2);
+	    sc_rm(dep_syst2);
+
+	    ifdebug(1) {
+		mem_spy_end("After dependence cone positive s2->s1");
+	    }
+
 	/* if the cone is not feasible, there are no loop-carried dependences;
 	 * this was not found by the previous test when computing levels;
 	 * but the dependence cone construction does not consider non-loop
@@ -1372,10 +1668,20 @@ Ptsg *gs,*gsop;
 	    /* the case of "all equals" independence at the same statement*/ 
 	    NbrAllEquals++;
 	}
+
+	ifdebug(1) {
+	    mem_spy_end("TestDependence: third phase");
+	    mem_spy_end("TestDependence-7");
+	}
 	
 	return(NIL);
     }
     
+
+    ifdebug(1) {
+	mem_spy_end("TestDependence: third phase");
+	mem_spy_end("TestDependence");
+    }
 
     return(levels);    
 }
@@ -1386,28 +1692,42 @@ Ptsg *gs,*gsop;
  *                                                  list llv, s2_enc_loops)
  * input    : 
  *      reference r1, r2  : current array references;
- *      Psystem sc1, sc2  : context systems for r1 and r2; they might be modified
+ *      Psystem sc1, sc2  : context systems for r1 and r2;
+ *                          they might be modified and even be freed (!)
  *                          by normalization procedures
  *      Psystem *psc_dep  : pointer toward the dependence context systeme;
  *      list llv          : current loop nest variant list;
  *      list s2_enc_loops : statement s2 enclosing loops;
  *
  * output  :
- *      boolean           : FALSE if one of the initial systems is unfeasible after normalization;
+ *      boolean           : FALSE if one of the initial systems is unfeasible
+ *                          after normalization;
  *                          TRUE otherwise;
  *      *psc_dep          : dependence system is the function value is TRUE;
- *                          SC_EMPTY otherwise;
+ *                          SC_EMPTY otherwise; no need to sc_rm() in the
+ *                          latter case.
  *
  * side effects : 
- *      psc_dep           : points toward the dependence context system built from 
- *                          sc1 and sc2, r1 and r2. 
+ *      psc_dep           : points toward the dependence context system built 
+ *                          from sc1 and sc2, r1 and r2, and llv.
  *                          Dependence distance variables (di) are introduced
- *                          in sc2, along with the dsi variables to take care of variables in llv
+ *                          in sc2, along with the dsi variables to take care
+ *                          of variables in llv
  *                          modified in the loop nest;
- *                          unrelevant constraints are removed
+ *                          irrelevant (?) existencial constraints are removed.
  *                          in order to make further manipulations easier.
  *      sc1               : side_effect of sc_normalize()
- * comment  :
+ *      sc2               : side_effect of sc_normalize()
+ *
+ * Comment  :
+ *
+ * Modifications:
+ *  - sc1 and sc2 cannot be sc_normalized because they may be part of
+ *    statement preconditions or regions; sc_normalize() is replaced by
+ *    sc_empty_p(); since regions and preconditions are normalized with
+ *    stronger normalization procedure, and since the feasibility of the
+ *    dependence test will be tested with an even stronger test, this
+ *    should have no accuracy impact (FI, 12 December 1995)
  */
 static boolean build_and_test_dependence_context(r1, r2, sc1, sc2, psc_dep, llv, 
 						 s2_enc_loops)
@@ -1441,7 +1761,7 @@ list llv, s2_enc_loops;
 	     */
 	    Pbase variables = BASE_UNDEFINED;	    
 	    
-	    if (sc_normalize(sc1) == NULL) 
+	    if (sc_empty_p(sc1)) 
 	    {
 		*psc_dep = SC_EMPTY;
 		debug(4, "build_and_test_dependence_context", 
@@ -1474,7 +1794,8 @@ list llv, s2_enc_loops;
 	    },
 		reference_indices(r1));
 	    
-	    sc_dep = sc_restricted_to_variables_transitive_closure(sc1, variables);
+	    sc_dep = sc_restricted_to_variables_transitive_closure(sc1,
+								   variables);
 	}
 
 	if(SC_UNDEFINED_P(sc2))
@@ -1495,7 +1816,7 @@ list llv, s2_enc_loops;
 	     */
 	    Pbase variables = BASE_UNDEFINED;
 
-	    if (sc_normalize(sc2) == NULL) 
+	    if (sc_empty_p(sc2)) 
 	    {
 		*psc_dep = SC_EMPTY;
 		debug(4, "build_and_test_dependence_context", 
@@ -1530,7 +1851,8 @@ list llv, s2_enc_loops;
 	    },
 		reference_indices(r2));
 	    
-	    sc_tmp = sc_restricted_to_variables_transitive_closure(sc2, variables);
+	    sc_tmp = sc_restricted_to_variables_transitive_closure(sc2,
+								   variables);
 	}
 	
 	ifdebug(6) 
@@ -1560,6 +1882,9 @@ list llv, s2_enc_loops;
 	     * It would be better to know the precondition associated
 	     * to the corresponding loop statement, but the information
 	     * is lost in this low-level function.
+	     *
+	     * FI: this is not true, you have sc1 and sc2 at hand to call
+	     * sc_minmax_of_variable()
 	     */
 	    inc = loop_increment_value(lo);
 	    if (inc != 0)  
@@ -1573,19 +1898,19 @@ list llv, s2_enc_loops;
 	    sc_add_dsi(l,ENTITY(CAR(pc)),sc_tmp);
 	}
 
-	/* sc_tmp is  emptied and freer by sc_fusion() */
+	/* sc_tmp is emptied and freed by sc_fusion() */
 	sc_dep = sc_fusion(sc_dep, sc_tmp);
     }
 
     ifdebug(6) 
     {
-	debug(6, "build_and_test_dependence_context", "\ndependence context is:\n");
+	debug(6, "build_and_test_dependence_context",
+	      "\ndependence context is:\n");
 	syst_debug(sc_dep);
     }
 
     *psc_dep = sc_dep;
     return(TRUE);
-
 }
 
 
@@ -1596,14 +1921,15 @@ list llv, s2_enc_loops;
  * input    : 
  *      references r1, r2 : current references;
  *      list llv          : loop nest variant list;
- *      list s2_enc_loops : statement s2 enclosing loops;
+ *      list s2_enc_loops : enclosing loops for statement s2;
  *      Psysteme *psc_dep : pointer toward the depedence system;
  * output   : TRUE if there is no dependence (GCD and constant test successful);
  *            FALSE if independence could not be proved.
- * modifies : *psc_dep;
+ * modifies : *psc_dep; at least adds dependence equations on phi variables
  * comment  :
- *      *psc_dep must not be undefined on entry; it must have been initialized
- *      by build_and_test_dependence_context.
+ *  - *psc_dep must be defined on entry; it must have been initialized
+ *    by build_and_test_dependence_context.
+ *  - no side effects on r1, r2,...
  */
 static boolean gcd_and_constant_dependence_test(r1, r2, llv, s2_enc_loops, psc_dep)
 reference r1, r2;
@@ -1682,10 +2008,10 @@ Psysteme *psc_dep;
     }
 
 
-    if (pc1 != NIL || pc2 != NIL)
-	/* should be an assert. BC. */
-	user_warning("TestDependence", "lengths of index lists differ\n");
-
+    if (pc1 != NIL || pc2 != NIL) {
+	pips_error("gcd_and_constant_dependence_test",
+		   "numbers of subscript expressions differ\n");
+    }
 
     return(FALSE);
 }
@@ -1699,12 +2025,23 @@ Psysteme *psc_dep;
  *      Psysteme *psc_dep : pointer toward the dependence system;
  *      list s1_enc_loops : statement s1 enclosing loops;
  *      Pvecteur *p_DiIncNonCons : pointer toward DiIncNonCons.
- * output   : nothing;
- * modifies : the dependence systeme (addition of constraints with lci and di 
- *            variables); and di variables are added to DiIncNonCons.
+ *
+ * output   : none
+ *
+ * modifies : 
+ *
+ *  *psc_dep, the dependence systeme (addition of constraints with lci and di 
+ *            variables, if useful; lci is a loop counter, di an iteration
+ *            difference variable);
+ *
+ *  DiIncNonCons: di variables are added to DiIncNonCons (means Di variables
+ *            for loops with non constant increment, i.e. unknown increment),
+ *            if any such loop exists.
+ *
  * comment  : DiIncNonCons must be undefined on entry.
  */
-static void dependence_system_add_lci_and_di(psc_dep, s1_enc_loops, p_DiIncNonCons)
+static void dependence_system_add_lci_and_di(psc_dep, s1_enc_loops,
+					     p_DiIncNonCons)
 Psysteme *psc_dep;
 list s1_enc_loops;
 Pvecteur *p_DiIncNonCons;
@@ -1715,7 +2052,9 @@ Pvecteur *p_DiIncNonCons;
     pips_assert("dependence_system_add_lci_and_di", 
 		VECTEUR_UNDEFINED_P(*p_DiIncNonCons));
 
-    /* Addition of lck and di variables */
+    /* Addition of lck, the loop counters, and di, the iteration difference,
+     * variables (if useful).
+     */
     for (pc = s1_enc_loops,l = 1; pc != NIL; pc = CDR(pc), l++) 
     {
 	loop lo = statement_loop(STATEMENT(CAR(pc)));
@@ -1725,6 +2064,12 @@ Pvecteur *p_DiIncNonCons;
 	expression lb = range_lower(loop_range(lo));
 	normalized nl = NORMALIZE_EXPRESSION(lb);
 
+	/* If the loop increment is not trivial, express the current
+	 * index value as the sum of the lower bound and the product
+	 * of the loop counter by the loop increment.
+	 *
+	 * Else, this new equation would be redundant
+	 */
 	/* make   nl + inc*lc# - ind = 0 */
 	if (inc != 0 && inc != 1 && inc != -1 && normalized_linear_p(nl)) 
 	{	   
@@ -1740,7 +2085,10 @@ Pvecteur *p_DiIncNonCons;
 	    sc_add_eg(*psc_dep, pc);
 	}
 	
-	/* make d#i -l#i + ind = 0 ,
+	/* If the loop increment is unknown, which is expressed by inc==0,
+	 * well, I do not understand what li variables are, not how they work
+	 */
+	/* make d#i - l#i + ind = 0 ,
 	   add d#i in list of DiIncNonCons*/
 	if (inc == 0) 
 	{
@@ -1760,6 +2108,7 @@ Pvecteur *p_DiIncNonCons;
 	    
     }
 
+    /* Update basis */
     if(!BASE_NULLE_P((*psc_dep)->base)) 
     {
 	vect_rm((*psc_dep)->base);
@@ -1772,26 +2121,45 @@ Pvecteur *p_DiIncNonCons;
 
 
 /*
-this function implements the last step of the CRI dependence test. ps is
-a system that has been projected on di variables. ps is examined to find
-out the set of possible values for di variables.
-
-there is a loop from 1 to cl, the maximum nesting level. at each step,
-the di variable corresponding to the current nesting level is examined.
-dependences added to the graph depend on the sign of the values computed
-for di. there is a dependence from s1 to s2 if di is positive and from
-s2 to s1 if di is negative. there are no dependence if di is equal to
-zero. finally, di is replaced by 0 at the end of the loop since
-dependences at level l are examined with sequential enclosing loops.
-
-ps is the projected system (the distance system for the dep: (s1->s2).
-
-cl is the common nesting level of statement s1 and s2.
-
-* Modification : l'ajout de variable NotPositive pour prendre en compt le cas 
-* quand di<=0.
-* Yi Qing (10/91)
-*/
+ * This function implements one of the last steps of the CRI dependence test.
+ *
+ * System ps has been projected on di variables. ps is examined to find
+ * out the set of possible values for di variables, the iteration differences
+ * for which a dependence exist.
+ *
+ * Loops are numbered from 1 to cl, the maximum nesting level. 
+ * At each step, the di variable corresponding to the current nesting level
+ * is examined.
+ *
+ * Dependences levels added to the graph depend on the sign of the values
+ * computed for di. There is a dependence from s1 to s2 if di can be
+ * positive and from s2 to s1 if di can be negative. 
+ *
+ * There are no loop-carried dependence if di is equal to zero. The 
+ * corresponding level is cl+1.
+ *
+ * Finally, di is set to 0 at the end of the loop since
+ * dependences at level l are examined assuming the enclosing loops are
+ * at the same iteration.
+ *
+ * Input:
+ *
+ *   ps is the projected system (the distance system for the dep: (s1->s2).
+ *      a copy of ps, pss is allocated to compute di's value, but ps is
+ *      modified until it is empty (all di variables have been projected),
+ *      or until it is unfeasible (this is detected on pss)
+ *
+ *   cl is the common nesting level of statement s1 and s2.
+ *
+ * Temporaries:
+ *
+ *   pss is deallocated by sc_minmax_of_variable_optim()
+ *
+ * Modification : 
+ *
+ * -  variable NotPositive added to take into acounnt the case di<=0.
+ *    Yi Qing (10/91)
+ */
 
 static list TestDiVariables(ps, cl, s1, ef1, s2, ef2)
 Psysteme ps;
@@ -1801,16 +2169,22 @@ effect ef1, ef2;
 {
     list levels = NIL;
     int l;
-    boolean levels_found = FALSE;
+    boolean all_level_founds = FALSE;
 
     pips_debug(7, "maximum common level (cl): %d\n", cl);
 
-    for (l = 1; !levels_found && l <= cl; l++) 
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+
+    for (l = 1; !all_level_founds && l <= cl; l++) 
     {
 	Variable di = (Variable) GetDiVar(l);
 	int min, max;
 	int IsPositif, IsNegatif, IsNull, NotPositif;
-	Psysteme pss = (l==cl) ? ps : sc_dup(ps);
+	/* FI: Keep a consistent interface in memory allocation */
+	/* Psysteme pss = (l==cl) ? ps : sc_dup(ps); */
+	Psysteme pss = sc_dup(ps);
 
 	ifdebug(7)
 	{
@@ -1821,7 +2195,7 @@ effect ef1, ef2;
 	if (sc_minmax_of_variable_optim(pss, di, &min, &max) == FALSE) 
 	{
 	    pips_debug(7,"sc_minmax_of_variable_optim: non feasible system\n");
-	    levels_found = TRUE;
+	    all_level_founds = TRUE;
 	    break;
 	}
 
@@ -1841,7 +2215,7 @@ effect ef1, ef2;
 
 	if(IsNegatif) 
 	{
-	    levels_found = TRUE;
+	    all_level_founds = TRUE;
 	    break;
 	}
 
@@ -1849,7 +2223,7 @@ effect ef1, ef2;
 	{
 	    pips_debug(7, "adding level %d\n", l);
 	    levels = gen_nconc(levels, CONS(INT, l, NIL));
-	    levels_found = TRUE;
+	    all_level_founds = TRUE;
 	    break;
 	}
 	
@@ -1859,10 +2233,13 @@ effect ef1, ef2;
 	    levels = gen_nconc(levels, CONS(INT, l, NIL));	     
 	}
 
-	if (!levels_found && l <= cl-1) 
+	if (!all_level_founds && l <= cl-1) 
 	{
 	    pips_debug(7, "forcing variable %s to 0 (l < cl)\n", 
 		       entity_local_name((entity) di));
+	    /* This function does not test feasibility and does not
+	     * deallocate ps
+	     */
 	    sc_force_variable_to_zero(ps, di);
 	}
     }
@@ -1880,10 +2257,14 @@ effect ef1, ef2;
      * of a single assignement, the generated code must preserve the order of
      * the write and read memory operations. BC.
      */
-    if (!levels_found && s1 != s2 && statement_possible_less_p(s1, s2) ) 
+    if (!all_level_founds && s1 != s2 && statement_possible_less_p(s1, s2) ) 
     {
 	pips_debug(7, "adding innermost level %d\n", l);
 	levels = gen_nconc(levels, CONS(INT, l, NIL));
+    }
+
+    ifdebug(1) {
+	mem_spy_end("TestsDiVariables");
     }
         
     return(levels);
@@ -1902,6 +2283,10 @@ Psysteme dep_sc;
     if (SC_UNDEFINED_P(dep_sc))
 	return(sg_env);
 
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+
     sc_env = sc_empty(dep_sc->base);
     n = dep_sc->dimension;
     b = dep_sc->base;
@@ -1912,6 +2297,10 @@ Psysteme dep_sc;
 	Pvecteur v;
 	Pcontrainte pc;
 	Pbase b1;
+
+	ifdebug(1) {
+	    mem_spy_begin();
+	}
 	
 	for(j=1, b1=b; j<=i-1; j++, b1=b1->succ)
 	{		
@@ -1936,8 +2325,13 @@ Psysteme dep_sc;
 	
 	if (! sc_integer_feasibility_ofl_ctrl(sub_sc, NO_OFL_CTRL, TRUE))
 	{ 
+	    sc_rm(sub_sc);
 	    debug(7,"dependence_cone_positive", 
 		  "sub lexico-positive dependence system not feasible\n");
+
+	    ifdebug(1) {
+		mem_spy_end("dependence_cone_positive: one iteration, continue 1");
+	    }
 	    continue;
 	}
 	
@@ -1945,6 +2339,10 @@ Psysteme dep_sc;
 	{ 
 	    debug(7, "Dependence_cone_positive", 
 		  "normalized system not feasible\n");
+
+	    ifdebug(1) {
+		mem_spy_end("dependence_cone_positive: one iteration, continue 1");
+	    }
 	    continue;	    
 	}
 	
@@ -1955,8 +2353,18 @@ Psysteme dep_sc;
 		    "Normalized sub lexico-positive dependence system :\n");
 	    syst_debug(sub_sc);
 	}
-	
+
+	ifdebug(1) {
+	    mem_spy_begin();
+	}
+
 	sc_env = sc_enveloppe_chernikova(sc_env,sub_sc);
+
+	ifdebug(1) {
+	    mem_spy_end("sc_enveloppe_chernikova");
+	}
+
+	sc_rm(sub_sc);
 	
 	ifdebug(7) 
 	{ 
@@ -1977,11 +2385,30 @@ Psysteme dep_sc;
 		}
 	    }
 	}
+
+	ifdebug(1) {
+	    mem_spy_end("dependence_cone_positive: one iteration");
+	}
 	
     } 
     
-    if (!SC_UNDEFINED_P(sc_env) && sc_dimension(sc_env)!= 0)
+    if (!SC_UNDEFINED_P(sc_env) && sc_dimension(sc_env)!= 0) {
+
+	ifdebug(1) {
+	    mem_spy_begin();
+	}
+
 	sg_env = sc_to_sg_chernikova(sc_env);
+	sc_rm(sc_env);
+
+	ifdebug(1) {
+	    mem_spy_end("sc_to_sg_chernikova");
+	}
+    }
+
+    ifdebug(1) {
+	mem_spy_end("dependence_cone_positive");
+    }
     
     return (sg_env);
 }
@@ -2019,8 +2446,9 @@ statement stat;
     return(lv);
 }
 
-/* this function detects the no loop carried independence when Di=(0,0,...0) and s1 = s2.
-*/ 
+/* this function detects intra-statement, non loop carried dependence
+ * ( Di=(0,0,...0) and s1 = s2).
+ */ 
 static boolean TestDiCnst(ps, cl, s1, ef1, s2, ef2)  
 Psysteme ps;
 int cl;
@@ -2028,18 +2456,49 @@ statement s1, s2;
 effect ef1,ef2;
 {
   int l;
+
+  ifdebug(1) {
+      mem_spy_begin();
+  }
     
   for (l = 1; l <=cl; l++) 
   {
       Variable di = (Variable) GetDiVar(l);
-      Psysteme pss = sc_dup(ps);
+      Psysteme pss;
       int val;
+      bool success_p = TRUE;
 
-      if (sc_value_of_variable(pss, di, &val) == TRUE) 
-      {
-	  if (val != 0) return (FALSE);
+      ifdebug(1) {
+	  mem_spy_begin();
       }
-      else return (FALSE);
+
+      pss = sc_dup(ps);
+      success_p = sc_value_of_variable(pss, di, &val);
+      sc_rm(pss);
+
+      ifdebug(1) {
+	  mem_spy_end("TestDiCnst: sc_value_of_variable");
+      }
+
+      if ( success_p ) 
+      {
+	  if (val != 0) {
+	      ifdebug(1) {
+		  mem_spy_end("TestDiCnst: exit 1");
+	      }
+	      return (FALSE);
+	  }
+      }
+      else {
+	      ifdebug(1) {
+		  mem_spy_end("TestDiCnst: exit 2");
+	      }
+	  return (FALSE);
+      }
+  }
+
+  ifdebug(1) {
+      mem_spy_end("TestDiCnst: exit 3");
   }
   /* case of di zero */
   if (s1 == s2) 
