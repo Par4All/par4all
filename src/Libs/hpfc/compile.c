@@ -2,6 +2,10 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.70  1997/10/28 14:37:33  keryell
+ * Renamed basename and dirname as pips_basename and pips_dirname for
+ * OSF1.
+ *
  * Revision 1.69  1997/10/28 09:36:16  coelho
  * nope.
  *
@@ -323,7 +327,7 @@ FILE *
 hpfc_fopen(
     string name)
 {
-    string base = basename(name, NULL);
+    string base = pips_basename(name, NULL);
     FILE *f = (FILE *) safe_fopen(name, "w");
     fprintf(f, "!\n! File %s\n! This file has been automatically generated " 
 	    "by the HPF compiler\n!\n", base);
@@ -336,7 +340,7 @@ hpfc_fclose(
     FILE *f,
     string name)
 {
-    string base = basename(name, NULL);
+    string base = pips_basename(name, NULL);
     fprintf(f, "!\n! That is all for %s\n!\n", base);
     free(base);
     safe_fclose(f, name);
