@@ -416,6 +416,13 @@ Le sous-domaine \verb/instruction/ contient
 l'instruction proprement dite.
 }
 
+\domain{Persistent_Statement_To_Statement = persistant statement -> persistent statement}
+{
+  Used for example in use_def_elimination() to store the eventual
+  statement father of a statement. The persistance is needed to avoid
+  freeing the statements when the mapping is freed.
+}
+
 \subsection{Instruction}
 \label{subsection-instruction}
 \index{Instruction}
@@ -634,6 +641,14 @@ All nodes of a CFG can be visited in a meaningless order using the
 \verb/CONTROL_MAP/ macros. Look for an example in library \verb/control/
 because auxiliary data structures must be decraled and freed.
 
+}
+
+\domain{Persistent_Control_To_Statement = persistant statement -> persistent control}
+{
+  Used for example in use_def_elimination() to store the eventual control
+  father of a statement in order to travel on the control graph
+  associated to a statement. The persistance is needed to avoid
+  freeing the control graph when the mapping is freed.
 }
 
 % \section{Repre'sentation des expressions}
