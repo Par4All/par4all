@@ -9,6 +9,10 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.77  2003/07/07 13:00:49  irigoin
+ * safe_find_rule_by_resource() added and
+ * check_physical_resource_up_to_date() commented and improved and reformatted.
+ *
  * Revision 1.76  2003/06/27 09:59:15  irigoin
  * Intermediate version. rmake() made visible for callgraph.c: to be improved
  * if possible and reversed to static rmake(). Comments added. Some casts
@@ -595,6 +599,19 @@ rule find_rule_by_resource(string rname)
     return(rule_undefined);
 }
 
+/* Always returns a defined rule */
+static rule safe_find_rule_by_resource(string rname)
+{
+  rule ru = rule_undefined;
+
+  if ((ru = find_rule_by_resource(rname)) == rule_undefined) {
+    /* else */
+    pips_internal_error("could not find a rule for %s\n", rname);
+  }
+
+  return ru;
+}
+
 static bool make_pre_transformation(string, rule);
 static bool make_required(string, rule);
 
@@ -893,118 +910,167 @@ static bool make_required(string oname, rule ru)
  */
 static bool check_physical_resource_up_to_date(string rname, string oname)
 {
-  list reals = NIL;
+  list real_required_resources = NIL;
+  list real_modified_resources = NIL;
   rule ru = rule_undefined;
   bool result = TRUE;
-  char * res = db_get_resource_id(rname, oname);
+  void * res_id = (void *) db_get_resource_id(rname, oname);
 
   /* Maybe is has already been proved true */
-  if(set_belong_p(up_to_date_resources, res))
+  if(set_belong_p(up_to_date_resources, res_id))
+    return TRUE;
+
+  /* Initial resources by definition are not associated to a rule.
+   * FI: and they always are up-to-date?!? Even if somebody touched the file? 
+   * You mean you do not propagate modifications performed outside of the workspace?
+   */
+  if (same_string_p(rname, DBR_USER_FILE))
     return TRUE;
 
   /* We get the active rule to build this resource */
-  if ((ru = find_rule_by_resource(rname)) == rule_undefined) {
-      /* initial resources have no rule, but that does not matter... */
-      if (same_string_p(rname, DBR_USER_FILE))
-	  return TRUE;
-      /* else */
-      pips_internal_error("could not find a rule for %s\n", rname);
-  }
+  ru = safe_find_rule_by_resource(rname);
 
   /* we build the list of required real_resources */
-  /* Here we are sure (thanks to find_rule_by_resource) that the rule does not
-     use a resource it produces */
+  /* Here we are sure (thanks to find_rule_by_resource) that the rule does
+     not use a resource it produces. FI: OK, this does not rule out
+     modified resources which should not be taken into account to avoid
+     infinite recursion. */
 
-  reals = build_real_resources(oname, rule_required(ru));
+  real_required_resources = build_real_resources(oname, rule_required(ru));
+  real_modified_resources = build_real_resources(oname, rule_modified(ru));
 
   /* we are going to check if the required resources are 
      - in the database or in the rule_modified list
      - proved up to date (recursively)
      - have timestamps older than the tested one
-     */
-  MAP(REAL_RESOURCE, rr,
-  {
-      string rron = real_resource_owner_name(rr);
-      string rrrn = real_resource_resource_name(rr);
+  */
+  MAP(REAL_RESOURCE, rr, {
+    string rron = real_resource_owner_name(rr);
+    string rrrn = real_resource_resource_name(rr);
       
-      bool res_in_modified_list_p = FALSE;
+    bool res_in_modified_list_p = FALSE;
       
-      /* we build the list of modified real_resources */
-      list virtuals = rule_modified(ru);
-      list reals2 = build_real_resources(oname, virtuals);
+    /* we build the list of modified real_resources */
       
-      MAP(REAL_RESOURCE, mod_rr,
-      {
-	  string mod_rron = real_resource_owner_name(mod_rr);
-	  string mod_rrrn = real_resource_resource_name(mod_rr);
+    MAP(REAL_RESOURCE, mod_rr, {
+      string mod_rron = real_resource_owner_name(mod_rr);
+      string mod_rrrn = real_resource_resource_name(mod_rr);
 	  
-	  if ((same_string_p(mod_rron, rron)) &&
-	      (same_string_p(mod_rrrn, rrrn))) {
-	      /* we found it */
-	      res_in_modified_list_p = TRUE;
-	      pips_debug(3, "resource %s(%s) is in the rule_modified list",
-			 rrrn, rron);
-	      break;
-	  }
-      }, reals2);
-
-    gen_full_free_list (virtuals);
-    gen_full_free_list (reals2);
+      if ((same_string_p(mod_rron, rron)) &&
+	  (same_string_p(mod_rrrn, rrrn))) {
+	/* we found it */
+	res_in_modified_list_p = TRUE;
+	pips_debug(3, "resource %s(%s) is in the rule_modified list",
+		   rrrn, rron);
+	break;
+      }
+    }, real_modified_resources);
 
     /* If the resource is in the modified list, then
        don't check anything */
-    if (res_in_modified_list_p == FALSE)
-    {
+    if (res_in_modified_list_p == FALSE) {
 	if (!db_resource_p(rrrn, rron)) {
-	    pips_debug(5, "resource %s(%s) is not there "
-		       "and not in the rule_modified list", rrrn, rron);
+	  pips_debug(5, "resource %s(%s) is not there "
+		     "and not in the rule_modified list", rrrn, rron);
+	  result = FALSE;
+	  break;
+	} else {
+	  /* Check if this resource is up to date */
+	  long rest;
+	  long respt;
+	  if (check_resource_up_to_date(rrrn, rron) == FALSE) {
+	    pips_debug(5, "resource %s(%s) is not up to date", rrrn, rron);
 	    result = FALSE;
 	    break;
-	} else {
-	    /* Check if this resource is up to date */
-	    long rest;
-	    long respt;
-	    if (check_resource_up_to_date(rrrn, rron) == FALSE) {
-		pips_debug(5, "resource %s(%s) is not up to date", rrrn, rron);
-		result = FALSE;
-		break;
-	    }
-	    rest = db_time_of_resource(rname, oname);
-	    respt = db_time_of_resource(rrrn, rron);
-	    /* Check if the timestamp is OK */
-	    if (rest<respt)
+	  }
+	  rest = db_time_of_resource(rname, oname);
+	  respt = db_time_of_resource(rrrn, rron);
+	  /* Check if the timestamp is OK */
+	  if (rest<respt)
 	    {
-		pips_debug(5, "resource %s(%s) with time stamp %ld is newer "
-			   "than resource %s(%s) with time stamp %ld\n",
-			   rrrn, rron, respt, rname, oname, rest);
-		result = FALSE;
-		break;
+	      pips_debug(5, "resource %s(%s) with time stamp %ld is newer "
+			 "than resource %s(%s) with time stamp %ld\n",
+			 rrrn, rron, respt, rname, oname, rest);
+	      result = FALSE;
+	      break;
 	    }
 	}
-    }
-  }, reals);
+      }
+  }, real_required_resources);
 
-  gen_full_free_list (reals);
+  gen_full_free_list (real_required_resources);
+  gen_full_free_list (real_modified_resources);
 
-  /* If the resource is up to date then add it in the set */
+  /* If the resource is up to date then add it in the set, as well as its
+     siblings, if they are produced by the same rule. Think of callgraph
+     with may produce literaly thousands of resources, three times the
+     number of modules! */
   if (result == TRUE) 
-  {
+    {
+      list real_produced_resources =  build_real_resources(oname, rule_produced(ru));
+      bool res_found_p = FALSE;
+
       pips_debug(5, "resource %s(%s) added to up_to_date "
 		 "with time stamp %d\n",
 		 rname, oname, db_time_of_resource(rname, oname));
-      set_add_element(up_to_date_resources, up_to_date_resources, res);
-  }
+      set_add_element(up_to_date_resources, up_to_date_resources, res_id);
+
+      MAP(REAL_RESOURCE, rpr, {
+	string srname = real_resource_resource_name(rpr);
+	string soname = real_resource_owner_name(rpr);
+	void * sres_id = (void *) db_get_resource_id(srname, soname);
+
+	if(sres_id != (real_resource) res_id) {
+
+	  if(same_string_p(rname, srname)) {
+	    /* We would retrieve the same rule and the same required
+               resources. rpr is up-to-date.*/
+
+	    pips_debug(5, "sibling resource %s(%s) added to up_to_date "
+		       "with time stamp %d\n",
+		       srname, soname, db_time_of_resource(srname, soname));
+	    set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
+	  }
+	  else {
+	    /* Check that the sibling is currently obtained by the same
+               rule, because an activate might preempt it for some of the
+               produced resources? */
+	    rule sru = find_rule_by_resource(srname);
+	    if(sru==ru) {
+	      /* The rule does not have to be fired again, so its produced
+                 resources are up-to-date. */
+	    string soname = real_resource_owner_name(rpr);
+
+	    pips_debug(5, "sibling resource %s(%s) added to up_to_date "
+		       "with time stamp %d\n",
+		       srname, soname, db_time_of_resource(srname, soname));
+	    set_add_element(up_to_date_resources, up_to_date_resources, sres_id);
+	    }
+	  }
+	}
+	else {
+	  res_found_p = TRUE;
+	}
+      }, real_produced_resources);
+
+      pips_assert("The resources res is among the real resources produced by rule ru",
+		  res_found_p);
+
+      gen_full_free_list (real_produced_resources);
+    }
   else
-  {
+    {
       /* well, if it is not okay, let us delete it!???
        * okay, this might be done later, but in some case it is not.
        * I'm not really sure this is the right fix, but at least it avoids 
        * a coredump after touching some internal file (.f_initial) and
        * requesting the PRINTED_FILE for it.
        * FC, 22/07/1998
+       *
+       * FI: this may be costly and should be avoided on a quit!
        */
       db_delete_resource(rname, oname);
-  }
+    }
   
   return result;
 }
