@@ -1,5 +1,5 @@
-! $RCSfile: xpomp_graphic_F.h,v $ (version $Revision$)
-! $Date: 1996/10/25 21:40:56 $, 
+! 
+! $Id$
 !
 !  The fortran headers for the XPOMP graphical library.
 !
@@ -61,5 +61,5 @@
 !fcd$ io xpompf show usage
 
 !
-! that is all for $RCSfile: xpomp_graphic_F.h,v $
+! that is all
 !
