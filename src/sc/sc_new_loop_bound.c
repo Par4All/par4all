@@ -197,7 +197,7 @@ algorithm_row_echelon(
      */
     ps_tmp =  sc_dup(scn);
     sc_transform_eg_in_ineg(ps_tmp);
-    ps_interm = sc_fusion(ps_interm, ps_tmp);
+    ps_interm = sc_fusion(ps_interm, ps_tmp); 
     ps_interm = sc_triang_elim_redund(ps_interm, base_index); 
 
     *pcondition = get_other_constraints(&ps_interm, base_index);
