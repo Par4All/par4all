@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1995/09/05 15:19:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+static char vcid[] = "%A% ($Date: 1995/09/05 15:19:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
 #include <stdio.h>
 #include <string.h>
 #include <varargs.h>
@@ -6,8 +12,7 @@
 #include "misc.h"
 #include "ri.h"
 
-/* FI: let's hope this will disappear with its related functions in top-level library */
-#include "constants.h"
+#include "top-level.h"
 
 #include "ri-util.h"
 
