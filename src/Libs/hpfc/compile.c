@@ -185,7 +185,7 @@ char *module_name;
     
     debug(4,"hpfcompile","end of procedure\n");
     reset_current_module_entity();
-    reset_static_mappings();
+    reset_hpfc_static_mappings();
     debug_off();
 }
 
