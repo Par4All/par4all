@@ -355,7 +355,7 @@ Variable v_new;
 void base_append(Pbase * pb1, Pbase b2)
 {
   if (BASE_NULLE_P(*pb1))
-    *pb1 = base_dup(b2);
+    *pb1 = base_copy(b2);
   else
   {
     Pvecteur v;
@@ -404,9 +404,9 @@ Pbase base_union(Pbase b1, Pbase b2)
     bn2 = BASE_NULLE_P(b2);
 
   if (!bn1 && bn2)
-    b = base_dup(b1);
+    b = base_copy(b1);
   else if (bn1 && !bn2)
-    b = base_dup(b2);
+    b = base_copy(b2);
   else if (!bn1 && !bn2)
   {
     linear_hashtable_pt seen = linear_hashtable_make();
