@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1994/11/28 14:45:02 $, ) version $Revision$,
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1994/12/06 14:42:52 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -19,7 +19,6 @@ extern fprintf();
  * Psystems stuff
  */
 
-#include "types.h"
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
