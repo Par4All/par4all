@@ -545,8 +545,8 @@ filename_list:
 	}
 	|
 	filename
-	/* opt_sep_list */
-	{
+	opt_sep_list
+	{ /* the opt_sep_list enables trailing blanks... */
 	    debug(7,"yyparse","reduce rule filename_list (%s)\n", $1);
 
 	    if (the_file_list.argc < FILE_LIST_MAX_LENGTH) {
@@ -771,10 +771,8 @@ list_of_owner_name:
 	;
 
 opt_sep_list:
-	sep_list
-	{$$ = 0;}
-	|
-	{$$ = 0;}
+	sep_list {$$ = 0;}
+	| {$$ = 0;}
 	;
 
 sep_list:
