@@ -424,9 +424,12 @@ type r; /* type of result */
 	    }
 	}
 	else if(storage_formal_p(s)){
-	    user_error("MakeExternalFunction", 
-		       "entity %s is a formal functional parameter\n",
-		       entity_name(e));
+	    user_warning("MakeExternalFunction", 
+			 "entity %s is a formal functional parameter\n",
+			 entity_name(e));
+	    ParserError("MakeExternalFunction",
+			"Formal functional parameters are not supported "
+			"by PIPS.\n");
 	    fe = e;
 	}
 	else {
@@ -489,13 +492,11 @@ type r; /* type of result */
 	if (! storage_formal_p(entity_storage(e)))
 	    entity_storage(fe) = MakeStorageRom();
 	else {
-	    user_error("MakeExternalFunction",
+	    user_warning("MakeExternalFunction",
 			 "unsupported formal function %s\n", 
 			 entity_name(fe));
-	    /*
 	    ParserError("MakeExternalFunction",
-			"Formal functions are not supported\n");
-			*/
+			"Formal functions are not supported by PIPS.\n");
 	}
 
     /* an external function has an unknown initial value */
