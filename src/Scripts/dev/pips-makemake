@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.326  1998/07/01 17:06:01  coelho
+# attempt to debug...
+#
 # Revision 1.325  1998/07/01 16:35:45  coelho
 # if no C files, does not attempt to generate an executable (for jpips).
 #
@@ -464,9 +467,11 @@ echo:; @echo \$(ECHO)
 #
 # Default rules
 ifneq (\$(ARCH),.)
+ifneq (\$(LIB_CFILES),)
 %: \$(ARCH)/%
 %.o: \$(ARCH)/%.o
 %.a: \$(ARCH)/%.a
+endif
 endif
 # Java:
 %.class: %.java; javac \$<
