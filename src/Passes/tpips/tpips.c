@@ -1,3 +1,7 @@
+/* $RCSfile: tpips.c,v $ (version $Revision$
+ * $Date: 1997/03/07 14:14:07 $, 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -38,21 +42,6 @@ static char *usage =
     "Usage: %s [-n] [-h/?] [-v] [-l logfilename] sourcefile...\n";
 
 /*************************************************************** Some Macros */
-
-#define TPIPS_PRIMARY_PROMPT 	"tpips> "	/* prompt for readline  */
-#define TPIPS_SECONDARY_PROMPT 	"> "
-#define TPIPS_CONTINUATION_CHAR '\\'
-#define TPIPS_HISTENV "TPIPS_HISTORY"	/* history file env variable */
-#define TPIPS_HISTORY_LENGTH 100	/* max length of history file */
-#define TPIPS_COMMENT_PREFIX '#'	/* comment prefix */
-#define HIST ".tpips.history" 		/* default history file */
-#define TPIPS_REQUEST_BUFFER_LENGTH 100
-#define SHELL_ESCAPE "shell" 		/* ! used for history reference */
-#define CHANGE_DIR   "cd "
-#define SET_ENV	     "setenv "
-#define QUIT         "quit"
-#define HELP         "help"
-#define ECHO         "echo"
 
 #define SEPARATOR_P(c) (index (" \t", c))
 #define PREFIX_EQUAL_P(str, prf) (strncmp(str, prf, strlen(prf))==0)
@@ -104,8 +93,9 @@ static struct t_completion_scheme completion_scheme[] =
 { "apply",      COMP_RULE,       COMP_NONE },
 { "display",    COMP_RESOURCE,   COMP_NONE },
 { "activate",   COMP_RULE,       COMP_NONE },
-{ "set",        COMP_PROPERTY,   COMP_NONE },
-{ "get",        COMP_PROPERTY,   COMP_NONE },
+{ SET_ENV,	COMP_NONE,	 COMP_NONE },
+{ SET_PROP,     COMP_PROPERTY,   COMP_NONE },
+{ GET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { "info",       COMP_PROPERTY,   COMP_NONE },
 { (char*)NULL,  COMP_NONE,       COMP_NONE }
 };
@@ -113,7 +103,7 @@ static struct t_completion_scheme completion_scheme[] =
 static char *tp_help_topics[] = 
 {
     "create","close","delete","echo","module","activate",
-    "make","apply","display","set","get",SHELL_ESCAPE,
+    "make","apply","display",SET_ENV, SET_PROP,GET_PROP,SHELL_ESCAPE,
     CHANGE_DIR,QUIT,HELP,"rule","resource","owner",
     (char*)NULL
 };
@@ -184,7 +174,7 @@ static void tpips_user_error(char * calling_function_name,
 
 /*  returns the full tpips history file name, i.e.
  *  - $TPIPS_HISTORY (if any)
- *  - $HOME/"HIST"
+ *  - $HOME/"TPIPS_HISTORY"
  */
 static char *default_hist_file_name()
 {
@@ -195,8 +185,8 @@ static char *default_hist_file_name()
     /* else builds the default name. memory leak.
      */
     home = getenv("HOME");
-    tmp = (char*) malloc(sizeof(char)*(strlen(home)+strlen(HIST)+2));
-    (void) sprintf(tmp, "%s/%s", home, HIST);
+    tmp = (char*) malloc(sizeof(char)*(strlen(home)+strlen(TPIPS_HISTORY)+2));
+    (void) sprintf(tmp, "%s/%s", home, TPIPS_HISTORY);
 
     return tmp;
 }
@@ -235,6 +225,16 @@ static void setenv_handler(char * line)
     user_log("%s\n", line);
     if (putenv(line+strlen(SET_ENV)))
 	fprintf(stderr, "error while changing environment\n");
+}
+
+/* was set in the gram, moved here as setenv */
+static void setproperty_handler(char * line)
+{
+    if (tpips_execution_mode) {
+	user_log("%s\n", line);
+	line+=strlen(SET_PROP);
+	parse_properties_string(line);
+    }
 }
 
 static void shell_handler(char * line)
@@ -352,10 +352,23 @@ static void help_handler(char * line)
 	if (*line) {
 	    printf("\tchange directory\n");
 	}
-    }if (PREFIX_EQUAL_P("setenv",line)) {
+    }
+    if (PREFIX_EQUAL_P("setenv",line)) {
 	printf("setenv    <name>=<value>\n");
 	if (*line) {
 	    printf("\tchange environment\n");
+	}
+    }
+    if (PREFIX_EQUAL_P("setproperty",line)) {
+	printf("setproperty <name>=<value>\n");
+	if (*line) {
+	    printf("\tchange property\n");
+	}
+    }
+    if (PREFIX_EQUAL_P(GET_PROP,line)) {
+	printf(GET_PROP " <name>\n");
+	if (*line) {
+	    printf("\t print property\n");
 	}
     }
     if (PREFIX_EQUAL_P("echo",line)) {
@@ -543,6 +556,8 @@ static struct t_handler handlers[] =
   { QUIT,		quit_handler },
   { CHANGE_DIR, 	cdir_handler },
   { SET_ENV,		setenv_handler },
+  { SET_PROP,   	setproperty_handler },
+  { "set ",		setproperty_handler }, /* compatibility */
   { SHELL_ESCAPE, 	shell_handler },
   { HELP,		help_handler },
   { ECHO,		echo_handler },
