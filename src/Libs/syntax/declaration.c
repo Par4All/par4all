@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/05/02 08:56:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/06/20 16:28:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/05/02 08:56:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/06/20 16:28:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -504,11 +504,60 @@ reset_common_size_map()
       hash_table_free(common_size_map);
       common_size_map = hash_table_undefined;
    }
+   else {
+       /* Problems:
+	*  - this routine may be called from ParserError()... which should not
+	*    be called recursively
+	*  - but it maight also be called from somewhere else and ParserError()
+	*    then should be called
+	* A second reset routine must be defined.
+	*/
+       ParserError("reset_common_size_map", "Resetting a resetted variable!\n");
+   }
+}
+
+void
+reset_common_size_map_on_error()
+{
+   if (common_size_map != hash_table_undefined) {
+      hash_table_free(common_size_map);
+      common_size_map = hash_table_undefined;
+   }
+}
+
+int
+common_to_size(entity a)
+{
+    int size;
+
+    if((size = (int) hash_get(common_size_map,(char *) a))
+       == (int) HASH_UNDEFINED_VALUE) {
+	    pips_error("common_to_size",
+		       "common_size_map uninitialized for common %s\n",
+		       entity_name(a));
+    }
+
+    return size;
+}
+
+void
+set_common_to_size(entity a, int size)
+{
+    (void) hash_put(common_size_map, (char *) a,
+		       (char *) (size));
+}
+
+void
+update_common_to_size(entity a, int new_size)
+{
+    (void) hash_update(common_size_map, (char *) a,
+		       (char *) (new_size));
 }
 
 /* MakeCommon:
  * This function creates a common block. pips creates static common
- * blocks. this is not true in the ANSI standard.
+ * blocks. This is not true in the ANSI standard stricto sensu, but
+ * true in most implementations.
  */
 entity 
 MakeCommon(e)
@@ -556,8 +605,11 @@ entity e;
 	AddEntityToDeclarations(e, get_current_module_entity());
     }
 
+    /*
     if(hash_get(common_size_map, (char *) e) == HASH_UNDEFINED_VALUE)
 	hash_put(common_size_map, (char *) e, (char *) 0);
+	*/
+    set_common_to_size(e, 0);
 
     return(e);
 }
@@ -592,6 +644,12 @@ entity c, v;
  *
  * Note FI: this function is called too early because a DIMENSION or a Type
  * statement can modify both the basic type and the dimensions of variable v.
+ *
+ * I do not understand why the Static and Dynamic area sizes are not recorded
+ * by a call to update_common_to_size(). Maybe because it is not necessary
+ * because they are local to the current procedure and hence area_size can be
+ * directly be used. But this is not consistent with other uses of the
+ * common_size_map...
  */
 int 
 CurrentOffsetOfArea(a, v)
@@ -601,16 +659,10 @@ entity a, v;
     type ta = entity_type(a);
     area aa = type_area(ta);
 
-    if(top_level_entity_p(a)) 
-	if((OldOffset = (int) hash_get(common_size_map,(char *) a))
-	   == (int) HASH_UNDEFINED_VALUE)
-	    pips_error("CurrentOffsetOfArea",
-		       "common_size_map uninitialized for common %s\n",
-		       entity_name(a));
-	else
-	    /* too bad this will generate a warn on redefinition... */
-	    (void) hash_update(common_size_map, (char *) a,
-			(char *) (OldOffset+SizeOfArray(v)));
+    if(top_level_entity_p(a)) {
+	OldOffset = common_to_size(a);
+	(void) update_common_to_size(a, OldOffset+SizeOfArray(v));
+    }
     else {
 	/* the local areas are StaticArea and DynamicArea */
 	OldOffset = area_size(aa);
@@ -657,7 +709,8 @@ update_common_sizes()
 	}
     },
 	     common_size_map);
-    reset_common_size_map();
+    /* Postpone the resetting because DynamicArea is updated till the EndOfProcedure() */
+    /* reset_common_size_map(); */
 }
 
 /* local variables for implicit type implementation */
