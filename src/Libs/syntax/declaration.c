@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.69  2003/04/29 13:51:28  coelho
+ * check type size... for FI/FF
+ *
  * Revision 1.68  2002/06/27 15:00:33  irigoin
  * DeclareVariable() updated to cope with the special case of character*(*)
  * variables defined by PIPS to replace formal return labels.
@@ -1525,24 +1528,49 @@ MakeFortranType(t, v)
 tag t;
 value v;
 {
-    basic b;
-    int l;
+  basic b;
+  int l;
 
-    if (t == is_basic_string) {
-	if (v == value_undefined) {
-	    l = DefaultLengthOfBasic(t);
-	    v = make_value(is_value_constant,
-			   make_constant(is_constant_int, (void *) l));
-	}
-	b = make_basic(t, v);
+  if (t == is_basic_string) {
+    if (v == value_undefined) {
+      l = DefaultLengthOfBasic(t);
+      v = make_value(is_value_constant,
+		     make_constant(is_constant_int, (void *) l));
     }
-    else {
-	l = (v == value_undefined) ? DefaultLengthOfBasic(t) : 
-	constant_int(value_constant(v));
-	b = make_basic(t, (void *) l);
-    }
+    b = make_basic(t, v);
+  }
+  else {
+    bool ok = FALSE;
+    l = (v == value_undefined) ? DefaultLengthOfBasic(t) : 
+      constant_int(value_constant(v));
 
-    return(MakeTypeVariable(b, NIL));
+    /* Check compatibility between type and byte length */
+    switch (t)
+      {
+      case is_basic_int:
+	ok = l==2 || l==4 || l==8;
+	break;
+      case is_basic_float:
+	ok = l==4 || l==8;
+	break;
+      case is_basic_logical:
+	ok = l==1 || l==2 || l==4 || l==8;
+	break;
+      case is_basic_complex:
+	ok = l==8 || l==16;
+	break;
+      case is_basic_string:
+	break;
+      case is_basic_overloaded:
+      default: break;
+      }
+    if(!ok) {
+      ParserError("Declaration", "incompatible type length");
+    }
+    b = make_basic(t, (void *) l);
+  }
+
+  return(MakeTypeVariable(b, NIL));
 }
 
 /* This function computes the numerical offset of a variable element from
