@@ -26,7 +26,7 @@ void model_fprint(FILE * fd, int pn, int bn, int ls)
 	    "Target Machine:\n"
 	    "Processor number: %d\n"
 	    "Memory bank number: %d\n"
-	    "Bank width (i.e. line size): %d\n\n", pn, bn ls);
+	    "Bank width (i.e. line size): %d\n\n", pn, bn, ls);
 }
 
 void model_fscan(FILE * fd, int * ppn, int * pbn, int * pls)
