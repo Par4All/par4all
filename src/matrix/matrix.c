@@ -56,7 +56,7 @@ Pmatrix b;			/* input */
 Pmatrix	c;			/* output */
 {
     int	loop1,loop2,loop3;
-    int	i;
+    Value i;
 
 
     /* validate dimensions */
@@ -68,14 +68,17 @@ Pmatrix	c;			/* output */
     assert(c != a && c != b);
 
     /* set denominator */
-    MATRIX_DENOMINATOR(c) = MATRIX_DENOMINATOR(a) * MATRIX_DENOMINATOR(b);
+    MATRIX_DENOMINATOR(c) = 
+	value_mult(MATRIX_DENOMINATOR(a),MATRIX_DENOMINATOR(b));
 
     /* use ordinary school book algorithm */
     for(loop1=1; loop1<=p; loop1++)
 	for(loop2=1; loop2<=r; loop2++) {
-	    i = 0;
+	    i = VALUE_ZERO;
 	    for(loop3=1; loop3<=q; loop3++) 
-		i = i + MATRIX_ELEM(a,loop1,loop3)*MATRIX_ELEM(b,loop3,loop2); 
+		value_add(i,
+			  value_mult(MATRIX_ELEM(a,loop1,loop3),
+				     MATRIX_ELEM(b,loop3,loop2))); 
 	    MATRIX_ELEM(c,loop1,loop2) = i;
 	}
 }
@@ -94,7 +97,7 @@ void matrix_normalize(a)
 Pmatrix	a;			/* input */
 {
     int	loop1,loop2;
-    int	factor;
+    Value	factor;
     int n = MATRIX_NB_LINES(a);
     int m = MATRIX_NB_COLUMNS(a);
     assert(MATRIX_DENOMINATOR(a) != 0);
@@ -107,25 +110,26 @@ Pmatrix	a;			/* input */
 	    factor = pgcd(factor,MATRIX_ELEM(a,loop1,loop2));
 
     /* factor out */
-    if (factor != 1) {
+    if (value_notone_p(factor)) {
 	for(loop1=1; loop1<=n; loop1++)
 	    for(loop2=1; loop2<=m; loop2++)
-		MATRIX_ELEM(a,loop1,loop2) = 
-		    MATRIX_ELEM(a,loop1,loop2) / factor;
-	MATRIX_DENOMINATOR(a) = MATRIX_DENOMINATOR(a) / factor;
+		value_division(MATRIX_ELEM(a,loop1,loop2), factor);
+	value_division(MATRIX_DENOMINATOR(a),factor);
     }
 
     /* ensure denominator is positive */
     /* FI: this code is useless because pgcd()always return a positive integer,
        even if a is the null matrix; its denominator CANNOT be 0 */
-    assert(MATRIX_DENOMINATOR(a) > 0);
+    assert(value_pos_p(MATRIX_DENOMINATOR(a)));
+
+/*
     if(MATRIX_DENOMINATOR(a) < 0) {
 	MATRIX_DENOMINATOR(a) = MATRIX_DENOMINATOR(a)*-1;
 	for(loop1=1; loop1<=n; loop1++)
 	    for(loop2=1; loop2<=m; loop2++)
 		MATRIX_ELEM(a,loop1,loop2) = 
 		    -1 * MATRIX_ELEM(a,loop1,loop2);
-    }
+    }*/
 }
 
 /* void matrix_normalizec(Pmatrix MAT):
@@ -143,18 +147,19 @@ Pmatrix	a;			/* input */
 void matrix_normalizec(MAT)
 Pmatrix MAT;
 {
-    int i,a;
+    int i;
+    Value a;
     int n = MATRIX_NB_LINES(MAT);
     int m = MATRIX_NB_COLUMNS(MAT);
     assert( n>0 && m>0);
 
     a = MATRIX_DENOMINATOR(MAT);
-    for (i = 1;(i<=n*m) && (a >1);i++)
+    for (i = 1;(i<=n*m) && value_gt(a,VALUE_ONE);i++)
 	a = pgcd(a,MAT->coefficients[i]);
 
-    if (a>1) {
+    if (value_gt(a,VALUE_ONE)) {
 	for (i = 0;i<=n*m;i++)
-	    MAT->coefficients[i] /= a;
+	    value_division(MAT->coefficients[i],a);
     }
 }
 
@@ -168,7 +173,7 @@ Pmatrix a;		/* input and output matrix */
 int	c1,c2;			/* column numbers */
 {
     int	loop1;
-    int	temp;
+    Value	temp;
     int n = MATRIX_NB_LINES(a);
     int m = MATRIX_NB_COLUMNS(a);
     assert(n > 0 && m > 0);
@@ -192,7 +197,7 @@ Pmatrix a;		/* input and output matrix */
 int	r1,r2;			/* row numbers */
 {
     int	loop1;
-    int	temp;
+    Value	temp;
     /* validation */
     int n = MATRIX_NB_LINES(a);
     int m = MATRIX_NB_COLUMNS(a);
@@ -277,8 +282,8 @@ Pmatrix Z;
     int m = MATRIX_NB_COLUMNS(Z);
     for (i=1;i<=n;i++)
 	for (j=1;j<=m;j++)
-	    MATRIX_ELEM(Z,i,j)=0;
-    MATRIX_DENOMINATOR(Z) = 1;
+	    MATRIX_ELEM(Z,i,j)=VALUE_ZERO;
+    MATRIX_DENOMINATOR(Z) = VALUE_ONE;
 }
 
 /* boolean matrix_nulle_p(Pmatrix Z):
@@ -404,7 +409,7 @@ boolean inferieure;
 	return(FALSE);
     else{
 	for(i=1; i<=n; i++)
-	    if (MATRIX_ELEM(Z,i,i) != 1)
+	    if (value_notone_p(MATRIX_ELEM(Z,i,i)))
 		return(FALSE);
 	return(TRUE);
     }
@@ -430,32 +435,35 @@ void matrix_substract(a,b,c)
 Pmatrix a;         /* output */
 Pmatrix b, c;      /* input */
 {
-    int d1,d2;   /* denominators of b, c */
-    int lcm;     /* ppcm of b,c */
+    Value d1,d2;   /* denominators of b, c */
+    Value lcm;     /* ppcm of b,c */
     int i,j;
 
     /* precondition */
     int n= MATRIX_NB_LINES(a);
     int m = MATRIX_NB_COLUMNS(a);
     assert(n>0 && m>0);
-    assert(MATRIX_DENOMINATOR(b) > 0);
-    assert(MATRIX_DENOMINATOR(c) > 0);
+    assert(value_pos_p(MATRIX_DENOMINATOR(b)));
+    assert(value_pos_p(MATRIX_DENOMINATOR(c)));
 
     d1 = MATRIX_DENOMINATOR(b);
     d2 = MATRIX_DENOMINATOR(c);
     if (d1 == d2){
 	for (i=1; i<=n; i++)
 	    for (j=1; j<=m; j++)
-		MATRIX_ELEM(a,i,j) = MATRIX_ELEM(b,i,j) - MATRIX_ELEM(c,i,j);
+		MATRIX_ELEM(a,i,j) = 
+		    value_minus(MATRIX_ELEM(b,i,j),MATRIX_ELEM(c,i,j));
 	MATRIX_DENOMINATOR(a) = d1;
     }
     else{
 	lcm = ppcm(d1,d2);
-	d1 = lcm/d1;
-	d2 = lcm/d2;
+	d1 = value_div(lcm,d1);
+	d2 = value_div(lcm,d2);
 	for (i=1; i<=n; i++)
 	    for (j=1; j<=m; j++)
-		MATRIX_ELEM(a,i,j) = MATRIX_ELEM(b,i,j)*d1 - MATRIX_ELEM(c,i,j)*d2;
+		MATRIX_ELEM(a,i,j) = 
+		    value_minus(value_mult(MATRIX_ELEM(b,i,j),d1),
+				value_mult(MATRIX_ELEM(c,i,j),d2));
 	MATRIX_DENOMINATOR(a) = lcm;
     }
 }
@@ -474,12 +482,14 @@ Pmatrix b, c;      /* input */
  */
 void matrix_subtraction_column(MAT,c1,c2,x)
 Pmatrix MAT;        
-int c1,c2,x;
+int c1,c2;
+Value x;
 {
     int i;
     int n = MATRIX_NB_LINES(MAT);
     for (i=1; i<=n; i++)
-	MATRIX_ELEM(MAT,i,c1) = MATRIX_ELEM(MAT,i,c1) - x * MATRIX_ELEM(MAT,i,c2);
+	value_sub(MATRIX_ELEM(MAT,i,c1),
+		  value_mult(x,MATRIX_ELEM(MAT,i,c2)));
 }
 
 /* void matrix_subtraction_line(Pmatrix MAT,int r1,int r2,int x):
@@ -498,10 +508,12 @@ int c1,c2,x;
  */
 void matrix_subtraction_line(MAT,r1,r2,x)
 Pmatrix MAT;
-int r1,r2,x;
+int r1,r2;
+Value x;
 {
     int i;
     int m = MATRIX_NB_COLUMNS(MAT);
     for (i=1; i<=m; i++)
-	MATRIX_ELEM(MAT,r1,i) = MATRIX_ELEM(MAT,r1,i) - x * MATRIX_ELEM(MAT,r2,i);
+	value_sub(MATRIX_ELEM(MAT,r1,i),
+		  value_mult(x,MATRIX_ELEM(MAT,r2,i)));
 }
