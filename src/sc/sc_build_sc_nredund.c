@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 2000/11/28 15:37:42 $, 
+ * $Date: 2001/10/11 14:57:25 $, 
  */
 
 #include <stdio.h>
@@ -11,10 +11,15 @@
 #include "sc.h"
 
 
-/* This function returns TRUE if the inequation ineq is redundant for 
-*  the system  ps and FALSE otherwise.
-*  sc and ineq are not modified by the function.
-*/
+/* This function returns TRUE if the inequation ineq is redundant for the
+ * system ps and FALSE otherwise.
+ * sc and ineq are not modified by the
+ * function.
+ *
+ * Inequality ineq may not be redundant wrt ps for rational numbers and
+ * nevertheless TRUE is returned if it is redundant wrt integer points.
+ *
+ */
  
 boolean ineq_redund_with_sc_p(sc, ineq)
 Psysteme sc;
@@ -136,6 +141,10 @@ Psysteme s1, s2;
  *              characteristic
  *            if ofl_ctrl == 1 overflow errors are forwarded to the
  *               calling routine.
+ *
+ *            the redundancy elimination assumes integer points. The
+ *            rational set defined by sc may be enlarged.
+ *
  */
 void build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl)
 Psysteme *psc;
@@ -364,7 +373,10 @@ int *rank_max;
  * 2 constraints are kept for each variable: one for the upper bound 
  * and the other for the lower bound. 
  *
- */ 
+ * The rational set defined by ps may be enlarged by this procedure
+ * because an integer constraint negation is used.
+ *
+ */
 
 Psysteme build_integer_sc_nredund(ps,index_base,tab_info,loop_level,dim_h,n)
 Psysteme ps;
