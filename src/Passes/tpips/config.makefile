@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/10 12:00:51 $, 
+# $Date: 1996/08/10 12:02:16 $, 
 
 YFLAGS+=	-v -d
 #
@@ -29,7 +29,7 @@ ana_lex_completed.l:	ana_lex.l \
 			$(PIPS_LIBDIR)/properties.rc
 	sh ./build_tpips_lex ana_lex.l > ana_lex_completed.l
 
-# lex takes 100 times more time to process this file compar to flex
+# lex takes 100 times more time to process this file compared to flex
 # (a few minutes versus a few seconds...).
 tp_lex.c: ana_lex_completed.l tp_yacc.h
 	$(SCAN) ana_lex_completed.l | \
