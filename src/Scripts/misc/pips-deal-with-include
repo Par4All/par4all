@@ -1,4 +1,8 @@
-#!/usr/local/bin/perl
+#! /usr/local/bin/perl
+#
+# $RCSfile: pips-deal-with-include,v $ (version $Revision$)
+# $Date: 1996/07/05 10:11:20 $, 
+#
 
 sub debug {
     #printf STDERR @_;
