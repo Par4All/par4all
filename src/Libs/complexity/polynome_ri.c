@@ -42,10 +42,13 @@ Variable var;
 
     if (var == TCST) 
 	s = strdup(TCST_NAME);
+    /* FI: no longer useful */
+    /*
     else if (var == UNKNOWN_VARIABLE) 
 	s = strdup(UNKNOWN_VARIABLE_NAME);
     else if (var == UNKNOWN_RANGE) 
 	s = strdup(UNKNOWN_RANGE_NAME);
+	*/
     else if (var == (Variable) chunk_undefined) 
 	pips_error("variable_name", "unexpected var == chunk_undefined.\n");
     else 
@@ -61,14 +64,17 @@ Variable var;
 
     if (var == TCST) 
 	s = strdup(TCST_NAME);
+    /*
     else if (var == UNKNOWN_VARIABLE) 
 	s = strdup(UNKNOWN_VARIABLE_NAME);
     else if (var == UNKNOWN_RANGE) 
 	s = strdup(UNKNOWN_RANGE_NAME);
+	*/
     else if (var == (Variable) chunk_undefined) 
-	pips_error("variable_local_name", "unexpected var == chunk_undefined.\n");
+	pips_error("variable_local_name",
+		   "unexpected var == chunk_undefined.\n");
     else 
-	s = strdup(module_local_name((entity) var));
+	s = strdup(entity_local_name((entity) var));
 
     return (s);
 }
@@ -126,10 +132,12 @@ char *name;
 {
     if (strcmp(name, TCST_NAME) == 0) 
 	return(TCST);
+    /*
     else if (strcmp(name, UNKNOWN_VARIABLE_NAME) == 0) 
 	return (UNKNOWN_VARIABLE);
     else if (strcmp(name, UNKNOWN_RANGE_NAME) == 0) 
 	return (UNKNOWN_RANGE);
+	*/
     else {
 	entity e = gen_find_tabulated(name, entity_domain);
 	if (e != entity_undefined) 
@@ -149,10 +157,12 @@ char *name;
 
     if (strcmp(name, TCST_NAME)==0) 
 	return(TCST);
+    /*
     else if (strcmp(name, UNKNOWN_VARIABLE_NAME) == 0) 
 	return (UNKNOWN_VARIABLE);
     else if (strcmp(name, UNKNOWN_RANGE_NAME) == 0) 
 	return (UNKNOWN_RANGE);
+	*/
     else {
 	entity e = gen_find_tabulated(s, entity_domain);
 	if (e != entity_undefined) 
