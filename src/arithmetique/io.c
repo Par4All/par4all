@@ -1,7 +1,7 @@
 /* package arithmetic
  *
  * $RCSfile: io.c,v $ (version $Revision$)
- * $Date: 1996/07/26 14:35:20 $, 
+ * $Date: 1996/07/26 14:44:21 $, 
  *
  * IO on a Value
  */
@@ -49,11 +49,11 @@ int sscan_Value(char *s, Value *pv)
 /* this seems a reasonnable upperbound
  */
 #define BUFFER_SIZE 50
-
 char * Value_to_string(Value v)
 {
     static char buf[BUFFER_SIZE];
-    return sprintf(VALUE_FMT "\0", buf, v);
+    sprintf(VALUE_FMT "\0", buf, v);
+    return buf;
 }
 
 /* end of $RCSfile: io.c,v $
