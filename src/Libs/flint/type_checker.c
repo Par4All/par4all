@@ -50,7 +50,7 @@ convert_constant_from_int_to_real(call c)
   strcat(s,".0E0");
   return make_call(make_constant_entity((string)s, 
 					is_basic_float, REAL_LENGTH),
-		   call_arguments(c));
+		   NIL);
 }
 /* INT -> DOUBLE
  * e.g: DBLE(10) => 10.0
@@ -63,7 +63,7 @@ convert_constant_from_int_to_double(call c)
   strcat(s,".0D0");
   return make_call(make_constant_entity((string)s, 
 					is_basic_float, DOUBLE_LENGTH),
-		   call_arguments(c));
+		   NIL);
 }
 /* REAL -> INT
  * e.g: INT(-5.9E2) => -590
@@ -78,7 +78,7 @@ convert_constant_from_real_to_int(call c)
   l = (long)r;
   sprintf(s, "%ld", l);
   return make_call(make_constant_entity((string)s, is_basic_int, INT_LENGTH),
-		   call_arguments(c));
+		   NIL);
 }
 /* REAL -> DOUBLE
  * e.g: DBLE(-5.9E-2) => -5.9D-2
@@ -105,7 +105,7 @@ convert_constant_from_real_to_double(call c)
   }
   return make_call(make_constant_entity((string)s, 
 					is_basic_float, DOUBLE_LENGTH),
-		   call_arguments(c));
+		   NIL);
 }
 /* DOUBLE -> REAL
  * e.g: REAL(-5.9D-2) => -5.9E-2
@@ -132,7 +132,7 @@ convert_constant_from_double_to_real(call c)
   }
   return make_call(make_constant_entity((string)s, 
 					is_basic_float, REAL_LENGTH),
-		   call_arguments(c));
+		   NIL);
 }
 /* DOUBLE -> INT
  * e.g: INT(-5.9D2) => -590
@@ -140,8 +140,10 @@ convert_constant_from_double_to_real(call c)
 call
 convert_constant_from_double_to_int(call c)
 {
-  call c_real = convert_constant_from_double_to_real(c);
-  return convert_constant_from_real_to_int(c_real);
+  call c_result, c_real = convert_constant_from_double_to_real(c);
+  c_result = convert_constant_from_real_to_int(c_real);
+  free_call(c_real);
+  return c_result;
 }
 /* REAL -> COMPLEX
  * e.g: CMPLX(-5.9E5) => (-5.9E5, 0.0)
@@ -152,7 +154,7 @@ convert_constant_from_real_to_complex(call c)
   expression exp_real, exp_imag;
   call c_imag;
   list args;
-  exp_real = make_expression(make_syntax(is_syntax_call, c), 
+  exp_real = make_expression(make_syntax(is_syntax_call, copy_call(c)), 
 			     normalized_undefined);
   c_imag = make_call(make_constant_entity("0.0E0", 
 					  is_basic_float, REAL_LENGTH),
@@ -168,8 +170,10 @@ convert_constant_from_real_to_complex(call c)
 call
 convert_constant_from_double_to_complex(call c)
 {
-  call c_real = convert_constant_from_double_to_real(c);
-  return convert_constant_from_real_to_complex(c_real);
+  call c_result, c_real = convert_constant_from_double_to_real(c);
+  c_result = convert_constant_from_real_to_complex(c_real);
+  free_call(c_real);
+  return c_result;
 }
 /* INT -> COMPLEX
  * e.g: CMPLX(-5) => (-5.0, 0.0)
@@ -177,8 +181,10 @@ convert_constant_from_double_to_complex(call c)
 call
 convert_constant_from_int_to_complex(call c)
 {
-  call c_real = convert_constant_from_int_to_real(c);
-  return convert_constant_from_real_to_complex(c_real);
+  call c_result, c_real = convert_constant_from_int_to_real(c);
+  c_result = convert_constant_from_real_to_complex(c_real);
+  free_call(c_real);
+  return c_result;
 }
 /* DOUBLE -> DCOMPLEX
  * e.g: DCMPLX(-5.9D5) => (-5.9D5, 0.0)
@@ -189,7 +195,7 @@ convert_constant_from_double_to_dcomplex(call c)
   expression exp_real, exp_imag;
   call c_imag;
   list args;
-  exp_real = make_expression(make_syntax(is_syntax_call, c), 
+  exp_real = make_expression(make_syntax(is_syntax_call, copy_call(c)), 
 			     normalized_undefined);
   c_imag = make_call(make_constant_entity("0.0D0", 
 					  is_basic_float, DOUBLE_LENGTH),
@@ -206,8 +212,10 @@ convert_constant_from_double_to_dcomplex(call c)
 call
 convert_constant_from_real_to_dcomplex(call c)
 {
-  call c_double = convert_constant_from_real_to_double(c);
-  return convert_constant_from_double_to_dcomplex(c_double);
+  call c_result, c_double = convert_constant_from_real_to_double(c);
+  c_result = convert_constant_from_double_to_dcomplex(c_double);
+  free_call(c_double);
+  return c_result;
 }
 /* INT -> DCOMPLEX
  * e.g: DCMPLX(-5) => (-5D0, 0.0D0)
@@ -215,9 +223,12 @@ convert_constant_from_real_to_dcomplex(call c)
 call
 convert_constant_from_int_to_dcomplex(call c)
 {
-  call c_double = convert_constant_from_int_to_double(c);
-  return convert_constant_from_double_to_dcomplex(c_double);
+  call c_result, c_double = convert_constant_from_int_to_double(c);
+  c_result = convert_constant_from_double_to_dcomplex(c_double);
+  free_call(c_double);
+  return c_result;
 }
+
 /***************************************************************************** 
  * Convert constant C to basic naming to_basic
  */
@@ -225,14 +236,13 @@ call
 convert_constant(call c, basic to_basic)
 {
   basic b;
-  expression exp_real, exp_imag;
-  entity function_called = function_call(c);
+  entity function_called = call_function(c);
   if(entity_constant_p(function_called))
   {
     b = entity_basic(function_called);
     if(basic_equal_p(b, to_basic))
     {
-      return c;
+      return copy_call(c);
     }
     else if (basic_int_p(b))
     {
@@ -267,7 +277,7 @@ convert_constant(call c, basic to_basic)
       /* REAL -> DOUBLE */
       else if (basic_float_p(to_basic) && basic_float(to_basic)==8)
       {
-	reuturn convert_constant_from_real_to_double(c);
+	return convert_constant_from_real_to_double(c);
       }
       /* REAL -> COMPLEX */
       else if (basic_complex_p(to_basic) && basic_complex(to_basic)==8)
@@ -303,86 +313,20 @@ convert_constant(call c, basic to_basic)
 	return convert_constant_from_double_to_dcomplex(c);
       }
     }
-    /* Cegative constant: -59.9D2 <=> Function "--" with argument 59.9D2 */
-    else if (ENTITY_UNARY_MINUS_P(function_called))
-    {
-      exp = EXPRESSION(CAR(call_arguments(c)));
-      if (syntax_call_p(expression_syntax(exp)))
-      {
-	return convert_constant(syntax_call(expression_syntax(exp)), 
-				to_basic);
-      }
-    }
-    /* Complex constant: (5.9, 6.7) <=> 
-     * Function "CMPLX_" with arguments 5.9 and 6.7 
-     */
-    else if (ENTITY_IMPLIED_CMPLX_P(function_called) ||
-	     ENTITY_IMPLIED_DCMPLX_P(function_called))
-    {
-      exp_real = EXPRESSION(CAR(call_arguments(c)));
-      if(!basic_complex_p(to_basic))
-      {
-	if (syntax_call_p(expression_syntax(exp_real)))
-	{
-	  return convert_constant(syntax_call(expression_syntax(exp_real)), 
-				  to_basic);
-	}
-      }
-      /* DCOMPLEX -> COMPLEX */
-      else if (basic_complex(to_basic) == 8 && 
-	       ENTITY_IMPLIED_DCMPLX_P(function_called))
-      {
-	exp_imag = EXPRESSION(CAR(CDR(call_arguments(c))));
-	if (syntax_call_p(expression_syntax(exp_real)) &&
-	    syntax_call_p(expression_syntax(exp_imag)))
-	{
-	  return convert_constant(syntax_call(expression_syntax(exp_real)), 
-				  to_basic);
-	}
-
-	if (cast_constant(exp_real, make_basic_float(4), context) &&
-	    cast_constant(exp_imag, make_basic_float(4), context))
-	{
-	  args = CONS(EXPRESSION, exp_real, CONS(EXPRESSION, exp_imag, NIL));
-	  syntax_call(s) = 
-	    make_call(CreateIntrinsic(IMPLIED_COMPLEX_NAME), args);
-	  context->number_of_simplication++;
-	  return TRUE;
-	}
-      }
-      /* COMPLEX -> DCOMPLEX */
-      else if (basic_complex(to_basic) == 16 && 
-	       ENTITY_IMPLIED_CMPLX_P(function_called))
-      {
-	exp_imag = EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-	if (cast_constant(exp_real, make_basic_float(8), context) &&
-	    cast_constant(exp_imag, make_basic_float(8), context))
-	{
-	  args = CONS(EXPRESSION, exp_real, CONS(EXPRESSION, exp_imag, NIL));
-	  syntax_call(s) = 
-	    make_call(CreateIntrinsic(IMPLIED_DCOMPLEX_NAME), args);
-	  context->number_of_simplication++;
-	  return TRUE;
-	}
-      }
-    }
-
   }
-  return 0;
+  return NULL;
 }
 
 /***************************************************************************** 
  * Cast an expression constant to the basic to_basic.
  * Return TRUE if OK
  */
-bool
+expression
 cast_constant(expression exp_constant, basic to_basic, type_context_p context)
 {
   entity function_called;
-  list args;
-  basic b;
   call c;
-  expression exp_real, exp_imag;
+  expression exp, exp_real, exp_imag, exp_real2, exp_imag2;
   syntax s = expression_syntax(exp_constant);
   if(syntax_call_p(s))
   {
@@ -390,70 +334,70 @@ cast_constant(expression exp_constant, basic to_basic, type_context_p context)
     if(entity_constant_p(function_called))
     {
       c = convert_constant(syntax_call(s), to_basic);
-      if (c != 0)
-      {
-	syntax_call(s) = c;
+      if (c != NULL)
+      {	
 	context->number_of_simplication++;
-	return TRUE;	
+	return make_expression(make_syntax(is_syntax_call, c), 
+			       normalized_undefined);	
       }
     }
-    /* Cegative constant: -59.9D2 <=> Function "--" with argument 59.9D2 */
-    else if (ENTITY_UNARY_MINUS_P(function_called))
+    else if(ENTITY_UNARY_MINUS_P(function_called))
     {
-      return cast_constant(EXPRESSION(CAR(call_arguments(syntax_call(s)))),
-			   to_basic,
-			   context);
+      exp = cast_constant(EXPRESSION(CAR(call_arguments(syntax_call(s)))),
+			  to_basic, context);
+      if (exp != NULL)
+      {
+	c = make_call(copy_entity(function_called),
+		      CONS(EXPRESSION, exp, NIL));
+	return make_expression(make_syntax(is_syntax_call, c),
+			       normalized_undefined);
+      }
     }
-    /* Complex constant: (5.9, 6.7) <=> 
-     * Function "CMPLX_" with arguments 5.9 and 6.7 
-     */
-    else if (ENTITY_IMPLIED_CMPLX_P(function_called) ||
-	     ENTITY_IMPLIED_DCMPLX_P(function_called))
+    else if(ENTITY_IMPLIED_CMPLX_P(function_called) ||
+	    ENTITY_IMPLIED_DCMPLX_P(function_called))
     {
       exp_real = EXPRESSION(CAR(call_arguments(syntax_call(s))));
-      if(!basic_complex_p(to_basic))
+      if (!basic_complex_p(to_basic))
       {
-	if (cast_constant(exp_real, to_basic, context))
-	{
-	  syntax_call(s) = syntax_call(expression_syntax(exp_real));
-	  context->number_of_simplication++;
-	  return TRUE;
-	}
+	return cast_constant(exp_real, to_basic, context);
       }
       /* DCOMPLEX -> COMPLEX */
-      else if (basic_complex(to_basic) == 8 && 
-	       ENTITY_IMPLIED_DCMPLX_P(function_called))
+      else if (basic_complex(to_basic) == 8 &&
+	  ENTITY_IMPLIED_DCMPLX_P(function_called))
       {
 	exp_imag = EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-	if (cast_constant(exp_real, make_basic_float(4), context) &&
-	    cast_constant(exp_imag, make_basic_float(4), context))
+	exp_real2 = cast_constant(exp_real, make_basic_float(4), context);
+	exp_imag2 = cast_constant(exp_imag, make_basic_float(4), context);
+	if ( exp_real2 == NULL || exp_imag2 == NULL)
 	{
-	  args = CONS(EXPRESSION, exp_real, CONS(EXPRESSION, exp_imag, NIL));
-	  syntax_call(s) = 
-	    make_call(CreateIntrinsic(IMPLIED_COMPLEX_NAME), args);
-	  context->number_of_simplication++;
-	  return TRUE;
+	  pips_internal_error("Real and imagine party are not constants!\n");
 	}
+	c = make_call(CreateIntrinsic(IMPLIED_COMPLEX_NAME),
+		      CONS(EXPRESSION, exp_real2,
+			   CONS(EXPRESSION, exp_imag2, NIL)));	
+	return make_expression(make_syntax(is_syntax_call, c),
+			       normalized_undefined);
       }
       /* COMPLEX -> DCOMPLEX */
-      else if (basic_complex(to_basic) == 16 && 
-	       ENTITY_IMPLIED_CMPLX_P(function_called))
+      else if (basic_complex(to_basic) == 16 &&
+	  ENTITY_IMPLIED_CMPLX_P(function_called))
       {
 	exp_imag = EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-	if (cast_constant(exp_real, make_basic_float(8), context) &&
-	    cast_constant(exp_imag, make_basic_float(8), context))
+	exp_real2 = cast_constant(exp_real, make_basic_float(8), context);
+	exp_imag2 = cast_constant(exp_imag, make_basic_float(8), context);
+	if ( exp_real2 == NULL || exp_imag2 == NULL)
 	{
-	  args = CONS(EXPRESSION, exp_real, CONS(EXPRESSION, exp_imag, NIL));
-	  syntax_call(s) = 
-	    make_call(CreateIntrinsic(IMPLIED_DCOMPLEX_NAME), args);
-	  context->number_of_simplication++;
-	  return TRUE;
+	  pips_internal_error("Real and imagine party are not constants!\n");
 	}
+	c = make_call(CreateIntrinsic(IMPLIED_DCOMPLEX_NAME),
+		      CONS(EXPRESSION, exp_real2,
+			   CONS(EXPRESSION, exp_imag2, NIL)));	
+	return make_expression(make_syntax(is_syntax_call, c),
+			       normalized_undefined);
       }
     }
   }
-  
-  return FALSE;
+  return NULL;
 }
 /***************************************************************************** 
  * Specify a cast for converting from a basic ('from') to another basic (cast)
@@ -536,15 +480,16 @@ insert_cast(basic cast, basic from, expression exp, type_context_p context)
   call c;
   syntax s;
   entity cast_function;
+  expression exp_constant;
   
   s = expression_syntax(exp);
   
   /* If exp is a constant -> Convert it 
    * e.g: 5.9 -> 5 (REAL -> INT)
    */ 
-  if (cast_constant(exp, cast, context))
+  if ((exp_constant = cast_constant(exp, cast, context)) != NULL)
   {
-    return exp;
+    return exp_constant;
   }
   
   /* If not */
