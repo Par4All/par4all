@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/04/10 11:33:45 $, ) 
+# ($Date: 1997/04/10 13:21:14 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -325,9 +325,31 @@ test_aspect()
        make_diff $aspect $name test
        continue
      fi
+
+     #
+     # default_tpips
+
+     if [ -f $aspect/default_tpips ]
+     then
+	echo "testing with default_tpips" >> $tmperr
+	FILE=${file}
+	export FILE
+	WSPACE=${name}
+	export WSPACE
+	${tpips_version} $aspect/default_tpips > $tmpout 2>> $tmperr
+	STATUS=$?
+	[ -f core ] && rm -f core
+
+        report $STATUS "Execution of $aspect/default_tpips on $file failed" ||
+	    { $DEBUG " || error"; continue;}
+       
+	make_diff $aspect $name test
+	continue
+     fi
      
      #
      # default case
+
      rm -f $tmpout $tmperr
      echo "testing with none (parallelize) - Init" > $tmperr
      # arg, no .F...
