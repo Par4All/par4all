@@ -6,9 +6,11 @@
  *
  * Fabien COELHO, Feb/Mar 94
  *
- * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1996/07/23 15:08:23 $, ) 
- * version $Revision$
+ * $Id$
+ * $Log: build-system.c,v $
+ * Revision 1.32  1997/03/20 10:23:58  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
