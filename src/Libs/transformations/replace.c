@@ -192,7 +192,8 @@ void CallReplaceReference(call c, reference ref, expression next)
 	break;
       case is_value_code:
 	pips_error("CallReplaceReference", 
-		   "case is_value_code: interprocedural replacement impossible\n");
+		   "case is_value_code: interprocedural replacement for"
+		   " call to \"%s\" is impossible\n", module_local_name(f));
 	break;
       default:
 	pips_error("CallReplaceReference", "unknown tag: %d\n", 
