@@ -1,7 +1,7 @@
 c
 c COMMON /HPFC_PARAM/
 c
-c $RCSfile: hpfc_param.h,v $ ($Date: 1995/07/26 16:01:05 $, )
+c $RCSfile: hpfc_param.h,v $ ($Date: 1996/02/16 11:58:26 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -20,9 +20,11 @@ c
      $     RANGEP(MAXNBOFPROCESSORS, 7, 3), 
      $     ALIGN(MAXNBOFARRAYS, 7, 3),
      $     DIST(MAXNBOFTEMPLATES, 7, 2),
-     $     MSTATUS(MAXNBOFARRAYS)
+     $     MSTATUS(MAXNBOFARRAYS),
+     $     LIVEMAPPING(MAXNBOFARRAYS)
 c
       integer 
      $     ATOT, TTOP, NODIMA, NODIMT, NODIMP, 
      $     RANGEA, RANGET, RANGEP, ALIGN, DIST, MSTATUS
+      logical LIVEMAPPING
 c
