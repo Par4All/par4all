@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.11  1997/09/30 06:57:15  coelho
+ * gen_array_* used...
+ *
  * Revision 1.10  1997/09/11 13:42:10  coelho
  * check consistency...
  *
@@ -65,22 +68,26 @@
 static entity
 get_main_entity(void)
 {
-    char *module_list[ARGS_LENGTH];
-    int nmodules = 0, i;
-    
-    db_get_module_list(&nmodules, module_list);
+    entity m;
+    gen_array_t modules = db_get_module_list();
+    int nmodules = gen_array_nitems(modules), i;
     pips_assert("some modules in the program", nmodules>0);
 
     for (i=0; i<nmodules; i++)
     {
-	entity m = local_name_to_top_level_entity(module_list[i]);
-	if (entity_main_module_p(m))
+	m = local_name_to_top_level_entity(gen_array_item(modules, i));
+	if (entity_main_module_p(m)) {
+	    gen_array_full_free(modules);
 	    return m;
+	}
     }
 
     /* ??? some default if there is no main... */
-    pips_user_warning("no main found, returning %s instead\n", module_list[0]);
-    return local_name_to_top_level_entity(module_list[0]);
+    pips_user_warning("no main found, returning %s instead\n", 
+		      gen_array_item(modules,0));
+    m = local_name_to_top_level_entity(gen_array_item(modules, 0));
+    gen_array_full_free(modules);
+    return m;
 }
 
 /******************************************************** PIPSMAKE INTERFACE */
@@ -141,9 +148,9 @@ bool
 program_precondition(string name)
 {
     transformer t = transformer_identity();
-    int nmodules = 0, i;
-    char * module_list[ARGS_LENGTH];
     entity the_main = get_main_entity();
+    int i, nmodules;
+    gen_array_t modules;
 
     pips_assert("main was found", the_main!=entity_undefined);
 
@@ -162,27 +169,25 @@ program_precondition(string name)
 					  TRUE));
     module_to_value_mappings(the_main);
     
-    db_get_module_list(&nmodules, module_list);
+    modules = db_get_module_list();
+    nmodules = gen_array_nitems(modules);
     pips_assert("some modules in the program", nmodules>0);
 
     for(i=0; i<nmodules; i++) 
     {
 	transformer tm;
-	pips_debug(1, "considering module %s\n", module_list[i]);
+	string mname = gen_array_item(modules, i);
+	pips_debug(1, "considering module %s\n", mname);
 	
 	tm = transformer_dup((transformer) /* no dup & FALSE => core */
 	    db_get_memory_resource(DBR_INITIAL_PRECONDITION,  
-				   module_list[i], TRUE));
+				   mname, TRUE));
 
 	pred_debug(3, "current: t =\n", t);
 	pred_debug(2, "to be added: tm =\n", tm);
-
 	translate_global_values(the_main, tm); /* modifies tm! */
-
 	pred_debug(3, "to be added after translation:\n", tm);
-
 	intersect(t, tm); 
-
 	free_transformer(tm);
     }
 
@@ -199,6 +204,7 @@ program_precondition(string name)
     reset_cumulated_rw_effects();
 
     free_value_mappings();
+    gen_array_full_free(modules);
 
     debug_off();
     return TRUE;
