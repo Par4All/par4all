@@ -4,7 +4,7 @@
  *
  * also include functions for timings...
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/04 18:04:04 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/04 18:04:40 $, )
  * version $Revision$
  *
  * Fabien Coelho, June 1993
@@ -143,7 +143,7 @@ STRING_ARG_DECL(comment);
      */  
     for (i=0; i<MAX_COMMENT_LENGTH && i<STRING_LEN(comment); i++)
 	buffer[i] = STRING_PTR(comment)[i];
-    buffer[i]='\0'
+    buffer[i]='\0';
 
     assert(is_timer_on);
     if (gettimeofday(&current, (struct timezone *) NULL))
