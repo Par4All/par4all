@@ -274,10 +274,10 @@ no_elim(Psysteme ps)
 }
 
 transformer 
-transformer_projection_with_redundancy_elimination(t, args, elim)
-transformer t;
-cons * args;
-Psysteme (*elim)(Psysteme);
+transformer_projection_with_redundancy_elimination(
+    transformer t,
+    list args,
+    Psysteme (*elim)(Psysteme))
 {
     /* Library Linear/sc contains several reundancy elimination functions:
      *  sc_elim_redund()
@@ -285,20 +285,35 @@ Psysteme (*elim)(Psysteme);
      *  ...
      * no_elim() is provided here to obtain the fastest possible projection
      */
-    cons * new_args = NIL;
+    list new_args = NIL;
     Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
 
-    if(!ENDP(args)) {
-	cons * cea;
+    if(!ENDP(args))
+    {
+	list cea;
 
 	/* get rid of unwanted values in the relation r and in the basis */
 	for (cea = args ; !ENDP(cea); POP(cea)) {
 	    entity e = ENTITY(CAR(cea));
 	    Pbase b = base_dup(sc_base(r));
-            pips_assert("transformer_projection",
+            pips_assert("base contains variable to project...",
                         base_contains_variable_p(b, (Variable) e));
             
-	    sc_projection_along_variable_ofl_ctrl(&r,(Variable) e, NO_OFL_CTRL);
+	    CATCH(overflow_error) 
+	    {
+                /* FC */
+		pips_user_warning("overflow error in projection of %s, "
+				  "variable eliminated\n",
+				  entity_name(e)); 
+		r = sc_elim_var(r, (Variable) e);
+	    }
+	    TRY 
+	    {
+		sc_projection_along_variable_ofl_ctrl
+		    (&r,(Variable) e, NO_OFL_CTRL);
+		UNCATCH(overflow_error);
+	    }
+
 	    sc_base_remove_variable(r,(Variable) e);
 	    /* Eliminate redundancy at each projection stage
 	     * to avoid explosion of the constraint number
