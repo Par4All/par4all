@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1997/02/18 09:13:32 $, ) 
+ * ($Date: 1997/03/19 15:55:48 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -402,6 +402,16 @@ void fprint_entity_list(FILE *fp, list l);
 /* fake resources...
  */
 #define NO_FILE (strdup("fake file name"))
+
+/* File suffixes 
+ */
+
+#define HOST_SUFFIX	"_host.f"
+#define NODE_SUFFIX	"_node.f"
+#define NINC_SUFFIX	"_node.h"
+#define BOTH_SUFFIX	"_both.f"
+#define PARM_SUFFIX	"_parameters.h"
+#define INIT_SUFFIX	"_init.h"
 
 /* that is all
  */
