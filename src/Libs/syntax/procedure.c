@@ -10,8 +10,8 @@
 #include "misc.h"
 #include "properties.h"
 
-#include "pipsdbm.h"
 #include "ri-util.h"
+#include "pipsdbm.h"
 #include "syntax.h"
 
 #include "toklex.h"
