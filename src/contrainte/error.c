@@ -3,7 +3,7 @@
 /*LINTLIBRARY*/
 
 #include <stdio.h>
-#include <varargs.h>
+#include <stdarg.h>
 	
 /* void contrainte_error(va_dcl va_alist) should be called to terminate
  * execution and to core dump when data structures are corrupted or when
@@ -17,17 +17,14 @@
  * arguments to vprintf. CONTRAINTE_ERROR terminates execution with abort.
  */
 /*VARARGS0*/
-void contrainte_error(va_alist)
-va_dcl
+void contrainte_error(char * name, char * fmt, ...)
 {
     va_list args;
-    char *fmt;
 
-    va_start(args);
+    va_start(args, fmt);
 
     /* print name of function causing error */
-    (void) fprintf(stderr, "contrainte error in %s: ", va_arg(args, char *));
-    fmt = va_arg(args, char *);
+    (void) fprintf(stderr, "contrainte error in %s: ", name);
 
     /* print out remainder of message */
     (void) vfprintf(stderr, fmt, args);
