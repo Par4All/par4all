@@ -160,15 +160,14 @@
     ((same_string_p(entity_local_name(e), DYNAMIC_AREA_LOCAL_NAME)) || \
      (same_string_p(entity_local_name(e), STATIC_AREA_LOCAL_NAME)))
 
-/*
-  constant sizes
-*/
+/*  constant sizes
+ */
 #define LABEL_SIZE 5
 #define INDENTATION 3
 #define MAXIMAL_MODULE_NAME_SIZE 36
 
-/* Default values */
-
+/* Default values
+ */
 #define STATEMENT_NUMBER_UNDEFINED (-1)
 #define STATEMENT_ORDERING_UNDEFINED (-1)
 
@@ -185,20 +184,27 @@
          (expression_normalized(e) = NormalizeExpression(e)) : \
          (expression_normalized(e)))
 
-
-/*
- * misc: newgen shorthands
+/*   MISC: newgen shorthands
  */
 
-#define  entity_declarations(e) (code_declarations(entity_code(e)))
+#define entity_declarations(e) (code_declarations(entity_code(e)))
+
 #define effect_system(e) \
 	(predicate_system(transformer_relation(effect_context(e))))
+
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
+
 #define statement_block_p(stat) \
 	(instruction_block_p(statement_instruction(stat)))
 
+#define instruction_to_statement(i) \
+   make_statement(entity_empty_label(),\
+		  STATEMENT_NUMBER_UNDEFINED, STATEMENT_ORDERING_UNDEFINED,\
+		  string_undefined, i)
 
-/*
- * that is all for ri-util-local.h
- *
+#define loop_to_instruction(l) make_instruction(is_instruction_loop, l)
+
+#define loop_to_statement(l) instruction_to_statement(loop_to_instruction(l))
+
+/* that is all for $RCSfile: ri-util-local.h,v $
  */
