@@ -218,7 +218,17 @@ char * module_name;
 
     set_current_module_entity(callee);
 
-    debug(8, "summary_precondition", "begin\n");
+    ifdebug(1) {
+	debug(1, "summary_precondition", "begin for %s with %d callers\n",
+	      module_name,
+	      gen_length(callees_callees(callers)));
+	MAP(STRING, caller_name, {
+	    (void) fprintf(stderr, "%s, ", caller_name);
+	}, callees_callees(callers));
+	    (void) fprintf(stderr, "\n");
+    }
+
+    reset_call_site_number();
 
     MAP(STRING, caller_name, {
 	entity caller = local_name_to_top_level_entity(caller_name);
@@ -228,16 +238,20 @@ char * module_name;
     if(transformer_undefined_p(t)) {
 	t = transformer_identity();
     }
+    else {
+	/* try to eliminate redundancy */
+	t = transformer_normalize(t);
+    }
 
     DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
 			   strdup(module_name), (char * )t);
 
-    ifdebug(8) {
-	debug(8, "summary_precondition", 
-	      "initial summary precondition %x for %s:\n",
-	      t, module_name);
+    ifdebug(1) {
+	debug(1, "summary_precondition", 
+	      "initial summary precondition %x for %s (%d call sites):\n",
+	      t, module_name, get_call_site_number());
 	dump_transformer(t);
-	debug(8, "summary_precondition", "end\n");
+	debug(1, "summary_precondition", "end\n");
     }
 
     reset_current_module_entity();
