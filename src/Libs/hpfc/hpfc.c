@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/03/20 19:09:47 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/04/01 11:36:38 $, )
  * version $Revision$
  */
  
@@ -288,6 +288,9 @@ static void set_resources_for_module(entity module)
     automatic_translation(hpfc_name_to_entity(HPF_PREFIX TIMEOFF_SUFFIX),
 			  hpfc_name_to_entity(HOST_TIMEOFF),
 			  hpfc_name_to_entity(NODE_TIMEOFF));
+    automatic_translation(hpfc_name_to_entity(HPF_PREFIX HOSTSECTION_SUFFIX),
+			  entity_intrinsic(CONTINUE_FUNCTION_NAME),
+			  entity_intrinsic(CONTINUE_FUNCTION_NAME));
 
     free(module_name);
 }
