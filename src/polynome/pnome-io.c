@@ -8,6 +8,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <malloc.h>
 
 #include "boolean.h"
 #include "vecteur.h"
@@ -27,15 +28,18 @@ float x;
     int i;
     float fprecision = (float) intpower(10.0, -PNOME_FLOAT_N_DECIMALES);
 
-    if (((x <= fprecision) && (x >= -fprecision)) ||          /* if too little */
-	((x>PNOME_FLOAT_TO_EXP_LEVEL) | (x<-PNOME_FLOAT_TO_EXP_LEVEL)))/* or too big */
-	sprintf(*ps, "%.*E", PNOME_FLOAT_N_DECIMALES, x); /* print it with an exponent */
+    if (((x <= fprecision) && (x >= -fprecision)) || 
+	((x>PNOME_FLOAT_TO_EXP_LEVEL) | (x<-PNOME_FLOAT_TO_EXP_LEVEL)))
+         /* if too little or too big print it with an exponent */
+	sprintf(*ps, "%.*E", PNOME_FLOAT_N_DECIMALES, x);
     else {
-	sprintf(*ps, "%.*f", PNOME_FLOAT_N_DECIMALES, x);/* default printing: as a float */
+	/* default printing: as a float */
+	sprintf(*ps, "%.*f", PNOME_FLOAT_N_DECIMALES, x);
 	for (i=1; i<PNOME_FLOAT_TO_FRAC_LEVEL; i++)
-	    if ((((x*i) - ((int) (x*i+0.5))) < (fprecision)) &&  /* if x is close enough */
-		(((x*i) - ((int) (x*i+0.5))) > (-fprecision))) { /* to a little fraction */
-		if ((((int) (x*i+0.5)) < PNOME_FLOAT_TO_FRAC_LEVEL) || (i=1))
+	    if ((((x*i) - ((int) (x*i+0.5))) < (fprecision)) &&  
+		(((x*i) - ((int) (x*i+0.5))) > (-fprecision))) { 
+		/* if x is close enough up to a little fraction */
+		if ((((int) (x*i+0.5)) < PNOME_FLOAT_TO_FRAC_LEVEL) || (i==1))
 		    /*print it as a fraction */
 		    if (i==1)
 			sprintf(*ps, "%d", (int) (x*i+0.5));
@@ -229,6 +233,26 @@ Variable var1, var2;
     return (0 < strcmp(default_variable_name(var1), default_variable_name(var2)));
 }
 
+/* boolean default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
+ *  return TRUE if var1 is before var2, lexicographically,
+ *  according to the "default_variable_name" naming.
+ */
+boolean default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
+{
+    return (0 < strcmp(default_variable_name(vecteur_var(varval1)),
+		       default_variable_name(vecteur_var(varval2))));
+}
+
+/* boolean default_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+ *  return TRUE if var1 is before var2, lexicographically,
+ *  according to the "default_variable_name" naming.
+ */
+boolean default_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+{
+    return (0 < strcmp(default_variable_name(vecteur_var(* pvarval1)),
+		       default_variable_name(vecteur_var(* pvarval2))));
+}
+
 static void remove_blanks(ps)
 char **ps;
 {
@@ -303,7 +327,7 @@ Variable (*name_to_variable)();
     Ppolynome pp = POLYNOME_NUL;
     Pmonome curpm;
     boolean constructing_monome = FALSE;
-    float coeff;
+    float coeff = 0.;
     char *varname;
     int power;
     char *s;
