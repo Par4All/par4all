@@ -10,9 +10,7 @@
  *
  * More thoughts needed. 
  *
- * $RCSfile: stack.c,v $ version $Revision$
- * $Date: 2000/02/23 13:36:58 $, 
- * got on %D%, %T%
+ * $Id$
  */
 
 #include <stdlib.h>
@@ -123,11 +121,11 @@ stack_iterator stack_iterator_init(stack s, int down)
     return(i);
 }
 
-int stack_iterator_next_and_go(stack_iterator i, char ** pitem)
+int stack_iterator_next_and_go(stack_iterator i, void ** pitem)
 {
     if (STACK_ITERATOR_END_P(i))
     {
-	*pitem = (char*) NULL;
+	*pitem = (void*) NULL;
 	return(0);
     }
     else
@@ -161,7 +159,7 @@ static _stack_ptr allocate_bucket(int size)
     
     x->n_item = 0;
     x->max_items = size;
-    x->items = (char **) malloc(sizeof(char *)*size);
+    x->items = (void **) malloc(sizeof(void *)*size);
     x->succ = STACK_PTR_NULL;
 
     return(x);
@@ -212,7 +210,7 @@ stack stack_make(int type, int bucket_size, int policy)
 static void free_bucket(x)
 _stack_ptr x;
 {
-    free(x->items), x->items = (char **) NULL, free(x);
+    free(x->items), x->items = (void **) NULL, free(x);
 }
 
 static void free_buckets(x)
@@ -310,7 +308,7 @@ stack s;
  * the size it the same than the initial bucket size. 
  * Other policies may be considered.
  */
-void stack_push(char * item, stack s)
+void stack_push(void * item, stack s)
 {
     _stack_ptr x = s->stack;
 
@@ -320,7 +318,7 @@ void stack_push(char * item, stack s)
     {
 	_stack_ptr saved = x;
 
-	x = find_or_allocate(x->max_items);
+	x = find_or_allocate(s);
 	x->succ = saved;
 	s->stack = x;
     }
@@ -337,7 +335,7 @@ void stack_push(char * item, stack s)
  * the empty buckets are not freed here. 
  * stack_free does the job.
  */
-char *stack_pop(stack s)
+void *stack_pop(stack s)
 {
     _stack_ptr x = s->stack;
 
@@ -359,7 +357,7 @@ char *stack_pop(stack s)
 
 /* returns the item on top of stack s
  */
-char *stack_head(stack s)
+void *stack_head(stack s)
 {
     _stack_ptr x = s->stack;
 
@@ -373,10 +371,10 @@ char *stack_head(stack s)
 
 /* REPLACEs the item on top of stack s, and returns the old item
  */
-char *stack_replace(char * item, stack s)
+void *stack_replace(void * item, stack s)
 {
     _stack_ptr x = s->stack;
-    char *old;
+    void *old;
 
     if (x->n_item==0) x = x->succ;
     assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
