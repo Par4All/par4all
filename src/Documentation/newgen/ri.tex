@@ -802,22 +802,15 @@ source fide`le.
 \label{subsubsection-constant}
 \index{Constant}\index{DATA}\index{PARAMETER}
 
-\domain{Constant = int + litteral:unit}
+\domain{Constant = int + entity + litteral:unit}
 {}
 
-Type {\tt constant} is used to represent the numerical or non-numerical
-value of constant entities. Only
-integer entities are relevant for PIPS which explains why other values,
-flagged as {\tt litteral}, are not stored in binary form. They still are
-available through the entity name, which is the external ASCII form of
-the constant.
-
-\begin{comment}
-Le domaine \verb/constant/ est utilisé pour représenter la valeur
-initiale des entités constantes. Seules les entités de type entier
-nous intéressent, ce qui explique qu'une constante puisse e^tre soit un
-\verb/int/ soit un \verb/litteral/ dont on ne garde pas la valeur (type unit).
-\end{comment}
+Type \texttt{constant} is used to represent the numerical or non-numerical
+value of constant entities. Integer entities are directly flagged with
+their \texttt{int} value, otherwise if possible the constant is
+represented as an \texttt{entity}, possibly itself if the constant is
+within the value of an entity, and finally if no entity can be thought of
+a \texttt{litteral} is chosen.
 
 \section{Code, Statements and Instructions}
 \label{code}
