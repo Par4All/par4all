@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.31  1997/12/05 16:50:16  coelho
+ * checkpoint added.
+ *
  * Revision 1.30  1997/12/05 13:29:21  coelho
  * CAPPLY keyword added.
  *
@@ -90,6 +93,7 @@ static int tpips_lex_input (void)
 <KEY>open		{ KEYWORD(TK_OPEN); }
 <KEY>create		{ KEYWORD(TK_CREATE); }
 <KEY>close		{ KEYWORD(TK_CLOSE); }
+<KEY>checkpoint		{ KEYWORD(TK_CHECKPOINT); }
 <KEY>delete		{ KEYWORD(TK_DELETE); }
 <KEY>module		{ KEYWORD(TK_MODULE); }
 <KEY>make		{ KEYWORD(TK_MAKE); }
