@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:14:39 $, )
+# ($Date: 1996/08/21 17:16:51 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -197,7 +197,11 @@ $(PVM_ARCH):; mkdir $@
 INSTALL_INC_DIR:=$(INSTALL_RTM_DIR)/hpfc
 INSTALL_LIB_DIR:=$(INSTALL_RTM_DIR)/hpfc/$(PVM_ARCH)
 
-INSTALL_INC =	$(CORE_HEADERS) $(DDC_HEADERS) $(HPFC_MAKEFILES) $(M4_MACROS)
+INSTALL_INC =	$(CORE_HEADERS) \
+		$(DDC_HEADERS) \
+		$(HPFC_MAKEFILES) \
+		$(M4_MACROS) \
+		$(SCRIPTS)
 INSTALL_LIB=	$(LIB_TARGET)
 
 #
