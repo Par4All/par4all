@@ -200,6 +200,11 @@ typedef hash_table control_mapping;
 #define entity_a_function_p(e,name) \
   (strcmp(entity_local_name(e), name##_FUNCTION_NAME)==0)
 
+#define ENTITY_CONVERSION_P(e,name) \
+  (strcmp(entity_local_name(e), name##_GENERIC_CONVERSION_NAME)==0)
+#define ENTITY_CONVERSION_CMPLX_P(e) ENTITY_CONVERSION_P(e, CMPLX)
+#define ENTITY_CONVERSION_DCMPLX_P(e) ENTITY_CONVERSION_P(e, DCMPLX)
+
 #define ENTITY_CONTINUE_P(e) entity_a_function_p(e, CONTINUE)
 #define ENTITY_STOP_P(e) entity_a_function_p(e, STOP)
 #define ENTITY_RETURN_P(e) entity_a_function_p(e, RETURN)
@@ -290,6 +295,24 @@ typedef hash_table control_mapping;
                                      ENTITY_DIVIDE_P(e) )
 
 #define IO_CALL_P(call) io_intrinsic_p(call_function(call))
+
+/* classification of basics
+ */
+#define basic_numeric_simple_p(b) (basic_int_p(b) || basic_float_p(b))
+#define basic_numeric_p(b) (basic_numeric_simple_p(b) || basic_complex_p(b))
+#define basic_compatible_simple_p(b1, b2) (\
+                (basic_numeric_simple_p(b1) && basic_numeric_simple_p(b2)) ||\
+                (basic_string_p(b1) && basic_string_p(b2)) ||\
+                (basic_logical_p(b1) && basic_logical_p(b2)) ||\
+                (basic_overloaded_p(b1) && basic_overloaded_p(b2)) ||\
+                (basic_undefined_p(b1) && basic_undefined_p(b2)))
+#define basic_compatible_p(b1, b2) (\
+                (basic_numeric_p(b1) && basic_numeric_p(b2)) ||\
+                (basic_string_p(b1) && basic_string_p(b2)) ||\
+                (basic_logical_p(b1) && basic_logical_p(b2)) ||\
+                (basic_overloaded_p(b1) && basic_overloaded_p(b2)) ||\
+                (basic_undefined_p(b1) && basic_undefined_p(b2)))
+
 
 /*  constant sizes
  */
