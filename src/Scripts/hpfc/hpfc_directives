@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/02/28 15:49:58 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/01 09:25:41 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -27,12 +27,12 @@
 # _i: independent
 # _k: block 
 # _n: new
-# _o: overloaded (declaration)
 # _p: processors
 # _t: template
 # _y: dynamic
 #
-# move static directives AFTER declarations.
+# move static directives AFTER declarations, since I need to parse them
+# as statements.
 #
 
 #
@@ -48,7 +48,9 @@ RM=rm
 #
 # temporary files prefix
 
-TMP=/tmp/hpfc_hpf.$$
+SCRIPT=`basename $0`
+
+TMP=/tmp/$SCRIPT.$$
 $RM -f $TMP.*
 
 #
@@ -77,8 +79,8 @@ $SED '/^chpf\$/s,[Bb][Ll][Oo][Cc][Kk],_k,g
       /^chpf\$/s,[Cc][Yy][Cc][Ll][Ii][Cc],_c,g
       /^chpf\$/s,_c\([\,)]\),_c(1)\1,g
       s,^chpf\$ [Dd][Yy][Nn][Aa][Mm][Ii][Cc] \(.*\),      _y(\1),
-      s,^chpf\$ [Tt][Ee][Mm][Pp][Ll][Aa][Tt][Ee] \(.*\),      _o \1      _t(\1),
-      s,^chpf\$ [Pp][Rr][Oo][Cc][Ee][Ss][Ss][Oo][Rr][Ss] \(.*\),      _o \1      _p(\1),
+      s,^chpf\$ [Tt][Ee][Mm][Pp][Ll][Aa][Tt][Ee] \(.*\),      integer \1      _t(\1),
+      s,^chpf\$ [Pp][Rr][Oo][Cc][Ee][Ss][Ss][Oo][Rr][Ss] \(.*\),      integer \1      _p(\1),
       s,^chpf\$ [Aa][Ll][Ii][Gg][Nn] \(.*\) [Ww][Ii][Tt][Hh] \(.*\),      _a(\1\,\2),
       s,^chpf\$ [Rr][Ee][Aa][Ll][Ii][Gg][Nn] \(.*\) [Ww][Ii][Tt][Hh] \(.*\),      _b(\1\,\2),
       s,^chpf\$ [Dd][Ii][Ss][Tt][Rr][Ii][Bb][Uu][Tt][Ee] \(.*\) [Oo][Nn][Tt][Oo] \(.*\),      _d(\1\,\2),
@@ -94,7 +96,7 @@ $SED '/^chpf\$/s,[Bb][Ll][Oo][Cc][Kk],_k,g
 #
 $TR '' '\012' |
 #
-# I should also break the created lines which are too long...
+# ??? I should also break the created lines which are too long...
 #
 # separates static directives from others
 #
@@ -103,17 +105,44 @@ $SED "/^      call hpfc[adptdy]/w $TMP.1
 
 #
 # line before which the static directives will be inserted
-# i.e. last statement beginning with end.
+# i.e. last line of the declarations.
+#
+# first, find the last declaration line
 
-ENDLINE=`$SED -n "/ .... [ 	]*[Ee][ 	]*[Nn][ 	]*[Dd]/=" $TMP.0 | 
+LAST_DECLARATION_LINE=`
+$SED -n '/^ .... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
+         /^ .... [ 	]*[Rr][Ee][Aa][Ll][ 	\*]/=
+         /^ .... [ 	]*[Ss][Uu][Bb][Rr][Oo][Uu][Tt][Ii][Nn][Ee][ 	\*]/=
+         /^ .... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	\*]/=
+         /^ .... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
+         /^ .... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
+         /^ .... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 | 
          $SED -n '$p'`
+
+LINE=`expr $LAST_DECLARATION_LINE + 1`
+
+#
+# then deal with continuations if any.
+
+LAST_LINE=`
+$SED -n "1,$LINE b
+         s/\( .... .*[^ 	].*\)/\1/
+         t nocont
+         =
+         b
+         : nocont
+         q" $TMP.0 | $SED -n '$p'`
+
+
+LINE=${LAST_LINE:-$LINE}
 
 #
 # final output
 
-$SED "$ENDLINE,\$d" $TMP.0
+$SED "$LINE,\$d" $TMP.0
 $SED -n p $TMP.1
-$SED -n "$ENDLINE,\$p" $TMP.0
+$SED -n "$LINE,\$p" $TMP.0
+
 
 #
 # clean temporary files
