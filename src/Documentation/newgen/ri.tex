@@ -1,6 +1,9 @@
-\documentstyle[a4,psfig,html,verbatim]{article}
+%% $RCSfile: ri.tex,v $ (version $Revision$)
+%% $Date: 1996/08/21 10:40:07 $, 
 
-% \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\documentstyle[a4,psfig,html,verbatim,newgen_domain]{article}
+
+%% \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
 \title{PIPS: Internal Representation of Fortran Code}
 \author{Franc,ois Irigoin \\
@@ -10,17 +13,6 @@
 \\
         CRI, Ecole des Mines de Paris}
 
-                                %\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{{#2}}}
-      {
-        \catcode `==\active
-        \gdef\domain{\medskip\par\noindent
-          \bgroup
-          \catcode `_ \other
-          \catcode `= \active
-          \def={\em{\rm \string=}}
-          \tt\em\vraidomain}
-        \gdef\vraidomain#1{#1\egroup\medskip\par}
-        }
 
 % Correction de quelques erreurs. RK, 07/02/1994.
 
