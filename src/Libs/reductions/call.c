@@ -1,5 +1,5 @@
 /* $RCSfile: call.c,v $ (version $Revision$)
- * $Date: 1996/06/18 14:42:17 $, 
+ * $Date: 1996/06/18 15:57:17 $, 
  *
  * Fabien COELHO
  */
@@ -61,19 +61,6 @@ translate_into_one_local_entity(
     }
 }
 
-static list /* of entity */
-translate_entity_list(
-    entity module,
-    call c,
-    list /* of entity */ le)
-{
-    list l = NIL;
-    MAP(ENTITY, e,
-	l = gen_nconc(translate_into_local_entities(module, c, e), l),
-	le);
-    return l;
-}
-
 /* translate formel_ref under called(real_args) into some new reference.
  * the formal reference may be arbitrary, A(B(I)) for instance...
  * thus reshapings must be managed with great care...
@@ -110,9 +97,8 @@ translate_reduction(
 	free_reference(reduction_reference(*pred));
 	reduction_reference(*pred) = ref;
 	gen_free_list(reduction_dependences(*pred));
-	reduction_dependences(*pred) = 
-	    translate_entity_list(get_current_module_entity(),
-				  c, reduction_dependences(external_red));
+	reduction_dependences(*pred) = NIL;
+
 	return TRUE;
     }
 
