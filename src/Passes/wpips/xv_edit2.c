@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/10 17:21:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/17 16:33:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/10/10 17:21:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1995/10/17 16:33:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -38,7 +38,8 @@ static bool dont_touch_window[MAX_NUMBER_OF_WPIPS_WINDOWS];
 int number_of_wpips_windows = INITIAL_NUMBER_OF_WPIPS_WINDOWS;
 
 static Menu_item current_selection_mi, 
-                 close_menu_item;
+                 close_menu_item,
+sequential_view_menu_item;
 Menu_item edit_menu_item;
 
 /* The menu "View" on the main panel: */
@@ -56,8 +57,9 @@ edit_notify(Menu menu,
 {
    char string_filename[SMALL_BUFFER_LENGTH],
       string_modulename[SMALL_BUFFER_LENGTH];
-   char *modulename = db_get_current_module_name();
-   char *filename;
+   char file_name_in_database[MAXPATHLEN*2];
+   char * modulename = db_get_current_module_name();
+   char * file_name;
    int win_nb;
 
    if (modulename == NULL) {
@@ -65,29 +67,42 @@ edit_notify(Menu menu,
       return;
    }
 
-   /* Is there an available edit_textsw ? */
-   if ( (win_nb=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
-      prompt_user("None of the text-windows is available");
-      return;
+   if (wpips_emacs_mode) {
+      char * label = (char *) xv_get(menu_item, MENU_STRING);
+      /* Rely on the standard EPips viewer: */
+      wpips_execute_and_display_something_outside_the_notifyer(label);
    }
+   else {
+      /* Is there an available edit_textsw ? */
+      if ( (win_nb=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
+         prompt_user("None of the text-windows is available");
+         return;
+      }
 
-   filename = db_get_file_resource(DBR_SOURCE_FILE, modulename, TRUE);
-   sprintf(string_filename, "File: %s", filename);
-   sprintf(string_modulename, "Module: %s", modulename);
+      file_name = db_get_file_resource(DBR_SOURCE_FILE, modulename, TRUE);
+      sprintf(file_name_in_database, "%s/%s",
+              build_pgmwd(db_get_current_workspace_name()),
+              file_name);
 
-   /* Display the file name and the module name. RK, 2/06/1993 : */
-   xv_set(edit_frame[win_nb], FRAME_LABEL, "Pips Edit Facility",
-          FRAME_SHOW_FOOTER, TRUE,
-          FRAME_LEFT_FOOTER, string_filename,
-          FRAME_RIGHT_FOOTER, string_modulename,
-          NULL);
+      sprintf(string_filename, "File: %s", file_name);
+      sprintf(string_modulename, "Module: %s", modulename);
 
-   xv_set(edit_textsw[win_nb], 
-          TEXTSW_FILE, filename,
-          TEXTSW_BROWSING, FALSE,
-          TEXTSW_FIRST, 0,
-          NULL);
+      /* Display the file name and the module name. RK, 2/06/1993 : */
+      xv_set(edit_frame[win_nb], FRAME_LABEL, "Pips Edit Facility",
+             FRAME_SHOW_FOOTER, TRUE,
+             FRAME_LEFT_FOOTER, string_filename,
+             FRAME_RIGHT_FOOTER, string_modulename,
+             NULL);
 
+      xv_set(edit_textsw[win_nb], 
+             TEXTSW_FILE, file_name_in_database,
+             TEXTSW_BROWSING, FALSE,
+             TEXTSW_FIRST, 0,
+             NULL);
+
+      unhide_window(edit_frame[win_nb]);
+   }
+   
    xv_set(current_selection_mi, 
           MENU_STRING, "Lasts",
           MENU_INACTIVE, FALSE,
@@ -95,7 +110,6 @@ edit_notify(Menu menu,
 
    xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
 
-   unhide_window(edit_frame[win_nb]);
 }
 
 
@@ -331,6 +345,9 @@ execute_wpips_execute_and_display_something_outside_the_notifyer()
       else if (strcmp(label, PLACEMENT_VIEW) == 0) {
          print_type = DBR_PLC_FILE;
       }
+      else if (strcmp(label, EDIT_VIEW) == 0) {
+         print_type = DBR_SOURCE_FILE;
+      }
       else {
          pips_error("view_notify", "bad label : %s\n", label);
       }
@@ -543,13 +560,20 @@ create_edit_menu()
                 MENU_RELEASE,
                 NULL);
 
+   sequential_view_menu_item =
+          xv_create(NULL, MENUITEM, 
+                MENU_STRING, SEQUENTIAL_VIEW,
+                MENU_NOTIFY_PROC, view_notify,
+                NULL);
+  
    view_menu = 
       xv_create(XV_NULL, MENU_COMMAND_MENU, 
                 MENU_GEN_PIN_WINDOW, main_frame, "View & Edit Menu",
                 MENU_TITLE_ITEM, "Viewing or editing a module ",
                 MENU_APPEND_ITEM, current_selection_mi,
-
-                MENU_ACTION_ITEM, SEQUENTIAL_VIEW, view_notify,
+                MENU_APPEND_ITEM, sequential_view_menu_item,
+                /* The sequential_view_menu_item is the default item: */
+                MENU_DEFAULT_ITEM, sequential_view_menu_item,
                 MENU_ACTION_ITEM, USER_VIEW, view_notify,
                 MENU_ACTION_ITEM, SEQUENTIAL_EMACS_VIEW, view_notify,
                 MENU_ACTION_ITEM, SEQUENTIAL_GRAPH_VIEW, view_notify,
