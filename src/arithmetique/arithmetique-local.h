@@ -198,11 +198,11 @@ typedef int Value;
 #undef value_addto
 #define value_addto(v1,v2) value_assign(v1,value_plus(v1,v2))
 #undef value_substract
-#define value_substract(v1,v2) value_add(v1,v2)
+#define value_substract(v1,v2) value_addto(v1,v2)
 #undef value_product
-#define value_product(v1,v2) value_add(v1,v2)
+#define value_product(v1,v2) value_addto(v1,v2)
 #undef value_division
-#define value_division(v1,v2) value_add(v1,v2)
+#define value_division(v1,v2) value_addto(v1,v2)
 #undef value_negz_p
 #define value_negz_p(v) ((int)v)
 #endif
