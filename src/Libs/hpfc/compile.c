@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.64  1997/07/22 13:21:04  keryell
+ * %x -> %p formats.
+ *
  * Revision 1.63  1997/04/15 10:57:02  creusil
  * statement_effects used instead of statement mappings. bc.
  *
@@ -921,8 +924,8 @@ void update_common_references_in_regions()
 	     list lef = effects_effects(effs);
 
 	     debug(3, "update_common_references_in_regions",
-		   "statement 0x%x (%d effects)\n", 
-		   (unsigned int) stat, gen_length((list) lef));
+		   "statement %p (%d effects)\n", 
+		   stat, gen_length((list) lef));
 	     
 	     MAP(EFFECT, e, update_common_rewrite(effect_reference(e)), 
 		 (list) lef);
