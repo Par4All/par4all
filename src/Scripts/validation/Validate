@@ -182,7 +182,7 @@ prefix_file_exists()
 # returns one arg chosen randomly
 randomize()
 {
-    $deb2 random is `type random ; echo $?`
+    # $deb2  `type random ; echo $?`
     if type random > /dev/null 2>&1 
     then
 	random -e $#
