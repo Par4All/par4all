@@ -633,8 +633,7 @@ lio_elem:  io_elem
 
 io_elem: expression
 	    { $$ = $1; }
-	| TK_LPAR lio_elem TK_COMMA atom TK_EQUALS do_plage TK_RPAR
-	    { $$ = MakeImpliedDo($4, $6, $2); }	;
+        ;
 
 pause_inst: TK_PAUSE opt_expression
 	    { $$ = MakeZeroOrOneArgCallInst("PAUSE", $2); }
@@ -648,36 +647,49 @@ continue_inst: TK_CONTINUE
 	    { $$ = MakeZeroOrOneArgCallInst("CONTINUE", expression_undefined);}
 	;
 
-do_inst: TK_DO label opt_virgule atom TK_EQUALS do_plage
+do_inst: TK_DO label opt_virgule atom do_plage
 	    { 
-		MakeDoInst($4, $6, $2); 
+		MakeDoInst($4, $5, $2); 
 		$$ = instruction_undefined;
 	    }
 	;
 
-bdo_inst: TK_DO atom TK_EQUALS do_plage
+bdo_inst: TK_DO atom do_plage
 	    { 
-		MakeDoInst($2, $4, "BLOCKDO"); 
+		MakeDoInst($2, $3, "BLOCKDO"); 
 		$$ = instruction_undefined;
 	    }
 	;
 
 wdo_inst: TK_DO TK_WHILE TK_LPAR expression TK_RPAR
 	    { 
+	        if(expression_implied_do_p($4))
+		    ParserError("Syntax", "Unexpected implied DO\n");
 		MakeWhileDoInst($4, "BLOCKDO");
 		$$ = instruction_undefined;
 	    }
         | TK_DO label TK_WHILE TK_LPAR expression TK_RPAR
 	    { 
+	        if(expression_implied_do_p($5))
+		    ParserError("Syntax", "Unexpected implied DO\n");
 		MakeWhileDoInst($5, $2);
 		$$ = instruction_undefined;
 	    }
 	;
 
-do_plage: expression TK_COMMA expression
-	    { $$ = make_range($1, $3, MakeIntegerConstantExpression("1")); }
-	| expression TK_COMMA expression TK_COMMA expression
-	    { $$ = make_range($1, $3, $5); }
+do_plage: TK_EQUALS expression TK_COMMA expression
+	    { 
+	      if(expression_implied_do_p($2) || expression_implied_do_p($4))
+		  ParserError("Syntax", "Unexpected implied DO\n");
+	      $$ = make_range($2, $4, MakeIntegerConstantExpression("1"));
+	    }
+	| TK_EQUALS expression TK_COMMA expression TK_COMMA expression
+	    {
+	      if(expression_implied_do_p($2) || expression_implied_do_p($4)
+		 || expression_implied_do_p($6))
+		  ParserError("Syntax", "Unexpected implied DO\n");
+	      $$ = make_range($2, $4, $6);
+	    }
 	;
 
 endif_inst: TK_ENDIF
@@ -696,6 +708,8 @@ elseif_inst: TK_ELSEIF TK_LPAR expression TK_RPAR TK_THEN
 	    {
 		int elsifs = MakeElseInst();
 
+	        if(expression_implied_do_p($3))
+		    ParserError("Syntax", "Unexpected implied DO\n");
 		MakeBlockIfInst( $3, elsifs+1 );
 		$$ = instruction_undefined;
 	    }
@@ -703,6 +717,8 @@ elseif_inst: TK_ELSEIF TK_LPAR expression TK_RPAR TK_THEN
 
 blockif_inst: TK_IF TK_LPAR expression TK_RPAR TK_THEN
 	    {
+	        if(expression_implied_do_p($3))
+		    ParserError("Syntax", "Unexpected implied DO\n");
 		MakeBlockIfInst($3,0);
 		$$ = instruction_undefined;
 	    }
@@ -710,6 +726,8 @@ blockif_inst: TK_IF TK_LPAR expression TK_RPAR TK_THEN
 
 logicalif_inst: TK_IF TK_LPAR expression TK_RPAR inst_exec
 	    {
+	        if(expression_implied_do_p($3))
+		    ParserError("Syntax", "Unexpected implied DO\n");
 		$$ = MakeLogicalIfInst($3, $5); 
 	    }
 	;
@@ -717,6 +735,8 @@ logicalif_inst: TK_IF TK_LPAR expression TK_RPAR inst_exec
 arithmif_inst: TK_IF TK_LPAR expression TK_RPAR 
 			label TK_COMMA label TK_COMMA label 
 	    {
+	        if(expression_implied_do_p($3))
+		    ParserError("Syntax", "Unexpected implied DO\n");
 		$$ = MakeArithmIfInst($3, $5, $7, $9);
 	    }
 	;
@@ -727,6 +747,8 @@ goto_inst: TK_GOTO label
 	    }
 	| TK_GOTO TK_LPAR licon TK_RPAR opt_virgule expression
 	    {
+	        if(expression_implied_do_p($6))
+		    ParserError("Syntax", "Unexpected implied DO\n");
 		$$ = MakeComputedGotoInst($3, $6);
 	    }
 	| TK_GOTO entity_name opt_virgule TK_LPAR licon TK_RPAR
@@ -774,6 +796,8 @@ assignment_inst: TK_ASSIGN icon TK_TO atom
 	    }
 	| atom TK_EQUALS expression
 	    {
+	        if(expression_implied_do_p($3))
+		  ParserError("Syntax", "Unexpected implied DO\n");
 		$$ = MakeAssignInst($1, $3);
 	    }
 	;
@@ -1020,9 +1044,13 @@ dataval: dataconst
 	    }
 	;
 
-dataconst: const_simple
+dataconst: const_simple /* expression -> shift/reduce conflicts */
 	    {
 		$$ = $1;
+	    }
+        | TK_LPAR const_simple TK_COMMA const_simple TK_RPAR
+	    {
+		$$ = MakeComplexConstantExpression($2, $4);
 	    }
 	| entity_name
 	    {
@@ -1046,6 +1074,7 @@ dataconst: const_simple
 		    ParserError("gram", "Error in initializer");
 		}
 	    }
+/*
 	| entity_name TK_LPAR const_simple TK_COMMA const_simple TK_RPAR
 	{
 	    bool simple = ENTITY_IMPLIED_CMPLX_P($1);
@@ -1054,6 +1083,7 @@ dataconst: const_simple
 	    $$ = MakeBinaryCall(CreateIntrinsic
 	    (simple? IMPLIED_COMPLEX_NAME: IMPLIED_DCOMPLEX_NAME), $3, $5);
 	}
+	*/
 	;
 
 datavar: atom
@@ -1064,13 +1094,13 @@ datavar: atom
 	    { $$ = $1; }
 	;
 
-dataidl: TK_LPAR atom TK_COMMA entity_name TK_EQUALS do_plage TK_RPAR
+dataidl: TK_LPAR atom TK_COMMA entity_name do_plage TK_RPAR
 	    {
-		$$ = MakeDataVar($2, $6);
+		$$ = MakeDataVar($2, $5);
 	    }
-	| TK_LPAR dataidl TK_COMMA entity_name TK_EQUALS do_plage TK_RPAR
+	| TK_LPAR dataidl TK_COMMA entity_name do_plage TK_RPAR
 	    {
-		$$ = ExpandDataVar($2, $6);
+		$$ = ExpandDataVar($2, $5);
 	    }
 	;
 
@@ -1326,7 +1356,7 @@ atom: entity_name
 indices: TK_LPAR TK_RPAR
 		{ $$ = NULL; }
 	| TK_LPAR lexpression TK_RPAR
-		{ $$ = $2; }
+		{ $$ = FortranExpressionList($2); }
 	;
 
 lexpression: expression
@@ -1340,7 +1370,11 @@ lexpression: expression
 	;
 
 opt_expression: expression
-	    { $$ = $1; }
+	    { 
+	        if(expression_implied_do_p($1))
+		  ParserError("Syntax", "Unexpected implied DO\n");
+		$$ = $1;
+            }
 	|
 	    { $$ = expression_undefined; }
 	;
@@ -1358,6 +1392,10 @@ expression: sous_expression
 
 		    $$ = c;
             }
+	| TK_LPAR expression TK_COMMA atom do_plage TK_RPAR
+	    { $$ = MakeImpliedDo($4, $5, CONS(EXPRESSION, $2, NIL)); }
+	| TK_LPAR expression TK_COMMA lexpression TK_COMMA atom do_plage TK_RPAR
+	    { $$ = MakeImpliedDo($6, $7, CONS(EXPRESSION, $2, $4)); }
         ;
 
 sous_expression: atom
@@ -1371,62 +1409,62 @@ sous_expression: atom
 	| signe expression  %prec TK_STAR
 	    {
 		    if ($1 == -1)
-			$$ = MakeUnaryCall(CreateIntrinsic("--"), $2);
+			$$ = MakeFortranUnaryCall(CreateIntrinsic("--"), $2);
 		    else
 			$$ = $2;
 	    }
 	| expression TK_PLUS expression
 	    {
-		    $$ = MakeBinaryCall(CreateIntrinsic("+"), $1, $3);
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("+"), $1, $3);
 	    }
 	| expression TK_MINUS expression
 	    {
-		    $$ = MakeBinaryCall(CreateIntrinsic("-"), $1, $3);
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("-"), $1, $3);
 	    }
 	| expression TK_STAR expression
 	    {
-		    $$ = MakeBinaryCall(CreateIntrinsic("*"), $1, $3);
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("*"), $1, $3);
 	    }
 	| expression TK_SLASH expression
 	    {
-		    $$ = MakeBinaryCall(CreateIntrinsic("/"), $1, $3);
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("/"), $1, $3);
 	    }
 	| expression TK_POWER expression
 	    {
-		    $$ = MakeBinaryCall(CreateIntrinsic("**"), 
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("**"), 
 					      $1, $3);
 	    }
 	| expression oper_rela expression  %prec TK_EQ
 	    {
-		    $$ = MakeBinaryCall($2, $1, $3);    
+		    $$ = MakeFortranBinaryCall($2, $1, $3);    
 	    }
 	| expression TK_EQV expression
 	    {
-		    $$ = MakeBinaryCall(CreateIntrinsic(".EQV."), 
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic(".EQV."), 
 					      $1, $3);
 	    }
 	| expression TK_NEQV expression
 	    {
-		    $$ = MakeBinaryCall(CreateIntrinsic(".NEQV."), 
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic(".NEQV."), 
 					      $1, $3);
 	    }
 	| expression TK_OR expression
 	    {
-		    $$ = MakeBinaryCall(CreateIntrinsic(".OR."), 
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic(".OR."), 
 					      $1, $3);
 	    }
 	| expression TK_AND expression
 	    {
-		    $$ = MakeBinaryCall(CreateIntrinsic(".AND."), 
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic(".AND."), 
 					      $1, $3);
 	    }
 	| TK_NOT expression
 	    {
-		    $$ = MakeUnaryCall(CreateIntrinsic(".NOT."), $2);
+		    $$ = MakeFortranUnaryCall(CreateIntrinsic(".NOT."), $2);
 	    }
 	| expression TK_CONCAT expression
             {
-		    $$ = MakeBinaryCall(CreateIntrinsic("//"), 
+		    $$ = MakeFortranBinaryCall(CreateIntrinsic("//"), 
 					      $1, $3);    
 	    }
 	;
