@@ -8,8 +8,6 @@
  */
 
 #include <stdio.h>
-extern int fprintf();
-extern int sscanf();
 #include <string.h>
 
 #include "genC.h"
