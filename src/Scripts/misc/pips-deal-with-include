@@ -9,11 +9,10 @@ sub include {
     my($file_name) = @_;
     &debug("Include file \"%s\"\n", $file_name);
     printf "c Inlining file '%s':\n", $file_name;
-    open(++$input,"<$file_name")
-	# Since there is no module in the .f,
-	# they may be have been forbidden,
-	# so try in the originate directory:
-	|| open(++$input,"<../$file_name")
+    # Since there is no module in the .f,
+    # they may be have been forbidden,
+    # so try in the originate directory:
+    open(++$input,"<../$file_name")
 	|| die "Include cannot open \"$file_name\"\n";
 }
 
