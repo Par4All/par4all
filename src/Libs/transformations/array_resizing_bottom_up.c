@@ -36,6 +36,28 @@ static string current_mod ="";
 
 #define PREFIX_DEC  "$DEC"
 
+void bottom_up_print_array_declaration(entity e)
+{
+  /* This function prints only the dimensions of an array 
+   => to use the script $PIPS_ROOT/Src/Script/misc/normalization.pl*/
+  variable v = type_variable(entity_type(e));   
+  list l_dims = variable_dimensions(v);
+  user_log("(");
+  while (!ENDP(l_dims)) 
+    {
+      dimension dim = DIMENSION(CAR(l_dims));
+      string s = words_to_string(words_dimension(dim));
+      user_log("%s", s);  
+      l_dims = CDR(l_dims);
+      if (l_dims == NIL) 
+	user_log(")");
+      else
+	user_log(",");
+      free(s);
+    }
+}
+
+
 static bool
 parameter_p(entity e)
 {
@@ -416,7 +438,7 @@ sc_min_max_of_variable(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *mi
   return (FALSE);
 }
 
-static void bottom_up_adn_array_region(region reg, entity e, Psysteme pre)
+void new_array_declaration_from_region(region reg, entity e, Psysteme pre)
 {  
   variable v = type_variable(entity_type(e));   
   list l_dims = variable_dimensions(v);
@@ -441,7 +463,7 @@ static void bottom_up_adn_array_region(region reg, entity e, Psysteme pre)
   user_log("%s\t%s\t%s\t%s\t%d\t%s\t", PREFIX_DEC, 
 	   db_get_memory_resource(DBR_USER_FILE,current_mod,TRUE), 
 	   current_mod,entity_local_name(e),length,words_to_string(words_expression(upper)));  
-  print_array_declaration(e);
+  bottom_up_print_array_declaration(e);
   user_log("\n");
   user_log("---------------------------------------------------------------------------------------\n");  
 }
@@ -449,7 +471,7 @@ static void bottom_up_adn_array_region(region reg, entity e, Psysteme pre)
 
 /*This function finds in the list of regions the read and write regions of e.
   If there are 2 regions, it returns the union region */
-static region find_union_regions(list l_regions,entity e)
+region find_union_regions(list l_regions,entity e)
 {
   region reg = region_undefined;
   while (!ENDP(l_regions))
@@ -469,6 +491,13 @@ static region find_union_regions(list l_regions,entity e)
   return reg;
 }
 
+
+/* This phase do array resizing for all kind of arrays: formal or local
+   You can have a property to make array resizing for unnormalized array only
+   or for all arrays.
+   So we need REGIONS, which is longer than SUMMARY_REGIONS but it is the only 
+   solution for POINTER, like in COXINEL*/
+
 bool array_resizing_bottom_up(char* mod_name)
 {
   entity mod_ent = local_name_to_top_level_entity(mod_name);
@@ -476,20 +505,6 @@ bool array_resizing_bottom_up(char* mod_name)
   statement  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
   transformer mod_pre;
   Psysteme pre;
-  /* If we use summary_precondition and the preconditions are calculated 
-     intraprocedurally (no activate PRECONDITION_INTER_FULL/FAST) 
-     => pips_error in db_get_memory_resource because 
-     summary_precondition of the module is not available. 
-     
-     NN : I don't see the reason to use summary_precondition because 
-     bottom_up_adn is intraprocedural, if summary_precondition is used, 
-     we do not have more useful information but may infeasible precondition 
-     for no called subroutine => do nothing for that subroutine that is in fact
-     a favour point of this approach in comparison with top_down_adn
-
-     So I replaced summary_precondition by precondition*/
-
-  /* transformer mod_pre = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION, mod_name, TRUE);*/
  
   current_mod = mod_name;  
   set_precondition_map((statement_mapping)
@@ -500,37 +515,24 @@ bool array_resizing_bottom_up(char* mod_name)
   debug_on("ARRAY_RESIZING_BOTTOM_UP_DEBUG_LEVEL");
   debug(1," Begin bottom up array resizing for %s\n", mod_name);
     l_regions = load_rw_effects_list(mod_stmt);  
-
-  /* version la plus rapide mais perte des declarations locales
-     notament des pointeurs que l'on peut vouloir conserver dans le cas de
-     COCCINELLE
-     l_regions = effects_effects((effects) 
-      db_get_memory_resource(DBR_SUMMARY_REGIONS, mod_name, TRUE));
-  */
   mod_pre = load_statement_precondition(mod_stmt);
   pre = predicate_system(transformer_relation(mod_pre));
   user_log("\n-------------------------------------------------------------------------------------\n");
   user_log("Prefix \tFile \tModule \tArray \tNdim \tNew declaration\tOld declaration\n");
   user_log("---------------------------------------------------------------------------------------\n");
   
-  /* This version computes new upper bound for all kind of unnormalized array declarations
-     Modification NN: for formal argument arrays only*/
   while (!ENDP(l_decl))
     {
       entity e = ENTITY(CAR(l_decl));
       if (unnormalized_array_p(e))
 	{
-	  /*  storage s = entity_storage(e);
-	      if (storage_formal_p(s))
-	      { */
 	  region reg = find_union_regions(l_regions,e);
-	  bottom_up_adn_array_region(reg,e,pre);
-	  /*  }*/
+	  new_array_declaration_from_region(reg,e,pre);
 	}
       l_decl = CDR(l_decl);
     }
   user_log(" \n The total number of right array declarations : %d \n"
-	  ,number_of_right_array_declarations );
+	   ,number_of_right_array_declarations );
   
   debug(1,"End bottom up array resizing for %s\n", mod_name);
   debug_off();  
@@ -541,11 +543,6 @@ bool array_resizing_bottom_up(char* mod_name)
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
   return TRUE;
 }
-
-
-
-
-
 
 
 
