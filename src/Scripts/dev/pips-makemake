@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/09/02 11:56:18 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/09/02 13:00:34 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -371,7 +371,7 @@ echo:; @echo $(ECHO)
 	chmod a+rx,ug+w,o-w \$* ; \
 	$(RM) \$*/*.aux \$*/*.idx \$*/*.log \$*/*.pl \$*/*.tex \$*/*.css \
 	    \$*/.[A-Z]* ; \
-	test ! -f \$@.ps || { cp \$*.ps \$* ; $(ZIP) \$*.ps ; } ; \
+	test ! -f \$@.ps || { cp \$*.ps \$* ; $(ZIP) \$*/\$*.ps ; } ; \
 	{ echo "<head><title>Html or Postscript</title></head>";\
 	  echo "<a href=\$@>Html</a> <a href=\$*.ps.gz>Postscript</a>";} \
 	  > \$*/index.html ;\
