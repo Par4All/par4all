@@ -1,4 +1,4 @@
-/* $RCSfile: generate.c,v $ ($Date: 1995/07/20 18:40:39 $, )
+/* $RCSfile: generate.c,v $ ($Date: 1995/07/31 19:04:37 $, )
  * version $Revision$
  * 
  * Fabien Coelho, May 1993
@@ -92,8 +92,7 @@ list *lhp, *lnp;
 }
 
 
-/*
- * generate_c1_alpha
+/* generate_c1_alpha
  *
  * a distributed array variable is defined
  */
@@ -101,15 +100,9 @@ void generate_c1_alpha(stat, lhp, lnp)
 statement stat;
 list *lhp, *lnp;
 {
-    statement
- 	statcomputation = statement_undefined,
-	statcomputecomputer = statement_undefined,
- 	statifcomputer = statement_undefined;
-    expression
- 	writtenexpr = expression_undefined,
- 	newreadexpr = expression_undefined;
-    call
-	the_call;
+    statement statcomputation, statcomputecomputer, statifcomputer;
+    expression writtenexpr, newreadexpr;
+    call the_call;
     list
  	lupdatecomp = NIL,
  	lupdatenotcomp = NIL,
@@ -118,16 +111,13 @@ list *lhp, *lnp;
 	lstatnotcomp = NIL,
 	lstat = NIL,
  	linds = NIL;
-    reference
- 	ref,
-	newref;
+    reference ref, newref;
     entity newarray;
 
     (*lhp) = NIL;
     (*lnp) = NIL;
     
-    /*
-     * assertions... 
+    /* assertions... 
      */
     assert(instruction_call_p(statement_instruction(stat)));
 
@@ -140,43 +130,38 @@ list *lhp, *lnp;
 	    (reference_variable
 	     (syntax_reference(expression_syntax(writtenexpr))))));
     
-    /*
-     * read references to distributed arrays. 
+    /* read references to distributed arrays. 
      */
     lreadreftodistarray =
 	FindRefToDistArray(EXPRESSION(CAR(CDR(call_arguments(the_call)))));
 
-    /*
-     * generation of the code to get the necessary values... 
+    /* generation of the code to get the necessary values... 
      */
     MAP(SYNTAX, s, 
-     { 	 
-	 list lnotcomp;
- 	 list lcomp;
-
-	 debug(8, "generate_c1_alpha", "considering reference to %s\n",  	
-	       entity_name(reference_variable(syntax_reference(s))));
-	 
-	 generate_read_of_ref_for_computer(s, &lcomp, &lnotcomp);
-
-	 lstatcomp = gen_nconc(lstatcomp, lcomp); 	
-	 lstatnotcomp = gen_nconc(lstatnotcomp, lnotcomp);
-     },
-	 lreadreftodistarray);
+    { 	 
+	list lnotcomp;
+	list lcomp;
+	
+	debug(8, "generate_c1_alpha", "considering reference to %s\n",  	
+	      entity_name(reference_variable(syntax_reference(s))));
+	
+	generate_read_of_ref_for_computer(s, &lcomp, &lnotcomp);
+	
+	lstatcomp = gen_nconc(lstatcomp, lcomp); 	
+	lstatnotcomp = gen_nconc(lstatnotcomp, lnotcomp);
+    },
+	lreadreftodistarray);
 
     gen_free_list(lreadreftodistarray);
 
-    /*
-     * then the updated statement is to be added to node:
+    /* then the updated statement is to be added to node:
      */
     ref = syntax_reference(expression_syntax(writtenexpr));
     newarray  =  load_new_node(reference_variable(ref));
     generate_compute_local_indices(ref, &lstat, &linds);
     newref = make_reference(newarray, linds);
-    newreadexpr = 
-	UpdateExpressionForModule(node_module,
-				  EXPRESSION(CAR(CDR(call_arguments(the_call)))));
-
+    newreadexpr = UpdateExpressionForModule
+	(node_module, EXPRESSION(CAR(CDR(call_arguments(the_call)))));
 
     statcomputation = 
 	make_assign_statement(reference_to_expression(newref), 
@@ -218,27 +203,18 @@ void generate_update_values_on_nodes(ref, newref, lscompp, lsnotcompp)
 reference ref, newref;
 list *lscompp, *lsnotcompp;
 { 
-    entity
-	array = reference_variable(ref);
+    entity array = reference_variable(ref);
 
     if (replicated_p(array))
     {
-	statement
-	    statif,
-	    statco, 
-	    statco2,
-	    statsndtoon,
-	    statrcvfromcomp;
-	list
-	    lstat,
-	    linds;
+	statement statif, statco, statco2, statsndtoon, statrcvfromcomp;
+	list lstat, linds;
 
-	/* 
-	 * remote values have to be updated
+	/* remote values have to be updated
  	 */
  	statco = st_compute_current_owners(ref);
-	/*
-	 * the computer has to compute the owners in order to call
+
+	/* the computer has to compute the owners in order to call
 	 * the send to other owners function, because the owners
 	 * are used to define the owners set, which was quite obvious:-)
 	 *
@@ -257,13 +233,12 @@ list *lscompp, *lsnotcompp;
 						  NIL)),
 				   NIL);
 	
-/*	(*lscompp) = CONS(STATEMENT, statsndtoon, NIL); */
-	(*lscompp) = CONS(STATEMENT, 
-			statco2,
-			CONS(STATEMENT,
-			     statsndtoon,
+	(*lscompp) = CONS(STATEMENT, statco2,
+		     CONS(STATEMENT, statsndtoon,
+			  NIL));
+	(*lsnotcompp) = CONS(STATEMENT, statco,
+			CONS(STATEMENT, statif,
 			     NIL));
-	(*lsnotcompp) = CONS(STATEMENT, statco, CONS(STATEMENT, statif, NIL));
     } 
     else
     { 
@@ -272,8 +247,7 @@ list *lscompp, *lsnotcompp;
     }
 }
 
-/*
- * generate_read_of_ref_for_computer
+/* generate_read_of_ref_for_computer
  *
  * en cours d'adaptation... 
  */
@@ -281,15 +255,9 @@ void generate_read_of_ref_for_computer(s, lcompp, lnotcompp)
 syntax s;
 list *lcompp, *lnotcompp;
 {
-    statement
- 	statcompco,
- 	statcompgv,
-	statnotcompco,
- 	statnotcompmaysend;
-    reference
- 	ref = syntax_reference(s);
-    entity
- 	tempn,
+    statement statcompco, statcompgv, statnotcompco, statnotcompmaysend;
+    reference ref = syntax_reference(s);
+    entity tempn,
  	var = reference_variable(ref),
 	temp = NewTemporaryVariable(get_current_module_entity(), 
 				    entity_basic(var));
@@ -328,20 +296,12 @@ void generate_read_of_ref_for_all(s, lhp, lnp)
 syntax s;
 list *lhp, *lnp;
 {
-    statement
- 	stathco,
- 	stathrcv,
- 	statnco,
- 	statngv;
-    reference 
-	ref = syntax_reference(s);
-    entity
-	temph,
- 	tempn,
+    statement stathco, stathrcv, statnco, statngv;
+    reference ref = syntax_reference(s);
+    entity temph, tempn,
 	var = reference_variable(ref),
 	temp = NewTemporaryVariable(get_current_module_entity(), 
 				    entity_basic(var));
-
 
     assert(array_distributed_p(var));
     
@@ -374,15 +334,15 @@ list *lhp, *lnp;
      * COMPUTE_CURRENT_OWNERS(ref)
      * IF OWNERP(ME)
      * THEN
-     * local_ref = COMPUTE_LOCAL(ref)
-     * temp = (local_ref)
-     * IF SENDERP(ME) // this protection in case of replicated arrays. 
-     * THEN
-     * SENDTOHOST(temp)
-     * SENDTONODE(ALL-OWNERS,temp)
-     * ENDIF
+     *   local_ref = COMPUTE_LOCAL(ref)
+     *   temp = (local_ref)
+     *   IF SENDERP(ME) // this protection in case of replicated arrays. 
+     *   THEN
+     *       SENDTOHOST(temp)
+     *   SENDTONODE(ALL-OWNERS,temp)
+     *   ENDIF
      * ELSE
-     * temp = RECEIVEFROM(SENDER(...)) 
+     *   temp = RECEIVEFROM(SENDER(...)) 
      * ENDIF
      */
     statnco = st_compute_current_owners(ref);
@@ -393,8 +353,7 @@ list *lhp, *lnp;
     DEBUG_STAT(9, entity_name(node_module), statnco);
     DEBUG_STAT(9, entity_name(node_module), statngv);
 
-    /*
-     * the new variable is inserted in the expression... 
+    /* the new variable is inserted in the expression... 
      */
     syntax_reference(s) = make_reference(temp, NIL);
 }
@@ -452,8 +411,7 @@ list *lsp, *lindsp;
 	      
 }
 
-/*
- * generate_common_hpfrtds(...)
+/* generate_common_hpfrtds(...)
  *
  * must add a common in teh declarations that define
  * the data structures needed for the run time resolution...
@@ -463,9 +421,7 @@ void generate_common_hpfrtds()
     pips_error("generate_common_hpfrtds", "not yet implemented\n");
 }
 
-
-/*
- * generate_get_value_locally
+/* generate_get_value_locally
  *
  * put the local value of ref in the variable local. 
  *
@@ -481,16 +437,11 @@ void generate_get_value_locally(ref, goal, lstatp)
 reference ref, goal;
 list *lstatp;
 { 
-    statement 
-	stat;
-    expression 
-	expr;
-    entity 
-	array = reference_variable(ref),
- 	newarray = load_new_node(array);
-    list 
-	ls = NIL,
-	newinds = NIL;
+    statement stat;
+    expression expr;
+    entity array = reference_variable(ref),
+ 	   newarray = load_new_node(array);
+    list ls = NIL, newinds = NIL;
     
     assert(array_distributed_p(array));
 
@@ -503,8 +454,7 @@ list *lstatp;
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, stat, NIL));
 }
 
-/*
- * generate_send_to_computer
+/* generate_send_to_computer
  *
  * sends the local value of ref to the current computer
  */
@@ -512,14 +462,11 @@ void generate_send_to_computer(ref, lstatp)
 reference ref;
 list *lstatp;
 { 
-    statement 
-	statsnd;
+    statement statsnd;
     entity 
 	array = reference_variable(ref),
  	newarray = load_new_node(array);
-    list 
-	ls = NIL,
-	newinds = NIL;
+    list ls = NIL, newinds = NIL;
     
     assert(array_distributed_p(array));
 
@@ -531,23 +478,15 @@ list *lstatp;
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, statsnd, NIL));
 }
 
-/*
- * generate_receive_from_computer
- *
- *
- */
 void generate_receive_from_computer(ref, lstatp)
 reference ref; 
 list *lstatp;
 {
-    statement 
-	statrcv;
+    statement statrcv;
     entity 
 	array = reference_variable(ref), 
  	newarray = load_new_node(array);
-    list 
-	ls = NIL,
-	newinds = NIL;
+    list ls = NIL, newinds = NIL;
     
     assert(array_distributed_p(array));
 
@@ -559,16 +498,11 @@ list *lstatp;
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, statrcv, NIL));
 }
 
-/*
- * generate_parallel_body
- */
 void generate_parallel_body(body, lstatp, lw, lr)
 statement body;
 list *lstatp, lw, lr;
 {
-    statement
-	statcc,
-	statbody;
+    statement statcc, statbody;
     list
 	lcomp = NIL,
 	lcompr = NIL,
@@ -612,13 +546,9 @@ list *lstatp, lw, lr;
 	 {
 	     /* we are sure that computer is one of the owners
 	      */
-	     list
-		 lstat = NIL;
-	     list
-		 linds = NIL;
-	     entity
-		 newarray = load_new_node(var);
-							
+	     list lstat = NIL;
+	     list linds = NIL;
+	     entity newarray = load_new_node(var);
 
 	     generate_compute_local_indices(r, &lstat, &linds);
 	     lstat = 
@@ -628,23 +558,18 @@ list *lstatp, lw, lr;
 			   make_assign_statement
 			     (reference_to_expression(make_reference(newarray, 
 								     linds)),
-			      reference_to_expression(make_reference(tempn, 
-								     NIL))),
+			      entity_to_expression(tempn)),
 			   NIL));
 									      
-	     generate_update_values_on_nodes(r, 
-					     make_reference(tempn, NIL), 
-					     &lco, 
-					     &lnotco);
+	     generate_update_values_on_nodes
+		 (r, make_reference(tempn, NIL), &lco, &lnotco);
 
 	     lco = gen_nconc(lstat, lco);
 	 }
 	 else
 	 {
-	     generate_update_values_on_computer_and_nodes(r, 
-							  make_reference(tempn, NIL), 
-							  &lco, 
-							  &lnotco);
+	     generate_update_values_on_computer_and_nodes
+		 (r, make_reference(tempn, NIL), &lco, &lnotco);
 	 }
 	 
 	 lcompw = gen_nconc(lcompw, lco);
@@ -655,18 +580,15 @@ list *lstatp, lw, lr;
 	 lw);
 
 
-    debug(6, "generate_parallel_body", 
-	  "%d statements for computer write:\n",
-	  gen_length(lcompw));
+    pips_debug(6, "%d statements for computer write:\n", gen_length(lcompw));
 
     ifdebug(8)
     {
 	MAP(STATEMENT, s, DEBUG_STAT(8, entity_name(node_module), s), lcompw);
     }
 
-    debug(6, "generate_parallel_body", 
-	  "%d statements for not computer write:\n",
-	  gen_length(lnotcompw));
+    pips_debug(6, "%d statements for not computer write:\n",
+	       gen_length(lnotcompw));
 
     ifdebug(8)
     {
@@ -680,13 +602,11 @@ list *lstatp, lw, lr;
     lcomp = gen_nconc(lcompr, CONS(STATEMENT, statbody, lcompw));
     lnotcomp = gen_nconc(lnotcompr, lnotcompw);
 
-    (*lstatp) = CONS(STATEMENT,
-		     statcc,
-		     CONS(STATEMENT,
-			  st_make_nice_test(condition_computerp(),
-					    lcomp,
-					    lnotcomp),
-			  NIL));
+    (*lstatp) = CONS(STATEMENT, statcc,
+		CONS(STATEMENT, st_make_nice_test(condition_computerp(),
+						  lcomp,
+						  lnotcomp),
+		     NIL));
 
     ifdebug(6)
     {
@@ -696,8 +616,7 @@ list *lstatp, lw, lr;
 }
 
 
-/*
- * generate_update_values_on_computer_and_nodes
+/* generate_update_values_on_computer_and_nodes
  *
  * inside a loop, a variable is defined, and the values have to be updated
  * on the computer node itself, and on the other owners of the given variable.
@@ -712,22 +631,11 @@ list *lscompp, *lsnotcompp;
 	array = reference_variable(ref),
 	newarray = load_new_node(array);
     statement
-	statif,
-	statcompif,
-	statco,
-	statcompco,
-	statcompassign,
-	statsndtoO,
-	statsndtoOO,
-	statrcvfromcomp;
-    list
-	lstat,
-	lstatcomp,
-	linds,
-	lindscomp;
+	statif, statcompif, statco, statcompco, statcompassign,
+	statsndtoO, statsndtoOO, statrcvfromcomp;
+    list lstat, lstatcomp, linds, lindscomp;
     
-    /* 
-     * all values have to be updated...
+    /* all values have to be updated...
      */
     statcompco = st_compute_current_owners(ref);
     generate_compute_local_indices(ref, &lstatcomp, &lindscomp);
@@ -747,32 +655,27 @@ list *lscompp, *lsnotcompp;
 	statsndtoOO = make_continue_statement(entity_undefined);
 	statsndtoO  = st_send_to_owner(val);
     }
-    statcompif = st_make_nice_test(condition_ownerp(),
-				   gen_nconc(lstatcomp, 
-					    CONS(STATEMENT,
-						 statcompassign,
-						 CONS(STATEMENT,
-						      statsndtoOO,
-						      NIL))),
-				   CONS(STATEMENT,
-					statsndtoO,
-					NIL));
+    statcompif = st_make_nice_test
+	(condition_ownerp(),
+	 gen_nconc(lstatcomp, CONS(STATEMENT, statcompassign,
+			      CONS(STATEMENT, statsndtoOO,
+				   NIL))),
+	 CONS(STATEMENT, statsndtoO,
+	      NIL));
 
     statco = st_compute_current_owners(ref);
     generate_compute_local_indices(ref, &lstat, &linds);
     statrcvfromcomp = 
 	st_receive_from_computer(make_reference(newarray,linds));
     statif = st_make_nice_test(condition_ownerp(),
-			       gen_nconc(lstat,
-					 CONS(STATEMENT,
-					      statrcvfromcomp,
-					      NIL)),
+			       gen_nconc(lstat, CONS(STATEMENT, statrcvfromcomp,
+						     NIL)),
 			       NIL);
     
-    (*lscompp)=CONS(STATEMENT, statcompco, 
-		    CONS(STATEMENT, statcompif, NIL));
-    (*lsnotcompp)=CONS(STATEMENT, statco,
-		       CONS(STATEMENT,statif,NIL));
+    (*lscompp) = CONS(STATEMENT, statcompco, 
+		 CONS(STATEMENT, statcompif, NIL));
+    (*lsnotcompp) = CONS(STATEMENT, statco,
+		    CONS(STATEMENT, statif, NIL));
 }
 
 /* generate_update_distributed_value_from_host
@@ -821,9 +724,7 @@ list *lhstatp, *lnstatp;
 
 }
 
-
-/*
- * generate_update_private_value_from_host
+/* generate_update_private_value_from_host
  */
 void generate_update_private_value_from_host(s, lhstatp, lnstatp)
 syntax s;
