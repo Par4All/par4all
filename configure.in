@@ -83,7 +83,7 @@ case "$target" in
         LDCONFIG=
         INSTALL_LIB="install-static" ;;
  i*-pc-cygwin)   
-	LD="ld -r"
+	LD="gcc -static"
 	SHEXT="dll"
 	SHAREDLIB_FLAG=""
 	LIBS="$LIBS -lcygwin -lkernel32 -lcrtdll"
