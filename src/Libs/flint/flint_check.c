@@ -14,8 +14,6 @@
 
 /* #include <stdlib.h> */
 #include <strings.h>
-extern int      fprintf();
-extern int      vfprintf();
 
 #include "genC.h"
 #include "ri.h"
