@@ -128,6 +128,8 @@ char *what ;
 							 FALSE) );
     mod_stat = get_current_module_statement();
 
+    /* FI: I do not understand this sequence. Non balanced  debug_off() ? */
+    /*
     ifdebug(7)
     {
 	fprintf(stderr, "\nTesting NewGen consistency for initial code %s:\n",
@@ -141,6 +143,8 @@ char *what ;
     }
 
     debug_off();
+    */
+
     /* FI, BB: hack*/
     /*(void) db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, FALSE);*/
     mod_inst = statement_instruction(mod_stat);
