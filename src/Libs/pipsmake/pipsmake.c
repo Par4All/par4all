@@ -827,7 +827,7 @@ delete_some_resources(void)
 	    db_delete_obsolete_resources(check_physical_resource_up_to_date); 
 	reset_make_cache();
 	if (ndeleted>0) user_log("%d destroyed.\n", ndeleted);
-	else user_log("none destroyed.\n"
+	else user_log("none destroyed.\n");
     } else if (same_string_p(what, "all")) {
 	db_delete_all_resources();
 	user_log("done.\n");
