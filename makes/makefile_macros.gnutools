@@ -1,0 +1,15 @@
+#
+# $Id$
+#
+
+LEX	= flex
+LFLAGS	= 
+LINT	= lint
+LINTFLAGS= -habxu
+YACC	= bison
+YFLAGS	= -y
+PROTO	= cproto
+PRFLAGS	= -evcf2
+
+# end of it!
+#
