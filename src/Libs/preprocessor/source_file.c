@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.98  1999/01/08 16:19:15  coelho
+ * error in fsplit...
+ *
  * Revision 1.97  1998/12/30 14:28:41  irigoin
  * Bug fix in process_thru_cpp()
  *
@@ -433,6 +436,8 @@ static bool handle_include_file(FILE * out, char * file_name)
     FILE * in;
     bool ok = TRUE;
     string cached = get_cached(file_name);
+    char * error = NULL;
+
     if (!cached)
     {
 	FILE * tmp_out;
@@ -454,7 +459,8 @@ static bool handle_include_file(FILE * out, char * file_name)
 	    tmp_hbc = safe_fopen(filtered, "w");
 	    tmp_in = safe_fopen(cached, "r");
 	    
-	    process_bang_comments_and_hollerith(tmp_in, tmp_hbc);
+	    error = process_bang_comments_and_hollerith(tmp_in, tmp_hbc);
+	    if (error) ok = FALSE;
 
 	    safe_fclose(tmp_in, cached);
 	    safe_fclose(tmp_hbc, filtered);
@@ -478,6 +484,9 @@ static bool handle_include_file(FILE * out, char * file_name)
 	safe_cat(out, in);
 	safe_fclose(in, cached);
     }
+
+    if (error) pips_user_error("preprocessing error: %s\n", error);
+
     return ok;
 }
 
@@ -629,14 +638,15 @@ static void sort_file(string name)
 
 static bool pips_split_file(string name, string tempfile)
 {
-    int err;
-    FILE * out = safe_fopen(tempfile, "w");
-    string dir = db_get_current_workspace_directory();
-    err = fsplit(dir, name, out);
-    free(dir);
-    safe_fclose(out, tempfile);
-    sort_file(tempfile);
-    return err;
+  char * err;
+  FILE * out = safe_fopen(tempfile, "w");
+  string dir = db_get_current_workspace_directory();
+  err = fsplit(dir, name, out);
+  free(dir);
+  safe_fclose(out, tempfile);
+  sort_file(tempfile);
+  if (err) fprintf(stderr, "split error: %s\n", err);
+  return err? TRUE: FALSE;
 }
 
 /********************************************** MANAGING .F FILES WITH CPP */
