@@ -2,7 +2,7 @@
 # for debug, try:
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 18:36:45 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/09 08:45:10 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -93,7 +93,7 @@ install_exe_dir='$(PIPS_BINDIR)'
 case $DIRTYPE in
   Lib) ALL_RULE_TARGET='lib$(TARGET).a' ;;
   Passes) ALL_RULE_TARGET='$(TARGET)' ;;
-  Scripts) ALL_RULE_TARGET='.runable' ;
+  Scripts) ALL_RULE_TARGET='.runable $(RFILES)' ;
            install_file_dir='$(PIPS_UTILDIR)' ;
            install_lib_dir='$(PIPS_UTILDIR)' ;
            install_exe_dir='$(PIPS_UTILDIR)' ;;
@@ -154,7 +154,7 @@ do
 # DEFAULTS, may be overwritten by the $CONFIG_FILE content.
 #
 TARGET=		${dir_real_name}
-TARGETDIR=	$(SRCDIR)/${DIRTYPE}/$(TARGET)
+TARGETDIR=	$(PIPS_SRCDIR)/${DIRTYPE}/$(TARGET)
 #
 # installation directories for quick-install
 #
@@ -187,6 +187,7 @@ MAKEFILE=	${MAKEFILE}
 all: $ALL_RULE_TARGET
 # to override sun's default rule
 .SCCS_GET:
+.INIT: $(MAKEFILE)
 #
 # begin of $CONFIG_FILE inclusion
 #
@@ -218,7 +219,7 @@ INSTALL_LIB=	$(LIB_TARGET)
 INSTALL_EXE=	`if [ $DIRTYPE = 'Passes' ] ; then echo '$(BIN_TARGET)' ; fi`
 #
 
-.INIT: $MAKEFILE check_os
+.INIT: check_os
 
 check_install:
 	@if test \`echo *.a | wc -w\` -gt 1 ; \\
@@ -242,8 +243,6 @@ INSTALL_FILE=	$(FILES)
 INSTALL_LIB=
 INSTALL_EXE=	$(SCRIPTS) $(RFILES)
 
-all: .runable $(RFILES)
-
 .runable: $(SCRIPTS)
 	-[ "$(SCRIPTS)" ] && chmod a+x $(SCRIPTS)
 	touch .runable
@@ -251,8 +250,6 @@ all: .runable $(RFILES)
 check_install:
 
 .quick-install: .runable $(RFILES)
-
-.INIT: $(MAKEFILE)
 
 %
 
@@ -263,9 +260,6 @@ OBJECTS=	$(MAIN).o $(LIB_OBJECTS)
 INCLUDES=	$(LIB_HEADERS)
 SOURCES= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES)
 #
-# TARGETDIR=	$(PIPS_LIBSRCDIR)/$(TARGET)
-#
-all: $(LIB_TARGET)
 
 test: $(LIB_TARGET)
 	$(LINK) pips -lpips $(PIPS_LIBS)
