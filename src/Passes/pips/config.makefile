@@ -18,7 +18,7 @@
 LIB_CFILES	= pips.c
 LIB_HEADERS	= pips-local.h 
 LIB_OBJECTS	= $(LIB_CFILES:.c=.o)
-LIB_MAIN	= pips_main.c
+LIB_MAIN	= main_pips.c
 #
 TARGET_LIBS	= $(PIPS_LIBS)
 #
