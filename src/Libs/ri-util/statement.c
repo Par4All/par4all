@@ -395,10 +395,13 @@ statement loop_nest;
 	if(instruction_call_p(first_i))
 	    return loop_nest;
 	else {
-	    /* must be a loop */
-	    pips_assert("perfectly_nested_loop_to_body",
-			instruction_loop_p(first_i));
-	    return perfectly_nested_loop_to_body(first_s);
+	    if(instruction_block_p(first_i)) 
+		return perfectly_nested_loop_to_body(STATEMENT(CAR(instruction_block(first_i))));
+	    else {
+		pips_assert("perfectly_nested_loop_to_body",
+			    instruction_loop_p(first_i));
+		return perfectly_nested_loop_to_body( first_s);
+	    }
 	}
 	break;
     } 
@@ -408,8 +411,8 @@ statement loop_nest;
 	break;
     }
     default:
-	    pips_error("perfectly_nested_loop_to_body","illegal tag\n");
-	    break;
+	pips_error("perfectly_nested_loop_to_body","illegal tag\n");
+	break;
     }
     return(statement_undefined); /* just to avoid a warning */
 }
