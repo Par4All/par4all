@@ -29,15 +29,17 @@ extern int  simplex_arithmetic_error;
 #define DEBUG_GLOBAL_EXCEPTIONS
 
 #if defined(DEBUG_GLOBAL_EXCEPTIONS)
-#define exception_debug(msg, what) 			\
+#define exception_debug(msg, n, what) 			\
   fprintf(stderr, "%s %d - %d (%s %s %d)\n", 		\
-	  msg, what, global_exception_index, __FUNCTION__, __FILE__, __LINE__)
+	  msg, what, n, __FUNCTION__, __FILE__, __LINE__)
 #else
 #define exception_debug(msg, what) 1
 #endif
 
-#define exception_push(what) exception_debug("PUSH", what)
-#define exception_pop(what)  exception_debug("POP", what)
+#define exception_push(what) \
+  exception_debug("PUSH", global_exception_index, what)
+#define exception_pop(what) \
+  exception_debug("POP", global_exception_index-1, what)
 
 #define EXCEPTION extern int
 
