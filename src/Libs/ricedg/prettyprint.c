@@ -51,7 +51,6 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
     FILE *fp;
     graph dg;
     statement mod_stat;
-    printf("HERE");
 
     set_current_module_entity(local_name_to_top_level_entity(mod_name));
     set_current_module_statement( (statement)
@@ -92,7 +91,9 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
 
 bool print_dependence_graph(string name)
 {
+    printf("HERE1");
     return print_dependence_or_chains_graph(name, TRUE);
+    printf("HERE2");
 }
 
 bool print_chains_graph(string name)
