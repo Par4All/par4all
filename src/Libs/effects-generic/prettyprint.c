@@ -31,6 +31,74 @@
 
 #include "effects-generic.h"
 
+/*****************Written by phamdat**********************/
+/*text my_text_statement_any_effect_type(entity module, int margin, statement stat)
+{
+  text result = make_text(NIL);
+  list l;
+  for (l=lp; l; POP(l)) {
+    p_prettyprint_stuff pps = (p_prettyprint_stuff) STRING(CAR(l));
+    MERGE_TEXTS(result, resource_text(module, margin, stat, pps));
+  }
+  return result;
+}*/
+
+text my_get_any_effects_text(string module_name)
+{
+  entity module;
+  statement module_stat;
+  text txt = make_text(NIL);
+
+  /* current entity
+   */
+  set_current_module_entity( local_name_to_top_level_entity(module_name));
+  module = get_current_module_entity();
+
+  /* current statement
+   */
+  set_current_module_statement((statement) db_get_memory_resource
+			       (DBR_CODE, module_name, TRUE));
+  module_stat = get_current_module_statement();
+
+  /* resources to be prettyprinted...
+   */
+  load_resources(module_name);
+  
+  debug_on("EFFECTS_DEBUG_LEVEL");
+
+  /* prepare the prettyprinting */
+  init_prettyprint(my_text_statement_any_effect_type);
+  
+  /* summary regions first */
+  MERGE_TEXTS(txt, my_text_summary_any_effect_type(module));
+    
+  /* then code with effects, using text_statement_any_effect_type */
+  MERGE_TEXTS(txt, text_module(module,  module_stat));
+
+  close_prettyprint();
+  
+  debug_off();
+  
+  reset_current_module_entity();
+  reset_current_module_statement();
+  
+  return txt;
+}
+
+text my_get_text_proper_effects(string module_name)
+{
+  text t;
+
+  set_is_user_view_p(FALSE);
+  set_methods_for_rw_effects_prettyprint(module_name);
+  add_a_generic_prettyprint(DBR_PROPER_EFFECTS, FALSE, effects_to_text_func, effects_prettyprint_func, attach_effects_decoration_to_text_func);
+  t = my_get_any_effects_text(module_name);
+  reset_generic_prettyprints();
+  reset_methods_for_effects_prettyprint(module_name);
+  return t;
+}
+/*********************************************************/
+
 /***************************************************** ACTION INTERPRETATION */
 
 static string read_action_interpretation = "read";
