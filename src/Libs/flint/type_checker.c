@@ -863,9 +863,9 @@ void typing_of_expressions(statement s)
   
   /* Summary */
   user_log("Type Checker Summary\n"
-	   "Number of errors found    : %d\n"
-	   "Number of conversions     : %d\n"
-	   "Number of simplifications : %d\n",
+	   "\t%d errors found\n"
+	   "\t%d conversions inserted\n"
+	   "\t%d simplifications performed\n",
 	   context.number_of_error,
 	   context.number_of_conversion,
 	   context.number_of_simplication);
