@@ -240,3 +240,50 @@ Pcontrainte c1, c2;
     c->succ=c2;
     return(c1);
 }
+
+/* common (simply equal) contraints are extracted, 
+ *   whether equalities or inequalities.
+ * returns the common extracted constaints.
+ * WARNING: *pc1 and *pc2 are modified.
+ */
+Pcontrainte 
+extract_common_constraints(Pcontrainte * pc1, Pcontrainte * pc2, boolean eq)
+{
+  Pcontrainte c = CONTRAINTE_UNDEFINED, c1, c2, c1p, c2p, nc1, nc2;
+  
+  for (c1 = *pc1, 
+	 c1p = CONTRAINTE_UNDEFINED, 
+	 nc1 = c1? c1->succ: CONTRAINTE_UNDEFINED; 
+       c1; 
+       c1p = (c1==nc1)? c1p: c1, 
+	 c1 = nc1, 
+	 nc1 = c1? c1->succ: CONTRAINTE_UNDEFINED)
+  {
+    for (c2 = *pc2,
+	   c2p = CONTRAINTE_UNDEFINED,
+	   nc2 = c2? c2->succ: CONTRAINTE_UNDEFINED; 
+	 c2; 
+	 c2p = (c2==nc2)? c2p: c2,
+	   c2 = nc2,
+	   nc2 = c2? c2->succ: CONTRAINTE_UNDEFINED)
+    {
+      if ((eq && egalite_equal(c1, c2)) || (!eq && contrainte_equal(c1, c2)))
+      {
+	/* common! */
+	Pcontrainte sc1 = c1->succ, sc2 = c2->succ;
+
+	c1->succ = c, c = c1; /* link to result. */
+	c2->succ = NULL, contrainte_free(c2);  /* clean */
+
+	if (c1p) c1p->succ = sc1; else *pc1 = sc1;
+	if (c2p) c2p->succ = sc2; else *pc2 = sc2;
+	
+	/* get to next. */
+	c1 = nc1;
+	c2 = nc2 = CONTRAINTE_UNDEFINED;
+      }
+    }
+  }
+
+  return c;
+}
