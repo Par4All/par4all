@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 #include <strings.h>
-extern int fprintf();
 
 #include "genC.h"
 #include "ri.h"
