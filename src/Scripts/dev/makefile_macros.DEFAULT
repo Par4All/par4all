@@ -1,41 +1,12 @@
 #
-# $RCSfile: makefile_macros.DEFAULT,v $ (version $Revision$)
-# $Date: 1996/09/19 11:51:49 $, 
+# $Id$
 #
 # this file contains macro definitions 
 
-AR	= ar
-ARFLAGS	= rv
-CC	= cc
-CFLAGS	= -O -g
-CMKDEP	= -M
-CPPFLAGS= -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
-LD	= $(CC)
-LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(EXTERN_ROOT)/Lib/$(ARCH)
-RANLIB	= ranlib
-LEX	= lex
-LFLAGS	=
-FC	= f77
-FFLAGS	= -O -g
-LINT	= lint
-LINTFLAGS= -habxu
-YACC	= yacc
-YFLAGS	=
-PROTO	= cproto
-PRFLAGS	= -evcf2
-ETAGS	= etags
-TAR	= tar
-ZIP	= compress
-DIFF	= diff
-M4	= m4
-M4FLAGS	=
-LX2HTML	= latex2html
-L2HFLAGS= -link 8 -split 5
-LATEX	= latex
-BIBTEX	= bibtex
-MAKEIDX	= makeindex
-DVIPS	= dvips
-RMAN	= rman
+include $(ROOT)/Include/makefile_macros.doc
+include $(ROOT)/Include/makefile_macros.misc
+include $(ROOT)/Include/makefile_macros.comp
+include $(ROOT)/Include/makefile_macros.flags
 
-# end of $RCSfile: makefile_macros.DEFAULT,v $
+# end of it.
 #
