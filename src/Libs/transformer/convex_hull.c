@@ -28,6 +28,7 @@
 /* temporarily, for ifdebug */
 #include "transformer.h"
 
+/* This function used to have side effects on arguments t1 and t2 */
 static transformer transformer_convex_hulls
 (transformer t1, transformer t2, Psysteme (*method)(Psysteme, Psysteme))
 {
@@ -40,12 +41,12 @@ static transformer transformer_convex_hulls
     transformer t = transformer_undefined;
 
 
-    debug(5,"transformer_convex_hulls","begin\n");
-    ifdebug(5) {
+    debug(6,"transformer_convex_hulls","begin\n");
+    ifdebug(6) {
 	(void) fprintf(stderr, "convex hull t1 (%p):\n", t1);
 	dump_transformer(t1) ;
     }
-    ifdebug(5) {
+    ifdebug(6) {
 	(void) fprintf(stderr, "convex hull t2 (%p):\n", t2);
 	dump_transformer(t2) ;
     }
@@ -66,8 +67,28 @@ static transformer transformer_convex_hulls
 			    transformer_arguments(t2));
 
 	/* get relation fields */
-	r1 = (Psysteme) predicate_system(transformer_relation(t1));
-	r2 = (Psysteme) predicate_system(transformer_relation(t2));
+	r1 = sc_dup((Psysteme) predicate_system(transformer_relation(t1)));
+	r2 = sc_dup((Psysteme) predicate_system(transformer_relation(t2)));
+
+	/* add implicit equality constraints in r1 and r2 */
+	MAP(ENTITY, a, {
+	  if(!entity_is_argument_p(a, transformer_arguments(t2))) {
+	    entity a_new = entity_to_new_value(a);
+	    entity a_old = entity_to_old_value(a);
+	    Pvecteur eq = vect_new((Variable) a_new, -1);
+	    vect_chg_coeff(&eq, (Variable) a_old, 1);
+	    r2 = sc_equation_add(r2, contrainte_make(eq));
+	  }
+	     }, transformer_arguments(t1));
+	MAP(ENTITY, a, {
+	  if(!entity_is_argument_p(a, transformer_arguments(t1))) {
+	    entity a_new = entity_to_new_value(a);
+	    entity a_old = entity_to_old_value(a);
+	    Pvecteur eq = vect_new((Variable) a_new, -1);
+	    vect_chg_coeff(&eq, (Variable) a_old, 1);
+	    r1 = sc_equation_add(r1, contrainte_make(eq));
+	  }
+	     }, transformer_arguments(t2));
 
 	/* update bases using their "union"; convex hull has to be computed 
 	   relatively to ONE space */
@@ -85,7 +106,7 @@ static transformer transformer_convex_hulls
 	sc_dimension(r1) = base_dimension(b);
 	sc_dimension(r2) = sc_dimension(r1);
 
-	/* meet operation */
+	/* meet operation (with no side-effect on arguments r1 and r2) */
 	r = (* method)(r1, r2);
 	if(SC_EMPTY_P(r)) {
 	    /* FI: this could be eliminated if SC_EMPTY was really usable; 27/5/93 */
@@ -97,15 +118,18 @@ static transformer transformer_convex_hulls
 	    b = BASE_NULLE;
 	}
 
+	sc_rm(r1);
+	sc_rm(r2);
+
 	predicate_system(transformer_relation(t)) = r;
 
     }
-    ifdebug(5) {
+    ifdebug(6) {
 	(void) fprintf(stderr, "convex hull, t (%p):\n", t);
 	dump_transformer(t) ;
     }
 
-    debug(5,"transformer_convex_hulls","end\n");
+    debug(6,"transformer_convex_hulls","end\n");
 
     return t;
 }
