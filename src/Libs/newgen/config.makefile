@@ -16,8 +16,8 @@ LIB_CFILES = \
 NEWGEN_CFILES = $(notdir $(wildcard $(inc_dir)/*.c))
 
 $(NEWGEN_CFILES):
-	for f in $(NEWGEN_CFILES:.c=) ; do \
-		ln -s $(inc_dir)/$$f.c . ; \
+	for f in $(NEWGEN_CFILES) ; do \
+		ln -s $(inc_dir)/$$f . ; \
 	done
 
 LIB_OBJECTS	=  $(LIB_CFILES:.c=.o) $(NEWGEN_CFILES:.c=.o)
