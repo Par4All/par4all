@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.19  1998/11/24 17:22:37  coelho
+ * simplify implemented.
+ *
  * Revision 1.18  1998/11/24 14:15:28  coelho
  * more comments.
  *
@@ -342,13 +345,87 @@ get_eole_command
 
 /************************************************************* SOME PATTERNS */
 
+/* A + (--B) -> A - B
+ */
+static entity
+  bplus  = NULL,
+  uminus = NULL,
+  bminus = NULL;
+
+/* returns B if uminus(B), else 0
+ */
+static expression is_uminus(expression e)
+{
+  syntax s = expression_syntax(e);
+  if (syntax_call_p(s))
+  {
+    call c = syntax_call(s);
+    if (call_function(c)==uminus && gen_length(call_arguments(c))==1)
+      return EXPRESSION(CAR(call_arguments(c)));
+  }
+  return NULL;
+}
+
+static void call_simplify_rwt(call c)
+{
+  if (call_function(c)==bplus)
+  {
+    list la = call_arguments(c);
+    expression e1, e2, me;
+    
+    pips_assert("2 args to binary plus", gen_length(la)==2);
+
+    e1 = EXPRESSION(CAR(la));
+    e2 = EXPRESSION(CAR(CDR(la)));
+
+    me = is_uminus(e2);
+    if (me)
+    {
+      EXPRESSION(CAR(CDR(la))) = me; /* memory leak */
+      call_function(c) = bminus;
+      return;
+    }
+
+    me = is_uminus(e1);
+    if (me)
+    {
+      EXPRESSION(CAR(CDR(la))) = me;
+      EXPRESSION(CAR(la)) = e2; /* memory leak */
+      call_function(c) = bminus;
+      return;
+    }
+  }
+}
+
+static void generate_bminus(statement s)
+{
+  bplus = entity_intrinsic(PLUS_OPERATOR_NAME);
+  uminus = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
+  bminus = entity_intrinsic(MINUS_OPERATOR_NAME);
+  gen_recurse(s, call_domain, gen_true, call_simplify_rwt);
+}
+
+static void generate_bdivision(statement s)
+{
+  /* not implemeted yet. */
+}
+
 /* look for some expressions in s and simplify some patterns.
  */
 static void optimize_simplify_patterns(statement s)
 {
   /* not implemented yet. */
 
+  /* a + (-b)       -> a - b */
+  /* (-b) + a       -> a - b */
+  generate_bminus(s);
+
+  /* a * (1/ b)     -> a / b */
+  /* (1/ b) * a     -> a / b */
+  generate_bdivision(s);
+
   /* a + (-b * c)   -> a - (b * c) */
+  
 }
 
 
@@ -578,8 +655,7 @@ build_binary_operators_with_huffman(
   huffman_cost = cost;
   huffman_mode = mode;
 
-  // debug !
-  print_statement(s);
+  ifdebug(8) print_statement(s);
 
   gen_multi_recurse(s,
 		    call_domain, gen_true, call_rwt,
