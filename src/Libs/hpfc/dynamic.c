@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1995/09/15 15:54:10 $, )
+ * ($Date: 1995/10/04 17:34:06 $, )
  */
 
 #include "defines-local.h"
@@ -449,8 +449,8 @@ reference r;
 	array_used = TRUE;
 }
 
-static void simple_switch_old_to_new(s)
-statement s;
+static void 
+simple_switch_old_to_new(statement s)
 {
     gen_multi_recurse
 	(statement_instruction(s),
@@ -471,7 +471,9 @@ continue_propagation_p(statement s)
     what_stat_debug(8, s);
 
     if (!instruction_call_p(i)) 
-	return TRUE;
+    {
+	pips_debug(8, "not a call\n"); return TRUE;
+    }
     else
     {
 	call c = instruction_call(i);
@@ -536,9 +538,11 @@ continue_propagation_p(statement s)
     }
 }
 
-void propagate_synonym(s, old, new)
-statement s;
-entity old, new;
+void 
+propagate_synonym(
+    statement s,
+    entity old, 
+    entity new)
 {
     statement current;
 
@@ -561,6 +565,8 @@ entity old, new;
 
     old_variable = entity_undefined, new_variable = entity_undefined;
     close_ctrl_graph_travel();
+
+    pips_debug(4, "out\n");
 }
 
 /*   REMAPPING GRAPH REMAPS "SIMPLIFICATION"
@@ -870,22 +876,31 @@ void simplify_remapping_graph()
  * output: a list of entities which is allocated.
  * side effects: none. 
  */
-list /* of entities */ alive_arrays(s, t)
-statement s;
-entity t;
+list /* of entities */ 
+alive_arrays(
+    statement s,
+    entity t)
 {
-    list /* of entities */ l = NIL,lseens = NIL; /* to tag seen primaries. */
+    list /* of entities */ l = NIL, lseens = NIL; /* to tag seen primaries. */
 
     assert(entity_template_p(t));
 
     /*   first the alive list is scanned.
      */
+
+    /* ??? well, it is not necessarily initialized, I guess...
+     */
+    if (!bound_alive_synonym_p(s))
+	store_alive_synonym(s, make_entities(NIL));
+
     MAP(ENTITY, array,
     {
 	if (align_template(load_entity_align(array))==t)
 	    l = CONS(ENTITY, array, l);
+
+	pips_debug(8, "adding %s as alive\n", entity_name(array));
 	
-	lseens = CONS(ENTITY, load_primary_entity(array), l);
+	lseens = CONS(ENTITY, load_primary_entity(array), lseens);
     },
 	entities_list(load_alive_synonym(s)));
 
@@ -898,12 +913,18 @@ entity t;
 	    if (align_template(load_entity_align(array))==t)
 		l = CONS(ENTITY, array, l);
 	    
-	    lseens = CONS(ENTITY, array, l);
+	    pips_debug(8, "adding %s as default\n", entity_name(array));
+	
+	    lseens = CONS(ENTITY, array, lseens);
 	}
     },
 	list_of_distributed_arrays());
 
-    gen_free_list(lseens); return l;
+    DEBUG_ELST(9, "seen arrays", lseens);
+    gen_free_list(lseens); 
+
+    DEBUG_ELST(7, "returned alive arrays", l);
+    return l;
 }
 
 /* statement generate_copy_loop_nest(src, trg)
