@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/08/26 13:27:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/04/16 14:45:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1997/08/26 13:27:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1998/04/16 14:45:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -23,6 +23,7 @@ char vcid_xv_edit2[] = "%A% ($Date: 1997/08/26 13:27:16 $, ) version $Revision$,
 #endif
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "makefile.h"
