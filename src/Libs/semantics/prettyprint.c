@@ -22,6 +22,7 @@ extern int fprintf();
 #include "resources.h"
 
 #include "misc.h"
+#include "properties.h"
 
 #include "prettyprint.h"
 
@@ -29,6 +30,11 @@ extern int fprintf();
 #include "effects.h"
 
 #include "semantics.h"
+
+#define PREC_FORESYS_PREFIX "C$PREC"
+#define TRAN_FORESYS_PREFIX "C$TRAN"
+#define FORESYS_CONTINUATION_PREFIX "C$&"
+#define PIPS_NORMAL_PREFIX "C"
 
 DEFINE_CURRENT_MAPPING(semantic, transformer)
 
@@ -77,7 +83,7 @@ char *module_name;
     entity mod;
     statement mod_stat;
     transformer summary = transformer_undefined;
-    statement user_stat;
+    statement user_stat = statement_undefined;
 
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     mod = get_current_module_entity();
@@ -101,13 +107,18 @@ char *module_name;
 	debug_off();
     }
 
+    /* to set up the hash table to translate value into value names */
+    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
+    module_to_value_mappings(mod);
+
+    /* semantic information to print */
     set_semantic_map( (statement_mapping)
 	db_get_memory_resource(
 			       is_transformer? DBR_TRANSFORMERS 
 			       : DBR_PRECONDITIONS,
 			       module_name,
 			       TRUE) );
-
     summary = (transformer)
 	db_get_memory_resource(
 			       is_transformer? DBR_SUMMARY_TRANSFORMER
@@ -122,10 +133,7 @@ char *module_name;
 		   : "DBR_SUMMARY_PRECONDITION");
     }
 
-    /* still necessary ? BA, September 1993 */
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
-    
+    /* prepare the prettyprintting */
     filename = strdup(concatenate(db_get_current_program_directory(), 
 				  "/",
 				  module_name,
@@ -139,20 +147,19 @@ char *module_name;
 
     debug_on("SEMANTICS_DEBUG_LEVEL");
 
-    module_to_value_mappings(mod);
+
 
     /* initial version; to be used again when prettyprint really prettyprints*/
     /* print_text(fd, text_statement(mod, 0, mod_stat)); */
 
     /* new version */
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_formatted,
-				       is_transformer? 
-				       transformer_to_string(summary)
-				       : precondition_to_string(summary)));
+
+    /* summary information first */
+    MERGE_TEXTS(r,text_transformer(summary)); 
 
     debug_off();
 
+    /* then code with the corresponding information */
     ADD_SENTENCE_TO_TEXT(r, 
 			 make_sentence(is_sentence_formatted, 
 				       code_decls_text(entity_code(mod))));
@@ -186,7 +193,7 @@ int margin;
 statement stmt;
 {
     transformer t;
-    text txt = make_text(NIL);
+    text txt;
 
     if(is_user_view) {
 	statement i = (statement) hash_get(nts, (char *) statement_number(stmt));
@@ -200,15 +207,46 @@ statement stmt;
     else
 	t = load_statement_semantic(stmt);
 
-    if(t != (transformer) HASH_UNDEFINED_VALUE) {
-	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-						is_transformer? 
-						transformer_to_string(t)
-						: precondition_to_string(t)));
-    }
+    txt = text_transformer(t);
     return txt; 
 }
 
+
+/* text text_transformer(transformer tran) 
+ * input    : a transformer representing a transformer or a precondition 
+ * output   : a text containing commentaries representing the transformer
+ * modifies : nothing.
+ */
+text text_transformer(tran)
+transformer tran;
+{
+    text txt = make_text(NIL);
+    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+    string str_tran, str_prefix;
+
+    if(tran != (transformer) HASH_UNDEFINED_VALUE) {
+	if (is_transformer){
+	    str_tran = transformer_to_string(tran);
+	    if (foresys) 
+		str_prefix = TRAN_FORESYS_PREFIX;
+	    else 
+		str_prefix = PIPS_NORMAL_PREFIX;
+	}
+	else { 
+	    str_tran = precondition_to_string(tran);
+	    if (foresys) 
+		str_prefix = PREC_FORESYS_PREFIX;
+	    else 
+		str_prefix = PIPS_NORMAL_PREFIX;
+	}
+	
+	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted, strdup("\n")));
+	MERGE_TEXTS(txt, 
+		    string_predicate_to_commentary(str_tran, str_prefix));
+	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted, strdup("\n")));
+    }
+    return txt; 
+}
 
 
 /* ---------------------------------------------------------------- */
@@ -217,34 +255,31 @@ statement stmt;
 /* ---------------------------------------------------------------- */
 
 #define MAX_PRED_COMMENTARY_STRLEN 70
-#define MAX_PRED_STRLEN (MAX_PRED_COMMENTARY_STRLEN - 3)
 
 
-/* text words_predicate_to_commentary(list w_pred)
- * input    : a list of strings, one of them representing a predicate.
- * output   : a text of several lines of commentaries containing 
- *            this list of strings.
- * modifies : nothing.
+/* text string_predicate_to_commentary(string str_pred, string comment_prefix) 
+ * input    : a string, part of which represents a predicate.
+ * output   : a text consisting of several lines of commentaries,
+ *            containing the string str_pred, and beginning with 
+ *            comment_prefix.
+ * modifies : str_pred;
  */
-text words_predicate_to_commentary(w_pred)
-list w_pred ;
+text string_predicate_to_commentary(str_pred, comment_prefix)
+string str_pred;
+string comment_prefix;
 {
     text t_pred = make_text(NIL);
-    string str_pred, str_suiv;
-    char str_tmp[MAX_PRED_STRLEN];
+    string str_suiv = NULL;
+    string str_prefix = comment_prefix;
+    char str_tmp[MAX_PRED_COMMENTARY_STRLEN];
     int len, new_str_pred_len, longueur_max;
-    sentence sent_pred;
     boolean premiere_ligne = TRUE;
-    
-    longueur_max = MAX_PRED_STRLEN;
+    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+    longueur_max = MAX_PRED_COMMENTARY_STRLEN - strlen(str_prefix) - 2;
 
-    /* str_pred is the string corresponding to the concatenation
-     * of the strings in w_pred */
-    str_pred = words_to_string(w_pred);
-    
     /* if str_pred is too long, it must be splitted in several lines; 
      * the hyphenation must be done only between the constraints of the
-     * predicate, when there is a ",". A space is added at the beginning
+     * predicate, when there is a "," or a ")". A space is added at the beginning
      * of extra lines, for indentation. */
     while((len = strlen(str_pred)) > 0) {
 	if (len > longueur_max) {
@@ -254,7 +289,14 @@ list w_pred ;
 	    str_tmp[0] = '\0';
 	    (void) strncat(str_tmp, str_pred, longueur_max);
 
-	    str_suiv = strrchr(str_tmp, ',');
+	    switch (foresys) {
+	    case FALSE : 
+		str_suiv = strrchr(str_tmp, ',');
+		break;
+	    case TRUE : 
+		str_suiv = strrchr(str_tmp, ')');
+		break;
+	    }
 	    new_str_pred_len = (strlen(str_tmp) - strlen(str_suiv)) + 1;
 	    str_suiv = strdup(&(str_pred[new_str_pred_len]));
 
@@ -264,7 +306,8 @@ list w_pred ;
 	    (void) strncat(str_tmp, str_pred, new_str_pred_len);
 
 	    /* add it to the text */
-	    ADD_SENTENCE_TO_TEXT(t_pred, sent_pred = make_pred_commentary_sentence(strdup(str_tmp)));
+	    ADD_SENTENCE_TO_TEXT(t_pred, 
+				 make_pred_commentary_sentence(strdup(str_tmp), str_prefix));
 	    str_pred =  str_suiv;
 	}
 	else {
@@ -274,33 +317,69 @@ list w_pred ;
 		(void) strcat(str_tmp, " "); 
 	    (void) strcat(str_tmp, str_pred);
 
-	    ADD_SENTENCE_TO_TEXT(t_pred, make_pred_commentary_sentence(str_tmp));
+	    ADD_SENTENCE_TO_TEXT(t_pred, 
+				 make_pred_commentary_sentence(str_tmp, str_prefix));
 	    str_pred[0] = '\0';
 	}
 	
 	if (premiere_ligne) {
 	    premiere_ligne = FALSE;
 	    longueur_max = longueur_max - 1;
-	}
+	    if (foresys){
+		int i, nb_espaces = strlen (str_prefix) - strlen(FORESYS_CONTINUATION_PREFIX);
+		str_prefix = strdup(str_prefix);
+		str_prefix[0] = '\0';
+		(void) strcat(str_prefix, FORESYS_CONTINUATION_PREFIX);
+		for (i=1; i <= nb_espaces; i++)
+		    (void) strcat(str_prefix, " ");
+	      }
+	  }
     }
     
     return(t_pred);
 }
+    
 
 
-/* sentence make_pred_commentary_sentence(string str_pred) 
+/* text words_predicate_to_commentary(list w_pred, string comment_prefix)
+ * input    : a list of strings, one of them representing a predicate.
+ * output   : a text of several lines of commentaries containing 
+ *            this list of strings, and beginning with comment_prefix.
+ * modifies : nothing.
+ */
+text words_predicate_to_commentary(w_pred, comment_prefix)
+list w_pred;
+string comment_prefix;
+{
+    string str_pred;
+    text t_pred;
+
+    /* str_pred is the string corresponding to the concatenation
+     * of the strings in w_pred */
+    str_pred = words_to_string(w_pred);
+
+    t_pred = string_predicate_to_commentary(str_pred, comment_prefix);
+
+    return(t_pred);
+}
+
+
+/* sentence make_pred_commentary_sentence(string str_pred, string comment_prefix) 
  * input    : a substring formatted to be a commentary
- * output   : a sentence, containing the commentary form of this string.
+ * output   : a sentence, containing the commentary form of this string,
+ *            beginning with the comment_prefix.
  * modifies : nothing
  */
-sentence make_pred_commentary_sentence(str_pred)
+sentence make_pred_commentary_sentence(str_pred, comment_prefix)
 string str_pred;
+string comment_prefix;
 {
     char str_tmp[MAX_PRED_COMMENTARY_STRLEN + 1];
     sentence sent_pred;
 
     str_tmp[0] = '\0';
-    (void) strcat(str_tmp, "C  "); 
+    (void) strcat(str_tmp, comment_prefix); 
+    (void) strcat(str_tmp, "  ");
     (void) strcat(str_tmp, str_pred);
     (void) strcat(str_tmp, "\n"); 
 
