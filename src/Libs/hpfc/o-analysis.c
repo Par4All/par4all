@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/12/26 16:23:32 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1996/06/08 10:53:19 $, )
  * version $Revision$
  */
 
@@ -742,6 +742,7 @@ static bool
 generate_optimized_code_for_loop_nest(
     statement innerbody, 
     statement *pstat,
+    syntax the_computer_syntax,
     list Wa,
     list Ra,
     list Ro,
@@ -749,9 +750,8 @@ generate_optimized_code_for_loop_nest(
     list lRa,
     list lRo)
 {
-    syntax the_written_syntax = SYNTAX(CAR(Wa));
-    reference the_written_reference = syntax_reference(the_written_syntax);
-    entity array = reference_variable(the_written_reference);
+    reference the_computer_reference = syntax_reference(the_computer_syntax);
+    entity array = reference_variable(the_computer_reference);
     int an = load_hpf_number(array);
     entity_mapping
 	new_indexes = MAKE_ENTITY_MAPPING(),
@@ -767,7 +767,7 @@ generate_optimized_code_for_loop_nest(
     MAP(LOOP, l,
      {
 	 index = loop_index(l);
-	 dim = which_array_dimension(the_written_reference, index);
+	 dim = which_array_dimension(the_computer_reference, index);
 
 	 if (ith_dim_distributed_p(array, dim, &p))
 	 {
@@ -864,10 +864,11 @@ statement stat, *pstat;
 {
     list lw = NIL, lr = NIL, Ra = NIL, Ro = NIL, Rrt = NIL,
 	lWa = NIL, lRa = NIL, lRo = NIL, W  = NIL, Wa = NIL, 
-        Wrt = NIL, lvect = NIL, lkind = NIL;
-    syntax the_written_syntax = syntax_undefined;
-    reference the_written_reference = reference_undefined;
+        Wrt = NIL, lvect = NIL, lkind = NIL, R=NIL;
+    syntax the_computer_syntax = syntax_undefined;
+    reference the_computer_reference = reference_undefined;
     statement innerbody, messages_stat, newloopnest;
+    bool computer_is_written = TRUE;
 
     DEBUG_STAT(9, "considering statement", stat);
 
@@ -883,6 +884,7 @@ statement stat, *pstat;
     /* keeps only written references of which dimensions are block distributed,
      * and indices simple enough (=> normalization of loops may be usefull).
      * ??? bug: should also search for A(i,i) things that are forbidden...
+     * ??? what if no dist vars are written??? 
      */
     MAP(SYNTAX, s,
     {
@@ -890,8 +892,7 @@ statement stat, *pstat;
 	entity array = reference_variable(r);
 	
 	if ((block_distributed_p(array)) && 
-	    (simple_indices_p(r)) &&
-	    (!replicated_p(array)))
+	    (simple_indices_p(r)) && (!replicated_p(array)))
 	    W = CONS(SYNTAX, s, W);
 	else
 	    Wrt = CONS(SYNTAX, s, Wrt);
@@ -899,54 +900,75 @@ statement stat, *pstat;
 	lw);
 
     gen_free_list(lw);
-    if (W==NIL) /* no ok distributed variable written ! */
+    if (W) /* ok distributed variable written ! */
     {
-	pips_debug(7, "FALSE: no ok distributed variable written\n");
-	RETURN(FALSE);
+	the_computer_syntax = choose_one_syntax_in_references_list(&W);
+	the_computer_reference = syntax_reference(the_computer_syntax);
+	Wa = CONS(SYNTAX, the_computer_syntax, NIL);
     }
+    else
+    {
+	/* must chose the computer among read references! */
+	computer_is_written = FALSE;
+
+	MAP(SYNTAX, s,
+	{
+	    reference r = syntax_reference(s);
+	    entity array = reference_variable(r);
 	
-    
-    the_written_syntax = choose_one_syntax_in_references_list(&W);
+	    if ((block_distributed_p(array)) && 
+		(simple_indices_p(r)) && (!replicated_p(array)))
+		R = CONS(SYNTAX, s, R);
+	},
+	    lr);
 
-    the_written_reference = syntax_reference(the_written_syntax);
-    Wa = CONS(SYNTAX, the_written_syntax, NIL);
+	the_computer_syntax = choose_one_syntax_in_references_list(&R);
+	the_computer_reference = syntax_reference(the_computer_syntax);
+	Ra = CONS(SYNTAX, the_computer_syntax, NIL);
+    }
 
-    if (!align_check(the_written_reference,
-		     the_written_reference, &lvect, &lkind))
+    if (!align_check(the_computer_reference,
+		     the_computer_reference, &lvect, &lkind))
 	pips_error("Overlap_Analysis","no self alignment!\n");
     
-    lWa = CONS(CONSP, CONS(CONSP, lkind,
-		      CONS(CONSP, lvect, NIL)), NIL);
+    if (computer_is_written)
+	lWa = CONS(CONSP, CONS(CONSP, lkind,
+			  CONS(CONSP, lvect, NIL)), NIL);
+    else
+	lRa = CONS(CONSP, CONS(CONSP, lkind,
+			  CONS(CONSP, lvect, NIL)), NIL);
 
     MAP(SYNTAX, s,
     {
 	reference r = syntax_reference(s);
-
-	 if (align_check(the_written_reference, r, &lvect, &lkind))
-	 {
-	     if (aligned_p(the_written_reference, r, lvect, lkind))
-	     {
-		 Wa = gen_nconc(Wa, CONS(SYNTAX, s, NIL));
-		 lWa = gen_nconc(lWa, CONS(CONSP,
-					   CONS(CONSP, lkind, 
-						CONS(CONSP, lvect, NIL)),
-					   NIL));
-	     }
-	     else /* ??? what about loop splitting */
-	     {
-		 Wrt = gen_nconc(Wrt, CONS(SYNTAX, s, NIL));
-		 gen_free_list(lvect);
-		 gen_free_list(lkind); /* ??? memory leak */
-	     }
-	 }
-	 else
-	 {
-	     Wrt = gen_nconc(Wrt, CONS(SYNTAX, s, NIL));
-	     gen_free_list(lvect);
-	     gen_free_list(lkind); /* ??? memory leak */
-	 }
-     },
-	 CDR(W));
+	
+	if (the_computer_reference==r) continue;
+	
+	if (align_check(the_computer_reference, r, &lvect, &lkind))
+	{
+	    if (aligned_p(the_computer_reference, r, lvect, lkind))
+	    {
+		Wa = gen_nconc(Wa, CONS(SYNTAX, s, NIL));
+		lWa = gen_nconc(lWa, CONS(CONSP,
+					  CONS(CONSP, lkind, 
+					       CONS(CONSP, lvect, NIL)),
+					  NIL));
+	    }
+	    else /* ??? what about loop splitting */
+	    {
+		Wrt = gen_nconc(Wrt, CONS(SYNTAX, s, NIL));
+		gen_free_list(lvect);
+		gen_free_list(lkind); /* ??? memory leak */
+	    }
+	    }
+	else
+	{
+	    Wrt = gen_nconc(Wrt, CONS(SYNTAX, s, NIL));
+	    gen_free_list(lvect);
+	    gen_free_list(lkind); /* ??? memory leak */
+	}
+    },
+	W);
 
     gen_free_list(W);
     
@@ -958,7 +980,6 @@ statement stat, *pstat;
 
     /* Now, we have the following situation:
      * Wa: set of aligned written refs, the first of which is ``the'' ref.
-     * (what if no written, for instance a reduction ??? 
      */
     MAP(SYNTAX, s,
      {
@@ -966,6 +987,8 @@ statement stat, *pstat;
 	 entity array = reference_variable(r);
 	 list lvect = NIL;
 	 list lkind = NIL;
+
+	 if (the_computer_reference==r) continue;
 
 	 pips_debug(6, "dealing with reference of array %s\n",
 		    entity_name(array));
@@ -977,9 +1000,9 @@ statement stat, *pstat;
 	     fprintf(stderr, "\n");
 	 }
 
-	 if (align_check(the_written_reference, r, &lvect, &lkind))
+	 if (align_check(the_computer_reference, r, &lvect, &lkind))
 	 {
-	     if (aligned_p(the_written_reference, r, lvect, lkind))
+	     if (aligned_p(the_computer_reference, r, lvect, lkind))
 	     {
 		 Ra = gen_nconc(Ra, CONS(SYNTAX, s, NIL));
 		 lRa = gen_nconc(lRa, CONS(CONSP,
@@ -1045,7 +1068,8 @@ statement stat, *pstat;
      * the common case)
      */
     if (!generate_optimized_code_for_loop_nest
-	(innerbody, &newloopnest, Wa, Ra, Ro, lWa, lRa, lRo))
+	(innerbody, &newloopnest, the_computer_syntax, 
+	 Wa, Ra, Ro, lWa, lRa, lRo))
 	RETURN(FALSE);
 
     DEBUG_STAT(9, entity_name(node_module), newloopnest);
@@ -1053,10 +1077,11 @@ statement stat, *pstat;
     (*pstat) = 
 	make_block_statement
 	    (CONS(STATEMENT, messages_stat,
-	     CONS(STATEMENT, loop_nest_guard(newloopnest,
-					     the_written_reference,
-					     CONSP(CAR(CONSP(CAR(lWa)))),
-					     CONSP(CAR(CDR(CONSP(CAR(lWa)))))),
+	     CONS(STATEMENT,
+		  loop_nest_guard(newloopnest,
+				  the_computer_reference,
+		  CONSP(CAR(CONSP(CAR(computer_is_written? lWa: lRa)))),
+		  CONSP(CAR(CDR(CONSP(CAR(computer_is_written? lWa: lRa)))))),
 		  NIL)));    
 
     DEBUG_STAT(8, entity_name(node_module), *pstat);
