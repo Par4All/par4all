@@ -76,12 +76,15 @@ Variable var;
 Value coeff;
 {
     Pvecteur v;
+    extern int etext;
 
     if(coeff!=0) {
 	v = (Pvecteur) MALLOC(sizeof(Svecteur),VECTEUR,"vect_new");
 	if (v == NULL) {
 	    (void) fprintf(stderr,"vect_new: Out of memory space\n");
-	    exit(-1);
+	    fprintf(stderr, "%10.3f MB", (sbrk(0) - etext)/(double)(1 << 20));
+   	    abort();
+	    /*exit(-1);*/
 	}
 	var_of(v) = var;
 	val_of(v) = coeff;
