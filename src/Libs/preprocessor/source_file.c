@@ -428,8 +428,16 @@ static bool pips_split_file(string name, string tempfile)
 /********************************************** managing .F files with cpp */
 
 #define CPP_FILTERED_SUFFIX 	".cpp_processed"
+
+/* pre-processor and added options from environment
+ */
+#define CPP_PIPS_ENV		"PIPS_CPP"
 #define CPP_PIPS_OPTIONS_ENV 	"PIPS_CPP_FLAGS"
-#define CPP_CPPFLAGS		"cpp -P -C -D__PIPS__ -D__HPFC__ "
+
+/* default preprocessor and basic options
+ */
+#define CPP_CPP			"cpp"
+#define CPP_CPPFLAGS		" -P -C -D__PIPS__ -D__HPFC__ "
 
 static bool dot_F_file_p(string name)
 {
@@ -442,8 +450,10 @@ static string process_thru_cpp(string name)
 {
     string new_name = strdup(concatenate(name, CPP_FILTERED_SUFFIX, NULL));
     string cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
+    string cpp = getenv(CPP_PIPS_ENV);
 
-    safe_system(concatenate(CPP_CPPFLAGS, cpp_options? cpp_options: "", " ",
+    safe_system(concatenate(cpp? cpp: CPP_CPP, 
+			    CPP_CPPFLAGS, cpp_options? cpp_options: "", " ",
 			    name, " > ", new_name, NULL));
 
     return new_name;
