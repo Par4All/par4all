@@ -17,6 +17,8 @@ SOURCES	=	$(SCRIPTS) hpfc_interactive.c
 INSTALL_SHR=	$(SCRIPTS)
 INSTALL_BIN=	$(ARCH)/hpfc_interactive
 
+all:	$(ARCH)/hpfc_interactive
+
 #
 # Some rules
 
