@@ -4,8 +4,14 @@
  * Unimodular loop transformations with guard elimination.
  */
 
+#include <sys/ddi.h>
+
 #include "genC.h"
+
 #include "linear.h"
+#include "matrice.h"
+#include "sparse_sc.h"
+
 #include "ri.h"
 #include "database.h"
 #include "resources.h"
@@ -13,12 +19,11 @@
 #include "ri-util.h"
 #include "pipsdbm.h" 
 #include "control.h"
-#include <sys/ddi.h>
-#include "matrice.h"
+
 Psysteme sc_newbase;
 Ptsg sg;
 bool if1=FALSE,if2=FALSE; 
-static string s;
+
 typedef struct 
 {
   stack statement_stack;
@@ -67,12 +72,7 @@ static Value eval2(val0,val1,val2,val)
   return (  value_div(value_direct_multiply (val1,val)+val0,-val2  )) ;
 }
 
-static Value reste (val0,val1,val2,val)
-     Value val0,val1,val2,val;
-{
-  return (  value_mod(value_direct_multiply (val1,val)+val0,-val2  )) ;
-}
-
+ 
 static Value intersection (pv1, pv2,var,floor)
      Pvecteur pv1,pv2;
      Variable var;
@@ -102,17 +102,17 @@ static void  stmt_rwt(statement s,context_p context)
 static bool loop_flt(loop l, context_p context)
 { 
                    /*DECLARATION */
-  statement s1,s2,s_in_loop_in_side,st;
+  statement s1=NULL,s2=NULL,s_in_loop_in_side=NULL,st=NULL;
   int i=0,cas=0;
   bool first1=TRUE,first2=TRUE;
-  Value val1=0,val2=0,f1_val1,f1_val2,f2_val1,f2_val2,e;
-  loop copyloop,loop_in_side;
+  Value val1=0,val2=0,f1_val1,f1_val2,f2_val1,f2_val2,e=0;
+  loop copyloop,loop_in_side=NULL;
   Variable var1= (Variable)loop_index(l);
   instruction ins,ins1,ins2;
   sequence seq,seq1,seq2;
   list lis=NIL,lis1=NIL,lis1par=NIL,lis2=NIL,lis2par=NIL;
   range range;
-  expression lower, upper,index ;
+  expression lower, upper,index=NULL ;
   normalized norm1, norm2;
   Pvecteur pv1 ,pv2;
   test t1,t2;
@@ -441,8 +441,8 @@ statement unimodular(s)
      statement s    ;
 {
   FILE *infp;
-  char name_file[5];
-  cons *lls;
+  char *name_file;
+  cons *lls=NULL;
   Psysteme sci;			/* sc initial */
   Psysteme scn;			/* sc nouveau */
   Psysteme sc_row_echelon;
@@ -454,8 +454,6 @@ statement unimodular(s)
   matrice G_inv;
   int n;				/* number of index */
   int m ;				/* number of constraints */
-  Value *h;
-  int i;   
   statement s_lhyp;
   Pvecteur *pvg;
   Pbase pb;  
@@ -472,10 +470,11 @@ statement unimodular(s)
   m = sci->nb_ineq;
   A = matrice_new(m,n);
   sys_matrice_index(sci, base_oldindex, A, n, m);
-  printf(" Entrer le nom de fichier ou se trouve T: ");
-  scanf("%s", name_file);
-  infp = fopen(name_file,"r");
+  name_file = user_request("nom du fichier pour la matrice T");
+  infp = safe_fopen(name_file,"r");
   matrice_fscan(infp,&G,&n,&n); 
+  safe_fclose(infp, name_file);
+  free(name_file);
   G_inv = matrice_new(n,n);
   matrice_general_inversion(G,G_inv,n);
   AG = matrice_new(m,n);
@@ -485,17 +484,17 @@ statement unimodular(s)
      AG and sci */
   scn = sc_dup(sci);
   matrice_index_sys(scn, base_oldindex, AG, n,m );
-  printf(" totototot \n");
+  
   /* computation of the new iteration space in the new basis G */
   sc_row_echelon = new_loop_bound(scn,base_oldindex);
 
-  printf(" je suis ici \n");
+ 
   /* change of basis for index */
   change_of_base_index(base_oldindex, &base_newindex);
-  printf(" hahahaha \n");
+  
   sc_newbase = sc_change_baseindex(sc_dup(sc_row_echelon), base_oldindex, base_newindex);
 
-  printf(" fin1" );
+  
   sc_syst_debug(sc_newbase);
   sc_dump(sc_newbase);
   sg= sc_to_sg_chernikova(sc_newbase);  
@@ -521,14 +520,13 @@ statement  free_guards( s)
 {
   int isoler =-1,isoler2=-1;
   instruction ins;
-  statement body1,body2,loop2;
+  statement body1,body2,loop2=NULL;
   sequence seqi,seqj,seq;
   list lisi,lisj,lisjcopy,lis,lisjcopy2,lisp;
-  statement first, last;
-  Variable var;
+  statement first, last=NULL;
   expression  exp;
   normalized norm;
-  Pvecteur pv1,pv2,pvif1=NULL,pvif2=NULL,pv_i_lower,pv_i_upper;
+  Pvecteur pv1,pv2=NULL,pvif1=NULL,pvif2=NULL,pv_i_lower,pv_i_upper;
   Pcontrainte cif1=NULL,cif2=NULL;
   Value sommetg[4];
   loop tab_loop[6], loop1;
@@ -544,7 +542,7 @@ statement  free_guards( s)
   ins =statement_instruction(s);
   loop1=instruction_loop(ins);
   body1=loop_body(instruction_loop(ins));
-  indice1=(Variable *)loop_index(instruction_loop(ins));
+  indice1=(Variable )loop_index(instruction_loop(ins));
   range_i=loop_range(instruction_loop(ins));
   normalize_all_expressions_of(range_lower(range_i));
   normalize_all_expressions_of(range_upper(range_i));
@@ -557,13 +555,13 @@ statement  free_guards( s)
   lisi =sequence_statements(seqi); 
   MAP(STATEMENT,s1,{loop2 =s1; },lisi) ; 
   ins=statement_instruction(loop2);
-  indice2=(Variable *)loop_index(instruction_loop(ins));
+  indice2=(Variable )loop_index(instruction_loop(ins));
   body2=loop_body(instruction_loop(ins));
   ins =statement_instruction(body2); 
   seqj=instruction_sequence(ins);
   lisj =sequence_statements(seqj); 
   lisjcopy= gen_full_copy_list(lisj);
-  first= CHUNK( CAR(lisj));
+  first= (statement )CHUNK( CAR(lisj));
   nbr_vertice=sg_nbre_sommets(sg);
   printf(" le nombre de sommet est %d \n",  nbr_vertice);
   vertice= sg_sommets(sg); 
@@ -597,7 +595,6 @@ statement  free_guards( s)
   if (if1){ 
     Pcontrainte peq;
     syntax syntax;
-    Value val;
     call call;
     list lis;
     CHUNK(CAR(lisjcopy))= (gen_chunk *)
@@ -608,7 +605,7 @@ statement  free_guards( s)
     syntax=expression_syntax(exp);
     call=syntax_call(syntax);
     lis =call_arguments(call);
-    exp=CHUNK(CAR(lis));
+    exp=(expression )CHUNK(CAR(lis));
     norm=expression_normalized(exp);
     pv1=normalized_linear(norm);
     MAP(EXPRESSION,exp,{
@@ -629,7 +626,6 @@ statement  free_guards( s)
   if(if2){
     Pcontrainte peq;
     syntax syntax;
-    Value val;
     call call;
     list lis;
     CHUNK(CAR(gen_last(lisjcopy)))= (gen_chunk *)
@@ -640,7 +636,7 @@ statement  free_guards( s)
     syntax=expression_syntax(exp);
     call=syntax_call(syntax);
     lis =call_arguments(call);
-    exp=CHUNK(CAR(lis));
+    exp=(expression) CHUNK(CAR(lis));
     norm=expression_normalized(exp);
     pv1=normalized_linear(norm);  
     MAP(EXPRESSION,exp,{
@@ -663,24 +659,21 @@ statement  free_guards( s)
   if(if1) CHUNK( CAR(    (lisjcopy2)))= (gen_chunk *) make_block_statement(NIL);
   if(if2)CHUNK(CAR(gen_last((lisjcopy))))= (gen_chunk *) make_block_statement(NIL);
   for(i=0;i<=2*nbr_vertice-2;i++){ 
-    Pcontrainte peq,peqinf,peqsup,cinf,csup;
-    Pvecteur pvinf,pvsup;
+    Pcontrainte peq,cinf=NULL,csup=NULL;
     statement body1,body2;
     instruction ins;
     sequence seqi,seqj;
     list lisi,lisj;
     range range; 
-    expression lower,upper;
-    statement loop2;
-    Value val_indice1,val_indice2,val_const;
-    bool condition1=FALSE,condition2=FALSE,cas3=FALSE,cas4=FALSE;
+    statement loop2=NULL;
+    bool condition1=FALSE,condition2=FALSE;
     tab_loop[i]=copy_loop(loop1);
     tab_instruction[i] = make_instruction_loop(tab_loop[i]);
     tab_statement[i]=instruction_to_statement (  tab_instruction[i]);
     lis=CONS(STATEMENT,  tab_statement[i],lis);
     if (i%2==0){
       int indice;
-      Value minjp=-100,maxjp=100,restemin,restemax;
+      Value minjp=-100,maxjp=100;
       indice=i/2;
       range_lower(loop_range(tab_loop[i]))=
 	make_integer_constant_expression( sommetg[indice]);
@@ -1031,7 +1024,6 @@ statement  free_guards( s)
 	insif1=make_instruction_sequence(seqif1);
 	sif1=instruction_to_statement(insif1);
 	if (value_abs  (vect_coeff(indice2,pvif2))==1){  
-	  printf(" la valeur de i %d",i);
 	  lisi=gen_concatenate(lisjcopy2,lisi);
 	  sequence_statements(seqi)=lisi;  
 	}  
@@ -1040,39 +1032,42 @@ statement  free_guards( s)
 	  call ca;
 	  expression exp1,exp2;
 	  Pvecteur pv;
-	  statement s;
-	  pv=vect_dup (pvif2); 
+	  Value val;
+	  statement s,s1;
+	  pv=vect_dup (pvif2);
+	  val=vect_coeff(indice2,pvif2);
 	  vect_erase_var( &pv,indice2);
-	  exp1=Pvecteur_to_expression(pv);
-	  s= copy_statement (last);
-	  lexp = CONS(EXPRESSION, make_integer_constant_expression
-		      (-vect_coeff(indice2,pvif2)), NIL);
-	  exp = CONS(EXPRESSION, exp1, lexp);
-	  ca = make_call(entity_intrinsic(MODULO_OPERATOR_NAME), exp);
+	  exp1=Pvecteur_to_expression(pv);;
+	    s= copy_statement (last);
+
+	    lexp = CONS(EXPRESSION, make_integer_constant_expression
+		      (-val), NIL);
+	   lexp = CONS(EXPRESSION, exp1, lexp); 
+	  ca = make_call(entity_intrinsic(MODULO_OPERATOR_NAME), lexp);
 	  exp1 = make_expression(make_syntax(is_syntax_call, ca),
 				 normalized_undefined);
-	  exp2=make_integer_constant_expression(0);
-	  exp1=eq_expression(exp1,exp2);
-	  test_condition(instruction_test(statement_instruction(s)))=exp1;    
-	  test_true(instruction_test(statement_instruction(s)))=sif1;    
-	  lisi=CONS(STATEMENT,s,lisi);
-	  sequence_statements(seqi)=lisi;
+	    exp2=make_integer_constant_expression(0);
+	    exp1=eq_expression(exp1,exp2); 
+	      test_condition(instruction_test(statement_instruction(s)))=exp1;    
+		test_true(instruction_test(statement_instruction(s)))=copy_statement (sif1);   
+	    lisi=CONS(STATEMENT,s,lisi);
+	      sequence_statements(seqi)=lisi; 
 	};
         v = vect_dup (contrainte_vecteur(cinf));
 	constante=vect_coeff(TCST,v);
         vect_chg_coeff(&v,TCST,value_plus(1,constante)); 
 	cinf=contrainte_make(v);
 	range_lower(range)=make_contrainte_expression(cinf,indice2);  
-      }  
+	}  
       /*fin cas3 */
       /* debut cas4 */
-      
+        
       if ( egalite_equal(csup,cif1)){
 	statement sif2;
 	sequence seqif2;
 	instruction insif2;
 	Pvecteur v;
-	list listemp,lisip;
+	list listemp;
 	Value  constante;
 	seqif2=make_sequence(lisjcopy);
 	insif2=make_instruction_sequence(seqif2);
@@ -1100,7 +1095,7 @@ statement  free_guards( s)
 	  exp2=make_integer_constant_expression(0);
 	  exp1=eq_expression(exp1,exp2);
 	  test_condition(instruction_test(statement_instruction(s)))=exp1;    
-	  test_true(instruction_test(statement_instruction(s)))=sif2;
+	  test_true(instruction_test(statement_instruction(s)))=copy_statement(sif2);
 	  listemp=CONS(STATEMENT,s ,NIL);
 	  lisi= gen_concatenate(lisi,listemp);
 	  sequence_statements(seqi)=lisi;  
@@ -1111,7 +1106,7 @@ statement  free_guards( s)
 	csup=contrainte_make(v);
 	range_upper(range)=make_contrainte_expression(csup,indice2);  
 	
-      }  
+	}  
       
       /*fin cas4 */
     };
@@ -1133,7 +1128,7 @@ statement  free_guards( s)
       if(i==2*nbr_vertice-2){
 	CHUNK( CAR(lisp))= (gen_chunk *) make_block_statement(NIL); 
 	range_upper(loop_range(tab_loop[i-1]))= 
-	  make_integer_constant_expression( sommetg[(i-1)/2+1]);
+	  make_integer_constant_expression(sommetg[(i-1)/2+1]);
       }
       else{   
 	body1=loop_body(tab_loop[i]);
@@ -1185,14 +1180,13 @@ statement  free_guards( s)
 
 bool guard_elimination(string module)
 {
-  cons * lls;
-  statement stat,s,s1;
+
+  statement stat,s1;
   string str ;
   int ordering ; 
   instruction ins;
   sequence seq;
   list lis;        
-  loop l;
   context_t context;                              
   debug_on("GUARD_ELIMINATION_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module);
@@ -1228,7 +1222,7 @@ bool guard_elimination(string module)
   	      
   s1=ordering_to_statement(ordering);
   MAP(STATEMENT,s,{if (statement_ordering(s)==ordering){
-     s1=unimodular(s1); ; s1= free_guards(s1); 
+    s1=unimodular(s1); ; s1= free_guards(s1);  
     CHUNK(CAR(lis))= (gen_chunk *) s1;}
   ;lis=CDR(lis) ;},lis) 
     
