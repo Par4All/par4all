@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/03/18 08:45:52 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/03/21 15:56:04 $, )
  * version $Revision$
  */
 
@@ -831,8 +831,17 @@ io_efficient_compile(
 	/* add array declaration on host if necessary
 	 */
 	if (array_distributed_p(array) && !bound_new_host_p(array))
-	    store_new_host_variable(AddEntityToModule(array, host_module), 
-				    array);
+	{
+	    entity host_array = AddEntityToModule(array, host_module);
+	    storage s = entity_storage(host_array);
+	    store_new_host_variable(host_array, array);
+
+	    /* local, not passed as an argument
+	     */
+	    if (storage_formal_p(s))
+		formal_offset(storage_formal(s)) = MAXINT;
+
+	}
 	
 	/* collect data if necessary
 	 */
