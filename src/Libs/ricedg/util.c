@@ -75,6 +75,7 @@ prettyprint_dependence_graph(FILE * fd,
     bool sru_format_p = get_bool_property("PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT");
     persistant_statement_to_int s_to_l = persistant_statement_to_int_undefined;
     int dl = -1;
+    printf("I AM HERE");
 
     debug_on("RICEDG_DEBUG_LEVEL");
 
@@ -167,7 +168,7 @@ prettyprint_dependence_graph(FILE * fd,
 			fprintf(fd, ") ");
 		    }
 		    else {
-			fprintf(fd, " at HELLO WORLD levels ");
+			fprintf(fd, " at levels ");
 			MAPL(pl, {
 			    fprintf(fd, " %d", INT(CAR(pl)));
 			}, cone_levels(conflict_cone(c)));
