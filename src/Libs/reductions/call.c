@@ -1,5 +1,5 @@
 /* $RCSfile: call.c,v $ (version $Revision$)
- * $Date: 1996/06/18 15:57:17 $, 
+ * $Date: 1996/06/18 22:48:49 $, 
  *
  * Fabien COELHO
  */
@@ -8,13 +8,9 @@
 
 /* these functions must translate external reductions into local ones if 
  * must be. thus it is similar to summary effects call translations.
- * however, the functions there are heavily binded to effects...
- * while we would have prefered entities and references that are
- * shared between these two types (effect and reduction).
- * moreover I do not wish to chnage the code there too much. 
- * thus I first define a set of useful translation functions, and 
- * it will be up to both code to use them...
- * All these functions are clearly inspired by the ones there.
+ * I do reuse some functions there by generating fake effects...
+ * I think they should be cleaned so as to offer reference plus predicate
+ * translations, and then would be used by reductions and effects.
  * Fabien.
  */
 
@@ -37,6 +33,23 @@ translate_into_local_entities(
 	    return CONS(ENTITY, reference_variable(syntax_reference(s)), NIL);
 	/* else might be binded to some call */
     }
+    else if (storage_ram_p(st))
+    {
+	effect ef = make_effect(make_reference(var, NIL),
+				make_action(is_action_read, UU),
+				make_approximation(is_approximation_must, UU),
+				make_transformer(NIL, make_predicate(NULL)));
+	list lef = global_effect_translation(ef, call_function(c));
+	list /* of entity */ lent = NIL;
+	
+	MAP(EFFECT, e, lent = gen_once(effect_variable(e), lent), lef);
+
+	gen_map(gen_free, lef); 
+	gen_free_list(lef);
+
+	return lent;
+    }
+    /* else what? */
     
     return NIL;
 }
