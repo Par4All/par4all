@@ -59,7 +59,8 @@
 %type <entity>		icon
 %type <entity>		entity_name
 %type <entity>		global_entity_name
-%type <entity>		module_name
+/* %type <entity>		module_name */
+%type <string>		module_name
 %type <entity>		common_name
 %type <entity>		declaration
 %type <entity>		common_inst
@@ -99,6 +100,8 @@
 %type <integer>		signe
 %type <liste>		decl_tableau
 %type <liste>		indices 
+%type <liste>		parameters
+%type <liste>		arguments
 %type <liste>		lci
 %type <liste>		ci
 %type <liste>		ldim_tableau
@@ -136,6 +139,7 @@
 #include "ri-util.h"
 
 #include "misc.h"
+#include "properties.h"
 
 #include "syntax.h"
 
@@ -283,7 +287,9 @@ prg_exec: begin_inst {reset_first_statement();} linstruction { check_first_state
 
 begin_inst: opt_fortran_type psf_keyword module_name
 	       opt_lformalparameter TK_EOS
-	    { MakeCurrentFunction($1, $2, $3, $4); }
+	    { 
+                 MakeCurrentFunction($1, $2, $3, $4);
+            }
 	;
 
 end_inst: TK_END TK_EOS
@@ -369,16 +375,47 @@ inst_exec: format_inst
 	    { $$ = $1; }
 	;
 
-return_inst: TK_RETURN
-	    { $$ = MakeReturn(); }
+return_inst: TK_RETURN opt_expression
+	    { $$ = MakeReturn($2); }
 	;
 
-call_inst: TK_CALL global_entity_name
-	    { $$ = MakeCallInst($2, NIL); }
+call_inst: tk_call global_entity_name
+	    { $$ = MakeCallInst($2, NIL); reset_alternate_returns();}
         |
-	  TK_CALL global_entity_name indices
-	    { $$ = MakeCallInst($2, $3); }
+	  tk_call global_entity_name parameters
+	    { $$ = MakeCallInst($2, $3); reset_alternate_returns(); }
 	;
+
+tk_call: TK_CALL
+            { set_alternate_returns();}
+        ;
+
+parameters: TK_LPAR TK_RPAR
+            { $$ = NULL; }
+	| TK_LPAR arguments TK_RPAR
+		{ $$ = $2; }
+	;
+
+arguments: expression
+	    {
+		$$ = CONS(EXPRESSION, $1, NIL);
+	    }
+	| arguments TK_COMMA expression
+	    {
+		$$ = gen_nconc($1, CONS(EXPRESSION, $3, NIL));
+	    }
+	| TK_STAR TK_ICON
+	    {
+		add_alternate_return($2);
+		$$ = NIL;
+	    }
+	| arguments TK_COMMA TK_STAR TK_ICON
+	    {
+		add_alternate_return($4);
+		$$ = $1;
+	    }
+	;
+
 
 io_inst:  io_keyword io_f_u_id
 	    { 
@@ -633,7 +670,7 @@ goto_inst: TK_GOTO label
 	    }
 	| TK_GOTO TK_LPAR licon TK_RPAR opt_virgule entity_name
 	    {
-		$$ = MakeComputedGotoInst($3,$6);
+		$$ = MakeComputedGotoInst($3, $6);
 	    }
 	| TK_GOTO entity_name opt_virgule TK_LPAR licon TK_RPAR
 	    {
@@ -793,9 +830,7 @@ dim_tableau: expression
 
 common_inst: common declaration
 	    { 
-		$$ = MakeCommon(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
-					   BLANK_COMMON_LOCAL_NAME));
-		AddVariableToCommon($$, $2);
+		$$ = NameToCommon(BLANK_COMMON_LOCAL_NAME);
 	    }
 	| common common_name declaration
 	    {
@@ -822,12 +857,11 @@ common: TK_COMMON
 
 common_name: TK_CONCAT
 	    {
-		$$ = MakeCommon(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
-					   BLANK_COMMON_LOCAL_NAME));
+		$$ = NameToCommon(BLANK_COMMON_LOCAL_NAME);
 	    }
-	| TK_SLASH global_entity_name TK_SLASH
+	| TK_SLASH global_name TK_SLASH
 	    {
-		$$ = MakeCommon($2);
+		$$ = NameToCommon($2);
 	    }
 	;
 
@@ -1044,10 +1078,11 @@ name: TK_NAME
 module_name: global_name
             {
 		/* $$ = FindOrCreateEntity(CurrentPackage, $1); */
-		$$ = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, $1);
+		/* $$ = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, $1); */
 		CurrentPackage = strdup($1);
 	        BeginingOfProcedure();
 		free($1);
+		$$ = CurrentPackage;
 	    }
 
 global_entity_name: global_name
@@ -1072,7 +1107,9 @@ opt_lformalparameter:
 	    }
 	| TK_LPAR lformalparameter TK_RPAR
 	    {
-		    $$ = $2;
+		/* Too early: the current module is still unknown */
+		/* $$ = add_formal_return_code($2); */
+		$$ = $2
 	    }
 	;
 
@@ -1080,10 +1117,32 @@ lformalparameter: entity_name
 	    {
 		    $$ = CONS(ENTITY, $1, NULL);
 	    }
+        | TK_STAR
+            {
+		if(!get_bool_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS")) {
+		    pips_user_warning("Lines %d-%d: Alternate return not supported. "
+				      "Formal label * ignored.\n", line_b_I, line_e_I);
+		}
+		else {
+		    uses_alternate_return(TRUE);
+		}
+		$$ = NIL;
+            }
 	| lformalparameter TK_COMMA entity_name
 	    {
 		    $$ = gen_nconc($1, CONS(ENTITY, $3, NIL));
 	    }
+        | lformalparameter TK_COMMA TK_STAR
+            {
+		if(!get_bool_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS")) {
+		    pips_user_warning("Lines %d-%d: Alternate return not supported. "
+				      "Formal label * ignored.\n", line_b_I, line_e_I);
+		}
+		else {
+		    uses_alternate_return(TRUE);
+		}
+		$$ = $1;
+            }
 	;
 
 opt_fortran_type: fortran_type
@@ -1311,7 +1370,8 @@ unsigned_const_simple: TK_TRUE
 	    }
 	| TK_DCON
 	    {
-		    $$ = MakeConstant($1, is_basic_float);
+		    $$ = make_constant_entity($1, is_basic_float,
+					      DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
 		    free($1);
 	    }
 	| TK_SCON
