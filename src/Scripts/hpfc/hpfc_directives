@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/10 17:00:08 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/17 14:29:49 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -18,17 +18,15 @@
 #
 # - Only one subroutine or function should be put in the pipe. 
 # - I do not deal with "R E A L" like Fortran lexical problems.
-# - There may be problems with if and do instructions...
-#   that is IF () & DO with a directive comment would not work.
 # - INDEPENDENT, NEW and REDUCTION are orthogonal.
-# - Ctrl-L, Ctrl-G and Ctrl-V are used as intermediate characters, 
+# - Ctrl-L, Ctrl-G, Ctrl-V and Ctrl-W are used as intermediate characters, 
 #   thus should not appear in the program, otherwise troubles...
 # - some default value is assigned to number of processors...
 # - some specific directives for HPFC.
 # - simple management of descriptive interfaces: 
 #   they are switched to prescriptive ones!:-)
 # - ! style comments in directives are okay.
-# - INHERIT is translated into DISTRIBUTE:-) Allowed by HPF:-)
+# - INHERIT is translated into DISTRIBUTE:-) Allowed by HPF?
 #
 # (c) Fabien Coelho, February 95 and later.
 # don't expect anything from this script.
@@ -49,7 +47,6 @@
 # _r: reduction
 # _s: *
 # _t: template
-# _u: pure
 # _y: dynamic
 # _#: number_of_processors()
 #
@@ -63,6 +60,7 @@
 # HPFC directives: (FCD = Fabien Coelho Directives:-)
 #
 # local/endlocal (hack for localized computations, cannot be nested)
+# _u: pure  // it is not a directive in HPF, but an attribute...
 # _1: synchro
 # _2: timeon
 # _3: timeoff
@@ -97,22 +95,24 @@ $RM -f $TMP.*
 # ??? maybe should I add some option to avoid this translation?
 #
 $SED '#
-      # switch HPF and FC directive origins to Ctrl-V
+      # switch HPF and FC directive origins to Ctrl-V ot Ctrl-W
       #
       s,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,\1,;
-      s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,;
+      s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,;
       #
       # ! style comments are removed. There should be none in time messages...
       #
-      //s,!.*,,;
+      /[]/s,!.*,,;
       #
       # switch to lower case letters the directives *only*
       #
-      //s,A,a,g;//s,B,b,g;//s,C,c,g;//s,D,d,g;//s,E,e,g;//s,F,f,g;
-      //s,G,g,g;//s,H,h,g;//s,I,i,g;//s,J,j,g;//s,K,k,g;//s,L,l,g;
-      //s,M,m,g;//s,N,n,g;//s,O,o,g;//s,P,p,g;//s,Q,q,g;//s,R,r,g;
-      //s,S,s,g;//s,T,t,g;//s,U,u,g;//s,V,v,g;//s,W,w,g;//s,X,x,g;
-      //s,Y,y,g;//s,Z,z,g;' |
+      /[]/s,A,a,g;/[]/s,B,b,g;/[]/s,C,c,g;/[]/s,D,d,g;
+      /[]/s,E,e,g;/[]/s,F,f,g;/[]/s,G,g,g;/[]/s,H,h,g;
+      /[]/s,I,i,g;/[]/s,J,j,g;/[]/s,K,k,g;/[]/s,L,l,g;
+      /[]/s,M,m,g;/[]/s,N,n,g;/[]/s,O,o,g;/[]/s,P,p,g;
+      /[]/s,Q,q,g;/[]/s,R,r,g;/[]/s,S,s,g;/[]/s,T,t,g;
+      /[]/s,U,u,g;/[]/s,V,v,g;/[]/s,W,w,g;/[]/s,X,x,g;
+      /[]/s,Y,y,g;/[]/s,Z,z,g;' |
 #
 # continuation handling:
 # - put the whole file on one line:-)
@@ -121,7 +121,7 @@ $SED '#
 # - and back to a normal file
 #
 $TR '\012' '' | 
-$SED 's,&[ 	]*., ,g;s, *[^ ], ,g' | 
+$SED 's,&[ 	]*[]., ,g;s, *[][^ ], ,g' | 
 $TR '' '\012' | 
 #
 # massive pattern-matching transformations:
@@ -130,11 +130,11 @@ $TR '' '\012' |
 $SED '#
       # space normalization (pattern-matching is easier afterwards)
       #
-      //s,[ 	][ 	]*, ,g;
-      //s, $,,;
-      //s,\([0-9a-z]\) \([^0-9a-z]\),\1\2,g;
-      //s,\([^0-9a-z]\) \([0-9a-z]\),\1\2,g;
-      //s,\([^0-9a-z]\) \([^0-9a-z]\),\1\2,g;
+      /[]/s,[ 	][ 	]*, ,g;
+      /[]/s, $,,;
+      /[]/s,\([0-9a-z]\) \([^0-9a-z]\),\1\2,g;
+      /[]/s,\([^[]0-9a-z]\) \([0-9a-z]\),\1\2,g;
+      /[]/s,\([^[]0-9a-z]\) \([^0-9a-z]\),\1\2,g;
       //s,)with\([\* ]\),) with\1,;
       //s,)onto ,) onto ,;
       #
@@ -161,19 +161,19 @@ $SED '#
       #
       # FC directives and hacks...
       #
-      s, synchro,1,
-      s, timeon,2,
-      s, timeoff,3,
-      s, setbool,4,
-      s, setint,5,
-      s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
-      s, end *local,      enddo,
-      s, io\(.*\),6(\1),
+      s, synchro,1,
+      s, timeon,2,
+      s, timeoff,3,
+      s, setbool,4,
+      s, setint,5,
+      s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
+      s, end *local,      enddo,
+      s, io\(.*\),6(\1),
       #
       # host section: hack to build blocks...
       #
-      s, host,      if (.true.) then7if (.true.) then,
-      s, end *host,      endifendif,
+      s, host,      if (.true.) then7if (.true.) then,
+      s, end *host,      endifendif,
       # io args shoud look like calls for pips
       /6(/s,\,,()\,,g;
       /6(/s,\([a-z0-9]\))$,\1()),;
@@ -183,7 +183,7 @@ $SED '#
       s, dynamic \(.*\),y(\1),
       s, template \(.*\),      logical \1t(\1),
       s, processors \(.*\),      logical \1p(\1),
-      s, pure\(.*\),u(\1),
+      s, pure\(.*\),u(\1),
       # pure treated as io above.
       /u(/s,\,,()\,,g;
       /u(/s,\([a-z0-9]\))$,\1()),;
@@ -221,7 +221,7 @@ $SED '#
       #
       # directives that may remain are errors:
       #
-      s,, syntax error:,
+      s,[], syntax error:,
       # 
       # insert needed spaces
       #
