@@ -11,8 +11,9 @@
 #include <string.h>
 
 #include "genC.h"
-
 #include "ri.h"
+
+#include "misc.h"
 #include "ri-util.h"
 #include "database.h"
 #include "resources.h"
