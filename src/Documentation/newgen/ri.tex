@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: ri.tex,v $
+%% Revision 1.71  2003/09/12 12:01:39  nguyen
+%% Add expression to instruction to handle C language
+%%
 %% Revision 1.70  2003/09/09 10:02:07  nguyen
 %% Add subscript syntax to handle general subscripting array expressions in C.
 %%
@@ -1166,7 +1169,7 @@ associate line number to a statement.
 \label{subsection-instruction}
 \index{Instruction}
 
-\domain{Instruction = sequence + test + loop + whileloop + goto:statement + call + unstructured + multitest + forloop + return:expression}
+\domain{Instruction = sequence + test + loop + whileloop + goto:statement + call + unstructured + multitest + forloop + return:expression + expression}
 
 Type {\tt instruction} is used to represent the command associated to a
 statement. An instruction can either be a sequence, a test, a loop,
@@ -1209,6 +1212,8 @@ nous étudierons la nature plus loin.
 \end{comment}
 
 Several PIPS contributors have asked for a \verb/while/ construct.
+In addition, a statement in C can be any expression, not only call
+expression, so we have to add \verb/expression/ to \verb/instruction/. 
 
 \subsubsection{Sequence}
 \label{subsubsection-sequence}
