@@ -809,69 +809,7 @@ static effect regions_may_convex_hull(region r1, region r2)
  */
 static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
 {
-    Psysteme ps;
-    Pbase b1;
-    Pbase b2;
-    Pbase b;
-
-    ifdebug(6)
-    {
-	pips_debug(6,"begin\n");
-	fprintf(stderr, "ps1:\n");
-	sc_syst_debug(ps1);    
-	fprintf(stderr, "ps2:\n");
-	sc_syst_debug(ps2);
-    }
-
-    /* update bases using their "union"; convex hull has to be computed 
-       relatively to ONE space. I don't know if it is usefull for regions,
-       since they concern the same array with the same preconditions.
-       BA, may 1994 */
-    b1 = ps1->base;
-    b2 = ps2->base;
-    b = base_union(b1, b2);
-    /* phi_first_sort_base(&b);  */
-    base_rm(b1);
-    base_rm(b2);
-    /* b is duplicated because it may be later freed by sc_enveloppe_chernikova
-     * FI->CA: To be changed when sc_enveloppe_chernikova is cleaned up
-     */
-    sc_base(ps1) = base_dup(b);
-    /* please, no sharing between Psysteme's */
-    sc_base(ps2) = base_dup(b);
-    sc_dimension(ps1) = base_dimension(b);
-    sc_dimension(ps2) = sc_dimension(ps1);
-
-    /* meet operation */
-       /* ps = sc_enveloppe_chernikova_ofl_ctrl(ps1, ps2, FWD_OFL_CTRL); 
-	  ps = my_sc_check_after_chernikova(ps);
-	*/
-    ps = sc_common_projection_convex_hull_with_base_ordering(ps1, ps2,
-							     no_base_sort); 
-    /* end meet operation */
-
-    if(SC_EMPTY_P(ps))
-    {
-	/* FI: this could be eliminated if SC_EMPTY was really usable;
-	   27/5/93 */
-	/* and replaced by a SC_UNDEFINED_P() and pips_error() */
-	ps = sc_empty(b);
-    }
-    else
-    {    
-	base_rm(b);
-	b = BASE_NULLE;
-    }
-
-    ifdebug(6)
-    {
-	fprintf(stderr, "convex hull:\n");
-	sc_syst_debug(ps);
-    }
-
-    pips_debug(5,"end\n");
-
-    return(ps);
+  return cute_convex_union(ps1, ps2);
 }
 
 
