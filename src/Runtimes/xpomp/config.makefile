@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/30 18:18:35 $ 
+# $Date: 1996/08/30 18:42:54 $ 
 
 ifeq ($(FC),g77)
 CPPFLAGS+=	-DCOMPILE_FOR_G77
@@ -14,13 +14,14 @@ BIN=		$(ARCH)/xpomp
 LOCAL_HEADERS=	gr.h rasterfile.h 
 EXPORT_HEADERS=	xpomp_graphic.h xpomp_graphic_F.h
 CFILES=		cgraphic.c xpomp.c 
-DEMO=		test_xpomp.c fatal.f 
+DEMO=		test_xpomp.c fratal.f 
 HPFC=		xpomp_fake.f
-
+DOC=		xpomp_manual.tex xPOMP_window_explained.eps
 SOURCES=	$(LOCAL_HEADERS) \
 		$(EXPORT_HEADERS) \
 		$(CFILES) \
-		$(DEMO)
+		$(DEMO) \
+		$(DOC)
 
 OFILES=		cgraphic.o
 
@@ -33,11 +34,13 @@ INSTALL_BIN_DIR:=$(INSTALL_RTM_DIR)/$(ARCH)
 INSTALL_BIN=	$(BIN) $(LIB)
 INSTALL_RTM=	$(EXPORT_HEADERS)
 INSTALL_SHR=	$(HPFC)
+INSTALL_DOC=	xpomp_manual.ps 
+INSTALL_HTM=	xpomp_manual.html xpomp_manual
 
 # 
 # compilation and so
 
-all: $(LIB) $(ARCH)/xpomp test_xpomp fractal
+all: $(LIB) $(ARCH)/xpomp test_xpomp fractal $(INSTALL_DOC) $(INSTALL_HTM)
 
 cproto :
 	$(PROTOIZE) xpomp.c
