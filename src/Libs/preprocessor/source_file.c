@@ -343,7 +343,7 @@ find_file(string name)
 	return other;
     free(other);
     
-    return NULL;
+    return find_file_in_directories(name, getenv(SRCPATH));
 }
 
 /* cache of preprocessed includes
