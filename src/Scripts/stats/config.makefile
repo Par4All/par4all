@@ -25,5 +25,7 @@ FILES =		dg-statistics.awk \
 		region_trans_stat_offset.awk \
 		region_trans_stat_type.awk 
 
+SOURCES	=	$(SCRIPTS) $(FILES)
+
 # that is all
 #
