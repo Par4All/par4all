@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/20 11:33:05 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/20 13:38:53 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -27,21 +27,21 @@ PREFIX void close_##name() { close(name);}
  * types are declared to newgen. It would also ease the db management.
  */
 
-#define GENERIC_FUNCTION(PREFIX, name, type)\
+#define GENERIC_FUNCTION(PREFIX, name, type, ktype, vtype)\
 GENERIC_STATIC_STATUS(PREFIX, name, type, make_##type(), free_##type)\
-PREFIX void extend_##name(k,v) gen_chunk *k,*v;\
+PREFIX void extend_##name(k,v) ktype k; vtype v;\
        { extend_##type(name, k, v);}\
-PREFIX void update_##name(k,v) gen_chunk *k,*v;\
+PREFIX void update_##name(k,v) ktype k; vtype v;\
        { update_##type(name, k, v);}\
-PREFIX gen_chunk *apply_##name(k) gen_chunk *k;\
+PREFIX vtype apply_##name(k) ktype k;\
        { return(apply_##type(name, k));}\
-PREFIX bool apply_##name##_defined_p(k) gen_chunk *k; \
-       { return(hash_get((name+1)->h, (char *)k)!=HASH_UNDEFINED_VALUE);}
+PREFIX bool apply_##name##_defined_p(k) ktype k; \
+       { return(apply_##type(name, k)!=HASH_UNDEFINED_VALUE);}
 
-#define GENERIC_LOCAL_FUNCTION(name, type)\
-        GENERIC_FUNCTION(static, name, type)
+#define GENERIC_LOCAL_FUNCTION(name, type, ktype, vtype)\
+        GENERIC_FUNCTION(static, name, type, ktype, vtype)
 
-#define GENERIC_GLOBAL_FUNCTION(name, type)\
-        GENERIC_FUNCTION(/**/, name, type)
+#define GENERIC_GLOBAL_FUNCTION(name, type, ktype, vtype)\
+        GENERIC_FUNCTION(/**/, name, type, ktype, vtype)
 
 #endif
