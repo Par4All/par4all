@@ -2,12 +2,12 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1996/08/11 21:19:12 $, ) 
+# ($Date: 1996/08/12 08:55:32 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
 # Validate without arguments takes the contents of the default_file file,
-# else arguments are subdirectories D in pips_test_directory. 
+# else arguments are subdirectories D in vdir. 
 # For each D, one applies test_aspect that checks every file .f F.
 # If a file F.{tpips,test} exists, it is executed and its output is
 # compared to $F.result/test.
@@ -35,8 +35,15 @@
 [ "$PIPS_HOME" ] || . /home/users/pips/Pips/pipsrc.sh
 umask 002
 
-pips_test_directory=${PIPS_VALIDDIR}
-default_file=defaults
+vdir=${PIPS_VALIDDIR}
+
+if test -r $vdir/defaults.$PIPS_ARCH
+then
+    default_file="$vdir/defaults.$PIPS_ARCH"
+else
+    default_file="$vdir/defaults"
+fi
+
 RUNNER=`whoami`
 HOSTNAME=`hostname`
 PWD=`pwd`
@@ -297,7 +304,7 @@ or $tpips_version" || \
 # validate command itself
 
 case $# in
-  0 ) 	aspects=`sed -e '/^#/d' $pips_test_directory/${default_file}` ;;
+  0 ) 	aspects=`sed -e '/^#/d' ${default_file}` ;;
   * ) 	aspects="$*" ;;
 esac
 
@@ -323,23 +330,23 @@ do
   old_errors=`cat $errors`
   directory=$i
 
-  if [ ! -d "$pips_test_directory/$i" ]
+  if [ ! -d "$vdir/$i" ]
   then
     report 1 \
-      "$i is not a directory in $pips_test_directory"
-  elif [ -f $pips_test_directory/$i/pipsmake.rc ] 
+      "$i is not a directory in $vdir"
+  elif [ -f $vdir/$i/pipsmake.rc ] 
   then
     report 2 \
-    "validate should not be run with a pipsmake.rc in $pips_test_directory/$i."
-  elif [ -f $pips_test_directory/$i/properties.rc ]
+    "validate should not be run with a pipsmake.rc in $vdir/$i."
+  elif [ -f $vdir/$i/properties.rc ]
   then
     report 3 \
-  "validate should not be run with a properties.rc in $pips_test_directory/$i."
+  "validate should not be run with a properties.rc in $vdir/$i."
   else
 
     $VERBOSE "validating $i"
 
-    test_aspect $pips_test_directory/$i
+    test_aspect $vdir/$i
   fi
 
   if [ "`cat $errors`" -ne "$old_errors" ] 
