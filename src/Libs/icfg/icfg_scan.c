@@ -32,14 +32,15 @@
 
 static int current_margin;
 
-#define st_DO	 "do"
-#define st_ENDDO "enddo"
-#define st_IF	 "if"
-#define st_THEN	 "then"
-#define st_ELSE	 "else"
-#define st_ENDIF "endif"
-#define st_WHILE "while"
-#define st_ENDWHILE "endwhile"
+#define st_DO	 	"do"
+#define st_DOWHILE	"do while"
+#define st_ENDDO 	"enddo"
+#define st_IF	 	"if"
+#define st_THEN	 	"then"
+#define st_ELSE	 	"else"
+#define st_ENDIF 	"endif"
+#define st_WHILE 	"while"
+#define st_ENDWHILE 	"endwhile"
 
 #define some_text_p(t) (t!=text_undefined && text_sentences(t)!=NIL)
 
@@ -59,8 +60,11 @@ static bool
     print_ifs = FALSE;
 static text (*decoration)(string) = NULL;
 
-static void
-append_marged_text(text t, int margin, string what1, string what2)
+static void append_marged_text(
+    text t, 
+    int margin, 
+    string what1, 
+    string what2)
 {
     int len = margin + strlen(what1) + strlen(what2) + 2;
     char * buffer = (char*) malloc(sizeof(char)*len);
@@ -69,8 +73,7 @@ append_marged_text(text t, int margin, string what1, string what2)
     ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted, buffer));
 }
 
-static void 
-append_icfg_file(text t, string module_name)
+static void append_icfg_file(text t, string module_name)
 {
     string filename, localfilename, dir;
     FILE * f_called;
@@ -99,33 +102,30 @@ append_icfg_file(text t, string module_name)
 
 /* STATEMENT
  */
-static bool 
-statement_filter(statement s)
+static bool statement_flt(statement s)
 {
     bool res = TRUE;
     text t = make_text (NIL);
 
     pips_debug (5,"going down\n");
 
-    store_statement_icfg (s, t);
-    res = current_stmt_filter (s);
+    store_statement_icfg(s, t);
+    res = current_stmt_filter(s);
     return res;
 }
 
-static void 
-statement_rewrite(statement s)
+static void statement_rwt(statement s)
 {
     pips_debug (5,"going up\n");
     ifdebug(9) print_text(stderr,(text) load_statement_icfg (s));
 
-    current_stmt_rewrite (s);
+    current_stmt_rewrite(s);
     return;
 }
 
 /* CALL
  */
-static void 
-call_filter(call c)
+static void call_flt(call c)
 {
     entity e_callee = call_function(c);
     string callee_name = module_local_name(e_callee);
@@ -186,16 +186,17 @@ call_filter(call c)
 
 /* LOOP
  */
-static bool 
-loop_filter (loop l)
+static bool loop_flt (loop l)
 {
     pips_debug (5, "Loop begin\n");
     if (print_do_loops) current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
-static void 
-loop_rewrite (loop l)
+static void anyloop_rwt(
+    string st_what, 
+    string st_index, 
+    statement body)
 {
     text inside_the_loop = text_undefined, 
 	inside_the_do = text_undefined,
@@ -209,7 +210,7 @@ loop_rewrite (loop l)
     inside_the_do = (text) load_statement_icfg (current_stmt_head());
     text_in_do_p = some_text_p(inside_the_do);
 
-    inside_the_loop = (text) load_statement_icfg (loop_body (l));
+    inside_the_loop = (text) load_statement_icfg (body);
     text_in_loop_p = some_text_p(inside_the_loop);
 
     /* Print the text inside do expressions (before the DO!)
@@ -224,8 +225,7 @@ loop_rewrite (loop l)
      */
     if ((text_in_loop_p || text_in_do_p) && print_do_loops) 
     {
-	append_marged_text(t, current_margin, st_DO " ", 
-			   entity_local_name(loop_index(l)));
+	append_marged_text(t, current_margin, st_what, st_index);
     }
 
     /* Print the text inside the loop
@@ -249,10 +249,19 @@ loop_rewrite (loop l)
     return ;
 }
 
+static void loop_rwt(loop l)
+{
+    anyloop_rwt(st_DO " ", entity_local_name(loop_index(l)), loop_body(l));
+}
+
+static void while_rwt(whileloop w)
+{
+    anyloop_rwt(st_DOWHILE " ", "", whileloop_body(w));
+}
+
 /* INSTRUCTION
  */
-static bool
-instruction_filter (instruction i)
+static bool instruction_flt (instruction i)
 {
     if(instruction_unstructured_p(i)
        && unstructured_while_p(instruction_unstructured(i))) {
@@ -262,8 +271,7 @@ instruction_filter (instruction i)
     return TRUE;
 }
 
-static void 
-instruction_rewrite (instruction i)
+static void instruction_rwt (instruction i)
 {
     text t = make_text (NIL);
     bool text_in_unstructured_p = FALSE;
@@ -342,8 +350,7 @@ instruction_rewrite (instruction i)
 /* RANGE
  * functions to avoid the indentation when dealing with DO expressions.
  */
-static bool 
-range_filter(range r)
+static bool range_flt(range r)
 {
     statement s = current_stmt_head();
 
@@ -352,8 +359,7 @@ range_filter(range r)
     return TRUE;
 }
 
-static void 
-range_rewrite(range r)
+static void range_rwt(range r)
 {
     statement s = current_stmt_head();
 
@@ -363,16 +369,14 @@ range_rewrite(range r)
 
 /* TEST
  */
-static bool 
-test_filter (test l)
+static bool test_flt (test l)
 {
     pips_debug (5, "Test begin\n");
     if (print_ifs) current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
-static void 
-test_rewrite (test l)
+static void test_rwt (test l)
 {
     text inside_then = text_undefined;
     text inside_else = text_undefined;
@@ -431,8 +435,7 @@ test_rewrite (test l)
     return;
 }
 
-void 
-print_module_icfg(entity module)
+void print_module_icfg(entity module)
 {
     string module_name = module_local_name(module);
     statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,TRUE);
@@ -453,12 +456,13 @@ print_module_icfg(entity module)
 
     gen_multi_recurse
 	(s,
-	 statement_domain, statement_filter, statement_rewrite,
-	 call_domain     , call_filter     , gen_null,
-	 loop_domain     , loop_filter     , loop_rewrite,
-	 instruction_domain    , instruction_filter  , instruction_rewrite,
-	 test_domain     , test_filter     , test_rewrite,
-         range_domain    , range_filter    , range_rewrite,
+	 statement_domain, statement_flt, statement_rwt,
+	 call_domain     , call_flt     , gen_null,
+	 loop_domain     , loop_flt     , loop_rwt,
+	 instruction_domain    , instruction_flt  , instruction_rwt,
+	 test_domain     , test_flt     , test_rwt,
+         whileloop_domain, loop_flt       , while_rwt,
+         range_domain    , range_flt    , range_rwt,
 	 NULL);
 
     pips_assert("stack is empty", current_stmt_empty_p());
@@ -479,8 +483,7 @@ print_module_icfg(entity module)
 
 /* parametrized by the decoration...
  */
-void 
-print_module_icfg_with_decoration(
+void print_module_icfg_with_decoration(
     entity module,
     text (*deco)(string))
 {
