@@ -11,7 +11,7 @@
 #include "linear.h"
 #include "matrice.h"
 #include "sparse_sc.h"
-
+   
 #include "ri.h"
 #include "database.h"
 #include "resources.h"
