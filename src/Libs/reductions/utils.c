@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1996/06/17 17:51:47 $, 
+ * $Date: 1996/06/17 18:11:28 $, 
  *
  * utilities for reductions.
  *
@@ -240,7 +240,7 @@ update_compatible_reduction(
     {
 	if (!reduction_none_p(*pr)) /* some reduction already available */
 	    return merge_two_reductions(*pr, found);
-	else 
+	else /* must update the reduction with the encountered effects */
 	{
 	    MAP(ENTITY, e,
 		remove_variable_from_reduction(found, e),
@@ -258,10 +258,9 @@ update_compatible_reduction(
 	MAP(EFFECT, e,
 	    if (!update_reduction_under_effect(*pr, e))
 	    {
-		pips_debug(8, "%s[%s] and %s\n",
-			   reduction_operator_tag_name
-			   (reduction_operator_tag(reduction_op(*pr))),
-			   entity_name(var), entity_name(effect_variable(e)));
+		DEBUG_REDUCTION(8, "kill of ", *pr);
+		pips_debug(8, "under effect to %s\n", 
+			   entity_name(effect_variable(e)));
 
 		free_reduction(*pr); *pr=NULL;
 		return FALSE;
@@ -272,9 +271,6 @@ update_compatible_reduction(
     {
 	MAP(EFFECT, e,
 	{
-	    pips_debug(8, "potential[%s] and %s\n",
-		       entity_name(var), entity_name(effect_variable(e)));
-
 	    if (entity_conflict_p(effect_variable(e), var))
 	        return FALSE;
 	    else if (effect_write_p(e)) /* stores for latter cleaning */
@@ -487,8 +483,6 @@ no_other_effects_on_references(
     le = load_statement_proper_effects(s);
     var = reference_variable(REFERENCE(CAR(lr)));
 
-    pips_assert("same variable", var==reference_variable(r2));
-    
     MAP(EFFECT, e,
     {
 	reference r = effect_reference(e);
@@ -563,15 +557,13 @@ call_proper_reduction_p(
     gen_free_list(lr);
     pips_debug(8, "no other effects\n");
 
-    pips_debug(7, "returning a %s reduction on %s\n",
-	       reduction_operator_tag_name(op), 
-	       entity_name(reference_variable(lhs)));
-
     /* well, it is ok for a reduction now! 
      */
     *red = make_reduction(copy_reference(lhs),
 			  make_reduction_operator(op, UU), 
 			  referenced_variables(lhs));
+
+    DEBUG_REDUCTION(7, "returning\n", *red);
     return TRUE;
 }
 
