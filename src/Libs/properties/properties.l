@@ -197,8 +197,8 @@ parse_properties(void)
 		fprintf(stderr, "user warning, "
 			"cannot change type from %s to %s "
 			"when updating property %s\n",
-			property_tag_to_string(property_tag(pr)),
 			property_tag_to_string(property_tag(opr)),
+			property_tag_to_string(property_tag(pr)),
 			n);
 		free_property(pr);
 	    }
