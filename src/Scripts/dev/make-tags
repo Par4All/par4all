@@ -1,5 +1,9 @@
 #!/bin/sh
-
+#
+# SCCS STuff
+# $RCSfile: make-tags,v $ ($Date: 1994/03/09 15:57:43 $) version $Revision$, got on %D%, %T%
+# %A%
+#
 # Tags computation for the PIPS project, using the Development version.
 # To be run by cron for user pips on isatis
 
@@ -8,8 +12,10 @@
 # Modifications:
 #  - add tags for Linear
 #  - add recomputation of TAGS for Linear
+#  - PIPS_ETAGS variable used
+#  - awk -> cut
 
-HOME=`ypcat passwd | egrep '^pips:' | awk -F: '{print $6}'`
+HOME=`ypcat passwd | egrep '^pips:' | cut -d: -f 6`
 
 # . /etc/profile
 . ${HOME}/.profile
@@ -22,10 +28,14 @@ PATHNAME_LIST="${HOME}/Newgen/genClib.c ${HOME}/Newgen/hash.c ${HOME}/Newgen/lis
 find ${PATHNAME_LIST} -name '*.[cyhl]' -print | \
 	sed '/SCCS/d' > ${FILES} 2>/dev/null
 
-/usr/local/bin/etags -f ${TAGS} `cat ${FILES}` 2>/dev/null
+${PIPS_ETAGS} -f ${TAGS} `cat ${FILES}` 2>/dev/null
 
 cp ${TAGS} ${PIPSDIR}/Tags/TAGS
 
 rm -f ${TAGS} ${FILES}
 (cd $LINEARDIR/Development; rm TAGS; make TAGS)
 cat ${HOME}/C3/Linear/Development/TAGS >>${PIPSDIR}/Tags/TAGS
+
+#
+# that's all
+#
