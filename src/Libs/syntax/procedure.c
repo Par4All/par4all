@@ -212,6 +212,17 @@ cons *lfp;
     instruction icf; /* the body of the current function */
     entity result; /* the second entity */
 
+    /* Let's hope cf is not a common */
+    if(entity_type(cf) != type_undefined
+       && type_area_p(entity_type(cf))) {
+	user_warning("MakeCurrentFunction",
+		     "Conflict for global name %s\n",
+		     entity_local_name(cf));
+	ParserError("MakeCurrentFunction",
+		    "Name conflict between a "
+		    "subroutine and/or a function and/or a common\n");
+    }
+
     /* set ghost variable entities to NIL */
     init_ghost_variable_entities();
 
@@ -229,19 +240,46 @@ cons *lfp;
 		entity fe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, main_name);
 
 		free(main_name);
-		debug(1, "MakeCurrentFunction",
-		      "current function %s re-declared as %s\n",
-		      entity_name(cf), entity_name(fe));
-		ghost_variable_entities = arguments_add_entity(ghost_variable_entities, cf);
-		debug(1, "MakeCurrentFunction",
-		      "entity %s to be destroyed\n",
-		      entity_name(cf));
-		cf = fe;
+
+		/* FI: I do not see how I could check that cf can safely
+		   be dumped; let's use an approximation... */
+		if(entity_initial(cf)==value_undefined) {
+		    debug(1, "MakeCurrentFunction",
+			  "current function %s re-declared as %s\n",
+			  entity_name(cf), entity_name(fe));
+		    ghost_variable_entities = 
+			arguments_add_entity(ghost_variable_entities, cf);
+		    debug(1, "MakeCurrentFunction",
+			  "entity %s to be destroyed\n",
+			  entity_name(cf));
+		    cf = fe;
+		}
+		else {
+		    user_warning("MakeCurrentFunction",
+				 "Conflict for global name %s\n",
+				 entity_local_name(cf));
+		    ParserError("MakeCurrentFunction",
+				"Name conflict between a main and a "
+				"subroutine or a function or a common\n");
+		}
 	    }
 	}
 	else {
 	    FatalError("MakeCurrentFunction", "bad type\n");
 	}
+    }
+
+    /* Let's hope cf is not a common */
+    if(entity_initial(cf) != value_undefined
+       && ! (value_code_p(entity_initial(cf))
+	     || value_unknown_p(entity_initial(cf)))) {
+	pips_error("MakeCurrentFunction", "Should have been trapped by the first test!\n");
+	user_warning("MakeCurrentFunction",
+		     "Conflict for global name %s\n",
+		     entity_local_name(cf));
+	ParserError("MakeCurrentFunction",
+		    "Name conflict between a "
+		    "subroutine and/or a function and/or a common\n");
     }
 
     /* clean up existing local entities in case of a recompilation */
