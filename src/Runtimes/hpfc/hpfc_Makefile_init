@@ -2,23 +2,14 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.61  1997/05/30 09:32:12  coelho
+# *** empty log message ***
+#
 # Revision 1.60  1997/05/16 14:26:36  coelho
 # LINUX case added.
 #
 # Revision 1.59  1997/05/03 17:10:23  coelho
 # diff does not need host and node executables, main and out are enough.
-#
-# Revision 1.58  1997/05/03 16:46:44  coelho
-# *** empty log message ***
-#
-# Revision 1.57  1997/05/03 16:45:33  coelho
-# *** empty log message ***
-#
-# Revision 1.56  1997/05/03 16:43:24  coelho
-# one all entry commented out...
-#
-# Revision 1.55  1997/05/03 16:38:30  coelho
-# *** empty log message ***
 #
 # Revision 1.54  1997/03/19 17:05:25  coelho
 # _both.f files considered as common files for host and node.
@@ -89,11 +80,7 @@ endif
 # the RT architecture relies both on PVM and PIPS architectures,
 # because of obscure issues related to naming conventions when g77 is used...
 
-ifeq ($(PIPS_ARCH),.)
-RT_ARCH=$(PVM_ARCH)
-else
-RT_ARCH=$(PVM_ARCH)-$(PIPS_ARCH)
-endif
+RT_ARCH=$(PIPS_ARCH)/$(PVM_ARCH)
 
 ifdef HPFC_RUNTIME
 RT_DIR=	$(HPFC_RUNTIME)
