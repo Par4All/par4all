@@ -128,10 +128,10 @@ Variable v;
        inegalite ou v a un coefficient negatif, faire une combinaison       */
 
     for( posit=rtri.pos; posit!=NULL; ) {
-	boolean integer_comb_p = TRUE;
-
+	boolean integer_comb_p = TRUE; 
 	non_equivalent_projections = FALSE;
 	for( negat=rtri.neg; negat!=NULL; ) {
+	   
 	    ineg = sc_integer_inequalities_combination_ofl_ctrl(sci, 
 								posit, negat, 
 								v,
@@ -140,9 +140,9 @@ Variable v;
 	    if(!integer_comb_p) {
 		vect_rm(ineg->vecteur);
 		ineg->vecteur = vect_dup(negat->vecteur);
+		non_equivalent_projections = TRUE;
 	    }
-	    non_equivalent_projections = !integer_comb_p;
-
+	    
 	    if (contrainte_constante_p(ineg)) {
 		if (contrainte_verifiee(ineg,FALSE)) {
 		    vect_rm(ineg->vecteur);
@@ -260,7 +260,7 @@ int tab_info[][3],dim,n;
   	sc = sc_integer_projection_along_variable(fsc,sc,vecteur_var(pv1));
 	sc= sc_normalize(sc);
 	sc_integer_projection_information(sc,index_base,tab_info,dim,n);
-	sc=build_integer_sc_nredund(sc,index_base,tab_info,dim,dim,n);
+	 sc=build_integer_sc_nredund(sc,index_base,tab_info,dim,dim,n);
     }
 }
 
