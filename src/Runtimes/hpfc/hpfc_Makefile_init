@@ -1,10 +1,12 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/08/31 13:15:40 $, )
+# ($Date: 1996/08/31 13:17:10 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
 # Makefile for PVM and HPFC, Fabien COELHO, 08/06/94
+
+SHELL=/bin/sh
 
 ifndef PIPS_ARCH
 PIPS_ARCH=.
