@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/10 20:53:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/23 22:26:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/04/10 20:53:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/04/23 22:26:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -301,11 +301,25 @@ hash_table used_labels;
         statement_number(nop) = statement_number(st);
         statement_comments(nop) = statement_comments(st);
 	succ = get_label_control(name);
+	/* Memory leak in CONS(CONTROL, pred, NIL). Also forgot to
+           unlink the predecessor of the former successor of pred. RK */
 	control_successors(pred) = ADD_SUCC(c_res, pred);
 	UPDATE_CONTROL(c_res, nop, 
 		       CONS(CONTROL, pred, NIL), 
 		       ADD_SUCC(succ, c_res )) ;
 	control_predecessors(succ) = ADD_PRED(c_res, succ);
+	/* I do not know why, but my following code does not work. So
+           I put back former one above... :-( RK. */
+#if 0
+	/* Use my procedures instead to set a GOTO from pred to
+           c_res. RK */
+	if (gen_length(control_successors(pred)) == 1)
+	    unlink_2_control_nodes(pred, CONTROL(CAR(control_successors(pred))));
+	link_2_control_nodes(pred, c_res);
+	link_2_control_nodes(c_res, succ);
+	/* Hmmm... A memory leak on the previous statement of c_res? */
+	control_statement(c_res) = nop;
+#endif
 	update_used_labels(used_labels, name, st);
 	controlized = TRUE;
 	break;
@@ -601,6 +615,9 @@ compact_list(list ctls,
 			      CONS(STATEMENT, succ_st, NIL));
 	    }
 	    /* Skip the useless control: */
+	    control_statement(succ) = statement_undefined;
+	    remove_a_control_from_an_unstructured(succ);
+#if 0	    
 	    gen_free_list(control_successors(c_res));
 	    control_successors(c_res) = control_successors(succ);
 	    patch_references(PREDS_OF_SUCCS, succ, c_res);
@@ -610,6 +627,7 @@ compact_list(list ctls,
 	    control_predecessors(succ) = NIL;
 	    control_statement(succ) = statement_undefined;
 	    free_control(succ);
+#endif
 	}
 
 	if(			/* We are at the end... */
@@ -696,14 +714,14 @@ hash_table used_labels;
 	check_control_coherency(pred);
 	check_control_coherency(succ);
 	check_control_coherency(c_res);
-	pips_debug(0, "(pred = %#x, succ = %#x, c_res = %#x)\n",
+	pips_debug(5, "(pred = %#x, succ = %#x, c_res = %#x)\n",
 		   (unsigned int) pred,
 		   (unsigned int) succ, (unsigned int) c_res);
-	pips_debug(0, "Nodes from pred %#x\n", (unsigned int) pred);
+	pips_debug(5, "Nodes from pred %#x\n", (unsigned int) pred);
 	display_linked_control_nodes(pred);
-	pips_debug(0, "Nodes from succ %#x\n", (unsigned int) succ);
+	pips_debug(5, "Nodes from succ %#x\n", (unsigned int) succ);
 	display_linked_control_nodes(succ);
-	pips_debug(0, "Nodes from c_res %#x\n", (unsigned int) c_res);
+	pips_debug(5, "Nodes from c_res %#x\n", (unsigned int) c_res);
 	display_linked_control_nodes(c_res);
     }
     
@@ -743,7 +761,7 @@ hash_table used_labels;
     }
     
     ctls = controlize_list_1(sts, pred, c_end, c_block, block_used_labels);
-    c_last = compact_list( ctls, c_end ) ;
+    c_last = compact_list(ctls, c_end);
 
     ifdebug(5) {
 	pips_debug(0, "Nodes from c_block %#x\n", (unsigned int) c_block);
@@ -753,20 +771,20 @@ hash_table used_labels;
     }
     
     if(covers_labels_p(st,block_used_labels)) {
-	/* There is no GOTO to labels outside the statement:
+	/* There is no GOTO to/from  outside the statement list:
            hierarchize the control graph. */
 	statement new_st; 
 
 	/* Unlink the c_block from the unstructured. RK. */
-	gen_remove(&control_predecessors(c_block), pred);
-	gen_remove(&control_successors(pred), c_block);
-	gen_remove(&control_successors(c_block), c_end);
-	gen_remove(&control_predecessors(c_end), c_block);
+	unlink_2_control_nodes(pred, c_block);
+	unlink_2_control_nodes(c_block, c_end);
 
 	if(ENDP(control_predecessors(c_block)) &&
 	    ENDP(control_successors(c_block))) {
 	    /* c_block is a lonely control node: */
 	    new_st = control_statement(c_block);
+	    control_statement(c_block) = statement_undefined;
+	    free_control(c_block);
 	}
 	else {
 	    /* The control is kept in an unstructured: */
@@ -784,14 +802,25 @@ hash_table used_labels;
 				    statement_comments(st),
 				    i);
 	}
+	/* Not a good idea from mine to add this free... RK
+	   free_statement(control_statement(c_res)); */
+	control_statement(c_res) = new_st;
+	link_2_control_nodes(pred, c_res);
+	link_2_control_nodes(c_res, succ);
+#if 0	
 	UPDATE_CONTROL(c_res, new_st,
 		        ADD_PRED(pred, c_res),
 		        CONS(CONTROL, succ, NIL));
 	control_predecessors(succ) = ADD_PRED(c_res, succ);
 	control_successors(pred) = CONS(CONTROL, c_res, NIL);
+#endif
 	controlized = FALSE;
     }
     else {
+	/* There are GOTO to/from outside this statement list: update
+           c_res to reflect c_block infact: */
+	/* We alredy have pred linked to c_block and the exit node
+           linked to succ. RK */
 	UPDATE_CONTROL(c_res,
 		        control_statement(c_block),
 		        control_predecessors(c_block),
@@ -904,12 +933,14 @@ statement st;
     if(!empty_label_p(name)) {
 	list used = (list) hash_get_default_empty_list(Label_statements, name);
 	list sts = CONS(STATEMENT, st, used);
+	/* Just append st to the list of statements pointing to
+	   this label. */
 	if (hash_defined_p(Label_statements, name))
 	    hash_update(Label_statements, name, (char *) sts);
 	else
 	    hash_put(Label_statements, name, (char *) sts);
 
-	if( hash_get(Label_control, name)==HASH_UNDEFINED_VALUE ) {
+	if (! hash_defined_p(Label_control, name)) {
 	    statement new_st = 
 		    make_continue_statement(statement_label(st)) ;
 	    control c = make_control( new_st, NIL, NIL);
@@ -974,7 +1005,7 @@ simplified_unstructured(control top,
     unstructured u;
     instruction i;
 
-    ifdebug(1) {
+    ifdebug(4) {
 	pips_debug(0, "Accessible nodes from top:\n");
 	display_linked_control_nodes(top);
 	check_control_coherency(top);
@@ -1060,6 +1091,12 @@ statement st;
 	set_bool_property("PRETTYPRINT_EMPTY_BLOCKS", TRUE);
     }
 
+    /* Since the controlizer does not seem to accept GOTO inside
+       sequence from outside but it appears in the code with
+       READ/WRITE with I/O exceptions (end=, etc), first remove
+       useless blocks. RK */
+    clean_up_sequences(st);
+    
     Label_statements = hash_table_make(hash_string, LABEL_TABLES_SIZE);
     Label_control = hash_table_make(hash_string, LABEL_TABLES_SIZE);
     create_statements_of_labels(st);
@@ -1072,7 +1109,7 @@ statement st;
 
     if(!ENDP(Unreachable)) {
 	user_warning("control_graph", "Some statements are unreachable\n");
-	ifdebug(1) {
+	ifdebug(2) {
 	    pips_debug(0, "Unreachable statements:\n");
 	    MAP(STATEMENT, s, {
 		pips_debug(0, "Statement %#x:\n", (unsigned int) s);
