@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/30 18:50:14 $ 
+# $Date: 1996/08/30 22:08:26 $ 
 
 ifeq ($(FC),g77)
 CPPFLAGS+=	-DCOMPILE_FOR_G77
@@ -33,7 +33,7 @@ INSTALL_BIN_DIR:=$(INSTALL_RTM_DIR)/$(ARCH)
 
 INSTALL_BIN=	$(BIN) $(LIB)
 INSTALL_RTM=	$(EXPORT_HEADERS)
-INSTALL_SHR=	$(HPFC)
+INSTALL_SHR=	$(HPFC) xpomp_graphic_F.h
 INSTALL_DOC=	xpomp_manual.ps 
 INSTALL_HTM=	xpomp_manual.html xpomp_manual
 
