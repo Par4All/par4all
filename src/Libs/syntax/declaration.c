@@ -32,6 +32,10 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.57  1998/12/24 11:04:33  irigoin
+ * Improved warning in SafeSizeOfArray() because PIPS does not handle real
+ * expressions in PARAMETER initializations.
+ *
  * Revision 1.56  1998/11/30 19:59:02  irigoin
  * Error message improved in AddVariableToCommon()
  *
@@ -71,6 +75,8 @@ SafeSizeOfArray(entity a)
 
     if(!SizeOfArray(a, &s)) {
 	user_warning("SafeSizeOfArray", "Varying size of array \"%s\"\n", entity_name(a));
+	user_warning("SafeSizeOfArray",
+		     "An integer PARAMETER may have been initialized with a real value?\n");
 	ParserError("SafeSizeOfArray", "Fortran standard prohibit varying size array\n");
     }
 
