@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/02 09:54:34 $, 
+# $Date: 1996/09/02 10:05:27 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -59,14 +59,14 @@ builder_map.h: pipsmake.rc
 	#
 	# building builder_map.h
 	# 
-	sh ./make-builder-map < $< > $@
+	{ cat $(AUTO).h ; sh ./make-builder-map < $< ;} > $@
 
 
 wpips_transform_menu_layout.h:  pipsmake-rc.tex
 	# 
 	# building wpips_transform_menu_layout.h
 	#
-	sh ./make-pips-menu < $< > $@
+	{ cat $(AUTO).h ; sh ./make-pips-menu < $< ; } > $@
 
 clean: local-clean
 
