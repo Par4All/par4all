@@ -86,13 +86,7 @@ then
   else	PGM=$OPT_PGM
   fi
 else	
-  echo sourcing $pips_prgm in `pwd` >&2
-  echo cat $pips_prgm [$PATH] >&2
-  ls -al $pips_prgm >&2 
-  cat $pips_prgm >&2 
-  echo cat done >&2
-  . $pips_prgm
-  echo done >&2
+  . ./$pips_prgm
   if [ "$OPT_PGM" ]
   then	
     if [ "$OPT_PGM" != "$PGM" ]
@@ -336,8 +330,6 @@ then
 fi
 # change mod -> convention so that only the owner uses this file
 chmod u+x $pips_prgm
-
-ls -al $pips_prgm
 
 #
 # that's all
