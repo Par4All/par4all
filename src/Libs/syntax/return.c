@@ -8,6 +8,9 @@
  * $Id$
  *
  * $Log: return.c,v $
+ * Revision 1.17  2003/08/02 14:05:27  irigoin
+ * New error recovery procedure: soft_reset_alternate_returns()
+ *
  * Revision 1.16  2003/06/19 07:38:06  nguyen
  * Update calls to make_statement and make_variable with new RI for C
  *
@@ -269,6 +272,17 @@ reset_alternate_returns()
     gen_free_list(alternate_returns);
     alternate_returns = list_undefined;
     current_number_of_alternate_returns = -1;
+}
+
+/* ParserError() cannot guess if it has been performed or not, because it
+   is reinitialized before and after each call statement. If the error
+   occurs within a call, alternate returns must be reset. Else they should
+   not be reset.*/
+void soft_reset_alternate_returns()
+{
+  if(!list_undefined_p(alternate_returns)) {
+    reset_alternate_returns();
+  }
 }
 
 static statement make_get_rc_statement(expression rc_ref)
