@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1996/06/08 16:17:52 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1996/06/08 17:41:15 $, )
  * version $Revision$
  */
 
@@ -168,7 +168,8 @@ int dim;
 }
 
 /* every thing should be manageable, i.e.
- * no star in the dimensions, and the width has to be accepted...
+ * ??? removed: no star in the dimensions , 
+ * and the width has to be accepted...
  */
 static bool 
 message_manageable_p(
@@ -188,12 +189,12 @@ message_manageable_p(
 	    t2 = vect_coeff(TEMPLATEV, (Pvecteur) PVECTOR(CAR(lp)));
 
 	if ((ta==not_aligned) ||
-	    (ta==local_star) ||
+	    /*(ta==local_star) ||*/
 	    (ta==aligned_star) ||
 	    ((ta==aligned_constant) &&
 	     (!on_same_proc_p(t2-dlt, t2,
-			     array_to_template(array), 
-			     template_dimension_of_array_dimension(array, i)))) ||
+		  array_to_template(array), 
+		  template_dimension_of_array_dimension(array, i)))) ||
 	    ((ta==aligned_shift) &&
 	     (shift>DistributionParameterOfArrayDim(array, i, &p))))
 	{
