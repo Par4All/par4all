@@ -5,10 +5,10 @@
   */
 
 #include <stdio.h>
-extern int fprintf();
 #include <sys/stdtypes.h>  /* for debug with dbmalloc */
 #include <malloc.h>
 #include <assert.h>
+
 #include "arithmetique.h"
 #include "boolean.h"
 #include "vecteur.h"
