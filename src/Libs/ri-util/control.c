@@ -96,7 +96,7 @@ display_address_of_control_nodes(list cs)
 {
 	MAP(CONTROL, cc,
 	    {
-		fprintf(stderr, "%#x,", cc);
+		fprintf(stderr, "%#x,", (unsigned int) cc);
 	    }, cs);
 }
 
