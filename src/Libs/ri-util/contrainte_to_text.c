@@ -136,8 +136,7 @@ contrainte_to_text_1(
     }
     constante_to_textline(operation_line,value_uminus(constante),is_inegalite,
 			  a_la_fortran);
-    first_line = add_to_current_line(aux_line, operation_line,
-				     str_prefix,txt,first_line);
+    add_to_current_line(aux_line, operation_line, str_prefix, txt);
     return aux_line;
 }
 
