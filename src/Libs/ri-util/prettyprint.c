@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.133  1999/09/02 16:39:44  irigoin
+ * Arguments for STOP and PAUSE are printed out when they are present
+ *
  * Revision 1.132  1999/05/31 15:54:12  ancourt
  * remove io entities in io_block after restructuration
  *
@@ -238,7 +241,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.132 1999/05/31 15:54:12 ancourt Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.133 1999/09/02 16:39:44 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -604,8 +607,27 @@ static list
 words_nullary_op(call obj, int precedence, bool leftmost)
 {
     list pc = NIL;
+    list args = call_arguments(obj);
+    entity func = call_function(obj);
+    string fname = entity_local_name(func);
 
-    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+    pc = CHAIN_SWORD(pc, fname);
+
+    /* STOP and PAUSE may have 0 or 1 argument */
+    if(gen_length(args)==1) {
+      if(same_string_p(fname,STOP_FUNCTION_NAME)
+	 || same_string_p(fname,PAUSE_FUNCTION_NAME)) {
+	expression e = EXPRESSION(CAR(args));
+	pc = CHAIN_SWORD(pc, " ");
+	pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE));
+      }
+      else {
+	pips_error("words_nullary_op", "unexpected arguments");
+      }
+    }
+    else if(gen_length(args)>1) {
+      pips_error("words_nullary_op", "unexpected arguments");
+    }
 
     return(pc);
 }
