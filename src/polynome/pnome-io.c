@@ -126,7 +126,7 @@ char * (*variable_name)();
 	}
     }
     free(u);
-    return(strdup((char *) t));
+    return (char*) strdup((char *) t);
 }
 
 /* void polynome_fprint(FILE* fd, Ppolynome pp,
@@ -199,7 +199,7 @@ boolean (*is_inferior_var)();
 	}
     }
     assert( strlen(t) < POLYNOME_BUFFER_SIZE);
-    return (strdup((char *) t));
+    return (char*) strdup((char *) t);
 }
 
 
@@ -335,7 +335,7 @@ Variable (*name_to_variable)();
     Value power;
     char *s;
 
-    s = strdup(sp);
+    s = (char*) strdup(sp);
     remove_blanks(&s);
 
     while (*s != '\0')
@@ -353,7 +353,7 @@ Variable (*name_to_variable)();
 	    else 
 		while ((*s == '.') || (*s == '*')) s++;
 	}
-	else varname = strdup("TCST");
+	else varname = (char*) strdup("TCST");
 
 	if (constructing_monome) {
 	    vect_add_elem(&(monome_term(curpm)), 
