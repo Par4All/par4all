@@ -313,8 +313,8 @@ list vv1, vv2;
         if( (cc2 = vect_coeff((Variable) e1, pv2)) != 0 ) {
 	  int g = pgcd(cc2, c1);
           vect_erase_var(&pv2, (Variable) e1);
-          VV_VAL(v2) = (char *) vect_cl2_ofl_ctrl((c1/g), pv2, (cc2/g), pv1,
-						  NO_OFL_CTRL);
+          VV_VAL(v2) = vect_cl2_ofl_ctrl((c1/g), pv2, (cc2/g), pv1,
+					 NO_OFL_CTRL);
 	}
         p2 = l2;
       }
@@ -338,8 +338,8 @@ list vv1, vv2;
 	if( (cc2 = vect_coeff((Variable) e1, pv2)) != 0 ) {
 	  int g = pgcd(cc2, c1);
 	  vect_erase_var(&pv2, (Variable) e1);
-	  VV_VAL(v2) = (char *) vect_cl2_ofl_ctrl((c1/g), pv2, (cc2/g), pv1,
-						  NO_OFL_CTRL);
+	  VV_VAL(v2) = vect_cl2_ofl_ctrl((c1/g), pv2, (cc2/g), pv1,
+					 NO_OFL_CTRL);
 	}
       }
     }
