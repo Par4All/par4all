@@ -108,7 +108,7 @@ Pbase base_index;
 Psysteme *pcondition, *penumeration;
 {
     int i, dimension = vect_size(base_index);
-    Psysteme ps_interm, ps_project;
+    Psysteme ps_interm, ps_project, ps_tmp;
     Pbase reverse_base;
     Pvecteur pb;
     Pcontrainte	ineq = NULL,
@@ -172,7 +172,9 @@ Psysteme *pcondition, *penumeration;
     /*  include the original system again, to recover simple
      *  constraints that may have been removed. May not be interesting...
      */
-    ps_interm = sc_fusion(ps_interm, sc_dup(scn));
+    ps_tmp =  sc_dup(scn);
+    sc_transform_eg_in_ineg(ps_tmp);
+    ps_interm = sc_fusion(ps_interm, ps_tmp);
     ps_interm = sc_triang_elim_redund(ps_interm, base_index); 
 
     *pcondition = get_other_constraints(&ps_interm, base_index);
