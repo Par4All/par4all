@@ -262,7 +262,7 @@ fi
 for d in ./Pips/Bin/* ;
 do
     [ -f $d/fpips ] && {
-	$verb expanding fpips in $d
+	verb expanding fpips in $d
 	for x in pips tpips wpips ; do ln $d/fpips $d/$x ; done
     }
 done
