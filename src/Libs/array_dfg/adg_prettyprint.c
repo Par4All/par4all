@@ -304,11 +304,11 @@ char * (*variable_name)();
 
   /* value */
   if (value_notzero_p(constante))
-      fprint_Value(fp, constante);
+      fprint_Value(fp, constante), fprintf(fp, " ");
 
   /* trail */
   if (is_what == IS_INEG)
-      fprintf (fp," <= 0 ,");
+      fprintf (fp,"<= 0 ,");
   else if(is_what == IS_EG) 
       fprintf (fp,"== 0 ,");
   else /* IS_VEC */ 
