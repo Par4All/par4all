@@ -197,15 +197,3 @@
 /* this one MUST be the last one.
  */    
 { NULL,				UNEXPECTED_METHODS }
-
-
-
-
-
-
-
-
-
-
-
-
