@@ -2360,6 +2360,7 @@ char*   module_name;
 
     DB_PUT_MEMORY_RESOURCE(DBR_PLC, strdup(module_name), pfunc);
     reset_current_stco_map();
+    reset_current_module_entity();
     debug_off();
     return;
   }
