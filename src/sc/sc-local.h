@@ -201,6 +201,7 @@ les anciens noms des fonctions */
  sc_rational_feasibility_ofl_ctrl((sc), FWD_OFL_CTRL, TRUE)
 #define sc_feasible_ofl(sc, b) sc_rational_feasibility_ofl_ctrl((sc), OFL_CTRL, (b))
 #define sc_elim_redond(ps) sc_elim_redund((ps))
+#define sc_triang_elim_redond(x,y) sc_triang_elim_redund(x,y)
 #define sc_rm_empty_constraints( ps,b) sc_elim_empty_constraints((ps),(b))
 #define sc_kill_db_eg( ps) sc_elim_db_constraints((ps))
 #define non_redundent_subsystem( s1,  s2) extract_nredund_subsystem((s1), (s2))
