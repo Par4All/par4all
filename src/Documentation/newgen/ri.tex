@@ -2,6 +2,10 @@
 %% $Id$
 %%
 %% $Log: ri.tex,v $
+%% Revision 1.67  2003/06/18 15:21:29  nguyen
+%% Add new Newgen structures for C programs.
+%% First version, without comments
+%%
 %% Revision 1.66  2003/04/29 16:06:14  irigoin
 %% typo fixed
 %%
@@ -347,7 +351,7 @@ etc.
 \label{subsection-type}
 \index{Type}
 
-\domain{Type = statement:unit + area + variable + functional + varargs:type + unknown:unit + void:unit}
+\domain{Type = statement:unit + area + variable + functional + varargs:type + unknown:unit + void:unit + struct:entity* + union:entity* + enum:entity*}
 
 Obviously, type {\tt type} is used to represent the type of an
 entity. This type is defined as union to cover the needs of different
@@ -460,7 +464,7 @@ absolue.}.
 \label{subsubsection-variable}
 \index{Variable}
 
-\domain{Variable = basic x dimensions:dimension*}
+\domain{Variable = basic x dimensions:dimension* x qualifiers:qualifier*}
 
 Type {\tt variable} represents the type of usual non-functional
 variables. Field {\tt basic} is the underlying scalar type, e.g. {\tt
@@ -496,7 +500,7 @@ nom '*D*' est utilisée pour les tableaux de taille non définie
 \index{Basic}\index{Integer}\index{Real}\index{Complex}
 \index{Character}\index{Overloaded}\index{Logical}
 
-\domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value}
+\domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value + signed:int + unsigned:int + char:int + bit:int + pointer:type + derived:entity + typedef:entity}
 
 Type {\tt basic} is used to store basic type information such has {\tt
 REAL} or {\tt INTEGER}. Each member includes a precision information,
@@ -536,6 +540,12 @@ Le domaine \verb/dimension/ permet de représenter une dimension d'un
 tableau, c'est-a`-dire un couple borne inférieure -- sous-domaine
 \verb/lower/ -- borne supérieure -- sous-domaine \verb/upper/.
 \end{comment}
+
+\subsubsection{Qualifier}
+\label{subsubsection-qualifier}
+\index{Qualifier}
+
+\domain{Qualifier = const:unit + restrict:unit + volatile:unit + register:unit}
 
 \subsubsection{Functional Type}
 \label{subsubsection-functional}
@@ -946,7 +956,7 @@ handle.
 \label{subsection-statement}
 \index{Statement}
 
-\domain{Statement = label:entity x number:int x ordering:int x comments:string x instruction}
+\domain{Statement = label:entity x number:int x ordering:int x comments:string x instruction x declarations:entity* x decls_text:string}
 {}
 
 Type {\tt statement} is used as a container of instructions. Methods for
@@ -1146,7 +1156,7 @@ associate line number to a statement.
 \label{subsection-instruction}
 \index{Instruction}
 
-\domain{Instruction = sequence + test + loop + whileloop + goto:statement + call + unstructured}
+\domain{Instruction = sequence + test + loop + whileloop + goto:statement + call + unstructured + multitest + forloop + return:expression}
 
 Type {\tt instruction} is used to represent the command associated to a
 statement. An instruction can either be a sequence, a test, a loop,
@@ -1414,7 +1424,9 @@ loops, other ranges are {\em not} expected in bound and step expressions.
 \label{subsubsection-whileloop}
 \index{While}
 
-\domain{Whileloop = condition:expression x body:statement x label:entity}
+\domain{Whileloop = condition:expression x body:statement x label:entity x evaluation}
+
+\domain{Evaluation = before:unit + after:unit}
 
 Here is a while loop. It is not the \verb|while| domain because it would
 interfere with C keywords. The content is similar to the \verb|loop|
@@ -1546,6 +1558,16 @@ control father of a statement in order to travel on the control graph
 associated to a statement. The persistance is needed to avoid freeing
 the control graph when the mapping is freed.
 
+\subsubsection{Switch}
+\label{subsubsection-switch}
+\index{switch}
+\domain{Multitest = controller:expression x body:statement}
+
+\subsubsection{For loop}
+\label{subsubsection-forloop}
+\index{Forloop}
+\domain{Forloop = initialization:expression x condition:expression x
+  increment:expression x body:statement}
 
 % \section{Représentation des expressions}
 \section{Expressions}
@@ -1603,7 +1625,7 @@ field set to {\tt normalized\_undefined}.
 \label{subsection-syntax}
 \index{Syntax}
 
-\domain{Syntax = reference + range + call}
+\domain{Syntax = reference + range + call + cast + sizeofexpression}
 {}
 
 Type \verb/syntax/ is used to represent expressions as they are
@@ -1629,7 +1651,6 @@ un \verb/range/, dans le cas des expressions bornes de boucles (le domaine
 {\tt range} est présenté au niveau des boucles, aussi dans la section
 {\em Instructions}).
 \end{comment}
-
 
 \subsubsection{Reference}
 \label{subsubsection-reference}
@@ -1672,6 +1693,21 @@ See Section~\ref{range}.
 
 All operators, including assignment, are represented as function calls
 with side effect. See Section~\ref{subsubsection-call}.
+
+
+\subsubsection{Cast}
+\label{subsubsection-cast}
+\index{Cast}
+
+\domain{Cast = type x expression}
+{}
+
+\subsubsection{Sizeof}
+\label{subsubsection-sizeof}
+\index{Sizeof}
+
+\domain{Sizeofexpression = type + expression}
+{}
 
 \subsection{Affine Representation of an Expression}
 \label{subsection-normalized}
