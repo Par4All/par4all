@@ -12,16 +12,17 @@
 
 enum {POSITION_UNDEFINED = -1};
 
+#if 0
 /* Mapping from an object to a name and from a name to an object: */
 static hash_table names_of_almost_everything_in_a_module = NULL;
 static hash_table names_to_almost_everything_in_a_module = NULL;
-
 
 /* The unique (well, I hope so...) integer to name an object in PIPS
    from the extern world. It is not reset since it could be useful to
    name various instance of the same module for example. I hope that
    the 2^32 wrap around will not occur too quickly... :-( */
 static int current_name_of_something = 1;
+#endif
 
 /* Just to keep the output file through the gen_recurse: */
 static FILE * local_output_file;
@@ -31,6 +32,7 @@ GENERIC_LOCAL_FUNCTION(word_to_attachments_begin, word_to_attachments)
 GENERIC_LOCAL_FUNCTION(word_to_attachments_end, word_to_attachments)
 
 
+#if 0
 bool
 name_something(chunk * something)
 {
@@ -83,6 +85,7 @@ free_names_of_almost_everything_in_a_module()
    hash_table_free(names_to_almost_everything_in_a_module);
    names_to_almost_everything_in_a_module = NULL;
 }
+#endif
 
 
 /* The translation functions between unique names and objects: */
@@ -96,7 +99,6 @@ begin_attachment_prettyprint()
       /* Initialize the local mapings: */
       init_word_to_attachments_begin();
       init_word_to_attachments_end();
-
       /*name_almost_everything_in_a_module(mod_stat);*/
    }
 }
@@ -110,12 +112,13 @@ end_attachment_prettyprint()
       /* Strings in attachments should already have been freed by
          print_sentence and attachement it-self (witout "s") by
          output_an_attachment(): */
-      close_word_to_attachments_begin();
+
+     close_word_to_attachments_begin();
       /* Should be OK since output_the_attachments_for_emacs() has
          already unlinked the attachment from
          ord_to_attachments_begin: */
       close_word_to_attachments_end();
-      
+
       /*free_names_of_almost_everything_in_a_module();*/
    }
 }
@@ -140,7 +143,7 @@ else {								\
 
 
 /* Attach something to a word list, from begin_word to end_word: */
-void
+static void
 attach_to_word_list(string begin_word,
 		    string end_word,
 		    attachee at) 
@@ -235,6 +238,7 @@ attach_head_to_sentence(sentence s,
 {
     if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
 	attach_to_sentence(s, make_attachee(is_attachee_module_head, module));
+
     return s;
 }
 
@@ -348,7 +352,7 @@ deal_with_sentence_word_end(string a_word,
 	};
     
 	debug_off();
-    }    
+    }
 }
 
 
@@ -375,7 +379,7 @@ output_an_attachment(attachment a)
     case is_attachee_reference:
 	{	    
 	    reference r = attachee_reference(at);
-	    pips_debug(5, "\tentity %#x\n", (unsigned int) r);
+	    pips_debug(5, "\treference %#x\n", (unsigned int) r);
 	    /* Output the address as a string because Emacs cannot
                store 32-bit numbers: */
 	    fprintf(local_output_file, "face epips-face-reference epips-property-reference \"%#x\"",
@@ -407,7 +411,7 @@ output_an_attachment(attachment a)
 	{
 	    pips_debug(5, "\tdecoration\n");
 	    fprintf(local_output_file,
-		    "face epips-face-decoration invisible epips-invisible-decoration");
+		    "invisible epips-invisible-decoration");
 	    break;
 	}
 
