@@ -143,14 +143,15 @@ static void call_rwt(call c)
 {
   entity e_callee = call_function(c);
   string callee_name = module_local_name(e_callee);
-  entity e_filter = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, "KMAX");
 
   text r = (text) load_statement_icfg (current_stmt_head());
 
   /* hum... pushes the current entity... */
   entity e_caller = get_current_module_entity();
-  reset_current_module_entity();
+  entity e_filter = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, "KMAX");
   printf(stderr, entity_local_name(e_filter));
+  reset_current_module_entity();
+
 
   switch (get_int_property (ICFG_DECOR)) {
   case ICFG_DECOR_NONE:
