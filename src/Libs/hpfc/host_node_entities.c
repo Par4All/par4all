@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: host_node_entities.c,v $
+ * Revision 1.24  1997/07/21 14:00:58  keryell
+ * Replaced %x format by %p.
+ *
  * Revision 1.23  1997/04/17 18:48:48  coelho
  * has_put warnings--
  *
@@ -147,8 +150,8 @@ void update_object_for_module(
     bool (*saved_bound)(entity);
     entity (*saved_load)(entity);
 
-    pips_debug(8, "updating (%s) 0x%x\n",
-	  gen_domain_name(gen_type(obj)), (unsigned int) obj);
+    pips_debug(8, "updating (%s) %p\n",
+	  gen_domain_name(gen_type(obj)), obj);
 
     saved_bound = bound_p, saved_load = load; /* push the current functions */
 
