@@ -25,6 +25,7 @@ developed within the <a href="/~pips">PIPS</a> project by
 
 <h2>Output language</h2>
 <ul>
+  <li> host and SPMD node model
   <li> Fortran 77
   <li> runtime support library
   <li> PVM 3.3
@@ -38,6 +39,8 @@ developed within the <a href="/~pips">PIPS</a> project by
   <li> 1,000 lines of shell and C for the driver and other utilities
   <li> 3,000 lines of m4/fortran for the runtime support library
        (expanded to +8,000)
+  <li> 2 programs are generated (host and SPMD node) and linked to PVM and
+       the HPFC runtime library.
 </ul>
 
 <h2>Standard Optimizations</h2>
@@ -60,25 +63,6 @@ developed within the <a href="/~pips">PIPS</a> project by
   <li> remapping-related communications and optimizations
        (<a href="doc/A-277.abstract">abstract</a>,
         <a href="doc/A-277.ps.gz">paper</a>)
-</ul>
-
-<h2>Implementation overview</h2>
-<ul>
-  <li> <b>hpfc</b> is the compiler driver shell.
-  <li> HPF directives are translated into fake Fortran calls
-       to reuse the PIPS parser. 
-  <li> These calls are filtered out of the parsed code and analyzed to set
-       internal data structures that describe array mappings and so.
-  <li> New declarations are computed for the distributed arrays.
-  <li> The input code is analyzed by PIPS (array regions, preconditions).
-  <li> Then 2 codes are generated for each subroutine. One for the host
-       and an SPMD code for the nodes. Implemented as a double rewriting of the
-       AST.  
-  <li> Initialization codes for the runtime data structures are also generated.
-  <li> Finally common declarations are dealt with, plus global initializations.
-  <li> The generated codes are compiled and linked to PVM and the HPFC Runtime
-       library. 2 executables are built (host and nodes). The host spawns the
-       nodes. 
 </ul>
 
 <h2>Experiments</h2>
