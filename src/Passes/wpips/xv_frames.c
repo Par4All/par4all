@@ -25,42 +25,58 @@ int l, t;
 
     frame_get_rect(frame, &rect);
 
-    rect.r_top = BOUND(t, 0, MAX(0,display_height-rect.r_height));
-    rect.r_left = BOUND(l, 0, MAX(0,display_width-rect.r_width));
+		/* We need to estimate the size of the decor added by the widow
+			manager, Y_WM_DECOR_SIZE & X_WM_DECOR_SIZE. RK, 9/10/1993. */
+    rect.r_top = BOUND(t, 0, MAX(0,display_height-rect.r_height-Y_WM_DECOR_SIZE));
+    rect.r_left = BOUND(l, 0, MAX(0,display_width-rect.r_width-X_WM_DECOR_SIZE));
 
     frame_set_rect(frame, &rect);
 }
 
 void create_frames()
 {
+	int i;
+    Display *dpy;
+    Xv_Screen screen;
+    int screen_no,display_width,display_height;
+
     main_frame = xv_create(NULL, FRAME, 
 			   FRAME_LABEL, "XView Pips", 
 /*			   XV_WIDTH, WPIPS_WIDTH, 
 			   XV_HEIGHT, WPIPS_HEIGHT,
 	*/		   NULL);
 
+
+    /* get the display dimensions */
+    dpy = (Display *)xv_get(main_frame, XV_DISPLAY);
+    screen = (Xv_Screen)xv_get(main_frame, XV_SCREEN);
+    screen_no = (int)xv_get(screen, SCREEN_NUMBER);
+
+    display_width = DisplayWidth(dpy, screen_no);
+    display_height = DisplayHeight(dpy, screen_no);
+
     log_frame = xv_create(main_frame, FRAME, 
 			       XV_SHOW, FALSE,
 			       FRAME_DONE_PROC, close_log_subwindow,
 			       XV_WIDTH, DIALOG_WIDTH, 
 			       XV_HEIGHT, DIALOG_HEIGHT, 
-			       0);
+			       NULL);
 
     xv_set(log_frame, FRAME_LABEL, "Pips Log Window", NULL);
 
 
-    edit_frame[0] = xv_create(main_frame, FRAME, 
+		/* Footers added to edit window.
+			RK, 21/05/1993. */
+	for (i = 0; i < 2; i++)
+    	edit_frame[i] = xv_create(main_frame, FRAME, 
 			   XV_SHOW, FALSE,
 			   FRAME_DONE_PROC, hide_window,
 			   XV_WIDTH, EDIT_WIDTH, 
 			   XV_HEIGHT, EDIT_HEIGHT, 
-			   0);
-    edit_frame[1] = xv_create(main_frame, FRAME, 
-			   XV_SHOW, FALSE,
-			   FRAME_DONE_PROC, hide_window,
-			   XV_WIDTH, EDIT_WIDTH, 
-			   XV_HEIGHT, EDIT_HEIGHT, 
-			   0);
+			   FRAME_SHOW_FOOTER, TRUE,
+			   FRAME_LEFT_FOOTER, "<",
+			   FRAME_RIGHT_FOOTER, ">",
+			   NULL);
 
 
     help_frame = xv_create(main_frame, FRAME, 
@@ -69,24 +85,31 @@ void create_frames()
 			   FRAME_DONE_PROC, hide_window,
 			   XV_WIDTH, HELP_WIDTH, 
 			   XV_HEIGHT, HELP_HEIGHT, 
-			   0);
+			   NULL);
 
     mchoose_frame = xv_create(main_frame, FRAME,
 			      XV_SHOW, FALSE,
 			      FRAME_DONE_PROC, hide_window,
-			      0);
+			      NULL);
 
     schoose_frame = xv_create(main_frame, FRAME,
 			      XV_SHOW, FALSE,
 			      FRAME_DONE_PROC, hide_window,
-			      0);
+			      NULL);
 
     query_frame = xv_create(main_frame, FRAME,
 			    XV_SHOW, FALSE,
 			    FRAME_DONE_PROC, hide_window,
 			    XV_WIDTH, QUERY_WIDTH, 
 			    XV_HEIGHT, QUERY_HEIGHT, 
-			    0);
+			    NULL);
+
+    properties_frame = xv_create(main_frame, FRAME,
+				FRAME_LABEL, "Properties panel",
+			      XV_SHOW, FALSE,
+			      XV_WIDTH, display_width - EDIT_WIDTH -2*X_WM_DECOR_SIZE, 
+			      FRAME_DONE_PROC, hide_window,
+			      NULL);
 }
 
 void place_frames()
@@ -105,6 +128,7 @@ void place_frames()
     dpy = (Display *)xv_get(full_frame, XV_DISPLAY);
     screen = (Xv_Screen)xv_get(full_frame, XV_SCREEN);
     screen_no = (int)xv_get(screen, SCREEN_NUMBER);
+	xv_destroy(full_frame);
 
     display_width = DisplayWidth(dpy, screen_no);
     display_height = DisplayHeight(dpy, screen_no);
@@ -117,6 +141,9 @@ void place_frames()
 		(display_width-WPIPS_WIDTH)/2, 
 		(display_height-WPIPS_HEIGHT)/2);
      */
+    place_frame(main_frame, 
+		0, 
+		(display_height-WPIPS_HEIGHT)/2);
 
     frame_get_rect(main_frame, &rect);
 
@@ -128,52 +155,28 @@ void place_frames()
     main_center_t = main_t+main_h/2;
     main_center_l = main_l+main_w/2;
 
-    /* in the bottom */
-    place_frame(log_frame, 
-		main_l,
-		main_t + main_h);
+    /* in the bottom left : */
+    place_frame(log_frame, 0, display_height);
 
-    /* in the bottom left corner */
-    /*place_frame(edit_frame, 
-		main_l - EDIT_WIDTH + MIN(main_w, EDIT_WIDTH)/3, 
-		main_t + main_h - MIN(main_h, EDIT_HEIGHT)/3);
-		*/
-    /* in the upper right corner */
-    place_frame(edit_frame[0], 
-		main_l + main_w - MIN(main_w, EDIT_WIDTH)/3,
-		main_t - EDIT_HEIGHT + MIN(main_h, EDIT_HEIGHT)/3);
+    /* in the upper right corner : */
+    place_frame(edit_frame[0], display_width, 0);
 
-    /* in the bottom right corner */
-    place_frame(edit_frame[1], 
-		main_l + main_w - MIN(main_w, EDIT_WIDTH)/3, 
-		main_t + main_h - MIN(main_h, EDIT_HEIGHT)/3);
+    /* in the bottom right corner : */
+    place_frame(edit_frame[1], display_width, display_height);
 
-    /* in the upper right corner */
-    /*place_frame(help_frame, 
-		main_l + main_w - MIN(main_w, HELP_WIDTH)/3,
-		main_t - HELP_HEIGHT + MIN(main_h, HELP_HEIGHT)/3);
-		*/
     /* in the upper */
     place_frame(help_frame, 
 		main_l + (main_w - HELP_WIDTH)/2,
 		main_t - HELP_HEIGHT);
 
-    /* in the upper left corner */
-    place_frame(mchoose_frame, 
-		main_l - MULTIPLE_CHOICE_WIDTH + 
-		  MIN(main_w, MULTIPLE_CHOICE_WIDTH)/3, 
-		main_t - MULTIPLE_CHOICE_HEIGHT + 
-		  MIN(main_h, MULTIPLE_CHOICE_HEIGHT)/3);
+    /* in the upper left corner : */
+    place_frame(mchoose_frame, 0, 0);
 
-    /* in the upper left corner */
-    place_frame(schoose_frame, 
-		main_l - SINGLE_CHOICE_WIDTH + 
-		  MIN(main_w, SINGLE_CHOICE_WIDTH)/3, 
-		main_t - SINGLE_CHOICE_HEIGHT + 
-		  MIN(main_h, SINGLE_CHOICE_HEIGHT)/3);
+    /* in the upper left corner : */
+    place_frame(schoose_frame, 0, 0);
 
     /* in the upper left corner */
     place_frame(query_frame, 
 		main_l - QUERY_WIDTH + MIN(main_w, QUERY_WIDTH)/3, 
-		main_t - QUERY_HEIGHT + MIN(main_h, QUERY_HEIGHT)/3);
+		main_t - QUERY_HEIGHT - Y_WM_DECOR_SIZE);
 }
