@@ -302,7 +302,7 @@ void CreateIntrinsics()
     }
 }
 
-void bootstrap(program)
+bool bootstrap(program)
 string program;
 {
     CreateIntrinsics();
@@ -314,6 +314,8 @@ string program;
      *  DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(program), string_undefined);
      */
     DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(program), "");
+
+    return TRUE;
 }
 
 value MakeValueLitteral()
