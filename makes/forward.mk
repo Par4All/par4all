@@ -51,6 +51,7 @@ FWD_ROOT	= .
 FWD_OUT		=
 FWD_MKFLAGS	=
 
+# get local stuff if any.
 -include *.mk
 
 la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
