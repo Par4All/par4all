@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/22 14:52:39 $, )
+# ($Date: 1996/08/22 15:00:05 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -164,8 +164,7 @@ LIB_M4FFILES = 	hpfc_packing.m4f \
 		hpfc_bufmgr.m4f \
 		hpfc_broadcast.m4f
 LIB_M4CFILES =	hpfc_misc.m4c
-LIB_FFILES =	hpfc_check.f \
-		hpfc_fake.f
+LIB_FFILES =	hpfc_check.f
 
 M4_HEADERS 	= hpfc_procs.m4h \
 		  hpfc_buffers.m4h 
@@ -220,8 +219,8 @@ INSTALL_INC =	$(CORE_HEADERS) \
 		$(HPFC_MAKEFILES) \
 		$(M4_MACROS) \
 		$(SCRIPTS) \
-		hpfc_check.f
-INSTALL_SHR=	hpfc_fake.f
+		$(LIB_FFILES)
+
 INSTALL_LIB=	$(LIB_TARGET)
 
 #
