@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-compile.c,v $
+ * Revision 1.45  1997/04/17 11:47:45  coelho
+ * *** empty log message ***
+ *
  * Revision 1.44  1997/03/20 10:24:44  coelho
  * RCS headers.
  *
@@ -348,7 +351,7 @@ clean_the_system(
     remove_variables_if_possible(ps, pltry);
 
     build_sc_nredund_2pass(ps);
-    base_rm(sc_base(*ps)), sc_base(*ps) = BASE_NULLE, sc_creer_base(*ps);
+    base_rm(sc_base(*ps)), sc_creer_base(*ps);
 }
 
 static Psysteme 
