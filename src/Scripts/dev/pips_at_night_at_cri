@@ -5,7 +5,7 @@
 # what to do at night from the pips account at cri on chailly.
 #
 
-script=/projects/Pips/Utilities/pips_at_night
+script=/projects/Pips/Production/Utils/pips_at_night
 mailto=pips_validation
 remote=rsh
 verb=:
@@ -16,8 +16,8 @@ more=
 
 function usage()
 {
-    echo "pips_at_night_at_cri [-gGvn]";
-    exit ${1}
+    echo "pips_at_night_at_cri [-gvn] [-a user]";
+    exit ${1:-1}
 }
 
 function verb()
@@ -28,11 +28,11 @@ function verb()
 #
 # OPTIONS
 
-while getopts gGvn opt
+while getopts a:gvn opt
 do
     case ${opt} in
-        g) mailto=coelho ;;
-	G) script=echo ;;
+        a) mailto=${OPTARG} ;;
+	g) script=echo ;;
 	v) verb=verb ;;
 	n) more=CNLPV ;;
 	*) usage 1;;
@@ -55,35 +55,52 @@ function doit()
     fi
 }
 
-# COmpile and VAlidate
-# host dir archs
-function docova()
+# COMPILE host dir archs
+function compile()
 {
-    ${verb} "[docova] compilation $@"
-    doit V "$@" ;
-
-    ${verb} "[docova] validation $@"
-    doit CNLP "$@" &
+    ${verb} "[compile] $@"
+    doit GV "$@" ;
 }
 
-# COMPile
-# host dir archs
-function docomp()
+# VALIDATE host dir archs
+function validate()
 {
-    ${verb} "[docomp] compilation $@"
-    doit V "$@" ;
+    ${verb} "[validate] $@"
+    doit GCNLP "$@" ;
+}
+
+# CLEAN host dir archs
+function clean()
+{
+    ${verb} "[clean] $@"
+    doit CNLPV "$@" ;
 }
 
 #
 # DO IT!
 
-docova coulommiers /tmp LINUXI86
-docova recanati /projects/Pips/Experiments2 GNUSOL2LL
-docova chailly ${HOME} .
+#
+# general cleaning (core, database and so)
 
+clean    chailly 	/projects/Pips . ;
+
+#
+# compilation/validation pipeline
+
+compile  coulommiers 	/tmp LINUXI86 ;
+validate coulommiers 	/tmp LINUXI86 &
+
+compile  recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;
+validate recanati 	/projects/Pips/Experiments2 GNUSOL2LL &
+
+compile  chailly 	/projects/Pips . ;
+validate chailly 	/projects/Pips . &
+
+#
 # remaining compilations
-docomp recanati /projects/Pips/Experiments2 SOL2LL
-docomp chailly ${HOME} "GNU SUN4 GPROF"
+
+compile  recanati 	/projects/Pips/Experiments2 SOL2LL ;
+compile  chailly 	/projects/Pips "GNU SUN4 GPROF" ;
 
 ${verb} waiting
 
