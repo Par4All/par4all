@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 1995/12/14 17:26:53 $, )
+/* $RCSfile: newgen_hash.h,v $ ($Date: 1997/04/24 18:56:11 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -77,20 +77,13 @@ if (hash_warn_on_redefinition_p() == TRUE)		\
 } else							\
     hash_put((hash_table)h, (char*)k, (char*)v);
 
-/*
-#define hash_put_or_update(h, k, v)\
-  if (hash_get((hash_table)h, (char*)k)==HASH_UNDEFINED_VALUE)\
-    hash_put((hash_table)h, (char*)k, (char*)v);\
-  else\
-    hash_update((hash_table)h, (char*)k, (char*)v);
-*/
-
 /* functions declared in hash.c 
  */
-extern void hash_warn_on_redefinition GEN_PROTO(());
-extern void hash_dont_warn_on_redefinition GEN_PROTO(());
-extern char *hash_del GEN_PROTO((hash_table, char *));
-extern char *hash_get GEN_PROTO((hash_table, char *));
+extern void hash_warn_on_redefinition GEN_PROTO((void));
+extern void hash_dont_warn_on_redefinition GEN_PROTO((void));
+extern char * hash_delget GEN_PROTO((hash_table, char *, char **));
+extern char * hash_del GEN_PROTO((hash_table, char *));
+extern char * hash_get GEN_PROTO((hash_table, char *));
 extern bool hash_defined_p GEN_PROTO((hash_table, char *));
 extern void hash_put GEN_PROTO((hash_table, char *, char *));
 extern void hash_table_clear GEN_PROTO((hash_table));
