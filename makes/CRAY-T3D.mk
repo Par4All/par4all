@@ -1,10 +1,8 @@
-#
 # $Id$
-#
 
 AR	= ar
 ARFLAGS	= -rv
-CC	= cc 
+CC	= cc -T cray-t3d
 CFLAGS	= -O 3
 CMKDEP	= -M
 CPPFLAGS= -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
@@ -13,8 +11,9 @@ LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH)
 RANLIB	= :
 LEX	= lex
 LFLAGS	=
-FC	= f90
-FFLAGS	= -O agress -O 3 -O unroll2 -O split2 -O scalar3 -e I
+FC	= cf77 -C cray-t3d
+# -g suppresses all optimizations!
+FFLAGS	= -O 1 -O scalar3
 LINT	= lint
 LINTFLAGS= -habxu
 YACC	= yacc
@@ -33,7 +32,3 @@ BIBTEX	= bibtex
 MAKEIDX	= makeindex
 DVIPS	= dvips
 RMAN	= rman
-
-#
-#
-#

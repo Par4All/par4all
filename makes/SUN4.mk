@@ -1,12 +1,9 @@
-#
 # $Id$
-#
-# this file contains macro definitions 
 
 CPPFLAGS += -Dsparc 
 LDFLAGS	+= -fast 
 
-include $(ROOT)/Include/makefile_macros.DEFAULT
+include $(ROOT)/makes/DEFAULT.mk
 
 CC	= acc -temp=$(pips_home)/tmp
 CFLAGS	= -g -fast -Xc
@@ -20,6 +17,3 @@ RANLIB	= granlib
 LEX	= flex
 
 FFLAGS	= -O -g -U -u -C 
-
-# end of it
-#

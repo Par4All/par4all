@@ -1,9 +1,4 @@
-#
-# $RCSfile: makefile_macros.TEST,v $ (version $Revision$)
-# $Date: 1996/09/19 11:51:52 $, 
-#
-# this file contains macro definitions 
-# the purpose is to test some options and so.
+# $Id$
 
 GLIBC	= /usr5/gnu/SPARC/glibc
 GCCDIR	= $(GCC_EXEC_PREFIX)sparc-sun-sunos4.1.4/2.7.2.f.1
@@ -38,6 +33,3 @@ LATEX	= :
 MAKEIDX	= :
 DVIPS	= :
 RMAN	= :
-
-# end of $RCSfile: makefile_macros.TEST,v $
-#

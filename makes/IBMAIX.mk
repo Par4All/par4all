@@ -1,11 +1,6 @@
-#
 # $Id$
-#
 
-#
-# for compiling:
-
-include $(ROOT)/Include/makefile_macros.DEFAULT
+include $(ROOT)/makes/DEFAULT.mk
 
 # ansi required for newgen (otherwise __STDC__ or __STRICT_ANSI__ not def).
 CANSI	= -qlanglvl=ansi 
@@ -36,7 +31,5 @@ DEPFILE = *.u
 TPIPS_ADDED_LIBS =	-lreadline -lcurses
 
 # wpips was never compiled under aix.
-include $(ROOT)/Include/makefile_macros.nowpips
+include $(ROOT)/makes/nowpips.mk
 
-# end of it
-#

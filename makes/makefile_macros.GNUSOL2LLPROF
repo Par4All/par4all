@@ -1,8 +1,0 @@
-#
-# $Id$
-#
-
-include $(ROOT)/Include/makefile_macros.GNUSOL2LL
-
-CFLAGS	+= -pg
-LDFLAGS	+= -pg

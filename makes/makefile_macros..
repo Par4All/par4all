@@ -1,9 +1,0 @@
-#
-# $Id$
-#
-# this is the default file at CRI.
-
-include $(ROOT)/Include/makefile_macros.GNUSOL1
-
-# end of it!
-#

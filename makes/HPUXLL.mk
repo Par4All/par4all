@@ -1,8 +1,6 @@
-#
 # $Id$
-#
 
-include $(ROOT)/Include/makefile_macros.GNULL
+include $(ROOT)/makes/GNULL.mk
 
 # -ansi needed for ... declarations?
 CC	= gcc-2.8.1 -ansi

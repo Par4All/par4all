@@ -1,6 +1,6 @@
-#
+# $Id$
 
-include $(ROOT)/Include/makefile_macros.DEFAULT
+include $(ROOT)/makes/DEFAULT.mk
 
 RANLIB	= :
 
@@ -12,7 +12,3 @@ FFLAGS	= -O agress -O 3 -O unroll2 -O split2 -O scalar3 -e I
 
 # the cray m4 results in some internal stack overflow on hpfc runtime...
 M4	= gm4
-
-#
-#
-#

@@ -1,15 +1,9 @@
-#
 # $Id$
-#
-# this file contains macro definitions 
 
-include $(ROOT)/Include/makefilemacros.IBMAIX
+include $(ROOT)/makes/IBMAIX.mk
 
 CFLAGS	+= -qlonglong 
 
 CPPFLAGS+= 	-DLINEAR_VALUE_IS_LONGLONG \
 		-DLINEAR_VALUE_PROTECT_MULTIPLY \
 		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
-
-# end of it!
-#
