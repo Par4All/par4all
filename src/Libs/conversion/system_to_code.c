@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/10 12:01:29 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/10 12:03:29 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -54,8 +54,8 @@ Psysteme_to_expression(
     Psysteme systeme)
 {
     entity
-	equ = entity_instrinsic(EQUAL_OPERATOR_NAME),
-	leq = entity_instrinsic(LESS_OR_EQUAL_OPERATOR_NAME);
+	equ = entity_intrinsic(EQUAL_OPERATOR_NAME),
+	leq = entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME);
     list conjonction;
     expression result;
 
@@ -388,7 +388,7 @@ constraints_to_loop_bound(
 	  if (vadd)
 	  {
 	      eadd = make_vecteur_expression(vadd);
-	      e = MakeBinaryCall(entity_instrinsic(PLUS_OPERATOR_NAME),
+	      e = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 				 eadd, ediv);
 	  }
 	  else
@@ -412,7 +412,7 @@ constraints_to_loop_bound(
   }
   else
   {
-      entity operator = entity_instrinsic(is_lower ? "MAX" : "MIN");
+      entity operator = entity_intrinsic(is_lower ? "MAX" : "MIN");
       result = make_call_expression(operator, le);
   }
 
