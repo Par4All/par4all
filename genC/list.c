@@ -445,13 +445,21 @@ chunk *obj ;
     }
 }
 
+/*  caution: the first item is 0!
+ *  was:  return( (n<=0) ? l : gen_nthcdr( n-1, CDR( l ))) ;
+ */
 list gen_nthcdr( n, l )
 int n ;
 list l ;
 {
-    return( (n<=0) ? l : gen_nthcdr( n-1, CDR( l ))) ;
+    list c;
+    assert(n>=0);
+    for (c=l; n>0; c=CDR(c), n--);
+    return(c);
 }
 
+/*  why a chunk ?
+ */
 chunk gen_nth( n, l )
 int n ;
 list l ;
@@ -465,8 +473,15 @@ list l ;
     return( CAR( gen_nthcdr( n, l ))) ;
 }
 
-/* sorts a list of chunks in place.
- * see man qsort about the compare function.
+/* Sorts a list of chunks in place, to avoid mallocs. 
+ * The list skeleton is not touched, but the items are replaced
+ * within the list. If some of the cons are shared, it may trouble
+ * the data and the program.
+ *
+ * See man qsort about the compare function: 
+ *  - 2 pointers to the data are passed, 
+ *  - and the result is <, =, > 0 if the comparison is lower than, equal...
+ *
  * FC 27/12/94
  */
 void gen_sort_list(l, compare)
@@ -479,16 +494,18 @@ int (*compare)();
 	**table = (chunk**) malloc(sizeof(chunk*)*n),
 	**point;
 
-    for (c=l, point=table; 
-	 !ENDP(c); 
-	 c=CDR(c), point++)
+    /*   the list items are first put in the temporary table,
+     */
+    for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
 	*point = CHUNK(CAR(c));
     
+    /*    then sorted,
+     */
     qsort(table, n, sizeof(chunk*), compare);
 
-    for (c=l, point=table; 
-	 !ENDP(c); 
-	 c=CDR(c), point++)
+    /*    and the list items are updated with the sorted table
+     */
+    for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
 	CHUNK(CAR(c)) = *point;
 
     free(table); 
