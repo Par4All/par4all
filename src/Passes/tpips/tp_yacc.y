@@ -327,7 +327,7 @@ i_display:
 	    if (execution_mode) {
 		string pager;
 
-		if (!(pager = getenv("PAGER")))
+		if ( (isatty(0)) || (!(pager = getenv("PAGER"))))
 		    pager = CAT_COMMAND;
 		
 		MAPL(e, {
