@@ -29,13 +29,16 @@ HTMS =	$(HTML_AUTO) \
 	wp65.html \
 	wp65_summary.html
 
-SOURCES= $(HTMS)
+SCRIPTS =	generate_pips_distributions
+
+SOURCES= $(HTMS) $(SCRIPTS)
 
 # Ask to make the html files:
 all: $(HTML_AUTO)
 clean: local_clean
 
 INSTALL_HTM= $(HTMS)
+INSTALL_UTL= $(SCRIPTS)
 
 # To deal with non-framed viewer and no server side include:
 APPLY_CPP = cpp -C -P
