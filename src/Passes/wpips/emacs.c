@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1995/11/27 16:43:33 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1996/06/17 10:01:03 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1995/11/27 16:43:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1996/06/17 10:01:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -26,6 +26,7 @@ char vcid_emacs[] = "%A% ($Date: 1995/11/27 16:43:33 $, ) version $Revision$, go
 #include "ri.h"
 #include "database.h"
 #include "pipsdbm.h"
+#include "properties.h"
 
 /* Include the label names: */
 #include "wpips-labels.h"
@@ -451,5 +452,8 @@ initialize_emacs_mode()
 
       /* Initialize the epips.el epips-window-number variable: */
       send_window_number_to_emacs(INITIAL_NUMBER_OF_WPIPS_WINDOWS);
+      
+      /* Ask for Emacs prettyprinting: */
+      set_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES", TRUE);	
    }
 }
