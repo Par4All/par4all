@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1997/04/15 17:30:16 $, 
+ * $Date: 1997/04/28 16:36:02 $, 
  */
 
 #include <stdio.h>
@@ -116,6 +116,13 @@ static bool privatizer(char *module_name)
 		store_as_regions || ! privatize_sections);
     pips_assert("No copy-in or copy-out if we do not privatize array sections.\n",
 		privatize_sections || (!copy_in && !copy_out) );
+
+
+    if (!same_string_p(rule_phase(find_rule_by_resource("REGIONS")),
+		       "MUST_REGIONS"))
+	pips_user_warning("\nMUST REGIONS not selected - "
+			  "Do not expect wonderful results\n");
+
 
     /* set and get the current properties concerning regions */
     set_bool_property("MUST_REGIONS", TRUE);
@@ -905,6 +912,12 @@ declarations_privatizer(char *mod_name)
 	pips_user_warning("property ARRAY_SECTION_PRIV_COPY_OUT set to TRUE ; " 
 			" COPY OUT not implemented.\n" ); 
     }
+
+    if (!same_string_p(rule_phase(find_rule_by_resource("REGIONS")),
+		       "MUST_REGIONS"))
+	pips_user_warning("\nMUST REGIONS not selected - "
+			  "Do not expect wonderful results\n");
+
 
     /* set and get the current properties concerning regions */
     set_bool_property("MUST_REGIONS", TRUE);
