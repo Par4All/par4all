@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.GNU,v $
+# Revision 1.32  1997/07/26 12:16:43  coelho
+# SOURCE macros added...
+#
 # Revision 1.31  1997/05/14 15:54:31  coelho
 # *** empty log message ***
 #
@@ -23,8 +26,15 @@ CC	= gcc
 CANSI	= -ansi -pedantic-errors
 CFLAGS	= -g -O2 -Wall -pipe
 CMKDEP	= -M
+
+# putenv() => svid
+# getwd()  => bsd
+# getopt() => posix2
+
 CPPFLAGS= \
-	-D__USE_BSD \
+	-D_POSIX_C_SOURCE=2 \
+	-D_BSD_SOURCE \
+	-D_SVID_SOURCE \
 	-D__USE_FIXED_PROTOTYPES__ \
 	-I. \
 	-I$(NEWGEN_ROOT)/Include \
