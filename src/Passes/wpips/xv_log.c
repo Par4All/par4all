@@ -1,8 +1,6 @@
-/* 	%A% ($Date: 1997/04/30 15:16:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char vcid_xv_log[] = "%A% ($Date: 1997/04/30 15:16:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
+/*
+ * $Id$
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,6 +17,8 @@ char vcid_xv_log[] = "%A% ($Date: 1997/04/30 15:16:47 $, ) version $Revision$, g
 #include <xview/xv_error.h>
 #include <setjmp.h>
 
+/* xview/newgen interaction
+ */
 #if (defined(TEXT))
 #undef TEXT
 #endif
@@ -69,9 +69,9 @@ prompt_user(string a_printf_format, ...)
 static void
 insert_something_in_the_wpips_log_window(char * a_message)
 {
-   int new_length;
-   int message_length = strlen(a_message);
-   int old_length = (int) xv_get(log_textsw, TEXTSW_LENGTH);
+    int new_length;
+    int message_length = strlen(a_message);
+    int old_length = (int) xv_get(log_textsw, TEXTSW_LENGTH);
 
    /* Try to insert at the end: */
    xv_set(log_textsw,
@@ -80,7 +80,8 @@ insert_something_in_the_wpips_log_window(char * a_message)
    textsw_insert(log_textsw, a_message, message_length);
    /* Verify it fitted: */
    new_length = (int) xv_get(log_textsw, TEXTSW_LENGTH);
-   if (new_length != old_length + message_length) {
+   if (new_length != old_length + message_length) 
+   {
       /* It ran out of space! */
       /* recreate_log_window(); */
       /* Discard the content without keeping the undo buffer: */
@@ -96,8 +97,8 @@ insert_something_in_the_wpips_log_window(char * a_message)
                   "you saw the log window was full :-) ...\n"
                   "It is now cut down to 0 byte again...\n\n"
                   "Anyway, you can retrieve all the log content "
-                  "in the file \"%s\"\n",
-                  log_file_name);
+                  "in the file \"%s/LOGFILE\"\n",
+                  db_get_current_workspace_directory());
    }   
 
    textsw_possibly_normalize(log_textsw, 
