@@ -34,8 +34,7 @@ bool region_consistent_p(region reg)
     Pbase b, t;
     Pcontrainte c;
 
-    pips_assert("it is a region", (int)(reg)->i == effect_domain);
-    pips_assert("transformer arguments is a NIL list", consistent);
+    pips_assert("it is a region",  effect_consistent_p(reg));
 
     /* the system must be defined */
     consistent = consistent && !SC_UNDEFINED_P(region_system(reg));
