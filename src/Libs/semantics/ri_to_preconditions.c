@@ -1152,6 +1152,7 @@ transformer_add_condition_information_updown(
     /* default option: no condition can be added */
     transformer newpre = pre;
     syntax s = expression_syntax(c);
+    tag t = syntax_tag(s);
 
     /* check first that c's effects are purely reads on integer scalar
        variable; I'm not sure I'm reusing Remi's function well... */
@@ -1168,15 +1169,15 @@ transformer_add_condition_information_updown(
 	print_transformer(pre);
     }
 
-    /* The following test is not right or too early: if in the while loop condition, 
+    /* The following test is not right (too early): if in the while loop condition, 
        there are 2 or more sub-expressions (e1.AND.e2 , e1.OR.e2 , ....) that one of 
        them does not have integer scalar read effects, the informations of others 
        are not counted !!!  */
 
     /*   if(integer_scalar_read_effects_p(ef)) */
 
-    
-    if(syntax_call_p(s)) 
+    switch(t){
+    case is_syntax_call: 
       {
 	entity e = call_function(syntax_call(s));
 	/* do not factor out c1/e1 and c2/e2 initialization; they do not
@@ -1193,6 +1194,7 @@ transformer_add_condition_information_updown(
 	    if(integer_scalar_read_effects_p(ef1) && integer_scalar_read_effects_p(ef2))  
 	      newpre = transformer_add_relation_information(pre, e, e1, e2, 
 							veracity, upwards);
+	     /* Help! I need a free_effects(ef) here */
 	    //    free_effect(ef1);
 	    //    free_effect(ef2);
 	  }
@@ -1338,13 +1340,21 @@ transformer_add_condition_information_updown(
 		   * keep pre unmodified
 		   */
 		  newpre = pre;
+	break;
       }
-    else
-      pips_error("transformer_add_condition_information_updown",
-		 "ill. expr. as test condition\n");
-    /* Help! I need a free_effects(ef) here 
-       NN : I've done it , free_effect(ef1) and free_effect(ef2) */
-    
+    case is_syntax_reference:
+      {
+	/* do not know what to do with other logical operators, for the time being! 
+		   * keep pre unmodified
+	 */
+	break;
+      }
+    case is_syntax_range:
+      {
+	pips_error("transformer_add_condition_information_updown",
+		   "ill. expr. as test condition\n");
+      }
+    }
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
       debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
 	      "transformer_add_condition_information_updown", "end newpre=\n");
