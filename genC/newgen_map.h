@@ -18,7 +18,7 @@
 #ifndef MAP_INCLUDED
 #define MAP_INCLUDED
 
-/* $RCSfile: newgen_map.h,v $ ($Date: 1997/09/22 10:10:34 $, ) 
+/* $RCSfile: newgen_map.h,v $ ($Date: 1998/04/11 11:25:09 $, ) 
  * version $Revision$
  * got on %D%, %T%
  *
@@ -32,22 +32,22 @@ extern gen_chunk *gen_hash_ ;
 
 #define HASH_GET(start,image,h,k) \
 IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-	 ((gen_hash_-1)->start=(k), \
+	 ((gen_hash_-1)->s=(char*)(k), \
 	  (((gen_chunk *)hash_get((h),(char *)(gen_hash_-- -1)))->image)), \
 	 gen_hash_->image)
 
 #define HASH_BOUND_P(start, image, h, k)\
 IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-	 ((gen_hash_-1)->start=(k), \
+	 ((gen_hash_-1)->s=(char*)(k), \
 	  (bool) (hash_defined_p((h), (char *)(gen_hash_-- -1)))), \
 	 (bool) gen_hash_)
 
 #define HASH_UPDATE(start,image,h,k,v) \
 IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-	 ((gen_hash_-1)->start=(k), \
+	 ((gen_hash_-1)->s=(char*)(k), \
 	  IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-		   ((gen_hash_-1)->image=(v), \
-		    *((gen_chunk *)hash_get((h),(char *)(gen_hash_-2)))= \
+		   ((gen_hash_-1)->s=(char*)(v), \
+		    *((gen_chunk *)hash_get((h),(char*)(gen_hash_-2)))= \
 		    *(gen_hash_-1), \
 		    gen_hash_ -=2, \
 		    (h)), \
@@ -57,10 +57,10 @@ IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 #define HASH_EXTEND(start,image,h,k,v) \
 IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 	 IN_HEAP((gen_hash_-1)->p, gen_chunk, \
-		 ((gen_hash_-1)->p->start=(k), \
+		 ((gen_hash_-1)->p->s=(char*)(k), \
 		  IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 			   IN_HEAP((gen_hash_-1)->p, gen_chunk, \
-				   ((gen_hash_-1)->p->image=(v), \
+				   ((gen_hash_-1)->p->s=(char*)(v), \
 				    hash_put((h), \
 					     (char *)(gen_hash_-2)->p,\
 					     (char *)(gen_hash_-1)->p), \
@@ -74,7 +74,7 @@ IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 
 #define HASH_DELETE(start,image,h,k) \
 IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-	 ((gen_hash_-1)->start=(k), \
+	 ((gen_hash_-1)->s=(char*)(k), \
 	  (((gen_chunk *)hash_del((h),(char *)(gen_hash_-- -1)))->image)), \
 	 gen_hash_->image)
 
@@ -84,8 +84,8 @@ IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
       char *_map_k; char *_map_v; \
       while ((_map_hash_p = \
 	   hash_table_scan(_map_hash_h,_map_hash_p,&_map_k,&_map_v))) { \
-        typename##_key_type k = ((gen_chunk*)_map_k)->start ; \
-        typename##_value_type v = ((gen_chunk*)_map_v)->image;\
+        typename##_key_type k = (typename##_key_type)((gen_chunk*)_map_k)->start ; \
+        typename##_value_type v = (typename##_value_type)((gen_chunk*)_map_v)->image;\
         code ; }}
 
 #endif
