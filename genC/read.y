@@ -154,7 +154,7 @@ Datas2 : Datas2 Data { }
 
 Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP 
           {
-	    int i, size = gen_size($3);
+	    int i, size = Domains[$3].size;
 	    cons *cp ;
 
 	    /* see HACK bellow. */
@@ -194,6 +194,7 @@ Type	: Int
 	}
 	;
 
+/* We should avoid to build explicit lists, as we know what we are reading? */
 Datas	: Datas Data { $$ = CONS( CHUNK, $2.p, $1 ); }
 	| { $$ = NIL; }
 	;
@@ -298,7 +299,7 @@ static gen_chunk * chunk_for_domain(int domain)
 {
   gen_chunk * cp;
   check_domain(domain);
-  cp = (gen_chunk*) alloc(sizeof(gen_chunk)*gen_size(domain));
+  cp = (gen_chunk*) alloc(sizeof(gen_chunk)*Domains[domain].size));
   cp->i = domain;
   return cp;
 }
@@ -387,7 +388,7 @@ static gen_chunk * make_ref(int domain, gen_chunk * st)
   {
     if (newgen_allow_forward_ref) 
     {
-      cp = (gen_chunk*) alloc(sizeof(gen_chunk)*gen_size(domain));
+      cp = (gen_chunk*) alloc(sizeof(gen_chunk)*Domains[domain].size);
       cp->i = domain;
       (cp+1)->i = 0; /* no number yet */
       (cp+2)->s = st->s; /* TAKEN! */
