@@ -316,8 +316,6 @@ static void simd_simple_sequence_rewrite(statement s)
 
 bool simdizer(char * mod_name)
 {
-   string resp;
-
    /* get the resources */
    statement mod_stmt = (statement)
       db_get_memory_resource(DBR_CODE, mod_name, TRUE);
@@ -330,31 +328,8 @@ bool simdizer(char * mod_name)
    debug_on("SIMDIZER_DEBUG_LEVEL");
    /* Now do the job */
   
-   resp = user_request("The Great Wizard knows how to:\n"
-		       "  1- unroll loops as needed\n"
-		       "  2- SIMDize simple statements\n"
-		       "Your choice ?\n");
-   
-   switch(resp[0])
-   {
-      case '1':
-      {
-	 printf("unrolling loops...\n");
-	 simd_unroll_as_needed(mod_stmt);
-      }
-      break;
-      
-      case '2':
-      {
-	 printf("SIMDizing simple statements...\n");
-	 gen_recurse(mod_stmt, statement_domain,
-		     simd_simple_sequence_filter, simd_simple_sequence_rewrite);
-      }
-      break;
-
-      default:
-	 printf("The Great Wizard can go to bed and do nothing, too...\n");
-   }
+   gen_recurse(mod_stmt, statement_domain,
+	       simd_simple_sequence_filter, simd_simple_sequence_rewrite);
 
    pips_assert("Statement is consistent after SIMDIZER", 
 	       statement_consistent_p(mod_stmt));
