@@ -1,6 +1,6 @@
 %
 %% $RCSfile: developer_guide.tex,v $ (version $Revision$)
-%% $Date: 1996/10/15 18:16:29 $, 
+%% $Date: 1996/10/17 22:36:12 $, 
 % PIPS development environment documentation; translated and updated from 
 % dret146.f.tex
 %
@@ -71,7 +71,9 @@ these variables are initialized by the script
 \verb+/projects/Pips/pipsrc.sh+ for \verb+sh+, \verb+ksh+ and \verb+bash+,
 and by \verb+/projects/Pips/pipsrc.csh+ for \verb+csh+ and \verb+tcsh+. Both
 scripts are automatically derived from a reference file \verb+pipsrc.ref+
-maintained in the \verb+Scripts/env+ directory of the sources.
+maintained in the \verb+Scripts/env+ directory of the sources (see
+Section~\ref{sec:directories} for a description of the directory hierarchy
+which holds the PIPS and related softwares).
 
 Two variables are of special interest: \verb+$PIPS_ROOT+ which stores the
 root of PIPS current version, and \verb+$PIPS_ARCH+.
@@ -103,19 +105,21 @@ Here are examples of pips architectures (distinct \verb+$PIPS_ARCH+
 values) used: %%$
 \begin{description}
 \item[.]: default version used locally, so as to be compatible with the
- past. \verb+gcc+, \verb+lex+ and \verb+yacc+.
+ past. \verb+gcc+, \verb+flex+ and \verb+bison+ are used.
 \item[DEFAULT]: default compilers and options expected to run on any
   machine (\verb+CC=cc+, and so on). The C compiler is expected to support
   ANSI features, includes and so.
 \item[GNU]: prefer gnu tools, as \verb+gcc+, \verb+flex+, \verb+bison+,
   \verb+g77+.
-\item[SUN4]: SUN SUNOS 4 compilers \verb+acc+, \verb+f77+\ldots
+\item[SUN4]: SUN SUNOS 4 compilers \verb+acc+,\verb+lex+, \verb+yacc+,
+  \verb+f77+, etc.
 \item[GNUSOL2LL]: version for SUN Solaris 2 compiled with gnu softwares and
   using ``long long'' (64 bits) integers in the mathematical computations
   of the C3/Linear library.
 \item[GPROF]: a gnu version compiled with -pg (which generates a trace
   file that can be exploited by \verb+gprof+ for extracting profiling
   information)
+\item[IBMAIX]: the compilers and options used on IBM AIX workstations. 
 \end{description}
 
 
@@ -123,7 +127,8 @@ values) used: %%$
 \section{PIPS directories}
 \label{sec:directories}
 
-This section describes the directory hierarchy of PIPS\@.  Pips resides in
+This section describes the directory hierarchy of PIPS\@. 
+Here at CRI, École des mines de Paris, Pips resides in
 \verb+/projects/Pips+ (\verb|$PIPS_DIR|). %% $
 This directory is owned by the \verb+pips+ user.
 From this directory, several sub directories can be found. The most
@@ -131,7 +136,7 @@ important is the \verb+Production+ directory which contains the main copy
 of Pips, including \emph{all} sources, compiled libraries and executables,
 documentation, include files, and so on. In the \verb+Development+
 directory you can find a development copy of the sources in which new
-codes are developped. Once correct, they are installed in the main
+codes are developed. Once correct, they are installed in the main
 (Production) hierarchy and will become the reference version.
 
 The sub-directories are described below. Almost at each level,
@@ -139,7 +144,7 @@ The sub-directories are described below. Almost at each level,
 installation of developments into the production hierarchy.
 
 The \verb+Bin+, \verb+Share+, \verb+Runtime+ and \verb+Doc+ directories
-should offer a working pips \emph{running} environment.
+offer a working pips \emph{running} environment.
 
 The organisation of the Newgen (\verb+/projects/Newgen+) and C3/Linear 
 (\verb+/projects/C3/Linear+) is very similar to this one.
@@ -153,7 +158,7 @@ passes. You can find the following subdirectories:
 
 Pips current binaries that can be executed. These binaries include
 \texttt{pips} (the main program), \texttt{tpips} (the same program with a
-interactive interface based on the readline library) and \texttt{wpips}
+interactive interface based on the GNU readline library) and \texttt{wpips}
 (the window interface). It also includes other architecture-dependent
 executables. Binaries for different architectures can be stored in
 different sub-directories depending on the value of \verb+$PIPS_ARCH+ %%$
@@ -167,7 +172,7 @@ include shell (sh and csh), sed, awk, perl and lisp scripts! Examples:
 \begin{itemize}
 \item  \verb+Init, Select, Perform, Display, Pips+:
   \index{Init}\index{Select}\index{Perform}\index{Display}\index{Pips}
-  batch interface for PIPS; it is described in ???
+  batch interface for PIPS; it is described in PIPS Web pages. 
   
 \item \verb+epips+: a shell to launch the emacs pips interface (which
   uses \verb+wpips+ and \verb+emacs+)
@@ -189,7 +194,7 @@ Important files are \verb+pipsmake.rc+, \verb+properties.rc+ and
 Pips documentation, namely many postscript files describing various
 aspects of PIPS, the internal data structures and so on.  Important
 documents: pipsmake-rc (the dependence rules between pips interprocedural
-analyses), developper\_guide (this document!), ri (the description of the
+analyses), developer\_guide (this document!), ri (the description of the
 pips Intermediate Representation).
 
 The \verb|Doc/manl| subdirectory contains local (obsolete?) man pages. 
@@ -268,7 +273,7 @@ various scripts used for running and developping the PIPS sofware.
 
 \subsubsection{Utils}
 
-Other architecture independent tools and files used for \emph{developping}
+Other architecture independent tools and files used for \emph{developing}
 pips (as opposed to \emph{running} it).
     
 \begin{description}
@@ -306,8 +311,9 @@ pips (as opposed to \emph{running} it).
   
   It is very important that \emph{all} source directories conform to
   the use of \verb+pips-makemake+, so as to provide an homogeneous
-  environment for PIPS developpers all over the PIPS, Newgen and
-  Linear, Thus developping in these environments is an easier task.
+  environment for PIPS developers all over the PIPS, Newgen and
+  Linear sofwares. Thus developing in these environments is an easier
+  task. 
   
   The documentation of this script is in the script. Well, it is the
   script. Without any option the script derives what to generate
@@ -319,11 +325,11 @@ pips (as opposed to \emph{running} it).
 \item[Validate]: \index{Validate} Non-regression tests; see ?!?;
   
   The arguments are names of subdirectories in
-  \verb+Pips/Tests/Validation+ (\verb|$PIPS_VALIDDIR|). %%$
+  \verb+$PIPS_ROOT/Validation+. %%$
   See \verb+Validate -h+ for some help and a list of options.
   
-  Tests are organized on a library basis in \verb+Pips/Tests/Validation+
-  while bugs are reported in the same way in \verb+Pips/Tests/Bugs+.  Bugs
+  Tests are organized on a library basis in \verb+Validation+
+  while bugs are reported in the same way in \verb+Bugs+.  Bugs
   and non-regression tests are characterized by one or more Fortran
   programs which either core dump (for bugs) or must have a known result
   (tests).
@@ -380,12 +386,13 @@ Each library is developped and tested under this subtree, linking by
 default with the \emph{installed} libraries in
 \verb+$PIPS_ROOT/Lib+. %%$
 
-Thus new versions can be developped without interfering with other
+Thus new versions can be developed without interfering with other
 developments. Once a new version of a library (or pass, or script, or
 anything) is okay and validated, it is installed under the
-\verb+$PIPS_ROOT/Src+ subtree and becomes the reference. %%$
+\verb+$PIPS_ROOT/Src+ subtree and becomes the reference for all other
+developers who may use its services. %%$
 
-When developping or debugging several related libraries at the same
+When developing or debugging several related libraries at the same
 time, you can used the development version of these libraries by
 using unix links (\texttt{ln -s}) to one of the directory under the
 corresponding \verb|$PIPS_ARCH| subdirectory. When building %%$
@@ -403,10 +410,6 @@ for debugging purposes.
 This directory is a large piece of disk space to be used temporarily to
 analyze large programs and to core dump large {\tt pips} processes; no
 permanent, non-deductible information should be stored there;
-
-A directory {\tt \bf Backup} would also be useful to save a version which
-has been installed, but is less ready than its developer have thought.
-
 
 
 \section{NewGen}
@@ -503,6 +506,9 @@ In such a way, typing \verb|^C ^A S| with the cursor on a variable of
 type statement will ask gdb to display this statement.
 
 
+
+
+
 \section{Linear library}
 \label{sec:linear}
 
@@ -524,13 +530,19 @@ similarily to Pips and Newgen.  Thus there are Production
 \section{Makefiles}
 \label{sec:makefiles}
 
-The {\tt make} utility is extensively used to ensure the coherency of PIPS
-components. However, most {\tt Makefile}s are not written by hand, but are
-automatically derived from configurations files called {\tt
-  config.makefile}\index{config.makefile}. This automatic derivation,
+The GNU {\tt make} utility is extensively used to ensure the coherency of
+PIPS components. However, most {\tt Makefile}s are not written by hand,
+but are automatically derived from configurations files called {\tt
+  config.makefile}\index{config.makefile}. This automatic derivation, 
 performed by the {\tt pips-makemake} utility, ensures that dependences and
 installation procedures are respected. It also eases development a lot, by
 providing a homogeneous environment all over the PIPS softwares.
+
+The rationale for relying on GNU make rather than make is that in the
+previous situation the software was relying heavily on SUN make special
+features, thus was highly not portable. Now it is more portable, say as
+much as the GNU softwares. The complex makefiles of PIPS rely on GNU
+extensions such as conditionals for instance. 
 
 {\tt make depend}\index{make!depend} must be used regularly to keep file
 dependencies up-to-date. The local header file corresponding to the current
