@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.102  1998/05/29 08:10:35  coelho
+ * -w NOT => -j
+ *
  * Revision 1.101  1998/05/27 14:53:06  coelho
  * -x option added (but not yet implemented...).
  *
@@ -212,6 +215,11 @@ bool jpips_is_running = FALSE;
 static FILE * in_from_jpips = stdin;
 static FILE * out_to_jpips = stdout;
 
+FILE * jpips_out_file(void)
+{
+    return out_to_jpips;
+}
+
 void jpips_begin_tag(string s)
 {
     fprintf(out_to_jpips, JPIPS_TAG " %s", s);
@@ -244,6 +252,12 @@ void jpips_tag2(string s1, string s2)
 void jpips_done(void)
 {
     jpips_tag("done");
+}
+
+void jpips_string(string a_message_format, va_list * some_arguments)
+{
+    vfprintf(out_to_jpips, a_message_format, * some_arguments);
+    fflush(out_to_jpips);
 }
 
 /********************************************************** TPIPS COMPLETION */
@@ -568,7 +582,7 @@ tpips_user_request(string fmt, va_list args)
     if (jpips_is_running)
     {
 	jpips_tag(BEGIN_RQ);
-	vfprintf(stdout, fmt, args); /* ??? */
+	jpips_string(fmt, args);
 	jpips_tag(END_RQ);
     }
     else if (use_readline)
@@ -608,8 +622,8 @@ tpips_user_error(string calling_function_name,
     if (jpips_is_running)
     {
 	jpips_tag(BEGIN_UE);
-	fprintf(stdout, "%s\n", calling_function_name);
-	vfprintf(stdout, a_message_format, * some_arguments);
+	jpips_string("%s\n", calling_function_name);
+	jpips_string(a_message_format, some_arguments);
 	jpips_tag(END_UE);
     }
     
@@ -1066,8 +1080,9 @@ parse_arguments(int argc, char * argv[])
 	    free(tpipsrc);
 	    tpipsrc = strdup(optarg);
 	    break;
-	case 'w':            /* -w => -j ??? */
+	case 'w':
 	    tpips_wrapper(); /* the wrapper process will never return */
+	    break;
 	case 'j':
 	    jpips_is_running = TRUE;
 	    break;
