@@ -22,11 +22,17 @@ Scientifiques</h2>
 <STRONG><a href="http://www.lifl.fr:80/~marquet/sc95.paradigme">PIPS and
 Paradigme at SuperComputing '95 </a></STRONG>
 
+<p>
+
+<STRONG><a href="http://wwwbode.informatik.tu-muenchen.de/~hackenbe/hips96.html">High-Level Programming Models and Supportive Environments</a></STRONG> at IPPS'96.
+
+</p>
+
 </center><br>
 
 <hr>
 
-Last update: 8 September 1995
+Last update: 14 September 1995
 
 <p>
 
@@ -107,10 +113,11 @@ are available.
 
 <p>
 
-All <b>PIPS</b>
-data-types are based on <em>Newgen</em>. A description of PIPS internal
-representation is available in a <a href="ri/ri.html">technical
-report</a>.
+All <b>PIPS</b> data-types are based on <em>Newgen</em>. A description
+of PIPS internal representation is available in a <a
+href="ri/ri.html">technical report</a>. The mapping of Fortran onto the
+PIPS internal representation is described in Technical Report <a
+href="dret105/dret105.html">TR E/105.</a>, Section 2.
 
 <p>
 
@@ -168,29 +175,62 @@ PIPS is available on request.
 
 <a name="tech"><h2>Technical Pages</h2></a>
 
+Overall PIPS presentation:
+
 <ul>
 
   <li> <a href="outline.html">Outline</a> of <b>PIPS</b>
        <a href="outline.html#analyses">analyses</a> and
-       <a href="outline.html#transformations">transformations</a>,
+       <a href="outline.html#transformations">transformations</a>
 
   <li> <a href="batch-interface.html><b>Pips</b></a> and 
        <a href="line-interface.html><b>Tpips</b></a> and 
-       <a href="wpips.html><b>Wpips</b></a> user interfaces,
+       <a href="wpips.html><b>Wpips</b></a> user interfaces
 
-  <li> <a href="regions.html">Regions</a>: Array Region Analyses,
+</ul>
+
+PIPS Analyses:
+
+<ul>
+
+  <li> <a href="regions.html">Regions</a>: Array Region Analyses
+
+</ul>
+
+PIPS parallelizers and compilers:
+
+<ul>
+
+  <li> <a href="wp65.html"><b>WP65</b></a>: A prototype to generate distributed code.
 
   <li> <a href="hpfc.html"><b>HPFC</b></a>: A prototype HPF compiler,
 
   <li> <a href="poly_meth.html">Polyhedric method</a>,
 
-  <li> <a href="pipsmake.html">Pipsmake resource manager</a> and
+</ul>
+
+PIPS infrastructure:
+
+<ul>
+
+  <li> <a href="pipsmake.html">Pipsmake consistency manager</a> and
 	its use to build the <a href="pipsmake-rc/pipsmake-rc.html">
-	PIPS High-Level Software Interface</a>,  
+	PIPS High-Level Software Interface</a>, as well as initial
+	<a href="dret133/dret133.html">motivations</a> for automatic
+	interprocedural consistency maintenance
 
-  <li> <a href="properties-rc/properties-rc.html">Properties</a>,
+  <li> <a href="dret133/dret133.html">Pipsdbm resource manager</a>: PIPS
+	database manager and the underlying data structures (in French)
 
-  <li> <a href="wp65.html"><b>WP65</b></a>: A prototype to generate distributed code.
+  <li> <a href="newgen-manual/newgen-manual.html"><em>Newgen User
+	Manual</em></a>, plus an introductory <a
+href="newgen-paper/newgen-paper.html">paper (in English) </a> and a <a
+href="newgen-tutorial/newgen-tutorial.html">tutorial (in French)</a>
+
+  <li> The <a href="dret105/dret105.html">mapping</a> of Fortran onto the
+<a href="ri/ri.html">PIPS internal representation</a> (in French)
+
+  <li> <a href="properties-rc/properties-rc.html">Properties</a>: fine tuning of PIPS behavior (advanced user level)
 
 </ul>
 
@@ -409,6 +449,11 @@ Ecole de Printemps du LITP, mai 1992
 Third International Workshop on Compilers for Parallel Computers, Vienne,
 July, 1992
 
+  <li> F. Irigoin, P. Jouvelot, R. Triolet,
+<em>Analyses syntaxique et s&eacute;mantique</em>,
+documentation interne du projet PIPS, mars 1988.
+<a href="dret105/dret105.html">TR E/105.</a>
+
   <li> F. Irigoin, P. Jouvelot, 
 <em> Projet PIPS: manuel d'utilisation du parall&eacute;liseur batch
  (VERSION 1.0)</em>.
@@ -493,7 +538,7 @@ Programmation parall&egrave;le et int&eacute;gration VLSI, Paris, 9-10 Novembre 
 
   <li> R. Triolet,
 <em>PIPSMAKE et PIPSDBM: Motivations et fonctionnalit&eacute;s</em>.
-27 Septembre 1990, TR E/133.
+27 Septembre 1990, <a href="dret133/dret133.html">TR E/133</a>.
 
   <li> R. Triolet, P. Feautrier, F. Irigoin, <em> Automatic
 Parallelization of Fortran Programs in the Presence of Procedure
