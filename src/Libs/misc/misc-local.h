@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1995/11/21 09:16:47 $, 
+ * $Date: 1995/12/13 22:55:18 $, 
  */
 
 #ifndef _STDARG_H
@@ -7,6 +7,8 @@
 #endif
 #include <setjmp.h>
 
+/* Measurement type for mem_spy.c */
+typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 
 #define ifdebug(l) if(the_current_debug_level>=(l))
 
