@@ -3,6 +3,17 @@
   * $Id$
   *
   * $Log: transformer.c,v $
+  * Revision 1.50  2003/07/24 08:45:35  irigoin
+  * A lot of reformatting, some additional debugging statement, empty
+  * transformers now must have an empty basis. transformer_safe_normalize()
+  * added to cope with undefined transformers which are now more used in the
+  * new version of semantics to model the lack of preconditions when the
+  * analysis is to be performed without preconditions.
+  * transformer_projection_with_redundancy_elimination_and_check() added to
+  * handle transformers which are non-consistent because they are in an
+  * intermediary state: the projection may be useful to become consistent
+  * again.  See also new function transformer_projection_without_check().
+  *
   * Revision 1.49  2003/06/20 07:21:45  irigoin
   * Intermediate version with development feaures about time-out control commented out
   *
@@ -259,111 +270,124 @@ transformer transformer_combine(transformer t1, transformer t2)
   ifdebug(8) (void) dump_transformer(t2);
   ifdebug(10) pips_assert("consistent t2", transformer_consistency_p(t2));
 
-  /* build new argument list and rename old and intermediate values,
-     as well as new (i.e. unmodified) variables in t1 */
+  if(!sc_empty_p(r1)) {
 
-  for(ce2 = a2; !ENDP(ce2); POP(ce2)) {
-    entity e2 = ENTITY(CAR(ce2));
-    if(entity_is_argument_p(e2, a1)) {
-      /* renaming of intermediate values in r1 and r2 */
-      entity e_int = entity_to_intermediate_value(e2);
-      entity e_old = entity_to_old_value(e2);
-      r1 = sc_variable_rename(r1, (Variable) e2, (Variable) e_int);
-      r2 = sc_variable_rename(r2, (Variable) e_old, (Variable) e_int);
-      ints = arguments_add_entity(ints, e_int);
+    if(sc_empty_p(r2)) {
+      t1 = empty_transformer(t1);
+    }
+    else { /* both t1 and t2 are not obviously unfeasible */
+
+    /* build new argument list and rename old and intermediate values,
+       as well as new (i.e. unmodified) variables in t1 */
+
+    for(ce2 = a2; !ENDP(ce2); POP(ce2)) {
+      entity e2 = ENTITY(CAR(ce2));
+      if(entity_is_argument_p(e2, a1)) {
+	/* renaming of intermediate values in r1 and r2 */
+	entity e_int = entity_to_intermediate_value(e2);
+	entity e_old = entity_to_old_value(e2);
+	r1 = sc_variable_rename(r1, (Variable) e2, (Variable) e_int);
+	r2 = sc_variable_rename(r2, (Variable) e_old, (Variable) e_int);
+	ints = arguments_add_entity(ints, e_int);
+      }
+      else {
+	/* if ever e2 is used as e2#new in r1 it must now be
+	   replaced by e2#old */
+	entity e_old = entity_to_old_value(e2);
+	if(base_contains_variable_p(r1->base, (Variable) e2))
+	  r1 = sc_variable_rename(r1, (Variable) e2, (Variable) e_old);
+	/* e2 must be appended to a1 as new t1's arguments;
+	   hopefully we are not iterating on a1; but 
+	   entity_is_argument_p() receives a longer argument each time;
+	   possible improvements? */
+	a1 = gen_nconc(a1, CONS(ENTITY, e2, NIL));
+      }
+    }
+
+    /* build global linear system: r1 is destroyed, r2 is preserved
+     */
+    r1 = sc_append(r1, r2);
+
+    /* ??? The base returned may be empty... FC...
+     * boumbadaboum in the projection later on.
+     */
+    sc_rm(r2);
+    r2 = SC_UNDEFINED;
+    ifdebug(9) {
+      pips_debug(9, "global linear system r1 before projection\n");
+      sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
+      sc_dump(r1);
+    }
+    
+    /* get rid of intermediate values, if any.
+     * ??? guard added to avoid an obscure bug, but I guess it should
+     * never get here with en nil base... FC
+     */
+    if (sc_base(r1)) {
+      MAP(ENTITY, e_temp,
+      {
+	if (sc_expensive_projection_p(r1,(Variable) e_temp)) {
+	  ifdebug(9) {
+	    pips_debug(9, "expensive projection on %s with\n",
+		       entity_local_name(e_temp));
+	    sc_fprint(stderr, r1, (char * (*)(Variable)) entity_local_name);
+	  }
+	  sc_elim_var(r1,(Variable) e_temp);
+	  sc_base_remove_variable(r1,(Variable) e_temp);
+	  ifdebug(9) {
+	    pips_debug(9, "simplified tranformer\n");
+	    sc_fprint(stderr, r1,(char * (*)(Variable)) entity_local_name);
+	  }
+	}
+	else {		   
+	  CATCH(overflow_error) 
+	    {
+	      /* CA */
+	      pips_user_warning("overflow error in projection of %s, "
+				"variable eliminated\n",
+				entity_name(e_temp)); 
+	      r1 = sc_elim_var(r1, (Variable) e_temp);
+	    }
+	  TRY 
+	    {
+	      sc_and_base_projection_along_variable_ofl_ctrl
+		(&r1, (Variable) e_temp, NO_OFL_CTRL);
+	      UNCATCH(overflow_error);
+	    }
+		
+	  if (! sc_empty_p(r1)) {
+	    r1 = sc_normalize2(r1);
+	    if(SC_EMPTY_P(r1)) {
+	      r1 = sc_empty(BASE_NULLE);
+	      break;
+	    }
+	  }
+	}
+      },
+	  ints);
+    }
+
+    ifdebug(9) {
+      pips_debug(9, "global linear system r1 after projection\n");
+      sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
+      sc_dump(r1);
+    }
+
+    /* get rid of ints */
+    gen_free_list(ints);
+    ints = NIL;
+
+    /* update t1 */
+    if(sc_empty_p(r1)) {
+      free_arguments(a1);
+      transformer_arguments(t1) = NIL;
     }
     else {
-      /* if ever e2 is used as e2#new in r1 it must now be
-	 replaced by e2#old */
-      entity e_old = entity_to_old_value(e2);
-      if(base_contains_variable_p(r1->base, (Variable) e2))
-	r1 = sc_variable_rename(r1, (Variable) e2, (Variable) e_old);
-      /* e2 must be appended to a1 as new t1's arguments;
-	 hopefully we are not iterating on a1; but 
-	 entity_is_argument_p() receives a longer argument each time;
-	 possible improvements? */
-      a1 = gen_nconc(a1, CONS(ENTITY, e2, NIL));
+      transformer_arguments(t1) = a1;
+    }
+    predicate_system(transformer_relation(t1)) = r1;
     }
   }
-
-  /* build global linear system: r1 is destroyed, r2 is preserved
-   */
-  r1 = sc_append(r1, r2);
-
-  /* ??? The base returned may be empty... FC...
-   * boumbadaboum in the projection later on.
-   */
-  sc_rm(r2);
-  r2 = SC_UNDEFINED;
-  ifdebug(9) {
-    pips_debug(9, "global linear system r1 before projection\n");
-    sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
-    sc_dump(r1);
-  }
-    
-  /* get rid of intermediate values, if any.
-   * ??? guard added to avoid an obscure bug, but I guess it should
-   * never get here with en nil base... FC
-   */
-  if (sc_base(r1)) {
-    MAP(ENTITY, e_temp,
-    {
-      if (sc_expensive_projection_p(r1,(Variable) e_temp)) {
-	ifdebug(9) {
-	  pips_debug(9, "expensive projection on %s with\n",
-		     entity_local_name(e_temp));
-	  sc_fprint(stderr, r1, (char * (*)(Variable)) entity_local_name);
-	}
-	sc_elim_var(r1,(Variable) e_temp);
-	sc_base_remove_variable(r1,(Variable) e_temp);
-	ifdebug(9) {
-	  pips_debug(9, "simplified tranformer\n");
-	  sc_fprint(stderr, r1,(char * (*)(Variable)) entity_local_name);
-	}
-      }
-      else {		   
-	CATCH(overflow_error) 
-	  {
-	    /* CA */
-	    pips_user_warning("overflow error in projection of %s, "
-			      "variable eliminated\n",
-			      entity_name(e_temp)); 
-	    r1 = sc_elim_var(r1, (Variable) e_temp);
-	  }
-	TRY 
-	  {
-	    sc_and_base_projection_along_variable_ofl_ctrl
-	      (&r1, (Variable) e_temp, NO_OFL_CTRL);
-	    UNCATCH(overflow_error);
-	  }
-		
-	if (! sc_empty_p(r1)) {
-	  Pbase b = base_dup(sc_base(r1));
-	  r1 = sc_normalize2(r1);
-	  if(SC_EMPTY_P(r1)) 
-	    r1 = sc_empty(b);
-	  else
-	    base_rm(b);
-	}
-      }
-    },
-	ints);
-  }
-
-  ifdebug(9) {
-    pips_debug(9, "global linear system r1 after projection\n");
-    sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
-    sc_dump(r1);
-  }
-
-  /* get rid of ints */
-  gen_free_list(ints);
-  ints = NIL;
-
-  /* update t1 */
-  transformer_arguments(t1) = a1;
-  predicate_system(transformer_relation(t1)) = r1;
-
      
   pips_debug(8,"res. t1=%p\n",t1);
   ifdebug(8) dump_transformer(t1);
@@ -426,39 +450,52 @@ static transformer transformer_general_intersection(transformer t1,
 						    transformer t2,
 						    bool image_only)
 {
-  transformer t = transformer_identity();
-  Psysteme s1 = sc_dup((Psysteme) predicate_system(transformer_relation(t1)));
-  Psysteme s2 = sc_dup((Psysteme) predicate_system(transformer_relation(t2)));
+  transformer t = transformer_undefined;
 
-  /*
-  pips_debug(9, "begin with s1 and s2:\n");
-  sc_dump(s1);
-  sc_dump(s2);
-  */
+  pips_debug(9, "Begins with t1 = %p and t2 = %p, image_only=%s\n",
+	     t1, t2, bool_to_string(image_only));
 
-  s1 = sc_append(s1, s2);
 
-  /*
-  pips_debug(9, "new s1:\n");
-  sc_dump(s1);
-  */
-
-  predicate_system(transformer_relation(t)) = s1;
-
-  if(image_only) {
-    /* Do not restrict the transition but the image of the relation t1
-       with constraints in t2. */
-    if(!ENDP(transformer_arguments(t2))) {
-      dump_transformer(t2);
-      pips_assert("Transformer t2 has no arguments", ENDP(transformer_arguments(t2)));
-    }
-    transformer_arguments(t) = dup_arguments(transformer_arguments(t1));
+  if(transformer_empty_p(t1)||transformer_empty_p(t2)) {
+    t = transformer_empty();
   }
   else {
-    /* intersect transition t1 and transition t2 */
-    transformer_arguments(t) = arguments_intersection(transformer_arguments(t1),
-						      transformer_arguments(t2));
+    Psysteme s1 = sc_dup((Psysteme) predicate_system(transformer_relation(t1)));
+    Psysteme s2 = sc_dup((Psysteme) predicate_system(transformer_relation(t2)));
+
+    t = transformer_identity();
+    /*
+      pips_debug(9, "begin with s1 and s2:\n");
+      sc_dump(s1);
+      sc_dump(s2);
+    */
+
+    s1 = sc_append(s1, s2);
+
+    /*
+      pips_debug(9, "new s1:\n");
+      sc_dump(s1);
+    */
+
+    predicate_system(transformer_relation(t)) = s1;
+
+    if(image_only) {
+      /* Do not restrict the transition but the image of the relation t1
+	 with constraints in t2. */
+      if(!ENDP(transformer_arguments(t2))) {
+	dump_transformer(t2);
+	pips_assert("Transformer t2 has no arguments", ENDP(transformer_arguments(t2)));
+      }
+      transformer_arguments(t) = dup_arguments(transformer_arguments(t1));
+    }
+    else {
+      /* intersect transition t1 and transition t2 */
+      transformer_arguments(t) = arguments_intersection(transformer_arguments(t1),
+							transformer_arguments(t2));
+    }
   }
+
+  pips_debug(9, "Exit with t=%p, for t1 = %p and t2 = %p\n", t, t1, t2);
 
   return t;
 }
@@ -475,7 +512,14 @@ transformer transformer_intersection(transformer t1, transformer t2)
 }
 transformer transformer_image_intersection(transformer t1, transformer t2)
 {
-  transformer t = transformer_general_intersection(t1, t2, TRUE);
+  transformer t = transformer_undefined;
+
+  pips_debug(9, "begins with t1 = %p and t2 = %p\n", t1, t2);
+
+  t = transformer_general_intersection(t1, t2, TRUE);
+
+  pips_debug(9, "ends with t = %p, t1 = %p and t2 = %p\n", t, t1, t2);
+
   return t;
 }
 
@@ -514,15 +558,18 @@ transformer transformer_safe_image_intersection(transformer t1, transformer t2)
 
  For a restriction on the image of tf, see transformer_image_intersection
 
- tf is updated by side effect.
- */
+ tf is updated by side effect although transformer_image_intersection()
+allocates a fresh new transformer.  */
 transformer transformer_domain_intersection(transformer tf,
 					    transformer pre)
 {
   transformer dom = transformer_dup(pre);
+  transformer tf_inter = transformer_undefined;
 
   pips_assert("pre does not involve old values and has no arguments",
 	      ENDP(transformer_arguments(pre)));
+
+  pips_debug(9, "Begin with tf=%p and pre=%p\n", tf, pre);
 
   /* if a value in pre is modified by tf, it must be renamed as an old
      value */
@@ -536,18 +583,28 @@ transformer transformer_domain_intersection(transformer tf,
   /* transformer dom is not consistent since it references old values but
      has no arguments */
 
-  tf = transformer_image_intersection(tf, dom);
+  tf_inter = transformer_image_intersection(tf, dom);
+  tf = move_transformer(tf, tf_inter);
   free_transformer(dom);
 
   return tf;
 }
+
+/* If tf and pre are defined, update tf.
+ * If tf is defined and pre is undefined, return tf unchanged.
+ * If tf and pre are undefined,  return tf unchanged.
+ * If tf is undefined and pre is defined, we could exploit pre or return undefined.
+ *.*/
 transformer transformer_safe_domain_intersection(transformer tf,
 						 transformer pre)
 {
   if(!transformer_undefined_p(pre)) {
-      tf = transformer_undefined_p(tf) ? 
-	transformer_dup(pre) :
-	transformer_domain_intersection(tf, pre);
+    if(transformer_undefined_p(tf)) {
+      tf = transformer_domain_intersection(transformer_identity(), pre);
+    }
+    else {
+      tf = transformer_domain_intersection(tf, pre);
+    }
   }
     
   return tf;
@@ -616,8 +673,12 @@ transformer transformer_to_domain(transformer tf)
   }, transformer_arguments(dtf));
 
   /* dtf = transformer_projection(dtf, args); */
-  dtf = transformer_projection_with_redundancy_elimination(dtf, new_args,
-							   sc_identity);
+  /* dtf = transformer_projection_with_redundancy_elimination(dtf, new_args,
+							   sc_identity); */
+  /* The resulting transformer is going to be inconsistent because old
+     values appear although the argument list is empty. */
+  dtf = transformer_projection_without_check(dtf, new_args,
+					     sc_identity);
 
   /* Careful, sc and b have been updated by the projections */
   sc = predicate_system(transformer_relation(dtf));
@@ -672,11 +733,19 @@ static bool varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvar
     return is_inferior; 
 }
 
-/* eliminate (some) redundancy */
+/* Eliminate (some) rational or integer redundancy. Remember that integer
+   redundancy elimination may degrade results because some transformer
+   operator such as convex hull use a rational interpretation of the
+   constraints. */
 transformer
 transformer_normalize(transformer t, int level)
 {
   Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
+
+  ifdebug(1) {
+    pips_assert("Transformer t is consistent on entrance",
+		transformer_consistency_p(t));
+  }
 
   if (!sc_empty_p(r)) {
     Pbase b = base_dup(sc_base(r));
@@ -784,15 +853,40 @@ transformer_normalize(transformer t, int level)
       } /* end of TRY */
 			
     if (SC_EMPTY_P(r)) {
-      r = sc_empty(b);
+      r = sc_empty(BASE_NULLE);
     }
     else 
       base_rm(b), b=BASE_NULLE;
     
     r->dimension = vect_size(r->base);
+
+    if(sc_empty_p(r)) {
+      free_arguments(transformer_arguments(t));
+      transformer_arguments(t) = NIL;
+    }
+
     predicate_system(transformer_relation(t)) = r;
   }
 
+  ifdebug(8) {
+    fprintf(stderr, "After normalization of transformer t=%p at level %d:\n",
+	    t, level);
+    fprint_transformer(stderr, t, entity_local_name);
+  }
+
+  ifdebug(1) {
+    pips_assert("Transformer t is consistent on exit",
+		transformer_consistency_p(t));
+  }
+
+  return t;
+}
+
+transformer transformer_safe_normalize(transformer t, int level)
+{
+  if(!transformer_undefined_p(t)) {
+    t = transformer_normalize(t, level);
+  }
   return t;
 }
 
@@ -889,11 +983,43 @@ no_elim(Psysteme ps)
     return ps;
 }
 
-transformer 
-transformer_projection_with_redundancy_elimination(
+/* It is not clear if this function projects values or variables. If
+   variables were projected, all values associated to a variable should
+   also be projected. If values are projected and the transformer argument
+   updated using args, old values should not be left in the basis when a
+   new value is projected and its associated variable removed from tthe
+   argument. 
+
+   New values are identical to variables which makes it confusing.
+
+   The implementation, and the signature, are aware of the nature of the
+   underlying predicate.  */
+transformer transformer_projection_with_redundancy_elimination(
     transformer t,
     list args,
     Psysteme (*elim)(Psysteme))
+{
+  return transformer_projection_with_redundancy_elimination_and_check
+    (t, args, elim, TRUE);
+}
+
+/* In some cases, you know the projection will result in a non-consistent
+   transformer that will be fixed later. The input transformer is
+   nevertheless expected weakly consistent. */
+transformer transformer_projection_without_check(
+    transformer t,
+    list args,
+    Psysteme (*elim)(Psysteme))
+{
+  return transformer_projection_with_redundancy_elimination_and_check
+    (t, args, elim, FALSE);
+}
+
+transformer transformer_projection_with_redundancy_elimination_and_check(
+    transformer t,
+    list args,
+    Psysteme (*elim)(Psysteme),
+    bool check_consistency_p)
 {
   /* Library Linear/sc contains several reundancy elimination functions:
    *  sc_elim_redund()
@@ -903,113 +1029,174 @@ transformer_projection_with_redundancy_elimination(
    */
   list new_args = NIL;
   Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
+  extern string entity_global_name(entity); /* useless with ri-util.h */
 
   ifdebug(9) {
-    pips_debug(9, "Begin with system\n");
+    pips_debug(9, "Begin for transformer %p\n", t);
     /* sc_fprint(stderr, r, exernal_value_name); */
-    sc_fprint(stderr, r, (char * (*)(Variable)) entity_local_name);
+    /* sc_fprint(stderr, r, (char * (*)(Variable)) entity_local_name); */
+    fprint_transformer(stderr, t, entity_global_name);
     pips_debug(9, "and entities to be projected: ");
     print_arguments(args);
+    pips_assert("t is weakly consistent", transformer_weak_consistency_p(t));
   }
 
-  if(!ENDP(args))
-    {
-      list cea;
+  /* A side effect of transformer_empty_p() is to normalize the transformer. */
+  if(transformer_empty_p(t)) {
+    empty_transformer(t);
+  }
+  else if(!ENDP(args)) {
+    list cea;
 
-      /* get rid of unwanted values in the relation r and in the basis */
-      for (cea = args ; !ENDP(cea); POP(cea)) {
-	entity e = ENTITY(CAR(cea));
-	pips_assert("base contains variable to project...",
-		    base_contains_variable_p(sc_base(r), (Variable) e));
+    /* Step 1: get rid of unwanted values in the relation r and in the basis */
+    for (cea = args ; !ENDP(cea); POP(cea)) {
+      entity e = ENTITY(CAR(cea));
+      pips_assert("base contains variable to project...",
+		  base_contains_variable_p(sc_base(r), (Variable) e));
  
-	pips_debug(9, "Projection of %s\n", entity_name(e));
+      pips_debug(9, "Projection of %s\n", entity_name(e));
 
-	CATCH(overflow_error) 
-	  {
-	    /* FC */
-	    pips_user_warning("overflow error in projection of %s, "
-			      "variable eliminated\n",
-			      entity_name(e)); 
-	    r = sc_elim_var(r, (Variable) e);
-	  }
-	TRY 
-	  {
-	    /* sc_projection_along_variable_ofl_ctrl_timeout_ctrl */
- 	    sc_projection_along_variable_ofl_ctrl
-	      (&r,(Variable) e, NO_OFL_CTRL);
-	    UNCATCH(overflow_error);
-	  }
+      CATCH(overflow_error) 
+	{
+	  /* FC */
+	  pips_user_warning("overflow error in projection of %s, "
+			    "variable eliminated\n",
+			    entity_name(e)); 
+	  r = sc_elim_var(r, (Variable) e);
+	}
+      TRY 
+	{
+	  /* sc_projection_along_variable_ofl_ctrl_timeout_ctrl */
+	  sc_projection_along_variable_ofl_ctrl
+	    (&r,(Variable) e, NO_OFL_CTRL);
+	  UNCATCH(overflow_error);
+	}
 
-	sc_base_remove_variable(r,(Variable) e);
+      sc_base_remove_variable(r,(Variable) e);
 	 
-	/* could eliminate redundancy at each projection stage to avoid
-	 * explosion of the constraint number...  however it is pretty
-	 * expensive to do so. But we explode with NPRIO in FPPP (Spec
-	 * CFP'95 benchmark). A heuristic could apply redundacy elimination
-	 * from time to time?
-	 *
-	 */
-
-	if(TRUE) {
-	  // if (!sc_empty_p(r)) {
-	  // Pbase b = base_dup(sc_base(r));
-
-	    r = elim(r);
-	    /* if (SC_EMPTY_P(r)) {
-	      r = sc_empty(b);
-	      sc_base_remove_variable(r,(Variable) e);
-	    }
-	    else base_rm(b);
-	  }*/
-
-	}
-
-	ifdebug(9) {
-	  pips_debug(9, "System after projection of %s\n", entity_name(e));
-	  /* sc_fprint(stderr, r, exernal_value_name); */
-	  sc_fprint(stderr, r, (char * (*)(Variable)) entity_local_name);
-	}
-      }
-
-      /* Eliminate redundancy only once projections have all
-       * been performed because redundancy elimination is
-       * expensive and because most variables are exactly 
-       * projected because they appear in at least one equation
+      /* could eliminate redundancy at each projection stage to avoid
+       * explosion of the constraint number...  however it is pretty
+       * expensive to do so. But we explode with NPRIO in FPPP (Spec
+       * CFP'95 benchmark). A heuristic could apply redundacy elimination
+       * from time to time?
+       *
        */
-      if (!sc_empty_p(r)) {
-	Pbase b = base_dup(sc_base(r));
+
+      if(TRUE) {
+	// if (!sc_empty_p(r)) {
+	// Pbase b = base_dup(sc_base(r));
+
 	r = elim(r);
-	if (SC_EMPTY_P(r)) {
-	  r = sc_empty(b);
-	}
-	else 
-	  base_rm(b);
+	/* if (SC_EMPTY_P(r)) {
+	   r = sc_empty(BASE_NULLE);
+	   sc_base_remove_variable(r,(Variable) e);
+	   }
+	   else base_rm(b);
+	   }*/
+
       }
 
-      r->dimension = vect_size(r->base);
+      ifdebug(9) {
+	pips_debug(9, "System after projection of %s\n", entity_name(e));
+	/* sc_fprint(stderr, r, exernal_value_name); */
+	sc_fprint(stderr, r, (char * (*)(Variable)) entity_global_name);
+      }
+    }
 
-      /* compute new_args */
-      MAP(ENTITY, e, 
-      { 
+    /* Step 2: eliminate redundancy only/again once projections have all
+     * been performed because redundancy elimination is
+     * expensive and because most variables are exactly 
+     * projected because they appear in at least one equation
+     */
+    if (!sc_empty_p(r)) {
+      Pbase b = base_dup(sc_base(r));
+      r = elim(r);
+      if (SC_EMPTY_P(r)) {
+	/* Should we use b or not? It does make some mathematical sense
+	   but it is not compatible with the argument list which should
+	   not be empty if old values appear in the basis. And the basis
+	   should not be used, even in convex hulls if the emptiness is
+	   detected first. */
+	r = sc_empty(BASE_NULLE);
+	base_rm(b);
+      }
+      else {
+	base_rm(b);
+      }
+    }
+    else {
+      /* get rid of a useless basis */
+      base_rm(sc_base(r));
+      sc_base(r) = BASE_NULLE;
+    }
+
+    r->dimension = vect_size(r->base);
+
+    ifdebug(9) {
+      pips_debug(9, "System after redundancy elimination\n");
+      /* sc_fprint(stderr, r, exernal_value_name); */
+      sc_fprint(stderr, r, (char * (*)(Variable)) entity_global_name);
+    }
+
+    /* Step 3: compute new_args, but beware of left over old values! */
+    MAP(ENTITY, e, 
+    { 
+      if(!local_temporary_value_entity_p(e)) {
+	entity v = value_to_variable(e);
+
 	if((entity) gen_find_eq(e, args) == (entity) chunk_undefined)
 	  {
 	    /* e must be kept if it is not in args */
 	    new_args = arguments_add_entity(new_args, e);
 	  }
-      },
-	  transformer_arguments(t));
+	else {
+	  /* The variable is going to be dropped from the argument list */
+	  entity old_e = entity_undefined;
 
-      /* update the relation and the arguments field for t */
+	  if(entity_has_values_p(v)) {
+	    old_e = entity_to_old_value(v);
+	  }
+	  else {
+	    /* Must be a variable from a module which is not the current module */
+	    old_e = global_new_value_to_global_old_value(v);
+	  }
 
-      /* the relation is updated by side effect FI ?
-       * Maybe not if SC_EMPTY(r) 1 Feb. 94 */
-      predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
+	  if(check_consistency_p
+	     && base_contains_variable_p(sc_base(r), (Variable) old_e)) {
+	    fprintf(stderr, "Value %s should have been eliminated earlier\n",
+		    entity_name(old_e));
+	    fprint_transformer(stderr, t, entity_global_name);
+	    pips_internal_error("Wrong set of projected variables\n");
+	  }
+	}
+      }
+    },
+	transformer_arguments(t));
 
-      /* replace the old arguments by the new one */
-      gen_free_list(transformer_arguments(t));
-      transformer_arguments(t) = new_args;
-    }
+    /* Step 4: update the relation and the arguments field for t */
 
+    /* the relation is updated by side effect FI ?
+     * Maybe not if SC_EMPTY(r) 1 Feb. 94 */
+    predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
+
+    /* replace the old arguments by the new one */
+    gen_free_list(transformer_arguments(t));
+    transformer_arguments(t) = new_args;
+  }
+
+  ifdebug(9) {
+    pips_debug(9, "Transformer after argument list update\n");
+    /* sc_fprint(stderr, r, exernal_value_name); */
+    fprint_transformer(stderr, t, entity_global_name);
+  }
+
+  ifdebug(1) {
+    /* Weak, because return value may still be present for functions. */
+    if(check_consistency_p)
+      pips_assert("After projection and redundancy elimination,"
+		  " transformer t is consistent",
+		  transformer_weak_consistency_p(t));
+  }
   pips_debug(9, "End for t=%p\n", t);
 
   return t;
@@ -1133,6 +1320,17 @@ cons * args;
 {
   cons * new_args = NIL;
   Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
+  extern string entity_global_name(entity); /* useless with ri-util.h */
+
+  ifdebug(9) {
+    pips_debug(9, "Begin for transformer %p\n", t);
+    /* sc_fprint(stderr, r, exernal_value_name); */
+    /* sc_fprint(stderr, r, (char * (*)(Variable)) entity_local_name); */
+    fprint_transformer(stderr, t, entity_global_name);
+    pips_debug(9, "and entities to be projected: ");
+    dump_arguments(args);
+    pips_assert("t is weakly consistent", transformer_weak_consistency_p(t));
+  }
 
   if(!ENDP(args) && !SC_EMPTY_P(r)) {
     /* get rid of unwanted values in the relation r and in the basis */
@@ -1189,6 +1387,20 @@ cons * args;
     free_arguments(transformer_arguments(t));
     transformer_arguments(t) = new_args;
   } 
+
+  ifdebug(9) {
+    pips_debug(9, "Transformer after argument list update\n");
+    /* sc_fprint(stderr, r, exernal_value_name); */
+    fprint_transformer(stderr, t, entity_global_name);
+  }
+
+  ifdebug(1) {
+    pips_assert("After filtering,"
+		" transformer t is consistent",
+		transformer_weak_consistency_p(t));
+  }
+  pips_debug(9, "End for t=%p\n", t);
+
   return t;
 }
 
