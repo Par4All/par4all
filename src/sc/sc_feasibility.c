@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1995/07/24 16:37:29 $, 
+ * date: $Date: 1995/09/01 14:32:33 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -141,10 +141,14 @@ boolean ofl_res;
 	}		
     default:
 	if (use_simplex)
+	{
 	    ok = sc_simplexe_feasibility_ofl_ctrl(sc, ofl_ctrl);
+	}
 	else 
+	{
 	    ok = sc_fourier_motzkin_feasibility_ofl_ctrl(sc, integer_p, 
 							 ofl_ctrl);
+	}
     }
 
     return(ok);
@@ -294,7 +298,9 @@ int ofl_ctrl;
 	sc_fprint(stderr, s1, variable_default_name);
     }
 
-    if ((s1 = sc_kill_db_eg(s1)))
+    s1 = sc_elim_db_constraints(s1);
+
+    if (s1 != NULL)
     {
 	/* projection successive selon les  variables du systeme
 	 */
@@ -314,7 +320,7 @@ int ofl_ctrl;
 	    }
 	    
 	    sc_projection_along_variable_ofl_ctrl(&s1, var, ofl_ctrl);
-	    
+
 	    ifscdebug(8)
 	    {
 		fprintf(stderr, "sc_fourier_motzkin_feasibility_ofl_ctrl]"
@@ -329,7 +335,8 @@ int ofl_ctrl;
 	    }
 
 	    if (integer_p) {
-		if (SC_EMPTY_P(s1 = sc_normalize(s1))) 
+		s1 = sc_normalize(s1);
+		if (SC_EMPTY_P(s1)) 
 		{ 
 		    faisable = FALSE; 
 		    break;
@@ -347,5 +354,6 @@ int ofl_ctrl;
 
     return faisable;
 }
+
 
 
