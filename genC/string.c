@@ -101,8 +101,9 @@ init_the_buffer()
     if (buffer_size==0)
     {
 	pips_assert("NULL buffer", buffer==NULL);
-	buffer = (string) malloc(BUFFER_SIZE_INCREMENT);
 	buffer_size = BUFFER_SIZE_INCREMENT;
+	buffer = (string) malloc(buffer_size);
+	if (!buffer) pips_exit(1, "memory exhausted\n");
     }
     current = 0;
     buffer[0] = '\0';
@@ -120,6 +121,7 @@ append_to_the_buffer(
     {
 	buffer_size = MAX(current+len+1, buffer_size+BUFFER_SIZE_INCREMENT);
 	buffer = realloc(buffer, buffer_size);
+	if (!buffer) pips_exit(1, "memory exhausted\n");
     }
 
     (void) memcpy(&buffer[current], s, len);
