@@ -3,14 +3,15 @@
  * Portability based on pvm m4 macros.
  *
  * Problems when gcc/g77 used, the PVM macros are not okay...
- * two underscores instead of one should be added to the name...
+ * two underscores instead of one should be added to the name
+ * if there is an underscore in it....
  *
 _GNU(define(`FUNCTION',`$1__'))dnl
  *
  * also include functions for timings...
  *
  * $RCSfile: hpfc_misc.m4c,v $ version $Revision$
- * ($Date: 1995/11/22 19:20:01 $, )
+ * ($Date: 1995/12/01 11:52:47 $, )
  *
  * Fabien Coelho, 1993-1994-1995
  */
