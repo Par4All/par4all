@@ -2,6 +2,14 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.14  2003/07/11 15:59:57  irigoin
+%% New rules to compute summary preconditions, explicitly intra- or
+%% inter-procedurally. Might not be the smartest way to perform the selection
+%% between intra- and inter-procedural analyses. The rules
+%% preconditions_intra and preconditions_inter could be fused since the
+%% intra/inter-procedural aspect is moved into the selection of the rule for
+%% the computation of summary_precondition.
+%%
 %% Revision 1.13  2003/06/30 10:03:48  nguyen
 %% Create C_PRINTED_FILE resource for C prettyprinter
 %%
@@ -514,7 +522,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/06/30 10:03:48 $~$
+$~$Date: 2003/07/11 15:59:57 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2020,6 +2028,7 @@ preconditions_intra            > MODULE.preconditions
         < MODULE.transformers
         < MODULE.summary_effects
         < MODULE.summary_transformer
+        < MODULE.summary_precondition
         < MODULE.code
 \end{verbatim}
 
@@ -2076,7 +2085,18 @@ preconditions_inter_full        > MODULE.preconditions
 \index{Summary Precondition}
 \index{Precondition (Summary)}
 
-An initial precondition for a module is derived from all its call
+A summary precondition is of type "transformer", but the argument list
+must be empty as it is a simple predicate on the initial state.
+
+The intraprocedural summary precondition uses DATA statement for the main
+module and is the TRUE constant for all other modules.
+
+\begin{verbatim}
+intraprocedural_summary_precondition            > MODULE.summary_precondition
+        < PROGRAM.entities
+\end{verbatim}
+
+An interprocedural precondition for a module is derived from all its call
 sites. Of course, preconditions must be known for all its callers'
 statements.  The summary precondition is the convex hull of all call
 sites preconditions, translated into a proper environment which is {\em
@@ -2088,16 +2108,28 @@ always translated into the {\em caller}'s frame. So each module must
 first translate its summary precondition, when receiving it from the
 resource manager ({\em pipsdbm}) before using it.
 
-A summary precondition is of type "transformer".
-
 Note: the previous algorithm was based on a on-the-fly reduction by
 convex hull. Each time a call site was encountered while computing a
 module preconditions, the callee's summary precondition was updated. This
 old scheme was more efficient but not compatible with program
 transformations because it was impossible to know when the summary
 preconditions of the modules had to be reset to the infeasible
-(a.k.a. empty) precondition. An infeasible precondition means that the
-module is never called (not implemented?).
+(a.k.a. empty) precondition. 
+
+An infeasible precondition means that the module is never called although
+a main is present in the workspace. If no main module is available, a TRUE
+precondition is generated.
+
+\begin{verbatim}
+interprocedural_summary_precondition            > MODULE.summary_precondition
+        < PROGRAM.entities
+        < PROGRAM.program_precondition
+        < CALLERS.preconditions
+        < MODULE.callers
+\end{verbatim}
+
+The following rule is obsolete. It is context sensitive and its results
+depends on the history of commands performed on the workspace.
 
 \begin{verbatim}
 summary_precondition            > MODULE.summary_precondition
