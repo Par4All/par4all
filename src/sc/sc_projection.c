@@ -847,7 +847,9 @@ Pvecteur pv;
 	boolean exact = TRUE;
 	sc1 = sc_projection_ofl_along_variables_with_test(sc1,pv,&exact);
 	sc_rm(sc);
+	UNCATCH(overflow_error);
 	return sc1;
+
     }
 }
 
