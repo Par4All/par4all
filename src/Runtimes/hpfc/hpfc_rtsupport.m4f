@@ -1,8 +1,9 @@
 c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
+c by Fabien COELHO.
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/04/21 17:01:50 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/09/01 15:35:55 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -1164,6 +1165,42 @@ c
          stop
       endif
       debug(`print *, "[hpfc_synchro] done"')
+      end
+c
+c-----------------
+c
+c HPFC_HTIMEON
+c
+      subroutine HPFC_HTIMEON()
+      call HPFC_SYNCHRO()
+      call HPFC_TIMEON()
+      call HPFC_SYNCHRO()
+      end
+c
+c-----------------
+c
+c HPFC_NTIMEON
+c
+      subroutine HPFC_NTIMEON()
+      call HPFC_SYNCHRO()
+      call HPFC_SYNCHRO()
+      end
+c
+c-----------------
+c
+c HPFC_HTIMEOFF
+c
+      subroutine HPFC_HTIMEOFF()
+      call HPFC_SYNCHRO()
+      call HPFC_TIMEOFF()
+      end
+c
+c-----------------
+c
+c HPFC_NTIMEOFF
+c
+      subroutine HPFC_NTIMEOFF()
+      call HPFC_SYNCHRO()
       end
 c
 c-----------------
