@@ -9,6 +9,10 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.13  2004/06/16 09:37:49  hurbain
+   Ça compile.
+   Yapuka debugger.
+
    Revision 1.12  2004/06/16 09:00:00  hurbain
    Backup version. Is not compilable.
 
@@ -382,7 +386,7 @@ static string claire_call_from_assignation(call c, int task_number){
   return result;
 }
 
-static void claire_call_from_indice(call c, string * offset_array, string paving_array[]){
+static void claire_call_from_indice(call c, string * offset_array, string paving_array[], string fitting_array[]){
   entity called = call_function(c);
   string funname = claire_entity_local_name(called);
   list arguments = call_arguments(c);
@@ -400,27 +404,45 @@ static void claire_call_from_indice(call c, string * offset_array, string paving
       
       if(same_string_p(funname, "+")){
 	if(syntax_tag(args[0]) == is_syntax_call){
-	  claire_call_from_indice(syntax_call(args[0]), offset_array, paving_array);
+	  claire_call_from_indice(syntax_call(args[0]), offset_array, paving_array, fitting_array);
 	}
 	if(syntax_tag(args[1]) == is_syntax_call){
-	  claire_call_from_indice(syntax_call(args[1]), offset_array, paving_array);
+	  claire_call_from_indice(syntax_call(args[1]), offset_array, paving_array, fitting_array);
 	}
 	if(syntax_tag(args[0]) == is_syntax_reference){
 	  reference ref = syntax_reference(args[0]);
-	  if((iterator_nr = gen_array_index(indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
+	  if((iterator_nr = gen_array_index(extern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
 	    paving_array[iterator_nr] = "1";
+	  }
+	  else if((iterator_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
+	    fitting_array[iterator_nr] = "1";
 	  }
 	}
 	if(syntax_tag(args[1]) == is_syntax_reference){
 	  reference ref = syntax_reference(args[1]);
-	  if((iterator_nr = gen_array_index(indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
+	  if((iterator_nr = gen_array_index(extern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
 	   paving_array[iterator_nr] = "1";
+	  }
+	  else if((iterator_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
+	   fitting_array[iterator_nr] = "1";
 	  }
 	}
       }
       else if(same_string_p(funname, "-")){
 	if(syntax_tag(args[1]) == is_syntax_call && gen_length(call_arguments(syntax_call(args[1])))==0){
-	  
+	  if(syntax_tag(args[0]) == is_syntax_reference){
+	    reference ref = syntax_reference(args[0]);
+	    if((iterator_nr = gen_array_index(extern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
+	      paving_array[iterator_nr] = "1";
+	    }
+	    else if((iterator_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
+	      fitting_array[iterator_nr] = "1";
+	    }
+	  }
+	  if(syntax_tag(args[0]) == is_syntax_call){
+	    claire_call_from_indice(syntax_call(args[0]), offset_array, paving_array, fitting_array);
+	  }
+	  claire_call_from_indice(syntax_call(args[1]), offset_array, paving_array, fitting_array);
 	}
 	else {
 	  pips_user_error("APOTRES doesn't allow negative coefficients in paving and fitting matrices");
@@ -431,9 +453,15 @@ static void claire_call_from_indice(call c, string * offset_array, string paving
 	  pips_user_error("Only scalar * reference are allowed here. Please develop expressions.");
 	}
 	else {
-	  int iterator_nr = gen_array_index(indices_array, claire_entity_local_name(reference_variable(syntax_reference(args[1]))));
+	  int intern_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(syntax_reference(args[1]))));
+	  int extern_nr = gen_array_index(extern_indices_array, claire_entity_local_name(reference_variable(syntax_reference(args[1]))));
 	  string mult =  claire_entity_local_name(call_function(syntax_call(args[0]))); 
-	  paving_array[iterator_nr] = mult;
+	  if(extern_nr != ITEM_NOT_IN_ARRAY){
+	    paving_array[extern_nr] = mult;
+	  }
+	  else if(intern_nr != ITEM_NOT_IN_ARRAY){
+	    fitting_array[intern_nr] = mult;
+	  }
 	}
       }
     }
@@ -455,20 +483,25 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   int indice_nr = 0;
   list indices = reference_indices(r);
   string result = "";
-  int nb_loops = gen_array_nitems(indices_array);
+  int nb_loops = gen_array_nitems(extern_indices_array);
   
   int * index_of_array = (int *) (gen_array_item(array_dims, gen_array_index(array_names, varname)));
   string offset_array[*index_of_array];
-  string paving_array[*index_of_array][gen_array_nitems(indices_array)];
+  string paving_array[*index_of_array][gen_array_nitems(extern_indices_array)];
+  string fitting_array[*index_of_array][gen_array_nitems(intern_indices_array)];
   int i;
   int j;
   
   for (i=0; i<*index_of_array; i++)
     offset_array[i] = "0";
   
-  for (i=0; i<gen_array_nitems(indices_array) ; i++)
+  for (i=0; i<gen_array_nitems(extern_indices_array) ; i++)
     for (j=0; j<*index_of_array; j++)
       paving_array[i][j] = "0";
+
+  for (i=0; i<gen_array_nitems(intern_indices_array) ; i++)
+    for (j=0; j<*index_of_array; j++)
+      fitting_array[i][j] = "0";
   
   result = strdup(concatenate(result, first?"":TAB, "DATA name = symbol!(\"", "T_", int_to_string(task_number),
 			      "\" /+ \"", varname, "\"),", NL, TAB, TAB, NULL));
@@ -506,7 +539,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
     result=strdup(concatenate(result, "vartype!(", offset_array[i],"), ", NULL));
   }
   result = strdup(concatenate(result, "vartype!(", offset_array[i], "))," NL, NULL));
-  result = strdup(concatenate(result, TAB, TAB, "fitting = list<list[VARTYPE]>(list("));
+  result = strdup(concatenate(result, TAB, TAB, "fitting = list<list[VARTYPE]>(list(", NULL));
   for(i=0;i<gen_array_nitems(intern_indices_array) - 1; i++){
     result = strdup(concatenate(result, "list(", NULL));
     for(j = 0; j<(*index_of_array)-1; j++){
@@ -523,7 +556,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   result = strdup(concatenate(result, TAB, TAB, "paving = list<list[VARTYPE]>(", NULL));
   
  
-  for(i=0;i<gen_array_nitems(indices_array) - 1; i++){
+  for(i=0;i<gen_array_nitems(extern_indices_array) - 1; i++){
     result = strdup(concatenate(result, "list(", NULL));
     for(j = 0; j<(*index_of_array)-1; j++){
       result = strdup(concatenate(result, "vartype!(", paving_array[i][j], "), ", NULL));
@@ -539,7 +572,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", int_to_string(gen_array_nitems(intern_indices_array)), NL, TAB, TAB, TAB, NULL));
   result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));
   
-  for(i = 0; i<gen_array_nitems(intern_upperbound_array) - 1; i++){
+  for(i = 0; i<gen_array_nitems(intern_upperbounds_array) - 1; i++){
     result = strdup(concatenate(result, "vartype!(", gen_array_item(intern_upperbounds_array, i), "), ", NULL));
   }
 
@@ -553,7 +586,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
 
   result = strdup(concatenate(result, QUOTE, gen_array_item(intern_indices_array, i), QUOTE, "),", NULL));
 
-\"m_i\"))))", NL, NULL)); 
+  result = strdup(concatenate(result, ")))", NL, NULL)); 
   return result;
   
 }
@@ -592,36 +625,38 @@ static string claire_call_from_loopnest(call c, int task_number){
     }
     first = FALSE;
   }, arguments);
+
+  result = strdup(concatenate(result, TAB, ")", NL, NULL));
   return result;
 }
 
 
 
-static call claire_loop_from_loop(loop l, int task_number){
+static call claire_loop_from_loop(loop l, string * result, int task_number){
   
   string * up = malloc(sizeof(string));
   string * claire_name = malloc(sizeof(string));
   statement s = loop_body(l);
   instruction i = statement_instruction(s);
 
-  *ln = int_to_string(loop_number);
+  *up = int_to_string(gen_array_nitems(extern_indices_array));
   *claire_name = claire_entity_local_name(loop_index(l));
   if( (*claire_name)[0] == 'M'){
-    gen_array_append(internal_indices_array, claire_name);
+    gen_array_append(intern_indices_array, claire_name);
   }
   else{
-    gen_array_append(external_indices_array, claire_name);
+    gen_array_append(extern_indices_array, claire_name);
   }
 
   switch(instruction_tag(i)){
   case is_instruction_loop:{
     loop l = instruction_loop(i);
-    return claire_loop_from_loop(l, task_number);
+    return claire_loop_from_loop(l, result, task_number);
     break;
   }
   case is_instruction_call:{
     call c = instruction_call(i);
-    *result = strdup(concatenate(*result, int_to_string(gen_array_nitems(external_indices_array)), ",", NL, TAB, TAB,NULL));
+    *result = strdup(concatenate(*result, *up, ",", NL, TAB, TAB,NULL));
     return c;
   }
   default:
@@ -634,7 +669,7 @@ static call claire_loop_from_loop(loop l, int task_number){
 static string claire_loop_from_sequence(loop l, int task_number){
   statement s = loop_body(l);
   call c;
-  inti i;
+  int i;
   /* (re-)initialize task-scoped arrays*/
   extern_indices_array = gen_array_make(0);
   intern_indices_array = gen_array_make(0);
@@ -657,21 +692,21 @@ static string claire_loop_from_sequence(loop l, int task_number){
   }
   else{
     string * up = malloc(sizeof(string));
-    *up = claire_expression(range_upper(loop_range(l)))
+    *up = claire_expression(range_upper(loop_range(l)));
     gen_array_append(extern_indices_array, name);
     gen_array_append(extern_upperbounds_array, up);
   }
 
 
-  switch(instruction_tag(i)){
+  switch(instruction_tag(ins)){
   case is_instruction_loop:{
     loop l = instruction_loop(ins);
-    c = claire_loop_from_loop(l, &result);
+    c = claire_loop_from_loop(l, &result, task_number);
     break;
   }
   case is_instruction_call:
     {
-      c = instruction_call(i);
+      c = instruction_call(ins);
     }
     break;
   default:
@@ -683,23 +718,23 @@ static string claire_loop_from_sequence(loop l, int task_number){
   /* add external upperbounds */
   result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));
   for(i=0; i<gen_array_nitems(extern_upperbounds_array) - 1; i++){
-    result = strdup(concatenate(result, "vartype!(", gen_array_item(extern_upperbound_array, i), "), ", NULL));
+    result = strdup(concatenate(result, "vartype!(", gen_array_item(extern_upperbounds_array, i), "), ", NULL));
   }
-  result = strdup(concatenate(result, "vartype!(", gen_array_item(extern_upperbound_array, i), ")),",NL, TAB, TAB, NULL));
+  result = strdup(concatenate(result, "vartype!(", gen_array_item(extern_upperbounds_array, i), ")),",NL, TAB, TAB, NULL));
   /* add external indices names*/
   result = strdup(concatenate(result, "names = list<string>(", NULL));
-  for(i=0, i<gen_array_nitems(extern_indices_array) - 1; i++){
-    result = strdup(concatenate(result, QUOTE, gen_array_item(extern_indices_array, i), QUOTE ", ", NULL))
+  for(i=0; i<gen_array_nitems(extern_indices_array) - 1; i++){
+    result = strdup(concatenate(result, QUOTE, gen_array_item(extern_indices_array, i), QUOTE ", ", NULL));
   }
   result = strdup(concatenate(result, QUOTE, gen_array_item(extern_indices_array, i), QUOTE, ")),", NL, TAB, NULL));
   
-  result = strdup(concatenate(result, claire_call_from_loopnest(c, task_number), NULL);
+  result = strdup(concatenate(result, claire_call_from_loopnest(c, task_number), NULL));
 
   gen_array_free(extern_indices_array);
   gen_array_free(intern_indices_array);
   gen_array_free(extern_upperbounds_array);
   gen_array_free(intern_upperbounds_array);
-  }, 
+     
   result = strdup(concatenate(result, NL, NULL));
   return result;
 }
