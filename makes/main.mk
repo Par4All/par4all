@@ -190,13 +190,24 @@ arch-clean:; -$(RMDIR) $(ARCH)
 
 ####################################################################### INSTALL
 
-# multiphase compilation
+# multiphase compilation?
+
+recompile:
+	$(MAKE) phase0
+	$(MAKE) phase1
+	$(MAKE) phase2
+	$(MAKE) phase3
+	$(MAKE) phase4
+	$(MAKE) phase5
+
+install: recompile
+
 phase0:
 phase1:
 phase2:
 phase3:
-#phase4: install_rtm
-#phase5: install_htm 
+phase4:
+phase5:
 
 # NO! otherwise compilation always redone because directory changed
 #ifdef LIB_OBJECTS
