@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1996/04/01 11:18:24 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1996/04/03 08:38:01 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -369,7 +369,11 @@ RICE_DATAFLOW_DEPENDENCE_ONLY FALSE
 
 \subsubsection{Printout}
 
-To print the dependence graph in a file called {\em module\_name}.{\tt dg}
+Here are the properties used to control the printing of dependence
+graphs in a file called {\em module\_name}.{\tt dg}. These properties
+should not be used explictly because they are set implicitly by the
+different print-out procedures available in \verb/pipsmake.rc/. However,
+not all combinations are available from \verb/pipsmake.rc/.
 
 \begin{verbatim}
 PRINT_DEPENDENCE_GRAPH FALSE
@@ -397,11 +401,14 @@ PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
 \subsubsection{Optimization}
 
 The default option is to compute the dependence graph only for loops
-which can be parallelized using Allen \& Kennedy algorithm.
-However it is possible to
-compute the dependences in any case even for loop containing test, goto,
-etc...
-by setting this option to TRUE.
+which can be parallelized using Allen \& Kennedy algorithm.  However it
+is possible to compute the dependences in all cases, even for loop
+containing test, goto, etc...  by setting this option to TRUE.
+
+Of course, this information is not used by the parallelization phase
+which is restricted to loops meeting the A\&K conditions. By the way,
+the hierarchical control flow graph is not exploited either by the
+parallelization phase.
 
 \begin{verbatim}
 COMPUTE_ALL_DEPENDENCES FALSE
