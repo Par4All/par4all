@@ -74,10 +74,12 @@
 
 (let
     (
-     (epips-frame-height (/ (- (/ (x-display-pixel-height)
+     (epips-frame-height (- (/ (- (/ (x-display-pixel-height)
 				  2) ; 2 stacked frames
 			       26) ; estimated window manager decor per frame
-			    (frame-char-height))
+			       (frame-char-height))
+			    1 ;; Keep room for the menu-bar
+			    )
 			 )
      (epips-log-frame-height (/ 250
 				(frame-char-height))
@@ -282,8 +284,8 @@ If no buffer can be found, just return nil."
 
 
 ; A function that insert some text with a property list :
-(defun epips-insert-with-properties (some-text property-list)
-  (epips-select-and-display-a-buffer (process-buffer a-process))
+(defun epips-insert-log-with-properties (some-text property-list)
+  (epips-select-and-display-a-buffer epips-process-buffer)
   (let ((old-point (point)))
     (insert some-text)
     (add-text-properties old-point
@@ -325,7 +327,7 @@ If no buffer can be found, just return nil."
   )
 
 
-(defun epips-daVinci-ignore ()
+(defun epips-daVinci-ignore (&rest nothing-at-all)
   "Do nothing"
   )
 
@@ -381,7 +383,7 @@ If no buffer can be found, just return nil."
 			 "^node_double_click$" 'epips-daVinci-node-double-click
 			 "^edge_selection_labels([\\(.*\\)])$" 'epips-daVinci-edge-selection
 			 "^edge_double_click$" 'epips-daVinci-edge-double-click
-			 "^quit" 'epips-daVinci-ignore
+			 "^quit$" 'epips-daVinci-ignore
 			 )
   )
 
@@ -440,8 +442,8 @@ If no buffer can be found, just return nil."
 ; Executed from send_prompt_user_to_emacs() in emacs.c:
 (defun epips-prompt-user-command (epips-command-content)
   (epips-debug 'epips-prompt-user-command)
-  (epips-insert-with-properties epips-command-content
-				'(face epips-face-prompt-user))
+  (epips-insert-log-with-properties epips-command-content
+				    '(face epips-face-prompt-user))
   (epips-raw-insert "\n"
 		    0
 		    nil
@@ -452,24 +454,24 @@ If no buffer can be found, just return nil."
 ; Executed from send_user_error_to_emacs() in emacs.c:
 (defun epips-user-error-command (epips-command-content)
   (epips-debug 'epips-user-error-command)
-  (epips-insert-with-properties epips-command-content
-				'(face epips-face-user-error))
+  (epips-insert-log-with-properties epips-command-content
+				    '(face epips-face-user-error))
   )  
 
 
 ; Executed from send_user_log_to_emacs() in emacs.c:
 (defun epips-user-log-command (epips-command-content)
   (epips-debug 'epips-user-log-command)
-  (epips-insert-with-properties epips-command-content
-				'(face epips-face-user-log))
+  (epips-insert-log-with-properties epips-command-content
+				    '(face epips-face-user-log))
   )  
 
 
 (defun epips-user-warning-command (epips-command-content)
   "Executed from send_user_warning_to_emacs() in emacs.c"
   (epips-debug 'epips-user-warning-command)
-  (epips-insert-with-properties epips-command-content
-				'(face epips-face-user-warning))
+  (epips-insert-log-with-properties epips-command-content
+				    '(face epips-face-user-warning))
   )  
 
 
@@ -1134,7 +1136,11 @@ such as the preconditions, the regions, etc."
 
 ;; The EPips main menu:
 (fset 'epips-main-menu epips-menu-keymap)
-(define-key epips-keymap [menu-bar epips-menu] '("EPips" . epips-main-menu))
+;; Ne marche plus
+;;(define-key epips-keymap [menu-bar epips-menu] '("EPips" . epips-main-menu))
+(define-key epips-keymap [menu-bar epips-menu] (cons "Epips" (make-sparse-keymap "Main epips")))
+(define-key epips-keymap [menu-bar epips-menu main] '("Main menu" . epips-main-menu))
+
 (define-key epips-menu-keymap [epips-kill-the-buffers-menu-item]
   '("Quit and kill the Pips buffers" . epips-kill-the-buffers))
 (define-key epips-menu-keymap [epips-another-pips-process-menu-item]
