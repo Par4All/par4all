@@ -449,10 +449,12 @@ Pvecteur l;
     if (!transformer_undefined_p(tf)){
 	list args = transformer_arguments(tf);
 
-	MAPL(cef, { entity e = ENTITY(CAR(cef));
-		    if(vect_coeff((Variable) e, l)!=0)
-			return TRUE;},
-	     args);
+	MAP(ENTITY, e, 
+	{
+	    Value v = vect_coeff((Variable) e, l);
+	    if(value_notzero_p(v)) return TRUE;
+	},
+	    args);
     }
 
     return FALSE;
