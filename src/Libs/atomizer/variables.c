@@ -22,6 +22,7 @@ extern int fprintf();
 #include "misc.h"
 #include "list.h"
 
+#include "loop_normalize.h"
 #include "atomizer.h"
 
 /* These globals variables count the number of temporary and auxiliary
