@@ -3,10 +3,8 @@
  *
  * DECLARATIONS compilation
  *
- * SCCS stuff:
- * $RCSfile: declarations.c,v $ ($Date: 1995/03/14 14:43:20 $, ) version $Revision$,
- * got on %D%, %T%
- * $Id$
+ * $RCSfile: declarations.c,v $ ($Date: 1995/03/23 16:54:41 $, )
+ * version $Revision$
  */
  
 #include <stdio.h>
@@ -37,8 +35,7 @@ extern fprintf();
  *
  */
 
-/*
- * ComputeNewSizeOfIthDimension
+/* ComputeNewSizeOfIthDimension
  *
  * here the new size of the ith dimension of the given array is computed.
  * because the declarations are static, there is a majoration of the space
@@ -211,7 +208,7 @@ tag *newdeclp;
 static void NewDeclarationOfDistributedArray(array)
 entity array;
 {
-    entity newarray = load_entity_node_new(array);
+    entity newarray = load_new_node(array);
     int ithdim = 1,
         newsize, p;
     tag newdecl;
