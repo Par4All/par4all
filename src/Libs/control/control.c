@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/12/09 18:35:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/12/10 16:20:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/12/09 18:35:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/12/10 16:20:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -493,6 +493,7 @@ hash_table used_labels;
     control_successors(pred) = ADD_SUCC(c_res, pred);
 
     union_used_labels( used_labels, loop_used_labels);
+    hash_table_free(loop_used_labels);
     
     pips_debug(5, "Exiting\n");
     
@@ -813,8 +814,9 @@ control pred, succ;
 control c_res;
 hash_table used_labels;
 {
-    hash_table t_used_labels = hash_table_make(hash_string, 0); 
-    hash_table f_used_labels = hash_table_make(hash_string, 0);
+    hash_table 
+	t_used_labels = hash_table_make(hash_string, 0), 
+	f_used_labels = hash_table_make(hash_string, 0);
     control c1 = make_conditional_control(test_true(t));
     control c2 = make_conditional_control(test_false(t));
     control c_join = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
@@ -870,6 +872,9 @@ hash_table used_labels;
     control_successors(pred) = ADD_SUCC(c_res, pred);
     union_used_labels(used_labels, 
 		      union_used_labels(t_used_labels, f_used_labels));
+
+    hash_table_free(t_used_labels);
+    hash_table_free(f_used_labels);
 
     ifdebug(5) {
 	pips_debug(1, "IF at exit:\n");
