@@ -499,6 +499,10 @@ entity get_ith_##lname##_prime(int i)\
 #define IO_ERROR_ARRAY_NAME "ERR_LUNS"
 /* size of the unit specifier */
 #define IO_EFFECTS_UNIT_SPECIFIER_LENGTH 4
+/* Standard unit numbers depend on the operating system. Here are UNIX definitions. */
+#define STDERR_LUN (0)
+#define STDIN_LUN (5)
+#define STDOUT_LUN (6)
 
 /* Empty comments (i.e. default comments) */
 
