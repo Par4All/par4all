@@ -356,6 +356,44 @@ bool db_resource_p(string rname, string oname)
       db_resource_loaded_and_stored_p(r);
 }
 
+static void db_check_time(string rname, string oname, db_resource r)
+{
+  pips_assert("resource is loaded",
+	      db_resource_loaded_and_stored_p(r) || db_resource_loaded_p(r));
+
+  /* just check for updates */
+  if (displayable_file_p(rname))
+  {
+    int its_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
+    if (its_time > db_resource_file_time(r))
+      pips_user_warning("file resource %s[%s] updated!\n", rname, oname);
+
+    /* update time of actual resource if appropriate
+     */
+    if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) && 
+	dbll_database_managed_file_p(db_resource_pointer(r)))
+    {
+      pips_user_warning("file '%s' for %s[%s] edited (%d -> %d)\n", 
+			db_resource_pointer(r), rname, oname,
+			db_resource_file_time(r), its_time);
+      db_resource_file_time(r) = its_time;
+      
+      db_inc_logical_time();
+      db_resource_time(r) = db_get_logical_time();
+      db_inc_logical_time();
+    }
+  }
+  else
+  {
+    int its_time = dbll_stat_resource_file(rname, oname, TRUE);
+    if (its_time > db_resource_file_time(r))
+    {
+      /* ??? just warn... may be a user error? */
+      pips_user_warning("internal resource %s[%s] updated!\n", rname, oname);
+    }
+  }
+}
+
 static void db_load_resource(string rname, string oname, db_resource r)
 {
   pips_debug(7, "loading %s[%s]\n", rname, oname);
@@ -368,20 +406,8 @@ static void db_load_resource(string rname, string oname, db_resource r)
   else
     db_status_tag(db_resource_db_status(r)) = is_db_status_loaded_and_stored;
 
-  /* just check for updates */
-  if (displayable_file_p(rname))
-  {
-    int its_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
-    if (its_time > db_resource_file_time(r))
-      /* should be an internal error? */
-      pips_user_warning("file resource %s[%s] updated!\n", rname, oname);
-  }
-  else
-  {
-    int its_time = dbll_stat_resource_file(rname, oname, TRUE);
-    if (its_time > db_resource_file_time(r))
-      pips_user_warning("internal resource %s[%s] updated!\n", rname, oname);
-  }
+  /* should it be checked elsewhere? */
+  db_check_time(rname, oname, r);
 }
 
 int db_time_of_resource(string rname, string oname)
@@ -395,33 +421,16 @@ int db_time_of_resource(string rname, string oname)
     return -1;
   
   /* we load the resource if it is a simple file name...
-   * so as to be able to check it next.
+   * the file time stamps are checked here anyway.
    */
-  if (db_resource_stored_p(r) && displayable_file_p(rname)) {
-    db_load_resource(rname, oname, r);
-  }
-  
-  /* loaded */
-  if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) && 
-      displayable_file_p(rname) &&
-      dbll_database_managed_file_p(db_resource_pointer(r)))
+  if (displayable_file_p(rname))
   {
-    /* check time of actual resource... 
-     */
-    int current_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
-    if (current_time > db_resource_file_time(r)) 
-    {
-      pips_user_warning("file '%s' for %s[%s] edited (%d -> %d)\n", 
-			db_resource_pointer(r), rname, oname,
-			db_resource_file_time(r), current_time);
-      db_resource_file_time(r) = current_time;
-      
-      db_inc_logical_time();
-      db_resource_time(r) = db_get_logical_time();
-      db_inc_logical_time();
-    }
+    if (db_resource_stored_p(r))
+      db_load_resource(rname, oname, r); /* will update time if needed. */
+    else
+      db_check_time(rname, oname, r); /* may update time... */
   }
-  
+
   return db_resource_time(r);
 }
 
@@ -603,8 +612,10 @@ void db_put_or_update_memory_resource(
     db_resource_time(r) = db_get_logical_time();
 
     if (displayable_file_p(rname))
-	db_resource_file_time(r) =
-	    dbll_stat_local_file(db_resource_pointer(r), FALSE);
+      db_resource_file_time(r) =
+	  dbll_stat_local_file(db_resource_pointer(r), FALSE);
+    else
+      db_resource_file_time(r) = -1; /* or what else? */
 
     debug_db_resource(9, rname, oname, r);
     debug_off();
