@@ -39,7 +39,7 @@ typedef text (*generic_text_function)(list /* of effect */);
 typedef void (*generic_prettyprint_function)(list /* of effect */);
 typedef void (*generic_attachment_function)(text);
 
-
+ 
 /* for db_* functions 
  */
 #define DB_GET_SE(name, NAME)				\
