@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/04/17 18:32:14 $, )
+ * ($Date: 1996/04/18 09:12:36 $, )
  */
 
 #include "defines-local.h"
@@ -792,7 +792,7 @@ HANDLER_PROTOTYPE(prescriptive)
  * I let the call as a marker for itself, and it will be removed later
  * on at the compilation stage *only*...
  */
-HANDLER_PROTOTYPE(dead)
+HANDLER_PROTOTYPE(kill)
 {
     pips_debug(4, "dead directive encountered");
 }
@@ -849,7 +849,7 @@ static struct DirectiveHandler handlers[] =
     {HPF_PREFIX INDEPENDENT_SUFFIX,	3,	HANDLER(independent) },
     {HPF_PREFIX NEW_SUFFIX,		3,	HANDLER(new) },
     {HPF_PREFIX REDUCTION_SUFFIX,	3,	HANDLER(reduction) }, 
-    {HPF_PREFIX DEAD_SUFFIX,		3,	HANDLER(dead) },
+    {HPF_PREFIX DEAD_SUFFIX,		3,	HANDLER(kill) },
     
     /* remappings before/after a call. internal management. 
      */
