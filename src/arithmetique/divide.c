@@ -1,7 +1,7 @@
 /* package arithmetique 
  *
  * $RCSfile: divide.c,v $ (version $Revision$)
- * $Date: 1996/07/16 22:04:38 $, 
+ * $Date: 1996/07/18 19:30:06 $, 
  */
 
 /*LINTLIBRARY*/
@@ -63,7 +63,7 @@ Value divide_fast(Value a, Value b)
 
     Value quotient;     /* valeur du quotient C */
 
-    assert(VALUE_NOTZERO_P(b));
+    assert(value_notzero_p(b));
 
     /* serait-il utile d'optimiser la division de a=0 par b? Ou bien
        cette routine n'est-elle jamais appelee avec a=0 par le package vecteur?
