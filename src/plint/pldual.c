@@ -45,7 +45,8 @@ int *no_som ;
     double min;
     double coeff;
     int nb_som1 = nb_som;
-    int den;
+    Value den;
+    double dden;
 
 #ifdef TRACE
     printf(" **** alg. dual - recherche de la ligne pivot \n");
@@ -56,18 +57,19 @@ int *no_som ;
     /*  initialisation du minimum    */
 
     for (som2 = sys;som2 != NULL  
-	 && (-vect_coeff(TCST,som2->vecteur) >= 0) ;
+	 && value_posz_p(vect_coeff(TCST,som2->vecteur)) ;
 	 som2 = som2->succ,nb_som1 --);
     den = som2->denominateur;
+    dden = VALUE_TO_DOUBLE(den);
 
-    min =- (double)vect_coeff(TCST,som2->vecteur)/den;
+    min = -VALUE_TO_DOUBLE(vect_coeff(TCST,som2->vecteur))/dden;
     lpivot = som2;
     *no_som = nb_som1;
     nb_som1 --;
     for (som1 = som2->succ;som1 != NULL;som1 = som1->succ)
     {
 	den = som1->denominateur;
-	if ((coeff = -(double)vect_coeff(TCST,som1->vecteur)/den) < 0
+	if ((coeff = -VALUE_TO_DOUBLE(vect_coeff(TCST,som1->vecteur))/dden) < 0
 	    && coeff < min)
 	{
 	    min = coeff;
@@ -96,9 +98,9 @@ Variable var_pivotd(eq,fonct)
 Psommet eq,fonct;
 {
     Pvecteur pv= VECTEUR_NUL;
-    double min, min2;
+    double min=0, min2;
     Variable no_lpivot = NULL;
-    int cf2 =0;
+    Value cf2 = VALUE_ZERO;
     boolean trouve = FALSE;
 
 #ifdef TRACE
@@ -108,7 +110,7 @@ Psommet eq,fonct;
     if (eq && fonct)
     {
 	/* initialisation du minimum   */
-	int cst = vect_coeff(TCST,eq->vecteur);
+	Value cst = vect_coeff(TCST,eq->vecteur);
 	Pvecteur pv3;
 	vect_chg_coeff(&(eq->vecteur),TCST,0);
 	pv = vect_sort(eq->vecteur, vect_compare);
@@ -117,12 +119,14 @@ Psommet eq,fonct;
 	pv3->succ = vect_new(TCST,cst);
     
 	for (; pv!= NULL && !trouve; pv = pv->succ) {
-	    if ((var_of(pv) != NULL) && (val_of(pv) <0)
-		&& ( (cf2 = vect_coeff(var_of(pv),fonct->vecteur))>= 0)) {
+	    if ((var_of(pv) != NULL) && (value_neg_p(val_of(pv))) && 
+		(value_posz_p(cf2 = vect_coeff(var_of(pv),fonct->vecteur))))
+	    {
 		double d1,d2 = 0;
-
-		d1 = pv->val * fonct->denominateur;
-		d2 =((double) (cf2 * eq->denominateur)) ;
+		d1 = VALUE_TO_DOUBLE(pv->val) * 
+		    VALUE_TO_DOUBLE(fonct->denominateur);
+		d2 = VALUE_TO_DOUBLE(cf2) * 
+		    VALUE_TO_DOUBLE(eq->denominateur) ;
 		min = - d2/d1;
 		trouve = TRUE;
 		no_lpivot = var_of(pv);
@@ -130,11 +134,14 @@ Psommet eq,fonct;
 	}
 	if (pv != VECTEUR_NUL) {
 	    for (; pv!= NULL && trouve ;pv= pv->succ) {
-		if ((var_of(pv) != NULL) && (val_of(pv) <0)
-		    && ((cf2 = vect_coeff(var_of(pv),fonct->vecteur)) >= 0)) {
+		if ((var_of(pv) != NULL) && value_neg_p(val_of(pv)) &&
+		    value_posz_p(cf2 = vect_coeff(var_of(pv),fonct->vecteur)))
+		{
 		    double d1,d2 = 0;
-		    d1 = cf2*eq->denominateur;
-		    d2 = ((double) (pv->val * fonct->denominateur));
+		    d1 = VALUE_TO_DOUBLE(cf2) *
+			VALUE_TO_DOUBLE(eq->denominateur);
+		    d2 = VALUE_TO_DOUBLE(pv->val) * 
+			VALUE_TO_DOUBLE(fonct->denominateur);
 		    min2 = -d1/d2;
 		    if (min2 < min) {
 			min = min2;
