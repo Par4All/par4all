@@ -127,14 +127,12 @@ tpips_user_log(char *fmt, va_list args)
 {
     FILE * log_file = get_log_file();
 
-    if (!log_file) {
-	/* It goes to stderr to have only displayed files on stdout */
-	vfprintf(stderr, fmt, args); 
-	fflush(stderr);
-	return;
-    }
+    /* It goes to stderr to have only displayed files on stdout.
+     */
+    vfprintf(stderr, fmt, args); 
+    fflush(stderr);
 
-    if (!get_bool_property("USER_LOG_P"))
+    if (!log_file || !get_bool_property("USER_LOG_P"))
 	return;
 
     if (vfprintf(log_file, fmt, args) <= 0) {
