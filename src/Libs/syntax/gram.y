@@ -1119,13 +1119,7 @@ lformalparameter: entity_name
 	    }
         | TK_STAR
             {
-		if(!get_bool_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS")) {
-		    pips_user_warning("Lines %d-%d: Alternate return not supported. "
-				      "Formal label * ignored.\n", line_b_I, line_e_I);
-		}
-		else {
-		    uses_alternate_return(TRUE);
-		}
+		uses_alternate_return(TRUE);
 		$$ = NIL;
             }
 	| lformalparameter TK_COMMA entity_name
@@ -1134,13 +1128,7 @@ lformalparameter: entity_name
 	    }
         | lformalparameter TK_COMMA TK_STAR
             {
-		if(!get_bool_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS")) {
-		    pips_user_warning("Lines %d-%d: Alternate return not supported. "
-				      "Formal label * ignored.\n", line_b_I, line_e_I);
-		}
-		else {
-		    uses_alternate_return(TRUE);
-		}
+		uses_alternate_return(TRUE);
 		$$ = $1;
             }
 	;
