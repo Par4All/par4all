@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.99  1997/08/04 13:55:59  coelho
+ * new generic effects includes.
+ *
  * Revision 1.98  1997/07/22 13:16:28  keryell
  * #include "makefile.h"
  * #include "pipsmake.h"
@@ -29,14 +32,15 @@
  
 #include "defines-local.h"
 
-#include "regions.h"
 #include "semantics.h"
-#include "effects.h"
 #include "resources.h"
 #include "pipsdbm.h"
 #include "makefile.h"
 #include "pipsmake.h"
 #include "control.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 
 /*************************************************************** REDUCTIONS */
 GENERIC_GLOBAL_FUNCTION(hpf_reductions, statement_entities)
