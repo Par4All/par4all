@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/19 10:34:35 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/20 14:44:53 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -150,6 +150,9 @@ PATH=${PATH}:${PIPS_BINDIR}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
 # default architcture for building pips
 # the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
 PIPS_ARCH="."
+
+# all defined "architectures" (i.e. existing makefile_macro suffixes)
+PIPS_ALL_ARCH=". SUN4 GNU GNULL DEFAULT TEST"
 
 # make MUST be gmake...
 PIPS_MAKE='gmake'
