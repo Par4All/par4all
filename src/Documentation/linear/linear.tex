@@ -26,10 +26,13 @@
 }
 
 \begin{abstract}
-Linear algebra algorithm can be used to prove program properties. However
-its worse-case exponential complexity is a problem. The problem sizes must
-be reduced as much as possible and sub-optimal or heuristics solution must
-be found when arithmetic overflows occur.
+  Linear algebra algorithm can be used to prove program properties.
+  However its worse-case exponential complexity is a problem because space
+  and time are limited for a compiler. The problem sizes must be reduced
+  as much as possible for time and space. Moreover, coefficient magnitude
+  also is a complexity issue and sub-optimal or heuristics solutions must
+  be found when arithmetic overflows occur in order to limit or control the
+  information loss.
 \end{abstract}
 
 \section{Introduction}
@@ -57,7 +60,10 @@ at first.
 
 \section{Simplexe}
 
-\section{Convex Hull}
+\section{Convex Hull or Union}
+
+The union of two convex sets is not a convex set. The union is usually
+over-approximated by the convex hull.
 
 \subsection{Definition}
 
@@ -80,7 +86,7 @@ A \subset A \vee A
 \end{eqnarray}
 
 \begin{eqnarray}
-A = A \vee A \Longleftrightarrow A is convex
+A = A \vee A \Longleftrightarrow A ~is~ convex
 \end{eqnarray}
 
 \subsubsection{Convex Hull and Intersection}
@@ -244,15 +250,15 @@ x = \lambda a_1 + ( 1 - \lambda ) a_2
   + \sum_{i=1}^{n_2} (1-\lambda)c^2_i e^2_i
 \]
 
-Since neither $e^1_i$ nor $e^2_i$ vectors are generators for $A$ and since
-$A$ is convex:
+Since $e^1_i$ and $e^2_i$ cannot generate vectors in $A$, their linear
+combination must be 0:
 
 \[
-x = \lambda a_1 + ( 1 - \lambda ) a_2~\in~A
+x = \lambda a_1 + ( 1 - \lambda ) a_2
 \]
 
 Since $a_1$ belongs to $A \cap B_1$ and $a_2$ belongs to $A \cap B_2$, $x$
-belongs to $(A \cap B_1) \vee (A \cap B_2)$.
+belongs to $(A \cap B_1) \vee (A \cap B_2)$ by definition.
 
 \paragraph{Theorem:} If $A$ is an affine subspace intersecting affine
 subspaces $B_1$ and $B_2$ and if all generating vectors in $A$ are free
@@ -279,11 +285,91 @@ complementary/orthogonal subspaces of $B_1$ and $B_2$.
 
 TO BE DONE.
 
-\subsubsection{Decomposition by Fabien and Corinne}
+\subsubsection{Decomposition by Corinne Fabien and Fabien}
+
+\paragraph{Note FI:} Lots of problems to refine these proposals
+and proof. Affine subspaces and convex subsets are not vector sets. Let's
+consider the two lines in a 2-D space, $D_1 = \{(x,y)|x=1\}$ and
+$D_2=\{(x,y)|y=2\}$. They are orthogonal because the underlying vector
+subspaces are orthogonal. Nevertheless, you cannot claim that any vector
+in $d_1$ and any vector in $d_2$ are orthogonal. Take for instance $(1,2)$
+and $(2,1)$.
+
+The purpose again is to find a set $P$ which can be factored out of the
+convex enveloppe:
+\[
+ P_1 \vee P_2 = (P \cap X_1) \vee (P \cap X_2) = P \cap (X_1 \vee X_2)
+\]
+
+\paragraph{Definition:} Two convex sets $X$ and $Y$ are said to be
+orthogonal, $X \bot Y$, if and only if:
+
+\begin{eqnarray}
+\forall~x~\in~X~~\forall~y~\in~Y~~ <x.y> = 0
+\end{eqnarray}
+
+This implies that any pair of vectors in their generating systems are
+orthogonal. There exist a basis such that elements in $X$ may only have
+non-zero coefficients in the first $n_X$ rows and that elements in $Y$ may only have
+non-zero coefficients in rows $n_X+1$ to $n_X+n_Y$, $n_x$ and $n_Y$ being
+the dimension of the smallest vector subspace containing $X$ and $Y$.
+
+This is a very strong definition of orthogonality since most orthogonal
+lines in a plane are founf to be non-orthogonal. They must be vector
+subspace, i.e. must contain 0, to be found orthogonal with this definition.
+
+\paragraph{Lemma:} Let $A$ and $B$ be two convex sets defined by affine
+constraints and $var(A)$ and $var(B)$ the sets of dimensions with a non-zero
+coefficient in at least one constraint of $A$, resp. $B$:
+
+\begin{eqnarray}
+var(A) \cap var(B) = \emptyset \Rightarrow proper(A) \bot proper(B)
+\end{eqnarray}
+
+Proof: If a dimension is unconstrained, a corresponding line is added to
+the generating system. This line can be used to reduce the coefficients
+for that dimension to 0 in all other generating systems.
+
+The implication might be reversable: if $A$ and $B$ have orthogonal proper
+???, there must exist a basis such that $var(A) \cap var(B)$.
+
+\paragraph{Decomposition and Transitive Closure}
+
+Let's decompose $P_1 \vee P_2$.
+
+Let $P$ be a convex set defined by constraints appearing both in $P_1$ and
+$P_2$. This is a syntactic definition and $P$ depends on the
+representation of $P_1$ and $P_2$ since there is no canonical
+representation. Let $P_1 = X_1 \cap P$ and $P_2 = X_2 \cap P$. The sets
+$X_1$ and $X_2$ are defined by the constraints in $P_1$, resp. $P_2$, that
+are not in $P$.
+
+$P$ is broken down into $P'$ and $P''$. If a constraint $c$ in $P$ and a
+constraint in $X_1$ or $X_2$ have both a non-zero coefficient in the same
+dimension, $c$ belongs to $P''$. $P'$ contains the constraints in $P$ that
+do not belong to $P''$. 
+
+This depends on the basis chosen:
 
 \[
- P1 \vee P2 = (P \cap X1) \vee (P \cap X2)
+P_1 = \{(x,y)|x+y=2, x-y=0, x+y \leq 10 \}
 \]
+
+\[
+P_2 = \{(x,y)|x+y=2, x-y=0, x+y \geq 10 \}
+\]
+
+\[
+P = \{(x,y)|x+y=2, x-y=0 \},~P'' = \{(x,y)|x+y=2, x-y=0 \}, P'=\{(x,y)\}
+\]
+
+If we change basis and use $u=x+y$ and $v=x-y$, then $P'$ is constraint by:
+
+\[
+P = \{(x,y)|x-y=0 \}
+\]
+
+As a result, $proper(P')$ is orthogonal to $proper(P'')$.
 
 Let $ P = P' \cap P'' $ so that $P' \bot X1$ and $P' \bot X2$ and $P' \bot P''$ built
 by transitive closure, then:
@@ -293,7 +379,7 @@ P1 \vee P2 = (P' \cap (P'' \cap X1)) \vee (P' \cap (P'' \cap X2)) =
                  P' \cap ((P'' \cap X1) \vee (P'' \cap X2))
 \]
 
-Proof by considering the generating systems:
+Proof: by considering the generating systems:
 
 Lemma:
 
@@ -307,11 +393,17 @@ Let $A = (x,v,l)$, $B = (y,w,m)$
 
 \[
 \begin{array}{lcl}
-A \cap B &=& \left\{ z | z = (x) \mu + (v) d + (l) e + (0) f \right.\\
-         & &       (0)     + (0)   + (0)     (I) \\
-         & & \wedge z = (0) \nu + (0) g + (0) h + (I) f' \\
-         & &         (y)     + (w)   + (m)     (0) \\
-         & &  \left. with \mu>0, \nu>0, \sum\mu=1, \sum\nu=1, d>0, g>0 \right\}
+A \cap B &=& \left\{ z | z = \left(\begin{array}{c} x \\ 0 \end{array}\right) \mu
+   + \left(\begin{array}{c} d \\ 0 \end{array}\right) d
+   + \left(\begin{array}{c} l \\ 0 \end{array}\right) e
+   + \left(\begin{array}{c} 0 \\ I \end{array}\right) f \right.\\
+         & & \wedge
+ z = \left(\begin{array}{c} 0 \\ y \end{array}\right) \mu
+   + \left(\begin{array}{c} 0 \\ w \end{array}\right) g
+   + \left(\begin{array}{c} 0 \\ m \end{array}\right) h
+   + \left(\begin{array}{c} I \\ 0 \end{array}\right) f' \\
+   & &  \left. with \mu \geq 0, \nu \geq 0, \sum_i\mu_i=1,
+         \sum_j\nu_j=1, d \geq 0, g \geq 0 \right\}
 \end{array}
 \]
 
@@ -320,29 +412,71 @@ so:
 
 \[
 \begin{array}{lcl}
-A \cap B &=& \left\{ z | z = (x 0) \mu + (v 0) d + (l 0) e \right.\\
-         & &      (0 y) \nu   (0 w) g   (0 m) h  \\
-         & & \left. with \mu \nu d g constraints... \right\}
+A \cap B &=& \left\{ z | \exists~\mu~~\exists~\nu~~... \right.\\
+         & & \left. z = 
+         \left(
+           \begin{array}{cc}
+             x & 0\\
+             0 & y
+           \end{array}
+         \right)
+         \left(
+           \begin{array}{c}
+             \mu\\
+             \nu
+           \end{array}
+         \right)
+         +
+         \left(
+           \begin{array}{cc}
+             v & 0\\
+             0 & w
+           \end{array}
+         \right)
+         \left(
+           \begin{array}{c}
+             d\\
+             g
+           \end{array}
+         \right)
+         +
+         \left(
+           \begin{array}{cc}
+             l & 0\\
+             0 & m
+           \end{array}
+         \right)
+         \left(
+           \begin{array}{c}
+             e\\
+             h
+           \end{array}
+         \right)
+\right\}
 \end{array}
 \]
 
-It is a convex : 
+It is a convex set, as could be expected from the intersection of two
+convex sets:
 
-\[
-\begin{array}{l}
-((xi)  , (v 0), (l 0)) \\
- (yj)ij, (0 w), (0 m)
-\end{array}
-\]
+\begin{eqnarray}
+\left(
+\left(\begin{array}{c}x_i\\y_j\end{array}\right)
+\left(\begin{array}{cc}v & 0\\ 0 & w\end{array}\right)
+\left(\begin{array}{cc}l & 0\\ 0 & m\end{array}\right)
+\right)
+\end{eqnarray}
+
 
 We just need to prove that $Cmn = Cg$ defined as:
 
-\[
-\begin{array}{l}
-  (x 0) \mu  ==  (xi)   \gamma with >0 \wedge \sum = 1 \\
-  (0 y) \nu      (yj)ij
-\end{array}
-\]
+\begin{eqnarray}
+\left(\begin{array}{cc}x&0\\0&y\end{array}\right)
+\left(\begin{array}{c}\mu\\\nu\end{array}\right)
+==
+\left(\begin{array}{c}x_i\\y_j\end{array}\right) \gamma
+~~   \gamma \geq 0 \wedge \sum_i \mu_i + \sum_j \nu_j = 1 
+\end{eqnarray}
 
 $Cg$ is included in a convex.
 
@@ -358,6 +492,17 @@ to their convex hull and to their intersection.
 A \bot B \wedge A \bot C => A \bot (B \vee C) \wedge A \bot (B \cap C)
 \end{eqnarray}
 
+Proof: for all $a$ in $A$, for all $x$ in $B \cap C$, $x$ belongs to $B$ and
+hence $<a.x>=0$.
+
+For all $a$ in $A$, for all $x$ in $B \vee C$, there exist $b$ in $B$ and $c$ in $C$ and
+$\lambda$ such that $x=\lambda b + (1-\lambda)c$. $x$ is orthogonal to $A$
+since $b$ and $c$ are orthogonal to $A$:
+
+\[
+<a . x > = <a .\lambda b + (1-\lambda)c > = \lambda <a.b> + (1-\lambda)<a.c>=0
+\]
+
 \paragraph{Theorem:} If $A$ is orthogonal to both $B$ and $C$ then the
 intersection is distributive with respect to the convex hull:
 
@@ -365,7 +510,8 @@ intersection is distributive with respect to the convex hull:
 A \bot B \wedge A \bot C => (A \cap B) \vee (A \cap C) = A \cap (B \vee C)
 \end{eqnarray}
 
-compute both generating systems with above props. they are equal.
+Proof: compute both generating systems with above propositions, theorems
+and lemmas and check that they are equal.
 
 \subsection{Heuristics}
 
