@@ -17,6 +17,9 @@
  * $Id$
  *
  * $Log: Console.java,v $
+ * Revision 1.4  1998/10/30 15:44:56  ancourt
+ * Jpanel resized
+ *
  * Revision 1.3  1998/10/17 09:51:45  coelho
  * background color is white.
  *
@@ -113,11 +116,13 @@ public class Console extends JFrame implements StreamObserver
       /* Create a Panel to get it in the ConsoleLinePanel because the
          CardLayout freeze by using the entire Frame event if the
          Frame is a container... RK. */
-      console_panel = new JPanel(new BorderLayout() {
+      console_panel = new JPanel(new BorderLayout()
+				 /* {
 	  public Dimension getPreferredSize() {
 	      return new Dimension(300, 200);
 	  }
-      });
+      } */
+	  );
       
       addWindowListener(new WindowAdapter() {
 	  public void windowClosing(WindowEvent e) 
@@ -127,7 +132,7 @@ public class Console extends JFrame implements StreamObserver
       });
 
       // A scrollable JTextArea:
-      aTextArea = new JTextArea();
+      aTextArea = new JTextArea(25,45);
       aTextArea.setEditable(false);
       aTextArea.setLineWrap(true);
       aTextArea.setBackground(Color.white);
