@@ -1,5 +1,13 @@
+/* 	$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.11 1997/07/22 12:57:11 keryell Exp $ ($Name:  $)\n Copyright (c) École des Mines de Paris Proprietary	 */
+
+#ifndef lint
+static char vcid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.11 1997/07/22 12:57:11 keryell Exp $ ($Name:  $)\n Copyright (c) École des Mines de Paris Proprietary";
+#endif /* lint */
+
+#include <stdlib.h>
 #include <stdio.h>
-#include <setjmp.h>
+#include <stdio.h>
+#include <malloc.h>
 
 #include "genC.h"
 #include "list.h"
