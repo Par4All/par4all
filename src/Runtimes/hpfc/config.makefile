@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/30 19:09:19 $, )
+# ($Date: 1996/08/30 19:19:18 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -8,7 +8,11 @@
 # + USE_PVMe
 # + USE_GNU
 
-RTARCH=$(PVM_ARCH)-$(ARCH)
+ifeq ($(PIPS_ARCH),.)
+RT_ARCH=$(PVM_ARCH)
+else
+RT_ARCH=$(PVM_ARCH)-$(PIPS_ARCH)
+endif
 
 #
 # additional defs for m4
@@ -187,7 +191,7 @@ DDC_HEADERS 	= $(LIB_M4FFILES:.m4f=.h) \
 LIB_HEADERS	= $(CORE_HEADERS) \
 		  $(DDC_HEADERS)
 
-LIB_OBJECTS= $(addprefix $(RTARCH)/, $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
+LIB_OBJECTS= $(addprefix $(RT_ARCH)/, $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
 
 M4_MACROS 	= hpfc_lib_m4_macros hpfc_architecture_m4_macros
 HPFC_MAKEFILES 	= hpfc_Makefile_init 
@@ -206,18 +210,18 @@ SOURCES = 	$(M4_MACROS) \
 		$(DOCS) \
 		$(SCRIPTS)
 
-LIB_TARGET = $(RTARCH)/libhpfcruntime.a
-MKI_TARGET = $(RTARCH)/compilers.make
+LIB_TARGET = $(RT_ARCH)/libhpfcruntime.a
+MKI_TARGET = $(RT_ARCH)/compilers.make
 
-# $(LIB_OBJECTS) $(LIB_TARGET): $(RTARCH)
+# $(LIB_OBJECTS) $(LIB_TARGET): $(RT_ARCH)
 
-$(RTARCH):; mkdir $@
+$(RT_ARCH):; mkdir $@
 
 #
 # Installation:
 
 INSTALL_INC_DIR:=$(INSTALL_RTM_DIR)/hpfc
-INSTALL_LIB_DIR:=$(INSTALL_RTM_DIR)/hpfc/$(RTARCH)
+INSTALL_LIB_DIR:=$(INSTALL_RTM_DIR)/hpfc/$(RT_ARCH)
 
 INSTALL_INC =	$(CORE_HEADERS) \
 		$(DDC_HEADERS) \
@@ -239,7 +243,7 @@ $(CMMD_F77_H):	$(CMMD_INDIR)/cm/$(CMMD_F77_H)
 	$(COPY) $(CMMD_INDIR)/cm/$(CMMD_F77_H) .
 endif
 
-all: $(RTARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
+all: $(RT_ARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
 		$(LIB_OBJECTS) $(LIB_TARGET) $(MKI_TARGET)
 
 #
@@ -264,13 +268,13 @@ $(LIB_TARGET):	$(PVM_HEADERS) $(LIB_HEADERS) $(LIB_OBJECTS)
 	./hpfc_generate_h < $< > $@
 	./hpfc_add_warning $@
 
-$(RTARCH)/%.o: %.c
+$(RT_ARCH)/%.o: %.c
 	$(COMPILE) $< -o $@
 
-$(RTARCH)/%.o: %.f
+$(RT_ARCH)/%.o: %.f
 	$(F77COMPILE) $< -o $@
 
-$(RTARCH)/compilers.make:
+$(RT_ARCH)/compilers.make:
 	#
 	# building $@
 	#
@@ -295,7 +299,7 @@ local-clean:
 	$(RM) *~ $(LIB_OBJECTS) $(PVM_HEADERS) \
 		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) \
 		$(LIB_TARGET)   $(MKI_TARGET)
-	test ! -d $(RTARCH) || rmdir $(RTARCH)
+	test ! -d $(RT_ARCH) || rmdir $(RT_ARCH)
 
 # that is all
 #
