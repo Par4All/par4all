@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/09 22:04:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/09 23:30:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/07/09 22:04:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/07/09 23:30:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -10,7 +10,6 @@ char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/07/09 22:04:20 $, ) versio
 #include <string.h>
 /* #include <stdlib.h> */
 
-#include "types.h"
 
 #include "genC.h"
 
