@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.84  1997/10/08 08:41:37  coelho
+ * management of saved variable fixed.
+ *
  * Revision 1.83  1997/10/08 06:04:49  coelho
  * dim or save variables are ok.
  *
@@ -66,7 +69,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.83 1997/10/08 06:04:49 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.84 1997/10/08 08:41:37 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1086,8 +1089,9 @@ sentence_area(entity e, entity module, bool pp_dimensions)
 
     if (!ENDP(area_layout(type_area(te))))
     {
+	bool pp_hpfc = get_bool_property("PRETTYPRINT_HPFC");
 	MAP(ENTITY, ee,
-	    if (local_entity_of_module_p(ee, module))
+	    if (local_entity_of_module_p(ee, module) || pp_hpfc)
 	        entities = CONS(ENTITY, ee, entities),
 	    area_layout(type_area(te)));
 
