@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-util.c,v $ ($Date: 1994/05/05 09:48:56 $, ) version $Revision$,
+ * $RCSfile: io-util.c,v $ ($Date: 1994/06/03 14:14:47 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -45,6 +45,8 @@ extern fprintf();
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
+#include "conversion.h"
+#include "properties.h"
 
 /* 
  * my own local includes
@@ -52,6 +54,7 @@ extern fprintf();
 
 #include "hpfc.h"
 #include "defines-local.h"
+/* #include "compiler_parameters.h" */
 
 entity CreateIntrinsic(string name); /* in syntax */
 
@@ -99,6 +102,7 @@ statement generate_deducables(le)
 list le;
 {
     list
+	rev = gen_nreverse(gen_copy_seq(le)),
 	ls = NIL;
 
     MAPL(ce,
@@ -109,19 +113,24 @@ list le;
 	     var = reference_variable(expression_reference(e));
 	 Pvecteur
 	     v = vect_dup(normalized_linear(expression_normalized(e)));
+	 int
+	     coef = vect_coeff((Variable) var, v);
+
+	 pips_assert("generate_deducables", (abs(coef)==1));
+
+	 vect_erase_var(&v, (Variable) var);
+	 if (coef==1) vect_chg_sgn(v);
 
 	 ls = CONS(STATEMENT,
-		   make_assign_statement
-		      (entity_to_expression(var),
-		       make_vecteur_expression((vect_erase_var(&v, 
-							       (Variable) var),
-						v))),
+		   make_assign_statement(entity_to_expression(var),
+					 make_vecteur_expression(v)),
 		   ls);	
 
 	 vect_rm(v);
      },
-	 le);
+	 rev);
 
+    gen_free_list(rev);
     return(make_block_statement(ls));
 }
 
@@ -218,11 +227,17 @@ int val, number;
 	l=NIL;
     int i;
 
+    pips_assert("make_list_of_constant", number>=0);
+
     for(i=1; i<=number; i++)
 	l = CONS(EXPRESSION, make_integer_constant_expression(val), l);
 
     return(l);
 }
+
+#define psi(i) entity_to_expression(get_ith_processor_dummy(i))
+
+/* expression linearized_processor(proc, creator) */
 
 /* static statement st_compute_lid(proc)
  *
@@ -234,10 +249,14 @@ entity proc;
     int
 	ndim = NumberOfDimension(proc);
     entity
-	lid = hpfc_name_to_entity(T_LID),
-	cmp_lid = hpfc_name_to_entity(CMP_LID);
+	lid = hpfc_name_to_entity(T_LID);
 
-    return(make_assign_statement
+    if (!get_bool_property("HPFC_EXPAND_CMPLID"))
+    {
+	entity
+	    cmp_lid = hpfc_name_to_entity(CMP_LID);
+	
+	return(make_assign_statement
    	       (entity_to_expression(lid),
 		make_call_expression
 		(cmp_lid,
@@ -246,7 +265,71 @@ entity proc;
 		      gen_nconc(hpfc_gen_n_vars_expr(get_ith_processor_dummy,
 						     ndim),
 				make_list_of_constant(0, 7-ndim))))));
-
+    }
+    else
+    {
+	int i = 0;
+	entity
+	    plus = CreateIntrinsic(PLUS_OPERATOR_NAME),
+	    minus = CreateIntrinsic(MINUS_OPERATOR_NAME),
+	    multiply = CreateIntrinsic(MULTIPLY_OPERATOR_NAME);
+	expression
+	    value = expression_undefined;
+	
+	/* if (NODIMP(pn).EQ.0) then
+	 *   lid = 1
+	 * else
+	 *   t = indp(1) - RANGEP(pn, 1, 1)
+	 *   do i=2, NODIMP(pn)
+	 *     t = (t * RANGEP(pn, i, 3)) + (indp(i) - RANGEP(pn, i, 1))
+	 *   enddo
+	 *   lid = t+1
+	 * endif
+	 */
+	
+	if (ndim==0) 
+	    return(make_assign_statement(entity_to_expression(lid),
+					 int_to_expression(1)));
+	
+	value = make_call_expression(minus,
+	    CONS(EXPRESSION, psi(1),
+	    CONS(EXPRESSION, 
+		 copy_expression(dimension_lower(FindIthDimension(proc, 1))),
+		 NIL)));
+	
+	for(i=2;
+	    i<=ndim;
+	    i++)
+	{
+	    dimension
+		dim = FindIthDimension(proc, i);
+	    expression
+		t1 = make_call_expression(minus,
+		     CONS(EXPRESSION, copy_expression(dimension_upper(dim)),
+		     CONS(EXPRESSION, copy_expression(dimension_lower(dim)),
+			  NIL))),
+		t2 = make_call_expression(plus,
+		     CONS(EXPRESSION, t1,
+		     CONS(EXPRESSION, int_to_expression(1),
+			  NIL))),
+		t3 = make_call_expression(multiply,
+		     CONS(EXPRESSION, t2,
+		     CONS(EXPRESSION, value,
+			  NIL))),
+		t4 = make_call_expression(minus,
+		     CONS(EXPRESSION, psi(i),
+		     CONS(EXPRESSION, copy_expression(dimension_lower(dim)),
+			  NIL)));
+	
+	    value = make_call_expression(plus,
+		    CONS(EXPRESSION, t3,
+		    CONS(EXPRESSION, t4,
+			 NIL)));
+	}
+    
+	value = MakeBinaryCall(plus, value, int_to_expression(1));
+	return(make_assign_statement(entity_to_expression(lid), value));
+    }
 }
 
 /* static statement add_2(exp)
@@ -520,7 +603,7 @@ entity array;
 tag move;
 {
     entity
-	proc = template_to_processors(array_to_template(array));
+	proc = array_to_processors(array);
     statement
 	stat = statement_undefined;
 
@@ -568,7 +651,7 @@ entity array;
 tag move;
 {
     entity
-	proc = template_to_processors(array_to_template(array));
+	proc = array_to_processors(array);
     statement
 	stat = statement_undefined;
 
@@ -593,6 +676,34 @@ tag move;
  *
  * ??? the variables are not generated in the right module
  *
+ * code to be generated:
+ * 
+ * Host:
+ *
+ * [ IF condition then ]
+ *     DO host_proc_loop
+ *         host_pre_io
+ *         DO host_scan_loop
+ *            host_deduce
+ *            host_in_io
+ *         ENDDO
+ *         host_post_io
+ *     ENDDO
+ * [ ENDIF ]
+ *
+ * Node:
+ *
+ * [ IF condition then ]
+ *     node_defproc
+ *     [ IF proc_cond then ]
+ *         node_pre_io
+ *         DO node_scan_loop
+ *            node_deduce
+ *            node_in_io
+ *         ENDDO
+ *         node_post_io
+ *     [ ENDIF ]
+ * [ ENDIF ]
  *
  */
 void generate_io_statements_for_distributed_arrays
@@ -607,7 +718,8 @@ list parameters, processors, scanners, rebuild;
 statement *psh, *psn;
 {
     entity
-	proc = template_to_processors(array_to_template(array));
+	proc = array_to_processors(array),
+	divide = hpfc_name_to_entity(IDIVIDE);
     Psysteme
 	/* proc_cond computation:
 	 * well, it may have been kept before the new loop bound computation?
@@ -617,16 +729,7 @@ statement *psh, *psn;
 	proc_cond = (sc_nredund(&proc_cond_tmp),
 		     non_redundent_subsystem(proc_cond_tmp, proc_decl));
     statement
-	inner_host_proc = statement_undefined,
-	inner_host_scan = statement_undefined,
-	inner_node_scan = statement_undefined,
 	node_tmp = statement_undefined,
-	host_proc_loop = 
-	    systeme_to_loop_nest(proc_echelon, processors, &inner_host_proc),
-	host_scan_loop = 
-	    systeme_to_loop_nest(tile_echelon, scanners, &inner_host_scan),
-	node_scan_loop = 
-	    systeme_to_loop_nest(tile_echelon, scanners, &inner_node_scan),
 	node_defproc = define_node_processor_id(proc),
 	node_deduce = generate_deducables(rebuild),
 	host_deduce = generate_deducables(rebuild),
@@ -635,78 +738,35 @@ statement *psh, *psn;
 	h_post = host_post_io(array, move),
 	n_pre = node_pre_io(array, move),
 	n_in = node_in_io(array, move),
-        n_post = node_post_io(array, move);
+        n_post = node_post_io(array, move),
+	host_scan_loop = 
+	    systeme_to_loop_nest
+		(tile_echelon, 
+		 scanners, 
+		 make_block_statement(CONS(STATEMENT, host_deduce,
+				      CONS(STATEMENT, h_in,
+					   NIL))),
+		 divide),
+	host_proc_loop = 
+	    systeme_to_loop_nest
+		(proc_echelon, 
+		 processors, 
+		 make_block_statement(CONS(STATEMENT, h_pre,
+				      CONS(STATEMENT, host_scan_loop,
+				      CONS(STATEMENT, h_post,
+					   NIL)))),
+		 divide),
+	node_scan_loop = 
+	    systeme_to_loop_nest
+		(tile_echelon, 
+		 scanners, 	
+		 make_block_statement(CONS(STATEMENT, node_deduce,
+				      CONS(STATEMENT, n_in,
+					   NIL))),
+		 divide);
 
-    ifdebug(8)
-    {
-	fprintf(stderr, 
-		"[generate_io_statements_for_distributed_array] statements:\n");
-	fprintf(stderr, "Host:\n");
-	fprintf(stderr, "host_pre_io:\n");
-	print_statement(h_pre);
-	fprintf(stderr, "host_deduce:\n");
-	print_statement(host_deduce);
-	fprintf(stderr, "host_in_io:\n");
-	print_statement(h_in);
-	fprintf(stderr, "host_post_io:\n");
-	print_statement(h_post);
-	fprintf(stderr, "Node:\n");
-	fprintf(stderr, "node_pre_io:\n");
-	print_statement(n_pre);
-	fprintf(stderr, "node_deduce:\n");
-	print_statement(node_deduce);
-	fprintf(stderr, "node_in_io:\n");
-	print_statement(n_in);
-	fprintf(stderr, "node_post_io:\n");
-	print_statement(n_post);
-    }
-
-    /*
-     * code to be generated:
-     * 
-     * Host:
-     *
-     * [ IF condition then ]
-     *     DO host_proc_loop
-     *         host_pre_io
-     *         DO host_scan_loop
-     *            host_deduce
-     *            host_in_io
-     *         ENDDO
-     *         host_post_io
-     *     ENDDO
-     * [ ENDIF ]
-     *
-     * Node:
-     *
-     * [ IF condition then ]
-     *     node_defproc
-     *     [ IF proc_cond then ]
-     *         node_pre_io
-     *         DO node_scan_loop
-     *            node_deduce
-     *            node_in_io
-     *         ENDDO
-     *         node_post_io
-     *     [ ENDIF ]
-     * [ ENDIF ]
-     */
-     
-    loop_body(instruction_loop(statement_instruction(inner_host_scan))) = 
-	make_block_statement(CONS(STATEMENT, host_deduce,
-			     CONS(STATEMENT, h_in,
-				  NIL)));
-    loop_body(instruction_loop(statement_instruction(inner_host_proc))) = 
-	make_block_statement(CONS(STATEMENT, h_pre,
-			     CONS(STATEMENT, host_scan_loop,
-			     CONS(STATEMENT, h_post,
-				  NIL))));
     *psh = generate_optional_if(condition, host_proc_loop);
 
-    loop_body(instruction_loop(statement_instruction(inner_node_scan))) = 
-	make_block_statement(CONS(STATEMENT, node_deduce,
-			     CONS(STATEMENT, n_in,
-				  NIL)));
     node_tmp = 
 	make_block_statement(CONS(STATEMENT, n_pre,
 			     CONS(STATEMENT, node_scan_loop,
@@ -733,6 +793,84 @@ statement *psh, *psn;
 	fprintf(stderr, "Node:\n");
 	print_statement(*psn);
     }
+}
+
+/*
+ * generate_io_statements_for_shared_arrays
+ *
+ * code to be generated:
+ *
+ * Host:
+ *
+ * [ IF condition then ]
+ *     init_send
+ *     DO scanners
+ *         rebuild
+ *         pack
+ *     ENDDO
+ *     host_cast
+ * [ ENDIF ]
+ *
+ * Node:
+ *
+ * [ IF condition then ]
+ *     receive_hcast
+ *     DO scanners
+ *        rebuild
+ *        unpack
+ *     ENDDO
+ * [ ENDIF ]
+ *
+ */
+void generate_io_statements_for_shared_arrays
+  (array, move,
+   condition, echelon,
+   parameters, scanners, rebuild,
+   psh, psn)
+entity array;
+tag move;
+Psysteme condition, echelon;
+list parameters, scanners, rebuild;
+statement *psh, *psn;
+{
+    entity
+	divide = hpfc_name_to_entity(IDIVIDE);
+    statement
+	h_pre = hpfc_initsend(),
+	h_rebuild = generate_deducables(rebuild),
+	h_pack = hpfc_pack(array, FALSE),
+	h_cast = hpfc_hcast(),
+	n_rcv = hpfc_nrecv(TRUE),
+	n_rebuild = generate_deducables(rebuild),
+	n_unpack = hpfc_unpack(array, FALSE),
+	h_scan = systeme_to_loop_nest
+	             (echelon, 
+		      scanners,
+		      make_block_statement(CONS(STATEMENT, h_rebuild,
+					   CONS(STATEMENT, h_pack,
+						NIL))),
+		      divide),
+	n_scan = systeme_to_loop_nest
+	             (echelon, 
+		      scanners,
+		      make_block_statement(CONS(STATEMENT, n_rebuild,
+					   CONS(STATEMENT, n_unpack,
+						NIL))),
+		      divide);
+
+    pips_assert("generate_io_statements_for_shared_arrays",
+		movement_update_p(move));
+
+    *psh = generate_optional_if(condition,
+				make_block_statement(CONS(STATEMENT, h_pre,
+						     CONS(STATEMENT, h_scan,
+						     CONS(STATEMENT, h_cast,
+							  NIL)))));
+
+    *psn = generate_optional_if(condition,
+				make_block_statement(CONS(STATEMENT, n_rcv,
+						     CONS(STATEMENT, n_scan,
+							  NIL))));
 }
 
 /*
