@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS STuff
-# $RCSfile: make-tags,v $ ($Date: 1995/08/08 17:32:36 $, )
+# $RCSfile: make-tags,v $ ($Date: 1996/06/13 23:24:29 $, )
 # version $Revision$,
 # got on %D%, %T%
 # %A%
@@ -32,7 +32,7 @@ FILES=/tmp/PIPS-FILES
 # only directories in this variable
 #
 
-PATHNAME_LIST="${PIPS_DEVEDIR}/Lib/[a-z]* ${PIPS_DEVEDIR}/Passes/[a-z]* ${PIPS_INCLUDEDIR} ${PIPS_EXTEDIR} ${NEWGENDIR}/C"
+PATHNAME_LIST="${PIPS_DEVEDIR}/Lib/[a-z]* ${PIPS_DEVEDIR}/Passes/[a-z]* ${PIPS_INCLUDEDIR} ${PIPS_EXTEDIR} ${NEWGEN_DIR}/C"
 
 rm -f $FILES $TAGS
 
@@ -50,11 +50,11 @@ done >> $FILES
 
 ${PIPS_ETAGS} -f ${TAGS} `cat ${FILES}` 2>/dev/null
 
-cp ${TAGS} ${PIPSDIR}/Tags/TAGS
+cp ${TAGS} ${PIPS_DIR}/Tags/TAGS
 
 rm -f ${TAGS} ${FILES}
-(cd $LINEARDIR/Development; rm -f TAGS; make TAGS)
-cat ${HOME}/C3/Linear/Development/TAGS >>${PIPSDIR}/Tags/TAGS
+(cd $LINEAR_DIR/Development; rm -f TAGS; make TAGS)
+cat ${HOME}/C3/Linear/Development/TAGS >>${PIPS_DIR}/Tags/TAGS
 
 #
 # that's all
