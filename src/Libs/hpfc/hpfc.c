@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.96  1997/04/17 18:46:11  coelho
+ * *** empty log message ***
+ *
  * Revision 1.95  1997/04/16 13:14:56  coelho
  * cleaner...
  *
@@ -460,6 +463,11 @@ bool hpfc_init(string name)
     set_bool_property("GLOBAL_EFFECTS_TRANSLATION", FALSE);
     set_bool_property("WARNING_ON_STAT_ERROR", FALSE); /* for my fake files */
     set_bool_property("PRETTYPRINT_IO_EFFECTS", FALSE); /* no LUNS(*) ! */
+
+    /* too verbose... */
+    set_bool_property("UNSPAGHETTIFY_DISPLAY_STATISTICS", FALSE);
+    set_bool_property("CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS", FALSE);
+    set_bool_property("WARN_ABOUT_EMPTY_SEQUENCES", FALSE);
 
     /* where the specials dummy/variables are stored... ??? */
     (void) make_empty_program(HPFC_PACKAGE);
