@@ -33,6 +33,13 @@
 #define LINE_PREFIX "C\t\t                  "
 #define LINE_SUFFIX "\n"
 
+/* new definitions for action interpretation
+ */
+#define ACTION_read 	"read   "
+#define ACTION_write	"written"
+#define ACTION_in   	"imported"
+#define ACTION_out	"exported"
+
 /* ======================================================================== */
 /* int compare_effect_reference(e1, e2):
  *
@@ -128,16 +135,22 @@ update_an_effect_type(bool * exist_flag,
  * prettyprint format. This is to avoid the problem occuring when the
  * buffer used in effect_to_string() is too small.
  */
-text
-simple_effects_to_text(list sefs_list)
+
+#define may_be 		"C\t\t<may be "
+#define must_be 	"C\t\t<must be "
+#define must_end	">:"
+#define may_end  	" " must_end
+
+static text
+simple_effects_to_text(list sefs_list, string ifread, string ifwrite)
 {
   text sefs_text = make_text(NIL);
   text rt, wt, Rt, Wt;
   char *t = NULL;
-  static char r[MAX_LINE_LENGTH];
-  static char w[MAX_LINE_LENGTH];
-  static char R[MAX_LINE_LENGTH];
-  static char W[MAX_LINE_LENGTH];
+  char r[MAX_LINE_LENGTH]; /* !!! HUM... */
+  char w[MAX_LINE_LENGTH];
+  char R[MAX_LINE_LENGTH];
+  char W[MAX_LINE_LENGTH];
   list ce;
 
   /* These booleans are used to say if a given type of effect is not
@@ -153,26 +166,12 @@ simple_effects_to_text(list sefs_list)
 
   /* These four buffers are used to build the current line of prettyprint
      for a given type of effect. */
-  if (get_read_action_interpretation() == READ_IS_READ)
-  {
-      r[0] = '\0'; (void) strcat(r, "C\t\t<may be read    >:");
-      R[0] = '\0'; (void) strcat(R, "C\t\t<must be read   >:");      
-  }
-  else
-  {
-      r[0] = '\0'; (void) strcat(r, "C\t\t<may be imported >:");
-      R[0] = '\0'; (void) strcat(R, "C\t\t<must be imported>:");      
-  }
-  if (get_write_action_interpretation() == WRITE_IS_WRITE)
-  {
-      w[0] = '\0'; (void) strcat(w, "C\t\t<may be written >:");
-      W[0] = '\0'; (void) strcat(W, "C\t\t<must be written>:");
-  }
-  else
-  {
-      w[0] = '\0'; (void) strcat(w, "C\t\t<may be exported >:");
-      W[0] = '\0'; (void) strcat(W, "C\t\t<must be exported>:");
-  }
+  
+  r[0] = '\0'; (void) strcat(r, concatenate(may_be, ifread, may_end, NULL));
+  R[0] = '\0'; (void) strcat(R, concatenate(must_be, ifread, must_end, NULL));
+  w[0] = '\0'; (void) strcat(w, concatenate(may_be, ifwrite, may_end, NULL));
+  W[0] = '\0'; (void) strcat(W, concatenate(must_be, ifwrite, must_end, NULL));
+
 
   /* These four "texts" are used to build all the text of prettyprint
      for a given type of effect. Each sentence contains one line. */
@@ -243,6 +242,13 @@ simple_effects_to_text(list sefs_list)
   return (sefs_text);
 }
 
+/* external interfaces
+ */
+text simple_rw_effects_to_text(list l) 
+{ return simple_effects_to_text(l, ACTION_read, ACTION_write);}
+
+text simple_inout_effects_to_text(list l)
+{ return simple_effects_to_text(l, ACTION_in, ACTION_out);}
 
 string
 effect_to_string(eff)
