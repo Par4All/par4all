@@ -113,8 +113,8 @@ Value *pmin, *pmax;
     Pcontrainte pc;
     Pbase b;
 
-    *pmax =  INT_MAX;
-    *pmin = INT_MIN;
+    *pmax =  VALUE_MAX;
+    *pmin = VALUE_MIN;
 
     if (sc_value_of_variable(ps, var, &val) == TRUE) {
 	*pmin = val;
@@ -186,13 +186,13 @@ Pbase b;
 	boolean faisable =  sc_minmax_of_variable(sc,var1, &min, &max);
 
 	if (faisable ) {
-	    if (min != INT_MIN) {
+	    if (min != VALUE_MIN) {
 		pv2 = vect_new(var1,-1);
 		pv2 = vect_add(pv2,vect_new(TCST,min));
 		pc = contrainte_make(pv2);
 		sc_add_ineg(ps2,pc);
 	    }
-	    if (max != INT_MAX) {
+	    if (max != VALUE_MAX) {
 		pv2 = vect_new(var1,1);
 		pv2 = vect_add(pv2,vect_new(TCST,-max));
 		pc = contrainte_make(pv2);
@@ -553,15 +553,15 @@ boolean sc_minmax_of_variable2(Psysteme ps, Variable var, int * pmin, int * pmax
 		ps = SC_UNDEFINED;
 	    }
 	    else {
-		*pmin = INT_MIN;
-		*pmax = INT_MAX;
+		*pmin = VALUE_MIN;
+		*pmax = VALUE_MAX;
 	    }
 	}
     }
 
     if(!feasible_p) {
-	*pmin = INT_MIN;
-	*pmax = INT_MAX;
+	*pmin = VALUE_MIN;
+	*pmax = VALUE_MAX;
     }
     else {
 	/* I'm afraid of sc_minmax_of_variable() behavior... 
