@@ -19,7 +19,6 @@
 #include "ri-util.h"
 /* #include "constants.h" */
 #include "misc.h"
-#include "list.h"
 
 /* AP: I removed this include because it no longer exists
 #include "loop_normalize.h" */
