@@ -248,7 +248,7 @@ Psysteme sc;
 
 	empty = vect_size(eq) == 1 && vecteur_var(eq) == TCST;
 	if(empty)
-	    assert(vecteur_val(eq)==1);
+	    assert(vecteur_val(eq)!=0);
     }
     return empty;
 }
