@@ -31,6 +31,7 @@
 
 /* prettyprint function types:
  */
+#include "text.h" /* hum... */
 typedef text (*generic_text_function)(list /* of effect */);
 typedef void (*generic_prettyprint_function)(list /* of effect */);
 typedef void (*generic_attachment_function)(text);
