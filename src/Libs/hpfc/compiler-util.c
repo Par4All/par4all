@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compiler-util.c,v $ ($Date: 1996/06/12 15:55:59 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1996/06/12 16:39:39 $, )
  * version $Revision$
  */
 
@@ -19,12 +19,9 @@ list l;
 /******************************************************* EMPTY STATEMENTS */
 static bool statement_is_empty;
 
-#define ENTITY_CONTINUE_P(e) \
-    (strcmp(entity_local_name(e), CONTINUE_FUNCTION_NAME))
-
 static bool cannot_be_empty(gen_chunk* x)
 {
-    statement_is_empty=FALSE;
+    statement_is_empty = FALSE;
     gen_recurse_stop(NULL);
     return FALSE;
 }
