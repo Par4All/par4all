@@ -1,7 +1,7 @@
 c
 c everything about packing
 c
-c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/12/22 16:59:54 $, )
+c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1995/09/07 11:13:06 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -25,8 +25,8 @@ define(`GENERIC_PACKING',`dnl
 pushdef(`LEVEL',$1)dnl
 pushdef(`PVMFUNCTION',$2)dnl
 pushdef(`NAME',$3)dnl
-pushdef(`TYPE',$4)dnl
-pushdef(`PVMTYPE',$5)dnl
+pushdef(`PVMTYPE',$4)dnl
+pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
 c
 c Packing LEVEL dimensional array
 c
@@ -61,38 +61,29 @@ popdef(`TYPE')dnl
 popdef(`PVMTYPE')dnl')dnl
 c
 define(ONE_PACKING,`
-GENERIC_PACKING($1,pvmfpack,PACK,$2,$3)
-GENERIC_PACKING($1,pvmfunpack,UNPACK,$2,$3)')dnl
+GENERIC_PACKING($1,pvmfpack,PACK,$2)
+GENERIC_PACKING($1,pvmfunpack,UNPACK,$2)')dnl
 define(ALLPACK,`
 c ----------------------------------------
 c
-c Packing serie for type $1, pvm $2
+c Packing serie for pvmtype $1
 c
-ONE_PACKING(1,$1,$2)
-ONE_PACKING(2,$1,$2)
-ONE_PACKING(3,$1,$2)
-ONE_PACKING(4,$1,$2)
-c ONE _PACKING(5,$1,$2)
-c ONE _PACKING(6,$1,$2)
-c ONE _PACKING(7,$1,$2)
+ONE_PACKING(1,$1)
+ONE_PACKING(2,$1)
+ONE_PACKING(3,$1)
+ONE_PACKING(4,$1)
+dnl ONE_PACKING(5,$1)
+dnl ONE_PACKING(6,$1)
+dnl ONE_PACKING(7,$1)
 c')dnl
 c
-c ALL PACK(byte,BYTE1)
-c ALL PACK(integer*2,INTEGER2)
-ALLPACK(integer*4,INTEGER4)
-ALLPACK(real*4,REAL4)
-ALLPACK(real*8,REAL8)
-c ALL PACK(complex*8,COMPLEX8)
-c ALL PACK(complex*16,COMPLEX16)
+dnl ALLPACK(BYTE1)
+dnl ALLPACK(INTEGER2)
+ALLPACK(INTEGER4)
+ALLPACK(REAL4)
+ALLPACK(REAL8)
+dnl ALLPACK(COMPLEX8)
+dnl ALLPACK(COMPLEX16)
 c
 c that is all
 c
-
-
-
-
-
-
-
-
-
