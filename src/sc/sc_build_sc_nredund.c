@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 2000/07/19 15:25:10 $, 
+ * $Date: 2000/07/21 13:23:44 $, 
  */
 
 #include <stdio.h>
@@ -171,6 +171,7 @@ int ofl_ctrl;
 	contrainte_reverse(ineg);
 	
 	sc_add_inegalite(sc,ineg);
+
 	if (sc_rational_feasibility_ofl_ctrl(sc,ofl_ctrl,TRUE))
 	    contrainte_reverse(ineg);
 	else {
