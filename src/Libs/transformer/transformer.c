@@ -179,7 +179,10 @@ transformer_normalize(transformer t)
 	 * for preconditions, 4 minutes between split ocean.f and
 	 * OCEAN.prec
 	 */
-	r = sc_strong_normalize(r);
+	/* r = sc_strong_normalize(r); */
+
+	/* Similar, but constants are actually propagated */
+	r = sc_strong_normalize2(r);
 
 	if (SC_EMPTY_P(r)) {
 	    r = sc_empty(b);
@@ -523,12 +526,15 @@ bool transformer_empty_p(transformer t)
     /* FI: the arguments seem to have no impact on the emptiness
      * (i.e. falseness) of t
      */
-  predicate pred = transformer_relation(t);
-  Psysteme ps = predicate_system(pred);
-  bool empty_p = FALSE;
+    predicate pred = transformer_relation(t);
+    Psysteme ps = predicate_system(pred);
+    bool empty_p = FALSE;
 
-  empty_p = !sc_faisabilite(ps);
+    empty_p = !sc_faisabilite(ps);
 
-  return empty_p;
+    /* empty_p = !sc_faisabilite(ps); */
+    empty_p = !sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL, TRUE);
+
+    return empty_p;
 }
 
