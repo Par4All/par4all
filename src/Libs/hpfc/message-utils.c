@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1995/12/26 16:23:45 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1996/03/11 17:46:39 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -686,44 +686,33 @@ expression *pguard;
 
 	 if ((rlo==rup) && (sz!=1) && (rlo>=lo) && (rup<=up))
 	 {
-	     /*
-	      * MYPOS(i, procnum).EQ.nn
+	     /* MYPOS(i, procnum).EQ.nn
 	      */
 	     conjonction = 
-		 CONS(EXPRESSION,
-		      MakeBinaryCall(entity_intrinsic(EQUAL_OPERATOR_NAME),
-				     make_mypos_expression(i, procnum),
-				     rloexpr),
-		      conjonction);
+		CONS(EXPRESSION,
+		     eq_expression(make_mypos_expression(i, procnum), rloexpr),
+		     conjonction);
 	 }
 	 else
 	 {
 	     if (rlo>lo)
 	     {
-		 /*
-		  * MYPOS(i, procnum).GE.(rloexpr)
+		 /* MYPOS(i, procnum).GE.(rloexpr)
 		  */
 		 conjonction =
-		     CONS(EXPRESSION,
-			  MakeBinaryCall
-			  (entity_intrinsic(GREATER_OR_EQUAL_OPERATOR_NAME),
-			   make_mypos_expression(i, procnum),
-			   rloexpr),
-			  conjonction);
+		   CONS(EXPRESSION,
+		     ge_expression(make_mypos_expression(i, procnum), rloexpr),
+			conjonction);
 	     }
 
 	     if (rup<up)
 	     {
-		 /*
-		  * MYPOS(i, procnum).LT.(rupexpr)
+		 /* MYPOS(i, procnum).LT.(rupexpr)
 		  */
 		 conjonction =
-		     CONS(EXPRESSION,
-			  MakeBinaryCall
-			  (entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
-			   make_mypos_expression(i, procnum),
-			   rupexpr),
-			  conjonction);
+		   CONS(EXPRESSION,
+		     le_expression(make_mypos_expression(i, procnum), rupexpr),
+			conjonction);
 	     }
 	 }
      }
