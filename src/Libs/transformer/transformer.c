@@ -146,6 +146,7 @@ transformer_normalize(transformer t)
 
 	if (SC_EMPTY_P(r)) {
 	    r = sc_empty(b);
+	    predicate_system(transformer_relation(t)) = r;
 	}
 	else 
 	    base_rm(b);
@@ -477,3 +478,18 @@ bool statement_feasible_p(statement s)
   /* Renvoie l'utilite' : */  
   return sc_faisabilite(ps);
 }
+
+bool transformer_empty_p(transformer t)
+{
+    /* FI: the arguments seem to have no impact on the emptiness
+     * (i.e. falseness) of t
+     */
+  predicate pred = transformer_relation(t);
+  Psysteme ps = predicate_system(pred);
+  bool empty_p = FALSE;
+
+  empty_p = !sc_faisabilite(ps);
+
+  return empty_p;
+}
+
