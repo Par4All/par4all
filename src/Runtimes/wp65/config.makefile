@@ -1,9 +1,7 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1995/11/30 14:59:20 $ 
+# $Date: 1996/07/11 13:27:07 $ 
 
-CC	=	$(WP65_CC)
-CFLAGS	=	$(WP65_CFLAGS)
-CPPFLAGS=	$(WP65_CPPFLAGS)
+CPPFLAGS+=	$(WP65_ADDED_CPPFLAGS)
 
 LOCAL_LIB=	libwp65runtime.a
 CFILES=		lance_wp65.c
@@ -14,6 +12,7 @@ SOURCES=	$(CONFIG_FILE) \
 		Makefile.compile_wp65
 
 OFILES=	$(CFILES:.c=.o)
+# OFILES:= $(addprefix $(ARCH)/, $(CFILES))
 
 #
 # installation
@@ -39,9 +38,6 @@ all: $(LOCAL_LIB) .runable
 .runable: compile_wp65
 	chmod a+x compile_wp65
 	touch $@
-
-.c.o:
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
 
 $(LOCAL_LIB):	$(OFILES)
 	$(AR) $(ARFLAGS) $(LOCAL_LIB) $(OFILES)
