@@ -3,6 +3,9 @@ dnl GENERAL M4 MACROS
 dnl
 dnl $Id$
 dnl $Log: hpfc_lib_m4_macros,v $
+dnl Revision 1.15  1997/07/03 11:05:02  zory
+dnl pvm constructions replaced by hpfc ones
+dnl
 dnl Revision 1.14  1997/06/10 09:47:18  zory
 dnl M4_PVM_LENGTH is now working on HPFC types
 dnl
@@ -62,11 +65,12 @@ dnl
 define(`M4_PVM_LENGTH',`dnl
 ifelse($1,`HPFC BYTE1',1,$1,`HPFC INTEGER2',2,$1,`HPFC INTEGER4',4,dnl
 $1,`HPFC REAL4',4,$1,`HPFC REAL8',8,$1,`HPFC COMPLEX8',8,dnl
-$1,`HPFC COMPLEX16',16)')dnl
+$1,`HPFC COMPLEX16',16,$1,`HPFC STRING',1)')dnl
 define(`m4_type_name',`dnl
 ifelse($1,`HPFC BYTE1',byte,dnl
 $1,`HPFC INTEGER2',integer*2,dnl
 $1,`HPFC INTEGER4',integer*4,dnl
+$1,`HPFC STRING',character,dnl
 $1,`HPFC REAL4',real*4,dnl
 $1,`HPFC REAL8',real*8,dnl
 $1,`HPFC COMPLEX8',complex*8,dnl
