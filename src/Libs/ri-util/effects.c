@@ -5,7 +5,7 @@
 
 #include "ri.h"
 
-#include"mapping.h"
+/* #include"mapping.h" */
 #include "misc.h"
 
 #include "ri-util.h"
