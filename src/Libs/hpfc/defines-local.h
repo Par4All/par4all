@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * (E%, ) 
+ * ($Date: 1995/08/11 08:57:24 $, ) 
  */
 
 /* Most includes are centralized here.
