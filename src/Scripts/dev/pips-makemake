@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/11 21:59:49 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/12 10:40:21 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -393,19 +393,16 @@ SOURCES+= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES) $(DOCS)
 
 test: all
 	$(LINK) $(ARCH)/pips -lpips $(PIPS_LIBS) 
-	@test $(ARCH) -eq . || ln -sf $(ARCH)/pips
 	@echo 
 
 wtest: all
 	$(LINK) $(ARCH)/wpips $(WPIPS_ADDED_LDFLAGS) -lwpips \\
 		$(PIPS_LIBS) $(WPIPS_ADDED_LIBS)
-	@test $(ARCH) -eq . || ln -sf $(ARCH)/wpips
 	@echo 
 
 ttest: all
 	$(LINK) $(ARCH)/tpips -ltpips \\
 		$(PIPS_LIBS) $(TPIPS_ADDED_LIBS)
-	@test $(ARCH) -eq . || ln -sf $(ARCH)/tpips
 	@echo 
 
 # obsolete rule I guess. test is better. FC.
@@ -425,7 +422,8 @@ clobber: clean
 #
 
 clean-compiled:
-	$(RM) $(OBJECTS) $(LIB_TARGET) $(BIN_TARGET) pips tpips wpips
+	$(RM) $(OBJECTS) $(LIB_TARGET) $(BIN_TARGET) \\
+		$(ARCH)/pips $(ARCH)/tpips $(ARCH)/wpips
 
 clean: generate_makefile_if_necessary_and_possible clean-compiled
 	-$(RM) TAGS $(BIN_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
