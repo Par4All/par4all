@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/07 16:39:25 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/07 17:13:39 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -271,9 +271,16 @@ test: $(LIB_TARGET)
 	@echo 
 
 wtest: $(LIB_TARGET) 
-	$(LINK) wpips -static -L$(OPENWINHOME)/lib -lwpips $(PIPS_LIBS)	-lxview -lolgx -lX11
+	$(LINK) wpips \\
+		-static -L$(OPENWINHOME)/lib -lwpips \\
+		$(PIPS_LIBS) -lxview -lolgx -lX11
 	@echo 
 
+ttest: $(LIB_TARGET)
+	$(LINK) tpips -ltpips $(PIPS_LIBS)
+	@echo 
+
+# obsolete rule I guess. test is better. FC.
 $(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
 	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS)
 	@echo 
@@ -303,7 +310,7 @@ INSTALL_TARGETS=	$(INSTALL_FILE) $(INSTALL_LIB) $(INSTALL_EXE)
 
 $(BIN_TARGET): $(INC_TARGET) $(LIB_TARGET)
 	$(LINK) $(BIN_TARGET) $(LIB_TARGET) $(TARGET_LIBS)
-	@echo ''
+	@echo 
 
 clean:
 	-$(RM) TAGS $(OBJECTS) $(BIN_TARGET) $(LIB_TARGET) \\
