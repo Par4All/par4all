@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/12/09 18:33:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/12/09 18:35:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/12/09 18:33:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/12/09 18:35:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -791,6 +791,8 @@ hash_table used_labels;
     }
     union_used_labels( used_labels, block_used_labels);
     
+    hash_table_free(block_used_labels);
+
     pips_debug(5, "Exiting\n");
     ifdebug(1) {
 	check_control_coherency(pred);
