@@ -92,13 +92,13 @@ int k,level;
     matrix_nulle(MAT);
     if (level > 0) {
 	for (i=1;i<=level; i++)
-	    MATRIX_ELEM(MAT,i,i) = 1;
+	    MATRIX_ELEM(MAT,i,i) = VALUE_ONE;
     }
 
     for (i=1+level,j=k; i<=n; i++,j++)
     {
 	if (j == n+1) j = 1 + level;
-	MATRIX_ELEM(MAT,i,j)=1;
+	MATRIX_ELEM(MAT,i,j)=VALUE_ONE;
     }
 }
 
@@ -127,13 +127,13 @@ int k,level;
     matrix_nulle(MAT);
     if(level > 0) {
 	for (i = 1; i <= level;i++)
-	    MATRIX_ELEM(MAT,i,i) = 1;
+	    MATRIX_ELEM(MAT,i,i) = VALUE_ONE;
     }
 
     for(j=1,i=k-level; j <= m - level; j++,i++) {
 	if(i == m-level+1)
 	    i = 1;
-	SUB_MATRIX_ELEM(MAT,i,j,level) = 1;
+	SUB_MATRIX_ELEM(MAT,i,j,level) = VALUE_ONE;
     }
 }
 
@@ -172,8 +172,8 @@ int level;
     int i,j;
     int vali= 0;
     int valj=0;
-    int min;
-    int val;
+    Value min=VALUE_ZERO;
+    Value val=VALUE_ZERO;
     boolean trouve = FALSE;
 
     int n = MATRIX_NB_LINES(MAT);
@@ -181,8 +181,9 @@ int level;
     /*  initialisation du minimum  car recherche d'un minimum non nul*/
     for (i=1+level;i<=n && !trouve;i++)
 	for(j = level+1; j <= m && !trouve; j++) {
-	    min = ABS(MATRIX_ELEM(MAT,i,j));
-	    if(min != 0) {
+	    min = MATRIX_ELEM(MAT,i,j);
+	    min = value_abs(min);
+	    if(value_notzero_p(min)) {
 		trouve = TRUE;
 		vali = i;
 		valj = j;
@@ -190,8 +191,10 @@ int level;
 	}
 
     for (i=1+level;i<=n;i++)
-	for (j=1+level;j<=m && min >1; j++) {
-	    if (((val = ABS(MATRIX_ELEM(MAT,i,j)))!= 0) && (val < min)) {
+	for (j=1+level;j<=m && value_gt(min,VALUE_ONE); j++) {
+	    val = MATRIX_ELEM(MAT,i,j);
+	    val = value_abs(val);
+	    if (value_notzero_p(val) && value_lt(val,min)) {
 		min = val;
 		vali= i;
 		valj =j;
@@ -226,16 +229,17 @@ Pmatrix A;
 Pmatrix P;
 int level;
 {
-    int A11;
+    Value A11;
     int i;
-    int x;
+    Value x;
     int n = MATRIX_NB_LINES(A);
     matrix_identity(P,0);
 
     A11 =SUB_MATRIX_ELEM(A,1,1,level);
     for (i=2+level; i<=n; i++) {
-	x = MATRIX_ELEM(A,i,1+level)/A11;
-	MATRIX_ELEM(P,i,1+level) = - x;
+	x = MATRIX_ELEM(A,i,1+level);
+	value_division(x,A11);
+	MATRIX_ELEM(P,i,1+level) = value_uminus(x);
     }
 }
 
@@ -263,15 +267,15 @@ Pmatrix A;
 Pmatrix Q;
 int level;
 {
-    int A11;
+    Value A11;
     int j;
-    int x;
+    Value x;
     int m= MATRIX_NB_COLUMNS(A);
     matrix_identity(Q,0);
     A11 =SUB_MATRIX_ELEM(A,1,1,level);
     for (j=2+level; j<=m; j++) {
-	x = MATRIX_ELEM(A,1+level,j)/A11;
-	MATRIX_ELEM(Q,1+level,j) = - x;
+	x = value_div(MATRIX_ELEM(A,1+level,j),A11);
+	MATRIX_ELEM(Q,1+level,j) = value_uminus(x);
     }
 }
 
@@ -294,11 +298,11 @@ int level;
     int n = MATRIX_NB_LINES(ID);
     for(i = level+1; i <= n; i++) {
 	for(j = level+1; j <= n; j++)
-	    MATRIX_ELEM(ID,i,j) = 0;
-	MATRIX_ELEM(ID,i,i) = 1;
+	    MATRIX_ELEM(ID,i,j) = VALUE_ZERO;
+	MATRIX_ELEM(ID,i,i) = VALUE_ONE;
     }
 
-    MATRIX_DENOMINATOR(ID) = 1;
+    MATRIX_DENOMINATOR(ID) = VALUE_ONE;
 }
 
 /* boolean matrix_identity_p(Pmatrix ID, int level)
@@ -325,11 +329,11 @@ int level;
     for(i = level+1; i <= n; i++) {
 	for(j = level+1; j <= n; j++) {
 	    if(i==j) {
-		if(	MATRIX_ELEM(ID,i,i) != 1)
+		if(value_notone_p(MATRIX_ELEM(ID,i,i)))
 		    return(FALSE);
 	    }
 	    else			/* i!=j */
-		if(MATRIX_ELEM(ID,i,j) != 0)
+		if(value_notzero_p(MATRIX_ELEM(ID,i,j)))
 		    return(FALSE);
 	}
     }
@@ -392,7 +396,7 @@ int level;
 {
     boolean trouve = FALSE;
     int j;
-    int min,val;
+    Value min = VALUE_ZERO,val=VALUE_ZERO;
     int m = MATRIX_NB_COLUMNS(MAT);
     *lg_nnul = 0;
     *cl_nnul = 0;
@@ -405,14 +409,17 @@ int level;
     /* recherche du plus petit (en valeur absolue) element non nul de cette ligne */
     if (*lg_nnul) {
 	for (j=1+level;j<=m && !trouve; j++) {
-	    min = ABS(MATRIX_ELEM(MAT,*lg_nnul,j));
-	    if (min != 0) {
+	    min = MATRIX_ELEM(MAT,*lg_nnul,j);
+	    min = value_abs(min);
+	    if (value_notzero_p(min)) {
 		trouve = TRUE;
 		*cl_nnul=j;
 	    }
 	}
-	for (j=1+level;j<=m && min >1; j++) {
-	    if (((val = ABS(MATRIX_ELEM(MAT,*lg_nnul,j)))!= 0) && (val < min)) {
+	for (j=1+level;j<=m && value_gt(min,VALUE_ONE); j++) {
+	    val = MATRIX_ELEM(MAT,*lg_nnul,j);
+	    val = value_abs(val);
+	    if (value_notzero_p(val) && value_lt(val,min)) {
 		min = val;
 		*cl_nnul =j;
 	    }
