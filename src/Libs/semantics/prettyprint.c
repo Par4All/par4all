@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/17 09:12:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/12/05 12:48:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/11/17 09:12:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/12/05 12:48:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -151,9 +151,10 @@ bool give_code_p;
 			      ((statement_mapping)
 			       db_get_memory_resource
 			       (DBR_CUMULATED_EFFECTS, module_name, TRUE)));
-    module_to_value_mappings(mod);
 
     debug_on("SEMANTICS_DEBUG_LEVEL");
+
+    module_to_value_mappings(mod);
 
     if(is_user_view) {
 	user_stat =  (statement)
@@ -182,6 +183,8 @@ bool give_code_p;
 			       : DBR_SUMMARY_PRECONDITION,
 			       module_name,
 			       TRUE);
+    /* The summary precondition may be in another module's frame */
+    translate_global_values(mod, summary);
 
     init_prettyprint(semantic_to_text);
 
