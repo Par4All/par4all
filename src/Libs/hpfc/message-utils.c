@@ -1,16 +1,13 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1995/10/04 10:54:02 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1995/10/10 11:38:11 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
  */
 
 #include "defines-local.h"
-
 #include "access_description.h"
-
-entity CreateIntrinsic(string name); /* in syntax.h */
 
 /* returns the index of an affine vector
  */
@@ -734,7 +731,7 @@ expression *pguard;
 
 	 if (rlo>rup) /* empty match case */
 	 {
-	     (*pguard) = entity_to_expression(CreateIntrinsic(".FALSE."));
+	     (*pguard) = entity_to_expression(entity_intrinsic(".FALSE."));
 	     return(TRUE); /* ??? memory leak with the content of conjonction */
 	 }
 
@@ -745,7 +742,7 @@ expression *pguard;
 	      */
 	     conjonction = 
 		 CONS(EXPRESSION,
-		      MakeBinaryCall(CreateIntrinsic(EQUAL_OPERATOR_NAME),
+		      MakeBinaryCall(entity_intrinsic(EQUAL_OPERATOR_NAME),
 				     make_mypos_expression(i, procnum),
 				     rloexpr),
 		      conjonction);
@@ -760,7 +757,7 @@ expression *pguard;
 		 conjonction =
 		     CONS(EXPRESSION,
 			  MakeBinaryCall
-			  (CreateIntrinsic(GREATER_OR_EQUAL_OPERATOR_NAME),
+			  (entity_intrinsic(GREATER_OR_EQUAL_OPERATOR_NAME),
 			   make_mypos_expression(i, procnum),
 			   rloexpr),
 			  conjonction);
@@ -774,7 +771,7 @@ expression *pguard;
 		 conjonction =
 		     CONS(EXPRESSION,
 			  MakeBinaryCall
-			  (CreateIntrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
+			  (entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
 			   make_mypos_expression(i, procnum),
 			   rupexpr),
 			  conjonction);
