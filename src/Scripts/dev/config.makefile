@@ -1,5 +1,5 @@
 #
-# $RCSfile: config.makefile,v $ for dev
+# $Id$
 #
 
 UTILS=		pips-makemake \
@@ -16,7 +16,8 @@ SCRIPTS = 	$(UTILS) \
 		pips-experiment \
 		pips_at_night \
 		pips_at_night_at_cri \
-		remove_from_sccs_file
+		remove_from_sccs_file \
+		build_so_files
 
 SRC_MACROS =	auto.h \
 		define_libraries.sh \
