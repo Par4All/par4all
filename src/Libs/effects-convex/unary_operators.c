@@ -12,6 +12,8 @@
 #include <string.h>
 
 #include "genC.h"
+#include "ri.h"
+#include "ri-util.h"
 
 #include "properties.h"
 
