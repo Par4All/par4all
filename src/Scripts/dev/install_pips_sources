@@ -3,6 +3,9 @@
 # $Id$
 # 
 # $Log: install_pips_sources,v $
+# Revision 1.18  1997/08/06 12:23:11  coelho
+# co afert -ko.
+#
 # Revision 1.17  1997/05/22 08:50:55  coelho
 # debug off.
 #
@@ -239,8 +242,9 @@ do
 	cmp -s $item ,$item && rm -f ,$item
       }
       is_rcs && { 
-	ci -u "$item"
+	ci "$item"
 	rcs -ko "$item"
+        co "$item"
       }
     fi
   else
