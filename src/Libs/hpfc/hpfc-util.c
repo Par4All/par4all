@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/09/12 14:34:30 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/09/13 14:41:26 $, )
  * version $Revision$
  */
 
@@ -239,67 +239,8 @@ gen_chunk* obj;
     return result;
 }
 
-/* -------------------------------------------------------------
- *
- * New Temporary Variables MANAGEMENT
- *
+/* hmmm...
  */
-
-static int 
-    unique_integer_number = 0,
-    unique_float_number = 0,
-    unique_logical_number = 0,
-    unique_complex_number = 0;
-
-void reset_unique_numbers()
-{
-    unique_integer_number=0;
-    unique_float_number=0;
-    unique_logical_number=0;
-    unique_complex_number=0;
-}
-
-entity NewTemporaryVariable(module, base)
-entity module;
-basic base;
-{
-    char buffer[20];
-    entity e;
-
-    do
-    {
-	switch(basic_tag(base))
-	{
-	case is_basic_int:
-	    sprintf(buffer,"%s%d", HPFINTPREFIX, unique_integer_number++);
-	    break;
-	case is_basic_float:
-	    sprintf(buffer,"%s%d", HPFFLOATPREFIX, unique_float_number++);
-	    break;
-	case is_basic_logical:
-	    sprintf(buffer,"%s%d", HPFLOGICALPREFIX, unique_logical_number++);
-	    break;
-	case is_basic_complex:
-	    sprintf(buffer,"%s%d", HPFCOMPLEXPREFIX, unique_complex_number++);
-	    break;
-	default:
-	    pips_error("NewTemporaryVariable", "basic not welcomed, %d\n",
-		       basic_tag(base));
-	    break;
-	}
-    }
-    while(gen_find_tabulated
-      (concatenate(module_local_name(module), MODULE_SEP_STRING, buffer, NULL),
-       entity_domain)!=entity_undefined);
-
-    pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(base));
-
-    e = make_scalar_entity(buffer, module_local_name(module), base);
-    AddEntityToDeclarations(e, module);
-    
-    return e;
-}
-
 entity FindOrCreateEntityLikeModel(package, name, model)
 string package, name;
 entity model;
