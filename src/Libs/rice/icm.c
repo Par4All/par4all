@@ -828,6 +828,7 @@ invariant_code_motion(string module_name)
 
 //    DB_PUT_MEMORY_RESOURCE(what, module_name, (char*) mod_stat);
 
+
     dg = graph_undefined;
     reset_current_module_statement();
     reset_current_module_entity();
