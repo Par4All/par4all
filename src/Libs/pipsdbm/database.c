@@ -17,6 +17,8 @@
  */
 #define db_resource_stored_p(r) db_status_stored_p(db_resource_db_status(r))
 #define db_resource_loaded_p(r) db_status_loaded_p(db_resource_db_status(r))
+#define db_resource_required_p(r) \
+        db_status_required_p(db_resource_db_status(r))
 
 /* module names must use some characters.
  */
@@ -86,14 +88,31 @@ void db_reset_pips_database_if_necessary(void)
 
 /******************************************************** LOAD/SAVE RESOURCE */
 
+static string db_status_string(db_status s)
+{
+  if (db_status_undefined_p(s))
+    return "undefined";
+  switch (db_status_tag(s))
+  {
+  case is_db_status_stored: 
+    return "stored";
+  case is_db_status_loaded: 
+    return "loaded";
+  case is_db_status_required: 
+    return "required";
+  default:
+    pips_internal_error("unexpected db_status tag %d\n", db_status_tag(s));
+    return NULL;
+  }
+}
+
 static void dump_db_resource(string rname, string oname, db_resource r)
 {
     pips_debug(1, "rname=%s, oname=%s, r=%p\n", rname, oname, r);
     if (!db_resource_undefined_p(r)) {
 	db_status s = db_resource_db_status(r);
 	pips_debug(1, "pointer=%p, status=%s, time=%d, file_time=%d\n", 
-		   db_resource_pointer(r), (db_status_undefined_p(s)? 
-		   "undefined": (db_status_loaded_p(s)? "loaded": "stored")),
+		   db_resource_pointer(r), db_status_string(s),
 		   db_resource_time(r), db_resource_file_time(r));
     }
 }
@@ -183,7 +202,7 @@ void db_delete_resource(string rname, string oname)
 	db_resource_pointer(r) = string_undefined;
 	free_db_resource(r);
 	delete_db_owned_resources(or, rs);
-    }    
+    }
 }
 
 /* this should really be a put. Just there for upward compatibility.
@@ -202,19 +221,33 @@ bool db_update_time(string rname, string oname)
 }
 
 /******************************************************* RESOURCE MANAGEMENT */
-/* from now on we must not know about the database internals.
- */
+
+/* from now on we must not know about the database internals? */
+
+bool db_resource_required_or_available_p(string rname, string oname)
+{
+  DB_OK;
+  return !db_resource_undefined_p(get_db_resource(rname, oname));
+}
 
 bool db_resource_p(string rname, string oname)
 {
-    DB_OK; return !db_resource_undefined_p(get_db_resource(rname, oname));
+  db_resource r; 
+  DB_OK; 
+  r = get_db_resource(rname, oname);
+  if (db_resource_undefined_p(r))
+    return FALSE;
+  else
+    return !db_resource_required_p(r);
 }
 
 int db_time_of_resource(string rname, string oname)
 {
     db_resource r = get_db_resource(rname, oname);
-    if (db_resource_undefined_p(r))
+    if (db_resource_undefined_p(r) || db_resource_required_p(r))
 	return -1;
+
+    /* loaded or stored */
     if (db_resource_loaded_p(r) && 
 	displayable_file_p(rname) &&
 	dbll_database_managed_file_p(db_resource_pointer(r)))
@@ -240,7 +273,8 @@ static void db_save_resource(string rname, string oname, db_resource r)
 {
     pips_debug(7, "saving %s of %s\n", rname, oname);
     pips_assert("resource loaded", db_resource_loaded_p(r));
-    if (!dbll_storable_p(rname))pips_internal_error("cannot store %s\n",rname);
+    if (!dbll_storable_p(rname))
+      pips_internal_error("cannot store %s\n",rname);
     dbll_save_resource(rname, oname, db_resource_pointer(r));
     db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
     db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
@@ -297,7 +331,7 @@ string db_get_memory_resource(string rname, string oname, bool pure)
 
     r = get_db_resource(rname, oname);
     debug_db_resource(9, rname, oname, r);
-    if (db_resource_undefined_p(r))
+    if (db_resource_undefined_p(r) || db_resource_required_p(r))
 	pips_internal_error("requested resource %s for %s not available\n", 
 			    rname, oname);
     /* else we have something. */
@@ -326,6 +360,16 @@ string db_get_memory_resource(string rname, string oname, bool pure)
     return result;
 }
 
+void db_set_resource_as_required_if_new(string rname, string oname)
+{
+  db_resource r;
+  DB_OK;
+  r = find_or_create_db_resource(rname, oname);
+  if (db_status_undefined_p(db_resource_db_status(r)))
+    /* newly created db_resource... */
+    db_resource_db_status(r) = make_db_status(is_db_status_required, UU);
+}
+
 void db_put_or_update_memory_resource(
     string rname, string oname, char * p, bool update_is_ok)
 {
@@ -342,9 +386,13 @@ void db_put_or_update_memory_resource(
 	/* was just created */
 	db_resource_db_status(r) = make_db_status(is_db_status_loaded, UU);
     else
-	if (!update_is_ok)
+    {
+	if (!update_is_ok && !db_resource_required_p(r))
 	    pips_internal_error("resource %s of %s already there\n", 
 				rname, oname);
+    }
+    
+    /* store data */
     db_resource_pointer(r) = p;
     db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
     db_resource_time(r) = db_get_logical_time();
@@ -389,7 +437,8 @@ void db_delete_all_resources(void)
 {
     int nr = dbll_number_of_resources(), i;
     DB_OK;
-    for (i=0; i<nr; i++) db_unput_resources(dbll_get_ith_resource_name(i));
+    for (i=0; i<nr; i++)
+      db_unput_resources(dbll_get_ith_resource_name(i));
 }
 
 /******************************************************************* MODULES */
