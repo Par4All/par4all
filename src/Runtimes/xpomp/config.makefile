@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/02 08:52:43 $ 
+# $Date: 1996/09/03 18:12:50 $ 
 
 # expected from makefile macros
 ifeq ($(FC),g77)
@@ -16,13 +16,15 @@ BIN=		$(ARCH)/xpomp
 
 LOCAL_HEADERS=	gr.h rasterfile.h 
 EXPORT_HEADERS=	xpomp_graphic.h xpomp_graphic_F.h
-CFILES=		cgraphic.c xpomp.c 
+CFILES=		xpomp.c 
+M4CFILES=		cgraphic.m4c
 DEMO=		test_xpomp.c fractal.f 
 HPFC=		xpomp_fake.f
 DOC=		xpomp_manual.tex xPOMP_window_explained.eps
 SOURCES=	$(LOCAL_HEADERS) \
 		$(EXPORT_HEADERS) \
 		$(CFILES) \
+		$(M4CFILES) \
 		$(DEMO) \
 		$(DOC)
 
@@ -52,9 +54,13 @@ doc: $(INSTALL_DOC) xpomp_manual.html
 xpomp: $(ARCH)/xpomp.o
 	$(LINK) $@ $+ $(X11LIB)
 
-$(LIB):	$(OFILES)
+# Deal with different Fortran to C interface call conventions (for strings)
+M4OPT=$(PVM_ROOT)/conf/$(PVM_ARCH).m4
+
+$(LIB):	$(OFILES) cgraphic.c
 	$(AR) $(ARFLAGS) $(LIB) $(OFILES)
 	ranlib $(LIB)
+
 
 $(ARCH)/test_xpomp : $(ARCH)/test_xpomp.o $(LIB) 
 	$(LINK) $@ $+ -lm $(LIB)
@@ -64,7 +70,7 @@ $(ARCH)/fractal : $(ARCH)/fractal.o $(LIB)
 
 clean: local-clean
 local-clean:
-	$(RM) $(ARCH)/*.o $(BIN) $(LIB) $(ARCH)/fractal $(ARCH)/test_xpomp
+	$(RM) cgraphic.c $(ARCH)/*.o $(BIN) $(LIB) $(ARCH)/fractal $(ARCH)/test_xpomp
 	$(RM) -r xpomp_manual xpomp_manual.html xpomp_manual.ps \
 		xpomp_manual.dvi
 
