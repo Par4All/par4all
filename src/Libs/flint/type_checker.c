@@ -578,7 +578,7 @@ typing_arguments_of_user_function(call c, type_context_p context)
   /* Function */
   else
   {
-    b = variable_basic(type_variable(result));
+    b = copy_basic(variable_basic(type_variable(result)));
   }
   return b;
 }
@@ -794,7 +794,7 @@ type_this_expression(expression e, type_context_p context)
     break;
     
   case is_syntax_reference:
-    b = entity_basic(reference_variable(syntax_reference(s)));
+    b = copy_basic(entity_basic(reference_variable(syntax_reference(s))));
     pips_debug(2,"Reference: %s; Type: %s\n", 
 	       entity_name(reference_variable(syntax_reference(s))), 
 	       basic_to_string(b));
@@ -871,7 +871,7 @@ void typing_of_expressions(statement s)
 	   context.number_of_simplication);
   
   /* Type checking ... */
-  /* HASH_MAP(st, ba, free_basic(ba), context.types); */
+  HASH_MAP(st, ba, free_basic(ba), context.types);
   hash_table_free(context.types);
   stack_free(&context.stats);
 }
