@@ -1,9 +1,11 @@
 /* HPFC module by Fabien COELHO
  *
- * these functions deal with HPF directives.
+ * These functions deal with HPF directives.
+ * (just a big hack, but few lines of code and neither lex nor yacc:-)
+ * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/08/02 15:40:41 $, )
+ * ($Date: 1995/08/10 10:58:12 $, )
  */
 
 #include "defines-local.h"
@@ -13,13 +15,15 @@
 #include "bootstrap.h"
 #include "control.h"
 
-/* directive names encoding: HPF_PREFIX + one character This encoding is
- * achieved thru a sed script that transforms directives into calls that
- * can be parsed by PIPS F77 parser. It's a hack but it greatly reduced
- * the number of lines for the directive analysis, and it allowed quite
- * simply to figure out where a executable directive is in the code.
+/* Directive names encoding: HPF_PREFIX + one character.
+ * This encoding is achieved thru a sed script that transforms directives 
+ * into calls that can be parsed by the PIPS F77 parser. It's a hack but 
+ * it greatly reduced the number of lines for directive analysis, and 
+ * it allowed quite simply to figure out where the executable directives
+ * are in the code.
  * However the syntax allowed in mapping directives is restricted to F77.
  */
+
 #define HPF_PREFIX		"HPFC"
 
 #define BLOCK_SUFFIX		"K"
@@ -85,8 +89,8 @@ bool redistribute_directive_p(entity f)
 
 /* management of PROCESSORS and TEMPLATE directives.
  *
- * just change the basic type to overloaded and 
- * store the entity as a processor or a template.
+ * just changes the basic type to overloaded and 
+ * stores the entity as a processor or a template.
  */
 static void switch_basic_type_to_overloaded(entity e)
 {
@@ -453,7 +457,8 @@ handle_distribute_and_redistribute_directive(entity f,
  *
  * each directive is handled by a function here.
  * these handlers may use the statement stack to proceed.
- * signature: void handle_(DIRECTIVE NAME)_directive (entity f, list args)
+ * signature: void handle_(DIRECTIVE NAME)_directive (entity f, list args).
+ * I may add some handlers for private directives?
  */
 #define HANDLER(name) handle_##name##_directive
 #define HANDLER_PROTOTYPE(name)\
@@ -582,7 +587,11 @@ HANDLER_PROTOTYPE(redistribute)
  *
  * DIRECTIVE HANDLING
  *
- *   finds the handler for a given entity.
+ * finds the handler for a given entity.
+ * the link between directive names and handlers is stored in the
+ * handlers static table. Some "directives" (BLOCK, CYCLIC) are 
+ * unexpected because they cannot appear after the chpf$...
+ * Ok, they are not directives, but I put them here as if.
  */
 struct DirectiveHandler 
 {
@@ -609,12 +618,12 @@ static struct DirectiveHandler handlers[] =
 };
 
 /* returns the handler for directive name.
- * assumes the name should point to a directive.
+ * assumes that name should point to a directive.
  */
 static void (*directive_handler(string name))(entity, list)
 {
     struct DirectiveHandler *x=handlers;
-    while (x->name!=(string) NULL && strcmp(name,x->name)!=0) x++;
+    while (x->name && strcmp(name, x->name)) x++;
     return x->handler;
 }
 
@@ -707,6 +716,7 @@ static void stmt_rewrite(statement s)
  *  - the special calls are freed and replaced by continues.
  * bugs or features:
  *  - the "new" directive is not used to tag private variables.
+ *  - a non hpf "pure" directive is parsed.
  */
 void handle_hpf_directives(statement s)
 {
