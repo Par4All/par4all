@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.106  1998/07/03 08:09:54  coelho
+ * tpips_usage options reordered.
+ *
  * Revision 1.105  1998/07/03 08:00:57  coelho
  * fixed typo in tpips_usage string.
  *
@@ -150,18 +153,19 @@ extern void tp_restart( FILE * ); /* tp_lex.c */
 /*************************************************************** Some Macros */
 
 #define tpips_usage							\
-  "Usage: %s [-nscvh?j] "						\
+  "Usage: %s [-nscvh?jw] "						\
   "[-l logfile] [-r rcfile] [-e tpips-cmds] tpips-scripts\n"		\
   "\t-n: no execution mode. just to check a script for syntax errors\n"	\
   "\t-s: behaves like a shell. tpips commands simply extend a shell.\n"	\
   "\t-c: behaves like a command, not a shell (it is the default).\n"	\
   "\t-h: this help. (also -?)\n"					\
   "\t-v: display version and architecture informations.\n"		\
+  "\t-j: jpips special mode.\n"						\
+  "\t-w: starts with a wrapper (jpips special again)...\n"		\
   "\t-l  logfile: log to logfile.\n"					\
   "\t-r  rcfile: tpips rc file to source. (default ~/.tpipsrc)\n"	\
   "\t-e  tpips-cmds: here tpips commands.\n"				\
-  "\t-j: jpips special mode.\n"						\
-  "\t-w: starts with a wrapper (jpips special again)...\n"
+  "\n"
 
 #define SEPARATOR_P(c) (index (" \t", c))
 
