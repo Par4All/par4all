@@ -332,51 +332,78 @@ hash_table used_labels;
    do-loop L for the loop header (i=1), the test (i<10) and the increment
    (i=i+1). */
 
-statement loop_header(l) 
-loop l;
+statement loop_header(statement sl) 
 {
-    expression i = make_entity_expression(loop_index(l), NIL);
+  loop l = statement_loop(sl);
+  statement hs = statement_undefined;
 
-    return(make_assign_statement(i, range_lower(loop_range(l))));
+  expression i = make_entity_expression(loop_index(l), NIL);
+
+  hs = make_assign_statement(i, range_lower(loop_range(l)));
+  statement_number(hs) = statement_number(sl);
+
+  return hs;
 }
 
-statement loop_test(l)
-loop l;
+statement loop_test(statement sl)
 {
-    call c = make_call(entity_intrinsic(".GT."),
-		        CONS(EXPRESSION,
-			     make_entity_expression(loop_index(l), NIL),
-			     CONS(EXPRESSION,
-				   range_upper(loop_range(l)),
-				   NIL)));
-    test t = make_test(make_expression(make_syntax(is_syntax_call, c),
-					normalized_undefined), 
-		       MAKE_CONTINUE_STATEMENT(), 
-		       MAKE_CONTINUE_STATEMENT());
- 
-    return(make_statement(entity_empty_label(), 
-			   STATEMENT_NUMBER_UNDEFINED,
-			   STATEMENT_ORDERING_UNDEFINED,
-			   string_undefined,
-			   make_instruction(is_instruction_test, t)));
+  loop l = statement_loop(sl);
+  statement ts = statement_undefined;
+  string cs = string_undefined;
+  call c = make_call(entity_intrinsic(".GT."),
+		     CONS(EXPRESSION,
+			  make_entity_expression(loop_index(l), NIL),
+			  CONS(EXPRESSION,
+			       range_upper(loop_range(l)),
+			       NIL)));
+  test t = make_test(make_expression(make_syntax(is_syntax_call, c),
+				     normalized_undefined), 
+		     MAKE_CONTINUE_STATEMENT(), 
+		     MAKE_CONTINUE_STATEMENT());
+  string csl = statement_comments(sl);
+  string prev_comm = empty_comments_p(csl)? "" : strdup(csl);
+  string lab = string_undefined;
+
+  if(entity_empty_label_p(loop_label(l)))
+    lab = "";
+  else 
+    lab = label_local_name(loop_label(l));
+
+  cs = strdup(concatenate(prev_comm,
+			  "C     DO loop ",
+			  lab,
+			  " with exit had to be desugared\n",
+			  NULL));
+
+  ts = make_statement(entity_empty_label(), 
+		      statement_number(sl),
+		      STATEMENT_ORDERING_UNDEFINED,
+		      cs,
+		      make_instruction(is_instruction_test, t));
+
+  return ts;
 }
 
-statement loop_inc(l)
-loop l;
+statement loop_inc(statement sl)
 {
-    expression I = make_entity_expression(loop_index(l), NIL);
-    expression II = make_entity_expression(loop_index(l), NIL);
-    call c = make_call(entity_intrinsic("+"), 
-		        CONS(EXPRESSION, 
-			      I, 
-			      CONS(EXPRESSION, 
-				    range_increment(loop_range(l)), 
-				    NIL)));
-    expression I_plus_one = 
-	    make_expression(make_syntax(is_syntax_call, c), 
-			    normalized_undefined);
+  loop l = statement_loop(sl);
+  expression I = make_entity_expression(loop_index(l), NIL);
+  expression II = make_entity_expression(loop_index(l), NIL);
+  call c = make_call(entity_intrinsic("+"), 
+		     CONS(EXPRESSION, 
+			  I, 
+			  CONS(EXPRESSION, 
+			       range_increment(loop_range(l)), 
+			       NIL)));
+  expression I_plus_one = 
+    make_expression(make_syntax(is_syntax_call, c), 
+		    normalized_undefined);
+  statement is = statement_undefined;
 
-    return(make_assign_statement(II, I_plus_one));
+  is = make_assign_statement(II, I_plus_one);
+  statement_number(is) = statement_number(sl);
+
+  return is;
 }
 
 /* CONTROLIZE_LOOP computes in C_RES the control graph of the loop L (of
@@ -418,15 +445,15 @@ hash_table used_labels;
 	control_predecessors(succ) = ADD_PRED(c_res, succ);
     }
     else {
-	control_statement(c_test) = loop_test(l);
+	control_statement(c_test) = loop_test(st);
 	control_predecessors(c_test) =
 		CONS(CONTROL, c_res, CONS(CONTROL, c_inc, NIL)),
 	control_successors(c_test) =
 		CONS(CONTROL, succ, CONS(CONTROL, c_body, NIL));
-	control_statement(c_inc) = loop_inc(l);
+	control_statement(c_inc) = loop_inc(st);
 	control_successors(c_inc) = CONS(CONTROL, c_test, NIL);
 	UPDATE_CONTROL(c_res,
-		       loop_header(l),
+		       loop_header(st),
 		       ADD_PRED(pred, c_res),
 		       CONS(CONTROL, c_test, NIL));
 	controlized = TRUE ;
