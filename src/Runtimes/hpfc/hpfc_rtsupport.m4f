@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/01/13 19:12:27 $, )
+! ($Date: 1997/01/14 13:24:01 $, )
 !
 !-----------------
 !
@@ -1407,6 +1407,19 @@ _CM5(
 !
 !-----------------
 !
+      integer function HPFC SIZE OF PROCS(pn)
+      integer pn
+      include "hpfc_commons.h"
+      integer size, i
+      size = 1
+      do i=1, NODIMP(pn)
+         size = size * RANGEP(pn, i, 3)
+      end do
+      HPFC SIZE OF PROCS = size
+      end
+!
+!
+!-----------------
 !
 ! HPFC LOOP BOUNDS
 !
@@ -1420,9 +1433,19 @@ _CM5(
       subroutine HPFC LOOP BOUNDS(nlb, nub, llb, lb, ub, an, dp)
       integer nlb, nub, llb, lb, ub, an, dp
       include "hpfc_commons.h"
+      external hpfc size of procs
+      integer hpfc size of procs
+      integer pn
       debug(print *, "HPFC LOOP BOUNDS ", lb, ub, " array ", an, dp)
-      call HPFC REMOTE LOOP BOUNDS
-     $     (nlb, nub, llb, lb, ub, an, dp, MYPOS(dp, TTOP(ATOT(an))))
+      pn = TTOP(ATOT(an))
+      if (MY LID.gt.HPFC SIZE OF PROCS(pn)) then
+         nlb = 0
+         nub = -1
+         llb = -1
+      else
+         call HPFC REMOTE LOOP BOUNDS
+     $        (nlb, nub, llb, lb, ub, an, dp, MYPOS(dp, pn))
+      end if
       debug(print *, "init lb: ", llb, " new lb: ", nlb, " new ub: ", nub)
       end
 !
