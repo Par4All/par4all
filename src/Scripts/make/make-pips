@@ -1,7 +1,11 @@
 #! /bin/sh
 #
-# $RCSfile: make-pips,v $ version $Revision$
-# $Date: 1997/06/28 08:07:21 $, 
+# $Id$
+#
+# $Log: make-pips,v $
+# Revision 1.42  1997/06/28 08:08:29  coelho
+# RCS headers improved.
+#
 #
 # (c) Fabien COELHO July 1996
 #
