@@ -29,7 +29,6 @@
 /* Statistic variables: */
 static int number_of_simplified_expressions;
 static int number_of_simplified_assign_expressions;
-static int number_of_simplified_while_conditions;
 static int number_of_simplified_if_conditions;
 static int number_of_false_while_conditions;
 static int number_of_false_if_conditions;
@@ -39,7 +38,6 @@ static void initialize_partial_redundancy_elimination_statistics()
 {
     number_of_simplified_expressions = 0;
     number_of_simplified_assign_expressions = 0;
-    number_of_simplified_while_conditions = 0;
     number_of_simplified_if_conditions = 0;
     number_of_false_while_conditions = 0;
     number_of_false_if_conditions = 0;
@@ -50,7 +48,7 @@ static void display_partial_redundancy_elimination_statistics()
 {
   number_of_simplified_expressions = 
     number_of_simplified_assign_expressions +
-    number_of_simplified_while_conditions +
+    number_of_false_while_conditions +
     number_of_simplified_if_conditions;
 
   if (number_of_simplified_expressions > 0) 
@@ -66,12 +64,6 @@ static void display_partial_redundancy_elimination_statistics()
 	       number_of_simplified_assign_expressions ,
 	       number_of_simplified_assign_expressions  > 1 ? "s" : "");		
     }
-  if (number_of_simplified_while_conditions > 0) 
-    {
-      user_log("*\t %d simplified while condition%s *\n",
-	       number_of_simplified_while_conditions ,
-	       number_of_simplified_while_conditions  > 1 ? "s" : "");		
-    }
   if (number_of_simplified_expressions > 0) 
     {
       user_log("*\t %d simplified if condition%s *\n",
@@ -80,12 +72,10 @@ static void display_partial_redundancy_elimination_statistics()
     }
   if (number_of_false_while_conditions > 0) 
     {
-      user_log("* There %s %d while loop%s with false condition *\n",
-	       number_of_false_while_conditions > 1 ? "are" : "is",
+      user_log("*\t %d false while loop condition%s *\n",
 	       number_of_false_while_conditions,
 	       number_of_false_while_conditions > 1 ? "s" : "");		
     }
-
   if (number_of_false_if_conditions > 0) 
     {
       user_log("* There %s %d if statement%s with false condition *\n",
@@ -598,28 +588,16 @@ partial_redundancy_elimination_rwt(statement s,
 		fprintf(stderr, " \n with non empty / not true precondition : ");
 		sc_fprint(stderr,prec, (char * (*)(Variable)) entity_local_name);
 	      }
-	    if (!expression_equal_p(retour,e))
+	    /* Try to simplify the whileloop's condition
+	       if (retour=.FALSE.) then 
+	          eliminate this while loop (a trivial case of dead code elimination)  
+	       else keep the loop */
+	    if (false_expression_p(retour))
 	      {
-		number_of_simplified_while_conditions++;
-		/* the whileloop's condition e is simplified,
-		   if (retour=.FALSE.) then 
-		   eliminate this while loop (a trivial case of dead code elimination)  
-		   else replace e by retour*/
-		if (false_expression_p(retour))
-		  {
-		    number_of_false_while_conditions++;
-		    //	free_instruction(statement_instruction(s));
-		    statement_instruction(s) = make_instruction_block(NIL);
-		    fix_sequence_statement_attributes(s);
-		  }
-		else 
-		  {
-		    whileloop  new = make_whileloop(copy_expression(retour),
-						    copy_statement(whileloop_body(wl)),
-						    copy_entity(whileloop_label(wl)));
-		    free_instruction(statement_instruction(s));
-		    statement_instruction(s) = make_instruction(is_instruction_whileloop,new);
-		  }
+		number_of_false_while_conditions++;
+		//	free_instruction(statement_instruction(s));
+		statement_instruction(s) = make_instruction_block(NIL);
+		fix_sequence_statement_attributes(s);
 	      }
 	    break;
 	  }
