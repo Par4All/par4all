@@ -263,7 +263,7 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
       TYPE val(size)
       include "hpfc_commons.h"
       external pvm_opname(NAME)
-      integer info, bufid
+      integer info
 !
 ! performs the reduction to the host
 !
