@@ -3,7 +3,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1994/12/22 16:52:22 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1994/12/27 08:53:23 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -68,6 +68,13 @@ statement stat, *pstat;
 	messages_stat, 
 	newloopnest;
 
+    ifdebug(9)
+    {
+	fprintf(stderr, "[Overlap_Analysis] considering stat 0x%x\n", 
+		(unsigned int) stat);
+	print_statement(stat);
+    }
+
     set_hpfc_current_statement(stat);
 
     reset_current_loops();   /* ??? should be on exit */
@@ -77,19 +84,9 @@ statement stat, *pstat;
     lloop = NIL;
     innerbody = parallel_loop_nest_to_body(stat, &lblocks, &lloop);
 
-    /*
-    if (!statically_decidable_loops(lloop)) 
-    {
-	debug(7, "Overlap_Analysis", 
-	      "returning FALSE because no static loop\n");
-	return(FALSE);
-    }
-    */
-
     FindRefToDistArrayInStatement(innerbody, &lw, &lr);
 
-    /*
-     * keeps only written references of which dimensions are block distributed,
+    /* keeps only written references of which dimensions are block distributed,
      * and indices simple enough (=> normalization of loops may be usefull).
      * ??? bug: should also search for A(i,i) things that are forbidden...
      */
@@ -180,12 +177,10 @@ statement stat, *pstat;
 	return(FALSE);
     }
 
-    /*
-     * Now, we have the fellowing situation:
+    /* Now, we have the fellowing situation:
      *
      * Wa: set of aligned written references, the first of which is ``the'' ref.
      */
-
     MAPL(cs,
      {
 	 syntax
@@ -225,7 +220,7 @@ statement stat, *pstat;
 		 lRo = gen_nconc(lRo, CONS(CONSP,
 					   CONS(CONSP, lkind, 
 						CONS(CONSP, lvect, NIL)),
-					   NIL));                         /* bof */
+					   NIL));
 	     }
 	     else
 	     {
@@ -263,8 +258,7 @@ statement stat, *pstat;
 	return(FALSE);
     }
 
-    /*
-     * here is the situation now:
+    /* here is the situation now:
      *
      * Wa set of aligned references written,
      * Ra set of aligned references read,
@@ -279,8 +273,7 @@ statement stat, *pstat;
 		     (messages_handling(Ro, lRo)):
 		     (make_continue_statement(entity_empty_label())));
 
-    /*
-     * generate the local loop for every processor, given the global loop
+    /* generate the local loop for every processor, given the global loop
      * bounds. The former indexes have to be computed, and the loops are
      * based upon new indexes, of which names have to be propagated in the
      * body of the loop. This generation is to be based on the normalized
