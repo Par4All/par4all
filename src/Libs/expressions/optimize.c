@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.25  1998/12/09 09:51:47  zory
+ * apply gen_nreverse to the list of indices to have i,j,k,.... in outermost
+ * to inermost order
+ *
  * Revision 1.24  1998/12/08 16:48:36  coelho
  * new structure to send data to eole.
  *
@@ -169,7 +173,7 @@ static list /* of entity */ indices;
 
 static void add_one_more_expression(expression e)
 {
-  expressionwithlevel ewl = make_expressionwithlevel(gen_copy_seq(indices), e);
+  expressionwithlevel ewl = make_expressionwithlevel(gen_nreverse(gen_copy_seq(indices)), e);
   rhs = CONS(EXPRESSIONWITHLEVEL, ewl, rhs);
 }
 
