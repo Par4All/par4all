@@ -57,11 +57,11 @@ typedef long long int Value;
 /* I can just trust myself for this...
  */
 #define VALUE_TO_LONG(val) \
-    ((long)((val)>=(Value)LONG_MIN&&(val)<=(Value)LONG_MAX)?\
-     (val):(abort(), VALUE_NAN))
+    ((long)((val)>(Value)LONG_MIN&&(val)<=(Value)LONG_MAX)?\
+     (val):(THROW(overflow_error), LONG_MIN))
 #define VALUE_TO_INT(val) \
-    ((int)((val)>=(Value)INT_MIN&&(val)<=(Value)INT_MAX)?\
-     (val):(abort(), VALUE_NAN))
+    ((int)((val)>(Value)INT_MIN&&(val)<=(Value)INT_MAX)?\
+     (val):(THROW(overflow_error), INT_MIN))
 #define VALUE_TO_DOUBLE(val) ((double)(val))
 #define VALUE_TO_FLOAT(val) ((float)(val))
 
