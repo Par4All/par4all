@@ -17,3 +17,4 @@
 #define ADD_ELEMENT_TO_LIST( _list, _type, _element) \
     (_list = gen_nconc( _list, CONS( _type, _element, NIL)))
 
+#define BASE_NODE_NUMBER 1000
