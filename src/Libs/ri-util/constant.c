@@ -123,7 +123,9 @@ make_constant_entity(
 	fe = make_functional(NIL, MakeTypeVariable(be, NIL));
 
 	if (bt == is_basic_int)
-		ce = make_constant(is_constant_int, (void*) atoi(name));
+	{
+	  ce = make_constant(is_constant_int, (void*) atoi(name));
+	}
 	else
 	{
 	  ce = make_constant(is_constant_call, e);
