@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/06/12 17:24:03 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/07/23 15:08:25 $, )
  * version $Revision$
  */
 
@@ -600,8 +600,10 @@ expression e;
     if ((n!=normalized_undefined) && (normalized_linear_p(n)))
     {
 	Pvecteur v = normalized_linear(n);
-	int s = vect_size(v), val = (int) vect_coeff(TCST, v);
-	
+	int s = vect_size(v), val;
+	Value vval = vect_coeff(TCST, v);
+
+	val = VALUE_TO_INT(vval);
 	if (s==0) return 0;
 	if ((s==1) && (val!=0)) return val;
     }
