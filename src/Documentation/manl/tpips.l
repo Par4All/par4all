@@ -15,7 +15,7 @@ tpips [-nscvh?jw] [-l
 .\"
 .SH DESCRIPTION
 
-.B tpips
+.B tpips 
 is the 
 .B line interface
 and scripting language of the
