@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.56  1998/11/30 19:59:02  irigoin
+ * Error message improved in AddVariableToCommon()
+ *
  * Revision 1.55  1998/10/15 06:37:09  irigoin
  * Consistency check between layout and ram section added in print_common_layout()
  *
@@ -894,7 +897,7 @@ entity c, v;
 	}
 	else if(storage_rom_p(entity_storage(v))) {
 	    user_warning("AddVariableToCommon",
-			 "Module %s declared in common %s between line %d and %d\n",
+			 "Module or parameter %s declared in common %s between line %d and %d\n",
 			 entity_local_name(v), module_local_name(c), line_b_I, line_e_I);
 	    ParserError("AddVariableToCommon",
 			"Ill. decl. of function or subroutine in a common\n");
