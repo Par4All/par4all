@@ -1,7 +1,10 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1997/03/19 16:00:43 $, )
+ * $Id$
+ * $Log: compile.c,v $
+ * Revision 1.62  1997/03/20 09:49:06  coelho
+ * system -> safe_system.
+ *
  */
 
 #include "defines-local.h"
@@ -467,8 +470,8 @@ compile_a_special_io_function(entity module)
     dir_name = db_get_current_workspace_directory();
     h_name = string_cat(prefix, HOST_SUFFIX);
 
-    system(concatenate("cp ", dir_name, "/", file_name, " ", 
-		              dir_name, "/", h_name, NULL));
+    safe_system(concatenate("cp ", dir_name, "/", file_name, " ", 
+		                   dir_name, "/", h_name, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, prefix, h_name);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, NO_FILE);
@@ -483,13 +486,15 @@ compile_a_pure_function(entity module)
 {
     string prefix, file_name, hn_name, dir_name;
 
+    pips_debug(1, "compiling pure a function (%s)\n", entity_name(module));
+
     prefix = module_local_name(module);
     dir_name = db_get_current_workspace_directory();
     file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
     hn_name = string_cat(prefix, BOTH_SUFFIX);
 
-    system(concatenate
-       ("cp ", dir_name, "/", file_name, " ", dir_name, "/", hn_name, NULL));
+    safe_system(concatenate("cp ", dir_name, "/", file_name, " ", 
+			           dir_name, "/", hn_name, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, prefix, hn_name);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, hn_name);
