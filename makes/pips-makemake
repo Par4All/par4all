@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/09/21 10:23:54 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/09/21 13:52:00 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -711,7 +711,9 @@ $verbose "specific to Production"
 FWD_ROOT=.
 RELEASE+= \$(ALL_SOURCES) \$(DEDUCED_CFILES) \$(DEDUCED_HEADERS) Makefile
 
-release:; @for f in \$(RELEASE) ; do echo \$(FWD_ROOT)/\$\$f ; done
+release:
+	@for f in \$(RELEASE) ; \\
+	do echo \$(FWD_ROOT)/\$\$f ; done \$(RELEASE_OUT)
 	    
 %
 
