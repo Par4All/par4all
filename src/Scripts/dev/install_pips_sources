@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: install_pips_sources,v $ ($Date: 1994/12/09 09:04:13 $, )
+# $RCSfile: install_pips_sources,v $ ($Date: 1995/08/08 17:30:32 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -35,7 +35,7 @@ usage()
 	  -h: help
 	  -v: verbose
 	  -D: debug
-	  -t dir: target directory (default image of source in \$PRODDIR)
+	  -t dir: target directory (default image of source in \$PIPS_SRCDIR)
 	  -s dir: source directory (default .)
 	  -y comment: comment for the installation
 	EOM
@@ -63,7 +63,7 @@ shift `expr $OPTIND - 1`
 [ "$COMMENT" ] || COMMENT='none'
 [ "$SOURCE_DIR" ] || SOURCE_DIR=`pwd`
 [ "$TARGET_DIR" ] || 
-  TARGET_DIR=$SRCDIR/`echo "$SOURCE_DIR" | sed 's,.*/\([^/]*/[^/]*\)$,\1,'`
+  TARGET_DIR=$PIPS_SRCDIR/`echo "$SOURCE_DIR" | sed 's,.*/\([^/]*/[^/]*\)$,\1,'`
 
 $DEBUG "source directory is $SOURCE_DIR"
 $DEBUG "target directory is $TARGET_DIR"
@@ -73,8 +73,8 @@ $DEBUG "target directory is $TARGET_DIR"
 
 $VERBOSE "entering directory $TARGET_DIR"
 
-[ -d "$TARGET_DIR" ] || mkdir "$TARGET_DIR" "$TARGET_DIR"/SCCS
-cd "$TARGET_DIR"
+[ -d "$TARGET_DIR" ] || mkdir $TARGET_DIR $TARGET_DIR/SCCS
+cd $TARGET_DIR
 
 sccs edit SCCS
 rm -f `sccs tell`
@@ -114,8 +114,7 @@ do
       sccs delget -y"$COMMENT" "$item"
     else
       sccs create "$item"
-      cmp -s $item ,$item || error "$item file not properly created"
-      rm -f ,$item
+      cmp -s $item ,$item && rm -f ,$item
     fi
   else
     error "$item is neither a file nor a directory"
