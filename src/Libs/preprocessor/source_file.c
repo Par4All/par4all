@@ -81,7 +81,7 @@ pips_get_fortran_list(int * pargc,
 char *
 hpfc_generate_path_name_of_file_name(char * file_name)
 {
-   return concatenate(build_pgmwd(db_get_current_program_name()),
+   return concatenate(build_pgmwd(db_get_current_workspace_name()),
                       "/",
                       HPFC_COMPILED_FILE_DIR,
                       "/",
@@ -100,7 +100,7 @@ hpfc_get_file_list(int * file_number,
         
    /* Get the HPFC file name list: */
    sprintf(hpfc_dir, "%s/%s",
-           build_pgmwd(db_get_current_program_name()),
+           build_pgmwd(db_get_current_workspace_name()),
            HPFC_COMPILED_FILE_DIR);
    
    return_code = safe_list_files_in_directory(file_number,
