@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/10 21:23:50 $, 
+# $Date: 1996/07/10 21:28:01 $, 
 
 LIB_CFILES=	sc_alloc.c \
 	        sc_projection.c \
@@ -44,7 +44,7 @@ sc_lex.c: sc_lex.l
 
 sc_gram.c y.tab.h: sc_gram.y
 	$(PARSE) $<
-	sed -e '/extern char \*malloc/d' y.tab.c > $@
+	sed -e '/extern char \*malloc/d' y.tab.c > sc_gram.c
 	$(RM) y.tab.c
  
 # end of $RCSfile: config.makefile,v $
