@@ -22,7 +22,9 @@ void default_update_props()
 void (* pips_update_props_handler)() = default_update_props;
 
 /* FI: should be called "initialize_workspace()"; a previous call to
-   db_create_workspace() is useful to create the log file says RK */
+ * db_create_workspace() is useful to create the log file between
+ * the two calls says RK
+ */
 bool create_workspace(pargc, argv)
 int *pargc;
 char *argv[];
@@ -36,6 +38,7 @@ char *argv[];
 		db_get_current_workspace()!=database_undefined);
 
     open_log_file();
+    set_entity_to_size();
 
     for (i = 0; i < *pargc; i++) {
 	success = process_user_file(argv[i]);
@@ -145,6 +148,7 @@ char *name;
 	(* pips_update_props_handler)();
 
 	open_log_file();
+	set_entity_to_size();
 
 	user_log("Workspace %s opened\n", name);
 
@@ -159,6 +163,7 @@ bool close_workspace()
 
     success = make_close_workspace();
     close_log_file();
+    reset_entity_to_size();
     return success;
     /*clear_props();*/
 }
