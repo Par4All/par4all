@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/18 09:06:11 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/19 11:06:11 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -128,8 +128,12 @@ $SED '#
       //s,\([0-9a-z]\) \([^0-9a-z]\),\1\2,g;
       //s,\([^0-9a-z]\) \([0-9a-z]\),\1\2,g;
       //s,\([^0-9a-z]\) \([^0-9a-z]\),\1\2,g;
-      //s,)with ,) with ,;
+      //s,)with\([\* ]\),) with\1,;
       //s,)onto ,) onto ,;
+      #
+      # descriptive mappings: the first element is a star-call...
+      //s, align \(.*\) with\*, align s()\,\1 with ,;
+      //s, distribute \([a-z0-9_]*\)\*, distribute s()\,\1,;
       #
       # indirect reserved words: block, cyclic, *, nop
       #
@@ -139,6 +143,7 @@ $SED '#
       //s,\([\,(]\)cyclic\([\,()]\),\1c\2,g
       //s,\([\,(]\)cyclic\([\,()]\),\1c\2,g
       //s,c\([\,)]\),c(1)\1,g
+      # the * if not a product...
       //s,\*\([\,)]\),s()\1,g
       //s,number_of_processors(),#,g
       #
