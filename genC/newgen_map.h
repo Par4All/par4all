@@ -18,11 +18,12 @@
 #ifndef MAP_INCLUDED
 #define MAP_INCLUDED
 
-/* -- map.h
-
-   These are the functions defined in the Newgen map library. 
-
-*/
+/* $RCSfile: newgen_map.h,v $ ($Date: 1995/03/14 16:56:27 $, ) 
+ * version $Revision$
+ * got on %D%, %T%
+ *
+ * These are the functions defined in the Newgen map library. 
+ */
 
 #define MAX_NESTED_HASH 10
 
@@ -64,5 +65,8 @@ IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 		  (h)), \
 		 (h)), \
 	 (h))
+
+#define FUNCTION_MAP(k, v, code, fun) \
+        HASH_MAP(k, v, code, (fun+1)->h)
 
 #endif
