@@ -126,7 +126,8 @@ ParserError(char * f, char * m)
     parser_reset_all_reader_buffers();
     parser_reset_StmtHeap_buffer();
     reset_parser_recursive_call();
-    ResetEntries();
+    ResetChains();
+    AbortEntries();
     AbortOfProcedure();
 
     InParserError = FALSE;
