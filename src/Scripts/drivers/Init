@@ -41,12 +41,27 @@ fi
 
 if [ "$DELETE" ]
 then
-	Delete "$1"
+	if Delete "$1"
+	then
+		true
+	else
+		exit 2
+	fi
 fi
 
 if [ "$SOURCE_FILES" ]
 then
-	Pips -w "$1" -f "$SOURCE_FILES"
+	if Pips -w "$1" -f "$SOURCE_FILES"
+	then
+		true
+	else
+		exit 3
 else
-	Pips -w "$1"
+	if Pips -w "$1"
+	then
+		true
+	else
+		exit 4
 fi
+
+exit 0
