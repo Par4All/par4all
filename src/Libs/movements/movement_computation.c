@@ -419,8 +419,9 @@ movement_computation(
 	for (pv1 = lvar_coeff_nunit;!VECTEUR_UNDEFINED_P(pv1);pv1=pv1->succ) {
 	    sc_proj = sc_projection(sc_proj,vecteur_var(pv1));
 	    sc_proj= sc_normalize(sc_proj);
-	    vect_chg_coeff(&lvar_coeff_nunit,vecteur_var(pv1),0);
-	}
+	}	    
+	/* vect_chg_coeff(&lvar_coeff_nunit,vecteur_var(pv1),0);*/
+
     }
     
     ifdebug(2) {
