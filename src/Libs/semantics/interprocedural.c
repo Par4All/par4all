@@ -232,6 +232,22 @@ entity f;
 
     return formals;
 }
+
+boolean 
+integer_scalar_entity_list_p(l)
+list l;
+{
+    boolean result= FALSE;
+    if (!ENDP(l)) { 
+	result= integer_scalar_entity_p(ENTITY(CAR(l)));
+	MAP(ENTITY,el, { 
+	    if (result) 
+		result = result && integer_scalar_entity_p(el);
+	},
+	    CDR(l));
+    }
+    return result; 
+}
 
 /* add_formal_to_actual_bindings_to_precondition(call c, transformer pre):
  *
@@ -243,153 +259,200 @@ entity f;
 transformer add_formal_to_actual_bindings(c, pre)
 call c;
 transformer pre;
-{
-    entity f = call_function(c);
-    list pc = call_arguments(c);
-    list formals = entity_to_formal_integer_parameters(f);
-    cons * ce;
+ {
+     entity f = call_function(c);
+     list pc = call_arguments(c);
+     list formals = entity_to_formal_integer_parameters(f);
+     cons * ce;
 
-    ifdebug(6) {
-	debug(6,"add_formal_to_actual_bindings",
-	      "begin for call to %s pre=%x\n", module_local_name(f), pre);
-	dump_transformer(pre);
-    }
+     ifdebug(6) {
+	 debug(6,"add_formal_to_actual_bindings",
+	       "begin for call to %s pre=%x\n", module_local_name(f), pre);
+	 dump_transformer(pre);
+     }
 
-    pips_assert("add_formal_to_actual_bindings", 
-		entity_module_p(f));
-    pips_assert("add_formal_to_actual_bindings", 
-		pre != transformer_undefined);
+     pips_assert("add_formal_to_actual_bindings", 
+		 entity_module_p(f));
+     pips_assert("add_formal_to_actual_bindings", 
+		 pre != transformer_undefined);
 
-    /* let's start a long, long, long MAPL, so long that MAPL is a pain */
-    for( ce = formals; !ENDP(ce); POP(ce)) {
-	entity e = ENTITY(CAR(ce));
-	int r = formal_offset(storage_formal(entity_storage(e)));
-	expression expr;
-	normalized n;
+     /* let's start a long, long, long MAPL, so long that MAPL is a pain */
+     for( ce = formals; !ENDP(ce); POP(ce)) {
+	 entity e = ENTITY(CAR(ce));
+	 int r = formal_offset(storage_formal(entity_storage(e)));
+	 expression expr;
+	 normalized n;
 
-	if((expr = find_ith_argument(pc, r)) == expression_undefined)
-	    user_error("add_formal_to_actual_bindings",
-		       "not enough args for formal parm. %d\n", r);
+	 if((expr = find_ith_argument(pc, r)) == expression_undefined)
+	     user_error("add_formal_to_actual_bindings",
+			"not enough args for formal parm. %d\n", r);
 
-	n = NORMALIZE_EXPRESSION(expr);
-	if(normalized_linear_p(n)) {
-	    Pvecteur v = vect_dup((Pvecteur) normalized_linear(n));
-	    entity e_new = external_entity_to_new_value(e);
+	 n = NORMALIZE_EXPRESSION(expr);
+	 if(normalized_linear_p(n)) {
+	     Pvecteur v = vect_dup((Pvecteur) normalized_linear(n));
+	     entity e_new = external_entity_to_new_value(e);
 
-	    vect_add_elem(&v, (Variable) e_new, -1);
-	    pre = transformer_equality_add(pre, v);
-	}
-    }
+	     vect_add_elem(&v, (Variable) e_new, -1);
+	     pre = transformer_equality_add(pre, v);
+	 }
+     }
 
-    free_arguments(formals);
+     free_arguments(formals);
 
-    ifdebug(6) {
-	debug(6,"add_formal_to_actual_bindings",
-	      "new pre=%x\n", pre);
-	dump_transformer(pre);
-	debug(6,"add_formal_to_actual_bindings","end for call to %s\n",
-	      module_local_name(f));
-    }
+     ifdebug(6) {
+	 debug(6,"add_formal_to_actual_bindings",
+	       "new pre=%x\n", pre);
+	 dump_transformer(pre);
+	 debug(6,"add_formal_to_actual_bindings","end for call to %s\n",
+	       module_local_name(f));
+     }
 
-    return pre;
-}
+     return pre;
+ }
 
 transformer precondition_intra_to_inter(callee, pre, le)
 entity callee;
 transformer pre;
 cons * le;
-{
+ {
 #define DEBUG_PRECONDITION_INTRA_TO_INTER 1
-    cons * values = NIL;
-    cons * lost_values = NIL;
-    Psysteme r;
-    Pbase b;
-    cons * ca;
+     cons * values = NIL;
+     cons * lost_values = NIL;
+     Psysteme r;
+     Pbase b;
+     cons * ca;
 
-    ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
-    {
-	debug(DEBUG_PRECONDITION_INTRA_TO_INTER,"precondition_intra_to_inter",
-	      "begin for call to %s\nwith precondition:\n", 
-	      module_local_name(callee));
-	/* precondition cannot be printed because equations linking formal 
-	 * parameters have been added to the real precondition
-	 */
-	dump_transformer(pre);
-    }
+     ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
+	 {
+	     debug(DEBUG_PRECONDITION_INTRA_TO_INTER,"precondition_intra_to_inter",
+		   "begin for call to %s\nwith precondition:\n", 
+		   module_local_name(callee));
+	     /* precondition cannot be printed because equations linking formal 
+	      * parameters have been added to the real precondition
+	      */
+	     dump_transformer(pre);
+	 }
 
-    r = (Psysteme) predicate_system(transformer_relation(pre));
+     r = (Psysteme) predicate_system(transformer_relation(pre));
 
-    /* make sure you do not export a (potentially) meaningless old value */
-    for( ca = transformer_arguments(pre); !ENDP(ca); POP(ca) ) 
-    {
-	entity e = ENTITY(CAR(ca));
-	entity e_old;
+     /* make sure you do not export a (potentially) meaningless old value */
+     for( ca = transformer_arguments(pre); !ENDP(ca); POP(ca) ) 
+     {
+	 entity e = ENTITY(CAR(ca));
+	 entity e_old;
 
-	/* Thru DATA statements, old values of other modules may appear */
-	if(!same_string_p(entity_module_name(e), 
-			  module_local_name(get_current_module_entity()))) {
-	    debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
-		  "precondition_intra_to_inter",
-		  "entitiy %s not belonging from module %s\n",
-		  entity_name(e),
-		  module_local_name(get_current_module_entity()));
-	}
+	 /* Thru DATA statements, old values of other modules may appear */
+	 if(!same_string_p(entity_module_name(e), 
+			   module_local_name(get_current_module_entity()))) {
+	     debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
+		   "precondition_intra_to_inter",
+		   "entitiy %s not belonging from module %s\n",
+		   entity_name(e),
+		   module_local_name(get_current_module_entity()));
+	 }
 
-	e_old  = entity_to_old_value(e);
+	 e_old  = entity_to_old_value(e);
 	
-	if(base_contains_variable_p(sc_base(r), (Variable) e_old))
-	    lost_values = arguments_add_entity(lost_values,
-					       e_old);
-    }
+	 if(base_contains_variable_p(sc_base(r), (Variable) e_old))
+	     lost_values = arguments_add_entity(lost_values,
+						e_old);
+     }
 
-    ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
-    {
-	debug(DEBUG_PRECONDITION_INTRA_TO_INTER, "precondition_intra_to_inter",
-	      "meaningless old value(s):\n");
-	dump_arguments(lost_values);
-    }
+     ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
+	 {
+	     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, "precondition_intra_to_inter",
+		   "meaningless old value(s):\n");
+	     dump_arguments(lost_values);
+	 }
 
-    /* get rid of old_values */
-    pre = transformer_projection_with_redundancy_elimination
-	(pre, lost_values, /* sc_elim_redund */ no_elim);
+     /* get rid of old_values */
+     pre = transformer_projection_with_redundancy_elimination
+	 (pre, lost_values, /* sc_elim_redund */ no_elim);
 
-    gen_free_list(lost_values);
+     gen_free_list(lost_values);
 
     
-    translate_global_values(callee, pre);
+     translate_global_values(callee, pre);
 
-    /* get rid of pre's variables that do not appear in effects le */
-    /* we should not have to know about these internal objects, Psysteme
-       and Pvecteur! */
-    lost_values = NIL;
-    r = (Psysteme) predicate_system(transformer_relation(pre));
-    for(b = r->base; b != NULL; b = b->succ)
-	values = arguments_add_entity(values, (entity) b->var);
+     /* get rid of pre's variables that do not appear in effects le */
+     /* we should not have to know about these internal objects, Psysteme
+	and Pvecteur! */
+     lost_values = NIL;
+     r = (Psysteme) predicate_system(transformer_relation(pre));
+     for(b = r->base; b != NULL; b = b->succ)
+	 values = arguments_add_entity(values, (entity) b->var);
 
-    /* build a list of arguments to suppress; 
-       get rid of variables that are not referenced, directly or indirectly,
-       by the callee; translate what you can */
-    MAPL(ca, 
-     {entity e = ENTITY(CAR(ca));
-      entity e_callee = entity_undefined;
-      if((e_callee = effects_conflict_with_entity(le, e)) == entity_undefined) {
-	  lost_values = arguments_add_entity(lost_values, e);
-	  debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
-		"precondition_intra_to_inter",
-		"value %s lost according to effect list\n",
-		entity_name(e));
-      } else if(e_callee != e) {
-	  pre = transformer_value_substitute(pre, e, e_callee);
-	  ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
-	      debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
-		    "precondition_intra_to_inter",
-		    "value %s substituted by %s according to effect list le:\n", 
-		    entity_name(e), entity_name(e_callee));
-	      dump_arguments(lost_values);
-	  }
-      }
-  },
-	 values);
+     /* build a list of arguments to suppress; 
+	get rid of variables that are not referenced, directly or indirectly,
+     by the callee; translate what you can */
+     for(ca =values; !ENDP(ca);  POP(ca))    {
+	 entity e = ENTITY(CAR(ca));
+	 list l_callee = (list) effects_conflict_with_entities(le, e);
+	 /* For clarity, all cases are presented */
+	 if (ENDP(l_callee)) {   /* no conflicts */
+	     lost_values = arguments_add_entity(lost_values, e);
+	     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+		   "precondition_intra_to_inter",
+		   "value %s lost according to effect list\n",
+		   entity_name(e));
+	 }
+	 else {
+	     /* list of conflicting entities */
+	     entity e_callee = ENTITY(CAR(l_callee));
+	     /* case 1: only one entity*/
+	     if (gen_length(l_callee)==1) {
+		 /*  case 1.1: one conflicting integer entity */
+		 if (integer_scalar_entity_p(e_callee)) {
+		     if(e_callee != e) {
+			 pre = transformer_value_substitute(pre, 
+							    e, e_callee);
+			 ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
+			     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+				   "precondition_intra_to_inter",
+				   "value %s substituted by %s according to effect list le:\n", 
+				   entity_name(e), entity_name(e_callee));
+			     dump_arguments(lost_values);
+			 }
+		     }
+		 }
+		 /* case 1.22: one conflicting non integer scalar entity*/
+		 else { 
+		     lost_values = arguments_add_entity(lost_values, e);
+		     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+			   "precondition_intra_to_inter",
+			   "value %s lost because non integer scalar entity\n",
+			   entity_name(e));
+		 }
+	     }   
+	     else  { /* case 2: at least 2 conflicting entities */
+		 if (integer_scalar_entity_list_p(l_callee)) {
+		     /* case 2.1: all entities have the same type, 
+			according to mapping_values the subtitution 
+		     is made with the first list element e_callee*/
+		     if(e_callee != e) {
+			 pre = transformer_value_substitute(pre, 
+							    e, e_callee);
+			 ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
+			     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+				   "precondition_intra_to_inter",
+				   "value %s substituted by %s the first element list according to effect list le:\n", 
+				   entity_name(e), entity_name(e_callee));
+			     dump_arguments(lost_values);
+			 }
+		     }
+		 }
+		
+		 else { /* case 2.2:all entities do not have the same type*/ 
+		     lost_values = arguments_add_entity(lost_values, e);
+		     debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+			   "precondition_intra_to_inter",
+			   "value %s lost - list of conflicting entities with different types\n",
+			   entity_name(e));
+		 }
+	     }
+	 }
+	
+     }
 
     ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
 	debug(DEBUG_PRECONDITION_INTRA_TO_INTER, "precondition_intra_to_inter",
