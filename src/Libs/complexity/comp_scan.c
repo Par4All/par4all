@@ -4,6 +4,9 @@
  * scan the Abstract Syntax Tree of a program to count operations
  *
  * $Log: comp_scan.c,v $
+ * Revision 1.21  1997/09/11 08:33:22  coelho
+ * missing header added.
+ *
  * Revision 1.20  1997/09/11 08:24:09  coelho
  * better RCS headers.
  *
@@ -27,6 +30,7 @@
 #include "matrice.h"
 #include "semantics.h"
 #include "effects-generic.h"
+#include "transformer.h"
 #include "complexity.h"
 
 hash_table hash_callee_to_complexity = hash_table_undefined;
