@@ -9,8 +9,8 @@
 %token APPLY
 %token DISPLAY
 %token ACTIVATE
-%token SET
-%token GET
+%token SET_PROPERTY
+%token GET_PROPERTY
 %token INFO
 %token OWNER_NAME
 %token OWNER_ALL
@@ -356,7 +356,7 @@ i_activate:
 	;
 
 i_set:
-	SET
+	SET_PROPERTY
 	sep_list
 	PROPNAME
 	{ $$ = (list) yylval.name; /* bof */}
@@ -428,7 +428,7 @@ i_set:
 	;
 
 i_get:
-	GET
+	GET_PROPERTY
 	sep_list
 	PROPNAME
 	opt_sep_list
