@@ -192,6 +192,11 @@ wpips_user_request(char * a_printf_format,
    user_log("%s\n\"%s\"\nEnd User Request\n",
             message_buffer, the_answer);
    
+   /* returns a newly allocated string...
+    */
+   if (the_answer && |string_undefined_p(the_answer))
+       the_answer = strdup(the_answer);
+
    return the_answer;
 }
 
