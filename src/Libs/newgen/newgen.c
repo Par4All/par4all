@@ -1,10 +1,12 @@
-/* %A% ($Date: 1997/07/24 16:00:40 $, ) 
-    version $Revision$, got on %D%, %T% [%P%].
-   Copyright (c) - École des Mines de Paris Proprietary.  */
+/*
+ * $Id$
+ *
+ * $Log: newgen.c,v $
+ * Revision 1.17  1998/04/11 13:01:09  coelho
+ * includes needed newgen generated support functions.
+ *
+ */
 
-#ifndef lint
-char top_level_newgen_c_vcid[] = "%A% ($Date: 1997/07/24 16:00:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,6 +15,12 @@ char top_level_newgen_c_vcid[] = "%A% ($Date: 1997/07/24 16:00:40 $, ) version $
 #include "all_newgen_headers.h"
 
 #include "ri-util.h"
+
+/* newgen stuff only at compile time.
+ */
+#if !defined(CPROTO_IS_PROTOTYPING)
+#include "newgen_cfiles.h"
+#endif
 
 void initialize_newgen()
 {
