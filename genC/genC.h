@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1995/12/14 17:26:54 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1995/12/14 17:59:36 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -163,6 +163,7 @@ extern void gen_clear_tabulated_element GEN_PROTO(( gen_chunk * )) ;
 extern gen_chunk *gen_copy_tree GEN_PROTO(( gen_chunk * )) ;
 extern int gen_consistent_p GEN_PROTO(( gen_chunk * )) ;
 extern char *alloc GEN_PROTO ((int )) ;
+extern int gen_allocated_memory GEN_PROTO((gen_chunk*));
 
 /*  recursion and utilities
  */
