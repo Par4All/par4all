@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/08/08 19:50:44 $, )
+# ($Date: 1996/08/08 20:16:54 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -143,6 +143,7 @@ shift `expr $OPTIND - 1`
 	    xargs rm -rf
 
 	$verbose - Removing generated files in Production...
+	msg="${msg}C"
         MAKE nlp cleaning $report clean .
     }
 
@@ -155,7 +156,7 @@ shift `expr $OPTIND - 1`
     } || {
 	$verbose Compiling Newgen/Production
 	$verbose date: `date`
-	msg="${msg} N"
+	msg="${msg}N"
 	MAKE n newgen $report "clean-compiled recompile" $arch
     }
     
@@ -165,7 +166,7 @@ shift `expr $OPTIND - 1`
     } || {
 	$verbose Compiling Linear/Production
 	$verbose date: `date`
-	msg="${msg} L"
+	msg="${msg}L"
 	MAKE l linear $report "clean-compiled recompile" $arch
     }
 
@@ -175,7 +176,7 @@ shift `expr $OPTIND - 1`
     } || {
 	$verbose Compiling Pips/Production
 	$verbose date: `date`
-	msg="${msg} P"
+	msg="${msg}P"
 	MAKE p pips $report "clean-compiled recompile" $arch
     }
 
@@ -186,7 +187,7 @@ shift `expr $OPTIND - 1`
 	$verbose date: `date`
 	summary=SUCCEEDED
 	grep 'failed$' $report > $report.failed && summary=FAILED
-	$mail -s "$script: compile${msg}: ${summary}" $email \
+	$mail -s "$script: compile ${msg} ($arch): ${summary}" $email \
 	    < $report.failed > /dev/null 2>&1
 	rm -f $report*
     }
