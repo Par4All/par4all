@@ -143,6 +143,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"-",                        no_write_effects},
     {"/",                        no_write_effects},
     {"*",                        no_write_effects},
+    {"INV",                      no_write_effects},
     {"--",                       no_write_effects},
     {"**",                       no_write_effects},
     {".EQV.",                    no_write_effects},
