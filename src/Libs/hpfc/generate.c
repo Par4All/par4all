@@ -1,5 +1,9 @@
-/* $RCSfile: generate.c,v $ ($Date: 1996/06/08 10:54:07 $, )
- * version $Revision$
+/* 
+ * $Id$
+ * $Log: generate.c,v $
+ * Revision 1.16  1997/03/20 10:20:35  coelho
+ * RCS headers.
+ *
  * 
  * Fabien Coelho, May 1993
  */
