@@ -594,20 +594,10 @@ statement
 make_return_statement(module)
 entity module;
 {
-  /* The special RETURN label should be used, shouldn't it? */
-
-    string name; 
-    entity l;
     char *module_name = entity_local_name(module);
-    name= concatenate( module_name, MODULE_SEP_STRING, LABEL_PREFIX,
+    string name= concatenate( module_name, MODULE_SEP_STRING, LABEL_PREFIX,
 		       RETURN_LABEL_NAME,NULL);
-    l = make_entity(strdup(name), type_undefined, storage_undefined, 
-			   value_undefined);
-    entity_type(l) = (type) MakeTypeStatement();
-    entity_storage(l) = (storage) MakeStorageRom();
-    entity_initial(l) = make_value(is_value_constant, 
-				   MakeConstantLitteral());
- 
+    entity l =(entity) make_label(strdup(name)) ;
     return make_call_statement(RETURN_FUNCTION_NAME, NIL, 
 			       l, empty_comments);
 }
