@@ -176,6 +176,10 @@ wpips_execute_and_display_something(char * label)
       print_type = DBR_PRINTED_FILE;
       icon_number = sequential_ICON;
    }
+   else if (strcmp(label, SEQUENTIAL_EMACS_VIEW) == 0) {
+      print_type = DBR_EMACS_PRINTED_FILE;
+      icon_number = sequential_ICON;
+   }
    else if (strcmp(label, PARALLEL_VIEW) == 0) {
       print_type = DBR_PARALLELPRINTED_FILE;
       icon_number = parallel_ICON;
@@ -241,7 +245,7 @@ wpips_execute_and_display_something(char * label)
       /* Is there an available edit_textsw ? */
       if ( (win2=alloc_first_initialized_window()) 
            == NO_TEXTSW_AVAILABLE ) {
-         prompt_user("None of the 2 text-windows is available");
+         prompt_user("None of the text-windows is available");
          return;
       }
 
@@ -404,6 +408,7 @@ void create_edit_menu()
 	/*	  MENU_ACTION_ITEM, HPFC_VIEW, view_notify,*/
 		  MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
 		  MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
+		  MENU_ACTION_ITEM, SEQUENTIAL_EMACS_VIEW, view_notify,
 		  MENU_APPEND_ITEM, close,
 		  NULL);
 
