@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.SUN4,v $ (version $Revision$)
-# $Date: 1996/07/11 10:27:40 $, 
+# $Date: 1996/07/11 13:14:21 $, 
 #
 # this file contains macro definitions 
 
@@ -13,6 +13,8 @@ LD	= $(CC) -bsdmalloc
 LDFLAGS	= -fast -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)
 LEX	= lex
 LFLAGS	=
+FC	= f77
+FFLAGS	= -O -g -U -u -C 
 LINT	= lint
 LINTFLAGS= -habxu
 YACC	= yacc
