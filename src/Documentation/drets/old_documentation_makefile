@@ -1,6 +1,6 @@
 # PROJET PIPS: EXPLOITATION DE LA DOCUMENTATION
 # ---------------------------------------------
-# $RCSfile: old_documentation_makefile,v $ ($Date: 1995/08/10 13:16:58 $, )
+# $RCSfile: old_documentation_makefile,v $ ($Date: 1995/08/10 13:28:13 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -46,6 +46,7 @@ LIBDIR		=	$(PIPS_LIBDIR)
 INCLUDEDIR	=	$(PIPS_INCLUDEDIR)
 UTILDIR		= 	$(PIPS_UTILDIR)
 LIBSRCDIR	= 	$(PIPS_LIBSRCDIR)
+BINSRCDIR	=	$(PIPS_BINSRCDIR)
 
 # GENERATION DE FICHIERS LATEX A INCLURE DANS LES RAPPORTS
 
