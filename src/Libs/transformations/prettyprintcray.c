@@ -116,7 +116,7 @@ list all_enclosed_scope_variables(statement stmt)
       case is_instruction_loop : {
 	  loop lp= instruction_loop(instr);
 	  statement lpb= loop_body(lp);
-	  effects cfx = stmt_to_fx(lpb, get_cumulated_effects_map() );
+	  effects cfx = stmt_to_fx(lpb, get_rw_effects() );
 
 	  pips_assert("all_enclosed_scope_variables", cfx != effects_undefined);
 	  ent_l= concat_new_entities(real_loop_locals(lp, cfx),
@@ -173,7 +173,7 @@ text text_microtasked_loop(entity module, int margin, statement lp_stt)
 
     wordl = CHAIN_SWORD(NIL, "DO ALL ");
 
-    fx = stmt_to_fx(loop_body(lp), get_cumulated_effects_map());
+    fx = stmt_to_fx(loop_body(lp), get_rw_effects());
 
     /* generate arguments for PRIVATE */
     /* nb: ent_l should contain entities only ones. */
@@ -338,16 +338,11 @@ bool print_parallelizedcray_code(char *mod_name)
 	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, TRUE);
     
     /* We need to recompute proper effects and cumulated effects */
-    set_proper_effects_map( MAKE_STATEMENT_MAPPING() );
-    /* FI: the last arg sems to be missing...
-       rproper_effects_of_statement(get_proper_effects_map(), mod_stat)
-       */
-    rproper_effects_of_statement( get_proper_effects_map() , mod_stat, NIL);
+    init_proper_rw_effects();
+    rproper_effects_of_statement(mod_stat);
 
-    set_cumulated_effects_map( MAKE_STATEMENT_MAPPING() );
-    rcumulated_effects_of_statement(get_cumulated_effects_map(),
-				     get_proper_effects_map(),
-				     mod_stat);
+    init_rw_effects();
+    rcumulated_effects_of_statement(mod_stat);
 
     set_current_module_entity(module);
 
@@ -362,12 +357,13 @@ bool print_parallelizedcray_code(char *mod_name)
 
     close_prettyprint();
 
-    /* free proper effects and cumulated effects */
-    free_list_effects_mapping( get_cumulated_effects_map() );
-    free_list_effects_mapping( get_proper_effects_map() );
+    /* free proper effects and cumulated effects 
+     Je ne sais pas trop comment le free fonctionne avec statement_effects. bc.*/
+    /* free_statement_effects( get_rw_effects() );
+       free_statement_effects( get_proper_rw_effects() ); */
 
-    reset_cumulated_effects_map();
-    reset_proper_effects_map();
+    reset_rw_effects();
+    reset_proper_rw_effects();
     reset_current_module_entity();
     
     set_bool_property("PRETTYPRINT_CRAY", prettyprint_cray_p);
