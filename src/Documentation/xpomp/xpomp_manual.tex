@@ -1,9 +1,10 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/26 13:57:25 $, 
+%% $Date: 1996/12/20 15:37:53 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html,verbatim}
+\usepackage{page_de_garde_CRI}
 \begin{document}
 \newcommand{\CRI}{\htmladdnormallink{Centre de Recherche en Informatique}
   {http://www.cri.ensmp.fr}\xspace}
@@ -29,11 +30,23 @@
 \renewcommand{\topfraction}{1}
 \renewcommand{\bottomfraction}{1}
 
+\begin{latexonly}
+\newcommand{\numerocri}{A/298-CRI}
+\newcommand{\titre}{xPOMP\\
+  a Simple X11 graphical Library to Display Arrays in C,
+  Fortran and HPF}
+\newcommand{\auteur}{Ronan \textsc{Keryell}\\
+  Nicolas \textsc{Paris}}
+\newcommand{\docdate}{\today}
+\newcommand{\lieu}{}
+\SortLaPageDeGarde
+\end{latexonly}
+
 
 \title{xPOMP: a Simple X11 graphical Library to Display Arrays in C,
   Fortran and HPF\\
   ---\\
-  Technical Report E/CRI/???}
+  Technical Report A/CRI/298}
 \author{Ronan \textsc{Keryell}\thanks{%
     \CRI,
     \htmladdnormallink{École Nationale Supérieure des Mines de Paris}
