@@ -464,15 +464,42 @@ some_io_effects(entity e, list args)
 
 static list read_io_effects(entity e, list args)
 {
-  /* get standard io effects */
+  /* READ is a special case , for example 
+     
+     N = 5
+     READ *,N, (T(I),I=1,N) 
+
+     There is write effect on N in the READ statement, so we have 
+     to project N from the proper region of the READ statement, then add
+     the precondition after.
+
+     The correct region in this case is :
+     
+     <T(PHI1)-MAY-{1 <= PHI1, N==5} >*/
+     
+
+  /*  get standard io effects 
+
+      Attention : in this list of io_effects, there are already 
+      preconditions  so the too late application of reverse transformer
+      still gives the false result !!!
+
+      io_effects => generic_proper_effects_of_expression => ....
+      effects_precondition_composition_op
+
+ */
+
   list le = io_effects(e, args);
 
   /* get current transformer */
   statement s = effects_private_current_stmt_head();
   transformer t = (*load_transformer_func)(s);
 
-  /* reverse-apply transformer to le. */
-  le = (*effects_transformer_composition_op)(le, t); 
+  if (!transformer_undefined_p(t)) /* hummm... */
+  {
+    /* reverse-apply transformer to le. */
+    le = (*effects_transformer_composition_op)(le, t); 
+  }
 
   return le;
 }
