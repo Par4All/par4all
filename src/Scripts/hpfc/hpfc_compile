@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/09/05 15:01:27 $, 
+# $Date: 1995/09/22 11:21:53 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -202,7 +202,6 @@ set +x
 	$DBDIR/*_node.f \
 	$DBDIR/*_parameters.h \
         $DBDIR/*_init.h \
-        $DBDIR/*_init.m4 \
  	$DBDIR/*_host.h \
 	$DBDIR/*_node.h 
 }
