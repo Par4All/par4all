@@ -1,10 +1,10 @@
 #! /bin/sh
 
 #
-# Build [-w wspace] [-m module] resource
+# Build [-v] [-w wspace] [-m module] resource
 #
 
-USAGE="Usage: Build [-w wspace] [-m module] resource"
+USAGE="Usage: Build [-v] [-w wspace] [-m module] resource"
 
 if [ $# -eq 0 ]
 then	echo $USAGE >&2
@@ -14,6 +14,7 @@ fi
 while getopts w:m: opt
 do
 	case $opt in
+	v)	VERBOSE=TRUE;;
 	w)	OPT_PGM=$OPTARG;;
 	m)	OPT_MOD=$OPTARG;;
 	\?)	echo $USAGE >&2
@@ -31,4 +32,9 @@ else
 	exit 1
 fi
 
-Pips -w "$OPT_PGM" -m "$OPT_MOD" -b $RES || exit 1;
+if [ -z "$VERBOSE" ]
+then
+	$PIPS_UTILDIR/Pips -w "$OPT_PGM" -m "$OPT_MOD" -b $RES 1>/dev/null || exit 1;
+else
+	$PIPS_UTILDIR/Pips -w "$OPT_PGM" -m "$OPT_MOD" -b $RES 1>&2 || exit 1;
+fi
