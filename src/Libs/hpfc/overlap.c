@@ -2,7 +2,7 @@
  * Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1995/03/13 15:37:07 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1995/03/13 15:52:23 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -33,14 +33,14 @@ extern int fprintf();
  */
 
 #define entry_defined_p(ent) \
-    (GET_ENTITY_MAPPING(overlaps, ent) != HASH_UNDEFINED_VALUE)
+    (GET_ENTITY_MAPPING(XXoverlaps, ent) != HASH_UNDEFINED_VALUE)
 
 /*
  * the overlap management is based on an hash table
  */
 
 static entity_mapping
-    overlaps;
+    XXoverlaps;
 
 /*
  * static void get_int_hash_table(ent)
@@ -52,10 +52,10 @@ entity ent;
 {
     if (!entry_defined_p(ent))
     {
-	SET_ENTITY_MAPPING(overlaps, ent, hash_table_make(hash_int, 0));
+	SET_ENTITY_MAPPING(XXoverlaps, ent, hash_table_make(hash_int, 0));
     }
     
-    return((hash_table) GET_ENTITY_MAPPING(overlaps, ent));
+    return((hash_table) GET_ENTITY_MAPPING(XXoverlaps, ent));
 }
 
 /*
@@ -65,7 +65,7 @@ entity ent;
  */
 void init_overlap_management()
 {
-    overlaps = MAKE_ENTITY_MAPPING();
+    XXoverlaps = MAKE_ENTITY_MAPPING();
     hash_dont_warn_on_redefinition();
 }
 
@@ -82,9 +82,9 @@ void close_overlap_management()
 		       debug(9, "close_overlap_management", "freeing for key %d\n", key);
 		       hash_table_free((hash_table) int_map);
 		   },
-		       overlaps);
+		       XXoverlaps);
 
-    FREE_ENTITY_MAPPING(overlaps);
+    FREE_ENTITY_MAPPING(XXoverlaps);
 }
 
 /*
