@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_generate_init,v $ ($Date: 1995/09/20 19:22:31 $, )
+# $RCSfile: hpfc_generate_init,v $ ($Date: 1996/03/14 10:54:03 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -35,6 +35,10 @@ init=$dirname/param_init.m4
 NAME="${NAME:-`basename $dirname .database`}"
 NAME=`echo $NAME | tr 'A-Z' 'a-z'`
 
+# the key is used to check that the nodes and host do match...
+
+key="${NAME}.`hostname`.`whoami`.`date +"%H$RCSfile: hpfc_generate_init,v $S%j%y"`"
+
 {
   echo "      subroutine HPFC_INIT_COMMON_PARAM()"
   echo "      include \"hpfc_commons.h\""
@@ -50,9 +54,11 @@ NAME=`echo $NAME | tr 'A-Z' 'a-z'`
   do
     echo "      include \"`basename $file`\""
   done
+  echo "c other initializations"
   echo "      NODE_PROGRAM_NAME=\"${NAME}_node\""
   echo "      NODE_ARCHITECTURE=\"PVM_ARCHITECTURE\""
   echo "      HPFC_GROUP_NAME=\"${NAME}_group\""
+  echo "      HPFC_KEY=\"$key\""
   echo "      end"
 } > $init
 
