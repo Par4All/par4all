@@ -1,5 +1,5 @@
 # $RCSfile: Makefile.compile_wp65,v $ (version $Revision$)
-# $Date: 1995/11/30 14:40:50 $, 
+# $Date: 1996/08/21 18:15:29 $, 
 #
 
 # Fait des vérifications exhaustives :
@@ -11,7 +11,9 @@ FC	= $(WP65_FC)
 FFLAGS	= $(WP65_FFLAGS)
 
 LD	= $(FC)
-LDFLAGS = -L$(WP65_LIBRARY) $(PIPS_LDFLAGS) -L$(PVM_ROOT)/lib/$(PVM_ARCH)
+LDFLAGS = -L$(WP65_LIBRARY)/$(PVM_ARCH) \
+	  -L$(PIPS_ROOT)/Lib/$(PIPS_ARCH) \
+	  -L$(PVM_ROOT)/lib/$(PVM_ARCH)
 
 #
 # Ronan links to 3 pips libraries (wp65, misc, properties) 
