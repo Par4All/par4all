@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/11 08:39:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/25 11:16:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/02/11 08:39:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/02/25 11:16:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -376,44 +376,289 @@ static string (*common_hook)(entity, entity) = default_common_hook;
 void set_prettyprinter_common_hook(string(*f)(entity,entity)){ common_hook=f;}
 void reset_prettyprinter_common_hook(){ common_hook=default_common_hook;}
 
+/* debugging for equivalences */
+#define EQUIV_DEBUG 8
+
+static void 
+equiv_class_debug(list l_equiv)
+{
+    if (ENDP(l_equiv))
+	fprintf(stderr, "<none>");
+    MAP(ENTITY, equiv_ent,
+	{
+	    fprintf(stderr, " %s", entity_local_name(equiv_ent));
+	}, l_equiv);
+    fprintf(stderr, "\n");
+}
+
+
+/* static int equivalent_entity_compare(entity *ent1, entity *ent2)
+ * input    : two pointers on entities.
+ * output   : an integer for qsort.
+ * modifies : nothing.
+ * comment  : this is a comparison function for qsort; the purpose
+ *            being to order a list of equivalent variables.
+ * algorithm: If two variables have the same offset, the longest 
+ * one comes first; if they have the same lenght, use a lexicographic
+ * ordering.
+ * author: bc.
+ */
+static int
+equivalent_entity_compare(entity *ent1, entity *ent2)
+{
+    int result;
+    int offset1 = ram_offset(storage_ram(entity_storage(*ent1)));
+    int offset2 = ram_offset(storage_ram(entity_storage(*ent2)));
+    Value size1, size2;
+    
+    result = offset1 - offset2;
+
+    /* pips_debug(1, "entities: %s %s\n", entity_local_name(*ent1),
+	  entity_local_name(*ent2)); */
+    
+    if (result == 0)
+    {
+	/* pips_debug(1, "same offset\n"); */
+	size1 = ValueSizeOfArray(*ent1);
+	size2 = ValueSizeOfArray(*ent2);
+	result = value_compare(size2,size1);
+	
+	if (result == 0)
+	{
+	    /* pips_debug(1, "same size\n"); */
+	    result = strcmp(entity_local_name(*ent1), entity_local_name(*ent2));
+	}
+    }
+
+    return(result);
+}
+
+/* static text text_equivalence_class(list  l_equiv)
+ * input    : a list of entities representing an equivalence class.
+ * output   : a text, which is the prettyprint of this class.
+ * modifies : sorts l_equiv according to equivalent_entity_compare.
+ * comment  : partially associated entities are not handled. 
+ * author   : bc.
+ */
 static text
 text_equivalence_class(list /* of entities */ l_equiv)
 {
     text t_equiv = make_text(NIL);
+    list lw = NIL;
+    list l1, l2;
+    entity ent1, ent2;
+    int offset1, offset2;
+    Value size1, size2, offset_end1;
+    boolean first;
+
+    if (ENDP(l_equiv)) return(t_equiv);
 
     /* FIRST, sort the list by increasing offset from the beginning of
        the memory suite. If two variables have the same offset, the longest 
        one comes first; if they have the same lenght, use a lexicographic
        ordering */
+    ifdebug(EQUIV_DEBUG)
+    {
+	pips_debug(1, "equivalence class before sorting:\n");
+	equiv_class_debug(l_equiv);
+    }
+    
+    gen_sort_list(l_equiv,equivalent_entity_compare);
+	
+    ifdebug(EQUIV_DEBUG)
+    {
+	pips_debug(1, "equivalence class after sorting:\n");
+	equiv_class_debug(l_equiv);
+    }
+    
+    /* THEN, prettyprint the sorted list*/	
+    pips_debug(EQUIV_DEBUG,"prettyprint of the sorted list\n");
+	
+    /* We are sure that there is at least one equivalence */
+    lw = CHAIN_SWORD(lw, "EQUIVALENCE");
 
-    /* THEN, prettyprint the sorted list*/
-
+    /* At each step of the next loop, we consider two entities
+     * from the equivalence class. l1 points on the first entity list,
+     * and l2 on the second one. If l2 is associated with l1, we compute
+     * the output string, and l2 becomes the next entity. If l2 is not
+     * associated with l1, l1 becomes the next entity, until it is 
+     * associated with l1. In the l_equiv list, l1 is always before l2.
+     */
+    
+    /* loop initialization */
+    l1 = l_equiv;
+    ent1 = ENTITY(CAR(l1));
+    offset1 = ram_offset(storage_ram(entity_storage(ent1)));
+    size1 = ValueSizeOfArray(ent1);
+    l2 = CDR(l_equiv);
+    first = TRUE;
+    /* */
+    
+    while(!ENDP(l2))
+    {
+	ent2 = ENTITY(CAR(l2));
+	offset2 = ram_offset(storage_ram(entity_storage(ent2)));
+	
+	pips_debug(EQUIV_DEBUG, "dealing with: %s %s\n", entity_local_name(ent1),
+		   entity_local_name(ent2));
+	
+	/* If the two variables have the same offset, their
+	 * first elements are equivalenced. 
+	 */
+	if (offset1 == offset2)
+	{
+	    pips_debug(EQUIV_DEBUG, "easiest case: offsets are the same\n");
+	    if (! first)
+		lw = CHAIN_SWORD(lw, ",");
+	    else
+		first = FALSE;
+	    lw = CHAIN_SWORD(lw, " (");
+	    lw = CHAIN_SWORD(lw, entity_local_name(ent1));
+	    lw = CHAIN_SWORD(lw, ",");
+	    lw = CHAIN_SWORD(lw, entity_local_name(ent2));
+	    lw = CHAIN_SWORD(lw, ")");		
+	    POP(l2);
+	}
+	/* Else, we first check that there is an overlap */
+	else 
+	{
+	    pips_assert("the equivalence class has been sorted\n",
+			offset1 < offset2);
+	    
+	    size2 = ValueSizeOfArray(ent2);		
+	    offset_end1 = value_plus(offset1, size1);
+	    
+	    /* If there is no overlap, we change the reference variable */
+	    if (value_le(offset_end1,offset2))
+	    {
+		pips_debug(1, "second case: there is no overlap\n");
+		POP(l1);
+		ent1 = ENTITY(CAR(l1));
+		offset1 = ram_offset(storage_ram(entity_storage(ent1)));
+		size1 = ValueSizeOfArray(ent1);	
+		if (l1 == l2) POP(l2);
+	    }
+	    
+	    /* Else, we must compute the coordinates of the element of ent1
+	     * which corresponds to the first element of ent2
+	     */
+	    else
+	    {
+		/* ATTENTION: Je n'ai pas considere le cas 
+		 * ou il y a association partielle. De ce fait, offset
+		 * est divisiable par size_elt_1. */
+		static char buffer[10];
+		int offset = offset2 - offset1;
+		int rest;
+		int current_dim;    
+		int dim_max = NumberOfDimension(ent1);		    
+		int size_elt_1 = SizeOfElements(
+		    variable_basic(type_variable(entity_type(ent1))));
+		list l_tmp = variable_dimensions(type_variable(entity_type(ent1)));
+		normalized nlo;
+		Pvecteur pvlo;
+		    
+		pips_debug(EQUIV_DEBUG, "third case\n");
+		pips_debug(EQUIV_DEBUG, "offset=%d, dim_max=%d, size_elt_1=%d\n",
+			   offset, dim_max,size_elt_1);
+				
+		if (! first)
+		    lw = CHAIN_SWORD(lw, ",");
+		else
+		    first = FALSE;
+		lw = CHAIN_SWORD(lw, " (");
+		lw = CHAIN_SWORD(lw, entity_local_name(ent1));
+		lw = CHAIN_SWORD(lw, "(");
+		
+		pips_assert("partial association case not implemented:\n"
+			    "offset % size_elt_1 == 0", (offset % size_elt_1) == 0);
+		
+		offset = offset/size_elt_1;
+		current_dim = 1;
+		
+		while (current_dim <= dim_max)
+		{
+		    dimension dim = DIMENSION(CAR(l_tmp));
+		    int new_decl;
+		    int size;
+		    
+		    pips_debug(EQUIV_DEBUG, "prettyprinting dimension %d\n",
+			       current_dim);
+		    size = SizeOfIthDimension(ent1, current_dim);
+		    rest = (offset % size);
+		    offset = offset / size;
+		    nlo = NORMALIZE_EXPRESSION(dimension_lower(dim));
+		    pvlo = normalized_linear(nlo);
+		    
+		    pips_assert("", vect_constant_p(pvlo));			
+		    pips_debug(EQUIV_DEBUG,
+			       "size=%d, rest=%d, offset=%d, lower_bound=%d\n",
+			       size, rest, offset, VALUE_TO_INT(val_of(pvlo)));
+		    
+		    new_decl = VALUE_TO_INT(val_of(pvlo)) + rest;
+		    buffer[0] = '\0';
+		    sprintf(buffer+strlen(buffer), "%d", new_decl);		 
+		    lw = CHAIN_SWORD(lw,strdup(buffer));			
+		    if (current_dim < dim_max)
+			lw = CHAIN_SWORD(lw, ",");
+		    
+		    POP(l_tmp);
+		    current_dim++;
+		    
+		} /* while */
+		
+		lw = CHAIN_SWORD(lw, ")");	
+		lw = CHAIN_SWORD(lw, ",");
+		lw = CHAIN_SWORD(lw, entity_local_name(ent2));
+		lw = CHAIN_SWORD(lw, ")");	
+		POP(l2);
+	    } /* if-else: there is an overlap */
+	} /* if-else: not same offset */
+    } /* while */
+    ADD_WORD_LIST_TO_TEXT(t_equiv, lw);
+    
+    pips_debug(EQUIV_DEBUG, "end\n");
     return t_equiv;
 }
 
+
+/* text text_equivalences(entity module, list ldecl)
+ * input    : the current module, and the list of declarations.
+ * output   : a text for all the equivalences.
+ * modifies : nothing
+ * comment  :
+ */
 text 
 text_equivalences(entity module, list ldecl)
 {
-    list equiv_classes = NIL;
+    list equiv_classes = NIL, l_tmp;
     text t_equiv_class;
 
+    pips_debug(1,"begin\n");
+
     /* FIRST BUILD EQUIVALENCE CLASSES */
+
+    pips_debug(EQUIV_DEBUG, "loop on declarations\n");
     /* consider each entity in the declaration */
     MAP(ENTITY, e,
 	{
 	    /* but only variables which have a ram storage must be considered */
-	    if (type_variable_p(entity_type(e)) &&
-		storage_ram_p(entity_storage(e)))
+	    if (type_variable_p(entity_type(e)) && storage_ram_p(entity_storage(e)))
 	    {
-		list shared = ram_shared(storage_ram(entity_storage(e)));
+		list l_shared = ram_shared(storage_ram(entity_storage(e)));
 		
+		ifdebug(EQUIV_DEBUG)
+		{
+		    pips_debug(1, "considering entity: %s\n", entity_local_name(e));
+		    pips_debug(1, "shared variables:\n");
+		    equiv_class_debug(l_shared);
+		}
+
 		/* If this variable is statically aliased */
-		if (!ENDP(shared))
+		if (!ENDP(l_shared))
 		{
 		    bool found = FALSE;
 		    list found_equiv_class = NIL;
-
-		    shared = CONS(ENTITY, e, shared);
 
 		    /* We first look in already found equivalence classes
 		     * if there is already a class in which one of the
@@ -421,27 +666,30 @@ text_equivalences(entity module, list ldecl)
 		     */
 		    MAP(LIST, equiv_class,
 			{
+			    ifdebug(EQUIV_DEBUG)
+			    {
+				pips_debug(1, "considering equivalence class:\n");
+				equiv_class_debug(equiv_class);
+			    }
+
 			    MAP(ENTITY, ent,
 				{
 				    if (variable_in_list_p(ent, equiv_class))
 				    {
 					found = TRUE;
+					found_equiv_class = equiv_class;
 					break;
 				    }
-				},
-				shared);
-			    if (found)
-			    {
-				found_equiv_class = equiv_class;
-				break;
-			    }
-			}, 
-			equiv_classes);
+				}, l_shared);
+
+			    if (found) break;			    
+			}, equiv_classes);
 
 		    if (found)
 		    {
+			pips_debug(EQUIV_DEBUG, "already there\n");
 			/* add the entities of shared which are not already in 
-			 * the existing equivalence class
+			 * the existing equivalence class. Useful ??
 			 */
 			MAP(ENTITY, ent,
 			    {
@@ -449,25 +697,56 @@ text_equivalences(entity module, list ldecl)
 				    found_equiv_class =
 					gen_nconc(found_equiv_class,
 						  CONS(ENTITY, ent, NIL));
-			    },
-			    shared)
+			    }, l_shared)
 		    }
 		    else
 		    {
-			equiv_classes = gen_nconc(equiv_classes, shared);
+			list l_tmp = NIL;
+			pips_debug(EQUIV_DEBUG, "not found\n");
+			/* add the list of variables in l_shared; necessary 
+			 * because variables may appear several times in 
+                         * l_shared. */
+			MAP(ENTITY, shared_ent,
+			    {
+				if (!variable_in_list_p(shared_ent, l_tmp))
+				    l_tmp = gen_nconc(l_tmp,
+						      CONS(ENTITY, shared_ent,
+							   NIL));
+			    }, l_shared);
+			equiv_classes =
+			    gen_nconc(equiv_classes, CONS(LIST, l_tmp, NIL));
 		    }
 		}
 	    }
-	},
-	ldecl);
+	}, ldecl);
+
+    ifdebug(EQUIV_DEBUG)
+    {
+	pips_debug(1, "final equivalence classes:\n");
+	MAP(LIST, equiv_class,
+	{
+	    equiv_class_debug(equiv_class);
+	},equiv_classes);	
+    }
 
     /* SECOND, PRETTYPRINT THEM */
     t_equiv_class = make_text(NIL); 
     MAP(LIST, equiv_class,
 	{
-	   MERGE_TEXTS(t_equiv_class, text_equivalence_class(equiv_class));
-	},
-	equiv_classes);
+	    MERGE_TEXTS(t_equiv_class, text_equivalence_class(equiv_class));
+	}, equiv_classes);
+
+    /* AND FREE THEM */    
+    for(l_tmp = equiv_classes; !ENDP(l_tmp); POP(l_tmp))
+    {
+	list equiv_class = LIST(CAR(l_tmp));
+	gen_free_list(equiv_class);
+	LIST(CAR(l_tmp)) = NIL;
+    }
+    gen_free_list(equiv_classes);
+    
+    /* THE END */
+    pips_debug(EQUIV_DEBUG, "end\n");
     return(t_equiv_class);
 }
 
@@ -647,7 +926,7 @@ text_entity_declaration(entity module, list ldecl)
     MERGE_TEXTS(r, make_text(area_decl));
 
     /* And lastly, equivalence statements... - BC -*/
-    /* MERGE_TEXTS(r, text_equivalences(module, ldecl)); */
+    MERGE_TEXTS(r, text_equivalences(module, ldecl)); 
 
     return r;
 }
