@@ -3,6 +3,9 @@
   $Id$
 
   $Log: loop_unroll.c,v $
+  Revision 1.24  2003/05/21 07:59:20  irigoin
+  In loop_unroll(), use index type for new index related variables
+
   Revision 1.23  2000/07/03 09:57:49  irigoin
   transformation cut...
 
@@ -141,6 +144,7 @@ void loop_unroll(statement loop_statement, int rate)
     loop il = instruction_loop(statement_instruction(loop_statement));
     range lr = loop_range(il);
     entity ind = loop_index(il);
+    basic indb = variable_basic(type_variable(entity_type(ind)));
     expression lb = range_lower(lr),
                ub = range_upper(lr),
                inc = range_increment(lr);
@@ -180,7 +184,8 @@ void loop_unroll(statement loop_statement, int rate)
     */
     nub = make_new_scalar_variable_with_prefix(NORMALIZED_UPPER_BOUND_NAME, 
 					       mod_ent,
-					       MakeBasic(is_basic_int));
+					       copy_basic(indb)
+					       /* MakeBasic(is_basic_int)*/);
 
     if (expression_integer_value(lb, &lbval) 
 	&& expression_integer_value(ub, &ubval) 
@@ -220,7 +225,8 @@ void loop_unroll(statement loop_statement, int rate)
     */
     ib = make_new_scalar_variable_with_prefix(INTERMEDIATE_BOUND_NAME, 
 					      mod_ent,
-					      MakeBasic(is_basic_int));
+					      copy_basic(indb)
+					      /* MakeBasic(is_basic_int)*/);
 
     if (numeric_range_p) {
 	rhs_expr = int_expr(FORTRAN_MOD(FORTRAN_DIV(ubval-lbval+incval, 
@@ -251,7 +257,8 @@ void loop_unroll(statement loop_statement, int rate)
     */
     lu_ind = make_new_scalar_variable_with_prefix(INDEX_NAME, 
 						  mod_ent,
-						  MakeBasic(is_basic_int));
+						  copy_basic(indb)
+						  /* MakeBasic(is_basic_int)*/);
 
     /* Loop range is created */
     rg = make_range(MakeIntegerConstantExpression("0"),
