@@ -2,11 +2,15 @@
  * and in the static area and in the dynamic area. The heap area is left
  * aside.
  *
- * 	%A% ($Date: 1998/10/09 11:44:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+ * 	%A% ($Date: 1998/10/13 20:17:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: equivalence.c,v $
+ * Revision 1.19  1998/10/13 20:17:51  irigoin
+ * Bug fix in ComputeAddress(): some order between DATA and COMMON
+ * declarations in equivalence chains was assumed.
+ *
  * Revision 1.18  1998/10/09 11:44:34  irigoin
  * Support for the *HEAP* area in ComputeAddresses()
  *
@@ -14,7 +18,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1998/10/09 11:44:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1998/10/13 20:17:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -501,13 +505,18 @@ ComputeAddresses()
 			    } 
 			    else if (sc == StaticArea) {
 				/* A variable may be located in a static area because
-				 * of a SAVE or a DATA statement and be equivalenced
+				 * of a SAVE (?) or a DATA statement and be equivalenced
 				 * with a variable in a common.
 				 */
 				pips_assert("ComputeAddresses", ram_section(r) != DynamicArea);
 				sc = ram_section(r);
 				ac = ram_offset(r)-o;
-			    } 
+			    }
+			    else if(ram_section(r) == StaticArea) {
+			      /* Same as above but in a different order */
+			      /* Let's hope this is due to a DATA and not to a SAVE */
+			      ram_section(r) == sc;
+			    }
 			    else {
 				user_warning("ComputeAddresses",
 					     "Incompatible default area %s and "
