@@ -1,10 +1,11 @@
 !
 ! everything about packing
 !
-! $RCSfile: hpfc_packing.m4f,v $ ($Date: 1997/01/07 11:50:17 $, )
-! version $Revision$
-! got on %D%, %T%
 ! $Id$
+! $Log: hpfc_packing.m4f,v $
+! Revision 1.16  1997/03/20 07:50:01  coelho
+! better RCS headers.
+!
 !
 ! macros for code generation
 !
