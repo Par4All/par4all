@@ -399,6 +399,7 @@ transformer tfb;
     expression e_incr = range_increment(r);
     Pvecteur v_incr = VECTEUR_UNDEFINED;
     int incr = 0;
+    Value vi;
     normalized n;
 
     debug(8,"add_index_range_conditions","begin\n");
@@ -411,28 +412,32 @@ transformer tfb;
 	    v_incr = (Pvecteur) normalized_linear(n);
 	    if(vect_constant_p(v_incr)) {
 		pips_assert("add_good_loop_conditions",!VECTEUR_NUL_P(v_incr));
-		incr = (int) vect_coeff(TCST, v_incr);
+		vi =vect_coeff(TCST, v_incr);
+		incr = VALUE_TO_INT(vi);
 	    }
 	    else if(vect_size(v_incr) == 1) {
-		/* if incr not numerically known, try the context... Thanks to KM:-) */
-		Psysteme s = sc_dup((Psysteme) predicate_system(transformer_relation(pre)));
-		int mininc = 0;
-		int maxinc = 0;
+		/* if incr not numerically known, try the context...
+		   Thanks to KM:-) */
+		Psysteme s = sc_dup((Psysteme) 
+		     predicate_system(transformer_relation(pre)));
+		Value mininc = VALUE_ZERO, maxinc = VALUE_ZERO;
 		entity e_incr = (entity) vecteur_var(v_incr);
 
 		if(sc_minmax_of_variable(s, (Variable) e_incr, 
 					 &mininc, &maxinc)) {
-		    debug(8, "add_index_range_preconditions", "mininc = % d, maxinc = %d\n",
-			  mininc, maxinc);
-		    if(mininc>0)
+		    /* debug(8, "add_index_range_preconditions",
+		       "mininc = % d, maxinc = %d\n",
+			  mininc, maxinc); */
+		    if(value_pos_p(mininc))
 			incr = 1;
-		    else if(maxinc<0)
+		    else if(value_neg_p(maxinc))
 			incr = -1;
 		    else
 			incr = 0;
 		}
 		else {
-		    user_warning("add_index_range_conditions", "dead code detected\n");
+		    user_warning("add_index_range_conditions", 
+				 "dead code detected\n");
 		    incr = 0;
 		}
 	    }
@@ -526,12 +531,12 @@ bool simple_dead_loop_p(expression lower, expression upper)
     if(normalized_linear_p(n_upper) && normalized_linear_p(n_lower)) {
 	Pvecteur v_lower = normalized_linear(n_lower);
 	Pvecteur v_upper = normalized_linear(n_upper);
-
+	
 	if(VECTEUR_NUL_P(v_lower)) {
 	    if (!VECTEUR_NUL_P(v_upper)) {
 		if(term_cst(v_upper)
 		   && VECTEUR_NUL_P(vecteur_succ(v_upper))) {
-		    dead_loop_p =  vecteur_val(v_upper) < 0;
+		    dead_loop_p =  value_neg_p(vecteur_val(v_upper));
 		}
 	    }
 	}
@@ -539,14 +544,15 @@ bool simple_dead_loop_p(expression lower, expression upper)
 	    if (!VECTEUR_NUL_P(v_lower)) {
 		if(term_cst(v_lower)
 		   && VECTEUR_NUL_P(vecteur_succ(v_lower))) {
-		    dead_loop_p =  vecteur_val(v_lower) > 0;
+		    dead_loop_p =  value_pos_p(vecteur_val(v_lower));
 		}
 	    }
 	}
 	else if(term_cst(v_upper) && term_cst(v_lower)
 	   && VECTEUR_NUL_P(vecteur_succ(v_upper))
 	   && VECTEUR_NUL_P(vecteur_succ(v_lower))) {
-	    dead_loop_p = vecteur_val(v_lower) > vecteur_val(v_upper);
+	    dead_loop_p = 
+		value_gt(vecteur_val(v_lower),vecteur_val(v_upper));
 	}
     }
 
@@ -712,7 +718,7 @@ transformer tf;
 
     return post;
 }
-
+
 transformer call_to_postcondition(pre, c, tf)
 transformer pre;
 call c;
@@ -745,8 +751,9 @@ transformer tf;
 	debug(5, "call_to_postcondition", "external function %s\n",
 	      entity_name(e));
 	if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	    list args = call_arguments(c);
 	    /*
+	      list args = call_arguments(c);
+
 	    transformer pre_callee = transformer_dup(pre);
 	    pre_callee = 
 		add_formal_to_actual_bindings(c, pre_callee);
