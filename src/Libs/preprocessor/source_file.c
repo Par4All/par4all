@@ -621,42 +621,32 @@ dot_F_file_p(string name)
     return l>=2 && name[l-1]=='F' && name[l-2]=='.';
 }
 
-/* returns the newly allocated name */
+/* returns the newly allocated name
+ */
 static string 
 process_thru_cpp(string name)
 {
-    string dir_name, new_name, simpler, cpp_options, cpp, tmp_link,
-	path_to_name, dir_to_name;
+    string dir_name, new_name, simpler, cpp_options, cpp;
 
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".F");
     new_name = strdup(concatenate(dir_name, "/", simpler, CPPED, 0));
-    tmp_link = strdup(concatenate(dir_name, "/", simpler, ".tmp.c", 0));
     free(dir_name);
     free(simpler);
 
     cpp = getenv(CPP_PIPS_ENV);
     cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
     
-    path_to_name = strdup(name[0]=='.'? concatenate("../../", name, 0): name);
-    dir_to_name = pips_dirname(name);
-
-    /* some C compilers do not like to cpp a .F file. (gcc without g77...)
-     * hence the tmp_link used here as a work around. 
-     * it can fail anyway if "'" appears in Fortran comments.
+    /* Note: the cpp used **must** know somehow about Fortran
+     * and its lexical and comment conventions. This is ok with gcc
+     * when g77 is included. Otherwise, "'" appearing in Fortran comments
+     * results in errors to be reported. Well, the return code could
+     * be ignored maybe, but I prefer not to.
      */
-    safe_symlink(path_to_name, tmp_link);
-	
     safe_system(concatenate(cpp? cpp: CPP_CPP, 
 			    CPP_CPPFLAGS, cpp_options? cpp_options: "", 
-			    " -I", dir_to_name, " ",
-			    tmp_link, " > ", new_name, 0));
+			    name, " > ", new_name, 0));
 
-    safe_unlink(tmp_link);
-
-    free(path_to_name);
-    free(dir_to_name);
-    free(tmp_link);
     return new_name;
 }
 
