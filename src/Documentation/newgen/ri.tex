@@ -1,4 +1,4 @@
-\documentstyle[a4,psfig]{article}
+\documentstyle[a4,psfig,html]{article}
 
 % \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
@@ -55,12 +55,23 @@ pre'sente' dans le rapport EMP-CRI-A191.
 \section{External Data Structures}
 \label{external}
 
+Two external data types appear in PIPS internal representation:
+\verb/Pvecteur/ and \verb/Psysteme/. Other types of C3 Linear Algebra
+Library also appear in PIPS code: \verb/Pcontrainte/, which is a
+component of \verb/Psysteme/, \verb/Ppolyedre/ for polyhedra, \verb/Psg/
+for generating systems, \verb/Pmatrix/ for matrices, and \verb
+/Ppolynome/, which is used for expressing program complexity (see
+\htmladdnormallink{Complexity
+Analysis}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}).
+
 \subsection{Vector}
 \label{subsection-pvecteur}
 \index{Pvecteur}
 
 \domain{External Pvecteur}
-{ Le domaine {\tt Pvecteur} est utilise' pour repre'senter les
+{}
+
+Le domaine {\tt Pvecteur} est utilise' pour repre'senter les
 expressions line'aires telles que {\tt 3I+2} (voir le domaine {\tt
 normalized}) ou des contraintes line'aires telles que {\tt 3I + J <= 2}
 ou {\tt 3I == J}. Ces contraintes sont utilise'es dans les syste`mes
@@ -78,15 +89,15 @@ Les expressions apparaissant dans le programme analyse' sont mises
 sous cette forme quand c'est possible.
 
 La structure de donne'es Pvecteur est importe'e de la bibliothe`que d'alge`bre
-line'aire en nombres entiers du CAII.
-}
+line'aire en nombres entiers du CRI.
 
 \subsection{Set of Affine Constraints}
 \label{subsection-psysteme}
 \index{Psysteme}
 
 \domain{External Psysteme}
-{
+{}
+
 Le domaine {\tt Psysteme} est utilise' pour repre'senter les syste`mes
 d'e'quations et d'ine'quations line'aires qui apparaissent lors
 de la phase d'analyse se'mantique (voir le domaine {\tt predicate}).
@@ -106,18 +117,25 @@ Un Psysteme est forme' de six champs:
 
 Comme le domaine Pvecteur, la structure de donne'es Psysteme est
 importe'e de la bibliothe`que d'alge`bre line'aire en nombres entiers du
-CAII.  }
+CRI.
 
 \section{Entities: Variables, Functions, Operators, Constants, Labels...}
 \label{entity}
+
+Data structure \verb/entity/ is a key PIPS data structure. Entities are
+stored in a unique\footnote{Retrospectively, choosing a unique symbol
+table was a mistake because it does not scale well for medium or large
+size programs. However, having only one symbol table provides a uniform
+access to information about entities, whether they are global, local or
+meta variables.} hash table, the global symbol table. They can be
+accessed by name.
 
 \subsection{Entity}
 \label{subsection-entity}
 \index{Entity}
 
 \domain{tabulated entity = name:string x type x storage x initial:value}
-\domain{entity_int = entity->int}
-{
+
 Tout objet ayant un nom dans un programme Fortran est repre'sente' par
 une \verb/entity/. Un tel objet peut e^tre un module, une variable, un
 common, un ope'rateur, une constante, un label, etc. Pour chaque objet,
@@ -130,40 +148,55 @@ le sous-domaine \verb/initial/ donne la valeur initiale, si elle est
 connue, de l'entite'. Le terme valeur initiale a ici un sens assez
 large, puisqu'il s'agit par exemple du code pour les entite's
 repre'sentant des modules.
-}
+
+\domain{entity_int = entity->int}
+
+This domain is used to map entities towards integer. Any interpretation
+of this integer is possible. It could be the value of a scalar integer
+variable, the offset of a variable in a common, the lengths of commons, etc...
 
 \subsection{Type}
 \label{subsection-type}
 \index{Type}
 
 \domain{Type = statement:unit + area + variable + functional + unknown:unit + void:unit}
-{
+
 Le domaine \verb/type/ repre'sente le type d'une entite'.  Le
 sous-domaine \verb/statement/ est utilise' pour les labels
 d'instruction.  Le sous-domaine \verb/area/ est utilise' pour les
-commons.  Le sous-domaine \verb/variable/ est utilise' pour toutes les
+commons et pour les deux zones statique et dynamique associe'e a` chaque
+module.  Le sous-domaine \verb/variable/ est utilise' pour toutes les
 variables, y compris les parame`tres formels et le re'sultat d'une
 fonction.  Le sous-domaine \verb/functional/ est utilise' pour les
 fonctions, pour les subroutines et pour le programme principal.  Le
 sous-domaine \verb/void/ est utilise' pour le re'sultat d'une subroutine
 ou d'un programme principal.
-}
 
 \subsubsection{Area Type}
 \label{subsubsection-area}
 \index{Area}
 
 \domain{Area = size:int x layout:entity*}
-{ Le domaine {\tt area} est utilise' pour repre'senter les aires de
+
+Le domaine {\tt area} est utilise' pour repre'senter les aires de
 stockage des variables telles que les commons et les aires statiques ou
-dynamiques. Le sous-domaine {\tt size} donne la taille de l'aire
+dynamiques. Ces aires sont des objets globaux et leur package de
+rattachement est donc \verb/TOP-LEVEL/.
+
+Le sous-domaine {\tt size} donne la taille de l'aire
 exprime'e en octets ({\em character storage unit} de la norme ANSI
-X3.9-1978, \S~2.13), et le sous-domaine {\tt layout} donne la liste des
-entite's stocke'es dans cette aire. L'ordre des de'clarations des
-variables est respecte', ce qui permettrait de reproduire des programmes
-sources fide`les a` ce qu'e'taient les programmes initiaux\footnote{Les
-de'clarations sont en fait conserve'es sous forme textuelle pour
-garantir une fide'lite' absolue.}.}
+X3.9-1978, \S~2.13). Cette taille est la taille maximum rencontre'e
+parmi les modules d'un programme. 
+
+Le sous-domaine {\tt layout} donne la
+liste des entite's stocke'es dans cette aire. Il s'agit des variables
+de'clare'es dans ce common dans n'importe quel module.
+
+L'ordre des de'clarations des variables est respecte', ce qui
+permettrait de reproduire des programmes sources fide`les a` ce
+qu'e'taient les programmes initiaux\footnote{Les de'clarations sont en
+fait conserve'es sous forme textuelle pour garantir une fide'lite'
+absolue.}.
 
 \subsubsection{Variable Type}
 \label{subsubsection-variable}
@@ -387,46 +420,68 @@ directement appele's dans le code. Il contient une partie du callgraph.
 \index{Statement}
 
 \domain{Statement = label:entity x number:int x ordering:int x comments:string x instruction}
-{ 
-Le
-domaine \verb/statement/ permet de repe'rer les instructions d'un
-module.  Le sous-domaine \verb/label/ contient une entite' qui de'finit
-le label\footnote{Un statement dont l'instruction est un bloc n'a
-jamais de label.}.
+{}
 
-Le sous-domaine \verb/number/ contient un nume'ro permettant
-de repe'rer le statement pour le debugging ou l'information de
-l'utilisateur (valeur par defaut:
-\verb+STATEMENT\_NUMBER\_UNDEFINED+). Ce nume'ro est de'fini par
-l'utilisateur et n'est (en princpe) jamais modifie'. Apre`s de'roulage
-de boucle, plusieurs \verb/statement/s peuvent avoir le me^me nume'ro.
+Le domaine \verb/statement/ permet de
+repe'rer les instructions d'un module.  Le sous-domaine \verb/label/
+contient une entite' qui de'finit le label\footnote{Un statement dont
+l'instruction est un \verb/block/ ou un \verb/unstructured/ n'a jamais
+de label.}. Un label spe'cial est de'fini pour les RETURN, ce qui permet
+de convertir les appels a` RETURN en des branchements a` ce label
+spe'cial. Un autre label spe'cial, \verb/empty_label/, est utilise' pour
+les statements sans label.
+
+Le sous-domaine \verb/number/ contient un nume'ro permettant de repe'rer
+le statement pour le debugging ou l'information de l'utilisateur (valeur
+par defaut: \verb+STATEMENT\_NUMBER\_UNDEFINED+). Ce nume'ro est de'fini
+par l'utilisateur ou implicitement par le parser qui prend le nume'ro de
+la premie`re ligne de l'sintruction dans le fichier source. Il n'est (en
+principe) jamais modifie' par PIPS. Apre`s de'roulage de boucle,
+plusieurs \verb/statement/s peuvent avoir le me^me nume'ro.
 
 Le sous-domaine \verb/ordering/ contient un entier caracte'ristique du
 statement; il est forme' de la concate'nation du nume'ro de composante
-dans le graphe de contro^le et du nume'ro de statement dans dans cette
-composante; cet entier sert a` comparer l'ordre lexical des statements
-et sa valeur par defaut est \verb+STATEMENT\_ORDERING\_UNDEFINED+. Il
-est automatiquement recalcule' apre`s chaque transformation de
-programme. Il est aussi utilise' comme nom absolu d'un \verb/statement/
-quand des structures de donne'es comme les tables de hash-code sont
-e'crites sur disque ou relues.
+dans le graphe de contro^le (nume'ro du control) et du nume'ro de
+statement dans dans cette composante; cet entier sert a` comparer
+l'ordre lexical des statements et sa valeur par defaut est
+\verb+STATEMENT\_ORDERING\_UNDEFINED+. Il est automatiquement recalcule'
+apre`s chaque transformation de programme. 
+
+Il est aussi utilise' comme nom absolu d'un \verb/statement/ quand des
+structures de donne'es comme les tables de hash-code sont e'crites sur
+disque ou relues. Il est aussi utilise' pour e'tabli un lien entre les
+noeuds du graphe de de'pendance et les statements. Il est possible de
+cre'er une table de correspondance entre \verb/ordering/ et
+\verb/statement/, mais elle ne fait pas partie de la repre'sentation
+interne et doit cond e^tre calcule'e explicitement.
+
+Notons que le champs \verb/ordering/ n'est pas force'ment calcule' pour
+tous les statements. En particulier, les statements qui ne sont pas
+accessibles d'apre`s le flot de contro^le n'en ont pas. Les statements
+sans e'tiquette se trouvant derrie`re un GOTO en sont un exemple. Les
+statements peuvent e^tre parcourus de manie`re se'lective, suivant le
+flot de contro^le, avec la macro \verb/CONTROL_MAP/\index{CONTROL MAP}, ou de manie`re
+syste'matique avec les fonctions de parcours de NewGen,
+\verb/gen_recurse/\index{gen\_recurse},
+\verb/gen_multi_recurse/\index{gen\_multi\_recurse},...
 
 Le sous-domaine {\tt comments} contient le texte du commentaire associe'
 a ce statement dans le programme initial; ce texte est utilise' par le
 prettyprinter. Ce sont les commentaires qui pre'ce`dent le statement
 qui s'y trouvent associe's. En l'absence de commentaires, ce champ
-prend la valeur \verb/string\_undefined/.
+prend la valeur \verb/string\_undefined/. Les commentaires associe's a`
+des instructions qui peuvent disparai^tre au cours des traitements comme
+CONTINUE, RETURN et GOTO, peuvent aussi disparaitre.
 
 Le sous-domaine \verb/instruction/ contient
 l'instruction proprement dite.
-}
 
 \domain{persistant_statement_to_statement = persistant statement -> persistant statement}
-{
-  Used for example in use_def_elimination() to store the eventual
-  statement father of a statement. The persistance is needed to avoid
-  freeing the statements when the mapping is freed.
-}
+{}
+
+Used for example in \verb/use_def_elimination()/ to store the eventual
+statement father of a statement. The persistance is needed to avoid
+freeing the statements when the mapping is freed.
 
 \subsection{Instruction}
 \label{subsection-instruction}
@@ -585,7 +640,7 @@ supe'rieure et l'incre'ment.
 \index{Call}
 
 \domain{Call = function:entity x arguments:expression*}
-{
+{}
 
 Le domaine \verb/call/ permet de repre'senter les commandes et les
 appels de fonctions Fortran sous une forme unique pseudo-fonctionelle.
@@ -605,15 +660,14 @@ ainsi que le volume de code ne'cessaire a` de nombreux algorithmes.
 Le sous-domaine \verb/function/ est une entite' qui de'finit la fonction
 appele'e. Le sous-domaine \verb/arguments/ est une liste de sous-domaines
 \verb/expression/ qui repre'sente les arguments d'appel de la fonction.
-}
 
 \subsubsection{Control Flow Graph (cont.)}
 \label{subsubsection-control}
 \index{Control}
 
 \domain{Control = statement x predecessors:control* x successors:control*}
-\domain{Controlmap = persistant statement->control}
-{ 
+{}
+
 
 Domain \verb/control/ is the type of nodes used to implement the CFG
 implied by an unstructured instruction (see Domain
@@ -636,25 +690,39 @@ and \verb/statement/ (via \verb/instruction/).
 \label{figure-unstructured}
 \end{figure}
 
-All statements but \verb/test/have only one successor. The first
-successor of \verb/test/ is the successor when the test condition is
-evaluated to true.  And the other way round for the second one. The exit
-node (see domain \verb/unstructured/) has no successor. The entry node
-as well as all other nodes may have an unlimited number of precedessors.
+All statements but \verb/test/s and the exit node only have one
+successor. The first successor of \verb/test/ is the successor when the
+test condition is evaluated to true.  And the other way round for the
+second one. The exit node (see domain \verb/unstructured/) has no
+successor. The entry node as well as all other nodes may have an
+unlimited number of precedessors.
 
-All nodes of a CFG can be visited in a meaningless order using the
-\verb/CONTROL_MAP/ macros. Look for an example in library \verb/control/
-because auxiliary data structures must be decraled and freed.
+The value of the exit node when it is not reachable is unclear. This is
+a minor problem since PIPS isn't supposed to deal with faulty programs.
 
-}
+All reachable nodes of a CFG can be visited in a meaningless order using the
+\verb/CONTROL_MAP/ macro. Look for an example in library \verb/control/
+because an auxiliary data structure, a block list, must be declared and
+freed. They can also be visited with \verb/gen_recurse()/, in a
+meaningless order, but regardless of their reachability.
+
+Note that the data structure used for the CFG is obsolete. A generic
+structure for oriented graphs, \verb/graph/, should be used instead so
+as to pool basic graph functions, e.g. search for strongly connected
+components.
+
+\subsubsection{Mappings between Statements and Controls}
+
+\domain{Controlmap = persistant statement->control}
+{}
 
 \domain{persistant_statement_to_control = persistant statement -> persistant control}
-{
-  Used for example in use_def_elimination() to store the eventual control
-  father of a statement in order to travel on the control graph
-  associated to a statement. The persistance is needed to avoid
-  freeing the control graph when the mapping is freed.
-}
+{}
+
+Used for example in \verb/use_def_elimination()/ to store the eventual
+control father of a statement in order to travel on the control graph
+associated to a statement. The persistance is needed to avoid freeing
+the control graph when the mapping is freed.
 
 % \section{Repre'sentation des expressions}
 \section{Expressions}
@@ -662,26 +730,33 @@ because auxiliary data structures must be decraled and freed.
 \index{Expression}
 
 \domain{Expression = syntax x normalized}
-{ 
+{}
+
 Le domaine \verb/expression/ permet de stocker les expressions.  Le
 sous-domaine {\tt syntax} contient la description de l'expression telle
-qu'elle apparai^t dans le texte source du programme. Le sous-domaine {\tt
-normalized} contient une forme compile'e des expressions line'aires,
-sous forme de Pvecteur.
+qu'elle apparai^t dans le texte source du programme. Le sous-domaine
+{\tt normalized} contient une forme compile'e des expressions
+line'aires, sous forme de \verb/Pvecteur/\index{Pvecteur}.
 
-Si le sous-domaine {\tt normalized} contient la valeur
-{\tt normalized\_undefined}, cela signifie que la fonction de line'arisation
+Si le sous-domaine {\tt normalized} contient la valeur {\tt
+normalized\_undefined}, cela signifie que la fonction de line'arisation
 n'a pas e'te' appele'e pour cette expression; cela {\bf ne} signifie
-{\bf pas}
-que l'expression n'est pas line'aire.
-}
+{\bf pas} que l'expression n'est pas line'aire.
+
+The \verb/normalized/ field is redundant with the \verb/syntax/
+field. There is no consistency check available. When new expressions are
+derived from old expressions, all normalized fields should be
+reset. Else some normalized expressions end up with non-normalized
+sub-expressions, and with a non-consistent normalized form.
+
 
 \subsection{Abstract Tree of an Expression: Syntax}
 \label{subsection-syntax}
 \index{Syntax}
 
 \domain{Syntax = reference + range + call}
-{
+{}
+
 Le domaine \verb/syntax/ permet de repre'senter les expressions telles
 qu'elles apparaissent dans le texte source du programme. Un
 \verb/syntax/ est soit une \verb/reference/ a` un e'le'ment de tableau
@@ -692,7 +767,7 @@ domaine {\tt call} est de'fini dans la section {\em Instructions}), soit
 un \verb/range/, dans le cas des expressions bornes de boucles (le domaine
 {\tt range} est pre'sente' au niveau des boucles, aussi dans la section
 {\em Instructions}).
-}
+
 
 \subsubsection{Reference}
 \label{subsubsection-reference}
@@ -740,9 +815,50 @@ examine'e. }
 \section{Memory Effects of Statements}
 \label{effects}
 
+Each statement read and write several memory locations to retrieve value
+stored and to store new values. Understanding the relationship between
+statements and memory is one of the many keys to restructure and
+parallelize programs. Several analyses provide different approximations
+of the statement effects on memory.
+
+Each program variable is a unique set of memory locations. Effects can
+be expressed as effects on these sets. They are called {\em atomic}
+effects, because a whole data structure is seen as read or written as
+soon as one element is read or written.
+
+The memory location representation can be refined for arrays. Certain
+sets of array locations are handled, for instance intervals like
+\verb/A[I:J]/ or even the so-called regular sections or Fortran~90
+triplets, like \verb/A[0:N:2]/, which adds a stride to the concept of
+interval. PIPS is able to handle polyhedral sets, called {\em array
+regions}. Extension to non-convex sets, intersections of a lattice and a
+polyhedron, is under investigation.
+
+Memory effects are not always perfectly known. It is undecidable in the
+general case. Effects can be labelled as {\tt MAY} if they might happen,
+{\tt MUST} if they always happen, and {\tt EXACT} if the abstract set
+used to represent them is equal to the dynamic set of effects. For
+historical reasons, exact effects are labelled {\tt MUST} and must
+effects are not computed.
+
+Finally, read and write effects are not precise enough for compound
+statements. It is more interesting to known is the {\em initial} value
+of a memory location is {\em used} by a statement, which is called a
+{\tt IN} effect, or if the memory location only is used for temporary
+storage. In the same way, it is important to know if the value left by a
+statement in a memory location is dead when leaving a statement or if it
+is used later by another statement execution. In the later case, it is
+called an {\tt OUT} effect.
+
 \subsection{Effects}
 \label{subsection-effects}
 \index{Effects}
+
+The {\tt effects} domain is a list of individual effects. Each effect
+can only be a read or a write and is related to only one variable. Lots
+of individual effects are linked to each statements, especially compound
+statements like {\tt blocks}, {\tt tests}, {\tt loops} and {\tt
+unstructured}.
 
 \domain{Effects =  effects:effect*}
 {}
@@ -751,15 +867,25 @@ examine'e. }
 \label{subsection-effect}
 \index{Effect}\index{Region}
 
-\domain{Effect =  persistant reference x action x approximation x context:transformer}
-{
+\domain{Effect = persistant reference x action x approximation x context:transformer}
+{}
+
 Le domaine \verb/effect/ est utilise' pour repre'senter les effets d'un
 statement sur les variables du module. Les effets des instructions sont
-le point de de'part du calcul des Def-Use Chains, des de'pendances, des
-Summary Data Flow Information, et des re'gions.
+le point de de'part du calcul des \htmladdnormallink{use-def
+chains}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html} , des
+de'pendances, des Summary Data Flow Information (known as summary
+effects at the module level, and as cumulated effects at the statement
+level), et des re'gions.
 
 Le sous-domaine {\tt reference} indique sur quelle variable, scalaire ou
-tableau, a lieu un effet, le sous-domaine {\tt action} pre'cise si la
+tableau, a lieu un effet. L'attribut {\tt persistant} lui est donne'
+parce que les re'fe'rences concerne'es fonr directement partie des
+statements du programme, au moins quand il s'agit d'effets simples. Cet
+attribut est naturellement ge^nant pour les re'gions qui utilisent des
+re'fe'rences synthe'tiques base'es sur les pseudo-variables $PHI$.
+
+Le sous-domaine {\tt action} pre'cise si la
 re'fe'rence est lue ou e'crite, et le sous-domaine {\tt approximation}
 permet de savoir si la re'fe'rence (pour les effets) ou l'ensemble des
 e'le'ments de tableaux de'fini par le contexte (pour les re'gions) est lu ou
@@ -771,12 +897,15 @@ variable statique apparaissant dans un {\tt SAVE}, il est important de
 re'cupe'rer une re'fe'rence qui sera la me^me pour tous les sites d'appels.
 Pour cela on choisit un module de re'fe'rence (dans lequel le common ou le
 save est de'clare'), dont le nom pre'fixera le nom de la variable. Le choix
-de ce module n'est pas trivial. A` l'heure actuel. il s'agit du nom du
+de ce module n'est pas trivial. A` l'heure actuelle, il s'agit du nom du
 module de la premie`re variable apparaissant dans la liste des variables du
-common ({\tt ram_section(storage_ram(entity_storage(<my_common>)))}). Selon
-l'ordre dans lequel les modules dont analyse's, le nom de module trouve'
-sera diffe'rent. Il faudrait en re'alite' prendre le premier nom de module
-dans l'ordre lexicographique des modules appele's (callees).
+common:
+\begin{quote}
+ {\tt ram\_section(storage\_ram(entity\_storage(<my\_common>)))}
+\end{quote}
+Selon l'ordre dans lequel les modules dont analyse's, le nom de module
+trouve' sera diffe'rent. Il faudrait en re'alite' prendre le premier nom
+de module dans l'ordre lexicographique des modules appele's (callees).
 
 Le sous-domaine {\tt reference} permet de pre'ciser qu'un effet n'a lieu que
 sur un sous-tableau en utilisant un {\tt range} comme expression d'indice.
@@ -796,18 +925,19 @@ Triolet).
 \index{Action}
 
 \domain{Action = read:unit + write:unit}
-{
+{}
+
 Deux types d'effets sont utilise's dans les conditions de Bernstein
 et dans les conditions propres a` chaque transformation de programme:
 la lecture d'une variable et son e'criture.
-}
 
 \subsection{Approximation of an Effect}
 \label{subsection-approximation}
 \index{Approximation}
 
 \domain{Approximation = may:unit + must:unit}
-{
+{}
+
 La pre'sence de tests et boucles ne permet pas de de'terminer en ge'ne'ral
 si une variable est effectivement lue ou e'crite lors de l'exe'cution
 d'un {\tt statement}. Il se peut me^me que certaines exe'cutions
@@ -820,7 +950,18 @@ le calcul des {\em use-def chains} pour effectuer un {\em kill} sur les
 variables scalaires. Un effet {\em must} sur un tableau ne signifie pas
 que tout le tableau est lu ou e'crit mais qu'au moins un de ses
 e'le'ments l'est.
-}
+
+\subsection{Mapping from Statements to Effects}
+
+A different mapping from reachable statements to effect lists is
+computed by each effect analysis. Because NewGen did not offer the {\em
+map} type construct, there is no NewGen type for these mappings. They
+are encoded as hash tables and used with primitives provided by the
+NewGen library. They are stored on and read from disk by PIPS
+interprocedural database manager, {\em pipsdbm}.
+
+For details about effect analyses available see the Effects Section in the
+\htmladdnormallink{PIPS phase descriptions}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}).
 
 \section{Analyse se'mantique}
 \label{semantics}
@@ -830,7 +971,8 @@ e'le'ments l'est.
 \index{Transformer}
 
 \domain{Transformer = arguments:entity* x relation:predicate}
-{
+{}
+
 Le domaine {\tt transformer} de'finit une relation entre deux e'tats
 me'moire. Cette relation
 porte sur les valeurs des variables scalaires entie`res d'un module ou
@@ -856,25 +998,24 @@ aussi associe' a` un {\tt statement}, donne une relation entre l'e'tat
 initial d'un module et l'e'tat pre'ce'dent l'exe'cution de ce {\tt statement}.
 
 Les transformers ne sont de'finis qu'apre`s une phase d'analyse se'mantique.
-}
 
 \subsection{Predicate}
 \label{subsection-predicate}
 \index{Predicate}\index{Precondition}\index{Transformer}
 
 \domain{Predicate = system:Psysteme}
-{
+{}
+
 Le domaine {\tt predicate} de'finit une relation entre valeurs de
 variables scalaires entie`res. Son interpre'tation est fonction de
 son utilisation. Il peut s'agir soit d'un pre'dicat valable en
 un point du programme (i.e. un invariant), soit d'un pre'dicat
 valable entre deux points du programme. Il s'agit alors d'une
 abstraction d'une commande, c'est-a`-dire d'un {\tt transformer}.
-}
 
 \newpage
 
-\section*{Annexe: re'capitulatif ri.newgen}
+\section*{Annexe: NewGen Declarations -- ri.newgen --}
 
 \begin{verbatim}
 --         --------------------------------------------------------
