@@ -48,8 +48,8 @@ no_alias_for(region reg)
 
     if (l_alias_lists != NIL)
 	do {
-	    alias_list = CAR(rest_alias_lists);
-	    alias_reg = CAR(alias_list);
+	    alias_list = LIST( CAR(rest_alias_lists) );
+	    alias_reg = EFFECT( CAR(alias_list) );
 	    if ( effects_same_action_p(reg,alias_reg) )
 	    {
 		reg_sys = region_system(reg);
@@ -69,10 +69,6 @@ make_alias_list_sub_region(region reg, string module_name)
 {
     list alias_list, l_pairs;
 */
-    /* first, we are going to create a list of alias pairs */
-    /* in the global var list_pairs */
-/*    list_pairs = NIL;
- */
     /* put reg in list of one element for call to alias_pairs */
 /*    l_pairs = alias_pairs( module_name, CONS(EFFECT,reg,NIL) );
  */
@@ -101,7 +97,7 @@ make_alias_list_if_sub_region(region reg, string module_name)
 /* for each alias_list=[alias_reg|list_trans_alias_reg] of this module,... */
 /*	MAP(LIST,alias_list,
 	    {
-		alias_reg = CAR(alias_list);
+		alias_reg = EFFECT( CAR(alias_list) );
 		*/
 /* ... except for COMMON region alias_lists, do */
 /*		if ( ! storage_ram_p(
@@ -148,12 +144,13 @@ make_alias_lists_for_sub_regions(string module_name)
 					  TRUE);
 					  */
 	/* for each alias list do */
-/*	MAP(EFFECTS, callee_alias_list,
+/*	MAP(EFFECTS, alias_list_effects,
 	    {
+                list callee_alias_list = regions_dup(effects_to_list(alias_list_effects));
 */
 /* don't treat COMMON regions */
 /*		if ( ! storage_ram_p(
-		    entity_storage(region_entity(CAR(callee_alias_list)))
+		    entity_storage(region_entity(EFFECT(CAR(callee_alias_list))))
 		    ))
 		{
 */
@@ -171,7 +168,7 @@ make_alias_lists_for_sub_regions(string module_name)
 			    CDR(callee_alias_list));
 		}	    
 	    },
-	    effects_classes_classes(callee_alias_lists));
+	    callee_alias_lists);
 	},
 	callees_callees(module_callees));
 }
@@ -186,13 +183,13 @@ add_pair_to_existing_list(alias_pair)
     region reg, trans_reg, alias_reg;
     bool result = FALSE;
 
-    reg = CAR(alias_pair);
-    trans_reg = CAR(CDR(alias_pair));
+    reg = EFFECT( CAR(alias_pair) );
+    trans_reg = EFFECT( CAR(CDR(alias_pair)) );
 
     if (l_alias_lists != NIL)
 	do {
-	    alias_list = CAR(rest_alias_lists);
-	    alias_reg = CAR(alias_list);
+	    alias_list = LIST( CAR(rest_alias_lists) );
+	    alias_reg = LIST( CAR(alias_list) );
 	    if (alias_reg == reg)
 	    {
 		result = TRUE;
@@ -208,31 +205,33 @@ add_pair_to_existing_list(alias_pair)
 bool
 alias_lists( string module_name )
     {
-/*    list alias_pairs;
+/*    list l_alias_pairs;
 
     l_alias_lists = NIL;
 */
     /* make alias lists from the IN_alias_pairs */
-/* alias_pairs = (list) db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
+/* l_alias_pairs = (list) db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
 					    module_name,
 					    TRUE);
-    MAP(EFFECTS, alias_pair,
+    MAP(EFFECTS, alias_pair_effects,
 	{
+	    list alias_pair = regions_dup(effects_to_list(alias_pair_effects));
 	    if ( ! add_pair_to_existing_list(alias_pair) )
-	    alias_lists = gen_nconc(alias_lists,CONS(LIST,alias_pair,NIL));
+	    l_alias_lists = gen_nconc(l_alias_lists,CONS(LIST,alias_pair,NIL));
 		},
-	effects_classes_classes(alias_pairs));
+	l_alias_pairs);
 	*/
     /* make alias lists from the OUT_alias_pairs */
-/*    alias_pairs = (list) db_get_memory_resource(DBR_OUT_ALIAS_PAIRS,
+/*    l_alias_pairs = (list) db_get_memory_resource(DBR_OUT_ALIAS_PAIRS,
 					    module_name,
 					    TRUE);
-    MAP(EFFECTS, alias_pair,
+    MAP(EFFECTS, alias_pair_effects,
 	{
+	    list alias_pair = regions_dup(effects_to_list(alias_pair_effects));
 	    if ( ! add_pair_to_existing_list(alias_pair) )
-	    alias_lists = gen_nconc(alias_lists,CONS(LIST,alias_pair,NIL));
+	    l_alias_lists = gen_nconc(l_alias_lists,CONS(LIST,alias_pair,NIL));
 	},
-	effects_classes_classes(alias_pairs));
+	l_alias_pairs);
 	*/
     /* check all callees for sub-regions of existing aliases */
 /*    make_alias_lists_for_sub_regions(module_name);
@@ -245,6 +244,7 @@ alias_lists( string module_name )
 }
 
 
+/* modifies gloabl var current_caller_statement */
 static bool stmt_filter(s)
 statement s;
 {
@@ -253,6 +253,7 @@ statement s;
     current_caller_stmt = s;
     return(TRUE);
 }
+
 
 /* static void add_common_aliases_for_this_region(entity func, region reg)
  * input    : func is the called function and
@@ -505,7 +506,9 @@ add_common_aliases_for_this_call_site()
  * input    : parameters: a call site and the calling context
  *            global variables: callee,list_regions_callee,list_pairs
  * output   : void
- * modifies : for each region in list_regions_callee which is a region of a
+ * global vars IN: list_regions_callee and list_pairs
+ * modifies : global var list_pairs
+ *            for each region in list_regions_callee which is a region of a
  *            formal parameter (of the callee) and for which the corresponding
  *            real parameter is an expression with only one entity, this
  *            function performs
@@ -569,11 +572,15 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 		    list pair;
 
 		    real_reg =
-			region_translation(callee_region, callee,
-					   reference_undefined,
-					   real_ent, get_current_module_entity(),
-					   real_ref,
-					   VALUE_ZERO, BACKWARD);
+			region_translation(
+			    callee_region,
+			    callee,
+			    reference_undefined,
+			    real_ent,
+			    get_current_module_entity(),
+			    real_ref,
+			    VALUE_ZERO,
+			    BACKWARD);
 		    
 		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
 		    pair = gen_nconc(pair,CONS(EFFECT,real_reg,NIL));
@@ -587,9 +594,12 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
        
 }
 
-
+/* global vars IN: callee, list_regions_callee, current_caller_statement
+ * and list_pairs
+ * modifies global var: list_pairs
+ */
 static bool
-call_site_to_alias_pairs(call call_site)
+add_alias_pairs_for_this_call_site(call call_site)
 {
     transformer context;
     list real_args;
@@ -612,8 +622,12 @@ call_site_to_alias_pairs(call call_site)
     return TRUE;
 }
 
+
+/* global vars IN: callee, list_regions_callee and list_pairs
+ * modifies global vars: list_pairs and current_caller_statement
+ */
 static void
-caller_to_alias_pairs( entity caller, entity callee)
+add_alias_pairs_for_this_caller( entity caller )
 {
     char *caller_name;
     statement caller_statement;
@@ -635,8 +649,12 @@ caller_to_alias_pairs( entity caller, entity callee)
     caller_statement = get_current_module_statement();
 
     gen_multi_recurse(caller_statement,
-		      statement_domain, stmt_filter, gen_null,
-		      call_domain, call_site_to_alias_pairs, gen_null,
+		      statement_domain,
+		      stmt_filter,
+		      gen_null,
+		      call_domain,
+		      add_alias_pairs_for_this_call_site,
+		      gen_null,
 		      NULL);
   
     reset_current_module_statement();
@@ -645,10 +663,13 @@ caller_to_alias_pairs( entity caller, entity callee)
 
     reset_current_module_entity();
     set_current_module_entity(callee);    
-
-
 }
 
+
+/* global vars IN: none
+ * modifies global vars: callee, list_regions_callee, current_caller_statement
+ * and list_pairs
+ */
 static list
 alias_pairs( string module_name, list l_reg )
 {
@@ -657,8 +678,7 @@ alias_pairs( string module_name, list l_reg )
     entity module;
 
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
-    module = get_current_module_entity();
-    callee = module;
+    callee = get_current_module_entity();
     list_regions_callee = l_reg;
 
     /* we need the callers of the current module  */
@@ -666,14 +686,14 @@ alias_pairs( string module_name, list l_reg )
 					       module_name,
 					       TRUE);
 
-    /* we scan the callers to find the call sites, and fill in the list of alias
-     * pairs (list_pairs). 
+    /* we scan the callers to find the call sites,
+     * and fill in the list of alias pairs (list_pairs)
      */
     list_pairs = NIL;
     MAP(STRING, caller_name,
     {
 	entity caller = local_name_to_top_level_entity(caller_name);
-	caller_to_alias_pairs(caller, module);
+	add_alias_pairs_for_this_caller(caller);
     },
 	callees_callees(callers));
 
@@ -681,10 +701,17 @@ alias_pairs( string module_name, list l_reg )
     return list_pairs;
 }
 
+
+/* modifies global vars callee, list_regions_callee, list_pairs and
+ * current_caller_stmt
+ */
 bool 
 in_alias_pairs( string module_name )
 {
     list l_reg, l_pairs;
+
+    debug_on("ALIAS_DEBUG_LEVEL");
+    pips_debug(9,"module %\n",module_name);
 
     /* we need the IN summary regions*/
     l_reg = (list) db_get_memory_resource(DBR_IN_SUMMARY_REGIONS,
@@ -698,17 +725,25 @@ in_alias_pairs( string module_name )
 			   strdup(module_name),
 			   (char*) make_effects_classes(l_pairs));
 
+    debug_off();
+
     return(TRUE);
 
 }
 
+/* modifies global vars callee, list_regions_callee, list_pairs and
+ * current_caller_stmt
+ */
 bool 
 out_alias_pairs( string module_name )
 {
-/*    list l_reg, l_pairs;
- */
+    list l_reg, l_pairs;
+
+    debug_on("ALIAS_DEBUG_LEVEL");
+    pips_debug(9,"module %\n",module_name);
+
     /* we need the OUT summary regions*/
-/*    l_reg = (list) db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS,
+    l_reg = (list) db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS,
 					  module_name,
 					  TRUE);
 
@@ -718,7 +753,9 @@ out_alias_pairs( string module_name )
     DB_PUT_MEMORY_RESOURCE(DBR_OUT_ALIAS_PAIRS, 
 			   strdup(module_name),
 			   (char*) make_effects_classes(l_pairs));
-			   */
+
+    debug_off();
+
     return(TRUE);
 
 }
