@@ -1,0 +1,7 @@
+#define SEQUENTIAL_REGION_SUFFIX ".reg"
+#define SEQUENTIAL_PROPER_REGION_SUFFIX ".preg"
+#define USER_REGION_SUFFIX ".ureg"
+#define SEQUENTIAL_IN_REGION_SUFFIX ".inreg"
+#define USER_IN_REGION_SUFFIX ".uinreg"
+#define SEQUENTIAL_OUT_REGION_SUFFIX ".outreg"
+#define USER_OUT_REGION_SUFFIX ".uoutreg"
