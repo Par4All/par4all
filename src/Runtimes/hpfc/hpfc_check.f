@@ -2,10 +2,10 @@
 ! Checks run-time library version
 !
 ! $RCSfile: hpfc_check.f,v $ version $Revision$
-! ($Date: 1996/09/07 17:05:46 $, )
+! ($Date: 1996/12/27 14:41:48 $, )
 !
       subroutine hpfc check
-      include 'real_parameters.h'
+      include 'global_parameters.h'
       include 'hpfc_commons.h'
       if  (REAL NB OF ARRAYS.GT.MAX NB OF ARRAYS.OR.
      $     REAL NB OF TEMPLATES.GT.MAX NB OF TEMPLATES.OR.
