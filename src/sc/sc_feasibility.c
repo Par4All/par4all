@@ -276,7 +276,7 @@ static boolean internal_sc_feasibility
   if ((method & PROJECT_EQ_METHOD))
   {
     w = sc_dup(sc);
-    ok = sc_fm_project_variables(w, integer_p, TRUE, ofl_ctrl);
+    ok = sc_fm_project_variables(w, int_p, TRUE, ofl_ctrl);
   }
 
   /* maybe the S/FM should be chosen again as #ref has changed... */
