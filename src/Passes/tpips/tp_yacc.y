@@ -12,6 +12,7 @@
 %token TK_MAKE
 %token TK_APPLY
 %token TK_DISPLAY
+%token TK_REMOVE
 %token TK_ACTIVATE
 %token TK_SET_PROPERTY
 %token TK_GET_PROPERTY
@@ -44,7 +45,7 @@
 %type <name>   TK_NAME TK_A_STRING TK_LINE propname phasename resourcename
 %type <status> instruction
 %type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
-%type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd
+%type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd i_rm
 %type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help
 %type <name> rulename filename 
 %type <array> filename_list
@@ -75,11 +76,6 @@
 
 #include "top-level.h"
 #include "tpips.h"
-
-extern FILE * yyin; 
-
-/* Default comand to print a file (if $PAGER is not set) */
-#define CAT_COMMAND "cat"
 
 /********************************************************** static variables */
 extern bool tpips_execution_mode;
@@ -115,6 +111,79 @@ set_env(string var, string val)
 	putenv(strdup(concatenate(var, "=", val, 0)));
 }
 
+/* Default comand to print a file (if $PAGER is not set) */
+#define CAT_COMMAND "cat"
+
+static bool
+display_a_resource(string rname, string mname)
+{
+    string pager, fname;
+    if ((isatty(0)) || (!(pager = getenv("PAGER"))))
+	pager = CAT_COMMAND;
+    lazy_open_module (mname);
+    fname = build_view_file(rname);
+    if (fname == NULL)
+	pips_user_error("Cannot build view file %s\n", rname);
+    safe_system(concatenate(pager, " ", fname, 0));
+    free(fname);
+    return TRUE;
+}
+
+static bool
+remove_a_resource(string rname, string mname)
+{
+    if (db_resource_p(rname, mname))
+	db_delete_resource(rname, mname);
+    else
+	pips_user_warning("no resource %s(%s) to delete\n", rname, mname);
+    return TRUE;
+}
+
+/* apply what to all resources in res
+ */
+static bool
+perform(bool (*what)(string, string), res_or_rule * res)
+{
+    bool result = TRUE;
+    
+    if (tpips_execution_mode)
+    {
+	string save_current_module_name;
+
+	if(!db_get_current_workspace_name())
+	    pips_user_error("Open or create a workspace first!\n");
+
+	/* push the current module. */
+	save_current_module_name = 
+	    db_get_current_module_name()?
+	    strdup(db_get_current_module_name()): NULL;
+	
+	MAPL(e, {
+	    string mod_name = STRING(CAR(e));
+	    
+	    if (mod_name != NULL)
+	    {
+		if (what(res->the_name, mod_name) == FALSE) {
+		    result = FALSE;
+		    break;
+		}
+	    }
+	    else
+		pips_user_warning("Select a module first!\n");
+	}, res->the_owners);
+	
+	/* restore the initial current module, if there was one */
+	if(save_current_module_name!=NULL) {
+	    if (db_get_current_module_name())
+		db_reset_current_module_name();
+	    db_set_current_module_name(save_current_module_name);
+	    free(save_current_module_name);
+	}
+    }
+    free_owner_content(res);
+    return result;
+}
+
 %}
 
 %union {
@@ -136,6 +205,7 @@ instruction: TK_ENDOFLINE { /* may be empty! */ }
 	| i_make
 	| i_apply
 	| i_display
+	| i_rm
 	| i_activate
 	| i_get
 	| i_getenv
@@ -162,7 +232,7 @@ i_quit: TK_QUIT TK_ENDOFLINE
 
 i_exit: TK_EXIT TK_ENDOFLINE 
 	{
-	    exit(0);
+	    exit(0); /* rather rough! */
 	}
 	;
 
@@ -415,131 +485,29 @@ i_module: TK_MODULE TK_NAME /* module name */ TK_ENDOFLINE
 
 i_make:	TK_MAKE resource_id TK_ENDOFLINE
 	{
-	    bool result = TRUE;
-	    pips_debug(7,"reduce rule i_make\n");
-
-	    if (tpips_execution_mode) {
-		string save_current_module_name = 
-		    db_get_current_module_name()?
-		    strdup(db_get_current_module_name()): NULL;
-
-		MAPL(e, {
-		    string mod_name = STRING(CAR(e));
-		    
-		    if (mod_name != NULL)
-		    {
-			if (safe_make ($2.the_name, mod_name) == FALSE) {
-			    result = FALSE;
-			    break;
-			}
-		    }
-		    else
-			pips_user_warning("Select a module first!\n");
-		}, $2.the_owners);
-
-		/* restore the initial current module, if there was one */
-		if(save_current_module_name!=NULL) {
-		    if (db_get_current_module_name())
-			db_reset_current_module_name();
-		    db_set_current_module_name(save_current_module_name);
-		    free(save_current_module_name);
-		}
-	    }
-	    $$ = result;
-	    free_owner_content(&$2);
+	    pips_debug(7, "reduce rule i_make\n");
+	    $$ = perform(safe_make, &$2);
 	}
 	;
 
 i_apply: TK_APPLY rule_id TK_ENDOFLINE
 	{
-	    bool result = TRUE;
-	    /* keep track of the current module, if there is one */
-
 	    pips_debug(7,"reduce rule i_apply\n");
-
-	    if (tpips_execution_mode) {
-		string save_current_module_name = 
-		    db_get_current_module_name()?
-		    strdup(db_get_current_module_name()): NULL;
-
-		if(!db_get_current_workspace_name()) {
-		    user_error("apply", "Open or create a workspace first!\n");
-		}
-	    
-		MAP(STRING, mod_name, 
-		{
-		    if (mod_name != NULL)
-		    {
-			if (safe_apply ($2.the_name, mod_name) == FALSE) {
-			    result = FALSE;
-			    break;
-			}
-		    }
-		    else
-			pips_user_warning("Select a module first!\n");
-		}, $2.the_owners);
-
-		/* restore the initial current module, if there was one */
-		if(save_current_module_name!=NULL) {
-		    if (db_get_current_module_name())
-			db_reset_current_module_name();
-		    db_set_current_module_name(save_current_module_name);
-		    free(save_current_module_name);
-		}
-	    }
-	    $$ = result;
-	    free_owner_content(&$2);
+	    $$ = perform(safe_apply, &$2);
 	}
 	;
 
 i_display: TK_DISPLAY resource_id TK_ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_display\n");
-	    if (tpips_execution_mode) {
-		string pager;
-		string save_current_module_name = 
-		    db_get_current_module_name()?
-		    strdup(db_get_current_module_name()): NULL;
+	    $$ = perform(display_a_resource, &$2);
+	}
+	;
 
-		if(!db_get_current_workspace_name()) {
-		    user_error("display",
-			       "Open or create a workspace first!\n");
-		}
-
-		if ( (isatty(0)) || (!(pager = getenv("PAGER"))))
-		    pager = CAT_COMMAND;
-		
-		MAPL(e, {
-		    string mod_name = STRING(CAR(e));
-		    
-		    if (mod_name != NULL)
-		    {
-			string fname;
-			lazy_open_module (mod_name);
-			fname = build_view_file($2.the_name);
-			if (fname == NULL)
-			    user_error("display",
-				       "Cannot build view file %s\n",
-				       $2.the_name);
-		    
-			safe_system(concatenate(pager, " ", fname, NULL));
-			free(fname);
-		    }
-		    else
-			pips_user_warning("Select a module first!\n");
-
-		}, $2.the_owners);
-
-		/* restore the initial current module, if there was one */
-		if(save_current_module_name!=NULL) {
-		    if (db_get_current_module_name())
-			db_reset_current_module_name();
-		    db_set_current_module_name(save_current_module_name);
-		    free(save_current_module_name);
-		}
-	    }
-	    $$ = TRUE;
-	    free_owner_content(&$2);
+i_rm: TK_REMOVE resource_id TK_ENDOFLINE
+	{
+	    pips_debug(7,"reduce rule i_rm\n");
+	    $$ = perform(remove_a_resource, &$2);	    
 	}
 	;
 
@@ -548,10 +516,8 @@ i_activate: TK_ACTIVATE rulename TK_ENDOFLINE
 	    pips_debug(7,"reduce rule i_activate\n");
 	    if (tpips_execution_mode) {
 
-		if(!db_get_current_workspace_name()) {
-		    user_error("activate",
-			       "Open or create a workspace first!\n");
-		}
+		if(!db_get_current_workspace_name())
+		    pips_user_error("Open or create a workspace first!\n");
 		
 		user_log("Selecting rule: %s\n", $2);
 		activate ($2);
