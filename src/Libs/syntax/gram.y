@@ -222,8 +222,17 @@ static datavar MakeDataVar(syntax s, range r)
 	    d = make_datavar(e, 1);
     }
     else {
-	d = make_datavar(e, SizeOfRange(r));
-    }		
+	int s;
+
+	if(range_count(r, &s)) {
+	    d = make_datavar(e, s);
+	}
+	else {
+	    ParserError("MakeDataVar",
+			"Only constant loop bounds with non-zero increment" 
+			" are supported by the PIPS parser\n");
+	}
+    }
 
     return(d);
 }
@@ -243,7 +252,16 @@ static datavar ExpandDataVar(dvr, r)
 datavar dvr;
 range r;
 {
-    datavar_nbelements(dvr) *= SizeOfRange(r);
+    int s;
+
+    if(range_count(r, &s)) {
+       datavar_nbelements(dvr) *= s;
+    }
+    else {
+	ParserError("ExpandDataVar",
+		    "Only constant loop bounds with non-zero increment"
+		    " are supported by the PIPS parser\n");
+    }
 
     return(dvr);
 }
