@@ -318,7 +318,7 @@ translate_IO_ref(call c, hash_table v_to_esv, boolean loop_or_call_print)
     expression exp; 
     syntax s;
     reference  result=reference_undefined;
-    if (strcmp(entity_local_name(call_function(c)), "WRITE") == 0) {
+    if (same_string_p(entity_local_name(call_function(c)), "WRITE")) {
 	pio = pc = call_arguments(c);  
 	/* scan the argument list till IOLIST' arguments*/
 	while (!ENDP(pio) && (!iolist_reached)) {
@@ -362,9 +362,12 @@ translate_IO_ref(call c, hash_table v_to_esv, boolean loop_or_call_print)
 	    result = ref1;
 	}
     }  
-    else pips_user_error("function calls are not handled in this version\n");
+    else
+    {
+	pips_user_error("function calls are not handled in this version\n");
+    }
   
-    return(result);
+    return result;
 }
 
 
