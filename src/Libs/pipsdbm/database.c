@@ -215,7 +215,13 @@ int db_time_of_resource(string rname, string oname)
     db_resource r = get_db_resource(rname, oname);
     if (db_resource_undefined_p(r))
 	return -1;
-    if (db_resource_loaded_p(r) && displayable_file_p(rname)) {
+    if (db_resource_loaded_p(r) && 
+	displayable_file_p(rname) &&
+	dbll_database_managed_file_p(db_resource_pointer(r)))
+    {
+	/* check time of actual resource... 
+	 * note that source files are skipped!
+	 */
 	int time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
 	if (time!=db_resource_file_time(r)) 
 	{
