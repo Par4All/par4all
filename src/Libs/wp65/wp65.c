@@ -31,6 +31,7 @@
 #include "pipsdbm.h"
 #include "transformations.h"
 #include "movements.h"
+#include "regions.h"
 #include "top-level.h"
 
 #include "wp65.h"
