@@ -76,8 +76,8 @@ Value	result[];			/* output */
 	result[1] = MATRIX_ELEM(h,1,1);
 	result[0] = denominator;
 	for(i=2; i <= n && result[1]!=0; i++) {
-	    value_prod(result[1],MATRIX_ELEM(h,i,i));
-	    value_prod(result[0],denominator);
+	    value_product(result[1],MATRIX_ELEM(h,i,i));
+	    value_product(result[0],denominator);
 	    determinant_gcd = pgcd_slow(result[0],result[1]);
 	    if(value_notone_p(determinant_gcd)) {
 		value_division(result[0],determinant_gcd);
@@ -86,8 +86,8 @@ Value	result[];			/* output */
 	}
 
 	/* product of determinants of three matrixs P, H, Q */
-	value_prod(result[1],determinant_p);
-	value_prod(result[1],determinant_q);
+	value_product(result[1],determinant_p);
+	value_product(result[1],determinant_q);
 
 	/* free useless matrices */
 	matrix_free(p);
