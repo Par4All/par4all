@@ -1,7 +1,7 @@
 /* $Id$ */
 
 #ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 2002/03/14 16:51:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "%A% ($Date: 2002/03/14 17:02:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -638,24 +638,24 @@ build_options_menu_and_panel(Menu menu_options,
 #endif
 }
 
-
+#define BSIZE_HERE (256)
 
 void
 build_aliases()
 {
-   char buffer[128];
-   char true_name[128], alias_name[128];
+   char buffer[BSIZE_HERE];
+   char true_name[BSIZE_HERE], alias_name[BSIZE_HERE];
    FILE *fd;
    char * wpips_rc = WPIPS_RC; /* WPIPS_RC hides a strdup()... */
 
    aliases = hash_table_make(hash_string, 0);
 
    if (wpips_rc == NULL)
-      user_error("build_aliases", "Shell variable LIBDIR is undefined. Have you run pipsrc?\n",
+      user_internal_error("Shell variable LIBDIR is undefined. Have you run pipsrc?\n",
                  0 );
    fd = safe_fopen(wpips_rc, "r");
 
-   while (fgets(buffer, 128, fd) != NULL) {
+   while (fgets(buffer, BSIZE_HERE, fd) != NULL) {
       if (buffer[0] == '-')
          continue;
 
