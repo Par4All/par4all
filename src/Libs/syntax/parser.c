@@ -47,19 +47,13 @@ char lab_I[6];
 statement */
 char FormatValue[FORMATLENGTH];
 
-
+extern void syn_reset_lex(void);
 
 void ParserError(char * f, char * m)
 {
-    /* reset lex... Might be better to read the whole file like sserror() */
-    extern char syn_sbuf[];
-    extern char * syn_sptr;
-    extern int syn_previous;
     entity mod = get_current_module_entity();
 
-    syn_sptr = syn_sbuf;
-# define MMNEWLINE 10
-    syn_previous = MMNEWLINE;
+    syn_reset_lex();
 
     ResetBlockStack();
 
