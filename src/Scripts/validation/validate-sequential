@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1995/04/28 13:11:46 $, ) version $Revision$,
+# $RCSfile: validate-sequential,v $ ($Date: 1995/07/25 11:28:51 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -47,8 +47,15 @@ default_file=defaults
 RUNNER=`whoami`
 HOSTNAME=`hostname`
 PWD=`pwd`
-subject="PIPS Validation Suite Report"
+subject="PIPS Validation Suite Report: "
 failed=""
+
+# to be used by report for subject generation
+
+directory=
+program=
+export directory
+export program
 
 VERBOSE=':'
 DEBUG=':'
@@ -164,7 +171,7 @@ report()
       echo "Validate Message from $HOSTNAME:"
       echo
       echo "$message" 
-    } | $MAIL -s "$subject" $RUNNER
+    } | $MAIL -s "$subject ${3:-$directory/$program}" $RUNNER
 
     # beurk!
     int=`cat $errors`
@@ -208,6 +215,7 @@ test_aspect()
   (for file in ${FILES:-`ls $aspect/*.f`} ; do
      name=`basename $file .f`
      u_name=`echo $name | tr a-z A-Z`
+     program=$name
      
      rm -f $tmpout $tmperr
      
@@ -298,6 +306,7 @@ echo 0 > $errors
 for i in $aspects
 do
   old_errors=`cat $errors`
+  directory=$i
 
   if [ ! -d "$pips_test_directory/$i" ]
   then
@@ -346,6 +355,9 @@ rm -f $tmpout $tmperr $diffout $diffout_e
 #
 # Final report
 
+directory=
+program=
+
 if [ "$LOCKFILE" ]
 then
   echo $failed > "$LOCKFILE.$HOSTNAME"
@@ -359,7 +371,7 @@ $final with $pips_version on $HOSTNAME
 
 $PERFORMANCE
 
-in case of problems, contact <jouvelot@cri.ensmp.fr>."
+in case of problems, contact <jouvelot@cri.ensmp.fr>." "$final"
 
 fi
 
