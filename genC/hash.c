@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1997/04/24 17:58:10 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1997/07/17 22:09:59 $, )
  * version $Revision$
  */
 
@@ -520,7 +520,7 @@ char *key1, *key2;
 static int hash_int_equal(key1, key2)
 char *key1, *key2;
 {
-    return (int)key1 == (int)key2;
+    return key1 == key2;
 }
 
 static int hash_pointer_equal(key1, key2)
