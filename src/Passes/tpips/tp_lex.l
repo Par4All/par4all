@@ -222,8 +222,7 @@ void yyrestart(FILE *f){ yyin = f;}
 
 %%
 
-yywrap()
-{return 1;}
+int yywrap(void){ return 1; }
 
 void yyinit_lex()
 {
@@ -238,3 +237,9 @@ void yybegin_key()
 
 void yybegin_fname()
 {BEGIN FNAME;}
+
+void yyerror(char * s)
+{
+    tpips_lex_print_pos(stderr);
+    pips_user_error("%s\n", s);
+}
