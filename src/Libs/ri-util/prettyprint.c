@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.222 2002/05/06 08:46:15 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.223 2002/05/06 09:43:36 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -1406,7 +1406,6 @@ sentence_goto(
     return sentence_goto_label(module, label, margin, tlabel, n);
 }
 
-/*static bool found_filter = FALSE;*/
 /********************************************************************* TEXT */
 
 static text 
