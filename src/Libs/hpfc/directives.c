@@ -3,7 +3,7 @@
  * these functions deal with HPF directives.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/04/21 10:28:18 $, )
+ * ($Date: 1995/04/25 18:56:34 $, )
  */
 
 #include "defines-local.h"
@@ -65,14 +65,14 @@ bool realign_directive_p(f)
 entity f;
 {
     return(top_level_entity_p(f) && 
-	   strcmp(HPF_PREFIX REALIGN_SUFFIX, entity_local_name(f))==0);
+	   same_string_p(HPF_PREFIX REALIGN_SUFFIX, entity_local_name(f)));
 }
 
 bool redistribute_directive_p(f)
 entity f;
 {
     return(top_level_entity_p(f) && 
-	   strcmp(HPF_PREFIX REDIST_SUFFIX, entity_local_name(f))==0);
+	   same_string_p(HPF_PREFIX REDIST_SUFFIX, entity_local_name(f)));
 }
 
 /*-----------------------------------------------------------------
@@ -758,7 +758,7 @@ void handle_hpf_directives(s)
 statement s;
 {
     make_current_stmt_stack();
-    init_alive_synonym();
+    init_dynamic_locals();
 
     to_be_cleaned = NIL;
 
@@ -768,19 +768,17 @@ statement s;
 	call_domain,       directive_filter, gen_null,     /* CALL */
 		      NULL);
 
-    gen_map(clean_statement, to_be_cleaned);
+    DEBUG_STAT(7, "intermediate code", s);
 
+    simplify_remapping_graph();
+    gen_map(clean_statement, to_be_cleaned);
     assert(current_stmt_empty_p());
 
     gen_free_list(to_be_cleaned), to_be_cleaned=NIL;
     free_current_stmt_stack();
-    close_alive_synonym();
+    close_dynamic_locals();
 
-    ifdebug(5) 
-    {
-	fprintf(stderr, "[handle_hpf_directives] resulting code:\n");
-	hpfc_print_code(stderr, get_current_module_entity(), s);
-    }
+    DEBUG_CODE(5, "resulting code", get_current_module_entity(), s);
 }
 
 /* that is all
