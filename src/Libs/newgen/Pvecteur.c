@@ -46,7 +46,10 @@ int (*f)();
 {
 /* VBUFSIZE was increased from 1024 to 2048 for cgg:opmkrnl; FI, 13 March 92 */
 /* VBUFSIZE was increased from 2048 to 4096 for mat:zebulon5; FI, 3 Jan 97 */
-#define VBUFSIZE 4096
+/* VBUFSIZE was increased from 4096 to 8192 for mat:zebulon5; FI, 3 Jan 97 */
+/* VBUFSIZE was increased from 8192 to 16384 for mat:zebulon5; FI, 3 Jan 97 */
+/* VBUFSIZE was increased from 16384 to 32768 for mat:zebulon5; FI, 3 Jan 97 */
+#define VBUFSIZE 32768
     Value val;
     Variable var;
     char *varname;
@@ -65,6 +68,8 @@ int (*f)();
 
     while ((c = f()) != ')') {
 	if (ibuffer >= VBUFSIZE-1) {
+	  while ((c = f()) != ')')
+	    ibuffer++;
 	    (void) fprintf(stderr,
 			   "[vect_gen_read] buffer[%d] too small for %d bytes\n",
 			   VBUFSIZE-1, ibuffer);
