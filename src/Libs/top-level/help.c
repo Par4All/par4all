@@ -1,5 +1,5 @@
 /* $RCSfile: help.c,v $ (version $Revision$)
- * $Date: 1997/04/14 10:48:11 $, 
+ * $Date: 1997/04/30 09:01:24 $, 
  */
 
 #include <stdio.h>
@@ -13,7 +13,8 @@
 
 #include "top-level.h"
 
-void get_help_topics(pargc, argv)
+void 
+get_help_topics(pargc, argv)
 int *pargc;
 char *argv[];
 {
@@ -45,7 +46,8 @@ char *argv[];
     fclose(fd);
 }
 
-void get_help_topic(topic, pargc, argv)
+void 
+get_help_topic(topic, pargc, argv)
 char *topic;
 int *pargc;
 char *argv[];
@@ -102,11 +104,15 @@ char *argv[];
     fclose(fd);
 }
 
-/* add checkings here
+/* add checkings here (FI: why in help.c?)
  */
-void pips_checks(void)
+void 
+pips_checks(void)
 {
-    if (!getenv("PIPS_ROOT"))
-	pips_user_error("PIPS_ROOT environment variable not set\n");
+    if (!getenv("PIPS_ROOT")) {
+	(void) fprintf(stderr, "PIPS_ROOT environment variable not set. \n"
+		       "Set it properly and relaunch.\n");
+	exit(1);
+    }
 }
 
