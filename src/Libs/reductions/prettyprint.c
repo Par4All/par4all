@@ -1,5 +1,5 @@
 /* $RCSfile: prettyprint.c,v $ (version $Revision$)
- * $Date: 1997/07/18 15:26:39 $, 
+ * $Date: 1997/07/21 12:39:34 $, 
  *
  * (pretty)print of reductions.
  *
@@ -123,7 +123,7 @@ static text text_reductions(entity module, int margin, statement s)
     text t;
 
     debug_on("REDUCTIONS_DEBUG_LEVEL");
-    pips_debug(1, "considering statement %#p\n", s);
+    pips_debug(1, "considering statement %p\n", s);
     
     t = bound_printed_reductions_p(s)? /* unreachable statements? */
 	words_predicate_to_commentary
