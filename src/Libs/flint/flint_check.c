@@ -95,7 +95,7 @@ bool check_procedure(c)
     type            the_tp;
     functional      ft;
     type            result;
-    bool            tmpbool;
+    bool            tmpbool= BOOL_UNDEF;
 
     if (call_intrinsic_p(c))
 	tmpbool = BOOL_UNDEF;
@@ -611,7 +611,8 @@ bool position_in_the_area(the_var, inf, sup)
 {
     basic           base;
     list            dims;
-    int             len_unit, nb_of_elements;
+    int             len_unit = 0;
+    int             nb_of_elements = 0;
 
     if (!find_bd_type_variable(entity_type(the_var), &base, &dims))
 	return (FALSE);
