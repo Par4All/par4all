@@ -1,6 +1,6 @@
 /* 
  * $RCSfile: xv_transform.c,v $ (version $Revision$)
- * $Date: 1997/04/30 15:17:54 $, 
+ * $Date: 1998/04/16 14:45:33 $, 
  */
 
 #include <stdio.h>
@@ -23,6 +23,7 @@
 
 #include "constants.h"
 #include "misc.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "top-level.h"
