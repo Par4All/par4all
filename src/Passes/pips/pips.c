@@ -225,8 +225,10 @@ char * argv[];
 
 	if (success && performed_rule != NULL) {
 	    /* Perform rule */
+	    /*
 	    user_log("Request: perform rule %s for module %s.\n", 
 		     performed_rule, module);
+		     */
 	    success = safe_apply(performed_rule, module);
 		if (success) {
 		    user_log("%s performed for %s.\n", 
