@@ -180,6 +180,19 @@ number_of_ordered_statements(hash_table h)
     return n;
 }
 
+bool
+pipsdbm_consistent_statement_function(gen_chunkp map)
+{
+    hash_table h = (map+1)->h;
+    STATEMENT_FUNCTION_MAP(s, x, 
+    {
+	if (gen_type(s)!=statement_domain) return FALSE;
+	if (!gen_consistent_p(x)) return FALSE;
+    },
+	h);
+    return TRUE;
+}
+
 /* the stored stuff need be based on the ordering...
  * because newgen wont regenerate pointers...
  */
