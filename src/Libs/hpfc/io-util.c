@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-util.c,v $ ($Date: 1994/12/06 14:42:50 $, ) version $Revision$,
+ * $RCSfile: io-util.c,v $ ($Date: 1994/12/22 16:52:26 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -115,7 +115,7 @@ list le;
 	 int
 	     coef = vect_coeff((Variable) var, v);
 
-	 pips_assert("generate_deducables", (abs(coef)==1));
+	 assert(abs(coef)==1);
 
 	 vect_erase_var(&v, (Variable) var);
 	 if (coef==1) vect_chg_sgn(v);
@@ -141,7 +141,7 @@ int number;
 	result = NIL;
     int i;
 
-    pips_assert("hpfc_gen_n_vars", (number>=0) && (number<=7));
+    assert(number>=0 && number<=7);
 
     for(i=number; i>=1; i--)
 	result=CONS(EXPRESSION,
@@ -226,7 +226,7 @@ int val, number;
 	l=NIL;
     int i;
 
-    pips_assert("make_list_of_constant", number>=0);
+    assert(number>=0);
 
     for(i=1; i<=number; i++)
 	l = CONS(EXPRESSION, make_integer_constant_expression(val), l);
@@ -857,8 +857,7 @@ statement *psh, *psn;
 						NIL))),
 		      divide);
 
-    pips_assert("generate_io_statements_for_shared_arrays",
-		movement_update_p(move));
+    assert(movement_update_p(move));
 
     *psh = generate_optional_if(condition,
 				make_block_statement(CONS(STATEMENT, h_pre,
