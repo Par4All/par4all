@@ -1,21 +1,33 @@
 /*
+  convinient functions to deal with strings.
+  moved from pips by FC, 16/09/1998.
 
-CONCATENATE concatenates a variable list of strings in a static string
-(which is returned).
+  $Id$
+  
+  $Log: string.c,v $
+  Revision 1.15  1998/09/16 14:27:24  coelho
+  header added.
 
-STRNDUP copie les N premiers caracteres de la chaine S dans une zone
-allouee dynamiquement, puis retourne un pointeur sur cette zone. si la
-longueur de S est superieure ou egale a N, aucun caratere null n'est
-ajoute au resultat. sinon, la chaine resultat est padde avec des
-caracteres null.
+*/
 
+/*
+  
+  CONCATENATE concatenates a variable list of strings in a static string
+  (which is returned).
+  
+  STRNDUP copie les N premiers caracteres de la chaine S dans une zone
+  allouee dynamiquement, puis retourne un pointeur sur cette zone. si la
+  longueur de S est superieure ou egale a N, aucun caratere null n'est
+  ajoute au resultat. sinon, la chaine resultat est padde avec des
+  caracteres null.
+  
 
-STRNDUP0 copie les N premiers caracteres de la chaine S dans une zone
-allouee dynamiquement, puis retourne un pointeur sur cette zone.
-l'allocation est systematiquement faite avec N+1 caracteres de telle
-sorte qu'un caractere null soit ajoute a la chaine resultat, meme si la
-longueur de la chaine S est superieure ou egale a N. dans le cas
-contraire, la chaine resultat est padde avec des caracteres null.
+  STRNDUP0 copie les N premiers caracteres de la chaine S dans une zone
+  allouee dynamiquement, puis retourne un pointeur sur cette zone.
+  l'allocation est systematiquement faite avec N+1 caracteres de telle
+  sorte qu'un caractere null soit ajoute a la chaine resultat, meme si la
+  longueur de la chaine S est superieure ou egale a N. dans le cas
+  contraire, la chaine resultat est padde avec des caracteres null.
 
 */
 
@@ -25,15 +37,11 @@ contraire, la chaine resultat est padde avec des caracteres null.
 #include <memory.h>
 
 #include <stdarg.h>
-#include "string.h"
 #include "genC.h"
 
-#include "misc.h"
-
-string
-strndup(n, s)
-register int n; /* le nombre de caracteres a copier */
-register string s; /* la chaine a copier */
+string strndup(
+    int n, /* le nombre de caracteres a copier */
+    string s /* la chaine a copier */)
 {
  	register string r;
 	register int i;
@@ -57,10 +65,9 @@ register string s; /* la chaine a copier */
 	return(r);
 }
 
-string 
-strndup0(n, s)
-register int n; /* le nombre de caracteres a copier */
-register string s; /* la chaine a copier */
+string strndup0(
+    int n, /* le nombre de caracteres a copier */
+    string s /* la chaine a copier */)
 {
  	register string r;
 	register int i;
@@ -95,8 +102,7 @@ static string buffer = (string) NULL;
 static int buffer_size = 0;
 static int current = 0;
 
-void
-init_the_buffer()
+void init_the_buffer(void)
 {
     /* initial allocation
      */
@@ -111,9 +117,7 @@ init_the_buffer()
     buffer[0] = '\0';
 }
 
-string 
-append_to_the_buffer(
-    string s) /* what to append to the buffer */
+string append_to_the_buffer(string s) /* what to append to the buffer */
 {
     int len = strlen(s);
 
@@ -133,19 +137,19 @@ append_to_the_buffer(
     return buffer;
 }
 
-string 
-get_the_buffer()
+string get_the_buffer(void)
 {
     return buffer;
 }
 
 /* concatenation is based on a static dynamic buffer
  * which is shared from one call to another.
+ *
  * FC.
  */
-string 
-concatenate(string next, ...)
+string concatenate(string next, ...)
 {
+    int count = 0;
     va_list args;
     
     init_the_buffer();
@@ -155,8 +159,11 @@ concatenate(string next, ...)
     va_start(args, next);
     while (next)
     {
+	count++;
 	(void) append_to_the_buffer(next);
 	next = va_arg(args, string);
+
+	/* should stop after some count. */
     }
     va_end(args);
 
@@ -165,9 +172,7 @@ concatenate(string next, ...)
     return buffer;
 }
 
-char *
-strupper(s1, s2)
-char *s1, *s2;
+string strupper(string s1, string s2)
 {
     char *r = s1;
 
@@ -182,9 +187,7 @@ char *s1, *s2;
     return(r);
 }
 
-char *
-strlower(s1, s2)
-char *s1, *s2;
+string strlower(string s1, string s2)
 {
     char *r = s1;
 
@@ -199,9 +202,7 @@ char *s1, *s2;
     return(r);
 }
 
-string 
-bool_to_string(b)
-bool b;
+string bool_to_string(bool b)
 {
     static string t = "TRUE";
     static string f = "FALSE";
@@ -209,12 +210,13 @@ bool b;
     return b?t:f;
 }
 
-string
-nth_suffix(int i)
+/* @return the english suffix for i.
+ */
+string nth_suffix(int i)
 {
     string suffix = string_undefined;
 
-    pips_assert("Formal parameter i is greater or equal to 1", i >= 1);
+    message_assert("Formal parameter i is greater or equal to 1", i >= 1);
 
     switch(i) {
     case 1: suffix = "st";
