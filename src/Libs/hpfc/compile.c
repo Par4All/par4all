@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/06/08 09:07:24 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/06/08 15:53:30 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -174,13 +174,19 @@ char *module_name;
     hpfcompiler(module_stat, &hoststat, &nodestat);
     add_pvm_init_and_end(&hoststat, &nodestat);
 
+    declaration_with_overlaps();
+
+    update_object_for_module(nodestat, node_module);
+    update_object_for_module(hoststat, host_module);
+    insure_declaration_coherency(node_module, nodestat);
+    insure_declaration_coherency(host_module, hoststat);
+
+    close_overlap_management();
+
     /*
     DeduceGotos(hoststat, hostgotos);
     DeduceGotos(nodestat, nodegotos);
     */
-    declaration_with_overlaps();
-    close_overlap_management();
-
     /*
      * output
      */
