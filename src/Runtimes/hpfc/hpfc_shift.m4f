@@ -1,6 +1,6 @@
 c
 c $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-c ($Date: 1995/12/01 11:43:53 $, )
+c ($Date: 1996/06/11 20:11:04 $, )
 c
 c
       subroutine hpfc_tdim(array, dim, template, tdim)
@@ -119,6 +119,8 @@ c
       include "hpfc_includes.h"
       logical replicated
       integer indp(7), i, lid
+! humm.... should be coherent with the compiler...
+      replicated = .false.
       do i=1, NODIMP(procs)
          indp(i)=MYPOS(i, procs)
       enddo
