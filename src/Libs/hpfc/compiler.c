@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/09/03 15:19:34 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/11/17 14:19:12 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -725,7 +725,7 @@ statement stat, *hoststatp, *nodestatp;
 
     hpfcompiler(body,&hostbody,&nodebody);
     
-    if (my_empty_statement_p(hostbody))
+    if (hpfc_empty_statement_p(hostbody))
     {
 	/*
 	 * ???
