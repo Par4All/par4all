@@ -326,7 +326,7 @@ typedef hash_table control_mapping;
 #define instruction_to_statement(i) \
    make_statement(entity_empty_label(),\
 		  STATEMENT_NUMBER_UNDEFINED, STATEMENT_ORDERING_UNDEFINED,\
-		  string_undefined, i)
+		  "", i)
 
 #define loop_to_instruction(l) make_instruction(is_instruction_loop, l)
 #define test_to_instruction(t) make_instruction(is_instruction_test, t)
@@ -487,6 +487,9 @@ entity get_ith_##lname##_prime(int i)\
 #define IO_ERROR_ARRAY_NAME "ERR_LUNS"
 /* size of the unit specifier */
 #define IO_EFFECTS_UNIT_SPECIFIER_LENGTH 4
+
+/* Empty comments (i.e. default comments) */
+#define empty_comments string_undefined
 
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
