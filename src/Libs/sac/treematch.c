@@ -11,74 +11,36 @@
 #include "sac.h"
 #include "patterns.tab.h"
 
-typedef struct {
-      int class;
-      list args;        /* <int*> */
-} _pattern, * pattern;
-
-typedef struct {
-      list patterns;    /* <pattern> */
-      hash_table sons;  /* <int -> match_tree> */
-} _match_tree, * match_tree;
-
-#define PATTERN(x) ((pattern)((x).p))
-#define TOKEN(x) ((int)((x).p))
-#define ARGUMENT(x) ((int*)((x).p))
 
 static bool patterns_initialized = FALSE;
 
-static hash_table operation_ids;   /* <string->int> */
-static operation operations = NULL;
-static int nbOperations = 0;
-static int nbAllocatedOperations = 0;
+static hash_table opcodeClass_ids;   /* <string->int> */
+static opcodeClass* opcodeClasses = NULL;
+static int nbOpcodeClasses = 0;
+static int nbAllocatedOpcodeClasses = 0;
 
-static match_tree patterns_tree = NULL;
+static matchTree patterns_tree = NULL;
 
-static pattern make_pattern(int id, list args)
+static matchTree make_tree()
 {
-   pattern n = (pattern)malloc(sizeof(_pattern));
-
-   n->class = id;
-   n->args = args;
+   matchTree n = make_matchTree(NIL, make_matchTreeSons());
 
    return n;
 }
 
-static match make_match(int type, list args)
+static void insert_tree_branch(matchTree t, int token, matchTree n)
 {
-   match n = (match)malloc(sizeof(_match));
-
-   n->type = type;
-   n->args = args;
-
-   return n;
+   extend_matchTreeSons(matchTree_sons(t), token, n);
 }
 
-static match_tree make_tree()
+static matchTree select_tree_branch(matchTree t, int token)
 {
-   match_tree n = (match_tree)malloc(sizeof(_match_tree));
-
-   n->patterns = NIL;
-   n->sons = hash_table_make(hash_int, 0);
-
-   return n;
-}
-
-static void insert_tree_branch(match_tree t, int token, match_tree n)
-{
-   hash_put(t->sons, (void*)token, (void*)n);
-}
-
-static match_tree select_tree_branch(match_tree t, int token)
-{
-   match_tree res = (match_tree)hash_get(t->sons, (void*)token);
-   
-   return (res == HASH_UNDEFINED_VALUE) ? NULL : res;
+   return apply_matchTreeSons(matchTree_sons(t), token);
 }
 
 /* Warning: list of arguments is built in reversed order
  * (the head is in fact the last argument) */
-static match_tree match_call(call c, match_tree t, list *args)
+static matchTree match_call(call c, matchTree t, list *args)
 {
    if (!top_level_entity_p(call_function(c)) || 
         call_constant_p(c))
@@ -137,9 +99,9 @@ static list merge_lists(list l, list format)
    /* merge according to the format specifier list */
    for( ; format != NIL; format = CDR(format))
    {
-      int* param = ARGUMENT(CAR(format));
+      patternArg param = PATTERNARG(CAR(format));
 
-      if (param == NULL)
+      if (patternArg_dynamic_p(param))
       {
 	 if (l != NIL)
 	 {
@@ -151,7 +113,7 @@ static list merge_lists(list l, list format)
       }
       else
       {
-	 expression e = make_integer_constant_expression(*param);
+	 expression e = make_integer_constant_expression(patternArg_static(param));
 
 	 res = CONS(EXPRESSION, e, res);
       }
@@ -167,7 +129,7 @@ static list merge_lists(list l, list format)
 /* return a list of matching statements */
 list match_statement(statement s)
 {
-   match_tree t;
+   matchTree t;
    list args = NULL;
    list matches = NIL;
    list i;
@@ -184,11 +146,11 @@ list match_statement(statement s)
    }
 
    /* build the matches */
-   for(i = t->patterns; i != NIL; i = CDR(i)) 
+   for(i = matchTree_patterns(t); i != NIL; i = CDR(i)) 
    {
-      pattern p = PATTERN(CAR(i));
-      match m = make_match(p->class, 
-		           merge_lists(args, p->args));
+      patternx p = PATTERNX(CAR(i));
+      match m = make_match(patternx_class(p), 
+		           merge_lists(args, patternx_args(p)));
 
       matches = CONS(MATCH, m, matches);
    }
@@ -196,88 +158,86 @@ list match_statement(statement s)
    return matches;
 }
 
-void insert_operation(char * s, int nbArgs, list opcodes)
+void insert_opcodeClass(char * s, int nbArgs, list opcodes)
 {
    int id;
-   operation op;
 
-   //Find an id for the operation
-   id = nbOperations++;
+   //Find an id for the opcodeClass
+   id = nbOpcodeClasses++;
 
    //Add the id and name in the map
-   hash_put(operation_ids, (void *)s, (void *)id);
+   hash_put(opcodeClass_ids, (void *)s, (void *)id);
 
-   //Make room for the new operation if needed
-   if (nbOperations > nbAllocatedOperations)
+   //Make room for the new opcodeClass if needed
+   if (nbOpcodeClasses > nbAllocatedOpcodeClasses)
    {
-      nbAllocatedOperations += 10;
+      nbAllocatedOpcodeClasses += 10;
 
-      operations = (operation)realloc((void*)operations, 
-				      sizeof(_operation)*nbAllocatedOperations);
+      opcodeClasses = (opcodeClass*)realloc((void*)opcodeClasses, 
+				      sizeof(opcodeClass)*nbAllocatedOpcodeClasses);
 
-      if (operations == NULL)
+      if (opcodeClasses == NULL)
       {
-	 printf("Fatal error: could not allocate memory for operations.\n");
+	 printf("Fatal error: could not allocate memory for opcodeClasses.\n");
 	 exit(-1);
       }
    }
 
    //Initialize members
-   op = operations + id;
-   op->nbArgs = nbArgs;
-   op->opcodes = opcodes;
+   opcodeClasses[id] = make_opcodeClass(nbArgs, opcodes);
 }
 
-operation get_operation(int kind)
+opcodeClass get_opcodeClass(int kind)
 {
-   return ((kind>=0) && (kind<nbOperations)) ?
-      &operations[kind] : NULL;
+   return ((kind>=0) && (kind<nbOpcodeClasses)) ?
+      opcodeClasses[kind] : NULL;
 }
 
-char * get_operation_opcode(int kind, int vecSize, int subwordSize)
+char * get_opcodeClass_opcode(int kind, int vecSize, int subwordSize)
 {
-   operation op = get_operation(kind);
+   opcodeClass op = get_opcodeClass(kind);
    list opcodes;
 
    if (!op)
       return NULL;
 
-   for(opcodes = op->opcodes; opcodes != NIL; opcodes = CDR(opcodes))
+   for(opcodes = opcodeClass_opcodes(op); opcodes != NIL; opcodes = CDR(opcodes))
    {
       opcode oc = OPCODE(CAR(opcodes));
 
-      if ( (oc->vectorSize == vecSize) &&
-	   (oc->subwordSize == subwordSize) )
-	 return oc->name;
+      if ( (opcode_vectorSize(oc) == vecSize) &&
+	   (opcode_subwordSize(oc) == subwordSize) )
+	 return opcode_name(oc);
    }
 
    return NULL;
 } 
 
-int get_operation_id(char * s)
+int get_opcodeClass_id(char * s)
 {
-   int id = (int)hash_get(operation_ids, (void*)s);
+   int id = (int)hash_get(opcodeClass_ids, (void*)s);
 
    return (id == (int)HASH_UNDEFINED_VALUE) ? -1 : id;
 }
 
 void insert_pattern(char * s, list tokens, list args)
 {
-   int c = get_operation_id(s);
-   pattern p = make_pattern(c, args);
-   match_tree m = patterns_tree;
+   int c = get_opcodeClass_id(s);
+   patternx p;
+   matchTree m = patterns_tree;
 
    if (c < 0)
    {
-      printf("Warning: defining pattern for an undefined operation (%s).",s);
-      free(p);
+      printf("Warning: defining pattern for an undefined opcodeClass (%s).",s);
       return;
    }
 
+   p = make_patternx(c, args);
+
    for( ; tokens != NIL; tokens = CDR(tokens) )
    {
-      int token = TOKEN(CAR(tokens));
-      match_tree next = select_tree_branch(m, token);
+      int token = INT(CAR(tokens));
+      matchTree next = select_tree_branch(m, token);
 
       if (next == NULL)
       {
@@ -289,7 +249,7 @@ void insert_pattern(char * s, list tokens, list args)
       m = next;
    }
 
-   m->patterns = CONS(PATTERN, p, m->patterns);
+   matchTree_patterns(m) = CONS(PATTERN, p, matchTree_patterns(m));
 }
 
 void patterns_yyparse();
@@ -303,7 +263,7 @@ void init_tree_patterns()
       patterns_initialized = TRUE;
 
       patterns_tree = make_tree();
-      operation_ids = hash_table_make(hash_string, 0);
+      opcodeClass_ids = hash_table_make(hash_string, 0);
 
       patterns_yyin = fopen("patterns.def", "r");
       patterns_yyparse();
