@@ -61,7 +61,7 @@ entity mod;
 	rl = CONS(ENTITY, local_name_to_top_level_entity(e), rl),
 	callees_list);
 
-    return return_list;
+    return rl;
 }
 
 /* 
