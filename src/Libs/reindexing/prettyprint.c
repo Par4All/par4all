@@ -382,7 +382,7 @@ char *mod_name;
   entity module;
   statement mod_stat;
   code c;
-  string s;
+  string s, pp;
   static_control stco;
   statement_mapping STS;
   bool success;
@@ -423,10 +423,8 @@ char *mod_name;
     fprint_plc(stderr, the_plc);
   }
 
-  set_bool_property("PRETTYPRINT_PARALLEL", TRUE);
-  set_bool_property("PRETTYPRINT_SEQUENTIAL", FALSE);
-  set_bool_property("PRETTYPRINT_CMFORTRAN", TRUE);
-  set_bool_property("PRETTYPRINT_FORTRAN90", TRUE);
+  pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
+  set_string_property(PRETTYPRINT_PARALLEL, "cmf");
   set_bool_property("PRETTYPRINT_ALL_DECLARATIONS", TRUE);
 
   init_prettyprint(empty_text);
@@ -434,26 +432,11 @@ char *mod_name;
   mod_stat = (statement)
     db_get_memory_resource(DBR_REINDEXED_CODE, mod_name, TRUE);
     
-/*
-  filename = (char *) strdup(concatenate(db_get_current_workspace_directory(), 
-					 "/", mod_name, CM_FORTRAN_EXT,
-					 (string) NULL));
-*/
-
   insure_declaration_coherency_of_module(module, mod_stat);
 
   cmf_layout_align(mod_stat);
 
   MERGE_TEXTS(r, text_module(module, mod_stat));
-
-/*
-  fd = safe_fopen(filename, "w");
-  print_text(fd, r);
-  safe_fclose(fd, filename);
-
-  DB_PUT_FILE_RESOURCE(DBR_PARALLELPRINTED_FILE, strdup(mod_name), 
-		       filename);
-*/
 
   success = make_text_resource(mod_name,
 			       DBR_PARALLELPRINTED_FILE,
@@ -463,6 +446,8 @@ char *mod_name;
   reset_current_stco_map();
   reset_current_module_entity();
   close_prettyprint();
+
+  set_string_property(PRETTYPRINT_PARALLEL, pp); free(pp);
 
   debug_off();
  
