@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/08/31 13:17:10 $, )
+# ($Date: 1996/08/31 18:14:11 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -274,8 +274,11 @@ param_init.f: param_init.m4
 #
 # Link
 
-ADDED_LD_FLAGS:=$(shell \
-	sed '/^![Ll][Dd][Ff]./!d;s/^![Ll][Dd][Ff].//' $(TARGET).f)
+# LDI: Link eDitor I/O (host & source)
+# LDP: Link eDitor Pure (all)
+
+LDI:=$(shell echo $(shell sed -n 's/^![Ll][Dd][Ii].//p' $(TARGET).f))
+LDP:=$(shell echo $(shell sed -n 's/^![Ll][Dd][Pp].//p' $(TARGET).f))
 
 $(HOST):  $(HEADERS) $(COMMON_OFILES) $(HOST_OFILES)
 	$(FC) $(FFLAGS) -o $(HOST) \
@@ -283,7 +286,7 @@ $(HOST):  $(HEADERS) $(COMMON_OFILES) $(HOST_OFILES)
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
 		$(ALL_HLIBS) \
-		$(ADDED_LD_FLAGS)
+		$(LDI) $(LDP)
 	$(STRIP) $(HOST)
 
 $(NODE):  $(HEADERS) $(COMMON_OFILES) $(NODE_OFILES) 
@@ -293,10 +296,11 @@ $(NODE):
 		$(NODE_OFILES) \
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
-		$(ALL_NLIBS)
+		$(ALL_NLIBS)\
+		$(LDP)
 	$(STRIP) $(NODE)
 
-ifdef ($(PVM_ARCH),CM5)
+ifeq ($(PVM_ARCH),CM5)
 $(NODE): $(HOST_OFILES)
 	$(CMLD) $(CMLD_FLAGS) \
 	   -comp $(FC) -o $(NODE) \
@@ -315,14 +319,13 @@ $(NODE): $(HOST_OFILES)
 endif
 
 $(RTEST):  $(FTEST)
-	$(FC) $(FFLAGS) -o $(RTEST) $(FTEST) $(ADDED_LD_FLAGS)
+	$(FC) $(FFLAGS) -o $(RTEST) $(FTEST) $(LDI) $(LDP)
 	$(STRIP) $(RTEST)
 
 #
 # Cleaning
 
 clean:;	$(RM) *.o *~ *.trace $(DEDUCED) core
-
 clobber: clean; $(RM) $(RUNABLES) $(PVM_BIN_DIR)/$(HOST) $(PVM_BIN_DIR)/$(NODE)
 
 # that is all
