@@ -3,6 +3,8 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "text.h"
@@ -10,9 +12,6 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "properties.h"
-
-#include "arithmetique.h"
-
 
 /* #include "constants.h" */
 
@@ -133,7 +132,7 @@ print_sentence(FILE * fd,
 	     * use the 88 algorithm to break as few
 	     * syntactic constructs as possible */
 	    else
-		if(strlen(w) < 70-7-em) {
+		if((int)strlen(w) < 70-7-em) {
 		    if (col + strlen(w) > 70) {
 			/* Complete current line with the statement
                            line number, if it is significative: */
