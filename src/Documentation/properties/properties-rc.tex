@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.147  2000/10/11 15:23:22  irigoin
+%% property PARSER_LINEARIZE_LOOP_BOUNDS added
+%%
 %% Revision 1.146  2000/10/11 14:44:56  irigoin
 %% Properties SEMANTICS_TRUST_ARRAY_DECLARATIONS and
 %% SEMANTICS_TRUST_ARRAY_REFERENCES added.
@@ -147,7 +150,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2000/10/11 14:44:56 $~$
+$~$Date: 2000/10/11 15:23:22 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -517,6 +520,7 @@ PARSER_TYPE_CHECK_CALL_SITES   FALSE
 
 \subsubsection{Loop Header with Label}
 \index{PARSER\_SIMPLIFY\_LABELLED\_LOOPS}
+\index{PARSER\_LINEARIZE\_LOOP\_BOUNDS}
 
 The PIPS implementation of Allen\&Kennedy algorithm cannot cope with
 labelled DO loops because the loop, and hence its label, may be
@@ -527,6 +531,14 @@ output code as close as possible to the user source code.
 
 \begin{verbatim}
 PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
+\end{verbatim}
+
+Most PIPS analyses work better if loop bounds are affine. It is sometimes
+possible to improve results for non-affine bounds by assigning the bound
+to an integer variables and by using this variable as bound.
+
+\begin{verbatim}
+PARSER_LINEARIZE_LOOP_BOUNDS FALSE
 \end{verbatim}
 
 \subsubsection{Entry}
