@@ -284,7 +284,8 @@ loop_undefined_descriptor_make(loop l)
 }
 
 list 
-effects_undefined_union_over_range(list l_eff, entity index, range r, descriptor d)
+effects_undefined_union_over_range(
+    list l_eff, entity index, range r, descriptor d)
 {
     return list_undefined;
 }
