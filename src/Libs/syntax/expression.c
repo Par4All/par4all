@@ -1,8 +1,11 @@
-/* 	%A% ($Date: 1999/01/05 12:35:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+/* 	%A% ($Date: 2000/04/26 11:27:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: expression.c,v $
+ * Revision 1.18  2000/04/26 11:27:55  irigoin
+ * MakeIoList() updated to avoid sharing between calls to IOLIST.
+ *
  * Revision 1.17  1999/01/05 12:35:47  irigoin
  * MakeAtom() updated so as not to declare every single variable: formal
  * parameters of entries must not be declared in the current module
@@ -25,7 +28,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1999/01/05 12:35:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 2000/04/26 11:27:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -362,11 +365,18 @@ int HasParenthesis;
 
 
 
-/* this function takes a list of io elements (i, j, t(i,j)), and returns
+/* This function takes a list of io elements (i, j, t(i,j)), and returns
 the same list, with a cons cell pointing to a character constant
-expression 'IOLIST=' before each element of the original list 
+expression 'IOLIST=' before each element of the original list.
 
 (i , j , t(i,j)) becomes ('IOLIST=' , i , 'IOLIST=' , j , 'IOLIST=' , t(i,j))
+
+This IO list is later concatenated to the IO control list to form the
+argument of an IO function. The tagging is necessary because of this
+concatenation.
+
+The IOLIST call used to be shared within one IO list. Since sharing is 
+avoided in the PIPS internal representation, they are now duplicated.
 */
 
 cons *
@@ -375,11 +385,10 @@ cons *l;
 {
     cons *pc; /* to walk thru l */
     cons *lr = NIL; /* result list */
-
-    expression e = MakeCharacterConstantExpression("IOLIST=");
 		
     pc = l;
     while (pc != NULL) {
+        expression e = MakeCharacterConstantExpression("IOLIST=");
 	cons *p = CONS(EXPRESSION, e, NIL);
 
 	CDR(p) = pc;
