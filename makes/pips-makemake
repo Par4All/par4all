@@ -65,6 +65,7 @@
 #	Transformation des << cp deledit >> en << edit cp delta >> car sinon
 #	on a des proble`mes de droit d'utilisateur. RK, 22/07/1993.
 #
+#	delta devient delget. RK.
 #
 # wish:
 #
@@ -231,13 +232,13 @@ install: $(INC_TARGET) $(LIB_TARGET)
 				exit 1; \\
 			fi ; \\
 		else \\
-			echo sccs -y\"\$\$comments\" delta \$\$module; \\
-			if sccs delta -y"\$\$comments" \$\$module; \\
-			then echo sccs delta succeeded; \\
+			echo sccs -y\"\$\$comments\" delget \$\$module; \\
+			if sccs delget -y"\$\$comments" \$\$module; \\
+			then echo sccs delget succeeded; \\
 			else status=\$\$? ; \\
 				if [ \$\$status -eq 255 ] ; \\
-					then echo sccs delta return code \$\$status ; \\
-					else echo sccs delta unusual return code \$\$status ; \\
+					then echo sccs delget return code \$\$status ; \\
+					else echo sccs delget unusual return code \$\$status ; \\
 						exit 1; \\
 				fi ; \\
 			fi ; \\
@@ -315,13 +316,13 @@ install: $(INC_TARGET) $(BIN_TARGET)
 				exit 1; \\
 			fi ; \\
 		else \\
-			echo sccs -y\"\$\$comments\" delta \$\$module; \\
-			if sccs delta -y"\$\$comments" \$\$module; \\
-			then echo sccs delta succeeded; \\
+			echo sccs -y\"\$\$comments\" delget \$\$module; \\
+			if sccs delget -y"\$\$comments" \$\$module; \\
+			then echo sccs delget succeeded; \\
 			else status=\$\$? ; \\
 				if [ \$\$status -eq 255 ] ; \\
-					then echo sccs delta return code \$\$status ; \\
-					else echo sccs delta unusual return code \$\$status ; \\
+					then echo sccs delget return code \$\$status ; \\
+					else echo sccs delget unusual return code \$\$status ; \\
 						exit 1; \\
 				fi ; \\
 			fi ; \\
