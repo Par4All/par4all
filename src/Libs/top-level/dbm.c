@@ -238,10 +238,21 @@ bool
 delete_workspace(string wname)
 {
     int failure;
-    
+    database p;
     /* FI: No check whatsoever about the current workspace, no information
        about deleting the non-current workspace vs deleting the current
        workspace... */
+
+    /* Yes but at least close the LOGFILE if we delete the current
+       workspace since it will fail on NFS because of the open file
+       descriptor (creation of .nfs files). RK */
+    if ((p = db_get_current_workspace()) != database_undefined) {
+	string name = database_name(p);
+	if (strcmp(wname, name) == 0)
+	    /* Trying to delete the current workspace! Close the
+               LOGFILE first... */
+	    close_log_file();
+    }
 
     if ((failure=safe_system_no_abort(concatenate("Delete ", wname, NULL))))
 	pips_user_warning("exit code for Delete is %d\n", failure);
