@@ -1,3 +1,8 @@
+/* 	%A% ($Date: 1997/02/05 00:36:11 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_control_control[] = "%A% ($Date: 1997/02/05 00:36:11 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
 
 /* - control.c
 
@@ -28,15 +33,10 @@
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
-/*
-#include "text.h"
-#include "text-util.h"
-*/
+#include "control.h"
 #include "properties.h"
 
 #include "misc.h"
-#include "ri-util.h"
-#include "control.h"
 
 #include "constants.h"
 
@@ -264,6 +264,18 @@ hash_table used_labels;
          controlize_call();
     bool controlized=FALSE;
 
+    ifdebug(5) {
+	list blocs = NIL ;
+	pips_debug(1, "st at entry:\n");
+	print_statement(st);
+	CONTROL_MAP(ctl, {
+	    pips_debug(1, "ctl=%#x:\n", (unsigned int) ctl);
+	    print_statement(control_statement(ctl));
+	}, c_res, blocs);
+	fprintf(stderr, "---\n");
+	gen_free_list(blocs);
+    }
+    
     switch(instruction_tag(i)) {
     case is_instruction_block: {
 	controlized = controlize_list(st, instruction_block(i),
@@ -295,25 +307,26 @@ hash_table used_labels;
 	break;
     }
     case is_instruction_call:
-      /* FI: IO calls may have control effects; they should be handled here! */
+	/* FI: IO calls may have control effects; they should be handled here! */
 	controlized = controlize_call(st, instruction_call(i), 
-				       pred, succ, c_res, used_labels);
+				      pred, succ, c_res, used_labels);
 	break;
     default:
 	pips_error("controlize", 
-		    "Unknown instruction tag %d\n", instruction_tag(i));
+		   "Unknown instruction tag %d\n", instruction_tag(i));
     }
 
     ifdebug(5) {
-	cons *blocs = NIL ;
+	list blocs = NIL ;
+	pips_debug(1, "st at exit:\n");
+	print_statement(st);
 	CONTROL_MAP(ctl, {
-	    pips_debug(1, "\n");
-	    print_statement(st);
+	    pips_debug(1, "ctl=%#x:\n", (unsigned int) ctl);
 	    /* print_text(stderr, text_statement(get_current_module_entity(), 0, st)); */
-	    fprintf(stderr, "---\n");
 	    print_statement(control_statement(ctl));
 	    /* print_text(stderr, text_statement(get_current_module_entity(), 0, control_statement(ctl))); */
 	}, c_res, blocs);
+	fprintf(stderr, "---\n");
 	gen_free_list(blocs);
     }
     
@@ -378,8 +391,8 @@ statement loop_test(statement sl)
 			       NIL)));
   test t = make_test(make_expression(make_syntax(is_syntax_call, c),
 				     normalized_undefined), 
-		     make_empty_statement(), 
-		     make_empty_statement());
+		     MAKE_CONTINUE_STATEMENT(), 
+		     MAKE_CONTINUE_STATEMENT());
   string csl = statement_comments(sl);
   string prev_comm = empty_comments_p(csl)? "" : strdup(csl);
   string lab = string_undefined;
@@ -579,7 +592,7 @@ hash_table used_labels;
 			 control_successors(Unreachable)) ;
 	}
 	if(controlized) {
-	    control c_in = make_control(make_empty_statement(), NIL, NIL);
+	    control c_in = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
 	    
 	    ctls = CONS(CONTROL, c_in, ctls);
 	    control_predecessors(c_in) = control_predecessors(c_next);
@@ -590,7 +603,7 @@ hash_table used_labels;
 	}
 	else {
 	    pred = (unreachable) ? 
-		    make_control(make_empty_statement(), NIL, NIL) :
+		    make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL) :
 		    c_res;
 	}
 	c_res = c_next ; 
@@ -613,7 +626,8 @@ hash_table used_labels;
     hash_table block_used_labels = hash_table_make(hash_string, 0);
     control c_block = 
 	    (ENDP(sts)) ?
-		    make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL) :
+		/* If the list is empty, return an empty block: */
+		    make_control(make_empty_statement(), NIL, NIL) :
 			    make_conditional_control(STATEMENT(CAR(sts)));
     control c_end = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
     control c_last = c_end;
@@ -687,33 +701,44 @@ hash_table used_labels;
     statement s_f = test_false(t);
     bool controlized;
 
+    ifdebug(5) {
+	pips_debug(1, "THEN at entry:\n");
+	print_statement(s_t);
+	pips_debug(1, "c1 at entry:\n");
+	print_statement(control_statement(c1));
+	pips_debug(1, "ELSE at entry:\n");
+	print_statement(s_f);
+	pips_debug(1, "c2 at entry:\n");
+	print_statement(control_statement(c2));
+    }
+
     controlize(s_t, c_res, c_join, c1, t_used_labels);	
     controlize(s_f, c_res, c_join, c2, f_used_labels);
 
     if(covers_labels_p(s_t, t_used_labels) && 
        covers_labels_p(s_f, f_used_labels)) {
 	test it = make_test(test_condition(t), 
-			     control_statement(c1),
-			     control_statement(c2));
+			    control_statement(c1),
+			    control_statement(c2));
 
 	UPDATE_CONTROL(c_res, 
-		        make_statement(statement_label(st), 
-				       statement_number(st),
-				       STATEMENT_ORDERING_UNDEFINED,
-				       statement_comments(st),
-				       make_instruction(is_instruction_test, 
-							it)),
-		        ADD_PRED(pred, c_res),
-		        CONS(CONTROL, succ, NIL));
+		       make_statement(statement_label(st), 
+				      statement_number(st),
+				      STATEMENT_ORDERING_UNDEFINED,
+				      statement_comments(st),
+				      make_instruction(is_instruction_test, 
+						       it)),
+		       ADD_PRED(pred, c_res),
+		       CONS(CONTROL, succ, NIL));
 	control_predecessors(succ) = ADD_PRED(c_res, succ);
 	controlized = FALSE;
     }
     else {
 	UPDATE_CONTROL(c_res, st, 
-		        ADD_PRED(pred, c_res),
-		        CONS(CONTROL, c1, CONS(CONTROL, c2, NIL)));
-	test_true(t) = make_empty_statement();
-	test_false(t) = make_empty_statement();
+		       ADD_PRED(pred, c_res),
+		       CONS(CONTROL, c1, CONS(CONTROL, c2, NIL)));
+	test_true(t) = MAKE_CONTINUE_STATEMENT();
+	test_false(t) = MAKE_CONTINUE_STATEMENT();
 	control_predecessors(succ) = ADD_PRED(c_join, succ);
 	control_successors(c_join) = CONS(CONTROL, succ, NIL);
 	controlized = TRUE;
@@ -721,6 +746,19 @@ hash_table used_labels;
     control_successors(pred) = ADD_SUCC(c_res, pred);
     union_used_labels(used_labels, 
 		      union_used_labels(t_used_labels, f_used_labels));
+
+    ifdebug(5) {
+	list blocs = NIL ;
+	pips_debug(1, "IF at exit:\n");
+	print_statement(st);
+	CONTROL_MAP(ctl, {
+	    pips_debug(1, "ctl=%#x:\n", (unsigned int) ctl);
+	    print_statement(control_statement(ctl));
+	}, c_res, blocs);
+	fprintf(stderr, "---\n");
+	gen_free_list(blocs);
+    }
+
     return(controlized);
 }
 
