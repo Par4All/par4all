@@ -59,7 +59,7 @@ class corresponding to the pattern, as well as a list that can be used
 to translate from original statement references or constants to
 arguments for the opcode.
 
-\domain{pattern = class:int x args:patternArg*}
+\domain{patternx = class:int x args:patternArg*}
 {}
 
 %% NON (FC): \domain{External hash\_table}
@@ -70,7 +70,7 @@ patterns corresponding to a statement. When traversed, it can thus map
 a statement to a list of patterns that can be used.
 
 %% x sons:hash_table
-\domain{matchTree = pattern:pattern*}
+\domain{matchTree = patternx:patternx*}
 {}
 
 A \verb+pattern+ can be translated into a \verb+match+ by mapping the
