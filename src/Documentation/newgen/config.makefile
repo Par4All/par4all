@@ -13,7 +13,8 @@ ETEXF =	ri.tex \
 	pipsdbm_private.tex \
 	eole_private.tex \
 	abc_private.tex \
-	alias_private.tex
+	alias_private.tex \
+	ubs_private.tex
 
 FTEXF =	complexity_ri.ftex \
 	database.ftex \
