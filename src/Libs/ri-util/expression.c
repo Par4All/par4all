@@ -741,8 +741,8 @@ Pvecteur pv;
 
     if (coef==-1) /* let us avoid -1*v */
     {
-	factor1 = make_factor_expression(1, (entity) vecteur_var(v));
 	entity op_ums = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
+	factor1 = make_factor_expression(1, (entity) vecteur_var(v));
 	factor1 = call_to_expression
 	    (make_call(op_ums, CONS(EXPRESSION, factor1, NIL)));
     }
