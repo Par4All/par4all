@@ -17,6 +17,28 @@
 #include "genC.h"
 #include "misc.h"
 
+/* pips meta information from pipsmake are made available here...
+ * (current phase and module...)
+ */
+static string current_phase = NULL;
+static string current_module = NULL;
+
+void set_pips_current_computation(string rname, string oname)
+{
+    pips_assert("no current computation", !current_module && !current_phase);
+
+    current_phase = strdup(rname);
+    current_module = strdup(oname);
+}
+
+void reset_pips_current_computation(void)
+{
+    pips_assert("some current computation", current_module && current_phase);
+
+    free(current_module), current_module = NULL;
+    free(current_phase), current_phase = NULL;
+}
+
 /* FI: grah, qu'est-ce que c'est que cette heresie? misc ne devait pas
    dependre de NewGen! */
 extern bool get_bool_property(string);
@@ -106,16 +128,39 @@ string user_request(char * a_message_format, ...)
  * for infos.) 
  */
 
+static FILE * warning_file = (FILE*) NULL;
+static string warning_file_name = (string) NULL;
+
+#define WARNING_FILE_NAME "Warnings"
+
+void open_warning_file(string dir)
+{
+    warning_file_name = strdup(concatenate(dir, "/", WARNING_FILE_NAME, 0));
+    warning_file = safe_fopen(warning_file_name, "a");
+}
+
+void close_warning_file(void)
+{
+    if (warning_file) 
+    {
+	safe_fclose(warning_file, warning_file_name);
+
+	warning_file = (FILE*) NULL;
+	free(warning_file_name);
+	warning_file_name = (string) NULL;
+    }
+}
+
 void
 default_user_warning(char * calling_function_name,
                      char * a_message_format,
                      va_list * some_arguments)
 {
-   /* print name of function causing warning */
-   (void) fprintf(stderr, "user warning in %s: ", calling_function_name);
-
-   /* print out remainder of message */
-   (void) vfprintf(stderr, a_message_format, *some_arguments);
+   /* print name of function causing warning
+    * print out remainder of message 
+    */
+    fprintf(stderr, "user warning in %s: ", calling_function_name);
+    vfprintf(stderr, a_message_format, *some_arguments);
 }
 
 /* default assignment of pips_warning_handler is default_user_warning. Some 
@@ -125,13 +170,27 @@ default_user_warning(char * calling_function_name,
 void (* pips_warning_handler)
     (char *, char *, va_list *) = default_user_warning;
 
+
 void
 user_warning(char * calling_function_name,
              char * a_message_format,
              ...)
 {
    va_list some_arguments;
+   
+   if (warning_file) 
+   {
+       va_start(some_arguments, a_message_format);
+       fprintf(warning_file, "%s[%s] (%s) ", 
+	       current_phase? current_phase: "unknown",
+	       current_module? current_module: "unknown",
+	       calling_function_name);
+       vfprintf(warning_file, a_message_format, some_arguments);
+       va_end(some_arguments);
+   }
+
    if (get_bool_property("NO_USER_WARNING")) return; /* FC */
+
    va_start(some_arguments, a_message_format);
    (* pips_warning_handler)
        (calling_function_name, a_message_format, &some_arguments);
