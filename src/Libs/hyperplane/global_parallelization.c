@@ -1,4 +1,12 @@
- /* interface with pipsmake */
+/* interfaces with pipsmake for hyperplane transformation
+ *
+ * $Id$
+ *
+ * $Log: global_parallelization.c,v $
+ * Revision 1.5  1998/10/09 15:50:52  irigoin
+ * New function loop_hyperplane() added as a new interface with pipsmake
+ *
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -15,18 +23,14 @@
 #include "control.h"
 #include "conversion.h"
 
-/* to cope with Yi-qing explicit handling of Psysteme */
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
+#include "transformations.h"
 
 #include "hyperplane.h"
 
-bool select_loop_nest(l)
-loop l;
+static bool 
+select_loop_nest(loop l)
 {
-return TRUE;
+    return TRUE;
 }
 
 
@@ -41,7 +45,7 @@ string module_name;
 	
     debug_on("HYPERPLANE_DEBUG_LEVEL");
 
-    look_for_nested_loop_statements(s, hyperplane,select_loop_nest);
+    look_for_nested_loop_statements(s, hyperplane, select_loop_nest);
 
     debug_off();
 
@@ -50,6 +54,14 @@ string module_name;
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, 
 			   strdup(module_name), 
 			   (char*) s);
+}
 
+bool
+loop_hyperplane(string module_name)
+{
+    bool return_status = FALSE;
 
+    return_status = interactive_loop_transformation(module_name, hyperplane);
+    
+    return return_status;
 }
