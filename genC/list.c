@@ -23,6 +23,7 @@
    . GEN_EQ is pointer comparison,
    . GEN_LENGTH returns the length of the list CP,
    . GEN_MAPL applies (*FP) to every CDR of CP.
+   . GEN_MAP applies (*FP) to every item of the list.
    . GEN_REDUCE successively applies (*FP) on R adn every CRD of CP. 
    . GEN_SOME aplies (*FP) to every CDR of CP and returns the first sublist
      whose CAR verifies (*FP).
@@ -92,6 +93,13 @@ void gen_mapl( fp, cp )
 {
   for( ; cp != NIL ; cp = cp->cdr )
     (*fp)( cp ) ;
+}
+
+void gen_map(fp, l)
+void (*fp)();
+list l;
+{
+    for (; !ENDP(l); l=CDR(l)) (*fp)(CHUNK(CAR(l)));
 }
 
 char * gen_reduce( r, fp, cp )
