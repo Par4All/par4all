@@ -283,10 +283,11 @@ bool dbll_storable_p(string rname)
 
 /****************************************************** LESS BASIC INTERFACE */
 
-void dbll_save_and_free_resource(string rname, string oname, char * p)
+void dbll_save_and_free_resource(string rname, string oname, 
+				 char * p, bool do_free)
 {
     dbll_save_resource(rname, oname, p);
-    dbll_free_resource(rname, oname, p);
+    if (do_free) dbll_free_resource(rname, oname, p);
 }
 
 /* rather approximated. */
