@@ -68,7 +68,8 @@ case "$target" in
 	ac_cv_sizeof_int=4
 	ac_cv_sizeof_long_int=4
 	ac_cv_sizeof_long_long_int=8;;
-	*)
+	lib_type=int
+    *)
 	AC_CHECK_SIZEOF(int,1)
 	AC_CHECK_SIZEOF(long int,1)
 	AC_CHECK_SIZEOF(long long int,1);;
