@@ -1,0 +1,247 @@
+<!DOCTYPE HTML SYSTEM "legacy.dtd">
+<HTML>
+
+<HEAD>
+<TITLE> PIPS: ARRAY REGIONS </TITLE>
+</HEAD>
+
+<BODY>
+
+<H1> Interprocedural Array Regions Analyses </H1>
+
+<A HREF="index.html"><B> B&eacute;atrice CREUSILLET</B></A>
+<P>
+<HR>
+<P>
+<H2> Outline </H2>
+
+<ol>
+<li> <A HREF="#intro">Introduction</A>
+<li> <A HREF="#rw_reg">READ and WRITE regions</A>
+<li> <A HREF="#interproc">Interprocedural propagation</A>
+<li> <A HREF="#in_out_reg">IN and OUT regions</A>
+<li> <A HREF="#references">References</A>
+</ol>
+
+<P>
+<HR>
+<P>
+
+<H2> <A NAME="intro">1. Introduction</A></H2>
+
+
+The optimization of scientific programs for distributed memory machines,
+hierarchical memory machines or fault-tolerant computing environments is a
+particularly troublesome problem that requires a precise intra- and
+inter-procedural analysis of array data flow.
+<P>
+
+<A HREF="#feautrier">Paul Feautrier</A> has opened up wide
+perspectives in this area.  His method provides an exact analysis of array
+data flow, originally in monoprocedural programs with static control. This
+last constraint has since been partially removed by <A
+HREF="#maslov">Vadim Maslov</A> and <A
+HREF="#collard">Jean-Fran&ccedil;ois Collard</A>, to the
+detriment of the accuracy of the results. Furthermore, this method has not
+yet been extended to interprocedural analyses, and its complexity makes it
+unpracticable on large programs.  <P>
+
+Another approach is to calculate conservative summaries of the effects of
+procedure calls on sets of array elements (<A
+HREF="#triolet">R&eacute;mi Triolet</A>, <A
+HREF="#callahan">David Callahan and Ken Kennedy</A>). They allow
+the analysis of large programs, thanks to their weak complexity (in
+practice). But since these analyses are flow insensitive, and since they do
+not precisely take into account the modifications of the values of integer
+scalar variables, they are not accurate enough to handle powerful
+optimizations.  <P>
+
+In <A HREF="/~pips">PIPS</A>, the Interprocedural Parallelizer of Scientific
+Programs developed at E'cole des Mines de Paris, we have extended Triolet's
+array regions to calculate summaries that exactly represent the effects of
+statements and procedures upon sets of array elements, whereas the regions
+originally defined by Triolet were <I> over-approximations </I> of these
+effects. The computation of READ and WRITE regions relies on a preliminary
+analysis of the exact effects of statements and procedures upon array
+elements. The resulting regions are already used to enhance the dependence
+analysis when there are procedure calls, and to efficiently <A
+HREF="hpfc.html">compile HPF</A>. However, they cannot be used to
+compute array data flow, and are thus insufficient for other optimizations
+such as array privatization.  <P>
+
+We have therefore introduced two new types of exact regions: for any
+statement or procedure, IN regions contain its imported array elements, and
+OUT regions represent its set of live array elements. For a massively
+parallel machine, these regions could be used to calculate the
+communications before and after the execution of a piece of code. They can
+also be used to privatize array sections. For a hierarchical memory machine,
+they provide the sets of array elements that are used or reused, and hence
+should be prefetched (IN regions) or kept (OUT regions) in caches or local
+memories; the array elements that do not appear in these sets and that are
+accessed in the current piece of code, are only temporaries, and should be
+handled as such.  For fault-tolerant systems, checkpointing is a software
+solution that regularly saves the current state: as they provide the set of
+elements that will be used in further computations, IN and OUT regions could
+be used to reduce the amount of data to be saved.  <P>
+
+<HR>
+<P>
+<H2> <A NAME="rw_reg">2. READ and WRITE regions</A></H2>
+
+Array regions are sets of array elements described by equalities and
+inequalities defining a convex polyhedron. Two other characteristics have
+been introduced in PIPS to represent the effects of statements and
+procedures upon array elements: 
+
+<UL>
+
+<LI> the <B> action</B> upon the elements of the region; READ
+  (<TT>R</TT>) for a use or WRITE (<TT>W</TT>) for a
+  definition; 
+
+<LI> the <B>approximation</B> of the region; <TT>MAY</TT> if the region is an
+  over-approximation of the set of array elements actually
+  referenced in the corresponding piece of code; <TT>MUST</TT> if the region
+  exactly represents this set (<I>exact</I> region).
+
+</UL>
+
+For instance, the region:
+<PRE>
+&lt;A(phi1,phi2)-W-MUST-{phi1==I, phi1==phi2}&gt;
+</PRE>
+where phi1 et phi2 respectively represent the first and second
+dimensions of <TT>A</TT>, corresponds to a definition of the element
+<TT>A(I,I)</TT>.
+<P>
+
+In order to manipulate regions and propagate them along the control flow
+graph of the program, we need several binary operators: union, intersection,
+and difference. We also need unary operators to eliminate the variables of
+the program that appear in the region predicates and that are modified. See
+some related <A HREF="/~creusil/references.html#publications">publications</A> for
+more details on these operators.
+
+<P>
+<HR>
+<P>
+<H2> <A NAME="interproc">3. Interprocedural propagation</A> </H2>
+
+The interprocedural propagation of READ/WRITE regions is a backward analysis: the
+summary regions of the called subroutine are translated from the callee's
+name space into the caller's name space. Because of array reshaping, this
+operation is not straightforward.  <P>
+
+In PIPS, arrays in <TT>COMMON</TT>s are handled in a very conservative
+way: either they are similarly declared (same offset in the common, and same
+shape, but not necessarily the same name) and the translation consists in
+changing the name of the array, and projecting the polyhedron onto the name
+space of the caller; or they do not have the same offset in the common, or
+the same shape, and the corresponding regions are propagated as such after
+prefixing the name of the array with the name of the called subroutine, and
+projecting the polyhedron onto the name space of the caller; the subsequent
+analyses or program transformations must be able to handle this aliasing. <P>
+
+Let us now concentrate on the translation from a formal to an actual array.
+In his thesis, Triolet gave conditions under which it only consists in
+changing the name of the array, possibly adding equalities between phi
+variables and the array reference indices at call site, and projecting the
+polyhedron onto the name space of the caller. These conditions are that the
+formal array is either similar to the actual array, or a <I>subarray</I> of
+the actual array, for instance a single column of a matrix. <P>
+
+By examining the Perfect Club Benchmarks, we found these conditions to be
+too restrictive. In particular, they cannot handle offsets in declarations,
+general offsets in the references at call site, and array reshaping is
+treated in a very few cases. In order to handle the general case, we have
+chosen to use <B>subscript values</B> as they are described in the FORTRAN
+norm. The subscript value of an array element is its <I>rank</I> in the
+array, given the fact that array elements are held in <I>column
+order</I>. The interprocedural translation of regions relies on the fact
+that the actual and formal arguments must have the same subscript values,
+more or less the offset of the actual argument. It consists in adding to the
+predicate of the region the equation giving the relations between the
+subscript values of the arrays in terms of phi variables. The phi variables
+of the formal array are then eliminated. This can be optimized by
+considering the similar dimensions of both arrays. This method handles array
+reshaping when the partial subscript values of the non similar dimensions
+are affine. 
+
+
+<P>
+<HR>
+<P>
+<H2> <A NAME="in_out_reg">4. IN and OUT regions</A> </H2>
+
+READ and WRITE regions summarize the exact effects of statements and
+procedures upon array elements. However, they do not represent the flow of
+array elements, the knowledge of which is necessary to achieve many
+optimizations.  For that purpose, we introduce two new types of region:
+IN and OUT regions. <P>
+
+IN regions contain the array elements, the values of which are (MUST) or
+may be (MAY) <I>imported</I> by the current piece of code. These are the
+elements that are read before being possibly redefined by another
+instruction of the same fragment.  <P>
+
+OUT regions corresponding to a piece of code contain the array elements
+that it defines, and that are (MUST) or may be (MAY) used afterwards, in
+the execution order of the program. These are the <I>live</I> or <I>
+exported</I> array elements. <P>
+
+The interprocedural propagation of IN regions is similar to that of READ or
+WRITE regions. It is a backward propagation: IN regions corresponding to
+formal parameters are translated into regions corresponding to actual
+parameters, at each call site. On the contrary, the propagation of OUT
+regions on the call graph is a forward propagation: actual parameters are
+translated into formal ones at each call site, and the resulting regions are
+merged into a unique summary, which forms the OUT regions of the procedure.
+For both types of region, the propagation consists in adding to the
+predicate of the region the equation giving the relations between the
+subscript values of the arrays in terms of phi variables. The phi variables
+of the formal (resp. actual) array in case of IN (resp. OUT) regions are
+then eliminated. This can be optimized by considering the similar dimensions
+of both arrays.
+
+<P>
+<HR>
+<P>
+<H2> <A NAME="references">5. References</A> </H2>
+
+<A HREF="/~creusil/references.html#publications">Related publications</A>.
+<P>
+
+<DT> <A NAME="callahan"> David Callahan and Ken Kennedy. </A> <CITE>
+Analysis of Interprocedural side effects in a parallel programming
+environment. </CITE>
+<DT> Journal of Parallel and Distributed Computing, No.5, pp. 517-550, 1988.
+<P>
+
+<DT> <A NAME="collard"> Jean-Fran&ccedil;ois Collard.</A> <CITE> Automatic
+parallelization of while-loops using speculative execution. </CITE> 
+<DT>International Journal of Parallel Programming, 23(2):47-56, February 1995.
+<P> 
+
+<DT> <A NAME="feautrier"> Paul Feautrier. </A> <CITE> Dataflow analysis of
+array and scalar references.</CITE> 
+<DT>International Journal of Parallel Programming, 10(1):23-53, September 1991.
+<P> 
+
+<DT> <A NAME="maslov"> Vadim Maslov. </A> <CITE> Lazy array data-flow
+analysis. </CITE>
+<DT> Symposium on Principles of Programming Language, pp.311-325, January
+1994. 
+<P>
+ 
+
+<DT><A NAME="triolet"> R&eacute;mi Triolet, Paul Feautrier and
+Fran&ccedil;ois Irigoin. </A> <CITE> Direct parallelization of call
+statements. </CITE>
+<DT> Proceedings of the ACM Symposium on Compiler Construction, 1986.
+<P>
+</DT>
+<HR>
+
+
+
+</BODY>
