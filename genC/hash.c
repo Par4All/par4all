@@ -498,6 +498,19 @@ hash_enlarge_table(hash_table htp)
   gen_free_area((void**)old_array, old_size*sizeof(hash_entry));
 }
 
+/* en s'inspirant vaguement de 
+ *   Fast Hashing of Variable-Length Text Strings
+ *   Peter K. Pearson
+ *   CACM vol 33, nb 6, June 1990
+ * qui ne donne qu'une valeur entre 0 et 255
+ *
+ * unsigned int T[256] with random values
+ * unsigned int h = 0;
+ * for (char * s = (char*) key; *s; s++)
+ *   h = ROTATION(...,h) ^ T[ (h^(*s)) % 256];
+ * mais...
+ */
+
 static unsigned int hash_string_rank(void * key, int size)
 {
   unsigned int v = 0;
