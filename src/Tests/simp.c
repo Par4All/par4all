@@ -23,31 +23,38 @@
 #include "types.h"
 #include "polyedre.h"
 
+#define NB_INEQ sc->nb_ineq
+#define NB_EQ sc->nb_eq
+#define DIMENSION sc->dimension
+
+int 
 main(int argc, char *argv[])
 {
-/*  Programme de test de faisabilite'
- *  d'un ensemble d'equations et d'inequations.
- */
+    /*  Programme de test de faisabilite'
+     *  d'un ensemble d'equations et d'inequations.
+     */
     FILE * f1;
     Psysteme sc=sc_new(); 
     int i; /* compte les systemes, chacun dans un fichier */
-
-/* lecture et test de la faisabilite' de systemes sur fichiers */
+    
+    /* lecture et test de la faisabilite' de systemes sur fichiers */
 
     if(argc>=2) for(i=1;i<argc;i++){
         if((f1 = fopen(argv[i],"r")) == NULL) {
-    	      fprintf(stdout,"Ouverture fichier %s impossible\n",
-    		      argv[1]);
-    	      exit(4);
+	    fprintf(stdout,"Ouverture fichier %s impossible\n",
+		    argv[1]);
+	    exit(4);
         }
         printf("systeme initial \n");
         if(sc_fscan(f1,&sc)) {
             fprintf(stdout,"syntaxe correcte dans %s\n",argv[i]);
             sc_fprint(stdout, sc, *variable_default_name);
             printf("Nb_eq %d , Nb_ineq %d, dimension %d\n",
-                NB_EQ, NB_INEQ, DIMENSION) ;
-            if(feasible(sc)) printf("Systeme faisable (soluble) en rationnels\n") ;
-            else printf("Systeme insoluble\n");
+		   NB_EQ, NB_INEQ, DIMENSION) ;
+            if (sc_simplexe_feasibility_ofl_ctrl(sc,OFL_CTRL))
+		printf("Systeme faisable (soluble) en rationnels\n") ;
+            else
+		printf("Systeme insoluble\n");
             fclose(f1) ;
         }
         else {
@@ -57,7 +64,7 @@ main(int argc, char *argv[])
     }
     else { f1=stdin ;
 
-/* lecture et test de la faisabilite' du systeme sur stdin */
+     /* lecture et test de la faisabilite' du systeme sur stdin */
 
         printf("systeme initial \n");
         if(sc_fscan(f1,&sc)) {
@@ -65,8 +72,10 @@ main(int argc, char *argv[])
 	    sc_fprint(stdout, sc, *variable_default_name);
             printf("Nb_eq %d , Nb_ineq %d, dimension %d\n",
                 NB_EQ, NB_INEQ, DIMENSION) ;
-            if(feasible(sc)) printf("Systeme faisable (soluble) en rationnels\n") ;
-            else printf("Systeme insoluble\n");
+            if(sc_simplexe_feasibility_ofl_ctrl(sc,OFL_CTRL))
+		printf("Systeme faisable (soluble) en rationnels\n") ;
+            else
+		printf("Systeme insoluble\n");
             exit(0) ;
         }
         else {
