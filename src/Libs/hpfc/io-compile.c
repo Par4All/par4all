@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/04/21 10:28:16 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/04/21 14:50:07 $, )
  * version $Revision$
  */
 
@@ -130,14 +130,8 @@ statement stat, *hp, *np;
 			       gen_nconc(ln_io,
 					 ln_update)));
 
-    ifdebug(9)
-    {
-	fprintf(stderr, "[io_efficient_compile] output:\n");
-	fprintf(stderr, "Host:\n");
-	print_statement(*hp);
-	fprintf(stderr, "Node:\n");
-	print_statement(*np);
-    }
+    DEBUG_STAT(9, "Host", *hp);
+    DEBUG_STAT(9, "Node", *np);
 
     debug_off();
 }
@@ -250,12 +244,8 @@ statement *psh, *psn;
 	}
     }
 
-    ifdebug(8)
-    {
-	fprintf(stderr, "[generate_io_collect_or_update] output:\n");
-	fprintf(stderr, "Host:\n"); print_statement(*psh);
-	fprintf(stderr, "Node:\n"); print_statement(*psn);
-    }
+    DEBUG_STAT(8, "Host", *psh);
+    DEBUG_STAT(8, "Node", *psn);
 }
 
 /*
@@ -284,12 +274,7 @@ tag move, act;
 
     sc_vect_sort(result, compare_Pvecteur);
 
-    ifdebug(2)
-    {
-	fprintf(stderr, "[generate_io_system] returning for array %s:\n",
-		entity_local_name(array));
-	syst_debug(result);
-    }
+    DEBUG_SYST(2, concatenate("array ", entity_name(array), NULL), result);
 
     return(result);
 }
@@ -325,13 +310,7 @@ tag move, act;
     result = sc_append(result, stamme);
     result = sc_append(result, contxt);
     
-    ifdebug(8)
-    {
-	fprintf(stderr, 
-		"[generate_shared_io_system] whole system for array %s:\n",
-		entity_local_name(array));
-	syst_debug(result);
-    }
+    DEBUG_SYST(8, concatenate("whole for", entity_name(array), NULL), result);
     
     /* the noisy system is cleaned
      * some variables are not used, they are removed here.
@@ -341,24 +320,13 @@ tag move, act;
     sc_base(result) = NULL;
     sc_creer_base(result);
     
-    ifdebug(7)
-    {
-	fprintf(stderr, "[generate_shared_io_system] systems for array %s:\n",
-		entity_local_name(array));
-	fprintf(stderr, "Region:\n"); syst_debug(region);
-	fprintf(stderr, "Array declaration:\n"); syst_debug(a_decl);
-	fprintf(stderr, "Unstammer:\n"); syst_debug(stamme);
-	fprintf(stderr, "Context:\n"); syst_debug(contxt);
-    }
+    DEBUG_SYST(7, "region", region);
+    DEBUG_SYST(7, "array declaration", a_decl);
+    DEBUG_SYST(7, "unstammer", stamme);
+    DEBUG_SYST(7, "context", contxt);
     
-    ifdebug(6)
-    {
-	fprintf(stderr, 
-	  "[generate_shared_io_system] resulting system for array %s:\n",
-		entity_local_name(array));
-	syst_debug(result);
-    }
- 
+    DEBUG_SYST(6, concatenate("result for", entity_name(array), NULL), result);
+    
     return(result);
 }
 
@@ -387,13 +355,7 @@ tag move, act;
     result = sc_append(result, stamme);
     result = sc_append(result, contxt);
     
-    ifdebug(8)
-    {
-	fprintf(stderr, 
-		"[generate_distributed_io_system] whole system for array %s:\n",
-		entity_local_name(array));
-	fprintf(stderr, "Result:\n"); syst_debug(result);
-    }
+    DEBUG_SYST(8, concatenate("whole for", entity_name(array), NULL), result);
     
     /* the noisy system is cleaned
      * some variables are not used, they are removed here.
@@ -403,28 +365,14 @@ tag move, act;
     sc_base(result) = NULL;
     sc_creer_base(result);
     
-    /* DEBUG stuff: the systems are printed
-     */
-    ifdebug(7)
-    {
-	fprintf(stderr, 
-		"[generate_distributed_io_system] systems for array %s:\n",
-		entity_local_name(array));
-	fprintf(stderr, "Region:\n"); syst_debug(region);
-	fprintf(stderr, "Array system:\n"); syst_debug(dist_v);
-	fprintf(stderr, "Hpf unicity:\n"); syst_debug(sother);
-	fprintf(stderr, "Unstammer:\n"); syst_debug(stamme);
-	fprintf(stderr, "Context:\n"); syst_debug(contxt);
-    }
+    DEBUG_SYST(7, "region", region);
+    DEBUG_SYST(7, "array syst", dist_v);
+    DEBUG_SYST(7, "hpf unicity", sother);
+    DEBUG_SYST(7, "unstammer", stamme);
+    DEBUG_SYST(7, "context", contxt);
     
-    ifdebug(6)
-    {
-	fprintf(stderr, 
-	  "[generate_distributed_io_system] resulting system for array %s:\n",
-		entity_local_name(array));
-	fprintf(stderr, "Result:\n"); syst_debug(result);
-    }
- 
+    DEBUG_SYST(6, concatenate("result for", entity_name(array), NULL), result);
+    
     return(result);
 }
 
@@ -448,12 +396,11 @@ list *plvars;
 	     bool exact = TRUE;
 	     
 	     debug(7, "remove_variables_if_possible", 
-		   "removing variable %s\n", 
-		   entity_local_name((entity) var));
+		   "removing variable %s\n", entity_local_name((entity) var));
 	     
-	     sc_projection_along_variables_with_test_ofl_ctrl(&syst, v, 
-							      &exact, 
-							      NO_OFL_CTRL);
+	     sc_projection_along_variables_with_test_ofl_ctrl
+		 (&syst, v, &exact, NO_OFL_CTRL);
+
 	     assert(exact);
 	     vect_rm(v);
 	 }
@@ -528,13 +475,7 @@ tag move;
     sc_base(syst) = BASE_NULLE;
     sc_creer_base(syst);
 
-    ifdebug(6)
-    {
-	fprintf(stderr, 
-	   "[clean_shared_io_system] resulting system for array %s:\n",
-		entity_local_name(array));
-	fprintf(stderr, "Result:\n"); syst_debug(syst);
-    }
+    DEBUG_SYST(6, entity_name(array), syst);
     
     return(syst);
 }
@@ -630,29 +571,14 @@ tag move;
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, try_keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, remove);
 
-    ifdebug(7)
-    {
-	fprintf(stderr, 
-		"[clean_distributed_io_system] list of variables:\nkeep: ");
-	fprint_entity_list(stderr, keep);
-	fprintf(stderr, "\ntry_keep: ");
-	fprint_entity_list(stderr, try_keep);
-	fprintf(stderr, "\ntry_remove: ");
-	fprint_entity_list(stderr, try_remove);
-	fprintf(stderr, "\nremove: ");
-	fprint_entity_list(stderr, remove);
-	fprintf(stderr, "\n");
-    }
+    DEBUG_ELST(7, "keep", keep);
+    DEBUG_ELST(7, "try_keep", try_keep);
+    DEBUG_ELST(7, "try_remove", try_remove);
+    DEBUG_ELST(7, "remove", remove);
 
     clean_the_system(&syst, &remove, &try_remove);
     
-    ifdebug(6)
-    {
-	fprintf(stderr, 
-	   "[clean_distributed_io_system] resulting system for array %s:\n",
-		entity_local_name(array));
-	fprintf(stderr, "Result:\n"); syst_debug(syst);
-    }
+    DEBUG_SYST(6, entity_name(array), syst);
     
     gen_free_list(keep);
     gen_free_list(try_keep);
@@ -740,18 +666,15 @@ list *plparam, *plproc, *plscan, *plrebuild;
 
     gen_free_list(all);
 
+    DEBUG_ELST(4, "params", lparam);
+    DEBUG_ELST(4, "procs", lproc);
+    DEBUG_ELST(4, "scanners", lscan);
+
     ifdebug(4)
     {
 	Pcontrainte pc = contrainte_make(VECTEUR_NUL);
 
-	fprintf(stderr, "[put_variables_in_ordered_lists] returning:\n");
-	fprintf(stderr, " - params:\n   ");
-	fprint_entity_list(stderr, lparam);
-	fprintf(stderr, "\n - procs:\n   ");
-	fprint_entity_list(stderr, lproc);
-	fprintf(stderr, "\n - scanners:\n   ");
-	fprint_entity_list(stderr, lscan);
-	fprintf(stderr, "\n - deducables:\n   ");
+	fprintf(stderr, "deducables:\n   ");
 	MAPL(ce,
 	 {
 	     expression ex = EXPRESSION(CAR(ce));
@@ -769,12 +692,7 @@ list *plparam, *plproc, *plscan, *plrebuild;
     sc_base(*psyst) = (base_rm(sc_base(*psyst)), BASE_NULLE);
     sc_creer_base(*psyst);
 
-    ifdebug(4)
-    {
-	fprintf(stderr, "[put_variables_in_ordered_lists] system for %s:\n",
-		entity_local_name(array));
-	syst_debug(*psyst);
-    }
+    DEBUG_SYST(4, entity_name(array), *psyst);
 }
 
 /* list simplify_deducable_variables(syst, vars, pleftvars)
@@ -924,29 +842,16 @@ Psysteme *pcondition, *pproc_echelon, *ptile_echelon;
 	outer = entity_list_to_base(processors),
 	inner = entity_list_to_base(scanners);
 
-    ifdebug(8)
-    {
-	fprintf(stderr, "[hpfc_algorithm_tiling] initial system:\n");
-	syst_debug(syst);
-	fprintf(stderr, "\n");
-    }
-	
+    DEBUG_SYST(8, "initial system", syst);
 
     algorithm_tiling(syst, outer, inner, 
 		     pcondition, pproc_echelon, ptile_echelon);
 
-    ifdebug(3)
-    {
-	fprintf(stderr, "[hpfc_algorithm_tiling] results:\n - condition:\n");
-	syst_debug(*pcondition);
-	fprintf(stderr, "- processors: ");
-	base_fprint(stderr, outer, entity_local_name);
-	syst_debug(*pproc_echelon);
-	fprintf(stderr, " - tiles: ");
-	base_fprint(stderr, inner, entity_local_name);
-	syst_debug(*ptile_echelon);
-	fprintf(stderr, "\n");
-    }
+    DEBUG_SYST(3, "condition", *pcondition);
+    DEBUG_BASE(3, "processors", outer);
+    DEBUG_SYST(3, "processors", *pproc_echelon);
+    DEBUG_BASE(3, "tiles", inner);
+    DEBUG_SYST(3, "tiles", *ptile_echelon);
 
     base_rm(outer);
     base_rm(inner);
