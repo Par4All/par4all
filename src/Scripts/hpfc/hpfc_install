@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1994/09/06 14:07:36 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1994/09/09 15:19:44 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -112,7 +112,6 @@ then
      $BASEDIR/*_node.h \
      $BASEDIR/*_parameters.h \
      $BASEDIR/*_init.h \
-     $PVM_ROOT/include/*pvm3.h \
      $DIRECTORY
 
   [ "$REFFILE" ] && cp $REFFILE $DIRECTORY/$NAME.f
