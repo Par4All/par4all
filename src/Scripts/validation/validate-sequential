@@ -267,7 +267,9 @@ make_diff()
 
 test_aspect()
 {
-  aspect=$1
+  aspect=${1}
+  PIPS_SRCPATH=${aspect}:${PIPS_SRCPATH}
+  export PIPS_SRCPATH
   
   (
    for file in ${FILES:-`ls $aspect/*.[fF]`} ; do
