@@ -1,0 +1,37 @@
+\chapter{Guide utilisateur}
+
+\section{Organisation du projet}
+
+\section{Le contro^leur des ressources}
+
+\subsection{Programme et modules}
+
+\subsection{Ressources re'sume'es et analyse interproce'durale}
+
+\section{Les interfaces utilisateurs}
+
+\subsection{Pips sur terminal asynchrone}
+
+\subsection{Pips sur station sous X-Window}
+
+\section{Les phases d'analyse}
+
+\subsection{Calcul des effets des instructions}
+\subsubsection{Calcul des effets simples}
+\subsubsection{Calcul des re'gions}
+
+\subsection{Calcul des pre-conditions}
+
+\subsection{Calcul des de'pendances entre instructions}
+
+\subsection{Calcul de la complexite' des instructions}
+
+\section{Les phases de transformation}
+
+\subsection{La privatisation}
+
+\subsection{La distribution}
+
+\subsection{La parallelisation par l'algorithme de Kennedy \& Allen}
+
+\subsection{L'e'change de boucles}
