@@ -157,9 +157,6 @@ shift `expr $OPTIND - 1`
 
 RUNDIR=${RUNDIR:-$PWD}
 cd $RUNDIR || error 2 "cannot cd $RUNDIR ($?)"
-# clean it
-Delete -a
-rm -f core
 
 # COMDIR=${COMDIR:-${RUNDIR}}
 # test -d $COMDIR || error 2 "no communication dir $COMDIR"
@@ -178,6 +175,10 @@ $verb "tpips to be used: $tpips_version"
 [ "$UNIQDIR" ] && { mkdir $UNIQDIR ; cd $UNIQDIR;}
 
 $verb "running in directory `pwd`"
+
+# clean it
+Delete -a
+rm -f core
 
 tmpout=${tdir}/validate.$$
 tmperr=${tdir}/validate_err.$$
