@@ -9,9 +9,7 @@
 
 #include <stdio.h>
 #include <malloc.h>
-extern int fprintf();
-extern int printf();
-extern char * strdup();
+#include <string.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
