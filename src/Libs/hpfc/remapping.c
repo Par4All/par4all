@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.64  1998/02/18 12:06:24  coelho
+ * cleaned log area.
+ *
  * Revision 1.63  1997/12/08 14:51:14  coelho
  * free_text added.
  *
@@ -25,23 +28,8 @@
  * Revision 1.58  1997/05/24 11:03:41  coelho
  * lambda upper bound constraint added?
  *
- * Revision 1.57  1997/05/24 10:25:33  coelho
- * *** empty log message ***
- *
- * Revision 1.56  1997/04/17 11:47:21  coelho
- * *** empty log message ***
- *
- * Revision 1.55  1997/04/15 16:38:15  coelho
- * *** empty log message ***
- *
- * Revision 1.54  1997/04/10 08:51:06  coelho
- * *** empty log message ***
- *
  * Revision 1.53  1997/04/10 08:50:05  coelho
  * optimizations guarded by properties.
- *
- * Revision 1.52  1997/04/10 08:21:49  coelho
- * *** empty log message ***
  *
  * Revision 1.51  1997/04/07 17:06:35  coelho
  * test normalization...
