@@ -14,10 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 2003/07/04 10:54:20 $, )
- * version $Revision: 815 $
- * got on %D%, %T%
- */
+/* $Id$ */
 
 #ifndef newgen_hash_included
 #define newgen_hash_included

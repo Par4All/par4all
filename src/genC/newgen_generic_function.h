@@ -1,7 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1998/12/02 13:42:51 $, )
- * version $Revision: 815 $
- * got on %D%, %T%
- */
+/* $Id$ */
 
 #ifndef NEWGEN_GENERIC_FUNCTION_INCLUDED
 #define NEWGEN_GENERIC_FUNCTION_INCLUDED
