@@ -863,8 +863,8 @@ void Matrix_Product(Matrix *Mat1,Matrix *Mat2,Matrix *Mat3) {
   
 /*
  * Given a rational matrix 'Mat'(k x k), compute its inverse rational matrix 
- * 'MatInv' k x k. The last column of each row in matrix MatInv is used 
- * to store the common denominator of the entries in a row. The output is 1,
+ * 'MatInv' k x k.
+ * The output is 1,
  * if 'Mat' is non-singular (invertible), otherwise the output is 0. Note:: 
  * (1) Matrix 'Mat' is modified during the inverse operation.
  * (2) Matrix 'MatInv' must be preallocated before passing into this function.
