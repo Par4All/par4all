@@ -55,7 +55,7 @@ ParserError(char * f, char * m)
 
     uses_alternate_return(FALSE);
     ResetReturnCodeVariable();
-    SubstituteAlternateReturns(FALSE);
+    SubstituteAlternateReturns("NO");
 
     syn_reset_lex();
 
