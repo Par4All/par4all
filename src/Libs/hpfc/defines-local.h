@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1996/12/27 18:00:55 $, ) 
+ * ($Date: 1997/01/14 13:36:27 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -180,6 +180,8 @@ void fprint_entity_list(FILE *fp, list l);
 #define INIT_HOST       "HPFC INIT HOST"
 #define NODE_END        "HPFC NODE END"
 #define HOST_END        "HPFC HOST END"
+
+#define HPFC_STOP	"HPFC STOP"
 
 #define LOOP_BOUNDS     "HPFC LOOP BOUNDS"
 #define SYNCHRO		"HPFC SYNCHRO"
