@@ -1,14 +1,14 @@
 #
-# $RCSfile: config.makefile,v $ for misc
+# $Id$
 #
 
-INSTALL_SHR=	pips-deal-with-include \
+INSTALL_SHR =	pips-deal-with-include \
 		pips-process-module \
 		pips-split \
-		pips-unsplit-workspace 
+		pips-unsplit-workspace \
+		subroutine_callgraph_level.pl
 
-UTL_SCRIPTS = \
-		filter_verbatim \
+UTL_SCRIPTS = 	filter_verbatim \
 		job-make \
 		job-receive \
 		unjustify
