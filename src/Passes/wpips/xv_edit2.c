@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/09 15:14:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/10 17:21:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/10/09 15:14:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/10/10 17:21:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -406,26 +406,28 @@ edit_close_notify(Menu menu,
                   Menu_item menu_item)
 {
    int i;
-  
-   for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
-      if (! (bool)xv_get(edit_textsw[i], TEXTSW_MODIFIED))
-         hide_window(edit_frame[i]);
 
-   for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
-      if ((bool)xv_get(edit_textsw[i], TEXTSW_MODIFIED)) {
-         unhide_window(edit_frame[i]);
-         prompt_user("File not saved in editor");
-         return;
-      }
+   if (! wpips_emacs_mode) {
+      for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
+         if (! (bool)xv_get(edit_textsw[i], TEXTSW_MODIFIED))
+            hide_window(edit_frame[i]);
+
+      for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
+         if ((bool)xv_get(edit_textsw[i], TEXTSW_MODIFIED)) {
+            unhide_window(edit_frame[i]);
+            prompt_user("File not saved in editor");
+            return;
+         }
   
+      for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
+         hide_window(edit_frame[i]);
+   }
+   
    xv_set(current_selection_mi, 
           MENU_STRING, "No Selection",
           MENU_INACTIVE, TRUE, NULL);
 
    xv_set(close_menu_item, MENU_INACTIVE, TRUE, NULL);
-
-   for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
-      hide_window(edit_frame[i]);
 
    display_memory_usage();
 }
