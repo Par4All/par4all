@@ -152,7 +152,7 @@ Vector *Vector_Alloc(unsigned length) {
   int i;
   Vector *vector;
   
-  vector = (Vector *)malloc(sizeof(vector));
+  vector = (Vector *)malloc(sizeof(Vector));
   if (!vector) {
     errormsg1("Vector_Alloc", "outofmem", "out of memory space");
     return 0;
