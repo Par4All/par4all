@@ -1003,14 +1003,46 @@ CheckParenthesis(void)
     }
 }
 
+/* This function is redundant with FindDo() but much easier to
+ * understand. I leave it as documentation. FI.
+ */
+
+int 
+FindDoWhile(void)
+{
+    int result = FALSE;
+
+    if (!ProfZeroEgal && StmtEqualString("DOWHILE", iStmt)) {
+	(void) CapitalizeStmt("DO", iStmt);
+	(void) CapitalizeStmt("WHILE", iStmt+2);
+	result = TRUE;
+    }
+
+    return(result);
+}
+
 int 
 FindDo(void)
 {
     int result = FALSE;
 
-    if (ProfZeroVirg && ProfZeroEgal && StmtEqualString("DO", iStmt)) {
-	(void) CapitalizeStmt("DO", iStmt);
-	result = TRUE;
+    if(StmtEqualString("DO", iStmt)) {
+	if (ProfZeroVirg && ProfZeroEgal) {
+	    (void) CapitalizeStmt("DO", iStmt);
+	    result = TRUE;
+	}
+	else if (!ProfZeroVirg && !ProfZeroEgal) {
+	    /* Let's skip a loop label to look for a while construct */
+	    int i = iStmt+2;
+	    while (isdigit(stmt_buffer[i]))
+		i++;
+
+	    if (StmtEqualString("WHILE", i)) {
+		(void) CapitalizeStmt("DO", iStmt);
+		(void) CapitalizeStmt("WHILE", i);
+		result = TRUE;
+	    }
+	}
     }
 
     return(result);
