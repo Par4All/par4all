@@ -128,17 +128,19 @@ save_meta_data(bool do_free)
     file_name = meta_data_db_file_name(DATABASE_STATUS);
     file = safe_fopen(file_name, "w");
     db_save_pips_database(file);
-    if (do_free) db_close_pips_database();
     safe_fclose(file, file_name);
     free(file_name);
+
+    if (do_free) db_close_pips_database();
 
     pips_debug(2, "saving database symbols\n");
     file_name = meta_data_db_file_name(DATABASE_SYMBOLS);
     file = safe_fopen(file_name, "w");
     gen_write_tabulated(file, db_symbol_domain);
-    if (do_free) gen_free_tabulated(db_symbol_domain);
     safe_fclose(file, file_name);
     free(file_name);
+
+    if (do_free) gen_free_tabulated(db_symbol_domain);
 
     pips_debug(2, "saving database misc data\n");
     file_name = meta_data_db_file_name(DATABASE_MISC);
@@ -274,8 +276,11 @@ db_checkpoint_workspace(void)
     debug_on(PIPSDBM_DEBUG_LEVEL);
     pips_debug(1, "Checkpointing workspace %s\n", 
 	       db_get_current_workspace_name());
-    db_save_workspace("Saving", FALSE);
-    /* load ENTITIES (since no one ask for them as they should;-) */
+
+    db_save_workspace("Saving", FALSE); 
+
+    /* load ENTITIES (since no one ask for them as they should...)
+     */
     if (db_resource_p(DBR_ENTITIES, "")) 
 	(void) db_get_memory_resource(DBR_ENTITIES, "", TRUE);
     debug_off();
