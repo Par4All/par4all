@@ -22,9 +22,12 @@
 
 bool controlizer(string module_name)
 {
+  entity m = local_name_to_top_level_entity(module_name);
    
     statement module_stat;
     
+    set_current_module_entity(m);
+
     module_stat = 
 	copy_statement((statement)
 	    db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE)) ;
@@ -61,7 +64,6 @@ bool controlizer(string module_name)
 
 	/* To have the debug in unspaghettify_statement() working: */
 	set_current_module_statement(module_stat);
-	set_current_module_entity(local_name_to_top_level_entity(module_name));
        
 	unspaghettify_statement(module_stat);
 
@@ -69,7 +71,6 @@ bool controlizer(string module_name)
            changed. */
 	module_reorder(module_stat);
 	reset_current_module_statement();
-	reset_current_module_entity();
     }
 
     ifdebug(5) {
@@ -77,6 +78,8 @@ bool controlizer(string module_name)
     }
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
+    
+    reset_current_module_entity();
 
     return TRUE;
 }
