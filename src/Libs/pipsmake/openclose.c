@@ -26,7 +26,6 @@
 #include "misc.h"
 
 extern makefile open_makefile();
-extern void close_makefile();
 
 /**** Begin saved_makefile version ****/
 static char pgm_makefile[MAXPATHLEN]="";
@@ -68,24 +67,29 @@ string name;
     return db_get_current_workspace_name();
 }
 
-void make_close_program()
+bool make_close_workspace()
 {
-    make_close_workspace();
-}
-
-void make_close_workspace()
-{
+    bool res = TRUE;
+    bool tmp_res;
     string name;
 
 
-    db_set_current_module_name(NULL);
+    tmp_res = db_set_current_module_name(NULL);
+    if (tmp_res)
+	res = FALSE;
 
     name = db_get_current_workspace_name();
 
-    close_makefile(name);
+    tmp_res = close_makefile(name);
+    if (tmp_res)
+	res = FALSE;
 
-    db_close_workspace();
+    tmp_res = db_close_workspace();
+    if (tmp_res)
+	res = FALSE;
 
     user_log("Workspace %s closed\n\n", name);
+
+    return res;
 }
 
