@@ -3,11 +3,7 @@
    include file for Interprocedural Control Flow Graph
  */
 
-#ifndef ICFG_INCLUDED
-#define ICFG_INCLUDED
-
 #define ICFG_NOT_FOUND NULL
-
 #define ICFG_OPTIONS "tcdDIFl"
 
 #define ICFG_CALLEES_TOPO_SORT "ICFG_CALLEES_TOPO_SORT"
@@ -30,6 +26,3 @@
 #define ICFG_DECOR_IN_REGIONS 7
 #define ICFG_DECOR_OUT_REGIONS 8
 #define ICFG_DECOR_COMPLEXITIES 9
-
-/* ENDIF ICFG_INCLUDED */
-#endif
