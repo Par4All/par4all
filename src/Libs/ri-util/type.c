@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.35  1999/05/12 14:35:04  zory
+ * *** empty log message ***
+ *
  * Revision 1.34  1998/12/15 16:52:10  zory
  * new functions included in the EOLE project (with TAGS)
  *
@@ -727,6 +730,9 @@ basic b;
  * a temporary variable, which will have the same declaration as "exp".
  *
  * WARNING: a new basic object is allocated
+ *
+ *  PREFER (???) expression_basic
+ *
  */
 basic 
 basic_of_expression(expression exp)
