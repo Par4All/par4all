@@ -192,8 +192,7 @@ unstructured_to_postcondition(
     return post;
 }
 
-static transformer
-add_loop_skip_condition(transformer pre, loop l)
+transformer add_loop_skip_condition(transformer pre, loop l)
 {
     /* It is assumed that loop l is not entered */
     range r = loop_range(l);
@@ -448,8 +447,7 @@ add_good_loop_conditions(
 }
 
 
-static transformer
-add_loop_index_initialization(transformer pre, loop l)
+transformer add_loop_index_initialization(transformer pre, loop l)
 {
     entity i = loop_index(l);
     expression init = range_lower(loop_range(l));
@@ -494,7 +492,7 @@ add_loop_index_initialization(transformer pre, loop l)
  * lower bounds are affine, that the increment is affine and that the
  * increment sign is known.
  */
-static transformer
+transformer
 add_loop_index_exit_value(
     transformer post, /* postcondition of the last iteration */
     loop l,           /* loop to process */
@@ -680,6 +678,154 @@ simple_dead_loop_p(expression lower, expression upper)
     return dead_loop_p;
 }
 
+transformer precondition_filter_old_values(transformer pre)
+{
+    Psysteme sc = predicate_system(transformer_relation(pre));
+    Pbase b = BASE_UNDEFINED;
+
+    for(b = sc_base(sc); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
+      entity old_v = (entity) vecteur_var(b);
+
+      if(old_value_entity_p(old_v)) {
+	pips_assert("No old values are left", FALSE);
+      }
+    }
+
+    return pre;
+}
+
+static list variables_to_values(list_mod)
+{
+  list list_val = NIL;
+
+  MAP(ENTITY, e, {
+    entity v_old = entity_to_old_value(e);
+    entity v_new = entity_to_new_value(e);
+
+    list_val = CONS(ENTITY, v_old, list_val);
+    list_val = CONS(ENTITY, v_new, list_val);
+  }, list_mod);
+  return list_val;
+}
+
+static list variables_to_old_values(list_mod)
+{
+  list list_val = NIL;
+
+  MAP(ENTITY, e, {
+    entity v_old = entity_to_old_value(e);
+
+    list_val = CONS(ENTITY, v_old, list_val);
+  }, list_mod);
+  return list_val;
+}
+
+list transformer_projectable_values(transformer tf)
+{
+  list proj = NIL;
+  Psysteme sc = predicate_system(transformer_relation(tf));
+  Pbase b = BASE_UNDEFINED;
+
+  for(b=sc_base(sc); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
+    entity v = (entity) vecteur_var(b);
+
+    proj = CONS(ENTITY, v, proj);
+  }
+
+  return proj;
+}
+
+/* Recompute a fixpoint conditionnally to a valid precondition for all iterations */
+static transformer recompute_loop_transformer(loop l, transformer pre)
+{
+  statement s = loop_body(l);
+  entity i = loop_index(l);
+  list list_mod = list_undefined;
+  list list_old = list_undefined;
+  list list_projectable = list_undefined;
+  list list_val = list_undefined;
+  transformer tf = load_statement_transformer(s);
+  transformer tfb = transformer_add_loop_index_incrementation(transformer_dup(tf), l);
+  transformer new_tf = transformer_undefined;
+  transformer preb = transformer_dup(pre);
+  Psysteme sc_pre = SC_UNDEFINED;
+  Psysteme sc = predicate_system(transformer_relation(tfb));
+  
+  ifdebug(5) {
+    pips_debug(5, "Begin with precondition:\n");
+    print_transformer(pre);
+    pips_assert("Precondition pre is consistent", 
+		transformer_internal_consistency_p(pre));
+    pips_debug(5, "and transformer:\n");
+    print_transformer(tf);
+  }
+
+  /* get rid of information modified by the loop body or the loop header */
+  list_mod = dup_arguments(transformer_arguments(tf));
+  arguments_add_entity(list_mod, i);
+  gen_list_and(&list_mod, transformer_arguments(preb));
+  ifdebug(5) {
+    pips_debug(5, "Variables eliminated from the preconditions"
+	       " because they are modified by tf:");
+    print_arguments(list_mod);
+  }
+  list_val = variables_to_values(list_mod);
+  /* get rid of old values in preb which are meaning less in tf */
+  list_old = arguments_difference(transformer_arguments(preb),
+				  transformer_arguments(tf));
+  ifdebug(5) {
+    pips_debug(5, "Variables eliminated from the preconditions"
+	       " because they are linked to the module entry point:");
+    print_arguments(list_old);
+  }
+  /* do not try to eliminate the same variable twice */
+  gen_list_and_not(&list_old, list_mod);
+
+  list_val = gen_nconc(list_val, variables_to_old_values(list_old));
+  ifdebug(5) {
+    pips_debug(5, "Values which should be eliminated from the preconditions:");
+    print_arguments(list_val);
+  }
+  /* Not all values can be projected in preb because some may appear in tf
+     and not in preb */
+  list_projectable = transformer_projectable_values(preb);
+  gen_list_and(&list_val, list_projectable);
+  ifdebug(5) {
+    pips_debug(5, "Values which can be eliminated from the preconditions:");
+    print_arguments(list_val);
+  }
+  preb = transformer_projection(preb, list_val);
+
+  /* add the remaining conditional information to the loop transformer */
+  sc_pre = predicate_system(transformer_relation(preb));
+  sc = sc_append(sc, sc_pre);
+  predicate_system(transformer_relation(tfb)) = sc;
+  ifdebug(1) {
+    if(!transformer_internal_consistency_p(tfb)) {
+      print_transformer(tfb);
+      sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
+    }
+    pips_assert("Conditional loop body transformer is consistent",
+		transformer_internal_consistency_p(tfb));
+  }
+
+  tfb = transformer_add_loop_index_incrementation(tfb, l);
+
+  new_tf = (* transformer_fix_point_operator)(tfb);
+  new_tf = transformer_add_loop_index_initialization(new_tf, l);
+
+  free_transformer(preb);
+  gen_free_list(list_mod);
+  gen_free_list(list_val);
+
+  ifdebug(5) {
+    pips_debug(5, "End with fixpoint:\n");
+    print_transformer(new_tf);
+  }
+
+  return new_tf;
+}
+
 static transformer 
 loop_to_postcondition(
     transformer pre,
@@ -738,6 +884,18 @@ loop_to_postcondition(
 	 *
 	 * Decision reverted: Francois Irigoin, 4 June 1997
 	 */
+
+	/* preb can now be used to obtain a refined tf, for instance to show that a
+           variable is monotonically increasing. */
+	if(get_bool_property("SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS")) {
+	  transformer new_tf = recompute_loop_transformer(l, preb);
+
+	  free_transformer(preb);
+	  preb = transformer_dup(pre);
+	  preb = transformer_combine(preb, new_tf);
+	  preb = add_good_loop_conditions(preb, l, new_tf);
+	}
+
 
 	/* FI: this is not correct when an invariant is found; we should add one
 	 * more incrementation of I (to modify the output of the invariant and
