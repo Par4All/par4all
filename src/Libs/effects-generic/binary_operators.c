@@ -3,7 +3,7 @@
  * File: binary_operators.c
  * ~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * This File contains generic binary operators for effects and lists of effects.
+ * This File contains generic binary operators for effects and lists of them.
  *
  */
 
@@ -16,9 +16,7 @@
 #include "effects-generic.h"
 
 
-/***********************************************************************/
-/* GENERIC BINARY OPERATORS                                            */
-/***********************************************************************/
+/************************************************* GENERIC BINARY OPERATORS */
 
 /* list list_of_effects_generic_binary_op(list l1,l2,
  *                         bool (*r1_r2_combinable_p)(),
@@ -61,7 +59,7 @@ list_of_effects_generic_binary_op(list l1, list l2,
      {
 	 list lr2 = l2;
 	 list prec_lr2;
-	 boolean combinable = FALSE;
+	 bool combinable = FALSE;
 	 
 	 prec_lr2 = NIL;
 	 while(!combinable && !ENDP(lr2))
@@ -226,9 +224,7 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
 
 
 
-/***********************************************************************/
-/* BOOLEAN FUNCTIONS                                                   */
-/***********************************************************************/
+/******************************************************* BOOL(EAN) FUNCTIONS */
 
 /* bool combinable_effects_p(effect eff1, eff2)
  * input    : two effects
@@ -339,7 +335,7 @@ bool w_r_combinable_p(effect eff1, effect eff2)
 
 list
 effects_undefined_binary_operator(list l1, list l2,
-				  boolean (*effects_combinable_p)(effect, effect))
+				  bool (*effects_combinable_p)(effect, effect))
 {
     return list_undefined;
 }
@@ -362,7 +358,7 @@ effect_entities_intersection(effect eff1, effect eff2)
 }
 
 /* list effects_entities_intersection(list l1, list l2, 
-                           boolean (*intersection_combinable_p)(effect, effect))
+                           bool (*intersection_combinable_p)(effect, effect))
  * input    : two lists of effects.
  * output   : a list of effects containing all the effects of l1 that have
  *            a corresponding effect (i.e. same entity) in l2.
@@ -371,7 +367,7 @@ effect_entities_intersection(effect eff1, effect eff2)
  */
 list
 effects_entities_intersection(list l1, list l2,
-			      boolean (*intersection_combinable_p)(effect, effect))
+			      bool (*intersection_combinable_p)(effect, effect))
 {
     list l_res = NIL;
 
@@ -399,8 +395,10 @@ effects_entities_intersection(list l1, list l2,
  *            combinable with those of l_reg1.	
  */
 list
-effects_entities_inf_difference(list l1, list l2,
-				boolean (*difference_combinable_p)(effect, effect))
+effects_entities_inf_difference(
+    list l1, 
+    list l2,
+    bool (*difference_combinable_p)(effect, effect))
 {
     list l_res = NIL;
 
@@ -415,9 +413,5 @@ effects_entities_inf_difference(list l1, list l2,
     return l_res;
 }
 
-
-
-/***********************************************************************/
-/* THE END                                                             */
-/***********************************************************************/
-
+/* that is all
+ */
