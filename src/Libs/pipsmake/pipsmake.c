@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.74  2003/06/13 13:13:59  coelho
+ * db_clean_all_required_resources() place...
+ *
  * Revision 1.73  2003/06/13 08:43:21  coelho
  * clean required resources.
  *
@@ -122,7 +125,6 @@ static bool catch_user_error(bool (*f)(char *), string rname, string oname)
     {
       /* CATCH */
       reset_static_phase_variables();
-      db_clean_all_required_resources();
       success = FALSE;
     }
     else 
@@ -1219,6 +1221,7 @@ static bool safe_do_something(
 	pips_user_warning("Request aborted in pipsmake: "
 			  "build %s %s for module %s.\n", 
 			  what_it_is, name, module_n);
+	db_clean_all_required_resources();
 	success = FALSE;
     }
     else
