@@ -1,5 +1,9 @@
 /* $Id$
    $Log: splitc.l,v $
+   Revision 1.3  2003/08/01 16:42:58  irigoin
+   Intermediate version, compatible with the C-syntax Validation, coupled
+   with the parser and the controlizer, if not yet the C prettyprinter.
+
    Revision 1.2  2003/08/01 06:00:47  irigoin
    Intermediate version installed to let Production link
 
@@ -102,6 +106,8 @@ static void update_csplit_current_beginning()
 
 void reset_csplit_current_beginning()
 {
+  int leaked = 0;
+
   csplit_current_beginning = 1000000;
   csplit_is_static_p = FALSE;
 
@@ -116,6 +122,11 @@ void reset_csplit_current_beginning()
   if(!string_undefined_p(csplit_definite_function_signature)) 
     free(csplit_definite_function_signature);
   csplit_definite_function_signature = string_undefined;
+
+  if((leaked=check_signature_balance())!=0) {
+    /* FI: I'm not ready to abort() here... */
+    pips_debug(5, "Likely memory leaks: %d\n", leaked);
+  }
 }
 
 int get_csplit_current_beginning()
@@ -457,8 +468,10 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 void yyerror(char * msg)
 {
     user_warning("yyerror",
- "C %s near \"%s\" at line %d\n",
- msg, yytext, csplit_line_number);
+                 "C %s near \"%s\" at line %d\n",
+                 msg, yytext, csplit_line_number);
+    /* I should call csplit_parser_error() or the equivalent module */
+    pips_user_error("Syntax error\n");
 }
 
 #ifndef yywrap
