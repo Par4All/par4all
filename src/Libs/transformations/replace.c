@@ -69,7 +69,13 @@ void StatementReplaceReference(statement s, reference ref, expression next)
 	  RangeReplaceReference(loop_range(l), ref, next);
 	  StatementReplaceReference(loop_body(l), ref, next);
 	  break;
-      }
+      }   
+    case is_instruction_whileloop : {
+	whileloop l = instruction_whileloop(inst);
+	ExpressionReplaceReference(whileloop_condition(l), ref, next);
+	StatementReplaceReference(whileloop_body(l), ref, next);
+	break;
+    }
       case is_instruction_call :
 	CallReplaceReference(instruction_call(inst), ref, next);
 	break;
