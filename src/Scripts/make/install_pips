@@ -7,15 +7,15 @@
 
 unset archdir type
 
-problems=./encountered_problemes
+problems=./encountered_problems
 rm -f $problems
 
-# some of uname to fix unix-version related problemes
+# some of uname to fix unix-version related problems
 uname_s=`uname -s`
 uname_v=`uname -v`
 uname_r=`uname -r`
 
-## on f.. IBM, sh is ksh and type is whence:-(
+## on f... AIX/IBM, sh is ksh and type is whence:-(
 
 type=type
 
@@ -170,6 +170,10 @@ checksubdir Newgen
 checksubdir Linear
 checksubdir Pips
 
+#
+# Pips
+#
+
 if test -d ./Pips 
 then
     PIPS_ROOT=$pwd/Pips
@@ -250,6 +254,22 @@ then
 	test -d $d && ARCH=`basename $d`
     done
 fi
+
+# 
+# expands fpips if necessary
+#
+
+for d in ./Pips/Bin/* ;
+do
+    [ -f $d/fpips ] && {
+	$verb expanding fpips in $d
+	for x in pips tpips wpips ; do ln $d/fpips $d/$x ; done
+    }
+done
+
+#
+# confirmation of the chosen ARCH
+#
 
 if question "Is software architure $ARCH ok as a default?"
 then
