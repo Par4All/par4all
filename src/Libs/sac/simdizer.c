@@ -144,36 +144,24 @@ static bool isomorphic_p(statement s1, statement s2)
 
 static hash_table successors;
 
-static list statement_successors(statement s)
-{
-   MAP(VERTEX,
-       a_vertex,
-   {
-      statement s1 = vertex_to_statement(a_vertex);
-
-      if (s1 == s)
-	 return vertex_successors(a_vertex);
-   },
-       graph_vertices(dependence_graph));
-
-   printf("\n\nno vertice for statement:");
-   print_statement(s);
-   return NIL;
-}
-
 void init_statement_successors_map(list l)
 {
    successors = hash_table_make(hash_pointer, 0);
 
-   MAP(STATEMENT,
-       s, 
+   MAP(VERTEX,
+       a_vertex,
    {
-      list succ = statement_successors(s);
+      list succ;
+      statement s = vertex_to_statement(a_vertex);
 
+      if (gen_find_eq(s, l) == gen_chunk_undefined)
+	 continue;
+
+      succ = vertex_successors(a_vertex);
       if (succ != NIL)
 	 hash_put(successors, (void *)s, (void *)succ);
    },
-       l);
+       graph_vertices(dependence_graph));
 }
 
 void free_statement_successors_map()
@@ -201,12 +189,11 @@ bool successor_p(statement s1, statement s2)
    return FALSE;
 }
 
-/* WARNING: will most likely crash if s is not in group */
 static bool move_allowed_p(list group, statement s)
 { 
    cons * i;
 
-   for(i = group; STATEMENT(CAR(i)) != s; i = CDR(i))
+   for(i = group; (i != NIL) && (STATEMENT(CAR(i)) != s); i = CDR(i))
    {
       if (successor_p(STATEMENT(CAR(i)), s))
 	 return FALSE;
@@ -376,10 +363,6 @@ bool simdizer(char * mod_name)
 
    set_current_module_statement(mod_stmt);
    set_current_module_entity(local_name_to_top_level_entity(mod_name));
-   set_proper_rw_effects((statement_effects)
-      db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
-   set_precondition_map((statement_mapping)
-      db_get_memory_resource(DBR_PRECONDITIONS, mod_name, TRUE));
    dependence_graph = 
       (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
 
@@ -422,8 +405,6 @@ bool simdizer(char * mod_name)
    /* update/release resources */
    reset_current_module_statement();
    reset_current_module_entity();
-   reset_proper_rw_effects();
-   reset_precondition_map();
 
    debug_off();
 
