@@ -125,7 +125,9 @@ make_constant_entity(
 	if (bt == is_basic_int)
 		ce = make_constant(is_constant_int, (void*) atoi(name));
 	else
-	    ce = MakeConstantLitteral();
+	{
+	  ce = make_constant(is_constant_call, e);
+	}
 
 	entity_type(e) = make_type(is_type_functional, fe);
 	entity_storage(e) = MakeStorageRom();
