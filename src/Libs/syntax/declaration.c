@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.72  2003/08/11 16:24:58  irigoin
+ * User error detection improved. Better handling of functional formal parameter.
+ *
  * Revision 1.71  2003/08/02 14:01:18  irigoin
  * Cosmetic change to silence gcc
  *
@@ -112,7 +115,8 @@
 #include "syntax.h"
 
 /* Problem with conditional includes, different strands of UNIXes,... */
-extern int isascii(int);
+/* extern int isascii(int); */
+
 #define IS_UPPER(c) (isascii(c) && isupper(c))
 
 int
@@ -306,6 +310,8 @@ void MakeVariableStatic(entity v, bool force_it)
     user_warning("parser", "Variable %s cannot be declared static "
 		 "be cause of its storage class (tag=%d)\n",
 		 entity_local_name(v), storage_tag(entity_storage(v)));
+    ParserError("parser", "SAVE statement incompatible with previous"
+		  " declaration (e.g. EXTERNAL).\n");
   }
 }
 
@@ -2052,13 +2058,15 @@ fprint_functional(FILE * fd, functional f)
 void 
 fprint_environment(FILE * fd, entity m)
 {
-    list decls = NIL;
+    list decls = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
     int nth = 0; /* rank of formal parameter */
     entity rv = entity_undefined; /* return variable */
 
     pips_assert("fprint_environment", entity_module_p(m));
 
-    decls = code_declarations(value_code(entity_initial(m)));
+    /* To simplify validation, at the expense of some information about
+       the parsing process. */
+    gen_sort_list(decls, compare_entities);
 
     (void) fprintf(fd, "\nDeclarations for module %s with type ", 
 		   module_local_name(m));
@@ -2132,25 +2140,28 @@ fprint_environment(FILE * fd, entity m)
 
     (void) fprintf(fd, "End of declarations for module %s\n\n",
 		   module_local_name(m));
+
+    gen_free_list(decls);
 }
 
 /* Problem: A functional global entity may be referenced without
    parenthesis or CALL keyword in a function or subroutine call as
    functional parameter. FindOrCreateEntity() will return a local variable
    which already is or will be in the ghost variable list. When ghost
-   variables are eliminted the data structure using this local variable
+   variables are eliminated the data structure using this local variable
    contain a pointer to nowhere.
 
    However, SafeFindOrCreateEntity() does not solve this problem
    entirely. The call with a functional parameter may occur before a call
-   to this functional parameter let us find out it is indeed functional.
+   to this functional parameter lets us find out it is indeed functional.
 
    Morevover, SafeFindOrCreateEntity() does create new problem because
    intrinsic overloading is ignored. Fortran does not use reserved words
    and a local variable may have the same name as an intrinsics. The
    intrinsic entity returned by this function must later be converted into
    a local variable when it is found out that the user really wanted a
-   local variable, for instance because it appears in a lhs.
+   local variable, for instance because it appears in a lhs. So intrinsics
+   are not searched anymore.
 
    This is yet another reason to split the building of the internal
    representation into three phases. The first phase should not assume any
@@ -2167,69 +2178,72 @@ SafeFindOrCreateEntity(
     string package, /* le nom du package */
     string name /* le nom de l'entite */)
 {
-    entity e = entity_undefined;
+  entity e = entity_undefined;
 
-    if(strcmp(package, TOP_LEVEL_MODULE_NAME) == 0) {
-	/* This is a request for a global variable */
-	e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, 0));
-    }
-    else {
-	/* This is a request for a local or a global variable. If a local
-           variable with name "name" exists, return it. */
-	string full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
-	entity le = gen_find_tabulated(full_name, entity_domain);
+  if(strcmp(package, TOP_LEVEL_MODULE_NAME) == 0) {
+    /* This is a request for a global variable */
+    e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, 0));
+  }
+  else {
+    /* This is a request for a local or a global variable. If a local
+       variable with name "name" exists, return it. */
+    string full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
+    entity le = gen_find_tabulated(full_name, entity_domain);
 
-	if(entity_undefined_p(le)) {
-	    /* Does a global variable with the same name exist and is it
-	       in the package's scope? */
+    if(entity_undefined_p(le)) {
+      /* Does a global variable with the same name exist and is it
+	 in the package's scope? */
 	    
-	    /* let s hope concatenate s buffer lasts long enough... */
-	    string full_top_name = concatenate(TOP_LEVEL_MODULE_NAME,
-					       MODULE_SEP_STRING, name, 0);
+      /* let s hope concatenate s buffer lasts long enough... */
+      string full_top_name = concatenate(TOP_LEVEL_MODULE_NAME,
+					 MODULE_SEP_STRING, name, 0);
 
-	    entity fe = gen_find_tabulated(full_top_name, entity_domain);
+      entity fe = gen_find_tabulated(full_top_name, entity_domain);
 
-	    if(entity_undefined_p(fe)) {
-		/* There is no such global variable. Let's make a new local variable */
-		full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
-		e = make_entity(strdup(full_name),
-				type_undefined, storage_undefined, value_undefined);
-	    }
-	    else {
-	      if(!entity_undefined_p(get_current_module_entity())
-		 && entity_is_argument_p(fe, 
-					 code_declarations(entity_code(get_current_module_entity())))) {
-		    /* There is such a global variable and it is in the proper scope */
-		    e = fe;
-		}
-		else if(intrinsic_entity_p(fe)) {
-		    e = fe;
-		}
-		else {
-		    /* The global variable is not in the scope. A local
-		       variable must be created. */
-		    full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
-		    e = make_entity(strdup(full_name),
-				    type_undefined, storage_undefined, value_undefined);
-		}
-	    }
+      if(entity_undefined_p(fe)) {
+	/* There is no such global variable. Let's make a new local variable */
+	full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
+	e = make_entity(strdup(full_name),
+			type_undefined, storage_undefined, value_undefined);
+      }
+      else {
+	if(!entity_undefined_p(get_current_module_entity())
+	   && entity_is_argument_p(fe, 
+				   code_declarations(entity_code(get_current_module_entity())))) {
+	  /* There is such a global variable and it is in the proper scope */
+	  e = fe;
+	}
+	else if(FALSE && intrinsic_entity_p(fe)) {
+	  /* Here comes the mistake if the current_module_entity is not
+             yet defined as is the case when formal parameters are
+             parsed.*/
+	  e = fe;
 	}
 	else {
-	    /* A local variable has been found */
-	    if(ghost_variable_entity_p(le)) {
-		string full_top_name = concatenate(TOP_LEVEL_MODULE_NAME,
-						   MODULE_SEP_STRING, name, 0);
-
-		entity fe = gen_find_tabulated(full_top_name, entity_domain);
-
-		pips_assert("Entity fe must be defined", entity_defined_p(fe));
-		e = fe;
-	    }
-	    else {
-		e = le;
-	    }
+	  /* The global variable is not be in the scope. A local
+	     variable must be created. */
+	  full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
+	  e = make_entity(strdup(full_name),
+			  type_undefined, storage_undefined, value_undefined);
 	}
+      }
     }
+    else {
+      /* A local variable has been found */
+      if(ghost_variable_entity_p(le)) {
+	string full_top_name = concatenate(TOP_LEVEL_MODULE_NAME,
+					   MODULE_SEP_STRING, name, 0);
 
-    return e;
+	entity fe = gen_find_tabulated(full_top_name, entity_domain);
+
+	pips_assert("Entity fe must be defined", entity_defined_p(fe));
+	e = fe;
+      }
+      else {
+	e = le;
+      }
+    }
+  }
+
+  return e;
 }
