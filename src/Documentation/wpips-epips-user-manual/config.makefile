@@ -2,7 +2,7 @@
 # config.makefile (version 1.19)
 # 96/12/17, 16:58:18
 
-PIPSMAKERC=$(PIPS_DIR)/Development/Documentation/pipsmake/pipsmake-rc.tex
+PIPSMAKERC=$(PIPS_ROOT)/Src/Documentation/pipsmake/pipsmake-rc.tex
 
 SOURCES=	wpips-epips-user-manual.tex \
 	A-279-modified.tex \
