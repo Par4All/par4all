@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$,
-# ($Date: 1995/08/09 18:01:02 $, )
+# ($Date: 1995/08/28 15:01:30 $, )
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
@@ -38,7 +38,8 @@ LIB_CFILES=	directives.c \
 		run-time-functions.c \
 		host_node_entities.c \
 		hpf_objects.c \
-		subarray_shift.c
+		subarray_shift.c \
+		full_copy.c
 
 LIB_HEADERS=	warning.h \
 		hpfc-local.h \
