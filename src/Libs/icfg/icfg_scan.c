@@ -121,6 +121,7 @@ static bool statement_flt(statement s)
 
 static void statement_rwt(statement s)
 {
+    text r = make_text(NIL);
     pips_debug (5,"going up\n");
     ifdebug(9) print_text(stderr,(text) load_statement_icfg (s));
 
@@ -130,24 +131,28 @@ static void statement_rwt(statement s)
 
 /* CALL
  */
-static bool call_flt(call c)
+static void call_flt(call c)
 {
     entity e_callee = call_function(c);
-    pips_debug (5,"called entity is %s\n", entity_name(e_callee));
+    string callee_name = module_local_name(e_callee);
 
-    /* If this is a "real function" (defined in the code elsewhere) */
-    return value_code_p(entity_initial(e_callee));
+    pips_debug (5,"called entity is %s\n", entity_name(e_callee));    
+
+    return; 
 }
 
 static void call_rwt(call c)
 {
   entity e_callee = call_function(c);
   string callee_name = module_local_name(e_callee);
-
-  text r = (text) load_statement_icfg (current_stmt_head());
+  text r;
 
   /* hum... pushes the current entity... */
   entity e_caller = get_current_module_entity();
+
+  /* If this is a "real function" (defined in the code elsewhere) */  
+  if (value_code_p(entity_initial(e_callee)))
+    r = (text) load_statement_icfg(current_stmt_head);
 
   reset_current_module_entity();
 
@@ -468,7 +473,7 @@ void print_module_icfg(entity module)
     gen_multi_recurse
 	(s,
 	 statement_domain, statement_flt, statement_rwt,
-	 call_domain     , call_flt     , call_rwt,
+	 call_domain     , call_flt     , gen_null,
 	 loop_domain     , loop_flt     , loop_rwt,
 	 instruction_domain    , instruction_flt  , instruction_rwt,
 	 test_domain     , test_flt     , test_rwt,
