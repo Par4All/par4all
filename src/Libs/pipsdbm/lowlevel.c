@@ -130,6 +130,7 @@ db_build_file_resource_name(string rname, string oname, string suffix)
 {
     if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;
     free(db_get_directory_name_for_module(oname));/* mkdir as a side effect. */
+    /* the next name must be compatible with the Display script... */       
     return strdup(concatenate(oname, "/", oname, suffix, 0));
 }
 
@@ -142,7 +143,7 @@ get_resource_file_name(string rname, string oname)
     string dir_name, file_name;
     if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;
     dir_name = db_get_directory_name_for_module(oname);
-    file_name = strdup(concatenate(dir_name, "/", oname, ".", rname, 0));
+    file_name = strdup(concatenate(dir_name, "/", rname, 0));
     free(dir_name);
     return file_name;
 }
