@@ -63,7 +63,7 @@ entity e;
 
     if (! already_here) {
 	debug(1, "update_called_modules", "addind %s\n", n);
-	called_modules = CONS(STRING, n, called_modules);
+	called_modules = CONS(STRING, strdup(n), called_modules);
     }
 }
 
