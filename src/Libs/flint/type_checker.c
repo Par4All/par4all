@@ -38,6 +38,8 @@
 #define COMPLEX_LENGTH 8
 #define DCOMPLEX_LENGTH 16
  
+static void type_this_entity_if_needed(entity, type_context_p);
+
 /************************************************************************** 
  * Convert a constant from INT to REAL
  * e.g: REAL(10) --> 10.0
@@ -573,11 +575,13 @@ typing_arguments_of_user_function(call c, type_context_p context)
   /* Subroutine */
   if (type_void_p(result))
   {
-    b = basic_undefined;
+    pips_debug(7, "type of %s is overloaded\n", entity_name(call_function(c)));
+    b = make_basic_overloaded();
   }
   /* Function */
   else
   {
+    pips_debug(7, "type of %s is a function\n", entity_name(call_function(c)));
     b = copy_basic(variable_basic(type_variable(result)));
   }
   return b;
@@ -612,8 +616,8 @@ type_this_call(expression exp, type_context_p context)
     b = typing_arguments_of_user_function(c, context);
   }
   
-  /* All intrinsics, operators */
-  else
+  /* All intrinsics */
+  else if (ENTITY_INTRINSIC_P(function_called))
   {
     /* Typing intrinsics */
     dotype = get_typing_function_for_intrinsic(
@@ -628,12 +632,21 @@ type_this_call(expression exp, type_context_p context)
 				   entity_local_name(function_called));
     if (simplifier != 0)
     {
-      //simplifier(c, context);
       simplifier(exp, context);
     }
   }
-  
-  /* Attention: b can have value basic_undefined */
+  else if (value_symbolic_p(entity_initial(function_called)))
+  {
+    /* lazy type entity contents... */
+    type_this_entity_if_needed(function_called, context);
+    b = GET_TYPE(context->types, 
+       symbolic_expression(value_symbolic(entity_initial(function_called))));
+    b = copy_basic(b);
+  }
+
+  pips_debug(7, "Call to %s typed as %s\n", entity_name(function_called), 
+	     basic_to_string(b));
+
   return b;
 }
 
@@ -657,25 +670,31 @@ type_this_instruction(instruction i, type_context_p context)
     {
       b1 = typing_arguments_of_user_function(c, context);
 
-      if (!basic_undefined_p(b1)) 
+      if (!basic_overloaded_p(b1)) 
       {
 	add_one_line_of_comment((statement) stack_head(context->stats), 
 				"Ignored %s value returned by '%s'",
 				basic_to_string(b1), 
 				entity_local_name(call_function(c)));
-	free_basic(b1);
+	/* Count the number of errors */
+	context->number_of_error++;
       }
+      free_basic(b1);
 
       return;
     }
 
+    /* type arguments of subroutine intrinsics such as FORMAT RETURN WRITE =...
+     */
+    // ... 
+
+    
     /* Here, we only do typing for assigment statement */
     if (!ENTITY_ASSIGN_P(call_function(c)))
     {
       return;
     }
 
-    /* handle ASSIGN special case? */
     args = call_arguments(c);
     
     if(!arguments_are_compatible(c, context->types))
@@ -683,7 +702,6 @@ type_this_instruction(instruction i, type_context_p context)
       add_one_line_of_comment((statement) stack_head(context->stats), 
 			    "Arguments of assignment '%s' are not compatible", 
 			      entity_local_name(call_function(c))); 
-      /* Count the number of errors */
       context->number_of_error++;
     }
     else
@@ -837,7 +855,7 @@ type_this_expression(expression e, type_context_p context)
   }
   
   /* Push the basic in hash table "types" */
-  if(!basic_undefined_p(b))
+  if (!basic_undefined_p(b))
   {
     PUT_TYPE(context->types, e, b);
   }
@@ -857,6 +875,30 @@ stmt_rwt(statement s, type_context_p context)
   stack_pop(context->stats);
 }
 
+static void type_this_chunk(void * c, type_context_p context)
+{
+  gen_context_multi_recurse(c, context, 
+			    statement_domain, stmt_flt, stmt_rwt,
+			    expression_domain, gen_true, type_this_expression,
+			   instruction_domain, gen_true, type_this_instruction,
+			    test_domain, gen_true, check_this_test,
+			    whileloop_domain, gen_true, check_this_whileloop,
+			    loop_domain, gen_true, check_this_loop,
+			    NULL);
+}
+
+static void type_this_entity_if_needed(entity e, type_context_p context)
+{
+  value v = entity_initial(e);
+  if (value_symbolic_p(v))
+  {
+    expression s = symbolic_expression(value_symbolic(v));
+
+    if (!hash_defined_p(context->types, s))
+      type_this_chunk((void *) s, context);
+  }
+}
+
 /************************************************************************** 
  * Type check all expressions in statements.
  * Returns false if type errors are detected.
@@ -872,14 +914,7 @@ void typing_of_expressions(statement s)
   context.number_of_simplication = 0;
   
   /* Bottom-up typing */
-  gen_context_multi_recurse(s, &context, 
-			    statement_domain, stmt_flt, stmt_rwt,
-			    expression_domain, gen_true, type_this_expression,
-			   instruction_domain, gen_true, type_this_instruction,
-			    test_domain, gen_true, check_this_test,
-			    whileloop_domain, gen_true, check_this_whileloop,
-			    loop_domain, gen_true, check_this_loop,
-			    NULL);
+  type_this_chunk((void *) s, &context);
   
   /* Summary */
   user_log("Type Checker Summary\n"
