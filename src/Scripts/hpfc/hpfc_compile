@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/08/08 09:19:47 $, 
+# $Date: 1995/08/10 18:02:12 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -15,8 +15,8 @@ DELETE=':'
 MAKE=':'
 PIPS='pips'
 TMP="/tmp/hpfc_tmp.`hostname`.$$"
-INSTALL="$HPFC_TOOLS/hpfc_install"
-PIPSARGS='-s MUST_REGIONS -p HPFC_CLOSE'
+PIPSARGS='-s MUST_REGIONS'
+HPFC='-p HPFC_CLOSE'
 TIMEPROP=
 PIPSPROP=
 
@@ -83,7 +83,7 @@ while getopts rtivxDdMqsn:hm:w:p:k: OPT
 do
   case $OPT in
     t) DUMPFILES='1' ;;
-    i) NOINSTALL='1' ;;
+    i) NOINSTALL='1' ; HPFC='-p HPFC_CLOSE' ;;
     p) PIPS="$OPTARG" ;;
     r) REDIRECT=':' ;;
     v) VERBOSE='verbose' ;;
@@ -100,9 +100,11 @@ do
 	 demo)
 	     STDERR='/dev/null' ;
 	     PIPSPROP='-1 HPFC_NO_WARNING -1 NO_USER_WARNING' ;
-	     VERBOSE='verbose' ;;
+	     VERBOSE='verbose' ;
+	     HPFC='-p HPFC_INSTALL' ;;
 	 full)
 	     DELETE='Delete' ;
+	     HPFC='-p HPFC_INSTALL' ;;
 	     MAKE='gmake' ;;
 	 timing)
 	     TIMEPROP='-1 LOG_TIMINGS' ;;
@@ -153,7 +155,7 @@ $DEBUG "`type $PIPS`"
 
 [ "$DEBUG" != : ] && set -x
 
-eval $PIPS $FILES $PIPSARGS $PIPSPROP $TIMEPROP -m $MODULE $WORKSPACE \
+eval $PIPS $FILES $PIPSARGS $HPFC $PIPSPROP $TIMEPROP -m $MODULE $WORKSPACE \
 	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
 
 STATUS="$?"
@@ -168,10 +170,9 @@ set +x
 [ "$NOINSTALL" ] ||
 {
   $VERBOSE "installing generated codes"
-  
-  [ -d "$WORKSPACE.hpfc" ] || mkdir $WORKSPACE.hpfc
-  eval ${INSTALL} -b $WORKSPACE.database $FILES -i \
-	$VERBOSEARG $DEBUGARG -t $WORKSPACE.hpfc -n $MODULE
+
+  [ -d $WORKSPACE.hpfc ] && rm -rf $WORKSPACE.hpfc
+  mv  $WORKSPACE.database/hpfc $WORKSPACE.hpfc
 }
 
 [ "$DUMPFILES" ] &&
