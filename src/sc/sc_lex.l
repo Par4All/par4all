@@ -100,7 +100,7 @@ extern boolean yysyntax_error;
 int yyerror(char *s)
 {
 	/* procedure minimun de recouvrement d'erreurs */
-//	int c;
+/*	int c;*/
 
 	(void) fprintf(stderr,"%s near %s\n",s,yytext);
 /*	while ((c = getchar()) != EOF)
