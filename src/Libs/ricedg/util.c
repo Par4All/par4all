@@ -250,6 +250,7 @@ prettyprint_dependence_graph_view(FILE * fd,
     debug_on("RICEDG_DEBUG_LEVEL");
     pv1 = graph_vertices(mod_graph);
     pv1 = CDR(pv1);
+    {
     /*    for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {*/
 	vertex v1 = VERTEX(CAR(pv1));
 	statement s1 = vertex_to_statement(v1);
@@ -326,7 +327,7 @@ prettyprint_dependence_graph_view(FILE * fd,
 		}
 	    }
 	}
-	/*    }*/
+    }
     clean_enclosing_loops();
     debug_off();
     fprintf(fd, "\n****************** End of Dependence Graph "
