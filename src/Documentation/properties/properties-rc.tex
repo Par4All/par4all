@@ -12,6 +12,11 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.161  2002/06/05 09:41:09  nguyen
+%% Remove the property ARRAY_BOUND_CHECKING_FOR_DEBUGGING
+%% Replace by PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE that is used by all
+%% program verifications
+%%
 %% Revision 1.160  2002/05/30 12:10:57  phamdat
 %% ICFG_DV added
 %%
@@ -190,7 +195,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2002/05/30 12:10:57 $~$
+$~$Date: 2002/06/05 09:41:09 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1882,31 +1887,6 @@ TYPE_CHECKER_ADD_SUMMARY FALSE
 TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
 \end{verbatim}
 
-\subsection{Array Bounds Checking}
-
-Array bounds checking refers to determining whether all array reference
-are within their declared range in all of its uses in a program. Here are
-array bounds checking options for code instrumentation, in order to
-compute the number of bound checks added. We can use only one property for
-these two case, but the meaning is not clear. To be changed ? 
-
-\begin{verbatim}
-INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
-PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
-\end{verbatim}
-
-The following property tells the array bound checking phase to instrument
-codes with the STOP or the PRINT message. Logically, if a bound violation
-is detected, the program will stop immediately. Furthermore, the STOP message gives the
-partial redundancy elimination phase more information to remove
-redundant tests occurred after this STOP. However, for the debugging
-purposes, one may need to display all possible out-of-bound errors but not
-to stop the program. In this case, a PRINT message is chosen. By default,
-we use the STOP message.
- 
-\begin{verbatim}
-ARRAY_BOUND_CHECKING_FOR_DEBUGGING FALSE
-\end{verbatim}
 
 \subsection{Array Resizing}
 
@@ -1967,7 +1947,38 @@ the option to compute new declarations for instrumented array
 ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 \end{verbatim}
 
-\subsection{Alias Checking}
+\section{Program Verifications}
+
+The following property tells the verification phases (array bound
+checking, alias checking or uninitialized variables checking) to instrument
+codes with the STOP or the PRINT message. Logically, if a standard violation
+is detected, the program will stop immediately. Furthermore, the STOP message gives the
+partial redundancy elimination phase more information to remove
+redundant tests occurred after this STOP. However, for the debugging
+purposes, one may need to display all possible violations such as
+out-of-bound or used-before-set errors, but not
+to stop the program. In this case, a PRINT message is chosen. By default,
+we use the STOP message.
+ 
+\begin{verbatim}
+PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE FALSE
+\end{verbatim}
+
+\subsection{Array Bound Checking}
+
+Array bounds checking refers to determining whether all array reference
+are within their declared range in all of its uses in a program. Here are
+array bounds checking options for code instrumentation, in order to
+compute the number of bound checks added. We can use only one property for
+these two case, but the meaning is not clear. To be changed ? 
+
+\begin{verbatim}
+INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
+PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
+\end{verbatim}
+
+\subsection{Alias Verification}
+
 This is a property to tell the alias propagation and alias checking phase to use
 information from MAIN program or not. If the current module is never
 called by the main program, we do no alias propagation and alias checking
@@ -1978,6 +1989,7 @@ top-down approach !
 \begin{verbatim}
 ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
 \end{verbatim}
+
 
 %%
 %% PRETTYPRINTER
