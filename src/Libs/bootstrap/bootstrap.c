@@ -347,6 +347,7 @@ integer_to_real_type(int n)
   return t;
 }
 
+/*
 static type 
 integer_to_double_type(int n)
 {
@@ -359,6 +360,7 @@ integer_to_double_type(int n)
   
   return t;
 }
+*/
 
 static type 
 real_to_integer_type(int n)
@@ -413,6 +415,7 @@ double_to_integer_type(int n)
   return t;
 }
 
+/*
 static type 
 double_to_real_type(int n)
 {
@@ -426,6 +429,7 @@ double_to_real_type(int n)
   
   return t;
 }
+*/
 
 static type 
 double_to_double_type(int n)
@@ -551,6 +555,8 @@ substring_type(int n)
 	 functional_parameters(ft));
   t = make_type(is_type_functional, ft);
   
+  pips_assert("valid arity", gen_length(functional_parameters(ft))==n);
+  
   return t;
 }
 
@@ -573,6 +579,8 @@ assign_substring_type(int n)
     CONS(PARAMETER, MakeCharacterParameter(),
 	 functional_parameters(ft));
   t = make_type(is_type_functional, ft);
+
+  pips_assert("valid arity", gen_length(functional_parameters(ft))==n);
   
   return t;
 }
@@ -1428,20 +1436,22 @@ typing_function_constant_dcomplex(call c, type_context_p context)
   
   return make_basic_complex(16);
 }
+
 static basic
 typing_function_overloaded(call c, type_context_p context)
 {
   return make_basic_overloaded();
 }
 
+/*
 static basic typing_function_error(call c, type_context_p context)
 {
-  /* subroutine intrinsics used as a function... */
   add_one_line_of_comment((statement) stack_head(context->stats),
 			  "intrinsic '%s' used as a function?",
 			  entity_local_name(call_function(c)));
   return make_basic_overloaded();
 }
+*/
 
 static basic typing_of_assign(call c, type_context_p context)
 {
@@ -2163,6 +2173,8 @@ CreateIntrinsics()
 bool 
 bootstrap(string workspace)
 {
+  pips_debug(1, "bootstraping in workspace %s\n", workspace);
+
   if (db_resource_p(DBR_ENTITIES, "")) 
     pips_internal_error("entities already initialized");
   
@@ -2191,6 +2203,9 @@ bootstrap(string workspace)
   /* FI: I suppress the owner filed to make the database moveable */
   /* FC: the content must be consistent with pipsdbm/methods.h */
   DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, "", (char*) entity_domain);
+
+  pips_debug(1, "bootstraping done\n");
+
   return TRUE;
 }
 
