@@ -192,7 +192,7 @@ static bool call_flt(call c)
 static void call_rwt(call c)
 {
   text r = (text) load_statement_icfg(current_stmt_head());
-  append_marged_text(r, 0, "CALL ", module_local_name(call_function(c)));
+  append_marged_text(r, current_margin, "CALL ", module_local_name(call_function(c)));
   update_statement_icfg(current_stmt_head(), r);
   return;
 }
