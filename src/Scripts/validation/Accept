@@ -6,6 +6,14 @@
 # the validations suite. Create a new ~.result .
 #
 # Mail problem to jouvelot@ensmp.fr
+#
+# modified by Fabien COELHO, 08/03/94
+# - cut used instead of awk
+# - theline variable added
+#
+# SCCS Stuff:
+# $RCSfile: Accept,v $ ($Date: 1994/03/08 16:50:57 $) version $Revision$, got on %D%, %T%
+# %A%
 
 pips_test_directory=/home/users/pips/Pips/Tests/Validation
 tmp_mail=/tmp/accept.mail.$$
@@ -13,11 +21,16 @@ header="Diff Commands for"
 
 cat > $tmp_mail
 
-module=`grep "$header" < $tmp_mail | awk '{print $4}'`
-file=`grep "$header" < $tmp_mail | awk '{print $6}'`
+theline=`grep "^$header" < $tmp_mail`
+module=`echo $theline | cut -d' ' -f 4`
+file=`echo $theline | cut -d' ' -f 6`
 
 result=`dirname $file`/`basename $file .f`.result
 
 sed -e "1,/${header}/d;s/^X//" < $tmp_mail | ed -s $result/$module
 
 rm -f $tmp_mail
+
+#
+# that's all
+#
