@@ -3438,7 +3438,7 @@ Polyhedron *DomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRay
     return (Polyhedron*) 0;
   }
   if (emptyQ(Pol2))
-    return Pol1;
+    return (Domain_Copy(Pol1));
   d = (Polyhedron *)0;
   for (p2=Pol2; p2; p2=p2->next) {
     for (p1=Pol1; p1; p1=p1->next) {
