@@ -364,35 +364,48 @@ Variable v_new;
  *    vect_add_elem, where there is vect_erase_var. We'll miss the variable
  *    Lei Zhou.   15/07/91
  */
-Pbase base_union(b1, b2)
-Pbase b1;
-Pbase b2;
+Pbase base_union(Pbase b1, Pbase b2)
 {
-    Pbase b = VECTEUR_NUL; 
-    Pbase vtmp;
+  Pbase b = BASE_NULLE;
+  boolean
+    bn1 = BASE_NULLE_P(b1),
+    bn2 = BASE_NULLE_P(b2);
 
-    if (!VECTEUR_NUL_P(b1)) {
-	vtmp = b = vect_new(var_of((Pvecteur) b1), VALUE_ONE);
-	for (b1 = b1->succ ; b1!=VECTEUR_NUL; b1=b1->succ) {
-	    vtmp->succ = vect_new(var_of((Pvecteur) b1), VALUE_ONE);
-	    vtmp = vtmp->succ;
-	} 
+  if (!bn1 && bn2)
+    b = base_dup(b1);
+  else if (bn1 && !bn2)
+    b = base_dup(b2);
+  else if (!bn1 && !bn2)
+  {
+    linear_hashtable_pt seen = linear_hashtable_make();
+    Pvecteur v;
+    Variable var;
+
+    for (v = b1; v; v=v->succ)
+    {
+      var = var_of(v);
+      if (var!=TCST)
+      {
+	linear_hashtable_put_once(seen, var, var);
+	b = vect_chain(b, var, VALUE_ONE);
+      }
     }
-    else 
-	if (!VECTEUR_NUL_P(b2)) {
-	    vtmp = b = vect_new(var_of((Pvecteur) b2), VALUE_ONE);
-	    b2 = b2->succ;
+    
+    for (v = b2; v; v=v->succ)
+    {
+      var = var_of(v);
+      if (var!=TCST)
+	if (!linear_hashtable_isin(seen, var))
+	{
+	  linear_hashtable_put_once(seen, var, var);
+	  b = vect_chain(b, var, VALUE_ONE);
 	}
-	else return b;
+    }
 
-    for ( ; b2!=VECTEUR_NUL; b2=b2->succ) {
-	if (!vect_coeff(var_of((Pvecteur) b2),b)) {
-	vtmp->succ = vect_new(var_of((Pvecteur) b2), VALUE_ONE);
-	vtmp = vtmp->succ; }
-    } 
-	
-    b = (Pbase) vect_sign(b);
-    return b;
+    linear_hashtable_free(seen);
+  }
+  
+  return b;
 }
 
 /* this function returns the rank of the variable var in the base 
