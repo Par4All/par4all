@@ -1,6 +1,9 @@
 dnl
-dnl $RCSfile: hpfc_architecture_m4_macros,v $ version $Revision$
-dnl ($Date: 1996/10/17 11:31:36 $, )
+dnl $Id$
+dnl $Log: hpfc_architecture_m4_macros,v $
+dnl Revision 1.17  1997/03/19 16:52:15  coelho
+dnl better RCS headers
+dnl
 dnl
 dnl DEFAULT ARCHITECTURE
 dnl
