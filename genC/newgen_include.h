@@ -59,12 +59,12 @@ DEFLIST(namelist,char *,name) ;
 DEFLIST(intlist,int,val) ;
 DEFLIST(domainlist,union domain *,domain) ;
 
-struct binding ;
+struct gen_binding ;
 
 /* A DOMAIN union describes the structure of a user type. 
 
    The (STRUCT BINDING *) are used either to point to strings (during
-   the parsing of the specifications), or to bindings (after compilation).
+   the parsing of the specifications), or to gen_bindings (after compilation).
 
    TYPE and CONSTRUCTOR members have to be at the same offset */
 
@@ -72,7 +72,7 @@ struct binding ;
  *
  * common part assumed for all: type
  * common part assumed for ba, li, se, ar: 
- *      type, constructor, persistant and one binding
+ *      type, constructor, persistant and one gen_binding
  *
  */
 union domain {
@@ -87,26 +87,26 @@ union domain {
 	int type ;
 	char *constructor ;
 	int persistant ;
-	struct binding *constructand ;
+	struct gen_binding *constructand ;
     } ba ;
     struct {
 	int type ;
 	char *constructor ;
 	int persistant ;
-	struct binding *element ;
+	struct gen_binding *element ;
     } li ;
     struct {
 	int type ;
 	char *constructor ;
 	int persistant ;
-	struct binding *element ;
+	struct gen_binding *element ;
 	set_type what ;
     } se ;
     struct {
 	int type ;
 	char *constructor ;
 	int persistant ;
-	struct binding *element ;
+	struct gen_binding *element ;
 	struct intlist *dimensions ;
     } ar ;
     struct {
@@ -134,7 +134,7 @@ union domain {
  */
 #define MAX_TABULATED_ELEMENTS 200003
 
-extern struct binding *Tabulated_bp ;
+extern struct gen_binding *Tabulated_bp ;
 
 /* INLINE[] gives, for each inlinable (i.e., unboxed) type, its NAME,
    its initial VALUE and its printing FORMAT (for each language which can
@@ -161,7 +161,7 @@ extern struct inlinable {
    inlined data types. INDEX is used whenever the type is used with
    refs and defs (ALLOC is the next place to allocate tabulated values). */
 
-extern struct binding Domains[] ;
+extern struct gen_binding Domains[] ;
 
 /* Action parameter to the LOOKUP() function in the symbol table. Are 
    looking for a new symbol or an old one ? */
@@ -169,8 +169,8 @@ extern struct binding Domains[] ;
 #define NEW_BINDING 1
 #define OLD_BINDING 2
 
-extern struct binding *lookup() ;
-extern struct binding *new_binding() ;
+extern struct gen_binding *lookup() ;
+extern struct gen_binding *new_binding() ;
 
 /* Used to check, while parsing specs, that a constructed domain use 
    only one operator type. */
