@@ -17,39 +17,7 @@
  *   parallelization.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "genC.h"
-
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "polyedre.h"
-
-#include "ri.h"
-#include "ri-util.h"
-#include "graph.h"
-#include "dg.h"
-#include "database.h"
-
-#include "misc.h"
-#include "text-util.h"
-#include "pipsdbm.h"
-#include "control.h"
-
-#include "constants.h"
-#include "properties.h"
-#include "resources.h"
-
-#include "chains.h"
-#include "ricedg.h"
-#include "rice.h"
+#include "local.h"
 
 /* the dependence graph of the current loop nest */
 graph dg = graph_undefined;
