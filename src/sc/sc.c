@@ -268,10 +268,14 @@ Psysteme sc;
     return consistent;
 }
 
-/* check that sc is well defined, that the
- * numbers of equalities and inequalities are consistent with the lists of
- * equalities and inequalities, and that every variable in the constraints is
- * in the base
+/* check that sc is well defined, that the numbers of equalities and
+ * inequalities are consistent with the lists of equalities and
+ * inequalities, that the dimension is consistent with the basis, that the
+ * basis itself is consistent (all coefficients must be 1), and that every
+ * variable in the constraints is in the basis.
+ *
+ * Each component in the basis should only appear once thanks to the
+ * specifications of Pvecteur (this is not checked).
  *
  * Francois Irigoin, 13 November 1995
  *
@@ -279,7 +283,7 @@ Psysteme sc;
  *  - there is no explicit check of TCST in the basis;
  * TCST should *not* be in the basis for some use of Psystemes, 
  * like transformers in PIPS.
- */
+ * */
 boolean sc_weak_consistent_p(Psysteme sc)
 {
     boolean weak_consistent;
