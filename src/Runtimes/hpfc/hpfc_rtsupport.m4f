@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/11/04 15:55:16 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/12/22 16:57:25 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -1104,7 +1104,7 @@ c
       if (dp.EQ.0) then
          nlb = lb
          nub = ub
-         llb = lb
+         llb = lb-1
          return
       endif 
       tn = ATOT(an)
@@ -1138,10 +1138,11 @@ c
       subroutine HPFC_LOOP_BOUNDS(nlb, nub, llb, lb, ub, an, dp)
       integer nlb, nub, llb, lb, ub, an, dp
       include "hpfc_commons.h"
+      debug(`print *, "HPFC_LOOP_BOUNDS ", lb, ub, " array ", an, dp')
       call HPFC_REMOTE_LOOP_BOUNDS
      $     (nlb, nub, llb, lb, ub, an, dp, MYPOS(dp, TTOP(ATOT(an))))
-      debug(`print *, "initial global lower bound: ", llb,
-     $    " new lower bound: ", nlb, " new upper bound: ", nub')
+      debug(`print *, "init lb: ", llb,
+     $    " new lb: ", nlb, " new ub: ", nub')
       end
 c
 c-----------------
