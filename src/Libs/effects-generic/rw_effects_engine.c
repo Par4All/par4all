@@ -224,21 +224,6 @@ rw_effects_of_call(call c)
     transformer context = (*load_context_func)(current_stat);
     list le = NIL;
 
-    if (transformer_undefined_p(context))
-    {
-	/* this happens to the CONTINUE statement of the exit node
-	 * even if unreachable. Thus transformer are not computed,
-	 * orderings are not set... however gen_multi_recurse goes there.
-	 * I just store NIL, what seems reasonnable an answer.
-	 * It seems to be sufficient for other passes. 
-	 * I should check that it is indeed the exit node?
-	 * FC.
-	 */
-	pips_debug(2, "call with undefined context... exit node?\n");
-	store_rw_effects_list(current_stat, NIL);
-	return;
-    }
-
     pips_debug(2, "begin\n");
 
     if (!(*empty_context_test)(context))
