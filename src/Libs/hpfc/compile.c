@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/10/05 11:51:36 $, )
+ * ($Date: 1995/10/06 08:56:12 $, )
  */
 
 #include "defines-local.h"
@@ -308,16 +308,14 @@ put_generated_resources_for_program (program_name)
 string program_name;
 {
     FILE *comm_file, *init_file;
-    string comm_filename, init_filename;
+    string comm_filename, init_filename, directory_name;
+
+    directory_name = db_get_current_workspace_directory();
 
     comm_filename = 
-	strdup(concatenate(db_get_current_program_directory(),
-			   "/real_parameters.h",
-			   NULL));
+	strdup(concatenate(directory_name, "/real_parameters.h", NULL));
     init_filename =
-	strdup(concatenate(db_get_current_program_directory(),
-			   "/hpf_init.h",
-			   NULL));
+	strdup(concatenate(directory_name, "/hpf_init.h", NULL));
 
     comm_file = (FILE *) safe_fopen(comm_filename, "w");
     create_common_parameters_h(comm_file);
