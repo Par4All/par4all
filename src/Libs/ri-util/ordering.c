@@ -6,6 +6,9 @@
  * reset_ordering_to_statement.
  *
  * $Log: ordering.c,v $
+ * Revision 1.13  1998/06/03 06:41:10  irigoin
+ * Handling of the whileloop construct added
+ *
  * Revision 1.12  1998/04/14 12:55:03  coelho
  * linear.h added.
  *
@@ -105,6 +108,10 @@ rinitialize_ordering_to_statement(hash_table ots, statement s)
 
       case is_instruction_loop:
 	rinitialize_ordering_to_statement(ots, loop_body(instruction_loop(i)));
+	break;
+
+      case is_instruction_whileloop:
+	rinitialize_ordering_to_statement(ots, whileloop_body(instruction_whileloop(i)));
 	break;
 
       case is_instruction_test:
