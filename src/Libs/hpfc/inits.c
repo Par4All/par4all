@@ -3,21 +3,10 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1995/03/23 16:54:32 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1995/04/10 18:49:36 $, )
  * version $Revision$,
  */
 
-#include <stdio.h>
-extern int fprintf();
-extern int vfprintf();
-
-#include "genC.h"
-#include "ri.h"
-#include "hpf.h"
-
-#include "misc.h"
-#include "ri-util.h"
-#include "hpfc.h"
 #include "defines-local.h"
 
 void create_common_parameters_h(file)
