@@ -1,7 +1,22 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/14 18:12:23 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/17 17:11:30 $, )
  * version $Revision$
  * got on %D%, %T%
  */
+
+#ifndef GENERIC_FUNCTION_INCLUDED
+#define GENERIC_FUNCTION_INCLUDED
+
+#define GENERIC_STATIC_OBJECT(PREFIX, name, type)\
+static type name = type##_undefined;\
+PREFIX bool name##_undefined_p() { return(name==type##_undefined);}\
+PREFIX void reset_##name() { name=type##_undefined;}\
+PREFIX void set_##name(o) type o; { name=o;}\
+PREFIX type get_##name() { return(name);}
+
+#define GENERIC_STATIC_STATUS(PREFIX, name, type, init, close)\
+GENERIC_STATIC_OBJECT(PREFIX, name, type)\
+PREFIX void init_##name() { name = init;}\
+PREFIX void close_##name() { close(name);}
 
 /* The idea here is to have a static function the name of which is
  * name, and which is a newgen function (that is a ->).
@@ -12,20 +27,16 @@
  * types are declared to newgen. It would also ease the db management.
  */
 
-#ifndef GENERIC_FUNCTION_INCLUDED
-#define GENERIC_FUNCTION_INCLUDED
-
 #define GENERIC_FUNCTION(PREFIX, name, type)\
-static type name;\
-PREFIX bool name##_undefined_p() { return(name==type##_undefined_p);}\
-PREFIX void reset_##name(){ name = type##_undefined;}\
-PREFIX void set_##name(v) type v; { assert(name##_undefined_p()); name = v;}\
-PREFIX type get_##name() { return(name);}\
-PREFIX void init_##name() { name = make_##type();}\
-PREFIX void close_##name() { free_##type(name);}\
-PREFIX void extend_##name(k,v) char *k,*v;{ extend_##type(name, k, v);}\
-PREFIX void update_##name(k,v) char *k,*v;{ update_##type(name, k, v);}\
-PREFIX char *apply_##name(k) char *k; { apply_##type(name, k);}
+GENERIC_STATIC_STATUS(PREFIX, name, type, make_##type(), free_##type)\
+PREFIX void extend_##name(k,v) gen_chunk *k,*v;\
+       { fprintf(stderr, "E %s\n", entity_name(k)); extend_##type(name, k, v);}\
+PREFIX void update_##name(k,v) gen_chunk *k,*v;\
+       { fprintf(stderr, "U %s\n", entity_name(k)); update_##type(name, k, v);}\
+PREFIX gen_chunk *apply_##name(k) gen_chunk *k; \
+       { fprintf(stderr, "A %s\n", entity_name(k));return(apply_##type(name, k));}\
+PREFIX bool apply_##name##_defined_p(k) gen_chunk *k; \
+       { return(hash_get((name+1)->h, (char *)k)!=HASH_UNDEFINED_VALUE);}
 
 #define GENERIC_LOCAL_FUNCTION(name, type)\
         GENERIC_FUNCTION(static, name, type)
