@@ -2,7 +2,7 @@
 ! COMMON /HPFC BUFFERS/ 
 !
 ! $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-! ($Date: 1996/10/17 11:51:12 $, )
+! ($Date: 1996/10/17 14:32:19 $, )
 !
 ! buffers to avoid small pvmf(un)pack calls...
 ! and to sends buckets of messages if necessary...
@@ -59,7 +59,7 @@ ifdef(`_HPFC_NO_INTEGER2_',,`
 ifdef(`_HPFC_NO_INTEGER4_',,`
       integer INTEGER4 MAXBUFFSIZE,
       parameter (INTEGER4 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
-      integer*4 INTEGER4 BUFF(INTEGER4 MAXBUFFSIZE))
+      integer*4 INTEGER4 BUFF(INTEGER4 MAXBUFFSIZE)
       equivalence (DATA BUFFER, INTEGER4 BUFF)')dnl
 
 ifdef(`_HPFC_NO_REAL4_',,`
