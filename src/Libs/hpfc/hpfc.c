@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/12/26 16:07:57 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/12/30 14:06:08 $, )
  * version $Revision$
  */
  
@@ -732,6 +732,7 @@ bool hpfc_close(string name)
      */
     save_hpfc_status();
     
+    delete_all_resources(); /* rough! */
     DB_PUT_FILE_RESOURCE(DBR_HPFC_COMMONS, name, NO_FILE); /* fake */
 
     debug_off();
