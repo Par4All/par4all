@@ -53,15 +53,15 @@ void add_a_icfgpe_print(string resource_name, get_text_function gt)
   lp = CONS(STRING, (char *)ips, lp);
 }
 
-/*static text text_statement_any_effect_type(entity module, int margin, statement stat)
+static text text_statement_any_effect_type(entity module, int margin, statement stat)
 {
   text result = make_text(NIL);
-  list l;
-  MAPL(l_ips, {
-    p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff)STRING(CAR(l_ips));
+  MAPL(l, {
+    p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff) STRING(CAR(l));
+    MERGE_TEXTS(result, resource_text(module, margin, stat, ips));
   }, lp);
+  return result;
 }
-*/
 
 static void
 load_resources(string module_name)
