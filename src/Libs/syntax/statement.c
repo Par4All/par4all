@@ -624,7 +624,7 @@ int MakeElseInst()
 
 void MakeEndifInst()
 {
-    int elsifs ;
+    int elsifs = -1;
 
     if(CurrentBlock==0) {
 	FatalError("MakeEndifInst", "unexpected ENDIF statement\n");
@@ -699,6 +699,7 @@ int token;
 	break;
       default:
 	FatalError("NameOfToken", "unknown token\n");
+	name = string_undefined; /* just to avoid a gcc warning */
 	break;
     }
 
@@ -801,6 +802,9 @@ void reset_first_statement()
 #define SIZE 32384
 void check_first_statement()
 {
+    int line_start = TRUE;
+    int in_comment = FALSE;
+
     if (! seen) {
 	FILE *fd;
 	int cpt = 0, ibuffer = 0, c;
@@ -813,13 +817,21 @@ void check_first_statement()
 
 	fd = safe_fopen(CurrentFN, "r");
 	while ((c = getc(fd)) != EOF) {
-	    buffer[ibuffer++] = c;
+	    if(line_start == TRUE)
+		in_comment = strchr(START_COMMENT_LINE,c) != NULL;
+	    buffer[ibuffer++] = in_comment? c : toupper(c);
 	    if (ibuffer >= SIZE) {
 		ParserError("check_first_statement", "buffer too small\n");
 	    }
 
-	    if (c == '\n')
+	    if (c == '\n') {
 		cpt++;
+		line_start = TRUE;
+		in_comment = FALSE;
+	    }
+	    else {
+		line_start = FALSE;
+	    }
 
 	    if (cpt == line_b_I-1)
 		break;
