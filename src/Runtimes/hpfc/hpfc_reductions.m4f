@@ -2,7 +2,7 @@ c
 c     Reductions management 
 c
 c $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-c ($Date: 1996/06/08 13:44:37 $, )
+c ($Date: 1996/06/08 13:57:26 $, )
 c
 c     it is supposed that the reduction is computed on a full
 c     array, which is nor replicated anyway. If used on a part,
@@ -222,19 +222,23 @@ define(`HPFC_REDUCTIONS',`dnl
 pushdef(`NAME',$1)dnl
 pushdef(`PVMTYPE',$2)dnl
 pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
-c
+c-----
 c
 c Functions for NAME reduction on TYPE scalars:
 c
       subroutine build_name(hpre,NAME,PVMTYPE)(val)
+      TYPE val
       end
       subroutine build_name(npre,NAME,PVMTYPE)(val)
+      TYPE val
       val = identity(NAME,val)
       end
       subroutine build_name(hpost,NAME,PVMTYPE)(val)
+      TYPE val
       include "fpvm3.h"
       include "hpfc_commons.h"
-      TYPE val
+      external pvm_opname(NAME)
+      integer info
 c
 c performs the reduction to the host
 c
@@ -248,9 +252,11 @@ c
       call HPFC_HSNDTO_A(PVMTYPE, val)
       end 
       subroutine build_name(npost,NAME,PVMTYPE)(val)
+      TYPE val
       include "fpvm3.h"
       include "hpfc_commons.h"
-      TYPE val
+      external pvm_opname(NAME)
+      integer info
 c
 c performs the reduction to the host
 c
@@ -263,6 +269,7 @@ c get final result
 c      
       call HPFC_RCVFR_mCH(PVMTYPE, val)
       end
+c
 popdef(`NAME')dnl
 popdef(`PVMTYPE')dnl
 popdef(`TYPE')dnl')dnl
