@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/12/27 13:23:04 $, )
+# ($Date: 1996/12/27 13:32:07 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -70,10 +70,10 @@ RT_DIR= $(PIPS_ROOT)/Runtime/hpfc
 endif
 
 # source files from the runtime needed to compile a spmd program
-RT_SRC_FILES =	$RT_DIR/hpfc_check.f \
-		$RT_DIR/hpfc_*.h \
-		$RT_DIR/hpfc_main*.f \
-		$RT_DIR/hpfc_architecture_m4_macros
+RT_SRC_FILES =	hpfc_check.f \
+		hpfc_*.h \
+		hpfc_main*.f \
+		hpfc_architecture_m4_macros
 
 # the default is to use the same compilers and options as the library.
 include $(RT_DIR)/$(RT_ARCH)/compilers.make
@@ -214,12 +214,12 @@ NODE 	= 	$(TARGET)_node
 MAIN	=	$(TARGET)_main
 
 RUNABLES = $(HOST) $(NODE) $(RTEST) $(MAIN)
-DEDUCED = $(PVM_HEADERS) param_init.f
+DEDUCED = $(PVM_HEADERS) param_init.f $(RT_SRC_FILES)
 
 #
 # Rules
 
-all:	$(DEDUCED) hpfc_files
+all:	$(DEDUCED) 
 
 .SUFFIXES:	.f .o .m4
 
@@ -227,8 +227,6 @@ all:	$(DEDUCED) hpfc_files
 # make is the target asked for by pipsmake for HPFC_MAKE
 
 make: all install pvm
-
-.INIT: hpfc_files
 
 #
 # PVM quick control
@@ -277,9 +275,8 @@ diff: $(RUNABLES) install pvm
 #
 # Headers
 
-hpfc_files:
-	$(COPY) $(RT_SRC_FILES) .
-	touch $@
+$(RT_SRC_FILES):
+	$(COPY) $(addprefix $(RT_SRC_FILES)/,$(RT_SRC_FILES)) .
 
 pvm3.h:	$(pvminc)/pvm3.h
 	$(COPY) $(pvminc)/pvm3.h .
