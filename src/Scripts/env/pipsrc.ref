@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.128  1997/11/17 07:35:54  coelho
+# location of linuxi86* files changed.
+#
 # Revision 1.127  1997/08/21 08:01:04  coelho
 # cpp is always gcc -E to improve the determinism of the validation at cri.
 #
@@ -188,8 +191,8 @@ PIPS_CPP='gcc -E'
 # where to put binaries (maybe on some other disk...)
 # default is directly in a subdirectory
 
-PIPS_DIRECTORY_FOR_LINUXI86_BINARIES=/usr/local/misc/pips/LINUXI86
-PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/usr/local/misc/pips/LINUXI86LL
+PIPS_DIRECTORY_FOR_LINUXI86_BINARIES=/home/coulommiers/pips/LINUXI86
+PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/home/coulommiers/pips/LINUXI86LL
 PIPS_DIRECTORY_FOR_GNUSOL2LL_BINARIES=/home/recanati/baraque1/pips/GNUSOL2LL
 PIPS_DIRECTORY_FOR_SOL2LL_BINARIES=/home/recanati/baraque1/pips/SOL2LL
 
