@@ -5,7 +5,6 @@
 #include <xview/xview.h>
 #include <xview/panel.h>
 #include <xview/defaults.h>
-#include <types.h>
 
 #include "genC.h"
 #include "misc.h"
