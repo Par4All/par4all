@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.81  2003/08/18 08:43:35  coelho
+ * CATCH/TRY/UNCATCH used.
+ *
  * Revision 1.80  2003/08/14 10:56:05  irigoin
  * COMPILATION_UNIT_PREFIX removed
  *
@@ -139,24 +142,20 @@
 
 static bool catch_user_error(bool (*f)(char *), string rname, string oname)
 {
-    jmp_buf pipsmake_jump_buffer;
     bool success = FALSE;
 
-    if(setjmp(pipsmake_jump_buffer)) 
+    CATCH(any_exception_error)
     {
-      /* CATCH */
       reset_static_phase_variables();
       success = FALSE;
     }
-    else 
+    TRY
     {
-      /* TRY */
-      push_pips_context (&pipsmake_jump_buffer);
       set_pips_current_computation(rname, oname);
       success = (*f)(oname);
+      UNCATCH(any_exception_error);
     }
 
-    pop_pips_context();
     reset_pips_current_computation();
 
     return success;
@@ -1314,7 +1313,6 @@ static bool safe_do_something(
     rule (*find_rule)(string),
     bool (*doit)(string,string))
 {
-    jmp_buf long_jump_buffer;
     bool success = FALSE;
 
     debug_on("PIPSMAKE_DEBUG_LEVEL");
@@ -1327,7 +1325,7 @@ static bool safe_do_something(
 	return success;
     }
 
-    if (setjmp(long_jump_buffer))
+    CATCH(any_exception_error)
     {
 	/* global variables that have to be reset after user-error */
 	reset_make_cache();
@@ -1339,9 +1337,8 @@ static bool safe_do_something(
 	db_clean_all_required_resources();
 	success = FALSE;
     }
-    else
+    TRY
     {
-	push_pips_context(&long_jump_buffer);
 	user_log("Request: build %s %s for module %s.\n", 
 		 what_it_is, name, module_n);
 	
@@ -1363,8 +1360,8 @@ static bool safe_do_something(
 			      "build %s %s for module %s.\n", 
 			      what_it_is, name, module_n);
 	}
+	UNCATCH(any_exception_error);
     }
-    pop_pips_context();
     debug_off();
     return success;
 }
@@ -1395,33 +1392,32 @@ bool safe_concurrent_apply(
     }
     else
     {
-	jmp_buf long_jump_buffer;
-	if (setjmp(long_jump_buffer))
+      CATCH(any_exception_error)
+      {
+	reset_make_cache();
+	retrieve_active_phases();
+	pips_user_warning("Request aborted in pipsmake\n");
+	ok = FALSE;
+      }
+      TRY
+      {
+	logs_on();
+	
+	ok = concurrent_apply(phase_n, modules);
+	
+	if (ok)
 	{
-	    reset_make_cache();
-	    retrieve_active_phases();
-	    pips_user_warning("Request aborted in pipsmake\n");
-	    ok = FALSE;
+	  logs_off();
 	}
 	else
 	{
-	    push_pips_context(&long_jump_buffer);
-	    logs_on();
-	    
-	    ok = concurrent_apply(phase_n, modules);
-	    
-	    if (ok)
-	    {
-		logs_off();
-	    }
-	    else
-	    {
-		pips_user_warning("Request aborted under pipsmake\n");
-	    }
+	  pips_user_warning("Request aborted under pipsmake\n");
 	}
+
+	UNCATCH(any_exception_error);
+      }
     }
 
-    pop_pips_context();
     debug_off();
     return ok;
 }
