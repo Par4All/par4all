@@ -1,6 +1,6 @@
 /* Fabien Coelho, May 1993
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/07/20 18:40:38 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/08/01 10:06:09 $, )
  * version $Revision$
  *
  * Compiler
@@ -23,9 +23,7 @@
 
 /* global variables
  */
-entity 
-    host_module,
-    node_module;
+entity host_module, node_module;
 
 #define debug_print_control(c)\
   fprintf(stderr, \
@@ -227,8 +225,7 @@ statement *hoststatp,*nodestatp;
 	hpf_compiler
 	    (control_statement
 	     (unstructured_control(instruction_unstructured(inst))),
-	     hoststatp,
-	     nodestatp);
+	     hoststatp, nodestatp);
     }
     else
     {
@@ -236,21 +233,13 @@ statement *hoststatp,*nodestatp;
 	    hostmap = MAKE_CONTROL_MAPPING(),
 	    nodemap = MAKE_CONTROL_MAPPING();
 	unstructured 
-	    u=instruction_unstructured(inst);
+	    u = instruction_unstructured(inst);
 	control 
 	    ct = unstructured_control(u),
 	    ce = unstructured_exit(u),
-	    new_ct = control_undefined,
-	    new_ce = control_undefined,
-	    nodec = control_undefined,
-	    hostc = control_undefined;
-	statement 
-	    statc = statement_undefined,
-	    stath = statement_undefined,
-	    statn = statement_undefined;
-
-	list 
-	    blocks = NIL;
+	    new_ct, new_ce, nodec, hostc;
+	statement statc, stath, statn;
+	list blocks = NIL;
 
 	debug(6, "hpf_compile_unstructured", "beginning\n");
 
@@ -283,10 +272,7 @@ statement *hoststatp,*nodestatp;
 
 	ifdebug(9)
 	{
-	    control
-		c_tmp = control_undefined,
-		h_tmp = control_undefined,
-		n_tmp = control_undefined;
+	    control h_tmp, n_tmp;
 
 	    fprintf(stderr, "[hpf_compile_unstructured] controls:\n");
 	    
@@ -354,21 +340,18 @@ static void hpf_compile_sequential_loop(stat,hoststatp,nodestatp)
 statement stat, *hoststatp, *nodestatp;
 {
     loop the_loop=statement_loop(stat);
-    statement
-	body=loop_body(the_loop),
-	hostbody,
-	nodebody;
+    statement body = loop_body(the_loop), hostbody, nodebody;
     range r=loop_range(the_loop);
     list /* of entities */ locals=loop_locals(the_loop);
     entity
-	label=loop_label(the_loop),
-	index=loop_index(the_loop),
-	nindex=NewVariableForModule(node_module, index),
-	hindex=NewVariableForModule(host_module, index);
+	label = loop_label(the_loop),
+	index = loop_index(the_loop),
+	nindex = NewVariableForModule(node_module, index),
+	hindex = NewVariableForModule(host_module, index);
     expression
-	lower=range_lower(r),
-	upper=range_upper(r),
-	increment=range_increment(r);
+	lower = range_lower(r),
+	upper = range_upper(r),
+	increment = range_increment(r);
     
     hpf_compiler(body, &hostbody, &nodebody);
     
@@ -449,32 +432,25 @@ static void hpf_compile_parallel_loop(stat, hoststatp, nodestatp)
 statement stat, *hoststatp, *nodestatp;
 {
     loop the_loop = statement_loop(stat);
-    statement
-	s, nodebody, body = loop_body(the_loop);
-    instruction
-	bodyinst = statement_instruction(body);
+    statement s, nodebody, body = loop_body(the_loop);
+    instruction bodyinst = statement_instruction(body);
     entity
-	label=loop_label(the_loop),
-	index=loop_index(the_loop),
-	nindex=NewVariableForModule(node_module,index);
-    range
-	r = loop_range(the_loop);
+	label = loop_label(the_loop),
+	index = loop_index(the_loop),
+	nindex = NewVariableForModule(node_module,index);
+    range r = loop_range(the_loop);
     expression
-	lower=range_lower(r),
-	upper=range_upper(r),
-	increment=range_increment(r);
+	lower = range_lower(r),
+	upper = range_upper(r),
+	increment = range_increment(r);
     
     assert(execution_parallel_p(loop_execution(the_loop)));
 
     if ((instruction_loop_p(bodyinst)) &&
 	(execution_parallel_p(loop_execution(instruction_loop(bodyinst)))))
-    {
 	hpf_compile_parallel_loop(body, &s, &nodebody);
-    }
     else
-    {
 	hpf_compile_parallel_body(body, &s, &nodebody);
-    }
     
     (*hoststatp) = make_continue_statement(entity_undefined);
     (*nodestatp) = MakeStatementLike(stat, is_instruction_loop);
