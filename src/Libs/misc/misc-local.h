@@ -82,3 +82,7 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
 #endif
+
+#define PIPS_CATCH(what) \
+   if (setjmp(*push_exception_on_stack(what, __CURRENT_FUNCTION_NAME__, \
+      	                    __FILE__, __LINE__, pop_debug_status)))
