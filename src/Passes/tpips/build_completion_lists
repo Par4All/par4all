@@ -8,6 +8,11 @@ echo "static char *tp_resource_names[]={"
 sed '/define/!d;s|.*\(".*"\).*|	\1 ,|;' $PIPS_ROOT/Include/resources.h
 echo "(char*)NULL};"
 
+echo "static char *tp_printablersc_names[]={"
+sed '/define/!d;s|.*\(".*"\).*|	\1 ,|;' \
+    $PIPS_ROOT/Include/printable_resources.h
+echo "(char*)NULL};"
+
 echo "static char *tp_property_names[]={"
 sed '/#/d;/^[ 	]*$/d;s|^[ ]*\([^ ][^ ]*\).*|	"\1" ,|;' \
     $PIPS_ROOT/Share/properties.rc
