@@ -185,7 +185,7 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
  */
 /* Retourne : 1 si le systeme est soluble (faisable)
  *  en rationnels,
- * 0 s'il n'y a pas de sulution.
+ * 0 s'il n'y a pas de solution.
  */
 /* overflow control :
  *  ofl_ctrl == NO_OFL_CTRL  => no overflow control
@@ -248,45 +248,53 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
     }
     /* Determination d'un numero pour chaque variable */
     
-    for(pc=sc->egalites, ligne=1 ; pc!=0; pc=pc->succ, ligne++) {
-        j=0 ; /* compteur du nb de variables de l'equation */
-        valeur=0 ; /* le terme cst vaut 0 par defaut */
-        for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
-            if(vect_coeff(pv->var,sc_base(sc))) { j++ ;
-		  h = hash((Variable) pv->var) ; trouve=0 ;
-		  while (hashtable[h].nom != 0)  {
-		      if (hashtable[h].nom==pv->var) {
-			  trouve=1 ;
-			  break ;
-		      }
-		      else { h = (h+1) % MAX_VAR ; }
-		  }
-		  if(!trouve) {
-		      hashtable[h].succ=premier_hash ;
-		      premier_hash = h ;
-		      hashtable[h].val = PTR_NIL ;
-		      hashtable[h].numero=compteur++ ;
-		      CREVARVISIBLE;
-		      hashtable[h].nom=pv->var ;
-		  }
-		  hh = h ;
-		  eg[NUMERO].existe = 1 ;
-		  eg[NUMERO].colonne[eg[NUMERO].taille].numero=ligne ;
-		  eg[NUMERO].colonne[eg[NUMERO].taille].num = pv->val ;
-		  eg[NUMERO].colonne[eg[NUMERO].taille].den = 1 ;
-		  eg[NUMERO].taille++ ;
-	      } 
-            else { valeur= - pv->val; 
-		   eg[0].existe = 1 ;
-		   eg[0].colonne[eg[0].taille].numero=ligne ;
-		   eg[0].colonne[eg[0].taille].num = valeur ;
-		   eg[0].colonne[eg[0].taille].den = 1 ;
-		   eg[0].taille++ ;
+    for(pc=sc->egalites, ligne=1 ; pc!=0; pc=pc->succ, ligne++)
+    {
+	pv=pc->vecteur;
+	if (pv!=NULL) /* skip if empty */
+	{
+	    j=0 ; /* compteur du nb de variables de l'equation */
+	    valeur=0 ; /* le terme cst vaut 0 par defaut */
+	    for(; pv !=0 ; pv=pv->succ) {
+		if(vect_coeff(pv->var,sc_base(sc))) {
+		    j++ ;
+		    h = hash((Variable) pv->var) ; trouve=0 ;
+		    while (hashtable[h].nom != 0)  {
+			if (hashtable[h].nom==pv->var) {
+			    trouve=1 ;
+			    break ;
+			}
+			else { h = (h+1) % MAX_VAR ; }
+		    }
+		    if(!trouve) {
+			hashtable[h].succ=premier_hash ;
+			premier_hash = h ;
+			hashtable[h].val = PTR_NIL ;
+			hashtable[h].numero=compteur++ ;
+			CREVARVISIBLE;
+			hashtable[h].nom=pv->var ;
+		    }
+		    hh = h ;
+		    eg[NUMERO].existe = 1 ;
+		    eg[NUMERO].colonne[eg[NUMERO].taille].numero=ligne ;
+		    eg[NUMERO].colonne[eg[NUMERO].taille].num = pv->val ;
+		    eg[NUMERO].colonne[eg[NUMERO].taille].den = 1 ;
+		    eg[NUMERO].taille++ ;
+		} 
+		else { valeur= - pv->val; 
+		       eg[0].existe = 1 ;
+		       eg[0].colonne[eg[0].taille].numero=ligne ;
+		       eg[0].colonne[eg[0].taille].num = valeur ;
+		       eg[0].colonne[eg[0].taille].den = 1 ;
+		       eg[0].taille++ ;
 	       }
-        }
-	/* Cas ou` valeur de variable est connue : */
-        if(j==1) hashtable[hh].val = valeur ;
-	if(DEBUG1&&sc->egalites!=0)dump_tableau(eg,compteur) ;
+	    }
+	    /* Cas ou` valeur de variable est connue : */
+	    if(j==1) hashtable[hh].val = valeur ;
+	    if(DEBUG1&&sc->egalites!=0)dump_tableau(eg,compteur) ;
+	}
+	else
+	    ligne--;
     }
     
     /* Allocation a priori du tableau du simplex "t" par
@@ -329,79 +337,86 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 
     /* Entree des inegalites dans la table */
     
-    for(pc=sc->inegalites, ligne=1; pc!=0; pc=pc->succ, ligne++) {
-        valeur = 0 ;
-        poidsM=0 ;
-        for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) 
-            if(vect_coeff(pv->var,sc_base(sc)))
-                poidsM += pv->val ;
-            else valeur = - pv->val ; /* val terme const */
+    for(pc=sc->inegalites, ligne=1; pc!=0; pc=pc->succ, ligne++) 
+    {
+	pv=pc->vecteur;
+	if (pv!=NULL) /* skip if empty */
+	{
+	    valeur = 0 ;
+	    poidsM=0 ;
+	    for(; pv !=0 ; pv=pv->succ) 
+		if(vect_coeff(pv->var,sc_base(sc)))
+		    poidsM += pv->val ;
+		else valeur = - pv->val ; /* val terme const */
 
-        for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
-            if(vect_coeff(pv->var,sc_base(sc))) {
-                h = hash((Variable)  pv->var) ; trouve=0 ;
-                while (hashtable[h].nom != 0)  {
-                    if (hashtable[h].nom==pv->var) {
-                        trouve=1 ;
-                        break ;
-                    }
-                    else { h = (h+1) % MAX_VAR ; }
-                }
-                if(!trouve) {
-                    hashtable[h].succ=premier_hash ;
-                    premier_hash = h ;
-                    hashtable[h].val = PTR_NIL ;
-                    hashtable[h].numero=compteur++ ;
-                    hashtable[h].nom=pv->var ;
-                    CREVARVISIBLE ;
-                }
-
-                if(poidsM < 0 || (poidsM==0 && valeur<0))
-                    t[NUMERO].colonne[0].num += pv->val,
-		    /*
-		       if(DEBUG)printf("pv->val = %ld, t[NUMERO].colonne[0].num = %ld\n",pv->val,t[NUMERO].colonne[0].num),
-		       */
-                    t[NUMERO].colonne[0].den = 1 ;
-                t[NUMERO].existe = 1 ;
-                t[NUMERO].colonne[t[NUMERO].taille].numero=ligne ;
-                if(poidsM < 0 || (poidsM==0 && valeur<0))
-                    i = -pv->val ; else i = pv->val ;
-                t[NUMERO].colonne[t[NUMERO].taille].num=i ;
-                t[NUMERO].colonne[t[NUMERO].taille].den = 1 ;
-                t[NUMERO].taille++ ;
-            }
-        }
-	/* Creation de variable d'ecart ? */
-        if(poidsM < 0 || (poidsM==0 && valeur<0)) {
-	    if(DEBUG)dump_tableau(t, compteur) ;
-            i=compteur++ ;
-            CREVARVISIBLE ;
-            t[i].existe = 1 ; t[i].taille = 2 ;
-            t[i].colonne[0].num = 1 ;
-            t[i].colonne[0].den = 1 ;
-	    if(DEBUG)printf("ligne ecart = %ld, colonne %ld\n",ligne,i) ;
-            t[i].colonne[1].numero = ligne ;
-            t[i].colonne[1].num = -1 ;
-            t[i].colonne[1].den = 1 ;
-            poidsM = - poidsM, valeur= - valeur ;
-            objectif[0].num+=valeur ; 
-            objectif[1].num+= poidsM ;
-        }
-	/* Mise a jour des colonnes 0 et 1 */
-        t[0].colonne[t[0].taille].numero = ligne ;
-	t[0].colonne[t[0].taille].den = 1 ;
-	t[0].colonne[t[0].taille].num = valeur ;
-	t[0].existe = 1 ;
-        t[0].taille++ ;
-	/* Element de poids M en 1ere colonne */
-        t[1].colonne[t[1].taille].numero = ligne ;
-        t[1].colonne[t[1].taille].num = poidsM ;
-        t[1].colonne[t[1].taille].den = 1 ;
-        t[1].existe = 1 ;
-        t[1].taille++ ;
-	/* Creation d'une colonne cachee */
-        CREVARCACHEE ;
-	if(DEBUG) dump_tableau(t, compteur) ;
+	    for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
+		if(vect_coeff(pv->var,sc_base(sc))) {
+		    h = hash((Variable)  pv->var) ; trouve=0 ;
+		    while (hashtable[h].nom != 0)  {
+			if (hashtable[h].nom==pv->var) {
+			    trouve=1 ;
+			    break ;
+			}
+			else { h = (h+1) % MAX_VAR ; }
+		    }
+		    if(!trouve) {
+			hashtable[h].succ=premier_hash ;
+			premier_hash = h ;
+			hashtable[h].val = PTR_NIL ;
+			hashtable[h].numero=compteur++ ;
+			hashtable[h].nom=pv->var ;
+			CREVARVISIBLE ;
+		    }
+		    
+		    if(poidsM < 0 || (poidsM==0 && valeur<0))
+			t[NUMERO].colonne[0].num += pv->val,
+			/*
+			   if(DEBUG)printf("pv->val = %ld, t[NUMERO].colonne[0].num = %ld\n",pv->val,t[NUMERO].colonne[0].num),
+			   */
+			t[NUMERO].colonne[0].den = 1 ;
+		    t[NUMERO].existe = 1 ;
+		    t[NUMERO].colonne[t[NUMERO].taille].numero=ligne ;
+		    if(poidsM < 0 || (poidsM==0 && valeur<0))
+			i = -pv->val ; else i = pv->val ;
+		    t[NUMERO].colonne[t[NUMERO].taille].num=i ;
+		    t[NUMERO].colonne[t[NUMERO].taille].den = 1 ;
+		    t[NUMERO].taille++ ;
+		}
+	    }
+	    /* Creation de variable d'ecart ? */
+	    if(poidsM < 0 || (poidsM==0 && valeur<0)) {
+		if(DEBUG)dump_tableau(t, compteur) ;
+		i=compteur++ ;
+		CREVARVISIBLE ;
+		t[i].existe = 1 ; t[i].taille = 2 ;
+		t[i].colonne[0].num = 1 ;
+		t[i].colonne[0].den = 1 ;
+		if(DEBUG)printf("ligne ecart = %ld, colonne %ld\n",ligne,i) ;
+		t[i].colonne[1].numero = ligne ;
+		t[i].colonne[1].num = -1 ;
+		t[i].colonne[1].den = 1 ;
+		poidsM = - poidsM, valeur= - valeur ;
+		objectif[0].num+=valeur ; 
+		objectif[1].num+= poidsM ;
+	    }
+	    /* Mise a jour des colonnes 0 et 1 */
+	    t[0].colonne[t[0].taille].numero = ligne ;
+	    t[0].colonne[t[0].taille].den = 1 ;
+	    t[0].colonne[t[0].taille].num = valeur ;
+	    t[0].existe = 1 ;
+	    t[0].taille++ ;
+	    /* Element de poids M en 1ere colonne */
+	    t[1].colonne[t[1].taille].numero = ligne ;
+	    t[1].colonne[t[1].taille].num = poidsM ;
+	    t[1].colonne[t[1].taille].den = 1 ;
+	    t[1].existe = 1 ;
+	    t[1].taille++ ;
+	    /* Creation d'une colonne cachee */
+	    CREVARCACHEE ;
+	    if(DEBUG) dump_tableau(t, compteur) ;
+	}
+	else
+	    ligne--;
     }
 
     if (DEBUG)
