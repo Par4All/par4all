@@ -4,6 +4,12 @@
    Ronan Keryell.
    */
 
+/* 	%A% ($Date: 1997/04/23 18:37:32 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_ri_util_control[] = "%A% ($Date: 1997/04/23 18:37:32 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
 #include <stdlib.h> 
 #include <stdio.h> 
 #include <string.h> 
@@ -76,13 +82,15 @@ check_control_coherency(control c)
 	MAP(CONTROL, cc, {	    
 	    if (!is_control_in_list_p(ctl, control_predecessors(cc))) {
 		pips_debug(0, "Control node %#x not in the predecessor list of %#x\n", (unsigned int) ctl, (unsigned int) cc);
-		/* pips_assert("Control incorrect", 0); */
+		ifdebug(9)
+		    pips_assert("Control incorrect", 0);
 	    }
 	}, control_successors(ctl));
 	MAP(CONTROL, cc, {
 	    if (!is_control_in_list_p(ctl, control_successors(cc))) {
 		pips_debug(0, "Control node %#x not in the successor list of %#x\n", (unsigned int) ctl, (unsigned int) cc);
-		/* pips_assert("Control incorrect", 0); */
+		ifdebug(9)
+		    pips_assert("Control incorrect", 0);
 	    }
 	}, control_predecessors(ctl));
     }, c, blocs);
