@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/04 19:09:39 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/09 15:46:37 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -190,6 +190,17 @@ if some characters are encountered in this comment field.
 \begin{verbatim}
 PARSER_WARN_FOR_COLUMNS_73_80   TRUE
 \end{verbatim}
+
+
+\subsection{Controlizer}
+
+By setting this property \verb|unspaghettify| is applyed
+directly in the controlizer phase.
+
+\begin{verbatim}
+UNSPAGHETTIFY_IN_CONTROLIZER   FALSE
+\end{verbatim}
+
 
 \subsection{Chains}
 
@@ -778,7 +789,7 @@ Since it is useful to display statistics on what has been found
 useless and removed in a program, this property is used to ask for
 statistics displaying:
 \begin{verbatim}
-DEAD_CODE_DISPLAY_STATISTICS FALSE
+DEAD_CODE_DISPLAY_STATISTICS TRUE
 \end{verbatim}
 
 
