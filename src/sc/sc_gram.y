@@ -169,18 +169,10 @@ terme	: const ident
 		}
 	;
 
-ident	: IDENT
-		{
-		    $$ = rec_ident(ps_yacc,$1);
-		    free($1);
-		}
+ident	: IDENT { $$ = rec_ident(ps_yacc, $1); }
 	;
 
-newid	: IDENT
-		{
-			new_ident(ps_yacc,$1);
-			free($1);
-		}
+newid	: IDENT	{ new_ident(ps_yacc,$1); }
 	;
 
 /* I'm pessimistic for long long here... 
