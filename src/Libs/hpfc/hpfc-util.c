@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/04/11 17:01:20 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/06/03 14:14:33 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -32,17 +32,7 @@ extern int fprintf();
  * Predicates
  */
 
-/*
- * array_distributed_p
- */
-bool array_distributed_p(ent)
-entity ent;
-{
-    list lda=distributedarrays;
 
-    while ((lda!=NULL) && (ENTITY(CAR(lda))!=ent)) lda=CDR(lda);
-    return((lda!=NULL) && (ENTITY(CAR(lda))==ent));
-}
 
 /*
  * ref_to_dist_array_p
@@ -59,15 +49,13 @@ expression expr;
 bool call_ref_to_dist_array_p(c)
 call c;
 {
-    bool flag=FALSE;
-
     MAPL(ce,
      {
-	 if (ref_to_dist_array_p(EXPRESSION(CAR(ce)))) flag=TRUE;
+	 if (ref_to_dist_array_p(EXPRESSION(CAR(ce)))) return(TRUE);
      },
 	 call_arguments(c));
 
-    return(flag);
+    return(FALSE);
 }
 
 /*
@@ -109,18 +97,21 @@ entity e;
     entity template;
     distribute d;
 
-    pips_assert("replicated_p",array_distributed_p(e));
+    pips_assert("replicated_p", array_distributed_p(e));
 
-    a=(align) GET_ENTITY_MAPPING(hpfalign,e);
+    a=load_entity_align(e);
     la=align_alignment(a);    
     template=align_template(a);
-    d=(distribute) GET_ENTITY_MAPPING(hpfdistribute,template);
+    d=load_entity_distribute(template);
     ld=distribute_distribution(d);
 
     for(i=1;i<=NumberOfDimension(template);i++)
     {
 	replicated = (replicated || 
-		      ith_dim_replicated_p(template,i,la,DISTRIBUTION(CAR(ld))));
+		      ith_dim_replicated_p(template,
+					   i,
+					   la,
+					   DISTRIBUTION(CAR(ld))));
 
 	ld=CDR(ld);
     }
@@ -166,7 +157,7 @@ entity array;
 int i, *pprocdim;
 {
     align
-	al = (align) GET_ENTITY_MAPPING(hpfalign, array);
+	al = load_entity_align(array);
     list
 	lal = align_alignment(al);
     alignment
@@ -174,7 +165,7 @@ int i, *pprocdim;
     entity
 	template = align_template(al);
     distribute
-	dis = (distribute) GET_ENTITY_MAPPING(hpfdistribute, template);
+	dis = load_entity_distribute(template);
     list
 	ld = distribute_distribution(dis);
     distribution
@@ -300,10 +291,26 @@ expression expr;
     return(NULL);
 }
 
-
-/*
- * NewTemporaryVariable
+/* -------------------------------------------------------------
+ *
+ * New Temporary Variables MANAGEMENT
+ *
  */
+
+static int 
+    unique_integer_number,
+    unique_float_number,
+    unique_logical_number,
+    unique_complex_number;
+
+void hpfc_init_unique_numbers()
+{
+    unique_integer_number=0;
+    unique_float_number=0;
+    unique_logical_number=0;
+    unique_complex_number=0;
+}
+
 entity NewTemporaryVariable(module, base)
 entity module;
 basic base;
@@ -314,16 +321,24 @@ basic base;
     switch(basic_tag(base))
     {
     case is_basic_int:
-	sprintf(buffer,"%s%d",HPFINTPREFIX,uniqueintegernumber++);
+	sprintf(buffer,"%s%d",
+		HPFINTPREFIX,
+		unique_integer_number++);
 	break;
     case is_basic_float:
-	sprintf(buffer,"%s%d",HPFFLOATPREFIX,uniquefloatnumber++);
+	sprintf(buffer,"%s%d",
+		HPFFLOATPREFIX,
+		unique_float_number++);
 	break;
     case is_basic_logical:
-	sprintf(buffer,"%s%d",HPFLOGICALPREFIX,uniquelogicalnumber++);
+	sprintf(buffer,"%s%d",
+		HPFLOGICALPREFIX,
+		unique_logical_number++);
 	break;
     case is_basic_complex:
-	sprintf(buffer,"%s%d",HPFCOMPLEXPREFIX,uniquecomplexnumber++);
+	sprintf(buffer,"%s%d",
+		HPFCOMPLEXPREFIX,
+		unique_complex_number++);
 	break;
     default:
 	pips_error("NewTemporaryVariable",
@@ -341,52 +356,37 @@ basic base;
     return(e);
 }
 
+entity AddEntityToModule(ent, module)
+entity ent, module;
+{
+    entity
+	new = make_entity(copy_string(concatenate(module_local_name(module),
+						  MODULE_SEP_STRING,
+						  entity_local_name(ent),
+						  NULL)),
+			  copy_type(entity_type(ent)),
+			  copy_storage(entity_storage(ent)),
+			  copy_value(entity_initial(ent)));
+
+    debug(7, "AddEntityToModule", "adding %s to module %s\n",
+	  entity_name(new), entity_name(module));
+    
+    AddEntityToDeclarations(new, module);
+
+    return(new);
+}
+
 /*
  * AddEntityToHostAndNodeModules
  */
 void AddEntityToHostAndNodeModules(e)
 entity e;
 {
-    entity 
-	en;
-
-    ifdebug(9)
-    {
-	fprintf(stderr,"[AddEntityToHostAndNodeModules]\nentity\n");
-	print_entity_variable(e);
-    }
-
-    en = make_entity(strdup(concatenate(NODE_NAME,
-					MODULE_SEP_STRING,
-					entity_local_name(e),
-					NULL)),
-		     type_variable_dup(entity_type(e)),
-		     entity_storage(e),
-		     entity_initial(e));
-    
-    ifdebug(8)
-    {
-	fprintf(stderr,"[AddEntityToHostAndNodeModules]\nentity\n");
-	print_entity_variable(en);
-    }
-    
-    AddEntityToDeclarations(en,nodemodule);
-    SET_ENTITY_MAPPING(oldtonewnodevar,e,en);
-    SET_ENTITY_MAPPING(newtooldnodevar,en,e);
+    store_new_node_variable(AddEntityToModule(e, node_module), e);
     
     if (!array_distributed_p(e))
     {
-	entity eh=make_entity(strdup(concatenate(HOST_NAME,
-						 MODULE_SEP_STRING,
-						 entity_local_name(e),
-						 NULL)),
-			      type_variable_dup(entity_type(e)),
-			      entity_storage(e),
-			      entity_initial(e));
-	
-	AddEntityToDeclarations(eh,hostmodule);
-	SET_ENTITY_MAPPING(oldtonewhostvar,e,eh);
-	SET_ENTITY_MAPPING(newtooldhostvar,eh,e);
+	store_new_host_variable(AddEntityToModule(e, host_module), e);
     }
 }
 
@@ -495,79 +495,6 @@ int dim, *tdim;
 }    
 
 /*
- * local_index_is_different_p
- */
-bool local_index_is_different_p(array,dim)
-entity array;
-int dim;
-{
-    list
-	l = (list) GET_ENTITY_MAPPING(newdeclarations, array);
-    int i;
-
-    pips_assert("local_index_is_different_p", (array_distributed_p(array)));
-
-    for (i=1; i<dim; i++) l=CDR(l);
-
-    return(INT(CAR(l))!=NO_NEW_DECLARATION);
-}
-
-/*
- * alignment FindArrayDimAlignmentOfArray(array, dim)
- */
-alignment FindArrayDimAlignmentOfArray(array, dim)
-entity array;
-int dim;
-{
-    align
-	a = (align) GET_ENTITY_MAPPING(hpfalign, array);
-    
-    return(FindAlignmentOfDim(align_alignment(a), dim));
-}
-
-/*
- * alignment FindTemplateDimAlignmentOfArray(array, dim)
- */
-alignment FindTemplateDimAlignmentOfArray(array, dim)
-entity array;
-int dim;
-{
-    align
-	a = (align) GET_ENTITY_MAPPING(hpfalign, array);
-    
-    return(FindAlignmentOfTemplateDim(align_alignment(a), dim));
-}
-
-
-/*
- * entity array_to_template(array)
- *
- */
-entity array_to_template(array)
-entity array;
-{
-    pips_assert("array_to_template",
-		array_distributed_p(array));
-
-    return(align_template((align) GET_ENTITY_MAPPING(hpfalign, array)));
-}
-
-/*
- * entity template_to_processors(template)
- *
- */
-entity template_to_processors(template)
-entity template;
-{
-    pips_assert("template_to_processors",
-		(gen_find_eq(template, templates)!=chunk_undefined));
-
-    return(distribute_processors
-	   ((distribute) GET_ENTITY_MAPPING(hpfdistribute, template)));
-}
-
-
-/*
  * int template_dimension_of_array_dimension(array, dim)
  *
  * the matching dimension of a distributed
@@ -577,7 +504,7 @@ entity array;
 int dim;
 {
     align
-	a = (align) GET_ENTITY_MAPPING(hpfalign, array);
+	a = load_entity_align(array);
     alignment
 	al = FindAlignmentOfDim(align_alignment(a), dim);
     
@@ -598,7 +525,7 @@ int dim, *pprocdim;
     entity
 	template = array_to_template(array);
     distribute
-	d = (distribute) GET_ENTITY_MAPPING(hpfdistribute, template);
+	d = load_entity_distribute(template);
     distribution
 	di = FindDistributionOfDim
 	    (distribute_distribution(d),
@@ -619,7 +546,7 @@ entity template;
 int tdim, tcell, *pprocdim; /* template dimension, template cell */
 {
     distribute
-	d = (distribute) GET_ENTITY_MAPPING(hpfdistribute, template);
+	d = load_entity_distribute(template);
     list
 	ld = distribute_distribution(d);
     entity
@@ -727,7 +654,9 @@ expression e;
     if (expression_integer_constant_p(e))
 	return(ExpressionToInt(e));
     else
-	return(-314); /* value returned if doesn't know */
+	pips_error("HpfcExpressionToInt", "can't return anything, sorry\n");
+
+    return(-1); /* just to avoid a gcc warning */
 }
 
 /* -------------------------------------------------------
@@ -742,7 +671,7 @@ entity array;
 int dim, *ptdim, *pa, *pb;
 { 
     align
-	al = (align) GET_ENTITY_MAPPING(hpfalign, array);
+	al = load_entity_align(array);
     alignment
 	a = alignment_undefined;
     
@@ -763,6 +692,34 @@ int dim, *ptdim, *pa, *pb;
 	*pa = HpfcExpressionToInt(alignment_rate(a));
 	*pb = HpfcExpressionToInt(alignment_constant(a));
     }
+}
+
+void get_distribution(template, dim, ppdim, pn)
+entity template;
+int dim, *ppdim, *pn;
+{
+    distribution
+        d = FindDistributionOfDim
+	    (distribute_distribution(load_entity_distribute(template)), 
+				     dim, ppdim);
+
+    *pn = (distribution_undefined_p(d) ?
+	   -1: HpfcExpressionToInt(distribution_parameter(d)));
+}
+
+void get_entity_dimensions(e, dim, plow, pup)
+entity e;
+int dim, *plow, *pup;
+{
+    dimension
+	d = dimension_undefined;
+
+    pips_assert("get_entity_dimensions",
+		entity_variable_p(e) && dim>0 && dim<=7);
+
+    d = entity_ith_dimension(e, dim),
+    *plow = ExpressionToInt(dimension_lower(d)),
+    *pup = ExpressionToInt(dimension_upper(d));
 }
 
 /*
