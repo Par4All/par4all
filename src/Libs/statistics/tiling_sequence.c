@@ -416,7 +416,7 @@ static void put_result(string filename)
 }
 
 
-int loop_statistics(string name)
+int tiling_sequence(string name)
 {
   statement stat;
   string filename, localfilename; 
