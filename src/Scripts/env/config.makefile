@@ -2,13 +2,12 @@
 # $RCSfile: config.makefile,v $ for env
 #
 
-SCRIPTS =	
+SCRIPTS =	Xressources \
+		xinitrc
 
 SFILES =	pipsrc.ref \
 		make-pipsrc.sh \
-		make-pipsrc.csh \
-		Xressources \
-		xinitrc
+		make-pipsrc.csh
 
 RFILES = 	pipsrc.sh \
 		pipsrc.csh
