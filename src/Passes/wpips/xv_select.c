@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/05 12:56:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/09 15:01:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1995/10/05 12:56:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1995/10/09 15:01:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -27,6 +27,13 @@ char vcid_xv_select[] = "%A% ($Date: 1995/10/05 12:56:37 $, ) version $Revision$
 #include "wpips.h"
 
 #include "resources.h"
+
+
+/* Maximum size of the module menu of the main frame: */
+enum {
+   WPIPS_MAX_MODULE_MENU_SIZE = 50
+};
+
 
 Menu_item directory_menu_item;
 
@@ -275,7 +282,7 @@ enable_module_selection()
 
 
 void
-end_delete_program_notify(char * name)
+end_delete_workspace_notify(char * name)
 {
    schoose_close();
 
@@ -305,8 +312,10 @@ end_delete_program_notify(char * name)
          goto do_not_delete_the_workspace;
       
       /* First close the workspace: */
-      /* if close_program_notify(NULL, NULL); */
-      close_program_notify(NULL, NULL);
+      if (!close_workspace_notify(NULL, NULL))
+         /* Hmm... This may put WPips in a strange state if close
+            fails... */
+         goto do_not_delete_the_workspace;
    }
 
    (void) delete_workspace(name);
@@ -322,7 +331,7 @@ end_delete_program_notify(char * name)
 
 
 void
-cancel_delete_program_notify()
+cancel_delete_workspace_notify()
 {
    /* Nothing to do. */
    enable_workspace_delete_or_open();
@@ -333,15 +342,15 @@ cancel_delete_program_notify()
 
 
 void
-start_delete_program_notify(Menu menu,
-                            Menu_item menu_item)
+start_delete_workspace_notify(Menu menu,
+                              Menu_item menu_item)
 {
-   char *program_list[ARGS_LENGTH];
-   int  program_list_length = 0;
+   char *workspace_list[ARGS_LENGTH];
+   int  workspace_list_length = 0;
 
-   pips_get_program_list(&program_list_length, program_list);
+   pips_get_workspace_list(&workspace_list_length, workspace_list);
 
-   if (program_list_length == 0) {
+   if (workspace_list_length == 0) {
       prompt_user("No workspace available in this directory.");
    }
    else {
@@ -351,44 +360,44 @@ start_delete_program_notify(Menu menu,
       disable_change_directory();
       
       schoose("Select the Workspace to Delete", 
-              program_list_length, program_list,
+              workspace_list_length, workspace_list,
               /* Choix initial sur le workspace courant si
                  possible : */
               db_get_current_workspace_name(),
-              end_delete_program_notify,
-              cancel_delete_program_notify);
+              end_delete_workspace_notify,
+              cancel_delete_workspace_notify);
    }
 }
 
 
 void
-start_create_program_notify(Menu menu,
+start_create_workspace_notify(Menu menu,
                             Menu_item menu_item)
 {
-   /* It is not coherent to change directory while creating a program. 
-    * Here should the menu item be set to MENU_INACTIVE
-    */
-   if (db_get_current_workspace_name() != NULL)
-      /* There is an open workspace: close it first: */
-      /* if close_program_notify((Menu) NULL, (Menu_item) NULL); */
-      close_program_notify((Menu) NULL, (Menu_item) NULL);
-
    disable_workspace_delete_or_open();
    disable_workspace_create_or_open();
    disable_change_directory();
 
+   if (db_get_current_workspace_name() != NULL)
+      /* There is an open workspace: close it first: */
+      if (!close_workspace_notify((Menu) NULL, (Menu_item) NULL)) {
+         /* If it fails: */
+         cancel_create_workspace_notify(NULL, NULL);
+         return;
+      }
+
    start_query("Create Workspace", 
                "Enter workspace name: ", 
                "CreateWorkspace",
-               continue_create_program_notify,
+               continue_create_workspace_notify,
                /* Pas la peine de faire quelque chose si on appuie
                   sur cancel : */
-               cancel_create_program_notify);
+               cancel_create_workspace_notify);
 }
 
 
 void
-cancel_create_program_notify(Panel_item item,
+cancel_create_workspace_notify(Panel_item item,
                              Event * event)
 {
    /* Re'tablit le droit d'ouvrir ou de cre'er un autre worspace : */
@@ -396,12 +405,12 @@ cancel_create_program_notify(Panel_item item,
    enable_workspace_delete_or_open();
    enable_change_directory();
    cancel_query_notify(item, event);
-   show_program();
+   show_workspace();
 }
 
 
 success
-continue_create_program_notify(char * name)
+continue_create_workspace_notify(char * name)
 {
    char *fortran_list[ARGS_LENGTH];
    int fortran_list_length = 0;
@@ -440,7 +449,7 @@ continue_create_program_notify(char * name)
                                    NOTICE_BUTTON_NO,   "No, cancel",
                                    NULL);
             if (result == NOTICE_NO)
-               goto continue_create_program_notify_failed;
+               goto continue_create_workspace_notify_failed;
          }
 
          disable_workspace_create_or_open();
@@ -454,14 +463,14 @@ continue_create_program_notify(char * name)
             user_log("There is only one Fortran program in the current directory.\n"
                      "\tCreating the workspace \"%s\" from the file \"%s\"...\n",
                      name, fortran_list[0]);     
-            end_create_program_notify(&fortran_list_length,
-                                      &fortran_list[0]);
+            end_create_workspace_notify(&fortran_list_length,
+                                        &fortran_list[0]);
          }
          else {
             mchoose("Create Workspace", 
                     fortran_list_length, fortran_list, 
-                    end_create_program_notify,
-                    (void (*)(void)) cancel_create_program_notify);
+                    end_create_workspace_notify,
+                    (void (*)(void)) cancel_create_workspace_notify);
          }
          /* Memory leak if mchoose exit... */
          args_free(&fortran_list_length, fortran_list);
@@ -471,8 +480,8 @@ continue_create_program_notify(char * name)
    }
 
    /* If it failed, cancel the creation: */
-  continue_create_program_notify_failed:
-   cancel_create_program_notify(NULL, NULL);
+  continue_create_workspace_notify_failed:
+   cancel_create_workspace_notify(NULL, NULL);
    
    return FALSE;
 }
@@ -490,24 +499,21 @@ user_prompt_not_a_valid_workspace_name(char * workspace_name)
 
 
 void
-end_create_program_notify(int * pargc,
-                          char * argv[])
+end_create_workspace_notify(int * pargc,
+                            char * argv[])
 {
    /* Is the name a valid workspace name? */
    if (workspace_name_p(workspace_name_to_create)) {
-      /* if (db_create_workspace(workspace_name_to_create)) { */
-      db_create_workspace(workspace_name_to_create); {
+      if (db_create_workspace(workspace_name_to_create)) {
          /* The create workspace has been successful: */
          open_log_file();
          display_memory_usage();
          
-         /* if (create_program(pargc, argv)) { */
-         create_workspace(pargc, argv);
-         if (TRUE) {
+         if (create_workspace(pargc, argv)) {
             /* The processing of user files has been successful: */
             enable_workspace_close();
 
-            show_program();
+            show_workspace();
             select_a_module_by_default();
             enable_module_selection();
             disable_change_directory();
@@ -536,20 +542,14 @@ end_create_program_notify(int * pargc,
 
 
 void
-end_open_program_notify(string name)
+end_open_workspace_notify(string name)
 {
    schoose_close();
 
-   /* Around a bug in schoose... */
-   /*
-   if (db_get_current_program_name() != NULL
-       && strcmp(db_get_current_program_name(), name) == 0)
-      return;
-      */
    if ( open_workspace(name) ) {
       open_log_file();
       enable_workspace_close();
-      show_program();
+      show_workspace();
       select_a_module_by_default();
       enable_module_selection();
       disable_change_directory();
@@ -562,65 +562,60 @@ end_open_program_notify(string name)
 
 
 void
-cancel_open_program_notify()
+cancel_open_workspace_notify()
 {
    enable_workspace_create_or_open();
    enable_change_directory();
-   show_program();
+   show_workspace();
 }
 
 
 void
-open_program_notify(Menu menu,
-                    Menu_item menu_item)
+open_workspace_notify(Menu menu,
+                      Menu_item menu_item)
 {
-   char *program_list[ARGS_LENGTH];
-   int  program_list_length = 0;
+   char *workspace_list[ARGS_LENGTH];
+   int  workspace_list_length = 0;
 
-   pips_get_program_list(&program_list_length, program_list);
+   pips_get_workspace_list(&workspace_list_length, workspace_list);
 
-   if (program_list_length == 0) {
+   if (workspace_list_length == 0) {
       prompt_user("No workspace available in this directory.");
    }
-   else if (program_list_length == 1) {
+   else if (workspace_list_length == 1) {
       /* There is only workspace: open it without asking confirmation
          to the user: */
       user_log("There is only one workspace in the current directory.\n"
                "\tOpening the workspace \"%s\"...\n",
-               program_list[0]); 
-      end_open_program_notify(program_list[0]);
+               workspace_list[0]); 
+      end_open_workspace_notify(workspace_list[0]);
    }
    else {
       disable_workspace_create_or_open();
 
       schoose("Select Workspace", 
-              program_list_length, program_list,
+              workspace_list_length, workspace_list,
               /* Choix initial sur le workspace courant si
                  possible : */
-              db_get_current_program_name(),
-              end_open_program_notify,
-              cancel_open_program_notify);
+              db_get_current_workspace_name(),
+              end_open_workspace_notify,
+              cancel_open_workspace_notify);
    }
-   args_free(&program_list_length, program_list);
+   args_free(&workspace_list_length, workspace_list);
 }
 
 
 success
-close_program_notify(Menu menu,
-                     Menu_item menu_item)
+close_workspace_notify(Menu menu,
+                       Menu_item menu_item)
 {
    success return_value;
    
-   /* if (close_program()) { */
-   close_workspace();
-   if (TRUE) {
+   if (close_workspace()) {
       /* The close has been successful: */
       close_log_file();
 
       edit_close_notify(menu, menu_item);
-
-      show_program();
-      show_module();
 
       enable_workspace_create_or_open();
       disable_workspace_close();
@@ -637,6 +632,8 @@ close_program_notify(Menu menu,
       return_value = FALSE;
   
    hide_window(schoose_frame);
+   show_workspace();
+   show_module();
    display_memory_usage();
 
    return return_value;
@@ -649,11 +646,11 @@ void
 open_or_create_workspace(char * workspace_name_original)
 {
    int i;
-   char *program_list[ARGS_LENGTH];
-   int program_list_length = 0;
+   char *workspace_list[ARGS_LENGTH];
+   int workspace_list_length = 0;
    static char workspace_name[SMALL_BUFFER_LENGTH];
 
-   /* If close_program_notify() is called below, show_program() will
+   /* If close_workspace_notify() is called below, show_workspace() will
       set the name to "(* none *)" in the panel and
       workspace_name_original is directly a pointer to it ! */
    (void) strncpy(workspace_name,
@@ -663,30 +660,30 @@ open_or_create_workspace(char * workspace_name_original)
    if (! workspace_name_p(workspace_name)) {
       /* Prompt the warning and restore the menu enable state: */
       user_prompt_not_a_valid_workspace_name(workspace_name);
-      show_program();
+      show_workspace();
       return;
    }
       
    if (db_get_current_workspace_name() != NULL)
       /* There is an open workspace: close it first: */
-      /* if close_program_notify((Menu) NULL, (Menu_item) NULL); */
-      close_program_notify((Menu) NULL, (Menu_item) NULL);
+      if (!close_workspace_notify((Menu) NULL, (Menu_item) NULL))
+         return;
 
    /* To choose between open or create, look for the an existing
       workspace with the same name: */
-   pips_get_program_list(&program_list_length, program_list);
+   pips_get_workspace_list(&workspace_list_length, workspace_list);
 
-   for(i = 0; i < program_list_length; i++)
-      if (strcmp(workspace_name, program_list[i]) == 0) {
+   for(i = 0; i < workspace_list_length; i++)
+      if (strcmp(workspace_name, workspace_list[i]) == 0) {
          /* OK, the workspace exists, open it: */
-         end_open_program_notify(workspace_name);
+         end_open_workspace_notify(workspace_name);
          return;
       }
    
    /* The workspace does not exist, create it: */
    disable_change_directory();
 
-   (void) continue_create_program_notify(workspace_name);
+   (void) continue_create_workspace_notify(workspace_name);
 }
 
 
@@ -697,10 +694,10 @@ generate_workspace_menu()
    Menu menu;
    Menu_item delete_menu_item;
    int i;
-   char *program_list[ARGS_LENGTH];
-   int  program_list_length = 0;
+   char *workspace_list[ARGS_LENGTH];
+   int  workspace_list_length = 0;
 
-   pips_get_program_list(&program_list_length, program_list);
+   pips_get_workspace_list(&workspace_list_length, workspace_list);
 
    menu = xv_create(NULL, MENU,
                     MENU_TITLE_ITEM, " Select in the workspace list: ",
@@ -712,10 +709,10 @@ generate_workspace_menu()
           xv_create(XV_NULL, MENUITEM,
                     MENU_STRING,
                     "   Create Workspace...",
-                    MENU_NOTIFY_PROC, start_create_program_notify,
+                    MENU_NOTIFY_PROC, start_create_workspace_notify,
                     MENU_RELEASE,
                     /* Always active since
-                       start_create_program_notify() does the close
+                       start_create_workspace_notify() does the close
                        if necessary: */
                     MENU_INACTIVE, wpips_create_workspace_menu_inactive,
                     NULL),
@@ -724,7 +721,7 @@ generate_workspace_menu()
           xv_create(XV_NULL, MENUITEM,
                     MENU_STRING,
                     "   Close Workspace",
-                    MENU_NOTIFY_PROC, close_program_notify,
+                    MENU_NOTIFY_PROC, close_workspace_notify,
                     MENU_RELEASE,
                     /* On can close only if there is something open: */
                     MENU_INACTIVE, wpips_close_workspace_menu_inactive,
@@ -733,7 +730,7 @@ generate_workspace_menu()
    delete_menu_item = xv_create(XV_NULL, MENUITEM,
                                 MENU_STRING,
                                 "   Delete Workspace...",
-                                MENU_NOTIFY_PROC, start_delete_program_notify,
+                                MENU_NOTIFY_PROC, start_delete_workspace_notify,
                                 MENU_RELEASE,
                                 MENU_INACTIVE, wpips_delete_workspace_menu_inactive,
                                 NULL);
@@ -743,7 +740,7 @@ generate_workspace_menu()
           NULL);
 
    /* Now complete with the list of the workspaces: */
-   if (program_list_length == 0) {
+   if (workspace_list_length == 0) {
       xv_set(menu, MENU_APPEND_ITEM,
              xv_create(XV_NULL, MENUITEM,
                        MENU_STRING,
@@ -759,10 +756,10 @@ generate_workspace_menu()
              NULL);
    }
    else {
-      for(i = 0; i < program_list_length; i++)
+      for(i = 0; i < workspace_list_length; i++)
          xv_set(menu, MENU_APPEND_ITEM,
                 xv_create(XV_NULL, MENUITEM,
-                          MENU_STRING, strdup(program_list[i]),
+                          MENU_STRING, strdup(workspace_list[i]),
                           MENU_RELEASE,
                           /* The strdup'ed string will also be
                              freed when the menu is discarded: */
@@ -771,8 +768,8 @@ generate_workspace_menu()
                           NULL),
                 NULL);
    }
-   args_free(&program_list_length,
-             program_list);
+   args_free(&workspace_list_length,
+             workspace_list);
    
    return menu;
 }
@@ -855,6 +852,19 @@ generate_module_menu()
                           NULL),
                 NULL);
       }
+      else if (module_list_length > WPIPS_MAX_MODULE_MENU_SIZE) {
+         xv_set(menu,
+                MENU_TITLE_ITEM,
+                " Too many modules. Click on the Module Chooser: ",
+                NULL);
+         xv_set(menu, MENU_APPEND_ITEM,
+                xv_create(XV_NULL, MENUITEM,
+                          MENU_STRING, "Module Chooser",
+                          MENU_NOTIFY_PROC, select_module_notify,
+                          MENU_RELEASE,
+                          NULL),
+                NULL);
+      }
       else {
          for(i = 0; i < module_list_length; i++)
             xv_set(menu, MENU_APPEND_ITEM,
@@ -882,19 +892,19 @@ create_select_menu()
 
    create_pgm = xv_create(NULL, MENUITEM, 
                           MENU_STRING, "Create",
-                          MENU_NOTIFY_PROC, start_create_program_notify,
+                          MENU_NOTIFY_PROC, start_create_workspace_notify,
                           MENU_RELEASE,
                           NULL);
 
    open_pgm = xv_create(NULL, MENUITEM, 
                         MENU_STRING, "Open",
-                        MENU_NOTIFY_PROC, open_program_notify,
+                        MENU_NOTIFY_PROC, open_workspace_notify,
                         MENU_RELEASE,
                         NULL);
 
    close_pgm = xv_create(NULL, MENUITEM, 
                          MENU_STRING, "Close",
-                         MENU_NOTIFY_PROC, close_program_notify,
+                         MENU_NOTIFY_PROC, close_workspace_notify,
                          MENU_INACTIVE, TRUE,
                          MENU_RELEASE,
                          NULL);
