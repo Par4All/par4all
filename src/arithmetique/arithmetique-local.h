@@ -12,6 +12,11 @@
  * to represent integer values. Thus Value is defined here. It should
  * be changed to "int" "long" or "long long". In an ideal world,
  * any source modification should be limited to this package.
+ *
+ * Indeed, we cannot switch easily to bignums that need constructors 
+ * dans destructors... That would lead to too many modifications...
+ *
+ * Fabien COELHO
  */
 
 #include <limits.h>
@@ -21,12 +26,25 @@ typedef long long Value;
 #define VALUE_CONST(val) val##LL
 #define VALUE_MIN LONG_LONG_MIN
 #define VALUE_MAX LONG_LONG_MAX
+#define VALUE_ZERO 0LL
+#define VALUE_ONE  1LL
+#define VALUE_MONE -1LL
 #else
 typedef long Value;
 #define VALUE_CONST(val) val##L
 #define VALUE_MIN LONG_MIN
 #define VALUE_MAX LONG_MAX
+#define VALUE_ZERO 0L
+#define VALUE_ONE  1L
+#define VALUE_MONE -1L
 #endif
+
+#define VALUE_POS_P(val) (val>VALUE_ZERO)
+#define VALUE_NEG_P(val) (val<VALUE_ZERO)
+#define VALUE_POSZ_P(val) (val>=VALUE_ZERO)
+#define VALUE_NEGZ_P(val) (val<=VALUE_ZERO)
+#define VALUE_ZERO_P(val) (val==VALUE_ZERO)
+#define VALUE_NOTZERO_P(val) (val!=VALUE_ZERO)
 
 /* valeur absolue */
 #ifndef ABS
