@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1995/04/28 12:07:35 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1995/08/08 18:40:49 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -25,8 +25,8 @@ REAL_PIPSHOME=`(cd $PIPSHOME/../pips;pwd)`
 
 unset UPDATE VALIDOPT PERFORMANCE
 
-VALDIR="$PIPSDIR/Tests/Validation"
-VALID="$UTILDIR/validate-sequential"
+VALDIR="$PIPS_VALIDDIR"
+VALID="$PIPS_UTILDIR/validate-sequential"
 
 PING='/usr/etc/ping'
 MAIL='/usr/ucb/mail'
