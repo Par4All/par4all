@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/03/28 13:17:37 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/03/28 21:51:23 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -945,7 +945,7 @@ struct driver *dr ;
 
     if( IS_TABULATED( bp ))
     {
-	static char local[512];
+	char local[512];
 	    
 	(void) sprintf(local, "%d%c%s", 
 		quick_domain_index(obj), HASH_SEPAR, (obj+HASH_OFFSET)->s) ;
