@@ -431,7 +431,6 @@ char* mod_name;
 	SET_STATEMENT_MAPPING( Gstatic_control_map, mod_stat, sc );
 
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), (char*) mod_stat);
-	hash_table_print((hash_table) Gstatic_control_map);
 	DB_PUT_MEMORY_RESOURCE(DBR_STATIC_CONTROL, strdup(mod_name),
 			(char*) Gstatic_control_map);
 
