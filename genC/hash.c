@@ -225,10 +225,11 @@ hash_table hash_table_make(hash_key_type key_type, int size)
     return(htp);
 }
 
+static int max_size_seen = 0;
+
 /* Clears all entries of a hash table HTP. [pj] */
 void hash_table_clear(hash_table htp)
 {
-    static int max_size_seen = 0;
     register hash_entry_pointer p ;
     register hash_entry_pointer end ;
 
