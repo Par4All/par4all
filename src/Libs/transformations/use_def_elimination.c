@@ -353,7 +353,7 @@ use_def_deal_if_useful(statement s)
    bool this_statement_has_an_io_effect;
    bool this_statement_writes_a_procedure_argument;
    bool this_statement_is_a_format;
-   
+
    if (get_debug_level() >= 5) {
       fprintf(stderr, "use_def_deal_if_useful: statement %#x (%#x)\n",
               (int) s, statement_ordering(s));
@@ -368,14 +368,15 @@ use_def_deal_if_useful(statement s)
    /* The possible reasons to have useful code: */
    /* - the statement does an I/O: */
    this_statement_has_an_io_effect = statement_io_effect_p(the_proper_effects, s);
-   /* - the statement writes a procedure argument, so the value may be
-      used by another procedure: */
+   /* - the statement writes a procedure argument or the return
+      variable of the function, so the value may be used by another
+      procedure: */
    /* Regions out should be more precise: */
    this_statement_writes_a_procedure_argument =
       statement_has_a_module_formal_argument_write_effect_p(s,
                                                             get_current_module_entity(),
                                                             the_proper_effects);
-
+   
    /* Avoid to remove formats in a first approach: */
    this_statement_is_a_format = instruction_format_p(statement_instruction(s));
    
