@@ -17,17 +17,21 @@
 #include "ri-util.h"
 #include "misc.h"
 
+
+/*********************************************************** CURRENT ENTITY */
+
 static entity current_module_entity = entity_undefined;
 
 void set_current_module_entity(e)
 entity e;
 {
-    pips_assert("set_current_module_entity", entity_module_p(e));
+    pips_assert("entity is a module", entity_module_p(e));
+
     /* FI: I should perform some kind of memorization for all static variables
        including the value maps (especially them) */
 
-    pips_assert("set_current_module_entity", 
-		current_module_entity == entity_undefined); 
+    pips_assert("current module is undefined", 
+		entity_undefined_p(current_module_entity)); 
 
     current_module_entity = e;
 }
@@ -39,9 +43,13 @@ entity get_current_module_entity()
 
 void reset_current_module_entity()
 {
-     current_module_entity = entity_undefined;
+    /* pips_assert("current entity defined", 
+       !entity_undefined_p(current_module_entity)); */ /* too risky ;-) */
+    current_module_entity = entity_undefined;
 }
 
+
+/******************************************************* CURRENT STATEMENT */
 
 /* used to retrieve the intraprocedural effects of the current module */
 
