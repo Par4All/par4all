@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1994/09/05 15:57:01 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1994/09/05 19:32:13 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -75,7 +75,7 @@ $DEBUG checking
 [ "$#" -eq 0 ] || usage
 [ "$BASEDIR" ] || usage
 
-NAME=`echo ${NAME:-`basename $BASEDIR .database`} | tr 'A-Z' 'a-z'`
+NAME=`echo ${NAME:-\`basename $BASEDIR .database\`} | tr 'A-Z' 'a-z'`
 
 [ "$DIRECTORY" ] ||
 {
@@ -84,7 +84,7 @@ NAME=`echo ${NAME:-`basename $BASEDIR .database`} | tr 'A-Z' 'a-z'`
 }
 
 #
-$DEBUG installation
+$DEBUG installating
 
 if [ "$TOINSTALL" ]
 then
@@ -96,10 +96,16 @@ then
   touch $BASEDIR/_host.h $BASEDIR/_node.h
 
   $VERBOSE "copying files in $DIRECTORY"
+
+  {
+    echo "TARGET = $NAME" 
+    cat $SRCDIR/hpfc_Makefile_init 
+  } > $DIRECTORY/Makefile
+
   cp $SRCDIR/hpfc_*.h \
      $SRCDIR/hpfc_*.f \
      $SRCDIR/hpfc_Makefile \
-     $BASEDIR/param_init.f \
+     $BASEDIR/param_init.m4 \
      $BASEDIR/*_host.f \
      $BASEDIR/*_host.h \
      $BASEDIR/*_node.f \
@@ -111,14 +117,13 @@ then
 
   [ "$REFFILE" ] && cp $REFFILE $DIRECTORY/$NAME.f
 
-  echo "TARGET = $NAME" > Makefile
-  ${M4} -D ARCHITETURE=`pvmgetarch` hpfc_Makefile >> Makefile
+  touch $DIRECTORY/hpfc_Makefile
 
   chmod u+w $DIRECTORY/*
 fi
 
 #
-$DEBUG make
+$DEBUG making
 
 if [ "$TOMAKE" ] 
 then
