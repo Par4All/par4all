@@ -3,13 +3,11 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/02/11 17:25:29 $, ), version $Revision$,
-# got on %D%, %T%
-# $Id$
+# $RCSfile: Validate,v $ ($Date: 1997/03/27 18:57:42 $, ), version $Revision$,
 #
 
 #
-# get the environment if necessary
+# get the environment if necessary (ok at CRI)
 
 [ "$PIPS_ROOT" ] || . /projects/Pips/pipsrc.sh
 
@@ -22,7 +20,15 @@ export PIPS_VALIDDIR
 # why does pwd sometimes return /home/users/pips on chailly?
 # sh and pwd are not very clever:-)
 
-REAL_PIPSHOME=`(cd $PIPS_HOME/../pips;pwd)`
+if [ "$PIPS_HOME" ] 
+then
+  # this is for cri...
+  REAL_PIPSHOME=`(cd $PIPS_HOME/../pips;pwd)`
+else
+  REAL_PIPSHOME=
+fi
+
+ping=${PIPS_PING:-ping}
 
 #
 
@@ -77,8 +83,8 @@ unstammer()
       unst_counter=\`expr $unst_counter + 1\`
     done | sort +1d -2 +0n -1 | uniq -1 | sort +0n -1 | cut -f 2 `
     do
-      echo -n "$unst_sep$unst_f1"
-    done
+      echo "$unst_sep$unst_f1"
+    done | tr -d '\012' 
 }
 
 #
@@ -88,8 +94,8 @@ alive()
 {
   for v_host in `echo $1 | tr ':' ' '`
   do
-    ping $v_host > /dev/null 2>&1 && echo -n ":$v_host"
-  done
+    $ping $v_host > /dev/null 2>&1 && echo ":$v_host"
+  done | tr -d '\012'
 }
 
 #
@@ -144,9 +150,9 @@ EOF
 prefix_file_exists()
 {
   $DEBUG2 " | in prefix_file_exists for $1"
-  test "`echo -n $1.* | tr -cs '*' ' '`" = " *" || \
-  { echo "1" ; $DEBUG2 " | found" ; return;}
+  for f in $1.* ; do test -f $f && return 0 ; done
   $DEBUG2 " | not found"
+  return 1
 }
 
 # returns one arg chosen randomly
@@ -168,15 +174,16 @@ randomize()
 #
 available_host()
 {
-  [ ! "`prefix_file_exists $WAITING`" ] && return 1
+  prefix_file_exists $WAITING || return 1
   #
   # waiting
   #
-  while [ ! "`prefix_file_exists $RESULT`" ]
+  until prefix_file_exists $RESULT
   do
     $DEBUG " | sleep" 
     sleep $update
   done
+  $DEBUG " | ok"
   #
   # get the result, hostname and remove the lock files
   #
