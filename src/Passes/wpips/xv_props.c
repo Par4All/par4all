@@ -1,7 +1,7 @@
 /* $Id$ */
 
 #ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 1997/09/20 12:15:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "%A% ($Date: 1998/04/16 14:45:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -15,6 +15,7 @@ char vcid_xv_props[] = "%A% ($Date: 1997/09/20 12:15:00 $, ) version $Revision$,
 #include <xview/panel.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "top-level.h"
 #include "graph.h"
