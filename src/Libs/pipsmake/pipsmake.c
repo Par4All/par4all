@@ -983,6 +983,12 @@ string res_n, module_n;
     jmp_buf long_jump_buffer;
     bool success = FALSE;
 
+    if(find_rule_by_resource(res_n) == rule_undefined) {
+	user_warning("safe_make", "Unkown resource \"%s\"\n", res_n);
+	success = FALSE;
+	return success;
+    }
+
     if( setjmp(long_jump_buffer) ) {
 	reset_make_cache();
 	user_warning("safe_make",
