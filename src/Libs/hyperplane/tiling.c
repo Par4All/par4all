@@ -1,8 +1,31 @@
-/* package hyperplane
+/* package tiling
+ *
+ * 1. Why?
+ *    - memory hierarchy (registers, caches L1/L2/L3, memory, virtual memory, out-of-core,...)
+ *    - granularity (amortization of fix costs: synchronization, communication, control,...)
+ * 2. Legality
+ *    - TO BE IMPLEMENTED
+ * 3. Selection
+ *    - directions (e.g. communication minimization): Darte/Robert, Hoegsted
+ *    - ratios (e.g. critical path minimization)
+ *    - volume (fix cost amortization) under memory constraints
+ * 4. Code Generation (Xue?)
+ *    - control and memory addressing overheads
+ * 5. Hierarchical Tiling (Ferrante/Carter,...)
+ * 6. Data vs Control Tiling
+ * 7. Extensions
+ *    - perfectly nested loops (IMPLEMENTED)
+ *    - non perfectly nested loops (e.g. matrix multiply)
+ *    - general nested loops
+ *    - sequence of loop nests (Thomson-CSF)
+ *    - ...
  *
  * $Id$
  * 
  * $Log: tiling.c,v $
+ * Revision 1.6  1999/10/05 11:23:17  irigoin
+ * Comments about tiling added at the beginning
+ *
  * Revision 1.5  1998/11/18 14:51:28  irigoin
  * insure coherency of specified tiling wrt the loop depth.
  *
