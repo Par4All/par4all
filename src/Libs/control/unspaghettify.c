@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/07/21 13:15:42 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/21 22:26:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/07/21 13:15:42 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/07/21 22:26:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -944,7 +944,7 @@ typedef successor predecessor;
 
 
 /* Remove all the predecessors of an interval: */
-void
+static void
 remove_interval_predecessors(vertex interval)
 {
     /* Detach the predecessor vertex: */
@@ -959,7 +959,7 @@ remove_interval_predecessors(vertex interval)
 
 /* Remove a predecessor pred of an interval. Return TRUE if pred was
    really in the predecessor list: */
-bool
+static bool
 remove_interval_predecessor(vertex interval,
 			    vertex pred)
 {
@@ -1064,7 +1064,7 @@ add_to_interval_or_create_new_interval(vertex node,
 }
 
 
-void	
+static void	
 display_interval_graph(graph intervals)
 {
     MAP(VERTEX, node, {
