@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/02 14:12:52 $, 
+%% $Date: 1996/09/02 18:28:52 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html}
@@ -19,6 +19,8 @@
   {http://www.cri.ensmp.fr/pips}\xspace}
 \newcommand{\FC}{\htmladdnormallink{Fabien \textsc{Coelho}}
   {http://www.cri.ensmp.fr/people/coelho}\xspace}
+\newcommand{\Xonze}{\htmladdnormallink{\textbf{X11}}
+  {http://www.x.org}\xspace}
 
 %% Stack up all the figures and the text:
 \renewcommand{\floatpagefraction}{1}
@@ -474,23 +476,29 @@ non-blocking way. The number of the button (usually 1 for left button,
 $(\verb|X|,\verb|Y|)$ of the cursor in the user area are returned by
 the following functions.
 
-
+For advanced usage, the \verb|state| value of the \textbf{X11}
+\verb|XbuttonPressedEvent| is returned. It describes the state of
+various modifiers and the mouse button just before the click. On one
+of our Sun SS4 with X11R6, its value looks like :
+\[
+\texttt{Shift}+\texttt{CapsLock}*2+\texttt{Control}*4+\texttt{Meta}*8+\texttt{Alt}*32 + \texttt{Button1}*256 + \texttt{Button2}*512 + \texttt{Button3}*1024
+\]
 \subsubsection{Waiting for a mouse click}
 The following functions block up to the user click with the mouse
 somewhere in the window:
 C:
 \begin{verbatim}
 XPOMP_display window;
-int button;
+int button, state;
 int X, Y;
-button = XPOMP_wait_mouse(window, &X, &Y);
+button = XPOMP_wait_mouse(window, &X, &Y, &state);
 \end{verbatim}
 Fortran:
 \begin{verbatim}
       integer window
-      integer button
+      integer button, state
       integer X, Y
-      call xpomp_wait_mouse(window, X, Y, button)
+      call xpomp_wait_mouse(window, X, Y, state, button)
 \end{verbatim}
 
 
@@ -500,16 +508,16 @@ somewhere in the window and do not block:
 C:
 \begin{verbatim}
 XPOMP_display window;
-int button;
+int button, state;
 int X, Y;
-button = XPOMP_is_mouse(window, &X, &Y);
+button = XPOMP_is_mouse(window, &X, &state, &Y);
 \end{verbatim}
 Fortran:
 \begin{verbatim}
       integer window
-      integer button
+      integer button, state
       integer X, Y
-      call xpomp_is_mouse(window, X, Y, button)
+      call xpomp_is_mouse(window, X, Y, state, button)
 \end{verbatim}
 
 If there is no mouse press down event, the value 0 is returned instead
