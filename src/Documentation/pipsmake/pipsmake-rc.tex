@@ -2,6 +2,11 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.16  2003/07/22 15:32:14  irigoin
+%% Reordering of sections about module_initial_precondition and inter- and
+%% intra-procedural summary preconditions. Pipsmake requires resources to be
+%% producable by at least one rule before they can be used by another one.
+%%
 %% Revision 1.15  2003/07/12 16:58:02  irigoin
 %% Resource MODULE.initial_precondition added as input to rule intraprocedural_summary_precondition
 %%
@@ -525,7 +530,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/07/12 16:58:02 $~$
+$~$Date: 2003/07/22 15:32:14 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1970,6 +1975,100 @@ summary_transformer             > MODULE.summary_transformer
         < MODULE.summary_effects
 \end{verbatim}
 
+\subsubsection{Initial Precondition}
+\label{subsubsection-initial-precs}
+\index{Precondition (Initial)}
+\index{Initial Precondition}
+
+All \texttt{DATA} initializations contribute to the global initial state
+of the program. The contribution of each module is computed independently.
+Note that variables statically initialized behave as static variables and
+are preserved between calls according to Fortran standard. The module
+initial states are abstracted by an initial precondition based on integer
+scalar variables only.
+
+\begin{verbatim}
+initial_precondition     > MODULE.initial_precondition
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < MODULE.summary_effects
+\end{verbatim}
+
+All initial preconditions, including the initial precondition for the
+main, are combined to define the program precondition which is an
+abstraction of the program initial state.
+
+\begin{verbatim}
+program_precondition     > PROGRAM.program_precondition
+        < PROGRAM.entities
+        < ALL.initial_precondition
+\end{verbatim}
+
+The program precondition can only be used for the initial state of the
+main procedure. Although it appears below for all interprocedural analyses
+and it always is computed, it only is used when a main procedure is
+available.
+
+\subsubsection{Initial Precondition}
+\label{subsubsection-initial-precs}
+\index{Precondition (Initial)}
+\index{Initial Precondition}
+
+All \texttt{DATA} initializations contribute to the global initial state
+of the program. The contribution of each module is computed independently.
+Note that variables statically initialized behave as static variables and
+are preserved between calls according to Fortran standard. The module
+initial states are abstracted by an initial precondition based on integer
+scalar variables only.
+
+\begin{verbatim}
+initial_precondition     > MODULE.initial_precondition
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < MODULE.summary_effects
+\end{verbatim}
+
+All initial preconditions, including the initial precondition for the
+main, are combined to define the program precondition which is an
+abstraction of the program initial state.
+
+\begin{verbatim}
+program_precondition     > PROGRAM.program_precondition
+        < PROGRAM.entities
+        < ALL.initial_precondition
+\end{verbatim}
+
+The program precondition can only be used for the initial state of the
+main procedure. Although it appears below for all interprocedural analyses
+and it always is computed, it only is used when a main procedure is
+available.
+
+\subsubsection{Intraprocedural Summary Precondition}
+\index{Intraprocedural Summary Precondition}
+\index{Precondition (Summary)}
+
+A summary precondition is of type "transformer", but the argument list
+must be empty as it is a simple predicate on the initial state. So in fact
+it is a state predicate.
+
+The intraprocedural summary precondition uses DATA statement for the main
+module and is the TRUE constant for all other modules.
+
+\begin{verbatim}
+intraprocedural_summary_precondition            > MODULE.summary_precondition
+        < PROGRAM.entities
+        < MODULE.initial_precondition
+\end{verbatim}
+
+Interprocedural summary preconditions can be requested instead. They are
+not described in the same section in order to introduce the summary
+precondition resource at the right place in \verb/pipsmake.rc/.
+
+No menu is declared to select either intra- or interprocedural summary
+preconditions.
+
 \subsubsection{Preconditions}
 \label{subsubsection-preconditions}
 \index{Precondition}
@@ -2084,33 +2183,24 @@ preconditions_inter_full        > MODULE.preconditions
 
 \end{verbatim}
 
-\subsubsection{Summary Precondition}
+\subsubsection{Interprocedural Summary Precondition}
 \index{Summary Precondition}
 \index{Precondition (Summary)}
 
-A summary precondition is of type "transformer", but the argument list
-must be empty as it is a simple predicate on the initial state.
+By default, summary preconditions are computed intraprocedurally. The
+interprocedural option must be explictly activated.
 
-The intraprocedural summary precondition uses DATA statement for the main
-module and is the TRUE constant for all other modules.
-
-\begin{verbatim}
-intraprocedural_summary_precondition            > MODULE.summary_precondition
-        < PROGRAM.entities
-        < MODULE.initial_precondition
-\end{verbatim}
-
-An interprocedural precondition for a module is derived from all its call
-sites. Of course, preconditions must be known for all its callers'
-statements.  The summary precondition is the convex hull of all call
-sites preconditions, translated into a proper environment which is {\em
-not} necessarily the module's frame. Because of {\em invisible} global
-and static variables and aliasing, it is difficult for a caller to know which
-variables might be used by the caller to represent a given memory
-location. To avoid the problem, the current summary precondition is
-always translated into the {\em caller}'s frame. So each module must
-first translate its summary precondition, when receiving it from the
-resource manager ({\em pipsdbm}) before using it.
+An interprocedural summary precondition for a module is derived from all
+its call sites. Of course, preconditions must be known for all its
+callers' statements.  The summary precondition is the convex hull of all
+call sites preconditions, translated into a proper environment which is
+{\em not} necessarily the module's frame. Because of {\em invisible}
+global and static variables and aliasing, it is difficult for a caller to
+know which variables might be used by the caller to represent a given
+memory location. To avoid the problem, the current summary precondition is
+always translated into the {\em caller}'s frame. So each module must first
+translate its summary precondition, when receiving it from the resource
+manager ({\em pipsdbm}) before using it.
 
 Note: the previous algorithm was based on a on-the-fly reduction by
 convex hull. Each time a call site was encountered while computing a
@@ -2122,7 +2212,12 @@ preconditions of the modules had to be reset to the infeasible
 
 An infeasible precondition means that the module is never called although
 a main is present in the workspace. If no main module is available, a TRUE
-precondition is generated.
+precondition is generated. Note that, in both cases, the impact of static
+initializations propagated by link edition is taken into account although
+this is prohibited by the Fortran Standard which requires a BLOCKDATA
+construct for such initializations. In other words, a module which is
+never called has an impact on the program execution and its declarations
+should not be destroyed.
 
 \begin{verbatim}
 interprocedural_summary_precondition            > MODULE.summary_precondition
@@ -2141,41 +2236,6 @@ summary_precondition            > MODULE.summary_precondition
         < CALLERS.preconditions
         < MODULE.callers
 \end{verbatim}
-
-\subsubsection{Initial Precondition}
-\label{subsubsection-initial-precs}
-\index{Precondition (Initial)}
-\index{Initial Precondition}
-
-All \texttt{DATA} initializations contribute to the global initial state
-of the program. The contribution of each module is computed independently.
-Note that variables statically initialized behave as static variables and
-are preserved between calls according to Fortran standard. The module
-initial states are abstracted by an initial precondition based on integer
-scalar variables only.
-
-\begin{verbatim}
-initial_precondition     > MODULE.initial_precondition
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.cumulated_effects
-        < MODULE.summary_effects
-\end{verbatim}
-
-All initial preconditions, including the initial precondition for the
-main, are combined to define the program precondition which is an
-abstraction of the program initial state.
-
-\begin{verbatim}
-program_precondition     > PROGRAM.program_precondition
-        < PROGRAM.entities
-        < ALL.initial_precondition
-\end{verbatim}
-
-The program precondition can only be used for the initial state of the
-main procedure. Although it appears below for all interprocedural analyses
-and it always is computed, it only is used when a main procedure is
-available.
 
 \subsubsection{Total Preconditions}
 \label{subsubsection-ototal-preconditions}
