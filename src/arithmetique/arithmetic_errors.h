@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.28  2000/07/26 09:11:58  coelho
+ * hop.
+ *
  * Revision 1.27  2000/07/26 09:07:32  coelho
  * *** empty log message ***
  *
@@ -78,7 +81,7 @@ const unsigned int any_exception_error = ~0;
 
 #define TRY else
 
-unsigned int the_last_just_thrown_exception;
+extern unsigned int the_last_just_thrown_exception;
 #define RETHROW() THROW(the_last_just_thrown_exception)
 
 #endif /* LINEAR_ARITHMETIC_ERROR_INCLUDED */
