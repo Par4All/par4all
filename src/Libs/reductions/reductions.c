@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1997/04/16 11:45:26 $, 
+ * $Date: 1997/07/18 15:22:27 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -215,9 +215,9 @@ static bool safe_effects_for_reductions(statement s, reductions rs)
 	if ((effect_write_p(e) && !gen_in_list_p(effect_reference(e), lr)) ||
 	    io_effect_entity_p(effect_variable(e)))
 	{
-	    pips_debug(8, "effect on %s (ref 0x%x) not trusted\n",
+	    pips_debug(8, "effect on %s (ref %#p) not trusted\n",
 		       entity_name(effect_variable(e)), 
-		       (unsigned int) effect_reference(e));
+		       effect_reference(e));
 
 	    gen_free_list(lr);
 	    return FALSE;
@@ -422,8 +422,8 @@ build_creductions_of_statement(
     /* list of candidate entities */
     le = list_of_reduced_variables(node, ls);
 
-    pips_debug(5, "stat %s 0x%x: %d candidate(s)\n",
-	       note_for_statement(node), (unsigned int) node, gen_length(le));
+    pips_debug(5, "stat %s %#p: %d candidate(s)\n",
+	       note_for_statement(node), node, gen_length(le));
 
     /* for each candidate, extract the reduction if any */
     MAP(ENTITY, var,
@@ -432,8 +432,8 @@ build_creductions_of_statement(
 	le);
 
     /* store the result */
-    pips_debug(5, "stat %s 0x%x -> %d reductions\n", 
-	       note_for_statement(node), (unsigned int) node, gen_length(lr));
+    pips_debug(5, "stat %s %#p -> %d reductions\n", 
+	       note_for_statement(node), node, gen_length(lr));
 
     store_cumulated_reductions(node, make_reductions(lr)); 
     gen_free_list(le);
