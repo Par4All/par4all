@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1997/01/04 22:12:05 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1997/01/13 10:40:26 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -310,6 +310,9 @@ check_install:
 include \$(ROOT)/Include/define_libraries.make
 include \$(ROOT)/Include/makefile_macros.\$(ARCH)
 include \$(CONFIG)
+#
+# The software architecture (compilers and options...) used.
+CPPFLAGS += -DSOFT_ARCH=\$(ARCH)
 #
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
