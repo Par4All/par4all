@@ -387,7 +387,7 @@ text text_transformer(transformer tran)
 	    }
 	  
 	    system_text_format(crt_line, str_prefix, txt, ps, 
-			       pips_user_value_name, foresys);
+			       (char * (*)(Variable)) pips_user_value_name, foresys);
 
 	}
       
