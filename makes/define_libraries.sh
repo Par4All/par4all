@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.11  1997/03/27 13:51:20  coelho
+# *_DOCS added.
+#
 # Revision 1.10  1997/03/27 13:39:00  coelho
 # fiew more comments.
 #
@@ -12,6 +15,7 @@
 #
 # NEWGEN
 
+NEWGEN_DOCS='doc'
 NEWGEN_ORDERED_LIBS='doc scripts genC'
 
 NEWGEN_LIBS='-lgenC'
@@ -19,6 +23,7 @@ NEWGEN_LIBS='-lgenC'
 #
 # C3/LINEAR
 
+LINEAR_DOCS=''
 LINEAR_ORDERED_LIBS='arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre plint sparse_sc union'
 
 # removed because not used by pips: plint
@@ -29,6 +34,10 @@ LINEAR_LIBS='-lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -ls
 # PIPS
 
 # static ordering for bootstraping PIPS...
+
+# many doc dirs are skipped (would be long?)
+PIPS_DOCS='Documentation constants help manl newgen'
+
 PIPS_ORDERED_LIBS='xpomp text-util properties misc ri-util conversion movements pipsdbm comp_sections transformer bootstrap control hyperplane flint syntax prettyprint static_controlize effects semantics complexity continuation reductions regions callgraph icfg paf-util pip ricedg array_dfg prgm_mapping scheduling reindexing chains rice transformations hpfc atomizer wp65 pipsmake top-level pips tpips wpips'
 
 # all libraires for pips
