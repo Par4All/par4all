@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/20 19:43:40 $, 
+# $Date: 1996/08/20 19:44:26 $, 
 
 MANS =	Delete.l \
 	Display.l \
@@ -12,7 +12,7 @@ MANS =	Delete.l \
 
 HTMS =	$(MANS:.l=.html)
 
-SOURCES = $(MANS)
+SOURCES = $(MANS) $(HTMS)
 
 INSTALL_DOC_DIR=$(PIPS_ROOT)/Doc/manl
 
