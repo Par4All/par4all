@@ -551,8 +551,8 @@ hierarchize_control_list(vertex interval,
 	if (exit_node != control_undefined) {
             pips_debug(0, "\nExit node %p\n", exit_node);
         }
-	pips_debug(0, "new_entry_node = %p, new_exit_node = %p\n",
-		   new_entry_node, new_exit_node);
+	pips_debug(0, "New unstructured %p: new_entry_node = %p, new_exit_node = %p\n",
+		   new_unstructured, new_entry_node, new_exit_node);
     }
     /* Now the hard work: replace carefully the old control nodes by
        new one in the spaghetti plate... */
@@ -649,6 +649,8 @@ hierarchize_control_list(vertex interval,
     }
     pips_assert("new_exit_node cannot have a successor.",
 		control_successors(new_exit_node) == NIL);
+    ifdebug(7)
+	print_statement(control_statement(entry_node));
 }
 
 
