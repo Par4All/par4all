@@ -113,4 +113,4 @@ typedef struct Svecteur Sbase, * Pbase;
 #define FWD_OFL_CTRL 1 /* overflows are treated by the calling procedure */
 #define NO_OFL_CTRL 0  /* overflows are not trapped at all  (dangerous !) */
 
-#endif VECTEUR_INCLUDED
+#endif /* VECTEUR_INCLUDED */
