@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/06/15 14:11:16 $, )
+ * ($Date: 1996/07/23 11:55:00 $, )
  */
 
 #include "defines-local.h"
@@ -143,8 +143,8 @@ static void array_as_template(entity array)
 
     for(; ndim>0; ndim--)
         l = CONS(ALIGNMENT, make_alignment(ndim, ndim,
-                                           Value_to_expression(1),
-                                           Value_to_expression(0)), l);
+                                           int_to_expression(1),
+                                           int_to_expression(0)), l);
 
     store_hpf_alignment(array, make_align(l, array));
 }
@@ -257,8 +257,8 @@ extract_the_align(
 	      
 	    aligns = CONS(ALIGNMENT,
 			  make_alignment(dim, dim, 
-					 Value_to_expression(1),
-					 Value_to_expression(-alower+tlower)),
+					 int_to_expression(1),
+					 int_to_expression(-alower+tlower)),
 			  aligns);
 	}
     }
