@@ -165,10 +165,12 @@ char * argv[];
 
     /* Make everything */
     if(setjmp(pips_top_level)) {
+	/* no need to pop_pips_context() at top-level */
 	make_close_program();
 	exit(1);
     }
     else {
+	push_pips_context(&pips_top_level);
 	if (selected_rules != NIL) {
 	    /* Select rules */
 	    MAPL(r_cp, {
