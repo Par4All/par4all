@@ -1422,6 +1422,7 @@ Ptsg *gs,*gsop;
 	    base_rm(tmp_base);
 	    return(NIL);
 	}
+	else UNCATCH(overflow_error);
     }
 
     base_rm(tmp_base);
