@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1996/12/26 17:27:11 $, 
+ * $Date: 1997/01/04 14:34:19 $, 
  */
 
 #include "defines-local.h"
@@ -851,10 +851,10 @@ bool full_define_p(reference r, list /* of loops */ ll)
 	 */
 	if (!integer_constant_expression_p(inc) ||
 	    integer_constant_expression_value(inc)!=1 ||
-	    !expression_equal_p(range_lower(rg), dimension_lower(dim)) ||
-	    !expression_equal_p(range_upper(rg), dimension_upper(dim)))
+	    !same_expression_p(range_lower(rg), dimension_lower(dim)) ||
+	    !same_expression_p(range_upper(rg), dimension_upper(dim)))
 	{
-	    pips_debug(9, "uncomplete scan of %s[dim=%d]\n", 
+	    pips_debug(9, "incomplete scan of %s[dim=%d]\n", 
 		       entity_name(array), ndim);
 	    gen_free_list(lseen);
 	    return FALSE;
