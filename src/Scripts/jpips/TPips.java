@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: TPips.java,v $
+ * Revision 1.4  1998/07/02 15:03:34  coelho
+ * synchronized sendCommand...
+ *
  * Revision 1.3  1998/07/01 13:32:34  coelho
  * more comments.
  *
@@ -143,7 +146,7 @@ public class TPips
     * @param command the message
     * @return the tpips response
     */  
-  public String sendCommand(String command)
+  synchronized public String sendCommand(String command)
     {
       String s = replaceCommand(command);
       if(s == null) return null;
