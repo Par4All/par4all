@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/04/24 17:01:10 $, ) 
+ * ($Date: 1995/04/24 18:23:41 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -318,6 +318,8 @@ list /* of entities */ l, lp, ll, /* of expressions */ ld;
     return(result);
 }
 
+/*  remaps src to trg
+ */
 statement hpf_remapping(src, trg)
 entity src, trg;
 {
@@ -358,7 +360,7 @@ entity src, trg;
  * how: polyhedron technique.
  * input: s, the statement.
  * output: statements *hsp and *nsp, the host and SPMD node code.
- * side effects: (node?)
+ * side effects: (none?)
  * bugs or features:
  */
 void remapping_compile(s, hsp, nsp)
@@ -376,8 +378,8 @@ statement s, *hsp /* Host Statement Pointer */, *nsp /* idem Node */;
      {
 	 renaming r = RENAMING(CAR(cr));
 
-	 l = CONS(STATEMENT,
-		  hpf_remapping(renaming_old(r), renaming_new(r)), l);
+	 l = CONS(STATEMENT, hpf_remapping(renaming_old(r), renaming_new(r)),
+		  l);
      },
 	 load_renamings(s));
 
