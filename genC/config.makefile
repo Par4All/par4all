@@ -43,6 +43,7 @@ LIB_CFILES=\
         build.c \
         genC.c \
         genClib.c \
+	tabulated.c \
         hash.c \
         set.c \
         list.c \
