@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/10/25 21:41:14 $, )
+# ($Date: 1996/12/27 11:00:57 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -83,6 +83,7 @@ endif
 
 ifeq ($(PVM_ARCH),SUN4SOL2)
 NETWORK = 1
+RUNTIME_LIBS	+= -lnsl -lsocket
 endif
 
 ifeq ($(PVM_ARCH),SUNMP)
