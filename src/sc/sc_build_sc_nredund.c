@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 1996/08/07 13:36:43 $, 
+ * $Date: 1997/09/08 19:25:35 $, 
  */
 
 #include <stdio.h>
@@ -10,7 +10,6 @@
 #include "contrainte.h"
 #include "sc.h"
 
-EXCEPTION overflow_error;
 
 /* This function returns TRUE if the inequation ineq is redundant for 
 *  the system  ps and FALSE otherwise.
@@ -399,9 +398,11 @@ int n;
 			    if (sign >0) tab_info[rank_hr][2] --;
 			    else if (sign <0) tab_info[rank_hr][3]--; 
 			}
+
 			else { pred = pred->succ;
 			       contrainte_reverse(ineg);
 			   }
+			UNCATCH(overflow_error);
 		    }
 		}
 	    }
@@ -448,6 +449,7 @@ Variable var;
 	    ineg = sc_integer_inequalities_combination_ofl_ctrl
 		(sc, posit, negat, var, &result, FWD_OFL_CTRL);
 	    contrainte_rm(ineg);
+	    UNCATCH(overflow_error);
 	}
 
 	contrainte_rm(posit);
