@@ -1,15 +1,20 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1995/12/05 14:06:08 $, 
+ * $Date: 1996/07/22 17:16:38 $, 
  */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/dirent.h>
+/* #include <sys/types.h> */
+/* #include <sys/dirent.h> */
 #include <sys/stat.h>
 #include <sys/param.h>
+
+#ifndef __USE_BSD
+#define __USE_BSD
+#endif
 #include <dirent.h>
 #include <setjmp.h>
 
@@ -304,16 +309,14 @@ bool directory_exists_p(name)
 char *name;
 {
     static struct stat buf;
-
-    return((stat(name, &buf) == 0) && (buf.st_mode & S_IFDIR));
+    return (stat(name, &buf) == 0) && S_ISDIR(buf.st_mode);
 }
 
 bool file_exists_p(name)
 char *name;
 {
     static struct stat buf;
-
-    return((stat(name, &buf) == 0) && (buf.st_mode & S_IFREG));
+    return (stat(name, &buf) == 0) && S_ISREG(buf.st_mode);
 }
 
 
