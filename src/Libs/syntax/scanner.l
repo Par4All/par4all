@@ -182,8 +182,10 @@ DCON (({MANT}|{UICON}){DEXP}?)
 			}
 
 .			{
-				user_error("sslex", 
+				user_warning("sslex", 
                                    "[scanner] illegal character %c (hex %x)\n",
                                    yytext[0], yytext[0]);
+                                ParserError("Lexical Analysis", 
+                                            "Check standard Fortran character set.\n");
 			}
 %%
