@@ -43,6 +43,7 @@ LIB_CFILES=	replace.c \
 		nest_parallelization.c\
 		dead_code_elimination.c \
 		privatize.c \
+		array_privatization.c \
 		simple_atomize.c \
 		standardize_structure.c \
 		loop_normalize.c
