@@ -1,0 +1,32 @@
+#! /bin/sh
+#
+# $RCSfile: pips_at_night,v $ version $Revision$
+# ($Date: 1995/09/15 19:13:27 $, )
+# 
+# what to do at night...
+#
+# source environment if needed.
+
+[ "$PIPS_DIR" ] || . /projects/Pips/pipsrc.sh
+NAME=`whoami`
+
+{
+  #
+  # Delete old workspaces...
+
+  $PIPS_UTILDIR/search-pips -w -m 14 -D
+
+  #
+  # Remove core files older than one month:
+
+  $PIPS_UTILDIR/search-pips -c -m 7 -e "rm {} ;" 
+
+  #
+  # Compile Production
+
+  $PIPS_UTILDIR/make-pips -p 2>&1 | mail -s "make-pips night report" $NAME
+  
+  # Validate Pips
+  Validate -vt
+
+} > /dev/null 2>&1 
