@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.334  1998/09/28 15:42:18  ancourt
+# add css files to the kept file list
+#
 # Revision 1.333  1998/09/16 11:16:28  coelho
 # .quick-install dependencies fixed?
 #
@@ -544,7 +547,9 @@ endif
 	\$(LX2HTML) \$(L2HFLAGS) \$< ;\
 	# Does not removed the .pl files since it is used
 	# for cross-referencing between HTML articles:
-	\$(RM) \$*/*.aux \$*/*.idx \$*/*.log \$*/*.tex \$*/*.css \
+	# Does not removed the .css files since it is included 
+	# in the generated HTML articles:
+	\$(RM) \$*/*.aux \$*/*.idx \$*/*.log \$*/*.tex \
 	    \$*/.[A-Z]* ;
 	# local .ps.gz if available
 	test ! -f \$*.ps || { cp \$*.ps \$* ; \$(ZIP) \$*/\$*.ps ; }
