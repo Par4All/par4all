@@ -76,7 +76,7 @@ list effects_filter(list l_effs, string str_filter)
 }
 
 static text
-resource_text_flt(entity module. int margin, statement stat, p_icfgpe_print_stuff ips)
+resource_text_flt(entity module, int margin, statement stat, p_icfgpe_print_stuff ips)
 {
   list l_eff = load_list_icfg(ips->resource, stat);
   list l_eff_flt = effects_filter(l_eff, "KMAX");
