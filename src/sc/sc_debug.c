@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_debug.c,v $ version $Revision$
- * date: $Date: 1996/08/08 14:45:44 $, 
+ * date: $Date: 2002/06/13 08:21:11 $, 
  */
 
 #include <stdio.h>
@@ -15,7 +15,7 @@
 
 #define SC_DEBUG_LEVEL "SC_DEBUG_LEVEL"
 
-char* (*default_variable_to_string)(Variable) = variable_default_name;
+static char* (*default_variable_to_string)(Variable) = variable_default_name;
 
 int sc_debug_level = 0;
 
