@@ -23,7 +23,7 @@ It calls
 .B Pips
 with appropriate arguments, and close the workspace afterwards.
 .\"
-.SH OPTIONS
+.SH OPTIONS 
 .TP
 .B \-w
 .I wspace
