@@ -1744,7 +1744,6 @@ void Polyhedron_Free(Polyhedron *Pol) {
 void Domain_Free(Polyhedron *Pol)  {
 
   int i,size;
-  int NbRows, NbColumns;
   Value *p;
   
   if(!Pol)
@@ -1752,8 +1751,6 @@ void Domain_Free(Polyhedron *Pol)  {
   if (Pol->next) 
     Domain_Free(Pol->next);
 
-  NbRows = Pol->NbConstraints + Pol->NbRays;
-  NbColumns = Pol->Dimension+2;
   size = Pol->p_Init_size;
   p = Pol->p_Init;
   for(i=0;i<size;i++)
@@ -2320,7 +2317,7 @@ int PolyhedronIncludes(Polyhedron *Pol1,Polyhedron *Pol2) {
  */
 Polyhedron *AddPolyToDomain(Polyhedron *Pol,Polyhedron *PolDomain) {
   
-  Polyhedron *p, *p_domain_end = (Polyhedron *) 0;
+  Polyhedron *p, *pnext, *p_domain_end = (Polyhedron *) 0;
   int Redundant;
   
   if (!Pol) 
@@ -2342,11 +2339,17 @@ Polyhedron *AddPolyToDomain(Polyhedron *Pol,Polyhedron *PolDomain) {
   
   /* Test 'Pol' against the domain 'PolDomain' */
   Redundant = 0;
-  for (p=PolDomain,PolDomain=(Polyhedron *)0; p; p=p->next) {
+  for (p=PolDomain,PolDomain=(Polyhedron *)0; p; p=pnext) {
     
     /* If 'Pol' covers 'p' */    
-    if (PolyhedronIncludes(Pol, p)) continue;
-    
+    if (PolyhedronIncludes(Pol, p))
+    {
+       /* free p */
+		 pnext = p->next;
+       Polyhedron_Free( p );
+       continue;
+    }
+
     /* Add polyhedron p to the new domain list */
     if (!PolDomain) PolDomain = p; else p_domain_end->next = p;
     p_domain_end = p;
@@ -2356,6 +2359,7 @@ Polyhedron *AddPolyToDomain(Polyhedron *Pol,Polyhedron *PolDomain) {
       Redundant = 1;
       break;
     }
+    pnext = p->next;
   }
   if (!Redundant) {  
     
@@ -3587,7 +3591,8 @@ Polyhedron *Polyhedron_Scan(Polyhedron *D, Polyhedron *C,unsigned NbMaxRays) {
   /* Vin100, aug 16, 2001:  The context is intersected with D */
   D2 = DomainIntersection( C1, D, NbMaxRays);
 
-  for (i=0; i<dim; i++) {
+  for (i=0; i<dim; i++)
+  {
     Vector_Set(Mat->p_Init,0,D2->Dimension*(D2->Dimension + 2));
     for (j=i+1; j<dim; j++) {
       value_set_si(Mat->p[j-i-1][j+1],1);
@@ -3598,10 +3603,12 @@ Polyhedron *Polyhedron_Scan(Polyhedron *D, Polyhedron *C,unsigned NbMaxRays) {
     if (!last) res = last = tmp;
     else { last->next = tmp; last = tmp; }
     C2 = DomainIntersection(C1, D1, NbMaxRays);
-    if (i>0) Polyhedron_Free(C1);
+    Domain_Free(C1);
     C1 = C2;
-    if (Mat->NbRows) Polyhedron_Free(D1);
+    if (Mat->NbRows) Domain_Free(D1);
   }
+  Domain_Free(D2);
+  Domain_Free(C1);
   Matrix_Free(Mat);
   return res;
 } /* Polyhedron_Scan */
@@ -4119,9 +4126,9 @@ Polyhedron *DomainAddConstraints(Polyhedron *Pol,Matrix *Mat,unsigned NbMaxRays)
  * WARNING: if all polyhedra are not of same geometrical dimension
  *          duplicates may appear.
  */
-Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
+Polyhedron *Disjoint_Domain( Polyhedron *P, int flag, unsigned NbMaxRays )
 {
-	Polyhedron *lP, *P, *tmp, *Result, *lR, *prec, *reste;
+	Polyhedron *lP, *tmp, *Result, *lR, *prec, *reste;
 	Polyhedron *p1, *p2, *p3, *Pol1, *dx, *d1, *d2, *pi, *newpi;
 	int i;
 
@@ -4131,10 +4138,9 @@ Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
 			"invalidarg", "flag should be equal to 0 or 1");
 		return (Polyhedron*) 0;
 	}
-	if(!Pol) return (Polyhedron*) 0;
-	if(!Pol->next) return Polyhedron_Copy(Pol);
+	if(!P) return (Polyhedron*) 0;
+	if(!P->next) return Polyhedron_Copy(P);
 
-	P = Domain_Copy(Pol);
 	Result = (Polyhedron *)0;
 
 	for(lP=P;lP;lP=lP->next)
@@ -4142,7 +4148,8 @@ Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
 		reste = Polyhedron_Copy(lP);
 		prec = (Polyhedron *)0; /* preceeding lR */
 		/* Intersection with each polyhedron of the current Result */
-		for(lR=Result;lR && reste;lR=lR->next)
+		lR=Result;
+		while( lR && reste )
 		{
 			/* dx = DomainIntersection(reste,lR->P,WS); */
 			dx = (Polyhedron *)0;
@@ -4154,9 +4161,15 @@ Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
 			}
 
 			/* if empty intersection, continue */
-			if(!dx) continue;
+			if(!dx)
+			{	prec = lR;
+				lR=lR->next;
+				continue;
+			}
 			if (emptyQ(dx)) {	
 				Domain_Free(dx);
+				prec = lR;
+				lR=lR->next;
 				continue;
    		}
 
@@ -4199,15 +4212,15 @@ Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
 					}
 					if( newpi && emptyQ( newpi ) )
 					{
-						Polyhedron_Free( newpi );
+						Domain_Free( newpi );
 						newpi = (Polyhedron *)0;
 					}
 					if( pi != p1 )
-						Polyhedron_Free( pi );
+						Domain_Free( pi );
 					pi = newpi;
 				}
 				if( pi != p1 )
-					Polyhedron_Free( pi );
+					Domain_Free( pi );
 			}
 
 			/* and now d2 */
@@ -4246,15 +4259,15 @@ Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
 						}
 						if( newpi && emptyQ( newpi ) )
 						{
-							Polyhedron_Free( newpi );
+							Domain_Free( newpi );
 							newpi = (Polyhedron *)0;
 						}
 						if( pi != p1 )
-							Polyhedron_Free( pi );
+							Domain_Free( pi );
 						pi = newpi;
 					}
 					if( pi && pi!=p1 )
-						Polyhedron_Free( pi );
+						Domain_Free( pi );
 				}
 				if( Pol1 )
 					Domain_Free( Pol1 );
@@ -4262,28 +4275,23 @@ Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
 			}
 			/* ok, d1 and d2 are computed */
 
-			/* now, replace lR by d2+dx and set reste to d1 */
+			/* now, replace lR by d2+dx (at least dx is nonempty) and set reste to d1 */
 			if( d1 && emptyQ(d1) )
 			{
-				Polyhedron_Free( d1 );
+				Domain_Free( d1 );
 				d1 = NULL;
 			}
 			if( d2 && emptyQ(d2) )
 			{
-				Polyhedron_Free( d2 );
+				Domain_Free( d2 );
 				d2 = NULL;
-			}
-			if( dx && emptyQ(dx) )
-			{
-				Polyhedron_Free( dx );
-				dx = NULL;
 			}
 
 			/* set reste */
 			Domain_Free( reste );
 			reste = d1;
 
-			/* add d2 to the list */
+			/* add d2 at beginning of Result */
 			if( d2 )
 			{
 				for( tmp=d2 ; tmp->next ; tmp=tmp->next )
@@ -4294,8 +4302,8 @@ Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
 					prec = tmp;
 			}
 
-			/* add dx to the list */
-			if( dx )
+			/* add dx at beginning of Result */
+//			if( dx )
 			{
 				for( tmp=dx ; tmp->next ; tmp=tmp->next )
 					;
@@ -4310,10 +4318,10 @@ Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
 				errormsg1( "Disjoint_Domain","internalerror","internal error");
 			prec->next = lR->next;
 			Polyhedron_Free( lR );
-			lR = prec;
-
+			lR = prec->next;
 		} /* end for result */
 
+printf("0x%08x\n", dx);
 		  /* if there is something left, add it to Result : */
 		if(reste)
 		{

@@ -566,6 +566,7 @@ static void addeliminatedparams_evalue(evalue *e,Matrix *CT) {
   
   /* Transform the references in e, using ref */
   aep_evalue(e,ref);
+  free( ref );
   return;
 } /* addeliminatedparams_evalue */
 
@@ -742,7 +743,8 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
   C = Universe_Polyhedron(0);
   S = Polyhedron_Scan(T,C,MAXRAYS);
   Polyhedron_Free(C);
-  
+  Polyhedron_Free(T);
+
 #ifdef EDEBUG6
   for(i=0;i<=(d+1);i++) {
     value_print(stderr,P_VALUE_FMT,min[i]);
@@ -753,14 +755,14 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
   fprintf(stderr,"\n");
 #endif
     
-  if (!cherche_min(min,S,1)) {
-    Polyhedron_Free(T);
+  if (!cherche_min(min,S,1))
+  {
     for(i=0;i<=(d+1);i++)
       value_clear(min[i]);
     value_clear(tmp);
     return(NULL);
   }
-  Polyhedron_Free(S);
+  Domain_Free(S);
   
 #ifdef EDEBUG6
   fprintf(stderr,"min = ( ");
@@ -1720,9 +1722,9 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
 /* Procedure to count points in a parameterized polytope.         */
 /* Returns a list of validity domains + evalues EP                */
 /*----------------------------------------------------------------*/
-Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS)
+Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS)
 {
-  Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD;
+  Polyhedron *L, *CQ, *CQ2, *LQ, *U, *CEq, *rVD, *P;
   Matrix *CT;
   Param_Polyhedron *PP;
   Param_Domain   *Q;
@@ -1732,6 +1734,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS)
   Enumeration *en, *res;
 
   res = NULL;
+  P = Pi;
 
 #ifdef EDEBUG2
   fprintf(stderr,"C = \n");
@@ -1765,8 +1768,12 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS)
     hdim -= CT->NbColumns-CT->NbRows;
     
     /* Don't call Polyhedron2Param_Domain if there are no parameters */
-    if(nb_param == 0) {
-      return(Enumerate_NoParameters(P,C,CT,CEq,MAXRAYS));
+    if(nb_param == 0)
+    {
+	    res = Enumerate_NoParameters(P,C,CT,CEq,MAXRAYS);
+	    if( P != Pi )
+		    Polyhedron_Free( P );
+	    return( res );
     }  
   }
 
@@ -1985,7 +1992,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS)
       /* Put back the original parameters into result */
       /* (equalities have been eliminated)            */
       if(CT) 
-	addeliminatedparams_evalue(&res->EP,CT);
+          addeliminatedparams_evalue(&res->EP,CT);
       
 #ifdef EPRINT
       fprintf(stdout,"\nEhrhart Polynomial:\n");
@@ -1997,15 +2004,16 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS)
     }
   }
 
+  if( P != Pi )
+ 	Polyhedron_Free( P );
   /* Clear all the 'Value' variables */
   for( np=0; np<nb_param ; np++ )
   {
     value_clear(lcm[np]); value_clear(m1[np]);
   }
-
   value_clear(hdv);
+
   return res;
-  
 } /* Polyhedron_Enumerate */ 
 
 #ifdef EMAIN
@@ -2015,7 +2023,7 @@ int main() {
   char str[1024];
   Matrix *C1, *P1;
   Polyhedron *C, *P;
-  Enumeration *en;
+  Enumeration *en, *ee;
   
 #ifdef EP_EVALUATION
   Value *p, *tmp;
@@ -2036,39 +2044,49 @@ int main() {
   /* Read the name of the parameters */
   param_name = Read_ParamNames(stdin,C->Dimension);
   en = Polyhedron_Enumerate(P,C,1024);
-  
-#ifdef EP_EVALUATION
-  if(!isatty(0) || C->Dimension == 0)
-  {  /* no tty input or no polyhedron -> no evaluation. */
-     free(param_name);
-     return 0 ;
-  }
 
-  printf("Evaluation of the Ehrhart polynomial :\n");
-  p = (Value *)malloc(sizeof(Value) * (C->Dimension));
-  for(i=0;i<C->Dimension;i++) 
-    value_init(p[i]);
-  FOREVER {
-    fflush(stdin);
-    printf("Enter %d parameters : ",C->Dimension);
-    for(k=0;k<C->Dimension;++k) {
-      scanf("%s",str);
-      value_read(p[k],str);
-    }
-    fprintf(stdout,"EP( ");
-    value_print(stdout,VALUE_FMT,p[0]);
-    for(k=1;k<C->Dimension;++k) {
-      fprintf(stdout,",");
-      value_print(stdout,VALUE_FMT,p[k]);
-    }  
-    fprintf(stdout," ) = ");
-    value_print(stdout,VALUE_FMT,*(tmp=compute_poly(en,p)));
-    free(tmp);
-    fprintf(stdout,"\n");  
-  }		
+#ifdef EP_EVALUATION
+  if( isatty(0) && C->Dimension != 0)
+  {  /* no tty input or no polyhedron -> no evaluation. */
+	  printf("Evaluation of the Ehrhart polynomial :\n");
+	  p = (Value *)malloc(sizeof(Value) * (C->Dimension));
+	  for(i=0;i<C->Dimension;i++) 
+   	 value_init(p[i]);
+	  FOREVER {
+   	 fflush(stdin);
+   	 printf("Enter %d parameters : ",C->Dimension);
+   	 for(k=0;k<C->Dimension;++k) {
+      	scanf("%s",str);
+      	value_read(p[k],str);
+   	 }
+   	 fprintf(stdout,"EP( ");
+   	 value_print(stdout,VALUE_FMT,p[0]);
+   	 for(k=1;k<C->Dimension;++k) {
+      	fprintf(stdout,",");
+      	value_print(stdout,VALUE_FMT,p[k]);
+   	 }  
+   	 fprintf(stdout," ) = ");
+   	 value_print(stdout,VALUE_FMT,*(tmp=compute_poly(en,p)));
+   	 free(tmp);
+   	 fprintf(stdout,"\n");  
+	  }
+  }
 #endif /* EP_EVALUATION */
   
+  while( en )
+  {
+	  free_evalue_refs( &(en->EP) );
+	  Polyhedron_Free( en->ValidityDomain );
+	  ee = en ->next;
+	  free( en );
+	  en = ee;
+  }
+  for( i=0 ; i<C->Dimension ; i++ )
+	  free( param_name[i] );
   free(param_name);
+  Polyhedron_Free( P );
+  Polyhedron_Free( C );
+
   return 0;
 }
 #endif /* EMAIN */

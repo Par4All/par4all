@@ -54,6 +54,9 @@ int main() {
 
 	AffContraintes(DD);
 
+	Domain_Free( DD );
+	Domain_Free( A );
+
 	return 0;
 }
 
