@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.274  1997/03/19 17:25:47  coelho
+# again rlog -LR -> rlog -L -R...
+#
 # Revision 1.273  1997/03/19 17:07:30  coelho
 # RCS checking of locked files should work as expected now.
 #
@@ -709,12 +712,12 @@ count:;	@wc -l \$(ALL_SOURCES)
 # some quick entries for SCCS:
 info:
 	-test -d SCCS && sccs info
-	-test -d RCS && rlog -LR RCS/*
+	-test -d RCS && rlog -L -R RCS/*
 
 # try to delta all checked out files
 delta:
 	-test -d SCCS && test ! "\`sccs tell\`" || sccs delget \`sccs tell\`
-	-test -d RCS && ci -u \`rlog -LR RCS/*\``
+	-test -d RCS && ci -u \`rlog -L -R RCS/*\``
 
 %
 
