@@ -416,7 +416,7 @@ Le sous-domaine \verb/instruction/ contient
 l'instruction proprement dite.
 }
 
-\domain{Persistant_Statement_To_Statement = persistant statement -> persistant statement}
+\domain{persistant_statement_to_statement = persistant statement -> persistant statement}
 {
   Used for example in use_def_elimination() to store the eventual
   statement father of a statement. The persistance is needed to avoid
@@ -643,7 +643,7 @@ because auxiliary data structures must be decraled and freed.
 
 }
 
-\domain{Persistant_Control_To_Statement = persistant statement -> persistant control}
+\domain{persistant_statement_to_control = persistant statement -> persistant control}
 {
   Used for example in use_def_elimination() to store the eventual control
   father of a statement in order to travel on the control graph
