@@ -228,11 +228,11 @@ double get_process_memory_size()
 
 double get_process_gross_heap_size()
 {
+    /* mallinfo is not portable */
     /* This is *used* part of the heap, but it may be bigger */
-    struct mallinfo heap_info = mallinfo(); 
+    /* struct mallinfo heap_info = mallinfo();  */
     /* double memory_size = (heap_info.uordbytes)/(double)(1 << 20); */
-    double memory_size = ((double) heap_info.uordblks)/(double)(1 << 20);
-
+    double memory_size = (sbrk(0))/(double)(1 << 20);
     return memory_size;
 }
 
