@@ -7,6 +7,8 @@ SCRIPTS = 	check_os \
 		job-make \
 		job-receive \
 		pips-split \
+		pips-deal-with-include \
+		pips-process-module \
 		pips-unsplit-workspace \
 		trunc \
 		unjustify
