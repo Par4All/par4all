@@ -3,6 +3,9 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.69  1997/09/26 11:10:30  coelho
+ * fake resource updated.
+ *
  * Revision 1.68  1997/07/23 14:54:10  keryell
  * syst_debug(s) changed to sc_syst_debug(s) to avoid conflict with bison
  * output of sc+gram.y... :-(
@@ -433,7 +436,7 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* fake resources...
  */
-#define NO_FILE (strdup("fake file name"))
+#define NO_FILE (strdup(""))
 
 /* File suffixes 
  */
