@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-util.c,v $
+ * Revision 1.39  1998/12/26 21:20:07  irigoin
+ * error_handler added
+ *
  * Revision 1.38  1997/08/04 13:58:09  coelho
  * new generic effects includes.
  *
@@ -78,6 +81,11 @@ host_section_p(
 /* ??? neglect expression side effects...
  */
 DEFINE_LOCAL_STACK(current_statement, statement)
+
+void hpfc_io_util_error_handler()
+{
+    error_reset_current_statement_stack();
+}
 
 static void only_io_sequence(sequence q)
 {
