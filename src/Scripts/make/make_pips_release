@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/02 22:41:09 $, 
+# $Date: 1996/09/02 22:47:30 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -47,7 +47,7 @@ usage()
 
 what="-d Share -d Doc -d Runtime -d Examples" 
 
-while getopts hvzw:SB:L:pnle opt
+while getopts hvszw:SB:L:pnle opt
 do
     case $opt in
 	h) usage 0 some help ;;
