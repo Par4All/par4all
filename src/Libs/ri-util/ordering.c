@@ -6,6 +6,9 @@
  * reset_ordering_to_statement.
  *
  * $Log: ordering.c,v $
+ * Revision 1.11  1997/12/09 14:21:11  coelho
+ * leaks--
+ *
  * Revision 1.10  1997/11/22 15:19:30  coelho
  * cleaner. RCS headers. better asser message.
  *
@@ -127,7 +130,7 @@ rinitialize_ordering_to_statement(hash_table ots, statement s)
 static hash_table 
 set_ordering_to_statement(statement s)
 {
-    hash_table ots =  hash_table_make(hash_int, 101);
+    hash_table ots =  hash_table_make(hash_int, 0);
     rinitialize_ordering_to_statement(ots, s);
     return ots;
 }
@@ -149,6 +152,6 @@ reset_ordering_to_statement(void)
     pips_assert("hash table is defined", 
 		OrderingToStatement!=hash_table_undefined);
 
-    hash_table_clear(OrderingToStatement);
+    hash_table_free(OrderingToStatement),
     OrderingToStatement = hash_table_undefined;
 }
