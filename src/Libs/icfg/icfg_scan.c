@@ -65,6 +65,17 @@ static bool
     print_ifs = FALSE;
 static text (*decoration)(string) = NULL;
 
+text my_text_statement_any_effect_type(entity module, int margin, statement stat)
+{
+  text result = make_text(NIL);
+  list l;
+  for (l=lp; l; POP(l)) {
+    p_prettyprint_stuff pps = (p_prettyprint_stuff) STRING(CAR(l));
+    MERGE_TEXTS(result, resource_text(module, margin, stat, pps));
+  }
+  return result;
+}
+
 text my_get_any_effects_text(string module_name)
 {
   entity module;
@@ -89,10 +100,10 @@ text my_get_any_effects_text(string module_name)
   debug_on("EFFECTS_DEBUG_LEVEL");
 
   /* prepare the prettyprinting */
-  init_prettyprint(text_statement_any_effect_type);
+  init_prettyprint(my_text_statement_any_effect_type);
   
   /* summary regions first */
-  MERGE_TEXTS(txt, text_summary_any_effect_type(module));
+  MERGE_TEXTS(txt, my_text_summary_any_effect_type(module));
     
   /* then code with effects, using text_statement_any_effect_type */
   MERGE_TEXTS(txt, text_module(module,  module_stat));
