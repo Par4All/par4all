@@ -548,6 +548,18 @@ expression e2;
     return syntax_equal_p(s1, s2);
 }
 
+bool same_expression_p(expression e1, expression e2)
+{
+    normalized
+	n1 = expression_normalized(e1),
+	n2 = expression_normalized(e2);
+
+    if (normalized_linear_p(n1) && normalized_linear_p(n2))
+	return vect_equal(normalized_linear(n1), normalized_linear(n2));
+    else
+	return expression_equal_p(e1, e2);
+}
+
 bool syntax_equal_p(s1, s2)
 syntax s1;
 syntax s2;
