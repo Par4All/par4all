@@ -192,7 +192,6 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
   */
 
   su = elementary_convex_union(s1, s2);
-  // su = actual_convex_union(s1, s2);
 
   sc_rm(s1); 
   sc_rm(s2);
@@ -203,7 +202,7 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
    */
   sc_transform_ineg_in_eg(sc);
 
-  /* sc, su union of disjoint */
+  /* sc, su: fast union of disjoint */
   sc = sc_fusion(sc, su);
 
   sc_fix(sc);
