@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-extern int fprintf();
 
 #include "boolean.h"
 #include "arithmetique.h"
