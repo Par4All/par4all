@@ -1,19 +1,18 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/12/27 11:57:55 $, ) 
+ * ($Date: 1995/12/28 18:20:45 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
  * ??? should drop the renaming domain?
  */
 
-#include <stdarg.h>
 #include "defines-local.h"
 
 #include "conversion.h"
 #include "resources.h"
-#include "pipsdbm.h"
+#include "pipsdbm.h" 
 
 /* linearize the processor arrangement on which array is distributed
  * or replicated (driven by distributed). The variables are those created 
@@ -23,11 +22,11 @@
  */
 static Pcontrainte
 partial_linearization(
-    entity array,
-    bool distributed,
-    entity var,
-    int *psize,
-    entity (*create_var)(int))
+    entity array,              /* array variable */
+    bool distributed,          /* distributed or replicated dimensions lin. */
+    entity var,                /* assigned variable if desired */
+    int *psize,                /* returned array extent */
+    entity (*create_var)(int)) /* dimension variable builder */
 {
     entity proc = array_to_processors(array);
     int dim = NumberOfDimension(proc), low, up, size;
@@ -55,12 +54,12 @@ partial_linearization(
  */ 
 Pcontrainte
 full_linearization(
-    entity obj,
-    entity var,
-    int *psize,
-    entity (*create_var)(int),
-    bool fortran_way,
-    int initial_offset)
+    entity obj,                /* array being lin. */
+    entity var,                /* assigned variable if desired */
+    int *psize,                /* returned array extent */
+    entity (*create_var)(int), /* dimension variable builder */
+    bool fortran_way,          /* Fortran/C linearization way */
+    int initial_offset)        /* initial offset if desired */
 {
     int dim = NumberOfDimension(obj), low, up, size, i;
     Pvecteur v = VECTEUR_NUL;
@@ -83,12 +82,20 @@ full_linearization(
     return contrainte_make(v);
 }
 
-/* should allow a stupid system with some property?
+/* load-balancing equation as suggested in the A-274 report.
+ * here some choices are quite arbitrary: 
+ *  - the dimension order linearization of both source and target procs.
+ *  - the initial offset
+ * some clever choice could be suggested so as to minimize the required
+ * communications by maximizing the local copies, knowing the actual
+ * hpf processors to real processors affectation...
+ *
+ * should allow a stupid system with some property?
  */
 static Psysteme 
 generate_work_sharing_system(
-    entity src, 
-    entity trg)
+    entity src, /* source array */
+    entity trg) /* target array */
 {
     entity psi_r = get_ith_temporary_dummy(1),
            psi_d = get_ith_temporary_dummy(2),
@@ -125,13 +132,17 @@ generate_work_sharing_system(
     return sharing;
 }
 
+/* returns the full remapping system, including the source and target
+ * mappings systems, the link and the work sharing system 
+ */
 static Psysteme 
-generate_remapping_system(src, trg)
-entity src, trg;
+generate_remapping_system(
+    entity src, /* source array for the remapping */
+    entity trg) /* target array */
 {
     int ndim = variable_entity_dimension(src);
     Psysteme 
-	result = sc_rn(NULL),
+	result,
 	s_src = generate_system_for_distributed_variable(src),
 	s_trg = shift_system_to_prime_variables
 	    (generate_system_for_distributed_variable(trg)),
@@ -144,7 +155,7 @@ entity src, trg;
     DEBUG_SYST(6, "link", s_equ);
     DEBUG_SYST(6, "sharing", s_shr);
 
-    result = sc_append(result, s_src), sc_rm(s_src);
+    result = s_src;
     result = sc_append(result, s_trg), sc_rm(s_trg);
     result = sc_append(result, s_equ), sc_rm(s_equ);
     result = sc_append(result, s_shr), sc_rm(s_shr);
@@ -152,13 +163,14 @@ entity src, trg;
     return result;
 }
 
-/*   ??? assumes that there are no parameters. what should be the case...
+/* ??? assumes that there are no parameters. what should be the case...
+ * generates the list of variables needed by the code generation.
  */
 static void 
 remapping_variables(
-    Psysteme s,
-    entity a1,
-    entity a2,
+    Psysteme s, /* full remapping system */
+    entity a1,  /* source array */
+    entity a2,  /* target array */
     list *pl, 	/* P */
     list *plp, 	/* P' */
     list *pll, 	/* locals */
@@ -254,17 +266,17 @@ remapping_variables(
  */
 static statement
 processor_loop(
-    Psysteme s,
-    list /* of entities */ l_psi,
-    list /* of entities */ l_oth,
-    entity psi,
-    entity oth,
-    entity lid, 
-    entity array,
-    entity (*create_psi)(int),
-    entity (*create_oth)(int),
-    statement body,
-    boolean sh) /* whether to shift the psi's */
+    Psysteme s,                   /* system of comm. couples of processors */
+    list /* of entities */ l_psi, /* processor local dimensions */
+    list /* of entities */ l_oth, /* communicating proc. dimensions */
+    entity psi,                   /* local processor arrangement */
+    entity oth,                   /* communicating processor arrangement */
+    entity lid,                   /* variable for the comm. proc local id */
+    entity array,                 /* array being remapped */
+    entity (*create_psi)(int),    /* to create a local proc. dim. */
+    entity (*create_oth)(int),    /* to create a comm. proc. dim. */
+    statement body,               /* loop body */
+    boolean sh)                   /* whether to shift the psi's */
 {
     entity divide = hpfc_name_to_entity(IDIVIDE);
     Psysteme condition, enumeration, known, simpler;
@@ -272,7 +284,7 @@ processor_loop(
     
     define_psis = define_node_processor_id(psi, create_psi);
 
-    /* the lid computation is delayed in the body for diffusions
+    /* the lid computation is delayed in the body for broadcasts.
      */
     compute_lid = (lid) ?
 	hpfc_compute_lid(lid, oth, create_oth, array) : 
@@ -330,10 +342,10 @@ processor_loop(
  */
 static statement
 elements_loop(
-    Psysteme s,
-    list /* of entities */ ll, 
-    list /* of expressions */ ld,
-    statement body)
+    Psysteme s,                   /* triangular bounds on ll */
+    list /* of entities */ ll,    /* loop indexes */
+    list /* of expressions */ ld, /* deduced scalars */
+    statement body)               /* loop body */
 {
     return systeme_to_loop_nest(s, ll,
 	   make_block_statement(CONS(STATEMENT, generate_deducables(ld),
@@ -351,9 +363,9 @@ elements_loop(
  */
 static statement
 if_different_pe(
-    entity lid,
-    statement true,
-    statement false)
+    entity lid,      /* process local id variable */
+    statement true,  /* then statement */
+    statement false) /* else statement */
 {
     return test_to_statement
       (make_test(MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
@@ -373,11 +385,11 @@ if_different_pe(
  */
 static statement 
 broadcast(
-    entity lid,
-    entity proc,
-    Psysteme sr,
-    list /* of entity */ ldiff,
-    bool lazy)
+    entity lid,                 /* variable to store the target local id */
+    entity proc,                /* target processors for the broadcast */
+    Psysteme sr,                /* broadcast polyhedron */
+    list /* of entity */ ldiff, /* dimension variables for the broadcast */
+    bool lazy)                  /* whether to send empty messages */
 {
     statement cmp_lid, body, nest;
 
@@ -425,6 +437,7 @@ broadcast(
 
 #define ret(name) result = name; break
 
+/* arguments: all that may be useful to generate some code */
 static statement 
 gen(int what,
     entity src, entity trg, entity lid, entity proc,
@@ -539,17 +552,20 @@ gen(int what,
     return result;
 }
 
+/* generates a remapping loop nest (copy/send/receive/broadcast)
+ * basically a loop on elements with pre/in/post statements...
+ */
 static statement 
 remapping_stats(
-    int t,
-    Psysteme s,
-    Psysteme sr,
-    list /* of entity */ ll,
-    list /* of entity */ ldiff, 
-    list /* of expressions */ ld,
-    entity lid,
-    entity src,
-    entity trg)
+    int t,                        /* tag: CPY/SND/RCV/BRD */
+    Psysteme s,                   /* elements polyhedron */
+    Psysteme sr,                  /* broadcast polyhedron */
+    list /* of entity */ ll,      /* indexes for element loops */
+    list /* of entity */ ldiff,   /* indexes for broadcasts */
+    list /* of expressions */ ld, /* deducable elements */
+    entity lid,                   /* lid variable to be used */
+    entity src,                   /* source array */
+    entity trg)                   /* target array */
 {
     entity proc = array_to_processors(trg);
     statement inner, prel, postl, result;
@@ -573,6 +589,8 @@ remapping_stats(
 	     CONS(STATEMENT, postl,
 		  NIL))));
 
+    /* comments are added to help understand the generated code
+     */
     statement_comments(result) = strdup(concatenate
 	("c - ", (what & LZY) ? "lazy " : "",
 	       t==CPY ? "copy" : t==SND ? "send" : t==RCV ? "receiv" :
@@ -581,6 +599,12 @@ remapping_stats(
     return result;
 }
 
+/* ??? should be moved to sc?
+ * builds two systems from one according to base b:
+ * the system of constraints that contain some b variables,
+ * and the system of those that do not.
+ * s and b are not touched.
+ */
 void 
 sc_separate_on_vars(
     Psysteme s,
@@ -597,18 +621,35 @@ sc_separate_on_vars(
     *pwithout = sc_make(e_without, i_without);
 }
 
+/* generates a full remapping code, given the systems and indexes
+ * to be used in the different loops. that is complementary send/broadcast
+ * and receive/copy. The distribution of target onto source processors
+ * may require special care if lambda. 
+ *
+ * output: 
+ * AS a source
+ *   DO target
+ *     DO element
+ *       PACK 
+ *     SEND/BROADCAST to target(s)
+ * AS a target
+ *   DO source
+ *     DO element RECEIVE/UNPACK
+ *     OR 
+ *     DO element COPY
+ */
 static statement
 generate_remapping_code(
-    entity src,
-    entity trg,
-    Psysteme procs,
-    Psysteme locals,
-    list /* of entity */ l,
-    list lp,
-    list ll,
-    list ldiff,
-    list /* of expression */ ld,
-    bool dist_p) /* true if must take care of lambda */
+    entity src,                  /* source array */
+    entity trg,                  /* target array */
+    Psysteme procs,              /* communicating processors polyhedron */
+    Psysteme locals,             /* elements polyhedron */
+    list /* of entity */ l,      /* source processor indexes */
+    list lp,                     /* target processor indexes */
+    list ll,                     /* element indexes */
+    list ldiff,                  /* broadcast target processor indexes */
+    list /* of expression */ ld, /* deducable elements */
+    bool dist_p)                 /* true if must take care of lambda */
 {
     entity lid = hpfc_name_to_entity(T_LID),
            p_src = array_to_processors(src),
@@ -707,16 +748,20 @@ generate_remapping_code(
     return result;
 }
 
-/* IF (MSTATUS(primary_number).eq.src_number) THEN
+/* Runtime descriptors management around the remapping code.
+ * performs the remapping if reaching mapping is ok, and update the 
+ * mapping status.
+ *
+ * IF (MSTATUS(primary_number).eq.src_number) THEN
  *   the_code
  *   MSTATUS(primary_number) = trg_number
  * ENDDIF
  */
 static statement
 generate_remapping_guard(
-    entity src,
-    entity trg,
-    statement the_code)
+    entity src,         /* source array */
+    entity trg,         /* target array */ 
+    statement the_code) /* remapping code */
 {
     int src_n = load_hpf_number(src), /* source, target and primary numbers */
         trg_n = load_hpf_number(trg),
@@ -748,7 +793,9 @@ generate_remapping_guard(
     return result;
 }
 
-/*  remaps src to trg.
+/* remaps src to trg.
+ * first builds the equation and needed lists of indexes,
+ * then call the actual code generation phase.
  */
 static statement 
 hpf_remapping(
@@ -842,7 +889,8 @@ hpf_remapping(
     return s;
 }
 
-/* {module}_{array}_{src}_{trg}_node.h
+/* file name for storing the remapping code.
+ * {module}_{array}_{src}_{trg}_node.h
  */
 static string
 remapping_file_name(
@@ -878,10 +926,8 @@ list_of_referenced_entities(
     statement s)
 {
     l_found = NIL;
-    gen_multi_recurse(s,
-		      loop_domain, gen_true, loop_rwt,
-		      reference_domain, gen_true, reference_rwt,
-		      NULL);
+    gen_multi_recurse(s, loop_domain, gen_true, loop_rwt,
+                         reference_domain, gen_true, reference_rwt, NULL);
     return l_found;
 }
 
@@ -911,9 +957,9 @@ generate_hpf_remapping_file(
     file_name = strdup(concatenate(db_get_current_workspace_directory(),
 				   "/", remapping_file_name(r), NULL));
 
-    f = safe_fopen(file_name, "w");
+    f = hpfc_fopen(file_name);
     print_text(f, t);
-    safe_fclose(f, file_name);
+    hpfc_fclose(f, file_name);
 
     free(file_name);
     free_statement(remap);
@@ -947,7 +993,7 @@ generate_remapping_include(
  * bugs or features:
  */
 void remapping_compile(
-    statement s, 
+    statement s,      /* initial statement in the source code */
     statement *hsp,   /* Host Statement Pointer */
     statement *nsp)   /* idem Node */
 {
