@@ -2,11 +2,13 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/05/18 12:13:26 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/08/29 13:38:41 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
+ifdef(`DEBUG',define(`debug',`$1'),define(`debug'))
+ifdef(`DEMO',define(`demo',`$1'),define(`demo'))
 c-----------------
 c
 c HPFC_TEMPLATE
@@ -372,13 +374,7 @@ c
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'sending to ', OLID
-c
-#endif
+      debug(`print *, ''`sending to ''`, OLID')
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
       call pvmfsend(OWNERTID, NODECHANNELS(OLID), info)
@@ -424,24 +420,12 @@ c
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'sending to all nodes'
-c
-#endif
+      debug(`print *, ''`sending to all nodes'')
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
       call pvmfmcast(NBOFTASKS, NODETIDS, MCASTHOST, info)
       MCASTHOST = MCASTHOST + 2
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'sent!'
-c
-#endif
+      debug(print *, ''`sent!'')
       end
 c
 c-----------------
@@ -489,27 +473,15 @@ c
       integer lb(7), ub(7), indp(7), lid
       if (OREPLICATED) then
          do i=1, NODIMP(OPN)
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'i = ', i, ' index is ', OINDP(i)
-c
-#endif
-           if (OINDP(i).EQ.INTFLAG) then
+            debug(`print *, ''`i = ''`, i, ''` index is ''`, OINDP(i)')
+            if (OINDP(i).EQ.INTFLAG) then
                lb(i) = RANGEP(OPN, i, 1)
                ub(i) = RANGEP(OPN, i, 2)
             else
                lb(i) = OINDP(i)
                ub(i) = OINDP(i)
             endif
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'bounds ', lb(i), ub(i)
-c
-#endif
+            debug(`print *, ''`bounds ''`, lb(i), ub(i)')
          enddo
          do i=(NODIMP(OPN)+1), 7
             lb(i) = 1
@@ -543,13 +515,7 @@ c
      $                             NODECHANNELS(lid), 
      $                             info)
                               NODECHANNELS(lid) = NODECHANNELS(lid) + 2
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'sending to ', lid
-c
-#endif
+                              debug(`print *, ''`sending to ''`, lid')
                            enddo
                         enddo
                      enddo
@@ -576,13 +542,7 @@ c
       integer i1, i2, i3, i4, i5, i6, i7
       integer lb(7), ub(7), indp(7), lid
       do i=1, NODIMP(OPN)
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'i = ', i, ' index is ', OINDP(i)
-c
-#endif
+         debug(`print *, ''`i = ''`, i, ''` index is ''`, OINDP(i)')
          if (OINDP(i).EQ.INTFLAG) then
             lb(i) = RANGEP(OPN, i, 1)
             ub(i) = RANGEP(OPN, i, 2)
@@ -590,13 +550,7 @@ c
             lb(i) = OINDP(i)
             ub(i) = OINDP(i)
          endif
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'bounds ', lb(i), ub(i)
-c
-#endif
+         debug(`print *, ''`bounds ''`, lb(i), ub(i)')
       enddo
       do i=(NODIMP(OPN)+1), 7
          lb(i) = 1
@@ -729,13 +683,7 @@ c
       call pvmfrecv(HOSTTID, HOSTCHANNEL, bufid)
       call pvmfunpack(what, goal, 1, 1, info)
       HOSTCHANNEL = HOSTCHANNEL + 2
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, MYLID, ' receiving from host'
-c
-#endif
+      debug(`print *, MYLID, ''` receiving from host'')
       end
 c
 c-----------------
@@ -761,24 +709,11 @@ c
       include 'fpvm3.h'
       include 'hpfc_commons.h'
       integer bufid, info
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'receiving from host'
-c
-#endif
-
+      debug(`print *, ''`receiving from host'')
       call pvmfrecv(HOSTTID, MCASTHOST, bufid)
       call pvmfunpack(what, goal, 1, 1, info)
       MCASTHOST = MCASTHOST + 2
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'received!'
-c
-#endif
+      debug(`print *, ''`received!'')
       end
 c
 c-----------------
@@ -920,16 +855,8 @@ c
       do i=1, NBOFPROCESSORS
          call HPFC_CMPPOS(i, MYLID, MYPOS(1, i))
       enddo
-#ifdef DEBUG
-c
-c Debug
-c
-      print *, 'lid: ', MYLID, ' tid: ', MYTID
-c
-#endif
-
+      debug(`print *, ''`lid: ''`, MYLID, ''` tid: ''`, MYTID')
       call pvmfjoingroup('hpfc_group', inum)
-
       end
 c
 c-----------------
@@ -978,14 +905,8 @@ c
      $     NBOFTASKS, 
      $     NODETIDS, 
      $     info)
-#ifdef DEMO
-c
-c DEMO
-c
-      CALL print_host_info()
-      CALL print_task_info(NBOFTASKS, NODETIDS, HOSTTID)
-c
-#endif
+      demo(`CALL print_host_info()')
+      demo(`CALL print_task_info(NBOFTASKS, NODETIDS, HOSTTID)'
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
       call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
@@ -1087,10 +1008,8 @@ c
       include 'hpfc_commons.h'
       call HPFC_REMOTE_LOOP_BOUNDS
      $     (nlb, nub, llb, lb, ub, an, dp, MYPOS(dp, TTOP(ATOT(an))))
-#ifdef DEBUG
-      print *, 'initial global lower bound: ', llb,
-     $    ' new lower bound: ', nlb,' new upper bound: ', nub
-#endif
+      debug(`print *, ''`initial global lower bound: ''`, llb,
+     $    ''` new lower bound: ''`, nlb,''` new upper bound: ''`, nub')
       end
 c
 c-----------------
