@@ -235,6 +235,24 @@ boolean a_la_fortran;
     int positive_terms = 0;
     int negative_terms = 0;
 
+    if(!is_inegalite) {
+	for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
+	    if(vecteur_var(coord)!= TCST) {
+		if(vecteur_val(coord) >0 )
+		    positive_terms++;
+		else
+		    negative_terms++;
+	    }
+	}
+
+	if(negative_terms > positive_terms) {
+	    vect_chg_sgn(v);
+	}
+    }
+
+    positive_terms = 0;
+    negative_terms = 0;
+
     for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
 	int coeff = vecteur_val(coord);
 
@@ -245,17 +263,21 @@ boolean a_la_fortran;
 		if (coeff == 1 && vecteur_var(coord) != TCST)
 		    (void) sprintf(s+strlen(s),"%s", 
 				   variable_name(vecteur_var(coord)));
-		else 
+		else if(!term_cst(coord) || is_inegalite)
 		    (void) sprintf(s+strlen(s),"%d%s", coeff,
 			    variable_name(vecteur_var(coord)));
+		else
+		    positive_terms--;
 	    }
 	    else
 		if (coeff == 1 && vecteur_var(coord) != TCST)
 		    (void) sprintf(s+strlen(s),"+%s", 
 				   variable_name(vecteur_var(coord)));
-		else 
+		else if(!term_cst(coord) || is_inegalite)
 		    (void) sprintf(s+strlen(s),"+%d%s", coeff,
-			    variable_name(vecteur_var(coord)));
+				   variable_name(vecteur_var(coord)));
+		else
+		    positive_terms--;
 	}
     }
 
@@ -304,6 +326,13 @@ boolean a_la_fortran;
 		    (void) sprintf(s+strlen(s),"+%d%s", -coeff,
 			    variable_name(vecteur_var(coord)));
 	}
+	else if(term_cst(coord) && !is_inegalite) {
+	    (void) sprintf(s+strlen(s),"%d", -coeff);
+	    /* And now, a lie... In fact, rhs_terms++ */
+	    negative_terms++;
+	}
+	else
+	    ;
     }
 
     if(negative_terms == 0)
