@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1995/04/10 18:49:36 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1995/07/20 18:40:40 $, )
  * version $Revision$,
  */
 
@@ -42,11 +42,8 @@ void create_parameters_h(file, module)
 FILE* file;
 entity module;
 {
-    entity 
-	array = entity_undefined,
-	newarray = entity_undefined;
-    dimension
-	d = dimension_undefined;
+    entity newarray = entity_undefined;
+    dimension d = dimension_undefined;
     int i;
     list l = list_of_distributed_arrays_for_module(module);
 
@@ -54,32 +51,31 @@ entity module;
 	    "c\nc parameters generated for %s\nc\n",
 	    module_local_name(module));
 
-    MAPL(ce,
-     {
-	 array = ENTITY(CAR(ce));
-	 newarray = load_new_node(array);
-
-	 debug(8, "create_parameters_h",
-	       "considering array %s (new is %s)\n",
-	       entity_name(array), entity_name(newarray));
-	 
-	 for (i=1 ; i<=NumberOfDimension(newarray) ; i++)
-	 {
-	     d = FindIthDimension(newarray, i);
-	     
-	     fprintf(file, "      integer %s, %s\n",
+    MAP(ENTITY, array,
+    {
+	newarray = load_new_node(array);
+	
+	debug(8, "create_parameters_h",
+	      "considering array %s (new is %s)\n",
+	      entity_name(array), entity_name(newarray));
+	
+	for (i=1 ; i<=NumberOfDimension(newarray) ; i++)
+	{
+	    d = FindIthDimension(newarray, i);
+	    
+	    fprintf(file, "      integer %s, %s\n",
 		     bound_parameter_name(newarray, LOWER, i),
-		     bound_parameter_name(newarray, UPPER, i));
-	     
-	     fprintf(file, 
-		     "      parameter(%s = %d)\n      parameter(%s = %d)\n",
-		     bound_parameter_name(newarray, LOWER, i),
-		     HpfcExpressionToInt(dimension_lower(d)),
-		     bound_parameter_name(newarray, UPPER, i),
-		     HpfcExpressionToInt(dimension_upper(d)));
-	 }
-     },
-	 l);
+		    bound_parameter_name(newarray, UPPER, i));
+	    
+	    fprintf(file, 
+		    "      parameter(%s = %d)\n      parameter(%s = %d)\n",
+		    bound_parameter_name(newarray, LOWER, i),
+		    HpfcExpressionToInt(dimension_lower(d)),
+		    bound_parameter_name(newarray, UPPER, i),
+		    HpfcExpressionToInt(dimension_upper(d)));
+	}
+    },
+	l);
 
     gen_free_list(l);
 }
@@ -89,20 +85,17 @@ int max_size_of_processors()
     int 
 	current_max = 1;
 
-    MAPL(ce, 
-     {
-	 entity
-	     e = ENTITY(CAR(ce));
-	 variable 
-	     a;
-	 
-	 assert(type_variable_p(entity_type(e)));
-	 a = type_variable(entity_type(e));
-
-	 current_max = max(current_max,
-			   NumberOfElements(variable_dimensions(a)));
-     }, 
-	 list_of_processors());
+    MAP(ENTITY, e, 
+    {
+	variable a;
+	
+	assert(type_variable_p(entity_type(e)));
+	a = type_variable(entity_type(e));
+	
+	current_max = max(current_max,
+			  NumberOfElements(variable_dimensions(a)));
+    }, 
+	list_of_processors());
 
     return(current_max);
 }
@@ -135,61 +128,56 @@ entity module;
     fprintf(file, "c\nc Arrays Initializations for %s\nc\n",
 	    module_local_name(module));
 
-    MAPL(ce,
-     {
-	 entity
-	     array = ENTITY(CAR(ce));
-	 int an = load_hpf_number(array);
-	 int nd = NumberOfDimension(array);
-	 align
-	     al = load_entity_align(array);
-	 entity
-	     template = align_template(al);
-	 int tn = load_hpf_number(template);
-	 distribute
-	     di = load_entity_distribute(template);
-	 int i;
-	 
-	 fprintf(file, "c\nc initializing array %s, number %d\nc\n",
-		 entity_local_name(array), an);
-	 
-	 /*
-	  * NODIMA: Number Of  DIMensions of an Array
-	  * ATOT: Array TO Template
-	  */
-	 fprintf(file, "      NODIMA(%d) = %d\n", an, nd);
-	 fprintf(file, "      ATOT(%d) = %d\n", an, tn);
-	 
-	 /*
-	  * RANGEA: lower, upper, size and declaration, aso
-	  */
-	 i = 1;
-	 for (i=1; i<=nd; i++)
-	 {
-	     dimension d = entity_ith_dimension(array, i);
-	     int lb = HpfcExpressionToInt(dimension_lower(d));
-	     int ub = HpfcExpressionToInt(dimension_upper(d));
-	     int sz = (ub-lb+1);
-	     tag decl = new_declaration(array, i);
-	     alignment a = FindAlignmentOfDim(align_alignment(al), i);
-	     
-	     /* RANGEA contents:
-	      *
-	      * 1: lower bound
-	      * 2: upper bound
-	      * 3: size, (2)-(1)+1
-	      * 4: new declaration flag
-	      */
-	     fprintf(file, "\n");
-	     fprintf(file, "      RANGEA(%d, %d, 1) = %d\n", an, i, lb);
-	     fprintf(file, "      RANGEA(%d, %d, 2) = %d\n", an, i, ub);
-	     fprintf(file, "      RANGEA(%d, %d, 3) = %d\n", an, i, sz);
-	     fprintf(file, "c\n");
-	     fprintf(file, "      RANGEA(%d, %d, 4) = %d\n", an, i, 
-		     code_number(decl));
-	     
-	     switch(decl)
-	     {
+    MAP(ENTITY, array,
+    {
+	int an = load_hpf_number(array);
+	int nd = NumberOfDimension(array);
+	align al = load_entity_align(array);
+	entity template = align_template(al);
+	int tn = load_hpf_number(template);
+	distribute di = load_entity_distribute(template);
+	int i;
+	
+	fprintf(file, "c\nc initializing array %s, number %d\nc\n",
+		entity_local_name(array), an);
+	
+	/*
+	 * NODIMA: Number Of  DIMensions of an Array
+	 * ATOT: Array TO Template
+	 */
+	fprintf(file, "      NODIMA(%d) = %d\n", an, nd);
+	fprintf(file, "      ATOT(%d) = %d\n", an, tn);
+	
+	/*
+	 * RANGEA: lower, upper, size and declaration, aso
+	 */
+	i = 1;
+	for (i=1; i<=nd; i++)
+	{
+	    dimension d = entity_ith_dimension(array, i);
+	    int lb = HpfcExpressionToInt(dimension_lower(d));
+	    int ub = HpfcExpressionToInt(dimension_upper(d));
+	    int sz = (ub-lb+1);
+	    tag decl = new_declaration(array, i);
+	    alignment a = FindAlignmentOfDim(align_alignment(al), i);
+	    
+	    /* RANGEA contents:
+	     *
+	     * 1: lower bound
+	     * 2: upper bound
+	     * 3: size, (2)-(1)+1
+	     * 4: new declaration flag
+	     */
+	    fprintf(file, "\n");
+	    fprintf(file, "      RANGEA(%d, %d, 1) = %d\n", an, i, lb);
+	    fprintf(file, "      RANGEA(%d, %d, 2) = %d\n", an, i, ub);
+	    fprintf(file, "      RANGEA(%d, %d, 3) = %d\n", an, i, sz);
+	    fprintf(file, "c\n");
+	    fprintf(file, "      RANGEA(%d, %d, 4) = %d\n", an, i, 
+		    code_number(decl));
+	    
+	    switch(decl)
+	    {
 	     case is_hpf_newdecl_none:
 		 break;
 	     case is_hpf_newdecl_alpha:
@@ -360,16 +348,12 @@ FILE* file;
 {
     fprintf(file, "c\nc Templates Initializations\nc\n");
 
-    MAPL(ce,
-     {
-	 entity
-	     template = ENTITY(CAR(ce));
+    MAP(ENTITY, template,
+    {
 	 int tn = load_hpf_number(template);
 	 int nd  = NumberOfDimension(template);
-	 distribute
-	     di = load_entity_distribute(template);
-	 entity
-	     proc = distribute_processors(di);
+	 distribute di = load_entity_distribute(template);
+	 entity proc = distribute_processors(di);
 	 int pn = load_hpf_number(proc);
 	 int procdim = 1;
 	 int tempdim = 1;
@@ -387,14 +371,12 @@ FILE* file;
 	 /*
 	  * RANGET: lower, upper, size 
 	  */
-	 MAPL(cd,
-	  {
-	      dimension
-		  d = DIMENSION(CAR(cd));
-	      int lb = HpfcExpressionToInt(dimension_lower(d));
-	      int ub = HpfcExpressionToInt(dimension_upper(d));
-	      int sz = (ub-lb+1);
-
+	 MAP(DIMENSION, d,
+	 {
+	     int lb = HpfcExpressionToInt(dimension_lower(d));
+	     int ub = HpfcExpressionToInt(dimension_upper(d));
+	     int sz = (ub-lb+1);
+	     
 	      fprintf(file, "\n");
 	      fprintf(file, "      RANGET(%d, %d, 1) = %d\n", tn, tempdim, lb);
 	      fprintf(file, "      RANGET(%d, %d, 2) = %d\n", tn, tempdim, ub);
@@ -409,13 +391,10 @@ FILE* file;
 	  */
 	 tempdim = 1;
 	 fprintf(file, "\n");
-	 MAPL(cd,
-	  {
-	      distribution 
-		  d = DISTRIBUTION(CAR(cd));
+	 MAP(DISTRIBUTION, d,
+	 {
 	      int param;
-	      bool 
-		  block_case = FALSE;
+	      bool block_case = FALSE;
 
 	      switch(style_tag(distribution_style(d)))
 	      {
@@ -450,13 +429,11 @@ FILE* file;
 {
     fprintf(file, "c\nc Processors Initializations\nc\n");
 
-    MAPL(ce,
-     {
-	 entity
-	     proc = ENTITY(CAR(ce));
-	 int pn = load_hpf_number(proc);
-	 int nd  = NumberOfDimension(proc);
-	 int procdim = 1;
+    MAP(ENTITY, proc,
+    {
+	int pn = load_hpf_number(proc);
+	int nd  = NumberOfDimension(proc);
+	int procdim = 1;
 	 
 	 fprintf(file, "c\nc initializing processors %s, number %d\nc\n",
 		 entity_local_name(proc), pn);
@@ -469,10 +446,8 @@ FILE* file;
 	 /*
 	  * RANGEP: lower, upper, size 
 	  */
-	 MAPL(cd,
-	  {
-	      dimension
-		  d = DIMENSION(CAR(cd));
+	 MAP(DIMENSION, d,
+	 {
 	      int lb = HpfcExpressionToInt(dimension_lower(d));
 	      int ub = HpfcExpressionToInt(dimension_upper(d));
 	      int sz = (ub-lb+1);
