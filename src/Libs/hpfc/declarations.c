@@ -3,7 +3,7 @@
  *
  * DECLARATIONS compilation
  *
- * $RCSfile: declarations.c,v $ ($Date: 1995/08/30 14:34:48 $, )
+ * $RCSfile: declarations.c,v $ ($Date: 1995/09/18 17:52:58 $, )
  * version $Revision$
  */
  
@@ -14,22 +14,18 @@
 #define normalized_dimension_p(dim) \
   (HpfcExpressionToInt(dimension_lower(dim))==1)
 
-/* -----------------------------------------------------------------
- *
- *     NEW DECLARATIONS
- *
- */
+/********************************************************* NEW DECLARATIONS */
 
 /* here the new size of the ith dimension of the given array is computed.
  * because the declarations are static, there is a majoration of the space
  * required on each processors to held his part of the distributed array.
  */
 static int 
-ComputeNewSizeOfIthDimension(dim, i, array, newdeclp)
-dimension dim;
-int i;
-entity array;
-tag *newdeclp;
+ComputeNewSizeOfIthDimension(
+    dimension dim,
+    int i,
+    entity array,
+    tag *newdeclp)
 {
     align a = load_entity_align(array);
     entity t = align_template(a);
@@ -183,60 +179,56 @@ tag *newdeclp;
  * deleted.
  */
 static void 
-NewDeclarationOfDistributedArray(array)
-entity array;
+NewDeclarationOfDistributedArray(
+    entity array)
 {
-    entity newarray = load_new_node(array);
-    int ithdim = 1,
-        newsize, p;
+    entity newarray;
+    int ithdim = 1, newsz, p;
     tag newdecl;
     list ld = NIL;
-    
+
+    /* it may happen that no newarray is available, 
+     * when a module with no distributed variables is considered...
+     */
+    if (!bound_new_node_p(array)) return;
+    newarray = load_new_node(array);
     assert(array_distributed_p(array) && entity_variable_p(array));
 
-    debug(6,"NewDeclarationOfDistributedArray",
-	  "considering array %s, new %s\n",
-	  entity_name(array),
-	  entity_name(newarray));
+    pips_debug(6, "considering array %s, new %s\n",
+	       entity_name(array), entity_name(newarray));
 
     /* compute the new size for every dimension on the array,
      * then update the dimensions of the newarray. remember
      * that the dimensions are shared between the old and new arrays.
      */
     MAP(DIMENSION, dim,
-     {
-	 if (ith_dim_distributed_p(array, ithdim, &p))
-	 {
-	     newsize = ComputeNewSizeOfIthDimension(dim, 
-						    ithdim, 
-						    array,
-						    &newdecl);
+    {
+	if (ith_dim_distributed_p(array, ithdim, &p))
+	{
+	    newsz = ComputeNewSizeOfIthDimension(dim, ithdim, array, &newdecl);
+	    
+	    pips_debug(8, "dimension %d new size: %d\n", ithdim, newsz);
 	     
-	     debug(8, "NewDeclarationOfDistributedArray",
-		   "dimension %d new size: %d\n", ithdim, newsize);
-	     
-	     
-	     ld = gen_nconc(ld,
-			    CONS(DIMENSION,
-				 make_dimension(int_to_expression(1),
-						int_to_expression(newsize)),
-				 NIL));
-	     
-	 }
-	 else
-	 {
-	     pips_debug(8, "dimension %d isn't touched\n", ithdim);
-
-	     newdecl = is_hpf_newdecl_none;
-	     ld = gen_nconc(ld, CONS(DIMENSION, dim, NIL)); /* sharing ! */
-	 }
-	 
-	 store_new_declaration(array, ithdim, newdecl);
-
-	 ithdim++;
-     },
-	 variable_dimensions(type_variable(entity_type(array))));
-
+	    ld = gen_nconc(ld,
+			   CONS(DIMENSION, make_dimension(int_to_expression(1),
+						      int_to_expression(newsz)),
+				NIL));
+	    
+	}
+	else
+	{
+	    pips_debug(8, "dimension %d isn't touched\n", ithdim);
+	    
+	    newdecl = is_hpf_newdecl_none;
+	    ld = gen_nconc(ld, CONS(DIMENSION, dim, NIL)); /* sharing ! */
+	}
+	
+	store_new_declaration(array, ithdim, newdecl);
+	
+	ithdim++;
+    },
+	variable_dimensions(type_variable(entity_type(array))));
+    
     variable_dimensions(type_variable(entity_type(newarray)))=ld;
 }
 
