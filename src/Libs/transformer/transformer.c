@@ -585,8 +585,13 @@ list le; /* list of entities */
  * by projection, regardless of the way they are modified; information
  * that they are modified is preserved; in fact, this is *not* a projection
  * but a cylinder based on the projection.
+ *                                                      inf
+ * A real fix-point a la Halbwachs should be used p' = UNION(tf^k(p))
+ *                                                      k=0
+ * or simply one of PIPS loop fix-points.
  *
- * A real fix-point a la Halbwachs should be used p' = tf(tf(tf(...tf(p))))
+ * Be careful if tf is not feasible because the result is p itself which may not
+ * be what you expect.
  *
  * p is not modified
  */
