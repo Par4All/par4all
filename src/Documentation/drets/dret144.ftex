@@ -25,7 +25,7 @@
 No.~88.017.01 passe' par la Direction des Recherches, Etudes et
 Techniques (De'le'gation Ge'ne'rale pour l'Armement)}
 }
-\renewcommand{\docdate}{13 Juillet 1992}
+\newcommand{\docdate}{9 Juillet 1993}
 \newcommand{\numero}{E144}
 
 \begin{document}
@@ -801,7 +801,8 @@ Les restrictions essentielles au langage sont les suivantes:
 
   \item initialisation de chai^nes de caracte`res de type Hollerith \\
 (par exemple \verb+DATA A /8HOPERATIN,8HG POINT /+ doit e^tre
-transforme' en \verb+DATA A /'OPERATIN','G POINT '/+)
+transforme' en \verb+DATA A /'OPERATIN','G POINT '/+; l'utilitaire
+\verb+ISTJS+ de Toolpack effectue cette conversion);
 
   \item le caracte`re {\em double quote} est prohibe' comme dans la
 norme bien que de nombreux compilateurs acceptent un jeu de caracte`res
@@ -859,13 +860,13 @@ Un nom plus e'vocateur que \verb+MAIN+ peut bien su^r e^tre choisi.
 L'objectif n'e'tant pas d'e'crire un compilateur commercial, les
 messages d'erreurs ne sont pas force'ment tre`s explicites. Il faut donc
 s'assurer au pre'alable que le programme soumis a` PIPS est accepte' par
-un compilateur conventionnel. Les options de compilation choisie devraient
+un compilateur conventionnel. Les options de compilation choisies devraient
 e^tre aussi se've`res que possible de manie`re a` e'liminer au maximum
 les extensions par rapport a` la norme Fortran-77.
 
 Un des proble`mes rencontre's est la restriction des instructions aux colonnes
 7 a 72. Avec les editeurs pleine page, il est parfois difficile de se rendre
-compte qu'on a depasser cette limite. Les messages fournis par PIPS sont
+compte qu'on a depasse' cette limite. Les messages fournis par PIPS sont
 alors impre'visibles et incompre'hensibles par celui qui regarde le source.
 
 Pour minimiser les proble`mes, les de'clarations devraient avoir la structure
@@ -898,9 +899,9 @@ doit e^tre mis sous la forme:
 \end{verbatim}
 
 Enfin, les ordres DATA portant sur des variables statiques ne sont
-correctement traite's qui s'ils se trouvent dans le programme principal
+correctement traite's que s'ils se trouvent dans le programme principal
 ou, tout au moins, dans le module le plus haut dans l'arbre des appels.
-Cela est du^ a` des hypothe`ses approximatives sur la maine`re dont les
+Cela est du^ a` des hypothe`ses approximatives sur la manie`re dont les
 ordres DATA sont imple'mente's pour les variables dynamiques...
 
 \newpage
@@ -970,7 +971,7 @@ les calculs de de'pendance qui porteront sur elles.
 Les STOPs apparaissant dans des sous-programmes et les exceptions en
 ge'ne'ral ne sont pas correctement traite's.
 
-Le caracte`re {\em double quote} est pas accepte' dans les chai^nes de
+Le caracte`re {\em double quote} n'est pas accepte' dans les chai^nes de
 caracte`res (N.B. il ne fait pas partie du jeu de caracte`res standard
 de Fortran). Mais il ne peut pas servir comme de'limiteur de constante
 chai^ne de caracte`res.
@@ -982,7 +983,7 @@ du module de nom sorrespondant si un CALL est rencontre' avant la
 de'finition de l'ENTRY. La de'finition de l'ENTRY provoque une
 erreur normale quand elle est rencontre'e.
 
-Les PARAMETERs entient doivent e^tre initialise's par des expressions
+Les PARAMETERs entiers doivent e^tre initialise's par des expressions
 inte'gralement entie`res. Aucun casting n'est effectue'.
 
 \newpage
