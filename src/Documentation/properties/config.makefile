@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/20 18:29:16 $, 
+# $Date: 1996/08/20 18:36:13 $, 
 
 SOURCES	= properties-rc.tex
 
@@ -17,6 +17,10 @@ properties.rc: properties-rc.tex
 	#
 	sed 's/^[\/ ]\*\/*/# /' $(PIPS_ROOT)/Include/auto.h > $@
 	sed 's,	,    ,g;s/ *$$//;/^alias /d' $< | filter_verbatim >> $@
+
+clean: local-clean
+local-clean:
+	$(RM) -r $(INSTALL_HTM) $(INSTALL_DOC) $(INSTALL_SHR) *.dvi
 
 # end of $RCSfile: config.makefile,v $
 #
