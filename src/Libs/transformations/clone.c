@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.10  1997/11/04 17:34:05  coelho
+ * more comments.
+ *
  * Revision 1.9  1997/11/04 13:41:29  coelho
  * version names are formed in exa instead of decimal...
  *
@@ -136,8 +139,6 @@ build_statement_for_clone(
     else
 	check_arg_value = make_continue_statement(entity_undefined);
 
-    
-
     stat = make_block_statement(
 	CONS(STATEMENT, check_arg_value,
 	CONS(STATEMENT, copy_statement(get_current_module_statement()), 
@@ -198,6 +199,8 @@ build_a_clone_for(
 
     /* add somme comments before the code.
      */
+
+    /* ??? */
 
     make_text_resource(new_name, DBR_INITIAL_FILE, ".f_initial", t);
     DB_PUT_MEMORY_RESOURCE(DBR_USER_FILE, new_name, 
