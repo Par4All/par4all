@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1995/03/14 18:50:27 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1995/03/22 10:56:54 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -122,7 +122,7 @@ hpfc_node_local_name (string name)
     return(hpfc_local_name(name, NODE_NAME));
 }
 
-static void 
+void 
 make_host_and_node_modules (entity module)
 {
     string
@@ -193,7 +193,7 @@ make_host_and_node_modules (entity module)
  * and the declarations of which are modified in the node_module
  * (call to NewDeclarationsOfDistributedArrays)...
  */
-static void 
+void 
 init_host_and_node_entities (void)
 {
     entity
@@ -218,8 +218,9 @@ init_host_and_node_entities (void)
 
 	     AddCommonToHostAndNodeModules(e); 
 
-	     if (gen_find_eq(e, the_commons)!=e)
-		 the_commons = CONS(ENTITY, e, the_commons);
+	     /* if (gen_find_eq(e, the_commons)!=e)
+		 the_commons = CONS(ENTITY, e, the_commons);*/
+	     add_a_common(e);
 	 }
      },
 	 entity_declarations(current_module)); 
@@ -333,7 +334,7 @@ set_resources_for_module (string module_name)
 	 the_callees);
 
     hpfc_init_run_time_entities();
-    reset_uniq_numbers();
+    reset_unique_numbers();
 
     /*   STOP is to be translated into hpfc_{host,node}_end
      */
@@ -356,7 +357,7 @@ set_resources_for_module (string module_name)
 		       NIL));
 }
 
-static void 
+void 
 put_generated_resources_for_common (entity common)
 {
     FILE 
@@ -417,7 +418,7 @@ put_generated_resources_for_common (entity common)
     free(node_filename);
 }
 
-static void 
+void 
 put_generated_resources_for_module(stat, host_stat, node_stat)
 statement stat, host_stat, node_stat;
 {
@@ -427,7 +428,7 @@ statement stat, host_stat, node_stat;
 	*parm_file,
 	*init_file;
     string
-	prefix = db_get_current_module_name(),
+	prefix = module_local_name(get_current_module_entity()),
 	host_filename,
 	node_filename,
 	parm_filename,
@@ -482,13 +483,18 @@ statement stat, host_stat, node_stat;
 	hpfc_print_file(stderr, node_filename);
     }
 
-    free(parm_filename),
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, strdup(prefix), parm_filename);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, strdup(prefix), host_filename);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, strdup(prefix), node_filename);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, strdup(prefix), init_filename);
+
+    /* free(parm_filename),
     free(init_filename),
     free(host_filename),
-    free(node_filename);
+    free(node_filename);*/
 }
 
-static void 
+void 
 put_generated_resources_for_program (program_name)
 string program_name;
 {
@@ -550,8 +556,8 @@ init_hpfc_for_program (void)
 
     /* hpfc_init_unique_numbers(); */
 
-    init_hpf_number_management();
-    init_overlap_management();
+    init_hpf_number_status();
+    init_overlap_status();
 
     make_align_map();       /* ??? memory leak */
     make_distribute_map();  /* ??? memory leak */
@@ -570,8 +576,8 @@ close_hpfc_for_program (void)
     gen_free_list(the_modules), the_modules = NIL;
     free_hpf_object_lists();
 
-    close_hpf_number_management();
-    close_overlap_management();
+    close_hpf_number_status();
+    close_overlap_status();
 
     free_align_map();
     free_distribute_map();
