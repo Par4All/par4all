@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.86  2003/07/28 15:07:01  coelho
+ * INV -> _INV_
+ *
  * Revision 1.85  2003/07/24 07:21:03  nguyen
  * Add prefixes and new basic type sizes for C language
  *
@@ -170,7 +173,7 @@ typedef hash_table control_mapping;
 #define UNARY_MINUS_OPERATOR_NAME 	"--"
 #define MULTIPLY_OPERATOR_NAME 		"*"
 #define DIVIDE_OPERATOR_NAME 		"/"
-#define INVERSE_OPERATOR_NAME           "INV"
+#define INVERSE_OPERATOR_NAME           "_INV_" /* internal stuff */
 #define POWER_OPERATOR_NAME 		"**"
 #define MODULO_OPERATOR_NAME 		"MOD"
 #define MIN_OPERATOR_NAME 		"MIN"
