@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1996/03/21 15:07:22 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1996/03/27 17:40:25 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -185,31 +185,50 @@ TPIPS_NO_EXECUTION_MODE      FALSE
 
 \subsection{Chains}
 
-Update dependency graph with RR dependency arcs.
-Useful for estimation of cache memory traffic. use/def related.
+It is possible to put use-use dependence arcs in the dependence graph.
+This is useful for estimation of cache memory traffic and of
+communication for distributed memory machine (e.g. you can parallelize
+only communication free loops). Beware of use-use dependence on scalar
+variables. You might expect scalars to be broadcasted and/or replicated
+on each processor but they are not handled that way by the
+parallelization process unless you manage to have them
+declared private with respect to all enclosing loops.
+
+This feature is not supported by PIPS user interfaces. Results may be
+hard to interprete. It is useful to print the dependence graph.
 
 \begin{verbatim}
 KEEP_READ_READ_DEPENDENCE FALSE
 \end{verbatim}
 
-Do we want to mask effects in loop bodies (dangerous with current
-version of Allen \& Kennedy which assumes that all the edges are
-present, the ones on private variables being eventually discarded
-but with a current distribution)
+It is possible to mask effects on local variables in loop bodies. This
+is dangerous with current version of Allen \& Kennedy which assumes that
+all the edges are present, the ones on private variables being
+partially ignored but for loop distribution. In other words, this
+property should always be set to \verb+false+.
 
 \begin{verbatim}
 CHAINS_MASK_EFFECTS FALSE
 \end{verbatim}
 
-Do we only keep dataflow (Def -- Use) dependences in the chain graph.
+It also is possible to keep only dtrue ataflow (Def -- Use) dependences in
+the dependence graph. This was an attempt at mimicking the effect of
+direct dependence analysis and at avoiding privatization. However, {\em
+direct} dependence analysis is not implemented in the standard tests and
+spurious def-use dependence arcs are taken into account.
 
 \begin{verbatim}
 CHAINS_DATAFLOW_DEPENDENCE_ONLY FALSE
 \end{verbatim}
 
+The last two properties are not consistent with PIPS current development
+(1995/96). It is assumed that {\em all} dependence arcs are present in the
+dependence graph. Phases using the latter should be able to filter out
+irrelevant arcs, e.g. pertaining to privatized variables.
+
 \subsection{Effects}
 
-print SDFI just after computation
+Print SDFI just after computation:
 
 \begin{verbatim}
 EFFECTS_PRINT_SDFI TRUE
