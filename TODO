@@ -1,4 +1,3 @@
-o [isabelle] importer les sources de newgen
-
-* construction
-- make, autoconf...
+* developpement
+- scripts de fusion
+- entrees "make diff" et equivalent ?
