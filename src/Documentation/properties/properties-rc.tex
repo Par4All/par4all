@@ -27,7 +27,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1997/10/03 13:11:50 $~$
+$~$Date: 1997/10/21 08:00:58 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -364,18 +364,25 @@ PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
 \index{Return (Alternate)}
 
 Alternate returns are put among the obsolete Fortran features by the
-Fortran~90 standard. It is possible to ignore them, up to a warning, or to
-substitute them by a semantically equivalent code based on return code
-values. To produce an executable code, the declarations must be
+Fortran~90 standard. It is possible (1) to refuse them, or (2) to ignore
+them and (3) to replace alternate returns by {\tt STOP}, or to substitute
+them by a semantically equivalent code based on return code values. Option
+(2) is useful if the alternate returns are used to propagate error
+conditions. Option (3) is useful to understand the impact of the alternate
+returns on the control flow graph and to maintain the code semantics.
+By default, the first option is selected and alternate returns are refused.
+
+To produce an executable code, the declarations must be
 regenerated: see property \verb/PRETTYPRINT_ALL_DECLARATIONS/ in
-Section~\ref{subsubsection-declarations}. By default, they are ignored.
-The code can still be executed if alternate returns are used only for
+Section~\ref{subsubsection-declarations}. 
+
+With option (2), the code can still be executed if alternate returns are used only for
 errors and if no errors occur. It can also be analyzed to understand what
 the {\em normal} behavior is. For instance, OUT regions are more likely to
 be exact when exceptions and errors are ignored.
 
 \begin{verbatim}
-PARSER_SUBSTITUTE_ALTERNATE_RETURNS FALSE
+PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
 PARSER_RETURN_CODE_VARIABLE "PIPS_RETURN_CODE_"
 \end{verbatim}
 
