@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1995/08/08 18:40:49 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1995/09/05 08:38:25 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -11,7 +11,7 @@
 #
 # get the environment if necessary
 
-[ "$PIPSDIR" ] || . /home/users/pips/Pips/pipsrc.sh
+[ "$PIPS_DIR" ] || . /users/soft/pips/Pips/pipsrc.sh
 
 #
 # should be in the environment
@@ -19,7 +19,7 @@
 # why does pwd sometimes return /home/users/pips on chailly?
 # sh and pwd are not very clever:-)
 
-REAL_PIPSHOME=`(cd $PIPSHOME/../pips;pwd)`
+REAL_PIPSHOME=`(cd $PIPS_HOME/../pips;pwd)`
 
 #
 
@@ -183,7 +183,7 @@ local_date()
 #
 absolute_name()
 {
-  echo $1 | sed "s,^$REAL_PIPSHOME,$PIPSHOME,"
+  echo $1 | sed "s,^$REAL_PIPSHOME,$PIPS_HOME,"
 }
 
 #
