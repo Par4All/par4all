@@ -1,0 +1,72 @@
+#! /bin/sh
+#
+# $RCSfile: hpfc_compile,v $ version $Revision$
+# $Date: 1994/09/03 18:06:17 $, 
+# got on %D%, %T%
+#
+
+script=`basename $0`
+VERBOSE=':'
+DEBUG=':'
+DELETE=':'
+PIPS='pips'
+INSTALL="$HPFC_TOOLS/hpfc_install"
+PIPSARGS='-s MUST_REGIONS -p HPFCOMPILE'
+
+unset HPFFILE MODULE WORKSPACE
+
+usage()
+{
+  echo "Usage: $script [-vDdh] [ -w ws ] [ -m mod ] [-n n | file]" 2>&1
+  exit ${1:-1}
+}
+
+verbose()
+{
+  echo "$script: $@"
+}
+
+debug()
+{
+  echo "$script: $@" 1>&2
+}
+
+while getopts vDdn:hm:w: OPT
+do
+  case $OPT in
+    v) VERBOSE='verbose' ;;
+    D) DEBUG='debug' ;;
+    d) DELETE='Delete' ;;
+    n) HPFFILE="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
+    m) MODULE="$OPTARG" ;;
+    w) WORKSPACE="$OPTARG" ;;
+    h|*) usage 1 ;;
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+[ "$#" -eq 1 ] && { HPFFILE="$1"; shift; }
+[ "$#" -eq 0 ] || usage 2
+
+[ "$MODULE" ] || MODULE=`basename $HPFFILE .f | tr 'a-z' 'A-Z'`
+[ "$WORKSPACE" ] || WORKSPACE=`basename $HPFFILE .f`
+
+$VERBOSE "applying hpfc on file $HPFFILE"
+
+set -e
+$PIPS -f $HPFFILE $PIPSARGS -m $MODULE $WORKSPACE
+set +e
+
+$VERBOSE "installing generated codes"
+
+[ -d "$WORKSPACE.hpfc" ] || mkdir $WORKSPACE.hpfc
+${INSTALL} -b $WORKSPACE.database -r $HPFFILE -i -t $WORKSPACE.hpfc
+
+$DELETE $WORKSPACE
+
+$VERBOSE "done"
+
+#
+# that is all
+#
