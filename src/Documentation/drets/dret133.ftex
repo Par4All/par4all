@@ -1,12 +1,16 @@
 \documentstyle[12pt,figfonts]{article}
-\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+%\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
 \newcommand{\titre}{PIPSMAKE ET PIPSDBM \\
 			MOTIVATIONS ET FONCTIONALITES
 }
+\author{Re'mi TRIOLET}
+\title{PIPSMAKE ET PIPSDBM \\
+			MOTIVATIONS ET FONCTIONALITES\\
+TR EMP E133}
+\date{Septembre 1990}
 
-\newcommand{\auteur}{Re'mi TRIOLET}
-\newcommand{\docdate}{Septembre 1990}
+
 \newcommand{\numero}{E133}
 
 \setlength{\parindent}{0cm}
@@ -28,8 +32,9 @@
 }
 
 \begin{document}
+\maketitle
 \sloppy
-\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+%\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
 
 \section{Introduction}
 
