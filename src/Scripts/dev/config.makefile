@@ -27,6 +27,7 @@ SRC_MACROS =	auto.h \
 		makefile_macros.TEST \
 		makefile_macros.GNULL \
 		makefile_macros.GNUSOL2LL \
+		makefile_macros.SOL2LL \
 		makefile_macros.GPROF
 
 DDC_MACROS = 	define_libraries.make \
