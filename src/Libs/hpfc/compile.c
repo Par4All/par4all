@@ -3,6 +3,9 @@
  * 
  * Fabien Coelho, May 1993
  *
+ * SCCS Stuff:
+ * $RCSfile: compile.c,v $ ($Date: 1994/03/10 09:17:54 $) version $Revision$, got on %D%, %T%
+ * %A%
  */
 
 /*
@@ -66,6 +69,8 @@ char *module_name;
     debug(3,"hpfcompile","module: %s\n",module_name);
 
     set_current_module_entity(module);
+    make_hpfc_static_mappings();
+
 /*    CurrentFunction = module;  is that not necessary any more? */
     module_stat = (statement)
 	db_get_memory_resource(DBR_CODE, module_name, FALSE);
