@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.7  1997/09/10 09:43:30  irigoin
+ * Explicit free_value_mappings() added. Context set for
+ * program_precondition() and the prettyprinter modules.
+ *
  * Revision 1.6  1997/09/09 11:03:15  coelho
  * initial preconditions should be ok.
  *
@@ -97,6 +101,8 @@ initial_precondition(string name)
     reset_current_module_statement();
     reset_cumulated_rw_effects();
 
+    free_value_mappings();
+
     debug_off();
     return TRUE;
 }
@@ -126,12 +132,25 @@ program_precondition(string name)
     char * module_list[ARGS_LENGTH];
     entity the_main = get_main_entity();
 
+    pips_assert("main was found", the_main!=entity_undefined);
+
     debug_on("SEMANTICS_DEBUG_LEVEL");
-    pips_debug(1, "considering program \"%s\"\n", name);
+    pips_debug(1, "considering program \"%s\" with main \"%s\"\n", name,
+	       module_local_name(the_main));
+
+    set_current_module_entity(the_main);
+    set_current_module_statement( (statement) 
+	db_get_memory_resource(DBR_CODE,
+			       module_local_name(the_main),
+			       TRUE));
+    set_cumulated_rw_effects((statement_effects) 
+		   db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+					  module_local_name(the_main),
+					  TRUE));
+    module_to_value_mappings(the_main);
     
     db_get_module_list(&nmodules, module_list);
     pips_assert("some modules in the program", nmodules>0);
-    pips_assert("main was found", the_main!=entity_undefined);
 
     for(i=0; i<nmodules; i++) 
     {
@@ -158,10 +177,16 @@ program_precondition(string name)
 
     DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_PRECONDITION, strdup(name), t);
 
+    reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+
+    free_value_mappings();
+
     debug_off();
     return TRUE;
 }
-
+
 /*********************************************************** PRETTY PRINTERS */
 
 bool 
@@ -175,13 +200,24 @@ print_initial_precondition(string name)
     debug_on("SEMANTICS_DEBUG_LEVEL");
 
     set_current_module_entity(module);
-
+    set_current_module_statement( (statement) 
+	db_get_memory_resource(DBR_CODE, name, TRUE));
+    set_cumulated_rw_effects((statement_effects) 
+		   db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+					  name,
+					  TRUE));
+    module_to_value_mappings(module);
+ 
     ok = make_text_resource(name,
 			    DBR_PRINTED_FILE,
 			    ".ipred",
 			    text_transformer(t));
 
     reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+
+    free_value_mappings();
 
     debug_off();
 
@@ -200,13 +236,26 @@ print_program_precondition(string name)
     pips_debug(1, "for \"%s\"\n", name);
 
     set_current_module_entity(m);
-
+    set_current_module_statement( (statement) 
+	db_get_memory_resource(DBR_CODE,
+			       module_local_name(m),
+			       TRUE));
+    set_cumulated_rw_effects((statement_effects) 
+		   db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+					  module_local_name(m),
+					  TRUE));
+    module_to_value_mappings(m);
+ 
     ok = make_text_resource(name,
 			    DBR_PRINTED_FILE,
 			    ".pipred",
 			    text_transformer(t));
 
     reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+
+    free_value_mappings();
 
     debug_off();
 
