@@ -13,21 +13,13 @@
 # - several files may be piped simultaneously
 #
 # SCCS Stuff:
-# $RCSfile: Accept,v $ ($Date: 1996/11/11 13:46:23 $, ) version $Revision$,
+# $RCSfile: Accept,v $ ($Date: 1997/02/19 09:01:31 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
 
 header="Differences for"
-pips_test_directory="${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}"
-
-scriptname="`basename $0` ($Revision$)"
-
-error()
-{
-  echo "$scriptname error $1: $2" >&2
-  exit $1
-}
+pips_test_directory="${$PIPS_ROOT/Validation}"
 
 sed -n "/^$header/s,^$header \([^ ]*\) in \([^ ]*\):,\1 \2,p" |
 while read module file
@@ -35,12 +27,15 @@ do
   outfile=$file.out
   reffile=$file
 
-  [ -f $outfile ] || error 2 "no $outfile"
+  if [ -f $outfile ] 
+  then
+    echo "accepting for $file"
 
-  echo "accepting for $file"
-
-  rm -f $reffile
-  mv $outfile $reffile
+    rm -f $reffile
+    mv $outfile $reffile
+  else
+    echo "*** $outfile not found" 2>&1 
+  fi
 done
 
 #
