@@ -16,9 +16,9 @@ Pmatrix matrix_new(n,m)
 int n,m;
 { 
     Pmatrix a = (Pmatrix) malloc(sizeof(Smatrix));
-    a->denominator = 1;
+    a->denominator = VALUE_ONE;
     a->number_of_lines = n;
     a->number_of_columns = m;
-    a->coefficients = (int *) malloc((unsigned) (sizeof(int)*((n)*(m)+1)));
+    a->coefficients = (Value *) malloc(sizeof(Value)*((n*m)+1));
     return (a);
 }
