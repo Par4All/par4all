@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/04/21 14:50:07 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/07/20 18:40:46 $, )
  * version $Revision$
  */
 
@@ -56,9 +56,8 @@ statement stat, *hp, *np;
     debug(2, "io_efficient_compile", "statement 0x%x, %d arrays\n",
 	  stat, gen_length(entities));
 
-    MAPL(ce,
+    MAP(EFFECT, e,
      {
-	 effect e = EFFECT(CAR(ce));
 	 entity array = reference_variable(effect_reference(e));
 	 action act = effect_action(e);
 	 approximation apr = effect_approximation(e);
@@ -383,9 +382,9 @@ list *plvars;
     Psysteme syst = *psyst;
     list kept = NIL;
 
-    MAPL(ce, 
+    MAP(ENTITY, e, 
      {
-	 Variable var = (Variable) ENTITY(CAR(ce));
+	 Variable var = (Variable) e;
 	 int coeff = -1;
 
 	 (void) contrainte_var_min_coeff(sc_egalites(syst), var, &coeff, FALSE);
@@ -436,9 +435,8 @@ tag move;
     
     /*   keep parameters !
      */
-    MAPL(ce,
+    MAP(ENTITY, e,
      {
-	 entity e = ENTITY(CAR(ce));
 	 string s = entity_module_name(e);
 
 	 if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
@@ -449,19 +447,15 @@ tag move;
     /*   others
      */
     gen_remove(&try_remove, (entity) TCST);
-    MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, keep);
-    MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, try_keep);
-    MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, remove);
+    MAP(ENTITY, e, gen_remove(&try_remove, e), keep);
+    MAP(ENTITY, e, gen_remove(&try_remove, e), try_keep);
+    MAP(ENTITY, e, gen_remove(&try_remove, e), remove);
     
     /*    remove variables that have to be removed
      */
-    MAPL(ce, 
-     {
-	 sc_projection_along_variable_ofl_ctrl(&syst,
-					       (Variable) ENTITY(CAR(ce)),
-					       NO_OFL_CTRL);
-     },
-	 remove);
+    MAP(ENTITY, e, 
+	sc_projection_along_variable_ofl_ctrl(&syst, (Variable) e, NO_OFL_CTRL),
+	remove);
     
     /* Try to remove other unusefull variables
      */
@@ -484,8 +478,8 @@ void remove_variables_from_system(ps, plv)
 Psysteme *ps;
 list /* of entity (Variable) */ *plv;
 {
-    MAPL(ce, sc_projection_along_variable_ofl_ctrl
-	 (ps, (Variable) ENTITY(CAR(ce)), NO_OFL_CTRL), *plv);
+    MAP(ENTITY, e, sc_projection_along_variable_ofl_ctrl
+	(ps, (Variable) e, NO_OFL_CTRL), *plv);
     gen_free_list(*plv), *plv=NIL;
 }
 
@@ -554,22 +548,21 @@ tag move;
 
     /*   Keep parameters !
      */
-    MAPL(ce,
-     {
-	 entity e = ENTITY(CAR(ce));
-	 string s = entity_module_name(e);
-
-	 if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
-	     keep = CONS(ENTITY, e, keep);
-     },
-	 try_remove);
+    MAP(ENTITY, e,
+    {
+	string s = entity_module_name(e);
+	
+	if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
+	    keep = CONS(ENTITY, e, keep);
+    },
+	try_remove);
 
     /*   others
      */
     gen_remove(&try_remove, (entity) TCST);
-    MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, keep);
-    MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, try_keep);
-    MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, remove);
+    MAP(ENTITY, e, gen_remove(&try_remove, e), keep);
+    MAP(ENTITY, e, gen_remove(&try_remove, e), try_keep);
+    MAP(ENTITY, e, gen_remove(&try_remove, e), remove);
 
     DEBUG_ELST(7, "keep", keep);
     DEBUG_ELST(7, "try_keep", try_keep);
@@ -626,17 +619,11 @@ list *plparam, *plproc, *plscan, *plrebuild;
 
     /* parameters: those variables that are not dummies...
      */
-    MAPL(ce,
-     {
-	 entity
-	     v = ENTITY(CAR(ce));
+    MAP(ENTITY, v,
+	if (!entity_hpfc_dummy_p(v)) lparam = CONS(ENTITY, v, lparam),
+	all);
 
-	 if (!entity_hpfc_dummy_p(v)) 
-	     lparam = CONS(ENTITY, v, lparam);
-     },
-	 all);
-
-    MAPL(ce, {gen_remove(&all, ENTITY(CAR(ce)));}, lparam);
+    MAP(ENTITY, e, gen_remove(&all, e), lparam);
     
     /* processors
      */
@@ -675,17 +662,15 @@ list *plparam, *plproc, *plscan, *plrebuild;
 	Pcontrainte pc = contrainte_make(VECTEUR_NUL);
 
 	fprintf(stderr, "deducables:\n   ");
-	MAPL(ce,
-	 {
-	     expression ex = EXPRESSION(CAR(ce));
-
-	     pc->vecteur = normalized_linear(expression_normalized(ex));
-	     
-	     fprintf(stderr, "%s rebuilt with ", entity_local_name
-		     (reference_variable(expression_reference(ex))));
-	     egalite_fprint(stderr, pc, entity_local_name);
-	 },
-	     lrebuild);
+	MAP(EXPRESSION, ex,
+	{
+	    pc->vecteur = normalized_linear(expression_normalized(ex));
+	    
+	    fprintf(stderr, "%s rebuilt with ", entity_local_name
+		    (reference_variable(expression_reference(ex))));
+	    egalite_fprint(stderr, pc, entity_local_name);
+	},
+	    lrebuild);
     }
 
     build_sc_nredund_2pass(psyst);
@@ -712,11 +697,10 @@ list vars, *pleftvars;
 
     *pleftvars = NIL;
 
-    MAPL(ce,
-     {
-	 Pcontrainte eq = CONTRAINTE_UNDEFINED;
-	 entity dummy = ENTITY(CAR(ce));
-	 int coeff = 0;
+    MAP(ENTITY, dummy,
+    {
+	Pcontrainte eq = CONTRAINTE_UNDEFINED;
+	int coeff = 0;
 
 	 if (eq = eq_v_min_coeff(sc_egalites(syst), (Variable) dummy, &coeff),
 	     (coeff == 1))
@@ -792,14 +776,11 @@ bool number_first;
 		CONS(ENTITY, get_ith_cycle_dummy(i),
 		       l))));
 
-	MAPL(ce,
-	 {
-	     entity e = ENTITY(CAR(ce));
-
-	     if (gen_in_list_p(e, le)) 
-		 lr = CONS(ENTITY, e, lr); /* reverse! */
-	 },
-	     l);
+	MAP(ENTITY, e,
+	{
+	    if (gen_in_list_p(e, le)) lr = CONS(ENTITY, e, lr); /* reverse! */
+	},
+	    l);
 
 	gen_free_list(l);
 	result = gen_nconc(result, lr);
@@ -863,13 +844,13 @@ list l;
     list l2 = gen_nreverse(gen_copy_seq(l));
     Pbase result = BASE_NULLE;
 	
-    MAPL(ce,
-     {
-	 Pbase new = (Pbase) vect_new((Variable) ENTITY(CAR(ce)), (Value) 1);
-	 new->succ = result;
-	 result = new;
-     },
-	 l2);
+    MAP(ENTITY, e,
+    {
+	Pbase new = (Pbase) vect_new((Variable) e, (Value) 1);
+	new->succ = result;
+	result = new;
+    },
+	l2);
 
     gen_free_list(l2);
     return(result);
