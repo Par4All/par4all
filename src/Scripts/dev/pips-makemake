@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 21:58:43 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 22:46:52 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -653,7 +653,10 @@ build-header-file:
 # it is build for the GNU target, because it is the only ANSI one...
 # FILE* and so are not struct _iobuf or so.
 # if pips is exported, may you should consider HEADER_ARCH="". FC.
-header: .header
+
+# header: checks for INC_TARGET dependencies (.header) and for
+# INC_TARGET existance !
+header: .header $(INC_TARGET)
 
 $(INC_TARGET): $(TARGET)-local.h 
 	$(MAKE) --no-print-directory $(HEADER_ARCH) build-header-file
