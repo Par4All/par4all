@@ -21,7 +21,6 @@
    The syntax of tokens written by GEN_WRITE. */
 
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 #include "genC.h"
 #include "newgen_include.h"
