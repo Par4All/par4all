@@ -1,7 +1,10 @@
 /* package sc 
  * $RCSfile: sc_elim_simple_redund.c,v $ (version $Revision$)
- * $Date: 2002/03/08 10:36:00 $, 
+ * $Date: 2003/07/28 09:08:07 $, 
  * $Log: sc_elim_simple_redund.c,v $
+ * Revision 1.7  2003/07/28 09:08:07  duong
+ * change _dup to _copy version
+ *
  * Revision 1.6  2002/03/08 10:36:00  irigoin
  * sc_elim_db_constraints() is restored and sc_elim_double_constraints() is
  * added to provide the new functionalities. sc_elim_db_constraints is used
@@ -475,7 +478,7 @@ Psysteme ps;
 
 	if(VECTEUR_NUL_P(sum)) {
 	  /* inequalities eq1 and eq2 define an equality */
-	  Pcontrainte eq = contrainte_make(vect_dup(contrainte_vecteur(eq1)));
+	  Pcontrainte eq = contrainte_make(vect_copy(contrainte_vecteur(eq1)));
 
 	  /* No need to update the basis since it used to be an inequality */
 	  sc_add_egalite(ps, eq);
