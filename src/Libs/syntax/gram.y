@@ -56,6 +56,9 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.56  2001/07/19 08:29:48  coelho
+  * substring initialization fixed.
+  *
   * Revision 1.55  2001/07/18 17:53:11  irigoin
   * Feature added for EDF code: pointers can be declared several times
   * pointing to different allocatable arrays
@@ -208,20 +211,32 @@ representation.  */
 
 static datavar MakeDataVar(syntax s, range r)
 {
-    entity e; 
+    entity e, touse; 
     reference ref;
     datavar d;
     syntax s2 = syntax_undefined;
+    bool is_a_substring = FALSE;
 
     if (! syntax_reference_p(s)) {
-	if(syntax_call_p(s)
-	   && call_function(syntax_call(s))==entity_intrinsic(SUBSTRING_FUNCTION_NAME)) {
-	    pips_debug(8, "Substring initialization\n");
-	    s2 = expression_syntax(EXPRESSION(CAR(call_arguments(syntax_call(s)))));
-	}
-	else {
-	    FatalError("MakeDataVar", "bad variable\n");
-	}
+      if(syntax_call_p(s)
+	 && call_function(syntax_call(s))==
+	                  entity_intrinsic(SUBSTRING_FUNCTION_NAME)) 
+      {
+	/*
+	 * we cannot handle correctly substring initialization
+	 * in analyze data. Hence we ignore these by putting a
+	 * entity_undefined...
+	 *
+	 * DATA S(1:2)/'ab'/
+	 * DATA S(3:4)/'cd'/
+	 */
+	pips_debug(8, "Substring initialization\n");
+	s2=expression_syntax(EXPRESSION(CAR(call_arguments(syntax_call(s)))));
+	is_a_substring = TRUE;
+      }
+      else {
+	FatalError("MakeDataVar", "bad variable\n");
+      }
     }
     else {
 	s2 = s;
@@ -229,36 +244,38 @@ static datavar MakeDataVar(syntax s, range r)
 
     ref = syntax_reference(s2);
     e = reference_variable(ref);
+    touse = is_a_substring? entity_undefined: e;
 
     if (r == range_undefined) {
-	if(reference_indices(ref)==NIL) {
-	    int ne = 0;
-
-	    if(!NumberOfElements(variable_dimensions(type_variable(entity_type(e))),
-				 &ne)) {
-		user_warning("MakeDataVar", "Varying size of array \"%s\"\n", entity_name(e));
-		ParserError("MakeDataVar", "Fortran standard prohibit varying size array\n");
-	    }
-
-	    d = make_datavar(e, ne);
+      if(reference_indices(ref)==NIL) {
+	int ne = 0;
+	
+	if(!NumberOfElements(variable_dimensions(type_variable(entity_type(e))),
+			     &ne)) {
+	  pips_user_warning("Varying size of array \"%s\"\n", entity_name(e));
+	  ParserError("MakeDataVar", 
+		      "Fortran standard prohibit varying size array\n");
 	}
-	else
-	    d = make_datavar(e, 1);
+	
+	d = make_datavar(touse, ne);
+      }
+      else
+	d = make_datavar(touse, 1);
     }
     else {
-	int c;
-
-	if(range_count(r, &c)) {
-	    d = make_datavar(e, c);
-	}
-	else {
-	    ParserError("MakeDataVar",
-			"Only constant loop bounds with non-zero increment" 
-			" are supported by the PIPS parser\n");
-	}
+      int c;
+      
+      if(range_count(r, &c)) {
+	d = make_datavar(touse, c);
+      }
+      else {
+	ParserError("MakeDataVar",
+		    "Only constant loop bounds with non-zero increment" 
+		    " are supported by the PIPS parser\n");
+      }
     }
-
-    return(d);
+    
+    return d;
 }
 
 /* this function is called when a data implied do has more than one
