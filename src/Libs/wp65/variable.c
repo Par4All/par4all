@@ -10,10 +10,10 @@
   * 1991
   */
 
+#include <stdlib.h>
 #include <stdio.h>
-
-extern double ceil();
-extern double log10();
+#include <malloc.h>
+#include <math.h>
 
 /* #include <values.h> */
 #include <limits.h>
@@ -393,8 +393,8 @@ hash_table r_to_ud;
     rv = reference_variable(r);
 
     ifdebug(8) {
-	(void) fprintf(stderr, "reference %x to %s:", 
-		       (unsigned int) r, entity_local_name(rv));
+	(void) fprintf(stderr, "reference %p to %s:", 
+		       r, entity_local_name(rv));
 	print_words(stderr, words_reference(r));
 	(void) putc('\n', stderr);
     }
@@ -402,7 +402,7 @@ hash_table r_to_ud;
     if((lllv = (list) hash_get(v_to_lllv, (char *) rv)) 
        == (list) HASH_UNDEFINED_VALUE) {
 	debug(8, "reference_conflicting_test_and_update", 
-	      "no local variables for reference %x to %s\n",
+	      "no local variables for reference %p to %s\n",
 	      r, entity_local_name(rv));
 
 	debug(8,"reference_conflicting_test_and_update", "return FALSE\n");
@@ -419,8 +419,8 @@ hash_table r_to_ud;
 	    entity rv2 = reference_variable(r2);
 
 	    ifdebug(8) {
-		(void) fprintf(stderr, "conflict_p with reference %x to %s:", (unsigned int) r2, 
-			entity_local_name(rv2));
+		(void) fprintf(stderr, "conflict_p with reference %p to %s:",
+			       r2, entity_local_name(rv2));
 		print_words(stderr, words_reference(r2));
 		(void) putc('\n', stderr);
 	    }
@@ -498,9 +498,9 @@ graph dg;
 
     debug(8,"reference_conflicting_p","begin\n");
     ifdebug(8) {
-	(void) fprintf(stderr,"Reference 1 %x: ", (unsigned int) r1);
+	(void) fprintf(stderr,"Reference 1 %p: ", (unsigned int) r1);
 	print_words(stderr, words_reference(r1));
-	(void) fprintf(stderr,"\nReference 2 %x: ", (unsigned int) r2);
+	(void) fprintf(stderr,"\nReference 2 %p: ", (unsigned int) r2);
 	print_words(stderr, words_reference(r2));
 	(void) fputc('\n',stderr);
     }
@@ -524,14 +524,14 @@ graph dg;
 		reference r21 = effect_reference(e_sink);
 
 		ifdebug(8) {
-		    (void) fprintf(stderr,"Test with reference 1 %x: ", (unsigned int) r1);
+		    (void) fprintf(stderr,"Test with reference 1 %p: ", r1);
 		    print_words(stderr, words_reference(r1));
-		    (void) fprintf(stderr," and reference 2 %x: ", (unsigned int) r2);
+		    (void) fprintf(stderr," and reference 2 %p: ", r2);
 		    print_words(stderr, words_reference(r2));
 		    (void) fputc('\n',stderr);
-		    (void) fprintf(stderr,"Test with reference 11 %x: ", (unsigned int) r11);
+		    (void) fprintf(stderr,"Test with reference 11 %p: ", r11);
 		    print_words(stderr, words_reference(r11));
-		    (void) fprintf(stderr," and reference 21 %x: ", (unsigned int) r21);
+		    (void) fprintf(stderr," and reference 21 %p: ", r21);
 		    print_words(stderr, words_reference(r21));
 		    (void) fputc('\n',stderr);
 		    (void) fputc('\n',stderr);
