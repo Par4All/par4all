@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/10/04 19:25:10 $, ) 
+ * ($Date: 1995/10/10 11:30:16 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -291,7 +291,7 @@ void fprint_entity_list(FILE *fp, list l);
   hpfc_name_to_expression(CND_COMPINOWNP)
 
 #define condition_not_computer_in_owners()\
-  (MakeUnaryCall(CreateIntrinsic(NOT_OPERATOR_NAME), \
+  (MakeUnaryCall(entity_intrinsic(NOT_OPERATOR_NAME), \
 		 condition_computer_in_owners()))
 
 #define hpfc_name_to_stmt(s) \
