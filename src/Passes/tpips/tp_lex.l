@@ -97,10 +97,10 @@ void yyrestart(FILE *f){ yyin = f;}
     return ACTIVATE;
 }
 
-<KEY>{OPTEMPTY}"set" {
-    pips_debug(8,"read token SET_PROPERTY\n");
+<KEY>{OPTEMPTY}"getproperty" {
+    pips_debug(8,"read token GET_PROPERTY\n");
     BEGIN PROP;
-    return SET_PROPERTY;
+    return GET_PROPERTY;
 }
 
 <KEY>{OPTEMPTY}"get" {
