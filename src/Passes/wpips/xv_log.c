@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/03 17:02:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/09 15:05:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/10/03 17:02:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_log[] = "%A% ($Date: 1995/10/09 15:05:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -162,8 +162,10 @@ wpips_user_error_message(char error_buffer[])
       insert_something_in_the_wpips_log_window(error_buffer);
 
    show_message(error_buffer);
+   if (!wpips_emacs_mode) 
+      unhide_window(log_frame);
 
-   prompt_user("Something went wrong. Check the log window");
+   /* prompt_user("Something went wrong. Check the log window"); */
       
    /* terminate PIPS request */
    if(get_bool_property("ABORT_ON_USER_ERROR"))
@@ -182,9 +184,11 @@ wpips_user_warning_message(char warning_buffer[])
 
    if (wpips_emacs_mode) 
       send_user_warning_to_emacs(warning_buffer);
-   else
+   else {
       insert_something_in_the_wpips_log_window(warning_buffer);
-
+      unhide_window(log_frame);
+   }
+   
    show_message(warning_buffer);
 }
 
