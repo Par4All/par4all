@@ -582,6 +582,46 @@ GENERATE_NESTED_PARALLEL_LOOPS TRUE
 WP65_DEBUG_LEVEL        0
 \end{verbatim}
 
+\section{HPFC {\em High Performance Fortran Compiler}}
+
+debugging levels considered by HPFC: {\tt HPFC\_DEBUG\_LEVEL}, 
+{\tt HPFC\_PARSER\_DEBUG\_LEVEL}, {\tt HPFC\_IO\_DEBUG\_LEVEL}.
+
+  These booleans decide whether some computations are directly
+generated in the output code, or computed thru calls to dedicated
+runtime functions. The default is the direct expansion.
+
+\begin{verbatim}
+HPFC_EXPAND_COMPUTE_LOCAL_INDEX TRUE
+\end{verbatim}
+
+\begin{verbatim}
+HPFC_EXPAND_COMPUTE_COMPUTE TRUE
+\end{verbatim}
+
+\begin{verbatim}
+HPFC_EXPAND_COMPUTE_OWNER TRUE
+\end{verbatim}
+
+\begin{verbatim}
+HPFC_EXPAND_CMPLID TRUE
+\end{verbatim}
+
+  These booleans control the I/O generation.
+
+\begin{verbatim}
+HPFC_NEW_IO_COMPILATION TRUE
+\end{verbatim}
+
+\begin{verbatim}
+HPFC_SYNCHRONIZE_IO FALSE
+\end{verbatim}
+
+\begin{verbatim}
+HPFC_IGNORE_MAY_IN_IO FALSE
+\end{verbatim}
+
+
 % \begin{thebibliography}{99}
 
 % \end{thebibliography}
