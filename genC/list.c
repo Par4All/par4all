@@ -35,7 +35,7 @@
    . GEN_FREE_LIST frees the spine of the list L.     
    . GEN_FULL_FREE_LIST frees the whole list L.     
    . GEN_NCONC physically concatenates CP1 and CP2 (returns CP1).
-   . GEN_COPY copies one chunks in another.
+   . GEN_COPY copies one gen_chunks in another.
    . GEN_FIND_IF returns the leftmost element (extracted from the cons cell 
      by EXTRACT) of the sequence SEQ that satisfies TEST. EXTRACT should 
      be one of the car_to_domain function that are automatically generated 
@@ -55,7 +55,7 @@
      duplicated.
    . GEN_LAST returns the last cons of a list.
    . GEN_REMOVE updates the list (pointer) CPP by removing (and freeing) any
-     ocurrence of the chunk OBJ.
+     ocurrence of the gen_chunk OBJ.
    . GEN_NTHCDR returns the N-th (beginning at 1) CDR element of L.
      CDR(L) = GEN_NTHCDR(1,L).
    . GEN_NTH returns the N-th (beginning at 0) car of L.
@@ -71,7 +71,7 @@
 extern int fprintf();
 
 int gen_eq( obj1, obj2 )
-chunk *obj1, *obj2 ;
+gen_chunk *obj1, *obj2 ;
 {
   return( obj1 == obj2 ) ;
 }
@@ -116,21 +116,21 @@ cons *cp ;
     return( NIL ) ;
 }
 
-static chunk *chunk_of_cons_of_chunk = chunk_undefined;
-static bool cons_of_chunk(cp)
+static gen_chunk *gen_chunk_of_cons_of_gen_chunk = gen_chunk_undefined;
+static bool cons_of_gen_chunk(cp)
 cons *cp;
 {
-    return(CHUNK(CAR(cp))==chunk_of_cons_of_chunk);
+    return(CHUNK(CAR(cp))==gen_chunk_of_cons_of_gen_chunk);
 }
 
 void gen_insert_after(new_obj, obj, l)
-chunk *new_obj, *obj;
+gen_chunk *new_obj, *obj;
 cons *l;
 {
     cons *obj_cons = NIL;
-    chunk_of_cons_of_chunk = obj;
+    gen_chunk_of_cons_of_gen_chunk = obj;
 
-    obj_cons = gen_some(cons_of_chunk, l);
+    obj_cons = gen_some(cons_of_gen_chunk, l);
     assert(!ENDP(obj_cons));
 
     CDR(obj_cons) = CONS(CHUNK, new_obj, CDR(obj_cons));
@@ -162,8 +162,8 @@ void gen_mapc_tabulated( fp, binding )
 void (*fp)() ;
 int binding ;
 {
-    struct binding *bp = &Domains[ binding ] ;
-    chunk *table = Gen_tabulated_[ bp->index ] ;
+    struct gen_binding *bp = &Domains[ binding ] ;
+    gen_chunk *table = Gen_tabulated_[ bp->index ] ;
     int i ;
 
     if( table == NULL ) {
@@ -171,23 +171,23 @@ int binding ;
 	return ;
     }
     for( i = 0 ; i < max_tabulated_elements() ; i++ ) {
-	if( (table+i)->p != chunk_undefined ) 
+	if( (table+i)->p != gen_chunk_undefined ) 
 		(*fp)( (table+i)->p ) ;
     }
 }
 
-chunk * gen_find_tabulated( key, domain )
+gen_chunk * gen_find_tabulated( key, domain )
 char *key ;
 int domain ;
 {
     static char full_key[ 1024 ] ;
-    chunk *hash ;
+    gen_chunk *hash ;
 
     sprintf( full_key, "%d%c%s", domain, HASH_SEPAR, key ) ;
 
-    if( (hash=(chunk *)hash_get( Gen_tabulated_names, full_key ))
-       == (chunk *)HASH_UNDEFINED_VALUE ) {
-	return( chunk_undefined ) ;
+    if( (hash=(gen_chunk *)hash_get( Gen_tabulated_names, full_key ))
+       == (gen_chunk *)HASH_UNDEFINED_VALUE ) {
+	return( gen_chunk_undefined ) ;
     }
     return( (Gen_tabulated_[ Domains[ domain ].index ]+abs( hash->i ))->p ) ;
 }
@@ -196,8 +196,8 @@ cons * gen_filter_tabulated( filter, domain )
 int (*filter)() ;
 int domain ;
 {
-    struct binding *bp = &Domains[ domain ] ;
-    chunk *table = Gen_tabulated_[ bp->index ] ;
+    struct gen_binding *bp = &Domains[ domain ] ;
+    gen_chunk *table = Gen_tabulated_[ bp->index ] ;
     int i ;
     cons *l ;
 
@@ -206,9 +206,9 @@ int domain ;
 	return( NIL ) ;
     }
     for( i = 0, l = NIL ; i < max_tabulated_elements() ; i++ ) {
-	chunk *obj = (table+i)->p ;
+	gen_chunk *obj = (table+i)->p ;
 
-	if( obj != chunk_undefined && (*filter)( obj )) {
+	if( obj != gen_chunk_undefined && (*filter)( obj )) {
 	    l = CONS( CHUNK, obj, l ) ;
 	}
     }
@@ -258,15 +258,15 @@ cons *cp1, *cp2 ;
 }
 
 void gen_copy( a, b )
-chunk *a, *b ;
+gen_chunk *a, *b ;
 {
     *a = *b ;
 }
 
-chunk *gen_find_if(test, seq, extract)
+gen_chunk *gen_find_if(test, seq, extract)
 bool (*test)();
 cons *seq;
-chunk *(*extract)();
+gen_chunk *(*extract)();
 {
     cons *pc;
 
@@ -275,16 +275,16 @@ chunk *(*extract)();
 		return((*extract)(CAR(pc)));
     }
 
-    return( chunk_undefined );
+    return( gen_chunk_undefined );
 }
 
-chunk *gen_find_if_from_end(test, seq, extract)
+gen_chunk *gen_find_if_from_end(test, seq, extract)
 bool (*test)();
 cons *seq;
-chunk *(*extract)();
+gen_chunk *(*extract)();
 {
     cons *pc;
-    chunk *e = chunk_undefined ;
+    gen_chunk *e = gen_chunk_undefined ;
 
     for (pc = seq; pc != NIL; pc = pc->cdr ) {
 	if ((*test)((*extract)(CAR(pc))))
@@ -294,11 +294,11 @@ chunk *(*extract)();
     return(e);
 }
 
-chunk *gen_find(item, seq, test, extract)
-chunk *item;
+gen_chunk *gen_find(item, seq, test, extract)
+gen_chunk *item;
 cons *seq;
 bool (*test)();
-chunk *(*extract)();
+gen_chunk *(*extract)();
 {
     cons *pc;
 
@@ -307,17 +307,17 @@ chunk *(*extract)();
 		return (*extract)(CAR(pc));
     }
 
-    return( chunk_undefined );
+    return( gen_chunk_undefined );
 }
 
-chunk *gen_find_from_end(item, seq, test, extract)
-chunk *item;
+gen_chunk *gen_find_from_end(item, seq, test, extract)
+gen_chunk *item;
 cons *seq;
 bool (*test)();
-chunk *(*extract)();
+gen_chunk *(*extract)();
 {
     cons *pc;
-    chunk *e = chunk_undefined ;
+    gen_chunk *e = gen_chunk_undefined ;
 
     for (pc = seq; pc != NIL; pc = pc->cdr ) {
 	if ((*test)(item, (*extract)(CAR(pc))))
@@ -327,8 +327,8 @@ chunk *(*extract)();
     return(e);
 }
 
-chunk *gen_find_eq(item, seq)
-chunk *item;
+gen_chunk *gen_find_eq(item, seq)
+gen_chunk *item;
 cons *seq;
 {
     cons *pc;
@@ -338,7 +338,7 @@ cons *seq;
 		return CAR(pc).p;
     }
 
-    return( chunk_undefined );
+    return( gen_chunk_undefined );
 }
 
 cons *gen_concatenate(l1, l2)
@@ -428,7 +428,7 @@ cons *l ;
 	
 void gen_remove( cpp, obj )
 cons **cpp ;
-chunk *obj ;
+gen_chunk *obj ;
 {
     if( ENDP( *cpp )) {
 	return ;
@@ -459,13 +459,13 @@ list l ;
     return(c);
 }
 
-/*  why a chunk ?
+/*  why a gen_chunk ?
  */
-chunk gen_nth( n, l )
+gen_chunk gen_nth( n, l )
 int n ;
 list l ;
 {
-    static chunk c ;
+    static gen_chunk c ;
 
     if( ENDP( l ) || n < 0 ) {
 	user( "gen_nth: incorrect arguments\n", "" ) ;
@@ -474,7 +474,7 @@ list l ;
     return( CAR( gen_nthcdr( n, l ))) ;
 }
 
-/* Sorts a list of chunks in place, to avoid mallocs. 
+/* Sorts a list of gen_chunks in place, to avoid mallocs. 
  * The list skeleton is not touched, but the items are replaced
  * within the list. If some of the cons are shared, it may trouble
  * the data and the program.
@@ -491,8 +491,8 @@ int (*compare)();
 {
     list c;
     int n = gen_length(l);
-    chunk 
-	**table = (chunk**) malloc(sizeof(chunk*)*n),
+    gen_chunk 
+	**table = (gen_chunk**) malloc(sizeof(gen_chunk*)*n),
 	**point;
 
     /*   the list items are first put in the temporary table,
@@ -502,7 +502,7 @@ int (*compare)();
     
     /*    then sorted,
      */
-    qsort(table, n, sizeof(chunk*), compare);
+    qsort(table, n, sizeof(gen_chunk*), compare);
 
     /*    and the list items are updated with the sorted table
      */
