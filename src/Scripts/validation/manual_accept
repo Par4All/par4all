@@ -1,0 +1,25 @@
+#! /bin/sh
+#
+# $RCSfile: manual_accept,v $ (version $Revision$)
+# $Date: 1996/12/26 14:00:43 $, 
+#
+
+CD=$PWD
+
+for dir
+do
+    cd $dir
+    for f in *.result/test.out
+    do 
+	ref="`dirname $f`/`basename $f .out`"
+	echo CONSIDERING $f and $ref
+        diff $ref $f | less
+        echo "accept (y|n)?"
+	read answer
+	[ "$answer" = 'y' -o "$answer" = 'Y' ] && mv $f $ref
+    done
+    cd $CD
+done
+
+# end of $RCSfile: manual_accept,v $
+#
