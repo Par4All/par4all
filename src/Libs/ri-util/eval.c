@@ -48,7 +48,8 @@ EvalSyntax(syntax s)
 		v = EvalCall((syntax_call(s)));
 		break;
 	    default:
-		fprintf(stderr, "[EvalExpression] case default\n");
+		fprintf(stderr, "[EvalExpression] Unexpected default case %d\n",
+			syntax_tag(s));
 		abort();
 	}
 
