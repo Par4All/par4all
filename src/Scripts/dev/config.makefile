@@ -9,7 +9,10 @@ SCRIPTS = 	pips-makemake \
 		analyze_libraries \
 		clean-pips \
 		grep_libraries \
-		search-pips
+		search-pips \
+		checked-out \
+		order_libraries \
+		pips-experiment
 
 FILES =		
 
