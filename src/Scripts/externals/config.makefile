@@ -7,9 +7,8 @@ SCRIPTS = 	fetch-linear \
 		recompile-linear \
 		recompile-newgen \
 		stf-workspace \
-		transformer-to-sc
-
-FILES =		
+		transformer-to-sc \
+		directory-name
 
 # that is all
 #
