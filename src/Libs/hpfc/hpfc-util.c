@@ -4,7 +4,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/27 16:23:37 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/27 17:14:18 $, )
  * version $Revision$,
  */
 
@@ -289,28 +289,19 @@ basic base;
     switch(basic_tag(base))
     {
     case is_basic_int:
-	sprintf(buffer,"%s%d",
-		HPFINTPREFIX,
-		unique_integer_number++);
+	sprintf(buffer,"%s%d", HPFINTPREFIX, unique_integer_number++);
 	break;
     case is_basic_float:
-	sprintf(buffer,"%s%d",
-		HPFFLOATPREFIX,
-		unique_float_number++);
+	sprintf(buffer,"%s%d", HPFFLOATPREFIX, unique_float_number++);
 	break;
     case is_basic_logical:
-	sprintf(buffer,"%s%d",
-		HPFLOGICALPREFIX,
-		unique_logical_number++);
+	sprintf(buffer,"%s%d", HPFLOGICALPREFIX, unique_logical_number++);
 	break;
     case is_basic_complex:
-	sprintf(buffer,"%s%d",
-		HPFCOMPLEXPREFIX,
-		unique_complex_number++);
+	sprintf(buffer,"%s%d",HPFCOMPLEXPREFIX, unique_complex_number++);
 	break;
     default:
-	pips_error("NewTemporaryVariable",
-		   "basic not welcomed, %d\n",
+	pips_error("NewTemporaryVariable", "basic not welcomed, %d\n",
 		   basic_tag(base));
 	break;
     }
