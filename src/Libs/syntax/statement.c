@@ -1293,17 +1293,22 @@ MakeEnddoInst()
 	ParserError("MakeEnddoInst", "Unexpected ENDDO statement\n");
     }
 
-    if (strcmp("BLOCKDO", BlockStack[CurrentBlock-1].l))
+    if (strcmp("BLOCKDO", BlockStack[CurrentBlock-1].l)
+	&&strcmp(lab_I, BlockStack[CurrentBlock-1].l))
 	    ParserError("MakeEnddoInst", "block do statement badly nested\n");
 
     /*LinkInstToCurrentBlock(MakeZeroOrOneArgCallInst("ENDDO", 
 						    expression_undefined));*/
     /* Although it is not really an instruction, the ENDDO statement may 
-     * carry comments
+     * carry comments and be labelled when closing a DO label structure.
      */
     LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
 
-    (void) PopBlock();
+    /* An unlabelled ENDDO can only close one loop. This cannot be
+     * performed by LinkInstToCurrentBlock().
+     */
+    if (strcmp("BLOCKDO", BlockStack[CurrentBlock-1].l)==0)
+      (void) PopBlock();
 }
 
 string 
