@@ -71,22 +71,29 @@ int error_seen ;
    the given MSG. If there already is a user error, let's suppose that's
    her fault ! */
 
-void fatal(char * fmt, va_list args)
+void fatal(char * fmt, ...)
 {
-    if( error_seen == 0 ) {
-	(void)fprintf( stderr, "\nNewgen Fatal Error -- " ) ;
-	(void)fprintf( stderr, fmt, args ) ;
-    }
+    va_list args;
+    va_start(args, fmt);
+    fprintf( stderr, "\nNewgen Fatal Error -- " ) ;
+    vfprintf( stderr, fmt, args) ;
+    va_end(args);
+
     abort() ;
 }
 
 /* USER generates a user error (i.e., non fatal) by printing the given MSG
    according to the FMT. */
 
-void user(char * fmt, va_list args)
+void user(char * fmt, ...)
 {
+    va_list args;
+    va_start(args, fmt);
+
     fprintf( stderr, "\nNewgen User Error -- " ) ;
-    fprintf( stderr, fmt, args ) ;
+    vfprintf( stderr, fmt, args ) ;
+
+    va_end(args);
     error_seen++ ;
 }
 
