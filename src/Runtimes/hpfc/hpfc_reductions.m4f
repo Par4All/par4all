@@ -2,7 +2,7 @@
 !     Reductions management 
 !
 ! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1997/03/03 14:47:57 $, )
+! ($Date: 1997/03/03 14:57:47 $, )
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -215,8 +215,8 @@ define(`pvm_opname',`ifelse($1,`PROD',PvmProduct,PVM`'$1)')dnl
 define(`identity',`ifelse($1,`SUM',0,$1,`PROD',1,$2)')dnl
 define(`HPFC_REDUCTIONS',`dnl
 pushdef(`NAME',$1)dnl
-pushdef(`PVMTYPE',$2)dnl
-pushdef(`LEVEL',$3)dnl
+pushdef(`PVMTYPE',$2)
+pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
 !-----
 !
 ! Functions for NAME reduction on TYPE scalars:
@@ -260,7 +260,7 @@ pushdef(`LEVEL',$3)dnl
       TYPE val(size)
       include "hpfc_commons.h"
       external pvm_opname(NAME)
-      integer info
+      integer info, bufid
 !
 ! performs the reduction to the host
 !
