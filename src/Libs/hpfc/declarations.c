@@ -4,7 +4,7 @@
  * normalization of HPF declarations.
  *
  * $RCSfile: declarations.c,v $ version $Revision$
- * ($Date: 1995/12/19 15:52:38 $, )
+ * ($Date: 1996/03/20 20:31:57 $, )
  */
  
 #include "defines-local.h"
@@ -696,6 +696,9 @@ int dim, side, width;
 
     pips_assert("valid dimension", dim>0);
 
+    pips_debug(10, "%s:(DIM=%d) %s%d\n", 
+	       entity_name(ent), dim, side?"+":"-", width);
+
     if (!bound_overlap_status_p(ent)) create_overlaps(ent);
     o = OVERLAP(gen_nth(dim-1, load_overlap_status(ent)));
 
@@ -721,6 +724,7 @@ int dim, side;
     overlap o;
 
     pips_assert("valid dimension", dim>0);
+    pips_debug(10, "%s (DIM=%d) %s\n", entity_name(ent), dim, side?"+":"-");
 
     if (!bound_overlap_status_p(ent)) create_overlaps(ent);
     pips_assert("overlap ok", bound_overlap_status_p(ent));
@@ -792,6 +796,40 @@ entity  module;
 
     declaration_with_overlaps(l);
     gen_free_list(l);
+}
+
+static void update_overlaps_of(entity u, entity v)
+{
+    int ndim = NumberOfDimension(v);
+
+    pips_assert("conformance", ndim==NumberOfDimension(u));
+
+    pips_debug(7, "%s from %s\n", entity_name(u), entity_name(v));
+
+    for(; ndim>0; ndim--)
+    {
+	set_overlap(u, ndim, 0, get_overlap(v, ndim, 0));
+	set_overlap(u, ndim, 1, get_overlap(v, ndim, 1));
+    }
+}
+
+void 
+update_overlaps_in_caller(
+    entity fun,                  /* the function */
+    list /* of expression */ le) /* call arguments in the initial code */
+{
+    int len = gen_length(le), i;
+
+    for (i=1; i<=len; i++, POP(le))
+    {
+	entity v = find_ith_parameter(fun, i);
+	if (array_distributed_p(v))
+	{
+	    entity u = expression_to_entity(EXPRESSION(CAR(le)));
+	    update_overlaps_of(load_old_node(u), v);
+	}
+
+    }
 }
 
 /*   That is all
