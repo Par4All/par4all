@@ -1,4 +1,4 @@
-$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/09/27 18:33:34 $, 
+$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/11/21 23:16:51 $, 
 
  (c) Fabien Coelho, 1993-1995
 
@@ -29,6 +29,7 @@ PIPS_M4 and HPFC_M4
   GNU m4 1.4 is okay.
 PVM_ROOT and PVM_ARCH
 HPFC_RUNTIME_M4_PARAMS:
+ -D HPFC_GNU	  (uses the GNU compilers: gcc/g77)
  -D DEMO          (print some messages when launched)
  -D DIRECT        (use direct connexions)
  -D DEBUG         (verbose run)
