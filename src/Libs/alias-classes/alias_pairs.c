@@ -98,15 +98,6 @@ add_parameter_aliases_for_this_call_site(call call_site,
 
 /*    real_args = call_arguments(call_site); */
 
-    ifdebug(9)
-	{
-	    pips_debug(9,"regions:\n");
-	    MAP(EFFECT, callee_region,
-		{
-		    print_region(callee_region);
-		}, list_regions_callee);
-	}
-
     for (r_args = real_args, arg_num = 1; r_args != NIL;
 	 r_args = CDR(r_args), arg_num++) 
     {
