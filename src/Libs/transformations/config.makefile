@@ -17,7 +17,6 @@ LIB_CFILES =	replace.c \
                 coarse_grain_parallelization.c\
 		dead_code_elimination.c \
                 trivial_test_elimination.c \
-		declaration_common_addition.c \
                 declaration_table_normalization.c \
 		privatize.c \
 		array_privatization.c \
