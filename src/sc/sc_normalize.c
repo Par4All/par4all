@@ -12,6 +12,7 @@
 #include "contrainte.h"
 #include "sc.h"
 
+
 /* Psysteme sc_normalize(Psysteme ps): normalisation d'un systeme d'equation
  * et d'inequations lineaires en nombres entiers ps, en place.
  *
@@ -155,20 +156,22 @@ Pcontrainte ineq;
 Psysteme sc_safe_normalize(ps)
 Psysteme ps;
 {
-    Pbase ps_base = base_dup(sc_base(ps));
 
-    if (sc_rn_p(ps))
-	return(ps);
-    else {        
+    if (!sc_rn_p(ps) && !sc_empty_p(ps))
+    {
+	Pbase ps_base = base_dup(sc_base(ps));	
 	ps = sc_normalize(ps);
-	if (ps == NULL)
-	    return sc_empty(ps_base);
-	else return(ps);
+	if (ps == SC_EMPTY)
+	    ps = sc_empty(ps_base);
+	else 
+	    base_rm(ps_base);
     }
+    return(ps);
 }
 
 static Psysteme sc_rational_feasibility(Psysteme sc)
 {
+
     if(!sc_rational_feasibility_ofl_ctrl((sc), OFL_CTRL,TRUE)) {
 	sc_rm(sc);
 	sc = SC_EMPTY;
@@ -229,6 +232,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 (Psysteme ps,
  Psysteme (*check_feasibility)(Psysteme))
 {
+
     Psysteme new_ps = SC_UNDEFINED;
     Psysteme proj_ps = SC_UNDEFINED;
     boolean feasible_p = TRUE;
@@ -734,6 +738,9 @@ int level)
 
     if_debug_sc_strong_normalize_and_check_feasibility2 {
 	fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Begin\n");
+	fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %x\n",
+		    (unsigned int) ps);
+	    sc_dump(ps);
     }
 
     if(SC_UNDEFINED_P(ps)) {
@@ -762,10 +769,11 @@ int level)
 	if_debug_sc_strong_normalize_and_check_feasibility2 {
 	    fprintf(stderr,
 		    "[sc_strong_normalize_and_check_feasibility2]: After call to sc_normalize\n");
-	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %x\n",
+	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system after normalization %x\n",
 		    (unsigned int) ps);
 	    sc_dump(ps);
 	}
+
 
 	/* 
 	 * Solve the equalities (if any)
@@ -847,7 +855,7 @@ int level)
 			    def = contrainte_dup(eq);
 			    ps = 
 			    sc_simple_variable_substitution_with_eq_ofl_ctrl
-			    (ps, def, v, NO_OFL_CTRL);
+			    (ps, def, v, FWD_OFL_CTRL);
 			    contrainte_rm(def);
 			}
 			else {
@@ -915,8 +923,9 @@ int level)
 
 	/* Check the inequalities */
 	assert(check_feasibility != (Psysteme (*)(Psysteme)) NULL);
+	
 	feasible_p = feasible_p && !SC_EMPTY_P(ps = check_feasibility(ps));
-
+    
 	if_debug_sc_strong_normalize_and_check_feasibility2 {
 	    fprintf(stderr,
 		    "Print the three systems after inequality normalization:\n");
@@ -952,6 +961,6 @@ int level)
 	sc_dump(new_ps);
 	fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: End\n");
     }
-
+    
     return new_ps;
 }
