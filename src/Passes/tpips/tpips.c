@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.122  2003/09/03 14:32:53  coelho
+ * ++
+ *
  * Revision 1.121  2003/09/03 14:22:14  coelho
  * exception context init.
  *
@@ -1003,7 +1006,7 @@ void tpips_init(void)
 
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
-    set_exception_callbacks(push_pips_context, pop_pips_context);
+    /* set_exception_callbacks(push_pips_context, pop_pips_context); */
     /* initialize_signal_catcher(); */
 
     set_bool_property("ABORT_ON_USER_ERROR", FALSE); /* ??? */
@@ -1283,6 +1286,8 @@ int tpips_main(int argc, char * argv[])
     debug_on("TPIPS_DEBUG_LEVEL");
     pips_log_handler = tpips_user_log;
     initialize_signal_catcher();
+    /* I need this one right now, as tpips init may be called too late. */
+    set_exception_callbacks(push_pips_context, pop_pips_context);
 
     {
 	string pid = (char*) malloc(sizeof(char)*20);
