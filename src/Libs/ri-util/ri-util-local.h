@@ -117,7 +117,7 @@ typedef hash_table control_mapping;
 #define IMPLIED_DO_NAME 		"IMPLIED-DO"
 #define RETURN_LABEL_NAME 		"00000"
 
-#define IMPLIED_COMPLEX_NAME		"IMPLIED-CMPLX"
+#define IMPLIED_COMPLEX_NAME		"CMPLX_"
 
 #define ASSIGN_OPERATOR_NAME 		"="
 #define PLUS_OPERATOR_NAME 		"+"
