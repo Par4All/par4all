@@ -148,12 +148,11 @@ static void pips_user_log(char *fmt, va_list args)
     fflush(stderr);
 }
 
-int pips_main(int argc, char ** argv)
+int 
+pips_main(int argc, char ** argv)
 {
     bool success = TRUE;
-
     pips_checks();
-
     initialize_newgen();
     initialize_sc((char*(*)(Variable)) entity_local_name); 
 
@@ -188,57 +187,45 @@ int pips_main(int argc, char ** argv)
 
 	/* Open module
 	 */
-	if (module != NULL) {
-	    /* CA - le 040293- remplacement de db_open_module(module) par */
+	if (module != NULL) 
 	    open_module(module);
-	}
-	else {
+	else 
 	    open_module_if_unique();
-	}
 
 	/* Activate rules
 	 */
-	if (success && selected_rules != NIL) {
-	    /* Select rules */
-	    MAPL(r_cp, {
+	if (success && selected_rules) 
+	{
+	    MAPL(r_cp, { /* Select rules */
 		select_rule(STRING(CAR(r_cp)));
 	    }, selected_rules);
 	}
 
 	/* Perform applies
 	 */
-	if (success && performed_rule != NULL) {
-	    /* Perform rule */
-	    /*
-	    user_log("Request: perform rule %s for module %s.\n", 
-		     performed_rule, module);
-		     */
+	if (success && performed_rule && module) 
+	{
 	    success = safe_apply(performed_rule, module);
-		if (success) {
-		    user_log("%s performed for %s.\n", 
-			     performed_rule, module);
-		}
-		else {
-		    user_log("Cannot perform %s for %s.\n", 
-			     performed_rule, module);
-		}
+	    if (success) {
+		user_log("%s performed for %s.\n", 
+			 performed_rule, module);
+	    }
+	    else {
+		user_log("Cannot perform %s for %s.\n", 
+			 performed_rule, module);
+	    }
 	}
 
 	/* Build resources
 	 */
-	if (success && build_resource_names != NIL) {
+	if (success && build_resource_names && module) 
+	{
 	    /* Build resource */
 	    MAPL(crn, {
 		string build_resource_name = STRING(CAR(crn));
-		/* user_log("Request: build resource %s for module %s.\n", 
-			 build_resource_name, module); */
 		success = safe_make(build_resource_name, module);
-		if (success) {
-		    /* user_log("%s built for %s.\n", 
-			     build_resource_name, module); */
-		    ;
-		}
-		else {
+		if (!success) 
+		{
 		    user_log("Cannot build %s for %s.\n", 
 			     build_resource_name, module);
 		    break;
