@@ -234,6 +234,8 @@ boolean a_la_fortran;
     short int debut = TRUE;
     int positive_terms = 0;
     int negative_terms = 0;
+    int const_coeff = 0;
+    boolean const_coeff_p = FALSE;
 
     if(!is_inegalite) {
 	for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
@@ -266,8 +268,10 @@ boolean a_la_fortran;
 		else if(!term_cst(coord) || is_inegalite)
 		    (void) sprintf(s+strlen(s),"%d%s", coeff,
 			    variable_name(vecteur_var(coord)));
-		else
+		else {
+		    debut = TRUE;
 		    positive_terms--;
+		}
 	    }
 	    else
 		if (coeff == 1 && vecteur_var(coord) != TCST)
@@ -307,7 +311,14 @@ boolean a_la_fortran;
     for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
 	int coeff = vecteur_val(coord);
 
-	if (coeff < 0) {
+	if(term_cst(coord) && !is_inegalite) {
+	    /* Save the constant term for future use */
+	    const_coeff_p = TRUE;
+	    const_coeff = coeff;
+	    /* And now, a lie... In fact, rhs_terms++ */
+	    negative_terms++;
+	}
+	else if (coeff < 0) {
 	    negative_terms++;
 	    if (debut == TRUE) {
 		debut = FALSE;
@@ -326,17 +337,23 @@ boolean a_la_fortran;
 		    (void) sprintf(s+strlen(s),"+%d%s", -coeff,
 			    variable_name(vecteur_var(coord)));
 	}
-	else if(term_cst(coord) && !is_inegalite) {
-	    (void) sprintf(s+strlen(s),"%d", -coeff);
-	    /* And now, a lie... In fact, rhs_terms++ */
-	    negative_terms++;
-	}
 	else
 	    ;
     }
 
     if(negative_terms == 0)
 	(void) sprintf(s+strlen(s),"0");
+    else if(const_coeff_p) {
+	assert(const_coeff!=0);
+	if(debut)
+	    (void) sprintf(s+strlen(s),"%d", -const_coeff);
+	else if(const_coeff < 0)
+	    (void) sprintf(s+strlen(s),"+%d", -const_coeff);
+	else
+	    (void) sprintf(s+strlen(s),"%d", -const_coeff);
+    }
+    else
+	;
 
     return s;
 }
