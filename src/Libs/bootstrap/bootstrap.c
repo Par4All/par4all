@@ -15,7 +15,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <values.h>
+/* #include <values.h> */
+#include <limits.h>
 #include <stdlib.h>
 
 #include "genC.h"
@@ -109,7 +110,7 @@ typedef struct IntrinsicDescriptor {
 /* the table of intrinsic functions. this table is used at the begining
 of linking to create Fortran operators, commands and intrinsic functions. 
 
-Functions with a variable number of arguments are declared with MAXINT
+Functions with a variable number of arguments are declared with INT_MAX
 arguments.
 */
 
@@ -140,18 +141,18 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
 
     {".NOT.", 1},
 
-    {"WRITE", (MAXINT)},
-    {"REWIND", (MAXINT)},
-    {"BACKSPACE", (MAXINT)},
-    {"OPEN", (MAXINT)},
-    {"CLOSE", (MAXINT)},
-    {"READ", (MAXINT)},
-    {"BUFFERIN", (MAXINT)},
-    {"BUFFEROUT", (MAXINT)},
-    {"ENDFILE", (MAXINT)},
-    {"IMPLIED-DO", (MAXINT)},
+    {"WRITE", (INT_MAX)},
+    {"REWIND", (INT_MAX)},
+    {"BACKSPACE", (INT_MAX)},
+    {"OPEN", (INT_MAX)},
+    {"CLOSE", (INT_MAX)},
+    {"READ", (INT_MAX)},
+    {"BUFFERIN", (INT_MAX)},
+    {"BUFFEROUT", (INT_MAX)},
+    {"ENDFILE", (INT_MAX)},
+    {"IMPLIED-DO", (INT_MAX)},
     {"FORMAT", 1},
-    {"INQUIRE", (MAXINT)},
+    {"INQUIRE", (INT_MAX)},
 
     {"CONTINUE", 0},
     {"ENDDO", 0},
@@ -191,18 +192,18 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"DIM", 2},
     {"DDIM", 2},
     {"DPROD", 2},
-    {"MAX", (MAXINT)},
-    {"MAX0", (MAXINT)},
-    {"AMAX1", (MAXINT)},
-    {"DMAX1", (MAXINT)},
-    {"AMAX0", (MAXINT)},
-    {"MAX1", (MAXINT)},
-    {"MIN", (MAXINT)},
-    {"MIN0", (MAXINT)},
-    {"AMIN1", (MAXINT)},
-    {"DMIN1", (MAXINT)},
-    {"AMIN0", (MAXINT)},
-    {"MIN1", (MAXINT)},
+    {"MAX", (INT_MAX)},
+    {"MAX0", (INT_MAX)},
+    {"AMAX1", (INT_MAX)},
+    {"DMAX1", (INT_MAX)},
+    {"AMAX0", (INT_MAX)},
+    {"MAX1", (INT_MAX)},
+    {"MIN", (INT_MAX)},
+    {"MIN0", (INT_MAX)},
+    {"AMIN1", (INT_MAX)},
+    {"DMIN1", (INT_MAX)},
+    {"AMIN0", (INT_MAX)},
+    {"MIN1", (INT_MAX)},
     {"LEN", 1},
     {"INDEX", 2},
     {"AIMAG", 1},
@@ -280,7 +281,7 @@ int n;
 		    make_storage(is_storage_rom, UU),
 		    make_value(is_value_intrinsic, NIL));
     
-    if (n < (MAXINT)) {
+    if (n < (INT_MAX)) {
 	while (n-- > 0) {
 	    functional_parameters(ft) = 
 		    CONS(PARAMETER, MakeOverloadedParameter(),
