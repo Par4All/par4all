@@ -403,7 +403,7 @@ absolue.}.
 \label{subsubsection-variable}
 \index{Variable}
 
-\domain{Variable = basic x dimensions:dimension*}{}
+\domain{Variable = basic x dimensions:dimension*}
 
 Type {\tt variable} represents the type of usual non-functional
 variables. Field {\tt basic} is the underlying scalar type, e.g. {\tt
@@ -438,7 +438,7 @@ nom '*D*' est utilise'e pour les tableaux de taille non de'finie
 \label{subsubsection-basic}
 \index{Basic}
 
-\domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value}{}
+\domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value}
 
 Type {\tt basic} is used to store basic type information such has {\tt
 REAL} or {\tt INTEGER}. Each member includes a precision information,
@@ -463,7 +463,7 @@ module declarations.
 \label{subsubsection-dimension}
 \index{Dimension}
 
-\domain{Dimension = lower:expression x upper:expression}{}
+\domain{Dimension = lower:expression x upper:expression}
 
 Type {\tt dimension} is used to represent intervals, with a lower and
 an upper bounds. These bounds may not be numerically known at compile
@@ -479,7 +479,7 @@ tableau, c'est-a`-dire un couple borne infe'rieure -- sous-domaine
 \label{subsubsection-functional}
 \index{Functional}
 
-\domain{Functional = parameters:parameter* x result:type}{}
+\domain{Functional = parameters:parameter* x result:type}
 
 Type {\tt functional} is used for objects representing the explicit
 syntactic type of a module, function, subroutine or main
@@ -517,7 +517,7 @@ unique.
 \label{subsubsection-parameter}
 \index{Parameter}
 
-\domain{Parameter = type x mode}{}
+\domain{Parameter = type x mode}
 
 Objects of type {\tt parameter} represents type and inout information
 for formal parameters.
