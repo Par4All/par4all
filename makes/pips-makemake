@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.277  1997/04/17 18:58:35  coelho
+# *** empty log message ***
+#
 # Revision 1.276  1997/03/28 07:13:52  coelho
 # SOFT_ARCH better defined?
 #
@@ -385,6 +388,10 @@ endif
 	# building \$@ from \$<
 	\$(NROFF) -man \$< | \$(RMAN) -f html > \$@
 	touch \$@
+#
+%.ps: %.l
+	# building \$@ from \$<
+	\$(GROFF) -tpe -man \$< > \$@
 #
 # Add the PIPS icon in the background of every page:
 #?cd \$*; for f in *.html ; do \\
