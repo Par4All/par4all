@@ -1,16 +1,10 @@
-/*
- * init.c
- *
- * Fabien Coelho, June 1993
+/* Fabien Coelho, June 1993
  *
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * SCCS stuff:
- * $RCSfile: inits.c,v $ ($Date: 1995/03/22 10:56:57 $, ) version $Revision$,
- * got on %D%, %T%
- * $Id$
- *
+ * $RCSfile: inits.c,v $ ($Date: 1995/03/23 16:54:32 $, )
+ * version $Revision$,
  */
 
 #include <stdio.h>
@@ -74,7 +68,7 @@ entity module;
     MAPL(ce,
      {
 	 array = ENTITY(CAR(ce));
-	 newarray = load_entity_node_new(array);
+	 newarray = load_new_node(array);
 
 	 debug(8, "create_parameters_h",
 	       "considering array %s (new is %s)\n",
