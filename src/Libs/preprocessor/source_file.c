@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.111  2003/12/30 14:42:27  irigoin
+ * user warning format improved
+ *
  * Revision 1.110  2003/12/16 14:06:46  irigoin
  * Exportation of several functions, previously declared static:
  * dot_F_file_p(), dot_f_file_p(), dot_c_file_p()
@@ -920,7 +923,7 @@ bool process_user_file(string file)
 
   if (!nfile)
     {
-      pips_user_warning("Cannot open file: %s\n", file);
+      pips_user_warning("Cannot open file: \"%s\"\n", file);
       return FALSE;
     }
 
