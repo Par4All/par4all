@@ -1,10 +1,12 @@
 #! /bin/sh
 #
 # $RCSfile: install_pips,v $ (version $Revision$)
-# $Date: 1996/09/03 13:34:54 $, 
+# $Date: 1996/09/03 14:39:11 $, 
 #
 # installation for pips softwares and automatic generation of pipsrc
 #
+
+unset archdir
 
 ################################################################# FUNCTIONS
 
@@ -84,12 +86,10 @@ environment()
 
 pwd=`pwd`
 
-verbn "looking for Pips: "
-if test -d ./Pips 
+verbn "looking for Extern: "
+if test -d ./Extern
 then
     echo found
-    PIPS_ROOT=$pwd/Pips
-    ARCH=`ls $PIPS_ROOT/Lib | head -1`
 else
     warning "not found!"
 fi
@@ -98,7 +98,6 @@ verbn "looking for Newgen: "
 if test -d ./Newgen
 then
     echo found
-    NEWGEN_ROOT=$pwd/Newgen
 else
     warning "not found!"
 fi
@@ -107,64 +106,82 @@ verbn "looking for Linear: "
 if test -d ./Linear 
 then
     echo found
-    LINEAR_ROOT=$pwd/Linear
 else
     warning "not found!"
 fi
 
-verbn "looking for Extern: "
-if test -d ./Extern
+verbn "looking for Pips: "
+if test -d ./Pips 
 then
     echo found
-    EXTERN_ROOT=$pwd/Extern
+    PIPS_ROOT=$pwd/Pips
+    test -d $PIPS_ROOT/Lib && archdir=$PIPS_ROOT/Lib
+    test -d $PIPS_ROOT/Bin && archdir=$PIPS_ROOT/Bin
 else
     warning "not found!"
 fi
 
+verbn "default PIPS_ARCH: "
+if test -d $archdir
+then
+    for d in $archdir/*
+    do
+	test -d $d && ARCH=`basename $d`
+    done
+fi
+
+ARCH=${ARCH:-.}
+
+echo $ARCH
 
 ##################################################################### PIPSRC
 
-cat > pipsrc.tmp <<-EOF
-	#
-	# Environment variables for PIPS.
-	#
-	# Pips root directory
-	PIPS_ROOT=$PIPS_ROOT
-	#
-	# Newgen root directory
-	NEWGEN_ROOT=$NEWGEN_ROOT
-	#
-	# Linear root directory
-	LINEAR_ROOT=$LINEAR_ROOT
-	#
-	# Extern root directory
-	# external libraries and so expected for building tpips
-	EXTERN_ROOT=$EXTERN_ROOT
-	#
-	# PATH and MANPATH updates
-	PATH=\$PIPS_ROOT/Share:\$PIPS_ROOT/Bin/\$PIPS_ARCH:\$PIPS_ROOT/Utils:\$EXTERN_ROOT/Share:\$EXTERN_ROOT/Bin/\$PIPS_ARCH:\$PATH
-	MANPATH=\$PIPS_ROOT/Doc:\$MANPATH
-	#
-	# Other variables of interest (and their default):
-	# EPIPS_EMACS (emacs)
-	# EPIPS_LISP (\$PIPS_ROOT/Share/epips.el)
-	# HPFC_RUNTIME (\$PIPS_ROOT/Runtime/hpfc)
-	# HPFC_SED (gsed)
-	# HPFC_TR (tr)
-	# HPFC_MAKE (gmake)
-	# HPFC_M4 (gm4)
-	# XPOMP_RUNTIME (\$PIPS_ROOT/Runtime/xpomp)
-	# WP65_LIBRARY (\$PIPS_ROOT/Runtime/wp65)
-	# PIPS_VALIDDIR (\$PIPS_ROOT/Validation)
-	# PIPS_HOSTS (\`hostname\`)
-	#
-	# External sofwares:
-	# Toolpack is used for STF (restructurer)
-	# TOOLPACK_DIR (???/Toolpack/toolpack1.2) (pips)
-	# PVMDIR (hpfc/wp65)
-	# X11_ROOT (xpomp)
-	# DAVINCI_DIR GRAPHEDITOR_DIRECTORY DAVINCI_ICONDIR (davinci)
-	# OPENWINHOME (wpips)
+cat > pipsrc.tmp <<EOF
+#
+# Environment variables for PIPS.
+#
+# Softwares common root:
+# just edit this setting if you move the pips softwares
+SOFT_ROOT=$pwd
+#
+# Pips root directory
+PIPS_ROOT=\$SOFT_ROOT/Pips
+#
+# Newgen root directory
+NEWGEN_ROOT=\$SOFT_ROOT/Newgen
+#
+# Linear root directory
+LINEAR_ROOT=\$SOFT_ROOT/Linear
+#
+# Extern root directory
+# external libraries and so expected for building tpips
+EXTERN_ROOT=\$SOFT_ROOT/Extern
+#
+# PATH and MANPATH updates
+PATH=\$EXTERN_ROOT/Share:\$EXTERN_ROOT/Bin/\$PIPS_ARCH:\$PATH
+PATH=\$PIPS_ROOT/Share:\$PIPS_ROOT/Bin/\$PIPS_ARCH:\$PIPS_ROOT/Utils:\$PATH
+MANPATH=\$PIPS_ROOT/Doc:\$MANPATH
+#
+# Other variables of interest (and their default):
+# EPIPS_EMACS (emacs)
+# EPIPS_LISP (\$PIPS_ROOT/Share/epips.el)
+# HPFC_RUNTIME (\$PIPS_ROOT/Runtime/hpfc)
+# HPFC_SED (gsed)
+# HPFC_TR (tr)
+# HPFC_MAKE (gmake)
+# HPFC_M4 (gm4)
+# XPOMP_RUNTIME (\$PIPS_ROOT/Runtime/xpomp)
+# WP65_RUNTIME (\$PIPS_ROOT/Runtime/wp65)
+# PIPS_VALIDDIR (\$PIPS_ROOT/Validation)
+# PIPS_HOSTS (\`hostname\`)
+#
+# External sofwares:
+# Toolpack is used for STF (restructurer)
+# TOOLPACK_DIR (???/Toolpack/toolpack1.2) (pips)
+# PVMDIR (hpfc/wp65)
+# X11_ROOT (xpomp)
+# DAVINCI_DIR GRAPHEDITOR_DIRECTORY DAVINCI_ICONDIR (davinci)
+# OPENWINHOME (wpips)
 EOF
 
 verb "generating pipsrc.sh"
@@ -173,7 +190,7 @@ verb "generating pipsrc.sh"
     echo "PIPS_ARCH=\${PIPS_ARCH:-$ARCH}"
     echo "export PIPS_ARCH"
     cat pipsrc.tmp
-    sed 's,^\([-A-Za-z0-9_]*\)=.*,export \1,;' pipsrc.tmp
+    sed -n 's,^\([-A-Za-z0-9_]*\)=.*,export \1,p;' pipsrc.tmp | sort -u
 } > pipsrc.sh
 
 verb "generating pipsrc.csh"
@@ -185,10 +202,10 @@ verb "generating pipsrc.csh"
 
 rm -f pipsrc.tmp
 
-##################################################################### CHECK
+##################################################################### CHECKS
 
-free="'  freeware - see http://www.cri.ensmp.fr/pips/distribution.html'"
-unix="'  should be available on any un*x'"
+free="'freeware - see http://www.cri.ensmp.fr/pips/distribution.html'"
+unix="'should be available on any UN*X'"
 
 question "do you plan to run PIPS? -- should be yes!" &&
 {
