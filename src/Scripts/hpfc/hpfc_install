@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log: hpfc_install,v $
+# Revision 1.34  1997/05/07 09:54:31  coelho
+# *** empty log message ***
+#
 # Revision 1.33  1997/03/20 09:48:43  coelho
 # *_both.f files also copied.
 #
@@ -23,7 +26,7 @@ MAKE=${HPFC_MAKE:-${PIPS_MAKE:-gmake}}
 M4=${HPFC_M4:-m4}
 
 verbose()
-{ echo "[$RCSfile: hpfc_install,v $]:" "$@" >&2;}
+{ echo "[hpfc_install]:" "$@" >&2;}
 
 #
 
@@ -129,8 +132,8 @@ then
   for f 
   do
      $debug "considering $f"
-     [ "`egrep '(^[!cC\*][Ff][Cc][Dd]\$[ 	]*[Ff][Aa][Kk][Ee][ 	]*$|hpfc9)' $f`" ] ||
-	cat $f
+    egrep -s '(^[!cC\*][Ff][Cc][Dd]\$[ 	]*[Ff][Aa][Kk][Ee][ 	]*$|hpfc9)' \
+	$f || { $debug "adding $f" ; cat $f ; } 
   done > $tdir/$name.f
 
   chmod ug+w $tdir/*
