@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 #
 # Guillaume Oget, Francois Irigoin, 15 sep 1995
@@ -20,24 +20,30 @@ source=$1
 
 if stf $source >$source$$ 2>$source.$$.log
 then
+: #do nothing ...
+else
+	echo $?
+	rm -f $source$$
+	rm -f $source.$$.log
 	exit 3
 fi
 
 if grep '_.TOOLPACK' $source.$$.log
 then
-	rm $source.$$.log
+	rm -f $source.$$.log
+	rm -f $source$$
 	exit 2
 fi
 
 if grep ERROR $source.$$.log
 then
-	rm $source.$$.log
+	rm -f $source.$$.log
 	exit 1
 else
-	rm $source
+	rm -f $source
 	sed -e '/\[ISTLY Normal Termination\]/d' <$source$$ >$source
-	rm $source$$
-	rm $source.$$.log
+	rm -f $source$$
+	rm -f $source.$$.log
 	exit 0
 fi
 exit 1 # should never be here...
