@@ -8,73 +8,26 @@
 
 	This software is provided as is, and no guarantee whatsoever is
 	provided regarding its appropriate behavior. Any request or comment
-	should be sent to newgen@isatis.ensmp.fr.
+	should be sent to newgen@cri.ensmp.fr.
 
 	(C) Copyright Ecole des Mines de Paris, 1989
 
 */
 
 
-#ifndef MAP_INCLUDED
-#define MAP_INCLUDED
+#ifndef newgen_map_included
+#define newgen_map_included
 
 /* $Id$
  *
  * These are the functions defined in the Newgen map library. 
  */
 
-#define MAX_NESTED_HASH 10
-
-extern gen_chunk Gen_hash_[] ;
-extern gen_chunk *gen_hash_ ;
-
-#define HASH_GET(start,image,h,k) \
-IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-	 ((gen_hash_-1)->e=(void*)(k), \
-	  (((gen_chunk *)hash_get((h),(void*)(gen_hash_-- -1)))->image)), \
-	 gen_hash_->image)
-
-#define HASH_BOUND_P(start, image, h, k)\
-IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-	 ((gen_hash_-1)->e=(void*)(k), \
-	  (bool) (hash_defined_p((h), (char *)(gen_hash_-- -1)))), \
-	 (bool) gen_hash_)
-
-#define HASH_UPDATE(start,image,h,k,v) \
-IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-	 ((gen_hash_-1)->e=(void*)(k), \
-	  IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-		   ((gen_hash_-1)->e=(void*)(v), \
-		    *((gen_chunk *)hash_get((h),(void*)(gen_hash_-2)))= \
-		    *(gen_hash_-1), \
-		    gen_hash_ -=2, \
-		    (h)), \
-		   (h))), \
-	 (h))
-
-#define HASH_EXTEND(start,image,h,k,v) \
-IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-	 IN_HEAP((gen_hash_-1)->p, gen_chunk, \
-		 ((gen_hash_-1)->p->e=(void*)(k), \
-		  IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-			   IN_HEAP((gen_hash_-1)->p, gen_chunk, \
-				   ((gen_hash_-1)->p->e=(void*)(v), \
-				    hash_put((h), \
-					     (gen_hash_-2)->e,\
-					     (gen_hash_-1)->e), \
-				    gen_hash_-=2, \
-				    (h)), \
-				   (h)), \
-			   (h)), \
-		  (h)), \
-		 (h)), \
-	 (h))
-
-#define HASH_DELETE(start,image,h,k) \
-IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-	 ((gen_hash_-1)->e=(void*)(k), \
-	  (((gen_chunk *)hash_del((h),(void *)(gen_hash_-- -1)))->image)), \
-	 gen_hash_->image)
+#define HASH_GET(start,image,h,k) ((gen_chunk*)hash_map_get((h), (k))->image)
+#define HASH_BOUND_P(start, image, h, k) hash_map_defined_p((h), (k))
+#define HASH_UPDATE(start,image,h,k,v) hash_map_update((h), (k), (v))
+#define HASH_EXTEND(start,image,h,k,v) hash_map_put((h), (k), (v))
+#define HASH_DELETE(start,image,h,k) hash_map_del((h), (k))
 
 #define FUNCTION_MAP(typename, start, image, k, v, code, fun) \
     { hash_table _map_hash_h = ((gen_chunk*)fun+1)->h ;\
@@ -86,4 +39,4 @@ IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
         typename##_value_type v = (typename##_value_type)((gen_chunk*)_map_v)->image;\
         code ; }}
 
-#endif
+#endif /* newgen_map_included */
