@@ -102,6 +102,6 @@ extern list gen_cons GEN_PROTO((void *, list));
 extern void gen_list_and GEN_PROTO((list *, list));
 extern void gen_list_and_not GEN_PROTO((list *, list));
 extern void gen_list_patch(list, void *, void *);
-extern void gen_position(void *, list);
+extern int gen_position(void *, list);
 
 #endif /* newgen_list_included */
