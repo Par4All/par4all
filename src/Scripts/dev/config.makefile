@@ -61,36 +61,25 @@ install_macros: $(DDC_MACROS)
 	$(COPY) $(MACROS) $(NEWGEN_INCLUDEDIR)
 	$(COPY) $(MACROS) $(LINEAR_INCLUDEDIR)
 
+#
+# where to install forward makefiles
+
+SUBDIRS = . Src Lib Passes Scripts Runtime Documentation \
+	Src/Lib Src/Passes Src/Scripts Src/Runtime Src/Documentation
+
+DIRS= 	$(PIPS_ROOT) $(NEWGEN_ROOT) $(LINEAR_ROOT) \
+	$(PIPS_DEVEDIR) $(NEWGEN_DEVEDIR) $(LINEAR_DEVEDIR)
+
 install_forward_makefiles: 
 	# 
 	# copying directory makefiles where required (and usefull)
 	#
-	# PIPS
-	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Lib/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Passes/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Scripts/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Runtime/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Documentation/Makefile
-	#
-	# NEWGEN
-	$(COPY) forward_gnu_makefile ${NEWGEN_ROOT}/Makefile
-	$(COPY) forward_gnu_makefile ${NEWGEN_ROOT}/Src/Makefile
-	#
-	# LINEAR
-	$(COPY) forward_gnu_makefile ${LINEAR_ROOT}/Makefile
-	$(COPY) forward_gnu_makefile ${LINEAR_ROOT}/Src/Makefile
-	#
-	# and development sides
-	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Lib/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Passes/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Scripts/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Runtime/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Documentation/Makefile
-	$(COPY) forward_gnu_makefile ${NEWGEN_DEVEDIR}/Makefile
-	$(COPY) forward_gnu_makefile ${LINEAR_DEVEDIR}/Makefile
+	for d in $(DIRS) ; do \
+	  for s in $(SUBDIRS) ; do \
+	    test ! -d $$d/$$s || \
+		{ echo "copying forward makefile to $$d/$$s"; \
+		$(COPY) forward_gnu_makefile $$d/$$s/Makefile; } ; done; done;\
+	$(RM) $(PIPS_ROOT)/Runtime/Makefile $(PIPS_ROOT)/Lib/Makefile
 
 # that is all
 #
