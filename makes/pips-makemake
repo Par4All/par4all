@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 21:53:40 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 21:55:36 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -635,7 +635,7 @@ $(TARGET)-local.h:
 build-header-file:
 	@$(COPY) $(TARGET)-local.h $(INC_TARGET);
 	{ \\
-	echo "/* header file built by $(PROTO) for $(HEADER_ARCH) */";\\
+	echo "/* header file built by $(PROTO) for ARCH=$(ARCH) */";\\
 	echo "#ifndef ${dir_simple_name}_header_included";\\
 	echo "#define ${dir_simple_name}_header_included";\\
 	cat $(TARGET)-local.h;\\
