@@ -21,7 +21,7 @@
 #include "misc.h"
 #include "matrice.h"
 #include "semantics.h"
-#include "effects.h"
+#include "effects-generic.h"
 #include "complexity.h"
 
 hash_table hash_callee_to_complexity = hash_table_undefined;
