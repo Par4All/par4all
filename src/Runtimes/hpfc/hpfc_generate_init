@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_generate_init,v $ ($Date: 1996/03/14 11:23:24 $, )
+# $RCSfile: hpfc_generate_init,v $ ($Date: 1996/08/30 14:29:41 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -62,4 +62,4 @@ key="${NAME}.`hostname`.`whoami`.`date +"%H.%M.%S.%j.%y"`"
   echo "      end"
 } > $init
 
-$HPFC_TOOLS/hpfc_add_warning $init
+hpfc_add_warning $init
