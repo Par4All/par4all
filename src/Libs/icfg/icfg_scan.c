@@ -295,10 +295,10 @@ static void instruction_rwt (instruction i)
 	pips_debug (5,"dealing with a block, appending texts\n");
 
 	{
-	  list s##_list = (instruction_block(i));
-	  STATEMENT##TYPE s;
-	  for(;s##_list; POP(s##_list)) {
-	    s = STATEMENT(CAR(s##_list));
+	  list s_list = (list)instruction_block(i);
+	  statement s;
+	  for(; s; POP(s_list)) {
+	    s = STATEMENT(CAR(s_list));
 	    MERGE_TEXT(t, load_statement_icfg(s));
 	  }
 	}
