@@ -1,0 +1,51 @@
+/* a set a functions to print the host and node status in MPI,
+ * called from a Fortran subroutine. Plus some timer functions.
+ * Portability based on pvm m4 macros.
+ *
+ * $RCSfile: hpfc_misc_mpi.m4c,v $ version $Revision$
+ * ($Date: 1997/07/03 11:06:17 $, )
+ *
+ * Fabien Coelho, 1993-1994-1995-1996
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+
+void 
+FUNCTION(printhostinfo) ARGS(`') /* `' */
+{
+    fprintf(stderr,"not yet implemented \n");
+}
+
+void 
+FUNCTION(printtaskinfo) ARGS(`number, tids, hosttid') /* `' */
+int *number, *tids, *hosttid;
+{
+    fprintf(stderr,"not yet implemented \n");
+}
+
+
+
+void
+FUNCTION(hpfctimeon) ARGS(`') /* `' */
+{
+    fprintf(stderr,"not yet implemented \n");
+}
+
+void
+FUNCTION(hpfctell) ARGS(`STRING_ARG(comment)') /* `' */
+STRING_ARG_DECL(comment);
+{
+    fprintf(stderr,"not yet implemented \n");
+}/* `' */
+
+void 
+FUNCTION(hpfctimeoff) ARGS(`STRING_ARG(comment)') /* `' */
+STRING_ARG_DECL(comment);
+{
+    fprintf(stderr,"not yet implemented \n");
+}
+
+/* that is all
+ */
