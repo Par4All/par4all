@@ -1,20 +1,439 @@
-/*
- * HPFC module by Fabien COELHO
+/* HPFC module by Fabien COELHO
  *
- * DECLARATIONS compilation
+ * new declarations compilation.
+ * normalization of HPF declarations.
  *
- * $RCSfile: declarations.c,v $ ($Date: 1995/09/18 17:52:58 $, )
- * version $Revision$
+ * $RCSfile: declarations.c,v $ version $Revision$
+ * ($Date: 1995/10/04 10:54:04 $, )
  */
  
 #include "defines-local.h"
+
+#include "control.h"
+#include "regions.h"
+#include "semantics.h"
+#include "effects.h"
+
+bool expression_constant_p(expression); /* in static_controlize */
+
+/************************************************** HPF OBJECTS MANAGEMENT */
+
+/* DISTRIBUTED ARRAYS
+ */
+
+#define STATIC_LIST_OF_HPF_OBJECTS(name, set_name, pred_name)\
+static list name = NIL;\
+int number_of_##name(){return(gen_length(name));}\
+list list_of_##name(){return(name);}\
+bool pred_name(e)entity e;{return(gen_in_list_p(e, name));}\
+void set_name(e)entity e;{\
+    if (!gen_in_list_p(e, name)){\
+	name = CONS(ENTITY, e, name); normalize_hpf_object(e);}}
+
+STATIC_LIST_OF_HPF_OBJECTS(distributed_arrays, set_array_as_distributed, 
+			   array_distributed_p)
+
+bool declaration_delayed_p(e)
+entity e;
+{
+    bool
+	distributed = 
+	    (array_distributed_p(e) ||
+	     array_distributed_p(load_old_host(e)) ||
+	     array_distributed_p(load_old_node(e))),
+	in_common = entity_in_common_p(e);
+
+    return(distributed && in_common);
+}
+
+/* returns the list of entities that are 'local' to module
+ */
+list list_of_distributed_arrays_for_module(module)
+entity module;
+{
+    list l = NIL;
+
+    MAP(ENTITY, e,
+    {
+	if (hpfc_main_entity(e)==module) l = CONS(ENTITY, e, l);
+    },
+	list_of_distributed_arrays());
+
+    return(l);
+}
+
+/************************************************** TEMPLATES and PROCESSORS */
+
+STATIC_LIST_OF_HPF_OBJECTS(templates, set_template, entity_template_p)
+STATIC_LIST_OF_HPF_OBJECTS(processors, set_processor, entity_processor_p)
+
+void reset_hpf_object_lists()
+{
+    distributed_arrays = NIL,
+    templates = NIL,
+    processors = NIL;
+}
+
+void free_hpf_object_lists()
+{
+    gen_free_list(distributed_arrays),
+    gen_free_list(templates),
+    gen_free_list(processors);
+
+    reset_hpf_object_lists();
+}
+
+/****************************************************  HPF NUMBER MANAGEMENT */
+
+GENERIC_GLOBAL_FUNCTION(hpf_number, entity_int)
+
+static int
+  current_array_index = 1,
+  current_template_index = 1,
+  current_processors_index = 1;
+
+static void init_currents()
+{
+    current_array_index = 1,
+    current_template_index = 1,
+    current_processors_index = 1;
+}
+
+/* STANDARS STATIC MANAGEMENT
+ *
+ * functions: {init,get,set,reset,close}_hpf_number_status
+ */
+
+void init_hpf_number_status()
+{
+    init_hpf_number();
+    init_currents();
+}
+
+numbers_status get_hpf_number_status()
+{
+    return(make_numbers_status(get_hpf_number(),
+			       current_array_index,
+			       current_template_index,
+			       current_processors_index));
+}
+
+void reset_hpf_number_status()
+{
+    reset_hpf_number();
+    init_currents();
+}
+
+void set_hpf_number_status(s)
+numbers_status s;
+{
+    set_hpf_number(numbers_status_numbermap(s));
+    current_array_index = numbers_status_arrays(s);
+    current_template_index = numbers_status_templates(s);
+    current_processors_index = numbers_status_processors(s);
+}
+
+void close_hpf_number_status()
+{
+    close_hpf_number();
+    init_currents();
+}
+
+/*
+ * GiveToHpfObjectsTheirNumber
+ *
+ * give to hpf objects listed in distributedarrays, templates and processors
+ * their number for the code generation...
+ */
+void GiveToHpfObjectsTheirNumber()
+{
+    debug(7, "GiveToHpfObjectsTheirNumber", "Here I am!\n");
+
+    MAP(ENTITY, e,
+    {
+	if (!bound_hpf_number_p(e))
+	    store_hpf_number(e, current_array_index++);
+    },
+	distributed_arrays);
+
+    MAP(ENTITY, e,
+    {
+	if (!bound_hpf_number_p(e))
+	    store_hpf_number(e, current_template_index++);
+    },
+	templates);
+
+    MAP(ENTITY, e,
+    {
+	if (!bound_hpf_number_p(e))
+	    store_hpf_number(e, current_processors_index++);
+    },
+	processors);
+}
+
+/*   returns the hpf_number parameter as a string
+ *   not really needed ???
+ *   ??? never called
+ */
+expression entity_hpf_number(e)
+entity e;
+{
+    storage
+	s = entity_storage(e);
+    bool
+	in_common = entity_in_common_p(e),
+	in_ram = storage_ram_p(s);
+    ram 
+	r = (in_ram ? storage_ram(s) : ram_undefined);
+    string
+	suffix = entity_local_name(e),
+	prefix = 
+	    (in_ram ? 
+	     entity_local_name(in_common ? ram_section(r) : ram_function(r)) :
+	     "DEFAULT");
+
+    assert(entity_variable_p(e) && in_ram);
+
+    return(MakeCharacterConstantExpression
+	   (strdup(concatenate("n_", prefix, "_", suffix, NULL))));
+			   
+}
+
+/****************************************************** ALIGN and DISTRIBUTE */
+
+GENERIC_CURRENT_MAPPING(align, align, entity)
+GENERIC_CURRENT_MAPPING(distribute, distribute, entity)
+
+/********************************************************** NEW DECLARATIONS */
+
+GENERIC_CURRENT_MAPPING(new_declaration, hpf_newdecls, entity) /* static */
+
+tag new_declaration(array, dim)
+entity array;
+int dim;
+{
+    tag t;
+
+    assert(dim>0 && dim<=7 && array_distributed_p(array));
+
+    t = hpf_newdecl_tag
+	(HPF_NEWDECL(gen_nth(dim-1, 
+	 hpf_newdecls_dimensions(load_entity_new_declaration(array)))));
+
+    debug(1, "new_declaration", "%s[%d]: %d\n", entity_name(array), dim, t);
+
+    return(t);
+}
+
+static void create_new_declaration(e)
+entity e;
+{
+    type t = entity_type(e);
+    list l = NIL;
+    int ndim;
+
+    assert(type_variable_p(t));
+    
+    ndim = gen_length(variable_dimensions(type_variable(t)));
+
+    for(; ndim>0; ndim--)
+	l = CONS(HPF_NEWDECL, make_hpf_newdecl(is_hpf_newdecl_none, UU), l);
+
+    store_entity_new_declaration(e, make_hpf_newdecls(l));
+}
+
+void store_new_declaration(array, dim, what)
+entity array;
+int dim;
+tag what;
+{
+    hpf_newdecl n;
+
+    assert(dim>0 && dim<=7 && array_distributed_p(array));
+
+    if (entity_new_declaration_undefined_p(array))
+	create_new_declaration(array);
+
+    n = HPF_NEWDECL(gen_nth(dim-1, 
+	    hpf_newdecls_dimensions(load_entity_new_declaration(array))));
+
+    hpf_newdecl_tag(n) = what;
+}
+
+void get_ith_dim_new_declaration(array, i, pmin, pmax)
+entity array;
+int i, *pmin, *pmax;
+{
+    dimension d = entity_ith_dimension(load_new_node(array), i);
+
+    assert((array_distributed_p(array)) && (entity_variable_p(array)));
+
+    *pmin = HpfcExpressionToInt(dimension_lower(d));
+    *pmax = HpfcExpressionToInt(dimension_upper(d));
+}
+
+/************************************* DATA STATUS INTERFACE FOR HPFC STATUS */
+
+void init_data_status()
+{
+    make_new_declaration_map();
+    make_align_map();
+    make_distribute_map();
+    reset_hpf_object_lists();
+}
+
+data_status get_data_status()
+{
+    newdeclmap n = make_newdeclmap();
+    alignmap a = make_alignmap();
+    distributemap d = make_distributemap();
+
+    function_mapping(n) = get_new_declaration_map(); /* memory leaks ??? */
+    function_mapping(a) = get_align_map();
+    function_mapping(d) = get_distribute_map();
+
+    return(make_data_status(n, a, d,			    
+			    list_of_distributed_arrays(),
+			    list_of_templates(),
+			    list_of_processors()));
+}
+
+void reset_data_status()
+{
+    reset_new_declaration_map();
+    reset_align_map();
+    reset_distribute_map();
+    reset_hpf_object_lists();
+}
+
+void set_data_status(s)
+data_status s;
+{
+    set_new_declaration_map(function_mapping(data_status_newdeclmap(s)));
+    set_align_map(function_mapping(data_status_alignmap(s)));
+    set_distribute_map(function_mapping(data_status_distributemap(s)));
+    distributed_arrays = data_status_arrays(s);
+    templates = data_status_templates(s);
+    processors = data_status_processors(s);
+}
+
+void close_data_status()
+{
+    free_new_declaration_map();
+    free_align_map();
+    free_distribute_map();
+    free_hpf_object_lists();
+}
+
+/*   that is all
+ */
+
+
+/********************************************************* Normalizations */
+
+/* NormalizeOneTemplateDistribution
+ */
+static void NormalizeOneTemplateDistribution(d,templ,templdimp,procs,procsdimp)
+distribution d;
+entity templ,procs;
+int *templdimp, *procsdimp;
+{
+    if (style_none_p(distribution_style(d)))
+	(*templdimp)++;
+    else
+    {
+	int szoftempldim = SizeOfIthDimension(templ,(*templdimp)),
+	    szofprocsdim = SizeOfIthDimension(procs,(*procsdimp));
+	
+	if (distribution_parameter(d)==expression_undefined)
+	{
+	    /* compute the missing value, in case of BLOCK distribution
+	     */
+	    
+	    switch(style_tag(distribution_style(d)))
+	    {
+	    case is_style_block:
+		distribution_parameter(d)=
+		    int_expr(iceil(szoftempldim, szofprocsdim));
+		break;
+	    default:
+		pips_error("NormalizeHpfDistribute","undefined style tag\n");
+		break;
+	    }
+	}
+	else
+	{
+	    /* check the given value
+	     */
+	    
+	    int paramvalue = HpfcExpressionToInt(distribution_parameter(d));
+	    
+	    switch(style_tag(distribution_style(d)))
+	    {
+	    case is_style_block:
+	    {
+		int minvalue = iceil(szoftempldim, szofprocsdim);
+		
+		if (paramvalue<minvalue) 
+		    user_error("NormalizeHpfDistribute",
+			   "too small a block parameter in %s distribution\n",
+			       entity_name(templ));
+		break;
+	    }
+	    default:
+		break;
+	    }
+	}
+	
+	(*templdimp)++;
+	(*procsdimp)++;
+    }
+}
+
+void normalize_distribute(t, d)
+entity t;
+distribute d;
+{
+    entity p = distribute_processors(d);
+    list /* of distribution */ ld = distribute_distribution(d);
+    int tdim = 1, pdim = 1;
+
+    normalize_first_expressions_of(d);
+    
+    MAP(DISTRIBUTION, di,
+	NormalizeOneTemplateDistribution(di, t, &tdim, p, &pdim), ld);
+
+    if ((pdim-1)!=NumberOfDimension(p))
+	user_error("normalize_distribute", 
+		   "%s not enough distributions\n", entity_name(t));
+		   
+}
+
+void normalize_align(e, a)
+entity e;
+align a;
+{
+    normalize_first_expressions_of(a);
+}
+
+void normalize_hpf_object(v)
+entity v;
+{
+    normalize_first_expressions_of(entity_type(v));
+}
+
+void NormalizeHpfDeclarations()
+{
+    GiveToHpfObjectsTheirNumber();
+    ifdebug(8){print_hpf_dir();}
+}
+
+/********************************************************* NEW DECLARATIONS */
 
 /*  local macros...
  */
 #define normalized_dimension_p(dim) \
   (HpfcExpressionToInt(dimension_lower(dim))==1)
-
-/********************************************************* NEW DECLARATIONS */
 
 /* here the new size of the ith dimension of the given array is computed.
  * because the declarations are static, there is a majoration of the space
@@ -249,5 +668,144 @@ void NewDeclarationsOfDistributedArrays()
 	list_of_distributed_arrays());
 }
 
-/* that is all
+/**************************************************************** OVERLAPS */
+
+GENERIC_GLOBAL_FUNCTION(overlap_status, overlapsmap)
+
+static void create_overlaps(e)
+entity e;
+{
+    type t = entity_type(e);
+    list o=NIL;
+    int n;
+
+    assert(type_variable_p(t));
+
+    n = gen_length(variable_dimensions(type_variable(t)));
+    for(; n>=1; n--) o = CONS(OVERLAP, make_overlap(0, 0), o);
+
+    store_overlap_status(e, o);
+
+    assert(bound_overlap_status_p(e));
+}
+
+/* set_overlap(ent, dim, side, width)
+ *
+ * set the overlap value for entity ent, on dimension dim,
+ * dans side side to width, which must be a positive integer.
+ * if necessary, the overlap is updates with the value width.
+ */
+void set_overlap(ent, dim, side, width)
+entity ent;
+int dim, side, width;
+{
+    overlap o;
+    int current;
+
+    assert(dim>0);
+
+    if (!bound_overlap_status_p(ent)) create_overlaps(ent);
+    o = OVERLAP(gen_nth(dim-1, load_overlap_status(ent)));
+
+    if (side) /* upper */
+    {
+	current = overlap_upper(o);
+	if (current<width) overlap_upper(o)=width;
+    }
+    else /* lower */
+    {
+	current = overlap_lower(o);
+	if (current<width) overlap_lower(o)=width;
+    }
+}
+
+/* int get_overlap(ent, dim, side)
+ *
+ * returns the overlap for a given entity, dimension and side,
+ * to be used in the declaration modifications
+ */
+int get_overlap(ent, dim, side)
+entity ent;
+int dim, side;
+{
+    overlap o;
+
+    assert(dim>0);
+
+    if (!bound_overlap_status_p(ent)) create_overlaps(ent);
+    assert(bound_overlap_status_p(ent));
+
+    o = OVERLAP(gen_nth(dim-1, load_overlap_status(ent)));
+    return(side ? overlap_upper(o) : overlap_lower(o));
+}
+
+/* static void overlap_redefine_expression(pexpr, ov)
+ *
+ * redefine the bound given the overlap which is to be included
+ */
+static void overlap_redefine_expression(pexpr, ov)
+expression *pexpr;
+int ov;
+{
+    expression
+	copy = *pexpr;
+
+    if (expression_constant_p(*pexpr))
+    {
+	*pexpr = int_to_expression(HpfcExpressionToInt(*pexpr)+ov);
+	free_expression(copy); /* this avoid a memory leak */
+    }
+    else
+	*pexpr = MakeBinaryCall(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
+						   PLUS_OPERATOR_NAME),
+				*pexpr,
+				int_to_expression(ov));
+}
+
+static void declaration_with_overlaps(l)
+list l;
+{
+    entity ent;
+    int ndim, i, lower_overlap, upper_overlap;
+    dimension the_dim;
+
+    MAP(ENTITY, oldent,
+     {
+	 ent = load_new_node(oldent);
+	 ndim = variable_entity_dimension(ent);
+
+	 assert(type_variable_p(entity_type(ent)));
+
+	 for (i=1 ; i<=ndim ; i++)
+	 {
+	     the_dim = entity_ith_dimension(ent, i);
+	     lower_overlap = get_overlap(oldent, i, 0);
+	     upper_overlap = get_overlap(oldent, i, 1);
+
+	     debug(8, "declaration_with_overlaps", 
+		   "%s(DIM=%d): -%d, +%d\n", 
+		   entity_name(ent), i, lower_overlap, upper_overlap);
+
+	     if (lower_overlap!=0) 
+		 overlap_redefine_expression(&dimension_lower(the_dim),
+					     -lower_overlap);
+		 
+	     if (upper_overlap!=0) 
+		 overlap_redefine_expression(&dimension_upper(the_dim),
+					     upper_overlap);
+	 }
+     },
+	 l);
+}
+
+void declaration_with_overlaps_for_module(module)
+entity  module;
+{
+    list l = list_of_distributed_arrays_for_module(module);
+
+    declaration_with_overlaps(l);
+    gen_free_list(l);
+}
+
+/*   That is all
  */
