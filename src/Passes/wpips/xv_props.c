@@ -1,7 +1,7 @@
 /* $Id$ */
 
 #ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 2002/03/14 17:02:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "%A% ($Date: 2002/03/15 07:55:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -651,8 +651,8 @@ build_aliases()
    aliases = hash_table_make(hash_string, 0);
 
    if (wpips_rc == NULL)
-      user_internal_error("Shell variable LIBDIR is undefined. Have you run pipsrc?\n",
-                 0 );
+      pips_user_error("Shell variable LIBDIR is undefined. "
+		      "Have you run pipsrc?\n");
    fd = safe_fopen(wpips_rc, "r");
 
    while (fgets(buffer, BSIZE_HERE, fd) != NULL) {
