@@ -205,6 +205,13 @@ extern int Current_index ;
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
 
+#define IS_UNIT_TYPE(n)		((n)==0)
+#define IS_BOOL_TYPE(n)		((n)==1)
+#define IS_CHAR_TYPE(n)		((n)==2)
+#define IS_INT_TYPE(n)		((n)==3)
+#define IS_FLOAT_TYPE(n)	((n)==4)
+#define IS_STRING_TYPE(n)	((n)==5)
+
 /* External routines. */
 extern char *alloc() ;
 extern void user(char *, ...) ;
