@@ -242,7 +242,7 @@ static void db_clean_db_resources()
     {
       string rn = db_symbol_name(rs);
       string on = db_symbol_name(os);
-      pips_debug(8, "considering %s[%s] (%p)\n", rn, on, (void*) r);
+      pips_debug(8, "considering %s[%s] (0x%p)\n", rn, on, (void*) r);
 
       if (db_resource_required_p(r))
       {
