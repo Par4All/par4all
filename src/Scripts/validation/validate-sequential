@@ -285,9 +285,16 @@ test_aspect()
   
   (
    for file in ${FILES:-`ls $aspect/*.[cfF]`} ; do
-     name=`basename $file '\.f'`
-     name=`basename $name '\.F'`
-     name=`basename $name '\.c'`
+     if [ "$OSTYPE" = "solaris2.8" ]; then
+	 name=`basename $file '\.f'`
+	 name=`basename $name '\.F'`
+	 name=`basename $name '\.c'`
+     else 
+     #linux-gnu
+	 name=`basename $file '.f'`
+	 name=`basename $name '.F'`
+	 name=`basename $name '.c'`
+     fi     
      u_name=`echo $name | tr [a-z] [A-Z]`
      program=$name
 
