@@ -937,9 +937,11 @@ dataconst: const_simple
 	    }
 	| entity_name TK_LPAR const_simple TK_COMMA const_simple TK_RPAR
 	{
+	    bool simple = ENTITY_IMPLIED_CMPLX_P($1);
 	    pips_assert("is implied complex", 
-			ENTITY_IMPLIED_CMPLX_P($1));
-	    $$ = MakeBinaryCall(CreateIntrinsic(IMPLIED_COMPLEX_NAME), $3, $5);
+			simple || ENTITY_IMPLIED_DCMPLX_P($1) );
+	    $$ = MakeBinaryCall(CreateIntrinsic
+	    (simple? IMPLIED_COMPLEX_NAME: IMPLIED_DCOMPLEX_NAME), $3, $5);
 	}
 	;
 
