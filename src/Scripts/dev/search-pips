@@ -124,7 +124,7 @@ SEARCHPATH=""
 if [ -n "$DIRECTORY" ]
 then
 	if [ -d "$DIRECTORY" ]
-	then SEARCHPATH="$DIRECTORY"
+	then SEARCHPATH="$DIRECTORY/."
 	else 
 	echo "$DIRECTORY is not a directory" >&2
 	exit 1
@@ -135,13 +135,13 @@ else	if [ -z "$PIPS$LINEAR$NEWGEN" ]
 	fi
 fi
 if [ -n "$PIPS" ]
-then SEARCHPATH="$SEARCHPATH $PIPS_DIR"
+then SEARCHPATH="$SEARCHPATH $PIPS_DIR/."
 fi
 if [ -n "$LINEAR" ]
-then SEARCHPATH="$SEARCHPATH $LINEARDIR"
+then SEARCHPATH="$SEARCHPATH $LINEARDIR/."
 fi
 if [ -n "$NEWGEN" ]
-then SEARCHPATH="$SEARCHPATH $NEWGENDIR"
+then SEARCHPATH="$SEARCHPATH $NEWGENDIR/."
 fi
 # PIPS_HOME=/home/users/pips 
 
