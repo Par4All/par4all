@@ -174,16 +174,6 @@ add_to_current_line(
 }
 
 void
-add_Value_to_current_line(
-    string buffer,
-    Value v,
-    string continuation,
-    text t)
-{
-    add_to_current_line(buffer, Value_to_string(v), continuation, t);
-}
-
-void
 close_current_line(
     string buffer,
     text txt)
