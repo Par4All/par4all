@@ -40,8 +40,6 @@
 #include "effects-generic.h"
 #include "effects-convex.h"
 
-jmp_buf overflow_error; /* to deal with overflow errors occuring during the projection 
-                         * of a Psysteme along a variable */
 
 /*********************************************************************************/
 /* STATISTICS FOR PROJECTION OPERATORS                                           */
@@ -700,7 +698,7 @@ void region_non_exact_projection_along_parameters(region reg, list l_param)
 	}
 	
 	/* if there is an overflow error, reg becomes a whole array may region */
-	if (setjmp(overflow_error))
+	CATCH(overflow_error)
 	{
 	    region reg_tmp = reference_whole_region(region_reference(reg),
 						    region_action_tag(reg));
@@ -712,11 +710,12 @@ void region_non_exact_projection_along_parameters(region reg, list l_param)
 	    sc_rm(ps);
 	    if (op_statistics_p()) nb_proj_param_ofl++;
 	}	
-	else 
+	TRY 
 	{	    
 	    ps = sc_projection_ofl_along_list_of_variables(ps, l_param);
 	    region_system_(reg) = newgen_Psysteme(ps);
 	    region_approximation_tag(reg) = is_approximation_may;
+	    UNCATCH(overflow_error);
 	}
     }    
 }
@@ -752,8 +751,7 @@ void region_exact_projection_along_parameters(region reg, list l_param)
 	if (op_statistics_p()) nb_proj_param++;
 	
 	/* if there is an overflow error, reg becomes a whole array may region */
-	if (setjmp(overflow_error)) 
-	{
+	CATCH(overflow_error) {
 	    region reg_tmp = reference_whole_region(region_reference(reg),
 						    region_action_tag(reg));
 
@@ -764,8 +762,7 @@ void region_exact_projection_along_parameters(region reg, list l_param)
 	    sc_rm(ps);
 	    if (op_statistics_p()) nb_proj_param_ofl++;
 	}
-	else 
-	{	    
+	TRY {	    
 	    /* if the initial region is a may region, the resulting region is
 	     * also a may region, even if the projection happens to be exact.
 	     * so we do not need to know whether it is exact or not
@@ -823,6 +820,7 @@ void region_exact_projection_along_parameters(region reg, list l_param)
 	    }
 	    region_system_(reg) = newgen_Psysteme(ps);
 	    region_approximation_tag(reg) = app;
+	    UNCATCH(overflow_error);
 	}
 	
 	ifdebug(6)
@@ -861,7 +859,7 @@ void region_non_exact_projection_along_variables(region reg, list l_var)
 	}
 	
 	/* if there is an overflow error, reg becomes a whole array may region */
-	if (setjmp(overflow_error)) 
+	CATCH(overflow_error) 
 	{
 	    region reg_tmp = reference_whole_region(region_reference(reg),
 						    region_action_tag(reg));
@@ -874,11 +872,12 @@ void region_non_exact_projection_along_variables(region reg, list l_var)
 	    if (op_statistics_p()) nb_proj_var_ofl++;
 
 	}
-	else 
+	TRY 
 	{
 	    ps = sc_projection_ofl_along_list_of_variables(ps, l_var);
 	    region_system_(reg) = newgen_Psysteme(ps);
 	    region_approximation_tag(reg) = is_approximation_may;
+	    UNCATCH(overflow_error);
 	}
     }
 }
@@ -910,7 +909,7 @@ list l_var;
 	}
 	
 	/* if there is an overflow error, reg becomes a whole array may region */
-	if (setjmp(overflow_error))
+	CATCH(overflow_error)
 	{
 	    region reg_tmp = reference_whole_region(region_reference(reg),
 						    region_action_tag(reg));
@@ -922,21 +921,22 @@ list l_var;
 	    sc_rm(ps);
 	    if (op_statistics_p()) nb_proj_var_ofl++;
 	}
-	else 
-	{
+	TRY {
 	    list ll_var = l_var;
 	    
 	    for(; !ENDP(ll_var) && 
-		(region_approximation_tag(reg) == is_approximation_must); 
+		    (region_approximation_tag(reg) == is_approximation_must); 
 		ll_var = CDR(ll_var)) 
 	    {
-		region_exact_projection_along_variable(reg, ENTITY(CAR(ll_var)));
+		region_exact_projection_along_variable(reg, 
+						       ENTITY(CAR(ll_var)));
 	    }
 	    
 	    if (!ENDP(ll_var))
 	    {
 		region_non_exact_projection_along_variables(reg, ll_var);
 	    }
+	    UNCATCH(overflow_error);
 	}
     }
 }
@@ -974,7 +974,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 	
 	if (base_contains_variable_p(sc->base, (Variable) var)) 
 	{
-	    if (setjmp(overflow_error))
+	    CATCH(overflow_error))
 	    {
 		region reg_tmp = 
 		    reference_whole_region(region_reference(reg),
@@ -987,8 +987,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 		sc_rm(sc);
 		if (op_statistics_p()) nb_proj_var_ofl++;
 	    }
-	    else 
-	    {
+	    TRY {
 		list l_phi_var = region_phi_cfc_variables(reg);
 		
 		if (gen_find_eq(var, l_phi_var) == chunk_undefined)
@@ -1024,6 +1023,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 		    }
 		}
 		gen_free_list(l_phi_var);
+		UNCATCH(overflow_error);
 	    }
 	}
 	
