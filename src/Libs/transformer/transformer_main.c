@@ -5,13 +5,9 @@
   * Francois Irigoin, 21 April 1990
   */
 
-#include <setjmp.h>
-
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
-
-jmp_buf pips_top_level;
 
 #include "transformer.h"
 
