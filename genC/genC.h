@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1994/12/29 18:44:18 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1994/12/29 18:51:31 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -65,7 +65,7 @@ typedef union chunk {
 	set t ;
 	hash_table h ;
 	union chunk *p ;
-} chunk, *object ;
+} chunk, *newgen_object ;
 
 #define chunk_undefined ((chunk *)(-16))
 #define chunk_undefined_p(c) ((c)==chunk_undefined)
