@@ -6,6 +6,9 @@
  * reset_ordering_to_statement.
  *
  * $Log: ordering.c,v $
+ * Revision 1.12  1998/04/14 12:55:03  coelho
+ * linear.h added.
+ *
  * Revision 1.11  1997/12/09 14:21:11  coelho
  * leaks--
  *
@@ -15,6 +18,8 @@
  */
 
 #include <stdio.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "ri.h"
