@@ -178,6 +178,21 @@ int *int_p;
 	return(FALSE);
 }
 
+/* (*int_p) gets integer constant if any */
+bool integer_symbolic_constant_p(ent, int_p)
+entity ent;
+int *int_p;
+{
+    if( type_tag(entity_type(ent))==is_type_functional
+       && value_tag(entity_initial(ent))==is_value_symbolic
+       && constant_tag(symbolic_constant(value_symbolic(entity_initial(ent))))==is_constant_int ) {
+	*int_p = constant_int(symbolic_constant(value_symbolic(entity_initial(ent))));
+	return(TRUE);
+    }
+    else
+	return(FALSE);
+}
+
 /* this function creates an character constant and then a call to that
 constant. */
 
