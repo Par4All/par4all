@@ -248,21 +248,12 @@ text_statement_any_effect_type(
 }
 
 static void 
-push_prettyprints(
-    string resource_name,
-    string summary_resource_name)
+push_prettyprints(string resource_name)
 {
 
     if (!string_undefined_p(resource_name))
 	add_a_generic_prettyprint(resource_name, 
 				  FALSE, 
-				  effects_to_text_func,
-				  effects_prettyprint_func, 
-				  attach_effects_decoration_to_text_func);
-
-    if (!string_undefined_p(summary_resource_name))
-	add_a_generic_prettyprint(summary_resource_name, 
-				  TRUE,
 				  effects_to_text_func,
 				  effects_prettyprint_func, 
 				  attach_effects_decoration_to_text_func);
@@ -314,7 +305,7 @@ text my_get_any_effects_text(string module_name)
 text my_get_any_effect_type_text(string module_name, string resource_name)
 {
     text txt;
-    push_prettyprints(resource_name, string_undefined);
+    push_prettyprints(resource_name);
     txt = my_get_any_effects_text(module_name);
     reset_generic_prettyprints();
     return txt;
