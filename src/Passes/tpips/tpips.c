@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/03/07 14:14:07 $, 
+ * $Date: 1997/03/08 14:49:24 $, 
  */
 
 #include <stdio.h>
@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <setjmp.h>
 #include <strings.h>
+#include <sys/param.h>
 
 #include "readline.h"
 #include "history.h"
@@ -210,193 +211,161 @@ static char * initialize_tpips_history()
     return last_entry ? last_entry->line : NULL ;
 }
 
+#define skip_blanks(str) \
+  while (*str && (*str==' ' || *str=='\t' || *str=='\n')) str++
+#define skip_nonblanks(str) \
+  while (*str && *str!=' ' && *str!='\t' && *str!='\n') str++
+
+static char *skip_first_word(char *line)
+{
+    skip_blanks(line);
+    skip_nonblanks(line);
+    skip_blanks(line);
+    return line;
+}
 
 /* Handlers
  */
 static void cdir_handler(char * line)
 {
     user_log("%s\n", line);
-    if (chdir(line+strlen(CHANGE_DIR)))
+    if (chdir(skip_first_word(line)))
 	fprintf(stderr, "error while changing directory\n");
+}
+
+static void pwd_handler(char * line)
+{
+    char pathname[MAXPATHLEN];
+    user_log("pwd\n");
+    fprintf(stdout, "current working directory: %s\n", getwd(pathname));
 }
 
 static void setenv_handler(char * line)
 {
     user_log("%s\n", line);
-    if (putenv(line+strlen(SET_ENV)))
+    if (putenv(skip_first_word(line)))
 	fprintf(stderr, "error while changing environment\n");
 }
 
-/* was set in the gram, moved here as setenv */
+/* was set in the grammar, moved here as setenv.
+ * motivation: the property lexer can be reused directly here.
+ * from the gramar, it must be reimplemented by hand...
+ * FC.
+ */
 static void setproperty_handler(char * line)
 {
     if (tpips_execution_mode) {
 	user_log("%s\n", line);
-	line+=strlen(SET_PROP);
-	parse_properties_string(line);
+	parse_properties_string(skip_first_word(line));
     }
 }
 
 static void shell_handler(char * line)
 {
-    line += strlen(SHELL_ESCAPE);
-    while ((*line ==' ') || (*line == '\t'))
-	line++;
-    if (*line) {
-	user_log("shell %s\n", line);
-	system(line);
-    }
-    else
-	system("sh");
+    user_log("%s\n", line);
+    line = skip_first_word(line);
+    system(*line? line: "sh");
 }
 
 static void echo_handler(char * line)
 {
     /* skip the key word and a blank character */
     user_log("%s\n", line); 
-    line += strlen(ECHO);
-    if (*line==' ' || *line=='\t') line++;
+    line = skip_first_word(line);
     fprintf(stdout,"%s\n",line);
     fflush(stdout);
 }
 
+#define TP_HELP(prefix, simple, full)		\
+  if (!*line || PREFIX_EQUAL_P(line, prefix)) {	\
+      printf(simple); if (*line) printf(full);}
+
 static void help_handler(char * line)
 {
-    char *tmpline;
-    /* skip the help word */
-    line += strlen(HELP);
-    /* skip blanks and tabs */
-    while ((*line)==' ' || (*line)=='\t')
-	line++;
+    line = skip_first_word(line);
 
-    /* forget spaces afeer */
-    tmpline = line;
-    while ((*tmpline) && (*tmpline !=' ') && (*tmpline != '\t'))
-	tmpline++;
-    if (*tmpline)
-	*tmpline = '\0';
-    
     printf("\n");
-    if (PREFIX_EQUAL_P("create",line)) {
-	printf("create   <workspace-name> <file-name>...\n");
-	if (*line) {
-	    printf("\tcreate a new worspace from a list of fortran files\n");
-	    printf("\tfirst delete the workspace if it exists\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("open",line)) {
-	printf("open     <workspace-name>\n");
-	if (*line) {
-	    printf("\topen an existing workspace\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("close",line)) {
-	printf("close    <workspace-name>\n");
-	if (*line) {
-	    printf("\tclose an opened workspace\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("delete",line)) {
-	printf("delete   <workspace-name>\n");
-	if (*line) {
-	    printf("\tdelete an existing workspace\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("module",line)) {
-	printf("module   <module-name>\n");
-	if (*line) {
-	    printf("\tselect a module from an opened workspace\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("activate",line)) {
-	printf("activate <rule-name>\n");
-	if (*line) {
-	    printf("\ttell a rule to be active\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("make",line)) {
-	printf("make     <resourcename[(OWNER)]>\n");
-	if (*line) {
-	    printf("\tbuild a resource\n"
-		   "\n\tExamples:\n\n"
-		   "\t\t make PRINTED_FILE\n"
-		   "\t\t make CALLGRAPH_FILE(my_module)\n"
-		   "\t\t make DG_FILE($ALL)\n"
-		   "\t\t make ICFG_FILE($CALLEES)\n\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("apply",line)) {
-	printf("apply    <rulename[(OWNER)]>\n");
-	if (*line) {
-	    printf("\tmake the produced resources of a rule\n"
-		   "\n\tExamples:\n\n"
-		   "\t\t apply PRINT_SOURCE_WITH_REGIONS\n"
-		   "\t\t apply HPFC_CLOSE(my_module)"
-		   "\t\t apply PRINT_CODE($ALL)\n"
-		   "\t\t apply PRINT_ICFG($CALLEES)\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("display",line)) {
-	printf("display  <resourcename[(OWNER)]>\n");
-	if (*line) {
-	    printf("\tprint a resource\n"
-		   "\n\tExamples:\n\n"
-		   "\t\t display PRINTED_FILE\n"
-		   "\t\t display CALLGRAPH_FILE(my_module)\n"
-		   "\t\t display DG_FILE($ALL)\n"
-		   "\t\t display ICFG_FILE($CALLEES)\n\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("cd",line)) {
-	printf("cd       <dirname>\n");
-	if (*line) {
-	    printf("\tchange directory\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("setenv",line)) {
-	printf("setenv    <name>=<value>\n");
-	if (*line) {
-	    printf("\tchange environment\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("setproperty",line)) {
-	printf("setproperty <name>=<value>\n");
-	if (*line) {
-	    printf("\tchange property\n");
-	}
-    }
-    if (PREFIX_EQUAL_P(GET_PROP,line)) {
-	printf(GET_PROP " <name>\n");
-	if (*line) {
-	    printf("\t print property\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("echo",line)) {
-	printf("echo     <string>\n");
-	if (*line) {
-	    printf("\tprint the string\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("quit",line)) {
-	printf("quit\n");
-	if (*line) {
-	    printf("\texit from tpips (you should close the workspace before\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("help",line)) {
-	printf("help     [<help-item>]\n");
-	if (*line) {
-	    printf("\tprint a list of all the commands or a \"detailled\" description of one\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("\\",line)) {
-	printf("shell   [<shell-function>]\n");
-	if (*line) {
-	    printf("\tallow shell functions call\n");
-	}
-    }
-    if (PREFIX_EQUAL_P("rulename",line) ||
-	PREFIX_EQUAL_P("rule",line)) {
+    TP_HELP("create",
+	 "create   <workspace-name> <file-name>...\n",
+	 "\tcreate a new worspace from a list of fortran files\n"
+	 "\tfirst delete the workspace if it exists\n");
+    TP_HELP("open",
+	 "open     <workspace-name>\n",
+	 "\topen an existing workspace\n");
+    TP_HELP("close",
+	 "close    <workspace-name>\n",
+	 "\tclose an opened workspace\n");
+    TP_HELP("delete",
+	 "delete   <workspace-name>\n",
+	 "\tdelete an existing workspace\n");
+    TP_HELP("module",
+	 "module   <module-name>\n",
+	 "\tselect a module from an opened workspace\n");
+    TP_HELP("activate",
+	 "activate <rule-name>\n",
+	 "\ttell a rule to be active\n");
+    TP_HELP("make",
+	 "make     <resourcename[(OWNER)]>\n",
+	 "\tbuild a resource\n"
+	 "\n\tExamples:\n\n"
+	 "\t\t make PRINTED_FILE\n"
+	 "\t\t make CALLGRAPH_FILE(my_module)\n"
+	 "\t\t make DG_FILE($ALL)\n"
+	 "\t\t make ICFG_FILE($CALLEES)\n\n");
+    TP_HELP("apply",
+	 "apply    <rulename[(OWNER)]>\n",
+	 "\tmake the produced resources of a rule\n"
+	 "\n\tExamples:\n\n"
+	 "\t\t apply PRINT_SOURCE_WITH_REGIONS\n"
+	 "\t\t apply HPFC_CLOSE(my_module)"
+	 "\t\t apply PRINT_CODE($ALL)\n"
+	 "\t\t apply PRINT_ICFG($CALLEES)\n");
+    TP_HELP("display",
+	"display  <resourcename[(OWNER)]>\n",
+	 "\tprint a resource\n"
+	 "\n\tExamples:\n\n"
+	 "\t\t display PRINTED_FILE\n"
+	 "\t\t display CALLGRAPH_FILE(my_module)\n"
+	 "\t\t display DG_FILE($ALL)\n"
+	 "\t\t display ICFG_FILE($CALLEES)\n\n");
+    TP_HELP("cd",
+	 "cd       <dirname>\n",
+	 "\tchange directory\n");
+    TP_HELP("pwd", "pwd\n", "\tprint current working directory\n");
+    TP_HELP("setenv",
+	 "setenv    <name>=<value>\n",
+	 "\tchange environment\n");
+    TP_HELP("setproperty",
+	 "setproperty <name>=<value>\n",
+	 "\tchange property\n");
+    TP_HELP(GET_PROP,
+	 GET_PROP " <name>\n",
+	 "\t print property\n");
+    TP_HELP("echo",
+	 "echo     <string>\n",
+	 "\tprint the string\n");
+    TP_HELP("quit",
+	 "quit\n",
+	 "\texit from tpips (you should close the workspace before\n");
+    TP_HELP("help",
+	 "help     [<help-item>]\n",
+	 "\tprint a list of all the commands or a \"detailled\""
+	 " description of one\n");
+    TP_HELP("shell",
+	 "shell   [<shell-function>]\n",
+	 "\tallow shell functions call\n");
+    TP_HELP("owner",
+	"* owner : variable *\n",
+	 "\tList of available owners:\n"
+	 "\t\t$MODULE\n"
+	 "\t\t$ALL\n"
+	 "\t\t$PROGRAM\n"
+	 "\t\t$CALLEES\n"
+	 "\t\t$CALLERS\n"
+	 "\t\t<module_name>\n");
+
+    if (!*line || PREFIX_EQUAL_P(line,"rulename") ||
+	PREFIX_EQUAL_P(line,"rule")) {
 	printf("* rulename : variable*\n");
 	if (*line) {
 	    char ** ps = tp_phase_names;
@@ -429,8 +398,8 @@ static void help_handler(char * line)
 	    }
 	}
     }
-    if (PREFIX_EQUAL_P("resourcename",line) ||
-	PREFIX_EQUAL_P("resource",line)) {
+    if (!*line || PREFIX_EQUAL_P(line,"resourcename") ||
+	PREFIX_EQUAL_P(line,"resource")) {
 	printf("* resourcename : variable*\n");
 	if (*line) {
 	    char ** ps = tp_resource_names;
@@ -464,18 +433,6 @@ static void help_handler(char * line)
 	    }
 	}
     }
-    if (PREFIX_EQUAL_P("owner",line)) {
-	printf("* owner : variable *\n");
-	if (*line) {
-	    printf("\tList of available owners:\n");
-	    printf("\t\t$MODULE\n");
-	    printf("\t\t$ALL\n");
-	    printf("\t\t$PROGRAM\n");
-	    printf("\t\t$CALLEES\n");
-	    printf("\t\t$CALLERS\n");
-	    printf("\t\t<module_name>\n");
-	}
-    }
     
     printf("\n");
 }
@@ -506,12 +463,8 @@ static void quit_handler(char * line)
 
 static void set_line_to_parse(char * line)
 {
-    /* skip blanks */
-    while (((*line) == ' ') ||
-	   ((*line) == '\t') ||
-	   ((*line) == '\n'))
-	line++;
-    
+    skip_blanks(line);
+
     /* store line pointer */
     line_parsed = line_to_parse = line;
 
@@ -561,6 +514,7 @@ static struct t_handler handlers[] =
   { SHELL_ESCAPE, 	shell_handler },
   { HELP,		help_handler },
   { ECHO,		echo_handler },
+  { "pwd",		pwd_handler },
   { (char *) NULL, 	default_handler}
 };
 
@@ -656,6 +610,7 @@ static void process_a_file()
 	     */
 	    pips_debug(2, "restating tpips scanner\n");
 	    tp_restart(tp_in);
+	    skip_blanks(line);
 	    (find_handler(line))(line);
 	}
 	pop_pips_context();
