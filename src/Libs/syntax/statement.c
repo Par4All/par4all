@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.58  2003/06/19 07:37:57  nguyen
+ * Update calls to make_statement and make_variable with new RI for C
+ *
  * Revision 1.57  2003/06/17 11:06:38  nguyen
  * Update functions with new RI
  *
@@ -389,7 +392,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED,
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
-			   i);
+			   i,NIL,NULL);
     }
     else {
 	s = make_statement(l,
@@ -397,7 +400,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
-			   i);
+			   i,NIL,NULL);
 	NewStmt(l, s);
     }
 
@@ -585,7 +588,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments, 
-			   i);
+			   i,NIL,NULL);
     }
 	
     return(s);
@@ -771,7 +774,7 @@ make_goto_instruction(entity l)
 		       STATEMENT_NUMBER_UNDEFINED,
 		       STATEMENT_ORDERING_UNDEFINED,
 		       empty_comments, 
-		       instruction_undefined);
+		       instruction_undefined,NIL,NULL);
     NewStmt(l, s);
   }
 
@@ -1027,7 +1030,7 @@ update_functional_type_with_actual_arguments(entity e, list l)
 	/* OK, it is not safe: may be it's a 0-ary function */
 	for (pc = l; pc != NULL; pc = CDR(pc)) {
 	    basic b = basic_of_expression(EXPRESSION(CAR(pc)));
-	    variable v = make_variable(b, NIL); 
+	    variable v = make_variable(b, NIL,NIL); 
 	    type t = make_type(is_type_variable, v);
 	    parameter p = make_parameter(t,
 					 MakeModeReference());
@@ -1046,7 +1049,7 @@ update_functional_type_with_actual_arguments(entity e, list l)
 	     !ENDP(pc) && !ENDP(pc2);
 	     POP(pc), i++) {
 	    basic b = basic_of_expression(EXPRESSION(CAR(pc)));
-	    variable v = make_variable(b, NIL); 
+	    variable v = make_variable(b, NIL,NIL); 
 	    type at = make_type(is_type_variable, v);
 	    type ft = parameter_type(PARAMETER(CAR(pc2)));
 	    type eft = type_varargs_p(ft)? type_varargs(ft) : ft;
@@ -1256,7 +1259,7 @@ MakeWhileDoInst(expression c, string l)
     stmt_do = instruction_to_statement(instblock_do);
 
     iwdo = make_instruction(is_instruction_whileloop,
-			   make_whileloop(c, stmt_do, dolab));
+			   make_whileloop(c, stmt_do, dolab,make_evaluation_before()));
 
     LinkInstToCurrentBlock(iwdo, TRUE);
    
