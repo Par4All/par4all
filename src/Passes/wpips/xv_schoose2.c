@@ -37,13 +37,29 @@ Panel_item item;
 Event *event;
 {
     char *curchoice;
+	int i, nchoices;
+	int item_is_in_the_list;
 
     curchoice = strdup((char *) xv_get(choice, PANEL_VALUE, 0));
-    if (strlen(curchoice)==0) {
-	prompt_user("Choose one item or cancel");
-    }
-
-    (*apply_on_choice)(curchoice);
+    if (strlen(curchoice)==0)
+		prompt_user("Choose one item or cancel");
+	else {
+			/* Modified to verify that an correct item is selected.
+				RK, 21/05/1993. */
+		nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
+		item_is_in_the_list = FALSE;
+		for(i = 0; i < nchoices; i++)
+			if (strcmp((char *)xv_get(choices, PANEL_LIST_STRING, i),
+				curchoice) == 0) {
+				item_is_in_the_list = TRUE;
+				break;
+			}
+		if (item_is_in_the_list == FALSE)
+			prompt_user("You have to choose one item of the list!");
+		else
+				/* Normal case : */
+    		(*apply_on_choice)(curchoice);
+	}
 
     free(curchoice);
 }
