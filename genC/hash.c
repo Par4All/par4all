@@ -221,8 +221,8 @@ hash_table htp;
 
 void hash_table_free(hash_table htp)
 {
-  gen_free_area(htp->hash_array, htp->hash_size*sizeof(hash_entry));
-  gen_free_area(htp, sizeof(struct __hash_table));
+  gen_free_area((void**) htp->hash_array, htp->hash_size*sizeof(hash_entry));
+  gen_free_area((void**) htp, sizeof(struct __hash_table));
 }
 
 /* This functions stores a couple (key,val) in the hash table pointed to
@@ -461,7 +461,7 @@ hash_enlarge_table(hash_table htp)
 	    htp->hash_array[rank] = he;
 	}
     }
-    gen_free_area(old_array, old_size*sizeof(hash_entry));
+    gen_free_area((void**)old_array, old_size*sizeof(hash_entry));
 }
 
 static int hash_string_rank(void * key, int size)
