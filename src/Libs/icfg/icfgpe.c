@@ -29,14 +29,33 @@ typedef struct
   string name;
   gen_chunk * resource;
   get_text_function get_text;
-} icfgpeprint_stuff, * p_icfgpeprint_stuff;
+} icfgpe_print_stuff, * p_icfgpe_print_stuff;
 
 static list lp = NIL;
+
+void reset_icfgpe_print()
+{
+  gen_map(free, lp);
+  gen_free_list(lp);
+  lp = NIL;
+}
+
+void add_a_icfgpe_print(string resource_name, get_text_function gt)
+{
+  p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff)malloc(sizeof(icfgpe_print_stuff));
+  ips->name = resource_name;
+  ips->resource = gen_chunk_undefined;
+  ips->get_text = gt;
+  
+  lp = CONS(STRING, (char *)ips, lp);
+}
 
 text get_any_effect_type_text_flt(string module_name, string resource_name, entity e_flt)
 {
   text txt;
-  txt = get_any_effects_text(module_name, TRUE);
+  
+  /*txt = get_any_effects_text(module_name, TRUE);*/
+  reset_icfgpe_print();
   return txt;
 }
 
