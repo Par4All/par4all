@@ -286,15 +286,19 @@ bool db_create_workspace(string name)
 
 /* stores all resources of module oname.
  */
-static void db_close_module(string what, string oname)
+static void db_close_module(string what, string oname, bool do_free)
 {
     /* the download order is retrieved from the methods... */
     int nr = dbll_number_of_resources(), i;
+
     if (!same_string_p(oname, "")) /* log if necessary. */
 	user_log("  %s module %s.\n", what, oname);
-    for (i=0; i<nr; i++)
+
+    for (i=0; i<nr; i++) 
+    {
 	db_save_and_free_memory_resource_if_any
-	    (dbll_get_ith_resource_name(i), oname);
+	    (dbll_get_ith_resource_name(i), oname, do_free);
+    }
 }
 
 static void db_save_workspace(string what, bool do_free)
@@ -303,7 +307,7 @@ static void db_save_workspace(string what, bool do_free)
 
     user_log("%s all modules.\n", what);
     a = db_get_module_list();
-    GEN_ARRAY_MAP(module, db_close_module(what, module), a);
+    GEN_ARRAY_MAP(module, db_close_module(what, module, do_free), a);
     gen_array_full_free(a);
     
     user_log("%s program.\n", what);
@@ -328,12 +332,12 @@ void db_checkpoint_workspace(void)
     debug_off();
 }
 
-bool db_close_workspace(void)
+bool db_close_workspace(bool is_quit)
 {
     debug_on(PIPSDBM_DEBUG_LEVEL);
     pips_debug(1, "Closing workspace %s\n", db_get_current_workspace_name());
 
-    db_save_workspace("Closing", TRUE);
+    db_save_workspace("Closing", /* free? */ !is_quit);
     db_reset_current_workspace_name();
     
     pips_debug(1, "done\n");
