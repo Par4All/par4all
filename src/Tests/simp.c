@@ -12,16 +12,11 @@
 #include <malloc.h>
 
 #include "boolean.h"
-#include "arithmetique.h"
 #include "assert.h"
+#include "arithmetique.h"
 #include "vecteur.h"
 #include "contrainte.h"
-#include "ray_dte.h"
-#include "sommet.h"
 #include "sc.h"
-#include "sg.h"
-#include "types.h"
-#include "polyedre.h"
 
 #define NB_INEQ sc->nb_ineq
 #define NB_EQ sc->nb_eq
