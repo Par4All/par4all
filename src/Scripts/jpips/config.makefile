@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.7  1998/07/03 08:55:18  coelho
+# install fixed.
+#
 # Revision 1.6  1998/07/03 08:51:26  coelho
 # use .class files for dependences.
 #
@@ -68,7 +71,7 @@ SOURCES	=	$(J_FILES) $(SCRIPTS) $(MENUS) $(GIF)
 JZIP	=	jpips.zip
 JJAR	=	jpips.jar
 
-INSTALL_SHR =	$(MENUS) $(GIF) $(JZIP)
+INSTALL_SHR =	$(MENUS) $(GIF) $(JZIP) $(SCRIPTS)
 
 #
 # default rule
