@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <xpomp_graphic.h>
+#include "xpomp_graphic.h"
 
 enum {
     X_data_array_size = 100,
@@ -95,6 +95,6 @@ main()
     
     /*
     XPOMP_close_display(d);
-    */
     return 0;
+    */
 }
