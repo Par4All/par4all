@@ -47,6 +47,11 @@ static int current_margin;
 /* We want to keep track of the current statement inside the recurse */
 DEFINE_LOCAL_STACK(current_stmt, statement)
 
+void icfg_error_handler()
+{
+    error_reset_current_stmt_stack();
+}
+
 /* We store the text for each statement in a mapping during a code traversal
    in order to print it afterwards 
 */
