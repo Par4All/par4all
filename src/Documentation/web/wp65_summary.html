@@ -1,0 +1,90 @@
+<HTML>
+<HEAD>
+<TITLE> WP65: Summary of features</TITLE>
+</HEAD>
+<BODY>
+<h1> WP65: Summary of features</h1>
+
+<ul>
+  <li> funded by Esprit project 2701 (PUMA - WorkPackage 6.5) and DRET.
+  <li> <i> Emulated Shared Memory</i> scheme (software cache):
+     <ul>
+	<li> processors with a fast local memory
+	<li> one half emulate shared memory banks
+	<li> one half perform the computation
+     </ul>	
+  <li> INMOS T9000 processor and C104 hardware router oriented.
+  <li> Developed by <a href=/~ancourt>Corinne ANCOURT</a> and
+       <a href=/~irigoin>Fran&ccedil;ois IRIGOIN</a>.
+</ul>
+
+<h2>Input</h2>
+<P>
+<ul>
+  <li> Fortran 77 with one main program.
+  <li> set of loop nests (maybe non perfectly nested).
+  <li> affine loop bounds.
+  <li> neither guards nor calls...
+  <li> indirections are ok.
+</ul>
+
+<h2> Compilation</h2>
+<P>
+<ul>
+  <li> implicite distribution of data over the memory banks (general cyclic)
+  <li> task generation based on control partioning
+    <ul>
+      <li> legal tiling chosen to parallelize the code
+      <li> use of the dependence graph
+      <li> partial loop distribution...
+      <li> default tile size used.
+    </ul>
+  <li> code generation for the tiles over the processors.
+</ul>
+
+<h2> Output  </h2>
+<P>
+<ul>
+  <li> 2 complementary SPMD Fortran 77 programs
+    <ul>
+      <li> <code>COMPUTE(PROC_ID)</code> for the compute processors
+      <li> <code>BANK(BANK_ID)</code> for the banks
+    </ul>
+  <li> similar structures, for each tile: 
+    <ul>
+      <li> the banks send data that are received by the processors 
+	(soft. cache prefetch) 
+      <li> the processors perform the computations
+      <li> the processors send the computed data to the banks
+	(soft. cache flush)
+    </ul>
+  <li> main difficulties:
+    <ul>
+      <li> data needed for one tile are often apart on different banks
+      <li> correctness requires that only needed data are communicated
+      <li> thus complex code with guards may be generated for communications
+      <li> local allocation and addressing to be chosen on the processors
+    </ul>
+  <li> PVM 3.3 used for testing purposes
+</ul>
+
+<h2> Features </h2>
+<P>
+<ul>
+  <li> no need for static or dynamic explicit data partitioning...
+  <li> more general than owner computes rule
+  <li> memory servers and computations may be different processors.
+    <ul>
+      <li> increased communication bandwidth
+      <li> less context switches
+    </ul>
+  <li> load balancing: any process can be started on any processor...
+  <li> parallelism granularity tuning easier 
+	since independent of data distribution.
+  <li> However a full software cache cannot be fully statically compiled.
+  But regular code can exploit the underlying INMOS hardware very efficiently.
+</ul>
+
+<p>URL: <a href=/pips/wp65.html><code>http://www.cri.ensmp.fr/pips/wp65.html</code></a>
+</body>
+</html>
