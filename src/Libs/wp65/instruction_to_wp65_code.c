@@ -100,8 +100,8 @@ reduce_loop_bound(loop l)
     if (normalized_linear_p(low_norm) && normalized_linear_p(up_norm)){
 	vlow = (Pvecteur) normalized_linear(low_norm);	
 	vup = (Pvecteur) normalized_linear(up_norm);
-	vect_add_elem(&vlow,TCST,-1);
-	vect_add_elem(&vup,TCST,-1);
+	vect_add_elem(&vlow,TCST, VALUE_MONE);
+	vect_add_elem(&vup,TCST, VALUE_MONE);
 	range_lower(r)= make_vecteur_expression(vlow);
 	range_upper(r)= make_vecteur_expression(vup);
     }
@@ -768,7 +768,7 @@ loop_nest_to_wp65_code(
 		 if (loop_nest_dimt > perfect_nested_loop_size) {
 		     loop_body_indices = vect_dup(initial_basis2);
 		     for ( pv=initial_basis; pv!= NULL;
-			  vect_chg_coeff(&loop_body_indices,pv->var,0),
+			vect_chg_coeff(&loop_body_indices,pv->var,VALUE_ZERO),
 			  pv =pv->succ);
 		     full_initial_basis=base_reversal(vect_add(initial_basis,
 							       loop_body_indices));
