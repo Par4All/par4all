@@ -541,10 +541,14 @@ void update_common_sizes()
 		       "set size %d for common %s\n", s, entity_name(c));
 	}
 	else if (area_size(ac) != s)
-	    user_error("update_common_sizes",
+/*	    user_error("update_common_sizes",
 		       "inconsistent size (%d and %d) for common %s in %s\n",
 		       area_size(ac), s, entity_name(c), 
-		       CurrentPackage);
+		       CurrentPackage);*/
+	    user_warning("update_common_sizes",
+			 "inconsistent size (%d and %d) for common %s in %s\n",
+			 area_size(ac), s, entity_name(c), 
+			 CurrentPackage);
 	else {
 	    debug(1, "update_common_sizes",
 		       "reset size %d for common %s\n", s, entity_name(c));
