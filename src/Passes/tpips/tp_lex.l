@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.36  1998/04/29 08:24:27  coelho
+ * "show" keyword added.
+ *
  * Revision 1.35  1997/12/15 13:49:14  coelho
  * new syntax. () -> [] and $ALL -> %ALL
  *
@@ -127,6 +130,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 <KEY>exit 		{ KEYWORD(TK_EXIT); }
 <KEY>help 		{ KEYWORD(TK_HELP); }
 <KEY>remove 		{ KEYWORD(TK_REMOVE); }
+<KEY>show 		{ KEYWORD(TK_SHOW); }
 
 <KEY>setproperty	{ LITTERAL(TK_SET_PROPERTY); }
 <KEY>set		{ LITTERAL(TK_SET_PROPERTY); }
