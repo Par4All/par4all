@@ -5,10 +5,10 @@
 
    */
 
-/* 	%A% ($Date: 1998/03/07 21:54:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/03/10 20:32:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 1998/03/07 21:54:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_clean_up_sequences[] = "%A% ($Date: 1998/03/10 20:32:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -29,6 +29,7 @@ static int clean_up_empty_block_removed;
 static int clean_up_fused_sequences;
 static int clean_up_1_statement_sequence;
 
+hash_table statement_to_goto_table = NULL;
 
 void
 initialize_clean_up_sequences_statistics()
@@ -69,6 +70,89 @@ clean_up_sequences_filter(statement s)
 {
     /* Just say to recurse... */
     return TRUE;
+}
+
+
+/* Add a couple (statement -> GOTO) to the map statement_to_goto_table: */
+boolean
+compute_statement_to_goto_table_filter(instruction i)
+{
+    if (instruction_goto_p(i)) {
+	statement s = instruction_goto(i);
+
+	pips_debug(7, "Adding GOTO from instruction %p to statement %p.\n",
+		   i, s);
+	
+	if (!hash_defined_p(statement_to_goto_table, (char *) s)) {
+	    hash_put(statement_to_goto_table,
+		     (char *) s,
+		     (char *) CONS(INSTRUCTION, i, NIL));
+	}
+	else {
+	    hash_update(statement_to_goto_table,
+			(char *) s,
+			(char *) CONS(INSTRUCTION,
+				      i,
+				      (list) hash_get(statement_to_goto_table,
+						      (char *) s)));
+	}
+	/* There is nothing to recurse into: */
+	return FALSE;
+    }
+    return TRUE;
+}
+
+
+/* Since clean_up_sequences() is called before the controlizer, there
+   may be some GOTO. GOTOs are in fact pointer to the target
+   statement, hence when target statements are moved around, some
+   GOTOs need to be updated. For this purpose, we build a list of
+   GOTOs per target statement.
+   */
+void
+compute_statement_to_goto_table(statement s)
+{
+    pips_assert("Map statement_to_goto_table should be uninitialized.\n",
+		statement_to_goto_table == NULL);
+    
+    statement_to_goto_table = hash_table_make(hash_pointer, 0);
+    gen_recurse(s, instruction_domain,
+		compute_statement_to_goto_table_filter,
+		gen_null);          
+}
+
+
+/* Discard the statement_to_goto_table map: */
+void
+discard_statement_to_goto_table()
+{
+    HASH_MAP(k, v, {
+	/* Discard every GOTO list: */
+	gen_free_list((list) v);
+    }, statement_to_goto_table);
+    hash_table_free(statement_to_goto_table);
+    statement_to_goto_table = NULL;
+}
+
+
+/* Adjust all the GOTOs pointing s1 to s2: */
+void
+adjust_goto_from_to(statement s1,
+		    statement s2)
+{
+    if (s1 == s2)
+	/* Nothing to do: */
+	return;
+
+    if (hash_defined_p(statement_to_goto_table, (char *) s1)) {
+	MAP(INSTRUCTION, i, {
+	    pips_assert("The GOTO should point to s1.\n",
+			instruction_goto(i) == s1);
+	    instruction_goto(i) = s2;
+	    pips_debug(6, "Adjusting GOTO from instruction %p -> statement %p to statement %p.\n",
+		       i, s1, s2);      
+	}, (list) hash_get(statement_to_goto_table, (char *) s1));
+    }
 }
 
 
@@ -220,6 +304,8 @@ clean_up_sequences_rewrite(statement s)
 		statement_comments(st) = string_undefined;
 		statement_instruction(s) = statement_instruction(st);
 		statement_instruction(st) = instruction_undefined;
+		/* Do not forget to adjust the GOTOs pointing on st: */
+		adjust_goto_from_to(st, s);
 		/* Discard the old statement: */
 		free_instruction(i);
 		pips_debug(3, "Sequence with 1 statement replaced by 1 statement...\n");
@@ -227,8 +313,7 @@ clean_up_sequences_rewrite(statement s)
 	    }
 	    
 	    ifdebug(5) {
-		pips_debug(5,
-			   "Statement at exit:\n");
+		pips_debug(5, "Statement at exit:\n");
 		print_statement(s);
 	    }
 	    break;
@@ -242,10 +327,16 @@ clean_up_sequences_rewrite(statement s)
 void
 clean_up_sequences_internal(statement s)
 {
-      gen_recurse(s, statement_domain,
+    debug_on("CLEAN_UP_SEQUENCES_DEBUG_LEVEL");
+    compute_statement_to_goto_table(s);
+    gen_recurse(s, statement_domain,
 		clean_up_sequences_filter,
 		clean_up_sequences_rewrite);  
+    discard_statement_to_goto_table();
+    debug_off();
 }
+
+
 /* Recursively clean up the statement sequences by fusing if possible
    and by removing useless one. Remove also epty blocs and useless
    continue. */
