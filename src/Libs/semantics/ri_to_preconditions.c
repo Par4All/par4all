@@ -1563,10 +1563,10 @@ entity m;
     return pre;
 }
 
-/* a simpler remake of the previous one that wotks in all cases. FC.
+/* a simpler remake of the previous one that works in all cases. FC.
  */
 transformer 
-all_data_to_precondition(entity m)
+all_data_to_precondition(entity m) 
 {
     transformer pre = transformer_identity();
     Pbase b = (Pbase) VECTEUR_NUL;
