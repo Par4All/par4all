@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/11/11 13:42:14 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/11/11 13:44:21 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -97,7 +97,7 @@ alive()
 
 which_executable()
 {
-  PATH="$PWD:$PWD/$PIPS_ARCH:$PIPS_BINDIR/$PIPS_ARCH:$PATH" \
+  PATH="$PWD:$PWD/$PIPS_ARCH:$PIPS_ROOT/Bin/$PIPS_ARCH:$PATH" \
     type $1 | sed "s,.* is ,,"
 }
 
