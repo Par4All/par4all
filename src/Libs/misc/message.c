@@ -12,10 +12,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <setjmp.h>
 #include <stdarg.h>
 #include <ctype.h>
-#include <setjmp.h>
 
 #include "genC.h"
 #include "misc.h"
