@@ -23,9 +23,9 @@ range obj;
     cons *pc;
     call c = syntax_call(expression_syntax(range_increment(obj)));
 
-    pc = words_subexpression(range_lower(obj), 0);
+    pc = words_subexpression(range_lower(obj), 0, TRUE);
     pc = CHAIN_SWORD(pc,":");
-    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0));
+    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0, TRUE));
     if (/*  expression_constant_p(range_increment(obj)) && */
 	 strcmp( entity_local_name(call_function(c)), "1") == 0 )
 	return(pc);
@@ -76,7 +76,7 @@ text text_loop_cmf(module, label, margin, obj, n, lr, lidx)
 	pc = CHAIN_SWORD(pc, ", ");
     }
     pc = CHAIN_SWORD(pc, ") ");
-    pc = gen_nconc(pc, words_call(instruction_call(i), 0));
+    pc = gen_nconc(pc, words_call(instruction_call(i), 0, TRUE));
     u = make_unformatted(strdup(label), n, margin, pc) ;
     result_text = make_text(CONS(SENTENCE,
 				 make_sentence(is_sentence_unformatted,
