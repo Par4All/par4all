@@ -2121,7 +2121,8 @@ string mod_name;
 bool print_dependence_graph(mod_name)
 string mod_name;
 {
-    string dg_name;
+    string dg_name = NULL;
+    string local_dg_name = NULL;
     graph dg;
     FILE *fp;
     statement mod_stat;
@@ -2135,7 +2136,9 @@ string mod_name;
 
     debug_on("RICEDG_DEBUG_LEVEL");
 
-    dg_name = (string) strdup(concatenate(db_get_current_workspace_directory(), "/", mod_name, ".dg", NULL));
+    local_dg_name = (string) strdup(concatenate(mod_name, ".dg", NULL));
+    dg_name = (string) strdup(concatenate(db_get_current_workspace_directory(), "/", 
+					  local_dg_name, NULL));
     fp = safe_fopen(dg_name, "w");
     if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") || 
 	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS")) {
@@ -2148,11 +2151,11 @@ string mod_name;
     debug_off();
     
     DB_PUT_FILE_RESOURCE(DBR_DG_FILE, strdup(mod_name), 
-			 dg_name);
+			 local_dg_name);
 
     reset_current_module_statement();
     reset_current_module_entity();
-
+    free(dg_name);
     return TRUE;
 }
 
