@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: TPips.java,v $
+ * Revision 1.12  1998/11/21 15:04:48  coelho
+ * cleaner?
+ *
  * Revision 1.11  1998/11/17 21:49:09  ancourt
  * properties for emacs
  *
@@ -115,61 +118,66 @@ public class TPips
       this.jpips = jpips;
     }
 
+  /** properties with emacs mode...
+   */
+  static final String 
+    PROP_EMACS = "setproperty PRETTYPRINT_ADD_EMACS_PROPERTIES TRUE",
+    PROP_DECLS = "setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE",
+    PROP_COMMS = "setproperty PRETTYPRINT_HEADER_COMMENTS TRUE";
 
   /** Starts the tpips process and sets the streams.
     */  
   public void start()
+  {
+    try
     {
-      try
-        {
-	    System.out.println("starting tpips...");
-	    tpips = Runtime.getRuntime().exec(execute);
-	    out = new PrintWriter(tpips.getOutputStream());
-	    in = new BufferedReader
-		(new InputStreamReader(tpips.getInputStream()));
-	    inErr = new BufferedReader
-		(new InputStreamReader(tpips.getErrorStream()));
-	    
-	    // listen to tpips error
-	    Thread listener = new Thread(new Listener(inErr,jpips));
-	    listener.start();
-	    
-	    // warns if tpips dies.
-	    //	  Thread watcher = new Thread(new Watcher(tpips));
-	    //	  watcher.start();
-	    
-	    if (emacsDisplayer!=null) {
-		String prop1="setproperty PRETTYPRINT_ADD_EMACS_PROPERTIES TRUE";
-		String prop2="setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE";
-		String prop3="setproperty PRETTYPRINT_HEADER_COMMENTS TRUE";
-		this.sendCommand(prop1);
-		this.sendCommand(prop2);
-		this.sendCommand(prop3);
-	    }
-	}  
-      catch(Exception e)
-	  {
-	      System.out.println("Cannot start tpips!");
-	  }
-    }
-    
-    
-    /** Stops the tpips process.
-     */  
-    public void stop()
+      System.out.println("starting tpips...");
+      tpips = Runtime.getRuntime().exec(execute);
+      out = new PrintWriter(tpips.getOutputStream());
+      in = new BufferedReader
+	(new InputStreamReader(tpips.getInputStream()));
+      inErr = new BufferedReader
+	(new InputStreamReader(tpips.getErrorStream()));
+      
+      // listen to tpips error
+      Thread listener = new Thread(new Listener(inErr,jpips));
+      listener.start();
+      
+      // warns if tpips dies.
+      //	  Thread watcher = new Thread(new Watcher(tpips));
+      //	  watcher.start();
+      
+      if (emacsDisplayer!=null) 
+      {
+	System.err.println("setting emacs properties...");
+	this.sendCommand(PROP_EMACS);
+	this.sendCommand(PROP_DECLS);
+	this.sendCommand(PROP_COMMS);
+      }
+    }  
+    catch(Exception e)
     {
-	tpips.destroy();
+      System.out.println("Cannot start tpips!");
     }
-    
-
+  }
+  
+  
+  /** Stops the tpips process.
+   */  
+  public void stop()
+  {
+    tpips.destroy();
+  }
+  
+  
   /** Sends a quit message to tpips.
-    */  
+   */  
   public void quit()
-    {
-      out.println(replaceCommand("quit"));
-      out.flush();
-    }
-    
+  {
+    out.println(replaceCommand("quit"));
+    out.flush();
+  }
+  
     
   /** Sends an exit message to tpips.
     */  
@@ -246,32 +254,32 @@ public class TPips
 		if (graphDisplayer.davinciExtension(f))
 		  graphDisplayer.display(f,true,true);
 		else 
-
-		    if (graphDisplayer.controlgraphExtension(f))
-			emacsDisplayer.graphdisplay(f, true, true);
-		    else
-			{
-			    if (emacsDisplayer!=null)
-				emacsDisplayer.display(f, true, true);
-			    else 
-				textDisplayer.display(f,true,true);
-			}
+		  
+		  if (graphDisplayer.controlgraphExtension(f))
+		    emacsDisplayer.graphdisplay(f, true, true);
+		  else
+		  {
+		    if (emacsDisplayer!=null)
+		      emacsDisplayer.display(f, true, true);
+		    else 
+		      textDisplayer.display(f,true,true);
+		  }
 	      }
 	      else if(response.equals(BEGIN_ERROR))
-		  {
-		      JOptionPane.showMessageDialog(frame,
-						    getText(END_ERROR),error,
-						    JOptionPane.ERROR_MESSAGE);
-		  }
+	      {
+		JOptionPane.showMessageDialog(frame,
+					      getText(END_ERROR),error,
+					      JOptionPane.ERROR_MESSAGE);
+	      }
 	      else if(response.equals(BEGIN_REQUEST))
-		  {
-		      String text = getText(END_REQUEST);
-		      //System.err.println("question: "+ text);
-		      String answer = JOptionPane.showInputDialog
-			  (frame, text, "TPIPS Input", JOptionPane.QUESTION_MESSAGE);
-		      out.println(answer);
-		      out.flush();
-		  }
+	      {
+		String text = getText(END_REQUEST);
+		//System.err.println("question: "+ text);
+		String answer = JOptionPane.showInputDialog
+		  (frame, text, "TPIPS Input", JOptionPane.QUESTION_MESSAGE);
+		out.println(answer);
+		out.flush();
+	      }
 	    }
 	  }
 	  s = in.readLine();
