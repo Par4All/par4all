@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.24  1997/11/21 10:23:13  coelho
+# polylib added as an independent lib.
+#
 # Revision 1.23  1997/11/12 13:18:02  coelho
 # semantics and control order reversed.
 #
@@ -56,11 +59,11 @@ NEWGEN_LIBS='-lgenC'
 LINEAR_DOCS=''
 
 # plint
-LINEAR_ORDERED_LIBS='arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre sparse_sc union'
+LINEAR_ORDERED_LIBS='arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polylib polyedre sparse_sc union'
 
 # removed because not used by pips: plint
 
-LINEAR_LIBS='-lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique'
+LINEAR_LIBS='-lmatrice -lunion -lpolyedre -lpolylib -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique'
 
 #
 # PIPS
