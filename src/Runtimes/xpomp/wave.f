@@ -4,7 +4,7 @@
 ! Fabien COELHO (HPF version)
 !
 ! $RCSfile: wave.f,v $ (version $Revision$)
-! $Date: 1996/09/06 10:46:11 $, 
+! $Date: 1996/09/07 16:53:39 $, 
 !
 
 !
@@ -214,12 +214,9 @@
 !hpf$ align with t:: speed, wave, depth, area
 
 ! Initialize XPOMP
-      call xpomp_open_display(x_display_size, y_display_size, display)
-      call xpomp_set_color_map(display, 0, 1, 128, -1, status)
-      call xpomp_show_usage
-      
-!      print *, 'click somewhere in the area'
-!      call xpomp_wait_mouse(display, x, y, button, state) 
+      call xpompf open display(x_display_size, y_display_size, display)
+      call xpompf set color map(display, 0, 1, 128, -1, status)
+      call xpompf show usage
       
       call init_area(depth, area)
 
@@ -240,7 +237,7 @@
       do iter=1, maxiter
 
 ! Checks for a drop
-         call xpomp_is_mouse
+         call xpompf is mouse
      $        (display, x_display, y_display, state, button)
          
          if (button.ne.0) then
@@ -257,7 +254,7 @@
 ! Compute the image and show it
 
          call compute_image(image, wave)
-         call xpomp_flash(display, image, x_size, y_size,
+         call xpompf flash(display, image, x_size, y_size,
      $        0, 0, x_display_zoom, y_display_zoom, status)
 
       end do
