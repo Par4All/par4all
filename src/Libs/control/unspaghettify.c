@@ -3,10 +3,10 @@
    Ronan Keryell, 1995.
    */
 
-/* 	%A% ($Date: 1995/10/04 15:51:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/14 15:55:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
- char vcid_unspaghettify[] = "%A% ($Date: 1995/10/04 15:51:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+ char vcid_unspaghettify[] = "%A% ($Date: 1995/10/14 15:55:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -654,7 +654,7 @@ unspaghettify(char * mod_name)
       pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
 
    /* Reorder the module, because new statements have been generated. */
-   module_body_reorder(mod_stmt);
+   module_reorder(mod_stmt);
 
    if (get_debug_level() > 0)
       pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
