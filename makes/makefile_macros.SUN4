@@ -1,20 +1,22 @@
 #
 # $RCSfile: makefile_macros.SUN4,v $ (version $Revision$)
-# $Date: 1996/09/19 11:51:51 $, 
+# $Date: 1997/05/03 10:26:55 $, 
 #
 # this file contains macro definitions 
 
 AR	= gar
 ARFLAGS	= rv
 CC	= acc -temp=$(PIPS_HOME)/tmp
-CFLAGS	= -fast -g -Xc
+CFLAGS	= -g -fast -Xc
 CMKDEP	= -M
 # The SC3 acc compiler forget to define the sparc flag;
 CPPFLAGS= -Dsparc -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC) -bsdmalloc
 LDFLAGS	= -fast -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(EXTERN_ROOT)/Lib/$(ARCH)
 RANLIB	= granlib
-LEX	= lex
+# lex broken for properties...
+# LEX	= lex
+LEX	= flex
 LFLAGS	=
 FC	= f77
 FFLAGS	= -O -g -U -u -C 
