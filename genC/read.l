@@ -24,7 +24,7 @@
 #include <string.h>
 #include "genC.h"
 #include "newgen_include.h"
-#include "x.tab.h"
+#include "genread.h"
 
 #ifdef FLEX_SCANNER
 #undef yywrap
@@ -38,14 +38,14 @@ static void append_to_literal() ;
 
 %}
 
-%Start string
+%Start a_string
 
 %%
-<string>\\\\            {strcat( literal, "\\" );}
-<string>\\\"		{strcat( literal, "\"" );}
-<string>[^\\"\n]*       {append_to_literal();}
-<string>[ \t\n]*        {append_to_literal();}
-<string>\"		{
+<a_string>\\\\            {strcat( literal, "\\" );}
+<a_string>\\\"		{strcat( literal, "\"" );}
+<a_string>[^\\"\n]*       {append_to_literal();}
+<a_string>[ \t\n]*        {append_to_literal();}
+<a_string>\"		{
 			BEGIN 0 ;
 			return( READ_STRING );
 			}
@@ -73,7 +73,7 @@ static void append_to_literal() ;
 [+-]?[ \t]*[0-9]+\.[0-9]+ {
                         return( READ_FLOAT );}
 \"			{
-			BEGIN string ;
+			BEGIN a_string ;
                         literal[0] = '\0';
 			}
 [ \t\n]*	        ;
