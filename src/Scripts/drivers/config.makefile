@@ -1,7 +1,7 @@
 #
 # $RCSfile: config.makefile,v $ for pips drivers
 # 
-# version $Revision$ ($Date: 1996/08/13 17:15:50 $, )
+# version $Revision$ ($Date: 1996/08/21 14:41:24 $, )
 #
 
 SCRIPTS =	Display \
@@ -13,7 +13,7 @@ SCRIPTS =	Display \
 		Select \
 		Interchange
 
-SOURCES =	$(SCRIPTS) config.makefile
+SOURCES =	$(SCRIPTS)
 
 INSTALL_SHR=	$(SCRIPTS)
 
