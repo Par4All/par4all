@@ -26,7 +26,8 @@ LIB_CFILES =	replace.c \
 		declarations.c \
 		clone.c \
 		forward_substitution.c \
-		optimize.c
+		optimize.c \
+		transformation_test.c 
 
 #		optimize_misc.c
 
