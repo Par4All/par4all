@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/21 13:55:10 $, 
+# $Date: 1996/09/21 14:04:17 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -105,20 +105,22 @@ $verb taring...
 
 # well, the list is potentially too big for being put as an argument:-(
 # hence this very slow version...
-
+#
 # cat $tmp.list |
 # while read file 
 # do
 #     $tar $taropt $tmp.tar $file
 # done
+#
+# or this one, which relies on the -T option (from GNU tar)
 
-$tar $taropt $tmp.tar -T $tmp.list
+$tar $taropt $tmp.tar -T $tmp.list || error 5 "tar returned $? while taring"
 
 # ls -l $tmp.tar 
 
 $verb untaring in $trgt...
-cd $trgt || error 5 "cannot cd to $trgt"
-$tar xf $tmp.tar
+cd $trgt || error 6 "cannot cd to $trgt"
+$tar xf $tmp.tar || error 7 "tar returned $? while untaring"
 
 $verb done
 
