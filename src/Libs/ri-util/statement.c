@@ -66,6 +66,41 @@ empty_code_list_p(list l)
 }
 
 
+/*************************************************************** COUNT LOOPS */
+
+static int nseq, npar;
+static void loop_rwt(loop l)
+{
+    if (execution_parallel_p(loop_execution(l)))
+	npar++;
+    else
+	nseq++;
+}
+
+void 
+number_of_sequential_and_parallel_loops(
+    statement stat,
+    int * pseq,
+    int * ppar)
+{
+    nseq=0, npar=0;
+    gen_recurse(stat, loop_domain, gen_true, loop_rwt);
+    *pseq=nseq, *ppar=npar;
+}
+
+void 
+print_number_of_loop_statistics(
+    FILE * out,
+    string msg,
+    statement s)
+{
+    int seq, par;
+    number_of_sequential_and_parallel_loops(s, &seq, &par);
+    fprintf(out, "%s: %d seq loops, %d par loops\n", msg, seq, par);
+}
+
+/****************************************************************************/
+
 bool
 empty_comments_p(string s)
 {
