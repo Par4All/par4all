@@ -207,8 +207,10 @@ resource_text(
     }
 
     /*******************written by Dat****************/
+    {
     list l_eff_flt = my_effects_filter(l_eff, "KMAX");
     l_eff_text = (*(pps->get_text))(l_eff_flt);
+    }
     /*************************************************/
     /*l_eff_text = (*(pps->get_text))(l_eff);*/
 
