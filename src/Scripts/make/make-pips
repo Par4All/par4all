@@ -3,6 +3,9 @@
 # $Id$
 #
 # $Log: make-pips,v $
+# Revision 1.45  1997/08/22 07:14:52  coelho
+# nop.
+#
 # Revision 1.44  1997/08/22 07:07:25  coelho
 # was broken by rcs conversion.
 #
@@ -79,7 +82,7 @@ usage()
 	  -P: Production (default)
 	  -D: Development
 	 misc
-	  -i: installation (recompile all but the Documentation)
+	  -i: installation \(recompile all but the Documentation)
 	  -b: build (Production, Pips+Linear+Newgen, recompile)
 	  -r: recompile (Production, Pips, clean+recompile)
 	  -d dir: specifies a directory
@@ -87,7 +90,7 @@ usage()
 	  -m msg: message
 	  -w where: where to redirect output (default is none)
 	 targets: make targets to require (e.g. clean all recompile diff...)
-EOF
+	EOF
     exit $ret
 }
 
