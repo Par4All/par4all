@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/10/21 21:52:35 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/10/21 22:35:06 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -84,12 +84,6 @@ SCRIPT=`$BASENAME $0`
 TMP=/tmp/$SCRIPT.$$
 $RM -f $TMP.*
 
-#
-# default processor arrangement is 1D.
-#
-cat - <<-%% |
-	chpf$ processors hpf_default_procs($NOP)
-%%
 #
 # directive normalization.
 # FCD are simply translated into hpf-like prefixed directives
@@ -207,11 +201,21 @@ $SED -n '$p'`
 
 LINE=${LAST_LINE:-$LINE}
 
+DEFAULT_USED=`grep ',hpf_default_procs)' $TMP.0 $TMP.1`
+
 #
 # final output
 
 {
   $SED -n "1,$LINE p" $TMP.0
+  #
+  # default processor arrangement is 1D
+  #
+  [ "$DEFAULT_USED" ] &&
+  { 
+    echo "      logical hpf_default_procs($NOP)"
+    echo "      call hpfcp(hpf_default_procs($NOP))"
+  }
   $SED -n p $TMP.1
   $SED "1,$LINE d" $TMP.0
 } | 
