@@ -5,15 +5,15 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/08/07 15:44:51 $, )
+# ($Date: 1996/08/13 15:19:33 $, )
 #
 
 RUN=':'
-SCRIPT=`basename $0`
+script=`basename $0`
 
 usage()
 {
-  echo "usage: $SCRIPT -(f|l|x|r prgm)  directory files ($2)";
+  echo "usage: $script -(f|l|x|r prgm)  directory files ($2)";
   exit ${1:-1}
 }
 
@@ -22,7 +22,7 @@ do
   case $opt in
     f) RUN=':' ;;
     l) RUN='ranlib' ;;
-    x) RUN='chmod a+x' ;;
+    x) RUN='chmod a+rx-w' ;;
     r) RUN="$OPTARG" ;;
     *) usage 4 "unexpected option ($opt)" ;;
   esac
@@ -43,12 +43,13 @@ do
   target=$directory/`basename $file`
   if test -f $target && cmp -s $file $target
   then
-    echo "$SCRIPT: skipping $file"
+    echo "$script: skipping $file"
   else
-    echo "$SCRIPT: copying $file"
+    echo "$script: copying $file"
     rm -f $target
     cp $file $directory
     eval "$RUN $target"
+    test -x $file && chmod a+rx-w $target
   fi
 done
 
