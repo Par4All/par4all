@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1997/02/03 22:27:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_syntax_reader[] = "%A% ($Date: 1997/02/03 22:27:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -317,7 +323,7 @@ char * s;
     char *kwcour, *t;
     static char buffer[32];
 
-    debug(9, "", "[IsCapKeyword] %s\n", s);
+    debug(9, "IsCapKeyword", "%s\n", s);
 
     /* la chaine s est mise en majuscules */
     t = buffer;
@@ -333,7 +339,7 @@ char * s;
     if (i != UNDEF) {
 	while ((kwcour = keywtbl[i].keywstr)!=0 && kwcour[0]==buffer[0]) {
 	    if (strcmp(buffer, kwcour) == 0) {
-		debug(9, "", "[IsCapKeyword] %s %d\n", kwcour, i);
+		debug(9, "IsCapKeyword", "%s %d\n", kwcour, i);
 		return(keywtbl[i].keywval);
 	    }
 
