@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compiler-util.c,v $ ($Date: 1994/12/02 15:00:54 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1994/12/22 16:52:14 $, )
  * got on %D%, %T%
  * $Id$
  *
@@ -61,9 +61,8 @@ control_mapping map;
     control
 	cprime = (control) GET_CONTROL_MAPPING(map, c);
 
-    pips_assert("update_control_lists",
-		(control_predecessors(cprime)==NIL) &&
-		(control_successors(cprime)==NIL));
+    assert(control_predecessors(cprime)==NIL &&
+	   control_successors(cprime)==NIL);
 
     control_predecessors(cprime) = 
 	updated_control_list(control_predecessors(c), map);
@@ -89,9 +88,8 @@ control_mapping map;
 	 current = CONTROL(CAR(cc));
 	 new_c = (control) GET_CONTROL_MAPPING(map, current);
 
-	 pips_assert("updated_control_list",
-		     !control_undefined_p(current) ||
-		     !control_undefined_p(new_c));
+	 assert(!control_undefined_p(current) ||
+		!control_undefined_p(new_c));
 
 	 lc_result = CONS(CONTROL, new_c, lc_result);
      },
@@ -196,7 +194,7 @@ syntax syn;
     list 
 	l = NIL;
 
-    pips_assert("IndicesOfRef",(syntax_reference_p(syn)));
+    assert(syntax_reference_p(syn));
 
     MAPL(ce,
      {
@@ -295,11 +293,9 @@ list FindDefinitionsOf(stat, lsyn)
 statement stat;
 list lsyn;
 {
-    list
-	result = NIL;
+    list result = NIL;
 
-    pips_assert("FindDefinitionsOf", 
-		ENDP(syntax_list) && ENDP(found_definitions));
+    assert(ENDP(syntax_list) && ENDP(found_definitions));
 
     syntax_list = lsyn;
 
@@ -307,9 +303,6 @@ list lsyn;
 		statement_domain,
 		gen_true,
 		FindDefinitionsOf_rewrite);
-
-    /* pips_assert("FindDefinitionsOf", 
-		gen_length(syntax_list)==gen_length(found_definitions)); */
 
     result = found_definitions,
     syntax_list = NIL,
@@ -440,16 +433,14 @@ list *pblocks, *ploops;
     blocks=NIL, n_levels=0;
     inner_body=statement_undefined;
 
-    pips_assert("parallel_loop_nest_to_body",
-		instruction_loop_p(statement_instruction(loop_nest)));
+    assert(instruction_loop_p(statement_instruction(loop_nest)));
 
     gen_recurse(loop_nest,
 		instruction_domain,
 		inst_filter,
 		inst_rewrite);
     
-    pips_assert("parallel_loop_nest_to_body",
-		n_loops!=0 && (n_loops-n_levels==1));
+    assert(n_loops!=0 && (n_loops-n_levels==1));
 
     *pblocks=CONS(CONSP, NIL, blocks); /* nothing was done for the first ! */
     *ploops=loops;
@@ -477,7 +468,7 @@ loop l;
 void set_current_loops(obj)
 chunk* obj;
 {
-    pips_assert("set_current_loop_", current_loop_list==NIL);
+    assert(current_loop_list==NIL);
 
     gen_recurse(obj,
 		loop_domain,
