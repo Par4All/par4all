@@ -288,13 +288,15 @@ expression e;
 bool min0_expression_p(e)
 expression e;
 {
-    return operator_expression_p(e, MIN0_OPERATOR_NAME);
+    return operator_expression_p(e, MIN0_OPERATOR_NAME) ||
+	operator_expression_p(e, MIN_OPERATOR_NAME);
 }
 
 bool max0_expression_p(e)
 expression e;
 {
-    return operator_expression_p(e, MAX0_OPERATOR_NAME);
+    return operator_expression_p(e, MAX0_OPERATOR_NAME) ||
+	operator_expression_p(e, MAX_OPERATOR_NAME);
 }
 
 bool operator_expression_p(e, op_name)
