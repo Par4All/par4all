@@ -4,7 +4,7 @@
  *
  * also include functions for timings...
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/05 15:46:07 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/19 18:22:47 $, )
  * version $Revision$
  *
  * Fabien Coelho, June 1993
@@ -34,10 +34,12 @@ static struct pvmtaskinfo
  */
 
 static char *
-host_name(int ti_host, int nhost, struct pvmhostinfo *hostp)
+host_name(
+    int ti_host, /* the host number we are looking for */
+    int nhost,   /* the number of hosts */
+    struct pvmhostinfo *hostp) /* the struct in which the information is */
 {
     int i;
-
     for(i=0 ; i<nhost ; i++)
 	if (hostp[i].hi_tid==ti_host) return hostp[i].hi_name;
 
@@ -45,7 +47,10 @@ host_name(int ti_host, int nhost, struct pvmhostinfo *hostp)
 }
 
 static struct pvmtaskinfo 
-which_task(int ti_tid, int ntask, struct pvmtaskinfo *taskp)
+which_task(
+    int ti_tid, /* the host number we are looking for */
+    int ntask,  /* the number of hosts */
+    struct pvmtaskinfo *taskp)/* the struct in which the information is */
 {
     int i;
     for(i=0 ; i<ntask ; i++)
@@ -92,7 +97,7 @@ int *number, *tids, *hosttid;
     info = pvm_tasks(0, &ntask, &taskp);
     if (info<0) 
 	fprintf(stderr, "[print_task_info] pvm_tasks error (%d)\n", info);
-    
+
     /* print tasks
      */
     fprintf(stderr, "host running on %s\n",
