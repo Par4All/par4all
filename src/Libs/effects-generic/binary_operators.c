@@ -149,7 +149,8 @@ proper_effects_contract(list l_effects)
 /* list proper_effects_combine(list l_effects, bool scalars_only_p)
  * input    : a list of proper effects, and a boolean to know on which
  *            elements to perform the combination.
- * output   : a list of effects, in which the selected elements have been merged.
+ * output   : a list of effects, in which the selected elements have been 
+ *            merged.
  * modifies : the input list.
  * comment  :
  */
