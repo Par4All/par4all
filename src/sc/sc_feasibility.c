@@ -436,7 +436,7 @@ int ofl_ctrl;
       sc_fprint(stderr, s1, default_variable_to_string);
     }
 
-  s1 = sc_elim_db_constraints(s1);
+  s1 = sc_elim_double_constraints(s1);
 
   if (s1 != NULL)
   {
