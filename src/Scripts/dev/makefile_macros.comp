@@ -1,0 +1,22 @@
+#
+# $Id$
+#
+
+AR	= ar
+ARFLAGS	= rv
+CC	= cc
+CFLAGS	= -O -g
+CMKDEP	= -M
+LD	= $(CC)
+RANLIB	= ranlib
+LEX	= lex
+LFLAGS	=
+FC	= f77
+FFLAGS	= -O -g
+LINT	= lint
+LINTFLAGS= -habxu
+YACC	= yacc
+YFLAGS	=
+
+# end of it!
+#
