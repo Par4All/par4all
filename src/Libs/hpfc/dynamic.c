@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/04/19 15:52:34 $, )
+ * ($Date: 1996/06/08 17:41:14 $, )
  */
 
 #include "defines-local.h"
@@ -248,6 +248,24 @@ static bool same_alignment_in_list_p(
     return FALSE;
 }
 
+bool conformant_templates_p(
+    entity t1,
+    entity t2)
+{
+    if (t1==t2 || conformant_entities_p(t1, t2))
+	return TRUE;
+    else
+    {
+	distribution
+	    d1 = load_hpf_distribution(t1),
+	    d2 = load_hpf_distribution(t2);
+
+	if (!same_distribute_p(d1, d2)) return FALSE;
+    }
+
+    return TRUE;
+}
+
 static bool same_align_p(
     align a1,
     align a2)
@@ -255,21 +273,10 @@ static bool same_align_p(
     list /* of alignments */ l1 = align_alignment(a1),
                              l2 = align_alignment(a2);
 
-    if (!conformant_entities_p(align_template(a1),align_template(a2)) ||
+    if (!conformant_templates_p(align_template(a1),align_template(a2)) ||
 	(gen_length(l1)!=gen_length(l2))) 
 	return FALSE;
 
-    /* if the template are different, must check the distribution...
-     */
-    if (align_template(a1)!=align_template(a2)) 
-    {
-	distribution
-	    d1 = load_hpf_distribution(align_template(a1)),
-	    d2 = load_hpf_distribution(align_template(a2));
-
-	if (!same_distribute_p(d1, d2)) return FALSE;
-    }
-    
     MAP(ALIGNMENT, a,
 	if (!same_alignment_in_list_p(a, l2)) return FALSE,
 	l1);
