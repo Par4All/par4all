@@ -1,5 +1,8 @@
 /* $Id$
  * $Log: local-ri-util.c,v $
+ * Revision 1.17  1998/04/15 09:55:33  coelho
+ * fixed.
+ *
  * Revision 1.16  1997/10/30 17:09:53  coelho
  * nope.
  *
@@ -82,11 +85,10 @@ list /* of expressions */ l;
     return gen_nreverse(n);		 
 }
 
-list entity_list_to_expression_list(l)
-list /* of entities */ l;
+list entity_list_to_expression_list(list /* of entities */ l)
 {
     list /* of expressions */ n = NIL;
-    MAP(EXPRESSION, e, n = CONS(EXPRESSION, entity_to_expression(e), n), l);
+    MAP(ENTITY, e, n = CONS(EXPRESSION, entity_to_expression(e), n), l);
     return gen_nreverse(n);
 }
 
