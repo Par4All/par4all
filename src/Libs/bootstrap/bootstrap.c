@@ -21,6 +21,9 @@
   - intrinsics are not properly typed
 
   $Log: bootstrap.c,v $
+  Revision 1.82  2005/03/22 16:41:00  nguyen
+  Add new C intrinsics for strings.h
+
   Revision 1.81  2004/02/18 10:03:48  nguyen
   Complete C intrinsic functions
 
@@ -50,6 +53,9 @@
 
   Revision 1.72  2002/06/10 12:00:37  irigoin
   $Log: bootstrap.c,v $
+  Revision 1.82  2005/03/22 16:41:00  nguyen
+  Add new C intrinsics for strings.h
+
   Revision 1.81  2004/02/18 10:03:48  nguyen
   Complete C intrinsic functions
 
@@ -4317,6 +4323,11 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   /*#include <string.h>*/
 
   {"strcmp",2,overloaded_to_integer_type, 0, 0},
+  {"strcpy",2,default_intrinsic_type, 0, 0},
+  {"strcat",2,default_intrinsic_type, 0, 0},
+  {"strlen",1,default_intrinsic_type, 0, 0},
+
+
   /*#include <tgmath.h>*/
   /*#include <time.h>*/
   /*#include <wchar.h>*/
