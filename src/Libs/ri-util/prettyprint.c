@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.73  1997/09/15 11:58:20  coelho
+ * initial value may be undefined from wp65... guarded.
+ *
  * Revision 1.72  1997/09/15 09:31:54  coelho
  * declaration regeneration~: data / blockdata fixes.
  *
@@ -32,7 +35,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.72 1997/09/15 09:31:54 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.73 1997/09/15 11:58:20 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1634,10 +1637,9 @@ text_data(entity module, list /* of entity */ ldecl)
     MAP(ENTITY, e,
     {
 	value v = entity_initial(e);
-	if(value_constant_p(v) && constant_int_p(value_constant(v)))
-	{
+	if(!value_undefined_p(v) && 
+	   value_constant_p(v) && constant_int_p(value_constant(v)))
 	    ls = CONS(SENTENCE, sentence_data(e), ls);
-	}
     },
 	ldecl);
 
