@@ -324,6 +324,10 @@ instruction:
 		if ($2 != instruction_undefined)
 			LinkInstToCurrentBlock($2, TRUE);
 	    }
+	|  format_inst
+	    { 
+		LinkInstToCurrentBlock($1, TRUE);
+	    }
 	;
 
 inst_spec: parameter_inst
@@ -337,9 +341,7 @@ inst_spec: parameter_inst
 	| save_inst
 	;
 
-inst_exec: format_inst
-	    { $$ = $1; }
-	| assignment_inst
+inst_exec: assignment_inst
 	    { $$ = $1; }
 	| goto_inst
 	    { $$ = $1; }
@@ -704,6 +706,7 @@ assignment_inst: TK_ASSIGN icon TK_TO atom
 
 format_inst: TK_FORMAT
 	    {
+		set_first_format_statement();
 		$$ = MakeZeroOrOneArgCallInst("FORMAT",
 			MakeCharacterConstantExpression(FormatValue));
 	    }
