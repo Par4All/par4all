@@ -189,6 +189,11 @@ static void call_flt(call c)
     return;
 }
 
+static void call_rwt(call c)
+{
+  return;
+}
+
 /* LOOP
  */
 static bool loop_flt (loop l)
@@ -462,7 +467,7 @@ void print_module_icfg(entity module)
     gen_multi_recurse
 	(s,
 	 statement_domain, statement_flt, statement_rwt,
-	 call_domain     , call_flt     , gen_null,
+	 call_domain     , call_flt     , call_rwt,
 	 loop_domain     , loop_flt     , loop_rwt,
 	 instruction_domain    , instruction_flt  , instruction_rwt,
 	 test_domain     , test_flt     , test_rwt,
