@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.40  1998/12/18 19:53:59  irigoin
+ * Stronger asserts put in CreateIntrinsic() and entity_intrinsic().
+ *
  * Revision 1.39  1998/11/05 13:50:57  zory
  * new EOLE automatic inclusion tags added
  *
@@ -412,9 +415,10 @@ intrinsic_entity_p(entity e)
     return intrinsic_p;
 }
 
-/* FI: I do not understand this function name. It seems to mee
+/* FI: I do not understand this function name (see next one!). It seems to mee
  * that any common or user function or user subroutine would
  * be return.
+ * FI: assert condition made stronger (18 December 1998)
  */
 entity 
 entity_intrinsic(string name)
@@ -425,7 +429,19 @@ entity_intrinsic(string name)
 					        NULL),
 				  entity_domain);
 
-    pips_assert("entity_intrinsic", e != entity_undefined );
+    pips_assert("entity_intrinsic", e != entity_undefined  && intrinsic_entity_p(e));
+    return(e);
+}
+
+
+
+/* this function creates an intrinsic function. */
+
+entity 
+CreateIntrinsic(string name)
+{
+    entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
+    pips_assert("entity is defined", e!=entity_undefined && intrinsic_entity_p(e));
     return(e);
 }
 
