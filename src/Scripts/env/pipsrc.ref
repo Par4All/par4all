@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/10 19:09:51 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/11 08:49:52 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -133,59 +133,11 @@ MANPATH=${MANPATH}:${PIPS_DOCDIR}
 PATH=${PATH}:${PIPS_BINDIR}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
 
 #
-# PIPS default options for Unix software development tools
-#
-
+# default architcture for building pips
+# the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
 PIPS_ARCH="."
 
-#
-# AR
-#
-PIPS_AR="/usr5/gnu/bin-sparc/ar"
-#
-# AR FLAGS
-#
-PIPS_ARFLAGS="rv"
-#
-# CC
-#
-PIPS_CC="gcc"
-PIPS_CC_SUN4="acc"
-#
-# C FLAGS
-#
-PIPS_CFLAGS="-O2 -g -ansi -pedantic -Wall -mv8 -pipe"
-PIPS_CFLAGS_SUN4="-fast -Xc -g"
-#
-# CPP FLAGS
-#
-PIPS_CPPFLAGS_SUN4="-I${NEWGEN_INCLUDEDIR} -I${LINEAR_INCLUDEDIR} -I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
-PIPS_CPPFLAGS="-D__USE_FIXED_PROTOTYPES__ ${PIPS_CPPFLAGS_SUN4}"
-# 
-# LD
-#
-PIPS_LD="${PIPS_CC}"
-PIPS_LD_SUN4="${PIPS_CC_SUN4} -bsdmalloc"
-#
-# LD FLAGS
-#
-PIPS_LDFLAGS='-g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)'
-PIPS_LDFLAGS_SUN4="-fast ${PIPS_LDFLAGS}"
-#
-# others
-# 
-PIPS_LEX="lex"
-PIPS_LFLAGS=""
-PIPS_LINT="lint"
-PIPS_LINTFLAGS="-habxu"
-PIPS_YACC="yacc"
-PIPS_YFLAGS=""
-PIPS_PROTOIZE="${PIPS_UTILDIR}/cproto -vcf2"
-PIPS_ETAGS='/usr5/gnu/bin-sparc/etags'
-PIPS_TAR='gtar'
-PIPS_ZIP='gzip -v9'
-PIPS_DIFF='diff'
-PIPS_M4='gm4'
+# make MUST be gmake...
 PIPS_MAKE='gmake'
 
 # never used...
