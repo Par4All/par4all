@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.29  2000/07/27 15:01:55  coelho
+ * hop.
+ *
  * Revision 1.28  2000/07/26 09:11:58  coelho
  * hop.
  *
@@ -44,8 +47,8 @@
  *
  */
 
-#if !defined(LINEAR_ARITHMETIC_ERROR_INCLUDED)
-#define LINEAR_ARITHMETIC_ERROR_INCLUDED
+#if !defined(linear_arithmetic_error_included)
+#define linear_arithmetic_error_included
 
 #include <setjmp.h>
 
@@ -56,6 +59,7 @@ const unsigned int user_exception_error = 4;
 const unsigned int parser_exception_error = 8;
 const unsigned int any_exception_error = ~0;
 */
+
 /* use gnu cpp '__FUNCTION__' extension if possible.
  */
 #if defined(__GNUC__)
@@ -64,8 +68,6 @@ const unsigned int any_exception_error = ~0;
 #define __CURRENT_FUNCTION_NAME__ "<unknown>"
 #endif
 
-/* set DEBUG_GLOBAL_EXCEPTIONS for debugging information
- */
 #define EXCEPTION extern const unsigned int
 
 #define THROW(what) \
@@ -84,7 +86,7 @@ const unsigned int any_exception_error = ~0;
 extern unsigned int the_last_just_thrown_exception;
 #define RETHROW() THROW(the_last_just_thrown_exception)
 
-#endif /* LINEAR_ARITHMETIC_ERROR_INCLUDED */
+#endif /* linear_arithmetic_error_included */
 
 /* end of it.
  */
