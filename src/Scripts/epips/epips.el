@@ -169,6 +169,7 @@ If no buffer can be found, just return nil."
     )
   )
 
+
 (defun epips-raw-insert (a-string
 			 begin-position
 			 end-position
@@ -393,7 +394,6 @@ If no buffer can be found, just return nil."
 					; Switch to the new buffer,
 					; called old compared with few
 					; lines below...:
-	(epips-user-warning-command old-buffer-name)
 	   (epips-select-and-display-a-buffer old-buffer-name)
   
 					; Erase an old content:
