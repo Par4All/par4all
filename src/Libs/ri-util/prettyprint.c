@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/15 09:33:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/15 15:35:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/15 09:33:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/15 15:35:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -48,16 +48,13 @@ char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/15 09:33:12 $, ) ve
 #define PRETTYPRINT_UNREACHABLE_EXIT_MARKER "\204Unstructured Unreachable"
 
 
-text empty_text( s )
-statement s ;
-{
-    return( make_text( NIL )) ;
-}
+text empty_text(entity e, int m, statement s)
+{ return( make_text(NIL));}
 
-static text (*text_statement_hook)() = empty_text ;
+static text (*text_statement_hook)(entity, int, statement) = empty_text;
 
 void init_prettyprint( hook )
-text (*hook)() ;
+text (*hook)(entity, int, statement) ;
 {
     /* checks that the prettyprint hook was actually reset...
      */
