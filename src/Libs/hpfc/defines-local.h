@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: defines-local.h,v $ ($Date: 1995/03/14 14:43:19 $, ) version $Revision$, got on %D%, %T%
+ * $RCSfile: defines-local.h,v $ ($Date: 1995/03/14 18:50:29 $, ) version $Revision$, got on %D%, %T%
  * $Id$
  */
 
@@ -24,6 +24,8 @@
 /*
  * Newgen short sentences
  */
+
+#define function_mapping(f) (((f)+1)->h)
 
 #define one_statement_unstructured(u) \
     ((control_predecessors(unstructured_control(u)) == NIL) && \
