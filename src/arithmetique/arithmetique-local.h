@@ -32,6 +32,7 @@
 #endif
 
 #if defined(LINEAR_VALUE_IS_LONGLONG)
+#define LINEAR_VALUE_STRING "long long int"
 typedef long long int Value;
 #define VALUE_FMT "%lld"
 #define VALUE_CONST(val) (val##LL)
@@ -56,6 +57,7 @@ typedef long long int Value;
 /* end LINEAR_VALUE_IS_LONGLONG
  */
 #elif defined(LINEAR_VALUE_IS_LONG)
+#define LINEAR_VALUE_STRING "long int"
 typedef long Value;
 #define VALUE_FMT "%ld"
 #define VALUE_CONST(val) (val##L)
@@ -72,6 +74,7 @@ typedef long Value;
  */
 /*
 #elif defined(LINEAR_VALUE_IS_FLOAT)
+#define LINEAR_VALUE_STRING "float"
 typedef float Value;
 #define VALUE_FMT "%f"
 #define VALUE_CONST(val) (val)
@@ -90,6 +93,7 @@ typedef float Value;
 /* the purpose of the chars version is to detect invalid assignments
  */
 #elif defined(LINEAR_VALUE_IS_CHARS)
+#define LINEAR_VALUE_STRING "chars..."
 typedef union { char *s; long l; int i; float f; double d;} Value;
 #define VALUE_FMT "%s"
 #define VALUE_CONST(val) ((Value)(val))
@@ -105,6 +109,7 @@ typedef union { char *s; long l; int i; float f; double d;} Value;
 /* end LINEAR_VALUE_IS_CHARS
  */
 #else /* default: LINEAR_VALUE_IS_INT */
+#define LINEAR_VALUE_STRING "int"
 typedef int Value;
 #define VALUE_FMT "%d"
 #define VALUE_CONST(val) (val)
