@@ -66,7 +66,7 @@ void StatementReplaceReference(statement s, reference ref, expression next)
 	     */
 	  loop l = instruction_loop(inst);
 	  RangeReplaceReference(loop_range(l), ref, next);
-	  StatementReplaceReference(l, ref, next);
+	  StatementReplaceReference(loop_body(l), ref, next);
 	  break;
       }
       case is_instruction_call :
