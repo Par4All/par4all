@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1994/03/28 08:40:26 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1994/04/21 09:59:46 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -352,13 +352,15 @@ $DEBUG " | failed : /$failed/"
 if [ "$failed" ]
 then
   final="failed: [$failed]"
+  finalsubject="$subject: failed"
 else
   final="succeeded"
+  finalsubject="$subject: succeeded"
 fi
 
 [ "$PERFORMANCE" ] && PERFORMANCE="$PERFORMANCE, end `local_date`"
 
-$MAIL -s "$subject" $USER <<%
+$MAIL -s "$finalsubject" $USER <<%
 Your Validation Suite Test for
 
 $MODULES
