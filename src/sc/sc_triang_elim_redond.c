@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/07/27 15:17:59 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/07/27 18:54:23 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -112,8 +112,8 @@ Pvecteur v;
 
 #define RETURN_HARDER(b) return(complex_for_compare ? (b) : -(b))
 #define RETURN_ORDER(b) return(inner_for_compare ? (b) : -(b))
-#define same_sign_p(v,w) ((value_negz_p(v) && value_negz_p(w)) || \
-			  (value_posz_p(v) && value_posz_p(w)))
+#define same_sign_p(v,w) ((value_neg_p(v) && value_neg_p(w)) || \
+			  (value_pos_p(v) && value_pos_p(w)))
 
 /* returns -1: c1<c2, 0: c1==c2, +1: c1>c2
  */
@@ -137,7 +137,7 @@ Pcontrainte *pc1, *pc2;
 	val_1 = vect_coeff(var_of(b), v1), null_1 = value_zero_p(val_1),
 	val_2 = vect_coeff(var_of(b), v2), null_2 = value_zero_p(val_2);
 
-	if (irank==0 && same_sign_p(val_1,val_2))
+	if (irank==0 && !same_sign_p(val_1,val_2))
 	    RETURN_ORDER(value_neg_p(val_1) && value_neg_p(val_2)? 
 			 value_compare(val_2,val_1): 
 			 value_compare(val_1,val_2));
@@ -202,21 +202,10 @@ static int compare_the_constraints_debug(pc1, pc2)
 Pcontrainte *pc1, *pc2;
 {
     int b1, b2;
-
-/*    fprintf(stderr, "[com]\n");
-
-    vect_fprint(stderr, (*pc1)->vecteur, variable_default_name);
-    vect_fprint(stderr, (*pc2)->vecteur, variable_default_name);
-  */  
-
     b1 = compare_the_constraints(pc1, pc2),
     b2 = compare_the_constraints(pc2, pc1);
-
-    /* fprintf(stderr, "result is %d, %d\n", b1, b2); */
-
     assert((b1+b2)==0);
-
-    return(b1);
+    return b1;
 }
 
 /* returns the highest rank pvector of v in b, of rank *prank
