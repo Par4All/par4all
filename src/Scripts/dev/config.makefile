@@ -16,7 +16,8 @@ SCRIPTS = 	pips-makemake \
 		pips_at_night \
 		remove_from_sccs_file
 
-SRC_MACROS =	define_libraries.sh \
+SRC_MACROS =	auto.h \
+		define_libraries.sh \
 		makefile_macros.. \
 		makefile_macros.DEFAULT \
 		makefile_macros.GNU \
@@ -26,7 +27,9 @@ SRC_MACROS =	define_libraries.sh \
 		makefile_macros.GNUSOL2LL \
 		makefile_macros.GPROF
 
-DDC_MACROS = 	define_libraries.make
+DDC_MACROS = 	define_libraries.make \
+		auto-dash.h \
+		auto-number.h
 
 MACROS	=	$(DDC_MACROS) $(SRC_MACROS) 
 
@@ -39,6 +42,12 @@ SOURCES	=	$(SCRIPTS) $(SRC_MACROS) forward_gnu_makefile
 
 quick-install: install_forward_makefiles install_macros 
 all: $(DDC_MACROS)
+
+auto-dash.h: auto.h
+	sed 's,^...,-- ,;s,^..,--,' $< > $@
+
+auto-number.h: auto.h
+	sed 's,^...,#  ,;s,^..,# ,' $< > $@
 
 define_libraries.make: define_libraries.sh
 	# make macros and sh variables can be initialized nearly the same way
