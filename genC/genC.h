@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1995/12/18 15:28:13 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1995/12/19 10:56:42 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -139,10 +139,9 @@ extern int gen_debug ;
 #define GEN_DBG_RECURSE 16
 
 #define GEN_DBG_TRAV \
-     (GEN_DBG_TRAV_LEAF|GEN_DBG_TRAV_SIMPLE|GEN_DBG_TRAV_OBJECT)
+    (GEN_DBG_TRAV_LEAF|GEN_DBG_TRAV_SIMPLE|GEN_DBG_TRAV_OBJECT)
 
 extern void gen_free GEN_PROTO(( gen_chunk * )) ;
-extern void gen_free_with_sharing GEN_PROTO(( gen_chunk * )) ;
 extern int gen_free_tabulated GEN_PROTO(( int )) ;
 extern void gen_write GEN_PROTO(( FILE *, gen_chunk * )) ;
 extern int gen_write_tabulated GEN_PROTO(( FILE *, int )) ;
@@ -152,6 +151,7 @@ extern int gen_read_tabulated GEN_PROTO(( FILE *, int )) ;
 extern int gen_read_and_check_tabulated GEN_PROTO(( FILE *, int )) ;
 extern gen_chunk *gen_make_array GEN_PROTO(( int )) ;
 extern gen_chunk *gen_alloc GEN_PROTO((int, int, int, ...)) ; 
+extern char * alloc GEN_PROTO((int));
 extern void gen_init_external GEN_PROTO((int, 
 					 char *(*)(), void (*)(), 
 					 void (*)(), char *(*)(), 
