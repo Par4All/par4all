@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/27 12:20:28 $, 
+ * $Date: 1997/10/27 13:28:06 $, 
  */
 
 #include <unistd.h>
@@ -467,6 +467,17 @@ safe_cat(FILE * out, FILE * in)
     while ((c=getc(in))!=EOF) 
 	if (putc(c, out)==EOF)
 	    pips_internal_error("cat failed");
+}
+
+void
+safe_copy(string source, string target)
+{
+    FILE * in, * out;
+    in = safe_fopen(source, "r");
+    out = safe_fopen(target, "w");
+    safe_cat(out, in);
+    safe_fclose(out, target);
+    safe_fclose(in, source);
 }
 
 /* /some/path/to/file.suffix -> file
