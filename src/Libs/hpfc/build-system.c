@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1996/03/15 13:57:12 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1996/06/11 13:26:51 $, ) 
  * version $Revision$
  */
 
@@ -26,6 +26,11 @@
 #define IOTA_PREFIX	"IOTA"
 #define SIGMA_PREFIX	"SIGMA"
 #define TMP_PREFIX	"TMP"
+
+/* tags with a newgen look and feel */
+#define is_entity_array		0
+#define is_entity_template	1
+#define is_entity_processors	2
 
 /* Variables
  *  + array dimensions (PHIs)
@@ -140,6 +145,7 @@ Psysteme s;
 #define Psysteme_undefined SC_UNDEFINED
 #define Psysteme_undefined_p(sc) SC_UNDEFINED_P(sc)
 #endif
+/* ??? used with a temporary hack to differentiate array and templates */
 GENERIC_LOCAL_MAPPING(declaration_constraints, Psysteme, entity)
 GENERIC_LOCAL_MAPPING(hpf_align_constraints, Psysteme, entity)
 GENERIC_LOCAL_MAPPING(hpf_distribute_constraints, Psysteme, entity)
@@ -215,51 +221,43 @@ string suffix, prefix;
 	 dims);
     
     sc_creer_base(new_system);
-    return(new_system);
+    return new_system;
 }
 
-static Psysteme hpfc_compute_entity_to_declaration_constraints(e)
-entity e;
+static Psysteme 
+hpfc_compute_entity_to_declaration_constraints(
+    entity e,
+    tag what)
 {
-    bool
-	is_darray = array_distributed_p(e),
-	is_template = entity_template_p(e),
-	is_processor = entity_processor_p(e),
-	is_array = (!is_darray) && (!is_template) && 
-	    (!is_processor) && entity_variable_p(e);
-    string
-	local_prefix = ((is_darray || is_array) ? ALPHA_PREFIX :
-			is_template ? THETA_PREFIX :
-			is_processor ? PSI_PREFIX : "ERROR");
+    string local_prefix = (what==is_entity_array? ALPHA_PREFIX:
+			   what==is_entity_template? THETA_PREFIX:
+			   what==is_entity_processors? PSI_PREFIX: "ERROR");
 
-    pips_assert("valid object", 
-		is_darray || is_array || is_template || is_processor);
-
-    return(compute_entity_to_declaration_constraints
-	   (e, local_prefix, HPFC_PACKAGE));
+    return compute_entity_to_declaration_constraints
+	   (e, local_prefix, HPFC_PACKAGE);
 }
 
-/* Psysteme entity_to_declaration_constraints(entity e);
- *
- * gives back the constraints due to the declarations.
+/* gives back the constraints due to the declarations.
  * Uses a demand driven approach: computed systems are stored
  * in the declaration_constraints mapping for later search.
  */
-Psysteme entity_to_declaration_constraints(e)
-entity e;
+Psysteme 
+entity_to_declaration_constraints(
+    entity e,
+    tag what)
 {
-    Psysteme 
-	p = load_entity_declaration_constraints(e);
-
+    Psysteme p = load_entity_declaration_constraints(e+what);
     pips_assert("variable", entity_variable_p(e));
 
     if (Psysteme_undefined_p(p))
     {
-	p = hpfc_compute_entity_to_declaration_constraints(e);
-	store_entity_declaration_constraints(e, p);
+	p = hpfc_compute_entity_to_declaration_constraints(e, what);
+	store_entity_declaration_constraints(e+what, p);
     }
 
-    return(p);
+    DEBUG_SYST(9, concatenate("entity ", entity_name(e), NULL), p);
+
+    return p;
 }
 
 /* Psysteme hpfc_compute_align_constraints(e)
@@ -754,9 +752,9 @@ generate_system_for_distributed_variable(
     t = align_template(load_hpf_alignment(v)),
     p = distribute_processors(load_hpf_distribution(t));    
 
-    result = sc_append(result, entity_to_declaration_constraints(v));
-    result = sc_append(result, entity_to_declaration_constraints(t));
-    result = sc_append(result, entity_to_declaration_constraints(p));
+    result = sc_append(result, entity_to_declaration_constraints(v, 0));
+    result = sc_append(result, entity_to_declaration_constraints(t, 1));
+    result = sc_append(result, entity_to_declaration_constraints(p, 2));
     result = sc_append(result, entity_to_hpf_align_constraints(v));
     result = sc_append(result, entity_to_hpf_distribute_constraints(t));
     result = sc_append(result, entity_to_new_declaration(v));
