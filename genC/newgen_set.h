@@ -35,10 +35,10 @@ typedef enum {
     set_pointer = hash_pointer
 } set_type ;
 
-typedef struct set {
+typedef struct {
     hash_table table ;
     set_type type ;
-} *set ;
+} set_chunk, *set ;
 
 #define set_undefined ((struct set *)(-16))
 #define set_undefined_p(s) ((s)==set_undefined)
@@ -60,5 +60,7 @@ extern set set_intersection GEN_PROTO(( set, set, set )) ;
 extern set set_make GEN_PROTO(( set_type )) ;
 extern set set_singleton GEN_PROTO(( set_type, char * )) ;
 extern set set_union GEN_PROTO(( set, set, set )) ;
+extern bool set_empty_p GEN_PROTO(( set )) ;
+extern void gen_set_closure GEN_PROTO(( void(*)(char*,set), set )) ;
 
 #endif
