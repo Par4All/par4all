@@ -48,6 +48,7 @@
 #include "reduction.h"
 #include "text.h"
 #include "paf-util.h"
+#include "static_controlize.h"
 #include "pip.h"
 
 
@@ -94,167 +95,144 @@ Pvecteur vect_for_sort;	/* Useful for the sorting of the variables in the
  */
 int integer_sol_edit(i)
 int i;
-{int j, n, first_entier, second_entier, longueur_liste;
- struct S *p;
- Entier N, D, d;
- p = sol_space + i;
+{
+    int j, n, first_entier, second_entier = 0, longueur_liste;
+    struct S *p;
+    Entier N, D, d;
+    p = sol_space + i;
 
- switch(p->flags) {
+    switch(p->flags) {
+	/* We have a newparm */
+    case New : n = p->param1;
+	first_entier = n;
+	i++; p++; /* call to Div case */
+	/* Let's take the first vector : vecteur2 (case Form) */
+	i++; p++; /* Call to Form */
+	n = p->param1;
+	/* Take all the coefficient2 */
+	init_vecteur();
+	for(j = 0; j<n; j++) {
+	    i++; p++;
+	    N = p->param1; D = p->param2;
+	    d = pgcd(N, D);
 
+	    if(d == D){ 
+		if(N/d < 0) ecrit_coeff_neg2( -N/d );
+		else ecrit_coeff2( N/d );
+	    }
+	    /* Should not be called here */
+	    else{ pips_error( "integer_sol_edit", "Division 1 in newparm\n");
+	      }
+	}
+	i++; p++;
 
+	/* Take the corresponding new parameter */
+	N = p->param1; D = p->param2;
+	d = pgcd(N, D);
+	if(d == D){
+	    second_entier =  N/d;
+	}
+	/* Should not happen here */
+	else{
+	    pips_error( "integer_sol_edit", "Division 2 in newparm\n");
+	  }
+	i++; p++;
 
+	ajoute_new_var( second_entier, first_entier );
 
-     /* We have a newparm */
-     case New : n = p->param1;
-		first_entier = n;
+	i = integer_sol_edit( i ); /* Look at the superquast */
+	
+	retire_par_de_pile();
+	break;
 
-		i++; p++; /* call to Div case */
-		/* Let's take the first vector : vecteur2 (case Form) */
-		i++; p++; /* Call to Form */
-                n = p->param1;
-		/* Take all the coefficient2 */
-		init_vecteur();
-                for(j = 0; j<n; j++) {
-                    i++; p++;
-                    N = p->param1; D = p->param2;
-                    d = pgcd(N, D);
+	/* Our quast is a conditional */
+    case If  : init_quast();
+	/* Take vecteur1 part of the if */
+	i++; p++; /* Call to case Form */
+	
+	creer_Psysteme();
 
-                    if(d == D){ 
-			if(N/d < 0) ecrit_coeff_neg2( -N/d );
-			else ecrit_coeff2( N/d );
-                    }
-		    /* Should not be called here */
-                    else{ pips_error( "integer_sol_edit", "Division 1 in newparm\n");
-		    }
-                }
-                i++; p++;
+	n = p->param1;
+	for(j = 0; j<n; j++) {
+	    i++; p++;
+	    N = p->param1; D = p->param2;
+	    d = pgcd(N, D);
+	    if(d == D){
+		ecrit_coeff1( N/d );
+	    }
+	    /* Should not be called here */
+	    else{ pips_error( "integer_sol_edit", "Division 3 in newparm\n");
+	      }
+	}
 
+	creer_predicat();
+	i++; p++;
 
-		/* Take the corresponding new parameter */
-     		N = p->param1; D = p->param2;
-                d = pgcd(N, D);
-                if(d == D){ second_entier =  N/d;
-                }
-		/* Should not happen here */
-                else{ pips_error( "integer_sol_edit", "Division 2 in newparm\n");
-		}
-                i++; p++;
+	/* Take true super quast */
+	i = integer_sol_edit(i);
 
-		ajoute_new_var( second_entier, first_entier );
+	creer_true_quast();
 
+	/* Take false super quast */
+	i = integer_sol_edit(i);
 
-		i = integer_sol_edit( i ); /* Look at the superquast */
+	fait_quast_value();
+	
+	fait_quast();
+	break;
 
-		retire_par_de_pile();
-		break;
+	/* Quast is a list of solutions */
+    case List: init_quast();
+	longueur_liste = p->param1;
+	if (longueur_liste > 0) init_liste_vecteur();
 
-
-
-    /* Our quast is a conditional */
-     case If  : init_quast();
-
-		/* Take vecteur1 part of the if */
-		i++; p++; /* Call to case Form */
-
-		creer_Psysteme();
-
-                n = p->param1;
-                for(j = 0; j<n; j++) {
-		    i++; p++;
-                    N = p->param1; D = p->param2;
-                    d = pgcd(N, D);
-                    if(d == D){
-			ecrit_coeff1( N/d );
-		    }
-		    /* Should not be called here */
-                    else{ pips_error( "integer_sol_edit", "Division 3 in newparm\n");
-		    }
-                }
-
-		creer_predicat();
+	i++; p++; /* call to the liste_vecteur */
+	/* Take each vecteur (call to Form case) */
+	while(longueur_liste--) {
+	    init_vecteur();
+	    n = p->param1;
+	    for(j = 0; j<n; j++) {
 		i++; p++;
-
-
-		/* Take true super quast */
-                i = integer_sol_edit(i);
-
-
- 		creer_true_quast();
-
-
-		/* Take false super quast */
-                i = integer_sol_edit(i);
-
-
-		fait_quast_value();
-
-		fait_quast();
-                break;
-
-
-
-
-
-     /* Quast is a list of solutions */
-     case List: init_quast();
-                longueur_liste = p->param1;
-		if (longueur_liste > 0) init_liste_vecteur();
-
-
-                i++; p++; /* call to the liste_vecteur */
-		/* Take each vecteur (call to Form case) */
-                while(longueur_liste--) {
-			init_vecteur();
-                	n = p->param1;
-                	for(j = 0; j<n; j++) {
-				i++; p++;
-                    		N = p->param1; D = p->param2;
-                    		d = pgcd(N, D);
-                    		if(d == D){
-					if (N/d < 0) ecrit_une_var_neg(-N/d);
-					else ecrit_une_var( N/d );
-                       		}
-				/* Should not happen here */
-                    		else{ pips_error( "integer_sol_edit", 
-						"Division 4 in newparm\n");
-		    		}
-                   	}
-			ecrit_liste_vecteur();
-                	i++; p++;
+		N = p->param1; D = p->param2;
+		d = pgcd(N, D);
+		if(d == D){
+		    if (N/d < 0) ecrit_une_var_neg(-N/d);
+		    else ecrit_une_var( N/d );
 		}
+		/* Should not happen here */
+		else{
+		    pips_error( "integer_sol_edit", 
+			       "Division 4 in newparm\n");
+		  }
+	    }
+	    ecrit_liste_vecteur();
+	    i++; p++;
+	}
 
-		creer_quast_value();
-		fait_quast();
-                break;
+	creer_quast_value();
+	fait_quast();
+	break;
 
+	/* We have an undefined quast */
+    case Nil : init_quast();
+	creer_quast_value();
+	fait_quast();
+	i++; break;
 
+	/* This should not happen any more */
+    case Form: pips_error("integer_sol_edit", "Form case call\n");
+	break;
 
+	/* This case should not happen any more */
+    case Div: 	pips_error("integer_sol_edit", "Div case call\n");
+	break;
 
-     /* We have an undefined quast */
-     case Nil : init_quast();
-		creer_quast_value();
-		fait_quast();
-                i++; break;
+	/* This case should not happen any more */
+    case Val:  pips_error("integer_sol_edit", "Val case call\n");
+	break;
 
-
-
-
-     /* This should not happen any more */
-     case Form: pips_error("integer_sol_edit", "Form case call\n");
-                break;
-
-     /* This case should not happen any more */
-     case Div: 	pips_error("integer_sol_edit", "Div case call\n");
-                break;
-
-     /* This case should not happen any more */
-     case Val:  pips_error("integer_sol_edit", "Val case call\n");
-                break;
-
-
-     default  : pips_error("integer_sol_edit", "Undefined kind of quast \n");
+    default  : pips_error("integer_sol_edit", "Undefined kind of quast \n");
     }
-
 	
     return(i);
 }
@@ -375,8 +353,9 @@ int i;
 		   	}
 
 
-			expression_act = make_op_exp( DIVIDE_OPERATOR_NAME,
-								expression_act, int_to_expression(lcm) );
+			expression_act = make_op_exp(DIVIDE_OPERATOR_NAME,
+						     expression_act,
+						     int_to_expression(lcm));
 			ecrit_liste_vecteur();
 			i++; p++;
 		}
@@ -426,7 +405,8 @@ int i;
  */
 int new_sol_edit(i)
 int i;
-{int j, n, first_entier, second_entier, longueur_liste;
+{
+ int j, n, first_entier, second_entier = 0, longueur_liste;
  struct S *p;
  Entier N, D, d;
  p = sol_space + i;
