@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1995/10/03 15:52:33 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1995/10/04 10:54:02 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -8,9 +8,11 @@
 
 #include "defines-local.h"
 
-/* Pvecteur the_index_of_vect(v0)
- *
- * returns the index of an affine vector
+#include "access_description.h"
+
+entity CreateIntrinsic(string name); /* in syntax.h */
+
+/* returns the index of an affine vector
  */
 Pvecteur the_index_of_vect(v0)
 Pvecteur v0;
@@ -26,8 +28,6 @@ Pvecteur v0;
     return v1;
 }
 
-/* list add_to_list_of_ranges_list(l, r)
- */
 list add_to_list_of_ranges_list(l, r)
 list l;
 range r;
@@ -49,9 +49,7 @@ range r;
     return(l);
 }
 
-/* list dup_list_of_ranges_list(l)
- *
- * ??? the complexity of this function could be greatly improved
+/* ??? the complexity of this function could be greatly improved
  */
 list dup_list_of_ranges_list(l)
 list l;
@@ -76,9 +74,7 @@ list l;
     return(result);
 }
 
-/* list dup_list_of_Pvecteur(l)
- *
- * ??? the complexity of this function could be improved greatly...
+/* ??? the complexity of this function could be improved greatly...
  */
 list dup_list_of_Pvecteur(l)
 list l;
@@ -96,9 +92,7 @@ list l;
     return result;
 }
 
-/* list add_elem_to_list_of_Pvecteur(l, var, val)
- *
- * caution, is initial list is destroied.
+/* caution, is initial list is destroied.
  */
 list add_elem_to_list_of_Pvecteur(l, var, val)
 list l;
@@ -131,7 +125,6 @@ int var, val;
     return result;
 }
     
-
 /* range complementary_range(array, dim, r)
  */
 range complementary_range(array, dim, r)
@@ -412,6 +405,433 @@ list lr1, lr2;
     pips_debug(7, "returning TRUE\n");
 
     return TRUE;
+}
+
+/****************************************************************** RANGES */
+
+list array_ranges_to_template_ranges(array, lra)
+entity array;
+list lra;
+{
+    align a = load_entity_align(array);
+    entity template = align_template(a);
+    list la = align_alignment(a), lrt = NIL;
+    int i = 1;
+    
+    for (i=1 ; i<=NumberOfDimension(template) ; i++)
+    {
+	alignment al = FindAlignmentOfTemplateDim(la, i);
+	int arraydim = alignment_arraydim(al);
+
+	if (arraydim==0) /* replication */
+	{
+	    expression b = alignment_constant(al);
+
+	    lrt = gen_nconc(lrt,
+			    CONS(RANGE,
+				 make_range(b, b, int_to_expression(1)),
+				 NIL));
+	}
+	else
+	{
+	    range rg = ith_range(arraydim-1, lra);
+	    int
+		a  = HpfcExpressionToInt(alignment_rate(al)),
+		b  = HpfcExpressionToInt(alignment_constant(al)),
+		lb = HpfcExpressionToInt(range_lower(rg)),
+		ub = HpfcExpressionToInt(range_upper(rg)),
+		in = HpfcExpressionToInt(range_increment(rg));
+	    expression
+		tl = int_to_expression(a*lb+b),
+		tu = int_to_expression(a*ub+b),
+		ti = int_to_expression(a*in);
+
+	    lrt = gen_nconc(lrt,
+			    CONS(RANGE,
+				 make_range(tl, tu, ti),
+				 NIL));
+	}
+    }
+    
+    return(lrt);	    
+}
+
+list template_ranges_to_processors_ranges(template, lrt)
+entity template;
+list lrt;
+{
+    distribute
+	d = load_entity_distribute(template);
+    entity
+	proc = distribute_processors(d);
+    list
+	ld = distribute_distribution(d),
+	lrp = NIL;
+    int
+	i = 1;
+
+    for (i=1 ; i<=NumberOfDimension(proc) ; i++)
+    {
+	int
+	    tdim = 0;
+	distribution
+	    di = FindDistributionOfProcessorDim(ld, i, &tdim);
+	style
+	    s = distribution_style(di);
+	range
+	    rg = ith_range(tdim-1, lrt);
+	int
+	    p  = 0,
+	    tl = HpfcExpressionToInt(range_lower(rg)),
+	    tu = HpfcExpressionToInt(range_upper(rg)),
+	    n  = HpfcExpressionToInt(distribution_parameter(di));
+
+	switch (style_tag(s))
+	{
+	case is_style_block:
+	{
+	    expression
+		pl = int_to_expression(processor_number(template, tdim, tl, &p)),
+		pu = int_to_expression(processor_number(template, tdim, tu, &p));
+
+	    /*
+	     * ??? another increment could be computed?
+	     */
+	    lrp = gen_nconc(lrp,
+			    CONS(RANGE,
+				 make_range(pl, pu, int_to_expression(1)),
+				 NIL));
+	    break;
+	}
+	case is_style_cyclic:
+	{
+	    dimension
+		dp = FindIthDimension(proc, i);
+	    int
+		sz = SizeOfDimension(dp);
+	    expression
+		pl = int_to_expression(processor_number(template, tdim, tl, &p)),
+		pu = int_to_expression(processor_number(template, tdim, tu, &p));
+
+	    if (((tu-tl)>n*sz) || (pl>pu) || ((pl==pu) && ((tu-tl)>n)))
+		lrp = gen_nconc(lrp,
+			    CONS(RANGE,
+				 make_range(dimension_lower(dp),
+					    dimension_upper(dp),
+					    int_to_expression(1)),
+				 NIL));
+	    else
+		lrp = gen_nconc(lrp,
+				CONS(RANGE,
+				     make_range(pl, pu,
+						int_to_expression(1)),
+				     NIL));
+	    
+	    break;
+	}
+	case is_style_none:
+	    pips_error("template_ranges_to_processors_ranges",
+		       "unexpected none style distribution\n");
+	    break;
+	default:
+	    pips_error("template_ranges_to_processors_ranges",
+		       "unexpected style tag (%d)\n",
+		       style_tag(s));
+	}
+    }
+    return(lrp);
+}
+
+/* range ith_range(i, l)
+ *
+ * caution, first range is 0.
+ */
+range ith_range(i, l)
+int i;
+list l;
+{
+    return((i<=0)?
+	   (RANGE(CAR(l))):
+	   (ith_range(i-1, CDR(l))));
+}
+
+list array_access_to_array_ranges(r, lkref, lvref)
+reference r;
+list lkref, lvref;
+{
+    entity
+	array = reference_variable(r);
+    list
+	li  = reference_indices(r),
+	lk  = lkref,
+	lv  = lvref,
+	lra = NIL,
+	ldim = variable_dimensions(type_variable(entity_type(array)));
+    
+    int dim = 1;
+
+    debug(7, "array_access_to_array_ranges",
+	  "considering array %s\n",
+	  entity_name(array));
+
+    for ( ; 
+	 li!=NIL ; 
+	 li=CDR(li), lk=CDR(lk), lv=CDR(lv), ldim=CDR(ldim), dim++)
+    {
+	access a = INT(CAR(lk));
+	Pvecteur v = (Pvecteur) PVECTOR(CAR(lv));
+	normalized n = expression_normalized(EXPRESSION(CAR(li)));
+	
+	switch (access_tag(a))
+	{
+	case local_form_cst:
+	{
+	    /*
+	     * this dimension shouldn't be used, so I put there whatever I want...
+	     * ??? mouais, the information is in the vector, I think.
+	     */
+	    lra = gen_nconc(lra,
+			    CONS(RANGE,
+				 make_range(expression_undefined,
+					    expression_undefined,
+					    expression_undefined),
+				 NIL));
+	    
+	    break;
+	}
+	case aligned_constant:
+	case local_constant:
+	{
+	    expression
+		arraycell = int_to_expression(vect_coeff(TCST, v));
+
+	    lra = gen_nconc(lra,
+			    CONS(RANGE,
+				 make_range(arraycell, arraycell,
+					    int_to_expression(1)),
+				 NIL));
+	    break;
+	}
+	case aligned_shift:
+	case local_shift:
+	{
+	    range
+		/* ??? should check that it is ok */
+		rg = loop_index_to_range
+		    ((entity) var_of(vect_del_var(v, TCST)));
+	    expression
+		rl = range_lower(rg),
+		ru = range_upper(rg),
+		in = range_increment(rg),
+		al = expression_undefined,
+		au = expression_undefined;
+	    int
+		lb = -1, 
+		ub = -1,
+		dt = vect_coeff(TCST, (Pvecteur) normalized_linear(n));
+
+	    if (expression_integer_constant_p(rl))
+		lb = HpfcExpressionToInt(rl),
+		al = int_to_expression(lb-dt);
+	    else
+		al = copy_expression(dimension_lower(DIMENSION(CAR(ldim))));
+
+	    if (expression_integer_constant_p(ru))
+		ub = HpfcExpressionToInt(ru),
+		au = int_to_expression(ub-dt);
+	    else
+		au = copy_expression(dimension_upper(DIMENSION(CAR(ldim))));
+
+	    lra = gen_nconc(lra,
+			    CONS(RANGE,
+				 make_range(al, au, in), /* shared! */
+				 NIL));
+	    break;
+	}
+	case aligned_affine:
+	case local_affine:
+	{
+	    Pvecteur
+		v2 = vect_del_var(v, TCST);
+	    entity
+		/* ??? should check that it is ok */
+		index = (entity) var_of(v2);
+	    range
+		rg = loop_index_to_range(index);
+	    int
+		rate = val_of(v2),
+		in = HpfcExpressionToInt(range_increment(rg)),
+		lb = HpfcExpressionToInt(range_lower(rg)),
+		ub = HpfcExpressionToInt(range_upper(rg)),
+		dt = vect_coeff(TCST, (Pvecteur) normalized_linear(n));
+	    expression
+		ai = int_to_expression(rate*in),
+		al = int_to_expression(rate*lb-dt),
+		au = int_to_expression(rate*ub-dt);
+
+	    lra = gen_nconc(lra,
+			    CONS(RANGE,
+				 make_range(al, au, ai), /* shared! */
+				 NIL));
+	    break;
+	}
+	default:
+	    pips_error("array_access_to_array_range",
+		       "unexpected but maybe legal access\n");
+	    break;
+	}
+    }
+    
+    return(lra);
+}
+
+/***************************************************************** GUARDS */
+ 
+statement generate_guarded_statement(stat, proc, lr)
+statement stat;
+entity proc;
+list lr;
+{
+    expression guard;
+
+    return((make_guard_expression(proc, lr, &guard))?
+	   (make_stmt_of_instr
+	    (make_instruction(is_instruction_test,
+			      make_test(guard,
+					stat,
+					make_continue_statement
+					(entity_empty_label()))))):
+	   stat);
+}
+
+/* bool make_guard_expression(proc, lr, pguard)
+ *
+ * compute the expression for the processors ranges lr guard.
+ * return true if not empty, false if empty.
+ */
+bool make_guard_expression(proc, lrref, pguard)
+entity proc;
+list lrref;
+expression *pguard;
+{
+    int	i, len = -1;
+    expression procnum = int_to_expression(load_hpf_number(proc));
+    list lr = lrref, conjonction = NIL;
+    
+    for (i=1 ; i<=NumberOfDimension(proc) ; i++, lr=CDR(lr))
+    {
+	 range rg = RANGE(CAR(lr));
+	 expression
+	     rloexpr = range_lower(rg),
+	     rupexpr = range_upper(rg);
+	 dimension d = FindIthDimension(proc, i);
+	 int
+	     lo  = HpfcExpressionToInt(dimension_lower(d)),
+	     up  = HpfcExpressionToInt(dimension_upper(d)),
+	     sz  = up-lo+1,
+	     rlo = HpfcExpressionToInt(rloexpr),
+	     rup = HpfcExpressionToInt(rupexpr);
+
+	 if (rlo>rup) /* empty match case */
+	 {
+	     (*pguard) = entity_to_expression(CreateIntrinsic(".FALSE."));
+	     return(TRUE); /* ??? memory leak with the content of conjonction */
+	 }
+
+	 if ((rlo==rup) && (sz!=1) && (rlo>=lo) && (rup<=up))
+	 {
+	     /*
+	      * MYPOS(i, procnum).EQ.nn
+	      */
+	     conjonction = 
+		 CONS(EXPRESSION,
+		      MakeBinaryCall(CreateIntrinsic(EQUAL_OPERATOR_NAME),
+				     make_mypos_expression(i, procnum),
+				     rloexpr),
+		      conjonction);
+	 }
+	 else
+	 {
+	     if (rlo>lo)
+	     {
+		 /*
+		  * MYPOS(i, procnum).GE.(rloexpr)
+		  */
+		 conjonction =
+		     CONS(EXPRESSION,
+			  MakeBinaryCall
+			  (CreateIntrinsic(GREATER_OR_EQUAL_OPERATOR_NAME),
+			   make_mypos_expression(i, procnum),
+			   rloexpr),
+			  conjonction);
+	     }
+
+	     if (rup<up)
+	     {
+		 /*
+		  * MYPOS(i, procnum).LT.(rupexpr)
+		  */
+		 conjonction =
+		     CONS(EXPRESSION,
+			  MakeBinaryCall
+			  (CreateIntrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
+			   make_mypos_expression(i, procnum),
+			   rupexpr),
+			  conjonction);
+	     }
+	 }
+     }
+    
+    /* use of conjonction 
+     */
+
+    len = gen_length(conjonction);
+
+    if (len==0) /* no guard */
+    {
+	(*pguard) = expression_undefined;
+	return(FALSE);
+    }
+    else
+    {
+	(*pguard) = expression_list_to_conjonction(conjonction);
+	gen_free_list(conjonction);
+	return(TRUE);
+    }
+}
+
+expression make_mypos_expression(i, exp)
+int i;
+expression exp;
+{
+    return(reference_to_expression
+	   (make_reference(hpfc_name_to_entity(MYPOS),
+			   CONS(EXPRESSION, int_to_expression(i),
+			   CONS(EXPRESSION, exp,
+				NIL)))));
+}
+
+statement loop_nest_guard(stat, r, lkref, lvref)
+statement stat;
+reference r;
+list lkref, lvref;
+{
+    entity
+	array    = reference_variable(r),
+	template = array_to_template(array),
+	proc     = template_to_processors(template);
+    list
+	lra = array_access_to_array_ranges(r, lkref, lvref),
+	lrt = array_ranges_to_template_ranges(array, lra),
+	lrp = template_ranges_to_processors_ranges(template, lrt);
+    statement
+	result = generate_guarded_statement(stat, proc, lrp);
+
+    gen_free_list(lra); /* ??? memory leak of some expressions */
+    gen_free_list(lrt);
+    gen_free_list(lrp);
+
+    return(result);
 }
 
 /*   That is all
