@@ -343,8 +343,7 @@ wpips_main_loop(Frame frame_to_map_first)
 
 
 int
-main(int argc,
-     char * argv[])
+wpips_main(int argc, char * argv[])
 {
     pips_checks();
 
