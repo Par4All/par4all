@@ -21,11 +21,6 @@
 
 #include "semantics.h"
 
-/* commented out for compilation - bc - beware, it seems dangerous */
-/*
-#include "effects-convex-local.h"
-#include "union-local.h"
-*/
 #include "pipsdbm.h"
 #include "resources.h"
 
@@ -43,7 +38,7 @@ static list list_pairs = NIL;
 static bool stmt_filter(s)
 statement s;
 {
-    pips_debug(8, "statement %03d\n", statement_number(s));
+    pips_debug(9, "statement %03d\n", statement_number(s));
     
     current_caller_stmt = s;
     return(TRUE);
@@ -94,7 +89,7 @@ add_parameter_aliases_for_this_call_site(call call_site,
     list r_args;
     int arg_num;
 
-    pips_debug(9, "begin\n");
+    pips_debug(4,"begin\n");
 
 /*    real_args = call_arguments(call_site); */
 
@@ -144,11 +139,6 @@ add_parameter_aliases_for_this_call_site(call call_site,
 			    VALUE_ZERO,
 			    BACKWARD);
 
-/* was (changed just for debug)
-		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
-		    pair = gen_nconc(pair,CONS(EFFECT,real_reg,NIL));
-		    */
-
 		    pair = CONS(EFFECT,real_reg,NIL);
 		    ifdebug(9)
 			{
@@ -165,7 +155,7 @@ add_parameter_aliases_for_this_call_site(call call_site,
 	 }, list_regions_callee);
     }
 
-    pips_debug(9, "end\n");
+    pips_debug(4,"end\n");
        
 }
 
@@ -183,7 +173,7 @@ add_alias_pairs_for_this_call_site(call call_site)
 
     if (call_function(call_site) != callee) return TRUE;
 
-    pips_debug(9,"begin\n");
+    pips_debug(4,"begin\n");
 
     pips_debug(9,
 	       "try load_statement_precondition for statement %03d\n",
@@ -213,7 +203,7 @@ add_alias_pairs_for_this_call_site(call call_site)
     reset_translation_context_sc();
     reset_arguments_to_eliminate();
 
-    pips_debug(9, "end\n");
+    pips_debug(4,"end\n");
 
     return TRUE;
 }
@@ -232,7 +222,7 @@ add_alias_pairs_for_this_caller( entity caller )
     reset_current_module_entity();
     set_current_module_entity(caller);
     caller_name = module_local_name(caller);
-    pips_debug(9, "begin for caller: %s\n", caller_name);
+    pips_debug(4,"begin for caller: %s\n", caller_name);
     
     /* ATTENTION: we must do ALL this before calling 
      * set_interprocedural_translation_context_sc
@@ -282,7 +272,7 @@ add_alias_pairs_for_this_caller( entity caller )
     reset_current_module_entity();
     set_current_module_entity(callee);    
 
-    pips_debug(9,"end\n");
+    pips_debug(4,"end\n");
 
 }
 
@@ -300,7 +290,7 @@ alias_pairs( string module_name, list l_reg )
 
     callees callers;
 
-    pips_debug(9,"begin for module %s\n",module_name);
+    pips_debug(4,"begin for module %s\n",module_name);
 
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     callee = get_current_module_entity();
@@ -311,33 +301,22 @@ alias_pairs( string module_name, list l_reg )
 	    /* ATTENTION: we have to do ALL this
 	     * just to call print_inout_regions for debug !!
 	     */
-
 	    set_current_module_statement( (statement)
 					  db_get_memory_resource(DBR_CODE,
 								 module_name,
 								 TRUE) );
-/*
-	    set_precondition_map( (statement_mapping) 
-				  db_get_memory_resource(DBR_PRECONDITIONS,
-							 module_name,
-							 TRUE) );
-							 */
 	    set_cumulated_rw_effects((statement_effects)
 				     db_get_memory_resource(
 					 DBR_CUMULATED_EFFECTS,
 					 module_name,
 					 TRUE));
-
 	    module_to_value_mappings(callee);
-
 	    /* that's it, but we musn't forget to reset everything below */
 
 	    pips_debug(9,"list_regions_callee is: \n");
 	    print_inout_regions(list_regions_callee);
 
 	    reset_current_module_statement();
-/*	    reset_precondition_map(); */
-
 	    reset_cumulated_rw_effects();
 	}
 
@@ -359,7 +338,7 @@ alias_pairs( string module_name, list l_reg )
 
     reset_current_module_entity();
 
-    pips_debug(9,"end\n");
+    pips_debug(4,"end\n");
 
     return list_pairs;
 }
@@ -375,7 +354,7 @@ in_alias_pairs( string module_name )
     list l_reg, l_pairs;
 
     debug_on("ALIAS_DEBUG_LEVEL");
-    pips_debug(9,"begin for module %s\n",module_name);
+    pips_debug(4,"begin for module %s\n",module_name);
 
     /* we need the IN summary regions*/
     l_reg = effects_to_list((effects)
@@ -395,7 +374,7 @@ in_alias_pairs( string module_name )
 			   strdup(module_name),
 			   (char*) make_effects_classes(l_pairs));
 
-    pips_debug(9,"end\n");
+    pips_debug(4,"end\n");
     debug_off();
 
     return(TRUE);
@@ -412,7 +391,7 @@ out_alias_pairs( string module_name )
     list l_reg, l_pairs;
 
     debug_on("ALIAS_DEBUG_LEVEL");
-    pips_debug(9,"begin for module %s\n",module_name);
+    pips_debug(4,"begin for module %s\n",module_name);
 
     /* we need the OUT summary regions*/
     l_reg = effects_to_list((effects)
@@ -433,7 +412,7 @@ out_alias_pairs( string module_name )
 			   strdup(module_name),
 			   (char*) make_effects_classes(l_pairs));
 
-    pips_debug(9,"end\n");
+    pips_debug(4,"end\n");
     debug_off();
 
     return(TRUE);
