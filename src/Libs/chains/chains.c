@@ -152,7 +152,7 @@ statement st ;
 	if (get_debug_level() > 0) {
 	    fprintf(stderr, "Init statement %d with effects %x\n", 
 		    statement_number( st ), 
-		    load_statement_effects(st) );
+		    (unsigned int) load_statement_effects(st) );
 	    print_effects( load_statement_effects(st) ) ;
 	}
 	hash_put( Gen, (char *)st, (char *)MAKE_STATEMENT_SET()) ;
@@ -283,7 +283,7 @@ cons *idxs ;
 		 SET_MAP( v, {
 		     statement def = (statement)v ;
 		     int nb_writes = 0 ;
-		     approximation the_write ;
+		     approximation the_write = approximation_undefined;
 
 		     MAPL( es, {effect e = EFFECT( CAR( es )) ;
 
