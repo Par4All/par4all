@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.126  1998/12/15 13:11:39  zory
+ * new prettyprint for inverse operator and fma operator
+ *
  * Revision 1.125  1998/11/27 13:52:36  irigoin
  * words_substring_op() modified to cope with substrings of unbounded strings passed as
  * formal parameters
@@ -216,7 +219,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.125 1998/11/27 13:52:36 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.126 1998/12/15 13:11:39 zory Exp $";
 #endif /* lint */
 
  /*
@@ -862,6 +865,34 @@ words_unary_minus(call obj, int precedence, bool leftmost)
     return(pc);
 }
 
+/* 
+   The precedence of (1/x) is the same as the multiply operator
+   (e.g. a*1/b without parentheses). Moreover, the MAXIMAL precedence is
+   used for the (x) subterm (e.g. 1/(a*b) 1/(-2) ...). However, 1/x**2 may
+   be a correct prettyprint in Fortran (?) */
+
+static list /* of string */ 
+words_inverse_op(call obj, int precedence, bool leftmost)
+{
+  list /* of string */ pc = NIL;
+  
+  expression e = EXPRESSION(CAR(call_arguments(obj)));
+  int prec = words_intrinsic_precedence(obj);
+  
+  if ( prec < precedence)
+    pc = CHAIN_SWORD(pc, "(");
+  pc = CHAIN_SWORD(pc, "1/");
+  pc = gen_nconc(pc, words_subexpression(e, MAXIMAL_PRECEDENCE , 
+					 FALSE));
+
+  if ( prec < precedence)
+    pc = CHAIN_SWORD(pc, ")");
+
+  return(pc);
+}
+
+
+
 list /* of string */
 words_goto_label(string tlabel)
 {
@@ -877,7 +908,7 @@ words_goto_label(string tlabel)
 }
 
 /* EOLE : The multiply-add operator is used within the optimize
-   transformation ( JZ - sept 98) - fma(a,b,c) -> (a + (b*c)) */
+   transformation ( JZ - sept 98) - fma(a,b,c) -> ((a*b)+c) */
 list /* of string */ 
 eole_fma_specific_op(call obj, int precedence, bool leftmost){
   list /* of strings */ pc = NIL;
@@ -888,34 +919,34 @@ eole_fma_specific_op(call obj, int precedence, bool leftmost){
   /* open parenthese one  */
   pc = CHAIN_SWORD(pc, "(");
 
-  /* get precedence for add operator */
-  prec = intrinsic_precedence("+");
-
-  /* first argument */
-  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
-  
-  /* add operator */
-  pc = CHAIN_SWORD(pc,"+");
-
   /* open parenthese two */
   pc = CHAIN_SWORD(pc, "(");
 
-  /* get precedence for multiply operator */
+  /* get precedence for mult operator */
   prec = intrinsic_precedence("*");
+  
+  /* first argument */
+  pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
+  
+  /* mult operator */
+  pc = CHAIN_SWORD(pc,"*");
 
-   /* second argument */
+  /* second argument */
   args = CDR(args);
   pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)),prec,TRUE));
+  
+  /* close parenthese two */
+  pc = CHAIN_SWORD(pc, ")");
 
-  /* multiply operator */
-  pc = CHAIN_SWORD(pc,"*");
+  /* get precedence for add operator */
+  prec = intrinsic_precedence("+");
+
+  /* add operator */
+  pc = CHAIN_SWORD(pc,"+");
 
   /* third argument */
   args = CDR(args);
   pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)),prec,FALSE));
-
-  /* close parenthese two */
-  pc = CHAIN_SWORD(pc, ")");
 
   /* close parenthese one  */
   pc = CHAIN_SWORD(pc,")");
@@ -1092,7 +1123,9 @@ static struct intrinsic_handler {
 
     {"*", words_infix_binary_op, 21},
     {"/", words_infix_binary_op, 21},
-
+    
+    {"INV", words_inverse_op, 21}, 
+    
     {"+", words_infix_binary_op, 20},
     {"-", words_infix_binary_op, 20},
 
