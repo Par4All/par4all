@@ -62,8 +62,14 @@ sentence s;
 	    fputs("      ", fd);
 	}
 
-	for (i = 0; i < em; i++) putc(' ', fd);
+	/* FI: do not indent too much (9 June 1995)*/
+	em = em > 42 ? 42 : em;
+
+	for (i = 0; i < em; i++) 
+	    putc(' ', fd);
 	col = 7+em;
+
+	pips_assert("print_sentence", col <= 72);
 
 	while (lw) {
 	    string w = STRING(CAR(lw));
@@ -76,7 +82,8 @@ sentence s;
 		(void) fprintf(fd, "%s", w);
 		col += strlen(w);
 	    }
-	    /* if the string fits on one line: use the 88 algorithm to break as few
+	    /* if the string fits on one line: 
+	     * use the 88 algorithm to break as few
 	     * syntactic constructs as possible */
 	    else if(strlen(w) < 70-7-em) {
 		if (col + strlen(w) > 70) {
@@ -108,7 +115,8 @@ sentence s;
 		(void) fprintf(fd, "%s", w);
 		col += strlen(w);
 	    }
-	    /* if the string has to be broken in at least two lines: new algorithmic part
+	    /* if the string has to be broken in at least two lines: 
+	     * new algorithmic part
 	     * to avoid line overflow (FI, March 1993) */
 	    else {
 		char * line = w;
