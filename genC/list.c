@@ -57,6 +57,10 @@
      duplicated.
    . GEN_APPEND concatenates two lists. the structure of the first list is
      duplicated.
+   . GEN_COPY_SEQ
+   . GEN_FULL_COPY_LIST
+   . GEN_COPY_STRING_LIST
+   . GEN_FREE_STRING_LIST
    . GEN_LAST returns the last cons of a list.
    . GEN_REMOVE updates the list (pointer) CPP by removing (and freeing) any
      ocurrence of the gen_chunk OBJ.
