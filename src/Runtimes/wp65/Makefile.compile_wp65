@@ -1,5 +1,5 @@
 # $RCSfile: Makefile.compile_wp65,v $ (version $Revision$)
-# $Date: 1996/08/21 18:17:42 $, 
+# $Date: 1996/09/03 14:40:25 $, 
 #
 
 # Fait des vérifications exhaustives :
@@ -19,12 +19,12 @@ else
 FFLAGS	= -u
 endif
 
-ifndef WP65_LIBRARY
-WP65_LIBRARY = 	$(PIPS_ROOT)/Runtime/wp65
+ifndef WP65_RUNTIME
+WP65_RUNTIME = 	$(PIPS_ROOT)/Runtime/wp65
 endif
 
 LD	= $(FC)
-LDFLAGS = -L$(WP65_LIBRARY)/$(PVM_ARCH) \
+LDFLAGS = -L$(WP65_RUNTIME)/$(PVM_ARCH) \
 	  -L$(PIPS_ROOT)/Lib/$(PIPS_ARCH) \
 	  -L$(PVM_ROOT)/lib/$(PVM_ARCH)
 
