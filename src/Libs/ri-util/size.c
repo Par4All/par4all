@@ -38,32 +38,47 @@ represented by a basic. */
 int SizeOfElements(b)
 basic b;
 {
-	int e;
+  int e = -1;
 
-	switch (basic_tag(b)) {
-	    case is_basic_int:
-		e = basic_int(b);
-		break;
-	    case is_basic_float:
-		e = basic_float(b);
-		break;
-	    case is_basic_logical:
-		e = basic_logical(b);
-		break;
-	    case is_basic_complex:
-		e = basic_complex(b);
-		break;
-	    case is_basic_string:
-		assert(value_constant_p(basic_string(b)));
-		assert(constant_int_p(value_constant(basic_string(b))));
-		e = constant_int(value_constant(basic_string(b)));
-		break;
-	    default:
-		fprintf(stderr, "[SizeOfElements] case default\n");
-		abort();
-	}
+  switch (basic_tag(b)) {
+  case is_basic_int:
+    e = basic_int(b);
+    break;
+  case is_basic_float:
+    e = basic_float(b);
+    break;
+  case is_basic_logical:
+    e = basic_logical(b);
+    break;
+  case is_basic_complex:
+    e = basic_complex(b);
+    break;
+  case is_basic_string: {
+    constant c = constant_undefined;
 
-	return(e);
+    /* pips_assert("SizeOfElements", gen_consistent_p(b)); */
+
+    if(value_constant_p(basic_string(b)))
+      c = value_constant(basic_string(b));
+    else if(value_symbolic_p(basic_string(b)))
+      c = symbolic_constant(value_symbolic(basic_string(b)));
+    else
+      user_error("SizeOfElements",
+		 "Sizing of character variable by illegal value (tag=%d)",
+		 basic_tag(b));
+
+    if(constant_int_p(c))
+      e = constant_int(c);
+    else
+      user_error("SizeOfElements",
+		 "Sizing of character variable by non-integer constant");
+    break;
+  }
+  default:
+    pips_error("SizeOfElements", "Ill. tag %d for basic", basic_tag(b));
+  }
+
+  return e;
 }
 
 
