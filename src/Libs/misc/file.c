@@ -1,32 +1,34 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/07/20 20:32:17 $, 
+ * $Date: 1997/08/26 12:52:27 $, 
  */
 
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
 #include <errno.h>
-/* #include <sys/types.h> */
-/* #include <sys/dirent.h> */
+
 #include <sys/stat.h>
 #include <sys/param.h>
 
-#ifndef __USE_BSD
-#define __USE_BSD
-#endif
 #include <dirent.h>
 #include <setjmp.h>
+
+/* could switch to the rx package? 
+ */
+#ifdef __linux
+#include <regex.h>
+#else
+char * re_comp(char *);
+int re_exec(char *);
+#endif
 
 #include "genC.h"
 #include "misc.h"
 
-/* hmmm. ???
+/* Should be in stdlib.h or errno.h:
  */
-extern char *re_comp();
-extern int re_exec();
-
-/* Should be in stdlib.h or errno.h: */
 extern char * sys_errlist[];
 
 FILE * safe_fopen( filename, what)
@@ -247,15 +249,12 @@ safe_list_files_in_directory(int * pargc,
                              char * re,
                              bool (* file_name_predicate)(char *))
 {
-   char complete_file_name[MAXNAMLEN + 1];
+   char * re_comp_message;
    list dir_list = NIL;
    DIR * dirp;
-   struct dirent * dp;
-   char * re_comp_message;
-   
+   struct dirent * dp;   
 
-   pips_assert("safe_list_files_in_directory", 
-               strcmp(dir, "") != 0);
+   pips_assert("some dir", strcmp(dir, "") != 0);
 
    re_comp_message = re_comp(re);
    if (re_comp_message != NULL)
@@ -267,10 +266,13 @@ safe_list_files_in_directory(int * pargc,
 
       if (dirp != NULL) {
          while((dp = readdir(dirp)) != NULL) {
-            if (re_exec(dp->d_name) == 1) {
-               (void) sprintf(complete_file_name, "%s/%s", dir, dp->d_name);
-               if (file_name_predicate(complete_file_name))
-                  dir_list = CONS(STRING, strdup(dp->d_name), dir_list);
+            if (re_exec(dp->d_name) == 1) 
+	    {
+		char * full_file_name = 
+		    strdup(concatenate(dir, "/", dp->d_name, NULL));
+               if (file_name_predicate(full_file_name))
+		   dir_list = CONS(STRING, strdup(dp->d_name), dir_list);
+	       free(full_file_name);
             }
          }
          closedir(dirp);
@@ -298,11 +300,8 @@ list_files_in_directory(int * pargc,
                         char * re,
                         bool (* file_name_predicate)(char *))
 {
-   int return_code = safe_list_files_in_directory(pargc,
-                                                  argv,
-                                                  dir,
-                                                  re,
-                                                  file_name_predicate);
+   int return_code = safe_list_files_in_directory
+       (pargc, argv, dir, re, file_name_predicate);
    
    if (return_code == -1)
       user_error("list_files_in_directory",
@@ -311,23 +310,19 @@ list_files_in_directory(int * pargc,
 }
 
 
-bool directory_exists_p(name)
-char *name;
+bool directory_exists_p(char * name)
 {
-    static struct stat buf;
+    struct stat buf;
     return (stat(name, &buf) == 0) && S_ISDIR(buf.st_mode);
 }
 
-bool file_exists_p(name)
-char *name;
+bool file_exists_p(char * name)
 {
-    static struct stat buf;
+    struct stat buf;
     return (stat(name, &buf) == 0) && S_ISREG(buf.st_mode);
 }
 
-
-bool create_directory(name)
-char *name;
+bool create_directory(char *name)
 {
     bool success;
 
@@ -346,8 +341,7 @@ char *name;
     return success;
 }
 
-bool purge_directory(name)
-char *name;
+bool purge_directory(char *name)
 {
     bool success = TRUE;
 
@@ -373,14 +367,19 @@ char *name;
     return success;
 }
 
-/* returns the current working directory
-*/
-/* I couldn't find any header declaring getwd... FC.
+#if !defined(PATH_MAX)
+#if defined(_POSIX_PATH_MAX)
+#define PATH_MAX _POSIX_PATH_MAX
+#else
+#define PATH_MAX 255
+#endif
+#endif
+
+/* returns the current working directory name.
  */
-extern char * getwd(char *);
 char *get_cwd()
 {
-    static char cwd[MAXPATHLEN];
-
-    return(getwd(cwd));
+    static char cwd[PATH_MAX];
+    cwd[PATH_MAX-1] = '\0';
+    return getcwd(cwd, PATH_MAX);
 }
