@@ -61,7 +61,6 @@
 
 /* Newgen includes 	*/
 #include "genC.h"
-#include "list.h"
 
 /* C3 includes 		*/
 #include "boolean.h"
