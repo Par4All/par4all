@@ -51,7 +51,7 @@ vdir="$PIPS_VALIDDIR"
 VALID="$PIPS_ROOT/Utils/validate-sequential"
 
 # so as to find the right ping, mail and date...
-PATH="/usr/ucb:/usr/etc:/usr/sbin:/usr/bin:/usr/games:.:$PATH"
+PATH="/usr/ucb:/usr/etc:/usr/bin:/usr/games:.:$PATH"
 
 hostname=`hostname`
 user=`whoami`
