@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1995/10/06 10:09:19 $, ) 
+# ($Date: 1995/10/13 09:19:31 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -242,7 +242,9 @@ test_aspect()
        [ -f core ] && rm -f core
 
        report $STATUS \
-         "Execution of $aspect/$name.test failed with $pips_version" || \
+         "Execution of $aspect/$name.test 
+failed with $pips_version 
+or $tpips_version" || \
          { $DEBUG " || error"; continue;}
        
        make_diff $aspect $name test
@@ -379,13 +381,14 @@ else
 
 $aspects ${FILES:+($FILES)}
   
-$final with $pips_version 
-       and $tpips_version
-  on $HOSTNAME
+$final
+   with $pips_version 
+   and $tpips_version
+   on $HOSTNAME
 
 $PERFORMANCE
 
-in case of problems, contact <jouvelot@cri.ensmp.fr>." "$final"
+in case of problems, contact <coelho@cri.ensmp.fr>." "$final"
 
 fi
 
