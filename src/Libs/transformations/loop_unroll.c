@@ -3,6 +3,9 @@
   $Id$
 
   $Log: loop_unroll.c,v $
+  Revision 1.19  1998/10/20 15:01:07  ancourt
+  add whileloop entry
+
   Revision 1.18  1998/09/17 12:16:46  coelho
   type fixed.
 
@@ -535,6 +538,10 @@ bool recursiv_loop_unroll(statement stmt, entity lb_ent, int rate)
       case is_instruction_goto :
 	  pips_error("recursiv_loop_unroll", 
 		       "Unexpected goto\n");
+	break;
+      case is_instruction_whileloop:
+	  pips_error("recursiv_loop_unroll", 
+		       "Unexpected while loop - not yet implemented\n");
 	break;
       case is_instruction_unstructured :
 	  /* ?? What should I do? go down the unstructured!
