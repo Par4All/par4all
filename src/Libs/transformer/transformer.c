@@ -183,113 +183,119 @@ transformer_combine(
 transformer
 transformer_normalize(transformer t, int level)
 {
-    Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
+  Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
 
-    if (!sc_empty_p(r)) {
-	Pbase b = base_dup(sc_base(r));
-	Pbase r2 = sc_dup(r);
-	/* Select one tradeoff between speed and accuracy:
-	 * enumerated by increasing speeds according to Beatrice
-	 */
-			    
-	CATCH(overflow_error) 
-	    {
-		/* CA */
-		pips_user_warning("overflow error in  redundancy elimination\n"); 
-		r = r2;
-	    }
-	TRY 
-	    {
-		switch(level) {
+  if (!sc_empty_p(r)) {
+    Pbase b = base_dup(sc_base(r));
+    Pbase r2 = sc_dup(r);
+    /* Select one tradeoff between speed and accuracy:
+     * enumerated by increasing speeds according to Beatrice
+     */
+    
+    CATCH(overflow_error) 
+      {
+	/* CA */
+	pips_user_warning("overflow error in  redundancy elimination\n");
+	sc_rm(r);
+	r = r2;
+      }
+    TRY 
+      {
+	switch(level) {
+	  
+	case 0:
+	  /* Our best choice for accuracy, but damned slow on ocean */
+	  r = sc_elim_redund(r);
+	  break;
 		    
-		case 0:
-		    /* Our best choice for accuracy, but damned slow on ocean */
-		    r = sc_elim_redund(r);
-		    break;
-		    
-		case 1:
-		    /* Beatrice's best choice: does not deal with minmax2 (only)
-		     * but still requires 74 minutes of real time (55 minutes of CPU time)
-		     * for ocean preconditions, when applied to each precondition stored.
-		     *
-		     * Only 64 s for ocean, if preconditions are not normalized.
-		     * But andne, callabsval, dead2, hind, negand, negand2, or,
-		     * validation_dead_code are not validated any more. Redundancy
-		     * could always be detected in a trivial way after propagating
-		     * values from equations into inequalities.
-		     */
-		    sc_nredund(&r);
-		    predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
-		    break;
-		    
-		case 2:
-		    /* Francois' own: does most of the easy stuff.
-		     * Fails on mimax2 and sum_prec, but it is somehow
-		     * more user-friendly because trivial preconditions are
-		     * not destroyed as redundant. It makes you feel safer.
-		     *
-		     * Result for full precondition normalization on ocean: 114 s
-		     * for preconditions, 4 minutes between split ocean.f and
-		     * OCEAN.prec
-		     */
-		    r = sc_strong_normalize(r);
-		    break;
-		    
-		case 5:
-		    /* Same plus a good feasibility test
-		     */
-		    r = sc_strong_normalize3(r);
-		    break;
-		    
-		case 3:
-		    /* Similar, but variable are actually substituted
-		     * which is sometimes painful when a complex equations
-		     * is used to replace a simple variable in a simple
-		     * inequality.
-		     */
-		    r = sc_strong_normalize2(r);
-		    break;
-		case 6:
-		    /* Similar, but variables are substituted if they belong to
-		     * a more or less simple equation, and simpler equations
-		     * are processed first and a lexicographically minimal
-		     * variable is chosen when equivalent variables are
-		     * available.
-		     */
-		    r = sc_strong_normalize4(r, (char * (*)(Variable)) external_value_name);
-		    break;
-		    
-		case 7:
-		    /* Same plus a good feasibility test, plus variable selection for elimination,
-		     * plus equation selection for elimination
-		     */
-		    r = sc_strong_normalize5(r, (char * (*)(Variable)) external_value_name);
-		    break;
-		    
-		case 4:
-		    /* Pretty lousy: equations are not even used to eliminate redundant 
-		     * inequalities!
-		     */
-		    r = sc_normalize(r);
-		    break;
-		    
-		default:
-		    pips_error("transformer_normalize", "unknown level %d\n", level);
-		}
-		sc_rm(r2);
-		UNCATCH(overflow_error);
-	    }
-			
-	if (SC_EMPTY_P(r)) {
-	    r = sc_empty(b);
+	case 1:
+	  /* Beatrice's best choice: does not deal with minmax2 (only)
+	   * but still requires 74 minutes of real time
+	   * (55 minutes of CPU time) for ocean preconditions, 
+	   * when applied to each precondition stored.
+	   *
+	   * Only 64 s for ocean, if preconditions are not normalized.
+	   * But andne, callabsval, dead2, hind, negand, negand2, or,
+	   * validation_dead_code are not validated any more. Redundancy
+	   * could always be detected in a trivial way after propagating
+	   * values from equations into inequalities.
+	   */
+	  sc_nredund(&r);
+	  predicate_system(transformer_relation(t)) = r;
+	  break;
+	  
+	case 2:
+	  /* Francois' own: does most of the easy stuff.
+	   * Fails on mimax2 and sum_prec, but it is somehow
+	   * more user-friendly because trivial preconditions are
+	   * not destroyed as redundant. It makes you feel safer.
+	   *
+	   * Result for full precondition normalization on ocean: 114 s
+	   * for preconditions, 4 minutes between split ocean.f and
+	   * OCEAN.prec
+	   */
+	  r = sc_strong_normalize(r);
+	  break;
+	  
+	case 5:
+	  /* Same plus a good feasibility test
+	   */
+	  r = sc_strong_normalize3(r);
+	  break;
+	  
+	case 3:
+	  /* Similar, but variable are actually substituted
+	   * which is sometimes painful when a complex equations
+	   * is used to replace a simple variable in a simple
+	   * inequality.
+	   */
+	  r = sc_strong_normalize2(r);
+	  break;
+	case 6:
+	  /* Similar, but variables are substituted if they belong to
+	   * a more or less simple equation, and simpler equations
+	   * are processed first and a lexicographically minimal
+	   * variable is chosen when equivalent variables are
+	   * available.
+	   */
+	  r = sc_strong_normalize4(r, 
+				   (char * (*)(Variable)) external_value_name);
+	  break;
+	  
+	case 7:
+	  /* Same plus a good feasibility test, plus variable selection 
+	   * for elimination, plus equation selection for elimination
+	   */
+	  r = sc_strong_normalize5(r, 
+				   (char * (*)(Variable)) external_value_name);
+	  break;
+	  
+	case 4:
+	  /* Pretty lousy: equations are not even used to eliminate redundant 
+	   * inequalities!
+	   */
+	  r = sc_normalize(r);
+	  break;
+	  
+	default:
+	  pips_internal_error("unknown level %d\n", level);
 	}
-	else 
-	    base_rm(b);
 
-	r->dimension = vect_size(r->base);
-	predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
+	sc_rm(r2), r2 = NULL;
+	UNCATCH(overflow_error);
+      } /* end of TRY */
+			
+    if (SC_EMPTY_P(r)) {
+      r = sc_empty(b);
     }
-    return t;
+    else 
+      base_rm(b), b=BASE_NULLE;
+    
+    r->dimension = vect_size(r->base);
+    predicate_system(transformer_relation(t)) = r;
+  }
+
+  return t;
 }
 
 /* transformer transformer_projection(transformer t, cons * args):
