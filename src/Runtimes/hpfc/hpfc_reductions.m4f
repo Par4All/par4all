@@ -2,7 +2,7 @@ c
 c     Reductions management 
 c
 c $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-c ($Date: 1996/09/07 16:17:41 $, )
+c ($Date: 1996/09/07 16:32:21 $, )
 c
 c     it is supposed that the reduction is computed on a full
 c     array, which is nor replicated anyway. If used on a part,
@@ -26,7 +26,7 @@ define(`TEMPO_REF',`t$1')dnl
 define(`INDEX_REF',`i$1')dnl
 define(`ZERO_REF',`0')dnl
 define(`LOOP_BOUNDS_COMPUTATION',`
-      d$1 = HPFC PROCDIM(an, $1)
+      d$1 = HPFC PROCESSOR DIM(an, $1)
       CALL HPFC LOOP BOUNDS(l$1, u$1, s$1, lo$1, up$1, an, d$1)')dnl
 define(`DO_LOOP',`
       do i$1 = l$1, u$1')dnl
