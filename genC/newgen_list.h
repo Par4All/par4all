@@ -98,5 +98,6 @@ extern char *gen_reduce GEN_PROTO(( char *, char *(*)(), cons * )) ;
 extern void gen_remove GEN_PROTO(( cons **, chunk * )) ;
 extern cons *gen_some  GEN_PROTO(( bool (*)(), cons * )) ;
 extern void gen_insert_after GEN_PROTO((chunk *, chunk *, cons *)) ;
+extern void gen_sort_list GEN_PROTO((list, int (*)())) ;
 
 #endif
