@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/06/08 15:04:34 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/06/12 15:52:46 $, )
  * version $Revision$
  *
  * Compiler
@@ -25,9 +25,9 @@
  */
 entity host_module, node_module;
 
-#define debug_print_control(c)\
+#define debug_print_control(c, w)\
   fprintf(stderr, \
-	  "control 0x%x (stat 0x%x) , %d predecessors, %d successors\n", \
+	  "%s: ctr 0x%x (stat 0x%x) , %d preds, %d succs\n", w, \
           (unsigned int) c, (unsigned int) control_statement(c), \
 	  gen_length(control_predecessors(c)), \
 	  gen_length(control_successors(c))); \
@@ -302,6 +302,27 @@ hpf_compile_call(
     }
 }
 
+static void compile_control(
+    control c,
+    statement_mapping maph,
+    statement_mapping mapn)
+{
+    control hostc, nodec;
+    statement stath, statn, statc = control_statement(c);
+    
+    hpf_compiler(statc, &stath, &statn);
+    
+    DEBUG_STAT(7, "statc", statc);
+    DEBUG_STAT(7, "host stat", stath);
+    DEBUG_STAT(7, "node stat", statn);
+    
+    hostc = make_control(stath, NIL, NIL);
+    SET_CONTROL_MAPPING(maph, c, hostc);
+    
+    nodec = make_control(statn, NIL, NIL);
+    SET_CONTROL_MAPPING(mapn, c, nodec);
+}
+
 static void 
 hpf_compile_unstructured(
     statement stat,
@@ -315,13 +336,11 @@ hpf_compile_unstructured(
     if (one_statement_unstructured(instruction_unstructured(inst)))
     {
 	pips_debug(7, "one statement recognize\n");
-	/* 
-	 * nothing spacial is done! 
-	 *
+
+	/* nothing spacial is done! 
 	 * ??? there may be a problem with the label of the statement, if any.
 	 */
-	hpf_compiler
-	    (control_statement
+	hpf_compiler(control_statement
 	     (unstructured_control(instruction_unstructured(inst))),
 	     hoststatp, nodestatp);
     }
@@ -330,36 +349,21 @@ hpf_compile_unstructured(
 	control_mapping 
 	    hostmap = MAKE_CONTROL_MAPPING(),
 	    nodemap = MAKE_CONTROL_MAPPING();
-	unstructured 
-	    u = instruction_unstructured(inst);
-	control 
-	    ct = unstructured_control(u),
-	    ce = unstructured_exit(u),
-	    new_ct, new_ce, nodec, hostc;
-	statement statc, stath, statn;
+	unstructured  u = instruction_unstructured(inst);
+	control ct = unstructured_control(u),
+	        ce = unstructured_exit(u), new_ct, new_ce;
 	list blocks = NIL;
 
 	pips_debug(6, "beginning\n");
 
-	CONTROL_MAP
-	    (c,
-	 {
-	     statc=control_statement(c);
-	     
-	     hpf_compiler(statc, &stath, &statn);
-	     
-	     DEBUG_STAT(7, "statc", statc);
-	     DEBUG_STAT(7, "host stat", stath);
-	     DEBUG_STAT(7, "node stat", statn);
-	     
-	     hostc = make_control(stath, NIL, NIL);
-	     SET_CONTROL_MAPPING(hostmap, c, hostc);
-	     
-	     nodec = make_control(statn, NIL, NIL);
-	     SET_CONTROL_MAPPING(nodemap, c, nodec);
-	 },
-	     ct,
-	     blocks);
+	CONTROL_MAP(c, compile_control(c, hostmap, nodemap), ct, blocks);
+
+	if (!gen_in_list_p(ce, blocks))
+	{
+	    pips_debug(5, "exit not in blocks\n");
+	    blocks = CONS(CONTROL, ce, blocks);
+	    compile_control(ce, hostmap, nodemap);
+	}
 	
 	MAP(CONTROL, c,
 	 {
@@ -372,19 +376,16 @@ hpf_compile_unstructured(
 	{
 	    control h_tmp, n_tmp;
 
-	    fprintf(stderr, "[hpf_compile_unstructured] controls:\n");
+	    pips_debug(9, "controls:\n");
 	    
 	    MAP(CONTROL, c_tmp,
 	     {
 		 h_tmp = (control) GET_CONTROL_MAPPING(hostmap, c_tmp);
 		 n_tmp = (control) GET_CONTROL_MAPPING(nodemap, c_tmp);
 		 
-		 fprintf(stderr, "\nOriginal:\n");
-		 debug_print_control(c_tmp);
-		 fprintf(stderr, "Host:\n");
-		 debug_print_control(h_tmp);
-		 fprintf(stderr, "Node:\n");
-		 debug_print_control(n_tmp);
+		 debug_print_control(c_tmp, "initial");
+		 debug_print_control(h_tmp, "host");
+		 debug_print_control(n_tmp, "node");
 	     },
 		 blocks);
 	}
@@ -396,19 +397,16 @@ hpf_compile_unstructured(
 	new_ct = (control) GET_CONTROL_MAPPING(hostmap, ct);
 	new_ce = (control) GET_CONTROL_MAPPING(hostmap, ce);
 
-	pips_assert("defined control",
-		    !control_undefined_p(new_ct) &&
+	pips_assert("defined control", !control_undefined_p(new_ct) &&
 		    !control_undefined_p(new_ce));
 
 	ifdebug(9)
 	{
-	    fprintf(stderr,
-		    "[hpf_compile_unstructured] host unstructured controls:\n");
+	    pips_debug(9, "host controls for [0x%x,0x%x]:\n", 
+		       (unsigned int) ct, (unsigned int) ce);
 	    
-		 fprintf(stderr, "Main:\n");
-		 debug_print_control(new_ct);
-		 fprintf(stderr, "Exit:\n");
-		 debug_print_control(new_ce);
+	    debug_print_control(new_ct, "main");
+	    debug_print_control(new_ce, "exit");
 	}
 
 	instruction_unstructured(statement_instruction(*hoststatp)) =
