@@ -245,7 +245,8 @@ static void simdize_simple_statements(statement s)
       CDR(sinfo) = make_simd_statements(group_matches, 
 					group_first, 
 					group_last);
-      sinfo = CDR(sinfo);
+      while(CDR(sinfo) != NIL)
+	 sinfo = CDR(sinfo);
 
       /* skip what has already been matched */
       i = group_last;
