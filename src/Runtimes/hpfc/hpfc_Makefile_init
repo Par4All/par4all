@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/12/27 15:18:32 $, )
+# ($Date: 1996/12/27 15:37:33 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -370,7 +370,7 @@ $(RTEST):  $(FTEST)
 #
 # Cleaning
 
-clean:;	$(RM) *.o *~ *.trace $(DEDUCED) core
+clean:;	$(RM) *.o *~ *.trace $(RT_INIT:.f=.m4) $(DEDUCED) core
 clobber: clean; $(RM) $(RUNABLES) $(pvmbin)/$(HOST) $(pvmbin)/$(NODE)
 
 echo:; @echo $(ECHO)
