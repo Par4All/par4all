@@ -28,4 +28,11 @@ extern FILE * syn_in; /* the file read in by the scanner */
 #define FatalError(f,m) \
 (pips_error(f,"Fatal error between lines %d and %d\n%s\n",line_b_I,line_e_I,m))
 
+/* strdup is declared in string.h under solaris 8
+   but is not imported with the -ansi option, 
+   although it is imported as a macro under linux...
+   Hence the following hack. FC 22/04/2002
+ */
+#ifndef strdup
 extern char * strdup(const char *);
+#endif
