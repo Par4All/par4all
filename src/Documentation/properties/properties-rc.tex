@@ -11,7 +11,7 @@
 \batchmode
 \documentstyle[11pt]{article}
 \title{Properties \\
-	Low Level Tuning of PIPS}
+    Low Level Tuning of PIPS}
 \author{Lei Zhou\thanks{E-mail: {\tt zhou@ensmp.fr}} \hspace{2cm} 
         Fran\c{c}ois Irigoin\thanks{E-mail: {\tt irigoin@ensmp.fr}} \vspace{1cm}\\
         Centre de Recherche en Informatique \\
@@ -140,6 +140,12 @@ Print statement regions as comments in code.
 
 \begin{verbatim}
 PRETTYPRINT_REGION FALSE
+\end{verbatim}
+
+Print regions of scalars.
+
+\begin{verbatim}
+PRETTYPRINT_SCALAR_REGIONS TRUE
 \end{verbatim}
 
 Print statement blocks
@@ -286,24 +292,24 @@ use and complexity of Fourier-Motzkin's pair-wise elimination (fields
 \begin{itemize}
 
   \item[1] array reference pairs, i.e. number of tests effected
-	(used to be the number of use-def, def-use and def-def pairs on arrays);
+    (used to be the number of use-def, def-use and def-def pairs on arrays);
 
   \item[2] number of independences found (on array reference pairs);
 
-	{\bf Note:} field 1 minus field 2 is the number of array
-	dependencies. 
+    {\bf Note:} field 1 minus field 2 is the number of array
+    dependencies. 
 
   \item[3] numbers of loop independent dependences between references
-	in the 	same statement (not useful for program transformation
-	and parallelization if statements are preserved); it should
-	be subtracted from field 2 to compare results with other
-	parallelizers;
+    in the  same statement (not useful for program transformation
+    and parallelization if statements are preserved); it should
+    be subtracted from field 2 to compare results with other
+    parallelizers;
 
   \item[4] numbers of constant dependences; 
 
   \item[5] numbers of exact dependences;
 
-	{\bf Note:} field 5 must be greater or equal to field 4.
+    {\bf Note:} field 5 must be greater or equal to field 4.
 
   \item[6] numbers of inexact dependences involved only by the 
            elimination of equation;
@@ -312,23 +318,23 @@ use and complexity of Fourier-Motzkin's pair-wise elimination (fields
   \item[8] numbers of inexact dependences involved by both elimination of
            equation and F-M elimination; 
 
-	{\bf Note:} the sum of fields 5 to 8 and field 2 equals field 1
+    {\bf Note:} the sum of fields 5 to 8 and field 2 equals field 1
 
   \item[9] number of dependences among scalar variables;
   \item[10] numbers of dependences among loop index variables;
   \item[11-40] dependence types detail table with the dimensions [5][3]
                and constant dependence detail table with the
                dimensions [5][3]; the first index is the array dimension
-	(from 0 to 4 - no larger arrays has ever been found); the
-	second index is the dependence nature (1: d-u, 2: u-d, 3: d-d);
-	both arrays are flatten according to C rule  as 5 sequences of
-	3 natures;
+    (from 0 to 4 - no larger arrays has ever been found); the
+    second index is the dependence nature (1: d-u, 2: u-d, 3: d-d);
+    both arrays are flatten according to C rule  as 5 sequences of
+    3 natures;
 
-	{\bf Note:} the sum of fields 11 to 25 should be equal to
-	the sum of field 9 and 2 minus field 1.
+    {\bf Note:} the sum of fields 11 to 25 should be equal to
+    the sum of field 9 and 2 minus field 1.
 
-	{\bf Note:} the fields 26 to 40 must be less than or equal to
-	the corresponding fields 11 to 25
+    {\bf Note:} the fields 26 to 40 must be less than or equal to
+    the corresponding fields 11 to 25
 
   \item[41] numbers of independences found by the test of constant;
   \item[42] numbers of independences found by the GCD test;
@@ -347,20 +353,20 @@ use and complexity of Fourier-Motzkin's pair-wise elimination (fields
   \item[49] numbers of independences found by the test of lexico-positive
             for Di sub-system; 
 
-	{\bf Note:} the sum of fields 41 to 49 equals field 2
+    {\bf Note:} the sum of fields 41 to 49 equals field 2
 
   \item[50] total number of Fourier-Motzkin's pair-wise eliminations
-	 used; 
+     used; 
   \item[51] number of Fourier-Motzkin's pair-wise elimination 
-	in which the system size doesn't augment after the elimination;
+    in which the system size doesn't augment after the elimination;
   \item[52-68] complexity counter table of dimension [17]. The
                complexity of one projection by F-M is the product of the
                number of positive inequalities and the number of negatives
                inequalities that contain the eliminated variable. This
-	is an histogram of the products. Products which are less than 
-	or equal to 4
-	imply that the total number of inequalities does not increase.
-	So if no larger product exists, field 50 and 51 must be equal.
+    is an histogram of the products. Products which are less than 
+    or equal to 4
+    imply that the total number of inequalities does not increase.
+    So if no larger product exists, field 50 and 51 must be equal.
 \end{itemize}
 
 The results are stored in the currentworkspace in MODULE.resulttestfast,
