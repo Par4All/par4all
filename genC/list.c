@@ -14,10 +14,8 @@
 
 */
 
-/* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 2000/07/05 08:42:40 $, )
- * version $Revision$
- * got on %D%, %T%
+/* 
+ * $Id$
  */
 
 /* -- list.c
@@ -574,6 +572,14 @@ list gen_make_list(int domain, ...)
 	CDR(current) = CONS(CHUNK, item, NIL), POP(current);
     
     return l;
+}
+
+list gen_cons(void * item, list next)
+{
+  list ncons = (list) malloc(sizeof(struct cons));
+  ncons->car = item;
+  ncons->cdr = next;
+  return ncons;
 }
 
 /*   That is all
