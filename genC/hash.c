@@ -69,30 +69,16 @@ struct __hash_table {
  */
 #define HASH_SIZE_LIMIT(size) ((size)>>1)
 
-/* Hash function to get the index
- * of the array from the key 
+/* Hash function to get the index of the array from the key 
  */
-#define HASH_FUNCTION(key, size) (((unsigned int)(key))%(size))
+#define RANK(key, size) (((unsigned int)(key))%(size))
 
-/* define the increment of the hash_function in case of hit.
+/* define the increment of the hash_function in case of a hit (heat;-)
  * The old version can be achieved by setting
  * this macro to ((int) 1)
  */
 #define HASH_FUNCTION_INCREMENT(key, size) \
     (1 + (((unsigned int)(key)&0x7fffffff)%((size) - 1)))
-
-/* Now we need the table size to be a prime number.
- * So we need to retrieve the next prime number in a list.
- */
-#define GET_NEXT_HASH_TABLE_SIZE(sz, pointer_to_table)			\
-{									\
-     while (*(pointer_to_table) <= (sz)) {				\
-	 message_assert("size too big ",				\
-			*(pointer_to_table) != END_OF_SIZE_TABLE);	\
-	 (pointer_to_table)++;						\
-     }									\
- (sz) = *(pointer_to_table);						\
-}
 
 /* Set of the different operations 
  */
@@ -118,12 +104,25 @@ static unsigned int hash_chunk_rank(gen_chunk*, int);
 
 /* List of the prime numbers from 17 to 2^31-1 
  */
-static int prime_numbers_for_table_size[] = {
+static int prime_list[] = {
     7,17,37,71,137,277,547,1091,2179,4357,8707,17417,
     34819,69653,139267,278543,557057,1114117,2228243,
     4456451,8912921,17825803,35651593,71303171,
     142606357,285212677,570425377,1140850699,
     END_OF_SIZE_TABLE};
+
+/* Now we need the table size to be a prime number.
+ * So we need to retrieve the next prime number in a list.
+ */
+static int get_next_hash_table_size(int size)
+{
+  int * p_prime = prime_list;
+  while (*p_prime <= size) {
+    message_assert("size too big ", *p_prime != END_OF_SIZE_TABLE);
+    p_prime++;
+  }
+  return *p_prime;
+}
 
 /* internal variable to know we should warm or not
  */
@@ -155,11 +154,10 @@ hash_table hash_table_make(hash_key_type key_type, int size)
 {
     register int i;
     hash_table htp;
-    int *prime_list = &prime_numbers_for_table_size[0];
 
     if (size<HASH_DEFAULT_SIZE) size=HASH_DEFAULT_SIZE - 1;
     /* get the next prime number in the table */
-    GET_NEXT_HASH_TABLE_SIZE(size, prime_list);
+    size = get_next_hash_table_size(size);
 
     htp = (hash_table) alloc(sizeof(struct __hash_table));
     htp->hash_type = key_type;
@@ -443,14 +441,13 @@ hash_enlarge_table(hash_table htp)
 {
   hash_entry_pointer old_array;
   int i, old_size;
-  int *prime_list = &prime_numbers_for_table_size[0];
   
   old_size = htp->hash_size;
   old_array = htp->hash_array;
   
   htp->hash_size++;
     /* Get the next prime number in the table */
-  GET_NEXT_HASH_TABLE_SIZE(htp->hash_size,prime_list);
+  htp->hash_size = get_next_hash_table_size(htp->hash_size);
   htp->hash_array = (hash_entry_pointer) 
     alloc(htp->hash_size* sizeof(hash_entry));
   htp->hash_size_limit = HASH_SIZE_LIMIT(htp->hash_size);
@@ -495,17 +492,17 @@ static unsigned int hash_string_rank(void * key, int size)
 
 static unsigned int hash_int_rank(void * key, int size)
 {
-  return HASH_FUNCTION(key, size);
+  return RANK(key, size);
 }
 
 static unsigned int hash_pointer_rank(void * key, int size)
 {
-  return HASH_FUNCTION(key, size);
+  return RANK(key, size);
 }
 
 static unsigned int hash_chunk_rank(gen_chunk * key, int size)
 {
-  return HASH_FUNCTION(key->i, size);
+  return RANK(key->i, size);
 }
 
 static int hash_string_equal(char * key1, char * key2)
@@ -564,7 +561,7 @@ hash_find_entry(hash_table htp,
   int r_increment;
   
   r_init = r = (*(htp->hash_rank))(key, htp->hash_size);
-  r_increment = HASH_FUNCTION_INCREMENT(r_init, htp->hash_size);
+  r_increment = HASH_FUNCTION_INCREMENT(key, htp->hash_size);
   
   while (1) 
   {
@@ -589,7 +586,6 @@ hash_find_entry(hash_table htp,
     /* GO: it is not anymore the next slot
      * we skip some of them depending on the
      * reckonned increment 
-     * FC: I don't really believe this r_increment. (04/06/2003)
      */
     r = (r + r_increment) % htp->hash_size;
     
