@@ -1,36 +1,27 @@
-
-/** $Id$
-  * $Log: Parser.java,v $
-  * Revision 1.1  1998/06/30 17:35:33  coelho
-  * Initial revision
-  *
-  * Revision 1.3  1998/06/30 15:37:31  didry
-  * double quoted added.
-  *
-  * Revision 1.2  1998/06/09 07:28:28  didry
-  * generate a menu and a frame
-  *
-  * Revision 1.1  1998/05/27 06:47:38  didry
-  * Initial revision
-  *
-  */
-
+/*
+ * $Id$
+ *
+ * $Log: Parser.java,v $
+ * Revision 1.2  1998/07/01 07:06:22  coelho
+ * cleaner.
+ *
+ * Revision 1.1  1998/06/30 17:35:33  coelho
+ * Initial revision
+ */
 
 package JPips;
-
 
 import java.lang.*;
 import java.util.*;
 import java.io.*;
 
-
 /** A sub class of StreamTokenizer which parses line by line.
+  * 
   * @author Francois Didry
   */
-public class Parser extends StreamTokenizer
+public class Parser 
+    extends StreamTokenizer
 {
-
-
   /** Defines a StreamTokenizer.
     */
   public Parser(FileReader f)
@@ -85,7 +76,6 @@ public class Parser extends StreamTokenizer
       whitespaceChars('\t','\t');      
     }
     
-
   /** @return the next line which is not null or null if EOF is reached
     */
   public String nextNonEmptyLine()
@@ -99,8 +89,6 @@ public class Parser extends StreamTokenizer
 	  System.out.println(e);
 	  System.out.flush();
 	}
-      return(this.sval);
+      return this.sval;
     }
-
-
 }
