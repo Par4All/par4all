@@ -211,7 +211,7 @@ struct eformat partial_eval_expression_and_copy(expression expr, Psysteme ps, ef
 
 struct eformat partial_eval_expression(expression e, Psysteme ps, effects fx)
 {
-    struct eformat ef= partial_eval_syntax(e, ps, fx);
+    struct eformat ef = partial_eval_syntax(e, ps, fx);
 
     return ef;
 }
@@ -446,9 +446,10 @@ struct eformat partial_eval_unary_operator(entity func, cons *la, Psysteme ps, e
 #define PERFORM_SUBTRACTION 2
 #define PERFORM_MULTIPLICATION 3
 #define PERFORM_DIVISION 4
-#define PERFORM_MODULO 5
-#define PERFORM_MINIMUM 6
-#define PERFORM_MAXIMUM 7
+#define PERFORM_POWER 5
+#define PERFORM_MODULO 6
+#define PERFORM_MINIMUM 7
+#define PERFORM_MAXIMUM 8
 
 struct eformat partial_eval_mult_operator(expression *ep1,
 					  expression *ep2,
@@ -752,6 +753,31 @@ struct eformat partial_eval_max_operator(expression *ep1,
     return ef;
 }
 
+struct eformat partial_eval_power_operator(expression *ep1,
+					   expression *ep2,
+					   Psysteme ps,
+					   effects fx)
+{
+    struct eformat ef, ef1, ef2;
+
+    ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+    ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
+
+    if( ef1.icoef == 0 && ef2.icoef == 0 && ef2.ishift >= 0) {
+	ef.icoef = 0;
+	ef.ishift = ipow(ef1.ishift, ef2.ishift);
+	ef.expr = expression_undefined;
+	ef.simpler = TRUE;
+    }
+    else {
+	regenerate_expression(&ef1, ep1);
+	regenerate_expression(&ef2, ep2);
+	ef = eformat_undefined;
+    }
+
+    return ef;
+}
+
 static struct perform_switch {
     string operator_name;
     struct eformat (*binary_operator)(expression *, expression *, Psysteme, effects);
@@ -760,6 +786,7 @@ static struct perform_switch {
     {MINUS_OPERATOR_NAME, partial_eval_minus_operator},
     {MULTIPLY_OPERATOR_NAME, partial_eval_mult_operator},
     {DIVIDE_OPERATOR_NAME, partial_eval_div_operator},
+    {POWER_OPERATOR_NAME, partial_eval_power_operator},
     {MODULO_OPERATOR_NAME, partial_eval_mod_operator},
     {MIN0_OPERATOR_NAME, partial_eval_min_operator},
     {MIN_OPERATOR_NAME, partial_eval_min_operator},
