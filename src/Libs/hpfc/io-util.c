@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-util.c,v $ ($Date: 1995/08/01 09:13:47 $, )
+ * $RCSfile: io-util.c,v $ ($Date: 1995/09/04 13:16:22 $, )
  * version $Revision$,
  */
 
@@ -173,7 +173,7 @@ statement *psh, *psn;
 	proc_decl = entity_to_declaration_constraints(proc),
 	proc_cond_tmp = sc_dup(proc_echelon),
 	proc_cond = (sc_nredund(&proc_cond_tmp),
-		     non_redundent_subsystem(proc_cond_tmp, proc_decl));
+		     extract_nredund_subsystem(proc_cond_tmp, proc_decl));
     statement
 	h_cont = make_empty_statement(),
 	n_cont = make_empty_statement(),
