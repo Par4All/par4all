@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/03 15:23:22 $, 
+# $Date: 1996/09/10 16:39:33 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -34,10 +34,11 @@ usage()
 	    -r: add proper installation and readme files in the root
 	    -s: strip binaries
 	    -z: tar and zip
-	    -w: additional options for make_release
+	    -w: additional options for make_release [-w '-e']
 	  release content:
-	    default: Share Doc Runtime Examples
+	    default: Share Doc Runtime Examples 
 	    -S: add sources (Include, Src, Utils, Validation)
+	    -D dir: add directory dir
 	    -B arch: add binaries for arch (Bin/arch)
 	    -L arch: add libraries for arch (Lin/arch)
 	  software:
@@ -50,7 +51,7 @@ usage()
     exit $ret
 }
 
-while getopts hvrszw:SB:L:pnle opt
+while getopts hvrszw:SB:L:D:pnle opt
 do
     case $opt in
 	h) usage 0 some help ;;
@@ -65,6 +66,7 @@ do
 	   name="${name}B$OPTARG" ;
 	   tostrip="$tostrip Bin/$OPTARG" ;;
 	L) what="$what -d Lib/$OPTARG" ; name="${name}L$OPTARG" ;;
+	D) what="$what -d $OPTARG"  ; name="${name}D$OPTARG" ;;
 	p) pack="$pack PIPS" ; name="${name}p" ;;
 	n) pack="$pack NEWGEN" ; name="${name}n" ;;
 	l) pack="$pack LINEAR" ; name="${name}l" ;;
