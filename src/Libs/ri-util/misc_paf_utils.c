@@ -150,7 +150,7 @@ int *Gcount_nlc;
 	new_ent = make_entity(name,
                       make_type(is_type_variable,
                           make_variable(make_basic(is_basic_int, UUINT(4)),
-                                              NIL)),
+                                              NIL,NIL)),
                       make_storage(is_storage_ram, ram_undefined),
                       make_value(is_value_unknown, UU));
 
@@ -198,7 +198,7 @@ entity make_nsp_entity()
         new_ent = make_entity(name,
                       make_type(is_type_variable,
                             make_variable(make_basic(is_basic_int, UUINT(4)),
-                                              NIL)),
+                                              NIL,NIL)),
                       make_storage(is_storage_ram, ram_undefined),
                       make_value(is_value_unknown, UU));
 
@@ -242,7 +242,7 @@ entity make_nub_entity()
         new_ent = make_entity(name,
                       make_type(is_type_variable,
                         make_variable(make_basic(is_basic_int, UUINT(4)),
-                                              NIL)),
+                                              NIL,NIL)),
                       make_storage(is_storage_ram, ram_undefined),
                       make_value(is_value_unknown, UU));
 
