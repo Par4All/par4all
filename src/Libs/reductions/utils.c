@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1996/06/17 16:20:28 $, 
+ * $Date: 1996/06/17 17:51:47 $, 
  *
  * utilities for reductions.
  *
@@ -478,18 +478,22 @@ equal_reference_in_expression_p(
 static bool
 no_other_effects_on_references(
     statement s,
-    reference r1,
-    reference r2)
+    list /* of reference on the same variable */ lr)
 {
-    list /* of effect */ le = load_statement_proper_effects(s);
-    entity var = reference_variable(r1);
+    list /* of effect */ le; 
+    entity var;
+    if (ENDP(lr)) return TRUE;
+
+    le = load_statement_proper_effects(s);
+    var = reference_variable(REFERENCE(CAR(lr)));
 
     pips_assert("same variable", var==reference_variable(r2));
     
     MAP(EFFECT, e,
     {
 	reference r = effect_reference(e);
-	if (r!=r1 && r!=r2 && entity_conflict_p(reference_variable(r), var))
+	if (!gen_in_list_p(r, lr) && 
+	    entity_conflict_p(reference_variable(r), var))
 	    return FALSE;
     },
 	le);
@@ -508,7 +512,7 @@ call_proper_reduction_p(
     call c,         /* the call of interest */
     reduction *red) /* the returned reduction (if any) */
 {
-    list /* of expression */ le;
+    list /* of expression */ le, /* of reference */ lr;
     expression elhs, erhs;
     reference lhs, other;
     tag op;
@@ -550,8 +554,13 @@ call_proper_reduction_p(
     
     /* there should be no extract effects on the reduced variable
      */
-    if (!no_other_effects_on_references(s, lhs, other))
+    lr = CONS(REFERENCE, lhs, CONS(REFERENCE, other, NIL));
+    if (!no_other_effects_on_references(s, lr))
+    {
+	gen_free_list(lr);
 	return FALSE;
+    }
+    gen_free_list(lr);
     pips_debug(8, "no other effects\n");
 
     pips_debug(7, "returning a %s reduction on %s\n",
