@@ -1,3 +1,4 @@
+#! /usr/local/bin/perl -w
 #
 # Generate various files for the User Manual:
 # 
