@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/09/21 15:39:32 $, )
+ * ($Date: 1996/09/21 15:42:06 $, )
  */
 
 #include "defines-local.h"
@@ -70,7 +70,7 @@ static void add_statement_to_clean(statement s)
 
 /* local primary dynamics
  */
-GENERIC_STATIC_STATUS(/**/, the_dynamics, list, NIL, gen_free_list)
+GENERIC_STATIC_STATUS(extern, the_dynamics, list, NIL, gen_free_list)
 
 void add_a_dynamic(entity c)
 {
