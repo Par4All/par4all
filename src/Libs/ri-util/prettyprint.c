@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/10 17:15:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/12 03:01:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/10 17:15:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/12 03:01:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -937,6 +937,34 @@ output_a_graph_view_of_the_unstructured_successors(text r,
 }
 
 
+bool
+output_a_graph_view_of_the_unstructured_from_a_control(text r,
+                                                       entity module,
+                                                       int margin,
+                                                       control begin_control,
+                                                       control exit_control)
+{
+   bool exit_node_has_been_displayed = FALSE;
+   list blocs = NIL;
+   
+   CONTROL_MAP(c,
+               {
+                  /* Display the statements of each node followed by
+                     the list of its successors if any: */
+                  output_a_graph_view_of_the_unstructured_successors(r,
+                                                                     module,
+                                                                     margin,
+                                                                     c);
+                  if (c == exit_control)
+                     exit_node_has_been_displayed = TRUE;
+               },
+                  begin_control,
+                  blocs);
+   gen_free_list(blocs);
+
+   return exit_node_has_been_displayed;
+}
+
 void
 output_a_graph_view_of_the_unstructured(text r,
                                         entity module,
@@ -946,7 +974,6 @@ output_a_graph_view_of_the_unstructured(text r,
                                         int num)
 {
    bool exit_node_has_been_displayed = FALSE;
-   list blocs = NIL;
    control begin_control = unstructured_control(u);
    control end_control = unstructured_exit(u);
 
@@ -954,31 +981,28 @@ output_a_graph_view_of_the_unstructured(text r,
                                      PRETTYPRINT_UNSTRUCTURED_BEGIN_MARKER,
                                      (unsigned int) begin_control,
                                      (unsigned int) end_control);
-
-   CONTROL_MAP(c,
-               {
-                  /* Display the statements of each node followed by
-                     the list of its successors if any: */
-                  output_a_graph_view_of_the_unstructured_successors(r,
-                                                                     module,
-                                                                     margin,
-                                                                     c);
-                  if (c == end_control)
-                     exit_node_has_been_displayed = TRUE;
-               },
-                  begin_control,
-                  blocs);
-   gen_free_list(blocs);
-
+   exit_node_has_been_displayed =
+      output_a_graph_view_of_the_unstructured_from_a_control(r,
+                                                             module,
+                                                             margin,
+                                                             begin_control,
+                                                             end_control);
+   
    /* If we have not displayed the exit node, that mean that it is not
       connex with the entry node and so the code is
       unreachable. Anyway, it has to be displayed as for the classical
       Sequential View: */
    if (! exit_node_has_been_displayed)
-      output_a_graph_view_of_the_unstructured_successors(r,
-                                                         module,
-                                                         margin,
-                                                         end_control);
+      /* Note that since the controlizer adds a dummy successor to the
+         exit node, use
+         output_a_graph_view_of_the_unstructured_from_a_control()
+         instead of
+         output_a_graph_view_of_the_unstructured_successors(): */
+      output_a_graph_view_of_the_unstructured_from_a_control(r,
+                                                             module,
+                                                             margin,
+                                                             end_control,
+                                                             end_control);
 
    add_one_unformated_printf_to_text(r, "%s %#x end: %#x\n",
                                      PRETTYPRINT_UNSTRUCTURED_END_MARKER,
