@@ -1,5 +1,13 @@
 /* 
  * $Id$
+ *
+ * $Log: initializer.c,v $
+ * Revision 1.13  2003/06/05 09:09:26  irigoin
+ * Two additional steps in missing_file_initializer() to survive partially
+ * corrupted databases, when new resources are present in the database but
+ * not recorded as resource.
+ *
+ *
  */
 #include <stdio.h>
 #include <string.h>
@@ -178,6 +186,10 @@ missing_file_initializer(string module_name)
     f = safe_fopen(full_name, "w");
     print_text(f, stub);
     safe_fclose(f, full_name);
+    /* A PIPS database may be partly incoherent after a core dump but
+       still usable (Cathare 2, FI)*/
+    if(file_exists_p(finit_name))
+      safe_unlink(finit_name);
     safe_link(finit_name, full_name);
 
     /* Add the new file as a file resource...
