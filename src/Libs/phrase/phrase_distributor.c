@@ -37,13 +37,14 @@ typedef dg_vertex_label vertex_label;
 
 #define EXTERNALIZED_CODE_PRAGMA_BEGIN "BEGIN_FPGA_%s"
 #define EXTERNALIZED_CODE_PRAGMA_END "END_FPGA_%s"
+#define EXTERNALIZED_CODE_PRAGMA_ANALYZED "ANALYZED_FPGA_%s (%d statements)"
 
 static entity create_module_with_statement (statement stat, 
 					    string new_module_name);
 
 /**
- * Return the identified function name of the externalized
- * portion of code
+ * Return the identified function name of the externalized portion of code
+ * by searching comment matching tag EXTERNALIZED_CODE_PRAGMA_BEGIN
  */
 static string get_externalized_function_name(statement stat) 
 {
@@ -70,6 +71,49 @@ static string get_externalized_function_name(statement stat)
 	  function_name = malloc(256);
 	  sscanf (first_occurence, comment_portion, function_name);
 	  /*pips_debug(5, "Found function: [%s]\n", function_name);*/
+	}
+	next_line = strtok(NULL, "\n");
+      }
+      while (next_line != NULL);
+    }
+  }
+
+  return function_name;
+}
+
+/**
+ * Return the identified function name of the externalized portion of code
+ * by searching comment matching tags EXTERNALIZED_CODE_PRAGMA_ANALYZED
+ * Sets the number of statements of this externalizable statement
+ */
+static string get_externalized_and_analyzed_function_name(statement stat,
+							  int* stats_nb) 
+{
+  string comments;
+  string searched_string;
+  string searched_string2;
+  string comment_portion = strdup(EXTERNALIZED_CODE_PRAGMA_ANALYZED);
+  char* function_name = NULL;
+  char*  next_line;
+  instruction i = statement_instruction(stat);
+  
+  if (instruction_tag(i) == is_instruction_sequence) {
+    stat = STATEMENT(gen_nth(0,sequence_statements(instruction_sequence(i))));
+  }
+  
+  if (!statement_with_empty_comment_p(stat)) {
+    searched_string = strdup(comment_portion);
+    searched_string[strcspn(comment_portion, "%s")] = '\0';
+    comments = strdup(statement_comments(stat));
+    next_line = strtok (comments, "\n");
+    if (next_line != NULL) {
+      do {
+	string first_occurence = strstr(next_line,searched_string);
+	if (first_occurence != NULL) {
+	  function_name = malloc(256);
+	  pips_debug(5, "Scanning: [%s] with [%s]", first_occurence, comment_portion);
+	  sscanf (first_occurence, comment_portion, function_name, stats_nb);
+	  pips_debug(5, "Found function: [%s] and %d stats \n", function_name, *stats_nb);
 	}
 	next_line = strtok(NULL, "\n");
       }
@@ -120,20 +164,22 @@ static statement isolate_code_portion (statement begin_tag_statement,
     }
     if ((!statement_to_isolate) && (s == begin_tag_statement)) {
       statement_to_isolate = TRUE;
-      {
-	char* new_tag = malloc(256);
-	sprintf (new_tag, 
-		 strdup(concatenate("! ",
-				    EXTERNALIZED_CODE_PRAGMA_BEGIN,
-				    "\n",
-				    NULL)),
-		 function_name);
-	insert_comments_to_statement(s, new_tag);
-      }
     }
     
   }, seq_stats);
 
+  /* Insert an analyzed tag */
+  {
+    char* new_tag = malloc(256);
+    sprintf (new_tag, 
+	     strdup(concatenate("! ",
+				EXTERNALIZED_CODE_PRAGMA_ANALYZED,
+				"\n",
+				NULL)),
+	     function_name,
+	     nb_of_statements_to_isolate);
+    insert_comments_to_statement(begin_tag_statement, new_tag);
+  }
 
   pips_debug(5, "Found %d statement to isolate\n",
 	     nb_of_statements_to_isolate);      
@@ -203,8 +249,26 @@ static statement isolate_code_portion (statement begin_tag_statement,
 }
 
 
-/* A portion of well-formed externalizable code must be one or more
- * continuous statements defined in a sequence statement.
+/* 
+ * This function return a list of statements that were previously marked
+ * for externalization during phase PHRASE_DISTRIBUTOR_INIT
+ */
+static list identify_analyzed_statements_to_distribute (statement stat,
+							string module_name) 
+{
+  /* We identify all the statement containing an analyzed tag */
+  return get_statements_with_comments_containing(EXTERNALIZED_CODE_PRAGMA_ANALYZED,
+						 stat); 
+  
+}
+
+
+/* 
+ * This function return a list of statements that are marked for
+ * externalization.  A well-formed externalizable code must be one or more
+ * continuous statements defined in a sequence statement framed with
+ * comments containing tags EXTERNALIZED_CODE_PRAGMA_BEGIN and
+ * EXTERNALIZED_CODE_PRAGMA_END
  */
 static list identify_statements_to_distribute (statement stat,
 					       string module_name) 
@@ -214,7 +278,7 @@ static list identify_statements_to_distribute (statement stat,
   list statements_to_distribute = NIL;
   
   /* First, we need to restructure the code to avoid imbricated sequences */
-  /*simple_restructure_statement(stat); */
+  simple_restructure_statement(stat);
 
   /* We identify all the statement containing a begin tag */
   statements_containing_begin_tag 
@@ -282,34 +346,47 @@ static list identify_statements_to_distribute (statement stat,
 }
 					      
 /**
- * This function is called after identification and isolation of a portion
- * of code to externalize. Externalizaton of specified code is done here.
+ * 
  */
-static void distribute_code (statement externalized_code, 
-			     statement stat, 
+static void compute_parameters (statement externalized_code, 
+				statement module_stat, 
+				entity module,
+				string module_name) 
+{
+}
+
+/**
+ * This function is called after identification and isolation of a portion
+ * of code to externalize. Externalization of specified code is done here.
+ * Note that specified code may be only the first statement of a sequence
+ * that will automatically be externalized !!!
+ */
+static void distribute_code (statement analyzed_code, 
+			     statement module_stat, 
 			     entity module,
 			     string module_name) 
 {
-  string function_name = get_externalized_function_name(externalized_code);
+  statement externalized_code = NULL;
+  string function_name;
   entity new_module;
   statement call_statement;
-  list list_out, list_in; 
+  int stats_nb;
 
+  function_name = get_externalized_and_analyzed_function_name(analyzed_code, &stats_nb);
+  
   pips_debug(5, "Distribute code for : [%s] ...\n", function_name);
 
-  list_out = load_out_effects_list(stat);
-  
-  ifdebug(2) {
-    pips_debug(2, "OUT regions: \n");
-    print_regions(list_out);
+  if (stats_nb > 1) {
+    externalized_code = sequence_statement_containing (module_stat, analyzed_code);
   }
-  
-  list_in = load_in_effects_list(stat);
-  
-  ifdebug(2) {
-    pips_debug(2, "IN regions: \n");
-    print_regions(list_in);
+  else if (stats_nb == 1) {
+    externalized_code = analyzed_code;
   }
+  else {
+    pips_internal_error("Strange externalized code\n");
+  }
+
+  compute_parameters (externalized_code, module_stat, module, module_name);
 
   new_module 
     = create_module_with_statement (externalized_code, 
@@ -325,7 +402,7 @@ static void distribute_code (statement externalized_code,
 
   replace_in_sequence_statement_with (externalized_code,
 				      call_statement, 
-				      stat);
+				      module_stat);
   
   pips_debug(5, "Code distribution for : [%s] is DONE\n", function_name);
 }
@@ -334,17 +411,17 @@ static void distribute_code (statement externalized_code,
  * Main function for PHRASE_DISTRIBUTION: phrase distribution for main
  * module module, with root statement stat
  */
-static void distribute (statement stat, 
+static void distribute (statement module_stat, 
 			entity module,
 			string module_name) 
 {
   entity new_module1, new_module2;
   list l;
 
-  l = identify_statements_to_distribute (stat, module_name);
+  l = identify_analyzed_statements_to_distribute (module_stat, module_name);
 
   MAP (STATEMENT, s, {
-    distribute_code (s, stat, module, module_name);
+    distribute_code (s, module_stat, module, module_name);
   }, l);
 
 }
@@ -353,15 +430,15 @@ static void distribute (statement stat,
  * Main function for PHRASE_DISTRIBUTION_INIT: phrase distribution for
  * main module module, with root statement stat
  */
-static void prepare_distribute (statement stat, 
-			entity module,
-			string module_name) 
+static void prepare_distribute (statement module_stat, 
+				entity module,
+				string module_name) 
 {
   entity new_module1, new_module2;
   list l;
-
-  l = identify_statements_to_distribute (stat, module_name);
-
+  
+  l = identify_statements_to_distribute (module_stat, module_name);
+  
 }
 
 /**
@@ -453,36 +530,89 @@ bool phrase_distributor_init(string module_name)
  * Phase main for PHRASE_DISTRIBUTOR
  *********************************************************/
 
+static entity dynamic_area = entity_undefined;
+
 bool phrase_distributor(string module_name)
 {
+  statement module_stat;
   entity module;
+  list l_priv = NIL, l_in, l_out, l_write; 
+  
+  /* set and get the current properties concerning regions */
+  set_bool_property("MUST_REGIONS", TRUE);
+  set_bool_property("EXACT_REGIONS", TRUE);
+  get_regions_properties();
   
   /* get the resources */
-  statement stat = (statement) db_get_memory_resource(DBR_CODE, 
-						      module_name, 
-						      TRUE);
+  module_stat = (statement) db_get_memory_resource(DBR_CODE, 
+						   module_name, 
+						   TRUE);
   
   module = local_name_to_top_level_entity(module_name);
   
-  set_current_module_statement(stat);
+  set_current_module_statement(module_stat);
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   
+  set_cumulated_rw_effects((statement_effects)
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+  module_to_value_mappings(module);
+  
+  /* sets dynamic_area */
+  if (entity_undefined_p(dynamic_area)) {   	
+    dynamic_area = FindOrCreateEntity(module_local_name(module),
+				      DYNAMIC_AREA_LOCAL_NAME); 
+  }
+
   debug_on("PHRASE_DISTRIBUTOR_DEBUG_LEVEL");
+
+     /* Get the READ, WRITE, IN and OUT regions of the module
+      */
+    set_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+    set_in_effects((statement_effects) 
+	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
+    set_out_effects((statement_effects) 
+	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
+   
+    l_write = regions_dup
+	(regions_write_regions(load_statement_local_regions(module_stat))); 
+    l_in = regions_dup(load_statement_in_regions(module_stat));
+    l_out = regions_dup(load_statement_out_regions(module_stat));
+
+    ifdebug(2)
+    {
+	pips_debug(3, "WRITE regions: \n");
+	print_regions(l_write);
+	pips_debug(3, "IN regions: \n");
+	print_regions(l_in);
+	pips_debug(3, "OUT regions: \n");
+	print_regions(l_out);
+    }
+
+    
+    l_priv = RegionsEntitiesInfDifference(l_write, l_in, w_r_combinable_p);
+    l_priv = RegionsEntitiesInfDifference(l_priv, l_out, w_w_combinable_p);
+
+    ifdebug(2)
+    {
+	pips_debug(3, "Private regions: \n");
+	print_regions(l_priv);
+    }
 
   /* Now do the job */
 
   pips_debug(2, "BEGIN of PHRASE_DISTRIBUTOR\n");
-  distribute (stat, module, module_name);
+  distribute (module_stat, module, module_name);
   pips_debug(2, "END of PHRASE_DISTRIBUTOR\n");
 
   pips_assert("Statement is consistent after PHRASE_DISTRIBUTOR", 
-	       statement_consistent_p(stat));
+	       statement_consistent_p(module_stat));
   
   /* Reorder the module, because new statements have been added */  
-  module_reorder(stat);
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stat);
+  module_reorder(module_stat);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
   DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, 
-			 compute_callees(stat));
+			 compute_callees(module_stat));
   
   /* update/release resources */
   reset_current_module_statement();
