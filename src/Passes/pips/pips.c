@@ -166,7 +166,7 @@ pips_main(int argc, char ** argv)
     if (setjmp(pips_top_level)) {
 	/* no need to pop_pips_context() at top-level */
 	/* FI: are you sure make_close_program() cannot call user_error() ? */
-	close_workspace();
+	close_workspace(TRUE);
 	success = FALSE;
     }
     else 
@@ -238,7 +238,7 @@ pips_main(int argc, char ** argv)
 	}
 	
 	/* whether success or not... */
-	close_workspace();
+	close_workspace(TRUE);
 	/* pop_performance_spy(stderr, "pips"); */
 	/* check debug level if no exception occured */
 	debug_off();
