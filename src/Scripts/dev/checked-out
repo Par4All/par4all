@@ -1,0 +1,13 @@
+#!/bin/sh
+
+USERNAME=$1
+# echo $USERNAME
+
+if [ -z "$USERNAME" ]
+then
+	find $DEVEDIR -name 'p.*' -ls 
+	find $LINEARDIR/Development -name 'p.*' -ls
+else
+	find $DEVEDIR -name 'p.*' -ls | grep "$USERNAME"
+	find $LINEARDIR/Development -name 'p.*' -ls | grep "$USERNAME"
+fi
