@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/27 19:46:45 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/30 16:49:12 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -37,7 +37,7 @@ extern int fprintf();
  * that I should normalize the code *before* the pips analysis...
  */
 bool ref_to_dist_array_p(obj)
-chunk* obj;
+gen_chunk* obj;
 {
     list l = FindRefToDistArray(obj);
     bool b = (l!=NIL);
@@ -200,7 +200,7 @@ int the_tag;
 			   STATEMENT_NUMBER_UNDEFINED,
 			   STATEMENT_ORDERING_UNDEFINED,
 			   statement_comments(stat),     /* sharing! */
-			   make_instruction(the_tag, chunk_undefined));
+			   make_instruction(the_tag, instruction_undefined));
 
     return(newstat);
 }
@@ -261,7 +261,7 @@ syntax s;
 }
 
 list FindRefToDistArray(obj)
-chunk* obj;
+gen_chunk* obj;
 {
     list
 	result = NIL,
