@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/12/27 13:38:56 $, )
+# ($Date: 1996/12/27 13:53:26 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -176,7 +176,7 @@ PVM_HLIB =
 PVM_NLIB =
 # 
 pvminc  = /usr/include/mpp
-pvmlib	=
+pvmlib	= .
 #
 # cannot strip MPP executables?
 #
