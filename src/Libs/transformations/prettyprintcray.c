@@ -127,6 +127,11 @@ list all_enclosed_scope_variables(statement stmt)
 	  ent_l= concat_new_entities(l1, l2);
 
 	  break;
+      }  
+      case is_instruction_whileloop : {
+	whileloop lp= instruction_whileloop(instr);
+	ent_l= all_enclosed_scope_variables(whileloop_body(lp));
+	break;
       }
       case is_instruction_unstructured : {
 	  list blocs = NIL;
