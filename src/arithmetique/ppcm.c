@@ -1,4 +1,8 @@
- /* package arithmetique */
+/* package arithmetique
+ * 
+ * $RCSfile: ppcm.c,v $ (version $Revision$)
+ * $Date: 1996/07/13 13:06:55 $, 
+ */
 
 /*LINTLIBRARY*/
 
@@ -11,19 +15,18 @@
  *
  * Ancien nom et ancien type: void lcm(int i, int j, int *pk)
  */
-int ppcm(i,j)
-int	i;			/* input */
-int	j;			/* input */
+Value ppcm(Value i, Value j)
 {
-    int	d;
-	
-    if (i < 0) i = -i;
-    if (j < 0) j = -j;
+    if (VALUE_NEG_P(i)) i = -i;
+    if (VALUE_NEG_P(j)) j = -j;
 
-    if ((i == 0) || (j == 0)) return(0);
-
+    if (VALUE_ZERO_P(i) || VALUE_ZERO_P(j)) 
+	return VALUE_ZERO;
     else {
-	d = pgcd(i,j);
-	return((i/d)*j);
+	Value d = pgcd(i,j);
+	return (i/d)*j;
     }
 }
+
+/* end of $RCSfile: ppcm.c,v $
+ */
