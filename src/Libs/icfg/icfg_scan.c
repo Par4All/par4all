@@ -108,7 +108,7 @@ static bool call_filter(call c)
 			     db_get_memory_resource
 			     (DBR_PRECONDITIONS,
 			      module_local_name(e_caller),
-			      TRUE) );
+			      FALSE) );
 
 	    /* load caller preconditions */
 	    caller_prec = load_statement_semantic(current_stmt_head());
