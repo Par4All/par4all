@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/08/29 12:02:07 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/08/30 10:35:50 $, )
  * version $Revision$
  */
 
@@ -48,21 +48,17 @@ list le;
 bool written_effects_to_dist_arrays_p(expr)
 expression expr;
 {
-    list
-	l,
-	leffects_to_dist_arrays=DistArraysEffects(expr);
+    list l, leffects_to_dist_arrays = DistArraysEffects(expr);
 
-    for(l=leffects_to_dist_arrays;
-	!ENDP(l);
-	l=CDR(l))
+    for(l=leffects_to_dist_arrays; !ENDP(l); POP(l))
 	if  (action_write_p(effect_action(EFFECT(CAR(l)))))
 	{
 	    gen_free_list(leffects_to_dist_arrays);
-	    return(TRUE);
+	    return TRUE;
 	}
 
     gen_free_list(leffects_to_dist_arrays);
-    return(FALSE);
+    return FALSE;
 }
 
 /* replicated_p
@@ -108,19 +104,14 @@ int i;
 list la;
 distribution dist;
 {
-    if (style_none_p(distribution_style(dist))) return(FALSE);
+    if (style_none_p(distribution_style(dist))) return FALSE;
 
     /* select the relevent alignment if exists.
      * could be some kind of gen_find_if()...
      */
-    MAP(ALIGNMENT, a,
-    {
-	if (alignment_templatedim(a)==i)
-	    return(FALSE);
-    },
-	la);
+    MAP(ALIGNMENT, a, if (alignment_templatedim(a)==i) return FALSE, la);
 
-    return(TRUE);
+    return TRUE;
 }
 
 /* TRUE if array a is replicated on processors p i-th dimension.
@@ -198,15 +189,9 @@ statement s;
 list DistArraysEffects(expr)
 expression expr;
 {
-    list
-	le=proper_effects_of_expression(expr,is_action_read),
-	lde=NULL;
+    list le = proper_effects_of_expression(expr,is_action_read), lde = NIL;
 
-    MAP(EFFECT, e,
-    {
-	if(array_distributed_p(e)) lde=CONS(EFFECT,e,lde);
-    },
-	le);
+    MAP(EFFECT, e, if (array_distributed_p(e)) lde=CONS(EFFECT,e,lde), le);
     
     gen_free_list(le);
     return(lde);
@@ -240,8 +225,7 @@ syntax s;
 list FindRefToDistArray(obj)
 gen_chunk* obj;
 {
-    list result = NIL,
-	 saved = found_syntaxes;
+    list result = NIL, saved = found_syntaxes;
 
     found_syntaxes = NIL;
 
@@ -252,7 +236,7 @@ gen_chunk* obj;
 
     result = found_syntaxes, found_syntaxes = saved;
 
-    return(result);
+    return result;
 }
 
 /* -------------------------------------------------------------
@@ -308,12 +292,12 @@ basic base;
       (concatenate(module_local_name(module), MODULE_SEP_STRING, buffer, NULL),
        entity_domain)!=entity_undefined);
 
-    debug(9,"NewTemporaryVariable","var %s, tag %d\n", buffer, basic_tag(base));
+    pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(base));
 
     e = make_scalar_entity(buffer, module_local_name(module), base);
     AddEntityToDeclarations(e,module);
     
-    return(e);
+    return e;
 }
 
 entity FindOrCreateEntityLikeModel(package, name, model)
@@ -332,8 +316,7 @@ entity model;
 
     assert(gen_consistent_p(model));
 
-    return(!entity_undefined_p(new) ?
-	   new :
+    return(!entity_undefined_p(new) ? new :
 	   make_entity(copy_string(new_name),
 		       /*
 			* ??? some bug in copy_type disable the possibility
@@ -373,9 +356,8 @@ entity e, module;
 void AddEntityToHostAndNodeModules(e)
 entity e;
 {
-    entity
-	new_node = AddEntityToModule(e, node_module),
-	new_host = entity_undefined;
+    entity new_node = AddEntityToModule(e, node_module),
+	   new_host = entity_undefined;
 
     if (!bound_new_node_p(e))
 	store_new_node_variable(new_node, e);
@@ -406,14 +388,10 @@ entity common, module;
 void (*update)();
 string suffix;
 {
-    string
-	name = strdup(concatenate(entity_local_name(common),
-				  "_", suffix, NULL));
-    entity
-	new_common = 
-	    FindOrCreateEntityLikeModel(HPFC_PACKAGE,
-					name,
-					common);
+    string name = strdup(concatenate(entity_local_name(common),
+				     "_", suffix, NULL));
+    entity new_common = 
+	FindOrCreateEntityLikeModel(HPFC_PACKAGE, name, common);
     list 
 	lref = area_layout(type_area(entity_type(common))),
 	lold = area_layout(type_area(entity_type(new_common))),
@@ -448,11 +426,10 @@ string suffix;
 	gen_nconc(gen_nreverse(lnew), lold);
 }
 
-void AddCommonToHostAndNodeModules(common)
-entity common;
+void AddCommonToHostAndNodeModules(entity common)
 {
     AddCommonToModule(common, node_module, store_new_node_variable, NODE_NAME);
-    AddCommonToModule(common, host_module, store_new_host_variable, HOST_NAME); 
+    AddCommonToModule(common, host_module, store_new_host_variable, HOST_NAME);
 }
 
 alignment FindAlignmentOfDim(lal, dim)
@@ -461,11 +438,10 @@ int dim;
 {
     list l=lal;
 
-    while ((!ENDP(l)) &&
-	   (alignment_arraydim(ALIGNMENT(CAR(l))) != dim))
-	l = CDR(l);
+    while ((!ENDP(l)) && (alignment_arraydim(ALIGNMENT(CAR(l))) != dim))
+	POP(l);
 
-    return ((l==NULL)?(alignment_undefined):(ALIGNMENT(CAR(l))));
+    return (l==NIL) ? alignment_undefined : ALIGNMENT(CAR(l));
 }
 
 alignment FindAlignmentOfTemplateDim(lal, dim)
@@ -474,9 +450,8 @@ int dim;
 {
     list l=lal;
 
-    while ((!ENDP(l)) &&
-	   (alignment_templatedim(ALIGNMENT(CAR(l))) != dim))
-	l = CDR(l);
+    while ((!ENDP(l)) && (alignment_templatedim(ALIGNMENT(CAR(l))) != dim))
+	POP(l);
 
     return ((l==NULL)?(alignment_undefined):(ALIGNMENT(CAR(l))));
 }
@@ -485,11 +460,8 @@ distribution FindDistributionOfDim(ldi, dim, pdim)
 list ldi;
 int dim, *pdim;
 {
-    list 
-	l = ldi;
-    int 
-	i,
-	procdim = 1;
+    list l = ldi;
+    int i, procdim = 1;
 
     assert(dim>=1 && dim<=gen_length(ldi));
 
@@ -497,7 +469,7 @@ int dim, *pdim;
     {
 	if (!style_none_p(distribution_style(DISTRIBUTION(CAR(l)))))
 	    procdim++;
-	l=CDR(l);
+	POP(l);
     }
 
     (*pdim) = procdim;
@@ -508,9 +480,7 @@ distribution FindDistributionOfProcessorDim(ldi, dim, tdim)
 list ldi;
 int dim, *tdim;
 {
-    int 
-	i = 1,
-	procdim = 0;
+    int i = 1, procdim = 0;
     
     MAP(DISTRIBUTION, d,
     {
@@ -541,31 +511,25 @@ int template_dimension_of_array_dimension(array, dim)
 entity array;
 int dim;
 {
-    align
-	a = load_entity_align(array);
-    alignment
-	al = FindAlignmentOfDim(align_alignment(a), dim);
+    align a = load_entity_align(array);
+    alignment al = FindAlignmentOfDim(align_alignment(a), dim);
     
-    return((al==alignment_undefined)?
-	   (-1):
-	   (alignment_templatedim(al)));
+    return (al==alignment_undefined) ? -1 : alignment_templatedim(al);
 }
 
 int DistributionParameterOfArrayDim(array, dim, pprocdim)
 entity array;
 int dim, *pprocdim;
 {
-    entity
-	template = array_to_template(array);
-    distribute
-	d = load_entity_distribute(template);
+    entity template = array_to_template(array);
+    distribute d = load_entity_distribute(template);
     distribution
 	di = FindDistributionOfDim
 	    (distribute_distribution(d),
 	     alignment_templatedim(FindArrayDimAlignmentOfArray(array, dim)),
 	     pprocdim);
     
-    return(HpfcExpressionToInt(distribution_parameter(di)));
+    return HpfcExpressionToInt(distribution_parameter(di));
 }
 
 /* int processor_number(template, tdim, tcell, pprocdim)
@@ -576,23 +540,17 @@ int processor_number(template, tdim, tcell, pprocdim)
 entity template;
 int tdim, tcell, *pprocdim; /* template dimension, template cell */
 {
-    distribute
-	d = load_entity_distribute(template);
-    list
-	ld = distribute_distribution(d);
-    entity
-	procs = distribute_processors(d);
-    distribution
-	di = FindDistributionOfDim(ld, tdim, pprocdim);
-    style
-	st = distribution_style(di);
-    int
-	n, tmin, pmin, psiz;
+    distribute d = load_entity_distribute(template);
+    list ld = distribute_distribution(d);
+    entity procs = distribute_processors(d);
+    distribution di = FindDistributionOfDim(ld, tdim, pprocdim);
+    style st = distribution_style(di);
+    int	n, tmin, pmin, psiz;
 
     if (style_none_p(st))
     {
 	*pprocdim = -1;
-	return(-1);
+	return -1;
     }
 
     tmin = HpfcExpressionToInt(dimension_lower(FindIthDimension(template, tdim)));
@@ -601,13 +559,13 @@ int tdim, tcell, *pprocdim; /* template dimension, template cell */
     n    = HpfcExpressionToInt(distribution_parameter(di));
 
     if (style_block_p(st))
-	return(((tcell-tmin)/n)+pmin);
+	return ((tcell-tmin)/n)+pmin;
 
     if (style_cyclic_p(st))
-	return((((tcell-tmin)/n)%psiz)+pmin);
+	return (((tcell-tmin)/n)%psiz)+pmin;
 
     *pprocdim = -1; /* just to avoid a gcc warning */
-    return(-1); 
+    return -1; 
 }    
 
 
@@ -620,19 +578,14 @@ int template_cell_local_mapping(array, dim, tc)
 entity array;
 int dim, tc;
 {
-    alignment
-	a = FindArrayDimAlignmentOfArray(array, dim);
-    int
-	p,
-	tmin,
-	n = DistributionParameterOfArrayDim(array, dim, &p);
-    dimension
-	d = FindIthDimension(array_to_template(array), 
-			     alignment_templatedim(a));
+    alignment a = FindArrayDimAlignmentOfArray(array, dim);
+    int	p, tmin, n = DistributionParameterOfArrayDim(array, dim, &p);
+    dimension d = FindIthDimension(array_to_template(array), 
+				   alignment_templatedim(a));
 
     tmin = HpfcExpressionToInt(dimension_lower(d));
 
-    return((tc-tmin)%n+1);
+    return (tc-tmin)%n+1;
 }
 	
 /* int global_array_cell_to_local_array_cell(array, dim, acell)
@@ -643,17 +596,15 @@ int global_array_cell_to_local_array_cell(array, dim, acell)
 entity array;
 int dim, acell;
 {
-    alignment
-	a = FindArrayDimAlignmentOfArray(array, dim);
-    int
-	rate, constant;
+    alignment a = FindArrayDimAlignmentOfArray(array, dim);
+    int rate, constant;
 
     assert(a!=alignment_undefined);
 
     rate     = HpfcExpressionToInt(alignment_rate(a));
     constant = HpfcExpressionToInt(alignment_constant(a));
 
-    return(template_cell_local_mapping(array, dim, rate*acell+constant));	
+    return template_cell_local_mapping(array, dim, rate*acell+constant);
 }
 
 /* HpfcExpressionToInt(e)
@@ -663,35 +614,30 @@ int dim, acell;
 int HpfcExpressionToInt(e)
 expression e;
 {
-    normalized
-	n = expression_normalized(e);
+    normalized n = expression_normalized(e);
 
     ifdebug(8) print_expression(e);
 
     if ((n!=normalized_undefined) && (normalized_linear_p(n)))
     {
-	Pvecteur
-	    v = normalized_linear(n);
-	int
-	    s = vect_size(v),
-	    val = (int) vect_coeff(TCST, v);
+	Pvecteur v = normalized_linear(n);
+	int s = vect_size(v), val = (int) vect_coeff(TCST, v);
 	
-	if (s==0) return(0);
-	if ((s==1) && (val!=0)) return(val);
+	if (s==0) return 0;
+	if ((s==1) && (val!=0)) return val;
     }
     
     if (expression_integer_constant_p(e))
-	return(ExpressionToInt(e));
+	return ExpressionToInt(e);
     else
 	pips_error("HpfcExpressionToInt", "can't return anything, sorry\n");
 
-    return(-1); /* just to avoid a gcc warning */
+    return -1; /* just to avoid a gcc warning */
 }
 
 /* -------------------------------------------------------
  *
- * a nicer interface to extract the needed informations:-)
- * FC 29/03/94
+ * a nicer interface to extract the needed information. FC 29/03/94
  *
  */
 
@@ -699,10 +645,8 @@ void get_alignment(array, dim, ptdim, pa, pb)
 entity array;
 int dim, *ptdim, *pa, *pb;
 { 
-    align
-	al = load_entity_align(array);
-    alignment
-	a = alignment_undefined;
+    align al = load_entity_align(array);
+    alignment a;
     
     assert(array_distributed_p(array));
     
@@ -747,6 +691,101 @@ int dim, *plow, *pup;
     d = entity_ith_dimension(e, dim),
     *plow = ExpressionToInt(dimension_lower(d)),
     *pup = ExpressionToInt(dimension_upper(d));
+}
+
+/* bool alignments_compatible_p(entity e1, int dim1,
+ *                             entity e2, int dim2)
+ *
+ * what: whether e1 and e2 dimensions dim1 and dim2 are aligned.
+ * how: basic low level comparison
+ * input: entities and dimension numbers
+ * output: the boolean result
+ * side effects:
+ *  - uses alignment internal descriptions
+ * bugs or features:
+ *  - ??? should be relative to a reference, instead of assuming mere indexes
+ */
+
+bool 
+alignments_compatible_p(entity e1, int dim1,
+		       entity e2, int dim2)
+{
+    int tdim1, rate1, shift1, tdim2, rate2, shift2;
+
+    get_alignment(e1, dim1, &tdim1, &rate1, &shift1);
+    get_alignment(e2, dim2, &tdim2, &rate2, &shift2);
+
+    if (tdim1!=tdim2) return FALSE;
+    if (!tdim1 && !tdim2) return TRUE;
+    
+    return rate1==rate2 && shift1==shift2;
+}
+
+/* bool references_aligned_p(reference r1, reference r2)
+ *
+ * what: tells whether the references are aligned or not
+ * how: quite basic and low level
+ * input: both references
+ * output: the returned boolean
+ * side effects:
+ *  - uses alignment internal descriptions
+ * bugs or features:
+ *  - assumes that both references are in the same store.
+ *  - ??? indices must be simple references to indexes.
+ */
+/* returns 0 if not found */
+static int 
+expression_number_for_index(entity index, list /* of expression */ le)
+{
+    int dim=1;
+
+    MAP(EXPRESSION, e,
+    {
+	if (expression_reference_p(e) && 
+	    reference_variable(syntax_reference(expression_syntax(e)))==index)
+	    return dim;
+	dim++;
+    },
+	le);
+
+    return 0;
+}
+
+bool 
+references_aligned_p(reference r1, reference r2)
+{
+    entity e1 = reference_variable(r1),
+           e2 = reference_variable(r2);
+    list /* of expression */ le1 = reference_indices(r1),
+                             le2 = reference_indices(r2);
+    align a1 = load_entity_align(e1), 
+          a2 = load_entity_align(e2);
+    int dim1 = 1, dim2;
+    entity index;
+
+    /* both references must be aligned to the same template
+     * and be of the same arity.
+     */
+    if (align_template(a1)!=align_template(a2) ||
+	gen_length(le1)==gen_length(le2))
+	return FALSE;
+    
+    MAP(EXPRESSION, ind, 
+    {
+	if (!expression_reference_p(ind))
+	    return FALSE;
+
+	index = reference_variable(syntax_reference(expression_syntax(ind)));
+	dim2 = expression_number_for_index(index, le2);
+
+	if (!alignments_compatible_p(e1, dim1, e2, dim2))
+	    return FALSE;
+	
+	dim1++;
+    },
+	le1);
+
+    return TRUE;
 }
 
 /*   that is all
