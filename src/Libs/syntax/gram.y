@@ -327,7 +327,14 @@ entry_inst: TK_ENTRY entity_name opt_lformalparameter
 	      /* In case the entry is a FUNCTION, you want to recover its type.
 	       * You cannot use entity_functional_name as second rule element.
 	       */
-                 $$ = MakeEntry($2, $3);
+		if(get_bool_property("PARSER_SUBSTITUTE_ENTRIES")) {
+		    $$ = MakeEntry($2, $3);
+		}
+		else {
+		    ParserError("Syntax", "ENTRY are not directly processed. "
+				"Set property PARSER_SUBSTITUTE_ENTRIES to allow "
+				"entry substitutions");
+		}
             }
 	;
 
@@ -796,9 +803,15 @@ assignment_inst: TK_ASSIGN icon TK_TO atom
 	    }
 	| atom TK_EQUALS expression
 	    {
+		syntax s = $1;
+		syntax new_s = syntax_undefined;
+
 	        if(expression_implied_do_p($3))
 		  ParserError("Syntax", "Unexpected implied DO\n");
-		$$ = MakeAssignInst($1, $3);
+
+		new_s = CheckLeftHandSide(s);
+
+		$$ = MakeAssignInst(new_s, $3);
 	    }
 	;
 
@@ -1174,7 +1187,7 @@ parametre: entity_name TK_EQUALS expression
 entity_name: name
 	    {
                 /* malloc_verify(); */
-		$$ = FindOrCreateEntity(CurrentPackage, $1);
+		$$ = SafeFindOrCreateEntity(CurrentPackage, $1);
 		free($1);
 	    }
 	;
@@ -1602,13 +1615,13 @@ iobuf_keyword: TK_BUFFERIN
         ;
 
 psf_keyword: TK_PROGRAM 
-	    { $$ = TK_PROGRAM; }
+	    { $$ = TK_PROGRAM; init_ghost_variable_entities(); }
 	| TK_SUBROUTINE 
-	    { $$ = TK_SUBROUTINE; }
+	    { $$ = TK_SUBROUTINE; init_ghost_variable_entities(); }
 	| TK_FUNCTION
-	    { $$ = TK_FUNCTION; }
+	    { $$ = TK_FUNCTION; init_ghost_variable_entities(); }
 	| TK_BLOCKDATA
-	    { $$ = TK_BLOCKDATA; }
+	    { $$ = TK_BLOCKDATA; init_ghost_variable_entities(); }
 	;
 
 opt_virgule:
