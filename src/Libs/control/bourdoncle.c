@@ -25,6 +25,11 @@
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.10  2003/07/16 15:39:54  irigoin
+ New debugging statements to locate a bug revealed by unstruc12.f and
+ unstruc12b.f. The bug turned out to be in gen_position(), a newgen
+ function from list.c
+
  Revision 1.9  2003/07/11 09:45:05  irigoin
  bourdoncle_free() added, some presentation imrpovements
 
@@ -1212,7 +1217,7 @@ static void update_successors_of_predecessor(control pred, control new_c, contro
     bool insert_p = FALSE; /* A meaningless control node must be inserted? */
     
     if((r=gen_position(old_c, control_successors(pred)))==0) {
-      pips_internal_error("old_c %p must be a  successor of pred %p\n", old_c, pred);
+      pips_internal_error("old_c %p must be a successor of pred %p\n", old_c, pred);
     }
     else if(r%2==1) {
       /* TRUE successor */
@@ -1359,7 +1364,13 @@ static void update_successor_in_copy(control new_pred,
 	      control_statement(c) ==control_statement(new_c));
   
   if(control_test_p(pred)) {
-    bool is_true_succ = gen_position(c, control_successors(pred))%2;
+    int pos = gen_position(c, control_successors(pred));
+    bool is_true_succ = pos%2;
+
+    pips_assert("The position is not zero since c is among the sucessors of pred"
+		" (see previous assert)", pos!=0);
+
+    pips_debug(4, "position=%d, is_true_succ=%d \n", pos, is_true_succ);
     pips_assert("pred is a test, new_pred is a test too", control_test_p(new_pred));
     pips_assert("pred is still a predecessor of new_c",
 		gen_in_list_p(pred, control_predecessors(new_c)));
@@ -1872,7 +1883,8 @@ list bourdoncle_partition(unstructured u,
 
     /* We also need the final embedding graph... which might be lost? Or
        hanging from the first node in partition, the entry point, and hence from new_u. */
-    pips_debug(2, "Final embedding graph:\n");
+    pips_debug(2, "Final embedding graph %p:\n", new_u);
+      print_unstructured(new_u);
     davinci_print_non_deterministic_unstructured(new_u, "Final embedding graph", scc_map, ancestor_map);
 
     pips_debug(2, "End. \n");
@@ -2025,7 +2037,7 @@ static void update_partition(control root,
       pips_debug(2, "No renaming\n");
     }
     else{
-      pips_debug(2, "After renaming, new partition:\n");
+      pips_debug(2, "After %d renamings, new partition:\n", changes);
       print_control_nodes(partition);
     }
   }
