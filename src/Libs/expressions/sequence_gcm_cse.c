@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.7  1999/05/25 13:14:50  zory
+   fixes for new atomize_as_required.
+
    Revision 1.6  1999/05/12 14:46:15  zory
    basic_of_expression replace by please_give_me_a_basic_for_an_expression
 
@@ -504,14 +507,13 @@ DEFINE_LOCAL_STACK(current_statement, statement)
 static int depth = 0;
 
 /* 
-   A shortcut to create variables for current module. 
+   A shortcut to create variables for current module.
+   The basic is consummed. It must be a fresh one.
 */
 entity 
-new_variable(
-    entity module,
-    tag t)
+new_variable(entity module, basic b)
 {
-    return make_new_scalar_variable(module, MakeBasic(t));
+    return make_new_scalar_variable(module, b);
 }
 
 /* 
@@ -1086,6 +1088,10 @@ atomization_with_levels (statement s)
 
 /*********************************************** CLASSIC ATOMIZATION **********/
 
+
+/*
+  decide wether to atomize expression or not ! 
+*/
 static bool 
 simple_expression_decision(e)
 expression e;
