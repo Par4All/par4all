@@ -1,5 +1,5 @@
 /* $RCSfile: prettyprint.c,v $ (version $Revision$)
- * $Date: 1996/06/18 11:45:40 $, 
+ * $Date: 1996/06/22 10:32:10 $, 
  *
  * (pretty)print of reductions.
  *
@@ -69,6 +69,14 @@ string reduction_operator_tag_name(tag t)
 string reduction_operator_name(reduction_operator o)
 {
     return strdup(reduction_operator_tag_name(reduction_operator_tag(o)));
+}
+
+/* returns a name of the reduction
+ */
+string reduction_name(reduction r)
+{
+    return 
+	reduction_operator_tag_name(reduction_operator_tag(reduction_op(r)));
 }
 
 /* allocates and returns a list of strings for reduction r
