@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/12 21:35:45 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/10/17 08:49:27 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -14,6 +14,7 @@
 #     that is IF () & DO with a directive comment would not work.
 # Ctr-L and C-G are used as intermediate characters, that should 
 # not appear in the program, otherwise troubles...
+# some default value is assigned to number of processors...
 #
 # (c) Fabien Coelho 02/95.
 #
@@ -35,6 +36,7 @@
 # _k: block 
 # _n: new
 # _p: processors
+# _r: number_of_processors()
 # _s: *
 # _t: template
 # _u: pure
@@ -69,6 +71,10 @@ SED=${HPFC_SED:-sed}
 TR=${HPFC_TR:-tr}
 RM=rm
 BASENAME=basename
+
+# number of processors...
+
+NOP=${1:-${HPFC_NUMBER_OF_PROCESSORS:-8}}
 
 #
 # temporary files prefix
@@ -119,6 +125,7 @@ $SED '/^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1k\2,g
       /^chpf\$/s,\([ 	\,(]\)cyclic\([ 	\,()]\),\1c\2,g
       /^chpf\$/s,c\([\,)]\),c(1)\1,g
       /^chpf\$/s,\*\([\,)]\),s()\1,g
+      s,number_of_processors(),r,g
       s,^chpf\$ synchro,      1,
       s,^chpf\$ timeon,      2,
       s,^chpf\$ timeoff,      3,
@@ -139,15 +146,17 @@ $SED '/^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1k\2,g
       s,^      i\,,      i()\,,
       s,^      i(\([^)]*\))[ 	]*\,[ 	]*new[ 	]*(\([^)]*\)),      i(\1)      n(\2),
       s,\([12345abdeintpyou]\),call hpfc\1,g
-      s,\([cks]\),hpfc\1,g' |
+      s,\([ckrs]\),hpfc\1,g' |
 #
 # handles multi lines breaking (independent with new...)
 #
-$TR '' '\012' |
+$TR '' '\012' | 
 #
-# separates static directives from others
+# number_of_processors substitution.
+# separates static directives from others.
 #
-$SED "/^      call hpfc[adptuy45]/w $TMP.1
+$SED "s,hpfcr,$NOP,g;
+      /^      call hpfc[adptuy45]/w $TMP.1
       /^      call hpfc[adptuy45]/d" > $TMP.0
 
 #
