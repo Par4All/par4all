@@ -41,7 +41,7 @@ extern FILE * yyin;
 
 /* set to 10000 by BC - necessary in PIPS for DYNA */
 /* Should be a compilation option ? */
-#define YYMAXDEPTH 100000
+/* #define YYMAXDEPTH 100000 */
 
 /* User selectable options. */
 
