@@ -94,10 +94,8 @@ text my_get_any_effects_text(string module_name)
   /* summary regions first */
   MERGE_TEXTS(txt, text_summary_any_effect_type(module));
     
-  if (give_code_p)
-    /* then code with effects, using text_statement_any_effect_type */
-    MERGE_TEXTS(txt, text_module(module,
-				 is_user_view_p? user_stat : module_stat));
+  /* then code with effects, using text_statement_any_effect_type */
+  MERGE_TEXTS(txt, text_module(module,  module_stat));
 
   close_prettyprint();
   
