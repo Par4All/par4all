@@ -28,9 +28,6 @@ LIB_CFILES =	replace.c \
 		forward_substitution.c \
 		optimize.c \
 		sequence_gcm_cse.c \
-                faire_jolie_expression.c \
-                verifier_instruction_GOTO.c \
-                normaliser_declaration_table.c \
 	        transformation_test.c
 
 #		optimize_misc.c
