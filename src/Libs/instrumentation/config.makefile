@@ -2,6 +2,13 @@
 # $Id$
 #
 # $Log: config.makefile,v $
+# Revision 1.8  2001/05/25 09:49:44  nguyen
+# Add new phases : alias_propagation and alias_check
+# Move to transformation : partial_redundancy_elimination,
+# array_resizing_top_down and array_resizing_instrumentation
+# Rename : array_bound_check_top_down, array_bound_check_bottom_up and
+# array_bound_check_interprocedural
+#
 # Revision 1.7  2001/01/04 09:48:36  nguyen
 # Add new phase : adn_instrumentation
 #
@@ -27,14 +34,27 @@
 #
 
 LIB_CFILES 	= \
-	bottom_up_array_bound_check.c \
-	top_down_array_bound_check.c \
+	array_bound_check_bottom_up.c \
+	array_bound_check_top_down.c \
 	array_bound_check_instrumentation.c \
-	partial_redundancy_elimination.c \
-	interprocedural_array_bound_check.c \
-	top_down_array_declaration_normalization.c \
-	adn_instrumentation.c
+	array_bound_check_interprocedural.c \
+	alias_propagation.c \
+	alias_check.c
 
 LIB_HEADERS	= instrumentation-local.h
 
 LIB_OBJECTS	= $(LIB_CFILES:%.c=%.o)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
