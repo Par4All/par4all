@@ -47,8 +47,6 @@ typedef dg_vertex_label vertex_label;
 #include "phrase_distribution.h"
 
 static boolean internal_compute_distribution_context (statement externalized_code,
-						      statement module_stat,
-						      entity module,
 						      hash_table* ht_params,
 						      hash_table* ht_private,
 						      hash_table* ht_in_regions,
@@ -102,6 +100,9 @@ boolean compute_distribution_context (list l_stats,
 {
   boolean returned_value = TRUE;
 
+  pips_debug(5, "[BEGIN] compute_distribution_context for %s: \n",
+	     entity_local_name(module));
+
   *ht_stats = hash_table_make (hash_pointer, 0); /* lazy init */
   *ht_params = hash_table_make (hash_pointer, 0); /* lazy init */
   *ht_private = hash_table_make (hash_pointer, 0); /* lazy init */
@@ -137,8 +138,6 @@ boolean compute_distribution_context (list l_stats,
 		   function_name);
 
     if (!internal_compute_distribution_context (externalized_code,
-						module_stat,
-						module,
 						ht_params,
 						ht_private,
 						ht_in_regions,
@@ -147,6 +146,9 @@ boolean compute_distribution_context (list l_stats,
       returned_value = FALSE;
     }
   }, l_stats);
+
+  pips_debug(5, "[END] compute_distribution_context for %s: \n",
+	     entity_local_name(module));
 
   return returned_value;
 }
@@ -203,11 +205,18 @@ boolean compute_distribution_controlization_context (list l_calls,
   string function_name;
   entity externalized_function;
 
+  pips_debug(5, "[BEGIN] compute_distribution_controlization_context for %s: \n",
+	     entity_local_name(module));
+  ifdebug(9) {
+    print_statement(module_stat);
+  }
+
   *ht_calls = hash_table_make (hash_pointer, 0); /* lazy init */
   *ht_params = hash_table_make (hash_pointer, 0); /* lazy init */
   *ht_private = hash_table_make (hash_pointer, 0); /* lazy init */
   *ht_in_regions = hash_table_make (hash_pointer, 0); /* lazy init */
   *ht_out_regions = hash_table_make (hash_pointer, 0); /* lazy init */
+
 
   MAP (STATEMENT, s, {
 
@@ -226,8 +235,6 @@ boolean compute_distribution_controlization_context (list l_calls,
       pips_debug(2, "Register statement for NEW function %s\n", function_name);
       hash_put(*ht_calls,externalized_function,CONS(STATEMENT, s, NIL));
       if (!internal_compute_distribution_context (s,
-						  module_stat,
-						  module,
 						  ht_params,
 						  ht_private,
 						  ht_in_regions,
@@ -250,6 +257,9 @@ boolean compute_distribution_controlization_context (list l_calls,
 		   function_name);
 
   }, l_calls);
+
+  pips_debug(5, "[END] compute_distribution_controlization_context for %s: \n",
+	     entity_local_name(module));
 
   return returned_value;
 }
@@ -313,8 +323,6 @@ list compute_regions_union (list l_in, list l_out)
  * externalized_code
  */
 static boolean internal_compute_distribution_context (statement externalized_code,
-						      statement module_stat,
-						      entity module,
 						      hash_table* ht_params,
 						      hash_table* ht_private,
 						      hash_table* ht_in_regions,
