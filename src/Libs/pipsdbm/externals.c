@@ -165,7 +165,7 @@ pipsdbm_free_statement_mapping(statement_mapping h)
  */
 
 #define STATEMENT_FUNCTION_MAP(k, v, code, _map_hash_h)			\
-    { hash_entry_pointer _map_hash_p = NULL;				\
+    { void * _map_hash_p = NULL;				        \
       void * _map_k; void * _map_v;					\
       while ((_map_hash_p =						\
 	   hash_table_scan(_map_hash_h,_map_hash_p,&_map_k,&_map_v))) {	\
