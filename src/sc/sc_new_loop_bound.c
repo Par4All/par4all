@@ -97,14 +97,25 @@ Pbase vars;
  *
  * (c) FC 16/05/94
  */
+/* Whether to remove all redundant constraints, or to keep some when in outer 
+ * loops. Done the former way in OMEGA, IRISA. It is generally more efficient.
+ */
+static boolean row_echelon_redundancy = FALSE ;
+void 
+sc_set_row_echelon_redundancy(boolean b)
+{
+    row_echelon_redundancy = b;
+}
 
 /* each variable should be at least within one <= and one >=;
  * scn IS NOT modified.
  */
-void algorithm_row_echelon(scn, base_index, pcondition, penumeration)
-Psysteme scn;
-Pbase base_index;
-Psysteme *pcondition, *penumeration;
+void 
+algorithm_row_echelon(
+    Psysteme scn,           /* initial system, which is not touched */
+    Pbase base_index,       /* enumeration variables, from outer to inner */
+    Psysteme *pcondition,   /* returned condition (what remains from scn) */
+    Psysteme *penumeration) /* returned enumeration system */
 {
     int i, dimension = vect_size(base_index);
     Psysteme ps_interm, ps_project, ps_tmp;
@@ -164,12 +175,25 @@ Psysteme *pcondition, *penumeration;
 
     ps_interm = sc_make(NULL, ineq);
 
-    /*
-    fprintf(stderr, "intermediate redundant system:\n");
-    sc_fprint(stderr, ps_interm, *variable_default_name);
-    */
-    /*  include the original system again, to recover simple
-     *  constraints that may have been removed. May not be interesting...
+    /* returns a a la Omega system, with no innerward redundancy.
+     * in fact this is just a quick approximation of that property.
+     * the way the system is computed may keep some outerward redundancy,
+     * because a constraint may be redundant with some not yet computed
+     * projection...
+     */
+    if (row_echelon_redundancy)
+    {
+	*pcondition = get_other_constraints(&ps_interm, base_index);
+	sc_transform_ineg_in_eg(*pcondition); 
+	*penumeration = ps_interm;
+
+	return;
+    }
+
+    /* ELSE remove redundancy in the system...
+     *
+     * include the original system again, to recover simple
+     * constraints that may have been removed. May not be interesting...
      */
     ps_tmp =  sc_dup(scn);
     sc_transform_eg_in_ineg(ps_tmp);
