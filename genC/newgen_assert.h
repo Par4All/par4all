@@ -2,7 +2,7 @@
  * the message generates the function name if possible.
  * message_assert prints a message before aborting
  *
- * $RCSfile: newgen_assert.h,v $ ($Date: 1994/12/28 14:56:52 $, )
+ * $RCSfile: newgen_assert.h,v $ ($Date: 1994/12/30 13:58:43 $, )
  * version $Revision$
  * got on %D%, %T%
  */
