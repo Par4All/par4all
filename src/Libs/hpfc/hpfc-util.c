@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: hpfc-util.c,v $
+ * Revision 1.59  2003/06/19 07:39:26  nguyen
+ * Update calls to make_statement and make_variable with new RI for C
+ *
  * Revision 1.58  1998/12/26 21:19:35  irigoin
  * error_handler added
  *
@@ -223,7 +226,7 @@ int the_tag;
 			   STATEMENT_NUMBER_UNDEFINED,
 			   STATEMENT_ORDERING_UNDEFINED,
 			   string_undefined_p(c)? c: strdup(c),
-			   make_instruction(the_tag, x));
+			   make_instruction(the_tag, x),NIL,NULL);
     fix_sequence_statement_attributes_if_sequence(new_s);
     return new_s;
 }
