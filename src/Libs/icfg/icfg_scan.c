@@ -296,7 +296,7 @@ text my_get_any_effects_text(string module_name)
     init_prettyprint(text_statement_any_effect_type);
 
     /* summary regions first */
-    /*MERGE_TEXTS(txt, text_summary_any_effect_type(module));*/
+    MERGE_TEXTS(txt, text_summary_any_effect_type(module));
 
     /* then code with effects, using text_statement_any_effect_type */
     MERGE_TEXTS(txt, my_text_named_module(module, module_stat));
