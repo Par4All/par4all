@@ -52,16 +52,8 @@ basic base;
 
     pips_debug(8, "name %s\n", full_name);
 
-    if ((e=gen_find_tabulated(full_name, entity_domain))!=entity_undefined)
-    {
-	/* it may happen that it is already defined.
-	 * let's say it's ok. (It is for hpfc. FC)
-	 * should check that the type and so are ok...
-	 * otherwise should be checked beforehand...
-	 */
-	free(full_name);
-	return e;
-    }
+    message_assert("not already defined", 
+	   gen_find_tabulated(full_name, entity_domain)==entity_undefined);
 
     e = make_entity(full_name, type_undefined, 
 		    storage_undefined, value_undefined);
@@ -178,8 +170,7 @@ make_new_scalar_variable(entity module,
 }
 
 
-/*
- * looks for an entity which should be a scalar of the specified
+/* looks for an entity which should be a scalar of the specified
  * basic. If found, returns it, else one is created.
  */
 entity find_or_create_scalar_entity(name, module_name, base)
