@@ -180,11 +180,11 @@ char * (*variable_name)();
 	contrainte_fprint(fp,ineg,TRUE,variable_name);
 }
 
-static int
+static void
 sprint_operator(char *s, boolean is_inegalite, boolean a_la_fortran)
 {
-    return sprintf(s, "%s",(is_inegalite? (a_la_fortran? ".LE.": "<="):
-		                  (a_la_fortran? ".EQ.": "==")));
+    (void) sprintf(s, "%s",(is_inegalite? (a_la_fortran? ".LE.": "<="):
+			    (a_la_fortran? ".EQ.": "==")));
 }
 
 static char * heuristique_1(s, v, is_inegalite, variable_name, a_la_fortran)
