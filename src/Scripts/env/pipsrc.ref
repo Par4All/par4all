@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.123  1997/05/24 09:54:13  coelho
+# *** empty log message ***
+#
 # Revision 1.122  1997/05/23 14:58:53  coelho
 # *** empty log message ***
 #
@@ -132,6 +135,10 @@ PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
 # preprocessor to use:
 # default: PIPS_CPP="cpp"
 #
+
+test ${uname_s} = Linux && \
+	PIPS_CPP='gcc -E'
+
 # Additional options to pass to cpp for .F files:
 # default: PIPS_CPP_FLAGS=""
 
