@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.304  1997/08/18 12:31:07  coelho
+# end of fixes for ftest, I hope;-)
+#
 # Revision 1.303  1997/08/18 10:45:45  coelho
 # ...
 #
@@ -591,7 +594,7 @@ wtest: all
 	#
 	\$(LINK) \$(ARCH)/wpips \$(WPIPS_ADDED_LDFLAGS) \\
 	    \$(ROOT)/Lib/\$(ARCH)/\$(WPIPS_MAIN) \\
-		-lwpips \$(PIPS_LIBS) \$(WPIPS_ADDED_LIBS)
+	    -lwpips \$(PIPS_LIBS) \$(WPIPS_ADDED_LIBS)
 	@echo 
 
 ftest: all
@@ -600,12 +603,12 @@ ftest: all
 	#
 	\$(LINK) \$(ARCH)/fpips \$(WPIPS_ADDED_LDFLAGS) \\
 	    \$(ROOT)/Lib/\$(ARCH)/\$(FPIPS_MAIN) \\
-	    -lfpips -lpips -ltpips -lwpips \$(PIPS_LIBS) \\
-	    \$(TPIPS_ADDED_LIBS) \$(WPIPS_ADDED_LIBS)
+	    -lfpips -lpips -ltpips -lwpips \\
+	    \$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS) \$(WPIPS_ADDED_LIBS)
 	#
 	# creating links
 	#
-	\$(RM) \$(ARCH)/pips \$(ARCH)/tpips \$(ARCH)/wpips 
+	\$(RM) \$(ARCH)/pips \$(ARCH)/[tw]pips
 	ln \$(ARCH)/fpips \$(ARCH)/pips 
 	ln \$(ARCH)/fpips \$(ARCH)/tpips 
 	ln \$(ARCH)/fpips \$(ARCH)/wpips 
