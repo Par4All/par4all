@@ -5,6 +5,9 @@
  * preprocessed.
  *
  * $Log: csplit_file.c,v $
+ * Revision 1.8  2003/08/14 09:32:13  irigoin
+ * COMPILATION_UNIT_PREFIX eliminated
+ *
  * Revision 1.7  2003/08/14 08:47:38  irigoin
  * Compatibility with LINUX for strdup() declaration
  *
@@ -40,7 +43,7 @@ extern char * strdup(const char *);
 
 #include "misc.h"
 
-/* To import FILE_SEP_STRING... and COMPILATION_UNIT_PREFIX... */
+/* To import FILE_SEP_STRING... */
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
@@ -80,7 +83,7 @@ current_input_line = 0;
 }
 
 static string current_compilation_unit_file_name = string_undefined;
-static string current_compilation_unit_name = string_undefined; /* includes FILE_SEP_STRING as a suffix and COMPILATION_UNIT_PREFIX as a prefix. */
+static string current_compilation_unit_name = string_undefined; /* includes FILE_SEP_STRING as a suffix. */
 static FILE * compilation_unit_file = NULL; /* Compilation unit*/
 
 static FILE * module_list_file = NULL;
@@ -114,7 +117,7 @@ void csplit_open_compilation_unit(string input_file_name)
 
   /* Step 1: Define the compilation unit name from the input file name. */
   unambiguous_file_name = strdup(concatenate(current_workspace_name,
-					     "/", COMPILATION_UNIT_PREFIX,
+					     "/",
 					     simpler_file_name,
 					     FILE_SEP_STRING,
 					     ".c",
@@ -135,7 +138,7 @@ void csplit_open_compilation_unit(string input_file_name)
 
   current_compilation_unit_file_name = unambiguous_file_name;
   current_compilation_unit_name
-    = strdup(concatenate(COMPILATION_UNIT_PREFIX, simpler_file_name, FILE_SEP_STRING, NULL));
+    = strdup(concatenate(simpler_file_name, FILE_SEP_STRING, NULL));
 
   /* Keep track of the new compilation unit as a "module" stored in a file */
 
