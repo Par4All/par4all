@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/06/10 19:17:02 $, 
+# $Date: 1996/08/22 14:32:03 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -150,7 +150,7 @@ FAKES="`egrep '^[Cc!\*][Ff][Cc][Dd]\\\$ [ 	]*([Ss][Yy][Nn][Cc][Hh][Rr][Oo]|[Tt][
 if [ "$FAKES" ] 
 then
    $DEBUG "adding needed fake file"
-   HPFFILES="$HPFFILES $HPFC_LIBS/hpfc_fake.f"
+   HPFFILES="$HPFFILES $PIPS_ROOT/Runtime/hpfc/hpfc_fake.f"
 else
    $DEBUG "no fake file needed"
 fi
