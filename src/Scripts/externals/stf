@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -f
 #
 #  stf is a csh script to standardize the structure of a Fortran program
 #  using ISTST.
@@ -10,35 +10,39 @@
 #  stf Fortran_source_file
 #
 #  Check command line validity.
+
+set echo_err = /home/users/pips/Toolpack/toolpack1.2/util/echoerr
+
 if ( $#argv < 1 ) then
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr \
-Invocation:
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr ""
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr \
-stf Fortran_source_file
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr ""
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr \
-Structured code is sent to standard output and may be redirected to a file.
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr ""
-   exit
+	$echo_err Invocation:
+	$echo_err ""
+	$echo_err stf Fortran_source_file
+	$echo_err ""
+	$echo_err Structured code is sent to standard output
+	$echo_err '(and may be redirected to a file).'
+	$echo_err ""
+	exit 1
 endif
+
 #  Check that Fortran_source_file exists.
+
 if ( -e $1 == 0 ) then
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr \
-"'$1' does not exist."
-   exit
+	$echo_err "'$1' does not exist."
+	exit 1
 endif
+
 #
 #  Create PFS.  If PFS already exists, exit with an advisory message.
 #
+
 if ( -e _.TOOLPACK == 0 ) then
-   mkdir _.TOOLPACK
+	mkdir _.TOOLPACK
 else
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr \
-Toolpack-created directory '"_.TOOLPACK"' exists. \
-Remove with script '"discard"'.
-   exit
+	$echo_err Toolpack-created directory '"_.TOOLPACK"' exists.
+	$echo_err Remove with script '"discard"'.
+	exit 1
 endif
+
 #  Make a tab-free copy of the Fortran source and use it as source.
 set src = ly.src$$
 expand $1 > _.TOOLPACK/$src
@@ -50,41 +54,49 @@ set tree = _.lytree
 set symb = _.ypsymb
 #  Comment index file name.
 set indx = _.lyindx
+
 #  Create the interprocess file IST.CMD and append parameters for ISTLY.
 /home/users/pips/Toolpack/toolpack1.2/util/mkipf \
 $src $cmt $tree $symb $indx
+
 #
 #  Invoke ISTLY.
 #
+
 /home/users/pips/Toolpack/toolpack1.2/exec/istly.u
 if ($status != 0) then
-	echo "Unable to run istly.u"
+	$echo_err "Unable to run istly.u"
+	/bin/rm -rf _.TOOLPACK
 	exit 1
 endif
 
 #
 #  If tool terminated with errors, advise user to obtain listing.  Exit.
 if ( `cat _.TOOLPACK/_.info` == -1 ) then
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr ""
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr \
-'Errors detected.  Invoke script "getlst" to obtain a listing showing'
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr \
-statement and token numbers.
-/home/users/pips/Toolpack/toolpack1.2/util/echoerr ""
-   /bin/rm -r _.TOOLPACK
-   exit
+	$echo_err ""
+	$echo_err Errors detected.
+	$echo_err Invoke script '"getlst"' to obtain a listing showing
+	$echo_err statement and token numbers.
+	$echo_err ""
+	/bin/rm -rf _.TOOLPACK
+	exit
 endif
+
 #  Create the interprocess file IST.CMD and append parameters for ISTST.
 /home/users/pips/Toolpack/toolpack1.2/util/mkipf \
 $tree $symb $indx $cmt \#1 -
+
 #
 #  Invoke ISTST.
 #
+
 /home/users/pips/Toolpack/toolpack1.2/exec/istst.u
 if ($status != 0) then
 	echo "Unable to run istst.u"
+	/bin/rm -rf _.TOOLPACK
 	exit 1
 endif
-#
-/bin/rm -r _.TOOLPACK
-#
+
+/bin/rm -rf _.TOOLPACK
+
+#EOF
