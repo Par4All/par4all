@@ -48,18 +48,21 @@ extern bool is_emacs_prettyprint;
 bool print_parallelized90_code(mod_name)
 char *mod_name;
 {
+    bool success;
     bool f90_property = get_bool_property("PRETTYPRINT_FORTRAN90");
 
     set_bool_property("PRETTYPRINT_FORTRAN90", TRUE);
-    print_parallelized_code(mod_name);
+    success = print_parallelized_code(mod_name);
     set_bool_property("PRETTYPRINT_FORTRAN90", f90_property);
+
+    return success;
 }
 
 bool print_parallelized77_code(mod_name)
 char *mod_name;
 {
     /* set_bool_property("PRETTYPRINT_FORTRAN90", FALSE); */
-    print_parallelized_code(mod_name);
+    return print_parallelized_code(mod_name);
 }
 
 bool print_parallelized_code(mod_name)
@@ -121,7 +124,7 @@ emacs_print_code(char *mod_name)
 
   is_emacs_prettyprint = TRUE;
   is_attachment_prettyprint = TRUE;
-  print_code(mod_name);
+  success = print_code(mod_name);
   is_emacs_prettyprint = FALSE;  
   is_attachment_prettyprint = FALSE;  
 
