@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: run-time.c,v $
+ * Revision 1.43  1997/12/13 09:09:19  coelho
+ * sprintf -> concatenate.
+ *
  * Revision 1.42  1997/10/27 16:48:29  coelho
  * return updated...
  *
@@ -491,16 +494,15 @@ string hpfc_main_entity_name(entity e)
 /* returns a name for the bound of the declaration 
  * of array array, side side and dimension dim.
  */
-string bound_parameter_name(array, side, dim)
-entity array;
-string side;
-int dim;
+string 
+bound_parameter_name(
+    entity array,
+    string side,
+    int dim)
 {
-    char buffer[100]; /* ??? */
-    sprintf(buffer, "%s %s %s%d",
-	    hpfc_main_entity_name(array),
-	    entity_local_name(array), side, dim);
-    return strdup(buffer);
+    return strdup(concatenate(hpfc_main_entity_name(array), " ",
+			      entity_local_name(array), " ",
+			      side, i2a(dim), 0));
 }
 
 entity 
