@@ -608,12 +608,19 @@ hierarchize_control_list(vertex interval,
     gen_list_and_not(&control_predecessors(entry_node), new_controls);	
 	pips_debug(0, "control_predecessors(entry_node)");
     display_address_of_control_nodes(control_predecessors(entry_node));
+    /* Unlink an eventual loop around entry_node that has been
+       captured anyway in the new unstructured: */
+    unlink_2_control_nodes(entry_node, entry_node);
+    
     if (exit_node != control_undefined) {
 	gen_list_and_not(&control_successors(exit_node), new_controls);
 	gen_list_and_not(&control_predecessors(exit_node), new_controls);
     }
 
-    if (exit_node != control_undefined) {
+    if (exit_node != control_undefined
+	&& control_successors(entry_node) == NIL /* When a single node
+	loop has been hierarchize, this link already exist */
+	) {
 	/* Now the exit_node becomes a successor of the entry_node: */
 	link_2_control_nodes(entry_node, exit_node);
     }
@@ -664,19 +671,12 @@ control_graph_recursive_decomposition(unstructured u)
        entry control node of the interval: */
     bool modified;
     control entry_node, exit_node;
-    hash_table control_already_hierarchized;
     graph intervals;
     
     debug_on("RECURSIVE_DECOMPOSITION_DEBUG_LEVEL");
     
     entry_node = unstructured_control(u);
     exit_node = unstructured_exit(u);
-    /* To record the entry node of intervals that have been
-       hierarchized. Use an hash_table to store the number of control
-       nodes that have been restructured as a hint to able further
-       hierarchizations if the new number of control nodes for a given
-       entry node is no longer the same du to interval fusion.  */
-    control_already_hierarchized = hash_table_make(hash_int, 0);
 
     /* The seed interval graph is indeed the control graph itself: */
     intervals = control_graph_to_interval_graph_format(entry_node);
@@ -694,63 +694,46 @@ control_graph_recursive_decomposition(unstructured u)
 
     /* Apply recursively interval graph decomposition: */
     do {
-	/* Construct the interval graph from the previous one: */
-	modified = interval_graph(intervals);
-	pips_debug(6, "Modified = %d\n", modified);
-	ifdebug(6)
-	    display_interval_graph(intervals);
-	
 	/* For all intervals of the graph: */
 	MAP(VERTEX, interval, {
 	    list controls = interval_vertex_label_controls(vertex_vertex_label(interval));
 	    control interval_entry = CONTROL(CAR(controls));
-	    /* I guess this guard is wrong! */
-	    if (!hash_defined_p(control_already_hierarchized,
-				(char *) interval_entry)
-		|| ((int) hash_get(control_already_hierarchized,
-				   (char *) interval_entry)
-		    != gen_length(controls))) {
-		/* Ok, at least this interval has not been hierarchized yet: */
-		list interval_exits = interval_exit_nodes(interval, exit_node);
-		if (gen_length(interval_exits) <= 1
-		    && /* Useless to restructure the exit node... */
-		    interval_entry != exit_node
-		    && /* If a single node, only useful if there is a
-		    loop inside: */
-		    (gen_length(controls) != 1
-		     || gen_length(control_successors(CONTROL(CAR(controls)))) == 2)) {
-		    /* If an interval has at most one exit, the
-		       underlaying control graph can be hierachized by
-		       an unstructured. */
-		    /* Put all the controls in their own unstructured
-                       to hierarchize the graph: */
-		    hierarchize_control_list(interval,
-					     controls,
-					     interval_exits == NIL ? control_undefined : CONTROL(CAR(interval_exits)));
-						      
-		    /* Update control_already_hierarchized with the
-                       new size (1 control) to avoid restructuring
-                       again this interval: */
-		    if (hash_defined_p(control_already_hierarchized,
-				       (char *) interval_entry))
-			hash_update(control_already_hierarchized,
-				    (char *) interval_entry,
-				    (char *) 1);
-		    else
-			hash_put(control_already_hierarchized,
-				 (char *) interval_entry,
-				 (char *) 1);
-		}
+	    list interval_exits = interval_exit_nodes(interval, exit_node);
+	    if (gen_length(interval_exits) <= 1
+		&& /* Useless to restructure the exit node... */
+		interval_entry != exit_node
+		&& /* If a single node, only useful if there is a loop
+		      inside (in order to detect these loops,
+		      hierarchize_control_list() is called before
+		      interval_graph() but then we need to add more
+		      guards...): */
+		(gen_length(controls) > 1
+		 || (gen_length(control_successors(interval_entry)) == 2
+		     && (CONTROL(CAR(control_successors(interval_entry))) == interval_entry
+			 || CONTROL(CAR(CDR(control_successors(interval_entry)))) == interval_entry)))
+		) {
+		/* If an interval has at most one exit, the
+		   underlaying control graph can be hierachized by an
+		   unstructured. */
+		/* Put all the controls in their own unstructured
+		   to hierarchize the graph: */
+		hierarchize_control_list(interval,
+					 controls,
+					 interval_exits == NIL ? control_undefined : CONTROL(CAR(interval_exits)));
+		
 		gen_free_list(interval_exits);
 	    }
 	}, CDR(graph_vertices(intervals)) /* Skip the entry interval */);
 	/* Stop if the interval graph does no longer changed : it is
            only one node or an irreductible graph: */
+	/* Construct the interval graph from the previous one: */
+	modified = interval_graph(intervals);
+	pips_debug(6, "Modified = %d\n", modified);
+	ifdebug(6)
+	    display_interval_graph(intervals);		
     } while (modified);
 
 
-    /* Delete useless datastructures: */
-    hash_table_free(control_already_hierarchized);
     /* Do not forget to detach control nodes from interval before
        sweeping: */
     MAP(VERTEX, v, {
