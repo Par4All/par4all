@@ -13,6 +13,7 @@
 
 #include "genC.h"
 #include "misc.h"
+#include "ri.h"
 #include "database.h"
 #include "pipsdbm.h"
 
