@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.4 2004/07/25 12:52:17 verdoolaege Exp $
+# $Id: Makefile.am,v 1.5 2004/08/22 21:10:42 verdoolaege Exp $
 #
 
 OBJ_DIR = $(top_builddir)
@@ -8,6 +8,8 @@ EHRHART =  \
 	8hedron.in \
 	alex11.in \
 	alex1.in \
+	bart6.in \
+	bart8.in \
 	c3.in\
 	c4.in\
 	e0.in\
