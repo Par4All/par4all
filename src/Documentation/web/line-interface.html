@@ -21,12 +21,12 @@
 <H2><A NAME="INTRO">1) Introduction</A></H2>
 
 <b>Tpips</b> is a command line interpreter for <a href="/~pips"
-><b>PIPS</b></a>. It allows the user to send elemtary orders to <a
-href="/~pips" ><b>PIPS</b></a>. Using <b>Tpips</b> is more accurate
-than using the convienient scripts like <b>Init</b>, <b>Perform</b>,
+><b>PIPS</b></a>. It allows the user to send elementary orders to <a
+href="/~pips" ><b>PIPS</b></a>. <b>Tpips</b> is more general and convenient
+than the usual scripts like <b>Init</b>, <b>Perform</b>,
 <b>Display</b>, <b>Select</b> or <b>Delete</b>, because it does not
 close the workspace on which you work after each command. Though it is
-quite similar to wpips work.<p>
+quite similar to <b>Wpips<b>' behaviour.<p>
 
 By processing a logfile from <b>Wpips</b>, it is possible to get the
 corresponding <b>Tpips</b> script. It makes <b>Wpips</b> - and
@@ -93,7 +93,7 @@ The owner of a resource or a rule - it means on which it should be
 applied - is either a module name or a generic owner - <b>PROGRAM</b>,
 <b>MODULE</b>, <b>MAIN</b>, <b>ALL</b>, <b>CALLERS</b>, or
 <b>CALLEES</b>. In this case, in order to avoid confusion with any
-<i>real</i> module name, these generic owner have to be preceded by a
+<i>real</i> module name, these generic owners have to be preceded by a
 dollar sign ($).<p>
 
 
@@ -110,7 +110,7 @@ sh&gt; Tpips                      <i>// run tpips</i>
 &gt; display $ALL.dg_file         <i>// display all the dependance graphs</i>
 &gt; close wfoo                   <i>// close the workspace</i>
 &gt; delete wfoo                  <i>// delete the workspace</i>
-&gt; exit                         <i>// exit for tpips</i>
+&gt; quit                         <i>// quit tpips</i>
 
 </pre>
 
