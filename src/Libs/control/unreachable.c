@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: unreachable.c,v $
+ * Revision 1.3  1997/11/12 12:07:58  coelho
+ * new interface for Ronan to use it...
+ *
  * Revision 1.2  1997/11/10 18:19:52  coelho
  * typos fixed...
  *
@@ -68,7 +71,7 @@ propagate(statement s)
 	if (bound_continued_p(s))
 	    return continued_p(s); /* already computed */
 	else
-	    return TRUE; /* avoids an infinite recursion */
+	    return TRUE; /* avoids an infinite recursion... */
     }
     else store_reached(s, TRUE);
 
@@ -124,12 +127,37 @@ propagate(statement s)
     return continued;
 }
 
+
+/***************************************************************** INTERFACE */
+
+void
+init_reachable(statement start)
+{
+    init_reached();
+    init_continued();
+    propagate(start);
+    close_continued();
+}
+
+bool
+statement_reachable_p(statement s)
+{
+    return reached_p(s);
+}
+
+void 
+close_reachable(void)
+{
+    close_reached();
+}
+
+/*
 static void 
 drop_code_rwt(statement s)
 {
     if (!reached_p(s)) 
     {
-	free_instruction(statement_instruction(s)); /* rough */
+	free_instruction(statement_instruction(s)); 
 	statement_instruction(s) = make_continue_instruction();
     }
 }
@@ -137,13 +165,8 @@ drop_code_rwt(statement s)
 void 
 drop_unreachable_code(statement start)
 {
-    init_reached();
-    init_continued();
-
-    propagate(start);
-    /* ??? what about FORMAT? */
+    init_reachable(start);
     gen_recurse(start, statement_domain, gen_true, drop_code_rwt);
-    
-    close_reached();
-    close_continued();
+    close_reachable();
 }
+*/
