@@ -6,7 +6,7 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/04/14 15:55:16 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/04/18 12:08:27 $, )
  * version $Revision$
  */
 
@@ -27,9 +27,49 @@
  * the synonyms of a given array are stored in a entities.
  * What I intend as a synonym is a version of the array or template
  * which is distributed or aligned in a different way.
+ * the renamings are associated to the remapping statements here.
  */
 GENERIC_GLOBAL_FUNCTION(dynamic_hpf, entity_entities);
 GENERIC_GLOBAL_FUNCTION(primary_entity, entitymap);
+GENERIC_GLOBAL_FUNCTION(renamings, statement_renamings);
+
+/*   DYNAMIC STATUS
+ */
+void init_dynamic_status()
+{
+    init_dynamic_hpf();
+    init_primary_entity();
+    init_renamings();
+}
+
+void reset_dynamic_status()
+{
+    reset_dynamic_hpf();
+    reset_primary_entity();
+    reset_renamings();
+}
+
+dynamic_status get_dynamic_status()
+{
+    return(make_dynamic_status(get_dynamic_hpf(),
+			       get_primary_entity(),
+			       get_renamings()));
+}
+
+void set_dynamic_status(d)
+dynamic_status d;
+{
+    set_dynamic_hpf(dynamic_status_dynamics(d));
+    set_primary_entity(dynamic_status_primary(d));
+    set_renamings(dynamic_status_renamings(d));
+}
+
+void close_dynamic_status()
+{
+    close_dynamic_hpf();
+    close_primary_entity();
+    close_renamings();
+}
 
 /*  a new dynamic entity is stored.
  *  HPF allows arrays and templates as dynamic.
@@ -261,6 +301,7 @@ distribute d;
  *    several synonyms at the same time...
  *  - what is done on an "incorrect" code is not clear.
  */
+GENERIC_GLOBAL_FUNCTION(alive_synonym, statement_entities);
 
 static entity 
     old_variable = entity_undefined,
@@ -308,7 +349,36 @@ statement s;
 
 		 if (reference_variable(r)==old_variable)
 		 {
+		     /*  the variable is realigned.
+		      */
 		     reference_variable(r) = new_variable;
+		     return(FALSE);
+		 }
+	     },
+		 call_arguments(c));
+	}
+	else if (redistribute_directive_p(fun))
+	{
+	    entity t = align_template(load_entity_align(new_variable));
+
+	    MAPL(ce,
+	     {
+		 if (expression_to_entity(EXPRESSION(CAR(ce)))==t)
+		 {
+		     /*  if the template t is redistributed...
+		      *  then the new_variable is the alive one.
+		      */
+		     entities es;
+
+		     /*   lazy initialization 
+		      */
+		     if (!bound_alive_synonym_p(s))
+			 store_alive_synonym(s, make_entities(NIL));
+		     
+		     es = load_alive_synonym(s);
+		     entities_list(es) = 
+			 gen_once(new_variable, entities_list(es));
+	    
 		     return(FALSE);
 		 }
 	     },
