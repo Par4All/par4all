@@ -275,16 +275,6 @@ char *mod_name;
     }
     
     hash_warn_on_redefinition();
-
-/*
-    ifdebug(1)
-    {
-	mem_spy_begin();
-	gen_write(stderr, chains);
-	mem_spy_end("after gen_write alone");
-    }
-*/
-
     dg = gen_copy_tree (chains);
 
     ifdebug(1) {
