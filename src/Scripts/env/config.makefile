@@ -24,8 +24,10 @@ pipsrc.csh: pipsrc.sh
 	$(SHELL) make-pipsrc.csh 
 	chmod a-w pipsrc.csh
 
-clean:
+clean-compiled:
 	$(RM) pipsrc.sh pipsrc.csh
+
+clean: clean-compiled
 
 # that is all
 #
