@@ -58,7 +58,7 @@ load_list_icfg(statement_effects m, statement s) {
   return effects_effects(apply_statement_effects(m, s));
 }
 
-list effects_filter(list l_effs, string str_filter)
+list effects_filter(list l_effs, entity e_flt)
 {
   list l_flt = NIL;
   MAPL(ce, {
@@ -79,7 +79,8 @@ static text
 resource_text_flt(entity module, int margin, statement stat, p_icfgpe_print_stuff ips)
 {
   list l_eff = load_list_icfg(ips->resource, stat);
-  list l_eff_flt = effects_filter(l_eff, "KMAX");
+  entity e_flt = FindOrCreateEntity(TOP_LEVEL_MODULE, "KMAX");
+  list l_eff_flt = effects_filter(l_eff, e_flt);
   text l_eff_text = (*(ips->get_text))(l_eff_flt);
   gen_free_list(l_eff_flt);
   return l_eff_text;
@@ -163,7 +164,7 @@ static text get_any_effects_text_flt(string module_name)
   return txt;
 }
 
-text get_any_effect_type_text_flt(string module_name, string resource_name, entity e_flt)
+text get_any_effect_type_text_flt(string module_name, string resource_name)
 {
   text txt;
   add_a_icfgpe_print(resource_name, effects_to_text_func);
@@ -172,11 +173,11 @@ text get_any_effect_type_text_flt(string module_name, string resource_name, enti
   return txt;
 }
 
-text get_text_proper_effects_flt(string module_name, entity e_flt)
+text get_text_proper_effects_flt(string module_name)
 {
   text t;
   set_methods_for_rw_effects_prettyprint(module_name);
-  t = get_any_effect_type_text_flt(module_name, DBR_PROPER_EFFECTS, TRUE);
+  t = get_any_effect_type_text_flt(module_name, DBR_PROPER_EFFECTS);
   reset_methods_for_effects_prettyprint(module_name);
   return t;
 }
