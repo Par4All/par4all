@@ -2,7 +2,7 @@
 #! /bin/sh -vx
 #
 # SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1995/08/10 11:26:30 $, )
+# $RCSfile: make-pips,v $ ($Date: 1995/08/10 14:22:22 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -143,7 +143,8 @@ for pass in $PASSES ; do
 			make $MAKE_OPTION clean >/dev/null
 			make $MAKE_OPTION production-depend >/dev/null
 		fi ;
-		make $MAKE_OPTION ${PIPS_BINDIR}/${pass} >/dev/null)
+		make $MAKE_OPTION \
+		${PIPS_LIBDIR}/lib${pass}.a ${PIPS_BINDIR}/${pass} >/dev/null)
 	if [ $? -ne 0 ] ; then
 		echo " Failed in building ${PIPS_BINDIR}/${pass}"
 		FAILURES="$FAILURES $pass (P),"
