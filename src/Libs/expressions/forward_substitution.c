@@ -22,6 +22,9 @@
  * and substitution are not performed.
  *
  * $Log: forward_substitution.c,v $
+ * Revision 1.8  1998/04/14 21:30:43  coelho
+ * linear.h
+ *
  * Revision 1.7  1998/04/01 13:22:02  coelho
  * initial comment updated after bug fix.
  *
@@ -54,6 +57,7 @@
 #include "genC.h"
 
 #include "misc.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "resources.h"
