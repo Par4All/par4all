@@ -94,10 +94,7 @@ prettyprint_dependence_graph(FILE * fd,
 	fprintf(fd, "%s\n", dependence_graph_banner[banner_number]);
     }
 
-    pv1 = graph_vertices(mod_graph);
-    pv1 = CDR(pv1);
-    /*    for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {*/
-    {
+    for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {
 	vertex v1 = VERTEX(CAR(pv1));
 	statement s1 = vertex_to_statement(v1);
 
@@ -252,10 +249,7 @@ prettyprint_dependence_graph_view(FILE * fd,
 
     debug_on("RICEDG_DEBUG_LEVEL");
 
-    pv1 = graph_vertices(mod_graph);
-    pv1 = CDR(pv1);
-    /*    for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {*/
-    {
+    for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {
 	vertex v1 = VERTEX(CAR(pv1));
 	statement s1 = vertex_to_statement(v1);
 	list loops1 = load_statement_enclosing_loops(s1);
