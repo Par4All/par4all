@@ -451,6 +451,9 @@ static bool some_phi_variable(Pcontrainte c)
  * this is implicit. this occurs with io effects of "PRINT *, A".
  * in such a case, the declaration constraints MUST be appended
  * before the translation, otherwise the result might be false.
+ *
+ * potential bug : if the declaration system cannot be generated,
+ *   the region should be turned to MAY for the translation?
  */
 void append_declaration_sc_if_exact_without_constraints(region r)
 {
