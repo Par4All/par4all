@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/06 14:39:15 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/22 11:27:09 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -32,6 +32,9 @@ extern int fprintf();
  */
 
 /* TRUE if there is a reference to a distributed array within obj
+ *
+ * ??? not very intelligent, should use the regions, the problem is
+ * that I should normalize the code *before* the pips analysis...
  */
 bool ref_to_dist_array_p(obj)
 chunk* obj;
@@ -45,6 +48,26 @@ chunk* obj;
 /*
  * written_effects_to_dist_arrays_p
  */
+
+bool written_effect_p(var, le)
+entity var;
+list le;
+{
+    effect e;
+
+    MAPL(ce,
+     {
+	 e = EFFECT(CAR(ce));
+
+	 if (reference_variable(effect_reference(e))==var &&
+	     action_write_p(effect_action(e)))
+	     return(TRUE);
+     },
+	 le);
+
+    return(FALSE);
+}
+
 bool written_effects_to_dist_arrays_p(expr)
 expression expr;
 {
