@@ -9,7 +9,8 @@ SCRIPTS = 	fetch-linear \
 		stf-workspace \
 		stf-module \
 		transformer-to-sc \
-		directory-name
+		directory-name \
+		remove-latex-comments
 
 # that is all
 #
