@@ -53,7 +53,7 @@ typedef int tag;
 
 typedef int unit ;
 #define UU ((void*)0)
-#define UUINT(i) ((void*)i)
+#define UUINT(i) ((void*)(i))
 
 #define array_undefined NULL
 #define array_undefined_p(a) ((a)==NULL)
@@ -68,6 +68,16 @@ struct gen_binding {
   union domain *domain ;
   struct inlinable *inlined ;
 } ;
+
+/* translation tables 
+*/
+typedef struct 
+{
+  bool identity;
+  int old_to_actual[MAX_DOMAIN];
+  int actual_to_old[MAX_DOMAIN];
+} 
+  gen_type_translation_t, * gen_type_translation_p;
 
 #ifdef __STRICT_ANSI__
 #define GEN_PROTO(x) x
