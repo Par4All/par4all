@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/09/19 10:49:45 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/10/02 15:50:45 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -8,21 +8,31 @@
 
 /* some _hack to avoid warnings if some functions are not used 
  */
-
 #define GENERIC_STATIC_OBJECT(PREFIX, name, type)\
 static type name = type##_undefined;\
-PREFIX bool name##_undefined_p() { return(name==type##_undefined);}\
-PREFIX void reset_##name() { name=type##_undefined;}\
-PREFIX void set_##name(o) type o; { name=o;}\
-PREFIX type get_##name() { return(name);}\
+PREFIX bool name##_undefined_p() { return name==type##_undefined;}\
+PREFIX void reset_##name() \
+{ message_assert("must reset sg defined", !name##_undefined_p());\
+  name=type##_undefined;}\
+PREFIX void set_##name(type o);\
+{ message_assert("must set sg undefined", name##_undefined_p());\
+  name=o;}\
+PREFIX type get_##name() \
+{ message_assert("must get sg defined", !name##_undefined_p());\
+  return name;}\
 static int name##_generic_static_status_hack()\
-{ return (int) name##_undefined_p & (int) reset_##name & \
+{ return (int) reset_##name & (int) set_##name & \
+      (int) reset_##name & (int) get_##name & \
       (int) name##_generic_static_status_hack;}
 
 #define GENERIC_STATIC_STATUS(PREFIX, name, type, init, close)\
 GENERIC_STATIC_OBJECT(PREFIX, name, type)\
-PREFIX void init_##name() { name = init;}\
-PREFIX void close_##name() { close(name);}
+PREFIX void init_##name() \
+{ message_assert("must init sg undefined", name##_undefined_p());\
+  name = init;}\
+PREFIX void close_##name()\
+{ message_assert("must close sg defined", !name##_undefined_p());\
+  close(name); name = type##_undefined;}
 
 /* The idea here is to have a static function the name of which is
  * name, and which is a newgen function (that is a ->).
