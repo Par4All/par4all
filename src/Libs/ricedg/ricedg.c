@@ -148,6 +148,22 @@ char *mod_name;
     return rice_dependence_graph(mod_name);
 }
 
+bool
+rice_filtered_dependence_graph(mod_name)
+char *mod_name;
+{
+    fprintf(stderr, "rice_filtered_dependence_graph worked");
+    return TRUE;
+}
+
+bool
+rice_filtered_dependence_daVinci_graph(mod_name)
+char *mod_name;
+{
+    fprintf(stderr, "rice_filtered_dependence_daVinci_graph worked");
+    return TRUE;
+}
+
 
 
 /*********************************************************************************/
