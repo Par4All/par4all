@@ -129,31 +129,33 @@ static bool isomorphic_p(statement s1, statement s2)
  */
 static bool independant_p(statement s1, statement s2)
 {
+   list le1 = load_proper_rw_effects_list(s1);
+   list le2 = load_proper_rw_effects_list(s2);
+
+   for( ; le1 != NIL; le1 = CDR(le1))
+   {
+      for( ; le2 != NIL; le2 = CDR(le2))
+      {
+	 effect e1 = EFFECT(CAR(le1));
+	 effect e2 = EFFECT(CAR(le2));
+
+	 /* if the statements affect the same variable, both effects must
+	  * be READ effects. 
+	  */
+	 if ( effects_same_variable_p(e1, e2) &&
+	      !(effect_read_p(e1) && effect_read_p(e2)) )
+	 {
+	    fprintf(stderr, "\ns1:\t");
+            print_words(stderr, words_effect(e1));
+            fprintf(stderr, "\ns2:\t");
+            print_words(stderr, words_effect(e2));
+
+	    return FALSE;
+	 }
+      }
+   }
+
    return TRUE;
-}
-
-statement make_load_statement()
-{
-    entity res = local_name_to_top_level_entity("SimdLoad");
-    if (entity_undefined_p(res))
-	res = make_empty_subroutine("SimdLoad");
-    return call_to_statement(make_call(res, NIL));
-}
-
-statement make_exec_statement()
-{
-    entity res = local_name_to_top_level_entity("SimdExec");
-    if (entity_undefined_p(res))
-	res = make_empty_subroutine("SimdExec");
-    return call_to_statement(make_call(res, NIL));
-}
-
-statement make_save_statement()
-{
-    entity res = local_name_to_top_level_entity("SimdSave");
-    if (entity_undefined_p(res))
-	res = make_empty_subroutine("SimdSave");
-    return call_to_statement(make_call(res, NIL));
 }
 
 /* Transform the code to use SIMD instructions. The input statement
@@ -230,41 +232,39 @@ static void simdize_simple_statements(statement s)
        */
       if (group_first != group_last)
       {
-	 statement load, exec, save;
+	 cons * tmp;
+	 cons * statements = make_simd_statements(group_first, group_last);
 
-	 load = make_load_statement();
-	 exec = make_exec_statement();
-	 save = make_save_statement();
-
+	 /* replace the first element */
 	 free_statement(STATEMENT(CAR(group_first)));
-	 STATEMENT(CAR(group_first)) = load;
+	 tmp = CDR(group_first);
+	 CAR(group_first) = CAR(statements);
+	 CDR(group_first) = CDR(statements);
+	 free(statements); /* free the first node of the list, as we do not 
+			    * use it anymore */
+	 statements = group_first;
+	 
+	 /* bind the end of the list to the remaining of the statements */
+	 while(CDR(statements) != NIL)
+	    statements = CDR(statements);
+	 CDR(statements) = CDR(group_last);
 
-	 free_statement(STATEMENT(CAR(CDR(group_first))));
-	 STATEMENT(CAR(CDR(group_first))) = exec;
-
-	 if (CDR(group_first) == group_last)
+	 /* free the original statements */
+	 group_first = tmp;
+	 CDR(group_last) = NIL;
+	 while(group_first != NIL)
 	 {
-	    /* Need to add an element to the list */
-	    CDR(CDR(group_first)) = CONS(STATEMENT, save, CDR(group_last));
-	 }
-	 else
-	 {
-	    /* Can reuse yet another element */
-	    free_statement(STATEMENT(CAR(CDR(CDR(group_first)))));
-	    STATEMENT(CAR(CDR(CDR(group_first)))) = save;
-
-	    i = CDR(CDR(CDR(group_first))); /* keep a ptr to the beginning of list */
-	    CDR(CDR(CDR(group_first))) = CDR(group_last);
-
-	    /* Now free the remaining list items, if any */
-	    CDR(group_last) = NIL;
-	    gen_full_free_list(i);
+	    cons * next = CDR(group_first);
+	    free_statement(STATEMENT(CAR(group_first)));
+	    free(group_first);
+	    group_first = next;
 	 }
 
 	 /* Maybe this is useful */
 	 fix_sequence_statement_attributes(s);
 
-	 group_last = CDR(CDR(group_first));
+	 group_first = NIL;
+	 group_last = statements;
       }
 
       /* skip what has already been matched */
@@ -298,7 +298,7 @@ static bool simd_simple_sequence_filter(statement s)
    return FALSE;
 }
 
-void simd_simple_sequence_rewrite(statement s)
+static void simd_simple_sequence_rewrite(statement s)
 {
    return;
 }
@@ -346,10 +346,10 @@ bool simdizer(char * mod_name)
       default:
 	 printf("The Great Wizard can go to bed and do nothing, too...\n");
    }
-   
+
    pips_assert("Statement is consistent after SIMDIZER", 
 	       statement_consistent_p(mod_stmt));
-   
+
    /* Reorder the module, because new statements have been added */  
    module_reorder(mod_stmt);
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
