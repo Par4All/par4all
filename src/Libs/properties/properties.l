@@ -374,7 +374,7 @@ open_properties(void)
  * this is called from close_workspace, so there is some current one.
  */
 void
-close_properties(void)
+save_properties(void)
 {
     string file_name = get_property_file_name();
     FILE * file = safe_fopen(file_name, "w");
