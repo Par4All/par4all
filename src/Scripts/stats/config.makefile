@@ -27,5 +27,7 @@ FILES =		dg-statistics.awk \
 
 SOURCES	=	$(SCRIPTS) $(FILES)
 
+INSTALL_UTL = 	$(SCRIPTS) $(FILES)
+
 # that is all
 #
