@@ -494,16 +494,25 @@ reset_value_mappings(void)
     hash_value_to_name = hash_table_undefined;
 }
 
+/* Normal call to free the mappings */
+
 void 
 free_value_mappings(void)
+{
+    pips_assert("no free of undefined mappings", 
+		!hash_table_undefined_p(hash_entity_to_old_value));
+    error_free_value_mappings();
+}
+
+/* To be called by an error handler */
+
+void 
+error_free_value_mappings(void)
 {
     /* free previous hash tables, desallocate names; this implies ALL
        value names were malloced and were not pointer to a ri part */
 
     /* the three tables are assumed to be allocated all together */
-
-    pips_assert("no free of undefined mappings", 
-		!hash_table_undefined_p(hash_entity_to_old_value));
 
     /* free names in hash_value_to_name; the other two hash tables
        contain pointers to the entity tabulated domain and thus need
