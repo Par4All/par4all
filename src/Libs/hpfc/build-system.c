@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/10/05 11:32:24 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1995/11/24 16:44:00 $, ) 
  * version $Revision$
  */
 
@@ -109,36 +109,29 @@ entity (*gen1)(), (*gen2)();
 #define STORE(name) \
   put_dummy_and_prime(get_ith_##name##_dummy, get_ith_##name##_prime)
 
-void lazy_initialize_dummy_to_prime()
+void hpfc_init_dummy_to_prime()
 {
-    if (dummy_to_prime_undefined_p())
-    {
-	init_dummy_to_prime();
-	STORE(array);
-	STORE(template);
-	STORE(processor);
-	STORE(block);
-	STORE(cycle);
-	STORE(local);
-	STORE(shift);
-	STORE(auxiliary);
-    }
+    init_dummy_to_prime();
+    STORE(array);
+    STORE(template);
+    STORE(processor);
+    STORE(block);
+    STORE(cycle);
+    STORE(local);
+    STORE(shift);
+    STORE(auxiliary);
 }
 
-/* ??? never called
- */
-void lazy_close_dummy_to_prime()
+void hpfc_close_dummy_to_prime()
 {
-    if (!dummy_to_prime_undefined_p())
-	close_dummy_to_prime();
+    close_dummy_to_prime();
 }
 
 Psysteme shift_system_to_prime_variables(s)
 Psysteme s;
 {
-    lazy_initialize_dummy_to_prime();
-    return(sc_rename_variables(s, bound_dummy_to_prime_p,
-			       (Variable(*)()) load_dummy_to_prime));
+    return sc_rename_variables(s, bound_dummy_to_prime_p,
+			       (Variable(*)()) load_dummy_to_prime);
 }
 
 /* already computed constraints
