@@ -15,51 +15,33 @@
 #include "polyedre.h"
 
 /* IRISA  data structures */
+#include "types-irisa.h"
 
-/* Ces structures sont reportees dans le fichier, 
-car il pourrait il y avoir des conflits avec nos 
-structures de donnees ayant les memes noms 
-*/
+/* Irisa is based on int. We would like to change this to 
+ * some other type, say "long long" if desired, as VALUE may
+ * also be changed. It is currently an int. Let us assume
+ * that the future type will be be called "IRINT" (Irisa Int)
+ */
+#define VALUE_TO_IRINT(val) VALUE_TO_INT(val)
+#define IRINT_TO_VALUE(i) ((Value)i)
 
-typedef struct vector
-{
-  int size;
-  int *p;
-} vector;
-
-
-typedef struct polyhedron
-{ struct polyhedron *next;
-  unsigned Dimension, NbConstraints, NbRays, NbEq, NbBid;
-  int **Constraint;
-  int **Ray;
-  int *p_Init;
-} Polyhedron;
-
-typedef struct matrix
-{
-  int NbRows;
-  int NbColumns;
-  int **p;
-  int *p_init;
-} matrix;
-
-extern matrix * Matrix_Alloc();
+/* should be ANSI C headers...
+ */
+extern Matrix * Matrix_Alloc();
 extern void Matrix_Print();
 extern void Matrix_Free();
 extern void Polyhedron_Print();
 extern Polyhedron * Constraints2Polyhedron();
 extern Polyhedron * Rays2Polyhedron();
-extern matrix * Polyhedron2Constraints();
+extern Matrix * Polyhedron2Constraints();
 extern void Polyhedron_Free();
 
 /*  Fonctions de conversion traduisant une ligne de la structure 
  * Matrix de l'IRISA en un Pvecteur
-*/
-
+ */
 
 static Pvecteur matrix_ligne_to_vecteur(mat,i,base,dim)
-matrix *mat;
+Matrix *mat;
 int i;
 Pbase base;
 int dim;
@@ -70,9 +52,11 @@ int dim;
 
     for (j=1,pv=base ;j<dim;j++,pv=pv->succ) {
 	if (mat->p[i][j]) 
-	    if (NEWPV) { pvnew= vect_new(vecteur_var(pv),mat->p[i][j]);
+	    if (NEWPV) { pvnew= vect_new(vecteur_var(pv),
+					 IRINT_TO_VALUE(mat->p[i][j]));
 			 NEWPV =FALSE;  }		
-	    else vect_add_elem(&pvnew,vecteur_var(pv),mat->p[i][j]);
+	    else vect_add_elem(&pvnew,vecteur_var(pv),
+			       IRINT_TO_VALUE(mat->p[i][j]));
     }
     return(pvnew);
 }
@@ -85,7 +69,7 @@ int dim;
 
 
 static Pcontrainte matrix_ligne_to_contrainte(mat,i,base)
-matrix * mat;
+Matrix * mat;
 int i;
 Pbase base;
 {
@@ -93,7 +77,7 @@ Pbase base;
     int dim = vect_size(base) +1;
 
     Pvecteur pvnew = matrix_ligne_to_vecteur(mat,i,base,dim);
-    vect_add_elem(&pvnew,TCST,mat->p[i][dim]);
+    vect_add_elem(&pvnew,TCST,IRINT_TO_VALUE(mat->p[i][dim]));
     vect_chg_sgn(pvnew);
     pc = contrainte_make(pvnew);
     return (pc);
@@ -117,9 +101,11 @@ int dim;
 
     for (j=1,pv=base ;j<dim;j++,pv=pv->succ) {
 	if (pol->Ray[i][j]) 
-	    if (NEWPV) { pvnew= vect_new(vecteur_var(pv),pol->Ray[i][j]);
+	    if (NEWPV) { pvnew= vect_new(vecteur_var(pv),
+					 IRINT_TO_VALUE(pol->Ray[i][j]));
 			 NEWPV =FALSE;  }		
-	    else vect_add_elem(&pvnew,vecteur_var(pv),pol->Ray[i][j]);
+	    else vect_add_elem(&pvnew,vecteur_var(pv),
+			       IRINT_TO_VALUE(pol->Ray[i][j]));
     }
     return(pvnew);
 }
@@ -127,12 +113,10 @@ int dim;
 
 /*  Fonctions de conversion traduisant une Pray_dte en une 
  * ligne de la structure matrix de l'IRISA 
-*/
-
- 
+ */ 
 static void ray_to_matrix_ligne(pr,mat,i,base)
 Pray_dte pr;
-matrix *mat;
+Matrix *mat;
 int i;
 Pbase base;
 {
@@ -140,20 +124,18 @@ Pbase base;
     int j;
 
     for (pb = base, j=1; !VECTEUR_NUL_P(pb) && j< mat->NbColumns-1; 
-	 mat->p[i][j] = vect_coeff(vecteur_var(pb),pr->vecteur),
+	 mat->p[i][j] = 
+	    VALUE_TO_IRINT(vect_coeff(vecteur_var(pb),pr->vecteur)),
 	 pb = pb->succ,j++); 
-
 }
 
 
 /*  Fonctions de conversion traduisant une Pcontrainte en une 
  * ligne de la structure matrix de l'IRISA 
-*/
-
-
+ */
 static void contrainte_to_matrix_ligne(pc,mat,i,base)
 Pcontrainte pc;
-matrix *mat;
+Matrix *mat;
 int i;
 Pbase base;
 {
@@ -161,27 +143,27 @@ Pbase base;
     int j;
 
     for (pv=base,j=1;!VECTEUR_NUL_P(pv);
-	 mat->p[i][j]= - vect_coeff(vecteur_var(pv),pc->vecteur),
+	 mat->p[i][j]= 
+	     VALUE_TO_IRINT(-vect_coeff(vecteur_var(pv),pc->vecteur)),
 	 pv=pv->succ,j++);
-    mat->p[i][j]= - vect_coeff(TCST,pc->vecteur);
+    mat->p[i][j]= VALUE_TO_IRINT(-vect_coeff(TCST,pc->vecteur));
 }
 
 
 
-/*
- * Passage du systeme lineaire sc a une matrice matrix (structure Irisa)
+/* Passage du systeme lineaire sc a une matrice matrix (structure Irisa)
  * Cette fonction de conversion est utilisee par la fonction 
  * sc_to_sg_chernikova
  */ 
-
 static void sc_to_matrix(sc,mat)
 Psysteme sc;
-matrix *mat;
+Matrix *mat;
 {
 
     int nbrows, nbcolumns, i, j;
     Pcontrainte peq;
     Pvecteur pv;
+
     nbrows = mat->NbRows;
     nbcolumns = mat->NbColumns;
 
@@ -204,11 +186,7 @@ matrix *mat;
     for (pv=sc->base,j=1;!VECTEUR_NUL_P(pv);
 	 mat->p[i][j] = 0,pv=pv->succ,j++);
     mat->p[i][j]=1;
-
 }
-
-
-
 
 /* Fonction de conversion traduisant un systeme generateur sg 
  * en une matrice de droites, rayons et sommets utilise'e par la 
@@ -220,7 +198,7 @@ matrix *mat;
 
 static void sg_to_polyhedron(sg,mat)
 Ptsg sg;
-matrix * mat;
+Matrix * mat;
 {
 
     Pray_dte pr;
@@ -232,7 +210,8 @@ matrix * mat;
     if (sg_nbre_droites(sg)) {
 	pr = sg->dtes_sg.vsg;
 	for (pr = sg->dtes_sg.vsg; pr!= NULL; 
-	     mat->p[nbC][0] = 0, mat->p[nbC][nbcolumns-1] =0,
+	     mat->p[nbC][0] = 0, 
+	     mat->p[nbC][nbcolumns-1] =0,
 	     ray_to_matrix_ligne(pr,mat,nbC,sg->base),
 	     nbC++,
 	     pr = pr->succ); 
@@ -241,7 +220,8 @@ matrix * mat;
     if (sg_nbre_rayons(sg)) {
 	pr =sg->rays_sg.vsg;
 	for (pr = sg->rays_sg.vsg; pr!= NULL; 
-	     mat->p[nbC][0] = 1, mat->p[nbC][nbcolumns-1] =0,
+	     mat->p[nbC][0] = 1, 
+	     mat->p[nbC][nbcolumns-1] =0,
 	     ray_to_matrix_ligne(pr,mat,nbC,sg->base),
 	     nbC++,
 	     pr = pr->succ);
@@ -250,7 +230,7 @@ matrix * mat;
     if (sg_nbre_sommets(sg)) {
 	for (ps = sg->soms_sg.ssg; ps!= NULL; 
 	     mat->p[nbC][0] = 1, 
-	     mat->p[nbC][nbcolumns-1] = ps->denominateur,
+	     mat->p[nbC][nbcolumns-1] = VALUE_TO_IRINT(ps->denominateur),
 	     ray_to_matrix_ligne(ps,mat,nbC,sg->base),
 	     nbC++,
 	     ps = ps->succ);
@@ -261,11 +241,8 @@ matrix * mat;
  * sous forme d'un syste`me lineaire sc. Cette fonction est 
  * utilisee paar la fonction sg_to_sc_chernikova 
  */ 
-
-
-
 static void matrix_to_sc(mat,sc)
-matrix *mat;
+Matrix *mat;
 Psysteme sc;
 {
     Pcontrainte pce=NULL;
@@ -283,18 +260,18 @@ Psysteme sc;
 	    switch (mat->p[i][0]) {
 	    case 0:
 		nbeq ++;
-		if (neweq) { pce= pc_tmp  = 
-				 matrix_ligne_to_contrainte(mat,
-							    i, sc->base);
-				 neweq = FALSE;} 
+		if (neweq) { 
+		    pce= pc_tmp  = 
+			matrix_ligne_to_contrainte(mat, i, sc->base);
+		    neweq = FALSE;} 
 		else {
-		    pc_tmp->succ = matrix_ligne_to_contrainte(mat,
-							      i,sc->base);
+		    pc_tmp->succ = 
+			matrix_ligne_to_contrainte(mat, i, sc->base);
 		    pc_tmp = pc_tmp->succ;	}
 		break;
 	    case 1:
 		nbineq++;
-		if (newineq) {pci = pc_tmp=
+		if (newineq) {pci = pc_tmp =
 				  matrix_ligne_to_contrainte(mat,
 							     i,sc->base); 
 				  newineq = FALSE; } 
@@ -411,7 +388,7 @@ Ptsg sg;
 Ptsg  sc_to_sg_chernikova(sc)
 Psysteme sc;
 {
-    matrix *a;
+    Matrix *a;
     int nbrows = 0;
     int nbcolumns = 0;
     Ptsg sg = sg_new();
@@ -457,7 +434,7 @@ Ptsg sg;
 
     int nbrows = sg_nbre_droites(sg)+ sg_nbre_rayons(sg)+sg_nbre_sommets(sg);
     int nbcolumns = base_dimension(sg->base)+2;
-    matrix *a;
+    Matrix *a;
     Psysteme sc= sc_new();
     Polyhedron *A;
 
@@ -508,13 +485,13 @@ Psysteme sc_convex_hull(sc1,sc2)
 Psysteme sc1,sc2;
 {
 
-    matrix *a1,*a2;
+    Matrix *a1,*a2;
     int nbrows1 = 0;
     int nbcolumns1 = 0;
     int nbrows2 = 0;
     int nbcolumns2 = 0;
     Polyhedron *A1,*A2;
-    matrix *a;
+    Matrix *a;
     Psysteme sc= sc_new();
     Polyhedron *A;
     int i1,i2,j;
