@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: directives.c,v $ ($Date: 1995/03/10 09:19:11 $, ) version $Revision$,
+ * $RCSfile: directives.c,v $ ($Date: 1995/03/13 11:56:31 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -33,46 +33,39 @@ extern system();
 #include "hpfc.h"
 #include "defines-local.h"
 
+/*   in Syntax
+ */
+extern void MakeExternalFunction();
+extern type MakeTypeVoid();
+
 #define HPF_PREFIX "HPFC"
 #define BLOCK_SUFFIX "K"
 #define CYCLIC_SUFFIX "C"
 #define STAR_SUFFIX "S"
 
-/*   UTILITIES
+/*-----------------------------------------------------------------
+ *
+ *   UTILITIES
+ *
  */
-/* recognize an hpf directive special entity
+/* recognize an hpf directive special entity.
+ * (the prefix of which is HPF_PREFIX, as a convention)
  */
 static bool hpf_directive_entity_p(e)
 entity e;
 {
-    string name=entity_local_name(e);
+    string name = entity_local_name(e);
+    int len = strlen(HPF_PREFIX);
 
-    return(top_level_entity_p(e) &&
-	   strcmp(HPF_PREFIX, name)>strlen(HPF_PREFIX));
+    return(top_level_entity_p(e) && strncmp(HPF_PREFIX, name, len)==0);
 }
 
 /* look for hpf directives thru the AST and handle them.
  */
 
-/* ENUMERATION of statements AFTER the current statement.
- * not too difficult if it is structured.
- * otherwise some thought needed.
- * iterator init, next, close...
- */
-
-/* I wanna put statement and controls in the stack... ???
- * I will need 
- * gen_type...
- * to take care of already seen statements...
- */
-DEFINE_LOCAL_STACK(current, statement) 
-
-
-
-/*  not yet
- */
-
-/* PROCESSOR and TEMPLATE directives
+/*-----------------------------------------------------------------
+ *
+ *  PROCESSORS and TEMPLATE directives.
  *
  * just change the basic type to overloaded and 
  * store the entity as a processor or a template.
@@ -115,7 +108,8 @@ expression e;
     set_template(t);
 }
 
-/* one simple ALIGN directive is handled.
+/*-----------------------------------------------------------------
+ * one simple ALIGN directive is handled.
  * retrieve the alignment from references array and template
  */
 /*  TRUE if the template dimension subscript is an alignment.
@@ -221,8 +215,8 @@ reference alignee, temp;
 
 
 
-/* one DISTRIBUTE directive management
- * 
+/*-----------------------------------------------------------------
+ * one DISTRIBUTE directive management
  */
 /* returns the expected style tag for the given distribution format,
  * plus a pointer to the list of arguments.
@@ -311,7 +305,9 @@ reference distributee, proc;
 			    make_distribute(gen_nreverse(ldist), processor));
 }
 
-/* DIRECTIVE HANDLERS: 
+/*-----------------------------------------------------------------
+ *
+ *    DIRECTIVE HANDLERS
  *
  * each directive is handled by a function here.
  * these handler may use the statement stack to proceed.
@@ -325,7 +321,12 @@ list args;
     user_error("handle_hpf_directives", "unexpected hpf directive\n");
 }
 
-/*  HPF OBJECTS DECLARATIONS
+/*-----------------------------------------------------------------
+ *
+ * HPF OBJECTS DECLARATIONS
+ *
+ * namely TEMPLATE and PROCESSORS directives.
+ * 
  */
 static void handle_processors_directive(i, args)
 instruction i;
@@ -341,7 +342,12 @@ list args;
     gen_map(new_template, args); /* see new_template */
 }
 
-/* HPF STATIC MAPPING
+/*-----------------------------------------------------------------
+ *
+ * HPF STATIC MAPPING
+ *
+ * namely ALIGN and DISTRIBUTE directives.
+ *
  */
 static void handle_align_directive(i, args)
 instruction i;
@@ -378,7 +384,11 @@ list args;
 				proc);
 }
 
-/* HPF PARALLELISM DIRECTIVES
+/*-----------------------------------------------------------------
+ *
+ * HPF PARALLELISM DIRECTIVES
+ *
+ * namely INDEPENDENT and NEW directives.
  */
 static void handle_independent_directive(i, args)
 instruction i;
@@ -391,10 +401,14 @@ static void handle_new_directive(i, args)
 instruction i;
 list args;
 {
-    return; /* that's indeed a first implementation */
+    return; /* (that's indeed a first implementation:-) */
 }
 
-/* DYNAMIC HPF DIRECTIVES.
+/*-----------------------------------------------------------------
+ *
+ * DYNAMIC HPF DIRECTIVES.
+ *
+ * these functions are not yet implemented in hpfc.
  */
 static void handle_dynamic_directive(i, args)
 instruction i;
@@ -417,7 +431,11 @@ list args;
     handle_unexpected_directive(i, args);
 }
 
-/* find the handler for a given entity.
+/*-----------------------------------------------------------------
+ *
+ * DIRECTIVE HANDLING
+ *
+ * find the handler for a given entity.
  */
 struct DirectiveHandler 
 {
@@ -464,14 +482,18 @@ instruction i;
 	entity e = call_function(c);
 
 	if (hpf_directive_entity_p(e))
+	{
+	    debug(8, "directive_filter", "hpfc entity is %s\n", entity_name(e));
 	    /*
 	     * call the appropriate handler for the directive
 	     */
 	    (directive_handler(entity_local_name(e)))
 		(i, call_arguments(c));
 
-	/* ??? must remove the directive!
-	 */
+	    free_call(c);
+	    instruction_call(i) = 
+		make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME), NIL);
+	}
 
 	return(FALSE); /* no instructions within a call! */
     }
@@ -479,82 +501,17 @@ instruction i;
     return(TRUE);
 }
 
-static bool stmt_filter(s)
-statement s;
-{
-    /* push */
-    return(TRUE);
-}
-
-static void stmt_rewrite(s)
-statement s;
-{
-    /* pop */
-}
-
 void handle_hpf_directives(s)
 statement s;
 {
-    /* init stack */
-
     gen_multi_recurse(s,
 		      /*
-		       * STATEMENT
-		       */
-		      statement_domain,
-		      stmt_filter,
-		      stmt_rewrite,
-		      /*
-		       * CONTROL ???
-		       */
-		      /*
-		       * INSTRUCTION
+		       * INSTRUCTION (I don't want the calls in expressions)
 		       */
 		      instruction_domain,
 		      directive_filter,
-		      gen_null);
-
-    /* end stack */
-}
-
-/* the source code is transformed with hpfc_directives
- * into something that can be parsed with a standard f77 compiler.
- */
-void hpfc_directives_filter(name)
-string name;
-{
-    string file_name = db_get_file_resource(DBR_SOURCE_FILE, name, TRUE);
-
-    system(concatenate
-	   ("mv ", file_name, " ", file_name, ".old ; ",
-	    "$HPFC_TOOLS/hpfc_directives < ", file_name, ".old > ", file_name,
-	    NULL));
-}
-
-void hpfc_init(name)
-string name;
-{
-    struct DirectiveHandler *x = handlers;
-
-    while (x->name!=(string) 0)
-	/*
-	 *   hpfc special entities are created as instrinsics...
-	 */
-	MakeIntrinsic(x->name, 0);
-}
-
-void hpfc_directives(name)
-string name;
-{
-    /*  get the code, entities and so, and handle the directives
-     */
-}
-
-void hpfc_compile(name)
-string name;
-{
-    /* hpfcompile to be renamed...
-     */
+		      gen_null,
+		      NULL);
 }
 
 /* that is all
