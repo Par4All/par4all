@@ -59,6 +59,7 @@
 %type <entity>		icon
 %type <entity>		entity_name
 %type <entity>		global_entity_name
+%type <entity>		functional_entity_name
 /* %type <entity>		module_name */
 %type <string>		module_name
 %type <entity>		common_name
@@ -381,10 +382,10 @@ return_inst: TK_RETURN opt_expression
 	    { $$ = MakeReturn($2); }
 	;
 
-call_inst: tk_call global_entity_name
+call_inst: tk_call functional_entity_name
 	    { $$ = MakeCallInst($2, NIL); reset_alternate_returns();}
         |
-	  tk_call global_entity_name parameters
+	  tk_call functional_entity_name parameters
 	    { $$ = MakeCallInst($2, $3); reset_alternate_returns(); }
 	;
 
@@ -756,12 +757,12 @@ intrinsic_inst: TK_INTRINSIC global_entity_name
 	    }
 	;
 
-external_inst: TK_EXTERNAL global_entity_name
+external_inst: TK_EXTERNAL functional_entity_name
 	    {
 		CurrentType = type_undefined;
 		(void) MakeExternalFunction($2, type_undefined);
 	    }
-	| external_inst TK_COMMA global_entity_name
+	| external_inst TK_COMMA functional_entity_name
 	    {
 		(void) MakeExternalFunction($3, type_undefined);
 	    }
@@ -1096,6 +1097,7 @@ entity_name: name
 
 name: TK_NAME
 	    { $$ = $1; }
+        ;
 
 module_name: global_name
             {
@@ -1106,11 +1108,39 @@ module_name: global_name
 		free($1);
 		$$ = CurrentPackage;
 	    }
+        ;
 
 global_entity_name: global_name
 	    {
 		/* $$ = FindOrCreateEntity(CurrentPackage, $1); */
 		$$ = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, $1);
+		free($1);
+	    }
+	;
+
+functional_entity_name: name
+	    {
+		entity f = gen_find_tabulated
+		    (concatenate(CurrentPackage, MODULE_SEP_STRING, $1, 0),
+		     entity_domain);
+
+		if(entity_undefined_p(f)) {
+		    $$ = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, $1);
+		}
+		else if(!storage_undefined_p(entity_storage(f))
+				 && storage_formal_p(entity_storage(f))) {
+		    /* The functional entity must be a formal parameter */
+		    $$ = f;
+		}
+		else if(storage_undefined_p(entity_storage(f))) {
+		    /* The current declaration is wrong and should be fixed
+		     * later, i.e. by MakeExternalFunction() or MakeCallInst()
+		     */
+		    $$ = f;
+		}
+		else {
+		    pips_assert("Unexpected kind of functional entity!", TRUE);
+		}
 		free($1);
 	    }
 	;
