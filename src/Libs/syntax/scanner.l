@@ -17,8 +17,8 @@ extern int _flsbuf();
 #include "toklex.h"
 %}
 DIG [0-9]
-ULET [A-Z]
-LLET [a-z]
+ULET [A-Z_]
+LLET [a-z_]
 SIG [+-]
 UICON ({DIG}+)
 ICON ({SIG}?{UICON})
@@ -28,67 +28,67 @@ DEXP (D{ICON})
 RCON (({MANT}|{UICON}){REXP}?)
 DCON (({MANT}|{UICON}){DEXP}?)
 %%
-_AND_			{
+%AND%			{
 				debug(9, "", "TK_AND\n");
 				return(TK_AND);
 			}
-_INOUT_			{
+%INOUT%			{
 				debug(9, "", "TK_INOUT\n");
 				return(TK_INOUT);
 			}
-_IN_			{
+%IN%			{
 				debug(9, "", "TK_IN\n");
 				return(TK_IN);
 			}
-_OUT_			{
+%OUT%			{
 				debug(9, "", "TK_OUT\n");
 				return(TK_OUT);
 			}
-_EQ_			{
+%EQ%			{
 				debug(9, "", "TK_EQ\n");
 				return(TK_EQ);
 			}
-_EQV_			{
+%EQV%			{
 				debug(9, "", "TK_EQV\n");
 				return(TK_EQV);
 			}
-_GE_			{
+%GE%			{
 				debug(9, "", "TK_GE\n");
 				return(TK_GE);
 			}
-_GT_			{
+%GT%			{
 				debug(9, "", "TK_GT\n");
 				return(TK_GT);
 			}
-_LE_			{
+%LE%			{
 				debug(9, "", "TK_LE\n");
 				return(TK_LE);
 			}
-_LT_			{
+%LT%			{
 				debug(9, "", "TK_LT\n");
 				return(TK_LT);
 			}
-_NE_			{
+%NE%			{
 				debug(9, "", "TK_NE\n");
 				return(TK_NE);
 			}
-_NEQV_			{
+%NEQV%			{
 				debug(9, "", "TK_NEQV\n");
 				return(TK_NEQV);
 			}
-_NOT_			{
+%NOT%			{
 				debug(9, "", "TK_NOT\n");
 				return(TK_NOT);
 			}
-_OR_			{
+%OR%			{
 				debug(9, "", "TK_OR\n");
 				return(TK_OR);
 			}
-_TRUE_			{
+%TRUE%			{
 				debug(9, "", "TK_TRUE\n");
 				return(TK_TRUE);
 			}
-_FALSE_			{
+%FALSE%			{
 				debug(9, "", "TK_FALSE\n");
 				return(TK_FALSE);
 			}
