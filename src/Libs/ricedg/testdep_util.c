@@ -44,9 +44,15 @@
                          * of a Psysteme along a variable */
 
 
-/* the table of di variables, li variable and ds variable. the variable DiVars[i-1] or 
-LiVars[i-1] is associated with the loop at nesting level i. the variable DsiVars[i] 
-is associated with the ith element in the list of scalar variable */
+/* the tables of di variables, li variables and ds variables.
+ *
+ * variable DiVars[i-1] or LiVars[i-1] is associated to the loop at nesting
+ * level i. A di variable represents the difference in iteration number
+ * between the two references considered.
+ *
+ * the variable DsiVars[i] is associated to the ith element in the list
+ * of scalar variables modified in the loops
+ */
 entity DiVars[MAXDEPTH];
 entity LiVars[MAXDEPTH];
 entity DsiVars[MAXSV];
@@ -297,13 +303,13 @@ Psysteme s;
 		  entity_local_name((entity) v));
 	    if (SC_EMPTY_P(s  = sc_projection_pure(s, v))) {
 		debug(8, "ProjectOnDi", "infaisable\n");
-		return(INFAISABLE);
+		return(FALSE);
   	    }
 	    debug(8, "ProjectOnDi", "faisable\n");
 	}
     }
 
-     return(FAISABLE);
+     return(TRUE);
 }
 
 
@@ -400,16 +406,24 @@ action ac1,ac2;
 
 
 /* int sc_proj_optim_on_di(cl, sc)  
- * this function projects a system on a set of di variables. this set is
+ *
+ * This function projects a system onto a set of di variables. This set is
  * defined by cl, the common nesting level of the two array references
- * being tested: only di variables whose nesting level is less or equal
- * than cl are kept in the projected system.
- * The projection is done first by eliminating variables in the part of
- * equations. The variable whose coefficient is 1 is considered before 
- * (in such case it's integer elimination), and the rest by elimination of   
- * Fourier-Motzkin.
+ * being tested: only di variables whose nesting level is less than or equal to
+ * cl are kept in the projected system (i.e. outermost loops).
+ *
+ * The projection is performed by first eliminating variables in the
+ * equations. Variables whose coefficients are 1 or -1 are considered first. 
+ * (in such case it's integer elimination). Remaining inequalities are
+ * projected by Fourier-Motzkin elimination.
+ *
  * cl is the common nesting level.
- * sc is the system to project. sc is modified.
+ * sc is the system to project. sc is modified but psc always points to
+ *    a consistent Psysteme on return (i.e. it's up to the caller to free it).
+ *    *psc on return is sc_empty() if *psc on entry turns out to be 
+ *    non-feasible.
+ * a long jump buffer must have been initialized to handle overflows
+ * The value returned is TRUE is the system is feasible, FALSE otherwise.
  */
 
 int sc_proj_optim_on_di_ofl(cl, psc)
@@ -442,10 +456,10 @@ Psysteme *psc;
     *psc = sc_projection_optim_along_vecteur_ofl(*psc, pv);
     
     if (sc_empty_p(*psc)){
-	    res = INFAISABLE;
+	    res = FALSE;
 	}
     else {
-	res = FAISABLE;
+	res = TRUE;
     }
 
     vect_rm(pv);
@@ -453,19 +467,27 @@ Psysteme *psc;
     debug(6, "sc_proj_on_di_ofl", "end\n");
 
     return(res); 
-  
 }
 
 /* boolean sc_faisabilite_optim (Psysteme sc) :
- * test of faisabilite of a system sc by projections successives of the system 
- * along all variables in his base. 
- * carry out the projection by using funciton ==>
- * sc_projection_optim_along_vecteur().
- * sc_normalize() is called here before the projection
- *  result return by function :
+ *
+ * Test system sc feasibility by successive projections
+ * along all variables in its basis.
+ *
+ * carry out the projection with function sc_projection_optim_along_vecteur().
+ *
+ * sc_normalize() is called here before the projection, which means
+ * that sc may be deallocated
+ * 
+ *  result  :
  *
  *  boolean	: TRUE if system is faisable
  *		  FALSE else
+ *
+ * Modification:
+ *  - call to sc_rm() added when sc_projection_optim_along_vecteur_ofl()
+ *    returns sc_empty; necessary to have a consistent interface: when FALSE
+ *    is returned, sc always has been freed.
  */
 boolean sc_faisabilite_optim(sc)
 Psysteme sc;
@@ -489,6 +511,7 @@ Psysteme sc;
 	    if (sc_empty_p(sc1)) {
 		debug(7, "sc_faisabilite_optim", "system not feasible\n");
 		debug(6, "sc_faisabilite_optim", "end\n");
+		sc_rm(sc);
 		return(FALSE);
 	    }	    
 	    else {
@@ -505,8 +528,6 @@ Psysteme sc;
 	return(FALSE);
     }
 }
-
-
 
 /* boolean combiner_ofl_with_test(Psysteme sc, Variable v): 
  * the copy of combiner() adding the test of suffisants conditions of integer 
