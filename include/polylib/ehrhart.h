@@ -27,6 +27,8 @@ extern Enumeration *Polyhedron_Enumerate ( Polyhedron *P, Polyhedron *C,
                                            unsigned MAXRAYS, char **pname );
 extern void print_enode ( FILE *DST, enode *p, char **pname );
 extern void print_evalue ( FILE *DST, evalue *e, char **pname );
+extern void reduce_evalue (evalue *e);
+extern void Enumeration_Free(Enumeration *en);
 
 #else /* __STDC__ */
 
@@ -40,6 +42,8 @@ extern Enumeration *Polyhedron_Enumerate (/* Polyhedron *P, Polyhedron
                                       *C, unsigned MAXRAYS, char **pname */);
 extern void print_enode (/* FILE *DST, enode *p, char **pname */);
 extern void print_evalue (/* FILE *DST, evalue *e, char **pname */);
+extern void reduce_evalue (/* evalue *e */);
+extern void Enumeration_Free(/* Enumeration *en */);
 
 #endif /* __STDC__ */
 #endif /* _ehrhart_H_ */

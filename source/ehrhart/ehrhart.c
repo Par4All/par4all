@@ -271,7 +271,7 @@ static int eequal(evalue *e1,evalue *e2) {
 @param e pointer to an evalue
 
 */
-static void reduce_evalue (evalue *e) {
+void reduce_evalue (evalue *e) {
   
     enode *p;
     int i, j, k;
@@ -2091,4 +2091,20 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
 
   return res;
 } /* Polyhedron_Enumerate */ 
+
+void Enumeration_Free(Enumeration *en)
+{
+  Enumeration *ee;
+
+  while( en )
+  {
+          free_evalue_refs( &(en->EP) );
+          Polyhedron_Free( en->ValidityDomain );
+          ee = en ->next;
+          free( en );
+          en = ee;
+  }
+}
+
+
 
