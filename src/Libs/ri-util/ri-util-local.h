@@ -193,6 +193,11 @@
 #define statement_block_p(stat) \
 	(instruction_block_p(statement_instruction(stat)))
 
+#define entity_constant_p(e) (type_functional_p(entity_type(e)) && \
+  storage_rom_p(entity_storage(e)) && value_constant_p(entity_initial(e)))
+
+/* building instruction and statements...
+ */
 #define instruction_to_statement(i) \
    make_statement(entity_empty_label(),\
 		  STATEMENT_NUMBER_UNDEFINED, STATEMENT_ORDERING_UNDEFINED,\
@@ -206,8 +211,19 @@
 #define test_to_statement(t) instruction_to_statement(test_to_instruction(t))
 #define call_to_statement(c) instruction_to_statement(call_to_instruction(c))
 
-#define entity_constant_p(e) (type_functional_p(entity_type(e)) && \
-  storage_rom_p(entity_storage(e)) && value_constant_p(entity_initial(e)))
+#define unary_intrinsic_statement(name, e)\
+ call_to_expression(make_call(CreateIntrinsic(name), CONS(EXPRESSION, e, NIL)))
+
+#define binary_intrinsic_statement(name, e1, e2)\
+ call_to_expression(make_call(CreateIntrinsic(name),\
+ CONS(EXPRESSION, e1, CONS(EXPRESSION, e2, NIL))))
+  
+#define not_expression(e) \
+    unary_intrinsic_statement(NOT_OPERATOR_NAME, e)
+#define or_expression(e1, e2) \
+    binary_intrinsic_statement(OR_OPERATOR_NAME, e1, e2)
+#define and_expression(e1, e2) \
+    binary_intrinsic_statement(AND_OPERATOR_NAME, e1, e2)
 
 /* For the control graph modifiers: */
 
