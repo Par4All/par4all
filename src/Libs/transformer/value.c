@@ -160,6 +160,9 @@
   * $Id$
   *
   * $Log: value.c,v $
+  * Revision 1.23  2002/07/22 17:21:26  irigoin
+  * Function readable_value_name() added to cope with temporary values
+  *
   * Revision 1.22  2002/03/19 17:42:04  irigoin
   * Due to a bug fixed in ../semantics/mappings.c, improvement of comments,
   * replacement of debug() by pips_debug() and of pips_error() by pips_internal_error()
@@ -1144,4 +1147,20 @@ entity value_alias(entity e)
 string value_full_name(entity v)
 {
   return entity_name(v);
+}
+
+/* For debugging purposes, we might have to print system with temporary
+   values */
+string readable_value_name(entity v)
+{
+  string n = "";
+
+  if(local_temporary_value_entity_p(v)) {
+    n = entity_local_name(v);
+  }
+  else {
+    n = external_value_name(v);
+  }
+
+  return n;
 }
