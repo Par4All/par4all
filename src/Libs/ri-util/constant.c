@@ -142,7 +142,13 @@ tag bt;
     return e;
 }
 
-/* make a complex constant from two calls to real or integer constants */
+/* make a complex constant from two calls to real or integer constants
+ *
+ * Problem: does not work if either of the components is negative because
+ * negative constants are stored as expressions. For instance, (0, -1) is
+ * not a complex constant for PIPS but an expression:
+ * cmplx(0,unary_minus(1)).
+ */
 entity 
 MakeComplexConstant(r, i)
 expression r;
@@ -153,7 +159,17 @@ expression i;
     entity e;
     char * name = strdup(concatenate("(",entity_local_name(re), ",",
 				     entity_local_name(ie),")", NULL));
-    e = MakeConstant(name, is_basic_complex);
+    type rt = entity_type(re);
+    type it = entity_type(ie);
+    type ert = functional_result(type_functional(rt));
+    type eit = functional_result(type_functional(it));
+    basic rb = variable_basic(type_variable(ert));
+    basic ib = variable_basic(type_variable(eit));
+    int rsize = basic_type_size(rb);
+    int isize = basic_type_size(ib);
+    int size = rsize>isize? rsize: isize;
+
+    e = make_constant_entity(name, is_basic_complex, size);
     /* name has to be allocated by strdup because of nested calls to
        concatenate */
     free(name);
@@ -170,13 +186,14 @@ MakeComplexConstantExpression(
     syntax is = expression_syntax(i);
 
     if(syntax_call_p(rs) && syntax_call_p(is)) {
-	entity rc = call_function(syntax_call(rs));
-	entity ic = call_function(syntax_call(is));
+	basic rb = basic_of_expression(r);
+	basic ib = basic_of_expression(i);
+	int rsize = basic_type_size(rb);
+	int isize = basic_type_size(ib);
+	int size = rsize>isize? rsize: isize;
 
-	if(entity_constant_p(rc) && entity_constant_p(ic)) {
-	    entity c = MakeComplexConstant(r, i);
-	    cce = entity_to_expression(c);
-	}
+	cce = MakeBinaryCall(local_name_to_top_level_entity
+			     (size==4? IMPLIED_COMPLEX_NAME: IMPLIED_DCOMPLEX_NAME), r, i);
     }
     return cce;
 }
