@@ -85,41 +85,60 @@ register string s; /* la chaine a copier */
 }
 
 /* CONCATENATE() *********** Last argument must be NULL *********/
-/*VARARGS0*/
-string
-concatenate(char * first_string, ...)
+
+#define BUFFER_SIZE_INCREMENT 128
+#ifndef MAX
+#define MAX(x,y) (((x)>(y))?(x):(y))
+#endif
+
+/* concatenation is based on a static dynamic buffer
+ * which is shared from one call to another.
+ * FC.
+ */
+string 
+concatenate(string next, ...)
 {
-#define CONCATENATE_BUFFER_SIZE (2*8192)
-   va_list args ;
-   static char result[ CONCATENATE_BUFFER_SIZE ] ;
-   char *p ;
-   char * next_string ;
-   char * current = &result[0];
-   char * end = &result[ CONCATENATE_BUFFER_SIZE - 1 ];
+    static string buffer = (string) NULL;
+    static int buffer_size = 0;
+    int current = 0; /* first not used char */
+    va_list args;
+    
+    /* initial allocation
+     */
+    if (buffer_size==0)
+    {
+	pips_assert("NULL buffer", buffer==NULL);
+	buffer = (string) malloc(BUFFER_SIZE_INCREMENT);
+	buffer_size = BUFFER_SIZE_INCREMENT;
+    }
 
-   va_start( args, first_string ) ;
-   result[ 0 ] = '\0' ;
+    /* now get the strings and concatenates them
+     */
+    va_start(args, next);
+    while (next)
+    {
+	int len = strlen(next);
+	if (current+len > buffer_size)
+	{
+	    int size = MAX(current+len, buffer_size+BUFFER_SIZE_INCREMENT);
+	    string new_buffer = (string) malloc(size);
+	    
+	    (void) strncpy(new_buffer, buffer, current);
 
-   p = first_string;
-   
-   do {
-      /* strcat( result, p ) ; */
-      char * pc;
+	    free(buffer); buffer = new_buffer, buffer_size = size;
+	}
 
-      next_string = va_arg( args, char * );
-      for(pc = p; *pc; pc++, current++)
-         if( current < end )
-            *current = *pc;
-         else
-            /* a larger buffer could be malloc'ed... */
-            pips_error("concatenate", "buffer overflow\n");
-      p = next_string;
-   }
-   while( next_string != NULL );
+	(void) strncpy(&buffer[current], next, len);
+	current+=len;
+	
+	next = va_arg(args, string);
+    }
+    buffer[current] = '\0' ;
+    va_end(args);
 
-   *current = '\0';
-   va_end( args ) ;
-   return( result ) ;
+    /* returns the static buffer
+     */
+    return buffer;
 }
 
 char *strupper(s1, s2)
