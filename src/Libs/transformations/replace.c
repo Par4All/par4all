@@ -228,8 +228,7 @@ expression next_expr;
     mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, FALSE);
 
     mod_inst = statement_instruction(mod_stat);
-    pips_assert("ReplaceReference", instruction_unstructured_p(mod_inst),
-		"unstructured expected\n");
+    pips_assert("ReplaceReference", instruction_unstructured_p(mod_inst));
 
     CONTROL_MAP(ctl, {
 	statement st = control_statement(ctl);
