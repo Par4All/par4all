@@ -2,8 +2,8 @@
 # $Id$
 #
 # $Log: makefile_macros.GNUSOL1,v $
-# Revision 1.29  1997/05/14 15:55:20  coelho
-# *** empty log message ***
+# Revision 1.30  1997/07/26 12:37:07  coelho
+# includes GNU, thus much smaller.
 #
 # Revision 1.28  1997/04/17 19:24:22  coelho
 # latex2html options changed.
@@ -15,58 +15,11 @@
 # this file contains macro definitions 
 # this is the default file at CRI.
 
-#
-# for compiling:
-AR	= gar
-ARFLAGS	= rv
-CC	= gcc
+include $(ROOT)/Include/makefile_macros.GNU
+
 CANSI	= -ansi -pedantic
-CFLAGS	= -g -O2 -msupersparc -Wall -pipe
-CMKDEP	= -M
-CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ \
-	-I. -I$(NEWGEN_ROOT)/Include \
-	-I$(LINEAR_ROOT)/Include \
-	-I$(PIPS_ROOT)/Include \
-	-I$(EXTERN_ROOT)/Include
-LD	= $(CC) 
-LDFLAGS	= -g -L./$(ARCH) \
-	-L$(PIPS_ROOT)/Lib/$(ARCH) \
-	-L$(NEWGEN_ROOT)/Lib/$(ARCH) \
-	-L$(LINEAR_ROOT)/Lib/$(ARCH) \
-	-L$(EXTERN_ROOT)/Lib/$(ARCH)
-FC	= g77
-FFLAGS	= -g -O2 -Wimplicit -pipe
-RANLIB	= granlib
-
-#
-# tools for managing/generating code
-LEX	= flex
-LFLAGS	= 
-YACC	= bison
-YFLAGS	= -y
-LINT	= lint
-LINTFLAGS= -habxu
-PROTO	= cproto
-PRFLAGS	= -evcf2
-M4	= gm4
-M4FLAGS	=
-ETAGS	= etags
-
-#
-# tools for the documentation
-LX2HTML	= latex2html
-L2HFLAGS= -link 4 -split 3
-LATEX	= latex
-BIBTEX	= bibtex
-MAKEIDX	= makeindex
-DVIPS	= dvips
-NROFF	= nroff
-RMAN	= rman
-
-#
-# others
-TAR	= gtar
-ZIP	= gzip -v9
+CFLAGS	+= -msupersparc
+L2HFLAGS= -link 8 -split 5
 DIFF	= diff
 
 # end of it!
