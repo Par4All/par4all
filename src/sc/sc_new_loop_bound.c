@@ -1,3 +1,12 @@
+/*
+  $Id$
+
+  $Log: sc_new_loop_bound.c,v $
+  Revision 1.13  1998/12/23 09:50:06  coelho
+  RCS stuff.
+
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
