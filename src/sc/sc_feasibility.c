@@ -351,7 +351,7 @@ switch_method_when_error(Psysteme d, boolean int_p, int ofl_ctrl)
 	  ok = sc_fourier_motzkin_feasibility_ofl_ctrl(d, int_p, ofl_ctrl);
 	  //if timeout, then go to CATCH(overflow_error) within S_overflow_or_timeout, else return ok.
 	  ifscprintexact(5) {	     fprintf(stdout," Pass !!!\n");}
-	  FM_overflow_or_timeout = FALSE;
+	  FM_overflow_or_timeout = FALSE;	  
 	  UNCATCH(any_exception_error);
 	  return ok;
 	}//of if (!(FM_overflow_or_timeout))
@@ -389,7 +389,8 @@ switch_method_when_error(Psysteme d, boolean int_p, int ofl_ctrl)
 	  return ok;
 	}//of (!(S_overflow_or_timeout))
 	fprintf(stderr,"Error: shouldn't reach here, DN.\n");
-	return ok;// 
+	UNCATCH(any_exception_error);
+	return ok;//default is faisable 
     }//of TRY
     //UNCATCH() already put in TRY{}
 }
@@ -407,10 +408,10 @@ static boolean internal_sc_feasibility
    
   if ((method & PROJECT_EQ_METHOD))//if method = 01 then 01&10 = 0, if method = 11 then 11&10= 1
   {
-    w = sc_dup(sc);//there's a change in sc_dup
+    w = sc_dup(sc);//there's a reversion of sc in sc_dup
     //w = sc_copy(sc);//copy the system of constraints
     ok = sc_fm_project_variables(&w, int_p, TRUE, ofl_ctrl);
-    }
+  }
   
   //  if nb_ineg >= 10 and nb_eg < 6 then use Simplex (replace n eg by 2n ineg 
   //  if nb_ineg >= 10 and nb_eg >= 6 then project eg and use Simplex
@@ -435,6 +436,9 @@ static boolean internal_sc_feasibility
 	CATCH(user_exception_error) //CATCH if second call of methods fails
 	  {
 	    if (w) sc_rm(w);  // free resource
+	    S_overflow_or_timeout = FALSE;
+	    FM_overflow_or_timeout = FALSE;
+
 	    if (ofl_ctrl==FWD_OFL_CTRL)
 	      THROW(overflow_error);// throw overflow_error like before
 	    return TRUE; //if not ofl_ctrl then default is TRUE
