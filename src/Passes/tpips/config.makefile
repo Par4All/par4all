@@ -1,4 +1,5 @@
 YFLAGS=		$(PIPS_YFLAGS) -v -d
+LEX=		flex
 #
 TARGET_CFILES=	tpips.c
 TARGET_HEADERS=	tpips-local.h ana_lex.l ana_syn.y
