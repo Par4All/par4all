@@ -105,10 +105,8 @@ static text get_continuation_condition_text(char *module_name, bool give_code_p)
     module_stat = get_current_module_statement();
 
     /* To set up the hash table to translate value into value names */       
-    set_cumulated_effects_map
-	(effectsmap_to_listmap
-	 ((statement_mapping)
-	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)) );
+    set_cumulated_rw_effects((statement_effects)
+	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings(module);
 
 
@@ -160,7 +158,7 @@ static text get_continuation_condition_text(char *module_name, bool give_code_p)
 
     reset_current_module_entity();
     reset_current_module_statement();
-    free_cumulated_effects_map();
+    reset_cumulated_rw_effects();
     reset_must_continuation_map();
     reset_may_continuation_map();
 
