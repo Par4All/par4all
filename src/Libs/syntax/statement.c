@@ -407,7 +407,9 @@ expression e;
 
    if (!syntax_reference_p(l)) {
       /* FI: we stumble here when a Fortran macro is used */
-      FatalError("MakeAssignInst", "bad lhs or unsupported Fortran macro\n");
+      ParserError("MakeAssignInst",
+		  "bad lhs (function call or undeclared array) or "
+		  "unsupported Fortran macro\n");
    }
 
    return make_assign_instruction(lhs, e);
@@ -658,6 +660,10 @@ void MakeEndifInst()
 
 void MakeEnddoInst()
 {
+    if(CurrentBlock<=1) {
+	ParserError("MakeEnddoInst", "Unexpected ENDDO statement\n");
+    }
+
     if (strcmp("BLOCKDO", BlockStack[CurrentBlock-1].l))
 	    ParserError("MakeEnddoInst", "block do statement badly nested\n");
 
