@@ -709,12 +709,12 @@ enddo_inst: TK_ENDDO
 	;
 
 else_inst: TK_ELSE
-	    { MakeElseInst(); }
+	    { MakeElseInst(TRUE); }
 	;
 
 elseif_inst: TK_ELSEIF TK_LPAR expression TK_RPAR TK_THEN
 	    {
-		int elsifs = MakeElseInst();
+		int elsifs = MakeElseInst(FALSE);
 
 	        if(expression_implied_do_p($3))
 		    ParserError("Syntax", "Unexpected implied DO\n");
