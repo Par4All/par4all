@@ -94,7 +94,9 @@ int check_poly(Polyhedron *S,Polyhedron *C,Enumeration *en,
       /* Count manually the number of points */
       count_points(1,S,z,&tmp);
 #ifdef PRINT_ALL_RESULTS
-	printf(", count = %d. ",cc);
+	printf(", count = ");
+	value_print(stdout, P_VALUE_FMT, tmp);
+	printf(". ");
 #endif
 
       if(value_ne(tmp,c)) {
