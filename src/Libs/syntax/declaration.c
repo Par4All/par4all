@@ -106,7 +106,10 @@ entity e;
     entity g = local_name_to_top_level_entity(entity_local_name(e));
 
     if(!entity_undefined_p(g)
-       && variable_in_module_p(g, get_current_module_entity())) {
+       /* Let's hope functions and subroutines called are listed in the
+	* declaration list.
+	*/
+       && entity_is_argument_p(g, code_declarations(value_code(entity_initial(get_current_module_entity()))))) {
 	user_warning("SaveEntity", 
 		     "Ambiguity between external %s and local %s forbidden by Fortran standard\n",
 		     entity_name(g), entity_name(e));
