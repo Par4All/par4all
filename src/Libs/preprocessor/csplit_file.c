@@ -5,6 +5,9 @@
  * preprocessed.
  *
  * $Log: csplit_file.c,v $
+ * Revision 1.11  2003/12/04 16:29:05  irigoin
+ * Bug fix in function signature declaration: static or extern
+ *
  * Revision 1.10  2003/09/03 16:27:49  irigoin
  * Activation of TRY/CATCH/UNCATCH in csplit() to recover from parsing errors.
  *
@@ -296,7 +299,10 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
   /* Step 4: Copy the function definition */
   /* Fabien: you could add here anything you might want to unsplit the
      file later. */
-  fprintf(compilation_unit_file, "extern %s;\n", signature);
+  if(strncmp("static", signature, 6)==0 || (strncmp("extern", signature, 6)==0))
+    fprintf(compilation_unit_file, "%s;\n", signature);
+  else
+    fprintf(compilation_unit_file, "extern %s;\n", signature);
 
   /* Step 5: Keep track of the new module */
   fprintf(module_list_file, "%s %s\n", unambiguous_module_name, unambiguous_module_file_name);
