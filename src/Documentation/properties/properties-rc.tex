@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.170  2003/06/16 14:05:52  coelho
+%% hop.
+%%
 %% Revision 1.169  2002/07/04 15:44:59  nguyen
 %% Add new property for array bound checking. Arrays in a common block are
 %% checked wrt the common size
@@ -222,7 +225,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2002/07/04 15:44:59 $~$
+$~$Date: 2003/06/16 14:05:52 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -432,6 +435,7 @@ PIPSMAKE_CHECKPOINTS 0
 \subsection{PipsDBM}
 \index{Pipsdbm}
 \index{PIPSDBM\_RESOURCES\_TO\_DELETE}
+\index{PIPSDBM\_NO\_FREE\_ON\_QUIT}
 
 Shell environment variables \verb+PIPSDBM_DEBUG_LEVEL+ can be set to ?
 to check object consistency when they are stored in the database, and to
@@ -447,7 +451,6 @@ what is obsolete or not.
 \begin{verbatim}
 PIPSDBM_RESOURCES_TO_DELETE "obsolete"
 \end{verbatim}
-
 
 \subsection{Top Level Control}
 \index{Top Level}
