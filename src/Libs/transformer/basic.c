@@ -1,6 +1,14 @@
  /* transformer package - basic routines
   *
   * Francois Irigoin
+  *
+  * $id$
+  *
+  * $Log: basic.c,v $
+  * Revision 1.21  2001/07/19 18:03:21  irigoin
+  * Lots of additions for a better handling of multitype transformers
+  *
+  *
   */
 
 #include <stdio.h>
@@ -126,14 +134,15 @@ Pvecteur incr;
     /* Psysteme * ps = 
        &((Psysteme) predicate_system(transformer_relation(t))); */
     Psysteme psyst = predicate_system(transformer_relation(t));
-    entity i_old;
+    entity i_old = entity_to_old_value(i);
+    entity i_new = entity_to_new_value(i);
+    entity i_rep = value_to_variable(i_new);
 
-    transformer_arguments(t) = arguments_add_entity(transformer_arguments(t), i);
-    i_old = entity_to_old_value(i);
-    psyst->base = vect_add_variable(psyst->base, (Variable) i);
+    transformer_arguments(t) = arguments_add_entity(transformer_arguments(t), i_rep);
+    psyst->base = vect_add_variable(psyst->base, (Variable) i_new);
     psyst->base = vect_add_variable(psyst->base, (Variable) i_old);
     psyst->dimension = vect_size(psyst->base);
-    vect_chg_coeff(&incr, (Variable) i, -1);
+    vect_chg_coeff(&incr, (Variable) i_new, -1);
     vect_chg_coeff(&incr, (Variable) i_old, 1);
     psyst = sc_equation_add(psyst, contrainte_make(incr));
 
@@ -149,7 +158,7 @@ bool equality;
     Pcontrainte c;
     Psysteme sc; 
 
-    pips_assert("transformer_constraint_add", tf != transformer_undefined
+    pips_assert("tf is defined", tf != transformer_undefined
 		&& tf != (transformer) NULL);
 
     if(VECTEUR_NUL_P(i)) {
@@ -200,6 +209,50 @@ Pcontrainte eqs;
     return tf;
 }
 
+/* Warning: */
+transformer 
+transformer_inequalities_add(transformer tf, Pcontrainte ineqs)
+{
+  Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+
+    for(ineq = ineqs; !CONTRAINTE_UNDEFINED_P(ineq); ineq = contrainte_succ(ineq))
+	(void) transformer_constraint_add(tf, 
+					  contrainte_vecteur(ineq),
+					  FALSE);
+    return tf;
+}
+
+bool 
+transformer_argument_consistency_p(t)
+transformer t;
+{
+  list args = transformer_arguments(t);
+  bool consistent = TRUE;
+  Psysteme sc = (Psysteme) predicate_system(transformer_relation(t));
+  Pbase b = sc_base(sc);
+
+  /* If a variable appears as argument, its new value must be in the basis
+   * See for instance, effects_to_transformer()
+   */
+
+  MAP(ENTITY, e, {
+    entity v = entity_to_new_value(e);
+    /*
+      pips_assert("Argument is in the basis", base_contains_variable_p(b, (Variable) v));
+    */
+    if(!base_contains_variable_p(b, (Variable) v)) {
+      /* pips_user_warning("No value for argument %s in relation basis\n",
+	 entity_name(e)); */
+      pips_internal_error("No value for argument %s in relation basis\n",
+			  entity_name(e));
+      consistent = FALSE;
+    }
+  }, args);
+  pips_assert("Argument variables must have values in basis", consistent);
+
+  return consistent;
+}
+
 /* FI: I do not know if this procedure should always return or fail when
  * an inconsistency is found. For instance, summary transformers for callees
  * are inconsistent with respect to the current module. FC/CA: help...
@@ -208,11 +261,13 @@ Pcontrainte eqs;
  * than 1. A demo effect? No, this routine is coded that way to save time on
  * regular runs.
  *
- * Also, since no precise information about the inconsistency is displayed, a
- * core dump would be welcome to retrieve pieces of information with gdb.
+ * Also, since no precise information about the inconsistency is
+ * displayed, a core dump would be welcome to retrieve pieces of
+ * information with gdb.  The returned value should always be tested and a
+ * call to pips_internal_error() should always be performed if an
+ * inconsistency is detected.
  *
- * But, see final comment... In spite of it, I do not always return any longer.
- */
+ * But, see final comment... In spite of it, I do not always return any longer.  */
 bool 
 transformer_consistency_p(t)
 transformer t;
@@ -231,7 +286,6 @@ transformer t;
      * the constraints. This does not seem very safe to me (FI, 13 Nov. 95)
      */
     Psysteme sc = (Psysteme) predicate_system(transformer_relation(t));
-    Pbase b = sc_base(sc);
     list args = transformer_arguments(t);
     bool consistent = TRUE;
 
@@ -246,7 +300,7 @@ transformer t;
 
     /* The predicate must be weakly consistent. Every variable
      * in the constraints must be in the basis (but not the other
-     * way round.
+     * way round).
      */
     consistent = consistent && sc_weak_consistent_p(sc);
     if(!consistent)
@@ -299,6 +353,9 @@ transformer t;
 	     * A general version of this routine is needed...
 	     * the return value of a function is not recognized as a 
 	     * global value by old_value_entity_p
+	     *
+	     * old_value_entity_p() is likely to core dump on
+	     * interprocedural transformers and preconditions.
 	     */
 	    if( !storage_return_p(entity_storage(val))
 		&& old_value_entity_p(val)) {
@@ -355,20 +412,8 @@ transformer t;
 	}
     }, args);
 
-    /* If a variable appears as argument, its new value must be in the basis
-     * See for instance, effects_to_transformer()
-     */
-    MAP(ENTITY, e, {
-	entity v = entity_to_new_value(e);
-	/*
-	pips_assert("Argument is in the basis", base_contains_variable_p(b, (Variable) v));
-	*/
-	if(!base_contains_variable_p(b, (Variable) v)) {
-	    pips_user_warning("No value for argument %s in relation basis\n",
-			      entity_name(e));
-	    consistent = FALSE;
-	}
-    }, args);
+    if(consistent)
+      consistent = transformer_argument_consistency_p(t);
 
     /* FI: let the user react and print info before core dumping */
     /* pips_assert("transformer_consistency_p", consistent); */
@@ -402,11 +447,28 @@ bool transformer_internal_consistency_p(transformer t)
 
     if(!(new_value_entity_p(val) || old_value_entity_p(val)
 	 || intermediate_value_entity_p(val))) {
-      pips_user_warning("Variable %s in basis should be an internal value",
-			entity_local_name(val));
-      pips_assert("Basis variables must be an internal value", FALSE);
+      if(!entity_constant_p(val)) {
+	pips_user_warning("Variable %s in basis should be an internal value",
+			  entity_local_name(val));
+	pips_assert("Basis variables must be an internal value", FALSE);
+      }
     }
   }
 
   return consistent;
+}
+
+list transformer_projectable_values(transformer tf)
+{
+  list proj = NIL;
+  Psysteme sc = predicate_system(transformer_relation(tf));
+  Pbase b = BASE_UNDEFINED;
+
+  for(b=sc_base(sc); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
+    entity v = (entity) vecteur_var(b);
+
+    proj = CONS(ENTITY, v, proj);
+  }
+
+  return proj;
 }
