@@ -374,8 +374,8 @@ loop l;
 	sc_add_inegalite(sc_loop_prec, contrainte_dup(contrainte));
 	sc_loop_prec->base = BASE_NULLE;
 	sc_creer_base(sc_loop_prec);
-	array_regions_add_sc(l_loc_i_prime, sc_loop_prec);
-	array_regions_add_sc(l_loc_i, sc_loop_prec);
+	l_loc_i_prime = array_regions_sc_append(l_loc_i_prime, sc_loop_prec, FALSE);
+	l_loc_i = array_regions_sc_append(l_loc_i, sc_loop_prec, FALSE);
 	sc_rm(sc_loop_prec);
 	
 	/* LOC_I(i) = LOC(i, i'<i) inter LOC(i', i'<i) */
@@ -401,7 +401,7 @@ loop l;
 	/* first proj_i'[IN(i')] */
 	sc_loop_prec = sc_loop_proper_precondition(l);
 	array_regions_variable_rename(l_in, i, i_prime);	
-	array_regions_add_sc(l_in, sc_loop_prec);
+	l_in = array_regions_sc_append(l_in, sc_loop_prec, FALSE);
 	sc_rm(sc_loop_prec);
 	project_regions_along_loop_index(l_in, i_prime, loop_range(l));
 	
