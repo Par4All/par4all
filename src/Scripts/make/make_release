@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/21 14:04:17 $, 
+# $Date: 1996/09/21 14:15:57 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -74,7 +74,8 @@ do
 	FWD_MKFLAGS='--no-print-directory' \
 	FWD_ROOT="./$dir" \
 	RELEASE_OUT=">> $tmp.tmp" release
-    find ./$dir -name 'Makefile' -print
+    # all Makefiles should be collected...
+    find ./$dir -name 'Makefile' -print >> $tmp.tmp
 done 
 
 # Direct 
