@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/07/21 11:32:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/10/07 15:48:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1998/07/21 11:32:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1998/10/07 15:48:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -19,20 +19,31 @@ char vcid_syntax_equivalence[] = "%A% ($Date: 1998/07/21 11:32:29 $, ) version $
 #include "syntax.h"
 
 #define EQUIADD 0
-#define EQUIMER 1
+#define EQUIMERGE 1
 
 /* external variables used by functions from equivalence.c
  */
 static equivalences TempoEquivSet = equivalences_undefined;
 static equivalences FinalEquivSet = equivalences_undefined;
 
-/* re-initialize chains between two successives calls to parser
+/* undefine chains between two successives calls to parser
  */
 void 
 ResetChains()
 {
     TempoEquivSet = equivalences_undefined;
     FinalEquivSet = equivalences_undefined;
+}
+
+/* initialize chains before each call to the parser
+ */
+void 
+SetChains()
+{
+    pips_assert("TempoEquivSet is undefined", equivalences_undefined_p(TempoEquivSet));
+    pips_assert("FinalEquivSet is undefined", equivalences_undefined_p(FinalEquivSet));
+    TempoEquivSet = make_equivalences(NIL);
+    FinalEquivSet = make_equivalences(NIL);
 }
 
 
@@ -91,10 +102,10 @@ syntax s;
     return(make_atom(e, o));
 }
 
-/* this function is called when an equivalence chain has been completely
-parsed. it looks for the atom with the biggest offset, and then
-substracts this maximum offset from all atoms. The result is that each
-atom has its offset from the begining of the chain. */
+/* This function is called when an equivalence chain has been completely
+parsed. It looks for the atom with the biggest offset, and then substracts
+this maximum offset from all atoms. The result is that each atom has its
+offset from the begining of the chain. */
 
 void 
 StoreEquivChain(c)
@@ -121,16 +132,19 @@ chain c;
 	}
     }
 
+    /*
     if (TempoEquivSet == equivalences_undefined) {
 	TempoEquivSet = make_equivalences(NIL);
     }
+    */
+    pips_assert("The TempoEquivSet is defined", !equivalences_undefined_p(TempoEquivSet));
 
     equivalences_chains(TempoEquivSet) = 
 	    CONS(CHAIN, c, equivalences_chains(TempoEquivSet));
 }
 
-/* this function merges all the equivalence chains to take into account
-equivalences due to transitivity. it is called at the end of the parsing. */
+/* This function merges all the equivalence chains to take into account
+equivalences due to transitivity. It is called at the end of the parsing. */
 
 void 
 ComputeEquivalences()
@@ -140,28 +154,39 @@ ComputeEquivalences()
 
     debug(8, "ComputeEquivalences", "Begin\n");
 
+    /*
     if (TempoEquivSet == equivalences_undefined) {
 	debug(8, "ComputeEquivalences", "Useless call, end\n");
 	    return;
     }
+    */
 
+    if (ENDP(equivalences_chains(TempoEquivSet))) {
+	debug(8, "ComputeEquivalences", "No equivalences to process, end\n");
+	    return;
+    }
+
+    /* They should be properly initialized by SetChains
     if (FinalEquivSet == equivalences_undefined) {
 	FinalEquivSet = make_equivalences(NIL);
     }
+    */
 
     debug(8, "ComputeEquivalences", "Initial equivalence chains\n");
-
     PrintChains(TempoEquivSet);
 
     while (again) {
 	for (pc = equivalences_chains(TempoEquivSet); pc != NIL; pc = CDR(pc))
-		again = (AddOrMergeChain(CHAIN(CAR(pc))) == EQUIMER);
+		again = (AddOrMergeChain(CHAIN(CAR(pc))) == EQUIMERGE);
 
 	free_equivalences(TempoEquivSet);
 
 	if (again) {
 	    TempoEquivSet = FinalEquivSet;
 	    FinalEquivSet = make_equivalences(NIL);
+
+	    debug(8, "ComputeEquivalences", "Intermediate equivalence chains\n");
+	    PrintChains(TempoEquivSet);
 	}
     }
 
@@ -193,7 +218,7 @@ chain ct;
 
 	if (ChainIntersection(pct, pcf)) {
 	    chain_atoms(cf) = MergeTwoChains(pct, pcf);
-	    return(EQUIMER);
+	    return(EQUIMERGE);
 	}
     }
 
@@ -277,8 +302,15 @@ equivalences e;
 {
     cons *pcc;
 
-    for (pcc = equivalences_chains(e); pcc != NIL; pcc = CDR(pcc)) {
-	PrintChain(CHAIN(CAR(pcc)));
+    if(ENDP(equivalences_chains(e))) {
+	ifdebug(9) {
+	    (void) fprintf(stderr, "Empty list of equivalence chains\n");
+	}
+    }
+    else {
+	for (pcc = equivalences_chains(e); pcc != NIL; pcc = CDR(pcc)) {
+	    PrintChain(CHAIN(CAR(pcc)));
+	}
     }
 }
 
@@ -299,7 +331,7 @@ chain c;
 			   entity_name(atom_equivar(a)), atom_equioff(a));
 	}
 	(void) fprintf(stderr, "\n");
-	debug(9, "PrintChain", "\n");
+	debug(9, "PrintChain", "End\n");
     }
 }
 
@@ -338,17 +370,69 @@ entity_in_equivalence_chain_p(entity e, chain c)
     return is_in_p;
 }
 
-/* This function computes an address for each variable. All common
- * variables already have their own addresses. If such a variable occurs in
- * an equivalence chain, all variables of this chain will have an address
- * in this common. The exact address depends on the offset stored in the
- * atom. 
+/* This function computes an address for every variable. Three different
+ * cases are adressed: variables in user-declared commons, static variables
+ * and dynamic variables.
+ *
+ * Variables may have:
+ *
+ *  - an undefined storage because they have the default dynamic storage
+ *  or because they should inherit their storage from an equivalence
+ *  chain. The inherited storage can be "user-declared common", "static" or
+ *  even "dynamic".
+ *
+ *  - a user-declared common storage. The offsets of these variables can
+ *  be computed from the common partial layout. Offsets for variables
+ *  equivalenced to one of them are derived and the layouts are updated.
+ *
+ *  - a static storage: the offset must be unknown on entrance in this
+ *  function.
+ *
+ *  - a dynamic storage: this is forbidden because there is no DYNAMIC
+ *  declaration.  The Fortran programmer does not have a way to enforce
+ *  explictly a dynamic storage.  All dynamic variables have an undefined
+ *  storage upon entrance.
+ *
+ *  - a non-ram storage: this obviously is forbidden.
+ *
+ * All variables explictly declared in a common have a storage fully
+ * defined within this common (see update_common_layout() which must have
+ * been called before entering ComputeAddresses()). If such a variable
+ * occurs in an equivalence chain, all other variables of this chain will
+ * have an address in this common. The exact address depends on the offset
+ * stored in the atom.
  * 
- * The same kind of processing is done for chains containing a static
- * variable. 
- * 
- * Otherwise, all variables of a chain have an address in the
- * dynamic area.
+ * The variables allocated in the static and dynamic areas are handled
+ * differently from variables explicitly declared in a common because the
+ * programmer does not have a direct control over the offset as within a
+ * common declaration. An arbitrary allocation is performed.  The same
+ * kind of processing is done for chains containing a static variable or
+ * only dynamic variables (i.e. each variable in the chain has an
+ * undefined storage).
+ *
+ * Static variables obviously have a partially defined storage since they
+ * are recognized as static.
+ *
+ * Each equivalence chain should be either attached to a user-declared
+ * common or to the static area or to the dynamic area of the current
+ * module.
+ *
+ * Static and dynamic chains are processed in a similar way. The size of
+ * each chain is computed and the space for the chain is allocated in the
+ * corresponding area. As for user-declared commons (but with no good
+ * reason?) only one representant of each chain is added to the layouts of
+ * the area.
+ *
+ * When the processing of equivalenced variables is completed,
+ * non-equivalenced static or dynamic (i.e. variables with undefined
+ * storage) variables are allocated.
+ *
+ * Finally equivalenced variables are appended to the layouts of the
+ * static and dynamic areas. This makes update_common_layout() unapplicable.
+ *
+ * As a result, variables declared in the static and dynamic area are not 
+ * ordered by increasing offsets.
+ *
  */
 
 void 
@@ -358,6 +442,9 @@ ComputeAddresses()
     entity sc;
     int lc, l, ac;
     list dynamic_aliases = NIL;
+    list static_aliases = NIL;
+
+    debug(1, "ComputeAddresses", "Begin\n");
 
     if (FinalEquivSet != equivalences_undefined) {
 	for (pcc = equivalences_chains(FinalEquivSet); pcc != NIL; 
@@ -365,8 +452,7 @@ ComputeAddresses()
 	    chain c = CHAIN(CAR(pcc));
 
 	    /* the default section for variables with no address is the dynamic
-	     * area.
-	     */
+	     * area.  */
 	    sc = DynamicArea;
 	    lc = 0;
 	    ac = 0;
@@ -374,7 +460,7 @@ ComputeAddresses()
 	    /* Try to locate the area for the current equivalence chain.
 	     * Only one variable should have a well-defined storage.
 	     * Or no variables have one because the equivalence chain 
-	     * is located in the dynamic area
+	     * is located in the dynamic area.
 	     */
 	    for (pca = chain_atoms(c); pca != NIL; pca = CDR(pca)) {
 		entity e;
@@ -383,11 +469,13 @@ ComputeAddresses()
 		e = atom_equivar(ATOM(CAR(pca)));
 		o = atom_equioff(ATOM(CAR(pca)));
 
+		/* Compute the total size of the chain. This only should
+                   be used for the static and dynamic areas */
 		/* FI: I do not understand why this assignment is not better guarded.
 		 * Maybe, because lc's later use *is* guarded.
 		 */
 		if ((l = SafeSizeOfArray(e)) > lc-o)
-			lc = l+o;
+		    lc = l+o;
 
 		if (entity_storage(e) != storage_undefined) {
 		    if (storage_ram_p(entity_storage(e))) {
@@ -413,13 +501,13 @@ ComputeAddresses()
 					     "area %s requested by equivalence for %s\n",
 					     entity_name(sc), entity_name(ram_section(r)),
 					     entity_local_name(e));
-				    ParserError("ComputeAddresses",
+				ParserError("ComputeAddresses",
 					    "incompatible areas\n");
 			    }
 			}
 		    }
 		    else
-			    FatalError("ComputeAddresses", "non ram storage\n");
+			FatalError("ComputeAddresses", "non ram storage\n");
 		}
 	    }
 
@@ -433,7 +521,7 @@ ComputeAddresses()
 		e = atom_equivar(ATOM(CAR(pca)));
 		o = atom_equioff(ATOM(CAR(pca)));
 
-		if (sc == DynamicArea) {
+		if (sc == DynamicArea || sc == StaticArea) {
 		    ac = area_size(type_area(entity_type(sc)));
 		}
 
@@ -451,19 +539,40 @@ ComputeAddresses()
 		    r = storage_ram(entity_storage(e));
 
 		    if (adr != ram_offset(r)) {
-			user_warning("ComputeAddresses",
-				     "Two conflicting offsets for %s: %d and %d\n",
-				     entity_local_name(e), adr, ram_offset(r));
-			ParserError("ComputeAddresses", "incompatible addresses\n");
+			if(ram_offset(r)==UNKOWN_RAM_OFFSET && ram_section(r)==StaticArea) {
+			    ram_offset(r) = adr;
+			    if(sc == StaticArea && pca != chain_atoms(c)) {
+				/* Static aliases cannot be added right away because
+				 * implicitly declared static variables still have to
+				 * be added whereas aliased variables are assumed to be
+				 * put behind in the layout list. Except the first one.
+				 *
+				 * Well, I'm not so sure!
+				 */
+				static_aliases = arguments_add_entity(static_aliases, e);
+			    }
+			    else {
+				area a = type_area(entity_type(sc));
+
+				area_layout(a) = gen_nconc(area_layout(a),
+							   CONS(ENTITY, e, NIL));
+			    }
+			}
+			else {
+			    user_warning("ComputeAddresses",
+					 "Two conflicting offsets for %s: %d and %d\n",
+					 entity_local_name(e), adr, ram_offset(r));
+			    ParserError("ComputeAddresses", "incompatible addresses\n");
+			}
 		    }
 		}
 		else {
 		    area a = type_area(entity_type(sc));
 
 		    entity_storage(e) = 
-			    make_storage(is_storage_ram,
-					 (make_ram(get_current_module_entity(), 
-						   sc, adr, NIL)));
+			make_storage(is_storage_ram,
+				     (make_ram(get_current_module_entity(), 
+					       sc, adr, NIL)));
 		    /* Add e in sc'layout and check that sc's size
 		     * does not have to be increased as for:
 		     * COMMON /FOO/X
@@ -498,47 +607,94 @@ ComputeAddresses()
 		}
 	    }
 
-	    if (sc == DynamicArea)
+	    if (sc == DynamicArea || sc == StaticArea)
 		area_size(type_area(entity_type(sc))) += lc;
 
 	}
     }
 
     /* All declared variables are scanned and stored in the dynamic area if their
-     * storage is still undefined.
+     * storage is still undefined or in the static area if their offsets are still
+     * unkown.
+     *
+     * This should be the case for all non-aliased static variables and most dynamic
+     * variables.
+     *
      */
+
+    debug(2, "ComputeAddresses", "Process left-over dynamic variables\n");
 
     for (pcv = code_declarations(EntityCode(get_current_module_entity())); pcv != NIL;
 	 pcv = CDR(pcv)) {
 	entity e = ENTITY(CAR(pcv));
 
 	if (entity_storage(e) == storage_undefined) {
-	    /* FI: I do not understand how this could work because
-	     * DynamicArea is managed directly and not thru common_size_map
-	     *
-	     * This could be hidden in CurrentOffsetOfArea()...
-	     *
-	     * FI, 16 June 1997
-	     */
+	    /* area da = type_area(entity_type(DynamicArea)); */
+
+	    debug(2, "ComputeAddresses", "Add dynamic non-aliased variable %s\n",
+		  entity_local_name(e));
+
 	    entity_storage(e) = 
-		    make_storage(is_storage_ram,
-				 (make_ram(get_current_module_entity(), 
-					   DynamicArea, 
-					   CurrentOffsetOfArea(DynamicArea,
-							       e), NIL)));
+		make_storage(is_storage_ram,
+			     (make_ram(get_current_module_entity(), 
+				       DynamicArea, 
+				       CurrentOffsetOfArea(DynamicArea,
+							   e), NIL)));
+	    /* area_layout(da) = gen_nconc(area_layout(da), CONS(ENTITY, e, NIL)); */
 	}
-    }
+	else if(storage_ram_p(entity_storage(e))) {
+	    ram r = storage_ram(entity_storage(e));
+	    if(ram_offset(r)==UNKOWN_RAM_OFFSET) {
+		/* area sa = type_area(entity_type(StaticArea)); */
+
+		debug(2, "ComputeAddresses", "Add static non-aliased variable %s\n",
+		      entity_local_name(e));
+
+		ram_offset(r) = CurrentOffsetOfArea(StaticArea, e);
+		/* area_layout(sa) = gen_nconc(area_layout(sa), CONS(ENTITY, e, NIL)); */
+	    }
+	}
+     }
 
     /* Add aliased dynamic variables */
     if(!ENDP(dynamic_aliases)) {
 	/* neither gen_concatenate() nor gen_append() are OK */
-	list dynamic = area_layout(type_area(entity_type(DynamicArea)));
+	list dynamics = area_layout(type_area(entity_type(DynamicArea)));
+
+	ifdebug(2) {
+	    debug(2, "ComputeAddresses", "There are dynamic aliased variables:");
+	    print_arguments(dynamic_aliases);
+	}
 
 	pips_assert("aliased dynamic variables imply standard dynamic variables",
-		    !ENDP(dynamic));
+		    !ENDP(dynamics));
 	/* side effect on area_layout */
-	(void) gen_nconc(dynamic, dynamic_aliases);
+	(void) gen_nconc(dynamics, dynamic_aliases);
     }
+
+    /* Add aliased static variables */
+    if(!ENDP(static_aliases)) {
+	/* neither gen_concatenate() nor gen_append() are OK */
+	list statics = area_layout(type_area(entity_type(StaticArea)));
+
+	ifdebug(2) {
+	    debug(2, "ComputeAddresses", "There are static aliased variables:");
+	    print_arguments(static_aliases);
+	}
+
+	pips_assert("aliased static variables imply standard static variables",
+		    !ENDP(statics));
+	/* side effect on area_layout */
+	(void) gen_nconc(statics, static_aliases);
+    }
+
+    /* The sizes of the static and dynamic areas are now known */
+    update_common_to_size(StaticArea,
+			  area_size(type_area(entity_type(StaticArea))));
+    update_common_to_size(DynamicArea,
+			  area_size(type_area(entity_type(DynamicArea))));
+
+    debug(1, "ComputeAddresses", "End\n");
 }
 
 /* Initialize the shared fields of aliased variables */
