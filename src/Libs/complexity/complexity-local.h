@@ -10,7 +10,6 @@
  */
 #include "matrice.h"
 
-#define COMPLEXITY_INCLUDED
 #define COMPLEXITY_UNDEFINED complexity_undefined
 /*
 #define COMPLEXITY_UNDEFINED_SYMBOL "<Complexity undefined>"
