@@ -172,6 +172,9 @@ tpips_version=${tpips_version:=`which_executable tpips`}
 
 export pips_version tpips_version
 
+test "${pips_version}" -a -x "${pips_version}" || error 4 "no pips!"
+test "${tpips_version}" -a -x "${tpips_version}" || error 5 "no tpips!"
+
 $verb "pips to be used: $pips_version"
 $verb "tpips to be used: $tpips_version"
 
