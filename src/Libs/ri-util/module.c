@@ -2,6 +2,9 @@
   * $Id$
   *
   * $Log: module.c,v $
+  * Revision 1.31  1997/12/02 16:18:14  coelho
+  * order fixed.
+  *
   * Revision 1.30  1997/12/02 12:18:50  coelho
   * resort declarations according to initial ones...
   *
@@ -340,8 +343,17 @@ cmp(const void * x1, const void * x2)
     entity e1 = * (entity*) x1, e2 = * (entity*) x2;
     int o1 = gen_find_occurence(initial_order, e1),
 	o2 = gen_find_occurence(initial_order, e2);
-    return (o1==-1 || o2==-1)? 
-	strcmp(entity_name(e1), entity_name(e2)): (o1-o2);
+
+    if (o1==-1)
+	if (o2==-1)
+	    return strcmp(entity_name(e1), entity_name(e2));
+	else
+	    return -1;
+    else 
+	if (o2==-1)
+	    return 1;
+	else
+	    return o1-o2;
     
 }
 static void 
