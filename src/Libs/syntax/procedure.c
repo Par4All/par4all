@@ -460,6 +460,7 @@ type r; /* type of result */
     else if (type_functional_p(tfe)) 
     {
 	type tr = functional_result(type_functional(tfe));
+	/* FI: the next test should be osfter to take into account overloaded type */
 	if(r != type_undefined && !type_equal_p(tr, r)) {
 	    /* a bug is detected here: MakeExternalFunction, as its name
 	       implies, always makes a FUNCTION, even when the symbol
@@ -472,7 +473,7 @@ type r; /* type of result */
 		functional_result(type_functional(tfe)) = r;
 	    else {
 		user_warning("MakeExternalFunction",
-			     "Type redefinition for %s.\n", entity_name(e));
+			     "Type redefinition for %s.\n", entity_name(fe));
 		ParserError("MakeExternalFunction",
 			   "Functional type redefinition.\n");
 	    }
