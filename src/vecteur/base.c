@@ -78,6 +78,16 @@ Variable var;
     return(result);
 }
 
+Pbase make_base_from_vect(Pvecteur pv)
+{
+    Pbase b = (Pbase) NULL;
+    for(;!VECTEUR_NUL_P(pv);pv=pv->succ)
+	if (pv->var != TCST)
+	    b = base_add_variable(b,pv->var);
+    return(b);
+}
+
+
 /* Pbase base_remove_variable(b, v): remove basis vector relative to v
  * from b; abort if v is not in b;
  */
