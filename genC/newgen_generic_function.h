@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/04/14 14:56:53 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/05/05 15:30:02 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -39,6 +39,8 @@ PREFIX void update_##name(k,v) type##_key_type k; type##_value_type v;\
        { update_##type(name, k, v);}\
 PREFIX type##_value_type load_##name(k) type##_key_type k;\
        { return(apply_##type(name, k));}\
+PREFIX type##_value_type delete_##name(k) type##_key_type k;\
+       { return(delete_##type(name, k));}\
 PREFIX bool bound_##name##_p(k) type##_key_type k; \
        { return(bound_##type##_p(name, k));}
 
@@ -51,7 +53,7 @@ static int name##_hack()\
 { return((int) name##_undefined_p & (int) reset_##name & \
 	 (int) set_##name & (int) get_##name & \
 	 (int) update_##name & (int) load_##name & \
-	 (int) bound_##name##_p & (int) name##_hack);}
+	 (int) bound_##name##_p & (int) delete_##type & (int) name##_hack);}
 
 #define GENERIC_GLOBAL_FUNCTION(name, type)\
         GENERIC_FUNCTION(/**/, name, type)
