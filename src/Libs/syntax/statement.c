@@ -2,6 +2,7 @@
 extern int fprintf();
 extern int _filbuf();
 #include <string.h>
+#include <ctype.h>
 
 #include "genC.h"
 #include "parser_private.h"
@@ -101,15 +102,20 @@ statement s;
 
 
 
-/* the purpose of the following data structure is to build the control
+/* The purpose of the following data structure is to build the control
 structure of the procedure being analyzed. each time a control statement
 (do loop, block if, ...) is analyzed, a new block is created and pushed
 on the block stack. regular statement (assign, goto, return, ...) are
 linked to the block that is on the top of the stack. blocks are removed
 from the stack when the corresponding end statement is encountered
-(endif, end of loop, ...). */
+(endif, end of loop, ...). 
 
-#define MAXBLOCK 20
+There does not seem to be any limit on the nesting level in Fortran standard.
+MAXBLOCK is set to "large" value for our users.
+*/
+
+#define MAXBLOCK 100
+
 typedef struct block {
 	instruction i; /* the instruction that contains this block */
 	string l;      /* the label that will end this block */
