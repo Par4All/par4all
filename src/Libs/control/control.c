@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/06/05 14:36:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/12/08 13:04:45 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1998/06/05 14:36:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1998/12/08 13:04:45 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -515,6 +515,9 @@ hash_table used_labels;
 }
 
 
+/* Generate a test statement ts for exiting loop sl.
+ * There should be no sharing between sl and ts.
+ */
 statement whileloop_test(statement sl)
 {
     whileloop l = instruction_whileloop(statement_instruction(sl));
@@ -522,14 +525,15 @@ statement whileloop_test(statement sl)
     string cs = string_undefined;
     call c = make_call(entity_intrinsic(".NOT."),
 		       CONS(EXPRESSION,
-			    whileloop_condition(l),
+			    copy_expression(whileloop_condition(l)),
 			    NIL));
     test t = make_test(make_expression(make_syntax(is_syntax_call, c),
 				       normalized_undefined), 
 		       MAKE_CONTINUE_STATEMENT(), 
 		       MAKE_CONTINUE_STATEMENT());
     string csl = statement_comments(sl);
-    string prev_comm = empty_comments_p(csl)? "" : strdup(csl);
+    /* string prev_comm = empty_comments_p(csl)? "" : strdup(csl); */
+    string prev_comm = empty_comments_p(csl)? strdup("") : strdup(csl);
     string lab = string_undefined;
 
     if(entity_empty_label_p(whileloop_label(l)))
@@ -553,7 +557,7 @@ statement whileloop_test(statement sl)
 }
 
 
-/* CONTROLIZE_LOOP computes in C_RES the control graph of the loop L (of
+/* CONTROLIZE_WHILELOOP computes in C_RES the control graph of the loop L (of
  *  statement ST) with PREDecessor and SUCCessor
  *
  * Derived by FI from controlize_loop()
@@ -601,11 +605,13 @@ hash_table used_labels;
     }
     else {
 	control_statement(c_res) = whileloop_test(st);
-	control_predecessors(c_res) =
-		CONS(CONTROL, pred, control_predecessors(c_res));
+	/* control_predecessors(c_res) =
+	   CONS(CONTROL, pred, control_predecessors(c_res)); */
+	ADD_PRED(pred, c_res);
 	control_successors(c_res) =
 		CONS(CONTROL, succ, control_successors(c_res));
 	controlized = TRUE ;
+	ifdebug(5) check_control_coherency(c_res);
     }
     control_predecessors(succ) = ADD_PRED(c_res, succ);
     control_successors(pred) = ADD_SUCC(c_res, pred);
@@ -839,6 +845,7 @@ hash_table used_labels;
     
     ctls = controlize_list_1(sts, pred, c_end, c_block, block_used_labels);
     c_last = compact_list(ctls, c_end);
+    /* To avoid compact list: c_last = c_end; */
 
     ifdebug(5) {
 	pips_debug(0, "Nodes from c_block %p\n", c_block);
