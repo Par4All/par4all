@@ -35,9 +35,7 @@
 #include "effects-generic.h"
 
 
-/*********************************************************************************/
-/* LOCAL FUNCTIONS                                                               */
-/*********************************************************************************/
+/********************************************************* LOCAL FUNCTIONS */
 
 static list no_write_effects(entity e,list args);
 static list affect_effects(entity e,list args);
@@ -166,6 +164,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"STOP",                     no_write_effects},
     {"END",                      no_write_effects},
     {"FORMAT",                   no_write_effects},
+
+    { IMPLIED_COMPLEX_NAME,      no_write_effects},
 
     {"INT",                      no_write_effects},
     {"IFIX",                     no_write_effects},
