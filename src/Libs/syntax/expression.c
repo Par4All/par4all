@@ -160,25 +160,52 @@ int HasParenthesis;
     te = entity_type(e);
 
     if (type_variable_p(te)) {
+      if((gen_length(indices)==0) ||
+	 (gen_length(indices)==
+	  gen_length(variable_dimensions(type_variable(te))))) {
 	if (lc == expression_undefined && fc == expression_undefined) {
-	    if((gen_length(indices)==0) ||
-	       (gen_length(indices)==
-		gen_length(variable_dimensions(type_variable(te))))) {
-		s = make_syntax(is_syntax_reference, 
-				make_reference(e, indices));
-	    }
-	    else {
-		user_warning("MakeAtom",
-			     "Too many or too few subscript expressions"
-			     " for reference to %s\n",
-			     entity_local_name(e));
-		ParserError("MakeAtom", "Illegal array reference\n");
-	    }
-
+	  s = make_syntax(is_syntax_reference, 
+			  make_reference(e, indices));
 	}
 	else {
-	    ParserError("MakeAtom", "Substrings are not implemented\n");
+	  /* substring */
+	  expression ref = 
+	    make_expression(make_syntax(is_syntax_reference, 
+					make_reference(e, indices)),
+			    normalized_undefined);
+	  expression lce = expression_undefined;
+	  expression fce = expression_undefined;
+	  list lexpr = NIL;
+	  entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
+	  basic bt = variable_basic(type_variable(te));
+
+	  pips_assert("Substring can only be applied to a string", basic_string_p(bt));
+
+	  if(fc == expression_undefined) 
+	    fce = int_to_expression(1);
+	  else
+	    fce = fc;
+
+	  if(lc == expression_undefined)
+	    lce = int_to_expression(basic_type_size(bt));
+	  else
+	    lce = lc;
+
+	  lexpr = CONS(EXPRESSION, ref, 
+		      CONS(EXPRESSION, fce,
+			   CONS(EXPRESSION, lce, NIL)));
+	  s = make_syntax(is_syntax_call, make_call(substr, lexpr));
+	  /* ParserError("MakeAtom", "Substrings are not implemented\n"); */
 	}
+      }
+      else {
+	user_warning("MakeAtom",
+		     "Too many or too few subscript expressions"
+		     " for reference to %s\n",
+		     entity_local_name(e));
+	ParserError("MakeAtom", "Illegal array reference\n");
+      }
+
     }
     else if (type_functional_p(te)) {
 	if (value_unknown_p(entity_initial(e))) {
