@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/03 12:46:56 $, 
+# $Date: 1996/09/13 13:31:39 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -31,7 +31,7 @@ usage()
 	 -e: edit list
 	 -r dir: Root directory -- absolute!
 	 -t dir: Target directory -- idem!
-         -s dir: Source directories -- with release!
+	 -s dir: Source directories -- with release!
 	 -d dir: Other directories -- direct!
 	 dirs: direct directories relative to root -- cleaned!
 	EOF
