@@ -256,33 +256,40 @@ graph obj;
    }
 }
 
+#define ADFG_EXT ".adfg_file"
 
 /*============================================================================*/
 boolean print_array_dfg( module_name )
 string module_name;
 {
-  FILE    	*fd = NULL;
-  char    	*filename = NULL;
-  entity  	module = NULL;
-  graph		dfg = NULL;
+  char *localfilename;
+  FILE        *fd;
+  char        *filename;
+  graph the_dfg;
 
   debug_on( "PRINT_ARRAY_DFG__DEBUG_LEVEL" );
+
+  if (get_debug_level() > 1)
+    user_log("\n\n *** PRINTING ARRAY DFG for %s\n", module_name);
+
+  the_dfg = (graph) db_get_memory_resource(DBR_ADFG, module_name, TRUE);
+
+  localfilename = strdup(concatenate(module_name, ADFG_EXT, NULL));
+  filename = strdup(concatenate(db_get_current_workspace_directory(), 
+				"/", localfilename, NULL));
   
-  if (get_debug_level() > 1) user_log("\n\n *** PRINTING ARRAY DFG for %s\n", module_name);
-
-  module = local_name_to_top_level_entity(module_name);
-  dfg = (graph) db_get_memory_resource(DBR_ADFG, module_name, TRUE);
-  filename = strdup(concatenate(db_get_current_workspace_directory(),
-				"/", module_name, ".adfg_file", NULL));
-
   fd = safe_fopen(filename, "w");
-  fprint_dfg(fd, dfg);
+  fprint_dfg(fd, the_dfg);
   safe_fclose(fd, filename);
   
-  DB_PUT_FILE_RESOURCE(DBR_ADFG_FILE, strdup(module_name), filename);
+  DB_PUT_FILE_RESOURCE(DBR_ADFG_FILE, strdup(module_name), localfilename);
+  
+  free(filename);
+  
   debug_off();
-
+  
   return(TRUE);
+
 }
 
 /*============================================================================*/
