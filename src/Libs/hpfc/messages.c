@@ -122,12 +122,8 @@ list Ro, lRo;
     lm3p = keep_non_empty_domain_messages(lm3);
     gen_free_list(lm3);
 
-    debug(6, "messages_handling",
-	  "lm3p length is %d\n", gen_length(lm3p));
-    ifdebug(8)
-    {
-	fprint_lmessage(stderr, lm3p);
-    }
+    debug(6, "messages_handling", "lm3p length is %d\n", gen_length(lm3p));
+    ifdebug(8) fprint_lmessage(stderr, lm3p);
 
     /*
      * fourth kind of messages generation
@@ -139,12 +135,8 @@ list Ro, lRo;
     lm4 = messages_guards_and_neighbour(lm3p);
     gen_free_list(lm3p);
     
-    debug(6, "messages_handling",
-	  "lm4 length is %d\n", gen_length(lm4));
-    ifdebug(8)
-    {
-	fprint_lmessage(stderr, lm4);
-    }
+    debug(6, "messages_handling", "lm4 length is %d\n", gen_length(lm4));
+    ifdebug(8) fprint_lmessage(stderr, lm4);
 
     /*
      * here should be performed some message coalescing and/or aggregation:
