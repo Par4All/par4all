@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/02/06 17:42:10 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/02/10 12:45:49 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -699,10 +699,22 @@ DISJUNCT_REGIONS FALSE
 DISJUNCT_IN_OUT_REGIONS FALSE
 \end{verbatim}
 
+Statistics may be obtained about the computation of array regions. When the first
+property ({\tt REGIONS_OP_STATISTICS}) is set to ({\tt TRUE}) statistics are
+provided about operators on regions (union, intersection,
+projection,\dots). The second property turns on the collection of statitics
+about the interprocedural translation.
 
 \begin{verbatim}
 REGIONS_OP_STATISTICS FALSE
 \end{verbatim}
+
+\begin{verbatim}
+REGIONS_TRANSLATION_STATISTICS FALSE
+\end{verbatim}
+
+
+
 
 \section{Transformations, Parallelization, Distribution}
 \label{section-transformations}
