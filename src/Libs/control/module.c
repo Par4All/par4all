@@ -29,11 +29,25 @@ string module_name;
 					      TRUE)) ;
     
        /* *module_stat can be re-used because control_graph reallocates
-	  statements; do not show that to any student! */
-    statement_instruction(module_stat) =
-	make_instruction(is_instruction_unstructured,
-			 control_graph(module_stat));
-    statement_ordering(module_stat) = MAKE_ORDERING(0,1) ;
+	  statements; do not show that to any student!
+	  statement_instruction(module_stat) =
+	  make_instruction(is_instruction_unstructured,
+	        control_graph(module_stat));
+    Maintenant que je nettoie le code aussi avant le controlizer,
+       un programme sans instruction ne contient qu'un statement
+       RETURN, c'est a` dire un statement de CALL vers RETURN avec le
+       label 00000.  Comme la ligne ci-dessus recycle le label et le
+       commentaire, on se retrouve avec un unstructured avec le label
+       et le commentaire du RETURN qu'il contient... En plus il y avait
+       une re'cursion de l'unstructured vers module_stat. :-(
+
+       So now correct the label and the comment: */
+    module_stat = make_statement(entity_empty_label(), 
+				 STATEMENT_NUMBER_UNDEFINED,
+				 MAKE_ORDERING(0,1), 
+				 empty_comments,
+				 make_instruction(is_instruction_unstructured,
+						  control_graph(module_stat)));
 
     /* By setting this property, we try to unspaghettify the control
        graph of the module: */
