@@ -2223,9 +2223,9 @@ void
 gen_init_external(int which,
 		  void *(*read)(FILE*),
 		  void (*write)(FILE*, void*),
-		  void (*free)(void*) ;
-		  void *(*copy)(void*) ;
-		  int (*allocated_memory)(void*));
+		  void (*free)(void*),
+		  void *(*copy)(void*),
+		  int (*allocated_memory)(void*))
 {
   struct gen_binding *bp = &Domains[ which ] ;
   union domain *dp = bp->domain ;
