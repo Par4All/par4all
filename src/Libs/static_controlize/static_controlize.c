@@ -240,7 +240,7 @@ unstructured u;
 	static_control 	sc, ret_sc = static_control_undefined;
 
 	debug(3, "static_controlize_unstructured", "begin UNSTRUCTURED\n");
-	get_blocs(unstructured_control(u), &blocs ) ;
+	control_map_get_blocs(unstructured_control(u), &blocs ) ;
 	blocs = gen_nreverse( blocs ) ;
 
 	MAPL( ctl_ptr, 	{
