@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1994/04/21 09:59:46 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1994/11/17 10:34:51 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -35,7 +35,6 @@ DATE='/usr/bin/date'
 HOSTNAME=`hostname`
 USER=`whoami`
 PWD=`pwd`
-# failed=""
 
 # defaults
 
@@ -50,6 +49,12 @@ PARALLEL="1"
 debug()
 {
   echo "$@" >&2
+}
+
+verbose()
+{
+  echo "$@" >&2
+  echo "$@" >> $MSG
 }
 
 unstammer()
@@ -211,9 +216,9 @@ do
     d) DEBUG="debug" ;;
     D) DEBUG="debug"; DEBUG2="debug";  VALIDOPT="$VALIDOPT -d" ;;
     t) PERFORMANCE="begin `local_date`"; VALIDOPT="$VALIDOPT -t";;
-    v) VERBOSE="echo" ;;
-    V) VERBOSE="echo" ; VALIDOPT="$VALIDOPT -v";;
-    s) VERBOSE=":" ;;
+    v) VERBOSE='verbose' ;;
+    V) VERBOSE='verbose' ; VALIDOPT="$VALIDOPT -v";;
+    s) VERBOSE=':' ;;
     p) PARALLEL="1" ;;
     n) PARALLEL="" ;;
     r) RUNDIR="$OPTARG" ;;
@@ -239,6 +244,7 @@ LOCKDIR=`absolute_name ${LOCKDIR:-$RUNDIR}`
 WAITING="$LOCKDIR/.validate_waiting.$HOSTNAME.$$"
 RESULT="$LOCKDIR/.validate_result.$HOSTNAME.$$"
 FAILED="$LOCKDIR/.validate_failed.$HOSTNAME.$$"
+MSG="$LOCKDIR/.validate_msg.$HOSTNAME.$$"
 
 #
 # the working directory
@@ -278,7 +284,7 @@ VALHOSTS=$HOSTNAME
 
 if [ "$PARALLEL" ]
 then
-  VALHOSTS="$VALHOSTS:${PIPS_HOSTS:-chailly:moret}"
+  VALHOSTS="$VALHOSTS:${PIPS_HOSTS:-chailly}"
 fi
 
 $DEBUG2 " | VALHOSTS 1: $VALHOSTS"
@@ -360,7 +366,8 @@ fi
 
 [ "$PERFORMANCE" ] && PERFORMANCE="$PERFORMANCE, end `local_date`"
 
-$MAIL -s "$finalsubject" $USER <<%
+cat >> $MSG <<%
+
 Your Validation Suite Test for
 
 $MODULES
@@ -372,8 +379,10 @@ $PERFORMANCE
 In case of problems, contact <jouvelot@cri.ensmp.fr>
 %
 
-rm -f $FAILED
+$MAIL -s "$finalsubject" $USER < $MSG
+
+rm -f $FAILED $MSG
 
 #
-# that's all
+# that is all
 #
