@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.107  1997/12/12 14:51:11  coelho
+ * leaks--
+ *
  * Revision 1.106  1997/12/10 12:10:19  coelho
  * missing strdup fixed.
  *
@@ -141,7 +144,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.106 1997/12/10 12:10:19 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.107 1997/12/12 14:51:11 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -1658,6 +1661,7 @@ text_statement(
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
 						  strdup(comments)));
 	}
+	free_text(temp);
     }
 
     attach_statement_information_to_text(r, stmt);
