@@ -134,22 +134,6 @@ statement spaghettify_statement (statement stat, string module_name)
     break;
   }
 
-  pips_debug(2,"\nSPAGHETTIFY: RETURN statement: =====================================\n");
-  ifdebug(2) {
-    print_statement(returned_statement);
-  }
-  pips_debug(2,"domain number = %d\n", statement_domain_number(returned_statement));
-  pips_debug(2,"entity = UNDEFINED\n");
-  pips_debug(2,"statement number = %d\n", statement_number(returned_statement));
-  pips_debug(2,"statement ordering = %d\n", statement_ordering(returned_statement));
-  if (statement_with_empty_comment_p(returned_statement)) {
-    pips_debug(2,"statement comments = EMPTY\n");
-  }
-  else {
-    pips_debug(2,"statement comments = %s\n", statement_comments(returned_statement));
-  }
-  pips_debug(2,"statement instruction = %s\n", statement_type_as_string(returned_statement));
-
   return returned_statement;
 }
 
