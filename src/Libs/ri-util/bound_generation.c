@@ -36,7 +36,7 @@ Variable index;
 
     /*search the couple (var,val) where var is equal to index and extract it */
     pv = vect_dup(pc->vecteur);
-    index_element = vect_elem(pv, index);
+    index_element = vect_dup(vect_elem(pv, index));
     vect_erase_var(&pv,index);
 
     coeff = index_element->val;
