@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: install_pips_sources,v $ ($Date: 1996/08/26 11:58:37 $, )
+# $RCSfile: install_pips_sources,v $ ($Date: 1996/08/26 12:09:26 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -116,7 +116,7 @@ do
   if [ -d "$src_item" ]
   then
     $VERBOSE "directory, recursing"
-    $0 $OPTIONS -vd -y "$COMMENT" -s "$src_item" -t "$trg_item" \
+    $0 $OPTIONS -y "$COMMENT" -s "$src_item" -t "$trg_item" \
     	`cd $src_item ; ls -d * | sed '/~/d;/SCCS/d;/OLD/d'`
     $DEBUG "end of recursion"
     continue
