@@ -11,6 +11,8 @@
 %token ACTIVATE
 %token SET_PROPERTY
 %token GET_PROPERTY
+%token SET_ENVIRONMENT
+%token GET_ENVIRONMENT
 %token INFO
 %token OWNER_NAME
 %token OWNER_ALL
@@ -30,7 +32,9 @@
 %token PHASENAME
 %token UNKNOWN_CHAR
 %token SETVALUE
+%token IDENT
 
+%type <name>   IDENT
 %type <status> line
 %type <status> instruction
 %type <status> i_open
@@ -91,6 +95,24 @@ extern bool tpips_execution_mode;
 
 extern int yylex(void);
 extern void yyerror(char *);
+
+static void
+free_owner_content(res_or_rule * pr)
+{
+    gen_map(free, pr->the_owners);
+    gen_free_list(pr->the_owners);
+    free(pr->the_name);
+    pr->the_owners = NIL;
+    pr->the_name = NULL;
+}
+
+void 
+close_workspace_if_opened(void)
+{
+    if (db_get_current_workspace_name() != NULL)
+	close_workspace();
+}
+
 
 %}
 
@@ -331,9 +353,7 @@ i_make:
 		}
 	    }
 	    $$ = result;
-/*	    free ($3.the_name);
-	    gen_free_list ($3.the_owners);
-*/
+	    free_owner_content(&$3);
 	}
 	;
 
@@ -379,9 +399,7 @@ i_apply:
 		}
 	    }
 	    $$ = result;
-/*	    free ($3.the_name);
-	    gen_free_list ($3.the_owners);
-*/
+	    free_owner_content(&$3);
 	}
 	;
 
@@ -437,10 +455,7 @@ i_display:
 		}
 	    }
 	    $$ = TRUE;
-/*
-	    free ($3.the_name);
-	    gen_free_list ($3.the_owners);
-*/
+	    free_owner_content(&$3);
 	}
 	;
 
@@ -636,7 +651,7 @@ owner:
 
 		for (ps = lcallees; ps != NIL; ps = CDR(ps)) {
 		    string on = STRING(CAR(ps));
-		    result = gen_nconc(result, CONS(STRING, on, NIL));
+		    result = gen_nconc(result, CONS(STRING, strdup(on), NIL));
 		}
 		$$ = result;
 	    }
@@ -666,7 +681,7 @@ owner:
 
 		for (ps = lcallers; ps != NIL; ps = CDR(ps)) {
 		    string on = STRING(CAR(ps));
-		    result = gen_nconc(result, CONS(STRING, on, NIL));
+		    result = gen_nconc(result, CONS(STRING, strdup(on), NIL));
 		}
 		$$ = result;
 	    }
@@ -680,7 +695,7 @@ owner:
 	    debug(7,"yyparse","reduce rule owner (none)\n");
 
 	    if (tpips_execution_mode) {
-		$$ = CONS(STRING, db_get_current_module_name (), NIL);
+		$$ = CONS(STRING, strdup(db_get_current_module_name()), NIL);
 	    }
 	}
 	;
@@ -691,13 +706,12 @@ list_of_owner_name:
 	COMMA
 	list_of_owner_name
 	{
-	    debug(7,"yyparse",
-		  "reduce rule owner list (name = %s)\n",$<name>2);
+	    pips_debug(7, "reduce rule owner list (name = %s)\n",$<name>2);
 
 	    if (tpips_execution_mode) {
 		char *c = $<name>2;
 		strupper (c, c);
-		$$ = CONS(STRING, c, $4);
+		$$ = CONS(STRING, strdup(c), $4);
 	    }
 	}
 	|
@@ -710,7 +724,7 @@ list_of_owner_name:
 	    if (tpips_execution_mode) {
 		char *c = $<name>2;
 		strupper (c, c);
-		$$ = CONS(STRING, c, NIL);
+		$$ = CONS(STRING, strdup(c), NIL);
 	    }
 	}
 	;
@@ -727,15 +741,9 @@ sep_list:
 	|
 	SEPARATOR 
 	{
-	    debug(7,"yyparse","reduce separator list\n");
+	    pips_debug(7,"reduce separator list\n");
 	    $$ = 0;
 	}
 	;
 
 %%
-
-void close_workspace_if_opened()
-{
-    if (db_get_current_workspace_name() != NULL)
-	close_workspace ();
-}
