@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/02 17:12:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/03 15:23:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/10/02 17:12:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/10/03 15:23:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -275,11 +275,13 @@ static text text_transformer(transformer tran)
 		str_prefix = PIPS_NORMAL_PREFIX;
 	}
 	
-	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-						strdup("\n")));
+	if (get_bool_property("PRETTYPRINT_LOOSE"))
+	    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+						    strdup("\n")));
 	MERGE_TEXTS(txt, 
 		    string_predicate_to_commentary(str_tran, str_prefix));
-	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+	if (get_bool_property("PRETTYPRINT_LOOSE"))
+	    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
 						strdup("\n")));
     }
     return txt; 
