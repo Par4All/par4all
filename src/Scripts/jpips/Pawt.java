@@ -2,6 +2,9 @@
  * $Id$
  * 
  * $Log: Pawt.java,v $
+ * Revision 1.7  1998/10/17 09:50:08  coelho
+ * white background color.
+ *
  * Revision 1.6  1998/10/16 16:53:06  coelho
  * swing package updated.
  *
@@ -143,33 +146,33 @@ interface Pawt
 
   class PRadioButtonMenuItem 
     extends com.sun.java.swing.JRadioButtonMenuItem
-    {
-      public String command, checking;
-      public PLabel label;
-      public PComboBox cob;
-      public Object o;
-      public PRadioButtonMenuItem rbmi;
+  {
+    public String command, checking;
+    public PLabel label;
+    public PComboBox cob;
+    public Object o;
+    public PRadioButtonMenuItem rbmi;
 
-      PRadioButtonMenuItem(String name, String command, 
-                           PComboBox cob, Object o, String checking)
-        { super(name); this.command = command; this.cob = cob; this.o = o;
-	  this.checking = checking; }
-
-      PRadioButtonMenuItem(String name){ super(name); }
-      PRadioButtonMenuItem(String name, String command)
-        { super(name); this.command = command; }
-      PRadioButtonMenuItem(String name, String command, PLabel label,
-                           PRadioButtonMenuItem rbmi)
-        { super(name); this.command = command; this.label = label;
-	  this.rbmi = rbmi; }
-      PRadioButtonMenuItem(String name, String command, PLabel label,
-                           PRadioButtonMenuItem rbmi, String checking)
-        { super(name); this.command = command; this.label = label;
+    PRadioButtonMenuItem(String name, String command, 
+			 PComboBox cob, Object o, String checking)
+    { super(name); this.command = command; this.cob = cob; this.o = o;
+    this.checking = checking; }
+    
+    PRadioButtonMenuItem(String name){ super(name); }
+    PRadioButtonMenuItem(String name, String command)
+    { super(name); this.command = command; }
+    PRadioButtonMenuItem(String name, String command, PLabel label,
+			 PRadioButtonMenuItem rbmi)
+    { super(name); this.command = command; this.label = label;
+    this.rbmi = rbmi; }
+    PRadioButtonMenuItem(String name, String command, PLabel label,
+			 PRadioButtonMenuItem rbmi, String checking)
+    { super(name); this.command = command; this.label = label;
 	  this.rbmi = rbmi; this.checking = checking; }
-      PRadioButtonMenuItem(String name, String command,
-                           PComboBox cob, Object o)
-        { super(name); this.command = command; this.cob = cob; this.o = o; }
-    }
+    PRadioButtonMenuItem(String name, String command,
+			 PComboBox cob, Object o)
+    { super(name); this.command = command; this.cob = cob; this.o = o; }
+  }
 
 
   class PSeparator 
@@ -220,133 +223,137 @@ interface Pawt
   }
     
   class PTextField extends com.sun.java.swing.JTextField
+  {
+    PTextField(String s)
     {
-      PTextField(){ super(); }
-      PTextField(String s){ super(s); }
+      super(s); 
+      setBackground(Color.white); 
     }
+
+    PTextField()
+    { 
+      this(""); 
+    }
+  }
     
   class PList extends com.sun.java.swing.JList
-    {
-      PList() { super(); }
-      PList(Vector v) { super(v); }
-      PList(DefaultListModel l) { super(l); }
-    }
+  {
+    PList() { super(); }
+    PList(Vector v) { super(v); }
+    PList(DefaultListModel l) { super(l); }
+  }
 
   /** A PComboBox can send directly its command on selections,
     * or wait for some specific action to do the job (e.g. a button pressed).
     */
   class PComboBox extends com.sun.java.swing.JComboBox
-    {
-      public String checking, marker;
-      public boolean direct;
-      public Vector vCommand = new Vector(),
-                    vRbmi = new Vector(),
-		    vChecking = new Vector();
-
-      PComboBox(String ch, String ma, boolean direct)
-      { 
-	super(); 
-	checking = ch; 
-	marker = ma; 
-	this.direct = direct;
-      }
-
-      PComboBox(){ this(null, null, true); }
-      PComboBox(String ch){ this(ch, null, true); }
-      PComboBox(String ch, String ma) { this(ch, ma, true); }
+  {
+    public String checking, marker;
+    public boolean direct;
+    public Vector vCommand = new Vector(),
+      vRbmi = new Vector(),
+      vChecking = new Vector();
+    
+    PComboBox(String ch, String ma, boolean direct)
+    { 
+      super(); 
+      checking = ch; 
+      marker = ma; 
+      this.direct = direct;
     }
-
+    
+    PComboBox(){ this(null, null, true); }
+    PComboBox(String ch){ this(ch, null, true); }
+    PComboBox(String ch, String ma) { this(ch, ma, true); }
+  }
 
   class PScrollPanel extends com.sun.java.swing.JScrollPane
-    {
-      PScrollPanel(){ super(); } 
-      PScrollPanel(Component c){ super(c); } 
-    }
-        
+  {
+    PScrollPanel(){ super(); } 
+    PScrollPanel(Component c){ super(c); } 
+  }
         
   class PButtonGroup extends com.sun.java.swing.ButtonGroup
-    {
-      public String checking;
-      PButtonGroup(String ch){ super(); checking = ch; }
-    }
-        
+  {
+    public String checking;
+    PButtonGroup(String ch){ super(); checking = ch; }
+  }
         
   class PTextArea extends java.awt.TextArea
-    {
-      PTextArea(){ super(); }
-      PTextArea(String s){ super(s); }
+  {
+    PTextArea(String s)
+    { 
+      super(s);  
+      setBackground(Color.white); 
     }
-        
+    
+    PTextArea()
+    { 
+      this("");
+    }
+  }
         
   class PTextFrame extends com.sun.java.swing.JFrame
+  {
+    boolean locked;
+    boolean writable;
+    PTextArea ta;
+    PButton panelButton;
+    
+    PTextFrame(String name, String text, boolean locked, boolean writable)
     {
-      boolean locked;
-      boolean writable;
-      PTextArea ta;
-      PButton panelButton;
-            
-      PTextFrame(String name, String text, boolean locked, boolean writable)
-        {
-	  //window
-	  super(name);
-	  this.locked = locked;
-	  this.writable = writable;
-          PButton b;
-	  getContentPane().setLayout(new BorderLayout());
-	  ta = new PTextArea(text);
-          ta.setFont(new Font("Monospaced", Font.PLAIN, 12));
-          ta.setEnabled(writable);
-	  PScrollPanel s = new PScrollPanel((Component)ta);
-	  getContentPane().add(s, BorderLayout.CENTER);
-	  
-	  PPanel p = new PPanel(new GridLayout(1,3));
-	  PCheckBox cb = new PCheckBox("Locked",this);
-	  cb.setSelected(locked);
-	  cb.addActionListener(new ActionListener()
-            {
-	      public void actionPerformed(ActionEvent e)
-	        {
-		  PCheckBox check = (PCheckBox)e.getSource();
-		  check.frame.locked = check.isSelected();
-		}
-	    });
-	  p.add(cb);
-	  b = new PButton("Hide",this);
-	  b.addActionListener(new ActionListener()
-            {
-	      public void actionPerformed(ActionEvent e)
-	        {
-		  PButton button = (PButton)e.getSource();
-		  button.frame.setVisible(false);
-		}
-	    });
-	  p.add(b);
-	  b = new PButton("Close",this);
-	  b.addActionListener(new ActionListener()
-            {
-	      public void actionPerformed(ActionEvent e)
-	        {
-		  PButton button = (PButton)e.getSource();
-		  button.frame.dispose();
-		}
-	    });
-	  p.add(b);
-	  getContentPane().add(p, BorderLayout.SOUTH);
-	  
-	  //jpips button
-	  panelButton = new PButton(name,this);
-	  panelButton.addActionListener(new ActionListener()
-            {
-	      public void actionPerformed(ActionEvent e)
-	        {
-		  PButton button = (PButton)e.getSource();
-		  button.frame.setVisible(true);
-		  button.frame.toFront();
-		}
-	    });
-
-	  pack();
-	  setSize(new Dimension(600,400));
+      //window
+      super(name);
+      this.locked = locked;
+      this.writable = writable;
+      PButton b;
+      getContentPane().setLayout(new BorderLayout());
+      ta = new PTextArea(text);
+      ta.setFont(new Font("Monospaced", Font.PLAIN, 12));
+      ta.setEnabled(writable);
+      PScrollPanel s = new PScrollPanel((Component)ta);
+      getContentPane().add(s, BorderLayout.CENTER);
+      
+      PPanel p = new PPanel(new GridLayout(1,3));
+      PCheckBox cb = new PCheckBox("Locked",this);
+      cb.setSelected(locked);
+      cb.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  PCheckBox check = (PCheckBox)e.getSource();
+	  check.frame.locked = check.isSelected();
 	}
+      });
+      p.add(cb);
+      b = new PButton("Hide",this);
+      b.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  PButton button = (PButton)e.getSource();
+	  button.frame.setVisible(false);
+	}
+      });
+      p.add(b);
+      b = new PButton("Close",this);
+      b.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  PButton button = (PButton)e.getSource();
+	  button.frame.dispose();
+	}
+      });
+      p.add(b);
+      getContentPane().add(p, BorderLayout.SOUTH);
+      
+      //jpips button
+      panelButton = new PButton(name,this);
+      panelButton.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  PButton button = (PButton)e.getSource();
+	  button.frame.setVisible(true);
+	  button.frame.toFront();
+	}
+      });
+      
+      pack();
+      setSize(new Dimension(600,400));
     }
+  }
 }
