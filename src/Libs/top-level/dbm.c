@@ -25,11 +25,9 @@ void (* pips_update_props_handler)() = default_update_props;
  * the two calls says RK
  */
 bool 
-create_workspace(pargc, argv)
-int *pargc;
-char *argv[];
+create_workspace(gen_array_t files)
 {
-    int i;
+    int i, argc = gen_array_nitems(files);
     string name;
     bool success = FALSE;
 
@@ -39,8 +37,8 @@ char *argv[];
     open_log_file();
     set_entity_to_size();
 
-    for (i = 0; i < *pargc; i++) {
-	success = process_user_file(argv[i]);
+    for (i = 0; i < argc; i++) {
+	success = process_user_file(gen_array_item(files, i));
 	if (success == FALSE)
 	    break;
     }
@@ -69,9 +67,8 @@ char *argv[];
 bool 
 open_module_if_unique()
 {
-    char *module_list[ARGS_LENGTH];
-    int  module_list_length = 0;
     bool success = TRUE;
+    gen_array_t a;
 
     pips_assert("open_module_if_unique", db_get_current_workspace_name());
 
@@ -79,13 +76,11 @@ open_module_if_unique()
        an empty one */
     (void) parse_makefile();
 
-    success = db_get_module_list(&module_list_length, module_list);
-    if (success) {
-	if (module_list_length == 1) {
-	    success = open_module(module_list[0]);
-	}
-	args_free(&module_list_length, module_list);
-    }
+    a = db_get_module_list();
+    if (gen_array_nitems(a)==1)
+	success = open_module(gen_array_item(a, 0));
+    gen_array_full_free(a);
+
     return success;
 }
 
