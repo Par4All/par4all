@@ -50,6 +50,7 @@ typedef struct Ssysteme {
 	} *Psysteme,Ssysteme;
 
 
+#include <setjmp.h>
 
 /* - Traitement des overflows :
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~ 
