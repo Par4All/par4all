@@ -5,7 +5,8 @@
 SCRIPTS = 	print-dg-statistics \
 		print-regions-op-statistics \
 		print-regions-translation-statistics \
-		parallelization_statistics
+		parallelization_statistics \
+		cumulate_statistics.pl
 
 FILES =		dg-statistics.awk \
 		dg-statistics.texheader \
