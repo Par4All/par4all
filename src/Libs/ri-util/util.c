@@ -1,13 +1,11 @@
-/* 	%A% ($Date: 1995/10/10 19:44:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/21 11:31:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/10/10 19:44:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-char * vcid_ri_util_util_c=vcid;
+char* vcid_ri_util_util_c = "%A% ($Date: 1995/11/21 11:31:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
 #include <string.h>
-#include <varargs.h>
 
 #include "genC.h"
 #include "misc.h"
@@ -79,7 +77,7 @@ char *s;
     return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
 		       s, SEQUENTIAL_CODE_EXT, NULL));
 }
-
+
 /* generation des noms de fichiers */
 string module_codefilename(e)
 entity e;
@@ -164,7 +162,7 @@ entity e;
 {
     return(string_entitiesfilename(entity_local_name(e)));
 }
-
+
 /* functions for expressions */
 
 expression make_entity_expression(e, inds)
@@ -176,7 +174,7 @@ cons *inds;
     return(make_expression(make_syntax(is_syntax_reference,E),
 			   normalized_undefined));			    
 }
-
+
 string new_label_name(module)
 entity module;
 {
@@ -205,7 +203,7 @@ entity module;
     }
     return(name);
 }
-	 
+	 
 entity find_ith_parameter(e, i)
 entity e;
 int i;
@@ -256,14 +254,14 @@ int i;
 
     return(FALSE);
 }
-
+
 /* functions for effects */
 entity effect_entity(e)
 effect e;
 {
     return(reference_variable(effect_reference(e)));
 }
-
+
 /* functions for references */
 
 /* returns the ith index of an array reference */
@@ -280,7 +278,7 @@ int i;
 
     return(EXPRESSION(CAR(pi)));
 }
-
+
 /* functions for area */
 
 bool dynamic_area_p(aire)
