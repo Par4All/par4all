@@ -13,10 +13,10 @@
 /*LINTLIBRARY*/
 
 #include <stdio.h>
-
 #include <string.h>
 
 #include "boolean.h"
+#include "arithmetique.h"
 #include "vecteur.h"
 
 /* boolean variable_equal(Variable v1, Variable v2): returns TRUE if
