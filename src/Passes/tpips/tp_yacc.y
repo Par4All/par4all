@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.79  1998/04/29 08:24:11  coelho
+ * show added.
+ *
  * Revision 1.78  1998/04/15 15:31:55  coelho
  * linear.h added.
  *
@@ -71,7 +74,10 @@
 %token TK_SET_ENVIRONMENT
 %token TK_GET_ENVIRONMENT
 %token TK_CDIR
-%token TK_INFO TK_PWD TK_HELP
+%token TK_INFO 
+%token TK_PWD 
+%token TK_HELP 
+%token TK_SHOW
 %token TK_SOURCE
 %token TK_SHELL TK_ECHO TK_UNKNOWN
 %token TK_QUIT TK_EXIT
@@ -99,7 +105,7 @@
 %type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd i_rm
 %type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help i_capply
-%type <status> i_checkpoint i_unknown
+%type <status> i_checkpoint i_show i_unknown
 %type <name> rulename filename propname phasename resourcename
 %type <array> filename_list
 %type <rn> resource_id rule_id
@@ -140,22 +146,19 @@ extern void tpips_set_line_to_parse(string);
 extern int yylex(void);
 extern void yyerror(char *);
 
-static void
-free_owner_content(res_or_rule * pr)
+static void free_owner_content(res_or_rule * pr)
 {
     gen_array_full_free(pr->the_owners), pr->the_owners = NULL;
     free(pr->the_name), pr->the_name = NULL;
 }
 
-void 
-close_workspace_if_opened(void)
+void close_workspace_if_opened(void)
 {
     if (db_get_current_workspace_name())
 	close_workspace();
 }
 
-static void
-set_env_log_and_free(string var, string val)
+static void set_env_log_and_free(string var, string val)
 {
     string ival = getenv(var);
     if (!ival || !same_string_p(val, ival))
@@ -166,8 +169,7 @@ set_env_log_and_free(string var, string val)
 
 /* display a resource using $PAGER if defined and stdout on a tty.
  */
-static bool
-display_a_resource(string rname, string mname)
+static bool display_a_resource(string rname, string mname)
 {
     string fname, pager = getenv("PAGER");
     if (!isatty(fileno(stdout))) pager = NULL;
@@ -190,20 +192,40 @@ display_a_resource(string rname, string mname)
     return TRUE;
 }
 
-static bool
-remove_a_resource(string rname, string mname)
+static bool remove_a_resource(string rname, string mname)
 {
     if (db_resource_p(rname, mname))
 	db_delete_resource(rname, mname);
     else
-	pips_user_warning("no resource %s(%s) to delete\n", rname, mname);
+	pips_user_warning("no resource %s[%s] to delete.\n", rname, mname);
+    return TRUE;
+}
+
+static bool just_show(string rname, string mname)
+{
+    string file;
+
+    if (!db_resource_p(rname, mname)) {
+	pips_user_warning("no resource %s[%s].\n", rname, mname);
+	return FALSE;
+    }
+    
+    if (!displayable_file_p(rname)) {
+	pips_user_warning("resource %s cannot be displayed.\n", rname);
+	return FALSE;
+    }
+
+    /* now returns the name of the file.
+     */
+    file = db_get_memory_resource(rname, mname, TRUE);
+    fprintf(stdout, "resource %s[%s] is file %s\n", rname, mname, file);
+
     return TRUE;
 }
 
 /* apply what to all resources in res. res is freed.
  */
-static bool
-perform(bool (*what)(string, string), res_or_rule * res)
+static bool perform(bool (*what)(string, string), res_or_rule * res)
 {
     bool result = TRUE;
     
@@ -244,8 +266,7 @@ perform(bool (*what)(string, string), res_or_rule * res)
     return result;
 }
 
-static void 
-tp_system(string s)
+static void tp_system(string s)
 {
     int status;
     user_log("shell%s%s\n", (s[0]==' '|| s[0]=='\t')? "": " ", s);
@@ -282,6 +303,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| i_apply
 	| i_capply
 	| i_display
+	| i_show
 	| i_rm
 	| i_activate
 	| i_get
@@ -614,6 +636,13 @@ i_display: TK_DISPLAY resource_id TK_ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_display\n");
 	    $$ = perform(display_a_resource, &$2);
+	}
+	;
+
+i_show: TK_SHOW resource_id TK_ENDOFLINE
+	{
+	    pips_debug(7, "reduce rule i_show\n");
+	    $$ = perform(just_show, &$2);
 	}
 	;
 
