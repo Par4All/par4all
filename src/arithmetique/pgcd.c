@@ -12,31 +12,30 @@
  * il vaudrait peut-etre mieux retourner 0 dans l'espoir de provoquer une
  * exception ulterieure par devision par 0; ou aborter immediatement;
  */
-int pgcd_slow(a,b)
-int a,b;
+Value pgcd_slow(Value a, Value b)
 {
-    if (a==0 && b==0) 
-	return(1);
+    if (VALUE_ZERO_P(a) && VALUE_ZERO_P(b))
+	return VALUE_ONE;
 
-    if (a==0) 
-	return(ABS(b));
+    if (VALUE_ZERO_P(a))
+	return ABS(b);
 
-    if (b==0) 
-	return(ABS(a));
+    if (VALUE_ZERO_P(b))
+	return ABS(a);
 
     a = ABS(a);
     b = ABS(b);
     if (a>=b) { 
 	if (a%b==0) 
-	    return(ABS(b));
+	    return ABS(b);
 	else 
-	    return(pgcd(b,a%b));
+	    return pgcd(b,a%b);
     }
     else {
 	if (b%a==0)
-	    return(ABS(a));
+	    return ABS(a);
 	else
-	    return(pgcd(a,b%a));
+	    return pgcd(a,b%a);
     }
 }
 
@@ -44,12 +43,11 @@ int a,b;
  * le pgcd retourne est toujours positif; il n'est pas defini si
  * a et b sont nuls (abort);
  */
-int pgcd_fast(a,b)
-int a,b;
+Value pgcd_fast(Value a, Value b)
 {
-    int gcd;
+    Value gcd;
    
-    assert(b!=0||a!=0);
+    assert(VALUE_NOTZERO_P(b)||VALUE_NOTZERO_P(a));
 
     a = ABS(a);
     b = ABS(b);
@@ -62,15 +60,14 @@ int a,b;
     else
 	gcd = (a==0)? b : pgcd_interne(b,a);
 
-    return(gcd);
+    return gcd;
 }
 
 /* int pgcd_interne(int a, int b): calcul iteratif du pgcd de deux entiers
  * strictement positifs tels que a > b;
  * le pgcd retourne est toujours positif;
  */
-int pgcd_interne(a,b)
-int a,b;
+Value pgcd_interne(Value a, Value b)
 {
     /* Definition d'une look-up table pour les valeurs de a appartenant
        a [0..GCD_MAX_A] (en fait [-GCD_MAX_A..GCD_MAX_A])
@@ -83,7 +80,7 @@ int a,b;
 #define GCD_MAX_B 15
     /* la commutativite du pgcd n'est pas utilisee pour reduire la
        taille de la table */
-    static int gcd_look_up[GCD_MAX_A+1][GCD_MAX_B+1]= {
+    static Value gcd_look_up[GCD_MAX_A+1][GCD_MAX_B+1]= {
 	/*  b ==        0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 */
         {/* a ==   0 */ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15},
         {/* a ==   1 */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -106,10 +103,10 @@ int a,b;
        pour diminuer le nombre de boucles */
 
     /* on utilise la valeur particuliere -1 pour iterer */
-    int gcd = -1;
-    int mod;
+    Value gcd = VALUE_MONE;
+    Value mod;
 
-    assert(a>b && b>=0);
+    assert(a>b && b>=VALUE_ZERO);
 
     do{
 	if(b<=GCD_MAX_B && a<=GCD_MAX_A) {
@@ -129,8 +126,9 @@ int a,b;
 	    }
 
 	}
-    } while(gcd < 0);
-    return(gcd);
+    } while(VALUE_NEG_P(gcd));
+
+    return gcd;
 }
 
 /* int gcd_subtract(int a, int b): find the gcd (pgcd) of two integers
@@ -150,9 +148,7 @@ int a,b;
  * Note: the signs of a and b do not matter because they can be exactly
  * divided by the gcd
  */
-int gcd_subtract(a,b)
-int	a;			/* input */
-int	b;			/* input */
+Value gcd_subtract(Value a, Value b)
 {
     if (a < 0) a = -a;
     if (b < 0) b = -b;
@@ -163,18 +159,16 @@ int	b;			/* input */
 	    b = b - a;
     }
 
-    if (a == 0) {
-	assert(b!=0);
-	return(b);
+    if (a == VALUE_ZERO) {
+	assert(b!=VALUE_ZERO);
+	return b;
     }
     else {
 	/* b == 0 */
-	assert(a!=0);
-	return(a); 
+	assert(a!=VALUE_ZERO);
+	return a; 
     }
 }
-        
-
 
 /* int vecteur_bezout(int u[], int v[], int l): calcul du vecteur v
  * qui verifie le theoreme de bezout pour le vecteur u; les vecteurs u et
@@ -184,21 +178,16 @@ int	b;			/* input */
  * < u . v > = gcd(u )
  *              i
  */
-int vecteur_bezout(u,v,l)
-int u[];
-int v[];
-int l;
+Value vecteur_bezout(Value u[], Value v[], int l)
 {
+    Value gcd, a1, x;
+    Value *p1, *p2;
     int i, j;
-    int a1;
-    int gcd;
-    int x;
-    int *p1,*p2;
 
     assert(l>0);
 
-    if (l==1){
-	v[0] = 1;
+    if (l==1) {
+	v[0] = VALUE_ONE;
 	gcd = u[0];
     }
     else {
@@ -206,7 +195,7 @@ int l;
 	a1 = u[0]; gcd = u[1];
 	gcd = bezout(a1,gcd,p1,p2);
 
-	printf("gcd = %d \n",gcd);
+	/* printf("gcd = %d \n",gcd); */
 
 	for (i=2;i<l;i++){ 
 	    /* sum u * v = gcd(u ) 
@@ -218,12 +207,13 @@ int l;
 	    a1 = u[i];
 	    p1 = &v[i];
 	    gcd = bezout(a1,gcd,p1,&x);
-	    printf("gcd = %d\n",gcd);
+	    /* printf("gcd = %d\n",gcd); */
 	    for (j=0;j<i;j++)
 		v[j] = v[j]*x;	
 	} 
     }
-    return(gcd);
+
+    return gcd;
 }
 
 /* int bezout(int a, int b, int *x, int *y): calcule x et y, les deux
@@ -233,11 +223,10 @@ int l;
  * a * x + b * y = gcd(a,b)
  * return gcd(a,b)
  */
-int bezout(a,b,x,y)
-int a,b,*x,*y;
+Value bezout(Value a, Value b, Value *x, Value *y)
 {
-    int u0=1,u1=0,v0=0,v1=1;
-    int a0,a1,u,v,r,q,c;
+    Value u0=1,u1=0,v0=0,v1=1;
+    Value a0,a1,u,v,r,q,c;
 
     if (a>=b)
     {
@@ -291,12 +280,11 @@ int a,b,*x,*y;
  *  si (a==0)(ou b==0) x=1(ou -1) y=0 (ou x=0 y=1(ou -1)) 
  *  et gcd()=a(ou -a) (ou gcd()=b(ou -b))
  */
-int bezout_grl(a,b,x,y)
-int a,b,*x,*y;
+Value bezout_grl(Value a, Value b, Value *x, Value *y)
 {
-    int u0=1,u1=0,v0=0,v1=1;
-    int a0,a1,u,v,r,q,c;
-    int sa,sb;               /* les signes de a et b */
+    Value u0=1,u1=0,v0=0,v1=1;
+    Value a0,a1,u,v,r,q,c;
+    Value sa,sb;               /* les signes de a et b */
 
     sa = sb = 1;
     if (a<0){
@@ -312,49 +300,48 @@ int a,b,*x,*y;
 	*y = 1;
 	return(0);
     }
-    else if(a==0 || b==0){
-	if (a==0){
-	    *x = 0;
+    else if(VALUE_ZERO_P(a) || VALUE_ZERO_P(b)){
+	if (VALUE_ZERO_P(a)){
+	    *x = VALUE_ZERO;
 	    *y = sb;
 	    return(b);
 	}
 	else{
 	    *x = sa;
-	    *y = 0;
+	    *y = VALUE_ZERO;
 	    return(a);
 	}
     }
     else{
 
-
 	if (a>=b)
 	{
 	    a0 = a;
 	    a1 = b;
-	    c = 0;
+	    c = VALUE_ZERO;
 	}
 	else
 	{
 	    a0 = b;
 	    a1 = a;
-	    c = 1;
+	    c = VALUE_ONE;
 	}
 	
 	r = a0 % a1;
-	while (r!=0)
+	while (VALUE_NOTZERO_P(r))
 	{
 	    q = a0 /a1;
 	    u = u0 - u1 * q;
 
 	    v = v0 - v1*q;
 	    a0 = a1; a1 = r;
-	    u0 = u1;u1 = u;
+	    u0 = u1; u1 = u;
 	    v0 = v1; v1 = v;
 
 	    r = a0 % a1;
 	}
   
-	if (c==0) {
+	if (VALUE_ZERO_P(c)) {
 	    *x = sa*u1;
 	    *y = sb*v1;
 	}
@@ -363,6 +350,9 @@ int a,b,*x,*y;
 	    *y = sb*u1;
 	}
 
-	return(a1);
+	return a1;
     }
 }
+
+/* end of $RCSfile: pgcd.c,v $
+ */
