@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/07/24 17:21:18 $, 
+%% $Date: 1997/09/02 14:52:51 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
@@ -1717,10 +1717,9 @@ computed. PIPS only deals with memory effects. Fortran exceptions like
 overflows or zero divides are considered programm errors and the error
 behaviors are not taken into account in PIPS analyses.
 
-Effects and the types defined in the following
-subsections are not used to represent code, but to store analysis
-result. These types are declared in the {\em internal representation\/}
-for historical reasons.
+Effects and the types defined in the following subsections are not used to
+represent code, but to store analysis result. These types are declared in
+the {\em internal representation\/} for historical reasons.
 
 \domain{Effects = effects:effect*}
 
@@ -1765,7 +1764,7 @@ effects at the module level, and as cumulated effects at the statement
 level, and array regions. Proper effects, cumulated effects, summary
 effects and array regions are all of type \verb/effect/. Proper effects,
 cumulated effects and summary effects are called simple effects and they
-do not use the last field, \verb/context/.
+do not use the last field, \verb/descriptor/.
 
 \begin{comment}
 Le domaine \verb/effect/ est utilisé pour représenter les effets d'un
@@ -1795,13 +1794,19 @@ re'fe'rences synthe'tiques base'es sur les pseudo-variables $PHI$.
 \end{comment}
 
 Field \verb/action/ specifies if the memory access is a read or a write,
-and field \verb/approximation/ is used to know if the reference, for
+for read/write effects, and if the memory value is read from the statement
+store for a \verb/in/ effect or region, and if the memory value written by
+the statement is later read for a \verb/out/ effect or region. So,
+\verb/read/ and \verb/in/ effects and regions have action \verb/read/ while
+\verb/write/ and \verb/out/ effects and regions have action \verb/write/.
+
+Field \verb/approximation/ is used to know if the reference for
 simple effects, or the set of array elements defined by the
-\verb/context/, for array regions, is or not accessed for sure. For
+\verb/descriptor/ for array regions, is or not accessed for sure. For
 instance, a conditional is going to generate may effects, and a
 sequence, must effects\footnote{Needless to say, reality is much more
   complex. This oversimplified statement only is written to support some
-  intuition about may and must information.}.
+  intuition about may and must and exact information.}.
 
 \begin{comment}
 Le sous-domaine {\tt action} pre'cise si la
@@ -1824,7 +1829,7 @@ common variable list is used:
 \begin{quote}
  {\tt ram\_section(storage\_ram(entity\_storage(<my\_common>)))}
 \end{quote}
-Unfortunately, thie name depends on the module parsing order. It would
+Unfortunately, this name depends on the module parsing order. It would
 be much better to use the lexicographic order among callees, assuming
 that callees are known before any analysis is started, which is true,
 and assuming that scopes are known, which is not true because some
