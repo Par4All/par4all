@@ -34,7 +34,7 @@ gen_array_make(int size)
 static void
 gen_array_resize(gen_array_t a)
 {
-    int nsize = GEN_ARRAY_SIZE_INCREMENT, i;
+    int nsize = a->size+GEN_ARRAY_SIZE_INCREMENT, i;
     a->array = (char**) realloc(a->array, sizeof(char*)*nsize);
     message_assert("realloc ok", a->array);
     for (i=a->size; i<nsize; i++) a->array[i] = (char*) NULL;
@@ -124,4 +124,20 @@ void
 gen_array_sort(gen_array_t a)
 {
    qsort(a->array, a->nitems, sizeof(char *), gen_array_cmp);
+}
+
+gen_array_t
+gen_array_from_list(list /* of string */ ls)
+{
+    gen_array_t a = gen_array_make(0);
+    MAP(STRING, s, gen_array_dupappend(a, s), ls);
+    return a;
+}
+
+list /* of string */
+list_from_gen_array(gen_array_t a)
+{
+    list ls = NIL;
+    GEN_ARRAY_MAP(s, ls = CONS(STRING, strdup(s), ls), a);
+    return ls;
 }
