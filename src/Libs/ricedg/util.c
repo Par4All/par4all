@@ -1,35 +1,8 @@
-#include <stdio.h>
-#include <values.h>
-#include <string.h>
 
-#include "genC.h"
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-#include "text.h"
-
-#include "misc.h"
-#include "text-util.h"
-#include "ri-util.h"
-#include "properties.h"
-#include "effects-generic.h"
-#include "effects-simple.h"
-
-/* includes pour system generateur */
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "polyedre.h"
-
-
-#include "ricedg.h" 
+#include "local.h" 
 
 extern bool 
 ignore_this_conflict(vertex v1, vertex v2, conflict c, int l);
- 
-/* instantiation of the dependence graph */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
 
 
 /* Vertex_to_statement looks for the statement that is pointed to by
