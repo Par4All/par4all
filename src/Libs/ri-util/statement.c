@@ -1032,7 +1032,7 @@ statement_to_label(statement s)
       MAPL(cs, {
 	statement stmt = STATEMENT(CAR(cs));
 	l = statement_to_label(stmt);
-	if(!empty_label_p(l)||!continue_statement_p(stmt))
+	if(!entity_empty_label_p(l)||!continue_statement_p(stmt))
 	  break;
       }, sequence_statements(instruction_sequence(i)));
       break;    
