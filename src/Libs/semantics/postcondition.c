@@ -1,6 +1,6 @@
 /* by Fabien COELHO
  *
- * $RCSfile: postcondition.c,v $ ($Date: 1996/06/12 16:23:44 $, )
+ * $RCSfile: postcondition.c,v $ ($Date: 1996/07/09 22:04:18 $, )
  * version $Revision$,
  */
 
