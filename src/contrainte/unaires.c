@@ -292,7 +292,8 @@ Pbase base_index;
 
 /* it sorts the vectors as expected. FC 24/11/94
  */
-void contrainte_vect_sort(c, compare)
+void 
+contrainte_vect_sort(c, compare)
 Pcontrainte c;
 int (*compare)();
 {
@@ -313,7 +314,8 @@ int (*compare)();
  *            if rm_if_not_first_p is TRUE, the returned contraint is
  *            remove only if it is not the first constraint.
  */
-Pcontrainte contrainte_var_min_coeff(contraintes, v, coeff, rm_if_not_first_p) 
+Pcontrainte 
+contrainte_var_min_coeff(contraintes, v, coeff, rm_if_not_first_p) 
 Pcontrainte contraintes;
 Variable v;
 Value *coeff;
@@ -351,10 +353,19 @@ boolean rm_if_not_first_p;
     *coeff = cv;
     return result;
 }
+
+/*
+ * Constraint sorting for prettyprinting
+ *
+ */
 
+/* Required because qsort (and C) do no let us parametrize the
+ * comparison function (no lambda closure).
+ */
+static int (* lexicographic_compare)(Pvecteur *, Pvecteur *) = NULL;
 
 int
-contrainte_lexicographic_compare(Pcontrainte c1, Pcontrainte c2, 
+equation_lexicographic_compare(Pcontrainte c1, Pcontrainte c2, 
 				 int (*compare)(Pvecteur*, Pvecteur*))
 {
     /* it is assumed that constraints c1 and c2 are already
@@ -366,20 +377,74 @@ contrainte_lexicographic_compare(Pcontrainte c1, Pcontrainte c2,
     return cmp;
 }
 
-static int (* lexicographic_compare)(Pvecteur *, Pvecteur *) = NULL;
+static int
+internal_equation_compare(Pcontrainte * pc1, Pcontrainte * pc2)
+{
+    int cmp = equation_lexicographic_compare(*pc1, *pc2, 
+					       lexicographic_compare);
+    return cmp;
+}
+
+int
+inequality_lexicographic_compare(Pcontrainte c1, Pcontrainte c2, 
+				 int (*compare)(Pvecteur*, Pvecteur*))
+{
+    /* it is assumed that constraints c1 and c2 are already
+       lexicographically sorted */
+    int cmp = 0;
+
+    cmp = vect_lexicographic_compare2(c1->vecteur, c2->vecteur, compare);
+
+    return cmp;
+}
 
 static int
-internal_constraint_compare(Pcontrainte * pc1, Pcontrainte * pc2)
+internal_inequality_compare(Pcontrainte * pc1, Pcontrainte * pc2)
 {
-    int cmp = contrainte_lexicographic_compare(*pc1, *pc2, 
+    int cmp = inequality_lexicographic_compare(*pc1, *pc2, 
 					       lexicographic_compare);
     return cmp;
 }
 
 
 Pcontrainte 
+equations_lexicographic_sort(Pcontrainte cl,
+			       int (*compare)(Pvecteur*, Pvecteur*))
+{
+    Pcontrainte result = CONTRAINTE_UNDEFINED;
+
+    result = constraints_lexicographic_sort_generic(cl, compare, TRUE);
+
+    return result;
+}
+
+Pcontrainte 
+inequalities_lexicographic_sort(Pcontrainte cl,
+			       int (*compare)(Pvecteur*, Pvecteur*))
+{
+    Pcontrainte result = CONTRAINTE_UNDEFINED;
+
+    result = constraints_lexicographic_sort_generic(cl, compare, FALSE);
+
+    return result;
+}
+
+/* For historical reasons, equal to equations_lexicographic_sort() */
+Pcontrainte 
 constraints_lexicographic_sort(Pcontrainte cl,
 			       int (*compare)(Pvecteur*, Pvecteur*))
+{
+    Pcontrainte result = CONTRAINTE_UNDEFINED;
+
+    result = constraints_lexicographic_sort_generic(cl, compare, TRUE);
+
+    return result;
+}
+
+Pcontrainte 
+constraints_lexicographic_sort_generic(Pcontrainte cl,
+				       int (*compare)(Pvecteur*, Pvecteur*),
+				       boolean is_equation)
 {
     int n = nb_elems_list(cl);
     Pcontrainte result = CONTRAINTE_UNDEFINED;
@@ -402,8 +467,12 @@ constraints_lexicographic_sort(Pcontrainte cl,
 
     /*  sort!
      */
-    qsort((char *) table, n, sizeof(Pcontrainte),
-	  (int (*)()) internal_constraint_compare);
+    if(is_equation)
+	qsort((char *) table, n, sizeof(Pcontrainte),
+	      (int (*)()) internal_equation_compare);
+    else
+	qsort((char *) table, n, sizeof(Pcontrainte),
+	      (int (*)()) internal_inequality_compare);
 
     /*  the vector is regenerated in order
      */
