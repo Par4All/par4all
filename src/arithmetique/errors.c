@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.17  2002/04/02 08:44:54  coelho
+  timeout_error ajoute.
+
   Revision 1.16  2000/10/27 13:26:03  ancourt
   exception_thrown -> linear_number_of_exception_thrown
 
@@ -55,6 +58,7 @@ unsigned int overflow_error = 1;
 unsigned int simplex_arithmetic_error = 2;
 unsigned int user_exception_error = 4;
 unsigned int parser_exception_error = 8;
+unsigned int timeout_error = 16;
 unsigned int any_exception_error = ~0;
 
 /* keep track of last thrown exception for RETHROW()
