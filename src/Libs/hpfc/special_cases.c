@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1995/10/05 11:32:40 $, 
+ * $Date: 1996/02/15 14:17:26 $, 
  */
 
 #include "defines-local.h"
@@ -767,7 +767,7 @@ bool full_copy_p(statement s, reference * pleft, reference * pright)
     reference left, right;
     int len;
 
-    DEBUG_STAT(3, "considering statement", s);
+    DEBUG_STAT(6, "considering statement", s);
 
     /* the loop nest must be perfect... ??? should check for continues?
      */
