@@ -3,6 +3,11 @@
  * to manage the hpfc data structures.
  *
  * Fabien Coelho, May 1993.
+ *
+ * SCCS stuff:
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/04/11 17:01:20 $, ) version $Revision$,
+ * got on %D%, %T%
+ * $Id$
  */
 
 #include <stdio.h>
@@ -725,3 +730,41 @@ expression e;
 	return(-314); /* value returned if doesn't know */
 }
 
+/* -------------------------------------------------------
+ *
+ * a nicer interface to extract the needed informations:-)
+ * FC 29/03/94
+ *
+ */
+
+void get_alignment(array, dim, ptdim, pa, pb)
+entity array;
+int dim, *ptdim, *pa, *pb;
+{ 
+    align
+	al = (align) GET_ENTITY_MAPPING(hpfalign, array);
+    alignment
+	a = alignment_undefined;
+    
+    pips_assert("get_alignment", array_distributed_p(array));
+    
+    *ptdim = template_dimension_of_array_dimension(array, dim);
+    a = FindAlignmentOfTemplateDim(align_alignment(al), *ptdim);
+
+    if (a==alignment_undefined)
+    {
+	pips_assert("get_alignment", *ptdim==0);
+	*pa = 0;
+	*pb = 0;
+    }
+    else
+    {
+	pips_assert("get_alignment", *ptdim>=1);
+	*pa = HpfcExpressionToInt(alignment_rate(a));
+	*pb = HpfcExpressionToInt(alignment_constant(a));
+    }
+}
+
+/*
+ * that's all
+ */
