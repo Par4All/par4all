@@ -1,6 +1,6 @@
 /* Package sc 
  * $RCSfile: sc_transformation.c,v $ (version $Revision$)
- * $Date: 2002/03/05 10:55:40 $, .
+ * $Date: 2002/03/08 10:39:28 $, .
  */
 
 #include <string.h>
@@ -36,16 +36,7 @@ Psysteme sc;
     sc->egalites = contraintes_free(sc->egalites);
     sc->nb_eq = 0;
 
-    /* Nga Nguyen 22/01/2002 
-       Put the following command in comment, because the function
-       sc_elim_db_constraints has been modified by FI: redundant 
-       constraints are eliminated, so sc may not be changed => 
-       core dumped when computing IN_REGIONS
-
-       This is a temporal solution => use old version of sc_elim_db_constraints ? */
-
-    // sc = sc_elim_db_constraints(sc); 
-    /* ??? humm, the result is *not* returned */
+    sc = sc_elim_db_constraints(sc); 
 }
 
 
@@ -82,7 +73,7 @@ Psysteme sc;
 	}
     } 
 
-    sc = sc_elim_db_constraints(sc);
+    sc = sc_elim_double_constraints(sc);
     /* ??? humm, the result is *not* returned */
 }
 
