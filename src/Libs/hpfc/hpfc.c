@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/04/18 12:08:27 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/04/28 11:48:14 $, )
  * version $Revision$
  */
  
@@ -208,15 +208,6 @@ entity module;
      */
     set_resources_for_module(module);
     s = get_current_module_statement();
-
-    /* ??? This should not be done. The modified references are
-     * *not* taken into account by the subsequent phases, so I 
-     * have to swith again the entities, but it should not be 
-     * necessary. This is a bug to be investigated.
-     */
-    update_common_references_in_obj(s); /* ?????? hmmm... */
-    update_common_references_in_regions(); /* ?????? no! */
-
     make_host_and_node_modules(module);
 
     /*   NORMALIZATIONS
@@ -280,11 +271,11 @@ string name;
     debug_on("HPFC_DEBUG_LEVEL");
     debug(1, "hpfc_init", "considering workspace %s\n", name);
 
-    set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
     set_bool_property("PRETTYPRINT_HPFC", TRUE);
+    set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
+    set_bool_property("GLOBAL_EFFECTS_TRANSLATION", FALSE);
 
     (void) make_empty_program(HPFC_PACKAGE);
-    make_update_common_map(); /* ?????? */
 
     init_hpfc_status();
     save_hpfc_status();
@@ -344,7 +335,7 @@ void hpfc_directives(name)
 string name;
 {
     entity module = local_name_to_top_level_entity(name);
-    statement s = (statement) db_get_resource(DBR_CODE, name, TRUE);
+    statement s = (statement) db_get_resource(DBR_CODE, name, FALSE);
 
     debug_on("HPFC_DEBUG_LEVEL");
     debug(1, "hpfc_directives", "considering module %s\n", name);
@@ -356,22 +347,24 @@ string name;
     {
 	set_current_module_entity(module);
 	load_hpfc_status();
-	/* make_update_common_map(); ??? */
+	make_update_common_map(); 
 	
-	NormalizeCommonVariables(module, s); /* ??? hmmm... */
+	NormalizeCommonVariables(module, s);
+	/* debug_print_referenced_entities(s); */
 	build_full_ctrl_graph(s);
 	handle_hpf_directives(s);
 
 	clean_ctrl_graph();
-	/* free_update_common_map(); ??? */
+	free_update_common_map(); 
 	reset_current_module_entity();
-
+	
+	db_unput_a_resource(DBR_CODE, name);
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(name), s);
 
 	save_hpfc_status();
     }
 
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_DIRECTIVES, strdup(name), NO_FILE); /* fake */
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_DIRECTIVES, strdup(name), NO_FILE);/* fake */
 
     debug_off(); debug_off();
 }
