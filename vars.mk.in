@@ -1,6 +1,6 @@
 
 # @Author: Bart Kienhuis
-# $Id: vars.mk.in,v 1.6 2002/10/14 14:07:59 olaru Exp $
+# $Id: vars.mk.in,v 1.7 2002/10/15 08:21:20 kienhuis Exp $
 
 VERSION = @VERSION@
 
@@ -81,7 +81,7 @@ AFLAGS=@DEFAULT_AFLAGS@
 OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)
 LIB = $(OBJ_DIR)/$(PSTATIC)
 EXEC_EXTRA_LIBS = $(LIB)
-CFLAGS +=  $(EXTRA_INCLUDE) $(AFLAGS) $(EXTRA_FLAGS) -I $(ROOT)/include
+CFLAGS +=  $(EXTRA_INCLUDES) $(AFLAGS) $(EXTRA_FLAGS) -I $(ROOT)/include
 
 
 ############################################################
