@@ -56,7 +56,7 @@ bool loop_interchange(string module_name)
     debug_off();
 
     /* Reorder the module, because new statements have been generated. */
-    module_body_reorder(s);
+    module_reorder(s);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, 
 			   strdup(module_name), 
