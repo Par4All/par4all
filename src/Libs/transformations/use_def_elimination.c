@@ -317,19 +317,23 @@ iterate_through_the_predecessor_graph(statement s,
 
    {
       /* And if the statement is in an unstructured, mark all the
-         unstructured nodes predecessors as useful. It is quite
-         conservative to deal with control dependences... */
+         controlling unstructured nodes predecessors as useful, that
+         is all the unstructured IF back-reachable. */
       if (bound_control_father_p(s)) {
+         list blocks = NIL;       
          control control_father = load_control_father(s);
-         MAP(CONTROL, a_control,
-             {
-                set_add_element(elements_to_visit,
-                                elements_to_visit,
-                                (char *) control_statement(a_control));
-                ifdebug(6)
-                   fprintf(stderr, "\tstatement %p (%#x) useful by control dependence.\n",
-                           control_statement(a_control), statement_ordering(control_statement(a_control)));
-             }, control_predecessors(control_father));
+         BACKWARD_CONTROL_MAP(pred, {
+            if (gen_length(control_successors(pred)) == 2) {
+               /* pred is an unstructured IF that control control_father: */
+               set_add_element(elements_to_visit,
+                               elements_to_visit,
+                               (char *) control_statement(pred));
+               ifdebug(6)
+                  fprintf(stderr, "\tstatement unstructed IF %p (%#x) useful by control dependence.\n",
+                          control_statement(pred), statement_ordering(control_statement(pred)));
+            }           
+         }, control_father, blocks);
+         gen_free_list(blocks);
       }
    }            
 }
@@ -409,6 +413,19 @@ remove_this_statement_if_useless(statement s)
       fix_sequence_statement_attributes(s);
       if (get_debug_level() >= 6)
          fprintf(stderr, "remove_this_statement_if_useless removes statement %p (%#x).\n", s, statement_ordering(s));
+      if (bound_control_father_p(s)) {
+	  /* s is owned by a control node: */
+	  control control_father = load_control_father(s);
+	  if (gen_length(control_successors(control_father))) {
+	      /* The statement is in fact an unstructured IF. Since it
+                 is useless, it does no longer control any useful
+                 statement and thus we can discard the then or else
+                 branch. In fact, if the exit node is only reachable
+                 though only one branch, we should not discard this
+                 one since we would break the the unstructured... */
+	      
+	  }
+      }
    }
 }
 
