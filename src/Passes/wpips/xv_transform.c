@@ -77,7 +77,10 @@ execute_safe_apply_outside_the_notifyer()
 {
    (void) safe_apply(execute_safe_apply_outside_the_notifyer_transformation_name_to_apply, execute_safe_apply_outside_the_notifyer_module_name);
    free(execute_safe_apply_outside_the_notifyer_transformation_name_to_apply);
-   free(execute_safe_apply_outside_the_notifyer_module_name);   
+   free(execute_safe_apply_outside_the_notifyer_module_name);
+
+   /* The module list may have changed: */
+   send_the_names_of_the_available_modules_to_emacs();
    display_memory_usage();
 }
 
