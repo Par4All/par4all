@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1995/08/09 16:45:35 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/02 19:42:05 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -138,20 +138,14 @@ Variable var;
 bool is_lower;
 entity divide;
 {
-  int 
-    len = 0,
-    sign = is_lower? -1: +1;
-  entity
-    operator = is_lower? CreateIntrinsic("MAX"): CreateIntrinsic("MIN");
-  expression
-    result = expression_undefined;
-  list
-    le = NIL;
+  int len = 0, sign = is_lower? -1: +1;
+  entity operator = is_lower? CreateIntrinsic("MAX"): CreateIntrinsic("MIN");
+  expression result;
+  list le = NIL;
   Psysteme s;
   
-  debug(5, "constraints_to_loop_bound",
-	"computing %ser bound for variable %s\n",
-	(is_lower?"low":"upp"), entity_local_name((entity) var));
+  pips_debug(5, "computing %ser bound for variable %s\n",
+	     (is_lower?"low":"upp"), entity_local_name((entity) var));
 
   ifdebug(6)
   {
@@ -174,31 +168,67 @@ entity divide;
       c!=(Pcontrainte) NULL;
       c=c->succ)
     {
-      Value 
-	val = vect_coeff(var, c->vecteur);
-      Pvecteur
-	v = vect_del_var(c->vecteur, var);
-      expression
-	e = expression_undefined;
+      Value val = vect_coeff(var, c->vecteur);
+      Pvecteur vdiv = vect_del_var(c->vecteur, var),
+               vadd = VECTEUR_NUL, v;
+      expression ediv, eadd, e;
 
       assert(sign*val>0);
 
       if (val>0) 
-	  vect_chg_sgn(v);
+	  vect_chg_sgn(vdiv);
       else
 	  /*  ax+b <= 0 and a<0 => x >= (b+(-a-1))/(-a)
 	   */
-	  val=-val, vect_add_elem(&v, TCST, val-1);
+	  val=-val, vect_add_elem(&vdiv, TCST, val-1);
 
-      e = make_vecteur_expression(v);
+      /* extract coefficients that are dividable by val...
+       */
+      for (v=vdiv; v; v=v->succ)
+      {
+	  Variable va = var_of(v);
+	  Value vl = val_of(v);
 
-      if (val!=1) e = MakeBinaryCall(divide, e, int_to_expression(val));
+	  if (vl%val==0) 
+	      vect_add_elem(&vadd, va, vl/val);
+      }
+
+      for (v=vadd; v; v=v->succ)
+      {
+	  vect_erase_var(&vdiv, var_of(v));
+      }
+
+      /* assert. no 2i=0 should have reached this function...
+       */
+      message_assert("some expression", vdiv || vadd);
+
+      if (vdiv)
+      {
+	  ediv = make_vecteur_expression(vdiv);
+	  
+	  if (val!=1) 
+	      ediv = MakeBinaryCall(divide, ediv, int_to_expression(val));
+	  
+	  if (vadd)
+	  {
+	      eadd = make_vecteur_expression(vadd);
+	      e = MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME),
+				 eadd, ediv);
+	  }
+	  else
+	  {
+	      e = ediv;
+	  }
+      }
+      else 
+      {
+	  e = make_vecteur_expression(vadd);
+      }
 
       le = CONS(EXPRESSION, e, le);
     }
 
-  /*
-   * final operation
+  /* final operation
    */
   len = gen_length(le);  assert(len!=0);
 
@@ -258,8 +288,7 @@ Pcontrainte lower, upper;
     return(result);
 }
 
-/*
- * sc is used to generate the loop nest bounds for variables vars.
+/* sc is used to generate the loop nest bounds for variables vars.
  * vars may be empty. the loop statement is returned.
  *
  * sc is not touched...
@@ -272,12 +301,9 @@ entity divide; /* I have to give the divide entity to be called */
 {
     range rg;
     Variable var;
-    Pcontrainte	
-	c, lower, upper;
+    Pcontrainte	c, lower, upper;
     list reverse;
-    statement 
-	assign,
-	current = body;
+    statement assign, current = body;
     Psysteme s;
     
     if (ENDP(vars)) return(body);
@@ -290,58 +316,57 @@ entity divide; /* I have to give the divide entity to be called */
 
     assert(sc_nbre_egalites(s)==0);
     
-    MAPL(ce,
-     {
-	 var = (Variable) ENTITY(CAR(ce));
-	 
-	 debug(5, "systeme_to_loop_nest",
-	       "variable %s loop\n", entity_name((entity) var));
-	 
-	 constraints_for_bounds(var, &c, &lower, &upper);
+    MAP(ENTITY, e,
+    {
+	var = (Variable) e;
+	
+	pips_debug(5, "variable %s loop\n", entity_name((entity) var));
+	
+	constraints_for_bounds(var, &c, &lower, &upper);
+	
+	if (bounds_equal_p(var, lower, upper))
+	{
+	    /*   VAR = LOWER
+	     *   body
+	     */
+	    assign = 
+		make_assign_statement(entity_to_expression((entity) var),
+				      constraints_to_loop_bound(lower, var, 
+								TRUE, divide));
+	    current = 
+		make_block_statement(CONS(STATEMENT, assign,
+				     CONS(STATEMENT, current,
+					  NIL)));
 
-	 if (bounds_equal_p(var, lower, upper))
-	 {
-	     /*   VAR = LOWER
-	      *   body
-	      */
-	     assign = 
-		 make_assign_statement(entity_to_expression((entity) var),
-				       constraints_to_loop_bound(lower, var, 
-								 TRUE, divide));
-	     current = 
-		 make_block_statement(CONS(STATEMENT, assign,
-				      CONS(STATEMENT, current,
-					   NIL)));
-
-	 }
-	 else
-	 {
-	     /*   DO VAR = LOWER, UPPER, 1
-	      *     body
-	      *   ENDDO
-	      */
-	     rg = make_range(constraints_to_loop_bound(lower, var, 
-						       TRUE, divide),
-			     constraints_to_loop_bound(upper, var, 
-						       FALSE, divide),
-			     int_to_expression(1));
+	}
+	else
+	{
+	    /*   DO VAR = LOWER, UPPER, 1
+	     *     body
+	     *   ENDDO
+	     */
+	    rg = make_range(constraints_to_loop_bound(lower, var, 
+						      TRUE, divide),
+			    constraints_to_loop_bound(upper, var, 
+						      FALSE, divide),
+			    int_to_expression(1));
 	 
-	     current = 
-		 make_stmt_of_instr
-		     (make_instruction
-		      (is_instruction_loop,
-		       make_loop((entity) var,
-				 rg, 
-				 current,
-				 entity_empty_label(),
-				 make_execution(is_execution_sequential, UU),
-				 NIL)));
-	 }
-
-	 contraintes_free(lower);
-	 contraintes_free(upper);
-     },
-	 reverse);
+	    current = 
+		make_stmt_of_instr
+		    (make_instruction
+		     (is_instruction_loop,
+		      make_loop((entity) var,
+				rg, 
+				current,
+				entity_empty_label(),
+				make_execution(is_execution_sequential, UU),
+				NIL)));
+	}
+	
+	contraintes_free(lower);
+	contraintes_free(upper);
+    },
+	reverse);
     
     gen_free_list(reverse);
     sc_inegalites(s)=c, sc_rm(s);
