@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1996/03/11 18:42:56 $, ) 
+ * ($Date: 1996/04/17 18:31:38 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -836,6 +836,33 @@ generate_remapping_guard(
       make_block_statement(CONS(STATEMENT, the_code, l)),
       make_empty_statement()));
 
+    return result;
+}
+
+statement 
+generate_all_live(
+    entity primary)
+{
+    statement result;
+    list /* of statement */ ls = NIL;
+
+    MAP(ENTITY, array,
+    {
+	/* LIVEMAPPING(array) = .TRUE.
+	 */
+	ls = CONS(STATEMENT, 
+		  make_assign_statement
+                  (live_mapping_expression(load_hpf_number(array)),
+		   make_constant_boolean_expression(TRUE)), ls);
+    },
+	entities_list(load_dynamic_hpf(primary)));
+
+    /* commented result
+     */
+    result = make_block_statement(ls);
+    statement_comments(result) = 
+	strdup(concatenate("c all live for ", 
+			   entity_local_name(primary), "\n", NULL));
     return result;
 }
 
