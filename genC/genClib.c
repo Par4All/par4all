@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 19:54:59 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 19:59:23 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -198,6 +198,12 @@ void gen_put_tabulated_name(int domain, char * name, char * val)
     char * key = build_unique_tabulated_name(domain, name);
     check_Gen_tabulated_names();
     hash_put(Gen_tabulated_names, strdup(key), val);
+}
+
+void gen_put_tabulated_name_direct(char * key, char * val)
+{
+    check_Gen_tabulated_names();
+    hash_put(Gen_tabulated_names, key, val);
 }
 
 /* FPRINTF_SPACES prints NUMBER spaces on the FD file descriptor.`
