@@ -253,7 +253,9 @@ bool summary_precondition(char * module_name)
 
     if (!callees_callees(callers) && !entity_main_module_p(callee))
     {
-      /* no callers => empty precondition (but the main). */
+      /* no callers => empty precondition (but the main). 
+	 FC. 08/01/1999.
+      */
       t = transformer_empty();
     } else if (transformer_undefined_p(t)) {
 	t = transformer_identity();
