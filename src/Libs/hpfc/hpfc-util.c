@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/09/13 14:41:26 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/09/15 15:54:13 $, )
  * version $Revision$
  */
 
@@ -66,10 +66,9 @@ expression expr;
  * check whether the distributed array e
  * is replicated or not.
  */
-bool replicated_p(e)
-entity e;
+bool replicated_p(entity e)
 {
-    int i;
+    int i, ntdim;
     align a;
     list la, ld;
     entity template;
@@ -80,17 +79,15 @@ entity e;
     a = load_entity_align(e);
     la = align_alignment(a);    
     template = align_template(a);
-
     d = load_entity_distribute(template);
     ld = distribute_distribution(d);
+    ntdim = NumberOfDimension(template);
 
-    for(i=1;
-	i<=NumberOfDimension(template);
-	i++, ld=CDR(ld))
+    for(i=1; i<=ntdim; i++, POP(ld))
 	if (ith_dim_replicated_p(template, i, la, DISTRIBUTION(CAR(ld))))
-	    return(TRUE);
+	    return TRUE;
 
-    return(FALSE);
+    return FALSE;
 }
 
 /* bool ith_dim_replicated_p(template, i, la, dist)
@@ -444,23 +441,35 @@ int dim, *tdim;
     return(distribution_undefined);
 }    
 
-/* int template_dimension_of_array_dimension(array, dim)
- *
- * the matching dimension of a distributed
- */
-int template_dimension_of_array_dimension(array, dim)
-entity array;
-int dim;
+int
+template_dimension_of_array_dimension(
+    entity array, 
+    int dim)
 {
-    align a = load_entity_align(array);
-    alignment al = FindAlignmentOfDim(align_alignment(a), dim);
+    align a;
+    alignment al;
+
+    a = load_entity_align(array);
+    al = FindAlignmentOfDim(align_alignment(a), dim);
     
     return (al==alignment_undefined) ? -1 : alignment_templatedim(al);
 }
 
-int DistributionParameterOfArrayDim(array, dim, pprocdim)
-entity array;
-int dim, *pprocdim;
+int
+processor_dimension_of_template_dimension(
+    entity template,
+    int dim)
+{
+    int pdim = 0, n;
+    if (dim>=0) get_distribution(template, dim, &pdim, &n);
+    return pdim;
+}
+
+int
+DistributionParameterOfArrayDim(
+    entity array,
+    int dim,
+    int *pprocdim)
 {
     entity template = array_to_template(array);
     distribute d = load_entity_distribute(template);
@@ -494,8 +503,10 @@ int tdim, tcell, *pprocdim; /* template dimension, template cell */
 	return -1;
     }
 
-    tmin = HpfcExpressionToInt(dimension_lower(FindIthDimension(template, tdim)));
-    pmin = HpfcExpressionToInt(dimension_lower(FindIthDimension(procs, *pprocdim)));
+    tmin = HpfcExpressionToInt
+	(dimension_lower(FindIthDimension(template, tdim)));
+    pmin = HpfcExpressionToInt
+	(dimension_lower(FindIthDimension(procs, *pprocdim)));
     psiz = SizeOfIthDimension(procs, *pprocdim);
     n    = HpfcExpressionToInt(distribution_parameter(di));
 
@@ -646,7 +657,6 @@ int dim, *plow, *pup;
  * bugs or features:
  *  - ??? should be relative to a reference, instead of assuming mere indexes
  */
-
 bool 
 alignments_compatible_p(entity e1, int dim1,
 		       entity e2, int dim2)
