@@ -116,7 +116,7 @@ string phase;
 		    if (get_bool_property("ACTIVATE_DEL_DERIVED_RES"))
 			delete_derived_resources (res);
 		    else
-			if (db_get_current_program() != database_undefined) {
+			if (db_get_current_workspace() != database_undefined) {
 			    /* remove resources with the same name as res to maintain 
 			       consistency in the database */
 			    db_unput_resources(vrn);
