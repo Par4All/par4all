@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.15  2000/07/27 15:21:55  coelho
+  message++
+
   Revision 1.14  2000/07/27 14:59:59  coelho
   trace added.
 
@@ -231,12 +234,12 @@ void throw_exception(
 		i);
   
       if (linear_exception_verbose_mode)
-	fprintf(stderr, "[%s:%d in %s = %d -> %s:%d in %s = %d]\n",
-		file, line, function, what,
+	fprintf(stderr, "exception %d/%d: %s(%s:%d) -> %s(%s:%d)\n",
+		what, exception_stack[i].what,
+		function, file, line,
+		exception_stack[i].function, 
 		exception_stack[i].file,
-		exception_stack[i].line,
-		exception_stack[i].function,
-		exception_stack[i].what);
+		exception_stack[i].line);
 
       longjmp(exception_stack[i].where,0);
     }
