@@ -122,7 +122,7 @@ expression *upper;
 		contrainte_fprint(stderr, pc, TRUE, entity_local_name);
 	    }
 	    ex = make_contrainte_expression(pc, (Variable) index);
-	    if (get_debug_level()>=7) {
+	    ifdebug(7){
 		fprintf(stderr, "\n expression after :");
 		print_expression(ex);
 	    }
@@ -143,22 +143,28 @@ expression *upper;
 						  "MAX"), 
 			     entity_domain);
 
-    pips_assert("make_vecteur_expression",min != entity_undefined && 
-		max != entity_undefined);
+    pips_assert("some entities",
+		min != entity_undefined && max != entity_undefined);
 
     if (gen_length(ll) > 1)
 	*lower = make_expression(make_syntax(is_syntax_call,
 					     make_call(max,ll)),
 				 normalized_undefined);
     else 
-	*lower = EXPRESSION(CAR(ll));
+	*lower = EXPRESSION(CAR(ll)); /* and memory leak... (cons lost) */
 
     if (gen_length(lu) > 1 )
 	*upper = make_expression(make_syntax(is_syntax_call,
 					     make_call(min,lu)),
 				 normalized_undefined );
     else
-	*upper = EXPRESSION(CAR(lu));   
+	*upper = EXPRESSION(CAR(lu)); /* idem... */
+
+    ifdebug(9) {
+	pips_debug(9, "returning: \n");
+	print_expression(*lower);
+	print_expression(*upper);
+    }
 }
 
 
