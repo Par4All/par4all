@@ -51,10 +51,14 @@ transformer_combine(
     cons * ce2;
 
     debug(8,"transformer_combine","begin\n");
+
     debug(8,"transformer_combine","arg. t1=%x\n",t1);
     ifdebug(8) (void) dump_transformer(t1);
+    ifdebug(9) pips_assert("consistent t1", transformer_consistency_p(t1));
+
     debug(8,"transformer_combine","arg. t2=%x\n",t2);
     ifdebug(8) (void) dump_transformer(t2);
+    ifdebug(9) pips_assert("consistent t2", transformer_consistency_p(t2));
 
     /* build new argument list and rename old and intermediate values,
        as well as new (i.e. unmodified) variables in t1 */
@@ -99,23 +103,28 @@ transformer_combine(
 	sc_dump(r1);
     }
     
-    /* get rid of intermediate values */
-    MAP(ENTITY, e_temp,
-    {
-	sc_and_base_projection_along_variable_ofl_ctrl
-	    (&r1, (Variable) e_temp, NO_OFL_CTRL);
-	if (! sc_empty_p(r1)) {
-	    Pbase b = base_dup(sc_base(r1));
-	    
-	    r1 = sc_normalize(r1);
-	    if(SC_EMPTY_P(r1)) {
-		r1 = sc_empty(b);
+    /* get rid of intermediate values, if any.
+     * ??? guard added to avoid an obscure bug, but I guess it should
+     * never get here with en nil base... FC
+     */
+    if (!sc_rn_p(r1)) {
+	MAP(ENTITY, e_temp,
+	{
+	    sc_and_base_projection_along_variable_ofl_ctrl
+		(&r1, (Variable) e_temp, NO_OFL_CTRL);
+	    if (! sc_empty_p(r1)) {
+		Pbase b = base_dup(sc_base(r1));
+		
+		r1 = sc_normalize(r1);
+		if(SC_EMPTY_P(r1)) {
+		    r1 = sc_empty(b);
+		}
+		else
+		    base_rm(b);
 	    }
-	    else
-		base_rm(b);
-	}
-    },
-	ints);
+	},
+	    ints);
+    }
 
     ifdebug(9) {
 	pips_debug(9, "global linear system r1 after projection\n");
