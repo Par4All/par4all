@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.70  2002/04/05 15:36:10  coelho
+ * hop.
+ *
  * Revision 1.69  2002/04/05 15:35:46  coelho
  * avoid recursion loop on checkpoint_workspace() call.
  *
@@ -424,6 +427,7 @@ static bool apply_a_rule(string oname, rule ru)
 	 apply_a_rule -> checkpoint_workspace -> delete_obsolete_resources ->
 	 check_physical_resource_up_to_date -> build_real_resources -> rmake ->
 	 apply_a_rule ! 
+	 * maybe it would be better treater in checkpoint_workspace?
       */
       checkpoint_workspace_being_done = true;
       checkpoint_workspace();
