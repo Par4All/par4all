@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1996/09/24 14:54:30 $, ) 
+# ($Date: 1996/09/24 15:47:52 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -237,6 +237,9 @@ make_diff()
   echo Differences for $module in $refresult: ;\
   cat $diffout ;\
   echo ; `"
+
+  # clean if ok.
+  test $status -eq 0 && rm -f $refresult.out
 }
 
 test_aspect()
