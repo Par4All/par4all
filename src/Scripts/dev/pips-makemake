@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/22 17:01:27 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/22 17:17:57 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -470,27 +470,37 @@ OBJECTS+=	\$(MAIN).o
 #
 
 test: all
+	#
+	# building a local PIPS
+	#
 	\$(LINK) \$(ARCH)/pips -lpips \$(PIPS_LIBS) 
 	@echo 
 
 wtest: all
+	#
+	# building a local WPIPS
+	#
 	\$(LINK) \$(ARCH)/wpips \$(WPIPS_ADDED_LDFLAGS) -lwpips \\
 		\$(PIPS_LIBS) \$(WPIPS_ADDED_LIBS)
 	@echo 
 
 ttest: all
-	\$(LINK) \$(ARCH)/tpips -ltpips \\
-		\$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS)
+	#
+	# building a local TPIPS
+	#
+	\$(LINK) \$(ARCH)/tpips -ltpips \$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS)
 	@echo 
 
 # obsolete rule I guess. test is better. FC.
 \$(BIN_TARGET): \$(LIB_TARGET) \$(ARCH)/\$(MAIN).o
+	#
+	# building $@
+	#
 	\$(LINK) \$(BIN_TARGET) \$(ARCH)/\$(MAIN).o \\
 		\$(LIB_TARGET) \$(PIPS_LIBS)
 	@echo 
 
-clobber: clean
-	-Delete *.database
+clobber: clean ; -Delete
 
 %
 
@@ -614,7 +624,7 @@ ALL_SOURCES =	\$(SOURCES) \$(CONFIG_FILE)
 	\$(INSTALL_SHR) \$(INSTALL_DOC) \$(INSTALL_UTL) \$(INSTALL_RTM) \\
 	\$(INSTALL_HTM) 
 	#
-	# installing files where needed
+	# installing files 
 	# 
 	# plain files
 	@test ! "\$(INSTALL_INC)" || \\
@@ -700,6 +710,9 @@ check_sccs:
 # install installs sources, so depends on sources. FC
 # to insure the library is compiled before hand, a make is added.
 .install: \$(ALL_SOURCES) check_install check_sccs
+	#
+	# installing new source files 
+	#
 	\$(MAKE) \$(GMKNODIR) all \$(TARGET_DIR) 
 	@echo ""; echo; echo -n "Description of changes: " ; \\
 	read comments ; \\
@@ -716,8 +729,10 @@ install:  .install
 # diff between dev and prod sources:
 
 diff:
-	-@for f in \$(ALL_SOURCES) ; \\
-	do \\
+	#
+	# showing diff between the local and installed version
+	#
+	-@for f in \$(ALL_SOURCES) ; do \\
 	  echo "DIFFERENCES BETWEEN DEV AND PROD FOR \$\$f:" ; \\
 	  \$(DIFF) \$\$f \$(TARGET_DIR)/\$\$f ; \\
 	done
@@ -762,7 +777,7 @@ build-header-file:
 	# 
 	# building the header file...
 	#
-	\$(COPY) \$(TARGET)-local.h \$(INC_TARGET);
+	\$(COPY) \$(TARGET)-local.h \$(INC_TARGET);\\
 	{ \\
 	echo "/* header file built by \$(PROTO) */";\\
 	echo "#ifndef ${dir_simple_name}_header_included";\\
@@ -776,8 +791,7 @@ build-header-file:
 
 # .header carrie all dependencies for INC_TARGET:
 .header: \$(TARGET)-local.h \$(DERIVED_HEADERS) \$(INC_CFILES) 
-	\$(MAKE) \$(GMKNODIR) build-header-file
-	touch .header
+	\$(MAKE) \$(GMKNODIR) build-header-file ; touch .header
 
 # checks for the header file, and build if necessary...
 
@@ -786,8 +800,7 @@ build-header-file:
 header: .header \$(INC_TARGET)
 
 \$(INC_TARGET): \$(TARGET)-local.h 
-	\$(RM) .header
-	\$(MAKE) \$(GMKNODIR) .header
+	\$(RM) .header; \$(MAKE) \$(GMKNODIR) .header
 
 %
 
@@ -816,6 +829,9 @@ depend: .depend
 # - the Makefile needs the dependences.
 # how to get out of this?
 $MAKEFILE.depend.\$(ARCH):
+	#
+	# generating the dependences for \$(ARCH)
+	#
 	# creates an empty dependence file, it is ok for going on and
 	# will prevent any recursion for generating the same dependences.
 	touch \$@ 
