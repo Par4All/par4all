@@ -188,13 +188,6 @@ static void rice_update_dependence_graph(statement /*stat*/, set /*region*/);
 static list TestCoupleOfEffects(statement /*s1*/, effect /*e1*/, statement /*s2*/,
 				 effect /*e2*/, list /*llv*/, Ptsg */*gs*/, 
 				 list */*levelsop*/, Ptsg */*gsop*/);
-/* static list TestCoupleOfReferences(list /*n1*/, Psysteme /*sc1*/,  */
-/* 				    statement /*s1*/, effect /*ef1*/,  */
-/* 				    reference /*r1*/, list /*n2*/,  */
-/* 				    Psysteme /*sc2*/, statement /*s2*/,  */
-/* 				    effect /*ef2*/, reference /*r2*/,  */
-/* 				    list /*llv*/, Ptsg */*gs*/,  */
-/* 				    list */*levelsop*/, Ptsg */*gsop*/); */
 static list TestDependence(list /*n1*/, Psysteme /*sc1*/, statement /*s1*/, 
 			    effect /*ef1*/, reference /*r1*/, list /*n2*/, 
 			    Psysteme /*sc2*/, statement /*s2*/, effect /*ef2*/, 
