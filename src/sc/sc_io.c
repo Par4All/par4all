@@ -1,7 +1,7 @@
  /* package sc */
 
 #include <stdio.h>
-extern   int fprintf();
+
 #include "assert.h"
 #include "boolean.h"
 #include "arithmetique.h"
