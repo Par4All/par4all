@@ -18,7 +18,35 @@
 #include "ri.h"
 #include "ri-util.h"
 
+/************************************************************* VECTEUR STUFF */
+
+void vect_debug(Pvecteur v)
+{
+    vect_fprint(stderr, v, entity_local_name);
+}
+
+/* comparison function for Pvecteur in pips
+ */
+int compare_Pvecteur(pv1, pv2)
+Pvecteur *pv1, *pv2;
+{
+    return compare_entities((entity*)&var_of(*pv1),
+			    (entity*)&var_of(*pv2));
+}
+
 /******************************************** FOR PRETTYPRINTING CONSTRAINTS */
+
+void 
+inegalite_debug(Pcontrainte c)
+{
+    inegalite_fprint(stderr, c, entity_local_name);
+}
+
+void 
+egalite_debug(Pcontrainte c)
+{
+    egalite_fprint(stderr, c, entity_local_name);
+}
 
 static string
 the_operator(
