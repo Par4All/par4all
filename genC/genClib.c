@@ -44,9 +44,10 @@ cons *Gen_cp_[ MAX_NESTED_CONS ] ;
 chunk Gen_hash_[ MAX_NESTED_HASH ] ;
 
 /* GEN_TABULATED maps any bp->index to the tabulation table. TABULATED_BP is
-   the fake domain that helps writing tabulation tables. GEN_TABULATED_NAMES
-   maps any name <domain_number|name> to its offset in the Gen_tabulated
-   of the domain number. */
+ * the fake domain that helps writing tabulation tables. GEN_TABULATED_NAMES
+ * maps any name <domain_number|name> to its offset in the Gen_tabulated
+ * of the domain number.
+ */
 
 chunk *Gen_tabulated_[ MAX_TABULATED ] ;
 struct binding *Tabulated_bp ;
@@ -70,37 +71,24 @@ static int disallow_undefined_tabulated = TRUE ;
  * Fabien COELHO 10/06/94
  */
 
-#define check_domain(function, domain) \
-    if ((domain)<0 || (domain)>=MAX_DOMAIN) \
-	fprintf(stderr, "%s: Inconsistent domain number %d\n", \
-		function, domain), \
-	abort();
+#define check_domain(domain) \
+  message_assert("Inconsistant domain number",\
+		 (domain)>=0 && (domain)<MAX_DOMAIN)
 
-#define check_read_spec_performed(function) \
-    if(! Read_spec_performed) \
-	user("%s: gen_read_spec not performed prior to use\n", function ), \
-	exit(1) ;
+#define check_read_spec_performed() \
+  message_assert("gen_read_spec not performed prior to use", \
+		 Read_spec_performed);
 
-/* DOMAIN_INDEX returns the index in the Domain table for object OBJ. */
+/* DOMAIN_INDEX returns the index in the Domain table for object OBJ.
+ */
 
 static int domain_index( obj )
 chunk *obj ;
 {
-    int i ;
-
-    if( obj == NULL ) {
-	user( "domain_index: Trying to use a NULL object\n", "" ) ;
-	exit( 1 ) ;
-    }
-    if( obj == chunk_undefined ) {
-	user( "domain_index: Trying to use an undefined object\n", "" ) ;
-	exit( 1 ) ;
-    }
-    if( (i=obj->i) < 0 || i >= MAX_DOMAIN ) {
-	user( "domain_index: Inconsistant domain number %s\n", itoa( i )) ;
-	abort() ;
-    }
-    return( i ) ;
+    message_assert("Trying to use a NULL object", obj!=NULL);
+    message_assert("Trying to use an undefined object", obj!=chunk_undefined);
+    check_domain(obj->i);
+    return(obj->i) ;
 }
 
 
@@ -359,10 +347,11 @@ va_dcl
 }
 
 /* The DRIVER structure is used to monitor the general function which
-   traverses objects. NULL is called whenver an undefined pointer is found.
-   <sort>_IN is called whenever an object of <sort> is entered. If the
-   returned value is TRUE, then recursive calls are made and, at the end,
-   the <sort>_OUT function is called. */
+ * traverses objects. NULL is called whenver an undefined pointer is found.
+ * <sort>_IN is called whenever an object of <sort> is entered. If the
+ * returned value is TRUE, then recursive calls are made and, at the end,
+ * the <sort>_OUT function is called. 
+ */
 
 struct driver {
   void (*null)() ;
@@ -375,10 +364,11 @@ struct driver {
   void (*obj_out)() ;
 } ;
 
-/* To be called on any object pointer. */
+/* To be called on any object pointer.
+ */
 
 #define CHECK_NULL(obj,bp,dr) \
-  if( (obj) == chunk_undefined ) {(*(dr)->null)(bp) ; return ;}
+  if((obj)==chunk_undefined) {(*(dr)->null)(bp) ; return ;}
 
 static void gen_trav_obj() ;
 
@@ -391,9 +381,10 @@ struct binding *bp ;
 chunk *obj ;
 struct driver *dr ;
 {
-    CHECK_NULL( obj, bp, dr ) ;
+    CHECK_NULL(obj, bp, dr) ;
 
-    if( gen_debug & GEN_DBG_TRAV_LEAF ) {
+    if (gen_debug & GEN_DBG_TRAV_LEAF)
+    {
 	fprintf_spaces( stderr, gen_debug_indent++ ) ;
 	(void) fprintf( stderr, "trav_leaf dealing with " ) ;
 
@@ -405,18 +396,22 @@ struct driver *dr ;
 		(void) fprintf( stderr, "tabulated %s\n", bp->name ) ;
 	else (void) fprintf( stderr, "constructed %s\n", bp->name ) ;
     }
-    if( (*dr->leaf_in)( obj, bp )) {
-	if( !IS_INLINABLE( bp ) && !IS_EXTERNAL( bp )) {
-	    if( gen_debug & GEN_DBG_CHECK ) {
+
+    if( (*dr->leaf_in)(obj, bp))
+    {
+	if( !IS_INLINABLE( bp ) && !IS_EXTERNAL( bp ))
+	{
+	    if (gen_debug & GEN_DBG_CHECK)
 		(void) gen_check( obj->p, bp-Domains ) ;
-	    }
-	    CHECK_NULL( obj->p, bp, dr ) ;
+	    
+	    CHECK_NULL(obj->p, bp, dr) ;
 	    gen_trav_obj( obj->p, dr ) ;
 	}
-	(*dr->leaf_out)( obj, bp ) ;
+
+	(*dr->leaf_out)(obj, bp) ;
     }
-    if( gen_debug & GEN_DBG_TRAV_LEAF ) 
-	    gen_debug_indent-- ;
+
+    if (gen_debug & GEN_DBG_TRAV_LEAF) gen_debug_indent-- ;
 }
 
 /* GEN_TRAV_SIMPLE traverses a simple OBJ (which is a (CONS *) for a list
@@ -429,55 +424,63 @@ union domain *dp ;
 chunk *obj ;
 struct driver *dr ;
 {
-    CHECK_NULL( obj, (struct binding *)NULL, dr ) ;
+    CHECK_NULL(obj, (struct binding *)NULL, dr);
 
-    if( gen_debug & GEN_DBG_TRAV_SIMPLE ) {
+    if( gen_debug & GEN_DBG_TRAV_SIMPLE ) 
+    {
 	fprintf_spaces( stderr, gen_debug_indent++ ) ;
 	(void) fprintf( stderr, "trav_simple dealing with " ) ;
 	print_domain( stderr, dp ) ;
 	(void) fprintf( stderr, "\n" ) ;
     }
-    if( (*dr->simple_in)( obj, dp )) {
-	switch( dp->ba.type ) {
+
+    if( (*dr->simple_in)(obj, dp))
+    {
+	switch( dp->ba.type ) 
+	{
 	case BASIS: 
 	    gen_trav_leaf( dp->ba.constructand, obj, dr ) ;
 	    break ;
-	case LIST: {
+	case LIST: 
+	{
 	    cons *p ;
 
-	    for( p = obj->l ; p != NULL ; p = p->cdr ) {
+	    for (p = obj->l ; p != NULL ; p = p->cdr)
 		gen_trav_leaf( dp->li.element, &p->car, dr ) ;
-	    }
 	    break ;
 	}
-	case SET: {
-	    SET_MAP( elt, {
-		gen_trav_leaf( dp->se.element, (chunk *)&elt, dr );
-	    }, obj->t ) ;
+	case SET:
+	    SET_MAP(elt,
+		{
+		    gen_trav_leaf(dp->se.element, (chunk *)&elt, dr);
+		}, 
+		    obj->t) ;
 	    break ;
-	}
-	case ARRAY: {
+	case ARRAY: 
+	{
 	    int i ;
-	    int size = array_size( dp->ar.dimensions ) ;
+	    int size = array_size(dp->ar.dimensions) ;
 
-	    for( i=0 ; i<size ; i++ )
-		    (*dr->array_leaf)( dp->ar.element, i, obj->p+i, dr ) ;
+	    for (i=0 ; i<size; i++)
+		(*dr->array_leaf)(dp->ar.element, i, obj->p+i, dr);
 
 	    break ;
 	}
 	default:
 	    fatal( "gen_trav_simple: Unknown type %s\n", itoa( dp->ba.type )) ;
 	}
+	
 	(*dr->simple_out)( obj, dp ) ;
     }
-    if( gen_debug & GEN_DBG_TRAV_SIMPLE ) 
-	    gen_debug_indent-- ;
+
+    if (gen_debug & GEN_DBG_TRAV_SIMPLE) gen_debug_indent-- ;
 }
 
-/* GEN_ARRAY_LEAF is the default recursive call to gen_trav_leaf. */
+/* GEN_ARRAY_LEAF is the default recursive call to gen_trav_leaf.
+ */
 
 static void
-gen_array_leaf( bp, i, obj, dr )
+gen_array_leaf(bp, i, obj, dr)
 struct binding *bp ;
 int i ;
 chunk *obj ;
@@ -491,7 +494,7 @@ struct driver *dr ;
    the driver DR. */
 
 static void 
-gen_trav_obj_constructed( obj, bp, dp, data, dr )
+gen_trav_obj_constructed(obj, bp, dp, data, dr)
 chunk *obj ;
 struct driver *dr ;
 struct binding *bp ;
@@ -500,35 +503,40 @@ int data ;
 {
     struct domainlist *dlp = dp->co.components ;
 
-    switch( dp->co.op ) {
-    case AND_OP: {
+    switch(dp->co.op)
+    {
+    case AND_OP: 
+    {
 	chunk *cp ;
 
-	for( cp = obj+data ; dlp != NULL ; cp++, dlp = dlp->cdr ) {
-	    gen_trav_simple( dlp->domain, cp, dr ) ;
-	}
+	for(cp = obj+data ; dlp != NULL ; cp++, dlp = dlp->cdr)
+	    gen_trav_simple(dlp->domain, cp, dr) ;
+
 	break ;
     }
-    case OR_OP: {
+    case OR_OP: 
+    {
 	int which = (obj+data)->i - dp->co.first ;
 
-	for( ; dlp!=NULL && which ; which--,dlp=dlp->cdr ) {
+	for(; dlp!=NULL && which; which--,dlp=dlp->cdr)
 	    ;
-	}
-	if( dlp == NULL ) {
+
+	if(dlp == NULL)
 	    fatal( "gen_trav_obj: Unknown tag %s\n", itoa( (obj+data)->i )) ;
-	}
-	gen_trav_simple( dlp->domain, obj+data+1, dr ) ;
+	
+	gen_trav_simple(dlp->domain, obj+data+1, dr);
 	break ;
     }
     case ARROW_OP: 
-	HASH_MAP( k, v, {
-	    gen_trav_simple( dlp->domain, (chunk *)k, dr ) ;
-	    gen_trav_simple( dlp->cdr->domain, (chunk *)v, dr ) ;
-	}, (obj+data)->h ) ;
+	HASH_MAP(k, v, 
+	     {
+		 gen_trav_simple( dlp->domain, (chunk *)k, dr ) ;
+		 gen_trav_simple( dlp->cdr->domain, (chunk *)v, dr ) ;
+	     }, 
+		 (obj+data)->h ) ;
 	break ;
     default:
-	fatal( "gen_trav_obj: Unknown op %s\n", itoa( dp->co.op )) ;
+	fatal( "gen_trav_obj: Unknown op %s\n", itoa(dp->co.op)) ;
     }
 }
 
@@ -539,46 +547,53 @@ gen_trav_obj( obj, dr )
 {
     CHECK_NULL( obj, (struct binding *)NULL, dr ) ;
 
-    if( !Read_spec_performed ) {
-	user( "gen_read_spec not performed prior to use\n", "" ) ;
-	exit( 1 ) ;
-    }
-    if( (*dr->obj_in)( obj, dr )) {
-	struct binding *bp = &Domains[ domain_index( obj ) ] ;
+    if ((*dr->obj_in)(obj, dr))
+    {
+	struct binding *bp = &Domains[quick_domain_index(obj)] ;
 	union domain *dp = bp->domain ;
 	int data = 1+IS_TABULATED( bp ) ;
 
-	if( gen_debug & GEN_DBG_TRAV_OBJECT ) {
+	if( gen_debug & GEN_DBG_TRAV_OBJECT )
+	{
 	    fprintf_spaces( stderr, gen_debug_indent++ ) ;
 	    (void) fprintf( stderr, "trav_obj dealing with " ) ;
 	    print_domain( stderr, dp ) ;
 	    (void) fprintf( stderr, "\n" ) ;
 	}
-	switch( dp->ba.type ) {
+
+	switch( dp->ba.type ) 
+	{
 	case LIST: 
 	case SET:
 	case ARRAY:
-	    gen_trav_simple( dp, obj+data, dr ) ;
+	    gen_trav_simple(dp, obj+data, dr);
 	    break ;
 	case CONSTRUCTED: 
-	    gen_trav_obj_constructed( obj, bp, dp, data, dr ) ;
+	    gen_trav_obj_constructed(obj, bp, dp, data, dr);
 	    break ;
 	default:
-	    fatal( "gen_trav_obj: Unknown type %s\n", itoa( dp->ba.type )) ;
+	    fatal( "gen_trav_obj: Unknown type %s\n", itoa(dp->ba.type));
 	}
-	(*dr->obj_out)( obj, bp, dr ) ;
+
+	(*dr->obj_out)(obj, bp, dr);
     }
-    if( gen_debug & GEN_DBG_TRAV_OBJECT )  {
-	gen_debug_indent-- ;
-    }
+    if( gen_debug & GEN_DBG_TRAV_OBJECT ) gen_debug_indent--;
 }
 
-/* Useful functions */
+/* Useful functions
+ */
 
 void
 gen_null(p)
 chunk *p;
 {
+}
+    
+bool
+gen_true(c)
+chunk *c;
+{
+    return(TRUE);
 }
 
 static int
@@ -586,13 +601,12 @@ tabulated_leaf_in( obj, bp )
 chunk *obj ;
 struct binding *bp ;
 {
-    return( !IS_TABULATED( bp )) ;
+    return(!IS_TABULATED(bp));
 }
 
-
-
-/* These functions computes an hash table of object pointers (to be used
-   to manage sharing when dealing with objects). */
+/* These functions computes an hash table of object pointers
+ * (to be used to manage sharing when dealing with objects). 
+ */
 
 #define MAX_SHARED_OBJECTS 10000
 
@@ -602,16 +616,18 @@ static char *seen_once = (char *)NULL ;
 #define FIRST_SEEN(s) (s>=first_seen && s<first_seen+MAX_SHARED_OBJECTS)
 
 /* The OBJ_TABLE maps objects to addresses within the arrays FIRST_SEEN
-   and SEEN_ONCE. In the first case, if the address is FIRST_SEEN, then
-   this is the first occurence of the object; if it has a non-zero
-   offset i, then it is the i-th shared object seen so far. This offset
-   is used in SHARED_OBJ to decide which number to print and update the
-   OBJ_TABLE to associate the object to SEEN_ONCE+i so that latter
-   references can be correctly generated. */
+ * and SEEN_ONCE. In the first case, if the address is FIRST_SEEN, then
+ * this is the first occurence of the object; if it has a non-zero
+ * offset i, then it is the i-th shared object seen so far. This offset
+ * is used in SHARED_OBJ to decide which number to print and update the
+ * OBJ_TABLE to associate the object to SEEN_ONCE+i so that latter
+ * references can be correctly generated. 
+ */
 
 static hash_table obj_table = (hash_table)NULL ;
 
-/* The running counter of shared objects number. */
+/* The running counter of shared objects number.
+ */
 
 static int shared_number = 0 ;
 
@@ -633,9 +649,9 @@ static void push_gen_trav_env()
 {
     struct gen_trav_env *env ;
 
-    if( gen_trav_env_top == MAX_GEN_TRAV_ENV ) {
-	fatal( "push_gen_trav_env: Too many recursive gen_trav\n", "" ) ;
-    }
+    message_assert("Too many recursive gen_trav",
+		   gen_trav_env_top < MAX_GEN_TRAV_ENV);
+
     env = &gen_trav_envs[gen_trav_env_top++] ;
     env->first_seen = first_seen ;
     env->seen_once = seen_once ;
@@ -652,9 +668,8 @@ static void pop_gen_trav_env()
 {
     struct gen_trav_env *env ;
 
-    if( gen_trav_env_top < 0 ) {
-	fatal( "pop_gen_trav_env: Too many pops\n", "" ) ;
-    }
+    message_assert("Too many pops", gen_trav_env_top >= 0);
+
     free( first_seen ) ;
     free( seen_once ) ;
     hash_table_free( obj_table ) ;
@@ -682,13 +697,15 @@ struct driver *dr ;
 	if( seen == first_seen ) {
 	    hash_del( obj_table, (char *)obj ) ;
 
-	    if( ++shared_number >= MAX_SHARED_OBJECTS ) {
-		fatal( "shared_obj_in: Too many shared objects\n", "" ) ;
-	    }
+	    shared_number++;
+	    message_assert("Too many shared objects", 
+			   shared_number<MAX_SHARED_OBJECTS);
+
 	    hash_put( obj_table, (char *)obj, first_seen+shared_number ) ;
 	}
 	return( !GO) ;
     }
+
     hash_put( obj_table, (char *)obj, first_seen ) ;
     return( GO) ;
 }
@@ -707,14 +724,12 @@ union domain *dp ;
 	if( obj->l == list_undefined ) {
 	    return( !GO) ;
 	}
-	for( p=obj->l ; p!=NIL ; p=p->cdr ) {
-	    if( hash_get( obj_table, (char *)p ) != HASH_UNDEFINED_VALUE ) {
-		user( "shared_simpl_in: Sharing of cons\n" ) ;
-		abort () ;
-	    }
-	    else {
-		hash_put( obj_table, (char *)p, (char *)p ) ;
-	    }
+	for( p=obj->l ; p!=NIL ; p=p->cdr ) 
+	{
+	    message_assert("Sharing of cons",
+		  hash_get(obj_table, (char *)p) == HASH_UNDEFINED_VALUE);
+
+	    hash_put(obj_table, (char *)p, (char *)p);
 	}
         return( !dp->li.persistant ) ;
     }
@@ -774,10 +789,8 @@ void (*others)() ;
     char *shared ;
     int shared_number ;
 
-    if( obj_table == (hash_table)NULL ) {
-	fatal( "shared_obj: Undefined obj_table\n", "" ) ;
-	/*NOTREACHED*/
-    }
+    message_assert("Undefined obj_table", obj_table!=(hash_table)NULL);
+
     if((shared=hash_get( obj_table, (char *)obj)) == HASH_UNDEFINED_VALUE) {
 	return( !GO) ;
     }
@@ -877,7 +890,7 @@ struct driver *dr ;
 	static char local[ 1024 ] ;
 	    
 	(void) sprintf( local, "%d%c%s", 
-		 domain_index( obj ), HASH_SEPAR, (obj+HASH_OFFSET)->s ) ;
+		quick_domain_index(obj), HASH_SEPAR, (obj+HASH_OFFSET)->s ) ;
 
 	if( Gen_tabulated_names == (hash_table)NULL ) {
 	    fatal( "free_obj_out: Null tabulated names for %s\n", bp->name ) ;
@@ -930,6 +943,8 @@ bool keep ;
 {
     struct driver dr ;
 
+    check_read_spec_performed();
+
     dr.null = gen_null ;
     dr.leaf_out = free_leaf_out ;
     dr.leaf_in = free_leaf_in ;
@@ -940,12 +955,8 @@ bool keep ;
     dr.obj_out = free_obj_out ;
 
     push_gen_trav_env() ;
-
-    if( !keep ) {
-	shared_pointers( obj, FALSE ) ;
-    }
+    if (!keep) shared_pointers( obj, FALSE ) ;
     gen_trav_obj( obj, &dr ) ;
-
     pop_gen_trav_env() ;
 }
 
@@ -1009,7 +1020,7 @@ struct driver *dr ;
 {
     int size;
     chunk *new_obj;
-    struct binding *bp = &Domains[ domain_index( obj ) ] ;
+    struct binding *bp = &Domains[quick_domain_index( obj ) ] ;
 
     if (shared_obj( obj, gen_null, gen_null ))
 	    return 0;
@@ -1275,6 +1286,8 @@ chunk *obj ;
     chunk *copy;
     struct driver dr ;
 
+    check_read_spec_performed();
+
     dr.null = gen_null ;
     dr.leaf_out = copy_leaf_out ;
     dr.leaf_in = tabulated_leaf_in ;
@@ -1286,23 +1299,27 @@ chunk *obj ;
 
     push_gen_trav_env() ;
 
-    /* sharing is computed */
+    /* sharing is computed
+     */
     shared_pointers( obj, FALSE ) ;
 
-    /* the copy_table is initialized */
-    if (copy_table == (hash_table) NULL) {
+    /* the copy_table is initialized 
+     */
+    if (copy_table == (hash_table) NULL)
 	copy_table = hash_table_make( hash_pointer, 0 ) ;
-    }
 
-    /* recursive travel thru data structures begins ... */
+    /* recursive travel thru data structures begins ...
+     */
     gen_trav_obj(obj,&dr) ;
 
     pop_gen_trav_env() ;
 
-    /* the result is extracted from the copy_table */
+    /* the result is extracted from the copy_table 
+     */
     copy = copy_hsearch( (char *)obj ) ;
 
-    /* the copy_table is cleared */
+    /* the copy_table is cleared
+     */
     hash_table_clear(copy_table);	
 
     return(copy); 
@@ -1342,6 +1359,8 @@ int domain ;
 			        Gen_tabulated_[ index ] ) ;
     struct driver dr ;
     int i ;
+
+    check_read_spec_performed();
 
     Tabulated_bp->domain->ar.element = bp ;
     dr.null = gen_null ;
@@ -1386,13 +1405,13 @@ void
 gen_clear_tabulated_element( obj )
 chunk *obj  ;
 {
-    struct binding *bp = &Domains[ domain_index( obj ) ] ;
+    struct binding *bp = &Domains[ quick_domain_index( obj ) ] ;
 
     if( IS_TABULATED( bp )) {
 	static char local[ 1024 ] ;
 	    
 	(void) sprintf(local, "%d%c%s", 
-		       domain_index( obj ),
+		       quick_domain_index( obj ),
 		       HASH_SEPAR, 
 		       (obj+HASH_OFFSET)->s ) ;
 
@@ -1450,7 +1469,7 @@ write_obj_in( obj, dr )
 chunk *obj ;
 struct driver *dr ;
 {
-    struct binding *bp = &Domains[ domain_index( obj ) ] ;
+    struct binding *bp = &Domains[ quick_domain_index( obj ) ] ;
     union domain *dp = bp->domain ;
     int data = 1+IS_TABULATED( bp ) ;
 
@@ -1649,6 +1668,8 @@ chunk *obj ;
 {
     struct driver dr ;
 
+    check_read_spec_performed();
+
     dr.null = write_null ;
     dr.leaf_out = gen_null ;
     dr.leaf_in = write_leaf_in ;
@@ -1678,6 +1699,8 @@ chunk *obj ;
 {
     struct driver dr ;
 
+    check_read_spec_performed();
+
     dr.null = write_null ;
     dr.leaf_out = gen_null ;
     dr.leaf_in = write_leaf_in ;
@@ -1686,11 +1709,15 @@ chunk *obj ;
     dr.simple_out = write_simple_out ;
     dr.obj_in = write_obj_in ;
     dr.obj_out = write_obj_out ;
+
     user_file = fd ;
-    if( obj_table != (hash_table)NULL ) {
-	hash_table_free( obj_table ) ;
+
+    if (obj_table != (hash_table)NULL)
+    {
+	hash_table_free(obj_table) ;
+	obj_table = (hash_table)NULL ;
     }
-    obj_table = (hash_table)NULL ;
+
     (void) fprintf( fd, "0 " ) ;
     gen_trav_obj( obj, &dr ) ;
 }
@@ -1739,6 +1766,8 @@ int domain ;
 				Tabulated_bp-Domains,
 			        Gen_tabulated_[ index ] ) ;
     struct driver dr ;
+
+    check_read_spec_performed();
 
     Tabulated_bp->domain->ar.element = &Domains[ domain ] ;
     dr.null = write_null ;
@@ -1906,7 +1935,8 @@ gen_make_array( num )
   return( ar ) ;
 }
 
-/* GEN_READ reads any object from the FILE stream. Sharing is restored. */
+/* GEN_READ reads any object from the FILE stream. Sharing is restored.
+ */
 
 chunk *
 gen_read( file )
@@ -2068,6 +2098,8 @@ chunk *obj ;
     struct driver dr ;
     static FILE *black_hole = NULL ;
 
+    check_read_spec_performed();
+
     if( black_hole == NULL ) {
 	if( (black_hole=fopen( "/dev/null", "r")) == NULL ) {
 	    fatal( "Cannot open /dev/null !", "" ) ;
@@ -2095,89 +2127,6 @@ chunk *obj ;
     return( error_seen == 0 ) ;
 }
 
-/* GEN_RECURSE is a limited version of CommonLISP NEWGEN:RPM.  The OBJ is
-   recursively walked through and, for any node of DOMAIN that returns true
-   when FILTER is applied to it, the REWRITE function is applied. 
-
-   The preservation of the OBJ_TABLE is required in case some recursive
-   call to GEN_RECURSE is performed in FILTER or REWRITE. */
-
-struct recurse {
-    int domain ;
-    bool (*filter)() ;
-    void (*rewrite)() ;
-} ;
-
-static struct recurse 
-    *current_rec = (struct recurse *)NULL ;
-
-static int
-recurse_obj_in( obj, dr )
-chunk *obj ;
-struct driver *dr ;
-{ 
-    if( shared_obj( obj, gen_null, gen_null )) {
-	return( !GO ) ;
-    }
-    if( IS_TABULATED( &Domains[ domain_index( obj ) ] )) {
-	return( !GO ) ;
-    }
-    if( obj->i == current_rec->domain ) {
-	return( (*current_rec->filter)( obj )) ;
-    }
-    return( GO) ;
-}
-
-static void
-recurse_obj_out( obj, bp, dr )
-chunk *obj ;
-struct binding *bp ;
-struct driver *dr ;
-{ 
-    if( obj->i == current_rec->domain ) {
-	(*current_rec->rewrite)( obj ) ;
-    }
-}
-
-void
-gen_slow_recurse( obj, domain, filter, rewrite )
-chunk *obj ;
-int domain ;
-bool (*filter)( chunk * ) ;
-void (*rewrite)( chunk * ) ;
-{
-    struct driver dr;
-    struct recurse rec, *saved_rec ;
-
-    rec.domain = domain ;
-    rec.filter = filter ;
-    rec.rewrite = rewrite ;
-
-    dr.null = dr.leaf_out = dr.simple_out = gen_null ;
-    dr.obj_out = recurse_obj_out ;
-    dr.obj_in = recurse_obj_in ;
-    dr.simple_in = persistant_simple_in ;
-    dr.array_leaf = gen_array_leaf ;
-    dr.leaf_in = tabulated_leaf_in ;
-
-    saved_rec = current_rec;
-    current_rec = &rec;
-    push_gen_trav_env() ;
-
-    shared_pointers( obj, FALSE ) ;
-    gen_trav_obj( obj, &dr ) ;
-
-    pop_gen_trav_env() ;
-    current_rec = saved_rec;
-}    
-    
-bool
-gen_true(c)
-chunk *c;
-{
-    return(TRUE) ;
-}
-
 /* GEN_SHARING_P checks whether OBJ1 uses objects (except tabulated) or
    CONS cells that appear in OBJ2. */
 
@@ -2185,7 +2134,7 @@ static hash_table pointers = (hash_table)NULL;
 static jmp_buf env  ;
 
 static bool
-check_sharing( p, type )
+check_sharing(p, type)
 char *p ;
 char *type ;
 {
@@ -2207,12 +2156,12 @@ struct driver *dr ;
 { 
     /* char *seen ; */
 
-  if( shared_obj( obj, gen_null, gen_null )) {
+  if (shared_obj(obj, gen_null, gen_null))
     return( !GO ) ;
-  }
-  if( IS_TABULATED( &Domains[ domain_index( obj ) ] )) {
+
+  if (IS_TABULATED( &Domains[quick_domain_index(obj)]))
     return( !GO ) ;
-  }
+
   check_sharing( (char *)obj, "CHUNK *" ) ;
   return( GO ) ;
 }
@@ -2243,20 +2192,21 @@ chunk *obj1, *obj2 ;
   struct driver dr ;
   bool found ;
 
-  if( pointers == (hash_table)NULL ) {
-    pointers = hash_table_make( hash_pointer, 0 ) ;
-  }
-  else {
-    hash_table_clear( pointers ) ;
-  }
+  check_read_spec_performed();
+
+  if( pointers == (hash_table)NULL )
+      pointers = hash_table_make(hash_pointer, 0);
+  else
+    hash_table_clear(pointers) ;
+
   dr.null = dr.leaf_out = dr.simple_out = dr.obj_out =  gen_null ;
   dr.obj_in = sharing_obj_in ;
   dr.simple_in = sharing_simple_in ;
   dr.array_leaf = gen_array_leaf ;
   dr.leaf_in = tabulated_leaf_in ;
 
-  push_gen_trav_env() ;;
-  shared_pointers( obj2, FALSE ) ;
+  push_gen_trav_env() ;
+  shared_pointers(obj2, FALSE );
 
   HASH_MAP( k, v, {
     hash_put( pointers, k, v ) ;
@@ -2264,12 +2214,12 @@ chunk *obj1, *obj2 ;
 
   shared_pointers( obj1, FALSE ) ;
 
-  if( (found=setjmp( env )) == 0 ) {
+  if( (found=setjmp( env )) == 0 )
     gen_trav_obj( obj1, &dr ) ;
-  }
+
   pop_gen_trav_env() ;
 
-  return( found ) ;
+  return(found) ;
 }
   
 /* -------------------------------------------------------------
@@ -2285,10 +2235,6 @@ chunk *obj1, *obj2 ;
  *
  *   number_of_domains: 
  *     the number of domains managed by newgen, max is MAX_DOMAIN.
- *
- *   current_decision_table:
- *     contains the decision to be taken when a domain is considered,
- *     whether to go on or not. It is a bool[MAX_DOMAIN] table.
  *
  *   DirectDomainsTable:
  *     DirectDomainsTable[domain_1, domain_2] is TRUE if domain_2
@@ -2307,9 +2253,6 @@ typedef GenDecisionTableType gen_tables[MAX_DOMAIN];
 
 static int 
     number_of_domains = -1;
-
-static GenDecisionTableType
-    *current_decision_table = NULL;
 
 static gen_tables 
     DirectDomainsTable, 
@@ -2452,7 +2395,7 @@ initialize_DirectDomainsTable()
 {
     int i,j;
 
-    check_read_spec_performed("initialize_DirectDomainsTable");
+    check_read_spec_performed();
 
     for (i=0; i<number_of_domains; i++)
     {
@@ -2521,108 +2464,12 @@ static GenDecisionTableType
 *get_decision_table(domain)
 int domain;
 {
-    check_domain("set_decision_table", domain);
+    check_domain(domain);
 
     if (*DecisionTables[domain]==decision_table_undefined) 
 	initialize_domain_DecisionTables(domain);
 
     return(&DecisionTables[domain]);
-}
-
-/* set the current table as requested.
- */
-static void 
-set_decision_table(domain)
-int domain;
-{
-    current_decision_table = get_decision_table(domain);
-}
-
-static int
-quick_recurse_obj_in(obj, dr)
-chunk *obj;
-struct driver *dr;
-{
-    if (shared_obj(obj, gen_null, gen_null) || 
-	IS_TABULATED(&Domains[quick_domain_index(obj)]))
-	return(!GO);
-
-    if (obj->i==current_rec->domain) return((*current_rec->filter)(obj));
-
-    return((*current_decision_table)[obj->i]);
-}
-
-static void
-quick_recurse_obj_out(obj, bp, dr)
-chunk *obj;
-struct binding *bp;
-struct driver *dr;
-{
-    if (obj->i==current_rec->domain) (*current_rec->rewrite)(obj);
-}
-
-static int
-quick_recurse_simple_in(obj, dp)
-chunk *obj ;
-union domain *dp ;
-{
-    int t;
-
-    return((*current_decision_table)[dp->se.element-Domains] &&
-	   (!dp->se.persistant) &&               /* stay at a given level */
-	   ((t=dp->ba.type)==BASIS ? TRUE :
-	     t==LIST               ? obj->l != list_undefined :
-	     t==SET                ? obj->t != set_undefined :
-	     t==ARRAY              ? obj->p != array_undefined : 
-	    (fatal("persistant_simple_in: unknown type %s\n", 
-		   itoa(dp->ba.type)), FALSE))); 
-}
-
-void 
-gen_old_recurse(obj, domain, filter, rewrite)
-chunk *obj;
-int domain;
-bool (*filter)();
-void (*rewrite)();
-{
-    GenDecisionTableType *saved_decision_table;
-    struct recurse rc, *saved_rc;
-    struct driver dr;
-
-    /*  driver's definition
-     */
-    dr.null 		= gen_null,
-    dr.leaf_in 		= tabulated_leaf_in,
-    dr.leaf_out  	= gen_null,
-    dr.simple_in 	= quick_recurse_simple_in,
-    dr.array_leaf 	= gen_array_leaf,
-    dr.simple_out 	= gen_null,
-    dr.obj_in 		= quick_recurse_obj_in,
-    dr.obj_out 		= quick_recurse_obj_out;
-
-    /*  recurse's definition
-     */
-    rc.domain 	= domain,
-    rc.filter 	= filter,
-    rc.rewrite 	= rewrite;
-
-    /*  save environment 
-     */
-    saved_decision_table = current_decision_table, 
-    set_decision_table(domain);
-    saved_rc = current_rec, current_rec = &rc;
-    push_gen_trav_env();
-
-    /*  recurse!
-     */
-    shared_pointers(obj, FALSE);
-    gen_trav_obj(obj, &dr);
-    
-    /*  restore environment
-     */
-    pop_gen_trav_env();
-    current_rec = saved_rc;
-    current_decision_table = saved_decision_table;
 }
 
 /*******************************************************************
@@ -2642,6 +2489,13 @@ typedef GenRewriteType GenRewriteTableType[MAX_DOMAIN];
 /* the current data needed for a multi recursion are 
  * stored in a multi recurse struct. 
  *
+ * - the seen hash_table stores the already encountered obj,
+ *   not to walk twice thru them. The previous implementation
+ *   used 2 recursions, one to mark the obj to visit, with an
+ *   associated number, and the other was the actual recursion.
+ *   This version is lazy, and just mark the encountered nodes,
+ *   thus allowing the full benefit of the decision table to avoid
+ *   walking thru the whole data structure.
  * - the visited domains are marked true in domains.
  *   I could have checked that the filter is not NULL,
  *   but it is clearer this way, I think, for the one who 
@@ -2671,9 +2525,6 @@ static struct multi_recurse
     *current_mrc = (struct multi_recurse *) NULL;
 
 /* MULTI RECURSE FUNCTIONS
- *
- * these functions are made after the equivalent quick_recurse functions
- * see the comments in these functions...
  */
 
 /*  true if obj was already seen in this recursion, and put it at TRUE
@@ -2752,6 +2603,8 @@ union domain *dp ;
 }
 
 /*  tells the recursion not to go in this object
+ *  This may be interesting when the recursion modifies
+ *  the data visited structure.
  */
 void 
 gen_recurse_stop(obj)
@@ -2770,6 +2623,9 @@ chunk *obj;
  *  applies filter_i on encountered domain_i objects,
  *  if true, recurses down from the domain_i object, 
  *       and applies rewrite_i on exit from the object.
+ *
+ * ??? bug : you can't visit domain 0 if any... 
+ * I can't remember what it is used for.
  */
 void gen_multi_recurse(va_alist)
 va_dcl
@@ -2793,6 +2649,10 @@ va_dcl
 	new_mrc;
     struct driver
 	dr;
+
+    /*  Initial check
+     */
+    check_read_spec_performed();
 
     va_start(pvar);
     obj = va_arg(pvar, chunk*);
@@ -2848,7 +2708,6 @@ va_dcl
     /*    push & save the current context
      */
     saved_mrc = current_mrc, current_mrc = &new_mrc;
-    push_gen_trav_env();
 
     /*  recurse!
      */
@@ -2857,10 +2716,11 @@ va_dcl
     /*  restore environment
      */
     hash_table_free(new_mrc.seen);
-    pop_gen_trav_env();
     current_mrc = saved_mrc;
 }
 
+/*  compatibility, old gen_recurse function.
+ */
 void 
 gen_recurse(obj, domain, filter, rewrite)
 chunk *obj;
