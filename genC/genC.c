@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1996/09/21 10:18:48 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1996/09/21 11:59:44 $, )
  * version $Revision$
  */
 
@@ -474,7 +474,7 @@ struct gen_binding *bp ;
     (void) printf( "#ifndef _newgen_%s_defined\n", s ) ;
     (void) printf( "#define _newgen_%s_defined\n", s ) ;
 
-    (void) printf("#define __");
+    (void) printf("#define ");
     fprint_upper(stdout, s);
     (void) printf( " (%s+%d)\n", start, TYPE( bp )) ;
 
