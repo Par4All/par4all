@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/02 14:36:20 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/05 13:31:52 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -20,7 +20,7 @@
 # - I do not deal with "R E A L" like Fortran lexical problems.
 # - There may be problems with if and do instructions...
 #   that is IF () & DO with a directive comment would not work.
-# - independent, new and reduction are orthogonal.
+# - INDEPENDENT, NEW and REDUCTION are orthogonal.
 # - Ctrl-L, Ctrl-G and Ctrl-V are used as intermediate characters, 
 #   thus should not appear in the program, otherwise troubles...
 # - some default value is assigned to number of processors...
@@ -28,6 +28,7 @@
 # - simple management of descriptive interfaces: 
 #   they are switched to prescriptive ones!:-)
 # - ! style comments in directives are okay.
+# - INHERIT is translated into DISTRIBUTE:-) Allowed by HPF:-)
 #
 # (c) Fabien Coelho, February 95 and later.
 # don't expect anything from this script.
@@ -39,7 +40,7 @@
 # _a: align
 # _b: realign
 # _c: cyclic
-# _d: distribute
+# _d: distribute, inherit
 # _e: redistribute
 # _i: independent
 # _k: block 
@@ -137,6 +138,11 @@ $SED '#
       //s,)with\([\* ]\),) with\1,;
       //s,)onto ,) onto ,;
       #
+      # simple 1D FORALL instruction without continuation... 
+      s,^\([^Cc!\*].... \)[ 	]*[Ff][Oo][Rr][Aa][Ll][Ll][ 	]*(\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\))\(.*\),\1do \2=\3\,\4\5enddo,
+      # simple 2D FORALL instruction without continuation... 
+      s,^\([^Cc!\*].... \)[ 	]*[Ff][Oo][Rr][Aa][Ll][Ll][ 	]*(\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\)\,\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\))\(.*\),\1do \2=\3\,\4do \5=\6\,\7\8enddoenddo,
+      #
       # descriptive mappings: switched to prescriptive!
       //s, align \(.*\) with\*, align \1 with ,;
       //s, distribute \([a-z0-9_]*\)\*, distribute \1,;
@@ -189,10 +195,14 @@ $SED '#
       # HPF static and dynamic mapping directives
       #  - some simple free style is parsed.
       #
+      # inherit... I am still laughing about it
+      s, inherit , distribute ,;
+      #
       s, align \(.*\) with \(.*\),a(\1\,\2),
       s, align with \(.*\)::\(.*\),a(\2\,\1),
       s, realign \(.*\) with \(.*\),b(\1\,\2),
       s, realign with \(.*\)::\(.*\),a(\2\,\1),
+      #
       s, distribute \(.*\) onto \(.*\),d(\1\,\2),
       s, distribute onto \(.*\)::\(.*\),d(\2\,\1),
       s, distribute \(.*\),d(\1\,hpfcX),
