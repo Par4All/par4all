@@ -39,21 +39,25 @@ statement s;
     return(TRUE);
 }
 
-/* static list formal_regions_backward_translation(entity func, list real_args, 
- *                                   func_regions, transformer context)
- * input    : an external function func, its real arguments at call site (real_args),
- *            its summary regions (with formal args), and the calling context. 
- * output   : the translated formal regions.
- * modifies : ?
+/* static void
+ * add_parameter_aliases_for_this_call_site(call call_site,transformer context)
+ * input    : parameters: a call site and the calling context
+ *            global variables: current_callee,list_regions_callee,list_pairs
+ * output   : void
+ * modifies : for each region in list_regions_callee which is a region of a
+ *            formal parameter (of the callee) and for which the corresponding
+ *            real parameter is an expression with only one entity, this
+ *            function performs
+ *            the backward translation: callee_region -> real_region
+ *            and adds an alias pair <callee_region,real_region> to list_pairs
  * comment  :	
  *
  * Algorithm :
  * -----------
- *    let list_regions_callee be the list of the regions on variables of
- *    current_callee
- *    let real_regions be the list of the translated regions
+ *    let list_regions_callee be the list of the regions on variables
+ *    of current_callee
+ *    let list_pairs be the list of alias pairs for the callee
  *
- *    real_regions = empty
  *    FOR each expression real_exp IN real_args
  *        arg_num = number in the list of the function real arguments
  *        FOR each callee_region IN list_regions_callee
@@ -61,7 +65,7 @@ statement s;
  *            IF callee_ent is the formal parameter numbered arg_num
  *                IF real_exp is an lhs (expression with one entity)
  *                    real_region = translation of the region callee_region
- *                    pairs = pairs + <callee_region,real_region>
+ *                    list_pairs = list_pairs + <callee_region,real_region>
  *                ENDIF
  *            ENDIF
  *        ENDFOR
@@ -123,6 +127,44 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 }
 
 
+/* static void
+ * add_common_aliases_for_this_call_site()
+ * input    : global variables: current_callee,list_regions_callee,list_pairs
+ * output   : void
+ * modifies : for each region in list_regions_callee which is a region of a
+ *            COMMON (declared in the callee), this function performs
+ *            the backward translation: callee_region -> real_regions
+ *            and then for each real_reg in the real_regions list, it
+ *            adds an alias pair <callee_region,real_reg> to list_pairs
+ */
+static void
+add_common_aliases_for_this_call_site()
+{
+    list real_regions = NIL;
+
+    MAP(EFFECT, callee_region, 
+    {
+	/* we are only interested in regions concerning common variables. 
+	 * They are  the entities with a ram storage. They can not be dynamic
+         * variables, because these latter were eliminated of the code_regions
+         * (cf. region_of_module). */
+	if (storage_ram_p(entity_storage(region_entity(callee_region))))
+	{
+	    real_regions = common_region_translation(current_callee, callee_region, BACKWARD);
+
+	    MAP(EFFECT, real_reg,
+		{
+		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
+		    pair = gen_nconc(pair,CONS(EFFECT,real_reg,NIL));
+		    list_pairs = gen_nconc(list_pairs,CONS(LIST,pair,NIL));
+		},
+		    real_regions)
+	}
+    },
+	list_regions_callee);
+}
+
+
 static bool
 call_site_to_alias_pairs(call call_site)
 {
@@ -139,6 +181,7 @@ call_site_to_alias_pairs(call call_site)
     set_backward_arguments_to_eliminate(current_callee);
 
     add_parameter_aliases_for_this_call_site(call_site,context);
+    add_common_aliases_for_this_call_site();
 
     reset_translation_context_sc();
     reset_arguments_to_eliminate();
