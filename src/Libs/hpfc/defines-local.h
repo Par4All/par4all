@@ -3,6 +3,10 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.68  1997/07/23 14:54:10  keryell
+ * syst_debug(s) changed to sc_syst_debug(s) to avoid conflict with bison
+ * output of sc+gram.y... :-(
+ *
  * Revision 1.67  1997/07/21 13:23:59  keryell
  * Replaced %x format by %p.
  *
@@ -140,7 +144,7 @@ void fprint_entity_list(FILE *fp, list l);
 #define DEBUG_MTRX(D, W, M) GEN_DEBUG(D, W, matrix_fprint(stderr, M))
 #define DEBUG_STAT(D, W, S) GEN_DEBUG(D, W, print_statement(S))
 #define DEBUG_CODE(D, W, M, S) GEN_DEBUG(D, W, hpfc_print_code(stderr, M, S))
-#define DEBUG_SYST(D, W, S) GEN_DEBUG(D, W, syst_debug(S))
+#define DEBUG_SYST(D, W, S) GEN_DEBUG(D, W, sc_syst_debug(S))
 #define DEBUG_ELST(D, W, L)\
    GEN_DEBUG(D, W, fprint_entity_list(stderr, L); fprintf(stderr, "\n"))
 #define DEBUG_BASE(D, W, B)\
