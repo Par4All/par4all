@@ -3,7 +3,7 @@ c Runtime Support Functions for the
 c High Performance Fortran Compiler
 c by Fabien COELHO.
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/09/07 14:00:39 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/09/15 15:57:04 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -910,8 +910,9 @@ c
       direct(`call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)')
       NBOFTASKS = MAXSIZEOFPROCS
 
-      call HPFC_INIT_COMMON_PROCS()
-      call HPFC_INIT_COMMON_PARAM()
+      call HPFC_INIT_COMMON_PROCS
+      call HPFC_INIT_COMMON_BUFFER
+      call HPFC_INIT_COMMON_PARAM
 
       call pvmfrecv(HOSTTID, 1, bufid)
       call pvmfunpack(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
@@ -965,6 +966,21 @@ c
       CPOSPN = 0
       HOSTCHANNEL = 2
       end
+c-----------------
+c
+c HPFC_INIT_COMMON_BUFFER
+      subroutine HPFC_INIT_COMMON_BUFFER
+      include "hpfc_commons.h"
+      BYTE1_BUFFSIZE = SIZEOFBUFFER
+      INTEGER2_BUFFSIZE = SIZEOFBUFFER/2
+      INTEGER4_BUFFSIZE = SIZEOFBUFFER/4
+      REAL4_BUFFSIZE = SIZEOFBUFFER/4
+      REAL8_BUFFSIZE = SIZEOFBUFFER/8
+      COMPLEX8_BUFFSIZE = SIZEOFBUFFER/8
+      COMPLEX16_BUFFSIZE = SIZEOFBUFFER/16
+      SEND_NOT_INITIALIZED = .TRUE.
+      RECEIVED_NOT_PERFORMED = .TRUE.
+      end
 c
 c-----------------
 c
@@ -1017,7 +1033,8 @@ _CM5(`      integer i')dnl
       call pvmfpack(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
       call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
 
-      call HPFC_INIT_COMMON_PROCS()
+      call HPFC_INIT_COMMON_PROCS
+      call HPFC_INIT_COMMON_BUFFER
 
 _CM5(`
 c
