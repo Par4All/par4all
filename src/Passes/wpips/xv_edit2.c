@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/12 08:01:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/12 15:33:11 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1996/06/12 08:01:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1996/07/12 15:33:11 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -394,6 +394,11 @@ execute_wpips_execute_and_display_something_outside_the_notifyer()
    }
    
    free(execute_wpips_execute_and_display_something_outside_the_notifyer_view_name);
+   
+   /* The module list may have changed (well not very likely to
+      happen, but...): */
+   send_the_names_of_the_available_modules_to_emacs();
+   display_memory_usage();
 }
 
 
