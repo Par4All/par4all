@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-util.c,v $ ($Date: 1995/04/21 17:01:13 $, )
+ * $RCSfile: io-util.c,v $ ($Date: 1995/04/24 18:23:21 $, )
  * version $Revision$,
  */
 
@@ -162,6 +162,7 @@ Psysteme condition, proc_echelon, tile_echelon;
 list parameters, processors, scanners, rebuild;
 statement *psh, *psn;
 {
+    string comment;
     entity
 	proc = array_to_processors(array),
 	divide = hpfc_name_to_entity(IDIVIDE);
@@ -174,6 +175,8 @@ statement *psh, *psn;
 	proc_cond = (sc_nredund(&proc_cond_tmp),
 		     non_redundent_subsystem(proc_cond_tmp, proc_decl));
     statement
+	h_cont = make_empty_statement(),
+	n_cont = make_empty_statement(),
 	node_tmp = statement_undefined,
 	node_defproc = define_node_processor_id(proc, get_ith_processor_dummy),
 	node_deduce = generate_deducables(rebuild),
@@ -199,7 +202,8 @@ statement *psh, *psn;
 		 make_block_statement(CONS(STATEMENT, h_pre,
 				      CONS(STATEMENT, host_scan_loop,
 				      CONS(STATEMENT, h_post,
-					   NIL)))),
+				      CONS(STATEMENT, h_cont,
+					   NIL))))),
 		 divide),
 	node_scan_loop = 
 	    systeme_to_loop_nest
@@ -224,10 +228,24 @@ statement *psh, *psn;
 				  CONS(STATEMENT, 
 				       generate_optional_if(proc_cond,
 							    node_tmp),
-				       NIL))));
+				  CONS(STATEMENT, n_cont,
+				       NIL)))));
 
-    sc_rm(proc_cond_tmp),
-    sc_rm(proc_cond);
+    sc_rm(proc_cond_tmp), sc_rm(proc_cond);
+
+    comment = concatenate("c ", 
+			  movement_update_p(move) ? "updating" : "collecting",
+			  " distributed variable ",
+			  entity_local_name(array), "\n", NULL);
+
+    statement_comments(*psh) = strdup(comment);
+    statement_comments(*psn) = strdup(comment);
+
+    comment = concatenate("c end of ",
+			  movement_update_p(move) ? "update" : "collect",
+			  "\n", NULL);
+    statement_comments(h_cont) = strdup(comment);
+    statement_comments(n_cont) = strdup(comment);
 
     DEBUG_STAT(5, "Host", *psh);
     DEBUG_STAT(5, "Node", *psn);
@@ -271,7 +289,10 @@ list parameters, scanners, rebuild;
 statement *psh, *psn;
 {
     entity divide = hpfc_name_to_entity(IDIVIDE);
+    string comment;
     statement
+	h_cont = make_empty_statement(),
+	n_cont = make_empty_statement(),
 	h_pre = hpfc_initsend(),
 	h_rebuild = generate_deducables(rebuild),
 	h_pack = hpfc_packing(array, get_ith_array_dummy, TRUE),
@@ -300,12 +321,23 @@ statement *psh, *psn;
 				make_block_statement(CONS(STATEMENT, h_pre,
 						     CONS(STATEMENT, h_scan,
 						     CONS(STATEMENT, h_cast,
-							  NIL)))));
+						     CONS(STATEMENT, h_cont,
+							  NIL))))));
 
     *psn = generate_optional_if(condition,
 				make_block_statement(CONS(STATEMENT, n_rcv,
 						     CONS(STATEMENT, n_scan,
-							  NIL))));
+						     CONS(STATEMENT, n_cont,
+							  NIL)))));
+
+    /*   some comments are generated to help understand the code
+     */
+    comment = concatenate("c updating shared variable ",
+			  entity_local_name(array), "\n", NULL);
+    statement_comments(*psh) = strdup(comment);
+    statement_comments(*psn) = strdup(comment);
+    statement_comments(h_cont) = strdup("c end of update\n");
+    statement_comments(n_cont) = strdup("c end of update\n");
 }
 
 /* that is all
