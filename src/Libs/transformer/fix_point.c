@@ -24,7 +24,8 @@
 
 #include "transformer.h"
 /*
-transformer transformer_fix_point(t1, t2)
+transformer 
+transformer_fix_point(t1, t2)
 transformer t1;
 transformer t2;
 {
@@ -35,7 +36,7 @@ transformer t2;
 
     debug(8,"transformer_fix_point","begin\n");
 
-    pips_assert("transformer_convex_hull",
+    pips_assert("transformer_fix_point",
 		arguments_equal_p(transformer_arguments(t1),
 				  transformer_arguments(t2)));
     transformer_arguments(t) = gen_copy_seq(transformer_arguments(t1));
@@ -52,7 +53,8 @@ transformer t2;
 }
 */
 
-transformer transformer_halbwachs_fix_point(tf)
+transformer 
+transformer_halbwachs_fix_point(tf)
 transformer tf;
 {
     /* THIS FUNCTION WAS NEVER CORRECT AND HAS NOT BEEN REWRITTEN FOR
@@ -142,7 +144,8 @@ transformer tf;
 
 
 
-static void build_transfer_matrix(pa, lteq, n_eq, b_new)
+static void 
+build_transfer_matrix(pa, lteq, n_eq, b_new)
 matrice * pa;
 Pcontrainte lteq;
 int n_eq;
@@ -209,7 +212,8 @@ Pbase b_new;
  * T = X P
  */
 
-transformer transformer_equality_fix_point(tf)
+transformer 
+transformer_equality_fix_point(tf)
 transformer tf;
 {
     /* result */
@@ -352,7 +356,8 @@ transformer tf;
     return fix_tf;
 }
 
-void build_transfer_equations(leq, plteq, pb_new)
+void 
+build_transfer_equations(leq, plteq, pb_new)
 Pcontrainte leq;
 Pcontrainte *plteq;
 Pbase * pb_new;
@@ -466,7 +471,8 @@ Pbase * pb_new;
  * by a previous internal fix-point as in KINETI of mdg-fi.f (Perfect Club). Maybe, something
  * could be done for these nested fix-points.
  */
-bool transfer_equation_p(eq)
+bool 
+transfer_equation_p(eq)
 Pvecteur eq;
 {
     Pvecteur t;
@@ -485,7 +491,8 @@ Pvecteur eq;
     return (n_new==1) && (value_one_p(coeff) || value_mone_p(coeff));
 }
 
-entity new_value_in_transfer_equation(eq)
+entity 
+new_value_in_transfer_equation(eq)
 Pvecteur eq;
 {
     Pvecteur t;
@@ -518,7 +525,8 @@ Pvecteur eq;
 /* FI: should be moved in base.c */
 
 /* sub_basis_p(Pbase b1, Pbase b2): check if b1 is included in b2 */
-bool sub_basis_p(b1, b2)
+bool 
+sub_basis_p(b1, b2)
 Pbase b1;
 Pbase b2;
 {
@@ -532,7 +540,8 @@ Pbase b2;
     return is_a_sub_basis;
 }
 
-void equations_to_bases(lteq, pb_new, pb_old)
+void 
+equations_to_bases(lteq, pb_new, pb_old)
 Pcontrainte lteq;
 Pbase * pb_new;
 Pbase * pb_old;
@@ -559,4 +568,298 @@ Pbase * pb_old;
 
     *pb_new = b_new;
     *pb_old = b_old;
+}
+
+
+transformer 
+transformer_pattern_fix_point(tf)
+transformer tf;
+{
+    /* result */
+    transformer fix_tf =  transformer_dup(tf);
+    Psysteme fix_sc = (Psysteme) predicate_system(transformer_relation(fix_tf));
+    Pvecteur v_inc = VECTEUR_UNDEFINED;
+    int inc = 1;
+
+    debug(8, "transformer_pattern_fix_point", "Begin for transformer:\n");
+
+    ifdebug(8) {
+	debug(8, "transformer_pattern_fix_point", "Begin for transformer:\n");
+	fprint_transformer(stderr, tf, external_value_name);
+    }
+
+    /* Look for the best loop counter: the smallest increment is chosen */
+    v_inc = look_for_the_best_counter(sc_egalites(fix_sc));
+
+    if(!VECTEUR_UNDEFINED_P(v_inc)) {
+
+	ifdebug(8) {
+	    debug(8, "transformer_pattern_fix_point", "incrementation vector=\n");
+	    vect_fprint(stderr, v_inc, external_value_name);
+	}
+
+	/* eliminate sharing between v_inc and fix_sc */
+	v_inc = vect_dup(v_inc);
+
+	/* retrieve inc from v_inc */
+	inc = vect_coeff(TCST, v_inc);
+
+	/* Replace constant terms in equalities and inequalities by
+	 * loop counter differences
+	 */
+	fix_sc = sc_eliminate_constant_terms(fix_sc, v_inc);
+
+	ifdebug(8) {
+	    debug(8, "transformer_pattern_fix_point", "after constant term elimination=\n");
+	    sc_fprint(stderr, fix_sc, external_value_name);
+	}
+
+	fix_sc = sc_elim_redund(fix_sc);
+
+	ifdebug(8) {
+	    debug(8, "transformer_pattern_fix_point", "after normalization=\n");
+	    sc_fprint(stderr, fix_sc, external_value_name);
+	}
+
+	fix_sc = sc_keep_invariants_only(fix_sc);
+
+	ifdebug(8) {
+	    debug(8, "transformer_pattern_fix_point", "after non-invariant elimination=\n");
+	    sc_fprint(stderr, fix_sc, external_value_name);
+	}
+
+	fix_sc = sc_elim_redund(fix_sc);
+
+	ifdebug(8) {
+	    debug(8, "transformer_pattern_fix_point", "after 2nd normalization=\n");
+	    sc_fprint(stderr, fix_sc, external_value_name);
+	}
+    }
+    else {
+	debug(8, "transformer_pattern_fix_point", "No counter found\n");
+	/* Remove all constraints to build the invariant transformer */
+	contraintes_free(sc_egalites(fix_sc));
+	sc_egalites(fix_sc) = CONTRAINTE_UNDEFINED;
+	sc_nbre_egalites(fix_sc) = 0;
+	contraintes_free(sc_inegalites(fix_sc));
+	sc_inegalites(fix_sc) = CONTRAINTE_UNDEFINED;
+	sc_nbre_inegalites(fix_sc) = 0;
+    }
+
+    ifdebug(8) {
+	debug(8, "transformer_pattern_fix_point", "fix-point fix_tf=\n");
+	fprint_transformer(stderr, fix_tf, external_value_name);
+	debug(8, "transformer_pattern_fix_point", "end\n");
+    }
+
+    return fix_tf;
+}
+
+Pvecteur
+look_for_the_best_counter(Pcontrainte egs)
+{
+    Pvecteur v_inc = VECTEUR_UNDEFINED;
+    entity old_index = entity_undefined;
+    entity new_index = entity_undefined;
+    Pcontrainte leq = CONTRAINTE_UNDEFINED;
+    int inc = 0;
+
+    for(leq = egs;
+	!CONTRAINTE_UNDEFINED_P(leq);
+	leq = contrainte_succ(leq)) {
+
+	Pvecteur v = contrainte_vecteur(leq);
+	int c_inc = 0;
+
+	if(vect_size(v)==3) {
+	    entity p_old_index = entity_undefined;
+	    entity p_new_index = entity_undefined;
+	    Pvecteur lv = VECTEUR_UNDEFINED;
+	    bool failed = FALSE;
+	    for(lv = v; !VECTEUR_UNDEFINED_P(lv) && !failed; lv = vecteur_succ(lv)) {
+		if(vecteur_var(lv) == TCST) {
+		    c_inc = (int) vecteur_val(lv);
+		}
+		else if(old_value_entity_p((entity) vecteur_var(lv))) {
+		    if(entity_undefined_p(p_old_index))
+			p_old_index = (entity) vecteur_var(lv);
+		    else
+			failed = TRUE;
+		}
+		else if(new_value_entity_p((entity) vecteur_var(lv))) {
+		    if(entity_undefined_p(new_index))
+			p_new_index = (entity) vecteur_var(lv);
+		    else
+			failed = TRUE;
+		}
+		else {
+		    pips_error("transformer_pattern_fix_point", "Unexpected value entity %s",
+			       entity_local_name((entity) vecteur_var(lv)));
+		}
+	    }
+	    if(!failed && value_to_variable(p_old_index) == value_to_variable(p_new_index)) {
+		if(ABS(c_inc) < ABS(inc) || c_inc == 1) {
+		    inc = c_inc;
+		    old_index = p_old_index;
+		    new_index = p_new_index;
+		    v_inc = v;
+		}
+	    }
+	}
+    }
+
+    return v_inc;
+}
+
+/* Eliminate all constant terms in sc using v.
+ * No sharing between sc and v is assumed as sc is updated!
+ *
+ * This function should be located in Linear/sc
+ */
+Psysteme
+sc_eliminate_constant_terms(Psysteme sc, Pvecteur v)
+{
+    int cv = vect_coeff(TCST, v);
+
+    assert(cv!=0);
+
+    sc_egalites(sc) = constraints_eliminate_constant_terms(sc_egalites(sc), v);
+    sc_inegalites(sc) = constraints_eliminate_constant_terms(sc_inegalites(sc), v);
+
+    return sc;
+}
+
+Pcontrainte
+constraints_eliminate_constant_terms(Pcontrainte lc, Pvecteur v)
+{
+    Value c1 = vect_coeff(TCST, v);
+    Pcontrainte cc = CONTRAINTE_UNDEFINED;
+
+    if(c1==0) {
+	abort();
+    }
+
+    for(cc = lc; !CONTRAINTE_UNDEFINED_P(cc); cc = contrainte_succ(cc)) {
+	Pvecteur cv = contrainte_vecteur(cc);
+	Value c2;
+
+	if((c2 = vect_coeff(TCST, cv))!=0) {
+	    cv = vect_multiply(cv, c1);
+	    cv = vect_cl(cv, -c2, v);
+	}
+
+	/* cv may now be the null vector */
+	contrainte_vecteur(cc) = cv;
+    }
+
+    return lc;
+}
+
+/* This function cannot be moved into the Linear library.
+ * It relies on the concepts of old and new values.
+ *
+ * It could be improved by using an approximate initial fix-point
+ * to evaluate v_sum (see invariant_vector_p) and to degrade
+ * equations into inequalities or too relax inequalities.
+ *
+ * For instance, p = p + a won't generate an invariant.
+ * However, if the lousy fix-point is sufficient to prove a >= 0,
+ * it is possible to derive p#new >= p#old. Or even better
+ * if a's value turns out to be known.
+ */
+Psysteme
+sc_keep_invariants_only(Psysteme sc)
+{
+    sc_egalites(sc) = constraints_keep_invariants_only(sc_egalites(sc));
+    sc_inegalites(sc) = constraints_keep_invariants_only(sc_inegalites(sc));
+    return sc;
+}
+
+
+Pcontrainte
+constraints_keep_invariants_only(Pcontrainte lc)
+{
+    Pcontrainte cc;
+
+    for(cc = lc; !CONTRAINTE_UNDEFINED_P(cc); cc = contrainte_succ(cc)) {
+	Pvecteur cv = contrainte_vecteur(cc);
+	if(!invariant_vector_p(cv)) {
+	    vect_rm(cv);
+	    contrainte_vecteur(cc) = VECTEUR_NUL;
+	}
+    }
+
+    return lc;
+}
+
+bool
+invariant_vector_p(Pvecteur v)
+{
+    bool invariant = TRUE;
+    Pvecteur cv = VECTEUR_UNDEFINED;
+    Pvecteur v_old = VECTEUR_NUL;
+    Pvecteur v_new = VECTEUR_NUL;
+    Pvecteur v_sum = VECTEUR_UNDEFINED;
+
+    ifdebug(8) {
+	debug(8, "invariant_vector_p", "begin for vector: ");
+	vect_fprint(stderr, v, external_value_name);
+    }
+
+    for(cv=v; !VECTEUR_UNDEFINED_P(cv); cv = vecteur_succ(cv)) {
+	if(vecteur_var(cv)==TCST) {
+	    /* OK, you could argue for invariant = FALSE,
+	     * but this would not help my debugging!
+	     */
+	    pips_error("invariant_vector_p",
+		       "Constant term in a potential invariant vector!\n");
+	}
+	else {
+	    entity e = (entity) vecteur_var(cv);
+	    entity var = value_to_variable(e);
+
+
+	    if(old_value_entity_p(e)) {
+		vect_add_elem(&v_old, (Variable) var, vecteur_val(cv));
+	    }
+	    else if(new_value_entity_p(e)) {
+		vect_add_elem(&v_new, (Variable) var, vecteur_val(cv));
+	    }
+	    else {
+		pips_error("invariant_vector_p",
+			   "Non value entity %s in invariant vector\n",
+			   entity_name(e));
+	    }
+	}
+    }
+
+    v_sum = vect_add(v_new, v_old);
+
+    ifdebug(8) {
+	debug(8, "invariant_vector_p", "vector v_new: ");
+	vect_fprint(stderr, v_new, external_value_name);
+	debug(8, "invariant_vector_p", "vector v_old: ");
+	vect_fprint(stderr, v_old, external_value_name);
+	debug(8, "invariant_vector_p", "vector v_sum: ");
+	vect_fprint(stderr, v_sum, external_value_name);
+    }
+
+    if(VECTEUR_NUL_P(v_sum)) {
+	invariant = TRUE;
+    }
+    else {
+	/* if v_sum is non zero, you might try to bound it
+	 * wrt the loop precondition?
+	 */
+	invariant = FALSE;
+	vect_rm(v_sum);
+    }
+
+    vect_rm(v_new);
+    vect_rm(v_old);
+
+    debug(8, "invariant_vector_p", "end invariant=%s\n",
+	  bool_to_string(invariant));
+
+    return invariant;
 }
