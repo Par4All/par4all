@@ -747,7 +747,7 @@ Pvecteur pv;
 		} 
 		ifdebug(7) {
 		    fprintf(stderr, "projected normalised system is:\n");
-		    syst_debug(sc);
+		    sc_syst_debug(sc);
 		}
 		/*eliminate v in the list of variables pve*/
 		if (prv == NULL) /* it's in head */
@@ -818,7 +818,7 @@ Pvecteur pv;
 		    }  
 		    ifdebug(7) {
 			fprintf(stderr, "projected normalised system is:\n");
-			syst_debug(sc);
+			sc_syst_debug(sc);
 		    }
 		    /*eliminate v in the list of variables pve*/
 		    if (prv == NULL) /* it's in head */
@@ -884,7 +884,7 @@ Pvecteur pv;
 	    
 /* 	    ifdebug(8) { */
 /* 		debug(8, "", "Sorted system :\n"); */
-/* 		syst_debug(sc); */
+/* 		sc_syst_debug(sc); */
 /* 	    } */
 
 	    build_sc_nredund_2pass_ofl_ctrl(&sc, FWD_OFL_CTRL);
@@ -897,7 +897,7 @@ Pvecteur pv;
 		else 
 		    fprintf(stderr, "%s\n", "not exact");
 		fprintf(stderr, "projected normalised system is:\n");
-		syst_debug(sc);
+		sc_syst_debug(sc);
 	    }
 	    if(nb_elems_list(sc->inegalites)<=syst_size_init)
 		NbrFMSystNonAug++;
