@@ -6,7 +6,7 @@
 
 #include "defines-local.h"
 
-extern char *flint_print_basic();
+extern char *flint_print_basic(basic);
 
 /* print_entity_variable(e)
  * 
@@ -118,7 +118,7 @@ distribution d;
 	(void) fprintf(stderr,"), ");
 	break;
     default:
-	pips_error("print_distribution","unexpected style tag\n");
+	pips_internal_error("unexpected style tag\n");
 	break;
     }
     (void) fprintf(stderr,"\n");
