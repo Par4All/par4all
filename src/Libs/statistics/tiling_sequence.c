@@ -14,7 +14,7 @@
 #define DEFAULT_COMPLEX_PREFIX	"C_"
 #define DEFAULT_STRING_PREFIX	"S_" 
 
-typedef struct INFO_LOOP {
+ typedef struct INFO_LOOP {   
   Variable index;
   Value upper, lower;  
 } info_loop;
@@ -50,25 +50,19 @@ static int unique_integer_number = 0,
   unique_complex_number = 0,
   unique_string_number = 0;
 
+ 
 
-static int *nbr_no_perf_nest_loop_of_depth, *nbr_perf_nest_loop_of_depth,
-  nbr_loop, nbr_perfectly_nested_loop, nbr_interested_loop,
-  nbr_no_perfectly_nested_loop,nbr_nested_loop,
-  max_depth_perfect, max_depth_no_perfect,cpt ;
-
-static bool sequence_valide=TRUE, first_turn=FALSE;
+static bool first_turn=FALSE;
 
 
-static typedef enum {is_a_stencil, is_unknown, is_a_perf_nes_loop, is_a_no_perf_nes_loop, 
-	      is_a_no_perf_nes_loop_t, is_a_call, is_a_continue,
-                is_a_while, is_a_test,  is_a_no_stencil } contenu_t;
-static typedef struct {
+ typedef enum {is_a_stencil, is_a_continue, is_a_no_stencil } contenu_t;
+ typedef struct {
   hash_table contenu;
   hash_table depth;
   stack statement_stack;
 } * context_p, context_t;
 
-static bool loop_flt(loop l, context_p context )
+static bool loop_flt(loop l )
 {  
   range range1;
   expression lower, upper;
@@ -136,14 +130,14 @@ static void stmt_rwt( statement s, context_p context)
  stack_pop(context->statement_stack);   
 }
  
-static bool seq_flt( sequence sq, context_p context  )
+static bool seq_flt(   )
 {
   return TRUE;
 }
 
 static void seq_rwt(sequence sq, context_p context)
 {
-  contenu_t contenu= is_unknown;
+  contenu_t contenu;
   int depth1=0, depth2=0;
   int max=0;
   int i=0;
@@ -186,12 +180,12 @@ static void seq_rwt(sequence sq, context_p context)
 	   (void *) max   );
 } 
 
-static bool uns_flt(unstructured u, context_p context   )
+static bool uns_flt(   )
 {
   return TRUE;
 }
 
-static void uns_rwt(unstructured u, context_p context)
+static void uns_rwt( context_p context)
 {  contenu_t contenu;
 
   contenu=is_a_no_stencil; 
@@ -202,12 +196,12 @@ static void uns_rwt(unstructured u, context_p context)
 	   ( void *) 0);  
 }
  
-static bool test_flt(test t, context_p context)
+static bool test_flt( )
 {
   return TRUE;
 }
 
-static void test_rwt(test t, context_p context)
+static void test_rwt( context_p context)
 {
   contenu_t contenu;
   contenu=is_a_no_stencil; 
@@ -217,7 +211,7 @@ static void test_rwt(test t, context_p context)
   hash_put(context->depth,stack_head(context->statement_stack), 
 	   ( void *) 0);   
 } 
-static bool call_flt( call  ca, context_p context)
+static bool call_flt( )
 {
   return TRUE ;
 }
@@ -339,14 +333,20 @@ static void call_rwt(call  ca, context_p context)
 }
 
 
-static void wl_rwt(whileloop w, context_p context)
+static void wl_rwt( context_p context)
 {  
-  contenu_t contenu=is_a_while;
-   hash_put(context->contenu,
-	    stack_head(context->statement_stack), 
-   (void *) contenu );
-} 
+
+  contenu_t contenu;
+  contenu=is_a_no_stencil; 
+  hash_put(context->contenu,
+	   stack_head(context->statement_stack), 
+	   (void *)contenu );
+  hash_put(context->depth,stack_head(context->statement_stack), 
+	   ( void *) 0); 
   
+ 
+} 
+
 static bool lexi_sup(Pmatrix a, Pmatrix b)
 {int i;
  for (i=1;i<=depth;i++)
@@ -356,6 +356,7 @@ static bool lexi_sup(Pmatrix a, Pmatrix b)
      if (MATRIX_ELEM(a,i,1) < MATRIX_ELEM(b,i,1))
        return FALSE;
     }
+ return FALSE;
 } 
 
 static void  trier(Pmatrix *st,int length)
@@ -409,13 +410,12 @@ static void compute_bound_merged_nest ()
  
 static statement  fusion()
 { int i,j;
- list lis;
+ list lis=NULL;
  instruction ins;
- sequence seq;
+ sequence seq=NULL;
   statement s;
-  normalized norm;
-  Pvecteur pv;
-  loop ls;
+  loop ls=NULL;
+  void ExpressionReplaceReference();
   /* calcul des delais des differents nis */
   compute_delay();
   compute_bound_merged_nest ();
@@ -423,7 +423,7 @@ static statement  fusion()
   normalize_all_expressions_of(expt);
   for (i=k1-1;i>=0;i--)
     {
-      expression e1,e2,e,exp,gauche,droite,delai_plus;
+      expression e1,e2,e,gauche=NULL,droite=NULL,delai_plus;
       test t;
       call c;
       int m;
@@ -503,10 +503,10 @@ static statement  fusion()
 			 TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
 	  delai_plus=Pvecteur_to_expression(pv);
 	  ExpressionReplaceReference(gauche,
-				     make_reference((entity*) sequen[i].nd[j].index,NIL),delai_plus);
+				     make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
 	  MAP(EXPRESSION,exp,{  
 	    ExpressionReplaceReference(exp,
-				       make_reference((entity*) sequen[i].nd[j].index,NIL),delai_plus);
+				       make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
 	  },call_arguments( syntax_call(expression_syntax(droite))));
 	};
       if (e==NULL)
@@ -527,7 +527,6 @@ static statement  fusion()
     {
       range range1;
       expression lower, upper;
-      Pvecteur pv1,pv2;
       range1=loop_range(ls); 
       lower=range_lower(range1);  
       upper=range_upper(range1); 
@@ -558,7 +557,7 @@ static void cons_coef(Pmatrix p, int nid)
 
 static Pvecteur buffer_acces(int nid )
 {
-  Pvecteur pv,tmp;
+  Pvecteur pv=NULL,tmp;
   int j;
   for(j=0;j<=depth-1;j++)
     {
@@ -700,16 +699,17 @@ static statement fusion_buffer()
   int m;
   int i;
   int j;
-  list lis,lis2,lis3,lisi;
-  expression exp,gauche, droite; 
+  list lis,lis3,lisi=NULL;
+                                 
   entity name;
-  Variable v1;
-  reference ref;
+ 
+  reference ref=NULL;
    Pmatrix temp1,temp2,temp3;
    sequence seq;
    instruction ins;
    statement s;
    loop ls;
+  void ExpressionReplaceReference();
   compute_delay();
   compute_bound_merged_nest ();
    
@@ -719,7 +719,7 @@ static statement fusion_buffer()
   temp3=matrix_new(depth,1);
   for(i=0;i<=k1-1;i++)
     {
-      expression e1,e2,e,exp,gauche,droite;
+      expression e1,e2,e,exp,gauche=NULL,droite=NULL;
       test t;
       statement s;
       if (i < k1-1){
@@ -733,7 +733,7 @@ static statement fusion_buffer()
       exp= binary_intrinsic_expression ("MOD",Pvecteur_to_expression(  sequen[i].pv_acces),
 					Value_to_expression( sequen[i].surface) );
       lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus (sequen[i].surface,VALUE_ONE))), NIL);
-      name= make_new_array_variable(get_current_module_entity() , make_basic(is_basic_int, 4), lis);
+      name= make_new_array_variable(get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
       
       lis =CONS(EXPRESSION, exp, NIL);
       ref=make_reference(name,lis);
@@ -838,7 +838,7 @@ static statement fusion_buffer()
 	      
 	      MAP(EXPRESSION,exp,{  
 		ExpressionReplaceReference(exp,
-					   make_reference((entity*) sequen[i].nd[j].index,NIL),delai_plus);
+					   make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
 		
 	      },call_arguments( syntax_call(expression_syntax(droite))));
 	      
@@ -880,7 +880,7 @@ static statement fusion_buffer()
     {
       range range1;
       expression lower, upper;
-      Pvecteur pv1,pv2;
+    
       range1=loop_range(ls); 
       lower=range_lower(range1);  
       upper=range_upper(range1); 
@@ -971,14 +971,14 @@ static bool array_overflow()
 bool tiling_sequence(string module)  
 {
   statement stat,s1;
-  int i,j,k,debordement;
+  
   context_t context;
  
   contenu_t contenu;
-  list lis;
-  instruction ins;
-  sequence seq;
+ 
   
+  
+ void  module_reorder(); 
   debug_on("STATISTICS_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module);
   set_current_module_entity(local_name_to_top_level_entity(module));
@@ -1005,7 +1005,7 @@ bool tiling_sequence(string module)
      NULL); 
   contenu = (contenu_t) hash_get(context.contenu, stat); 
   depth = (int ) hash_get(context.depth, stat);
-  
+    
   
   if (contenu!=is_a_stencil)
     {
@@ -1013,7 +1013,7 @@ bool tiling_sequence(string module)
       array_overflow();
     }
   else
-    {
+    {  
       if(!array_overflow())
 	{
 	  
