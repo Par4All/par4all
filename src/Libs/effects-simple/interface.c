@@ -26,7 +26,7 @@
 /* SPECIFIC INTERFACES */
 
 bool 
-cumulated_references(char * module_name)
+cumulated_references(string module_name)
 {
     bool ok;
     set_methods_for_cumulated_references();
@@ -36,7 +36,7 @@ cumulated_references(char * module_name)
 }
 
 bool 
-proper_references(char * module_name)
+proper_references(string module_name)
 {
     bool ok;
     set_methods_for_proper_references();
@@ -46,19 +46,13 @@ proper_references(char * module_name)
 }
 
 bool 
-proper_effects(char * module_name)
+proper_effects(string module_name)
 {
-    bool res1, res2;
-
-    set_methods_for_proper_references();
-    res1 = proper_effects_engine(module_name);
-    generic_effects_reset_all_methods();
-
+    bool ok;
     set_methods_for_proper_simple_effects();
-    res2 = proper_effects_engine(module_name);
+    ok = proper_effects_engine(module_name);
     generic_effects_reset_all_methods();
-    
-    return res1 && res2;
+    return ok;
 }
 
 bool 
@@ -82,7 +76,7 @@ cumulated_effects(string module_name)
 }
 
 bool
-in_summary_effects(char *module_name)
+in_summary_effects(string module_name)
 {
     bool ok;
     set_methods_for_simple_effects();
@@ -92,14 +86,14 @@ in_summary_effects(char *module_name)
 }
 
 bool
-out_summary_effects(char *module_name)
+out_summary_effects(string module_name)
 {
     return TRUE;
 }
 
 
 bool
-in_effects(char *module_name)
+in_effects(string module_name)
 {
     bool ok;
     set_methods_for_simple_effects();
@@ -109,14 +103,14 @@ in_effects(char *module_name)
 }
 
 bool
-out_effects(char *module_name)
+out_effects(string module_name)
 {
     return TRUE;
 }
 
 
 bool
-print_code_proper_effects(char *module_name)
+print_code_proper_effects(string module_name)
 {
     bool ok;
     set_methods_for_proper_simple_effects();
@@ -124,10 +118,10 @@ print_code_proper_effects(char *module_name)
     set_prettyprint_with_attachments(TRUE);
     set_read_action_interpretation(READ_IS_READ);
     set_write_action_interpretation(WRITE_IS_WRITE);
-    ok = (print_source_or_code_with_any_effects_engine(module_name,
-							 DBR_PROPER_EFFECTS,
-							 string_undefined,
-							 ".prop"));
+    ok = print_source_or_code_with_any_effects_engine(module_name,
+						      DBR_PROPER_EFFECTS,
+						      string_undefined,
+						      ".prop");
     generic_effects_reset_all_methods();
     return ok;
 }
@@ -141,16 +135,51 @@ print_code_cumulated_effects(char* module_name)
     set_prettyprint_with_attachments(TRUE);
     set_read_action_interpretation(READ_IS_READ);
     set_write_action_interpretation(WRITE_IS_WRITE);
-    ok = (print_source_or_code_with_any_effects_engine(module_name,
-							 DBR_CUMULATED_EFFECTS,
-							 DBR_SUMMARY_EFFECTS,
-							 ".cumu"));
+    ok = print_source_or_code_with_any_effects_engine(module_name,
+						      DBR_CUMULATED_EFFECTS,
+						      DBR_SUMMARY_EFFECTS,
+						      ".cumu");
     generic_effects_reset_all_methods();
     return ok;
 }
 
+bool 
+print_code_proper_references(char * module_name)
+{
+    bool ok;
+    set_methods_for_proper_references();
+    set_is_user_view_p(FALSE);
+    set_prettyprint_with_attachments(TRUE);
+    set_read_action_interpretation(READ_IS_READ);
+    set_write_action_interpretation(WRITE_IS_WRITE);
+    ok = print_source_or_code_with_any_effects_engine(module_name,
+						      DBR_PROPER_REFERENCES,
+						      string_undefined,
+						      ".propref");
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool 
+print_code_cumulated_references(char * module_name)
+{
+    bool ok;
+    set_methods_for_cumulated_references();
+    set_is_user_view_p(FALSE);
+    set_prettyprint_with_attachments(TRUE);
+    set_read_action_interpretation(READ_IS_READ);
+    set_write_action_interpretation(WRITE_IS_WRITE);
+    ok = print_source_or_code_with_any_effects_engine(module_name,
+						      DBR_CUMULATED_REFERENCES,
+						      string_undefined,
+						      ".cumuref");
+    generic_effects_reset_all_methods();
+    return ok;
+  
+}
+
 bool
-print_code_in_effects(char *module_name)
+print_code_in_effects(string module_name)
 {
     bool ok;
     set_methods_for_simple_effects();
@@ -166,7 +195,7 @@ print_code_in_effects(char *module_name)
 }
 
 bool
-print_code_out_effects(char *module_name)
+print_code_out_effects(string module_name)
 {
     bool ok;
     set_methods_for_simple_effects();
@@ -183,7 +212,7 @@ print_code_out_effects(char *module_name)
 
 
 bool
-print_source_proper_effects(char *module_name)
+print_source_proper_effects(string module_name)
 {
     bool ok;
     set_methods_for_proper_simple_effects();
@@ -218,7 +247,7 @@ print_source_cumulated_effects(char* module_name)
 
 
 bool
-print_source_in_effects(char *module_name)
+print_source_in_effects(string module_name)
 {
     bool ok;
     set_methods_for_simple_effects();
@@ -234,7 +263,7 @@ print_source_in_effects(char *module_name)
 }
 
 bool
-print_source_out_effects(char *module_name)
+print_source_out_effects(string module_name)
 {
     bool ok;
     set_methods_for_simple_effects();
