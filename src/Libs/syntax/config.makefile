@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/12 15:20:17 $m 
+# $Date: 1997/04/26 10:00:22 $m 
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
@@ -60,7 +60,7 @@ scanner.c: scanner.l syn_yacc.h
 	sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/SYN_/g;s/yy/syn_/g' > $@
 
 keywtbl.h: warning.h f77keywords
-	@echo "Generating $@"
+	# Generating $@
 	{ cat warning.h ; \
 	  echo "#include \"syn_yacc.h\"" ; \
 	  echo "struct Skeyword keywtbl[] = {" ;\
