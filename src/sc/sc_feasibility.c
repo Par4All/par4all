@@ -313,7 +313,8 @@ boolean ofl_res;
        *   it is quite fast with few inequalities anyway.
        *
        * - SIMPLEX switches every eq to 2 inequalities, adding hyperplanes.
-       *   thus it is not that good with equalities.
+       *   thus it is not that good with equalities. Maybe equalities could
+       *   be handled as such but I don't think that it is the case.
        *   it is quite slow with small systems because of the dense matrix
        *   to build and manipulate.
        *
@@ -349,6 +350,7 @@ boolean ofl_res;
     }
   }
 
+  /* clean-up */
   if (sw) sc_rm(sw);
   
   if (catch_performed)
