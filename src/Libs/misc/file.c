@@ -1,5 +1,5 @@
-/* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/30 16:18:10 $, 
+/* 
+ * $Id$
  */
 
 #include <unistd.h>
@@ -294,7 +294,6 @@ list_files_in_directory(
 		   dir,  sys_errlist[errno]);
 }
 
-
 bool 
 directory_exists_p(char * name)
 {
@@ -542,4 +541,24 @@ pips_dirname(string fullpath)
     while (result[--len]!='/' && len>=0);
     result[len] = '\0';
     return result;
+}
+
+void
+safe_unlink(string file_name)
+{
+    if (unlink(file_name)) 
+    {
+	perror("[safe_unlink] ");
+	pips_internal_error("unlink %s failed\n", file_name);
+    }
+}
+
+void
+safe_symlink(string topath, string frompath)
+{
+    if (symlink(topath, frompath))
+    {
+	perror("[safe_symlink] ");
+	pips_internal_error("symlink(%s, %s) failed\n", topath, frompath);
+    }
 }
