@@ -1129,30 +1129,8 @@ global_entity_name: global_name
 
 functional_entity_name: name
 	    {
-		entity f = gen_find_tabulated
-		    (concatenate(CurrentPackage, MODULE_SEP_STRING, $1, 0),
-		     entity_domain);
-
-		/* Ignore ghost variables, they are *not* in the current scope */
-		f = ghost_variable_entity_p(f)? entity_undefined : f;
-
-		if(entity_undefined_p(f)) {
-		    $$ = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, $1);
-		}
-		else if(!storage_undefined_p(entity_storage(f))
-				 && storage_formal_p(entity_storage(f))) {
-		    /* The functional entity must be a formal parameter */
-		    $$ = f;
-		}
-		else if(storage_undefined_p(entity_storage(f))) {
-		    /* The current declaration is wrong and should be fixed
-		     * later, i.e. by MakeExternalFunction() or MakeCallInst()
-		     */
-		    $$ = f;
-		}
-		else {
-		    pips_assert("Unexpected kind of functional entity!", TRUE);
-		}
+		/* This includes BLOCKDATA modules because of EXTERNAL */
+		$$ = NameToFunctionalEntity($1);
 		free($1);
 	    }
 	;
