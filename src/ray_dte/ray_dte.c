@@ -15,6 +15,7 @@
  * Voir aussi ray_dte.h et poly.h
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
 
