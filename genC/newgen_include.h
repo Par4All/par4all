@@ -61,7 +61,10 @@ struct gen_binding ;
 
    TYPE and CONSTRUCTOR members have to be at the same offset */
 
-/* FC, 10/06/94, set_type in se moved.
+/* FC, 10/06/1994, set_type in se moved.
+ *
+ * FC 03/06/2003: it lacks a "size" information which could be 
+ *                stored directly next to the type, for alloc/free ?
  *
  * common part assumed for all: type
  * common part assumed for ba, li, se, ar: 
