@@ -1,24 +1,26 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1996/11/17 17:36:02 $, 
+%% $Date: 1996/11/18 10:44:17 $, 
 
-\documentstyle[a4,psfig,html,verbatim,newgen_domain]{article}
+\documentclass[a4paper]{article}
+\usepackage{psfig,verbatim,newgen_domain}
 
-%% \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+%% To generate an index:
+\usepackage{makeidx}
+\makeindex
 
 \title{PIPS: Internal Representation of Fortran Code}
 \author{Fran\c{c}ois Irigoin \\
-        Pierre Jouvelot \\
-	Ronan Keryell \\
-        Rémi Triolet\\
-\\
-        CRI, Ecole des Mines de Paris}
+  Pierre Jouvelot \\
+  Ronan Keryell \\
+  Rémi Triolet\\
+  \\
+  CRI, Ecole des Mines de Paris}
 
 
 % Correction de quelques erreurs. RK, 07/02/1994.
 
-\renewcommand{\indexname}{Index}
+%\renewcommand{\indexname}{Index}
 
-\makeindex
 
 \begin{document}
 \maketitle
@@ -28,16 +30,16 @@
 
 This document contains the high-level description of data structures
 used in PIPS as internal representations of programs. These data
-structures are declared using the NewGen Data Definition Language, which
-insulates them from a particular programming language. They currently
-are translated into C or Common Lisp declarations and basic run-time
-support routines, such as \verb+make+, \verb+free+,... A basic
-understanding of Newgen declarations\footnote{If you edit this document,
-please remember that NewGen declarations introduced by \verb/\domain/
-must fit on one line.} is assumed throughout this document, but the
-notation is close enough to standard programming language to be
-interpreted by newcommers. For more information about NewGen see
-\cite{JT89}\cite{JT90}.
+structures are declared using the NewGen Data Definition Language,
+which insulates them from a particular programming language. They
+currently are translated into C or Common Lisp declarations and basic
+run-time support routines, such as \verb+make+, \verb+free+,... A
+basic understanding of Newgen declarations\footnote{If you edit this
+  document, please remember that NewGen declarations introduced by
+  \expandafter\texttt{\string\domain} must fit on one line.} is
+assumed throughout this document, but the notation is close enough to
+standard programming language to be interpreted by newcommers. For
+more information about NewGen see \cite{JT89,JT90}.
 
 This document is part of PIPS documentation and its Latex version is
 located in \verb+$PIPS_ROOT/Src/Documentation/newgen/ri.tex+ (\verb+ri+
@@ -105,11 +107,11 @@ présenté dans le rapport EMP-CRI-A191.
 Two external data types appear in PIPS internal representation:
 \verb/Pvecteur/ and \verb/Psysteme/. Other types of C3 Linear Algebra
 Library also appear in PIPS code: \verb/Pcontrainte/, which is a
-component of \verb/Psysteme/, \verb/Ppolyedre/ for polyhedra, \verb/Psg/
-for generating systems, \verb/Pmatrix/ for matrices, and \verb
-/Ppolynome/, which is used for expressing program complexity (see
+component of \verb/Psysteme/, \verb/Ppolyedre/ for polyhedra,
+\verb/Psg/ for generating systems, \verb/Pmatrix/ for matrices, and
+\verb/Ppolynome/, which is used for expressing program complexity (see
 \htmladdnormallink{Complexity
-Analysis}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}).
+  Analysis}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}).
 
 \subsection{Vector}
 \label{subsection-pvecteur}
@@ -871,15 +873,16 @@ callees} contient la liste des noms des sous-programmes et fonctions
 directement appelés dans le code. Il contient une partie du callgraph.
 \fi
 
-A set of such variables, \verb/callers/\footnote{Obviously, \verb/callers/ are
-of type \verb/callees/...}, \verb/callees/, \verb/all/, is
-used by Pipsmake to schedule interprocedural
+A set of such variables, \verb/callers/\footnote{Obviously,
+  \texttt{callers} are of type \texttt{callees}...}, \verb/callees/,
+\verb/all/, is used by Pipsmake to schedule interprocedural
 analyses\cite{Trio90}. Pipsmake and Pipsdbm are strongly
 string-oriented and not entity-oriented, because it is easier to deal
 with disk storage and ASCII files. Some C functions in library
 \verb/ri-util/ have either a string or an entity type for an entity
 formal parameter. The NewGen hash-table for entities makes both
-functionally equivalent, but strings are often more of a pain to handle.
+functionally equivalent, but strings are often more of a pain to
+handle.
 
 \subsection{Statement}
 \label{subsection-statement}
@@ -1442,16 +1445,16 @@ field set to {\tt normalized\_undefined}.
 \domain{Syntax = reference + range + call}
 {}
 
-Type \verb/syntax/ is used to represent expressions as they are defined
-in the program source code. A \verb/syntax/ object is either a
+Type \verb/syntax/ is used to represent expressions as they are
+defined in the program source code. A \verb/syntax/ object is either a
 \verb/reference/ object pointing towards an array
 element\footnote{Scalar variables are represented as 0-dimensional
-arrays.}, or a \verb/call/ to a function\footnote{All operators and
-commands, including assignment, are encoded as {\em functions}. This
-explains why the \verb/call/ type is defined in the {\em Instruction}
-section.}, or a \verb/range/ as in loop definitions\footnote{This
-explains why type \verb/range/ is defined in the {\em Instruction}
-section.} and array declarations.
+  arrays.}, or a \verb/call/ to a function\footnote{All operators and
+  commands, including assignment, are encoded as {\em functions}. This
+  explains why the \texttt{call} type is defined in the {\em
+    Instruction} section.}, or a \verb/range/ as in loop
+definitions\footnote{This explains why type \texttt{range} is defined
+  in the {\em Instruction} section.} and array declarations.
 
 \iffalse
 Le domaine \verb/syntax/ permet de représenter les expressions telles
@@ -2058,11 +2061,11 @@ PIPS Documentation
 \end{thebibliography}
 
 
-\newpage
+%\newpage
 
 % Cross-references for points and keywords
 
-\input{ri.ind}
+\printindex
 
 \end{document}
 \end
