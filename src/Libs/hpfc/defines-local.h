@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/10/17 11:32:12 $, ) 
+ * ($Date: 1995/11/30 16:47:30 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -257,6 +257,17 @@ void fprint_entity_list(FILE *fp, list l);
 /*  Very Short and very local functions
  *    moved to macros, FC 17/05/94
  */
+#define set_integer(var, i) \
+    make_assign_statement(entity_to_expression(var), int_to_expression(i))
+
+#define set_logical(var, b) \
+    make_assign_statement(entity_to_expression(var),\
+	 make_call_expression(MakeConstant \
+	      (b ? ".TRUE." : ".FALSE.", is_basic_logical), NIL))
+
+#define set_expression(var, e) \
+    make_assign_statement(entity_to_expression(var), e)
+
 #define local_index_is_different_p(array, dim) \
   (new_declaration(array, dim)!=is_hpf_newdecl_none)
 
