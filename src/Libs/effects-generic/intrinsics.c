@@ -188,6 +188,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"ABS",                      no_write_effects},
     {"DABS",                     no_write_effects},
     {"CABS",                     no_write_effects},
+    {"CDABS",                     no_write_effects},
 
     {"MOD",                      no_write_effects},
     {"AMOD",                     no_write_effects},
