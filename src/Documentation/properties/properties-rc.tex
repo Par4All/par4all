@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/08/04 10:56:23 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/08/10 13:05:27 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -64,6 +64,29 @@ Useful for use/def and semantics analysis.
 \begin{verbatim}
 ONE_TRIP_DO FALSE
 \end{verbatim}
+
+Shall we print phase timings
+
+\begin{verbatim}
+LOG_TIMINGS FALSE
+\end{verbatim}
+
+\section{Pipsmake}
+
+Shall we log and report differences between resource read/write and
+which are not declared to pipsmake
+
+\begin{verbatim}
+CHECK_RESOURCE_USAGE FALSE
+\end{verbatim}
+
+The rule activation process may delete from the database all the
+derived resources from the newly activated rule
+
+\begin{verbatim}
+ACTIVATE_DEL_DERIVED_RES TRUE
+\end{verbatim}
+
 
 \section{Chains}
 
@@ -619,6 +642,10 @@ to be destroyed
 
 \begin{verbatim}
 ICFG_CALLEES_TOPO_SORT FALSE
+\end{verbatim}
+
+\begin{verbatim}
+ICFG_DECOR 0
 \end{verbatim}
 
 \begin{verbatim}
