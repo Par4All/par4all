@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/30 14:45:41 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/30 15:14:42 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -206,9 +206,13 @@ CUMULATE_REDUCTION($1, $2, MULT, *)')dnl
 c
 c All the reductions:
 c
-REDUCTIONS(real*8, REAL8) 
-REDUCTIONS(real*4, REAL4)
+REDUCTIONS(byte, BYTE1)
+REDUCTIONS(integer*2, INTEGER4)
 REDUCTIONS(integer*4, INTEGER4)
+REDUCTIONS(real*4, REAL4)
+REDUCTIONS(real*8, REAL8) 
+REDUCTIONS(complex*8, COMPLEX8)
+REDUCTIONS(complex*16, COMPLEX16)
 c
 c that is all
 c
