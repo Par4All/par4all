@@ -1,0 +1,416 @@
+#
+# $Id$
+#
+# Basic menus for jpips.
+#
+# $Log: jpips_menus.basic,v $
+# Revision 1.1  1998/07/03 08:14:59  coelho
+# Initial revision
+#
+#
+
+TOP_MENU
+Analyses
+Analyses Option Panel
+
+## one may have either "display" or "make" 
+## (no display, but the resource is built)
+##
+LABEL_WITH_CHOICE
+Mode
+checking lc
+m_or_d
+display generated files or just build them
+
+	Display
+	display
+	..
+
+	Make
+	make
+	..
+
+CLOSE
+
+SEPARATOR
+
+##
+## menu for Sequential view
+##
+
+BUTTON_WITH_MENU
+Show Code with
+$TAGm_or_d PRINTED_FILE[$MODULES]
+display sequential code with selected decorations
+
+	RADIOBUTTONGROUP
+	check activate PRINTED_FILE
+
+		MENU
+		Misc
+			RADIOBUTTON
+			None
+			activate PRINT_CODE
+			PRINT_CODE
+
+			RADIOBUTTON
+			Complexities
+			activate PRINT_CODE_COMPLEXITIES
+			PRINT_CODE_COMPLEXITIES
+
+		CLOSE
+
+		MENU
+		Semantics
+
+			RADIOBUTTON
+			Transformers
+			activate PRINT_CODE_TRANSFORMERS
+			PRINT_CODE_TRANSFORMERS
+
+			RADIOBUTTON
+			Preconditions
+			activate PRINT_CODE_PRECONDITIONS
+			PRINT_CODE_PRECONDITIONS
+
+			RADIOBUTTON
+			Continuations
+			activate PRINT_CODE_CONTINUATION_CONDITIONS
+			PRINT_CODE_CONTINUATION_CONDITIONS
+
+		CLOSE
+
+		MENU
+		Regions
+
+			RADIOBUTTON
+			Proper R&W
+			activate PRINT_CODE_PROPER_REGIONS
+			PRINT_CODE_PROPER_REGIONS
+
+			RADIOBUTTON
+			Cumulated R&W
+			activate PRINT_CODE_REGIONS
+			PRINT_CODE_REGIONS
+
+			RADIOBUTTON
+			In
+			activate PRINT_CODE_IN_REGIONS
+			PRINT_CODE_IN_REGIONS
+
+			RADIOBUTTON
+			Out
+			activate PRINT_CODE_OUT_REGIONS
+			PRINT_CODE_OUT_REGIONS
+
+			RADIOBUTTON
+			Privatized
+			activate PRINT_CODE_PRIVATIZED_REGIONS
+			PRINT_CODE_PRIVATIZED_REGIONS
+
+		CLOSE
+
+		MENU
+		Effects
+
+			RADIOBUTTON
+			Proper
+			activate PRINT_CODE_PROPER_EFFECTS
+			PRINT_CODE_PROPER_EFFECTS
+		
+			RADIOBUTTON
+			Cumulated
+			activate PRINT_CODE_CUMULATED_EFFECTS
+			PRINT_CODE_CUMULATED_EFFECTS
+
+			RADIOBUTTON
+			In
+			activate PRINT_CODE_IN_EFFECTS
+			PRINT_CODE_IN_EFFECTS
+
+			RADIOBUTTON
+			Out
+			activate PRINT_CODE_OUT_EFFECTS
+			PRINT_CODE_OUT_EFFECTS
+
+		CLOSE
+
+		MENU
+		References
+
+			RADIOBUTTON
+			Proper
+			activate PRINT_CODE_PROPER_REFERENCES
+			PRINT_CODE_PROPER_REFERENCES
+
+			RADIOBUTTON
+			Cumulated
+			activate PRINT_CODE_CUMULATED_REFERENCES
+			PRINT_CODE_CUMULATED_REFERENCES
+
+		CLOSE
+
+		MENU
+		Reductions
+
+			RADIOBUTTON
+			Proper
+			activate PRINT_CODE_PROPER_REDUCTIONS
+			PRINT_CODE_PROPER_REDUCTIONS
+
+			RADIOBUTTON
+			Cumulated
+			activate PRINT_CODE_CUMULATED_REDUCTIONS
+			PRINT_CODE_CUMULATED_REDUCTIONS
+
+		CLOSE
+
+	CLOSE
+
+CLOSE
+
+## close Sequential
+
+##
+## ICFG
+##
+
+BUTTON_WITH_MENU
+Show ICFG View with
+$TAGmarker ICFG_FILE[$MODULES]
+display interprocedural call graph with selected decorations
+
+	RADIOBUTTONGROUP
+	check activate ICFG_FILE
+
+		MENU
+		Simple
+
+			RADIOBUTTON
+			None
+			activate PRINT_ICFG
+			PRINT_ICFG
+
+			RADIOBUTTON
+			Preconditions
+			activate PRINT_ICFG_WITH_PRECONDITIONS
+			PRINT_ICFG_WITH_PRECONDITIONS
+
+			RADIOBUTTON
+			Transformers
+			activate PRINT_ICFG_WITH_TRANSFORMERS
+			PRINT_ICFG_WITH_TRANSFORMERS
+
+			RADIOBUTTON
+			Regions
+			activate PRINT_ICFG_WITH_REGIONS
+			PRINT_ICFG_WITH_REGIONS
+
+		CLOSE
+
+		MENU
+		Loops
+
+			RADIOBUTTON
+			None
+			activate PRINT_ICFG_WITH_LOOPS
+			PRINT_ICFG_WITH_LOOPS
+
+			RADIOBUTTON
+			Preconditions
+			activate PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
+			PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
+
+			RADIOBUTTON
+			Transformers
+			activate PRINT_ICFG_WITH_LOOPS_TRANSFORMERS
+			PRINT_ICFG_WITH_LOOPS_TRANSFORMERS
+
+			RADIOBUTTON
+			Regions
+			activate PRINT_ICFG_WITH_LOOPS_REGIONS
+			PRINT_ICFG_WITH_LOOPS_REGIONS
+
+		CLOSE
+
+		MENU
+		Control
+
+			RADIOBUTTON
+			None
+			activate PRINT_ICFG_WITH_CONTROL
+			PRINT_ICFG_WITH_CONTROL
+
+			RADIOBUTTON
+			Preconditions
+			activate PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
+			PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
+
+			RADIOBUTTON
+			Transformers
+			activate PRINT_ICFG_WITH_CONTROL_TRANSFORMERS
+			PRINT_ICFG_WITH_CONTROL_TRANSFORMERS
+
+			RADIOBUTTON
+			Regions
+			activate PRINT_ICFG_WITH_CONTROL_REGIONS
+			PRINT_ICFG_WITH_CONTROL_REGIONS
+
+		CLOSE
+
+	CLOSE
+
+CLOSE
+
+## end ICFG
+
+##
+## Parallel Stuff
+##
+
+SEPARATOR
+
+LABEL_WITH_CHOICE
+Use-Def Chains
+check activate CHAINS
+..
+select use-def chains generation
+
+	Standard
+	activate ATOMIC_CHAINS
+	ATOMIC_CHAINS
+
+	Regions
+	activate REGION_CHAINS
+	REGION_CHAINS
+
+	In-Out Regions
+	activate IN_OUT_REGIONS_CHAINS
+	IN_OUT_REGIONS_CHAINS
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Dependence Test
+check activate DG
+..
+select dependence test for parallelization
+
+	Simple
+	activate RICE_FAST_DEPENDENCE_GRAPH
+	RICE_FAST_DEPENDENCE_GRAPH
+
+	with Loop Bounds
+	activate RICE_FULL_DEPENDENCE_GRAPH
+	RICE_FULL_DEPENDENCE_GRAPH
+
+	with Preconditions
+	activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+	RICE_SEMANTICS_DEPENDENCE_GRAPH
+
+	with Regions
+	activate RICE_REGIONS_DEPENDENCE_GRAPH
+	RICE_REGIONS_DEPENDENCE_GRAPH
+CLOSE
+
+LABEL_WITH_CHOICE
+Parallelization
+check activate PARALLELIZED_CODE
+..
+select parallelization algorithm
+	
+	using All Dependences
+	activate RICE_ALL_DEPENDENCE
+	RICE_ALL_DEPENDENCE
+
+	using True Dependences Only
+	activate RICE_DATA_DEPENDENCE
+	RICE_DATA_DEPENDENCE
+
+	of Loop Nests
+	activate NEST_PARALLELIZATION
+	NEST_PARALLELIZATION
+
+	Coarse Grain
+	activate COARSE_GRAIN_PARALLELIZATION
+	COARSE_GRAIN_PARALLELIZATION
+
+CLOSE
+
+BUTTON_WITH_CHOICE
+Show Parallel Code
+$TAGm_or_d PARALLELPRINTED_FILE[$MODULES]
+check activate PARALLELPRINTED_FILE
+display parallel code using the selected syntax
+
+	in Fortran 77
+	activate PRINT_PARALLELIZED77_CODE
+	PRINT_PARALLELIZED77_CODE
+
+	with OMP Directives
+	activate PRINT_PARALLELIZEDOMP_CODE
+	PRINT_PARALLELIZEDOMP_CODE
+
+	with HPF Directives
+	activate PRINT_PARALLELIZEDHPF_CODE
+	PRINT_PARALLELIZEDHPF_CODE
+
+CLOSE
+
+##
+## end of parallelization stuff
+##
+
+##
+## Semantics stuff
+##
+
+LABEL_WITH_CHOICE
+Transformers
+check activate TRANSFORMERS
+..
+select transformers computation algorithm
+
+	Quick Intra-Procedural
+	activate TRANSFORMERS_INTRA_FAST
+	TRANSFORMERS_INTRA_FAST
+
+	Full Intra-Procedural
+	activate TRANSFORMERS_INTRA_FULL
+	TRANSFORMERS_INTRA_FULL
+
+	Quick Inter-Procedural
+	activate TRANSFORMERS_INTER_FAST
+	TRANSFORMERS_INTER_FAST
+
+	Full Inter-Procedural
+	activate TRANSFORMERS_INTER_FULL
+	TRANSFORMERS_INTER_FULL
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Preconditions
+check activate PRECONDITIONS
+..
+select preconditions computation algorithm
+
+	Intra-Procedural
+	activate PRECONDITIONS_INTRA
+	PRECONDITIONS_INTRA
+
+	Quick Inter-Procedural
+	activate PRECONDITIONS_INTER_FAST
+	PRECONDITIONS_INTER_FAST
+
+	Full Inter-Procedural
+	activate PRECONDITIONS_INTER_FULL
+	PRECONDITIONS_INTER_FULL
+
+CLOSE
+
+##
+##
+##
+
+CLOSE
