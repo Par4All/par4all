@@ -353,13 +353,14 @@ db_unput_resources(string rname)
 {
     db_symbol r;
     DB_OK;
-
     r = find_or_create_db_symbol(rname);
     DB_RESOURCES_MAP(s, or,
     {
 	pips_debug(7, "deleting %s of %s if any\n", rname, db_symbol_name(s));
-	if (bound_db_owned_resources_p(or, r))
+	if (bound_db_owned_resources_p(or, r)) {
 	    db_delete_resource(rname, db_symbol_name(s));
+	    dbll_unlink_resource_file(rname, db_symbol_name(s), FALSE);
+	}
     },
         get_pips_database());
 }
@@ -369,7 +370,6 @@ db_save_and_free_memory_resource_if_any(string rname, string oname)
 {
     db_resource r;
     DB_OK;
-
     r = get_db_resource(rname, oname);
     if (!db_resource_undefined_p(r) && db_resource_loaded_p(r))
 	db_save_and_free_resource(rname, oname, r);
@@ -378,10 +378,12 @@ db_save_and_free_memory_resource_if_any(string rname, string oname)
 /* FC: I added this function to clean all resources, hence avoiding
  * to save them. This speed uo hpfc at low cost;-).
  */
-void 
+void
 db_delete_all_resources(void)
 {
-    pips_internal_error("not implemented yet\n");
+    int nr = dbll_number_of_resources(), i;
+    DB_OK;
+    for (i=0; i<nr; i++) db_unput_resources(dbll_get_ith_resource_name(i));
 }
 
 /******************************************************************* MODULES */
