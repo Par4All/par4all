@@ -29,7 +29,7 @@
 #define LINEAR_VALUE LONG
 #endif
 
-#if (LINEAR_VALUE==LONGLONG)
+#if LINEAR_VALUE == LONGLONG
 typedef long long Value;
 #define VALUE_FMT "%lld"
 #define VALUE_CONST(val) val##LL
@@ -47,7 +47,7 @@ typedef long long Value;
     ((int)(val>=(Value)INT_MIN&&val<=(Value)INT_MAX)?val:abort())
 #endif /* LONGLONG */
 
-#if (LINEAR_VALUE==LONG)
+#if LINEAR_VALUE == LONG
 typedef long Value;
 #define VALUE_FMT "%ld"
 #define VALUE_CONST(val) val##L
@@ -58,7 +58,7 @@ typedef long Value;
 #define VALUE_MONE -1L
 #define VALUE_TO_LONG(val) (val)
 #define VALUE_TO_INT(val) ((int)val)
-#endif
+#endif /* LONG */
 
 #define VALUE_POS_P(val) (val>VALUE_ZERO)
 #define VALUE_NEG_P(val) (val<VALUE_ZERO)
