@@ -31,7 +31,7 @@
 #include "sc.h"
 #include "polyedre.h"
 #include "union.h"
-#include "matrice.h"
+/*#include "matrice.h" Obsolete */
 #include "matrix.h"
 
 /* Pips includes 	*/
@@ -961,7 +961,8 @@ int prototype_dimension(pp, ind_l)
 Ppolynome pp;
 list ind_l;
 {
-  int dim, n, m, det_q, det_p;
+  int dim, n, m;
+  Value det_q, det_p;
   matrice mat_A, mat_Z, mat_P, mat_Q, mat_H;
   list li;
   Pbase base_L;
