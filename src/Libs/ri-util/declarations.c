@@ -3,6 +3,10 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.21  2003/05/21 08:05:07  irigoin
+ * text_entity_declaration(): size of integers taken into account. I'm not
+ * proud of the code, but I did not do any refactoring.
+ *
  * Revision 1.20  2002/06/21 13:42:10  irigoin
  * Improvements and bug fixes when prettyprinting DATA statements
  *
@@ -1134,9 +1138,14 @@ text_entity_declaration(
 {
   string how_common = get_string_property("PRETTYPRINT_COMMONS");
   bool print_commons = !same_string_p(how_common, "none");
-  list before = NIL, area_decl = NIL, ph = NIL,
-    pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, 
+  list before = NIL, area_decl = NIL,
+    pi1 = NIL, pi2 = NIL, pi4 = NIL, pi8 = NIL,
+    ph1 = NIL, ph2 = NIL, ph4 = NIL, ph8 = NIL,
+    pf4 = NIL, pf8 = NIL,
+    pl = NIL, 
     pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL;
+  list * ppi;
+  list * pph;
   text r, t_chars = make_text(NIL), t_area = make_text(NIL); 
   string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
   bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
@@ -1246,13 +1255,49 @@ text_entity_declaration(
 	    pips_debug(7, "is an integer\n");
 	    if (variable_dimensions(type_variable(te)))
 	      {
-		pi = CHAIN_SWORD(pi, pi==NIL ? "INTEGER " : ",");
-		pi = gen_nconc(pi, words_declaration(e, pp_dim)); 
+		string s;
+
+		switch (basic_int(b))
+		  {
+		  case 4: ppi = &pi4;
+		    s = "INTEGER ";
+		    break;
+		  case 2: ppi = &pi2;
+		    s = "INTEGER*2 ";
+		    break;
+		  case 8: ppi = &pi8;
+		    s = "INTEGER*8 ";
+		    break;
+		  case 1: ppi = &pi1;
+		    s = "INTEGER*1 ";
+		    break;
+		  default: pips_internal_error("Unexpected integer size");
+		  }
+		*ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : ",");
+		*ppi = gen_nconc(*ppi, words_declaration(e, pp_dim)); 
 	      }
 	    else
 	      {
-		ph = CHAIN_SWORD(ph, ph==NIL ? "INTEGER " : ",");
-		ph = gen_nconc(ph, words_declaration(e, pp_dim)); 
+		string s;
+
+		switch (basic_int(b))
+		  {
+		  case 4: pph = &ph4;
+		    s = "INTEGER ";
+		    break;
+		  case 2: pph = &ph2;
+		    s = "INTEGER*2 ";
+		    break;
+		  case 8: pph = &ph8;
+		    s = "INTEGER*8 ";
+		    break;
+		  case 1: pph = &ph1;
+		    s = "INTEGER*1 ";
+		    break;
+		  default: pips_internal_error("Unexpected integer size");
+		  }
+		*pph = CHAIN_SWORD(*pph, *pph==NIL ? s : ",");
+		*pph = gen_nconc(*pph, words_declaration(e, pp_dim)); 
 	      }
 	    break;
 	  case is_basic_float:
@@ -1364,10 +1409,22 @@ text_entity_declaration(
   MERGE_TEXTS(r, text_of_parameters(lparam));
   gen_free_list(lparam), lparam = NIL;
 
-  ADD_WORD_LIST_TO_TEXT(r, ph);
-  attach_declaration_type_to_words(ph, "INTEGER");
-  ADD_WORD_LIST_TO_TEXT(r, pi);
-  attach_declaration_type_to_words(pi, "INTEGER");
+  ADD_WORD_LIST_TO_TEXT(r, ph1);
+  attach_declaration_type_to_words(ph1, "INTEGER*1");
+  ADD_WORD_LIST_TO_TEXT(r, ph2);
+  attach_declaration_type_to_words(ph2, "INTEGER*2");
+  ADD_WORD_LIST_TO_TEXT(r, ph4);
+  attach_declaration_type_to_words(ph4, "INTEGER");
+  ADD_WORD_LIST_TO_TEXT(r, ph8);
+  attach_declaration_type_to_words(ph8, "INTEGER*8");
+  ADD_WORD_LIST_TO_TEXT(r, pi1);
+  attach_declaration_type_to_words(pi1, "INTEGER*1");
+  ADD_WORD_LIST_TO_TEXT(r, pi2);
+  attach_declaration_type_to_words(pi2, "INTEGER*2");
+  ADD_WORD_LIST_TO_TEXT(r, pi4);
+  attach_declaration_type_to_words(pi4, "INTEGER");
+  ADD_WORD_LIST_TO_TEXT(r, pi8);
+  attach_declaration_type_to_words(pi8, "INTEGER*8");
   ADD_WORD_LIST_TO_TEXT(r, pf4);
   attach_declaration_type_to_words(pf4, "REAL*4");
   ADD_WORD_LIST_TO_TEXT(r, pf8);
