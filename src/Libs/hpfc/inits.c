@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1995/10/05 11:32:31 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1995/12/19 15:52:35 $, )
  * version $Revision$,
  */
 
@@ -135,10 +135,10 @@ entity module;
     {
 	int an = load_hpf_number(array);
 	int nd = NumberOfDimension(array);
-	align al = load_entity_align(array);
+	align al = load_hpf_alignment(array);
 	entity template = align_template(al);
 	int tn = load_hpf_number(template);
-	distribute di = load_entity_distribute(template);
+	distribute di = load_hpf_distribution(template);
 	int i;
 	
 	/* NODIMA: Number Of  DIMensions of an Array
@@ -166,7 +166,7 @@ entity module;
 	    int lb = HpfcExpressionToInt(dimension_lower(d));
 	    int ub = HpfcExpressionToInt(dimension_upper(d));
 	    int sz = (ub-lb+1);
-	    tag decl = new_declaration(array, i);
+	    tag decl = new_declaration_tag(array, i);
 	    alignment a = FindAlignmentOfDim(align_alignment(al), i);
 	    
 	    /* RANGEA contents:
@@ -361,7 +361,7 @@ FILE* file;
     {
 	 int tn = load_hpf_number(template);
 	 int nd  = NumberOfDimension(template);
-	 distribute di = load_entity_distribute(template);
+	 distribute di = load_hpf_distribution(template);
 	 entity proc = distribute_processors(di);
 	 int pn = load_hpf_number(proc);
 	 int procdim = 1;
