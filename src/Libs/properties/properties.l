@@ -1,8 +1,9 @@
 %{
-/* $RCSfile: properties.l,v $ (version $Revision$)
- * $Date: 1997/09/08 13:42:10 $, 
+/*
+ * $Id$
  * 
- * - 01/96: PIPS_PROPERTIESRC added. FC.
+ * - 01/1996: PIPS_PROPERTIESRC added. FC.
+ * - 09/1997: save/load properties in database. FC.
  */
 
 /* The syntax of a property list. */
@@ -14,7 +15,7 @@
 #include "genC.h"
 #include "properties.h"
 #include "misc.h"
-#include "top-level.h"
+#include "constants.h"
 
 #define TTRUE	10
 #define TFALSE	11
@@ -22,6 +23,9 @@
 #define TNUMB	13
 #define TSTRING  14
 
+/* properties are stored in this hash table (string -> property)
+ * for fast accesses.
+ */
 static hash_table pl = (hash_table) NULL;
 
 #ifdef FLEX_SCANNER
@@ -76,9 +80,8 @@ FALSE			{return(TFALSE);}
 ^[ \t]*#.*$		;
 [ \t\n]*		;
 =			; /* ignore an = */
-.                       {fprintf(stderr, 
-			         "[read_properties] unknown char %c (%d)\n", 
-				 *yytext, *yytext);
+.                       { pips_internal_error("unexpected char %c (%d)\n",
+					      *yytext, *yytext);
 			 exit(1);
 			}
 %%
@@ -86,20 +89,44 @@ FALSE			{return(TFALSE);}
 int yywrap(void)
 { return 1;}
 
-static void parse_properties(void)
+static bool 
+property_equal_p(property p1, property p2)
+{
+    bool equal_p = (property_tag(p1)==property_tag(p2));
+
+    if(equal_p) {
+        switch(property_tag(p1)) {
+        case is_property_int:
+            equal_p = (property_int(p1)==property_int(p2));
+            break;
+        case is_property_bool:
+            equal_p = (property_bool(p1)==property_bool(p2));
+            break;
+        case is_property_string:
+            equal_p = (strcmp(property_string(p1),property_string(p2))==0);
+            break;
+        default:
+            pips_error("property_equal_p", "ill. tag %d\n", property_tag(p1));
+        }
+    }
+
+    return equal_p;
+}
+
+static void 
+parse_properties(void)
 {
     int tok;
     property pr;
     property opr;
     
+    if (!pl) pl = hash_table_make(hash_string, 0); /* lazy init */
+
     while ((tok = yylex())) {
 	string n;
 	
-	if (tok != TIDENT) {
-	    fprintf(stderr, 
-		    "[read_properties] syntax error in property file\n");
-	    exit(1);
-	}
+	if (tok != TIDENT)
+	    pips_internal_error("syntax error in property file\n");
 			  
 	n = strdup(yytext);
 
@@ -146,46 +173,32 @@ static void parse_properties(void)
     }
 }
 
-bool property_equal_p(property p1, property p2)
+static void
+parse_properties_file(FILE * fd)
 {
-    bool equal_p = (property_tag(p1)==property_tag(p2));
-
-    if(equal_p) {
-        switch(property_tag(p1)) {
-        case is_property_int:
-            equal_p = (property_int(p1)==property_int(p2));
-            break;
-        case is_property_bool:
-            equal_p = (property_bool(p1)==property_bool(p2));
-            break;
-        case is_property_string:
-            equal_p = (strcmp(property_string(p1),property_string(p2))==0);
-            break;
-        default:
-            pips_error("property_equal_p", "ill. tag %d\n", property_tag(p1));
-        }
-    }
-
-    return equal_p;
+    yyin = fd;
+    parse_properties();
+    yyin = (FILE*) NULL;
 }
 
-static void read_properties()
+static void 
+read_properties(void)
 {
     string rc;
 
     if (pl != (hash_table) NULL)
 	return;
-    else
-	pl = hash_table_make(hash_string, 0);
+    /* else */
+    pl = hash_table_make(hash_string, 0);
 
     /* ${PIPS_ROOT}/Share/properties.rc
      */
     rc = PROPERTIES_LIB_FILE;
     if ((yyin = fopen(rc, "r")) == NULL)
-	user_warning("read_properties",
-                   "no default properties (%s), check PIPS installation!\n", rc);
+	pips_user_warning("no default properties (%s), "
+			  "check PIPS installation!\n", rc);
     else {
-	parse_properties();
+	parse_properties_file(yyin);
 	fclose(yyin);
     }
     free(rc);
@@ -195,154 +208,153 @@ static void read_properties()
     rc = getenv("PIPS_PROPERTIESRC");
     if (rc)
     {
-	if ((yyin = fopen(rc, "r")) == NULL) {
-	    fprintf(stderr, "[read_properties] "
-            "no properties (%s), check Shell variable $PIPS_PROPERTIESRC\n", rc);
-            exit(1);
-        }
-	else {
-	    parse_properties();
-	    fclose(yyin);
-	}
+	if ((yyin = fopen(rc, "r")) == NULL)
+	    pips_internal_error("no properties (%s), "
+			"check Shell variable $PIPS_PROPERTIESRC\n", rc);
+	/* else */
+	parse_properties_file(yyin);
+	fclose(yyin);
     }
     
     /* ./properties.rc
      */
     if ((yyin = fopen(PROPERTIES_FILE, "r")) != NULL) {
-	parse_properties();
+	parse_properties_file(yyin);
 	fclose(yyin);
     }
 }
 
-property get_property(name)
-string name;
+static property
+get_property(string name)
 {
     property p;
-
-    if (pl == (hash_table) NULL)
-	read_properties();
-
-    if ((p=(property) hash_get(pl, name)) == (property)HASH_UNDEFINED_VALUE) {
-	fprintf(stderr, "[get_property] unknown property : %s\n", name);
-	exit(1);
-    }
-
-    return(p);
+    if (!pl) read_properties(); /* rather lazy... */
+    if ((p=(property) hash_get(pl, name)) == (property)HASH_UNDEFINED_VALUE) 
+	pips_internal_error("unknown property : %s\n", name);
+    return p;
 }
 
-bool get_bool_property(name)
-string name;
+bool 
+get_bool_property(string name)
 {
     property p = get_property(name);
-
-    if (! property_bool_p(p)) {
-	fprintf(stderr, "[get_bool_property] property %s is not bool\n", name);
-	exit(1);
-    }
-
+    if (! property_bool_p(p))
+	pips_internal_error("property %s is not bool\n", name);
     return(property_bool(p));
 }
 
-void set_bool_property(name, b)
-string name;
-bool b;
+void 
+set_bool_property(string name, bool b)
 {
     property p = get_property(name);
-
-    if (! property_bool_p(p)) {
-	fprintf(stderr, "[set_bool_property] property %s is not bool\n", name);
-	exit(1);
-    }
-
+    if (! property_bool_p(p))
+	pips_internal_error("property %s is not bool\n", name);
     property_bool(p) = b;
 }
 
-string get_string_property(name)
-string name;
+string 
+get_string_property(string name)
 {
     property p = get_property(name);
-
-    if (! property_string_p(p)) {
-	fprintf(stderr, "[get_string_property] property %s is not string\n", 
-		name);
-	exit(1);
-    }
-
-    return(property_string(p));
+    if (! property_string_p(p)) 
+	pips_internal_error("property %s is not string\n", name);
+    return property_string(p);
 }
 
-void set_string_property(name, s)
-string name;
-string s;
+void 
+set_string_property(string name, string s)
 {
     property p = get_property(name);
-
-    if (! property_string_p(p)) {
-	fprintf(stderr, "[get_string_property] property %s is not string\n", 
-		name);
-	exit(1);
-    }
-
+    if (! property_string_p(p))
+	pips_internal_error("property %s is not string\n", name);
     free(property_string(p));
     property_string(p) = strdup(s);
 }
 
-int get_int_property(name)
-string name;
+int 
+get_int_property(string name)
 {
     property p = get_property(name);
-
-    if (! property_int_p(p)) {
-	fprintf(stderr, "[get_int_property] property %s is not int\n", 
-		name);
-	exit(1);
-    }
-
-    return(property_int(p));
+    if (! property_int_p(p)) 
+	pips_internal_error("property %s is not int\n", name);
+    return property_int(p);
 }
 
-void set_int_property(name, i)
-string name;
-int i;
+void 
+set_int_property(string name, int i)
 {
     property p = get_property(name);
-
-    if (! property_int_p(p)) {
-	fprintf(stderr, "[get_int_property] property %s is not int\n", 
-		name);
-	exit(1);
-    }
-
+    if (! property_int_p(p)) 
+	pips_internal_error("property %s is not int\n", name);
     property_int(p) = i;
 }
 
-static string true( b )
-bool b ;
+void 
+fprint_property(FILE * fd, string pname)
 {
-    return( (b == TRUE) ? "TRUE" : "FALSE" ) ;
+    property p = get_property(pname);
+    switch (property_tag(p)) {
+    case is_property_bool: 
+	fprintf(fd, "%s %s\n", pname, property_bool(p)? "TRUE": "FALSE");
+	break;
+    case is_property_int:
+	fprintf(fd, "%s %d\n", pname, property_int(p));
+	break;
+    case is_property_string:
+	fprintf(fd, "%s \"%s\"\n", pname, property_string(p));
+	break;
+    default: 
+	fprintf(fd, "# bad property type for %s\n", pname);
+    }
 }
 
-void fprint_properties(fd)
-FILE *fd;
+void 
+fprint_properties(FILE * fd)
 {
-    if (pl == (hash_table) NULL)
-	read_properties();
+    if (pl) { /* dump all sorted properties in fd. */
+	int n = hash_table_entry_count(pl), i=0;
+	char ** array = (char**) malloc(sizeof(char*)*n);
+	fprintf(fd, "# PIPS PROPERTIES\n");
+	HASH_MAP(name, p, array[i++]=name, pl);
+	args_sort(n, array);
+	for (i=0; i<n; i++) fprint_property(fd, array[i]);
+	free(array);
+    } else fprintf(fd, "# NO PIPS PROPERTIES...\n");
+}
 
-    HASH_MAP(n, p, {
-	property pr = (property) p;
-	fprintf(fd, "%40.40s ", n);
-	if (property_bool_p(pr)) {
-	    fprintf(fd, "%s\n", true(property_bool(pr)));
-	}
-	else if (property_int_p(pr)) {
-	    fprintf(fd, "%d\n", property_int(pr));
-	}
-	else if (property_string_p(pr)) {
-	    fprintf(fd, "%s\n", property_string(pr));
-	}
-	else {
-	    fprintf(fd, "[fprint_properties] property %s : bad type\n", n); 
-	    abort();
-	}
-    }, pl);
+/******************************************************* TOP-LEVEL INTERFACE */
+
+extern string db_get_meta_data_directory(void); /* in pipsdbm */
+
+static string
+get_property_file_name(void)
+{
+    string dir_name = db_get_meta_data_directory(),
+	name = strdup(concatenate(dir_name, "/properties", 0));
+    free(dir_name); return name;
+}
+
+/* when opening a workspace, retrieve the properties.
+ */
+void
+open_properties(void)
+{
+    string file_name = get_property_file_name();
+    FILE * file = safe_fopen(file_name, "r");
+    if (pl) hash_table_free(pl), pl = (hash_table) NULL; /* lazy clean... */
+    parse_properties_file(file);
+    safe_fclose(file, file_name);
+    free(file_name);
+}
+
+/* on close, save the properties.
+ */
+void
+close_properties(void)
+{
+    string file_name = get_property_file_name();
+    FILE * file = safe_fopen(file_name, "w");
+    fprint_properties(file);
+    safe_fclose(file, file_name);
+    free(file_name);
 }
