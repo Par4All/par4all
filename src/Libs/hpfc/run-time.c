@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: run-time.c,v $
+ * Revision 1.38  1997/10/20 19:54:00  irigoin
+ * Calls to MakeExternalFunction() and make_empty_module() replaced.
+ *
  * Revision 1.37  1997/08/04 13:58:59  coelho
  * new generic effects includes.
  *
@@ -27,8 +30,6 @@
 #include "effects-simple.h"
 #include "effects-convex.h"
 
-extern entity MakeExternalFunction(entity e, type r);       /* idem */
-
 /* entity MakeRunTimeSupportSubroutine(local_name, number_of_arguments)
  *
  * modify 27/09/93, in order not to attempt to redeclare an already declared
@@ -38,11 +39,14 @@ entity MakeRunTimeSupportSubroutine(local_name, number_of_arguments)
 string local_name;
 int number_of_arguments;
 {
+    /*
     string full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
 				   MODULE_SEP_STRING, local_name, NULL);
     entity e = gen_find_tabulated(full_name, entity_domain);
 
-    return (e==entity_undefined) ? make_empty_module(full_name) : e;
+    return (e==entity_undefined) ? make_empty_subroutine(local_name) : e;
+    */
+    return make_empty_subroutine(local_name);
 }
 
 /* entity MakeRunTimeSupportFunction
@@ -51,16 +55,17 @@ int number_of_arguments;
  * this function can be used even if the function is already declared
  * ??? an integer shouldn't always be returned
  */
-entity MakeRunTimeSupportFunction(local_name, number_of_arguments, return_type)
+entity 
+MakeRunTimeSupportFunction(local_name, number_of_arguments, return_type)
 string local_name;
 int number_of_arguments;
 tag return_type;
 {
-    return MakeExternalFunction(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
-						   local_name),
-				(return_type==is_basic_int ? /* ??? rough */
-				 MakeIntegerResult() :
-				 MakeOverloadedResult()));
+    entity f = make_empty_function(local_name,
+				   (return_type==is_basic_int ? /* ??? rough */
+				    MakeIntegerResult() :
+				    MakeOverloadedResult()));
+    return f;				 MakeOverloadedResult()));
 }
 
 expression 
