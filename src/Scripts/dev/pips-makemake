@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/09/20 16:25:46 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/09/21 18:51:02 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -11,7 +11,7 @@
 #
 
 SCRIPT=`basename $0`
-USAGE="$SCRIPT [-h (HELP!)] [-l|p|s|r] [-D|P] [-c|a] (default -c)"
+USAGE="$SCRIPT [-h (HELP!)] [-l|p|s|r|i|n] [-D|P] [-c|a] (default -c)"
 
 MAKEFILE=Makefile
 CONFIG_FILE=config.makefile
@@ -22,7 +22,7 @@ help()
 	$USAGE
 	version $Revision$
 	Builds $MAKEFILE from $CONFIG_FILE for PIPS.
-	  -l|p|s|r: libraries|passes|scripts|runtime
+	  -l|p|s|r|i|n: libraries|passes|scripts|runtime|linear|newgen
 	  -D|P: for Development|Production directories
 	  -c|a: for the current|all directory(ies)
 	  -h: this help
@@ -33,6 +33,8 @@ help()
 	 - passes: TARGET_{CFILES,HEADERS,OBJECTS,LIBS}
 	 - scripts: SCRIPTS, FILES, SFILES, RFILES
 	 - runtime: SOURCES, INSTALL_{FILES,LIBS,EXE}
+	 - c3/linear: 
+	 - newgen:
 	Many default macros are defined and may be overwritten.
 	Many rules are also defined.
 	END_OF_HELP
@@ -45,25 +47,35 @@ usage()
   exit ${1:-1}
 }
 
+warning()
+{
+  echo "$SCRIPT: warning, $@" >&2 
+}
+
+#
+# what is to be done...
+
 DIRSIDE=''
 DIRTYPE=''
 DIRS='.'
 ALL=''
 ALL_RULE_TARGET=''
 
-while getopts lpsrDPcah opt
+while getopts lpsrinDPcah opt
 do
   case $opt in
-    l)	DIRTYPE='Lib' ;;
-    p)	DIRTYPE='Passes' ;;
-    s)  DIRTYPE='Scripts' ;;
-    r)  DIRTYPE='Runtime' ;;
-    D)	DIRSIDE="$PIPS_DEVEDIR" ;;
-    P)	DIRSIDE="$PIPS_SRCDIR" ;;
-    c)	DIRS='.';;
-    a)	ALL='1' ;;
-    h)  help ; exit 0 ;;
-    *)	usage 2 "invalid option ($opt)" ;;
+    l) DIRTYPE='Lib' ;;
+    p) DIRTYPE='Passes' ;;
+    s) DIRTYPE='Scripts' ;;
+    r) DIRTYPE='Runtime' ;;
+    i) DIRTYPE='Linear' ;;
+    n) DIRTYPE='Newgen' ;;
+    D) DIRSIDE="$PIPS_DEVEDIR" ;;
+    P) DIRSIDE="$PIPS_SRCDIR" ;;
+    c) DIRS='.';;
+    a) ALL='1' ;;
+    h) help ; exit 0 ;;
+    *) usage 2 "invalid option ($opt)" ;;
   esac
 done
 shift `expr $OPTIND - 1`
@@ -96,18 +108,29 @@ cd_dirname=`dirname $current_directory`
 # install_lib_dir for library files
 # install_exe_dir for executable files
 
+PART=PIPS
 install_file_dir='$(PIPS_INCLUDEDIR)'
 install_lib_dir='$(PIPS_LIBDIR)'
 install_exe_dir='$(PIPS_BINDIR)'
 
 case $DIRTYPE in
   Lib) ALL_RULE_TARGET='lib$(TARGET).a' ;;
-  Passes) ALL_RULE_TARGET='$(TARGET)' ;;
+  Passes)  ALL_RULE_TARGET='$(TARGET)' ;;
   Scripts) ALL_RULE_TARGET='.runable' ;
            install_file_dir='$(PIPS_UTILDIR)' ;
            install_lib_dir='$(PIPS_UTILDIR)' ;
            install_exe_dir='$(PIPS_UTILDIR)' ;;
   Runtime) ALL_RULE_TARGET='' ;
+           install_file_dir='$(PIPS_EXTEDIR)' ;
+           install_exe_dir='$(PIPS_EXTEDIR)' ;
+           install_lib_dir='$(PIPS_EXTEDIR)' ;;
+  Linear)  ALL_RULE_TARGET='' ;
+           PART=LINEAR ;
+           install_file_dir='$(PIPS_EXTEDIR)' ;
+           install_exe_dir='$(PIPS_EXTEDIR)' ;
+           install_lib_dir='$(PIPS_EXTEDIR)' ;;
+  Newgen)  ALL_RULE_TARGET='' ;
+           PART=NEWGEN ;
            install_file_dir='$(PIPS_EXTEDIR)' ;
            install_exe_dir='$(PIPS_EXTEDIR)' ;
            install_lib_dir='$(PIPS_EXTEDIR)' ;;
@@ -135,6 +158,8 @@ do
     mv $MAKEFILE $MAKEFILE.old;
   }
     
+  [ -f $CONFIG_FILE ] || warning "no local $CONFIG_FILE"
+
   cat >> $MAKEFILE <<%
 #	---------------------------------------------------------------
 #	---------------------------------------------------------------
@@ -176,24 +201,24 @@ INSTALL_EXE_DIR=  ${install_exe_dir}
 # (obsolete?)
 MAIN=		main
 #
-AR=             $(PIPS_AR)
-ARFLAGS=        $(PIPS_ARFLAGS)
-CC=             $(PIPS_CC)
-CFLAGS=         $(PIPS_CFLAGS)
-CPPFLAGS=       $(PIPS_CPPFLAGS)
-LD=             $(PIPS_LD)
-LDFLAGS=        $(PIPS_LDFLAGS)
-LEX=            $(PIPS_LEX)
-LFLAGS=         $(PIPS_LFLAGS)
-LINT=           $(PIPS_LINT)
-LINTFLAGS=      $(PIPS_LINTFLAGS)
-YACC=           $(PIPS_YACC)
-YFLAGS=         $(PIPS_YFLAGS)
-TAR=		$(PIPS_TAR)
-ZIP=		$(PIPS_ZIP)
-DIFF= 		$(PIPS_DIFF)
-M4=		$(PIPS_M4)
-PROTO=		$(PIPS_PROTOIZE)
+AR=             $(${PART}_AR)
+ARFLAGS=        $(${PART}_ARFLAGS)
+CC=             $(${PART}_CC)
+CFLAGS=         $(${PART}_CFLAGS)
+CPPFLAGS=       $(${PART}_CPPFLAGS)
+LD=             $(${PART}_LD)
+LDFLAGS=        $(${PART}_LDFLAGS)
+LEX=            $(${PART}_LEX)
+LFLAGS=         $(${PART}_LFLAGS)
+LINT=           $(${PART}_LINT)
+LINTFLAGS=      $(${PART}_LINTFLAGS)
+YACC=           $(${PART}_YACC)
+YFLAGS=         $(${PART}_YFLAGS)
+TAR=		$(${PART}_TAR)
+ZIP=		$(${PART}_ZIP)
+DIFF= 		$(${PART}_DIFF)
+M4=		$(${PART}_M4)
+PROTO=		$(${PART}_PROTOIZE)
 # 
 #
 CONFIG_FILE=	${CONFIG_FILE}
@@ -399,8 +424,11 @@ tar:
 
 quick-install: .quick-install
 
-$MAKEFILE:  $(PIPS_UTILDIR)/pips-makemake
-	@pips-makemake
+$MAKEFILE: .makefile
+
+.makefile:
+	-@[ -x $(PIPS_UTILDIR)/pips-makemake ] && $(PIPS_UTILDIR)/pips-makemake
+	touch .makefile
 
 count:
 	@wc -l $(SOURCES)
@@ -497,6 +525,8 @@ depend: $(INC_TARGET) $(MAKEFILE) .depend
 include $MAKEFILE.depend
 %
 
+touch .makefile
+
 ### generates the dependences...
 
 [ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] &&
@@ -504,6 +534,7 @@ include $MAKEFILE.depend
   touch $MAKEFILE.depend
   make -f $MAKEFILE depend
 }
+
 
 ### end good case
 
