@@ -45,7 +45,7 @@ error()
 {
     ret=$1 ; 
     shift ; 
-    echo "$RCSfile: install_pips,v $:" "$@" >&2 ; 
+    echo "[install_pips]:" "$@" >&2 ; 
     exit $ret ; 
 }
 
@@ -53,7 +53,7 @@ error()
 question()
 {
     echo
-    $echon "$RCSfile: install_pips,v $:" "$@" "(y/n) [y]: "
+    $echon "[install_pips]:" "$@" "(y/n) [y]: "
     read answer
     if [ ${answer:-y} = n ]
     then
