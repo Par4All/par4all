@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/03/20 20:32:34 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/03/21 08:51:31 $, )
  * version $Revision$
  *
  * Compiler
@@ -114,13 +114,13 @@ hpf_compile_call(
 {
     call c = instruction_call(statement_instruction(stat));
 
-    pips_assert("call", instruction_call_p(statement_instruction(stat)));
-
-    pips_debug(7, "function %s\n", entity_name(call_function(c)));
-
     /* IO functions should be detected earlier, in hpf_compiler
      */
     pips_assert("not an io call", !IO_CALL_P(c));
+    pips_assert("call", instruction_call_p(statement_instruction(stat)));
+    pips_debug(7, "function %s\n", entity_name(call_function(c)));
+
+    DEBUG_STAT(9, "statement", stat);
 
     /* no reference to distributed arrays...
      * the call is just translated into local objects.
