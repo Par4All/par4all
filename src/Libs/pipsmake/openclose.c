@@ -79,7 +79,7 @@ make_close_workspace(void)
     name = strdup(db_get_current_workspace_name()); 
 
     res &= close_makefile(name);
-    close_properties();
+    save_properties();
     res &= db_close_workspace();
 
     if(res)
@@ -105,9 +105,7 @@ checkpoint_workspace(void)
 	pips_debug(3, "\tsaving resources...\n");
 	db_checkpoint_workspace();
 	pips_debug(3, "\tproperties and makefile...\n");
-	close_properties();
-	open_properties();
-	close_makefile();
-	open_makefile();
+	save_properties();
+	save_makefile();
     }
 }
