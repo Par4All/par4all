@@ -3,6 +3,9 @@
 !
 ! $Id$
 ! $Log: hpfc_packing.m4f,v $
+! Revision 1.18  1997/06/09 14:01:43  zory
+! include hpfc_commons_pvm (temporary)
+!
 ! Revision 1.17  1997/05/29 15:48:06  zory
 ! *** empty log message ***
 !
@@ -41,7 +44,7 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_SECTION')
       TYPE
      $ array(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
-      include "hpfc_commons.h"
+      include "hpfc_commons_pvm.h"
       integer info, nitem
       integer COMMA_REPLICATE(LEVEL, `INDEX_REF')
       i1=rl1
