@@ -6,7 +6,6 @@
 #include <sys/resource.h>
 #include <xview/xview.h>
 #include <xview/panel.h>
-#include <xview/text.h>
 #include <xview/svrimage.h>
 
 #include "genC.h"
@@ -28,12 +27,6 @@
 #include "wpips.h"
 #include "xv_sizes.h"
 
-/*
-extern void(* pips_error_handler)();
-extern void(* pips_warning_handler)();
-extern void(* pips_log_handler)(char * fmt, va_list args);
-extern void(* pips_update_props_handler)();
-*/
 /* If we are in the Emacs mode, the log_frame is no longer really used: */
 Frame main_frame, 
     schoose_frame, 
@@ -51,31 +44,33 @@ Panel main_panel,
     schoose_panel,
     help_panel;
 
-void
+void static
 create_menus()
 {
-    create_select_menu();
-    create_edit_menu();
+   create_select_menu();
+   create_edit_menu();
 /*    create_analyze_menu();*/
-    create_transform_menu();
-    create_compile_menu();
-    /* The option panel use the definition of the edit menu and so
-       needs to be create after it: */
-    create_options_menu_and_window();
-    /* Gone in create_menus_end():
-       create_help_menu(); */
-    /* In the Emacs mode, no XView log window: */
-    /* In fact, create it but disabled to keep the same frame layout: */
-    create_log_menu();
-    create_quit_button();
+   create_transform_menu();
+   create_compile_menu();
+   /* The option panel use the definition of the edit menu and so
+      needs to be create after it: */
+   create_options_menu_and_window();
+   /* Gone in create_menus_end(): ...No ! */
+   create_help_menu(); 
+   /* In the Emacs mode, no XView log window: */
+   /* In fact, create it but disabled to keep the same frame layout: */
+   create_log_menu();
+   create_quit_button();
 }
 
 
-void
+/*
+void static
 create_menus_end()
 {
    create_help_menu();
 }
+*/
 
 
 static int first_mapping = TRUE;
@@ -93,7 +88,8 @@ Event *event;
 }
 
 
-void create_main_window()
+void
+create_main_window()
 {
     /* Xv_window main_window; */
 
@@ -200,9 +196,30 @@ char *argv[];
     }
 }
 
-int main(argc,argv)
-int argc;
-char *argv[];
+
+/* Try to inform the user about an XView error. For debug, use the
+   WPIPS_DEBUG_LEVEL to have an abort on this kind
+   of error. */
+int static
+wpips_xview_error(Xv_object object,
+                  Attr_avlist avlist)
+{
+   debug_on("WPIPS_DEBUG_LEVEL");
+
+   fprintf(stderr, "wpips_xview_error caught an error:\n%s\n",
+           xv_error_format(object, avlist));
+   /* Cannot use pips_assert since it uses XView, neither
+      get_bool_property for the same reason: */
+   assert(get_debug_level() < 1);
+   debug_off();
+   
+   return XV_OK;
+}
+
+
+int
+main(int argc,
+     char * argv[])
 {
    pips_warning_handler = wpips_user_warning;
    pips_error_handler = wpips_user_error;
@@ -220,7 +237,7 @@ char *argv[];
    /* we parse command line arguments */
    /* XV_ERROR_PROC unset as we shifted to xview.3, Apr. 92 */
    xv_init(XV_INIT_ARGC_PTR_ARGV, &argc, argv, 
-           /* XV_ERROR_PROC, xview_error_recovery, */
+           XV_ERROR_PROC, wpips_xview_error,
            0);
 
    /* we parse remaining command line arguments */
@@ -252,7 +269,7 @@ char *argv[];
 
    create_status_subwindow();
 
-   create_menus_end();
+   /* create_menus_end(); */
 
    create_icons();
    /*    create_icon();*/
@@ -266,6 +283,7 @@ char *argv[];
    display_memory_usage();
 
    enable_workspace_create_or_open();
+   enable_change_directory();
    disable_workspace_close();
    disable_module_selection();
    disable_view_selection();
