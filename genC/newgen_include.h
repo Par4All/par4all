@@ -229,5 +229,5 @@ extern int zzparse();
 extern int xxparse();
 extern void print_domain();
 /* FI: for list.c */
-extern void shared_pointers();
-extern void gen_free_with_sharing();
+/* extern void shared_pointers(); */
+/* extern void gen_free_with_sharing(); */
