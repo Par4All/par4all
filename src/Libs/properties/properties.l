@@ -194,7 +194,6 @@ parse_properties_file(FILE * fd)
 {
     yyrestart(fd);
     parse_properties();
-    yyin = (FILE*) NULL;
 }
 
 static void 
@@ -216,7 +215,7 @@ read_properties(void)
 		"check PIPS installation!\n", rc);
     } else {
 	parse_properties_file(yyin);
-	fclose(yyin);
+	fclose(yyin), yyin = (FILE*) NULL;
     }
     free(rc);
 
@@ -230,14 +229,14 @@ read_properties(void)
 		    "check Shell variable $PIPS_PROPERTIESRC\n", rc);
 	/* else */
 	parse_properties_file(yyin);
-	fclose(yyin);
+	fclose(yyin), yyin = (FILE*) NULL;
     }
     
     /* ./properties.rc
      */
     if ((yyin = fopen(PROPERTIES_FILE, "r")) != NULL) {
 	parse_properties_file(yyin);
-	fclose(yyin);
+	fclose(yyin), yyin = (FILE*) NULL;
     }
 }
 
