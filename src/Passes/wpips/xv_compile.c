@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/23 15:36:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/27 16:52:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/10/23 15:36:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/11/27 16:52:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -54,19 +54,14 @@ void
 notify_hpfc_file_view(Menu menu,
                       Menu_item menu_item)
 {
-   int window_number;
    char * file_name = (char *) xv_get(menu_item, MENU_STRING);
    char * path_name = hpfc_generate_path_name_of_file_name(file_name);
     
-   /* Is there an available edit_textsw ? */
-   if ( (window_number = alloc_first_initialized_window())
-        == NO_TEXTSW_AVAILABLE ) {
-      prompt_user("None of the text-windows is available");
-      return;
-   }
-
+   /* Try to allocate an available edit_textsw in non-emacs mode: */
+   (void) alloc_first_initialized_window(FALSE);
+   
+   wpips_file_view(path_name, file_name, "HPFC File", -1, "HPFC");
    user_log("HPFC View of \"%s\" done.\n", file_name);
-   wpips_file_view(path_name, file_name, "HPFC File", window_number, -1, "HPFC");
 }
 
 
@@ -188,7 +183,13 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
 
 /* quick fix around pipsmake, FC, 23/10/95
  */
-static bool hpfc_install_was_performed = FALSE;
+static bool wpips_hpfc_install_was_performed_hack = FALSE;
+
+void 
+initialize_wpips_hpfc_hack_for_fabien_and_from_fabien()
+{
+   wpips_hpfc_install_was_performed_hack = FALSE;
+}
 
 void
 hpfc_notify(Menu menu,
@@ -206,14 +207,14 @@ hpfc_notify(Menu menu,
     label = (char *) xv_get(menu_item, MENU_STRING);
 
     /* I apply the installation only once, whatever...
-     * Quick fix because the the right dependences expressed for pipsmake
+     * Quick fix because the right dependences expressed for pipsmake
      * do not seem to work. It seems that the verification of up to date 
      * resources is too clever... FC.
      */
-    if (!hpfc_install_was_performed)
+    if (!wpips_hpfc_install_was_performed_hack)
     {
-	safe_apply_outside_the_notifyer(BUILDER_HPFC_INSTALL, modulename);
-	hpfc_install_was_performed = TRUE;
+	safe_apply(BUILDER_HPFC_INSTALL, modulename);
+	wpips_hpfc_install_was_performed_hack = TRUE;
     }
 
     if (same_string_p(label, HPFC_COMPILE))
@@ -237,9 +238,8 @@ create_compile_menu()
                 MENU_ACTION_ITEM, HPFC_COMPILE, hpfc_notify,
 		MENU_ACTION_ITEM, HPFC_MAKE, hpfc_notify,
 		MENU_ACTION_ITEM, HPFC_RUN, hpfc_notify,
-                /*
-                MENU_ACTION_ITEM, "Display an HPF program", display_hpfc_file,
-                */
+                                /* Just a separator: */
+                WPIPS_MENU_SEPARATOR,
                 MENU_GEN_PULLRIGHT_ITEM,
                 "View the HPF Compiler Output",
                 generate_a_menu_with_HPF_output_files,
