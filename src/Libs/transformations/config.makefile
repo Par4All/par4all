@@ -10,6 +10,7 @@ LIB_CFILES =	replace.c \
 		partial_eval.c \
 		prettyprintcray.c \
 		strip_mine.c \
+		interactive_loop_transformation.c \
 		loop_interchange.c \
 		interchange.c \
 		target.c \
