@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.151  2003/06/20 08:49:46  coelho
+# use make instead of default gmake
+#
 # Revision 1.150  2002/04/23 09:34:12  coelho
 # hop.
 #
@@ -335,6 +338,8 @@ test ${uname_s} = Linux && \
 test ${uname_s} = Linux && \
 	PIPS_FLINT="g77 -c -Wall -Wimplicit"
 
+test ${uname_s} = Linux && \
+	PIPS_MAKE="make"
 
 
 #
