@@ -112,7 +112,10 @@ Variable v;
     boolean non_equivalent_projections = FALSE;
     int nb_pos=0;
     int nb_neg = 0;
+    int i1,dim = sc->nb_ineq;
+    boolean ineg_stay[dim+1];
 
+    for (i1 =1; i1<=dim; ineg_stay[i1]=TRUE, i1++);
     if (!SC_UNDEFINED_P(sc)) {
 	inegs=sc->inegalites;
 	scd = sc_dup(sc);
@@ -124,25 +127,23 @@ Variable v;
 
     constraint_sort(inegs,v,&rtri,&nb_pos,&nb_neg);
 
+
     /* pour chaque inegalite ou v a un coeff. positif et chaque 
        inegalite ou v a un coefficient negatif, faire une combinaison       */
 
     for( posit=rtri.pos; posit!=NULL; ) {
 	boolean integer_comb_p = TRUE; 
 	non_equivalent_projections = FALSE;
-	for( negat=rtri.neg; negat!=NULL; ) {
+	for( negat=rtri.neg, i1=1; negat!=NULL; i1++) {
 	   
 	    ineg = sc_integer_inequalities_combination_ofl_ctrl(sci, 
 								posit, negat, 
 								v,
 								&integer_comb_p,
 								OFL_CTRL);
-	    if(!integer_comb_p) {
-		vect_rm(ineg->vecteur);
-		ineg->vecteur = vect_dup(negat->vecteur);
-		non_equivalent_projections = TRUE;
-	    }
-	    
+	    ineg_stay[i1] = ineg_stay[i1] && integer_comb_p;
+ 
+	  
 	    if (contrainte_constante_p(ineg)) {
 		if (contrainte_verifiee(ineg,FALSE)) {
 		    vect_rm(ineg->vecteur);
@@ -163,7 +164,13 @@ Variable v;
 		    /* systeme non faisable */
 		}
 	    }
-	    else {
+	    else {  
+		if(!integer_comb_p) {
+		    vect_rm(ineg->vecteur);
+		    ineg->vecteur = vect_dup(negat->vecteur);
+		    non_equivalent_projections = TRUE;
+		}
+	    
 		ineg->succ = rtri.cnul;
 		rtri.cnul = ineg;
 		/* combinaison simple reussie => 1ineg en + */
@@ -179,6 +186,13 @@ Variable v;
 
 	if (posit) posit = posit->succ;
 
+    }
+    for( negat=rtri.neg, i1=1; negat!=NULL; negat=negat->succ, i1++) {
+	if (!ineg_stay[i1]) { 
+	    ineg = contrainte_dup(negat);
+	    ineg->succ = rtri.cnul;
+	    rtri.cnul = ineg;
+	}
     }
     contraintes_free(rtri.pos);
     contraintes_free(rtri.neg);
