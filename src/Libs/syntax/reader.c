@@ -917,7 +917,8 @@ int NeedKeyword()
 	}
     }
 
-    FatalError("NeedKeyword", "[scanner] keyword expected\n");
+    /* FatalError("NeedKeyword", "[scanner] keyword expected\n"); */
+    ParserError("NeedKeyword", "[scanner] keyword expected\n");
 
     return(-1); /* just to avoid a gcc warning */
 		  
