@@ -466,8 +466,6 @@ use_def_elimination(char * module_name)
 {
    statement module_statement;
 
-   debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
-
    /* Get the true ressource, not a copy. */
    module_statement =
       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
@@ -496,6 +494,10 @@ use_def_elimination(char * module_name)
 
    set_current_module_statement(module_statement);
    set_current_module_entity(local_name_to_top_level_entity(module_name));
+
+   initialize_ordering_to_statement(module_statement);
+
+   debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
 
    use_def_elimination_on_a_statement(module_statement);
 
