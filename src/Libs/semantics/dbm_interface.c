@@ -23,6 +23,9 @@
 /* $Id$
  * 
  * $Log: dbm_interface.c,v $
+ * Revision 1.41  2001/12/05 17:13:19  irigoin
+ * Numerous additions to compute total preconditions
+ *
  * Revision 1.40  2001/10/22 16:22:38  irigoin
  * refine_transformers() added
  *
@@ -67,9 +70,9 @@
 
 DEFINE_CURRENT_MAPPING(transformer, transformer)
 DEFINE_CURRENT_MAPPING(precondition, transformer)
-/* DEFINE_CURRENT_MAPPING(proper_effects, list)         a mettre dans les effects  */
-/* DEFINE_CURRENT_MAPPING(cumulated_effects, list)     idem  */
+DEFINE_CURRENT_MAPPING(total_precondition, transformer)
 
+
 transformer (* transformer_fix_point_operator)(transformer);
 
 static void
@@ -101,7 +104,7 @@ select_fix_point_operator()
     }
     */
 }
-
+
 static void add_declaration_information(transformer pre, entity m, bool precondition_p)
 {
   list decls = code_declarations(value_code(entity_initial(m)));
@@ -159,7 +162,7 @@ static void precondition_add_declaration_information(transformer pre, entity m)
 {
   add_declaration_information(pre, m, TRUE);
 }
-
+
 /* Functions to make transformers */
 
 bool transformers_intra_fast(char * module_name)
@@ -228,7 +231,7 @@ bool summary_transformer(char * module_name)
   pips_debug(1, "considering module %s\n", module_name);
   return TRUE;
 }
-
+
 bool preconditions_intra(char * module_name)
 {
     /* nothing to do: transformers are preconditions for this
@@ -270,45 +273,69 @@ bool preconditions_inter_full(char * module_name)
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_preconditions(module_name);
 }
+
+bool total_preconditions_intra(char * module_name)
+{
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    select_fix_point_operator();
+    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
+    return module_name_to_total_preconditions(module_name);
+}
 
+bool total_preconditions_inter(char * module_name)
+{
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    select_fix_point_operator();
+    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
+    return module_name_to_total_preconditions(module_name);
+}
 
+
 bool old_summary_precondition(char * module_name)
 {
-    /* do not nothing because it has been computed by side effects;
-     * or provide an empty precondition for root modules;
-     * maybe a touch to look nicer? 
-     */
+  /* do not nothing because it has been computed by side effects;
+   * or provide an empty precondition for root modules;
+   * maybe a touch to look nicer? 
+   */
 
-    transformer t;
+  transformer t;
 
-    debug_on(SEMANTICS_DEBUG_LEVEL);
+  debug_on(SEMANTICS_DEBUG_LEVEL);
 
-    debug(8, "summary_precondition", "begin\n");
+  debug(8, "summary_precondition", "begin\n");
 
-    if(db_resource_p(DBR_SUMMARY_PRECONDITION, module_name)) {
-	/* touch it */
-	t = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION,
-						      module_name,
-						      TRUE);
-    }
-    else {
-	t = transformer_identity();
-    }
+  if(db_resource_p(DBR_SUMMARY_PRECONDITION, module_name)) {
+    /* touch it */
+    t = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION,
+					     module_name,
+					     TRUE);
+  }
+  else {
+    t = transformer_identity();
+  }
 
-    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
-			   module_name, (char * )t);
+  DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
+			 module_name, (char * )t);
 
-    ifdebug(8) {
-	debug(8, "summary_precondition", 
-	      "initial summary precondition %x for %s:\n",
-	      t, module_name);
-	dump_transformer(t);
-	debug(8, "summary_precondition", "end\n");
-    }
+  ifdebug(8) {
+    debug(8, "summary_precondition", 
+	  "initial summary precondition %x for %s:\n",
+	  t, module_name);
+    dump_transformer(t);
+    debug(8, "summary_precondition", "end\n");
+  }
 
-    debug_off();
+  debug_off();
 
-    return TRUE;
+  return TRUE;
 }
 
 bool summary_precondition(char * module_name)
@@ -412,8 +439,109 @@ bool summary_precondition(char * module_name)
   return TRUE;
 }
 
+bool summary_total_postcondition(char * module_name)
+{
+  /* Look for all call sites in the callers
+   */
+  callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
+						     module_name,
+						     TRUE);
+  entity callee = local_name_to_top_level_entity(module_name);
+  /* transformer t = transformer_identity(); */
+  transformer t = transformer_undefined;
+
+  debug_on(SEMANTICS_DEBUG_LEVEL);
+
+  pips_assert("Not implemented yet", FALSE);
+
+  set_current_module_entity(callee);
+
+  ifdebug(1) {
+    debug(1, "summary_precondition", "begin for %s with %d callers\n",
+	  module_name,
+	  gen_length(callees_callees(callers)));
+    MAP(STRING, caller_name, {
+      (void) fprintf(stderr, "%s, ", caller_name);
+    }, callees_callees(callers));
+    (void) fprintf(stderr, "\n");
+  }
+
+  reset_call_site_number();
+
+  MAP(STRING, caller_name, 
+  {
+    entity caller = local_name_to_top_level_entity(caller_name);
+    t = update_precondition_with_call_site_preconditions(t, caller, callee);
+  }, callees_callees(callers));
+
+  if (!callees_callees(callers) && 
+      !entity_main_module_p(callee) && 
+      some_main_entity_p())
+    {
+      /* no callers => empty precondition (but the main). 
+	 FC. 08/01/1999.
+      */
+      pips_user_warning("empty precondition to %s "
+			"because not in call tree from main.\n", module_name);
+      t = transformer_empty();
+    } else if (transformer_undefined_p(t)) {
+      t = transformer_identity();
+    } else {
+      /* try to eliminate (some) redundancy at a reasonnable cost */
+      /* t = transformer_normalize(t, 2); */
+
+      /* what cost? */
+      t = transformer_normalize(t, 7);
+    }
+
+  /* Add declaration information: arrays cannot be empty (Fortran
+   * standard, Section 5.1.2)
+   *
+   * It does not seem to be a good idea for the semantics of
+   * SUMMARY_PRECONDITION. It seems better to have this information in the
+   * summary transformer as an input validity condition.
+   *
+   */
+  if(FALSE && get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
+    set_current_module_statement(
+				 (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
+    set_cumulated_rw_effects((statement_effects) 
+			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+    module_to_value_mappings( get_current_module_entity() );
+    transformer_add_declaration_information(t,
+					    get_current_module_entity());
+    reset_cumulated_rw_effects();
+    reset_current_module_statement();
+    free_value_mappings();
+  }
+
+  DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_TOTAL_POSTCONDITION, 
+			 module_name, (char * )t);
+
+  ifdebug(1) {
+    pips_debug(1,
+	       "summary total postcondition %p for %s (%d call sites):\n",
+	       t, module_name, get_call_site_number());
+    dump_transformer(t);
+    pips_debug(1, "end for module %s\n", module_name);
+  }
+
+  reset_current_module_entity();
+  debug_off();
+
+  return TRUE;
+}
+
+bool summary_total_precondition(char * module_name)
+{
+    /* there is a choice: do nothing and leave the effective computation
+       in module_name_to_total_preconditions or move it here */
+  pips_debug(1, "considering module %s\n", module_name);
+  return TRUE;
+}
 
 
+
 /* resource module_name_to_transformers(char * module_name):
  * compute a transformer for each statement of a module with a given
  * name; compute also the global transformer for the module
@@ -524,6 +652,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
 
     return TRUE;
 }
+
 bool module_name_to_transformers_in_context(char *module_name)
 {
   bool rc = FALSE;
@@ -541,13 +670,14 @@ bool module_name_to_transformers_in_context(char *module_name)
   set_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT", save_prop);
   return rc;
 }
+
 bool module_name_to_transformers(char *module_name)
 {
   bool rc = FALSE;
   rc = generic_module_name_to_transformers(module_name, FALSE);
   return rc;
 }
-
+
 /* resource module_name_to_preconditions(char * module_name):
  * compute a transformer for each statement of a module with a given
  * name; compute also the global transformer for the module
@@ -686,6 +816,11 @@ bool module_name_to_preconditions(char *module_name)
 	    /* memory leak: the old pre should be freed */
 	}
     }
+    else {
+      DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
+			   module_name, 
+			   (char*) transformer_dup(pre) );
+    }
 
     /* Add declaration information: arrays cannot be empty (Fortran
        standard, Section 5.1.2) */
@@ -727,8 +862,130 @@ bool module_name_to_preconditions(char *module_name)
 
     return TRUE;
 }
+
+bool module_name_to_total_preconditions(char *module_name)
+{
+  transformer t_inter = transformer_undefined;
+  transformer t_pre = transformer_undefined;
+  transformer t_pre_inter = transformer_undefined;
+  transformer t_post = transformer_undefined;
+  list e_inter = list_undefined;
+
+  debug_on(SEMANTICS_DEBUG_LEVEL);
+
+  set_current_module_entity( local_name_to_top_level_entity(module_name) );
+  set_current_module_statement( 
+			       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
+  if(get_current_module_statement() == (statement) database_undefined)
+    pips_error("module_name_to_preconditions",
+	       "no statement for module %s\n", module_name);
+
+  set_proper_rw_effects((statement_effects) 
+			db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+
+  set_cumulated_rw_effects((statement_effects) 
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+
+  e_inter = effects_to_list((effects)
+			    db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
+
+  set_transformer_map( (statement_mapping) 
+		       db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE));
+
+  set_precondition_map( (statement_mapping) 
+		       db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE));
 
 
+  t_inter = (transformer) 
+    db_get_memory_resource(DBR_SUMMARY_TRANSFORMER, module_name, TRUE);
+
+  set_total_precondition_map( MAKE_STATEMENT_MAPPING() );  
+
+  module_to_value_mappings( get_current_module_entity() );
+
+  /* set the list of global values */
+  set_module_global_arguments(transformer_arguments(t_inter));
+
+  if(entity_main_module_p(get_current_module_entity())) {
+    /* The program postcondition should be used DBR_PROGRAM_POSTCONDITION */
+    t_post = transformer_identity();
+  }
+    
+  ifdebug(3) {
+    pips_debug(1, "considering final total postcondition for %s\n", module_name);
+    print_transformer(t_post);
+  }
+
+  if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+    transformer ip = 
+      load_summary_total_postcondition(get_current_module_entity());
+    if( ip == transformer_undefined) {
+      /* that might be because we are at the call tree root
+	 or because no information is available;
+	 maybe, every module precondition should be initialized
+	 to a neutral value? */
+      pips_user_warning("no interprocedural module total postcondition for %s\n",
+			entity_local_name(get_current_module_entity() ));
+      ;
+    }
+    else {
+      translate_global_values(get_current_module_entity(), ip);
+      ifdebug(8) {
+	pips_debug(8, "\t summary_total_postcondition %p after translation:\n",
+		   ip);
+	print_transformer(ip);
+	pips_assert("The summary total postcondition is consistent",
+		    transformer_consistency_p(ip));
+      }
+      t_post = transformer_combine(transformer_dup(ip), t_post);
+    }
+  }
+  else if(transformer_undefined_p(t_post)) {
+    /* intra-procedural case, not a main module */
+    t_post = transformer_identity();
+  }
+
+  /* propagate the module total postcondition */
+  init_reachable(get_current_module_statement());
+  t_pre = statement_to_total_precondition(t_post, get_current_module_statement() );
+  close_reachable();
+
+  DB_PUT_MEMORY_RESOURCE(DBR_TOTAL_PRECONDITIONS, 
+			 module_name, 
+			 (char*) get_total_precondition_map() );
+
+  /* filter out local variables from the global intraprocedural effect */
+  t_pre_inter = transformer_intra_to_inter(t_pre, e_inter);
+  t_pre_inter = transformer_normalize(t_pre_inter, 2);
+  if(!transformer_consistency_p(t_pre_inter)) {
+    (void) print_transformer(t_pre_inter);
+    pips_internal_error("Non-consistent summary transformer\n");
+  }
+  DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_TOTAL_PRECONDITION, 
+			 module_local_name(get_current_module_entity()), 
+			 (char*) t_pre_inter);
+
+  pips_debug(8, "total precondition computed for %s\n", 
+	     entity_local_name( get_current_module_entity() ));
+  ifdebug(8) (void) print_transformer(t_pre);
+  pips_debug(1, "end\n");
+
+  reset_current_module_entity();
+  reset_current_module_statement();
+  reset_transformer_map();
+  reset_precondition_map();
+  reset_total_precondition_map();
+  reset_proper_rw_effects();
+  reset_cumulated_rw_effects();
+
+  free_value_mappings();
+
+  debug_off();
+
+  return TRUE;
+}
+
+
 transformer load_summary_transformer(entity e)
 {
     /* FI: I had to add a guard db_resource_p() on Nov. 14, 1995.
@@ -768,7 +1025,7 @@ transformer load_summary_transformer(entity e)
     return t;
 }
 
-
+
 /* void update_summary_precondition(e, t): t is supposed to be a precondition
  * related to one of e's call sites and translated into e's basis; 
  *
@@ -815,7 +1072,7 @@ void update_summary_precondition(entity e, transformer t)
 	debug(8, "update_summary_precondition", "end\n");
     }
 }
-
+
 /* summary_preconditions are expressed in any possible frame, in fact the frame of
  * the last procedure that used/produced it
  */
@@ -844,7 +1101,35 @@ transformer load_summary_precondition(entity e)
 
     return t;
 }
+
+/* summary_preconditions are expressed in any possible frame, in fact the frame of
+ * the last procedure that used/produced it
+ */
+transformer load_summary_total_postcondition(entity e)
+{
+    transformer t_post = transformer_undefined;;
 
+    pips_assert("e is a module", entity_module_p(e));
+
+    debug(8, "load_summary_precondition", "begin\n for %s\n", 
+	  module_local_name(e));
+
+    t_post = (transformer) 
+	db_get_memory_resource(DBR_SUMMARY_TOTAL_POSTCONDITION, module_local_name(e), 
+			       TRUE);
+
+    pips_assert("t is defined", t_post != transformer_undefined);
+    
+    ifdebug(8) {
+	pips_debug(8, " total postcondition for %s:\n",
+	      module_local_name(e));
+	dump_transformer(t_post);
+	pips_debug(8, " end\n");
+    }
+
+    return t_post;
+}
+
 
 list load_summary_effects(entity e)
 {
@@ -862,7 +1147,7 @@ list load_summary_effects(entity e)
     return t;
 }
 
-
+
 list load_module_intraprocedural_effects(entity e)
 {
     /* memoization could be used to improve efficiency */
