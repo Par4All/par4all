@@ -383,6 +383,7 @@ text my_get_text_proper_effects(string module_name)
 
 static void call_rwt(call c)
 {
+  entity e_filter = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, "KMAX");
   entity e_callee = call_function(c);
   string callee_name = module_local_name(e_callee);
 
