@@ -1,12 +1,41 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/10/19 11:52:55 $, )
+# ($Date: 1996/10/24 11:49:01 $, )
 #
 # This is the initial makefile for HPFC compilation
-# a TARGET entry is expected somewhere...
+# a TARGET macro is expected somewhere...
 # Makefile for PVM and HPFC, Fabien COELHO, 08/06/94
 
 SHELL=/bin/sh
+
+# default target
+help:
+	#
+	# SOME HELP!
+	#
+	# NOTE: this make file should be run with GNU make (gmake)
+	#
+	# Possible targets of high interest: out main install run
+	#
+	# COMPILATION and INSTALLATION
+	#
+	#   out: generates $(TARGET)_out sequential executable 
+	#   main: generates $(TARGET)_main paralle PVM executable 
+	#     (one SPMD executable which insures both I/O and computations)
+	#   install: insures that $(TARGET)_main is copied in the PVM directory
+	#   hostnode: generates $(TARGET)_{host,node} PVM executables
+	#     (two executables, one for I/Os and a SPMD one for the nodes)
+	#
+	# OTHERS
+	#
+	#   diff: compares sequential and parallel stdouts!
+	#   clean: removes deducable files
+	#   reset: reset pvm
+	#   install_{main,hostnode}: 
+	#     copies executables to the pvm directory (where spawn find them)
+	#            
+	#
+
 PVM=pvm
 
 ifndef PIPS_ARCH
@@ -21,9 +50,6 @@ RT_ARCH=$(PVM_ARCH)
 else
 RT_ARCH=$(PVM_ARCH)-$(PIPS_ARCH)
 endif
-
-# default target
-all:
 
 ifdef HPFC_RUNTIME
 RT_DIR=	$(HPFC_RUNTIME)
@@ -203,9 +229,7 @@ reset:
 # Installation to run
 
 $(pvmbin):; mkdir -p $(pvmbin)
-
-$(pvmbin)/%: % $(pvmbin)
-	$(COPY) $< $@
+$(pvmbin)/%: % $(pvmbin); $(COPY) $< $@
 
 hostnode: host node
 host: $(pvmbin)/$(HOST) 
@@ -213,15 +237,18 @@ node: $(pvmbin)/$(NODE)
 main: $(pvmbin)/$(MAIN)
 out: $(RTEST)
 
-install: $(pvmbin)/$(HOST) $(pvmbin)/$(NODE) $(pvmbin)/$(MAIN)
-	@echo files installed
-	@echo 
+install_main: $(pvmbin)/$(MAIN)
+install_hostnode: install_node install_host
+install_host: $(pvmbin)/$(HOST)
+install_node: $(pvmbin)/$(NODE)
+
+install:; $(RM) $(pvmbin)/$(MAIN); $(MAKE) install_main;
 
 run: install pvm
 	$(pvmbin)/$(HOST)
 
 diff: $(RUNABLES) install pvm
-	$(pvmbin)/$(HOST) > parallel.out 2> parallel.err
+	$(pvmbin)/$(MAIN) > parallel.out 2> parallel.err
 	$(RTEST) > sequential.out 2> sequential.err
 	@if cmp -s parallel.out sequential.out ; \
 	then echo "DIFF ON STDOUT: none!" ; \
