@@ -37,28 +37,30 @@ void show_directory()
 
 
 
-void show_program()
+void
+show_program()
 {
-    static char *none = "none";
-    char *name = db_get_current_program_name();
+   static char *none = "(* none *)";
+   char *name = db_get_current_program_name();
 
-    if (name == NULL)
-	name = none;
+   if (name == NULL)
+      name = none;
 
-    xv_set(program_name, PANEL_VALUE, name, 0);
+   xv_set(program_name, PANEL_VALUE, name, 0);
 }
 
 
 
-void show_module()
+void
+show_module()
 {
-    static char *none = "none";
-    char *name = db_get_current_module_name();
+   static char *none = "(* none *)";
+   char *module_name_content = db_get_current_module_name();
 
-    if (name == NULL)
-	name = none;
+   if (module_name_content == NULL)
+      module_name_content = none;
 
-    xv_set(module_name, PANEL_VALUE, name, 0);
+   xv_set(module_name, PANEL_VALUE, module_name_content, 0);
 }
 
 
