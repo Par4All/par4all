@@ -268,8 +268,9 @@ char * argv[];
 	/* whether success or not... */
 	close_workspace();
 	/* pop_performance_spy(stderr, "pips"); */
+	/* check debug level if no exception occured */
+	debug_off();
     }
 
-    debug_off();
     exit(!success);
 }
