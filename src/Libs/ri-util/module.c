@@ -77,8 +77,7 @@ void add_non_declared_reference_to_declaration(reference ref)
 	string name=strdup(concatenate(
 	    module_local_name(checked_module), 
 	    MODULE_SEP_STRING,
-	    entity_local_name(
-		reference_variable(ref)), 
+	    entity_local_name(var), 
 	    NULL));
 	if ((ent = gen_find_tabulated(name,entity_domain)) ==entity_undefined)
 	{
