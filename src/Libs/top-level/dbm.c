@@ -135,6 +135,7 @@ create_workspace(gen_array_t files)
          call to create_workspace */
         reset_entity_to_size();
 	close_log_file();
+	close_warning_file();
     }
 
     return success;
