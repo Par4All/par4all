@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/17 16:33:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/27 16:53:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1995/10/17 16:33:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1995/11/27 16:53:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -74,7 +74,7 @@ edit_notify(Menu menu,
    }
    else {
       /* Is there an available edit_textsw ? */
-      if ( (win_nb=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
+      if ( (win_nb=alloc_first_initialized_window(FALSE)) == NO_TEXTSW_AVAILABLE ) {
          prompt_user("None of the text-windows is available");
          return;
       }
@@ -146,47 +146,53 @@ compute_title_string(int window_number)
   return title_string;
 }
 
-
-int alloc_first_initialized_window()
+/* Find the first free window if any. If called with TRUE, giive the
+   same as the previous choosen one. */
+int
+alloc_first_initialized_window(bool the_same_as_previous)
 {
    static int next = 0;
-   int i, candidate;
+   static int candidate = 0;
+   int i;
 
+   if (the_same_as_previous)
+      return candidate;
+   
    for(i = next; i < next + number_of_wpips_windows; i++) {
       candidate = i % number_of_wpips_windows;
-      if (! wpips_emacs_mode) {
-         /* Make sence only without Emacs yet: */
-         /* Skip windows with modified text inside : */
-         if ((bool)xv_get(edit_textsw[candidate], TEXTSW_MODIFIED))
-            continue;
-         /* Skip windows with a retain attribute : */
-         /*
-           check_box = (Panel_item) xv_get(edit_textsw[candidate],
-           XV_KEY_DATA, PANEL_CHECK_BOX,
-           NULL);
-           */
-         if ((bool)xv_get(check_box[candidate], PANEL_VALUE))
-            continue;
-      }
+      /* Skip windows with modified text inside : */
+      if ((bool)xv_get(edit_textsw[candidate], TEXTSW_MODIFIED))
+         continue;
+      /* Skip windows with a retain attribute : */
+      if ((bool)xv_get(check_box[candidate], PANEL_VALUE))
+         continue;
     
       next = candidate + 1;
       return candidate;
    }
-   return(NO_TEXTSW_AVAILABLE);
+   candidate = NO_TEXTSW_AVAILABLE;
+   
+   return candidate;
 }    
 
 
 /* Mark a wpips or epips window as busy: */
-void
+bool
 wpips_view_marked_busy(char * title_module_name, /* The module name for example */
                        char * title_label, /* "Sequential View" for exemple */
-                       int window_number,
                        int icon_number,
                        char * icon_title)
 {
    char busy_label[SMALL_BUFFER_LENGTH];
    
    if (! wpips_emacs_mode) {
+      int window_number;
+      /* Is there an available edit_textsw ? */
+      if ((window_number = alloc_first_initialized_window(FALSE))
+          == NO_TEXTSW_AVAILABLE) {
+         prompt_user("None of the text-windows is available");
+         return FALSE;
+      }
       (void) sprintf(busy_label, "*Computing %s * ...", title_label);
       /* Display the file name and the module name. RK, 2/06/1993 : */
       xv_set(edit_frame[window_number],
@@ -203,6 +209,8 @@ wpips_view_marked_busy(char * title_module_name, /* The module name for example 
       unhide_window(edit_frame[window_number]);
    }
    display_memory_usage();
+
+   return TRUE;
 }
 
 
@@ -211,7 +219,6 @@ void
 wpips_file_view(char * file_name,
                 char * title_module_name, /* The module name for example */
                 char * title_label, /* "Sequential View" for exemple */
-                int window_number,
                 int icon_number,
                 char * icon_title)
 {
@@ -222,6 +229,15 @@ wpips_file_view(char * file_name,
    }
    
    if (! wpips_emacs_mode) {
+      int window_number;
+      
+      /* Is there an available edit_textsw ? Ask for the same one
+         allocated for wpips_view_marked_busy() */
+      if ((window_number = alloc_first_initialized_window(TRUE))
+          == NO_TEXTSW_AVAILABLE) {
+         prompt_user("None of the text-windows is available");
+         return;
+      }
       /* Display the file name and the module name. RK, 2/06/1993 : */
       xv_set(edit_frame[window_number],
              FRAME_LABEL, compute_title_string(window_number),
@@ -247,7 +263,6 @@ wpips_file_view(char * file_name,
    }
    else {
       /* The Emacs mode equivalent: */
-      send_window_number_to_emacs(window_number);
       send_module_name_to_emacs(db_get_current_module_name());
       /* send_icon_name_to_emacs(icon_number); */
       send_view_to_emacs(title_label, file_name);
@@ -268,7 +283,7 @@ void
 execute_wpips_execute_and_display_something_outside_the_notifyer()
 {
    char * file_name;
-   char *module_name = db_get_current_module_name();
+   char * module_name = db_get_current_module_name();
 
    string label = execute_wpips_execute_and_display_something_outside_the_notifyer_view_name;
    
@@ -285,20 +300,13 @@ execute_wpips_execute_and_display_something_outside_the_notifyer()
    }
    else {
       /* Use some text viewer to display the resource: */
-      int window_number;
-      char * print_type;
+      char * print_type = NULL;
       char * print_type_2 = NULL;
       /* No icon image by default: */
       int icon_number = -1;
       int icon_number2 = -1;
       char title_module_name[SMALL_BUFFER_LENGTH];
       
-      /* Is there an available edit_textsw ? */
-      if ((window_number = alloc_first_initialized_window())
-          == NO_TEXTSW_AVAILABLE) {
-         prompt_user("None of the text-windows is available");
-         return;
-      }
       icon_number = icon_number2 = -1;
       if (strcmp(label, USER_VIEW) == 0) {
          print_type = DBR_PARSED_PRINTED_FILE;
@@ -353,31 +361,27 @@ execute_wpips_execute_and_display_something_outside_the_notifyer()
       }
 
       sprintf(title_module_name, "Module: %s", module_name);
-      wpips_view_marked_busy(title_module_name, label, window_number, icon_number, module_name);
+      if (wpips_view_marked_busy(title_module_name, label, icon_number, module_name)) {
 
-      file_name = build_view_file(print_type);
+         file_name = build_view_file(print_type);
 
-      wpips_file_view(file_name, title_module_name, label, window_number, icon_number, module_name);
+         wpips_file_view(file_name, title_module_name, label, icon_number, module_name);
    
    
   
-      if ( print_type_2 != NULL ) {
-         char bank_view_name[SMALL_BUFFER_LENGTH];
-         /* Is there an available edit_textsw ? */
-         if ((window_number = alloc_first_initialized_window())
-             == NO_TEXTSW_AVAILABLE) {
-            prompt_user("None of the text-windows is available");
-            return;
-         }
+         if ( print_type_2 != NULL ) {
+            char bank_view_name[SMALL_BUFFER_LENGTH];
 
-         (void) sprintf(bank_view_name, "%s (bank view)", label);
-         wpips_view_marked_busy(title_module_name, bank_view_name, window_number, icon_number2, module_name);
-         file_name = get_dont_build_view_file(print_type_2);
+            (void) sprintf(bank_view_name, "%s (bank view)", label);
+            if (wpips_view_marked_busy(title_module_name, bank_view_name, icon_number2, module_name)) {
+               file_name = get_dont_build_view_file(print_type_2);
       
-         wpips_file_view(file_name, title_module_name, bank_view_name, window_number, icon_number2, module_name);
+               wpips_file_view(file_name, title_module_name, bank_view_name, icon_number2, module_name);
+            }
+         }
       }
    }
-
+   
    free(execute_wpips_execute_and_display_something_outside_the_notifyer_view_name);
 }
 
@@ -575,31 +579,23 @@ create_edit_menu()
                 /* The sequential_view_menu_item is the default item: */
                 MENU_DEFAULT_ITEM, sequential_view_menu_item,
                 MENU_ACTION_ITEM, USER_VIEW, view_notify,
-                MENU_ACTION_ITEM, SEQUENTIAL_EMACS_VIEW, view_notify,
+                /* MENU_ACTION_ITEM, SEQUENTIAL_EMACS_VIEW, view_notify, */
                 MENU_ACTION_ITEM, SEQUENTIAL_GRAPH_VIEW, view_notify,
                                 /* Just a separator: */
-                MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
-                NULL,
-
+                WPIPS_MENU_SEPARATOR,
                 MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
                                  /* Just a separator: */
-                MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
-                NULL,
-
+                WPIPS_MENU_SEPARATOR,
                 MENU_ACTION_ITEM, ARRAY_DFG_VIEW, view_notify,
                 MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
                 MENU_ACTION_ITEM, PLACEMENT_VIEW, view_notify,
                 MENU_ACTION_ITEM, TIME_BASE_VIEW, view_notify,
                                  /* Just a separator: */
-                MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
-                NULL,
-
+                WPIPS_MENU_SEPARATOR,
                 MENU_ACTION_ITEM, CALLGRAPH_VIEW, view_notify,
                 MENU_ACTION_ITEM, ICFG_VIEW, view_notify,
                                  /* Just a separator: */
-                MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
-                NULL,
-
+                WPIPS_MENU_SEPARATOR,
                 MENU_ACTION_ITEM, DISTRIBUTED_VIEW, view_notify,
                 MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
                 MENU_APPEND_ITEM, close_menu_item,
