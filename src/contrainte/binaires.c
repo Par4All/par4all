@@ -67,7 +67,7 @@ Variable v;
  * a coefficients positifs de celui de la faisabilite et de la trivialite
  *
  * Le controle de l'overflow est effectue et traite par le retour 
- * du contexte correspondant au dernier setjmp(overflow_error) effectue.
+ * du contexte correspondant au dernier CATCH(overflow_error) effectue.
  */
 int contrainte_subst_ofl_ctrl(v,def,c,eq_p, ofl_ctrl)
 Variable v;
@@ -139,7 +139,7 @@ int ofl_ctrl;
  *    integer overflow risk (Francois Irigoin, 17 December 1991)
  *
  * Le controle de l'overflow est effectue et traite par le retour 
- * du contexte correspondant au dernier setjmp(overflow_error) effectue.
+ * du contexte correspondant au dernier CATCH(overflow_error) effectue.
  */
 Pcontrainte inegalite_comb_ofl_ctrl(posit,negat,v, ofl_ctrl)	
 Pcontrainte posit, negat;
