@@ -37,11 +37,24 @@
 
    */
 
-/* gnu and sun do not have the same conventions for "long long"
+/* put there because I cannot have these constants with ansi options.
  */
 #ifndef LONG_LONG_MAX
-#define LONG_LONG_MAX LLONG_MAX
-#define LONG_LONG_MIN LLONG_MIN
+
+/* would fix on solaris:
+ * #define LONG_LONG_MAX LLONG_MAX
+ * #define LONG_LONG_MIN LLONG_MIN
+ */
+
+#ifndef __LONG_LONG_MAX__
+#define __LONG_LONG_MAX__ 9223372036854775807LL
+#endif
+#undef LONG_LONG_MAX
+#define LONG_LONG_MAX __LONG_LONG_MAX__
+#undef LONG_LONG_MIN
+#define LONG_LONG_MIN (-LONG_LONG_MAX-1)
+#undef ULONG_LONG_MAX
+#define ULONG_LONG_MAX (LONG_LONG_MAX * 2ULL + 1)
 #endif
 
 #if defined(LINEAR_VALUE_IS_LONGLONG)
