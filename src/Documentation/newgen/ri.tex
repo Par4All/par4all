@@ -1,5 +1,10 @@
 %%
 %% $Id$
+%%
+%% $Log: ri.tex,v $
+%% Revision 1.63  2002/06/13 11:36:13  irigoin
+%% initializations field added to code
+%%
 %% 
 
 \documentclass[a4paper]{article}
@@ -821,7 +826,7 @@ a \texttt{litteral} is chosen.
 \label{subsection-code}
 \index{Code}\index{Declarations}\index{Decls text}
 
-\domain{Code = declarations:entity* x decls\_text:string}
+\domain{Code = declarations:entity* x decls\_text:string x initializations:sequence}
 {}
 
 Type {\tt code} is not used to stored module bodies. The effective code
@@ -855,6 +860,10 @@ almost impossible to regenerate. When the module is deeply transformed
 or synthesized, the field \verb/decls_text/ is destroyed and set to the
 empty string\footnote{A symbolic constant should be used instead of the
 C empty string constant "".} to force declaration generation.
+
+Member \verb/initializations/ contains statix initialization derived from
+the DATA statements. They are represented as a sequence of calls to a
+pseudo static initialization function.
 
 It is sometimes useful to regenerate declarations because lazy users
 include every single common in every procedure.
