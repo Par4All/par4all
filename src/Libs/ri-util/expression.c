@@ -4,6 +4,9 @@
   *  Yi-Qing YANG, Lei ZHOU, Francois IRIGOIN
   *
   *  12, Sep, 1991
+  *
+  * AP, sep 25th 1995 : I have added some usefull functions from
+  * static_controlize/utils.c
   */
 
 #include <stdio.h>
@@ -861,6 +864,379 @@ call c;
     return( (value_tag(cv) == is_value_constant) ||
 	   (value_tag(cv) == is_value_symbolic)   );
 }
+
+
+/* AP, sep 25th 95 : some usefull functions moved from
+   static_controlize/utils.c */
+
+/*=================================================================*/
+/* expression Pvecteur_to_expression(Pvecteur vect): returns an
+ * expression equivalent to "vect".
+ *
+ * A Pvecteur is a list of variables, each with an associated value.
+ * Only one term of the list may have an undefined variables, it is the
+ * constant term of the vector :
+ *     (var1,val1) , (var2,val2) , (var3,val3) , ...
+ *
+ * An equivalent expression is the addition of all the variables, each
+ * multiplied by its associated value :
+ *     (...((val1*var1 + val2*var2) + val3*var3) +...)
+ *
+ * Two special cases are treated in order to get a more simple expression :
+ *       _ if the sign of the value associated to the variable is
+ *         negative, the addition is replaced by a substraction and we
+ *         change the sign of the value (e.g. 2*Y + (-3)*X == 2*Y - 3*X).
+ *         This optimization is of course not done for the first variable.
+ *       _ the values equal to one are eliminated (e.g. 1*X == X).
+ *
+ * Note (IMPORTANT): if the vector is equal to zero, then it returns an
+ * "expression_undefined", not an expression equal to zero.
+ *
+ */
+expression Pvecteur_to_expression(vect)
+Pvecteur vect;
+{
+Pvecteur Vs;
+expression aux_exp, new_exp;
+entity plus_ent, mult_ent, minus_ent, unary_minus_ent, op_ent;
+
+new_exp = expression_undefined;
+Vs = vect;
+
+debug( 7, "Pvecteur_to_expression", "doing\n");
+if(!VECTEUR_NUL_P(Vs))
+  {
+  entity var = (entity) Vs->var;
+  int val = (int) Vs->val;
+
+  /* We get the entities corresponding to the three operations +, - and *. */
+  plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                                                     PLUS_OPERATOR_NAME),
+                                entity_domain);
+  minus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                                                      MINUS_OPERATOR_NAME),
+                                 entity_domain);
+  mult_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                                                     MULTIPLY_OPERATOR_NAME),
+                                entity_domain);
+  unary_minus_ent =
+         gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                                                 UNARY_MINUS_OPERATOR_NAME),
+		 	    entity_domain);
+
+  /* Computation of the first variable of the vector. */
+  if(term_cst(Vs))
+    /* Special case of the constant term. */
+    new_exp = make_integer_constant_expression(val);
+  else if( (val != 1) && (val != -1) )
+    new_exp = MakeBinaryCall(mult_ent,
+                             make_integer_constant_expression(val),
+                             make_entity_expression(var, NIL));
+  else if (val == 1)
+    /* We eliminate this value equal to one. */
+    new_exp = make_entity_expression(var, NIL);
+  else /* val == -1 */
+    new_exp = MakeUnaryCall(unary_minus_ent, make_entity_expression(var, NIL));
+
+  /* Computation of the rest of the vector. */
+  for(Vs = vect->succ; !VECTEUR_NUL_P(Vs); Vs = Vs->succ)
+    {
+    var = (entity) Vs->var;
+    val = (int) Vs->val;
+
+    if (val < 0)
+      {
+      op_ent = minus_ent;
+      val = -val;
+      }
+    else
+      op_ent = plus_ent;
+
+    if(term_cst(Vs))
+      /* Special case of the constant term. */
+      aux_exp = make_integer_constant_expression(val);
+    else if(val != 1)
+      aux_exp = MakeBinaryCall(mult_ent,
+                               make_integer_constant_expression(val),
+                               make_entity_expression(var, NIL));
+    else
+      /* We eliminate this value equal to one. */
+      aux_exp = make_entity_expression(var, NIL);
+
+    new_exp = MakeBinaryCall(op_ent, new_exp, aux_exp);
+    }
+  }
+return(new_exp);
+}
+
+/*=================================================================*/
+/* bool expression_equal_integer_p(expression exp, int i): returns TRUE if
+ * "exp" is a constant value equal to "i".
+ */
+bool expression_equal_integer_p(exp, i)
+expression exp;
+int i;
+{
+debug( 7, "expression_equal_integer", "doing\n");
+if(expression_constant_p(exp))
+  return(expression_to_int(exp) == i);
+return(FALSE);
+}
+
+/*=================================================================*/
+/* expression make_op_exp(char *op_name, expression exp1 exp2):
+ * Returns an expression containing the operation "op_name" between "exp1" and
+ * "exp2".
+ * "op_name" must be one of the four classic operations : +, -, * or /.
+ *
+ * If both expressions are integer constant values and the operation
+ * result is an integer then the returned expression contained the
+ * calculated result.
+ *
+ * Else, we treat five special cases :
+ *       _ exp1 and exp2 are integer linear and op_name is + or -.
+ *         This case is resolved by make_lin_op_exp().
+ *       _ exp1 = 0
+ *       _ exp1 = 1
+ *       _ exp2 = 0
+ *       _ exp2 = 1
+ *
+ * Else, we create a new expression with a binary call.
+ *
+ * Note: The function MakeBinaryCall() comes from Pips/.../syntax/expression.c
+ *       The function make_integer_constant_expression() comes from ri-util.
+ */
+expression make_op_exp(op_name, exp1, exp2)
+char *op_name;
+expression exp1, exp2;
+{
+expression result_exp = expression_undefined;
+entity op_ent, unary_minus_ent;
+
+debug( 7, "make_op_exp", "doing\n");
+op_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                                                 op_name), entity_domain);
+unary_minus_ent =
+         gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                                                 UNARY_MINUS_OPERATOR_NAME),
+		 	    entity_domain);
+
+debug(5, "make_op_exp", "begin OP EXP : %s  %s  %s\n",
+			words_to_string(words_expression(exp1)),
+                        op_name,
+                        words_to_string(words_expression(exp2)));
+
+if( ! ENTITY_FOUR_OPERATION_P(op_ent) )
+  user_error("make_op_exp", "operation must be : +, -, * or /");
+
+if( expression_constant_p(exp1) && expression_constant_p(exp2) )
+  {
+  int val1, val2;
+
+  debug(6, "make_op_exp", "Constant expressions\n");
+
+  val1 = expression_to_int(exp1);
+  val2 = expression_to_int(exp2);
+
+  if (ENTITY_PLUS_P(op_ent))
+    result_exp = make_integer_constant_expression(val1 + val2);
+  else if(ENTITY_MINUS_P(op_ent))
+    result_exp = make_integer_constant_expression(val1 - val2);
+  else if(ENTITY_MULTIPLY_P(op_ent))
+    result_exp = make_integer_constant_expression(val1 * val2);
+  else /* ENTITY_DIVIDE_P(op_ent) */
+	/* we compute here as FORTRAN would do */
+      result_exp = make_integer_constant_expression((int) (val1 / val2));
+  }
+else
+  {
+  /* We need to know the integer linearity of both expressions. */
+  normalized nor1 = NORMALIZE_EXPRESSION(exp1);
+  normalized nor2 = NORMALIZE_EXPRESSION(exp2);
+
+  if((normalized_tag(nor1) == is_normalized_linear) &&
+     (normalized_tag(nor2) == is_normalized_linear) &&
+     (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent)) )
+     {
+     debug(6, "make_op_exp", "Linear operation\n");
+
+     result_exp = make_lin_op_exp(op_ent, exp1, exp2);
+     }
+  else if(expression_equal_integer_p(exp1, 0))
+    {
+    if (ENTITY_PLUS_P(op_ent))
+      result_exp = exp2;
+    else if(ENTITY_MINUS_P(op_ent))
+      result_exp = MakeUnaryCall(unary_minus_ent, exp2);
+    else /* ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent) */
+      result_exp = make_integer_constant_expression(0);
+    }
+  else if(expression_equal_integer_p(exp1, 1))
+    {
+    if(ENTITY_MULTIPLY_P(op_ent))
+      result_exp = exp2;
+    }
+  else if(expression_equal_integer_p(exp2, 0))
+    {
+    if (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent))
+      result_exp = exp1;
+    else if (ENTITY_MULTIPLY_P(op_ent))
+      result_exp = make_integer_constant_expression(0);
+    else /* ENTITY_DIVIDE_P(op_ent) */
+      user_error("make_op_exp", "division by zero");
+    }
+  else if(expression_equal_integer_p(exp2, 1))
+    {
+    if(ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent))
+      result_exp = exp1;
+    }
+
+  /* Both expressions are unnormalized because they might be reused in
+   * an unnormalized expression. */
+  unnormalize_expression(exp1);
+  unnormalize_expression(exp2);
+  }
+
+if(result_exp == expression_undefined)
+  result_exp = MakeBinaryCall(op_ent, exp1, exp2);
+
+debug(5, "make_op_exp", "end   OP EXP : %s\n",
+	 words_to_string(words_expression(result_exp)));
+
+return (result_exp);
+}
+
+
+/*=================================================================*/
+/* expression make_lin_op_exp(entity op_ent, expression exp1 exp2): returns
+ * the expression resulting of the linear operation (ie. + or -) "op_ent"
+ * between two integer linear expressions "exp1" and "exp2".
+ *
+ * This function uses the linear library for manipulating Pvecteurs.
+ *
+ * Pvecteur_to_expression() is a function that rebuilds an expression
+ * from a Pvecteur.
+ */
+expression make_lin_op_exp(op_ent, exp1, exp2)
+entity op_ent;
+expression exp1, exp2;
+{
+    Pvecteur V1, V2, newV = VECTEUR_NUL;
+
+    debug( 7, "make_lin_op_exp", "doing\n");
+    if((normalized_tag(expression_normalized(exp1)) == is_normalized_complex) ||
+       (normalized_tag(expression_normalized(exp2)) == is_normalized_complex))
+	user_error("make_lin_op_exp",
+		   "expressions MUST be linear and normalized");
+    
+    V1 = (Pvecteur) normalized_linear(expression_normalized(exp1));
+    V2 = (Pvecteur) normalized_linear(expression_normalized(exp2));
+    
+    if (ENTITY_PLUS_P(op_ent))
+	newV = vect_add(V1, V2);
+    else if (ENTITY_MINUS_P(op_ent))
+	newV = vect_substract(V1, V2);
+    else
+	pips_error("make_lin_op_exp", "operation must be : + or -");
+    
+    return(Pvecteur_to_expression(newV));
+}
+
+/*=================================================================*/
+/* void unnormalize_expression(expression exp): puts the normalized
+ * field of "exp" to undefined and does the unnormalization recursively
+ * if this expression is a call to an intrinsic function.
+ *
+ * This is very useful when you combine expressions. It prohibits
+ * unnormalized expressions with normalized sub-expressions.
+ */
+void unnormalize_expression(exp)
+expression exp;
+{
+syntax sy;
+
+debug( 9, "unnormalize_expression", "doing\n");
+expression_normalized(exp) = normalized_undefined;
+sy = expression_syntax(exp);
+
+if(syntax_tag(sy) == is_syntax_call)
+  {
+  call c = syntax_call(sy);
+  value v = entity_initial(call_function(c));
+
+  /* We unnormalize the arguments of the intrinsic functions. */
+  if(value_tag(v) == is_value_intrinsic)
+    {
+    list la = call_arguments(c);
+    for(; la != NIL; la = CDR(la))
+      unnormalize_expression(EXPRESSION(CAR(la)));
+    }
+  }
+}
+
+
+/*=================================================================*/
+/* int expression_to_int(expression exp): returns the integer value of "exp".
+ *
+ * Note: "exp" is supposed to contain an integer value which means that the
+ *       function expression_constant_p() has returned TRUE with "exp" in
+ *       argument.
+ *       This implies that if "exp" is not a "value_constant", it must be
+ *       a "value_intrinsic". In that case it is an unary minus operation
+ *       upon an expression for which the function expression_constant_p()
+ *       returns TRUE (See the commentary given for it).
+ */
+int expression_to_int(exp)
+expression exp;
+{
+    int rv = 0;
+
+    debug( 7, "expression_to_int", "doing\n");
+    if(expression_constant_p(exp)) {
+	call c = syntax_call(expression_syntax(exp));
+	switch(value_tag(entity_initial(call_function(c)))) {
+	case is_value_constant:	{
+	    rv = constant_int(value_constant(entity_initial(call_function(c))));
+	    break;
+	}
+	case is_value_intrinsic: {
+	    rv = 0 - expression_to_int(EXPRESSION(CAR(call_arguments(c))));
+	    break;
+	}
+	}
+    }
+    else
+	pips_error("expression_to_int",
+		   "expression is not an integer constant");
+    return(rv);
+}
+
+/*=================================================================*/
+/* bool expression_constant_p(expression exp)
+ * Returns TRUE if "exp" contains an integer constant value.
+ *
+ * Note : A negative constant can be represented with a call to the unary
+ *        minus intrinsic function upon a positive value.
+ */
+bool expression_constant_p(exp)
+expression exp;
+{
+debug( 7, "expression_constant_p", "doing\n");
+if(syntax_tag(expression_syntax(exp)) == is_syntax_call)
+  {
+  call c = syntax_call(expression_syntax(exp));
+  switch(value_tag(entity_initial(call_function(c))))
+    {
+    case is_value_constant:
+      return(TRUE);
+    case is_value_intrinsic:
+      if(ENTITY_UNARY_MINUS_P(call_function(c)))
+	return(expression_constant_p(EXPRESSION(CAR(call_arguments(c)))));
+    }
+  }
+return(FALSE);
+}
+
 
 /*
  *   that is all
