@@ -71,7 +71,7 @@ Psysteme sc;
 	vup = VECTEUR_NUL,
 	pv_incr = VECTEUR_NUL;
 
-    int incr= 1;
+    Value incr= VALUE_ONE;
 
     expression low = range_lower(r);
     expression up = range_upper(r);
@@ -95,16 +95,16 @@ Psysteme sc;
     if (normalized_linear_p(incr_norm)) 
 	pv_incr = (Pvecteur) normalized_linear(incr_norm);
     if (vect_constant_p(pv_incr)) {
-	if ((incr = vecteur_val(pv_incr)) ==1) {
+	if (value_one_p(incr = vecteur_val(pv_incr))) {
 	    /*make two constraints for the current index: 
 	      I-vup<=0, -I+vlow<=0 */
 	    pv = vect_dup(vup);
 	    vect_chg_sgn(pv);
-	    vect_add_elem(&pv, (Variable) ind, (Value) 1);
+	    vect_add_elem(&pv, (Variable) ind, VALUE_ONE);
 	    pc = contrainte_make(pv);
 	    sc_add_ineg(sc,pc);
 	    pv = vect_dup(vlow);
-	    vect_add_elem(&pv, (Variable) ind, (Value) -1);
+	    vect_add_elem(&pv, (Variable) ind, VALUE_MONE);
 	    pc = contrainte_make(pv);
 	    sc_add_ineg(sc,pc);
 	}
@@ -113,21 +113,21 @@ Psysteme sc;
 	    sc->dimension++;
 	    sc->base = vect_add_variable(sc->base, (Variable) new_var);
 	    /* build   - new_var <= 0 */
-	    pv = vect_new((Variable) ind, (Value) -1);
+	    pv = vect_new((Variable) ind, VALUE_MONE);
 	    pc = contrainte_make(pv);
 	    sc_add_ineg(sc,pc);
 	    /* build     incr * new_var - vup + vlow <= 0 */   
 	    pv = vect_dup(vup);
 	    vect_chg_sgn(pv);
 	    pv = vect_add(pv,vect_dup(vlow));
-	    vect_add_elem(&pv, (Variable) new_var, (Value) incr);
+	    vect_add_elem(&pv, (Variable) new_var, incr);
 	    pc = contrainte_make(pv);
 	    sc_add_ineg(sc,pc);
 	    /* build   ind == vlow + incr * new_var */
 	    pv = vect_dup(vlow);
 	    vect_chg_sgn(pv);
-	    pv = vect_add(pv,vect_new((Variable) ind, (Value) 1));
-	    pv = vect_add(pv,vect_new((Variable) new_var, (Value) -incr));
+	    pv = vect_add(pv,vect_new((Variable) ind, VALUE_ONE));
+	    pv = vect_add(pv,vect_new((Variable) new_var, value_uminus(incr)));
 	    pc = contrainte_make(pv);
 	    sc_add_eg(sc,pc);
 	}
