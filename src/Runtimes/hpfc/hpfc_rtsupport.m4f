@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/04/11 10:23:59 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/05/06 11:51:12 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -106,6 +106,27 @@ c
             lid = t+1
          endif
       endif
+      end
+c
+c-----------------
+c
+c HPFC_CMPLID
+c
+cdecl      external HPFC_CMPLID
+cdecl      integer HPFC_CMPLID
+      integer function HPFC_CMPLID(pn, p1, p2, p3, p4, p5, p6, p7)
+      integer pn, p1, p2, p3, p4, p5, p6, p7
+      include 'hpfc_commons.h'
+      integer lid, indp(7)
+      indp(1)=p1
+      indp(2)=p2
+      indp(2)=p3
+      indp(4)=p4
+      indp(5)=p5
+      indp(6)=p6
+      indp(7)=p7
+      call HPFC_PROCLID(indp, pn, lid, .FALSE.)
+      HPFC_CMPLID=lid
       end
 c
 c-----------------
