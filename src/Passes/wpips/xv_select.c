@@ -164,6 +164,11 @@ void end_open_program_notify(name)
 {
     schoose_close();
 
+    /* Around a bug in schoose... */
+    if (db_get_current_program_name() != NULL
+	&& strcmp(db_get_current_program_name(), name) == 0)
+      return;
+    
     if ( open_program(name) ) {
       open_log_file();
       xv_set(close_pgm, MENU_INACTIVE, FALSE, 0);
@@ -241,7 +246,7 @@ Menu_item menu_item;
 void end_select_module_notify(name)
 string name;
 {
-    open_module(name);
+    lazy_open_module(name);
 
     show_module();
 }
