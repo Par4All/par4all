@@ -33,19 +33,19 @@
 
 \section{Introduction}
 
-\paragraph{} 
+ 
 Ce document n'a pas e'te' incorpore' au pre'ce'dent rapport d'avancement
 car les travaux qui y sont de'crits ne font pas partie du cahier des
 charges initial du projet PIPS. 
 
-\paragraph{} 
+ 
 Ce travail e'tait ne'ammoins ne'cessaire, ainsi que nous l'expliquons
 ci-dessous, et il justifie une partie du retard pris par le projet.
 C'est pourquoi nous l'exposons maintenant.
 
 \section{Motivations}
 
-\paragraph{} 
+ 
 Pips est un logiciel assez complexe qui se compose de plusieurs phases
 d'analyse de programme et de plusieurs phases de transformation de
 programme (cf. figure \ref{org}). Pips n'est pas conc,u pour que ces
@@ -54,7 +54,7 @@ enchainement strict, mais au contraire pour qu'elles soient applique'es
 sur la demande de l'utilisateur en fonction des transformations qu'il
 souhaite effectuer sur son programme.
 
-\paragraph{} 
+ 
 Les diffe'rentes phases ne sont cependant pas tout a` fait
 inde'pendantes les unes des autres. Ainsi, la plupart des
 transformations ne'cessitent que les re'sultats d'une ou plusieurs
@@ -64,7 +64,7 @@ aux analyses, il existe un ordre partiel entre elles; par exemple, le
 calcul des de'pendances ne peut e^tre fait que si les effets et les
 pre'conditions sont disponibles.
 
-\paragraph{} 
+ 
 Il n'est pas possible d'imposer a` l'utilisateur la connaissance de ces
 relations de de'pen\-dan\-ces entre phases. C'est pourquoi Pips est
 organise' autour d'une base de donne'es capable a` la fois de stocker
@@ -72,7 +72,7 @@ l'information calcule'e par chaque phase, et d'appliquer une ou
 plusieurs phases dans le bon ordre lorsqu'on lui demande l'acce`s a` des
 donne'es non encore disponibles.
 
-\paragraph{} 
+ 
 Le logiciel responsable de l'archivage des donne'es est le {\em
 gestionnaire des ressources}; il s'appelle {\em Pipsdbm}. Le logiciel
 responsable de l'enchainement des phases est le {\em contro^leur des
@@ -80,18 +80,18 @@ ressources}; il s'appelle {\em Pipsmake}.
 
 \section{Fonctionnalite's du contro^leur}
 
-\paragraph{} 
+ 
 L'organisation du projet PIPS est de'crite dans la figure \ref{org}. 
 \draw{pips-org}{\label{org}Organisation du projet PIPS}
 
-\paragraph{}
+
 Les deux interfaces utilisateurs W-Pips et T-Pips (en haut de la figure)
 permettent a` l'utilisateur d'appliquer des transformations sur les
 modules de son programme, puis d'afficher le re'sultat de ces
 transformations sur l'e'cran. Des informations supple'mentaires peuvent
 e^tre incluses dans le texte source du programme par les pretty-printers.
 
-\paragraph{}
+
 Ces deux interfaces ne dialoguent qu'avec le contro^leur des ressources,
 ainsi que le montre la figure.  C'est lui qui se charge d'exe'cuter
 re'ellement les diffe'rentes transformations et les diffe'rentes
@@ -99,7 +99,7 @@ analyses. Nous avons vu que ces diffe'rentes phases e'taient
 interde'pendantes. Le proble`me est d'autant plus complique' que PIPS
 est interproce'dural.
 
-\paragraph{}
+
 Par exemple, pour calculer les pre'conditions des instructions d'un
 module {\tt M}, il faut non seulement disposer des effets des
 instructions de {\tt M} (pour ne pas propager les pre'conditions sur des
@@ -108,7 +108,7 @@ outre des {\em transformeurs re'sume's} de tous les modules appele's par
 {\tt M} (pour propager les pre'conditions a` travers les appels de
 proce'dure).
 
-\paragraph{}
+
 Pipsmake est responsable de l'enchainement correct des transformations
 et des analyses. Pipsmake tient compte des de'pendances directes entre
 phases; ces de'pendances lui sont donne'es par un fichier de description
@@ -117,7 +117,7 @@ de paralle'lisation ne peut e^tre applique'e a` un module que si le
 graphe des de'pendance est disponible (i.e. a e'te' calcule' auparavant)
 pour ce me^me module.
 
-\paragraph{}
+
 Pipsmake tient aussi compte des de'pendances indirectes qui sont dues a`
 l'interproce'dura\-li\-te'. Pour cela, Pipsmake dispose du graphe des
 appels du programme en cours d'analyse. Ce graphe est calcule' au moment
@@ -126,7 +126,7 @@ fichiers Fortran le programme qu'il souhaite cre'er est compose'. Il est
 a` noter que l'existence d'un enchainement est en partie due a` la
 non-re'cursivite' de Fortran.
 
-\paragraph{}
+
 L'enchainement impose' par Pipsmake garantit que les informations dont
 une phase a besoin ont e'te' calcule'es pre'alablement a` l'exe'cution
 de cette phase. Calculer les informations est une chose, savoir les
@@ -135,14 +135,14 @@ Pipsdbm, le gestionnaire des ressources.
 
 \section{Imple'mentation du contro^leur}
 
-\paragraph{}
+
 La description des interde'pendances statiques entre phases est contenue
 dans un objet Newgen de type {\tt makefile} dont la description est
 donne'e dans la section \ref{makefile}. Cet objet est initialise' a`
 partir du fichier de configuration {\tt pipsmake.rc} donne' dans la
 section \ref{pipsmake.rc}.
 
-\paragraph{}
+
 Du point de vue de W-Pips et T-Pips, Pipsmake propose deux fonctions
 pour de'clencher le calcul de ressources:
 \begin{verbatim}
@@ -155,7 +155,7 @@ pour de'clencher le calcul de ressources:
    { ... }
 \end{verbatim}
 
-\paragraph{}
+
 {\tt Make} permet de de'clencher le calcul d'une ressource particulie`re
 pour un module donne'. {\tt Apply} permet d'exe'cuter une
 transformation, quelles que soient les ressources dont cette
@@ -163,16 +163,16 @@ transformation a besoin.
 
 \section{Fonctionnalite's du gestionnaire}
 
-\paragraph{}
+
 Le gestionnaire des ressources entretient un base de donne'es pour
 chaque programme utilisateur sur lequel PIPS est utilise'.
 
-\paragraph{}
+
 Un programme utilisateur est compose' d'une collection d'objets de
 diffe'rentes natures. Ces objets sont appele's {\em ressource} dans la
 terminologie Pips. 
 
-\paragraph{}
+
 Selon sa nature, une {\tt ressource} peut repre'senter:
 
 \begin{itemize}
@@ -202,7 +202,7 @@ etc ...
 
 \end{itemize}
 
-\paragraph{}
+
 Certaines {\tt ressources} doivent toujours re'sider en me'moire (les
 entite's), d'autres ne peuvent que re'sider sur fichier (sources
 Fortran), d'autres enfin peuvent migrer d'un fichier vers la me'moire,
@@ -211,7 +211,7 @@ disponible. Les ressources pouvant migrer sont dites {\em actives}
 lorsqu'elles sont en me'moire et {\em inactives} sinon. L'utilisation
 d'une ressource ne'cessite que celle-ci soit active.
 
-\paragraph{}
+
 Le programme de l'utilisateur e'volue en fonction des phases qui sont
 exe'cute'es par Pipsmake sur reque^te de l'utilisateur. Une phase qui a
 besoin d'une ressource pour un certain module en demande l'activation et
@@ -221,7 +221,7 @@ Pipsmake. Chaque phase qui calcule une nouvelle ressource doit {\em
 de'poser} cette ressource dans la base pour que celle-ci soit
 re'cupe'rable par d'autres phases.
 
-\paragraph{}
+
 Pipsdbm doit donc entretenir une description de ce qui se trouve dans la
 base a` tout instant. Il doit notamment savoir dans quels fichiers
 re'sident les diffe'rents objets. Pour chaque type de ressource, Pipsdbm
@@ -232,7 +232,7 @@ ressources devenues inactives (par exemple les ressources les moins
 re'cemment utilise'es) de la me'moire vers un fichier, et
 re'ciproquement pour les ressources dont l'activation a e'te' demande'e.
 
-\paragraph{}
+
 Ces se'quences d'instructions sont inscrites dans une table de me'thode
 qui indique au gestionnaire les fonctions a` utiliser. Ces fonctions sont
 majoritairement {\tt gen\_read}, {\tt gen\_write}, {\tt gen\_free} ou
@@ -243,7 +243,7 @@ spe'cifiques. Lors du de'veloppement, s'il y a ajout d'une nouvelle
 ressource, il est donc ne'cessaire de spe'cifier a` pipsdbm les fonctions a`
 utiliser en les indiquant dans cette table.
 
-\paragraph{}
+
 Lorsque l'activation d'une ressource est demande'e par une phase,
 l'existence de la res\-sour\-ce est garantie par Pipsmake. Cette ressource
 peut ne'ammoins re'sider temporairement sur fichier, auquel cas Pipsdbm
@@ -252,12 +252,12 @@ la nature de'pend du type de la ressource.
 
 \section{Imple'mentation du gestionnaire}
 
-\paragraph{}
+
 La description des objets pre'sents dans la base de donne'es est
 contenue dans un objet Newgen de type {\tt database} dont la description
 est donne'e dans la section \ref{database}. 
 
-\paragraph{}
+
 L'interface propose'e aux phases d'analyse et de transformation par
 Pipsmake se compose de deux fonctions pour de'poser ou retrouver
 des ressources.
@@ -274,12 +274,12 @@ des ressources.
    { ... }
 \end{verbatim}
 
-\paragraph{}
+
 Ces deux fonctions devraient e^tre les seules publiques aux autres passes.
 Malheureusement, a` l'heure actuelle, certaines passes font appels a` des
 fonctions de plus bas niveau de Pipsdbm.
 
-\paragraph{}
+
 {\tt Db\_get\_resource} permet
 aux phases de retrouver une ressource qui a e'te' de'pose'e auparavant
 dans la base par la me^me phase ou par une autre phase. Les ressources
@@ -289,7 +289,7 @@ descripteur de ressource me'moire est tout simplement un pointeur de
 type {\tt (char *)} que la phase doit transformer en un pointeur vers un
 objet du bon type par une conversion C.
 
-\paragraph{}
+
 Le boole'en {\tt pure} permet a` la phase de pre'ciser ses intentions
 par rapport a` la ressource: la valeur {\tt TRUE} indique que la
 ressource ne sera pas modifie'e et la valeur {\tt FALSE} indique au
@@ -297,10 +297,10 @@ contraire que la phase va modifier la ressource (par exemple pour
 produire une nouvelle ressource). Dans ce dernier cas, Pipsdbm donne une
 copie de la ressource et non pas l'original.
 
-\paragraph{}
+
 {\tt Db\_put\_resource} permet de de'poser une ressource dans la base.
 
-\paragraph{}
+
 Les ope'rations de migration entre les fichiers et la me'moire sont
 automatiques et ne sont pas visibles des phases. Les fonctions qui
 re'alisent ces migrations sont {\tt db\_read}, {\tt db\_load}, {\tt
@@ -308,7 +308,7 @@ db\_unload}, etc.
 
 \section{Conclusion}
 
-\paragraph{}
+
 Nous avons de'ja` pre'sente' les nombreux avantages de l'environnement
 propose' par PIPS pour de'velopper, puis inte'grer de nombreuses phases
 d'analyse et de transformation de programme. Rappelons les points
@@ -333,7 +333,7 @@ programmation;
 
 \end{itemize}
 
-\paragraph{}
+
 Les re'cents de'veloppements sur Pipsmake et Pipsdbm enrichissent
 conside'rablement cet environnement. Les transformations n'ont plus a`
 enchainer elles me^mes les exe'cutions des analyses puisque cela est
@@ -341,7 +341,7 @@ fait par Pipsmake de`s lors que son fichier de configuration est mis a`
 jour. De plus, l'acce`s aux donne'es calcule'es par ces analyses est
 rendu encore plus facile par Pipsdbm.
 
-\paragraph{}
+
 Cet enrichissement devrait permettre d'inte'grer tre`s rapidement les
 phases de transformation qui sont en cours de de'veloppement et de
 terminer le projet PIPS pour la fin de l'anne'e 1990.
@@ -350,23 +350,25 @@ terminer le projet PIPS pour la fin de l'anne'e 1990.
 \section{Annexe - La structure Makefile}
 \label{makefile}
 
-\paragraph{}
+
 Cette section de'crit la structure de donne'es {\tt makefile}. Un objet
 de ce type est initialise' par Pipsmake a` partir du fichier {\tt
 pipsmake.rc} de'crit dans la section \ref{pipsmake.rc}.
 
-\domain{Makefile = rules:rule* x active\_phases:string*}
-{Le domaine {\tt makefile} est utilise' par le driver de haut niveau
+\paragraph{Makefile = rules:rule* x active\_phases:string*}
+
+Le domaine {\tt makefile} est utilise' par le driver de haut niveau
 pour de'crire les de'pendances entre les diffe'rentes phases de Pips. Un
 {\tt Makefile} est une liste de re`gles ({\tt rule}), chaque re`gle
 de'crivant une des phases de Pips. En outre, le {\tt Makefile} donne la
 liste des phases qui sont actives a` l'instant pre'sent ({\tt
 active\_phases}). Rappelons que chaque type de ressources peut
 e'ventuellement e^tre produit par diffe'rentes phases, mais qu'une seule
-phase est utilisable a` un instant donne'. }
+phase est utilisable a` un instant donne'.
 
-\domain{Rule = phase:string x required:virtual\_resource* x produced:virtual\_resource* x preserved:virtual\_resource* x modified:virtual\_resource*}
-{Le domaine {\tt rule} permet de de'crire les actions des phases de Pips
+\paragraph{Rule = phase:string x required:virtual\_resource* x produced:virtual\_resource* x preserved:virtual\_resource* x modified:virtual\_resource*}
+
+Le domaine {\tt rule} permet de de'crire les actions des phases de Pips
 sur les ressources ge're'es par pips-db. Chaque phase ne'cessite que
 certaines ressources soient disponibles ({\tt required}), elle produit
 une ou plusieurs ressources ({\tt produced}), et en modifie d'autres
@@ -374,36 +376,38 @@ une ou plusieurs ressources ({\tt produced}), et en modifie d'autres
 celles modifie'es permet au driver d'enchainer les phases dans le bon
 ordre.
 
-\paragraph{}
+
 Les phases de transformation agissent sur le code des modules, ce qui
 implique ge'ne'rale\-ment que les informations qui de'corent ce module
 sont perdues. Pourtant, certaines d'entre-elles font des transformations
 si mineures que certaines de'corations sont pre'\-ser\-ve'es ({\tt
 preserved}). C'est notamment le cas de la privatisation qui pre'servent
-toutes les de'corations.  }
+toutes les de'corations.
 
-\domain{Virtual\_resource = name:string x owner }
-{Le domaine {\tt virtual\_resource} permet de de'signer une ressource
+\paragraph{Virtual\_resource = name:string x owner }
+
+Le domaine {\tt virtual\_resource} permet de de'signer une ressource
 lue ou modifie'e par une phase en pre'cisant en plus de la nature de la
 ressource ({\tt name}) si la ressource acce'de'e est celle attache'e au
 module, au programme, aux modules appele's par le module auquel la phase
-est applique'e ou a` celui qui l'appelle ({\tt owner}).}
+est applique'e ou a` celui qui l'appelle ({\tt owner}).
 
-\domain{Owner = \{ program , module , callees , caller \}}
-{Le domaine {\tt owner} permet de pre'ciser dans une re`gle de
+\paragraph{Owner = \{ program , module , callees , caller \}}
+
+Le domaine {\tt owner} permet de pre'ciser dans une re`gle de
 de'pendances a` quels modules sont rattache'es les ressources lues,
 e'crites, produites ou pre'serve'es. Ce peut e^tre le module lui-me^me
 ({\tt module}), le programme ({\tt program}), les modules appele's par le
 module auquel la phase est applique'e ({\tt callees}) ou a` celui qui
 l'appelle ({\tt caller}). Cet attribut supple'mentaire des de'pendances
 permet au top-level driver de ge'rer les appels multiples rendus
-ne'cessaires par l'interproce'duralite' de Pips.}
+ne'cessaires par l'interproce'duralite' de Pips.
 
 \newpage
 \section{Annexe - Le fichier de configuration de Pipsmake}
 \label{pipsmake.rc}
 
-\paragraph{}
+
 Cette section contient le fichier {\tt pipsmake.rc} qui permet a`
 Pipsmake de connaitre la liste des phases applicables a` un programme,
 les ressources utilise'es par ces phases (derrie`re le symbole
@@ -558,7 +562,7 @@ distributer                    > MODULE.code
 \section{Annexe - La structure Database}
 \label{database}
 
-\paragraph{}
+
 Cette section de'crit la structure de donne'es {\tt database}. Un objet
 de ce type est cre'e' et entretenu par Pipsdbm pour chaque programme
 Fortran soumis a` PIPS. Cet objet permet a` Pipsdbm de savoir quelles
@@ -566,8 +570,9 @@ ressources ont e'te' calcule'es pour ce programme, a` quels modules
 sont attache'es les ressources, et ou` se trouvent ces ressources, sur
 disque ou en me'moire.
 
-\domain{Database = name:string x directory:string x resources:resource*}
-{ Le domaine {\tt database} est utilise' par Pipsdbm pour de'crire
+\paragraph{Database = name:string x directory:string x resources:resource*}
+
+Le domaine {\tt database} est utilise' par Pipsdbm pour de'crire
 l'e'tat d'un programme utilisateur. Ce domaine contient son nom ({\tt
 name}), le re'pertoire dans lequel il a e'te' cre'e', et les
 informations qui ont e'te' calcule'es pour les diffe'rents modules ({\tt
@@ -575,10 +580,11 @@ resources}).
 
 Un e'le'ment de type {\tt resource} est ajoute' a` la liste {\tt resources}
 pour chaque objet calcule' pour ce programme par les phases d'analyse ou
-de transformation de Pips. }
+de transformation de Pips.
 
-\domain{Resource = name:string x owner\_name:string x status x time:int}
-{ Le domaine {\tt resource} est utilise' par Pipsdbm pour de'crire l'une
+\paragraph{Resource = name:string x owner\_name:string x status x time:int}
+
+Le domaine {\tt resource} est utilise' par Pipsdbm pour de'crire l'une
 des informations suceptibles d'e^tre calcule'es par Pips pour un module
 ou un programme. Pour chaque information, il faut connai^tre son nom
 ({\tt name}), savoir qui elle de'core ({\tt owner\_name}), savoir si elle
@@ -590,14 +596,15 @@ de'fini comme un type e'nume're'. C'est par souci de simplicite' et
 ge'ne'ricite' de pipsdbm que nous avons choisi de le de'finir comme par
 une chaine de caracte`res. C'est ce {\tt name} qui permet notamment a`
 pipsdbm de choisir la fonction pour lire, e'crire ou libe'rer une
-ressource.}
+ressource.
 
-\domain{Status = memory:string + file:string}
-{ Le domaine {\tt status} est utilise' par pipsdbm pour savoir si la
+\paragraph{Status = memory:string + file:string}
+
+Le domaine {\tt status} est utilise' par pipsdbm pour savoir si la
 ressource concerne'e est re'sident en me'moire ou dans un fichier. Dans
 ce dernier cas, le sous-domaine {\tt file} donne le nom de ce fichier.
 Si la ressource est en me'moire, le sous-domaine {\tt memory} contient
-un pointeur vers cette ressource.}
+un pointeur vers cette ressource.
 
 \end{document}
 \end
