@@ -2,6 +2,8 @@
 #include <string.h>
 #include <values.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "misc.h"
@@ -13,8 +15,7 @@
 /* this function shouldn't be called. 
  * Use macro NORMALIZE_EXPRESSION(e) instead.
  */
-normalized NormalizeExpression(e)
-expression e;
+normalized NormalizeExpression(expression e)
 {
     normalized n;
 
@@ -27,8 +28,7 @@ expression e;
     return(n);
 }
 
-normalized NormalizeSyntax(s)
-syntax s;
+normalized NormalizeSyntax(syntax s)
 {
     normalized n=normalized_undefined;
 
@@ -49,8 +49,7 @@ syntax s;
     return(n);
 }
 
-normalized NormalizeCall(c)
-call c;
+normalized NormalizeCall(call c)
 {
     normalized n=normalized_undefined;
     entity f = call_function(c);
@@ -77,8 +76,7 @@ call c;
     return(n);
 }
 
-normalized NormalizeConstant(c) 
-constant c;
+normalized NormalizeConstant(constant c)
 {
     return((constant_int_p(c)) ?
 	   make_normalized(is_normalized_linear, 
@@ -86,8 +84,7 @@ constant c;
 	   make_normalized(is_normalized_complex, UU));
 }
 
-normalized NormalizeReference(r)
-reference r;
+normalized NormalizeReference(reference r)
 {
     normalized n=normalized_undefined;
     entity e = reference_variable(r);
@@ -105,11 +102,8 @@ reference r;
 
     return(n);
 }
-
 
-normalized NormalizeIntrinsic(e, la)
-entity e;
-cons *la;
+normalized NormalizeIntrinsic(entity e, list la)
 {
     normalized n;
 
@@ -164,13 +158,13 @@ cons *la;
 
 	if (EvalNormalized(nd, &val)) {
 	    FreeNormalized(nd);
-	    normalized_linear_(n = ng) = 
-		(char *) vect_multiply(normalized_linear(ng), val);
+	    normalized_linear(n = ng) = 
+		vect_multiply(normalized_linear(ng), val);
 	}
 	else if (EvalNormalized(ng, &val)) {
 	    FreeNormalized(ng);
-	    normalized_linear_(n = nd) = 
-		(char *) vect_multiply(normalized_linear(nd), val);
+	    normalized_linear(n = nd) = 
+		vect_multiply(normalized_linear(nd), val);
 	}
 	else {
 	    FreeNormalized(ng);
@@ -323,18 +317,19 @@ expression e;
     }
 }
 
-/* FI: any chunk* can be passed; this function could be applied to an expression */
-void recursive_free_normalized(st)
-statement st ;
+/* FI: any chunk* can be passed; 
+ * this function could be applied to an expression
+ */
+void recursive_free_normalized(void * st)
 {
-    gen_recurse(st, 
-		expression_domain,
-		gen_true,
-		free_expression_normalized);
+    gen_multi_recurse(st, 
+		      expression_domain,
+		      gen_true,
+		      free_expression_normalized,
+		      NULL);
 }
 
-Pvecteur expression_to_affine(e)
-expression e;
+Pvecteur expression_to_affine(expression e)
 {
     normalized n;
     Pvecteur v;
@@ -527,9 +522,10 @@ norm_all_rewrite(expression e)
 }
 
 void 
-normalize_all_expressions_of(chunk *obj)
+normalize_all_expressions_of(void * obj)
 {
-    gen_recurse(obj, expression_domain, gen_true, norm_all_rewrite);
+    gen_multi_recurse(obj, expression_domain, gen_true, norm_all_rewrite, 
+		      NULL);
 }
 
 /* --------------------------------------------------------------------- 
@@ -537,8 +533,7 @@ normalize_all_expressions_of(chunk *obj)
  *   the first expressions encountered are normalized
  */
 
-static bool normalize_first_expressions_filter(e)
-expression e;
+static bool normalize_first_expressions_filter(expression e)
 {
     if (normalized_undefined_p(expression_normalized(e)))
     {
@@ -550,16 +545,16 @@ expression e;
 	    print_expression(e);
     }
 
-    return(FALSE);
+    return FALSE;
 }
 
-void normalize_first_expressions_of(obj)
-chunk *obj;
+void normalize_first_expressions_of(void * obj)
 {
-    gen_recurse(obj,
-		expression_domain,
-		normalize_first_expressions_filter,
-		gen_null);
+    gen_multi_recurse(obj,
+		      expression_domain,
+		      normalize_first_expressions_filter,
+		      gen_null,
+		      NULL);
 }
 
 /*   that is all
