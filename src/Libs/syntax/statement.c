@@ -711,39 +711,50 @@ update_functional_type_with_actual_arguments(entity e, list l)
     }
     else if(get_bool_property("PARSER_TYPE_CHECK_CALL_SITES"))  {
 	/* The pre-existing typing of e should match the new one */
-	if(gen_length(functional_parameters(ft))!=gen_length(l)) {
-	    user_warning("update_functional_type_with_actual_arguments", "inconsistent arg. list lengths for %s:\n"
-			 " %d args according to type and %d actual arguments\n"
-			 "between lines %d and %d. Current type is not updated\n",
-			 module_local_name(e),
-			 gen_length(functional_parameters(ft)), 
-			 gen_length(l), line_b_I, line_e_I);
-	}
-	else {
-	    int i = 0;
+	int i = 0;
+	bool warning_p = FALSE;
 
-	    for (pc = l, pc2 = functional_parameters(ft), i = 1;
-		 pc != NULL && !ENDP(pc2);
-		 POP(pc), POP(pc2), i++) {
-		basic b = basic_of_expression(EXPRESSION(CAR(pc)));
-		variable v = make_variable(b, NIL); 
-		type at = make_type(is_type_variable, v);
-		type ft = parameter_type(PARAMETER(CAR(pc2)));
+	for (pc = l, pc2 = functional_parameters(ft), i = 1;
+	     !ENDP(pc) && !ENDP(pc2);
+	     POP(pc), i++) {
+	    basic b = basic_of_expression(EXPRESSION(CAR(pc)));
+	    variable v = make_variable(b, NIL); 
+	    type at = make_type(is_type_variable, v);
+	    type ft = parameter_type(PARAMETER(CAR(pc2)));
+	    type eft = type_varargs_p(ft)? type_varargs(ft) : ft;
 
-		if((type_variable_p(ft)
-		   && basic_overloaded_p(variable_basic(type_variable(ft))))
-		   || type_equal_p(at, ft)) {
-		    /* OK */
-		}
-		else {
-		    user_warning("update_functional_type_with_actual_arguments",
-				 "incompatible %dth actual argument and type in call to %s\n"
-				 "between lines %d and %d. Current type is not updated\n",
-				 i,module_local_name(e), line_b_I, line_e_I);
-		    free_type(at);
-		    break;
-		}
+	    if((type_variable_p(eft)
+		&& basic_overloaded_p(variable_basic(type_variable(eft))))
+	       || type_equal_p(at, eft)) {
+		/* OK */
+		if(!type_varargs_p(ft)) 
+		    POP(pc2);
+	    }
+	    else {
+		user_warning("update_functional_type_with_actual_arguments",
+			     "incompatible %d%s actual argument and type in call to %s "
+			     "between lines %d and %d. Current type is not updated\n",
+			     i, nth_suffix(i),
+			     module_local_name(e), line_b_I, line_e_I);
 		free_type(at);
+		warning_p = TRUE;
+		break;
+	    }
+	    free_type(at);
+	}
+
+	if(!warning_p) {
+	    if(!(ENDP(pc) /* the actual parameter list must be exhausted */
+		 && (ENDP(pc2) /* as well as the type parameter list */
+		     || (ENDP(CDR(pc2)) /* unless the last type in the parameter list is a varargs */
+			 && type_varargs_p(parameter_type(PARAMETER(CAR(pc2)))))))) {
+		user_warning("update_functional_type_with_actual_arguments",
+			     "inconsistent arg. list lengths for %s:\n"
+			     " %d args according to type and %d actual arguments\n"
+			     "between lines %d and %d. Current type is not updated\n",
+			     module_local_name(e),
+			     gen_length(functional_parameters(ft)), 
+			     gen_length(l), line_b_I, line_e_I);
 	    }
 	}
     }
@@ -753,18 +764,38 @@ update_functional_type_with_actual_arguments(entity e, list l)
 is the argument list, a list of expressions. */
 
 instruction 
-MakeCallInst(e, l)
-entity e;
-cons * l;
+MakeCallInst(
+    entity e, /* callee */
+    cons * l  /* list of actual parameters */
+)
 {
+    instruction i = instruction_undefined;
+    list ar = get_alternate_returns();
+    list ap = add_actual_return_code(l);
 
     update_called_modules(e);
 
     pips_assert("MakeCallInst", MakeExternalFunction(e, MakeTypeVoid()) == e); 
 
-    update_functional_type_with_actual_arguments(e, l);
+    update_functional_type_with_actual_arguments(e, ap);
 
-    return(make_instruction(is_instruction_call, make_call(e, l)));
+    if(!ENDP(ar)) {
+	statement s = instruction_to_statement
+	    (make_instruction(is_instruction_call, make_call(e, ap)));
+
+	statement_number(s) = look_at_next_statement_number();
+	pips_assert("Alternate return substitution required\n", SubstituteAlternateReturnsP());
+	i = generate_return_code_checks(ar);
+	pips_assert("Must be a sequence", instruction_block_p(i));
+	instruction_block(i) = CONS(STATEMENT,
+				    s,
+				    instruction_block(i));
+    }
+    else {
+	i = make_instruction(is_instruction_call, make_call(e, ap));
+    }
+
+    return i;
 }
 
 
@@ -839,7 +870,21 @@ instruction i;
     if (i == instruction_undefined)
 	    FatalError("MakeLogicalIfInst", "bad instruction\n");
 
-    statement_number(bt) = get_future_statement_number();
+    /* instruction i should not be ablock, unless an alternate return is being processed */
+    if(instruction_block_p(i)) {
+	/* There should be two statements in the sequence.
+	 * They have to be re-numbered.
+	 */
+	list l = instruction_block(i);
+	int sn = get_future_statement_number();
+	pips_assert("Block of two instructions", gen_length(l)==2);
+	MAP(STATEMENT, s, {
+	    statement_number(s) = sn;
+	}, l);
+    }
+    else {
+	statement_number(bt) = get_future_statement_number();
+    }
 
     return ti;
 }
@@ -1282,6 +1327,8 @@ expression e1, e2, e3, e4;
 			    make_call(CreateIntrinsic(NameOfToken(keyword)),
 				      l)));
 }
+
+/* Are we in the declaration or in the executable part? */
 
 static int seen = FALSE;
 
