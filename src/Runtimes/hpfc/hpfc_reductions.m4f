@@ -254,7 +254,7 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
 !      
       call HPFC INIT SEND(_HPFC_ENCODING_, bufid)
       call HPFC PACK(PVMTYPE, val, size, 1, info)
-      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS, MCASTHOST, info)
+      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS(1), MCASTHOST, info)
       MCASTHOST = MCASTHOST + 2
 
       end 
