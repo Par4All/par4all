@@ -1,3 +1,17 @@
+/* ========================================================================= */
+/*                       SIMPLEXE for integer variables                      */
+/*                            ALL-INTEGER METHODS                            */
+/*                             Jean Claude SOGNO                             */
+/*                     Projet CHLOE -- INRIA ROCQUENCOURT                    */
+/*                                Juin 1994                                  */
+/* ========================================================================= */
+
+/* ========================================================================= */
+/*                             Duong NGUYEN QUE                              */
+/*                 Adaption to abstract computation: janusvalue              */
+/*                               CRI-ENSMP                                   */
+/* ========================================================================= */
+
 /* ............. tailles maxima du probleme simplexe .............. */
 #define RMAXCOLONNES 48		/* variables */
 #define RMAXLIGNES 90 /* contraintes */
