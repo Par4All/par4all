@@ -17,6 +17,8 @@ extern Polyhedron *align_context(Polyhedron *Pol,int align_dimension,
 				  int NbMaxRays);
 extern Polyhedron *Constraints2Polyhedron(Matrix *Constraints, unsigned
 					  NbMaxRays);
+extern Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned
+               NbMaxRays );
 extern Polyhedron *DomainAddConstraints(Polyhedron *Pol,Matrix *Mat,
 					unsigned NbMaxRays);
 extern Polyhedron *DomainAddRays(Polyhedron *Pol,Matrix *Ray,
@@ -55,6 +57,8 @@ extern Polyhedron *Polyhedron_Image(Polyhedron *Pol,Matrix *Func,
 extern Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,
 				       unsigned NbMaxRays);
 extern void Polyhedron_Print(FILE *Dst,char *Format,Polyhedron *Pol);
+extern void Polyhedron_PrintConstraints(FILE *Dst,char *Format,
+                Polyhedron *Pol);
 extern Polyhedron *Polyhedron_Scan(Polyhedron *D,Polyhedron *C,
 				   unsigned MAXRAYS);
 extern void PolyPrint(Polyhedron *Pol);
@@ -74,6 +78,7 @@ extern Polyhedron *align_context(Polyhedron *Pol,int align_dimension,
 				  int NbMaxRays);
 extern Polyhedron *Constraints2Polyhedron(Matrix *Constraints, unsigned
 					  NbMaxRays);
+extern Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays );
 extern Polyhedron *DomainAddConstraints(Polyhedron *Pol,Matrix *Mat,
 					unsigned NbMaxRays);
 extern Polyhedron *DomainAddRays(Polyhedron *Pol,Matrix *Ray,
@@ -110,6 +115,8 @@ extern Polyhedron *Polyhedron_Image(Polyhedron *Pol,Matrix *Func,
 extern Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,
 				       unsigned NbMaxRays);
 extern void Polyhedron_Print(FILE *Dst,char *Format,Polyhedron *Pol);
+extern void Polyhedron_PrintConstraints(FILE *Dst,char *Format,
+                Polyhedron *Pol);
 extern Polyhedron *Polyhedron_Scan(Polyhedron *D,Polyhedron *C,
 				   unsigned MAXRAYS);
 extern void PolyPrint(Polyhedron *Pol);

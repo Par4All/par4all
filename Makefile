@@ -21,8 +21,8 @@ PEXEC = \
 	r2p \
 	findv \
 	pp \
-	union_disjointe \
-	union_disjointe2 \
+	disjoint_union_sep \
+	disjoint_union_adj \
 	union_convex \
 	ehrhart \
 	verif_ehrhart\
@@ -244,6 +244,8 @@ clean:
 	$(RM) -r Obj.*
 distclean: clean
 	$(RM) config.cache config.log config.status
+cvsclean:
+	$(RM) -r CVS */CVS */*/CVS
 
 ###########################################################
 ## Tests
@@ -373,14 +375,14 @@ $(OBJ_DIR)/verif_ehrhart$(EXEC_EXTRA_SUFFIX): $(POLYLIB_SRC)/verif_ehrhart.c \
 		$(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
 
 # misc : disjoint and convex union of polyhedra (cf. sources)
-$(OBJ_DIR)/union_disjointe$(EXEC_EXTRA_SUFFIX): $(PHEADERS) $(LIB) \
-			$(POLYLIB_SRC)/union_disjointe.c
+$(OBJ_DIR)/disjoint_union_sep$(EXEC_EXTRA_SUFFIX): $(PHEADERS) $(LIB) \
+			$(POLYLIB_SRC)/disjoint_union_sep.c
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ \
-		$(POLYLIB_SRC)/union_disjointe.c $(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
-$(OBJ_DIR)/union_disjointe2$(EXEC_EXTRA_SUFFIX): $(PHEADERS) $(LIB) \
-			$(POLYLIB_SRC)/union_disjointe2.c
+		$(POLYLIB_SRC)/disjoint_union_sep.c $(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
+$(OBJ_DIR)/disjoint_union_adj$(EXEC_EXTRA_SUFFIX): $(PHEADERS) $(LIB) \
+			$(POLYLIB_SRC)/disjoint_union_adj.c
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ \
-		$(POLYLIB_SRC)/union_disjointe2.c $(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
+		$(POLYLIB_SRC)/disjoint_union_adj.c $(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
 $(OBJ_DIR)/union_convex$(EXEC_EXTRA_SUFFIX): $(PHEADERS) $(LIB) \
 			$(POLYLIB_SRC)/union_convex.c
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ \

@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.6 2002/05/24 09:28:25 risset Exp $
+# $Id: vars.mk,v 1.7 2002/05/31 14:54:31 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -35,7 +35,7 @@ VERSION = 5.00
 # edit vars.mk.in, which is read by configure
 
 # Default top-level directory.
-prefix =	$(PWD)
+prefix =	/usr/local
 
 # Usually the same as prefix. 
 # exec_prefix is part of the autoconf standard.
@@ -77,27 +77,27 @@ GMP_BITS = gmp
 # Library type to construct
 LIBSTYPE_TO_BUILD = lib-static
 # Library type to install
-INSTALL_LIB = install-static
+INSTALL_LIB = 
 
 # Commands used to install scripts and data
-INSTALL =		/usr/local/bin/install -c
+INSTALL =		/usr/bin/install -c
 INSTALL_PROGRAM =	${INSTALL}
 INSTALL_DATA =		${INSTALL} -m 644
 
 ## GNU-MP stuff
 EXTRA_INCLUDES=
-EXTRA_LIBS=
+EXTRA_LIBS=-lgmp 
 
 # Platform specific variables
-OSTYPE	= solaris2.6
-HOST    = sun
-BUILD   = sparc
+OSTYPE	= linux-gnu
+HOST    = pc
+BUILD   = i686
 
 
 EXEC_EXTRA_SUFFIX = 
 
 ## make install puts everything here: relays on --prefix 
-INSTALLDIR = $(PWD)
+INSTALLDIR = /usr/local
 BINDIR = $(INSTALLDIR)/bin
 LIBDIR = $(INSTALLDIR)/lib
 INCLUDEDIR = $(INSTALLDIR)/include
@@ -106,9 +106,9 @@ DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
-EXEC_EXTRA_LIBS= -L${exec_prefix}/lib -lpolylib$(BITS) $(LIBS)
-SHAREDLIB_FLAG          = -G
-LDCONFIG = 
+EXEC_EXTRA_LIBS= -L$(OBJ_DIR) -lpolylib$(BITS) $(LIBS)
+SHAREDLIB_FLAG          = -shared
+LDCONFIG = ldconfig
 
 LIBS_TO_BUILD = 64
 EXEC_TO_BUILD = 64

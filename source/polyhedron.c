@@ -3463,7 +3463,7 @@ Polyhedron *DomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRay
 	d = AddPolyToDomain (p3, d);
 	
 	/* If the constraint p2->constraint[i][0] is an equality, then  */
-	/* add the constraint ( +p2->cpnstraint[i] -1) >= 0  in 'p1' and*/
+	/* add the constraint ( +p2->constraint[i] -1) >= 0  in 'p1' and*/
 	/* create the new polyhedron 'p3'.                              */
 	
 	if( value_notzero_p(p2->Constraint[i][0]) ) /* Inequality */
@@ -4105,8 +4105,244 @@ Polyhedron *DomainAddConstraints(Polyhedron *Pol,Matrix *Mat,unsigned NbMaxRays)
 } /* DomainAddConstraints */
 
 
+/* 
+ * Computes the disjoint union of a union of polyhedra.
+ * If flag = 0 the result is such that there are no intersections
+ *                   between the resulting polyhedra,
+ * if flag = 1 it computes a joint union, the resulting polyhedra are
+ *                   adjacent (they have their facets in common).
+ *
+ * WARNING: if all polyhedra are not of same geometrical dimension
+ *          the result may be surprising (duplicates may appear).
+ */
+Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
+{
+	Polyhedron *lP, *P, *tmp, *Result, *lR, *prec, *reste;
+	Polyhedron *p1, *p2, *p3, *Pol1, *dx, *d1, *d2, *pi, *newpi;
+	int i;
+
+	if( flag!=0 && flag!=1 )
+	{
+		errormsg1("Disjoint_Domain",
+			"invalidarg", "flag should be equal to 0 or 1");
+		return (Polyhedron*) 0;
+	}
+	if(!Pol) return (Polyhedron*) 0;
+	if(!Pol->next) return Polyhedron_Copy(Pol);
+
+	P = Domain_Copy(Pol);
+	Result = (Polyhedron *)0;
+
+	for(lP=P;lP;lP=lP->next)
+	{
+		reste = Polyhedron_Copy(lP);
+		prec = (Polyhedron *)0; /* preceeding lR */
+		/* Intersection with each polyhedron of the current Result */
+		for(lR=Result;lR && reste;lR=lR->next)
+		{
+			/* dx = DomainIntersection(reste,lR->P,WS); */
+			dx = (Polyhedron *)0;
+			for( p1=reste; p1; p1=p1->next )
+			{
+				p3 = AddConstraints(lR->Constraint[0], lR->NbConstraints, p1,
+						NbMaxRays);
+				dx = AddPolyToDomain(p3,dx);
+			}
+
+			/* if empty intersection, continue */
+			if(!dx) continue;
+			if (emptyQ(dx)) {	
+				Domain_Free(dx);
+				continue;
+   		}
+
+			/* intersection is not empty, we need to compute the differences */
+			/* between the intersection and the two polyhedra, such that the */
+			/* results are disjoint unions (according to flag)               */
+			/* d1 = reste \ P = DomainDifference(reste,lR->P,WS);	*/
+			/* d2 = P \ reste = DomainDifference(lR->P,reste,WS); */
+
+			/* compute d1 */
+			d1 = (Polyhedron *)0;
+			for (p1=reste; p1; p1=p1->next)
+			{
+				pi = p1;
+				for (i=0; i<P->NbConstraints && pi ; i++)
+				{
+
+					/* Add the constraint ( -P->constraint[i] [-1 if flag=0]) >= 0 in 'p1' */
+					/* and create the new polyhedron 'p3'.                      */
+					p3 = SubConstraint(P->Constraint[i], pi, NbMaxRays,2*flag);
+					/* Add 'p3' in the new domain 'd1' */
+					d1 = AddPolyToDomain (p3, d1);
+
+					/* If the constraint P->constraint[i][0] is an equality, then add   */
+					/* the constraint ( +P->constraint[i] [-1 if flag=0]) >= 0  in 'pi' */
+					/* and create the new polyhedron 'p3'.                              */
+					if( value_zero_p(P->Constraint[i][0]) ) /* Inequality */
+					{
+						p3 = SubConstraint(P->Constraint[i], pi, NbMaxRays,1+2*flag);
+						/* Add 'p3' in the new domain 'd1' */
+						d1 = AddPolyToDomain (p3, d1);
+
+						/* newpi : add constraint P->constraint[i]==0 to pi */
+						newpi = AddConstraints( P->Constraint[i], 1, pi, NbMaxRays);
+					}
+					else
+					{
+						/* newpi : add constraint +P->constraint[i] >= 0 in pi */
+						newpi = SubConstraint(P->Constraint[i], pi, NbMaxRays,3);
+					}
+					if( newpi && emptyQ( newpi ) )
+					{
+						Polyhedron_Free( newpi );
+						newpi = (Polyhedron *)0;
+					}
+					if( pi != p1 )
+						Polyhedron_Free( pi );
+					pi = newpi;
+				}
+				if( pi != p1 )
+					Polyhedron_Free( pi );
+			}
+
+			/* and now d2 */
+			Pol1 = Polyhedron_Copy( lR );
+			for (p2=reste; p2; p2=p2->next)
+			{
+				d2 = (Polyhedron *)0;
+				for (p1=Pol1; p1; p1=p1->next)
+				{
+					pi = p1;
+					for (i=0; i<p2->NbConstraints && pi ; i++)
+					{
+
+						/* Add the constraint ( -p2->constraint[i] [-1 if flag=0]) >= 0 in 'pi' */
+						/* and create the new polyhedron 'p3'.                      */
+						p3 = SubConstraint(p2->Constraint[i], pi, NbMaxRays,2*flag);
+						/* Add 'p3' in the new domain 'd2' */
+						d2 = AddPolyToDomain (p3, d2);
+
+						/* If the constraint p2->constraint[i][0] is an equality, then add   */
+						/* the constraint ( +p2->constraint[i] [-1 if flag=0]) >= 0  in 'pi' */
+						/* and create the new polyhedron 'p3'.                              */
+						if( value_zero_p(p2->Constraint[i][0]) ) /* Inequality */
+						{
+							p3 = SubConstraint(p2->Constraint[i], pi, NbMaxRays,1+2*flag);
+							/* Add 'p3' in the new domain 'd2' */
+							d2 = AddPolyToDomain (p3, d2);
+
+							/* newpi : add constraint p2->constraint[i]==0 to pi */
+							newpi = AddConstraints( p2->Constraint[i], 1, pi, NbMaxRays);
+						}
+						else
+						{
+							/* newpi : add constraint +p2->constraint[i] >= 0 in pi */
+							newpi = SubConstraint(p2->Constraint[i], pi, NbMaxRays,3);
+						}
+						if( newpi && emptyQ( newpi ) )
+						{
+							Polyhedron_Free( newpi );
+							newpi = (Polyhedron *)0;
+						}
+						if( pi != p1 )
+							Polyhedron_Free( pi );
+						pi = newpi;
+					}
+					if( pi && pi!=p1 )
+						Polyhedron_Free( pi );
+				}
+				if( Pol1 )
+					Domain_Free( Pol1 );
+				Pol1 = d2;
+			}
+			/* ok, d1 and d2 are computed */
+
+			/* now, replace lR by d2+dx and set reste to d1 */
+			if( d1 && emptyQ(d1) )
+			{
+				Polyhedron_Free( d1 );
+				d1 = NULL;
+			}
+			if( d2 && emptyQ(d2) )
+			{
+				Polyhedron_Free( d2 );
+				d2 = NULL;
+			}
+			if( dx && emptyQ(dx) )
+			{
+				Polyhedron_Free( dx );
+				dx = NULL;
+			}
+
+			/* set reste */
+			Domain_Free( reste );
+			reste = d1;
+
+			/* add d2 to the list */
+			if( d2 )
+			{
+				for( tmp=d2 ; tmp->next ; tmp=tmp->next )
+						;
+				tmp->next = Result;
+				Result = d2;
+				if( !prec )
+					prec = tmp;
+			}
+
+			/* add dx to the list */
+			if( dx )
+			{
+				for( tmp=dx ; tmp->next ; tmp=tmp->next )
+					;
+				tmp->next = Result;
+				Result = dx;
+				if( !prec )
+					prec = tmp;
+			}
+
+			/* suppress current lR */
+			if( !prec )
+				errormsg1( "Disjoint_Domain","internalerror","internal error");
+			prec->next = lR->next;
+			Polyhedron_Free( lR );
+			lR = prec;
+
+		} /* end for result */
+
+		  /* if there is something left, add it to Result : */
+		if(reste)
+		{
+			if(emptyQ(reste))
+				Domain_Free( reste );
+			else
+			{
+				for( tmp=reste ; tmp->next ; tmp=tmp->next )
+					;
+				tmp->next = Result;
+				Result = reste;
+   		}
+		}
+	}
+
+	return( Result );
+}
 
 
 
+/* Procedure to print constraint matrix of a polyhedron */
+void Polyhedron_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol)
+{
+	int i,j;
+
+	fprintf( Dst, "%d %d\n", Pol->NbConstraints, Pol->Dimension+2 );
+	for( i=0 ; i<Pol->NbConstraints ; i++ )
+	{
+		for( j=0 ; j<Pol->Dimension+2 ; j++ )
+			fprintf( Dst, Format, Pol->Constraint[i][j] );
+		fprintf( Dst, "\n" );
+	}
+
+}
 
 
