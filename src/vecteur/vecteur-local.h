@@ -94,6 +94,7 @@ typedef struct Svecteur Sbase, * Pbase;
 #define val_of(varval) ((varval)->val)
 #define vecteur_var(v) ((v)->var)
 #define vecteur_val(v) ((v)->val)
+#define vecteur_succ(v) ((v)->succ)
 
 /* VARIABLE REPRESENTANT LE TERME CONSTANT */
 #define TCST ((Variable) 0)
