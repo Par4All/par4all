@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: install_pips,v $ (version $Revision$)
-# $Date: 1997/03/27 15:53:55 $, 
+# $Date: 1997/03/27 18:50:36 $, 
 #
 # installation for pips softwares and automatic generation of pipsrc
 #
@@ -219,6 +219,7 @@ MANPATH="\${PIPS_ROOT}/Doc:\${MANPATH}"
 # PIPS_MAKE (gmake)
 # PIPS_VALIDDIR (\${PIPS_ROOT}/Validation)
 # PIPS_HOSTS (\`hostname\`)
+# PIPS_PING (ping)
 # EPIPS_EMACS (emacs)
 # EPIPS_LISP (\${PIPS_ROOT}/Share/epips.el)
 # HPFC_RUNTIME (\${PIPS_ROOT}/Runtime/hpfc)
