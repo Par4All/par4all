@@ -7,6 +7,10 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.109  2003/12/16 13:35:39  irigoin
+ * new function preprocessed_to_user_file() added to regenerate user filename
+ * in case of preprocessing
+ *
  * Revision 1.108  2003/09/04 15:44:08  irigoin
  * Deletion of static functions insert_at(), add_continuation_if_needed(),
  * try_this_one(), handle_complex_constants() and CONTINUATION define. They
@@ -634,6 +638,25 @@ static bool pips_split_file(string name, string tempfile)
 #define CPP_FORTRAN_ED		 	".cpp_processed.f"
 #define CPP_C_ED		 	".cpp_processed.c"
 #define CPP_ERR			".stderr"
+
+/* allocates a new string containing the user file name, before preprocessing */
+string preprocessed_to_user_file(string preprocessed_user_file)
+{
+  string user_file = strdup(preprocessed_user_file);
+  string suffix = string_undefined;
+
+  if((suffix=strstr(user_file, CPP_FORTRAN_ED))!=NULL) {
+    strcpy(suffix, ".f");
+  }
+  else if((suffix=strstr(user_file, CPP_C_ED))!=NULL) {
+    strcpy(suffix, ".c");
+  }
+  else {
+    /* No preprocessing has occured */
+    ;
+  }
+  return user_file;
+}
 
 /* pre-processor and added options from environment
  */
