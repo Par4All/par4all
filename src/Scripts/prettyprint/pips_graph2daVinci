@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/sh -- # -*- perl -*-
 
 # This takes a PIPS output file in the -graph format as a file name
 # and generates a new one in the -daVinci format file.
