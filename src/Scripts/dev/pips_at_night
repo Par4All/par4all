@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/08/10 12:12:09 $, )
+# ($Date: 1996/08/10 12:22:20 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -9,9 +9,14 @@
 
 #
 # source environment if needed (as from cron)
+# and insures that PIPS_ARCH is not overwritten by the sources:
+
+pips_arch="$PIPS_ARCH"
 
 test -r $HOME/.profile && . $HOME/.profile
 test "$PIPS_DIR" || . /projects/Pips/pipsrc.sh
+
+PIPS_ARCH=${pips_arch:-$PIPS_ARCH}
 
 #
 # initialization of variables
@@ -22,7 +27,7 @@ unset no_cleaning no_newgen no_linear no_pips no_validation
 mail=/usr/ucb/mail
 test -x $mail || mail=mail
 
-arch=.
+arch=${PIPS_ARCH:-.}
 user=`whoami`
 host=`hostname`
 email=${REPLYTO:-$user}
@@ -57,7 +62,7 @@ usage()
 	Summary of options:
 	  -h: this help
 	  -v: verbose
-	  -c arch: compile for arch (may be a list, default is .)
+	  -c arch: compile for (can be a list, default: \$PIPS_ARCH then .)
 	  -a email: address to report (default: \$REPLYTO else \`whoami\`)
 	  -C: skip cleaning
 	  -N: skip newgen
