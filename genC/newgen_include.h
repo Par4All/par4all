@@ -123,7 +123,7 @@ union domain {
 
 /* MAX_DOMAIN is the maximum number of entries in the DOMAINS table */
 
-#define MAX_DOMAIN 150
+#define MAX_DOMAIN 250
 
 /* For tabulated types. */
 
