@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.18  1998/09/17 11:55:25  coelho
+ * error handling added when dealing with user interaction.
+ *
  * Revision 1.17  1998/04/14 21:30:37  coelho
  * linear.h
  *
@@ -456,8 +459,9 @@ clone_rwt(call c)
 /* clone module calls on argument arg in caller.
  * formal parameter of module number argn must be an integer scalar.
  * also used for user-directed cloning or substitution.
+ * @return whether okay.
  */
-static void
+static bool
 perform_clone(
     entity module      /* the module being cloned */,
     string caller_name /* the caller of interest */,
@@ -516,6 +520,8 @@ perform_clone(
     clonee_to_substitute = entity_undefined;
     free_stmt_stack();
     if (argn!=0) reset_precondition_map();
+
+    return some_cloning_performed;
 }
 
 
@@ -563,9 +569,46 @@ is_a_caller_or_error(
     MAP(STRING, s, 
 	if (same_string_p(s, caller)) return, /* ok */
 	callees_callees(callers));
+
+    reset_currents(name);
     pips_user_error("%s is not a caller of %s\n", caller, name);    
 }
 
+#define invalid_request_result(s) \
+	(!(s) || string_undefined_p((s) || (strlen((s))==0))
+
+static string
+checked_string_user_request(
+    string fmt, string arg,
+    string error)
+{
+    string result = user_request(fmt, arg);
+    if (!result || string_undefined_p(result) || (strlen(result)==0))
+    {
+	reset_currents(entity_local_name(get_current_module_entity()));
+	pips_user_error("invalid string for %s\n", error); /* exception */
+	return NULL;
+    }
+    return result;
+}
+
+static int
+checked_int_user_request(
+    string fmt, string arg,
+    string error)
+{
+    int result;
+    string si = checked_string_user_request(fmt, arg, error);
+
+    if (sscanf(si, "%d", &result)!=1)
+    {
+	reset_currents(entity_local_name(get_current_module_entity()));
+	pips_user_error("invalid int for %s\n", error); /* throw */
+	return 0;
+    }
+    free(si);
+    return result;
+}
 
 /******************************************************* PIPSMAKE INTERFACES */
 
@@ -600,9 +643,8 @@ clone_on_argument(string name)
     {
 	do /* perform a user request to get the argument, 0 to stop */
 	{
-	    string args = user_request("argument of %s to clone", name);
-	    argn = atoi(args); 
-	    free(args);
+	    argn = checked_int_user_request("argument of %s to clone", name,
+					    "argument number to clone");
 	}
 	while (argn<0);
     }
@@ -614,7 +656,11 @@ clone_on_argument(string name)
 	variable v;
 
 	if (entity_undefined_p(arg))
+	{
+	    reset_currents(name);
 	    pips_user_error("%s: no #%d formal\n", name, argn);
+	    return FALSE;
+	}
 	
 	t = entity_type(arg);
 	pips_assert("arg is a variable", type_variable_p(t));
@@ -622,7 +668,11 @@ clone_on_argument(string name)
 
 	if (basic_tag(variable_basic(v))!=is_basic_int ||
 	    variable_dimensions(v))
+	{
+	    reset_currents(name);
 	    pips_user_error("%s: %d formal not a scalar int\n", name, argn);
+	    return FALSE;
+	}
     }
 
     MAP(STRING, caller_name, 
@@ -652,38 +702,59 @@ clone_or_clone_substitute(
     bool clone_substitute_p)
 {
     entity module, substitute;
-    string caller, number_s;
+    string caller;
     int number;
+    bool okay;
 
     DEBUG_ON;
     set_currents(name);
     module = get_current_module_entity();
     
-    caller = user_request("%s caller to update?", name);
+    caller = checked_string_user_request("%s caller to update?", name,
+					 "caller to update");
+
+    /* checks whether it is an actual caller. */
     is_a_caller_or_error(name, caller);
 	
-    number_s = user_request("statement number of %s to clone?", caller);
-    number = atoi(number_s);
-    free(number_s);
+    number = checked_int_user_request(
+	"statement number of %s to clone?", caller,
+	"statement number to clone");
 
     if (clone_substitute_p)
     {
-	string substitute_s = user_request("replacement for %s?", name);
+	string substitute_s = 
+	    checked_string_user_request("replacement for %s?", name,
+					"replacement function");
+
+	/* must be a top-level entity */
 	substitute = local_name_to_top_level_entity(substitute_s);
 	if (entity_undefined_p(substitute) || 
 	    !type_functional_p(entity_type(substitute)))
+	{
+	    reset_currents(name);
 	    pips_user_error("%s is not an existing function\n", substitute_s);
+	    return FALSE;
+	}
 	free(substitute_s);
     }
     else
 	substitute = entity_undefined;
 
-    perform_clone(module, caller, 0, number, substitute);
+    okay = perform_clone(module, caller, 0, number, substitute);
+
+    if (!okay)
+    {
+	pips_user_warning("substitution of %s by %s at %s:%d not performed\n",
+			  name, 
+			  entity_undefined_p(substitute)? 
+			      "<none>": entity_local_name(substitute), 
+			  caller, number);
+    }
 
     free(caller);
     reset_currents(name);
     debug_off();
-    return TRUE;
+    return okay;
 }
 
 /* clone name in one of its callers/statement number
