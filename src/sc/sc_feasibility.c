@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1995/09/14 20:05:26 $, 
+ * date: $Date: 1995/11/23 11:17:57 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -69,6 +69,11 @@ boolean ofl_res;
  * LOW LEVEL FUNCTIONS 
  */
 /*  just a test to improve the Simplex/FM decision.
+ * c is a list of constraints, equalities or inequalities
+ * pc is the number of constraints in the list
+ * pv is the number of non-zero coefficients in the system
+ *
+ * pc and pv MUST be initialized. They are multiplied by weight.
  */
 static void 
 decision_data(c, pc, pv, weight)
