@@ -1,4 +1,7 @@
-YFLAGS+=	-v -d
+#
+# $RCSfile: config.makefile,v $ (version $Revision$)
+# $Date: 1996/07/15 15:07:21 $, 
+
 LEX=		flex
 LFLAGS=         -l
 #
@@ -24,7 +27,7 @@ lex.yy.c: ana_lex_completed.l y.tab.h
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
 # filtred here.
 y.tab.c: ana_syn.y
-	$(PARSE) ana_syn.y
+	$(YACC) $(YFLAGS) -v -d ana_syn.y
 	sed -e '/extern char \*malloc/d;s/YY/TP_/g;s/yy/tp_/g' y.tab.c > m.tab.c
 	mv m.tab.c y.tab.c
 	sed -e 's/YY/TP_/g;s/yy/tp_/g' y.tab.h > m.tab.h
