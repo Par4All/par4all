@@ -883,29 +883,19 @@ void delete_all_resources(void)
 string 
 get_first_main_module(void)
 {
-    string name, tmp_file_name = strdup(".seekfirstmainmoduleXXXXXX");
-    FILE * tmp_file;
-
+    string dir_name = db_get_current_workspace_directory(), main_name;
     debug_on("PIPSMAKE_DEBUG_LEVEL");
+    main_name = strdup(concatenate(dir_name, "/.fsplit_main_list", 0));
+    free(dir_name);
 
-    if (!mktemp(tmp_file_name))
-	pips_internal_error("unable to make a temporary file\n");
-
-    system(concatenate
-	   ("sed -n 's, ,,g;s,	,,g;s,^[pP][rR][oO][gG][rR][aA][mM]"
-	    "\\([0-9a-zA-Z\\-_]*\\).*$,\\1,p' ",
-	    db_get_current_workspace_directory(),
-	    "/*/*.f_initial > ", /**/ tmp_file_name, 0));
-
-    tmp_file = safe_fopen(tmp_file_name, "r");
-    name = safe_readline(tmp_file);
-    safe_fclose(tmp_file, tmp_file_name);
-    unlink(tmp_file_name);
-    free(tmp_file_name);
-
-    if (name) strupper(name,name);
-    else name=string_undefined;
-
+    if (file_exists_p(main_name)) 
+    {
+	FILE * tmp_file = safe_fopen(tmp_file_name, "r");
+	name = safe_readline(tmp_file);
+	safe_fclose(tmp_file, tmp_file_name);
+    }
+    else name = string_undefined;
+    free(main_name);
     debug_off();
     return name;
 }
