@@ -7,6 +7,9 @@
  * generated, they should also be stored there. 
  * 
  * $Log: unsplit.c,v $
+ * Revision 1.2  1997/10/16 19:09:25  coelho
+ * comment added.
+ *
  * Revision 1.1  1997/10/16 18:59:07  coelho
  * Initial revision
  *
@@ -44,9 +47,9 @@ get_new_user_file(string dir_name, string user_file)
     return s;
 }
 
-/* unsplit > PROGRAM.USER_FILE
- *         < ALL.USER_FILE
- *         < ALL.PRINTED_FILE
+/* unsplit > PROGRAM.user_file
+ *         < ALL.user_file
+ *         < ALL.printed_file
  */
 bool
 unsplit(string name)
@@ -59,8 +62,13 @@ unsplit(string name)
 
     user_files = hash_table_make(hash_string, 2*n);
 
-    if (!purge_directory(src_dir) || !create_directory(src_dir))
-	pips_internal_error("failure with directory %s\n", src_dir);
+    /* should only purge the directory of .f files?
+     */
+    if (!purge_directory(src_dir))
+	pips_internal_error("purge of Src dir failed\n");
+
+    if (!create_directory(src_dir))
+	pips_internal_error("creation of Src dir failed\n");
 
     summary = safe_fopen(summary_name, "w");
     fprintf(summary, "module / file\n");
