@@ -13,6 +13,8 @@
 #include "effects-generic.h"
 #include "transformations.h"
 
+#include "sac-local.h" /* needed because sac.h may not exist when 
+                        * simdizer.c is compiled */
 #include "sac.h"
 
 #include "dg.h"
@@ -33,113 +35,62 @@ typedef dg_vertex_label vertex_label;
 
 static graph dependence_graph;
 
-/* Tell if the statement is a "simple statement", ie a statement of the form:
- * X = Y oper Z, X = Y or X = -Y, where arguments are all references or 
- * ranges and oper is an operator (+, *, / or -)
- */
-static bool simple_statement_p(statement s)
+static hash_table matches = NULL;
+
+void init_statement_matches_map(list l)
 {
-   cons * arg;
-   syntax syn;
-   instruction i = statement_instruction(s);
-   entity function;
-   
-   /* Check if the statement is a call */
-   if (!instruction_call_p(i))
-      return FALSE;
+   init_operator_id_mappings();
+   init_tree_patterns();
 
-   /* Check if the statement is a function call */
-   function = call_function(instruction_call(i));
-   if ( !type_functional_p(entity_type(function)) ||
-        !ENTITY_ASSIGN_P(function) )
-      return FALSE;
-
-   /* First argument must be a reference */
-   arg = call_arguments(instruction_call(i));
-   if ( (arg == NIL) ||
-	!syntax_reference_p(expression_syntax(EXPRESSION(CAR(arg)))))
-      return FALSE;
-   
-   /* Second argument can be a reference, a constant, or a call to
-    * a supported operator. */
-   arg = CDR(arg);
-   if (arg == NIL)
-      return FALSE;
-   syn = expression_syntax(EXPRESSION(CAR(arg)));
-   if (syntax_call_p(syn))
+   matches = hash_table_make(hash_pointer, 0);
+   MAP(STATEMENT,
+       s,
    {
-      cons * k;
-      call c;
+      list match = match_statement(s);
 
-      /* Only supported operators and constants*/
-      c = syntax_call(syn);
-      if (!ENTITY_FOUR_OPERATION_P(call_function(c)) &&
-	  !call_constant_p(c) )
-	 return FALSE;
-
-      /* All arguments MUST be references or constants (which are calls) */
-      for( k = call_arguments(c);
-	   k != NIL;
-	   k = CDR(k) )
-      {
-	 syntax syn = expression_syntax(EXPRESSION(CAR(k)));
-
-	 if ( syntax_call_p(syn) &&
-	      !call_constant_p(syntax_call(syn)) )
-	    return FALSE;
-      }
-   }
-
-   return TRUE;
+      if (match != NIL)
+	 hash_put(matches, (void *)s, (void *)match);
+   },
+       l);
 }
 
-static bool same_function_call_p(call c1, call c2)
+void free_statement_matches_map()
 {
-   return same_entity_lname_p(call_function(c1), call_function(c2));
+   hash_table_free(matches);
 }
 
-/* Tell if the two statements are isomrophic, ie they perform
- * of the same "operations" in the same order.
- *
- * WARNING: Works only for simple statements.
- */
-static bool isomorphic_p(statement s1, statement s2)
+list get_statement_matches(statement s)
 {
-   call c1, c2;
-   cons * arg1, * arg2;
+   list m;
 
-   c1 = instruction_call(statement_instruction(s1));
-   c2 = instruction_call(statement_instruction(s2));
-   if (!same_function_call_p(c1, c2))
-      return FALSE;
+   m = (list)hash_get(matches, (void*)s);
 
-   for( arg1 = call_arguments(c1), arg2 = call_arguments(c2);
-	(arg1 != NIL) && (arg2 != NIL);
-	arg1 = CDR(arg1), arg2 = CDR(arg2) )
+   return (m == HASH_UNDEFINED_VALUE) ? NIL : m; 
+}
+
+match get_statement_match_of_kind(statement s, int kind)
+{
+   list l = get_statement_matches(s);
+
+   for( ; l!=NIL; l=CDR(l))
    {
-      syntax syn1;
-      syntax syn2;
-
-      syn1 = expression_syntax(EXPRESSION(CAR(arg1)));
-      syn2 = expression_syntax(EXPRESSION(CAR(arg2)));
-
-      /* Must be the same kind of argument */
-      if (syntax_tag(syn1) != syntax_tag(syn2))
-	 return FALSE;
-
-      /* If they are function calls, both arguments must be:
-       *      - constants
-       *  or 
-       *      - functions with the same name
-       */
-      if ( syntax_call_p(syn1) &&
-	   !( call_constant_p(syntax_call(syn1)) && 
-	      call_constant_p(syntax_call(syn2)) ) &&
-	   !same_function_call_p(syntax_call(syn1), syntax_call(syn2)) )
-	 return FALSE;
+      match m = MATCH(CAR(l));
+      if (m->type == kind)
+	 return m;
    }
 
-   return TRUE;
+   return NULL;
+}
+
+list get_statement_matching_types(statement s)
+{
+   list m = get_statement_matches(s);
+   list k = NIL;
+
+   for( ; m != NIL; m = CDR(m))
+      k = CONS(INT, MATCH(CAR(m))->type, k);
+
+   return k;
 }
 
 static hash_table successors;
@@ -221,6 +172,7 @@ static void simdize_simple_statements(statement s)
       return;
 
    seq = sequence_statements(instruction_sequence(statement_instruction(s)));
+   init_statement_matches_map(seq);
    init_statement_successors_map(seq);
 
    /* Traverse to list to group isomorphic statements */
@@ -231,35 +183,41 @@ static void simdize_simple_statements(statement s)
       cons * j, * p;
       cons * group_first, * group_last;
       statement si = STATEMENT(CAR(i));
+      list group_matches;
 
       /* Initialize current group */
       group_first = i;
       group_last = i;
 
-      /* if this is not a "simple" statement, skip it */
-      if (!simple_statement_p(si))
+      /* if this is not a recognized statement (ie, no match), skip it */
+      group_matches = get_statement_matching_types(si);
+      if (group_matches == NIL)
 	 continue;
 
-      /* try to find an isomorphic statement after the current
-       * statement
+      /* try to find all the compatible isomorphic statements after the
+       * current statement
        */
       for( j = CDR(group_last), p = NIL;
 	   j != NIL;
 	   p = j, j = CDR(j) )
       {
 	 statement sj = STATEMENT(CAR(j));
+	 list m_sj;
 
-	 /* if this is not a "simple" statement, skip it */	       
-	 if (!simple_statement_p(sj))
+	 print_statement(sj);
+
+	 /* if this is not a recognized statement (ie, no match), skip it */
+	 m_sj = get_statement_matching_types(sj);
+	 if (m_sj == NIL)
 	    continue;
 
-	 /* if the statement are isomorphic and independant, then we
-	  * can group them. So move it right after the other one, and
-	  * keep searching.
+	 /* if the matches for statement sj and for the group have a non-empty
+	  * intersection, and the move is legal (ie, does not break dependency
+	  * chain) then we can add the statement sj to the group.
 	  */
-	 if ( isomorphic_p(si,sj) &&
+	 gen_list_and(&m_sj, group_matches);
+	 if ( (m_sj!=NIL) &&
 	      move_allowed_p(group_first, sj) )
-	    /* would also need to check if the move is legal */
 	 {
 	    if (j != CDR(group_last))
 	    {
@@ -272,6 +230,8 @@ static void simdize_simple_statements(statement s)
 	    }
 
 	    group_last = CDR(group_last);
+	    gen_free_list(group_matches);
+	    group_matches = m_sj;
 	 }
       }
 
@@ -282,7 +242,7 @@ static void simdize_simple_statements(statement s)
       if (group_first != group_last)
       {
 	 cons * tmp;
-	 cons * statements = make_simd_statements(group_first, group_last);
+	 cons * statements = make_simd_statements(group_matches, group_first, group_last);
 
 	 /* replace the first element */
 	 free_statement(STATEMENT(CAR(group_first)));
@@ -320,6 +280,7 @@ static void simdize_simple_statements(statement s)
       i = group_last;
    }
    
+   free_statement_matches_map();
    free_statement_successors_map();
 }
 
