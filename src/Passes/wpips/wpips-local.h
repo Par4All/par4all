@@ -1,7 +1,6 @@
-#define SMALL_BUFFER_LENGTH 256
-#define LARGE_BUFFER_LENGTH 256
+#define SMALL_BUFFER_LENGTH 2560
 
-#define MESSAGE_BUFFER_LENGTH 128
+#define MESSAGE_BUFFER_LENGTH 1024
 #define TEXT_BUFFER_LENGTH 1024
 
 /* How many display wondows can be opened : */
