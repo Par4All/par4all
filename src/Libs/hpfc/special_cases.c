@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1997/01/22 18:58:01 $, 
+ * $Date: 1997/03/03 15:25:31 $, 
  */
 
 #include "defines-local.h"
@@ -246,8 +246,7 @@ static reduction_operator get_operator(entity e, statement s)
  */
 static hpfc_reductions reduction_of_in(entity e, statement s)
 {
-    pips_assert("reduction variable is a scalar", entity_scalar_p(e));
-    pips_debug(5, "considering scalar %s in 0x%x\n", 
+    pips_debug(5, "considering %s in 0x%x\n", 
 	       entity_name(e), (unsigned int) s);
 
     return make_hpfc_reductions(e, entity_undefined, get_operator(e, s));
@@ -317,7 +316,10 @@ compile_one_reduction(
     return call_to_statement
 	(make_call(make_new_reduction_function
 	    (hpfc_reductions_operator(red), prolog, host, entity_basic(var)),
-	     CONS(EXPRESSION, entity_to_expression(var), NIL)));
+	     CONS(EXPRESSION, entity_to_expression(var), 
+	     CONS(EXPRESSION, int_to_expression(NumberOfElements(
+		 variable_dimensions(type_variable(entity_type(var))))),
+		  NIL))));
 }
 
 /* 
