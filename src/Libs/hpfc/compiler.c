@@ -1,6 +1,6 @@
 /* Fabien Coelho, May 1993
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/09/22 13:11:44 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/10/04 19:28:58 $, )
  * version $Revision$
  *
  * Compiler
@@ -207,7 +207,7 @@ statement *hoststatp,*nodestatp;
      * assignment. Since I do not use the effects as I should, nothing is
      * done...
      */
-    hpfc_warning("hpf_compile_call", "not implemented yet\n");
+    hpfc_warning("not implemented yet\n");
 }
 
 static void 
