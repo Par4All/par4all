@@ -1,5 +1,4 @@
 
-%token DOT
 %token SEPARATOR
 %token OPEN
 %token CREATE
@@ -10,19 +9,28 @@
 %token APPLY
 %token DISPLAY
 %token ACTIVATE
-%token EXIT
+%token SET
+%token GET
+%token INFO
+%token OWNER_NAME
 %token OWNER_ALL
 %token OWNER_PROGRAM
 %token OWNER_MAIN
 %token OWNER_MODULE
 %token OWNER_CALLERS
 %token OWNER_CALLEES
-%token NAME
+%token MNAME
+%token WORKSPACE
+%token OPENBRACE
+%token COMMA
+%token CLOSEBRACE
+%token DOT
+%token PROPNAME
 %token FILE_NAME
-%token PATH_NAME
+%token RESOURCENAME
+%token PHASENAME
 %token UNKNOW_CHAR
 
-%type <status> lines
 %type <status> line
 %type <status> instruction
 %type <status> i_open
@@ -33,14 +41,17 @@
 %type <status> i_make
 %type <status> i_apply
 %type <status> i_activate
-%type <status> i_exit
 %type <status> i_display
+%type <status> i_set
+%type <status> i_get
 %type <name> rulename
-%type <name> filename
 %type <name> filename_list
 %type <rn> resource_id
 %type <rn> rule_id
 %type <owner> owner
+%type <owner> list_of_owner_name
+%type <status> sep_list
+%type <status> opt_sep_list
 
 %{
 #include <stdio.h>
@@ -71,6 +82,9 @@
 extern char yytext[];
 extern FILE * yyin; 
 
+#define MORE_COMMAND "less "
+
+static void print_property(char*,property);
 
 %}
 
@@ -83,185 +97,337 @@ extern FILE * yyin;
 
 %%
 
-lines:
-	lines line
-	|
-	{ $$ = TRUE; /* OK */ }
-	;
-
 line:
+	opt_sep_list
 	instruction
-	SEPARATOR
-	{ $$ = $1; }
+	opt_sep_list
+	{ $$ = $2; return TRUE;}
     ;
 
 instruction:
 	  i_open
 	| i_create
-	| i_close
+  	| i_close
 	| i_delete
 	| i_module
 	| i_make
 	| i_apply
 	| i_display
 	| i_activate
-	| i_exit
+	| i_set
+	| i_get
 	| error
       { $$ = FALSE; }
 	;
 
 i_open:
 	OPEN
-	NAME /* workspace name */
+	sep_list
+	WORKSPACE /* workspace name */
 	{
-		$$ = open_program (yytext);
+		string main_module_name;
+
+		debug(7,"tp_parse","reduce rule i_open\n");
+		if (db_get_current_program_name() != NULL)
+			close_program ();
+		$$ = open_program (yylval.name);
+      
+		main_module_name = get_first_main_module();
+
+		if (!string_undefined_p(main_module_name)) {
+			/* Ok, we got it ! Now we select it: */
+			user_log("Main module PROGRAM \"%s\" found.\n", main_module_name);
+			lazy_open_module(main_module_name);
+		}
+		return TRUE;
 	}
 	;
 
 i_create:
 	CREATE
-	NAME /* workspace name */
+	sep_list
+	WORKSPACE /* workspace name */
+	{ $$ = (int) yylval.name;}
+	sep_list
 	filename_list /* list of fortran files */
 	{
 	    /* now no more than one file is OK */
 		int the_argc;
 		char *the_argv;
+		string main_module_name;
 
-		the_argv = $3;
+		the_argv = $6;
 		the_argc = 1;
 
-		db_create_workspace (yytext);
+		debug(7,"tp_parse","reduce rule i_create\n");
+		db_create_workspace ((string) $<name>4);
+		free($<name>4);
 		create_program (&the_argc, &the_argv);
 
-		$$ = TRUE;
+		main_module_name = get_first_main_module();
+
+		if (!string_undefined_p(main_module_name)) {
+			/* Ok, we got it ! Now we select it: */
+			user_log("Main module PROGRAM \"%s\" found.\n", main_module_name);
+			lazy_open_module(main_module_name);
+		}		
+		return TRUE;
 	}
 	;
 
 i_close:
 	CLOSE
 	{
-		close_program ();
-		$$ = TRUE;
+		debug(7,"tp_parse","reduce rule i_close\n");
+		if (db_get_current_program_name() != NULL) {
+			close_program ();
+			$$ = TRUE;
+		} else {
+			user_warning ("tp_parse","No workspace to close\n");
+			$$ = FALSE;
+		}	
+		return TRUE;
 	}
 	;
 
 i_delete:
 	DELETE
-	NAME /* workspace name */
+	sep_list
+	WORKSPACE /* workspace name */
 	{
+		debug(7,"tp_parse","reduce rule i_delete\n");
 		$$ = TRUE;
+		return TRUE;
 	}
 	;
 
 i_module:
 	MODULE
-	NAME /* module name */
+	sep_list
+	WORKSPACE /* module name */
 	{
-		lazy_open_module (yytext);
+		char *t = yylval.name;
+
+		debug(7,"tp_parse","reduce rule i_module\n");
+		lazy_open_module (strupper(t,t));
+		free(t);
 		$$ = TRUE;
+		return TRUE;
 	}
 	;
 
 i_make:
 	MAKE
+	sep_list
 	resource_id
 	{
+		debug(7,"tp_parse","reduce rule i_make\n");
 		MAPL(e, {
-			if (safe_make_p ($2.the_name, (string) e) == FALSE) {
+			if (safe_make_p ($3.the_name, STRING(CAR(e))) == FALSE) {
 				$$ = FALSE;
 				break;
 			}
-		}, $2.the_owners);
+		}, $3.the_owners);
 
 		$$ = TRUE;
+		return TRUE;
 	}
 	;
 
 i_apply:
 	APPLY
+	sep_list
 	rule_id
 	{
+		debug(7,"tp_parse","reduce rule i_apply\n");
 		MAPL(e, {
-			safe_apply ($2.the_name, (string) e);
-		}, $2.the_owners);
+			safe_apply ($3.the_name, STRING(CAR(e)));
+		}, $3.the_owners);
 
 		$$ = TRUE;
+		return TRUE;
 	}
 	;
 
 i_display:
 	DISPLAY
+	sep_list
 	resource_id
 	{
+		debug(7,"tp_parse","reduce rule i_display\n");
+	
 		MAPL(e, {
+			lazy_open_module (STRING(CAR(e)));
+			fprintf(stdout,"---  %s for %s\n",
+					$3.the_name,
+					STRING(CAR(e)));
+			system(concatenate(MORE_COMMAND,
+					build_view_file($3.the_name),
+					NULL));
 
-			lazy_open_module ((string) e);
-			fprintf(stdout,"---  %s for %s\n", $2.the_name, (string) e);
-			fputs(build_view_file($2.the_name), stdout);
-
-		}, $2.the_owners);
+		}, $3.the_owners);
 
 		$$ = TRUE;
+		return TRUE;
 	}
 	;
 
 i_activate:
 	ACTIVATE
+	sep_list
 	rulename
 	{
-		activate ($2);
+		debug(7,"tp_parse","reduce rule i_activate\n");
+		activate ($3);
 		$$ = TRUE;
-	}
-	;
-
-i_exit:
-	EXIT
-	{
-		/* should check if program is closed ... */
-		close_program ();
 		return TRUE;
 	}
 	;
 
+i_set:
+	SET
+	sep_list
+	PROPNAME
+	{ $$ = yylval.name;}
+	sep_list
+	WORKSPACE
+	{
+		property p;
+
+		p = get_property ($<name>4);
+
+		strupper (yylval.name,yylval.name);
+
+		debug(7,"tp_parse","reduce rule i_set(%s,%s)\n",
+		      $<name>4,yylval.name);
+
+		switch (property_tag(p))
+		{
+		case is_property_bool:
+			{
+				if (!strcmp ("TRUE",yylval.name))
+					set_bool_property ($<name>4, TRUE);
+				else if (!strcmp ("FALSE",yylval.name))
+					set_bool_property ($<name>4, FALSE);
+				else {
+					yyerror ("type mismatch");
+					return FALSE;
+				    }
+				break;
+			}
+		case is_property_int:
+			{
+				char **ptr;
+				long l;
+
+				l = strtol (yylval.name, ptr, 0);
+				if (**ptr != '\0') {
+					yyerror ("type mismatch");
+					return FALSE;
+				} else
+					set_int_property($<name>4, (int) l);
+				break;
+			}
+		case is_property_string:
+			{
+				set_string_property($<name>4, yylval.name);
+				break;
+			}
+		}
+		print_property($<name>4,p);
+		return TRUE;
+	}
+
+
+i_get:
+	GET
+	sep_list
+	PROPNAME
+	{
+		property p;
+
+		debug(7,"tp_parse","reduce rule i_get (%s)\n",
+		      yylval.name);
+
+		strupper (yylval.name,yylval.name);
+		p = get_property (yylval.name);
+
+		print_property(yylval.name, p);
+		return TRUE;
+	}
+
+
 rulename:
-	NAME { $$ = yytext;}
+	PHASENAME
+	{
+ 		debug(7,"tp_parse","reduce rule rulename (%s)\n",yylval.name);
+		$$ = yylval.name;
+	}
 	;
 
-filename:
-	  NAME { $$ = yytext;}
-	| FILE_NAME { $$ = yytext;}
-	| PATH_NAME { $$ = yytext;}
-	;	
-
 filename_list:
-	filename {$$ = $1;}
+	FILE_NAME
+	{
+ 		debug(7,"tp_parse","reduce rule filename_list (%s)\n",yylval.name);
+		$$ = yylval.name;
+	}
 	;
 
 resource_id:
-	NAME
+	RESOURCENAME
 	{
-		$$.the_name = yytext;
-		$$.the_owners = CONS(STRING, db_get_current_module_name(),NIL);
+ 		debug(7,"tp_parse","reduce rule resource_id (%s)\n",yylval.name);
+		$$.the_name = yylval.name;
+		$$.the_owners=CONS(STRING,db_get_current_module_name(),NIL);
 	}
 	|
-	owner DOT NAME
+	owner RESOURCENAME
 	{
-		$$.the_name = yytext;
+ 		debug(7,"tp_parse","reduce rule resource_id (%s)\n",yylval.name);
+		$$.the_name = yylval.name;
 		$$.the_owners = $1;
 	}
 	;
 
 rule_id:
-	resource_id
+	PHASENAME
+	{
+ 		debug(7,"tp_parse","reduce rule rule_id (%s)\n",yylval.name);
+		$$.the_name = yylval.name;
+		$$.the_owners=CONS(STRING,db_get_current_module_name(),NIL);
+	}
+	|
+	owner PHASENAME
+	{
+ 		debug(7,"tp_parse","reduce rule rule_id (%s)\n",yylval.name);
+		$$.the_name = yylval.name;
+		$$.the_owners = $1;
+	}
 	;
 
 owner:
 	  OWNER_ALL
 	{
-		
+	    int nmodules = 0;
+	    char *module_list[ARGS_LENGTH];
+	    int i;
+		list result = NIL;
+
+ 		debug(7,"tp_parse","reduce rule owner (ALL)\n");
+	    db_get_module_list(&nmodules, module_list);
+	    pips_assert("tpips:yacc", nmodules>0);
+	    for(i=0; i<nmodules; i++) {
+		string on = module_list[i];
+
+		result = gen_nconc(result, 
+				   CONS(STRING, on, NIL));
+	    }
+
+		$$ = result;		
 	}
 	| OWNER_PROGRAM
     {
+ 		debug(7,"tp_parse","reduce rule owner (PROGRAM)\n");
 		$$ = CONS(STRING, db_get_current_program_name (), NIL);
 	}
 	| OWNER_MAIN
@@ -271,6 +437,7 @@ owner:
 	    int i;
 	    int number_of_main = 0;
 
+ 		debug(7,"tp_parse","reduce rule owner (MAIN)\n");
 	    db_get_module_list(&nmodules, module_list);
 	    pips_assert("tpips:yacc", nmodules>0);
 	    for(i=0; i<nmodules; i++) {
@@ -280,7 +447,8 @@ owner:
 				local_name_to_top_level_entity(on)) == TRUE)
 			{
 				if (number_of_main)
-				pips_error("build_real_resources", "More the one main\n");
+				pips_error("build_real_resources",
+					   "More the one main\n");
 
 				number_of_main++;
 				$$ = CONS(STRING, on, NIL);
@@ -289,6 +457,7 @@ owner:
 	}
 	| OWNER_MODULE
     {
+ 		debug(7,"tp_parse","reduce rule owner (MODULE)\n");
 		$$ = CONS(STRING, db_get_current_module_name (), NIL);
 	}
 	| OWNER_CALLEES
@@ -298,12 +467,13 @@ owner:
 		list ps;
 		list result = NIL;
 
+ 		debug(7,"tp_parse","reduce rule owner (CALLEES)\n");
 	    if (safe_make_p(DBR_CALLEES, db_get_current_module_name())
 			== FALSE)
 			YYERROR;	
 
 	    called_modules = (callees) 
-		db_get_memory_resource(DBR_CALLEES, db_get_current_module_name(), TRUE);
+		db_get_memory_resource(DBR_CALLEES, db_get_current_module_name(),TRUE);
 	    lcallees = callees_callees(called_modules);
 
 	    for (ps = lcallees; ps != NIL; ps = CDR(ps)) {
@@ -322,12 +492,13 @@ owner:
 		list ps;
 		list result = NIL;
 
+ 		debug(7,"tp_parse","reduce rule owner (CALLERS)\n");
 	    if (safe_make_p(DBR_CALLERS, db_get_current_module_name())
 			== FALSE)
 			YYERROR;	
 
 	    caller_modules = (callees) 
-		db_get_memory_resource(DBR_CALLERS, db_get_current_module_name(), TRUE);
+		db_get_memory_resource(DBR_CALLERS, db_get_current_module_name(),TRUE);
 	    lcallers = callees_callees(caller_modules);
 
 	    for (ps = lcallers; ps != NIL; ps = CDR(ps)) {
@@ -339,10 +510,59 @@ owner:
 
 		$$ = result;
 	}
-	| NAME
+	|
+	OWNER_NAME
+	{ $$ = yylval.name; }
+	DOT
 	{
-		$$ = CONS(STRING, yytext, NIL);
+		char *c = $<name>2;
+
+ 		debug(7,"tp_parse","reduce rule owner (name = %s)\n",c);
+		strupper (c, c);
+		$$ = CONS(STRING, c, NIL);
 	}
+	| OPENBRACE
+	list_of_owner_name
+	{ $$ = $2; }
+	;
+
+list_of_owner_name:
+	OWNER_NAME
+	{ $$ = yylval.name; }
+	COMMA
+	list_of_owner_name
+	{
+		char *c = $<name>2;
+ 		debug(7,"tp_parse",
+			  "reduce rule owner list (name = %s)\n",c);
+
+		c[strlen(c) - 1] = '\0'; /* skip the comma */
+		$$ = gen_nconc($4,CONS(STRING, c, NIL));
+	}
+	|
+	OWNER_NAME
+	{ $$ = yylval.name; }
+	CLOSEBRACE
+	DOT
+	{
+		char *c = $<name>2;
+
+ 		debug(7,"tp_parse","reduce rule owner list(name = %s)\n",c);
+		strupper (c, c);
+		$$ = CONS(STRING, c, NIL);
+	}
+	;
+
+opt_sep_list:
+	sep_list {$$ = 0;}
+	|
+	{$$ = 0;}
+	;
+
+sep_list:
+	sep_list SEPARATOR {$$ = $1;}
+	|
+	SEPARATOR {$$ = 0;}
 	;
 
 %%
@@ -350,9 +570,42 @@ owner:
 void yyerror(s)
 char * s;
 {
-	fprintf(stderr, "[yacc] %s near %s\n", s, yytext);
-	fprintf(stderr, "[yacc] unparsed text:\n");
-
-	return;
+    fprintf(stderr, "[yyparse] %s near %s\n", s, yytext);
+    tpips_lex_print_pos(stderr);
+    return;
 }
 
+void close_workspace_if_opened()
+{
+    if (db_get_current_program_name() != NULL)
+	close_program ();
+}	
+
+static void print_property(char* pname, property p)
+{
+    switch (property_tag(p))
+    {
+    case is_property_bool:
+    {
+		printf ("%s = %s\n",
+			pname,
+			get_bool_property (pname) == TRUE ?
+			"TRUE" : "FALSE");
+		break;
+    }
+    case is_property_int:
+    {
+		printf ("%s = %d\n",
+			pname,
+			get_int_property (pname));
+		break;
+    }
+    case is_property_string:
+    {
+		printf ("%s = %s\n",
+			pname,
+			get_string_property (pname));
+		break;
+    }
+    }
+}
