@@ -51,7 +51,8 @@ transformer t1;
 transformer t2;
 {
     /* return transformer_convex_hulls(t1, t2, sc_enveloppe);  */
-    return transformer_convex_hulls(t1, t2, sc_enveloppe_chernikova); 
+    /* return transformer_convex_hulls(t1, t2, sc_enveloppe_chernikova); */
+    return transformer_convex_hulls(t1, t2, sc_common_projection_convex_hull); 
 }
 
 
