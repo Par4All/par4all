@@ -36,7 +36,7 @@ $(OBJDIR)/%.o : %.c
 	@if [ ! -d $(EXECDIR) ]; \
 		then mkdir -p $(EXECDIR) ; \
 	fi
-	$(LD) $(LDFLAGS) -o $(EXECDIR)/$@ $< \
+	$(LD) $(LDFLAGS) -o $(EXECDIR)/$*$(BITS).exe $<  \
 		$(ROOT)/lib/$(STATIC_LIB) $(EXTRA_LIBS) 
 
 # Recursively, construct all packages
