@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 13:52:58 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 14:23:07 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2023,6 +2023,20 @@ char *s ;
 
 /**************************************************** Type Translation Table */
 
+/* translation tables type...
+ */
+typedef struct 
+{
+  bool identity; /* whether the translation is nope... */
+  int old_to_actual[MAX_DOMAIN]; /* forwards translation */
+  int actual_to_old[MAX_DOMAIN]; /* backwards translation */
+} 
+  gtt_t, * gtt_p;
+
+/* global translation table.
+ */
+static gtt_p gtt_current_table = NULL;
+
 /* returns the allocated line read, whatever its length.
  * returns NULL on EOF. also some asserts. FC 09/97.
  */
@@ -2048,12 +2062,12 @@ string gen_read_string(FILE * file, char upto)
 }
 
 /* returns an allocated and initialized translation table... */
-static gen_type_translation_p gtt_make(void)
+static gtt_p gtt_make(void)
 {
-  return (gen_type_translation_p) alloc(sizeof(gen_type_translation_t));
+  return (gtt_p) alloc(sizeof(gtt_t));
 }
 
-static void gtt_table_init(gen_type_translation_p table)
+static void gtt_table_init(gtt_p table)
 {
   int i;
   table->identity = FALSE;
@@ -2064,7 +2078,7 @@ static void gtt_table_init(gen_type_translation_p table)
   }
 }
 
-static void gtt_table_identity(gen_type_translation_p table)
+static void gtt_table_identity(gtt_p table)
 {
   int i;
   table->identity = TRUE;
@@ -2099,10 +2113,9 @@ static int first_available(int t[MAX_DOMAIN])
 
 /* read and setup a table from a file 
  */
-static gen_type_translation_p
-gtt_read_table(string filename)
+static gtt_p gtt_read(string filename)
 {
-  gen_type_translation_p table;
+  gtt_p table;
   FILE * file;
   bool same;
   int i;
@@ -2202,8 +2215,7 @@ gtt_read_table(string filename)
 
 /* writes what the previous reads...
  */
-static void 
-gtt_write_table(string filename, gen_type_translation_p table)
+static void gtt_write(string filename, gtt_p table)
 {
   int i;
   FILE * file = fopen(filename, "w");
@@ -2221,26 +2233,27 @@ gtt_write_table(string filename, gen_type_translation_p table)
   fclose(file);
 }
 
-/* exported... */
-static gen_type_translation_p gen_current_type_translation_table = NULL;
-
+/* forwards conversion
+ */
 int gen_type_translation_old_to_actual(int n)
 {
   int nn;
   message_assert("valid old type number", n>=0 && n<MAX_DOMAIN);
-  if (!gen_current_type_translation_table) return n;
-  nn = gen_current_type_translation_table->old_to_actual[n];
+  if (!gtt_current_table) return n;
+  nn = gtt_current_table->old_to_actual[n];
   if (nn==-1) fatal("old type number %d not available", n);
   message_assert("valid new type number", nn>=0 && nn<MAX_DOMAIN);
   return nn;
 }
 
+/* backwards conversion
+ */
 int gen_type_translation_actual_to_old(int n)
 {
   int on;
   message_assert("valid new type number", n>=0 && n<MAX_DOMAIN);
-  if (!gen_current_type_translation_table) return n;
-  on = gen_current_type_translation_table->actual_to_old[n];
+  if (!gtt_current_table) return n;
+  on = gtt_current_table->actual_to_old[n];
   if (on==-1) fatal("new type number %d not available", n);
   message_assert("valid new type number", on>=0 && on<MAX_DOMAIN);
   return on;
@@ -2248,11 +2261,18 @@ int gen_type_translation_actual_to_old(int n)
 
 void gen_type_translation_reset(void)
 {
-  if (gen_current_type_translation_table) 
+  if (gtt_current_table) 
   {
-    free(gen_current_type_translation_table);
-    gen_current_type_translation_table = NULL;
+    free(gtt_current_table);
+    gtt_current_table = NULL;
   }
+}
+
+void gen_type_translation_default(void)
+{
+  gen_type_translation_reset();
+  gtt_current_table = gtt_make();
+  gtt_table_identity(gtt_current_table);
 }
 
 /* set current type translation table according to file 
@@ -2260,22 +2280,13 @@ void gen_type_translation_reset(void)
 void gen_type_translation_read(string filename)
 {
   gen_type_translation_reset();
-  gen_current_type_translation_table = gtt_read_table(filename);
-}
-
-void gen_type_translation_default(void)
-{
-  gen_type_translation_reset();
-  gen_current_type_translation_table = gtt_make();
-  gtt_table_identity(gen_current_type_translation_table);
+  gtt_current_table = gtt_read(filename);
 }
 
 void gen_type_translation_write(string filename)
 {
-  message_assert("some type translation table to write",
-		 gen_current_type_translation_table);
-
-  gtt_write_table(filename, gen_current_type_translation_table);
+  message_assert("some type translation table to write", gtt_current_table);
+  gtt_write(filename, gtt_current_table);
 }
 
 /********************************************* NEWGEN RUNTIME INITIALIZATION */
