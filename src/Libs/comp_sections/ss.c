@@ -310,11 +310,11 @@ PutBoundPair(simple_section Dad, int DimNo, LinExpr Low, LinExpr Up)
     if (bound_pair_index(bp) == DimNo) {
       if (Low != NULL) {
 	  /* check later vect_rm(bound_pair_lb(bp));  */
-	bound_pair_lb(bp) = Low;
+	  bound_pair_lb_(bp) = (char*) Low;
       }
       if (Up != NULL) {
 	  /* check later vect_rm(bound_pair_ub(bp)); */
-	bound_pair_ub(bp) = Up;
+	  bound_pair_ub_(bp) = (char*) Up;
       }
       return;
     }
