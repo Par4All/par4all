@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1996/11/22 17:52:22 $, 
+ * $Date: 1997/02/06 18:01:13 $, 
  */
 
 #include <stdio.h>
@@ -311,18 +311,10 @@ loop l;
 	       statement_number(current_stmt_head()));
 
 
-    /* first get the write, in and out regions */
-    l_write = regions_dup(regions_write_regions(load_statement_local_regions(b)));
-    l_in = regions_to_write_regions(regions_dup(load_statement_in_regions(b)));
+    /* first get the write, in and out regions, invariant if available */
+    l_write = regions_dup(regions_write_regions(load_statement_inv_regions(b)));
+    l_in = regions_to_write_regions(regions_dup(load_statement_inv_in_regions(b)));
     l_out = regions_dup(load_statement_out_regions(b));
-
-    project_regions_with_transformer_inverse(l_write, 
-				     loop_trans, 
-				     CONS(ENTITY, i, NIL));
-
-    project_regions_with_transformer_inverse(l_in, 
-				     loop_trans, 
-				     CONS(ENTITY, i, NIL));
 
     project_regions_with_transformer_inverse(l_out, 
 				     loop_trans, 
