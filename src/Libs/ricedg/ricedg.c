@@ -583,20 +583,19 @@ statement stat;
  */
 
 static void 
-rice_update_dependence_graph(stat, region)
-statement stat;
-set region;
+rice_update_dependence_graph(
+    statement stat,
+    set region)
 {
     list pv1, ps, pss;
     list llv, llv1;
 
-    pips_assert("rice_update_dependence_graph", statement_loop_p(stat));
+    pips_assert("statement is a loop", statement_loop_p(stat));
 
-    debug(1, "rice_update_dependence_graph", "updating dependence graph\n");
+    pips_debug(1, "updating dependence graph\n");
     
     if(dg_type == DG_FULL) {
-	debug(1, "rice_update_dependence_graph", 
-	      "computing execution contexts\n");
+	pips_debug(1, "computing execution contexts\n");
 	set_context_map( contexts_mapping_of_nest(stat) );
     }
 
@@ -657,7 +656,8 @@ set region;
 		{
 		    /* This conflict cone has been updated. */
 		    ifdebug(4) { 
-			fprintf(stderr, " \nThis dependence has been computed.\n");
+			fprintf(stderr, 
+				" \nThis dependence has been computed.\n");
 		    }
 		    true_conflicts = gen_nconc(true_conflicts, 
 					       CONS(CONFLICT, c, NIL));
@@ -710,7 +710,8 @@ set region;
 			    }
 			    else 
 			    {
-				dals2s1 = (dg_arc_label) successor_arc_label(s2su); 
+				dals2s1 = (dg_arc_label) 
+				    successor_arc_label(s2su); 
 				pcs2s1 = dg_arc_label_conflicts(dals2s1);
 				pchead1 = pcs2s1;
 				while ((pcs2s1!=NIL) && !Finds2s1) 
@@ -738,7 +739,8 @@ set region;
 			    }
 			}
 			
-			/* if (!Finds2s1) pips_error("rice_update_dependence_graph",  
+			/* if (!Finds2s1) 
+			   pips_error("rice_update_dependence_graph",  
 			   "Expected opposite dependence are not found"); */
 			
 			if (Finds2s1) 
@@ -758,9 +760,11 @@ set region;
 		    }
 
 		    llv1 = gen_copy_seq(llv);
-		
+		    
 		    levels = TestCoupleOfEffects(s1, e1, s2, e2, llv1, &gs,
 						 &levelsop, &gsop);
+
+		    gen_free_list(llv1);
 		    
 		    /* updating DG for the dependence (s1,e1)-->(s2,e2)*/
 		    if (levels == NIL) 
