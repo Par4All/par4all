@@ -1,0 +1,106 @@
+/*
+ * print_info.c
+ *
+ * a set a functions to print the host and node status in PVM,
+ * called from a Fortran subroutine.
+ *
+ * Fabien Coelho, June 1993
+ */
+#include <stdio.h>
+#include <string.h>
+#include "pvm3.h"
+extern int fprintf();
+
+char *host_name(ti_host, nhost, hostp)
+int ti_host, nhost;
+struct hostinfo *hostp;
+{
+    int i;
+
+    for( i=0 ; i<nhost ; i++ )
+    {
+	if (hostp[i].hi_tid==ti_host) 
+	    return(hostp[i].hi_name);
+    }
+
+    return("name not found");
+}
+
+struct taskinfo which_task(ti_tid, ntask, taskp)
+int ti_tid, ntask;
+struct taskinfo *taskp;
+{
+    static struct taskinfo
+	blup = {0, 0, 0, 0, "task not found"};
+
+    int i;
+    for( i=0 ; i<ntask ; i++ )
+    {
+	if (taskp[i].ti_tid==ti_tid) 
+	    return(taskp[i]);
+    }
+
+    return(blup); /* just to avoid a gcc warning */
+}
+
+void print_host_info_ ()
+{
+    int
+	i,
+	info,
+	nhost,
+	narch;
+
+    struct hostinfo
+	*hostp;
+
+    info = pvm_config(&nhost, &narch, &hostp);
+
+    /*
+     * print hosts
+     */
+    fprintf(stdout, "%d machines:\n", nhost);
+    for( i=0 ; i<nhost ; i++ )
+	fprintf(stdout, "%s\n", hostp[i].hi_name);
+    fprintf(stdout, "\n");
+}
+
+void print_task_info_ (number, tids, hosttid)
+int *number, *tids, *hosttid;
+{
+    int
+	i,
+	info,
+	nhost,
+	narch,
+	ntask;
+
+    struct taskinfo
+	*taskp;
+
+    struct hostinfo
+	*hostp;
+	
+    info = pvm_config(&nhost, &narch, &hostp);
+    info = pvm_tasks(0, &ntask, &taskp);
+    
+    /*
+     * print tasks
+     */
+
+    fprintf(stdout, "host running on %s\n",
+	    host_name(which_task((*hosttid), ntask, taskp).ti_host,
+		      nhost, hostp));
+
+    fprintf(stdout, "%d nodes:\n", (*number));
+
+    for( i=0 ; i<(*number) ; i++ )
+	fprintf(stdout, 
+		"%d running on %s\n",
+		i+1,
+		host_name(which_task(tids[i], ntask, taskp).ti_host, 
+			  nhost, hostp));
+
+    fprintf(stdout, "\n");	
+}
+
