@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1994/03/09 11:57:00 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: build-system.c,v $ ($Date: 1994/03/10 12:28:14 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -109,7 +109,14 @@ extern fprintf();
 GENERIC_CURRENT_MAPPING(declaration_constraints, Psysteme, entity);
 GENERIC_CURRENT_MAPPING(hpf_constraints, Psysteme, entity);
 
-void free_hpfc_static_mappings()
+void make_hpfc_current_mappings()
+{
+    make_declaration_constraints_map();
+    make_hpf_constraints_map();
+    make_only_io_map();
+}
+
+void free_hpfc_current_mappings()
 {
     free_declaration_constraints_map();
     free_hpf_constraints_map();
