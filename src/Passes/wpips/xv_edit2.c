@@ -61,36 +61,45 @@ void edit_notify(menu, menu_item)
 Menu menu;
 Menu_item menu_item;
 {
+	char string_filename[SMALL_BUFFER_LENGTH], string_modulename[SMALL_BUFFER_LENGTH];
     char *modulename = db_get_current_module_name();
     char *filename;
     int win_nb;
 
     if (modulename == NULL) {
-	prompt_user("No module selected");
-	return;
+		prompt_user("No module selected");
+		return;
     }
 
     /* Is there an available edit_textsw ? */
     if ( (win_nb=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
-	prompt_user("None of the 2 text-windows is available");
-	return;
+		prompt_user("None of the 2 text-windows is available");
+		return;
     }
 
     filename = db_get_file_resource(DBR_SOURCE_FILE, modulename, TRUE);
+	sprintf(string_filename, "File: %s", filename);
+	sprintf(string_modulename, "Module: %s", modulename);
 
-    xv_set(edit_frame[win_nb], FRAME_LABEL, "Pips Edit Facility", 0);
+		/* Display the file name and the module name. RK, 2/06/1993 : */
+    xv_set(edit_frame[win_nb], FRAME_LABEL, "Pips Edit Facility",
+		FRAME_SHOW_FOOTER, TRUE,
+		FRAME_LEFT_FOOTER, string_filename,
+		FRAME_RIGHT_FOOTER, string_modulename,
+		NULL);
 
     xv_set(edit_textsw[win_nb], 
 	   TEXTSW_FILE, filename,
 	   TEXTSW_BROWSING, FALSE,
 	   TEXTSW_FIRST, 0,
-	   0);
+	   NULL);
 
     xv_set(current_selection_mi, 
 	   MENU_STRING, "Lasts",
 	   MENU_INACTIVE, FALSE,
-	   0);
-    xv_set(close, MENU_INACTIVE, FALSE, 0);
+	   NULL);
+
+    xv_set(close, MENU_INACTIVE, FALSE, NULL);
 
     unhide_window(edit_frame[win_nb]);
 }
@@ -100,23 +109,22 @@ Xv_opaque view_notify(menu, menu_item)
 Menu menu;
 Menu_item menu_item;
 {
+	char string_modulename[SMALL_BUFFER_LENGTH], bank_view_name[SMALL_BUFFER_LENGTH];
     char *print_type, *print_type_2 = NULL;
     char *label = (char *) xv_get(menu_item, MENU_STRING);
     char *modulename = db_get_current_module_name();
     int win1, win2;
 
     if (modulename == NULL) {
-	prompt_user("No module selected");
-	return;
+		prompt_user("No module selected");
+		return;
     }
 
     /* Is there an available edit_textsw ? */
     if ( (win1=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
-	prompt_user("None of the 2 text-windows is available");
-	return;
+		prompt_user("None of the 2 text-windows is available");
+		return;
     }
-
-    xv_set(edit_frame[win1], FRAME_LABEL, "Xview Pips Display Facility", 0);
 
     if (strcmp(label, SEQUENTIAL_VIEW) == 0) {
 	print_type = DBR_PRINTED_FILE;
@@ -144,35 +152,48 @@ Menu_item menu_item;
 	pips_error("view_notify", "bad label : %s\n", label);
     }
 
+		/* Display the file name and the module name. RK, 2/06/1993 : */
+	sprintf(string_modulename, "Module: %s", modulename);
+    xv_set(edit_frame[win1], FRAME_LABEL, "Xview Pips Display Facility",
+		FRAME_SHOW_FOOTER, TRUE,
+		FRAME_LEFT_FOOTER, label,
+		FRAME_RIGHT_FOOTER, string_modulename,
+		NULL);
+
     xv_set(edit_textsw[win1], 
 	   TEXTSW_FILE, build_view_file(print_type),
 	   TEXTSW_BROWSING, TRUE,
 	   TEXTSW_FIRST, 0,
-	   0);
+	   NULL);
 
     if ( print_type_2 != NULL ) {
-	/* Is there an available edit_textsw ? */
-	if ( (win2=alloc_first_initialized_window()) 
-	    == NO_TEXTSW_AVAILABLE ) {
-	    prompt_user("None of the 2 text-windows is available");
-	    return;
-	}
+			/* Is there an available edit_textsw ? */
+		if ( (win2=alloc_first_initialized_window()) 
+			== NO_TEXTSW_AVAILABLE ) {
+			prompt_user("None of the 2 text-windows is available");
+			return;
+		}
 
-	xv_set(edit_frame[win2], FRAME_LABEL, 
-	       "Xview Pips Display Facility", 0);
 
-	xv_set(edit_textsw[win2], 
-	       TEXTSW_FILE, build_view_file(print_type_2),
-	       TEXTSW_BROWSING, TRUE,
-	       TEXTSW_FIRST, 0,
-	       0);
+		/* Display the file name and the module name. RK, 2/06/1993 : */
+		sprintf(bank_view_name, "%s (bank view)", label);
+		xv_set(edit_frame[win2], FRAME_LABEL, "Xview Pips Display Facility",
+			FRAME_SHOW_FOOTER, TRUE,
+			FRAME_LEFT_FOOTER, bank_view_name,
+			FRAME_RIGHT_FOOTER, string_modulename,
+			NULL);
 
+		xv_set(edit_textsw[win2], 
+			   TEXTSW_FILE, build_view_file(print_type_2),
+			   TEXTSW_BROWSING, TRUE,
+			   TEXTSW_FIRST, 0,
+			   NULL);
     }
 
     xv_set(current_selection_mi, 
 	   MENU_STRING, "Lasts",
-	   MENU_INACTIVE, FALSE, 0);
-    xv_set(close, MENU_INACTIVE, FALSE, 0);
+	   MENU_INACTIVE, FALSE, NULL);
+    xv_set(close, MENU_INACTIVE, FALSE, NULL);
 
     unhide_window(edit_frame[win1]);
     if ( print_type_2 != NULL ) {
@@ -197,9 +218,9 @@ Menu_item menu_item;
 
     xv_set(current_selection_mi, 
 	   MENU_STRING, "No Selection",
-	   MENU_INACTIVE, TRUE, 0);
+	   MENU_INACTIVE, TRUE, NULL);
 
-    xv_set(close, MENU_INACTIVE, TRUE, 0);
+    xv_set(close, MENU_INACTIVE, TRUE, NULL);
 
     hide_window(edit_frame[0]);
     hide_window(edit_frame[1]);
@@ -258,6 +279,7 @@ void create_edit_menu()
 
     menu = 
 	xv_create(XV_NULL, MENU_COMMAND_MENU, 
+		  MENU_GEN_PIN_WINDOW, main_frame, "View & Edit Menu",
 		  MENU_APPEND_ITEM, current_selection_mi,
 		  MENU_APPEND_ITEM, edit,
 		  MENU_ACTION_ITEM, SEQUENTIAL_VIEW, view_notify,
