@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1996/10/18 22:22:51 $, ) 
+ * ($Date: 1996/12/27 14:37:55 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -96,6 +96,11 @@ void fprint_entity_list(FILE *fp, list l);
 #define int_undefined ((int) (-15))
 #define int_undefined_p(i) ((i)==int_undefined)
 #endif
+
+/* file names to be generated
+ */
+#define GLOBAL_PARAMETERS_H "global_parameters.h"
+#define GLOBAL_INIT_H       "global_init.h"
 
 /* Constants
  */
