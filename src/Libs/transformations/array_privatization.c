@@ -356,41 +356,44 @@ loop l;
 	}
     }
     
-    /* Keep only arrays that induce false dependences between iterations   
-     * that is to say arrays such that LOC(i) inter LOC(i', i'<i) != empty_set 
-     */
-    sc_loop_prec = sc_loop_proper_precondition(l);
-    
-    /* we make and LOC(i, i'<i) and LOC(i', i'<i) */
-    l_loc_i_prime = regions_dup(l_loc);
-    l_loc_i = regions_dup(l_loc);
-    array_regions_variable_rename(l_loc_i_prime, i, i_prime);
-    contrainte = contrainte_make(vect_make(VECTEUR_NUL, 
-					   (Variable) i_prime, 1,
-					   (Variable) i, -1,
-					   TCST, 1));
-    sc_add_inegalite(sc_loop_prec, contrainte_dup(contrainte));
-    sc_loop_prec->base = BASE_NULLE;
-    sc_creer_base(sc_loop_prec);
-    array_regions_add_sc(l_loc_i_prime, sc_loop_prec);
-    array_regions_add_sc(l_loc_i, sc_loop_prec);
-    sc_rm(sc_loop_prec);
-    
-    /* LOC_I(i) = LOC(i, i'<i) inter LOC(i', i'<i) */
-    l_loc_i = RegionsIntersection(l_loc_i, l_loc_i_prime, w_w_combinable_p);
-    
-    /* We keep in Loc(i) only the regions that correspond to arrays in l_loc_i,
-     * that is to say arrays that induce false dependences
-     */
-    l_loc = RegionsEntitiesIntersection(l_loc, l_loc_i, w_w_combinable_p);
-
-    ifdebug(3)
+    if (get_bool_property("ARRAY_PRIV_FALSE_DEP_ONLY"))
     {
-	pips_debug(3,"regions on arrays that really induce false dependences:\n");
-	print_regions(l_loc);
+	/* Keep only arrays that induce false dependences between iterations   
+	 * that is to say arrays such that LOC(i) inter LOC(i', i'<i) != empty_set 
+	 */
+	sc_loop_prec = sc_loop_proper_precondition(l);
+	
+	/* we make and LOC(i, i'<i) and LOC(i', i'<i) */
+	l_loc_i_prime = regions_dup(l_loc);
+	l_loc_i = regions_dup(l_loc);
+	array_regions_variable_rename(l_loc_i_prime, i, i_prime);
+	contrainte = contrainte_make(vect_make(VECTEUR_NUL, 
+					       (Variable) i_prime, 1,
+					       (Variable) i, -1,
+					       TCST, 1));
+	sc_add_inegalite(sc_loop_prec, contrainte_dup(contrainte));
+	sc_loop_prec->base = BASE_NULLE;
+	sc_creer_base(sc_loop_prec);
+	array_regions_add_sc(l_loc_i_prime, sc_loop_prec);
+	array_regions_add_sc(l_loc_i, sc_loop_prec);
+	sc_rm(sc_loop_prec);
+	
+	/* LOC_I(i) = LOC(i, i'<i) inter LOC(i', i'<i) */
+	l_loc_i = RegionsIntersection(l_loc_i, l_loc_i_prime, w_w_combinable_p);
+	
+	/* We keep in Loc(i) only the regions that correspond to arrays in l_loc_i,
+	 * that is to say arrays that induce false dependences
+	 */
+	l_loc = RegionsEntitiesIntersection(l_loc, l_loc_i, w_w_combinable_p);
+
+	ifdebug(3)
+	{
+	    pips_debug(3,
+		       "regions on arrays that really induce false dependences:\n");
+	    print_regions(l_loc);
+	}
     }
-
-
+    
     if (privatize_sections)
     {
 	/* CAND(i) = LOC(i) -inf proj_i'[IN(i')] */
