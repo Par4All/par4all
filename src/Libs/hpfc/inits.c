@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1995/09/15 15:54:15 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1995/10/04 14:48:59 $, )
  * version $Revision$,
  */
 
@@ -67,7 +67,9 @@ entity module;
 	    /* ??? memory leak from bound_parameter_name
 	     */
 	    fprintf(file,
-		    "      integer %s, %s\n"
+		    "      integer \n"
+		    "     $    %s,\n"
+		    "     $    %s\n"
 		    "      parameter(%s = %d)\n"
 		    "      parameter(%s = %d)\n",
 		    bound_parameter_name(newarray, LOWER, i),
@@ -99,7 +101,7 @@ int max_size_of_processors()
     }, 
 	list_of_processors());
 
-    return(current_max);
+    return current_max;
 }
 
 /* translation from an hpf_newdecl tag to the runtime code expected
@@ -109,16 +111,16 @@ tag t;
 {
     switch(t)
     {
-    case is_hpf_newdecl_none: return(0);
-    case is_hpf_newdecl_alpha: return(1);
-    case is_hpf_newdecl_beta: return(2);
-    case is_hpf_newdecl_gamma: return(3);
-    case is_hpf_newdecl_delta: return(4);
+    case is_hpf_newdecl_none: return 0;
+    case is_hpf_newdecl_alpha: return 1;
+    case is_hpf_newdecl_beta: return 2;
+    case is_hpf_newdecl_gamma: return 3;
+    case is_hpf_newdecl_delta: return 4;
     default: 
 	pips_error("code_number", "unexpected hpf_newdecl tag %d\n", t);
     }
     
-    return(-1); /* just to avoid a gcc warning */
+    return -1; /* just to avoid a gcc warning */
 }
 
 void create_init_common_param_for_arrays(file, module)
