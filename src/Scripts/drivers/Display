@@ -13,6 +13,7 @@ USAGE="Usage: Display [-h] [-w wspace] [-m module] [-v] [-l] [pretty-print]"
 AVAILABLE_PRETTY_P="Available Pretty-prints: para77 para90 cray cmf craft adfg bdt plc code tran utran prec uprec comp regi inreg outreg prop cumu cg cgcomp cgprec cgtran cgprop cgcumu cgreg cgin cgout icfg icfgprec icfgcomp icfgl icfglprec icfglcomp icfgc icfgcprec icfgccomp dg edg lcdg wdg wp65 bank flint dead"
 
 more=${PIPS_MORE:-less}
+export more
 
 show()
 {
@@ -24,9 +25,9 @@ show()
 display()
 {
     file="${1}/${2}${3}"
-    test -f ${file} && show $file
+    test -f ${file} && show ${file}
     file="${1}/${2}/${2}${3}" 
-    test -f ${file} && show $file
+    test -f ${file} && show ${file}
 }
 
 #if [ $# -eq 0 ]
@@ -262,4 +263,7 @@ fi
 fi
 
 display $PGM.database $MOD $EXT
-[ "$ASSOC_EXT" ] display $PGM.database $MOD $ASSOC_EXT
+[ "$ASSOC_EXT" ] && display $PGM.database $MOD $ASSOC_EXT
+
+exit 0
+
