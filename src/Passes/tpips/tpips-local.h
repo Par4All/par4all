@@ -30,17 +30,17 @@ extern void tp_restart(FILE *);
 #define TPIPS_HISTORY ".tpips.history" 	/* default history file */
 
 #define SHELL_ESCAPE "shell" 		/* ! used for history reference */
-#define CHANGE_DIR   "cd "
+#define CHANGE_DIR   "cd"
 
 #define SET_ENV	     "setenv"
 #define GET_ENV	     "getenv"
 
-#define SET_PROP     "setproperty "
+#define SET_PROP     "setproperty"
 #define GET_PROP     "getproperty"
 
 #define QUIT         "quit"
 #define HELP         "help"
 #define ECHO         "echo"
 
-/* end of $RCSfile: tpips-local.h,v $ 
- */
+#define skip_blanks(str) \
+  while (*str && (*str==' ' || *str=='\t' || *str=='\n')) str++
