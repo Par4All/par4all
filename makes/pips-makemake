@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.332  1998/08/06 15:57:48  coelho
+# UMASK added to cooperate with SHELL.
+#
 # Revision 1.331  1998/08/06 09:55:48  coelho
 # umask fixed within the SHELL macro.
 #
@@ -393,7 +396,9 @@ INSTALL_BIN_DIR= ${install_bin_dir}/\$(ARCH)
 CONFIG	= ${CONFIG_FILE}
 MAKEFILE= ${MAKEFILE}
 # the umask within pips is fixed here!
-SHELL	= umask 002 ; /bin/sh
+# however I cannot fix the group at this level.
+UMASK   = 002
+SHELL	= umask $(UMASK) ; exec /bin/sh
 COPY	= cp
 MOVE	= mv -f
 GMKNODIR= --no-print-directory
