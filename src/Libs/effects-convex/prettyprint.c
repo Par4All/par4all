@@ -37,267 +37,397 @@
 #define REGION_FORESYS_PREFIX "C$REG"
 #define PIPS_NORMAL_PREFIX "C"
 
-static boolean in_out_regions_p = FALSE;
-static boolean is_user_view_p = FALSE;
-static hash_table nts = hash_table_undefined;
 
-static bool print_code_with_regions(string, string, string, string);
-static text get_any_regions_text(string, string, string, bool);
 
+
+/* char * pips_region_user_name(entity ent)
+ * output   : the name of entity.
+ * modifies : nothing.
+ * comment  : allows to "catch" the PHIs entities, else, it works like
+ *            pips_user_value_name() (see semantics.c).	
+ */
+char *
+pips_region_user_name(entity ent)
+{
+    /* external_value_name cannot be used because there is no need for
+       the #new suffix, but the #old one is necessary */
+    if(ent == NULL)
+	/* take care of the constant term TCST */
+	return "";
+    else {
+	char *ent_name = entity_name(ent);
+
+	if (strncmp(ent_name, REGIONS_MODULE_NAME, 7) == 0)
+	    /* ent is a PHI entity from the regions module */
+	    return(entity_local_name(ent));
+	else	
+            return entity_has_values_p(ent)? entity_minimal_name(ent) :
+		entity_name(ent); 
+    }
+}
+
+
+/* static string region_sc_to_string(string s, Psysteme ps)
+ * input    : a string buffer and a region predicate
+ * output   : the string buffer filled with a character string representing the
+ *            predicate.
+ * modifies : nothing.
+ * comment  : ps is supposed to be sorted in such a way that in equalities and 
+ *            inequalities constraints containing phi variables come first.
+ *            equalities with phi variables are printed first, and then 
+ *            inequalities with phi variables, and then equalities and inequalities
+ *            with no phi variables.
+ */
+string
+region_sc_to_string(string s, Psysteme ps)
+{
+    Pcontrainte peg, pineg;
+    boolean a_la_fortran = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+    bool first = TRUE;
+    int passe ;
+    
+    if (ps == NULL) 
+    {
+	(void) sprintf(s+strlen(s),"SC_UNDEFINED");
+	return(s);
+    }
+
+    peg = ps->egalites;
+    pineg = ps->inegalites;
+
+    if (!a_la_fortran)
+	(void) sprintf(s+strlen(s), "{");
+
+    for(passe = 1; passe <= 2; passe++) {
+	bool phis = (passe == 1);
+
+	for (; (peg!=NULL) &&  ((!phis) || (phis && vect_contains_phi_p(peg->vecteur))); 
+	     peg=peg->succ) 
+	{
+	    if(first)
+		first = FALSE;
+	    else
+		switch (a_la_fortran) {
+		case FALSE :
+		    (void) sprintf(s+strlen(s),", ");
+		    break;
+		case TRUE : 
+		    (void) sprintf(s+strlen(s),".AND.");
+		    break;
+		}
+	    if (a_la_fortran)
+		(void) sprintf(s+strlen(s),"(");
+	    egalite_sprint_format(s,peg,pips_region_user_name, a_la_fortran);
+	    if (a_la_fortran)
+		(void) sprintf(s+strlen(s),")");
+	}
+	
+	for (;
+	     (pineg!=NULL) &&  ((!phis) || 
+				(phis && vect_contains_phi_p(pineg->vecteur))); 
+	     pineg=pineg->succ) {
+	    if(first)
+	    first = FALSE;
+	    else
+		switch (a_la_fortran) {
+		case FALSE :
+		    (void) sprintf(s+strlen(s),", ");
+		    break;
+		case TRUE : 
+		    (void) sprintf(s+strlen(s),".AND.");
+		    break;
+		}
+	    if (a_la_fortran)
+		(void) sprintf(s+strlen(s),"(");
+	    inegalite_sprint_format(s,pineg, pips_region_user_name, a_la_fortran);
+	    if (a_la_fortran)
+		(void) sprintf(s+strlen(s),")");
+	}
+    
+    }
+    
+    if (!a_la_fortran)
+	(void) strcat(s,"}");
+
+    return(s);
+}
+
+
+
+/* list words_region(effect reg)
+ * input    : a region.
+ * output   : a list of strings representing the region.
+ * modifies : nothing.
+ * comment  :	because of 'buffer', this function cannot be called twice before
+ * its output is processed. Also, overflows in relation_to_string() 
+ * cannot be prevented. They are checked on return.
+ */
+list
+words_region(region reg)
+{
+    static char buffer[REGION_BUFFER_SIZE];
+    
+    list pc = NIL;
+    reference r = effect_reference(reg);
+    action ac = effect_action(reg);
+    approximation ap = effect_approximation(reg);
+    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+    Psysteme sc = region_system(reg);
+
+    buffer[0] = '\0';
+
+    if(!region_empty_p(reg) && !region_rn_p(reg))
+    {
+	Pbase sorted_base = region_sorted_base_dup(reg);
+	Psysteme sc = sc_dup(region_system(reg));
+	
+	/* sorts in such a way that constraints with phi variables come first */
+	region_sc_sort(sc, sorted_base);
+
+	strcat(buffer, "-");	
+	region_sc_to_string(buffer, sc);
+	sc_rm(sc);
+	base_rm(sorted_base);
+
+    }
+    else
+    {
+	strcat(buffer, "-");	
+	region_sc_to_string(buffer, sc);
+    }
+    pips_assert("words_region", strlen(buffer) < REGION_BUFFER_SIZE );
+
+    switch (foresys)
+    {
+    case FALSE :
+      pc = CHAIN_SWORD(pc, "<");
+      pc = gen_nconc(pc, effect_words_reference(r));
+      if (action_read_p(ac))	  	  
+	  pc = CHAIN_SWORD(pc, get_read_action_interpretation() == READ_IS_READ ?
+			   "-R" : "-IN");
+      else 
+	  pc = CHAIN_SWORD(pc, get_write_action_interpretation() == WRITE_IS_WRITE?
+			   "-W" : "-OUT");
+      pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY" : "-EXACT");
+      pc = CHAIN_SWORD(pc, buffer);
+      pc = CHAIN_SWORD(pc, ">");
+      break;
+    case TRUE:
+      pc = gen_nconc(pc, words_reference(r));
+      pc = CHAIN_SWORD(pc, ", RGSTAT(");
+      pc = CHAIN_SWORD(pc, action_read_p(ac) ? "R," : "W,");
+      pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "MAY), " : "EXACT), ");
+      pc = CHAIN_SWORD(pc, buffer);
+      break;
+    }
+
+    return(pc);
+}
+
+
+
+
+
+/* text text_region(effect reg)
+ * input    : a region
+ * output   : a text consisting of several lines of commentaries, 
+ *            representing the region
+ * modifies : nothing
+ */
+text 
+text_region(effect reg)
+{
+    text t_reg = make_text(NIL);
+    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+    string str_prefix;
+
+    if (foresys)
+	str_prefix = REGION_FORESYS_PREFIX;
+    else
+	str_prefix = PIPS_NORMAL_PREFIX;
+    
+    if(reg == effect_undefined)
+    {
+	ADD_SENTENCE_TO_TEXT(t_reg, 
+			     make_pred_commentary_sentence(strdup("<REGION_UNDEFINED>"),
+							   str_prefix));
+	user_log("[region_to_string] unexpected effect undefined\n");
+    }
+    else
+    {
+	gen_free(t_reg);
+	t_reg = words_predicate_to_commentary(words_region(reg), str_prefix);
+    }
+
+    return(t_reg);   
+}
+
+
+/* text text_array_regions(list l_reg)
+ * input    : a list of regions
+ * output   : a text representing this list of regions.
+ * comment  : if the number of array regions is not nul, and if 
+ *            PRETTYPRINT_LOOSE is TRUE, then empty lines are
+ *            added before and after the text of the list of regions.
+ */
 text
-get_text_regions(string module_name)
+text_array_regions(list l_reg)
 {
-    is_user_view_p = FALSE;
-    in_out_regions_p = FALSE;
+    text reg_text = make_text(NIL);
+    /* in case of loose_prettyprint, at least one region to print? */
+    boolean loose_p = get_bool_property("PRETTYPRINT_LOOSE");
+    boolean one_p = FALSE;  
 
-    return get_any_regions_text(module_name,
-				DBR_REGIONS,
-				DBR_SUMMARY_REGIONS,
-				FALSE);
+    /* GO: No redundant test anymore, see  text_statement_array_regions */
+    if (l_reg != (list) HASH_UNDEFINED_VALUE && l_reg != list_undefined) 
+    {
+	gen_sort_list(l_reg, effect_compare);
+	MAP(EFFECT, reg,
+	{
+	    entity ent = effect_entity(reg);
+	    if ( get_bool_property("PRETTYPRINT_SCALAR_REGIONS") || 
+		! entity_scalar_p(ent)) 
+	    {
+		if (loose_p && !one_p )
+		{
+		    ADD_SENTENCE_TO_TEXT(reg_text, 
+					 make_sentence(is_sentence_formatted, 
+						       strdup("\n")));
+		    one_p = TRUE;
+		}
+		MERGE_TEXTS(reg_text, text_region(reg));
+	    }	
+	},
+	    l_reg);
+
+	if (loose_p && one_p)
+	    ADD_SENTENCE_TO_TEXT(reg_text, 
+				 make_sentence(is_sentence_formatted, 
+					       strdup("\n")));
+    }
+    return(reg_text);
 }
 
-text
-get_text_in_regions(string module_name)
-{
-    is_user_view_p = FALSE;
-    in_out_regions_p = TRUE;
 
-    return get_any_regions_text(module_name,
-				DBR_IN_REGIONS,
-				DBR_IN_SUMMARY_REGIONS,
-				FALSE);
-}
-
-text
-get_text_out_regions(string module_name)
-{
-    is_user_view_p = FALSE;
-    in_out_regions_p = TRUE;
-
-    return get_any_regions_text(module_name,
-				DBR_OUT_REGIONS,
-				DBR_OUT_SUMMARY_REGIONS,
-				FALSE);
-}
-
-/* bool print_source_regions(string module_name)
- * input    : the name of the current module
+/* void print_regions(list pc)
+ * input    : a list of regions.
  * modifies : nothing.
- * comment  : prints the original source code with the corresponding regions.	
+ * comment  : prints the list of regions on stderr .
  */
-bool
-print_source_regions(module_name)
-string module_name;
+void print_regions(list pc)
 {
-    is_user_view_p = TRUE;
-    in_out_regions_p = FALSE;
+    list lr;
 
-    return print_code_with_regions(module_name,
-				   DBR_REGIONS,
-				   DBR_SUMMARY_REGIONS,
-				   USER_REGION_SUFFIX);
+    if (pc == NIL) {
+	fprintf(stderr,"\t<NONE>\n");
+    }
+    else {
+        for (lr = pc ; !ENDP(lr); POP(lr)) {
+            effect ef = EFFECT(CAR(lr));
+	    print_region(ef);
+	    fprintf(stderr,"\n");
+        }
+    }
 }
 
-/* bool print_source_in_regions(string module_name)
- * input    : the name of the current module
+/* void print_regions(effect r)
+ * input    : a region.
  * modifies : nothing.
- * comment  : prints the original source code with the corresponding in regions.	
+ * comment  : prints the region on stderr using words_region.
  */
-bool
-print_source_in_regions(module_name)
-string module_name;
+void print_region(effect r)
 {
-    is_user_view_p = TRUE;
-    in_out_regions_p = TRUE;
-
-    return print_code_with_regions(module_name,
-				   DBR_IN_REGIONS,
-				   DBR_IN_SUMMARY_REGIONS,
-				   USER_IN_REGION_SUFFIX);
+    fprintf(stderr,"\t");
+    if(effect_region_p(r)) 
+	print_words(stderr, words_region(r));
+    else 
+	/* print_words(stderr, words_effect(r)); */
+    fprintf(stderr,"\n");
 }
 
-/* bool print_source_out_regions(string module_name)
- * input    : the name of the current module
- * modifies : nothing.
- * comment  : prints the original source code with the corresponding out regions.	
+
+
+/*********************************************************************************/
+/* STATISTICS FOR OPERATORS                                                      */
+/*********************************************************************************/
+
+
+void
+print_regions_op_statistics(char *mod_name, int regions_type)
+{
+    string prefix = string_undefined;
+
+    switch (regions_type) {
+    case R_RW : 
+	prefix = "rrw-";
+	break;
+    case R_IN : 
+	prefix = "rin-";
+	break;
+    case R_OUT :
+	prefix = "rout-";
+	break;
+    }
+
+/*    print_proj_op_statistics(mod_name, prefix);
+    print_umust_statistics(mod_name, prefix);
+    print_umay_statistics(mod_name, prefix);
+    print_dsup_statistics(mod_name, prefix); */
+    /* print_dinf_statistics(mod_name, prefix); */
+
+}
+
+
+/*********************************************************************************/
+/* SORTING                                                                       */
+/*********************************************************************************/
+
+
+/* Compares two effects for sorting. The first criterion is based on names.
+ * Local entities come first; then they are sorted according to the
+ * lexicographic order of the module name, and inside each module name class,
+ * according to the local name lexicographic order. Then for a given
+ * entity name, a read effect comes before a write effect. It is assumed
+ * that there is only one effect of each type per entity. bc.
  */
-bool
-print_source_out_regions(module_name)
-string module_name;
+int
+effect_compare(effect *peff1, effect *peff2)
 {
-    is_user_view_p = TRUE;
-    in_out_regions_p = TRUE;
+    entity ent1 = effect_entity(*peff1);
+    entity ent2 = effect_entity(*peff2);
+    int eff1_pos = 0;
 
-    return print_code_with_regions(module_name,
-				   DBR_OUT_REGIONS,
-				   DBR_OUT_SUMMARY_REGIONS,
-				   USER_OUT_REGION_SUFFIX);
-}
+    /* same entity case: sort on action */
+    if (same_entity_p(ent1,ent2))
+	if (effect_read_p(*peff1)) 
+	    return(-1);
+	else
+	    return(1);
+    
+    /* sort on module name */
+    eff1_pos = strcmp(entity_module_name(ent1), entity_module_name(ent2));
+    
+    /* if same module name: sort on entity local name */
+    if (eff1_pos == 0)
+    {
+	eff1_pos = strcmp(entity_local_name(ent1), entity_local_name(ent2));	
+    }
+    /* else: current module comes first, others in lexicographic order */
+    else
+    {
+	entity module = get_current_module_entity();
 
+	if (strcmp(module_local_name(module), entity_module_name(ent1)) == 0)
+	    eff1_pos = -1;
+	if (strcmp(module_local_name(module), entity_module_name(ent2)) == 0)
+	    eff1_pos = 1;	    	
+    }
 
-
-/* bool print_code_regions(string module_name)
- * input    : the name of the current module
- * modifies : nothing.
- * comment  : prints the source code with the corresponding regions.	
- */
-bool
-print_code_regions(module_name)
-string module_name;
-{
-    is_user_view_p = FALSE;
-    in_out_regions_p = FALSE;
-
-    return print_code_with_regions(module_name,
-				   DBR_REGIONS,
-				   DBR_SUMMARY_REGIONS,
-				   SEQUENTIAL_REGION_SUFFIX);
-}
-
-
-/* bool  print_code_in_regions(string module_name)
- * input    : the name of the current module
- * modifies : nothing.
- * comment  : prints the source code with the corresponding in regions.	
- */
-bool
-print_code_in_regions(module_name)
-string module_name;
-{
-    is_user_view_p = FALSE;
-    in_out_regions_p = TRUE;
-
-    return print_code_with_regions(module_name,
-				   DBR_IN_REGIONS,
-				   DBR_IN_SUMMARY_REGIONS,
-				   SEQUENTIAL_IN_REGION_SUFFIX);
-}
-
-/* bool print_code_out_regions(string module_name)
- * input    : the name of the current module
- * modifies : nothing.
- * comment  : prints the source code with the corresponding out regions.	
- */
-bool
-print_code_out_regions(module_name)
-string module_name;
-{
-    is_user_view_p = FALSE;
-    in_out_regions_p = TRUE;
-
-    return print_code_with_regions(module_name,
-				   DBR_OUT_REGIONS,
-				   DBR_OUT_SUMMARY_REGIONS,
-				   SEQUENTIAL_OUT_REGION_SUFFIX);
-}
-
-/* bool print_code_proper_regions(string module_name)
- * input    : the name of the current module
- * modifies : nothing.
- * comment  : prints the source code with the corresponding proper regions
- *            (and summary regions for compatibility purposes).	
- */
-bool
-print_code_proper_regions(module_name)
-string module_name;
-{
-    is_user_view_p = FALSE;
-    in_out_regions_p = FALSE;
-
-    return print_code_with_regions(module_name,
-				   DBR_PROPER_REGIONS,
-				   DBR_SUMMARY_REGIONS,
-				   SEQUENTIAL_PROPER_REGION_SUFFIX);
+    return(eff1_pos);
 }
 
 
 
 
-/* bool print_code_with_regions(string module_name, list summary_regions)
- * input    : the name of the current module, the name of the region and
- *            summary region resources and the file suffix
- *            the regions are in the global variable local_regions_map.
- * modifies : nothing.
- * comment  : prints the source code with the corresponding regions.	
- */
-static bool
-print_code_with_regions(string module_name,
-			string resource_name,
-			string summary_resource_name,
-			string file_suffix)
-{
-    char *file_name, *file_resource_name;
-    bool success = TRUE;
 
-    file_name = strdup(concatenate(file_suffix,
-                                  get_bool_property
-				  ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
-				  GRAPH_FILE_EXT : "",
-                                  NULL));
-    file_resource_name = get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
-	DBR_GRAPH_PRINTED_FILE : 
-	    (is_user_view_p ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE);
-
-    /*
-    begin_attachment_prettyprint();
-    */  
-    success = make_text_resource(module_name, file_resource_name,
-				 file_name,
-				 get_any_regions_text(module_name,
-				    resource_name,
-				    summary_resource_name,
-				    TRUE));
-    /*
-    end_attachment_prettyprint();
-    */
-    free(file_name);
-    return(TRUE);
-}
-
-static text 
-get_any_regions_text(string module_name,
-		     string resource_name,
-		     string summary_resource_name,
-		     bool give_code_p)
-{
-    list summary_regions;
-    entity module;
-    statement module_stat, user_stat = statement_undefined;
-    text txt = make_text(NIL);
-
-    debug_on("REGIONS_DEBUG_LEVEL");
-
-    /* load regions corresponding to the current module */
-    set_rw_effects((statement_effects) 
-			   db_get_memory_resource
-			   (resource_name, module_name, TRUE) );
-
-    summary_regions = 
-	effects_to_list((effects) db_get_memory_resource
-			(summary_resource_name,
-			 module_name, TRUE));
-
-    set_current_module_entity( local_name_to_top_level_entity(module_name));
-    module = get_current_module_entity();
-
-    set_current_module_statement((statement) db_get_memory_resource
-				 (DBR_CODE, module_name, TRUE));
-
-    module_stat = get_current_module_statement();
-
-    /* To set up the hash table to translate value into value names */       
-    set_cumulated_rw_effects((statement_effects)
-	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-    module_to_value_mappings(module);
-
-    debug_off();
-
-    reset_current_module_entity();
-    reset_current_module_statement();
-    reset_rw_effects(); 
-
-    reset_cumulated_rw_effects();
-
-    return txt;
-}
 
