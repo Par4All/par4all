@@ -285,6 +285,14 @@ entity e;
 		   strlen(entity_module_name(e))) == 0);
 }
 
+bool io_entity_p(e)
+entity e;
+{
+    return(strncmp(IO_EFFECTS_PACKAGE_NAME, 
+		   entity_name(e),
+		   strlen(entity_module_name(e))) == 0);
+}
+
 entity entity_intrinsic(name)
 string name;
 {
