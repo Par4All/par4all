@@ -3,6 +3,9 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.72  1998/04/14 16:28:27  coelho
+ * cleaner header.
+ *
  * Revision 1.71  1998/04/14 16:27:56  coelho
  * switch to linear.h
  *
@@ -19,21 +22,11 @@
  * Revision 1.67  1997/07/21 13:23:59  keryell
  * Replaced %x format by %p.
  *
- * Revision 1.66  1997/06/10 09:15:30  coelho
- * *** empty log message ***
- *
- * Revision 1.65  1997/06/10 08:56:30  coelho
- * *** empty log message ***
- *
  * Revision 1.64  1997/04/17 11:46:54  coelho
  * io comms pvm -> runtime.
  *
  * Revision 1.63  1997/04/07 09:46:40  coelho
  * DEBUG_MTRX macro added
- *
- * Revision 1.62  1997/03/19 15:59:19  coelho
- * *** empty log message ***
- *
  */
 
 /* Most includes are centralized here.
