@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/04/28 11:48:14 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/04/28 14:07:27 $, )
  * version $Revision$
  */
  
@@ -269,7 +269,7 @@ void hpfc_init(name)
 string name;
 {
     debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfc_init", "considering workspace %s\n", name);
+    debug(1, "hpfc_init", "considering program %s\n", name);
 
     set_bool_property("PRETTYPRINT_HPFC", TRUE);
     set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
@@ -412,6 +412,37 @@ string name;
     debug_off();
 }
 
+/* void hpfc_common(name)
+ * string name;
+ *
+ * what: compile a common, that is generate the common for both host and nodes.
+ * how: generate files to be included.
+ * input: a common name.
+ * output: none.
+ * side effects:
+ *  - uses the hpfc_status.
+ *  - generates 4 files.
+ * bugs or features:
+ *  - never called by pipsmake (:-)
+ */
+void hpfc_common(name)
+string name;
+{
+    debug_on("HPFC_DEBUG_LEVEL");
+    debug(1, "hpfc_common", "considering common %s\n", name);
+
+    load_hpfc_status();
+
+    /* commons compilation
+     */
+    set_bool_property("PRETTYPRINT_COMMONS", TRUE);
+    compile_common(local_name_to_top_level_entity(name));
+
+    save_hpfc_status();
+
+    debug_off();
+}
+
 /* void hpfc_close(name)
  * string name;
  *
@@ -428,7 +459,7 @@ void hpfc_close(name)
 string name;
 {
     debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfc_close", "considering %s\n", name);
+    debug(1, "hpfc_close", "considering program %s\n", name);
  
     load_hpfc_status();
     
