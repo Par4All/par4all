@@ -270,6 +270,93 @@ unstructured u;
 
 
 
+ /* the following data structure describes an io intrinsic function: its
+    name */
+
+typedef struct IOIntrinsicDescriptor {
+    string name;
+} IOIntrinsicDescriptor;
+
+static IOIntrinsicDescriptor IOIntrinsicDescriptorTable[] = {
+    {"WRITE"},
+    {"REWIND"},
+    {"BACKSPACE"},
+    {"OPEN"},
+    {"CLOSE"},
+    {"READ"},
+    {"BUFFERIN"},
+    {"BUFFEROUT"},
+    {"ENDFILE"},
+    {"INQUIRE"},
+    {IMPLIED_DO_NAME},
+
+    {NULL}
+};
+
+
+/*=======================================================================*/
+/* bool io_filter(st)
+ *
+ * Tests if the statement is a call to an IO function. In such a case, we
+ * put the statement inside a comment.
+ * 
+ * AP, oct 9th 1995
+ */
+
+static bool io_filter(st)
+statement st;
+{
+  bool res_b;
+  instruction ins;
+
+  res_b = TRUE;
+  ins = statement_instruction(st);
+
+  if(instruction_tag(ins) == is_instruction_call) {
+    call ca = instruction_call(ins);
+    entity e = call_function(ca);
+
+    /* There can be no statement inside a call, so gen_recurse() do not
+       need to go further. */
+    res_b = FALSE;
+
+    if(value_tag(entity_initial(e)) == is_value_intrinsic) {
+      string s = entity_local_name(e);
+      IOIntrinsicDescriptor *pid = IOIntrinsicDescriptorTable;
+      bool found = FALSE;
+
+      while ((pid->name != NULL) && (!found)) {
+        if (strcmp(pid->name, s) == 0) {
+	  char         *comment;
+	  statement    stat;
+	  list lstat;
+
+	  comment = malloc(64);
+	  sprintf(comment, "C  ");
+	  sprintf(comment, "%s %s", comment,
+		  words_to_string(words_call(ca, 0)));
+	  sprintf(comment, "%s\n", comment);
+ 
+	  stat = make_statement(entity_empty_label(),
+				STATEMENT_NUMBER_UNDEFINED,
+				STATEMENT_ORDERING_UNDEFINED,
+				comment, 
+				make_instruction(is_instruction_block, NIL));
+	  lstat = CONS(STATEMENT, stat, NIL);
+ 
+	  statement_instruction(st) = make_instruction(is_instruction_block,
+						       lstat);
+	  found = TRUE;
+	}
+        pid += 1;
+      }
+    }
+  }
+
+  return(res_b);
+}
+
+
 /*==================================================================*/
 /* void static_controlize((char*) mod_name)			AL 05/93
  * Computes the static_control attached to module-name : mod_name.
@@ -311,20 +398,34 @@ char* mod_name;
 	if (!instruction_unstructured_p(mod_inst))
 		pips_error("static_controlize", "unstructured expected\n");
 
+	/* HAS TO BE REMOVED AS SOON AS POSSIBLE: as the IOs are not
+	   treated as they would, all the instructions containing IOs are
+	   put inside comments. AP, oct 9th 1995 */
+	gen_recurse(mod_inst, statement_domain, io_filter, gen_null);
+
+	/* Normalization of all loops */
 	loop_normalize_of_unstructured(instruction_unstructured(mod_inst),
 				       Gforward_substitute_table,
 				       &Genclosing_loops,
 				       &Genclosing_tests,
 				       &Gscalar_written_forward,
 				       &Gcount_nlc);
+
+	/* The code has been modified, so the orderings are recomputed. */
  	module_body_reorder( mod_stat );  
 	verify_structural_parameters(formal_integers,
 				     &Gscalar_written_forward);
 
 	Genclosing_loops      = (list) NIL;
 	Genclosing_tests      = (list) NIL;
-	sc = static_controlize_unstructured(instruction_unstructured(mod_inst));
+
+	/* We compute the static control infos for each instruction. */
+	sc =
+	  static_controlize_unstructured(instruction_unstructured(mod_inst));
+
+	/* Renumber the statements. */
 	stco_renumber_code( mod_stat, 0 );
+
 	SET_STATEMENT_MAPPING( Gstatic_control_map, mod_stat, sc );
 
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), (char*) mod_stat);
