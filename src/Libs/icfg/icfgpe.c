@@ -1,5 +1,5 @@
 
-text get_text_proper_effects_flt(string module_name)
+text get_text_proper_effects_flt(string module_name, entity e_flt)
 {
   text t;
   set_methodes_for_rw_effects_prettyprint(module_name);
