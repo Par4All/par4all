@@ -1,5 +1,5 @@
  /* $RCSfile: module.c,v $ (version $Revision$)
-  * $Date: 1996/12/27 09:10:08 $, 
+  * $Date: 1997/02/04 18:22:30 $, 
   */
 #include <stdio.h>
 #include <string.h>
@@ -12,8 +12,6 @@
 
 #include "misc.h"
 #include "properties.h"
-
-#include "control.h"
 
 static bool module_coherent_p=TRUE;
 static entity checked_module = entity_undefined;
