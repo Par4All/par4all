@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1996/03/11 17:47:30 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1996/06/11 13:27:21 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -400,9 +400,10 @@ list lr1, lr2;
 
 /****************************************************************** RANGES */
 
-list array_ranges_to_template_ranges(array, lra)
-entity array;
-list lra;
+list 
+array_ranges_to_template_ranges(
+    entity array,
+    list lra)
 {
     align a = load_hpf_alignment(array);
     entity template = align_template(a);
@@ -412,9 +413,18 @@ list lra;
     for (i=1 ; i<=NumberOfDimension(template) ; i++)
     {
 	alignment al = FindAlignmentOfTemplateDim(la, i);
-	int arraydim = alignment_arraydim(al);
+	int arraydim = alignment_undefined_p(al)? -1: alignment_arraydim(al);
 
-	if (arraydim==0) /* replication */
+	if (arraydim==-1) /* scratched */
+	{
+	    dimension d = FindIthDimension(template, i);
+	    lrt = gen_nconc(lrt,
+               CONS(RANGE,
+		    make_range(copy_expression(dimension_lower(d)),
+			       copy_expression(dimension_upper(d)),
+			       int_to_expression(1)), NIL));
+	} 
+	else if (arraydim==0) /* replication */
 	{
 	    expression b = alignment_constant(al);
 
