@@ -190,9 +190,18 @@ pips_internal_error_function(
 void default_prompt_user(s)
 char *s;
 {
-    fprintf(stderr, "%s\n", s);
-    fprintf(stderr, "Press <Return> to continue ");
+    fprintf(stderr, "%s\nPress <Return> to continue ", s);
     while (getchar() != '\n') ;
+}
+
+void 
+pips_exit_function(int code, char * format, ...)
+{
+    va_list some_arguments;
+    va_start(some_arguments, format);
+    (void) vfprintf(stderr, format, some_arguments); /* ??? */
+    va_end(some_arguments);
+    exit(code);
 }
 
 /* PROMPT_USER schould be implemented. (its a warning with consent of the user)
