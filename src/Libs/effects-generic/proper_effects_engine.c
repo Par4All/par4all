@@ -38,7 +38,7 @@
 
 /************************************************ TO CONTRACT PROPER EFFECTS */
 
-static contract_p = TRUE;
+static bool contract_p = TRUE;
 
 void
 set_contracted_proper_effects(bool b)
@@ -76,9 +76,7 @@ free_cumu_range_effects()
 }
 
 
-/*********************************************************************************/
-/* EXPRESSSIONS                                                                  */
-/*********************************************************************************/
+/************************************************************** EXPRESSSIONS */
 
 
 /* list generic_proper_effects_of_range(range r, context)
@@ -339,9 +337,7 @@ generic_r_proper_effects_of_call(call c)
 }
 
 
-/*********************************************************************************/
-/* STATEMENTS                                                                    */
-/*********************************************************************************/
+/**************************************************************** STATEMENTS */
 
 static void 
 proper_effects_of_call(call c)
@@ -391,11 +387,10 @@ loop_filter(loop l)
     return(TRUE);
 }
 
-static void 
-proper_effects_of_loop(loop l)
+static void proper_effects_of_loop(loop l)
 {
-    list l_proper=NIL;
     statement current_stat = effects_private_current_stmt_head();
+    list l_proper = NIL;
     list l_cumu_range = NIL;
 
     entity i = loop_index(l);
@@ -447,11 +442,19 @@ proper_effects_of_loop(loop l)
 
     if (contract_p)
 	l_proper = proper_effects_contract(l_proper);
+
     store_proper_rw_effects_list(current_stat, l_proper);
 }
 
-static void 
-proper_effects_of_test(test t)
+static void proper_effects_of_while(whileloop w)
+{
+    statement current_stat = effects_private_current_stmt_head();
+    list /* of effect */ l_proper = 
+	generic_proper_effects_of_expression(whileloop_condition(w));
+    store_proper_rw_effects_list(current_stat, l_proper);
+}
+
+static void proper_effects_of_test(test t)
 {
     list l_proper=NIL;
     statement current_stat = effects_private_current_stmt_head();
@@ -477,15 +480,13 @@ proper_effects_of_test(test t)
     store_proper_rw_effects_list(current_stat, l_proper);
 }
 
-static void 
-proper_effects_of_sequence(sequence block)
+static void proper_effects_of_sequence(sequence block)
 {
     statement current_stat = effects_private_current_stmt_head();   
     store_proper_rw_effects_list(current_stat, NIL);
 }
 
-static bool 
-stmt_filter(statement s)
+static bool stmt_filter(statement s)
 {
     pips_debug(1, "Entering statement %03d :\n", statement_ordering(s));
     effects_private_current_stmt_push(s);
@@ -493,8 +494,7 @@ stmt_filter(statement s)
     return(TRUE);
 }
 
-static void 
-proper_effects_of_statement(statement s)
+static void proper_effects_of_statement(statement s)
 {
     if (!bound_proper_rw_effects_p(s)) 
      { 
@@ -508,8 +508,7 @@ proper_effects_of_statement(statement s)
   
 }
 
-void 
-proper_effects_of_module_statement(statement module_stat)
+void proper_effects_of_module_statement(statement module_stat)
 {    
     make_effects_private_current_stmt_stack();
     make_effects_private_current_context_stack();
@@ -523,6 +522,7 @@ proper_effects_of_module_statement(statement module_stat)
 	 test_domain, gen_true, proper_effects_of_test,
 	 call_domain, gen_true, proper_effects_of_call,
 	 loop_domain, loop_filter, proper_effects_of_loop,
+	 whileloop_domain, gen_true, proper_effects_of_while,
 	 unstructured_domain, gen_true, proper_effects_of_unstructured,
 	 expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
 	 NULL); 
@@ -533,8 +533,7 @@ proper_effects_of_module_statement(statement module_stat)
     free_current_downward_cumulated_range_effects_stack();
 }
 
-bool
-proper_effects_engine(char *module_name)
+bool proper_effects_engine(char *module_name)
 {    
 
     /* Get the code of the module. */
