@@ -23,6 +23,10 @@
  * integer translation is forgotten.
  *
  * $Log: forward_substitution.c,v $
+ * Revision 1.6  1998/04/01 12:30:27  coelho
+ * generic conversions are inserted if necessary, or the conversion is not
+ * performed if no conversion function is available.
+ *
  * Revision 1.5  1998/04/01 09:43:43  coelho
  * fixed a bug that was too optimistic when selectig cool statements...
  * w/w conflict have to be avoided to allow the transformation.
@@ -68,6 +72,48 @@ typedef struct
 }
     t_substitution, * p_substitution;
 
+/* newgen-looking make/free
+ */
+static p_substitution 
+make_substitution(statement source, entity var, expression val)
+{
+    p_substitution subs;
+    basic bval = basic_of_expression(val), bvar = entity_basic(var);
+
+    pips_assert("defined basics", 
+		!(basic_undefined_p(bval) || basic_undefined_p(bvar)));
+
+    subs = (p_substitution) malloc(sizeof(t_substitution));
+    pips_assert("malloc ok", subs);
+    subs->source = source;
+    subs->var = var;
+    if (basic_equal_p(bval, bvar))
+	subs->val = copy_expression(val);
+    else
+    {
+	entity conv = basic_to_generic_conversion(bvar);
+	if (entity_undefined_p(conv))
+	{
+	    pips_user_warning("no conversion function...");
+	    free(subs); 
+	    return NULL;
+	}
+	subs->val = make_call_expression
+	    (conv, CONS(EXPRESSION, copy_expression(val), NIL));
+    }
+    free_basic(bval);
+    return subs;
+}
+
+static void 
+free_substitution(p_substitution subs)
+{
+    if (subs) {
+	free_expression(subs->val);
+	free(subs);
+    }
+}
+
 #define DEBUG_NAME "FORWARD_SUBSTITUTION_DEBUG_LEVEL"
 
 /* returns whether there is other write proper effect than on var
@@ -102,7 +148,6 @@ substitution_candidate(statement s, bool only_scalar)
     entity fun, var;
     syntax svar;
     instruction i = statement_instruction(s);
-    p_substitution subs;
 
     if (!instruction_call_p(i)) return NULL; /* CALL */
     
@@ -126,13 +171,7 @@ substitution_candidate(statement s, bool only_scalar)
 
     if (!functionnal_on(var, s)) return NULL; /* NO SIDE EFFECTS */
 
-    subs = (p_substitution) malloc(sizeof(t_substitution));
-
-    subs->source = s;
-    subs->var = var; /* ?? could be the expression for array propagation? */
-    subs->val = EXPRESSION(CAR(CDR(args)));
-
-    return subs;
+    return make_substitution(s, var, EXPRESSION(CAR(CDR(args))));
 }
 
 /* x = a(i) ; a(j) = x;
@@ -146,7 +185,7 @@ cool_enough_for_a_last_substitution(statement s)
 {
     p_substitution x = substitution_candidate(s, FALSE);
     bool ok = (x!=NULL);
-    if (x) free(x);
+    free_substitution(x);
     return ok;
 }
 
@@ -260,7 +299,7 @@ seq_flt(sequence s)
 	    },   
 		CDR(ls));
 
-	    free(subs);
+	    free_substitution(subs);
 	}
     },
         sequence_statements(s));
