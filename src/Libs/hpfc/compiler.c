@@ -1,37 +1,12 @@
-/*
- * HPF Compiler
- * 
- * Fabien Coelho, May 1993
+/* Fabien Coelho, May 1993
  *
- * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1995/04/04 10:47:20 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/04/10 18:49:33 $, )
  * version $Revision$
- * got on %D%, %T%
- * $Id$
  */
 
-/*
- * included files, from C libraries, newgen and pips libraries.
- */
-
-#include <stdio.h>
-#include <string.h>
-extern int fprintf();
-
-#include "genC.h"
-
-#include "ri.h"
-#include "database.h"
-#include "hpf.h"
-#include "hpf_private.h"
-
-#include "misc.h"
-#include "ri-util.h"
-#include "control.h"     /* for CONTROL_MAP() */
-#include "text-util.h"
-#include "properties.h"
-#include "hpfc.h"
 #include "defines-local.h"
+
+#include "control.h"     /* for CONTROL_MAP() */
 
 /* global variables
  */
