@@ -218,6 +218,7 @@ static int lend()
 static int implicit_program; /* FC */
 static int implicit_blockdata_name; /* FC */
 static int implicit_program_name; /* FC */
+static int it_is_a_main; /* FC */
 
 /*		check for keywords for subprograms	
 		return 0 if comment card, 1 if found
@@ -232,6 +233,7 @@ char *s;
 	implicit_program = 0;
 	implicit_blockdata_name = 0;
 	implicit_program_name = 0;
+	it_is_a_main = 0;
 
 	/* first check for comment cards */
 	if(buf[0]=='c' || buf[0]=='C' || buf[0]=='*' || buf[0]=='!') return 0;
@@ -241,9 +243,7 @@ char *s;
 
 
 	ptr = skiplab(buf);
-	if (ptr == 0)
-		return (0);
-
+	if (ptr == 0) return (0);
 
 	/*  copy to buffer and converting to lower case */
 	p = ptr;
@@ -260,10 +260,11 @@ char *s;
 		if(scan_name(s, ptr)) return(1);
 		strcpy( s, x);
 	} else if((ptr = look(line, "program")) != 0) {
-		if(scan_name(s, ptr)) return(1);
-		implicit_program_name = 1;
-		get_name( mainp, 4);
-		strcpy( s, mainp);
+	    it_is_a_main = 1;
+	    if(scan_name(s, ptr)) return(1);
+	    implicit_program_name = 1;
+	    get_name( mainp, 4);
+	    strcpy( s, mainp);
 	} else if((ptr = look(line, "blockdata")) != 0) {
 		if(scan_name(s, ptr)) return(1);
 		implicit_blockdata_name = 1;
@@ -274,6 +275,7 @@ char *s;
 		strcpy( s, x);
 	} else {
 	    implicit_program = 1;
+	    it_is_a_main = 1;
 		get_name( mainp, 4);
 		strcpy( s, mainp);
 	}
@@ -398,6 +400,14 @@ int fsplit(char * file_name, FILE * out)
 	    hollerith(buf); /* FC */
 	    if (nflag == 0) /* if no name yet, try and find one */
 		nflag = lname(name);
+	    if (it_is_a_main) {
+		FILE * fm = fopen(".fsplit_main_list", "a");
+		char * c = name;
+		while (*c && *c!='.') putc(toupper(*c++), fm);
+		putc('\n', fm);
+		fclose(fm);
+		it_is_a_main = 0;
+	    }
 	    if (implicit_program==1) /* FC again */ 
 	    {
 		fprintf(ofp, 
