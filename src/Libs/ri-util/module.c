@@ -157,13 +157,14 @@ bool variable_declaration_coherency_p(entity module, statement st)
 
 /* ??? used as ok or undefined 
  */
-GENERIC_GLOBAL_FUNCTION(referenced_variables, entity_int);
-GENERIC_LOCAL_FUNCTION(declared_variables, entity_int);
+GENERIC_GLOBAL_FUNCTION(referenced_variables, entity_int)
+GENERIC_LOCAL_FUNCTION(declared_variables, entity_int)
 
 /* the list is needed to insure a deterministic scanning, what would be
  * rather random over installations thru hash_table_map for instance.
  */
-static list referenced_variables_list = NIL;
+static list /* of entity */
+    referenced_variables_list = NIL;
 
 static void store_this_variable(var)
 entity var;
@@ -178,7 +179,7 @@ entity var;
 
     if (!bound_referenced_variables_p(var))
     {
-	debug(9, "store_this_variable", "%s\n", entity_name(var));
+	pips_debug(9, "%s\n", entity_name(var));
 	store_referenced_variables(var, TRUE);
     }
 }
@@ -186,63 +187,58 @@ entity var;
 static void store_a_referenced_variable(ref)
 reference ref;
 {
-    assert(!reference_undefined_p(ref));
+    /* assert(!reference_undefined_p(ref)); */
     store_this_variable(reference_variable(ref));
 }
 
 static void store_the_loop_index(l)
 loop l;
 {
-    assert(!loop_undefined_p(l));
+    /* assert(!loop_undefined_p(l)); */
     store_this_variable(loop_index(l));
 }
 
 /*  to be called if the referenced map need not be shared between modules
- *  otherwise the next function is okay
+ *  otherwise the next function is okay.
  */
-void insure_declaration_coherency_of_module(module, stat)
-entity module;
-statement stat;
+void insure_declaration_coherency_of_module(
+    entity module,
+    statement stat)
 {
     init_referenced_variables();
-    insure_declaration_coherency(module, stat);
+    insure_declaration_coherency(module, stat, NIL);
     close_referenced_variables();
 }
 
 /*  the referenced_variable_map is global and must be made/freed
  *  before/after the call
  */
-void insure_declaration_coherency(module, stat)
-entity module;
-statement stat;
+void insure_declaration_coherency(
+    entity module,
+    statement stat,
+    list /* of entity */ le) /* added entities, for includes... */
 {
-    list
-	decl = entity_declarations(module),
-	new_decl = NIL;
+    list decl = entity_declarations(module), new_decl = NIL;
 
     debug_on("RI_UTIL_DEBUG_LEVEL");
 
     assert(!referenced_variables_undefined_p());
 
-    debug(5, "insure_declaration_coherency",
-	  "Processing module %s\n", entity_name(module));
+    pips_debug(5, "Processing module %s\n", entity_name(module));
 
     init_declared_variables();
     referenced_variables_list = NIL;
     
-    MAPL(ce, store_declared_variables(ENTITY(CAR(ce)), TRUE), decl);
+    MAP(ENTITY, e, store_this_variable(e), le);
+    MAP(ENTITY, e, store_declared_variables(e, TRUE), decl);
 
     gen_multi_recurse(stat,
 		      /*   Direct References   
 		       */
-		      reference_domain, 
-		      gen_true, 
-		      store_a_referenced_variable,
+		      reference_domain, gen_true, store_a_referenced_variable,
 		      /*   References in Loops   
 		       */
-		      loop_domain, 
-		      gen_true, 
-		      store_the_loop_index,
+		      loop_domain, gen_true, store_the_loop_index,
 		      NULL);
 
     /*    checks each declared variable for a reference
@@ -256,16 +252,14 @@ statement stat;
 	     value_symbolic_p(entity_initial(var)) ||
 	     bound_referenced_variables_p(var))
 	 {
-	     debug(7, "insure_declaration_coherency",
-		   "declared variable %s is referenced, kept\n",
-		   entity_name(var));
+	     pips_debug(7, "declared variable %s is referenced, kept\n",
+			entity_name(var));
 	     new_decl = CONS(ENTITY, var, new_decl);
 	 }
 	 else
 	 {
-	     debug(7, "insure_declaration_coherency",
-		   "declared variable %s not referenced, removed\n",
-		   entity_name(var));
+	     pips_debug(7, "declared variable %s not referenced, removed\n",
+			entity_name(var));
 	 }
      },
 	 decl);
@@ -279,17 +273,15 @@ statement stat;
 	 if (!bound_declared_variables_p(var) &&
 	     !basic_overloaded_p(entity_basic(var)))
 	 {
-	     debug(7, "insure_declaration_coherency",
-		   "referenced variable %s not declared, added\n",
-		   entity_name(var));
+	     pips_debug(7, "referenced variable %s not declared, added\n",
+			entity_name(var));
 	     new_decl=CONS(ENTITY, var, new_decl);
 	     store_declared_variables(var, TRUE);
 	 }
 	 else
 	 {
-	     debug(7, "insure_declaration_coherency",
-		   "referenced variable %s declared\n",
-		   entity_name(var));
+	     pips_debug(7, "referenced variable %s declared\n",
+			entity_name(var));
 	 }
      },
 	 referenced_variables_list);
