@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1996/08/21 11:53:22 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1996/09/20 18:59:54 $, )
  * version $Revision$
  */
 
@@ -184,9 +184,9 @@ union domain *dp ;
   {
       struct gen_binding *bp = dp->ba.constructand ;
       
-      if (IS_INLINABLE(bp))     sprintf( buffer, "");
+      if (IS_INLINABLE(bp))     /*sprintf( buffer, "")*/ *buffer='\0';
       else if (IS_EXTERNAL(bp)) sprintf( buffer, "(%s)", bp->name ) ;
-      else                      sprintf( buffer, "");
+      else                      /*sprintf( buffer, "")*/ *buffer='\0';
 
       break ;
   }
@@ -243,7 +243,7 @@ int offset ;
 	       cast, offset, field, dp->ba.constructand->name ) ;
     }
     else {
-	printf( "(%s(((node)+%d)->%s))\n", cast, offset, field ) ;
+	printf( "(%s(((node)+%d)->%s))\n", /* cast */ " " , offset, field ) ;
     }
 }
 
