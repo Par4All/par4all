@@ -38,7 +38,7 @@ stf(char *mod_name)
     char outline[MAX__LENGTH];
     FILE *ftmp;
     int status;
-    string wdn = db_get_workspace_directory_name();
+    string wdn = db_get_current_workspace_directory();
 
     extern int system(char*);
     extern int unlink(char*);
