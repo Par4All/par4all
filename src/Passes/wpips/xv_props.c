@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/27 17:46:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/28 13:52:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 1995/09/27 17:46:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "%A% ($Date: 1995/09/28 13:52:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -358,7 +358,6 @@ build_options_menu_and_panel(Menu menu_options,
    makefile m = parse_makefile();
    int max_item_width = 0;
   
-   int max_length_of_all_the_options = 0;
    int number_of_options = 0;
    hash_table phase_by_made_htp = hash_table_make(hash_string, 0);
 
@@ -393,12 +392,8 @@ build_options_menu_and_panel(Menu menu_options,
       string alias1 = hash_get_key_by_value(aliases, k);
       list l = (list) v;
 
-      if ((alias1 != HASH_UNDEFINED_VALUE) && (gen_length(l) >= 2)) {
-         int alias1_length = strlen(alias1);
-         max_length_of_all_the_options = MAX(max_length_of_all_the_options,
-                                             alias1_length);
+      if ((alias1 != HASH_UNDEFINED_VALUE) && (gen_length(l) >= 2))
          number_of_options++;
-      }
    }, phase_by_made_htp);
 
    all_the_options = (option_type *)
@@ -452,7 +447,7 @@ build_options_menu_and_panel(Menu menu_options,
                                                STRING(CAR(vrn)));
          Menu_item sub_menu_option_item;
 
-         if (alias2!=HASH_UNDEFINED_VALUE) {
+         if (alias2 != HASH_UNDEFINED_VALUE) {
             /* Add a sub-option entry in the menu: */
             sub_menu_option_item = (Menu_item) xv_create(NULL, MENUITEM,
                                                          MENU_STRING, 
@@ -499,6 +494,10 @@ build_options_menu_and_panel(Menu menu_options,
          max_item_width = MAX(max_item_width,
                               (int) xv_get(item, PANEL_LABEL_WIDTH));
       PANEL_END_EACH
+
+         /* It looks on my screen that this width is 8:7 larger. Apply
+            a pifometric scaling factor... :-) */
+         max_item_width = (max_item_width*7)/8;
 
       PANEL_EACH_ITEM(options_panel, item)
          xv_set(item, PANEL_LABEL_WIDTH,
