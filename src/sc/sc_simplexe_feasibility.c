@@ -273,6 +273,7 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 			hashtable[h].nom=pv->var ;
 		    }
 		    hh = h ;
+		    assert((NUMERO) < (3+DIMENSION));
 		    eg[NUMERO].existe = 1 ;
 		    eg[NUMERO].colonne[eg[NUMERO].taille].numero=ligne ;
 		    eg[NUMERO].colonne[eg[NUMERO].taille].num = pv->val ;
@@ -365,7 +366,7 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 			hashtable[h].nom=pv->var ;
 			CREVARVISIBLE ;
 		    }
-		    
+		    assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
 		    if(poidsM < 0 || (poidsM==0 && valeur<0))
 			t[NUMERO].colonne[0].num += pv->val,
 			/*
@@ -473,6 +474,7 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
                     CREVARVISIBLE ;
                     hashtable[h].nom=pv->var ;
                 }
+		assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
                 if(poidsM < 0 || (poidsM==0 && valeur<0))
                     t[NUMERO].colonne[0].num += pv->val,
                     t[NUMERO].colonne[0].den = 1 ;
@@ -542,6 +544,7 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
                     hashtable[h].nom=pv->var ;
                     CREVARVISIBLE ;
                 }
+		assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
                 if(poidsM < 0 || (poidsM==0 && valeur<0))
                     t[NUMERO].colonne[0].num -= pv->val,
                     t[NUMERO].colonne[0].den = 1 ;
