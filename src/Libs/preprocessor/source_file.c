@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/param.h>
+/*#include <sys/param.h>*/
 /*#include <sys/wait.h>*/
-#include <sys/types.h>
+/*#include <sys/types.h>*/
 #include <dirent.h>
 /*#include <sys/timeb.h>*/
 #include <sys/stat.h>
