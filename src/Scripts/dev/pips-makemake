@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.305  1997/08/18 12:36:45  coelho
+# fixed main clean for Libs.
+#
 # Revision 1.304  1997/08/18 12:31:07  coelho
 # end of fixes for ftest, I hope;-)
 #
@@ -554,7 +557,7 @@ SOURCES+= 	\$(INCLUDES) \$(CFILES) \$(DOCS) \$(LIB_MAIN)
 
 clean-compiled:
 	\$(RM) \$(OBJECTS) \$(LIB_TARGET) \$(BIN_TARGET) \\
-		\$(ARCH)/\$(LIB_MAIN:.c=.o) \$(ARCH)/pips \$(ARCH)/[tw]pips
+		\$(ARCH)/pips \$(ARCH)/[tw]pips
 
 clean: generate_makefile_if_necessary_and_possible clean-compiled
 	-\$(RM) TAGS \$(BIN_TARGET) \$(DERIVED_HEADERS) \$(DERIVED_CFILES) \\
