@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/05 16:46:59 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/08 18:17:53 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -23,7 +23,7 @@
         Ecole des Mines de Paris \\
         77305 Fontainebleau Cedex \\
         France \\}
-\date{October 1991}
+\date{\today (Initial version: October 1991)}
 
 \addtolength{\textwidth}{72pt}
 \addtolength{\oddsidemargin}{-48pt}
@@ -41,25 +41,37 @@
 
 \section*{Introduction}
 
-This paper describes...
+This paper describes global variables used to modify or fine tune PIPS
+behavior. Since global variables are useful for some purposes, but
+always dangerous, PIPS programmers are required to declare them
+explictly as {\em properties}. Properties have an ASCII name and can
+have boolean, integer or string values.
 
-The information here is machine and/or site independent.
+% The information here is machine and/or site independent.
 
-Casual users should not use them. They do modify them only through pipsmake
-requests.
+Casual users should not use them. Properties are modified for them by
+the user interface and/or the high-level functions.
 
-Experimented users can modify them by inserting a file called properties.rc
-in their local directory. Of course, they cannot declare new properties,
-which would not be recognized by the PIPS system.
+Experimented users can modify properties by inserting a file called
+\verb+properties.rc+ in their local directory. Of course, they cannot
+declare new properties, since they would not be recognized by the PIPS
+system. The local property file is read {\em after} the default property
+file, \verb+Production/Lib/properties.rc+. Some user-specified property
+values may be ignored because it is modified by a PIPS function before
+it had a chance to have any effect. Unfortunately, there is no explicit
+indication of usefulness for the properties in this report.
 
-Properties are presented on a library basis, but for the general options.
+The default property file can be used to generate a custom version of
+properties.rc. It is derived automatically from
+\verb+Documentation/properties-rc.tex+.
 
-The file Production/Lib/properties.rc is derived...
+Properties are listed on a source library basis, except for general
+properties..
 
-\section{Global Option}
+\section{Global Options}
 
-Are DO loops bodies at-least executed once (F-66 style).
-Useful for use/def and semantics analysis.
+Are DO loops bodies executed at least once (F-66 style), or not (Fortran~77)?
+This is useful for use/def and semantics analysis.
 
 \begin{verbatim}
 ONE_TRIP_DO FALSE
@@ -90,7 +102,7 @@ ACTIVATE_DEL_DERIVED_RES TRUE
 
 \section{Chains}
 
-Update dependency graph with RR dependencies.
+Update dependency graph with RR dependency arcs.
 Useful for estimation of cache memory traffic. use/def related.
 
 \begin{verbatim}
@@ -334,7 +346,7 @@ SEMANTICS_DEBUG_LEVEL 0
 
 % Module code and list of called module names.
 
-\paragraph{Dependence test choice}
+\subsection{Dependence Test Selection}
 
 This property seems to be now obsolete. The dependence test choice is
 now controlled directly and only by rules in pipsmake.rc.
@@ -343,7 +355,7 @@ now controlled directly and only by rules in pipsmake.rc.
 DEPENDENCE_TEST "full"
 \end{verbatim}
 
-\paragraph{Statistics}
+\subsection{Statistics}
 
 Provide the following counts during the dependence test. There are three
 parts: numbers of dependencies and independences (fields 1-10),
@@ -448,18 +460,19 @@ including these involved in call statement.
 RICEDG_STATISTICS_ALL_ARRAYS FALSE
 \end{verbatim}
 
-\paragraph{Algorithmic dependences}
+\subsection{Algorithmic Dependences}
 
-Only take into account true flow dependences (Def -- Use) during the computation of
-SCC?  Note that this is different from the
-CHAINS\_DATAFLOW\_DEPENDENCE\_ONLY option which doesn't compute the whole
-graph.  Warning: this option potentially yields incorrect parallel code.
+Only take into account true flow dependences (Def -- Use) during the
+computation of SCC?  Note that this is different from the
+CHAINS\_DATAFLOW\_DEPENDENCE\_ONLY option which doesn't compute the
+whole graph.  Warning: this option potentially yields incorrect parallel
+code.
 
 \begin{verbatim}
 RICE_DATAFLOW_DEPENDENCE_ONLY FALSE
 \end{verbatim}
 
-\paragraph{Printout}
+\subsection{Printout}
 
 To print the dependence graph in a file called {\em module\_name}.{\tt dg}
 
@@ -480,7 +493,7 @@ To print the dependence graph without the no loop carried dependences
 PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
 \end{verbatim}
 
-\paragraph{Optimization}
+\subsection{Optimization}
 
 The default option is to compute the dependence graph only for loops
 which can be parallelized using Allen \& Kennedy algorithm.
@@ -503,11 +516,12 @@ EFFECTS_PRINT_SDFI TRUE
 
 \section{Regions}
 
-if {\tt MUST\_REGIONS} is true, then it computes regions using the algorithm
-described in report E/181/CRI, called {\em $T^{-1}$ algorithm}. It provides more
-accurate regions, and preserve MUST approximations more often. But it is less
-efficient. Its default value is FALSE. EXACT\_REGIONS is true for the moment for
-backward compatibility only.
+if {\tt MUST\_REGIONS} is true, then it computes regions using the
+algorithm described in report E/181/CRI, called {\em $T^{-1}$
+algorithm}. It provides more accurate regions, and preserve MUST
+approximations more often. But it is less efficient. Its default value
+is FALSE. EXACT\_REGIONS is true for the moment for backward
+compatibility only.
 
 \begin{verbatim}
 EXACT_REGIONS TRUE
@@ -544,61 +558,143 @@ REGIONS_OP_STATISTICS FALSE
 
 \section{Static Complexity Evaluation}
 
-print each ri-walk function call
+The following properties control the static estimation of dynamic code
+execution time.
+
+\subsection{Debugging}
+
+Trace the walk across a module's internal representation:
 
 \begin{verbatim}
 COMPLEXITY_TRACE_CALLS FALSE
 \end{verbatim}
 
-
-print intermediate complexities 
+Trace all intermediate complexities:
 
 \begin{verbatim}
 COMPLEXITY_INTERMEDIATES FALSE
 \end{verbatim}
 
-Print the complete cost table at the beginning of the execution.
+Print the complete cost table at the beginning of the execution:
 
 \begin{verbatim}
 COMPLEXITY_PRINT_COST_TABLE FALSE
 \end{verbatim}
 
-list of variables that must appear litterally in the complexity formula.
-They have relatively high priority.
+The cost table(s) contain machine and compiler dependent information
+about basic execution times, e.g. time for a load or a store.
+
+\subsection{Fine Tuning}
+
+It is possible to specify a list of variables which must remain
+litterally in the complexity formula, although their numerical values
+are known (this is OK) or although they have multiple unkown and
+unrelated values during any execution (this leads to an incorrect
+result).
+
+Formal parameters and imported global variables are left unevaluated.
+
+They have relatively high priority (FI: I do not understand this comment
+by Lei).
+
+This list should be empty by default (but is not for unknown historical
+reasons):
 
 \begin{verbatim}
 COMPLEXITY_PARAMETERS "IMAX LOOP"
 \end{verbatim}
 
-Controls the printing of statistics:    \\
- ... = 0 : don't prettyprint statistics with complexities  \\
- ... = 1 : prettyprint statistics only for loop/block/test/unstr.
-statements \\
- ... = 2 : prettyprint statistics for all statements
+Controls the printing of {\em accuracy} statistics:
+
+\begin{itemize}
+
+  \item 0: do not prettyprint any statistics with complexities (to give
+the user a false sense of accuracy and/or to avoid clutering his/her
+display); this is the default value;
+
+  \item 1: prettyprint statistics only for loop/block/test/unstr.
+statements and not for basic statements, since they should not cause
+accuracy problems;
+
+  \item 2 : prettyprint statistics for all statements
+
+\end{itemize}
 
 \begin{verbatim}
 COMPLEXITY_PRINT_STATISTICS 0
 \end{verbatim}
 
-In order to change cost table easily, I added this property.
-It means that unit cost can be found under this directory. We have all\_1
-that means all operation cost is 1 , fp\_1 that means only floating
-point operation is taken into account and has cost unit 1.
-In the future, we will add ``sparc-2'' and ``cray-ymp'',etc.
-The cost filenames are stored in the complexity-local.h, they are operation,
-memory, index, transcend and trigo.
+\subsection{Target Machine and Compiler Selection}
+
+This property is used to select a set of basic execution times. These
+times depend on the target machine, the compiler and the compilation
+options used. It is shown in \cite{Z94} that fixed basic times can be
+used to obtain accurate execution times, if enough basic times are
+considered, and if the target machine has a simple RISC processor. For
+instance, it is not possible to use only one time for a register
+load. It is necessary to take into account the nature of the variable,
+i.e. formal parameter, dynamic variable, global variable, and the nature
+of the access, e.g. the dimension of an accessed array. The cache can be
+ignored an replacer by an average hit ratio.
+
+Different set of elementary cost tables are available:
+
+\begin{itemize}
+
+  \item \verb+all_1+: each basic operation cost is 1;
+
+  \item \verb+fp_1+: only floating point operations are taken into
+account and have cost unit 1; all other operations have a null cost.
+
+\end{itemize}
+
+In the future, we might add a sparc-2 table...
+
+The different elementary table names are defined in
+\verb+complexity-local.h+. They presently are \verb+operation+, 
+\verb+memory+, \verb+index+, \verb+transcend+
+and \verb+trigo+.
+
+The different tables required are to be found in
+\verb+$LIBDIR/complexity/xyz+,
+where \verb+xyz+ is specified by this property:
 
 \begin{verbatim}
 COMPLEXITY_COST_TABLE "all_1"
 \end{verbatim}
 
-For the moment, we have two versions of variable evaluation. First,
-evaluate variable as early as possible. This mothod is easier to reach
-but at least it has two drawbacks: (1) If there are several unknown
-variables which are identical, when we use early variable evaluation, we
-can get several UU's . (2) If user want to see the relation of
-complexity. Because the variable is too early replaced by a constant, we
-can not see great thing.
+\subsection{Evaluation Strategy}
+
+For the moment, we have designed two ways to to solve the complexity
+combination problem.Since symbolic complexity formulae use program
+variable it is necessary to specify in which store they are
+evaluated. If two complexity formulae are computed relatively to two
+different stores, they cannot be directly added.
+
+First approach, which is implemented, uses the module initial store as
+universal store for all formulae (but possibly for the complexity of
+elementary statements).
+In some way, symbolic variable are evaluated as early as possible as
+soon as it is known that they won't make it in the module summary
+complexity.
+
+This first method is easy to implement when the preconditions are available
+but it has at least two drawbacks:
+
+\begin{itemize}
+
+  \item if a variable is used in different places with the same unknown
+value, each occurence will be replaced by a different unknown value
+symbol (the infamous \verb+UU_xx+ symbols in formulae).
+
+  \item since variables are replaced by numerical values as soon as
+possible as early as possible, the user is shown a numerical execution
+time instead of a symbolic formulae which would likely be more useful
+(see property \verb+COMPLEXITY_PARAMETERS+). This is especially true
+with interprocedural constant propagation.
+
+\end{itemize}
+
 
 \begin{verbatim}
 COMPLEXITY_EARLY_EVALUATION TRUE
@@ -626,7 +722,7 @@ ex: if A calls B twice, in callgraph, we only have ONCE A calls B;
 while in icfg, we have twice B called by A.
 So there is no option on the so-called callgraph except the debugging.
 
-debugging level (should be CALLGRAPH\_DEBUG\_LEVEL and numeric)
+debugging level (should be \verb+CALLGRAPH_DEBUG_LEVEL+ and numeric!)
 
 \begin{verbatim}
 CALLGRAPH_DEBUG FALSE
@@ -664,16 +760,17 @@ ICFG_DECOR 0
 ICFG_DRAW TRUE
 \end{verbatim}
 
-debugging level (should be ICFG\_DEBUG\_LEVEL and numeric)
+Debugging level (should be \verb+ICFG_DEBUG_LEVEL+ and numeric instead
+of boolean!):
 
 \begin{verbatim}
 ICFG_DEBUG FALSE
 \end{verbatim}
 
-\section{Rice (parallelization)}
+\section{Rice (Parallelization)}
 
-TRUE to show all parallel loops  \
-FALSE to generate real code
+TRUE to show all parallel loops, FALSE to generate real (vector,
+innermost parallel?) code
 
 \begin{verbatim}
 GENERATE_NESTED_PARALLEL_LOOPS TRUE
@@ -756,8 +853,19 @@ Whether to measure and display the compilation times for remappings
 HPFC_TIME_REMAPPINGS TRUE
 \end{verbatim}
 
-% \begin{thebibliography}{99}
+\section*{Conclusion}
 
-% \end{thebibliography}
+Do not be surprised by strange results obtained after selecting a
+property yourself!
+
+\begin{thebibliography}{99}
+
+\bibitem{Z94} Lei Zhou,
+{\em Analyse statique et dynamique de la compl\'exite' des programmes
+scientifiques}, 
+Th\`ese de doctorat de l'universit\'e Pierre et Marie Curie, 14
+septembre 1994. Technical Report A/255.
+
+\end{thebibliography}
 
 \end{document}
