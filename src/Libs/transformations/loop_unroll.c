@@ -1,4 +1,12 @@
 /*
+
+  $Id$
+
+  $Log: loop_unroll.c,v $
+  Revision 1.18  1998/09/17 12:16:46  coelho
+  type fixed.
+
+
  * LOOP_UNROLL()
  *
  * Bruno Baron, Francois Irigoin
@@ -107,18 +115,18 @@ void loop_unroll(statement loop_statement, int rate)
     else {
 	expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 			 MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME), 
-					gen_copy_tree(ub), 
-					gen_copy_tree(lb) ),
-			 gen_copy_tree(inc) );
+					copy_expression(ub), 
+					copy_expression(lb) ),
+			 copy_expression(inc) );
 	rhs_expr = MakeBinaryCall(entity_intrinsic(DIVIDE_OPERATOR_NAME),
 				  expr,
-				  gen_copy_tree(inc) );
+				  copy_expression(inc) );
     }
     expr = make_ref_expr(nub, NIL);
     stmt = make_assign_statement(expr,
 				 rhs_expr );
     if(get_debug_level()==9) {
-	gen_consistent_p(expr);
+	expression_consistent_p(expr);
     }
     /* The first statement gets label of the initial loop */
     statement_label(stmt) = statement_label(loop_statement);
@@ -175,35 +183,35 @@ void loop_unroll(statement loop_statement, int rate)
 				   int_expr(1) ),
 		    MakeIntegerConstantExpression("1") );
     if(get_debug_level()>=9) {
-	pips_assert("loop_unroll", gen_consistent_p(rg));
+	pips_assert("loop_unroll", range_consistent_p(rg));
     }
 
     /* Create body of the loop, with updated index */
-    body = gen_copy_tree(loop_body(il));
+    body = copy_statement(loop_body(il));
     ifdebug(9) {
-	pips_assert("loop_unroll", gen_consistent_p(body));
+	pips_assert("loop_unroll", statement_consistent_p(body));
 	/* "gen_copy_tree returns bad statement\n"); */
     }
     expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 			  MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME), 
 					 make_ref_expr(lu_ind, NIL),
-					 gen_copy_tree(inc)),
-			  gen_copy_tree(lb));
+					 copy_expression(inc)),
+			  copy_expression(lb));
     ifdebug(9) {
-	pips_assert("loop_unroll", gen_consistent_p(expr));
+	pips_assert("loop_unroll", expression_consistent_p(expr));
 	    /* "gen_copy_tree returns bad expression(s)\n"); */
     }
     StatementReplaceReference(body,
 			      make_reference(ind,NIL),
 			      expr);
-    gen_free(expr);
+    free_expression(expr);
 
     label_entity = make_new_label(module_name);
     stmt = make_continue_statement(label_entity);
     body = make_block_statement(CONS(STATEMENT, body,
 				     CONS(STATEMENT, stmt, NIL)));
     if(get_debug_level()>=9) {
-	pips_assert("loop_unroll", gen_consistent_p(body));
+	pips_assert("loop_unroll", statement_consistent_p(body));
     }
 
     /* Create loop and insert it in block */
@@ -217,7 +225,7 @@ void loop_unroll(statement loop_statement, int rate)
 				      NIL));
 
     if(get_debug_level()>=9) {
-	pips_assert("loop_unroll", gen_consistent_p(inst));
+	pips_assert("loop_unroll", instruction_consistent_p(inst));
     }
 
     instruction_block(block)= gen_nconc(instruction_block(block),
@@ -251,30 +259,30 @@ void loop_unroll(statement loop_statement, int rate)
 	statement transformed_stmt;
 	list body_block = instruction_block(statement_instruction(body));
 
-	transformed_stmt = gen_copy_tree(loop_body(il));
+	transformed_stmt = copy_statement(loop_body(il));
 	ifdebug(9)
-	    gen_consistent_p(transformed_stmt);
+	    statement_consistent_p(transformed_stmt);
 	tmp_expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 				  make_ref_expr(lu_ind, NIL),
 				  int_expr(rate) );
 	expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 			      MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME), 
 					     tmp_expr,
-					     gen_copy_tree(inc) ),
-			      gen_copy_tree(lb) );
+					     copy_expression(inc) ),
+			      copy_expression(lb) );
 	ifdebug(9) {
-	    pips_assert("loop_unroll", gen_consistent_p(expr));
+	    pips_assert("loop_unroll", expression_consistent_p(expr));
 	}
 	StatementReplaceReference(transformed_stmt,
 				  make_reference(ind,NIL),
 				  expr);
 	ifdebug(9) {
-	    pips_assert("loop_unroll", gen_consistent_p(transformed_stmt));
+	    pips_assert("loop_unroll", statement_consistent_p(transformed_stmt));
 	}
 	free_expression(expr);
 	
 	ifdebug(9) {
-	    pips_assert("loop_unroll", gen_consistent_p(transformed_stmt));
+	    pips_assert("loop_unroll", statement_consistent_p(transformed_stmt));
 	}
 
 	
@@ -297,7 +305,7 @@ void loop_unroll(statement loop_statement, int rate)
 				      NIL));
 
     if(get_debug_level()>=9) {
-	pips_assert("loop_unroll", gen_consistent_p(inst));
+	pips_assert("loop_unroll", instruction_consistent_p(inst));
     }
 
 
@@ -313,16 +321,16 @@ void loop_unroll(statement loop_statement, int rate)
 			  MakeBinaryCall(entity_intrinsic(MAX0_OPERATOR_NAME), 
 					 make_ref_expr(nub, NIL),
 					 int_expr(0) ),
-			  gen_copy_tree(inc) );
+			  copy_expression(inc) );
     rhs_expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-			      gen_copy_tree(lb),
+			      copy_expression(lb),
 			      expr);
     expr = make_ref_expr(ind, NIL);
     stmt = make_assign_statement(expr,
 				 rhs_expr );
     ifdebug(9) {
 	print_text(stderr,text_statement(entity_undefined,0,stmt));
-	pips_assert("loop_unroll", gen_consistent_p(stmt));
+	pips_assert("loop_unroll", statement_consistent_p(stmt));
     }
     instruction_block(block)= gen_nconc(instruction_block(block),
 					CONS(STATEMENT, stmt, NIL ));
@@ -340,7 +348,7 @@ void loop_unroll(statement loop_statement, int rate)
     
     ifdebug(9) {
 	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
-	pips_assert("loop_unroll", gen_consistent_p(loop_statement));
+	pips_assert("loop_unroll", statement_consistent_p(loop_statement));
     }
     /* ?? Bad condition */
     if(get_debug_level()==7) {
@@ -404,23 +412,23 @@ void full_loop_unroll(statement loop_statement)
     for(iter = lbval; iter <= ubval; iter += incval) {
 	statement transformed_stmt;
 
-	transformed_stmt = gen_copy_tree(loop_body(il));
+	transformed_stmt = copy_statement(loop_body(il));
 	ifdebug(9)
-	    gen_consistent_p(transformed_stmt);
+	    statement_consistent_p(transformed_stmt);
 	expr = int_to_expression(iter);
 	ifdebug(9) {
-	    pips_assert("full_loop_unroll", gen_consistent_p(expr));
+	    pips_assert("full_loop_unroll", expression_consistent_p(expr));
 	}
 	StatementReplaceReference(transformed_stmt,
 				  make_reference(ind,NIL),
 				  expr);
 	ifdebug(9) {
-	    pips_assert("full_loop_unroll", gen_consistent_p(transformed_stmt));
+	    pips_assert("full_loop_unroll", statement_consistent_p(transformed_stmt));
 	}
 	free_expression(expr);
 
 	ifdebug(9) {
-	    pips_assert("full_loop_unroll", gen_consistent_p(transformed_stmt));
+	    pips_assert("full_loop_unroll", statement_consistent_p(transformed_stmt));
 	}
 	
 	/* Add the transformated old loop body (transformed_stmt) at
@@ -437,7 +445,7 @@ void full_loop_unroll(statement loop_statement)
     stmt = make_assign_statement(expr, rhs_expr);
     ifdebug(9) {
 	print_text(stderr,text_statement(entity_undefined,0,stmt));
-	pips_assert("full_loop_unroll", gen_consistent_p(stmt));
+	pips_assert("full_loop_unroll", statement_consistent_p(stmt));
     }
     instruction_block(block)= gen_nconc(instruction_block(block),
 					CONS(STATEMENT, stmt, NIL ));
@@ -455,7 +463,7 @@ void full_loop_unroll(statement loop_statement)
     
     ifdebug(9) {
 	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
-	pips_assert("full_loop_unroll", gen_consistent_p(loop_statement));
+	pips_assert("full_loop_unroll", statement_consistent_p(loop_statement));
     }
     /* ?? Bad condition */
     if(get_debug_level()==7) {
