@@ -188,9 +188,11 @@ effects_dup(list l_eff)
 {
     list l_new = NIL;
     MAP(EFFECT, eff,
-	{l_new = gen_nconc(l_new, CONS(EFFECT, (*effect_dup_func)(eff), NIL));},
+	/* build last to first */
+	l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new),
 	l_eff);
-    return l_new;
+    /* and the order is reversed */
+    return gen_nreverse(l_new);
 }
 
 void
