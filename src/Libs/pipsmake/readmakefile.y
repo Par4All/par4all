@@ -2,7 +2,7 @@
  * pipsmake/readmakefile.y pipsmake.h )
  *
  * $RCSfile: readmakefile.y,v $ (version $Revision$)
- * $Date: 1997/01/13 20:54:08 $, 
+ * $Date: 1997/03/26 17:20:41 $, 
  *
  * They only occure between following tags: 
  *
@@ -38,7 +38,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "genC.h"
+#include "database.h"
 #include "makefile.h"
 
 #include "misc.h"
