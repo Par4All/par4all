@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.6  1997/09/09 11:03:15  coelho
+ * initial preconditions should be ok.
+ *
  * Revision 1.5  1997/09/08 17:52:05  coelho
  * some version for testing.
  *
@@ -50,7 +53,7 @@ static entity
 get_main_entity(void)
 {
     char *module_list[ARGS_LENGTH];
-    int nmodules, i;
+    int nmodules = 0, i;
     
     db_get_module_list(&nmodules, module_list);
     pips_assert("some modules in the program", nmodules>0);
@@ -62,7 +65,9 @@ get_main_entity(void)
 	    return m;
     }
 
-    return entity_undefined;
+    /* ??? some default if there is no main... */
+    pips_user_warning("no main found, returning %s instead\n", module_list[0]);
+    return local_name_to_top_level_entity(module_list[0]);
 }
 
 /******************************************************** PIPSMAKE INTERFACE */
@@ -96,6 +101,21 @@ initial_precondition(string name)
     return TRUE;
 }
 
+/* returns t1 inter= t2;
+ */
+static void
+intersect(
+    transformer t1,
+    transformer t2)
+{
+    predicate_system_(transformer_relation(t1)) = (char*)
+	sc_append((Psysteme) predicate_system(transformer_relation(t1)),
+		  (Psysteme) predicate_system(transformer_relation(t2)));
+}
+
+#define pred_debug(level, msg, trans) \
+  ifdebug(level) { pips_debug(level, msg); dump_transformer(trans);}
+
 /* Compute the union of all initial preconditions.
  */
 bool
@@ -107,6 +127,7 @@ program_precondition(string name)
     entity the_main = get_main_entity();
 
     debug_on("SEMANTICS_DEBUG_LEVEL");
+    pips_debug(1, "considering program \"%s\"\n", name);
     
     db_get_module_list(&nmodules, module_list);
     pips_assert("some modules in the program", nmodules>0);
@@ -114,21 +135,26 @@ program_precondition(string name)
 
     for(i=0; i<nmodules; i++) 
     {
-	transformer tm, tn;
+	transformer tm;
 	pips_debug(1, "considering module %s\n", module_list[i]);
 	
 	tm = (transformer) 
 	    db_get_memory_resource(DBR_INITIAL_PRECONDITION,  
 				   module_list[i], FALSE);
 
-	translate_global_values(the_main, tm);
+	pred_debug(3, "current: t =\n", t);
+	pred_debug(2, "to be added: tm =\n", tm);
 
-	tn = transformer_convex_hull(t, tm); 
+	translate_global_values(the_main, tm); /* modifies tm! */
 
-	free_transformer(t);
+	pred_debug(3, "to be added after translation:\n", tm);
+
+	intersect(t, tm); 
+
 	free_transformer(tm);
-	t = tn;
     }
+
+    pred_debug(1, "resulting program precondition:\n", t);
 
     DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_PRECONDITION, strdup(name), t);
 
@@ -146,6 +172,8 @@ print_initial_precondition(string name)
     transformer t = (transformer) 
 	db_get_memory_resource(DBR_INITIAL_PRECONDITION, name, TRUE);
     
+    debug_on("SEMANTICS_DEBUG_LEVEL");
+
     set_current_module_entity(module);
 
     ok = make_text_resource(name,
@@ -155,6 +183,8 @@ print_initial_precondition(string name)
 
     reset_current_module_entity();
 
+    debug_off();
+
     return ok;
 }
 
@@ -163,9 +193,12 @@ print_program_precondition(string name)
 {
     bool ok;
     transformer t = (transformer) 
-	db_get_memory_resource(DBR_PROGRAM_PRECONDITION, name, TRUE);
+	db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", TRUE);
     entity m = get_main_entity();
     
+    debug_on("SEMANTICS_DEBUG_LEVEL");
+    pips_debug(1, "for \"%s\"\n", name);
+
     set_current_module_entity(m);
 
     ok = make_text_resource(name,
@@ -174,6 +207,8 @@ print_program_precondition(string name)
 			    text_transformer(t));
 
     reset_current_module_entity();
+
+    debug_off();
 
     return ok;
 }
