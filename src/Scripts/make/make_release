@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1997/03/26 17:51:54 $, 
+# $Date: 1997/03/27 13:50:39 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -85,8 +85,13 @@ do
     find ./$dir ! -type d -print >> $tmp.tmp
 done
 
+#
+# clean the list of file of obvious useless stuff.
+
 sed '/\/OLD/d;/\/SCCS/d;/\/RCS/d;/~/d;/\.database/d;/\.out$/d;/core/d;' \
     $tmp.tmp | sort -u > $tmp.list
+
+rm -f $tmp.tmp
 
 #
 # suggest editing the file now
@@ -102,26 +107,14 @@ test "$edit" &&
 # target 
 
 $verb copying files in $trgt
-$verb taring...
+$verb taring and untaring for copy...
 
-# well, the list is potentially too big for being put as an argument:-(
-# hence this very slow version...
-#
-# cat $tmp.list |
-# while read file 
-# do
-#     $tar $taropt $tmp.tar $file
-# done
-#
-# or this one, which relies on the -T option (from GNU tar)
+# relies on the -T option (from GNU tar),
+# otherwise the list of files is just too big to be put as a arg.
 
-$tar $taropt $tmp.tar -T $tmp.list || error 5 "tar returned $? while taring"
-
-# ls -l $tmp.tar 
-
-$verb untaring in $trgt...
-cd $trgt || error 6 "cannot cd to $trgt"
-$tar xf $tmp.tar || error 7 "tar returned $? while untaring"
+{ $tar $taropt - -T $tmp.list || error 5 "tar returned $? while taring" ; } |
+( cd $trgt || error 6 "cannot cd to $trgt" ; 
+  $tar xf - || error 7 "tar returned $? while untaring" ; ) 
 
 $verb done
 
