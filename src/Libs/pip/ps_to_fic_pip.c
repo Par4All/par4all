@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include "types.h"
 
 #include "genC.h"
 #include "misc.h"
@@ -23,7 +22,6 @@
 #include "ri-util.h"
 #include "paf_ri.h"
 #include "pip.h"
-#include "list.h"
 
 #define PIP_IN_FILE "pip_in"
 
