@@ -96,7 +96,7 @@ statement s;
     pips_assert("statement_to_postcondition", pre != transformer_undefined);
     ifdebug(1) {
 	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %#p:\n",
+	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %p:\n",
 		       statement_number(s), ORDERING_NUMBER(so),
 		       ORDERING_STATEMENT(so), pre);
 	(void) print_transformer(pre) ;
@@ -140,7 +140,7 @@ statement s;
 
 	if(!transformer_consistency_p(pre)) {
 	    int so = statement_ordering(s);
-	    (void) fprintf(stderr, "statement %03d (%d,%d), precondition %#p end:\n",
+	    (void) fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
 			   statement_number(s), ORDERING_NUMBER(so),
 			   ORDERING_STATEMENT(so), pre);
 	    (void) print_transformer(pre);
@@ -164,7 +164,7 @@ statement s;
 
     ifdebug(1) {
 	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %#p end:\n",
+	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
 		       statement_number(s), ORDERING_NUMBER(so),
 		       ORDERING_STATEMENT(so), load_statement_precondition(s));
 	(void) print_transformer(load_statement_precondition(s)) ;
@@ -172,7 +172,7 @@ statement s;
 
     ifdebug(1) {
 	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), postcondition %#p:\n",
+	(void) fprintf(stderr, "statement %03d (%d,%d), postcondition %p:\n",
 		       statement_number(s), ORDERING_NUMBER(so),
 		       ORDERING_STATEMENT(so), post);
 	(void) print_transformer(post) ;
