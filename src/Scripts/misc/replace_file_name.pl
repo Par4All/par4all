@@ -6,6 +6,10 @@
 # a jour un fichier de description des redeclaration.
 # voir normalisation.pl
 #
+# arguments : tous les fichiers sources cibles.
+# entree standard : fichier de modification sorti de pips.
+# sortie standard : resultat transforme.
+#
 
 %modtofile = ();
 
