@@ -57,8 +57,8 @@ $sed -n \
      s,^Closing all modules.,close,p;
      s,^Workspace [^ ]* opened,open $WS,p;
      s,^Directory \(.*\) selected,cd \1,p;
-     s,^Request: build resource \(.*\) for module \(.*\).,display \1(\2),p;
-     s,^Request: perform rule \(.*\) on module \(.*\).,apply \1(\2),p;
+     s,^Request: build resource \(.*\) for module \(.*\).,display \1[\2],p;
+     s,^Request: perform rule \(.*\) on module \(.*\).,apply \1[\2],p;
      s,^Options: phase \(.*\) (\(.*\)) set on.,activate \2 # \1,p;
      s,^Selecting rule: \(.*\),activate \1,p;
      s,^HPFC View of \"\(.*\)\" done.,shell $CAT $WDIR\/hpfc\/\1,p;
