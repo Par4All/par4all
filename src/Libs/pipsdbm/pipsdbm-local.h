@@ -3,7 +3,11 @@
  */
 
 #define PROGRAM_RESOURCE_OWNER ""
-#define WORKSPACE_TMP_SPACE "Tmp"
+
+#define WORKSPACE_TMP_SPACE 		"Tmp"
+#define WORKSPACE_SRC_SPACE 		"Src"
+#define WORKSPACE_PROGRAM_SPACE 	"Program"
+#define WORKSPACE_METADATA_SPACE	"Metadata"
 
 /* conform to old interface.
  */
