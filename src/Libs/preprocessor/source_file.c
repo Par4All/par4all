@@ -672,6 +672,7 @@ process_user_file(string file)
     FILE *fd;
     bool success_p = FALSE, cpp_processed_p;
     string initial_file, nfile, name, file_list;
+    string dir_name = db_get_current_workspace_directory();
 
     static int number_of_files = 0;
     static int number_of_modules = 0;
@@ -706,23 +707,17 @@ process_user_file(string file)
     }
 
     /* the new file is registered in the database
+     * and splitted...
      */
     user_log("Registering file %s\n", file);
-
-    /* the new file is splitted according to Fortran standard */
-
     user_log("Splitting file    %s\n", nfile);
 
     /* if two modules have the same name, the first splitted wins
        and the other one is hidden by the call to "sed" since
        fsplit gives it a zzz00n.f name */
     /* Let's hope no user module is called zzz???.f */
-    {
-	string dir = db_get_current_workspace_directory();
-	file_list = strdup(concatenate(dir, "/.fsplit_file_list", 0));
-	unlink(file_list);
-	free(dir);
-    }
+    file_list = strdup(concatenate(dir_name, "/.fsplit_file_list", 0));
+    unlink(file_list);
 
     if (pips_split_file(nfile, file_list))
 	return FALSE;
@@ -750,13 +745,10 @@ process_user_file(string file)
 	    (DBR_INITIAL_FILE, mod_name, ".f_initial");
 
 	{
-	    string abs_file, abs_res, dir_name;
-	    dir_name = db_get_current_workspace_directory();
-	    abs_file = strdup(concatenate(dir_name, "/", file_name, 0));
+	    string abs_res;
 	    abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
-	    free(dir_name);
 
-	    if (rename(abs_file, abs_res)) {
+	    if (rename(file_name, abs_res)) {
 		perror("process_user_file");
 		pips_internal_error("mv %s %s failed\n", 
 				    file_name, res_name);
@@ -767,12 +759,13 @@ process_user_file(string file)
 	     * absolute path to the file so that db moves should be ok...
 	     */
 	    DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
-	    free(file_name); free(abs_file); free(abs_res);
+	    free(file_name); free(abs_res);
 	}
     }
     safe_fclose(fd, file_list);
     unlink(file_list); 
     free(file_list);
+    free(dir_name);
 
     if (cpp_processed_p)
 	free(initial_file);
