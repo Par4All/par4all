@@ -123,7 +123,33 @@ Pvecteur *pv1, *pv2;
 			    (entity*)&var_of(*pv2)));
 }
 
+/* generates var = linear expression 
+ * from the Pvecteur. var is removed if necessary.
+ * ??? should manage an (positive remainder) integer divide ?
+ */
+statement
+Pvecteur_to_assign_statement(
+    entity var,
+    Pvecteur v)
+{
+    statement result;
+    Pvecteur vcopy;
+    int coef;
+    
+    coef = vect_coeff((Variable) var, v);
+    assert(abs(coef)<=1);
 
-/*
- *   That is all
+    vcopy = vect_dup(v);
+	
+    if (coef) vect_erase_var(&vcopy, (Variable) var);
+    if (coef==1) vect_chg_sgn(v);
+	
+    result = make_assign_statement(entity_to_expression(var),
+				   make_vecteur_expression(vcopy));
+    vect_rm(vcopy);
+
+    return result;
+}
+
+/*   That is all
  */
