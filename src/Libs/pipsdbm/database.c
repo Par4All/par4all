@@ -44,32 +44,33 @@ find_or_create_db_symbol(string name)
  */
 GENERIC_LOCAL_FUNCTION(pips_database, db_resources)
 
-#define DB_OK pips_assert("defined database", !pips_database_undefined_p())
+#define DB_OK    pips_assert("defined database", !pips_database_undefined_p())
+#define DB_UNDEF pips_assert("undefined database", pips_database_undefined_p())
 
 /* exported interface is minimal.
  */
 void
 db_create_pips_database(void)
 {
-    pips_assert("pips database undefined", pips_database_undefined_p());
-    init_pips_database();
-    DB_OK;
+    DB_UNDEF; init_pips_database(); DB_OK;
 }
 
 void
 db_open_pips_database(FILE * fd)
 {
-    pips_assert("pips database undefined", pips_database_undefined_p());
-    set_pips_database(read_db_resources(fd));
-    DB_OK;
+    DB_UNDEF; set_pips_database(read_db_resources(fd)); DB_OK;
 }
 
 void
-db_close_pips_database(FILE * fd)
+db_save_pips_database(FILE * fd)
 {
-    DB_OK;
-    write_db_resources(fd, get_pips_database());
-    close_pips_database();
+    DB_OK; write_db_resources(fd, get_pips_database());
+}
+
+void
+db_close_pips_database(void)
+{
+    DB_OK; close_pips_database(); DB_UNDEF;
 }
 
 /******************************************************** LOAD/SAVE RESOURCE */
