@@ -1309,7 +1309,7 @@ Ptsg *gs,*gsop;
     ifdebug(6)  
     {
 	fprintf(stderr, "\ninitial system is:\n");
-	syst_debug(dep_syst);
+	sc_syst_debug(dep_syst);
     }
 
     ifdebug(1) {
@@ -1421,7 +1421,7 @@ Ptsg *gs,*gsop;
     ifdebug(6) 
     {
 	fprintf(stderr, "projected system is:\n");
-	syst_debug(dep_syst);
+	sc_syst_debug(dep_syst);
     }
 
     ifdebug(1) {
@@ -1447,7 +1447,7 @@ Ptsg *gs,*gsop;
     ifdebug(6)  
     {
 	fprintf(stderr, "normalised projected system is:\n");
-	syst_debug(dep_syst);
+	sc_syst_debug(dep_syst);
 	fprintf(stderr, "The list of DiIncNonCons is :\n");
 	vect_debug(DiIncNonCons);
     }
@@ -1482,7 +1482,7 @@ Ptsg *gs,*gsop;
     {
 	fprintf(stderr, 
 		"normalised projected system after DiIncNonCons elimination is:\n");
-	syst_debug(dep_syst);
+	sc_syst_debug(dep_syst);
     }
 
     ifdebug(1) {
@@ -1523,7 +1523,7 @@ Ptsg *gs,*gsop;
     {
 	debug(4,"", "\nComputes the levels and DC for dep: (s1,e1)->(s2,e2)\n");
 	fprintf(stderr, "\nThe distance system for dep is:\n");
-	syst_debug(dep_syst);
+	sc_syst_debug(dep_syst);
     }
     
     /* Make a proper copy of dep_syst before it is destroyed to compute
@@ -1630,7 +1630,7 @@ Ptsg *gs,*gsop;
 	ifdebug(4) 
 	{
 	    fprintf(stderr, "\nThe invers distance system for dep_op is:\n");  
-	    syst_debug(dep_syst_op);
+	    sc_syst_debug(dep_syst_op);
 	}    	
 	
 	dep_syst2 = sc_dup(dep_syst_op);    
@@ -1816,7 +1816,7 @@ list llv, s2_enc_loops;
 	    ifdebug(6) 
 	    {
 		debug(6, "", "Initial system sc1 before restrictions : \n");
-		syst_debug(sc1);
+		sc_syst_debug(sc1);
 	    }
 
 	    MAP(EXPRESSION, ex1, 
@@ -1871,7 +1871,7 @@ list llv, s2_enc_loops;
 	    ifdebug(6) 
 	    {
 		debug(6, "", "Initial system sc2 before restrictions : \n");
-		syst_debug(sc2);
+		sc_syst_debug(sc2);
 	    }
 
 	    MAP(EXPRESSION, ex2,
@@ -1902,8 +1902,8 @@ list llv, s2_enc_loops;
 	ifdebug(6) 
 	{
 	    debug(6, "", "Initial systems after restrictions : \n");
-	    syst_debug(sc_dep);
-	    syst_debug(sc_tmp);
+	    sc_syst_debug(sc_dep);
+	    sc_syst_debug(sc_tmp);
 	}
 	
 	/* introduce dependence distance variable if loop increment value
@@ -1953,7 +1953,7 @@ list llv, s2_enc_loops;
     {
 	debug(6, "build_and_test_dependence_context",
 	      "\ndependence context is:\n");
-	syst_debug(sc_dep);
+	sc_syst_debug(sc_dep);
     }
 
     *psc_dep = sc_dep;
@@ -2372,7 +2372,7 @@ Psysteme dep_sc;
 	{ 
 	    fprintf(stderr,
 		    "\nInitial sub lexico-positive dependence system:\n");
-	    syst_debug(sub_sc); 
+	    sc_syst_debug(sub_sc); 
 	}
 	
 	/* dans le cas d'une erreur d'overflow, on fait comme si le test 
@@ -2414,7 +2414,7 @@ Psysteme dep_sc;
 	{ 
 	    fprintf(stderr,
 		    "Normalized sub lexico-positive dependence system :\n");
-	    syst_debug(sub_sc);
+	    sc_syst_debug(sub_sc);
 	}
 
 	ifdebug(1) {
@@ -2433,7 +2433,7 @@ Psysteme dep_sc;
 	{ 
 	    fprintf(stderr, "Dependence system of the enveloppe of subs "
 		    "lexico-positive dependence:\n");
-	    syst_debug(sc_env);
+	    sc_syst_debug(sc_env);
 	    
 	    if (!SC_UNDEFINED_P(sc_env) && !sc_rn_p(sc_env))
 	    {
