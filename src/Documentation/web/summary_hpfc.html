@@ -1,29 +1,32 @@
 <html>
 <head>
-<title>HPFC: Summary of features ($Date$)</title>
+<title>HPFC: At a glance ($Date$)</title>
 </head>
 
 <body>
-<h1>HPFC: Summary of features</h1>
+<h1>HPFC at a glance</h1>
 
 <a href=/pips/hpfc.html>HPFC</a> is a prototype High Performance Fortran
-Compiler which is being developed within the <a href="/pips">PIPS</a> project
-by <a href="/~coelho">Fabien COELHO</a> at
+Compiler which is being developed within the <a href="/pips">PIPS</a>
+framework by <a href="/~coelho">Fabien COELHO</a> at
 <a href=/index-english.html>CRI</a>, &Eacute;cole des mines de Paris.
+It aims at testing new compilation techniques for distributed-memory
+parallel architectures. Funded by PARADIGME.
+<b>URL: </b>http://www.cri.ensmp.fr/pips/hpfc.html
 
 <h2>Input language</h2>
 <ul>
   <li> Fortran 77
-  <li> HPF <b>static</b> and <b>dynamic</b> mapping directives (no array syntax) 
-  <li> HPF independent and dynamic directives
+  <li> HPF <b>static</b> and <b>dynamic</b> mapping directives 
+  <li> HPF <code>independent</code> and <code>dynamic</code> directives
   <li> assumes a number of processors known at compile time
-  <li> distributed arrays cannot be passed as arguments
-       (but commons can be used)
+  <li> distributed arrays can be passed thru commons
+       (but not as arguments)
 </ul>
 
-<h2>Output language</h2>
+<h2>Output</h2>
 <ul>
-  <li> host and SPMD node model (2 programs are generated).
+  <li> 2 programs: host for I/Os and SPMD node for computations
   <li> Fortran 77 + HPFC Runtime support + PVM 3
 </ul>
 
@@ -38,7 +41,7 @@ by <a href="/~coelho">Fabien COELHO</a> at
 
 <h2>Standard Optimizations</h2>
 <ul>
-  <li> on top of a basic run-time resolution scheme:
+  <li> run-time resolution to handle general cases.
   <li> reduced allocation of distributed arrays on nodes.
   <li> overlaps, shifts and reductions
        for block-distributed stride-1 aligned arrays.
@@ -46,10 +49,10 @@ by <a href="/~coelho">Fabien COELHO</a> at
 
 <h2>Advanced Optimizations</h2>
 <ul>
-  <li> I/O-related communications
+  <li> for I/O-related communications
        (<a href="/~coelho/doc/A-264.abstract">abstract</a>,
         <a href="/~coelho/doc/A-264.ps.gz">paper</a>)
-  <li> remapping-related communications and optimizations
+  <li> for array remappings
        (<a href="/~coelho/doc/A-277.abstract">abstract</a>,
         <a href="/~coelho/doc/A-277.ps.gz">paper</a>)
   <li> and more  linear algebra-based techniques to come
@@ -59,16 +62,14 @@ by <a href="/~coelho">Fabien COELHO</a> at
 
 <h2>Experiments</h2>
 <ul>
-  <li> +100 small or medium size codes 
-       for non regression testing every night.
+  <li> +100 small or medium size codes for non regression test.
   <li> SOR on a network of SUN workstations
        (<a href="/~coelho/doc/A-257.abstract">abstract</a>,
         <a href="/~coelho/doc/A-257.ps.gz">paper</a>).
-  <li> wave propagation code from IFP on the SEH/ETCA CM5.
-  <li> matrix transpose on a DEC Alpha farm (see paper about remappings).
+  <li> wave propagation code from IFP (French Oil Institute)
+       on the SEH/ETCA CM5.
+  <li> matrix transpose on a DEC Alpha farm (see remappings).
 </ul>
-
-<b>URL: </b>http://www.cri.ensmp.fr/pips/hpfc.html
 
 </body>
 </html>
