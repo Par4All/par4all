@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/08/30 14:02:07 $, 
+# $Date: 1995/09/05 14:39:18 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -20,8 +20,7 @@ HPFC='-p HPFC_INSTALL'
 TIMEPROP=
 PIPSPROP=
 
-unset HPFFILES MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR REDIRECT \
-	FILES
+unset MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR REDIRECT FILES HPFFILES
 rm -f $TMP.*
 
 #
@@ -141,6 +140,11 @@ done
 [ "$HPFFILES" ] || usage 2
 [ "$MODULE" ] || MODULE=`default_module $HPFFILES .f`
 [ "$WORKSPACE" ] || WORKSPACE=`echo $MODULE | tr 'A-Z' 'a-z'`
+
+#
+# special file that contains FC special fake subroutines...
+#
+HPFFILES="$HPFFILES $HPFC_LIBS/hpfc_fake.f"
 
 for f in $HPFFILES
 do
