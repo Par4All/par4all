@@ -2,7 +2,7 @@
  * a set a functions to print the host and node status in PVM,
  * called from a Fortran subroutine.
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1994/09/03 13:09:27 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1994/09/07 10:28:54 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -13,6 +13,24 @@
 #include <string.h>
 #include "pvm3.h"
 extern int fprintf();
+
+/* PVM 3.2 compatibility
+ *  - pvmhostinfo <-> hostinfo
+ *  - pvmtaskinfo <-> taskinfo (also adds ti_pid)
+ */
+
+#ifdef PVM_OLD
+#define pvmtaskinfo taskinfo
+#define pvmhostinfo hostinfo
+static struct pvmtaskinfo
+    task_not_found = {0, 0, 0, 0, "task not found"};
+#else
+static struct pvmtaskinfo
+    task_not_found = {0, 0, 0, 0, "task not found", 0};
+#endif
+
+/*   end of fix for compatibility
+ */
 
 char *host_name(ti_host, nhost, hostp)
 int ti_host, nhost;
@@ -33,9 +51,6 @@ struct pvmtaskinfo which_task(ti_tid, ntask, taskp)
 int ti_tid, ntask;
 struct pvmtaskinfo *taskp;
 {
-    static struct pvmtaskinfo
-	blup = {0, 0, 0, 0, "task not found", 0};
-
     int i;
     for( i=0 ; i<ntask ; i++ )
     {
@@ -43,7 +58,7 @@ struct pvmtaskinfo *taskp;
 	    return(taskp[i]);
     }
 
-    return(blup); /* just to avoid a gcc warning */
+    return(task_not_found); /* just to avoid a gcc warning */
 }
 
 void print_host_info_ ()
