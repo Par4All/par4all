@@ -139,13 +139,13 @@ void create_frames()
 			  NULL);
   install_event_procedure(query_frame);
 
-  properties_frame = xv_create(main_frame, FRAME,
-			       FRAME_LABEL, "Options panel",
-			       XV_SHOW, FALSE,
-			       XV_WIDTH, display_width - EDIT_WIDTH -2*X_WM_DECOR_SIZE, 
-			       FRAME_DONE_PROC, hide_window,
-			       NULL);
-  install_event_procedure(properties_frame);
+  options_frame = xv_create(main_frame, FRAME,
+                            FRAME_LABEL, "Options panel",
+                            XV_SHOW, FALSE,
+                            XV_WIDTH, display_width - EDIT_WIDTH -2*X_WM_DECOR_SIZE, 
+                            FRAME_DONE_PROC, hide_window,
+                            NULL);
+  install_event_procedure(options_frame);
 }
 
 void place_frames()
@@ -204,9 +204,9 @@ void place_frames()
 
 
 		/* Above the main frame : */
-    place_frame(properties_frame, 
+    place_frame(options_frame, 
 		0, 
-		main_t - xv_get(properties_frame, XV_HEIGHT) - Y_WM_DECOR_SIZE);
+		main_t - xv_get(options_frame, XV_HEIGHT) - Y_WM_DECOR_SIZE);
 
     /* in the upper right corner, in the bottom right corner, etc : */
     for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
