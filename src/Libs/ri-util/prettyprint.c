@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.104  1997/11/25 10:18:16  coelho
+ * updates for add_to_current_line
+ *
  * Revision 1.103  1997/11/22 12:16:49  coelho
  * OMP style prettyprint of parallel loops added.
  *
@@ -132,7 +135,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.103 1997/11/22 12:16:49 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.104 1997/11/25 10:18:16 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -1108,24 +1111,24 @@ text_directive(
     
     if (execution_parallel_p(loop_execution(obj)))
     {
-	add_to_current_line(buffer, dir, cont, t, TRUE);
-	add_to_current_line(buffer, parallel, cont, t, TRUE);
+	add_to_current_line(buffer, dir, cont, t);
+	add_to_current_line(buffer, parallel, cont, t);
 	l = loop_private_variables(obj);
 	if (l && is_hpf) 
-	    add_to_current_line(buffer, ", ", cont, t, TRUE);
+	    add_to_current_line(buffer, ", ", cont, t);
     }
     else if (get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"))
     {
 	l = loop_private_variables(obj);
 	if (l) 
 	{
-	    add_to_current_line(buffer, dir, cont, t, TRUE);
-	    if (is_omp) add_to_current_line(buffer, "DO", cont, t, TRUE);
+	    add_to_current_line(buffer, dir, cont, t);
+	    if (is_omp) add_to_current_line(buffer, "DO", cont, t);
 	}
     }
     
     if (strlen(buffer)>0)
-	MAP(STRING, s, add_to_current_line(buffer, s, cont, t, FALSE), l);
+	MAP(STRING, s, add_to_current_line(buffer, s, cont, t), l);
 
     /* what about reductions? should be associated to the ri somewhere.
      */
