@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/20 17:26:27 $, 
+# $Date: 1996/08/20 17:44:18 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
