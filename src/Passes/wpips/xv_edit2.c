@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/29 13:50:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/30 14:18:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1995/11/29 13:50:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1995/11/30 14:18:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -372,11 +372,18 @@ execute_wpips_execute_and_display_something_outside_the_notifyer()
          if ( print_type_2 != NULL ) {
             char bank_view_name[SMALL_BUFFER_LENGTH];
 
-            (void) sprintf(bank_view_name, "%s (bank view)", label);
-            if (wpips_view_marked_busy(title_module_name, bank_view_name, icon_number2, module_name)) {
+	    /* I removed the "(bank view)" appended here so that 
+	     * wpips/epips comms are ok for WP65...
+	     * I could also have added a special view handler in epips...
+	     * well... FC 30/11/95
+	     */
+            (void) sprintf(bank_view_name, "%s", label);
+            if (wpips_view_marked_busy(title_module_name, bank_view_name, 
+				       icon_number2, module_name)) {
                file_name = get_dont_build_view_file(print_type_2);
       
-               wpips_file_view(file_name, title_module_name, bank_view_name, icon_number2, module_name);
+               wpips_file_view(file_name, title_module_name, 
+			       bank_view_name, icon_number2, module_name);
             }
          }
       }
