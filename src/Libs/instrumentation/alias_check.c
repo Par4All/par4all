@@ -24,10 +24,42 @@
  we instrument the code with tests that check the violation dynamically 
  during execution of program.
 
+ For each alias_association of a formal variable F, check for 2 cases:
+
+ Case 1: there is other formal variable F' that has a same section by an
+ included call path => test(F,F')
+
+ Case 2: 
+ 2.1 there is a common variable W in current module that has same section
+ with F => test(F,W)
+ 2.2 there is a common variable V in some callee (direct and indirect) of the 
+ current  module that has same section with F => test(F,V)
+
+ Test(A,B):
+ 1. No intersection between A and B => OK
+ 2. Intersection
+    2.1 no write on one variable => OK
+    2.2 write on one varibale => violation
+    2.3 Undecidable
+ 3. Undecidable
+
+ In case of undecidable, we try to repeat Test(A,B) in one higher call site 
+ in the call path. And if we return to undecidable cases, we use dynamic checks
+ 
 *******************************************************************/
 
-/* TO AMELIORATE : TAKE MORE INFORMATION, 
-   from array declarations, A(l:u) => u>l*/
+/* ATTENTION : depend on the debugging need, we can chose make_print_statement(msg)
+   or make_stop_statement(msg) 
+   
+   IF (I.LT.1) PRINT *,"Alias violation ...."
+
+   IF (I.LT.1) STOP "Alias violation ...." */
+
+
+/* TO AMELIORATE :
+   for the moment, we only use trivial_expression_p to compare offsets + array sizes 
+   CAN TAKE MORE INFORMATION from array declarations, A(l:u) => u>l
+   not precondtitions (corrupted)*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,9 +81,10 @@
 #include "transformations.h"
 #include "text-util.h" /* for words_to_string*/
 
+#define PREFIX1 "$ALIAS_CHECK"
+#define PREFIX2 "$ALIAS_CHECK_END"
 #define ALIAS_FLAG "ALIAS_FLAG"
-#define ALIAS_FUNCTION "ALIAS_CHECK"
-#define ALIAS_FILE "ALIAS_CHECKS"
+#define ALIAS_FUNCTION "DYNAMIC_ALIAS_CHECK"
 
 typedef struct 
 {
@@ -73,14 +106,52 @@ static list l_module_aliases = NIL;
 static statement module_statement = statement_undefined;
 static statement current_statement = statement_undefined;
 static int current_ordering = 0;
-static int number_of_tests = 0;
-static int number_of_calls = 0;
 static FILE * out;
 static entity alias_flag = entity_undefined;
 static entity alias_function = entity_undefined;
-static int unique_flag_number = 0; // a counter for alias flags
-static list l_dynamic_check = NIL; 
 /* This list tells us if two variables have been checked dynamically or not*/
+static list l_dynamic_check = NIL; 
+static int unique_flag_number = 0; // a counter for alias flags
+static int number_of_tests = 0;
+static int number_of_calls = 0;
+static int number_of_processed_modules = 0;
+
+
+expression simplify_relational_expression(expression e)
+{  
+  if (relational_expression_p(e))
+    {
+      /* If e is a relational expression*/
+      list args = call_arguments(syntax_call(expression_syntax(e)));
+      expression e1 =  EXPRESSION(CAR(args));
+      expression e2 = EXPRESSION(CAR(CDR(args)));    
+      if (!expression_undefined_p(e1) && !expression_undefined_p(e2))
+	{
+	  normalized n1 = NORMALIZE_EXPRESSION(e1);
+	  normalized n2 = NORMALIZE_EXPRESSION(e2);
+	  if (normalized_linear_p(n1) && normalized_linear_p(n2))
+	    {
+	      entity op = call_function(syntax_call(expression_syntax(e)));
+	      Pvecteur v1 = normalized_linear(n1);
+	      Pvecteur v2 = normalized_linear(n2);
+	      Pvecteur v = vect_substract(v1,v2);
+	      expression new_exp;
+	      vect_normalize(v);
+	      new_exp = Pvecteur_to_expression(v);
+	      return binary_intrinsic_expression(entity_local_name(op),new_exp,int_to_expression(0));
+	    }
+	}
+    }
+  return e;
+}
+
+static void display_alias_check_statistics()
+{
+  user_log("\n Number of flags : %d", unique_flag_number); 
+  user_log("\n Number of tests : %d", number_of_tests);
+  user_log("\n Number of calls : %d", number_of_calls);
+  user_log("\n Number of processed modules: %d\n",number_of_processed_modules); 
+}
 
 /*****************************************************************************
 
@@ -181,7 +252,7 @@ static bool same_call_site_p(call_site cs1, call_site cs2)
 
 *****************************************************************************/
 
-static bool included_call_chain(list l1, list l2)
+bool included_call_chain_p(list l1, list l2)
 {
   while (!ENDP(l1) && !ENDP(l2))
     {
@@ -205,14 +276,13 @@ static bool tail_call_path_p(call_site cs, list l1, list l2)
   if (gen_length(l1) == gen_length(l2)+1)
     {
       call_site cs1 = CALL_SITE(CAR(l1));
-      return (same_call_site_p(cs,cs1) && included_call_chain(l2,CDR(l1)));
+      return (same_call_site_p(cs,cs1) && included_call_chain_p(l2,CDR(l1)));
     }
   return FALSE;
 }
 
 
-static string 
-int_to_string(int i)
+string int_to_string(int i)
 {
   char buffer[10];
   sprintf(buffer, "%d", i);
@@ -254,11 +324,14 @@ void  print_alias_association(alias_association aa)
   entity sec = alias_association_section(aa);
   expression exp = alias_association_offset(aa);
   list path = alias_association_call_chain(aa);
+  int l = alias_association_lower_offset(aa);
+  int u = alias_association_upper_offset(aa);
   fprintf(stderr,"\n Alias association :");
   fprintf(stderr,"\n Formal variable %s with",entity_name(e));
   fprintf(stderr, "\n section :%s", entity_name(sec));
   fprintf(stderr, "\n offset :");
   print_expression(exp);
+  fprintf(stderr, "lower offset :%d, upper offset: %d \n",l,u);
   fprintf(stderr, "call path :%s \n", print_call_path(path)); 
 }
 
@@ -270,11 +343,9 @@ void  print_alias_association(alias_association aa)
 
 void  print_list_of_alias_associations(list l)
 {
-  MAP(ALIAS_ASSOCIATION, aa,
-  {
+  MAP(ALIAS_ASSOCIATION, aa,{
     print_alias_association(aa);
-  },
-      l);    
+  },l);    
 }
 
 /*****************************************************************************
@@ -322,8 +393,7 @@ static expression array_size_stride(entity ent)
 	  print_expression(exp);
 	}
     }
-  //  else 
-  // user_log("\n Warning : Assumed-size A(N,*) or pointer-type A(N,1) array \n");
+  /* else return expression_undefined with assumed-size or pointer-type array*/
   return exp;
 }
 
@@ -345,17 +415,22 @@ static void insert_test_before_statement(expression flags, expression condition,
 				      entity_local_name(e1),", aliased with ",
 				      entity_local_name(e2)," by call path ",
 				      print_call_path(path),"\"", NULL));
+  string mod_name = module_local_name(current_mod);
+  string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
+  string base_name = pips_basename(user_file, NULL);
+  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
   if (true_expression_p(condition))
     cond = copy_expression(flags);
   else
     cond = and_expression(condition,flags);
-  smt = test_to_statement(make_test(cond, make_print_statement(message),
+  smt = test_to_statement(make_test(cond, make_stop_statement(message),
 				    make_block_statement(NIL)));
-  fprintf(out, "AC: %s (%d,%d)\n",module_local_name(current_mod),
+  fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_mod),
 	  ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
   print_text(out, text_statement(entity_undefined,0,smt));
-  fprintf(out, "ACEND \n");
+  fprintf(out,"%s\n",PREFIX2);
   number_of_tests++;
+  free(file_name), file_name = NULL;
 }
 
 /*****************************************************************************
@@ -374,12 +449,17 @@ static void insert_flag_before_call_site(list flags,list path)
       entity caller = call_site_function(cs);
       int order = call_site_ordering(cs);
       statement s_flag = make_assign_statement(e_flag,make_true_expression());
-      fprintf(out, "AC: %s (%d,%d)\n",module_local_name(caller),
+      string call_name = module_local_name(caller);
+      string user_file = db_get_memory_resource(DBR_USER_FILE,call_name,TRUE);
+      string base_name = pips_basename(user_file, NULL);
+      string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
+      fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(caller),
 	      ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
-      print_text(out, text_statement(entity_undefined,0,s_flag));
-      fprintf(out, "ACEND \n");
+      print_text(out,text_statement(entity_undefined,0,s_flag));
+      fprintf(out, "%s\n",PREFIX2);
       path = CDR(path);
       flags = CDR(flags);
+      free(file_name), file_name = NULL;
     }
 }
 
@@ -393,23 +473,27 @@ static void insert_flag_before_call_site(list flags,list path)
 static void insert_test_before_caller(expression condition, expression e_flag)
 {
   statement s_flag = make_assign_statement(e_flag,make_true_expression());
+  string user_file = db_get_memory_resource(DBR_USER_FILE,caller_name,TRUE);
+  string base_name = pips_basename(user_file, NULL);
+  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
   if (true_expression_p(condition))
     {
-      fprintf(out, "AC: %s (%d,%d)\n",module_local_name(current_caller),
+      fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_caller),
 	      ORDERING_NUMBER(current_ordering),ORDERING_STATEMENT(current_ordering));
-      print_text(out, text_statement(entity_undefined,0,s_flag));
-      fprintf(out, "ACEND \n");
+      print_text(out,text_statement(entity_undefined,0,s_flag));
+      fprintf(out,"%s\n",PREFIX2);
     }
   else
     {
       statement smt = test_to_statement(make_test(condition, s_flag,
 						  make_block_statement(NIL)));
-      fprintf(out, "AC: %s (%d,%d)\n",module_local_name(current_caller),
+      fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_caller),
 	      ORDERING_NUMBER(current_ordering),ORDERING_STATEMENT(current_ordering));
       print_text(out, text_statement(entity_undefined,0,smt));
-      fprintf(out, "ACEND \n");
+      fprintf(out,"%s\n",PREFIX2);
       number_of_tests++;
     }
+  free(file_name), file_name = NULL;
 }
 
 static list make_list_of_flags(list path)
@@ -450,11 +534,6 @@ static bool variable_is_written_by_statement_flt(statement s)
 {
   if (statement_call_p(s))
     {	
-      ifdebug(3)
-	{
-          fprintf(stderr,"\n Call statement :\n");
-	  print_statement(s);
-	}
       if (!functional_call_p(statement_call(s)))
 	{
 	  list l_rw = load_proper_rw_effects_list(s);
@@ -465,13 +544,13 @@ static bool variable_is_written_by_statement_flt(statement s)
 	      {
 		reference r = effect_reference(eff);
 		entity e = reference_variable(r);
-		ifdebug(3)
-		  {
-		    fprintf(stderr,"\n Write on entity %s :\n",entity_name(e));
-		    fprintf(stderr,"\n Current entity %s :\n",entity_name(current_entity));
-		  }
 		if (same_entity_p(e,current_entity))
 		  {
+		    ifdebug(3)
+		      {
+			fprintf(stderr,"\n Write on entity %s :\n",entity_name(e));
+			fprintf(stderr,"\n Current entity %s :\n",entity_name(current_entity));
+		      }
 		    written = TRUE;
 		    //gen_recurse_stop(NULL);
 		    return FALSE;
@@ -507,16 +586,21 @@ static void insert_check_alias_before_statement(entity e1, expression subval,
   list l = CONS(EXPRESSION,size,NIL);
   statement smt;
   int order = statement_ordering(s);
+  string mod_name = module_local_name(current_mod);
+  string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
+  string base_name = pips_basename(user_file, NULL);
+  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
   l = CONS(EXPRESSION,entity_to_expression(e2),l);
   l = CONS(EXPRESSION,subval,l);
   l = CONS(EXPRESSION,entity_to_expression(e1),l);
   l = CONS(EXPRESSION,MakeCharacterConstantExpression(message),l);
   smt = call_to_statement(make_call(alias_function,l));
-  fprintf(out, "AC: %s (%d,%d)\n",module_local_name(current_mod),
+  fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_mod),
 	  ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
   print_text(out, text_statement(entity_undefined,0,smt));
-  fprintf(out, "ACEND \n");
+  fprintf(out,"%s\n",PREFIX2);
   number_of_calls++; 
+  free(file_name), file_name = NULL;
 }
 
 /*****************************************************************************
@@ -562,9 +646,9 @@ static bool dynamic_alias_check_flt(statement s, alias_context_p context)
 		  insert_check_alias_before_statement(context->first_entity,subval,
 						      context->second_entity,size,s);
 		else
-		  /* Assumed-size A(N,*) or pointer-type A(N,1) array, the size of dummy array can not be 
+		  /* Assumed-size or pointer-type array, the size of dummy array can not be 
 		     derived from the size of actual argument as we have no corresponding call chain*/
-		  user_log("\n Warning : Assumed-size A(N,*) or pointer-type A(N,1) array \n");
+		  pips_user_warning("\nAssumed-size or pointer-type array \n");
 		return FALSE;
 	      }
 	    return TRUE;
@@ -647,15 +731,19 @@ static bool alias_check_array_and_scalar_variable_in_module_flt(statement s,
 		list l_inds = reference_indices(r);
 		/* Attention : <may be written> V(*,*) => what kind of indices ???*/
 		expression subval2 = subscript_value_stride(context->first_entity,l_inds);
-		expression ref2;
 		expression diff;
 		int k;
-		if (expression_equal_integer_p(subval2,0))
-		  ref2 = copy_expression(context->offset2);
+		if (same_expression_p(context->offset1,context->offset2))
+		  diff = eq_expression(int_to_expression(0),subval2);
 		else
-		  ref2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-						     context->offset2,subval2);
-		diff = eq_expression(context->offset1,ref2);
+		  {
+		    expression ref2;
+		    if (expression_equal_integer_p(context->offset2,0))
+		      ref2 = copy_expression(subval2);
+		    else
+		      ref2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,context->offset2,subval2);
+		    diff = eq_expression(context->offset1,ref2);
+		  }
 		clean_all_normalized(diff);
 		k = trivial_expression_p(diff);
 		switch(k){
@@ -666,7 +754,7 @@ static bool alias_check_array_and_scalar_variable_in_module_flt(statement s,
 		  {
 		    /* k = 0 or 1*/
 		    if (k==0)
-		      insert_test_before_statement(context->flags,diff,s,
+		      insert_test_before_statement(context->flags,simplify_relational_expression(diff),s,
 						   context->first_entity,context->second_entity,
 						   context->path);
 		    else 
@@ -717,15 +805,18 @@ static bool alias_check_array_variable_in_module_flt(statement s,alias_context_p
 		list l_inds = reference_indices(r);
 		/* Attention : <may be written> V(*,*) => what kind of indices ???*/
 		expression subval1 = subscript_value_stride(context->first_entity,l_inds);
-		expression ref1;
 		expression diff1;
 		int k1;
-		if (expression_equal_integer_p(subval1,0))
-		  ref1 = copy_expression(context->offset1);
+		expression ref1;
+		if (expression_equal_integer_p(context->offset1,0))
+		  ref1 = copy_expression(subval1);
 		else
 		  ref1 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
 						     context->offset1,subval1);
-		diff1 = ge_expression(ref1,context->offset2);
+		if (same_expression_p(context->offset1,context->offset2))
+		  diff1 = ge_expression(subval1,int_to_expression(0));
+		else
+		  diff1 = ge_expression(ref1,context->offset2);
 		clean_all_normalized(diff1);
 		k1 = trivial_expression_p(diff1);
 		switch(k1){
@@ -736,10 +827,20 @@ static bool alias_check_array_variable_in_module_flt(statement s,alias_context_p
 		  {
 		    expression size2 = array_size_stride(context->second_entity);
 		    // test of assumed-size array is carried out before
-		    expression sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-								  context->offset2,size2);
-		    expression diff2 = le_expression(ref1,sum2);
+		    expression diff2;
 		    int k2;
+		    if (same_expression_p(context->offset1,context->offset2))
+		      diff2 = le_expression(subval1,size2);
+		    else
+		      {
+			expression sum2;
+			if (expression_equal_integer_p(context->offset2,0))
+			  sum2 = copy_expression(size2);
+			else
+			  sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+							     context->offset2,size2);
+			diff2 = le_expression(ref1,sum2);
+		      }
 		    clean_all_normalized(diff2);
 		    k2 = trivial_expression_p(diff2);
 		    switch(k2){
@@ -750,8 +851,10 @@ static bool alias_check_array_variable_in_module_flt(statement s,alias_context_p
 		      {
 			/* k1 = 0 or 1, k2 = 0 or 1*/
 			if (k1+k2==0) // k1=k2=0
-			  insert_test_before_statement(context->flags,and_expression(diff1,diff2),s,
-						       context->first_entity,context->second_entity,
+			  insert_test_before_statement(context->flags,
+						       and_expression(simplify_relational_expression(diff1),
+								      simplify_relational_expression(diff2)),
+						       s,context->first_entity,context->second_entity,
 						       context->path);
 			else 
 			  {
@@ -762,11 +865,13 @@ static bool alias_check_array_variable_in_module_flt(statement s,alias_context_p
 			    else
 			      {
 				if (k1==0) // k1=0, k2=1
-				  insert_test_before_statement(context->flags,diff1,s,
+				  insert_test_before_statement(context->flags,
+							       simplify_relational_expression(diff1),s,
 							       context->first_entity,context->second_entity,
 							       context->path);
 				else // k2=0, k1=1
-				  insert_test_before_statement(context->flags,diff2,s,
+				  insert_test_before_statement(context->flags,
+							       simplify_relational_expression(diff2),s,
 							       context->first_entity,context->second_entity,
 							       context->path);
 			      }
@@ -821,8 +926,8 @@ static void alias_check_two_scalar_variables_in_module(entity e1,entity e2,expre
       context.flags = expression_list_to_conjonction(l_flags);	  
       if (k==1)
 	context.condition = make_true_expression();
-      else
-	context.condition = diff;
+      else   
+	context.condition = simplify_relational_expression(diff);
       context.first_entity = e1;
       context.second_entity = e2;
       gen_context_recurse(module_statement,&context, statement_domain, 
@@ -874,9 +979,19 @@ static void alias_check_scalar_and_array_variables_in_module(entity e1,entity e2
       expression size2 = array_size_stride(e2);
       if (!expression_undefined_p(size2)) // not assumed-size array
 	{
-	  expression sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,off2,size2);
-	  expression diff2 = le_expression(off1,sum2);
+	  expression diff2;
 	  int k2;
+	  if (same_expression_p(off1,off2))
+	    diff2 = le_expression(int_to_expression(0),size2);
+	  else
+	    {
+	      expression sum2;
+	      if (expression_equal_integer_p(off2,0))
+		sum2 = copy_expression(size2);
+	      else
+		sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,off2,size2);
+	      diff2 = le_expression(off1,sum2);
+	    }
 	  clean_all_normalized(diff2);
 	  k2 = trivial_expression_p(diff2);
 	  switch(k2){
@@ -893,7 +1008,8 @@ static void alias_check_scalar_and_array_variables_in_module(entity e1,entity e2
 	      context.path = path;
 	      context.flags = expression_list_to_conjonction(l_flags);
 	      if (k1+k2==0) // k1=k2=0
-		context.condition = and_expression(diff1,diff2);
+		context.condition = and_expression(simplify_relational_expression(diff1),
+						   simplify_relational_expression(diff2));
 	      else 
 		{
 		  if (k1+k2==2) // k1=k2=1
@@ -901,9 +1017,9 @@ static void alias_check_scalar_and_array_variables_in_module(entity e1,entity e2
 		  else
 		    {
 		      if (k1==0) // k1=0, k2=1
-			context.condition = diff1;
+			context.condition = simplify_relational_expression(diff1); 
 		      else // k2=0, k1=1
-			context.condition = diff2;
+			context.condition = simplify_relational_expression(diff2);
 		    }
 		}
 	      context.first_entity = e1;
@@ -927,9 +1043,9 @@ static void alias_check_scalar_and_array_variables_in_module(entity e1,entity e2
 	  }
 	}
       else
-	/* Assumed-size A(N,*) or pointer-type A(N,1) array, the size of dummy array can be 
+	/* Assumed-size or pointer-type array, the size of dummy array can be 
 	 derived from the size of actual argument, as we have the corresponding call chain*/
-	user_log("\n Warning : Assumed-size A(N,*) or pointer-type A(N,1) array \n");
+	pips_user_warning("\nAssumed-size or pointer-type array \n");
     }
   }
 }
@@ -956,12 +1072,16 @@ static void alias_check_two_array_variables_in_module(entity e1,entity e2,expres
   expression size2 = array_size_stride(e2);
   if (!expression_undefined_p(size2)) // not assumed-size array
     {
-      expression sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,off2,size2);
-      expression diff1 = gt_expression(off1,sum2);
+      expression sum2,diff1;
       int k1;
+      if (expression_equal_integer_p(off2,0))
+	sum2 = copy_expression(size2);
+      else
+	sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,off2,size2);
+      diff1 = gt_expression(off1,sum2);
       clean_all_normalized(diff1);
       k1 = trivial_expression_p(diff1);
-      ifdebug(2) 
+      ifdebug(2)
 	fprintf(stderr,"\n Check in module, 2 array variables \n");
       switch(k1){
       case 1: 
@@ -976,10 +1096,13 @@ static void alias_check_two_array_variables_in_module(entity e1,entity e2,expres
 	  expression size1 = array_size_stride(e1);
 	  if (!expression_undefined_p(size1)) // not assumed-size array
 	    {
-	      expression sum1 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-							    off1,size1);
-	      expression diff2 = gt_expression(off2,sum1);
+	      expression sum1,diff2;
 	      int k2;
+	      if (expression_equal_integer_p(off1,0))
+		sum1 = copy_expression(size1);
+	      else
+		sum1 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,off1,size1);
+	      diff2 = gt_expression(off2,sum1);
 	      clean_all_normalized(diff2);
 	      k2 = trivial_expression_p(diff2);
 	      switch(k2){
@@ -1021,16 +1144,16 @@ static void alias_check_two_array_variables_in_module(entity e1,entity e2,expres
 	      }
 	    }
 	  else 
-	    /* Assumed-size A(N,*) or pointer-type A(N,1) array, the size of dummy array can be 
+	    /* Assumed-size or pointer-type array, the size of dummy array can be 
 	       derived from the size of actual argument, as we have the corresponding call chain*/
-	    user_log("\n Warning : Assumed-size A(N,*) or pointer-type A(N,1) array \n");
+	    pips_user_warning("\nAssumed-size or pointer-type array \n");
 	}
       }
     }
   else 
-    /* Assumed-size A(N,*) or pointer-type A(N,1) array, the size of dummy array can be 
+    /* Assumed-size or pointer-type array, the size of dummy array can be 
        derived from the size of actual argument, as we have the corresponding call chain*/
-    user_log("\n Warning : Assumed-size A(N,*) or pointer-type A(N,1) array \n");
+    pips_user_warning("\nAssumed-size or pointer-type array \n");
 }
 
 /*****************************************************************************
@@ -1043,12 +1166,7 @@ static void alias_check_two_array_variables_in_module(entity e1,entity e2,expres
 static void alias_check_in_module(entity e1,entity e2,
 				  expression off1,expression off2,list path)
 {
-  /* Algorithm : 
-     Firstly, try to use off1, off2 and the size of arrays e1, e2 (if exists) 
-     to conclude if there is alias between these 2 variables or not. And then 
-     check with the written reference to find alias violation.
-     
-     There are 3 cases:
+  /* There are 3 cases:
      - Case 1: e1 and e2 are scalar variables
      - Case 2: e1 is a scalar variable, e2 is an array variable or vice-versa
      - Case 3: e1 and e2 are array variables */
@@ -1110,7 +1228,7 @@ static bool alias_check_scalar_variable_in_caller_flt(statement s,alias_context_
 
  This function checks if an array element which is aliased with a scalar variable 
  is written or not. Test : ref2 == off1 ? where ref2 = off2+subval_stride2
-If yes, insert test before direct call
+ If yes, insert test before direct call
 
 *****************************************************************************/
 
@@ -1137,17 +1255,23 @@ static bool alias_check_array_and_scalar_variable_in_caller_flt(statement s,alia
 		list l_inds = reference_indices(r);
 		/* Attention : <may be written> V(*,*) => what kind of indices ???*/
 		expression subval2 = subscript_value_stride(context->first_entity,l_inds);
-		expression ref2;
-		if (expression_equal_integer_p(subval2,0))
-		  ref2 = copy_expression(context->offset2);
-		else
-		  ref2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,context->offset2,subval2);
-		/* Translate ref2 to the frame of caller, in order to compare with offsets*/
-		ref2 = translate_to_module_frame(current_mod,current_caller,ref2,current_call);
-		if (!expression_undefined_p(ref2))
-		  {
-		    expression diff = eq_expression(context->offset1,ref2);
+		/* Translate subval2 to the frame of caller, in order to compare with offsets*/
+		expression new_subval2 = translate_to_module_frame(current_mod,current_caller,subval2,current_call);
+		if (!expression_undefined_p(new_subval2))
+		  { 
+		    expression diff;
 		    int k;
+		    if (same_expression_p(context->offset1,context->offset2))
+		      diff = eq_expression(int_to_expression(0),new_subval2);
+		    else
+		      {
+			expression ref2;
+			if (expression_equal_integer_p(context->offset2,0))
+			  ref2 = copy_expression(new_subval2);
+			else
+			  ref2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,context->offset2,new_subval2);
+			diff = eq_expression(context->offset1,ref2);
+		      }
 		    clean_all_normalized(diff);
 		    k = trivial_expression_p(diff);
 		    switch(k){
@@ -1174,7 +1298,7 @@ static bool alias_check_array_and_scalar_variable_in_caller_flt(statement s,alia
 						       context->first_entity,context->second_entity,
 						       context->path);
 			if (k==0)
-			  insert_test_before_caller(diff,e_flag);
+			  insert_test_before_caller(simplify_relational_expression(diff),e_flag);
 			else 
 			  insert_test_before_caller(make_true_expression(),e_flag);
 			return FALSE;
@@ -1183,7 +1307,7 @@ static bool alias_check_array_and_scalar_variable_in_caller_flt(statement s,alia
 		  }
 		else
 		  {
-		    /* We can not translate ref to the frame of caller => use dynamic check*/
+		    /* We can not translate subval to the frame of caller => use dynamic check*/
 		    insert_check_alias_before_statement(context->first_entity,subval2,
 							context->second_entity,int_to_expression(0),s);
 		    return FALSE;
@@ -1214,7 +1338,6 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
     l_rw = load_proper_rw_effects_list(s);
   else
     l_rw = load_cumulated_rw_effects_list(s);
-
   MAP(EFFECT, eff,
   {
     action a = effect_action(eff);
@@ -1230,19 +1353,23 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
 		list l_inds = reference_indices(r);
 		/* Attention : <may be written> V(*,*) => what kind of indices ???*/
 		expression subval1 = subscript_value_stride(context->first_entity,l_inds);
-		expression ref1;
-		expression diff1;
-		int k1;
-		if (expression_equal_integer_p(subval1,0))
-		  ref1 = copy_expression(context->offset1);
-		else
-		  ref1 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-						     context->offset1,subval1);
-		/* Translate ref1 to the frame of caller, in order to compare with offsets*/
-		ref1 = translate_to_module_frame(current_mod,current_caller,ref1,current_call);
-		if (!expression_undefined_p(ref1))
+		/* Translate subval1 to the frame of caller, in order to compare with offsets*/
+		expression new_subval1 = translate_to_module_frame(current_mod,current_caller,subval1,current_call);
+		if (!expression_undefined_p(new_subval1))
 		  {
-		    diff1 = ge_expression(ref1,context->offset2);
+		    expression diff1;
+		    int k1;
+		    expression ref1;
+		    if (same_expression_p(context->offset1,context->offset2))
+		      diff1 = ge_expression(new_subval1,int_to_expression(0));
+		    else
+		      {
+			if (expression_equal_integer_p(context->offset1,0))
+			  ref1 = copy_expression(new_subval1);
+			else
+			  ref1 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,context->offset1,new_subval1);
+			diff1 = ge_expression(ref1,context->offset2);
+		      }
 		    clean_all_normalized(diff1);
 		    k1 = trivial_expression_p(diff1);
 		    switch(k1){
@@ -1257,10 +1384,19 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
 			size2 =  translate_to_module_frame(current_mod,current_caller,size2,current_call);
 			if (!expression_undefined_p(size2))
 			  {
-			    expression sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-									  context->offset2,size2);
-			    expression diff2 = le_expression(ref1,sum2);
+			    expression diff2;
 			    int k2;
+			    if (same_expression_p(context->offset1,context->offset2))
+			      diff2 = le_expression(new_subval1,size2);
+			    else
+			      {
+				expression sum2;
+				if (expression_equal_integer_p(context->offset2,0))
+				  sum2 = copy_expression(size2);
+				else
+				  sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,context->offset2,size2);
+				diff2 = le_expression(ref1,sum2);
+			      }
 			    clean_all_normalized(diff2);
 			    k2 = trivial_expression_p(diff2);
 			    switch(k2){
@@ -1287,7 +1423,8 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
 							       context->first_entity,context->second_entity,
 							       context->path);
 				if (k1+k2==0) // k1=k2=0
-				  insert_test_before_caller(and_expression(diff1,diff2),e_flag);
+				  insert_test_before_caller(and_expression(simplify_relational_expression(diff1),
+									   simplify_relational_expression(diff2)),e_flag);
 				else 
 				  {
 				    if (k1+k2==2) // k1=k2=1
@@ -1295,9 +1432,9 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
 				    else
 				      {
 					if (k1==0) // k1=0, k2=1
-					  insert_test_before_caller(diff1,e_flag);
+					  insert_test_before_caller(simplify_relational_expression(diff1),e_flag);
 					else // k2=0, k1=1
-					  insert_test_before_caller(diff2,e_flag);
+					  insert_test_before_caller(simplify_relational_expression(diff2),e_flag);
 				      }
 				  }
 				break;
@@ -1306,18 +1443,17 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
 			  }
 			else
 			  /* We can not translate size2 to the frame of caller => create new common variable*/
-			  user_log("\n Warning : Can not translate size of array to frame of caller \n");
+			  pips_user_warning("\nCan not translate size of array to frame of caller \n");
 			break;
 		      }
 		    }
 		  }
 		else
 		  {
-		    /* We can not translate ref to the frame of caller => use dynamic check*/
+		    /* We can not translate subval1 to the frame of caller => use dynamic check*/
 		    expression size2 = array_size_stride(context->second_entity);
 		    insert_check_alias_before_statement(context->first_entity,subval1,
 							context->second_entity,size2,s);
-		    //  user_log("\n Warning : Can not translate writing reference to frame of caller \n");
 		  }
 		return FALSE;
 	      }
@@ -1365,7 +1501,7 @@ static void alias_check_two_scalar_variables_in_caller(entity e1,entity e2,expre
       if (k==1)
 	insert_test_before_caller(make_true_expression(),e_flag);
       else
-	insert_test_before_caller(diff,e_flag);
+	insert_test_before_caller(simplify_relational_expression(diff),e_flag);
       context.path = path;
       context.flags = expression_list_to_conjonction(l_flags);
       context.first_entity = e1;
@@ -1423,10 +1559,19 @@ static void alias_check_scalar_and_array_variables_in_caller(entity e1, entity e
 	  size2 = translate_to_module_frame(current_mod,current_caller,size2,current_call);
 	  if (!expression_undefined_p(size2))
 	    {
-	      expression sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-							    off2,size2);
-	      expression diff2 = le_expression(off1,sum2);
+	      expression diff2;
 	      int k2;
+	      if (same_expression_p(off1,off2))
+		diff2 = le_expression(int_to_expression(0),size2);
+	      else
+		{
+		  expression sum2;
+		  if (expression_equal_integer_p(off2,0))
+		    sum2 = copy_expression(size2);
+		  else
+		    sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,off2,size2);
+		  diff2 = le_expression(off1,sum2);
+		}
 	      clean_all_normalized(diff2);
 	      k2 = trivial_expression_p(diff2);
 	      switch(k2){
@@ -1446,7 +1591,8 @@ static void alias_check_scalar_and_array_variables_in_caller(entity e1, entity e
 		    {
 		      expression e_flag = EXPRESSION(CAR(l_flags));
 		      if (k1+k2==0) // k1=k2=0
-			insert_test_before_caller(and_expression(diff1,diff2),e_flag);
+			insert_test_before_caller(and_expression(simplify_relational_expression(diff1),
+								 simplify_relational_expression(diff2)),e_flag);
 		      else 
 			{
 			  if (k1+k2==2) // k1=k2=1
@@ -1454,9 +1600,9 @@ static void alias_check_scalar_and_array_variables_in_caller(entity e1, entity e
 			  else
 			    {
 			      if (k1==0) // k1=0, k2=1
-				insert_test_before_caller(diff1,e_flag);
+				insert_test_before_caller(simplify_relational_expression(diff1),e_flag);
 			      else // k2=0, k1=1
-				insert_test_before_caller(diff2,e_flag);
+				insert_test_before_caller(simplify_relational_expression(diff2),e_flag);
 			    }
 			}
 		    }
@@ -1466,7 +1612,17 @@ static void alias_check_scalar_and_array_variables_in_caller(entity e1, entity e
 		  context.second_entity = e2;
 		  gen_context_recurse(module_statement,&context, statement_domain, 
 				      alias_check_scalar_variable_in_caller_flt, gen_null);
-		  context.flags = expression_list_to_conjonction(CDR(l_flags));
+
+		  /* Attention: there are differences between scalar and array variables 
+		     when adding test/flag before current statement and current caller. 
+		     For array variable, we must take into account the ref (reference),
+		     it must be sure if this reference is written or not. So new flag
+		     is inserted to guarantee if the reference is written. */
+
+		  if (ENDP(CDR(l_flags)))
+		    context.flags = make_true_expression();
+		  else
+		    context.flags = expression_list_to_conjonction(CDR(l_flags));
 		  context.offset1 = off1;
 		  context.offset2 = off2;
 		  context.first_entity = e2;
@@ -1484,12 +1640,12 @@ static void alias_check_scalar_and_array_variables_in_caller(entity e1, entity e
 	      }
 	    }
 	  else
-	    user_log("\n Warning : Can not translate size of array to frame of caller");
+	    pips_user_warning("\nCan not translate size of array to frame of caller");
 	}
       else
-	/* Assumed-size A(N,*) or pointer-type A(N,1) array, the size of dummy array can be 
+	/* Assumed-size or pointer-type array, the size of dummy array can be 
 	   derived from the size of actual argument, as we have the corresponding call chain*/
-	user_log("\n Warning : Assumed-size A(N,*) or pointer-type A(N,1) array \n");  
+	pips_user_warning("\nAssumed-size or pointer-type array \n");  
     }
   }
 }
@@ -1519,9 +1675,13 @@ static void alias_check_two_array_variables_in_caller(entity e1, entity e2,
       size2 = translate_to_module_frame(current_mod,current_caller,size2,current_call);
       if (!expression_undefined_p(size2))
 	{
-	  expression sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,off2,size2);
-	  expression diff1 = gt_expression(off1,sum2);
+	  expression sum2,diff1;
 	  int k1;
+	  if (expression_equal_integer_p(off2,0))
+	    sum2 = copy_expression(size2);
+	  else
+	    sum2 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,off2,size2);
+	  diff1 = gt_expression(off1,sum2);
 	  clean_all_normalized(diff1);
 	  k1 = trivial_expression_p(diff1);
 	  ifdebug(2) 
@@ -1539,10 +1699,13 @@ static void alias_check_two_array_variables_in_caller(entity e1, entity e2,
 		  size1 = translate_to_module_frame(current_mod,current_caller,size1,current_call);
 		  if (!expression_undefined_p(size1))
 		    {
-		      expression sum1 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-								    off1,size1);
-		      expression diff2 = gt_expression(off2,sum1);
+		      expression sum1,diff2;
 		      int k2;
+		      if (expression_equal_integer_p(off1,0))
+			sum1 = copy_expression(size1);
+		      else
+			sum1 = binary_intrinsic_expression(PLUS_OPERATOR_NAME,off1,size1);
+		      diff2 = gt_expression(off2,sum1);
 		      clean_all_normalized(diff2);
 		      k2 = trivial_expression_p(diff2);
 		      switch(k2){
@@ -1585,22 +1748,22 @@ static void alias_check_two_array_variables_in_caller(entity e1, entity e2,
 		      }
 		    }
 		  else
-		    user_log("\n Warning : Can not translate size of array to frame of caller");
+		    pips_user_warning("\nCan not translate size of array to frame of caller");
 		}
 	      else 
-		/* Assumed-size A(N,*) or pointer-type A(N,1) array, the size of dummy array can be 
+		/* Assumed-size or pointer-type array, the size of dummy array can be 
 		   derived from the size of actual argument, as we have the corresponding call chain*/
-		user_log("\n Warning : Assumed-size A(N,*) or pointer-type A(N,1) array \n");  
+		pips_user_warning("\nAssumed-size or pointer-type array \n");  
 	    }
 	  }
 	}
       else
-	user_log("\n Warning : Can not translate size of array to frame of caller");
+	pips_user_warning("\nCan not translate size of array to frame of caller");
     }
   else 
-    /* Assumed-size A(N,*) or pointer-type A(N,1) array, the size of dummy array can be 
+    /* Assumed-size or pointer-type array, the size of dummy array can be 
        derived from the size of actual argument, as we have the corresponding call chain*/
-    user_log("\n Warning : Assumed-size A(N,*) or pointer-type A(N,1) array \n");      
+    pips_user_warning("\nAssumed-size or pointer-type array \n");      
 }
 
 
@@ -1661,10 +1824,8 @@ static expression storage_ram_offset(storage s,expression subval)
 static expression storage_formal_offset(call_site cs,entity actual_var,
 					expression subval,list path)
 {
-  list l_caller_aliases =  
-    alias_associations_list((alias_associations)
-			    db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,
-						   caller_name, TRUE)); 
+  list l_caller_aliases = alias_associations_list((alias_associations)
+        db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name,TRUE)); 
   expression exp = expression_undefined;
   MAP(ALIAS_ASSOCIATION, aa,
   {
@@ -1779,8 +1940,9 @@ static void alias_check_two_variables(entity e1, entity e2, expression off1,
 		alias_check_in_caller(e1,e2,new_off1,new_off2,path);
 	      else
 		{
-		  /* Try with special cases : 
-		    CALL FOO(R(TR(K),R(TR(K)))*/
+		  /* Try with special cases : CALL FOO(R(TR(K)),R(TR(K))) ???????
+		     Does this case exist when we create special section + offset 
+		     for same actual arguments ??? */
 		  /* use dynamic alias check*/
 		  alias_context_t context;
 		  context.first_entity = e1;
@@ -1794,12 +1956,11 @@ static void alias_check_two_variables(entity e1, entity e2, expression off1,
 		  context.first_entity = entity_undefined;
 		  context.second_entity = entity_undefined;
 		  set_dynamic_checked(e1,e2);
-		  // user_log("\n Warning : Alias check in higher caller \n");
 		}
 	      current_call = call_undefined;
 	    }
 	  else 
-	    pips_user_warning(" Problem with statement ordering *\n"); 
+	    pips_user_warning("Problem with statement ordering *\n"); 
 	  current_statement = statement_undefined;
 	  current_ordering = 0;
 	  current_caller = entity_undefined;
@@ -1818,43 +1979,30 @@ static void alias_check_two_variables(entity e1, entity e2, expression off1,
 
 bool alias_check(char * module_name)
 {
-  /* File out = ALIAS_CHECKS is used to stock alias checks and the include line */
+  /* File instrument.out is used to store alias checks and flags*/
   string dir_name = db_get_current_workspace_directory();
-  string file_name = strdup(concatenate(dir_name, "/",ALIAS_FILE, 0));
+  string instrument_file = strdup(concatenate(dir_name, "/instrument.out", 0));
   free(dir_name), dir_name = NULL;
-  out = safe_fopen(file_name, "a");  
- 
-  l_module_aliases = alias_associations_list((alias_associations)
-					     db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,
-								    module_name, TRUE)); 
-  ifdebug(2)
-    print_list_of_alias_associations(l_module_aliases);
+  out = safe_fopen(instrument_file, "a");  
+  number_of_processed_modules++;
   current_mod = local_name_to_top_level_entity(module_name);
-  /* We do not add the line "INCLUDE alias_common.h" into
-     code_decls_text(entity_code(current_mod)) because of
-     repeated bug for module with ENTRY (like in 
-     ARRAY_BOUND_CHECK_INSTRUMENTATION): new modules are 
-     created and the declaration of initial module is cleaned.
-     PRETTYPRINT wil regenerate this declaration if it discovers an empty
-     declaration, but this declaration is not empty anymore, because of 
-     our new line => no declaration for initial module.
-     
-     Example can be found with SPEC benchmark, 146.wave5, module ADVBND*/
-  
-  if (!entity_blockdata_p(current_mod))
-    {
-      fprintf(out, "AC: %s (%d,%d)\n",module_local_name(current_mod),0,1);
-      fprintf(out,"      INCLUDE 'alias_flags.h'\n");
-      fprintf(out, "ACEND \n");
-    }
+  /* We do not add the line "INCLUDE alias_flags.h" into code_decls_text because of
+     repeated bug for module with ENTRY.
+     09/11/2001 : do not add INCLUDE any more, because there are modules that do not 
+     need this INCLUDE => use script: if a module is modified => add INCLUDE line
+     fprintf(out, "AC: %s (%d,%d)\n",module_local_name(current_mod),0,1);
+     fprintf(out,"      INCLUDE 'alias_flags.h'\n");
+     fprintf(out, "ACEND \n");*/
   debug_on("ALIAS_CHECK_DEBUG_LEVEL");
   ifdebug(1)
     fprintf(stderr, " \n Begin alias_check for %s \n", module_name); 
+  l_module_aliases = alias_associations_list((alias_associations)
+		 db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,module_name,TRUE)); 
   /* if the list of alias associations of module is NIL, do nothing*/
   if (l_module_aliases != NIL)
     {
       /* Compute the list of direct and indirect callees of current module */
-      //     list l_callees = compute_all_callees(current_mod);             
+      // list l_callees = compute_all_callees(current_mod);             
       string alias_flag_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 						  MODULE_SEP_STRING,ALIAS_FLAG,NULL));
       string alias_function_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
@@ -1869,8 +2017,11 @@ bool alias_check(char * module_name)
       if (entity_undefined_p(alias_function))
 	alias_function = make_empty_subroutine(ALIAS_FUNCTION);
       module_statement = (statement) db_get_memory_resource(DBR_CODE,module_name,TRUE);
-      ifdebug(3)
-	print_list_of_alias_associations(l_module_aliases);
+      ifdebug(2)
+	{
+	  fprintf(stderr, " \n The list of alias associations for module %s is:\n", module_name); 
+	  print_list_of_alias_associations(l_module_aliases);
+	}
       set_current_module_entity(current_mod);
       initialize_ordering_to_statement(module_statement);  
       /* Get the proper and cumulated effects of the module, we have to take both kinds of 
@@ -1891,29 +2042,42 @@ bool alias_check(char * module_name)
 	  entity sec1 = alias_association_section(aa1);
 	  list path1 = alias_association_call_chain(aa1);
 	  expression off1 = alias_association_offset(aa1);
+	  int l1 = alias_association_lower_offset(aa1);
+	  int u1 = alias_association_upper_offset(aa1);
 	  l_module_aliases = CDR(l_module_aliases);
 
 	  /* Looking for another formal variable in the list of alias
 	     associations that has same section and included call path. 
 	     If this variable is checked dynamically with e1 => no need 
 	     to continue */
-
+	
 	  MAP(ALIAS_ASSOCIATION, aa2,
 	  {
 	    entity e2 = alias_association_variable(aa2);
 	    entity sec2 = alias_association_section(aa2);
 	    list path2 = alias_association_call_chain(aa2);
-	    if (!dynamic_checked_p(e1,e2) && same_entity_p(sec1,sec2) && 
-		!same_entity_p(e1,e2) && included_call_chain(path1,path2))
+	    if (!same_entity_p(e1,e2) && same_entity_p(sec1,sec2) && 
+		!dynamic_checked_p(e1,e2)&& included_call_chain_p(path1,path2))
 	      {  
-		expression off2 = alias_association_offset(aa2);
-		ifdebug(2) 
-		  fprintf(stderr, "\n Found two may be aliased formal parameters : %s, %s. Let's check !\n",
-			  entity_name(e1),entity_name(e2));
-		if (gen_length(path1) < gen_length(path2))
-		  alias_check_two_variables(e1,e2,off1,off2,path2);
-		else 
-		  alias_check_two_variables(e1,e2,off1,off2,path1);
+		int l2 = alias_association_lower_offset(aa2);
+		int u2 = alias_association_upper_offset(aa2);
+		/*
+		  Special cases : no alias u1 < l2, u2 <l1, u1< o1, u2 < o1, 
+		  o2 + s2 < l1, o1 + s1 < l2
+		  So easiest case: If u1,l2 are defined (different to -1) and u1<l2, 
+		  there is no alias violation
+		  The same for: u2,l1 are defined (different to -1) and u2<l1*/
+		if (((u1==-1)||(u1>=l2))&&((u2==-1)||(u2>=l1)))
+		  {
+		    expression off2 = alias_association_offset(aa2);
+		    ifdebug(2) 
+		      fprintf(stderr, "\nFound two may be aliased formal parameters: %s, %s. Let's check !\n",
+			      entity_name(e1),entity_name(e2));
+		    if (gen_length(path1) < gen_length(path2))
+		      alias_check_two_variables(e1,e2,off1,off2,path2);
+		    else 
+		      alias_check_two_variables(e1,e2,off1,off2,path1);
+		  }
 	      }
 	  },
 	      l_module_aliases); 
@@ -1936,12 +2100,27 @@ bool alias_check(char * module_name)
 		if (!dynamic_checked_p(e1,e2) && same_entity_p(sec1,sec2))
 		  {  
 		    /* formal parameter has a same section with other common variable*/
-		    expression off2 = int_to_expression(ram_offset(ra));
-		    /* The common variable always have a good offset off2 */
-		    ifdebug(2) 
-		      fprintf(stderr,"\n Found may be aliased formal and common variable :%s, %s. Let's check ! \n",
-			    entity_name(e1), entity_name(e2));
-		    alias_check_two_variables(e1,e2,off1,off2,path1);
+		    int l2 = ram_offset(ra);
+		    int u2 = l2;
+		    if (array_entity_p(e2))
+		      {
+			int tmp;
+			if (SizeOfArray(e2,&tmp))
+			  u2 = tmp-SizeOfElements(variable_basic(type_variable(entity_type(e2))))+l2;
+			else
+			  user_log("Varying size of common variable");
+		      }
+		    /* If u1 is defined (different to -1) and u1<l2, there is no alias violation
+		       The same for: l1 is defined (different to -1) and u2<l1*/
+		    if (((u1==-1)||(u1>=l2))&&(u2>=l1))
+		      {
+			expression off2 = int_to_expression(l2);
+			/* The common variable always have a good offset off2 */
+			ifdebug(2) 
+			  fprintf(stderr,"\n Found may be aliased formal and common variable :%s, %s. Let's check ! \n",
+				  entity_name(e1), entity_name(e2));
+			alias_check_two_variables(e1,e2,off1,off2,path1);
+		      }
 		  }
 	      }
 	  },
@@ -1954,17 +2133,15 @@ bool alias_check(char * module_name)
       reset_ordering_to_statement();
       reset_current_module_entity();
       module_statement = statement_undefined;
-      //      free(alias_flag_name), alias_flag_name = NULL;
+      // free(alias_flag_name), alias_flag_name = NULL;
       // free(alias_function_name), alias_function_name = NULL;
     }
   else
     user_log("\n No alias for this module \n"); 
 
-  safe_fclose(out, file_name);
-  free(file_name), file_name = NULL;
-  user_log("\n Total number of flags : %d\n", unique_flag_number); 
-  user_log("\n Total number of tests : %d\n", number_of_tests);
-  user_log("\n Total number of calls : %d\n", number_of_calls);
+  safe_fclose(out,instrument_file);
+  free(instrument_file), instrument_file= NULL;
+  display_alias_check_statistics();
   pips_debug(1, "end\n");
   debug_off();
   l_module_aliases = NIL;
