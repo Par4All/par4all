@@ -32,8 +32,8 @@
  */
 static string actual_fortran_string_to_compare(string fs, int * plength)
 {
-  int len;
   string s = fs;
+  int len;
 
   /* skip TOP-LEVEL header */
   if (strncmp(s, TOP_LEVEL_MODULE_NAME, strlen(TOP_LEVEL_MODULE_NAME))==0)
@@ -73,8 +73,8 @@ static string actual_fortran_string_to_compare(string fs, int * plength)
  * since these rules are ascii compatible, we'll take ascii.
  * in practice, this may be implementation dependent?
  * 
- * @param fs1 constant fortran string (entity name)
- * @param fs2 constant fortran string (entity name)
+ * @param fs1 constant fortran string (entity name is fine)
+ * @param fs2 constant fortran string (entity name is fine)
  * @return -n 0 +n depending on < == >, n first differing char.
  */
 int fortran_string_compare(string fs1, string fs2)
@@ -87,7 +87,7 @@ int fortran_string_compare(string fs1, string fs2)
   s2 = actual_fortran_string_to_compare(fs2, &l2);
 
   /* collating sequence comparison. */
-  for (i=0; c!=0 && i<l1 && i<l2; i++)
+  for (i=0; c==0 && i<l1 && i<l2; i++)
   {
     if (s1[i] < s2[i]) c = -i-1;
     if (s1[i] > s2[i]) c = i+1;
