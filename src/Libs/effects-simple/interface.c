@@ -1,5 +1,7 @@
 /* package simple effects :  Be'atrice Creusillet 5/97
  *
+ * $Id$
+ *
  * File: interface.c
  * ~~~~~~~~~~~~~~~~~
  *
@@ -366,7 +368,7 @@ statement_to_effects(statement s)
 
 /* SIDE EFFECT: set both proper_rw_effects and expr_prw_effects.
  */
-bool full_proper_effects(string module_name, statement current)
+bool full_simple_proper_effects(string module_name, statement current)
 {
   bool ok = TRUE;
   set_methods_for_proper_simple_effects();
