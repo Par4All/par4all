@@ -183,8 +183,9 @@ extern int Current_op ;
    - NUMBER_IMPORTS is the number of imported domains (for which no
      access functions have to be generated - see TYPE in genC.c)
    - CURRENT_START is the beginning index (after TABULATED_BP) in Domains
-   - CURRENT_FIRST is, for each OR_OP domain, the first tag number (used
-     only in READ_SPEC_MODE */
+   - CURRENT_FIRST **WAS**, for each OR_OP domain, the first tag number (used
+     only in READ_SPEC_MODE). It is now 0. 
+*/
 
 extern int Number_imports ;
 extern int Current_start ;
