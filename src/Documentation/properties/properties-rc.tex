@@ -301,6 +301,16 @@ output code as close as possible to the user source code.
 PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
 \end{verbatim}
 
+Alternate returns are put among the obsolete Fortran features by the
+Fortran~90 standard. It is possible to ignore them, up to a warning, or to
+substitute them by a semantically equivalent code based on return code
+values.  By default, they are ignored.
+
+\begin{verbatim}
+PARSER_SUBSTITUTE_ALTERNATE_RETURNS FALSE
+PARSER_RETURN_CODE_VARIABLE "PIPS_RETURN_CODE_"
+\end{verbatim}
+
 For debugging purposes, it is possible to print a summary of the symbol
 table. But this is not the default option.
 
