@@ -288,6 +288,7 @@ typedef int Value;
     v=value_protected_mult(v,w)
 
 /* whether the default is protected or not 
+ * this define makes no sense any more... well, doesn't matter. FC.
  */
 #if defined(LINEAR_VALUE_PROTECT_MULTIPLY)
 #define value_mult(v,w) value_protected_mult(v,w)
@@ -295,10 +296,12 @@ typedef int Value;
 #else
 
 /* I do enforce the protection whatever requested:-)
+ * prints out a message and throws the exception, hoping
+ * that some valid CATCH waits for it upwards. 
  */
-#define value_mult(v,w) 					\
-  value_protected_multiply(v,w,					\
-    (fprintf(stderr,"[value_mult] value overflow!\n"),abort()))
+#define value_mult(v,w)							      \
+  value_protected_multiply(v,w,						      \
+    (fprintf(stderr,"[value_mult] value overflow!\n"),THROW(overflow_error)))
 #define value_product(v,w) v=value_mult(v,w)
 
 /* was:
