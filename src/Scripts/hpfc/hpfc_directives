@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/06 17:04:26 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/23 17:30:00 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -33,6 +33,7 @@
 # _k: block 
 # _n: new
 # _p: processors
+# _s: *
 # _t: template
 # _y: dynamic
 #
@@ -85,10 +86,13 @@ $TR '' '\012' |
 #
 # massive transformations
 #
-$SED '/^chpf\$/s,\([ 	\,(]\)[Bb][Ll][Oo][Cc][Kk]\([ 	\,(]\),\1_k\2,g
-      /^chpf\$/s,_k\([\,)]\),_k(\*)\1,g
+$SED '/^chpf\$/s,\([ 	\,(]\)[Bb][Ll][Oo][Cc][Kk]\([ 	\,()]\),\1_k\2,g
+      /^chpf\$/s,\([ 	\,(]\)[Bb][Ll][Oo][Cc][Kk]\([ 	\,()]\),\1_k\2,g
+      /^chpf\$/s,_k\([\,)]\),_k()\1,g
+      /^chpf\$/s,\([ 	\,(]\)[Cc][Yy][Cc][Ll][Ii][Cc]\([ 	\,()]\),\1_c\2,g
       /^chpf\$/s,\([ 	\,(]\)[Cc][Yy][Cc][Ll][Ii][Cc]\([ 	\,()]\),\1_c\2,g
       /^chpf\$/s,_c\([\,)]\),_c(1)\1,g
+      /^chpf\$/s,\*,_s(),g
       s,^chpf\$ [Dd][Yy][Nn][Aa][Mm][Ii][Cc] \(.*\),      _y(\1),
       s,^chpf\$ [Tt][Ee][Mm][Pp][Ll][Aa][Tt][Ee] \(.*\),      _o \1      _t(\1),
       s,^chpf\$ [Pp][Rr][Oo][Cc][Ee][Ss][Ss][Oo][Rr][Ss] \(.*\),      _o \1      _p(\1),
@@ -101,7 +105,7 @@ $SED '/^chpf\$/s,\([ 	\,(]\)[Bb][Ll][Oo][Cc][Kk]\([ 	\,(]\),\1_k\2,g
       s,^      _i\,,      _i()\,,
       s,^      _i(\([^)]*\))[ 	]*\,[ 	]*[Nn][Ee][Ww][ 	]*(\([^)]*\)),      _i(\1)      _n(\2),
       s,_\([abdeintpyo]\),call hpfc\1,g
-      s,_\([ck]\),hpfc\1,g' |
+      s,_\([cks]\),hpfc\1,g' |
 #
 # handles multi lines breaking (independent with new...)
 #
@@ -127,7 +131,8 @@ $SED -n '/^ .... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
          /^ .... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	]/=
          /^ .... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
          /^ .... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
-         /^ .... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 | 
+         /^ .... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=
+         /^ .... call hpfco /=' $TMP.0 | 
 $SED -n '$p'`
 
 #
@@ -169,7 +174,6 @@ $TR '' '\012'
 
 #
 # clean temporary files
-
 $RM -f $TMP.*
 
 #
