@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1997/02/06 18:01:13 $, 
+ * $Date: 1997/02/07 15:59:27 $, 
  */
 
 #include <stdio.h>
@@ -136,8 +136,12 @@ static bool privatizer(char *module_name)
     /* Get the READ, WRITE, IN and OUT regions of the module */
     set_local_regions_map( effectsmap_to_listmap( (statement_mapping) 
 	db_get_memory_resource(DBR_REGIONS, module_name, TRUE) ) );
+    set_inv_regions_map( effectsmap_to_listmap( (statement_mapping) 
+	db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE) ) );
     set_in_regions_map( effectsmap_to_listmap( (statement_mapping) 
 	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE) ) );
+    set_inv_in_regions_map( effectsmap_to_listmap( (statement_mapping) 
+	db_get_memory_resource(DBR_INV_IN_REGIONS, module_name, TRUE) ) );
     set_out_regions_map( effectsmap_to_listmap( (statement_mapping) 
 	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE) ) );
 
@@ -190,7 +194,9 @@ static bool privatizer(char *module_name)
     reset_precondition_map();
     free_cumulated_effects_map();
     free_local_regions_map();
+    free_inv_regions_map();
     free_in_regions_map();
+    free_inv_in_regions_map();
     free_out_regions_map();
     if (store_as_regions)
     {
