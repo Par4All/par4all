@@ -2,7 +2,7 @@ c
 c Checks run-time library version
 c
 c $RCSfile: hpfc_check.f,v $ version $Revision$
-c ($Date: 1995/09/27 18:02:50 $, )
+c ($Date: 1995/12/01 11:49:57 $, )
 c
       subroutine hpfc_check()
       include 'real_parameters.h'
@@ -12,7 +12,7 @@ c
      $     REALNBOFPROCESSORS.GT.MAXNBOFPROCESSORS.OR.
      $     REALMAXSIZEOFPROCS.GT.MAXMAXSIZEOFPROCS.OR.
      $     REALMAXSIZEOFBUFFER.GT.MAXMAXSIZEOFBUFFER) then
-         print *, 
+         write (unit=0, fmt=*) 
      $        'HPFC run-time library',
      $        '  must be recompiled with larger parameters'
          stop
