@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/02/16 12:02:19 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/03/15 13:57:12 $, )
  * version $Revision$
  */
 
@@ -309,7 +309,7 @@ generate_shared_io_system(
     result = sc_append(result, stamme);
     result = sc_append(result, contxt);
     
-    DEBUG_SYST(8, concatenate("whole for", entity_name(array), NULL), result);
+    DEBUG_SYST(8, concatenate("whole: ", entity_name(array), NULL), result);
     
     /* the noisy system is cleaned
      * some variables are not used, they are removed here.
@@ -324,7 +324,7 @@ generate_shared_io_system(
     DEBUG_SYST(7, "unstammer", stamme);
     DEBUG_SYST(7, "context", contxt);
     
-    DEBUG_SYST(6, concatenate("result for", entity_name(array), NULL), result);
+    DEBUG_SYST(6, concatenate("result: ", entity_name(array), NULL), result);
     
     return result;
 }
@@ -355,7 +355,7 @@ Psysteme generate_distributed_io_system(
     result = sc_append(result, stamme);
     result = sc_append(result, contxt);
     
-    DEBUG_SYST(8, concatenate("whole for", entity_name(array), NULL), result);
+    DEBUG_SYST(8, concatenate("whole: ", entity_name(array), NULL), result);
     
     /* the noisy system is cleaned
      * some variables are not used, they are removed here.
@@ -371,7 +371,7 @@ Psysteme generate_distributed_io_system(
     DEBUG_SYST(7, "unstammer", stamme);
     DEBUG_SYST(7, "context", contxt);
     
-    DEBUG_SYST(6, concatenate("result for", entity_name(array), NULL), result);
+    DEBUG_SYST(6, concatenate("result: ", entity_name(array), NULL), result);
     
     return(result);
 }
@@ -506,9 +506,9 @@ clean_the_system(
 
 Psysteme 
 clean_distributed_io_system(
-    Psysteme syst,
-    entity array,
-    tag move)
+    Psysteme syst, /* system to be cleaned */
+    entity array,  /* io on array */
+    tag move)      /* collect or update */
 {
     /* ??? what about the variables?
      * some are usefull, some are constants, and others should
@@ -561,7 +561,8 @@ clean_distributed_io_system(
 	string s = entity_module_name(e);
 	
 	if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
-	    keep = CONS(ENTITY, e, keep);
+	    /* keep = CONS(ENTITY, e, keep); */
+	    try_remove = CONS(ENTITY, e, try_remove);
     },
 	try_remove);
 
@@ -840,9 +841,9 @@ hpfc_algorithm_tiling(
 		     pcondition, pproc_echelon, ptile_echelon);
 
     DEBUG_SYST(3, "condition", *pcondition);
-    DEBUG_BASE(3, "processors", outer);
+    DEBUG_BASE(3, "proc vars", outer);
     DEBUG_SYST(3, "processors", *pproc_echelon);
-    DEBUG_BASE(3, "tiles", inner);
+    DEBUG_BASE(3, "tile vars", inner);
     DEBUG_SYST(3, "tiles", *ptile_echelon);
 
     base_rm(outer);
