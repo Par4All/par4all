@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: host_node_entities.c,v $
+ * Revision 1.29  1997/11/22 16:32:15  coelho
+ * assert, and debug function added... ('bout mappings...)
+ *
  * Revision 1.28  1997/10/30 17:09:41  coelho
  * nope
  *
@@ -39,6 +42,17 @@ GENERIC_GLOBAL_FUNCTION(new_host, entitymap)
 GENERIC_GLOBAL_FUNCTION(old_host, entitymap)
 GENERIC_GLOBAL_FUNCTION(new_node, entitymap)
 GENERIC_GLOBAL_FUNCTION(old_node, entitymap)
+
+void
+debug_host_node_variables(entity e)
+{
+    fprintf(stderr, "variable %s:\n\tnh=%s\n\toh=%s\n\tnn=%s\n\ton=%s\n",
+	    entity_name(e),
+	    bound_new_host_p(e)? entity_name(load_new_host(e)): "<undef>",
+	    bound_old_host_p(e)? entity_name(load_old_host(e)): "<undef>",
+	    bound_new_node_p(e)? entity_name(load_new_node(e)): "<undef>",
+	    bound_old_node_p(e)? entity_name(load_old_node(e)): "<undef>");
+}
 
 void 
 store_new_node_variable(entity new, entity old)
@@ -200,9 +214,7 @@ void update_object_for_module(
     bound_p = saved_bound, load = saved_load; /* pop the initial functions */
 }
 
-void update_list_for_module(l, module)
-list l;
-entity module;
+void update_list_for_module(list l, entity module)
 {
     MAPL(cx, update_object_for_module(CHUNK(CAR(cx)), module), l);
 }
@@ -211,13 +223,14 @@ entity module;
  * the global map refenreced_variables should be set and ok
  * the variables updated are those local to the common...
  */
-void clean_common_declaration(common)
-entity common;
+void clean_common_declaration(entity common)
 {
     type t = entity_type(common);
     list l = NIL, lnew = NIL;
 
     pips_assert("area", type_area_p(t));
+    pips_assert("defined referenced variables", 
+		!referenced_variables_undefined_p());
 
     l = area_layout(type_area(t));
 
