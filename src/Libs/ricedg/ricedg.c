@@ -243,7 +243,7 @@ char *mod_name;
 	  "Computing Rice dependence graph for %s\n", mod_name);
 
     ifdebug(1) {
-	mem_spy_init(0, 0, NET_MEASURE, 0);
+	mem_spy_init(0, 5*1024, NET_MEASURE, 0);
     }
 
     debug_off();
@@ -1567,7 +1567,7 @@ Ptsg *gs,*gsop;
 	    ifdebug(1) {
 		mem_spy_begin();
 	    }
-	    *gs = dependence_cone_positive(dep_syst2);
+	    *gsop = dependence_cone_positive(dep_syst2);
 	    sc_rm(dep_syst2);
 
 	    ifdebug(1) {
@@ -2250,7 +2250,7 @@ Psysteme dep_sc;
 	mem_spy_begin();
     }
 
-    sc_env = sc_empty(dep_sc->base);
+    sc_env = sc_empty(base_dup(dep_sc->base));
     n = dep_sc->dimension;
     b = dep_sc->base;
     
