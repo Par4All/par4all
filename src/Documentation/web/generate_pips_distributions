@@ -57,6 +57,8 @@ move public_GNUSOL2LL
 make_pips_release -P -rz public_GNUSOL2LL ||
 	error 7 "ret $?"
 
+# make_pips_release -CB IBMAIX -D Examples -pe -rz pips_IBMAIX 
+
 echo done
 
 chmod a+r *.tar.gz
