@@ -29,6 +29,7 @@
 static int NB_EQ = 0;
 static int NB_INEQ = 0;
 
+
 /************************************************************* DEBUG MACROS */
 /* debug macros may be trigered with -DDEBUG{,1,2}
  */
@@ -60,8 +61,26 @@ static int NB_INEQ = 0;
 #define DEBUG3(code) { code }
 #endif
 
+/*****duong - set timeout with signal and alarm*****/
+#include <signal.h>
+#define SIMPLEX_TIMEOUT timeout_for_S
+//get timeout from environment by extern variable timeout_for_S. default 3 minutes
+
+boolean S_timeout = FALSE;
+
+void 
+catch_alarm_Simplex (int sig)
+{ 
+  alarm(0); //clear the alarm 
+  DEBUG(fprintf(stderr,"CATCH ALARM sc_simplexe_feasibility_ofl_ctrl !!!\n");)  
+  S_timeout = TRUE;
+  THROW(timeout_error);
+
+}
+/*****duong*****/
 
 /*************************************************************** CONSTANTS */
+
 #define PTR_NIL ((char*)0xdeadbeef)
 #define INFINI VALUE_MAX
 #define MAX_VAR 1971 /* nombre max de variables */
@@ -112,12 +131,43 @@ static int NB_INEQ = 0;
     else 					\
       { G(j,b,a); }				\
 }
+/*************************************************** Replacement of macro GCD to GCD_ZERO_CTRL : duong.
+
+Explication : I have seen negative numbers when debugging this program (with variables x.num, x.den look for example in lines 238-239), that's why I tried to find out if the macro Macro GCD(j,a,b) were used with negative arguments. The macro GCD(j,a,b) calls the macro G(j,a,b), which assumes b > 0 and better with a>b (means a>b>0). (I must state here that G(j,a,b) works well with 0 < a < b.)
+
+I don't understand why, if these macros were supposed to work with positive numbers, still have inside them a statement like this : if (value_neg_p(j)) value_oppose(j). This means a can be negative.
+If a < 0 then G(j,a,b) still works fine, but GCD(j,a,b) will work wrongly. Because if b > 0, a < 0, then we alwayls have GCD(a,b) = abs(a). Moreover, when b < 0, if we put G(a,b) = b => This is confusing :-)
+
+I propose another macro GCDZZN(j,a,b): ZxZ)->N+, which means GCDZZN(a,b) = GCD(value_absolute(a),value_absolute(b)). Another remark, is that the Greatest Commom Divisor normally of two positive integers (a>=1,b>=1), so if a = 0 or b = 0, it'll make no sense. That's why I test if a = 0 or b = 0 by macro GCD_ZERO_CTRL(j,a,b) before send it to GCDNNZ(j,a,b). 
+
+Then GCDNNZ will be faster, assuming a != 0 and b != 0. If a = 0 or b = 0 then GCD_ZERO_CTRL(a,b) = 1.
+Change only in line 262.
+****************************************************/
+
+#define GCDZZN(j,a,b)					\
+{tag("GCDZZN")						\
+    Value i,k;						\
+    i = (value_absolute(a)), k = (value_absolute(b));	\
+    while(value_notzero_p(j=value_mod(i,k)))	\
+	    i=k, k=j;					\
+    j = k;						\
+}
+
+#define GCD_ZERO_CTRL(j,a,b)				\
+{tag("GCD_ZERO_CTRL")					\
+    if ((value_notzero_p(a)) && (value_notzero_p(b)))	\
+        { GCDZZN(j,a,b);}				\
+    else \
+   	{fprintf(stderr,"********************************************************************Error : GCD of number zero !");	\
+   	j = (VALUE_ONE);}			\
+}
+
 
 /* SIMPL normalizes rational a/b (b<>0):
  *   divides by gcd(a,b) and returns with b>0
  * note that there should be no arithmetic exceptions within this macro:
  * (well, only uminus may have trouble for VALUE_MIN...)
- * ??? a==0 ? 
+ * ??? a==0 ? then a = a/b = 0 and b = b/b = 1.
  */
 #define SIMPL(a,b)					\
 {							\
@@ -144,7 +194,15 @@ static int NB_INEQ = 0;
 }
 
 #define AFF(x,y) {x.num=y.num; x.den=y.den;} /* x=y should be ok:-) */
+
 #define INV(x,y) {x.num=y.den; x.den=y.num;} /* x=1/y */
+/* ??? value_zero_p(y.num)? 
+Then x.num != VALUE_ZERO and x.den = VALUE_ZERO, it's not good at all.(assuming y.den != VALUE_ZERO) 
+This means : test if  y = 0 then x = 0 else x = 1/y
+Change in line 286 :duong.*/
+
+#define INV_ZERO_CTRL(x,y) {if (value_zero_p(y.num)) {fprintf(stderr,"ERROR : inverse of fraction zero !"); x.num = VALUE_ZERO; x.den = VALUE_ONE;} else {INV(x,y)}}
+
 
 #define METINFINI(f) {f.num=VALUE_MAX;  f.den=VALUE_ONE;}
 #define MET_ZERO(f)  {f.num=VALUE_ZERO; f.den=VALUE_ONE;}
@@ -172,17 +230,17 @@ static int NB_INEQ = 0;
     value_eq(mult(x.num,y.den),mult(x.den,y.num))))
 
 /*#define INF_MACRO(x,y,mult) (value_lt(mult(x.num,y.den),mult(x.den,y.num)))
-// c'est pas assez pour la comparaison entre deux fractions, que se passe  \
-// s'il y a seulement un denominateur negatif??? Ca donnera un resultat faux. On l'utilise, ce macro!
+// c'est pas assez pour la comparaison entre deux fractions, qu'est-ce qui se passe  \
+// s'il y a seulement un denominateur negatif??? Ca donnera un resultat faux.
 // a/b < c/d <=> if b*d > 0 then a*d < b*c else a*d < b*c : duong.
-// remarque : ici on utilise deja le macro mult_protected
 */
 
 #define INF_MACRO(x,y,mult) ((value_pos_p(mult(x.den,y.den)) && value_lt(mult(x.num,y.den),mult(x.den,y.num))) || (value_neg_p(mult(x.den,y.den)) && value_gt(mult(x.num,y.den),mult(x.den,y.num))))
 
 /* computes x = simplify(y/z)
  */
-#define DIV_MACRO(x,y,z,mult)			\
+
+/*#define DIV_MACRO(x,y,z,mult)			\
 {tag("DIV_MACRO")				\
     if (value_zero_p(y.num))			\
     {						\
@@ -195,6 +253,35 @@ static int NB_INEQ = 0;
 	SIMPLIFIE(x);				\
     }						\
 }
+*/
+
+/* This macro DIV_MACRO doesn't test if z = 0, then x = y/z means x.num = y.num*z.den and x.den = 0. 
+It's not good so I added the test : if z = 0 then x.num = 0 and x.den = 1
+I tried to avoid the denominator equal to 0 : duong.
+*/
+
+#define DIV_MACRO(x,y,z,mult)			\
+{tag("DIV_MACRO")				\
+    if (value_zero_p(y.num))			\
+    {						\
+	MET_ZERO(x);				\
+    }						\
+    else					\
+    {					\
+           if (value_zero_p(z.num))		\
+           {					\
+	      fprintf(stderr,"ATTENTION : divided by zero number!");	\
+	      MET_ZERO(x);			\
+           }					\
+           else					\
+{						\
+	      x.num=mult(y.num,z.den);		\
+	      x.den=mult(y.den,z.num);		\
+	      SIMPLIFIE(x);			\
+}						\
+    }						\
+}
+
 
 /* computes x = simplify(y*z)
  */
@@ -229,13 +316,13 @@ static int NB_INEQ = 0;
     else /* must compute the stuff: */					      \
     {									      \
 	Value ad=A.den, bd=B.den, gd, v;				      \
-	GCD(gd,ad,bd);							      \
+	GCD_ZERO_CTRL(gd,ad,bd);							      \
 	if (value_notone_p(gd)) value_division(ad,gd), value_division(bd,gd); \
         X.num = mult(A.num,bd);						      \
         v = mult(B.num,ad);						      \
 	value_substract(X.num,v);					      \
-	X.den = mult(ad,bd);						      \
-	X.den = mult(X.den,gd);						      \
+	v = mult(ad,bd);						      \
+	X.den = mult(v,gd);						      \
 	SIMPLIFIE(X);							      \
     }									      \
 }
@@ -245,7 +332,7 @@ static int NB_INEQ = 0;
 #define FULL_PIVOT_MACRO_SIOUX(X,A,B,C,D,mult) 				\
 {									\
     frac u,v,w; tag("FULL_PIVOT_SIOUX")					\
-    AFF(u,B); AFF(v,C); INV(w,D); /* u*v*w == B*C/D */			\
+    AFF(u,B); AFF(v,C); INV_ZERO_CTRL(w,D); /* u*v*w == B*C/D */			\
     SIMPL(u.num,v.den); SIMPL(u.num,w.den);				\
     SIMPL(v.num,u.den); SIMPL(v.num,w.den);				\
     SIMPL(w.num,u.den); SIMPL(w.num,v.den);				\
@@ -276,7 +363,7 @@ static int NB_INEQ = 0;
 
 #define direct_p(v) (value_lt(v,MAXVAL))
 
-/* computes X = A - B*C/D, with a swtich to use SIOUX or DIRECT
+/* computes X = A - B*C/D, with a switch to use SIOUX or DIRECT
  * thae rationale for the actual condition is quite fuzzy.
  */
 #define FULL_PIVOT_MACRO(X,A,B,C,D,mult)				\
@@ -327,9 +414,11 @@ static int NB_INEQ = 0;
 /* Pivot :  x = a - b c / d
  * mult is used for multiplying values.
  * the macro has changed a lot, for indentation and so... FC.
+ * Why don't we test if d.num = 0 ? (meanwhile, we do test d.den = 0).duong.
  */
+	     
 #define PIVOT_MACRO(X,A,B,C,D,mult)					      \
-{									      \
+{ if (value_zero_p(D.num)) fprintf(stderr,"division of zero!!!");	      \
     DEBUG3(fprintf(stdout, "pivot on: ");				      \
 	   printfrac(A); printfrac(B); printfrac(C); printfrac(D));	      \
    if (value_zero_p(A.num))/* a==0? */					      \
@@ -420,7 +509,7 @@ dump_hashtable(hashtable_t hashtable[])
  */
 /* utilise'es par dump_tableau ; a rendre local */
 static int nbvariables, variablescachees[MAX_VAR], variables[MAX_VAR] ; 
-static frac frac0={0,0,0} ;
+static frac frac0={0,1,0} ;//duong.change 000 -> 010
 
 static void printfrac(frac x) {
     printf(" "); print_Value(x.num);
@@ -494,6 +583,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     Pbase saved_base;
     int saved_dimension;
     EXCEPTION simplex_arithmetic_error;
+    EXCEPTION timeout_error;
     tableau *eg = NULL; /* tableau des egalite's  */
     tableau *t = NULL; /* tableau des inegalite's  */
     /* les colonnes 0 et 1 sont reservees au terme const: */
@@ -501,21 +591,36 @@ sc_simplexe_feasibility_ofl_ctrl(
     long i, j, k, h, trouve, hh=0, ligne, i0, i1, jj, ii ;
     Value poidsM, valeur, tmpval;
     long w ;
-    static int soluble = 1 ; /* valeur retournee par feasible */
+    int soluble; /* valeur retournee par feasible */
     frac *nlle_colonne = NULL, *colo;
     frac objectif[2] ; /* objectif de max pour simplex : 
 			  somme des (b2,c2) termes constants "inferieurs" */
     frac rapport1, rapport2, min1, min2, pivot, cc ;
+
+    
+    static int duong = 0;// count number of calls of this function (at the beginning)       
+    //char * label;// label to print sc in a file sc_default_dump.out
+    
+
+    soluble=1;// int soluble = 1;
+
+    rapport1 =frac0, rapport2 =frac0, min1 =frac0, min2 =frac0, pivot =frac0, cc =frac0 ;
+    objectif[0] = frac0, objectif[1] = frac0;
+    i=-1, j=-1, k=-1, h=-1, trouve=-1, hh=0, ligne=-1, i0=-1, i1=-1, jj=-1, ii=-1;
+    poidsM =-1, valeur=-1, tmpval=-1,w=-1;//duong.
 
     /* recompute the base so as to only allocate necessary columns
      * some bases are quite large although all variables do not appear in
      * actual contraints. The base is used to store all variants in
      * preconditions for instance.
      */
+  
     saved_base = sc_base(sc);
     saved_dimension = sc_dimension(sc);
-    sc_base(sc) = BASE_NULLE;
+    sc_base(sc) = BASE_NULLE;   
+    
     sc_creer_base(sc);
+
     
     /* Allocation a priori du tableau des egalites.
      * "eg" : tableau a "nb_eq" lignes et "dimension"+2 colonnes.
@@ -524,8 +629,13 @@ sc_simplexe_feasibility_ofl_ctrl(
 	fprintf(stderr, "[sc_simplexe_feasibility_ofl_ctrl] "
 		"should not (yet) be called with control %d...\n", ofl_ctrl);
 
-    DEBUG(fprintf(stdout, "\n\n IN sc_simplexe_feasibility_ofl_ctrl:\n");
-          sc_fprint(stdout, sc, default_variable_to_string);)
+    /* DEBUG(fprintf(stdout, "\n\n IN sc_simplexe_feasibility_ofl_ctrl:\n");
+       sc_fprint(stdout, sc, default_variable_to_string);)*/
+
+    duong++;
+    DEBUG(fprintf(stderr,"BEGIN SIMPLEX : %d th\n",duong);
+	  sc_default_dump(sc);//sc_default_dump_to_file(); print to file	  
+    )
 
     /* the input Psysteme must be consistent; this is not the best way to
      * do this; array bound checks should be added instead in proper places;
@@ -547,13 +657,13 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    NB_INEQ++;
     }
     
-    CATCH(simplex_arithmetic_error)
+    CATCH(simplex_arithmetic_error|timeout_error)
     {
       ifscdebug(2) {
 	fprintf(stderr,"[sc_simplexe_feasibility_ofl_ctrl] arithmetic error\n");
       }
 
-      DEBUG(fprintf(stdout, "arithmetic error in simplex\n");)
+      DEBUG(fprintf(stdout, "arithmetic error or timeout in simplex\n");)
       
       for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
 	hashtable[i].nom = 0 ;
@@ -569,18 +679,50 @@ sc_simplexe_feasibility_ofl_ctrl(
       for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)  
 	free(t[i].colonne); 
       free(t); 
-      free(nlle_colonne); 
-      
+      free(nlle_colonne);  
+                  
       /* restore initial base */
       base_rm(sc_base(sc));
       sc_base(sc) = saved_base;
       sc_dimension(sc) = saved_dimension;
       
-      if (ofl_ctrl == FWD_OFL_CTRL) 
-	THROW(overflow_error);
-      
-      return TRUE; /* default is feasible */
-    }
+      alarm(0); //clear the alarm
+
+      //only print sc when timeout, not when exception (too many)
+      if (S_timeout) {
+	S_timeout = FALSE;
+	//fprintf(stderr,"System of constraints given to Simplex that timeout printed to sc_default_dump.out: \n");
+	//duong. it's might be different from sc that comes from internal_sc_feasibility
+	//because of projection, normalization, ...
+	//label = "LABEL - System given to sc_simplex_feasibility_ofl_ctrl :";
+	//sc_default_dump_to_file(sc,label,duong);//print to file
+	//sc_default_dump(sc);// print on the stderr
+
+	DEBUG(fprintf(stderr,"END SIMPLEX by timeout: %d th\n",duong);)	  
+      }
+      else {
+	DEBUG(fprintf(stderr,"END SIMPLEX by overflow: %d th\n",duong);)
+      }
+
+      if (ofl_ctrl == FWD_OFL_CTRL) {
+	fprintf(stderr,"\nThis is an exception rethrown from sc_simplexe_feasibility_ofl_ctrl(): \n");
+	RETHROW(); //rethrow whatever the exception is
+      }
+      //THROW(user_exception_error);
+      // need CATCH(user_exception_error) before calling sc_simplexe_feasibility)
+
+      return TRUE; /* if don't catch exception, then default is feasible */
+
+      //if (ofl_ctrl == FWD_OFL_CTRL)  
+      //THROW(overflow_error);
+
+      //return TRUE; /* default is feasible */
+    }// of CATCH(simplex_arithmetic_error)
+
+    //start the alarm
+    signal(SIGALRM, catch_alarm_Simplex);   
+    alarm(SIMPLEX_TIMEOUT);
+    S_timeout = FALSE;
 
     if(NB_EQ != 0)
     {
@@ -716,8 +858,8 @@ sc_simplexe_feasibility_ofl_ctrl(
 		    assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
 		    if (value_neg_p(poidsM) || 
 			(value_zero_p(poidsM) && value_neg_p(valeur)))
-			value_addto(t[NUMERO].colonne[0].num,pv->val),
-			    t[NUMERO].colonne[0].den = VALUE_ONE ;
+			{value_addto(t[NUMERO].colonne[0].num,pv->val),
+			   t[NUMERO].colonne[0].den = VALUE_ONE ;}
 		    t[NUMERO].existe = 1 ;
 		    t[NUMERO].colonne[t[NUMERO].taille].numero=ligne ;
 		    if(value_neg_p(poidsM) || 
@@ -771,7 +913,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 
     DEBUG1(dump_hashtable(hashtable);)
     DEBUG1(dump_tableau("avant sol prov", t, compteur);)
-    
+      
     /* NON IMPLEMENTE' */
     
     /* Elimination de Gauss-Jordan dans le tableau "eg"
@@ -820,8 +962,8 @@ sc_simplexe_feasibility_ofl_ctrl(
 		assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
                 if(value_neg_p(poidsM) || 
 		   (value_zero_p(poidsM) && value_neg_p(valeur)))
-                    value_addto(t[NUMERO].colonne[0].num,pv->val),
-                    t[NUMERO].colonne[0].den = VALUE_ONE ;
+                    {value_addto(t[NUMERO].colonne[0].num,pv->val),
+		       t[NUMERO].colonne[0].den = VALUE_ONE ;}
                 t[NUMERO].existe = 1 ;
                 t[NUMERO].colonne[t[NUMERO].taille].numero=ligne ;
                 if(value_neg_p(poidsM) || 
@@ -900,8 +1042,8 @@ sc_simplexe_feasibility_ofl_ctrl(
 		assert((NUMERO) < (3 + NB_INEQ + NB_EQ + DIMENSION));
                 if(value_neg_p(poidsM) || 
 		   (value_zero_p(poidsM) && value_neg_p(valeur)))
-                    value_substract(t[NUMERO].colonne[0].num,pv->val),
-                    t[NUMERO].colonne[0].den = VALUE_ONE ;
+                    {value_substract(t[NUMERO].colonne[0].num,pv->val),
+		       t[NUMERO].colonne[0].den = VALUE_ONE ;}
                 t[NUMERO].existe = 1 ;
                 t[NUMERO].colonne[t[NUMERO].taille].numero=ligne ;
                 if(value_neg_p(poidsM) || 
@@ -1116,7 +1258,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         /* Cas d'impossibilite'  */
 	if(ii==-1) {
 	    DEBUG1(dump_tableau("sol infinie", t, compteur);
-		   printf(stderr,"Solution infinie\n");)
+		   fprintf(stderr,"Solution infinie\n");)
 	    SOLUBLE(1)
 	}
 
@@ -1174,6 +1316,8 @@ sc_simplexe_feasibility_ofl_ctrl(
 			   printf("fractions: ");
 			   printfrac(t[j].colonne[i]) ;
 			   printfrac(t[jj].colonne[i1]) ;
+			   if (value_zero_p(t[jj].colonne[i1].den))
+			   printf("ATTENTION fraction 0/0 ");/*duong*/
 			   printfrac(cc);
 			   printfrac(pivot);)
 		    
@@ -1188,6 +1332,7 @@ sc_simplexe_feasibility_ofl_ctrl(
                                  *a = &t[j].colonne[i],
                                  *b = &t[jj].colonne[i1];
 			    if (ofl_ctrl == FWD_OFL_CTRL) {
+ 
 				PIVOTOFL((*n), (*a), (*b), cc, pivot);
 			    }
 			    else {
@@ -1293,6 +1438,8 @@ sc_simplexe_feasibility_ofl_ctrl(
     DEBUG1(dump_tableau("fin simplexe", t, compteur);)
     DEBUG(fprintf(stderr, "soluble = %d\n", soluble);)
 
+    DEBUG(fprintf(stderr,"END SIMPLEX: %d th\n",duong);)
+
     for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
       hashtable[i].nom = 0 ;
     
@@ -1306,16 +1453,26 @@ sc_simplexe_feasibility_ofl_ctrl(
       free(t[i].colonne);
     free(t);
     free(nlle_colonne);
-    UNCATCH(simplex_arithmetic_error);
+
+    alarm(0); //clear the alarm
+
+    UNCATCH(simplex_arithmetic_error|timeout_error);
     
     /* restore initial base */
     vect_rm(sc_base(sc));
     sc_base(sc) = saved_base;
     sc_dimension(sc) = saved_dimension;
-  
+    
     return soluble;
 }     /* main */
 
 /* (that is all, folks!:-)
  */
-;
+
+
+
+
+
+
+
+
