@@ -1,7 +1,10 @@
 /* this is a set of functions to help hpfc debugging
  *
- * $RCSfile: debug-util.c,v $ (version $Revision$)
- * $Date: 1996/12/26 15:34:51 $, 
+ * $Id$
+ * $Log: debug-util.c,v $
+ * Revision 1.21  1997/03/20 10:17:11  coelho
+ * RCS headers and ANSI C declarations.
+ *
  *
  * Fabien Coelho, May 1993.
  */
@@ -17,16 +20,14 @@ extern char *flint_print_basic(basic);
  * otherwise just the entity name is printed
  */
 
-static void print_dimension(d)
-dimension d;
+static void print_dimension(dimension d)
 {
     fprintf(stderr,"dimension :\n");
     print_expression(dimension_lower(d));
     print_expression(dimension_upper(d));
 }
 
-void print_entity_variable(e)
-entity e;
+void print_entity_variable(entity e)
 {
     variable v;
 
@@ -41,8 +42,7 @@ entity e;
     gen_map(print_dimension, variable_dimensions(v));
 }
 
-void print_align(a)
-align a;
+void print_align(align a)
 {
     (void) fprintf(stderr, "aligned (%d dimensions)\n", 
 		   gen_length(align_alignment(a)));
@@ -51,8 +51,7 @@ align a;
 		   entity_name(align_template(a)));
 }
 
-void print_alignment(a)
-alignment a;
+void print_alignment(alignment a)
 {
     (void) fprintf(stderr,
 		   "Alignment: arraydim %d, templatedim %d,\n",
@@ -66,7 +65,7 @@ alignment a;
     (void) fprintf(stderr,"\n");
 }
 
-void print_aligns()
+void print_aligns(void)
 {
     fprintf(stderr,"Aligns:\n");
     MAP(ENTITY, a,
@@ -78,7 +77,7 @@ void print_aligns()
 	list_of_distributed_arrays());
 }
 
-void print_distributes()
+void print_distributes(void)
 {
     fprintf(stderr,"Distributes:\n");
 
@@ -92,8 +91,7 @@ void print_distributes()
     
 }
 
-void print_distribute(d)
-distribute d;
+void print_distribute(distribute d)
 {
     (void) fprintf(stderr,"distributed\n");
 
@@ -103,8 +101,7 @@ distribute d;
 		   entity_name(distribute_processors(d)));    
 }
 
-void print_distribution(d)
-distribution d;
+void print_distribution(distribution d)
 {
     switch(style_tag(distribution_style(d)))
     {
@@ -128,7 +125,7 @@ distribution d;
     (void) fprintf(stderr,"\n");
 }
 
-void print_hpf_dir()
+void print_hpf_dir(void)
 {
     (void) fprintf(stderr,"HPF directives:\n");
 
@@ -143,27 +140,28 @@ void print_hpf_dir()
     print_distributes();
 }
 
-void print_templates()
+void print_templates(void)
 {
     (void) fprintf(stderr,"Templates:\n");
     gen_map(print_entity_variable, list_of_templates());
 }
 
-void print_processors()
+void print_processors(void)
 {
     (void) fprintf(stderr,"Processors:\n");
     gen_map(print_entity_variable, list_of_processors());
 }
 
-void print_distributed_arrays()
+void print_distributed_arrays(void)
 {
     (void) fprintf(stderr,"Distributed Arrays:\n");
     gen_map(print_entity_variable, list_of_distributed_arrays());
 }
 
-void hpfc_print_common(file, module, common)
-FILE *file;
-entity module, common;
+void hpfc_print_common(
+    FILE *file,
+    entity module, 
+    entity common)
 {
     text t;
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
@@ -175,17 +173,16 @@ entity module, common;
     debug_off();
 }
 
-void hpfc_print_file(file_name)
-string file_name;
+void hpfc_print_file(string file_name)
 {
     string dir_name = db_get_current_workspace_directory();
 
     safe_system(concatenate("cat ", dir_name, "/", file_name, " >&2", NULL));
 }
 
-void fprint_range(file, r)
-FILE* file;
-range r;
+void fprint_range(
+    FILE* file,
+    range r)
 {
     int lo, up, in;
     bool
@@ -207,9 +204,9 @@ range r;
 	fprintf(file, "X");
 }
 
-void fprint_lrange(file, l)
-FILE* file;
-list l;
+void fprint_lrange(
+    FILE* file,
+    list l)
 {
     bool firstrange = TRUE;
 
@@ -224,9 +221,9 @@ list l;
 	l);
 }
 
-void fprint_message(file, m)
-FILE* file;
-message m;
+void fprint_message(
+    FILE* file,
+    message m)
 {
     (void) fprintf(file, "message is array %s(", 
 		   entity_local_name(message_array(m)));
@@ -238,9 +235,9 @@ message m;
     (void) fprintf(file, "\n");
 }
 
-void fprint_lmessage(file, l)
-FILE* file;
-list l;
+void fprint_lmessage(
+    FILE* file,
+    list l)
 {
     if (ENDP(l))
 	fprintf(file, "message list is empty\n");
