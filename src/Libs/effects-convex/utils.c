@@ -154,13 +154,12 @@ void regions_end()
 region region_dup(region reg)
 {
     region new_reg;
-    
     debug_region_consistency(reg);
+
     new_reg = copy_effect(reg);
 
     /* work around persistency of effect reference 
      */
-    /* region_reference(new_reg) = reference_dup(region_reference(reg)); */
     region_reference(new_reg) = reference_dup(region_reference(reg));
     debug_region_consistency(new_reg);
     return new_reg;
@@ -183,7 +182,7 @@ list regions_dup(list l_reg)
 	l_reg_dup = region_add_to_regions(reg_dup, l_reg_dup);
     }, l_reg);
     
-    return(l_reg_dup);
+    return l_reg_dup;
 }
 
 /* (void) regions_free(list l_reg)
