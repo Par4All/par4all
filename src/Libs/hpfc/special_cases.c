@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1996/06/12 21:05:28 $, 
+ * $Date: 1996/06/15 14:32:01 $, 
  */
 
 #include "defines-local.h"
@@ -25,7 +25,7 @@ typedef struct t_reduction
     int  ndim;
 } t_reduction;
 
-static t_reduction reductions[] =
+static t_reduction all_reductions[] =
 {
   {"REDMIN",  MIN_REDUCTION, -1},
   {"REDMIN1", MIN_REDUCTION, 1},
@@ -45,16 +45,12 @@ static t_reduction reductions[] =
 static t_reduction *find_reduction(s)
 string s;
 {
-     t_reduction
-	 *red = reductions;
+     t_reduction *red;
      
-     while(red->kind != 0)
-     {
-	 if (!strcmp(s, red->name)) return(red);
-	 red++;
-     }
+     for (red=all_reductions; red->kind; red++)
+	 if (same_string_p(s, red->name)) return red;
      
-     return(NULL);
+     return NULL;
  }
 
 /* bool call_reduction_p(c)
@@ -215,22 +211,22 @@ static bool ref_filter(reference r)
     fun = call_function(current_call_head()); 
 
     if (ENTITY_PLUS_P(fun)||ENTITY_MINUS_P(fun)) 
-	found_operator=is_reduction_sum;
+	found_operator=is_reduction_operator_sum;
     else if (ENTITY_MULTIPLY_P(fun)) 
-	found_operator=is_reduction_prod;
+	found_operator=is_reduction_operator_prod;
     else if (ENTITY_MIN_P(fun)||ENTITY_MIN0_P(fun))
-	found_operator=is_reduction_min;
+	found_operator=is_reduction_operator_min;
     else if (ENTITY_MAX_P(fun)||ENTITY_MAX0_P(fun))
-	found_operator=is_reduction_max;
+	found_operator=is_reduction_operator_max;
     else if (ENTITY_AND_P(fun))
-	found_operator=is_reduction_and;
+	found_operator=is_reduction_operator_and;
     else if (ENTITY_OR_P(fun))
-	found_operator=is_reduction_or;
+	found_operator=is_reduction_operator_or;
 
     return FALSE;
 }
 
-static reduction get_operator(entity e, statement s)
+static reduction_operator get_operator(entity e, statement s)
 {
     make_current_call_stack();
     found_operator = tag_undefined;
@@ -242,7 +238,7 @@ static reduction get_operator(entity e, statement s)
     free_current_call_stack();
 
     pips_assert("some operator found", found_operator!=tag_undefined);
-    return make_reduction(found_operator, UU);
+    return make_reduction_operator(found_operator, UU);
 }
 
 /* finally, I can do without replacement:
@@ -271,23 +267,23 @@ handle_hpf_reduction(statement s)
 
 /* for reduction directive:
  */
-static string new_reduction_name(reduction op)
+static string new_reduction_name(reduction_operator op)
 {
-    if (reduction_sum_p(op)) 
+    if (reduction_operator_sum_p(op)) 
 	return "SUM";
-    else if (reduction_prod_p(op))
+    else if (reduction_operator_prod_p(op))
 	return "PROD";
-    else if (reduction_min_p(op))
+    else if (reduction_operator_min_p(op))
 	return "MIN";
-    else if (reduction_max_p(op))
+    else if (reduction_operator_max_p(op))
 	return "MAX";
-    else if (reduction_and_p(op))
+    else if (reduction_operator_and_p(op))
 	return "AND";
-    else if (reduction_or_p(op))
+    else if (reduction_operator_or_p(op))
 	return "OR";
     else
-	pips_internal_error("unexpected reduction tag (%d)\n",
-			    reduction_tag(op));
+	pips_internal_error("unexpected reduction_operator tag (%d)\n",
+			    reduction_operator_tag(op));
 
     return "unknown";
 }
@@ -296,7 +292,7 @@ static string new_reduction_name(reduction op)
  */
 static entity 
 make_new_reduction_function(
-    reduction op,
+    reduction_operator op,
     bool prolog,
     bool host,
     basic base)
