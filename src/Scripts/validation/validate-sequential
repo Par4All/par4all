@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1995/09/12 15:05:23 $, ) 
+# ($Date: 1995/09/12 16:30:41 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -76,6 +76,7 @@ usage()
     echo "  -l file: lockfile name where to report"
     echo "  -f file: fortran files"
     echo "  -x pips: pips to be used (dafault . then Production)"
+    echo "  -y tpips: tpips to be used (dafault . then Production)"
     echo "  -r dir: directory where to run (default .)"
   } >&2
   exit ${1:-1}
@@ -86,7 +87,7 @@ usage()
 
 unset FILES
 
-while getopts tuvsdhx:r:f:l: opt
+while getopts tuvsdhx:y:r:f:l: opt
 do
   case $opt in
     t) PERFORMANCE="begin: `date`" ;;
@@ -95,6 +96,7 @@ do
     d) DEBUG='debug' ;;
     u) UNIQDIR=".validate_directory.$HOSTNAME.$$" ;;
     x) pips_version="$OPTARG" ;;
+    y) tpips_version="$OPTARG" ;;
     r) RUNDIR="$OPTARG" ;;
     f) FILES="$FILES $OPTARG" ;;
     l) LOCKFILE="$OPTARG" ;;
@@ -116,23 +118,26 @@ debug()
   echo "$@" >&2
 }
 
-which_pips()
+which_executable()
 {
-  if [ -x pips ]
+  if [ -x $1 ]
   then 
-    echo $PWD/pips
+    echo $PWD/$1
   else
-    type pips | sed 's,^pips is ,,'
+    type $1 | sed "s,^$1 is ,,"
   fi
 }
 
 RUNDIR=${RUNDIR:-$PWD}
 cd $RUNDIR
 
-pips_version=${pips_version:-`which_pips`}
-export pips_version
+pips_version=${pips_version:-`which_executable pips`}
+tpips_version=${tpips_version:=`which_executable tpips`}
+
+export pips_version tpips_version
 
 $VERBOSE "pips to be used: $pips_version"
+$VERBOSE "tpips to be used: $tpips_version"
 
 #
 # a special directory is used when the -u option is set.
@@ -227,12 +232,12 @@ test_aspect()
      if [ -f $aspect/$name.tpips ]
      then 
        $DEBUG " || .tpips case"
-       $aspect/$name.tpips > $tmpout 2> $tmperr
+       $tpips_version $aspect/$name.tpips > $tmpout 2> $tmperr
        STATUS=$?
        [ -f core ] && rm -f core
 
        report $STATUS \
-         "Execution of $aspect/$name.tpips failed with $pips_version" || \
+         "Execution of $aspect/$name.tpips failed with $tpips_version" || \
          { $DEBUG " || error"; continue;}
        
        make_diff $aspect $name test
@@ -387,7 +392,9 @@ else
 
 $aspects ${FILES:+($FILES)}
   
-$final with $pips_version on $HOSTNAME
+$final with $pips_version 
+       and $tpips_version
+  on $HOSTNAME
 
 $PERFORMANCE
 
