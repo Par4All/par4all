@@ -1210,8 +1210,8 @@ typing_function_complex_to_real(call c, type_context_p context)
 {
   basic result, type_REAL = make_basic_float(4);
   basic type_CMPLX = make_basic_complex(8);
-  result = typing_function_argument_type_to_return_type(c, context, type_CMPLX, 
-						      type_REAL);
+  result = typing_function_argument_type_to_return_type(c, context, 
+							type_CMPLX, type_REAL);
   free_basic(type_REAL);
   free_basic(type_CMPLX);
   return result;
@@ -1221,8 +1221,8 @@ typing_function_dcomplex_to_double(call c, type_context_p context)
 {
   basic result, type_DBLE = make_basic_float(8);
   basic type_DCMPLX = make_basic_complex(16);
-  result = typing_function_argument_type_to_return_type(c, context, type_DCMPLX,
-						      type_DBLE);
+  result = typing_function_argument_type_to_return_type(c, context,
+						     type_DCMPLX, type_DBLE);
   free_basic(type_DBLE);
   free_basic(type_DCMPLX);
   return result;
