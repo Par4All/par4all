@@ -371,7 +371,7 @@ bool simdizer(char * mod_name)
 	       statement_consistent_p(mod_stmt));
    
    /* Reorder the module, because new statements have been added */  
-   /* module_reorder(mod_stmt); */
+   module_reorder(mod_stmt);
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
  
    /* update/release resources */
