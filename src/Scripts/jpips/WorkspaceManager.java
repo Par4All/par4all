@@ -2,6 +2,9 @@
   $Id$
   
   $Log: WorkspaceManager.java,v $
+  Revision 1.8  1998/11/20 18:15:46  coelho
+  fixed multi-selection...
+
   Revision 1.7  1998/11/20 18:01:22  coelho
   fix of file management...
 
@@ -241,16 +244,15 @@ public class WorkspaceManager implements JPipsComponent
 	  {
 	    System.err.println("Adding...");
 	    File[] v = chooser.getSelectedFiles();
-	    if (v.length>0)
+	    if (v!=null && v.length>0)
 	    {
 	      for (int i=0; i<v.length; i++)
-	      { 
 		addIfFortranFile(v[i]);
-	      }
 	    }
 	    else
 	    {
-	      addIfFortranFile(chooser.getSelectedFile());
+	      File f = chooser.getSelectedFile();
+	      if (f!=null) addIfFortranFile(f);
 	    }
 	    dialog.pack();
 	  }
@@ -343,7 +345,8 @@ public class WorkspaceManager implements JPipsComponent
    */
   public void addIfFortranFile(File f)
   {
-    boolean ok = true;
+    if (f==null) return;
+
     String abs_name = f.getAbsolutePath();
     String file_name = f.getName();
 
