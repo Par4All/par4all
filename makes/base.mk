@@ -109,19 +109,24 @@ $(ARCH)/%.o: $(ARCH)
 
 ################################################################## DEPENDENCIES
 
-# bug: the dependecy file is rebuilt whatever the target?
--include .depend.$(ARCH)
+phase0: depend
 
-.depend.$(ARCH): $(CFILES) $(DERIVED_CFILES) $(DERIVED_LIB_HEADERS)
+DEPEND	= .depend.$(ARCH)
+
+-include $(DEPEND)
+
+# false generation
+$(DEPEND): $(CFILES) $(DERIVED_CFILES) $(DERIVED_LIB_HEADERS)
+	touch $@
+
+# actual generation is done on demand only
+depend:
 	$(MAKEDEP) $(CFILES) $(DERIVED_CFILES) | \
-		sed 's,^\(.*\.o:\),$(ARCH)/\1,' > $@
+		sed 's,^\(.*\.o:\),$(ARCH)/\1,' > $(DEPEND)
 
 clean: depend-clean
 
 depend-clean:; $(RM) .depend.*
-
-# force regeneration
-depend:; $(RM) .depend.$(ARCH)
 
 ####################################################################### HEADERS
 
