@@ -584,6 +584,9 @@ hash_find_entry(hash_table htp,
     /* history of r_inc value
      * RT: 1
      * GO: 1 + abs(r_init)%(size-1)
+     * FC rationnal: if r_init is perfect, 1 is fine...
+     *    if it is not perfect, let us randmize here some more...
+     *    I'm not sure the result is any better than 1.
      */
     r_inc  = inc_prime_list[ RANK(r_init, HASH_INC_SIZE) ];
   hash_entry he;
