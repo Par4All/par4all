@@ -1,10 +1,11 @@
-%START COMMENT TEXT
+%start COMMENT TEXT
 
 %{
 #include <stdio.h>
+#include <string.h>
 #include "genC.h"
 #include "makefile.h"
-#include "y.tab.h"
+#include "pipsmake_yacc.h"
 %}
 
 %%
@@ -27,7 +28,7 @@
 <TEXT>=		        {return PRESERVED;}
 <TEXT>\!	        {return PRE_TRANSFORMATION;}
 <TEXT>\.		{return DOT;}
-<TEXT>[-_a-zA-Z0-9]+	{return NAME;}
+<TEXT>[-_a-zA-Z0-9]+	{ yylval.name=strdup(yytext); return NAME;}
 <TEXT,COMMENT>.               	{
 			fprintf(stderr, 
 				"[readmakefile] unknown char %c (%d)\n", 
@@ -35,6 +36,7 @@
                         exit(1);
 			}
 %%
+
 int yywrap()
 {
     return 1;
@@ -42,5 +44,12 @@ int yywrap()
 
 int init_lex()
 {
-	BEGIN TEXT;
+    BEGIN TEXT;
+    return 1;
 }
+
+void yyerror_lex_part(char *s)
+{
+    fprintf(stderr, "[yyerror_lex_part] %s near %s\n", s, yytext);
+}
+
