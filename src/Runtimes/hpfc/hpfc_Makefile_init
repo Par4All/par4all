@@ -1,6 +1,10 @@
 #
 # $Id$
+# 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.55  1997/05/03 16:38:30  coelho
+# *** empty log message ***
+#
 # Revision 1.54  1997/03/19 17:05:25  coelho
 # _both.f files considered as common files for host and node.
 #
@@ -11,7 +15,14 @@
 
 SHELL=/bin/sh
 
-# default target
+#
+# usual default target is to build and install the seq and par versions
+all: out main install
+	# $(NAME)_out sequential version compiled
+	# $(NAME)_main parallel version compiled and installed
+
+#
+# help target
 help:
 	#
 	# SOME HELP!
@@ -31,6 +42,7 @@ help:
 	#
 	# OTHERS
 	#
+	#   all: out main install
 	#   diff: compares sequential and parallel stdouts!
 	#   clean: removes deducable files
 	#   clobber: also removes executables files.
