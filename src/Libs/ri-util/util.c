@@ -4,6 +4,10 @@
  * $Id$
  *
  * $Log: util.c,v $
+ * Revision 1.14  2000/08/29 13:51:32  irigoin
+ * Bug fix in new_label_name(), call to entity_local_name() replaced by call
+ * to module_local_name()
+ *
  * Revision 1.13  1998/11/05 09:27:50  zory
  * EOLE tags for automatic function extraction added
  *
@@ -240,7 +244,7 @@ entity module;
 	module_name = "__GENSYM" ;
     }
     else {
-	module_name = entity_local_name(module) ;
+	module_name = module_local_name(module) ;
     }
     for(sprintf(name, "%s%s%s%d", module_name, MODULE_SEP_STRING, LABEL_PREFIX,
 		--init);
