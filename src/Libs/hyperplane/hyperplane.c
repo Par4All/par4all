@@ -7,6 +7,7 @@
 #include <malloc.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "misc.h"
 #include "text.h"
