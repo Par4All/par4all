@@ -33,7 +33,8 @@ SRC_MACROS =	auto.h \
 		makefile_macros.IBMAIX \
 		makefile_macros.IBMAIXLL \
 		makefile_macros.CRAY-T3D \
-		makefile_macros.CRAY-T3D-F90
+		makefile_macros.CRAY-T3D-F90 \
+		makefile_macros.CRAY-T3E
 
 DDC_MACROS = 	define_libraries.make \
 		auto-dash.h \
