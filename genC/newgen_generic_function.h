@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1996/06/22 10:36:02 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1996/09/21 15:27:58 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -25,14 +25,14 @@ static int name##_generic_static_status_hack()\
       (int) reset_##name & (int) get_##name & \
       (int) name##_generic_static_status_hack;}
 
-#define GENERIC_STATIC_STATUS(PREFIX, name, type, init, close)\
+#define GENERIC_STATIC_STATUS(PREFIX, name, type, init, cloze)\
 GENERIC_STATIC_OBJECT(PREFIX, name, type)\
 PREFIX void init_##name() \
-{ message_assert("must init sg undefined", name##_undefined_p());\
+{ message_assert("must initialize sg undefined", name##_undefined_p());\
   name##_object = init;}\
 PREFIX void close_##name()\
 { message_assert("must close sg defined", !name##_undefined_p());\
-  close(name##_object); name##_object = type##_undefined;}
+  cloze(name##_object); name##_object = type##_undefined;}
 
 /* The idea here is to have a static function the name of which is
  * name, and which is a newgen function (that is a ->).
@@ -73,6 +73,6 @@ static int name##_generic_local_function_hack()\
          (int) store_##name & (int) name##_generic_local_function_hack;}
 
 #define GENERIC_GLOBAL_FUNCTION(name, type)\
-        GENERIC_FUNCTION(/**/, name, type)
+        GENERIC_FUNCTION(auto, name, type)
 
 #endif /* NEWGEN_GENERIC_FUNCTION_INCLUDED */
