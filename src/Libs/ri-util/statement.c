@@ -182,7 +182,8 @@ empty_statement_or_continue_p(statement st)
 
 
 /* Return true if the statement is an empty instruction block or a
-   continue without comments or a recursive combination of above. */
+   continue without comments or without LABEL or a recursive
+   combination of above. */
 bool
 empty_statement_or_continue_without_comment_p(statement st)
 {
@@ -192,6 +193,11 @@ empty_statement_or_continue_without_comment_p(statement st)
    if (!(the_comments == NULL || string_undefined_p(the_comments)))
        return FALSE;
 
+   if (!entity_empty_label_p(statement_label(st)))
+      return FALSE;
+   if (continue_statement_p(st))
+      return TRUE;
+   
    i = statement_instruction(st);
    if (instruction_block_p(i)) {
        MAP(STATEMENT, s,
