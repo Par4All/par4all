@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.109  1997/05/13 20:39:56  coelho
+# *** empty log message ***
+#
 # Revision 1.108  1997/05/13 20:30:12  coelho
 # some settings for Linux.
 #
@@ -190,7 +193,7 @@ OPENWINHOME="/usr/openwin"
 
 X11_ROOT="$OPENWINHOME"
 
-test ${uname_r} = Linux && \
+test ${uname_s} = Linux && \
 	X11_ROOT="/usr/X11"
 
 # 
