@@ -4,7 +4,7 @@
 ! Fabien COELHO (HPF version)
 !
 ! $RCSfile: wave.f,v $ (version $Revision$)
-! $Date: 1996/09/03 23:25:12 $, 
+! $Date: 1996/09/04 08:58:18 $, 
 !
 
 !
@@ -27,7 +27,7 @@
 
 !hpf$ independent
       do i=1, x_size
-         area(i, j) = 0.0
+         area(i, 1) = 0.0
       end do
 
 !hpf$ independent
@@ -44,28 +44,28 @@
       end do
 
 !hpf$ independent 
-      do i=1, x_size/4
+      do i=x_size/2, 3*x_size/4
          area(i,y_size/2) = 0.0
       enddo
 
 !hpf$ independent 
-      do i=(x_size/4)+5, x_size/2
+      do i=(3*x_size/4)+5, x_size
          area(i,y_size/2) = 0.0
       enddo
 
 !hpf$ independent
-      do j=1, y_size/4
+      do j=1, y_size
 !hpf$    independent
          do i=1, x_size
-            depth(i,j) = 2600.0
+            depth(i,j) = 800.0
          end do
       end do
 
 !hpf$ independent
-      do j=(y_size/4)+1, y_size
+      do j=1, y_size/4
 !hpf$    independent
-         do i=1, x_size
-            depth(i,j) = 800.0
+         do i=1, x_size/2
+            depth(i,j) = 2600.0
          end do
       end do
 
@@ -74,14 +74,15 @@
 
 
 !
-! Impact of a drop at X, Y on WAVE
+! Impact of a drop of sign S at X, Y on WAVE
 !
-      subroutine drop(wave, x, y)
+      subroutine drop(wave, x, y, s)
       
       include 'wave_parameters.h'
 
       real*8 wave(x_size, y_size)
-      integer x, y
+      integer x, y, s
+
 !hpf$ align with t:: wave
       
       integer i, j, d, dl
@@ -90,11 +91,11 @@
       print *, 'drop at ', x, ' ', y
 
 !hpf$ independent, new(d)
-      do j=max(1,y-radius), min(y_size,y+radius)
+      do j=max(2,y-radius), min(y_size-1,y+radius)
 !hpf$    independent
-         do i=max(1,x-radius), min(y_size,x+radius)
+         do i=max(2,x-radius), min(x_size-1,x+radius)
             d = (i-x)*(i-x) + (j-y)*(j-y)
-            if (d.le.dl) wave(i,j) = wave(i,j) + height*(25-d)
+            if (d.le.dl) wave(i,j) = wave(i,j) + s*height*(25-d)
          end do
       end do
 
@@ -125,9 +126,9 @@
 
 ! update speed:
 !hpf$ independent
-      do j=1, y_size-1
+      do j=2, y_size-1
 !hpf$    independent
-         do i=1, x_size-1
+         do i=2, x_size-1
             speed(i,j,1) = speed(i,j,1) +
      $           alpha * (wave(i+1,j)-wave(i,j))
             speed(i,j,2) = speed(i,j,2) +
@@ -137,9 +138,9 @@
 
 ! update wave:
 !hpf$ independent, new(div)
-      do j=2, y_size
+      do j=2, y_size-1
 !hpf$    independent
-         do i=2, x_size
+         do i=2, x_size-1
             div = speed(i,j,1) - speed(i-1,j,1) + 
      $           speed(i,j,2) - speed(i,j-1,2)
             wave(i,j) =  friction * 
@@ -242,11 +243,11 @@
          call xpomp_is_mouse
      $        (display, x_display, y_display, state, button)
          
-         if (button.eq.1) then
+         if (button.ne.0) then
             x = (x_display + x_display_zoom-1)/x_display_zoom
             y = (y_display + y_display_zoom-1)/y_display_zoom
 
-            call drop(wave, x, y)
+            call drop(wave, x, y, 2-button)
          end if
 
 ! Iterate wave propagation once
