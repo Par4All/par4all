@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1996/06/11 13:26:51 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1996/07/23 15:08:23 $, ) 
  * version $Revision$
  */
 
@@ -208,14 +208,16 @@ string suffix, prefix;
 	 /* now the dummy is to be used to generate two inequalities: 
 	  * -dummy + lower <= 0 and dummy - upper <= 0
 	  */
-	 sc_add_inegalite(new_system,
-			  contrainte_make(vect_make(VECTEUR_NUL,
-						    dummy, 	-1,
-						    TCST, 	ilower)));
-	 sc_add_inegalite(new_system,
-			  contrainte_make(vect_make(VECTEUR_NUL,
-						    dummy, 	1,
-						    TCST, 	-iupper)));
+	 sc_add_inegalite
+	     (new_system,
+	      contrainte_make(vect_make(VECTEUR_NUL,
+					dummy, 	VALUE_MONE,
+					TCST, 	int_to_value(ilower))));
+	 sc_add_inegalite
+	     (new_system,
+	      contrainte_make(vect_make(VECTEUR_NUL,
+					dummy, 	VALUE_ONE,
+					TCST, 	int_to_value(-iupper))));
 	 dim_number++;
      },
 	 dims);
@@ -288,8 +290,8 @@ entity e;
 		constant = HpfcExpressionToInt(alignment_constant(a));
 	    Pvecteur
 		v = vect_make(VECTEUR_NUL,
-			      theta, 	1,
-			      TCST, 	-constant);
+			      theta, 	VALUE_ONE,
+			      TCST, 	int_to_value(-constant));
 					       
 	    if (adim==0)
 	    {
@@ -300,7 +302,7 @@ entity e;
 		entity phi = get_ith_array_dummy(adim);
 		int rate = HpfcExpressionToInt(alignment_rate(a));
 
-		v = vect_make(v, phi, -rate, TCST, 0);
+		v = vect_make(v, phi, int_to_value(-rate), TCST, VALUE_ZERO);
 		sc_add_egalite(new_system, contrainte_make(v));
 	    }
 	}
@@ -341,10 +343,11 @@ entity e;
 		    HpfcExpressionToInt
 			(dimension_lower(entity_ith_dimension(template, i)));
 
-	    sc_add_egalite(new_system,
-			   contrainte_make(vect_make(VECTEUR_NUL,
-						     theta, 	1,
-						     TCST, 	-low)));
+	    sc_add_egalite
+		(new_system,
+		 contrainte_make(vect_make(VECTEUR_NUL,
+					   theta, 	VALUE_ONE,
+					   TCST, 	int_to_value(-low))));
 	}
     }
     sc_creer_base(new_system);
@@ -396,24 +399,24 @@ entity e;
 	/* -delta_j <= 0
 	 */
 	sc_add_inegalite(new_system, 
-			 contrainte_make(vect_new((Variable) delta, -1)));
+		contrainte_make(vect_new((Variable) delta, VALUE_MONE)));
 
 	/* delta_j - (N_j - 1) <= 0
 	 */
 	sc_add_inegalite(new_system,
-			 contrainte_make(vect_make(VECTEUR_NUL,
-						   (Variable) delta, 	1,
-						   TCST, 	-param+1)));
+	   contrainte_make(vect_make(VECTEUR_NUL,
+				     (Variable) delta, 	VALUE_ONE,
+				     TCST, int_to_value(-param+1))));
 
 	/* theta_i - Nj psi_j - Nj Pj gamma_j - delta_j + Nj psi_j0 - theta_i0
 	 * == 0
 	 */
 	v = vect_make(VECTEUR_NUL,
-		      (Variable) theta, 1,
-		      (Variable) psi, 	-param,
-		      (Variable) gamma, -(param*proc_size),
-		      (Variable) delta, -1,
-		      TCST, 		param*psi0-theta0);
+		      (Variable) theta, VALUE_ONE,
+		      (Variable) psi, 	int_to_value(-param),
+		      (Variable) gamma, int_to_value(-(param*proc_size)),
+		      (Variable) delta, VALUE_MONE,
+		      TCST, 		int_to_value((param*psi0)-theta0));
 
 	sc_add_egalite(new_system, contrainte_make(v));	
 
@@ -422,14 +425,14 @@ entity e;
 	 */
 	if (style_block_p(st))
 	    sc_add_egalite(new_system,
-			   contrainte_make(vect_new((Variable) gamma, 1)));
+	       contrainte_make(vect_new((Variable) gamma, VALUE_ONE)));
 
 	/* if cyclic(1) distributed
 	 * delta_j == 0
 	 */
 	if (style_cyclic_p(st) && (param==1))
 	    sc_add_egalite(new_system,
-			   contrainte_make(vect_new((Variable) delta, 1)));
+		contrainte_make(vect_new((Variable) delta, VALUE_ONE)));
 	    
     }
     sc_creer_base(new_system);
@@ -507,11 +510,12 @@ hpfc_compute_entity_to_new_declaration(
 	 case is_hpf_newdecl_none:
 	     /* LALPHAi == ALPHAi
 	      */
-	     sc_add_egalite(syst, 
-			    contrainte_make(vect_make(VECTEUR_NUL,
-						      alpha, 	1,
-						      lalpha, 	-1,
-						      TCST,	0)));
+	     sc_add_egalite
+		 (syst, 
+		  contrainte_make(vect_make(VECTEUR_NUL,
+					    alpha, 	VALUE_ONE,
+					    lalpha, 	VALUE_MONE,
+					    TCST,	VALUE_ZERO)));
 	     break;
 	 case is_hpf_newdecl_alpha:
 	 {
@@ -522,11 +526,12 @@ hpfc_compute_entity_to_new_declaration(
 
 	     get_ith_dim_new_declaration(array, dim, &min, &max);
 	     
-	     sc_add_egalite(syst,
-			    contrainte_make(vect_make(VECTEUR_NUL,
-						      alpha, 	1,
-						      lalpha, 	-1,
-						      TCST, 	1-min)));
+	     sc_add_egalite
+		 (syst,
+		  contrainte_make(vect_make(VECTEUR_NUL,
+					    alpha, 	VALUE_ONE,
+					    lalpha, 	VALUE_MONE,
+					    TCST, 	int_to_value(1-min))));
 
 	     break;
 	 }
@@ -550,30 +555,30 @@ hpfc_compute_entity_to_new_declaration(
 	     {
 		 /* IOTA is not needed */
 		 sc_add_egalite(syst,
-				contrainte_make(vect_make(VECTEUR_NUL,
-							  delta, 	1,
-							  lalpha, 	-1,
-							  TCST, 	1)));
+		   contrainte_make(vect_make(VECTEUR_NUL,
+					     delta, 	VALUE_ONE,
+					     lalpha, 	VALUE_MONE,
+					     TCST, 	VALUE_ONE)));
 	     }
 	     else
 	     {
 		 entity iota = get_ith_shift_dummy(pdim);
 		 Pvecteur
 		     v1 = vect_make(VECTEUR_NUL,
-				    (Variable) lalpha, 	abs(a),
-				    (Variable) iota, 	1,
-				    (Variable) delta, 	-1,
-				    TCST, 	-abs(a));
+				    (Variable) lalpha, 	int_to_value(abs(a)),
+				    (Variable) iota, 	VALUE_ONE,
+				    (Variable) delta, 	VALUE_MONE,
+				    TCST, 	int_to_value(-abs(a)));
 
 		 sc_add_egalite(syst, contrainte_make(v1));
 		 sc_add_inegalite(syst,
 				  contrainte_make(vect_new((Variable) iota, 
-						  -1)));
+							   VALUE_MONE)));
 		 sc_add_inegalite
 		     (syst,
 		      contrainte_make(vect_make(VECTEUR_NUL,
-						(Variable) iota, 1,
-						TCST, 	-(abs(a)-1))));
+			     (Variable) iota, VALUE_ONE,
+			      TCST, 	int_to_value(-(abs(a)-1)))));
 	     }
 
 	     break;
@@ -587,8 +592,7 @@ hpfc_compute_entity_to_new_declaration(
 		 delta = entity_undefined,
 		 template = array_to_template(array),
 		 processor = template_to_processors(template);
-	     int 
-		 gamma_0 = 0, tdim = -1, pdim = -1, a = 0, b = 0,
+	     int gamma_0 = 0, tdim = -1, pdim = -1, a = 0, b = 0,
 		 n, plow, pup, tlow, tup, alow, aup;
 	     
 	     get_alignment(array, dim, &tdim, &a, &b);
@@ -608,11 +612,12 @@ hpfc_compute_entity_to_new_declaration(
 
 	     sc_add_egalite
 		 (syst,
-		  contrainte_make(vect_make(VECTEUR_NUL,
-					    delta, 	1,
-					    gamma, 	n,
-					    lalpha, 	-1,
-					    TCST, 	1-(n*gamma_0))));
+		  contrainte_make(vect_make
+		    (VECTEUR_NUL,
+		     delta, 	VALUE_ONE,
+		     gamma, 	int_to_value(n),
+		     lalpha, 	VALUE_MONE,
+		     TCST, 	int_to_value(1-(n*gamma_0)))));
 	     break;
 	 }
 	 case is_hpf_newdecl_delta:
@@ -621,15 +626,13 @@ hpfc_compute_entity_to_new_declaration(
 	      * DELTA_j = |a|*SIGMA_j + IOTA_j
 	      * 0 <= IOTA_j < |a|
 	      */
-	     entity
-		 sigma = entity_undefined,
+	     entity sigma = entity_undefined,
 		 iota = entity_undefined,
 		 gamma = entity_undefined,
 		 delta = entity_undefined,
 		 template = array_to_template(array),
 		 processor = template_to_processors(template);
-	     int 
-		 gamma_0 = 0, tdim = -1, pdim = -1, a = 0, b = 0,
+	     int gamma_0 = 0, tdim = -1, pdim = -1, a = 0, b = 0,
 		 n, icn, plow, pup, tlow, tup, alow, aup;
 	     
 	     get_alignment(array, dim, &tdim, &a, &b);
@@ -652,28 +655,31 @@ hpfc_compute_entity_to_new_declaration(
 
 	     sc_add_egalite
 		 (syst,
-		  contrainte_make(vect_make(VECTEUR_NUL,
-					    sigma, 	1,
-					    gamma, 	icn,
-					    lalpha, 	-1,
-					    TCST, 	1-(icn*gamma_0))));
+		  contrainte_make
+		  (vect_make(VECTEUR_NUL,
+			     sigma, 	VALUE_ONE,
+			     gamma, 	int_to_value(icn),
+			     lalpha, 	VALUE_MONE,
+			     TCST, 	int_to_value(1-(icn*gamma_0)))));
 
 	     sc_add_egalite
 		 (syst,
-		  contrainte_make(vect_make(VECTEUR_NUL,
-					    delta,	1,
-					    sigma,	-abs(a),
-					    iota,	-1,
-					    TCST,	0)));
+		  contrainte_make
+		  (vect_make(VECTEUR_NUL,
+			     delta,	VALUE_ONE,
+			     sigma,	int_to_value(-abs(a)),
+			     iota,	VALUE_MONE,
+			     TCST,	VALUE_ZERO)));
 
 	     sc_add_inegalite(syst,
 			      contrainte_make(vect_new((Variable) iota, 
-						       -1)));
+						       VALUE_MONE)));
 	     sc_add_inegalite
 		 (syst,
-		  contrainte_make(vect_make(VECTEUR_NUL,
-					    (Variable) iota, 1,
-					    TCST, 	-(abs(a)-1))));
+		  contrainte_make
+		  (vect_make(VECTEUR_NUL,
+			     (Variable) iota, VALUE_ONE,
+			     TCST, 	int_to_value(-(abs(a)-1)))));
 	     break;
 	 }
 	 default:
@@ -713,7 +719,8 @@ generate_system_for_equal_variables(
 
     for(; n>0; n--)
 	sc_add_egalite(s, contrainte_make
-	     (vect_make(VECTEUR_NUL, gen1(n), 1, gen2(n), -1, TCST, 0)));
+	     (vect_make(VECTEUR_NUL, gen1(n), VALUE_ONE, 
+			gen2(n), VALUE_MONE, TCST, VALUE_ZERO)));
 
     sc_creer_base(s); return s;
 }
