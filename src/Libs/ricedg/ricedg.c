@@ -25,7 +25,9 @@
  *    freed;
  *
  */
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <values.h>
 #include <string.h>
 
