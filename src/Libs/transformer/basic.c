@@ -235,7 +235,7 @@ transformer t;
 
     /* The NewGen data structure must be fully defined */
     ifdebug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL)
-	consistent = gen_defined_p(t);
+	consistent = transformer_defined_p(t);
     else
 	consistent = TRUE;
     if(!consistent)
