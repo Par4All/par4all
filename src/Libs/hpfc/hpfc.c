@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/09/15 16:52:15 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/09/18 13:23:28 $, )
  * version $Revision$
  */
  
@@ -308,7 +308,7 @@ void hpfc_filter(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
 
-    system(concatenate("$HPFC_TOOLS/hpfc_filter ", file_name, NULL));
+    safe_system(concatenate("$HPFC_TOOLS/hpfc_filter ", file_name, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_SOURCE_FILE, strdup(name), file_name);
 
@@ -487,8 +487,32 @@ void hpfc_install(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
 
-    system(concatenate("$HPFC_TOOLS/hpfc_install -iob ", dir, 
-		       " -n ", name, NULL));
+    safe_system(concatenate("$HPFC_TOOLS/hpfc_install -iob ", dir, 
+			    " -n ", name, NULL));
+
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, strdup(name), NO_FILE);
+
+    debug_off();
+}
+
+/* void hpfc_make(string name)
+ *
+ * what: compile the generated and installed code. for wpips.
+ * how: system call to $HPFC_MAKE
+ * input: the workspace name (which is not used)
+ * output: none.
+ * side effects:
+ *  - may generate a core if the make fails...
+ * bugs or features:
+ */
+void hpfc_make(string name)
+{
+    string dir = db_get_current_program_directory();
+    
+    debug_on("HPFC_DEBUG_LEVEL");
+    pips_debug(1, "considering program %s\n", name);
+
+    safe_system(concatenate("cd ", dir, " ; $HPFC_MAKE ", NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, strdup(name), NO_FILE);
 
