@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-//#include <assert.h>
-//#include <malloc.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -31,11 +29,10 @@ struct problem Z;
 static boolean 
 sc_to_iproblem(Psysteme sc)
 {
-  //sc
-  // int nbrows, nbcolumns; // common temporary counter i,j 
   Pcontrainte peq;
   Pvecteur pv;
-  //  Value v;
+  Value temp;
+  boolean special_constraint_p = FALSE;
 
   //Janus 
   // int p6,p5,p4,p3,p2,p1;
@@ -51,7 +48,11 @@ sc_to_iproblem(Psysteme sc)
   par5 = 0; par6 = 1;  par7 = 1;
 
   //have to remove this debug in the futur for exact time measument
-  fdebug=fopen("jtrace.tex","w") ; /* file for trace */
+  if (par4) {
+    fdebug=fopen("jtrace.tex","w") ; /* file for trace */
+  }else {
+    fdebug = NULL;
+  }
   Z.ftrace=fdebug;
   
   /**************** BEGIN parameters into structure ************************/
@@ -87,31 +88,30 @@ sc_to_iproblem(Psysteme sc)
   /**************** END print debug into structure ************************/
 
 /**************** BEGIN reset some parameters in the structures ************************/
-Z.negal=0;Z.icout=0;Z.minimum=0;Z.mx=0;Z.nx=0;Z.ic1=0;Z.tmax=0;Z.niter=0;Z.itdirect=0;Z.nredun=0;Z.numero=0;Z.numax=0;
-Z.lastfree=0;Z.nub= 0;Z.ntp = 0;Z.vdum = 0;Z.nturb = 0;
+  Z.negal=0;Z.icout=0;Z.minimum=0;Z.mx=0;Z.nx=0;Z.ic1=0;Z.tmax=0;Z.niter=0;Z.itdirect=0;Z.nredun=0;Z.numero=0;Z.numax=0; Z.lastfree=0;Z.nub= 0;Z.ntp = 0;Z.vdum = 0;Z.nturb = 0;
 /*
-for ( i=1;i<=MAXLIGNES+1; i++) { 
-   for (j=1; j<=MAXCOLONNES+1; j++)     
-	      value_assign(I.a[i][j],VALUE_ZERO);
-}
-for ( i=1 ; i <= MAXLIGNES +1 ; i++)  {      
-      value_assign(I.d[i],VALUE_ZERO);
-}
-for ( i=1 ; i <= MAXLIGNES +1 ; i++)  {
- I.e[i]=0;
-}
-for ( i=1;i<=AKLIGNES; i++) { 
-   for (j=1; j<=AKCOLONNES; j++)     
-	      value_assign(Z.ak[i][j],VALUE_ZERO);
-}
-for ( i=1 ; i <= AKLIGNES ; i++)  { 
-      value_assign(Z.dk[i],VALUE_ZERO);
-}*/
-//There's a bug here: if we donot reinitialize these variables, then we'll have a wrong insertion
-//into the structure. And the order is important, when the parameter pointer gives errors after some iteration
-//DN 25/11/2002. We should use another way to do this. Need time to consider.
+  for ( i=1;i<=MAXLIGNES+1; i++) { 
+  for (j=1; j<=MAXCOLONNES+1; j++)     
+  value_assign(I.a[i][j],VALUE_ZERO);
+  }
+  for ( i=1 ; i <= MAXLIGNES +1 ; i++)  {      
+  value_assign(I.d[i],VALUE_ZERO);
+  }
+  for ( i=1 ; i <= MAXLIGNES +1 ; i++)  {
+  I.e[i]=0;
+  }
+  for ( i=1;i<=AKLIGNES; i++) { 
+  for (j=1; j<=AKCOLONNES; j++)     
+  value_assign(Z.ak[i][j],VALUE_ZERO);
+  }
+  for ( i=1 ; i <= AKLIGNES ; i++)  { 
+  value_assign(Z.dk[i],VALUE_ZERO);
+  }
+*/
+  //TODO: If these parameters are already initialized before used in the code (which is not easy to see now), 
+  //then it's not necessary to reinitialize them here. If not, then we might have a bug.
 
-/**************** END reset some parameters in the structures ************************/
+  /**************** END reset some parameters in the structures ************************/
 
   /**************** BEGIN to insert DIMENSION with tests into structure *************/
   // removed reading from file. replace by direct assign
@@ -119,39 +119,43 @@ for ( i=1 ; i <= AKLIGNES ; i++)  {
  
   //fscanf(fh,"%d",&Z.nvar);   /* nombre total de variables */
   Z.nvar = sc->dimension; /* to be verified */
-  if (Z.nvar <= 0) { //sc given is not correct. 
-    printf("\nAttention: Number of variables <= 0 ");
-    return FALSE;
-    // put exception here saying Janus cannot handle this system of constraints
+  if (Z.nvar < 0) { //sc given is not correct (normally tested before)
+    ifscdebug(5) {
+      printf("\n Attention: Janus has a number of variables < 0 ");
+    }
+    return FALSE;// Janus cannot handle this system of constraints
   }
-  if (Z.nvar> MAXCOLONNES)    {
-    printf("Too many variables %3d > max=%3d\n",Z.nvar,MAXCOLONNES);
-    return FALSE;// put exception here saying Janus cannot handle this system of constraints
+  if (Z.nvar> MAXCOLONNES) {
+    ifscdebug(5) {
+      printf("Too many variables %3d > max=%3d\n",Z.nvar,MAXCOLONNES);
+    }
+    return FALSE;// Janus cannot handle this system of constraints
   }
 
   //fscanf(fh,"%d",&Z.mcontr); /* nombre de contraintes */
-  Z.mcontr = sc->nb_eq + sc->nb_ineq; /* to be verified*/
-  if (Z.mcontr> MAXLIGNES)
-    { 
+  Z.mcontr = sc->nb_eq + sc->nb_ineq; /* sc's parameters must be true*/
+  if (Z.mcontr> MAXLIGNES) {
+    ifscdebug(5) {
       printf("Too many constraints %3d > max = %3d \n",Z.mcontr,MAXLIGNES);
-      return FALSE;// put exception here saying Janus cannot handle this system of constraints
     }
+    return FALSE;// Janus cannot handle this system of constraints
+  }
 
   //fscanf(fh,"%d",&Z.nvpos);/* nombre de variables >=0 donc: Z.nvpos<= Z.nvar */
   Z.nvpos = 0;  /* to be verified */
-  if (Z.nvpos > Z.nvar)
-    { 
-      printf(" %3d variables positives, depasse %3d\n",Z.nvpos,Z.nvar);
-      return FALSE;// ?? can we put nvpos = 0 here ??
+  if (Z.nvpos > Z.nvar) { 
+    ifscdebug(5) {
+      printf(" %3d variables positives, greater than %3d\n",Z.nvpos,Z.nvar);
     }
+    return FALSE;// ?? can we put nvpos = 0 here ??
+  }
 
   //fscanf(fh,"%d",&vi0); /* unused parameter */
-  vi0 = 0;
-      
+  vi0 = 0;      
   /**************** END to insert DIMENSION into structure ********************/
 
   /**************** BEGIN to insert MATRIX into structure*********************/
-  // need exact DIMENSION, similar to sc_to_atrix
+  // need exact DIMENSION, similar to sc_to_matrix
   /* for ( i=1 ; i <= Z.mcontr ; i++)
     { fscanf(fh,"%d",&ventier) ; I.e[i]=ventier ;
       for ( j=1 ; j <= Z.nvar ; j++)
@@ -162,6 +166,8 @@ for ( i=1 ; i <= AKLIGNES ; i++)  {
   */
   //ATTENTION, first elements in array in struct initpb are not used. 
   //this array is not initiated. In use : rows 1 -> Z.mcontr, columns 1-> Z.nvar
+
+  //DN: need to check the special inequality here: 0 < 1, mean a vector of one element.
 
   for ( i=1 ; i <= Z.mcontr ; i++) // differentiation eq and ineq, running by constraints
     { 
@@ -180,19 +186,28 @@ for ( i=1 ; i <= AKLIGNES ; i++)  {
 	{     
 	  value_assign(I.a[i][j],value_uminus(vect_coeff(vecteur_var(pv),peq->vecteur)));
 	}
-      value_assign(I.d[i],vect_coeff(TCST,peq->vecteur));       
+      value_assign(I.d[i],vect_coeff(TCST,peq->vecteur));
     }
 	
   //inegalites
   for (peq = sc->inegalites; !CONTRAINTE_UNDEFINED_P(peq); peq=peq->succ, i++) 
-    {      
+    {       
+      value_assign(temp,VALUE_ZERO); 
       for (pv=sc->base,j=1; !VECTEUR_NUL_P(pv); pv=pv->succ,j++)
 	{     
 	  value_assign( I.a[i][j],value_uminus(vect_coeff(vecteur_var(pv),peq->vecteur)));
+	  value_addto(temp,value_abs(I.a[i][j]));
 	}
-      value_assign(I.d[i],vect_coeff(TCST,peq->vecteur));
-    }   
-     
+      if value_zero_p(temp) {
+	special_constraint_p = TRUE;
+      }
+     value_assign(I.d[i],vect_coeff(TCST,peq->vecteur));
+    } 
+  if (special_constraint_p) {
+    //sc_default_dump(sc); 
+    //TODO: what to do with this special constraint? if 0<1 ok, if 1 < 0 then not ok, return FALSE
+  }
+  
   /**************** END to insert MATRIX into structure *********************/ 
   return TRUE;
 }
@@ -204,11 +219,12 @@ sc_janus_feasibility(Psysteme sc)
   int r = 0;
 
   /**************** change format into Janus, using global struct iproblem */
-  ok = sc_to_iproblem(sc);
+  ok = sc_to_iproblem(sc); //Attention with dimension=0
   
   /**************** BEGIN execution simplexe entier classique */
   if (ok) r = isolve(&I,&Z,0);
-else r = 9;//DN janus should not be used here.
+  else r = 9;//DN janus should not be used here.
+
   // the third parameter means test only one time
   // only I is initialized. Z is still empty
   /*
@@ -237,8 +253,8 @@ else r = 9;//DN janus should not be used here.
   if (Z.ntrace||Z.ntrac2)
     { fprintf(FTRACE,"\\end{document}\n");
     }
-      
-  fclose(fdebug);
+  
+  if (fdebug) fclose(fdebug);// DN: In Solaris, we can fclose(NULL), but in LINUX, we cannot.
 
   if (r==VRFIN) {ok = TRUE; return ok;}
   else if ((r==VRVID)||(r==VRINF)) {ok = FALSE;return ok;}
