@@ -8,8 +8,6 @@
 
 #include "ri-util.h"
 
-extern int fprintf();
-
 /* this function shouldn't be called. 
  * Use macro NORMALIZE_EXPRESSION(e) instead.
  */
