@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1994/12/22 15:39:34 $, ) version $Revision$,
+ * $RCSfile: build-system.c,v $ ($Date: 1994/12/27 19:46:41 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -107,9 +107,9 @@ extern fprintf();
 #define Psysteme_undefined SC_UNDEFINED
 #define Psysteme_undefined_p(sc) SC_UNDEFINED_P(sc)
 #endif
-GENERIC_CURRENT_MAPPING(declaration_constraints, Psysteme, entity);
-GENERIC_CURRENT_MAPPING(hpf_constraints, Psysteme, entity);
-GENERIC_CURRENT_MAPPING(new_declaration_constraints, Psysteme, entity);
+GENERIC_LOCAL_MAPPING(declaration_constraints, Psysteme, entity);
+GENERIC_LOCAL_MAPPING(hpf_constraints, Psysteme, entity);
+GENERIC_LOCAL_MAPPING(new_declaration_constraints, Psysteme, entity);
 
 void make_hpfc_current_mappings()
 {
