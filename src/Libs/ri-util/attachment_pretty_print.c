@@ -413,7 +413,7 @@ attach_preconditions_decoration_to_text(text t)
 
 /* Attach a total preconditions decoration: */
 void
-attach_preconditions_decoration_to_text(text t)
+attach_total_preconditions_decoration_to_text(text t)
 {
   pips_assert("not implemented yet", FALSE);
 }
