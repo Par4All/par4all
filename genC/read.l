@@ -98,7 +98,7 @@ T			{ return CHUNK_BEGIN; }
 \)			{ return RP; }
 \{		        { return LC; }
 \}			{ return RC; }
-H			{ return SHARED_POINTER ; }
+H			{ return SHARED_POINTER; }
 U			{ return READ_UNIT; }
 B			{ return READ_BOOL; }
 E	 		{ return READ_EXTERNAL; }
