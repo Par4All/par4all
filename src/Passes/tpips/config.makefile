@@ -1,8 +1,9 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/08 14:05:46 $, 
+# $Date: 1996/08/08 17:19:19 $, 
 
 LEX=		flex
+CPPFLAGS+=	-DFLEX_SCANNER
 YFLAGS+=	-v -d
 #
 LIB_CFILES=	tpips.c
@@ -11,9 +12,9 @@ LIB_OBJECTS=	$(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o)
 #
 TARGET_LIBS= 	$(PIPS_LIBS) $(TPIPS_ADDED_LIBS)
 
-DERIVED_HEADERS= y.tab.h completion_list.h
-DERIVED_CFILES= y.tab.c lex.yy.c
-DERIVED_FILES= y.output ana_lex_completed.l
+DERIVED_HEADERS= tp_yacc.h completion_list.h
+DERIVED_CFILES= tp_yacc.c tp_lex.c
+DERIVED_FILES= ana_lex_completed.l
 
 ana_lex_completed.l:	ana_lex.l \
 			$(PIPS_INCLUDEDIR)/resources.h \
@@ -21,17 +22,17 @@ ana_lex_completed.l:	ana_lex.l \
 			$(PIPS_LIBDIR)/properties.rc
 	$(PIPS_UTILDIR)/build_tpips_lex ana_lex.l > ana_lex_completed.l
 
-lex.yy.c: ana_lex_completed.l y.tab.h
-	$(SCAN) ana_lex_completed.l | sed -e 's/YY/TP_/g;s/yy/tp_/g' > lex.yy.c
+tp_lex.c: ana_lex_completed.l tp_yacc.h
+	$(SCAN) ana_lex_completed.l | \
+	sed -e '/^FILE *\*/s,=[^,;]*,,g;s/YY/TP_/g;s/yy/tp_/g' > tp_lex.c
 
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
 # filtred here.
-y.tab.c y.tab.h: ana_syn.y
+tp_yacc.c tp_yacc.h: ana_syn.y
 	$(PARSE) ana_syn.y
-	sed -e '/extern char \*malloc/d;s/YY/TP_/g;s/yy/tp_/g' y.tab.c > m.tab.c
-	mv m.tab.c y.tab.c
-	sed -e 's/YY/TP_/g;s/yy/tp_/g' y.tab.h > m.tab.h
-	mv m.tab.h y.tab.h
+	sed 's/YY/TP_/g;s/yy/tp_/g' y.tab.c > tp_yacc.c
+	sed -e 's/YY/TP_/g;s/yy/tp_/g' y.tab.h > tp_yacc.h
+	$(RM) y.output y.tab.c y.tab.h
 
 completion_list.h :	$(PIPS_INCLUDEDIR)/resources.h \
 			$(PIPS_INCLUDEDIR)/phases.h \
@@ -39,5 +40,6 @@ completion_list.h :	$(PIPS_INCLUDEDIR)/resources.h \
 	$(PIPS_UTILDIR)/build_completion_lists > completion_list.h
 
 # for bootstraping the dependences...
+tpips.h: completion_list.h
 tpips.o: completion_list.h
 tpips.c: completion_list.h
