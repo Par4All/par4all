@@ -1,5 +1,8 @@
 /* $Id$
    $Log: splitc.l,v $
+   Revision 1.2  2003/08/01 06:00:47  irigoin
+   Intermediate version installed to let Production link
+
    Revision 1.1  2003/07/29 15:12:00  irigoin
    Initial revision
 
@@ -77,7 +80,49 @@ extern char * strdup(char *);
 #include "c_syntax.h"
 #include "splitc.h"
 
-static int csplit_line_number = 0;
+extern string csplit_current_function_name;
+extern string csplit_definite_function_name;
+extern string csplit_definite_function_signature;
+extern bool csplit_is_static_p;
+
+int csplit_line_number = 1; /* To be exported to the parser */
+
+void reset_csplit_line_number()
+{
+  csplit_line_number = 1;
+}
+
+static int csplit_current_beginning = 1000000;
+
+static void update_csplit_current_beginning()
+{
+  csplit_current_beginning = csplit_current_beginning > csplit_line_number?
+    csplit_line_number : csplit_current_beginning;
+}
+
+void reset_csplit_current_beginning()
+{
+  csplit_current_beginning = 1000000;
+  csplit_is_static_p = FALSE;
+
+  if(!string_undefined_p(csplit_current_function_name)) 
+    free(csplit_current_function_name);
+  csplit_current_function_name = string_undefined;
+
+  if(!string_undefined_p(csplit_definite_function_name)) 
+    free(csplit_definite_function_name);
+  csplit_definite_function_name = string_undefined;
+
+  if(!string_undefined_p(csplit_definite_function_signature)) 
+    free(csplit_definite_function_signature);
+  csplit_definite_function_signature = string_undefined;
+}
+
+int get_csplit_current_beginning()
+{
+  return csplit_current_beginning;
+}
+
 extern int csplit_is_external;
 extern int csplit_is_function;
 
@@ -105,7 +150,7 @@ floatsuffix [fFlL]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
 ident ({letter}|"_")({letter}|{decdigit}|"_")* 
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
-blank [ \t\012\r]+
+blank [ \t\r]+
 escape ('\\'_)
 hex_escape ('\\'[xX]{hexdigit}+)
 oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?) 
@@ -114,11 +159,11 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 "/*"([^\*]|(\*+[^\/]))*"*/"	{ 
                                 pips_debug(5,"Comment %s\n",yytext);
                         }
-"//".*\n                { 
+"//"[^\n]*                { 
                                 pips_debug(5,"Comment %s\n",yytext);
                         }
-^"#"[^\\n]*\n                { 
-                                csplit_line_number++;
+^"#"[^\n]*              { 
+                                /* csplit_line_number++; */
                                 pips_debug(5,"Pragma comment %s\n",yytext);
                         }
 {blank}			{ 
@@ -126,11 +171,7 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
                         }
 \n                      { 
                                 csplit_line_number++;
-                                fprintf(stderr, "Line %d, ext=%d, func=%d", csplit_line_number, csplit_is_external, csplit_is_function);
-                                pips_debug(5,"New line\n");
-                        }
-"#"			{ 
-                                pips_debug(5,"Hash %s\n",yytext);
+                                pips_debug(5, "New line %d, ext=%d, func=%d\n", csplit_line_number, csplit_is_external, csplit_is_function);
                         }
 "_Pragma" 	        { 
                                 pips_debug(5,"Pragma not implemented %s\n",yytext);
@@ -379,6 +420,7 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 {ident}			{ 
                                 /* C keywords or identifiers */
 				int t = is_c_keyword_typedef(yytext);
+                                update_csplit_current_beginning();
                                 if (t>0) 
 				   { 
 				       pips_debug(5,"Keyword or typedef name: %s\n",yytext);
@@ -387,7 +429,18 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 				   }
 				else
 				   {
-				       pips_debug(5,"Identifier: %s\n",yytext);
+				       pips_debug(5,"TK_IDENT: %s\n",yytext);
+                                       /* Might not work if a function returns a struct declared locally in the function declaration, or a pointer to such a structrue */
+                                       if(string_undefined_p(csplit_current_function_name)) {
+                                       csplit_current_function_name = strdup(yytext);
+                                       pips_debug(5, "Temptative function name found: \"%s\"\n",
+                                                  csplit_current_function_name)
+                                       }
+                                       else {
+                                       pips_debug(5, "Identifier ignored: \"%s\"\n",
+                                                  yytext)
+  
+                                       }
                                        yylval.string = strdup(yytext);
 				       return(TK_IDENT); 
 				   }
@@ -411,5 +464,3 @@ void yyerror(char * msg)
 #ifndef yywrap
 int yywrap() { return 1;}
 #endif
-
-
