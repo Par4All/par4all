@@ -117,7 +117,7 @@ makeit()
 #
 # Get command line options
 
-while getopts hvDd:CNLPVc:a: OPT
+while getopts hvDd:GCNLPVc:a: OPT
 do
     case $OPT in
 	h) usage 0 "some help" ;;
