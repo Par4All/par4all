@@ -1,4 +1,5 @@
 #! /bin/sh
+#! /bin/sh -vx
 
 # Automatic generation of Makefile for the PIPS project
 #
@@ -85,7 +86,19 @@
 #	a` Sun (RS/6000 au CEA :-) ) je suis oblige' de relancer un $(MAKE).
 #	Mais ce n'est pas ge^nant !
 #
+#	RK, 12/11/93 :
+#	suppression de :
+#	# Pas necessaire, mais bon...
+#	$(MAKEFILE): $(DERIVED_HEADERS) $(EXTERN)
+#		$(MAKE) production-depend
 #
+# 	Par contre on pourrait rajouter une de'pendance entre Makefile et
+#	config.makefile, non ?
+#	Correction d'un nug dans make depend dans le cas des bibliothe`ques.
+# - rajout d'un wtest. RK, 112/1994.
+# - "/lib/cpp $(CFLAGS)" moved to "$(PREPROC)" in production-depend target
+#   FC 21/02/94
+# - rm -f -> $(RM) or -$(RM)  FC 22/02/94
 #
 # wish:
 #
@@ -222,8 +235,25 @@ test: all $(DEVEDIR)/Passes/pips/pips.o
 	$(LINK) pips $(DEVEDIR)/Passes/pips/pips.o $(PIPS_LIBS)
 	@echo 
 
+WPIPS_DEVEDIR=$(DEVEDIR)/Passes/wpips
+# Extrait ici le noms des .o et des bibliothèques necessaires à wpips. 
+# C'est très crado :-) ! RK.
+# Probablement que ce serait mieux de faire un make -n dans wpips pour
+# avoir l'instruction exacate à utiliser...
+wtest: all $(WPIPS_DEVEDIR)/wpips.o
+	$(LINK) wpips -L$(WPIPS_DEVEDIR) -L$(OPENWINHOME)/lib \\
+	\`perl -ne 'chop; if (\$\$trouve != 1) \\
+		{ /TARGET_OBJECTS/ && do {\$\$trouve = 1; print;}} \\
+		else { s/\x5c// && print || print && exit(0);};' \\
+		$(WPIPS_DEVEDIR)/config.makefile \\
+	| perl -ne 's/.*=//; s/[\\t\\r\\n \x5c]+/ /g; \\
+		s,([^ ]+),$(WPIPS_DEVEDIR)/\$\$1,g; print' \` \\
+	\`grep '^TARGET_LIB' $(WPIPS_DEVEDIR)/config.makefile \\
+		| sed -e 's/.*=/echo /' -e 's/[()]//g' | sh \`
+	@echo 
+
 $(LIB_TARGET): $(LIB_OBJECTS)
-	rm -f $(LIB_TARGET)
+	$(RM) $(LIB_TARGET)
 	$(ARCHIVE) $(LIB_TARGET) \`lorder $(LIB_OBJECTS) | tsort\`
 	ranlib $(LIB_TARGET)
 
@@ -237,7 +267,7 @@ install: $(INC_TARGET) $(LIB_TARGET)
 	then mkdir $(TARGETDIR) ; \\
 	fi
 	-cd $(TARGETDIR) ; sccs edit SCCS
-	rm -f $(TARGETDIR)/* pips
+	-$(RM) $(TARGETDIR)/* pips
 	cp $(SOURCES) $(TARGETDIR)
 	echo ""; echo; \\
 	echo -n "Description of changes: " ; \\
@@ -280,7 +310,7 @@ $(LIBDIR)/$(LIB_TARGET): $(LIB_TARGET)
 	ranlib $(LIBDIR)/$(LIB_TARGET)
 
 clean:
-	-rm -f TAGS $(OBJECTS) $(INC_TARGET) $(LIB_TARGET) $(BIN_TARGET) $(DERIVED_HEADERS) *.~[0-9]~\\
+	-$(RM) TAGS $(OBJECTS) $(INC_TARGET) $(LIB_TARGET) $(BIN_TARGET) $(DERIVED_HEADERS) *.~[0-9]~\\
 		$(LIB_IFILES)
 
 INC_CFILES = $(LIB_CFILES)
@@ -316,7 +346,7 @@ install: $(INC_TARGET) $(BIN_TARGET)
 	then mkdir $(TARGETDIR) ; \\
 	fi
 	-cd $(TARGETDIR) ; sccs edit SCCS
-	rm -f $(TARGETDIR)/*
+	-$(RM) $(TARGETDIR)/*
 	cp $(SOURCES) $(TARGETDIR)
 	echo ""; echo; \\
 	echo -n "Description of changes: " ; \\
@@ -354,7 +384,7 @@ quick-install: $(BINDIR)
 	cp $(BIN_TARGET) $(BINDIR)
 
 clean:
-	-rm -f TAGS $(OBJECTS) $(BIN_TARGET) $(INC_TARGET) $(DERIVED_HEADERS) *.~[0-9]~
+	-$(RM) TAGS $(OBJECTS) $(BIN_TARGET) $(INC_TARGET) $(DERIVED_HEADERS) *.~[0-9]~
 
 INC_CFILES = $(TARGET_CFILES)
 
@@ -396,25 +426,22 @@ $(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
 	$(UTILDIR)/cproto $(CPPFLAGS) $(INC_IFILES) \\
 		| sed -e 's/int __builtin_va_alist//' \\
 		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
-	rm -f *.i
+	$(RM) *.i
 	mv $(INC_TARGET).tmp $(INC_TARGET)
 
 depend: $(INC_TARGET) production-depend $(MAKEFILE)
 # Relance une compilation de $(INC_TARGET) en rajoutant la dependance sur les
 #	fichiers C :
-	PIPS_MAKE_DEPEND_CFILES="$(TARGET_CFILES)" $(MAKE) $(INC_TARGET)
+	PIPS_MAKE_DEPEND_CFILES="$(INC_CFILES)" $(MAKE) $(INC_TARGET)
 
-# Pas necessaire, mais bon...
-$(MAKEFILE): $(DERIVED_HEADERS) $(EXTERN)
-	$(MAKE) production-depend
 
 # Quand on cree le Makefile, il faut toujours le completer avec
 #	les dependances d''include :
 production-depend: $(DERIVED_HEADERS) $(EXTERN)
 	sed -n -e 's/^		*\$\$//; 1,/^### DO NOT DELETE THIS LINE./p;' < $(MAKEFILE) > $(MAKEFILE).new
-	-for file in $(CFILES) ; do /lib/cpp $(CPPFLAGS) -M \$\$file >> $(MAKEFILE).new; done;
+	-for file in $(CFILES) ; do $(PREPROC) -M \$\$file >> $(MAKEFILE).new; done;
 	cp $(MAKEFILE).new $(MAKEFILE)
-	rm -f $(MAKEFILE).new
+	$(RM) $(MAKEFILE).new
 
 ### DO NOT DELETE THIS LINE. USED FOR MAKE DEPEND
 %
