@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/03/23 17:44:22 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/03/25 17:45:53 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -37,6 +37,7 @@ extern int system();
 #include "pipsdbm.h"
 #include "resources.h"
 #include "effects.h"
+#include "semantics.h"
 #include "regions.h"
 #include "hpfc.h"
 #include "defines-local.h"
@@ -79,19 +80,44 @@ char *module_name;
     set_current_module_entity(module);
     set_current_module_statement
 	((statement) db_get_memory_resource(DBR_CODE, module_name, FALSE));
-    set_cumulated_effects_map
-	((statement_mapping) 
-	 db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, FALSE));
-    set_proper_effects_map
-	((statement_mapping) 
-	 db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, FALSE));
+    module_stat = get_current_module_statement();
+
+/*    set_cumulated_effects_map
+ *	((statement_mapping) 
+ *	 db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, FALSE));
+ *    set_proper_effects_map
+ *	((statement_mapping) 
+ *	 db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, FALSE));
+ */
+    /*
+     * Preconditions are loaded
+     */
+    set_precondition_map
+	((statement_mapping)
+	 db_get_memory_resource(DBR_PRECONDITIONS, module_name, FALSE));
+    /*
+     * Postconditions are computed
+     */
+    set_postcondition_map
+	(compute_postcondition(module_stat, 
+			       MAKE_STATEMENT_MAPPING(),
+			       get_precondition_map()));
+    /*
+     * Regions are loaded
+     */
     set_local_regions_map
 	((statement_mapping)
 	 db_get_memory_resource(DBR_REGIONS, module_name, FALSE));
-
-    module_stat = get_current_module_statement();
-
+    
+    /*
+     * Initialize mappings
+     */
     make_hpfc_current_mappings();
+    only_io_mapping_initialize(module_stat);
+    
+    /* HPFC-PACKAGE is used to put dummy variables in
+     */
+    (void) make_empty_program(HPFC_PACKAGE);
 
     /* what is to be done 
      * filter the source for the directives
@@ -212,6 +238,9 @@ char *module_name;
     reset_cumulated_effects_map();
     reset_proper_effects_map();
     reset_local_regions_map();
+
+    free_postcondition_map();
+    reset_postcondition_map();
 
     free_hpfc_current_mappings();
     debug_off();
