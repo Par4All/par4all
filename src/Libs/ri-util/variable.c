@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: variable.c,v $
+ * Revision 1.47  2003/06/19 07:25:35  nguyen
+ * Update calls to make_statement and make_variable with new RI for C
+ *
  * Revision 1.46  2003/06/17 11:46:05  irigoin
  * Update functions for new RI
  *
@@ -488,7 +491,7 @@ int c;
       make_functional(NIL, 
 		      make_type(is_type_variable, 
 				make_variable(make_basic(is_basic_int, (void*)sizeof(int)),
-					      NIL)));
+					      NIL,NIL)));
     type ct = make_type(is_type_functional, cf);
     ce = make_entity(strdup(cn), ct, MakeStorageRom(),
 		     make_value(is_value_constant, 
@@ -829,7 +832,7 @@ int kind;
     new_ent = make_entity(name,
     make_type(is_type_variable,
     make_variable(ba,
-    NIL)),
+    NIL,NIL)),
     make_storage(is_storage_rom, UU),
     make_value(is_value_unknown, UU));
   */
@@ -837,7 +840,7 @@ int kind;
   new_ent = make_entity(name,
 			make_type(is_type_variable,
 				  make_variable(ba,
-						NIL)),
+						NIL,NIL)),
 			storage_undefined,
 			make_value(is_value_unknown, UU));
   dynamic_area = global_name_to_entity(module_local_name(mod_ent),
