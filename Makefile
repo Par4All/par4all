@@ -306,8 +306,11 @@ install-static: lib-static
 	$(LN_S) $(LIBDIR)/$(PSTATIC) $(LIBDIR)/libpolylib$(BITS).a
 
 install-include:
-	$(mkinstalldirs) $(INCLUDEDIR)/polylib
-	$(INSTALL_DATA) ./include/polylib/*.h $(INCLUDEDIR)/polylib
+	if [ ! -d "$(INCLUDEDIR)/polylib" ]; then \
+		echo "Creating '$(INCLUDEDIR)/polylib' directory"; \
+		$(mkinstalldirs) $(INCLUDEDIR)/polylib ;\
+		$(INSTALL_DATA) ./include/polylib/* $(INCLUDEDIR)/polylib ;\
+	fi
 
 install-man:
 # to be done...
