@@ -65,7 +65,7 @@ list effects_filter(list l_effs, string str_filter)
     effect eff = EFFECT(CAR(ce));
     action ac = effect_action(eff);
     reference ref = effect_reference(eff);
-    list ls = effect_word_reference(ref);
+    list ls = effect_words_reference(ref);
     string t = words_to_string(ls);
     gen_free_string_list(ls);
     if (same_string_p(t, str_filter) && !action_read_p(ac))
