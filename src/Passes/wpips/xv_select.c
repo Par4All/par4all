@@ -1,10 +1,11 @@
-/* 	%A% ($Date: 1995/09/28 10:03:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/05 11:01:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1995/09/28 10:03:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1995/10/05 11:01:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -13,7 +14,6 @@ char vcid_xv_select[] = "%A% ($Date: 1995/09/28 10:03:55 $, ) version $Revision$
 #include <xview/notice.h>
 #include <xview/text.h>
 #include <types.h>
-#include <setjmp.h>
 
 #include "genC.h"
 #include "ri.h"
@@ -305,10 +305,11 @@ end_delete_program_notify(char * name)
          goto do_not_delete_the_workspace;
       
       /* First close the workspace: */
+      /* if close_program_notify(NULL, NULL); */
       close_program_notify(NULL, NULL);
    }
 
-   delete_program(name);
+   (void) delete_program(name);
 
   do_not_delete_the_workspace:
    enable_workspace_delete_or_open();
@@ -321,8 +322,7 @@ end_delete_program_notify(char * name)
 
 
 void
-cancel_delete_program_notify(Menu menu,
-                             Menu_item menu_item)
+cancel_delete_program_notify()
 {
    /* Nothing to do. */
    enable_workspace_delete_or_open();
@@ -370,6 +370,7 @@ start_create_program_notify(Menu menu,
     */
    if (db_get_current_program_name() != NULL)
       /* There is an open workspace: close it first: */
+      /* if close_program_notify((Menu) NULL, (Menu_item) NULL); */
       close_program_notify((Menu) NULL, (Menu_item) NULL);
 
    disable_workspace_delete_or_open();
@@ -404,25 +405,16 @@ continue_create_program_notify(char * name)
 {
    char *fortran_list[ARGS_LENGTH];
    int fortran_list_length = 0;
-   extern jmp_buf pips_top_level;
 
-   if( setjmp(pips_top_level) ) {
-      cancel_create_program_notify(NULL, NULL);
-      return(FALSE);
+   /* Is the name a valid workspace name? */
+   if (! workspace_name_p(name)) {
+      user_prompt_not_a_valid_workspace_name(name);
    }
    else {
-      /* Is the name a valid workspace name? */
-      if (! workspace_name_p(name)) {
-         user_prompt_not_a_valid_workspace_name(name);
-         /* Heavy weight ! :-) */
-         longjmp(pips_top_level, 1);
-      }
-   
       pips_get_fortran_list(&fortran_list_length, fortran_list);
 
       if (fortran_list_length == 0) {
          prompt_user("No Fortran files in this directory");
-         longjmp(pips_top_level, 1);
       }
       else {
          /* Code added to confirm for a database destruction before
@@ -448,7 +440,7 @@ continue_create_program_notify(char * name)
                                    NOTICE_BUTTON_NO,   "No, cancel",
                                    NULL);
             if (result == NOTICE_NO)
-               longjmp(pips_top_level, 1);
+               goto continue_create_program_notify_failed;
          }
 
          disable_workspace_create_or_open();
@@ -477,6 +469,12 @@ continue_create_program_notify(char * name)
          return(TRUE);
       }
    }
+
+   /* If it failed, cancel the creation: */
+  continue_create_program_notify_failed:
+   cancel_create_program_notify(NULL, NULL);
+   
+   return FALSE;
 }
 
 
@@ -497,26 +495,42 @@ end_create_program_notify(int * pargc,
 {
    /* Is the name a valid workspace name? */
    if (workspace_name_p(workspace_name_to_create)) {
-      db_create_workspace(workspace_name_to_create);
-      open_log_file();
-      display_memory_usage();
-   
-      create_program(pargc, argv);
-      enable_workspace_close();
+      /* if (db_create_workspace(workspace_name_to_create)) { */
+      db_create_workspace(workspace_name_to_create); {
+         /* The create workspace has been successful: */
+         open_log_file();
+         display_memory_usage();
+         
+         /* if (create_program(pargc, argv)) { */
+         create_program(pargc, argv);
+         if (TRUE) {
+            /* The processing of user files has been successful: */
+            enable_workspace_close();
 
-      show_program();
-      select_a_module_by_default();
-      enable_module_selection();
-      disable_change_directory();
+            show_program();
+            select_a_module_by_default();
+            enable_module_selection();
+            disable_change_directory();
+            
+            enable_workspace_create_or_open();
+            enable_workspace_delete_or_open();
+            
+            display_memory_usage();
+         
+            return;
+         }
+         else
+            close_log_file();
+      }
    }
-   else {
+   else
       user_prompt_not_a_valid_workspace_name(workspace_name_to_create);
-      enable_change_directory();
-   }
-   
+
+   /* The creation failed: */
+   enable_change_directory();
    enable_workspace_create_or_open();
    enable_workspace_delete_or_open();
-     
+   
    display_memory_usage();
 }
 
@@ -586,38 +600,46 @@ open_program_notify(Menu menu,
               db_get_current_program_name(),
               end_open_program_notify,
               cancel_open_program_notify);
-
-      /* FI/RK: too early; we are not sure to successfully open the workspace
-       * xv_set(module_item, MENU_INACTIVE, FALSE, 0);
-       */
    }
    args_free(&program_list_length, program_list);
 }
 
 
-void
+success
 close_program_notify(Menu menu,
                      Menu_item menu_item)
 {
+   success return_value;
+   
+   /* if (close_program()) { */
    close_program();
-   close_log_file();
+   if (TRUE) {
+      /* The close has been successful: */
+      close_log_file();
 
-   edit_close_notify(menu, menu_item);
+      edit_close_notify(menu, menu_item);
 
-   show_program();
-   show_module();
+      show_program();
+      show_module();
 
-   enable_workspace_create_or_open();
-   disable_workspace_close();
+      enable_workspace_create_or_open();
+      disable_workspace_close();
    
-   /* It is the only place to enable a directory change, after a close
-      workspace: */
-   enable_change_directory();
+      /* It is the only place to enable a directory change, after a close
+         workspace: */
+      enable_change_directory();
 
-   disable_module_selection();
-   
+      disable_module_selection();
+
+      return_value = TRUE;
+   }
+   else
+      return_value = FALSE;
+  
    hide_window(schoose_frame);
    display_memory_usage();
+
+   return return_value;
 }
 
 
@@ -647,6 +669,7 @@ open_or_create_workspace(char * workspace_name_original)
       
    if (db_get_current_program_name() != NULL)
       /* There is an open workspace: close it first: */
+      /* if close_program_notify((Menu) NULL, (Menu_item) NULL); */
       close_program_notify((Menu) NULL, (Menu_item) NULL);
 
    /* To choose between open or create, look for the an existing
