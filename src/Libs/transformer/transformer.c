@@ -401,8 +401,12 @@ cons * args;
 	MAPL(cea, { entity e = ENTITY(CAR(cea));
 		    if(base_contains_variable_p(r->base, (Variable) e)) {
 			/* r = sc_projection(r, (Variable) e); */
+			/*
                         sc_projection_along_variable_ofl_ctrl(&r, (Variable) e,
                                                               NO_OFL_CTRL);
+							      */
+                        sc_projection_along_variable_ofl_ctrl(&r, (Variable) e,
+                                                              OFL_CTRL);
 			sc_base_remove_variable(r,(Variable) e);}},
 	     args);
 	r->dimension = vect_size(r->base);
@@ -420,7 +424,11 @@ cons * args;
 
 	/* update the relation and the arguments field for t */
 
-	/* the relation is updated by side effect FI ? */
+	/* Is the relation updated by side effect?
+	 * Yes, in general. No if the system is non feasible
+	 */
+
+	predicate_system(transformer_relation(t)) = r;
 
 	/* replace the old arguments by the new one */
 	free_arguments(transformer_arguments(t));
@@ -533,7 +541,8 @@ entity e2;
 }
 
 /* Return true if statement s is reachable according to its precondition. */
-bool statement_feasible_p(statement s)
+static bool parametric_statement_feasible_p(statement s,
+					    bool empty_p(transformer))
 {
     transformer pre;
     bool feasible_p;
@@ -542,25 +551,53 @@ bool statement_feasible_p(statement s)
 
     ifdebug(6) {
 	int so = statement_ordering(s);
-	debug(6, "statement_feasible_p",
+	debug(6, "parametric_statement_feasible_p",
 	      "Begin for statement %d (%d,%d) and precondition 0x%x\n",
 	      statement_number(s),
 	      ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
 	      (unsigned int) pre);
     }
 
-    feasible_p = !transformer_empty_p(pre);
+    feasible_p = !empty_p(pre);
 
-    debug(6, "statement_feasible_p", " End with feasible_p = %d\n",
+    debug(6, "parametric_statement_feasible_p", " End with feasible_p = %d\n",
 	  feasible_p);
 
     return feasible_p;
 }
 
-/* If TRUE is returned, the transformer certainly is empty. If FALSE is returned,
- * the transformer still might be empty, but it's not too likely...
+/* Return FALSE if precondition of statement s is transformer_empty() */
+bool statement_weakly_feasible_p(statement s)
+{
+    transformer pre = load_statement_precondition(s);
+    bool feasible_p = !transformer_empty_p(pre);
+
+    return feasible_p;
+}
+
+/* Return true if statement s is reachable according to its precondition. */
+bool statement_feasible_p(statement s)
+{
+    bool feasible_p = parametric_statement_feasible_p(s, transformer_empty_p);
+    return feasible_p;
+}
+
+/* Return true if statement s is reachable according to its precondition. */
+bool statement_strongly_feasible_p(statement s)
+{
+    bool feasible_p =
+	parametric_statement_feasible_p(s, transformer_strongly_empty_p);
+    return feasible_p;
+}
+
+/* If TRUE is returned, the transformer certainly is empty.
+ * If FALSE is returned,
+ * the transformer still might be empty, it all depends on the normalization
+ * procedure power. Beware of its execution time!
  */
-bool transformer_empty_p(transformer t)
+static bool parametric_transformer_empty_p(transformer t,
+					   Psysteme (*normalize)(Psysteme,
+								 char * (*)(Variable)))
 {
     /* FI: the arguments seem to have no impact on the emptiness
      * (i.e. falseness) of t
@@ -573,11 +610,11 @@ bool transformer_empty_p(transformer t)
     /* empty_p = !sc_faisabilite(ps); */
     /* empty_p = !sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL, TRUE); */
 
-    /* Normalize the transformer, use all "reasonnable" equations to reduce the problem
+    /* Normalize the transformer, use all "reasonnable" equations
+     * to reduce the problem
      * size, check feasibility on the projected system
      */
-    new_ps = sc_strong_normalize_and_check_feasibility2
-	(new_ps, sc_normalize, (char * (*)(Variable)) external_value_name, 2);
+    new_ps = normalize(new_ps, (char * (*)(Variable)) external_value_name);
 
     if(SC_EMPTY_P(new_ps)) {
 	empty_p = TRUE;
@@ -587,6 +624,26 @@ bool transformer_empty_p(transformer t)
 	empty_p = FALSE;
     }
 
+    return empty_p;
+}
+
+/* If TRUE is returned, the transformer certainly is empty.
+ * If FALSE is returned,
+ * the transformer still might be empty, but it's not too likely...
+ */
+bool transformer_empty_p(transformer t)
+{
+    bool empty_p = parametric_transformer_empty_p(t, sc_strong_normalize4);
+    return empty_p;
+}
+
+/* If TRUE is returned, the transformer certainly is empty.
+ * If FALSE is returned,
+ * the transformer still might be empty, but it's not likely at all...
+ */
+bool transformer_strongly_empty_p(transformer t)
+{
+    bool empty_p = parametric_transformer_empty_p(t, sc_strong_normalize5);
     return empty_p;
 }
 
