@@ -316,12 +316,12 @@ alias_pairs( string module_name, list l_reg )
 					  db_get_memory_resource(DBR_CODE,
 								 module_name,
 								 TRUE) );
-
+/*
 	    set_precondition_map( (statement_mapping) 
 				  db_get_memory_resource(DBR_PRECONDITIONS,
 							 module_name,
 							 TRUE) );
-
+							 */
 	    set_cumulated_rw_effects((statement_effects)
 				     db_get_memory_resource(
 					 DBR_CUMULATED_EFFECTS,
@@ -336,7 +336,7 @@ alias_pairs( string module_name, list l_reg )
 	    print_inout_regions(list_regions_callee);
 
 	    reset_current_module_statement();
-	    reset_precondition_map();
+/*	    reset_precondition_map(); */
 
 	    reset_cumulated_rw_effects();
 	}
