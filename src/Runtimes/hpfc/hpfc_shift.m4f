@@ -1,6 +1,6 @@
 c
 c $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-c ($Date: 1995/09/25 17:45:23 $, )
+c ($Date: 1995/12/01 11:43:53 $, )
 c
 c
       subroutine hpfc_tdim(array, dim, template, tdim)
@@ -14,7 +14,8 @@ c
       do i=1, NODIMT(template)
          if (ALIGN(array,i,1).eq.dim) tdim=i
       enddo
-      debug(`print *, "hpfc_tdim ", array, dim, template, tdim')
+      debug(write (unit=0, fmt=*)
+     $     "hpfc_tdim ", array, dim, template, tdim)
       end
 c
 c
@@ -29,7 +30,8 @@ c
       do i=1, NODIMP(procs)
          if (DIST(template,i,1).eq.tdim) pdim=i
       enddo
-      debug(`print *, "hpfc_pdim ", template, tdim, procs, pdim')
+      debug(write (unit=0, fmt=*)
+     $     "hpfc_pdim ", template, tdim, procs, pdim)
       end
 c
 c
@@ -105,7 +107,8 @@ c
      $     * (n-RANGEP(procs, pdim, 1)+1) - 1
      $     + RANGET(template, tdim, 1)
      $     - ALIGN(array, tdim,  3)) / ALIGN(array, tdim, 2)
-      debug(`print *, procs, "[", pdim, "](", n,  ") last ", last')
+      debug(write (unit=0, fmt=*)
+     $     procs, "[", pdim, "](", n,  ") last ", last)
       end
 c
 c computes the relative lid 
@@ -140,7 +143,8 @@ c
       integer nlb, nub, llb, pdim, procs, tdim, template
       integer glb, gub, glbd, gubd, p1, p2, last
 c
-      debug(`print *, "hpfc_shift array/dim/area: ", array, dim, lb, ub')
+      debug(write (unit=0, fmt=*)
+     $     "hpfc_shift array/dim/area: ", array, dim, lb, ub)
       call hpfc_tdim(array, dim, template, tdim)
       call hpfc_pdim(template, tdim, procs, pdim)
       call hpfc_loop_bounds(nlb, nub, llb, lb, ub, array, pdim)
@@ -154,7 +158,7 @@ c
          lb2=1
          ub2=0
          lid2=-1
-         debug(`print *, "hpfc_shift, nothing for ", MYLID')
+         debug(write (unit=0, fmt=*) "hpfc_shift, nothing for ", MYLID)
          return
       endif
       glb = llb+1
@@ -185,8 +189,8 @@ c only one target
          ub2=nub
          call hpfc_cmp_lid(procs, pdim, p2, lid2)
       endif
-      debug(`print *, "hpfc_shift, for ", MYLID,
-     $     ": ", lb1, ub1, lid1, lb2, ub2, lid2')
+      debug(write (unit=0, fmt=*) "hpfc_shift, for ", MYLID,
+     $     ": ", lb1, ub1, lid1, lb2, ub2, lid2)
       end
 c
 c after packing functions
@@ -240,8 +244,8 @@ c
             call HPFC_LOOP_BOUNDS
      $           (l(i), u(i), tmp, il(i), iu(i), 
      $            an, hpfc_proc_dim(an, i))
-            debug(`print *, MYLID, " dim ", i, " bounds: ",
-     $           l(i), u(i)')
+            debug(write (unit=0, fmt=*) MYLID, " dim ", i, " bounds: ",
+     $           l(i), u(i))
          else
             call hpfc_shift
      $           (an, dim, il(i), iu(i), sh,
@@ -258,7 +262,7 @@ c
       enddo
       do j=1, 2
          if (lid(j).eq.MYLID) then
-            debug(`print *, MYLID, " copying shift"')
+            debug(write (unit=0, fmt=*) MYLID, " copying shift")
 c
 c the SHIFT is local
 c         
@@ -268,7 +272,8 @@ REVERSE_REPLICATE(LEVEL,`DO_LOOP')
 SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
          else
             if (lid(j).gt.0) then
-               debug(`print *, MYLID, " sending shift to ", lid(j)')
+               debug(write (unit=0, fmt=*)
+     $              MYLID, " sending shift to ", lid(j))
 c
 c the SHIFT is to another processor
 c
@@ -296,7 +301,8 @@ c
 c
        do j=1, 2
           if (lid(j).gt.0.and.lid(j).ne.MYLID) then
-             debug(`print *, MYLID, " receiving shift from ", lid(j)')
+             debug(write (unit=0, fmt=*) 
+     $            MYLID, " receiving shift from ", lid(j))
 c
 c the SHIFT is to another processor
 c
