@@ -131,6 +131,7 @@ void free_evalue_refs(evalue *e) {
     value_clear(e->x.n);
     return; 
   }  
+  value_clear(e->d);
   p = e->x.p;
   if (!p) return;	/* null pointer */
   for (i=0; i<p->size; i++) {
