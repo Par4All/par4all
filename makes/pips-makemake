@@ -3,13 +3,7 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
-# Revision 1.286  1997/05/23 12:43:45  coelho
-# *** empty log message ***
-#
-# Revision 1.285  1997/05/23 12:41:11  coelho
-# *** empty log message ***
-#
-# Revision 1.284  1997/05/23 12:20:45  coelho
+# Revision 1.287  1997/05/29 16:27:24  coelho
 # *** empty log message ***
 #
 # Revision 1.276  1997/03/28 07:13:52  coelho
@@ -369,7 +363,7 @@ TYPECHECK=\$(LINT) \$(LINTFLAGS) \$(CPPFLAGS) \$(LINT_LIBS)
 PARSE=	  \$(YACC) \$(YFLAGS) \$(YOPT)
 ARCHIVE=  \$(AR) \$(ARFLAGS)
 PROTOIZE= \$(PROTO) \$(PRFLAGS) -E "\$(PREPROC)"
-M4FILTER= \$(M4) \$(M4FLAGS) \$(M4OPT)
+M4FILTER= \$(M4) \$(M4OPT) \$(M4FLAGS)
 MAKEDEP=  \$(CC) \$(CMKDEP) \$(CPPFLAGS) \$(CPPOPT) \$(CANSI) \$(CFLAGS) \$(COPT)
 #
 # for easy debugging... e.g. gmake ECHO='something' echo
