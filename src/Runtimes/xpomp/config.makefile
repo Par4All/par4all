@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/04 09:58:32 $ 
+# $Date: 1996/09/04 10:02:40 $ 
 
 # expected from makefile macros
 ifeq ($(FC),g77)
@@ -45,9 +45,12 @@ INSTALL_HTM=	xpomp_manual
 # 
 # compilation and so
 
+DRUN =	$(LIB) $(BIN) $(ARCH)/fractal $(ARCH)/test_xpomp $(ARCH)/wave
+DDOC =	$(INSTALL_DOC) xpomp_manual.html xpomp_manual/fractal.f
+
 all: run doc
-run: $(LIB) $(BIN) fractal test_xpomp wave
-doc: $(INSTALL_DOC) xpomp_manual.html xpomp_manual/fractal.f
+run: $(DRUN)
+doc: $(DDOC)
 
 xpomp_manual/fractal.f: xpomp_manual.html
 	cp fractal.f xpomp_manual
@@ -76,9 +79,8 @@ $(ARCH)/wave : $(ARCH)/wave.o $(LIB)
 
 clean: local-clean
 local-clean:
-	$(RM) cgraphic.c $(ARCH)/*.o $(BIN) $(LIB) $(ARCH)/fractal $(ARCH)/test_xpomp
-	$(RM) -r xpomp_manual xpomp_manual.html xpomp_manual.ps \
-		xpomp_manual.dvi
+	$(RM) cgraphic.c $(ARCH)/*.o $(DRUN) xpomp_manual.dvi
+	$(RM) -r $(DDOC) 
 
 # that is all
 #
