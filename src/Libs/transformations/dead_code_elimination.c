@@ -72,36 +72,38 @@ display_dead_code_statistics()
 	elimination_count += dead_code_unstructured_if_removed
 	    + dead_code_unstructured_if_replaced_by_its_effect;
 	
-	if (elimination_count > 0) {
-	    user_log("* %d dead code part%s %s been discarded. *\n",
-		     elimination_count,
-		     elimination_count > 1 ? "s" : "",
-		     elimination_count > 1 ? "have" : "has");
-
-	    user_log("Statements removed (directly dead): %d\n",
-		     dead_code_statement_removed);
-	
-	    user_log("Loops: loops removed: %d, loops executed only once: %d\n",
-		     dead_code_loop_removed, dead_code_loop_executed_once);
-	
-	    user_log("Structured tests: \"if\" removed: %d, "
-		     "\"if\" replaced by side effects: %d\n"
-		     "\t(\"then\" removed: %d, "
-		     "\"else\" removed: %d)\n",
-		     dead_code_if_removed, dead_code_if_replaced_by_its_effect,
-		     dead_code_if_true_branch_removed,
-		     dead_code_if_false_branch_removed);
-	
-	    user_log("Unstructured tests: \"if\" removed: %d, \"if\" replaced by side effects: %d\n"
-		     "\t(unstructured \"then\" removed: %d, "
-		     "unstructured \"else\" removed: %d)\n",
-		     dead_code_unstructured_if_removed,
-		     dead_code_unstructured_if_replaced_by_its_effect,
-		     dead_code_unstructured_if_true_branch_removed,
-		     dead_code_unstructured_if_false_branch_removed);
-	    /* Display also the statistics about clean_up_sequences
-               that is called in suppress_dead_code: */
-	    display_clean_up_sequences_statistics();
+	if (elimination_count > 0) 
+	{
+	  user_log("* %d dead code part%s %s been discarded. *\n",
+		   elimination_count,
+		   elimination_count > 1 ? "s" : "",
+		   elimination_count > 1 ? "have" : "has");
+	  
+	  user_log("Statements removed (directly dead): %d\n",
+		   dead_code_statement_removed);
+	  
+	  user_log("Loops: loops removed: %d, loops executed only once: %d\n",
+		   dead_code_loop_removed, dead_code_loop_executed_once);
+	  
+	  user_log("Structured tests: \"if\" removed: %d, "
+		   "\"if\" replaced by side effects: %d\n"
+		   "\t(\"then\" removed: %d, "
+		   "\"else\" removed: %d)\n",
+		   dead_code_if_removed, dead_code_if_replaced_by_its_effect,
+		   dead_code_if_true_branch_removed,
+		   dead_code_if_false_branch_removed);
+	  
+	  user_log("Unstructured tests: \"if\" removed: %d, "
+		   "\"if\" replaced by side effects: %d\n"
+		   "\t(unstructured \"then\" removed: %d, "
+		   "unstructured \"else\" removed: %d)\n",
+		   dead_code_unstructured_if_removed,
+		   dead_code_unstructured_if_replaced_by_its_effect,
+		   dead_code_unstructured_if_true_branch_removed,
+		   dead_code_unstructured_if_false_branch_removed);
+	  /* Display also the statistics about clean_up_sequences
+	     that is called in suppress_dead_code: */
+	  display_clean_up_sequences_statistics();
 	}
     }
 }
