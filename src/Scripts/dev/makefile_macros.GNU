@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.GNU,v $
+# Revision 1.30  1997/05/14 08:33:54  coelho
+# use bsd files...
+#
 # Revision 1.29  1997/04/15 12:10:22  coelho
 # -pedantic-errors...
 #
@@ -18,6 +21,7 @@ CFLAGS	= -g -O2 -ansi -pedantic-errors -Wall -pipe
 CMKDEP	= -M
 CPPFLAGS= \
 	-D__USE_FIXED_PROTOTYPES__ \
+	-D__USE_BSD \
 	-I. \
 	-I$(NEWGEN_ROOT)/Include \
 	-I$(LINEAR_ROOT)/Include \
