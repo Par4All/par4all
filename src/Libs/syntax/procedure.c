@@ -275,7 +275,7 @@ EndOfProcedure()
 
     ifdebug(5){
 	fprintf(stderr, "Parser: checking callees consistency = %d\n",
-		gen_consistent_p( make_callees( called_modules ))) ;
+		callees_consistent_p( make_callees( called_modules ))) ;
     }
 
     /*  remove hpfc special routines if required.
@@ -313,7 +313,7 @@ EndOfProcedure()
     
     ifdebug(5) {
 	fprintf(stderr, "Parser: checking code consistency = %d\n",
-		gen_consistent_p( function_body )) ;
+		statement_consistent_p( function_body )) ;
     }
 
     DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE, 
@@ -632,7 +632,7 @@ MakeExternalFunction(
 		 * which is going to be freed later with e
 		 */
 		type new_r = type_undefined;
-		new_r = gen_copy_tree(r);
+		new_r = copy_type(r);
 		r = new_r;
 	    }
 	}
@@ -757,7 +757,7 @@ MakeFormalParameter(entity fp, int nfp)
     pips_assert("type is undefined", entity_type(fp) == type_undefined);
 
     if(SubstituteAlternateReturnsP() && ReturnCodeVariableP(fp)) {
-	entity_type(fp) = MakeTypeVariable(make_basic(is_basic_int, 4), NIL);
+	entity_type(fp) = MakeTypeVariable(make_basic(is_basic_int, (void *) 4), NIL);
     }
     else {
 	entity_type(fp) = ImplicitType(fp);
