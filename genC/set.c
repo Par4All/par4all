@@ -197,14 +197,11 @@ set_empty_p(
     return TRUE;
 }
 
-/* a set-based implementation of gen_closure
- * that does not go twice in the same object.
- * FC 27/10/95.
- */
 void
-gen_set_closure(
-    void (*iterate)(char *, set),
-    set initial)
+gen_set_closure_iterate(
+    void (*iterate)(char*, set),
+    set initial,
+    bool dont_iterate_twice)
 {
     set curr, next, seen;
     set_type t = initial->type;
@@ -218,14 +215,34 @@ gen_set_closure(
     while (!set_empty_p(curr))
     {
 	SET_MAP(x, iterate(x, next), curr);
-	(void) set_union(seen, seen, curr);
-	set_difference(curr, next, seen);
-	set_clear(next);
+	if (dont_iterate_twice)
+	{
+	    (void) set_union(seen, seen, curr);
+	    set_difference(curr, next, seen);
+	    set_clear(next);
+	}
+	else
+	{
+	    set_assign(curr, next);
+	}
     }
 
     set_free(curr);
     set_free(seen);
     set_free(next);
+
+}
+
+/* a set-based implementation of gen_closure
+ * that does not go twice in the same object.
+ * FC 27/10/95.
+ */
+void
+gen_set_closure(
+    void (*iterate)(char *, set),
+    set initial)
+{
+    gen_set_closure_iterate(iterate, initial, TRUE);
 }
 
 int
