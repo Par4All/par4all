@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/09/22 13:14:29 $, )
+ * ($Date: 1995/09/22 14:41:43 $, )
  */
 
 #include "defines-local.h"
@@ -66,7 +66,7 @@ static void add_statement_to_clean(statement s)
  */
 GENERIC_STATIC_STATUS(/**/, the_dynamics, list, NIL, gen_free_list)
 
-void add_a_dynamic(entity c)
+static void add_a_dynamic(entity c)
 {
     the_dynamics = gen_once(c, the_dynamics);
 }
@@ -75,62 +75,6 @@ void add_a_dynamic(entity c)
  *  scanning the AST with gen_recurse.
  */
 DEFINE_LOCAL_STACK(current_stmt, statement)
-
-/* recognize an hpf directive special entity.
- * (the prefix of which is HPF_PREFIX, as a convention)
- * both functions are available, based on the name and on the entity.
- */
-bool hpf_directive_string_p(string s)
-{
-    return strncmp(HPF_PREFIX, s, strlen(HPF_PREFIX))==0;
-}
-
-bool hpf_directive_entity_p(entity e)
-{
-    return top_level_entity_p(e) && 
-	hpf_directive_string_p(entity_local_name(e));
-}
-
-bool realign_directive_p(entity f)
-{
-    return top_level_entity_p(f) && 
-	same_string_p(HPF_PREFIX REALIGN_SUFFIX, entity_local_name(f));
-}
-
-bool redistribute_directive_p(entity f)
-{
-    return top_level_entity_p(f) && 
-	same_string_p(HPF_PREFIX REDISTRIBUTE_SUFFIX, entity_local_name(f));
-}
-
-bool fcd_directive_string_p(string s)
-{
-    return same_string_p(s, HPF_PREFIX SYNCHRO_SUFFIX) ||
-	   same_string_p(s, HPF_PREFIX TIMEON_SUFFIX) ||
-	   same_string_p(s, HPF_PREFIX TIMEOFF_SUFFIX) ;
-}
-
-bool fcd_directive_p(entity f)
-{
-    return top_level_entity_p(f) &&
-	fcd_directive_string_p(entity_local_name(f));
-}
-
-/* whether an entity must be kept in the code.
- * if so, a maybe fake source code must be supplied, 
- * and the directive will be kept in the callee list.
- * not kept if some property tells not to...
- */
-bool keep_directive_in_code_p(string s)
-{
-    return fcd_directive_string_p(s) &&
-	!(same_string_p(s, HPF_PREFIX SYNCHRO_SUFFIX) && 
-	  get_bool_property(FCD_IGNORE_PREFIX "SYNCHRO")) &&
-	!(same_string_p(s, HPF_PREFIX TIMEON_SUFFIX) &&
-	  get_bool_property(FCD_IGNORE_PREFIX "TIME")) &&
-	!(same_string_p(s, HPF_PREFIX TIMEOFF_SUFFIX) &&
-	  get_bool_property(FCD_IGNORE_PREFIX "TIME")) ;
-}
 
 /* management of PROCESSORS and TEMPLATE directives.
  *
