@@ -185,7 +185,7 @@ statement loop_chunk_size_and_strip_mine(cons *lls)
 /* Top-level function
  */
 
-void strip_mine(char *mod_name)
+bool strip_mine(char *mod_name)
 {
     statement mod_stmt;
     char lp_label[6];
@@ -194,16 +194,18 @@ void strip_mine(char *mod_name)
     debug_on("STRIP_MINE_DEBUG_LEVEL");
 
     /* Get the loop label form the user */
-    resp = user_request("Which loop do you want to strip_mine?\n(give its label): ");
+    resp = user_request("Which loop do you want to strip_mine?\n"
+			"(give its label): ");
     sscanf(resp, "%s", lp_label);
     selected_label = find_label_entity(mod_name, lp_label);
     if (selected_label==entity_undefined) {
 	user_error("strip_mine", "loop label `%s' does not exist\n", lp_label);
     }
 
-    /* DBR_CODE will be changed: argument "pure" should take FALSE but this would be useless
-       since there is only *one* version of code; a new version will be put back in the
-       data base after strip_mineing */
+    /* DBR_CODE will be changed: argument "pure" should take FALSE but
+       this would be useless since there is only *one* version of code;
+       a new version will be put back in the data base after
+       strip_mineing */
     mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
     look_for_nested_loop_statements(mod_stmt,loop_chunk_size_and_strip_mine,
@@ -217,4 +219,5 @@ void strip_mine(char *mod_name)
     debug(2,"strip_mine","done for %s\n", mod_name);
     debug_off();
 
+    return TRUE;
 }
