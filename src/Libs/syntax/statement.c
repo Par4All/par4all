@@ -1466,7 +1466,8 @@ check_first_statement()
 	*/
 
 	/* clean up the declarations */
-	update_common_sizes();
+	/* Common sizes are not yet known because ComputeAddresses() has not been called yet */
+	/* update_common_sizes(); */
 
 	/* It might seem logical to perform these calls from EndOfProcedure()
 	 * here. But at least ComputeAddresses() is useful for implictly 
