@@ -1,6 +1,10 @@
 /* package sc */
 
 #include <stdio.h>
+#include <stddef.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 #include "assert.h"
 #include "boolean.h"
@@ -97,63 +101,66 @@ Psysteme * ps;
     return(!syst_syntax_error);
 }
 
-/* void sc_dump(Psysteme sc): impression d'un systeme
- * de contraintes sans passer de fonction pour calculer le nom
- * des variables (cf. sc_fprint()).
+/* void sc_dump(Psysteme sc): dump to stderr
  *
  * Ancien nom: sc_fprint() (modifie a cause d'un conflit avec une autre
  * fonction sc_fprint d'un profil different)
  *
+ * using variable_dump_name(); lost of original variables' names
+ * Better use sc_default_name(Psysteme) or sc_default_dump_to_file(...)
+ * DN(5/8/2002) 
  */
-
 void sc_dump(sc)
 Psysteme sc;
 {
     if(!SC_UNDEFINED_P(sc)) {
 
-      (void) fprintf(stderr,"Better use sc_default_name(/*Psysteme*/) "); 
-      (void) fprintf(stderr,"Or sc_default_dump_to_file(...) \n");
-      	(void) fprintf(stderr,"DIMENSION: %d  ",sc->dimension);
+       	(void) fprintf(stderr,"#DIMENSION: (%d)  ",sc->dimension);
 	(void) fprintf(stderr,"INEGALITES (%d)  ",sc_nbre_inegalites(sc));
 	(void) fprintf(stderr,"EGALITES (%d)  ",sc_nbre_egalites(sc));
-	(void) fprintf(stderr,"\nVAR ");
-	
+	(void) fprintf(stderr,"\nVAR ");	
 	base_fprint(stderr,sc->base, variable_dump_name);
-	(void) fprintf(stderr,"  {\n ");
+	(void) fprintf(stderr,"  {\n");
 	inegalites_fprint(stderr,sc->inegalites, variable_dump_name);
-	egalites_fprint(stderr,sc->egalites, variable_dump_name);
-	
+	egalites_fprint(stderr,sc->egalites, variable_dump_name);	
 	(void) fprintf(stderr,"  }\n");
     }
     else
 	(void) fprintf(stderr, "SC_RN ou SC_EMPTY ou SC_UNDEFINED\n");
 }
-//sc_default_dump is now more compatible as possible with sc_fscan
-//print with name of variables from default_variable_to_string
-//print to stderr
 
+/* void sc_default_dump(Psysteme sc): dump to stderr
+ *
+ * sc_default_dump is now compatible with sc_fscan
+ * using default_variable_to_string (stored by LINEAR. see sc_debug.c)
+ * DN(5/8/2002) 
+ */
 void sc_default_dump(sc)
 Psysteme sc;
 {
     if(!SC_UNDEFINED_P(sc)) {
-	(void) fprintf(stderr,"DIMENSION: %d  ",sc->dimension);
+	(void) fprintf(stderr,"#DIMENSION: %d  ",sc->dimension);
 	(void) fprintf(stderr,"INEGALITES (%d)  ",sc_nbre_inegalites(sc));
 	(void) fprintf(stderr,"EGALITES (%d)  ",sc_nbre_egalites(sc));
-	(void) fprintf(stderr,"\nVAR ");
-	
+	(void) fprintf(stderr,"\nVAR ");	
 	base_fprint(stderr,sc->base, default_variable_to_string);
-	(void) fprintf(stderr,"  {\n ");
+	(void) fprintf(stderr,"  {\n");
 	inegalites_fprint(stderr,sc->inegalites, default_variable_to_string);
-	egalites_fprint(stderr,sc->egalites, default_variable_to_string);
-	
+	egalites_fprint(stderr,sc->egalites, default_variable_to_string);	
 	(void) fprintf(stderr,"  }\n");
     }
     else
 	(void) fprintf(stderr, "SC_RN ou SC_EMPTY ou SC_UNDEFINED\n");
 }
-// Print all the system of constraints into one output file named sc_dump.out
-// If the file doesn't exist, create then. duong
-// Print with a label and name (maybe by number) of the system explaining the reason why
+
+/* void sc_default_dump_to_file(Psysteme sc, label, sc_nb,filename): 
+ *
+ * compatible with sc_fscan
+ * Print the system of constraints into a file with a name given
+ * Print with a label and name (maybe by number) of the system.
+ * using default_variable_to_string (stored by LINEAR. see sc_debug.c)
+ * DN(5/8/2002) 
+ */
 void sc_default_dump_to_file(sc, label, sc_nb,filename)
 Psysteme sc;
 char * label;
@@ -162,23 +169,19 @@ char * filename;
 {
   FILE * f;
 
-    if (filename == NULL) filename = "noname.out";
-   
+    if (filename == NULL) filename = "noname.out";   
     if ((f = fopen(filename,"a")) != NULL) {
       
-      (void) fprintf(f,"%s %d th \n",label,sc_nb);
-      
+      (void) fprintf(f,"#%s %d \n",label,sc_nb);      
       if(!SC_UNDEFINED_P(sc)) {
-	(void) fprintf(f,"DIMENSION: %d  ",sc->dimension);
+	(void) fprintf(f,"#DIMENSION (%d)  ",sc->dimension);
 	(void) fprintf(f,"INEGALITES (%d)  ",sc_nbre_inegalites(sc));
 	(void) fprintf(f,"EGALITES (%d)  ",sc_nbre_egalites(sc));
-	(void) fprintf(f,"\nVAR ");
-	
+	(void) fprintf(f,"\nVAR ");	
 	base_fprint(f,sc->base, default_variable_to_string);
 	(void) fprintf(f,"  {\n ");
 	inegalites_fprint(f,sc->inegalites, default_variable_to_string);
-	egalites_fprint(f,sc->egalites, default_variable_to_string);
-	
+	egalites_fprint(f,sc->egalites, default_variable_to_string);	
 	(void) fprintf(f,"  }\n");
       }
       else {
@@ -187,13 +190,65 @@ char * filename;
       fclose(f);
     }
     else {
-      fprintf(stderr,"Ouverture du fichier %s impossible\n",
-		    filename);
+      fprintf(stderr,"Ouverture du fichier %s impossible\n", filename);
     }    
 }
 
+/* void sc_default_dump_to_files(Psysteme sc, sc_nb,directory_name):
+ *
+ * Print the system of constraints into several output files in a directory with names given
+ * Each file is 100% compatible with sc_fscan
+ * print with name of variables from default_variable_to_string
+ * overwrite if files exist
+ * DN(10/2/2003) 
+ */
+void sc_default_dump_to_files(sc, sc_nb,directory_name)
+Psysteme sc;
+int sc_nb;
+char *directory_name;
+{
+  FILE * f;
+  int d,n;
+  char *fn,*tmp,*filename;
+  
+  filename = "_sc.out";
+  if (directory_name==NULL) {directory_name = "SC_OUT_DEFAULT";}  
+  d = chdir(directory_name);
+  if (d) {
+    mkdir(directory_name,S_IRWXU);
+    d = chdir(directory_name);
+  }   
+  tmp = fcvt((double) sc_nb,0,&d,&n);
+  fn = strcat(tmp,filename);
+   
+  if ((f = fopen(fn,"w")) != NULL) {
+    if(!SC_UNDEFINED_P(sc)) {
+      (void) fprintf(f,"#DIMENSION (%d)  ",sc->dimension);
+      (void) fprintf(f,"INEGALITES (%d)  ",sc_nbre_inegalites(sc));
+      (void) fprintf(f,"EGALITES (%d)  ",sc_nbre_egalites(sc));
+      (void) fprintf(f,"VAR ");
+	
+      base_fprint(f,sc->base, default_variable_to_string);
+      (void) fprintf(f,"  {\n ");
+      inegalites_fprint(f,sc->inegalites, default_variable_to_string);
+      egalites_fprint(f,sc->egalites, default_variable_to_string);      
+      (void) fprintf(f,"  }\n");
+    }
+    else {
+      (void) fprintf(f, "SC_RN ou SC_EMPTY ou SC_UNDEFINED\n");
+    }
+    fclose(f);
+  } else {
+    fprintf(stderr,"Ouverture du fichier %s impossible\n",fn);
+  }    
+  chdir("..");    
+}
 
-/* void sc_print() */
+/* void sc_print() 
+ *
+ * Better use sc_default_dump()
+ *
+ */
 void sc_print(ps, nom_var)
 Psysteme ps;
 char * (*nom_var)();
@@ -217,6 +272,8 @@ char * (*nom_var)();
  *  - pourquoi n'utilise-t-on pas inegalites_fprint (et egalites_fprint)
  *    pour ne pas reproduire un boucle inutile? Sont-elles compatibles avec
  *    la routine de lecture d'un systeme?
+ *
+ * DN:  Better use sc_default_dump(sc) or sc_default_dump_to_file(sc, label, sc_nb,filename)
  */
 void sc_fprint(fp, ps, nom_var)
 FILE *fp;
@@ -251,8 +308,3 @@ char * (*nom_var)(Variable);
     else
 	(void) fprintf(fp,"(nil)\n");
 }
-
-
-
-
-
