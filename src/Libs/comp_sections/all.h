@@ -4,11 +4,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "linear.h"
+
 /*{{{  newgen includes*/
 #include "genC.h"
 #include "ri.h"
 #include "database.h"
-#include "newgen_hash.h"
 
 /*}}}*/
 
@@ -28,15 +29,11 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "constants.h"
-#include "graph.h"
+/*#include "graph.h"*/
 #include "dg.h"
-#include "paf_ri.h"
 #include "text.h"
 #include "text-util.h"
 #include "misc.h"
-#include "paf-util.h"
-#include "static_controlize.h"
-
 
 #include "control.h"
 #include "constants.h"
