@@ -1,7 +1,7 @@
 /*
  * $Id$
  * 
- * Unix wrapper around tpips for jpips, for signal management.
+ * UNIX wrapper around tpips for jpips, for signal management.
  * Under special comments on the pipe, signals are sent to tpips.
  * I could not use popen() because I found no way to access the pid
  * of the child process. Basically this is a re-implementation of popen().
@@ -10,24 +10,39 @@
  * stdin TPIPS -w [stdout -> stdin] TPIPS stdout
  *
  *
- *       -> OutputStream/stdin TPIPS -w stdout/stdin -> TPIPS -> stdout/--+
- * JPIPS                                                                  |
- *       <- InputStream/<-------------------------------------------------+
+ * The full picture with jpips:
  *
+ *                                         -> kill/signal ->
+ *       -> OutputStream/stdin -> TPIPS -w -> out/stdin   ->
+ * JPIPS                                                     TPIPS
+ *       <- InputStream/stdout <----------------------------
+ *
+ *
+ * What we might have some day:
+ *
+ * tty <-> EMACS <-> JPIPS > TPIPS -W s> TPIPS <-> XTERM 
+ *                         <---------------+
  *
  * @author Fabien Coelho (with some advises from Ronan Keryell)
  *
  * $Log: wrapper.c,v $
+ * Revision 1.2  1998/05/27 14:49:12  coelho
+ * stdout of wrapper not used any more.
+ *
  * Revision 1.1  1998/05/27 10:30:50  coelho
  * Initial revision
  *
  */
 
+/* UNIX headers.
+ */
 #include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>
 #include <errno.h>
 
+/* Standard C headers.
+ */
 #include <stdio.h>
 #include <string.h>
 
@@ -142,10 +157,14 @@ static void tpw_set_sig_handlers(void)
     (void) signal(SIGPIPE, tpw_sig_handler);
 }
 
+static FILE * in_from_wrapper = NULL;
+static FILE * out_to_tpips = NULL;
+
 /* fork, with stdout-stdin link kept
  * @return the created pid.
  * should be in_from_jpips instead of stdin?
  * what about out_to_jpips and the wrapper???
+ * fdopen() might be of some help.
  */
 static pid_t tpw_fork_inout(void)
 {
@@ -165,30 +184,37 @@ static pid_t tpw_fork_inout(void)
    {
        /* CHILD
 	*/
-       tpw_check(dup2(filedes[0], 0), "dup2()");  /* in -> stdin */
+       in_from_wrapper = fdopen(filedes[0], "r");
+       if (!in_from_wrapper) tpw_check(-1, "fdopen()");
+       
+       tpw_check(dup2(filedes[0], 0), "dup2()"); /* stdin = in_from_wrapper; */
    }
    else
    {
        /* PARENT 
 	*/
-       tpw_check(dup2(filedes[1], 1), "dup2()"); /* out -> stdout */
+       out_to_tpips = fdopen(filedes[1], "w");
+       if (!out_to_tpips) tpw_check(-1, "fdopen()");
+   }
+
+   if (process) 
+   {
+       /* the output might be interleaved with tpips output...
+	* maybe I should lock stderr.
+	*/
+       fprintf(stderr, WRAPPER "started, tpips pid is %d\n", (int) process);
+       fflush(stderr);
    }
 
    tpw_log("tpw_fork_inout() done");
 
-   /* if (process) 
-   {
-       fprintf(stdout, WRAPPER "started for tpips (pid=%d)\n", (int) process);
-       fflush(stdout);
-   } */
-
    return process;
 }
 
-/* @return a line from "in", or NULL of EOF.
+/* @return a line from "in", or NULL at EOF.
  * @caution a pointer to a static buffer is returned!
  */
-static char * tpw_readline(FILE * in)
+static char * tpw_read_line(FILE * in)
 {
     static char buffer[SIZE]; 
     int c=0, i=0;
@@ -202,6 +228,21 @@ static char * tpw_readline(FILE * in)
     return buffer;
 }
 
+/* send line to tpips.
+ */
+static void tpw_send_string_to_tpips(char * line)
+{
+    if (!out_to_tpips) 
+	tpw_fatal_error("no out_to_tpips");
+
+    fputs(line, out_to_tpips);
+    fflush(out_to_tpips);
+    
+    /* could send a signal to tpips to warn about the incoming command.
+     * it would be read from in_from_wrapper only.
+     */
+}
+
 /* fork a tpips to goes on, while the current process acts as a wrapper,
  * which forwards orders, and perform some special signal handling.
  */
@@ -211,22 +252,26 @@ void tpips_wrapper(void)
 
     tpips_pid = tpw_fork_inout();
 
-    /* the child is a new tpips 
-     * the parent just acts as a wrapper.
+    /* the child is a new tpips, it keeps on executing...
+     * the parent just acts as a wrapper, it never returns from here.
      */
-    if (tpips_pid==0) return; 
+    if (tpips_pid==0) return; /* CHILD is tpips and returns. */
 
+    /* code for the WRAPPER starts here. the PARENT.
+     */
+
+    /* special handlers.
+     */
     tpw_set_sig_handlers();
 
-    while ((line = tpw_readline(stdin)))
+    while ((line = tpw_read_line(stdin)))
     {
 	/* forward to tpips.
 	 * how to ensure that tpips is alive?
-	 * SIGCHLD and SIGPIPE caught.
+	 * SIGCHLD and SIGPIPE are caught.
 	 */
-	fputs(line, stdout);
-	fflush(stdout);
-	
+	tpw_send_string_to_tpips(line);
+
 	/* handle signals.
 	 */
 	if (starts_with(line, SIGNAL_TAG))
