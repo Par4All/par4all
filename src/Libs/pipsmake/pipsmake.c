@@ -3,12 +3,17 @@
  * 
  * pipsmake: call by need (make),
  * rule selection (activate),
- * explicit call (apply)
+ * explicit call (apply/capply)
  *
  * Remi Triolet, Francois Irigoin, Pierre Jouvelot, Bruno Baron,
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.60  1997/12/05 19:39:03  coelho
+ * cleaned a lot.
+ * automatic checkpoints added for CA.
+ * massive memory leak of real_resources (all of them;-) fixed.
+ *
  * Revision 1.59  1997/12/05 16:36:43  coelho
  * checkpoint moved to openclose.c
  *
@@ -95,8 +100,6 @@ static bool (*get_builder(string name))(char *)
     return NULL;
 }
 
-
-
 /*********************************************** UP TO DATE RESOURCES CACHE */
 
 /* FI: make is very slow when interprocedural analyzes have been selected;
@@ -140,6 +143,10 @@ reinit_make_cache_if_necessary()
 
 static bool rmake(string, string);
 
+#define add_res(vrn, on)					\
+  result = gen_nconc(result, CONS(REAL_RESOURCE, 		\
+      make_real_resource(strdup(vrn), strdup(on)), NIL));
+
 /* Translate and expand a list of virtual resources into a potentially 
  * much longer list of real resources
  *
@@ -148,56 +155,45 @@ static bool rmake(string, string);
 static list 
 build_real_resources(string oname, list lvr)
 {
-    cons *pvr, *ps;
-    list result = NIL;
+    list pvr, result = NIL;
 
-    for (pvr = lvr; pvr != NIL; pvr = CDR(pvr)) {
+    for (pvr = lvr; pvr != NIL; pvr = CDR(pvr))
+    {
 	virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
 	string vrn = virtual_resource_name(vr);
 	tag vrt = owner_tag(virtual_resource_owner(vr));
 
-	switch (vrt) {
+	switch (vrt) 
+	{
 	    /* FI: should be is_owner_workspace, but changing Newgen decl... */
 	case is_owner_program:
 	    /* FI: for  relocation of workspaces */
-	    result = gen_nconc(result, CONS(REAL_RESOURCE, 
-					    make_real_resource(vrn, ""),
-					    NIL));
+	    add_res(vrn, "");
 	    break;
 
 	case is_owner_module:
-	    result = gen_nconc(result, 
-			       CONS(REAL_RESOURCE, 
-				    make_real_resource(vrn, oname),
-				    NIL));
+	    add_res(vrn, oname);
 	    break;
 
 	case is_owner_main:
 	{
-	    int i;
 	    int number_of_main = 0;
 	    gen_array_t a = db_get_module_list();
-	    int nmodules = gen_array_nitems(a);
 
-	    pips_assert("some modules...", nmodules>0);
-	    for(i=0; i<nmodules; i++) {
-		string on = gen_array_item(a, i);
-
+	    GEN_ARRAY_MAP(on, 
+	    {
 		if (entity_main_module_p
 		    (local_name_to_top_level_entity(on)) == TRUE)
 		{
 		    if (number_of_main)
-			pips_error("build_real_resources",
-				   "More the one main\n");
-
+			pips_internal_error("More the one main\n");
+		    
 		    number_of_main++;
-		    debug(8, "build_real_resources", "Main is %s\n", on);
-		    result = gen_nconc(result, 
-				       CONS(REAL_RESOURCE, 
-				       make_real_resource(vrn, strdup(on)),
-					    NIL));
+		    pips_debug(8, "Main is %s\n", on);
+		    add_res(vrn, on);
 		}
-	    }
+	    },
+		a);
 
 	    gen_array_full_free(a);
 	    break;
@@ -209,27 +205,24 @@ build_real_resources(string oname, list lvr)
 
 	    if (!rmake(DBR_CALLEES, oname)) {
 		/* FI: probably missing source code... */
-		user_error ("build_real_resources",
-			    "unable to build callees for %s\n%s\n",
-			    oname, "Some source code probably is missing!");
+		pips_user_error("unable to build callees for %s\n"
+				"Some source code probably is missing!\n",
+				 oname);
 	    }
 	    
 	    called_modules = (callees) 
 		db_get_memory_resource(DBR_CALLEES, oname, TRUE);
-	    lcallees = callees_callees(called_modules);
+	    lcallees = gen_copy_string_list(callees_callees(called_modules));
+	    
+	    pips_debug(8, "Callees of %s are:\n", oname);
+	    MAP(STRING, on, 
+	    {
+		pips_debug(8, "\t%s\n", on);
+		add_res(vrn, on);
+	    },
+		lcallees);
+	    gen_free_string_list(lcallees);
 
-	    debug(8, "build_real_resources", "Callees of %s are:\n", oname);
-
-	    for (ps = lcallees; ps != NIL; ps = CDR(ps)) {
-		string on = STRING(CAR(ps));
-
-		debug(8, "build_real_resources", "\t%s\n", on);
-
-		result = gen_nconc(result, 
-				   CONS(REAL_RESOURCE, 
-					make_real_resource(vrn, on),
-					NIL));
-	    }
 	    break;
 	}
 	case is_owner_callers:
@@ -248,36 +241,29 @@ build_real_resources(string oname, list lvr)
 
 	    caller_modules = (callees) 
 		db_get_memory_resource(DBR_CALLERS, oname, TRUE);
-	    lcallers = callees_callees(caller_modules);
+	    lcallers = gen_copy_string_list(callees_callees(caller_modules));
 
-	    debug(8, "build_real_resources", "Callers of %s are:\n", oname);
+	    pips_debug(8, "Callers of %s are:\n", oname);
 
-	    for (ps = lcallers; ps != NIL; ps = CDR(ps)) {
-		string on = STRING(CAR(ps));
-
-		debug(8, "build_real_resources", "\t%s\n", on);
-
-		result = gen_nconc(result, 
-				   CONS(REAL_RESOURCE, 
-					make_real_resource(vrn, on),
-					NIL));
-	    }
+	    MAP(STRING, on,
+	    {
+		pips_debug(8, "\t%s\n", on);
+		add_res(vrn, on);
+	    },
+		lcallers);
+	    gen_free_string_list(lcallers);
 	    break;
 	}
 	case is_owner_all:
 	{
 	    gen_array_t modules = db_get_module_list();
-	    int nmodules = gen_array_nitems(modules), i;
 
-	    pips_assert("some modules", nmodules>0);
-	    for(i=0; i<nmodules; i++) {
-		string on = gen_array_item(modules, i);
+	    GEN_ARRAY_MAP(on, 
+	    {
 		pips_debug(8, "\t%s\n", on);
-		result = gen_nconc(result, 
-				   CONS(REAL_RESOURCE, 
-					make_real_resource(vrn, strdup(on)),
-					NIL));
-	    }
+		add_res(vrn, on);
+	    },
+		modules);
 
 	    gen_array_full_free(modules);
 	    break;
@@ -325,12 +311,14 @@ update_preserved_resources(string oname, rule ru)
 	}
     }, reals);
 
-    gen_free_list (reals);
+    gen_full_free_list (reals);
 }
 
 static bool 
 apply_a_rule(string oname, rule ru)
 {
+    static int number_of_applications_of_a_rule = 0;
+
     double initial_memory_size = 0.;
     string run = rule_phase(ru), rname, rowner;
     bool first_time = TRUE, success_p = TRUE,
@@ -338,11 +326,24 @@ apply_a_rule(string oname, rule ru)
 	 print_memory_usage_p = get_bool_property("LOG_MEMORY_USAGE"),
 	 check_res_use_p = get_bool_property("CHECK_RESOURCE_USAGE");
     bool (*builder) (char*) = get_builder(run);
+    int frequency = get_int_property("PIPSMAKE_CHECKPOINTS");
+    list lrp;
+
+    /* periodically checkpoints the workspace if required.
+     */
+    number_of_applications_of_a_rule++;
+    if (frequency>0 && number_of_applications_of_a_rule>=frequency)
+    {
+	checkpoint_workspace();
+	number_of_applications_of_a_rule = 0;
+    }
 
     /* output the message somewhere...
      */
+    lrp = build_real_resources(oname, rule_produced(ru));
     MAP(REAL_RESOURCE, rr, 
     {
+	list lr = build_real_resources(oname, rule_required(ru));
 	bool is_required = FALSE;
 	rname = real_resource_resource_name(rr);
 	rowner = real_resource_owner_name(rr);
@@ -356,14 +357,18 @@ apply_a_rule(string oname, rule ru)
 		break;
 	    }
 	}, 
-	    build_real_resources(oname, rule_required(ru)));
+	    lr);
+
+	gen_full_free_list(lr);
 
 	user_log("  %-30.60s %8s   %s(%s)\n", 
 		 first_time == TRUE ? (first_time = FALSE,run) : "",
 		 is_required == TRUE ? "updating" : "building",
 		 rname, rowner);
     }, 
-	build_real_resources(oname, rule_produced(ru)));
+	lrp);
+
+    gen_full_free_list(lrp);
 
     if (check_res_use_p)
 	init_resource_usage_check();
@@ -450,15 +455,14 @@ find_rule_by_resource(string rname)
 		    pips_debug(5, "made by phase %s\n", rule_phase(r));
 
 		    /* is this phase an active one ? */
-		    MAPL(pp, {
-			if (same_string_p(STRING(CAR(pp)), rule_phase(r))) {
-			    debug(5, "find_rule_by_resource",
-				  "active phase\n");
+		    MAP(STRING, pps, {
+			if (same_string_p(pps, rule_phase(r))) {
+			    pips_debug(5, "active phase\n");
 			    return(r);
 			}
 		    }, makefile_active_phases(m));
 
-		    debug(5, "find_rule_by_resource", "inactive phase\n");
+		    pips_debug(5, "inactive phase\n");
 		}
 	    }, rule_produced(r));
 	}
@@ -618,10 +622,13 @@ rmake(string rname, string oname)
 		    rname,oname);
     } else {
 	bool success = FALSE;
+	list lr;
 
 	/* we build the resource */
 	success = apply_a_rule(oname, ru);
 	if (!success) return FALSE;
+
+	lr = build_real_resources(oname, rule_produced(ru));
 
 	/* set up-to-date all the produced resources for that rule */
 	MAP(REAL_RESOURCE, rr,
@@ -642,7 +649,10 @@ rmake(string rname, string oname)
 		pips_internal_error("resource %s(%s) just built not found!\n",
 				    rname, oname);
 	    }
-	}, build_real_resources(oname, rule_produced(ru)));
+	}, 
+	    lr);
+
+	gen_full_free_list(lr);
     }
     return TRUE;
 }
@@ -706,7 +716,8 @@ make_required(string oname, rule ru)
     reals = build_real_resources(oname, rule_required(ru));
 
     /* we recursively make required resources */
-    MAP(REAL_RESOURCE, rr, {
+    MAP(REAL_RESOURCE, rr, 
+    {
 	string rron = real_resource_owner_name(rr);
 	string rrrn = real_resource_resource_name(rr);
 	
@@ -726,7 +737,7 @@ make_required(string oname, rule ru)
 	
     }, reals);
 
-    gen_free_list (reals);
+    gen_full_free_list (reals);
     return success_p;
 }
 
@@ -790,8 +801,8 @@ check_physical_resource_up_to_date(string rname, string oname)
 	  }
       }, reals2);
 
-    gen_free_list (virtuals);
-    gen_free_list (reals2);
+    gen_full_free_list (virtuals);
+    gen_full_free_list (reals2);
 
     /* If the rule is in the modified list, then
        don't check anything */
@@ -826,7 +837,7 @@ check_physical_resource_up_to_date(string rname, string oname)
     }
   }, reals);
 
-  gen_free_list (reals);
+  gen_full_free_list (reals);
 
   /* If the resource is up to date then add it in the set */
   if (result == TRUE) {
@@ -842,9 +853,10 @@ int
 delete_obsolete_resources(void)
 {
     int ndeleted;
-    init_make_cache();
+    bool cache_off = set_undefined_p(up_to_date_resources);
+    if (cache_off) init_make_cache();
     ndeleted =db_delete_obsolete_resources(check_physical_resource_up_to_date);
-    reset_make_cache();
+    if (cache_off) reset_make_cache();
     return ndeleted;
 }
 
@@ -968,7 +980,7 @@ do_resource_usage_check(string oname, rule ru)
 
     /* Try to find an illegally read resrouce ... */
     SET_MAP(re,	user_log("resource %s has been read\n", re), res_read);
-    gen_free_list(reals);
+    gen_full_free_list(reals);
 
     /* build the real produced resources */
     reals = build_real_resources(oname, rule_produced (ru));
@@ -994,7 +1006,7 @@ do_resource_usage_check(string oname, rule ru)
 	user_log ("resource %s has been written\n", re);
     }, res_write);
 
-    gen_free_list(reals);
+    gen_full_free_list(reals);
 
     set_clear(res_read);
     set_clear(res_write);
