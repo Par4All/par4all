@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/19 10:55:23 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/20 13:13:21 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -886,14 +886,8 @@ gen_chunk *obj ;
 struct gen_binding *bp ;
 {
     if( IS_INLINABLE(bp )) {
-	if( *bp->name == 's' && obj->s) {
-
-	    /* some side effect: constants are not freed...
-	     * thus no core dump with the shared use of string_undefined...
-	     * ??? hmmm... neither portable nor clean:-(
-	     */
-	    free( obj->s ) ; 
-	}
+	if( *bp->name == 's' && obj->s && !string_undefined_p(obj->s))
+	    free(obj->s); 
 	return ;
     }
     else
@@ -1065,14 +1059,16 @@ gen_full_free_list(
 
 static hash_table copy_table = NULL;/* maps an object on its copy */
 
-gen_chunk *copy_hsearch(key)
-gen_chunk *key;
+static gen_chunk *
+copy_hsearch(gen_chunk *key)
 {
     gen_chunk *p ;
 
-    if( key == (gen_chunk *)NULL || key == (gen_chunk *)HASH_UNDEFINED_VALUE) {
-	return( key ) ;
-    }
+    /* special cases... */
+    if(!key || string_undefined_p((char*)key) ||
+       key == (gen_chunk *)HASH_UNDEFINED_VALUE)
+	return key;
+
     if ((p=(gen_chunk *)hash_get( copy_table, (char *)key ))==
 	(gen_chunk *)HASH_UNDEFINED_VALUE) {
 	fatal( "[copy_hsearch] bad key: %s\n", itoa( (int) key ));
@@ -1080,12 +1076,14 @@ gen_chunk *key;
     return(p);
 }
     
-void copy_hput( t, k, v )
-hash_table t ;
-char *k, *v ;
+static void 
+copy_hput(
+    hash_table t,
+    char *k, 
+    char *v)
 {
     if( k != (char *) HASH_UNDEFINED_VALUE && k != (char *) NULL)
-	hash_put( t, k, v ) ;
+	hash_put(t, k, v) ;
 }
 
 
@@ -1094,49 +1092,35 @@ char *k, *v ;
    by the call to memcpy. remaining sub-domains require further processing
 */
 
-static int copy_obj_in(obj, dr)
+static int 
+copy_obj_in(obj, dr)
 gen_chunk *obj ;
 struct driver *dr ;
 {
-    int size;
-    gen_chunk *new_obj;
     struct gen_binding *bp = &Domains[quick_domain_index( obj ) ] ;
 
-    if (shared_obj( obj, gen_null, gen_null ))
-	    return 0;
+    /* if (shared_obj( obj, gen_null, gen_null )) return 0;*/
 
-    /* FI: hash_get() theoretically is useless because shared_obj()
-     * should be enough to avoid duplicate copies.
-     * Also shared_obj is useless because of the copy table kept?...
-     */
-    if ((gen_chunk *)hash_get( copy_table, (char *)obj )==
-	(gen_chunk *)HASH_UNDEFINED_VALUE) {
-	/* memory is allocated to duplicate the object referenced by obj */
-	size = gen_size(bp)*sizeof(gen_chunk);
+    if (!hash_defined_p(copy_table, (char*) obj))
+    {
+	/* memory is allocated to duplicate the object referenced by obj 
+	 */
+	gen_chunk *new_obj;
+	int size = gen_size(bp)*sizeof(gen_chunk);
 	new_obj = (gen_chunk *)alloc(size);
 
-	/* the object obj is copied into the new one
-	 * ??? what should be done about the approximate use
-	 * of string_undefined defined as a value is not clear...
+	/* thus content is copied, thus no probleme with inlined and so
+	 * and newgen domain number.
 	 */
-	if (IS_INLINABLE(bp) && strcmp(bp->name, "string")==0)
-	{
-	    new_obj->s = obj->s ? strdup(obj->s) : (char *) 0 ;
-	}
-	else /* the value is copied */
-	{
-	    (void) memcpy((char *) new_obj, (char *) obj, size);
-	}
-	
-	/* hash table copy_table is updated */
+	(void) memcpy((char *) new_obj, (char *) obj, size);
+
+	/* hash table copy_table is updated 
+	 */
 	copy_hput(copy_table, (char *)obj, (char *)new_obj);
-	return 1;
+	return TRUE;
     }
-    /* FI: I'd like to return 0, but this would not be consistent
-     * with shared_obj. Let's do it anyway to avoid recursing uselessly
-     * downwards with gen_trav_obj().
-     */
-    return 0;
+
+    return FALSE;
 }
 
 /* Just check for defined simple domains. */
@@ -1171,12 +1155,19 @@ copy_simple_in(
 /* COPY_LEAF_OUT manages external sub-domains. warning: the test
    IS_EXTERNAL cannot be applied on an inlined sub-domain */
 
-static void copy_leaf_out(obj,bp) 
+static void 
+copy_leaf_out(obj,bp) 
 gen_chunk *obj ;
 struct gen_binding *bp ;
 {
-    if (IS_INLINABLE(bp))
-	    return;
+    if (IS_INLINABLE(bp)) 
+    {
+	if (*bp->name=='s' && obj->s && !string_undefined_p(obj->s) &&
+	    !hash_defined_p(copy_table, obj->s))
+	    copy_hput(copy_table, obj->s, strdup(obj->s));
+
+	return;
+    }
 		
     if (IS_EXTERNAL(bp)) {
 	if (bp->domain->ex.copy == NULL) {
@@ -1236,7 +1227,8 @@ union domain *dp ;
    contained in the old array. the second argument is the domain pointer of
    the old array */
 
-gen_chunk *gen_copy_array(old_a, dp)
+gen_chunk *
+gen_copy_array(old_a, dp)
 gen_chunk *old_a;
 union domain *dp ;
 {
@@ -1313,7 +1305,7 @@ union domain *dp ;
 
 #define COPYABLE_DOMAIN(d) \
 ( d->ba.type != BASIS_DT || \
- (!IS_INLINABLE( d->ba.constructand ) && \
+ (!(IS_INLINABLE(d->ba.constructand) && (*d->ba.constructand->name!='s')) && \
   !IS_TABULATED( d->ba.constructand )))
 
 static void
@@ -1398,7 +1390,7 @@ struct driver *dr ;
 static gen_chunk *
 gen_local_copy_tree(
     gen_chunk *obj, 
-    bool keep) /* whether to keep the copy and sharing tables... */
+    bool keep) /* whether to keep the copy tables... */
 {
     gen_chunk *copy;
     struct driver dr ;
@@ -1421,18 +1413,18 @@ gen_local_copy_tree(
     {
 	old_copy_table = copy_table;
 	copy_table = hash_table_make( hash_pointer, 0 ) ;
-	push_gen_trav_env() ;
+	/* push_gen_trav_env() ; */
     }
 
     /* actual job. First sharing is computed, then the recursion.
      */
-    shared_pointers(obj, keep);
+    /* shared_pointers(obj, keep); */
     gen_trav_obj(obj, &dr) ;
-    copy = copy_hsearch( (char *)obj ) ;
+    copy = copy_hsearch(obj) ;
 
     if (!keep)
     {	
-	pop_gen_trav_env() ;
+	/* pop_gen_trav_env() ; */
 	hash_table_free(copy_table);
 	copy_table = old_copy_table;
     }
@@ -1692,15 +1684,22 @@ struct gen_binding *bp ;
 	char *format = bp->inlined->C_format ;
 
 	if( strcmp( bp->name, UNIT_TYPE_NAME ) == 0 ) 
-		(void) fprintf( user_file, format ) ;
+	    (void) fprintf( user_file, format ) ;
 	else if( strcmp( bp->name, "bool" ) == 0 )
-		(void) fprintf( user_file, format, obj->b ) ;
+	    (void) fprintf( user_file, format, obj->b ) ;
 	else if( strcmp( bp->name, "int" ) == 0 ) 
-		(void) fprintf( user_file, format, obj->i ) ;
+	    (void) fprintf( user_file, format, obj->i ) ;
 	else if( strcmp( bp->name, "float" ) == 0 )
-		(void) fprintf( user_file, format, obj->f ) ;
+	    (void) fprintf( user_file, format, obj->f ) ;
 	else if( strcmp( bp->name, "string" ) == 0 )
-		write_string( "\"", obj->s, "\"" ) ;
+	{
+	    /* special management of string_undefined... FC.\
+	     */
+	    string s = obj->s;
+	    write_string( "\"", 
+			 string_undefined_p(s) ? disk_string_undefined : s,
+			 "\"" ) ;
+	}
 	else fatal( "write_leaf_in: Don't know how to print %s\n", bp->name ) ;
 	(void) fprintf( user_file, " " ) ;
     }
