@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: hpfc.c,v $ ($Date: 1995/03/24 15:02:13 $, ) version $Revision$,
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/03/27 16:28:36 $, ) version $Revision$,
  * got on %D%, %T%
  */
  
@@ -290,7 +290,6 @@ string name;
     debug(1, "hpfc_init", "considering workspace %s\n", name);
 
     set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
-    set_bool_property("HPFC_NO_WARNING", TRUE);     /* silent */
     set_bool_property("PRETTYPRINT_HPFC", TRUE);
 
     init_hpfc_status();
@@ -313,7 +312,8 @@ string name;
     debug(1, "hpfc_directives", "considering module %s\n", name);
 
     if (!hpfc_entity_reduction_p(module) &&
-	!hpf_directive_entity_p(module))
+	!hpf_directive_entity_p(module) &&
+	!fortran_library_entity_p(module))
     {
 	set_current_module_entity(module);
 	load_hpfc_status();
@@ -349,7 +349,8 @@ string name;
     debug(1, "hpfc_compile", "considering module %s\n", name);
 
     if (!hpfc_entity_reduction_p(module) &&
-	!hpf_directive_entity_p(module))
+	!hpf_directive_entity_p(module) &&
+	!fortran_library_entity_p(module))
     {
 	load_hpfc_status();
 	set_current_module_entity(module);
