@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/11/24 16:44:00 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1995/12/19 15:52:32 $, ) 
  * version $Revision$
  */
 
@@ -271,7 +271,7 @@ entity e;
 static Psysteme hpfc_compute_align_constraints(e)
 entity e;
 {
-    align al = load_entity_align(e);
+    align al = load_hpf_alignment(e);
     entity template = align_template(al);
     Psysteme new_system = sc_new();
     int i;
@@ -321,7 +321,7 @@ entity e;
 Psysteme hpfc_compute_unicity_constraints(e)
 entity e;
 {
-    align al = load_entity_align(e);
+    align al = load_hpf_alignment(e);
     entity template = align_template(al);
     Psysteme new_system = sc_new();
     int i;
@@ -367,14 +367,10 @@ entity e;
 static Psysteme hpfc_compute_distribute_constraints(e)
 entity e;
 {
-    Psysteme
-	new_system = sc_new();
-    distribute
-	di = load_entity_distribute(e);
-    entity
-	proc = distribute_processors(di);
-    list
-	ld = distribute_distribution(di);
+    Psysteme new_system = sc_new();
+    distribute di = load_hpf_distribution(e);
+    entity proc = distribute_processors(di);
+    list ld = distribute_distribution(di);
     int j, i;
     
     pips_assert("template", entity_template_p(e));
@@ -516,7 +512,7 @@ entity array;
 	 entity lalpha = get_ith_local_dummy(dim),
 	        alpha = get_ith_array_dummy(dim);
 
-	 switch (new_declaration(array, dim))
+	 switch (new_declaration_tag(array, dim))
 	 {
 	 case is_hpf_newdecl_none:
 	     /* LALPHAi == ALPHAi
@@ -778,8 +774,8 @@ entity v;
 
     pips_assert("distributed array", array_distributed_p(v));
 
-    t = align_template(load_entity_align(v)),
-    p = distribute_processors(load_entity_distribute(t));    
+    t = align_template(load_hpf_alignment(v)),
+    p = distribute_processors(load_hpf_distribution(t));    
 
     result = sc_append(result, entity_to_declaration_constraints(v));
     result = sc_append(result, entity_to_declaration_constraints(t));
