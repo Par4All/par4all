@@ -92,7 +92,7 @@ representation of reference of the form \verb+A[I+5]+. The reference
 expression has already been parsed to find all the items.
 
 
-\domain{vectorElement = vector:entity x element:int}
+\domain{vectorElement = statement:simdStatementInfo x vectorIndex:int x element:int}
 {}
 
 \domain{statementArgument = expression x dependances:vectorElement*}
