@@ -10,7 +10,6 @@
 #include <xview/panel.h>
 #include <xview/text.h>
 #include <xview/svrimage.h>
-#include <types.h>
 
 #include "genC.h"
 #include "ri.h"
@@ -18,6 +17,7 @@
 #include "database.h"
 
 #include "misc.h"
+#include "ri-util.h"
 #include "pipsdbm.h"
 
 #include "wpips.h"
