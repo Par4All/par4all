@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/12 17:33:33 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/13 10:01:41 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -280,15 +280,15 @@ include $CONFIG_FILE
 LIB_OBJECTS:=$(addprefix $(ARCH)/, $(LIB_OBJECTS))
 #
 # {C,CPP,LD,L,Y}opt macros allow to *add* things from the command line
-# as gmake CPPopt="-DFOO=bar" ... that will be added to the defaults
-# a typical interesting example is to put -pg in {C,LD}opt
+# as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
+# a typical interesting example is to put -pg in {C,LD}OPT
 #
-PREPROC=	$(CC) -E $(CPPFLAGS) $(CPPopt) $(TARGET_ARCH)
-COMPILE=	$(CC) $(CFLAGS) $(Copt) $(CPPFLAGS) $(CPPopt) $(TARGET_ARCH) -c
-LINK=		$(LD) $(LDFLAGS) $(LDopt) -o
-SCAN=		$(LEX) $(LFLAGS) $(Lopt) -t
+PREPROC=	$(CC) -E $(CPPFLAGS) $(CPPOPT) $(TARGET_ARCH)
+COMPILE=	$(CC) $(CFLAGS) $(COPT) $(CPPFLAGS) $(CPPOPT) $(TARGET_ARCH) -c
+LINK=		$(LD) $(LDFLAGS) $(LDOPT) -o
+SCAN=		$(LEX) $(LFLAGS) $(LOPT) -t
 TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
-PARSE=		$(YACC) $(YFLAGS) $(Yopt)
+PARSE=		$(YACC) $(YFLAGS) $(YOPT)
 ARCHIVE=	$(AR) $(ARFLAGS)
 # struct _iobuf -> FILE for sun headers that would not look nice.
 PROTOIZE=	$(PROTO) $(PRFLAGS) -E "$(PREPROC)"
