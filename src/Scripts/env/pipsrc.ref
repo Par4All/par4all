@@ -2,8 +2,8 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
-# Revision 1.125  1997/08/19 19:48:44  coelho
-# suggested (in comment) addition to LD_LIBRARY_PATH
+# Revision 1.126  1997/08/20 06:49:13  coelho
+# LD_LIBRARY_PATH added.
 #
 # Revision 1.124  1997/08/06 08:01:54  coelho
 # default arch . -> GNUSOL1; some variables switched to lower case.
@@ -28,6 +28,17 @@
 
 set -a
 
+
+
+#
+#           ##    #####    ####   #    #
+#          #  #   #    #  #    #  #    #
+#         #    #  #    #  #       ######
+#         ######  #####   #       #    #
+#         #    #  #   #   #    #  #    #
+#         #    #  #    #   ####   #    #
+#
+
 # hum.... uname output vary quite a lot... :-(
 # on sunos, they are not orderer as expected...
 # on sol2, the version is "generic"...
@@ -35,6 +46,22 @@ set -a
 uname_s=`uname -s`
 # uname_v=`uname -v`
 uname_r=`uname -r`
+
+# default architecture for building pips
+PIPS_ARCH="GNU"
+
+# the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
+
+test ${uname_s} = SunOS && expr ${uname_r} : '^5' > /dev/null && \
+	PIPS_ARCH="GNUSOL2LL"
+
+test ${uname_s} = SunOS && expr ${uname_r} : '^4' > /dev/null && \
+	PIPS_ARCH="GNUSOL1"
+
+test ${uname_s} = Linux && \
+	PIPS_ARCH="LINUXI86"
+
+
 
 # 
 #         #    #  ######  #    #   ####   ######  #    #
@@ -59,7 +86,12 @@ NEWGEN_ROOT="${newgen_dir}/Production"
 NEWGEN_DEVEDIR="${newgen_dir}/Development"
 
 # PATH update
-PATH="${PATH}:${NEWGEN_ROOT}/Share:${NEWGEN_ROOT}/Bin:${NEWGEN_ROOT}/Utils"
+PATH="${PATH}:${NEWGEN_ROOT}/Share:${NEWGEN_ROOT}/Utils"
+PATH="${PATH}:${NEWGEN_ROOT}/Bin/${PIPS_ARCH}"
+
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${NEWGEN_ROOT}/Lib/${PIPS_ARCH}"
+
+
 
 #
 #         #          #    #    #  ######    ##    #####
@@ -80,7 +112,12 @@ LINEAR_ROOT="${linear_dir}/Production"
 LINEAR_DEVEDIR="${linear_dir}/Development"
 
 # PATH update
-PATH="${PATH}:${LINEAR_ROOT}/Share:${LINEAR_ROOT}/Bin:${LINEAR_ROOT}/Utils"
+PATH="${PATH}:${LINEAR_ROOT}/Share:${LINEAR_ROOT}/Utils"
+PATH="${PATH}:${LINEAR_ROOT}/Bin/${PIPS_ARCH}"
+
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${LINEAR_ROOT}/Lib/${PIPS_ARCH}"
+
+
 
 # 
 #         #####      #    #####    ####
@@ -91,6 +128,7 @@ PATH="${PATH}:${LINEAR_ROOT}/Share:${LINEAR_ROOT}/Bin:${LINEAR_ROOT}/Utils"
 #         #          #    #        ####
 # 
 
+
 ############################################################### PIPS LOCATION
 
 # Pips project sources and binaries
@@ -100,18 +138,8 @@ pips_dir=/projects/Pips
 # space for temporary files
 # default: PIPS_TEMPDIR="/tmp"
 
+
 ################################################################ RUNNING PIPS
-
-# default architecture for building pips
-# the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
-test ${uname_s} = SunOS && expr ${uname_r} : '^5' > /dev/null && \
-	PIPS_ARCH="GNUSOL2LL"
-
-test ${uname_s} = SunOS && expr ${uname_r} : '^4' > /dev/null && \
-	PIPS_ARCH="GNUSOL1"
-
-test ${uname_s} = Linux && \
-	PIPS_ARCH="LINUXI86"
 
 PIPS_ROOT="${pips_dir}/Production"
 
@@ -119,7 +147,7 @@ PIPS_ROOT="${pips_dir}/Production"
 MANPATH="${MANPATH}:${PIPS_ROOT}/Doc"
 PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
 
-# LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${NEWGEN_ROOT}/Lib/${PIPS_ARCH}:${LINEAR_ROOT}/Lib/${PIPS_ARCH}:${PIPS_ROOT}/Lib/${PIPS_ARCH}"
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PIPS_ROOT}/Lib/${PIPS_ARCH}"
 
 #
 # The properties.rc file to use: PIPS_PROPERTIESRC
@@ -161,6 +189,7 @@ PIPS_DIRECTORY_FOR_LINUXI86_BINARIES=/usr/local/misc/pips/LINUXI86
 PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/usr/local/misc/pips/LINUXI86LL
 PIPS_DIRECTORY_FOR_GNUSOL2LL_BINARIES=/home/recanati/baraque1/pips/GNUSOL2LL
 PIPS_DIRECTORY_FOR_SOL2LL_BINARIES=/home/recanati/baraque1/pips/SOL2LL
+
 
 ############################################################ DEVELOPPING PIPS
 
@@ -208,6 +237,8 @@ test ${uname_s} = Linux && \
 test ${uname_s} = Linux && \
 	PIPS_FLINT="g77 -c -Wall -Wimplicit"
 
+
+
 #
 #         #    #  #####      #    #####    ####
 #         #    #  #    #     #    #    #  #
@@ -226,6 +257,8 @@ X11_ROOT="$OPENWINHOME"
 
 test ${uname_s} = Linux && \
 	X11_ROOT="/usr/X11"
+
+
 
 # 
 #        ######  #####      #    #####    ####
@@ -250,6 +283,8 @@ test ${uname_s} = SunOS && \
 # emacs-lisp code for epips
 # you may change this default by defining this variable
 # default: EPIPS_LISP="${PIPS_ROOT}/Share/epips.el" 
+
+
 
 #
 # 
@@ -276,6 +311,8 @@ test ${uname_s} = Linux && \
 test ${uname_s} = Linux && \
 	HPFC_M4=m4
 
+
+
 #
 #                         #####  #######
 #         #    #  #####  #     # #
@@ -289,6 +326,8 @@ test ${uname_s} = Linux && \
 # where the WP65 runtime is expected
 # (can be changed to $PIPS_DEVEDIR/Runtime/wp65 to link with dev)
 # default: WP65_LIBRARY=$PIPS_ROOT/Runtime/wp65
+
+
 
 # 
 #         #    #     #     ####    ####
@@ -320,6 +359,8 @@ PATH="${PATH}:${DAVINCIHOME}"
 # Toolpack is used for STF
 TOOLPACK_DIR="${pips_home}/Toolpack/toolpack1.2"
 
+
+
 #
 #         ######  #    #   #####  ######  #####   #    #
 #         #        #  #      #    #       #    #  ##   #
@@ -331,10 +372,17 @@ TOOLPACK_DIR="${pips_home}/Toolpack/toolpack1.2"
 
 
 # libraries which are not part of Pips project
-# the readline library may be expected here for instance.
+# the readline or rx libraries may be expected here for instance, 
+# if not available in a standard location.
+
 EXTERN_ROOT="${pips_dir}/Externals"
 
-PATH="${PATH}:${EXTERN_ROOT}/Share:${EXTERN_ROOT}/Bin:${EXTERN_ROOT}/Utils"
+PATH="${PATH}:${EXTERN_ROOT}/Share:${EXTERN_ROOT}/Utils"
+PATH="${PATH}:${EXTERN_ROOT}/Bin/${PIPS_ARCH}"
+
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${EXTERN_ROOT}/Lib/${PIPS_ARCH}"
+
+
 
 #
 #          ####   #       #####
