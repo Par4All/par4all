@@ -53,8 +53,7 @@
 #include "properties.h"
 #include "pipsmake.h"
 
-/*
- * static functions 
+/* static functions 
  */
 static void update_preserved_resources();
 static bool rmake();
@@ -79,10 +78,9 @@ static bool catch_user_error(bool (*f)(char *), string oname)
     return success;
 }
 
-/*
- * Apply an instanciated rule with a given ressource owner 
+/* Apply an instanciated rule with a given ressource owner 
  */
-
+
 static bool apply_a_rule(oname, ru)
 string oname;
 rule ru;
@@ -129,11 +127,12 @@ rule ru;
 		init_resource_usage_check();
 
 	    if (print_timing_p)
+	    {
 		init_log_timers();
-
-	    if (print_memory_usage_p) {
-		initial_memory_size = get_process_gross_heap_size();
 	    }
+
+	    if (print_memory_usage_p) 
+		initial_memory_size = get_process_gross_heap_size();
 
 	    success_p = catch_user_error(pbm->builder_func, oname);
 
@@ -175,7 +174,7 @@ rule ru;
     pips_error("apply_a_rule", "could not find function %s\n", run);
     return FALSE;		/* should never be here ... */
 }
-
+
 /* FI: make is very slow when interprocedural analyzes have been selected;
  * some memorization has been added; we need to distinguish betweeen an
  * external make which initializes a set of up-to-date resources and
@@ -297,7 +296,7 @@ string rname, oname;
     }
     return TRUE;
 }
-
+
 static bool apply(pname, oname)
 string pname, oname;
 {
@@ -322,7 +321,7 @@ string pname, oname;
 
     return success_p;
 }
-
+
 static bool apply_without_reseting_up_to_date_resources(pname, oname)
 string pname, oname;
 {
@@ -343,7 +342,7 @@ string pname, oname;
 
     return apply_a_rule (oname, ru);
 }
-
+
 /* this function returns the active rule to produce resource rname */
 rule find_rule_by_resource(rname)
 string rname;
@@ -402,9 +401,9 @@ string rname;
 
     return(rule_undefined);
 }
-
-/* Translate and expand a list of virtual resources into a potentially much longer
- * list of real resources
+
+/* Translate and expand a list of virtual resources into a potentially 
+ * much longer list of real resources
  *
  * In spite of the name, no resource is actually built.
  */
@@ -987,7 +986,7 @@ void do_resource_usage_check(string oname, rule ru)
     set_clear(res_read);
     set_clear(res_write);
 }
-
+
 bool safe_make(res_n, module_n)
 string res_n, module_n;
 {
