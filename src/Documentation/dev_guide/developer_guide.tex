@@ -1,6 +1,6 @@
 %
 %% $RCSfile: developer_guide.tex,v $ (version $Revision$)
-%% $Date: 1996/10/17 22:36:12 $, 
+%% $Date: 1997/04/02 13:22:18 $, 
 % PIPS development environment documentation; translated and updated from 
 % dret146.f.tex
 %
@@ -164,7 +164,9 @@ executables. Binaries for different architectures can be stored in
 different sub-directories depending on the value of \verb+$PIPS_ARCH+ %%$
 which describes the current architecture, as discussed in
 Section~\ref{sec:shell}. 
-    
+
+
+
 \subsubsection{Share}
 
 Non architecture-dependent executables needed or used by pips. They
@@ -189,6 +191,8 @@ the \LaTeX{} documentation in \verb+$PIPS_ROOT/Src/Documentation+. %% $
 Important files are \verb+pipsmake.rc+, \verb+properties.rc+ and
 \verb+wpips.rc+. 
 
+
+
 \subsubsection{Doc}
 
 Pips documentation, namely many postscript files describing various
@@ -200,10 +204,15 @@ pips Intermediate Representation).
 The \verb|Doc/manl| subdirectory contains local (obsolete?) man pages. 
 \verb+$PIPS_ROOT/Doc+ can be added to user MANPATH variables. %%$
   
+
+
+
 \subsubsection{Html}
 
 Html documentation of PIPS. Some real html files, and some generated from
 \LaTeX{} files.
+
+
     
 \subsubsection{Runtime}
 
@@ -213,6 +222,9 @@ Environments needed for executing pips-compiled files.  Namely
 includes the files needed for executing the generated files (as header and
 make files or compiled libraries), but not necessarily the corresponding
 sources.
+
+
+
 
 \subsubsection{Src}
 
@@ -270,6 +282,8 @@ various scripts used for running and developping the PIPS sofware.
   \verb+hpfc+, and the second one for the WP65 project.
 
 \end{description}
+
+
 
 \subsubsection{Utils}
 
@@ -339,9 +353,29 @@ pips (as opposed to \emph{running} it).
   data structures are not checked, among them, all that contain
   external types;
       
-  Use \verb+accept+ to update reference files for validation; can be used
-  with \verb+/usr/ucb/mail+: \verb+| xx accept+ where \verb+xx+ is the
+  Use \verb+Accept+ to update reference files for validation; can be used
+  with \verb+/usr/ucb/mail+: \verb+| xx Accept+ where \verb+xx+ is the
   message number;
+
+  There is also a \verb|manual_accept| script for interactive display of
+  the differences and confirmation of the acceptation. The script expects 
+  the validation directories to be checked. 
+
+  For each source file found in a directory, the scripts looks for a
+  corresponding \texttt{.test} file, and executes it. If none is found, it
+  looks for a \texttt{.tpips} file which is executed as a tpips script.
+  If none is found, it looks for a \verb|default_test| file as a template
+  for a \texttt{.test} file, performs some substitutions and executes the
+  test file. Finally if none of these case apply, the scripts parallelize
+  all modules.
+
+  For maintenance purposes, the \verb|default_file| approach is the
+  best (only one source file to maintain for all the sources of a
+  validation directory). However, this can be used only if the very same
+  test is to be applied. As a second choice, the \texttt{.tpips} script 
+  is encouraged. It is very important not to validate stderr output and 
+  pips with some level of debugging on, because these outputs are not very
+  stable from one architecture to another.
 \end{description}
 
 
@@ -365,6 +399,8 @@ pips (as opposed to \emph{running} it).
   
 \end{itemize}
     
+
+
 \subsubsection{Include}
 
 This directory contains all shared files needed for building PIPS.  It
@@ -372,11 +408,32 @@ includes C header files automatically generated from NewGen specifications
 and for each library, and from some file in the documentation. Also pips
 architecture configuration file that define makefile macros are there.
 
+
+
 \subsubsection{Lib}
 
 This directory contains PIPS compiled libraries ({\tt lib*.a}) ready
 to be linked. They are stored under their \verb|$PIPS_ARCH| %% $
 subdirectory.
+
+
+
+\subsubsection{Validation}
+
+This directory holds the validation directories. Each directory contains
+source files \verb|foo.f|, a test program for them (typically
+\verb|foo.test|, and store the expected result of the run in the 
+\verb|foo.result| subdirectory.
+
+The \verb|default| file within this directory contains the subdirectories
+to be tested by the default validation (see the \texttt{Validate}
+command). For instance, \texttt{Validate Hpfc} performs all tests of the
+\verb|${PIPS_ROOT}/Validation/Hpfc| directory. %% $
+
+Caution: The test scripts must be location independent, and will not be
+run in the directory. Thus you \emph{must} use the \verb|${PIPS_ROOT}| %%$
+environment variable to specify the access path to the source file.
+
 
 \subsection{Development (\texttt{PIPS\_DEVEDIR})}
 
