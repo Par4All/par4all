@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1996/07/08 16:37:01 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1996/07/08 16:46:37 $, )
  * version $Revision$
  */
 
@@ -78,14 +78,14 @@ struct __hash_table {
 /* Now we need the table size to be a prime number.
  * So we need to retrieve the next prime number in a list.
  */
-#define GET_NEXT_HASH_TABLE_SIZE(size,pointer_to_table)			\
+#define GET_NEXT_HASH_TABLE_SIZE(sz,pointer_to_table)			\
 {									\
-     while (*(pointer_to_table) <= (size)) {				\
+     while (*(pointer_to_table) <= (sz)) {				\
 	 message_assert("size too big ",				\
 			*(pointer_to_table) != END_OF_SIZE_TABLE);	\
 	 (pointer_to_table)++;						\
      }									\
- (size) = *(pointer_to_table);						\
+ (sz) = *(pointer_to_table);						\
 }
 
 /* Set of the different operations 
@@ -512,7 +512,7 @@ char *key1, *key2;
 static int hash_chunk_equal(key1, key2)
 gen_chunk *key1, *key2;
 {
-    return memcmp(key1, key2, sizeof(gen_chunk))==0;
+    return memcmp((char*)key1, (char*)key2, sizeof(gen_chunk))==0;
 }
 
 static char *hash_print_key(t, key)
