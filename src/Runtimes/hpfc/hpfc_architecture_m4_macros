@@ -1,6 +1,6 @@
 dnl
 dnl $RCSfile: hpfc_architecture_m4_macros,v $ version $Revision$
-dnl ($Date: 1995/10/18 22:55:18 $, )
+dnl ($Date: 1995/11/21 23:16:53 $, )
 dnl
 dnl DEFAULT ARCHITECTURE
 dnl
@@ -34,6 +34,12 @@ ifelse(ARCHITECTURE,`SUN4',`define(`_SUN4',`$@')',
        ARCHITECTURE,`CM5',`define(`_CM5',`$@')',
        ARCHITECTURE,`ALPHA',`define(`_ALPHA',`$@')',
        ARCHITECTURE,`RS6K',`define(`_RS6K',`$@')')dnl
+dnl
+dnl GNU Fortran compiler g77
+dnl byte is not supported...
+dnl
+ifdef(`HPFC_GNU',`define(`_GNU',`$@')',`define(`_GNU',)')dnl
+ifdef(`HPFC_GNU',`define(`_NOGNU',)',`define(`_NOGNU',`$@')')dnl
 dnl
 dnl TO USE IBM PVMe IMPLEMENTATION
 dnl 
