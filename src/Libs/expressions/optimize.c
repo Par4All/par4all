@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.9  1998/10/22 11:30:29  zory
+ * double type for const values added
+ *
  * Revision 1.8  1998/10/20 14:51:23  zory
  * move the free statement for all strings inside the if statement
  *
@@ -131,39 +134,51 @@ read_new_entities_from_eole(FILE * file, string module){
   int i;
   int ent_int_value;
   int test;
+  double ent_double_value;
   float ent_float_value;
   entity e; 
   string ent_type = (char *) malloc(100) ;
 
   /* read the number of new entities to create */
   test = fscanf(file,"%d\n",&num);
-  pips_assert("fscanf failed : read number of entity \n",(test==1));
+  pips_assert("fscanf - read number of entity \n",(test==1));
   pips_debug(3,"reading %d new entity from module %s\n", num, module);
   for (i=0;i<num;i++){
     
     test = fscanf(file,"%s",ent_type);
-    pips_assert("fscanf failed : read entity type \n",(test==1));
+    pips_assert("fscanf - read entity type \n",(test==1));
     
     if (!strcmp(ent_type,"int")) {/* int */
       test = fscanf(file," %d\n", &ent_int_value);
-      pips_assert("fscanf failed : read entity int value \n",(test==1));
+      pips_assert("fscanf - read entity int value \n",(test==1));
       
       /* create integer entity */
       e = make_integer_constant_entity(ent_int_value);
-      pips_assert("error with integer constant entity\n",
+      pips_assert("make integer constant entity\n",
 		  entity_consistent_p(e));  
     }
     else 
       if (!strcmp(ent_type,"float")) {/* float */
 	test = fscanf(file," %f\n", &ent_float_value);
-	pips_assert("fscanf failed : read entity float value \n",(test==1));
+	pips_assert("fscanf - read entity float value \n",(test==1));
 	/* create float entity */
 	e = make_float_constant_entity(ent_float_value);
-	pips_assert("error with float constant entity\n",
+	pips_assert("make float constant entity\n",
 		    entity_consistent_p(e));  
       }
-      else
-	pips_assert("unknown type of entity",0);    
+      else 
+	if (!strcmp(ent_type,"double")) {/* double */
+	  test = fscanf(file," %lf\n", &ent_double_value);
+	  pips_assert("fscanf - read entity double value \n",(test==1));
+	  /* create double entity */
+	  e = make_double_constant_entity(ent_double_value);
+	  pips_assert("make double constant entity\n",
+		      entity_consistent_p(e));  
+	} else 
+	  {
+	    pips_debug(0, "type of entity -%d- is : %s \n", i, ent_type);
+	    pips_assert("type of entity",0);    
+	  }
   } /* end for */
 }
 
@@ -251,14 +266,20 @@ bool optimize_expressions(string module_name)
     /* Could perform more optimizations here...
      */
 
+
+    /* check consistency before optimizations */
+    pips_assert("consistency checking before optimizations \n",statement_consistent_p(s));
+
     /* begin EOLE stuff
      */
     le = get_list_of_rhs(s);
     if (gen_length(le)) { /* not empty list */
       
+      /* create temporary files */
       in = safe_new_tmp_file(IN_FILE_NAME);
       out = safe_new_tmp_file(OUT_FILE_NAME);
       
+      /* write informations in out file for EOLE */
       write_to_eole(module_name, le, out);
 
       /* run eole (Evaluation Optimization for Loops and Expressions) 
@@ -272,17 +293,19 @@ bool optimize_expressions(string module_name)
       
       safe_system(cmd);
       
+      /* read optimized expressions from eole */
       ln = read_from_eole(module_name, in);
+
+      /* replace the syntax values inside le by the syntax values from ln */
       swap_syntax_in_expression(le, ln);
+
+      /* must now free the useless expressions */
+      
 
       /* remove temorary files and free allocated memory.
        */
       safe_unlink(out);
       safe_unlink(in);
-
-      /* free the list and destroy all unoptimized expressions */
-      gen_free_list(ln), ln=NIL;
-
 
       /* free strings */
       free(out), out = NULL;
@@ -294,10 +317,18 @@ bool optimize_expressions(string module_name)
       pips_debug(3,"no expression for module %s \n", module_name);
 
 
+    /* free lists */
+    gen_free_list(ln);
+    gen_free_list(le);
+
     pips_debug(3,"EOLE transformations ... Done for module %s \n", module_name);
 
     /* end EOLE stuff.
      */
+
+    /* check consistency after optimizations */
+    pips_assert("consistency checking after optimizations \n",statement_consistent_p(s));
+    
 
     /* Could perform more optimizations here...
      */
