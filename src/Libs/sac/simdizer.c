@@ -295,11 +295,6 @@ static bool simd_simple_sequence_filter(statement s)
    return FALSE;
 }
 
-static void simd_simple_sequence_rewrite(statement s)
-{
-   return;
-}
-
 bool simdizer(char * mod_name)
 {
    /* get the resources */
@@ -315,7 +310,7 @@ bool simdizer(char * mod_name)
    /* Now do the job */
   
    gen_recurse(mod_stmt, statement_domain,
-	       simd_simple_sequence_filter, simd_simple_sequence_rewrite);
+	       simd_simple_sequence_filter, gen_null);
 
    pips_assert("Statement is consistent after SIMDIZER", 
 	       statement_consistent_p(mod_stmt));
