@@ -15,13 +15,15 @@
 */
 
 /* $RCSfile: new.c,v $ (version $Revision$)
- * $Date: 1996/08/09 09:15:33 $, 
+ * $Date: 1997/04/24 19:29:03 $, 
  */
 
 #include <stdio.h>
+#include "genC.h"
 #include "newgen_include.h"
 
 extern int build();
+extern FILE *genspec_in, *genspec_out;
 
 /* MAIN is the C entry (in fact a renaming for BUILD). */
 
@@ -29,18 +31,18 @@ extern int build();
 extern int genspec_debug ;
 #endif
 
-int main( argc, argv )
-int argc;
-char *argv[] ;
+int main(
+    int argc,
+    char *argv[])
 {
 #ifdef GENSPEC_DEBUG
     genspec_debug = 0 ; 
 #endif
     Read_spec_mode = 0 ;
 
-    /* explicit initialization
+    /* explicit initialization (lex default not assumed)
      */
     genspec_in = stdin;
     genspec_out = stdout;
-    return( build( argc, argv )) ;
+    return build(argc, argv);
 }
