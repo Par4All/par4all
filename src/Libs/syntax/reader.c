@@ -310,7 +310,9 @@ char * s;
 	}
     }
 
-    user_error("IsCapKeyword", "[scanner] keyword expected near %s\n", buffer);
+    user_warning("IsCapKeyword", "[scanner] keyword expected near %s\n",
+		 buffer);
+    ParserError("IsCapKeyword", "Missing keyword.\n");
     
     return(-1); /* just to avoid a gcc warning */
     /*NOTREACHED*/
