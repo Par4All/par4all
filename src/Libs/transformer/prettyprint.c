@@ -7,6 +7,13 @@
  * Date         : 92 08 27
  * Old version  : prettyprint.old.c
  *
+ * $Id$
+ *
+ * $Log: prettyprint.c,v $
+ * Revision 1.7  2001/07/19 18:06:02  irigoin
+ * Better type casting somewhere. Minor change.
+ *
+ *
  */
 
 #include <stdio.h>
@@ -59,7 +66,7 @@ char * pips_user_value_name(entity e)
 	return "";
     }
     else {
-	(void) gen_check(e, entity_domain);
+	(void) gen_check((gen_chunk *) e, entity_domain);
 	return entity_has_values_p(e)? entity_minimal_name(e) :
 	    external_value_name(e);
     }
