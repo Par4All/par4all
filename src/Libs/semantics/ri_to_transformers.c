@@ -9,6 +9,10 @@
   *
   * $Id$
   *
+  * $Log: ri_to_transformers.c,v $
+  * Revision 1.47  1999/01/07 07:52:32  irigoin
+  * Bug fix in minmax_to_transformer()
+  *
   */
 
 #include <stdio.h>
@@ -1304,8 +1308,26 @@ bool minmax;
 	}
     }
 
-    tf = make_transformer(tf_args,
-			  make_predicate(sc_make(CONTRAINTE_UNDEFINED, cl)));
+    if(CONTRAINTE_UNDEFINED_P(cl) || CONTRAINTE_NULLE_P(cl)) {
+	Psysteme sc = sc_make(CONTRAINTE_UNDEFINED, cl);
+	entity oldv = entity_to_old_value(e);
+	entity newv = entity_to_new_value(e);
+
+	sc_base(sc) = base_add_variable(base_add_variable(BASE_NULLE,
+							  (Variable) oldv),
+					(Variable) newv);
+	sc_dimension(sc) = 2;
+	tf = make_transformer(tf_args,
+			      make_predicate(sc));
+    }
+    else {
+	/* A miracle occurs and the proper basis is derived from the
+	   constraints ( I do not understand why the new and the old value
+	   of e both appear... so it may not be necessary for the
+	   consistency check... I'm lost, FI, 6 Jan. 1999) */
+	tf = make_transformer(tf_args,
+			      make_predicate(sc_make(CONTRAINTE_UNDEFINED, cl)));
+    }
 
 
     ifdebug(8) {
