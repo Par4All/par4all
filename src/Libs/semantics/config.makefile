@@ -1,5 +1,10 @@
 # Semantics Analysis
 #
+# SCCS Stuff:
+# $RCSfile: config.makefile,v $ ($Date: 1994/03/24 18:29:16 $, ) version $Revision$
+# got on %D%, %T%
+# $Id$
+#
 # Francois Irigoin, 17 April 1990
 #
 # This library supports intra and interprocedural semantic analysis.
@@ -81,7 +86,7 @@ LINT_LIBS = $(LINEARDEV)/arithmetique.dir/llib-larithmetique.ln \
 # Do not include the main program source file.
 LIB_CFILES=	misc.c ri_to_transformers.c interprocedural.c\
 		ri_to_preconditions.c mappings.c dbm_interface.c \
-		prettyprint.c
+		prettyprint.c postcondition.c
 LIB_HEADERS=	semantics-local.h
 LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
 
