@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.97  1997/05/03 14:11:00  coelho
+ * *** empty log message ***
+ *
  * Revision 1.96  1997/04/17 18:46:11  coelho
  * *** empty log message ***
  *
@@ -385,6 +388,14 @@ clean_the_code(statement s)
     gen_recurse(s, loop_domain, gen_true, loop_rwt);
 }
 
+/* ??? some quick hack to move bound computations ahead if possible
+ */
+static list /* of statement */ added_ahead_of_node_code;
+void hpfc_add_ahead_of_node_code(statement s)
+{
+    added_ahead_of_node_code = CONS(STATEMENT, s, added_ahead_of_node_code);
+}
+
 static void 
 compile_module(entity module)
 {
@@ -396,6 +407,7 @@ compile_module(entity module)
     s = get_current_module_statement();
     make_host_and_node_modules(module);
     hpfc_init_dummy_to_prime();
+    added_ahead_of_node_code = NIL;
 
     /*   NORMALIZATIONS
      */
@@ -409,6 +421,11 @@ compile_module(entity module)
     /*   ACTUAL COMPILATION
      */
     hpf_compiler(s, &host_stat, &node_stat);
+    if (added_ahead_of_node_code)
+	node_stat = make_block_statement
+	    (gen_nconc(added_ahead_of_node_code,
+		       CONS(STATEMENT, node_stat, NIL)));
+
     clean_the_code(host_stat);
     clean_the_code(node_stat);
 
@@ -437,6 +454,7 @@ compile_module(entity module)
 
     /*   CLOSE
      */
+    added_ahead_of_node_code = NIL;
     hpfc_close_dummy_to_prime();
     reset_resources_for_module();
 }
