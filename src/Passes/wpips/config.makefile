@@ -52,16 +52,16 @@ TARGET= 	wpips
 #
 	# Source, header and object files used to build the target
 # xv_icons.c
-TARGET_CFILES=	wpips.c \
+TARGET_CFILES=	emacs.c wpips.c \
 		xv_analyze.c xv_log.c \
 		xv_edit2.c xv_frames.c xv_help.c xv_icons.c xv_mchoose.c \
 		xv_props.c xv_query.c xv_quit.c \
 		xv_schoose2.c xv_select.c xv_status.c \
 		xv_transform.c xv_utils.c vararg.c 
 # Rajoute le directory icons :
-TARGET_HEADERS=	xv_sizes.h wpips-local.h pips.icon icons
+TARGET_HEADERS=	xv_sizes.h wpips-local.h wpips-labels.h pips.icon icons
 # xv_icons.o
-TARGET_OBJECTS=	wpips.o \
+TARGET_OBJECTS=	emacs.o wpips.o \
 		xv_analyze.o xv_log.o \
 		xv_edit2.o xv_frames.o xv_help.o xv_icons.o xv_mchoose.o \
 		xv_props.o xv_query.o xv_quit.o \
