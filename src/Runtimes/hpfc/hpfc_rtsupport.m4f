@@ -2,14 +2,13 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/02 18:06:36 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/02 19:26:22 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
 ifdef(`DEBUG',`define(`debug',$1)',`define(`debug')')dnl
 ifdef(`DEMO',`define(`demo',$1)',`define(`demo')')dnl
-debug(this is a debugsection)
 c-----------------
 c
 c HPFC_TEMPLATE
