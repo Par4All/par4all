@@ -2,6 +2,9 @@
 
 /** $Id$
   * $Log: TextDisplayer.java,v $
+  * Revision 1.5  1998/10/17 09:53:01  coelho
+  * typo.
+  *
   * Revision 1.4  1998/10/17 09:42:01  coelho
   * frame title now includes the date (to check for recomputations).
   * more comments.
@@ -50,7 +53,7 @@ public class TextDisplayer extends Displayer
     this.frame = frame;
     setInfos();
   }
-0
+
   /** Sets the extension info table.
     */
   public void setInfos()
