@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/04/28 14:07:27 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/05/05 16:42:38 $, )
  * version $Revision$
  */
  
@@ -346,6 +346,7 @@ string name;
 	!fortran_library_entity_p(module))
     {
 	set_current_module_entity(module);
+	set_current_module_statement(s);
 	load_hpfc_status();
 	make_update_common_map(); 
 	
@@ -357,6 +358,7 @@ string name;
 	clean_ctrl_graph();
 	free_update_common_map(); 
 	reset_current_module_entity();
+	reset_current_module_statement();
 	
 	db_unput_a_resource(DBR_CODE, name);
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(name), s);
