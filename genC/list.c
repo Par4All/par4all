@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/04/19 20:48:32 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/09/16 21:42:40 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -72,6 +72,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include "newgen_include.h"
 #include "genC.h"
 
@@ -267,9 +268,9 @@ cons *cp1, *cp2 ;
 {
     cons *head = cp1 ;
 
-    if( cp1 == NIL ) {
+    if( cp1 == NIL ) 
 	return( cp2 ) ;
-    }
+
     for( ; !ENDP( CDR( cp1 )) ; cp1 = CDR( cp1 )) 
 	    ;
     CDR( cp1 ) = cp2 ;
@@ -551,6 +552,57 @@ int (*compare)();
 	CHUNK(CAR(c)) = *point;
 
     free(table); 
+}
+
+/* void gen_closure(iterate, initial)
+ * list [of X] (*iterate)([ X, list of X ]), initial;
+ * 
+ * what: computes the transitive closure of sg starting from sg.
+ * how: iterate till stability.
+ * input: an iterate function and an initial list for the closure.
+ *        the iterate functions performs some computations on X
+ *        and should update the list of X to be looked at at the next 
+ *        iteration. This list must be returned by the function.
+ * output: none.
+ * side effects:
+ *  - *none* on initial...
+ *  - those of iterate.
+ * bugs or features:
+ *  - not idiot proof. may run into an infinite execution...
+ *  - a set base implementation would be nicer, but less deterministic.
+ */
+void gen_closure(iterate, initial)
+list /* of X */ (*iterate)(/* X, list of X */), initial;
+{
+    list /* of X */ l_next, l_close = gen_copy_seq(initial);
+
+    while (l_close)
+    {
+	l_next = NIL;
+
+	MAPL(cc, l_next = iterate(CHUNK(CAR(cc)), l_next), l_close);
+
+	gen_free_list(l_close), l_close = l_next;
+    }
+}
+
+list gen_make_list(int domain, ...)
+{
+    list l, current;
+    gen_chunk *item;
+    va_list args;
+    va_start(args, domain);
+
+    item = va_arg(args, gen_chunk*);
+    
+    if (!item) return NIL;
+	
+    l = CONS(CHUNK, item, NIL), current = l;
+
+    while((item=va_arg(args, gen_chunk*)))
+	CDR(current) = CONS(CHUNK, item, NIL), POP(current);
+    
+    return l;
 }
 
 /*   That is all
