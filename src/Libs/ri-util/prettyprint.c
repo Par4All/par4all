@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.134  2000/05/15 16:05:05  coelho
+ * fixed prettyprint bug when functions are used as subroutines...
+ *
  * Revision 1.133  1999/09/02 16:39:44  irigoin
  * Arguments for STOP and PAUSE are printed out when they are present
  *
@@ -241,7 +244,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.133 1999/09/02 16:39:44 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.134 2000/05/15 16:05:05 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -310,7 +313,6 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 #define PRETTYPRINT_UNSTRUCTURED_SUCC_MARKER "\203Unstructured Successor ->"
 #define PRETTYPRINT_UNREACHABLE_EXIT_MARKER "\204Unstructured Unreachable"
 
-
 /******************************************************************* STYLES */
 
 static bool 
@@ -470,8 +472,8 @@ words_reference(reference obj)
     return(pc);
 }
 
-list 
-words_regular_call(call obj)
+static list 
+words_regular_call(call obj, bool is_a_subroutine)
 {
     list pc = NIL;
 
@@ -488,6 +490,15 @@ words_regular_call(call obj)
 
     if (type_void_p(functional_result(type_functional(t)))) {
 	pc = CHAIN_SWORD(pc, "CALL ");
+	if (!is_a_subroutine) {
+	  pips_user_warning("subroutine '%s' used as a function.\n",
+			    entity_name(f));
+	}
+    }
+    else if (is_a_subroutine) {
+      pips_user_warning("function '%s' used as a subroutine.\n",
+			entity_name(f));
+      pc = CHAIN_SWORD(pc, "CALL ");
     }
 
     /* the implied complex operator is hidden... [D]CMPLX_(x,y) -> (x,y)
@@ -507,15 +518,15 @@ words_regular_call(call obj)
     else if(!type_void_p(functional_result(type_functional(t)))) {
 	pc = CHAIN_SWORD(pc, "()");
     }
-    return(pc);
+    return pc;
 }
 
 
 /* To deal with attachment on user module usage. */
-list 
-words_genuine_regular_call(call obj)
+static list 
+words_genuine_regular_call(call obj, bool is_a_subroutine)
 {
-  list pc = words_regular_call(obj);
+  list pc = words_regular_call(obj, is_a_subroutine);
   
   if (call_arguments(obj) != NIL) {
     /* The call is not used to code a constant: */
@@ -528,7 +539,6 @@ words_genuine_regular_call(call obj)
       attach_regular_call_to_word(STRING(CAR(pc)), obj);
   }
   
-
   return pc;
 }
 
@@ -1240,7 +1250,7 @@ words_intrinsic_call(call obj, int precedence, bool leftmost)
 	p++;
     }
 
-    return(words_regular_call(obj));
+    return words_regular_call(obj, FALSE);
 }
 
 static int 
@@ -1270,17 +1280,17 @@ list
 words_call(
     call obj,
     int precedence,
-    bool leftmost)
+    bool leftmost,
+    bool is_a_subroutine)
 {
     list pc;
     entity f = call_function(obj);
     value i = entity_initial(f);
     pc = (value_intrinsic_p(i)) ? 
 	(words_intrinsic_call(obj, 
-			     (precedence_p||precedence<=1)? precedence : MAXIMAL_PRECEDENCE,
+	(precedence_p||precedence<=1)? precedence : MAXIMAL_PRECEDENCE,
 			     leftmost))
-	: 
-	words_genuine_regular_call(obj);
+	: words_genuine_regular_call(obj, is_a_subroutine);
     return pc;
 }
 
@@ -1298,10 +1308,10 @@ words_syntax(syntax obj)
 	pc = words_range(syntax_range(obj));
     }
     else if (syntax_call_p(obj)) {
-	pc = words_call(syntax_call(obj), 0, TRUE);
+        pc = words_call(syntax_call(obj), 0, TRUE, FALSE);
     }
     else {
-	pips_error("words_syntax", "tag inconnu");
+	pips_internal_error("unexpected tag");
 	pc = NIL;
     }
 
@@ -1326,7 +1336,8 @@ words_subexpression(
     list pc;
     
     if ( expression_call_p(obj) )
-	pc = words_call(syntax_call(expression_syntax(obj)), precedence, leftmost);
+	pc = words_call(syntax_call(expression_syntax(obj)), precedence, 
+			leftmost, FALSE);
     else 
 	pc = words_syntax(expression_syntax(obj));
     
@@ -1336,12 +1347,13 @@ words_subexpression(
 
 /**************************************************************** SENTENCE */
 
-sentence 
+static sentence 
 sentence_tail(void)
 {
-    return(MAKE_ONE_WORD_SENTENCE(0, "END"));
+  return MAKE_ONE_WORD_SENTENCE(0, "END");
 }
 
+/* exported for unstructured.c */
 sentence 
 sentence_goto_label(
     entity module,
@@ -1575,6 +1587,7 @@ text_omp_directive(loop l, int m)
 			  OMP_PARALLELDO);
 }
 
+/* exported for fortran90.c */
 text 
 text_loop_default(
     entity module,
@@ -1651,6 +1664,7 @@ text_loop_default(
     return r;
 }
 
+/* exported for conversion/look_for_nested_loops.c */
 text 
 text_loop(
     entity module,
@@ -1704,12 +1718,12 @@ text_loop(
 	}
 	break ;
 	default:
-	pips_error("text_loop", "Unknown tag\n") ;
+	pips_internal_error("Unknown tag\n") ;
     }
     return r;
 }
 
-text 
+static text 
 text_whileloop(
     entity module,
     string label,
@@ -1835,7 +1849,7 @@ text_logical_if(
     pc = CHAIN_SWORD(pc, "IF (");
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
     pc = CHAIN_SWORD(pc, ") ");
-    pc = gen_nconc(pc, words_call(c, 0, TRUE));
+    pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE));
 
     ADD_SENTENCE_TO_TEXT(r, 
 			 make_sentence(is_sentence_unformatted, 
@@ -2117,12 +2131,13 @@ text_instruction(
 	if (instruction_continue_p(obj) &&
 	    empty_local_label_name_p(label) &&
 	    !get_bool_property("PRETTYPRINT_ALL_LABELS")) {
-	    debug(5, "text_instruction", "useless CONTINUE not printed\n");
-	    r = make_text(NIL);
+	  pips_debug(5, "useless CONTINUE not printed\n");
+	  r = make_text(NIL);
 	}
 	else {
 	    u = make_unformatted(strdup(label), n, margin, 
-				 words_call(instruction_call(obj), 0, TRUE));
+				 words_call(instruction_call(obj), 
+					    0, TRUE, TRUE));
 
 	    s = make_sentence(is_sentence_unformatted, u);
 
@@ -2232,7 +2247,7 @@ text_statement(
        
     return(r);
 }
-
+
 /* Keep track of the last statement to decide if a final return can be omitted
  * or not. If no last statement can be found for sure, for instance because it
  * depends on the prettyprinter, last_statement is set to statement_undefined
