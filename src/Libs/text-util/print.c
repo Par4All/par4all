@@ -39,7 +39,10 @@ sentence s;
 	string ps = sentence_formatted(s);
 	while (*ps) {
 	    char c = *ps++;
-	    (void) putc((islower((int) c) ? (char) toupper((int) c) : c), fd);
+	    /* FI/FC: Why on earth?!?
+	       (void) putc((islower((int) c) ? (char) toupper((int) c) : c), fd);
+	       */
+	    (void) putc( c, fd);
 	}
     }
     else {
