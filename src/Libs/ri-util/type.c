@@ -299,8 +299,8 @@ dimension_equal_p(
     dimension d1, 
     dimension d2)
 {
-    return expression_equal_p(dimension_lower(d1), dimension_lower(d2)) &&
-	expression_equal_p(dimension_upper(d1), dimension_upper(d2));
+    return same_expression_p(dimension_lower(d1), dimension_lower(d2)) &&
+	same_expression_p(dimension_upper(d1), dimension_upper(d2));
 }
 
 bool 
