@@ -4,6 +4,11 @@
   * $Id$
   *
   * $Log: expression.c,v $
+  * Revision 1.6  2001/12/05 17:14:59  irigoin
+  * Maybe less accurate handling of conditions (if side effects) but faster
+  * than previous implementation which required too many projections to
+  * convert a precondition into a condition on a store (precondition range)
+  *
   * Revision 1.5  2001/10/22 15:50:39  irigoin
   * Lots of "context" arguments added because repeated calls to
   * transformer_range() were too slow on ocean. However, the previous version
@@ -664,6 +669,28 @@ precondition_add_condition_information(
   reset_temporary_value_counter();
 
   return post;
+}
+
+transformer 
+transformer_add_domain_condition(
+    transformer tf,
+    expression c,
+    transformer context,
+    bool veracity)
+{
+  tf = transformer_add_condition_information(tf, c, context, veracity);
+  return tf;
+}
+
+transformer 
+transformer_add_range_condition(
+    transformer tf,
+    expression c,
+    transformer context,
+    bool veracity)
+{
+  tf = precondition_add_condition_information(tf, c, context, veracity);
+  return tf;
 }
 
 /* INTEGER EXPRESSIONS */
@@ -1838,7 +1865,9 @@ transformer transformer_add_any_relation_information(
   /* context = upwards? transformer_undefined : pre; */
   /* context = transformer_range(pre); */
 
-  if(basic_tag(b1)==basic_tag(b2)) {
+  if( (basic_tag(b1)==basic_tag(b2))
+     || (basic_int_p(b1) && basic_string_p(b2))
+      || (basic_string_p(b1) && basic_int_p(b2)) ) {
 
     switch(basic_tag(b1)) {
     case is_basic_logical:
