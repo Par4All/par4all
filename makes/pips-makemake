@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/22 15:24:55 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/22 15:56:40 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -429,7 +429,7 @@ clean: generate_makefile_if_necessary_and_possible clean-compiled
 	-$(RM) TAGS $(BIN_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
 		$(DERIVED_FILES) *.~[0-9]~ $(LIB_IFILES) $(INC_TARGET)
 
-INC_CFILES = $(LIB_CFILES)
+INC_CFILES += $(LIB_CFILES)
 
 %
 
@@ -466,7 +466,7 @@ clean: clean-compiled
 	-$(RM) TAGS $(INC_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
 		$(DERIVED_FILES) *.~[0-9]~
 
-INC_CFILES = $(LIB_CFILES)
+INC_CFILES += $(LIB_CFILES)
 
 %
 
