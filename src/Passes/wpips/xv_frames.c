@@ -21,17 +21,17 @@ static int display_width, display_height;
     void
 event_procedure(Xv_Window window, Event *event, Notify_arg arg)
 {
-  debug_on("WPIPS_EVENTmake _DEBUG_LEVEL");
+  debug_on("WPIPS_EVENT_DEBUG_LEVEL");
   debug(2,"event_procedure",
 	"Event_id %d, event_action %d\n",
 	event_id(event), event_action(event));
-  debug_off();
   switch (event_id(event)) {
   case LOC_WINENTER :
     win_set_kbd_focus(window, xv_get(window, XV_XID));
-    printf("Entre'e\n");
+    debug(2,"event_procedure : LOC_WINENTER\n");
     break;
   }
+  debug_off();
 }
 
 
