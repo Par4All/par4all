@@ -153,12 +153,20 @@ create_transform_menu()
    /* Now add all the transformation entries: */
    for (current_transformation = &wpips_transform_menu_layout[0];
         current_transformation->menu_entry_string != NULL;
-        current_transformation++)
-      xv_set(transform_menu,
-             MENU_ACTION_ITEM, current_transformation->menu_entry_string,
-             transform_notify,
-             NULL);
-
+        current_transformation++) {
+      if (strcmp(current_transformation->menu_entry_string,
+                 WPIPS_MENU_SEPARATOR_ID) == 0)
+         xv_set(transform_menu,
+                                /* Just a separator: */
+                WPIPS_MENU_SEPARATOR,
+                NULL);
+      else
+         xv_set(transform_menu,
+                MENU_ACTION_ITEM, current_transformation->menu_entry_string,
+                transform_notify,
+                NULL);
+   }
+   
    /* Add the Edit entry as the last one: */
    xv_set(transform_menu,
                                 /* Just a separator: */
