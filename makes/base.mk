@@ -54,6 +54,7 @@ all: $(ARCH)
 
 UTC_DATE = $(shell date -u | tr ' ' '_')
 CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
+
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
 # a typical interesting example is to put -pg in {C,LD}OPT
@@ -81,24 +82,24 @@ INSTALL	= install
 # for easy debugging... e.g. gmake ECHO='something' echo
 echo:; @echo $(ECHO)
 
-$(ARCH)/%.o: %.c ; $(COMPILE) $< -o $@
-$(ARCH)/%.o: %.f ; $(F77CMP) $< -o $@
+$(ARCH)/%.o: %.c; $(COMPILE) $< -o $@
+$(ARCH)/%.o: %.f; $(F77CMP) $< -o $@
 $(ARCH)/%.o: $(ARCH)
 
 %.class: %.java; $(JAVAC) $<
 %.h: %.class; $(JNI) $*
 
+%.f: %.m4f;	$(M4FLT) $(M4FOPT) $< > $@
+%.c: %.m4c;	$(M4FLT) $(M4COPT) $< > $@
+%.h: %.m4h;	$(M4FLT) $(M4HOPT) $< > $@
+
 # latex
 %.dvi: %.tex
-	-grep '\\\\makeindex' $*.tex && touch $*.ind
+	-grep '\\makeindex' $*.tex && touch $*.ind
 	$(LATEX) $<
-	-grep '\\\\bibdata{' \*.aux && { $(BIBTEX) $* ; $(LATEX) $< ;}
+	-grep '\\bibdata{' \*.aux && { $(BIBTEX) $* ; $(LATEX) $< ;}
 	test ! -f $*.idx || { $(MAKEIDX) $*.idx ; $(LATEX) $< ;}
 	$(LATEX) $<
-	touch $@
-
-%.ps: %.dvi
-	$(DVIPS) -o $@ $<
 	touch $@
 
 %.newgen: %.tex
@@ -106,17 +107,23 @@ $(ARCH)/%.o: $(ARCH)
 	remove-latex-comments $<
 	chmod a-w $@
 
-%.o: %.f
-	$(F77CMP) $< -o $@
+################################################################## DEPENDENCIES
 
-%.f: %.m4f
-	$(M4FLT) $(M4FOPT) $< > $@
+# bug: the dependecy file is rebuilt whatever the target?
+-include .depend.$(ARCH)
 
-%.c: %.m4c
-	$(M4FLT) $(M4COPT) $< > $@
+.depend.$(ARCH): $(CFILES) $(DERIVED_CFILES) $(DERIVED_LIB_HEADERS)
+	$(MAKEDEP) $(CFILES) $(DERIVED_CFILES) | \
+		sed 's,^\(.*\.o:\),$(ARCH)/\1,' > $@
 
-%.h: %.m4h
-	$(M4FLT) $(M4HOPT) $< > $@
+clean: depend-clean
+
+depend-clean:; $(RM) .depend.*
+
+# force regeneration
+depend:; $(RM) .depend.$(ARCH)
+
+####################################################################### HEADERS
 
 ifdef INC_TARGET
 
@@ -128,12 +135,12 @@ build-header-file:
 	$(COPY) $(TARGET)-local.h $(INC_TARGET); \
 	{ \
 	  echo "/* header file built by \$(PROTO) */"; \
-	  echo "#ifndef ${dir_simple_name}_header_included";\
-	  echo "#define ${dir_simple_name}_header_included";\
+	  echo "#ifndef $(dir_simple_name)_header_included";\
+	  echo "#define $(dir_simple_name)_header_included";\
 	  cat $(TARGET)-local.h;\
 	  $(PROTOIZE) $(INC_CFILES) | \
 	  sed 's/struct _iobuf/FILE/g;s/__const/const/g;/_BUFFER_STATE/d;/__inline__/d;' ;\
-	  echo "#endif /* ${dir_simple_name}_header_included */";\
+	  echo "#endif /* $(dir_simple_name)_header_included */";\
 	} > $(INC_TARGET).tmp
 	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
 
@@ -145,12 +152,15 @@ header:	.header $(INC_TARGET)
 
 $(INC_TARGET): $(TARGET)-local.h
 	$(RM) .header; $(MAKE) $(GMKNODIR) .header
+
 endif # INC_TARGET
 
 # ARCH subdirectory
 $(ARCH):; $(MKDIR) $(ARCH)
 clean: arch-clean
 arch-clean:; -$(RMDIR) $(ARCH)
+
+####################################################################### INSTALL
 
 # multiphase compilation
 phase1:
@@ -175,6 +185,7 @@ $(INC.d):; $(MKDIR) $(INC.d)
 
 install_inc: $(INSTALL_INC) $(INC.d)
 	$(INSTALL) $(INSTALL_INC) $(INC.d)
+
 endif # INSTALL_INC
 
 # libraries
@@ -238,6 +249,8 @@ $(UTL.d):; $(MKDIR) $(UTL.d)
 install_utl: $(INSTALL_UTL) $(UTL.d)
 	$(INSTALL) $(INSTALL_UTL) $(UTL.d)
 endif # INSTALL_UTL
+
+##################################################################### UNINSTALL
 
 # clean installation. TOO ROUGH!
 uninstall:
