@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/22 18:41:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/12/05 08:51:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/22 18:41:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/12/05 08:51:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -807,18 +807,32 @@ statement obj;
     string label = 
 	    entity_local_name(statement_label(obj)) + strlen(LABEL_PREFIX);
 
-    MERGE_TEXTS(r, init_text_statement(module, margin, obj)) ;
-
     if (strcmp(label, RETURN_LABEL_NAME) == 0) {
-	/* do not add a redundant RETURN before an END:
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,
-						       RETURN_FUNCTION_NAME));
-						       */
-	return(r);
+	/* do not add a redundant RETURN before an END, unless required */
+	if(get_bool_property("PRETTYPRINT_FINAL_RETURN")) {
+	    /*
+	    ADD_SENTENCE_TO_TEXT(temp,
+				 MAKE_ONE_WORD_SENTENCE(margin,
+							RETURN_FUNCTION_NAME));
+	    */
+	    sentence s = MAKE_ONE_WORD_SENTENCE(margin,
+						RETURN_FUNCTION_NAME);
+	    temp = make_text(CONS(SENTENCE, s ,NIL));
+	}
+	else {
+	    temp = make_text(NIL);
+	}
     }
-    temp = text_instruction(module, label, margin, i, statement_number(obj)) ;
-    MERGE_TEXTS(r, temp);
+    else {
+	temp = text_instruction(module, label, margin, i,
+				statement_number(obj)) ;
+    }
 
+    if(!ENDP(text_sentences(temp))) {
+	MERGE_TEXTS(r, init_text_statement(module, margin, obj)) ;
+	MERGE_TEXTS(r, temp);
+    }
+       
     return(r);
 }
 
