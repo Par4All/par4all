@@ -198,7 +198,7 @@ sc_gen_allocated_memory(
 	 + sizeof(Ssysteme) ;
 }
 
-void syst_debug(s)
+void sc_syst_debug(s)
 Psysteme s;
 {
     sc_fprint(stderr, s, entity_local_name);
