@@ -2039,7 +2039,8 @@ list l_ind, l_exp;
  *
  * AC 94/05/15 */
 
-static list build_third_comb(old_ref, cls, assign_i, pc, te, sc, c, linit, lmax)
+static list 
+build_third_comb(old_ref, cls, assign_i, pc, te, sc, c, linit, lmax)
 list         cls, *linit, *lmax;
 instruction  assign_i;
 Pcell        pc;
@@ -2492,7 +2493,7 @@ int          *c;
 		      (words_expression(cst_sched)));
 	    }
 	  }
-		    
+	  
 	  /* get a possible max for global time */
 	  *lmax = gen_nconc((*lmax), remove_minmax(CONS(EXPRESSION,
 							EXPRESSION(CAR(ub)),
