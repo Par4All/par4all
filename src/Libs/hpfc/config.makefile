@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$,
-# ($Date: 1995/10/04 10:54:05 $, )
+# ($Date: 1995/10/10 16:32:19 $, )
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
@@ -16,7 +16,6 @@ LIB_CFILES=	directives.c \
 		compile.c \
 		run-time.c \
 		generate.c \
-		norm-code.c \
 		local-ri-util.c \
 		inits.c \
 		o-analysis.c \
