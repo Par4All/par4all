@@ -4,6 +4,14 @@
  * and MakeReturn() are sufficient to process regular RETURN statements.
  *
  * Francois Irigoin
+ *
+ * $Id$
+ *
+ * $Log: return.c,v $
+ * Revision 1.12  2002/06/08 16:17:53  irigoin
+ * Functions added to replace formal return labels and actual return labels
+ * by character strings
+ *
  */
 
 #include <stdio.h>
@@ -101,27 +109,41 @@ ResetReturnCodeVariable()
  * variable.
  */
 static bool current_module_uses_alternate_returns = FALSE;
+/* The current number of alternate returns is used to process a module
+   declaration */
+static int current_number_of_alternate_returns = -1;
 
-bool
-uses_alternate_return_p()
+bool uses_alternate_return_p()
 {
     return current_module_uses_alternate_returns;
 }
 
-void
-uses_alternate_return(bool use)
+void uses_alternate_return(bool use)
 {
-    if(use && strcmp(get_string_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"), "NO")==0) {
-	pips_user_warning
-	    ("Lines %d-%d: Alternate return not processed with current option \"%s\". "
-	     "Formal label * ignored.\n"
-	     "See property PARSER_SUBSTITUTE_ALTERNATE_RETURNS for other options\n",
-	     line_b_I, line_e_I, get_string_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"));
-	ParserError("uses_alternate_return", "Alternate returns prohibited by user\n");
-    }
+  if(use && strcmp(get_string_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"), "NO")==0) {
+    pips_user_warning
+      ("Lines %d-%d: Alternate return not processed with current option \"%s\". "
+       "Formal label * ignored.\n"
+       "See property PARSER_SUBSTITUTE_ALTERNATE_RETURNS for other options\n",
+       line_b_I, line_e_I, get_string_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"));
+    ParserError("uses_alternate_return", "Alternate returns prohibited by user\n");
+  }
 
-     current_module_uses_alternate_returns = use;
+  current_number_of_alternate_returns++;
+    
+  current_module_uses_alternate_returns = use;
 }
+
+void set_current_number_of_alternate_returns()
+{
+  current_number_of_alternate_returns = 0;
+}
+
+void reset_current_number_of_alternate_returns()
+{
+  current_number_of_alternate_returns = -1;
+}
+
 
 /* Update the formal and actual parameter lists by adding the return code
  * variable as last argument.
@@ -129,8 +151,7 @@ uses_alternate_return(bool use)
  * To avoid an explicit check in gram.y which is large enough, the additions
  * are conditional to the alternate return substitution.
  */
-list
-add_formal_return_code(list fpl)
+list add_formal_return_code(list fpl)
 {
     list new_fpl = fpl;
 
@@ -143,8 +164,7 @@ add_formal_return_code(list fpl)
     return new_fpl;
 }
 
-list
-add_actual_return_code(list apl)
+list add_actual_return_code(list apl)
 {
     list new_apl = apl;
 
@@ -205,6 +225,7 @@ set_alternate_returns()
 {
     pips_assert("alternate return list is undefined", list_undefined_p(alternate_returns));
     alternate_returns = NIL;
+    current_number_of_alternate_returns = 0;
 }
 
 void
@@ -213,10 +234,10 @@ reset_alternate_returns()
     pips_assert("alternate return list is defined", !list_undefined_p(alternate_returns));
     gen_free_list(alternate_returns);
     alternate_returns = list_undefined;
+    current_number_of_alternate_returns = -1;
 }
 
-instruction
-generate_return_code_checks(list labels)
+instruction generate_return_code_checks(list labels)
 {
     instruction i = instruction_undefined;
     list lln = NIL;
@@ -324,4 +345,66 @@ GenerateReturn()
     }
 
     LinkInstToCurrentBlock(inst, TRUE);
+}
+
+expression generate_string_for_alternate_return_argument(string i)
+{
+  expression e = expression_undefined;
+  char buffer[9];
+  
+  pips_assert("A label cannot be more than 5 character long", strlen(i)<=5);
+  buffer[0]='"';
+  buffer[1]='*';
+  buffer[2]=0;
+
+  strcat(&buffer[0], i);
+  
+  buffer[strlen(i)+2]='"';
+  buffer[strlen(i)+3]=0;
+
+  e = MakeCharacterConstantExpression(strdup(buffer));
+  
+  return e;
+}
+
+/* * used as formal label parameter is replaced by a string variable as
+   suggested by Fabien Coelho. Its storage and initial value are lated
+   initialized by MakeFormalParameter(). */
+entity generate_pseudo_formal_variable_for_formal_label()
+{
+  entity fs = entity_undefined;
+  /* string lsp = get_string_property("PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX"); */
+  string lsp = "FORMAL_RETURN_LABEL_";
+  /* let's assume that there are fewer than 999 formal label arguments */
+  char buffer[4];
+  string sn = &buffer[0];
+  
+  pips_assert("No more than 999 alternate returns", current_number_of_alternate_returns<999);
+  
+  sprintf(buffer, "%d", current_number_of_alternate_returns);
+
+  /* Generate a variable of type CHARACTER*(*). See gram.y,
+     "lg_fortran_type:". It is postponed to MakeFormalParameter */
+  fs = make_entity(strdup(concatenate(CurrentPackage, MODULE_SEP_STRING, lsp, sn, NULL)),
+		   type_undefined,
+		   storage_undefined,
+		   value_undefined);
+
+  pips_debug(8, "Generate replacement for formal return label: %s\n",
+	     entity_name(fs));
+  
+  return fs;
+}
+
+bool formal_label_replacement_p(entity fp)
+{
+  bool replacement_p = FALSE;
+  
+  string fpn = entity_local_name(fp);
+  /* string lsp = get_string_property("PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX"); */
+  string lsp = "FORMAL_RETURN_LABEL_";
+
+  replacement_p = (strstr(fpn, lsp)==fpn);
+  
+  return replacement_p;
 }
