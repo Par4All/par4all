@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/11 10:00:48 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/11 10:04:04 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -155,6 +155,7 @@ case $DIRTYPE in
            install_exe_dir='$(LINEAR_BINDIR)' ;
            install_lib_dir='$(LINEAR_LIBDIR)' ;;
   Newgen)  ALL_RULE_TARGET='' ;
+	   PART=NEWGEN ;
 	   install_src_dir='$(NEWGEN_SRCDIR)';
            install_file_dir='$(NEWGEN_INCLUDEDIR)' ;
            install_exe_dir='$(NEWGEN_BINDIR)' ;
