@@ -1,9 +1,10 @@
-; To store the module name in a buffer:
+;; To store the module name in a buffer:
 (make-variable-buffer-local 'epips-local-module-name)
 
 
-; The faces used to display various informations. Use the
-; hilit-lookup-face-create function from hilit19.el:
+;;; The faces used to display various informations. Use the
+;;; hilit-lookup-face-create function from hilit19.el:
+
 (if (x-display-color-p)
     (progn
      ; We have a color screen:
@@ -52,7 +53,9 @@
    )
   )
 
-; The position of the EPips frames:
+;;; The position of the EPips frames:
+
+
 (let
     (
      (epips-frame-height (/ (- (/ (x-display-pixel-height)
@@ -81,15 +84,8 @@
   )
 
 
-(defun epips-debug (something)
-  "To print some messages during the epips debugging"
-  (print something (get-buffer "*Messages*"))
-  )
-
-					; The token to mark the begin
-					; and end of command. Use some
-					; strings to be usually never
-					; used in ISO-8859-1:
+;; The token to mark the begin and end of command. Use some strings to
+;; be usually never used in ISO-8859-1:
 (setq
  epips-begin-of-command-token "\200"
  epips-end-of-command-token "\201"
@@ -98,8 +94,8 @@
  epips-command-separator ":"
  )
 
-; All the command string that are used to name commands between Pips
-; and emacs:
+;; All the command string that are used to name commands between Pips
+;; and emacs:
 (setq
  epips-array-data-flow-graph-view-command-name "Array data flow graph View"
  epips-bank-view-command-name "BANK"
@@ -112,6 +108,7 @@
  epips-hpfc-file-view-command-name "HPFC File"
  epips-ICFG-view-command-name "ICFG View"
  epips-module-command-name "MODULE_NAME"
+ epips-available-modules-command-name "AVAILABLE_MODULES"
  epips-parallel-view-command-name "Parallel View"
  epips-placement-view-command-name "Placement View"
  epips-prompt-user-command-name "PROMPT_USER"
@@ -124,6 +121,26 @@
  epips-window-number-command-name "WINDOW_NUMBER"
  )
 
+
+;;; Some utilities:
+
+(defun epips-debug (something)
+  "To print some messages during the epips debugging"
+  (print something (get-buffer "*Messages*"))
+  )
+
+
+(defun epips-list-to-completion-alist (a-list)
+  "Transform a list in an alist suitable for completion stuff"
+  (let ((i 1))
+    (mapcar '(lambda (x) (prog1
+			     (list x i)
+			   (setq i (1+ i))))
+	    a-list)
+    )
+  )
+
+  
 
 (defun epips-select-and-display-a-buffer (name)
   "The function used to select and display a buffer."
@@ -154,9 +171,8 @@ If no buffer can be found, just return nil."
 			  (aref epips-buffers
 				epips-new-current-window-number))
 			 )
-					; Get the local variable
-					; buffer-read-only in the
-					; buffer:
+	       ;; Get the local variable buffer-read-only in the
+	       ;; buffer:
 	       (buffer-is-read-only-p
 		(save-excursion
 		  (set-buffer a-buffer)
@@ -167,21 +183,21 @@ If no buffer can be found, just return nil."
 		       buffer-is-read-only-p
 		       )
 		   )
-					; Well, return this buffer:
+	      ;; Well, return this buffer:
 	      (progn
 		(setq epips-current-window-number epips-new-current-window-number)
 		(throw 'a-usable-pips-buffer-has-been-found
 		       (buffer-name a-buffer))
 		)
 	    )
-					; Try the next buffer:
+	  ;; Try the next buffer:
 	  (setq
 	   do-not-exit-loop (/= epips-new-current-window-number epips-current-window-number)
 	   epips-new-current-window-number (% (1+ epips-new-current-window-number) epips-window-number)
 	   )
 	  )
 	)
-					; Else the while return nil.
+      ;; Else the while return nil.
       )
     )
   )
@@ -267,7 +283,7 @@ If no buffer can be found, just return nil."
   (if (fboundp 'hilit-rehighlight-buffer)
       (hilit-rehighlight-buffer)
     )
-  (epips-add-keymaps-and-menu-in-the-current-buffer)
+  ;;(epips-add-keymaps-and-menu-in-the-current-buffer)
   )
 
 
@@ -458,7 +474,7 @@ epips-command-content contains the name of the file to display."
 	      )
 	    )
 	   )
-	(epips-user-warning-command " No more buffer available...\n")
+	(epips-user-warning-command " No more buffer available... Unprotect or save some or increase the number of windows.\n")
 	)
       )
     )
@@ -581,144 +597,145 @@ epips-command-content contains the name of the file to display."
 
 ; Parse the output of wpips to see if there are some commands inside:
 (defun epips-analyse-output (a-process an-output-string)
-  (setq epips-packet-begin-position nil
-	epips-packet-end-position nil)
-  (if
-      (equal
-       epips-output-automaton-state
-       'epips-output-automaton-state-wait-for-begin
-       )
+  (let ((epips-packet-begin-position nil)
+	(epips-packet-end-position nil))
+    (if
+	(equal
+	 epips-output-automaton-state
+	 'epips-output-automaton-state-wait-for-begin
+	 )
 					; We are waiting for a begin
 					; of packet:
-      (progn
+	(progn
 					; Search for a begin of packet:
-	(setq epips-packet-begin-position
-	      (string-match epips-begin-of-command-token an-output-string))
-	(epips-debug 'epips-packet-begin-position)
-	(epips-debug epips-packet-begin-position)
+	  (setq epips-packet-begin-position
+		(string-match epips-begin-of-command-token an-output-string))
+	  (epips-debug 'epips-packet-begin-position)
+	  (epips-debug epips-packet-begin-position)
 					; Display all the string up to
 					; a potential
 					; epips-begin-of-command-token:
-	(epips-raw-insert an-output-string
-			  0
-			  epips-packet-begin-position
-			  a-process)
-	(if epips-packet-begin-position
+	  (epips-raw-insert an-output-string
+			    0
+			    epips-packet-begin-position
+			    a-process)
+	  (if epips-packet-begin-position
 					; If we have found a begin,
 					; look for an end from the
 					; begin position:
-	    (progn
+	      (progn
 					; Raw output up to the command
 					; begin :
-	      (setq epips-packet-end-position
-		    (string-match epips-end-of-command-token an-output-string
-				  (+ 1 epips-packet-begin-position)))
-	      (epips-debug 'epips-packet-end-position)
-	      (epips-debug epips-packet-end-position)
-	      (if epips-packet-end-position
+		(setq epips-packet-end-position
+		      (string-match epips-end-of-command-token an-output-string
+				    (+ 1 epips-packet-begin-position)))
+		(epips-debug 'epips-packet-end-position)
+		(epips-debug epips-packet-end-position)
+		(if epips-packet-end-position
 					; Ok, we have the end of
 					; packet in the same string
 					; too
-		  (progn
+		    (progn
 					; Execute the command
-		    (epips-execute-output-command
-		     an-output-string
-		     epips-packet-begin-position
-		     epips-packet-end-position
-		     a-process)
-		    (setq
+		      (epips-execute-output-command
+		       an-output-string
+		       epips-packet-begin-position
+		       epips-packet-end-position
+		       a-process)
+		      (setq
 					; We discard the command from
 					; the an-output-string:
-		     an-output-string
-		     (substring an-output-string
-				(+
-				 epips-packet-end-position
-				 (length epips-end-of-command-token))
-				nil))
+		       an-output-string
+		       (substring an-output-string
+				  (+
+				   epips-packet-end-position
+				   (length epips-end-of-command-token))
+				  nil))
 					; We stay in the
 					; wait-for-begin state.
-		    )
+		      )
 	  
 					; Else we do not have the end
 					; of packet yet so we store
 					; the command...
-		(setq epips-output-command-string
-		      (substring
-		       an-output-string
-		       epips-packet-begin-position
-		       nil)
+		  (setq epips-output-command-string
+			(substring
+			 an-output-string
+			 epips-packet-begin-position
+			 nil)
 					; We empty the output-string:
-		      an-output-string ""
+			an-output-string ""
 					; And stay in the wait-for-end
 					; state:
-		      epips-output-automaton-state
-		      'epips-output-automaton-state-wait-for-end
-		      )
+			epips-output-automaton-state
+			'epips-output-automaton-state-wait-for-end
+			)
+		  )
 		)
-	      )
 					; Else, no command found, we
 					; stay in the wait-for-begin
 					; state and empty the
 					; output-string:
-	  (setq an-output-string "")
+	    (setq an-output-string "")
 
+	    )
 	  )
-	)
 					; Else:
 					; We are waiting for an end of
 					; packet:
-    (progn
+      (progn
 					; Search for an end of packet:
-      (setq epips-packet-end-position
-	    (string-match epips-end-of-command-token an-output-string))
-      (if epips-packet-end-position
+	(setq epips-packet-end-position
+	      (string-match epips-end-of-command-token an-output-string))
+	(if epips-packet-end-position
 					; If we have found an end, we
 					; can send the command:
-	  (progn
-	    (
-	     epips-execute-output-command
-	     (concat epips-output-command-string
-		     (substring an-output-string
-				0
-				epips-packet-end-position))
-	     0
-	     nil
-	     a-process)
+	    (progn
+	      (
+	       epips-execute-output-command
+	       (concat epips-output-command-string
+		       (substring an-output-string
+				  0
+				  epips-packet-end-position))
+	       0
+	       nil
+	       a-process)
 
-	    (setq
+	      (setq
 					; We leave the wait-for-end
 					; state:
-	     epips-output-automaton-state
-	     'epips-output-automaton-state-wait-for-begin
+	       epips-output-automaton-state
+	       'epips-output-automaton-state-wait-for-begin
 					; An leave the rest of the
 					; line
-	     an-output-string
-	     (substring an-output-string
-			(+
-			 epips-packet-end-position
-			 (length epips-end-of-command-token))
-			nil)
-	     )
-	    )
-	(setq
+	       an-output-string
+	       (substring an-output-string
+			  (+
+			   epips-packet-end-position
+			   (length epips-end-of-command-token))
+			  nil)
+	       )
+	      )
+	  (setq
 					; Else it is a piece of
 					; command, thus we just add
 					; the string to the command
 					; string
-	 epips-output-command-string (concat
-				      epips-output-command-string
-				      an-output-string)
+	   epips-output-command-string (concat
+					epips-output-command-string
+					an-output-string)
 					; End empty the output string
-	 an-output-string "")
+	   an-output-string "")
+	  )
 	)
       )
-    )
-  (epips-debug epips-packet-begin-position)
-  (epips-debug epips-packet-end-position)
-  (epips-debug epips-output-automaton-state)
+    (epips-debug epips-packet-begin-position)
+    (epips-debug epips-packet-end-position)
+    (epips-debug epips-output-automaton-state)
 					; Return the remaining
 					; an-output-string:
-  an-output-string
+    an-output-string
+    )
   )
 
 
@@ -798,15 +815,18 @@ epips-command-content contains the name of the file to display."
   )
 
 
-(defun epips-send-module-select-command (module-name)
-  "Send a command for choosing a module to the Pips process"
-  (epips-send-a-command-to-pips epips-module-command-name module-name)
-  )
-
-
 (defun epips-send-sequential-view-command (&optional module-name)
   "Send a command for displaying the sequential view of the current module"
   (epips-send-a-command-to-pips epips-sequential-view-command-name module-name)
+  )
+
+
+;;; Module selection:
+
+
+(defun epips-send-module-select-command (module-name)
+  "Send a command for choosing a module to the Pips process"
+  (epips-send-a-command-to-pips epips-module-command-name module-name)
   )
 
 
@@ -821,6 +841,32 @@ epips-command-content contains the name of the file to display."
 	(epips-send-sequential-view-command module-name)
 	)
   )
+
+
+(defvar epips-select-module-history nil
+  "Store the history of previously selected modules")
+
+
+(defvar epips-available-module-list '("A" "B" "TRUC")
+  "Store the name of the modules available in the current workspace")
+
+
+(defun epips-select-module (module-name)
+  "Select a module from the module list"
+  (interactive 
+   (list ; "interactive" waits for a list of arguments...
+    (completing-read
+    "Enter the name of the module to select: "
+    (epips-list-to-completion-alist epips-available-module-list)
+    nil ; No predicate
+    t ; Require the module choosen really exists
+    nil ; No initial choice
+    epips-select-module-history)))
+  (epips-send-module-select-command module-name)
+  )
+
+
+;;;
 
 
 (defun epips-save-to-seminal-file ()
@@ -863,6 +909,7 @@ such as the preconditions, the regions, etc."
   "Keymap for the menu of the Emacs PIPS mode.")
 ;(define-key epips-keymap "\C-C\C-K" 'epips-kill-the-buffers)
 (define-key epips-keymap "\C-C\C-L" 'epips-clear-log-buffer)
+(define-key epips-keymap "\C-C\C-M" 'epips-select-module)
 (define-key epips-keymap "\C-C\C-P" 'epips)
 (define-key epips-keymap "\C-C\C-Q" 'epips-kill-the-buffers)
 (define-key epips-keymap "\C-C\C-S" 'epips-save-to-seminal-file)
@@ -872,16 +919,18 @@ such as the preconditions, the regions, etc."
 ;; The EPips main menu:
 (fset 'epips-main-menu epips-menu-keymap)
 (define-key epips-keymap [menu-bar epips-menu] '("EPips" . epips-main-menu))
-(define-key epips-menu-keymap [epips-save-to-seminal-file-menu-item]
-  '("Save the file after edit in the seminal .f" . epips-save-to-seminal-file))
 (define-key epips-menu-keymap [epips-kill-the-buffers-menu-item]
   '("Quit and kill the Pips buffers" . epips-kill-the-buffers))
 (define-key epips-menu-keymap [epips-another-pips-process-menu-item]
   '("Launch another Pips process" . epips))
-(define-key epips-menu-keymap [epips-toggle-decoration-display-menu-item]
-  '("Toggle decoration display" . epips-toggle-decoration-display))
 (define-key epips-menu-keymap [epips-clear-log-buffer-menu-item]
   '("Clear log buffer" . epips-clear-log-buffer))
+(define-key epips-menu-keymap [epips-save-to-seminal-file-menu-item]
+  '("Save the file after edit in the seminal .f" . epips-save-to-seminal-file))
+(define-key epips-menu-keymap [epips-toggle-decoration-display-menu-item]
+  '("Toggle decoration display" . epips-toggle-decoration-display))
+(define-key epips-menu-keymap [epips-select-module-menu-item]
+  '("Select a Fortran module" . epips-select-module))
 
 (define-key epips-keymap [S-down-mouse-1]
   '("Go to module" . epips-mouse-module-select))
@@ -899,8 +948,8 @@ such as the preconditions, the regions, etc."
 (defvar epips-reference-keymap (make-sparse-keymap "The PIPS keymap for references")
   "Keymap active when the mouse is on a reference.")
 
-(define-key epips-reference-keymap [down-mouse-2] 'epips-click-on-a-reference)
-(define-key epips-keymap "\C-C\C-C" 'epips-click-on-a-reference)
+(define-key epips-reference-keymap [down-mouse-2] 'epips-display-the-declaration-of-a-reference-variable)
+(define-key epips-reference-keymap [double-mouse-2] 'epips-jump-to-a-declaration)
 (define-key epips-keymap "\C-C\C-A" 'epips-show-property)
 
 
@@ -924,7 +973,7 @@ such as the preconditions, the regions, etc."
   )
 
 
-(defun epips-insert-with-properties (a-string-with-some-properties)
+(defun epips-insert-with-properties-read-syntax-like (a-string-with-some-properties)
   "Insert a string with some properties.
 The properties can merge (that is not the case for read symtax '#(...)').
 The format is
@@ -980,13 +1029,11 @@ with the value a-value. Return '(min-pos max-pos) if found, nil else"
     )
   )
 
-  
 
-(defun epips-click-on-a-reference ()
-  "Deal with clicking on a reference"
-  (interactive)
-  ;; First, do as usual
-  ;;(mouse-save-then-kill)
+(defun epips-get-the-declaration-of-the-reference-at-point ()
+  "If there is a reference at point, give the position
+of its declaration and the declaration string: (begin start string).
+If not, barf and return nil."
   (let ((property-reference-variable
 	 (get-text-property (point)
 			    'epips-property-reference-variable)))
@@ -995,22 +1042,55 @@ with the value a-value. Return '(min-pos max-pos) if found, nil else"
 			       'epips-property-declaration
 			       property-reference-variable)))
 	  (if property-place
-	      (progn
-		;; Modify the mark to be able to come back later:
-		(push-mark (point) nil nil)
-		(message (substitute-command-keys
-			  "Jumped to \"%s %s\". To go back to the reference, type \\[exchange-point-and-mark]")
-			 ;; Get the type of the variable:
-			 (get-text-property (car property-place)
-					    'epips-property-type)
-			 ;; And its name:
-			 (buffer-substring (car property-place)
-					   (car (cdr property-place))))
-		;; Go to the variable declaration:
-		(goto-char (car property-place)))
-	    (epips-user-warning "Cannot find the declaration here!")
+	      ;; Give the result back:
+	      (append property-place
+		      (list (format "%s %s"
+				    ;; Get the type of the variable:
+				    (get-text-property (car property-place)
+						       'epips-property-type)
+				    ;; And its name:
+				    (buffer-substring (car property-place)
+						      (car (cdr property-place))))))	
+	    (progn
+	      (epips-user-warning "Cannot find the declaration here!")
+	      nil)
 	    )
 	  )
+      (progn
+	(epips-user-warning "Cannot find a reference here!")
+	nil)      
+      )
+    )
+  )
+  
+
+(defun epips-display-the-declaration-of-a-reference-variable (event)
+  "Display a message describing the declaration 
+of the reference variable we are clicking on"
+  (interactive "e")
+  ;; Goto where we clicked on first:
+  (goto-char (posn-point (event-start event)))
+  (message "Variable declaration is \"%s\""
+	   (elt (epips-get-the-declaration-of-the-reference-at-point) 2))
+  )
+  
+
+(defun epips-jump-to-a-declaration (event)
+  "Go to the declaration we are on"
+  (interactive "e")
+  ;; Goto where we clicked on first:
+  (goto-char (posn-point (event-start event)))
+  (let ((declaration (epips-get-the-declaration-of-the-reference-at-point)))
+    (if declaration
+	(progn
+	  ;; Modify the mark to be able to come back later:
+	  (push-mark (point) nil nil)
+	  (message (substitute-command-keys
+		    "Jumped to \"%s\". To go back to the reference, type \\[exchange-point-and-mark]")
+		   (elt declaration 2))          
+          ;; Go to the variable declaration:
+          (goto-char (car declaration)))
+      (epips-user-warning "Cannot find the declaration here!")
       )
     )
   )
@@ -1128,10 +1208,10 @@ with the value a-value. Return '(min-pos max-pos) if found, nil else"
 )
 
 
-; Initialize the buffers to display PIPS stuff:
+;; Initialize the buffers to display PIPS stuff:
 (setq epips-buffer-number 9)
 
-; Launch the wpips process from Emacs:
+;; Launch the wpips process from Emacs:
       
 (defun epips ()
   "The Emacs-PIPS mode.
@@ -1172,6 +1252,7 @@ Special commands:
 					; Just to have the function
 					; for the user :
   (interactive)
+  (message "Entering Emacs PIPS mode...")
 					; Initialize the automaton
 					; that analyses the pips
 					; output:
@@ -1194,6 +1275,7 @@ Special commands:
 ;;    (setq epips-process (start-process "WPips" "Pips-Log" "wpips" "-emacs"))
     (setq epips-process (start-process "WPips" "Pips-Log" "/projects/Pips/Development/Lib/ri-util/wpips" "-emacs"))
 					;(goto-char (process-mark epips-process))
+    (message "WPips process launched...")
     (setq epips-process-buffer (process-buffer epips-process))
     (set-process-filter epips-process 'epips-output-filter)
     (epips-select-and-display-a-buffer epips-process-buffer)
@@ -1215,9 +1297,6 @@ Special commands:
       (epips-mode 1)
       )
     )
-					; The command loop display the
-					; returned value...
-  "Launching the WPips process..."
   )
 
 
