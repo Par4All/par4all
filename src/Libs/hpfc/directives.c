@@ -2,36 +2,16 @@
  *
  * these functions deal with HPF directives.
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/04/03 17:00:36 $, )
+ * $RCSfile: directives.c,v $ ($Date: 1995/04/10 18:49:46 $, )
  * version $Revision$,
  */
 
-#include <stdio.h>
-#include <string.h> 
-extern fprintf();
-extern system();
+#include "defines-local.h"
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-
-#include "genC.h"
-
-#include "ri.h" 
-#include "database.h"
-#include "hpf.h" 
-
-#include "ri-util.h" 
-#include "misc.h" 
-#include "properties.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "bootstrap.h"
 #include "control.h"
-
-#include "hpfc.h"
-#include "defines-local.h"
 
 #define HPF_PREFIX "HPFC"
 #define BLOCK_SUFFIX "K"
