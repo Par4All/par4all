@@ -496,7 +496,7 @@ void init_cost_table()
 	file = concatenate(cost_dir,"/", cost_table, "/", tmp, NULL);
 
 	debug(5,"init_cost_table","file_factor is %f\n", file_factor);
-	debug(5,"init_cost_table","cost file is %s\n",file);
+	debug(1,"init_cost_table","cost file is %s\n",file);
 	load_cost_file(file, file_factor);
 	token = strtok(NULL, sep_chars);
     }
