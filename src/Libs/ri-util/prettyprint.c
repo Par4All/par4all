@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.66  1997/08/04 13:02:08  coelho
+ * *** empty log message ***
+ *
  * Revision 1.65  1997/07/24 15:10:08  keryell
  * Assert added to insure no attribute on a sequence statement.
  *
@@ -14,7 +17,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.65 1997/07/24 15:10:08 keryell Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.66 1997/08/04 13:02:08 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1096,28 +1099,30 @@ loop_private_variables(loop obj)
     bool
 	all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"),
 	hpf_private = get_bool_property("PRETTYPRINT_HPF"),
-	some_before = FALSE;
+	some_after = FALSE;
     list l = NIL;
 
     /* comma-separated list of private variables. 
-     * ??? should be build in reverse order to avoid adding at the end...
+     * built in reverse order to avoid adding at the end...
      */
     MAP(ENTITY, p,
     {
 	if((p!=loop_index(obj)) || all_private) 
 	{
-	    if (some_before) 
-		l = CHAIN_SWORD(l, ",");
+	    if (some_after) 
+		l = CONS(STRING, strdup(","), l);
 	    else
-		some_before = TRUE; /* from now on commas... */
+		some_after = TRUE; /* from now on commas, triggered... */
 
-	    l = gen_nconc(l, words_declaration(p,TRUE));
+	    l = gen_nconc(words_declaration(p,TRUE), l);
 	}
     }, 
 	loop_locals(obj)) ; /* end of MAP */
     
     pips_debug(5, "#printed %d/%d\n", gen_length(l), 
 	       gen_length(loop_locals(obj)));
+
+    l = gen_nreverse(l);
 
     /* stuff around if not empty
      */
