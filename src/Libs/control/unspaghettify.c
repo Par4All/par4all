@@ -2,10 +2,20 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1998/12/08 12:57:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2002/06/27 14:49:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/*
+ * $Log: unspaghettify.c,v $
+ * Revision 1.42  2002/06/27 14:49:44  irigoin
+ * Function fuse_sequences_in_unstructured() updated to keep track of
+ * implicit target label appearing in IO statement after an END= or ERR=
+ * clause. Lots of print_text() replaced by print_statement() to cope with
+ * debugging levels better and avoid useless debugging information.
+ *
+ *
+ */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1998/12/08 12:57:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 2002/06/27 14:49:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -200,17 +210,22 @@ fuse_sequences_in_unstructured(statement s)
     list blocs = NIL;
     list control_nodes_to_fuse = NIL;
     unstructured u = instruction_unstructured(statement_instruction(s));
-
+    list tl = statement_to_implicit_target_labels(s);
     /* The entry point of the unstructured: */
     control entry_node = unstructured_control(u);
     /* and its exit point: */
     control exit_node = unstructured_exit(u);
-
-    /* To store the list of the controls to fuse we use a mapping since
+   /* To store the list of the controls to fuse we use a mapping since
        we need to keep track of eventual previous fuse on a control: */
     hash_table controls_to_fuse_with_their_successors =
 	hash_table_make(hash_pointer, 0);
-   
+
+    ifdebug(4) {
+      pips_debug(4, "Begin with implicit target labels:");
+      print_arguments(tl);
+      pips_debug(4, "\n");
+    }
+    
     ifdebug (1)
 	pips_assert("unstructured is consistent",
 		    unstructured_consistent_p(u));
@@ -286,7 +301,7 @@ fuse_sequences_in_unstructured(statement s)
 		blocs);
     gen_free_list(blocs);
    
-    /* Reverse the list to follow the order of apperance : */
+    /* Reverse the list to follow the order of appearance : */
     control_nodes_to_fuse = gen_nreverse(control_nodes_to_fuse);
    
     /* Now, since we have the list of the control nodes to fuse with
@@ -324,14 +339,20 @@ fuse_sequences_in_unstructured(statement s)
 	}
 	a_control_to_fuse = (control) its_address_now;
 	       
-	ifdebug(5)
-	    print_text(stderr, text_statement(get_current_module_entity(), 0, control_statement(a_control_to_fuse)));
+	ifdebug(5) {
+	  fprintf(stderr,"Statement with label \"%s\" for control a_control_fo_fuse=%p\n",
+		  entity_local_name(statement_label(control_statement(a_control_to_fuse))),
+		  a_control_to_fuse);
+	  print_statement(control_statement(a_control_to_fuse));
+	  fprintf(stderr,"Let's print the statement a second time to see its label again:\n");
+	  print_statement(control_statement(a_control_to_fuse));
+	}
 	ifdebug(6) {
 	    pips_debug(5, "All the unstructured %p:\n", u);
-	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+	    print_statement(s);
 	}
 	ifdebug (3)
-	    fprintf(stderr, "Want to fuse control %p", a_control_to_fuse);
+	    fprintf(stderr, "Want to fuse control %p\n", a_control_to_fuse);
 	ifdebug (1)
 	    pips_assert("control a_control_to_fuse is consistent",
 			control_consistent_p(a_control_to_fuse));
@@ -357,7 +378,14 @@ fuse_sequences_in_unstructured(statement s)
 		 && the_successor != entry_node
 		 && number_of_predecessors_of_the_successor == 1)
 		||
-		empty_statement_or_continue_p(control_statement(a_control_to_fuse))) {
+		(empty_statement_or_continue_p(control_statement(a_control_to_fuse))
+		 && (!gen_in_list_p(statement_to_label(control_statement(a_control_to_fuse)), tl)
+		     /* ||entity_empty_label_p(statement_to_label(control_statement(the_successor)))*/)
+		 /*
+		   (entity_empty_label_p(statement_to_label(control_statement(a_control_to_fuse)))
+		     || entity_empty_label_p(statement_to_label(control_statement(the_successor))))
+		 */
+		 )) {
 		/* Well, it seems to be a real sequence, at most a
 		   loop with 2 control nodes... */
 		pips_debug(3, "\tOk fuse them.\n");
@@ -401,6 +429,7 @@ fuse_sequences_in_unstructured(statement s)
     unstructured_control(u)= entry_node;
     unstructured_exit(u)= exit_node;
 
+    gen_free_list(tl);
     hash_table_free(controls_to_fuse_with_their_successors);
 }
 
@@ -748,8 +777,7 @@ restructure_this_test(control c,
 
     ifdebug(9) {
 	pips_debug(9, "the test statement:\n");
-	print_text(stderr, text_statement(get_current_module_entity(),
-					  0, the_test_statement));
+	print_statement(the_test_statement);
 	pips_assert("Statement is consistent",
 		    statement_consistent_p(the_test_statement));
     }
@@ -778,8 +806,7 @@ restructure_this_test(control c,
 	test_true(the_test) = then_statement;
 	ifdebug(9) {
 	    pips_debug(9, "then statement:\n");
-	    print_text(stderr, text_statement(get_current_module_entity(),
-					      0, then_statement));
+	    print_statement(then_statement);
 	    pips_assert("Statement is consistent",
 			statement_consistent_p(then_statement));
 	}
@@ -789,8 +816,7 @@ restructure_this_test(control c,
 	test_false(the_test) = else_statement;
 	ifdebug(9) {
 	    pips_debug(9, "else statement:\n");
-	    print_text(stderr, text_statement(get_current_module_entity(),
-					      0, else_statement));
+	    print_statement(else_statement);
 	    pips_assert("Statement is consistent",
 			statement_consistent_p(else_statement));
 	}
@@ -821,8 +847,7 @@ restructure_this_test(control c,
     
     ifdebug(9) {
 	pips_debug(9, "the test statement:\n");
-	print_text(stderr, text_statement(get_current_module_entity(),
-					  0, the_test_statement));
+	print_statement(the_test_statement);
 	pips_assert("Statement is consistent",
 		    statement_consistent_p(the_test_statement));
     }
@@ -956,7 +981,7 @@ recursively_restructure_an_unstructured(statement s)
     fuse_sequences_in_unstructured(s);
     ifdebug(5) {
 	pips_debug(5, "after fuse_sequences_in_unstructured\n");
-	print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+	print_statement(s);
 	pips_assert("Statement is consistent", statement_consistent_p(s));
     }
     
@@ -967,8 +992,7 @@ recursively_restructure_an_unstructured(statement s)
 	ifdebug(5) {
 	    pips_debug(5,
 		       "after take_out_the_entry_node_of_the_unstructured\n");
-	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-	    pips_assert("Statement is consistent", statement_consistent_p(s));
+	    print_statement(s);
 	}
 
 	new_unstructured_statement =
@@ -976,7 +1000,7 @@ recursively_restructure_an_unstructured(statement s)
 	
 	ifdebug(5) {
 	    pips_debug(5, "after take_out_the_exit_node_if_not_a_continue\n");
-	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+	    print_statement(s);
 	    pips_assert("Statement is consistent", statement_consistent_p(s));
 	}
 
@@ -985,7 +1009,7 @@ recursively_restructure_an_unstructured(statement s)
 	    && restructure_if_then_else(new_unstructured_statement)) {
 	    ifdebug(5) {
 		pips_debug(5, "after restructure_if_then_else\n");
-		print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+		print_statement(s);
 		pips_assert("Statement is consistent", statement_consistent_p(s));
 	    }
 	    /* Well, some tests has been restructured, recurse: */
@@ -1013,9 +1037,7 @@ clean_up_control(statement s)
 	ifdebug (3) {
 	    display_linked_control_nodes(unstructured_control(u));
 	    fprintf(stderr, "[ The current statement : ]\n");
-	    debug_on("NO_DEBUG");
-	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-	    debug_off();
+	    print_statement(s);
 	}
 	clean_up_exit_node(u);
    
@@ -1028,9 +1050,7 @@ clean_up_control(statement s)
 	    display_linked_control_nodes(unstructured_control(u));
 	    pips_debug(0, "Accessible nodes from exit:\n");
 	    display_linked_control_nodes(unstructured_exit(u));
-	    debug_on("NO_DEBUG");
-	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-	    debug_off();
+	    print_statement(s);
 	}
 
 	remove_useless_continue_or_empty_code_in_unstructured(u);
@@ -1038,9 +1058,7 @@ clean_up_control(statement s)
 	ifdebug(5) {
 	    pips_assert("Consistent unstructured", unstructured_consistent_p(u));
 	    pips_debug(5, "after remove_useless_continue_or_empty_code_in_unstructured\n");
-	    debug_on("NO_DEBUG");
-	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-	    debug_off();
+	    print_statement(s);
 	}
 	pips_debug(2, "exit\n");
     }
@@ -1073,13 +1091,14 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
    ifdebug (1)
       pips_assert("Statement is consistent", statement_consistent_p(mod_stmt));
 
-   if (currently_apply_recursive_decomposition)
+   if (currently_apply_recursive_decomposition) {
        /* Then try to hierarchize the control flow: */
        gen_recurse(mod_stmt, unstructured_domain,
 		   gen_true, control_graph_recursive_decomposition);
    
    ifdebug (1)
       pips_assert("Statement is consistent", statement_consistent_p(mod_stmt));
+   }
 
    /* Now apply some local rule, such as if/then/else restructuring
       and so on: */
