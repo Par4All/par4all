@@ -537,7 +537,7 @@ bool module_name_to_preconditions(char *module_name)
     else
       pre = transformer_identity();
     
-    ifdebug(1) {
+    ifdebug(3) {
       pips_debug(1, "considering initial precondition for %s\n", module_name);
       print_transformer(pre);
     }
