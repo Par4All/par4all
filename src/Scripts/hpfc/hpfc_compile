@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/08/22 14:43:22 $, 
+# $Date: 1996/08/22 14:53:32 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -154,7 +154,7 @@ then
    then 
       fake="${HPFC_RUNTIME}/hpfc_fake.f"
    else
-      fake="${PIPS_ROOT}/Runtime/hpfc/hpfc_fake.f"
+      fake="${PIPS_ROOT}/Share/hpfc_fake.f"
    fi
    HPFFILES="$HPFFILES $fake"
 else
