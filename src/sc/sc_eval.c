@@ -1,6 +1,6 @@
 /* package sc
  * $RCSfile: sc_eval.c,v $ (version $Revision$)
- * $Date: 1997/07/22 11:04:18 $, 
+ * $Date: 1998/11/18 12:31:20 $, 
  */
 
 #include <string.h>
@@ -471,11 +471,16 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 			     * use a copy!
 			     */
 			    def = contrainte_dup(eq);
+			    CATCH(overflow_error) {
+				ps=sc_elim_var(ps,v);
+			    }
+			    TRY {
 			    ps = 
 			    sc_simple_variable_substitution_with_eq_ofl_ctrl
 			    (ps, def, v, NO_OFL_CTRL);
 			    contrainte_rm(def);
-
+			    UNCATCH(overflow_error);
+			    }
 			    /* Print ps after projection.
 			     * This really generates a lot of output on real life systems!
 			     * But less than the next debug statement...
