@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1995/01/06 14:24:53 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/03/22 10:57:02 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -282,7 +282,7 @@ statement *psh, *psn;
 	}
 	else
 	{
-	    user_warning("generate_io_collect_or_update",
+	    hpfc_warning("generate_io_collect_or_update",
 			 "empty operation for array %s\n", 
 			 entity_name(array));
 	    *psh = make_continue_statement(entity_undefined);
@@ -326,7 +326,7 @@ statement *psh, *psn;
 	}
 	else
 	{
-	    user_warning("generate_io_collect_or_update",
+	    hpfc_warning("generate_io_collect_or_update",
 			 "empty operation for array %s\n", 
 			 entity_name(array));
 	    *psh = make_continue_statement(entity_undefined);
