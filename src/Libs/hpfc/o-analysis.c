@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/04/10 18:49:40 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/04/21 14:32:54 $, )
  * version $Revision$
  */
 
@@ -19,8 +19,7 @@ static list
 
 GENERIC_LOCAL_MAPPING(variable_used, int, entity);
 
-/*
- * Overlap_Analysis
+/* Overlap_Analysis
  *
  * check conditions and compile...
  */
@@ -50,12 +49,7 @@ statement stat, *pstat;
 	messages_stat, 
 	newloopnest;
 
-    ifdebug(9)
-    {
-	fprintf(stderr, "[Overlap_Analysis] considering stat 0x%x\n", 
-		(unsigned int) stat);
-	print_statement(stat);
-    }
+    DEBUG_STAT(9, "considering statement", stat);
 
     set_hpfc_current_statement(stat);
 
@@ -247,8 +241,7 @@ statement stat, *pstat;
      * Ro set of nearly aligned references that suits the overlap analysis
      */
 
-    /*
-     * messages handling
+    /* messages handling
      */
 
     messages_stat = ((gen_length(Ro)>0)?
@@ -288,8 +281,7 @@ statement stat, *pstat;
     return(TRUE);
 }
 
-/*
- * bool block_distributed_p(array)
+/* bool block_distributed_p(array)
  *
  * true if there is no cyclic distribution for the array
  */
@@ -312,8 +304,7 @@ entity array;
     return(TRUE);
 }
 
-/*
- * bool simple_indices_p(r)
+/* bool simple_indices_p(r)
  *
  * true if indices are constants or index
  */
@@ -404,8 +395,7 @@ reference r;
     return(TRUE);
 }
 
-/*
- * bool aligned_p(r1, r2, lvref, lkref)
+/* bool aligned_p(r1, r2, lvref, lkref)
  *
  * true if references are aligned or, for constants, on the same processor...
  */
@@ -456,8 +446,7 @@ list lvref, lkref;
     return(result);
 }
 
-/*
- * bool message_manageable_p(array, lpref, lkref) 
+/* bool message_manageable_p(array, lpref, lkref) 
  *
  * conditions:
  * every thing should be manageable, i.e.
@@ -532,12 +521,6 @@ list lpref, lkref;
     return(TRUE); /* accepted! */
 }
 
-/*
- * bool statically_decidable_loops(l)
- *
- *
- *
- */
 bool statically_decidable_loops(l)
 list l;
 {
@@ -553,9 +536,6 @@ list l;
 	    statically_decidable_loops(CDR(l))));
 }
 
-/*
- * bool expression_integer_constant_p(e)
- */
 bool expression_integer_constant_p(e)
 expression e;
 {
@@ -902,8 +882,7 @@ statement stat;
     return(hpfc_killed_scalar);
 }
 
-/*
- * int which_array_dimension(r, e)
+/* int which_array_dimension(r, e)
  *
  * returns the dimension of reference on which index entity e is used
  */
@@ -934,11 +913,6 @@ entity e;
     return(-1);
 }
 
-/*
- * loop make_loop_skeleton(newindex, newlobnd, newupbnd)
- *
- * 
- */
 loop make_loop_skeleton(newindex, lower_expression, upper_expression)
 entity newindex;
 expression lower_expression, upper_expression;
@@ -953,11 +927,6 @@ expression lower_expression, upper_expression;
 		     NIL));
 }
 
-/*
- * void update_indices_for_local_computation(new_indexes, Ref, lRef)
- *
- *
- */
 void update_indices_for_local_computation(new_indexes, Ref, lRef)
 entity_mapping new_indexes;
 list Ref, lRef;
@@ -1073,13 +1042,6 @@ list Ref, lRef;
     
 }
 
-/*
- * statement make_loop_nest_for_overlap(...)
- */
-
-/*
- * statement make_increment_statement(index)
- */
 statement make_increment_statement(index)
 entity index;
 {
@@ -1090,8 +1052,7 @@ entity index;
 			   int_to_expression(1))));
 }
 
-/*
- * bool variable_used_in_statement_p(ent, stat)
+/* bool variable_used_in_statement_p(ent, stat)
  *
  * not 0 if ent is referenced in statement stat.
  * yes, I know, proper effects may be called several
@@ -1101,7 +1062,6 @@ entity index;
  * the statement being generated, but It would not have been as easy
  * to compute and to use.
  */
-
 static statement 
   current_variable_used_statement = statement_undefined;
 
@@ -1189,8 +1149,7 @@ statement stat;
     return(result);
 }
 
-/*
- * syntax choose_one_syntax_in_references_list(pls)
+/* syntax choose_one_syntax_in_references_list(pls)
  *
  * one of the syntax is chosen from the list. The "larger one".
  * and the list is given back, the chosen syntax as first element.
@@ -1239,9 +1198,6 @@ list *pls;
     return(chosen);
 }
 
-/*
- * int number_of_distributed_dimensions(a)
- */
 int number_of_distributed_dimensions(a)
 entity a;
 {
@@ -1257,8 +1213,7 @@ entity a;
     return(n);
 }
 
-/*
- * bool on_same_proc_p(t1, t2, temp, dim)
+/* bool on_same_proc_p(t1, t2, temp, dim)
  *
  * true if the given template elements on the specified dimension
  * are mapped on the same processor.
@@ -1275,6 +1230,5 @@ int dim;
 }
 
 
-/*
- * That is all
+/* That is all
  */
