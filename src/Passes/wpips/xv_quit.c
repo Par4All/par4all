@@ -68,7 +68,7 @@ quit_notify(Menu menu,
       if (result == NOTICE_NO)
          return;
       else if (strcmp(menu_string, CLOSE_QUIT) == 0)
-         close_workspace();
+         close_workspace(TRUE);
       else if (strcmp(menu_string, DELETE_QUIT) == 0)
       {
 	  int win = 0;
