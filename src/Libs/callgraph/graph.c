@@ -6,6 +6,9 @@
  * Code by Corinne Ancourt and Fabien Coelho.
  *
  * $Log: graph.c,v $
+ * Revision 1.6  1998/11/24 11:55:26  coelho
+ * lazy use of resource, not to core on resources that are not available.
+ *
  * Revision 1.5  1998/04/14 19:01:52  coelho
  * linear.h
  *
@@ -47,9 +50,11 @@ static void
 node(FILE * out, string name)
 {
     bool first=TRUE;
-    callees module_callees;
+    list lcallees = NIL;
 
-    module_callees = (callees) db_get_memory_resource(DBR_CALLEES, name, TRUE);
+    if (db_resource_p(DBR_CALLEES, name)) /* lazy callees. */
+      lcallees = callees_callees((callees) 
+	db_get_memory_resource(DBR_CALLEES, name, TRUE));
 
     /* daVinci node prolog. */
     fprintf(out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"%s\")],[", name, name);
@@ -62,7 +67,7 @@ node(FILE * out, string name)
 	fprintf(out, " l(\"%s->%s\",e(\"\",[],r(\"%s\")))", 
 		name, module_called, module_called);
     },
-        callees_callees(module_callees));
+        lcallees);
 
     /* node epilog */
     fprintf(out, "]))");
@@ -86,15 +91,21 @@ static bool seen_p(string m){ return hash_defined_p(seen, (char*)m); }
 static void
 recursive_append(FILE* out, string name)
 {
-    callees l;
     if (seen_p(name)) return;
     /* else */
     if (first_seen) fprintf(out, ",\n");
     else first_seen = TRUE;
     node(out, name);
     set_as_seen(name);
-    l = (callees) db_get_memory_resource(DBR_CALLEES, name, TRUE);
-    MAP(STRING, c, recursive_append(out, c), callees_callees(l));
+
+    /* the resource may not have been defined, for instance if the
+     * code was not parsed, because the %ALL dependence is limited.
+     */
+    if (db_resource_p(DBR_CALLEES, name))
+    {
+      callees l = (callees) db_get_memory_resource(DBR_CALLEES, name, TRUE);
+      MAP(STRING, c, recursive_append(out, c), callees_callees(l));
+    }
 }
 
 /* to be called by pipsmake.
@@ -128,14 +139,15 @@ graph_of_calls(string name)
 /* To be called by pipsmake.
  * Generate a global resource, hence name is ignored.
  */
-bool
-full_graph_of_calls(string name)
+bool full_graph_of_calls(string name)
 {
     gen_array_t modules = db_get_module_list();
     int n = gen_array_nitems(modules), i;
     FILE * out;
     bool first = TRUE;
     string dir_name, file_name, full_name;
+
+    pips_debug(7, "global call graph requested for %s (PROGRAM)\n", name);
 
     /* build file name... and open it. */
     dir_name = db_get_current_workspace_directory();
