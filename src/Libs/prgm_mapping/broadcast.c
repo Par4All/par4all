@@ -7,7 +7,9 @@
  * 
  */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 
 /* Newgen includes 	*/
 #include "genC.h"
