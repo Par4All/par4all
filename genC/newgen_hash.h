@@ -14,6 +14,10 @@
 
 */
 
+/* $RCSfile: newgen_hash.h,v $ ($Date: 1995/03/17 17:11:31 $, )
+ * version $Revision$
+ * got on %D%, %T%
+ */
 
 #ifndef HASH_INCLUDED
 #define HASH_INCLUDED
@@ -61,8 +65,14 @@ typedef struct hash_table {
             code ; }}}
 #endif
 
-/* functions declared in hash.c */
+#define hash_put_or_update(h, k, v)\
+  if (hash_get((hash_table)h, (char*)k)==HASH_UNDEFINED_VALUE)\
+    hash_put((hash_table)h, (char*)k, (char*)v);\
+  else\
+    hash_update((hash_table)h, (char*)k, (char*)v);
 
+/* functions declared in hash.c 
+ */
 extern void hash_warn_on_redefinition GEN_PROTO(());
 extern void hash_dont_warn_on_redefinition GEN_PROTO(());
 extern char *hash_del GEN_PROTO((hash_table, char *));
@@ -75,4 +85,7 @@ extern void hash_table_print GEN_PROTO((hash_table));
 extern void hash_table_fprintf GEN_PROTO((FILE *, char *(*)(), 
 					  char *(*)(), hash_table));
 extern int hash_table_entry_count GEN_PROTO((hash_table));
-extern char *hash_update GEN_PROTO((hash_table, char*, char*));
+extern void hash_update GEN_PROTO((hash_table, char*, char*));
+
+/*  that is all
+ */
