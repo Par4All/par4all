@@ -1,0 +1,144 @@
+/*
+ * HPFC module by Fabien COELHO
+ *
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/04/04 10:47:31 $, )
+ * version $Revision$
+ */
+ 
+#include <stdio.h>
+#include <string.h> 
+extern fprintf();
+
+#include "boolean.h"
+#include "vecteur.h"
+#include "contrainte.h"
+#include "sc.h"
+
+#include "genC.h"
+#include "ri.h" 
+#include "hpf.h" 
+#include "hpf_private.h"
+
+#include "ri-util.h" 
+#include "misc.h" 
+#include "control.h"
+#include "regions.h"
+#include "semantics.h"
+#include "effects.h"
+#include "properties.h"
+
+#include "hpfc.h"
+#include "defines-local.h"
+
+/*--------------------------------------------------
+ *
+ *        UTILITIES
+ */
+
+/*  DYNAMIC MANAGEMENT
+ *
+ * the synonyms of a given array are stored in a entities.
+ * What I intend as a synonym is a version of the array or template
+ * which is distributed or aligned in a different way.
+ */
+GENERIC_GLOBAL_FUNCTION(dynamic_hpf, entity_entities);
+
+void set_entity_as_dynamic(a)
+entity a;
+{
+    if (!bound_dynamic_hpf_p(a))
+	store_dynamic_hpf(a, make_entities(CONS(ENTITY, a, NIL)));
+}
+
+void add_dynamic_synonym(new_e, e)
+entity new_e, e;
+{
+    entities es = load_dynamic_hpf(e);
+
+    debug(3, "add_dynamic_synonym", "%s added to %s synonyms\n",
+	  entity_name(new_e), entity_name(e));
+
+    assert(dynamic_entity_p(e) && !dynamic_entity_p(new_e));
+
+    entities_list(es) = CONS(ENTITY, new_e, entities_list(es));
+    store_dynamic_hpf(new_e, es);
+}
+
+bool dynamic_entity_p(a)
+entity a;
+{
+    return(bound_dynamic_hpf_p(a));
+}
+
+/*  as expected, TRUE if d1 and d2 describe the same mapping
+ */
+bool same_distribute_p(d1, d2)
+distribute d1, d2;
+{
+    pips_error("same_distribute_p", "not implemented yet");
+    return(TRUE);
+}
+
+/* idem for align
+ */
+bool same_align_p(a1, a2)
+align a1, a2;
+{
+    pips_error("same_align_p", "not implemented yet");
+    return(TRUE);
+}
+
+/* returns an array aligned as specified by a
+ */
+entity array_synonym_aligned_as(array, a)
+entity array;
+align a;
+{
+    entities es = load_dynamic_hpf(array);
+    list /* of entities */ l = entities_list(es);
+
+    for (; !ENDP(l); POP(l))
+    {
+	entity ar = ENTITY(CAR(l));
+
+	if (same_align_p(load_entity_align(ar), a))
+	{
+	    free_align(a);
+	    return(ar);
+	}
+    }
+
+    /*  else no compatible array does exist, so one must be created
+     */
+
+    
+}
+
+/* returns a template distributed as specified by d
+ */
+entity template_synonym_distributed_as(temp, d)
+entity temp;
+distribute d;
+{
+    entities es = load_dynamic_hpf(temp);
+    list /* of entities */ l = entities_list(es);
+
+    for (; !ENDP(l); POP(l))
+    {
+	entity t = ENTITY(CAR(l));
+
+	if (same_distribute_p(load_entity_distribute(t), d))
+	{
+	    free_distribute(d);
+	    return(t);
+	}
+    }
+
+    /*  else no compatible template does exist, so one must be created
+     */
+
+    
+}
+
+/* that is all
+ */
