@@ -65,9 +65,9 @@
 #define IS_UPPER_BOUND 1
 
 /* another non recursive section used to filter out preconditions */
-static cons * module_global_arguments = NIL;
+static list module_global_arguments = NIL;
 
-static cons * 
+static list
 get_module_global_arguments()
 {
     return module_global_arguments;
@@ -75,169 +75,18 @@ get_module_global_arguments()
 
 void 
 set_module_global_arguments(args)
-cons * args;
+list args;
 {
     module_global_arguments = args;
 }
 /* end of the non recursive section */
-
-transformer 
-statement_to_postcondition(pre, s)
-transformer pre;
-statement s;
-{
-    transformer post = transformer_undefined;
-    instruction i = statement_instruction(s);
-    transformer tf = load_statement_transformer(s);
 
-    /* ACHTUNG! "pre" is likely to be misused! FI, Sept. 3, 1990 */
+transformer statement_to_postcondition(transformer, statement);
 
-    debug(1,"statement_to_postcondition","begin\n");
-
-    pips_assert("statement_to_postcondition", pre != transformer_undefined);
-    ifdebug(1) {
-	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %p:\n",
-		       statement_number(s), ORDERING_NUMBER(so),
-		       ORDERING_STATEMENT(so), pre);
-	(void) print_transformer(pre) ;
-    }
-
-    pips_assert("statement_to_postcondition", tf != transformer_undefined);
-    ifdebug(1) {
-	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
-		       statement_number(s), ORDERING_NUMBER(so),
-		       ORDERING_STATEMENT(so), tf);
-	(void) print_transformer(tf) ;
-    }
-
-    if (load_statement_precondition(s) == transformer_undefined) {
-	/* keep only global initial scalar integer values;
-	   else, you might end up giving the same xxx#old name to
-	   two different local values */
-	cons * non_initial_values =
-	    arguments_difference(transformer_arguments(pre),
-				 get_module_global_arguments());
-
-	MAPL(cv,
-	 {entity v = ENTITY(CAR(cv));
-	  ENTITY(CAR(cv)) = entity_to_old_value(v);},
-	     non_initial_values);
-
-	post = instruction_to_postcondition(pre, i, tf);
-
-	/* add equivalence equalities */
-	pre = tf_equivalence_equalities_add(pre);
-
-	/* eliminate redundancy */
-	/* FI: nice... but time consuming! */
-	/* Version 3 is OK. Equations are over used and make
-	 * inequalities uselessly conplex
-	 */
-	/* pre = transformer_normalize(pre, 3); */
-
-	pre = transformer_normalize(pre, 6);
-
-	if(!transformer_consistency_p(pre)) {
-	    int so = statement_ordering(s);
-	    (void) fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
-			   statement_number(s), ORDERING_NUMBER(so),
-			   ORDERING_STATEMENT(so), pre);
-	    (void) print_transformer(pre);
-	    pips_error("statement_to_postcondition", "Non-consistent precondition after update\n");
-	}
-
-	/* store the precondition in the ri */
-	store_statement_precondition(s,
-				     transformer_filter(pre,
-							non_initial_values));
-    }
-    else {
-	debug(8,"statement_to_postcondition","precondition already available");
-	/* pre = statement_precondition(s); */
-	(void) print_transformer(pre);
-	pips_error("statement_to_postcondition",
-		   "precondition already computed\n");
-    }
-
-    /* post = instruction_to_postcondition(pre, i, tf); */
-
-    ifdebug(1) {
-	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
-		       statement_number(s), ORDERING_NUMBER(so),
-		       ORDERING_STATEMENT(so), load_statement_precondition(s));
-	(void) print_transformer(load_statement_precondition(s)) ;
-    }
-
-    ifdebug(1) {
-	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), postcondition %p:\n",
-		       statement_number(s), ORDERING_NUMBER(so),
-		       ORDERING_STATEMENT(so), post);
-	(void) print_transformer(post) ;
-    }
-
-    pips_assert("statement_to_postcondition: unexpected sharing",post!=pre);
-
-    debug(1,"statement_to_postcondition","end\n");
-
-    return post;
-}
-
-transformer 
-instruction_to_postcondition(pre, i, tf)
-transformer pre;
-instruction i;
-transformer tf;
-{
-    transformer post = transformer_undefined;
-    test t;
-    loop l;
-    call c;
-
-    debug(8,"instruction_to_postcondition","begin pre=%x tf=%x\n", pre, tf);
-
-    switch(instruction_tag(i)) {
-      case is_instruction_block:
-	post = block_to_postcondition(pre, instruction_block(i));
-	break;
-      case is_instruction_test:
-	t = instruction_test(i);
-	post = test_to_postcondition(pre, t, tf);
-	break;
-      case is_instruction_loop:
-	l = instruction_loop(i);
-	post = loop_to_postcondition(pre, l, tf);
-	break;
-      case is_instruction_goto:
-	pips_error("instruction_to_postcondition",
-		   "unexpected goto in semantics analysis");
-	/* never reached: post = pre; */
-	break;
-      case is_instruction_call:
-	c = instruction_call(i);
-	post = call_to_postcondition(pre, c, tf);
-	break;
-      case is_instruction_unstructured:
-	post = unstructured_to_postcondition(pre, instruction_unstructured(i),
-					     tf);
-	break ;
-      default:
-	pips_error("instruction_to_postcondition","unexpected tag %d\n",
-	      instruction_tag(i));
-    }
-    debug(9,"instruction_to_postcondition","resultat post:\n");
-    ifdebug(9) (void) print_transformer(post);
-    debug(8,"instruction_to_postcondition","post=%x end\n", post);
-    return post;
-}
-
-transformer 
-block_to_postcondition(b_pre, b)
-transformer b_pre;
-list b;
+static transformer 
+block_to_postcondition(
+    transformer b_pre,
+    list b)
 {
     statement s;
     transformer post;
@@ -268,12 +117,59 @@ list b;
     debug(8,"block_to_postcondition","post=%x end\n", post);
     return post;
 }
-
-transformer 
-unstructured_to_postcondition(pre, u, tf)
-transformer pre;
-unstructured u;
-transformer tf;
+
+static void 
+unstructured_to_postconditions(
+    transformer pre,
+    transformer pre_first,
+    unstructured u)
+{
+    cons *blocs = NIL ;
+    control ct = unstructured_control(u) ;
+    transformer c_pre = transformer_undefined;
+    transformer post = transformer_undefined;
+
+    debug(8,"unstructured_to_postconditions","begin\n");
+
+    /* SHARING! Every statement gets a pointer to the same precondition!
+     * I do not know if it's good or not but beware the bugs!!!
+     */
+    /* FI: changed to make free_transformer_mapping possible without 
+     * testing sharing.
+     *
+     * pre and pre_first can or not be used depending on the
+     * unstructured structure. They are always duplicated and
+     * the caller has to take care of their de-allocation.
+     */
+    CONTROL_MAP(c, {
+	statement st = control_statement(c) ;
+	if(c==ct && ENDP(control_predecessors(c)) && statement_test_p(st)) {
+	    /* special case for the first node if it has no predecessor */
+	    /* and if it is a test, as it always should, at least if */
+	    /* unspaghettify has been applied... */
+	    /* this is pretty useless and should be generalized to the
+	       DAG part of the CFG */
+	    c_pre = transformer_dup(pre_first);
+	    post = statement_to_postcondition(c_pre, st);
+	    transformer_free(post);
+	}
+	else {
+	    c_pre = transformer_dup(pre);
+	    post = statement_to_postcondition(c_pre, st);
+	    transformer_free(post);
+	}
+    }, ct, blocs) ;
+
+    gen_free_list(blocs) ;
+
+    debug(8,"unstructured_to_postconditions","end\n");
+}
+
+static transformer 
+unstructured_to_postcondition(
+    transformer pre,
+    unstructured u,
+    transformer tf)
 {
     transformer post;
     control c;
@@ -325,55 +221,8 @@ transformer tf;
 
     return post;
 }
-
-void 
-unstructured_to_postconditions(pre, pre_first, u)
-transformer pre;
-transformer pre_first;
-unstructured u ;
-{
-    cons *blocs = NIL ;
-    control ct = unstructured_control(u) ;
-    transformer c_pre = transformer_undefined;
-    transformer post = transformer_undefined;
 
-    debug(8,"unstructured_to_postconditions","begin\n");
-
-    /* SHARING! Every statement gets a pointer to the same precondition!
-     * I do not know if it's good or not but beware the bugs!!!
-     */
-    /* FI: changed to make free_transformer_mapping possible without 
-     * testing sharing.
-     *
-     * pre and pre_first can or not be used depending on the
-     * unstructured structure. They are always duplicated and
-     * the caller has to take care of their de-allocation.
-     */
-    CONTROL_MAP(c, {
-	statement st = control_statement(c) ;
-	if(c==ct && ENDP(control_predecessors(c)) && statement_test_p(st)) {
-	    /* special case for the first node if it has no predecessor */
-	    /* and if it is a test, as it always should, at least if */
-	    /* unspaghettify has been applied... */
-	    /* this is pretty useless and should be generalized to the
-	       DAG part of the CFG */
-	    c_pre = transformer_dup(pre_first);
-	    post = statement_to_postcondition(c_pre, st);
-	    transformer_free(post);
-	}
-	else {
-	    c_pre = transformer_dup(pre);
-	    post = statement_to_postcondition(c_pre, st);
-	    transformer_free(post);
-	}
-    }, ct, blocs) ;
-
-    gen_free_list(blocs) ;
-
-    debug(8,"unstructured_to_postconditions","end\n");
-}
-
-transformer
+static transformer
 add_loop_skip_condition(transformer pre, loop l)
 {
     /* It is assumed that loop l is not entered */
@@ -447,38 +296,85 @@ add_loop_skip_condition(transformer pre, loop l)
     return pre;
 }
 
-transformer 
-add_good_loop_conditions(pre, l, tf)
-transformer pre;
-loop l;
-transformer tf;
+static transformer 
+add_affine_bound_conditions(transformer pre, 
+			    entity index,
+			    Pvecteur v_bound, 
+			    bool lower_or_upper,
+			    transformer tfb)
 {
-    /* loop bounds can be kept as preconditions for the loop body
-       if the loop increment is numerically known and if they
-       are linear and if they are loop body invariant, i.e.
-       indices are accepted */
-    /* arg. tf is unused, it was replaced by tfb to correct a bug */
-    statement b = loop_body(l);
-    entity i = loop_index(l);
-    range r = loop_range(l);
-    transformer tfb = load_statement_transformer(b);
+    Pvecteur v = vect_dup(v_bound);
 
-    debug(8,"add_good_loop_conditions","begin\n");
+    /* check that v is not affected by tfb:
+     * N = 10
+     * DO I = 1, N
+     *   N = 1
+     *   {1<=I<=N} !wrong!
+     *   T(I) = 0.
+     * ENDDO
+     * and make sure that aliasings (I,J) and (I,X) are correctly handled
+     */
 
-    pre = add_index_range_conditions(pre, i, r, tfb);
+    /* Achtung: value_mappings_compatible_vector_p() has a side
+     * effect on its argument; it has to be evaluated before
+     * the second half of the test else effects would be wrongly
+     * interpreted in case of equivalences 
+     */
 
-    debug(8,"add_good_loop_conditions","end\n");
-    return(pre);
-    
+    if(value_mappings_compatible_vector_p(v) &&
+       !transformer_affect_linear_p(tfb,v)) {
+	if (lower_or_upper == IS_LOWER_BOUND)
+	    vect_add_elem(&v,
+			  (Variable) entity_to_new_value(index), VALUE_MONE);
+	else{
+	    vect_chg_sgn(v);
+	    vect_add_elem(&v, 
+			  (Variable) entity_to_new_value(index), VALUE_ONE);
+	}
+	pre = transformer_inequality_add(pre, v);
+    }
+    else{
+	vect_rm(v);
+	v = VECTEUR_UNDEFINED;
+    }	
+    return pre;
 }
 
+static transformer 
+add_index_bound_conditions(
+    transformer pre,
+    entity index,
+    expression bound,
+    int lower_or_upper,
+    transformer tfb)
+{
+    normalized n = NORMALIZE_EXPRESSION(bound);
+    /* tfb does not take into account the index incrementation */
+    transformer t_iter = transformer_dup(tfb);
+
+    /* It is assumed on entry that index has values recognized 
+     * by the semantics analysis
+     */
+    /* pips_assert("add_index_bound_conditions", entity_has_values_p(index)); */
+
+    transformer_arguments(t_iter) = 
+	arguments_add_entity(transformer_arguments(t_iter), index);
+
+    if(normalized_linear_p(n)) {
+	Pvecteur v_bound = (Pvecteur) normalized_linear(n);
+	add_affine_bound_conditions(pre, index, v_bound, lower_or_upper, t_iter);
+    }
+
+    free_transformer(t_iter);
+    return(pre);
+}
 
 transformer 
-add_index_range_conditions(pre, i, r, tfb)
-transformer pre;
-entity i;
-range r;
-transformer tfb;
+add_index_range_conditions(
+    transformer pre,
+    entity i,
+    range r,
+    transformer tfb)
 {
     /* if tfb is not undefined, then it is a loop;
        loop bounds can be kept as preconditions for the loop body
@@ -547,80 +443,33 @@ transformer tfb;
     return pre;
 }
 
-transformer 
-add_index_bound_conditions(pre, index, bound, lower_or_upper, tfb)
-transformer pre;
-entity index;
-expression bound;
-int lower_or_upper;
-transformer tfb; 
+static transformer 
+add_good_loop_conditions(
+    transformer pre,
+    loop l,
+    transformer tf)
 {
-    normalized n = NORMALIZE_EXPRESSION(bound);
-    /* tfb does not take into account the index incrementation */
-    transformer t_iter = transformer_dup(tfb);
+    /* loop bounds can be kept as preconditions for the loop body
+       if the loop increment is numerically known and if they
+       are linear and if they are loop body invariant, i.e.
+       indices are accepted */
+    /* arg. tf is unused, it was replaced by tfb to correct a bug */
+    statement b = loop_body(l);
+    entity i = loop_index(l);
+    range r = loop_range(l);
+    transformer tfb = load_statement_transformer(b);
 
-    /* It is assumed on entry that index has values recognized 
-     * by the semantics analysis
-     */
-    /* pips_assert("add_index_bound_conditions", entity_has_values_p(index)); */
+    debug(8,"add_good_loop_conditions","begin\n");
 
-    transformer_arguments(t_iter) = 
-	arguments_add_entity(transformer_arguments(t_iter), index);
+    pre = add_index_range_conditions(pre, i, r, tfb);
 
-    if(normalized_linear_p(n)) {
-	Pvecteur v_bound = (Pvecteur) normalized_linear(n);
-	add_affine_bound_conditions(pre, index, v_bound, lower_or_upper, t_iter);
-    }
-
-    free_transformer(t_iter);
+    debug(8,"add_good_loop_conditions","end\n");
     return(pre);
+    
 }
 
-transformer 
-add_affine_bound_conditions(transformer pre, 
-			    entity index,
-			    Pvecteur v_bound, 
-			    bool lower_or_upper,
-			    transformer tfb)
-{
-    Pvecteur v = vect_dup(v_bound);
 
-    /* check that v is not affected by tfb:
-     * N = 10
-     * DO I = 1, N
-     *   N = 1
-     *   {1<=I<=N} !wrong!
-     *   T(I) = 0.
-     * ENDDO
-     * and make sure that aliasings (I,J) and (I,X) are correctly handled
-     */
-
-    /* Achtung: value_mappings_compatible_vector_p() has a side
-     * effect on its argument; it has to be evaluated before
-     * the second half of the test else effects would be wrongly
-     * interpreted in case of equivalences 
-     */
-
-    if(value_mappings_compatible_vector_p(v) &&
-       !transformer_affect_linear_p(tfb,v)) {
-	if (lower_or_upper == IS_LOWER_BOUND)
-	    vect_add_elem(&v,
-			  (Variable) entity_to_new_value(index), VALUE_MONE);
-	else{
-	    vect_chg_sgn(v);
-	    vect_add_elem(&v, 
-			  (Variable) entity_to_new_value(index), VALUE_ONE);
-	}
-	pre = transformer_inequality_add(pre, v);
-    }
-    else{
-	vect_rm(v);
-	v = VECTEUR_UNDEFINED;
-    }	
-    return pre;
-}
-
-transformer
+static transformer
 add_loop_index_initialization(transformer pre, loop l)
 {
     entity i = loop_index(l);
@@ -666,11 +515,12 @@ add_loop_index_initialization(transformer pre, loop l)
  * lower bounds are affine, that the increment is affine and that the
  * increment sign is known.
  */
-transformer
-add_loop_index_exit_value(transformer post, /* postcondition of the last iteration */
-			  loop l,           /* loop to process */
-			  transformer pre,  /* precondition on loop entrance */
-			  list lbe          /* list of loop body effects */ )
+static transformer
+add_loop_index_exit_value(
+    transformer post, /* postcondition of the last iteration */
+    loop l,           /* loop to process */
+    transformer pre,  /* precondition on loop entrance */
+    list lbe          /* list of loop body effects */ )
 {
     entity i = loop_index(l);
     expression e_incr = range_increment(loop_range(l));
@@ -811,7 +661,7 @@ add_loop_index_exit_value(transformer post, /* postcondition of the last iterati
 
     return post;
 }
-
+
 bool 
 simple_dead_loop_p(expression lower, expression upper)
 {
@@ -850,12 +700,11 @@ simple_dead_loop_p(expression lower, expression upper)
     return dead_loop_p;
 }
 
-
-transformer 
-loop_to_postcondition(pre, l, tf)
-transformer pre;
-loop l;
-transformer tf;
+static transformer 
+loop_to_postcondition(
+    transformer pre,
+    loop l,
+    transformer tf)
 {
     transformer post = transformer_undefined;
     statement s = loop_body(l);
@@ -999,12 +848,12 @@ transformer tf;
     debug(8,"loop_to_postcondition","end\n");
     return post;
 }
-
-transformer 
-test_to_postcondition(pre, t, tf)
-transformer pre;
-test t;
-transformer tf;
+
+static transformer 
+test_to_postcondition(
+    transformer pre,
+    test t,
+    transformer tf)
 {
 #   define DEBUG_TEST_TO_POSTCONDITION 7
     expression e = test_condition(t);
@@ -1089,11 +938,11 @@ transformer tf;
     return post;
 }
 
-transformer 
-call_to_postcondition(pre, c, tf)
-transformer pre;
-call c;
-transformer tf;
+static transformer 
+call_to_postcondition(
+    transformer pre,
+    call c,
+    transformer tf)
 {
     transformer post = transformer_undefined;
     entity e = call_function(c);
@@ -1154,26 +1003,6 @@ transformer tf;
 
     return(post);
 }
-
-transformer 
-transformer_add_condition_information(pre, c, veracity)
-transformer pre;
-expression c;
-bool veracity;
-{
-    transformer post =  transformer_add_condition_information_updown(pre, c, veracity, TRUE);
-    return post;
-}
-
-transformer
-precondition_add_condition_information(pre, c, veracity)
-transformer pre;
-expression c;
-bool veracity;
-{
-    transformer post = transformer_add_condition_information_updown(pre, c, veracity, FALSE);
-    return post;
-}
 
 /* Non-convex information can be made convexe when moving postcondition downwards
  * because some of the parts introducing non-convexity may be made empty by
@@ -1187,12 +1016,12 @@ bool veracity;
  * freed and newpre allocated. In other words, argument "pre" should not be used
  * after a call to this function.
  */
-transformer 
-transformer_add_condition_information_updown(pre, c, veracity, upwards)
-transformer pre;
-expression c;
-bool veracity;
-bool upwards;
+static transformer 
+transformer_add_condition_information_updown(
+    transformer pre,
+    expression c,
+    bool veracity,
+    bool upwards)
 {
 #   define DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN 7
     /* default option: no condition can be added */
@@ -1366,7 +1195,29 @@ bool upwards;
 
     return newpre;
 }
-
+
+transformer 
+transformer_add_condition_information(
+    transformer pre,
+    expression c,
+    bool veracity)
+{
+    transformer post = 
+	transformer_add_condition_information_updown(pre, c, veracity, TRUE);
+    return post;
+}
+
+transformer
+precondition_add_condition_information(
+    transformer pre,
+    expression c,
+    bool veracity)
+{
+    transformer post = 
+	transformer_add_condition_information_updown(pre, c, veracity, FALSE);
+    return post;
+}
+
 /* Renaming of variables in v according to transformations occuring
  * later. If a variable is modified by post, its old value must
  * be used in v
@@ -1389,13 +1240,13 @@ upwards_vect_rename(Pvecteur v, transformer post)
 }
 
 transformer 
-transformer_add_relation_information(pre, relop, e1, e2, veracity, upwards)
-transformer pre;
-entity relop;
-expression e1;
-expression e2;
-bool veracity;
-bool upwards;
+transformer_add_relation_information(
+    transformer pre,
+    entity relop,
+    expression e1,
+    expression e2,
+    bool veracity,
+    bool upwards)
 {
 #   define DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION 7
     /* default: no change */
@@ -1601,4 +1452,170 @@ all_data_to_precondition(entity m)
     }
 
     return pre;
+}
+
+static transformer 
+instruction_to_postcondition(
+    transformer pre,
+    instruction i,
+    transformer tf)
+{
+    transformer post = transformer_undefined;
+    test t;
+    loop l;
+    call c;
+
+    debug(8,"instruction_to_postcondition","begin pre=%x tf=%x\n", pre, tf);
+
+    switch(instruction_tag(i)) {
+      case is_instruction_block:
+	post = block_to_postcondition(pre, instruction_block(i));
+	break;
+      case is_instruction_test:
+	t = instruction_test(i);
+	post = test_to_postcondition(pre, t, tf);
+	break;
+      case is_instruction_loop:
+	l = instruction_loop(i);
+	post = loop_to_postcondition(pre, l, tf);
+	break;
+      case is_instruction_goto:
+	pips_error("instruction_to_postcondition",
+		   "unexpected goto in semantics analysis");
+	/* never reached: post = pre; */
+	break;
+      case is_instruction_call:
+	c = instruction_call(i);
+	post = call_to_postcondition(pre, c, tf);
+	break;
+      case is_instruction_unstructured:
+	post = unstructured_to_postcondition(pre, instruction_unstructured(i),
+					     tf);
+	break ;
+      default:
+	pips_error("instruction_to_postcondition","unexpected tag %d\n",
+	      instruction_tag(i));
+    }
+    debug(9,"instruction_to_postcondition","resultat post:\n");
+    ifdebug(9) (void) print_transformer(post);
+    debug(8,"instruction_to_postcondition","post=%x end\n", post);
+    return post;
+}
+
+transformer 
+statement_to_postcondition(
+    transformer pre,
+    statement s)
+{
+    transformer post = transformer_undefined;
+    instruction i = statement_instruction(s);
+    transformer tf = load_statement_transformer(s);
+
+    /* ACHTUNG! "pre" is likely to be misused! FI, Sept. 3, 1990 */
+
+    debug(1,"statement_to_postcondition","begin\n");
+
+    pips_assert("statement_to_postcondition", pre != transformer_undefined);
+
+    ifdebug(1) {
+	int so = statement_ordering(s);
+	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %p:\n",
+		       statement_number(s), ORDERING_NUMBER(so),
+		       ORDERING_STATEMENT(so), pre);
+	(void) print_transformer(pre) ;
+    }
+
+    pips_assert("statement_to_postcondition", tf != transformer_undefined);
+    ifdebug(1) {
+	int so = statement_ordering(s);
+	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
+		       statement_number(s), ORDERING_NUMBER(so),
+		       ORDERING_STATEMENT(so), tf);
+	(void) print_transformer(tf) ;
+    }
+
+    if (!statement_reachable_p(s))
+    {
+	/* FC: if the code is not reachable (thanks to STOP or GOTO), which
+	 * is a structural information, the precondition is just empty.
+	 */
+	/* pre = transformer_empty(); */
+	free_predicate(transformer_relation(pre));
+	gen_free_list(transformer_arguments(pre));
+	transformer_arguments(pre) = NIL;
+	transformer_relation(pre) = make_predicate(sc_empty(BASE_NULLE));
+    }
+
+    if (load_statement_precondition(s) == transformer_undefined) {
+	/* keep only global initial scalar integer values;
+	   else, you might end up giving the same xxx#old name to
+	   two different local values */
+	cons * non_initial_values =
+	    arguments_difference(transformer_arguments(pre),
+				 get_module_global_arguments());
+
+	MAPL(cv,
+	 {entity v = ENTITY(CAR(cv));
+	  ENTITY(CAR(cv)) = entity_to_old_value(v);},
+	     non_initial_values);
+
+	post = instruction_to_postcondition(pre, i, tf);
+
+	/* add equivalence equalities */
+	pre = tf_equivalence_equalities_add(pre);
+
+	/* eliminate redundancy */
+	/* FI: nice... but time consuming! */
+	/* Version 3 is OK. Equations are over used and make
+	 * inequalities uselessly conplex
+	 */
+	/* pre = transformer_normalize(pre, 3); */
+
+	pre = transformer_normalize(pre, 6);
+
+	if(!transformer_consistency_p(pre)) {
+	    int so = statement_ordering(s);
+	    (void) fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
+			   statement_number(s), ORDERING_NUMBER(so),
+			   ORDERING_STATEMENT(so), pre);
+	    (void) print_transformer(pre);
+	    pips_error("statement_to_postcondition", "Non-consistent precondition after update\n");
+	}
+
+	/* store the precondition in the ri */
+	store_statement_precondition(s,
+				     transformer_filter(pre,
+							non_initial_values));
+    }
+    else {
+	pips_debug(8,"precondition already available");
+	/* pre = statement_precondition(s); */
+	(void) print_transformer(pre);
+	pips_error("statement_to_postcondition",
+		   "precondition already computed\n");
+    }
+
+    /* post = instruction_to_postcondition(pre, i, tf); */
+
+    ifdebug(1) {
+	int so = statement_ordering(s);
+	fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
+		statement_number(s), ORDERING_NUMBER(so),
+		ORDERING_STATEMENT(so), load_statement_precondition(s));
+	print_transformer(load_statement_precondition(s)) ;
+    }
+
+    ifdebug(1) {
+	int so = statement_ordering(s);
+	fprintf(stderr, "statement %03d (%d,%d), postcondition %p:\n",
+		statement_number(s), ORDERING_NUMBER(so),
+		ORDERING_STATEMENT(so), post);
+	print_transformer(post) ;
+    }
+
+    pips_assert("statement_to_postcondition: unexpected sharing",post!=pre);
+
+    debug(1,"statement_to_postcondition","end\n");
+
+    return post;
 }
