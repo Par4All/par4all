@@ -28,8 +28,8 @@ RFILES=		hpfc_interactive
 
 hpfc_interactive: hpfc_interactive.o
 	$(RM) hpfc_interactive
-	$(LD) $(LDFLAGS) -o hpfc_interactive \
-		hpfc_interactive.o -lreadline -ltermcap
+	$(LD) $(LDFLAGS) \
+		-o hpfc_interactive hpfc_interactive.o -lreadline -ltermcap
 	chmod a-w hpfc_interactive
 
 hpfc_interactive.o: hpfc_interactive.c
