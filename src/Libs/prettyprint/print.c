@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: print.c,v $
+ * Revision 1.20  1997/12/08 14:17:43  coelho
+ * make_text_resource_and_free() added.
+ *
  * Revision 1.19  1997/11/22 11:02:51  coelho
  * print_parallelizedOMP_code added.
  *
@@ -45,12 +48,13 @@ make_text_resource(
     string file_ext, /* file extension */
     text texte       /* text to be printed as this resource */)
 {
-    string filename, localfilename;
+    string filename, localfilename, dir;
     FILE *fd;
     
     localfilename = db_build_file_resource_name(res_name, mod_name, file_ext);
-    filename = strdup(concatenate(db_get_current_workspace_directory(), 
-				  "/", localfilename, NULL));
+    dir = db_get_current_workspace_directory();
+    filename = strdup(concatenate(dir, "/", localfilename, NULL));
+    free(dir);
 
     fd = safe_fopen(filename, "w");
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
@@ -63,6 +67,18 @@ make_text_resource(
     free(filename);
     
     return TRUE;
+}
+
+bool 
+make_text_resource_and_free(
+    string mod_name,
+    string res_name,
+    string file_ext,
+    text t)
+{
+    bool ok = make_text_resource(mod_name, res_name, file_ext, t);
+    free_text(t);
+    return ok;
 }
 
 static bool is_user_view;	/* print_code or print_source */
