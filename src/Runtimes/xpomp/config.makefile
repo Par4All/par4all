@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/30 18:43:09 $ 
+# $Date: 1996/08/30 18:50:14 $ 
 
 ifeq ($(FC),g77)
 CPPFLAGS+=	-DCOMPILE_FOR_G77
@@ -61,6 +61,7 @@ $(ARCH)/fractal : $(ARCH)/fractal.o $(LIB)
 clean: local-clean
 local-clean:
 	$(RM) $(ARCH)/*.o $(BIN) $(LIB) $(ARCH)/fractal $(ARCH)/test_xpomp
+	$(RM) -rf xpomp_manual xpomp_manual.html xpomp_manual.ps
 
 # that is all
 #
