@@ -69,11 +69,13 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
     dg_name = strdup(concatenate(db_get_current_workspace_directory(), 
 				 "/", local_dg_name, NULL));
     fp = safe_fopen(dg_name, "w");
-    
-    debug_on("RICEDG_DEBUG_LEVEL");
 
+    debug_on("TRACING_VARIABLE_DEBUG_LEVEL");
+    
     /* for tracing variables */
-    variable_trace(mod_name);
+    variable_trace(fp, mod_stat, dg, mod_name);
+
+    debug_on("RICEDG_DEBUG_LEVEL");
 
     if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") || 
 	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS"))
