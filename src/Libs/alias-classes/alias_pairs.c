@@ -147,11 +147,9 @@ add_parameter_aliases_for_this_call_site(call call_site,
 			    pips_debug(9,"region translated to:\n\t");
 			    print_inout_regions(pair);
 			}
-		    pair = gen_nconc(
-			CONS(EFFECT,region_dup(callee_region),NIL),
-			pair);
+		    pair = CONS(EFFECT,region_dup(callee_region),pair);
 
-		    list_pairs = gen_nconc(list_pairs,CONS(LIST,pair,NIL));
+		    list_pairs = CONS(EFFECTS,make_effects(pair),list_pairs);
 		}
 	     }
 	 }, list_regions_callee);
