@@ -8,9 +8,6 @@
 #include <string.h>
 
 #include "genC.h"
-#include "list.h"
-#include "hash.h"
-#include "mapping.h"
 
 #include "text.h"
 #include "text-util.h"
@@ -116,7 +113,7 @@ text text_loop_craft(module, label, margin, obj, n, lr, lidx)
       reference_indices(syntax_reference(lhs_sy)) = new_lli;
     }
 
-    comment = malloc(64);
+    comment = (char*) malloc(64);
     sprintf(comment,"CDIR$ DOSHARED(");
     for(lli = lidx; !ENDP(lli); POP(lli)) {
       sprintf(comment, "%s%s", comment,
