@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1994/03/25 17:45:55 $, ) version $Revision$,
+ * $RCSfile: build-system.c,v $ ($Date: 1994/04/11 17:01:17 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -198,11 +198,13 @@ string suffix, prefix;
 	  */
 	 
 	 sc_add_inegalite(new_system,
-			  contrainte_make(vect_add(vect_new(TCST, ilower),
-						   vect_new(dummy, -1))));
+			  contrainte_make(vect_make(VECTEUR_NUL,
+						    dummy, 	-1,
+						    TCST, 	ilower)));
 	 sc_add_inegalite(new_system,
-			  contrainte_make(vect_add(vect_new(TCST, -iupper),
-						   vect_new(dummy, 1))));
+			  contrainte_make(vect_make(VECTEUR_NUL,
+						    dummy, 	1,
+						    TCST, 	-iupper)));
 	 sc_creer_base(new_system);
 	 
 	 dim_number++;
@@ -270,6 +272,12 @@ int i;
     return(get_ith_dummy(HPFC_PACKAGE, ALPHA_PREFIX, i));
 }
 
+entity get_ith_region_dummy(i)
+int i;
+{
+    return(get_ith_dummy(REGIONS_MODULE_NAME, PHI_PREFIX, i));
+}
+
 entity get_ith_template_dummy(i)
 int i;
 {
@@ -300,6 +308,18 @@ int i;
     return(get_ith_dummy(HPFC_PACKAGE, LALPHA_PREFIX, i));
 }
 
+entity get_ith_shift_dummy(i)
+int i;
+{
+    return(get_ith_dummy(HPFC_PACKAGE, IOTA_PREFIX, i));
+}
+
+bool entity_hpfc_dummy_p(e)
+entity e;
+{
+    return(!strcmp(entity_module_name(e), HPFC_PACKAGE));
+}
+
 /*
  * Psysteme hpfc_compute_align_constraints(e)
  * entity e is an array
@@ -326,7 +346,6 @@ entity e;
     {
 	entity
 	    theta = get_ith_template_dummy(i);
-
 	alignment
 	    a = FindAlignmentOfTemplateDim(align_alignment(al), i);
 	
@@ -336,8 +355,9 @@ entity e;
 		adim = alignment_arraydim(a),
 		constant = HpfcExpressionToInt(alignment_constant(a));
 	    Pvecteur
-		v = vect_add(vect_new(TCST, -constant),
-			     vect_new(theta, 1));
+		v = vect_make(VECTEUR_NUL,
+			      theta, 	1,
+			      TCST, 	-constant);
 					       
 	    if (adim==0)
 	    {
@@ -350,11 +370,13 @@ entity e;
 		int
 		    rate = HpfcExpressionToInt(alignment_rate(a));
 
-		sc_add_egalite(new_system,
-		     contrainte_make(vect_add(v, vect_new(phi, -rate))));
+		v = vect_make(v, phi, -rate, TCST, 0);
+		
+		sc_add_egalite(new_system, contrainte_make(v));
 	    }
 	}
     }
+
     sc_creer_base(new_system);
     return(new_system);
 }
@@ -365,7 +387,7 @@ entity e;
  *
  * equations for non aligned template dimensions are computed:
  *
- * phi_i - lower_template_i == 0
+ * theta_i - lower_template_i == 0
  */
 Psysteme hpfc_compute_unicity_constraints(e)
 entity e;
@@ -396,8 +418,9 @@ entity e;
 			(dimension_lower(entity_ith_dimension(template, i)));
 
 	    sc_add_egalite(new_system,
-			   contrainte_make(vect_add(vect_new(theta, 1),
-						    vect_new(TCST, -low))));
+			   contrainte_make(vect_make(VECTEUR_NUL,
+						     theta, 	1,
+						     TCST, 	-low)));
 	}
     }
     sc_creer_base(new_system);
@@ -415,6 +438,7 @@ entity e;
  * delta_j < Nj
  * ??? if block distribution: gamma_j == 0 
  * ??? not distributed template dimensions are skipped...
+ * ??? if cyclic(1) distribution: delta_j == 0
  */
 static Psysteme hpfc_compute_distribute_constraints(e)
 entity e;
@@ -448,10 +472,10 @@ entity e;
 	    psi0 = HpfcExpressionToInt
 		(dimension_lower(entity_ith_dimension(proc, j))),
 	    proc_size = SizeOfIthDimension(proc, j);
-	bool
-	    is_block = style_block_p(distribution_style(d));
+	style
+	    st = distribution_style(d);
 	Pvecteur
-	    v = VECTEUR_NUL;
+	    v = VECTEUR_UNDEFINED;
 
 	/*
 	 * -delta_j <= 0
@@ -463,8 +487,9 @@ entity e;
 	 * delta_j - (N_j - 1) <= 0
 	 */
 	sc_add_inegalite(new_system,
-			 contrainte_make(vect_add(vect_new(delta, 1),
-						  vect_new(TCST, -param+1))));
+			 contrainte_make(vect_make(VECTEUR_NUL,
+						   delta, 	1,
+						   TCST, 	-param+1)));
 
 	/*
 	 * theta_i 
@@ -474,21 +499,31 @@ entity e;
 	 * + Nj psi_j0 - theta_i0
 	 * == 0
 	 */
-	v = vect_new(theta, 1);
-	v = vect_add(v, vect_new(psi, -param));
-	v = vect_add(v, vect_new(gamma, -(param*proc_size)));
-	v = vect_add(v, vect_new(delta, -1));
-	v = vect_add(v, vect_new(TCST, param*psi0-theta0));
-	
+	v = vect_make(VECTEUR_NUL,
+		      theta, 	1,
+		      psi, 	-param,
+		      gamma, 	-(param*proc_size),
+		      delta, 	-1,
+		      TCST, 	param*psi0-theta0);
+
 	sc_add_egalite(new_system, contrainte_make(v));	
 
 	/*
 	 * if block distributed
 	 * gamma_j == 0
 	 */
-	if (is_block)
+	if (style_block_p(st))
 	    sc_add_egalite(new_system,
 			   contrainte_make(vect_new(gamma, 1)));
+
+	/*
+	 * if cyclic(1) distributed
+	 * delta_j == 0
+	 */
+	if (style_cyclic_p(st) && (param==1))
+	    sc_add_egalite(new_system,
+			   contrainte_make(vect_new(delta, 1)));
+	    
     }
     sc_creer_base(new_system);
     return(new_system);
@@ -570,11 +605,11 @@ Psysteme hpfc_compute_entity_to_new_declaration(array)
 entity array;
 {
     list
-	nd = GET_ENTITY_MAPPING(newdeclarations, array);
+	nd = (list) GET_ENTITY_MAPPING(newdeclarations, array);
     int
 	dim = 1;
     Psysteme
-	syst = sc_rm(NULL);
+	syst = sc_rn(NULL);
 
     pips_assert("hpfc_compute_entity_to_new_declaration",
 		array_distributed_p(array));
@@ -595,22 +630,90 @@ entity array;
 	      * LALPHAi == ALPHAi
 	      */
 	     sc_add_egalite(syst, 
-			    contrainte_make(vect_add(vect_new(alpha, 1),
-						     vect_new(lalpha, -1))));
+			    contrainte_make(vect_make(VECTEUR_NUL,
+						      alpha, 	1,
+						      lalpha, 	-1,
+						      TCST,	0)));
 	     break;
 	 case ALPHA_NEW_DECLARATION:
+	 {
 	     /*
-	      * LALPHAi = ALPHAi + offset
+	      * LALPHAi = ALPHAi - ALPHAi_min + 1
 	      */
+	     int min = 314159;
+	     int max = -314159;
+
+	     get_ith_dim_new_declaration(array, dim, &min, &max);
+	     
+	     sc_add_egalite(syst,
+			    contrainte_make(vect_make(VECTEUR_NUL,
+						      alpha, 	1,
+						      lalpha, 	-1,
+						      TCST, 	1-min)));
+
 	     break;
+	 }
 	 case BETA_NEW_DECLARATION:
-	     /*
-	      * LALPHAi == DELTAj + 1
+	 {
+	     /* 
+	      * (|a|==1) LALPHA_i == DELTA_j + 1
+	      * generalized to:
+	      * (|a|!=1) |a| * (LALPHA_i - 1) + IOTA_j == DELTA_j
+	      *           0 <= IOTA_j < |a|
 	      */
+	     entity
+		 delta = entity_undefined;
+	     int tdim = -1;
+	     int a = 0;
+	     int b = 0;
+	     
+	     get_alignment(array, dim, &tdim, &a, &b);
+	     	     
+	     pips_assert("hpfc_compute_entity_to_new_declaration", 
+			 (a!=0) && (tdim!=0));
+	     
+	     delta = get_ith_block_dummy(tdim);
+
+	     if (abs(a)==1)
+	     {
+		 /* IOTA is not needed */
+		 sc_add_egalite(syst,
+				contrainte_make(vect_make(VECTEUR_NUL,
+							  delta, 	1,
+							  lalpha, 	-1,
+							  TCST, 	1)));
+	     }
+	     else
+	     {
+		 entity
+		     iota = get_ith_shift_dummy(tdim);
+		 Pvecteur
+		     v1 = vect_make(NULL,
+				    lalpha, 	abs(a),
+				    iota, 	1,
+				    delta, 	-1,
+				    TCST, 	-abs(a));
+
+		 sc_add_egalite(syst, contrainte_make(v1));
+		 
+		 sc_add_inegalite(syst,
+				  contrainte_make(vect_new(iota, -1)));
+		 sc_add_inegalite
+		     (syst,
+		      contrainte_make(vect_make(VECTEUR_NUL,
+						iota, 	1,
+						TCST, 	-(abs(a)-1))));
+	     }
+
 	     break;
+	 }
 	 case GAMMA_NEW_DECLARATION:
+	     user_warning("hpfc_compute_entity_to_new_declaration",
+			  "GAMMA case not implemented yet\n");
 	     break;
 	 case DELTA_NEW_DECLARATION:
+	     user_warning("hpfc_compute_entity_to_new_declaration",
+			  "DELTA case not implemented yet\n");
 	     break;
 	 default:
 	     pips_error("hpfc_compute_entity_to_new_declaration",
@@ -642,6 +745,35 @@ entity array;
     }
 
     return(p);
+}
+
+/* ------------------------------------------------------------
+ * 
+ * PHIi == ALPHAi list
+ *
+ */
+
+Psysteme hpfc_unstutter_dummies(array)
+entity array;
+{
+    Psysteme
+	new_syst = sc_rn(NULL);
+    int 
+	i = 1,
+	ndim = variable_entity_dimension(array);
+
+    for(;i<=ndim;i++)
+    {
+	sc_add_egalite
+	    (new_syst,
+	     contrainte_make(vect_make(VECTEUR_NUL,
+				       get_ith_region_dummy(i), 1,
+				       get_ith_array_dummy(i),  -1,
+				       TCST, 			0)));
+    }
+
+    sc_creer_base(new_syst);
+    return(new_syst);
 }
 
 /*
