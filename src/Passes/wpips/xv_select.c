@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/08/07 12:08:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/08/09 13:51:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/08/07 12:08:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/08/09 13:51:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -57,26 +57,26 @@ select_a_module_by_default()
 }
 
 
-success end_directory_notify(dir)
-char *dir;
+success
+end_directory_notify(char * dir)
 {
-    char *s;
+   char *s;
 
-    if (dir != NULL) {
-	if ((s = pips_change_directory(dir)) == NULL) {
-	    user_log("Directory %s does not exist\n", dir);
-	    /* FI: according to cproto and gcc */
-	    /* prompt_user("Directory %s does not exist !", dir); */
-	    prompt_user("Directory does not exist !");
-	    return (FALSE);
-	}
-	else {
-	    user_log("Directory %s selected\n", dir);
-	}
-    }
+   if (dir != NULL) {
+      if ((s = pips_change_directory(dir)) == NULL) {
+         user_log("Directory %s does not exist\n", dir);
+         /* FI: according to cproto and gcc */
+         /* prompt_user("Directory %s does not exist !", dir); */
+         prompt_user("Directory does not exist !");
+         return (FALSE);
+      }
+      else {
+         user_log("Directory %s selected\n", dir);
+      }
+   }
 
-    show_directory();
-    return (TRUE);
+   show_directory();
+   return (TRUE);
 }
 
 
@@ -99,6 +99,67 @@ void start_directory_notify(menu, menu_item)
 
 static Menu_item create_pgm, open_pgm, close_pgm, module_item;
 
+
+void
+disable_workspace_create_or_open()
+{
+   xv_set(create_pgm,
+          MENU_INACTIVE, TRUE,
+          NULL);
+   xv_set(open_pgm,
+          MENU_INACTIVE, TRUE,
+          NULL);
+}
+
+
+void
+enable_workspace_create_or_open()
+{
+   xv_set(create_pgm,
+          MENU_INACTIVE, FALSE,
+          NULL);
+   xv_set(open_pgm,
+          MENU_INACTIVE, FALSE,
+          NULL);
+}
+
+
+void
+disable_workspace_close()
+{
+   xv_set(close_pgm, MENU_INACTIVE, TRUE, 0);
+}
+
+
+void
+enable_workspace_close()
+{
+   xv_set(close_pgm, MENU_INACTIVE, FALSE, 0);
+}
+
+
+void
+disable_module_selection()
+{
+   xv_set(module_item, MENU_INACTIVE, TRUE, 0);
+   xv_set(module_name_panel_item, PANEL_INACTIVE, TRUE, 0);
+   disable_view_selection();
+   disable_transform_selection();
+   disable_option_selection();
+}
+
+
+void
+enable_module_selection()
+{
+   xv_set(module_item, MENU_INACTIVE, FALSE, 0);
+   xv_set(module_name_panel_item, PANEL_INACTIVE, FALSE, 0);
+   enable_view_selection();
+   enable_transform_selection();
+   enable_option_selection();
+}
+
+
 void
 start_create_program_notify(Menu menu,
                             Menu_item menu_item)
@@ -120,10 +181,9 @@ void
 cancel_create_program_notify(Panel_item item,
                              Event * event)
 {
-  /* Re'tablit le droit d'ouvrir ou de cre'er un autre worspace : */
-  xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
-  xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
-  cancel_query_notify(item, event);
+   /* Re'tablit le droit d'ouvrir ou de cre'er un autre worspace : */
+   enable_workspace_create_or_open();
+   cancel_query_notify(item, event);
 }
 
 
@@ -136,8 +196,7 @@ continue_create_program_notify(char * name)
 
 
    if( setjmp(pips_top_level) ) {
-      xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
-      xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
+      enable_workspace_create_or_open();;
       return(FALSE);
    }
    else {
@@ -174,8 +233,7 @@ continue_create_program_notify(char * name)
                return(FALSE);
          }
 
-         xv_set(create_pgm, MENU_INACTIVE, TRUE, 0);
-         xv_set(open_pgm, MENU_INACTIVE, TRUE, 0);
+         disable_workspace_create_or_open();
 
          /* To avoid passing the name through mchoose(): */
          workspace_name_to_create = name;
@@ -212,11 +270,13 @@ end_create_program_notify(int * pargc, char * argv[])
    
    create_program(pargc, argv);
 
-   xv_set(close_pgm, MENU_INACTIVE, FALSE, 0);
-   xv_set(module_item, MENU_INACTIVE, FALSE, 0);
+   disable_workspace_create_or_open();
+   enable_workspace_close();
 
    show_program();
    select_a_module_by_default();
+   enable_module_selection();
+
    display_memory_usage();
 }
 
@@ -233,61 +293,62 @@ end_open_program_notify(string name)
     
    if ( open_program(name) ) {
       open_log_file();
-      xv_set(close_pgm, MENU_INACTIVE, FALSE, 0);
-      xv_set(module_item, MENU_INACTIVE, FALSE, 0);
+      disable_workspace_create_or_open();
+      enable_workspace_close();
       show_program();
       select_a_module_by_default();
+      enable_module_selection();
    }
    else {
-      xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
-      xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
+      enable_workspace_create_or_open();
    }
    display_memory_usage();
 }
 
-void cancel_open_program_notify()
+
+void
+cancel_open_program_notify()
 {
-    xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
-    xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
+   enable_workspace_create_or_open();
 }
 
-void open_program_notify(menu, menu_item)
-Menu menu;
-Menu_item menu_item;
+
+void
+open_program_notify(Menu menu,
+                    Menu_item menu_item)
 {
-    char *program_list[ARGS_LENGTH];
-    int  program_list_length = 0;
+   char *program_list[ARGS_LENGTH];
+   int  program_list_length = 0;
 
-    pips_get_program_list(&program_list_length, program_list);
+   pips_get_program_list(&program_list_length, program_list);
 
-    if (program_list_length == 0) {
-		prompt_user("No workspace available in this directory.");
-    }
-    else if (program_list_length == 1) {
-       /* There is only workspace: open it without asking confirmation
-          to the user: */
-       user_log("There is only one workspace in the current directory.\n"
-                     "\tOpening the workspace \"%s\"...\n",
-                     program_list[0]); 
-       end_open_program_notify(program_list[0]);
-    }
-    else {
-		xv_set(create_pgm, MENU_INACTIVE, TRUE, 0);
-		xv_set(open_pgm, MENU_INACTIVE, TRUE, 0);
+   if (program_list_length == 0) {
+      prompt_user("No workspace available in this directory.");
+   }
+   else if (program_list_length == 1) {
+      /* There is only workspace: open it without asking confirmation
+         to the user: */
+      user_log("There is only one workspace in the current directory.\n"
+               "\tOpening the workspace \"%s\"...\n",
+               program_list[0]); 
+      end_open_program_notify(program_list[0]);
+   }
+   else {
+      disable_workspace_create_or_open();
 
-		schoose("Select Workspace", 
-			program_list_length, program_list,
-			/* Choix initial sur le workspace courant si
-                           possible : */
-			db_get_current_program_name(),
-			end_open_program_notify,
-			cancel_open_program_notify);
+      schoose("Select Workspace", 
+              program_list_length, program_list,
+              /* Choix initial sur le workspace courant si
+                 possible : */
+              db_get_current_program_name(),
+              end_open_program_notify,
+              cancel_open_program_notify);
 
-		/* FI/RK: too early; we are not sure to successfully open the workspace
-		 * xv_set(module_item, MENU_INACTIVE, FALSE, 0);
-		 */
-    }
-    args_free(&program_list_length, program_list);
+      /* FI/RK: too early; we are not sure to successfully open the workspace
+       * xv_set(module_item, MENU_INACTIVE, FALSE, 0);
+       */
+   }
+   args_free(&program_list_length, program_list);
 }
 
 
@@ -305,11 +366,11 @@ close_program_notify(Menu menu,
    show_program();
    show_module();
 
-   xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
-   xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
-   xv_set(close_pgm, MENU_INACTIVE, TRUE, 0);
+   enable_workspace_create_or_open();
+   disable_workspace_close();
 
-   xv_set(module_item, MENU_INACTIVE, TRUE, 0);
+   disable_module_selection();
+   
    hide_window(schoose_frame);
    display_memory_usage();
 }
@@ -484,59 +545,60 @@ generate_module_menu()
 }
 
 
-void create_select_menu()
+void
+create_select_menu()
 {
-    Menu menu, pmenu;
+   Menu menu, pmenu;
 
-    create_pgm = xv_create(NULL, MENUITEM, 
-		      MENU_STRING, "Create",
-		      MENU_NOTIFY_PROC, start_create_program_notify,
-		      MENU_RELEASE,
-		      NULL);
+   create_pgm = xv_create(NULL, MENUITEM, 
+                          MENU_STRING, "Create",
+                          MENU_NOTIFY_PROC, start_create_program_notify,
+                          MENU_RELEASE,
+                          NULL);
 
-    open_pgm = xv_create(NULL, MENUITEM, 
-		      MENU_STRING, "Open",
-		      MENU_NOTIFY_PROC, open_program_notify,
-		      MENU_RELEASE,
-		      NULL);
+   open_pgm = xv_create(NULL, MENUITEM, 
+                        MENU_STRING, "Open",
+                        MENU_NOTIFY_PROC, open_program_notify,
+                        MENU_RELEASE,
+                        NULL);
 
-    close_pgm = xv_create(NULL, MENUITEM, 
-		      MENU_STRING, "Close",
-		      MENU_NOTIFY_PROC, close_program_notify,
-		      MENU_INACTIVE, TRUE,
-		      MENU_RELEASE,
-		      NULL);
+   close_pgm = xv_create(NULL, MENUITEM, 
+                         MENU_STRING, "Close",
+                         MENU_NOTIFY_PROC, close_program_notify,
+                         MENU_INACTIVE, TRUE,
+                         MENU_RELEASE,
+                         NULL);
 
-    module_item = xv_create(NULL, MENUITEM, 
-		      MENU_STRING, "Module",
-		      MENU_NOTIFY_PROC, select_module_notify,
-		      MENU_INACTIVE, TRUE,
-		      MENU_RELEASE,
-		      NULL);
+   module_item = xv_create(NULL, MENUITEM, 
+                           MENU_STRING, "Module",
+                           MENU_NOTIFY_PROC, select_module_notify,
+                           MENU_INACTIVE, TRUE,
+                           MENU_RELEASE,
+                           NULL);
 
-		/* Exchange of the order of create_pgm & open_pgm on the screen
-			for ergonomic reasons. :-) RK, 19/02/1993. */
-    pmenu = 
-	xv_create(NULL, MENU_COMMAND_MENU, 
-		  MENU_GEN_PIN_WINDOW, main_frame, "Workspace Menu",
-		  MENU_APPEND_ITEM, open_pgm,
-		  MENU_APPEND_ITEM, create_pgm,
-		  MENU_APPEND_ITEM, close_pgm,
-		  NULL);
+   /* Exchange of the order of create_pgm & open_pgm on the screen
+      for ergonomic reasons. :-) RK, 19/02/1993. */
+   pmenu = 
+      xv_create(NULL, MENU_COMMAND_MENU, 
+                MENU_GEN_PIN_WINDOW, main_frame, "Workspace Menu",
+                MENU_APPEND_ITEM, open_pgm,
+                MENU_APPEND_ITEM, create_pgm,
+                MENU_APPEND_ITEM, close_pgm,
+                NULL);
 
-		/* Exchange of the order of start_directory_notify &
-			module_item on the screen for ergonomic reasons.
-			:-) RK, 19/02/1993. */
-    menu = 
-	xv_create(NULL, MENU_COMMAND_MENU, 
-		  MENU_GEN_PIN_WINDOW, main_frame, "Selection Menu",
-		  MENU_APPEND_ITEM, module_item,
-		  MENU_PULLRIGHT_ITEM, "Workspace", pmenu,
-		  MENU_ACTION_ITEM, "Directory", start_directory_notify,
-		  0);
+   /* Exchange of the order of start_directory_notify &
+      module_item on the screen for ergonomic reasons.
+      :-) RK, 19/02/1993. */
+   menu = 
+      xv_create(NULL, MENU_COMMAND_MENU, 
+                MENU_GEN_PIN_WINDOW, main_frame, "Selection Menu",
+                MENU_APPEND_ITEM, module_item,
+                MENU_PULLRIGHT_ITEM, "Workspace", pmenu,
+                MENU_ACTION_ITEM, "Directory", start_directory_notify,
+                0);
 
-    (void) xv_create(main_panel, PANEL_BUTTON,
-		     PANEL_LABEL_STRING, "Select",
-		     PANEL_ITEM_MENU, menu,
-		     NULL);
+   (void) xv_create(main_panel, PANEL_BUTTON,
+                    PANEL_LABEL_STRING, "Select",
+                    PANEL_ITEM_MENU, menu,
+                    NULL);
 }
