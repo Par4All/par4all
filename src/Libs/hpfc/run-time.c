@@ -4,7 +4,7 @@
  * Fabien Coelho, May and June 1993
  *
  * SCCS stuff:
- * $RCSfile: run-time.c,v $ ($Date: 1994/04/11 11:47:39 $, ) version $Revision$,
+ * $RCSfile: run-time.c,v $ ($Date: 1994/06/03 14:14:42 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -18,146 +18,12 @@ extern int fprintf();
 #include "misc.h"
 #include "ri-util.h"
 #include "bootstrap.h"
+#include "properties.h"
 #include "hpfc.h"
-#include "compiler_parameters.h"
 #include "defines-local.h"
 
-extern instruction MakeAssignInst(syntax l, expression r);
 extern entity CreateIntrinsic(string name);                 /* in syntax.h */
 extern entity MakeExternalFunction(entity e, type r);       /* idem */
-
-entity 
-    e_MYPOS,
-    e_SendToC, 
-    e_SendToH, 
-    e_SendToA,
-    e_HSendToA,
-    e_SendToO, 
-    e_SendToOs, 
-    e_SendToOOs, 
-    e_SendToHA, 
-    e_SendToNO, 
-    e_SendToHNO, 
-    e_ReceiveFromS, 
-    e_ReceiveFromH, 
-    e_ReceiveFromC, 
-    e_ReceiveFrommCS, 
-    e_ReceiveFrommCH, 
-    e_ComputeComputer, 
-    e_ComputeOwners,
-    e_CompNeighbour,
-    e_SenderP, 
-    e_OwnerP, 
-    e_ComputerP,
-    e_CompInOwnersP,
-    e_LocalInd,
-    e_LocalIndGamma,
-    e_LocalIndDelta,
-    e_InitHost,
-    e_InitNode,
-    e_HostEnd,
-    e_NodeEnd,
-    e_LoopBounds,
-    e_SendToNeighb,
-    e_ReceiveFromNeighb;
-
-#define SND_TO_C 	"HPFC_SNDTO_C"
-#define SND_TO_H 	"HPFC_SNDTO_H"
-#define SND_TO_A 	"HPFC_SNDTO_A"
-#define SND_TO_A_BY_H 	"HPFC_HSNDTO_A"
-#define SND_TO_O 	"HPFC_SNDTO_O"
-#define SND_TO_OS 	"HPFC_SNDTO_OS"
-#define SND_TO_OOS 	"HPFC_SNDTO_OOS"
-#define SND_TO_HA 	"HPFC_SNDTO_HA"
-#define SND_TO_NO 	"HPFC_SNDTO_NO"
-#define SND_TO_HNO 	"HPFC_SNDTO_HNO"
-
-#define RCV_FR_S 	"HPFC_RCVFR_S"
-#define RCV_FR_H 	"HPFC_RCVFR_H"
-#define RCV_FR_C 	"HPFC_RCVFR_C"
-#define RCV_FR_mCS 	"HPFC_RCVFR_mCS"
-#define RCV_FR_mCH 	"HPFC_RCVFR_mCH"
-
-#define CMP_COMPUTER 	"HPFC_CMPCOMPUTER"
-#define CMP_OWNERS 	"HPFC_CMPOWNERS"
-#define CMP_NEIGHBOUR	"HPFC_CMPNEIGHBOUR"
-
-#define CND_SENDERP 	"HPFC_SENDERP"
-#define CND_OWNERP 	"HPFC_OWNERP"
-#define CND_COMPUTERP 	"HPFC_COMPUTERP"
-#define CND_COMPINOWNP 	"HPFC_COMPUTERINOWNERSP"
-
-#define LOCAL_IND 	"HPFC_LOCALIND"
-#define LOCAL_IND_GAMMA	"HPFC_LOCALINDGAMMA"
-#define LOCAL_IND_DELTA "HPFC_LOCALINDDELTA"
-
-#define INIT_NODE	"HPFC_INIT_NODE"
-#define INIT_HOST	"HPFC_INIT_HOST"
-#define NODE_END	"HPFC_NODE_END"
-#define HOST_END	"HPFC_HOST_END"
-
-#define LOOP_BOUNDS	"HPFC_LOOP_BOUNDS"
-
-#define SND_TO_N	"HPFC_SNDTO_N"
-#define RCV_FR_N	"HPFC_RCVFR_N"
-
-/*
- *
- */
-void init_pvm_based_intrinsics()
-{
-    e_SendToC		= MakeRunTimeSupportSubroutine(SND_TO_C, 2); 
-    e_SendToH		= MakeRunTimeSupportSubroutine(SND_TO_H, 2); 
-    e_SendToA		= MakeRunTimeSupportSubroutine(SND_TO_A, 2); 
-    e_HSendToA		= MakeRunTimeSupportSubroutine(SND_TO_A_BY_H, 2); 
-    e_SendToO		= MakeRunTimeSupportSubroutine(SND_TO_O, 2); 
-    e_SendToOs		= MakeRunTimeSupportSubroutine(SND_TO_OS, 2); 
-    e_SendToOOs		= MakeRunTimeSupportSubroutine(SND_TO_OOS, 2); 
-    e_SendToHA		= MakeRunTimeSupportSubroutine(SND_TO_HA, 2); 
-    e_SendToNO		= MakeRunTimeSupportSubroutine(SND_TO_NO, 2); 
-    e_SendToHNO		= MakeRunTimeSupportSubroutine(SND_TO_HNO, 2);
-
-    e_ReceiveFromS	= MakeRunTimeSupportSubroutine(RCV_FR_S, 2); 
-    e_ReceiveFromH	= MakeRunTimeSupportSubroutine(RCV_FR_H, 2); 
-    e_ReceiveFromC	= MakeRunTimeSupportSubroutine(RCV_FR_C, 2); 
-    e_ReceiveFrommCS	= MakeRunTimeSupportSubroutine(RCV_FR_mCS, 2); 
-    e_ReceiveFrommCH	= MakeRunTimeSupportSubroutine(RCV_FR_mCH, 2); 
-
-#ifndef HPFC_EXPAND_COMPUTE_COMPUTER
-    e_ComputeComputer	= MakeRunTimeSupportSubroutine(CMP_COMPUTER, 1); 
-#else
-    e_ComputeComputer	= MakeRunTimeSupportSubroutine(CMP_COMPUTER, 8); 
-#endif
-
-#ifndef HPFC_EXPAND_COMPUTE_OWNERS
-    e_ComputeOwners	= MakeRunTimeSupportSubroutine(CMP_OWNERS, 1);
-#else
-    e_ComputeOwners	= MakeRunTimeSupportSubroutine(CMP_OWNERS, 8);
-#endif
-
-    e_CompNeighbour	= MakeRunTimeSupportSubroutine(CMP_NEIGHBOUR, 1);
-
-    e_SenderP		= MakeRunTimeSupportFunction(CND_SENDERP, 0); 
-    e_OwnerP		= MakeRunTimeSupportFunction(CND_OWNERP, 0); 
-    e_ComputerP		= MakeRunTimeSupportFunction(CND_COMPUTERP, 0);
-    e_CompInOwnersP	= MakeRunTimeSupportFunction(CND_COMPINOWNP, 0);
-
-    e_LocalInd		= MakeRunTimeSupportFunction(LOCAL_IND, 3);
-    e_LocalIndGamma	= MakeRunTimeSupportFunction(LOCAL_IND_GAMMA, 3);
-    e_LocalIndDelta	= MakeRunTimeSupportFunction(LOCAL_IND_DELTA, 3);
-
-    e_InitHost		= MakeRunTimeSupportSubroutine(INIT_HOST, 0);
-    e_InitNode		= MakeRunTimeSupportSubroutine(INIT_NODE, 0);
-    e_HostEnd		= MakeRunTimeSupportSubroutine(HOST_END, 0);
-    e_NodeEnd		= MakeRunTimeSupportSubroutine(NODE_END, 0);
-
-    e_LoopBounds	= MakeRunTimeSupportSubroutine(LOOP_BOUNDS, 7);
-
-    e_SendToNeighb	= MakeRunTimeSupportSubroutine(SND_TO_N, 0);
-    e_ReceiveFromNeighb = MakeRunTimeSupportSubroutine(RCV_FR_N, 0);
-
-    /* and so on. all these functions must be defined somewhere. */
-}
 
 /*
  * entity MakeRunTimeSupportSubroutine(local_name, number_of_arguments)
@@ -191,6 +57,15 @@ int number_of_arguments;
     return(MakeExternalFunction(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
 						   local_name),
 				MakeIntegerResult()));
+}
+
+expression pvm_what_option_expression(v)
+entity v;
+{
+    pips_assert("pvm_what_option_expression", entity_variable_p(v));
+
+    return(MakeCharacterConstantExpression
+	       (strdup(pvm_what_options(entity_basic(v)))));
 }
 
 /*
@@ -264,180 +139,15 @@ basic b;
  * Sends
  */
 
-/*
- *
- */
-statement st_call_send_or_receive(e, r)
-entity e;
+statement st_call_send_or_receive(f, r)
+entity f;
 reference r;
 {
     return
-	(mere_statement
-	 (make_instruction
-	  (is_instruction_call, 			
-	   make_call(e, 				
-		     CONS(EXPRESSION,
-			  MakeCharacterConstantExpression
-			    (pvm_what_options(entity_basic(reference_variable(r)))),
-		     CONS(EXPRESSION,
-			  reference_to_expression(r),
-			  NIL)))))); 
-}
-
-/*
- *
- */
-statement st_send_to_computer(val)
-reference val;
-{
-    return(st_call_send_or_receive(e_SendToC, val));
-}
-
-/*
- *
- */
-statement st_send_to_host(val)
-reference val;
-{
-    return(st_call_send_or_receive(e_SendToH, val));
-}
-
-/*
- *
- */
-statement st_send_to_all_nodes(val)
-reference val;
-{
-    return(st_call_send_or_receive(e_SendToA, val));
-}
-
-/*
- *
- */
-statement st_host_send_to_all_nodes(val)
-reference val;
-{
-    return(st_call_send_or_receive(e_HSendToA, val));
-}
-
-/*
- *
- */
-statement st_send_to_neighbour()
-{
-    return(my_make_call_statement(e_SendToNeighb, NIL));
-}
-
-/*
- *
- */
-statement st_send_to_owner(val)
-reference val;
-{
-    return(st_call_send_or_receive(e_SendToO, val));
-}
-
-/*
- *
- */
-statement st_send_to_owners(val)
-reference val;
-{
-    return(st_call_send_or_receive(e_SendToOs, val));
-}
-
-/*
- *
- */
-statement st_send_to_other_owners(val)
-reference val;
-{
-    return(st_call_send_or_receive(e_SendToOOs, val));
-}
-
-/*
- *
- */
-statement st_send_to_host_and_all_nodes(val)
-reference val;
-{
-    return(st_call_send_or_receive(e_SendToHA, val));
-}
-
-/*
- *
- */
-statement st_send_to_not_owners(val)
-reference val; 
-{
-    return(st_call_send_or_receive(e_SendToNO, val));
-}
-
-/*
- *
- */
-statement st_send_to_host_and_not_owners(val)
-reference val; 
-{
-    return(st_call_send_or_receive(e_SendToHNO, val));
-}
-
-/******************************************************************************/
-/*
- * Receives
- */
-
-/*
- *
- */
-statement st_receive_from_sender(goal)
-reference goal;
-{
-    return(st_call_send_or_receive(e_ReceiveFromS, goal));
-}
-
-/*
- *
- */
-statement st_receive_from_neighbour()
-{
-    return(my_make_call_statement(e_ReceiveFromNeighb, NIL));
-}
-
-/*
- *
- */
-statement st_receive_from_host(goal)
-reference goal;
-{
-    return(st_call_send_or_receive(e_ReceiveFromH, goal));
-}
-
-/*
- *
- */
-statement st_receive_from_computer(goal)
-reference goal;
-{
-    return(st_call_send_or_receive(e_ReceiveFromC, goal));
-}
-
-/*
- *
- */
-statement st_receive_mcast_from_sender(goal)
-reference goal;
-{
-    return(st_call_send_or_receive(e_ReceiveFrommCS, goal));
-}
-
-/*
- *
- */
-statement st_receive_mcast_from_host(goal)
-reference goal;
-{
-    return(st_call_send_or_receive(e_ReceiveFrommCH, goal));
+	(my_make_call_statement(f,
+	   CONS(EXPRESSION, pvm_what_option_expression(reference_variable(r)),
+	   CONS(EXPRESSION, reference_to_expression(r),
+		NIL))));
 }
 
 /******************************************************************************/
@@ -451,36 +161,25 @@ reference goal;
 statement st_compute_current_computer(ref)
 reference ref;
 {
-#ifndef HPFC_EXPAND_COMPUTE_COMPUTER
-    return(mere_statement(MakeUnaryCallInst(e_ComputeComputer,
-					    reference_to_expression(ref))));
-#else
-    list 
-	largs=NIL,
-	linds = reference_indices(ref);
-    int
-	narray = (int) GET_ENTITY_MAPPING(hpfnumber, reference_variable(ref)),
-	arity  = gen_length(linds);
-
-    switch(arity)
+    if (get_bool_property("HPFC_EXPAND_COMPUTE_COMPUTER"))
     {
-    case 0: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 1: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 2: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 3: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 4: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 5: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 6: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 7: break;
-    default: pips_error("st_compute_current_computer", "too many indices (%d)\n", arity);
-    }
+	list 
+	    linds = reference_indices(ref),
+	    largs = make_list_of_constant(0, 7-gen_length(linds));
+	int
+	    narray = get_hpf_number(reference_variable(ref));
 	
-    largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), NIL),
-		      gen_nconc(lUpdateExpr(oldtonewnodevar, linds), largs));
-
-    return(mere_statement(make_instruction(is_instruction_call,
-					   make_call(e_ComputeComputer, largs))));
-#endif
+	largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), 
+			       NIL),
+			  gen_nconc(lUpdateExpr(node_module, linds), largs));
+	
+	return(my_make_call_statement(hpfc_name_to_entity(CMP_COMPUTER), 
+				      largs));
+    }
+    else
+	return(my_make_call_statement(hpfc_name_to_entity(CMP_COMPUTER),
+		     CONS(EXPRESSION, reference_to_expression(ref),
+			  NIL)));
 }
 
 /*
@@ -489,36 +188,24 @@ reference ref;
 statement st_compute_current_owners(ref)
 reference ref;
 {
-#ifndef HPFC_EXPAND_COMPUTE_OWNERS
-    return(mere_statement(MakeUnaryCallInst(e_ComputeOwners,
-					reference_to_expression(ref))));
-#else
-    list 
-	largs=NIL,
-	linds = reference_indices(ref);
-    int
-	narray = (int) GET_ENTITY_MAPPING(hpfnumber, reference_variable(ref)),
-	arity  = gen_length(linds);
-
-    switch(arity)
+    if (get_bool_property("HPFC_EXPAND_COMPUTE_OWNER"))
     {
-    case 0: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 1: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 2: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 3: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 4: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 5: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 6: largs = CONS(EXPRESSION, int_to_expression(0), largs);
-    case 7: break;
-    default: pips_error("st_compute_current_computer", "too many indices (%d)\n", arity);
-    }
+	list 
+	    linds = reference_indices(ref),
+	    largs = make_list_of_constant(0, 7-gen_length(linds));
+	int
+	    narray = get_hpf_number(reference_variable(ref));
 	
-    largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), NIL),
-		      gen_nconc(lUpdateExpr(oldtonewnodevar,  linds), largs));
-
-    return(mere_statement(make_instruction(is_instruction_call,
-					   make_call(e_ComputeOwners, largs))));
-#endif
+	largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), NIL),
+			  gen_nconc(lUpdateExpr(node_module,  linds), largs));
+	
+	return(my_make_call_statement(hpfc_name_to_entity(CMP_OWNERS), 
+				      largs));
+    }
+    else
+	return(my_make_call_statement(hpfc_name_to_entity(CMP_OWNERS),
+		     CONS(EXPRESSION, reference_to_expression(ref),
+			  NIL)));
 }
 
 /*
@@ -532,227 +219,143 @@ entity array;
 int dim;
 expression expr;
 {
-#ifndef HPFC_EXPAND_COMPUTE_LOCAL_INDEX
-    expression
-	expr1 = int_to_expression((int) GET_ENTITY_MAPPING(hpfnumber, array)),
-	expr2 = int_to_expression(dim);
-    
-    return(MakeTernaryCall(e_LocalInd, expr1, expr2, expr));
-#else
-    list
-	l    = (list) GET_ENTITY_MAPPING(newdeclarations, array),
-	ldim = variable_dimensions(type_variable(entity_type(array)));
-    int 
-	i,
-	newdecl;
-    dimension 
-	the_dim;
-
-    /* ??? gen_find_ith */
-    for (i=1; i<dim; i++)
+    if (get_bool_property("HPFC_EXPAND_COMPUTE_LOCAL_INDEX"))
     {
-	ldim=CDR(ldim);
-	l=CDR(l);
-    }
-
-    newdecl = INT(CAR(l));
-    the_dim = DIMENSION(CAR(ldim));
+	int 
+	    newdecl = new_declaration(array, dim);
+	dimension 
+	    the_dim = entity_ith_dimension(array, dim);
         
-    switch(newdecl)
-    {
-    case NO_NEW_DECLARATION:
-	return(expr);
-    case ALPHA_NEW_DECLARATION:
-    {
-	expression
-	    shift = 
-		int_to_expression(1 - HpfcExpressionToInt(dimension_lower(the_dim)));
-	
-	return(MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME), expr, shift));
-    }
-    case BETA_NEW_DECLARATION:
-    {
-	align
-	    a = (align) GET_ENTITY_MAPPING(hpfalign, array);
-	entity
-	    template = align_template(a);
-	distribute
-	    d = (distribute) GET_ENTITY_MAPPING(hpfdistribute, template);
-	alignment
-	    al = FindAlignmentOfDim(align_alignment(a),dim);
-	int
-	    tempdim = alignment_templatedim(al),
-	    procdim;
-	dimension
-	    template_dim = FindIthDimension(template,tempdim);
-	distribution
-	    di = FindDistributionOfDim(distribute_distribution(d), tempdim, &procdim);
-	expression
-	    parameter = distribution_parameter(di),
-	    rate = alignment_rate(al),
-            prod,
-	    t1,
-	    the_mod,
-	    t2;
-	int
-	    iabsrate = abs(HpfcExpressionToInt(rate)),
-	    ishift = (HpfcExpressionToInt(alignment_constant(al)) - 
-		      HpfcExpressionToInt(dimension_lower(template_dim)));
-		    
-	
-	prod = ((HpfcExpressionToInt(rate)==1)?
-		(expr):((iabsrate==1)?
-			(MakeUnaryCall(CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME),
-				       expr)):
-			(MakeBinaryCall(CreateIntrinsic(MULTIPLY_OPERATOR_NAME),
-					rate,
-					expr))));
-	
-	t1 = ((ishift==0)?
-	      (prod):((ishift>0)?
-		      (MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME),prod,
-				      int_to_expression(ishift))):
-		      (MakeBinaryCall(CreateIntrinsic(MINUS_OPERATOR_NAME),prod,
-				      int_to_expression(abs(ishift))))));
-	
-	the_mod = MakeBinaryCall(CreateIntrinsic(MOD_INTRINSIC_NAME),
-				 t1,
-				 parameter);
-
-	t2 = ((iabsrate==1)?
-	      (the_mod):
-	      MakeBinaryCall(CreateIntrinsic(DIVIDE_OPERATOR_NAME),
-			     the_mod,
-			     int_to_expression(iabsrate)));
-		
-	return(MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME), 
+	switch(newdecl)
+	{
+	case NO_NEW_DECLARATION:
+	    return(expr);
+	case ALPHA_NEW_DECLARATION:
+	{
+	    int
+		dl = HpfcExpressionToInt(dimension_lower(the_dim));
+	    expression
+		shift = int_to_expression(1 - dl);
+	    
+	    return(MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME), 
+				  expr, shift));
+	}
+	case BETA_NEW_DECLARATION:
+	{
+	    align
+		a = load_entity_align(array);
+	    entity
+		template = align_template(a);
+	    distribute
+		d = load_entity_distribute(template);
+	    alignment
+		al = FindAlignmentOfDim(align_alignment(a), dim);
+	    int
+		tempdim = alignment_templatedim(al),
+		procdim;
+	    dimension
+		template_dim = FindIthDimension(template,tempdim);
+	    distribution
+		di = FindDistributionOfDim(distribute_distribution(d), 
+					   tempdim, 
+					   &procdim);
+	    expression
+		parameter = distribution_parameter(di),
+		rate = alignment_rate(al),
+		prod,
+		t1,
+		the_mod,
+		t2;
+	    int
+		iabsrate = abs(HpfcExpressionToInt(rate)),
+		ishift = (HpfcExpressionToInt(alignment_constant(al)) - 
+			  HpfcExpressionToInt(dimension_lower(template_dim)));
+	    
+	    
+	    prod = ((HpfcExpressionToInt(rate)==1)?
+		    (expr):
+		    ((iabsrate==1)?
+		     (MakeUnaryCall(CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME),
+				    expr)):
+		     (MakeBinaryCall(CreateIntrinsic(MULTIPLY_OPERATOR_NAME),
+				     rate,
+				     expr))));
+	    
+	    t1 = ((ishift==0)?
+		  (prod):
+		  ((ishift>0)?
+		   (MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME),prod,
+				   int_to_expression(ishift))):
+		   (MakeBinaryCall(CreateIntrinsic(MINUS_OPERATOR_NAME),prod,
+				   int_to_expression(abs(ishift))))));
+	    
+	    the_mod = MakeBinaryCall(CreateIntrinsic(MOD_INTRINSIC_NAME),
+				     t1,
+				     parameter);
+	    
+	    t2 = ((iabsrate==1)?
+		  (the_mod):
+		  MakeBinaryCall(CreateIntrinsic(DIVIDE_OPERATOR_NAME),
+				 the_mod,
+				 int_to_expression(iabsrate)));
+	    
+	    return(MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME), 
 			      t2,
-			      int_to_expression(1)));
+				  int_to_expression(1)));
+	}
+	case GAMMA_NEW_DECLARATION:
+	{
+	    expression
+		expr1 = 
+		    int_to_expression(get_hpf_number(array)),
+		    expr2 = int_to_expression(dim);
+	    
+	    return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND_GAMMA), 
+				       expr1, expr2, expr));
+	}
+	case DELTA_NEW_DECLARATION:
+	{
+	    expression
+		expr1 = int_to_expression(get_hpf_number(array)),
+		expr2 = int_to_expression(dim);
+	    
+	    return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND_DELTA), 
+				       expr1, expr2, expr));
+	}
+	default:
+	    pips_error("expr_compute_local_index",
+		       "unexpected new declaration tag\n");
+	}
+	
     }
-    case GAMMA_NEW_DECLARATION:
+    else
     {
 	expression
-	    expr1 = int_to_expression((int) GET_ENTITY_MAPPING(hpfnumber, array)),
+	    expr1 = int_to_expression(get_hpf_number(array)),
 	    expr2 = int_to_expression(dim);
 	
-	return(MakeTernaryCall(e_LocalIndGamma, expr1, expr2, expr));
-    }
-    case DELTA_NEW_DECLARATION:
-    {
-	expression
-	    expr1 = int_to_expression((int) GET_ENTITY_MAPPING(hpfnumber, array)),
-	    expr2 = int_to_expression(dim);
-	
-	return(MakeTernaryCall(e_LocalIndDelta, expr1, expr2, expr));
-    }
-    default:
-	pips_error("expr_compute_local_index","unexpected new declaration tag\n");
+	return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND), 
+				   expr1, expr2, expr));
     }
 
-    return(expression_undefined);
-#endif			   
+    return(expression_undefined); /* just to avoid a gcc warning */
 }
 
 /******************************************************************************/
-/*
- * Conditions
- */
 
 /*
- *
- */
-expression condition_senderp()
-{
-    return(MakeNullaryCall(e_SenderP));
-}
-
-/*
- *
- */
-expression condition_ownerp()
-{
-    return(MakeNullaryCall(e_OwnerP));
-}
-
-/*
- *
- */
-expression condition_computerp()
-{
-    return(MakeNullaryCall(e_ComputerP));
-}
-
-/*
- *
- */
-expression condition_computer_in_owners()
-{
-    return(MakeNullaryCall(e_CompInOwnersP));
-}
-
-/*
- *
- */
-expression condition_not_computer_in_owners()
-{
-    return(MakeUnaryCall(CreateIntrinsic(NOT_OPERATOR_NAME),
-			 condition_computer_in_owners()));
-}
-
-/*
- *
- */
-instruction MakeUnaryCallInst(f,e)
-entity f;
-expression e;
-{
-    return(make_instruction(is_instruction_call,
-			    make_call(f, CONS(EXPRESSION, e, NIL))));
-}
-
-/*
- *
- */
-statement st_init_host()
-{
-    return(my_make_call_statement(e_InitHost, NIL));
-}
-
-/*
- *
- */
-statement st_init_node()
-{
-    return(my_make_call_statement(e_InitNode, NIL));
-}
-
-/*
- *
- */
-statement st_host_end()
-{
-    return(my_make_call_statement(e_HostEnd, NIL));
-}
-
-/*
- *
- */
-statement st_node_end()
-{
-    return(my_make_call_statement(e_NodeEnd, NIL));
-}
-
-/*
- * statement my_make_call_statement(e, l)
- *
- * generate a call statement to function e, with expression list l as an argument.
+ * statement my_make_call_statement(e, l) 
+ * generate a call statement to function e, with expression list l 
+ * as an argument. 
  */
 statement my_make_call_statement(e, l)
 entity e;
 list l;
 {
-    return(mere_statement(make_instruction(is_instruction_call,
-					   make_call(e, l))));
+    pips_assert("my_make_call_statement", !entity_undefined_p(e));
+
+    return(make_stmt_of_instr(make_instruction(is_instruction_call,
+					       make_call(e, l))));
 }
 
 /*
@@ -793,7 +396,7 @@ statement *phs, *pns;
 statement st_compute_neighbour(d)
 int d;
 {
-    return(my_make_call_statement(e_CompNeighbour, 
+    return(my_make_call_statement(hpfc_name_to_entity(CMP_NEIGHBOUR), 
 				  CONS(EXPRESSION,
 				       int_to_expression(d),
 				       NIL)));
@@ -858,7 +461,11 @@ bool bsend;
      */
 
     return(my_make_call_statement
-	   (make_packing_function("HPFC", len, bsend, entity_basic(array), 1+5*len),
+	   (make_packing_function("HPFC", 
+				  len, 
+				  bsend, 
+				  entity_basic(array), 
+				  1+5*len),
 	    larg));
 
 }
@@ -966,4 +573,8 @@ int nargs;
 
     return(MakeRunTimeSupportSubroutine(buffer, nargs));
 }
+
+/*
+ * that is all
+ */
 
