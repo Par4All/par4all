@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1996/03/11 17:46:39 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1996/03/11 17:47:30 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -707,7 +707,7 @@ expression *pguard;
 
 	     if (rup<up)
 	     {
-		 /* MYPOS(i, procnum).LT.(rupexpr)
+		 /* MYPOS(i, procnum).LE.(rupexpr)
 		  */
 		 conjonction =
 		   CONS(EXPRESSION,
