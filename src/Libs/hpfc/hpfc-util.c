@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/06/09 16:53:18 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/06/26 19:39:04 $, )
  * version $Revision$
  */
 
@@ -287,31 +287,36 @@ basic base;
 {
     char buffer[20];
     entity e;
-    
-    switch(basic_tag(base))
+
+    do
     {
-    case is_basic_int:
-	sprintf(buffer,"%s%d", HPFINTPREFIX, unique_integer_number++);
-	break;
-    case is_basic_float:
-	sprintf(buffer,"%s%d", HPFFLOATPREFIX, unique_float_number++);
-	break;
-    case is_basic_logical:
-	sprintf(buffer,"%s%d", HPFLOGICALPREFIX, unique_logical_number++);
-	break;
+	switch(basic_tag(base))
+	{
+	case is_basic_int:
+	    sprintf(buffer,"%s%d", HPFINTPREFIX, unique_integer_number++);
+	    break;
+	case is_basic_float:
+	    sprintf(buffer,"%s%d", HPFFLOATPREFIX, unique_float_number++);
+	    break;
+	case is_basic_logical:
+	    sprintf(buffer,"%s%d", HPFLOGICALPREFIX, unique_logical_number++);
+	    break;
     case is_basic_complex:
-	sprintf(buffer,"%s%d",HPFCOMPLEXPREFIX, unique_complex_number++);
-	break;
-    default:
-	pips_error("NewTemporaryVariable", "basic not welcomed, %d\n",
-		   basic_tag(base));
-	break;
+	    sprintf(buffer,"%s%d",HPFCOMPLEXPREFIX, unique_complex_number++);
+	    break;
+	default:
+	    pips_error("NewTemporaryVariable", "basic not welcomed, %d\n",
+		       basic_tag(base));
+	    break;
+	}
     }
+    while(gen_find_tabulated
+      (concatenate(module_local_name(module), MODULE_SEP_STRING, buffer, NULL),
+       entity_domain)!=entity_undefined);
 
     debug(9,"NewTemporaryVariable","var %s, tag %d\n", buffer, basic_tag(base));
 
     e = make_scalar_entity(buffer, module_local_name(module), base);
-
     AddEntityToDeclarations(e,module);
     
     return(e);
@@ -321,19 +326,15 @@ entity FindOrCreateEntityLikeModel(package, name, model)
 string package, name;
 entity model;
 {
-    string
-	new_name = concatenate(package, 
-			       MODULE_SEP_STRING, 
-			       name, 
-			       NULL);
-    entity 
-	new = gen_find_tabulated(new_name, entity_domain);
-    area
-	tmp_area = area_undefined;
+    string new_name = concatenate(package, 
+				  MODULE_SEP_STRING, 
+				  name, 
+				  NULL);
+    entity new = gen_find_tabulated(new_name, entity_domain);
+    area tmp_area = area_undefined;
 
-    debug(3, "FindOrCreateEntityLikeModel",
-	  "entity %s to be made after %s\n",
-	  new_name, entity_name(model));
+    pips_debug(3, "entity %s to be made after %s\n",
+	       new_name, entity_name(model));
 
     assert(gen_consistent_p(model));
 
@@ -361,13 +362,11 @@ entity model;
 entity AddEntityToModule(e, module)
 entity e, module;
 {
-    entity 
-	new = FindOrCreateEntityLikeModel(module_local_name(module),
-					  entity_local_name(e),
-					  e);
+    entity new = FindOrCreateEntityLikeModel(module_local_name(module),
+					     entity_local_name(e),e);
 
-    debug(7, "AddEntityToModule", "adding %s to module %s\n",
-	  entity_name(new), entity_name(module));
+    pips_debug(7, "adding %s to module %s\n",
+	       entity_name(new), entity_name(module));
     
     if (entity_module_p(module))
 	AddEntityToDeclarations(new, module);
