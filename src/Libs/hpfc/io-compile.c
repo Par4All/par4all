@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/09/22 13:19:36 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/09/22 13:29:12 $, )
  * version $Revision$
  */
 
@@ -53,7 +53,8 @@ statement stat, *hp, *np;
 
     debug_on("HPFC_IO_DEBUG_LEVEL");
     pips_debug(1, "compiling!\n");
-    pips_debug(2, "statement 0x%x, %d arrays\n", stat, gen_length(entities));
+    pips_debug(2, "statement 0x%x, %d arrays\n", (unsigned int) stat, 
+	       gen_length(entities));
 
     MAP(EFFECT, e,
      {
