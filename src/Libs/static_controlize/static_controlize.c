@@ -13,8 +13,6 @@
 
 /* Newgen includes	*/
 #include "genC.h"
-#include "hash.h"
-#include "list.h"
 #include "boolean.h"
 
 /* C3 includes		*/
@@ -38,7 +36,6 @@
 #include "constants.h"
 #include "misc.h"
 #include "control.h"
-#include "mapping.h"
 #include "text-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
@@ -331,7 +328,7 @@ statement st;
 	  statement    stat;
 	  list lstat;
 
-	  comment = malloc(64);
+	  comment = (char*) malloc(64);
 	  sprintf(comment, "C  ");
 	  sprintf(comment, "%s %s", comment,
 		  words_to_string(words_call(ca, 0)));
