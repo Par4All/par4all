@@ -90,14 +90,6 @@ extern void tpips_set_line_to_parse(string);
 extern int yylex(void);
 extern void yyerror(char *);
 
-static string 
-strtoup(string init)
-{
-    string s = init;
-    while (*s) *s = toupper(*s);
-    return init;
-}
-
 static void
 free_owner_content(res_or_rule * pr)
 {
