@@ -31,13 +31,7 @@ typedef enum {PIPS_ICON, ICFG_ICON, WP65_PE_ICON, WP65_bank_ICON, callgraph_ICON
 		parallel_ICON, sequential_ICON, user_ICON, LAST_ICON} icon_list;
 
 
-extern char *re_comp();
-extern int re_exec();
-
-typedef bool success ;
-
-/* Manques dans les .h de PIPS : */
-extern int get_bool_property();
+typedef bool success;
 
 
 /* This variable is used to indicate wether wpips is in the Emacs
@@ -60,6 +54,18 @@ typedef struct
    char * transformation_name_to_apply;
 }
 wpips_transform_menu_layout_line;
+
+
+/* The type describing a View menu entry: */
+struct wpips_view_menu_layout_line_s
+{
+   char * menu_entry_string;
+   char * resource_name_to_view;
+   void (* method_function_to_use)(struct wpips_view_menu_layout_line_s *);
+   char * icon_name;
+};
+typedef struct wpips_view_menu_layout_line_s wpips_view_menu_layout_line;
+
 
 /* Define the menu separator: */
 #define WPIPS_MENU_SEPARATOR MENU_ITEM, MENU_STRING, "", MENU_INACTIVE, TRUE, NULL
