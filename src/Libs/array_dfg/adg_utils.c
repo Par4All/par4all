@@ -681,14 +681,14 @@ boolean take_last;
   cut_space = pa_faisabilite(pa_intersect_system(in_pa, delt_sc));
 
   /* See if tsou2 could be after *tsou */
-  pvec     = vect_add( vect_new(TCST,1), diff );
+  pvec     = vect_add( vect_new(TCST, VALUE_ONE), diff );
   delt_sc2 = sc_make(CONTRAINTE_UNDEFINED, contrainte_make(pvec));
   new_pa2  = pa_intersect_system( in_pa, delt_sc2 );
   after2   = pa_faisabilite( new_pa2 );
 
   /* See if *tsou could be after tsou2 */
   vect_chg_sgn( diff );
-  pvec     = vect_add( vect_new(TCST,1), diff );
+  pvec     = vect_add( vect_new(TCST, VALUE_ONE), diff );
   delt_sc1 = sc_make(CONTRAINTE_UNDEFINED, contrainte_make(pvec));
   new_pa1  = pa_intersect_system( in_pa, delt_sc1 );
   after1   = pa_faisabilite( new_pa1 );
@@ -898,7 +898,7 @@ boolean with_tcst;
     { vect_add_elem( pvec, (Variable) ENTITY(CAR( in_list )), (Value) 1 ); }
 
   /* Add the TCST var or not */
-  if (with_tcst) vect_add_elem( pvec, TCST, 1 );
+  if (with_tcst) vect_add_elem( pvec, TCST, VALUE_ONE);
   
   /* Reverse the vecteur to recover the order of the input list */
   pv2 = vect_reversal( *pvec );
