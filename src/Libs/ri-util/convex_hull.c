@@ -197,6 +197,12 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
   sc_rm(s1); 
   sc_rm(s2);
 
+  /* better compatibility with previous version, as the convex union
+   * normalizes the system and removes redundancy, what is not done
+   * if part of the system is separated. Other calls may be considered here?
+   */
+  sc_transform_ineg_in_eg(sc);
+
   /* sc, su union of disjoint */
   sc = sc_fusion(sc, su);
 
