@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-compile.c,v $
+ * Revision 1.53  1998/11/18 14:01:32  coelho
+ * conditions fixed?
+ *
  * Revision 1.52  1998/11/18 13:24:00  coelho
  * row echelon with option.
  *
@@ -139,6 +142,8 @@ hpfc_algorithm_row_echelon(
     Pbase base = entity_list_to_base(scanners);
     algorithm_row_echelon_generic(syst, base, pcond, penum,
 	get_bool_property("HPFC_REDUNDANT_SYSTEMS_FOR_REMAPS"));
+    /* this should improve conditions? */
+    sc_find_equalities(pcond);
     base_rm(base);
 }
 
