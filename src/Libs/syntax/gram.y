@@ -873,6 +873,8 @@ dataidl: TK_LPAR atom TK_COMMA entity_name TK_EQUALS do_plage TK_RPAR
 
 implicit_inst: TK_IMPLICIT limplicit
 	    {
+               /* Formal parameters have inherited default implicit types */
+               retype_formal_parameters();
 	    }
 	;
 
