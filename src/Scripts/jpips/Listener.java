@@ -2,6 +2,9 @@
   $Id$
  
   $Log: Listener.java,v $
+  Revision 1.6  1998/10/16 14:42:00  coelho
+  fixed again.
+
   Revision 1.5  1998/10/16 14:39:10  coelho
   BufferedReader used.
 
@@ -39,11 +42,11 @@ public class Listener
   public BufferedReader	in;		//input stream from tpips
   public Pawt.PFrame frame;
 
-  public Listener(DataInputStream in, Resetable jpips)
+  public Listener(BufferedReader in, Resetable jpips)
   {
     this.frame = frame;
     this.jpips = jpips;
-    this.in = new BufferedReader(new InputStreamReader(in));
+    this.in = in;
   }
 
   /** Listens and print the specified stream.
