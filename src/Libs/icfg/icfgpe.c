@@ -90,7 +90,7 @@ static text text_statement_any_effect_type_flt(entity module, int margin, statem
   text result = make_text(NIL);
   MAPL(l, {
     p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff) STRING(CAR(l));
-    MERGE_TEXTS(result, resource_text(module, margin, stat, ips));
+    MERGE_TEXTS(result, resource_text_flt(module, margin, stat, ips));
   }, lp);
   return result;
 }
