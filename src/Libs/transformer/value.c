@@ -470,7 +470,7 @@ void free_value_mappings()
 	hash_value_to_name = (hash_table) NULL;
     }
 }
-
+
 /* HASH TABLE INITIALIZATION */
 
 /* void add_new_value_name(entity e): add a new value name for entity e */
