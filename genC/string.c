@@ -89,7 +89,7 @@ register string s; /* la chaine a copier */
 string
 concatenate(char * first_string, ...)
 {
-#define CONCATENATE_BUFFER_SIZE 10240
+#define CONCATENATE_BUFFER_SIZE (2*8192)
    va_list args ;
    static char result[ CONCATENATE_BUFFER_SIZE ] ;
    char *p ;
