@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 1995/05/18 10:20:05 $, )
+/* $RCSfile: newgen_hash.h,v $ ($Date: 1995/12/14 17:26:53 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -104,6 +104,7 @@ extern void hash_update GEN_PROTO((hash_table, char*, char*));
 
 extern int hash_table_entry_count GEN_PROTO((hash_table));
 extern int hash_table_size GEN_PROTO((hash_table));
+extern int hash_table_own_allocated_memory GEN_PROTO((hash_table));
 extern hash_key_type hash_table_type GEN_PROTO((hash_table));
 extern hash_entry_pointer hash_table_scan GEN_PROTO((hash_table,
 						     hash_entry_pointer,
