@@ -252,7 +252,8 @@ void insure_declaration_coherency(
 	     !local_entity_of_module_p(var, module) ||
 	     storage_formal_p(entity_storage(var)) ||
 	     value_symbolic_p(entity_initial(var)) ||
-	     bound_referenced_variables_p(var))
+	     (bound_referenced_variables_p(var) &&
+	      !gen_in_list_p(var, new_decl)))
 	 {
 	     pips_debug(7, "declared variable %s is referenced, kept\n",
 			entity_name(var));
