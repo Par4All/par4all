@@ -164,22 +164,20 @@ go () {
 	    # however it depends on newgen renumerotation
 	    # so as to keep the synchronization right?
 	    # Let's try without...
-	    domain=`egrep '^([a-zA-Z_ ]* =|external)' $i | wc -l | tr -cd '0-9'`
-	    index=`grep '^tabulated' $i | wc -l | tr -cd '0-9'`
-	    echo "$domain $index" > $include
+	    dom=`egrep '^([a-zA-Z_ ]* =|external)' $i | wc -l | tr -cd '0-9'`
+	    echo "$dom" > $include
 	done
 
 	tsort $DEP 1>$ORDER 2>$OK
 	
 	if [ -s $OK ] ; then
-		echo "newgen: Cannot sort dependencies"; cat $OK $DEP
-		echo "(possible misuse of keywords)"
-		exit 1
+	  echo "newgen: Cannot sort dependencies"; cat $OK $DEP
+	  echo "(possible misuse of keywords)"
+	  exit 1
 	fi
 	
 	# INITIAL NEWGEN OFFSET...
 	start=7
-	index=0
 	
 	echo -n "" > $DEP
 	
@@ -191,7 +189,7 @@ go () {
 	  include=$base$POSTFIX
 	  rm -f $base.spec
 	  echo ${base}_spec
-	  read domains tabulateds < $include
+	  read domains < $include
 	  rm $include
 	  touch $include
 	  define_base $base $include
@@ -201,7 +199,6 @@ go () {
 	  enter_package $base $include
 	  {
 	    echo "--NEWGEN-START $start";
-	    echo "--NEWGEN-INDEX $index"; 
 	    cat $i;
 	   } | ${CPP} - | $NEWGEN $base $base.spec >> $include
 
@@ -213,15 +210,13 @@ go () {
 	  ed -s $base.spec <<!
 0a
 --NEWGEN-START $start
---NEWGEN-INDEX $index
 .
 w
 q
 !
-	    # echo "$start $index $domains $tabulateds" >&2
+	    #echo "$start $domains" >&2
 	    exit_package $include $base
 	    start=`expr $start + $domains`
-	    sindex=`expr $index + $tabulateds`
 	done
 	
 	update_first $start `head -1 $ORDER` $POSTFIX
