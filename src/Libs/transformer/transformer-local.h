@@ -15,12 +15,3 @@
 #define NEW_VALUE_SUFFIX "#new"
 #define OLD_VALUE_SUFFIX "#init"
 #define INTERMEDIATE_VALUE_SUFFIX "#int"
-
-/*VARARGS2*/
-void debug();
-
-/*VARARGS2*/
-void pips_error();
-
-/*VARARGS2*/
-char * concatenate();
