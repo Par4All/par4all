@@ -4,7 +4,7 @@
  * here should be build equations and inequations to deal
  * with the I/O in hpf programs.
  *
- * Fabien COELHO, 18 Feb 94
+ * Fabien COELHO, Feb/Mar 94
  */
 
 /*
