@@ -132,7 +132,7 @@ rule ru;
 		init_log_timers();
 
 	    if (print_memory_usage_p) {
-		initial_memory_size = get_process_memory_size();
+		initial_memory_size = get_process_gross_heap_size();
 	    }
 
 	    success_p = catch_user_error(pbm->builder_func, oname);
@@ -149,7 +149,7 @@ rule ru;
 	    }
 
 	    if (print_memory_usage_p) {
-		double final_memory_size = get_process_memory_size();
+		double final_memory_size = get_process_gross_heap_size();
 		user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
 			 final_memory_size,
 			 final_memory_size-initial_memory_size);
@@ -1021,7 +1021,7 @@ string res_n, module_n;
 	}
 
 	if (print_memory_usage_p) {
-	    initial_memory_size = get_process_memory_size();
+	    initial_memory_size = get_process_gross_heap_size();
 	}
 
 	pips_malloc_debug();
@@ -1045,7 +1045,7 @@ string res_n, module_n;
 	    }
 
 	    if (print_memory_usage_p) {
-		double final_memory_size = get_process_memory_size();
+		double final_memory_size = get_process_gross_heap_size();
 		user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
 			 final_memory_size,
 			 final_memory_size-initial_memory_size);
@@ -1097,7 +1097,7 @@ string phase_n, module_n;
 	}
 
 	if (print_memory_usage_p) {
-	    initial_memory_size = get_process_memory_size();
+	    initial_memory_size = get_process_gross_heap_size();
 	}
 
 	success = apply(phase_n, module_n);
@@ -1120,7 +1120,7 @@ string phase_n, module_n;
 	    }
 
 	    if (print_memory_usage_p) {
-		double final_memory_size = get_process_memory_size();
+		double final_memory_size = get_process_gross_heap_size();
 		user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
 			 final_memory_size,
 			 final_memory_size-initial_memory_size);
