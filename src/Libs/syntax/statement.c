@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.47  1998/11/09 16:33:56  keryell
+ * Added a copy_expression to avoid a false sharing in assigned gotos.
+ *
  * Revision 1.46  1998/10/19 15:44:10  irigoin
  * Comments for ELSEIF construct moved up into the previous block for
  * easier/better prettyprint when the code is structured.
@@ -779,7 +782,7 @@ bool assigned;
 					      make_entity_fullname(TOP_LEVEL_MODULE_NAME,
 								   EQUAL_OPERATOR_NAME), 
 					      entity_domain),
-			   e,
+			   copy_expression(e),
 			   int_to_expression(assigned? atoi(ln):l));
 	/* Assigned GO TO: if the current label is not in the list, this is an error
 	 * in Fortran 90. ISO/IEC 1539 Section 8.2.4 page 108. Same in Fortran 77
