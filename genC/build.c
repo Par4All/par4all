@@ -144,7 +144,7 @@ void init(void)
     for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
 	bp->name = NULL ;
 	bp->compiled = 0 ;
-	bp->index = -1 ;
+	bp->tabulated = NULL;
 	bp->domain = NULL ;
 	bp->inlined = NULL ;
     }
@@ -224,18 +224,15 @@ struct gen_binding * lookup(char * name, int action)
    definition. Note that we could (should ?) check that this new gen_binding
    isn't a new (and incompatible) IMPORT definition. */
 
-struct gen_binding *
-new_binding( name, val )
-char *name ;
-union domain *val ;
+struct gen_binding * new_binding(char * name, union domain * val)
 {
-    struct gen_binding *bp ;
+    struct gen_binding * bp;
 
     if( Read_spec_mode && val->ba.type ==  IMPORT_DT ) {
-	bp = lookup( name, OLD_BINDING ) ;
+	bp = lookup(name, OLD_BINDING);
     }
     else {
-	bp = lookup( name, NEW_BINDING ) ;
+	bp = lookup(name, NEW_BINDING);
     }
     if( bp->domain == NULL ) {
 #ifdef DBG_BINDING
