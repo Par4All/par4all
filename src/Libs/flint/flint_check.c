@@ -17,6 +17,8 @@
 
 #include "genC.h"
 #include "ri.h"
+/* To avoid a global variable to pass the dependence graph in flint.c: */
+#include "graph.h"
 #include "flint.h"
 #include "control.h"
 #include "ri-util.h"
