@@ -182,15 +182,19 @@ db_delete_resource(string rname, string oname)
     }    
 }
 
+/* this should really be a put. Just there for upward compatibility.
+ */
 bool 
 db_update_time(string rname, string oname)
 {
     db_resource r;
     DB_OK;
-
+    pips_assert("displayable resource", displayable_file_p(rname));
     r = get_real_db_resource(rname, oname);
     db_resource_time(r) = db_get_logical_time();
-    db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
+    db_resource_file_time(r) =
+	dbll_stat_local_file(db_resource_pointer(r), FALSE); 
+    /*dbll_stat_resource_file(rname, oname, TRUE); */
     return TRUE;
 }
 
