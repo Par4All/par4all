@@ -25,7 +25,7 @@ LIB_HEADERS=\
 	newgen_array.h
 
 DERIVED_LIB_HEADERS	= \
-	newgen_string.h
+	newgen_auto_string.h
 
 OTHER_HEADERS=\
         newgen_include.h \
@@ -80,7 +80,7 @@ $(addprefix $(ARCH)/,$(OTHER_CFILES:.c=.o)) $(LIB_OBJECTS): $(DERIVED_HEADERS)
 #
 # local rules
 
-newgen_%.h: %.c
+newgen_auto_%.h: %.c
 	$(RM) $@ ; $(PROTOIZE) $< > $@
 
 $(ARCH)/libgenC.a: $(LIB_OBJECTS)
