@@ -1,5 +1,10 @@
 /* $Id$
    $Log: splitc.y,v $
+   Revision 1.8  2003/08/14 16:12:36  irigoin
+   Simplified signature with fewer useless SPACES, failed attempt at retrieving
+   multiple names types declared with one typedef statement, additional
+   debugging statements
+
    Revision 1.7  2003/08/14 08:58:28  coelho
    { YYACCEPT; } instead of { YYACCEPT }
 
@@ -169,7 +174,7 @@ static bool current_function_is_static_p = FALSE;
 
 /* All the following global variables must be replaced by functions, once we have the preprocessor for C */
 
-static int csplit_is_typedef = 0; /* to know if this is a typedef name or not */
+static int csplit_is_typedef = FALSE; /* to know if this is a typedef name or not */
 
 /* If any of the strings is undefined, we are in trouble. If not,
    concatenate them with separator into a new string and free all input
@@ -307,7 +312,7 @@ static string safe_build_signature(string s1, ...)
 	   /* Do not copy a second space */
 	   source++;
 	 }
-	 else if (*source==',' || *source=='(' || *source==';') {
+	 else if (*source==',' || *source=='(' || *source==')' || *source==';') {
 	   /* Overwrite the space in the destination */
 	 *destination = *source++;
 	 }
@@ -316,8 +321,18 @@ static string safe_build_signature(string s1, ...)
 	 *++destination = *source++;
 	 }
        }
+       else if(*destination=='(' || *destination=='*') {
+	 if(*source==' ') {
+	   /* Do not copy a space after some separators */
+	   source++;
+	 }
+	 else {
+	 /* Normal copy */
+	 *++destination = *source++;
+	 }
+       }
        else {
-	   /* Normal copy */
+	 /* Normal copy */
 	 *++destination = *source++;
        }
      }
@@ -595,6 +610,7 @@ global:
                         {
 			  pips_debug(5, "declaration->global\n");
 			  csplit_is_external = 1; /* the variable is declared outside of any function */
+			  /* csplit_is_typedef = 0; */
 			  pips_debug(1, "Declaration is located between line %d and line %d\n", get_csplit_current_beginning(), csplit_line_number);
 			  csplit_append_to_compilation_unit(csplit_line_number);
 			  if(!string_undefined_p($1)) {
@@ -1318,16 +1334,21 @@ for_clause:
 declaration:                                /* ISO 6.7.*/
     decl_spec_list init_declarator_list TK_SEMICOLON
                         {
+			  pips_debug(5, "decl_spec_list init_declarator_list TK_SEMICOLON -> declaration\n");
+			  pips_debug(5, "decl_spec_list=\"%s\", init_declarator_list=\"%s\"\n",
+				     $1, string_undefined_p($2) ? "UNDEFINED" : $2);
 			  csplit_is_function = 0; /* not function's declaration */
-			  csplit_is_typedef = 0;
+			  csplit_is_typedef = FALSE;
 			  free_partial_signature($1);
 			  free_partial_signature($2);
 			  $$ = string_undefined;
 			}
 |   decl_spec_list TK_SEMICOLON	
                         {
+			  pips_debug(5, "decl_spec_list TK_SEMICOLON -> declaration\n");
+			  pips_debug(5, "decl_spec_list=\"%s\"\n", $1);
 			  csplit_is_function = 0; /* not function's declaration */
-			  csplit_is_typedef = 0;
+			  csplit_is_typedef = FALSE;
 			  free_partial_signature($1);
 			  $$ = string_undefined;
 			}
@@ -1366,7 +1387,7 @@ decl_spec_list:                         /* ISO 6.7 */
     TK_TYPEDEF decl_spec_list_opt          
                         {
 			  pips_debug(5, "TK_TYPEDEF decl_spec_list_opt->decl_spec_list\n");
-			  csplit_is_typedef = 1;
+			  csplit_is_typedef = TRUE;
 			  /* I would have liked not to build them when unnecessary. */
 			  /*
 			  free_partial_signature($2);
@@ -1701,6 +1722,8 @@ enumerator:
 declarator:  /* (* ISO 6.7.5. Plus Microsoft declarators.*) */
     pointer_opt direct_decl attributes_with_asm
                         {
+			  pips_debug(5, "pointer_opt direct_decl attributes_with_asm -> declarator\n");
+			  pips_debug(5, "pointer_opt=\"%s\", direct_decl=\"%s\", attributes_with_asm=\"%s\"\n", $1, $2, $3);
 			  /* Type and identifier information are mixed
                              here. Instead of trying to retrieve the type
                              only, it might be easier to postprocess the
@@ -1710,7 +1733,13 @@ declarator:  /* (* ISO 6.7.5. Plus Microsoft declarators.*) */
 			    csplit_parser_warning("attributes_with_asm not supported\n");
 			    free_partial_signature($3);
 			  }
-			  $$ = build_signature($1, $2, NULL);
+			  if(TRUE) /* Keep parameter names in signatures. */
+			    $$ = build_signature($1, $2, NULL);
+			  else {
+			    /* This does not work! Do not try it anymore... */
+			    free_partial_signature($2);
+			    $$ = $1;
+			  }
 			}
 ;
 
@@ -1719,16 +1748,29 @@ direct_decl: /* (* ISO 6.7.5 *) */
                                     * types as variable names *) */
     id_or_typename
                        {
-			 if (csplit_is_typedef)
-			   {
-			     /* Tell the lexer about the new type names : add to keyword_typedef_table */
-			     /*
+			 pips_debug(5, "id_or_typename -> direct_decl\n");
+			 pips_debug(5,"id_or_typename=\"%s\", csplit_is_typedef=%s\n", $1, bool_to_string(csplit_is_typedef));
+			 /* FI: I declare many too many types! I should look at Nga's grammar. */
+			 if (csplit_is_typedef) {
+			   /* Tell the lexer about the new type names : add to keyword_typedef_table */
+			   /*
 			     hash_put(keyword_typedef_table,new_signature($1),(void *) TK_NAMED_TYPE);
-			     */
-			     keep_track_of_typedef(new_signature($1));
-			     csplit_is_typedef = FALSE;
-			   }
-			 $$ = $1;
+			   */
+			   keep_track_of_typedef(new_signature($1));
+			   /* To early to reset: one typedef can be used
+                              to declare several named types... but I do
+                              not know how to use it. */
+			   csplit_is_typedef = FALSE;
+			   $$ = $1;
+			 }
+			 else if(TRUE) { /* Keep identifiers in signatures */
+			   $$ = $1;
+			 }
+			 else { /* You are going to loose the function
+                                   identifier. You may also loose enum
+                                   member names... */
+			   $$ = new_empty();
+			 }
 		       }
 |   TK_LPAREN attributes declarator TK_RPAREN
                         {
@@ -1895,6 +1937,8 @@ old_pardef:
 pointer: /* (* ISO 6.7.5 *) */ 
     TK_STAR attributes pointer_opt 
                         {
+			  pips_debug(5, "TK_STAR attributes pointer_opt -> pointer\n");
+			  pips_debug(5, "attributes: \"%s\", pointer_opt: \"%s\"\n", $2, $3);
 			  $$ = build_signature(new_star(), $2, $3, NULL);
 			}
 ;
@@ -1919,10 +1963,12 @@ type_name: /* (* ISO 6.7.6 *) */
 abstract_decl: /* (* ISO 6.7.6. *) */
     pointer_opt abs_direct_decl attributes  
                         {
+			  pips_debug(5, "pointer_opt abs_direct_decl attributes -> abstract_decl\n");
 			  $$ = build_signature($1, $2, $3, NULL);
 			}
 |   pointer                     
                         {
+			  pips_debug(5, "pointer -> abstract_decl\n");
 			  $$ = $1;
 			}
 ;
