@@ -1,5 +1,8 @@
 /* $Id$
    $Log: splitc.l,v $
+   Revision 1.4  2003/08/04 16:51:35  irigoin
+   strdup() declaration updated, bug indicated in comment lexing
+
    Revision 1.3  2003/08/01 16:42:58  irigoin
    Intermediate version, compatible with the C-syntax Validation, coupled
    with the parser and the controlizer, if not yet the C prettyprinter.
@@ -72,7 +75,7 @@
 #include <string.h>
 #include <ctype.h>
 
-extern char * strdup(char *);
+extern char * strdup(const char *);
 
 
 #include "genC.h"
@@ -168,6 +171,7 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 
 %%
 "/*"([^\*]|(\*+[^\/]))*"*/"	{ 
+                                /* Bug FI: line feed are not counted! */
                                 pips_debug(5,"Comment %s\n",yytext);
                         }
 "//"[^\n]*                { 
