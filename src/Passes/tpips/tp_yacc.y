@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.96  2000/02/29 10:29:11  coelho
+ * fixed if file does not exist.
+ *
  * Revision 1.95  1998/11/27 17:03:52  coelho
  * should resist wrong module names a little bit...
  *
@@ -940,8 +943,10 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 		    gen_array_full_free($2);
 		    pips_user_error("cannot source file %s\n", name);
 		}
-		tpips_process_a_file(sourced, FALSE);
-		fclose(sourced);
+		else {
+		  tpips_process_a_file(sourced, FALSE);
+		  fclose(sourced);
+		}
 	    }
 	    gen_array_full_free($2);
 	    tpips_set_line_to_parse(""); /* humm... */
