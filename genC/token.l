@@ -27,7 +27,7 @@
 #include "genC.h"
 #include "z.tab.h"
 
-#ifdef flex_scanner
+#ifdef FLEX_SCANNER
 #undef yywrap
 #endif
 
@@ -75,13 +75,13 @@ x			{return( AND );}
 
 int yywrap()
 {
-#ifdef flex_scanner
+#ifdef FLEX_SCANNER
     yy_init = 1 ;
 #endif
     return( 1 ) ;
 }
 
-#ifdef flex_scanner
+#ifdef FLEX_SCANNER
 int yyinput()
 {
     return( input()) ;
