@@ -128,7 +128,7 @@ string
 db_build_file_resource_name(string rname, string oname, string suffix)
 {
     if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;
-    return strdup(concatenate(oname, "/", oname, ".", suffix, 0));
+    return strdup(concatenate(oname, "/", oname, suffix, 0));
 }
 
 /* allocate a full file name for the given resource.
