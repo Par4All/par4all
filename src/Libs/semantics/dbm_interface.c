@@ -202,8 +202,8 @@ bool summary_transformer(char * module_name)
 {
     /* there is a choice: do nothing and leave the effective computation
        in module_name_to_transformers, or move it here */
-
-    return TRUE;
+  pips_debug(1, "considering module %s\n", module_name);
+  return TRUE;
 }
 
 bool preconditions_intra(char * module_name)
@@ -516,23 +516,31 @@ bool module_name_to_preconditions(char *module_name)
     /* if(call_site_count( get_current_module_entity() )<=1) */
     /* Let's assume static initializations (FI, 14 September 1993) */
 
-    if(entity_main_module_p(get_current_module_entity())) {
-      if (get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	    pre = (transformer)
-		db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE);
-	    if(transformer_empty_p(pre)) {
-	      pips_user_warning("Initial preconditions are not consistent.\n"
-				" The Fortran standard rules about variable initialization"
-				" with DATA statements are likely to be violated.\n"
-				"set property PARSER_ACCEPT_ANSI_EXTENSIONS to false\n"
-				"and CHECK_FORTRAN_SYNTAX_BEFORE_PIPS to true.\n");
-	    }
+    if(entity_main_module_p(get_current_module_entity())) 
+    {
+      if (get_bool_property(SEMANTICS_INTERPROCEDURAL)) 
+      {
+	pre = (transformer)
+	  db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE);
+	if(transformer_empty_p(pre)) {
+	  pips_user_warning(
+	     "Initial preconditions are not consistent.\n"
+	     " The Fortran standard rules about variable initialization"
+	     " with DATA statements are likely to be violated.\n"
+	     "set property PARSER_ACCEPT_ANSI_EXTENSIONS to false\n"
+	     "and CHECK_FORTRAN_SYNTAX_BEFORE_PIPS to true.\n");
+	}
       }
-	else
-	    pre = data_to_precondition(get_current_module_entity());
+      else
+	pre = data_to_precondition(get_current_module_entity());
     }
     else
-	pre = transformer_identity();
+      pre = transformer_identity();
+    
+    ifdebug(1) {
+      pips_debug(1, "considering initial precondition for %s\n", module_name);
+      print_transformer(pre);
+    }
 
     /* interprocedural try for DRET demo - I'm not sure it's correct! 
        especially when there are DATA statements... */
