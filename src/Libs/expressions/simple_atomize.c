@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1995/08/10 10:23:45 $, 
+ * $Date: 1995/09/19 17:36:09 $, 
  */
 
 #include <stdio.h>
@@ -12,6 +12,7 @@
 #include "ri-util.h"
 #include "misc.h"
 #include "control.h" /* for CONTROL_MAP() */
+#include "transformations.h"
 
 /* void atomize_as_required(stat, expr_decide, func_decide, test_decide, new)
  * statement stat;
