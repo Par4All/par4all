@@ -344,8 +344,8 @@ coarse_grain_parallelization(string module_name)
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     module_stat = get_current_module_statement();
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)) );
+    set_cumulated_rw_effects((statement_effects)
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings(module);
  
     /* Invariant  read/write regions */
@@ -366,7 +366,7 @@ coarse_grain_parallelization(string module_name)
     
     reset_current_module_entity();
     reset_current_module_statement();
-    free_cumulated_effects_map();
+    reset_cumulated_rw_effects();
     reset_invariant_rw_effects();
     return(TRUE);
 }
