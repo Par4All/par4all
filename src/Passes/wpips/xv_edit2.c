@@ -272,7 +272,7 @@ wpips_execute_and_display_something(char * label)
 	    set_pips_icon(edit_frame[win2], icon_number2, modulename);
 
 	    xv_set(edit_textsw[win2], 
-		   TEXTSW_FILE, build_view_file(print_type_2),
+		   TEXTSW_FILE, get_dont_build_view_file(print_type_2),
 		   TEXTSW_BROWSING, TRUE,
 		   TEXTSW_FIRST, 0,
 		   NULL);
@@ -288,7 +288,7 @@ wpips_execute_and_display_something(char * label)
 	    /* Should be the same, nevertheless...: */
 	    send_module_name_to_emacs(modulename);
 	    /* send_icon_name_to_emacs(icon_number2); */
-	    send_view_to_emacs("BANK", build_view_file(print_type_2));
+	    send_view_to_emacs("BANK", get_dont_build_view_file(print_type_2));
 	}
     }
 
