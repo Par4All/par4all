@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/03/27 18:57:42 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/03/28 23:18:28 $, ), version $Revision$,
 #
 
 #
@@ -94,6 +94,7 @@ alive()
 {
   for v_host in `echo $1 | tr ':' ' '`
   do
+    $DEBUG2 " | $ping $v_host"
     $ping $v_host > /dev/null 2>&1 && echo ":$v_host"
   done | tr -d '\012'
 }
