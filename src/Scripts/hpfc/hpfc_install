@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log: hpfc_install,v $
+# Revision 1.36  1997/10/27 15:47:03  coelho
+# unsplit should work fine ?
+#
 # Revision 1.35  1997/10/27 13:55:24  coelho
 # new version with Src
 #
@@ -110,7 +113,7 @@ then
 
   cp $basedir/Src/* $tdir
 
-  [ "$unsplit" ] && set $basedir/[a-z]*.f 
+  [ "$unsplit" ] && set $basedir/[A-Z][A-Z]*/[a-z]*.f 
   [ "$reffiles" ] && set `echo "$reffiles" | cut -d " " -f 2`
 
   $debug rebuilding initial source file
