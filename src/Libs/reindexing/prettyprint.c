@@ -172,8 +172,6 @@ statement make_shared_statement(ae, serial, news)
 void cmf_layout_align(mod_stat)
      statement mod_stat;
 {
-  unstructured mod_un;
-  statement body;
   list list_body, list_la, lae = NIL, li = NIL, lv;
 
   for(lv = graph_vertices(current_dfg); !ENDP(lv); POP(lv)) {
@@ -264,16 +262,16 @@ void cmf_layout_align(mod_stat)
   }
 
   /* We add these declarations to the statement of the module */
-  mod_un = instruction_unstructured(statement_instruction(mod_stat));
-  body = control_statement(unstructured_control(mod_un));
-  
-  if(instruction_tag(statement_instruction(body)) !=
-     is_instruction_block)
-    user_error("cmf_layout_align", "\nBody is not a block\n");
+  /* After reindexing, the first statement is in fact a sequence and
+     no longer an unstructured. Trust it to simplify the following: */
+  if(instruction_tag(statement_instruction(mod_stat)) !=
+     is_instruction_sequence)
+    pips_user_error("Body is not a block\n");
 
   list_body = gen_nconc(list_la,
-			instruction_block(statement_instruction(body)));
-  instruction_block(statement_instruction(body)) = list_body;
+			sequence_statements(instruction_sequence(statement_instruction(mod_stat))));
+  sequence_statements(instruction_sequence(statement_instruction(mod_stat))) =
+      list_body;
 }
 
 
@@ -282,11 +280,9 @@ void cmf_layout_align(mod_stat)
  * 
  */
 
-void craft_layout_align(mod_stat)
-     statement mod_stat;
+void
+craft_layout_align(statement mod_stat)
 {
-  unstructured mod_un;
-  statement body;
   list list_body, list_la, lae = NIL, li = NIL, lv;
 
   for(lv = graph_vertices(current_dfg); !ENDP(lv); POP(lv)) {
@@ -377,17 +373,17 @@ void craft_layout_align(mod_stat)
   }
 
   /* We add these declarations to the statement of the module */
-  mod_un = instruction_unstructured(statement_instruction(mod_stat));
-  body = control_statement(unstructured_control(mod_un));
-  
-  if(instruction_tag(statement_instruction(body)) !=
-     is_instruction_block)
-    user_error("craft_layout_align", "\nBody is not a block\n");
+  /* After reindexing, the first statement is in fact a sequence and
+     no longer an unstructured. Trust it to simplify the following: */
+  if(instruction_tag(statement_instruction(mod_stat)) !=
+     is_instruction_sequence)
+    pips_user_error("Body is not a block\n");
 
   list_body = gen_nconc(list_la,
-			instruction_block(statement_instruction(body)));
-  instruction_block(statement_instruction(body)) = list_body;
-}
+			sequence_statements(instruction_sequence(statement_instruction(mod_stat))));
+  sequence_statements(instruction_sequence(statement_instruction(mod_stat))) =
+      list_body;
+  }
 
 
 /*=======================================================================*/
