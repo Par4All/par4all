@@ -1,7 +1,7 @@
 #! /bin/sh
 # 
 # $RCSfile: hpfc,v $ (version $Revision$)
-# $Date: 1995/04/25 15:54:29 $, 
+# $Date: 1995/04/25 19:17:55 $, 
 #
 # HPFC scripts very front-end.
 # just an easy way not to have to remember the name of some scripts.
@@ -19,24 +19,28 @@ usage()
 {
   cat >&2 <<-END
 	usage: $script [-vdq] function [options] [arguments]
-	  version is $Revision$, function among (3 significant characters:-):
-	  h|help: gives this help (but nothing more:-)
-	  c|compile: compile
-	  f|full: compile, compile and link
-	  D|debug: compile with debug option
-	  C|clean: clean directories
-	  d|delete: delete hpfc directory
-	  F|filter: show filter result
-	  m|make: compile and link
-	  r|run: run...
-	  v|view|less: display a file
-	  p|pvm: pvm control
-	  i|interactive: interactive mode (thanks to GNU readline library)
-	  s|ls: list directory content
-	  q|quit: does nothing...
-	  validate: used by the validation...
-	  test: make test...
-	  pwd: print working directory (but cannot change it:-)
+	  version is $Revision$, 
+	  function among (3 significant characters:-):
+	  COMPILATION:
+	    i|interactive: (thanks to GNU readline library)
+	    c|compile: compile
+	    m|make: compile and link
+	    p|pvm: pvm control
+	    r|run: run (not implemented yet:-)
+	    f|full: compile + make
+	    d|delete: delete hpfc directory
+	    v|view|less: display a file
+	    q|quit: does nothing
+	  DEBUG:
+	    D|debug: compile with debug option
+	    C|clean: clean directories (pips and hpfc)
+	    F|filter: show filter result
+	    test: make test...
+	  MISC:
+	    pwd: print working directory (but cannot change it:-)
+	    h|help: gives this help (but nothing more:-)
+	    s|ls: list directory content
+	    validate: used by the validation...
 	END
   exit ${1:-1}
 }
