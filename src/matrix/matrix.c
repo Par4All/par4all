@@ -80,7 +80,7 @@ Pmatrix	c;			/* output */
 	    {
 		va = MATRIX_ELEM(a,loop1,loop3), 
 		vb = MATRIX_ELEM(b,loop3,loop2);
-		value_addto(i, value_mult(va, vb))
+		value_addto(i, value_mult(va, vb));
 	    }
 	    MATRIX_ELEM(c,loop1,loop2) = i;
 	}
