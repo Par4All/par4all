@@ -78,8 +78,11 @@
 /* Pips includes	*/
 #include "linear.h"
 #include "ri.h"
-#include "graph.h"
+
 #include "paf_ri.h"
+typedef dfg_arc_label arc_label;
+typedef dfg_vertex_label vertex_label;
+#include "graph.h"
 #include "database.h"
 #include "ri-util.h"
 #include "constants.h"
