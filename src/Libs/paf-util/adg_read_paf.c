@@ -195,30 +195,6 @@ char * s;
 }
 
 
-/*============================================================================*/
-/* static successor find_succ_with_vertex(vertex v, list sl): This function
- * returns the first successor of "sl" that has the same statement number as
- * "v".
- * If such a successor does not exist in this list, the function returns an
- * undefined successor.
- */
-static successor find_succ_with_vertex(v, sl)
-vertex v;
-list sl;
-{
- int so = vertex_int_stmt(v);
- list l = sl;
-
- for(l = sl; l != NIL; l = CDR(l))
-   {
-    successor aux_succ = SUCCESSOR(CAR(l));
-    int aux_so = vertex_int_stmt(successor_vertex(aux_succ));
-    if(aux_so == so)
-      return(aux_succ);
-   }
- return(successor_undefined);
-}
-
 #define INIT_STATEMENT_SIZE 20
 
 /*============================================================================*/
@@ -821,36 +797,6 @@ void ubound_exp()
  range_upper(loop_range(crt_loop)) = crt_exp;
 
  lin_exp_l = NIL;
-}
-
-
-/*============================================================================*/
-/* void save_float(float f): The parser has found a float as a part of a
- * lisp expression. We save it in our global variable "lin_exp_l".
- *
- * If "lin_exp_l" is empty, then this float becomes the current expression.
- * If not, it becomes an argument of the first lisp expression of "lin_exp_l".
- */
-void save_float(f)
-float f;
-{
- extern list lin_exp_l;
- extern expression crt_exp;
- entity ce;
- expression aux_exp;
-
- ce = MakeConstant((string) stringf("%f", f), is_basic_float);
- aux_exp = make_expression(make_syntax(is_syntax_call, make_call(ce,NIL)),
-                           normalized_undefined);
-
- if(lin_exp_l == NIL)
-    crt_exp = aux_exp;
- else
-   {
-    lisp_expression crt_le = LISP_EXPRESSION(CAR(lin_exp_l));
-    lisp_expression_args(crt_le) = gen_nconc(lisp_expression_args(crt_le),
-                                             CONS(EXPRESSION, aux_exp, NIL));
-   }
 }
 
 
