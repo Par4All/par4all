@@ -82,10 +82,21 @@ void StatementReplaceReference(statement s, reference ref, expression next)
       case is_instruction_goto :
 	pips_error("StatementReplaceReference", "case is_instruction_goto");
 	break;
-      case is_instruction_unstructured :
-	pips_error("StatementReplaceReference", 
-		   "case is_instruction_unstructured");
+    case is_instruction_unstructured : {
+      list nodes = NIL;
+      unstructured u = instruction_unstructured(inst);
+      control entry_node = unstructured_control(u);
+
+      FORWARD_CONTROL_MAP(c, {
+	statement st = control_statement(c);
+
+	StatementReplaceReference(st, ref, next);
+      }, entry_node, nodes);
+      gen_free(nodes);
+      /* pips_error("StatementReplaceReference", 
+	 "case is_instruction_unstructured"); */
 	break;
+    }
 	default : 
 	pips_error("StatementReplaceReference", 
 		   "Bad instruction tag");
