@@ -14,14 +14,14 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/09/16 22:10:17 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/12/14 11:30:03 $, )
  * version $Revision$
  */
 
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include <malloc.h>
+#include </usr/include/malloc.h>
+#include </usr/include/stdlib.h>
 
 #include "newgen_types.h"
 #include "genC.h"
@@ -159,7 +159,6 @@ int size;
     htp->hash_size = size;
     htp->hash_entry_number = 0;
     htp->hash_size_limit = HASH_SIZE_LIMIT(size);
-    
     htp->hash_array = (hash_entry_pointer) alloc(size*sizeof(hash_entry));
 
     for (i = 0; i < size; i++) 
@@ -222,8 +221,8 @@ hash_table htp;
 void hash_table_free(htp)
 hash_table htp;
 {
-    cfree(htp->hash_array);
-    free(htp);
+    assert(free(htp->hash_array)==1);
+    assert(free(htp)==1);
 }
 
 /* This functions stores a couple (key,val) in the hash table pointed to
@@ -452,7 +451,7 @@ hash_table htp;
 	    htp->hash_array[rank] = he;
 	}
     }
-    cfree(old_array);
+    assert(free(old_array)==1);
 }
 
 static int hash_string_rank(key, size)
