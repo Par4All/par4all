@@ -5,6 +5,10 @@
   * $id$
   *
   * $Log: basic.c,v $
+  * Revision 1.22  2001/10/22 15:54:36  irigoin
+  * reformatting + precondition_to_abstract_store() added, although it is
+  * redundant with transformer_range()
+  *
   * Revision 1.21  2001/07/19 18:03:21  irigoin
   * Lots of additions for a better handling of multitype transformers
   *
@@ -220,6 +224,21 @@ transformer_inequalities_add(transformer tf, Pcontrainte ineqs)
 					  contrainte_vecteur(ineq),
 					  FALSE);
     return tf;
+}
+
+transformer
+transformer_add_identity(transformer tf, entity v)
+{
+  entity v_new = entity_to_new_value(v);
+  entity v_old = entity_to_old_value(v);
+  Pvecteur eq = vect_new((Variable) v_new, (Value) 1);
+
+  vect_add_elem(&eq, (Variable) v_old, (Value) -1);
+  tf = transformer_equality_add(tf, eq);
+  transformer_arguments(tf) = 
+    arguments_add_entity(transformer_arguments(tf), v_new);
+
+  return tf;
 }
 
 bool 
@@ -471,4 +490,20 @@ list transformer_projectable_values(transformer tf)
   }
 
   return proj;
+}
+/* Get rid of all old values and arguments. Argument pre is unchanged and
+   result as is allocated. Should be a call to transformer_range(). */
+transformer
+precondition_to_abstract_store(transformer pre)
+{
+  transformer as = transformer_dup(pre);
+
+  /* Project all old values */
+  as = transformer_projection(as, transformer_arguments(as));
+
+  /* Redefine the arguments */
+  gen_free_list(transformer_arguments(as));
+  transformer_arguments(as) = NIL;
+
+  return as;
 }
