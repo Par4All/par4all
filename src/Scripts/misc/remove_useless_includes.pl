@@ -101,8 +101,8 @@ sub load_include_file_identificators($)
 	    if (exists $identificator{$id} and 
 		$identificator{$id} ne $filename)
 	    {
-		# tell anyway, as it might be a 
-		print "id $id in $identificator{$id} and $filename\n";
+		print STDERR "id $id in $identificator{$id} and $filename\n"
+		    if $verbose>1;
 		${$declaration_dependencies{$identificator{$id}}}{$filename}=1;
 	    }
 	    else
