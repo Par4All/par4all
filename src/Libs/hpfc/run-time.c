@@ -1,26 +1,13 @@
-/*
- * Runtime Support Functions Management
+/* Runtime Support Functions Management
  *
  * Fabien Coelho, May and June 1993
  *
- * SCCS stuff:
- * $RCSfile: run-time.c,v $ ($Date: 1995/03/22 10:57:03 $, ) version $Revision$,
- * got on %D%, %T%
- * $Id$
+ * $RCSfile: run-time.c,v $ ($Date: 1995/04/10 18:49:42 $, )
+ * version $Revision$,
  */
 
-#include <stdio.h>
-extern int fprintf();
-
-#include "genC.h"
-#include "ri.h"
-
-#include "misc.h"
-#include "ri-util.h"
-#include "bootstrap.h"
-#include "properties.h"
-#include "hpfc.h"
 #include "defines-local.h"
+#include "bootstrap.h"
 
 extern entity CreateIntrinsic(string name);                 /* in syntax.h */
 extern entity MakeExternalFunction(entity e, type r);       /* idem */
