@@ -69,7 +69,7 @@ static int key_location(linear_hashtable_pt h, void * k, boolean toget)
 
 static void linear_hashtable_extend(linear_hashtable_pt h)
 {
-  void ** oldkeys, ** oldvals;
+  register void ** oldkeys, ** oldvals;
   register int i, oldsize, moved_nitems;
 
   moved_nitems = h->nitems;
