@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/29 10:21:13 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/29 10:31:06 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -90,18 +90,41 @@ PATH=${PATH}:${PIPS_BINDIR}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
 
 PIPS_ARCH="."
 
+#
+# AR
+#
 PIPS_AR="/usr5/gnu/bin-sparc/ar"
+#
+# AR FLAGS
+#
 PIPS_ARFLAGS="rv"
-# PIPS_CC="cc"
+#
+# CC
+#
 PIPS_CC="gcc"
-# For SUNOS' cc:
-# PIPS_CFLAGS="-pipe -temp=${PIPS_TEMPDIR} -g"
-# For GNU cc:
+PIPS_CC_SUN4="acc"
+#
+# C FLAGS
+#
 PIPS_CFLAGS="-O2 -g -ansi -pedantic -Wall -mv8 -pipe"
+PIPS_CFLAGS_SUN4="-fast -g"
+#
+# CPP FLAGS
+#
 PIPS_CPPFLAGS="-D__USE_FIXED_PROTOTYPES__ -I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
-# PIPS_LD="cc"
-PIPS_LD="gcc"
-PIPS_LDFLAGS="-L. -L${PIPS_LIBDIR}/$(ARCH) -L${PIPS_EXTEDIR}/$(ARCH) -g"
+# 
+# LD
+#
+PIPS_LD=${PIPS_CC}
+PIPS_LD_SUN4=${PIPS_CC_SUN4}
+#
+# LD FLAGS
+#
+PIPS_LDFLAGS="-g -L$(ARCH) -L${PIPS_LIBDIR}/$(ARCH) -L${PIPS_EXTEDIR}/$(ARCH)"
+PIPS_LDFLAGS_SUN4="-fast ${PIPS_LDFLAGS}"
+#
+# others
+# 
 PIPS_LEX="lex"
 PIPS_LFLAGS=""
 PIPS_LINT="lint"
