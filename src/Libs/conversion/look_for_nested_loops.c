@@ -3,7 +3,6 @@
  */
 
 #include <stdio.h>
-extern int fprintf();
 #include "genC.h"
 #include "ri.h"
 #include "misc.h"
@@ -20,7 +19,7 @@ extern int fprintf();
 #include "contrainte.h"
 #include "sc.h"
 
-#include "generation.h"
+#include "conversion.h"
 
 
 /* void look_for_nested_loop_statements(statement s)
@@ -144,9 +143,9 @@ bool (*loop_predicate)();
 	    /*there are no more nested loops */
 
 	    look_for_nested_loop_statements(ss,loop_transformation, loop_predicate);
-	    debug_on("GENERATION_DEBUG_LEVEL");
-	    new_s = (*loop_transformation)(sl,loop_predicate);
 	    debug_off();
+	    new_s = (*loop_transformation)(sl,loop_predicate);
+	    debug_on("GENERATION_DEBUG_LEVEL");
 	}
 	
 	for( b1=CDR(b); !ENDP(b1); b1 = CDR(b1) ) {
@@ -165,9 +164,9 @@ bool (*loop_predicate)();
 	false_s= test_false(tt);
 	look_for_nested_loop_statements(true_s,loop_transformation, loop_predicate);
 	look_for_nested_loop_statements(false_s,loop_transformation, loop_predicate);
-	debug_on("GENERATION_DEBUG_LEVEL");
-	new_s = (*loop_transformation)(sl,loop_predicate);
 	debug_off();
+	new_s = (*loop_transformation)(sl,loop_predicate);
+	debug_on("GENERATION_DEBUG_LEVEL");
 	return(new_s);
 	break;
 
@@ -206,6 +205,8 @@ bool (*loop_predicate)();
 	pips_error("look_for_inner_loop",
 		   "unexpected tag %d\n",instruction_tag(i));
     }
+
+    return(statement_undefined); /* just to avoid a gcc warning */
 }
 
 
