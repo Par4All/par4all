@@ -23,3 +23,5 @@
 #define db_get_file_resource db_get_memory_resource
 #define db_unput_a_resource(r,o) (db_delete_resource(r,o), TRUE)
 #define build_pgmwd db_get_workspace_directory_name
+
+#define db_make_subdirectory(n) free(db_get_directory_name_for_module(n))
