@@ -161,7 +161,7 @@ static bool call_flt(call c)
 	    break;
 	case ICFG_DECOR_PROPER_EFFECTS:
 	  /*MERGE_TEXTS(r,get_text_proper_effects(callee_name));*/
-	    MERGE_TEXT(r, get_any_effects_text(callee_name, TRUE));
+	    MERGE_TEXTS(r, get_any_effects_text(callee_name, TRUE));
 	    break;
 	case ICFG_DECOR_CUMULATED_EFFECTS:
 	    MERGE_TEXTS(r,get_text_cumulated_effects(callee_name));
