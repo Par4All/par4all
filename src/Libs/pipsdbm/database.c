@@ -67,12 +67,12 @@ bool db_open_pips_database(FILE * fd)
     db_resources rs;
     DB_UNDEF; 
     rs = read_db_resources(fd);
+    if (db_resources_undefined_p(rs)) return FALSE;
+    set_pips_database(rs); 
 
     /* coredump in copy if done on save in next function ???. */
     db_clean_db_resources(rs);
 
-    if (db_resources_undefined_p(rs)) return FALSE;
-    set_pips_database(rs); 
     DB_OK;
     return TRUE;
 }
@@ -123,13 +123,16 @@ static string db_status_string(db_status s)
 
 static void dump_db_resource(string rname, string oname, db_resource r)
 {
+  ifdebug(1) 
+  {
     pips_debug(1, "rname=%s, oname=%s, r=%p\n", rname, oname, r);
     if (!db_resource_undefined_p(r)) {
-	db_status s = db_resource_db_status(r);
-	pips_debug(1, "pointer=%p, status=%s, time=%d, file_time=%d\n", 
-		   db_resource_pointer(r), db_status_string(s),
-		   db_resource_time(r), db_resource_file_time(r));
+      db_status s = db_resource_db_status(r);
+      pips_debug(1, "pointer=%p, status=%s, time=%d, file_time=%d\n", 
+		 db_resource_pointer(r), db_status_string(s),
+		 db_resource_time(r), db_resource_file_time(r));
     }
+  }
 }
 
 #define debug_db_resource(l, r, o, p) ifdebug(l) { dump_db_resource(r, o, p);}
@@ -207,7 +210,17 @@ static void db_clean_db_resources(db_resources dbres)
   {
     DB_OWNED_RESOURCES_MAP(rs, r,
     {
-      if (!db_resource_stored_p(r)) 
+      string rn = db_symbol_name(rs);
+      string on = db_symbol_name(os);
+      pips_debug(8, "considering %s[%s] (%p)\n", rn, on, (void*) r);
+
+      if (db_resource_required_p(r))
+      {
+	pips_debug(1, "deleting required %s[%s]\n", rn, on);
+	dump_db_resource(rn, on, r);
+	db_delete_resource(rn, on);
+      }
+      else if (!db_resource_stored_p(r)) 
       {
 	pips_debug(5, "resource %s[%s] set as stored\n",
 		   db_symbol_name(os), db_symbol_name(rs));
@@ -628,7 +641,7 @@ int db_delete_obsolete_resources(bool (*keep_p)(string, string))
 	string rn = db_symbol_name(rs);
 	string on = db_symbol_name(os);
 	pips_debug(8, "considering %s of %s (%p)\n", rn, on, (void *) r);
-	if (!keep_p(rn, on)) {
+	if (!db_resource_required_p(r) && !keep_p(rn, on)) {
 	  pips_debug(8, "to be destroyed: %s of %s\n", rn, on);
 	  ndeleted++;
 	  lr = CONS(STRING, rn, lr);
