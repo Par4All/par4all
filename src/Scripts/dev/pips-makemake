@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/22 20:23:44 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/23 22:17:07 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -222,12 +222,16 @@ ROOT= \$(${PART}_ROOT)
 TARGET=		${dir_real_name}
 TARGET_DIR=	${install_src_dir}/${target_dir}
 #
-# default architecture is taken from PIPS_ARCH environment variable
-# if set, and . is chosen otherwise.
+# default architecture is taken from ${PART}_ARCH then from PIPS_ARCH 
+# environment variable, else the default is "." (dot). 
+ifdef ${PART}_ARCH
+ARCH =	\$(${PART}_ARCH)
+else
 ifdef PIPS_ARCH
 ARCH =	\$(PIPS_ARCH)
 else
 ARCH =	.
+endif
 endif
 #
 # installation directories for quick-install
@@ -245,12 +249,14 @@ MAIN=		main
 #
 # 
 #
-CONFIG_FILE=	${CONFIG_FILE}
-MAKEFILE=	${MAKEFILE}
-SHELL	=	/bin/sh
-COPY	=	cp
-MOVE	=	mv -f
-GMKNODIR=	--no-print-directory
+CONFIG	= ${CONFIG_FILE}
+MAKEFILE= ${MAKEFILE}
+SHELL	= /bin/sh
+COPY	= cp
+MOVE	= mv -f
+GMKNODIR= --no-print-directory
+INSTALL = pips_install_file
+INSTSRC = install_pips_sources
 #
 # default targets...
 all: generate_makefile_if_necessary_and_possible
@@ -289,7 +295,7 @@ check_install:
 #
 include \$(ROOT)/Include/define_libraries.make
 include \$(ROOT)/Include/makefile_macros.\$(ARCH)
-include $CONFIG_FILE
+include \$(CONFIG)
 #
 # prefixed objects:
 LIB_OBJECTS:=\$(addprefix \$(ARCH)/, \$(LIB_OBJECTS))
@@ -298,7 +304,6 @@ LIB_OBJECTS:=\$(addprefix \$(ARCH)/, \$(LIB_OBJECTS))
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
 # a typical interesting example is to put -pg in {C,LD}OPT
 #
-INSTALL= pips_install_file
 PREPROC=  \$(CC) -E \$(CPPFLAGS) \$(CPPOPT) \$(TARGET_ARCH)
 COMPILE=  \$(CC) \$(CFLAGS) \$(COPT) \$(CPPFLAGS) \$(CPPOPT) \$(TARGET_ARCH) -c
 F77COMPILE=\$(FC) \$(FFLAGS) \$(FOPT) -c
@@ -323,7 +328,7 @@ M4FILTER= \$(M4) \$(M4FLAGS) \$(M4OPT)
 #
 %.dvi: %.tex
 	# building \$@ from \$<
-	touch \$*.ind
+	-grep '\\\\makeindex' \$*.tex && touch \$*.ind
 	\$(LATEX) \$<
 	-grep '\\\\bibdata{' \$*.aux && { \$(BIBTEX) \$* ; \$(LATEX) \$< ;}
 	test ! -f \$*.idx || { \$(MAKEIDX) \$*.idx ; \$(LATEX) \$< ;}
@@ -409,7 +414,7 @@ INSTALL_BIN+=	`if [ $DIRTYPE = 'Passes' ] ; then echo '\$(BIN_TARGET)' ; fi`
 check_install:
 	@if test \`echo *.a | wc -w\` -gt 1 ; \\
 	then \\
-	  echo "install failed: additional local libraries prevent it" >&2;\\
+	  echo "install failed: additional local libraries prevented it" >&2;\\
 	  exit 1;\\
 	fi
 
@@ -597,7 +602,7 @@ $verbose "common to all again"
 
 cat >> $MAKEFILE <<%
 
-ALL_SOURCES =	\$(SOURCES) \$(CONFIG_FILE)
+ALL_SOURCES =	\$(SOURCES) \$(CONFIG)
 
 \$(TARGET_DIR):;	mkdir \$(TARGET_DIR)
 
@@ -701,10 +706,8 @@ check_sccs:
 	#
 	\$(MAKE) \$(GMKNODIR) all \$(TARGET_DIR) 
 	@echo ""; echo; echo -n "Description of changes: " ; \\
-	read comments ; \\
-	install_pips_sources \\
-		-rv -s \`pwd\` -t \$(TARGET_DIR) -y "\$\$comments" \\
-		\$(ALL_SOURCES)
+	read x ; \\
+	\$(INSTSRC) -rv -s \`pwd\` -t \$(TARGET_DIR) -y "\$\$x" \$(ALL_SOURCES)
 	-@cd \$(TARGET_DIR) ; pips-makemake $PIPSMKMK_OPTION -S
 	touch .install
 	\$(MAKE) quick-install
