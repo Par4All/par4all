@@ -41,7 +41,7 @@ static char *flint_current_module_name;
 /*************************************************************/
 /* Routine of  global module verification                    */
 
-void flinter(module_name)
+bool flinter(module_name)
 char *module_name;
 {
     entity module = local_name_to_top_level_entity(module_name);
@@ -87,7 +87,7 @@ char *module_name;
 			 filename);
     debug_off();
 
-
+    return TRUE;
 }
 
 /*************************************************************/
