@@ -2,6 +2,9 @@
   $Id$
 
   $Log: ModuleManager.java,v $
+  Revision 1.5  1998/11/20 17:32:18  coelho
+  %MAIN added to the menu.
+
   Revision 1.4  1998/10/17 12:19:24  coelho
   border++.
 
@@ -76,7 +79,7 @@ public class ModuleManager implements JPipsComponent
    */  
   public Component getComponent()
   {
-    return (Component)panel;
+    return (Component) panel;
   }
   
   /** Sets as selected all the modules of the list.
@@ -84,8 +87,9 @@ public class ModuleManager implements JPipsComponent
   public void setAllSelected()
   {
     DefaultListModel dlm = (DefaultListModel) list.getModel();
-    int tab[] = new int[dlm.size()];
-    for(int i=0; i<dlm.size(); i++) tab[i] = i;
+    int tab[] = new int[dlm.size()-1];
+    // skip first one.
+    for(int i=1; i<dlm.size(); i++) tab[i-1] = i;
     list.setSelectedIndices(tab);
   }
   
@@ -114,6 +118,7 @@ public class ModuleManager implements JPipsComponent
 	// modules.addElement(module);
 	modules.add(0, module); 
       }
+      modules.add(0, "%MAIN"); // add so as to select the main.
     }
   }
 
