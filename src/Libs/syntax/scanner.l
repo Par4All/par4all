@@ -1,6 +1,19 @@
 %{
+
+#ifndef FLEX_SCANNER
+/* the portability of the following macro makes many (:-) assumptions
+ * about lex internals hence should not be very portable...
+ * POSIX states that input and unput should not be modified.
+ */
 #undef input()
 #define input() (((yytchar=yysptr>yysbuf?U(*--yysptr):PipsGetc(yyin))==10?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
+#else
+#define YY_INPUT(buf,result,max_size) \
+{ \
+ int c = PipsGetc(yyin); \
+ result = (c == EOF)? YY_NULL: (buf[0] = c, 1); \
+}
+#endif
 
 /* les definitions des valeurs des tokens */
 #include <stdio.h>
@@ -196,8 +209,7 @@ DCON (({MANT}|{UICON}){DEXP}?)
 			}
 
 .			{
-   user_warning("sslex", 
-                "[scanner] illegal character %c (hex %x)\n",
+   pips_user_warning("illegal character %c (hex %x)\n",
                 yytext[0], yytext[0]);
    ParserError("Lexical Analysis", 
                "Check standard Fortran character set.\n");
@@ -207,4 +219,19 @@ DCON (({MANT}|{UICON}){DEXP}?)
 void yyerror_lex_part(char *s)
 {
     user_warning("parser"," error - %s near %s\n", s, yytext);
+}
+
+void yyreset_lex(void)
+{
+#ifndef FLEX_SCANNER
+    extern char syn_sbuf[];
+    extern char * syn_sptr;
+    extern int syn_previous;
+    /* reset lex... Might be better to read the whole file? */
+    syn_sptr = syn_sbuf;
+# define MMNEWLINE 10
+    syn_previous = MMNEWLINE;
+#else
+    yyrestart(yyin);
+#endif
 }
