@@ -210,6 +210,8 @@ typedef int Value;
 #define value_substract(v1,v2) value_addto(v1,v2)
 #undef value_product
 #define value_product(v1,v2) value_addto(v1,v2)
+#undef value_modulus
+#define value_modulus(v1,v2) value_addto(v1,v2)
 #undef value_division
 #define value_division(v1,v2) value_addto(v1,v2)
 #undef value_negz_p
