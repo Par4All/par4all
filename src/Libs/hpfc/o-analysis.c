@@ -292,7 +292,7 @@ statement stat, *pstat;
 						  CONSP(CAR(CDR(CONSP(CAR(lWa)))))),
 				  NIL)));    
 
-    IFDBPRINT(8, "Overlap_Analysis", nodemodule, (*pstat));
+    IFDBPRINT(8, "Overlap_Analysis", node_module, (*pstat));
 
     reset_hpfc_current_statement();
 
@@ -307,19 +307,19 @@ statement stat, *pstat;
 bool block_distributed_p(array)
 entity array;
 {
-    MAPL(ci,
-     {
-	 int
-	     nd = INT(CAR(ci));
+    int
+	dim = NumberOfDimension(array),
+	n = NEW_DECLARATION_UNDEFINED;
 
-	 if ((nd==GAMMA_NEW_DECLARATION) || 
-	     (nd==DELTA_NEW_DECLARATION))
+    for(; dim>0; dim--)
+    {
+	n = new_declaration(array, dim);
+	if ((n==GAMMA_NEW_DECLARATION) || (n==DELTA_NEW_DECLARATION))
 	    /* distributed && (nd==NO_NEW_DECLARATION)) ?
 	     * ??? the case is not handled later on 
 	     */
-	     return(FALSE);
-     },
-	 (list) GET_ENTITY_MAPPING(newdeclarations, array));
+	    return(FALSE);
+    }
 
     return(TRUE);
 }
@@ -587,6 +587,8 @@ list l;
 bool expression_integer_constant_p(e)
 expression e;
 {
+    syntax
+	s = expression_syntax(e);
     normalized
 	n = expression_normalized(e);
 
@@ -610,10 +612,10 @@ expression e;
 	return((s==1) && ((int) vect_coeff(TCST,v)!=0));
     }
     else
-    if (syntax_call_p(expression_syntax(e)))
+    if (syntax_call_p(s))
     {
 	call 
-	    c = syntax_call(expression_syntax(e));
+	    c = syntax_call(s);
 	value
 	    v = entity_initial(call_function(c));
 
@@ -643,7 +645,7 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
     entity
 	array = reference_variable(the_written_reference);
     int
-	an = (int) GET_ENTITY_MAPPING(hpfnumber, array);
+	an = get_hpf_number(array);
     entity_mapping
 	new_indexes = MAKE_ENTITY_MAPPING(),
 	old_indexes = MAKE_ENTITY_MAPPING();
@@ -675,16 +677,16 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
 	     int
 		 ub = HpfcExpressionToInt(range_upper(rg));
 	     entity
-		 newindex = NewTemporaryVariable(nodemodule, 
+		 newindex = NewTemporaryVariable(node_module, 
 						 MakeBasic(is_basic_int));
 	     entity
-		 newlobnd = NewTemporaryVariable(nodemodule, 
+		 newlobnd = NewTemporaryVariable(node_module, 
 						 MakeBasic(is_basic_int));
 	     entity
-		 newupbnd = NewTemporaryVariable(nodemodule, 
+		 newupbnd = NewTemporaryVariable(node_module, 
 						 MakeBasic(is_basic_int));
 	     entity
-		 oldidxvl = NewTemporaryVariable(nodemodule, 
+		 oldidxvl = NewTemporaryVariable(node_module, 
 						 MakeBasic(is_basic_int));
 
 	     boundcomp = gen_nconc(boundcomp,
@@ -754,6 +756,8 @@ entity e;
 	dim = 1;
     list
 	li = reference_indices(r);
+    Variable
+	v = (Variable) e;
 
     MAPL(ce,
      {
@@ -761,7 +765,7 @@ entity e;
 	     n = expression_normalized(EXPRESSION(CAR(ce)));
 
 	 if (normalized_linear_p(n) &&
-	     (vect_coeff(e, (Pvecteur)normalized_linear(n)) != 0))
+	     (vect_coeff(v, (Pvecteur)normalized_linear(n)) != 0))
 	     return(dim);
 
 	 dim++;
@@ -796,7 +800,7 @@ int  lb, ub, an, dp;
 		 int_to_expression(dp),
 		 NIL)))))));
 
-    return(my_make_call_statement(e_LoopBounds, l));
+    return(my_make_call_statement(hpfc_name_to_entity(LOOP_BOUNDS), l));
 }
 
 /*
@@ -975,7 +979,8 @@ statement innerbody;
 	 * ENDDO
 	 */
 	loop_body(newloop) = body;
-	return(mere_statement(make_instruction(is_instruction_loop, newloop)));
+	return(make_stmt_of_instr(make_instruction(is_instruction_loop,
+						   newloop)));
     }
     else /* only when necessary */
     {
@@ -998,10 +1003,10 @@ statement innerbody;
 							    NIL)));
 
 	return(make_block_statement
-	       (CONS(STATEMENT,
-		     init,
+	       (CONS(STATEMENT, init,
 		CONS(STATEMENT,
-		     mere_statement(make_instruction(is_instruction_loop, newloop)),
+		     make_stmt_of_instr(make_instruction(is_instruction_loop, 
+							 newloop)),
 		     NIL))));	
     }
 }
