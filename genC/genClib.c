@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/07/22 12:57:31 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/07/22 15:44:58 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1655,7 +1655,7 @@ struct driver *dr ;
     if( shared_obj( obj, write_define_shared_node, write_shared_node ))
 	    return( !GO) ;
 
-    (void) fprintf( user_file, "#(#]type %p ", bp-Domains ) ;
+    (void) fprintf( user_file, "#(#]type %d ", bp-Domains ) ;
 
     if( IS_TABULATED( bp )) {
 	(void) fprintf( user_file, "%d ", abs( (obj+1)->i )) ;
@@ -2789,7 +2789,7 @@ union domain *dp;
     case SET_DT:
 	if (gen_debug & GEN_DBG_RECURSE)
 	    fprintf(stderr,
-		    " - setting %s (%d) contains %s (%p)\n",
+		    " - setting %s (%d) contains %s (%d)\n",
 		    Domains[target].name, target,
 		    dp->se.element->name, dp->se.element-Domains);
 	DirectDomainsTable[dp->se.element-Domains][target] = TRUE;
