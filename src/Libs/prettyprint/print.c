@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: print.c,v $
+ * Revision 1.24  2002/06/14 14:59:01  irigoin
+ * calls to (re)set_current_module_entity/statement added
+ *
  * Revision 1.23  1998/05/05 14:53:23  coelho
  * warning added...
  *
@@ -119,12 +122,16 @@ print_code_or_source(string mod_name)
 		GRAPH_FILE_EXT : "",
 		NULL));
 
+    set_current_module_entity(module);
+
     pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
     set_string_property(PRETTYPRINT_PARALLEL, "do");
 
     mod_stat = (statement)
 	db_get_memory_resource(is_user_view?
 			       DBR_PARSED_CODE:DBR_CODE, mod_name, TRUE);
+
+    set_current_module_statement(mod_stat);
 
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
 
@@ -137,6 +144,9 @@ print_code_or_source(string mod_name)
     debug_off();
 
     set_string_property(PRETTYPRINT_PARALLEL, pp); free(pp);
+
+    reset_current_module_entity();
+    reset_current_module_statement();
 
     free_text(r);
     free(resource_name);
