@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1995/10/04 10:54:06 $, 
+ * $Date: 1995/10/05 11:32:40 $, 
  */
 
 #include "defines-local.h"
@@ -90,7 +90,7 @@ list *pl;
     expression
 	arg = EXPRESSION(CAR(call_arguments(c)));
 
-    assert(syntax_reference_p(expression_syntax(arg)));
+    pips_assert("reference", syntax_reference_p(expression_syntax(arg)));
 
     *pe   = reference_variable(syntax_reference(expression_syntax(arg)));
     *pl   = CDR(call_arguments(c));
@@ -104,7 +104,7 @@ int kind;
 {
     static char *reduction_names[] = {"MAX", "MIN", "SUM"};
 
-    assert((kind>=0) && (kind<3));
+    pips_assert("valid kind", kind>=0 && kind<3);
 
     return(reduction_names[kind-1]);
 }
@@ -156,23 +156,23 @@ statement initial, *phost, *pnode;
 	hostfunction = entity_undefined, 
 	nodefunction = entity_undefined;
 
-    assert((instruction_call_p(i) && 
-	    ENTITY_ASSIGN_P(call_function(instruction_call(i))) &&
-	    (gen_length(call_arguments(instruction_call(i)))==2)));
+    pips_assert("assignment",
+		(instruction_call_p(i) && 
+		 ENTITY_ASSIGN_P(call_function(instruction_call(i))) &&
+		 (gen_length(call_arguments(instruction_call(i)))==2)));
 
     args = call_arguments(instruction_call(i));
     ref  = EXPRESSION(CAR(args));
     cll  = EXPRESSION(CAR(CDR(args)));
 
-    assert((syntax_reference_p(expression_syntax(ref)) &&
+    pips_assert("reference", (syntax_reference_p(expression_syntax(ref)) &&
 	    syntax_call_p(expression_syntax(cll))));
 
     reduction = syntax_call(expression_syntax(cll));
     
-    debug(7, "compile_reduction", "call to %s\n",
-	  entity_name(call_function(reduction)));
+    pips_debug(7, "call to %s\n", entity_name(call_function(reduction)));
 
-    assert(call_reduction_p(reduction));
+    pips_assert("reduction call", call_reduction_p(reduction));
 
     reduction_parameters(reduction, &red, &b, &dim, &array, &largs);
 
@@ -277,14 +277,13 @@ statement s;
 		 !rectangular_region_p(predicate_system
 			    (transformer_relation(effect_context(e)))))
 	     {
-		 debug(6, "rectangular_must_region_p", "FALSE\n");
-		 return FALSE;
+		 pips_debug(6, "FALSE\n"); return FALSE;
 	     }
 	 }
      },
 	 le);
 
-    debug(6, "rectangular_must_region_p", "TRUE\n");
+    pips_debug(6, "TRUE\n");
     return TRUE;
 }
 
@@ -316,7 +315,7 @@ static bool subarray_shift_assignment_p(call c)
 
     /*  LHS *must* be a reference
      */ 
-    assert(expression_reference_p(lhs));
+    pips_assert("reference", expression_reference_p(lhs));
 
     /* is RHS a reference?
      */
@@ -336,7 +335,7 @@ static bool subarray_shift_assignment_p(call c)
     lhs_ind = reference_indices(lhs_ref),
     rhs_ind = reference_indices(rhs_ref);
     
-    assert(gen_length(lhs_ind)==gen_length(rhs_ind));
+    pips_assert("same arity", gen_length(lhs_ind)==gen_length(rhs_ind));
 
     /*  compute the difference of every indices, if possible.
      */
@@ -384,9 +383,8 @@ static bool subarray_shift_assignment_p(call c)
 	     !ith_dim_distributed_p(array, dim, &p) ||
 	     !locally_constant_vector_p(v))
 	 {
-	     debug(7, "subarray_shift_assignment_p",
-		   "false on array %s, dimension %d\n",
-		   entity_local_name(array), dim);
+	     pips_debug(7, "false on array %s, dimension %d\n",
+			entity_local_name(array), dim);
 	     free_vector_list(lvect);
 	     lvect = NIL;
 	     return FALSE;
@@ -439,7 +437,7 @@ instruction i;
     case is_instruction_goto:
 	subarray_shift_ok = FALSE;
     default:
-	pips_error("statement_filter", "unexpected instruction tag\n");
+	pips_internal_error("unexpected instruction tag\n");
     }
 
     return subarray_shift_ok;
@@ -455,10 +453,7 @@ list *plvect;
     lvect = NIL;
     current_regions = load_statement_local_regions(s);
 
-    gen_recurse(s,
-		instruction_domain,
-		instruction_filter,
-		gen_null);
+    gen_recurse(s, instruction_domain, instruction_filter, gen_null);
 
     subarray_shift_ok &= !entity_undefined_p(array) &&
 	rectangular_must_region_p(array, s);
@@ -483,8 +478,8 @@ static entity make_shift_subroutine(entity var)
     variable v;
     int ndim;
     
-    assert(!entity_undefined_p(var)); t = entity_type(var);
-    assert(type_variable_p(t)); v = type_variable(t);
+    pips_assert("defined", !entity_undefined_p(var)); t = entity_type(var);
+    pips_assert("variable", type_variable_p(t)); v = type_variable(t);
 
     ndim = gen_length(variable_dimensions(v));
 
@@ -577,7 +572,7 @@ statement generate_subarray_shift(statement s, entity var, list lshift)
      },
 	 lshift);
 
-    assert(shift!=expression_undefined);
+    pips_assert("shift defined", shift!=expression_undefined);
     free_vector_list(lshift);
     
     /*  all the arguments
@@ -683,10 +678,10 @@ bool full_define_p(reference r, list /* of loops */ ll)
          /* of dimension */ ld,
          /* of entity */ lseen = NIL;
     
-    assert(entity_variable_p(array));
+    pips_assert("variable", entity_variable_p(array));
 
     ld = variable_dimensions(type_variable(entity_type(array)));
-    assert(gen_length(ll)==gen_length(ld));
+    pips_assert("same arity", gen_length(ll)==gen_length(ld));
 
     /* checks that the indices are *simply* the loop indexes,
      * and that the whole dimension is scanned. Also avoids (i,i)...
@@ -795,7 +790,7 @@ bool full_copy_p(statement s, reference * pleft, reference * pright)
     }
 
     la = call_arguments(instruction_call(statement_instruction(simple)));
-    message_assert("2 arguments to assign", gen_length(la)==2);
+    pips_assert("2 arguments to assign", gen_length(la)==2);
 
     left = expression_reference(EXPRESSION(CAR(la)));
     e = EXPRESSION(CAR(CDR(la)));
