@@ -6,7 +6,9 @@
   -- MAXINT replaced by INT_MAX, -MAXINT by INT_MIN FI 1/12/95
 */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 /* #include <values.h>   */ 
 #include <limits.h>
 #include <string.h>
