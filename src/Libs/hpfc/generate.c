@@ -1,7 +1,7 @@
 /* 
- * generate.c 
- * 
- * code generation 
+ * $RCSfile: generate.c,v $ ($Date: 1994/12/22 16:52:16 $, )
+ * version $Revision$
+ * got on %D%, %T%
  * 
  * Fabien Coelho, May 1993
  *
@@ -56,27 +56,19 @@ list *lhp, *lnp;
     (*lhp) = NIL;
     (*lnp) = NIL;
     
-    /*
-     * assertions...  
-     */
-    
-    pips_assert("generate_c1_beta",
-		(instruction_call_p(statement_instruction(stat))));
+    assert(instruction_call_p(statement_instruction(stat)));
 
     the_call = instruction_call(statement_instruction(stat));
 
-    /*
-     * this shouldn't be necessary
+    /* this shouldn't be necessary
      */
-    pips_assert("generate_c1_beta",
-		ENTITY_ASSIGN_P(call_function(the_call)));
+    assert(ENTITY_ASSIGN_P(call_function(the_call)));
     
     w = EXPRESSION(CAR(call_arguments(the_call)));
     
-    pips_assert("generate_c1_beta",
-	      (syntax_reference_p(expression_syntax(w)) &&
-	      (!array_distributed_p
-	      (reference_variable(syntax_reference(expression_syntax(w)))))));
+    assert(syntax_reference_p(expression_syntax(w)) &&
+	   (!array_distributed_p
+	    (reference_variable(syntax_reference(expression_syntax(w))))));
 
     /*
      * references to distributed arrays:
@@ -167,19 +159,16 @@ list *lhp, *lnp;
     /*
      * assertions... 
      */
-    pips_assert("generate_c1_alpha",
-		(instruction_call_p(statement_instruction(stat))));
+    assert(instruction_call_p(statement_instruction(stat)));
 
     the_call = instruction_call(statement_instruction(stat));
-    pips_assert("generate_c1_alpha",
-		ENTITY_ASSIGN_P(call_function(the_call)));
+    assert(ENTITY_ASSIGN_P(call_function(the_call)));
 
     writtenexpr = EXPRESSION(CAR(call_arguments(the_call)));
-    pips_assert("generate_c1_alpha",
-		(syntax_reference_p(expression_syntax(writtenexpr)) &&
-		 (array_distributed_p 		
-		  (reference_variable
-		   (syntax_reference(expression_syntax(writtenexpr)))))));
+    assert(syntax_reference_p(expression_syntax(writtenexpr)) &&
+	   (array_distributed_p 		
+	    (reference_variable
+	     (syntax_reference(expression_syntax(writtenexpr))))));
     
     /*
      * read references to distributed arrays. 
@@ -339,8 +328,7 @@ list *lcompp, *lnotcompp;
 	temp = NewTemporaryVariable(get_current_module_entity(), 
 				    entity_basic(var));
 
-    pips_assert("generate_read_of_ref_for_computer", 
-		(array_distributed_p(var)));
+    assert(array_distributed_p(var));
 
     AddEntityToHostAndNodeModules(temp);
     tempn = load_entity_node_new(temp);
@@ -400,7 +388,7 @@ list *lhp, *lnp;
 				    entity_basic(var));
 
 
-    pips_assert("generate_read_of_ref_for_all", (array_distributed_p(var)));
+    assert(array_distributed_p(var));
     
     AddEntityToHostAndNodeModules(temp);
     temph = load_entity_host_new(temp); 
@@ -474,7 +462,7 @@ list *lsp, *lindsp;
  	inds = reference_indices(ref);
 
 
-    pips_assert("generate_compute_local_indexes", array_distributed_p(array));
+    assert(array_distributed_p(array));
 
     (*lsp) = NIL;
     (*lindsp) = NIL;
@@ -557,7 +545,7 @@ list *lstatp;
 	ls = NIL,
 	newinds = NIL;
     
-    pips_assert("st_get_local",array_distributed_p(array));
+    assert(array_distributed_p(array));
 
     generate_compute_local_indices(ref, &ls, &newinds);
     expr = reference_to_expression(make_reference(newarray, newinds));
@@ -586,7 +574,7 @@ list *lstatp;
 	ls = NIL,
 	newinds = NIL;
     
-    pips_assert("st_get_local",array_distributed_p(array));
+    assert(array_distributed_p(array));
 
     generate_compute_local_indices(ref, &ls, &newinds);
     statsnd = st_send_to_computer(make_reference(newarray, newinds));
@@ -614,7 +602,7 @@ list *lstatp;
 	ls = NIL,
 	newinds = NIL;
     
-    pips_assert("st_receive_from_computer", array_distributed_p(array));
+    assert(array_distributed_p(array));
 
     generate_compute_local_indices(ref, &ls, &newinds);
     statrcv = st_receive_from_computer(make_reference(newarray, newinds));
@@ -644,7 +632,7 @@ list *lstatp, lw, lr;
     syntax
 	comp = SYNTAX(CAR(lw));
 
-    pips_assert("generate_parallel_body", (gen_length(lw)>0));
+    assert(gen_length(lw)>0);
 
     statcc = st_compute_current_computer(syntax_reference(comp));
 
@@ -905,8 +893,7 @@ list *lhstatp, *lnstatp;
 	linds = NIL,
 	lnstat = NIL;
 
-    pips_assert("generate_update_distributed_value_from_host", 
-		(array_distributed_p(reference_variable(syntax_reference(s)))));
+    assert(array_distributed_p(reference_variable(syntax_reference(s))));
 
     array    = reference_variable(r);
     newarray = load_entity_node_new(array);
@@ -955,8 +942,7 @@ list *lhstatp, *lnstatp;
 	varn = load_entity_node_new(var),
 	varh = load_entity_host_new(var);
     
-    pips_assert("generate_update_private_value_from_host", 
-		(!array_distributed_p(reference_variable(syntax_reference(s)))));
+    assert(!array_distributed_p(reference_variable(syntax_reference(s))));
 
     (*lhstatp) = CONS(STATEMENT,
 		      st_host_send_to_all_nodes(make_reference(varh, NIL)),
@@ -966,3 +952,6 @@ list *lhstatp, *lnstatp;
 		      st_receive_mcast_from_host(make_reference(varn, NIL)),
 		      NIL);
 }
+
+/*   That is all
+ */
