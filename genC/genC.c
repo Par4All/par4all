@@ -135,29 +135,21 @@ union domain *dp ;
   static char buffer[ 1024 ];
 
   switch( dp->ba.type ) {
-  case BASIS: {
+  case BASIS: 
+  {
       struct gen_binding *bp = dp->ba.constructand ;
       
-      if( IS_INLINABLE( bp )) {
-	  sprintf( buffer, "(%s)", bp->name ); /* was "", but pb with -> */
-      }
-      else if( IS_EXTERNAL( bp )) {
-	  sprintf( buffer, "(%s)", bp->name ) ;
-      }
-      else {
-	  sprintf( buffer, "(%s)", bp->name ) ;/* was "", but pb with -> */
-      }
+      if (IS_INLINABLE(bp))     sprintf( buffer, "");
+      else if (IS_EXTERNAL(bp)) sprintf( buffer, "(%s)", bp->name ) ;
+      else                      sprintf( buffer, "");
+
       break ;
   }
   case EXTERNAL:
   case IMPORT:
-	  sprintf(buffer, "");
-	  break;
   case LIST:
-	  sprintf(buffer, "(list)");
-	  break;
   case SET:
-	  sprintf( buffer, "(set)" ) ;
+	  sprintf(buffer, "");
 	  break ;
   case ARRAY: 
     if( dp->ar.dimensions->cdr != NULL ) {
