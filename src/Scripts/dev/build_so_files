@@ -35,6 +35,7 @@ convert()
    ar xv ${name}.a
    gcc -g -shared -o ${name}.so ${ofiles}
    rm -f ${ofiles}
+   chmod a+rx-w ${name}.so
 }
 
 
