@@ -82,6 +82,9 @@ string mod_name;
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
+    if(!ordering_to_statement_initialized_p()) {
+	initialize_ordering_to_statement(get_current_module_statement());
+    }
 
     dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
 
