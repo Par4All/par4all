@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/09/01 21:51:06 $, 
+! $Date: 1996/09/02 18:29:05 $, 
 !
       program fractal
 
@@ -46,7 +46,7 @@
       
       real*8 zoom, xcenter, ycenter
       real*8 zr, zrp, zi, cr, ci, d
-      integer status, button
+      integer status, button, state
       
 ! Some HPF distributions:
 ! cyclic would make more sense as far as load balancing is concerned
@@ -104,7 +104,7 @@
      &     0, 0, x_display_zoom, y_display_zoom, status)
 
 ! Wait for user interaction:
-      call xpomp_wait_mouse(display, x, y, button)
+      call xpomp_wait_mouse(display, x, y, state, button)
       xcenter = xcenter + (x/x_display_zoom - x_size/2)*zoom/x_size
       ycenter = ycenter + (y/y_display_zoom - y_size/2)*zoom/y_size
       
@@ -114,7 +114,8 @@
          zoom = zoom*zooming_factor
       endif
 
-      print *, 'Position (', xcenter, ',', ycenter, '), zoom =', zoom
+      print *, 'Position (', xcenter, ',', ycenter, '), zoom =', 
+     &     zoom, ' (button =', button, ', state =', state, ')'
 
 ! hpfc does not like infinite loop without an exit point...
 ! some bug related to the management of unstructured to be investigated
