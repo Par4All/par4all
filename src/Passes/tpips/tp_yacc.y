@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.88  1998/05/29 12:42:17  coelho
+ * bug--
+ *
  * Revision 1.87  1998/05/29 08:09:11  coelho
  * info modules: missing ws added.
  *
@@ -365,8 +368,9 @@ static void tp_some_info(string about)
 	for(i=0; i<n; i++) 
 	{
 	    string m = gen_array_item(modules, i);
-	    fprintf(stdout, "%s ", m);
 	    if (jpips_is_running) jpips_add_tag(m);
+	    else fprintf(stdout, "%s ", m);
+
 	}
 	if (jpips_is_running) jpips_end_tag();
 	gen_array_full_free(modules);
