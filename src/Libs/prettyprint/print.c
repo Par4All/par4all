@@ -187,33 +187,8 @@ text texte;
 
     DB_PUT_FILE_RESOURCE(strdup(res_name), strdup(mod_name), localfilename);
 
-    /* Add the attachment in Emacs mode by creating a twin file that
-       is decorated with Emacs properties: */
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {
-	char * emacs_file_name = strdup(concatenate(filename, EMACS_FILE_EXT, NULL));
-	FILE * emacs_file_stream = safe_fopen(emacs_file_name, "w");
-	init_output_the_attachments_for_emacs(emacs_file_stream);
-	/* Now include the original plain file: */
-	fd = safe_fopen(filename, "r");
-	for(;;) {
-	    char c = getc(fd);
-	    /* Strange semantics: must have read the character first: */
-	    if (feof(fd))
-		break;
-	    
-	    /* Just backslashify the '"' and '\': */
-	    if (c == '"' || c == '\\')
-		(void) putc('\\', fd);
-	    
-	    (void) putc(c, emacs_file_stream);	  
-	}
-	safe_fclose(fd, filename);
-	/* Actually add the interesting stuff: */
-	output_the_attachments_for_emacs(emacs_file_stream);
-	safe_fclose(emacs_file_stream, emacs_file_name);
-	free(emacs_file_name);
-    }
-    
+    write_an_attachment_file(filename);
+   
     free(filename);
     
     return TRUE;
