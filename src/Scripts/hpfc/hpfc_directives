@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/06 17:26:14 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/18 09:06:11 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -25,7 +25,7 @@
 #   thus should not appear in the program, otherwise troubles...
 # - some default value is assigned to number of processors...
 # - some specific directives for HPFC.
-# - * for descriptive mappings at subroutine interface are not managed.
+# - * for descriptive mappings at subroutine interface are not managed yet.
 #
 # (c) Fabien Coelho, February 95 and later.
 # don't expect anything from this script.
@@ -66,6 +66,7 @@
 # _4: setbool // to change the compiler global behavior...
 # _5: setint  // dangerous and added for validation purposes...
 # _6: io/host // declares an io function (host call only...)
+# _7: begin/end io/host // io/host section...
 #
 # (_ is hpfc)
 #
@@ -148,10 +149,16 @@ $SED '#
       s, timeoff,      3,
       s, setbool,      4,
       s, setint,      5,
+      s, begin *local\(.*\),      i(I_LOCAL)\1      do I_LOCAL = 0\, 0,
       s, local\(.*\),      i(I_LOCAL)\1      do I_LOCAL = 0\, 0,
-      s, end[ ]*local,      enddo,
+      s, end *local,      enddo,
       s, io\(.*\),      6(\1),
       s, host\(.*\),      6(\1),
+      # io/host section: hack to build a block 
+      s, begin *io,      do I_IO = 0\, 0      7,
+      s, begin *host,      do I_IO = 0\, 0      7,
+      s, end *io,      enddo,
+      s, end *host,      enddo,
       # io args shoud look like calls for pips
       /6(/s,\,,()\,,g;
       /6(/s,\([a-z0-9]\))$,\1()),;
@@ -199,7 +206,7 @@ $SED '#
       #
       # switch to special hpfc functions...
       #
-      s,\([123456abdeintpryu]\),call hpfc\1,g
+      s,\([1234567abdeintpryu]\),call hpfc\1,g
       s,\([ck#s]\),hpfc\1,g' | 
 #
 # handles multi lines breaking (independent/new/reduction...)
@@ -223,9 +230,9 @@ $SED "s,hpfc#,$NOP,g;
 LINE=`$SED -n '
      /^[^Cc\*!].... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	]/=
      /^[^Cc\*!].... [ 	]*[Ss][Uu][Bb][Rr][Oo][Uu][Tt][Ii][Nn][Ee][ 	]/=
-     /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	\*]/=
-     /^[^Cc\*!].... [ 	]*[Pp][Aa][Rr][Aa][Mm][Ee][Tt][Ee][Rr][ 	]/=
-     /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Pp][Aa][Rr][Aa][Mm][Ee][Tt][Ee][Rr][ 	(]/=
+     /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\/]/=
      /^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Rr][Ee][Aa][Ll][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Ss][Tt][Rr][Ii][Nn][Gg][ 	\*]/=
