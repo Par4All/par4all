@@ -26,7 +26,7 @@ MACROS	=	makefile_macros.. \
 FILES	=	forward_gnu_makefile \
 		$(MACROS)
 
-COPY	=	cp
+COPY	=	cp -f
 
 quick-install: install_forward_makefiles install_macros
 
