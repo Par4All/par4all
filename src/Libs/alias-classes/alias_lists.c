@@ -13,8 +13,10 @@
 #include "misc.h"
 #include "text.h"
 
-#include "effects.h"
-#include "regions.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
+
 #include "semantics.h"
 
 /* commented out for compilation - bc - beware, it seems dangerous */
