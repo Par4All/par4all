@@ -21,7 +21,8 @@
 #include "ri-util.h"
 #include "constants.h"
 #include "control.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 
 #include "misc.h"
 
