@@ -452,7 +452,7 @@ static bool some_phi_variable(Pcontrainte c)
  * in such a case, the declaration constraints MUST be appended
  * before the translation, otherwise the result might be false.
  */
-static void append_declaration_sc_if_exact_without_constraints(region r)
+void append_declaration_sc_if_exact_without_constraints(region r)
 {
   entity v = reference_variable(region_reference(r));
   Psysteme s = region_system(r);
