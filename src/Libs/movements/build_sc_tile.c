@@ -40,7 +40,7 @@ make_loop_indice_equation(
     Value val;
     for (i=1,lti =tile_local_indices, li = loop_indices; i<rank;
 	 lti =lti->succ,li= li->succ, i++);
-    pv = vect_make(NULL,vecteur_var(lti),1,TCST,VALUE_ZERO);
+    pv = vect_make(NULL,vecteur_var(lti),VALUE_ONE,TCST,VALUE_ZERO);
 
     for (j=1;j<=m; j++,ti = ti->succ) {
 	if (value_ne(ACCESS(P,n,i,j),VALUE_CONST(999))) { 
