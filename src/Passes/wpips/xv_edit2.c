@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/12/04 22:12:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/30 00:31:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1996/12/04 22:12:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1997/04/30 00:31:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -32,6 +32,16 @@ char vcid_xv_edit2[] = "%A% ($Date: 1996/12/04 22:12:33 $, ) version $Revision$,
 /* Include the label names: */
 #include "wpips-labels.h"
 
+static wpips_view_menu_layout_line wpips_view_menu_layout[] = {
+#include "wpips_view_menu_layout.h"
+   /* No more views */
+   {
+      NULL, NULL, NULL
+   }
+};
+
+
+
 static Textsw edit_textsw[MAX_NUMBER_OF_WPIPS_WINDOWS];
 static Panel_item check_box[MAX_NUMBER_OF_WPIPS_WINDOWS];
 static bool dont_touch_window[MAX_NUMBER_OF_WPIPS_WINDOWS];
@@ -48,7 +58,7 @@ Menu view_menu;
 
 /* To pass the view name to
    execute_wpips_execute_and_display_something_outside_the_notifyer(): */
-string static execute_wpips_execute_and_display_something_outside_the_notifyer_view_name = NULL;
+static wpips_view_menu_layout_line * execute_wpips_execute_and_display_something_outside_the_notifyer_menu_line = NULL;
 
 
 void
@@ -69,9 +79,20 @@ edit_notify(Menu menu,
     }
 
     if (wpips_emacs_mode) {
-	char * label = (char *) xv_get(menu_item, MENU_STRING);
 	/* Rely on the standard EPips viewer: */
-	wpips_execute_and_display_something_outside_the_notifyer(label);
+	wpips_view_menu_layout_line * current_view;
+	char * label = (char *) xv_get(menu_item, MENU_STRING);
+	/* Translate the menu string in a resource name: */
+	for (current_view = &wpips_view_menu_layout[0];
+	     current_view->menu_entry_string != NULL;
+	     current_view++)
+	    if (strcmp(label, current_view->menu_entry_string) == 0)
+		break;
+
+	pips_assert("Resource related to the menu entry not found",
+		    current_view->menu_entry_string != NULL);
+    
+	wpips_execute_and_display_something_outside_the_notifyer(current_view);
     }
     else {
 	file_name = db_get_file_resource(DBR_SOURCE_FILE, modulename, TRUE);
@@ -189,7 +210,7 @@ alloc_first_initialized_window(bool the_same_as_previous)
 bool
 wpips_view_marked_busy(char * title_module_name, /* The module name for example */
                        char * title_label, /* "Sequential View" for exemple */
-                       int icon_number,
+                       char * icon_name,
                        char * icon_title)
 {
    char busy_label[SMALL_BUFFER_LENGTH];
@@ -212,8 +233,7 @@ wpips_view_marked_busy(char * title_module_name, /* The module name for example 
              FRAME_BUSY, TRUE,
              NULL);
 
-      if (icon_number >= 0)
-         set_pips_icon(edit_frame[window_number], icon_number, icon_title);
+      set_pips_icon(edit_frame[window_number], icon_name, icon_title);
 
       unhide_window(edit_frame[window_number]);
    }
@@ -228,7 +248,7 @@ void
 wpips_file_view(char * file_name,
                 char * title_module_name, /* The module name for example */
                 char * title_label, /* "Sequential View" for exemple */
-                int icon_number,
+                char * icon_name,
                 char * icon_title)
 {
    if (file_name == NULL) {
@@ -254,8 +274,7 @@ wpips_file_view(char * file_name,
              FRAME_RIGHT_FOOTER, title_module_name,
              NULL);
 
-      if (icon_number >= 0)
-         set_pips_icon(edit_frame[window_number], icon_number, icon_title);
+      set_pips_icon(edit_frame[window_number], icon_name, icon_title);
 
       xv_set(edit_textsw[window_number], 
              TEXTSW_FILE, file_name,
@@ -285,16 +304,18 @@ wpips_file_view(char * file_name,
 }
 
 
+/* Use daVinci to display a graph information: */
 void
-display_graph_with_daVinci(string file_name)
+wpips_display_graph_file_display(wpips_view_menu_layout_line * menu_line)
 {
+    char * file_name;
     char a_buffer[SMALL_BUFFER_LENGTH];
     /* Exploit some parallelism between daVinci/Emacs and PIPS
        itself: */
     if (wpips_emacs_mode)
 	ask_emacs_to_open_a_new_daVinci_context();
 
-    file_name = build_view_file(DBR_GRAPH_PRINTED_FILE);
+    file_name = build_view_file(menu_line->resource_name_to_view);
 
     user_log("Displaying in a \"daVinci\" window...\n");
 
@@ -308,8 +329,59 @@ display_graph_with_daVinci(string file_name)
 						 "/", file_name, NULL));
     }
     else {
-	sprintf(a_buffer, "pips_graph2daVinci -launch_daVinci %s", file_name);
+	(void) sprintf(a_buffer, "pips_graph2daVinci -launch_daVinci %s", file_name);
 	system(a_buffer);
+    }
+}
+
+
+/* Use some text viewer to display the resource: */
+void
+wpips_display_plain_file(wpips_view_menu_layout_line * menu_line)
+{
+    char title_module_name[SMALL_BUFFER_LENGTH];
+
+    char * print_type = menu_line->resource_name_to_view;
+    char * icon_name = menu_line->icon_name;
+    char * label = menu_line->menu_entry_string;
+    
+    (void) sprintf(title_module_name, "Module: %s",
+		   db_get_current_module_name());
+    if (wpips_view_marked_busy(title_module_name, label, icon_name, db_get_current_module_name())) {
+	char * file_name = build_view_file(print_type);
+
+	wpips_file_view(file_name, title_module_name, label, icon_name, db_get_current_module_name());
+    }
+}
+
+
+/* Mainly a hack to display 2 files in only one method for WP65... */
+void
+wpips_display_WP65_file(wpips_view_menu_layout_line * menu_line)
+{
+    char title_module_name[SMALL_BUFFER_LENGTH];
+
+    char * print_type = menu_line->resource_name_to_view;
+    char * icon_name = menu_line->icon_name;
+    char * label = menu_line->menu_entry_string;
+
+    (void) sprintf(title_module_name, "Module: %s", db_get_current_module_name());
+    if (wpips_view_marked_busy(title_module_name, label, icon_name, db_get_current_module_name())) {
+	char bank_view_name[SMALL_BUFFER_LENGTH];
+	
+	char * file_name = build_view_file(print_type);
+	wpips_file_view(file_name, title_module_name, label, icon_name,  db_get_current_module_name());
+	/* Now display the other file: */
+	(void) sprintf(bank_view_name, "%s (bank view)", label);
+	if (wpips_view_marked_busy(title_module_name, bank_view_name, 
+				   "WP65_bank", db_get_current_module_name())) {
+	    /* Assume the previous build_view_file built the both
+               resources: */
+	    file_name = get_dont_build_view_file(DBR_WP65_BANK_FILE);
+      
+	    wpips_file_view(file_name, title_module_name, 
+			    bank_view_name, "WP65_bank", db_get_current_module_name());
+	}
     }
 }
 
@@ -319,102 +391,10 @@ display_graph_with_daVinci(string file_name)
 void
 execute_wpips_execute_and_display_something_outside_the_notifyer()
 {
-   char * file_name;
-   char * module_name = db_get_current_module_name();
+   wpips_view_menu_layout_line * menu_line = execute_wpips_execute_and_display_something_outside_the_notifyer_menu_line;
 
-   string label = execute_wpips_execute_and_display_something_outside_the_notifyer_view_name;
-   
-   if (strcmp(label, SEQUENTIAL_GRAPH_VIEW) == 0)
-       /* Use some graph viewer to display the resource: */
-       display_graph_with_daVinci(file_name);
-   else {
-      /* Use some text viewer to display the resource: */
-      char * print_type = NULL;
-      char * print_type_2 = NULL;
-      /* No icon image by default: */
-      int icon_number = -1;
-      int icon_number2 = -1;
-      char title_module_name[SMALL_BUFFER_LENGTH];
-      
-      icon_number = icon_number2 = -1;
-      if (strcmp(label, USER_VIEW) == 0) {
-         print_type = DBR_PARSED_PRINTED_FILE;
-         icon_number = user_ICON;
-      }
-      else if (strcmp(label, SEQUENTIAL_VIEW) == 0) {
-         print_type = DBR_PRINTED_FILE;
-         icon_number = sequential_ICON;
-      }
-      else if (strcmp(label, PARALLEL_VIEW) == 0) {
-         print_type = DBR_PARALLELPRINTED_FILE;
-         icon_number = parallel_ICON;
-      }
-      else if (strcmp(label, CALLGRAPH_VIEW) == 0) {
-         print_type = DBR_CALLGRAPH_FILE;
-         icon_number = callgraph_ICON;
-      }
-      else if (strcmp(label, ICFG_VIEW) == 0) {
-         print_type = DBR_ICFG_FILE;
-         icon_number = ICFG_ICON;
-      }
-      else if (strcmp(label, DISTRIBUTED_VIEW) == 0) {
-         print_type = DBR_WP65_COMPUTE_FILE;
-         icon_number = WP65_PE_ICON;
-         print_type_2 = DBR_WP65_BANK_FILE;
-         icon_number2 = WP65_bank_ICON;
-      }
-      else if (strcmp(label, DEPENDENCE_GRAPH_VIEW) == 0) {
-         print_type = DBR_DG_FILE;
-      }
-      else if (strcmp(label, FLINT_VIEW) == 0) {
-         print_type = DBR_FLINTED;
-      }
-      else if (strcmp(label, ARRAY_DFG_VIEW) == 0) {
-         print_type = DBR_ADFG_FILE;
-      }
-      else if (strcmp(label, TIME_BASE_VIEW) == 0) {
-         print_type = DBR_BDT_FILE;
-      }
-      else if (strcmp(label, PLACEMENT_VIEW) == 0) {
-         print_type = DBR_PLC_FILE;
-      }
-      else if (strcmp(label, EDIT_VIEW) == 0) {
-         print_type = DBR_SOURCE_FILE;
-      }
-      else {
-         pips_error("view_notify", "bad label : %s\n", label);
-      }
-
-      sprintf(title_module_name, "Module: %s", module_name);
-      if (wpips_view_marked_busy(title_module_name, label, icon_number, module_name)) {
-
-         file_name = build_view_file(print_type);
-
-         wpips_file_view(file_name, title_module_name, label, icon_number, module_name);
-   
-   
-  
-         if ( print_type_2 != NULL ) {
-            char bank_view_name[SMALL_BUFFER_LENGTH];
-
-	    /* I removed the "(bank view)" appended here so that 
-	     * wpips/epips comms are ok for WP65...
-	     * I could also have added a special view handler in epips...
-	     * well... FC 30/11/95
-	     */
-            (void) sprintf(bank_view_name, "%s", label);
-            if (wpips_view_marked_busy(title_module_name, bank_view_name, 
-				       icon_number2, module_name)) {
-               file_name = get_dont_build_view_file(print_type_2);
-      
-               wpips_file_view(file_name, title_module_name, 
-			       bank_view_name, icon_number2, module_name);
-            }
-         }
-      }
-   }
-   
-   free(execute_wpips_execute_and_display_something_outside_the_notifyer_view_name);
+   /* Execute the needed method: */
+   menu_line->method_function_to_use(menu_line);
    
    /* The module list may have changed (well not very likely to
       happen, but...): */
@@ -424,9 +404,9 @@ execute_wpips_execute_and_display_something_outside_the_notifyer()
 
 
 void
-wpips_execute_and_display_something_outside_the_notifyer(char * label)
+wpips_execute_and_display_something_outside_the_notifyer(wpips_view_menu_layout_line * menu_line)
 {
-   execute_wpips_execute_and_display_something_outside_the_notifyer_view_name = strdup(label);
+   execute_wpips_execute_and_display_something_outside_the_notifyer_menu_line = menu_line;
    /* Ask to execute the
       execute_wpips_execute_and_display_something_outside_the_notifyer(): */
    execute_main_loop_command(WPIPS_EXECUTE_AND_DISPLAY);
@@ -437,16 +417,53 @@ wpips_execute_and_display_something_outside_the_notifyer(char * label)
 /* To execute something and display some Pips output with wpips or
    epips: */
 void
-wpips_execute_and_display_something(char * label)
+wpips_execute_and_display_something(char * resource_name)
 {
-   char * module_name = db_get_current_module_name();
+    char * module_name = db_get_current_module_name();
+    wpips_view_menu_layout_line * current_view;
 
-   if (module_name == NULL) {
-      prompt_user("No module selected");
-      return;
-   }
+    if (module_name == NULL) {
+	prompt_user("No module selected");
+	return;
+    }
 
-   wpips_execute_and_display_something_outside_the_notifyer(label);
+    /* Translate the resource name in a menu entry descriptor: */
+    for (current_view = &wpips_view_menu_layout[0];
+	 current_view->menu_entry_string != NULL;
+	 current_view++)
+	if (strcmp(resource_name, current_view->resource_name_to_view) == 0)
+	    break;
+
+    pips_assert("Resource related to the menu entry not found",
+		current_view->menu_entry_string != NULL);
+    
+    wpips_execute_and_display_something_outside_the_notifyer(current_view);
+}
+
+
+/* To execute something and display some Pips output with wpips or
+   epips by knowing its alias: */
+void
+wpips_execute_and_display_something_from_alias(char * alias_name)
+{
+    char * module_name = db_get_current_module_name();
+    wpips_view_menu_layout_line * current_view;
+
+    if (module_name == NULL) {
+	prompt_user("No module selected");
+	return;
+    }
+
+    for (current_view = &wpips_view_menu_layout[0];
+	 current_view->menu_entry_string != NULL;
+	 current_view++)
+	if (strcmp(alias_name, current_view->menu_entry_string) == 0)
+	    break;
+
+    pips_assert("Resource related to the menu entry not found",
+		current_view->menu_entry_string != NULL);
+    
+    wpips_execute_and_display_something_outside_the_notifyer(current_view);
 }
 
 
@@ -454,10 +471,12 @@ void
 view_notify(Menu menu,
             Menu_item menu_item)
 {
-   char * label = (char *) xv_get(menu_item, MENU_STRING);
-
-   wpips_execute_and_display_something(label);
+    wpips_view_menu_layout_line * current_view;
+    /* Translate the menu string in a resource name: */
+    char * label = (char *) xv_get(menu_item, MENU_STRING);
+    wpips_execute_and_display_something_from_alias(label);
 }
+
 
 void
 edit_close_notify(Menu menu,
@@ -584,6 +603,8 @@ void create_edit_window()
 void
 create_edit_menu()
 {
+    wpips_view_menu_layout_line * current_view;
+ 
    current_selection_mi = 
       xv_create(NULL, MENUITEM, 
                 MENU_STRING, "No Selection",
@@ -617,31 +638,22 @@ create_edit_menu()
        xv_set(view_menu, MENU_APPEND_ITEM, current_selection_mi,
 	      NULL);
    }
-   xv_set(view_menu, MENU_APPEND_ITEM, sequential_view_menu_item,
-	  /* The sequential_view_menu_item is the default item: */
-	  MENU_DEFAULT_ITEM, sequential_view_menu_item,
-	  MENU_ACTION_ITEM, USER_VIEW, view_notify,
-	  MENU_ACTION_ITEM, SEQUENTIAL_GRAPH_VIEW, view_notify,
-	  /* Just a separator: */
-	  WPIPS_MENU_SEPARATOR,
-	  MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
-	  /* Just a separator: */
-	  WPIPS_MENU_SEPARATOR,
-	  MENU_ACTION_ITEM, ARRAY_DFG_VIEW, view_notify,
-	  MENU_ACTION_ITEM, TIME_BASE_VIEW, view_notify,
-	  MENU_ACTION_ITEM, PLACEMENT_VIEW, view_notify,
-	  /* Just a separator: */
-	  WPIPS_MENU_SEPARATOR,
-	  MENU_ACTION_ITEM, CALLGRAPH_VIEW, view_notify,
-	  MENU_ACTION_ITEM, ICFG_VIEW, view_notify,
-	  /* Just a separator: */
-	  WPIPS_MENU_SEPARATOR,
-	  MENU_ACTION_ITEM, DISTRIBUTED_VIEW, view_notify,
-	  MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
-	  /* Just a separator: */
-	  WPIPS_MENU_SEPARATOR,
-	  MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
-	  NULL);   
+   /* Now add all the view entries: */
+   for (current_view = &wpips_view_menu_layout[0];
+        current_view->menu_entry_string != NULL;
+        current_view++) {
+      if (strcmp(current_view->menu_entry_string,
+                 WPIPS_MENU_SEPARATOR_ID) == 0)
+         xv_set(view_menu,
+                                /* Just a separator: */
+                WPIPS_MENU_SEPARATOR,
+                NULL);
+      else
+         xv_set(view_menu,
+                MENU_ACTION_ITEM, current_view->menu_entry_string,
+                view_notify,
+                NULL);
+   }
    if (! wpips_emacs_mode) {
        /* Make sense only if we have XView edit windows: */
        xv_set(view_menu, 	  /* Just a separator: */
