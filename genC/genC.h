@@ -29,7 +29,8 @@
 /* #include <sys/stdtypes.h> */
 #include <stdio.h>
 #include <malloc.h>
-extern char *strdup();
+#include <strings.h>
+/* extern char * strdup(const char *);*/
 
 #include "newgen_assert.h"
 
@@ -55,18 +56,18 @@ extern char *strdup();
  */
 
 typedef union gen_chunk {
-    unit u ;
-    bool b ;
-    char c ;
-    int i ;
-    float f ;
-    string s ;
-    char * e ; /* for externals */
-    struct cons *l ;
-    set t ;
-    hash_table h ;
-    union gen_chunk *p ;
-} gen_chunk, *gen_chunkp, chunk /* obsolete */;
+  unit u;
+  bool b;
+  char c;
+  int i;
+  float f;
+  string s;
+  void * e; /* for externals */
+  struct cons * l;
+  set t;
+  hash_table h;
+  union gen_chunk * p;
+} gen_chunk, *gen_chunkp;
 
 #define gen_chunk_undefined ((gen_chunk *)(-16))
 #define gen_chunk_undefined_p(c) ((c)==gen_chunk_undefined)
@@ -171,7 +172,7 @@ extern void gen_init_external GEN_PROTO((int,
 extern gen_chunk *gen_check GEN_PROTO(( gen_chunk *, int )) ;
 extern bool gen_sharing_p GEN_PROTO((gen_chunk *, gen_chunk *));
 extern int gen_type GEN_PROTO((gen_chunk *)) ;
-extern char *gen_domain_name GEN_PROTO((int)) ;
+extern string gen_domain_name GEN_PROTO((int)) ;
 extern void gen_clear_tabulated_element GEN_PROTO((gen_chunk *)) ;
 extern gen_chunk *gen_copy_tree GEN_PROTO((gen_chunk *)) ;
 extern gen_chunk *gen_copy_tree_with_sharing GEN_PROTO((gen_chunk *)) ;
