@@ -12,19 +12,13 @@
 #include "sc.h"
 #include "sc-private.h"
 
-/* Janus */
-#include <sys/types.h>
-//#include "iproblem.h"
-/* Janus */
+/* Janus should be activated by option -DJANUS in compilation time. If not, pls do not use Janus by heuristic */
+#ifdef JANUS
 
-FILE *fopen(), *fdebug;
-//struct initpb I;
-//struct problem Z;
-initpb I; 
-problem Z;
+#include "JanusValue/JanusValue.h"
 
-#define FTRACE fdebug
-//sc must be consistant
+
+/*sc must be consistant*/
 static boolean 
 sc_to_iproblem(Psysteme sc)
 {
@@ -33,20 +27,20 @@ sc_to_iproblem(Psysteme sc)
   Value temp;
   boolean special_constraint_p = FALSE;
 
-  //Janus 
-  // int p6,p5,p4,p3,p2,p1;
+  /*Janus 
+    int p6,p5,p4,p3,p2,p1;*/
   int vi0,targ,pr,nblevel,mtlevel,tas;
   int i,j,choix,vision,methode;    
   int par1,par2,par3,par4,par5,par6,par7;
-  // int tfois = 1;// for time measurement only. other initiation removed.
+  /* int tfois = 1; for time measurement only. other initiation removed.*/
 
   /* prefixed parameter for Janus - to be changed in futur */
   tas=0; pr=0;
   par1 = 0; par2 = 0; par3 = 0;
-  par4 = 0; // no debug mode
+  par4 = 0; /* no debug mode*/
   par5 = 0; par6 = 1;  par7 = 1;
 
-  //have to remove this debug in the futur for exact time measument
+  /*have to remove this debug in the futur for exact time measument*/
   if (par4) {
     fdebug=fopen("jtrace.tex","w") ; /* file for trace */
   }else {
@@ -80,8 +74,8 @@ sc_to_iproblem(Psysteme sc)
   /**************** BEGIN print debug into structure ************************/
   if (Z.dyn) dynam(&Z,0);
   if (Z.ntrace||Z.ntrac2)
-  {fprintf(FTRACE,"\\documentstyle[fullpage,epic,eepic,fancybox]{article} \n");
-   fprintf(FTRACE,"\\begin{document}\n");
+  {fprintf(Z.ftrace,"\\documentstyle[fullpage,epic,eepic,fancybox]{article} \n");
+   fprintf(Z.ftrace,"\\begin{document}\n");
    tableau_janus(&I,&Z);
   }
   /**************** END print debug into structure ************************/
@@ -107,54 +101,54 @@ sc_to_iproblem(Psysteme sc)
   value_assign(Z.dk[i],VALUE_ZERO);
   }
 */
-  //TODO: If these parameters are already initialized before used in the code (which is not easy to see now), 
-  //then it's not necessary to reinitialize them here. If not, then we might have a bug.
+  /*TODO: If these parameters are already initialized before used in the code (which is not easy to see now), 
+    then it's not necessary to reinitialize them here. If not, then we might have a bug.*/
 
   /**************** END reset some parameters in the structures ************************/
 
   /**************** BEGIN to insert DIMENSION with tests into structure *************/
-  // removed reading from file. replace by direct assign
-  // we can chosse probleme janus ou simplexe entier classique or other in this section
+  /* removed reading from file. replace by direct assign*/
+  /* we can chosse probleme janus ou simplexe entier classique or other in this section*/
  
-  //fscanf(fh,"%d",&Z.nvar);   /* nombre total de variables */
+  /*fscanf(fh,"%d",&Z.nvar);    nombre total de variables */
   Z.nvar = sc->dimension; /* to be verified */
-  if (Z.nvar < 0) { //sc given is not correct (normally tested before)
+  if (Z.nvar < 0) { /*sc given is not correct (normally tested before)*/
     ifscdebug(5) {
       printf("\n Attention: Janus has a number of variables < 0 ");
     }
-    return FALSE;// Janus cannot handle this system of constraints
+    return FALSE;/* Janus cannot handle this system of constraints*/
   }
   if (Z.nvar> MAXCOLONNES) {
     ifscdebug(5) {
       printf("Too many variables %3d > max=%3d\n",Z.nvar,MAXCOLONNES);
     }
-    return FALSE;// Janus cannot handle this system of constraints
+    return FALSE;/* Janus cannot handle this system of constraints*/
   }
 
-  //fscanf(fh,"%d",&Z.mcontr); /* nombre de contraintes */
+  /*fscanf(fh,"%d",&Z.mcontr);  nombre de contraintes */
   Z.mcontr = sc->nb_eq + sc->nb_ineq; /* sc's parameters must be true*/
   if (Z.mcontr> MAXLIGNES) {
     ifscdebug(5) {
       printf("Too many constraints %3d > max = %3d \n",Z.mcontr,MAXLIGNES);
     }
-    return FALSE;// Janus cannot handle this system of constraints
+    return FALSE;/* Janus cannot handle this system of constraints*/
   }
 
-  //fscanf(fh,"%d",&Z.nvpos);/* nombre de variables >=0 donc: Z.nvpos<= Z.nvar */
+  /*fscanf(fh,"%d",&Z.nvpos); nombre de variables >=0 donc: Z.nvpos<= Z.nvar */
   Z.nvpos = 0;  /* to be verified */
   if (Z.nvpos > Z.nvar) { 
     ifscdebug(5) {
       printf(" %3d variables positives, greater than %3d\n",Z.nvpos,Z.nvar);
     }
-    return FALSE;// ?? can we put nvpos = 0 here ??
+    return FALSE;/* ?? can we put nvpos = 0 here */
   }
 
-  //fscanf(fh,"%d",&vi0); /* unused parameter */
+  /*fscanf(fh,"%d",&vi0);  unused parameter */
   vi0 = 0;      
   /**************** END to insert DIMENSION into structure ********************/
 
   /**************** BEGIN to insert MATRIX into structure*********************/
-  // need exact DIMENSION, similar to sc_to_matrix
+  /* need exact DIMENSION, similar to sc_to_matrix*/
   /* for ( i=1 ; i <= Z.mcontr ; i++)
     { fscanf(fh,"%d",&ventier) ; I.e[i]=ventier ;
       for ( j=1 ; j <= Z.nvar ; j++)
@@ -163,22 +157,22 @@ sc_to_iproblem(Psysteme sc)
       fscanf(fh,"%d",&ventier) ; I.d[i]=ventier ;
     }
   */
-  //ATTENTION, first elements in array in struct initpb are not used. 
-  //this array is not initiated. In use : rows 1 -> Z.mcontr, columns 1-> Z.nvar
+  /*ATTENTION, first elements in array in struct initpb are not used. */
+  /*this array is not initiated. In use : rows 1 -> Z.mcontr, columns 1-> Z.nvar*/
 
-  //DN: need to check the special inequality here: 0 < 1, mean a vector of one element.
+  /*DN: need to check the special inequality here: 0 < 1, mean a vector of one element.*/
 
-  for ( i=1 ; i <= Z.mcontr ; i++) // differentiation eq and ineq, running by constraints
+  for ( i=1 ; i <= Z.mcontr ; i++) /* differentiation eq and ineq, running by constraints*/
     { 
-      //if egalite then 0, inegalite then -1. Put in egalites first
+      /*if egalite then 0, inegalite then -1. Put in egalites first*/
       if (i<=sc->nb_eq) I.e[i]= 0;
       else I.e[i]= -1;
     }
 
-  //included constant (or rhs) here, which is the last element in the vector, donot change the sign of constant
-  // DN 6/11/02. use Marcos of Value. Needed Value in struct problem.
+  /*included constant (or rhs) here, which is the last element in the vector, donot change the sign of constant
+    DN 6/11/02. use Marcos of Value. Needed Value in struct problem.*/
 
-  //egalites coeffs, i for columns, j for rows
+  /*egalites coeffs, i for columns, j for rows*/
   for (peq = sc->egalites, i = 1; !CONTRAINTE_UNDEFINED_P(peq); peq=peq->succ, i++) 
     {      
       for (pv=sc->base,j=1; !VECTEUR_NUL_P(pv); pv=pv->succ,j++)
@@ -188,7 +182,7 @@ sc_to_iproblem(Psysteme sc)
       value_assign(I.d[i],vect_coeff(TCST,peq->vecteur));
     }
 	
-  //inegalites
+  /*inegalites*/
   for (peq = sc->inegalites; !CONTRAINTE_UNDEFINED_P(peq); peq=peq->succ, i++) 
     {       
       value_assign(temp,VALUE_ZERO); 
@@ -203,8 +197,8 @@ sc_to_iproblem(Psysteme sc)
      value_assign(I.d[i],vect_coeff(TCST,peq->vecteur));
     } 
   if (special_constraint_p) {
-    //sc_default_dump(sc); 
-    //TODO: what to do with this special constraint? if 0<1 ok, if 1 < 0 then not ok, return FALSE
+    /*sc_default_dump(sc); 
+      TODO: what to do with this special constraint? if 0<1 ok, if 1 < 0 then not ok, return FALSE */
   }
   
   /**************** END to insert MATRIX into structure *********************/ 
@@ -214,18 +208,19 @@ sc_to_iproblem(Psysteme sc)
 boolean 
 sc_janus_feasibility(Psysteme sc)
 { 
+  
   boolean ok = FALSE;
   int r = 0;
 
   /**************** change format into Janus, using global struct iproblem */
-  ok = sc_to_iproblem(sc); //Attention with dimension=0
+  ok = sc_to_iproblem(sc); /*Attention with dimension=0*/
   
   /**************** BEGIN execution simplexe entier classique */
   if (ok) r = isolve(&I,&Z,0);
-  else r = 9;//DN janus should not be used here.
+  else r = 9;/*DN janus should not be used here.*/
 
-  // the third parameter means test only one time
-  // only I is initialized. Z is still empty
+  /* the third parameter means test only one time
+     only I is initialized. Z is still empty */
   /*
   if (r==VRFIN) printf("solution finie\n") ;
   else if (r==VRVID) printf("polyedre vide\n") ;
@@ -250,14 +245,28 @@ sc_janus_feasibility(Psysteme sc)
   /***************** END execution simplexe entier classique */
 
   if (Z.ntrace||Z.ntrac2)
-    { fprintf(FTRACE,"\\end{document}\n");
+    { fprintf(Z.ftrace,"\\end{document}\n");
     }
   
-  if (fdebug) fclose(fdebug);// DN: In Solaris, we can fclose(NULL), but in LINUX, we cannot.
+  if (fdebug) fclose(fdebug);/* DN: In Solaris, we can fclose(NULL), but in LINUX, we cannot.*/
 
   if (r==VRFIN) {ok = TRUE; return ok;}
   else if ((r==VRVID)||(r==VRINF)) {ok = FALSE;return ok;}
-  else return r; // in case of failure then return r >=3
-  //donnot want to use exception here, nor one more parameter, 
-  //while wanting to keep return boolean for compatibility. To be changed.
+  else return r; /* in case of failure then return r >=3
+		    donnot want to use exception here, nor one more parameter, 
+		    while wanting to keep return boolean for compatibility. To be changed.*/
 }
+#else
+/*
+static boolean 
+sc_to_iproblem(Psysteme sc) 
+{ 
+  return TRUE;
+}
+*/
+boolean 
+sc_janus_feasibility(Psysteme sc) 
+{ 
+return TRUE;
+}
+#endif
