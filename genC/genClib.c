@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 14:23:07 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 14:59:04 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1656,14 +1656,13 @@ struct driver *dr ;
     struct gen_binding *bp = &Domains[ quick_domain_index( obj ) ] ;
     union domain *dp = bp->domain ;
     int data = 1+IS_TABULATED( bp ) ;
-
-    /* fprintf(stderr, "object 0x%x type %s\n", (unsigned int) obj, bp->name); 
-     */
+    int type_number;
 
     if( shared_obj( obj, write_define_shared_node, write_shared_node ))
 	    return( !GO) ;
 
-    (void) fprintf( user_file, "#(#]type %d ", bp-Domains ) ;
+    type_number = gen_type_translation_actual_to_old(bp-Domains);
+    (void) fprintf( user_file, "#(#]type %d ", type_number ) ;
 
     if( IS_TABULATED( bp )) {
 	(void) fprintf( user_file, "%d ", abs( (obj+1)->i )) ;
@@ -1736,9 +1735,9 @@ write_leaf_in(
 	    }
 	}
 	else {
-	  int type_number = gen_type_translation_actual_to_old(bp->index);
+	  int type_number = gen_type_translation_actual_to_old(bp-Domains);
 	  (void) fprintf( user_file ,"#]ref %d \"%d%c", 
-			  type_number, bp-Domains, HASH_SEPAR ) ;
+			  bp->index, type_number, HASH_SEPAR ) ;
 	  write_string( "", (obj->p+HASH_OFFSET)->s, "\" " ) ;
 	}
 	return( !GO) ;
@@ -1767,13 +1766,15 @@ write_leaf_in(
 	(void) fprintf( user_file, " " ) ;
     }
     else if( IS_EXTERNAL( bp )) {
-	if( bp->domain->ex.write == NULL ) {
-	    user( "gen_write: uninitialized external type %s (%d)\n",
-		 bp->name, bp-Domains);
-	    return( !GO) ;
-	}
-	(void) fprintf( user_file, "#]external %d ", bp-Domains ) ;
-	(*(bp->domain->ex.write))( user_file, obj->s ) ;
+      int type_number;
+      if( bp->domain->ex.write == NULL ) {
+	user( "gen_write: uninitialized external type %s (%d)\n",
+	      bp->name, bp-Domains);
+	return( !GO) ;
+      }
+      type_number = gen_type_translation_actual_to_old(bp-Domains);
+      (void) fprintf(user_file, "#]external %d ", type_number);
+      (*(bp->domain->ex.write))(user_file, obj->s);
     }
     return( GO) ;
 }
@@ -1943,9 +1944,9 @@ write_tabulated_leaf_in(
 	 */
 	if( number >= 0 ) 
 	{
-	  int type_number = gen_type_translation_actual_to_old(bp->index);
+	  int type_number = gen_type_translation_actual_to_old(bp-Domains);
 	  (void) fprintf( user_file ,"#]def %d \"%d%c", 
-			  type_number, bp-Domains, HASH_SEPAR);
+			  bp->index, type_number, HASH_SEPAR);
 	  write_string( "", (obj->p+HASH_OFFSET)->s, "\" " );
 	    
 	    /* once written the domain number sign is inverted,
@@ -2024,6 +2025,7 @@ char *s ;
 /**************************************************** Type Translation Table */
 
 /* translation tables type...
+   BUG: tabulated domains are not translated properly, I guess.
  */
 typedef struct 
 {
