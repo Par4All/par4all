@@ -104,7 +104,7 @@ char * (*variable_name)();
     Pvecteur p;
 
     if(v==NULL) 
-	(void) fprintf(f,"vecteur nul\n");
+	(void) fprintf(f,"nul vector\n");
     else
 	for (p = v; p != NULL; p = p->succ)
 	{
