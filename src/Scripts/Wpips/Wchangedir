@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/12 14:37:10 $, 
+# $Date: 1996/09/12 18:21:42 $, 
 #
 # (c) FC September 1996
 #
@@ -117,7 +117,7 @@ proc changedir { root currentdir } {
 	$changedir_root.top.okay invoke
     }
     pack $root.top.root $root.top.home $root.top.okay $root.top.quit \
-	-side left -expand true -fill x -padx 2 -pady 2 -ipadx 2 -ipady 2
+	-side left -expand true -fill x -padx 2 -pady 2 -ipadx 1 -ipady 1
 
     #
     # direct entry in the middle 
@@ -148,9 +148,9 @@ proc changedir { root currentdir } {
 	}
     }
 
-    pack  $root.direct.lab -side left -padx 2 -pady 2 -ipadx 2 -ipady 2 
+    pack  $root.direct.lab -side left -padx 2 -pady 2 -ipadx 1 -ipady 1
     pack  $root.direct.entry -side left \
-	-padx 2 -pady 2 -ipadx 2 -ipady 2 -fill y -expand true
+	-padx 2 -pady 2 -ipadx 1 -ipady 1 -fill y -expand true
 
     #
     # choice from the list
@@ -170,8 +170,8 @@ proc changedir { root currentdir } {
 	}
     }
     pack $root.list.dirs -side left -fill both -expand true \
-	-padx 1m -pady 1m -ipadx 2 -ipady 2
-    pack $root.list.scroll -side left -fill y -padx 1m -pady 1m 
+	-padx 2 -pady 2 -ipadx 1 -ipady 1
+    pack $root.list.scroll -side left -fill y -padx 2 -pady 2
 
     #
     # full window (if resized, .list is expanded on y)
