@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/07/23 16:52:25 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/07/23 19:03:47 $, )
  * version $Revision$
  */
 
@@ -179,6 +179,7 @@ statement stat;
 int the_tag;
 {
     loop x = loop_undefined;
+    string c = statement_comments(stat);
 
 /* temporary for block->sequence transition
  */
@@ -190,7 +191,7 @@ int the_tag;
     return make_statement(statement_label(stat),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
-			  strdup(statement_comments(stat)),
+			  string_undefined_p(c)? c: strdup(c),
 			  make_instruction(the_tag, x));
 }
 
