@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.62  2002/06/08 16:20:56  irigoin
+ * Replacement of formal return labels by formal strings
+ *
  * Revision 1.61  2002/03/08 10:28:25  irigoin
  * debug() replaced by pips_debug()
  *
@@ -1839,18 +1842,25 @@ MakeFormalParameter(
 		    entity fp, /* formal parameter */
 		    int nfp) /* offset (i.e. rank) of formal parameter */
 {
-    pips_assert("type is undefined", entity_type(fp) == type_undefined);
+  pips_assert("type is undefined", entity_type(fp) == type_undefined);
 
-    if(SubstituteAlternateReturnsP() && ReturnCodeVariableP(fp)) {
-	entity_type(fp) = MakeTypeVariable(make_basic(is_basic_int, (void *) 4), NIL);
-    }
-    else {
-	entity_type(fp) = ImplicitType(fp);
-    }
+  if(formal_label_replacement_p(fp)){
+    entity_type(fp) = make_type(is_type_variable, 
+				make_variable(make_basic(is_basic_string, 
+							 MakeValueUnknown()),
+					      NIL));
+  }
+  else if(SubstituteAlternateReturnsP() && ReturnCodeVariableP(fp)) {
+    entity_type(fp) = MakeTypeVariable(make_basic(is_basic_int, (void *) 4), NIL);
+  }
+  else {
+    entity_type(fp) = ImplicitType(fp);
+  }
 
-    entity_storage(fp) = 
-	make_storage(is_storage_formal, make_formal(m, nfp));
-    entity_initial(fp) = MakeValueUnknown();
+  entity_storage(fp) = 
+    make_storage(is_storage_formal, make_formal(m, nfp));
+
+  entity_initial(fp) = MakeValueUnknown();
 }
 
 
