@@ -90,8 +90,10 @@ void Matrix_Free(Matrix *Mat) {
     for(j=0;j<Mat->NbColumns;j++) 
       value_clear(*p++);
   }
-  free((Value *) Mat->p_Init);
-  free((Value *) Mat->p);
+  if (Mat->p_Init)
+    free((Value *) Mat->p_Init);
+  if (Mat->p)
+    free((Value *) Mat->p);
   free((Value *) Mat);
 
 } /* Matrix_Free */
