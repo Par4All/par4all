@@ -1,10 +1,12 @@
 #!/bin/sh
 # 
 # $RCSfile: checked-out,v $ (version $Revision$)
-# $Date: 1995/10/04 15:54:56 $, 
+# $Date: 1997/01/01 22:55:46 $, 
 
 USERNAME=$1
 # echo $USERNAME
+
+PIPS_DOCDIR=$PIPS_DEVEDIR/Documentation
 
 if [ -z "$USERNAME" ]
 then
