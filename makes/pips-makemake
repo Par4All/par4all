@@ -77,6 +77,16 @@
 #   BA, september 1, 1993
 # - add a bell at the end of the test link, FC 17/09/93
 #
+#	RK, 9/11/93 :
+#	modification de make depend pour que $(INC_TARGET) de'pende des
+#	$(TARGET_CFILES). E'vite ainsi de faire un touch a` la main...
+#	De`s qu'on touche a` $(TARGET)-local.h, $(INC_TARGET) est refait.
+#	Pour ne pas utiliser les macros conditionnelles spe'cifiques
+#	a` Sun (RS/6000 au CEA :-) ) je suis oblige' de relancer un $(MAKE).
+#	Mais ce n'est pas ge^nant !
+#
+#
+#
 # wish:
 #
 
@@ -200,8 +210,6 @@ SOURCES= 	$(MAKEFILE) $(CONFIG_FILE) $(INCLUDES) $(CFILES)
 #
 TARGETDIR=	$(LIBSRCDIR)/$(TARGET)
 #
-LIB_IFILES=	$(LIB_CFILES:.c=.i)
-#
 all: $(LIB_TARGET)
 
 .INIT:
@@ -271,29 +279,17 @@ $(LIBDIR)/$(LIB_TARGET): $(LIB_TARGET)
 	cp $(LIB_TARGET) $(LIBDIR)
 	ranlib $(LIBDIR)/$(LIB_TARGET)
 
-$(BINDIR)/$(BIN_TARGET): $(BIN_TARGET)
-	cp $(BIN_TARGET) $(BINDIR)
-
 clean:
 	-rm -f TAGS $(OBJECTS) $(INC_TARGET) $(LIB_TARGET) $(BIN_TARGET) $(DERIVED_HEADERS) *.~[0-9]~\\
 		$(LIB_IFILES)
 
-$(TARGET)-local.h:
-	if [ ! -f $(TARGET)-local.h ] ; then touch $(TARGET)-local.h ; fi
-
-$(INC_TARGET): $(TARGET)-local.h
-	for cfile in $(LIB_CFILES) ; do \\
-		ifile=\`basename \$\$cfile .c\`;\\
-		$(PREPROC) \$\$cfile  > \$\$ifile.i; done
-	$(UTILDIR)/cproto $(CPPFLAGS) $(LIB_IFILES) \\
-		| sed -e 's/int __builtin_va_alist//' \\
-		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
-	rm -f *.i
-	mv $(INC_TARGET).tmp $(INC_TARGET)
+INC_CFILES = $(LIB_CFILES)
 
 %
+
 else
 # ie. for Passes 
+
 cat >> $MAKEFILE <<% 
 #
 CFILES=		$(TARGET_CFILES)
@@ -311,7 +307,7 @@ TARGET_IFILES=	$(TARGET_CFILES:.c=.i)
 	     echo "$(PIPS_CHECK_OS)"; exit 1; \
 	fi
 
-$(BIN_TARGET): $(OBJECTS)
+$(BIN_TARGET): $(OBJECTS) $(INC_TARGET)
 	$(LINK) $(BIN_TARGET) $(OBJECTS) $(TARGET_LIBS)
 
 install: $(INC_TARGET) $(BIN_TARGET)
@@ -353,37 +349,30 @@ install: $(INC_TARGET) $(BIN_TARGET)
 	done
 	$(MAKE) quick-install
 
-$(BINDIR):
-	mkdir $(BINDIR)
-
 quick-install: $(BINDIR)
 	cp $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
-	cp $(BIN_TARGET) $(BINDIR)
-
-$(BINDIR)/$(BIN_TARGET): $(BIN_TARGET) $(BINDIR)
 	cp $(BIN_TARGET) $(BINDIR)
 
 clean:
 	-rm -f TAGS $(OBJECTS) $(BIN_TARGET) $(INC_TARGET) $(DERIVED_HEADERS) *.~[0-9]~
 
-$(TARGET)-local.h:
-	if [ ! -f $(TARGET)-local.h ] ; then touch $(TARGET)-local.h ; fi
-
-$(INC_TARGET): $(TARGET)-local.h
-	for cfile in $(TARGET_CFILES) ; do \\
-		ifile=\`basename \$\$cfile .c\`;\\
-		$(PREPROC) \$\$cfile  > \$\$ifile.i; done
-	$(UTILDIR)/cproto $(CPPFLAGS) $(TARGET_IFILES) \\
-		| sed -e 's/int __builtin_va_alist//' \\
-		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
-	rm -f *.i
-	mv $(INC_TARGET).tmp $(INC_TARGET)
+INC_CFILES = $(TARGET_CFILES)
 
 %
+
 fi
+
+
+# La partie commune aux bibliotheques et aux passes :
 
 cat >> $MAKEFILE <<%
 #
+$(BINDIR)/$(BIN_TARGET): $(BIN_TARGET) $(BINDIR)
+	cp $(BIN_TARGET) $(BINDIR)
+
+$(BINDIR):
+	mkdir $(BINDIR)
+
 lint:
 	$(TYPECHECK) $(CFILES) | sed '/possible pointer alignment/d;/gen_alloc/d'
 
@@ -391,8 +380,36 @@ TAGS: $(INCLUDES) $(CFILES)
 	etags $(INCLUDES) $(CFILES)
 	ctage $(INCLUDES) $(CFILES)
 
-depend: $(INC_TARGET) production-depend
+$(TARGET)-local.h:
+	if [ ! -f $(TARGET)-local.h ] ; then touch $(TARGET)-local.h ; fi
 
+# Ici commence la partie parametree en lib/passe :
+INC_IFILES=	$(INC_CFILES:.c=.i)
+
+#
+# Pour eviter trop de compilations, $(INC_TARGET) ne depend pas 
+#	de $(TARGET_CFILES) tout le temps :
+$(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
+	for cfile in $(INC_CFILES) ; do \\
+		ifile=\`basename \$\$cfile .c\`;\\
+		$(PREPROC) \$\$cfile  > \$\$ifile.i; done
+	$(UTILDIR)/cproto $(CPPFLAGS) $(INC_IFILES) \\
+		| sed -e 's/int __builtin_va_alist//' \\
+		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
+	rm -f *.i
+	mv $(INC_TARGET).tmp $(INC_TARGET)
+
+depend: $(INC_TARGET) production-depend $(MAKEFILE)
+# Relance une compilation de $(INC_TARGET) en rajoutant la dependance sur les
+#	fichiers C :
+	PIPS_MAKE_DEPEND_CFILES="$(TARGET_CFILES)" $(MAKE) $(INC_TARGET)
+
+# Pas necessaire, mais bon...
+$(MAKEFILE): $(DERIVED_HEADERS) $(EXTERN)
+	$(MAKE) production-depend
+
+# Quand on cree le Makefile, il faut toujours le completer avec
+#	les dependances d''include :
 production-depend: $(DERIVED_HEADERS) $(EXTERN)
 	sed -n -e 's/^		*\$\$//; 1,/^### DO NOT DELETE THIS LINE./p;' < $(MAKEFILE) > $(MAKEFILE).new
 	-for file in $(CFILES) ; do /lib/cpp $(CPPFLAGS) -M \$\$file >> $(MAKEFILE).new; done;
@@ -402,10 +419,11 @@ production-depend: $(DERIVED_HEADERS) $(EXTERN)
 ### DO NOT DELETE THIS LINE. USED FOR MAKE DEPEND
 %
 
-make -s -f $MAKEFILE ${PRODUCTION:+production-}depend
+# Supprime le mode silencieux -s :
+make -f $MAKEFILE ${PRODUCTION:+production-}depend
 
 ### end good case
-fi
+fi	# [ ! -f $CONFIG_FILE ]
 
 echo
 
