@@ -3,9 +3,9 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/03/24 14:47:56 $, 
+# $Date: 1995/03/24 14:59:41 $, 
 
-script=`basename $0`
+sh=`basename $0`
 STATUS='0'
 VERBOSE=':'
 DEBUG=':'
@@ -16,7 +16,7 @@ TMP="/tmp/hpfc_tmp.`hostname`.$$"
 INSTALL="$HPFC_TOOLS/hpfc_install"
 PIPSARGS='-s MUST_REGIONS -p HPFC_CLOSE'
 
-unset HPFFILE MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR
+unset HPFFILE MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR REDIRECT
 rm -f $TMP.*
 
 #
@@ -24,12 +24,12 @@ rm -f $TMP.*
 
 verbose()
 {
-  echo "$script: $@"
+  echo "$sh: $@"
 }
 
 debug()
 {
-  echo "$script: $@" >&2
+  echo "$sh: $@" >&2
 }
 
 default_module()
@@ -48,11 +48,12 @@ default_module()
 usage()
 {
   cat <<-EOF
-	Usage: $script [-vxDdhMqsti] [-k K] [-p P] [-w W] [-m M] [-n N|file[.f]]
+	Usage: $sh [-vxDdhMqstir] [-k K] [-p P] [-w W] [-m M] [-n N|file[.f]]
 	  version is $Revision$
 	  -t: test (dump the resulting files)
 	  -i: no installation
 	  -p P: P pips version to be used
+	  -r: pips redirection (>&2)
 	  -v: verbose about what is being done
 	  -x: not verbose
 	  -D: debug messages
@@ -73,12 +74,13 @@ usage()
 #
 # the keyword control enables a global control of tyhe switches
 
-while getopts tivxDdMqsn:hm:w:p:k: OPT
+while getopts rtivxDdMqsn:hm:w:p:k: OPT
 do
   case $OPT in
-    t) DUMPFILES="1" ;;
-    i) NOINSTALL="1" ;;
+    t) DUMPFILES='1' ;;
+    i) NOINSTALL='1' ;;
     p) PIPS="$OPTARG" ;;
+    r) REDIRECT='1' ;;
     v) VERBOSE='verbose' ;;
     x) VERBOSE=':' ;;
     D) DEBUG='debug' ;;
@@ -96,8 +98,9 @@ do
 	     VERBOSE='verbose' ;
 	     MAKE='gmake' ;;
 	 validate) 
-	     DUMPFILES="1" ;
-	     NOINSTALL="1" ;
+	     DUMPFILES='1' ;
+	     NOINSTALL='1' ;
+	     REDIRECT='1' ;
 	     VERBOSE=':' ;
 	     DELETE='Delete' ;;
 	 *)  echo "no $OPTARG keyword" ;
@@ -118,8 +121,11 @@ shift `expr $OPTIND - 1`
 $VERBOSE "applying hpfc on file $HPFFILE"
 $DEBUG "`type $PIPS`"
 
+#
+# PIPS execution with possible redirections...
+
 eval $PIPS -f $HPFFILE $PIPSARGS -m $MODULE $WORKSPACE \
-	${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
+	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
 
 STATUS="$?"
 
