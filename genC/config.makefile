@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/08 16:50:56 $, 
+# $Date: 1996/07/10 19:42:43 $, 
 #
 # Newgen should be quite particular...
 
@@ -43,6 +43,7 @@ LIB_CFILES=\
         stack.c
 
 OTHER_CFILES=\
+	new.c \
 	genLisp.c \
 	genSML.c
 
