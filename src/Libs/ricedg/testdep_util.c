@@ -392,6 +392,9 @@ action ac1,ac2;
 	return (3);
     else
 	pips_error("dep_type","A undefined chain ---chains fault");
+
+    /* to please gcc */
+    return -1;
 }
 
 
