@@ -705,7 +705,9 @@ sc_simplexe_feasibility_ofl_ctrl(
       }
 
       if (ofl_ctrl == FWD_OFL_CTRL) {
-	fprintf(stderr,"\nThis is an exception rethrown from sc_simplexe_feasibility_ofl_ctrl(): \n");
+	ifscprintexact(2) {
+	  fprintf(stderr,"\nThis is an exception rethrown from sc_simplexe_feasibility_ofl_ctrl(): \n");
+	}
 	RETHROW(); //rethrow whatever the exception is
       }
       //THROW(user_exception_error);
