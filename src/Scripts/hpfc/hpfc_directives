@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/10/17 08:49:27 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/10/21 21:52:35 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -85,8 +85,14 @@ TMP=/tmp/$SCRIPT.$$
 $RM -f $TMP.*
 
 #
-# directive normalization
-# FCD are simply translated into hpf-like prefixed directives.
+# default processor arrangement is 1D.
+#
+cat - <<-%% |
+	chpf$ processors hpf_default_procs($NOP)
+%%
+#
+# directive normalization.
+# FCD are simply translated into hpf-like prefixed directives
 #
 $SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,chpf$\1,;
       s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,chpf$\1,' |
@@ -140,7 +146,9 @@ $SED '/^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1k\2,g
       s,^chpf\$ align \(.*\) with \(.*\),      a(\1\,\2),
       s,^chpf\$ realign \(.*\) with \(.*\),      b(\1\,\2),
       s,^chpf\$ distribute \(.*\) onto \(.*\),      d(\1\,\2),
+      s,^chpf\$ distribute \(.*\),      d(\1\,hpf_default_procs),
       s,^chpf\$ redistribute \(.*\) onto \(.*\),      e(\1\,\2),
+      s,^chpf\$ redistribute \(.*\),      e(\1\,hpf_default_procs),
       s,^chpf\$ independent[ 	]*\([^( ,][^()\,]*\),      i(\1),
       s,^chpf\$ independent[ 	]*\(.*\),      i\1,
       s,^      i\,,      i()\,,
