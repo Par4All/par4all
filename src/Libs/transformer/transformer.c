@@ -1,8 +1,7 @@
  /* Predicate transformer package: sc complexity level */
 
 #include <stdio.h>
-extern int fprintf();
-extern int printf();
+
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
