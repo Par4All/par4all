@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1995/03/21 13:33:34 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1995/03/22 17:48:14 $, )
  * version $Revision$
  */
 
@@ -89,7 +89,10 @@ struct gen_binding *bp ;
 }
 
 /* PRIMITIVE_FIELD returns the appropriate field to acces an object in DP.
-   Note how inlined types are managed (see genC.h comments). */
+   Note how inlined types are managed (see genC.h comments).
+   ??? static data returned, cannot be called twice in the same expression
+       (FC)
+ */
 
 static char *
 primitive_field( dp )
@@ -338,9 +341,9 @@ struct gen_binding *bp ;
     (void) printf(",%s,((hash)+%d)->h,(var),(val)))\n",
 		  primitive_field(image), data ) ;
 
-    (void) printf("#define bound_%s_p(hash, var) "
-		  "(HASH_BOUND_P(%s,%s,(hash+%d)->h, (var)))\n",
-		  name, primitive_field(start), primitive_field(image), data);
+    (void) printf("#define bound_%s_p(hash, var) (HASH_BOUND_P(%s,",
+		  name, primitive_field(start));
+    (void) printf("%s,(hash+%d)->h, (var)))\n", primitive_field(image), data);
 }
 
 
