@@ -468,7 +468,8 @@ static list read_io_effects(entity e, list args)
   list le = io_effects(e, args);
 
   /* get current transformer */
-  transformer t = (*load_transformer_func)(effects_private_current_stmt_head());
+  statement s = effects_private_current_stmt_head();
+  transformer t = (*load_transformer_func)(s);
 
   /* reverse-apply transformer to le. */
   le = (*effects_transformer_composition_op)(le, t); 
