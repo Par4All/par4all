@@ -24,7 +24,8 @@ LIB_CFILES =	replace.c \
 		loop_normalize.c  \
 		declarations.c \
 		clone.c \
-		forward_substitution.c
+		forward_substitution.c \
+		optimize.c
 
 LIB_HEADERS =	transformations-local.h
 
