@@ -177,6 +177,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"DFLOAT",                   no_write_effects},
     {"SNGL",                     no_write_effects},
     {"DBLE",                     no_write_effects},
+    {"DREAL",                    no_write_effects}, /* Added for Arnauld Leservot */
     {"CMPLX",                    no_write_effects},
     {"DCMPLX",                   no_write_effects},
     {"ICHAR",                    no_write_effects},
