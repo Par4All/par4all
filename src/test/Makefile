@@ -16,7 +16,9 @@ LIB=$(DEV)/genC/$(ARCH)
 #
 # test the local version
 
-local:	hash_test
+local:	test_hash test_reserv
+
+test_hash: hash_test
 	@echo Warning: do not make reserv \(GO\)
 	./hash_test 100
 
@@ -32,7 +34,7 @@ reserv: reserv.c
 
 reserv: spec.h $(LIB)/libgenC.a
 
-run_test: reserv
+test_reserv: reserv
 	reserv < newres.in ; 
 	diff sortie sortie2;
 
