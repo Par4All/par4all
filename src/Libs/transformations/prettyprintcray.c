@@ -1,5 +1,5 @@
 #include <stdio.h>
-extern int fprintf();
+extern int fprintf(FILE *, const char *, ...);
 #include <string.h>
 #include <values.h>
 
@@ -22,18 +22,12 @@ extern int fprintf();
 
 #include "transformations.h"
 
-/* Global variables */
-static statement_mapping cumulated_effects_map;
-
-bool same_entity_name_p(e1, e2)
-entity e1, e2;
+bool same_entity_name_p(entity e1, entity e2)
 {
     return(strcmp(entity_name(e1), entity_name(e2))==0);
 }
 
-bool entity_in_list(ent, ent_l)
-entity ent;
-cons *ent_l;
+bool entity_in_list(entity ent, cons *ent_l)
 {
     MAPL(ce, {
 	entity e = ENTITY(CAR(ce));
@@ -55,8 +49,7 @@ cons *ent_l;
 
 /* returns l1 after elements of l2 but not of l1 have been appended to l1. */
 /* l2 is freed */
-list concat_new_entities(l1,l2)
-list l1, l2;
+list concat_new_entities(list l1, list l2)
 {
     list new_l2=NIL;
 
@@ -76,26 +69,29 @@ list l1, l2;
  * - and are member of loop_locals(lp)
  * makes sure the loop index is in the list
  */
-list real_loop_locals(lp, cfx)
-loop lp;
-effects cfx;
+list real_loop_locals(loop lp, effects cfx)
 {
     list rll= NIL;
 
-    MAPL(ce, { 
-	effect eff = EFFECT(CAR(ce));
-	entity ent = reference_variable(effect_reference(eff));
+    MAPL(ce, 
+     { 
+	effect 
+	    eff = EFFECT(CAR(ce));
+	entity 
+	    ent = reference_variable(effect_reference(eff));
 
 	if (!entity_in_list(ent, rll)
-	    && entity_in_list(ent,loop_locals(lp)) ) {
+	    && entity_in_list(ent,loop_locals(lp)) ) 
+	{
 	    /* ent is a real loop local */
-	    debug(7, "real_loop_locals", "real loop local: %s",
+	    debug(7, "real_loop_locals", "real loop local: %s\n",
 		  entity_local_name(ent));
 	    rll = CONS(ENTITY, ent, rll);
 	}
     }, effects_effects(cfx));
 
-    if( !entity_in_list(loop_index(lp) ,rll) ) {
+    if( !entity_in_list(loop_index(lp), rll) ) 
+    {
 	rll= CONS(ENTITY, loop_index(lp), rll);
     }
     return(rll);
@@ -105,8 +101,7 @@ effects cfx;
  * recursively concatenates all real loop locals of all enclosed loops.
  * filters redondant entities
  */
-list all_enclosed_scope_variables(stmt)
-statement stmt;
+list all_enclosed_scope_variables(statement stmt)
 {
     instruction instr = statement_instruction(stmt);
     list ent_l= NIL;
@@ -122,7 +117,7 @@ statement stmt;
       case is_instruction_loop : {
 	  loop lp= instruction_loop(instr);
 	  statement lpb= loop_body(lp);
-	  effects cfx = stmt_to_fx(lpb, cumulated_effects_map);
+	  effects cfx = stmt_to_fx(lpb, get_cumulated_effects_map() );
 
 	  pips_assert("all_enclosed_scope_variables", cfx != effects_undefined);
 	  ent_l= concat_new_entities(real_loop_locals(lp, cfx),
@@ -163,10 +158,7 @@ statement stmt;
 }
 
 /* lp_stt must be a loop statement */
-text text_microtasked_loop(module, margin, lp_stt)
-entity module;
-int margin;
-statement lp_stt;
+text text_microtasked_loop(entity module, int margin, statement lp_stt)
 {
     text txt;
     unformatted u;
@@ -182,7 +174,7 @@ statement lp_stt;
 
     wordl = CHAIN_SWORD(NIL, "DO ALL ");
 
-    fx = stmt_to_fx(loop_body(lp), cumulated_effects_map);
+    fx = stmt_to_fx(loop_body(lp), get_cumulated_effects_map());
 
     /* generate arguments for PRIVATE */
     /* nb: ent_l should contain entities only ones. */
@@ -202,13 +194,34 @@ statement lp_stt;
 
     wordl = CHAIN_SWORD(wordl, ") ");
 
-    gen_free_list(ent_l);
+    ifdebug(6)
+    {
+	fprintf(stderr, 
+		"[text_microtasked_loop] loop locals of %s: ",
+		entity_minimal_name(loop_index(lp)));
 
+	MAPL(ce,
+	 {
+	     fprintf(stderr, "%s ", entity_minimal_name(ENTITY(CAR(ce))));
+	 },
+	     loop_locals(lp));
+
+	fprintf(stderr, "\nent_l content is: ");
+	
+	MAPL(ce,
+	 {
+	     fprintf(stderr, "%s ", entity_minimal_name(ENTITY(CAR(ce))));
+	 },
+	     ent_l);
+
+	fprintf(stderr, "\n");
+    }
 
     /* generate arguments for SHARED */
     wordl = CHAIN_SWORD(wordl, "SHARED(");
     np=0;
-    MAPL(ce, { 
+    MAPL(ce, 
+     { 
 	effect eff = EFFECT(CAR(ce));
 	entity ent = reference_variable(effect_reference(eff));
 
@@ -219,8 +232,19 @@ statement lp_stt;
 	/* What about arrays? nothing special?? */
 	/* if (!ENDP(reference_indices(effect_reference(eff)))) */
 
-	if (!entity_in_list(ent,loop_locals(lp))
-	    && !entity_in_list(ent,lp_shared) ) {
+	/*
+	 * ent_l added, in order to use the newly computed << good >> effects, 
+	 * and to warrant the fact that no variables should be declared
+	 * at the same time private and shared.
+	 * same_entity_p added also, just in case.
+	 *
+	 * FC 28/09/93
+	 */
+	if ((!entity_in_list(ent, loop_locals(lp))) &&
+	    (!entity_in_list(ent, ent_l)) &&
+	    (!same_entity_p(ent, loop_index(lp))) &&
+	    (!entity_in_list(ent, lp_shared)))
+	{
 	    /* ent is a new shared entity */
 	    if (np>0)
 		wordl = CHAIN_SWORD(wordl, ",");
@@ -235,6 +259,7 @@ statement lp_stt;
     wordl = CHAIN_SWORD(wordl, ") ");
 
     gen_free_list(lp_shared);
+    gen_free_list(ent_l);
 
     u = make_unformatted("CMIC$", 0, 0, wordl) ;
 
@@ -246,10 +271,7 @@ statement lp_stt;
 }
 
 /* lp_stt must be a loop statement */
-text text_vectorized_loop(module, margin, lp_stt)
-entity module;
-int margin;
-statement lp_stt;
+text text_vectorized_loop(entity module, int margin, statement lp_stt)
 {
     text txt;
     unformatted u;
@@ -266,10 +288,7 @@ statement lp_stt;
 }
 
 
-text text_cray(module, margin, stat)
-entity module;
-int margin;
-statement stat;
+text text_cray(entity module, int margin, statement stat)
 {
     text txt;
 
@@ -301,13 +320,14 @@ statement stat;
 }
 
 
-void print_parallelizedcray_code(mod_name)
-char *mod_name;
+void print_parallelizedcray_code(char *mod_name)
 {
-    entity module = local_name_to_top_level_entity(mod_name);
-    statement mod_stat;
-    statement_mapping proper_effects_map;
-    bool prettyprint_cray_p = get_bool_property("PRETTYPRINT_CRAY");
+    entity 
+	module = local_name_to_top_level_entity(mod_name);
+    statement 
+	mod_stat = statement_undefined;
+    bool 
+	prettyprint_cray_p = get_bool_property("PRETTYPRINT_CRAY");
 
     /* which properties? */
     set_bool_property("PRETTYPRINT_CRAY", TRUE);
@@ -319,16 +339,18 @@ char *mod_name;
 	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, TRUE);
     
     /* We need to recompute proper effects and cumulated effects */
-    MAKE_STATEMENT_MAPPING(proper_effects_map);
+    set_proper_effects_map( MAKE_STATEMENT_MAPPING() );
     /* FI: the last arg sems to be missing...
-       rproper_effects_of_statement(proper_effects_map, mod_stat)
+       rproper_effects_of_statement(get_proper_effects_map(), mod_stat)
        */
-    rproper_effects_of_statement(proper_effects_map, mod_stat, NIL);
+    rproper_effects_of_statement( get_proper_effects_map() , mod_stat, NIL);
 
-    MAKE_STATEMENT_MAPPING(cumulated_effects_map);
-    rcumulated_effects_of_statement(cumulated_effects_map,
-				     proper_effects_map,
+    set_cumulated_effects_map( MAKE_STATEMENT_MAPPING() );
+    rcumulated_effects_of_statement(get_cumulated_effects_map(),
+				     get_proper_effects_map(),
 				     mod_stat);
+
+    set_current_module_entity(module);
 
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
 
@@ -340,11 +362,27 @@ char *mod_name;
 		       text_module(module, mod_stat) );
 
     /* free proper effects and cumulated effects */
-    free_effects_mapping(cumulated_effects_map);
-    free_effects_mapping(proper_effects_map);
+    free_list_effects_mapping( get_cumulated_effects_map() );
+    free_list_effects_mapping( get_proper_effects_map() );
+
+    reset_cumulated_effects_map();
+    reset_proper_effects_map();
+    reset_current_module_entity();
     
     set_bool_property("PRETTYPRINT_CRAY", prettyprint_cray_p);
 
     debug_off();
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
