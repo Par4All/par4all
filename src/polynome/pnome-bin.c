@@ -5,7 +5,9 @@
  */
 
 #include <stdio.h>
-#include <boolean.h>
+
+#include "boolean.h"
+#include "arithmetique.h"
 #include "vecteur.h"
 #include "polynome.h"
 
