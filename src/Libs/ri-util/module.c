@@ -2,6 +2,9 @@
   * $Id$
   *
   * $Log: module.c,v $
+  * Revision 1.28  1997/11/22 17:09:00  coelho
+  * global and local referenced entities are maintained separately...
+  *
   * Revision 1.27  1997/11/22 16:55:52  coelho
   * more debug...
   *
@@ -173,7 +176,8 @@ variable_declaration_coherency_p(entity module, statement st)
 #define bool_undefined_p(b) ((b)==bool_undefined)
 #endif
 
-/* ??? used as ok or undefined 
+/* global summary of referenced variables. 
+ * used to clean commons on the whole by hpfc...
  */
 GENERIC_GLOBAL_FUNCTION(referenced_variables, entity_int)
 GENERIC_LOCAL_FUNCTION(declared_variables, entity_int)
@@ -181,25 +185,26 @@ GENERIC_LOCAL_FUNCTION(declared_variables, entity_int)
 /* the list is needed to insure a deterministic scanning, what would be
  * rather random over installations thru hash_table_map for instance.
  */
-static list /* of entity */
-    referenced_variables_list = NIL;
+GENERIC_LOCAL_FUNCTION(referenced_variables_in_list, entity_int)
+static list /* of entity */ referenced_variables_list = NIL;
 
 static void 
 store_this_entity(entity var)
 {
     message_assert("defined entity", !entity_undefined_p(var));
     pips_debug(5, "ref to %s\n", entity_name(var));
-    if (!bound_referenced_variables_p(var))
+    if (!bound_referenced_variables_in_list_p(var))
     {
 	storage s = entity_storage(var);
 	pips_debug(4, "new reference to %s (storage: %d)\n",
 		   entity_name(var), storage_tag(s));
 	referenced_variables_list = 
 	    CONS(ENTITY, var, referenced_variables_list);
-	store_referenced_variables(var, TRUE);
+	store_or_update_referenced_variables(var, TRUE);
+	store_referenced_variables_in_list(var, TRUE);
 
 	if (storage_ram_p(s) && 
-            !bound_referenced_variables_p(ram_section(storage_ram(s)))) 
+           !bound_referenced_variables_in_list_p(ram_section(storage_ram(s)))) 
 	{
 	    /* the COMMON is also marqued as referenced...
 	     * as well as its variables: one => all primary members...
@@ -272,8 +277,9 @@ insure_global_declaration_coherency(
     pips_debug(2, "Processing module %s\n", entity_name(module));
 
     init_declared_variables();
-    pips_assert("ref var initialized", !referenced_variables_undefined_p());
+    init_referenced_variables_in_list();
     referenced_variables_list = NIL;
+    pips_assert("ref var initialized", !referenced_variables_undefined_p());
 
     if (le) MAP(ENTITY, e, store_this_entity(e), le);
 
@@ -305,7 +311,7 @@ insure_global_declaration_coherency(
      */
     MAP(ENTITY, var,
     {
-	if (bound_referenced_variables_p(var) &&
+	if (bound_referenced_variables_in_list_p(var) &&
 	    !bound_declared_variables_p(var))
 	{
 	    pips_debug(3, "declared %s referenced, kept\n",
@@ -347,10 +353,10 @@ insure_global_declaration_coherency(
 
     /* the temporaries are cleaned
      */
-    close_declared_variables();
     gen_free_list(decl);
-    gen_free_list(referenced_variables_list),
-    referenced_variables_list = NIL;
+    close_declared_variables();
+    close_referenced_variables_in_list();
+    gen_free_list(referenced_variables_list), referenced_variables_list = NIL;
 
     debug_off();
 }
