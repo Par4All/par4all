@@ -1,0 +1,20 @@
+%%
+%% $Id$
+%%
+
+\documentclass{article}
+
+\usepackage{newgen_domain}
+
+\title{Array Bound Check private stuff}
+\author{Nga Nguyen}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+\domain{dimension\_checked = lower:bool x upper:bool}
+\domain{array\_dimension\_checked = array:entity x dims:dimension\_checked*}
+\domain{abc\_checked\_list = list:array\_dimension\_checked*}
+
+\end{document}
