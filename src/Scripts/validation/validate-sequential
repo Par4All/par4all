@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1996/09/23 09:07:50 $, ) 
+# ($Date: 1996/09/24 14:54:30 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -208,19 +208,22 @@ make_diff()
   aspect=$1
   name=$2
   module=$3
-  
-  if [ ! -f $aspect/$name.result/$module ] 
+
+  refresult=$aspect/$name.result/$module
+  test -f $refresult.$PIPS_ARCH && refresult=$refresult.$PIPS_ARCH
+
+  if [ ! -f $refresult ] 
   then
     report 1 "Cannot open result file $aspect/$name.result/$module"
     [ "$LOCKFILE" ] && echo "$aspect:$name:$module" > $LOCKFILE.$HOSTNAME
     exit 1
   fi
 
-  rm -f $aspect/$name.result/$module.out
-  cp $tmpout $aspect/$name.result/$module.out
+  rm -f $refresult.out
+  cp $tmpout $refresult.out
 
   # diff -e $aspect/$name.result/$module $tmpout > $diffout_e
-  diff $aspect/$name.result/$module $tmpout > $diffout
+  diff $refresult $tmpout > $diffout
   status=$?
   lines=`wc -l $diffout | sed 's,^ *\([0-9][0-9]*\)[^0-9].*,\1,'`
   if [ $lines -gt $MAX_NB_LINES ] 
@@ -231,7 +234,7 @@ make_diff()
 
   report $status \
   "`echo Run accept on mail message to resynchronize for $pips_version. ;\
-  echo Differences for $module in $file : ;\
+  echo Differences for $module in $refresult: ;\
   cat $diffout ;\
   echo ; `"
 }
