@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1998/04/15 12:09:42 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1998/07/08 13:39:11 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2144,22 +2144,18 @@ gen_make_array( num )
 /* GEN_READ reads any object from the FILE stream. Sharing is restored.
  */
 
-gen_chunk *
-gen_read( file )
-     FILE *file ;
+gen_chunk * gen_read(FILE * file)
 {
+  Read_chunk = gen_chunk_undefined;
   genread_in = file ;
   genread_parse() ;
-  return( Read_chunk ) ;
+  return Read_chunk;
 }
 
 /* GEN_READ_TABULATED reads FILE to update the Gen_tabulated_ table. Creates
    if CREATE_P is true. */
 
-int
-gen_read_tabulated( file, create_p )
-FILE *file ;
-int create_p ;
+int gen_read_tabulated(FILE * file, int create_p)
 {
     /* gen_chunk *cp ; */
     int domain, index, max ;
