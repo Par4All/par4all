@@ -1,7 +1,4 @@
-/* 
- * $Id$
- */
-
+ 
 #include <stdio.h>
 
 #include "genC.h"
@@ -175,24 +172,6 @@ int loop_statistics(string name)
   debug_off();
   return TRUE;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
