@@ -1,3 +1,5 @@
+/* $RCSfile: lance_wp65.c,v $ ($Revision$)
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <setjmp.h>
@@ -449,6 +451,10 @@ void WP65_RECEIVE_4_(int *bank_id, float *donnee, int *taille)
   receive_4(tids[*bank_id + nb_procs], *bank_id, donnee, *taille);
 }
 
+int idiv_(int * i, int * j)
+{
+    return (*i)>=0 ? (*i)/(*j) : (-(-(*i)+(*j)-1)/(*j));
+}
 
 /* Horreur pour que la bibliothèque F77 soit contente : */
 void MAIN_()
