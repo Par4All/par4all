@@ -670,7 +670,7 @@ lsavename: savename
 	;
 
 savename: entity_name
-	    { SaveEntity($1); }
+	    { ProcessSave($1); }
 	| common_name
 	    { SaveCommon($1); }
 	;
