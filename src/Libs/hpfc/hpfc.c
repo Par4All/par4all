@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/08/03 11:53:23 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/08/10 13:30:45 $, )
  * version $Revision$
  */
  
@@ -13,8 +13,9 @@
 #include "pipsdbm.h"
 #include "control.h"
 
+/* fake resources...
+ */
 #define NO_FILE "no file name"
-
 
 /*  COMMONS
  */
@@ -445,6 +446,31 @@ void hpfc_close(string name)
 
     close_hpfc_status();
     db_unput_resources(DBR_HPFC_STATUS);            /* destroy hpfc status */
+
+    debug_off();
+}
+
+/* void hpfc_install(string name)
+ *
+ * what: install generated files in a directory. done for wpips.
+ * how: all in the hpfc_install shell script.
+ * input: program name.
+ * output: none.
+ * side effects:
+ *  - creates an hpfc directory in the database
+ *  - copies the files in this directory...
+ * bugs or features:
+ */
+void hpfc_install(string name)
+{
+    string dir = db_get_current_program_directory();
+
+    debug_on("HPFC_DEBUG_LEVEL");
+    pips_debug(1, "considering program %s\n", name);
+
+    system(concatenate("$HPFC_TOOLS/hpfc_install -iob ", dir, NULL));
+
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, strdup(name), NO_FILE);
 
     debug_off();
 }
