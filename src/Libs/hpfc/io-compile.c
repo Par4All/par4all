@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/10/03 17:00:17 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/10/04 19:28:48 $, )
  * version $Revision$
  */
 
@@ -194,9 +194,7 @@ generate_io_collect_or_update(
 	}
 	else
 	{
-	    hpfc_warning("generate_io_collect_or_update",
-			 "empty operation for array %s\n", 
-			 entity_name(array));
+	    hpfc_warning("empty io for %s\n", entity_name(array));
 	    *psh = make_continue_statement(entity_undefined);
 	    *psn = make_continue_statement(entity_undefined);
 	}
@@ -232,9 +230,7 @@ generate_io_collect_or_update(
 	}
 	else
 	{
-	    hpfc_warning("generate_io_collect_or_update",
-			 "empty operation for array %s\n", 
-			 entity_name(array));
+	    hpfc_warning("empty io for %s\n", entity_name(array));
 	    *psh = make_continue_statement(entity_undefined);
 	    *psn = make_continue_statement(entity_undefined);
 	}
