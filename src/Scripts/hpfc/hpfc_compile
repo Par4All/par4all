@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log: hpfc_compile,v $
+# Revision 1.54  1997/10/27 15:49:37  coelho
+# dump of generated files.
+#
 # Revision 1.53  1997/06/26 08:50:03  coelho
 # path fixed to look for pips.
 #
@@ -246,7 +249,6 @@ set +x
 [ "$NOINSTALL" ] ||
 {
   $verbose "installing generated codes"
-
   [ -d $WORKSPACE.hpfc ] && rm -rf $WORKSPACE.hpfc
   mv  $WORKSPACE.database/hpfc $WORKSPACE.hpfc
 }
@@ -254,28 +256,7 @@ set +x
 [ "$DUMPFILES" ] &&
 {
   $verbose "dumping generated files"
-
-  DBDIR=$WORKSPACE.database
-
-  #
-  # stupid hack to ease the dump
-
-  touch $DBDIR/_host.h $DBDIR/_node.h 
-  [ -f $DBDIR/host.f ] &&
-  {
-    touch $DBDIR/_init.h 
-    mv $DBDIR/host.f $DBDIR/_host.f
-    mv $DBDIR/node.f $DBDIR/_node.f
-    mv $DBDIR/init_param.f $DBDIR/_init.f
-    mv $DBDIR/parameters.h $DBDIR/_parameters.h
-  }
-
-  cat 	$DBDIR/*_host.f \
-	$DBDIR/*_node.f \
-	$DBDIR/*_parameters.h \
-        $DBDIR/*_init.h \
- 	$DBDIR/*_host.h \
-	$DBDIR/*_node.h 
+  car $WORKSPACE.database/Src/*.[fh]
 }
   
 [ "$DELETE" = : ] ||
