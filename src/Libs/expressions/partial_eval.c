@@ -1348,7 +1348,9 @@ partial_eval(char *mod_name)
 
 	gen_free_list(blocs);
 	break;
- 
+    case is_instruction_call:
+	if (return_statement_p(mod_stmt) || continue_statement_p(mod_stmt))
+	    break;
     default:
 	pips_error("partial_eval", "Non-acceptable instruction tag %d\n",
 		   instruction_tag (mod_inst));
