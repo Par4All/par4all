@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/03 22:26:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/04/14 21:28:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_eval[] = "%A% ($Date: 1997/02/03 22:26:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_eval[] = "%A% ($Date: 1998/04/14 21:28:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* This file contains a set of functions to evaluate integer constant
@@ -20,6 +20,7 @@ to a constant function is evaluated if its basic type is integer.
 range: a range is not evaluated. */
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "parser_private.h"
 #include "syntax.h"
