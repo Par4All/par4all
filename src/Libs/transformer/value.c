@@ -351,9 +351,10 @@ entity e;
 bool entity_has_values_p(e)
 entity e;
 {
-    /* is e variable whose value(s) (already) are analyzed? */
-    return hash_get(hash_entity_to_new_value, (char *) e)
-	!= HASH_UNDEFINED_VALUE;
+    /* is e variable whose value(s) (already) are analyzed?
+     */
+    bool has =  hash_defined_p(hash_entity_to_new_value, (char *) e);
+    return has;
 }
 
 /* the following three functions are directly or indirectly relative
