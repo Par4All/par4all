@@ -53,29 +53,12 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h)
 
 
-case "$target" in
- i*-pc-cygwin)   
-	CPPFLAGS="-DCYGWIN $CPPFLAGS"
-esac
-
-
 dnl /*****************************************************************************/
 dnl See if the only goal is to create an 'int', 'longint', or 'longlongint' library
 
-case "$target" in
-   i*-pc-cygwin)   
-	echo "setting sizes of int by hand:  int 4, long int 4, long long int 8 "
-	ac_cv_sizeof_int=4
-	ac_cv_sizeof_long_int=4
-	ac_cv_sizeof_long_long_int=8
-	lib_type=int
-	;;
-    *)
-	AC_CHECK_SIZEOF(int,1)
-	AC_CHECK_SIZEOF(long int,1)
-	AC_CHECK_SIZEOF(long long int,1);;
-esac
-
+AC_CHECK_SIZEOF(int,1)
+AC_CHECK_SIZEOF(long int,1)
+AC_CHECK_SIZEOF(long long int,1)
 
 AC_ARG_ENABLE(int-lib,
 	[  --enable-int-lib        Build an int library], 
