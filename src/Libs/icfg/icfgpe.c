@@ -53,7 +53,7 @@ void add_a_icfgpe_print(string resource_name, get_text_function gt)
 text get_any_effect_type_text_flt(string module_name, string resource_name, entity e_flt)
 {
   text txt;
-  add_a_icfgpe_print(resource_name, effect_to_text_func);
+  add_a_icfgpe_print(resource_name, effects_to_text_func);
   /*txt = get_any_effects_text(module_name, TRUE);*/
   reset_icfgpe_print();
   return txt;
