@@ -155,9 +155,9 @@ static text
 aliases_text(string module_name, string resource_name)
 {
     list alias_lists;
+    list al = NIL;
     entity module;
     text txt = make_text(NIL);
-    text txt_reg = make_text(NIL);
 
     pips_debug(4,"module %s resource %s\n",module_name,resource_name);
 
@@ -195,14 +195,15 @@ aliases_text(string module_name, string resource_name)
 	    if (alias_list != (list) HASH_UNDEFINED_VALUE
 		&& alias_list != list_undefined) 
 	    {
+		/* have to copy alias_list here */
+		al = alias_list;
 		MAP(EFFECT,alias,
 		    {
 			pips_debug(9,"make text for alias\n");
 
-			txt_reg = text_region_no_action(alias);
-			MERGE_TEXTS(txt,txt_reg);
+			MERGE_TEXTS(txt,text_region_no_action(alias));
 		    },
-			alias_list);
+			al);
 
 		ADD_SENTENCE_TO_TEXT(
 		    txt,
