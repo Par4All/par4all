@@ -580,160 +580,103 @@ logical_to_logical_type(int n)
 }
 
 /**************************************************************** TYPE A CALL FUNCTIONS */
-/* I have to cast b to REAL or DOUBLE. Between REAL et DOUBLE, 
- * I have to choose the type that is the nearest to b!
- * e.g: type_nearest_RealDouble(INT(x)) --> REAL
- * e.g: type_nearest_RealDouble(CMPLX(x)) --> DOUBLE
- *
- * WARNING: b must be a type numeric, otherwise, I return basic_undefined
+/* Determine the longest basic among the arguments of c
  */
-basic type_nearest_RealDouble(basic b)
+static basic 
+basic_union_arguments(call c, hash_table types)
 {
-    if(basic_int_p(b) || (basic_float_p(b) && basic_float(b)==4))
+    basic b2, b1 = basic_undefined;
+    
+    MAP(EXPRESSION, e,
     {
-        return make_basic_float(4);
-    }
-    if(basic_complex_p(b) || (basic_float_p(b) && basic_float(b)==8))
-    {
-        return make_basic_float(8);
-    }
-    return basic_undefined;
-}
-basic type_nearest_IntegerRealDouble(basic b)
-{
-    if(basic_int_p(b))
-    {
-        return copy_basic(b);
-    }
-    return type_nearest_RealDouble(b);
-}
-basic type_nearest_RealDoubleComplex(basic b)
-{
-    if(basic_complex_p(b))
-    {
-        return copy_basic(b);
-    }
-    return type_nearest_RealDouble(b);
-}
-basic type_nearest_IntegerRealDoubleComplex(basic b)
-{
-    if(basic_complex_p(b))
-    {
-        return copy_basic(b);
-    }
-    return type_nearest_IntegerRealDouble(b);
-}
-/***************************************************************************************** 
- * Determine the longest basic among the arguments of c
- */
-basic basic_union_arguments(call c, hash_table types)
-{
-    basic b1, b2;
-    list args = call_arguments(c);
-
-    // #arguments = 0
-    if (args == NIL)
-    {
-        return basic_undefined;
-    }
-
-    // #arguments >= 1
-    b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
-    args = CDR(args);
-    while (args != NIL)
-    {
-	b2 = GET_TYPE(types, EXPRESSION(CAR(args)));
-	if (is_inferior_basic(b1, b2))
+	if (b1==basic_undefined)
 	{
-	    b1 = b2;
+	    /* first time */
+	    b1 = GET_TYPE(types, e);
 	}
-	args = CDR(args);
-    }
-    return copy_basic(b1);
+	else 
+	{
+	    /* after first argument */
+	    b2 = GET_TYPE(types, e);
+	    if (is_inferior_basic(b1, b2))
+		b1 = b2;
+	}
+    },
+	call_arguments(c));
+    
+    return b1==basic_undefined? b1: copy_basic(b1);
 }
+
 /********************** CHECK THE VALIDE OF ARGUMENTS BASIC OF FUNCTION ******************/
 /* Verify if all the arguments basic of function C are INTEGER
  * If there is no argument, I return TRUE
  */
-bool arguments_are_integer(call c, hash_table types)
+static bool 
+check_if_basics_ok(list le, hash_table types, bool(*basic_ok)(basic))
 {
-    basic b;
-    list args = call_arguments(c);
-
-    while (args != NIL)
+    MAP(EXPRESSION, e, 
     {
-	b = GET_TYPE(types, EXPRESSION(CAR(args)));
-	if (!basic_int_p(b))
+	if (!basic_ok(GET_TYPE(types, e))) 
 	{
-	  return FALSE;
+	    return FALSE;
 	}
-	args = CDR(args);
     }
+	, le);
+
     return TRUE;
 }
-bool arguments_are_real(call c, hash_table types)
-{
-    basic b;
-    list args = call_arguments(c);
 
-    while (args != NIL)
-    {
-	b = GET_TYPE(types, EXPRESSION(CAR(args)));
-	if ( !(basic_float_p(b) && (basic_float(b) == 4)))
-	{
-	  return FALSE;
-	}
-	args = CDR(args);
-    }
-    return TRUE;
+static bool 
+is_basic_int_p(basic b) 
+{ 
+    return basic_int_p(b); 
 }
-bool arguments_are_double(call c, hash_table types)
-{
-    basic b;
-    list args = call_arguments(c);
-
-    while (args != NIL)
-    {
-	b = GET_TYPE(types, EXPRESSION(CAR(args)));
-	if ( !(basic_float_p(b) && (basic_float(b) == 8)))
-	{
-	  return FALSE;
-	}
-	args = CDR(args);
-    }
-    return TRUE;
+static bool 
+is_basic_real_p(basic b) 
+{ 
+    return basic_float_p(b) && basic_float(b)==4; 
 }
-bool arguments_are_complex(call c, hash_table types)
-{
-    basic b;
-    list args = call_arguments(c);
-
-    while (args != NIL)
-    {
-	b = GET_TYPE(types, EXPRESSION(CAR(args)));
-	if ( !(basic_complex_p(b) && basic_complex(b) == 8))
-	{
-	  return FALSE;
-	}
-	args = CDR(args);
-    }
-    return TRUE;
+static bool 
+is_basic_double_p(basic b) 
+{ 
+    return basic_float_p(b) && basic_float(b)==8; 
 }
-bool arguments_are_dcomplex(call c, hash_table types)
-{
-    basic b;
-    list args = call_arguments(c);
+static bool 
+is_basic_complex_p(basic b) 
+{ 
+    return basic_complex_p(b) && basic_complex(b)==8; 
+}
+static bool 
+is_basic_dcomplex_p(basic b) 
+{ 
+    return basic_complex_p(b) && basic_complex(b)==16; 
+}
 
-    while (args != NIL)
-    {
-	b = GET_TYPE(types, EXPRESSION(CAR(args)));
-	if ( !(basic_complex_p(b) && basic_complex(b) == 16))
-	{
-	  return FALSE;
-	}
-	args = CDR(args);
-    }
-    return TRUE;
+static bool 
+arguments_are_integer(call c, hash_table types)
+{
+    return check_if_basics_ok(call_arguments(c), types, is_basic_int_p);
+}
+
+static bool 
+arguments_are_real(call c, hash_table types)
+{
+    return check_if_basics_ok(call_arguments(c), types, is_basic_real_p);
+}
+static bool 
+arguments_are_double(call c, hash_table types)
+{
+    return check_if_basics_ok(call_arguments(c), types, is_basic_double_p);
+}
+static bool 
+arguments_are_complex(call c, hash_table types)
+{
+    return check_if_basics_ok(call_arguments(c), types, is_basic_complex_p);
+}
+static bool 
+arguments_are_dcomplex(call c, hash_table types)
+{
+    return check_if_basics_ok(call_arguments(c), types, is_basic_dcomplex_p);
 }
 
 /***************************************************************************************** 
@@ -795,20 +738,11 @@ bool arguments_are_RDC(call c, hash_table types)
 bool arguments_are_IRDC(call c, hash_table types)
 {
     basic b;
-    expression e;
     list args = call_arguments(c);
 
     while (args != NIL)
     {      
 	b = GET_TYPE(types, EXPRESSION(CAR(args))); 
-	e = EXPRESSION(CAR(args));
-	if(expression_call_p(e))
-	  fprintf(stdout, "e = %s\n", 
-		  entity_local_name(call_function(syntax_call(expression_syntax((e))))));
-	if(expression_reference_p(e))
-	  fprintf(stdout, "e = %s\n", 
-		  entity_local_name(reference_variable(syntax_reference(expression_syntax((e))))));
-
 	if ( !basic_int_p(b) && 
 	     !basic_float_p(b) &&
 	     !(basic_complex_p(b) && basic_complex(b) == 8))
@@ -852,6 +786,36 @@ bool arguments_are_logical(call c, hash_table types)
     }
     return TRUE;
 }
+/***************************************************************************************** 
+ * Verification if all the arguments are compatible
+ * PDSon: If #arguments <=1, I return true
+ */
+bool arguments_are_compatible(call c, hash_table types)
+{
+    basic b1, b2;
+    b1 = basic_undefined;
+
+    MAP(EXPRESSION, e,
+    { 
+	// First item
+	if(basic_undefined_p(b1))
+	{
+	    b1 = GET_TYPE(types, e);
+	}
+	// Next item
+	else
+	{
+	    b2 = GET_TYPE(types, e);
+	    if(!basic_compatible_p(b1, b2))
+	    {
+		return FALSE;
+	    }
+	}
+    }
+	, call_arguments(c));
+
+    return TRUE;
+}
 
 /***************************************************************************************** 
  * Typing all the arguments of c to basic b if their basic <> b
@@ -875,7 +839,35 @@ void typing_arguments(call c, hash_table types, basic b)
 }
 
 /***************************************************************************************** 
- * Typing arithmetic operator (+, -, *, /), except **
+ * Typing assignment statement (=)
+ */
+static basic
+typing_assignment(call c, hash_table types)
+{
+    basic b1, b2;
+    list args = call_arguments(c);
+
+    if(!arguments_are_compatible(c, types))
+    {
+        // ERROR: Invalide of type
+        fprintf(stderr,"Assignment: Arguments are not compatible\n"); 
+
+	// Just for return a result
+	return make_basic_float(4); 
+    }
+
+    b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
+    b2 = GET_TYPE(types, EXPRESSION(CAR(CDR(args))));
+    if (!basic_equal_p(b1, b2))
+    {
+	EXPRESSION(CAR(CDR(args))) = 
+	    insert_cast(b1, b2, EXPRESSION(CAR(CDR(args))));
+    }
+
+    return copy_basic(b1);    
+}
+/***************************************************************************************** 
+ * Typing arithmetic operator (+, -, --, *, /), except **
  */
 static basic
 typing_arithmetic_operator(call c, hash_table types)
@@ -1211,9 +1203,6 @@ typing_function_RealDouble_to_RealDouble(call c, hash_table types)
     // Find the longest type amongs all arguments
     b = basic_union_arguments(c, types);
 
-    // Find the nearest type between REAL and DOUBLE
-    //b = type_nearest_RealDouble(b); 
-
     // Typing all arguments to b if necessary
     typing_arguments(c, types, b);
 
@@ -1236,9 +1225,6 @@ typing_function_RealDoubleComplex_to_RealDoubleComplex(call c, hash_table types)
     // Find the longest type amongs all arguments
     b = basic_union_arguments(c, types);
 
-    // Find the nearest type between REAL, DOUBLE and COMPLEX
-    //b = type_nearest_RealDoubleComplex(b); 
-
     // Typing all arguments to b if necessary
     typing_arguments(c, types, b);
 
@@ -1260,8 +1246,7 @@ typing_function_IntegerRealDouble_to_IntegerRealDouble(call c, hash_table types)
     }
     // Find the longest type amongs all arguments
     b = basic_union_arguments(c, types);
-    // Find the nearest type between REAL and DOUBLE
-    b = type_nearest_IntegerRealDouble(b); 
+
     // Typing all arguments to b if necessary
     typing_arguments(c, types, b);
 
@@ -1289,9 +1274,6 @@ typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c, hash_t
     }
     // Find the longest type amongs all arguments
     b = basic_union_arguments(c, types);
-
-    // Find the nearest type between REAL and DOUBLE
-    //b = type_nearest_IntegerRealDoubleComplex(b); 
 
     // Typing all arguments to b if necessary
     typing_arguments(c, types, b);
@@ -1352,11 +1334,12 @@ name and its arity and its type. */
 
 typedef basic (*typing_function_t)(call, hash_table);
 
-typedef struct IntrinsicDescriptor {
-  string name;
-  int nbargs;
-  type (*intrinsic_type)(int);
-  typing_function_t type_function;
+typedef struct IntrinsicDescriptor 
+{
+    string name;
+    int nbargs;
+    type (*intrinsic_type)(int);
+    typing_function_t type_function;
 } IntrinsicDescriptor;
 
 /* the table of intrinsic functions. this table is used at the begining
@@ -1372,10 +1355,10 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"/", 2, default_intrinsic_type, typing_arithmetic_operator},
     {"INV", 1, real_to_real_type, 0},
     {"*", 2, default_intrinsic_type, typing_arithmetic_operator},
-    {"--", 1, default_intrinsic_type, 0},
+    {"--", 1, default_intrinsic_type, typing_arithmetic_operator},
     {"**", 2, default_intrinsic_type, typing_power_operator},
 
-    {"=", 2, default_intrinsic_type, 0},
+    {"=", 2, default_intrinsic_type, typing_assignment},
 
     {".EQV.", 2, overloaded_to_logical_type, typing_logical_operator},
     {".NEQV.", 2, overloaded_to_logical_type, typing_logical_operator},
@@ -1393,7 +1376,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
 
     {"//", 2, character_to_character_type, typing_concat_operator},
 
-    {"WRITE", (INT_MAX), default_intrinsic_type, 0},
+    {"WRITE", (INT_MAX), default_intrinsic_type, 0}, /* ERROR ? */
     {"REWIND", (INT_MAX), default_intrinsic_type, 0},
     {"BACKSPACE", (INT_MAX), default_intrinsic_type, 0},
     {"OPEN", (INT_MAX), default_intrinsic_type, 0},
@@ -1546,27 +1529,27 @@ multiply-add operators ( JZ - sept 98) */
 
 typing_function_t get_typing_function_for_intrinsic(string name)
 {
-  static hash_table name_to_type_function = NULL;
+    static hash_table name_to_type_function = NULL;
 
-  /* initialize first time */
-  if (!name_to_type_function) 
-  {
-    IntrinsicDescriptor * pdt = IntrinsicDescriptorTable;
-
-    name_to_type_function = hash_table_make(hash_string, 0);
+    /* initialize first time */
+    if (!name_to_type_function) 
+    {
+	IntrinsicDescriptor * pdt = IntrinsicDescriptorTable;
+	
+	name_to_type_function = hash_table_make(hash_string, 0);
+	
+	for(; pdt->name; pdt++)
+	{
+	    hash_put(name_to_type_function, (char*)pdt->name, (char*)pdt->type_function);
+	}
+    }
     
-    for(; pdt->name; pdt++)
+    if (!hash_defined_p(name_to_type_function, name))
     {
-        hash_put(name_to_type_function, (char*)pdt->name, (char*)pdt->type_function);
+	pips_internal_error("No type function for intrinsics %s\n", name);
     }
-  }
-
-  if (!hash_defined_p(name_to_type_function, name))
-    {
-      pips_internal_error("No type function for intrinsics %s\n", name);
-    }
-
-  return (typing_function_t) hash_get(name_to_type_function, name);
+    
+    return (typing_function_t) hash_get(name_to_type_function, name);
 }
 
 /* this function creates an entity that represents an intrinsic
