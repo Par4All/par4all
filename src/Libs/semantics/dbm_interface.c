@@ -281,40 +281,40 @@ bool old_summary_precondition(char * module_name)
 
 bool summary_precondition(char * module_name)
 {
-    /* Look for all call sites in the callers
-     */
-    callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
-						       module_name,
-						       TRUE);
-    entity callee = local_name_to_top_level_entity(module_name);
-    /* transformer t = transformer_identity(); */
-    transformer t = transformer_undefined;
+  /* Look for all call sites in the callers
+   */
+  callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
+						     module_name,
+						     TRUE);
+  entity callee = local_name_to_top_level_entity(module_name);
+  /* transformer t = transformer_identity(); */
+  transformer t = transformer_undefined;
 
-    debug_on(SEMANTICS_DEBUG_LEVEL);
+  debug_on(SEMANTICS_DEBUG_LEVEL);
 
-    set_current_module_entity(callee);
+  set_current_module_entity(callee);
 
-    ifdebug(1) {
-	debug(1, "summary_precondition", "begin for %s with %d callers\n",
-	      module_name,
-	      gen_length(callees_callees(callers)));
-	MAP(STRING, caller_name, {
-	    (void) fprintf(stderr, "%s, ", caller_name);
-	}, callees_callees(callers));
-	    (void) fprintf(stderr, "\n");
-    }
-
-    reset_call_site_number();
-
-    MAP(STRING, caller_name, 
-    {
-      entity caller = local_name_to_top_level_entity(caller_name);
-      t = update_precondition_with_call_site_preconditions(t, caller, callee);
+  ifdebug(1) {
+    debug(1, "summary_precondition", "begin for %s with %d callers\n",
+	  module_name,
+	  gen_length(callees_callees(callers)));
+    MAP(STRING, caller_name, {
+      (void) fprintf(stderr, "%s, ", caller_name);
     }, callees_callees(callers));
+    (void) fprintf(stderr, "\n");
+  }
 
-    if (!callees_callees(callers) && 
-	!entity_main_module_p(callee) && 
-	some_main_entity_p())
+  reset_call_site_number();
+
+  MAP(STRING, caller_name, 
+  {
+    entity caller = local_name_to_top_level_entity(caller_name);
+    t = update_precondition_with_call_site_preconditions(t, caller, callee);
+  }, callees_callees(callers));
+
+  if (!callees_callees(callers) && 
+      !entity_main_module_p(callee) && 
+      some_main_entity_p())
     {
       /* no callers => empty precondition (but the main). 
 	 FC. 08/01/1999.
@@ -323,27 +323,35 @@ bool summary_precondition(char * module_name)
 			"because not in call tree from main.\n", module_name);
       t = transformer_empty();
     } else if (transformer_undefined_p(t)) {
-	t = transformer_identity();
+      t = transformer_identity();
     } else {
-	/* try to eliminate redundancy */
-	t = transformer_normalize(t, 2);
+      /* try to eliminate (some) redundancy at a reasonnable cost */
+      t = transformer_normalize(t, 2);
+      /* Corinne's best one... for YPENT2 in ARC2D, but be ready to pay
+	 the price! And in case an overflow occurs, you may loose a lot of
+	 accuracy without any control. */
+      /* t = transformer_normalize(t, 8); */
+      /* No consistency check possible here because value_mappings are
+	 not available */
+      /* pips_assert("The summary precondition is consistent",
+	 transformer_consistency_p(t));*/
     }
 
-    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
-			   module_name, (char * )t);
+  DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
+			 module_name, (char * )t);
 
-    ifdebug(1) {
-	debug(1, "summary_precondition", 
-	      "initial summary precondition %x for %s (%d call sites):\n",
-	      t, module_name, get_call_site_number());
-	dump_transformer(t);
-	debug(1, "summary_precondition", "end\n");
-    }
+  ifdebug(1) {
+    debug(1, "summary_precondition", 
+	  "initial summary precondition %x for %s (%d call sites):\n",
+	  t, module_name, get_call_site_number());
+    dump_transformer(t);
+    debug(1, "summary_precondition", "end\n");
+  }
 
-    reset_current_module_entity();
-    debug_off();
+  reset_current_module_entity();
+  debug_off();
 
-    return TRUE;
+  return TRUE;
 }
 
 
@@ -530,6 +538,10 @@ bool module_name_to_preconditions(char *module_name)
 	    /* convert global variables in the summary precondition in the
 	     * local frame as defined by value mappings (FI, 31 January 1994) 
 	     */
+	  ifdebug(1) {
+	    pips_assert("The summary precondition is consistent",
+			transformer_consistency_p(ip));
+	  }
 	    translate_global_values(get_current_module_entity(), ip);
 	    ifdebug(8) {
 		(void) fprintf(stderr,
