@@ -7,31 +7,51 @@
 #
 # Mail problem to jouvelot@ensmp.fr
 #
-# modified by Fabien COELHO, 08/03/94
+# modified by Fabien COELHO
 # - cut used instead of awk
 # - theline variable added
+# - mv instead if ed used to update the results
 #
 # SCCS Stuff:
-# $RCSfile: Accept,v $ ($Date: 1994/03/24 10:44:48 $) version $Revision$, got on %D%, %T%
-# %A%
+# $RCSfile: Accept,v $ ($Date: 1994/04/22 14:21:24 $, ) version $Revision$,
+# got on %D%, %T%
+# $Id$
+#
+
+# tmp_mail=/tmp/accept.mail.$$
+# cat > $tmp_mail
+#  < $tmp_mail
+# sed '1,/^Validate Message:$/d' < $tmp_mail | \
+# sed -e "1,/${header}/d;s/^X//" | \
+# ed -s $result/$module
+# rm -f $tmp_mail
+
+scriptname="`basename $0` ($Revision$)"
+
+error()
+{
+  echo "$scriptname error $1: $2" >&2
+  exit $1
+}
 
 pips_test_directory=/home/users/pips/Pips/Tests/Validation
-tmp_mail=/tmp/accept.mail.$$
 header="Diff Commands for"
 
-cat > $tmp_mail
+# here is the standard input considered
+theline=`sed -n "/^$header/p;/^$header/q"`
 
-theline=`grep "^$header" < $tmp_mail`
 module=`echo $theline | cut -d' ' -f 4`
 file=`echo $theline | cut -d' ' -f 6`
 
-result=`dirname $file`/`basename $file .f`.result
+resultdir=`dirname $file`/`basename $file .f`.result
+outfile=$resultdir/$module.out
+reffile=$resultdir/$module
 
-sed '1,/^Validate Message:$/d' < $tmp_mail | \
-sed -e "1,/${header}/d;s/^X//" | \
-ed -s $result/$module
+[ -d $resultdir ] || error 1 "no $resultdir"
+[ -f $outfile ] || error 2 "no $outfile"
 
-rm -f $tmp_mail
+rm -f $reffile
+mv $outfile $reffile
 
 #
 # that's all
