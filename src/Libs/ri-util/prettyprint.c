@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.85  1997/10/23 11:37:58  irigoin
+ * Detection of last statement added.
+ *
  * Revision 1.84  1997/10/08 08:41:37  coelho
  * management of saved variable fixed.
  *
@@ -69,7 +72,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.84 1997/10/08 08:41:37 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.85 1997/10/23 11:37:58 irigoin Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -2560,7 +2563,8 @@ text_statement(
 
     if (strcmp(label, RETURN_LABEL_NAME) == 0) {
 	/* do not add a redundant RETURN before an END, unless required */
-	if(get_bool_property("PRETTYPRINT_FINAL_RETURN")) {
+	if(get_bool_property("PRETTYPRINT_FINAL_RETURN")
+	    || !last_statement_p(stmt)) {
 	    /*
 	    ADD_SENTENCE_TO_TEXT(temp,
 				 MAKE_ONE_WORD_SENTENCE(margin,
@@ -2609,7 +2613,85 @@ text_statement(
        
     return(r);
 }
+
+/* Keep track of the last statement to decide if a final return can be omitted
+ * or not. If no last statement can be found for sure, for instance because it
+ * depends on the prettyprinter, last_statement is set to statement_undefined
+ * which is safe.
+ */
+static statement last_statement = statement_undefined;
 
+statement
+find_last_statement(statement s)
+{
+    statement last = statement_undefined;
+
+    pips_assert("statement is defined\n", !statement_undefined_p(s));
+
+    if(block_statement_p(s)) {
+	list ls = instruction_block(statement_instruction(s));
+
+	last = (ENDP(ls)? statement_undefined : STATEMENT(CAR(gen_last(ls))));
+    }
+    else if(unstructured_statement_p(s)) {
+	unstructured u = instruction_unstructured(statement_instruction(s));
+	list trail = unstructured_to_trail(u);
+
+	last = control_statement(CONTROL(CAR(trail)));
+
+	gen_free_list(trail);
+    }
+    else if(statement_call_p(s)) {
+	/* Hopefully it is a return statement.
+	 * Since the semantics of STOP is ignored by the parser, a
+	 * final STOp should be followed by a RETURN.
+	 */
+	last = s;
+    }
+    else {
+	/* loop or test cannot be last statements of a module */
+	last = statement_undefined;
+    }
+
+    /* recursive call */
+    if(!statement_undefined_p(last)
+       && (block_statement_p(last) || unstructured_statement_p(last))) {
+	last = find_last_statement(last);
+    }
+
+    /* I had a lot of trouble writing the condition for this assert... */
+    pips_assert("Last statement is either undefined or a call to return",
+		statement_undefined_p(last) /*let's give up: it's always safe */
+		|| !block_statement_p(s) /* not a block: any kind of statement can be found */
+		||return_statement_p(last)); /* if a block, then a return */
+
+    return last;
+}
+
+void
+set_last_statement(statement s)
+{
+    statement ls = statement_undefined;
+
+    pips_assert("last statement is undefined\n", statement_undefined_p(last_statement));
+
+    ls = find_last_statement(s);
+
+    last_statement = ls;
+}
+
+void
+reset_last_statement()
+{
+    last_statement = statement_undefined;
+}
+
+bool
+last_statement_p(statement s) {
+    pips_assert("statement is defined\n", !statement_undefined_p(s));
+    return s == last_statement;
+}
+
 /* function text text_module(module, stat)
  *
  * carefull! the original text of the declarations is used
@@ -2622,6 +2704,8 @@ text_module(entity module,
     text r = make_text(NIL);
     code c = entity_code(module);
     string s = code_decls_text(c);
+
+    set_last_statement(stat);
 
     if ( strcmp(s,"") == 0 
 	|| get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") )
@@ -2653,6 +2737,8 @@ text_module(entity module,
     }
 
     ADD_SENTENCE_TO_TEXT(r, sentence_tail());
+
+    reset_last_statement();
 
     return(r);
 }
