@@ -12,10 +12,19 @@ int
 main()
 {
     int i, x, y;
+    XPOMP_display d2, d3;
     unsigned char data[X_data_array_size][Y_data_array_size];
 
     XPOMP_display d = XPOMP_open_display(590, 290);
     printf("Display = %d\n", d);
+
+    d2 = XPOMP_open_display(590, 290);
+    printf("Display = %d\n", d2);
+
+    x = 100;
+    y = 100;
+    xpompfopendisplay_(&x, &y, &d3);
+    printf("Display = %d\n", d3);
 
     for(x = 0; x < X_data_array_size; x++)
 	for(y = 0; y < Y_data_array_size; y++)
