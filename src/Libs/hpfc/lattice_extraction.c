@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: lattice_extraction.c,v $
+ * Revision 1.8  1997/04/08 06:41:22  coelho
+ * useless var removed.
+ *
  * Revision 1.7  1997/04/08 06:40:27  coelho
  * *** empty log message ***
  *
@@ -113,7 +116,7 @@ extract_lattice(
 {
     /* - should try to remove deducables before hand?
      */
-    int nscanners, nothers, ntotal, neq, nin;
+    int nscanners, nothers, ntotal, neq;
     Pbase b, bsorted, byr;
     Pmatrix FM, F, M, V, P, H, Q, Hl, Hli, Ql, Qr, QlHli,
 	QlHliM, QlHliV, mQr, I, Fnew;
@@ -123,7 +126,6 @@ extract_lattice(
     Pcontrainte eq;
 
     neq = sc_nbre_egalites(s);
-    nin = sc_nbre_inegalites(s);
 
     if (neq==0 || !get_bool_property("HPFC_LATTICE_EXTRACTION")) 
     {
