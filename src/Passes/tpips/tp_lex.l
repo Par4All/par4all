@@ -139,6 +139,7 @@ void yyinit_lex()
 
 void yyerror(char * s)
 {
+    tpips_init(); /* needed for the user error... */
     tpips_lex_print_pos(stderr);
     pips_user_error("%s\n", s);
 }
