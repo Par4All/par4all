@@ -15,18 +15,11 @@
 
 #include "genC.h"
 #include "ri.h"
-#include "ri-util.h"
 #include "misc.h"
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "polynome.h"
+#include "newgen.h"
 
-/*#include "ri-util.h"*/
-
-void monome_gen_write(fd,pm)
-FILE *fd;
-Pmonome pm;
+void monome_gen_write(FILE *fd, Pmonome pm)
 {
     pips_assert("monome_gen_write", !MONOME_UNDEFINED_P(pm));
 
