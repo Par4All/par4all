@@ -14,12 +14,7 @@
   * Idem for type Psysteme (FI 3 November 1990)
   */
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-#include "polynome.h"
-#include "word_attachment.h"
+#include "linear.h"
 
 #include "text.h"
 
