@@ -70,8 +70,8 @@ bool continuation_conditions(char *module_name)
        translated into variables local to module */
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     /* cumulated effects */
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)) );
+    set_cumulated_rw_effects((statement_effects)
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings(get_current_module_entity());
     
     /* Get the transformers of the module. */
@@ -102,7 +102,7 @@ bool continuation_conditions(char *module_name)
     reset_current_module_entity();
     reset_current_module_statement();
     reset_transformer_map();
-    free_cumulated_effects_map();
+    reset_cumulated_rw_effects();
     reset_must_continuation_map();
     reset_may_continuation_map();
 
