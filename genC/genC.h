@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1994/12/30 13:58:45 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1995/03/14 18:09:07 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -176,8 +176,10 @@ extern void gen_recurse GEN_PROTO((gen_chunk *,
 #define GEN_CHECK_ALLOC 0
 #endif
 
+#include "newgen_map.h"
+
 #include "newgen_generic_mapping.h"
 #include "newgen_generic_stack.h"
-#include "newgen_map.h"
+#include "newgen_generic_function.h"
 
 #endif
