@@ -2,7 +2,7 @@
 # -*- perl -*-
 #
 # $RCSfile: pips-deal-with-include,v $ (version $Revision$)
-# $Date: 1996/09/21 16:51:53 $, 
+# $Date: 1996/09/21 16:54:24 $, 
 #
 
 # Load perl according to the $PATH:
@@ -12,7 +12,7 @@ test "`type perl | grep 'not found'`" && {
   exit 0
 }
 
-sed '1,/^###/d' $0 | perl "$@"
+sed '1,/^###/d' $0 | perl -- "$@"
 
 ###
 #
