@@ -182,8 +182,7 @@ static bool call_flt(call c)
 	/* retrieve the caller entity */
 	set_current_module_entity(e_caller);
 	/* append the callee' icfg */
-	append_icfg_file(r, "CALL ");
-	/*append_icfg_file (r, callee_name);*/
+	append_icfg_file (r, callee_name);
 	/* store it to the statement mapping */
 	update_statement_icfg (current_stmt_head(), r);
     }
