@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.6  2004/03/25 14:38:18  hurbain
+   Debug
+
    Revision 1.5  2004/03/25 14:35:11  hurbain
    *** empty log message ***
 
@@ -1582,8 +1585,8 @@ bool print_claire_code(string module_name)
   
   /*pips_internal_error("Not implemented yet\n"); */
 
-  crough = db_get_memory_resource(DBR_CLAIREROUGH, module_name, TRUE);
-  cpretty = db_build_file_resource_name(DBR_CLAIRE_PRINTED_FILE, module_name, CLAIREPRETTY);
+  clairerough = db_get_memory_resource(DBR_CLAIREROUGH, module_name, TRUE);
+  clairepretty = db_build_file_resource_name(DBR_CLAIRE_PRINTED_FILE, module_name, CLAIREPRETTY);
   dir = db_get_current_workspace_directory();
 
   cmd = strdup(concatenate(INDENT, " ", 
