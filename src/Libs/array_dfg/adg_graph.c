@@ -26,7 +26,7 @@
 #include "sg.h"
 #include "sc.h"
 #include "polyedre.h"
-#include "matrice.h"
+/*#include "matrice.h" Obsolete*/
 #include "matrix.h"
 #include "union.h"
 
