@@ -43,7 +43,7 @@ type i;\
 PREFIX type name##_replace(i)\
 type i;\
 {\
-  return(stack_replace((char *)i, name##_stack));\
+  return((type) stack_replace((char *)i, name##_stack));\
 }\
 \
 PREFIX type name##_pop()\
