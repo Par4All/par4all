@@ -53,6 +53,8 @@ VALID="$PIPS_ROOT/Utils/validate-sequential"
 # so as to find the right ping, mail and date...
 PATH="/usr/ucb:/usr/etc:/usr/bin:/usr/games:.:$PATH"
 
+MAIL=${PIPS_MAIL:-Mail}
+
 hostname=`hostname`
 user=`whoami`
 PWD=`absolute_name \`pwd\``
@@ -471,7 +473,7 @@ $performance
 In case of problems, contact coelho@cri.ensmp.fr
 %
 
-mail -s "$finalsubject" $user < $MSG
+${MAIL} -s "$finalsubject" $user < $MSG
 
 rm -f $FAILED $MSG
 
