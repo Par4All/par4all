@@ -7,7 +7,7 @@
 # utilise les librairies locales en priorite.
 # 
 
-CFILES	=	sc_to_sg_test1.c \
+LIB_HEADERS=	sc_to_sg_test1.c \
 		sc_to_sg_test.c \
 		env_test.c \
 		elarg_test.c \
@@ -21,13 +21,11 @@ CFILES	=	sc_to_sg_test1.c \
 
 LIB_CFILES = Tests-local.h
 
-SOURCES	= $(CFILES) 
+SOURCES	= $(LIB_HEADERS) 
 
 all: test_chernikova simp
 
-Test.h: touch $@
-
-%: %.c;	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $< $(LINEAR_LIBS) -o $@
+%: %.c;	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $< $(LINEAR_LIBS) -o $(ARCH)/$@
 
 # test_simp:	simp
 # 	sh ./test_simp.sh | sed -f filtre.sed > resultat.2 ; 
@@ -35,8 +33,7 @@ Test.h: touch $@
 # 	$(RM) resultat.2
 
 clean: local-clean
-local-clean:
-	$(RM) $(CFILES:.c=) *~
+local-clean:; $(RM) $(LIB_HEADERS:.c=) $(ARCH)/* *~
 
 # end of it.
 #
