@@ -1,9 +1,10 @@
 /* $RCSfile: reductions-local.h,v $ (version $Revision$)
- * $Date: 1996/06/15 13:22:10 $, 
+ * $Date: 1996/06/17 15:52:12 $, 
  */
 /* shorthands for REDUCTION:
  */
 #define reduction_variable(r) reference_variable(reduction_reference(r))
+#define reduction_none_p(r) reduction_operator_none_p(reduction_op(r))
 
 /* shorthands for EFFECT:
  */
