@@ -170,13 +170,14 @@ LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PIPS_ROOT}/Lib/${PIPS_ARCH}"
 
 #
 # preprocessor to use:
-# default: PIPS_CPP="cpp"
+# default: PIPS_FPP="cpp"
 #
 # to get some determinism...
 
 PIPS_CPP='gcc -E -C'
+PIPS_FPP='gcc -E -C'
 test "${PIPS_ARCH}" = GNUSOL2LL && \
-	PIPS_CPP="fpp"
+	PIPS_FPP="fpp"
 
 # Additional options to pass to cpp for .F files:
 # default: PIPS_CPP_FLAGS=""
