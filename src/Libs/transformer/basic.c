@@ -203,7 +203,8 @@ Pcontrainte eqs;
  * are inconsistent with respect to the current module. FC/CA: help...
  *
  * I do not understand why errors are reported only if the debug level is greater
- * than 1. A demo effect?
+ * than 1. A demo effect? No, this routine is coded that way to save time on
+ * regular runs.
  *
  * Also, since no precise information about the inconsistency is displayed, a
  * core dump would be welcome to retrieve pieces of information with gdb.
@@ -371,4 +372,39 @@ transformer t;
     /* pips_assert("transformer_consistency_p", consistent); */
 
     return consistent;
+}
+
+/* Same as above but equivalenced variables should not appear in the
+   argument list or in the predicate basis. */
+bool transformer_internal_consistency_p(transformer t)
+{
+  Psysteme sc = (Psysteme) predicate_system(transformer_relation(t));
+  Pbase b = sc_base(sc);
+  Pbase e = BASE_UNDEFINED;
+  list args = transformer_arguments(t);
+  bool consistent = transformer_consistency_p(transformer t);
+
+  MAP(ENTITY, e, {
+    entity v = entity_to_new_value(e);
+
+    if(v!=e) {
+      pips_user_warning("New value %s should be the same entity as variable %s"
+			" as long as equivalence equations are not added\n", 
+			variable_local_name(v), variable_local_name(e));
+      pips_assert("Argument must be a value", FALSE);
+    }
+  }, args);
+
+  for(e=b; !BASE_NULLE_P(vect_succ(e)); e = vecteur_succ(e)) {
+    entity val = (entity) vecteur_var(t);
+
+    if(!(new_value_entity_p(val) || old_value_entity_p(val)
+	 || intermediate_value_entity_p(val)) {
+      pips_user_warning("Variable %s in basis should be an internal value",
+			variable_local_name(val));
+      pips_assert("Basis variables must be an internal value", FALSE);
+    }
+  }
+
+  return consistent;
 }
