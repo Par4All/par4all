@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.22  1998/10/24 15:18:26  coelho
+ * THROW macro updated to tell its source.
+ *
  * Revision 1.21  1998/10/24 14:33:08  coelho
  * parser exception added.
  *
@@ -48,7 +51,8 @@ extern const unsigned int any_exception_error;
  */
 #define EXCEPTION extern const unsigned int
 
-#define THROW(what) (throw_exception(what))
+#define THROW(what) \
+   (throw_exception(what, __CURRENT_FUNCTION_NAME__, __FILE__, __LINE__))
 
 #define CATCH(what) 							\
    if (setjmp(*push_exception_on_stack(what, __CURRENT_FUNCTION_NAME__,	\
