@@ -89,11 +89,8 @@ string mod_name;
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
-    /*
-    if(!ordering_to_statement_initialized_p()) {
-	initialize_ordering_to_statement(get_current_module_statement());
-    }
-    */
+    initialize_ordering_to_statement(mod_stat);
+
     dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
     local_dg_name = db_build_file_resource_name(DBR_DG, mod_name, ".dg");
     dg_name = strdup(concatenate(db_get_current_workspace_directory(), 
@@ -103,9 +100,8 @@ string mod_name;
     debug_on("RICEDG_DEBUG_LEVEL");
 
     if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") || 
-	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS")) {
+	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS"))
 	prettyprint_dependence_graph_view(fp, mod_stat, dg);
-    }
     else  
 	prettyprint_dependence_graph(fp, mod_stat, dg);
     
@@ -119,6 +115,7 @@ string mod_name;
     
     reset_current_module_statement();
     reset_current_module_entity();
+    reset_ordering_to_statement();
 
     return TRUE;
 }
