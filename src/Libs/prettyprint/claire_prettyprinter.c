@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.20  2004/08/06 08:11:33  hurbain
+   Debugging of claire_array_in_task. Generates apparently CLAIRE correct code.
+
    Revision 1.19  2004/08/05 15:41:31  hurbain
    Function claire_array_in_task() modified to check null column in fitting matrix and to avoid spurious warning by APOTRES for laurent03_explicit.f. Spurious warning still there. Intermediate version. (Isabelle and Francois)
 
@@ -545,7 +548,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
 
   bool null_fitting_p = TRUE;
   string internal_index_declarations = strdup("");
-
+  string fitting_declaration = strdup("");
 
   /* initialization of the arrays */
   for (i=0; i<index_of_array; i++)
@@ -608,27 +611,30 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   for(i=0;i<intern_nb; i++){
     bool is_null_p = TRUE;
     for(j = 0; j<index_of_array; j++){
-      is_null_p = is_null_p && (fitting_array[j][i] == 0);
+      is_null_p = is_null_p && (same_string_p(fitting_array[j][i], "0"));
     }
-    result = strdup(concatenate(result, "list(", NULL));
+    /*    result = strdup(concatenate(result, "list(", NULL));*/
     if(!is_null_p){
+      
       null_fitting_p = FALSE;
       for(j = 0; j<index_of_array-1; j++){
-	result = strdup(concatenate(result, "vartype!(", fitting_array[j][i], "), ", NULL));
+	fitting_declaration = strdup(concatenate(fitting_declaration, "vartype!(", fitting_array[j][i], "), ", NULL));
       }
-      result = strdup(concatenate(result, 
-				  "vartype!(", 
-				  fitting_array[j][i], 
-				  i<intern_nb-1?")),":"))),", 
-				  NL, TAB, TAB, 
-				  i<intern_nb-1?TAB:"", 
-				  NULL));
+      fitting_declaration = strdup(concatenate(fitting_declaration, 
+					       "vartype!(", 
+					       fitting_array[j][i], 
+					       i<intern_nb-1?")),":"))),",
+					       NL, TAB, TAB, 
+					       i<intern_nb-1?TAB:"", 
+					       NULL));
     }
   }
 
+  result = strdup(concatenate(result, "list(", fitting_declaration, NULL));
+
   if(null_fitting_p){
-    result = strdup(concatenate(result, "list()),", NL, TAB, TAB, NULL));
-  }
+    result = strdup(concatenate(result, ")),", NL, TAB, TAB, NULL));
+    }
 
   null_fitting_p = TRUE;
   /* Generation of paving CLAIRE code*/
@@ -662,7 +668,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   for (j = 0; j<intern_nb; j++){
     bool is_null_p = TRUE;
     for(i = 0; i < index_of_array; i++){
-      is_null_p = is_null_p && (fitting_array[i][j] == 0);
+      is_null_p = is_null_p && (same_string_p(fitting_array[i][j], "0"));
     }
     if(!is_null_p){
       null_fitting_p = FALSE;
