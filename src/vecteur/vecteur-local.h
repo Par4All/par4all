@@ -8,7 +8,7 @@
  *    "_gC_" ont ete deplacees dans _gC_lib
  *  - passage a "char *" pour le type Variable au lieu de "int" (Linear-C3) 
  *    et de "entity *" (PIPS); le package n'est pas independant de la
- *    definition du type "Variable"; il faudrati ameliorer ca avec un
+ *    definition du type "Variable"; il faudrait ameliorer ca avec un
  *    package "Variable"
  *  - ajout des fonctions d'interface avec Newgen: (RT, 27/11/89)
  *  - ajout de la notion de base, comme cas particulier de vecteur
@@ -65,19 +65,17 @@ typedef struct Svecteur {
 
 /* Une base est definie par son vecteur diagonal
  *
- * On ne sait pas encore s'il faut verifier l'appartenance a une base
- * par strcmp ou par egalite de pointeur. La premiere solution est
- * quand meme plus robuste!
+ * Les tests d'appartenance sont effectues par comparaison des pointeurs 
+ * et non par des strcmp.
  *
  * Rien ne contraint les coefficients a valoir 1 et le package plint
  * mais meme certains coefficients a 0, ce qui devrait revenir a faire
  * disparaitre la variable (i.e. la coordonnee) correspondante de la
  * base.
- * Ajoute' les 4 macros BASE_NULLE ... BASE_UNDEFINED_P  20/06/90  PB
  */
 typedef struct Svecteur Sbase, * Pbase;
 
-/* definition du vecteur nul */
+/* DEFINITION DU VECTEUR NUL */
 #define VECTEUR_NUL ((Pvecteur) 0)
 #define VECTEUR_NUL_P(v) ((v)==VECTEUR_NUL)
 #define VECTEUR_UNDEFINED ((Pvecteur) 0)
@@ -97,7 +95,7 @@ typedef struct Svecteur Sbase, * Pbase;
 #define vecteur_var(v) ((v)->var)
 #define vecteur_val(v) ((v)->val)
 
-/* variable representant le terme constant */
+/* VARIABLE REPRESENTANT LE TERME CONSTANT */
 #define TCST ((Variable) 0)
 #define term_cst(varval) ((varval)->var == TCST)
 
@@ -110,7 +108,7 @@ typedef struct Svecteur Sbase, * Pbase;
 #define base_add_dimension(b,v) vect_chg_coeff((Pvecteur *)(b),(v),1)
 #define base_rm(b) vect_rm((Pvecteur)(b))
 
-/* overflow control */
+/* OVERFLOW CONTROL */
 #define OFL_CTRL 2     /* overflows are treated in the called procedure */
 #define FWD_OFL_CTRL 1 /* overflows are treated by the calling procedure */
 #define NO_OFL_CTRL 0  /* overflows are not trapped at all  (dangerous !) */
