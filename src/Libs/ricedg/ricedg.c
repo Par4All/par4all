@@ -233,9 +233,9 @@ static boolean TestDiCnst(Psysteme /*ps*/, int /*cl*/, statement /*s1*/,
 
 
 
-/*********************************************************************************/
-/* WALK THROUGH THE DEPENDENCE GRAPH                                             */
-/*********************************************************************************/
+/**************************************** WALK THROUGH THE DEPENDENCE GRAPH */
+
+extern int current_shared_obj_table_size(void); /* in genClib.c */
 
 /* The supplementary call to init_ordering_to_statement should be 
    avoided if ordering.c were more clever. */
