@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: OptionParser.java,v $
+ * Revision 1.6  1998/07/03 17:32:35  coelho
+ * cleaner withMenu stuff...
+ *
  * Revision 1.5  1998/07/03 16:36:24  coelho
  * new INDIRECT label and button with choice...
  *
@@ -359,6 +362,27 @@ public class OptionParser
       return null;      
     }
 
+  /** common part for the labeled-menu in label and button with menu.
+    * it creates a label and a menu which updates the label on selections.
+    */
+  private void addWithMenu(PMenu m2)
+    {
+      PLabel l = new PLabel();
+      add(optionPanel,l,
+	  1,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
+
+      PMenuBar mb = new PMenuBar();
+      PMenu m1 = new PMenu();
+      ImageIcon icon = new ImageIcon(getDownArrowImageFileName());
+      m1.setIcon(icon);
+      
+      parseCommand(m1, m2, l, null, null);
+
+      mb.add(m1);
+      add((Container)optionPanel,mb,
+	  2,position++,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
+    }
+
   /** Adds a button, a label, and a single menu menubar to optionPanel.
     * The selection of the menu is displayed in the label.
     * Adds an executable menuItem to menu.
@@ -373,30 +397,16 @@ public class OptionParser
       tip = p.nextNonEmptyLine();
 
       PButton b = new PButton(name,command,tip);
-      add((Container)optionPanel,b,
+      add(optionPanel,b,
 	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
+      b.addActionListener(getBListener());
 
-      PLabel l = new PLabel();
-      add((Container)optionPanel,l,
-	  1,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
-
-      PMenuBar mb = new PMenuBar();
-      PMenu m1 = new PMenu();
-      ImageIcon icon = new ImageIcon(getDownArrowImageFileName());
-      m1.setIcon(icon);
-      
-      parseCommand(m1, null, l, null, null);
-      mb.add(m1);
-      add((Container)optionPanel,mb,
-	  2,position++,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
+      addWithMenu(null);
 
       PMenuItem mi = new PMenuItem(name,command);
       menu.add(mi);
-
-      b.addActionListener(getBListener());
       mi.addActionListener(getMIListener());
     }
-    
 
   /** Adds 2 labels, and a single menu menubar to optionPanel.
     * The selection of the menu is displayed in the second label.
@@ -413,23 +423,8 @@ public class OptionParser
       add((Container)optionPanel,l1,
 	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
-      PLabel l2 = new PLabel();
-      add((Container)optionPanel,l2,
-	  1,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
-
-      PMenuBar mb = new PMenuBar();
-      PMenu m1 = new PMenu();
-      ImageIcon icon = new ImageIcon(image);
-      m1.setIcon(icon);      
-
       PMenu m2 = new PMenu(name);
-
-      parseCommand(m1, m2, l2, null, null);
-
-      mb.add(m1);
-      add((Container)optionPanel,m1,
-	  2,position++,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
-
+      addWithMenu(m2);
       menu.add(m2);
     }
     
