@@ -9,9 +9,10 @@
 #include "ri-util.h"
 #include "misc.h"
 #include "properties.h"
-#include "word_attachment.h"
 /* Used in word_to_attachments: */
 typedef char * void_star;
+#include "word_attachment.h"
+
 #include "top-level.h"
 
 /* To store the fact a prettyprinter ask for Emacs attachments: */
