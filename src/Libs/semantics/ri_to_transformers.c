@@ -40,17 +40,17 @@
 
 extern Psysteme sc_projection_by_eq(Psysteme sc, Pcontrainte eq, Variable v);
 
-
-
 /* Recursive Descent in Data Structure Statement */
 
-
 /* SHARING : returns the transformer stored in the database. Make a copy 
- * before using it. The copy is not made here because the result is not always used
- * after a call to this function, and itwould create non reachable structures. Another
- * solution would be to store a copy and free the unused result in the calling function
- * but transformer_free does not really free the transformer. Not very clean. 
- * BC, oct. 94 */
+ * before using it. The copy is not made here because the result is not 
+ * always used after a call to this function, and itwould create non 
+ * reachable structures. Another solution would be to store a copy and free 
+ * the unused result in the calling function but transformer_free does not 
+ * really free the transformer. Not very clean. 
+ * BC, oct. 94 
+ */
+
 transformer statement_to_transformer(s)
 statement s;
 {
@@ -506,14 +506,13 @@ cons * ef; /* effects of call c */
     cons *pc = call_arguments(c);
     tag tt;
 
-    debug(8,"call_to_transformer","begin\n");
+    pips_debug(8,"begin\n");
 
     switch (tt = value_tag(entity_initial(e))) {
       case is_value_code:
 	/* call to an external function; preliminary version:
 	   rely on effects */
-	debug(5, "call_to_transformer", "external function %s\n",
-	      entity_name(e));
+	pips_debug(5, "external function %s\n", entity_name(e));
 	if(get_bool_property(SEMANTICS_INTERPROCEDURAL))
 	    tf = user_call_to_transformer(e, pc, ef);
 	else
@@ -524,19 +523,17 @@ cons * ef; /* effects of call c */
 	tf = transformer_identity();
 	break;
       case is_value_unknown:
-	pips_error("call_to_transformer", "unknown function %s\n",
-		   entity_name(e));
+	pips_internal_error("unknown function %s\n", entity_name(e));
 	break;
       case is_value_intrinsic:
-	debug(5, "call_to_transformer", "intrinsic function %s\n",
-	      entity_name(e));
+	  pips_debug(5, "intrinsic function %s\n", entity_name(e));
 	tf = intrinsic_to_transformer(e, pc, ef);
 	break;
       default:
-	pips_error("call_to_transformer", "unknown tag %d\n", tt);
+	pips_internal_error("unknown tag %d\n", tt);
     }
 
-    debug(8,"call_to_transformer","end\n");
+    pips_debug(8,"end\n");
 
     return(tf);
 }
@@ -561,7 +558,7 @@ cons * ef; /* effects of intrinsic call */
 
     return tf;
 }
-
+
 transformer assign_to_transformer(args, ef)
 cons *args; /* arguments for assign */
 cons * ef; /* effects of assign */
@@ -585,13 +582,11 @@ cons * ef; /* effects of assign */
     transformer tf = transformer_undefined;
     normalized n = NORMALIZE_EXPRESSION(lhs);
 
-    debug(8,"assign_to_transformer","begin\n");
-
-    pips_assert("assign_to_transformer", CDR(CDR(args))==NIL);
+    pips_debug(8,"begin\n");
+    pips_assert("2 args to assign", CDR(CDR(args))==NIL);
 
     if(normalized_linear_p(n)) {
-	Pvecteur vlhs =
-	    (Pvecteur) normalized_linear(n);
+	Pvecteur vlhs = (Pvecteur) normalized_linear(n);
 	entity e = (entity) vecteur_var(vlhs);
 
 	if(entity_has_values_p(e) && integer_scalar_entity_p(e)) {
@@ -621,9 +616,9 @@ cons * ef; /* effects of assign */
     if(tf==transformer_undefined)
 	tf = effects_to_transformer(ef);
 
-    debug(9,"assign_to_transformer","return tf=%x\n",tf);
-    ifdebug(9) (void) print_transformer(tf);
-    debug(8,"assign_to_transformer","end\n");
+    pips_debug(6,"return tf=%lx\n", (unsigned long)tf);
+    ifdebug(6) (void) print_transformer(tf);
+    pips_debug(8,"end\n");
     return tf;
 }
 
@@ -654,7 +649,7 @@ list ef;
 {
     transformer tf = transformer_undefined;
 
-    debug(8, "expression_to_transformer", "begin\n");
+    pips_debug(8, "begin\n");
 
     if(entity_has_values_p(e)) {
 	Pvecteur ve = vect_new((Variable) e, (Value) 1);
@@ -726,14 +721,15 @@ list ef;
 	}
     }
 
-    debug(8, "expression_to_transformer",
-	  "end with tf=%x\n", (unsigned int) tf);
+    pips_debug(8, "end with tf=%x\n", (unsigned int) tf);
 
     return tf;
 }
-
-transformer user_function_call_to_transformer(entity e, expression expr,
-					      list ef)
+
+transformer user_function_call_to_transformer(
+    entity e, 
+    expression expr,
+    list ef)
 {
     syntax s = expression_syntax(expr);
     call c = syntax_call(s);
@@ -742,8 +738,7 @@ transformer user_function_call_to_transformer(entity e, expression expr,
     transformer t_caller = transformer_undefined;
     basic rbt = basic_of_call(c);
 
-    debug(8, "user_function_call_to_transformer", "begin\n");
-
+    pips_debug(8, "begin\n");
     pips_assert("user_function_call_to_transformer", syntax_call_p(s));
 
     if(basic_int_p(rbt)) {
@@ -764,18 +759,18 @@ transformer user_function_call_to_transformer(entity e, expression expr,
 	t_caller = user_call_to_transformer(f, pc, ef);
 
 	ifdebug(8) {
-	    debug(8, "user_function_call_to_transformer", 
-		  "Transformer 0x%x for callee %s:\n",
-		  t_caller, entity_local_name(f));
+	    pips_debug(8, "Transformer 0x%x for callee %s:\n",
+		       t_caller, entity_local_name(f));
 	    dump_transformer(t_caller);
 	}
 
 	/* Build a transformer representing the assignment of
 	 * the function value to e
 	 */
-	eq = vect_make(eq, (Variable) entity_to_new_value(e), (Value) 1,
-		       (Variable) rv, (Value) -1,
-		       0, 0);
+	eq = vect_make(eq,
+		       (Variable) entity_to_new_value(e), VALUE_ONE,
+		       (Variable) rv, VALUE_MONE,
+		       TCST, VALUE_ZERO);
 	c = contrainte_make(eq);
 	sc = sc_make(c, CONTRAINTE_UNDEFINED);
 	/* FI: I do not understand why this is useful since the basis
@@ -921,7 +916,7 @@ cons * le;
 
     return ftf;
 }
-
+
 transformer user_call_to_transformer(f, pc, ef)
 entity f;
 list pc;
@@ -933,9 +928,8 @@ list ef;
     entity caller = entity_undefined;
     list all_args = list_undefined;
 
-    debug(8, "user_call_to_transformer", "begin\n");
-
-    pips_assert("user_call_to_transformer", entity_module_p(f));
+    pips_debug(8, "begin\n");
+    pips_assert("f is a module", entity_module_p(f));
 
     if(!get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
 	/*
@@ -962,8 +956,8 @@ list ef;
 	ifdebug(8) {
 	    Psysteme s = 
 		(Psysteme) predicate_system(transformer_relation(t_callee));
-	    debug(8, "user_call_to_transformer", 
-		  "Transformer for callee %s:\n", entity_local_name(f));
+	    pips_debug(8, "Transformer for callee %s:\n", 
+		       entity_local_name(f));
 	    dump_transformer(t_callee);
 	    sc_fprint(stderr, s, dump_value_name);
 	}
@@ -979,10 +973,10 @@ list ef;
 	    normalized n;
 
 	    if((expr = find_ith_argument(pc, r)) == expression_undefined)
-		user_error("user_call_to_transformer",
-			   "not enough args for %d formal parm. %s in call to %s from %s\n",
-			   r, entity_local_name(e), entity_local_name(f),
-			   get_current_module_entity());
+		pips_user_error("not enough args for %d formal parm."
+				" %s in call to %s from %s\n",
+				r, entity_local_name(e), entity_local_name(f),
+				get_current_module_entity());
 
 	    n = NORMALIZE_EXPRESSION(expr);
 	    if(normalized_linear_p(n)) {
@@ -1003,16 +997,12 @@ list ef;
 			    user_error("user_call_to_transformer",
 				       "value (!) modifed by call to %s\n",
 				       entity_local_name(f));
-			a_new = entity_to_new_value((entity)
-						    vecteur_var(v));
-			a_old = entity_to_old_value((entity)
-						    vecteur_var(v));
-			t_caller = transformer_value_substitute(t_caller,
-								e_new,
-								a_new);
-			t_caller = transformer_value_substitute(t_caller,
-								e_old,
-								a_old);
+			a_new = entity_to_new_value((entity) vecteur_var(v));
+			a_old = entity_to_old_value((entity) vecteur_var(v));
+			t_caller = transformer_value_substitute
+			    (t_caller, e_new, a_new);
+			t_caller = transformer_value_substitute
+			    (t_caller, e_old, a_old);
 		    }
 		    else {
 			/* simple case: formal parameter e is not
@@ -1093,7 +1083,6 @@ list ef;
     return t_caller;
 }
 
-
 transformer modulo_to_transformer(e, expr)
 entity e;
 expression expr;
