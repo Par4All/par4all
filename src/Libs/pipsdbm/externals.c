@@ -6,6 +6,7 @@
 
 #include "private.h"
 
+#include "linear.h"
 #include "ri.h"
 #include "complexity_ri.h"
 #include "resources.h"
