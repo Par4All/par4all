@@ -300,6 +300,23 @@ bool db_resource_p(string rname, string oname)
     return db_resource_loaded_p(r) || db_resource_stored_p(r);
 }
 
+void db_check_time_of_all_resources(string rname, string oname)
+{
+  pips_debug(2, "checking time of all resources...");
+
+  DB_RESOURCES_MAP(os, or,
+  {
+    DB_OWNED_RESOURCES_MAP(rs, r,
+    {
+      string rn = db_symbol_name(rs);
+      string on = db_symbol_name(os);
+      db_time_of_resource(rn, on);
+    },
+			   or);
+  },
+		   get_pips_database());
+}
+
 int db_time_of_resource(string rname, string oname)
 {
     db_resource r = get_db_resource(rname, oname);
