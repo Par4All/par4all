@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.6  1998/07/03 08:51:26  coelho
+# use .class files for dependences.
+#
 # Revision 1.5  1998/07/03 08:28:32  coelho
 # mode fixed for java classes.
 #
@@ -68,19 +71,20 @@ JJAR	=	jpips.jar
 INSTALL_SHR =	$(MENUS) $(GIF) $(JZIP)
 
 #
+# default rule
+all: $(pkg_dir) $(JZIP)
+
+#
 # compilation and related stuff
 
-d	=	JAVA
-$(d):;	mkdir $(d)
+package	=	JPips
+d	=	$(pkg_dir)/$(package)
+
 $(pkg_dir):; mkdir $(pkg_dir)
 
-all: $(d) $(pkg_dir) $(JZIP)
-
-OJ_FILES=	$(addprefix $(d)/, $(J_FILES:.java=))
+OJ_FILES=	$(addprefix $(d)/, $(J_FILES:.java=.class))
 
 # local stuff
-
-package	=	JPips
 
 swing	=	/usr/local/swing/swingall.jar
 jdk	=	$(jdk_lib)/classes.zip
@@ -102,9 +106,8 @@ JDOC	=	$(jdk_bin)/javadoc
 JDFLAGS	=	-author -d $(doc_dir)
 
 # default rule for compiling java files.
-$(d)/%: %.java
+$(d)/%.class: %.java
 	$(JENV) $(JAVAC) $(JCFLAGS) $< \
-		&& touch $@ \
 		&& chmod ug+rw $(pkg_dir)/$(package)/$**
 
 .doc:
@@ -129,37 +132,82 @@ jrun: $(JJAR)
 	CLASSPATH=$(JJAR) $(JAVA) $(JFLAGS) $(package).JPips
 
 clean:local-clean
-local-clean:; $(RM) $(OJ_FILES) $(JJAR) $(JZIP); $(RM) -rf $(pkg_dir) $(d)
+local-clean:; $(RM) $(OJ_FILES) $(JJAR) $(JZIP); $(RM) -rf $(pkg_dir)
 
 #
 # java module dependencies (set manually)
 #
 
-$(d)/Activatable:
-$(d)/Stateable:
-$(d)/Resetable:
-$(d)/Requestable:
-$(d)/StreamObserver:
+$(d)/Activatable.class:
+$(d)/Stateable.class:
+$(d)/Resetable.class:
+$(d)/Requestable.class:
+$(d)/StreamObserver.class:
 
-$(d)/ObservableStream: $(d)/StreamObserver
-$(d)/Console: $(d)/ObservableStream $(d)/StreamObserver
+$(d)/ObservableStream.class: \
+	$(d)/StreamObserver.class
 
-$(d)/Pawt: $(d)/Activatable
-$(d)/JPipsComponent: $(d)/Activatable $(d)/Pawt $(d)/Stateable
-$(d)/Displayer: $(d)/JPipsComponent
-$(d)/TextDisplayer: $(d)/Pawt $(d)/Displayer 
+$(d)/Console.class: \
+	$(d)/ObservableStream.class \
+	$(d)/StreamObserver.class
 
-$(d)/Listener: $(d)/Requestable
-$(d)/Watcher: $(d)/Requestable
-$(d)/TPips: $(d)/Listener $(d)/Watcher $(d)/Stateable $(d)/Requestable
+$(d)/Pawt.class: \
+	$(d)/Activatable.class
 
-$(d)/Option: $(d)/TPips $(d)/Stateable
-$(d)/Parser: $(d)/Option
-$(d)/OptionParser: $(d)/Parser $(d)/Option
+$(d)/JPipsComponent.class: \
+	$(d)/Activatable.class \
+	$(d)/Pawt.class \
+	$(d)/Stateable.class
 
-$(d)/DirectoryManager: $(d)/TPips $(d)/Pawt $(d)/JPipsComponent
-$(d)/ModuleManager: $(d)/TPips $(d)/Pawt $(d)/JPipsComponent
-$(d)/WorkspaceManager: $(d)/TPips $(d)/Pawt $(d)/JPipsComponent
+$(d)/Displayer.class: \
+	$(d)/JPipsComponent.class
 
-$(d)/JPips: $(d)/DirectoryManager $(d)/ModuleManager $(d)/WorkspaceManager \
-		$(d)/TPips $(d)/TextDisplayer $(d)/OptionParser
+$(d)/TextDisplayer.class: \
+	$(d)/Pawt.class \
+	$(d)/Displayer.class 
+
+$(d)/Listener.class: \
+	$(d)/Requestable.class
+
+$(d)/Watcher.class: \
+	$(d)/Requestable.class
+
+$(d)/TPips.class: \
+	$(d)/Listener.class \
+	$(d)/Watcher.class \
+	$(d)/Stateable.class \
+	$(d)/Requestable.class
+
+$(d)/Option.class: \
+	$(d)/TPips.class \
+	$(d)/Stateable.class
+
+$(d)/Parser.class: \
+	$(d)/Option.class
+
+$(d)/OptionParser.class: \
+	$(d)/Parser.class \
+	$(d)/Option.class
+
+$(d)/DirectoryManager.class: \
+	$(d)/TPips.class \
+	$(d)/Pawt.class \
+	$(d)/JPipsComponent.class
+
+$(d)/ModuleManager.class: \
+	$(d)/TPips.class \
+	$(d)/Pawt.class \
+	$(d)/JPipsComponent.class
+
+$(d)/WorkspaceManager.class: \
+	$(d)/TPips.class \
+	$(d)/Pawt.class \
+	$(d)/JPipsComponent.class
+
+$(d)/JPips.class: \
+	$(d)/DirectoryManager.class \
+	$(d)/ModuleManager.class \
+	$(d)/WorkspaceManager.class \
+	$(d)/TPips.class \
+	$(d)/TextDisplayer.class \
+	$(d)/OptionParser.class
