@@ -2,6 +2,9 @@
 %% $Id$
 %% 
 %% $Log: pipsdbm_private.tex,v $
+%% Revision 1.4  2003/06/16 14:52:42  coelho
+%% db_void
+%%
 %% Revision 1.3  2003/06/16 14:19:35  coelho
 %% loaded_and_stored status added.
 %%
@@ -42,6 +45,7 @@ a while, it was decided that \texttt{pipsdbm} should know about this
 subclassification of resources, and this is finally reflected by the
 data structures.
 
+\domain{external db_void}
 
 \subsection{Named objects}
 \label{sec:named}
@@ -65,7 +69,7 @@ resource?), or being required by pipsmake but not yet produced.
 
 \domain{db_status = loaded:unit + stored:unit + required:unit + loaded_and_stored:unit}
 
-\domain{db_resource = pointer:string x db_status x time:int x file_time:int}
+\domain{db_resource = pointer:db_void x db_status x time:int x file_time:int}
 
 
 \subsection{Resource mappings}
