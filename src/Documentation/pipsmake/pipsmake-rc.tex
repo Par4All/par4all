@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.23  2003/10/09 07:22:54  nguyen
+%% Remove c_parser_tmp and add more comments
+%%
 %% Revision 1.22  2003/08/12 15:49:45  irigoin
 %% compilation unit concept added
 %%
@@ -548,7 +551,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/08/12 15:49:45 $~$
+$~$Date: 2003/10/09 07:22:54 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1181,7 +1184,9 @@ compilation_unit_parser         > COMPILATION_UNIT.declarations
         < COMPILATION_UNIT.c_source_file
 \end{verbatim}
 
-This draft parser is used to parse C code.  
+DECLARATIONS is a special resource to impose that each compilation unit
+must be parsed before its functions. It is in fact a hash table 
+containing C keywords and typedef names in each compilation unit.  
 
 \begin{verbatim}
 c_parser                        > MODULE.parsed_code
@@ -1189,14 +1194,6 @@ c_parser                        > MODULE.parsed_code
         < PROGRAM.entities
         < MODULE.c_source_file
         < COMPILATION_UNIT.declarations
-\end{verbatim}
-
-To allow Nga and Francois to debug their parts (quite) independently:
-\begin{verbatim}
-c_parser_tmp                        > MODULE.parsed_code
-                                > MODULE.callees
-        < PROGRAM.entities
-        < MODULE.source_file
 \end{verbatim}
 
 \subsection{Controlized Code}
