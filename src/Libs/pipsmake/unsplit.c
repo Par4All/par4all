@@ -7,6 +7,9 @@
  * generated, they should also be stored there. 
  * 
  * $Log: unsplit.c,v $
+ * Revision 1.4  1997/10/27 09:52:00  coelho
+ * basename moved to misc.
+ *
  * Revision 1.3  1997/10/21 05:24:11  coelho
  * unsplit seems ok.
  *
@@ -30,26 +33,6 @@
 /* initial user file -> generated user file
  */
 static hash_table user_files = hash_table_undefined;
-
-string 
-basename(string fullpath, string suffix)
-{
-    int len = strlen(fullpath)-1, i, j;
-    string result;
-    if (suffix) /* drop the suffix */
-    {
-	int ls = strlen(suffix)-1, le = len;
-	while (suffix[ls]==fullpath[le] && ls>=0 && le>=0) ls--, le--;
-	if (ls<0) /* ok */ len=le;
-    }
-    for (i=len; i>=0; i--) if (fullpath[i]=='/') break;
-    /* fullpath[i+1:len] */
-    result = (char*) malloc(sizeof(char)*(len-i));
-    for (i++, j=0; i<=len; i++, j++) 
-	result[j] = fullpath[i];
-    result[j++] = '\0';
-    return result;
-}
 
 /* returns the new user file where to store user_file
  */
