@@ -83,9 +83,12 @@ static control make_exit_from_whileloop ()
  * Build and return a new control containing body statement
  * of the unstructured whileloop 
  */
-static control make_body_from_whileloop (whileloop the_whileloop)
+static control make_body_from_whileloop (whileloop the_whileloop, 
+					 string module_name)
 {
-  return make_control (whileloop_body(the_whileloop), NIL, NIL);
+  return make_control 
+    (spaghettify_statement(whileloop_body(the_whileloop),
+			   module_name), NIL, NIL);
 }
 
 /**
@@ -97,16 +100,17 @@ static unstructured make_unstructured_from_whileloop (whileloop the_whileloop,
 						      string module_name) 
 {
   control condition = make_condition_from_whileloop (the_whileloop,stat);
-  control exit = make_exit_from_whileloop ();
-  control body = make_body_from_whileloop (the_whileloop);
+  control exit = make_exit_from_whileloop();
+  control body = make_body_from_whileloop(the_whileloop,module_name);
   
-  link_2_control_nodes (condition, body); /* true condition, we go to body */
+  /* The first connexion is the FALSE one */
   link_2_control_nodes (condition, exit); /* false condition, we exit from whileloop */
+  link_2_control_nodes (condition, body); /* true condition, we go to body */
   link_2_control_nodes (body, condition); /* after body, we go back to condition */
   
   return make_unstructured (condition, exit);
 }
-
+ 
 /* 
  * This function takes the statement stat as parameter and return a new 
  * spaghettized statement, asserting stat is a WHILELOOP statement
