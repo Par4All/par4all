@@ -486,7 +486,7 @@ void init_cost_table()
 	    file_factor = 1.0;
 	}
 	else {
-	    int ii = ((int) comma) - ((int) token);
+	    int ii = comma - token;
 	    strncpy(tmp, token, ii);
 	    *(tmp + ii) = '\0';
 	    sscanf(++comma, "%f", &file_factor);
