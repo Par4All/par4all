@@ -651,7 +651,7 @@ gen_list_patch(list l,
 
 /* Element ranks are strictly positive as for first, second, and so on. If
    item is not in l, 0 is returned. */
-static int gen_position(void * item, list l)
+int gen_position(void * item, list l)
 {
   list c_item = list_undefined;
   int rank = 0;
