@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.32  2004/02/20 13:56:01  nguyen
+ * Print EXTERN
+ *
  * Revision 1.31  2004/02/19 14:04:17  nguyen
  * Prettyprint qualifiers + abstract type
  *
@@ -129,7 +132,7 @@
 /*===================== Variables and Function prototypes for C ===========*/
 
 extern bool is_fortran;
-text c_text_entity(entity e, int margin);
+text c_text_entity(entity module, entity e, int margin);
 list c_words_entity(type t, list name);
 static list words_qualifier(list obj);
 static list words_dimensions(list dims);
@@ -246,7 +249,7 @@ words_dimension(dimension obj)
 	    if (expression_integer_value(eup, &up))
 	      pc = CHAIN_IWORD(pc,up+1);
 	    else
-	      /* to be refined here to make more beautiful expression */
+	      /* to be refined here to make more beautiful expression, use normalize ? */
 	      pc = words_expression(MakeBinaryCall(CreateIntrinsic("+"),eup,int_to_expression(1)));
 	  }
       }
@@ -1901,7 +1904,6 @@ bool typedef_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
-
 /* This recursive function prints a C variable with its type. 
    It can be a simple variable declaration such as "int a"
    or complicated one such as "int (* forces[10])()" (an array of 
@@ -2034,22 +2036,19 @@ list c_words_entity(type t, list name)
   return NIL;
 }
 
-text c_text_entities(list ldecl, int margin)
+text c_text_entities(entity module, list ldecl, int margin)
 {
   text r = make_text(NIL);
   MAP(ENTITY,e,
   {
-    if (!intrinsic_entity_p(e))
-      {
-	text tmp = c_text_entity(e, margin);
-	MERGE_TEXTS(r,tmp);
-      }
+    text tmp = c_text_entity(module, e, margin);
+    MERGE_TEXTS(r,tmp);
   },ldecl);
   
   return r; 
 }
 
-text c_text_entity(entity e, int margin)
+text c_text_entity(entity module, entity e, int margin)
 {
   text r = make_text(NIL);
   string name = entity_user_name(e);
@@ -2058,7 +2057,7 @@ text c_text_entity(entity e, int margin)
   value val = entity_initial(e);
   list pc = NIL;
  
-  pips_debug(5,"Print declaration for entity: %s\n",name);
+  pips_debug(5,"Print declaration for entity %s in module %s\n",entity_name(e),entity_name(module));
 
   /* A declaration has two parts: declaration specifiers and declarator (even with initializer) 
      In declaration specifiers, we can have : 
@@ -2069,8 +2068,12 @@ text c_text_entity(entity e, int margin)
      - function specifiers : inline */
 
   /* This part is for storage specifiers */
+  if (extern_entity_p(module,e))
+    pc = CHAIN_SWORD(pc,"extern ");
+
   if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
     pc = CHAIN_SWORD(pc,"typedef ");
+ 
   if (storage_ram_p(s) && static_area_p(ram_section(storage_ram(s))))
     pc = CHAIN_SWORD(pc,"static ");
 
@@ -2083,7 +2086,7 @@ text c_text_entity(entity e, int margin)
   case is_type_struct:
     {
       list l = type_struct(t);
-      text fields = c_text_entities(l,margin+INDENTATION);
+      text fields = c_text_entities(module,l,margin+INDENTATION);
       pc = CHAIN_SWORD(pc,"struct ");
       pc = CHAIN_SWORD(pc,name);
       pc = CHAIN_SWORD(pc," {");
@@ -2096,7 +2099,7 @@ text c_text_entity(entity e, int margin)
   case is_type_union:
     {
       list l = type_union(t);
-      text fields = c_text_entities(l,margin+INDENTATION);
+      text fields = c_text_entities(module,l,margin+INDENTATION);
       pc = CHAIN_SWORD(pc,"union ");
       pc = CHAIN_SWORD(pc,name);
       pc = CHAIN_SWORD(pc," {");
@@ -2131,8 +2134,9 @@ text c_text_entity(entity e, int margin)
   case is_type_unknown:
     {
       pc = gen_nconc(pc,c_words_entity(t,CHAIN_SWORD(NIL,name)));
-      /* This part is for declarator initialization if there is*/
-      if (!value_undefined_p(val))
+      /* This part is for declarator initialization if there is. 
+	 If the entity is declared extern wrt current module, do not add this initialization*/
+      if (!extern_entity_p(module,e) && !value_undefined_p(val))
 	{
 	  if (value_expression_p(val))
 	    {
