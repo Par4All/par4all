@@ -236,6 +236,7 @@ char *mod_name;
 
     statement mod_stat;
     int i,j;
+    graph chains;
     string dg_name;
     entity module = local_name_to_top_level_entity(mod_name);
 
@@ -251,8 +252,15 @@ char *mod_name;
    
     initialize_ordering_to_statement(mod_stat);
 
-    dg = (graph)
+    chains = (graph)
 	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
+
+    ifdebug(1) {
+	gen_consistent_p (chains);
+    }
+    
+    dg = gen_copy_tree (chains);
+
     debug(8,"rice_dependence_graph","original graph\n");
     ifdebug(8) {  	
 	print_graph(stderr, mod_stat, dg);
