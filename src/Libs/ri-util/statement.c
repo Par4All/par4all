@@ -8,6 +8,11 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.65  2000/03/14 10:56:28  nguyen
+    Function : statement make_stop_statement(string message) added
+    	   void insert_statement(statement s1, statement s2, bool before) added
+    	   statement update_statement_instruction(statement s,instruction i) added
+
     Revision 1.64  1999/05/25 15:45:46  irigoin
     Error message improved in clear_label()
 
@@ -662,6 +667,26 @@ entity module;
 
 /* adds a RETURN statement to *ps if necessary
  */
+/*-------------------------------------------------------------------------------------------------
+
+  This function returns a stop statement with an error message
+
+-------------------------------------------------------------------------------------------------*/
+
+statement make_stop_statement(string message)
+{
+     list args=NIL; 
+     expression e;
+  
+     e = make_call_expression(MakeConstant(message,is_basic_string),NIL);
+       
+     args = CONS(EXPRESSION,e,NIL);
+
+     return make_call_statement(STOP_FUNCTION_NAME, args, entity_undefined, empty_comments);
+   
+}
+
+
 void
 insure_return_as_last_statement(
     entity module,
@@ -1960,5 +1985,105 @@ statement_to_line_number(statement s)
     stmt_to_line = persistant_statement_to_int_undefined;
     return s_to_l;
 }
+
+/*--------------------------------------------------------------------------------------------------- 
+
+ * NOT TESTED !!!
+ * insert statement s2 before or after statement s1
+ *
+ * If statement s2 is a sequence, simply insert s1 at the begining
+ * or at the end of the sequence.
+ *
+ * If not, create a new statement s3 with s1's fields and update
+ * s1 as a sequence with no comments and undefined number and ordering.
+ * The sequence is either "s2;s3" if "before" is TRUE or "s3;s2" else.
+ 
+--------------------------------------------------------------------------------------------------- */
+
+void insert_statement(statement s1, statement s2, bool before)
+{
+  list ls;
+  instruction i2 = statement_instruction(s2);
+  if (instruction_sequence_p(i2))
+    {
+      ls = instruction_block(i2);
+      if (before)	
+	ls = gen_nconc(ls,CONS(STATEMENT,s1,NIL));
+      else
+	ls = gen_nconc(CONS(STATEMENT,s1,NIL),ls);
+      sequence_statements(instruction_sequence(i2)) = ls;
+    }
+  else
+    {
+      statement s3 = copy_statement(s1);      
+      if (before)  
+	ls = CONS(STATEMENT,s2,CONS(STATEMENT,s3,NIL));
+      else
+	ls = CONS(STATEMENT,s3,CONS(STATEMENT,s2,NIL));	
+
+      s1 = update_statement_instruction(s1,make_instruction(is_instruction_sequence,make_sequence(ls)));
+    }
+ 
+}
+/*--------------------------------------------------------------------------------------------------- 
+
+ * Replace the instruction in statement s by instruction i.
+ *
+ * Free the old instruction. 
+ *
+ * If the new instruction is a sequence,
+ * add a CONTINUE to carry the label and/or the comments. The
+ * statement number and ordering are set to undefined.
+ *
+ * Else if the new instruction is not a sequence, the statement number
+ * and the ordering are also set to undefined because the connexion
+ * with the parsed line is lost and the ordering most likely obsolete.
+ * If the parsed statement number is still meaningfull, the caller must
+ * take care of it.
+ *
+ * If the initial instruction has been re-used, do not forget
+ * to dereference it before calling this function:
+ *
+ * statement_instruction(s) = instruction_undefined;
+ *
+ * Be careful with the label and the comments too: they may have
+ * been reused.
+
+
+--------------------------------------------------------------------------------------------------- */
+statement update_statement_instruction(statement s,instruction i)
+{
+  list seq = NIL;
+  statement cs = statement_undefined;
+
+
+  statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+  statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
+
+  if (instruction_sequence_p(i) && ((!statement_with_empty_comment_p(s)) || (!unlabelled_statement_p(s))))
+    {
+      cs = make_call_statement(CONTINUE_FUNCTION_NAME,
+			       NIL,
+			       statement_label(s), 
+			       statement_comments(s));
+	
+      statement_comments(s) = empty_comments;
+      statement_label(s)= entity_empty_label();
+      
+      /* add the CONTINUE statement before the sequence instruction i */
+      seq = CONS(STATEMENT, cs, CONS(STATEMENT,instruction_to_statement(i),NIL));
+      
+      free_instruction(statement_instruction(s));
+      statement_instruction(s) =  make_instruction(is_instruction_sequence,make_sequence(seq));
+    }
+    
+  else
+    {
+      free_instruction(statement_instruction(s));
+      statement_instruction(s) = i;
+    }
+  return s;
+}
+
 
 /* That's all folks */
