@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/10/06 21:45:10 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/10/09 17:14:19 $, )
  * version $Revision$
  */
  
@@ -344,6 +344,7 @@ bool hpfc_init(string name)
     set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
     set_bool_property("GLOBAL_EFFECTS_TRANSLATION", FALSE);
     set_bool_property("WARNING_ON_STAT_ERROR", FALSE); /* for my fake files */
+    set_bool_property("PRETTYPRINT_IO_EFFECTS", FALSE); /* no LUNS(*) ! */
 
     (void) make_empty_program(HPFC_PACKAGE);
 
