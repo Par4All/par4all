@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/05 21:31:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/22 11:29:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/02/05 21:31:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/07/22 11:29:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /*
@@ -41,34 +41,32 @@ text_unstructured(entity module,
     control cexit = unstructured_exit(u) ;
     control centry = unstructured_control(u) ;
 
-    debug(2, "text_unstructured", "Begin for unstructured %x\n",
-	  (unsigned int) u);
+    debug(2, "text_unstructured", "Begin for unstructured %p\n", u);
    
     ifdebug(3) {
 	list blocks = NIL;
-	fprintf(stderr,"Unstructured %x (%x, %x)\n", 
-		(unsigned int) u, (unsigned int) centry, (unsigned int) cexit ) ;
+	fprintf(stderr,"Unstructured %p (%p, %p)\n", u, centry, cexit) ;
 	CONTROL_MAP( n, {
 	    statement st = control_statement(n) ;
 
 	    /*
-	      fprintf(stderr, "\n%*sNode %x (%s)\n--\n", margin, "", 
+	      fprintf(stderr, "\n%*sNode %p (%s)\n--\n", margin, "", 
 	      (unsigned int) n, control_to_label_name(n, labels)) ;
 	      */
-	    fprintf(stderr, "\n%*sNode %x (%s)\n--\n", margin, "", 
-		    (unsigned int) n, statement_identification(st));
+	    fprintf(stderr, "\n%*sNode %p (%s)\n--\n", margin, "", 
+		    n, statement_identification(st));
 	    ifdebug(9)
 		print_text(stderr, text_statement(module,margin,st));
 	    fprintf(stderr, "--\n%*sPreds:", margin, "");
 	    MAPL(ps,{
 		int so = statement_ordering(control_statement(CONTROL(CAR(ps))));
-		fprintf(stderr,"%x (%d,%d), ", (unsigned int) CONTROL(CAR(ps)),
+		fprintf(stderr,"%p (%d,%d), ", CONTROL(CAR(ps)),
 			ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
 	    }, control_predecessors(n));
 	    fprintf(stderr, "\n%*sSuccs:", margin, "") ;
 	    MAPL(ss,{
 		int so = statement_ordering(control_statement(CONTROL(CAR(ss))));
-		fprintf(stderr,"%x (%d,%d), ", (unsigned int) CONTROL(CAR(ss)),
+		fprintf(stderr,"%p (%d,%d), ", CONTROL(CAR(ss)),
 			ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
 	    }, control_successors(n));
 	    fprintf(stderr, "\n\n") ;
@@ -133,8 +131,7 @@ text_unstructured(entity module,
 
     hash_table_free(labels) ;
 
-    debug(2, "text_unstructured", "End for unstructured %x\n",
-	  (unsigned int) u);
+    debug(2, "text_unstructured", "End for unstructured %p\n", u);
 
     return(r) ;
 }
