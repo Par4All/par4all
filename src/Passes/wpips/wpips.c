@@ -32,7 +32,7 @@ extern void(* pips_update_props_handler)();
 /* If we are in the Emacs mode, the log_frame is no longer really used: */
 Frame main_frame, 
     schoose_frame, 
-    mchoose_frame, 
+    mchoose_frame,
     log_frame, 
     edit_frame[MAX_NUMBER_OF_WPIPS_WINDOWS], 
     help_frame, 
@@ -48,20 +48,30 @@ Panel main_panel,
 
 
 
-void create_menus()
+void
+create_menus()
 {
     create_select_menu();
     create_edit_menu();
 /*    create_analyze_menu();*/
     create_transform_menu();
+    create_compile_menu();
     /* The option panel use the definition of the edit menu and so
        needs to be create after it: */
     create_options_menu_and_window();
-    create_help_menu();
+    /* Gone in create_menus_end():
+       create_help_menu(); */
     /* In the Emacs mode, no XView log window: */
     if (! wpips_emacs_mode)
        create_log_menu();
     create_quit_button();
+}
+
+
+void
+create_menus_end()
+{
+   create_help_menu();
 }
 
 
@@ -240,6 +250,8 @@ char *argv[];
 
    create_status_subwindow();
 
+   create_menus_end();
+
    create_icons();
    /*    create_icon();*/
 
@@ -256,6 +268,7 @@ char *argv[];
    disable_module_selection();
    disable_view_selection();
    disable_transform_selection();
+   disable_compile_selection();
    disable_option_selection();
    
    xv_main_loop(main_frame);
