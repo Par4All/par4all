@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/03/13 15:05:56 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/03/20 09:19:47 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -475,36 +475,22 @@ gen_chunk *obj ;
  *  was:  return( (n<=0) ? l : gen_nthcdr( n-1, CDR( l ))) ;
  *  if n>gen_length(l), NIL is returned.
  */
-list gen_nthcdr( n, l )
+list gen_nthcdr(n, l )
 int n ;
 list l ;
 {
-    list c;
     assert(n>=0);
-    for (c=l; !ENDP(c) && n>0; c=CDR(c), n--);
-    return(c);
+    for (; !ENDP(l) && n>0; l=CDR(l), n--);
+    return(l);
 }
 
-/*  why a gen_chunk ?
+/* to be used as ENTITY(gen_nth(3, l))...
  */
-gen_chunk gen_nth( n, l )
-int n ;
-list l ;
-{
-    static gen_chunk c ;
-
-    if( ENDP( l ) || n < 0 ) {
-	user( "gen_nth: incorrect arguments\n", "" ) ;
-	return( c ) ;
-    }
-    return( CAR( gen_nthcdr( n, l ))) ;
-}
-
-gen_chunk *gen_nthitem(n, l)
+gen_chunk gen_nth(n, l)
 int n;
 list l;
 {
-    return(CHUNK(CAR(gen_nthcdr(n, l))));
+    return(CAR(gen_nthcdr(n, l)));
 }
 
 /* Sorts a list of gen_chunks in place, to avoid mallocs. 
