@@ -228,7 +228,7 @@ safe_list_files_in_directory(int * pargc,
 {
    char complete_file_name[MAXNAMLEN + 1];
    list dir_list = NIL;
-   struct dirent * dirp;
+   DIR * dirp;
    struct dirent * dp;
    char * re_comp_message;
    
@@ -328,9 +328,11 @@ char *name;
     }
 }
 
-/* 
-returns the current working directory
+/* returns the current working directory
 */
+/* I couldn't find any header declaring getwd... FC.
+ */
+extern char * getwd(char *);
 char *get_cwd()
 {
     static char cwd[MAXPATHLEN];
