@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1997/01/27 15:31:29 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1997/04/10 16:31:54 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -110,10 +110,6 @@ PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
 # redefine this variable if you wish to change the default path or the name...
 # PIPS_MAKE='gmake'
 
-# libraries which are not part of Pips project
-# the readline library may be expected here for instance.
-# PIPS_EXTEDIR="${PIPS_DIR}/Externals"
-
 
 ############################################################ DEVELOPPING PIPS
 
@@ -169,7 +165,7 @@ X11_ROOT="$OPENWINHOME"
 # emacs to be used by epips. should be gnu emacs.
 # you may change the default by defining this variable
 # default: EPIPS_EMACS='emacs'
-EPIPS_EMACS='xemacs'
+EPIPS_EMACS='Emacs'
 #
 # emacs-lisp code for epips
 # you may change this default by defining this variable
@@ -248,6 +244,9 @@ TOOLPACK_DIR="$PIPS_HOME/Toolpack/toolpack1.2"
 #         ######  #    #     #    ######  #    #  #    #
 #
 
+
+# libraries which are not part of Pips project
+# the readline library may be expected here for instance.
 EXTERN_ROOT="$PIPS_DIR/Externals"
 
 PATH="${PATH}:${EXTERN_ROOT}/Share:${EXTERN_ROOT}/Bin:${EXTERN_ROOT}/Utils"
@@ -261,90 +260,6 @@ PATH="${PATH}:${EXTERN_ROOT}/Share:${EXTERN_ROOT}/Bin:${EXTERN_ROOT}/Utils"
 #          ####   ######  #####
 #
 # OBSOLETE variables
-
-# test `whoami` != coelho && {
-
-# LINEARDIR="${LINEAR_DIR}"
-# NEWGENDIR="${NEWGEN_DIR}"
-
-# empty string if make can be run in this environment
-# PIPS_CHECK_OS="`${PIPS_UTILDIR}/check_os`"
-# sources of libraries
-# PIPS_LIBSRCDIR="${PIPS_SRCDIR}/Libs"
-# sources of passes
-# PIPS_BINSRCDIR="${PIPS_SRCDIR}/Passes"
-# runtime sources
-# PIPS_RTSRCDIR="${PIPS_SRCDIR}/Runtimes"
-#
-# file name in which pips current program is stored (for batch version).
-# this is the default value assume. It can be overwritten by defining
-# this variable to some other value: PIPS_CURRENT_PROGRAM=".pipsprogram"
-#
-# Dynamic memory allocation (last item in PIPS_LIBS):
-#  - debug malloc for SUNOS: /usr/lib/debug/malloc.o
-#  - public domain debug malloc: -ldbmalloc
-#   (implies a special "malloc.h" in PIPS_EXTEDIR)
-# PIPS_PASSES='pips wpips tpips'
-#
-# can be added explicitely to LDopt if required (obsolete?)
-# PIPS_MALLOC='/usr/lib/debug/malloc.o'
-#
-# complexity cost tables directory
-# PIPS_COSTDIR="${PIPS_SHRDIR}/complexity"
-
-# NEWGEN_PRODDIR="${NEWGEN_DIR}/Production"
-# NEWGEN_DOCDIR="${NEWGEN_DIR}/Documentation"
-# NEWGEN_RELEASEDIR="${NEWGEN_DIR}/Release"
-
-# NEWGEN_INCLUDEDIR="${NEWGEN_PRODDIR}/Include"
-# NEWGEN_SHRDIR="${NEWGEN_PRODDIR}/Include"
-# NEWGEN_SRCDIR="${NEWGEN_PRODDIR}/Src"
-# NEWGEN_LIBDIR="${NEWGEN_PRODDIR}/Lib"
-# NEWGEN_BINDIR="${NEWGEN_PRODDIR}/Bin"
-
-# LINEAR_PRODDIR="${LINEAR_DIR}/Production"
-# LINEAR_DOCDIR="${LINEAR_DIR}/Documentation"
-# LINEAR_RELEASEDIR="${LINEAR_DIR}/Release"
-# LINEAR_INCLUDEDIR="${LINEAR_PRODDIR}/Include"
-# LINEAR_SHRDIR="${LINEAR_PRODDIR}/Include"
-# LINEAR_SRCDIR="${LINEAR_PRODDIR}/Src"
-# LINEAR_LIBDIR="${LINEAR_PRODDIR}/Lib"
-# LINEAR_BINDIR="${LINEAR_PRODDIR}/Bin"
-
-# PIPS
-#
-# current production version - sources and binaries
-# PIPS_PRODDIR="${PIPS_DIR}/Production"
-
-# scripts and files for running pips 
-# Pips and so...
-# various rc files... icons...
-# help...
-# hpfc scripts...
-# cost tables and so...
-# PIPS_SHRDIR="${PIPS_ROOT}/Share"
-
-# binaries
-# PIPS_BINDIR="${PIPS_ROOT}/Bin"
-
-# documentation
-# PIPS_DOCDIR="${PIPS_ROOT}/Doc"
-
-# headers
-# PIPS_INCLUDEDIR="${PIPS_ROOT}/Include"
-
-# libraries
-# PIPS_LIBDIR="${PIPS_ROOT}/Lib"
-
-# sources
-# PIPS_SRCDIR="${PIPS_ROOT}/Src"
-
-# where Public software sources are stored
-# PIPS_PUBLICDIR="${PIPS_SRCDIR}/Public"
-
-# PIPS_RUNTIMEDIR="${PIPS_ROOT}/Runtime"
-
-# }
 
 # that is all for $RCSfile: pipsrc.ref,v $
 #
