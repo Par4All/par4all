@@ -86,6 +86,8 @@ char *mod_name;
     MERGE_TEXTS(r, text_module(module, mod_stat));
     debug_off();
 
+    close_prettyprint();
+
     success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
 				  PARALLEL_FORTRAN_EXT, r);
 
