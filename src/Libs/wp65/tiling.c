@@ -39,7 +39,7 @@ int perfect_nested_level;
     Pvecteur pv;
     int vs = vect_size((Pvecteur)(base_index));
     Psysteme sc_proj;
-    int min,max;
+    Value min,max;
     boolean faisable;
     int i;
 
@@ -56,11 +56,11 @@ int perfect_nested_level;
     M = matrice_new(vs,vs);
     matrice_nulle(M,vs,vs); 
     for (i =1; i<= vs && i < first_parallel_level; i++)
-	ACCESS(M,vs,i,i) = 1;
+	ACCESS(M,vs,i,i) = VALUE_ONE;
     for (; i<= vs && i <= last_parallel_level; i++)
-	ACCESS(M,vs,i,i) = lsd;
+	ACCESS(M,vs,i,i) = int_to_value(lsd);
     for (i = MIN(perfect_nested_level+1,last_parallel_level+1); i<= vs; i++)
-	ACCESS(M,vs,i,i) = 999;
+	ACCESS(M,vs,i,i) = VALUE_CONST(999);
 
   
     /* build origin tile vector as the first iteration to minimize
@@ -72,7 +72,7 @@ int perfect_nested_level;
 	faisable =  sc_minmax_of_variable(sc_proj,var, &min, &max);
 	if (faisable) 
 	    /*	    vect_chg_coeff(&porigin,var,min);*/
-	    vect_chg_coeff(&porigin,var,1);
+	    vect_chg_coeff(&porigin,var,VALUE_ONE);
 	else
 	    pips_error("loop_nest_to_tile","illegal empty iteration domain\n");
 
