@@ -7,7 +7,7 @@
 
 #include "local.h"
 
-extern entity hpfc_new_variable(entity, tag);
+extern entity hpfc_new_variable(entity, basic);
 extern bool expression_constant_p(expression);
 
 static bool 
