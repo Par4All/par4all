@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/10/11 17:20:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/12/04 22:12:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1996/10/11 17:20:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1996/12/04 22:12:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -302,7 +302,10 @@ display_graph_with_daVinci(string file_name)
     if (wpips_emacs_mode) {
 	sprintf(a_buffer, "pips_graph2daVinci %s", file_name);
 	system(a_buffer);
-	ask_emacs_to_display_a_graph(file_name);
+	/* Since Emacs may be with another current directory, use the
+           full path name: */
+	ask_emacs_to_display_a_graph(concatenate(get_cwd(),
+						 "/", file_name, NULL));
     }
     else {
 	sprintf(a_buffer, "pips_graph2daVinci -launch_daVinci %s", file_name);
