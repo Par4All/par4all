@@ -220,11 +220,11 @@ int count;
  communication comm = dataflow_communication(df);
 
  if(count == 0)
-   fprintf(fp
+   fprintf(fp,
 	   " ---Def-Use---> ins_%d:\n  Reference: %s\n  Transformation: [",
 	   stmt, words_to_string(words_reference(ref)));
  else
-   fprintf(fp
+   fprintf(fp,
 	   " ---Def-Use---> ins_%d_%d:\n  Reference: %s\n  Transformation: [",
 	   stmt, count, words_to_string(words_reference(ref)));
 
