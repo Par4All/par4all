@@ -24,10 +24,16 @@
 #include "text-util.h"
 #include "icfg.h"
 
+text get_any_effect_type_text_flt(string module_name, string resource_name, entity e_flt)
+{
+  text txt;
+  txt = get_any_effects_text(module_name, TRUE);
+  return txt;
+}
+
 text get_text_proper_effects_flt(string module_name, entity e_flt)
 {
   text t;
-  set_is_user_view_p(FALSE);
   set_methods_for_rw_effects_prettyprint(module_name);
   t = get_any_effect_type_text(module_name, DBR_PROPER_EFFECTS, string_undefined, TRUE);
   reset_methods_for_effects_prettyprint(module_name);
