@@ -10,6 +10,9 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.49  2000/05/25 08:37:55  coelho
+  * no more successor when adding an eq of ineq.
+  *
   * Revision 1.48  1999/01/07 16:44:14  irigoin
   * Bug fix in user_call_to_transformer() to handle aliasing between two formal parameters. See spice02.f in Validation.
   *
@@ -331,6 +334,7 @@ loop_to_transformer(loop l, list e) /* effects of loop l */
 		    Pcontrainte neq;
 
 		    neq = eq->succ;
+		    eq->succ = NULL;
 		    sc_add_egalite(sc, eq);
 		    eq = neq;
 		}
@@ -340,6 +344,7 @@ loop_to_transformer(loop l, list e) /* effects of loop l */
 		    Pcontrainte neq;
 		    
 		    neq = eq->succ;
+		    eq->succ = NULL;
 		    sc_add_inegalite(sc, eq);
 		    eq = neq;
 		}
