@@ -1,5 +1,5 @@
 ! $RCSfile: xpomp_stubs.f,v $ (version $Revision$)
-! $Date: 1996/09/03 18:13:14 $, 
+! $Date: 1996/09/07 16:37:49 $, 
 !
 ! List of fake functions to have PIPS happy with 
 ! the same « effects » as the xPOMP graphical library.
@@ -10,7 +10,7 @@
 !
 !     Ronan.Keryell@cri.ensmp.fr
 !
-      subroutine xpomp_open_display(x, y, d)
+      subroutine xpompf open display(x, y, d)
       integer x, y, d
 !fcd$ io
 !fcd$ fake
@@ -18,21 +18,21 @@
       read *, d
       end
       
-      subroutine xpomp_close_display(d)
+      subroutine xpompf close display(d)
       integer d
 !fcd$ io
 !fcd$ fake
       print *, d
       end
       
-      subroutine xpomp_get_current_default_display(d)
+      subroutine xpompf get current default display(d)
       integer d
 !fcd$ io
 !fcd$ fake
       read *, d
       end
       
-      subroutine xpomp_set_current_default_display(d, r)
+      subroutine xpompf set current default display(d, r)
       integer d, r
 !fcd$ io
 !fcd$ fake
@@ -40,14 +40,14 @@
       read *, r
       end
       
-      subroutine xpomp_get_depth(d)
+      subroutine xpompf get depth(d)
       integer d
 !fcd$ io
 !fcd$ fake
       read *, d
       end
       
-      subroutine xpomp_set_color_map(screen,
+      subroutine xpompf set color map(screen,
      &     pal, cycle, start, clip, r)
       integer screen, pal, cycle, start, clip, r
 !fcd$ io
@@ -56,7 +56,7 @@
       read *, r
       end
       
-      subroutine xpomp_set_user_color_map(screen,
+      subroutine xpompf set user color map(screen,
      &     red, green, blue, r)
       integer screen
       character red(256), green(256), blue(256)
@@ -69,7 +69,7 @@
       read *, r
       end
 
-      subroutine xpomp_wait_mouse(screen, X, Y, state, r)
+      subroutine xpompf wait mouse(screen, X, Y, state, r)
       integer screen, X, Y, state, r
 !fcd$ io
 !fcd$ fake
@@ -77,7 +77,7 @@
       read *, X, Y, state, r
       end
 
-      subroutine xpomp_is_mouse(screen, X, Y, state, r)
+      subroutine xpompf is mouse(screen, X, Y, state, r)
       integer screen, X, Y, state, r
 !fcd$ io
 !fcd$ fake
@@ -85,84 +85,84 @@
       read *, X, Y, state, r
       end
       
-      subroutine xpomp_flash(window,
+      subroutine xpompf flash(window,
      &     image,
-     &     X_data_array_size, Y_data_array_size,
-     &     X_offset, Y_offset,
-     &     X_zoom_ratio, Y_zoom_ratio,
+     &     X data array size, Y data array size,
+     &     X offset, Y offset,
+     &     X zoom ratio, Y zoom ratio,
      &     status)
       integer window
-      integer X_data_array_size, Y_data_array_size
-      character image(X_data_array_size, Y_data_array_size)
-      integer X_offset, Y_offset
-      integer X_zoom_ratio, Y_zoom_ratio
+      integer X data array size, Y data array size
+      character image(X data array size, Y data array size)
+      integer X offset, Y offset
+      integer X zoom ratio, Y zoom ratio
       integer status, x, y
 !fcd$ io
 !fcd$ fake
-      print *, window, X_data_array_size, Y_data_array_size,
-     &     X_offset, Y_offset,
-     &     X_zoom_ratio, Y_zoom_ratio
-      do x = 1, X_data_array_size
-         do y = 1, Y_data_array_size
+      print *, window, X data array size, Y data array size,
+     &     X offset, Y offset,
+     &     X zoom ratio, Y zoom ratio
+      do x = 1, X data array size
+         do y = 1, Y data array size
             print *, image(x, y)
          enddo
       enddo
       read *, status
       end
 
-      subroutine xpomp_show_real4(screen, image,
-     &     X_data_array_size, Y_data_array_size,
-     &     X_offset, Y_offset,
-     &     X_zoom_ratio, Y_zoom_ratio,
-     &     min_value, max_value,
+      subroutine xpompf show real4(screen, image,
+     &     X data array size, Y data array size,
+     &     X offset, Y offset,
+     &     X zoom ratio, Y zoom ratio,
+     &     min value, max value,
      &     status)
       integer screen
-      integer X_data_array_size, Y_data_array_size
-      real*4 image(X_data_array_size, Y_data_array_size)
-      integer X_offset, Y_offset
-      integer X_zoom_ratio, Y_zoom_ratio
-      real*8 min_value, max_value
+      integer X data array size, Y data array size
+      real*4 image(X data array size, Y data array size)
+      integer X offset, Y offset
+      integer X zoom ratio, Y zoom ratio
+      real*8 min value, max value
       integer status, x, y
 !fcd$ io
 !fcd$ fake
-      print *, screen, X_data_array_size, Y_data_array_size,
-     &     X_offset, Y_offset,
-     &     X_zoom_ratio, Y_zoom_ratio
-      do x = 1, X_data_array_size
-         do y = 1, Y_data_array_size
+      print *, screen, X data array size, Y data array size,
+     &     X offset, Y offset,
+     &     X zoom ratio, Y zoom ratio
+      do x = 1, X data array size
+         do y = 1, Y data array size
             print *, image(x, y)
          enddo
       enddo
       read *, status
       end
 
-      subroutine xpomp_show_real8(screen, image,
-     &     X_data_array_size, Y_data_array_size,
-     &     X_offset, Y_offset,
-     &     X_zoom_ratio, Y_zoom_ratio,
-     &     min_value, max_value,
+      subroutine xpompf show real8(screen, image,
+     &     X data array size, Y data array size,
+     &     X offset, Y offset,
+     &     X zoom ratio, Y zoom ratio,
+     &     min value, max value,
      &     status)
       integer screen
-      integer X_data_array_size, Y_data_array_size
-      real*8 image(X_data_array_size, Y_data_array_size)
-      integer X_offset, Y_offset
-      integer X_zoom_ratio, Y_zoom_ratio
-      real*8 min_value, max_value
+      integer X data array size, Y data array size
+      real*8 image(X data array size, Y data array size)
+      integer X offset, Y offset
+      integer X zoom ratio, Y zoom ratio
+      real*8 min value, max value
       integer status, x, y
 !fcd$ io
 !fcd$ fake
-      print *, screen, X_data_array_size, Y_data_array_size,
-     &     X_offset, Y_offset,
-     &     X_zoom_ratio, Y_zoom_ratio
-      do x = 1, X_data_array_size
-         do y = 1, Y_data_array_size
+      print *, screen, X data array size, Y data array size,
+     &     X offset, Y offset,
+     &     X zoom ratio, Y zoom ratio
+      do x = 1, X data array size
+         do y = 1, Y data array size
             print *, image(x, y)
          enddo
       enddo
       read *, status
       end
       
-      subroutine xpomp_scroll(window, y, result)
+      subroutine xpompf scroll(window, y, result)
       integer window, y, result
 !fcd$ io
 !fcd$ fake
@@ -170,27 +170,27 @@
       read *, result
       end
       
-      subroutine xpomp_draw_frame(window,
+      subroutine xpompf draw frame(window,
      &     title,
-     &     title_color, background_color,
+     &     title color, background color,
      &     X0, Y0, X1, Y1,
      &     color,
      &     status)
       integer window
       character*(*) title
-      integer title_color, background_color
+      integer title color, background color
       integer X0, Y0, X1, Y1
       integer color
       integer status
 !fcd$ io
 !fcd$ fake
-      print *, window, title, title_color, background_color,
-     &     X_data_array_size, Y_data_array_size,
+      print *, window, title, title color, background color,
+     &     X data array size, Y data array size,
      &     X0, Y0, X1, Y1, color
       read *, status
       end
       
-      subroutine xpomp_show_usage()
+      subroutine xpompf show usage()
 !fcd$ io
 !fcd$ fake
       print *, 'Some help...'
