@@ -115,6 +115,9 @@
 /* Resource for alias analysis */
 { DBR_ALIAS_ASSOCIATIONS,       NEWGEN_METHODS },
 
+/* Resource for used before set analysis */
+{ DBR_UBS,                      NEWGEN_METHODS },
+
 /* COMPLEXITY
  */
 { DBR_COMPLEXITIES,		STATEMENT_MAPPING_METHODS },
