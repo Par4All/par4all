@@ -1018,6 +1018,32 @@ string l;
     PushBlock(instblock_do, l);
 }
 
+/* This function creates a while do loop statement.
+ *
+ * c is the loop condition
+ * l is the label of the last statement of the loop.
+ */
+
+void 
+MakeWhileDoInst(expression c, string l)
+{
+    instruction iwdo, instblock_do;
+    statement stmt_do;
+    entity dolab;
+
+    dolab = MakeLabel((strcmp(l, "BLOCKDO") == 0) ? "" : l);
+
+    instblock_do = MakeEmptyInstructionBlock();
+    stmt_do = instruction_to_statement(instblock_do);
+
+    iwdo = make_instruction(is_instruction_whileloop,
+			   make_whileloop(c, stmt_do, dolab));
+
+    LinkInstToCurrentBlock(iwdo, TRUE);
+   
+    PushBlock(instblock_do, l);
+}
+
 /* this function creates a logical if statement. the true part of the
  * test is a block with only one instruction (i), and the false part is an
  * empty block.  
