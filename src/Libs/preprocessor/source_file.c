@@ -526,9 +526,10 @@ filter_file(string mod_name)
 
 /******************************************************************** SPLIT */
 
-static bool zzz_file_p(string s) /* zzz???.f */
-{ return strlen(s)==8 && s[0]=='z' && s[1]=='z' && s[2]=='z' &&
-      s[6]=='.' && s[7]=='f'; }
+static bool zzz_file_p(string s) /* .../zzz???.f */
+{ int len = strlen(s)-1;
+  return len>=8 && s[len-8]=='/' && s[len-7]=='z' && s[len-6]=='z' && 
+      s[len-5]=='z' && s[len-1]=='.' && s[len]=='f'; }
 static int cmp(const void * x1, const void * x2)
 { return strcmp(*(char**)x1, *(char**)x2);}
 static void sort_file(string name)
@@ -666,13 +667,30 @@ check_fortran_syntax_before_pips(
 #define MAXNAMLEN (1024)
 #endif
 
+/* (./foo.database/)name.f -> NAME
+ * rather ugly. C lacks some substring manipulation functions...
+ */
+static string
+extract_module_name(string file_name)
+{
+    string tmp, module, saved=NULL;
+    for (tmp = file_name + strlen(file_name) - 1; tmp>file_name; tmp--)
+	if (*tmp=='.') { saved=tmp; *tmp='\0'; break; }
+    while (*--tmp!='/' && tmp>=file_name);
+    tmp++;
+    module = strdup(tmp);
+    if (saved) *saved='.';
+    (void) strupper(module, module);
+    return module;
+}
+
 bool 
 process_user_file(string file)
 {
     FILE *fd;
     bool success_p = FALSE, cpp_processed_p;
-    string initial_file, nfile, name, file_list;
-    string dir_name = db_get_current_workspace_directory();
+    string initial_file, nfile, file_name, file_list,
+	dir_name = db_get_current_workspace_directory();
 
     static int number_of_files = 0;
     static int number_of_modules = 0;
@@ -684,19 +702,24 @@ process_user_file(string file)
      */
     nfile = find_file_in_directories(file, getenv("PIPS_SRCPATH"));
 
-    if (!nfile) {
+    if (!nfile)
+    {
 	pips_user_warning("Cannot open file : %s\n", file);
 	return FALSE;
     }
 
     initial_file = nfile;
 
-    /* Fortran compiler.
+    /* the new file is registered (well, not really...) in the database.
+     */
+    user_log("Registering file %s\n", file);
+
+    /* Fortran compiler if required.
      */
     if (pips_check_fortran()) 
 	check_fortran_syntax_before_pips(nfile);
 
-    /* CPP
+    /* CPP if necessary.
      */
     cpp_processed_p = dot_F_file_p(nfile);
 
@@ -706,61 +729,49 @@ process_user_file(string file)
 	nfile = process_thru_cpp(initial_file);
     }
 
-    /* the new file is registered in the database
-     * and splitted...
-     */
-    user_log("Registering file %s\n", file);
-    user_log("Splitting file    %s\n", nfile);
-
     /* if two modules have the same name, the first splitted wins
-       and the other one is hidden by the call to "sed" since
-       fsplit gives it a zzz00n.f name */
-    /* Let's hope no user module is called zzz???.f */
+     * and the other one is hidden by the call since fsplit gives 
+     * it a zzz00n.f name 
+     * Let's hope no user module is called zzz???.f 
+     */
     file_list = strdup(concatenate(dir_name, "/.fsplit_file_list", 0));
     unlink(file_list);
 
+    user_log("Splitting file    %s\n", nfile);
     if (pips_split_file(nfile, file_list))
 	return FALSE;
 
     /* the newly created module files are registered in the database */
     fd = safe_fopen(file_list, "r");
-    while ((name=safe_readline(fd))) 
+    while ((file_name=safe_readline(fd))) 
     {
-	string mod_name, file_name, res_name;
-
-	number_of_modules++;
-	pips_debug(2, "module %s (number %d)\n", name, number_of_modules);
+	string mod_name, res_name, abs_res, abs_file;
 
 	success_p = TRUE;
-	file_name = strdup(name);
+	number_of_modules++;
+	pips_debug(2, "module %s (number %d)\n", file_name, number_of_modules);
 
-	*strchr(name, '.') = '\0'; /* there MUST be one one dot... */
-	mod_name = strdup(name);
-	(void) strupper(mod_name, mod_name);
-	free(name);
-
+	mod_name = extract_module_name(file_name);
 	user_log("  Module         %s\n", mod_name);
 
 	res_name = db_build_file_resource_name
 	    (DBR_INITIAL_FILE, mod_name, ".f_initial");
 
+	abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
+	abs_file = strdup(concatenate(dir_name, "/", file_name, 0));
+	
+	if (rename(abs_file, abs_res))
 	{
-	    string abs_res;
-	    abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
-
-	    if (rename(file_name, abs_res)) {
-		perror("process_user_file");
-		pips_internal_error("mv %s %s failed\n", 
-				    file_name, res_name);
-	    }
-
-	    DB_PUT_NEW_FILE_RESOURCE(DBR_INITIAL_FILE, mod_name, res_name);
-	    /* from which file the initial source was derived.
-	     * absolute path to the file so that db moves should be ok...
-	     */
-	    DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
-	    free(file_name); free(abs_res);
+	    perror("process_user_file");
+	    pips_internal_error("mv %s %s failed\n", file_name, res_name);
 	}
+	
+	DB_PUT_NEW_FILE_RESOURCE(DBR_INITIAL_FILE, mod_name, res_name);
+	/* from which file the initial source was derived.
+	 * absolute path to the file so that db moves should be ok?
+	 */
+	DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
+	free(file_name); free(abs_res); free(abs_file); free(mod_name);
     }
     safe_fclose(fd, file_list);
     unlink(file_list); 
@@ -768,11 +779,11 @@ process_user_file(string file)
     free(dir_name);
 
     if (cpp_processed_p)
-	free(initial_file);
+	free(initial_file); /* hey, that's cleaning! */
 
     if(!success_p)
 	pips_user_warning("No module was found when splitting file %s.\n",
 			  nfile);
     free(nfile);
-    return success_p;
+    return success_p; /* FALSE if no module was found. */
 }
