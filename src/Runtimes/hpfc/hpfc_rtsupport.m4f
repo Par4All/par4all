@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/05/29 13:40:45 $, )
+! ($Date: 1997/05/29 15:46:49 $, )
 !
 !-----------------
 !
@@ -749,8 +749,11 @@ _CM5(
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
+      print *,"hpfc receive from sender", SLID
       call HPFC RECEIVE(SENDERTID, RECVCHANNELS(SLID), bufid)
+      print *,"HPFC RCVFR S - Unpack data"
       call HPFC UNPACK(what, goal, 1, 1, info)
+      print *,"data unpacked"
       RECVCHANNELS(SLID) = RECVCHANNELS(SLID) + 2
       end
 !
@@ -1207,26 +1210,25 @@ _direct(`'
       include "hpfc_commons.h"
       integer bufid, info
       character*64 node key
-
+      
       debug(print *, "[HPFC INIT HOST] in ", MY LID)
-
+      
       MYLID = 0
       HOSTTID = MYTID
-
+      
       _direct(call HPFC DIRECTROUTE IF POSSIBLE)
 
       _spawn(
       if (.not. SPAWN PERFORMED) then
-       debug(print *, "[HPFC INIT HOST] spawning ", NB OF TASKS, 
-     $      " ", NODE PROGRAM NAME)
+       debug(print *,"[HPFCINITHOST] spawning",NB OF TASKS," ", NODE PROGRAM NAME)
 
-         call pvmfspawn(
-     $        NODE PROGRAM NAME, 
-     $        PVM ARCH, 
-     $        NODE ARCHITECTURE, 
-     $        NB OF TASKS, 
-     $        NODE TIDS, 
-     $        info)
+       call pvmfspawn(
+     $      NODE PROGRAM NAME, 
+     $      PVM ARCH, 
+     $      NODE ARCHITECTURE, 
+     $      NB OF TASKS, 
+     $      NODE TIDS, 
+     $      info)
 
          if (info.lt.0) then
             call HPFC PRINT ERROR MSG("initial spawning", info)
