@@ -1,13 +1,13 @@
-c
-c everything about packing
-c
-c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1996/09/07 16:56:19 $, )
-c version $Revision$
-c got on %D%, %T%
-c $Id$
-c
-c macros for code generation
-c
+!
+! everything about packing
+!
+! $RCSfile: hpfc_packing.m4f,v $ ($Date: 1996/10/17 13:49:14 $, )
+! version $Revision$
+! got on %D%, %T%
+! $Id$
+!
+! macros for code generation
+!
 define(`LIST_DECL_BOUNDS',`
      $ dl$1, du$1')dnl
 define(`LIST_SECTION',`
@@ -24,9 +24,9 @@ pushdef(`PVMFUNCTION',$2)dnl
 pushdef(`NAME',$3)dnl
 pushdef(`PVMTYPE',$4)dnl
 pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
-c
-c Packing LEVEL dimensional array
-c
+!
+! Packing LEVEL dimensional array
+!
       subroutine build_name(HPFC,NAME,PVMTYPE,LEVEL)(
      $     array, dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
@@ -50,37 +50,31 @@ REVERSE_BUT_LAST_REPLICATE(LEVEL, `DO_LOOP')
      $         nitem, ri1, info)  dnl
 SIMPLE_REPLICATE(eval(LEVEL - 1), `ENDDO_LOOP')
       end  
-c
+!
 popdef(`LEVEL')dnl
 popdef(`PVMFUNCTION')dnl
 popdef(`NAME')dnl
 popdef(`TYPE')dnl
-popdef(`PVMTYPE')dnl')dnl
-c
+popdef(`PVMTYPE')')dnl
+!
 define(ONE_PACKING,`
 GENERIC_PACKING($1,pvmfpack,PACK,$2)
 GENERIC_PACKING($1,pvmfunpack,UNPACK,$2)')dnl
 define(ALLPACK,`
-c ----------------------------------------
-c
-c Packing serie for pvmtype $1
-c
-ONE_PACKING(1,$1)
-ONE_PACKING(2,$1)
-ONE_PACKING(3,$1)
-ONE_PACKING(4,$1)
-dnl ONE_PACKING(5,$1)
-dnl ONE_PACKING(6,$1)
-dnl ONE_PACKING(7,$1)
-c')dnl
-c
-dnl ALLPACK(BYTE1)
-dnl ALLPACK(INTEGER2)
-ALLPACK(INTEGER4)
-ALLPACK(REAL4)
-ALLPACK(REAL8)
-dnl ALLPACK(COMPLEX8)
-dnl ALLPACK(COMPLEX16)
-c
-c that is all
-c
+! ----------------------------------------
+!
+! Packing serie for pvmtype $1
+!
+forloop(`_D_',1,_HPFC_DIMENSIONS_,`ONE_PACKING(_D_,$1)')
+!')dnl
+!
+ifdef(`_HPFC_NO_BYTE1_',,`ALLPACK(BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`ALLPACK(INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`ALLPACK(INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`ALLPACK(REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`ALLPACK(REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`ALLPACK(COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`ALLPACK(COMPLEX16)')
+!
+! that is all
+!
