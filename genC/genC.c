@@ -4,6 +4,13 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.36  1998/04/14 20:18:53  coelho
+ * more hacks and compatibility.
+ *
+ * Revision 1.35  1998/04/14 12:39:23  coelho
+ * typedef of externals added to generated .c.
+ * cast macro from gen_chunk fixed.
+ *
  * Revision 1.34  1998/04/11 13:14:16  coelho
  * cr added.
  *
@@ -391,7 +398,7 @@ static void generate_arrow(
 	    "extern %s apply_%s(%s, %s);\n"
 	    "extern void update_%s(%s, %s, %s);\n"
 	    "extern void extend_%s(%s, %s, %s);\n"
-	    "extern void delete_%s(%s, %s);\n"
+	    "extern %s delete_%s(%s, %s);\n"
 	    "extern bool bound_%s_p(%s, %s);\n",
 	    name, kname, /* key type */
 	    name, vname, /* val type */
@@ -399,7 +406,7 @@ static void generate_arrow(
 	    vname, name, name, kname, /* apply */
 	    name, name, kname, vname, /* update */
 	    name, name, kname, vname, /* extend */
-	    name, name, kname, /* delete */
+	    vname, name, name, kname, /* delete */
 	    name, name, kname /* bound_p */);
 
     fprintf(code, 
@@ -409,14 +416,14 @@ static void generate_arrow(
 	    "{ HASH_UPDATE(%c, %c, %s_hash_table(f), k, v); }\n"
 	    "void extend_%s(%s f, %s k, %s v)\n"
 	    "{ HASH_EXTEND(%c, %c, %s_hash_table(f), k, v); }\n"
-	    "void delete_%s(%s f, %s k)\n"
-	    "{ HASH_DELETE(%c, %c, %s_hash_table(f), k); }\n"
+	    "%s delete_%s(%s f, %s k)\n"
+	    "{ return (%s) HASH_DELETE(%c, %c, %s_hash_table(f), k); }\n"
 	    "bool bound_%s_p(%s f, %s k)\n"
 	    "{ return HASH_BOUND_P(%c, %c, %s_hash_table(f), k); }\n",
 	    vname, name, name, kname, vname, kc, vc, name, /* apply */
 	    name, name, kname, vname, kc, vc, name, /* update */
 	    name, name, kname, vname, kc, vc, name, /* extend */
-	    name, name, kname, kc, vc, name, /* delete */
+	    vname, name, name, kname, vname, kc, vc, name, /* delete */
 	    name, name, kname, kc, vc, name /* bound_p */);
 
     free(Name);
@@ -450,7 +457,9 @@ generate_safe_definition(
 	 * externals should really be global?
 	 */
 	fprintf(out, 
+		"#define newgen_%s(p) (p) /* old hack compatible */\n"
 		"#define %s_NEWGEN_EXTERNAL (_gen_%s_start+%d)\n",
+		name,
 		Name, file, index);
     else
 	fprintf(out, 
@@ -479,7 +488,7 @@ generate_domain(
 	 */
 	fprintf(header, 
 		"/* %s\n */\n"
-		"#define %s(x) ((%s)(x))\n"
+		"#define %s(x) ((%s)((x).p))\n"
 		"#define %s_TYPE %s\n"
 		"#define %s_undefined ((%s)gen_chunk_undefined)\n"
 		"#define %s_undefined_p(x) ((x)==%s_undefined)\n"
@@ -523,6 +532,15 @@ generate_domain(
 		name, name, /* free */
 		name, name, name, name, name, /* check */
 		name, name, name /* consistent */);
+
+	if (IS_TABULATED(bp))
+	{
+	    fprintf(header, "extern %s gen_find_%s(char *);\n", name, name);
+	    fprintf(code, 
+		    "%s gen_find_%s(char * s)\n"
+		    "{ return (%s) gen_find_tabulated(s, %s_domain); }\n",
+		    name, name, name, name);
+	}
     }
     
     switch (dp->ba.type) {
@@ -594,13 +612,24 @@ void gencode(string file)
 
     if (file==NULL) fatal("[gencode] no file name specified\n");
 
+    if (sizeof(void *)!=sizeof(gen_chunk))
+	fatal("[gencode] newgen fundamental layout hypothesis broken\n");
+
     /* header = fopen_suffix(file, ".h"); */
     header = stdout;
     code = fopen_suffix(file, ".c");
 
     fprintf(header, DONT_TOUCH);
-
     fprintf(code, DONT_TOUCH);
+
+    for (i=0; i<MAX_DOMAIN; i++)
+    {
+	struct gen_binding * bp = &Domains[i];
+	if (bp->name && !IS_INLINABLE(bp) && !IS_TAB(bp))
+	    if (IS_EXTERNAL(bp))
+		fprintf(code, "typedef void * %s;\n", bp->name);	
+    }
+
     fprintf(code, 
 	    "\n"
 	    "#include <stdio.h>\n"
