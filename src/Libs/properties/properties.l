@@ -122,16 +122,20 @@ bool property_equal_p(property p1, property p2)
 
 static void read_properties()
 {
+    string rc = PROPERTIES_LIB_FILE;
+
     if (pl != (hash_table) NULL)
 	return;
 
     pl = hash_table_make(hash_string, 0);
 
-    if ((yyin = fopen(PROPERTIES_LIB_FILE, "r")) == NULL) {
-	pips_error("read_properties", "no default properties\n");
+    if ((yyin = fopen(rc, "r")) == NULL) {
+	pips_internal_error("no default properties (%s)\n", rc);
     }
     else
 	parse_properties();
+
+    free(rc);
 
     if ((yyin = fopen(PROPERTIES_FILE, "r")) != NULL) {
 	parse_properties();
