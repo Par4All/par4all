@@ -5,10 +5,10 @@
 
    */
 
-/* 	%A% ($Date: 2004/01/23 13:32:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2004/02/16 15:24:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 2004/01/23 13:32:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_clean_up_sequences[] = "%A% ($Date: 2004/02/16 15:24:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -191,14 +191,15 @@ clean_up_sequences_rewrite(statement s)
 	    if(!(statement_with_empty_comment_p(s)
 		 && statement_number(s) == STATEMENT_NUMBER_UNDEFINED
 		 && unlabelled_statement_p(s))) {
-		user_log("Statement %s\n"
-			 "Number=%d, label=\"%s\", comment=\"%s\"\n",
-			 statement_identification(s),
-			 statement_number(s), label_local_name(statement_label(s)),
-			 statement_comments(s));
-		pips_error("text_statement", "This block statement should be labelless, numberless"
-	
-			   " and commentless.\n");
+	      print_statement(s);
+	      user_log("Statement %s\n"
+		       "Number=%d, label=\"%s\", comment=\"%s\"\n",
+		       statement_identification(s),
+		       statement_number(s), label_local_name(statement_label(s)),
+		       statement_comments(s));
+	      pips_error("text_statement", "This block statement should be labelless, numberless"
+			 
+			 " and commentless.\n");
 		}
 
 	    /*
