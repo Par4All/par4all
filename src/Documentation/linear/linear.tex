@@ -67,7 +67,7 @@ which is difficult.
 The dynamic behavior of programs is often controlled by integers, booleans
 and character strings. They all can be mapped on integers whereas linear
 algebra is mostly based on real and rational numbers. Linear algebra does
-not provide exact set operators very often. So different implementation of
+not provide exact set operators very often. So different implementations of
 a set operator by linear lagebra algorithms can be exact, over- or
 under-approximation and be compared for accuracy and speed.
 
@@ -561,6 +561,13 @@ A_1 = A \cap B_1 ~~~\wedge~~~ A_2 = A \cap B_2
 
 then $A$ and $A \cap (B_1 \vee B_2)$ are over-approximations of $A_1 \vee
 A_2$.
+
+\section{Implementation}
+
+Arithmetic overflows: should they generate exceptions, and memory leaks,
+or return codes, and less readable code?
+
+How do you decide which level in the library should cope with them?
 
 \section{Experiments}
 
