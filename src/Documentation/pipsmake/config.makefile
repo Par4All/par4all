@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/02 09:13:50 $, 
+# $Date: 1996/09/02 09:50:39 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -21,6 +21,8 @@ INSTALL_HTM=	pipsmake-rc
 DERIVED_FILES=	$(INSTALL_SHR) $(DERIVED_INC) $(INSTALL_DOC) $(INSTALL_HTM) \
 		pipsmake-rc.html
 
+AUTO =	$(PIPS_ROOT)/Include/auto
+
 all: $(DERIVED_FILES)
 
 pipsmake.rc: pipsmake-rc.tex
@@ -28,14 +30,14 @@ pipsmake.rc: pipsmake-rc.tex
 	# building pipsmake.rc
 	#
 	sed 's,	,    ,g;s/ *$$//;/^alias /d' $< | filter_verbatim | \
-		cat auto.h - > $@
+		cat $(AUTO).h - > $@
 
 wpips.rc: pipsmake-rc.tex
 	#
 	# buidling wpips.rc
 	#
-	sed 's/^[\/ ]\*\/*/--/' auto.h > $@
-	sed 's,	,    ,g;s/ *$$//;/^alias /!d' $< >> $@
+	{ cat $(AUTO)-dash.h ;\
+	  sed 's,	,    ,g;s/ *$$//;/^alias /!d' $< ; } > $@
 
 resources.h: pipsmake.rc
 	#
@@ -45,14 +47,14 @@ resources.h: pipsmake.rc
 	sed '/>/!d;s/^.*MODULE\.//;s/^.*PROGRAM\.//;\
 		s/^.*ALL\.//;s/^.*MAIN\.//;' | \
 	tr '[a-z]' '[A-Z]' | sort -u | sed 's/.*/#define DBR_& "&"/' | \
-	cat auto.h - > $@
+	cat $(AUTO).h - > $@
 
 phases.h: pipsmake.rc
 	#
 	# building phases.h
 	#
 	cpp $< | sed '/^[a-z]/!d;s/ .*//g;' | tr '[a-z]' '[A-Z]' | sort -u | \
-	sed 's/.*/#define BUILDER_& "&"/' | cat auto.h - > $@
+	sed 's/.*/#define BUILDER_& "&"/' | cat $(AUTO).h - > $@
 
 builder_map.h: pipsmake.rc
 	#
