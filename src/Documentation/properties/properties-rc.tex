@@ -1,18 +1,24 @@
-% PIPS Project
-%
-% $Id$
-%
-% Description des enchainements possibles des passes et analyses de PIPS
-% pour properties
-%
-% Derivation rules and aliases must be included in verbatim environments. 
-% Nothing else should appear in a verbatim environment.
-% 
-% Modifications
-
-%% \batchmode
-
-% \documentstyle[11pt,html]{article}
+%%
+%% PIPS Project
+%%
+%% $Id$
+%%
+%% Description des enchainements possibles des passes et analyses de PIPS
+%% pour properties
+%%
+%% Derivation rules and aliases must be included in verbatim environments. 
+%% Nothing else should appear in a verbatim environment.
+%% 
+%% Modifications
+%%
+%% $Log: properties-rc.tex,v $
+%% Revision 1.110  1997/11/21 12:28:59  coelho
+%% prettyprint of parallel loops is now managed thru only one property
+%% which describe the style to be used. typically do, doall, f90, hpf and
+%% so. I do this before adding the new omp (Open MP) style. The previous
+%% state was driven by a set of boolean properties.
+%%
+%%
 
 \documentclass[a4paper]{article}
 \usepackage{alltt,html,fancybox,amstext,xspace,psfig}
@@ -27,7 +33,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1997/10/31 10:09:16 $~$
+$~$Date: 1997/11/21 12:28:59 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1288,46 +1294,11 @@ PRETTYPRINT_STATEMENT_NUMBER TRUE
 \index{Fortran (Cray)}
 \index{Craft}
 
-Added for homogeneity reason; could be (easily) reduced to one?  In
-fact, with many target machines in mind, we should have an integer flag
-``architecture'', with two basic architectures, sequential and parallel.
-Useless values: re-initialized in the C code.
+How to print, from a syntactic point of view, a parallel do loop. Possible
+values are: \texttt{do doall f90 hpf cray craft cmf omp}. 
 
 \begin{verbatim}
-PRETTYPRINT_PARALLEL FALSE
-
-PRETTYPRINT_SEQUENTIAL TRUE
-\end{verbatim}
-
-Print parallel DO loops using FORTRAN 90 syntax. Useless value:
-re-initialized in the C code.
-
-\begin{verbatim}
-PRETTYPRINT_FORTRAN90 FALSE
-\end{verbatim}
-
-Print parallel DO loops with the HPF directives (independent and new).
-\begin{verbatim}
-PRETTYPRINT_HPF FALSE
-\end{verbatim}
-
-Adds Cray (FMP + CFT77) compatible directives for parallelization.
-Useless value: re-initialized in the C code.
-
-\begin{verbatim}
-PRETTYPRINT_CRAY FALSE
-\end{verbatim}
-
-Adds Connection Machine Fortran prettyprint.
-
-\begin{verbatim}
-PRETTYPRINT_CMFORTRAN FALSE
-\end{verbatim}
-
-Adds Cray-T3D CRAFT Fortran prettyprint.
-
-\begin{verbatim}
-PRETTYPRINT_CRAFT FALSE
+PRETTYPRINT_PARALLEL    "do"
 \end{verbatim}
 
 \subsubsection{Display Analysis Results}
