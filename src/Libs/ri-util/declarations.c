@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.31  2004/02/19 14:04:17  nguyen
+ * Prettyprint qualifiers + abstract type
+ *
  * Revision 1.30  2004/02/18 10:13:56  nguyen
  * Add c_words_entity to prettyprint C variables which can be recursive
  * (function of pointers to functions, array of pointers to functions, ...)
@@ -126,8 +129,8 @@
 /*===================== Variables and Function prototypes for C ===========*/
 
 extern bool is_fortran;
-static text c_text_entity(entity e, int margin);
-static list c_words_entity(type t, list name);
+text c_text_entity(entity e, int margin);
+list c_words_entity(type t, list name);
 static list words_qualifier(list obj);
 static list words_dimensions(list dims);
 
@@ -198,8 +201,9 @@ words_parameters(entity e)
 	    type t = parameter_type(p);
 	    /* param can be undefined for C language: void foo(void)
 	       We do not have an entity corresponding to the 1st argument */
-	    pips_user_warning("%dth parameter out of %d parameters not found for function %s\n",
-			      i, nparams, entity_name(e));
+	    if (is_fortran)
+	      pips_user_warning("%dth parameter out of %d parameters not found for function %s\n",
+				i, nparams, entity_name(e));
 	    pc = gen_nconc(pc,words_type(t));
 	  }
 	else 
@@ -1904,7 +1908,7 @@ bool typedef_type_p(type t)
    10 pointers, each pointer points to a function 
    with no parameter and the return type is int)  */
 
-static list c_words_entity(type t, list name)
+list c_words_entity(type t, list name)
 {
   list pc = NIL;
   if (type_functional_p(t))
@@ -1912,8 +1916,7 @@ static list c_words_entity(type t, list name)
       functional f = type_functional(t);
       type t2 = functional_result(f);
       list lparams = functional_parameters(f);
-      bool first = TRUE;   
-      list tmp = NIL;  
+      bool first = TRUE;  
 
       pips_debug(7,"Function type with name = %s and length %d\n", list_to_string(name), gen_length(name));
  
@@ -1921,15 +1924,15 @@ static list c_words_entity(type t, list name)
 	{
 	  /* Function name is an expression like *vfs[] in (*vfs[])() 
 	     (syntax = application), or an abstract function type, so parentheses must be added */
-	  tmp = CHAIN_SWORD(tmp,"(");
-	  tmp = gen_nconc(tmp,name);
-	  tmp = CHAIN_SWORD(tmp,")(");
+	  pc = CHAIN_SWORD(NIL,"(");
+	  pc = gen_nconc(pc,name);
+	  pc = CHAIN_SWORD(pc,")(");
 
 	}
       else 
 	{
 	  /* Function name is a simple reference */
-	  tmp = CHAIN_SWORD(name,"(");
+	  pc = CHAIN_SWORD(name,"(");
 	}
       
       MAP(PARAMETER,p,
@@ -1937,24 +1940,37 @@ static list c_words_entity(type t, list name)
 	type t1 = parameter_type(p);
 	pips_debug(3,"Parameter type %s\n ",words_to_string(words_type(t1)));
 	if (!first)
-	  tmp = gen_nconc(tmp,CHAIN_SWORD(NIL,","));
+	  pc = gen_nconc(pc,CHAIN_SWORD(NIL,","));
 	/* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
-	tmp = gen_nconc(tmp,c_words_entity(t1,NIL));
-	pips_debug(3,"List of parameters %s\n ",list_to_string(tmp));
+	pc = gen_nconc(pc,c_words_entity(t1,NIL));
+	pips_debug(3,"List of parameters %s\n ",list_to_string(pc));
 	first = FALSE;
       },lparams);
       
-      tmp = CHAIN_SWORD(tmp,")");
-      return c_words_entity(t2,tmp);
+      pc = CHAIN_SWORD(pc,")");
+      return c_words_entity(t2,pc);
     }
-  
+
+  if (pointer_type_p(t))
+    {
+      type t1 = basic_pointer(variable_basic(type_variable(t)));
+      pips_debug(7,"Pointer type with name = %s\n", list_to_string(name));
+
+      pc = CHAIN_SWORD(NIL,"*");
+      if (variable_qualifiers(type_variable(t)) != NIL)
+	pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
+      pc = gen_nconc(pc,name);
+      return c_words_entity(t1,pc);
+    }
+
   /* Add type qualifiers if there are */
   if (type_variable_p(t) && variable_qualifiers(type_variable(t)) != NIL)
-    pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
-  
+    pc = words_qualifier(variable_qualifiers(type_variable(t)));
+
   if (basic_type_p(t))
     {
       pips_debug(7,"Basic type with name = %s\n", list_to_string(name));
+ 
       pc = gen_nconc(pc,words_type(t));
       pc = gen_nconc(pc,name);
       if (bit_type_p(t))
@@ -1972,29 +1988,24 @@ static list c_words_entity(type t, list name)
       list tmp = NIL; 
       pips_debug(7,"Array type with name = %s\n", list_to_string(name));
 
-      if (gen_length(name) <= 1)
-	{
-	  /* Array name is a simple reference or empty (abstract array type) */
-	  tmp = name;
-	}
-      else 
+      if ((gen_length(name) > 1) || ((gen_length(name) == 1) && (strcmp(STRING(CAR(name)),"*")==0)))
 	{
 	  /* Array name is an expression like __ctype+1 in (__ctype+1)[*np]
-	     (syntax = subscript), parentheses must be added */
+	     (syntax = subscript), or abstract type, parentheses must be added */
 	  tmp = CHAIN_SWORD(tmp,"(");
 	  tmp = gen_nconc(tmp,name);
 	  tmp = CHAIN_SWORD(tmp,")");
 	}
-      
+      else
+	{
+	  /* Array name is a simple reference  */
+	  tmp = name;
+	}
       variable_dimensions(type_variable(t1)) = NIL;
+      variable_qualifiers(type_variable(t1)) = NIL;
       return gen_nconc(pc,c_words_entity(t1,gen_nconc(tmp,words_dimensions(dims))));
     }
-  if (pointer_type_p(t))
-    {
-      type t1 = basic_pointer(variable_basic(type_variable(t)));
-      pips_debug(7,"Pointer type with name = %s\n", list_to_string(name));
-      return gen_nconc(pc,c_words_entity(t1,gen_nconc(CHAIN_SWORD(NIL,"*"),name)));
-    }
+ 
   if (derived_type_p(t))
     {
       entity ent = basic_derived(variable_basic(type_variable(t)));
@@ -2038,7 +2049,7 @@ text c_text_entities(list ldecl, int margin)
   return r; 
 }
 
-static text c_text_entity(entity e, int margin)
+text c_text_entity(entity e, int margin)
 {
   text r = make_text(NIL);
   string name = entity_user_name(e);
