@@ -75,10 +75,12 @@ align=middle> You can get a beta version of the
        user-selectable
   <li> Cloning
   <li> Forward substitution
-  <li> First OpenMP output
+  <li> OpenMP output
   <li> Graph representation of large call graphs (with DaVinci)
   <li> A Java-based user interface, jpips; still in its infancy!
-  <li> Perfect Club benchmarks:
+  <li> Perfect Club benchmarks: adm, arc2d, bdna, dyfesm, flo52, mdg, ocean, qcd,
+       smsi, spec77, spice, track, trdf
+       
   <li> Spec-CFP95 benchmarks: applu, apsi , fpppp, hydro2d, mgrid, su2cor,
        swim, tomcatv, turb3d, wave5
   <li> Number of simultaneously analyzed modules above 200!
@@ -89,7 +91,7 @@ align=middle> You can get a beta version of the
 <hr>
 
 <b>Last update: </b>
-$Date: 1998/07/24 15:37:45 $
+$Date: 1998/09/28 12:24:50 $
 
 <b>URL: </b>http://www.cri.ensmp.fr/pips
 
@@ -101,9 +103,9 @@ $Date: 1998/07/24 15:37:45 $
 <a name="introduction"><h2>Objectives</h2></a>
 
 The goal of the <b>PIPS</b> project is to develop a free, open and
-extensible workbench for automatically analyzing and transforming signal
-processing and scientific applications. The <b>PIPS</b> workbench is
-especially relevant for people interested in whole program compilation,
+extensible workbench for automatically analyzing and transforming
+scientific and signal processing applications. The <b>PIPS</b> workbench
+is especially relevant for people interested in whole program compilation,
 reverse-engineering, program verification, source-to-source program
 optimization and parallelization. Its interprocedural analyses help with
 program understanding and with checking legality and impact of automatic
@@ -112,7 +114,7 @@ execution cost and latency, as well as the optimization cost itself.
 
 <p>
 
-Techniques developped for <b>PIPS</b> can be re-used for signal processing
+Techniques developed for <b>PIPS</b> can be re-used for signal processing
 code written in C, because pointers, data structures and dynamic
 allocation are not used much, and for Java code optimization because array
 boundary checking must be minimized conservatively.
@@ -133,6 +135,83 @@ research like <b>SUIF</b> but is much better as a Fortran source-to-source
 tool because the data types (e.g. complex) the code structures, the
 comments and, to some extent, the initial statement numbers are preserved.
 
+<a name="WhatisinPips?"><h2>What is in  Pips ?</h2></a>
+
+<BR><HR>
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=2 WIDTH="100%" BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<B>INPUTS</B> 
+<UL>
+<LI> Fortran 77
+<LI> Fortran 77 + High Performance Fortran directives
+</UL>
+<B>ANALYSES</B>
+  <UL>
+<LI> Array Privatization
+<LI> Array Section Privatization
+<LI> Array Element Regions
+<LI> Call Graph
+<LI> Control Flow Graph
+<LI> Continuation Conditions
+<LI> Dependences
+<LI> Memory Effects
+<LI> Preconditions
+<LI> Program Complexity
+<LI> Reduction Detection
+<LI> Scalar Variable Privatization
+<LI> Transformers
+<LI> Use-Def Chains
+</UL>
+<B>RESTRUCTURATIONS</B>
+  <UL>
+<LI> Atomization
+<LI> Cloning
+<LI> Control Restructuration
+<LI> Dead Code Elimination
+<LI> Useless Definition Elimination
+<LI> Declaration Cleaning 
+</UL>
+<BR>
+</TD>
+
+<TD>
+
+<BR> 
+ <B>OUTPUTS</B> 
+<UL>
+<LI> Call Graph
+<LI> Control Flow Graph
+<LI> Dependence Graph
+<LI> Fortran 77  (After transformation, optimization, restructuration)
+<LI> Fortran 77 + Commented information (Analyses)
+<LI> Fortran 77 + doall (parallel loops)
+<LI> Fortran 77 + CRAY directives
+<LI> Fortran 77 + OpenMP
+<LI> Fortran 77 + PVM
+<LI> Fortran 77 + MPI
+<LI>
+</UL>
+<B>TRANSFORMATIONS</B>
+  <UL>
+<LI> Coarse Grain Parallelization
+<LI> Expression Optimizations
+<LI> Forward Substitution
+<LI> Loop Distribution
+<LI> Loop Interchange
+<LI> Loop Normalize
+<LI> Loop Reductions
+<LI> Loop Unrolling
+<LI> Partial Evaluation
+<LI> Parallelization
+<LI> Strip Mining
+</UL>
+<BR>
+</TD>
+</TR>
+</TABLE>
+
+
 <a name="Examples"><h2>Examples</h2></a>
 
 <p>
@@ -140,8 +219,7 @@ comments and, to some extent, the initial statement numbers are preserved.
 <b>PIPS</b> was initially designed as an automatic parallelizer for
 scientific programs. It takes as input Fortran 77 codes and emphasizes
 <b>interprocedural</b> techniques for program analyses. <b>PIPS</b> specific
-interprocedural analyses are <a
-href="cnrs-nsf92/cnrs-nsf92.html">precondition</a> and <a
+interprocedural analyses are precondition and <a
 href="regions.html">array region</a> computations. <b>PIPS</b> automatically
 computes affine preconditions for integer scalar variables which are much
 more powerful than standard constant propagation or forward substitution
@@ -149,8 +227,12 @@ as shown below:
 
 <p>
 
+
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1  BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
 <pre>
-      I = 1
+   I = 1
       N = 10 
       J = 3
 
@@ -173,18 +255,23 @@ C  P(I,J,N) {N==10, I==10, 5<=2I+J, J<=3}
 
       PRINT *, I, J
 </pre>
+</TD>
+</TR>
+</TABLE>
 
 <p>
 
-<b>PIPS</b> also computes several kinds of polyhedral array regions (READ,
+<b>PIPS</b> also computes several kinds of polyhedral <b>array regions</b> (READ,
 WRITE, IN and OUT) which are used for array and partial array
-interprocedural privatization as well as for interprocedural
+interprocedural <b>privatization</b> as well as for interprocedural
 parallelization. Here, for instance, array <code>TI</code> is
-automatically privatized in spite of its initialization thru call to
+automatically privatized in spite of its initialization thru the call to
 <code>PVNMUT</code>:
 
 <p>
-
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1  BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
 <pre>
 !$OMP PARALLEL DO PRIVATE(J)
       DO K = K1, K2
@@ -199,31 +286,34 @@ automatically privatized in spite of its initialization thru call to
          ENDDO
       ENDDO
 </pre>
+</TD>
+</TR>
+</TABLE>
 
 <p>
 
-As mentionned above, <b>PIPS</b> can also be used as a reverse engineering
+As mentioned above, <b>PIPS</b> can also be used as a reverse engineering
 tool. Region analyses provide useful summaries of procedure effects, while
-precondition-based partial evaluation and dead-code elimination reduce
-code size. Cloning has also be used successfully to split a routine
+precondition-based <b>partial evaluation</b>  and <b>dead-code elimination</b> reduce
+code size. <b>Cloning</b> has also be used successfully to split a routine
 implementing several functionalities into a set of routines implementing
-each exactly one functionality. Auomatic cleaning of declarations is
+each exactly one functionality. Automatic <b>cleaning of declarations</b> is
 useful when commons are over-declared thru include statements.
 
 <a name="analyses-and-transformations"><h2>Analyses and Transformations</h2></a>
 
 <p>
 
-All analyses and transformations are listed in the documentation of the
-<a href="pipsmake-rc/pipsmake-rc.html"><em>PIPS API</em></a>. Static
-analyses compute call graphs, memory effects, use-def chains, dependence
-graphs, interpocedural checks, transformers, preconditions, continuation
-conditions, complexity estimation, reduction detection, array regions
-(read, write, in and out, may or exact), aliases and complementary
-sections. The results of analyses can be displayed with the source code,
-with the call graph or with an elapsed interprocedural control flow graph,
-as texts or as graphs. The dependence graphs can also be displayed either
-as text or graph.
+All analyses and transformations are listed in the documentation of the <a
+href="pipsmake-rc/pipsmake-rc.html"><em>PIPS API</em></a> and of PIPS
+interfaces. Static analyses compute call graphs, memory effects, use-def
+chains, dependence graphs, interprocedural checks, transformers,
+preconditions, continuation conditions, complexity estimation, reduction
+detection, array regions (read, write, in and out, may or exact), aliases
+and complementary sections. The results of analyses can be displayed with
+the source code, with the call graph or with an elapsed interprocedural
+control flow graph, as texts or as graphs. The dependence graphs can also
+be displayed either as texts or graphs.
 
 <p>
 
@@ -231,62 +321,21 @@ Several parallelization algorithms are available, including Allen&Kennedy,
 as well as automatic code distribution, including a prototype HPF
 compiler, <b>hpfc</b>. Different views of the parallel outputs are
 available: HPF, OpenMP, Fortran90, Cray Fortran. Furthermore, the
-polyedral method of Pr. Feautrier also is implemented.
+polyhedral method of Pr. Feautrier also is implemented.
 
 <p>
 
 Program transformations include loop distribution, scalar and
-array privatizion, Atomizers (reduction of a statements to a three-address
+array privatization, atomizers (reduction of a statements to a three-address
 form), loop unrolling (partial and full), strip-mining, loop interchange,
 partial evaluation, dead-code elimination, use-def elimination, control
 restructuring, loop normalization, declaration
 cleaning, cloning, forward substitution and expression optimizations.
 
-<a name="user-interfaces"><h2>User Interfaces</h2></a>
-
-<p>
-
-Five user interfaces are available: a Shell interface <a
-href="dret144/dret144.html"><em>(Pips)</em></a>, a line interface <a
-href="line-interface.html"><em>(Tpips)</em></a> and three window-based
-interfaces. The two X-window interfaces (<a href="wpips.html"><em>wpips
-man</em></a>, <a
-href="wpips-epips-user-manual/wpips-epips-user-manual.html"><em>WPips and
-EPips user manual</em></a>) to the parallelizer are the best suited for
-users. The last interface is Java based.  Click <a
-href="images/wpips-screen-snapshot.gif">here</a> for a Wpips screen
-snpashot.
-
 <p>
 
 <a href="images/wpips-screen-snapshot.gif"><IMG
 SRC="images/wpips-screen-reduced-snapshot.gif"></a>.
-
-<a name="research"><h2>On-going research at CRI</h2></a>
-
-<p>
-
-The current research objectives are:
-<P>
-<ul>
-  <li>expression optimization for superscalar and VLIW architectures (<a
-href="http://www.cri.ensmp.fr/~zory">Julien Zory</a>)
-
-  <li>analysis refinment to support automatic computation of
-module signatures (<a
-href="http://www.cri.ensmp.fr/~albez">Olivier Albiez</a>, Nicky Williams-Preston)
-
-  <li>new effective encodings of sets of integer to support signal
-processing application better (<a
-href="http://www.cri.ensmp.fr/~albiez">Oliver Albiez</a>)
-
-  <li>compilation of signal processing specifications (<a
-href="http://www.cri.ensmp.fr/~ancourt">Corinne Ancourt</a>)
-</ul>
-
-These objectives were defined with our industrial partners (CEA, EDF,
-SAGEM, Thomson-CSF).
-
 
 <a name="workbench"><h2>Workbench</h2></a>
 
@@ -301,25 +350,16 @@ or tiling.
 Analyses and transformations are driven by a make system, <a
 href="pipsmake.html"><em>(pipsmake)</em></a> which enforces consistency
 across analyses and modules, and results are stored for future
-interprocedural use in a database by a resource manager,
-<em>(pipsdbm)</em>. The compiler is made of phases that are called on
+interprocedural use in a database by a resource manager
+<em>(pipsdbm)</em>. The workbench is made of phases that are called on
 demand to perform the analyses or transformations required by the user.
+Thus interprocedural requests are very easy to formulate: only the final
+in demand result must be specified.
 
 <center>
 <IMG SRC=images/poster_aggrandi.gif><br>
-<b>PIPS Overall Structure (Note: an OpenMP output is now available)</b>
+<b>PIPS Overall Structure (Note: OpenMP and MPI outputs are now available)</b>
 </center>
-
-<p>
-
-<b>PIPS</b> has been developped at <a href="/index-english.html">CRI</a>
-since 1988, thru several research projects funded by the French DoD
-(DRET), the French NSF (CNRS) and the European Union (ESPRIT
-programs). The initial design was made by R&eacute;mi TRIOLET,
-Fran&ccedil;ois IRIGOIN and Pierre JOUVELOT. This initial design has
-proved good enough since then and has not required any major change. The
-overview paper presented at <a href="Papers/ics91/ics91.html">ICS'91</a> still
-is up-to-date, although major functionalities have been added since.
 
 <p>
 
@@ -344,7 +384,7 @@ href="dret105/dret105.html">TR E/105</a>, Section 2.
 
 The second tool is the <em>Linear C3</em> library which handles vectors,
 matrices, linear constraints and structures based on these such as
-polyhedrons. The algorithms used are designed for integer and/or
+polyhedra. The algorithms used are designed for integer and/or
 rational coefficients. This library is extensively used for analyses
 such as dependence test, precondition and region computation, and for
 transformations, such as tiling, and for code generation, such as send
@@ -357,14 +397,174 @@ PRISM a C implementation of PIP (Parametric Integer Programming).
 
 <!--
 
-New phases have been developped for distributed-memory machines, both in
+New phases have been developed for distributed-memory machines, both in
 house (WP65 and HPFC projects) and outside.
 
 -->
 
+
+<a name="user-interfaces"><h2>User Interfaces</h2></a>
+
+<p>
+
+Five user interfaces are available: a Shell interface <em>(Pips)</em>, a
+line interface <a href="line-interface.html"><em>(Tpips)</em></a> and
+three window-based interfaces. The three X-window interfaces <em>Wpips,
+Epips</em> and <em> Jpips</em> to the workbench are the best suited for
+new users (see the <a href="wpips.html"><em>wpips man</em></a> and <a
+href="wpips-epips-user-manual/wpips-epips-user-manual.html"><em>WPips and
+EPips user manual</em></a>). The last interface is Java based but not yet
+available.  Click <a href="images/wpips-screen-snapshot.gif">here</a> for
+a Wpips screen snapshot.
+
+<a name="History"><h2>History</h2></a>
+
+<p>
+
+<b>PIPS</b> has been developed at <a href="/index-english.html">CRI</a>
+since 1988, thru several research projects funded by the French DoD
+(DRET), the French NSF (CNRS) and the European Union (ESPRIT
+programs). The initial design was made by R&eacute;mi TRIOLET,
+Fran&ccedil;ois IRIGOIN and Pierre JOUVELOT. This initial design has
+proved good enough since then and has not required any major change. The
+overview paper presented at <a href="Papers/ics91/ics91.html">ICS'91</a> still
+is up-to-date, although major functionalities have been added since.
+
+<a name="PipsBibliography"><h2>Pips Bibliography</h2></a>
+
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1 WIDTH="100%">
+<TR>
+<TD>
+<b> PIPS OVERVIEWS</b>
+<ul>
+
+  <li> <em><b> Semantical
+Interprocedural Parallelization: An Overview of the PIPS Project</b></em>,
+<DD>  F. Irigoin, P. Jouvelot, R. Triolet, 1991 International Conference on Supercomputing, Cologne, June 1991.
+Also available as <a href="Papers/ics91/ics91.html">Tech. Report A/201.</a>
+
+  <li><b> <i>PIPS: a Workbench for Program Parallelization and
+Optimization</i></b>
+       <DD><A HREF = "http://www.cri.ensmp.fr/doc/A-299/color-transparencies-Phaser440.ps.gz">A-299
+color transparencies</A> 
+presented at European Parallel Tool Meeting 1996 (EPTM'96),
+Corinne Ancourt, Fabien Coelho, Béatrice Creusillet, François Irigoin,
+Pierre Jouvelot and Ronan Keryell.
+October 23, 1996, ONERA, FRANCE.
+
+  <li><em><b>PIPS --- A Workbench for Interprocedural Program Analyses and
+    Parallelization</b></em>
+       <DD>  Corinne Ancourt, Béatrice Apvrille, Fabien Coelho, François
+Irigoin, Pierre Jouvelot, Ronan Keryell, <a
+href="Lille_1994/PIPS_Lille_1994-HP-4Si-MX-600dpi.ps.gz">Gzip report</a>. April 22, 1994, The slides of the Villeneuve
+d'Ascq '94 <em>Franco-British N+N Meeting on DATA PARALLEL LANGUAGES
+AND COMPILERS FOR PORTABLE PARALLEL COMPUTING</em>
+</ul>
+
+<b> USER INTERFACES</b>
+
+Five user interfaces:
+<ul>
+
+<li> <em><b>WPips &amp EPips User Manual (Paralléliseur Interprocédural de
+  Programmes Scientifiques) --- Linear Algebra based Automatic
+  Parallelizer &amp Program Transformer</b></em>, <DD> Ronan Keryell,
+April 9, 1996.  Technical Report A-288 in <A HREF =
+"http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.ps.gz">PostScript</A>
+or in <A HREF =
+"http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html">HTML</A>
+
+   <li> <em><b> Wpips </b></em> <a href="wpips.html"> Window
+interface</a>,
+
+   <li> <em><b>Tpips</b></em> <a href="line-interface.html"> Line
+interface</a>
+
+   <li><em><b>Pips</b></em> <a href="dret144/dret144.html"> Shell
+interface </a>,
+
+	<li><em><b>Jpips</b></em>  A Java interface (in development)
+</ul>
+ <b> For PIPS DEVELOPERS</b>
+<ul>
+
+<li> <b>PIPS
+Development Environment</b>, <DD>  Corinne Ancourt, Fabien Coelho, Béatrice Creusillet,
+François Irigoin, Pierre Jouvelot, Ronan Keryell, May 1996. <A HREF =
+"http://www.cri.ensmp.fr/pips/developer_guide"><i>Report A-291</i></A>.
+
+  <li> <em> <b>PIPS: Représentation Intermédiaire</b></em>,
+       <DD> F. Irigoin, P. Jouvelot, R. Triolet, documentation interne du projet PIPS, septembre 1988.
+New version, May 1992, <a href="ri/ri.html">TR E/166.</a>
+
+ 
+</ul>
+
+<b> About NEWGEN</b>
+<ul>
+
+ <li> <em> <b>NewGen User Manual</b></em>. <DD> P. Jouvelot, R. Triolet, December
+1990, <a href="Newgen/newgen_manual/newgen_manual.html">Tech. Report.</a>
+
+ <li> <em> <b>NewGen: A Language-Independent Program Generator</b></em>. 
+<DD>  P. Jouvelot, R. Triolet,  July 12, 1989, 
+<a href="Newgen/newgen_paper/newgen_paper.html">Tech. Report A/191.</a>
+
+
+ <li> <em> A French tutorial in </em> <a href="Newgen/tutoriel_newgen/tutoriel_newgen.html"> HTML file </a>
+
+      </ul>
+
+ <b> About PIPSMAKE</b>
+<ul>
+
+  <li> <em><b>PIPSMAKE et PIPSDBM: Motivations et fonctionnalités</b></em>.
+<DD> F. Irigoin ,  27 Septembre 1990, <a href="dret133/dret133.html">TR E/133</a>.
+
+ <li> The <a href="pipsmake-rc/pipsmake-rc.html"><em>PIPSMAKE </em></a>
+High-Level Software INterface.
+  <li> The   <a href="properties/properties-rc/properties-rc.html"><em> PROPERTIES </em></a>   
+    Low Level Tuning of PIPS
+</ul>
+ 
+
+ <a href="wpips.html"><b> COMPLETE BIBLIOGRAPHY</b></a>
+
+</TD>
+</TR>
+</TABLE>
+
+<a name="research"><h2>On-going research at CRI</h2></a>
+
+<p>
+
+The current research objectives are:
+<P>
+<ul>
+  <li>expression optimization for superscalar and VLIW architectures (<a
+href="http://www.cri.ensmp.fr/~zory">Julien Zory</a>)
+
+  <li>analysis refinement to support automatic computation of
+module signatures (<a
+href="http://www.cri.ensmp.fr/~albez">Olivier Albiez</a>, Nicky Williams-Preston)
+
+  <li>new effective encodings of sets of integer to support signal
+processing application better (<a
+href="http://www.cri.ensmp.fr/~albiez">Oliver Albiez</a>)
+
+  <li>compilation of signal processing specifications (<a
+href="http://www.cri.ensmp.fr/~ancourt">Corinne Ancourt</a>)
+</ul>
+
+These objectives were defined with our industrial partners (CEA, EDF,
+SAGEM, Thomson-CSF).
+
+
+<a name="ExternalCollaboration"><h2>External Collaboration</h2></a>
+
 A team at CEA, lead by
 Benoit de Dinechin, contributed several phases which implement
-techniques developped by Paul Feautrier (PRISM) for TMC CM-5 and Cray
+techniques developed by Paul Feautrier (PRISM) for TMC CM-5 and Cray
 T-3D machines, as well as extensions of these techniques (see <a
 href="poly_meth.html">Polyhedric method</a>). These external phases were
 easily blended within <b>PIPS</b> thanks to NewGen, which constraints the
@@ -374,14 +574,14 @@ framework for low-level classes (list, hash-table,...), and thanks to
 of analyses and transformations from the programmer as well as from the
 user.
 
-<a name="availability"><h2>Availability</h2></a>
+<a name="Availability"><h2>Availability</h2></a>
 
 <p>
 
 Ten years after its inception, <b>PIPS</b> as a workbench is still alive
 and well. <b>PIPS</b> provides a robust infrastructure for new experiments in
-compilation, program analysis, optimisation, transformation and
-parallelization. The <b>PIPS</b> developper environment is described in a <a
+compilation, program analysis, optimization, transformation and
+parallelization. The <b>PIPS</b> developer environment is described in a <a
 href="developer_guide">technical report</a> but it also is possible
 to develop new phases on top of but <em>outside</em> of <b>PIPS</b> since all
 (in fact, most...) <b>PIPS</b> data structures can be reloaded using Newgen
@@ -389,12 +589,14 @@ primitives from C or Lisp programs.
 
 <p>
 
-<b>PIPS</b> is written in C and developped under SUNOS 4.1.4. <b>PIPS</b>
+<b>PIPS</b> is written in C and developed under SUNOS 4.1.4. <b>PIPS</b>
 can also be used under SOLARIS 2.5.1 and Solaris 2.6, under LINUX, under
 AIX and Digital UNIX. Two versions are available: Integer values are
 represented either by 32-bit or by 64-bit words. The source code is
 available on request and executables are
 <a href="distribution.html">downloadable</a>.
 
-
+<a name="Maintenance"><h2>Maintenance and Support</h2></a>
+Send  your comments, questions and  requests to <b>pips-support@cri.ensmp.fr</b>.
 <hr> 
+
