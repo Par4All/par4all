@@ -19,6 +19,8 @@
 #define db_resource_loaded_p(r) db_status_loaded_p(db_resource_db_status(r))
 #define db_resource_required_p(r) \
         db_status_required_p(db_resource_db_status(r))
+#define db_resource_loaded_and_stored_p(r) \
+        db_status_loaded_and_stored_p(db_resource_db_status(r))
 
 /* module names must use some characters.
  */
@@ -115,6 +117,8 @@ static string db_status_string(db_status s)
     return "loaded";
   case is_db_status_required: 
     return "required";
+  case is_db_status_loaded_and_stored:
+    return "loaded&stored";
   default:
     pips_internal_error("unexpected db_status tag %d\n", db_status_tag(s));
     return NULL;
@@ -220,7 +224,7 @@ static void db_clean_db_resources(db_resources dbres)
 	dump_db_resource(rn, on, r);
 	db_delete_resource(rn, on);
       }
-      else if (!db_resource_stored_p(r)) 
+      else if (db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) 
       {
 	pips_debug(5, "resource %s[%s] set as stored\n",
 		   db_symbol_name(os), db_symbol_name(rs));
@@ -243,14 +247,18 @@ void db_delete_resource(string rname, string oname)
     pips_assert("valid owned resources", !db_owned_resources_undefined_p(or));
     r = get_resource(rname, or);
     if (!db_resource_undefined_p(r))
-    { /* let us do it! */
-	db_symbol rs = find_or_create_db_symbol(rname);
-	void * p = db_resource_pointer(r);
-	if (db_resource_loaded_p(r) && p)
-	    dbll_free_resource(rname, oname, p);
-	db_resource_pointer(r) = NULL;
-	free_db_resource(r);
-	delete_db_owned_resources(or, rs);
+    { 
+      /* let us do it! */
+      db_symbol rs = find_or_create_db_symbol(rname);
+      if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) && 
+	  db_resource_pointer(r))
+      {
+	dbll_free_resource(rname, oname, db_resource_pointer(r));
+	/* ??? I should unlink the file */
+      }
+      db_resource_pointer(r) = NULL;
+      free_db_resource(r);
+      delete_db_owned_resources(or, rs);
     }
 }
 
@@ -344,7 +352,8 @@ bool db_resource_p(string rname, string oname)
   if (db_resource_undefined_p(r))
     return FALSE;
   else
-    return db_resource_loaded_p(r) || db_resource_stored_p(r);
+    return db_resource_loaded_p(r) || db_resource_stored_p(r) ||
+      db_resource_loaded_and_stored_p(r);
 }
 
 static void db_load_resource(string rname, string oname, db_resource r)
@@ -352,7 +361,7 @@ static void db_load_resource(string rname, string oname, db_resource r)
   pips_debug(7, "loading %s of %s\n", rname, oname);
   pips_assert("resource stored", db_resource_stored_p(r));
   db_resource_pointer(r) = dbll_load_resource(rname, oname);
-  db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
+  db_status_tag(db_resource_db_status(r)) = is_db_status_loaded_and_stored;
   if (displayable_file_p(rname))
   {
     int its_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
@@ -382,7 +391,7 @@ int db_time_of_resource(string rname, string oname)
     }
 
     /* loaded */
-    if (db_resource_loaded_p(r) && 
+    if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) && 
 	displayable_file_p(rname) &&
 	dbll_database_managed_file_p(db_resource_pointer(r)))
     {
@@ -409,9 +418,16 @@ int db_time_of_resource(string rname, string oname)
 static void db_save_resource(string rname, string oname, db_resource r)
 {
     pips_debug(7, "saving %s of %s\n", rname, oname);
-    pips_assert("resource loaded", db_resource_loaded_p(r));
+    pips_assert("resource loaded", 
+		db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r));
+
     if (!dbll_storable_p(rname))
       pips_internal_error("cannot store %s\n",rname);
+
+    /* already saved */
+    if (db_resource_loaded_and_stored_p(r))
+      return;
+
     dbll_save_resource(rname, oname, db_resource_pointer(r));
     db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
 
@@ -424,18 +440,38 @@ static void db_save_and_free_resource(
     string rname, string oname, db_resource r, bool do_free)
 {
     pips_debug(7, "saving and freeing %s of %s\n", rname, oname);
-    pips_assert("resource loaded", db_resource_loaded_p(r));
-    if (dbll_storable_p(rname)) {
-        dbll_save_and_free_resource(rname, oname, 
-				    db_resource_pointer(r), do_free);
-	if (do_free)
-	{
-	  db_resource_pointer(r) = NULL;
-	  db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
-	  db_resource_file_time(r) = 
-	    dbll_stat_resource_file(rname, oname, TRUE);
-	}
-    } else { /* lost.. delete resource. */
+    pips_assert("resource loaded", 
+		db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r));
+
+    if (db_resource_loaded_and_stored_p(r))
+    {
+      if (do_free) {
+	dbll_free_resource(rname, oname, db_resource_pointer(r));
+	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
+	db_resource_pointer(r) = NULL;
+      }
+      return;
+    }
+    else if (dbll_storable_p(rname)) 
+    {
+      dbll_save_and_free_resource(rname, oname, 
+				  db_resource_pointer(r), do_free);
+      if (do_free)
+      {
+	db_resource_pointer(r) = NULL;
+	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
+	db_resource_file_time(r) = 
+	  dbll_stat_resource_file(rname, oname, TRUE);
+      }
+      else
+      {
+	db_status_tag(db_resource_db_status(r)) = 
+	  is_db_status_loaded_and_stored;
+	db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
+      }
+    } 
+    else 
+    { /* lost.. delete resource. */
       if (do_free)
       {
         dbll_free_resource(rname, oname, db_resource_pointer(r));
@@ -506,7 +542,8 @@ void db_set_resource_as_required(string rname, string oname)
   if (db_status_undefined_p(s))
     /* newly created db_resource... */
     db_resource_db_status(r) = make_db_status(is_db_status_required, UU);
-  else if (db_status_loaded_p(s) && db_resource_pointer(r))
+  else if ((db_status_loaded_p(s) || db_status_loaded_and_stored_p(s)) && 
+	   db_resource_pointer(r))
   {
     dbll_free_resource(rname, oname, db_resource_pointer(r));
     db_resource_pointer(r) = NULL;
@@ -530,7 +567,7 @@ void db_put_or_update_memory_resource(
     r = find_or_create_db_resource(rname, oname);
     if (db_status_undefined_p(db_resource_db_status(r)))
 	/* was just created */
-	db_resource_db_status(r) = make_db_status(is_db_status_loaded, UU);
+	db_resource_db_status(r) = make_db_status_loaded();
     else
     {
 	if (!update_is_ok && !db_resource_required_p(r))
@@ -573,7 +610,8 @@ void db_save_and_free_memory_resource_if_any
     db_resource r;
     DB_OK;
     r = get_db_resource(rname, oname);
-    if (!db_resource_undefined_p(r) && db_resource_loaded_p(r))
+    if (!db_resource_undefined_p(r) && 
+	(db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)))
 	db_save_and_free_resource(rname, oname, r, do_free);
 }
 
