@@ -30,8 +30,10 @@ for each command. {\tt tpips} is less user-friendly than wpips and epips,
 although it provides the unique opportunity to apply a transformation or
 display some information on several modules with one command, using
 pipsmake metavariables, 
-\verb+%CALLERS+ and  \verb+%CALLEES+,  or environment  user defined variables such
-as \verb+$MODULES+ (see Example \ref{exm2}). The jpips future user
+\verb+%CALLERS+ and  \verb+%CALLEES+,  
+or environment  user defined variables such
+as \verb+$MODULES+ %% $
+(see Example \ref{exm2}). The jpips future user
 interface will provide these pips/tpips functionalities too.
 
 {\tt tpips} is recommended for large benchmarks and experiments, when
@@ -226,7 +228,9 @@ shell.
 
 \item [ {\bf echo} $<$string$>$] prints $<$string$>$
 
-\item [ {\bf getenv} $<$variable-name$>$] prints the value of $<$variable-name$>$ (equivalent to \verb+echo ${<variable-name>}+)
+\item [ {\bf getenv} $<$variable-name$>$] prints the value of
+  $<$variable-name$>$ (equivalent to \verb+echo ${<variable-name>}+)
+%% $
 \item  [ {\bf setenv} $<$variable-name$>$ = $<$value$>$] sets $<$value$>$ to $<$variable-name$>$
 
 
@@ -242,9 +246,10 @@ shell.
 \subsection{Parameters}
 The parameters of the different commands are :
 \begin{description}
-\quote
-\item [$<$file-name$>$] Unix path and file name. \\ Shell syntax, such
-  as \verb+*.f+, can be used when \verb+s+ option is specified or \verb+TPIPS_IS_A_SHELL+ variable is set.
+%%\quote
+\item [$<$file-name$>$] Unix path and file name. 
+  \par Shell syntax, such as \verb+*.f+, can be used when 
+  \verb+s+ option is specified or \verb+TPIPS_IS_A_SHELL+ variable is set.
           
 \item [$<$workspace-name$>$] Unix file name - no path.
   
@@ -266,16 +271,16 @@ The OWNER - used in the previous $<$rule-descriptor$>$ and
 $<$ resource-descriptor$>$ - can take these formats:
 
 \begin{description}
-\quote
-        \item [module-name] the target module name.
-        \item [\%PROGRAM] the whole program (for global resource) . 
-        \item [\%MAIN] the main module of the program. 
-        \item [\%MODULE] the current  module.
-        \item [\$\{MODULES\}] the modules associated to the Shell variable
-          {\tt MODULES}. The different names are SPACE or/and TAB separated.
-        \item [\%ALL] All worksapce modules 
-        \item [\%CALLEES] All the callees of the current selected  module.
-        \item [\%CALLERS]  All  the callers of the current selected  module.
+%%\quote
+\item [module-name] the target module name.
+\item [\%PROGRAM] the whole program (for global resource) . 
+\item [\%MAIN] the main module of the program. 
+\item [\%MODULE] the current  module.
+\item [\$\{MODULES\}] the modules associated to the Shell variable
+  {\tt MODULES}. The different names are SPACE or/and TAB separated.
+\item [\%ALL] All worksapce modules 
+\item [\%CALLEES] All the callees of the current selected  module.
+\item [\%CALLERS]  All  the callers of the current selected  module.
 
 \end{description}
 If no OWNER is specified, then the current  module is assumed. For
@@ -344,6 +349,7 @@ tpips > quit
 
 \end{verbatim}
 }
+%% $
 
 \section{Examples}
 \subsection{Call Graph}
@@ -478,7 +484,9 @@ This example presents some pips transformations and use of
 \item pips property: \verb+PREPROCESSOR_MISSING_FILE_HANDLING "generate"+ , 
 \item transformation application : \verb+apply CLONE_ON_ARGUMENT[FUNCT]+.
 \item $<$rule-name$>$ : \verb+PRINT_CODE+,..
-\item $<$rule-descriptor$>$ :  \verb+SUPPRESS_DEAD_CODE[${modules}]+,  \verb+UNSPLIT[%PROGRAM]+,..
+\item $<$rule-descriptor$>$ : 
+  \verb+SUPPRESS_DEAD_CODE[${modules}]+,  \verb+UNSPLIT[%PROGRAM]+,..
+%% $
 \item $<$resource-descriptor$>$ :  \verb+PRINTED_FILE[FUNCT]+,  \verb+CALLGRAPH_FILE[%ALL]+,..
 \end{itemize}
 \begin{rawhtml}
@@ -1169,7 +1177,8 @@ Usage: {\tt tpips} [-nscvh?jw] [-l logfile] [-r rcfile] [-e tpips-cmds] tpips-sc
 \item [-j] jpips special mode.
 \item [-w] starts with a wrapper (jpips special again)...
 \item [-l] $<$logfile$>$: log to $<$logfile$>$.
-\item [-r] $<$rcfile$>$: source the $<$rcfile$>$ file. (default {\tilde}/.tpipsrc)
+\item [-r] $<$rcfile$>$: source the $<$rcfile$>$ file. 
+  (default \verb|$HOME/.tpipsrc|) %% $
 \item [-e] tpips-cmds: executes the $<$tpips-cmds$>$ commands.
 \end{description}
 
