@@ -334,7 +334,7 @@ Psysteme in_ps;
 
 
   /* v1 = 1*TCST to build complement system ... */
-  v1 = vect_new( TCST, 1 );
+  v1 = vect_new( TCST, VALUE_ONE);
   /* Look for equalities */
   for( eq = in_ps->egalites; eq != NULL; eq = eq->succ ) {
     ps     = sc_make( CONTRAINTE_UNDEFINED,
