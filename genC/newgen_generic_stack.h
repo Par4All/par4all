@@ -1,5 +1,9 @@
 /* Made after the generic current mappings
  * Fabien COELHO, 05/12/94
+ * 
+ * $RCSfile: newgen_generic_stack.h,v $ verison $Revision$
+ * $Date: 1995/02/03 10:10:24 $, 
+ * got on %D%, %T%
  */
 
 #define DEFINE_STACK(PREFIX, name, type) \
@@ -9,12 +13,12 @@ static stack name##_stack = stack_undefined; \
 PREFIX void make_##name##_stack() \
 {\
   assert(name##_stack==stack_undefined);\
-  name##_stack = stack_make(type##_domain, 0);\
+  name##_stack = stack_make(type##_domain, 0, 0);\
 }\
 \
 PREFIX void free_##name##_stack() \
 {\
-  stack_free(name##_stack); \
+  stack_free(&name##_stack); \
   name##_stack = stack_undefined; \
 }\
 \
