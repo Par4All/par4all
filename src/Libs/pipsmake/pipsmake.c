@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.69  2002/04/05 15:35:46  coelho
+ * avoid recursion loop on checkpoint_workspace() call.
+ *
  * Revision 1.68  1998/12/26 22:01:01  irigoin
  * error handler reset_static_phase_variables() improved
  *
@@ -398,6 +401,7 @@ static void update_preserved_resources(string oname, rule ru)
 static bool apply_a_rule(string oname, rule ru)
 {
     static int number_of_applications_of_a_rule = 0;
+    static bool checkpoint_workspace_being_done = false;
 
     double initial_memory_size = 0.;
     string run = rule_phase(ru), rname, rowner;
@@ -412,10 +416,19 @@ static bool apply_a_rule(string oname, rule ru)
     /* periodically checkpoints the workspace if required.
      */
     number_of_applications_of_a_rule++;
-    if (frequency>0 && number_of_applications_of_a_rule>=frequency)
+
+    if (!checkpoint_workspace_being_done &&
+	frequency>0 && number_of_applications_of_a_rule>=frequency)
     {
-	checkpoint_workspace();
-	number_of_applications_of_a_rule = 0;
+      /* ??? FC 05/04/2002 quick fix because of a recursion loop:
+	 apply_a_rule -> checkpoint_workspace -> delete_obsolete_resources ->
+	 check_physical_resource_up_to_date -> build_real_resources -> rmake ->
+	 apply_a_rule ! 
+      */
+      checkpoint_workspace_being_done = true;
+      checkpoint_workspace();
+      checkpoint_workspace_being_done = false;
+      number_of_applications_of_a_rule = 0;
     }
 
     /* output the message somewhere...
