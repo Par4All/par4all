@@ -335,9 +335,9 @@ prettyprint_dependence_graph_view(FILE * fd,
 	    }
 	}
     }
-    reset_enclosing_loops_map();
+    clean_enclosing_loops();
     debug_off();
-    fprintf(fd, "\n****************** End of Dependence Graph ******************\n");
+    fprintf(fd, "\n******** End of Dependence Graph ********\n");
 }
 
 		    
