@@ -19,6 +19,11 @@
 #define QUICK_QUIT "Quit without saving"
 #define CLOSE_QUIT "Close & Quit"
 
+
+Panel_item quit_button;
+
+
+
 void quit_notify(menu, menu_item)
 Menu menu;
 Menu_item menu_item;
@@ -63,18 +68,18 @@ Menu_item menu_item;
 }
 
 
-
-void create_quit_button()
+void
+create_quit_button()
 {
-    Menu menu;
+   Menu menu;
 
-    menu = xv_create(XV_NULL, MENU_COMMAND_MENU, 
-		     MENU_ACTION_ITEM, CLOSE_QUIT, quit_notify,
-		     MENU_ACTION_ITEM, QUICK_QUIT, quit_notify,
-		     NULL);
+   menu = xv_create(XV_NULL, MENU_COMMAND_MENU, 
+                    MENU_ACTION_ITEM, CLOSE_QUIT, quit_notify,
+                    MENU_ACTION_ITEM, QUICK_QUIT, quit_notify,
+                    NULL);
 
-    (void) xv_create(main_panel, PANEL_BUTTON,
-		     PANEL_LABEL_STRING, "Quit ",
-		     PANEL_ITEM_MENU, menu,
-		     NULL);
+   quit_button = xv_create(main_panel, PANEL_BUTTON,
+                           PANEL_LABEL_STRING, "Quit ",
+                           PANEL_ITEM_MENU, menu,
+                           NULL);
 }
