@@ -60,7 +60,7 @@ char *module_name;
 	db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
     filename = 
-	strdup(concatenate(db_get_current_program_directory(),
+	strdup(concatenate(db_get_current_workspace_directory(),
 			   "/", module_name, ".flinted", NULL));
     flint_messages_file = 
 	(FILE *) safe_fopen(filename, "w");
