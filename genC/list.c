@@ -447,6 +447,7 @@ chunk *obj ;
 
 /*  caution: the first item is 0!
  *  was:  return( (n<=0) ? l : gen_nthcdr( n-1, CDR( l ))) ;
+ *  if n>gen_length(l), NIL is returned.
  */
 list gen_nthcdr( n, l )
 int n ;
@@ -454,7 +455,7 @@ list l ;
 {
     list c;
     assert(n>=0);
-    for (c=l; n>0; c=CDR(c), n--);
+    for (c=l; !ENDP(c) && n>0; c=CDR(c), n--);
     return(c);
 }
 
