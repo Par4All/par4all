@@ -2,6 +2,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_mpi.m4f,v $
+! Revision 1.7  1997/07/21 14:46:16  zory
+! erase an unused variable
+!
 ! Revision 1.6  1997/07/21 14:27:37  zory
 ! Buffered communications inserted (does not work :-( )
 !
@@ -355,7 +358,7 @@
 !
       subroutine HPFC BSEND(dest, tag, info)
       include "hpfc_commons_mpi.h"
-      integer dest, tag, info, size, bytesize
+      integer dest, tag, info, size
       character buffer(MAX MAX SIZE OF BUFFER)
       
       if (BUFFER ATTACHED) then 
