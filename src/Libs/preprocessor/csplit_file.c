@@ -5,6 +5,9 @@
  * preprocessed.
  *
  * $Log: csplit_file.c,v $
+ * Revision 1.4  2003/08/04 16:49:48  irigoin
+ * Reset keyword and typedef table added
+ *
  * Revision 1.3  2003/08/01 16:42:28  irigoin
  * Intermediate version, compatible with the C-syntax Validation, coupled
  * with the parser and the controlizer, if not yet the C prettyprinter.
@@ -257,10 +260,18 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
 /* Close open files and reset variables */
 void csplit_error_handler()
 {
+  /* Reset keyword table */
+  extern void reset_keyword_typedef_table();
+
+  reset_keyword_typedef_table();
 }
 
 void csplit_reset() 
 {
+  /* Reset keyword table */
+  extern void reset_keyword_typedef_table();
+
+  reset_keyword_typedef_table();
 }
 
 /* Returns an error message or NULL if no error has occured. */
