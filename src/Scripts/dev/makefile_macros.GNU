@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNU,v $ (version $Revision$)
-# $Date: 1996/08/13 15:38:18 $, 
+# $Date: 1996/08/20 17:22:12 $, 
 #
 # this file contains macro definitions 
 
@@ -27,6 +27,10 @@ TAR	= gtar
 ZIP	= gzip -v9
 DIFF	= gdiff
 M4	= gm4
+LX2HTML	= latex2html
+LATEX	= latex
+MAKEIDX	= makeindex
+DVIPS	= dvips
 
 # end of $RCSfile: makefile_macros.GNU,v $
 #
