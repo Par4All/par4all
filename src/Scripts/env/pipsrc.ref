@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1997/05/07 15:28:24 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1997/05/08 09:04:11 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -82,10 +82,10 @@ PIPS_DIR=/projects/Pips
 
 # default architecture for building pips
 # the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
-test ${uname_s} = SunOS -a ${uname_r} = 5.5 && \
+test ${uname_s} = SunOS -a ${uname_v} = Generic && \
 	PIPS_ARCH="GNUSOL2LL"
 
-test ${uname_s} = SunOS -a ${uname_r} = 4.1.4 && \
+test ${uname_s} = SunOS -a ${uname_v} = 1 && \
 	PIPS_ARCH="."
 
 test ${uname_s} = AIX && \
@@ -144,10 +144,10 @@ PATH="${PATH}:${PIPS_ROOT}/Utils:/usr5/gnu/bin-sparc"
 # PIPS_VALIDDIR="${PIPS_ROOT}/Validation"
 
 # hosts for Validate:
-test ${PIPS_ARCH} = GNUSOL2LL && \
+test "${PIPS_ARCH}" = GNUSOL2LL && \
 	PIPS_HOSTS="recanati:deauville"
 
-test ${PIPS_ARCH} = . -o ${PIPS_ARCH} = GNU && \
+test "${PIPS_ARCH}" = . -o "${PIPS_ARCH}" = GNU && \
 	 PIPS_HOSTS="chailly:episy:aiguebelette:roazhon"
 
 # PIPS_EXPERIMENTSDIR="${PIPS_DIR}/Experiments"
