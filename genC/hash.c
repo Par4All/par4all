@@ -14,6 +14,9 @@
 
 */
 
+/* $RCSfile: hash.c,v $ ($Date: 1995/03/20 11:17:56 $, )
+ * version $Revision$
+ */
 
 #include <stdio.h>
 extern int fprintf();
@@ -25,7 +28,6 @@ extern int fprintf();
 #include "newgen_hash.h"
 extern int cfree();
 
-
 #define abs(v) (((v) > 0) ? (v) : (-(v)))
 
 #define FREE (char *) 0
@@ -36,9 +38,9 @@ extern int cfree();
  */
 #define HASH_SIZE_LIMIT(size) (((size)>>1)+((size)>>2))
 #define HASH_ENLARGE_PARAMETER ((int)2)
-#define HASH_FUNCTION(key, size) ((((int)(key))&(0x7fffffff))%(size))
+#define HASH_FUNCTION(key, size) ((((unsigned int)(key))&(0x7fffffff))%(size))
 
-typedef enum hash_operation 
+typedef enum 
     { hash_get_op , hash_put_op , hash_del_op } hash_operation;
 
 static void hash_enlarge_table();
@@ -70,7 +72,7 @@ void hash_dont_warn_on_redefinition()
 
 bool hash_warn_on_redefinition_p()
 {
-    return( should_i_warn_on_redefinition ) ;
+    return(should_i_warn_on_redefinition);
 }
 
 /* this function makes a hash table of size size. if size is less or
@@ -82,54 +84,46 @@ hash_key_type key_type;
 int size;
 {
     register int i;
-    extern int fprintf();
+    hash_table htp;
 
-    if (size <= 0) size = HASH_DEFAULT_SIZE;
+    if (size<=0) size=HASH_DEFAULT_SIZE;
+    message_assert("size too small", size>1);
 
-    if (size == 1) 
+    htp = (hash_table) alloc(sizeof(struct hash_table));
+    htp->hash_type = key_type;
+    htp->hash_size = size;
+    htp->hash_entry_number = 0;
+    htp->hash_size_limit = HASH_SIZE_LIMIT(size);
+    
+    htp->hash_array = (hash_entry *) alloc(size*sizeof(hash_entry));
+
+    for (i = 0; i < size; i++) 
+	htp->hash_array[i].key = FREE;
+    
+    switch(key_type)
     {
-	fprintf(stderr, "[hash_table_make] size %d too small\n", size);
-	exit(1);
-    }	    
-
-    if (key_type==hash_string||
-	key_type==hash_int||
-	key_type==hash_pointer||
-	key_type==hash_chunk) {
-	hash_table htp;
-
-	htp = (hash_table) alloc(sizeof(struct hash_table));
-	htp->hash_type = key_type;
-	htp->hash_size = size;
-	htp->hash_entry_number = 0;
-	htp->hash_size_limit = HASH_SIZE_LIMIT(size);
-
-	htp->hash_array = (hash_entry *) alloc( size*sizeof(hash_entry));
-	for (i = 0; i < size; i++)
-		htp->hash_array[i].key = FREE;
-
-	if (key_type == hash_string) {
-	    htp->hash_equal = hash_string_equal;
-	    htp->hash_rank = hash_string_rank;
-	}
-	else if (key_type == hash_int) {
-	    htp->hash_equal = hash_int_equal;
-	    htp->hash_rank = hash_int_rank;
-	}
-	else if (key_type == hash_chunk) {
-	    htp->hash_equal = hash_chunk_equal;
-	    htp->hash_rank = hash_chunk_rank;
-	}
-	else {
-	    htp->hash_equal = hash_pointer_equal;
-	    htp->hash_rank = hash_pointer_rank;
-	}
-
-	return(htp);
+    case hash_string:
+	htp->hash_equal = hash_string_equal;
+	htp->hash_rank = hash_string_rank;
+	break;
+    case hash_int:
+	htp->hash_equal = hash_int_equal;
+	htp->hash_rank = hash_int_rank;
+	break;
+    case hash_chunk:
+	htp->hash_equal = hash_chunk_equal;
+	htp->hash_rank = hash_chunk_rank;
+	break;
+    case hash_pointer:
+	htp->hash_equal = hash_pointer_equal;
+	htp->hash_rank = hash_pointer_rank;
+	break;
+    default:
+	fprintf(stderr, "[make_hash_table] bad type %d\n", key_type);
+	abort();
     }
 
-    fprintf(stderr, "[make_hash_table] bad type %d\n", key_type);
-    abort();
+    return(htp);
 }
 
 /* Clears all entries of a hash table HTP. [pj] */
@@ -410,17 +404,6 @@ static int hash_pointer_rank(key, size)
 char *key;
 int size;
 {
-/*
-    unsigned int skey;
-    int v;
-
-    skey = (unsigned int) key;
-    v = abs((int) (skey>>2));
-    v %= size;
-
-    return(v);
-*/
-
     return(HASH_FUNCTION(key, size));
 }
 
@@ -428,17 +411,7 @@ static int hash_chunk_rank(key, size)
 char *key;
 int size;
 {
-/*
-    unsigned int skey;
-    int v;
-
-    skey = (unsigned int) ((chunk *)key)->i ;
-    v = abs((int) (skey>>2)); 
-    v %= size;
-
-    return(v);
-*/
-    return(HASH_FUNCTION(key, size));
+    return(HASH_FUNCTION(((chunk *)key)->i, size));
 }
 
 static int hash_string_equal(key1, key2)
