@@ -1,8 +1,11 @@
 /*
- * print_info.c
- *
  * a set a functions to print the host and node status in PVM,
  * called from a Fortran subroutine.
+ *
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1994/04/12 14:00:43 $, )
+ * version $Revision$
+ * got on %D%, %T%
+ * $Id$
  *
  * Fabien Coelho, June 1993
  */
@@ -55,6 +58,8 @@ void print_host_info_ ()
 	*hostp;
 
     info = pvm_config(&nhost, &narch, &hostp);
+    if (info<0) 
+	fprintf(stderr, "[print_host_info] pvm_config error (%d)\n", info);
 
     /*
      * print hosts
@@ -82,14 +87,25 @@ int *number, *tids, *hosttid;
 
     struct hostinfo
 	*hostp;
-	
+    
+    /* 
+     * get informations from pvm
+     */
     info = pvm_config(&nhost, &narch, &hostp);
+    if (info<0) 
+	fprintf(stderr, 
+		"[print_task_info] pvm_config error (%d)\n",
+		info);
+
     info = pvm_tasks(0, &ntask, &taskp);
+    if (info<0) 
+	fprintf(stderr, 
+		"[print_task_info] pvm_tasks error (%d)\n", 
+		info);
     
     /*
      * print tasks
      */
-
     fprintf(stdout, "host running on %s\n",
 	    host_name(which_task((*hosttid), ntask, taskp).ti_host,
 		      nhost, hostp));
