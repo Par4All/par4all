@@ -294,9 +294,24 @@ typedef hash_table control_mapping;
 #define entity_declarations(e) (code_declarations(entity_code(e)))
 
 #define effect_system(e) \
-	(predicate_system(transformer_relation(effect_context(e))))
+	(descriptor_convex_p(effect_descriptor(e))? \
+	 descriptor_convex(effect_descriptor(e)) : SC_UNDEFINED)
+
+#define effect_reference(e) \
+	 preference_reference(cell_preference(effect_cell(e)))
 
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
+
+#define make_simple_effect(reference,action,approximation)\
+    make_effect(make_cell(is_cell_preference, make_preference(reference)),\
+    (action),(approximation), \
+    make_descriptor(is_descriptor_none,UU))  
+
+#define make_convex_effect(reference,action,approximation,system)\
+    make_effect(make_cell(is_cell_preference, make_preference(reference)),\
+    (action),(approximation), \
+    make_descriptor(is_descriptor_convex,system))  
+
 
 #define statement_block_p(stat) \
 	(instruction_block_p(statement_instruction(stat)))
