@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/12/05 08:51:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/12/07 18:43:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/12/05 08:51:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/12/07 18:43:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -759,7 +759,7 @@ statement obj;
 {
     instruction i = statement_instruction(obj);
     text r = make_text( NIL ) ;
-    string comments = statement_comments(obj);
+    /* string comments = statement_comments(obj); */
 
     if (get_bool_property("PRETTYPRINT_ALL_EFFECTS")) {
 	r = (*text_statement_hook)( module, margin, obj ) ;
@@ -772,10 +772,12 @@ statement obj;
     else {
 	r = (*text_statement_hook)( module, margin, obj ) ;
     }
+    /*
     if (! string_undefined_p(comments)) {
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
 					      comments));
     }
+    */
     if (get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
 	get_bool_property("PRETTYPRINT_STATEMENT_ORDERING")) {
 	static char buffer[ 256 ] ;
@@ -796,16 +798,23 @@ statement obj;
     return( r ) ;
 }
 
-text text_statement(module, margin, obj)
+/* Handles all statements but tests with are nodes of an unstructured
+ * Those are handled by text_control.
+ */
+text text_statement(module, margin, stmt)
 entity module;
 int margin;
-statement obj;
+statement stmt;
 {
-    instruction i = statement_instruction(obj);
+    instruction i = statement_instruction(stmt);
     text r= make_text(NIL);
     text temp;
     string label = 
-	    entity_local_name(statement_label(obj)) + strlen(LABEL_PREFIX);
+	    entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
+    string comments = statement_comments(stmt);
+
+    debug(2, "text_statement", "Begin for statement %s\n",
+	  statement_identification(stmt));
 
     if (strcmp(label, RETURN_LABEL_NAME) == 0) {
 	/* do not add a redundant RETURN before an END, unless required */
@@ -825,13 +834,27 @@ statement obj;
     }
     else {
 	temp = text_instruction(module, label, margin, i,
-				statement_number(obj)) ;
+				statement_number(stmt)) ;
     }
 
     if(!ENDP(text_sentences(temp))) {
-	MERGE_TEXTS(r, init_text_statement(module, margin, obj)) ;
+	MERGE_TEXTS(r, init_text_statement(module, margin, stmt)) ;
+	if (! string_undefined_p(comments)) {
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+						  comments));
+	}
 	MERGE_TEXTS(r, temp);
     }
+    else {
+	/* Preserve comments */
+	if (! string_undefined_p(comments)) {
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+						  comments));
+	}
+    }
+
+    debug(2, "text_statement", "End for statement %s\n",
+	  statement_identification(stmt));
        
     return(r);
 }
@@ -1053,6 +1076,9 @@ text_unstructured(entity module,
    control cexit = unstructured_exit(u) ;
    control ct = unstructured_control(u) ;
 
+   debug(2, "text_unstructured", "Begin for unstructured %x\n",
+	 (unsigned int) u);
+
    if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH"))
    {
       r = empty_text(NULL);
@@ -1092,7 +1118,7 @@ text_unstructured(entity module,
        }
    }
    
-   if( get_debug_level() == 9 ) {
+   ifdebug(9) {
       fprintf(stderr,"Unstructured %x (%x, %x)\n", 
               (unsigned int) u, (unsigned int) ct, (unsigned int) cexit ) ;
       CONTROL_MAP( n, {
@@ -1113,6 +1139,10 @@ text_unstructured(entity module,
    }
    hash_table_free(labels) ;
    set_free(trail) ;
+
+   debug(2, "text_unstructured", "End for unstructured %x\n",
+	 (unsigned int) u);
+
    return(r) ;
 }
 
@@ -1191,6 +1221,10 @@ hash_table labels;
     cons *pc;
     string label;
     string label_name ;
+    string comments = statement_comments(st);
+
+    debug(2, "text_control", "Begin for statement %s\n",
+	  statement_identification(st));
 
     label = control_slabel(module, obj, labels);
     label_name = strdup(local_name(label)+strlen(LABEL_PREFIX)) ;
@@ -1231,6 +1265,10 @@ hash_table labels;
 	assert(instruction_test_p(i));
 
 	MERGE_TEXTS(r, init_text_statement(module, margin, st)) ;
+	if (! string_undefined_p(comments)) {
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+						  comments));
+	}
 	pc = CHAIN_SWORD(NIL, "IF (");
 	t = instruction_test(i);
 	pc = gen_nconc(pc, words_expression(test_condition(t)));
@@ -1253,6 +1291,10 @@ hash_table labels;
     default:
 	pips_error("text_graph", "incorrect number of successors\n");
     }
+
+    debug(2, "text_control", "End for statement %s\n",
+	  statement_identification(st));
+
     return( r ) ;
 }
 
