@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.69  1997/12/11 16:17:02  coelho
+ * fixed log on shells.
+ *
  * Revision 1.68  1997/12/11 16:08:02  coelho
  * implicit shell added.
  *
@@ -217,7 +220,7 @@ static void
 tp_system(string s)
 {
     int status;
-    user_log("shell %s\n", s);
+    user_log("shell%s%s\n", (s[0]==' '|| s[0]=='\t')? "": " ", s);
     status = system(s);
     fflush(stdout);
     if (status) 
