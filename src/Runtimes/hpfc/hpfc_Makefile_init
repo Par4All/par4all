@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/12/27 11:00:57 $, )
+# ($Date: 1996/12/27 11:36:49 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -355,6 +355,19 @@ clean:;	$(RM) *.o *~ *.trace $(DEDUCED) core
 clobber: clean; $(RM) $(RUNABLES) $(pvmbin)/$(HOST) $(pvmbin)/$(NODE)
 
 echo:; @echo $(ECHO)
+
+#
+# Taring
+
+TAR =	tar
+ZIP =	gzip -v9
+
+tar: clean
+	# taring the sources, maybe for export
+	cd .. ;\
+	$(TAR) cf $(TARGET).tar $(TARGET).hpfc ;\
+	$(ZIP) $(TARGET).tar
+
 
 # that is all
 #
