@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.15  2000/07/03 12:26:06  phamdinh
+   Pour changer repertoire a travailer
+
    Revision 1.14  2000/06/28 14:16:17  coelho
    CSE not inverted?
 
@@ -163,11 +166,19 @@ GENERIC_LOCAL_FUNCTION(inserted, persistant_statement_to_statement)
  */
 static void push_nesting(statement s)
 {
+  /* Just for testing nesting */
+  fprintf(stderr,"Level before push: %d\n", gen_length(nesting));
+  print_statement(s);
+
   nesting = CONS(STATEMENT, s, nesting);
 }
 
 static void pop_nesting(statement s)
 {
+  /* Just for testing nesting */
+  //fprintf(stderr,"Level before pop: %d\n", gen_length(nesting));
+  //print_statement(s);
+
   list old = nesting;
   pips_assert("same ", nesting && (s == STATEMENT(CAR(nesting))));
   nesting = CDR(nesting);
@@ -392,7 +403,7 @@ static void do_atomize_if_different_level(expression e, int level)
 {
   int elevel = expr_level_of(e);
 
-  /* fprintf(stderr, "ATOM %d/%d\n", elevel, level); print_expression(e); */
+  fprintf(stderr, "ATOM %d/%d\n", elevel, level); print_expression(e);
 
   if (elevel!=-1 && 
       elevel<level &&
@@ -451,7 +462,7 @@ static void atomize_or_associate_for_level(expression e, int level)
   lenargs = gen_length(args);
   exprlevel = expr_level_of(e);
 
-  if (Is_Associatif_Commutatif(func) && lenargs>2)
+  if (Is_Associatif_Commutatif(func) && lenargs>=2)
     {
       /* reassociation + atomization maybe needed.
 	 code taken from JZ.
@@ -541,6 +552,9 @@ static void atomize_whileloop(whileloop w)
 
 static void atomize_or_associate(expression e)
 {
+  fprintf(stderr,"\n---Atomize or associate---");
+  print_expression(e);
+
   atomize_or_associate_for_level(e, expr_level_of(e));
 }
 
@@ -579,7 +593,7 @@ static void insert_rwt(statement s)
   if (bound_inserted_p(s))
     {
       statement sblock = load_inserted(s);
-      instruction i = statement_instruction(sblock);
+      instruction i = statement_innstruction(sblock);
       sequence seq;
       pips_assert("it is a sequence", instruction_sequence_p(i));
 
