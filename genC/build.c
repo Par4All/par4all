@@ -212,7 +212,8 @@ int action ;
 {
     struct gen_binding *bp ;
 
-    bp = (action == NEW_BINDING) ? Tabulated_bp+Current_start+1 : Domains ;
+    //bp = (action == NEW_BINDING) ? Tabulated_bp+Current_start+1 : Domains ;
+    bp = Domains + ((action == NEW_BINDING) ? Current_start : 0);
 
     for( ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
 	if( bp->name == NULL ) {
