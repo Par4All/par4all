@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compiler.c,v $
+ * Revision 1.54  1997/07/21 13:29:45  keryell
+ * Replaced %x format by %p.
+ *
  * Revision 1.53  1997/05/03 11:48:52  coelho
  * *** empty log message ***
  *
@@ -408,8 +411,7 @@ hpf_compile_unstructured(
 
 	ifdebug(9)
 	{
-	    pips_debug(9, "host controls for [0x%x,0x%x]:\n", 
-		       (unsigned int) ct, (unsigned int) ce);
+	    pips_debug(9, "host controls for [%p,%p]:\n", ct, ce);
 	    
 	    debug_print_control(new_ct, "main");
 	    debug_print_control(new_ce, "exit");
