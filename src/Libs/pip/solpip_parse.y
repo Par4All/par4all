@@ -69,7 +69,7 @@ char *blabla;
 %start quast_sol
 %token <valeur>  ENTIER
 %token <blabla>  TEXTE
-%token  LIST LPAR RPAR LCRO RCRO DIES IF NEWPARM DIV DIV_OP MOINS_OP
+%token  LST LPAR RPAR LCRO RCRO DIES IF NEWPARM DIV DIV_OP MOINS_OP
 %type <valeur> coefficient
 
 %left DIV_OP 
@@ -135,7 +135,7 @@ quast             : forme
 
 
 forme             :     
-                  | LIST 
+                  | LST 
 		   {
 		   init_liste_vecteur ();
 		   }
@@ -224,13 +224,12 @@ coefficient1      : MOINS_OP ENTIER
 		  ;
 
 %% 
-void yyerror(s)
 
-	char*	s;
+int yyerror(char* s)
 {
-	fputs(s,stderr);
-	putc('\n',stderr);
+    fputs(s,stderr);
+    putc('\n',stderr);
+    return 0;
 }
 
-/*#include "lex.yy.c"*/   /* Le repertoire est au 25 / 03 / 93 : ~lamour/C/yac */
     
