@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.228 2002/06/17 13:47:18 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.229 2002/06/20 15:41:23 ancourt Exp $";
 #endif /* lint */
 
  /*
@@ -595,6 +595,7 @@ words_regular_call(call obj, bool is_a_subroutine)
 
 	/* Get rid of initial and final quotes */
 	ls1 = strncpy(ls1, ls+1, strlen(ls)-2);
+	*(ls1+strlen(ls)-2) = '\000';
 	pips_assert("eap must be a call to a constant string", expression_call_p(eap));
 	if(strcmp(get_string_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"), "STOP")!=0) {
 	  pc = CHAIN_SWORD(pc, ls1);
