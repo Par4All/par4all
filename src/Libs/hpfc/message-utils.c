@@ -2,6 +2,9 @@
  * 
  * $Id$
  * $Log: message-utils.c,v $
+ * Revision 1.19  1997/05/03 11:52:10  coelho
+ * *** empty log message ***
+ *
  * Revision 1.18  1997/03/20 10:23:31  coelho
  * RCS headers.
  *
@@ -446,21 +449,37 @@ array_ranges_to_template_ranges(
 	else
 	{
 	    range rg = RANGE(gen_nth(arraydim-1, lra));
-	    int
-		a  = HpfcExpressionToInt(alignment_rate(al)),
-		b  = HpfcExpressionToInt(alignment_constant(al)),
-		lb = HpfcExpressionToInt(range_lower(rg)),
-		ub = HpfcExpressionToInt(range_upper(rg)),
+
+	    if (expression_undefined_p(range_lower(rg)))
+	    {
+		/* non distributed dimension, so not used...
+		 */
+		lrt = gen_nconc(lrt, CONS(RANGE, 
+					  make_range(expression_undefined,
+						     expression_undefined,
+						     expression_undefined),
+					  NIL));
+	    }
+	    else
+	    {
+		int
+		    a  = HpfcExpressionToInt(alignment_rate(al)),
+		    b  = HpfcExpressionToInt(alignment_constant(al)),
+		    lb, ub, in;
+		expression tl, tu, ti;
+
+		lb = HpfcExpressionToInt(range_lower(rg));
+		ub = HpfcExpressionToInt(range_upper(rg));
 		in = HpfcExpressionToInt(range_increment(rg));
-	    expression
-		tl = int_to_expression(a*lb+b),
-		tu = int_to_expression(a*ub+b),
+		tl = int_to_expression(a*lb+b);
+		tu = int_to_expression(a*ub+b);
 		ti = int_to_expression(a*in);
 
-	    lrt = gen_nconc(lrt,
-			    CONS(RANGE,
-				 make_range(tl, tu, ti),
-				 NIL));
+		lrt = gen_nconc(lrt,
+				CONS(RANGE,
+				     make_range(tl, tu, ti),
+				     NIL));
+	    }
 	}
     }
     
