@@ -1,4 +1,8 @@
 #
+# $RCSfile: config.makefile,v $ (version $Revision$)
+# $Date: 1996/07/14 13:05:53 $, 
+#
+YFLAGS+=	-d
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
 LIB_CFILES=	pipsmake.c activate.c initializer.c callgraph.c \
@@ -19,7 +23,7 @@ lex.yy.c: readmakefile.l y.tab.h
 
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
 # filtred here.
-y.tab.c: readmakefile.y
+y.tab.c y.tab.h: readmakefile.y
 	$(YACC) $(YFLAGS) readmakefile.y
 	sed -e '/extern char \*malloc/d;s/YY/MM/g;s/yy/mm/g' y.tab.c > m.tab.c
 	mv m.tab.c y.tab.c
@@ -27,15 +31,6 @@ y.tab.c: readmakefile.y
 	mv m.tab.h y.tab.h
 
 m.tab.c: y.tab.c
-
-# on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
-# filtred here.
-y.tab.h: readmakefile.y
-	$(YACC) $(YFLAGS) readmakefile.y
-	sed -e '/extern char \*malloc/d;s/YY/MM/g;s/yy/mm/g' y.tab.c > m.tab.c
-	mv m.tab.c y.tab.c
-	sed -e 's/YY/MM/g;s/yy/mm/g' y.tab.h > m.tab.h
-	mv m.tab.h y.tab.h
 
 depend: y.tab.c lex.yy.c
 
