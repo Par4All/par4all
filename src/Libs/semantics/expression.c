@@ -4,6 +4,10 @@
   * $Id$
   *
   * $Log: expression.c,v $
+  * Revision 1.3  2001/07/19 17:54:31  irigoin
+  * Lots of additional reformatting with an indentation factor of two instead
+  * of four
+  *
   * Revision 1.2  2001/07/13 15:01:06  irigoin
   * First multitype version
   *
@@ -67,63 +71,63 @@ generic_minmax_to_transformer(entity e,
 			      bool minmax,
 			      bool is_internal)
 {
-    transformer tf = transformer_undefined;
-    transformer tf_acc = transformer_undefined;
-    list cexpr;
-    Pcontrainte cl = CONTRAINTE_UNDEFINED;
+  transformer tf = transformer_undefined;
+  transformer tf_acc = transformer_undefined;
+  list cexpr;
+  Pcontrainte cl = CONTRAINTE_UNDEFINED;
 
-    pips_debug(8, "begin\n");
+  pips_debug(8, "begin\n");
 
-    pips_assert("Precondition is unused", transformer_undefined_p(pre));
+  pips_assert("Precondition is unused", transformer_undefined_p(pre));
 
-    for(cexpr = args; !ENDP(cexpr); POP(cexpr)) {
-	expression arg = EXPRESSION(CAR(cexpr));
-	type t = entity_type(e);
-	entity tmp = make_local_temporary_value_entity(t);
-	transformer tfe = any_expression_to_transformer(tmp, arg, pre, is_internal);
+  for(cexpr = args; !ENDP(cexpr); POP(cexpr)) {
+    expression arg = EXPRESSION(CAR(cexpr));
+    type t = entity_type(e);
+    entity tmp = make_local_temporary_value_entity(t);
+    transformer tfe = any_expression_to_transformer(tmp, arg, pre, is_internal);
 	
-	Pvecteur v = vect_new((Variable) tmp, VALUE_ONE);
-	Pcontrainte cv = CONTRAINTE_UNDEFINED;
+    Pvecteur v = vect_new((Variable) tmp, VALUE_ONE);
+    Pcontrainte cv = CONTRAINTE_UNDEFINED;
 
-	vect_add_elem(&v, (Variable) e, VALUE_MONE);
+    vect_add_elem(&v, (Variable) e, VALUE_MONE);
 
-	if(minmax) {
-	  v = vect_multiply(v, VALUE_MONE);
-	}
-
-	cv = contrainte_make(v);
-	cv->succ = cl;
-	cl = cv;
-
-	/* memory leak! */
-	tf_acc = transformer_safe_image_intersection(tf_acc, tfe);
+    if(minmax) {
+      v = vect_multiply(v, VALUE_MONE);
     }
 
+    cv = contrainte_make(v);
+    cv->succ = cl;
+    cl = cv;
 
-    if(CONTRAINTE_UNDEFINED_P(cl) || CONTRAINTE_NULLE_P(cl)) {
-	Psysteme sc = sc_make(CONTRAINTE_UNDEFINED, cl);
+    /* memory leak! */
+    tf_acc = transformer_safe_image_intersection(tf_acc, tfe);
+  }
 
-	sc_base(sc) = base_add_variable(BASE_NULLE, (Variable) e);
-	sc_dimension(sc) = 1;
-	tf = make_transformer(NIL,
-			      make_predicate(sc));
-    }
-    else {
-	/* A miracle occurs and the proper basis is derived from the
-	   constraints ( I do not understand why the new and the old value
-	   of e both appear... so it may not be necessary for the
-	   consistency check... I'm lost, FI, 6 Jan. 1999) */
-      tf_acc = transformer_inequalities_add(tf_acc, cl);
-      tf = tf_acc;
-    }
 
-    ifdebug(8) {
-	pips_debug(8, "result:\n");
-	dump_transformer(tf);
-	pips_debug(8, "end\n");
-    }
+  if(CONTRAINTE_UNDEFINED_P(cl) || CONTRAINTE_NULLE_P(cl)) {
+    Psysteme sc = sc_make(CONTRAINTE_UNDEFINED, cl);
 
-    return tf;
+    sc_base(sc) = base_add_variable(BASE_NULLE, (Variable) e);
+    sc_dimension(sc) = 1;
+    tf = make_transformer(NIL,
+			  make_predicate(sc));
+  }
+  else {
+    /* A miracle occurs and the proper basis is derived from the
+       constraints ( I do not understand why the new and the old value
+       of e both appear... so it may not be necessary for the
+       consistency check... I'm lost, FI, 6 Jan. 1999) */
+    tf_acc = transformer_inequalities_add(tf_acc, cl);
+    tf = tf_acc;
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "result:\n");
+    dump_transformer(tf);
+    pips_debug(8, "end\n");
+  }
+
+  return tf;
 }
 
 /* Type independent. Most of it should be factored out for unary operations. */
@@ -209,9 +213,19 @@ static transformer addition_operation_to_transformer(entity v,
     tf12 = transformer_combine(tf1, tf2);
   }
   else {
-    pips_debug(9, "No side effects\n");
-    tf12 = transformer_safe_intersection(tf1, tf2);
-    free_transformer(tf1);
+    pips_debug(9, "No adversary side effects\n");
+    if(transformer_undefined_p(tf1)
+       || transformer_undefined_p(tf2)
+       || (ENDP(transformer_arguments(tf1)) && ENDP(transformer_arguments(tf2)))) {
+      /* No side effects at all */
+      pips_debug(9, "No side effects at all\n");
+      tf12 = transformer_safe_intersection(tf1, tf2);
+      free_transformer(tf1);
+    }
+    else {
+    pips_debug(9, "Side effects on other variables\n");
+      tf12 = transformer_combine(tf1, tf2);
+    }
   }
 
   tf = transformer_safe_image_intersection(tf12, tf_op);
@@ -656,101 +670,102 @@ precondition_add_condition_information(
 transformer 
 simple_affine_to_transformer(entity e, Pvecteur a, bool is_internal)
 {
-    transformer tf = transformer_undefined;
-    Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
-    Pvecteur vexpr = vect_dup(a);
-    Pcontrainte c;
-    Pvecteur eq = VECTEUR_NUL;
+  transformer tf = transformer_undefined;
+  Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
+  Pvecteur vexpr = vect_dup(a);
+  Pcontrainte c;
+  Pvecteur eq = VECTEUR_NUL;
 
-    pips_debug(8, "begin with is_internal=%s\n", bool_to_string(is_internal));
+  pips_debug(8, "begin with is_internal=%s\n", bool_to_string(is_internal));
 
-    ifdebug(9) {
-	pips_debug(9, "\nLinearized expression:\n");
-	vect_dump(vexpr);
-    }
+  ifdebug(9) {
+    pips_debug(9, "\nLinearized expression:\n");
+    vect_dump(vexpr);
+  }
 
-    if(!is_internal
-       || (value_mappings_compatible_vector_p(ve) &&
-       value_mappings_compatible_vector_p(vexpr))) {
-      /* The renaming used to eliminate equivalenced variables cannot be
-         performed because e may be a temporary value. It is better to
-         perform it at a higher level, for instance at the assignement
-         level. */
-	eq = vect_substract(ve, vexpr);
-	vect_rm(ve);
-	vect_rm(vexpr);
-	c = contrainte_make(eq);
-	tf = make_transformer(NIL,
-			      make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
-    }
-    else {
-	vect_rm(eq);
-	vect_rm(ve);
-	vect_rm(vexpr);
-	tf = transformer_undefined;
-    }
+  if(!is_internal
+     || (value_mappings_compatible_vector_p(ve) &&
+	 value_mappings_compatible_vector_p(vexpr))) {
+    /* The renaming used to eliminate equivalenced variables cannot be
+       performed because e may be a temporary value. It is better to
+       perform it at a higher level, for instance at the assignement
+       level. */
+    eq = vect_substract(ve, vexpr);
+    vect_rm(ve);
+    vect_rm(vexpr);
+    c = contrainte_make(eq);
+    tf = make_transformer(NIL,
+			  make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
+  }
+  else {
+    vect_rm(eq);
+    vect_rm(ve);
+    vect_rm(vexpr);
+    tf = transformer_undefined;
+  }
 
-    pips_debug(8, "end with tf=%p\n", tf);
-    ifdebug(8) dump_transformer(tf);
+  pips_debug(8, "end with tf=%p\n", tf);
+  ifdebug(8) dump_transformer(tf);
 
-    return tf;
+  return tf;
 }
+
 transformer 
 affine_to_transformer(entity e, Pvecteur a, bool assignment)
 {
-    transformer tf = transformer_undefined;
-    Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
-    entity e_new = entity_to_new_value(e);
-    entity e_old = entity_to_old_value(e);
-    cons * tf_args = CONS(ENTITY, e_new, NIL);
-    /* must be duplicated right now  because it will be
-       renamed and checked at the same time by
-       value_mappings_compatible_vector_p() */
-    Pvecteur vexpr = vect_dup(a);
-    Pcontrainte c;
-    Pvecteur eq = VECTEUR_NUL;
+  transformer tf = transformer_undefined;
+  Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
+  entity e_new = entity_to_new_value(e);
+  entity e_old = entity_to_old_value(e);
+  cons * tf_args = CONS(ENTITY, e_new, NIL);
+  /* must be duplicated right now  because it will be
+     renamed and checked at the same time by
+     value_mappings_compatible_vector_p() */
+  Pvecteur vexpr = vect_dup(a);
+  Pcontrainte c;
+  Pvecteur eq = VECTEUR_NUL;
 
-    pips_debug(8, "begin\n");
+  pips_debug(8, "begin\n");
 
-    ifdebug(9) {
-	pips_debug(9, "\nLinearized expression:\n");
-	vect_dump(vexpr);
+  ifdebug(9) {
+    pips_debug(9, "\nLinearized expression:\n");
+    vect_dump(vexpr);
+  }
+
+  if(!assignment) {
+    vect_add_elem(&vexpr, (Variable) e, (Value) 1);
+
+    ifdebug(8) {
+      pips_debug(8, "\nLinearized expression for incrementation:\n");
+      vect_dump(vexpr);
     }
+  }
 
-    if(!assignment) {
-	vect_add_elem(&vexpr, (Variable) e, (Value) 1);
+  if(value_mappings_compatible_vector_p(ve) &&
+     value_mappings_compatible_vector_p(vexpr)) {
+    ve = vect_variable_rename(ve,
+			      (Variable) e,
+			      (Variable) e_new);
+    (void) vect_variable_rename(vexpr,
+				(Variable) e_new,
+				(Variable) e_old);
+    eq = vect_substract(ve, vexpr);
+    vect_rm(ve);
+    vect_rm(vexpr);
+    c = contrainte_make(eq);
+    tf = make_transformer(tf_args,
+			  make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
+  }
+  else {
+    vect_rm(eq);
+    vect_rm(ve);
+    vect_rm(vexpr);
+    tf = transformer_undefined;
+  }
 
-	ifdebug(8) {
-	    pips_debug(8, "\nLinearized expression for incrementation:\n");
-	    vect_dump(vexpr);
-	}
-    }
+  pips_debug(8, "end\n");
 
-    if(value_mappings_compatible_vector_p(ve) &&
-       value_mappings_compatible_vector_p(vexpr)) {
-	ve = vect_variable_rename(ve,
-				  (Variable) e,
-				  (Variable) e_new);
-	(void) vect_variable_rename(vexpr,
-				    (Variable) e_new,
-				    (Variable) e_old);
-	eq = vect_substract(ve, vexpr);
-	vect_rm(ve);
-	vect_rm(vexpr);
-	c = contrainte_make(eq);
-	tf = make_transformer(tf_args,
-		      make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
-    }
-    else {
-	vect_rm(eq);
-	vect_rm(ve);
-	vect_rm(vexpr);
-	tf = transformer_undefined;
-    }
-
-    pips_debug(8, "end\n");
-
-    return tf;
+  return tf;
 }
 
 transformer 
@@ -769,72 +784,72 @@ static transformer modulo_to_transformer(entity e, /* assumed to be a value */
 					 transformer pre,
 					 bool is_internal)
 {
-    transformer tf = transformer_undefined;
+  transformer tf = transformer_undefined;
 
-    debug(8, "modulo_to_transformer", "begin\n");
+  debug(8, "modulo_to_transformer", "begin\n");
 
-    pips_assert("Precondition is unused", pre==pre);
-    pips_assert("arg1 is unused, shut up the compiler", arg1==arg1);
-    pips_assert("arg1 is unused, shut up the compiler", is_internal==is_internal);
+  pips_assert("Precondition is unused", pre==pre);
+  pips_assert("arg1 is unused, shut up the compiler", arg1==arg1);
+  pips_assert("arg1 is unused, shut up the compiler", is_internal==is_internal);
     
-    if(integer_constant_expression_p(arg2)) {
-	int d = integer_constant_expression_value(arg2);
-	Pvecteur ub = vect_new((Variable) e, VALUE_ONE);
-	Pvecteur lb = vect_new((Variable) e, VALUE_MONE);
-	Pcontrainte clb = contrainte_make(lb);
-	Pcontrainte cub = CONTRAINTE_UNDEFINED;
+  if(integer_constant_expression_p(arg2)) {
+    int d = integer_constant_expression_value(arg2);
+    Pvecteur ub = vect_new((Variable) e, VALUE_ONE);
+    Pvecteur lb = vect_new((Variable) e, VALUE_MONE);
+    Pcontrainte clb = contrainte_make(lb);
+    Pcontrainte cub = CONTRAINTE_UNDEFINED;
 
-	vect_add_elem(&ub, TCST, int_to_value(1-d));
-	vect_add_elem(&lb, TCST, int_to_value(d-1));
-	cub = contrainte_make(ub);
-	clb->succ = cub;
-	tf = make_transformer(NIL,
-		make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
-    }
+    vect_add_elem(&ub, TCST, int_to_value(1-d));
+    vect_add_elem(&lb, TCST, int_to_value(d-1));
+    cub = contrainte_make(ub);
+    clb->succ = cub;
+    tf = make_transformer(NIL,
+			  make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
+  }
 
-    ifdebug(8) {
-	debug(8, "modulo_to_transformer", "result:\n");
-	dump_transformer(tf);
-	debug(8, "modulo_to_transformer", "end\n");
-    }
+  ifdebug(8) {
+    debug(8, "modulo_to_transformer", "result:\n");
+    dump_transformer(tf);
+    debug(8, "modulo_to_transformer", "end\n");
+  }
 
-   return tf;
+  return tf;
 }
 
 static transformer iabs_to_transformer(entity e, /* assumed to be a value */
 				       expression expr,
 				       transformer pre)
 {
-    transformer tf = transformer_undefined;
-    normalized n = NORMALIZE_EXPRESSION(expr);
+  transformer tf = transformer_undefined;
+  normalized n = NORMALIZE_EXPRESSION(expr);
 
-    pips_debug(8, "begin\n");
+  pips_debug(8, "begin\n");
 
-    pips_assert("Precondition is unused", transformer_undefined_p(pre));
+  pips_assert("Precondition is unused", transformer_undefined_p(pre));
 
-    if(normalized_linear_p(n)) {
-	Pvecteur vlb1 = vect_dup((Pvecteur) normalized_linear(n));
-	Pvecteur vlb2 = vect_multiply(vect_dup((Pvecteur) normalized_linear(n)), VALUE_MONE);
-	Pcontrainte clb1 = CONTRAINTE_UNDEFINED;
-	Pcontrainte clb2 = CONTRAINTE_UNDEFINED;
-	cons * tf_args = NIL;
+  if(normalized_linear_p(n)) {
+    Pvecteur vlb1 = vect_dup((Pvecteur) normalized_linear(n));
+    Pvecteur vlb2 = vect_multiply(vect_dup((Pvecteur) normalized_linear(n)), VALUE_MONE);
+    Pcontrainte clb1 = CONTRAINTE_UNDEFINED;
+    Pcontrainte clb2 = CONTRAINTE_UNDEFINED;
+    cons * tf_args = NIL;
 
-	vect_add_elem(&vlb1, (Variable) e, VALUE_MONE);
-	vect_add_elem(&vlb2, (Variable) e, VALUE_MONE);
-	clb1 = contrainte_make(vlb1);
-	clb2 = contrainte_make(vlb2);
-	clb1->succ = clb2;
-	tf = make_transformer(tf_args,
-		make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb1)));
-    }
+    vect_add_elem(&vlb1, (Variable) e, VALUE_MONE);
+    vect_add_elem(&vlb2, (Variable) e, VALUE_MONE);
+    clb1 = contrainte_make(vlb1);
+    clb2 = contrainte_make(vlb2);
+    clb1->succ = clb2;
+    tf = make_transformer(tf_args,
+			  make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb1)));
+  }
 
-    ifdebug(8) {
-	pips_debug(8, "result:\n");
-	dump_transformer(tf);
-	pips_debug(8, "end\n");
-    }
+  ifdebug(8) {
+    pips_debug(8, "result:\n");
+    dump_transformer(tf);
+    pips_debug(8, "end\n");
+  }
 
-   return tf;
+  return tf;
 }
 
 static transformer 
@@ -844,42 +859,43 @@ integer_divide_to_transformer(entity e,
 			      transformer pre,
 			      bool is_internal)
 {
-    transformer tf = transformer_undefined;
-    normalized n1 = NORMALIZE_EXPRESSION(arg1);
+  transformer tf = transformer_undefined;
+  normalized n1 = NORMALIZE_EXPRESSION(arg1);
 
-    pips_debug(8, "begin with is_internal=%s\n",
-	       bool_to_string(is_internal));
+  pips_debug(8, "begin with is_internal=%s\n",
+	     bool_to_string(is_internal));
  
-    pips_assert("Precondition is unused", transformer_undefined_p(pre));
+  /* pips_assert("Precondition is unused", transformer_undefined_p(pre)); */
+  pips_assert("Shut up the compiler", pre==pre);
 
-    if(integer_constant_expression_p(arg2) && normalized_linear_p(n1)) {
-	int d = integer_constant_expression_value(arg2);
-	/* must be duplicated right now  because it will be
-	   renamed and checked at the same time by
-	   value_mappings_compatible_vector_p() */
-	Pvecteur vlb =
-	    vect_multiply(vect_dup(normalized_linear(n1)), VALUE_MONE); 
-	Pvecteur vub = vect_dup(normalized_linear(n1));
-	Pcontrainte clb = CONTRAINTE_UNDEFINED;
-	Pcontrainte cub = CONTRAINTE_UNDEFINED;
+  if(integer_constant_expression_p(arg2) && normalized_linear_p(n1)) {
+    int d = integer_constant_expression_value(arg2);
+    /* must be duplicated right now  because it will be
+       renamed and checked at the same time by
+       value_mappings_compatible_vector_p() */
+    Pvecteur vlb =
+      vect_multiply(vect_dup(normalized_linear(n1)), VALUE_MONE); 
+    Pvecteur vub = vect_dup(normalized_linear(n1));
+    Pcontrainte clb = CONTRAINTE_UNDEFINED;
+    Pcontrainte cub = CONTRAINTE_UNDEFINED;
 
-	vect_add_elem(&vlb, (Variable) e, int_to_value(d));
-	vect_add_elem(&vub, (Variable) e, int_to_value(-d));
-	vect_add_elem(&vub, TCST, int_to_value(1-d));
-	clb = contrainte_make(vlb);
-	cub = contrainte_make(vub);
-	clb->succ = cub;
-	tf = make_transformer(NIL,
-	       make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
-    }
+    vect_add_elem(&vlb, (Variable) e, int_to_value(d));
+    vect_add_elem(&vub, (Variable) e, int_to_value(-d));
+    vect_add_elem(&vub, TCST, int_to_value(1-d));
+    clb = contrainte_make(vlb);
+    cub = contrainte_make(vub);
+    clb->succ = cub;
+    tf = make_transformer(NIL,
+			  make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
+  }
 
-    ifdebug(8) {
-	debug(8, "integer_divide_to_transformer", "result:\n");
-	dump_transformer(tf);
-	debug(8, "integer_divide_to_transformer", "end\n");
-    }
+  ifdebug(8) {
+    debug(8, "integer_divide_to_transformer", "result:\n");
+    dump_transformer(tf);
+    debug(8, "integer_divide_to_transformer", "end\n");
+  }
 
-    return tf;
+  return tf;
 }
 
 static transformer 
@@ -1054,76 +1070,76 @@ integer_minmax_to_transformer(entity e,
 			      bool is_min,
 			      bool is_internal)
 {
-    transformer tf = transformer_undefined;
-    expression arg = expression_undefined;
-    normalized n = normalized_undefined;
-    list cexpr;
-    Pcontrainte cl = CONTRAINTE_UNDEFINED;
+  transformer tf = transformer_undefined;
+  expression arg = expression_undefined;
+  normalized n = normalized_undefined;
+  list cexpr;
+  Pcontrainte cl = CONTRAINTE_UNDEFINED;
 
-    pips_debug(8, "begin for %s %s\n",
-	       is_min? "minimum" : "maximum",
-	       is_internal? "intraprocedural" : "interprocedural");
+  pips_debug(8, "begin for %s %s\n",
+	     is_min? "minimum" : "maximum",
+	     is_internal? "intraprocedural" : "interprocedural");
 
-    pips_assert("Precondition is unused", transformer_undefined_p(pre));
+  pips_assert("Precondition is unused", transformer_undefined_p(pre));
 
-    for(cexpr = args; !ENDP(cexpr); POP(cexpr)) {
-	arg = EXPRESSION(CAR(cexpr));
-	n = NORMALIZE_EXPRESSION(arg);
+  for(cexpr = args; !ENDP(cexpr); POP(cexpr)) {
+    arg = EXPRESSION(CAR(cexpr));
+    n = NORMALIZE_EXPRESSION(arg);
 
-	if(normalized_linear_p(n)) {
-	    Pvecteur v = vect_dup((Pvecteur) normalized_linear(n));
-	    Pcontrainte cv = CONTRAINTE_UNDEFINED;
+    if(normalized_linear_p(n)) {
+      Pvecteur v = vect_dup((Pvecteur) normalized_linear(n));
+      Pcontrainte cv = CONTRAINTE_UNDEFINED;
 
-	    vect_add_elem(&v, (Variable) e, VALUE_MONE);
+      vect_add_elem(&v, (Variable) e, VALUE_MONE);
 
-	    if(is_min) {
-		v = vect_multiply(v, VALUE_MONE);
-	    }
+      if(is_min) {
+	v = vect_multiply(v, VALUE_MONE);
+      }
 
-	    cv = contrainte_make(v);
-	    cv->succ = cl;
-	    cl = cv;
+      cv = contrainte_make(v);
+      cv->succ = cl;
+      cl = cv;
 
-	}
     }
+  }
 
-    if(CONTRAINTE_UNDEFINED_P(cl) || CONTRAINTE_NULLE_P(cl)) {
-	Psysteme sc = sc_make(CONTRAINTE_UNDEFINED, cl);
+  if(CONTRAINTE_UNDEFINED_P(cl) || CONTRAINTE_NULLE_P(cl)) {
+    Psysteme sc = sc_make(CONTRAINTE_UNDEFINED, cl);
 
-	sc_base(sc) = base_add_variable(BASE_NULLE, (Variable) e);
-	sc_dimension(sc) = 1;
-	tf = make_transformer(NIL,
-			      make_predicate(sc));
-    }
-    else {
-	/* A miracle occurs and the proper basis is derived from the
-	   constraints ( I do not understand why the new and the old value
-	   of e both appear... so it may not be necessary for the
-	   consistency check... I'm lost, FI, 6 Jan. 1999) */
-	tf = make_transformer(NIL,
-			      make_predicate(sc_make(CONTRAINTE_UNDEFINED, cl)));
-    }
+    sc_base(sc) = base_add_variable(BASE_NULLE, (Variable) e);
+    sc_dimension(sc) = 1;
+    tf = make_transformer(NIL,
+			  make_predicate(sc));
+  }
+  else {
+    /* A miracle occurs and the proper basis is derived from the
+       constraints ( I do not understand why the new and the old value
+       of e both appear... so it may not be necessary for the
+       consistency check... I'm lost, FI, 6 Jan. 1999) */
+    tf = make_transformer(NIL,
+			  make_predicate(sc_make(CONTRAINTE_UNDEFINED, cl)));
+  }
 
 
-    ifdebug(8) {
-	pips_debug(8, "result:\n");
-	dump_transformer(tf);
-	pips_debug(8, "end\n");
-    }
+  ifdebug(8) {
+    pips_debug(8, "result:\n");
+    dump_transformer(tf);
+    pips_debug(8, "end\n");
+  }
 
-    return tf;
+  return tf;
 }
 
 static transformer 
 min0_to_transformer(entity e, list args, transformer pre, bool is_internal)
 {
-    return integer_minmax_to_transformer(e, args, pre, TRUE, is_internal);
+  return integer_minmax_to_transformer(e, args, pre, TRUE, is_internal);
 }
 
 static transformer 
 max0_to_transformer(entity e, list args, transformer pre, bool is_internal)
 {
-    return integer_minmax_to_transformer(e, args, pre, FALSE, is_internal);
+  return integer_minmax_to_transformer(e, args, pre, FALSE, is_internal);
 }
 
 /* */
@@ -1800,7 +1816,7 @@ any_expression_to_transformer(
   basic bv = variable_basic(type_variable(entity_type(v)));
 
   ifdebug(8) {
-    pips_debug(8, "begin for entity %s of type % s and %s expression ", entity_local_name(v),
+    pips_debug(8, "begin for entity %s of type %s and %s expression ", entity_local_name(v),
 	       basic_to_string(bv), basic_to_string(be));
     print_expression(expr);
   }
@@ -1859,37 +1875,37 @@ any_expression_to_transformer(
 
 bool false_condition_wrt_precondition_p(expression c, transformer pre)
 {
-    bool result = FALSE;
+  bool result = FALSE;
 
-    result = eval_condition_wrt_precondition_p(c, pre, FALSE);
+  result = eval_condition_wrt_precondition_p(c, pre, FALSE);
 
-    return result;
+  return result;
 }
 
 bool true_condition_wrt_precondition_p(expression c, transformer pre)
 {
-    bool result = FALSE;
+  bool result = FALSE;
 
-    result = eval_condition_wrt_precondition_p(c, pre, TRUE);
+  result = eval_condition_wrt_precondition_p(c, pre, TRUE);
 
-    return result;
+  return result;
 }
 
 bool eval_condition_wrt_precondition_p(expression c, transformer pre, bool veracity)
 {
-    bool result = FALSE;
-    transformer f = transformer_dup(pre);
+  bool result = FALSE;
+  transformer f = transformer_dup(pre);
 
-    if(veracity) {
-	f = precondition_add_condition_information(f, c, FALSE);
-    }
-    else {
-	f = precondition_add_condition_information(f, c, TRUE);
-    }
+  if(veracity) {
+    f = precondition_add_condition_information(f, c, FALSE);
+  }
+  else {
+    f = precondition_add_condition_information(f, c, TRUE);
+  }
 
-    result = transformer_empty_p(f);
+  result = transformer_empty_p(f);
 
-    return result;
+  return result;
 }
 
 /* It is supposed to be obsolete but is still called. Maybe, it's only
