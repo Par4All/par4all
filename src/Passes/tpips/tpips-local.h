@@ -32,8 +32,8 @@ extern void tp_restart(FILE *);
 #define SHELL_ESCAPE "shell" 		/* ! used for history reference */
 #define CHANGE_DIR   "cd "
 
-#define SET_ENV	     "setenv "
-#define GET_ENV	     "getenv "
+#define SET_ENV	     "setenv"
+#define GET_ENV	     "getenv"
 
 #define SET_PROP     "setproperty "
 #define GET_PROP     "getproperty"
