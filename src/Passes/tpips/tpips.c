@@ -665,7 +665,7 @@ static char * substitute_variables(char * line)
 static char * last = NULL;
 
 static bool tpips_init_done = FALSE;
-static void 
+void 
 tpips_init(void)
 {
     if (tpips_init_done) return;
