@@ -35,9 +35,8 @@ extern bool get_bool_property(string);
 
 void default_user_log(char *fmt, va_list args)
 {
-    if(get_bool_property("USER_LOG_P")==FALSE)
+    if(!get_bool_property("USER_LOG_P")) 
 	return;
-
     (void) vfprintf(stdout, fmt, args);
     fflush(stdout);
 }
