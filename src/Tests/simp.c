@@ -1,5 +1,5 @@
 /* $RCSfile: simp.c,v $ (version $Revision$)
- * $Date: 1996/08/07 13:13:39 $, 
+ * $Date: 1996/08/08 16:01:22 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -61,6 +61,8 @@ main(int argc, char *argv[])
      */
     FILE * f1;
     int i; /* compte les systemes, chacun dans un fichier */
+
+    initialize_sc(variable_default_name);
     
     /* lecture et test de la faisabilite' de systemes sur fichiers */
 
