@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1995/07/26 16:52:52 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1995/09/13 17:25:07 $, )
  * version $Revision$,
  */
 
@@ -17,16 +17,19 @@ FILE* file;
 	    "     $     REALNBOFARRAYS,\n"
 	    "     $     REALNBOFTEMPLATES,\n"
 	    "     $     REALNBOFPROCESSORS,\n"
-	    "     $     REALMAXSIZEOFPROCS\n\n"
+	    "     $     REALMAXSIZEOFPROCS\n"
+	    "     $     REALMAXSIZEOFBUFFER\n\n"
 	    "c\nc parameters\nc\n"
 	    "      parameter(REALNBOFARRAYS = %d)\n"
 	    "      parameter(REALNBOFTEMPLATES = %d)\n"
 	    "      parameter(REALNBOFPROCESSORS = %d)\n"
-	    "      parameter(REALMAXSIZEOFPROCS = %d)\n",
+	    "      parameter(REALMAXSIZEOFPROCS = %d)\n"
+	    "      parameter(REALMAXSIZEOFBUFFER = %d)\n",
 	    number_of_distributed_arrays(),
 	    number_of_templates(),
 	    number_of_processors(),
-	    max_size_of_processors());
+	    max_size_of_processors(),
+	    get_int_property("HPFC_BUFFER_SIZE"));
 }
 
 /* create_parameters_h
@@ -48,22 +51,27 @@ entity module;
 
     MAP(ENTITY, array,
     {
+	int andim;
+
 	newarray = load_new_node(array);
-	
+	andim  = NumberOfDimension(newarray);
+
 	debug(8, "create_parameters_h",
 	      "considering array %s (new is %s)\n",
 	      entity_name(array), entity_name(newarray));
 	
-	for (i=1 ; i<=NumberOfDimension(newarray) ; i++)
+	for (i=1 ; i<=andim ; i++)
 	{
 	    d = FindIthDimension(newarray, i);
 	    
-	    fprintf(file, "      integer %s, %s\n",
-		     bound_parameter_name(newarray, LOWER, i),
-		    bound_parameter_name(newarray, UPPER, i));
-	    
-	    fprintf(file, 
-		    "      parameter(%s = %d)\n      parameter(%s = %d)\n",
+	    /* ??? memory leak from bound_parameter_name
+	     */
+	    fprintf(file,
+		    "      integer %s, %s\n"
+		    "      parameter(%s = %d)\n"
+		    "      parameter(%s = %d)\n",
+		    bound_parameter_name(newarray, LOWER, i),
+		    bound_parameter_name(newarray, UPPER, i),
 		    bound_parameter_name(newarray, LOWER, i),
 		    HpfcExpressionToInt(dimension_lower(d)),
 		    bound_parameter_name(newarray, UPPER, i),
@@ -77,8 +85,7 @@ entity module;
 
 int max_size_of_processors()
 {
-    int 
-	current_max = 1;
+    int current_max = 1;
 
     MAP(ENTITY, e, 
     {
@@ -133,14 +140,14 @@ entity module;
 	distribute di = load_entity_distribute(template);
 	int i;
 	
-	fprintf(file, "c\nc initializing array %s, number %d\nc\n",
-		entity_local_name(array), an);
-	
 	/* NODIMA: Number Of  DIMensions of an Array
 	 * ATOT: Array TO Template
 	 */
-	fprintf(file, "      NODIMA(%d) = %d\n", an, nd);
-	fprintf(file, "      ATOT(%d) = %d\n", an, tn);
+	fprintf(file, 
+		"c\nc initializing array %s, number %d\nc\n"
+		"      NODIMA(%d) = %d\n"
+		"      ATOT(%d) = %d\n",
+		entity_local_name(array), an, an, nd, an, tn);
 
 	if (dynamic_entity_p(array) && array==load_primary_entity(array))
 	{
@@ -168,13 +175,13 @@ entity module;
 	     * 3: size, (2)-(1)+1
 	     * 4: new declaration flag
 	     */
-	    fprintf(file, "\n");
-	    fprintf(file, "      RANGEA(%d, %d, 1) = %d\n", an, i, lb);
-	    fprintf(file, "      RANGEA(%d, %d, 2) = %d\n", an, i, ub);
-	    fprintf(file, "      RANGEA(%d, %d, 3) = %d\n", an, i, sz);
-	    fprintf(file, "c\n");
-	    fprintf(file, "      RANGEA(%d, %d, 4) = %d\n", an, i, 
-		    code_number(decl));
+	    fprintf(file, "\n"
+		    "      RANGEA(%d, %d, 1) = %d\n"
+		    "      RANGEA(%d, %d, 2) = %d\n"
+		    "      RANGEA(%d, %d, 3) = %d\nc\n"
+		    "      RANGEA(%d, %d, 4) = %d\n", 
+		    an, i, lb, an, i, ub, an, i, sz,
+		    an, i, code_number(decl));
 	    
 	    switch(decl)
 	    {
@@ -211,9 +218,11 @@ entity module;
 		  * 6: alignment rate a,
 		  * 7: alignment shift, b-t_{m}
 		  */
-		 fprintf(file, "      RANGEA(%d, %d, 5) = %d\n", an, i, param);
-		 fprintf(file, "      RANGEA(%d, %d, 6) = %d\n", an, i, rate);
-		 fprintf(file, "      RANGEA(%d, %d, 7) = %d\n", an, i, shift);
+		 fprintf(file, 
+			 "      RANGEA(%d, %d, 5) = %d\n"
+			 "      RANGEA(%d, %d, 6) = %d\n"
+			 "      RANGEA(%d, %d, 7) = %d\n",
+			 an, i, param, an, i, rate, an, i, shift);
 		 
 		 break;
 	     }
@@ -246,10 +255,12 @@ entity module;
 		  * 7: initial cycle number,
 		  * 8: alignment shift, b-t_{m}
 		  */
-		 fprintf(file, "      RANGEA(%d, %d, 5) = %d\n", an, i, param);
-		 fprintf(file, "      RANGEA(%d, %d, 6) = %d\n", an, i, sc);
-		 fprintf(file, "      RANGEA(%d, %d, 7) = %d\n", an, i, no);
-		 fprintf(file, "      RANGEA(%d, %d, 8) = %d\n", an, i, shift);
+		 fprintf(file,
+			 "      RANGEA(%d, %d, 5) = %d\n"
+			 "      RANGEA(%d, %d, 6) = %d\n"
+			 "      RANGEA(%d, %d, 7) = %d\n"
+			 "      RANGEA(%d, %d, 8) = %d\n", 
+			 an, i, param, an, i, sc, an, i, no, an, i, shift);
 		 
 		 break;
 	     }
@@ -287,13 +298,15 @@ entity module;
 		  *  9: alignment rate a,
 		  * 10: chunck size ceil(n,|a|)
 		  */
-		 fprintf(file, "      RANGEA(%d, %d, 5) = %d\n", an, i, param);
-		 fprintf(file, "      RANGEA(%d, %d, 6) = %d\n", an, i, sc);
-		 fprintf(file, "      RANGEA(%d, %d, 7) = %d\n", an, i, no);
-		 fprintf(file, "      RANGEA(%d, %d, 8) = %d\n", an, i, shift);
-		 fprintf(file, "      RANGEA(%d, %d, 9) = %d\n", an, i, rate);
-		 fprintf(file, "      RANGEA(%d, %d, 10) = %d\n", an, i, chck);
-		 
+		 fprintf(file,
+			 "      RANGEA(%d, %d, 5) = %d\n"
+			 "      RANGEA(%d, %d, 6) = %d\n"
+			 "      RANGEA(%d, %d, 7) = %d\n"
+			 "      RANGEA(%d, %d, 8) = %d\n"
+			 "      RANGEA(%d, %d, 9) = %d\n"
+			 "      RANGEA(%d, %d, 10) = %d\n",
+			 an, i, param, an, i, sc, an, i, no,
+			 an, i, shift, an, i, rate, an, i, chck);
 		 break;
 	     }
 	     default:
@@ -321,16 +334,13 @@ entity module;
 	     {
 		 int adim = alignment_arraydim(a);
 
-		 fprintf(file, "      ALIGN(%d, %d, 1) = %d\n", an, i, adim);
-		 
-		 if (adim==0)
-		     fprintf(file, "      ALIGN(%d, %d, 2) = 0\n", an, i);
-		 else
-		     fprintf(file, "      ALIGN(%d, %d, 2) = %d\n", an, i,
-			     HpfcExpressionToInt(alignment_rate(a)));
-
-		 fprintf(file, "      ALIGN(%d, %d, 3) = %d\n", an, i,
-			 HpfcExpressionToInt(alignment_constant(a)));
+		 fprintf(file, 
+			 "      ALIGN(%d, %d, 1) = %d\n"
+			 "      ALIGN(%d, %d, 2) = %d\n"
+			 "      ALIGN(%d, %d, 3) = %d\n", 
+			 an, i, adim, an, i,
+			 adim ? HpfcExpressionToInt(alignment_rate(a)) : 0,
+			 an, i, HpfcExpressionToInt(alignment_constant(a)));
 
 	     }
 	  }
@@ -355,14 +365,14 @@ FILE* file;
 	 int procdim = 1;
 	 int tempdim = 1;
 	 
-	 fprintf(file, "c\nc initializing template %s, number %d\nc\n",
-		 entity_local_name(template), tn);
-
 	 /* NODIMT: Number Of  DIMensions of a Template
 	  * TTOP: Template TO Processors arrangement
 	  */
-	 fprintf(file, "      NODIMT(%d) = %d\n", tn, nd);
-	 fprintf(file, "      TTOP(%d) = %d\n", tn, pn);
+	 fprintf(file,
+		 "c\nc initializing template %s, number %d\nc\n"
+		 "      NODIMT(%d) = %d\n"
+		 "      TTOP(%d) = %d\n", 
+		 entity_local_name(template), tn, tn, nd, tn, pn);
 	 
 	 /* RANGET: lower, upper, size 
 	  */
@@ -372,10 +382,11 @@ FILE* file;
 	     int ub = HpfcExpressionToInt(dimension_upper(d));
 	     int sz = (ub-lb+1);
 	     
-	      fprintf(file, "\n");
-	      fprintf(file, "      RANGET(%d, %d, 1) = %d\n", tn, tempdim, lb);
-	      fprintf(file, "      RANGET(%d, %d, 2) = %d\n", tn, tempdim, ub);
-	      fprintf(file, "      RANGET(%d, %d, 3) = %d\n", tn, tempdim, sz);
+	      fprintf(file, "\n"
+		      "      RANGET(%d, %d, 1) = %d\n"
+		      "      RANGET(%d, %d, 2) = %d\n"
+		      "      RANGET(%d, %d, 3) = %d\n",
+		      tn, tempdim, lb, tn, tempdim, ub, tn, tempdim, sz);
 
 	      tempdim++;
 	  },
@@ -399,10 +410,10 @@ FILE* file;
 	      case is_style_cyclic:
 		  param = HpfcExpressionToInt(distribution_parameter(d));
 		  if (!block_case) param = -param;
-		  fprintf(file, "      DIST(%d, %d, 1) = %d\n", 
-			  tn, procdim, tempdim);
-		  fprintf(file, "      DIST(%d, %d, 2) = %d\n", 
-			  tn, procdim, param);
+		  fprintf(file, 
+			  "      DIST(%d, %d, 1) = %d\n"
+			  "      DIST(%d, %d, 2) = %d\n", 
+			  tn, procdim, tempdim, tn, procdim, param);
 		  procdim++;
 		  break;
 	      default:
@@ -444,10 +455,11 @@ FILE* file;
 	      int ub = HpfcExpressionToInt(dimension_upper(d));
 	      int sz = (ub-lb+1);
 
-	      fprintf(file, "\n");
-	      fprintf(file, "      RANGEP(%d, %d, 1) = %d\n", pn, procdim, lb);
-	      fprintf(file, "      RANGEP(%d, %d, 2) = %d\n", pn, procdim, ub);
-	      fprintf(file, "      RANGEP(%d, %d, 3) = %d\n", pn, procdim, sz);
+	      fprintf(file, "\n"
+		      "      RANGEP(%d, %d, 1) = %d\n"
+		      "      RANGEP(%d, %d, 2) = %d\n"
+		      "      RANGEP(%d, %d, 3) = %d\n",
+		      pn, procdim, lb, pn, procdim, ub, pn, procdim, sz);
 	      
 	      procdim++;
 	  },
