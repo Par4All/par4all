@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1996/09/07 17:15:46 $, )
+! ($Date: 1996/09/09 16:49:16 $, )
 !
 !-----------------
 !
@@ -279,7 +279,7 @@
 ! HPFC OWNERP
 !
 !
-      logical function HPFC OWNERP()
+      logical function HPFC OWNERP
       include "hpfc_commons.h"
       logical result
       integer i
@@ -300,7 +300,7 @@
 ! HPFC SENDERP
 !
 !
-      logical function HPFC SENDERP()
+      logical function HPFC SENDERP
       include "hpfc_commons.h"
       HPFC SENDERP = MYLID.EQ.SLID
       end
@@ -310,7 +310,7 @@
 ! HPFC COMPUTERP
 !
 !
-      logical function HPFC COMPUTERP()
+      logical function HPFC COMPUTERP
       include "hpfc_commons.h"
       HPFC COMPUTERP = MYLID.EQ.CLID
       end
@@ -320,7 +320,7 @@
 ! HPFC COMPUTERINOWNERSP
 !
 !
-      logical function HPFC COMPUTERINOWNERSP()
+      logical function HPFC COMPUTERINOWNERSP
       include "hpfc_commons.h"
       logical result
       integer i
@@ -938,12 +938,12 @@ _CM5(
 !
 ! entry point in the library for a non differentiated host/node program.
 ! 
-      subroutine HPFC INIT MAIN()
+      subroutine HPFC INIT MAIN
 
       include "fpvm3.h"
       include "hpfc_commons.h"
       
-      _CRAYT3D(integer my rank)
+      _CRAY(integer my rank)
       integer info, inum
       logical host known
 
@@ -1053,7 +1053,7 @@ _CM5(
 !
 ! this is the entry point in the hpfc runtime library for a node.
 !
-      subroutine HPFC INIT NODE()
+      subroutine HPFC INIT NODE
       _CM5(include "cmmd_fort.h")
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -1120,7 +1120,7 @@ _CM5(
 !
 ! HPFC INIT COMMON PROCS
 !
-      subroutine HPFC INIT COMMON PROCS()
+      subroutine HPFC INIT COMMON PROCS
       include "hpfc_commons.h"
       integer i
       do i=1, NBOFTASKS
@@ -1194,7 +1194,7 @@ _direct(`'
 !
 ! this is the entry point in the hpfc runtime library for a program.
 !
-      subroutine HPFC INIT HOST()
+      subroutine HPFC INIT HOST
       _CM5(include "cmmd_fort.h")
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -1212,10 +1212,10 @@ _direct(`'
 
       call pvmfspawn(
      $     NODE PROGRAM NAME, 
-     $     PVMARCH, 
+     $     PVM ARCH, 
      $     NODE ARCHITECTURE, 
-     $     NBOFTASKS, 
-     $     NODETIDS, 
+     $     NB OF TASKS, 
+     $     NODE TIDS, 
      $     info)
 
       if (info.lt.0) then
@@ -1305,7 +1305,7 @@ _CM5(
 !
 ! HPFC HOST END
 !
-      subroutine HPFC HOST END()
+      subroutine HPFC HOST END
       integer info
       sync_exit(call HPFC SYNCHRO)
       call pvmfexit(info)
@@ -1316,7 +1316,7 @@ _CM5(
 !
 ! HPFC NODE END
 !
-      subroutine HPFC NODE END()
+      subroutine HPFC NODE END
       integer info
       sync_exit(call HPFC SYNCHRO)
       call pvmfexit(info)
@@ -1327,7 +1327,7 @@ _CM5(
 !
 ! HPFC RCVFR N
 !
-      subroutine HPFC RCVFR N()
+      subroutine HPFC RCVFR N
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
@@ -1338,7 +1338,7 @@ _CM5(
 !
 ! HPFC SNDTO N
 !
-      subroutine HPFC SNDTO N()
+      subroutine HPFC SNDTO N
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
@@ -1403,7 +1403,7 @@ _CM5(
 !
 ! HPFC SYNCHRO
 !
-      subroutine HPFC SYNCHRO()
+      subroutine HPFC SYNCHRO
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
@@ -1422,19 +1422,19 @@ _CM5(
 !
 ! HPFC HTIMEON
 !
-      subroutine HPFC HTIMEON()
-      call HPFC SYNCHRO()
-      call HPFC TIMEON()
-      call HPFC SYNCHRO()
+      subroutine HPFC HTIMEON
+      call HPFC SYNCHRO
+      call HPFC TIMEON
+      call HPFC SYNCHRO
       end
 !
 !-----------------
 !
 ! HPFC NTIMEON
 !
-      subroutine HPFC NTIMEON()
-      call HPFC SYNCHRO()
-      call HPFC SYNCHRO()
+      subroutine HPFC NTIMEON
+      call HPFC SYNCHRO
+      call HPFC SYNCHRO
       end
 !
 !-----------------
@@ -1443,7 +1443,7 @@ _CM5(
 !
       subroutine HPFC HTIMEOFF(comment)
       character comment*(*)
-      call HPFC SYNCHRO()
+      call HPFC SYNCHRO
       call HPFC TIMEOFF(comment)
       end
 !
@@ -1453,7 +1453,7 @@ _CM5(
 !
       subroutine HPFC NTIMEOFF(comment)
       character comment*(*)
-      call HPFC SYNCHRO()
+      call HPFC SYNCHRO
       end
 !
 !-----------------
