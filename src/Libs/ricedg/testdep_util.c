@@ -10,7 +10,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <values.h>
+/* #include <values.h> */
+#include <limits.h>
 
 #include <setjmp.h>
 
@@ -881,8 +882,8 @@ Value *pmin, *pmax;
     Pbase b;
     Pvecteur pv = NULL;
 
-    *pmax =  MAXINT;
-    *pmin = -MAXINT;
+    *pmax =  INT_MAX;
+    *pmin = INT_MIN;
 
     if (sc_value_of_variable(ps, var, &val) == TRUE) {
 	*pmin = val;
@@ -900,9 +901,9 @@ Value *pmin, *pmax;
 
     if (setjmp(overflow_error)) {
 	debug(6, "sc_minmax_of_variable_optim", 
-	      " overflow error, returning MAXINT and -MAXINT. \n");
-	*pmax =  MAXINT;
-	*pmin = -MAXINT;
+	      " overflow error, returning INT_MAX and INT_MIN. \n");
+	*pmax =  INT_MAX;
+	*pmin = INT_MIN;
     }
     else {
 	ps = sc_projection_optim_along_vecteur_ofl(ps, pv);
