@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.15  2003/07/12 16:58:02  irigoin
+%% Resource MODULE.initial_precondition added as input to rule intraprocedural_summary_precondition
+%%
 %% Revision 1.14  2003/07/11 15:59:57  irigoin
 %% New rules to compute summary preconditions, explicitly intra- or
 %% inter-procedurally. Might not be the smartest way to perform the selection
@@ -522,7 +525,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/07/11 15:59:57 $~$
+$~$Date: 2003/07/12 16:58:02 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2094,6 +2097,7 @@ module and is the TRUE constant for all other modules.
 \begin{verbatim}
 intraprocedural_summary_precondition            > MODULE.summary_precondition
         < PROGRAM.entities
+        < MODULE.initial_precondition
 \end{verbatim}
 
 An interprocedural precondition for a module is derived from all its call
