@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.158  2002/03/20 08:32:47  nguyen
+%% Add a debugging property for array bound checking
+%%
 %% Revision 1.157  2001/12/07 13:21:39  nguyen
 %% Add new options for ARRAY_RESIZING_TOP_DOWN and BOTTOM_UP
 %%
@@ -181,7 +184,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2001/12/07 13:21:39 $~$
+$~$Date: 2002/03/20 08:32:47 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1879,6 +1882,19 @@ these two case, but the meaning is not clear. To be changed ?
 \begin{verbatim}
 INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
 PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
+\end{verbatim}
+
+The following property tells the array bound checking phase to instrument
+codes with the STOP or the PRINT message. Logically, if a bound violation
+is detected, the program will stop immediately. Furthermore, the STOP message gives the
+partial redundancy elimination phase more information to remove
+redundant tests occurred after this STOP. However, for the debugging
+purposes, one may need to display all possible out-of-bound errors but not
+to stop the program. In this case, a PRINT message is chosen. By default,
+we use the STOP message.
+ 
+\begin{verbatim}
+ARRAY_BOUND_CHECKING_FOR_DEBUGGING FALSE
 \end{verbatim}
 
 \subsection{Array Resizing}
