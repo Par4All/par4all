@@ -293,8 +293,10 @@ test_aspect()
 
      $debg " || in `pwd` for $file ($name)"
 
+     # This test is stronger than the loop selection because soft links
+     # are ignored.
      test -r $aspect/$name.f -o -r $aspect/$name.F -o -r $aspect/$name.c || 
-	echo "! no $aspect/$name.[cfF]"
+	echo "! no $aspect/$name.[cfF] (can be due to a symbolic link)"
 
      #
      # decompose...
