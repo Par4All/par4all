@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1996/07/16 15:31:58 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1996/07/16 16:21:04 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -30,6 +30,7 @@
  */
 /* #include <sys/stdtypes.h> */
 #include <stdio.h>
+#include <malloc.h>
 /* #include "malloc.h"    */                /* for debug with malloclib */
 #include "newgen_assert.h"
 
