@@ -5,6 +5,9 @@
 # a shell wrapper for "JPips", the java-based pips interface.
 #
 # $Log: jpips,v $
+# Revision 1.7  1998/11/06 10:38:19  ancourt
+# tpips is a shell for jpips.
+#
 # Revision 1.6  1998/10/17 10:00:09  coelho
 # zip -> jar.
 #
@@ -121,6 +124,9 @@ PATH="${JAVA_ROOT:-/usr/local/jdk1.2beta3}/bin:${PATH}"
 # now do the job
 
 export CLASSPATH
+
+# always as a shell...
+export TPIPS_IS_A_SHELL=1
 
 # verbose execution...
 set -x
