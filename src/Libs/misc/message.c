@@ -98,7 +98,7 @@ va_list args;
  * top-level (eg. wpips) may need a special user_request proceedure; they 
  * should let pips_request_handler point toward it.
  */
-string (* pips_request_handler)() = default_user_request;
+string (* pips_request_handler)(char *, va_list) = default_user_request;
 
 
 /* USER_REQUEST(format [, arg] ... ) */
@@ -122,7 +122,7 @@ string user_request(char * a_message_format, ...)
 void
 default_user_warning(char * calling_function_name,
                      char * a_message_format,
-                     va_list *some_arguments)
+                     va_list * some_arguments)
 {
    /* print name of function causing warning */
    (void) fprintf(stderr, "user warning in %s: ", calling_function_name);
@@ -135,7 +135,9 @@ default_user_warning(char * calling_function_name,
  * top-level (eg. wpips) may need a special user_warning proceedure; they 
  * should let pips_warning_handler point toward it.
  */
-void (* pips_warning_handler)() = default_user_warning;
+void (* pips_warning_handler)(char *,
+                              char *,
+                              va_list *) = default_user_warning;
 
 /* USER_WARNING(fonction, format [, arg] ... )
  * string fonction, format;
@@ -237,7 +239,9 @@ default_user_error(char * calling_function_name,
  * top-level (eg. wpips) may need a special user_error proceedure; they 
  * should let pips_error_handler point toward it.
  */
-void (* pips_error_handler)() = default_user_error;
+void (* pips_error_handler)(char *,
+                            char *,
+                            va_list *) = default_user_error;
 
 /* USER_ERROR(fonction, format [, arg] ... )
  * string fonction, format;
