@@ -4,6 +4,13 @@
 
     Lei ZHOU         12 Sep. 1991
     Francois IRIGOIN
+
+    $Id$
+
+    $Log: statement.c,v $
+    Revision 1.60  1998/10/08 16:51:45  irigoin
+    Improvement to statement_identification() and Id and Log added for RCS
+
   */
 
 #include <stdlib.h>
@@ -1218,6 +1225,7 @@ statement_identification(statement s)
     static char buffer[50];
     char *instrstring = NULL;
     int so = statement_ordering(s);
+    entity called = entity_undefined;
 
     switch (instruction_tag(statement_instruction(s)))
     {
@@ -1234,20 +1242,22 @@ statement_identification(statement s)
 	instrstring="GOTO";
 	break;
     case is_instruction_call:
-      {if(continue_statement_p(s))
+    {if(continue_statement_p(s))
 	instrstring="CONTINUE";
-      else if(return_statement_p(s))
+    else if(return_statement_p(s))
 	instrstring="RETURN";
-      else if(stop_statement_p(s))
+    else if(stop_statement_p(s))
 	instrstring="STOP";
-      else if(format_statement_p(s))
+    else if(format_statement_p(s))
 	instrstring="FORMAT";
-      else if(assignment_statement_p(s))
+    else if(assignment_statement_p(s))
 	instrstring="ASSIGN";
-      else
+    else {
+	called = call_function(instruction_call(statement_instruction(s)));
 	instrstring="CALL";
-      break;
-      }
+    }
+    break;
+    }
     case is_instruction_block:
 	instrstring="BLOCK";
 	break;
@@ -1259,12 +1269,13 @@ statement_identification(statement s)
 			instruction_tag(statement_instruction(s)));
     }
 
-    sprintf(buffer, "%d (%d, %d) at %p: %s\n",
+    sprintf(buffer, "%d (%d, %d) at %p: %s %s\n",
 	    statement_number(s),
 	    ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so),
 	    s,
-	    instrstring);
+	    instrstring,
+	    entity_undefined_p(called)? "" : module_local_name(called));
 
     return buffer;
 }
