@@ -234,7 +234,7 @@ void dbll_save_resource(string rname, string oname, void * p)
 {
     methods * m;
     FILE * f;
-    pips_debug(7, "saving resource %s[%s]\n", rname, oname);
+    pips_debug(7, "saving resource %s[%s] (0x%p)\n", rname, oname, p);
 
     dbll_current_module = oname;
     m = get_methods(rname);
