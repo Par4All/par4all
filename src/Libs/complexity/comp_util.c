@@ -47,6 +47,7 @@
 #include "constants.h"     /* IMPLIED_DO_NAME is defined there */
 #include "properties.h"    /* get_string_property is defined there */
 #include "matrice.h"
+#include "polynome.h"
 #include "complexity.h"
 
 /* for debugging */
@@ -1170,4 +1171,20 @@ string oldname,newname;
 	}
     }
     return (comp);
+}
+
+bool complexity_is_monomial_p(complexity c)
+{
+    Ppolynome p = complexity_eval(c);
+    bool monomial_p = is_single_monome(p);
+
+    return monomial_p;
+}
+
+int complexity_degree(complexity c)
+{
+    Ppolynome p = complexity_eval(c);
+    int degree = polynome_max_degree(p);
+
+    return degree;
 }
