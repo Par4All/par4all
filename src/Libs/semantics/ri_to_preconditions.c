@@ -826,7 +826,7 @@ bool upwards;
 
     /* check first that c's effects are purely reads on integer scalar
        variable; I'm not sure I'm reusing Remi's function well... */
-    cons * ef = proper_effects_of_expression(c, is_action_read);
+    cons * ef = proper_effects_of_expression(c);
 
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
 	debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
