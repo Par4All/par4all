@@ -8,12 +8,10 @@
 extern int fprintf();
 
 #include "genC.h"
+#include "hash.h"
 
 #include "ri.h"
-#include "mapping.h"
 #include "hpf.h"
-#include "entitymapping.h"
-#include "controlmapping.h"
 
 #include "misc.h"
 #include "ri-util.h"
@@ -1046,4 +1044,19 @@ statement stat;
     }
 
     return(ll);
+}
+
+/*
+ * some little functions needed.
+ */
+bool entity_template_p(e)
+entity e;
+{
+    return(gen_find_eq((chunk *) e, templates)==e);
+}
+
+bool entity_processor_p(e)
+entity e;
+{
+    return(gen_find_eq((chunk *) e, processors)==e);
 }
