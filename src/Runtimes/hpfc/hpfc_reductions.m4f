@@ -274,7 +274,7 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
 !
 ! get final result 
 !      
-      call HPFC BCAST RECV(HOSTLID, MCASTHOST, bufid)
+      call HPFC BCAST RECV(HOSTLID, MCASTHOST)
       call HPFC UNPACK(PVMTYPE, val, size, 1, info)
       MCASTHOST = MCASTHOST + 2
       end
