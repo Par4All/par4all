@@ -210,7 +210,8 @@ static bool always_select_p(loop l)
 bool nest_parallelization(string module_name)
 {
     entity module;
-    statement mod_stat;
+    statement mod_stat = statement_undefined;
+    statement mod_parallel_stat = statement_undefined;
 
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     module = get_current_module_entity();
@@ -222,29 +223,40 @@ bool nest_parallelization(string module_name)
 		(statement) db_get_memory_resource(DBR_CODE, module_name, FALSE) );
     mod_stat = get_current_module_statement();
 
+    mod_parallel_stat = copy_statement(mod_stat);
+
     dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+
+    /* Make sure the dependence graph points towards the code copy */
+    if(ordering_to_statement_initialized_p())
+	reset_ordering_to_statement();
+    initialize_ordering_to_statement(mod_parallel_stat);
 
     debug_on("NEST_PARALLELIZATION_DEBUG_LEVEL");
 
     parallel_loop_has_been_selected = FALSE;
 
-    look_for_nested_loop_statements(mod_stat, parallelization, always_select_p);
+    look_for_nested_loop_statements(mod_parallel_stat, parallelization,
+				    always_select_p);
+
+    /* Regenerate statement_ordering for the parallel code */
+    reset_ordering_to_statement();
+    module_body_reorder(mod_parallel_stat);
+
+    ifdebug(7)
+    {
+	fprintf(stderr, "\nparallelized code %s:", module_name);
+	if (gen_consistent_p((statement)mod_parallel_stat))
+	    fprintf(stderr," gen consistent ");
+    }
 
     debug_off();
 
     DB_PUT_MEMORY_RESOURCE(DBR_PARALLELIZED_CODE,
 			   strdup(module_name), 
-			   (char*) mod_stat);
+			   (char*) mod_parallel_stat);
+
     reset_current_module_statement();
-
-    /* FI: hack for hash-tables consistency; see Lib/rice/rice.c for details */
-     set_current_module_statement(
-		(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
-    mod_stat = get_current_module_statement();
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE,
-			   strdup(module_name), 
-			   (char*) mod_stat);
-
     reset_current_module_entity();
     reset_current_module_statement();
 
@@ -300,23 +312,27 @@ statement one_loop_parallelization(statement s)
 	if( c <= one_loop_transformation_strategies[kind][size].maximum_iteration_count)
 	    break;
 
-    if(size>LARGE_LOOP_COUNT)
+    if(size>LARGE_LOOP_COUNT) {
 	pips_error("one_loop_parallelization", 
-		   "cannot find a transformation strategy for kind %d and count %d\n",
+		   "cannot find a transformation strategy"
+		   " for kind %d and count %d\n",
 		   kind, c);
+    }
     else {
-	    debug(9, "one_loop_parallelization", "kind = %d, size = %d, c = %d\n",
+	    debug(9, "one_loop_parallelization",
+		  "kind = %d, size = %d, c = %d\n",
 			   kind, size, c);
-	(* one_loop_transformation_strategies[kind][size].loop_transformation)(s, c);
+	(* one_loop_transformation_strategies[kind][size].loop_transformation)
+	    (s, c);
     }
 
 
-    debug(9,"one_loop_parallelization", "output loop\n");
-    if(get_debug_level()>=9) {
+    ifdebug(9) {
+	debug(9,"one_loop_parallelization", "output loop\n");
 	print_text(stderr,text_statement(entity_undefined,0,s));
 	pips_assert("loop_unroll", gen_consistent_p(s));
+	debug(9,"one_loop_parallelization", "end\n");
     }
-    debug(9,"one_loop_parallelization", "end\n");
 
     return new_s;
 }
