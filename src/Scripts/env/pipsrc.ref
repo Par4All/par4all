@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/21 18:35:20 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/24 10:21:57 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -29,7 +29,7 @@ NEWGEN_ROOT=${NEWGEN_DIR}/Production
 NEWGEN_DEVEDIR="${NEWGEN_DIR}/Development"
 
 # PATH update
-PATH="${PATH}:${NEWGEN_ROOT}/Share:${NEWGEN_ROOT}/Bin"
+PATH="${PATH}:${NEWGEN_ROOT}/Share:${NEWGEN_ROOT}/Bin:${NEWGEN_ROOT}/Utils"
 
 #
 #         #          #    #    #  ######    ##    #####
@@ -50,7 +50,7 @@ LINEAR_ROOT=${LINEAR_DIR}/Production
 LINEAR_DEVEDIR="${LINEAR_DIR}/Development"
 
 # PATH update
-PATH="${PATH}:${LINEAR_ROOT}/Share:${LINEAR_ROOT}/Bin"
+PATH="${PATH}:${LINEAR_ROOT}/Share:${LINEAR_ROOT}/Bin:${LINEAR_ROOT}/Utils"
 
 # 
 #         #####      #    #####    ####
@@ -89,8 +89,6 @@ PATH=${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}
 # PIPS_MAKE='gmake'
 
 # libraries which are not part of Pips project
-# note that Newgen and the C3/Linear library are considered part
-# of the pips project, hence should be installed beforehand.
 # the readline library may be expected here for instance.
 PIPS_EXTEDIR="${PIPS_DIR}/Externals"
 
@@ -147,12 +145,12 @@ OPENWINHOME="/usr/openwin"
 #
 # emacs to be used by epips. 
 # you may change the default by defining this variable
-# EPIPS_EMACS='emacs'
+# default: EPIPS_EMACS='emacs'
 EPIPS_EMACS='xemacs'
 #
 # emacs-lisp code for epips
 # you may change this default by defining this variable
-# EPIPS_LISP="${PIPS_ROOT}/Share/epips.el" 
+# default: EPIPS_LISP="${PIPS_ROOT}/Share/epips.el" 
 
 #
 # 
@@ -167,11 +165,12 @@ EPIPS_EMACS='xemacs'
 #
 # where HPFC runtime can be found
 # default: HPFC_RUNTIME=$PIPS_ROOT/Runtime/hpfc
+#
 # some commands
 # default: HPFC_SED='gsed'
 # default: HPFC_TR='tr'
 # default: HPFC_MAKE='gmake'
-# HPFC_M4='gm4'
+# default: HPFC_M4='gm4'
 
 #
 #                         #####  #######
@@ -202,7 +201,7 @@ EPIPS_EMACS='xemacs'
 LISP=/usr/local/bin/cl
 
 # PVM directory
-PVMDIR="${PIPS_ROOT}/Runtime/pvm3.3"
+PVMDIR=${PIPS_HOME}/pvm3.3
 
 #
 # For the daVinci Graph Viewer/Editor :
@@ -234,11 +233,11 @@ NEWGENDIR=$NEWGEN_DIR
 # empty string if make can be run in this environment
 # PIPS_CHECK_OS="`${PIPS_UTILDIR}/check_os`"
 # sources of libraries
-# PIPS_LIBSRCDIR="${PIPS_SRCDIR}/Lib"
+# PIPS_LIBSRCDIR="${PIPS_SRCDIR}/Libs"
 # sources of passes
 # PIPS_BINSRCDIR="${PIPS_SRCDIR}/Passes"
 # runtime sources
-# PIPS_RTSRCDIR="${PIPS_SRCDIR}/Runtime"
+# PIPS_RTSRCDIR="${PIPS_SRCDIR}/Runtimes"
 #
 # file name in which pips current program is stored (for batch version).
 # this is the default value assume. It can be overwritten by defining
@@ -250,7 +249,7 @@ NEWGENDIR=$NEWGEN_DIR
 #   (implies a special "malloc.h" in PIPS_EXTEDIR)
 # PIPS_PASSES='pips wpips tpips'
 #
-# can be added explicitely to LDopt if required
+# can be added explicitely to LDopt if required (obsolete?)
 # PIPS_MALLOC='/usr/lib/debug/malloc.o'
 #
 # complexity cost tables directory
