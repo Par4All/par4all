@@ -1,7 +1,5 @@
 #include <stdio.h>
-extern int fprintf();
-extern int _flsbuf();
-extern char * toupper();
+#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 
