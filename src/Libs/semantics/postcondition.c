@@ -1,7 +1,6 @@
-/*
- * by Fabien COELHO
+/* by Fabien COELHO
  *
- * $RCSfile: postcondition.c,v $ ($Date: 1995/09/26 09:22:11 $, )
+ * $RCSfile: postcondition.c,v $ ($Date: 1996/06/12 16:23:44 $, )
  * version $Revision$,
  */
 
@@ -35,11 +34,7 @@
 #include "semantics.h"
 #include "transformer.h"
 
-/*-------------------------------------------------------------
- *
- * POSTCONDITIONS MAPPING
- *
- */
+/************************************************ POSTCONDITIONS MAPPING */
 
 GENERIC_CURRENT_MAPPING(postcondition, transformer, statement)
 
@@ -63,34 +58,35 @@ static statement_mapping
     (debug(9, "LoadPre", "loading 0x%x\n", stat), \
      (transformer) (hash_get(current_precondition_map, (char*) stat)))
 
-/*
- * filter used by gen_recurse:
+/* filter used by gen_recurse:
  * Top-down computation of the postcondition mapping
  */
-static bool postcondition_filter(stat)
-statement stat;
+static bool postcondition_filter(statement stat)
 {
-    instruction
-	inst = statement_instruction(stat);
-    transformer
-	post = LoadPost(stat);
+    instruction inst = statement_instruction(stat);
+    transformer post = LoadPost(stat);
 
-    debug(5, "postcondition_filter", "statement 0x%x\n", stat);
+    pips_debug(5, "statement 0x%x (post 0x%x)\n", 
+	       (unsigned int) stat, (unsigned int) post);
     
+    ifdebug(9) {
+	pips_debug(9, "statement is\n");
+	print_statement(stat);
+    }
+
+    /* ??? may happen in obscure unstructured... */
+    if (transformer_undefined_p(post)) return TRUE; 
+
     switch(instruction_tag(inst))
     {
     case is_instruction_block:
     {
-	list
-	    ls = gen_nreverse(gen_copy_seq(instruction_block(inst)));
+	list ls = gen_nreverse(gen_copy_seq(instruction_block(inst)));
 
-	debug(6, "postcondition_filter", "in block\n");
+	pips_debug(6, "in block\n");
 
-	MAPL(cs,
+	MAP(STATEMENT, s,
 	 {
-	     statement
-		 s = STATEMENT(CAR(cs));
-
 	     StorePost(s, post);
 	     post = LoadPre(s);
 	 },
@@ -101,10 +97,8 @@ statement stat;
     }
     case is_instruction_test:
     {
-	test
-	    t = instruction_test(inst);
-
-	debug(6, "postcondition_filter", "in test\n");
+	test t = instruction_test(inst);
+	pips_debug(6, "in test\n");
 
 	StorePost(test_true(t), post);
 	StorePost(test_false(t), post);
@@ -112,37 +106,32 @@ statement stat;
         break;
     }
     case is_instruction_loop:
-	debug(6, "postcondition_filter", "in loop\n");
+	pips_debug(6, "in loop\n");
 	StorePost(loop_body(instruction_loop(inst)), post);
         break;
     case is_instruction_goto:
 	/* ??? may be false... */
-	pips_error("postcondition_filter",
-		   "unexpected goto encountered\n");
+	pips_internal_error("unexpected goto encountered\n");
         break;
     case is_instruction_call:
         break;
     case is_instruction_unstructured:
-	/* ??? may be false... */
+	/* ??? is just false... */
     {
-	control
-	    c = unstructured_control(instruction_unstructured(inst));
-	list
-	    blocks = NIL;
+	control c = unstructured_control(instruction_unstructured(inst));
+	list blocks = NIL;
 
-	debug(6, "postcondition_filter", "in unstructured\n");
+	pips_debug(6, "in unstructured\n");
 
-	CONTROL_MAP(ct,	{}, c, blocks);
+	CONTROL_MAP(ct,	{}, c, blocks); /* generates the full list */
 
 	blocks = gen_nreverse(blocks);
 
-	MAPL(cs,
+	MAP(CONTROL, c,
 	 {
-	     statement
-		 s = control_statement(CONTROL(CAR(cs)));
-
+	     statement s = control_statement(c);
 	     StorePost(s, post);
-	     post = LoadPre(s);
+	     post = LoadPre(s); /* ??? */
 	 },
 	     blocks);
 
@@ -156,20 +145,10 @@ statement stat;
         break;
     }
 
-    return(TRUE); /* must go downward */
+    return TRUE; /* must go downward */
 }
 
-/*
- * Bottom-up pass: nothing to be down
- */
-static void postcondition_rewrite(stat)
-statement stat;
-{
-    return;
-}
-
-/*
- * statement_mapping compute_postcondition(stat, post_map, pre_map)
+/* statement_mapping compute_postcondition(stat, post_map, pre_map)
  * statement stat;
  * statement_mapping post_map, pre_map;
  *
@@ -180,12 +159,14 @@ statement stat;
  * The last postcondition is arbitrary set to transformer_identity,
  * what is not enough. (??? should I take the stat transformer?)
  */
-statement_mapping compute_postcondition(stat, post_map, pre_map)
-statement stat;
-statement_mapping post_map, pre_map;
+statement_mapping 
+compute_postcondition(
+    statement stat,
+    statement_mapping post_map,
+    statement_mapping pre_map)
 {
     debug_on("SEMANTICS_POSTCONDITION_DEBUG_LEVEL");
-    debug(1, "compute_postcondition", "computing!\n");
+    pips_debug(1, "computing!\n");
 
     current_postcondition_map = post_map;
     current_precondition_map = pre_map;
@@ -194,19 +175,14 @@ statement_mapping post_map, pre_map;
     StorePost(stat, transformer_identity());
 
     /* Top-down definition */
-    gen_recurse(stat,
-		statement_domain,
-		postcondition_filter,
-		postcondition_rewrite);
+    gen_recurse(stat, statement_domain, postcondition_filter, gen_null);
 
     current_precondition_map = hash_table_undefined;
     current_postcondition_map = hash_table_undefined;
 
     debug_off();
-
-    return(post_map);
+    return post_map;
 }
 
-/*
- * that's all
+/* that is all
  */
