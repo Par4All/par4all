@@ -8,9 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
+#include "linear.h"
 
 #include "genC.h"
 
