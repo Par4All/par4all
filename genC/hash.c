@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1997/07/17 22:09:59 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1997/12/10 13:59:22 $, )
  * version $Revision$
  */
 
@@ -433,8 +433,8 @@ hash_table htp;
  * that will be greater or equal to the actual size 
  */
 
-static void hash_enlarge_table(htp)
-hash_table htp;
+static void 
+hash_enlarge_table(hash_table htp)
 {
     hash_entry_pointer old_array;
     int i, old_size;
@@ -446,16 +446,16 @@ hash_table htp;
     htp->hash_size++;
     /* Get the next prime number in the table */
     GET_NEXT_HASH_TABLE_SIZE(htp->hash_size,prime_list);
-    htp->hash_array = 
-	    (hash_entry_pointer) alloc( htp->hash_size* sizeof(hash_entry));
+    htp->hash_array = (hash_entry_pointer) 
+	malloc(htp->hash_size* sizeof(hash_entry));
     htp->hash_size_limit = HASH_SIZE_LIMIT(htp->hash_size);
 
-    for (i = 0; i < htp->hash_size ; i++) {
+    for (i = 0; i < htp->hash_size ; i++)
 	htp->hash_array[i].key = HASH_ENTRY_FREE;
-    }
-    for (i = 0; i < old_size; i++) {
-	hash_entry he;
 
+    for (i = 0; i < old_size; i++) 
+    {
+	hash_entry he;
 	he = old_array[i];
 
 	if (he.key != HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT) {
