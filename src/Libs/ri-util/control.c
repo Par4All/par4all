@@ -14,6 +14,41 @@
 #include "text-util.h"
 #include "misc.h"
 
+/* Build recursively the list of all controls reachable from any control of
+ * an unstructured. It is usually called from the CONTROL_MAP macro,
+ * with the entry node of an unstructured as initial argument. It uses
+ * both successors and predecessors to define reachability.
+ */
+
+void
+control_map_get_blocs( c, l )
+control c ;
+cons **l ;
+{
+    MAPL( cs,
+    {if( CONTROL( CAR( cs )) == c ) return ;},
+    *l ) ;
+    *l = CONS( CONTROL, c, *l ) ;
+    MAPL( cs,
+    {control_map_get_blocs( CONTROL( CAR( cs )), l );},
+    control_successors( c )) ;
+    MAPL( ps, {control_map_get_blocs( CONTROL( CAR( ps )), l );},
+    control_predecessors( c )) ;
+}
+
+/* Same as above, but follows successors only */
+
+void
+forward_control_map_get_blocs( c, l )
+control c ;
+cons **l ;
+{
+    MAPL( cs, {if( CONTROL( CAR( cs )) == c ) return ;}, *l ) ;
+    *l = CONS( CONTROL, c, *l ) ;
+    MAPL( cs,
+	  {forward_control_map_get_blocs( CONTROL( CAR( cs )), l );},
+	  control_successors( c )) ;
+}
 
 /* Remove all the control nodes (with its statement) from c in the
    successor tree of c up to the nodes with more than 1 predecessor: */
