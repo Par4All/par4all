@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/09 12:54:14 $, 
+ * $Date: 1997/07/17 20:45:01 $, 
  */
 
 /* test du simplex : 
@@ -9,6 +9,7 @@
  * en faisant : make test_simp
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
