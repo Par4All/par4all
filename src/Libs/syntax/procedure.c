@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.68  2003/08/11 16:29:22  irigoin
+ * Comments or messages improved.
+ *
  * Revision 1.67  2003/08/02 14:04:33  irigoin
  * One step to accomodate formal parameters. Some reformatting and additional
  * comments as well.
@@ -1088,6 +1091,9 @@ EndOfProcedure()
     /* Now that retyping and equivalences have been taken into account: */
     update_common_sizes();
 
+    /* Why keep it in (apparent) declaration order rather than
+       alphabetical order? Because some later processing may be based on
+       this assumption. Sort can be performed before printouts. */
     code_declarations(EntityCode(CurrentFunction)) =
 	    gen_nreverse(code_declarations(EntityCode(CurrentFunction))) ;
 
@@ -1880,7 +1886,7 @@ MakeEntry(
 		    ParserError("MakeEntry",
 				"Formal parameters of entries cannot appear textually"
 				" in executable statements before they are declared"
-				" (Fortran Standard, 15.7.4, pp. 15-13)");
+				" (Fortran 77 Standard, 15.7.4, pp. 15-13)");
 		    */
 		}
 	    }
