@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/07 13:34:56 $, 
+ * $Date: 1996/08/07 13:41:19 $, 
  */
 
 /* test du simplex : 
@@ -465,7 +465,7 @@ static int hash(Variable s)
 /* overflow control :
  *  ofl_ctrl == NO_OFL_CTRL  => no overflow control
  *  ofl_ctrl == FWD_OFL_CTRL  
- *           => overflow control is made (longjmp(overflow_error,5))
+ *           => overflow control is made THROW(overflow_error,5)
  * BC, 13/12/94
  */
 boolean 
