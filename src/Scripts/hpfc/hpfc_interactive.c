@@ -1,5 +1,8 @@
 /* $Id$
  * $Log: hpfc_interactive.c,v $
+ * Revision 1.19  1997/05/24 08:26:34  coelho
+ * sprintf returns an int on linux... fixed csq.
+ *
  * Revision 1.18  1997/03/19 17:52:04  coelho
  * better RCS headers.
  *
@@ -34,15 +37,16 @@
  */
 static char *default_hist_file_name()
 {
-    char *home, *hist = getenv(HPFC_HISTENV);
+    char *home, *hist = getenv(HPFC_HISTENV), *name;
 
     if (hist) return hist;
 
     /* else builds the default name. memory leak.
      */
     home = getenv("HOME");
-    return sprintf((char*) malloc(sizeof(char)*(strlen(home)+strlen(HIST)+2)),
-		   "%s/%s", home, HIST);
+    name = (char*) malloc(sizeof(char)*(strlen(home)+strlen(HIST)+2));
+    sprintf(name, "%s/%s", home, HIST);
+    return name;
 }
 
 static char * initialize_hpfc_history()
@@ -92,11 +96,10 @@ void quit_handler(char * line)
 
 void default_handler(char * line)
 {
-    char *shll = (char*)
-	malloc(sizeof(char)*(strlen(HPFC_SHELL)+strlen(line)+2));
-    
-    system(sprintf(shll, "%s %s", HPFC_SHELL, line));
-
+    char *shll = 
+	(char*) malloc(sizeof(char)*(strlen(HPFC_SHELL)+strlen(line)+2));
+    (void)sprintf(shll, "%s %s", HPFC_SHELL, line);
+    system(shll);
     free(shll);
 }
 
