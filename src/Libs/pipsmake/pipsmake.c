@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.73  2003/06/13 08:43:21  coelho
+ * clean required resources.
+ *
  * Revision 1.72  2003/06/05 16:15:05  coelho
  * recursion detection.
  *
@@ -115,15 +118,19 @@ static bool catch_user_error(bool (*f)(char *), string rname, string oname)
     jmp_buf pipsmake_jump_buffer;
     bool success = FALSE;
 
-    if(setjmp(pipsmake_jump_buffer)) {
-	reset_static_phase_variables();
-	success = FALSE;
+    if(setjmp(pipsmake_jump_buffer)) 
+    {
+      /* CATCH */
+      reset_static_phase_variables();
+      db_clean_all_required_resources();
+      success = FALSE;
     }
-    else {
-	push_pips_context (&pipsmake_jump_buffer);
-	set_pips_current_computation(rname, oname);
-
-	success = (*f)(oname);
+    else 
+    {
+      /* TRY */
+      push_pips_context (&pipsmake_jump_buffer);
+      set_pips_current_computation(rname, oname);
+      success = (*f)(oname);
     }
 
     pop_pips_context();
