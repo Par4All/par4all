@@ -1,4 +1,8 @@
- #include <stdio.h>
+/* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
+ * $Date: 1996/07/18 19:15:54 $, 
+ */
+
+#include <stdio.h>
 #include <setjmp.h>
 
 #include "boolean.h"
@@ -7,6 +11,10 @@
 #include "contrainte.h"
 #include "sc.h"
 
+/* ??? bof. devrait etre extern et s'appeler arithmetic_error. 
+ * ??? et declare dans un .h specific avec des macros qui cachent un
+ * ??? peu les details... et un petit coup de CATCH/TRY a la c++. FC.
+ */
 jmp_buf overflow_error;
 
 /* This function returns TRUE if the inequation ineq is redundant for 
@@ -149,7 +157,7 @@ int ofl_ctrl;
 
     sc = sc_init_with_sc(ps);
     if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,TRUE)) { 
-	Pvecteur v = vect_new(TCST, 1);
+	Pvecteur v = vect_new(TCST, VALUE_ONE);
 	Pcontrainte eq = contrainte_make(v);
 	sc->egalites = eq;
 	sc->nb_eq =1;
@@ -242,7 +250,8 @@ void build_sc_nredund_2pass(Psysteme *psc)
  * lower bounds.
 */
 
-static boolean sc_elim_triang_integer_redund_constraint_p(pc2,index_base,ineq,var_hr,tab_info,rank_max)
+static boolean sc_elim_triang_integer_redund_constraint_p
+    (pc2,index_base,ineq,var_hr,tab_info,rank_max)
 Pcontrainte pc2;
 Pbase index_base;
 Pcontrainte ineq;
@@ -250,10 +259,9 @@ Variable var_hr;
 int tab_info[][3];
 int *rank_max;
 {
-
     int rank_hr = rank_of_variable(index_base,var_hr);
-    int coeff=vect_coeff(var_hr,ineq->vecteur);
-    int sign = (coeff >0) ? 1:-1;
+    Value coeff = vect_coeff(var_hr,ineq->vecteur);
+    int sign = value_sign(coeff);
     boolean result=FALSE;
     boolean trouve=FALSE;
     *rank_max=rank_hr;
@@ -277,28 +285,33 @@ int *rank_max;
 	     !CONTRAINTE_UNDEFINED_P(pc) && !trouve;
 	     pc = pc->succ) {
 
-	    int coeff2 = vect_coeff(var_hr,pc->vecteur);
-	    int sign2 = (coeff2 >0) ? 1:-1;
-	    int right_coeff,right_rank,left_coeff,left_rank;
+	    Value coeff2 = vect_coeff(var_hr,pc->vecteur);
+	    int sign2 = value_sign(coeff2);
+	    int right_rank, left_rank;
+	    Value right_coeff, left_coeff;
 	    Variable right_var,left_var;
 				    
-	    if (coeff2 !=0 && sign == -sign2) {
+	    if (value_notzero_p(coeff2) && sign == -sign2) {
 		constraint_integer_combination(index_base,ineq,pc,rank_hr,
 			       &right_var,&right_rank,&right_coeff,
 			       &left_var,&left_rank,&left_coeff);
-		*rank_max = (right_rank > left_rank) ? right_rank : left_rank;
+		*rank_max = MAX(right_rank,left_rank);
 		if (((right_rank>left_rank) 
-		     && (((right_coeff >0) && (tab_info[right_rank][2] <=1))
-			 || ((right_coeff <0) && (tab_info[right_rank][3] <=1)))) 
+		     && (((value_pos_p(right_coeff)) && 
+			  (tab_info[right_rank][2] <=1))
+			 || (value_neg_p(right_coeff) && 
+			     (tab_info[right_rank][3] <=1)))) 
 		    || ((right_rank<left_rank) 
-			&& (((left_coeff>0) && (tab_info[left_rank][2]<=1)) 
-			    || ((left_coeff<0) && (tab_info[left_rank][3] <=1)))))
+			&& ((value_pos_p(left_coeff) && 
+			     (tab_info[left_rank][2]<=1)) 
+			    || (value_neg_p(left_coeff) && 
+				(tab_info[left_rank][3] <=1)))))
 		    trouve = TRUE;
 	    }   
 	}
 	if (!trouve) result = TRUE;
     } 
-    return(result);
+    return result;
 
 }
 
@@ -327,7 +340,8 @@ int n;
     Pcontrainte ineq,pred,eq;
     int rank_hr,rank_max = 0;
     Variable var_hr;
-    int coeff,sign;
+    Value coeff;
+    int sign;
 
     sc->base = base_dup(ps->base);
     sc->dimension = ps->dimension; 
@@ -353,10 +367,10 @@ int n;
 	    if (( rank_hr= search_higher_rank(ineq->vecteur,index_base)) >0) {
 		var_hr=variable_of_rank(index_base,rank_hr);
 		coeff=vect_coeff(var_hr,ineq->vecteur);
-		sign = (coeff >0) ? 1:-1;
+		sign = value_sign(coeff);
 
-		if (sc_elim_triang_integer_redund_constraint_p(ps->inegalites,index_base,ineq,
-					   var_hr,tab_info, &rank_max) 
+		if (sc_elim_triang_integer_redund_constraint_p
+		  (ps->inegalites,index_base,ineq, var_hr,tab_info, &rank_max)
 		    && (rank_max >= loop_level)) {
 
 		    /* this condition is TRUE if the constraint can be
@@ -424,7 +438,7 @@ Variable var;
 
     if (!CONTRAINTE_UNDEFINED_P(ineq1) && !CONTRAINTE_UNDEFINED_P(ineq2)) {
 	
-	if (vect_coeff(var,ineq1->vecteur) > 0) {	    
+	if (value_pos_p(vect_coeff(var,ineq1->vecteur))) {	    
 	    posit = contrainte_dup(ineq1);
 	    negat = contrainte_dup(ineq2);
 	}
@@ -436,18 +450,13 @@ Variable var;
 	if (setjmp(overflow_error)) 
 	    result = FALSE;
 	else {
-	    ineg = sc_integer_inequalities_combination_ofl_ctrl(sc,
-								posit,
-								negat,
-								var,
-								&result,
-								FWD_OFL_CTRL);
+	    ineg = sc_integer_inequalities_combination_ofl_ctrl
+		(sc, posit, negat, var, &result, FWD_OFL_CTRL);
 	    contrainte_rm(ineg);
 	}
 
 	contrainte_rm(posit);
 	contrainte_rm(negat);
     }    
-    return(result);
-
+    return result;
 }
