@@ -9,6 +9,8 @@
 #
 # cumulate_statistics.pl y.database/*/*.loop_stats
 #
+# Any question to Fabien Coelho;-) and Youcef;-)
+#
 
 ($nom, $nombre) = split /: /;
 $stats{$nom} += $nombre;
