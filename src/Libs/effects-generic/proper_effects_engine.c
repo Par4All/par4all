@@ -547,8 +547,7 @@ proper_effects_engine(char *module_name)
     pips_debug(1, "end\n");
     debug_off();
 
-    (*db_put_proper_rw_effects_func)(strdup(module_name), get_proper_rw_effects());
-
+    (*db_put_proper_rw_effects_func)(module_name, get_proper_rw_effects());
 
     reset_current_module_entity();
     reset_current_module_statement();
