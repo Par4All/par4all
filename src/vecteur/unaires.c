@@ -517,7 +517,7 @@ vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
 	}
     }
 
-    if (VECTEUR_UNDEFINED_P(pv1))
+    if (VECTEUR_UNDEFINED_P(pv1)) {
 	if (VECTEUR_UNDEFINED_P(pv2)) {
 	    /* cmp is left unchanged since there is no more information
 	     * to make a decision!
@@ -545,6 +545,7 @@ vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
 	else {
 	    ;
 	}
+    }
     else {
 	if(VECTEUR_UNDEFINED_P(pv2)) {
 	    if (cmp==0) {
