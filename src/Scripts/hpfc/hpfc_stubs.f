@@ -5,20 +5,20 @@ c
 c (c) Fabien COELHO, 09/95
 c
 c $RCSfile: hpfc_stubs.f,v $ (version $Revision$)
-c ($Date: 1996/04/01 11:31:22 $, )
+c ($Date: 1996/04/01 11:31:47 $, )
 c     
 c synchronization 
       subroutine hpfc1()
-      print *, 'hpf1: '
+      print *, 'hpfc1: '
       end
 c timer on
       subroutine hpfc2()
-      print *, 'hpf2: '
+      print *, 'hpfc2: '
       end
 c timer off
       subroutine hpfc3(comment)
       character comment*(*)
-      print *, 'hpf3: ', comment
+      print *, 'hpfc3: ', comment
       end
 c io/host section marker
       subroutine hpfc7()
