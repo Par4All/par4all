@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.GNU,v $
+# Revision 1.29  1997/04/15 12:10:22  coelho
+# -pedantic-errors...
+#
 # Revision 1.28  1997/03/26 17:25:59  coelho
 # simply GNU softwares.
 #
@@ -11,7 +14,7 @@
 AR	= gar
 ARFLAGS	= rv
 CC	= gcc
-CFLAGS	= -O2 -ansi -g -pedantic -Wall -pipe
+CFLAGS	= -g -O2 -ansi -pedantic-errors -Wall -pipe
 CMKDEP	= -M
 CPPFLAGS= \
 	-D__USE_FIXED_PROTOTYPES__ \
