@@ -298,7 +298,14 @@ static void instruction_rwt (instruction i)
 	  list s_list = (list)(instruction_block(i));
 	  statement s;
 	  for(; s_list; POP(s_list)) {
-	    s = (statement) STATEMENT(CAR(s_list));
+	    s = STATEMENT(CAR(s_list));
+	    {
+	      text _r_ = (t);
+	      text _t_ = load_statement_icfg(s);
+	      text_sentence(_r_) = gen_nconc(text_sentences(_r_), text_sentences(_t_));
+	      text_sentence(_t_) = NIL;
+	      free_text(_t_);
+	    }
 	    MERGE_TEXTS(t, load_statement_icfg(s));
 	  }
 	}
