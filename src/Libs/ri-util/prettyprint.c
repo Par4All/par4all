@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.226 2002/06/13 12:07:12 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.227 2002/06/14 17:29:05 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -476,6 +476,10 @@ words_reference(reference obj)
 
   return(pc);
 }
+
+/* words_regular_calls used for user subroutine and user function and
+   intrinsics called like user function such as MOD(). */
+static list label_strings_required_for_alternate_returns = list_undefined;
 
 static list 
 words_regular_call(call obj, bool is_a_subroutine)
@@ -485,7 +489,7 @@ words_regular_call(call obj, bool is_a_subroutine)
   entity f = call_function(obj);
   value i = entity_initial(f);
   type t = entity_type(f);
-    
+
   if (call_arguments(obj) == NIL) {
     if (type_statement_p(t))
       return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
@@ -515,35 +519,75 @@ words_regular_call(call obj, bool is_a_subroutine)
 
   /* The corresponding formal parameter cannot be checked by
      formal_label_replacement_p() because the called modules may not have
-     been parserd yet. */
+     been parsed yet. */
+
+  /* This is not always true, for instance when you are called for
+     intrinsics that are called like Fortran functions */
+  /*
+    pips_assert("No alternate returns have been considered yet",
+    label_strings_required_for_alternate_returns == NIL);
+  */
 
   if( !ENDP( call_arguments(obj))) {
+    list pa = list_undefined;
     pc = CHAIN_SWORD(pc, "(");
-    MAPL(pa, {
+
+    for(pa = call_arguments(obj); !ENDP(pa); POP(pa)) {
       expression eap = EXPRESSION(CAR(pa));
       if(get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
-	 && actual_label_replacement_p(eap)) {
+	 && expression_call_p(eap) && actual_label_replacement_p(eap)) {
 	entity cf = call_function(syntax_call(expression_syntax(eap)));
 	string ls = entity_local_name(cf);
 	string ls1 = malloc(strlen(ls));
-	pips_assert("ls has at least four characters", strlen(ls)>=4);
+	/* pips_assert("ls has at least four characters", strlen(ls)>=4); */
+
+	/*
+	pips_assert("Alternate return list is defined",
+		    label_strings_required_for_alternate_returns != list_undefined);
+	*/
+	if(label_strings_required_for_alternate_returns == list_undefined) {
+	  pips_debug(1, "Function name: %s\n", entity_name(f));
+	  pips_assert("Alternate return list is defined",
+		      label_strings_required_for_alternate_returns != list_undefined);
+	}
+
 	/* Get rid of initial and final quotes */
 	ls1 = strncpy(ls1, ls+1, strlen(ls)-2);
 	pips_assert("eap must be a call to a constant string", expression_call_p(eap));
-	pc = CHAIN_SWORD(pc, ls1);
-	free(ls1);
+	if(strcmp(get_string_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"), "STOP")!=0) {
+	  pc = CHAIN_SWORD(pc, ls1);
+	  /* free(ls1); */
+	}
+	else {
+	  /* The actual label cannot always be used because it might have been
+             eliminated as part of dead code by PIPS since it is not used
+             with the STOP option. */
+	  if(label_string_defined_in_current_module_p(ls1+1)) {
+	    pc = CHAIN_SWORD(pc, ls1);
+	  }
+	  else {
+	    entity nl = make_new_label(get_current_module_name());
+	    pc = CHAIN_SWORD(pc, "*");
+	    pc = CHAIN_SWORD(pc, strdup(label_local_name(nl)));
+	    label_strings_required_for_alternate_returns = 
+	      gen_nconc(label_strings_required_for_alternate_returns,
+			CONS(STRING, label_local_name(nl), NIL));
+	  }
+	}
       }
       else
 	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pa))));
       if (CDR(pa) != NIL)
 	pc = CHAIN_SWORD(pc, ", ");
-    }, call_arguments(obj));
+    }
+
     pc = CHAIN_SWORD(pc, ")");
   }
   else if(!type_void_p(functional_result(type_functional(t))) ||
 	  !is_a_subroutine) {
     pc = CHAIN_SWORD(pc, "()");
   }
+
   return pc;
 }
 
@@ -2111,7 +2155,9 @@ text_test(
        && entity_empty_label_p(statement_label(tb))
        && empty_comments_p(statement_comments(tb))
        && !statement_continue_p(tb)
-       && !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")) {
+       && !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")
+       && !(call_contains_alternate_returns_p(statement_call(tb))
+	    && get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS"))) {
 	r = text_logical_if(module, label, margin, obj, n);
     }
     /* 2nd case: one test in the false branch => ELSEIF block */
@@ -2158,55 +2204,74 @@ text_instruction(
     instruction obj,
     int n)
 {
-    text r = text_undefined;
+  text r = text_undefined;
 
-    if (instruction_block_p(obj)) {
-	r = text_block(module, label, margin, instruction_block(obj), n) ;
-    }
-    else if (instruction_test_p(obj)) {
-	r = text_test(module, label, margin, instruction_test(obj), n);
-    }
-    else if (instruction_loop_p(obj)) {
-	r = text_loop(module, label, margin, instruction_loop(obj), n);
-    }
-    else if (instruction_whileloop_p(obj)) {
-	r = text_whileloop(module, label, margin, instruction_whileloop(obj), n);
-    }
-    else if (instruction_goto_p(obj)) {
-	r = make_text(CONS(SENTENCE, 
-			   sentence_goto(module, label, margin,
-					 instruction_goto(obj), n), 
-			   NIL));
-    }
-    else if (instruction_call_p(obj)) {
-	unformatted u;
-	sentence s;
+  if (instruction_block_p(obj)) {
+    r = text_block(module, label, margin, instruction_block(obj), n) ;
+  }
+  else if (instruction_test_p(obj)) {
+    r = text_test(module, label, margin, instruction_test(obj), n);
+  }
+  else if (instruction_loop_p(obj)) {
+    r = text_loop(module, label, margin, instruction_loop(obj), n);
+  }
+  else if (instruction_whileloop_p(obj)) {
+    r = text_whileloop(module, label, margin, instruction_whileloop(obj), n);
+  }
+  else if (instruction_goto_p(obj)) {
+    r = make_text(CONS(SENTENCE, 
+		       sentence_goto(module, label, margin,
+				     instruction_goto(obj), n), 
+		       NIL));
+  }
+  else if (instruction_call_p(obj)) {
+    unformatted u;
+    sentence s;
 
-	if (instruction_continue_p(obj) &&
-	    empty_local_label_name_p(label) &&
-	    !get_bool_property("PRETTYPRINT_ALL_LABELS")) {
-	  pips_debug(5, "useless CONTINUE not printed\n");
-	  r = make_text(NIL);
-	}
-	else {
-	    u = make_unformatted(strdup(label), n, margin, 
-				 words_call(instruction_call(obj), 
-					    0, TRUE, TRUE));
-
-	    s = make_sentence(is_sentence_unformatted, u);
-
-	    r = make_text(CONS(SENTENCE, s, NIL));
-	}
-    }
-    else if (instruction_unstructured_p(obj)) {
-	r = text_unstructured(module, label, margin, 
-			      instruction_unstructured(obj), n) ;
+    if (instruction_continue_p(obj) &&
+	empty_local_label_name_p(label) &&
+	!get_bool_property("PRETTYPRINT_ALL_LABELS")) {
+      pips_debug(5, "useless CONTINUE not printed\n");
+      r = make_text(NIL);
     }
     else {
-	pips_error("text_instruction", "unexpected tag");
-    }
+      list sl = NIL;
 
-    return(r);
+      label_strings_required_for_alternate_returns = NIL;
+
+      u = make_unformatted(strdup(label), n, margin, 
+			   words_call(instruction_call(obj), 
+				      0, TRUE, TRUE));
+
+      s = make_sentence(is_sentence_unformatted, u);
+      sl = CONS(SENTENCE, s, sl);
+
+      /* Add continue to satisfy alternate returns if necessary */
+      MAP(STRING, ls, {
+	sentence s1 = sentence_undefined;
+	unformatted u1 =
+	  make_unformatted
+	  (strdup(ls),
+	   n, margin, 
+	   CONS(STRING, strdup("CONTINUE"), NIL));
+
+	s1 = make_sentence(is_sentence_unformatted, u1);
+	sl = gen_nconc(sl, CONS(SENTENCE, s1, NIL));
+      }, label_strings_required_for_alternate_returns);
+      gen_free_list(label_strings_required_for_alternate_returns);
+      label_strings_required_for_alternate_returns = list_undefined;
+      r = make_text(sl);
+    }
+  }
+  else if (instruction_unstructured_p(obj)) {
+    r = text_unstructured(module, label, margin, 
+			  instruction_unstructured(obj), n) ;
+  }
+  else {
+    pips_error("text_instruction", "unexpected tag");
+  }
+
+  return(r);
 }
 
 /* Handles all statements but tests that are nodes of an unstructured.
