@@ -389,7 +389,7 @@ system_sorted_text_format(
 	add_to_current_line(line, "<null system>", prefix, txt, FALSE);
 	return;
     }
-    else if (Psysteme_undefined_p(ps))
+    else if (SC_UNDEFINED_P(ps))
     {
 	add_to_current_line(line, "<undefined system>", prefix, txt, FALSE);
 	return;
