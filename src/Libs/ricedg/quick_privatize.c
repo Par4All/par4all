@@ -21,15 +21,8 @@ typedef dg_vertex_label vertex_label;
 /* #include "text-util.h" */
 
 #include "ri-util.h" /* linear.h is included in */
-#include "effects.h"
-/*
-#include "control.h"
-#include "pipsdbm.h"
-#include "semantics.h"
-
-#include "constants.h"
-#include "properties.h"
-*/
+#include "effects-generic.h"
+#include "effects-simple.h"
 
 /* includes pour system generateur */
 #include "ray_dte.h"
