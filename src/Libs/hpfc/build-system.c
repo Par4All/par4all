@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1996/03/01 15:52:03 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1996/03/15 13:57:12 $, ) 
  * version $Revision$
  */
 
@@ -185,9 +185,7 @@ string suffix, prefix;
     
     /* system may be empty for scalars ???
      */
-    debug(5,"compute_entity_to_declaration_constraints",
-	  "entity %s, [%s,%s]\n",
-	  entity_name(ent), prefix, suffix);
+    pips_debug(5, "entity %s, [%s,%s]\n", entity_name(ent), prefix, suffix);
     
     MAP(DIMENSION, dim,
      {
