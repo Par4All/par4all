@@ -104,7 +104,6 @@ bool loop_normalize(mod_name)
 char *mod_name;
 {
   statement mod_stat;
-  instruction mod_inst;
   int Gcount_nlc;
   hash_table 	Gforward_substitute_table;
   list		Genclosing_loops;
@@ -122,9 +121,6 @@ char *mod_name;
 
   mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
  
-  mod_inst = statement_instruction(mod_stat);
-
-
   /* Initialization of the NLC counters. It numbers the NLC variables
    * created during the computation.
    */
@@ -137,11 +133,13 @@ char *mod_name;
   Gforward_substitute_table = hash_table_make( hash_pointer, 0 );
  
   /* Compute the loops normalization of the module. */
-  ln_of_unstructured(instruction_unstructured(mod_inst),
-		     Gforward_substitute_table, &Genclosing_loops,
-		     &Genclosing_tests, &Gscalar_written_forward,
-		     &Gcount_nlc);
 
+  /* No longer assumption on a global unstructured around... */
+  ln_of_statement(mod_stat,
+		  Gforward_substitute_table, &Genclosing_loops,
+		  &Genclosing_tests, &Gscalar_written_forward,
+		  &Gcount_nlc);
+  
   debug_off();
 
   /* Reorder the module. It is necessary because new statements have been
