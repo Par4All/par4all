@@ -17,6 +17,24 @@ string mod_name;
     return print_dependence_graph(mod_name);
 }
 
+bool
+print_filtered_dependence_graph(mod_name)
+string mod_name;
+{
+    fprintf(stderr, "print_filtered_dependence_graph worked");
+
+    return TRUE;
+}
+
+bool
+print_filtered_depedence_daVinci_graph(mod_name)
+string mod_name;
+{
+    fprintf(stderr, "print_filtered_depedence_daVinci_graph worked");
+    
+    return TRUE;
+}
+
 bool 
 print_effective_dependence_graph(mod_name)
 string mod_name;
