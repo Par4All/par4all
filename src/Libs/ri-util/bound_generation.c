@@ -1,0 +1,159 @@
+
+ /* package ri-util
+  */
+
+#include <stdio.h>
+extern int fprintf();
+
+#include "genC.h"
+#include "misc.h" 
+#include "ri.h"
+
+#include "arithmetique.h"
+
+#include "ri-util.h"
+
+char *nom_de_variable(e)
+char *e;
+{
+    if (e!=NULL) return(entity_name((entity) e));
+    else return("TCST");
+}
+
+/* expression make_contrainte_expression(Pcontrainte pc, variable index)
+ * make an expression for constraint of index I 
+ * for example: for a constraint of index I : aI + expr_linear(J,K,TCST) <=0
+ *              the new expression for I will be : -expr_linear(J,K,TCST)/a 
+ */
+expression make_contrainte_expression(pc, index)
+Pcontrainte pc;
+Variable index;
+{    
+    Pvecteur pv;
+    Pvecteur index_element;
+    expression ex1,ex2,ex;
+    entity div;
+    int coeff;
+
+    /*search the couple (var,val) where  var is equal to index and extract it */
+    pv = vect_dup(pc->vecteur);
+    index_element = vect_elem(pv, index);
+    vect_erase_var(&pv,index);
+
+    coeff = index_element->val;
+    if (coeff > 0) 
+	vect_chg_sgn(pv);
+    else 
+	vect_add_elem(&pv,TCST,ABS(coeff)-1);
+
+    if(vect_size(pv)==1 && vecteur_var(pv)==TCST) {
+	vecteur_val(pv) = DIVIDE(vecteur_val(pv), ABS(coeff));
+	return make_vecteur_expression(pv);
+    }
+
+    if(VECTEUR_NUL_P(pv))
+	return make_integer_constant_expression(0);
+
+    ex1 = make_vecteur_expression(pv); 
+    
+    if (ABS(coeff) > 1){
+	/* FI->YY: before generating a division, you should test if it could
+	   not be performed statically; you have to check if ex1 is not
+	   a constant expression, which is fairly easy since you still
+	   have its linear form, pv */
+	div = gen_find_tabulated("TOP-LEVEL:/",entity_domain);
+   
+	pips_assert("make_contraitne_expression",div != entity_undefined);
+	ex2 = make_integer_constant_expression(ABS(coeff));
+
+	ex = make_expression(make_syntax(is_syntax_call,
+					 make_call(div,
+						   CONS(EXPRESSION,ex1,
+							CONS(EXPRESSION,
+							     ex2,NIL)))
+					 ),normalized_undefined);	
+	return(ex);
+    }
+    else 
+	return(ex1);
+
+}
+
+/* void make_bound_expression(variable index, Pbase base, Psysteme sc,
+ * expression *lower, expression *upper)
+ * make the  expression of the  lower and  upper bounds of  "index"
+ * which is in "base" and referenced in "sc"
+ */
+void make_bound_expression(index, base, sc, lower, upper)
+Variable index;
+Pbase base;
+Psysteme sc;
+expression *lower;
+expression *upper;
+{
+    Pcontrainte pc;
+    cons *ll = NIL;
+    cons *lu = NIL;
+
+    expression ex;
+    entity min, max;
+
+    int i;
+    int rank_index ;
+
+    /* compute the rank d of the  index in the basis */  
+    rank_index = base_find_variable_rank(base,index,nom_de_variable);
+    debug(7,"make_bound_expression","index :%s\n",nom_de_variable(index));
+    debug(8,"make_bound_expression","rank_index = %d\n",rank_index);
+
+    /*search constraints referencing "index" and create the list of 
+      expressions for lower and upper bounds */
+    for (pc=sc->inegalites; pc!=NULL; pc=pc->succ) {
+	i = level_contrainte(pc, base);
+	debug(8,"make_bound_expression","level: %d\n",i);
+	if (ABS(i)==rank_index){	/* found */
+	    if (get_debug_level()>=7) {
+		fprintf(stderr, "\n constraint before :");
+		contrainte_fprint(stderr, pc, TRUE, entity_local_name);
+	    }
+	    ex = make_contrainte_expression(pc, (Variable) index);
+	    if (get_debug_level()>=7) {
+		fprintf(stderr, "\n expression after :");
+		print_expression(ex);
+	    }
+	    /* add the expression to the list of  lower bounds
+	       or to the list of upper bounds*/
+	    if (i>0)
+		lu = CONS(EXPRESSION, ex, lu);
+	    else ll = CONS(EXPRESSION, ex, ll);
+	}
+    }
+
+    /* make expressions of  lower and  upper  bounds*/
+    min = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+						  "MIN"), 
+			     entity_domain);
+    max = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+						  "MAX"), 
+			     entity_domain);
+
+    pips_assert("make_vecteur_expression",min != entity_undefined && 
+		max != entity_undefined);
+
+    if (gen_length(ll) > 1)
+	*lower = make_expression(make_syntax(is_syntax_call,
+					     make_call(max,ll)),
+				 normalized_undefined);
+    else 
+	*lower = EXPRESSION(CAR(ll));
+
+    if (gen_length(lu) > 1 )
+	*upper = make_expression(make_syntax(is_syntax_call,
+					     make_call(min,lu)),
+				 normalized_undefined );
+    else
+	*upper = EXPRESSION(CAR(lu));   
+}
+
+
+ 
