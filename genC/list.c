@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/03/21 13:33:34 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/03/24 16:46:50 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -503,6 +503,16 @@ list l;
 	if (CHUNK(CAR(c))==item) return(l);
 
     return(CONS(CHUNK, item, l));
+}
+
+bool gen_in_list_p(item, l)
+gen_chunk *item;
+list l;
+{
+    for (; !ENDP(l); POP(l))
+	if (CHUNK(CAR(l))==item) return(TRUE); /* found! */
+
+    return(FALSE); /* else no found */
 }
 
 /* Sorts a list of gen_chunks in place, to avoid mallocs. 
