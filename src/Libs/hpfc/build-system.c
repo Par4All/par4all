@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/04/21 10:28:14 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1995/06/09 16:53:17 $, ) 
  * version $Revision$
  */
 
@@ -27,6 +27,7 @@
 #define DELTA_PREFIX	"DELTA"
 #define IOTA_PREFIX	"IOTA"
 #define SIGMA_PREFIX	"SIGMA"
+#define TMP_PREFIX	"TMP"
 
 /* Variables
  *  + array dimensions (PHIs)
@@ -110,6 +111,7 @@ GET_DUMMY(HPFC_PACKAGE, 	GAMMA_PREFIX, 	cycle);
 GET_DUMMY(HPFC_PACKAGE, 	LALPHA_PREFIX, 	local);
 GET_DUMMY(HPFC_PACKAGE, 	IOTA_PREFIX, 	shift);
 GET_DUMMY(HPFC_PACKAGE, 	SIGMA_PREFIX, 	auxiliary);
+GET_DUMMY(HPFC_PACKAGE,		TMP_PREFIX,	temporary);
 
 /* shift dummy variables to prime variables.
  * systeme s is modified.
