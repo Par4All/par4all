@@ -1,7 +1,7 @@
 %
 % Documentation de l'environnement de de'veloppement PIPS
 %
-% $RCSfile: dret146.ftex,v $ ($Date: 1994/11/21 09:11:49 $) version $Revision$, got on %D%, %T%
+% $RCSfile: dret146.ftex,v $ ($Date: 1995/09/19 18:51:40 $) version $Revision$, got on %D%, %T%
 % %A%
 %
 
@@ -27,7 +27,11 @@
                         Be'atrice APVRILLE 
 }
 %\newcommand{\docdate}{7 octobre 1993}
-\newcommand{\docdate}{$Date: 1994/11/21 09:11:49 $}
+\newcommand{\docdate}{$Date: 1995/09/19 18:51:40 $}
+
+\renewcommand{\indexname}{Index}
+
+\makeindex
 
 \begin{document}
 
@@ -150,6 +154,7 @@ logiciel Pips. Cette version sert pour les installations et pour les
 de'monstrations.
 
 {\em Ne semble plus utilise' depuis 1990... }
+
 \begin{itemize}
 \item {\tt \bf Config.}
 Ce re'pertoire contient les scripts qui permettent de positionner toutes
@@ -186,13 +191,14 @@ gestion de Pips et le recompilation de Pips, les bibliothe`ques Newgen
 et Linear.
 \begin{itemize}
 
-  \item \verb+clean-pips+: destruction de fichiers inutiles
+  \item \verb+clean-pips+: \index{clean-pips}destruction de fichiers inutiles
 
   \item \verb+make-pips+: cf. section Modification...
 
   \item \verb+recompile-pips(newgen, linear)+: cf. section Modification...
 
-  \item \verb+search-pips+: recherche et, e'ventuellement, destruction
+  \item \verb+search-pips+: \index{search-pips}
+	recherche et, e'ventuellement, destruction
          de fichiers auxiliaires comme les \verb+database+; exemple:
         destruction de toutes les bases non utilise'es depuis un
         mois:
@@ -1224,6 +1230,12 @@ Le sauvegardes ge'ne'rales sont effectue'es les mardi et vendredi comme
 pour les autres partitions du syste`me a` l'aide de \verb+/etc/dump+.
 Les fichiers peuvent e^tre restaure's a` l'aide de \verb+/etc/restore+.
 
+
+\newpage
+
+% Cross-references for points and keywords
+
+\input{dret146.ind}
 
 \end{document}
 \end
