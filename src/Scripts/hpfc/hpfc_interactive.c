@@ -1,7 +1,10 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/08/01 11:22:10 $, 
+ * $Date: 1995/08/08 10:54:37 $, 
  *
- * interactive interface to hpfc, based on the GNU realine library.
+ * interactive interface to hpfc,
+ * based on the GNU READLINE library for interaction,
+ * and the associated HISTORY library for history.
+ * taken from bash.
  */
 
 #include <stdio.h>
@@ -15,11 +18,13 @@ extern int chdir();
 #include "readline/readline.h"
 #include "readline/history.h"
 
-#define HPFC_PROMPT "hpfc> " /* prompt for readline  */
-#define HPFC_PREFIX "hpfc"   /* forked shell script  */
-#define HIST ".hpfc.history" /* default history file */
+#define HPFC_PROMPT "hpfc> " 		/* prompt for readline  */
+#define HPFC_PREFIX "hpfc"   		/* forked shell script  */
+#define HPFC_HISTENV "HPFC_HISTORY"	/* history file env variable */
+#define HPFC_HISTORY_LENGTH 100		/* max length of history file */
+#define HIST ".hpfc.history" 		/* default history file */
 
-#define SHELL_ESCAPE "\\"
+#define SHELL_ESCAPE "\\" 		/* ! used for history reference */
 #define CHANGE_DIR   "cd "
 #define QUIT         "quit"
 
@@ -33,7 +38,7 @@ extern int chdir();
  */
 static char *default_hist_file_name()
 {
-    char *home, *hist = getenv("HPFC_HISTORY");
+    char *home, *hist = getenv(HPFC_HISTENV);
 
     if (hist) return hist;
 
@@ -48,12 +53,21 @@ static char *default_hist_file_name()
  */
 int main()
 {
-    char *last = NULL, *line = NULL, *file_name = default_hist_file_name();
+    HIST_ENTRY * last_entry;
+    char *last, *line, *file_name = default_hist_file_name();
     
-    /*  initialize history
+    /*  initialize history: 
+     *  read the history file, then point to the last entry.
      */
     using_history();
     read_history(file_name);
+    history_set_pos(history_length);
+    last_entry = previous_history();
+
+    /* last points to the last history line of any.
+     * used to avoid to put twice the same line.
+     */
+    last = last_entry ? last_entry->line : NULL ;
     
     /*  interactive loop
      */
@@ -86,7 +100,7 @@ int main()
 	    free(shll);
 	}
 
-	/*   add to history if not the same as the last one (in this session)
+	/*   add to history if not the same as the last one
 	 */
 	if (line && *line && ((last && strcmp(last, line)!=0) || (!last)))
 	    add_history(line), last = line; 
@@ -96,10 +110,10 @@ int main()
 
     if (!line) fprintf(stdout, "\n"); /* for Ctrl-D terminations */
 
-    /*   close history
+    /*   close history: truncate list and write history file
      */
+    stifle_history(HPFC_HISTORY_LENGTH);
     write_history(file_name);
-    history_truncate_file(file_name, 100);
 
     return 0;
 }
