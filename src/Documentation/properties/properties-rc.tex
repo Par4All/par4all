@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/27 17:48:11 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/29 00:15:13 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -807,13 +807,27 @@ DEAD_CODE_DISPLAY_STATISTICS TRUE
 
 
 
-\subsection{Control graph restructuring}
+\subsection{Control flow graph restructuring}
+
+
+
+\subsubsection{Unspaghettify \& restructurer}
 
 
 To display the statistics about unspaghettify and control graph
 restructuring.
 \begin{verbatim}
 UNSPAGHETTIFY_DISPLAY_STATISTICS TRUE
+\end{verbatim}
+
+
+\subsubsection{clean up sequences}
+
+
+To display the statistics about cleaning-up sequences and removing
+useless CONTINUE or empty statement.
+\begin{verbatim}
+CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS TRUE
 \end{verbatim}
 
 
