@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.16  2000/07/03 12:51:16  coelho
+   typo fixed.
+
    Revision 1.15  2000/07/03 12:26:06  phamdinh
    Pour changer repertoire a travailer
 
@@ -593,7 +596,7 @@ static void insert_rwt(statement s)
   if (bound_inserted_p(s))
     {
       statement sblock = load_inserted(s);
-      instruction i = statement_innstruction(sblock);
+      instruction i = statement_instruction(sblock);
       sequence seq;
       pips_assert("it is a sequence", instruction_sequence_p(i));
 
