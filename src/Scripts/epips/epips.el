@@ -44,21 +44,24 @@
 			       26) ; estimated window manager decor per frame
 			    (frame-char-height))
 			 )
+     (epips-log-frame-height (/ 250
+				(frame-char-height))
+			 )
      )
   (add-to-list
-   'special-display-regexps `("Pips-Log" ,@(x-parse-geometry "80x12+0-0")))
+   'special-display-regexps `("Pips-Log" (top - 0) (left . 0) (height . ,epips-log-frame-height)))
   (add-to-list
    'special-display-regexps
-   `("Emacs-Pips-[048]" (top . 0) (left - 0) (height . ,epips-frame-height)))
+   `("EPips-[048]" (top . 0) (left - 0) (height . ,epips-frame-height)))
   (add-to-list
    'special-display-regexps
-   `("Emacs-Pips-[159]" (top - 0) (left - 0) (height . ,epips-frame-height)))
+   `("EPips-[159]" (top - 0) (left - 0) (height . ,epips-frame-height)))
   (add-to-list
    'special-display-regexps
-   `("Emacs-Pips-[26]" (top . 0) (left . 0) (height . ,epips-frame-height)))
+   `("EPips-[26]" (top . 0) (left . 0) (height . ,epips-frame-height)))
   (add-to-list
    'special-display-regexps
-   `("Emacs-Pips-[37]" (top - 0) (left . 0) (height . ,epips-frame-height)))
+   `("EPips-[37]" (top - 0) (left . 0) (height . ,epips-frame-height)))
   )
 
 ; To print some messages during the epips debugging:
