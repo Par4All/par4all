@@ -569,8 +569,10 @@ static void process_a_file()
      */
     while ((line = read_a_line(TPIPS_PROMPT)))
     {
+	pips_debug(3, "considering line: %s\n", line? line: " --- empty ---");
 	if (setjmp(pips_top_level)) {
 #ifdef FLEX_SCANNER
+	    pips_debug(2, "restating tpips scanner\n");
 	    tp_restart(tp_in);
 #endif
 	}
@@ -587,6 +589,10 @@ static void process_a_file()
 	    }
 	    /*   calls the appropriate handler.
 	     */
+#ifdef FLEX_SCANNER
+	    pips_debug(2, "restating tpips scanner\n");
+	    tp_restart(tp_in);
+#endif
 	    (find_handler(line))(line);
 	}
 	pop_pips_context();
