@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.166  2002/06/14 09:09:30  irigoin
+%% property PRETTYPRINT_REGENERATED_LABEL added
+%%
 %% Revision 1.165  2002/06/12 09:50:51  irigoin
 %% Latex bug with underscores fixed
 %%
@@ -207,7 +210,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2002/06/12 09:50:51 $~$
+$~$Date: 2002/06/14 09:09:30 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -693,11 +696,14 @@ following property:
 
 \begin{verbatim}
 PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS FALSE
+PRETTYPRINT_REGENERATED_LABEL "12345"
 \end{verbatim}
 
 This is useful to link modules processed by PIPS with user modules using
 the alternate return constructs if alternate returns are replaced by STOP
-statement in the code processed by PIPS.
+statement in the code processed by PIPS. The actual labels present in call
+sites may be dead code eliminated and a fake non-conflicting label must be
+used. It is defined by property \verb/PRETTYPRINT_REGENERATED_LABEL/.
 
 If all modules have been processed by PIPS, it is possible not to
 regenerate alternate returns and to use a code close to the internal
