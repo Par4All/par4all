@@ -931,6 +931,7 @@ int use;
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     module_stat = get_current_module_statement();
     set_current_module_entity(local_name_to_top_level_entity(module_name));
+    set_entity_to_size();
 
     debug_on("CHAINS_DEBUG_LEVEL");
    
@@ -948,19 +949,30 @@ int use;
     }
     set_effects(module_name,use);
 
+    /* */
     module_graph = 
 	dependence_graph(instruction_unstructured(module_inst));
+	/* */
+
+    /* module_graph = statement_dependence_graph(module_stat); */
 
     if (get_debug_level() > 0)
 	print_graph(stderr, module_stat, module_graph);
 
     debug_off();
 
-    if( !control_undefined_p( module_cont )) { gen_free( module_cont )
-	; } DB_PUT_MEMORY_RESOURCE(DBR_CHAINS, strdup(module_name),
-	(char*) module_graph); reset_effects();
-	reset_enclosing_loops_map(); reset_current_module_statement();
-	reset_current_module_entity();
+    if( !control_undefined_p( module_cont )) {
+	control_statement (module_cont) = statement_undefined;
+	gen_free( module_inst );
+    }
+
+    DB_PUT_MEMORY_RESOURCE(DBR_CHAINS, strdup(module_name),
+	(char*) module_graph);
+    reset_effects();
+    reset_enclosing_loops_map();
+    reset_current_module_statement();
+    reset_current_module_entity();
+    reset_entity_to_size();
 
     return TRUE;
 }
@@ -992,6 +1004,38 @@ unstructured u ;
     init_control( c ) ;
     inout_control( c ) ;
     usedef_control( c ) ;
+    return( dg ) ;
+}
+
+
+
+/* STATEMENT_DEPENDENCE_GRAPH computes, from the statement s, the dependency 
+ * graph. Statement s is assumed "controlized, i.e. GOTO have been replaced
+ * by unstructured.
+ *
+ * FI: this function is bugged. As Pierre said, you have to start with
+ * an unstructured for the use-def chain computation to be correct.
+ */
+
+graph statement_dependence_graph(statement s)
+{
+    one_trip_do = get_bool_property( "ONE_TRIP_DO" ) ;
+    keep_read_read_dependences = 
+	    get_bool_property( "KEEP_READ_READ_DEPENDENCE" ) ;
+
+    Gen = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
+    Ref = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
+    Kill = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
+    Def_in = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
+    Def_out = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
+    Ref_in = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
+    Ref_out = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
+    Defs = hash_table_make( hash_pointer, INIT_ENTITY_SIZE ) ;
+    Vertex_statement = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
+    dg = make_graph( NIL ) ;
+    init_statement( s ) ;
+    inout_statement( s ) ;
+    usedef_statement( s ) ;
     return( dg ) ;
 }
 
