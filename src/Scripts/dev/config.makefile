@@ -17,8 +17,9 @@ SCRIPTS = 	pips-makemake \
 		remove_from_sccs_file
 
 MACROS=		makefile_macros.. \
-		makefile_macros.SUN4 \
-		makefile_macros.DEFAULT
+		makefile_macros.GNU \
+		makefile_macros.DEFAULT \
+		makefile_macros.SUN4
 
 FILES=		forward_gnu_makefile \
 		$(MACROS)
