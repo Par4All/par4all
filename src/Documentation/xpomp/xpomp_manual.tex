@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/08 21:50:32 $, 
+%% $Date: 1996/09/26 13:57:25 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html,verbatim}
@@ -633,11 +633,13 @@ c' = c \oplus \texttt{color}
 This is useful to display a frame on very color changing images.
 
 If the given title is an empty string (that is \verb|""| in C or
-\verb|''| in Fortran and not a NULL pointer), no title is displayed.
-If a title is given, it is displayed below the frame with color
-\verb|title_color| in a box with color \verb|background_color|. If
-\verb|background_color| is $-1$, the title box background remains
-transparent.
+\verb|' '| in Fortran\footnote{Note this is a string with one blank
+  character in Fortran~77 because the Fortran~77 does not allow a
+  string with no character in it...} and not a NULL pointer), no title
+is displayed.  If a title is given, it is displayed below the frame
+with color \verb|title_color| in a box with color
+\verb|background_color|. If \verb|background_color| is $-1$, the title
+box background remains transparent.
 
 The drawing is clipped to not override the color map area.
 
