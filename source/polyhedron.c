@@ -125,11 +125,13 @@ static SatMatrix *SMAlloc(int rows,int cols) {
 /* 
  * Free the memory space occupied by saturation matrix. 
  */ 
-static void SMFree (SatMatrix *matrix) {
+static void SMFree (SatMatrix **matrix) {
 
-  free ((char *) matrix->p_init);
-  free ((char *) matrix->p);
-  free ((char *) matrix);
+  if (matrix[0]){ 
+  free ((char *) matrix[0]->p_init);
+  free ((char *) matrix[0]->p);
+  free ((char *) matrix[0]);
+  matrix[0]=NULL;}
 } /* SMFree */
 
 /*
@@ -1973,7 +1975,7 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
   CATCH(any_exception_error) {
 
     /* In case of overflow, free the allocated memory and forward. */    
-    if (Sat) SMFree(Sat);
+    if (Sat) SMFree(&Sat);
     if (Ray) Matrix_Free(Ray);
     if (Pol) Polyhedron_Free(Pol);
     RETHROW();
@@ -2003,7 +2005,7 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
   Polyhedron_Print(stderr,"%4d",Pol);
 #endif
   
-  SMFree(Sat), Sat = NULL;
+  SMFree(&Sat), Sat = NULL;
   Matrix_Free(Ray), Ray = NULL; 
   return Pol;
 } /* Constraints2Polyhedron */
@@ -2091,8 +2093,8 @@ Polyhedron *Rays2Polyhedron(Matrix *Ray,unsigned NbMaxConstrs) {
     /* In case of overflow, free the allocated memory before forwarding
      * the exception. 
      */
-    if (SatTranspose) SMFree(SatTranspose);
-    if (Sat) SMFree(Sat);
+    if (SatTranspose) SMFree(&SatTranspose);
+    if (Sat) SMFree(&Sat);
     if (Mat) Matrix_Free(Mat);
     if (Pol) Polyhedron_Free(Pol);
     RETHROW();
@@ -2120,7 +2122,7 @@ Polyhedron *Rays2Polyhedron(Matrix *Ray,unsigned NbMaxConstrs) {
     SMPrint(Sat);
 #endif
     
-    SMFree(SatTranspose), SatTranspose = NULL;
+    SMFree(&SatTranspose), SatTranspose = NULL;
     
     /* Remove redundant rays from the ray matrix 'Ray' */
     Pol = Remove_Redundants(Mat,Ray,Sat,0);
@@ -2133,7 +2135,7 @@ Polyhedron *Rays2Polyhedron(Matrix *Ray,unsigned NbMaxConstrs) {
   Polyhedron_Print(stderr,"%4d",Pol);
 #endif
   
-  SMFree(Sat);
+  SMFree(&Sat);
   Matrix_Free(Mat);
   return Pol;
 } /* Rays2Polyhedron */
@@ -2157,7 +2159,7 @@ static SatMatrix *BuildSat(Matrix *Mat,Matrix *Ray,unsigned NbConstraints,unsign
   
   CATCH(any_exception_error) {
     if (Sat) 
-      SMFree(Sat);
+      SMFree(&Sat);
     value_clear(tmp);
     RETHROW();
   }
@@ -2218,7 +2220,7 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
     if (NewPol) Polyhedron_Free(NewPol);
     if (Mat) Matrix_Free(Mat);
     if (Ray) Matrix_Free(Ray);
-    if (Sat) SMFree(Sat);
+    if (Sat) SMFree(&Sat);
     RETHROW();
   }
   TRY {
@@ -2264,7 +2266,7 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
   } /* end of TRY */
   
   UNCATCH(any_exception_error);  
-  SMFree(Sat);
+  SMFree(&Sat);
   Matrix_Free(Ray);
   Matrix_Free(Mat);  
   return NewPol;
@@ -2391,7 +2393,7 @@ Polyhedron *SubConstraint(Value *Con,Polyhedron *Pol,unsigned NbMaxRays,int Pass
     if (NewPol) Polyhedron_Free(NewPol);
     if (Mat) Matrix_Free(Mat);
     if (Ray) Matrix_Free(Ray);
-    if (Sat) SMFree(Sat);
+    if (Sat) SMFree(&Sat);
     RETHROW();
   }
   TRY {
@@ -2457,7 +2459,7 @@ Polyhedron *SubConstraint(Value *Con,Polyhedron *Pol,unsigned NbMaxRays,int Pass
   
   UNCATCH(any_exception_error);
   
-  SMFree(Sat);
+  SMFree(&Sat);
   Matrix_Free(Ray);
   Matrix_Free(Mat);
   return NewPol;
@@ -2530,8 +2532,8 @@ Polyhedron *AddRays(Value *AddedRays,unsigned NbAddedRays,Polyhedron *Pol,unsign
     if (NewPol) Polyhedron_Free(NewPol);
     if (Mat) Matrix_Free(Mat);
     if (Ray) Matrix_Free(Ray);
-    if (Sat) SMFree(Sat);
-    if (SatTranspose) SMFree(SatTranspose);
+    if (Sat) SMFree(&Sat);
+    if (SatTranspose) SMFree(&SatTranspose);
     RETHROW();
   }
   TRY {
@@ -2577,12 +2579,12 @@ Polyhedron *AddRays(Value *AddedRays,unsigned NbAddedRays,Polyhedron *Pol,unsign
     /* Transform the saturation matrix 'SatTranspose' in the standard format */
     /* , that is, (ray X constraint) format.                                 */
     Sat = TransformSat(Mat, Ray, SatTranspose);
-    SMFree(SatTranspose), SatTranspose = NULL;
+    SMFree(&SatTranspose), SatTranspose = NULL;
     
     /* Remove redundant rays from the ray matrix 'Ray' */
     NewPol = Remove_Redundants(Mat, Ray, Sat, 0);
     
-    SMFree(Sat), Sat = NULL;
+    SMFree(&Sat), Sat = NULL;
     Matrix_Free(Mat), Mat = NULL;
     Matrix_Free(Ray), Ray = NULL;  
   } /* end of TRY */
@@ -2763,7 +2765,7 @@ static void FindSimple(Polyhedron *P1,Polyhedron *P2,unsigned *Filter,unsigned N
     if (tmpC) free(tmpC);
     if (tmpR) free(tmpR);
     if (Mat) Matrix_Free(Mat);
-    if (Sat) SMFree(Sat);
+    if (Sat) SMFree(&Sat);
     if (Pol2 && Pol2!=P2) Polyhedron_Free(Pol2);
     if (Pol && Pol!=Pol2 && Pol!=P2) Polyhedron_Free(Pol);
     
@@ -2942,7 +2944,7 @@ static void FindSimple(Polyhedron *P1,Polyhedron *P2,unsigned *Filter,unsigned N
 	  value_decrement(NbConstraintsLeft,NbConstraintsLeft);
 	}
       }
-      SMFree(Sat), Sat = NULL;
+      SMFree(&Sat), Sat = NULL;
       free(tmpC), tmpC = NULL;
       free(tmpR), tmpR = NULL;
     }   
@@ -2978,7 +2980,7 @@ static int SimplifyConstraints(Polyhedron *Pol1,Polyhedron *Pol2,unsigned *Filte
     if (Pol) Polyhedron_Free(Pol);
     if (Mat) Matrix_Free(Mat);
     if (Ray) Matrix_Free(Ray);
-    if (Sat) SMFree(Sat);
+    if (Sat) SMFree(&Sat);
     RETHROW();
   }
   TRY {
@@ -3033,7 +3035,7 @@ static int SimplifyConstraints(Polyhedron *Pol1,Polyhedron *Pol2,unsigned *Filte
     /* Polyhedron_Print(stderr,"%4d",Pol1); */
 
     Polyhedron_Free(Pol), Pol = NULL;
-    SMFree(Sat), Sat = NULL;
+    SMFree(&Sat), Sat = NULL;
     Matrix_Free(Ray), Ray = NULL;
     Matrix_Free(Mat), Mat = NULL;
     
