@@ -3,6 +3,9 @@
 !
 ! $Id$
 ! $Log: hpfc_procs.m4h,v $
+! Revision 1.15  1997/06/03 08:05:58  zory
+! *** empty log message ***
+!
 ! Revision 1.14  1997/06/03 08:00:06  zory
 ! new common HOST LID
 !
@@ -15,7 +18,7 @@
      $     MY LID,
      $     MY TID,
      $     HOST TID,
-     $     HOST LID
+     $     HOST LID,
      $     NODE TIDS(MAX MAX SIZE OF PROCS),
      $     MY POS(7, MAX NB OF PROCESSORS),
      $     NB OF TASKS,
