@@ -4,7 +4,7 @@
  * Empty lines with SPACE and TAB characters 
  * are be preprocessed and reduced to an empty line by GetChar().
  */
-#define START_COMMENT_LINE "CcDd*!\n"
+#define START_COMMENT_LINE "CcDd*!#\n"
 
 extern FILE * syn_in; /* the file read in by the scanner */
 
