@@ -282,25 +282,18 @@ handle_complex_constants(string * line)
 }
 
 /* tries several path for a file to include...
+ * first rely on $PIPS_SRCPATH, then other directories.
  */
 static string 
 find_file(string name)
 {
-    string other;
-
-    other = strdup(concatenate(user_file_directory, "/", name, 0));
-    if (file_exists_p(other))
-	return other;
-    free(other);
-
-    if (file_exists_p(name)) return strdup(name);
-
-    other = strdup(concatenate("../", name, NULL));
-    if (file_exists_p(other))
-	return other;
-    free(other);
-    
-    return find_file_in_directories(name, getenv(SRCPATH));
+    string srcpath = getenv(SRCPATH), result;
+    string path = strdup(concatenate(
+	srcpath? srcpath: "", ":", 
+	user_file_directory? user_file_directory: "", ":.:..", 0));
+    result = find_file_in_directories(name, path);
+    free(path);
+    return result;
 }
 
 /* cache of preprocessed includes
