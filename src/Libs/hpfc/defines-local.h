@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/08/11 08:57:24 $, ) 
+ * ($Date: 1995/08/31 11:46:08 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -149,8 +149,7 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* debug macro
  */
-#define GEN_DEBUG(D, W, P)\
- ifdebug(D) {fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W);P;}
+#define GEN_DEBUG(D, W, P) ifdebug(D) { pips_debug(D, "%s:\n", W); P;}
 
 #define DEBUG_STAT(D, W, S) GEN_DEBUG(D, W, print_statement(S))
 #define DEBUG_CODE(D, W, M, S) GEN_DEBUG(D, W, hpfc_print_code(stderr, M, S))
