@@ -6,7 +6,7 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/05/05 19:04:59 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/05/05 19:06:22 $, )
  * version $Revision$
  */
 
@@ -868,6 +868,7 @@ list_of_remapping_statements()
 /* functions used for debug.
  */
 static void print_control_ordering(c)
+control c;
 {
     register int so = statement_ordering(control_statement(c));
     fprintf(stderr, "(%d,%d), ", ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
