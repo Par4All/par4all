@@ -5,7 +5,7 @@
 ! (c) Fabien COELHO, 09/95
 !
 ! $RCSfile: hpfc_stubs.f,v $ (version $Revision$)
-! ($Date: 1996/09/13 17:55:24 $, )
+! ($Date: 1997/01/18 16:58:30 $, )
 !     
 ! synchronization 
       subroutine hpfc1
@@ -22,6 +22,11 @@
 !!fcd$ fake
       character comment*(*)
       print *, 'hpfc3: ', comment
+      end
+      subroutine hpfc0(comment)
+!!fcd$ fake
+      character comment*(*)
+      print *, 'hpfc0: ', comment
       end
 ! io/host section marker
       subroutine hpfc7
