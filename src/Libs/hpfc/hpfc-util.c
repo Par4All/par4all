@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/07/23 15:08:25 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/07/23 16:52:25 $, )
  * version $Revision$
  */
 
@@ -170,7 +170,7 @@ ith_dim_overlapable_p(
 
 
 /* creates a new statement for the given module
- * that looks like the stat one, i.e. same (shared) comment, same 
+ * that looks like the stat one, i.e. same comment, same 
  * label, and so on. The goto table is updated. The instruction
  * is also created. (is that really a good idea?)
  */
@@ -190,7 +190,7 @@ int the_tag;
     return make_statement(statement_label(stat),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
-			  statement_comments(stat),     /* sharing! */
+			  strdup(statement_comments(stat)),
 			  make_instruction(the_tag, x));
 }
 
