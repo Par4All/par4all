@@ -24,8 +24,6 @@
 #include "text-util.h"
 #include "icfg.h"
 
-extern void set_methods_for_rw_effects_prettyprint(string /*module_name*/);
-
 text get_text_proper_effects_flt(string module_name, entity e_flt)
 {
   text t;
