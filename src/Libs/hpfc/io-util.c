@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/04/01 11:36:35 $, )
+ * ($Date: 1996/04/02 08:56:46 $, )
  */
 
 #include "defines-local.h"
@@ -84,7 +84,8 @@ only_io_rewrite(
 	/* ??? something else should be done?
 	 * other kind of statements should not modify this status?
 	 */
-	is_io = io_intrinsic_p(f) ||     /* intrinsics */
+	is_io = entity_continue_p(f) ||  /* CONTINUE */
+	        io_intrinsic_p(f) ||     /* Fortran IO intrinsics */
 	        hpfc_special_io(f) ||    /* declared with FCD */
 		hpfc_io_like_function(f);/* runtime managed */
         break;
