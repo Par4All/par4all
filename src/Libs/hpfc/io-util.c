@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-util.c,v $
+ * Revision 1.35  1997/07/21 15:25:59  keryell
+ * Forgotten 'u'.
+ *
  * Revision 1.34  1997/07/21 13:56:05  keryell
  * Replaced %x format by %p.
  *
@@ -116,7 +119,7 @@ static void only_io_unstructured(unstructured u)
 
     CONTROL_MAP(ct, is_io = is_io & Load(control_statement(ct)), c, blocks);
     gen_free_list(blocks);
-    pips_debug(5, "unstructured %p: %d\n", , is_io);
+    pips_debug(5, "unstructured %p: %d\n", u, is_io);
     Store(current_statement_head(), is_io);
 }
 
