@@ -94,7 +94,7 @@ void ParserError(char * f, char * m)
 }
 
 
-/* this function is called for each new file */
+/* this function is called for each new file (FI: once?) */
 void BeginingOfParsing()
 {
     static bool called = FALSE;
@@ -118,6 +118,9 @@ the_actual_parser(
     string dbr_file)
 {
     debug_on("SYNTAX_DEBUG_LEVEL");
+
+    /* set up parser properties */
+    init_parser_properties();
 
     /* parser is initialized */
     BeginingOfParsing();
@@ -160,4 +163,9 @@ bool hpfc_parser(string module)
 bool parser(string module)
 {
     return the_actual_parser(module, DBR_SOURCE_FILE);
+}
+
+void init_parser_properties()
+{
+  init_parser_reader_properties();
 }
