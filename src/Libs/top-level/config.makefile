@@ -7,7 +7,6 @@
 
 LIB_CFILES =	dbm.c \
 		help.c \
-		newgen.c \
 		logging.c \
 		view.c
 
