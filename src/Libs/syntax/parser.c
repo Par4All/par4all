@@ -91,12 +91,18 @@ string module;
     /* scanner is initialized */
     ScanNewFile();
 
-    CurrentFN = db_get_file_resource(DBR_SOURCE_FILE, module, TRUE);
+    pips_assert("parser", CurrentFN==NULL);
+    CurrentFN = strdup(concatenate(db_get_current_workspace_directory(),
+				   "/",
+				   db_get_file_resource(DBR_SOURCE_FILE, module, TRUE),
+				   NULL));
 
     /* yacc parser is called */
     ssin = safe_fopen(CurrentFN, "r");
     ssparse();
     safe_fclose(ssin, CurrentFN);
+    free(CurrentFN);
+    CurrentFN = NULL;
 
     /* This debug_off() occurs too late since pipsdbm has been called
      * before. Initially, the parser was designed to parse more than
