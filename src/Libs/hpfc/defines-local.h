@@ -49,6 +49,11 @@ extern int system();
 #include "ri-util.h"
 #include "hpfc.h"
 
+/* in paf-util.h:
+ */
+list base_to_list(Pbase base);
+void fprint_entity_list(FILE *fp, list l);
+
 #define PVECTOR(v) ((Pvecteur)CHUNK(v))
 
 /* ??? very beurk!
