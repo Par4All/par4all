@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/05 12:47:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/05 23:14:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/10/05 12:47:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/10/05 23:14:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -102,15 +102,9 @@ char *module_name;
 static bool print_code_semantics(module_name)
 char *module_name;
 {
-    char *filename;
-    FILE *fd;
+    bool success = TRUE;
 
-    /* prepare the prettyprintting */
-    filename = strdup
-	(concatenate(db_get_current_workspace_directory(), 
-		     "/",
-		     module_name,
-		     is_transformer?
+    char * file_ext = strdup(concatenate(is_transformer?
 		     (is_user_view? USER_TRANSFORMER_SUFFIX :
 		      SEQUENTIAL_TRANSFORMER_SUFFIX ) :
 		     (is_user_view? USER_PRECONDITION_SUFFIX :
@@ -119,21 +113,20 @@ char *module_name;
 		     ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
 		     GRAPH_FILE_EXT : "",
 		     NULL));
-    fd = safe_fopen(filename, "w");
 
-    print_text(fd, get_semantic_text(module_name,TRUE));
+    char * resource_name =
+	get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
+	    DBR_GRAPH_PRINTED_FILE :
+		(is_user_view? DBR_PARSED_PRINTED_FILE :
+		 DBR_PRINTED_FILE);
 
-    safe_fclose(fd, filename);
+    success = make_text_resource(module_name,
+				 resource_name,
+				 file_ext,
+				 get_semantic_text(module_name,TRUE));
 
-    /* Let's assume that value_mappings will be somehow sometime freed... */
-
-    DB_PUT_FILE_RESOURCE(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? DBR_GRAPH_PRINTED_FILE :
-                         (is_user_view? DBR_PARSED_PRINTED_FILE :
-                          DBR_PRINTED_FILE),
-			 strdup(module_name),
- 			 filename);
-
-    return TRUE;
+    free(file_ext);
+    return success;
 }
 
 static text get_semantic_text(module_name,give_code_p)
