@@ -788,11 +788,11 @@ savename: entity_name
 
 intrinsic_inst: TK_INTRINSIC global_entity_name
 	    {
-		(void) CreateIntrinsic(entity_name($2));
+		(void) DeclareIntrinsic($2);
 	    }
 	| intrinsic_inst TK_COMMA global_entity_name
 	    {
-		(void) CreateIntrinsic(entity_name($3));
+		(void) DeclareIntrinsic($3);
 	    }
 	;
 
