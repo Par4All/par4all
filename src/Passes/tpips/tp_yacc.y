@@ -340,7 +340,9 @@ i_display:
 				   "Cannot build view file %s\n",
 				   $3.the_name);
 		    
-		    safe_system(concatenate(pager, " ", file, NULL));
+		    safe_system(concatenate(pager, " ", 
+					    db_get_current_workspace_directory(), "/", file,
+					    NULL));
 
 		}, $3.the_owners);
 		$$ = TRUE;
