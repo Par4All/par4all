@@ -4,9 +4,7 @@
 #
 # P. Jouvelot (06/01/88)
 #
-# $RCSfile: newgen,v $ ($Date: 1994/12/30 15:29:49 $, )
-# version $Revision$
-# got on %D%, %T%
+# $Id$
 #
 
 VERSION='undefined'
@@ -146,6 +144,8 @@ go () {
 	ORDER=/tmp/order$$
 	OK=/tmp/result$$
 	FILES=/tmp/files$$
+
+	PATH=$PATH:$NEWGEN_ROOT/Bin/$NEWGEN_ARCH:$NEWGEN_ROOT/Bin/$PIPS_ARCH
 
 	shift 3
 	> $FILES
