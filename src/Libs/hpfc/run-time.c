@@ -4,7 +4,7 @@
  * Fabien Coelho, May and June 1993
  *
  * SCCS stuff:
- * $RCSfile: run-time.c,v $ ($Date: 1994/12/22 11:27:11 $, ) version $Revision$,
+ * $RCSfile: run-time.c,v $ ($Date: 1995/03/14 14:43:17 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -25,8 +25,7 @@ extern int fprintf();
 extern entity CreateIntrinsic(string name);                 /* in syntax.h */
 extern entity MakeExternalFunction(entity e, type r);       /* idem */
 
-/*
- * entity MakeRunTimeSupportSubroutine(local_name, number_of_arguments)
+/* entity MakeRunTimeSupportSubroutine(local_name, number_of_arguments)
  *
  * modify 27/09/93, in order not to attempt to redeclare an already declared
  * subroutine. 
@@ -44,8 +43,7 @@ int number_of_arguments;
     return((e==entity_undefined) ? make_empty_module(full_name) : e);
 }
 
-/*
- * entity MakeRunTimeSupportFunction
+/* entity MakeRunTimeSupportFunction
  *   (local_name, number_of_arguments, return_type)
  *
  * this function can be used even if the function is already declared
@@ -72,8 +70,7 @@ entity v;
 	       (strdup(pvm_what_options(entity_basic(v)))));
 }
 
-/*
- * string pvm_what_options(b)
+/* string pvm_what_options(b)
  *
  * the pvm what option is given back as a string, fellowing the basic given.
  */
@@ -225,16 +222,14 @@ expression expr;
 {
     if (get_bool_property("HPFC_EXPAND_COMPUTE_LOCAL_INDEX"))
     {
-	int 
-	    newdecl = new_declaration(array, dim);
-	dimension 
-	    the_dim = entity_ith_dimension(array, dim);
+	tag newdecl = new_declaration(array, dim);
+	dimension the_dim = entity_ith_dimension(array, dim);
         
 	switch(newdecl)
 	{
-	case NO_NEW_DECLARATION:
+	case is_hpf_newdecl_none:
 	    return(expr);
-	case ALPHA_NEW_DECLARATION:
+	case is_hpf_newdecl_alpha:
 	{
 	    int
 		dl = HpfcExpressionToInt(dimension_lower(the_dim));
@@ -244,7 +239,7 @@ expression expr;
 	    return(MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME), 
 				  expr, shift));
 	}
-	case BETA_NEW_DECLARATION:
+	case is_hpf_newdecl_beta:
 	{
 	    align
 		a = load_entity_align(array);
@@ -307,7 +302,7 @@ expression expr;
 			      t2,
 				  int_to_expression(1)));
 	}
-	case GAMMA_NEW_DECLARATION:
+	case is_hpf_newdecl_gamma:
 	{
 	    expression
 		expr1 = 
@@ -317,7 +312,7 @@ expression expr;
 	    return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND_GAMMA), 
 				       expr1, expr2, expr));
 	}
-	case DELTA_NEW_DECLARATION:
+	case is_hpf_newdecl_delta:
 	{
 	    expression
 		expr1 = int_to_expression(load_entity_hpf_number(array)),
