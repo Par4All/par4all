@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1995/12/19 10:56:42 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1996/07/16 15:31:58 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -28,9 +28,9 @@
 /*
  * This is the include file to be used for the generation of C code.
  */
-#include <sys/stdtypes.h>
+/* #include <sys/stdtypes.h> */
 #include <stdio.h>
-#include "malloc.h"                    /* for debug with malloclib */
+/* #include "malloc.h"    */                /* for debug with malloclib */
 #include "newgen_assert.h"
 
 #include "newgen_types.h"
