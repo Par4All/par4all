@@ -6,7 +6,7 @@
 ! PVM specific
 !
       include "fpvm3.h"
-      include "hpfc_buf_pvm.h"
+      include "hpfc_specific_pvm.h"
 !
 ! end of it
 !
