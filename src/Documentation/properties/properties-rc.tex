@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/24 15:28:20 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/27 17:48:11 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -960,11 +960,13 @@ Print regions of scalars.
 PRETTYPRINT_SCALAR_REGIONS FALSE
 \end{verbatim}
 
-\subsubsection{Display Iternals for Debugging}
+\subsubsection{Display Internals for Debugging}
 
 All these debugging options should be set to FALSE for normal operation.
 
-Print block statement.
+Sequences are implicit in Fortran and in many programming languages but
+they are internally represented. It is possible to print pieces of
+information  gathered about sequences by turning on this property.
 
 \begin{verbatim}
 PRETTYPRINT_BLOCKS FALSE
@@ -1017,6 +1019,17 @@ default, private variables are shown only for parallel DO loops.
 PRETTYPRINT_ALL_PRIVATE_VARIABLES FALSE
 \end{verbatim}
 
+Non-standard variables and tests are generated to simulate the control
+effect of Fortran IO statements. If an end-of-file condition is
+encountered or if an io-error is raised, a jump to relevant labels may
+occur if clauses \verb|ERR=| or \verb|END=| are defined in the IO
+control list. These tests are normally not printed because they could
+not be compiled by a standard Fortran compiler and because they are
+redundant with the IO statement itself.
+
+\begin{verbatim}
+PRETTYPRINT_CHECK_IO_STATEMENTS FALSE
+\end{verbatim}
 
 Regenerate all variable declarations, including those variables not
 declared in the user program. By default, when possible, the user
