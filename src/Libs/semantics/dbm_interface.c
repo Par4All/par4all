@@ -221,16 +221,16 @@ char *module_name;
 	pips_error("module_name_to_transformers",
 		   "no statement for module %s\n", module_name);
 
-    set_proper_effects_map( (statement_mapping) 
-	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+    set_proper_effects_map( effectsmap_to_listmap((statement_mapping) 
+	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE)));
 
-    set_cumulated_effects_map( (statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
 
     /* cumulated_effects_map_print(); */
 
-    e_inter = (list) 
-	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE);
+    e_inter = effects_to_list(
+	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
 
     set_transformer_map( MAKE_STATEMENT_MAPPING() ); 
 
@@ -287,8 +287,8 @@ char *module_name;
 		   "no statement for module %s\n", module_name);
 
     /* cumulated effects are used to compute the value mappings */
-    set_cumulated_effects_map( (statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
 
     set_transformer_map( (statement_mapping) 
 	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE));
@@ -505,9 +505,9 @@ entity e;
 
     pips_assert("load_summary_effects", entity_module_p(e));
 
-    t = (list) 
+    t = effects_to_list( 
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_local_name(e), 
-			       TRUE);
+			       TRUE));
 
     pips_assert("load_summary_effects", t != list_undefined);
 
