@@ -29,8 +29,8 @@
 typedef struct __stack_bucket
 {
     int n_item;                 /* next available item in the bucket */
-    int max_items;              /* the maximun number of items of this bucket */
-    char **items;               /* the items (only pointers at the moment) */
+    int max_items;              /* the max number of items of this bucket */
+    void **items;               /* the items (only pointers at the moment) */
     struct __stack_bucket *succ;/* the next bucket */
 }
    _stack_bucket, *_stack_ptr;
@@ -210,7 +210,7 @@ stack stack_make(int type, int bucket_size, int policy)
 static void free_bucket(x)
 _stack_ptr x;
 {
-    free(x->items), x->items = (void **) NULL, free(x);
+    free(x->items), x->items = (void**)NULL, free(x);
 }
 
 static void free_buckets(x)
