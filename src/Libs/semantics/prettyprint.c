@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/12/05 12:48:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/12 23:34:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/12/05 12:48:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/06/12 23:34:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -120,11 +120,15 @@ char *module_name;
 		(is_user_view? DBR_PARSED_PRINTED_FILE :
 		 DBR_PRINTED_FILE);
 
+    begin_attachment_prettyprint();
+    
     success = make_text_resource(module_name,
 				 resource_name,
 				 file_ext,
 				 get_semantic_text(module_name,TRUE));
 
+    end_attachment_prettyprint();
+ 
     free(file_ext);
     return success;
 }
@@ -193,7 +197,12 @@ bool give_code_p;
 
     /* summary information first */
     MERGE_TEXTS(r,text_transformer(summary)); 
-
+    attach_decoration_to_text(r);
+    if (is_transformer)
+	attach_transformers_decoration_to_text(r);
+    else
+	attach_preconditions_decoration_to_text(r);
+ 
     if (give_code_p == TRUE) {
 	/* then code with the corresponding information */
 	ADD_SENTENCE_TO_TEXT(r, 
@@ -242,6 +251,12 @@ statement stmt;
 	t = load_statement_semantic(stmt);
 
     txt = text_transformer(t);
+
+    if (is_transformer)
+	attach_transformers_decoration_to_text(txt);
+    else
+	attach_preconditions_decoration_to_text(txt);
+	
     return txt; 
 }
 
@@ -353,8 +368,10 @@ text text_transformer(transformer tran)
       str_prefix = PIPS_NORMAL_PREFIX;
   }
 
-  ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					  strdup("\n")));
+  /* If in EMACS mode, does not add any separator line: */
+  if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+      ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+					      strdup("\n")));
 
   crt_line[0] = '\0'; (void) strcat(crt_line, str_prefix);
   (void) strcat(crt_line, " ");
@@ -520,9 +537,10 @@ text text_transformer(transformer tran)
     ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
 					    strdup(crt_line)));
   }
-
-  ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					  strdup("\n")));
+  
+  if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+      ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+					      strdup("\n")));
 
   return txt; 
 }
