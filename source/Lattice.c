@@ -588,7 +588,7 @@ static Matrix * MakeDioEqforInter (Lattice *A, Lattice *B) {
 } /* MakeDioEqforInter */
 
 static void AddLattice(LatticeUnion *,Matrix *,  Matrix *, int , int);
-static LatticeUnion *SplitLattice(Matrix *, Matrix *, Matrix *);
+LatticeUnion *SplitLattice(Matrix *, Matrix *, Matrix *);
 
 /**
 
@@ -792,7 +792,7 @@ LatticeUnion *LatticeDifference(Matrix  *A,Matrix *B) {
  * {b0 ... bn} are the columns of Lattice B1. The list is so formed that the 
  * Lattice B2 is the Head of the list. 
  */     
-static LatticeUnion *SplitLattice(Matrix *B1, Matrix *B2, Matrix *C) {
+LatticeUnion *SplitLattice(Matrix *B1, Matrix *B2, Matrix *C) {
   
   int i;
   
@@ -1561,7 +1561,7 @@ int intcompare (const void *a, const void *b) {
   return 0;
 } /* intcompare */
 
-static int sqrt(int i);
+static int polylib_sqrt(int i);
 static factor allfactors (int num) {
  
   int i,j, tmp;
@@ -1574,7 +1574,7 @@ static factor allfactors (int num) {
   list[0] = 1;
   
   tmp = num;
-  for (i = 2; i <= sqrt(tmp); i++) {
+  for (i = 2; i <= polylib_sqrt(tmp); i++) {
     if ((tmp % i) == 0) {
       if (noofelmts == 0) {
 	list = (int *) malloc (sizeof (int));
@@ -1624,7 +1624,7 @@ static factor allfactors (int num) {
   return result;
 } /* allfactors */
 
-static int sqrt (int i) {
+static int polylib_sqrt (int i) {
   
   int j;
   j = 0;
@@ -1637,7 +1637,7 @@ static int sqrt (int i) {
       j ++;
   }
   return (j-1);
-} /* sqrt */
+} /* polylib_sqrt */
 
 
 
