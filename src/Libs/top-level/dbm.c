@@ -45,11 +45,10 @@ create_workspace(gen_array_t files)
 
     if (success) {
 	(* pips_update_props_handler)();
-
 	name = db_get_current_workspace_name();
 	user_log("Workspace %s created and opened.\n", name);
-
 	success = open_module_if_unique();
+	if (success) init_processed_include_cache();
     }
     else {
 	/* FI: in fact, the whole workspace should be deleted!
@@ -149,13 +148,12 @@ open_workspace(string name)
     }
     else {
 	(* pips_update_props_handler)();
-
 	open_log_file();
 	set_entity_to_size();
-
 	user_log("Workspace %s opened.\n", name);
-
 	success = open_module_if_unique();
+	if (success) init_processed_include_cache();
+	
     }
     return success;
 }
@@ -173,6 +171,7 @@ close_workspace(void)
     delete_some_resources();
     success = make_close_workspace();
     close_log_file();
+    close_processed_include_cache();
     reset_entity_to_size();
     return success;
     /*clear_props();*/
