@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/10/18 18:40:09 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1997/01/22 18:58:00 $, )
  * version $Revision$
  *
  * Compiler
@@ -572,38 +572,37 @@ statement stat;
 statement *hoststatp, *nodestatp;
 {
     loop the_loop = instruction_loop(statement_instruction(stat));
+    list l = NIL;
+    entity var;
+    bool is_shift = subarray_shift_p(stat, &var, &l);
 
-    pips_assert("loop", statement_loop_p(stat));
+    pips_assert("stat is a loop", statement_loop_p(stat));
 
-    if (execution_parallel_p(loop_execution(the_loop)))
+    if (is_shift)
     {
-	entity var;
-	reference left, right;
-	list l=NIL;
-	bool is_shift = subarray_shift_p(stat, &var, &l),
-	     is_full_copy = full_copy_p(stat, &left, &right),
-	    /* 
-	     * should verify that only listed in labels and distributed
-	     * entities are defined inside the body of the loop
-	     */
-	    at_ac = atomic_accesses_only_p(stat),
-	    in_in = indirections_inside_statement_p(stat);
+	pips_debug(4, "shift detected\n");
 	
-	pips_debug(5, "condition results: sh %d, aa %d, in %d\n",
-	      is_shift, at_ac, in_in);
+	*nodestatp = generate_subarray_shift(stat, var, l);
+	*hoststatp = make_empty_statement();
+    }
+    else if (execution_parallel_p(loop_execution(the_loop)))
+    {
+	reference left, right;
+	bool /* should verify that only listed in labels and distributed
+	      * entities are defined inside the body of the loop
+	      */
+	    at_ac = atomic_accesses_only_p(stat),
+	    in_in = indirections_inside_statement_p(stat),
+	    is_full_copy = full_copy_p(stat, &left, &right);
+	
+	pips_debug(5, "condition results: aa %d, in %d\n", at_ac, in_in);
 
+	
 	if (is_full_copy)
 	{
 	    pips_debug(4, "full copy detected\n");
-
-	    *nodestatp = generate_full_copy(left, right);
-	    *hoststatp = make_empty_statement();
-	}
-	else if (is_shift)
-	{
-	    pips_debug(4, "shift detected\n");
 	    
-	    *nodestatp = generate_subarray_shift(stat, var, l);
+	    *nodestatp = generate_full_copy(left, right);
 	    *hoststatp = make_empty_statement();
 	}
 	else if (at_ac && !in_in)
