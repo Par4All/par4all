@@ -1028,11 +1028,11 @@ safe_make(string res_n, string module_n)
 		get_request_string_timers (&request_time, &phase_time,
 					   &dbm_time);
 
-		user_log ("                                 time       ");
+		user_log ("                                 stime      ");
 		user_log (request_time);
 		user_log ("                                 phase time ");
 		user_log (phase_time);
-		user_log ("                                 IO time    ");
+		user_log ("                                 IO stime   ");
 		user_log (dbm_time);
 	    }
 
