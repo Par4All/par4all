@@ -1470,14 +1470,16 @@ list *init_l, *elim_l;
 		entity crt_var = ENTITY(CAR(l));
 		Value crt_val = vect_coeff((Variable) crt_var, init_vec);
 		
-		if(value_one_p(crt_val) || value_mone_p(crt_val)) {
+		if(value_one_p(crt_val) || value_mone_p(crt_val)) 
+		{
 		    coeff_one_not_found = FALSE;
 		    var_found = TRUE;
 		    var = crt_var;
 		    val = crt_val;
 		}
-		else if((value_notzero_p(crt_val)) && !var_found) {
-		    var_not_found = FALSE;
+		else if((value_notzero_p(crt_val)) && !var_found) 
+		{
+		    var_found = TRUE;
 		    var = crt_var;
 		    val = crt_val;
 		}
