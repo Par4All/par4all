@@ -10,7 +10,8 @@
 
 #include "linear.h"
 #include "matrice.h"
-#include "sparse_sc.h"
+#include "matrix.h"
+#include "sparse_sc.h"      
 
 #include "ri.h"
 #include "database.h"
@@ -188,37 +189,6 @@ static bool loop_flt(loop l, context_p context)
 	      lis1par=CDR(lis1par);
 	    };
 	  };
-	}
-	else 
-	  {
-	    if (i==1)  { 
-	      lis1=CONS(STATEMENT,s,NIL); 
-	      lis1par=lis1;
-	    }
-	    else {
-	      CDR(lis1par)=CONS(STATEMENT,s,NIL);
-	      lis1par=CDR(lis1par);
-	    };
-	  }; 
-      };
-      if( (instruction_loop_p(ins1))&&first1 ) {
-	loop_in_side=instruction_loop(ins1);
-	index=  entity_to_expression(loop_index(loop_in_side));
-	s_in_loop_in_side=loop_body( loop_in_side   );
-	range=loop_range(loop_in_side);
-	lower=range_lower(range);
-	upper=range_upper(range); 
-	normalize_all_expressions_of(lower);
-	normalize_all_expressions_of(upper);
-	norm1=expression_normalized(lower);
-	norm2=expression_normalized(upper);
-	pips_assert("normalized are linear", normalized_linear_p(norm1) &&
-		    normalized_linear_p(norm2));
-	pv1= normalized_linear(norm1);
-	pv2= normalized_linear(norm2);
-	f1_val1= eval(pv1,val1,var1);
-	f1_val2= eval(pv1,val2,var1);
-	f2_val1= eval(pv2,val1,var1);
 	f2_val2= eval(pv2,val2,var1);
 	if ( (f2_val1 >=f1_val1)&&(f2_val2 >=f1_val2)){
 	  cas=1;
@@ -495,11 +465,11 @@ statement unimodular(s)
   Psysteme sc_row_echelon;
   Pbase base_oldindex = NULL;
   Pbase base_newindex = NULL;
-  matrice A;
-  matrice G;
-  matrice AG; 
-  matrice G_inv;
-  int n;				/* number of index */
+  Pmatrix A;
+  Pmatrix G;
+  Pmatrix AG; 
+  Pmatrix G_inv;
+   int n;				
   int m ;	
   statement s_lhyp;
   Pvecteur *pvg;
@@ -507,7 +477,7 @@ statement unimodular(s)
   expression lower, upper;
   Pvecteur pv1, pv2;
   loop l;
-
+  
   while(instruction_loop_p(statement_instruction (s))) {
     lls = CONS(STATEMENT,s,lls);
     s = loop_body(instruction_loop(statement_instruction(s)));
@@ -515,42 +485,37 @@ statement unimodular(s)
   sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
   n = base_dimension(base_oldindex);
   m = sci->nb_ineq;
-  A = matrice_new(m,n);
-  sys_matrice_index(sci, base_oldindex, A, n, m);
-
-  /*  name_file = user_request("nom du fichier pour la matrice T");
-      infp = safe_fopen(name_file,"r"); */
+  A = matrix_new(m,n);
+  sys_matrix_index(sci, base_oldindex, A, n, m);
+  
 
 
   st = user_request("Entrer la matrice T :");
-  matrice_sscan(st,&G,&n,&n); 
-  /*   safe_fclose(infp, name_file);
-       free(name_file); */
+  /*  matrix_sscan(st,&G,&n,&n); 
+ 
   G_inv = matrice_new(n,n);
   matrice_general_inversion(G,G_inv,n);
+ 
   AG = matrice_new(m,n);
   matrice_multiply(A,  G_inv, AG, m, n, n);
-  /* create the new system of constraintes (Psysteme scn) with  
-     AG and sci */
+
+ 
   scn = sc_dup(sci);
   matrice_index_sys(scn, base_oldindex, AG, n,m );
   
-  /* computation of the new iteration space in the new basis G */
   sc_row_echelon = new_loop_bound(scn,base_oldindex);
 
  
-  /* change of basis for index */
   change_of_base_index(base_oldindex, &base_newindex);
   
   sc_newbase = sc_change_baseindex(sc_dup(sc_row_echelon), base_oldindex, base_newindex);
-  /* sc_syst_debug(sc_newbase); */
+  
   sg= sc_to_sg_chernikova(sc_newbase);  
-  /* generation of hyperplane  code */
-  /*  generation of bounds */
+  
   for (pb=base_newindex; pb!=NULL; pb=pb->succ) {
     make_bound_expression(pb->var, base_newindex, sc_newbase, &lower, &upper);
   }
-  /* loop body generation */
+  
   pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
   scanning_base_to_vect(G_inv,n,base_newindex,pvg);
   pv1 = sc_row_echelon->inegalites->succ->vecteur;
@@ -558,8 +523,8 @@ statement unimodular(s)
   l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
   lower = range_upper(loop_range(l));
   upper= expression_to_expression_newbase(lower, pvg, base_oldindex);
-  s_lhyp = code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase);
-  return(s_lhyp);
+  s_lhyp = code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase); 
+  return(s_lhyp); */
 }
 statement  free_guards( s)
      statement s;
@@ -1283,6 +1248,660 @@ bool guard_elimination(string module)
   debug_off();
   return TRUE;  
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
