@@ -10,6 +10,10 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.61  2003/07/24 10:54:37  irigoin
+  * More debugging messages, more normalization steps, handling of
+  * unstructured statements moved into usntructured.c.
+  *
   * Revision 1.60  2001/10/22 15:42:16  irigoin
   * Intraprocedural preconditions can be propagated along transformers to
   * refine them.
@@ -184,6 +188,7 @@ block_to_transformer(list b, transformer pre)
     s = STATEMENT(CAR(l));
     stf = statement_to_transformer(s, pre);
     post = transformer_safe_apply(stf, pre);
+    post = transformer_safe_normalize(post, 4);
     btf = transformer_dup(stf);
     for (POP(l) ; !ENDP(l); POP(l)) {
       s = STATEMENT(CAR(l));
@@ -192,8 +197,9 @@ block_to_transformer(list b, transformer pre)
       next_pre = post;
       stf = statement_to_transformer(s, next_pre);
       post = transformer_safe_apply(stf, next_pre);
+      post = transformer_safe_normalize(post, 4);
       btf = transformer_combine(btf, stf);
-      btf = transformer_normalize(btf, 7);
+      btf = transformer_normalize(btf, 4);
       ifdebug(1) 
 	pips_assert("btf is a consistent transformer", 
 		    transformer_consistency_p(btf));
@@ -206,69 +212,6 @@ block_to_transformer(list b, transformer pre)
 
   pips_debug(8, "end\n");
   return btf;
-}
-
-static void 
-unstructured_to_transformers(unstructured u, transformer pre)
-{
-  list blocs = NIL ;
-  control ct = unstructured_control(u) ;
-  
-  pips_debug(5,"begin\n");
-  
-  /* There is no need to compute transformers for unreachable code,
-   * using CONTROL_MAP, but this may create storage and prettyprinter
-   * problems because of the data structure inconsistency.
-   */
-  CONTROL_MAP(c, {
-    statement st = control_statement(c) ;
-    (void) statement_to_transformer(st, pre) ;
-  }, ct, blocs) ;
-  
-  gen_free_list(blocs) ;
-  
-  pips_debug(5,"end\n");
-}
-
-static transformer 
-unstructured_to_transformer(unstructured u, transformer pre, list e) /* effects */
-{
-  transformer ctf;
-  transformer tf;
-  control c;
-
-  pips_debug(8,"begin\n");
-
-  pips_assert("unstructured_to_transformer", u!=unstructured_undefined);
-
-  c = unstructured_control(u);
-  if(control_predecessors(c) == NIL && control_successors(c) == NIL) {
-    /* there is only one statement in u; no need for a fix-point */
-    pips_debug(8,"unique node\n");
-    ctf = statement_to_transformer(control_statement(c), pre);
-    tf = transformer_dup(ctf);
-  }
-  else {
-    /* statement exit = control_statement(unstructured_exit(u)); */
-
-    /* simple unstructured fixpoint */
-    transformer fpf = effects_to_transformer(e);
-    /* approximate precondition for nodes */
-    transformer epre = transformer_safe_apply(fpf, pre);
-      
-    pips_debug(8,"complex: based on effects\n");
-      
-    /* compute node transformers */
-    unstructured_to_transformers(u, epre);
-    free_transformer(epre);
-
-    /* compute CFG transformer */
-    tf = unstructured_to_accurate_transformer(u, pre, e);
-  }
-
-  pips_debug(8,"end\n");
-
-  return tf;
 }
 
 list 
@@ -340,7 +283,7 @@ test_to_transformer(test t, transformer pre, list ef) /* effects of t */
     ifdebug(8) {
       pips_debug(8, "tftwc after transformer_apply %p:\n", tftwc);
       (void) print_transformer(tftwc);
-      pips_debug(8, "post_tftwc before transformer_apply %p:\n", post_tftwc);
+      pips_debug(8, "post_tftwc after transformer_apply %p:\n", post_tftwc);
       (void) print_transformer(post_tftwc);
     }
 
@@ -349,6 +292,12 @@ test_to_transformer(test t, transformer pre, list ef) /* effects of t */
     reset_temporary_value_counter();
     post_tffwc = transformer_apply(statement_to_transformer(sf, tffwc), tffwc);
 
+    ifdebug(8) {
+      pips_debug(8, "post_tftwc before transformer_convex_hull %p:\n", post_tftwc);
+      (void) print_transformer(post_tftwc);
+      pips_debug(8, "post_tffwc after transformer_apply %p:\n", post_tffwc);
+      (void) print_transformer(post_tffwc);
+    }
     tf = transformer_convex_hull(post_tftwc, post_tffwc);
     transformer_free(context);
     transformer_free(tftwc);
@@ -401,7 +350,7 @@ call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
   cons *pc = call_arguments(c);
   tag tt;
 
-  pips_debug(8,"begin\n");
+  pips_debug(8,"begin with precondition %p\n", pre);
 
   switch (tt = value_tag(entity_initial(e))) {
   case is_value_code:
@@ -432,11 +381,24 @@ call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
   pips_assert("transformer tt is consistent", 
 	      transformer_consistency_p(tf)); 
 
+  pips_debug(8,"Transformer before intersection with precondition, tf=%p\n", tf);
+  ifdebug(8) {
+    (void) print_transformer(tf);
+  }
+
   /* Add information from pre. Invariant information is easy to
      use. Information about initial values, that is final values in pre,
      can also be used. */
   tf = transformer_safe_domain_intersection(tf, pre);
-  tf = transformer_normalize(tf, 7);
+  pips_debug(8,"After intersection and before normalization with tf=%p\n", tf);
+  ifdebug(8) {
+    (void) print_transformer(tf);
+  }
+  pips_debug(8,"with precondition pre=%p\n", pre);
+  ifdebug(8) {
+    (void) print_transformer(pre);
+  }
+  tf = transformer_normalize(tf, 4);
 
   pips_debug(8,"end after normalization with tf=%p\n", tf);
   ifdebug(8) {
@@ -572,7 +534,7 @@ transformer_intra_to_inter(
   cons * lost_args = NIL;
   /* Filtered TransFormer ftf */
   transformer ftf = transformer_dup(tf);
-  cons * old_args = transformer_arguments(ftf);
+  /* cons * old_args = transformer_arguments(ftf); */
   Psysteme sc = SC_UNDEFINED;
   Pbase b = BASE_UNDEFINED;
   Pbase eb = BASE_UNDEFINED;
@@ -588,7 +550,10 @@ transformer_intra_to_inter(
    * to be suppressed too (6 July 1993)
    *
    * FI: because only read arguments are eliminated, non? (12 November 1995)
+   *
+   * FI: the resulting intermediate transformer is not consistent (18 July 2003)
    */
+  /*
   MAPL(ca, 
   {entity e = ENTITY(CAR(ca));
   if(!effects_write_entity_p(le, e) &&
@@ -596,16 +561,18 @@ transformer_intra_to_inter(
     lost_args = arguments_add_entity(lost_args, e);
   },
        old_args);
-
+  */
   /* get rid of them */
-  ftf = transformer_projection(ftf, lost_args);
+  /* ftf = transformer_projection(ftf, lost_args); */
 
   /* free the temporary list of entities */
+  /*
   gen_free_list(lost_args);
   lost_args = NIL;
 
   debug(8,"transformer_intra_to_inter","after first filtering ftf=%x\n",ftf);
   ifdebug(8) (void) dump_transformer(ftf);
+  */
 
   /* get rid of local read variables */
 
@@ -717,12 +684,12 @@ user_call_to_transformer(
 	basic bexpr = basic_of_expression(expr);
 
 	if(!basic_equal_p(bfp, bexpr)) {
-	  pips_user_warning("Type incompatibility (formal %s/ actual %s)"
-			    " for formal parameter %s (rank %d)"
-			    " in call to %s from %s\n",
+	  pips_user_warning("Type incompatibility\n(formal %s/actual %s)"
+			    "\nfor formal parameter %s (rank %d)"
+			    "\nin call to %s from %s\n",
 			    basic_to_string(bfp), basic_to_string(bexpr),
 			    entity_local_name(fp), r, module_local_name(f),
-			    get_current_module_entity());
+			    module_local_name(get_current_module_entity()));
 	  continue;
 	}
       }
@@ -853,6 +820,7 @@ user_call_to_transformer(
     dump_transformer(t_caller);
   }
 
+  if(!transformer_empty_p(t_caller)) {
   /* Callee f may have read/write effects on caller's scalar
    * integer variables thru an array and/or non-integer variables.
    */
@@ -869,8 +837,17 @@ user_call_to_transformer(
     Psysteme sc = (Psysteme) predicate_system(transformer_relation(t_caller));
     sc_base_add_variable(sc, (Variable) v);
   }, transformer_arguments(t_effects));
+  }
+  else {
+    pips_user_warning("Call to %s seems never to return."
+		      " This may be due to an infinite loop in %s,"
+		      " or to a systematic exit in %s,"
+		      " or to standard violations (see previous messages)\n",
+		      module_local_name(f),
+		      module_local_name(f),
+		      module_local_name(f));
+  }
     
-
   ifdebug(8) {
     pips_debug(8,
 	       "End: after taking all scalar effects in consideration %p\n",
@@ -878,9 +855,9 @@ user_call_to_transformer(
     dump_transformer(t_caller);
   }
 
-  /* pips_assert("transformer t_caller is consistent", transformer_consistency_p(t_caller)); 
-   */
-
+  /* The return value of a function is not yet projected. */
+  pips_assert("transformer t_caller is consistent",
+	      transformer_weak_consistency_p(t_caller));
 
   return t_caller;
 }
@@ -1038,7 +1015,7 @@ transformer any_scalar_assign_to_transformer(entity v,
 	pips_debug(9,"After substitution tmp=%s -> v_new=%s\n",
 	      entity_local_name(tmp), entity_local_name(v_new));
 
-	transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), v_repr);
+	transformer_add_modified_variable(tf, v_repr);
       }
     }
     if(!transformer_undefined_p(tf)) {
@@ -1131,9 +1108,9 @@ instruction_to_transformer(
     pips_error("instruction_to_transformer","unexpected tag %d\n",
 	       instruction_tag(i));
   }
-  debug(9,"instruction_to_transformer","resultat:\n");
+  pips_debug(9, "resultat:\n");
   ifdebug(9) (void) print_transformer(tf);
-  debug(8,"instruction_to_transformer","end\n");
+  pips_debug(8, "end\n");
   return tf;
 }
 
@@ -1148,10 +1125,12 @@ transformer statement_to_transformer(
   transformer te = transformer_undefined;
   transformer pre = transformer_undefined;
 
-  pips_debug(8,"begin for statement %03d (%d,%d) with precondition:\n",
+  pips_debug(8,"begin for statement %03d (%d,%d) with precondition %p:\n",
 	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
-	     ORDERING_STATEMENT(statement_ordering(s)));
+	     ORDERING_STATEMENT(statement_ordering(s)), spre);
   ifdebug(8) {
+    pips_assert("The statement and its substatements are fully defined",
+		all_statements_defined_p(s));
     (void) print_transformer(spre);
   }
 
@@ -1241,6 +1220,11 @@ transformer statement_to_transformer(
   }
 
   free_transformer(pre);
+
+  ifdebug(8) {
+    pips_assert("The statement and its substatements are still fully defined",
+		all_statements_defined_p(s));
+  }
 
   pips_debug(8,"end for statement %03d (%d,%d) with t=%p and te=%p\n",
 	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
