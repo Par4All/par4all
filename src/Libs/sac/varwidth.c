@@ -11,7 +11,8 @@
 
 #include "sac.h"
 
-bool effective_variable_width(char * module_name)
+/* bool effective_variable_width(char * module_name) */
+bool simdizer(char * module_name)
 {
    /* get the resources */
    statement module_stmt = (statement)
