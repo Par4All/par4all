@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/31 11:13:41 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/31 11:15:20 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -424,11 +424,11 @@ $(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
 	
 header:
 	{ \\
-	echo "#ifndef ${dir_simple_name}_header_included" ;\\
-	echo "#define ${dir_simple_name}_header_included" ;\\
-	cat $(TARGET)-local.h ;\\
-	$(PROTOIZE)  $(INC_CFILES) \\
-	echo "#endif" ; \\
+	echo "#ifndef ${dir_simple_name}_header_included";\\
+	echo "#define ${dir_simple_name}_header_included";\\
+	cat $(TARGET)-local.h;\\
+	$(PROTOIZE)  $(INC_CFILES);\\
+	echo "#endif";\\
 	} > $(INC_TARGET).tmp
 	mv $(INC_TARGET).tmp $(INC_TARGET)
 
