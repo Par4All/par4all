@@ -4,8 +4,7 @@
 #
 
 LIB_CFILES =	util.c contexts.c testdep_util.c \
-		ricedg.c prettyprint.c quick_privatize.c \
-		trace.c
+		ricedg.c prettyprint.c quick_privatize.c
 
 LIB_HEADERS =	ricedg-local.h local.h
 
