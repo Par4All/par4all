@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.87  1998/05/29 08:09:11  coelho
+ * info modules: missing ws added.
+ *
  * Revision 1.86  1998/05/25 10:43:38  coelho
  * more log on errors.
  *
@@ -352,7 +355,13 @@ static void tp_some_info(string about)
     {
 	gen_array_t modules = db_get_module_list();
 	int n = gen_array_nitems(modules), i;
-	if (jpips_is_running) jpips_begin_tag("modules");
+
+	if (jpips_is_running) 
+	{
+	    jpips_begin_tag("modules");
+	    jpips_add_tag("");
+	}
+	
 	for(i=0; i<n; i++) 
 	{
 	    string m = gen_array_item(modules, i);
@@ -767,7 +776,7 @@ i_get: TK_GET_PROPERTY propname TK_ENDOFLINE
 		{
 		    jpips_begin_tag("property");
 		    jpips_add_tag("");
-		    fprint_property_direct(stdout, $2);
+		    fprint_property_direct(jpips_out_file(), $2);
 		    jpips_end_tag();
 		}
 		$$ = TRUE;
