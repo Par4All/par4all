@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/11/19 18:41:11 $, )
+ * ($Date: 1996/12/26 10:23:33 $, )
  */
 
 #include "defines-local.h"
@@ -313,13 +313,20 @@ init_host_and_node_entities ()
     }
 }
 
+static string basename(string s)
+{
+    string fin = s + strlen(s);
+    while (fin>s && *fin!='/') fin--;
+    return fin;
+}
+
 FILE *
 hpfc_fopen(
     string name)
 {
     FILE *f = (FILE *) safe_fopen(name, "w");
-    fprintf(f, "c\nc This file has been automatically generated " 
-	    "by the hpf compiler\nc\n");
+    fprintf(f, "!\n! File %s\n! This file has been automatically generated " 
+	    "by the HPF compiler\n!\n", basename(name));
     return f;
 }
 
@@ -328,7 +335,7 @@ hpfc_fclose(
     FILE *f,
     string name)
 {
-    fprintf(f, "c\nc That is all\nc\n");
+    fprintf(f, "!\n! That is all for %s\n!\n", basename(name));
     safe_fclose(f, name);
 }
 
