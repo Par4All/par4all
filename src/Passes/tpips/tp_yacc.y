@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.71  1997/12/12 12:54:43  coelho
+ * clearer warning.
+ *
  * Revision 1.70  1997/12/12 12:25:24  coelho
  * guarded unknown rule to behave like a shell...
  *
@@ -333,7 +336,8 @@ i_unknown: TK_UNKNOWN TK_ENDOFLINE
 		    "\tMaybe you intended to execute a direct shell command.\n"
 		    "\tThis convinient feature is desactivated by default.\n"
 		    "\tTo enable it, you can run tpips with the -s option,\n"
-		    "\tor do \"setproperty TPIPS_IS_A_SHELL=TRUE\"\n\n");
+		    "\tor do \"setproperty TPIPS_IS_A_SHELL=TRUE\".\n"
+		    "\tOtherwise use ! or \"shell\" as a command prefix.\n\n");
 	    }
 	    free($1);
 	}
