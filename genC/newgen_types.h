@@ -53,20 +53,6 @@ typedef int unit ;
 #define array_undefined NULL
 #define array_undefined_p(a) ((a)==NULL)
 
-/* actually defined in tabulated.c */
-typedef struct _gtp * gen_tabulated_p;
-
-union domain ;
-struct inlinable ;
-struct gen_binding {
-  char * name;
-  int compiled;
-  int size; /* number of chunks to hold this data. */
-  gen_tabulated_p tabulated;
-  union domain *domain ;
-  struct inlinable *inlined ;
-} ;
-
 #ifdef __STRICT_ANSI__
 #define GEN_PROTO(x) x
 #else
