@@ -2,7 +2,7 @@
 ! COMMON /HPFC BUFFERS/ 
 !
 ! $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-! ($Date: 1997/06/09 12:59:51 $, )
+! ($Date: 1997/06/10 09:04:49 $, )
 !
 ! buffers to avoid small pvmf(un)pack calls...
 ! and to sends buckets of messages if necessary...
@@ -26,7 +26,7 @@
      $     RECEIVED NOT PERFORMED
       integer
      $     BUF INDEX,
-     $     BUFFER ID(MAX SIZE OF STATUS),
+     $     BUFFER ID,
      $     SIZE OF RECEIVED BUFFER,
      $     STRING BUFFSIZE,
      $     BYTE1 BUFFSIZE,
@@ -43,11 +43,7 @@
      $     RECEIVED NOT PERFORMED
       ifdef(`_HPFC_NO_BYTE1_',character,byte)
      $     DATA BUFFER
-!
-! PVM encoding to use.
-!
-      integer BUFFER ENCODING
-      parameter (BUFFER ENCODING = _HPFC_ENCODING_)
+
 !
 ! buffer sizes
 !
