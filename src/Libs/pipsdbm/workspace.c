@@ -311,7 +311,7 @@ static void db_save_workspace(string what, bool do_free)
     gen_array_full_free(a);
     
     user_log("%s program.\n", what);
-    db_close_module(what, ""); /* ENTITIES are saved here... */
+    db_close_module(what, "", do_free); /* ENTITIES are saved here... */
 
     user_log("%s workspace.\n", what);
     save_meta_data(do_free);
