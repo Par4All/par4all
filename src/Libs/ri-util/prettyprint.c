@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.98  1997/11/18 23:42:26  keryell
+ * Fixed a memory leak in words_io_inst() with a nasty side effect that
+ * leads to fail in Epips attacments...
+ *
  * Revision 1.97  1997/11/12 15:30:10  coelho
  * cleaner...
  *
@@ -112,7 +116,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.97 1997/11/12 15:30:10 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.98 1997/11/18 23:42:26 keryell Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -490,7 +494,7 @@ words_io_inst(call obj, int precedence)
     bool iolist_reached = FALSE;
     bool complex_io_control_list = FALSE;
     list fmt_words = NIL;
-    list unit_words = NIL;
+    expression unit_arg = expression_undefined;
     string called = entity_local_name(call_function(obj));
     
     /* AP: I try to convert WRITE to PRINT. Three conditions must be
@@ -515,8 +519,13 @@ words_io_inst(call obj, int precedence)
 	   pio_write = CDR(CDR(pio_write));
 	}
 	else if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
-	    good_unit = strcmp
-		(STRING(CAR(unit_words = words_expression(arg))), "*")==0;
+	    /* Avoid to use words_expression(arg) because it set some
+               attachments and unit_words may not be used
+               later... RK. */
+	    good_unit = syntax_reference_p(expression_syntax(arg))
+		&& (strcmp(entity_local_name(reference_variable(syntax_reference(expression_syntax(arg)))), "*")==0);
+	    /* To display the unit later: */
+	    unit_arg = arg;
 	    pio_write = CDR(CDR(pio_write));
 	}
 	else if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
@@ -559,6 +568,7 @@ words_io_inst(call obj, int precedence)
        pcio = pio_write;
     }	
     else if(!complex_io_control_list) {
+	list unit_words = words_expression(unit_arg);
 	pips_assert("A unit must be defined", !ENDP(unit_words));
       pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
       pc = CHAIN_SWORD(pc, " (");
@@ -578,7 +588,6 @@ words_io_inst(call obj, int precedence)
       pc = gen_nconc(pc, words_io_control(&pcio, precedence));
       pc = CHAIN_SWORD(pc, ") ");
       /* 
-	free_words(unit_words);
 	free_words(fmt_words);
       */
     }
