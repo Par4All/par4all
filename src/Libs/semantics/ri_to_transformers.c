@@ -10,6 +10,9 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.53  2000/11/03 17:15:07  irigoin
+  * Declarations and references are trusted or not. Better handling of unstructured.
+  *
   * Revision 1.52  2000/07/20 14:29:42  coelho
   * cleaner.
   *
@@ -301,16 +304,17 @@ unstructured_to_transformer(unstructured u, list e) /* effects */
       
       unstructured_to_transformers(u);
       
-      if(load_statement_transformer(exit)!=transformer_undefined) {
+      /* if(load_statement_transformer(exit)!=transformer_undefined) { */
 	/* The exit node has been reached */
 	/* tf = effects_to_transformer(e); */
-	tf = unstructured_to_global_transformer(u);
-      }
-      else {
+	/* tf = unstructured_to_global_transformer(u); */
+      /* } */
+      /* else { */
 	/* Never ending loop in unstructured... unless a call to STOP
 	   occurs */
-	tf = transformer_empty();
-      }
+	/* tf = transformer_empty(); */
+      /* } */
+      tf = unstructured_to_accurate_transformer(u);
     }
 
     pips_debug(8,"end\n");
@@ -1320,6 +1324,53 @@ expression expr;
 }
 
 static transformer 
+iabs_to_transformer(e, expr)
+entity e;
+expression expr;
+{
+    transformer tf = transformer_undefined;
+    call c = syntax_call(expression_syntax(expr));
+    expression arg = EXPRESSION(CAR(call_arguments(c)));
+    normalized n = NORMALIZE_EXPRESSION(arg);
+
+    debug(8, "iabs_to_transformer", "begin\n");
+
+    if(normalized_linear_p(n)) {
+	entity e_new = entity_to_new_value(e);
+	entity e_old = entity_to_old_value(e);
+	Pvecteur vlb1 = vect_dup((Pvecteur) normalized_linear(n));
+	Pvecteur vlb2 = vect_multiply(vect_dup((Pvecteur) normalized_linear(n)), VALUE_MONE);
+	Pcontrainte clb1 = CONTRAINTE_UNDEFINED;
+	Pcontrainte clb2 = CONTRAINTE_UNDEFINED;
+	cons * tf_args = CONS(ENTITY, e_new, NIL);
+
+	(void) vect_variable_rename(vlb1,
+				    (Variable) e_new,
+				    (Variable) e_old);
+
+	(void) vect_variable_rename(vlb2,
+				    (Variable) e_new,
+				    (Variable) e_old);
+
+	vect_add_elem(&vlb1, (Variable) e_new, VALUE_MONE);
+	vect_add_elem(&vlb2, (Variable) e_new, VALUE_MONE);
+	clb1 = contrainte_make(vlb1);
+	clb2 = contrainte_make(vlb2);
+	clb1->succ = clb2;
+	tf = make_transformer(tf_args,
+		make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb1)));
+    }
+
+    ifdebug(8) {
+	debug(8, "iabs_to_transformer", "result:\n");
+	print_transformer(tf);
+	debug(8, "iabs_to_transformer", "end\n");
+    }
+
+   return tf;
+}
+
+static transformer 
 integer_divide_to_transformer(e, expr)
 entity e;
 expression expr;
@@ -1374,6 +1425,172 @@ expression expr;
     }
 
     return tf;
+}
+
+static transformer 
+integer_power_to_transformer(e, expr)
+entity e;
+expression expr;
+{
+  transformer tf = transformer_undefined;
+  call c = syntax_call(expression_syntax(expr));
+  expression arg1 = expression_undefined;
+  normalized n1 = normalized_undefined;
+  expression arg2 = expression_undefined;
+  normalized n2 = normalized_undefined;
+
+  debug(8, "integer_power_to_transformer", "begin\n");
+    
+  arg1 = find_ith_argument(call_arguments(c), 1);
+  n1 = NORMALIZE_EXPRESSION(arg1);
+  arg2 = find_ith_argument(call_arguments(c), 2);
+  n2 = NORMALIZE_EXPRESSION(arg2);
+
+  if(signed_integer_constant_expression_p(arg2) && normalized_linear_p(n1)) {
+    int d = signed_integer_constant_expression_value(arg2);
+
+    if(d%2==0) {
+      entity e_new = entity_to_new_value(e);
+      entity e_old = entity_to_old_value(e);
+      cons * tf_args = CONS(ENTITY, e, NIL);
+
+      if(d==0) {
+	/* 1 is assigned unless arg1 equals 0... which is neglected */
+	Pvecteur v = vect_new((Variable) e_new, VALUE_ONE);
+
+	vect_add_elem(&v, TCST, VALUE_MONE);
+	tf = make_transformer(tf_args,
+			      make_predicate(sc_make(contrainte_make(v),
+						     CONTRAINTE_UNDEFINED)));
+      }
+      else if(d>0) {
+	/* Does not work because unary minus is not seen as part of a constant */
+	/* The expression value must be greater or equal to arg2 and positive */
+	/* must be duplicated right now  because it will be
+	   renamed and checked at the same time by
+	   value_mappings_compatible_vector_p() */
+	Pvecteur vlb1 = vect_dup(normalized_linear(n1));
+	Pvecteur vlb2 = vect_multiply(vect_dup(normalized_linear(n1)), VALUE_MONE);
+	Pcontrainte clb1 = CONTRAINTE_UNDEFINED;
+	Pcontrainte clb2 = CONTRAINTE_UNDEFINED;
+
+	(void) vect_variable_rename(vlb1,
+				    (Variable) e_new,
+				    (Variable) e_old);
+
+	vect_add_elem(&vlb1, (Variable) e_new, VALUE_MONE);
+	vect_add_elem(&vlb2, (Variable) e_new, VALUE_MONE);
+	clb1 = contrainte_make(vlb1);
+	clb2 = contrainte_make(vlb2);
+	clb1->succ = clb2;
+	tf = make_transformer(tf_args,
+			      make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb1)));
+      }
+      else {
+	/* d is negative and even */
+	entity e_new = entity_to_new_value(e);
+	cons * tf_args = CONS(ENTITY, e, NIL);
+	Pvecteur vub = vect_new((Variable) e_new, VALUE_ONE);
+	Pvecteur vlb = vect_new((Variable) e_new, VALUE_MONE);
+	Pcontrainte clb = CONTRAINTE_UNDEFINED;
+	Pcontrainte cub = CONTRAINTE_UNDEFINED;
+
+	vect_add_elem(&vub, TCST, VALUE_MONE);
+	clb = contrainte_make(vlb);
+	cub = contrainte_make(vub);
+	clb->succ = cub;
+	tf = make_transformer(tf_args,
+			      make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
+      }
+    }
+    else if(d<0) {
+      /* d is negative, arg1 cannot be 0, expression value is -1, 0
+	 or 1 */
+      entity e_new = entity_to_new_value(e);
+      cons * tf_args = CONS(ENTITY, e, NIL);
+      Pvecteur vub = vect_new((Variable) e_new, VALUE_MONE);
+      Pvecteur vlb = vect_new((Variable) e_new, VALUE_ONE);
+      Pcontrainte clb = CONTRAINTE_UNDEFINED;
+      Pcontrainte cub = CONTRAINTE_UNDEFINED;
+
+      vect_add_elem(&vub, TCST, VALUE_MONE);
+      vect_add_elem(&vlb, TCST, VALUE_MONE);
+      clb = contrainte_make(vlb);
+      cub = contrainte_make(vub);
+      clb->succ = cub;
+      tf = make_transformer(tf_args,
+			    make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
+    }
+    else if(d==1) {
+	entity e_new = entity_to_new_value(e);
+	cons * tf_args = CONS(ENTITY, e, NIL);
+	Pvecteur v = vect_dup(normalized_linear(n1));
+
+	vect_add_elem(&v, (Variable) e_new, VALUE_MONE);
+	tf = make_transformer(tf_args,
+			      make_predicate(sc_make(contrainte_make(v),
+						     CONTRAINTE_UNDEFINED)));
+    }
+  }
+  else if(signed_integer_constant_expression_p(arg1)) {
+    int d = signed_integer_constant_expression_value(arg1);
+    entity e_new = entity_to_new_value(e);
+
+    if(d==0||d==1) {
+      /* 0 or 1 is assigned unless arg2 equals 0... which is neglected */
+      cons * tf_args = CONS(ENTITY, e, NIL);
+      Pvecteur v = vect_new((Variable) e_new, VALUE_ONE);
+
+      vect_add_elem(&v, TCST, int_to_value(-d));
+      tf = make_transformer(tf_args,
+			    make_predicate(sc_make(contrainte_make(v),
+						   CONTRAINTE_UNDEFINED)));
+    }
+    else if(d > 1) {
+      /* the assigned value is positive */
+      cons * tf_args = CONS(ENTITY, e, NIL);
+      Pvecteur v1 = vect_new((Variable) e_new, VALUE_MONE);
+      Pcontrainte c1 = contrainte_make(v1);
+
+      if(normalized_linear_p(n2)) {
+	Pvecteur v2 = vect_dup(normalized_linear(n2));
+	Pcontrainte c2 = CONTRAINTE_UNDEFINED;
+
+	vect_add_elem(&v2, TCST, VALUE_ONE);
+	vect_add_elem(&v2, (Variable) e_new, VALUE_MONE);
+	c2 = contrainte_make(v2);
+	contrainte_succ(c1) = c2;
+      }
+
+      tf = make_transformer(tf_args,
+			    make_predicate(sc_make(CONTRAINTE_UNDEFINED, c1)));
+    }
+    else if(d == -1) {
+      /* The assigned value is 1 or -1 */
+      entity e_new = entity_to_new_value(e);
+      cons * tf_args = CONS(ENTITY, e, NIL);
+      Pvecteur vub = vect_new((Variable) e_new, VALUE_MONE);
+      Pvecteur vlb = vect_new((Variable) e_new, VALUE_ONE);
+      Pcontrainte clb = CONTRAINTE_UNDEFINED;
+      Pcontrainte cub = CONTRAINTE_UNDEFINED;
+
+      vect_add_elem(&vub, TCST, VALUE_MONE);
+      vect_add_elem(&vlb, TCST, VALUE_MONE);
+      clb = contrainte_make(vlb);
+      cub = contrainte_make(vub);
+      clb->succ = cub;
+      tf = make_transformer(tf_args,
+			    make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
+    }
+  }
+
+  ifdebug(8) {
+    debug(8, "integer_power_to_transformer", "result:\n");
+    print_transformer(tf);
+    debug(8, "integer_power_to_transformer", "end\n");
+  }
+
+  return tf;
 }
 
 static transformer 
@@ -1509,6 +1726,12 @@ expression_to_transformer(
 	else if(divide_expression_p(expr)) {
 	    tf = integer_divide_to_transformer(e, expr);
 	}
+	else if(power_expression_p(expr)) {
+	    tf = integer_power_to_transformer(e, expr);
+	}
+	else if(iabs_expression_p(expr)) {
+	    tf = iabs_to_transformer(e, expr);
+	}
 	else if(min0_expression_p(expr)) {
 	    tf = min0_to_transformer(e, expr);
 	}
@@ -1583,7 +1806,7 @@ assign_to_transformer(list args, /* arguments for assign */
 	    }
 	}
     }
-    /* if any condition was not met and transformer derivation failed */
+    /* if some condition was not met and transformer derivation failed */
     if(tf==transformer_undefined)
 	tf = effects_to_transformer(ef);
 
@@ -1662,6 +1885,12 @@ statement s;
     /* it would be nicer to control warning_on_redefinition */
     if (t == transformer_undefined) {
 	t = instruction_to_transformer(i, e);
+
+	/* add array references information */
+	if(get_bool_property("SEMANTICS_TRUST_ARRAY_REFERENCES")) {
+	    transformer_add_reference_information(t, s);
+	}
+
 	if(!transformer_consistency_p(t)) {
 	    int so = statement_ordering(s);
 	    (void) fprintf(stderr, "statement %03d (%d,%d):\n",
