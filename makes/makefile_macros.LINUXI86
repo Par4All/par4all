@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: makefile_macros.LINUXI86,v $
+# Revision 1.2  1997/05/14 08:17:02  coelho
+# use bsd def...
+#
 # Revision 1.1  1997/05/12 21:20:53  coelho
 # Initial revision
 #
@@ -11,6 +14,7 @@
 include $(ROOT)/Include/makefile_macros.GNU
 
 CFLAGS	+=	-m486
+CPPFLAGS+=	-D__USE_BSD
 
 AR	=	ar
 RANLIB	=	ranlib
