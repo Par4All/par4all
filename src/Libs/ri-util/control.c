@@ -1,5 +1,5 @@
 /* Some utilities to deal with the control graph.
-   It is mainly used by my unspaghettify.
+   It is mainly used by my unspaghettify and the controlizer.
 
    Ronan Keryell.
    */
@@ -50,30 +50,104 @@ cons **l ;
 	  control_successors( c )) ;
 }
 
-/* Remove all the control nodes (with its statement) from c in the
-   successor tree of c up to the nodes with more than 1 predecessor: */
-void
-remove_all_the_controls_in_a_control_successor_tree_till_some_predecessors(control c)
+/* Test if a control node is in a list of control nodes: */
+bool
+is_control_in_list_p(control c,
+		     list cs)
 {
-   /* For each successor of c: */
-   MAP(CONTROL, a_successor,
-       {
-          if (gen_length(control_predecessors(a_successor)) <= 1)
-             /* If there is no more than 1 predecessor, we can remove
-                down this way: */
-             remove_all_the_controls_in_a_control_successor_tree_till_some_predecessors(a_successor);
-          else
-             /* Just remove any predecessor reference of itself in
-                this successor: */
-             gen_remove(&control_predecessors(a_successor), c);
-       },
-          control_successors(c));
+    MAP(CONTROL, cc, {
+	if (cc == c)
+	    return TRUE;
+    }, cs);
+    return FALSE;
+}
 
-   gen_free_list(control_predecessors(c));
-   control_predecessors(c) = NIL;
-   gen_free_list(control_successors(c));
-   control_successors(c) = NIL;
-   gen_free(c);
+
+/* Test the coherency of a control network.
+
+   Do not verify the fact that nodes could appear twice in the case of
+   unstructured tests. */
+void
+check_control_coherency(control c)
+{
+    list blocs = NIL;
+    CONTROL_MAP(ctl, {
+	/* Test the coherency of the successors: */
+	MAP(CONTROL, cc, {	    
+	    if (!is_control_in_list_p(ctl, control_predecessors(cc))) {
+		pips_debug(0, "Control node %#x not in the predecessor list of %#x\n", (unsigned int) ctl, (unsigned int) cc);
+		/* pips_assert("Control incorrect", 0); */
+	    }
+	}, control_successors(ctl));
+	MAP(CONTROL, cc, {
+	    if (!is_control_in_list_p(ctl, control_successors(cc))) {
+		pips_debug(0, "Control node %#x not in the successor list of %#x\n", (unsigned int) ctl, (unsigned int) cc);
+		/* pips_assert("Control incorrect", 0); */
+	    }
+	}, control_predecessors(ctl));
+    }, c, blocs);
+    gen_free_list(blocs);  
+}
+
+
+/* Display a list of control: */
+void
+display_address_of_control_nodes(list cs)
+{
+	MAP(CONTROL, cc,
+	    {
+		fprintf(stderr, "%#x,", cc);
+	    }, cs);
+}
+
+
+/* Display all the control nodes from c for debugging purpose: */
+void
+display_linked_control_nodes(control c) {
+    list blocs = NIL;
+    CONTROL_MAP(ctl, {
+	fprintf(stderr, "%#x (pred (#%d)=", (unsigned int) ctl,
+		gen_length(control_predecessors(ctl)));
+	display_address_of_control_nodes(control_predecessors(ctl));
+	fprintf(stderr, " succ (#%d)=", gen_length(control_successors(ctl)));
+	display_address_of_control_nodes(control_successors(ctl));
+	fprintf(stderr, "), ");
+	ifdebug(8) {
+	    pips_debug(0, "Statement of control %#x:\n", (unsigned int) ctl);
+	    print_statement(control_statement(ctl));
+	}
+    }, c, blocs);
+    gen_free_list(blocs);
+    fprintf(stderr, "---\n");
+}
+
+
+/* Remove all the control nodes (with its statement) from c in the
+   successor tree of c up to the nodes with more than 1 predecessor.
+   The entry node of the unstructured is given to avoid removing it
+   when there is an unreachable sequence pointing on it: */
+void
+remove_unreachable_following_control(control c,
+				     control entry_node)
+{
+    /* For each successor of c: */
+    MAP(CONTROL, a_successor, {
+	if (a_successor != entry_node
+	    && gen_length(control_predecessors(a_successor)) <= 1)
+	    /* If there is no more than 1 predecessor, we can remove
+	       down this way: */
+	    remove_unreachable_following_control(a_successor, entry_node);
+	else
+	    /* Just remove any predecessor reference of itself in
+	       this successor: */
+	    gen_remove(&control_predecessors(a_successor), c);
+    }, control_successors(c));
+
+    gen_free_list(control_predecessors(c));
+    control_predecessors(c) = NIL;
+    gen_free_list(control_successors(c));
+    control_successors(c) = NIL;
+    free_control(c);
 }
 
 
@@ -107,7 +181,7 @@ remove_the_unreachable_controls_of_an_unstructured(unstructured u)
    /* Now remove all the marqued sequences: */
    MAP(CONTROL, c,
        {
-          remove_all_the_controls_in_a_control_successor_tree_till_some_predecessors(c);
+          remove_unreachable_following_control(c, entry_node);
        },
           control_remove_list);
    gen_free_list(control_remove_list);
@@ -304,3 +378,104 @@ generate_a_statement_list_from_a_control_sequence(control begin,
 }
 
 
+/* Add an edge between 2 control nodes.
+   Assume that this edge does not already exist. */
+void
+link_2_control_nodes(control source,
+		     control target)
+{
+    control_successors(source) = CONS(CONTROL,
+				      target,
+				      control_successors(source));
+    control_predecessors(target) = CONS(CONTROL,
+					source,
+					control_predecessors(target));
+}
+
+
+/* Remove an edge between 2 control nodes.
+   Assume that this edge does already exist. */
+void
+unlink_2_control_nodes(control source,
+		       control target)
+{
+    gen_remove(&control_successors(source), target);
+    gen_remove(&control_predecessors(target), source);
+}
+
+
+/* Fuse a 2 control node and add the statement of the second one to
+   the statement of the first one. Assumes that the second node is the
+   only successor of the first one:\. Do not update the entry or exit
+   field of the unstructured. */
+void
+fuse_2_control_nodes(control first,
+		     control second)
+{
+    if (gen_length(control_successors(second)) == 2) {
+	/* If the second node has 2 successors, it is a test node. The
+	   fused node has 2 successors and must be a test too. So, the
+	   only thing I can do is to remove the first statement, just
+	   keeping its comments: */
+	string first_comment =
+	    gather_all_comments_of_a_statement(control_statement(first));
+	insert_comments_to_statement(control_statement(second),
+				     first_comment);
+	control_statement(first) = control_statement(second);	
+    }
+    else {
+	/* If not, build a block with the 2 statements: */
+	statement st = make_empty_statement();
+	statement_instruction(st) =
+	    make_instruction_block(CONS(STATEMENT,
+					control_statement(first),
+					CONS(STATEMENT,
+					     control_statement(second), NIL)));
+	/* Reconnect the new statement to the node to fuse: */
+	control_statement(first) = st;
+    }
+    control_statement(second) = statement_undefined;
+
+    /* Unlink the second node from the first one: */
+    gen_free_list(control_successors(first));
+    gen_remove(&control_predecessors(second), first);
+	       
+    /* Link the first node with the successors of the second one in
+       the forward direction: */
+    control_successors(first) =
+	control_successors(second);
+    /* Update all the predecessors of the successors: */
+    MAP(CONTROL, c,
+	{
+	    MAPL(cp,
+		 {
+		     if (CONTROL(CAR(cp)) == second)
+			 CONTROL(CAR(cp)) = first;
+		 }, control_predecessors(c));
+	}, control_successors(first));
+	       
+    /* Transfer the predecessors of the second node to the first one.
+       Note that the original second -> first predecessor link has
+       already been removed. But a loop from second to second appear
+       at this point as a link from first to second. Nasty bug... */
+    MAP(CONTROL, c,
+	{
+	    control_predecessors(first) = CONS(CONTROL,
+					       c,
+					       control_predecessors(first));
+	    MAPL(cp,
+		 {
+		     if (CONTROL(CAR(cp)) == second) {
+			 CONTROL(CAR(cp)) = first;
+		     }
+		 }, control_successors(c));
+	}, control_predecessors(second));
+    
+    /* Now we remove the useless intermediate node "second": */
+    /* Do not gen_free_list(control_successors(second)) since it is
+       used as control_successors(first) now: */
+    control_successors(second) = NIL;
+    gen_free_list(control_predecessors(second));
+    control_predecessors(second) = NIL;
+    free_control(second);
+}
