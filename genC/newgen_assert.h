@@ -2,7 +2,7 @@
  * the message generates the function name if possible.
  * message_assert prints a message before aborting
  *
- * $RCSfile: newgen_assert.h,v $ ($Date: 1995/02/01 09:55:22 $, )
+ * $RCSfile: newgen_assert.h,v $ ($Date: 1995/09/22 13:09:23 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -29,7 +29,7 @@
       if (!(ex)) \
       {\
          (void) fprintf(stderr, _newgen_assert_message);\
-         (void) fprintf(stderr, "\n - %s\n\n", msg);\
+         (void) fprintf(stderr, "\n %s not verified\n\n", msg);\
 	 (void) abort();\
       }\
    }
