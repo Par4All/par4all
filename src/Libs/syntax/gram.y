@@ -142,6 +142,8 @@
 extern int yylex(void);
 extern void yyerror(char *);
 
+#define YYERROR_VERBOSE 1 /* much clearer error messages with bison */
+
     /* local variables */
     int ici; /* to count control specifications in IO statements */
     type CurrentType = type_undefined; /* the type in a type or dimension
@@ -1412,20 +1414,3 @@ opt_virgule:
 	| TK_COMMA
 	;
 %%
-
-extern void yyerror_lex_part(char *);
-
-void yyerror(s)
-char * s;
-{
-    /* procedure minimum de recouvrement d'erreurs */
-    int c;
-    yyerror_lex_part(s);
-    user_warning("parser", "Non analyzed source text stored in logfile\n");
-    
-    while ((c = getc(yyin)) != EOF)
-	putc(c, stderr);
-	
-    /* pas de recouvrement d'erreurs */
-    ParserError("yyerror", "Syntax error\n");
-}
