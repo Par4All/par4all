@@ -1,4 +1,4 @@
-.SUFFIXES:      .c .cc .h .l .y .d .tag .mk .exec .in .tested .out
+.SUFFIXES:      .c .cc .h .l .y .d .tag .mk .exe .in .tested .out
 
 
 ##############################################################
@@ -7,7 +7,7 @@
 
 OBJS= $(SRCS:%.c=$(OBJDIR)/%.o) 
 
-POLY_EXEC= $(SRCS:%.c=%.exec) 
+POLY_EXEC= $(SRCS:%.c=%.exe) 
 
 OBJDIR = $(ROOT)/$(OBJ_DIR)
 #EXECDIR = $(ROOT)/bin/$(OBJ_DIR)
@@ -32,7 +32,7 @@ $(OBJDIR)/%.o : %.c
 	$(CC) -c $(CFLAGS) $(EXTRA_FLAGS) $(DEFINES) $(EXTRA_DEFINES) $< -o $@
 
 # The default compile rule to create executable application
-.o.exec:
+.o.exe:
 	@if [ ! -d $(EXECDIR) ]; \
 		then mkdir -p $(EXECDIR) ; \
 	fi
@@ -80,7 +80,7 @@ execs:
 		    fi ; \
 		done ; \
 	fi ;\
-	make exec
+	make exe
 
 # Run the tests for the various applications
 tests: 
@@ -98,11 +98,11 @@ tests:
 
 # To construct an executable, compile the 'c' file and link with the
 # library
-exec: $(OBJS) $(POLY_EXEC)
+exe: $(OBJS) $(POLY_EXEC)
 
 # Remove classes from this directory then subdirectories
 clean:
-	rm -f $(OBJDIR)/*.o $(OBJDIR)/*.a* $(EXECDIR)/*.exec patch.exe.core 
+	rm -f $(OBJDIR)/*.o $(OBJDIR)/*.a* $(EXECDIR)/*.exe patch.exe.core 
 	rm -f #*# *.*~ *~ *.html *.css 
 	rm -f tmpfile junk* *.o TAGS
 	@if [ "x$(SUBDIRS)" != "x" ]; then \
@@ -158,7 +158,7 @@ install-docs:
 
 install-exec: $(POLY_EXEC)
 	$(mkinstalldirs) $(BINDIR)
-	$(INSTALL) $(ROOT)/bin/$(OBJ_DIR)/*.exec $(BINDIR)
+	$(INSTALL) $(ROOT)/bin/$(OBJ_DIR)/*.exe $(BINDIR)
 
 # Get the Platform dependent VARIABLES
 include $(ROOT)/vars.mk

@@ -1,44 +1,81 @@
 #
-# $Id: Makefile~,v 1.1 2002/10/14 15:31:43 olaru Exp $
+# $Id: Makefile~,v 1.2 2002/10/15 10:08:52 kienhuis Exp $
 #
-
-.SUFFIXES: .in .tested. .out
 
 ROOT  = ../..
 
-ZPOLYTESTS =  \
-	LatHNF1.in \
-	LatHNF2.in \
-	LatHNF3.in \
-	LatInter1.in \
-	LatInter2.in \
-	LatInc1.in \
-	LatInc2.in \
-	ZEmpty1.in \
-	ZEmpty2.in \
-	ZInter1.in \
-	ZInter2.in  \
-	ZInter3.in  \
-	ZUnion1.in \
-	ZUnion2.in \
-	ZDiff1.in \
-	ZDiff2.in \
-	ZImage1.in \
-	ZPre1.in \
-	ZPre2.in  \
-	ZPre3.in \
-	ZImPre1.in \
-	SplitZpol1.in \
-	SplitZpol2.in \
-	SplitZpol3.in
+EHRHART =  \
+	8hedron.in \
+	alex11.in \
+	alex1.in \
+	c3.in\
+	c4.in\
+	e0.in\
+	e10.in\
+	e11.in\
+	e12.in\
+	e13.in\
+	e14.in\
+	e15.in\
+	e16.in\
+	e1.in\
+	e2b.in\
+	e2.in\
+	e3.in\
+	e4.in\
+	e5.in\
+	e6.in\
+	e7.in\
+	e8.in\
+	e9.in\
+	g12.in\
+	g13.in\
+	g14.in\
+	g1.in\
+	g2.in\
+	g4.in\
+	g5.in\
+	isnm2.in\
+	t1.in\
+	t2.in\
+	t31.in\
+	t3.in\
+	t4.in\
+	tpar.in
 
-TEST=$(ZPOLYTESTS:%.in=%.tested) 
+TEST=$(EHRHART:%.in=%.tested) 
 
-zpoly_tests: $(TEST)
+TESTLONG=$(EHRHART:%.in=%.tested) 
+
+test:
+	@failedtest=0; \
+	for x in $(EHRHART) ; do \
+		echo "Verify file $$x" ; \
+		$(ROOT)/bin/testehrhart.exec < $$x > xyz;\
+		diff -w xyz `basename $$x .in`.out ; \
+		result=$$?; \
+		if [ "$$result" -eq "1" ]; then \
+			echo "Error: $$x is not the same"; \
+			failedtest=`expr $$failedtest + 1`; \
+		else \
+			echo "$$x passed"; \
+	        fi; \
+	done ; \
+        if [ $$failedtest != 0 ]; then \
+		echo "$$failedtest tests failed"; \
+	else \
+	        echo "Test ehrhart works correctly"; \
+        fi
+
+longtest:
+	@for x in $(EHRHART) ; do \
+		echo "Verify Ehrhart for $$x"; \
+		$(ROOT)/bin/verif_ehrhart.exec < $$x ;\
+	done ; \
 
 # The default compile rule
 .in.tested:
-	$(ROOT)/bin/Zpolytest.exec < $< > xyz
+	$(ROOT)/bin/ehrhart.exec < $< > xyz
 	diff -w xyz $*.out
 
 # Include the shared compilation rules
