@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (Version $Revision$)
-# $Date: 1996/10/10 18:39:44 $, 
+# $Date: 1996/10/10 18:40:22 $, 
 #
 # revu par FC
 # pour fabriquer un executable FOO, faire "make FOO"
@@ -19,7 +19,7 @@ CFILES	=	sc_to_sg_test1.c \
 		time_sg_union.c \
 		feasability.c
 
-SOURCE	= $(CFILES) 
+SOURCES	= $(CFILES) 
 
 all: test_chernikova simp
 
