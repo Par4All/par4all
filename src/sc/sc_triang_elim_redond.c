@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/07/29 09:04:42 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/09/20 18:09:00 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -17,6 +17,8 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
+
+#include "sc-private.h"
 
 
 /*   COMPARISON of CONSTRAINTS
@@ -246,7 +248,7 @@ Pcontrainte constraints_sort_info(c, sort_base, compare, info)
 Pcontrainte c;
 Pbase sort_base;
 int (*compare)();
-int info[][2];
+two_int_infop info;
 {
     Pcontrainte pc, *tc;
     Pvecteur phrank;
@@ -296,11 +298,10 @@ Pcontrainte c;
 Pbase sort_base;
 int (*compare)();
 {
-    int 
-	n = vect_size(sort_base)+1,
-	(*info)[2];
+    int n = vect_size(sort_base)+1;
+    two_int_infop info;
 
-    info = malloc(sizeof(int)*2*n);
+    info = (two_int_infop) malloc(sizeof(int)*2*n);
 
     c = constraints_sort_info(c, sort_base, compare, info);
 
@@ -384,10 +385,8 @@ Psysteme ps;
 Pbase base_index;
 {
     Pcontrainte ineq, ineq1;
-    int 
-	level,
-	n = vect_size(base_index)+1,
-	(*info)[2];
+    int level, n = vect_size(base_index)+1;
+    two_int_infop info;
 
     ps = sc_normalize(ps);
      
@@ -514,16 +513,13 @@ Pbase indexes; /* outer to inner */
 {
     Pcontrainte
 	old ;
-    int
-	level, side,
-	n_other_constraints,
-	n = vect_size(indexes)+1,
-	(*info)[2];
+    int level, side, n_other_constraints, n = vect_size(indexes)+1;
+    two_int_infop info;
 
     s = sc_normalize(s);
     if (s==NULL || sc_nbre_inegalites(s)==0) return(s);
 
-    info = malloc(sizeof(int)*2*n);
+    info = (two_int_infop) malloc(sizeof(int)*2*n);
 
     /* sort outer first and complex first
      */
