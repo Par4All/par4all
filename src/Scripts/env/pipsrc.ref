@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/28 19:14:04 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/28 22:03:00 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -88,7 +88,7 @@ PATH=${PATH}:${PIPS_BINDIR}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
 # PIPS default options for Unix software development tools
 #
 
-PIPS_ARCH="SUN4"
+PIPS_ARCH="."
 
 PIPS_AR="/usr5/gnu/bin-sparc/ar"
 PIPS_ARFLAGS="rv"
