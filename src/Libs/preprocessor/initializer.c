@@ -113,9 +113,17 @@ string module_name;
 
 		pips_assert("initializer", type_variable_p(tp));
 
-		(void) fprintf(f, "      %s %c\n", 
-			       basic_to_string(variable_basic(type_variable(tp))),
-			       nv);
+		if(basic_overloaded_p(variable_basic(type_variable(tp)))) {
+		    (void) fprintf(f, "C     Unable to determine the type of parameter %c\n", nv);
+		    (void) fprintf(f, "C     %s %c\n", 
+				   basic_to_string(variable_basic(type_variable(tp))),
+				   nv);
+		}
+		else {
+		    (void) fprintf(f, "      %s %c\n", 
+				   basic_to_string(variable_basic(type_variable(tp))),
+				   nv);
+		}
 		nv++;
 	    }, functional_parameters(t));
 
