@@ -4,6 +4,9 @@
   * Prettyprint unstructured
   *
   * $Log: unstructured.c,v $
+  * Revision 1.13  2003/08/06 13:45:52  nguyen
+  * Modify and add functions for C prettyprinter
+  *
   * Revision 1.12  2001/03/12 15:53:45  irigoin
   * Bug fix in decorate_trail() and text_trail() for check IO statement. See
   * cplch.f in Validation. I had forgotten that the apparent successor of an
@@ -513,7 +516,7 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	if((l=control_to_label_name(c, labels))!=string_undefined) {
 	    if(strcmp(l, label_local_name(statement_to_label(control_statement(c))))
 	       != 0) {
-		list pc = CHAIN_SWORD(NIL,"CONTINUE") ;
+		list pc = CHAIN_SWORD(NIL,is_fortran?"CONTINUE":";") ;
 		sentence s = make_sentence(is_sentence_unformatted,
 					   make_unformatted(NULL, 0, margin, pc)) ;
 		unformatted_label(sentence_unformatted(s)) = l ;
@@ -591,7 +594,7 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 						      strdup(comments)));
 	    }
 
-	    pc = CHAIN_SWORD(NIL, "IF (");
+	    pc = CHAIN_SWORD(NIL, is_fortran?"IF (":"if (");
 	    t = instruction_test(i);
 	    pc = gen_nconc(pc, words_expression(test_condition(t)));
 
@@ -607,7 +610,15 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 			/* succ2 must be reached by GOTO */
 			l = control_to_label_name(succ2, labels);
 			pips_assert("Must be labelled", l!= string_undefined);
-			ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+			if (is_fortran)
+			  {
+			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+			  }
+			else 
+			  {
+			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
+			  }
 			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
 								     margin+INDENTATION,
 								     l, 0));
@@ -627,7 +638,15 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
 								     margin+INDENTATION,
 								     l, 0));
-			ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+			if (is_fortran)
+			  {
+			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+			  }
+			else 
+			  {
+			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+			    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
+			  }
 			l = control_to_label_name(succ2, labels);
 			pips_assert("Must be labelled", l!= string_undefined);
 			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
@@ -645,7 +664,15 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 		ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
 							     margin+INDENTATION,
 							     l, 0));
-		ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+		if (is_fortran)
+		  {
+		    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+		  }
+		else 
+		  {
+		    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+		    ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
+		  }
 		l = control_to_label_name(succ2, labels);
 		pips_assert("Must be labelled", l!= string_undefined);
 		ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
@@ -658,7 +685,7 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 		pc = gen_nconc(pc, words_goto_label(l));
 	    }
 	    else {
-		pc = CHAIN_SWORD(pc, ") THEN");
+	      pc = CHAIN_SWORD(pc, is_fortran? ") THEN": ") {");
 	    }
 	    u = make_unformatted(NULL, statement_number(st), margin, pc) ;
 
@@ -679,7 +706,7 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	    ADD_SENTENCE_TO_TEXT(r, s);
 	    MERGE_TEXTS(r, r1);
 	    if(!no_endif)
-		ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
+		ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,is_fortran?"ENDIF":"}"));
 	    break;
 	}
 	default:
