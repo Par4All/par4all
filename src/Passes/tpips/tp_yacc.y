@@ -528,14 +528,14 @@ rulename:
 	;
 
 filename_list:
-	filename
-	sep_list
 	filename_list
+	sep_list
+	filename
 	{
 	    debug(7,"yyparse","reduce rule filename_list (%s)\n", $1);
 
 	    if (the_file_list.argc < FILE_LIST_MAX_LENGTH) {
-		the_file_list.argv[the_file_list.argc] = $1;
+		the_file_list.argv[the_file_list.argc] = $3;
 		the_file_list.argc++;
 	    } else {
 	      pips_error("tpips",
@@ -545,7 +545,7 @@ filename_list:
 	}
 	|
 	filename
-	opt_sep_list
+	/* opt_sep_list */
 	{
 	    debug(7,"yyparse","reduce rule filename_list (%s)\n", $1);
 
