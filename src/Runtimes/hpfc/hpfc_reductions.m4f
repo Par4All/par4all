@@ -1,0 +1,339 @@
+c
+c     Reductions management 
+c
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/04/11 10:23:56 $, )
+c version $Revision$
+c got on %D%, %T%
+c $Id$
+c
+c     it is supposed that the reduction is computed on a full
+c     array, which is nor replicated anyway. If used on a part,
+c     should work, but I am not so sure.
+c
+c----------
+c
+c this could be computed statically, where it is used...
+c
+cdecl      external HPFC_PROCDIM
+cdecl      integer HPFC_PROCDIM
+c
+      integer function HPFC_PROCDIM(an, ad)
+      include 'hpfc_commons.h'
+      integer an, ad
+      integer tn, pn, i, it, ip
+      tn = ATOT(an)
+      pn = TTOP(tn)
+      it = 0
+      ip = 0
+      do i=1, NODIMT(tn)
+         if (ALIGN(an, i, 1).EQ.ad) it = i
+      enddo
+      if (it.NE.0) then
+         do i=1, NODIMP(pn)
+            if (DIST(tn, i, 1).EQ.it) ip = i
+         enddo
+      endif
+      HPFC_PROCDIM = ip
+      return
+      end
+c      
+c----------
+c
+
+#define LOGICALRED3(TYPE,PVMTYPE,NAME,OPERATOR)				\
+^c     									\
+^c NODE PART								\
+^c									\
+^cdecl      external nred3_##PVMTYPE##_##NAME				\
+^cdecl      TYPE nred3_##PVMTYPE##_##NAME				\
+^      TYPE 								\
+^     &  function nred3_##PVMTYPE##_##NAME(a, an, 			\
+^     &  dl1, du1, dl2, du2, dl3, du3,					\
+^     &  lo1, up1, lo2, up2, lo3, up3)					\
+^      include 'fpvm3.h'						\
+^      include 'hpfc_commons.h'						\
+^      include 'hpfc_rtsupport.h'					\
+^      external HPFC_PROCDIM						\
+^      integer HPFC_PROCDIM						\
+^      TYPE a(dl1:du1, dl2:du2, dl3:du3)				\
+^      integer 								\
+^     &    an, 								\
+^     &    dl1, du1, dl2, du2, dl3, du3,				\
+^     &    lo1, up1, lo2, up2, lo3, up3					\
+^      TYPE result							\
+^      integer t1, i1, l1, u1, s1, d1					\
+^      integer t2, i2, l2, u2, s2, d2					\
+^      integer t3, i3, l3, u3, s3, d3					\
+^c									\
+^c initiate with a valid value						\
+^c									\
+^      CALL HPFC_CMPOWNERS(an, lo1, lo2,lo3, 0, 0, 0, 0)		\
+^      if (HPFC_SENDERP()) then						\
+^         t1 = HPFC_LOCALIND(an, 1, lo1)				\
+^         t2 = HPFC_LOCALIND(an, 2, lo2)				\
+^         t3 = HPFC_LOCALIND(an, 3, lo3)				\
+^         CALL HPFC_SNDTO_A(PVMTYPE, a(t1, t2, t3))			\
+^         result = a(t1, t2, t3)					\
+^      else								\
+^         CALL HPFC_RCVFR_mCS(PVMTYPE, result)				\
+^      endif								\
+^c									\
+^c compute the loop bounds						\
+^c									\
+^      d1 = HPFC_PROCDIM(an, 1)						\
+^      CALL HPFC_LOOP_BOUNDS(l1, u1, s1, lo1, up1, an, d1)		\
+^      d2 = HPFC_PROCDIM(an, 2)						\
+^      CALL HPFC_LOOP_BOUNDS(l2, u2, s2, lo2, up2, an, d2)		\
+^      d3 = HPFC_PROCDIM(an, 3)						\
+^      CALL HPFC_LOOP_BOUNDS(l3, u3, s3, lo3, up3, an, d3)		\
+^c									\
+^c local reduction							\
+^c									\
+^      do i1=l1, u1							\
+^         do i2=l2, u2							\
+^            do i3=l3, u3						\
+^               if (a(i1, i2, i3)##OPERATOR##result) 			\
+^     &              result = a(i1, i2, i3)				\
+^            enddo							\
+^         enddo								\
+^      enddo								\
+^c									\
+^c send partial result to host, and get the final result		\
+^c      								\
+^      CALL HPFC_SNDTO_H(PVMTYPE, result)				\
+^      CALL HPFC_RCVFR_mCH(PVMTYPE, result)				\
+^      nred3_##PVMTYPE##_##NAME = result				\
+^      return								\
+^      end								\
+^c									\
+^c HOST PART								\
+^c									\
+^cdecl      external hred3_##PVMTYPE##_##NAME				\
+^cdecl      TYPE hred3_##PVMTYPE##_##NAME				\
+^      TYPE function hred3_##PVMTYPE##_##NAME()				\
+^      include 'fpvm3.h'						\
+^      include 'hpfc_commons.h'						\
+^      TYPE result(MAXMAXSIZEOFPROCS), final				\
+^c									\
+^c get partial results							\
+^c									\
+^      do i=1, MAXSIZEOFPROCS						\
+^         SENDERTID = NODETIDS(i)					\
+^         SLID = i							\
+^         CALL HPFC_RCVFR_S(PVMTYPE, result(i))				\
+^      enddo								\
+^c									\
+^c compute final result							\
+^c									\
+^      final = result(1)						\
+^      do i=2, MAXSIZEOFPROCS						\
+^         if (result(i)##OPERATOR##final) 				\
+^     &        final = result(i)					\
+^      enddo								\
+^c									\
+^c send final result to nodes 						\
+^c      								\
+^      CALL HPFC_HSNDTO_A(PVMTYPE, final)				\
+^      hred3_##PVMTYPE##_##NAME = final					\
+^      return								\
+^      end								\
+^c									\
+^c------------								\
+^c
+
+#define LOGICALRED2(TYPE,PVMTYPE,NAME,OPERATOR)				\
+^c     									\
+^c NODE PART								\
+^c									\
+^cdecl      external nred2_##PVMTYPE##_##NAME				\
+^cdecl      TYPE nred2_##PVMTYPE##_##NAME				\
+^      TYPE 								\
+^     &     function nred2_##PVMTYPE##_##NAME(a, an, 			\
+^     &     dl1, du1, dl2, du2,						\
+^     &     lo1, up1, lo2, up2)						\
+^      include 'fpvm3.h'						\
+^      include 'hpfc_commons.h'						\
+^      include 'hpfc_rtsupport.h'					\
+^      external HPFC_PROCDIM						\
+^      integer HPFC_PROCDIM						\
+^      TYPE a(dl1:du1, dl2:du2)						\
+^      integer 								\
+^     &     an, 							\
+^     &     dl1, du1, dl2, du2,						\
+^     &     lo1, up1, lo2, up2						\
+^      TYPE result							\
+^      integer t1, i1, l1, u1, s1, d1					\
+^      integer t2, i2, l2, u2, s2, d2					\
+^c									\
+^c initiate with a valid value						\
+^c									\
+^      CALL HPFC_CMPOWNERS(an, lo1, lo2, 0, 0, 0, 0, 0)			\
+^      if (HPFC_SENDERP()) then						\
+^         t1 = HPFC_LOCALIND(an, 1, lo1)				\
+^         t2 = HPFC_LOCALIND(an, 2, lo2)				\
+^         CALL HPFC_SNDTO_A(PVMTYPE, a(t1, t2))				\
+^         result = a(t1, t2)						\
+^      else								\
+^         CALL HPFC_RCVFR_mCS(PVMTYPE, result)				\
+^      endif								\
+^c									\
+^c compute the loop bounds						\
+^c									\
+^      d1 = HPFC_PROCDIM(an, 1)						\
+^      CALL HPFC_LOOP_BOUNDS(l1, u1, s1, lo1, up1, an, d1)		\
+^      d2 = HPFC_PROCDIM(an, 2)						\
+^      CALL HPFC_LOOP_BOUNDS(l2, u2, s2, lo2, up2, an, d2)		\
+^c									\
+^c local reduction							\
+^c									\
+^      do i1=l1, u1							\
+^         do i2=l2, u2							\
+^            if (a(i1, i2)##OPERATOR##result) 				\
+^     &           result = a(i1, i2)					\
+^         enddo								\
+^      enddo								\
+^c									\
+^c send partial result to host, and get the final result		\
+^c      								\
+^      CALL HPFC_SNDTO_H(PVMTYPE, result)				\
+^      CALL HPFC_RCVFR_mCH(PVMTYPE, result)				\
+^      nred2_##PVMTYPE##_##NAME = result				\
+^      return								\
+^      end								\
+^c									\
+^c HOST PART								\
+^c									\
+^cdecl      external hred2_##PVMTYPE##_##NAME				\
+^cdecl      TYPE hred2_##PVMTYPE##_##NAME				\
+^      TYPE 								\
+^     &   function hred2_##PVMTYPE##_##NAME()				\
+^      include 'fpvm3.h'						\
+^      include 'hpfc_commons.h'						\
+^      TYPE result(MAXMAXSIZEOFPROCS), final				\
+^c									\
+^c get partial results							\
+^c									\
+^      do i=1, MAXSIZEOFPROCS						\
+^         SENDERTID = NODETIDS(i)					\
+^         SLID = i							\
+^         CALL HPFC_RCVFR_S(PVMTYPE, result(i))				\
+^      enddo								\
+^c									\
+^c compute final result							\
+^c									\
+^      final = result(1)						\
+^      do i=2, MAXSIZEOFPROCS						\
+^         if (result(i)##OPERATOR##final) 				\
+^     &        final = result(i)					\
+^      enddo								\
+^c									\
+^c send final result to nodes 						\
+^c      								\
+^      CALL HPFC_HSNDTO_A(PVMTYPE, final)				\
+^      hred2_##PVMTYPE##_##NAME = final					\
+^      return								\
+^      end								\
+^c									\
+^c------------								\
+^c
+
+#define LOGICALRED1(TYPE,PVMTYPE,NAME,OPERATOR)				\
+^c     									\
+^c NODE PART								\
+^c									\
+^cdecl      external nred1_##PVMTYPE##_##NAME				\
+^cdecl      TYPE nred1_##PVMTYPE##_##NAME				\
+^      TYPE 								\
+^     &   function nred1_##PVMTYPE##_##NAME(a, an, dl1, du1, lo1, up1)	\
+^      include 'fpvm3.h'						\
+^      include 'hpfc_commons.h'						\
+^      include 'hpfc_rtsupport.h'					\
+^      external HPFC_PROCDIM						\
+^      integer HPFC_PROCDIM						\
+^      TYPE a(dl1:du1)							\
+^      integer an, dl1, du1, lo1, up1					\
+^      TYPE result							\
+^      integer t1, i1, l1, u1, s1, d1					\
+^c									\
+^c initiate with a valid value						\
+^c									\
+^      CALL HPFC_CMPOWNERS(an, lo1, 0, 0, 0, 0, 0, 0)			\
+^      if (HPFC_SENDERP()) then						\
+^         t1 = HPFC_LOCALIND(an, 1, lo1)				\
+^         CALL HPFC_SNDTO_A(PVMTYPE, a(t1))				\
+^         result = a(t1)						\
+^      else								\
+^         CALL HPFC_RCVFR_mCS(PVMTYPE, result)				\
+^      endif								\
+^c									\
+^c compute the loop bounds						\
+^c									\
+^      d1 = HPFC_PROCDIM(an, 1)						\
+^      CALL HPFC_LOOP_BOUNDS(l1, u1, s1, lo1, up1, an, d1)		\
+^c									\
+^c local reduction							\
+^c									\
+^      do i1=l1, u1							\
+^         if (a(i1)##OPERATOR##result) 					\
+^     &        result = a(i1)						\
+^      enddo								\
+^c									\
+^c send partial result to host, and get the final result		\
+^c      								\
+^      CALL HPFC_SNDTO_H(PVMTYPE, result)				\
+^      CALL HPFC_RCVFR_mCH(PVMTYPE, result)				\
+^      nred1_##PVMTYPE##_##NAME = result				\
+^      return								\
+^      end								\
+^c									\
+^c HOST PART								\
+^c									\
+^cdecl      external hred1_##PVMTYPE##_##NAME				\
+^cdecl      TYPE hred1_##PVMTYPE##_##NAME				\
+^      TYPE function hred1_##PVMTYPE##_##NAME()				\
+^      include 'fpvm3.h'						\
+^      include 'hpfc_commons.h'						\
+^      TYPE result(MAXMAXSIZEOFPROCS), final				\
+^c									\
+^c get partial results							\
+^c									\
+^      do i=1, MAXSIZEOFPROCS						\
+^         SENDERTID = NODETIDS(i)					\
+^         SLID = i							\
+^         CALL HPFC_RCVFR_S(PVMTYPE, result(i))				\
+^      enddo								\
+^c									\
+^c compute final result							\
+^c									\
+^      final = result(1)						\
+^      do i=2, MAXSIZEOFPROCS						\
+^         if (result(i)##OPERATOR##final) 				\
+^     &        final = result(i)					\
+^      enddo								\
+^c									\
+^c send final result to nodes 						\
+^c      								\
+^      CALL HPFC_HSNDTO_A(PVMTYPE, final)				\
+^      hred1_##PVMTYPE##_##NAME = final					\
+^      return								\
+^      end								\
+^c									\
+^c------------								\
+^c
+
+#define REDUCTIONS(TYPE,PVMTYPE)					\
+REDUCTIONSWITHDIM(1,TYPE,PVMTYPE)					\
+REDUCTIONSWITHDIM(2,TYPE,PVMTYPE)					\
+REDUCTIONSWITHDIM(3,TYPE,PVMTYPE)
+
+#define REDUCTIONSWITHDIM(DIM,TYPE,PVMTYPE)				\
+LOGICALRED##DIM(TYPE,PVMTYPE,MIN,.LT.)					\
+LOGICALRED##DIM(TYPE,PVMTYPE,MAX,.GT.)
+
+REDUCTIONS(real*8,REAL8) 
+REDUCTIONS(real*4,REAL4)
+REDUCTIONS(integer*4, INTEGER4)
+
+c
+c that s all
+c
