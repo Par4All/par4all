@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/05/27 11:47:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/05/28 18:26:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/05/27 11:47:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/05/28 18:26:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -205,7 +205,7 @@ entity e, module;
 	     {
 		 if (comma) pc = CHAIN_SWORD(pc, ",");
 		 else comma = TRUE;
-		 pc = gen_nconc(pc, words_declaration(ee, FALSE));
+		 pc = gen_nconc(pc, words_declaration(ee, TRUE));
 	     },
 		 entities);
 
