@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/31 11:48:26 $, )
+# ($Date: 1996/09/02 11:10:36 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -265,8 +265,8 @@ $(LIB_TARGET):	$(PVM_HEADERS) $(LIB_HEADERS) $(LIBOBJECTS)
 
 %.h: %.f
 	# building $@ from $<
-	./hpfc_generate_h < $< > $@
-	./hpfc_add_warning $@
+	sh ./hpfc_generate_h < $< > $@ ; \
+	sh ./hpfc_add_warning $@
 
 $(RT_ARCH)/%.o: %.c
 	$(COMPILE) $< -o $@
@@ -292,7 +292,7 @@ hpfc_includes.h: $(LIB_M4FFILES:.m4f=.h)
 	#
 	{ for i in $(LIB_M4FFILES:.m4f=.h) ; do \
 	  echo "      include \"$$i\"" ; done; } > $@
-	./hpfc_add_warning $@
+	sh ./hpfc_add_warning $@
 
 clean: local-clean
 local-clean: 
