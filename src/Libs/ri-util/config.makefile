@@ -32,14 +32,16 @@ MAIN=		main
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
 LIB_CFILES=	Psc.c Ppolynome.c Pvecteur.c Pcontrainte.c matrice.c eval.c \
-		size.c util.c ordering.c prettyprint.c loop.c fortran90.c \
+		size.c util.c ordering.c prettyprint.c emacs_pretty_print.c \
+		loop.c fortran90.c \
 		constant.c bound_generation.c entity.c variable.c statement.c \
 		expression.c type.c normalize.c static.c arguments.c module.c \
 		effects.c cmfortran.c craft.c
 
 LIB_HEADERS=	ri-util-local.h
 LIB_OBJECTS=	Psc.o Ppolynome.o Pvecteur.o Pcontrainte.o matrice.o eval.o \
-		size.o ordering.o loop.o fortran90.o prettyprint.o constant.o\
+		size.o ordering.o loop.o fortran90.o prettyprint.o \
+		emacs_pretty_print.o constant.o\
 		util.o  bound_generation.o entity.o variable.o statement.o \
 		expression.o type.o normalize.o static.o arguments.o module.o \
 		effects.o cmfortran.o craft.o
