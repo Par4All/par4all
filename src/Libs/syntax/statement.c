@@ -876,8 +876,13 @@ instruction i;
 	 * They have to be re-numbered.
 	 */
 	list l = instruction_block(i);
+	statement first = STATEMENT(CAR(l));
 	int sn = get_future_statement_number();
-	pips_assert("Block of two instructions", gen_length(l)==2);
+	pips_assert("Block of two instructions or call with return code checks",
+		    (gen_length(l)==2 && assignment_statement_p(first))
+		    ||
+		    (statement_call_p(first))
+	    );
 	MAP(STATEMENT, s, {
 	    statement_number(s) = sn;
 	}, l);
