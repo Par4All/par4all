@@ -232,14 +232,15 @@ void fprint_makefile(FILE *fd, makefile m)
     }, makefile_rules(m));
 }
 		
-makefile parse_makefile(void)
+makefile 
+parse_makefile(void)
 {
     string default_pipsmake_rc_file;
     extern int init_lex();
     extern int yyparse();
 
-    if (pipsmakefile == makefile_undefined) {
-
+    if (pipsmakefile == makefile_undefined)
+    {
 	debug_on("PIPSMAKE_DEBUG_LEVEL");
 
 	default_pipsmake_rc_file = getenv("PIPS_PIPSMAKERC");
@@ -255,14 +256,12 @@ makefile parse_makefile(void)
 	yyparse();
 	safe_fclose(yyin, "some pipsmake.rc file");
 
-	ifdebug(8) {
-	    fprint_makefile(stderr, pipsmakefile);
-	}
+	ifdebug(8) fprint_makefile(stderr, pipsmakefile);
 
 	debug_off();
     }
 
-    return(pipsmakefile);
+    return pipsmakefile;
 }
 
 
@@ -340,7 +339,8 @@ void add_rule(rule r)
 					     CONS(RULE, r, NIL));
 }
 
-makefile open_makefile(string name)
+makefile 
+open_makefile(string name)
 {
     FILE *fd;
     char * mkf_name;
@@ -365,7 +365,8 @@ makefile open_makefile(string name)
     return (pipsmakefile);
 }
 
-void save_makefile(string name)
+void 
+save_makefile(string name)
 {
     char * mkf_name = build_pgm_makefile(name);
     FILE * fd = safe_fopen(mkf_name, "w");
@@ -375,7 +376,8 @@ void save_makefile(string name)
     free(mkf_name);
 }
 
-bool close_makefile(string name)
+bool 
+close_makefile(string name)
 {
     save_makefile(name);
     free_makefile(pipsmakefile), pipsmakefile = makefile_undefined;
