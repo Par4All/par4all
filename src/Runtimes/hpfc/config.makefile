@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/09/09 17:11:55 $, )
+# ($Date: 1996/09/13 12:50:24 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -124,19 +124,6 @@ CPPFLAGS= -D__USE_FIXED_PROTOTYPES__
 #
 endif
 
-ifdef USE_PVMe
-#
-# PVM 3.2 compatibility
-#
-M4FLAGS += -D PVMDATARAW=PVMRAW \
-	   -D PvmDataRaw=PVMRAW \
-	   -D pvmtaskinfo=taskinfo \
-	   -D pvmhostinfo=hostinfo
-
-M4FLAGS	+= -D SYNC_EXIT
-#
-endif
-
 M4FLAGS += -D PVM_ARCH=$(PVM_ARCH) hpfc_lib_m4_macros
 
 COPY		= cp
@@ -151,7 +138,7 @@ PVM_CONF	= $(PVM_ROOT)/conf
 ifdef USE_PVMe
 #
 # if another PVM is used, I still need PVM 3 m4 macros...
-#
+# IBM puts includes in lib:-(
 PVM_INC		= $(PVM_ROOT)/lib
 PVM_CONF	= $(PVM3_ROOT)/conf
 #
@@ -256,8 +243,8 @@ pvm3.h:	$(PVM_INC)/pvm3.h
 fpvm3.h:$(PVM_INC)/fpvm3.h
 	$(COPY) $< $@
 
-$(PVM_ARCH).m4: $(PVM_CONF)/$(PVM_ARCH).m4
-	$(COPY) $< $@
+$(PVM_ARCH).m4:
+	$(COPY) $(PVM_CONF)/$(PVM_ARCH).m4 $@
 
 #
 
