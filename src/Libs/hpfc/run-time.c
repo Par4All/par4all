@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: run-time.c,v $
+ * Revision 1.42  1997/10/27 16:48:29  coelho
+ * return updated...
+ *
  * Revision 1.41  1997/10/21 13:36:45  coelho
  * guard against already defined routines...
  *
@@ -312,39 +315,88 @@ expr_compute_local_index(
     return(expression_undefined); /* just to avoid a gcc warning */
 }
 
-/******************************************************************************/
+/*****************************************************************************/
 
 /* statement hpfc_make_call_statement(e, l) 
  * generate a call statement to function e, with expression list l 
  * as an argument. 
  */
-statement hpfc_make_call_statement(entity e, list l)
+statement 
+hpfc_make_call_statement(entity e, list l)
 {
     pips_assert("defined", !entity_undefined_p(e));
-
     return make_stmt_of_instr(make_instruction(is_instruction_call,
 					       make_call(e, l)));
 }
 
+/************************************************************** SUBSTITUTION */
 
-void add_pvm_init_and_end(statement *phs, statement *pns)
+static entity 
+    sub_call_o = entity_undefined, 
+    sub_call_n = entity_undefined,
+    sub_ret_label = entity_undefined;
+
+static void rwt(call c)
 {
+    if (call_function(c)==sub_call_o) 
+	call_function(c) = sub_call_n;
+}
+static void srwt(statement s)
+{
+    if (entity_return_label_p(statement_label(s))) {
+	sub_ret_label = statement_label(s);
+	statement_label(s) = entity_empty_label();
+    }
+}
+static void 
+substitute_return(entity o, entity n, statement s)
+{
+    sub_call_o = o;
+    sub_call_n = n;
+
+    gen_multi_recurse(s,
+		      statement_domain, gen_true, srwt,
+		      call_domain, gen_true, rwt,
+		      expression_domain, gen_false, gen_null,
+		      NULL);
+
+    sub_call_n = entity_undefined;
+    sub_call_o = entity_undefined;
+}
+
+/* this is for the main.
+ * also subs CALL RETURN -> CALL HPFC {HOST|NONE} END...
+ */
+void 
+add_pvm_init_and_end(statement *phs, statement *pns)
+{
+    entity
+	rete = entity_intrinsic("RETURN"),
+	hhe = hpfc_name_to_entity(HOST_END),
+	hne = hpfc_name_to_entity(NODE_END);
+    statement ret = hpfc_make_call_statement(rete, NIL);
+
+    substitute_return(rete, hhe, *phs);
+    substitute_return(rete, hne, *pns);
+
+
+    if (sub_ret_label!=entity_undefined) {
+	statement_label(ret) = sub_ret_label;
+	sub_ret_label = entity_undefined;
+    }
+
     (*phs) = make_block_statement(CONS(STATEMENT, st_init_host(),
 				  CONS(STATEMENT, (*phs),
-				  CONS(STATEMENT, st_host_end(),
+				  CONS(STATEMENT, ret,
 				       NIL))));
 
     (*pns) = make_block_statement(CONS(STATEMENT, st_init_node(),
 				  CONS(STATEMENT, (*pns),
-				  CONS(STATEMENT, st_node_end(),
+				  CONS(STATEMENT, copy_statement(ret),
 				       NIL))));
-
 }
 
-/*
- * statement st_compute_neighbour(d)
- *
- * call to the runtime support function HPFC_CMPNEIGHBOUR(d)
+/* call to the runtime support function HPFC_CMPNEIGHBOUR(d)
  */
 statement st_compute_neighbour(int d)
 {
@@ -353,9 +405,7 @@ statement st_compute_neighbour(int d)
 				       NIL));
 }
 
-/* entity make_packing_function(prefix, ndim, kind, base, nargs)
- *
- * find or create an entity for the packing function...
+/* find or create an entity for the packing function...
  */
 static entity make_packing_function(ndim, kind, base, nargs)
 int ndim;
