@@ -1,5 +1,9 @@
 /* Some modifications are made to save the current makefile (s.a. files
  * pipsmake/readmakefile.y pipsmake.h )
+ *
+ * $RCSfile: readmakefile.y,v $ (version $Revision$)
+ * $Date: 1997/01/13 20:54:08 $, 
+ *
  * They only occure between following tags: 
  *
  * Bruno Baron
@@ -248,17 +252,20 @@ makefile parse_makefile()
 
     if (pipsmakefile == makefile_undefined) {
 
-	if (((default_pipsmake_rc_file = getenv("DEFAULT_PIPSMAKE_RC_FILE")) == NULL) ||
-	    ((yyin = fopen(default_pipsmake_rc_file, "r")) == (FILE *) NULL))
-
-	    if ((yyin = fopen(PIPSMAKE_RC, "r")) == (FILE *) NULL)
+	default_pipsmake_rc_file = getenv("PIPS_PIPSMAKERC");
+	if (default_pipsmake_rc_file)
+	    yyin = safe_fopen(default_pipsmake_rc_file, "r");
+	else
+	    if (file_exists_p(PIPSMAKE_RC))
+		yyin = safe_fopen(PIPSMAKE_RC, "r");
+	    else
 		yyin = safe_fopen(DEFAULT_PIPSMAKE_RC, "r");
 
 	init_lex();
 	yyparse();
-	safe_fclose(yyin, "");
+	safe_fclose(yyin, "some pipsmake.rc file");
 
-	if (get_debug_level() >= 8) {
+	ifdebug(8) {
 	    fprint_makefile(stderr, pipsmakefile);
 	}
     }
