@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/09 16:29:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/23 15:36:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/10/09 16:29:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/10/23 15:36:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -184,13 +184,18 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
 
 #define HPFC_COMPILE "Compile an HPF program"
 #define HPFC_MAKE "Make an HPF program"
+#define HPFC_RUN "Run an HPF program"
+
+/* quick fix around pipsmake, FC, 23/10/95
+ */
+static bool hpfc_install_was_performed = FALSE;
 
 void
 hpfc_notify(Menu menu,
             Menu_item menu_item)
 {
     char *label, *modulename;
-   
+
     modulename = db_get_current_module_name();
     if (!modulename)
     {
@@ -199,14 +204,27 @@ hpfc_notify(Menu menu,
     }
 
     label = (char *) xv_get(menu_item, MENU_STRING);
-    if (same_string_p(label, HPFC_COMPILE))
-	(void) safe_apply_outside_the_notifyer(BUILDER_HPFC_INSTALL, modulename);
-    else if (same_string_p(label, HPFC_MAKE))
-	(void) safe_apply_outside_the_notifyer(BUILDER_HPFC_MAKE, modulename);
-    else
-	pips_error("hpfc_notify", "Bad choice");
-}
 
+    /* I apply the installation only once, whatever...
+     * Quick fix because the the right dependences expressed for pipsmake
+     * do not seem to work. It seems that the verification of up to date 
+     * resources is too clever... FC.
+     */
+    if (!hpfc_install_was_performed)
+    {
+	safe_apply_outside_the_notifyer(BUILDER_HPFC_INSTALL, modulename);
+	hpfc_install_was_performed = TRUE;
+    }
+
+    if (same_string_p(label, HPFC_COMPILE))
+	;
+    else if (same_string_p(label, HPFC_MAKE))
+	safe_apply_outside_the_notifyer(BUILDER_HPFC_MAKE, modulename);
+    else if (same_string_p(label, HPFC_RUN))
+	safe_apply_outside_the_notifyer(BUILDER_HPFC_RUN,  modulename);
+    else
+	pips_internal_error("Bad choice: %s", label);
+}
 
 
 void
@@ -218,6 +236,7 @@ create_compile_menu()
                 MENU_TITLE_ITEM, "Compilation ",
                 MENU_ACTION_ITEM, HPFC_COMPILE, hpfc_notify,
 		MENU_ACTION_ITEM, HPFC_MAKE, hpfc_notify,
+		MENU_ACTION_ITEM, HPFC_RUN, hpfc_notify,
                 /*
                 MENU_ACTION_ITEM, "Display an HPF program", display_hpfc_file,
                 */
