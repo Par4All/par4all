@@ -58,6 +58,10 @@ use_def_true_filter(statement s)
    statement for build_statement_to_statement_father_mapping(): */
 DEFINE_LOCAL_STACK(current_statement, statement)
 
+void use_def_elimination_error_handler()
+{
+    error_reset_current_statement_stack();
+}
 
 /* Define the mapping to store the statement owning the statements and the
    functions used to deal with: */
