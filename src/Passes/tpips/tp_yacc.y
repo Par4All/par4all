@@ -144,7 +144,7 @@ i_open:
 		    
 		    if (!string_undefined_p(main_module_name)) {
 			/* Ok, we got it ! Now we select it: */
-			user_log("Main module PROGRAM \"%s\" found.\n",
+			user_log("Main module PROGRAM \"%s\" selected.\n",
 				 main_module_name);
 			lazy_open_module(main_module_name);
 		    }
@@ -173,8 +173,8 @@ i_create:
 	    
 	    if (execution_mode) {
 		if (workspace_exists_p($<name>4))
-		    user_error ("yyparse",
-				"the workspace %s exists\n",
+		    user_error ("create",
+				"Workspace %s already exists. Delete it!\n",
 				$<name>4);
 		else {
 		    db_create_workspace ((string) $<name>4);
@@ -183,13 +183,14 @@ i_create:
 			string wname = db_get_current_workspace_name();
 			db_close_workspace();
 			delete_workspace(wname);
-			user_error("tpips", "could not create workspace %s\n", wname);
+			user_error("create",
+				   "Could not create workspace %s\n", wname);
 		    }
 		    main_module_name = get_first_main_module();
 		    
 		    if (!string_undefined_p(main_module_name)) {
 			/* Ok, we got it ! Now we select it: */
-			user_log("Main module PROGRAM \"%s\" found.\n",
+			user_log("Main module PROGRAM \"%s\" selected.\n",
 				 main_module_name);
 			lazy_open_module(main_module_name);
 		    }
@@ -214,8 +215,10 @@ i_close:
 		if (db_get_current_workspace_name() != NULL) {
 		    close_workspace ();
 		    $$ = TRUE;
-		} else {
-		    user_error ("yyparse","No workspace to close\n");
+		}
+		else {
+		    user_error ("close",
+				"No workspace to close. Open or create one!\n");
 		    $$ = FALSE;
 		}	
 		$$ = TRUE;
@@ -236,7 +239,9 @@ i_delete:
 	    if (execution_mode) {
 		string wname = db_get_current_workspace_name();
 		if ((wname != NULL) && same_string_p(wname, t)) {
-		    user_error ("yyparse","Workspace opened\n");
+		    user_error ("delete",
+				"Close before delete: Workspace %s is open\n",
+				wname);
 		    $$ = FALSE;
 		} else {
 		    if(delete_workspace (t)) {
@@ -246,7 +251,7 @@ i_delete:
 			$$ = TRUE;
 		    }
 		    else {
-			user_error("yyparse",
+			user_error("delete",
 				   "Could not delete workspace %s\n", t);
 		    }
 		}
@@ -269,7 +274,8 @@ i_module:
 		    lazy_open_module (strupper(t,t));
 		    $$ = TRUE;
 		} else {
-		    user_error ("yyparse", "No workspace opened\n");
+		    user_error ("module",
+				"No workspace open. Open or create one!\n");
 		    $$ = FALSE;
 		}
 	    }
@@ -312,7 +318,7 @@ i_apply:
 	    debug(7,"yyparse","reduce rule i_apply\n");
 
 	    if(db_get_current_workspace()==database_undefined) {
-		user_error("tp_parse", "Open or create a workspace first!\n");
+		user_error("apply", "Open or create a workspace first!\n");
 	    }
 
 	    if (execution_mode) {
@@ -339,7 +345,7 @@ i_display:
 	    debug(7,"yyparse","reduce rule i_display\n");
 
 	    if(db_get_current_workspace()==database_undefined) {
-		user_error("tp_parse", "Open or create a workspace first!\n");
+		user_error("display", "Open or create a workspace first!\n");
 	    }
 
 	    if (execution_mode) {
@@ -354,7 +360,7 @@ i_display:
 		    lazy_open_module (STRING(CAR(e)));
 		    file = build_view_file($3.the_name);
 		    if (file == NULL)
-			user_error("yyparse",
+			user_error("display",
 				   "Cannot build view file %s\n",
 				   $3.the_name);
 		    
@@ -379,7 +385,7 @@ i_activate:
 	    debug(7,"yyparse","reduce rule i_activate\n");
 
 	    if(db_get_current_workspace()==database_undefined) {
-		user_error("tp_parse", "Open or create a workspace first!\n");
+		user_error("activate", "Open or create a workspace first!\n");
 	    }
 
 	    if (execution_mode) {
@@ -441,7 +447,7 @@ i_set:
 		{
 		    char *q = strrchr(yylval.name, '"');
 		    if (!q)
-			user_error("yyparse",
+			user_error("set",
 				   "Did not find a quote in the string\n");
 		    *q = '\0';
 		    set_string_property($<name>4, yylval.name + 1);
