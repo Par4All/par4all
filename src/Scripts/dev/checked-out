@@ -1,17 +1,19 @@
 #!/bin/sh
 # 
 # $RCSfile: checked-out,v $ (version $Revision$)
-# $Date: 1995/09/25 18:38:46 $, 
+# $Date: 1995/10/04 15:54:56 $, 
 
 USERNAME=$1
 # echo $USERNAME
 
 if [ -z "$USERNAME" ]
 then
+	find $PIPS_DOCDIR -name 'p.*' -ls 
 	find $PIPS_DEVEDIR -name 'p.*' -ls 
 	find $LINEAR_DIR/Development -name 'p.*' -ls
 	find $NEWGEN_DIR -name 'p.*' -ls 
 else
+	find $PIPS_DOCDIR -name 'p.*' -ls | grep "$USERNAME"
 	find $PIPS_DEVEDIR -name 'p.*' -ls | grep "$USERNAME"
 	find $LINEAR_DIR/Development -name 'p.*' -ls | grep "$USERNAME"
 	find $NEWGEN_DIR -name 'p.*' -ls | grep "$USERNAME"
