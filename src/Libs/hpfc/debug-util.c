@@ -176,27 +176,6 @@ void print_distributed_arrays()
     gen_map(print_entity_variable, list_of_distributed_arrays());
 }
 
-
-void print_alignsrc(as)
-alignsrc as;
-{
-    switch(alignsrc_tag(as))
-    {
-    case is_alignsrc_star:
-	fprintf(stderr,"alignsrc is *\n");
-	break;
-    case is_alignsrc_colon:
-	fprintf(stderr,"alignsrc is :\n");
-	break;
-    case is_alignsrc_dummy:
-	fprintf(stderr,"alignsrc is %s\n",alignsrc_dummy(as));
-	break;
-    default:
-	pips_error("print_alignsrc","unexpected aligsrc tag\n");
-	break;
-    }
-}
-
 /*
  * for debug purposes:-)
  */
@@ -348,3 +327,5 @@ list l;
 	     l);
 }
 
+/*  that's all
+ */
