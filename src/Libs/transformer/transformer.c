@@ -110,17 +110,30 @@ transformer_combine(
     if (sc_base(r1)) {
 	MAP(ENTITY, e_temp,
 	{
-	    sc_and_base_projection_along_variable_ofl_ctrl
-		(&r1, (Variable) e_temp, NO_OFL_CTRL);
-	    if (! sc_empty_p(r1)) {
-		Pbase b = base_dup(sc_base(r1));
-		
-		r1 = sc_normalize(r1);
-		if(SC_EMPTY_P(r1)) {
-		    r1 = sc_empty(b);
+	    if (sc_expensive_projection_p(r1,(Variable) e_temp)) {
+		ifdebug(9) {
+		    pips_debug(9, "expensive projection on %s with\n",
+			       entity_local_name(e_temp));
+		    sc_fprint(stderr, r1,entity_local_name);
 		}
-		else
-		    base_rm(b);
+		sc_elim_var(r1,(Variable) e_temp);
+		sc_base_remove_variable(r1,(Variable) e_temp);
+		ifdebug(9) {
+		    pips_debug(9, "simplified tranformer\n");
+		    sc_fprint(stderr, r1,entity_local_name);
+		}
+	    }
+	    else {
+		sc_and_base_projection_along_variable_ofl_ctrl
+		    (&r1, (Variable) e_temp, NO_OFL_CTRL);
+		if (! sc_empty_p(r1)) {
+		    Pbase b = base_dup(sc_base(r1));
+		    r1 = sc_normalize(r1);
+		    if(SC_EMPTY_P(r1)) 
+			r1 = sc_empty(b);
+		    else
+			base_rm(b);
+		}
 	    }
 	},
 	    ints);
