@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/04/26 17:17:27 $, 
+ * $Date: 1995/05/17 12:26:02 $, 
  *
  * interactive interface to hpfc, based on the GNU realine library.
  */
@@ -9,6 +9,7 @@
 
 extern int system();
 extern int fprintf();
+extern int chdir();
 extern char *getenv();
 extern int malloc();
 extern void free();
@@ -20,7 +21,13 @@ extern void free();
 #define HPFC_PREFIX "hpfc"
 #define HIST ".hpfc.history"
 
-#define QUIT "qui"
+#define SHELL_ESCAPE "! "
+#define CHANGE_DIR   "cd "
+#define QUIT         "quit"
+
+/* the lexer is quite simple:-)
+ */
+#define PREFIX_EQUAL_P(str, prf) (strncmp(str, prf, strlen(prf))==0)
 
 /*  returns the full hpfc history file name, i.e.
  *  - $HPFC_HISTORY (if any)
@@ -28,9 +35,7 @@ extern void free();
  */
 static char *default_hist_file_name()
 {
-    char 
-	*hist = getenv("HPFC_HISTORY"),
-	*home;
+    char *home, *hist = getenv("HPFC_HISTORY");
 
     if (hist) return(hist);
 
@@ -45,11 +50,7 @@ static char *default_hist_file_name()
  */
 int main()
 {
-    char 
-	*file_name = default_hist_file_name(),
-	*shll = NULL,
-	*last = NULL,
-	*line = NULL;
+    char *last = NULL, *line = NULL, *file_name = default_hist_file_name();
     
     /*  initialize history
      */
@@ -60,24 +61,37 @@ int main()
      */
     while ((line=readline(HPFC_PROMPT)))
     {
-	if (strncmp(line, QUIT, strlen(QUIT))==0) /* quit! */
+	if (PREFIX_EQUAL_P(line, QUIT)) 
 	    break;
+	else if (PREFIX_EQUAL_P(line, CHANGE_DIR))
+	{
+	    if (chdir(line+strlen(CHANGE_DIR)))
+		fprintf(stderr, "error while changing directory\n");
+	}
+	else if (PREFIX_EQUAL_P(line, SHELL_ESCAPE))
+	{
+	    /*   the shell escape is directly executed. That easy!
+	     */
+	    system(line+strlen(SHELL_ESCAPE));
+	}
+	else
+	{
+	    /*   calls a script:-)
+	     *   All this stuff could be taken care of in the C, but shell
+	     *   scripts are much easier to develop:-) 
+	     */
+	    char *shll = (char*)
+		malloc(sizeof(char)*(strlen(HPFC_PREFIX)+strlen(line)+2));
 
-	/*   calls a script:-)
-	 *   All this stuff could be taken care of in the C, but shell
-	 *   scripts are much easier to develop. 
-	 */
-	shll = (char*) 
-	    malloc(sizeof(char)*(strlen(HPFC_PREFIX)+strlen(line)+2));
+	    system(sprintf(shll, "%s %s", HPFC_PREFIX, line));
 
-	system(sprintf(shll, "%s %s", HPFC_PREFIX, line));
-
-	free(shll), shll = NULL;
+	    free(shll);
+	}
 
 	/*   add to history if not the same as the last one (in this session)
 	 */
 	if ((last && line && strcmp(last, line)!=0) || (line && !last))
-	    add_history(line),  last = line; 
+	    add_history(line), last = line; 
 	else
 	    free(line), line = NULL;
 	    
