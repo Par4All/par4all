@@ -1,5 +1,5 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/08/30 17:07:27 $, 
+ * $Date: 1996/08/30 17:12:40 $, 
  */
 
 #include <stdlib.h>
@@ -133,12 +133,12 @@ static char * path_of(char * binary)
 	 *pipsr = getenv(PIPS_ROOT),
 	 *pipsa = getenv(PIPS_ARCH);
 
+    /* checks for no "name" buffer overflow
+     */
     len = (xpomp? strlen(xpomp): 
 	   pipsr? strlen(pipsr)+strlen(XPOMP_DIR): 0) +
 	  (pipsa? strlen(pipsa): 0) + strlen(binary) + 4;
 
-    /* checks for no "name" buffer overflow
-     */
     if (len>NAME_MAX_LENGTH) 
     {
 	fprintf(stderr, "[path_of] %s path name length too large (%l)\n",
