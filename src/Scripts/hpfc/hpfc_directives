@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1996/06/10 18:59:03 $, 
+# $Date: 1996/06/11 21:42:54 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -294,7 +294,7 @@ LINE=`$SED -n '
      /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\/]/=
      /^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Rr][Ee][Aa][Ll][ 	\*]/=
-     /^[^Cc\*!].... [ 	]*[Ss][Tt][Rr][Ii][Nn][Gg][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Cc][Hh][Aa][Rr][Aa][Cc][Tt][Ee][Rr][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 |
