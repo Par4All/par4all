@@ -13,10 +13,19 @@
  * be changed to "int" "long" or "long long". In an ideal world,
  * any source modification should be limited to this package.
  */
-#ifdef LONGLONG_VALUE
+
+#include <limits.h>
+
+#ifdef VALUE_IS_LONGLONG
 typedef long long Value;
+#define VALUE_CONST(val) val##LL
+#define VALUE_MIN LONG_LONG_MIN
+#define VALUE_MAX LONG_LONG_MAX
 #else
 typedef long Value;
+#define VALUE_CONST(val) val##L
+#define VALUE_MIN LONG_MIN
+#define VALUE_MAX LONG_MAX
 #endif
 
 /* valeur absolue */
