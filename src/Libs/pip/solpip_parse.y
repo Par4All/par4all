@@ -91,7 +91,7 @@ quast_sol          : LPAR LPAR commentaire RPAR
 
 commentaire       : 
 		   |
-		    TEXTE
+		    TEXTE {}
                   |  
 		    commentaire TEXTE
 		  |
@@ -166,7 +166,7 @@ vecteur           : DIES LCRO
 		   }
                   ;
          
-liste_coefficient : coefficient              
+liste_coefficient : coefficient             {} 
                   | liste_coefficient coefficient 
                   ;
 
@@ -197,14 +197,14 @@ coefficient2      : MOINS_OP ENTIER
                    {
 		   ecrit_coeff_neg2 ( $2 );
                    }
-                  | ENTIER
+                  | ENTIER {}
                   ;
 
 vecteur1          : DIES LCRO 
 		   {
 		   creer_Psysteme();
 		   }
-		    liste_coefficient1 RCRO
+		    liste_coefficient1 RCRO 
                   ;
 
 liste_coefficient1: coefficient1
