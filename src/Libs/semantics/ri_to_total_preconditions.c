@@ -38,6 +38,9 @@
   * $Id$
   *
   * $Log: ri_to_total_preconditions.c,v $
+  * Revision 1.3  2003/07/24 10:55:56  irigoin
+  * Intermediate version, starting to take unstructured into consideration.
+  *
   * Revision 1.2  2001/12/05 17:18:10  irigoin
   * Currently being developped. Installed because necessary for Nga and pipsmake.
   *
@@ -141,17 +144,17 @@ unstructured_to_total_precondition(
        Preconditions associated to its components are then computed
        independently, hence the name unstructured_to_total_preconditionS
        instead of unstructured_to_total_precondition */
-    /* propagate as precondition an invariant for the whole
-       unstructured u assuming that all nodes in the CFG are fully
-       connected, unless tf is not feasible because the unstructured
-       is never exited or exited thru a call to STOP which invalidates
-       the previous assumption. */
+    /* propagate as precondition an invariant for the whole unstructured u
+       assuming that all nodes in the CFG are fully connected, unless tf
+       is not feasible because the unstructured is never exited or exited
+       thru a direct or indirect call to STOP which invalidates the
+       previous assumption. */
     transformer tf_u = transformer_undefined;
     transformer pre_u = transformer_undefined;
 
     pips_debug(8, "complex: based on transformer\n");
     if(transformer_empty_p(tf)) {
-      tf_u = unstructured_to_global_transformer(u);
+      tf_u = unstructured_to_flow_insensitive_transformer(u);
     }
     else {
       tf_u = tf;
@@ -162,7 +165,7 @@ unstructured_to_total_precondition(
 	    "filtered precondition pre_u:\n");
       (void) print_transformer(pre_u) ;
     }
-    post = unstructured_to_accurate_total_preconditions(pre_u, pre, u);
+    post = unstructured_to_flow_sensitive_total_preconditions(pre_u, pre, u);
     pips_assert("A valid total_precondition is returned",
 		!transformer_undefined_p(post));
     if(transformer_undefined_p(post)) {
