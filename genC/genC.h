@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1994/12/30 10:30:34 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1994/12/30 13:58:45 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -40,8 +40,8 @@
  *  gen_chunks) 
  */
 
-#define GEN_HEADER 1
-#define GEN_HEADER_SIZE (sizeof(gen_chunk)*HEADER)
+#define GEN_HEADER (1)
+#define GEN_HEADER_SIZE (sizeof(gen_chunk)*GEN_HEADER)
 
 /* A gen_chunk is used to store every object. It has to be able to store,
  * at least, a (CHUNK *) and every inlinable value. To use a union is a
@@ -64,10 +64,15 @@ typedef union gen_chunk {
 	set t ;
 	hash_table h ;
 	union gen_chunk *p ;
-} gen_chunk, *gen_chunkp;
+} gen_chunk, chunk /* obsolete */;
 
 #define gen_chunk_undefined ((gen_chunk *)(-16))
 #define gen_chunk_undefined_p(c) ((c)==gen_chunk_undefined)
+
+/* obsolete
+ */
+#define chunk_undefined gen_chunk_undefined 
+#define chunk_undefined_p(c) gen_chunk_undefined_p(c)
 
 #define UNIT(x) "You don't want to take the value of a unit type, do you !"
 #define BOOL(x) ((x).b)
@@ -99,7 +104,7 @@ extern struct gen_binding Domains[], *Tabulated_bp ;
 
 /* The root of the gen_chunk read with READ_CHUNK. */
 
-extern gen_chunk *Read_gen_chunk ;
+extern gen_chunk *Read_chunk ;
 
 /* Function interface for user applications. */
 
@@ -171,7 +176,7 @@ extern void gen_recurse GEN_PROTO((gen_chunk *,
 #define GEN_CHECK_ALLOC 0
 #endif
 
-#include "newgen_generic-mapping.h"
+#include "newgen_generic_mapping.h"
 #include "newgen_generic_stack.h"
 #include "newgen_map.h"
 
