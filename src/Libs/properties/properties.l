@@ -78,14 +78,14 @@ void parse_properties_string(char *s)
 %}
 
 %%
-TRUE                    {return(TTRUE);}
-FALSE			{return(TFALSE);}
-[0-9]+       		{return(TNUMB);}
-[-_a-zA-Z][-_a-zA-Z0-9]* {return(TIDENT);}
-\"[^\"]*\"		{/*"*/return(TSTRING);}
-^[ \t]*#.*$		{/* comments are skipped. */}
-[ \t\n]*		{/* blanks are skipped. */}
-=			{/* ignore an = */}
+TRUE                    { return(TTRUE); }
+FALSE			{ return(TFALSE); }
+[0-9]+       		{ return(TNUMB); }
+[-_a-zA-Z][-_a-zA-Z0-9]* { return(TIDENT); }
+\"[^\"]*\"		{ /*"*/return(TSTRING); }
+^[ \t]*#.*$		{ /* comments are skipped. */ }
+[ \t\n]*		{ /* blanks are skipped. */ }
+=			{ /* ignore an = */ }
 .                       { fprintf(stderr, "skipping unexpected char %c (%d)\n",
 				  *yytext, *yytext);
 			}
@@ -120,6 +120,16 @@ property_equal_p(property p1, property p2)
     return equal_p;
 }
 
+static string property_tag_to_string(tag t)
+{
+    switch (t) {
+    case is_property_int: return "int";
+    case is_property_bool: return "bool";
+    case is_property_string: return "string";
+    default: return "UNKNOW property type";
+    } 
+}
+
 static property get_property(string, bool);
 
 static void 
@@ -130,7 +140,8 @@ parse_properties(void)
     
     if (!pl) pl = hash_table_make(hash_string, 0); /* lazy init */
 
-    while ((tok = yylex())) {
+    while ((tok = yylex())) 
+    {
 	string n;
 	
 	if (tok != TIDENT) {
@@ -147,7 +158,8 @@ parse_properties(void)
 	    return;
 	}
 
-	switch (tok = yylex()) {
+	switch (tok = yylex()) 
+	{
 	  case TTRUE:
 	    pr = make_property(is_property_bool, TRUE);
 	    break;
@@ -178,11 +190,26 @@ parse_properties(void)
 	}
 
 	if ((opr = (property) hash_get(pl, n)) != 
-            (property) HASH_UNDEFINED_VALUE) {
-            if(!property_equal_p(pr, opr))
-                fprintf(stderr, "user warning, property %s redefined\n", n);
-            free_property(opr);
-            hash_update(pl, n, (char *) pr); 
+            (property) HASH_UNDEFINED_VALUE) 
+	{
+	    if (property_tag(opr)!=property_tag(pr))
+	    {
+		fprintf(stderr, "user warning, "
+			"cannot change type from %s to %s "
+			"when updating property %s\n",
+			property_tag_to_string(property_tag(pr)),
+			property_tag_to_string(property_tag(opr)),
+			n);
+		free_property(pr);
+	    }
+	    else 
+	    {
+		if(!property_equal_p(pr, opr))
+		    fprintf(stderr, "user warning, "
+			    "property %s redefined\n", n);
+		free_property(opr);
+		hash_update(pl, n, (char *) pr);
+	    }
         }
         else
 	    hash_put(pl, n, (char *) pr);
