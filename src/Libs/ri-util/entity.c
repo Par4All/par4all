@@ -21,7 +21,8 @@ make_empty_module(
      */
     if (e!=entity_undefined)
     {
-	user_warning("module %s already exists, returning it\n", full_name);
+	pips_user_warning("module %s already exists, returning it\n", 
+			  full_name);
 	return e;
     }
 
