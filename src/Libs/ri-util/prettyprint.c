@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.132  1999/05/31 15:54:12  ancourt
+ * remove io entities in io_block after restructuration
+ *
  * Revision 1.131  1999/05/07 12:33:39  ancourt
  * remove label on tests
  *
@@ -235,7 +238,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.131 1999/05/07 12:33:39 ancourt Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.132 1999/05/31 15:54:12 ancourt Exp $";
 #endif /* lint */
 
  /*
@@ -1878,25 +1881,32 @@ text_io_block_if(
     text r = make_text(NIL);
     list pc = NIL;
     string strglab= local_name(new_label_name(module))+1;
- 
-    pips_assert("empty else in io block IF", empty_statement_p(test_false(obj)));
-   r = make_text(CONS(SENTENCE, 
-			   sentence_goto_label(module, label, margin,
-					 strglab, n), 
-			   NIL));
+
+    if (!empty_statement_p(test_true(obj))) {
+      
+      r = make_text(CONS(SENTENCE, 
+			 sentence_goto_label(module, label, margin,
+					     strglab, n), 
+			 NIL));
+      
+      ADD_SENTENCE_TO_TEXT(r, 
+			   make_sentence(is_sentence_unformatted, 
+					 make_unformatted(strdup(label), n, 
+							  margin, pc)));
+      MERGE_TEXTS(r, text_statement(module, margin, 
+				    test_true(obj)));
+      
+      
+      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, 
+					    make_unformatted(strdup(strglab), n, margin, 
+							     CONS(STRING, 
+								  strdup("CONTINUE"), NIL))));
+    } 
     
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_unformatted, 
-				       make_unformatted(strdup(label), n, 
-							margin, pc)));
-    MERGE_TEXTS(r, text_statement(module, margin, 
-				  test_true(obj)));
-
- 
-    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, 
-					  make_unformatted(strdup(strglab), n, margin, 
-							   CONS(STRING, strdup("CONTINUE"), NIL))));
-
+    if (!empty_statement_p(test_false(obj))) 
+      MERGE_TEXTS(r, text_statement(module, margin, 
+				    test_false(obj)));
+    
     return(r);
 }
 
@@ -2031,12 +2041,12 @@ text_test(
     else {   
 	syntax c = expression_syntax(test_condition(obj));
 	
-	if (syntax_reference_p(c) 
+	if (syntax_reference_p(c)  
 	    && io_entity_p(reference_variable(syntax_reference(c)))
-		&&  !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS"))
-	    r = text_io_block_if(module, label, margin, obj, n);
+	    &&  !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS"))
+	  r = text_io_block_if(module, label, margin, obj, n);
 	else 
-	    r = text_block_if(module, label, margin, obj, n);
+	  r = text_block_if(module, label, margin, obj, n);
     }
     
     return r;
