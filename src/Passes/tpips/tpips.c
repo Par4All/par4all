@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.87  1997/12/15 13:50:01  coelho
+ * does not substitute shell and comments...
+ *
  * Revision 1.86  1997/12/12 17:35:07  coelho
  * cleaner...
  *
@@ -106,8 +109,13 @@ extern void tp_restart( FILE * ); /* tp_lex.c */
   "  It includes software from GNU (readline, rx) and Berkeley (fsplit).\n\n"
 
 #define SEPARATOR_P(c) (index (" \t", c))
-#define PREFIX_EQUAL_P(str, prf) (strncmp(str, prf, strlen(prf))==0)
 
+static bool 
+prefix_equal_p(string str, string prf)
+{
+    skip_blanks(str);
+    return !strncmp(str, prf, strlen(prf));
+}
 
 /********************************************************** TPIPS COMPLETION */
 
@@ -241,7 +249,7 @@ param_generator(char *texte, int state)
 	/* We scan the array of function to find
 	   the used function */
 	while ((cs->fun_name) &&
-	       !PREFIX_EQUAL_P(rl_line_buffer, cs->fun_name))
+	       !prefix_equal_p(rl_line_buffer, cs->fun_name))
 	{
 	    cs++;
 	    
@@ -495,7 +503,7 @@ initialize_tpips_history(void)
 /* Handlers
  */
 #define TP_HELP(prefix, simple, full)		\
-  if (!*line || PREFIX_EQUAL_P(line, prefix)) {	\
+  if (!*line || prefix_equal_p(line, prefix)) {	\
       printf(simple); if (*line) printf(full);}
 
 void 
@@ -585,8 +593,8 @@ tpips_help(string line)
     TP_HELP("*", "* default rule...\n",
 	    "\tan implicit \"shell\" is assumed.\n");
 
-    if (!*line || PREFIX_EQUAL_P(line,"rulename") ||
-	PREFIX_EQUAL_P(line,"rule")) {
+    if (!*line || prefix_equal_p(line,"rulename") ||
+	prefix_equal_p(line,"rule")) {
 	printf("* rulename : variable*\n");
 	if (*line) {
 	    char ** ps = tp_phase_names;
@@ -618,8 +626,8 @@ tpips_help(string line)
 	    }
 	}
     }
-    if (!*line || PREFIX_EQUAL_P(line,"resourcename") ||
-	PREFIX_EQUAL_P(line,"resource")) {
+    if (!*line || prefix_equal_p(line,"resourcename") ||
+	prefix_equal_p(line,"resource")) {
 	printf("* resourcename : variable*\n");
 	if (*line) {
 	    char ** ps = tp_resource_names;
@@ -721,7 +729,10 @@ tp_substitutions(string line)
 {
     string substituted;
 
-    if (line_with_substitutions(line))
+    /* shell and comments are not substituted...
+     */
+    if (!prefix_equal_p(line, "shell") && !prefix_equal_p(line, "!")
+	&& !prefix_equal_p(line, "#") && line_with_substitutions(line))
     {
 	substituted = safe_system_substitute(line);
 	if (!substituted)
