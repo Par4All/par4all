@@ -1,7 +1,7 @@
 /* $RCSfile: tpips-local.h,v $ (version $Revision$)
- * $Date: 1996/08/08 17:13:02 $, 
+ * $Date: 1996/12/30 17:52:47 $, 
  */
-#define FILE_LIST_MAX_LENGTH 10
+#define FILE_LIST_MAX_LENGTH 200
 
 typedef struct _t_file_list {
 	int argc;
