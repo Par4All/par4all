@@ -1,7 +1,7 @@
 c
 c COMMON /HPFC_PARAM/
 c
-c $RCSfile: hpfc_param.h,v $ ($Date: 1994/04/11 10:23:54 $, )
+c $RCSfile: hpfc_param.h,v $ ($Date: 1994/09/21 17:23:04 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
