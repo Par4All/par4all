@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1996/03/11 17:46:21 $, ) 
+ * ($Date: 1996/03/11 18:42:56 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -362,22 +362,6 @@ mylid_ne_lid(entity lid)
 }
 
 /* to be generated:
- * 
- *   IF (MYLID.NE.LID)
- *   THEN true
- *   ELSE false
- *   ENDIF
- */
-static statement
-if_different_pe(
-    entity lid,      /* process local id variable */
-    statement true,  /* then statement */
-    statement false) /* else statement */
-{
-    return test_to_statement(make_test(mylid_ne_lid(lid), true, false));
-}
-
-/* to be generated:
  * IF (MYLID.NE.LID[.AND.NOT.HPFC_TWIN_P(an, LID)])
  * THEN true 
  * ELSE false
@@ -407,8 +391,6 @@ if_different_pe_and_not_twin(
 
     return test_to_statement(make_test(cond, true, false));
 }
-    
-
 
 /* builds the diffusion loop.
  *
@@ -421,6 +403,7 @@ if_different_pe_and_not_twin(
  */
 static statement 
 broadcast(
+    entity src,			/* source array */
     entity lid,                 /* variable to store the target local id */
     entity proc,                /* target processors for the broadcast */
     Psysteme sr,                /* broadcast polyhedron */
@@ -432,8 +415,8 @@ broadcast(
     cmp_lid = hpfc_compute_lid(lid, proc, get_ith_processor_prime, NULL);
     body = make_block_statement
 	(CONS(STATEMENT, cmp_lid,
-	 CONS(STATEMENT, if_different_pe
-	      (lid, hpfc_generate_message(lid, TRUE, FALSE),
+	 CONS(STATEMENT, if_different_pe_and_not_twin
+	      (src, lid, hpfc_generate_message(lid, TRUE, FALSE),
 	       make_empty_statement()),
 	      NIL)));
 
@@ -554,7 +537,7 @@ gen(int what,
 
     case BRD+PST:
     case BRD+PST+LZY:
-	ret(broadcast(lid, proc, sr, ldiff, is_lazy));
+	ret(broadcast(src, lid, proc, sr, ldiff, is_lazy));
 
     case SND+PST+BUF:
     case SND+PST+LZY+BUF:
@@ -715,7 +698,8 @@ generate_remapping_code(
 	send = processor_loop
 	    (procs, l, lp, p_src, p_trg, lid, NULL,
 	     get_ith_processor_dummy, get_ith_processor_prime,
-	     if_different_pe(lid, rp_send, make_empty_statement()), FALSE);
+	     if_different_pe_and_not_twin(src, lid, rp_send, 
+					  make_empty_statement()), FALSE);
     }
     else
     {
