@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/01/13 21:29:23 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/01/14 08:37:30 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -266,9 +266,10 @@ then
     valid_option="$valid_option -p $PIPS_PIPSMAKERC"
     warning="$PIPS_PIPSMAKERC used! $warning"
 else
-    test -f ./pipsmake.rc && 
+    test -f ./pipsmake.rc && {
 	valid_option="$valid_option -m $PWD/pipsmake.rc"
 	warning="./pipsmake.rc used! $warning"
+    }
 fi
 
 
