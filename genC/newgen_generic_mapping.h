@@ -27,7 +27,7 @@
  *
  * FC, Feb 21, 1994
  *
- * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1995/10/12 18:32:33 $, )
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1995/10/13 17:13:15 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -38,6 +38,9 @@
 /* PIPS level:
  *
  * GENERIC_MAPPING(PREFIX, name, result, type)
+ *
+ * This macros are obsolete. Declare the mappings in newgen instead,
+ * and use the generic functions!
  *
  * name: name of the mapping
  * result: type of the result
@@ -51,7 +54,7 @@
  */
 #define GENERIC_MAPPING(PREFIX, name, result, type)\
 static type##_mapping name##_map = hash_table_undefined;\
-PREFIX bool name##_undefined_p()\
+PREFIX bool name##_map_undefined_p()\
 { return name##_map == hash_table_undefined;}\
 PREFIX void set_##name##_map(m) type##_mapping m;\
 { assert(name##_map == hash_table_undefined); name##_map = m;}\
@@ -71,7 +74,7 @@ PREFIX bool type##_##name##_undefined_p(s) type s;\
 { return(load_##type##_##name(s)==result##_undefined);}\
 PREFIX void store_##type##_##name(s,t) type s; result t;\
 { assert(s != type##_undefined && t != result##_undefined);\
-  hash_put((hash_table) (name##_map), (char *)(s), (char *)(t));}
+  hash_put((hash_table) name##_map, (char*) s, (char*) t);}
 
 #define GENERIC_CURRENT_MAPPING(name, result, type) \
         GENERIC_MAPPING(/**/, name, result, type)
@@ -83,11 +86,11 @@ PREFIX void store_##type##_##name(s,t) type s; result t;\
 #define GENERIC_LOCAL_MAPPING(name, result, type) \
         GENERIC_MAPPING(static, name, result, type)\
 static int name##_hack_to_avoid_warnings()\
-{ return((int) set_##name##_map & (int) get_##name##_map &\
+{ return (int) set_##name##_map & (int) get_##name##_map &\
 	 (int) reset_##name##_map & (int) free_##name##_map &\
 	 (int) make_##name##_map & (int) load_##type##_##name &\
 	 (int) type##_##name##_undefined_p & (int) store_##type##_##name &\
-	 (int) name##_hack_to_avoid_warnings);}
+	 (int) name##_hack_to_avoid_warnings & (int) name##_map_undefined_p;}
 
 /* end GENERIC_MAPPING_INCLUDED */
 #endif
