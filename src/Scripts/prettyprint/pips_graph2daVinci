@@ -10,7 +10,7 @@
 # Ronan.Keryell@cri.ensmp.fr, 5/09/1995.
 
 # Load perl according to the $PATH:
-eval "type perl | grep 'perl is' > /dev/null && exec perl -S $0 $* || echo Warning: Perl not found and thus $0 is not run! 1>&2; exit 0"
+eval "type perl > /dev/null && exec perl -S $0 $* || echo Warning: Perl not found and thus $0 is not run! 1>&2; exit 0"
     if $running_under_some_shell;
 
 $statement_number = 0;
