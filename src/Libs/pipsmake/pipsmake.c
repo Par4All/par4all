@@ -1,5 +1,5 @@
 /* $RCSfile: pipsmake.c,v $ (version $Revision$)
- * $Date: 1997/09/25 08:53:05 $, 
+ * $Date: 1997/09/25 14:16:15 $, 
  * pipsmake: call by need (make),
  *
  * rule selection (activate),
@@ -889,7 +889,7 @@ get_first_main_module(void)
 	pips_internal_error("unable to make a temporary file\n");
 
     system(concatenate
-	   ("sed -n 's, ,,g;s,	,,g;s,[pP][rR][oO][gG][rR][aA][mM]"
+	   ("sed -n 's, ,,g;s,	,,g;s,^[pP][rR][oO][gG][rR][aA][mM]"
 	    "\\([0-9a-zA-Z\\-_]*\\).*$,\\1,p' ",
 	    db_get_current_workspace_directory(),
 	    "/*.f > ", /**/ tmp_file_name, 0));
