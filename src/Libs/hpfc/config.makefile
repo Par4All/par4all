@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$,
-# ($Date: 1995/08/04 13:14:26 $, )
+# ($Date: 1995/08/09 11:35:10 $, )
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
@@ -44,6 +44,11 @@ LIB_HEADERS=	warning.h \
 		hpfc-local.h \
 		defines-local.h \
 		access_description.h 
+
+#
+# to get nice headers. to be put in the pips common environment?
+
+CPPFLAGS+=	-D__USE_FIXED_PROTOTYPES__
 
 # should be automatically derived ?
 # headers made by some rule (except $INC_TARGET)
