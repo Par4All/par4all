@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.30  2003/06/13 13:59:55  coelho
+ * hop.
+ *
  * Revision 1.29  2000/07/27 15:01:55  coelho
  * hop.
  *
@@ -68,7 +71,8 @@ const unsigned int any_exception_error = ~0;
 #define __CURRENT_FUNCTION_NAME__ "<unknown>"
 #endif
 
-#define EXCEPTION extern const unsigned int
+/* 'const' out because of cproto 4.6. FC 13/06/2003 */
+#define EXCEPTION extern unsigned int
 
 #define THROW(what) \
    (throw_exception(what, __CURRENT_FUNCTION_NAME__, __FILE__, __LINE__))
