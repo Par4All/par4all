@@ -301,9 +301,18 @@ i_make:
 		    NULL : strdup(db_get_current_module_name());
 
 		MAPL(e, {
-		    if (safe_make ($3.the_name, STRING(CAR(e))) == FALSE) {
-			result = FALSE;
-			break;
+		    string mod_name = STRING(CAR(e));
+		    
+		    if (mod_name != NULL)
+		    {
+			if (safe_make ($3.the_name, mod_name) == FALSE) {
+			    result = FALSE;
+			    break;
+			}
+		    }
+		    else
+		    {
+			user_warning("make", "Select a module first!\n");
 		    }
 		}, $3.the_owners);
 
@@ -339,9 +348,18 @@ i_apply:
 		}
 	    
 		MAPL(e, {
-		    if (safe_apply ($3.the_name, STRING(CAR(e))) == FALSE) {
-			result = FALSE;
-			break;
+		    string mod_name = STRING(CAR(e));
+		    
+		    if (mod_name != NULL)
+		    {
+			if (safe_apply ($3.the_name, mod_name) == FALSE) {
+			    result = FALSE;
+			    break;
+			}
+		    }
+		    else
+		    {
+			user_warning("apply", "Select a module first!\n");
 		    }
 		}, $3.the_owners);
 		/* restore the initial current module, if there was one */
@@ -380,15 +398,23 @@ i_display:
 		
 		MAPL(e, {
 		    string file;
-
-		    lazy_open_module (STRING(CAR(e)));
-		    file = build_view_file($3.the_name);
-		    if (file == NULL)
-			user_error("display",
-				   "Cannot build view file %s\n",
-				   $3.the_name);
+		    string mod_name = STRING(CAR(e));
 		    
-		    safe_system(concatenate(pager, " ", file, NULL));
+		    if (mod_name != NULL)
+		    {
+			lazy_open_module (mod_name);
+			file = build_view_file($3.the_name);
+			if (file == NULL)
+			    user_error("display",
+				       "Cannot build view file %s\n",
+				       $3.the_name);
+		    
+			safe_system(concatenate(pager, " ", file, NULL));
+		    }
+		    else
+		    {
+			user_warning("display", "Select a module first!\n");
+		    }
 
 		}, $3.the_owners);
 		db_set_current_module_name(save_current_module_name);
