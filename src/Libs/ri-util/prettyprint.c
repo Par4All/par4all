@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/25 17:44:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/10/25 17:14:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/07/25 17:44:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/10/25 17:14:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -23,6 +23,17 @@ char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/07/25 17:44:43 $, ) ve
   * - Addition of CMF and CRAFT prettyprints. Only text_loop() has been
   * modified.
   *    Alexis Platonoff, Nov. 18, 1994
+
+  * - Modifications of sentence_area to deal with  the fact that
+  *   " only one appearance of a symbolic name as an array name in an 
+  *     array declarator in a program unit is permitted."
+  *     (Fortran standard, number 8.1, line 40) 
+  *   array declarators now only appear with the type declaration, not with the
+  *   area. - BC - october 196.
+  * - Modification of text_entity_declaration to ensure that the OUTPUT of PIPS
+  *   can also be used as INPUT; in particular, variable declarations must appear
+  *   before common declarations. BC.
+  * - Also, EQUIVALENCE statements are not generated for the moment. BC.
   */
 #include <stdlib.h>
 #include <stdio.h>
@@ -154,8 +165,7 @@ entity e, module;
 	pc = NIL,
 	entities = NIL;
 
-    if (strcmp(area_name, STATIC_AREA_LOCAL_NAME) == 0 ||
-	strcmp(area_name, DYNAMIC_AREA_LOCAL_NAME) == 0) 
+    if (dynamic_area_p(e))
 	return(make_sentence(is_sentence_formatted, ""));
 
     assert(type_area_p(te));
@@ -175,21 +185,27 @@ entity e, module;
 	{
 	    bool comma = FALSE;
 
-	    pc = CHAIN_SWORD(pc, "COMMON ");
-	    if (strcmp(area_name, BLANK_COMMON_LOCAL_NAME) != 0) 
+	    if (static_area_p(e))
 	    {
-		pc = CHAIN_SWORD(pc, "/");
-		pc = CHAIN_SWORD(pc, area_name);
-		pc = CHAIN_SWORD(pc, "/ ");
+		pc = CHAIN_SWORD(pc, "SAVE ");
 	    }
-	    
+	    else
+	    {
+		pc = CHAIN_SWORD(pc, "COMMON ");
+		if (strcmp(area_name, BLANK_COMMON_LOCAL_NAME) != 0) 
+		{
+		    pc = CHAIN_SWORD(pc, "/");
+		    pc = CHAIN_SWORD(pc, area_name);
+		    pc = CHAIN_SWORD(pc, "/ ");
+		}
+	    }
 	    entities = gen_nreverse(entities);
 	    
 	    MAP(ENTITY, ee, 
 	     {
 		 if (comma) pc = CHAIN_SWORD(pc, ",");
 		 else comma = TRUE;
-		 pc = gen_nconc(pc, words_declaration(ee, TRUE));
+		 pc = gen_nconc(pc, words_declaration(ee, FALSE));
 	     },
 		 entities);
 
@@ -351,10 +367,10 @@ list ldecl;
     bool print_commons = get_bool_property("PRETTYPRINT_COMMONS"),
          from_hpfc = get_bool_property("PRETTYPRINT_HPFC");
     text r, t_chars;
-    list before = NIL, after_before = NIL, ph = NIL,
+    list before = NIL, area_decl = NIL, ph = NIL,
 	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, pc = NIL, ps = NIL;
 
-    t_chars = make_text(NIL);
+    t_chars = make_text(NIL); 
 
     MAP(ENTITY, e,
      {
@@ -366,22 +382,22 @@ list ldecl;
 		 (func && 
 		  value_code_p(entity_initial(e)) &&
 		  !type_void_p(functional_result(type_functional(te))));
-	 bool common = type_area_p(te);
+	 bool area_p = type_area_p(te);
 	 bool var = type_variable_p(te);
 	 bool in_ram = storage_ram_p(entity_storage(e));
 	 
 	 pips_debug(3, "entity name is %s\n", entity_name(e));
 
-	 if (!print_commons && common && !SPECIAL_COMMON_P(e))
+	 if (!print_commons && area_p && !SPECIAL_COMMON_P(e))
 	 {
-	     after_before = 
+	     area_decl = 
 		 CONS(SENTENCE, make_sentence(is_sentence_formatted,
 					      common_hook(module, e)),
-		      after_before);
+		      area_decl);
 	 }
 
 	 if (!print_commons && 
-	     (common || (var && in_ram && 
+	     (area_p || (var && in_ram && 
              !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e)))))))
 	 {
 	     pips_debug(5, "skipping entity %s\n", entity_name(e));
@@ -402,12 +418,12 @@ list ldecl;
 	     before = CONS(SENTENCE, sentence_basic_declaration(e), 
 			   before);
 	 }
-	 else if (common)
+	 else if (area_p)
 	 {
-	     /*            COMMONS 
-	      */
-	     before = CONS(SENTENCE, sentence_area(e, module),
-			   before);
+	     /*            AREAS 
+	      */	     
+	     area_decl = CONS(SENTENCE, sentence_area(e, module),
+			   area_decl);
 	 }
 	 else if (var)
 	 {
@@ -500,7 +516,7 @@ list ldecl;
 	 }
      }, ldecl);
 
-    r = make_text(gen_nconc(before, after_before));
+    r = make_text(before);
 
     ADD_WORD_LIST_TO_TEXT(r, ph);
     attach_declaration_type_to_words(ph, "INTEGER");
@@ -518,7 +534,10 @@ list ldecl;
     ADD_WORD_LIST_TO_TEXT(r, ps);
     attach_declaration_type_to_words(ps, "CHARACTER");
     MERGE_TEXTS(r, t_chars);
+    MERGE_TEXTS(r, make_text(area_decl));
 
+    /* And lastly, equivalence statements... Euhhhhh???? - BC -*/
+    
     return (r);
 }
 
@@ -1040,11 +1059,12 @@ text_module(entity module,
     string s = code_decls_text(c);
 
     if ( strcmp(s,"") == 0 
-	|| get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") ) {
+	|| get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") )
+    {
 	if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
 	    /* Add the original header comments if any: */
 	    ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
-	    
+	
 	ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(sentence_head(module),
 							module));
 	if (head_hook) 
@@ -1494,6 +1514,9 @@ entity e;
 /* some compilers don't like dimensions that are declared twice.
  * this is the case of g77 used after hpfc. thus I added a
  * flag not to prettyprint again the dimensions of common variables. FC.
+ *
+ * It is in the standard that dimensions cannot be declared twice in a 
+ * single module. BC.
  */
 list words_declaration(
     entity e,
@@ -1502,8 +1525,11 @@ list words_declaration(
     list pl = NIL;
     pl = CHAIN_SWORD(pl, entity_local_name(e));
 
-    if (type_variable_p(entity_type(e))) {
-	if (!(variable_in_common_p(e) && !prettyprint_common_variable_dimensions_p)) {
+    if (type_variable_p(entity_type(e)))
+    {
+	if (!((variable_in_common_p(e) || variable_static_p(e)) &&
+	      !prettyprint_common_variable_dimensions_p))
+	{
 	    if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
 	    {
 		list dims = variable_dimensions(type_variable(entity_type(e)));
