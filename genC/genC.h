@@ -155,9 +155,11 @@ extern gen_chunk *gen_make_array GEN_PROTO(( int )) ;
 extern gen_chunk *gen_alloc GEN_PROTO((int, int, int, ...)) ; 
 extern char * alloc GEN_PROTO((int));
 
+extern int gen_type_translation_old_to_actual GEN_PROTO((int));
+extern int gen_type_translation_actual_to_old GEN_PROTO((int));
 extern void gen_type_translation_reset GEN_PROTO((void));
 extern void gen_type_translation_default GEN_PROTO((void));
-extern void gen_type_translation_read GEN_PROTO((string)
+extern void gen_type_translation_read GEN_PROTO((string));
 extern void gen_type_translation_write GEN_PROTO((string));
 
 extern void gen_init_external GEN_PROTO((int, 
