@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/07/20 18:40:36 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1995/09/08 12:55:48 $, ) 
  * version $Revision$
  */
 
@@ -16,8 +16,6 @@
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
-
-#define PRIME		"p"
 
 #define ALPHA_PREFIX	"ALPHA"
 #define LALPHA_PREFIX	"LALPHA"
@@ -84,34 +82,16 @@ entity e;
     return(same_string_p(entity_module_name(e), HPFC_PACKAGE));
 }
 
-entity get_ith_dummy(prefix, suffix, i)
-string prefix, suffix;
-int i;
-{
-    char buffer[100]; 
-    assert(i>=1 && i<=7);
-    (void) sprintf(buffer, "%s%d", suffix, i);
-    return(find_or_create_scalar_entity(buffer, prefix, is_basic_int));
-}
-
-/* define to build the _dummy and _prime of a variable.
- */
-#define GET_DUMMY(MODULE, NAME, lname)\
-entity get_ith_##lname##_dummy(int i)\
-    {return(get_ith_dummy(MODULE, NAME, i));}\
-entity get_ith_##lname##_prime(int i)\
-    {return(get_ith_dummy(MODULE, NAME PRIME, i));}
-
-GET_DUMMY(REGIONS_MODULE_NAME,	PHI_PREFIX, 	region);
-GET_DUMMY(HPFC_PACKAGE, 	ALPHA_PREFIX, 	array);
-GET_DUMMY(HPFC_PACKAGE, 	THETA_PREFIX, 	template);
-GET_DUMMY(HPFC_PACKAGE, 	PSI_PREFIX, 	processor);
-GET_DUMMY(HPFC_PACKAGE, 	DELTA_PREFIX, 	block);
-GET_DUMMY(HPFC_PACKAGE, 	GAMMA_PREFIX, 	cycle);
-GET_DUMMY(HPFC_PACKAGE, 	LALPHA_PREFIX, 	local);
-GET_DUMMY(HPFC_PACKAGE, 	IOTA_PREFIX, 	shift);
-GET_DUMMY(HPFC_PACKAGE, 	SIGMA_PREFIX, 	auxiliary);
-GET_DUMMY(HPFC_PACKAGE,		TMP_PREFIX,	temporary);
+GET_DUMMY_VARIABLE_ENTITY(REGIONS_MODULE_NAME,	PHI_PREFIX, 	region);
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	ALPHA_PREFIX, 	array);
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	THETA_PREFIX, 	template);
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	PSI_PREFIX, 	processor);
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	DELTA_PREFIX, 	block);
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	GAMMA_PREFIX, 	cycle);
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	LALPHA_PREFIX, 	local);
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	IOTA_PREFIX, 	shift);
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	SIGMA_PREFIX, 	auxiliary);
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE,		TMP_PREFIX,	temporary);
 
 /* shift dummy variables to prime variables.
  * systeme s is modified.
