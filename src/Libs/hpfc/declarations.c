@@ -3,29 +3,14 @@
  *
  * DECLARATIONS compilation
  *
- * $RCSfile: declarations.c,v $ ($Date: 1995/03/23 16:54:41 $, )
+ * $RCSfile: declarations.c,v $ ($Date: 1995/04/10 18:49:50 $, )
  * version $Revision$
  */
  
-#include <stdio.h>
-#include <string.h> 
-extern fprintf();
-
-#include "genC.h"
-
-#include "ri.h" 
-#include "hpf.h" 
-#include "hpf_private.h"
-
-#include "ri-util.h" 
-#include "misc.h" 
-
-#include "hpfc.h"
 #include "defines-local.h"
 
 /*  local macros...
  */
-
 #define normalized_dimension_p(dim) \
   (HpfcExpressionToInt(dimension_lower(dim))==1)
 
@@ -290,7 +275,5 @@ void NewDeclarationsOfDistributedArrays()
 	 list_of_distributed_arrays());
 }
 
-/*
- * that is all
+/* that is all
  */
-
