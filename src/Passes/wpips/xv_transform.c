@@ -80,6 +80,9 @@ transform_notify(Menu menu,
       else if (strcmp(label, PARTIAL_EVAL_TRANSFORM) == 0) {
          safe_apply(BUILDER_PARTIAL_EVAL, modulename);
       }
+      else if (strcmp(label, FULL_UNROLL_TRANSFORM) == 0) {
+         safe_apply(BUILDER_FULL_UNROLL, modulename);
+      }
       else if (strcmp(label, UNROLL_TRANSFORM) == 0) {
          safe_apply(BUILDER_UNROLL, modulename);
       }
@@ -137,6 +140,7 @@ create_transform_menu()
                 MENU_ACTION_ITEM, REDUCTIONS_TRANSFORM, transform_notify,
                 MENU_ACTION_ITEM, STRIP_MINE_TRANSFORM, transform_notify,
                 MENU_ACTION_ITEM, UNROLL_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, FULL_UNROLL_TRANSFORM, transform_notify,
                 MENU_ACTION_ITEM, UNSPAGHETTIFY_TRANSFORM, transform_notify,
                                  /* Just a separator: */
                 MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
