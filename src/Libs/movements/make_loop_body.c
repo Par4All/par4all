@@ -77,20 +77,17 @@ find_entity(entity module, Pvecteur pv,string st)
 {
   entity  new_ind;
   string name;
-  new_ind=gen_find_tabulated(concatenate(entity_local_name(module),
-					  MODULE_SEP_STRING,
-					  entity_local_name(
-							    (entity) vecteur_var(pv)),
-					  st,
-					  (char *) NULL), 
-			      entity_domain);
-
+  new_ind=gen_find_tabulated(
+      concatenate(entity_local_name(module),
+		  MODULE_SEP_STRING, 
+		  entity_local_name((entity) vecteur_var(pv)),
+		  st, (char *) NULL), 
+      entity_domain);
+  
     if (new_ind == entity_undefined) {
-	name = concatenate(entity_local_name((entity) vecteur_var(pv)),
-			    st,
-			    NULL);
-	new_ind = make_scalar_integer_entity(strdup(name), 
-					      entity_local_name(module));
+	name = strdup(concatenate(entity_local_name((entity) vecteur_var(pv)),
+				  st, NULL));
+	new_ind = make_scalar_integer_entity(name, entity_local_name(module));
 	add_variable_declaration_to_module(module, new_ind);
 	free(name);
     }
