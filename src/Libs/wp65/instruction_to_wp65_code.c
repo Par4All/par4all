@@ -363,10 +363,7 @@ translate_IO_ref(call c, hash_table v_to_esv, boolean loop_or_call_print)
 	}
     }  
     else
-    {
 	pips_user_error("function calls are not handled in this version\n");
-    }
-  
     return result;
 }
 
@@ -611,7 +608,7 @@ loop_nest_to_wp65_code(
     int i1,lpl, loop_nest_dimt;
     int first_parallel_level=1;
     int last_parallel_level, perfect_nested_loop_size; 
-    boolean loop_carried_dep[10];  
+    boolean loop_carried_dep[11];  
     boolean fully_parallel;
     boolean fully_sequential=TRUE;
     int   nested_level2,nested_level=0;
@@ -826,7 +823,6 @@ loop_nest_to_wp65_code(
 
 	instruction_block(binst)= new_compute_lst;
 	body = instruction_to_statement(binst);
-
 	ifdebug(8) {
 	    fprintf(stderr,"loop body \n");
 	    wp65_debug_print_text(module, body); 
@@ -870,8 +866,10 @@ loop_nest_to_wp65_code(
 				      tile_basis_in_initial_basis,
 				      iteration_domain,first_parallel_level,
 				      last_parallel_level);
-	ems = make_scanning_over_tiles(memory_module, embl, proc_id_mm, pn, tile, initial_basis, 
-				       tile_basis_in_tile_basis, tile_basis_in_initial_basis,
+	ems = make_scanning_over_tiles(memory_module, embl, proc_id_mm, 
+				       pn, tile, initial_basis, 
+				       tile_basis_in_tile_basis, 
+				       tile_basis_in_initial_basis,
 				       iteration_domain,first_parallel_level,
 				       last_parallel_level);
 	
@@ -879,12 +877,14 @@ loop_nest_to_wp65_code(
 	    range looprange = make_range(make_integer_constant_expression(0),
 					 make_integer_constant_expression(pn-1),
 					 make_integer_constant_expression(1));
-	    entity looplabel = make_loop_label(9000, entity_local_name(compute_module));
+	    entity looplabel = make_loop_label(9000, 
+					       entity_local_name(compute_module));
 	    loop newloop = make_loop(proc_id, 
 				     looprange,
 				     ems,
 				     looplabel, 
-				     make_execution(is_execution_parallel,UU),
+				     make_execution(is_execution_parallel,
+						    UU),
 				     NIL);
 	    
 	    ems = loop_to_statement(newloop);
@@ -905,7 +905,7 @@ loop_nest_to_wp65_code(
     }
     gen_map(reference_scalar_defined_p, store_data_list);
     
-    MAPL(r1,{ 
+      MAPL(r1,{ 
 	reference rf = REFERENCE(CAR(r1));
 	if (reference_scalar_p(rf)) {
 	    include_constant_symbolic_communication(compute_module,CONS(REFERENCE,rf,NIL),
@@ -914,7 +914,7 @@ loop_nest_to_wp65_code(
 						    TRUE,emulator,(entity)bank_indices->var);
 	}
     },
-	 store_data_list);
+	 store_data_list); 
     hash_table_free(llv_to_lcr);
     hash_table_free(r_to_llv);
     hash_table_free(v_to_lllv);
@@ -1031,7 +1031,7 @@ search_parallel_loops( mod_stat,loop_statement,dg,loop_carried_dep)
 statement mod_stat;
 statement loop_statement;
 graph dg;
-boolean loop_carried_dep[10];
+boolean loop_carried_dep[11];
 {
     cons *pv1, *ps, *pc;
     set region = region_of_loop(loop_statement);;
@@ -1078,8 +1078,8 @@ boolean loop_carried_dep[10];
 }
 
 boolean 
-full_parallel_loop_nest_p(statement mod_stat,statement loop_stmt, int nest_dim, 
-				  graph dg, boolean *loop_carried_dep)
+full_parallel_loop_nest_p(statement mod_stat,statement loop_stmt, 
+			  int nest_dim,graph dg, boolean *loop_carried_dep)
 {
     int i; 
     search_parallel_loops(mod_stat,loop_stmt, dg,loop_carried_dep);
