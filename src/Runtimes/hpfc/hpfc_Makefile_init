@@ -1,0 +1,23 @@
+#
+# $RCSfile: hpfc_Makefile_init,v $ ($Date: 1994/09/05 19:34:24 $, )
+# version $Revision$
+# got on %D%, %T%
+#
+
+MAKEFILE = Makefile
+HPFC_MAKEFILE = hpfc_Makefile
+MOVE = mv
+SED = sed
+M4 = m4
+
+.INIT:	$(MAKEFILE)
+
+$(MAKEFILE): $(HPFC_MAKEFILE)
+	$(SED) -n '1,/^### do not delete this line/p' \
+		$(MAKEFILE) > $(MAKEFILE).new
+	$(M4) -D ARCHITECTURE=$(PVM_ARCH) $(HPFC_MAKEFILE) >> $(MAKEFILE).new
+	$(MOVE) $(MAKEFILE) $(MAKEFILE).old
+	$(MOVE) $(MAKEFILE).new $(MAKEFILE)
+
+#
+### do not delete this line
