@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/11 08:53:42 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/11 10:00:48 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -242,7 +242,7 @@ MAIN=		main
 CONFIG_FILE=	${CONFIG_FILE}
 MAKEFILE=	${MAKEFILE}
 SHELL=		/bin/sh
-
+COPY	=	cp -fa
 #
 # default targets...
 all: generate_makefile_if_necessary_and_possible
@@ -538,6 +538,16 @@ delta:
 
 ##############################################################################
 #
+
+[ "$production" ] && cat >> $MAKEFILE <<EOF
+#
+#
+# release:
+#    $(COPY) 
+EOF
+
+##############################################################################
+#
 # partie specifique a Development
 #
 
@@ -624,6 +634,10 @@ header: .header
 	-[ -f $(TARGET).h ] || { $(RM) .header ; $(MAKE) .header ; }
 
 %
+
+
+
+##############################################################################
 
 [ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Newgen' -o $DIRTYPE = 'Linear' ] && cat >> $MAKEFILE <<%
 #
