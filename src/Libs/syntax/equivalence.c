@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/05/05 15:43:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/07/20 16:55:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1998/05/05 15:43:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1998/07/20 16:55:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -45,18 +45,41 @@ syntax s;
 {
     reference r;
     entity e;
-    int o;
+    int o = 0; /* reference offset */
+    int so = 0; /* substring offset */
 
     if (!syntax_reference_p(s)) {
 	pips_assert("This is syntax is a call", syntax_call_p(s));
-	pips_user_warning("A function call to %s has been identified by the parser "
-			  "in an EQUIVALENCE statement. Maybe an array declaration "
-			  "should be moved up ahead of the EQUIVALENCE\n",
-			  module_local_name(call_function(syntax_call(s))));
-	ParserError("MakeEquivAtom", "function call in equivalence chain\n");
+	if(strcmp(entity_local_name(call_function(syntax_call(s))), 
+		  SUBSTRING_FUNCTION_NAME) == 0) {
+	    list args = call_arguments(syntax_call(s));
+	    syntax ss = expression_syntax(EXPRESSION(CAR(args)));
+	    expression lb = EXPRESSION(CAR(CDR(args)));
+
+	    pips_assert("syntax is reference",syntax_reference_p(ss));
+
+	    r = syntax_reference(ss);
+	    if(expression_constant_p(lb)) {
+		so = expression_to_int(lb)-1;
+	    }
+	    else {
+		ParserError("MakeEquivAtom",
+			    "Non constant substring lower bound in equivalence chain\n");
+	    }
+	}
+	else {
+	    pips_user_warning("A function call to %s has been identified by the parser "
+			      "in an EQUIVALENCE statement. Maybe an array declaration "
+			      "should be moved up ahead of the EQUIVALENCE\n",
+			      module_local_name(call_function(syntax_call(s))));
+	    ParserError("MakeEquivAtom", "function call in equivalence chain\n");
+	}
+    }
+    else {
+	r = syntax_reference(s);
+	so = 0;
     }
 
-    r = syntax_reference(s);
     e = reference_variable(r);
 
     /* what is the offset of this reference ? */
