@@ -570,7 +570,9 @@ static void process_a_file()
     while ((line = read_a_line(TPIPS_PROMPT)))
     {
 	if (setjmp(pips_top_level)) {
-	    ;
+#ifdef FLEX_SCANNER
+	    tp_restart(tp_in);
+#endif
 	}
 	else {
 	    push_pips_context(&pips_top_level);
