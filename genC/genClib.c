@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/22 15:50:19 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/06/11 09:16:37 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2675,6 +2675,17 @@ int domain;
 	DecisionTables[domain][i] = DirectDomainsTable[domain][i];
 
     not_used[domain]=FALSE;
+
+    /* Add the domain itself because a gen_recurse filter is called if
+       the decision is true in quick_multi_recurse_simple_in(). RK,
+       11/06/1996: */
+    if (gen_debug & GEN_DBG_RECURSE)
+	fprintf(stderr, 
+		" - including %s (%d) itself\n", 
+		Domains[domain].name, domain);
+    DecisionTables[domain][domain] = TRUE;
+
+    
 
     /*   now the closure is computed
      */
