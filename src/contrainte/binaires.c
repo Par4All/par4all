@@ -84,12 +84,12 @@ int ofl_ctrl;
 
     /* il faut que cv_def soit non nul pour que la variable v puisse etre
        eliminee */
-    assert(VALUE_NOTZERO_P(cv_def));
+    assert(value_notzero_p(cv_def));
 
     /* il n'y a rien a faire si la variable v n'apparait pas dans la
        contrainte c */
     /* substitution inutile: variable v absente */
-    if (VALUE_ZERO_P(cv_c)) return 1;
+    if (value_zero_p(cv_c)) return 1;
 
     /* on garde trace de la valeur de c avant substitution pour pouvoir
        la desallouer apres le calcul de la nouvelle */
@@ -97,7 +97,7 @@ int ofl_ctrl;
     /* on ne fait pas de distinction entre egalites et inegalites, mais
        on prend soin de toujours multiplier la contrainte, inegalite
        potentielle, par un coefficient positif */
-    if (VALUE_NEG_P(cv_def)) {
+    if (value_neg_p(cv_def)) {
 	c->vecteur = vect_cl2_ofl_ctrl(value_uminus(cv_def),
 				       c->vecteur,cv_c,
 				       def->vecteur,
@@ -152,7 +152,7 @@ int ofl_ctrl;
     cv_p = vect_coeff(v,posit->vecteur); 
     cv_n = vect_coeff(v,negat->vecteur);
 
-    assert(VALUE_POS_P(cv_p) && VALUE_NEG_P(cv_n));
+    assert(value_pos_p(cv_p) && value_neg_p(cv_n));
 
     d = pgcd(cv_p, value_uminus(cv_n));
     if(value_notone_p(d)) {
