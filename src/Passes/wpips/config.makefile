@@ -1,4 +1,4 @@
-# $RCSfile: config.makefile,v $ ($Date: 1997/05/27 12:05:05 $, ) 
+# $RCSfile: config.makefile,v $ ($Date: 1997/06/03 06:20:48 $, ) 
 # version $Revision$
 # got on %D%, %T%
 # [%P%].
@@ -18,8 +18,9 @@
 CPPFLAGS +=	-DLARGE_FONTS \
 		$(WPIPS_ADDED_CPPFLAGS) \
 		$(PIPS_X11_ADDED_CPPFLAGS)
+
 # Current version of XView is not quite ANSI... :-)
-CANSI = -pedantic
+# CANSI = -pedantic
 
 LDFLAGS  +=	$(WPIPS_ADDED_LDFLAGS) \
 		$(PIPS_X11_ADDED_LDFLAGS)
