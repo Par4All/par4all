@@ -9,7 +9,8 @@
 #include "pipsdbm.h"
 #include "properties.h"
 
-#define LOG_FILE "LOGFILE"
+#define LOG_FILE "Logfile"
+
 /* The log file is closed by default
  */
 static FILE *log_file = NULL;
