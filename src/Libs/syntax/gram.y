@@ -56,6 +56,10 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.65  2003/08/02 13:51:01  irigoin
+  * Three obsolete functions removed to silence gcc: MakeData, ValMakeDataVar,
+  * ExpandDataVar. Comments improved in one place.
+  *
   * Revision 1.64  2002/06/27 15:01:39  irigoin
   * Bug fix in MakeDataValueSet() to deal with complex constant in DATA statements
   *
@@ -201,32 +205,6 @@ extern void yyerror(char *);
 
 /* functions for DATA */
 
-/* this function creates a 'dataval'. it takes two expressions as
-arguments:
-
-c is a constant.
-
-n is an iteration count, i.e. a positive integer constant. */
-
-static dataval MakeDataVal(expression n, expression c)
-{
-    int in;
-    constant cc;
-    value vc;
-
-    in = (n == expression_undefined) ? 1 : ExpressionToInt(n);
-
-    vc = EvalExpression(c);
-    if (! value_constant_p(vc)) {
-	ParserError("MakeDataVal", "data value must be a constant\n");
-    }
-    cc = value_constant(vc);
-    value_constant(vc) = constant_undefined;
-    free_value(vc);
-
-    return make_dataval(cc, in);
-}
-
 static expression MakeDataValueSet(expression n, expression c)
   {
     expression repeat_factor = expression_undefined;
@@ -256,114 +234,6 @@ static expression MakeDataValueSet(expression n, expression c)
 
     return value_set;
   }
-
-
-
-/* this function creates a 'datavar'. it takes two arguments: an syntax
-s that represents the variable being initialized, and a range r that
-indicates which elements of s are initalized. the range might be
-undefined, in which case the whole variable s is initialized. remember that
-a scalar is represented by a zero dimension variable in our internal
-representation.  */ 
-
-static datavar MakeDataVar(syntax s, range r)
-{
-    entity e, touse; 
-    reference ref;
-    datavar d;
-    syntax s2 = syntax_undefined;
-    bool is_a_substring = FALSE;
-
-    if (! syntax_reference_p(s)) {
-      if(syntax_call_p(s)
-	 && call_function(syntax_call(s))==
-	                  entity_intrinsic(SUBSTRING_FUNCTION_NAME)) 
-      {
-	/*
-	 * we cannot handle correctly substring initialization
-	 * in analyze data. Hence we ignore these by putting a
-	 * entity_undefined...
-	 *
-	 * DATA S(1:2)/'ab'/
-	 * DATA S(3:4)/'cd'/
-	 */
-	pips_debug(8, "Substring initialization\n");
-	s2=expression_syntax(EXPRESSION(CAR(call_arguments(syntax_call(s)))));
-	is_a_substring = TRUE;
-      }
-      else {
-	FatalError("MakeDataVar", "bad variable\n");
-      }
-    }
-    else {
-	s2 = s;
-    }
-
-    ref = syntax_reference(s2);
-    e = reference_variable(ref);
-    touse = is_a_substring? entity_undefined: e;
-
-    if (r == range_undefined) {
-      if(reference_indices(ref)==NIL) {
-	int ne = 0;
-	
-	if(!NumberOfElements(variable_dimensions(type_variable(entity_type(e))),
-			     &ne)) {
-	  pips_user_warning("Varying size of array \"%s\"\n", entity_name(e));
-	  ParserError("MakeDataVar", 
-		      "Fortran standard prohibit varying size array\n");
-	}
-	
-	d = make_datavar(touse, ne);
-      }
-      else
-	d = make_datavar(touse, 1);
-    }
-    else {
-      int c;
-      
-      if(range_count(r, &c)) {
-	d = make_datavar(touse, c);
-      }
-      else {
-	ParserError("MakeDataVar",
-		    "Only constant loop bounds with non-zero increment" 
-		    " are supported by the PIPS parser\n");
-      }
-    }
-    
-    return d;
-}
-
-/* this function is called when a data implied do has more than one
-dimension, i.e. the number of nested do loops is greater than one. the
-number of elements initialized by the outer loop is calculated by
-MakeDataVar, and elements initialized by inner loops are calculated by
-ExpandDataVar. 
-
-dvr is the datavar created by a call to MakeDataVar (and possibly
-modified by one or more call to ExpandDataVar).
-
-r is the range of the inner loop.  */
-
-static datavar ExpandDataVar(dvr, r)
-datavar dvr;
-range r;
-{
-    int s;
-
-    if(range_count(r, &s)) {
-       datavar_nbelements(dvr) *= s;
-    }
-    else {
-	ParserError("ExpandDataVar",
-		    "Only constant loop bounds with non-zero increment"
-		    " are supported by the PIPS parser\n");
-    }
-
-    return(dvr);
-}
-
 %}
 
 /* Specify precedences and associativies. */
@@ -1235,7 +1105,8 @@ parametre: entity_name TK_EQUALS expression
 
 entity_name: name
 	    {
-                /* malloc_verify(); */
+	        /* malloc_verify(); */
+	        /* if SafeFind were used, intrinsic would mask local variables. */
 		/* $$ = SafeFindOrCreateEntity(CurrentPackage, $1); */
 		$$ = FindOrCreateEntity(CurrentPackage, $1);
 		free($1);
