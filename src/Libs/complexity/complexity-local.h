@@ -8,10 +8,9 @@
  *  - deletion of includes in this include file; Francois Irigoin,
  *    13 March 1991
  */
+#include "matrice.h"
 
-#ifndef COMPLEXITY_INCLUDED
 #define COMPLEXITY_INCLUDED
-
 #define COMPLEXITY_UNDEFINED complexity_undefined
 /*
 #define COMPLEXITY_UNDEFINED_SYMBOL "<Complexity undefined>"
@@ -162,5 +161,3 @@
 #define SIX_INDEX_COST    DONT_COUNT_THAT
 #define SEVEN_INDEX_COST  DONT_COUNT_THAT
 
-#endif
-/* COMPLEXITY_INCLUDED */
