@@ -488,10 +488,12 @@ expression exp;
     debug(6, "basic_of_expression", "\n");
 
 
-    /* FI-AP: is it a simple short cut (which should be eliminated)
+    /* FI->AP: is it a simple short cut (which should be eliminated)
        or is it important?!? */
-    if(nlc_linear_expression_p(exp))
+    /* AP->FI: it is a short cut (not that short, in fact) */
+/*    if(nlc_linear_expression_p(exp))
 	return(make_basic(is_basic_int, 4));
+*/
 
     switch(syntax_tag(sy))
     {
