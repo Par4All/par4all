@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNU,v $ (version $Revision$)
-# $Date: 1996/08/21 18:48:29 $, 
+# $Date: 1996/09/02 13:44:24 $, 
 #
 # this file contains macro definitions 
 
@@ -29,6 +29,7 @@ DIFF	= gdiff
 M4	= gm4
 M4FLAGS	=
 LX2HTML	= latex2html
+L2HFLAGS= -link 8 -split 5
 LATEX	= latex
 BIBTEX	= bibtex
 RMAN	= rman
