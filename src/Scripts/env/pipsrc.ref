@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/11 08:49:52 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/11 10:07:49 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -21,6 +21,8 @@ NEWGEN_DIR="/projects/Newgen"
 
 NEWGEN_PRODDIR="${NEWGEN_DIR}/Production"
 NEWGEN_DEVEDIR="${NEWGEN_DIR}/Development"
+NEWGEN_DOCDIR="${NEWGEN_DIR}/Documentation"
+NEWGEN_RELEASEDIR="${NEWGEN_DIR}/Release"
 
 NEWGEN_INCLUDEDIR="${NEWGEN_PRODDIR}/Include"
 NEWGEN_LIBDIR="${NEWGEN_PRODDIR}/Lib"
@@ -44,6 +46,8 @@ LINEAR_DIR="/projects/C3/Linear"
 
 LINEAR_PRODDIR="${LINEAR_DIR}/Production"
 LINEAR_DEVEDIR="${LINEAR_DIR}/Development"
+LINEAR_DOCDIR="${LINEAR_DIR}/Documentation"
+LINEAR_RELEASEDIR="${LINEAR_DIR}/Release"
 
 LINEAR_INCLUDEDIR="${LINEAR_PRODDIR}/Include"
 LINEAR_LIBDIR="${LINEAR_PRODDIR}/Lib"
@@ -118,7 +122,7 @@ PIPS_DEVEDIR="${PIPS_DIR}/Development"
 PIPS_EXTEDIR="${PIPS_DIR}/Externals"
 
 # current demo version - binaries only
-PIPS_RELEDIR="${PIPS_DIR}/Release"
+PIPS_RELEASEDIR="${PIPS_DIR}/Release"
 
 # where documents are stored
 PIPS_DOCDIR="${PIPS_DIR}/Documentation"
@@ -139,11 +143,7 @@ PIPS_ARCH="."
 
 # make MUST be gmake...
 PIPS_MAKE='gmake'
-
-# never used...
-# PIPS_FC='f77'
-# PIPS_FFLAGS=''
-		
+	
 # file name in which pips current program is stored (for batch version).
 
 PIPS_CURRENT_PROGRAM=".pipsprogram"
