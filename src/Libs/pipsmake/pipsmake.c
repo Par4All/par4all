@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.63  1998/07/22 11:45:16  coelho
+ * comment about potential coredump.
+ *
  * Revision 1.62  1998/05/04 13:33:52  coelho
  * set/reset pips current computation.
  *
@@ -80,8 +83,7 @@
 #include "properties.h"
 #include "pipsmake.h"
 
-static bool 
-catch_user_error(bool (*f)(char *), string rname, string oname)
+static bool catch_user_error(bool (*f)(char *), string rname, string oname)
 {
     jmp_buf pipsmake_jump_buffer;
     bool success = FALSE;
@@ -127,23 +129,20 @@ static bool (*get_builder(string name))(char *)
  */
 static set up_to_date_resources = set_undefined;
 
-void 
-reset_make_cache(void)
+void reset_make_cache(void)
 {
     pips_assert("set is defined", !set_undefined_p(up_to_date_resources));
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
 }
 
-void 
-init_make_cache(void)
+void init_make_cache(void)
 {
     pips_assert("not set", set_undefined_p(up_to_date_resources));
     up_to_date_resources = set_make(set_pointer);
 }
 
-void 
-reinit_make_cache_if_necessary()
+void reinit_make_cache_if_necessary(void)
 {
     if (!set_undefined_p(up_to_date_resources))
 	reset_make_cache(), init_make_cache();
@@ -156,16 +155,15 @@ reinit_make_cache_if_necessary()
 static bool rmake(string, string);
 
 #define add_res(vrn, on)					\
-  result = gen_nconc(result, CONS(REAL_RESOURCE, 		\
-      make_real_resource(strdup(vrn), strdup(on)), NIL));
+  result = CONS(REAL_RESOURCE, \
+		make_real_resource(strdup(vrn), strdup(on)), result);
 
 /* Translate and expand a list of virtual resources into a potentially 
  * much longer list of real resources
  *
  * In spite of the name, no resource is actually built.
  */
-static list 
-build_real_resources(string oname, list lvr)
+static list build_real_resources(string oname, list lvr)
 {
     list pvr, result = NIL;
 
@@ -268,6 +266,11 @@ build_real_resources(string oname, list lvr)
 	}
 	case is_owner_all:
 	{
+	    /* some funny stuff here:
+	     * some modules may be added by the phases here...
+	     * then we might expect a later coredump if the new resource 
+	     * is not found.
+	     */
 	    gen_array_t modules = db_get_module_list();
 
 	    GEN_ARRAY_MAP(on, 
@@ -290,11 +293,10 @@ build_real_resources(string oname, list lvr)
 	}
     }
 
-    return(result);
+    return gen_nreverse(result);
 }
 
-static void 
-update_preserved_resources(string oname, rule ru)
+static void update_preserved_resources(string oname, rule ru)
 {
     list reals;
 
@@ -326,8 +328,7 @@ update_preserved_resources(string oname, rule ru)
     gen_full_free_list (reals);
 }
 
-static bool 
-apply_a_rule(string oname, rule ru)
+static bool apply_a_rule(string oname, rule ru)
 {
     static int number_of_applications_of_a_rule = 0;
 
@@ -495,8 +496,9 @@ static bool make_required(string, rule);
  * Safe apply checks if the rule applied is activated and produces ressources 
  * that it requires (no transitive closure) --DB 8/96
  */
-static bool 
-apply_without_reseting_up_to_date_resources(string pname, string oname)
+static bool apply_without_reseting_up_to_date_resources(
+    string pname, 
+    string oname)
 {
     rule ru;
 
@@ -520,8 +522,7 @@ apply_without_reseting_up_to_date_resources(string pname, string oname)
 
 /* compute all pre-transformations to apply a rule on an object 
  */
-static bool 
-make_pre_transformation(string oname, rule ru)
+static bool make_pre_transformation(string oname, rule ru)
 {
     list reals;
     bool success_p = TRUE;
@@ -571,8 +572,7 @@ make_pre_transformation(string oname, rule ru)
     return TRUE;
 }
 
-static bool 
-make(string rname, string oname)
+static bool make(string rname, string oname)
 {
     bool success_p = TRUE;
 
@@ -594,8 +594,7 @@ make(string rname, string oname)
     return success_p;
 }
 
-static bool 
-rmake(string rname, string oname)
+static bool rmake(string rname, string oname)
 {
     rule ru;
     char * res = NULL;
@@ -669,8 +668,7 @@ rmake(string rname, string oname)
     return TRUE;
 }
 
-static bool 
-apply(string pname, string oname)
+static bool apply(string pname, string oname)
 {
     bool success_p = TRUE;
 
@@ -689,8 +687,7 @@ apply(string pname, string oname)
     return success_p;
 }
 
-static bool
-concurrent_apply(
+static bool concurrent_apply(
     string pname,       /* phase to be applied */
     gen_array_t modules /* modules that must be computed */)
 {
@@ -718,8 +715,7 @@ concurrent_apply(
 }
 
 /* compute all resources needed to apply a rule on an object */
-static bool 
-make_required(string oname, rule ru)
+static bool make_required(string oname, rule ru)
 {
     list reals;
     bool success_p = TRUE;
@@ -755,8 +751,7 @@ make_required(string oname, rule ru)
 
 /* returns whether resource is up to date.
  */
-static bool 
-check_physical_resource_up_to_date(string rname, string oname)
+static bool check_physical_resource_up_to_date(string rname, string oname)
 {
   list reals = NIL;
   rule ru = rule_undefined;
@@ -861,8 +856,7 @@ check_physical_resource_up_to_date(string rname, string oname)
   return result;
 }
 
-int
-delete_obsolete_resources(void)
+int delete_obsolete_resources(void)
 {
     int ndeleted;
     bool cache_off = set_undefined_p(up_to_date_resources);
@@ -874,8 +868,7 @@ delete_obsolete_resources(void)
 
 /* this is quite ugly, but I wanted to put the enumeration down to pipsdbm.
  */
-void
-delete_some_resources(void)
+void delete_some_resources(void)
 {
     string what = get_string_property("PIPSDBM_RESOURCES_TO_DELETE");
     dont_interrupt_pipsmake_asap();
@@ -897,16 +890,14 @@ delete_some_resources(void)
 /* To be used in a rule. use and update the up_to_dat list
  * created by makeapply 
  */
-bool 
-check_resource_up_to_date(string rname, string oname)
+bool check_resource_up_to_date(string rname, string oname)
 {
     return db_resource_p(rname, oname)?
 	check_physical_resource_up_to_date(rname, oname): FALSE;
 }
 
 /* Delete from up_to_date all the resources of a given name */
-void 
-delete_named_resources (string rn)
+void delete_named_resources (string rn)
 {
     /* GO 29/6/95: many lines ...
        db_unput_resources_verbose (rn);*/
@@ -931,16 +922,14 @@ delete_named_resources (string rn)
     }
 }
 
-void 
-delete_all_resources(void)
+void delete_all_resources(void)
 {
     db_delete_all_resources();
     set_free(up_to_date_resources);
     up_to_date_resources = set_make(set_pointer);
 }
 
-string 
-get_first_main_module(void)
+string get_first_main_module(void)
 {
     string dir_name = db_get_current_workspace_directory(), main_name, name;
     debug_on("PIPSMAKE_DEBUG_LEVEL");
@@ -961,8 +950,7 @@ get_first_main_module(void)
 
 /* check the usage of resources 
  */
-void 
-do_resource_usage_check(string oname, rule ru)
+void do_resource_usage_check(string oname, rule ru)
 {
     list reals;
     set res_read = set_undefined;
@@ -1029,8 +1017,7 @@ do_resource_usage_check(string oname, rule ru)
 
 static double initial_memory_size;
 
-static void
-logs_on(void)
+static void logs_on(void)
 {
     if (get_bool_property("LOG_TIMINGS"))
 	init_request_timers();
@@ -1039,8 +1026,7 @@ logs_on(void)
 	initial_memory_size = get_process_gross_heap_size();
 }
 
-static void
-logs_off(void)
+static void logs_off(void)
 {
     if (get_bool_property("LOG_TIMINGS"))
     {
@@ -1064,8 +1050,7 @@ logs_off(void)
     }
 }
 
-static bool
-safe_do_something(
+static bool safe_do_something(
     string name, 
     string module_n, 
     string what_it_is,
@@ -1125,22 +1110,19 @@ safe_do_something(
     return success;
 }
 
-bool 
-safe_make(string res_n, string module_n)
+bool safe_make(string res_n, string module_n)
 {
     return safe_do_something(res_n, module_n, "resource",
 			     find_rule_by_resource, make);
 }
 
-bool 
-safe_apply(string phase_n, string module_n)
+bool safe_apply(string phase_n, string module_n)
 {
     return safe_do_something(phase_n, module_n, "phase/rule",
 			     find_rule_by_phase, apply);
 }
 
-bool
-safe_concurrent_apply(
+bool safe_concurrent_apply(
     string phase_n, 
     gen_array_t modules)
 {
