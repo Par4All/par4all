@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.310  1997/08/19 11:03:06  coelho
+# also clean .so.
+#
 # Revision 1.309  1997/08/19 10:49:53  coelho
 # preliminary java rules added.
 #
@@ -574,11 +577,11 @@ SOURCES+= 	\$(INCLUDES) \$(CFILES) \$(DOCS) \$(LIB_MAIN)
 
 clean-compiled:
 	\$(RM) \$(OBJECTS) \$(LIB_TARGET) \$(BIN_TARGET) \\
-		\$(ARCH)/pips \$(ARCH)/[ftw]pips
+		\$(ARCH)/pips \$(ARCH)/[ftw]pips \$(LIB_TARGET:.a=.so)
 
 clean: generate_makefile_if_necessary_and_possible clean-compiled
 	-\$(RM) TAGS \$(BIN_TARGET) \$(DERIVED_HEADERS) \$(DERIVED_CFILES) \\
-		\$(DERIVED_FILES) *.~[0-9]~ \$(LIB_IFILES) \$(INC_TARGET) core
+	       \$(DERIVED_FILES) *.~[0-9]~ \$(LIB_IFILES) \$(INC_TARGET) core
 
 INC_CFILES += \$(LIB_CFILES)
 
@@ -679,7 +682,8 @@ endif
 \$(PIPS_BINDIR):; mkdir \$(PIPS_BINDIR)
 
 clean-compiled:
-	\$(RM) \$(OBJECTS) \$(MAIN) \$(LIB_TARGET) \$(BIN_TARGET) 
+	\$(RM) \$(OBJECTS) \$(MAIN) \$(LIB_TARGET) \$(LIB_TARGET:.a=.so) \\
+	    \$(BIN_TARGET) 
 
 clean: clean-compiled
 	-\$(RM) TAGS \$(INC_TARGET) \$(DERIVED_HEADERS) \$(DERIVED_CFILES) \\
