@@ -2,7 +2,8 @@
  * 
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compile.c,v $ ($Date: 1995/07/20 18:40:35 $) version $Revision$
+ * $RCSfile: compile.c,v $ version $Revision$
+ * ($Date: 1995/09/15 19:36:22 $, )
  */
 
 #include "defines-local.h"
@@ -23,13 +24,12 @@ extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
 				"/", prefix, suffix, NULL));
 
 #define add_warning(filename)\
-  system(concatenate("$HPFC_TOOLS/hpfc_add_warning ", filename, NULL));
-
+   safe_system(concatenate("$HPFC_TOOLS/hpfc_add_warning ", filename, NULL));
 
 static string 
 hpfc_local_name (string name, string suffix)
 {
-    static char buffer[100]; /* should be enough */
+    static char buffer[100]; /* ??? should be enough */
 
     return(sprintf(buffer, "%s_%s", name, suffix));
 }
@@ -49,11 +49,8 @@ hpfc_node_local_name (string name)
 void 
 make_host_and_node_modules (entity module)
 {
-    string
-	name = entity_local_name(module);
-    entity
-	host = entity_undefined,
-	node = entity_undefined;
+    string name = entity_local_name(module);
+    entity host, node;
 
     if (bound_new_node_p(module))
 	return;
@@ -108,8 +105,7 @@ make_host_and_node_modules (entity module)
     store_new_node_variable(node, module);
 }
 
-/*
- * init_host_and_node_entities
+/* init_host_and_node_entities
  *
  * both host and node modules are initialized with the same
  * declarations than the compiled module, but the distributed arrays
@@ -120,8 +116,7 @@ make_host_and_node_modules (entity module)
 void 
 init_host_and_node_entities (void)
 {
-    entity
-	current_module = get_current_module_entity();
+    entity current_module = get_current_module_entity();
 
     host_module = load_new_host(current_module);
     node_module = load_new_node(current_module);
@@ -192,17 +187,9 @@ init_host_and_node_entities (void)
 void 
 put_generated_resources_for_common (entity common)
 {
-    FILE 
-	*host_file,
-	*node_file,
-	*parm_file,
-	*init_file;
-    string
-	prefix = entity_local_name(common),
-	host_filename,
-	node_filename,
-	parm_filename,
-	init_filename;
+    FILE *host_file, *node_file, *parm_file, *init_file;
+    string prefix = entity_local_name(common),
+	host_filename, node_filename, parm_filename, init_filename;
     entity
 	node_common = load_new_node(common),
 	host_common = load_new_host(common);
@@ -254,19 +241,11 @@ void
 put_generated_resources_for_module(stat, host_stat, node_stat)
 statement stat, host_stat, node_stat;
 {
-    FILE 
-	*host_file,
-	*node_file,
-	*parm_file,
-	*init_file;
+    FILE *host_file, *node_file, *parm_file, *init_file;
     string
 	prefix = module_local_name(get_current_module_entity()),
-	host_filename,
-	node_filename,
-	parm_filename,
-	init_filename;
-    entity
-	module = get_current_module_entity();
+	host_filename, node_filename, parm_filename, init_filename;
+    entity module = get_current_module_entity();
     
     generate_file_name(host_filename, prefix, "_host.f");
     generate_file_name(node_filename, prefix, "_node.f");
@@ -277,21 +256,21 @@ statement stat, host_stat, node_stat;
     hpfc_print_code(host_file, host_module, host_stat);
     safe_fclose(host_file, host_filename);
     add_warning(host_filename);
-    system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
-		       host_filename, 
-		       " host ", 
-		       module_local_name(module),
-		       NIL));
+    safe_system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
+			    host_filename, 
+			    " host ", 
+			    module_local_name(module),
+			    NIL));
 
     node_file = (FILE *) safe_fopen(node_filename, "w");
     hpfc_print_code(node_file, node_module, node_stat);
     safe_fclose(node_file, node_filename);
     add_warning(node_filename);
-    system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
-		       node_filename,
-		       " node ", 
-		       module_local_name(module),
-		       NIL));
+    safe_system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
+			    node_filename,
+			    " node ", 
+			    module_local_name(module),
+			    NIL));
 
     parm_file = (FILE *) safe_fopen(parm_filename, "w");
     create_parameters_h(parm_file, module);
@@ -330,12 +309,8 @@ void
 put_generated_resources_for_program (program_name)
 string program_name;
 {
-    FILE
-	*comm_file,
-	*init_file;
-    string
-	comm_filename,
-	init_filename;
+    FILE *comm_file, *init_file;
+    string comm_filename, init_filename;
 
     comm_filename = 
 	strdup(concatenate(db_get_current_program_directory(),
@@ -356,11 +331,11 @@ string program_name;
     safe_fclose(init_file, init_filename);
     add_warning(init_filename);
 
-    system(concatenate("$HPFC_TOOLS/hpfc_generate_init -n ",
-		       program_name,
-		       " ",
-		       db_get_current_program_directory(),
-		       NULL));
+    safe_system(concatenate("$HPFC_TOOLS/hpfc_generate_init -n ",
+			    program_name,
+			    " ",
+			    db_get_current_program_directory(),
+			    NULL));
     
     ifdebug(1)
     {
@@ -375,10 +350,7 @@ string program_name;
     free(init_filename);
 }
 
-/*
- * hpfcompile
- *
- * Compiler call
+/* Compiler call, obsole. left here for allowing linking
  */
 void 
 hpfcompile (char *module_name)
