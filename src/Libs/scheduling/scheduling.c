@@ -1,4 +1,12 @@
+/* 	$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.13 1997/07/22 16:00:21 keryell Exp $ \n Copyright (c) École des Mines de Paris Proprietary	 */
+
+#ifndef lint
+char vcid_scheduling_scheduling[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.13 1997/07/22 16:00:21 keryell Exp $ \n Copyright (c) École des Mines de Paris Proprietary";
+#endif /* lint */
+
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <setjmp.h>
 
 #include "genC.h"
