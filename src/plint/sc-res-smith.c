@@ -10,6 +10,9 @@
 #include "sc.h"
 #include "matrix.h"
 
+#include "sommet.h"
+#include "plint.h"
+
 #define MALLOC(s,t,f) malloc((unsigned)(s))
 #define FREE(s,t,f) free((char *)(s))
 
@@ -46,11 +49,10 @@ Psysteme ps;
     Pmatrix B2=MATRIX_UNDEFINED;
     Pmatrix D=MATRIX_UNDEFINED;
 
-    int den=1;
+    Value den=VALUE_ONE;
     int nbl;
     int n; 
     int m;
-    int sgn = 1;
     boolean infaisab = FALSE;
     if (ps) {
 	sys = sc_normalize(sc_dup(sys));
@@ -78,8 +80,8 @@ Psysteme ps;
 	    if (sys->egalites != NULL) contraintes_free(sys->egalites);
 	    sys->egalites = NULL;
 
-	    MATRIX_DENOMINATOR(B)=1;
-	    MATRIX_DENOMINATOR(MAT) = 1;
+	    MATRIX_DENOMINATOR(B)=VALUE_ONE;
+	    MATRIX_DENOMINATOR(MAT) = VALUE_ONE;
 
 	    matrix_nulle(B2);
 
@@ -107,9 +109,10 @@ Psysteme ps;
 		 terme correspondant de la
 		 * diagonale de la matrice D
 		 */
-		if (MATRIX_ELEM(MAT,i,i) != 0)
-		    if ((MATRIX_ELEM(B,i,1) % MATRIX_ELEM(MAT,i,i)) == 0)
-			MATRIX_ELEM(B,i,1) = sgn * MATRIX_ELEM(B,i,1)/(MATRIX_ELEM(MAT,i,i));
+		Value matii=MATRIX_ELEM(MAT,i,i);
+		if (value_notzero_p(matii))
+		    if (value_zero_p(value_mod(MATRIX_ELEM(B,i,1), matii)))
+			value_division(MATRIX_ELEM(B,i,1),matii);
 		    else infaisab = TRUE;
 		
 		else
@@ -123,7 +126,7 @@ Psysteme ps;
 		     * En effet, l'equation "0 * x = 0"  
 		     ==> la variable x est non contrainte
 		     */
-		    if (MATRIX_ELEM(B,i,1) == 0)
+		    if (value_zero_p(MATRIX_ELEM(B,i,1)))
 		    {   MATRIX_ELEM(B,i,nbl) = den;
 			nbl++;
 		    }
