@@ -19,6 +19,7 @@ close_log_file()
 {
    if (log_file != NULL && get_bool_property("USER_LOG_P") == TRUE)
       if (fclose(log_file) != 0) {
+	  pips_error("close_log_file", "Could not close\n");
          perror("close_log_file");
          abort();
       }
