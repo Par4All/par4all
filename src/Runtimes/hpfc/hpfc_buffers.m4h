@@ -2,14 +2,15 @@
 ! COMMON /HPFC BUFFERS/ 
 !
 ! $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-! ($Date: 1997/04/17 13:19:24 $, )
+! ($Date: 1997/05/02 16:36:46 $, )
 !
 ! buffers to avoid small pvmf(un)pack calls...
 ! and to sends buckets of messages if necessary...
 !
       common /HPFC BUFFERS/
      $     DATA BUFFER(MAX MAX SIZE OF BUFFER),
-     $     BUFINDEX,
+     $     BUF INDEX,
+     $     BUFFER ID,
      $     SIZE OF RECEIVED BUFFER,
      $     STRING BUFFSIZE,
      $     BYTE1 BUFFSIZE,
@@ -25,6 +26,7 @@
      $     RECEIVED NOT PERFORMED
       integer
      $     BUF INDEX,
+     $     BUFFER ID,
      $     SIZE OF RECEIVED BUFFER,
      $     STRING BUFFSIZE,
      $     BYTE1 BUFFSIZE,
