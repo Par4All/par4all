@@ -88,6 +88,7 @@ then
 else	
   echo sourcing $PIPS_CURRENT_PROGRAM in `pwd` >&2
   . $PIPS_CURRENT_PROGRAM
+  echo done >&2
   if [ "$OPT_PGM" ]
   then	
     if [ "$OPT_PGM" != "$PGM" ]
