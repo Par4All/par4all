@@ -47,14 +47,19 @@ static text alias_pairs_text(string module_name,string resource_name)
 
     pips_debug(8,"got pairs\n");
 
-    /* To set up the hash table to translate value into value names */       
-
+    /* ATTENTION: all this is necessary to call module_to_value_mappings
+     * to set up the hash table to translate value into value names
+     * before the call to text_region below
+     */       
     set_current_module_entity( local_name_to_top_level_entity(module_name));
     module = get_current_module_entity();
     set_current_module_statement((statement) db_get_memory_resource
 				 (DBR_CODE, module_name, TRUE));
     set_cumulated_rw_effects((statement_effects)
 	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+    /* that's it, but we musn't forget to rest everything after the call
+     */
+
     module_to_value_mappings(module);
 
     pips_debug(8,"hash table set up\n");
@@ -77,6 +82,14 @@ static text alias_pairs_text(string module_name,string resource_name)
 			*/
 
 		txt_reg = text_region(EFFECT(CAR(pair)));
+
+		pips_debug(9,"done text_region\n");
+
+		MERGE_TEXTS(txt,txt_reg);
+
+		pips_debug(9,"done MERGE_TEXTS\n");
+
+		txt_reg = text_region(EFFECT(CAR(CDR(pair))));
 
 		pips_debug(9,"done text_region\n");
 
@@ -107,6 +120,7 @@ static text alias_pairs_text(string module_name,string resource_name)
 
     reset_action_interpretation();
 
+    reset_current_module_statement();
     reset_current_module_entity();
     reset_cumulated_rw_effects();
 
