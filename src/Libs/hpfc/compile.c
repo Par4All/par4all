@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/04/11 10:52:49 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/06/03 14:14:26 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -106,8 +106,8 @@ char *module_name;
      * Regions are loaded
      */
     set_local_regions_map
-	((statement_mapping)
-	 db_get_memory_resource(DBR_REGIONS, module_name, FALSE));
+	(effectsmap_to_listmap((statement_mapping)
+	 db_get_memory_resource(DBR_REGIONS, module_name, FALSE)));
     
     /*
      * Initialize mappings
@@ -148,11 +148,11 @@ char *module_name;
 		       NIL));
 
     InitializeGlobalVariablesOfHpfc();
+    hpfc_init_run_time_entities();
     init_overlap_management();
     ReadHpfDir(module_name);
     NormalizeHpfDeclarations();
     NormalizeCodeForHpfc(module_stat);
-
    
     normfilename = 
 	strdup(concatenate(db_get_current_program_directory(), 
@@ -166,7 +166,7 @@ char *module_name;
     safe_fclose(normfile, normfilename);
 
     init_host_and_node_entities();
-    init_pvm_based_intrinsics();
+    /* init_pvm_based_intrinsics(); // old */
     
     hoststat = statement_undefined;
     nodestat = statement_undefined;
@@ -174,8 +174,10 @@ char *module_name;
     hpfcompiler(module_stat, &hoststat, &nodestat);
     add_pvm_init_and_end(&hoststat, &nodestat);
 
+    /*
     DeduceGotos(hoststat, hostgotos);
     DeduceGotos(nodestat, nodegotos);
+    */
     declaration_with_overlaps();
     close_overlap_management();
 
@@ -198,14 +200,22 @@ char *module_name;
 
 
     hostfile = (FILE *) safe_fopen(hostfilename, "w");
-    hpfc_print_code(hostfile, hostmodule, hoststat);
+    hpfc_print_code(hostfile, host_module, hoststat);
     safe_fclose(hostfile, hostfilename);
-    system(concatenate("$UTILDIR/hpfc_add_includes ", hostfilename, NIL));
+    system(concatenate("$UTILDIR/hpfc_add_includes ", 
+		       hostfilename, 
+		       " ", 
+		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
+		       NIL));
 
     nodefile = (FILE *) safe_fopen(nodefilename, "w");
-    hpfc_print_code(nodefile, nodemodule, nodestat);
+    hpfc_print_code(nodefile, node_module, nodestat);
     safe_fclose(nodefile, nodefilename);
-    system(concatenate("$UTILDIR/hpfc_add_includes ", nodefilename, NIL));
+    system(concatenate("$UTILDIR/hpfc_add_includes ", 
+		       nodefilename,
+		       " ", 
+		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
+		       NIL));
 
     parmfile = (FILE *) safe_fopen(parmfilename, "w");
     create_parameters_h(parmfile);
@@ -219,9 +229,9 @@ char *module_name;
     {
 	fprintf(stderr, "Result of HPFC:\n");
 	fprintf(stderr, "-----------------\n");
-	hpfc_print_code(stderr, hostmodule, hoststat);
+	hpfc_print_code(stderr, host_module, hoststat);
 	fprintf(stderr, "-----------------\n");
-	hpfc_print_code(stderr, nodemodule, nodestat);
+	hpfc_print_code(stderr, node_module, nodestat);
 	fprintf(stderr, "-----------------\n");
 	create_parameters_h(stderr);
 	fprintf(stderr, "-----------------\n");
@@ -229,7 +239,8 @@ char *module_name;
 	fprintf(stderr, "-----------------\n");
     }
 
-/*    DB_PUT_FILE_RESOURCE(DBR_xxx, strdup(module_name), filename);*/
+/*    DB_PUT_FILE_RESOURCE(DBR_xxx, strdup(module_name), filename);
+ */
     
     debug(4,"hpfcompile","end of procedure\n");
 
@@ -267,22 +278,13 @@ string module_name;
  */	 
 void InitializeGlobalVariablesOfHpfc()
 {
-    debug(8,"InitializeGlobalVariablesOfHpfc","Hello !\n");
+    debug(8, "InitializeGlobalVariablesOfHpfc", "Hello !\n");
 
-    uniqueintegernumber=0;
-    uniquefloatnumber=0;
-    uniquelogicalnumber=0;
-    uniquecomplexnumber=0;
-
-    hpfnumber=MAKE_ENTITY_MAPPING();
-    hpfalign=MAKE_ENTITY_MAPPING();
-    hpfdistribute=MAKE_ENTITY_MAPPING();
-
-    distributedarrays=NULL;
-    templates=NULL;
-    processors=NULL;
-
-    /* and others? */
+    hpfc_init_unique_numbers();
+    reset_hpf_object_lists();
+    make_new_declaration_map();
+    make_align_map();
+    make_distribute_map();
 }
 
 
@@ -291,14 +293,14 @@ void InitializeGlobalVariablesOfHpfc()
  *
  * both host and node modules are initialized with the same
  * declarations than the compiled module, but the distributed arrays
- * declarations... which are not declared in the case of the hostmodule,
- * and the declarations of which are modified in the nodemodule
+ * declarations... which are not declared in the case of the host_module,
+ * and the declarations of which are modified in the node_module
  * (call to NewDeclarationsOfDistributedArrays)...
  */
 void init_host_and_node_entities()
 {
-    hostmodule = make_empty_program(HOST_NAME);
-    nodemodule = make_empty_program(NODE_NAME);
+    host_module = make_empty_program(HOST_NAME);
+    node_module = make_empty_program(NODE_NAME);
 
 
     hostgotos = MAKE_STATEMENT_MAPPING();
@@ -309,12 +311,7 @@ void init_host_and_node_entities()
      * between the compiled module, the host and the node.
      */
 
-    oldtonewhostvar = MAKE_ENTITY_MAPPING();
-    oldtonewnodevar = MAKE_ENTITY_MAPPING();
-    newtooldhostvar = MAKE_ENTITY_MAPPING();
-    newtooldnodevar = MAKE_ENTITY_MAPPING();
-
-    newdeclarations = MAKE_ENTITY_MAPPING();
+    make_host_node_maps();
 
     MAPL(ce,
      {
@@ -332,35 +329,27 @@ void init_host_and_node_entities()
 	     ((storage_rom_p(entity_storage(e))) &&
 	      (value_symbolic_p(entity_initial(e)))))
 	     AddEntityToHostAndNodeModules(e);
+	 else
+	 if (type_functional_p(t))
+	 {
+	     AddEntityToDeclarations(e, host_module);
+	     AddEntityToDeclarations(e, node_module);
+	 }
+	 
      },
 	 entity_declarations(get_current_module_entity())); 
     
     NewDeclarationsOfDistributedArrays();    
-
-
-    /* overloaded basic type, why not? */
-    e_MYPOS = make_scalar_entity("MYPOS", 
-				 module_local_name(nodemodule),
-				 MakeBasic(is_basic_overloaded)); 
-
-    variable_dimensions(type_variable(entity_type(e_MYPOS))) =
-	CONS(DIMENSION,
-	     make_dimension(int_to_expression(1),
-			    int_to_expression(7)),
-	CONS(DIMENSION,
-	     make_dimension(int_to_expression(1),
-			    int_to_expression(1024)), /* why not ? */
-	     NIL));
 
     ifdebug(3)
     {
 	debug_off();
 	fprintf(stderr,"[init_host_and_node_entities]\n old declarations:\n");
 	print_text(stderr,text_declaration(get_current_module_entity()));
-	fprintf(stderr, "new declarations,\nhostmodule:\n");
-	print_text(stderr,text_declaration(hostmodule));
-	fprintf(stderr,"nodemodule:\n");
-	print_text(stderr,text_declaration(nodemodule));
+	fprintf(stderr, "new declarations,\nhost_module:\n");
+	print_text(stderr,text_declaration(host_module));
+	fprintf(stderr,"node_module:\n");
+	print_text(stderr,text_declaration(node_module));
 	debug_on("HPFC_DEBUG_LEVEL");
     }
 }
