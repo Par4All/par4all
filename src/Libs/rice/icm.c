@@ -1,4 +1,6 @@
 /*
+ * Invariant Code Motion 
+ *
  * $Id$
  *
  * Olivier Albiez
