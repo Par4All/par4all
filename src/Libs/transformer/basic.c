@@ -249,7 +249,7 @@ transformer t;
     consistent = consistent && sc_weak_consistent_p(sc);
     if(!consistent)
 	debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
-	      "transformer_consistency_p", "sc is not weekly consistent\n");
+	      "transformer_consistency_p", "sc is not weakly consistent\n");
 
     /* If an old value appears in the predicate, the corresponding
      * variable should be an argument of the transformer
