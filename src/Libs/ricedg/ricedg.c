@@ -237,7 +237,7 @@ char *mod_name;
 
     ifdebug(1) {
 	fprintf(stderr, "Space for chains: %d bytes\n", 
-		gen_allocated_memory((chunk *) chains));
+		gen_allocated_memory((gen_chunk *) chains));
 	fprintf(stderr, "Space for obj_table: %d bytes\n", 
 		current_shared_obj_table_size());
 	mem_spy_begin();
@@ -249,7 +249,7 @@ char *mod_name;
     ifdebug(1) {
 	mem_spy_end("After DG copy");
 	fprintf(stderr, "Space for chains's copy: %d bytes\n", 
-		gen_allocated_memory((chunk *) dg));	
+		gen_allocated_memory((gen_chunk *) dg));	
 	fprintf(stderr, "Space for obj_table: %d bytes\n", 
 		current_shared_obj_table_size());
     }
