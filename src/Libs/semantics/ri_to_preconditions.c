@@ -126,6 +126,8 @@ statement s;
 	/* add equivalence equalities */
 	pre = tf_equivalence_equalities_add(pre);
 
+	/* eliminate redundancy */
+	/* FI: nice... but time consuming! */
 	pre = transformer_normalize(pre);
 	if(!transformer_consistency_p(pre)) {
 	    int so = statement_ordering(s);
