@@ -1,5 +1,9 @@
 /*
  * Messages handling
+ *
+ * $RCSfile: messages.c,v $ ($Date: 1994/12/22 16:52:21 $, )
+ * version $Revision$
+ * got on %D%, %T%
  * 
  * Fabien Coelho, August 1993
  */
@@ -50,7 +54,7 @@ list Ro, lRo;
     int
 	len = gen_length(Ro);
     
-    pips_assert("messages_hangling", ((len==gen_length(lRo)) && (len>=1)));
+    assert(len==gen_length(lRo) && len>=1);
 
     /*
      * first kind of messages generation
@@ -207,8 +211,7 @@ list Ro, lRo;
 	int
 	    len = gen_length(li);
 
-	pips_assert("messages_generation",
-		    ((len==gen_length(lk)) && (len==gen_length(lv))));
+	assert(len==gen_length(lk) && len==gen_length(lv));
 
 	lm = CONS(MESSAGE,
 		  generate_one_message(array, li, lk, lv),
@@ -707,8 +710,7 @@ message m;
 		localdlo = global_array_cell_to_local_array_cell(array, i, dlo),
 		localdup = global_array_cell_to_local_array_cell(array, i, dup);
 	    
-	    pips_assert("shape_one_message", 
-			(rlo<=rup)); /* message content isn't empty */
+	    assert(rlo<=rup); /* message content isn't empty */
 	    
 	    /*
 	     * I thought a long time about it, just for these two formulas:
@@ -789,7 +791,7 @@ message m;
      * the code is similar to the runtime support function HPFC_PROCLID().
      */
 
-    pips_assert("one_message_guards_and_neighbour", (procndim>=1));
+    assert(procndim>=1);
 
     t = (int) vect_coeff((Variable) 1, v);
     for (i=2 ; i<=NumberOfDimension(processor) ; i++)
