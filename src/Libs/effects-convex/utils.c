@@ -364,24 +364,28 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
  * output   : nothing.
  * modifies : the initial region to which a copy of sc is appended.
  * comment  : add to the predicate of the region a copy of the system sc.
- *            redundancies are then eliminated if nredund_p is true. 
+ *            redundancies are then eliminated if nredund_p is true.
+ * bug fixed 13/04/2000 CA/FC: sc MUST NOT be modified...
  */
 void region_sc_append_and_normalize(region reg, Psysteme sc, int level)
 {
     Psysteme sc_reg;
+    Psysteme copy = sc_dup(sc);
 
     /* pips_assert("region context must be defined\n", 
 		!transformer_undefined_p(region_context(reg))); */
 
     sc_reg = region_system(reg);    
     assert(sc_weak_consistent_p(sc_reg));
-    assert(sc_weak_consistent_p(sc));
-    sc_reg = sc_safe_append(sc_safe_normalize(sc_reg), sc_safe_normalize(sc)); 
+    assert(sc_weak_consistent_p(copy));
+    sc_reg = sc_safe_append(sc_safe_normalize(sc_reg), sc_safe_normalize(copy)); 
     assert(sc_weak_consistent_p(sc_reg));
     if (level!=-1) 
 	sc_reg = region_sc_normalize(sc_reg, level);
     assert(sc_weak_consistent_p(sc_reg));
     
+    sc_rm(copy);
+
     region_system_(reg) = newgen_Psysteme(sc_reg);      
 }
 
