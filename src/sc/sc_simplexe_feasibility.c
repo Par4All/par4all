@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/07 13:31:43 $, 
+ * $Date: 1996/08/07 13:32:07 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -15,7 +15,6 @@
 #include <malloc.h>
 #include <string.h>
 #include <limits.h>
-#include <setjmp.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -23,9 +22,6 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-
-/* some global jmp is shared for handling arithmetic errors */
-extern jmp_buf overflow_error;
 
 /* To replace #define NB_EQ and #define NB_INEQ - BC, 2/4/96 - 
  * NB_EQ and NB_INEQ are initialized at the beginning of the main subroutine.
