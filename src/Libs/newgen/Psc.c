@@ -22,7 +22,6 @@
   */
 
 #include <stdio.h>
-extern int fputc();
 #include <string.h>
 
 #include "boolean.h"
