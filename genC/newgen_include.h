@@ -236,5 +236,6 @@ extern void gen_delete_tabulated_name(gen_chunk *);
 extern char * gen_get_tabulated_name_basic(int , char *);
 extern char * gen_get_tabulated_name(gen_chunk *);
 extern char * gen_get_tabulated_name_direct(char *);
+extern char * gen_build_unique_tabulated_name(int, char *);
 extern void gen_put_tabulated_name(int, char *, char *);
 extern void gen_put_tabulated_name_direct(char *, char *);
