@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: defines-local.h,v $ ($Date: 1994/11/17 14:19:20 $, ) version $Revision$, got on %D%, %T%
+ * $RCSfile: defines-local.h,v $ ($Date: 1994/11/25 10:39:55 $, ) version $Revision$, got on %D%, %T%
  * $Id$
  */
 
@@ -29,21 +29,17 @@
     ((control_predecessors(unstructured_control(u)) == NIL) && \
      (control_successors(unstructured_control(u)) == NIL))
 
+#define entity_functional(e) (type_functional(entity_type(e)))
+	    
+#define update_functional_as_model(e, model) \
+    free_functional(entity_functional(e)), \
+    entity_functional(e) = copy_functional(entity_functional(model));
+
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
 
 /* integer ceiling function */
 #define iceil(a,b) ((((a)-1)/(b))+1)
-
-/*  update a subroutine to a function
- */
-
-#define entity_result_type(e)\
-    functional_result(type_functional(entity_type(e)))
-
-#define update_result_type_as_model(e, model) \
-    free_type(entity_result_type(e)), \
-    entity_result_type(e) = copy_type(entity_result_type(model));
 
 #ifndef bool_undefined
 #define bool_undefined ((bool) (-15))
