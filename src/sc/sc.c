@@ -219,7 +219,10 @@ Psysteme sc;
 	consistent = BASE_NULLE_P(diff);
     }
 
-    assert(consistent);
+/* This assert is too bad ! I remove it.
+ *
+ * Alexis Platonoff, 31 january 1995 */
+/*    assert(consistent); */
 
     return consistent;
 }
