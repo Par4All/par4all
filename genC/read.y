@@ -313,7 +313,7 @@ int which ;
     union domain *dp = bp->domain ;
     extern int yyinput() ;
 
-    if( dp->ba.type != EXTERNAL ) {
+    if( dp->ba.type != EXTERNAL_DT ) {
 	fatal( "gen_read: undefined external %s\n", bp->name ) ;
 	/*NOTREACHED*/
     }
