@@ -1,5 +1,5 @@
  
-#include <sys/ddi.h>
+/*#include <sys/ddi.h>*/
 
 #include "genC.h"
 
