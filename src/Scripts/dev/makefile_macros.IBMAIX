@@ -2,8 +2,8 @@
 # $Id$
 #
 # $Log: makefile_macros.IBMAIX,v $
-# Revision 1.11  1997/05/14 15:55:58  coelho
-# *** empty log message ***
+# Revision 1.12  1997/08/18 15:10:00  coelho
+# fpips does not include wpips.
 #
 # Revision 1.10  1997/03/28 09:53:39  coelho
 # -qfullpath added (for debug)
@@ -20,13 +20,15 @@
 AR	= ar
 ARFLAGS	= rv
 CC	= cc
+# ansi required for newgen (otherwise __STDC__ or __STRICT_ANSI__ not def).
 CANSI	= -qlanglvl=ansi 
 # -ma to allow alloca():
-# ansi required for newgen (otherwise __STDC__ or __STRICT_ANSI__ not def).
 CFLAGS	= -g -O2 -qmaxmem=8192 -qfullpath -ma 
 # if -E is ommitted, the file is *compiled*:-(
 CMKDEP	= -E -M
-CPPFLAGS= 	-I. \
+# wpips was never compiled with aix...
+CPPFLAGS= 	-DFPIPS_WITHOUT_WPIPS \
+		-I. \
 		-I$(NEWGEN_ROOT)/Include \
 		-I$(LINEAR_ROOT)/Include \
 		-I$(PIPS_ROOT)/Include \
