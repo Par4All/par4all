@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1995/08/01 18:18:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+static char vcid[] = "%A% ($Date: 1995/08/01 18:18:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -8,6 +14,7 @@
 #include <xview/xview.h>
 #include <xview/panel.h>
 #include <xview/text.h>
+#include <xview/textsw.h>
 #include <xview/notice.h> 
 #include <xview/xv_error.h>
 #include <setjmp.h>
@@ -26,9 +33,11 @@ static Menu_item open_front, clear, close;
 #define LOG_FILE "LOGFILE"
 /* Par de'faut, le fichier est ferme' : */
 static FILE *log_file = NULL;
+static char log_file_name[MAXPATHLEN];
 
 
-  void
+
+void
 close_log_file()
 {
   if (log_file != NULL && get_bool_property("USER_LOG_P")==TRUE)
@@ -40,28 +49,27 @@ close_log_file()
 }
 
 
-  void
+void
 open_log_file()
 {
-  char file_name[MAXPATHLEN];
-
   if (log_file != NULL)
     close_log_file();
 
   if (get_bool_property("USER_LOG_P")==TRUE) {
-    (void) strcpy(file_name,
+    (void) strcpy(log_file_name,
 		  concatenate(database_directory(db_get_current_workspace()),
 			      "/",
 			      LOG_FILE,
 			      NULL));
-    if ((log_file = fopen(file_name, "w")) == NULL) {
+    if ((log_file = fopen(log_file_name, "w")) == NULL) {
       perror("open_log_file");
       abort();
     }
   }
 }
 
-  void
+
+static void
 log_on_file(char chaine[])
 {
   if (log_file != NULL && get_bool_property("USER_LOG_P")==TRUE) {
@@ -74,56 +82,9 @@ log_on_file(char chaine[])
   }
 }
 
-/* Useless function... RK, 17/5/1995. */
-/*
-int go_on_p(s)
-char *s;
-{
-    int	result;
-    Event e;
 
-    result = notice_prompt(main_frame, &e,
-			   NOTICE_MESSAGE_STRINGS,
-			   s,
-			   0,
-			   NOTICE_BUTTON_YES,	"Yes",
-			   NOTICE_BUTTON_NO,	"Cancel",
-			   0);
-
-    return(result == NOTICE_YES);
-}
-*/
-
-/*VARARGS0*/
-/*
-void prompt_user(va_alist)
-va_dcl
-{
-    Event e;
-    static char message_buffer[SMALL_BUFFER_LENGTH];
-    va_list args;
-    char *fmt;
-
-    va_start(args);
-
-    fmt = va_arg(args, char *);
-
-    (void) vsprintf(message_buffer, fmt, args);
-
-    va_end(args);
-
-    (void) notice_prompt(xv_find(main_frame, WINDOW, 0), 
-			 &e,
-			 NOTICE_MESSAGE_STRINGS,
-			 message_buffer,
-			 0,
-			 NOTICE_BUTTON_YES,	"Press Here",
-			 0);
-}
-*/
-
-
-void prompt_user(string a_printf_format, ...)
+void
+prompt_user(string a_printf_format, ...)
 {
    Event e;
    va_list some_arguments;
@@ -145,130 +106,94 @@ void prompt_user(string a_printf_format, ...)
 }
 
 
-/* function suppressed on 92.04 as we shifted to xview.3
-Xv_error_action xview_error_recovery(object, severity, avlist)
-Xv_object object;
-Xv_error_severity severity;
-Attr_avlist avlist[ATTR_STANDARD_SIZE];
+static void
+insert_something_in_the_wpips_log_window(char * a_message)
 {
-    char buf[32];
+   int new_length;
+   int message_length = strlen(a_message);
+   int old_length = (int) xv_get(log_textsw, TEXTSW_LENGTH);
 
-    fprintf(stderr, "wpips error on object called %s\n", 
-	    object==NULL ? "undefined_object" : 
-	    (char *)xv_get(object, XV_NAME));
+   /* Try to insert at the end: */
+   xv_set(log_textsw,
+          TEXTSW_INSERTION_POINT, old_length,
+          NULL);
+   textsw_insert(log_textsw, a_message, message_length);
+   /* Verify it fitted: */
+   new_length = (int) xv_get(log_textsw, TEXTSW_LENGTH);
+   if (new_length != old_length + message_length) {
+      /* It ran out of space! */
+      /* recreate_log_window(); */
+      /* Discard the content without keeping the undo buffer: */
+      textsw_reset(log_textsw, 0, 0);
+      
+      xv_set(log_textsw,
+             TEXTSW_INSERTION_POINT, 0,
+             NULL);
+      /* Hope there is no use of recursion... */
+      textsw_insert(log_textsw, a_message, message_length);
 
-	    / *(Xv_pkg *) xv_get(object, XV_TYPE)* /
+      prompt_user("As you have just clicked, "
+                  "you saw the log window was full :-) ...\n"
+                  "It is now cut down to 0 byte again...\n\n"
+                  "Anyway, you can retrieve all the log content "
+                  "in the file \"%s\"\n",
+                  log_file_name);
+   }   
 
-    if (severity == XV_ERROR_RECOVERABLE) {
-	fprintf(stderr, "Dump core? (y/n) "), fflush(stderr);
-	gets(buf);
-	if (buf[0] == 'y' || buf[0] == 'Y' || buf[0] == NULL)
-	    abort();
-	else return XV_ERROR_CONTINUE;
-    }
-    abort();
+   textsw_possibly_normalize(log_textsw, 
+                             (Textsw_index) xv_get(log_textsw, TEXTSW_INSERTION_POINT));
+
+   XFlush((Display *) xv_get(main_frame, XV_DISPLAY));
+   XFlush((Display *) xv_get(log_frame, XV_DISPLAY));
+
+   xv_set(clear, MENU_INACTIVE, FALSE, 0);
 }
-*/
 
-void wpips_user_error_message(error_buffer)
-char error_buffer[];
+
+void
+wpips_user_error_message(char error_buffer[])
 {
-   char * perror_buffer = &error_buffer[0];
-   int l = (int) xv_get(log_textsw, TEXTSW_LENGTH);
    extern jmp_buf pips_top_level;
 
    log_on_file(error_buffer);
 
+   if (wpips_emacs_mode) 
+      send_user_error_to_emacs(error_buffer);
+   else
+      insert_something_in_the_wpips_log_window(error_buffer);
+
+   show_message(error_buffer);
+
+   prompt_user("Something went wrong. Check the log window");
+      
    /* terminate PIPS request */
    if(get_bool_property("ABORT_ON_USER_ERROR"))
       abort();
-   else {
-      if (wpips_emacs_mode) 
-         send_user_error_to_emacs(error_buffer);
-      else {         
-         xv_set(log_textsw, TEXTSW_INSERTION_POINT, l, NULL);
-         textsw_insert(log_textsw, error_buffer, strlen(perror_buffer));
-         textsw_possibly_normalize(log_textsw, 
-                                   (Textsw_index) xv_get(log_textsw, TEXTSW_INSERTION_POINT));
-         show_message(error_buffer);
-         XFlush((Display *) xv_get(main_frame, XV_DISPLAY));
-         xv_set(clear, MENU_INACTIVE, FALSE, 0);
-      }
 
-      prompt_user("Something went wrong. Check the log window");
+   longjmp(pips_top_level, 1);
       
-      longjmp(pips_top_level, 1);
-   }
-
    (void) exit(1);
 }
 
 void 
-wpips_user_warning_message(warning_buffer)
-char warning_buffer[];
+wpips_user_warning_message(char warning_buffer[])
 {
-   int l = (int) xv_get(log_textsw, TEXTSW_LENGTH);
-
    log_on_file(warning_buffer);
 
    if (wpips_emacs_mode) 
       send_user_warning_to_emacs(warning_buffer);
-   else {
-      xv_set(log_textsw, TEXTSW_INSERTION_POINT, l, NULL);
-      textsw_insert(log_textsw, warning_buffer, strlen(warning_buffer));
-      textsw_possibly_normalize(log_textsw, 
-                                (Textsw_index) xv_get(log_textsw, TEXTSW_INSERTION_POINT));
-      show_message(warning_buffer);
-      XFlush((Display *) xv_get(main_frame, XV_DISPLAY));
-      xv_set(clear, MENU_INACTIVE, FALSE, 0);
-   }
+   else
+      insert_something_in_the_wpips_log_window(warning_buffer);
+
+   show_message(warning_buffer);
 }
 
 
 #define MAXARGS     100
-/*VARARGS0*/
-/*
-void log_execl(va_alist)
-va_dcl
+
+void
+wpips_user_log(string fmt, va_list args)
 {
-    FILE *fd;
-    char buffer[256];
-
-    char command_buffer[SMALL_BUFFER_LENGTH];
-    va_list args;
-    char *s;
-
-    va_start(args);
-
-    strcpy(command_buffer, "");
-    while ((s = va_arg(args, char *)) != (char *) NULL) {
-	strcat(command_buffer, s);
-	strcat(command_buffer, " ");
-    }
-    va_end(args);
-
-    strcat(command_buffer, " 2>&1");
-    if ((fd = popen(command_buffer, "r")) == NULL) {
-		fprintf(stderr, "could not popen a new process\n");
-		exit(1);
-    }
-
-    while (fgets(buffer, 256, fd) != NULL) {
-	textsw_insert(log_textsw, buffer, strlen(buffer));
-	textsw_possibly_normalize(log_textsw, 
-		(Textsw_index) xv_get(log_textsw, TEXTSW_INSERTION_POINT));
-	show_message(buffer);
-	XFlush((Display *) xv_get(main_frame, XV_DISPLAY));
-    }
-    pclose(fd);
-
-    xv_set(clear, MENU_INACTIVE, FALSE, 0);
-}
-*/
-
-void wpips_user_log(string fmt, va_list args)
-{
-   int l = (int) xv_get(log_textsw, TEXTSW_LENGTH);
    static char log_buffer[SMALL_BUFFER_LENGTH];
 
    if(get_bool_property("USER_LOG_P")==FALSE)
@@ -280,20 +205,12 @@ void wpips_user_log(string fmt, va_list args)
 
    if (wpips_emacs_mode) 
       send_user_log_to_emacs(log_buffer);
-   else {
-      xv_set(log_textsw, TEXTSW_INSERTION_POINT, l, NULL);
-      textsw_insert(log_textsw, log_buffer, strlen(log_buffer));
-      textsw_possibly_normalize(log_textsw, 
-                                (Textsw_index) xv_get(log_textsw, TEXTSW_INSERTION_POINT));
-      XFlush((Display *) xv_get(log_frame, XV_DISPLAY));
-      xv_set(clear, MENU_INACTIVE, FALSE, 0);
-   }
-   /* Display the "Message:" line in the main windo also in the emacs
+   else
+      insert_something_in_the_wpips_log_window(log_buffer);
+   /* Display the "Message:" line in the main window also in the emacs
       mode: */
    show_message(log_buffer);
-   XFlush((Display *) xv_get(main_frame, XV_DISPLAY));
 }
-
 
 
 void open_log_subwindow(menu, menu_item)
@@ -304,7 +221,6 @@ Menu_item menu_item;
     xv_set(close, MENU_INACTIVE, FALSE, 0);
     unhide_window(log_frame);
 }
-
 
 
 void clear_log_subwindow(menu, menu_item)
@@ -326,7 +242,6 @@ Menu_item menu_item;
     xv_set(close, MENU_INACTIVE, TRUE, 0);
     hide_window(log_frame);
 }
-
 
 
 void create_log_menu()
@@ -365,6 +280,15 @@ void create_log_menu()
 		     0);
 }
 
+
+/* This works but it is cleaner to use textsw_reset() instead...
+void
+recreate_log_window()
+{
+   xv_destroy(log_textsw);
+   log_textsw = (Xv_Window) xv_create(log_frame, TEXTSW, 0);
+}
+*/
 
 
 void create_log_window()
