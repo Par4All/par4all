@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: Listener.java,v $
+ * Revision 1.3  1998/07/01 13:32:25  coelho
+ * cleaner.
+ *
  * Revision 1.2  1998/07/01 07:04:47  coelho
  * cleaner.
  *
@@ -16,27 +19,26 @@ import java.util.*;
 import java.io.*;
 import java.applet.*;
 
-import JPips.Pawt.*;
-
-/** A class that redirects the tpips output stream.
+/** A class that redirects an input stream to the output stream.
   * 
   * @author Francois Didry
   */  
 public class Listener 
   implements Runnable
 {
-  public	Resetable	jpips;
-  public	DataInputStream	in;		//input stream from tpips
   public final	String 		listener = "listener   : ",
   				signal = "[tpips_wrapper] killing tpips...";
 
-  public PFrame frame;
+
+  public	Resetable	jpips;
+  public	DataInputStream	in;		//input stream from tpips
+  public 	PFrame 		frame;
 
   public Listener(DataInputStream in, Resetable jpips)
     {
       this.frame = frame;
-      this.in = in;
       this.jpips = jpips;
+      this.in = in;
     }
 
   /** Listens and print the specified stream.
@@ -45,7 +47,7 @@ public class Listener
     {
       try
         {
-	  System.out.println(listener+"Tpips listener running");
+	  System.out.println(listener + "Tpips listener running");
 	  boolean tpipsRunning = true;
           while(tpipsRunning)
 	    {
@@ -53,7 +55,7 @@ public class Listener
 	      System.out.println(listener + s);
 	      if(s.indexOf(signal) != -1) tpipsRunning = false;
 	    }
-	  System.out.println(listener+"tpips down...restarting tpips...");
+	  System.out.println(listener+"tpips down... restarting tpips...");
 	  jpips.reset();
 	}
       catch(IOException e)
