@@ -28,11 +28,11 @@ LIB_CFILES =	replace.c \
 		forward_substitution.c \
 		optimize.c \
 		sequence_gcm_cse.c \
-		transformation_test.c 
+		transformation_test.c \
+		array_bound_check.c
 
 #		optimize_misc.c
 
 LIB_HEADERS =	transformations-local.h
 
 LIB_OBJECTS =	$(LIB_CFILES:%.c=%.o)
-
