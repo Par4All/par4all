@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.61  1997/06/06 14:54:21  zory
+# hpfc_communication -> hpfc_communication_pvm
+#
 # Revision 1.60  1997/06/03 08:06:56  coelho
 # *** empty log message ***
 #
@@ -206,7 +209,7 @@ LIB_M4FFILES = 	hpfc_packing.m4f \
 		hpfc_shift.m4f \
 		hpfc_bufmgr.m4f \
 		hpfc_broadcast.m4f \
-		hpfc_communication.m4f
+		hpfc_communication_pvm.m4f
 
 LIB_M4CFILES =	hpfc_misc.m4c
 LIB_FFILES =	hpfc_check.f \
