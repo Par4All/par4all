@@ -33,6 +33,8 @@ typedef struct
 
 static list lp = NIL;
 
+
+static
 void reset_icfgpe_print()
 {
   gen_map(free, lp);
@@ -40,6 +42,7 @@ void reset_icfgpe_print()
   lp = NIL;
 }
 
+static
 void add_a_icfgpe_print(string resource_name, get_text_function gt)
 {
   p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff)malloc(sizeof(icfgpe_print_stuff));
@@ -50,11 +53,56 @@ void add_a_icfgpe_print(string resource_name, get_text_function gt)
   lp = CONS(STRING, (char *)ips, lp);
 }
 
+/*static text text_statement_any_effect_type(entity module, int margin, statement stat)
+{
+  text result = make_text(NIL);
+  list l;
+  MAPL(l_ips, {
+    p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff)STRING(CAR(l_ips));
+  }, lp);
+}
+*/
+static text get_any_effects_text_flt(string module_name)
+{
+  entity module;
+  statement module_stat, user_stat = statement_undefined;
+  text txt = make_text(NIL);
+  
+  /* current entity
+   */
+  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  module = get_current_module_entity();
+
+  /* current statement
+   */
+  set_current_module_statement((statement)db_get_memory_ressource(DBR_CODE, module_name, TRUE));
+  module_stat = get_current_module_statement();
+  
+  /* resources to be printed...
+   */
+  load_resources(module_name);
+  
+  debug_on("EFFECTS_DEBUG_LEVEL");
+  
+  /* init_pretty_print(text_statement_any_effect_type); */
+
+  MERGE_TEXTS(txt, text_module(module, module_stat));
+  
+  /*close_prettyprint();*/
+
+  debug_off;
+  
+  reset_current_module_entity();
+  reset_current_module_statement();
+  
+  return txt;
+}
+
 text get_any_effect_type_text_flt(string module_name, string resource_name, entity e_flt)
 {
   text txt;
   add_a_icfgpe_print(resource_name, effects_to_text_func);
-  /*txt = get_any_effects_text(module_name, TRUE);*/
+  txt = get_any_effects_text_flt(module_name);
   reset_icfgpe_print();
   return txt;
 }
