@@ -248,6 +248,7 @@ effect_to_string(effect eff)
     return result;
 }
 
+/* Assumes that the cell is a preference and not a reference. */
 list
 words_effect(obj)
 effect obj;
