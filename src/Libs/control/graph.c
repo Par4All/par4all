@@ -2,7 +2,7 @@
  *
  *  (c) Fabien COELHO - march 1995
  *
- *  $RCSfile: graph.c,v $ ($Date: 1996/06/15 14:17:33 $, )
+ *  $RCSfile: graph.c,v $ ($Date: 1996/06/18 10:33:26 $, )
  *  version $Revision$
  */
 
@@ -80,16 +80,13 @@ list /* of statements */ l;
 	add_arrow_in_ctrl_graph(s, STATEMENT(CAR(l)));
 }
 
-static list control_list_to_statement_list(l)
-list /* of controls */ l;
+list /* of statement */ 
+control_list_to_statement_list(
+    list /* of control */ lc)
 {
-    list /* of statements */ r;
-
-    if (ENDP(l)) return(NIL);
-    
-    r = control_list_to_statement_list(CDR(l));
-    r = CONS(STATEMENT, control_statement(CONTROL(CAR(l))), r);
-    return(r);
+    list /* of statements */ ls = NIL;
+    MAP(CONTROL, c, ls = CONS(STATEMENT, control_statement(c), ls), lc);
+    return ls;
 }
 
 static void statement_arrows(s, next)
