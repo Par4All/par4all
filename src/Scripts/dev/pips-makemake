@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.275  1997/03/26 13:49:18  coelho
+# $(ECHO) in comments interpretaed on AIX.
+#
 # Revision 1.274  1997/03/19 17:25:47  coelho
 # again rlog -LR -> rlog -L -R...
 #
@@ -341,7 +344,7 @@ PROTOIZE= \$(PROTO) \$(PRFLAGS) -E "\$(PREPROC)"
 M4FILTER= \$(M4) \$(M4FLAGS) \$(M4OPT)
 MAKEDEP=  \$(CC) \$(CMKDEP) \$(CPPFLAGS) \$(CPPOPT) \$(CFLAGS) \$(COPT)
 #
-# for easy debugging... e.g. gmake ECHO='$(FOO)' echo
+# for easy debugging... e.g. gmake ECHO='something' echo
 echo:; @echo \$(ECHO)
 #
 # Default rules
