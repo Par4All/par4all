@@ -1,5 +1,5 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/09/06 10:54:23 $, 
+ * $Date: 1996/09/07 17:07:14 $, 
  */
 
 #include <unistd.h>
@@ -781,21 +781,8 @@ XPOMP_show_usage()
 
 /* The Fortran 77 wrappers: */
 
-/* G77 adds 2 underscores to function name which has 1 _ soemewhere
- * and only one to functions that have no underscores at all.
- * I just cannot see the rationale, but this is not the point:-)
- * FC, 30/11/95
- */
-#ifdef COMPILE_FOR_G77
-#define FUNCTION_(name) name##__
-#define FUNCTION(name) name##_
-#else
-#define FUNCTION_(name) name##_
-#define FUNCTION(name) name##_
-#endif
-
 void
-FUNCTION_(xpomp_open_display)(int * X_window_size,
+FUNCTION(xpompfopendisplay)(int * X_window_size,
 			      int * Y_window_size, 
 			      XPOMP_display * d)
 {
@@ -804,21 +791,21 @@ FUNCTION_(xpomp_open_display)(int * X_window_size,
 
 
 void
-FUNCTION_(xpomp_close_display)(XPOMP_display * screen)
+FUNCTION(xpompfclosedisplay)(XPOMP_display * screen)
 {
     XPOMP_close_display(*screen);
 }
 
 
 void
-FUNCTION_(xpomp_get_current_default_display)(int * d)
+FUNCTION(xpompfgetcurrentdefaultdisplay)(int * d)
 {
     *d = XPOMP_get_current_default_display();
 }
 
 
 void 
-FUNCTION_(xpomp_set_current_default_display)(XPOMP_display * screen,
+FUNCTION(xpompfsetcurrentdefaultdisplay)(XPOMP_display * screen,
 					     int * d)
 {
     *d = XPOMP_set_current_default_display(*screen);
@@ -826,7 +813,7 @@ FUNCTION_(xpomp_set_current_default_display)(XPOMP_display * screen,
 
 
 void
-FUNCTION_(xpomp_get_depth)(XPOMP_display * screen,
+FUNCTION(xpompfgetdepth)(XPOMP_display * screen,
 			   int * d)
 {
     *d = XPOMP_get_depth(*screen);
@@ -834,7 +821,7 @@ FUNCTION_(xpomp_get_depth)(XPOMP_display * screen,
 
 
 void
-FUNCTION_(xpomp_set_color_map)(XPOMP_display * screen,
+FUNCTION(xpompfsetcolormap)(XPOMP_display * screen,
 			       int * pal,
 			       int * cycle,
 			       int * start,
@@ -846,7 +833,7 @@ FUNCTION_(xpomp_set_color_map)(XPOMP_display * screen,
 
 
 void
-FUNCTION_(xpomp_set_user_color_map)(XPOMP_display  * screen,
+FUNCTION(xpompfsetusercolormap)(XPOMP_display  * screen,
 				    unsigned char * red,
 				    unsigned char * green,
 				    unsigned char * blue,
@@ -857,7 +844,7 @@ FUNCTION_(xpomp_set_user_color_map)(XPOMP_display  * screen,
 
 
 void
-FUNCTION_(xpomp_wait_mouse)(XPOMP_display * screen,
+FUNCTION(xpompfwaitmouse)(XPOMP_display * screen,
 			    int * X,
 			    int * Y,
 			    int * state,
@@ -868,7 +855,7 @@ FUNCTION_(xpomp_wait_mouse)(XPOMP_display * screen,
 
 
 void
-FUNCTION_(xpomp_is_mouse)(XPOMP_display * screen,
+FUNCTION(xpompfismouse)(XPOMP_display * screen,
 			  int * X,
 			  int * Y,
 			  int * state,
@@ -879,7 +866,7 @@ FUNCTION_(xpomp_is_mouse)(XPOMP_display * screen,
 
 
 void
-FUNCTION_(xpomp_flash)(XPOMP_display * screen,
+FUNCTION(xpompfflash)(XPOMP_display * screen,
 		       unsigned char * data_array,
 		       int * X_data_array_size,
 		       int * Y_data_array_size,
@@ -897,7 +884,7 @@ FUNCTION_(xpomp_flash)(XPOMP_display * screen,
 
 
 void
-FUNCTION_(xpomp_show_real4)(XPOMP_display * screen,
+FUNCTION(xpompfshowreal4)(XPOMP_display * screen,
 			    float * data_array,
 			    int * X_data_array_size,
 			    int * Y_data_array_size,
@@ -918,7 +905,7 @@ FUNCTION_(xpomp_show_real4)(XPOMP_display * screen,
 
 
 void
-FUNCTION_(xpomp_show_real8)(XPOMP_display * screen,
+FUNCTION(xpompfshowreal8)(XPOMP_display * screen,
 			    double * data_array,
 			    int * X_data_array_size,
 			    int * Y_data_array_size,
@@ -939,7 +926,7 @@ FUNCTION_(xpomp_show_real8)(XPOMP_display * screen,
 
 
 void
-FUNCTION_(xpomp_scroll)(XPOMP_display * screen,
+FUNCTION(xpompfscroll)(XPOMP_display * screen,
 			int * delta_Y,
 			int * return_value)
 {
@@ -949,9 +936,7 @@ FUNCTION_(xpomp_scroll)(XPOMP_display * screen,
 
 /* Deal with nasty conventions with strings between Fortran and C: */
 void
-FUNCTION_(xpomp_draw_frame)ARGS(`screen, STRING_ARG(title),
-				title_color, background_color, X0, Y0, X1, Y1, color,
-				return_value')
+FUNCTION(xpompfdrawframe) ARGS(`screen, STRING_ARG(title), title_color, background_color, X0, Y0, X1, Y1, color, return_value')
 XPOMP_display * screen;
 STRING_ARG_DECL(title);
 int * title_color;
@@ -981,7 +966,7 @@ int * return_value;
 
 
 void
-FUNCTION_(xpomp_show_usage)()
+FUNCTION(xpompfshowusage)()
 {
     XPOMP_show_usage();
 }
