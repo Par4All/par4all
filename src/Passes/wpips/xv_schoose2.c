@@ -20,10 +20,15 @@
 
 #include "wpips.h"
 
+enum
+{
+   ABBREV_MENU_WITH_TEXT_AFTER_SELECTION = 9841,
+      ABBREV_MENU_WITH_TEXT_GENERATE_MENU = 1431       
+};
+
 static Panel_item choice, choices, ok, help, cancel;
 static void (*apply_on_choice)();
 static void (*apply_on_cancel)();
-
 
 static void schoose_help_notify(item, event)
 Panel_item item;
@@ -172,7 +177,176 @@ void (*f)(), (*g)();
 }
 
 
-void create_schoose_window()
+/* Accept only typed text in the menu list: */
+static void
+schoose_abbrev_menu_with_text_text_notify(Panel_item text_item,
+                                /* int Value, ? */
+                                          Event * event)
+{
+   void (* real_user_notify_function)(char *);
+   
+   char * text = (char *) xv_get(text_item, PANEL_VALUE);
+
+   real_user_notify_function =
+      (void (*)(char *)) xv_get(text_item, XV_KEY_DATA,
+                                ABBREV_MENU_WITH_TEXT_AFTER_SELECTION);
+   real_user_notify_function(text);
+   
+#if 0
+   Panel_item abbrev_menu = (Panel_item) xv_get(text_item,
+                                                PANEL_CLIENT_DATA);
+
+   Menu menu = (Menu) xv_get(abbrev_menu,
+                             PANEL_ITEM_MENU);
+
+   bool found = FALSE;
+   
+   for(i = (int) xv_get(menu, MENU_NITEMS); i >= 0; i--)
+      if (strcmp(text, (char *) xv_get(menu, MENU_NTH_ITEM, i)) == 0) {
+         found = TRUE;
+         break;
+      }
+   
+   if (found)
+      *(void (* )(char *))(text);
+#endif
+}
+
+
+/* The function that calls the real user notifying function: */
+static void
+abbrev_menu_with_text_menu_notify(Menu menu, Menu_item menu_item)
+{
+   void (* real_user_notify_function)(char *);
+   char * menu_choice = (char *) xv_get(menu_item, MENU_STRING);
+
+   real_user_notify_function =
+      (void (*)(char *)) xv_get(menu, MENU_CLIENT_DATA);
+   
+   real_user_notify_function(menu_choice);
+}
+
+
+static Notify_value
+abbrev_menu_event_filter_proc(Panel panel,
+                              Event * event,
+                              Notify_arg arg,
+                              Notify_event_type type)
+{
+   Panel_item item;
+   Rect * rect;
+   Menu (* generate_menu)(void);
+   
+   /* See example p. 675 in the XView Programming Manual: */
+   if (event_is_down(event)) {
+      /* Find the Panel_item */
+      PANEL_EACH_ITEM(panel, item) 
+         {
+            rect = (Rect *) xv_get(item, XV_RECT);
+            if (rect_includespoint(rect,
+                                   event->ie_locx,
+                                   event->ie_locy)) {
+               generate_menu =
+                  (Menu (* )()) xv_get(item,
+                                           XV_KEY_DATA,
+                                           ABBREV_MENU_WITH_TEXT_GENERATE_MENU);
+
+               if (generate_menu != NULL) {
+                  /* OK, we clicked on a abbrev_menu_with_text menu: */
+                  Menu new_menu;
+                  
+                  /* If there is an old menu, remove it: */
+                  Menu old_menu = xv_get(item, PANEL_ITEM_MENU);
+                  if (old_menu != NULL)
+                     xv_destroy(old_menu);
+
+                  /* Create the new menu: */
+                  new_menu = generate_menu();
+
+                  xv_set(new_menu, MENU_NOTIFY_PROC,
+                         abbrev_menu_with_text_menu_notify,
+                         NULL);
+
+                  {
+                     /* Associate the real notify function to the menu too: */
+                     void (* after_selection)(char *);
+                     
+                     after_selection = (void (*)(char *))
+                        xv_get(item,
+                               XV_KEY_DATA,
+                               ABBREV_MENU_WITH_TEXT_AFTER_SELECTION);
+                     
+                     xv_set(new_menu,
+                            MENU_CLIENT_DATA,
+                            after_selection,
+                            NULL);
+                  }
+                  xv_set(item, PANEL_ITEM_MENU, new_menu);
+               }
+            }
+         }
+      PANEL_END_EACH
+         }
+   
+   /* Now call the normal event procedure: */
+   return notify_next_event_func(panel, (Notify_event) event, arg, type);
+}
+
+
+/* Create an abbreviation menu attached with a text item.
+ after_selection() is called when a selection is done or a text has been
+ entered. It can be seen as a new widget. */
+Panel_item
+schoose_create_abbrev_menu_with_text(Panel main_panel,
+                                     char * label_string,
+                                     int value_display_length,
+                                     int x,
+                                     int y,
+                                     Menu (* generate_menu)(void),
+                                     void (* after_selection)(char *))
+{
+   Panel_item item, text;
+
+   item = xv_create(main_panel, PANEL_ABBREV_MENU_BUTTON,
+                    PANEL_LABEL_STRING, label_string,
+                    PANEL_VALUE_DISPLAY_LENGTH, value_display_length,
+                    PANEL_LAYOUT, PANEL_HORIZONTAL,
+                    PANEL_VALUE_X, x,
+                    PANEL_VALUE_Y, y,
+                    /* No real menu yet: */
+                    PANEL_ITEM_MENU, xv_create(NULL, MENU,
+                                               MENU_STRINGS, "* none *", NULL,
+                                               NULL),
+                    XV_KEY_DATA, ABBREV_MENU_WITH_TEXT_GENERATE_MENU, generate_menu,
+                    XV_KEY_DATA, ABBREV_MENU_WITH_TEXT_AFTER_SELECTION, after_selection,
+                    
+                    NULL);
+
+   notify_interpose_event_func(main_panel,
+                               abbrev_menu_event_filter_proc,
+                               NOTIFY_SAFE);
+
+   text = xv_create(main_panel, PANEL_TEXT,
+                    PANEL_VALUE_DISPLAY_LENGTH, value_display_length,
+                    PANEL_VALUE_STORED_LENGTH, 128,
+                    PANEL_READ_ONLY, FALSE,
+                    PANEL_NOTIFY_PROC, schoose_abbrev_menu_with_text_text_notify,
+                    XV_KEY_DATA, ABBREV_MENU_WITH_TEXT_AFTER_SELECTION,
+                    after_selection,
+                    /* Strange, 21 does a
+                       Program received signal SIGSEGV, Segmentation fault.
+                       0x1cf988 in attr_check_use_custom () */
+                    PANEL_VALUE_X, x + 25,
+                    PANEL_VALUE_Y, y,
+                    /* PANEL_ITEM_X_GAP, 22,*/
+                    NULL);
+   
+   return text;
+}
+
+
+void
+create_schoose_window()
 {
     schoose_frame = xv_create(main_frame, FRAME,
 			      XV_SHOW, FALSE,
