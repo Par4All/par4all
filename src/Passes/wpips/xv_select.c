@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/08/10 13:41:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/13 17:46:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/08/10 13:41:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/09/13 17:46:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -145,6 +145,7 @@ disable_module_selection()
    xv_set(module_name_panel_item, PANEL_INACTIVE, TRUE, 0);
    disable_view_selection();
    disable_transform_selection();
+   disable_compile_selection();
    disable_option_selection();
 }
 
@@ -156,6 +157,7 @@ enable_module_selection()
    xv_set(module_name_panel_item, PANEL_INACTIVE, FALSE, 0);
    enable_view_selection();
    enable_transform_selection();
+   enable_compile_selection();
    enable_option_selection();
 }
 
