@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/15 14:38:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/22 17:25:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/15 14:38:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/09/22 17:25:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -20,10 +20,7 @@ static char vcid[] = "%A% ($Date: 1995/09/15 14:38:43 $, ) version $Revision$, g
 #include "top-level.h"
 #include "wpips.h"
 
-
-
 static Menu compile_menu;
-
 
 void
 apply_on_each_compile_item(void (* function_to_apply_on_each_menu_item)(Menu_item))
@@ -82,7 +79,7 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
    char * file_names[ARGS_LENGTH];
    int file_number = 0;
 
-   debug(1, "generate_a_menu_with_HPF_output_files", "Enter\n");
+   pips_debug(1, "Enter\n");
    
    menu = (Menu) xv_get(menu_item, MENU_PULLRIGHT);
    
@@ -92,7 +89,7 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
         int return_code;
         char *hpfc_directory;
         
-        debug(1, "generate_a_menu_with_HPF_output_files", "MENU_DISPLAY\n");
+        pips_debug(1, "MENU_DISPLAY\n");
    
         /* Create a new menu with the content of the hpfc directory: */
         
@@ -185,20 +182,31 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
    return menu;
 }
 
+#define HPFC_COMPILE "Compile an HPF program"
+#define HPFC_MAKE "Make an HPF program"
 
 void
 hpfc_notify(Menu menu,
             Menu_item menu_item)
 {
-   char * modulename = db_get_current_module_name();
+    char *label, *modulename;
+   
+    modulename = db_get_current_module_name();
+    if (!modulename)
+    {
+	prompt_user("No module selected");
+	return;
+    }
 
-   if (modulename == NULL) {
-      prompt_user("No module selected");
-      return;
-   }
-
-   safe_apply(BUILDER_HPFC_INSTALL, modulename);
+    label = (char *) xv_get(menu_item, MENU_STRING);
+    if (same_string_p(label, HPFC_COMPILE))
+	safe_apply(BUILDER_HPFC_INSTALL, modulename);
+    else if (same_string_p(label, HPFC_MAKE))
+	safe_apply(BUILDER_HPFC_MAKE, modulename);
+    else
+	pips_error("hpfc_notify", "Bad choice");
 }
+
 
 
 void
@@ -207,8 +215,9 @@ create_compile_menu()
    compile_menu = 
       xv_create(XV_NULL, MENU_COMMAND_MENU, 
                 MENU_GEN_PIN_WINDOW, main_frame, "Compile Menu",
-                MENU_TITLE_ITEM, "Compiling a module or workspace ",
-                MENU_ACTION_ITEM, "Compile an HPF program", hpfc_notify,
+                MENU_TITLE_ITEM, "Compilation ",
+                MENU_ACTION_ITEM, HPFC_COMPILE, hpfc_notify,
+		MENU_ACTION_ITEM, HPFC_MAKE, hpfc_notify,
                 /*
                 MENU_ACTION_ITEM, "Display an HPF program", display_hpfc_file,
                 */
@@ -222,3 +231,4 @@ create_compile_menu()
                     PANEL_ITEM_MENU, compile_menu,
                     NULL);
 }
+
