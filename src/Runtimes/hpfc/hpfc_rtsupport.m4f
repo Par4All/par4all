@@ -3,10 +3,8 @@ c Runtime Support Functions for the
 c High Performance Fortran Compiler
 c by Fabien COELHO.
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/09/20 19:26:08 $, )
-c version $Revision$
-c got on %D%, %T%
-c $Id$
+c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
+c ($Date: 1995/09/27 18:02:13 $, )
 c
 c-----------------
 c
@@ -904,7 +902,8 @@ c
       include "hpfc_commons.h"
       integer i, bufid, info, inum
 
-      call hpfc_check()
+      call HPFC_CHECK
+
       call pvmfmytid(MYTID)
       call pvmfparent(HOSTTID)
       direct(`call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)')
@@ -1000,14 +999,16 @@ c
       include "hpfc_commons.h"
       integer bufid, info, inum
 _CM5(`      integer i')dnl
-      call hpfc_check()
+
+      call HPFC_CHECK
+
       call pvmfmytid(MYTID)
       direct(`call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)')
       MYLID = 0
       HOSTTID = MYTID
       NBOFTASKS = MAXSIZEOFPROCS
 
-      call HPFC_INIT_COMMON_PARAM()
+      call HPFC_INIT_COMMON_PARAM
 
       debug(`print *, "spawning ", NODE_PROGRAM_NAME
       print *, "   on ", NBOFTASKS, " ", NODE_ARCHITECTURE')
