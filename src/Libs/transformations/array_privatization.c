@@ -5,8 +5,7 @@
  *
  * This File contains the functions computing the private regions.
  *
- * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1997/07/21 13:09:02 $, 
+ * $Id$
  */
 
 #include <stdlib.h>
@@ -30,21 +29,15 @@
 #include "pipsmake.h"
 #include "transformer.h"
 #include "semantics.h"
-#include "effects.h"
-#include "regions.h"
+#include "effects-generic.h"
+#include "effects-convex.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "prettyprint.h"
 
-/*********************************************************************************/
-/*********************************************************************************/
-/* 1-  PRIVATIZABILITY DETECTION  && LOOP PRIVATISATION                          */
-/*********************************************************************************/
-/*********************************************************************************/
+/********************** 1-  PRIVATIZABILITY DETECTION  && LOOP PRIVATISATION */
 
-/*********************************************************************************/
-/* USEFUL VARIABLES AND ACCESS FUNCTIONS                                         */
-/*********************************************************************************/
+/************************************* USEFUL VARIABLES AND ACCESS FUNCTIONS */
 
 /* global static variable local_regions_map, and its access functions */
 GENERIC_GLOBAL_FUNCTION(private_effects, statement_effects)
@@ -61,11 +54,8 @@ static bool copy_in = FALSE;
 static bool copy_out = FALSE;
 
 
-/* =============================================================================== 
- *
- * INTRAPROCEDURAL PRIVATE REGIONS ANALYSIS
- *
- * =============================================================================== */
+/********************************** INTRAPROCEDURAL PRIVATE REGIONS ANALYSIS */
+
 
 static void private_regions_of_module_statement(statement module_stat);
 static void private_regions_of_module_loops(statement module_stat);
@@ -116,9 +106,11 @@ static bool privatizer(char *module_name)
     statement module_stat;
 
     pips_assert("Coyp-in not implemented.\n", !copy_in);
-    pips_assert("No array section privatization if we do not store as regions.\n", 
+    pips_assert("No array section privatization"
+		" if we do not store as regions.\n", 
 		store_as_regions || ! privatize_sections);
-    pips_assert("No copy-in or copy-out if we do not privatize array sections.\n",
+    pips_assert("No copy-in or copy-out"
+		" if we do not privatize array sections.\n",
 		privatize_sections || (!copy_in && !copy_out) );
 
 
@@ -592,9 +584,7 @@ loop l;
 }
 
 
-/*********************************************************************************/
-/* PRETTYPRINT OF PRIVATIZED REGIONS (AND COPY-OUT)                              */
-/*********************************************************************************/
+/************************* PRETTYPRINT OF PRIVATIZED REGIONS (AND COPY-OUT) */
 static boolean is_user_view_p = FALSE;
 static hash_table nts = hash_table_undefined;
 static text text_statement_privatized_array_regions(entity module,
@@ -604,7 +594,7 @@ static text get_privatized_regions_text(string module_name,
 					bool give_code_p);
 static text text_privatized_array_regions(list l_priv, list l_out);
 
-/* bool print_code_privatized_sections(string module_name, list summary_regions)
+/* bool print_code_privatized_sections(string module_name, list summ_regions)
  * input    : the name of the current module, the name of the region and
  *            summary region resources and the file suffix
  *            the regions are in the global variable local_regions_map.
@@ -614,31 +604,37 @@ static text text_privatized_array_regions(list l_priv, list l_out);
  */
 bool print_code_privatized_regions(string module_name)
 {
-    char *file_name, *file_resource_name;
-    bool success = TRUE;
-    /* we print all private variables, even when attached to blocks */
-    bool blocks_tmp = get_bool_property("PRETTYPRINT_BLOCKS");
-    bool priv_tmp = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
+    bool blocks_tmp, priv_tmp, success;
+    string file_name, file_resource_name;
 
-    file_name = strdup(concatenate(".priv_reg",
-                                  get_bool_property
-				  ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
-				  GRAPH_FILE_EXT : "",
-                                  NULL));
-    file_resource_name = get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
+    blocks_tmp = get_bool_property("PRETTYPRINT_BLOCKS");
+    priv_tmp = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
+
+    file_name = strdup(concatenate
+	       (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
+		GRAPH_FILE_EXT : "", NULL));
+
+    file_resource_name = 
+	get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
 	DBR_GRAPH_PRINTED_FILE : 
-	    (is_user_view_p ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE);
-
+	(is_user_view_p ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE);
+    
     set_bool_property("PRETTYPRINT_BLOCKS", TRUE);
     set_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES", TRUE);
-    success = make_text_resource(module_name, file_resource_name,
-				 file_name,
-				 get_privatized_regions_text(module_name, TRUE));
+
+    set_read_action_interpretation(READ_IS_IN);
+    set_write_action_interpretation(WRITE_IS_OUT);
+
+    success = make_text_resource
+	(module_name, file_resource_name, file_name,
+	 get_privatized_regions_text(module_name, TRUE));
 
     set_bool_property("PRETTYPRINT_BLOCKS", blocks_tmp);
     set_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES", priv_tmp);
+
     free(file_name);
-    return(TRUE);
+
+    return success;
 }
 
 static text get_privatized_regions_text(string module_name,
@@ -687,6 +683,7 @@ static text get_privatized_regions_text(string module_name,
 
     /* prepare the prettyprinting */
     init_prettyprint(text_statement_privatized_array_regions);
+    set_in_out_regions_p_variable(TRUE);
 
     if (give_code_p)
 	/* then code with regions, using text_array_regions */
@@ -713,8 +710,8 @@ static text get_privatized_regions_text(string module_name,
 }
 
 
-/* static text text_statement_privatized_array_regions(entity module, int margin, 
- *                                                     statement stat)
+/* static text text_statement_privatized_array_regions
+ *               (entity module, int margin, statement stat)
  * output   : a text representing the list of array regions associated with the
  *            statement stat.
  * comment  : if the number of array regions is not nul, then empty lines are
