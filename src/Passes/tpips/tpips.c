@@ -1,11 +1,9 @@
 #include <stdio.h>
-#include <fcntl.h>
-#include <string.h>
-#include <stdarg.h>
-#include <setjmp.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <stdarg.h>
 #include <unistd.h>
+#include <setjmp.h>
+#include <strings.h>
 
 #include "readline.h"
 #include "history.h"
@@ -184,15 +182,17 @@ static void tpips_user_error(char * calling_function_name,
  */
 static char *default_hist_file_name()
 {
-    char *home, *hist = getenv(TPIPS_HISTENV);
+    char *home, *hist = getenv(TPIPS_HISTENV), *tmp;
 
     if (hist) return hist;
 
     /* else builds the default name. memory leak.
      */
     home = getenv("HOME");
-    return sprintf((char*) malloc(sizeof(char)*(strlen(home)+strlen(HIST)+2)),
-		   "%s/%s", home, HIST);
+    tmp = (char*) malloc(sizeof(char)*(strlen(home)+strlen(HIST)+2));
+    (void) sprintf(tmp, "%s/%s", home, HIST);
+
+    return tmp;
 }
 
 static char * initialize_tpips_history()
