@@ -25,6 +25,9 @@
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.13  2003/08/02 13:34:49  irigoin
+ Four useless/obsolete static functions removed to reduce gcc warnings.
+
  Revision 1.12  2003/07/23 14:29:01  irigoin
  Bug fix in bourdoncle_unstructured_free()
 
@@ -1324,17 +1327,6 @@ static void add_test_successor(control t, control new_s, bool is_true_successor)
   }
   */
 }
-
-static void add_false_successor(control t, control s)
-{
-  add_test_successor(t, s, FALSE);
-}
-
-static void add_true_successor(control t, control s)
-{
-  add_test_successor(t, s, TRUE);
-}
-
 
 /* Make new_c a successor of new_pred, the same way c is a successor of
    pred. new_c is not consistent on entry: it points towards pred but is
@@ -1401,49 +1393,6 @@ static void update_successor_in_copy(control new_pred,
   }
 }
 
-static void shallow_free_control(control c)
-{
-  /* free_control() cannot be used because you do not want to free the
-     statement, the successors and the predecessors. But you want to get
-     rid of meaningless control nodes */
-  control_statement(c) = statement_undefined;
-
-  MAP(CONTROL, c, 
-  {
-    if(meaningless_control_p(c)) {
-      free_meaningless_control(c);
-    }
-  }
-      , control_successors(c));
-  
-  gen_free_list(control_predecessors(c));
-  gen_free_list(control_successors(c));
-  control_predecessors(c)= list_undefined;
-  control_successors(c)= list_undefined;
-
-  free_control(c);
-}
-
-/* To avoid sharing of meaningless control nodes. */
-static list copy_successors(list succs)
-{
-  list nl = gen_copy_seq(succs);
-  MAPL(c_c, {
-    control c = CONTROL(CAR(c_c));
-    if(meaningless_control_p(c)) {
-      /* Allocate a meaningless copy of c */
-      control new_c =  make_meaningless_control(control_predecessors(c),
-						   control_successors(c));
-      CONTROL(CAR(c_c)) = new_c;
-      pips_debug(8, "Allocation of %p, meaningless copy of meaningless %p\n",
-		 new_c, c);
-    }
-  } , nl);
-  
-  return nl;
-}
-
-
 /* The nodes in scc partition but root must be removed. Replicated nodes
    must be added to build all input and output paths to and from root
    using control nodes in partition.
@@ -1454,7 +1403,7 @@ static list copy_successors(list succs)
 
    The cycle head must be a non-deterministic control node. Hence it
    cannot be a test since tests stay deterministics (thanks to Pierre's
-   data structrue). Another node in the partition could be chosen as new
+   data structure). Another node in the partition could be chosen as new
    cycle head, but the partition may only contain tests with side
    effects. Instead we choose to insert a non-deterministic node in front
    in case it is needed. The initial CFG is less disturbed.
