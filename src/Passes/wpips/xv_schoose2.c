@@ -147,45 +147,47 @@ schoose_frame_done_proc(Frame frame)
 }
 
 
-void schoose(title, argc, argv, initial_choice, f, g)
-char *title;
-int argc;
-char *argv[];
-char *initial_choice;
-void (*f)(), (*g)();
+void
+schoose(char * title,
+        int argc,
+        char * argv[],
+        char * initial_choice,
+        void (*function_for_ok)(Menu, Menu_item),
+        void (*function_for_cancel)(Menu, Menu_item))
 {
-  int i;
-  int nchoices;
+   int i;
+   int nchoices;
 
-  apply_on_choice = f;
-  apply_on_cancel = g;
+   apply_on_choice = function_for_ok;
+   apply_on_cancel = function_for_cancel;
 
-  xv_set(schoose_frame, FRAME_LABEL, title, NULL);
+   xv_set(schoose_frame, FRAME_LABEL, title, NULL);
 
-  /* reset the choice set to empty */
-  nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
+   /* reset the choice set to empty */
+   nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
 
-  for (i = 0; i < nchoices; i++) {
-    xv_set(choices, PANEL_LIST_DELETE, 0, NULL);
-  }
+   /* Delete all the rows, ie nchoices rows from row 0: */
+   xv_set(choices,
+          PANEL_LIST_DELETE_ROWS, 0, nchoices,
+          NULL);
 
-  for (i = 0; i < argc; i++) {
-    xv_set(choices, PANEL_LIST_STRING, i, argv[i], NULL);
-  }
+   for (i = 0; i < argc; i++) {
+      xv_set(choices, PANEL_LIST_STRING, i, argv[i], NULL);
+   }
 
-  /* Initialise au choix initial ou à défaut le premier : */
-  xv_set(choice, PANEL_VALUE, argv[0], NULL);
-  if (initial_choice != NULL)
-    for (i = 0; i < argc; i++)
-      if (strcmp(initial_choice, argv[i]) == 0) {
-	xv_set(choice, PANEL_VALUE, argv[i], NULL);
-	xv_set(choices, PANEL_LIST_SELECT, i, TRUE, NULL);
-	break;
-      }
+   /* Initialise au choix initial ou à défaut le premier : */
+   xv_set(choice, PANEL_VALUE, argv[0], NULL);
+   if (initial_choice != NULL)
+      for (i = 0; i < argc; i++)
+         if (strcmp(initial_choice, argv[i]) == 0) {
+            xv_set(choice, PANEL_VALUE, argv[i], NULL);
+            xv_set(choices, PANEL_LIST_SELECT, i, TRUE, NULL);
+            break;
+         }
   
-  unhide_window(schoose_frame);
-  /* move the pointer to the center of the query window */
-  pointer_in_center_of_frame(schoose_frame);
+   unhide_window(schoose_frame);
+   /* move the pointer to the center of the query window */
+   pointer_in_center_of_frame(schoose_frame);
 }
 
 
