@@ -548,6 +548,7 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	Polyhedron_Print(stderr, "%4d",A2);
     }
     
+    sc = sc_new();
     sc->base = base_dup(sc1->base);
     sc->dimension = vect_size(sc->base);
 
@@ -622,7 +623,6 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	Polyhedron_Free(A), A = NULL;
     }
 
-    sc = sc_new();
     matrix_to_sc(a,sc);
     Matrix_Free(a), a = NULL;
 
