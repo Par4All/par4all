@@ -240,8 +240,8 @@ pips_process_file(string file_name)
 
 static regex_t 
     implicit_none_rx, 
-    include_file_rx,
-    block_data_rx;
+    include_file_rx /*,
+    block_data_rx*/;
 static FILE *output_file;
 
 /* tries several path for a file to include...
