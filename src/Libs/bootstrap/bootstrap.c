@@ -695,57 +695,141 @@ arguments_are_dcomplex(call c, hash_table types)
  *
  * Note: I - Integer; R - Real; D - Double; C - Complex
  */
+
+
 static bool 
-arguments_are_RD(call c, hash_table types)
+arguments_are_something(
+    call c, 
+    type_context_p context,
+    bool integer_ok,
+    bool real_ok,
+    bool double_ok,
+    bool complex_ok,
+    bool dcomplex_ok,
+    bool logical_ok,
+    bool character_ok)
 {
   basic b;
+  int argnumber = 0;
+  bool 
+    okay = TRUE,  
+    arg_double = FALSE,
+    arg_cmplx = FALSE;
+
   list args = call_arguments(c);
   
-  while (args != NIL)
+  MAP(EXPRESSION, e,
   {
-    b = GET_TYPE(types, EXPRESSION(CAR(args)));
-    if ( !basic_float_p(b) )
+    argnumber++;
+
+    if (!hash_defined_p(context->types, e))
     {
-      return FALSE;
+      pips_internal_error("Undefined key in hash_table\n");
     }
-    args = CDR(args);
+    
+    b = GET_TYPE(context->types, e);
+
+    /* Subroutine maybe be used as a function */
+    if (basic_overloaded_p(b))
+    {
+      syntax s = expression_syntax(e);
+      string what = NULL;
+      switch (syntax_tag(s)) {
+      case is_syntax_call: 
+	what = entity_local_name(call_function(syntax_call(s)));
+	break;
+      case is_syntax_reference:
+	what = entity_local_name(reference_variable(syntax_reference(s)));
+	break;
+      case is_syntax_range:
+	what = "**RANGE**";
+	break;
+      default: pips_internal_error("unexpected syntax tag");
+      }
+
+      add_one_line_of_comment((statement) stack_head(context->stats),
+			      "untyped '%s' used as a function.",
+			      what,
+			      entity_local_name(call_function(c)));
+      context->number_of_error++;
+      okay = FALSE;
+    }
+    else if (!((integer_ok && basic_int_p(b)) ||
+	  (real_ok && basic_float_p(b) && basic_float(b)==4) ||
+	  (double_ok &&  basic_float_p(b) && basic_float(b)==8) ||
+	  (complex_ok && basic_complex_p(b) && basic_complex(b)==8) ||
+	  (dcomplex_ok && basic_complex_p(b) && basic_complex(b)==16) ||
+	  (logical_ok && basic_logical_p(b)) ||
+	  (character_ok && basic_string_p(b))))
+    {
+      add_one_line_of_comment((statement) stack_head(context->stats),
+	   "#%d argument of '%s' must be %s%s%s%s%s%s%s but not %s",
+			      argnumber,
+			      entity_local_name(call_function(c)),
+			      integer_ok? "INT, ": "",
+			      real_ok? "REAL, ": "",
+			      double_ok? "DOUBLE, ": "",
+			      complex_ok? "COMPLEX, ": "",
+			      dcomplex_ok? "DCOMPLEX, ": "",
+			      logical_ok? "LOGICAL, ": "",
+			      character_ok? "CHARACTER, ": "",
+			      basic_to_string(b));
+      context->number_of_error++;
+      okay = FALSE;
+    }
+
+    arg_cmplx = arg_cmplx ||
+      (complex_ok && basic_complex_p(b) && basic_complex(b)==8);
+    arg_double = arg_double || 
+      (double_ok &&  basic_float_p(b) && basic_float(b)==8);
+
+    if (arg_cmplx && arg_double)
+    {
+      /* warning/error? */
+      okay = FALSE;
+    }
   }
-  return TRUE;
+      , args);
+  
+  return okay;
 }
 
 static bool 
-arguments_are_IR(call c, hash_table types)
+arguments_are_IRDC(call c, type_context_p context)
 {
-  basic b;
-  list args = call_arguments(c);
-  
-  while (args != NIL)
-  {
-    b = GET_TYPE(types, EXPRESSION(CAR(args)));
-    if ( !basic_int_p(b) && !(basic_float_p(b) && basic_float(b)==4))
-    {
-      return FALSE;
-    }
-    args = CDR(args);
-  }
-  return TRUE;
+  return arguments_are_something
+    (c, context, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE);
+}
+static bool
+arguments_are_character(call c, type_context_p context)
+{
+  return arguments_are_something
+    (c, context, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE);
+}
+static bool
+arguments_are_logical(call c, type_context_p context)
+{
+  return arguments_are_something
+    (c, context, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE);
 }
 static bool 
-arguments_are_IRD(call c, hash_table types)
+arguments_are_RD(call c, type_context_p context)
 {
-  basic b;
-  list args = call_arguments(c);
-  
-  while (args != NIL)
-  {
-    b = GET_TYPE(types, EXPRESSION(CAR(args)));
-    if ( !basic_int_p(b) && !basic_float_p(b))
-    {
-      return FALSE;
-    }
-    args = CDR(args);
-  }
-  return TRUE;
+  return arguments_are_something
+    (c, context, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE);
+}
+
+static bool 
+arguments_are_IR(call c, type_context_p context)
+{
+  return arguments_are_something
+    (c, context, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE);
+}
+static bool 
+arguments_are_IRD(call c, type_context_p context)
+{
+  return arguments_are_something
+    (c, context, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE);
 }
 /***************************************************************************** 
  * Verify if all the arguments basic of function C are REAL, DOUBLE and COMPLEX
@@ -756,113 +840,12 @@ arguments_are_IRD(call c, hash_table types)
  * PDSon: If there is no argument, I return TRUE
  */
 static bool 
-arguments_are_RDC(call c, hash_table types)
+arguments_are_RDC(call c, type_context_p context)
 {
-  basic b;
-  bool arg_double, arg_cmplx;    
-  list args = call_arguments(c);
-  
-  arg_double = FALSE;
-  arg_cmplx = FALSE;
-  
-  MAP(EXPRESSION, e,
-  {
-    b = GET_TYPE(types, e);
-    if ( !basic_float_p(b) &&
-	 !(basic_complex_p(b) && basic_complex(b) == 8))
-    {
-      return FALSE;
-    }
-    else if ((arg_cmplx && basic_float_p(b) && basic_float(b) == 8)||
-	     (arg_double && basic_complex_p(b) && basic_complex(b) == 8))
-    {
-      return FALSE;	    
-    }
-    else if (!arg_double && basic_float_p(b) && basic_float(b) == 8)
-    {
-      arg_double = TRUE;
-    }
-    else if (!arg_cmplx && basic_complex_p(b) && basic_complex(b) == 8)
-    {
-      arg_cmplx = TRUE;
-    }
-  }
-      , args);
-  
-  return TRUE;
-}
-static bool 
-arguments_are_IRDC(call c, hash_table types)
-{
-  basic b;
-  bool arg_double, arg_cmplx;    
-  list args = call_arguments(c);
-  
-  arg_double = FALSE;
-  arg_cmplx = FALSE;
-  
-  MAP(EXPRESSION, e,
-  {
-    b = GET_TYPE(types, e);
-    if ( !basic_int_p(b) && 
-	 !basic_float_p(b) &&
-	 !(basic_complex_p(b) && basic_complex(b) == 8))
-    {
-      return FALSE;
-    }
-    else if ((arg_cmplx && basic_float_p(b) && basic_float(b) == 8)||
-	     (arg_double && basic_complex_p(b) && basic_complex(b) == 8))
-    {
-      return FALSE;	    
-    }
-    else if (!arg_double && basic_float_p(b) && basic_float(b) == 8)
-    {
-      arg_double = TRUE;
-    }
-    else if (!arg_cmplx && basic_complex_p(b) && basic_complex(b) == 8)
-    {
-      arg_cmplx = TRUE;
-    }
-  }
-      , args);
-  
-  return TRUE;
+  return arguments_are_something
+    (c, context, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE);
 }
 
-static bool
-arguments_are_character(call c, hash_table types)
-{
-  basic b;
-  list args = call_arguments(c);
-  
-  while (args != NIL)
-  {
-    b = GET_TYPE(types, EXPRESSION(CAR(args)));
-    if (!basic_string_p(b))
-    {
-      return FALSE;
-    }
-    args = CDR(args);
-  }
-  return TRUE;
-}
-static bool
-arguments_are_logical(call c, hash_table types)
-{
-  basic b;
-  list args = call_arguments(c);
-  
-  while (args != NIL)
-  {
-    b = GET_TYPE(types, EXPRESSION(CAR(args)));
-    if (!basic_logical_p(b))
-    {
-      return FALSE;
-    }
-    args = CDR(args);
-  }
-  return TRUE;
-}
 /***************************************************************************** 
  * Verification if all the arguments are compatible
  * PDSon: If #arguments <=1, I return true
@@ -927,16 +910,8 @@ typing_arithmetic_operator(call c, type_context_p context)
 {
   basic b;
   
-  if(!arguments_are_IRDC(c, context->types))
+  if(!arguments_are_IRDC(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats), 
-		  "Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX" \
-			    " and not DOUBLE & COMPLEX",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     /* Just for return a result */
     return make_basic_float(4); 
   }
@@ -958,16 +933,8 @@ typing_power_operator(call c, type_context_p context)
   list /* of expression */ args = call_arguments(c);
   b = basic_undefined;
   
-  if(!arguments_are_IRDC(c, context->types))
+  if(!arguments_are_IRDC(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats),
-		   "Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX" \
-			    " and not DOUBLE & COMPLEX",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     /* Just for return a result */
     return make_basic_float(4); 
   }
@@ -1008,16 +975,8 @@ typing_relational_operator(call c, type_context_p context)
 {
   basic b;
   
-  if(!arguments_are_IRDC(c, context->types))
+  if(!arguments_are_IRDC(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats), 
-		   "Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX" \
-			    " and not DOUBLE & COMPLEX",
-			    entity_local_name(call_function(c))); 
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     /* Just for return a result */
     return make_basic(is_basic_logical, UUINT(4));
   }
@@ -1036,15 +995,8 @@ typing_relational_operator(call c, type_context_p context)
 static basic
 typing_logical_operator(call c, type_context_p context)
 {
-  if(!arguments_are_logical(c, context->types))
+  if(!arguments_are_logical(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats),
-			    "Argument(s) of '%s' must be LOGICAL",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     /* Just for return a result */
     return make_basic(is_basic_logical, UUINT(4));
   }
@@ -1056,15 +1008,8 @@ typing_logical_operator(call c, type_context_p context)
 static basic
 typing_concat_operator(call c, type_context_p context)
 {
-  if(!arguments_are_character(c, context->types))
+  if(!arguments_are_character(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats), 
-			    "Argument(s) of '%s' must be CHARACTER",
-			    entity_local_name(call_function(c))); 
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     /* Just for return a result */
     return make_basic(is_basic_string, value_undefined);
   }
@@ -1109,12 +1054,12 @@ typing_function_argument_type_to_return_type(call c, type_context_p context,
   /* CHAR */
   else if(basic_string_p(from_type))
   {
-    check_arg = arguments_are_character(c, context->types);
+    check_arg = arguments_are_character(c, context);
   }
   /* LOGICAL */
   else if(basic_logical_p(from_type))
   {
-    check_arg = arguments_are_logical(c, context->types);
+    check_arg = arguments_are_logical(c, context);
   }
   /* UNEXPECTED */
   else
@@ -1289,15 +1234,8 @@ typing_function_RealDouble_to_RealDouble(call c, type_context_p context)
 {
   basic b;
   
-  if(!arguments_are_RD(c, context->types))
+  if(!arguments_are_RD(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats), 
-			    "Argument(s) of '%s' must be REAL or DOUBLE",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     return make_basic_float(4); /* Just for return a result */
   }
   /* Find the longest type amongs all arguments */
@@ -1313,15 +1251,8 @@ typing_function_RealDouble_to_Integer(call c, type_context_p context)
 {
   basic b;
   
-  if(!arguments_are_RD(c, context->types))
+  if(!arguments_are_RD(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats), 
-			    "Argument(s) of '%s' must be REAL or DOUBLE",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     return make_basic_float(4); /* Just for return a result */
   }
   /* Find the longest type amongs all arguments */
@@ -1339,15 +1270,8 @@ typing_function_RealDoubleComplex_to_RealDoubleComplex(call c,
 {
   basic b;
   
-  if(!arguments_are_RDC(c, context->types))
+  if(!arguments_are_RDC(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats),
-		       "Argument(s) of '%s' must be REAL, DOUBLE or COMPLEX",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     return make_basic_float(4); /* Just for return a result  */
   }
   /* Find the longest type amongs all arguments */
@@ -1364,15 +1288,8 @@ typing_function_IntegerRealDouble_to_IntegerRealDouble(call c,
 {
   basic b;
   
-  if(!arguments_are_IRD(c, context->types))
+  if(!arguments_are_IRD(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats),
-			    "Argument(s) of '%s' must be INT, REAL or DOUBLE",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     return make_basic_float(4); /* Just for return a result */
   }
   /* Find the longest type amongs all arguments */
@@ -1395,15 +1312,8 @@ typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c,
 {
   basic b;
   
-  if(!arguments_are_IRDC(c, context->types))
+  if(!arguments_are_IRDC(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats),
-		    "Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     return make_basic_float(4); /* Just for return result */
   }
   /* Find the longest type amongs all arguments */
@@ -1429,14 +1339,9 @@ static basic
 typing_function_conversion_to_numeric(call c, type_context_p context, 
 				      basic to_type)
 {
-  if(!arguments_are_IRDC(c, context->types))
+  if(!arguments_are_IRDC(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats), 
-		   "Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
+    return copy_basic(to_type);
   }
   return copy_basic(to_type);
 }
@@ -1485,15 +1390,8 @@ static basic
 typing_function_constant_complex(call c, type_context_p context)
 {
   basic b;
-  if(!arguments_are_IR(c, context->types))
+  if(!arguments_are_IR(c, context))
   {
-    /* ERROR: Invalide of type  */
-    add_one_line_of_comment((statement) stack_head(context->stats), 
-			    "Argument(s) of '%s' must be INT, REAL",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     return make_basic_float(4); /* Just for return result */
   }
   /* Typing all arguments to REAL if necessary */
@@ -1508,15 +1406,8 @@ static basic
 typing_function_constant_dcomplex(call c, type_context_p context)
 {
   basic b;
-  if(!arguments_are_IRD(c, context->types))
+  if(!arguments_are_IRD(c, context))
   {
-    /* ERROR: Invalide of type */
-    add_one_line_of_comment((statement) stack_head(context->stats),
-			    "Argument(s) of '%s' must be INT, REAL or DOUBLE",
-			    entity_local_name(call_function(c)));
-    /* Count the number of errors */
-    context->number_of_error++;
-    
     return make_basic_float(4); /* Just for return result */
   }
   /* Typing all arguments to DOUBLE if necessary */
@@ -1525,6 +1416,46 @@ typing_function_constant_dcomplex(call c, type_context_p context)
   free_basic(b);
   
   return make_basic_complex(16);
+}
+static basic
+typing_function_overloaded(call c, type_context_p context)
+{
+  return make_basic_overloaded();
+}
+
+static basic typing_function_error(call c, type_context_p context)
+{
+  /* subroutine intrinsics used as a function... */
+  add_one_line_of_comment((statement) stack_head(context->stats),
+			  "XXX");
+  return make_basic_overloaded();
+}
+
+static basic typing_of_assign(call c, type_context_p context)
+{
+  list args = call_arguments(c);
+  basic b1, b2;
+    
+  if(!arguments_are_compatible(c, context->types))
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats), 
+			    "Arguments of assignment '%s' are not compatible", 
+			    entity_local_name(call_function(c))); 
+    /* Count the number of errors */
+    context->number_of_error++;
+  }
+  else
+  {
+    b1 = GET_TYPE(context->types, EXPRESSION(CAR(args)));
+    b2 = GET_TYPE(context->types, EXPRESSION(CAR(CDR(args))));
+    if (!basic_equal_p(b1, b2))
+    {
+      EXPRESSION(CAR(CDR(args))) = 
+	insert_cast(b1, b2, EXPRESSION(CAR(CDR(args))), context);
+      }
+  }
+
+  return basic_undefined; /* should not be used... */
 }
 
 /***************************************** SIMPLIFICATION DES EXPRESSIONS */
@@ -1870,12 +1801,13 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
   {"+", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"-", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"/", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
-  {"INV", 1, real_to_real_type, 0, 0},
+  {"INV", 1, real_to_real_type, 
+   typing_function_RealDoubleComplex_to_RealDoubleComplex, 0},
   {"*", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"--", 1, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"**", 2, default_intrinsic_type, typing_power_operator, 0},
   
-  {"=", 2, default_intrinsic_type, 0, 0},
+  {"=", 2, default_intrinsic_type, typing_of_assign, 0},
   
   {".EQV.", 2, overloaded_to_logical_type, typing_logical_operator, 0},
   {".NEQV.", 2, overloaded_to_logical_type, typing_logical_operator, 0},
@@ -1893,7 +1825,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
   
   {"//", 2, character_to_character_type, typing_concat_operator, 0},
   
-  {"WRITE", (INT_MAX), default_intrinsic_type, 0, 0}, /* ERROR ? */
+  {"WRITE", (INT_MAX), default_intrinsic_type, 0, 0}, /* ERROR ??? */
   {"REWIND", (INT_MAX), default_intrinsic_type, 0, 0},
   {"BACKSPACE", (INT_MAX), default_intrinsic_type, 0, 0},
   {"OPEN", (INT_MAX), default_intrinsic_type, 0, 0},
@@ -2070,8 +2002,10 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
   {"LLE", 2, character_to_logical_type, typing_function_char_to_logical, 0},
   {"LLT", 2, character_to_logical_type, typing_function_char_to_logical, 0},
   
-  {LIST_DIRECTED_FORMAT_NAME, 0, default_intrinsic_type, 0, 0},
-  {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type, 0, 0},
+  {LIST_DIRECTED_FORMAT_NAME, 0, default_intrinsic_type, 
+   typing_function_overloaded, 0},
+  {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type, 
+   typing_function_overloaded, 0},
   
   /* These operators are used within the OPTIMIZE transformation in
      order to manipulate operators such as n-ary add and multiply or
