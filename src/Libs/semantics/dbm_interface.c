@@ -25,7 +25,6 @@
 
 #include "genC.h"
 #include "database.h"
-#include "mapping.h" /* FI: should be useless! Fabien has moved the
 		      * typedef statement_mapping from genC.h
 		      * to ri-util.h; 23 Feb. 94 */
 
