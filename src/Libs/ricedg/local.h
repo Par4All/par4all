@@ -13,8 +13,6 @@
 #include "text.h"
 #include "ri.h"
 #include "dg.h"
-#include "paf_ri.h"
-#include "paf-util.h"
 
 typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
