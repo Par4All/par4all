@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/08/10 10:58:12 $, )
+ * ($Date: 1995/08/29 09:48:53 $, )
  */
 
 #include "defines-local.h"
@@ -689,17 +689,6 @@ static bool directive_filter(call c)
     return FALSE; /* no instructions within a call! */
 }
 
-static bool stmt_filter(statement s)
-{
-    current_stmt_push(s);
-    return TRUE;
-}
-
-static void stmt_rewrite(statement s)
-{
-    (void) current_stmt_pop();
-}
-
 /* void handle_hpf_directives(s)
  * statement s;
  *
@@ -728,9 +717,9 @@ void handle_hpf_directives(statement s)
     store_renamings(s, NIL);
 
     gen_multi_recurse(s,
-        statement_domain,  stmt_filter,      stmt_rewrite, /* STATEMENT */
-	expression_domain, gen_false,        gen_null,     /* EXPRESSION */
-	call_domain,       directive_filter, gen_null,     /* CALL */
+        statement_domain,  current_stmt_filter, current_stmt_rewrite, 
+	expression_domain, gen_false,           gen_null,
+	call_domain,       directive_filter,    gen_null,
 		      NULL);
 
     initial_alignment(s);
