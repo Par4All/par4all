@@ -132,29 +132,33 @@ int ofl_ctrl;
 	    s = sc_rn(base_dup(sc_base(s1)));
 	    break;
 	}		
-    default:
+    default: {
     
-	if (SC_RN_P(s2) || sc_rn_p(s2) || sc_dimension(s2)==0
-	    || sc_empty_p(s1) || !sc_faisabilite_ofl(s1)) 
-	{
-	    Psysteme sc2 = sc_dup(s2);
-	    sc2 = sc_elim_redond(sc2);
-	    s = SC_UNDEFINED_P(sc2)? sc_empty(base_dup(sc_base(s2))): sc2;
-	}
-	else 
-	    if (SC_RN_P(s1) ||sc_rn_p(s1) || sc_dimension(s1)==0   
-		 || sc_empty_p(s2) || !sc_faisabilite_ofl(s2)) 
+	    if (SC_RN_P(s2) || sc_rn_p(s2) || sc_dimension(s2)==0
+		|| sc_empty_p(s1) || !sc_faisabilite_ofl(s1)) 
 	    {
-		Psysteme sc1 = sc_dup(s1);
-		sc1 = sc_elim_redond(sc1);
-		s = SC_UNDEFINED_P(sc1)? sc_empty(base_dup(sc_base(s1))): sc1;
+		Psysteme sc2 = sc_dup(s2);
+		sc2 = sc_elim_redond(sc2);
+		s = SC_UNDEFINED_P(sc2)? sc_empty(base_dup(sc_base(s2))): 
+		    sc2;
 	    }
 	    else 
-	    {
-		/* calcul de l'enveloppe convexe */
-		s = sc_convex_hull(s1,s2);
-		/* printf("systeme final \n"); sc_dump(s);  */
-	    }
+		if (SC_RN_P(s1) ||sc_rn_p(s1) || sc_dimension(s1)==0   
+		    || sc_empty_p(s2) || !sc_faisabilite_ofl(s2)) 
+		{
+		    Psysteme sc1 = sc_dup(s1);
+		    sc1 = sc_elim_redond(sc1);
+		    s = SC_UNDEFINED_P(sc1)? 
+			sc_empty(base_dup(sc_base(s1))): sc1;
+		}
+		else 
+		{
+		    /* calcul de l'enveloppe convexe */
+		    s = sc_convex_hull(s1,s2);
+		    /* printf("systeme final \n"); sc_dump(s);  */
+		}
+	    UNCATCH(overflow_error);
+	}
     }
     /* mem_spy_end("sc_enveloppe_chernikova_ofl_ctrl"); */
     return s;
