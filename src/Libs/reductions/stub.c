@@ -46,7 +46,7 @@ bool old_reductions(string mod_name)
 	return FALSE;
     }
     debug_on("REDUCTIONS_DEBUG_LEVEL");
-    db_close_workspace() ;
+    db_close_workspace(FALSE) ;
     options = (get_debug_level() <= 5) ? " -batch" : "" ;
     sprintf(command, 
 	    "(echo \"(defparameter files-directory \\\"%s\\\")\
