@@ -1,9 +1,8 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 1996/07/18 19:15:54 $, 
+ * $Date: 1996/08/07 13:36:43 $, 
  */
 
 #include <stdio.h>
-#include <setjmp.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -11,11 +10,7 @@
 #include "contrainte.h"
 #include "sc.h"
 
-/* ??? bof. devrait etre extern et s'appeler arithmetic_error. 
- * ??? et declare dans un .h specific avec des macros qui cachent un
- * ??? peu les details... et un petit coup de CATCH/TRY a la c++. FC.
- */
-jmp_buf overflow_error;
+EXCEPTION overflow_error;
 
 /* This function returns TRUE if the inequation ineq is redundant for 
 *  the system  ps and FALSE otherwise.
@@ -381,11 +376,11 @@ int n;
 		       number of loops) */
 
 		    contrainte_reverse(ineg);
-		    if (setjmp(overflow_error)) {
+		    CATCH(overflow_error) {
 			pred = pred->succ;
 			contrainte_reverse(ineg);
 		    }
-		    else {
+		    TRY {
 			/* test de sc_faisabilite avec la nouvelle 
 			   inegalite */
 			if (!sc_rational_feasibility_ofl_ctrl(sc,OFL_CTRL,TRUE)) { 
@@ -447,9 +442,9 @@ Variable var;
 	    negat = contrainte_dup(ineq1);
 	}
 	
-	if (setjmp(overflow_error)) 
+	CATCH(overflow_error)
 	    result = FALSE;
-	else {
+	TRY {
 	    ineg = sc_integer_inequalities_combination_ofl_ctrl
 		(sc, posit, negat, var, &result, FWD_OFL_CTRL);
 	    contrainte_rm(ineg);
