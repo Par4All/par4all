@@ -9,7 +9,7 @@ LIB_CFILES =	dbm.c \
 		help.c \
 		newgen.c \
 		logging.c \
-		view.c 
+		view.c
 
 LIB_HEADERS =	top-level-local.h
 
