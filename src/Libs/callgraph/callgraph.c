@@ -44,42 +44,7 @@
 list string_to_callees(module_name)
 string module_name;
 {
-    /* GO 6/7/95
-       This code was fool. It used to store in a hash table
-       things calculated every time ...
-       
-       Moreover if a ressource is not valid anymore a core dumped
-       comes.
-       
-       
-       callees cl;
-       static hash_table hash_table_to_callees_string;
-       static bool hash_table_is_created = FALSE;
-       list callees_list=NIL;
-       
-       cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,TRUE);
-       
-       if ( !hash_table_is_created ) {
-       hash_table_to_callees_string = hash_table_make(hash_pointer, 0);
-       hash_table_is_created = TRUE;
-       }
-       
-       callees_list=(list)hash_get(hash_table_to_callees_string,module_name);
-       
-       if ( callees_list == (list)HASH_UNDEFINED_VALUE ) {
-       callees_list = callees_callees(cl);
-       hash_put(hash_table_to_callees_string, module_name, 
-       (char *)callees_list);
-       }
-       
-       I prefer this with no useless Htable ...
-       
-       */
-
-    callees cl;
-
-    cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,TRUE);
-       
+    callees cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,TRUE);
     return callees_callees(cl);
 }
 
@@ -88,16 +53,15 @@ entity mod;
 {
     list callees_list=NIL;
     string module_name = module_local_name(mod);
-    list return_list = NIL;
+    list rl = NIL;
 
     callees_list = string_to_callees(module_name);
     
-    MAPL(ce,{string e = STRING(CAR(ce));
-	     return_list = CONS(ENTITY, local_name_to_top_level_entity(e),
-				return_list);
-	 },callees_list);
+    MAP(STRING, e,
+	rl = CONS(ENTITY, local_name_to_top_level_entity(e), rl),
+	callees_list);
 
-    return(return_list);
+    return return_list;
 }
 
 /* 
@@ -171,13 +135,14 @@ int decor_type;
     } else {
 	FILE *fp;
 	string localfilename = strdup(concatenate(module_name, ".cg",  NULL));
-	string filename = strdup(concatenate(db_get_current_workspace_directory(), 
-				      "/", localfilename,  NULL));
+	string filename = 
+	    strdup(concatenate(db_get_current_workspace_directory(), 
+			       "/", localfilename,  NULL));
 
 	fp = safe_fopen(filename, "w");
-
+	
 	callgraph_module_name(0, module, fp, decor_type);
-
+	
 	safe_fclose(fp, filename);
 	DB_PUT_FILE_RESOURCE(DBR_CALLGRAPH_FILE, 
 			     strdup(module_name), localfilename);
