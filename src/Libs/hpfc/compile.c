@@ -3,7 +3,7 @@
  * Fabien Coelho, May 1993
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/09/15 19:36:22 $, )
+ * ($Date: 1995/09/21 09:02:10 $, )
  */
 
 #include "defines-local.h"
@@ -330,12 +330,6 @@ string program_name;
     create_init_common_param(init_file);
     safe_fclose(init_file, init_filename);
     add_warning(init_filename);
-
-    safe_system(concatenate("$HPFC_TOOLS/hpfc_generate_init -n ",
-			    program_name,
-			    " ",
-			    db_get_current_program_directory(),
-			    NULL));
     
     ifdebug(1)
     {
