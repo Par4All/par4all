@@ -274,7 +274,7 @@ transformer tf;
      * because the number of iterations may be zero which implies identity.
      */
     if(transformer_empty_p(tf)) {
-	fix_tf = transformer_identity();
+      /* fix_tf = transformer_identity(); */
 	ifdebug(8) {
 	    debug(8, "transformer_equality_fix_point", "fix-point fix_tf=\n");
 	    fprint_transformer(stderr, fix_tf, external_value_name);
@@ -372,12 +372,18 @@ transformer tf;
     }
 
     /* Set fix_tf's argument list */
+    /*
     for(t = b_new; !BASE_NULLE_P(t); t = t->succ) {
-	/* I should use a conversion function from value_to_variable() */
+	I should use a conversion function from value_to_variable()
 	entity arg = (entity) vecteur_var(t);
 
 	transformer_arguments(fix_tf) = arguments_add_entity(transformer_arguments(fix_tf), arg);
     }
+    */
+    transformer_arguments(fix_tf) = dup_arguments(transformer_arguments(tf));
+    /* Fix the basis and the dimension */
+    sc_base(sc_inv) = base_dup(sc_base(predicate_system(transformer_relation(tf))));
+    sc_dimension(sc_inv) = sc_dimension(predicate_system(transformer_relation(tf)));
     transformer_relation(fix_tf) = make_predicate(sc_inv);
  
     /* get rid of dense matrices */
@@ -1224,13 +1230,27 @@ transformer transformer_derivative_fix_point(transformer tf)
 }
 
 /* Computation of a fix point: drop all constraints, remember which
- * variables are changed.
- *
- */
+ * variables are changed. Except if the transformer is syntactically empty
+ * since its fix point is easy to compute. Without normalization,
+ * mathematically empty transformers are lost.
+ * 
+*/
 transformer transformer_basic_fix_point(transformer tf)
 {
-  transformer fix_tf = transformer_identity();
-  transformer_arguments(fix_tf) = gen_copy_seq(transformer_arguments(tf));
+  transformer fix_tf = copy_transformer(tf);
+  
+  if(!transformer_empty_p(tf)) {
+    /* get rid of equalities and inequalities but keep the basis */
+    Psysteme sc = predicate_system(transformer_relation(fix_tf));
+    Pcontrainte eq = sc_egalites(sc);
+    Pcontrainte ineq = sc_inegalites(sc);
+    contraintes_free(eq);
+    contraintes_free(ineq);
+    sc_egalites(sc) = CONTRAINTE_UNDEFINED;
+    sc_inegalites(sc) = CONTRAINTE_UNDEFINED;
+    sc_nbre_egalites(sc) = 0;
+    sc_nbre_inegalites(sc) = 0;
+  }
 
   return fix_tf;
 }
