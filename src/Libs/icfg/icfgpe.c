@@ -61,14 +61,17 @@ load_list_icfg(statement_effects m, statement s) {
   return effects_effects(apply_statement_effects(m, s));
 }
 
-list effects_filter(list l_effs, entity e_flt)
+list /* of effect */ effects_filter(list l_effs, entity e_flt)
 {
   list l_flt = NIL;
-  MAPL(ce, {
-    effect eff = EFFECT(CAR(ce));
+  MAP(EFFECT, eff, 
+  {
     action ac = effect_action(eff);
-    reference ref = effect_reference(eff);
-    entity ent = reference_variable(ref);
+    reference ref;
+    entity ent;
+    ref = effect_reference(eff);
+    ent = reference_variable(ref);
+
     fprintf(stderr, entity_local_name(ent));
     if (entity_conflict_p(e_flt, ent) && !action_read_p(ac))
       l_flt = CONS(EFFECT, eff, l_flt);
