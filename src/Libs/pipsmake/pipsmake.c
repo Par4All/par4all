@@ -1,5 +1,5 @@
 /* $RCSfile: pipsmake.c,v $ (version $Revision$)
- * $Date: 1997/04/16 15:15:10 $, 
+ * $Date: 1997/09/08 18:04:16 $, 
  * pipsmake: call by need (make),
  *
  * rule selection (activate),
@@ -1146,7 +1146,7 @@ string res_n, module_n;
 
     return success;
 }
-
+
 bool safe_apply(phase_n, module_n)
 string phase_n, module_n;
 {
@@ -1158,7 +1158,8 @@ string phase_n, module_n;
     rule r;
 
     if ((r = find_rule_by_phase(phase_n)) == rule_undefined) {
-	user_warning("safe_apply", "Unkown phase/rule \"%s\"\n", phase_n);
+	pips_user_warning("Unkown phase/rule \"%s\" for %s\n", 
+			  phase_n, module_n);
 	success = FALSE;
 	return success;
     }
