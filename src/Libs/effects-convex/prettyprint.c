@@ -154,7 +154,7 @@ text_region(effect reg)
     /* CLOSE 
      */
     if (!foresys) append(">");
-    close_current_line(line_buffer, t_reg);
+    close_current_line(line_buffer, t_reg,str_prefix);
 
     return t_reg;   
 }
