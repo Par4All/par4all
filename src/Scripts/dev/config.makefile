@@ -28,6 +28,7 @@ SRC_MACROS =	auto.h \
 		makefile_macros.gnutools \
 		makefile_macros.linux \
 		makefile_macros.pentium \
+		makefile_macros.nowpips \
 		makefile_macros.ll \
 		makefile_macros.misc \
 		makefile_macros.. \
