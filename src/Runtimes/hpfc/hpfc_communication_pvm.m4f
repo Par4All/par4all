@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.19  1997/09/17 15:51:44  zory
+! unused variable removed
+!
 ! Revision 1.18  1997/07/03 10:55:19  zory
 ! broadcast subroutines extracted from rt_support (specific pvm/mpi)
 !
@@ -324,7 +327,7 @@ _CM5(
       subroutine HPFC INIT HOST
       _CM5(include "cmmd_fort.h")
       include "hpfc_commons_pvm.h"
-      integer info,i
+      integer info
       character*64 node key
       
       debug(print *, "[HPFC INIT HOST] in ")
