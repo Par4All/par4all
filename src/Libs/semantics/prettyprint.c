@@ -304,6 +304,22 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 
 #define append(s) add_to_current_line(crt_line, s, str_prefix, txt)
 
+static bool value_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+{
+    bool is_inferior = TRUE;
+    
+    if (term_cst(*pvarval1))
+	is_inferior = FALSE;
+    else if(term_cst(*pvarval2))
+	is_inferior = TRUE;
+    else
+	is_inferior = (strcmp(external_value_name((entity) vecteur_var(*pvarval1)), 
+			      external_value_name((entity) vecteur_var(*pvarval2)))
+		       > 0 );
+
+    return is_inferior; 
+}
+
 /* text text_transformer(transformer tran) 
  * input    : a transformer representing a transformer or a precondition 
  * output   : a text containing commentaries representing the transformer
