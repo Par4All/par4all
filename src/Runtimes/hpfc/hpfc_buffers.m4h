@@ -2,7 +2,7 @@ c
 c COMMON /HPFC_BUFFERS/ 
 c
 c $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-c ($Date: 1995/09/15 15:57:05 $, )
+c ($Date: 1995/09/27 18:04:00 $, )
 c
 c buffers to avoid small pvmf(un)pack calls...
 c and to sends buckets of messages if necessary...
@@ -10,7 +10,6 @@ c
       common /HPFC_BUFFERS/
      $     DATA_BUFFER(MAXMAXSIZEOFBUFFER),
      $     BUFINDEX,
-     $     SIZEOFBUFFER,
      $     SIZEOFRECEIVEDBUFFER,
      $     BYTE1_BUFFSIZE,
      $     INTEGER2_BUFFSIZE,
