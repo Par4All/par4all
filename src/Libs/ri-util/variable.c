@@ -32,7 +32,8 @@ symbolic_constant_entity_p(entity e)
 /* this function adds an entity to the list of variables of the
 CurrentFunction. it does nothing if e is already in the list. */
 
-void AddEntityToDeclarations(e, f)
+void 
+AddEntityToDeclarations(e, f)
 entity e;
 entity f;
 {
@@ -50,7 +51,8 @@ entity f;
 
 /* entity make_scalar_entity(name, module_name, base)
  */
-entity make_scalar_entity(name, module_name, base)
+entity 
+make_scalar_entity(name, module_name, base)
 string name;
 string module_name;
 basic base;
@@ -87,7 +89,7 @@ basic base;
     return(e);
 }
 
-
+
 /* -------------------------------------------------------------
  *
  * New Temporary Variables MANAGEMENT
@@ -100,7 +102,8 @@ static int
     unique_logical_number = 0,
     unique_complex_number = 0;
 
-void reset_unique_variable_numbers()
+void 
+reset_unique_variable_numbers()
 {
     unique_integer_number=0;
     unique_float_number=0;
@@ -185,7 +188,8 @@ make_new_scalar_variable(entity module,
 /* looks for an entity which should be a scalar of the specified
  * basic. If found, returns it, else one is created.
  */
-entity find_or_create_scalar_entity(name, module_name, base)
+entity 
+find_or_create_scalar_entity(name, module_name, base)
 string name;
 string module_name;
 tag base;
@@ -223,7 +227,8 @@ find_or_create_typed_entity(
     return(make_scalar_entity(name, module_name, MakeBasic(base)));
 }
 
-entity make_scalar_integer_entity(name, module_name)
+entity 
+make_scalar_integer_entity(name, module_name)
 char *name;
 char *module_name;
 {
@@ -263,7 +268,8 @@ char *module_name;
 }
 
 
-bool entity_scalar_p(e)
+bool 
+entity_scalar_p(e)
 entity e;
 {
     type t = entity_type(e);
@@ -277,7 +283,8 @@ entity e;
 /* for variables (like I), not constants (like 1)!
  * use integer_constant_p() for constants
  */
-bool entity_integer_scalar_p(e)
+bool 
+entity_integer_scalar_p(e)
 entity e;
 {
     return(entity_scalar_p(e) &&
@@ -286,7 +293,8 @@ entity e;
 
 
 /* integer_scalar_entity_p() is obsolete; use entity_integer_scalar_p() */
-bool integer_scalar_entity_p(e)
+bool 
+integer_scalar_entity_p(e)
 entity e;
 {
     return type_variable_p(entity_type(e)) && 
@@ -295,7 +303,8 @@ entity e;
 }
 
 
-dimension entity_ith_dimension(e, i)
+dimension 
+entity_ith_dimension(e, i)
 entity e;
 int i;
 {
@@ -323,7 +332,8 @@ int i;
  * modifies : nothing
  * comment  : 
  */
-boolean entity_unbounded_p(e)
+boolean 
+entity_unbounded_p(e)
 entity e;
 {
     int nb_dim = NumberOfDimension(e);
@@ -336,7 +346,8 @@ entity e;
 /* variable_entity_dimension(entity v): returns the dimension of variable v;
  * scalar have dimension 0
  */
-int variable_entity_dimension(v)
+int 
+variable_entity_dimension(v)
 entity v;
 {
     int d = 0;
@@ -352,7 +363,8 @@ entity v;
 }
 
 
-void remove_variable_entity(v)
+void 
+remove_variable_entity(v)
 entity v;
 {
     /* FI: this is pretty dangerous as it may leave tons of dangling pointers;
@@ -392,7 +404,8 @@ entity v;
 /* entity make_integer_constant_entity(int c)
  * make entity for integer constant c
  */
-entity make_integer_constant_entity(c)
+entity 
+make_integer_constant_entity(c)
 int c;
 {
     entity ce;
@@ -427,7 +440,8 @@ int c;
  * to a's offset. The initial offset is returned to the calling function.
  * v is added to a's layout.
  */
-int add_variable_to_area(a, v)
+int 
+add_variable_to_area(a, v)
 entity a, v;
 {
     int OldOffset=-1;
@@ -450,7 +464,8 @@ entity a, v;
 }
 
 
-void add_variable_declaration_to_module(m, v)
+void 
+add_variable_declaration_to_module(m, v)
 entity m;
 entity v;
 {
@@ -520,13 +535,20 @@ variable_in_common_p(
 	!SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(v)))) ;
 }
 
-/* true if v appears in a SAVE statement */
+/* true if v appears in a SAVE statement, or in a DATA statement */
 bool
 variable_static_p(entity v)
 {
     return(type_variable_p(entity_type(v)) &&
 	   storage_ram_p(entity_storage(v)) &&
 	   static_area_p(ram_section(storage_ram(entity_storage(v)))));
+}
+bool
+variable_dynamic_p(entity v)
+{
+    return(type_variable_p(entity_type(v)) &&
+	   storage_ram_p(entity_storage(v)) &&
+	   dynamic_area_p(ram_section(storage_ram(entity_storage(v)))));
 }
 
 bool
@@ -558,7 +580,8 @@ list l;
    prettyprinter ignoring the textual declaration and remake all from
    the declarations without touching the corresponding property
    (PRETTYPRINT_ALL_DECLARATIONS). RK, 31/05/1994. */
-void discard_module_declaration_text(a_module)
+void 
+discard_module_declaration_text(a_module)
 entity a_module;
 {
     code c = entity_code(a_module);
@@ -574,7 +597,8 @@ entity a_module;
  *
  * moved to ri-util from hpfc on BC's request. FC 08/09/95
  */
-entity get_ith_dummy(prefix, suffix, i)
+entity 
+get_ith_dummy(prefix, suffix, i)
 string prefix, suffix;
 int i;
 {
@@ -586,7 +610,8 @@ int i;
 }
 
 
-entity make_new_module_variable(entity module,int d)	       
+entity 
+make_new_module_variable(entity module,int d)	       
 { 
 
     static char name[ 64 ];
@@ -626,9 +651,13 @@ entity make_new_module_variable(entity module,int d)
     return ent1;
 }
 
+
 /* These globals variables count the number of temporary and auxiliary
  * entities. Each time such a variable is created, the corresponding
  * counter is incremented.
+ *
+ * FI: this must be wrong. A function to reset count_tmp and count_aux 
+ * is needed if tpips or wpips are to work in a consistent way!
  */
 static int count_tmp = 0;
 static int count_aux = 0;
@@ -650,131 +679,132 @@ static int count_aux = 0;
  *       _ FindOrCreateEntity() : syntax/declaration.c
  *       _ CurrentOffsetOfArea() : syntax/declaration.c
  */
-entity make_new_entity(ba, kind)
+entity 
+make_new_entity(ba, kind)
 basic ba;
 int kind;
 {
-  extern int count_tmp, count_aux;
-  extern list integer_entities, real_entities, logical_entities, complex_entities,
-  double_entities, char_entities;
+    extern int count_tmp, count_aux;
+    extern list integer_entities, real_entities, logical_entities, complex_entities,
+	double_entities, char_entities;
 
-  entity new_ent, mod_ent;
-  char prefix[4], *name, *num;
-  int number = 0;
-  entity dynamic_area;
+    entity new_ent, mod_ent;
+    char prefix[4], *name, *num;
+    int number = 0;
+    entity dynamic_area;
   
-  /* The first letter of the local name depends on the basic:
-   *       int --> I
-   *     real  --> F (float single precision)
-   *    others --> O
-   */
-  switch(basic_tag(ba))
+    /* The first letter of the local name depends on the basic:
+     *       int --> I
+     *     real  --> F (float single precision)
+     *    others --> O
+     */
+    switch(basic_tag(ba))
     {
     case is_basic_int: { (void) sprintf(prefix, "I"); break;}
     case is_basic_float:
-      {
+    {
 	if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
-	  (void) sprintf(prefix, "O");
+	    (void) sprintf(prefix, "O");
 	else
-	  (void) sprintf(prefix, "F");
+	    (void) sprintf(prefix, "F");
 	break;
-      }
+    }
     default: (void) sprintf(prefix, "O");
     }
 
-  /* The three following letters are whether "TMP", for temporaries
-   * or "AUX" for auxiliary variables.
-   */
-  switch(kind)
+    /* The three following letters are whether "TMP", for temporaries
+     * or "AUX" for auxiliary variables.
+     */
+    switch(kind)
     {
     case TMP_ENT:
-      {
+    {
 	number = (++count_tmp);
 	(void) sprintf(prefix+1, "TMP");
 	break;
-      }
+    }
     case AUX_ENT:
-      {
+    {
 	number = (++count_aux);
 	(void) sprintf(prefix+1, "AUX");
 	break;
-      }
+    }
     default: user_error("make_new_entity", "Bad kind of entity: %d", kind);
     }
 
-  mod_ent = get_current_module_entity();
-  num = (char*) malloc(32);
-  (void) sprintf(num, "%d", number);
+    mod_ent = get_current_module_entity();
+    num = (char*) malloc(32);
+    (void) sprintf(num, "%d", number);
 
-  /* The first part of the full name is the concatenation of the define
-   * constant ATOMIZER_MODULE_NAME and the local name of the module
-   * entity.
-   */
-  /* ATOMIZER_MODULE_NAME discarded : it is a bug ! RK, 31/05/1994.
-     name = strdup(concatenate(ATOMIZER_MODULE_NAME, entity_local_name(mod_ent),
-     MODULE_SEP_STRING, prefix, num, (char *) NULL));
+    /* The first part of the full name is the concatenation of the define
+     * constant ATOMIZER_MODULE_NAME and the local name of the module
+     * entity.
      */
-  name = strdup(concatenate(entity_local_name(mod_ent),
-			    MODULE_SEP_STRING, prefix, num, (char *) NULL));
-  /*
-     new_ent = make_entity(name,
-     make_type(is_type_variable,
-     make_variable(ba,
-     NIL)),
-     make_storage(is_storage_rom, UU),
-     make_value(is_value_unknown, UU));
-     */
-  /* Create a true dynamic variable. RK, 31/05/1994 : */
-  new_ent = make_entity(name,
-			make_type(is_type_variable,
-				  make_variable(ba,
-						NIL)),
-			storage_undefined,
-			make_value(is_value_unknown, UU));
-  dynamic_area = global_name_to_entity(module_local_name(mod_ent),
-			    DYNAMIC_AREA_LOCAL_NAME);
-  entity_storage(new_ent) = make_storage(is_storage_ram,
-					 make_ram(mod_ent,
-						  dynamic_area,
-						  add_variable_to_area(dynamic_area, new_ent),
-						  NIL));
-  add_variable_declaration_to_module(mod_ent, new_ent);
+    /* ATOMIZER_MODULE_NAME discarded : it is a bug ! RK, 31/05/1994.
+       name = strdup(concatenate(ATOMIZER_MODULE_NAME, entity_local_name(mod_ent),
+       MODULE_SEP_STRING, prefix, num, (char *) NULL));
+    */
+    name = strdup(concatenate(entity_local_name(mod_ent),
+			      MODULE_SEP_STRING, prefix, num, (char *) NULL));
+    /*
+      new_ent = make_entity(name,
+      make_type(is_type_variable,
+      make_variable(ba,
+      NIL)),
+      make_storage(is_storage_rom, UU),
+      make_value(is_value_unknown, UU));
+    */
+    /* Create a true dynamic variable. RK, 31/05/1994 : */
+    new_ent = make_entity(name,
+			  make_type(is_type_variable,
+				    make_variable(ba,
+						  NIL)),
+			  storage_undefined,
+			  make_value(is_value_unknown, UU));
+    dynamic_area = global_name_to_entity(module_local_name(mod_ent),
+					 DYNAMIC_AREA_LOCAL_NAME);
+    entity_storage(new_ent) = make_storage(is_storage_ram,
+					   make_ram(mod_ent,
+						    dynamic_area,
+						    add_variable_to_area(dynamic_area, new_ent),
+						    NIL));
+    add_variable_declaration_to_module(mod_ent, new_ent);
 
-  /* Is the following useless : */
+    /* Is the following useless : */
   
-  /* The new entity is stored in the list of entities of the same type. */
-  switch(basic_tag(ba))
+    /* The new entity is stored in the list of entities of the same type. */
+    switch(basic_tag(ba))
     {
     case is_basic_int:
-      {
+    {
 	integer_entities = CONS(ENTITY, new_ent, integer_entities);
 	break;
-      }
+    }
     case is_basic_float:
-      {
+    {
 	if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
-	  double_entities = CONS(ENTITY, new_ent, double_entities);
+	    double_entities = CONS(ENTITY, new_ent, double_entities);
 	else
-	  real_entities = CONS(ENTITY, new_ent, real_entities);
+	    real_entities = CONS(ENTITY, new_ent, real_entities);
 	break;
-      }
+    }
     case is_basic_logical:
-      {
+    {
 	logical_entities = CONS(ENTITY, new_ent, logical_entities);
 	break;
-      }
+    }
     case is_basic_complex:
-      {
+    {
 	complex_entities = CONS(ENTITY, new_ent, complex_entities);
 	break;
-      }
+    }
     case is_basic_string:
-      {
+    {
 	char_entities = CONS(ENTITY, new_ent, char_entities);
 	break;
-      }
+    }
     default:break;
     }
 
-  return new_ent;
+    return new_ent;
 }
