@@ -1,37 +1,38 @@
-
-/** $Id$
-  * $Log: DirectoryManager.java,v $
-  * Revision 1.1  1998/06/30 17:35:33  coelho
-  * Initial revision
-  *
-  */
-
+/*
+ * $Id$
+ *
+ * $Log: DirectoryManager.java,v $
+ * Revision 1.2  1998/07/01 07:02:57  coelho
+ * cleaner (wrt my standards).
+ *
+ * Revision 1.1  1998/06/30 17:35:33  coelho
+ * Initial revision
+ *
+ */
 
 package JPips;
 
-
 import java.io.*;
 import java.awt.*;
-import JPips.Pawt.*;
 import java.awt.swing.*;
 import java.awt.swing.preview.*;
 import java.awt.swing.border.*;
 import java.awt.event.*;
 
+import JPips.Pawt.*;
 
 /** A manager for the current directory of JPips 
+  * 
   * @author Francois Didry
   */  
 public class DirectoryManager implements JPipsComponent
 {
-
   public	TPips		tpips;		//tpips instance
   public	File		directory;	//current directory
   public	PPanel		panel;		//jpips directory panel
   public	PTextField	tf;		//textfield in the panel
   public	PButton		browse;		//button in the panel
   public	PFrame		frame;		//frame of jpips
-
 
   /** Creates and opens the root directory file.
     * Builds the panel for JPips.
@@ -44,14 +45,12 @@ public class DirectoryManager implements JPipsComponent
       check();
     }
 
-
   /** @return the current directory.
     */  
   public String getDirectory()
     {
       return directory.getAbsolutePath();
     }
-    
 
   /** Creates the directory panel for jpips.
     */  
@@ -104,14 +103,12 @@ public class DirectoryManager implements JPipsComponent
       panel.add(browse,c);
     }
 
-
   /** @return the directory panel for JPips
     */  
   public Component getComponent()
     {
       return (Component)panel;
     }
-
 
   /** Opens the specified directory in tpips.
     * Updates the textfield.
@@ -124,7 +121,6 @@ public class DirectoryManager implements JPipsComponent
       check();
     }
 
-
   /** Checks if the tpips and the jpips directory are similar.
     */
   public void check()
@@ -134,7 +130,6 @@ public class DirectoryManager implements JPipsComponent
       tf.setText(directory.getAbsolutePath());
       tpips.directory = directory;
     }
-    
 
   /** Displays a file chooser to select a directory.
     */
@@ -151,12 +146,10 @@ public class DirectoryManager implements JPipsComponent
       frame.pack();
     }
 
-
   public PMenu getMenu()
     {
       return null;
     }
-  
   
   public void setActivated(boolean yes)
     {
@@ -168,8 +161,4 @@ public class DirectoryManager implements JPipsComponent
     {
       check();
     }
-
-
 }
-
-
