@@ -13,7 +13,6 @@
 #include "ri-util.h"
 #include "text-util.h"
 #include "misc.h"
-#include "control.h"
 
 
 /* Remove all the control nodes (with its statement) from c in the
