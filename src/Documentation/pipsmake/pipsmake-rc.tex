@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.5  2002/11/22 14:53:35  phamdat
+%% MODULE.preconditions added to input of impact_check
+%%
 %% Revision 1.4  2002/09/26 14:55:14  nguyen
 %% Modification of array resizing statistic
 %%
@@ -483,7 +486,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2002/09/26 14:55:14 $~$
+$~$Date: 2002/11/22 14:53:35 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -6236,8 +6239,11 @@ impact_check    > MODULE.code
         < PROGRAM.entities 
         < MODULE.alias_associations
         < MODULE.cumulated_effects
-        < MODULE.dg
+	< MODULE.summary_effects
         < MODULE.proper_effects
+	< MODULE.preconditions
+	< MODULE.summary_precondition
+        < MODULE.dg
         < ALL.code
 \end{verbatim}
 
