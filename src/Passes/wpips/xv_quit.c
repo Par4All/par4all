@@ -42,6 +42,8 @@ Menu_item menu_item;
 
 	sprintf(str, fmt , pn);
 
+        /* Send to emacs if we are in the emacs mode: */
+        send_notice_prompt_to_emacs(str, str1, str2, NULL);
 	result =  notice_prompt(xv_find(main_frame, WINDOW, 0), 
 				&e,
 				NOTICE_MESSAGE_STRINGS,
