@@ -13,7 +13,6 @@ extern void tp_error();
 extern void tp_init_lex();
 extern void tp_begin_key();
 extern void tp_begin_fname();
-extern void close_workspace_if_opened();
 
 extern FILE * tp_in;
 #ifdef FLEX_SCANNER
