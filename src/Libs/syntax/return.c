@@ -33,5 +33,6 @@ void GenerateReturn()
 {
     strcpy(lab_I, end_label_local_name);
     LinkInstToCurrentBlock(MakeZeroOrOneArgCallInst("RETURN", 
-						    expression_undefined));
+						    expression_undefined),
+			   TRUE);
 }
