@@ -2,14 +2,14 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/08 13:10:49 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/16 17:04:28 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
-ifdef(`DEBUG',`define(`debug',`$@')',`define(`debug')')dnl
-ifdef(`DEMO',`define(`demo',`$@')',`define(`demo')')dnl
-ifdef(`DIRECT',`define(`direct',`$@')',`define(`direct')')dnl
+c
+include("m4_macros")dnl
+c
 c-----------------
 c
 c HPFC_TEMPLATE
@@ -932,7 +932,7 @@ c HPFC_HOST_END
 c
       subroutine HPFC_HOST_END()
       integer info
-c      call HPFC_SYNCHRO()
+      sync_exit(`call HPFC_SYNCHRO()')
       call pvmfexit(info)
       stop
       end
@@ -943,7 +943,7 @@ c HPFC_NODE_END
 c
       subroutine HPFC_NODE_END()
       integer info
-c      call HPFC_SYNCHRO()
+      sync_exit(`call HPFC_SYNCHRO()')
       call pvmfexit(info)
       stop
       end
