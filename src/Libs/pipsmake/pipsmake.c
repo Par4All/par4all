@@ -799,15 +799,16 @@ string get_first_main_module()
 		   "unable to make a temporary file\n");
 
     system(concatenate
-	   ("sed -n -e 's;^[ \\t][ \\t]*[pP][rR][oO][gG][rR][aA][mM][ \\t][ \\t]*\\([0-9a-zA-Z-_]*\\).*$;\\1;p' ",
+	   ("sed -n -e 's;^[ 	t]*[pP][rR][oO][gG][rR][aA][mM][ 	]*\\([0-9a-zA-Z-_]*\\).*$;\\1;p' ",
 	    db_get_current_workspace_directory(),
-	    "/*.f | tr a-z A-Z > ",
+	    "/*.f > ",
 	    tmpfile,
 	    NULL));
 
     if ((ftmp = fopen (tmpfile,"r")) != NULL)
     {
 	status = fscanf (ftmp,"%s\n", name);
+	strupper(name,name);
 	fclose (ftmp);
 	unlink (tmpfile);
 	if (status != 1)	/* bad item has been read */
