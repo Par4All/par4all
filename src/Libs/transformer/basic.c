@@ -200,10 +200,23 @@ Pcontrainte eqs;
     return tf;
 }
 
+/* FI: I do not know if this procedure should always return or fail when
+ * an inconsistency is found. For instance, summary transformers for callees
+ * are inconsistent with respect to the current module. FC/CA: help...
+ *
+ * I do not understand why errors are reported only if the debug level is greater
+ * than 1. A demo effect?
+ *
+ * Also, since no precise information about the inconsistency is displayed, a
+ * core dump would be welcome to retrieve pieces of information with gdb.
+ *
+ * But, see final comment... In spite of it, I do not always return any longer.
+ */
 bool 
 transformer_consistency_p(t)
 transformer t;
 {
+#define TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL 0
     /* the relation should be consistent 
      * and any variable corresponding to an old value
      * should appear in the argument list since 
@@ -217,14 +230,18 @@ transformer t;
      * the constraints. This does not seem very safe to me (FI, 13 Nov. 95)
      */
     Psysteme sc = (Psysteme) predicate_system(transformer_relation(t));
+    Pbase b = sc_base(sc);
     list args = transformer_arguments(t);
     bool consistent = TRUE;
 
     /* The NewGen data structure must be fully defined */
-    ifdebug(1)
+    ifdebug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL)
 	consistent = gen_defined_p(t);
     else
 	consistent = TRUE;
+    if(!consistent)
+	debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
+	      "transformer_consistency_p", "transformer t is not gen_defined\n");
 
     /* The predicate must be weakly consistent. Every variable
      * in the constraints must be in the basis (but not the other
@@ -232,7 +249,8 @@ transformer t;
      */
     consistent = consistent && sc_weak_consistent_p(sc);
     if(!consistent)
-	debug(1, "transformer_consistency_p", "sc is not weekly consistent\n");
+	debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
+	      "transformer_consistency_p", "sc is not weekly consistent\n");
 
     /* If an old value appears in the predicate, the corresponding
      * variable should be an argument of the transformer
@@ -255,7 +273,8 @@ transformer t;
 
 		consistent = entity_is_argument_p(var, args);
 		if(!consistent)
-		    debug(1, "transformer_consistency_p",
+		    debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
+			  "transformer_consistency_p",
 			  "Old value of % s in sc but not in arguments\n",
 			  entity_name(var));
 	    }
@@ -263,7 +282,8 @@ transformer t;
 	    if(consistent) {
 		consistent = consistent && !term_cst(t);
 		if(!consistent)
-		    debug(1, "transformer_consistency_p", "TCST in sc basis\n");
+		    debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
+			  "transformer_consistency_p", "TCST in sc basis\n");
 	    }
 	}
     }
@@ -274,8 +294,48 @@ transformer t;
 	    consistent = consistent && (e != (entity) TCST);
 	}, args);
 	if(!consistent)
-	    debug(1, "transformer_consistency_p", "TCST appears in arguments\n");
+	    debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
+		  "transformer_consistency_p", "TCST appears in arguments\n");
     }
+
+    /* Check that the transformer is compatible with the current value mappings.
+     *
+     * This is not always true as you may need to import the summary transformer
+     * of a callee. Before translation, this check will most likely fail.
+     *
+     * Debugging step which does not return if an incompatibility is found.
+     */
+
+    /* Check that every argument has a value.
+     * This is not redundant with the printout procedure which uses
+     * entity_minimal_name() and not the value mappings.
+     */
+    MAP(ENTITY, e, {
+	/*
+	pips_assert("Argument entity appears in the value mappings",
+		    entity_has_values_p(e));
+		    */
+	if(!entity_has_values_p(e)) {
+	    pips_user_warning("No value for argument %s in value mappings\n",
+			      entity_name(e));
+	    consistent = FALSE;
+	}
+    }, args);
+
+    /* If a variable appears as argument, its new value must be in the basis
+     * See for instance, effects_to_transformer()
+     */
+    MAP(ENTITY, e, {
+	entity v = entity_to_new_value(e);
+	/*
+	pips_assert("Argument is in the basis", base_contains_variable_p(b, (Variable) v));
+	*/
+	if(!base_contains_variable_p(b, (Variable) v)) {
+	    pips_user_warning("No value for argument %s in relation basis\n",
+			      entity_name(e));
+	    consistent = FALSE;
+	}
+    }, args);
 
     /* FI: let the user react and print info before core dumping */
     /* pips_assert("transformer_consistency_p", consistent); */
