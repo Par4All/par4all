@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/08/09 13:51:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/08/10 13:41:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/08/09 13:51:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/08/10 13:41:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -580,6 +580,7 @@ create_select_menu()
       for ergonomic reasons. :-) RK, 19/02/1993. */
    pmenu = 
       xv_create(NULL, MENU_COMMAND_MENU, 
+                MENU_TITLE_ITEM, "Deal with workspaces ",
                 MENU_GEN_PIN_WINDOW, main_frame, "Workspace Menu",
                 MENU_APPEND_ITEM, open_pgm,
                 MENU_APPEND_ITEM, create_pgm,
@@ -591,6 +592,7 @@ create_select_menu()
       :-) RK, 19/02/1993. */
    menu = 
       xv_create(NULL, MENU_COMMAND_MENU, 
+                MENU_TITLE_ITEM, "Selecting workspace & Fortran module ",
                 MENU_GEN_PIN_WINDOW, main_frame, "Selection Menu",
                 MENU_APPEND_ITEM, module_item,
                 MENU_PULLRIGHT_ITEM, "Workspace", pmenu,
