@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/11 11:58:12 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/11 14:14:37 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -504,7 +504,8 @@ The different elementary table names are defined in
 and \verb+trigo+.
 
 The different tables required are to be found in
-\verb+$LIBDIR/complexity/xyz+,
+\verb+$PIPS_LIBDIR/complexity/xyz+,
+%% $
 where \verb+xyz+ is specified by this property:
 
 \begin{verbatim}
@@ -615,7 +616,7 @@ WP65_DEBUG_LEVEL        0
 \subsubsection{HPFC {\em High Performance Fortran Compiler}}
 
 debugging levels considered by HPFC: 
-{\tt HPFC\_\{,IO,REMAPPING\}\_DEBUG\_LEVEL}.
+\verb+HPFC_{,DIRECTIVES,IO,REMAPPING}_DEBUG_LEVEL+.
 
   These booleans decide whether some computations are directly
 generated in the output code, or computed thru calls to dedicated
@@ -663,6 +664,12 @@ Whether to measure and display the compilation times for remappings
 \begin{verbatim}
 HPFC_TIME_REMAPPINGS TRUE
 \end{verbatim}
+
+\begin{verbatim}
+HPFC_BUFFER_SIZE 3920
+\end{verbatim}
+
+
 
 \subsection{Program Transformations}
 
