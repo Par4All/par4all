@@ -144,6 +144,9 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                     s and a successor: */
                  MAP(CONFLICT, a_conflict,
                      {
+                        statement use;
+                        statement def;
+                        
                         ifdebug(7) 
                            {
                               fprintf(stderr, "\t\tfrom ");
@@ -156,21 +159,35 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                         /* Something is useful for the current statement if
                            it writes something that is used in the current
                            statement: */
-                        if (action_read_p(conflict_source(a_conflict))
-                            && action_write_p(conflict_sink(a_conflict))) {
+                        if (action_read_p(effect_action(conflict_source(a_conflict)))
+                            && action_write_p(effect_action(conflict_sink(a_conflict)))) {
+                           use = s1;
+                           def = s2;
+                        }
+                        else if (action_write_p(effect_action(conflict_source(a_conflict)))
+                                 && action_read_p(effect_action(conflict_sink(a_conflict)))) {
+                           def = s1;
+                           use = s2;
+                        }
+                        else
+                           /* The dependance is not a use-def one,
+                              look forward... */
+                           continue;
+                        
+                        {
                            /* Mark that we will visit the node that defined a
                               source for this statement, if not already
                               visited: */
                            set statements_set =
                               (set) hash_get(statements_use_def_dependence,
-                                             (char *) s1);
+                                             (char *) use);
                                        
                            if (statements_set == (set) HASH_UNDEFINED_VALUE) {
                               /* It is the first dependence we found
                                  for s1. Create the set: */
                               statements_set = set_make(set_pointer);
                               hash_put(statements_use_def_dependence,
-                                       (char *) s1,
+                                       (char *) use,
                                        (char *) statements_set);
                            }
 
@@ -178,16 +195,17 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                               useful for s1: */
                            set_add_element(statements_set,
                                            statements_set,
-                                           (char *) s2);
+                                           (char *) def);
 
                            ifdebug(6)
-                              fprintf(stderr, "\tstatement %#x (%#x) useful by use-def.\n",
-                                      (int) s2, statement_ordering(s2));
-  
-                           /* One use-def is enough for this variable
-                              couple: */
-                           break;
+                              fprintf(stderr, "\tUse: statement %#x (%#x). Def: statement %#x (%#x).\n",
+                                      (int) use, statement_ordering(use),
+                                      (int) def, statement_ordering(def));
                         }
+                        
+                        /* One use-def is enough for this variable
+                           couple: */
+                        break;
                      },
                         dg_arc_label_conflicts(an_arc_label));
               },
@@ -195,6 +213,17 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
 
        },
           graph_vertices(dependence_graph));
+}
+
+
+void static
+free_statement_to_statement_dependence_mapping()
+{
+   HASH_MAP(key, value,
+            {
+               set_free((set) value);
+            },
+            statements_use_def_dependence);
 }
 
 
@@ -243,10 +272,6 @@ static void
 iterate_through_the_predecessor_graph(statement s,
                                       set elements_to_visit)
 {
-   /* Get the dependence list for this statement: */
-   vertex the_statement_vertex = (vertex) hash_get(ordering_to_dg_mapping,
-                                                   (char *) statement_ordering(s));
-
    ifdebug(6)
       fprintf(stderr, "iterate_through_the_predecessor_graph, statement %#x (%#x).\n",
               (int) s, statement_ordering(s));
@@ -255,56 +280,28 @@ iterate_through_the_predecessor_graph(statement s,
    set_add_element(the_useful_statements, the_useful_statements, (char *) s);
   
    /* First mark the dependence graph predecessors: */
-   if (the_statement_vertex == (vertex) HASH_UNDEFINED_VALUE)
-      user_warning("iterate_through_the_predecessor_graph", "The statement %#x (%#x) does not have any dependance graph information\n", (int) s, statement_ordering(s));
-   else {
-      ifdebug(7)
-         fprintf(stderr, "\tSuccessor list: %#x\n", 
-                 (int) vertex_successors(the_statement_vertex));
-      
-      MAP(SUCCESSOR, a_successor,
-          {
-             vertex sv = successor_vertex(a_successor);
-             dg_arc_label label = successor_arc_label(a_successor);
-             ifdebug(7)
-                fprintf(stderr, "\t%#x --> %#x with conflicts\n", 
-                        (int) s, (int) vertex_to_statement(sv));
-             /* Try to find at least one of the use-def chains between
-                s and a successor: */
-             MAP(CONFLICT, a_conflict,
+   {
+      set statements_set = (set) hash_get(statements_use_def_dependence,
+                                          (char *) s);
+      if (statements_set != (set) HASH_UNDEFINED_VALUE) {
+         /* There is at least one statement that generates something
+            useful for s: */
+         SET_MAP(element,
                  {
-                    ifdebug(7) 
-                       {
-                          fprintf(stderr, "\t\tfrom ");
-                          print_words(stderr, words_effect(conflict_source(a_conflict)));
-                          fprintf(stderr, " to ");
-                          print_words(stderr, words_effect(conflict_sink(a_conflict)));
-                          fprintf(stderr, "\n");
-                       }
+                    statement s2 = (statement) element;
                     
-                    /* Something is useful for the current statement if
-                       it writes something that is used in the current
-                       statement: */
-                    if (action_read_p(conflict_source(a_conflict))
-                        && action_write_p(conflict_sink(a_conflict))) {
-                       /* Mark that we will visit the node that defined a
-                          source for this statement, if not already
-                          visited: */
-                       set_add_element(elements_to_visit,
-                                       elements_to_visit,
-                                       (char *) vertex_to_statement(sv));
+                    /* Mark that we will visit the node that defined a
+                       source for this statement, if not already
+                       visited: */
+                    set_add_element(elements_to_visit,
+                                    elements_to_visit,
+                                    (char *) s2);
                        ifdebug(6)
                           fprintf(stderr, "\tstatement %#x (%#x) useful by use-def.\n",
-                                  (int) vertex_to_statement(sv), statement_ordering(vertex_to_statement(sv)));
-  
-                       /* One use-def is enough for this variable
-                          couple: */
-                       break;
-                    }
+                                  (int) s2, statement_ordering(s2));
                  },
-                    dg_arc_label_conflicts(label));
-          },
-             vertex_successors(the_statement_vertex));
+                    statements_set);
+      }
    }
    
    /* Mark the father too for control dependences: */
@@ -450,7 +447,7 @@ use_def_elimination_on_a_statement(statement s)
    remove_all_the_non_marked_statements(s);
 
    hash_table_free(ordering_to_dg_mapping);
-   hash_table_free(statements_use_def_dependence);
+   free_statement_to_statement_dependence_mapping();
    close_statement_father();
    close_control_father();
    set_free(the_useful_statements);
