@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/02 13:55:40 $, 
+ * $Date: 1997/10/15 04:43:05 $, 
  */
 
 #include <unistd.h>
@@ -451,3 +451,11 @@ safe_readline(FILE * file)
     return res;
 }
 
+void 
+safe_cat(FILE * out, FILE * in)
+{
+    int c;
+    while ((c=getc(in))!=EOF) 
+	if (putc(c, out)==EOF)
+	    pips_internal_error("cat failed");
+}
