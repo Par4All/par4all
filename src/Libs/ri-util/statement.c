@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.78  2004/02/18 10:28:17  keryell
+    I stole lock to install ri-util
+
     Revision 1.77  2003/12/05 17:09:42  nguyen
     Add expression and forloop instruction cases
 
@@ -707,8 +710,6 @@ entity module;
     return make_call_statement(RETURN_FUNCTION_NAME, NIL, l, empty_comments);
 }
 
-/* adds a RETURN statement to *ps if necessary
- */
 /*----------------------------
 
   This function returns a stop statement with an error message
@@ -729,6 +730,8 @@ statement make_stop_statement(string message)
 }
 
 
+/* adds a RETURN statement to *ps if necessary
+ */
 void
 insure_return_as_last_statement(
     entity module,
