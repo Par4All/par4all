@@ -6,4 +6,4 @@ AR	= ar
 RANLIB	= ranlib
 CFLAGS  += -msupersparc
 CANSI	=
-INSTALL	= cp
+INSTALL	= INSTALL=cp install.sh
