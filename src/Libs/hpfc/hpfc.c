@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/12/05 19:28:47 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/12/19 15:52:37 $, )
  * version $Revision$
  */
  
@@ -562,7 +562,7 @@ bool hpfc_close(string name)
     /* not close, because it would free the memory and 
      * pipsdbm will run into troubles when trying to free the resource...
      */
-    reset_hpfc_status();
+    save_hpfc_status();
     
     DB_PUT_FILE_RESOURCE(DBR_HPFC_COMMONS, strdup(name), NO_FILE); /* fake */
 
