@@ -38,6 +38,9 @@
   * $Id$
   *
   * $Log: ri_to_total_preconditions.c,v $
+  * Revision 1.2  2001/12/05 17:18:10  irigoin
+  * Currently being developped. Installed because necessary for Nga and pipsmake.
+  *
   * Revision 1.1  2001/10/23 15:58:10  irigoin
   * Initial revision
   *
@@ -68,58 +71,41 @@
 
 #include "semantics.h"
 
-/* another non recursive section used to filter out total preconditions */
-static list module_global_arguments = NIL;
-
-static list
-get_module_global_arguments()
-{
-  return module_global_arguments;
-}
-
-static void 
-set_module_global_arguments(args)
-list args;
-{
-  module_global_arguments = args;
-}
-/* end of the non recursive section */
-
 transformer statement_to_total_precondition(transformer, statement);
 
 static transformer 
 block_to_total_precondition(
-			    transformer b_pre,
+			    transformer t_post,
 			    list b)
 {
   statement s;
-  transformer post;
-  transformer s_pre = transformer_undefined;
+  transformer t_pre = transformer_undefined;
+  transformer s_post = transformer_undefined;
   list ls = b;
 
-  pips_debug(8,"begin pre=%x\n", b_pre);
-
-  /* The first statement of the block must receive a copy
-   * of the block precondition to avoid data sharing
-   */
+  pips_debug(8,"begin t_post=%p\n", t_post);
 
   if(ENDP(ls))
-    /* to avoid accumulating equivalence equalities */
-    post = transformer_dup(b_pre);
+    t_pre = transformer_dup(t_post);
   else {
-    s = STATEMENT(CAR(ls));
-    s_pre = transformer_dup(b_pre);
-    post = statement_to_total_precondition(s_pre, s);
-    for (POP(ls) ; !ENDP(ls); POP(ls)) {
-      s = STATEMENT(CAR(ls));
-      /* the precondition has been allocated as post */
-      s_pre = post;
-      post = statement_to_total_precondition(s_pre, s);
+    list rls = gen_nreverse(ls);
+    list crls = rls;
+
+    s = STATEMENT(CAR(rls));
+    s_post = statement_to_total_precondition(t_post, s);
+    for (POP(crls) ; !ENDP(crls); POP(crls)) {
+      s = STATEMENT(CAR(crls));
+      t_pre = statement_to_total_precondition(s_post, s);
+      s_post = t_pre;
     }
+    ls = gen_nreverse(rls);
+
+    /* t_pre is already associated with a statement */
+    t_pre = transformer_dup(t_pre);
   }
 
-  pips_debug(8,"post=%x end\n", post);
-  return post;
+  pips_debug(8,"post=%p end\n", t_pre);
+  return t_pre;
 }
 
 static transformer 
@@ -131,9 +117,11 @@ unstructured_to_total_precondition(
   transformer post;
   control c;
 
+  pips_assert("Not implemented yet", FALSE);
+
   pips_debug(8,"begin\n");
 
-  pips_assert("unstructured is deinfed", u!=unstructured_undefined);
+  pips_assert("unstructured is defined", u!=unstructured_undefined);
 
   c = unstructured_control(u);
   if(control_predecessors(c) == NIL && control_successors(c) == NIL) {
@@ -174,12 +162,6 @@ unstructured_to_total_precondition(
 	    "filtered precondition pre_u:\n");
       (void) print_transformer(pre_u) ;
     }
-    /* FI: I do not know if I should duplicate pre or not. */
-    /* FI: well, dumdum, you should have duplicated tf! */
-    /* FI: euh... why? According to comments about transformer_apply()
-     * neither arguments are modified...
-     */
-    /* post = unstructured_to_total_preconditions(pre_u, pre, u); */
     post = unstructured_to_accurate_total_preconditions(pre_u, pre, u);
     pips_assert("A valid total_precondition is returned",
 		!transformer_undefined_p(post));
@@ -198,91 +180,50 @@ static transformer
 test_to_total_precondition(
     transformer t_post,
     test t,
-    transformer tf)
+    transformer tf,
+    transformer context)
 {
 #   define DEBUG_TEST_TO_TOTAL_PRECONDITION 7
-  expression e = test_condition(t);
+  expression c = test_condition(t);
   statement st = test_true(t);
   statement sf = test_false(t);
   transformer t_pre;
 
-  pips_debug(DEBUG_TEST_TO_TOTAL_PRECONDITION,"begin\n");
+  pips_debug(DEBUG_TEST_TO_TOTAL_PRECONDITION, "begin\n");
 
-  /* there are three levels of flow sensitivity and we have only a
-     boolean flag! FI */
+  if(pips_flag_p(SEMANTICS_FLOW_SENSITIVE)) {
+    transformer t_pret = statement_to_total_precondition(t_post, st);
+    transformer t_pref = statement_to_total_precondition(t_post, sf);
 
-  /* test conditions are assumed to have no side effects; it might
-     be somewhere in the standard since functions called in an expression e
-     cannot (should not) modify any variable used in e */
+    t_pret = transformer_add_domain_condition(t_pret, c, context,
+					       TRUE);
+    t_pret = transformer_normalize(t_pret, 4);
 
-  if(pips_flag_p(SEMANTICS_FLOW_SENSITIVE) /* && !transformer_identity_p(tf) */) {
-    /* convex hull might avoided if it is not required or if it is certainly useless 
-     * but test information should always be propagated 
-     */
-    transformer pret =
-      precondition_add_condition_information(transformer_dup(pre),e, pre,
-					     TRUE);
-    transformer pref = transformer_undefined;
-
-    transformer postt;
-    transformer postf;
-
-    /* "strong" transformer normalization to detect dead code generated by the
-     * test condition
-     */
-    /* A normalization of degree 3 is fine */
-    /* transformer_normalize(pret, 3); */
-    transformer_normalize(pret, 7);
-
-    /* FI, CA: the following "optimization" was added to avoid a call
-     * to Chernikova convex hull that core dumps:-(. 8  September 1993
-     *
-     * From a theoretical point of view, pref could always be computed.
-     *
-     * FI: removed because it is mathematically wrong in many cases;
-     * the negation of the test condition is lost! I keep the structure
-     * just in case another core dump occurs (25 April 1997).
-     */
-    if(!empty_statement_p(sf)||TRUE) {
-	  
-      pref = precondition_add_condition_information(transformer_dup(pre),e,
-						    pre, FALSE);
-      /* transformer_normalize(pref, 3); */
-      transformer_normalize(pref, 7);
-    }
-    else {
-      /* do not try to compute a refined precondition for an empty block
-       * keep the current precondition to store in the precondition statement mapping
-       */
-      pref = transformer_dup(pre);
-    }
+    t_pref = transformer_add_domain_condition(t_pref, c, context,
+					      FALSE);
+    transformer_normalize(t_pref, 4);
 
     ifdebug(DEBUG_TEST_TO_TOTAL_PRECONDITION) {
-      debug(DEBUG_TEST_TO_TOTAL_PRECONDITION,"test_to_total_precondition","pret=\n");
-      (void) print_transformer(pret);
-      debug(DEBUG_TEST_TO_TOTAL_PRECONDITION,"test_to_total_precondition","pref=\n");
-      (void) print_transformer(pref);
+      pips_debug(DEBUG_TEST_TO_TOTAL_PRECONDITION,"t_pret=%p\n",t_pret);
+      (void) print_transformer(t_pret);
+      pips_debug(DEBUG_TEST_TO_TOTAL_PRECONDITION,"t_pref=%p\n",t_pref);
+      (void) print_transformer(t_pref);
     }
 
-    postt = statement_to_total_precondition(pret, st);
-    postf = statement_to_total_precondition(pref, sf);
-    post = transformer_convex_hull(postt, postf);
-    transformer_free(postt);
-    transformer_free(postf);
+    t_pre = transformer_convex_hull(t_pret,t_pref);
   }
   else {
-    (void) statement_to_total_precondition(pre, st);
-    (void) statement_to_total_precondition(pre, sf);
-    post = transformer_apply(tf, pre);
+    (void) statement_to_total_precondition(t_post, st);
+    (void) statement_to_total_precondition(t_post, sf);
+    t_pre = transformer_apply(t_post, tf);
   }
 
   ifdebug(DEBUG_TEST_TO_TOTAL_PRECONDITION) {
-    debug(DEBUG_TEST_TO_TOTAL_PRECONDITION,"test_to_total_precondition",
-	  "end post=\n");
-    (void) print_transformer(post);
+    pips_debug(DEBUG_TEST_TO_TOTAL_PRECONDITION, "end post=\n");
+    (void) print_transformer(t_pre);
   }
 
-  return post;
+  return t_pre;
 }
 
 static transformer 
@@ -299,56 +240,12 @@ call_to_total_precondition(
 
   switch (tt = value_tag(entity_initial(e))) {
   case is_value_intrinsic:
-    /* there is room for improvement because assign is now the only 
-       well handled intrinsic */
-    pips_debug(5, "intrinsic function %s\n",
-	       entity_name(e));
-    if(get_bool_property("SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS")
-       && ENTITY_ASSIGN_P(call_function(c))) {
-      entity f = call_function(c);
-      list args = call_arguments(c);
-      /* impredance problem: build an expression from call c */
-      expression expr = make_expression(make_syntax(is_syntax_call, c),
-					normalized_undefined);
-      list ef = expression_to_proper_effects(expr);
-      transformer pre_r = transformer_range(pre);
-      transformer new_tf = intrinsic_to_transformer(f, args, pre_r, ef);
-
-      post = transformer_apply(new_tf, pre);
-      syntax_call(expression_syntax(expr)) = call_undefined;
-      free_expression(expr);
-      free_transformer(new_tf);
-      free_transformer(pre_r);
-    }
-    else {
-      post = transformer_apply(tf, pre);
-    }
-    /* propagate precondition pre as summary precondition 
-       of user functions */
-    /* FI: don't! Summary preconditions are computed independently*/
-    /*
-      if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-      list args = call_arguments(c);
-      expressions_to_summary_precondition(pre, args);
-      }
-    */
+    t_pre = transformer_inverse_apply(tf, t_post);
+    /* memory leak */
+    t_pre = transformer_to_domain(t_pre);
     break;
   case is_value_code:
-    pips_debug(5, "external function %s\n", entity_name(e));
-    if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-      /*
-	list args = call_arguments(c);
-
-	transformer pre_callee = transformer_dup(pre);
-	pre_callee = 
-	add_formal_to_actual_bindings(c, pre_callee);
-	add_module_call_site_precondition(e, pre_callee);
-      */
-      /*
-	expressions_to_summary_precondition(pre, args);
-      */
-    }
-    post = transformer_apply(tf, pre);
+    t_pre = transformer_inverse_apply(tf, t_post);
     break;
   case is_value_symbolic:
   case is_value_constant:
@@ -364,22 +261,23 @@ call_to_total_precondition(
 
   pips_debug(8,"end\n");
 
-  return post;
+  return t_pre;
 }
 
 static transformer 
 instruction_to_total_precondition(
     transformer t_post,
     instruction i,
-    transformer tf)
+    transformer tf,
+    transformer context)
 {
   transformer t_pre = transformer_undefined;
-  test t;
-  loop l;
-  whileloop wl;
-  call c;
+  test t = test_undefined;
+  loop l = loop_undefined;
+  whileloop wl = whileloop_undefined;
+  call c = call_undefined;
 
-  pips_debug(9,"begin pre=%p tf=%p\n", pre, tf);
+  pips_debug(9,"begin t_post=%p tf=%p\n", t_post, tf);
 
   switch(instruction_tag(i)) {
   case is_instruction_block:
@@ -387,15 +285,15 @@ instruction_to_total_precondition(
     break;
   case is_instruction_test:
     t = instruction_test(i);
-    t_pre = test_to_total_precondition(t_post, t, tf);
+    t_pre = test_to_total_precondition(t_post, t, tf, context);
     break;
   case is_instruction_loop:
     l = instruction_loop(i);
-    t_pre = loop_to_total_precondition(t_post, l, tf);
+    t_pre = loop_to_total_precondition(t_post, l, tf, context);
     break;
   case is_instruction_whileloop:
     wl = instruction_whileloop(i);
-    t_pre = whileloop_to_total_precondition(t_post, wl, tf);
+    t_pre = whileloop_to_total_precondition(t_post, wl, tf, context);
     break;
   case is_instruction_goto:
     pips_error("instruction_to_total_precondition",
@@ -414,9 +312,9 @@ instruction_to_total_precondition(
     pips_error("instruction_to_total_precondition","unexpected tag %d\n",
 	       instruction_tag(i));
   }
-  pips_debug(9,"resultat post, %p:\n", t_pre);
+  pips_debug(9,"resultat t_pre, %p:\n", t_pre);
   ifdebug(9) (void) print_transformer(t_pre);
-  return post;
+  return t_pre;
 }
 
 transformer 
@@ -427,16 +325,18 @@ statement_to_total_precondition(
   transformer t_pre = transformer_undefined;
   instruction i = statement_instruction(s);
   transformer tf = load_statement_transformer(s);
+  /* Preconditions may be useful to deal with tests and loops and to find
+     out if some control paths do not exist */
+  /* transformer context = transformer_undefined; */
+  transformer context = load_statement_precondition(s);
 
-  /* ACHTUNG! "pre" is likely to be misused! FI, Sept. 3, 1990 */
-
-  debug(1,"statement_to_total_precondition","begin\n");
+  pips_debug(1,"begin\n");
 
   pips_assert("The statement total postcondition is defined", t_post != transformer_undefined);
 
   ifdebug(1) {
     int so = statement_ordering(s);
-    (void) fprintf(stderr, "statement %03d (%d,%d), precondition %p:\n",
+    (void) fprintf(stderr, "statement %03d (%d,%d), total postcondition %p:\n",
 		   statement_number(s), ORDERING_NUMBER(so),
 		   ORDERING_STATEMENT(so), t_post);
     (void) print_transformer(t_post) ;
@@ -445,27 +345,31 @@ statement_to_total_precondition(
   pips_assert("The statement transformer is defined", tf != transformer_undefined);
   ifdebug(1) {
     int so = statement_ordering(s);
-    (void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
-		   statement_number(s), ORDERING_NUMBER(so),
-		   ORDERING_STATEMENT(so), tf);
+    pips_debug(9,"statement %03d (%d,%d), transformer %p:\n",
+	       statement_number(s), ORDERING_NUMBER(so),
+	       ORDERING_STATEMENT(so), tf);
     (void) print_transformer(tf) ;
   }
 
   if (!statement_reachable_p(s))
     {
-      /* FC: if the code is not reachable (thanks to STOP or GOTO), which
-       * is a structural information, the total precondition is just identity.
+      /* If the code is not reachable, thanks to STOP or GOTO, which
+       * is a structural information, the total precondition is just empty.
        */
 
-      t_pre = transformer_identity();
+      t_pre = transformer_empty();
     }
 
   if (load_statement_total_precondition(s) == transformer_undefined) {
+    list non_initial_values = list_undefined;
+
+    t_pre = instruction_to_total_precondition(t_post, i, tf, context);
+
     /* keep only global initial scalar integer values;
        else, you might end up giving the same xxx#old name to
-       two different local values */
-    list non_initial_values =
-      arguments_difference(transformer_arguments(pre),
+       two different local values (?) */
+    non_initial_values =
+      arguments_difference(transformer_arguments(t_pre),
 			   get_module_global_arguments());
 
     MAPL(cv,
@@ -474,8 +378,6 @@ statement_to_total_precondition(
       ENTITY(CAR(cv)) = entity_to_old_value(v);
     },
 	 non_initial_values);
-
-    t_pre = instruction_to_total_precondition(t_post, i, tf);
 
     /* add equivalence equalities */
     t_pre = tf_equivalence_equalities_add(t_pre);
@@ -491,18 +393,21 @@ statement_to_total_precondition(
       pips_internal_error("Non-consistent precondition after update\n");
     }
 
-    /* store the precondition in the ri */
-    store_statement_total_precondition(s,
-				       transformer_filter(t_pre,
-							  non_initial_values));
+    t_pre = transformer_filter(t_pre, non_initial_values);
+
+    /* store the total precondition in the ri */
+    store_statement_total_precondition(s, t_pre);
 
     gen_free_list(non_initial_values);
   }
   else {
-    pips_debug(8,"total precondition already available");
+    int so = statement_ordering(s);
+    pips_debug(8, "total precondition already available:\n");
     (void) print_transformer(t_pre);
-    pips_error("statement_to_total_precondition",
-	       "precondition already computed\n");
+    pips_debug(8, "for statement %03d (%d,%d), total precondition %p end:\n",
+	    statement_number(s), ORDERING_NUMBER(so),
+	    ORDERING_STATEMENT(so), load_statement_total_precondition(s));
+    pips_internal_error("total precondition already computed\n");
   }
 
   ifdebug(1) {
