@@ -62,7 +62,7 @@ static string dependence_graph_banner[8] = {
 	"\n ********* Dependence Graph (ill. option combination) *******\n",
 	"\n **** Loop Carried Dependence Graph with Dependence Cones ***\n"
     };
-
+
 /* Print all edges and arcs */
 void 
 prettyprint_dependence_graph(FILE * fd,
@@ -186,7 +186,7 @@ prettyprint_dependence_graph(FILE * fd,
 				    fprint_lsom_as_dense(fd, sg_sommets(gs), gs->base);
 				}
 				else {
-				    fprintf(fd, "ddv()");
+				    sg_fprint_as_ddv(fd, gs);
 				}
 			    }
 			    else {
