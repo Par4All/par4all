@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/11 21:29:31 $, 
+# $Date: 1996/09/11 21:33:55 $, 
 #
 # this script allow to chose a directory interactively
 #
@@ -177,7 +177,7 @@ proc changedir { root currentdir } {
 if {$argc == 0} {
     set dir .
 } else {
-    set dir [lindex $argv 1]
+    set dir [lindex $argv 0]
 }
 
 puts [changedir "" $dir ]
