@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/10 15:57:05 $m 
+# $Date: 1996/08/10 16:01:35 $m 
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
@@ -64,11 +64,11 @@ scanner.c: scanner.l
 keywtbl.h: warning.h f77keywords
 	@echo "Generating $@"
 	{ cat warning.h ; \
-	echo "#include \"syn_yacc.h\"" ; \
-	echo "struct Skeyword keywtbl[] = {" ;\
-	sed "s/^.*/{\"&\", TK_&},/" f77keywords ;\
-	echo "{0, 0}" ;\
-	echo "};" ; } > keywtbl.h
+	  echo "#include \"syn_yacc.h\"" ; \
+	  echo "struct Skeyword keywtbl[] = {" ;\
+	  sed "s/^.*/{\"&\", TK_&},/" f77keywords ;\
+	  echo "{0, 0}" ;\
+	  echo "};" ; } > keywtbl.h
 
 tokyacc.h: warning.h f77keywords f77symboles
 	cat f77keywords f77symboles | nl -s: | cat warning.h - | sed "s/\([^:]*\):\(.*\)/%token TK_\2 \1/" > tokyacc.h
