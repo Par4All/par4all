@@ -239,6 +239,8 @@ static db_resource find_or_create_db_resource(string rname, string oname)
  * - status may be 'loaded', but it is not true!
  * - status may be 'required', but it is not true either.
  * - also, as obsolete resources are not cleaned...
+ *
+ * maybe the required stuff should be handled by pipsmake on its own?
  */
 static void db_clean_db_resources()
 {
@@ -403,8 +405,13 @@ void db_print_all_required_resources(FILE * file)
 
 void db_clean_all_required_resources(void)
 {
+  list /* of db_symbols */ owners_to_delete = NIL;
+  db_resources db = get_pips_database();
+
+  /* Owner Symbol, Owned Resources */
   DB_RESOURCES_MAP(os, or,
   {
+    /* Resource Symbol, DB Resource */
     DB_OWNED_RESOURCES_MAP(rs, r,
     {
       string rn = db_symbol_name(rs);
@@ -414,14 +421,25 @@ void db_clean_all_required_resources(void)
       if (db_resource_required_p(r))
       {
 	pips_debug(1, "deleting %s[%s]\n", rn, on);
-	dump_db_resource(rn, on, r);
+	dump_db_resource(rn, on, r); /* DEBUG? */
 	db_delete_resource(rn, on);
       }
     },
       or);
-  },
-		   get_pips_database());
 
+    /* mark as to be deleted if owned resouces is empty. */
+    if (hash_table_entry_count(db_owned_resources_hash_table(or))==0)
+    {
+      pips_user_warning("module '%s' to be deleted, no more resources owned.\n"
+			"  (maybe temporarily required by pipsmake but some error occured)\n",
+			db_symbol_name(os));
+
+      owners_to_delete = CONS(DB_SYMBOL, os, owners_to_delete);
+    }
+  },
+		   db);
+
+  MAP(DB_SYMBOL, os, delete_db_resources(db, os), owners_to_delete);
 }
 
 /******************************************************* RESOURCE MANAGEMENT */
