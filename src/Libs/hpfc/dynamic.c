@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1997/02/18 18:35:44 $, )
+ * ($Date: 1997/02/18 18:51:52 $, )
  */
 
 #include "defines-local.h"
@@ -1321,23 +1321,6 @@ static void regenerate_renamings(statement s)
     }
 }
 
-/* special case. tags leavings to enable initializing hpfc runtime.
- */
-static void 
-update_root_special_renamings(statement s)
-{
-    list /* of renamings */ lr = NIL;
-
-    gen_map(gen_free, load_renamings(s)),
-    gen_free_list(load_renamings(s));
-
-    MAP(ENTITY, a, lr = CONS(RENAMING, make_renaming(a, a), lr),
-	entities_list(load_leaving_mappings(s)));
-    
-    update_renamings(s, lr); 
-    /* delete_renamings(s); */
-}
-
 static list /* of statements */ 
 list_of_remapping_statements()
 {
@@ -1425,7 +1408,6 @@ void simplify_remapping_graph(void)
     if (bound_remapped_p(root))	remove_unused_remappings(root);
 
     gen_map(regenerate_renamings, ls);
-    /* update_root_special_renamings(root); */
 
     gen_free_list(ls);
 }
