@@ -243,7 +243,8 @@ static void echo_handler(char * line)
 {
     /* skip the key word and a blank character */
     user_log("%s\n", line); 
-    line += strlen(ECHO) + 1;
+    line += strlen(ECHO);
+    if (*line==' ' || *line=='\t') line++;
     fprintf(stdout,"%s\n",line);
     fflush(stdout);
 }
