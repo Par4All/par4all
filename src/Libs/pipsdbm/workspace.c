@@ -119,6 +119,12 @@ meta_data_db_file_name(string data)
 }
 
 static void
+free_meta_data(void)
+{
+    gen_free_tabulated(db_symbol_domain);
+}
+
+static void
 save_meta_data(void)
 {
     string file_name;
@@ -135,7 +141,6 @@ save_meta_data(void)
     file_name = meta_data_db_file_name(DATABASE_SYMBOLS);
     file = safe_fopen(file_name, "w");
     gen_write_tabulated(file, db_symbol_domain);
-    gen_free_tabulated(db_symbol_domain);
     safe_fclose(file, file_name);
     free(file_name);
 
@@ -213,7 +218,7 @@ db_create_workspace(string name)
 {
     bool ok;
     string dir_name;
-    debug_on("PIPSDBM_DEBUG_LEVEL");
+    debug_on(PIPSDBM_DEBUG_LEVEL);
 
     dir_name = db_get_workspace_directory_name(name);
 
@@ -239,39 +244,55 @@ db_create_workspace(string name)
 /* stores all resources of module oname.
  */
 static void
-db_close_module(string oname)
+db_close_module(string what, string oname)
 {
     /* the download order is retrieved from the methods... */
     int nr = dbll_number_of_resources(), i;
     if (!same_string_p(oname, "")) /* log if necessary. */
-	user_log("  Closing module %s.\n", oname);
+	user_log("  %s module %s.\n", what, oname);
     for (i=0; i<nr; i++)
 	db_save_and_free_memory_resource_if_any
 	    (dbll_get_ith_resource_name(i), oname);
+}
+
+static void
+db_save_workspace(string what)
+{
+    gen_array_t a;
+
+    user_log("%s all modules.\n", what);
+    a = db_get_module_list();
+    GEN_ARRAY_MAP(module, db_close_module(what, module), a);
+    gen_array_full_free(a);
+    
+    user_log("%s program.\n", what);
+    db_close_module(what, ""); /* ENTITIES are saved here... */
+
+    user_log("%s workspace.\n", what);
+    save_meta_data();
+}
+
+void
+db_checkpoint_workspace(void)
+{
+    debug_on(PIPSDBM_DEBUG_LEVEL);
+    pips_debug(1, "Checkpointing workspace %s\n", 
+	       db_get_current_workspace_name());
+    db_save_workspace("Saving");
+    debug_off();
 }
 
 bool
 db_close_workspace(void)
 {
     string name = db_get_current_workspace_name();
-    int nmodules, i;
-    gen_array_t a;
 
-    debug_on("PIPSDBM_DEBUG_LEVEL");
-    pips_debug(1, "closing workspace %s\n", name);
+    debug_on(PIPSDBM_DEBUG_LEVEL);
+    pips_debug(1, "Closing workspace %s\n", name);
 
-    user_log("Closing all modules.\n");
-    a = db_get_module_list();
-    nmodules = gen_array_nitems(a);
-    for (i=0; i<nmodules; i++)
-	db_close_module(gen_array_item(a, i));
-    gen_array_full_free(a);
-    
-    user_log("Closing program.\n");
-    db_close_module(""); /* ENTITIES are saved here... */
+    db_save_workspace("Closing");
+    free_meta_data();
 
-    user_log("Closing workspace.\n");
-    save_meta_data();
     db_reset_current_workspace_name();
     
     pips_debug(1, "done\n");
@@ -284,8 +305,8 @@ db_open_workspace(string name)
 {
     bool ok = TRUE;
     string dir_name;
-    debug_on("PIPSDBM_DEBUG_LEVEL");
-    pips_debug(1, "opening workspace %s\n", name);
+    debug_on(PIPSDBM_DEBUG_LEVEL);
+    pips_debug(1, "Opening workspace %s\n", name);
 
     dir_name = db_get_workspace_directory_name(name);
     if (directory_exists_p(dir_name))
