@@ -139,6 +139,27 @@ static void dump_db_resource(string rname, string oname, db_resource r)
   }
 }
 
+void dump_all_db_resource_status(FILE * file)
+{
+  DB_RESOURCES_MAP(os, or,
+  {
+    DB_OWNED_RESOURCES_MAP(rs, r,
+    {
+      string rn = db_symbol_name(rs);
+      string on = db_symbol_name(os);
+      fprintf(file, "resource %s[%s] status '%s' since %d (%d) 0x%p\n",
+	      rn, on, 
+	      db_status_string(db_resource_db_status(r)), 
+	      db_resource_time(r),
+	      db_resource_file_time(r),
+	      db_resource_pointer(r));
+    },
+			   or);
+  },
+		   get_pips_database());
+  
+}
+
 #define debug_db_resource(l, r, o, p) ifdebug(l) { dump_db_resource(r, o, p);}
 
 static void init_owned_resources_if_necessary(string name)
@@ -210,6 +231,11 @@ static db_resource find_or_create_db_resource(string rname, string oname)
  */
 static void db_clean_db_resources()
 {
+  list lr = NIL, lo = NIL, lo_init = NIL, lr_init = NIL;
+
+  ifdebug(1) 
+    dump_all_db_resource_status(stderr);
+
   DB_RESOURCES_MAP(os, or,
   {
     DB_OWNED_RESOURCES_MAP(rs, r,
@@ -220,13 +246,13 @@ static void db_clean_db_resources()
 
       if (db_resource_required_p(r))
       {
-	pips_debug(1, "deleting required %s[%s]\n", rn, on);
-	dump_db_resource(rn, on, r);
-	db_delete_resource(rn, on);
+	/* to be deleted later on */
+	lr = CONS(STRING, rn, lr);
+	lo = CONS(STRING, on, lo);
       }
       else if (db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) 
       {
-	pips_debug(5, "resource %s[%s] set as stored\n", rn, on);
+	pips_debug(1, "resource %s[%s] set as stored\n", rn, on);
 	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
 	db_resource_pointer(r) = NULL;
       }
@@ -234,6 +260,18 @@ static void db_clean_db_resources()
 			   or)
       },
 		   get_pips_database());
+
+  for (; lr && lo; lr = CDR(lr), lo = CDR(lo))
+  {
+    string rn = STRING(CAR(lr)), on = STRING(CAR(lo));
+    db_resource r = get_db_resource(rn, on);
+    pips_debug(1, "deleting required %s[%s]\n", rn, on);
+    dump_db_resource(rn, on, r);
+    db_delete_resource(rn, on);
+  }
+  
+  gen_free_list(lr_init);
+  gen_free_list(lo_init);
 }
 
 void db_delete_resource(string rname, string oname)
@@ -572,14 +610,23 @@ void db_set_resource_as_required(string rname, string oname)
 
   r = find_or_create_db_resource(rname, oname);
   s = db_resource_db_status(r);
-  if (db_status_undefined_p(s))
+  if (db_status_undefined_p(s)) {
     /* newly created db_resource... */
     db_resource_db_status(r) = make_db_status(is_db_status_required, UU);
-  else if ((db_status_loaded_p(s) || db_status_loaded_and_stored_p(s)) && 
-	   db_resource_pointer(r))
+  }
+  else 
   {
-    dbll_free_resource(rname, oname, db_resource_pointer(r));
-    db_resource_pointer(r) = NULL;
+    pips_debug(1, "set %s[%s] as 'required' from '%s' at %d\n",
+	       rname, oname, 
+	       db_status_string(db_resource_db_status(r)),
+	       db_get_logical_time());
+
+    if ((db_status_loaded_p(s) || db_status_loaded_and_stored_p(s)) && 
+	db_resource_pointer(r))
+    {
+      dbll_free_resource(rname, oname, db_resource_pointer(r));
+      db_resource_pointer(r) = NULL;
+    }
   }
 
   db_status_tag(db_resource_db_status(r)) = is_db_status_required;
@@ -617,7 +664,7 @@ void db_put_or_update_memory_resource(
       db_resource_file_time(r) =
 	  dbll_stat_local_file(db_resource_pointer(r), FALSE);
     else
-      db_resource_file_time(r) = -1; /* or what else? */
+      db_resource_file_time(r) = 0; /* or what else? */
 
     debug_db_resource(9, rname, oname, r);
     debug_off();
