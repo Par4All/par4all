@@ -3,9 +3,10 @@
  * Corinne Ancourt  - juin 1990
  */
 
+#include <stdlib.h>
 #include <stdio.h>
-
-extern char * strdup();
+#include <malloc.h>
+#include <string.h>
 
 #include "genC.h"
 #include "misc.h"
