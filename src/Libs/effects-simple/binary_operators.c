@@ -234,7 +234,9 @@ proper_to_summary_simple_effect(effect eff)
 {
     if (!effect_scalar_p(eff))
     {
-	effect_reference(eff) = make_reference(effect_entity(eff), NIL);
+	entity e = effect_entity(eff);
+	free_reference(effect_reference(eff));
+	effect_reference(eff) = make_reference(e, NIL);
 	effect_approximation_tag(eff) = is_approximation_may;
     }
     return(eff);
