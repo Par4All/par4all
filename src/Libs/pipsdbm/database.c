@@ -333,8 +333,37 @@ bool db_update_time(string rname, string oname)
   return TRUE;
 }
 
+/* FI wants a sort... so here it is, FC. */
+typedef struct 
+{
+  int time; 
+  string owner_name; 
+  string res_name;
+} t_tmp_result, * p_tmp_result;
+
+static p_tmp_result make_tmp_result(int t, string on, string rn)
+{
+  p_tmp_result res = (p_tmp_result) malloc(sizeof(t_tmp_result));
+  res->time = t;
+  res->owner_name = on;
+  res->res_name = rn;
+  return res;
+}
+
+static int tmp_result_cmp(const p_tmp_result * p1, const p_tmp_result * p2)
+{
+  if ((*p1)->time != (*p2)->time)
+    return (*p1)->time - (*p2)->time;
+  if ((*p1)->owner_name != (*p2)->owner_name)
+    return strcmp((*p1)->owner_name, (*p2)->owner_name);
+  return strcmp((*p1)->res_name, (*p2)->res_name);
+}
+
 void db_print_all_required_resources(FILE * file)
 {
+  list lres = NIL;
+
+  /* first collect result */
   DB_RESOURCES_MAP(os, or,
   {
     DB_OWNED_RESOURCES_MAP(rs, r,
@@ -345,13 +374,28 @@ void db_print_all_required_resources(FILE * file)
 		 rn, on, db_status_string(db_resource_db_status(r)));
 
       if (db_resource_required_p(r)) {
-	fprintf(file, "resource %s[%s] is in 'required' status since %d\n", 
-		rn, on, db_resource_time(r));
+	lres = CONS(DB_VOID,  
+		    make_tmp_result(db_resource_time(r), on, rn),
+		    lres);
       }
     },
       or);
   },
 		   get_pips_database());
+
+  /* then sort, dump and free */
+  gen_sort_list(lres, tmp_result_cmp);
+
+  MAPL(l,
+  {
+    p_tmp_result p = (p_tmp_result) CAR(l).e;
+    fprintf(file, 
+	    "resource %s[%s] is in 'required' status since %d\n", 
+	    p->res_name, p->owner_name, p->time);
+    free(p);
+  },
+       lres);
+  gen_free_list(lres);
 }
 
 void db_clean_all_required_resources(void)
