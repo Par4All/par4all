@@ -23,11 +23,12 @@ SRC_MACROS =	define_libraries.sh \
 		makefile_macros.SUN4 \
 		makefile_macros.TEST \
 		makefile_macros.GNULL \
-		makefile_macros.GNUSOL2LL
+		makefile_macros.GNUSOL2LL \
+		makefile_macros.GPROF
 
 DDC_MACROS = 	define_libraries.make
 
-MACROS	=	$(SRC_MACROS) $(DDC_MACROS)
+MACROS	=	$(DDC_MACROS) $(SRC_MACROS) 
 
 COPY	=	cp -f
 
@@ -40,18 +41,16 @@ quick-install: install_forward_makefiles install_macros
 all: $(DDC_MACROS)
 
 define_libraries.make: define_libraries.sh
+	# make macros and sh variables can be initialized nearly the same way
 	sed "s,$<,$@,g;s,',,g" $< > $@
 
 clean: local-clean
-local-clean:
-	$(RM) $(DDC_MACROS)
+local-clean:; $(RM) $(DDC_MACROS)
 
+#
 # bootstraping temporarily include files if needed...
-$(PIPS_ROOT)/Include/makefile_macros.$(ARCH):
-	touch $@
-
-$(PIPS_ROOT)/Include/define_libraries.make:
-	touch $@	
+$(PIPS_ROOT)/Include/makefile_macros.$(ARCH):; touch $@
+$(PIPS_ROOT)/Include/define_libraries.make:; touch $@
 
 install_macros: $(DDC_MACROS)
 	#
