@@ -34,7 +34,7 @@ enum {DECALAGE_STATUS = 100
 };
 
 /* Max number of digits displayed in the status panel: */
-enum {CPU_USAGE_LENGTH = 5
+enum {CPU_USAGE_LENGTH = 8
 };
 
 
@@ -72,7 +72,7 @@ display_memory_usage()
          an_rusage.ru_utime.tv_sec + an_rusage.ru_stime.tv_sec
          + (an_rusage.ru_utime.tv_usec + an_rusage.ru_stime.tv_usec)*1e-6;
       sprintf(cpu_string, "%*.*g",
-              CPU_USAGE_LENGTH, CPU_USAGE_LENGTH,the_cpu_time);
+              CPU_USAGE_LENGTH, CPU_USAGE_LENGTH - 2, the_cpu_time);
    }
    else
       /* getrusage() failed: */
