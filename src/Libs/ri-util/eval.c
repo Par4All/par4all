@@ -333,7 +333,7 @@ IsBinaryOperator(entity e)
 		token = AND;
 	else if (same_string_p(entity_local_name(e), IMPLIED_COMPLEX_NAME) ||
 		 same_string_p(entity_local_name(e), IMPLIED_DCOMPLEX_NAME))
-	        token = CAST;
+	        token = CAST_OP;
 	else
 		token = -1;
 
