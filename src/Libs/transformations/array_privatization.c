@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1996/10/17 11:09:31 $, 
+ * $Date: 1996/10/17 13:22:57 $, 
  */
 
 #include <stdio.h>
@@ -869,8 +869,9 @@ privatize_entity(entity ent)
     storage new_ent_storage;
     entity module = get_current_module_entity();
 
-    /* We do not need to privatize local variables */
-    if (!storage_ram_p(ent_storage))
+    /* We do not need to privatize local (dynamic) or formal variables */
+    if (storage_ram_p(ent_storage) &&
+	!dynamic_area_p(ram_section(storage_ram(ent_storage))))
     {
 
 	/* Make a new ram entity, similar to the previous one, 
@@ -933,6 +934,7 @@ declarations_privatizer(char *module_name)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)) );
     module_to_value_mappings(module);
     
+    debug_on("ARRAY_PRIVATIZATION_DEBUG_LEVEL");
 
     /* Privatizable array regions */
     /* For the moment, we only want to privatize whole variables;
@@ -952,20 +954,42 @@ declarations_privatizer(char *module_name)
 	(regions_write_regions(load_statement_local_regions(module_stat))); 
     l_in = regions_dup(load_statement_in_regions(module_stat));
     l_out = regions_dup(load_statement_out_regions(module_stat));
+
+    ifdebug(2)
+    {
+	pips_debug(3, "WRITE regions: \n");
+	print_regions(l_write);
+	pips_debug(3, "IN regions: \n");
+	print_regions(l_in);
+	pips_debug(3, "OUT regions: \n");
+	print_regions(l_out);
+    }
+
     
     l_priv = RegionsEntitiesInfDifference(l_write, l_in, w_r_combinable_p);
     l_priv = RegionsEntitiesInfDifference(l_priv, l_out, w_w_combinable_p);
 
+    ifdebug(2)
+    {
+	pips_debug(3, "Private regions: \n");
+	print_regions(l_priv);
+    }
 
     /* We effectively perform the privatization */
     MAP(REGION, reg,
 	{
+	    pips_user_warning("privatizing variable: %s\n",
+			      entity_local_name(region_entity(reg)));
 	    privatize_entity(region_entity(reg));
 	},
 	l_priv);
 
     /* Then we need to clean the declarations */
-    /* to be done later */
+    /* to be done later or in another phase */
+
+    debug_off();
+
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
 
     reset_current_module_entity();
     reset_current_module_statement();
