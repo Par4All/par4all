@@ -58,7 +58,7 @@ char * argv[];
     while ((c = getopt(argc, argv, "vf:m:s:p:b:1:0:")) != -1)
 	switch (c) {
 	case 'v':
-	    fprintf(stderr, "pips: (ARCH=%s) %s\n", PIPS_ARCH, argv[0]);
+	    fprintf(stderr, "pips: (ARCH=%s) %s\n", SOFT_ARCH, argv[0]);
 	    break;
 	case 'f':
 	    source_files = 
