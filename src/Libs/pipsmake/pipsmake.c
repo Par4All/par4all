@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.66  1998/12/03 11:56:11  irigoin
+ * Typo in format in get_builder() fixed.
+ *
  * Revision 1.65  1998/12/02 14:32:32  irigoin
  * Function reset_static_phase_variables() added to improve error handlers such as catch_user_error()
  *
@@ -117,7 +120,7 @@ static bool (*get_builder(string name))(char *)
     for (pbm = builder_maps; pbm->builder_name; pbm++)
 	if (same_string_p(pbm->builder_name, name))
 	    return pbm->builder_func;
-    pips_internal_error("no builder for $s\n", name);
+    pips_internal_error("no builder for %s\n", name);
     return NULL;
 }
 
