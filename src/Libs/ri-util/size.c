@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: size.c,v $
+ * Revision 1.16  2002/03/07 17:19:01  irigoin
+ * Comment added for SizeOfElements()
+ *
  * Revision 1.15  1999/01/12 20:39:02  irigoin
  * Performance improvements for entity_conflict_p(). Instead of gathering all
  * information and making a final test, partial tests are performed as soon
@@ -82,7 +85,8 @@ ValueSizeOfArray(entity e)
    in the EOLE project (JZ - 11/98) */
 
 /* this function returns the length in bytes of the fortran type
-represented by a basic. */
+represented by a basic, except for a varying size string (formal
+parameter). */
 
 int 
 SizeOfElements(b)
