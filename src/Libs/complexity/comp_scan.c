@@ -25,14 +25,14 @@
 #include "effects.h"
 #include "complexity.h"
 
-hash_table hash_callee_to_complexity;
-hash_table hash_complexity_parameters;
+hash_table hash_callee_to_complexity = hash_table_undefined;
+hash_table hash_complexity_parameters = hash_table_undefined;
 
 /* declares the static variable complexity_map and defines its access functions */
 DEFINE_CURRENT_MAPPING(complexity, complexity)
 
 
-/* void complexities(module_name)
+/* bool complexities(module_name)
  *   Entry point called by the pips makefile
  *
  *   "hash_callee_to_complexity" contains a list of summary_complexity
@@ -47,7 +47,7 @@ DEFINE_CURRENT_MAPPING(complexity, complexity)
  *   can't be evaluated are replaced by the pseudo-variable UNKNOWN_VARIABLE,
  *   which will be given an arbitrary value at the end of the evaluation.
  */
-void complexities(module_name)
+bool complexities(module_name)
 char *module_name;
 {
     transformer precond = transformer_undefined;
@@ -120,6 +120,8 @@ char *module_name;
     reset_complexity_map();
     reset_current_module_entity();
     reset_current_module_statement();
+
+    return TRUE;
 }
 
 void summary_complexity(module_name)
