@@ -31,7 +31,7 @@ Psysteme ps;
     }
 
     for (eq = ps->inegalites; eq != (Pcontrainte )NULL; eq = eq->succ)
-	(void) vect_multiply(eq->vecteur,-1);
+	(void) vect_multiply(eq->vecteur, VALUE_MONE);
 
     return(ps);
 }
