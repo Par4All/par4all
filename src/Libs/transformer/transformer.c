@@ -379,7 +379,7 @@ transformer pre;
  * no basis is carried in the current implementation of an empty system,
  * this cannot be performed (FI, 7/12/92).
  *
- * args is not modified
+ * formal argument args is not modified
  *
  * Note: this function is almost equal to transformer_projection();
  * however, entities of args do not all have to appear in t's relation;
@@ -461,32 +461,50 @@ Pvecteur l;
     return FALSE;
 }
 
+transformer args_to_transformer(e)
+cons * e; /* list of entities */
+{
+    transformer tf = transformer_identity();
+    cons * args = transformer_arguments(tf);
+    Pbase b = VECTEUR_NUL;
+    Psysteme s = sc_new();
+
+    MAPL(ce, { 
+      entity e = ENTITY(CAR(ce));
+      entity new_val = entity_to_new_value(e);
+
+      args = arguments_add_entity(args, new_val);
+      b = vect_add_variable(b, (Variable) new_val);
+      }, e);
+
+    transformer_arguments(tf) = args;
+    s->base = b;
+    s->dimension = vect_size(b);
+    predicate_system_(transformer_relation(tf)) = (char *) s;
+    return tf;
+}
+
 /* transformer invariant_wrt_transformer(transformer p, transformer tf):
  * keep the invariant part of predicat p wrt tf in a VERY crude way;
  * old and new values related to an entity modified by tf are discarded
  * by projection, regardless of the way they are modified; information
- * that they are modified is preserved
+ * that they are modified is preserved; in fact, this is *not* a projection
+ * but a cylinder based on the projection.
  *
- * p is modified and returned;
+ * A real fix-point a la Halbwachs should be used p' = tf(tf(tf(...tf(p))))
+ *
+ * p is not modified
  */
 transformer invariant_wrt_transformer(p, tf)
 transformer p;
 transformer tf;
 {
-    cons * olds = NIL;
+    transformer rtf = args_to_transformer(transformer_arguments(tf));
+    transformer inv = transformer_apply(rtf, p);
 
-    /* get rid of new values */
-    p = transformer_filter(p, transformer_arguments(tf));
+    free_transformer(rtf);
 
-    /* get rid of old values */
-    MAPL(ce, {entity e = ENTITY(CAR(ce));
-	      olds = CONS(ENTITY, entity_to_old_value(e), olds);},
-	 transformer_arguments(tf));
-    p = transformer_filter(p, olds);
-
-    free_arguments(olds);
-
-    return p;
+    return inv;
 }
 
 /*transformer transformer_value_substitute(transformer t,
