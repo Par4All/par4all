@@ -34,8 +34,8 @@ static Panel props_panel;
 
 static hash_table aliases;
 
-static char display_properties_panel[] = "Properties panel...";
-static char hide_properties_panel[] = "Hide properties panel";
+static char display_properties_panel[] = "Options panel...";
+static char hide_properties_panel[] = "Hide options panel";
 
 	/* Flag allowing update_props also to select a property : */
 int verbose_update_props = 1;
@@ -395,7 +395,7 @@ void create_props_menu_and_window()
 		NULL);
 
     props_menu = (Menu) xv_create(XV_NULL, MENU_COMMAND_MENU, 
-			MENU_GEN_PIN_WINDOW, main_frame, "Properties Menu",
+			MENU_GEN_PIN_WINDOW, main_frame, "Options Menu",
 			MENU_ITEM,
 				MENU_STRING, display_properties_panel,
 				MENU_NOTIFY_PROC, display_or_hide_properties_panel,
@@ -406,7 +406,7 @@ void create_props_menu_and_window()
     build_props_menu_and_panel(props_menu,props_panel);
 
     (void) xv_create(main_panel, PANEL_BUTTON,
-		     PANEL_LABEL_STRING, "Props",
+		     PANEL_LABEL_STRING, "Options",
 		     PANEL_ITEM_MENU, props_menu,
 		     NULL);
 
