@@ -1,7 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: install_pips,v $ (version $Revision$)
-# $Date: 1997/05/07 15:26:45 $, 
+# $Id$
 #
 # installation for pips softwares and automatic generation of pipsrc
 #
@@ -70,18 +69,18 @@ query()
     var=$1
     shift
     echo
-    $echon "$RCSfile: install_pips,v $:" "$@"": "
+    $echon "[install_pips]" "$@"": "
     read $var
 }
 
 verb()
 {
-    echo "$RCSfile: install_pips,v $:" "$@"
+    echo "[install_pips]" "$@"
 }
 
 verbn()
 {
-    $echon "$RCSfile: install_pips,v $:" "$@"
+    $echon "[install_pips]" "$@"
 }
 
 warning()
@@ -186,6 +185,10 @@ then
     }
 fi
 
+#
+# daVinci
+#
+
 verbn "looking for a version of daVinci "
 d=`echo daVinci*`
 $echon "($d): "
@@ -200,6 +203,10 @@ else
     addavincihome=""
     adddavincipath=""
 fi
+
+#
+# Toolpack
+#
 
 verbn "looking for a version of Toolpack "
 d=`echo toolpack*`
@@ -226,9 +233,15 @@ case ${uname_s} in
 	esac ;;
     AIX)
 	ARCH=IBMAIX ;;
+    Linux)
+	ARCH=LINUXI86 ;;
     *) 
 	ARCH=GNU ;;
 esac
+
+#
+# if some binaries are available, they are used...
+#
 
 if test "$archdir" -a -d $archdir/.
 then
@@ -301,7 +314,7 @@ MANPATH="\${PIPS_ROOT}/Doc:\${MANPATH}"
 #
 # PIPS_PING (ping)
 #  - command to test whether a host is alive
-#   aix: "ping -c 1"
+#   aix and linux: "ping -c 1"
 # 
 # PIPS_DIFF (diff) [gdiff?]
 #  - differences of validation results
@@ -364,6 +377,12 @@ $adddavincipath
 # OPENWINHOME/xview (wpips)
 EOF
 
+
+
+#
+# FIXES for some OS
+#
+
 verb "fixes for ${uname_s} if necessary"
 
 test ${uname_s} = AIX && cat >> pipsrc.tmp <<EOF
@@ -374,7 +393,29 @@ PIPS_PING='ping -c 1'
 PIPS_DIFF='gdiff'
 PIPS_MORE='cat'
 #
+# end of AIX fixes
+#
 EOF
+
+test ${uname_s} = Linux && cat >> pipsrc.tmp <<EOF
+#
+# fixes for Linux
+#
+PIPS_PING='ping -c 1'
+PIPS_TAR='tar'
+PIPS_FLINT='g77 -c -Wall -Wimplicit'
+#
+HPFC_SED='sed'
+HPFC_M4='m4'
+#
+# end of Linux fixes
+#
+EOF
+
+
+#
+# Generate the actual pipsrc files
+#
 
 verb "generating pipsrc.sh"
 {
