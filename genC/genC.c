@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1996/08/08 19:04:20 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1996/08/12 12:50:20 $, )
  * version $Revision$
  */
 
@@ -292,8 +292,7 @@ char *args ;
     printf("#define make_%s(%s) ", bp->name, args ) ;
     printf("(%s)gen_alloc(%ld+%d*sizeof(gen_chunk),%s,%s_domain%s%s)\n", 
 	   bp->name, GEN_HEADER_SIZE, size+IS_TABULATED( bp ), 
-	   "GEN_CHECK_ALLOC", bp->name,
-	   (strlen(args) == (int)0) ? "" : ",",  args ) ;
+	   "GEN_CHECK_ALLOC", bp->name, (strlen(args)==0)? "": ",",  args);
 }
 
 /* GEN_AND generates the manipulation functions for an AND type BP. */
