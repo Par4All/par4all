@@ -28,10 +28,9 @@
  *
  * FC, Feb 21, 1994
  *
- * PLEASE COPY THIS FILE IN $NEWGENDIR AFTER MODIFICATIONS
- *
- * generic-mapping.h (94/03/10) version 1.6, got on 94/03/10, 13:31:20
- * @(#) generic-mapping.h 1.6@(#)
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1994/12/27 19:02:37 $, )
+ * version $Revision$
+ * got on %D%, %T%
  */
 
 #ifndef GENERIC_MAPPING_INCLUDED
@@ -40,7 +39,7 @@
 /*
  * PIPS level:
  *
- * GENERIC_CURRENT_MAPPING(name, result, type, CTYPE)
+ * GENERIC_MAPPING(PREFIX, name, result, type)
  *
  * name: name of the mapping
  * result: type of the result
@@ -52,35 +51,35 @@
  *
  * the mapping is   'name' = 'type' -> 'result'
  */
-#define GENERIC_CURRENT_MAPPING(name, result, type)\
+#define GENERIC_MAPPING(PREFIX, name, result, type)\
 static type##_mapping name##_map = hash_table_undefined;\
 \
-void set_##name##_map(m) \
+PREFIX void set_##name##_map(m) \
 type##_mapping m;\
 {\
     assert(name##_map == hash_table_undefined);\
     name##_map = m;\
 }\
 \
-type##_mapping get_##name##_map() \
+PREFIX type##_mapping get_##name##_map() \
 {\
     return name##_map;\
 }\
 \
-void reset_##name##_map()\
+PREFIX void reset_##name##_map()\
 {\
      name##_map = hash_table_undefined;\
 }\
-void free_##name##_map() \
+PREFIX void free_##name##_map() \
 {\
      hash_table_free(name##_map);\
      name##_map = hash_table_undefined;\
 }\
-void make_##name##_map() \
+PREFIX void make_##name##_map() \
 {\
      name##_map = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);\
 }\
-result load_##type##_##name(s)\
+PREFIX result load_##type##_##name(s)\
 type s;\
 {\
      result t;\
@@ -89,19 +88,29 @@ type s;\
      if (t ==(result) HASH_UNDEFINED_VALUE) t = result##_undefined;\
      return t;\
 }\
-bool type##_##name##_undefined_p(s)\
+PREFIX bool type##_##name##_undefined_p(s)\
 type s;\
 {\
     return(load_##type##_##name(s)==result##_undefined);\
 }\
 \
-void store_##type##_##name(s,t)\
+PREFIX void store_##type##_##name(s,t)\
 type s;\
 result t;\
 {\
     assert(s != type##_undefined && t != result##_undefined);\
     hash_put((hash_table) (name##_map), (char *)(s), (char *)(t));\
 }
+
+#define GENERIC_CURRENT_MAPPING(name, result, type) \
+        GENERIC_MAPPING(/**/, name, result, type)
+
+/*  to allow mappings local to a file.
+ *  it seems not to make sense, but I like the interface.
+ *  FC 27/12/94
+ */
+#define GENERIC_LOCAL_MAPPING(name, result, type) \
+        GENERIC_MAPPING(static, name, result, type)
 
 /* end GENERIC_MAPPING_INCLUDED */
 #endif
