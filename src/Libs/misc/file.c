@@ -15,21 +15,14 @@
 #include <dirent.h>
 #include <setjmp.h>
 
-/* could switch to the rx package? 
- */
-#ifdef __linux
-#include <regex.h>
-#else
-char * re_comp(char *);
-int re_exec(char *);
+#ifndef __linux
+extern char * sys_errlist[];
 #endif
+
+#include "rxposix.h"
 
 #include "genC.h"
 #include "misc.h"
-
-/* Should be in stdlib.h or errno.h:
- */
-extern char * sys_errlist[];
 
 FILE * 
 safe_fopen(char *filename, char *what)
@@ -237,37 +230,38 @@ safe_list_files_in_directory(
     char *re, /* regular expression */
     bool (*file_name_predicate)(string) /* condition to list a file */)
 {
-   char *re_comp_message;
-   DIR * dirp;
-   struct dirent * dp;   
-   int index = 0;
+    DIR * dirp;
+    struct dirent * dp;   
+    int index = 0;
 
-   pips_assert("some dir", strcmp(dir, "") != 0);
+    pips_assert("some dir", strcmp(dir, "") != 0);
 
-   re_comp_message = re_comp(re);
-   if (re_comp_message != NULL)
-      user_error("list_files_in_directory",
-                 "re_comp() failed to compile \"%s\", %s.\n",
-                 re, re_comp_message);
-   else {
-      dirp = opendir(dir);
+    dirp = opendir(dir);
+    
+    if (dirp != NULL) 
+    {
+	regex_t re_compiled;
 
-      if (dirp != NULL) {
-         while((dp = readdir(dirp)) != NULL) {
-            if (re_exec(dp->d_name) == 1) 
+	if (regcomp(&re_compiled, re, REG_ICASE))
+	    pips_user_error("regcomp() failed to compile \"%s\".\n", re);
+	
+	while((dp = readdir(dirp)) != NULL) {
+	    if (!regexec(&re_compiled, dp->d_name, 0, NULL, 0))
 	    {
 		char * full_file_name = 
 		    strdup(concatenate(dir, "/", dp->d_name, NULL));
-               if (file_name_predicate(full_file_name))
-		   gen_array_dupaddto(files, index++, dp->d_name);
-	       free(full_file_name);
+		if (file_name_predicate(full_file_name))
+		    gen_array_dupaddto(files, index++, dp->d_name);
+		free(full_file_name);
             }
-         }
-         closedir(dirp);
-      }
-      else
-         return -1;
-   }
+	}
+
+	regfree(&re_compiled);
+
+	closedir(dirp);
+    }
+    else
+	return -1;
 
    gen_array_sort(files);
    return 0;
