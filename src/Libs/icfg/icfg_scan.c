@@ -62,17 +62,12 @@ static text (*decoration)(string) = NULL;
 static void 
 append_icfg_file(text t, string module_name)
 {
-    string filename, localfilename, prefix, dir;
+    string filename, localfilename, dir;
     FILE *f_called;
     string buf;
     char textbuf[MAX_LINE_LENGTH]; /* argh... */
-
-    prefix = print_ifs ? ".icfgc" : print_do_loops ? ".icfgl" : ".icfg";
        
-    /* create filename */
-    /* should ask it to pipsdbm... */
-    localfilename = 
-        db_build_file_resource_name(DBR_ICFG_FILE, module_name, prefix);
+    localfilename = db_get_memory_resource(DBR_ICFG_FILE, module_name, TRUE);
     dir = db_get_current_workspace_directory();
     filename = strdup(concatenate(dir, "/", localfilename, 0));
     free(dir);
@@ -94,7 +89,7 @@ append_icfg_file(text t, string module_name)
     
     /* push resulting text */
     safe_fclose (f_called, filename);
-    free(filename); free(localfilename);
+    free(filename); 
 }
 
 /* STATEMENT
