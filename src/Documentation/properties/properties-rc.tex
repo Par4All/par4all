@@ -11,24 +11,51 @@
 % Modifications
 
 %% \batchmode
-\documentstyle[11pt,html]{article}
+
+% \documentstyle[11pt,html]{article}
+
+\documentclass[a4paper]{article}
+\usepackage{alltt,html,fancybox,amstext,xspace,psfig}
+
 \title{Properties \\
     Low Level Tuning of PIPS}
 \author{Lei Zhou \hspace{2cm} 
-        Fran\c{c}ois Irigoin\thanks{E-mail: {\tt irigoin@ensmp.fr}} \vspace{1cm}\\
+        Fran\c{c}ois Irigoin\thanks{E-mail: {\tt irigoin@cri.ensmp.fr}} \vspace{1cm}\\
         Centre de Recherche en Informatique \\
         Ecole des Mines de Paris \\
         77305 Fontainebleau Cedex \\
         France \\}
-\date{\today (Initial version: October 1991)}
+% \date{\today (Initial version: October 1991)}
+\date{
+$~$Date: 1997/09/29 09:15:45 $~$
+}
 
-\addtolength{\textwidth}{72pt}
-\addtolength{\oddsidemargin}{-48pt}
-\addtolength{\evensidemargin}{-48pt}
-\addtolength{\textheight}{172pt}
-\addtolength{\topmargin}{-60pt}
+% \addtolength{\textwidth}{72pt}
+% \addtolength{\oddsidemargin}{-48pt}
+% \addtolength{\evensidemargin}{-48pt}
+% \addtolength{\textheight}{172pt}
+% \addtolength{\topmargin}{-60pt}
 
 \newcommand{\PIPS}{\htmladdnormallink{{\em PIPS}}{http://www.cri.ensmp.fr/pips}}
+\newcommand{\PIPSMAKE}{\htmladdnormallink{\emph{pipsmake/}}{http://www.cri.ensmp.fr/pips/pipsmake.html}}
+\newcommand{\PLinear}{\emph{Linear C$^3$}}
+\newcommand{\PNEWGEN}{\htmladdnormallink{\emph{NewGen}}{http://www.cri.ensmp.fr/pips/newgen-manual/newgen-manual.html}}
+\newcommand{\PdaVinci}{\htmladdnormallink{\emph{daVinci}}{http://www.informatik.uni-bremen.de/~davinci}}
+\newcommand{\Pri}{\htmladdnormallink{\emph{Internal\space{}Representation}}{http://www.cri.ensmp.fr/pips/ri/ri.html}}
+\newcommand{\WPsc}{\htmladdnormallink{\emph{WP65}}{http://www.cri.ensmp.fr/pips/wp65.html}}
+
+%% Now the interface names :
+\newcommand{\pips}{\htmladdnormallink{\texttt{pips}}{http://www.cri.ensmp.fr/pips/batch-interface.html}}
+\newcommand{\EPIPS}{\htmladdnormallink{\texttt{epips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
+\newcommand{\TPIPS}{\htmladdnormallink{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}}
+\newcommand{\WPIPS}{\htmladdnormallink{\texttt{wpips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}}
+\newcommand{\Init}{\htmladdnormallink{\texttt{Init}}{http://www.cri.ensmp.fr/pips/Init.html}}
+\newcommand{\Select}{\htmladdnormallink{\texttt{Select}}{http://www.cri.ensmp.fr/pips/Select.html}}
+\newcommand{\Perform}{\htmladdnormallink{\texttt{Perform}}{http://www.cri.ensmp.fr/pips/Perform.html}}
+\newcommand{\Display}{\htmladdnormallink{\texttt{Display}}{http://www.cri.ensmp.fr/pips/Display.html}}
+\newcommand{\Delete}{\htmladdnormallink{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
+
+\makeindex
 
 \begin{document}
 \thispagestyle{empty}
@@ -47,7 +74,7 @@
 This paper describes global variables used to modify or fine tune PIPS
 behavior. Since global variables are useful for some purposes, but
 always dangerous, PIPS programmers are required to declare them
-explictly as {\em properties}. Properties have an ASCII name and can
+explicitly as {\em properties}. Properties have an ASCII name and can
 have boolean, integer or string values.
 
 % The information here is machine and/or site independent.
@@ -83,20 +110,25 @@ is useful to analyze large programs. Its default value is 12,000 but it is
 not uncommon to have to set it up to 200,000.
 
 Properties are listed below on a source library basis. The outline is
-close the outline for pipsmake-rc\cite{}.  Properties used in more than
-one library are presented
-first. Section~\ref{section-pips-infrastructure} contains information
-about infrastructure, external and user interface libraries. Analyses
-are grouped in Section~\ref{section-analyses}. Program transformations,
-parallelization and distribution phases are listed in the next
-section. User output produced by different kinds of prettyprinters are
-presented in
-Section~\ref{section-prettyprinters}. Section~\ref{section-feautrier} is
-dedicated to libraries added by CEA to implement Feautrier's method.
+close to the outline of \PIPSMAKE{}.  Properties used in more than
+one library are presented first. Section~\ref{section-pips-infrastructure}
+contains information about infrastructure, external and user interface
+libraries. Analyses are grouped in Section~\ref{section-analyses}. Program
+transformations, parallelization and distribution phases are listed in the
+next section. User output produced by different kinds of prettyprinters
+are presented in Section~\ref{section-prettyprinters}.
+Section~\ref{section-feautrier} is dedicated to libraries added by CEA to
+implement Feautrier's method.
 
 Virtually every PIPS programmer contributed some lines in this
 report. Inconsistencies are likely. Please report them to the PIPS team!
 
+
+\newpage
+
+\tableofcontents
+
+\newpage
 
 
 %%
@@ -112,6 +144,9 @@ region analyses. This dangerous property should be set to FALSE.
 \begin{verbatim}
 ONE_TRIP_DO FALSE
 \end{verbatim}
+
+\subsection{Logging}
+\index{Logging}
 
 It is possible to display the amount of real, cpu and system times
 directly spent in each phase as well as the times spent reading/writing data
@@ -146,16 +181,19 @@ LOG_MEMORY_USAGE FALSE
 \label{section-pips-infrastructure}
 
 \subsection{Newgen}
+\index{NewGen}
 
 Newgen offers some debugging support to check object consistency
 (\verb+gen_consistent_p+ and \verb+gen_defined_p+), and for dynamic type
 checking. See Newgen documentation\cite{JT89}\cite{JT90}.
 
 \subsection{C3 Linear Library}
+\index{C3 Linear Library}
 
 This library is external and offers an independent debugging system.
 
 \subsection{Pipsmake}
+\index{Pipsmake}
 
 It is possible to log and report differences between the set of resources
 actually read and written by the procedures called by pipsmake and the set
@@ -174,6 +212,7 @@ ACTIVATE_DEL_DERIVED_RES TRUE
 \end{verbatim}
 
 \subsection{Pipsbdm}
+\index{Pipsdbm}
 
 Shell environment variables \verb+PIPSDBM_DEBUG_LEVEL+ can be set to ?
 to check object consistency when they are stored in the database, and to
@@ -187,7 +226,10 @@ PIPSDBM_RESOURCES_TO_DELETE "obsolete"
 \end{verbatim}
 
 
-\subsection{Top level control}
+\subsection{Top Level Control}
+\index{Top Level}
+\index{Logging}
+\index{Abort}
 
 Print a log of the session
 
@@ -201,16 +243,20 @@ What to do on user errors: go ahead (default) or core dump (debug)
 ABORT_ON_USER_ERROR     FALSE
 \end{verbatim}
 
-\subsection{Tpips command line interface}
+\subsection{Tpips Command Line Interface}
+\index{Tpips}
 
-Shall we execute the instructions of just check the syntax
+\TPIPS{} is one of PIPS user interfaces.
+
+Shall we execute the instructions of just check the syntax:
 
 \begin{verbatim}
 TPIPS_NO_EXECUTION_MODE      FALSE
 \end{verbatim}
 
 
-\subsection{Miscelleaneous}
+\subsection{Warning Control}
+\index{Warning}
 
 User warnings may be turned off. Definitely, this is not the default
 option! Most warnings {\em must} be read to understand surprising results.
@@ -229,13 +275,16 @@ WARNING_ON_STAT_ERROR TRUE
 \end{verbatim}
 
 Control restructuring eliminates empty sequences but as empty true or
-false branch of structured \verb/IF/. This semantic property of \PIPS{}
-internal representation is enforced by libraries \verb/effects/,
+false branch of structured \verb/IF/. This semantic property of \Pri{}
+is enforced by libraries \verb/effects/,
 \verb/regions/, \verb/hpfc/, \verb/effects-generic/.
 
 \begin{verbatim}
 WARN_ABOUT_EMPTY_SEQUENCES FALSE
 \end{verbatim}
+
+\subsection{Preprocessing}
+\index{Preprocessing}
 
 FC: could you please check the consistency between the next property and the
 preprocessing section in pipsmake-rc.tex?
@@ -266,8 +315,12 @@ GENERATE_MISSING_SOURCE_FILES FALSE
 
 \section{Analyses}
 \label{section-analyses}
+\index{Analysis}
 
 \subsection{Parser}
+\index{Parser}
+
+\subsubsection{Input Format}
 
 Some subtle errors occur because the PIPS parser uses a fixed
 format. Columns 73 to 80 are ignored, but the parser may emit a warning
@@ -276,6 +329,9 @@ if some characters are encountered in this comment field.
 \begin{verbatim}
 PARSER_WARN_FOR_COLUMNS_73_80   TRUE
 \end{verbatim}
+
+\subsubsection{Type Checking}
+\index{Type Checking}
 
 Each argument list at calls to a function or a subroutine is compared to
 the functional type of the callee. Turn this off if you need to support
@@ -290,6 +346,8 @@ Since the functional typing is shaky, let's turn it off by default!
 PARSER_TYPE_CHECK_CALL_SITES   FALSE
 \end{verbatim}
 
+\subsubsection{Loop Header with Label}
+
 The PIPS implementation of Allen\&Kennedy algorithm cannot cope with
 labelled DO loops because the loop, and hence its label, may be
 replicated if the loop is distributed. The parser can generate an extra
@@ -301,15 +359,26 @@ output code as close as possible to the user source code.
 PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
 \end{verbatim}
 
+\subsubsection{Alternate Return}
+\index{Alternate Return}
+\index{Return (Alternate)}
+
 Alternate returns are put among the obsolete Fortran features by the
 Fortran~90 standard. It is possible to ignore them, up to a warning, or to
 substitute them by a semantically equivalent code based on return code
-values.  By default, they are ignored.
+values. To produce an executable code, the declarations must be
+regenerated: see property \verb/PRETTYPRINT_ALL_DECLARATIONS/ in
+Section~\ref{subsubsection-declarations}. By default, they are ignored.
+The code can still be executed if alternate returns are used only for
+errors and if no errors occur.
 
 \begin{verbatim}
 PARSER_SUBSTITUTE_ALTERNATE_RETURNS FALSE
 PARSER_RETURN_CODE_VARIABLE "PIPS_RETURN_CODE_"
 \end{verbatim}
+
+\subsubsection{Symbol Table}
+\index{Symbol Table}
 
 For debugging purposes, it is possible to print a summary of the symbol
 table. But this is not the default option.
@@ -317,6 +386,9 @@ table. But this is not the default option.
 \begin{verbatim}
 PARSER_DUMP_SYMBOL_TABLE FALSE
 \end{verbatim}
+
+\subsubsection{Statement Function}
+\index{Statement Function}
 
 Whether to attempt to support fortran statement functions by cold
 substitution in the parser. Otherwise there is no support at all.
@@ -333,6 +405,7 @@ PARSER_EXPAND_STATEMENT_FUNCTIONS FALSE
 
 
 \subsection{Controlizer}
+\index{Controlizer}
 
 By unsetting this property \verb|unspaghettify| is not applied
 implicitly in the controlizer phase.
@@ -344,6 +417,10 @@ UNSPAGHETTIFY_IN_CONTROLIZER   TRUE
 
 
 \subsection{Chains}
+\index{Use-Def Chains}
+\index{Def-Use Chains}
+\index{Def-Def Chains}
+\index{Use-Use Chains}
 
 It is possible to put use-use dependence arcs in the dependence graph.
 This is useful for estimation of cache memory traffic and of
@@ -387,6 +464,8 @@ dependence graph. Phases using the latter should be able to filter out
 irrelevant arcs, e.g. pertaining to privatized variables.
 
 \subsection{Effects}
+\index{Effects (Memory)}
+\index{Memory Effects}
 
 Print SDFI just after computation:
 
@@ -396,13 +475,15 @@ EFFECTS_PRINT_SDFI TRUE
 
 
 \subsection{Dependence Test (Ricedg)}
+\index{Dependence Test}
 
 % Module code and list of called module names.
 
 \subsubsection{Dependence Test Selection}
+\index{Dependence Test}
 
 This property seems to be now obsolete. The dependence test choice is
-now controlled directly and only by rules in pipsmake.rc. The procedures
+now controlled directly and only by rules in \PIPSMAKE{}. The procedures
 called by these rules may use this property. Anyway, it is useless to
 set it manually.
 
@@ -517,6 +598,7 @@ RICEDG_STATISTICS_ALL_ARRAYS FALSE
 \end{verbatim}
 
 \subsubsection{Algorithmic Dependences}
+\index{Def-Use Chains}
 
 Only take into account true flow dependences (Def -- Use) during the
 computation of SCC?  Note that this is different from the
@@ -529,6 +611,9 @@ RICE_DATAFLOW_DEPENDENCE_ONLY FALSE
 \end{verbatim}
 
 \subsubsection{Printout}
+\index{Dependence Graph}
+\index{Prettyprinter (DG)}
+\index{DG Prettyprinter}
 
 Here are the properties used to control the printing of dependence
 graphs in a file called {\em module\_name}.{\tt dg}. These properties
@@ -583,21 +668,28 @@ COMPUTE_ALL_DEPENDENCES FALSE
 \end{verbatim}
 
 \subsection{Flinter}
+\index{Flinter}
 
 No property for this library.
 
 \subsection{Semantic Analysis}
 \label{subsection-semantic-analysis}
+\index{Semantics}
+\index{Precondition}
+\index{Transformer}
 
-\subsubsection{Flow sensitivity}
+\subsubsection{Flow Sensitivity}
+\index{Flow Sensitivity}
 
-Perform ``meet'' operations for semantics analysis.
+Perform ``meet'' operations for semantics analysis. This property is
+managed by \PIPSMAKE{}.
 
 \begin{verbatim}
 SEMANTICS_FLOW_SENSITIVE FALSE
 \end{verbatim}
 
-\subsubsection{Interprocedural semantics analysis}
+\subsubsection{Interprocedural Semantics Analysis}
+\index{Interprocedural}
 
 To be refined later; basically, use callee\'s transformers instead of
 callee\'s effects when computing transformers bottom-up in the call graph;
@@ -610,7 +702,8 @@ SEMANTICS_INTERPROCEDURAL FALSE
 
 This property is used internally and is not user selectable.
 
-\subsubsection{Fix point operators}
+\subsubsection{Fix Point Operators}
+\index{Fix Point}
 
 CPU time and memory space are cheap enough to compute loop fix points for
 {\em transformers}. This property implies SEMANTICS\_FLOW\_SENSITIVE and is not
@@ -655,6 +748,7 @@ SEMANTICS_INEQUALITY_INVARIANT FALSE
 \end{verbatim}
 
 \subsubsection{Debugging}
+\index{Debug (Semantics)}
 
 Output semantics results on stdout
 
@@ -669,11 +763,13 @@ SEMANTICS_DEBUG_LEVEL 0
 \end{verbatim}
 
 \subsection{Static Complexity Evaluation}
+\index{Complexity}
 
 The following properties control the static estimation of dynamic code
 execution time.
 
 \subsubsection{Debugging}
+\index{Debug (Complexity)}
 
 Trace the walk across a module's internal representation:
 
@@ -830,6 +926,8 @@ COMPLEXITY_EARLY_EVALUATION FALSE
 
 \subsection{Regions}
 \label{subsection-regions}
+\index{Array Region}
+\index{Region (Array)}
 
 if {\tt MUST\_REGIONS} is true, then it computes regions using the
 algorithm described in report E/181/CRI, called {\em $T^{-1}$
@@ -887,11 +985,14 @@ REGIONS_TRANSLATION_STATISTICS FALSE
 
 \section{Transformations, Parallelization, Distribution}
 \label{section-transformations}
+\index{Transformation}
 
 
 \subsection{Parallelization}
+\index{Parallelization}
 
 \subsubsection{Rice (Parallelization)}
+\index{Allen\&Kennedy}
 
 TRUE to show all parallel loops, FALSE to generate real (vector,
 innermost parallel?) code
@@ -905,20 +1006,32 @@ Show statistics on the number of loops parallelized by pips.
 PARALLELIZATION_STATISTICS FALSE
 \end{verbatim}
 
-\subsection{Code Distribution}
+\subsubsection{Coarse grain Parallelization}
 
-\subsubsection{wp65 (PUMA project)}
+No property.
+
+\subsubsection{Nested Loop Parallelization}
+
+No property.
+
+\subsection{Code Distribution}
+\index{Distribution (Code)}
+\index{Code Distribution}
+
+\subsubsection{WP65 (PUMA Project)}
+\index{WP65}
 
 \begin{verbatim}
 WP65_DEBUG_LEVEL        0
 \end{verbatim}
 
 \subsubsection{HPFC {\em High Performance Fortran Compiler}}
+\index{HPF}
 
-debugging levels considered by HPFC: 
+Debugging levels considered by HPFC: 
 \verb+HPFC_{,DIRECTIVES,IO,REMAPPING}_DEBUG_LEVEL+.
 
-  These booleans decide whether some computations are directly
+  These booleans control whether some computations are directly
 generated in the output code, or computed thru calls to dedicated
 runtime functions. The default is the direct expansion.
 
@@ -1000,7 +1113,8 @@ HPFC_EXTRACT_LATTICE TRUE
 
 %% \section{Program Transformations}
 
-\subsection{Dead code elimination}
+\subsection{Dead Code Elimination}
+\index{Dead Code}
 
 Since it is useful to display statistics on what has been found
 useless and removed in a program, this property is used to ask for
@@ -1011,11 +1125,14 @@ DEAD_CODE_DISPLAY_STATISTICS TRUE
 
 
 
-\subsection{Control flow graph restructuring}
+\subsection{Control Flow Graph Restructuring}
+\index{CFG}
+\index{Control Flow Graph}
+\index{Restructurer}
 
 
 
-\subsubsection{Unspaghettify \& restructurer}
+\subsubsection{Unspaghettify \& Restructurer}
 
 
 To display the statistics about unspaghettify and control graph
@@ -1037,7 +1154,7 @@ UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION FALSE
 \end{verbatim}
 
 
-\subsubsection{Clean up sequences}
+\subsubsection{Clean Up Sequences}
 
 
 To display the statistics about cleaning-up sequences and removing
@@ -1047,7 +1164,8 @@ CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS FALSE
 \end{verbatim}
 
 
-\subsubsection{FORMAT restructuring}
+\subsubsection{FORMAT Restructuring}
+\index{Format (Fortran)}
 
 To able deeper code transformation, FORMATs can be gathered at the
 very beginning of the code or at the very end according to the
@@ -1058,7 +1176,10 @@ GATHER_FORMATS_AT_END FALSE
 \end{verbatim}
 
 
-\subsection{Array privatization}
+\subsection{Array Privatization}
+\index{Privatization}
+\index{Privationzation (Array)}
+\index{Array Privatization}
 
 This transfomation privatizes array sections. Several privitizability
 criterions could be applied, and its not clear which one should be used. The
@@ -1078,6 +1199,8 @@ ARRAY_SECTION_PRIV_COPY_OUT TRUE
 \end{verbatim}
 
 \subsubsection{Partial Atomizer}
+\index{Atomization}
+\index{Three Address Code}
 
 This transformation only atomizes indirect references of array access
 functions.
@@ -1087,6 +1210,8 @@ ATOMIZE_INDIRECT_REF_ONLY FALSE
 \end{verbatim}
 
 \subsubsection{Loop Distribution}
+\index{Loop Distribution}
+\index{Distribution (Loop)}
 
 Partial distribution distributes the statements of a loop nest except
  the isolated statements,that have no dependences at the common level l,
@@ -1104,10 +1229,14 @@ PARTIAL_DISTRIBUTION FALSE
 
 \section{Prettyprinter Options}
 \label{section-prettyprinters}
+\index{Prettyprinter}
 
 \subsection{Code Prettyprinter}
+\index{Prettyprinter (Code)}
+\index{Code Prettyprinter}
 
 \subsubsection{Layout}
+\index{Analysis}
 
 When prettyprinting semantic information (preconditions, transformers and
 regions), add a line before and after each piece of information if set to
@@ -1127,14 +1256,19 @@ generates large source files. It may be turned off.
 
 Note that the statement number is {\em not} related to the line
 number. Two statements on the same line have different statement
-numbers. A multiline statement only has one number. See PIPS internal
-representation report. 
+numbers. A multiline statement only has one number. See \Pri{}.
 
 \begin{verbatim}
 PRETTYPRINT_STATEMENT_NUMBER TRUE 
 \end{verbatim}
 
 \subsubsection{Target Language Selection}
+\index{HPF}
+\index{Fortran 90}
+\index{CM Fortran}
+\index{Cray Fortran}
+\index{Fortran (Cray)}
+\index{Craft}
 
 Added for homogeneity reason; could be (easily) reduced to one?  In
 fact, with many target machines in mind, we should have an integer flag
@@ -1225,6 +1359,7 @@ PRETTYPRINT_SCALAR_REGIONS FALSE
 \end{verbatim}
 
 \subsubsection{Display Internals for Debugging}
+\index{Debug}
 
 All these debugging options should be set to FALSE for normal operation,
 when the prettyprinter is expected to produce code as close as possible to
@@ -1325,7 +1460,7 @@ information gathered by PIPS may be lost. This property can be turned on
 to have an output closer to the internal representation. Note that edges
 of the control flow graphs may still be displayed as {\em logical if}
 since they never carry any useful information\footnote{Information is
-carried by the vertices (i.e. nodes). A \verb/CONTINUE/ statement is
+carried by the vertices (i.e. nodes). A CONTINUE statement is
 generated to have an attachment node when
 some information must be stored and displayed.}.
 
@@ -1334,6 +1469,8 @@ PRETTYPRINT_BLOCK_IF_ONLY FALSE
 \end{verbatim}
 
 \subsubsection{Declarations}
+\label{subsubsection-declarations}
+\index{Declaration}
 
 By default, module declarations are preserved as huge strings to produce
 an output as close as possible to the input (see field \verb/decls_text/
@@ -1366,15 +1503,18 @@ PRETTYPRINT_COMMONS TRUE
 \verb/DATA/ declarations are not handled presently.
 
 \subsubsection{FORESYS Interface}
+\index{Foresys}
 
-Print transformers, preconditions and regions in a format acceptd by
-Foresys and Partita.
+Print transformers, preconditions and regions in a format accepted by
+Foresys and Partita. Not maintained.
 
 \begin{verbatim}
 PRETTYPRINT_FOR_FORESYS FALSE
 \end{verbatim}
 
 \subsubsection{HPFC Prettyprinter}
+\index{HPF}
+\index{Prettyprinter (HPF)}
 
 To deal specifically with the prettyprint for hpfc
 
@@ -1384,9 +1524,11 @@ PRETTYPRINT_HPFC FALSE
 
 
 \subsubsection{Interface to Emacs}
+\index{Emacs}
 
 The following property tells PIPS to attach various Emacs properties
-for interactive purpose. Used internally by the Emacs pretyyprinter.
+for interactive purpose. Used internally by the Emacs pretyyprinter and
+the \EPIPS{} user interface.
 \begin{verbatim}
 PRETTYPRINT_ADD_EMACS_PROPERTIES FALSE
 \end{verbatim}
@@ -1396,7 +1538,7 @@ PRETTYPRINT_ADD_EMACS_PROPERTIES FALSE
 
 To output a code with a hierarchical view of the control graph with
 markers instead of a flat one. It purposes a display with a graph
-browser such as daVinci:
+browser such as \PdaVinci{}:
 
 \begin{verbatim}
 PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH FALSE
@@ -1409,15 +1551,23 @@ PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE FALSE
 \end{verbatim}
 
 \subsection{Call Graph}
+\label{subsection-call-graph}
+\index{Call Graph}
 
-This library is used to display the calling relationship between
-modules.  It is different from the interprocedural call flow graph
-(ICFG). For  example: if A calls B twice, in
-callgraph, there is only one edge between A and B; while in ICFG (see
-next section)), there are two edges between A and B, since A contains
-two call sites.  
+This library is used to display the calling relationship between modules.
+It is different from the interprocedural call flow graph, ICFG (see
+Section~\ref{subsection-interprocedural-control-flow-graph}). For example:
+if A calls B twice, in callgraph, there is only one edge between A and B;
+while in ICFG (see next section)), there are two edges between A and B,
+since A contains two call sites.
 
-The call graph is derived from the modules declarations.
+The call graph is derived from the modules declarations. It does not
+really the parsed code per se, but the code must have been parsed to have
+up-to-date declarations in the symbol table.
+
+Because of printout limitations, the call graph is developped into a tree
+before it is printed. The sub-graph of a module appears as many times as
+is has callers. The resulting printout may be very long.
 
 There is no option for the callgraph prettyprinter except
 for debugging.
@@ -1429,10 +1579,13 @@ CALLGRAPH_DEBUG FALSE
 \end{verbatim}
 
 \subsection{Interprocedural Control Flow Graph}
+\label{subsection-interprocedural-control-flow-graph}
+\index{ICFG}
 
-This prettyprinter is NOT a call graph prettyprinter. Control flow
-information can be displayed and every call site is shown, possibly with
-some annotation like precondition or region
+This prettyprinter is NOT a call graph prettyprinter (see
+Section~\ref{subsection-call-graph}). Control flow information can be
+displayed and every call site is shown, possibly with some annotation like
+precondition or region
 
 This prettyprinter uses the module codes in the workspace database to
 build the ICFG.
@@ -1497,18 +1650,25 @@ property yourself!
 \bibitem{JT89} P. Jouvelot, R. Triolet, 
 {\em NewGen: A Language-Independent Program Generator},
 July 12, 1989, 
-<a href="newgen-paper/newgen-paper.html">Tech. Report A/191.</a>
+\htmladdnormallink{Tech. Report A/191}{newgen-paper/newgen-paper.html}
 
 \bibitem{JT90} P. Jouvelot, R. Triolet, 
 {\em NewGen User Manual}. December
-1990, <a href="newgen-manual/newgen-manual.html">Tech. Report A/???.</a>
+1990, 
+\htmladdnormallink{Tech. Report A/???.}{newgen-manual/newgen-manual.html}
 
 \bibitem{Z94} Lei Zhou,
-{\em Analyse statique et dynamique de la compl\'exite' des programmes
+{\em Analyse statique et dynamique de la compléxité  des programmes
 scientifiques}, 
-Th\`ese de doctorat de l'universit\'e Pierre et Marie Curie, 14
+Thèse de doctorat de l'université Pierre et Marie Curie, 14
 septembre 1994. Technical Report A/255.
 
 \end{thebibliography}
+
+\newpage
+
+% Cross-references for points and keywords
+
+\input{properties-rc.ind}
 
 \end{document}
