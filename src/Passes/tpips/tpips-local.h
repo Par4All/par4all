@@ -1,5 +1,5 @@
 /* $RCSfile: tpips-local.h,v $ (version $Revision$)
- * $Date: 1996/08/08 17:12:44 $, 
+ * $Date: 1996/08/08 17:13:02 $, 
  */
 #define FILE_LIST_MAX_LENGTH 10
 
@@ -21,9 +21,9 @@ extern void tp_begin_key();
 extern void tp_begin_fname();
 extern void close_workspace_if_opened();
 
-FILE * tp_in;
+extern FILE * tp_in;
 #ifdef FLEX_SCANNER
-void tp_restart(FILE *);
+extern void tp_restart(FILE *);
 #endif
 
 /* end of $RCSfile: tpips-local.h,v $ 
