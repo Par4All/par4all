@@ -53,6 +53,7 @@
 #include "matrix.h"
 
 /* Pips includes 	*/
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "constants.h"
