@@ -299,7 +299,7 @@ static void instruction_rwt (instruction i)
 	  statement s;
 	  for(; s; POP(s_list)) {
 	    s = STATEMENT(CAR(s_list));
-	    MERGE_TEXT(t, load_statement_icfg(s));
+	    MERGE_TEXTS(t, load_statement_icfg(s));
 	  }
 	}
 	
