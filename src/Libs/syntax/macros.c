@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: macros.c,v $
+ * Revision 1.7  1998/07/24 07:30:37  coelho
+ * apply macro expansion on new macros before entering them.
+ *
  * Revision 1.6  1998/04/14 21:28:17  coelho
  * linear.h
  *
@@ -39,6 +42,7 @@
 
 #include "syntax.h"
 
+extern void parser_macro_expansion(expression);
 
 /*********************************************************** MACRO HANDLING */
 
@@ -51,8 +55,7 @@ static macro_t * current_macros;
 static int current_macros_size = 0;
 static int current_macro_index = 0; /* next available chunk */
 
-void
-parser_init_macros_support(void)
+void parser_init_macros_support(void)
 {
     pips_debug(5, "initializing macro-expansion support stuff\n");
 
@@ -67,8 +70,7 @@ parser_init_macros_support(void)
     }
 }
 
-void
-parser_close_macros_support(void)
+void parser_close_macros_support(void)
 {
     pips_debug(5, "closing macro-expansion support stuff\n");
 
@@ -94,8 +96,7 @@ parser_close_macros_support(void)
     }
 }
 
-static macro_t *
-find_entity_macro(entity e)
+static macro_t * find_entity_macro(entity e)
 {
     int i;
     for (i=0; i<current_macro_index; i++)
@@ -105,15 +106,12 @@ find_entity_macro(entity e)
     return NULL; /* not found */
 }
 
-bool
-parser_entity_macro_p(entity e)
+bool parser_entity_macro_p(entity e)
 {
     return find_entity_macro(e)==NULL;
 }
 
-
-void 
-parser_add_a_macro(call c, expression e)
+void parser_add_a_macro(call c, expression e)
 {
     entity macro = call_function(c);
 
@@ -131,6 +129,12 @@ parser_add_a_macro(call c, expression e)
     pips_assert("macro not already defined", 
 		find_entity_macro(macro) == NULL);
 
+    /* expand macros in the macro! 
+     */
+    parser_macro_expansion(e);
+
+    /* store the result.
+     */
     current_macros[current_macro_index].lhs = c;
     current_macros[current_macro_index].rhs = e;
     current_macro_index++;
@@ -141,8 +145,7 @@ parser_add_a_macro(call c, expression e)
  */
 static bool some_call;
 
-static bool 
-call_flt(call c)
+static bool call_flt(call c)
 {
     value v = entity_initial(call_function(c));
     if (value_intrinsic_p(v) || value_constant_p(v) || value_symbolic_p(v))
@@ -154,8 +157,7 @@ call_flt(call c)
     return FALSE;
 }
 
-static bool
-untrusted_call_p(expression e)
+static bool untrusted_call_p(expression e)
 {
     some_call = FALSE;
     gen_recurse(e, call_domain, call_flt, gen_null);
@@ -171,14 +173,12 @@ untrusted_call_p(expression e)
 static expression s_init = expression_undefined, s_repl = expression_undefined;
 static list /* of expression */ already_subs = NIL;
 
-static bool
-expr_flt(expression e)
+static bool expr_flt(expression e)
 {
     return !gen_in_list_p(e, already_subs);
 }
 
-static void
-expr_rwt(expression e)
+static void expr_rwt(expression e)
 {
     if (expression_equal_p(s_init, e)) 
     {
@@ -190,8 +190,7 @@ expr_rwt(expression e)
 
 /* substitutes occurences of initial by replacement in tree
  */
-static void
-substitute_expression_in_expression(
+static void substitute_expression_in_expression(
     expression tree,
     expression initial,
     expression replacement)
@@ -212,15 +211,13 @@ substitute_expression_in_expression(
     s_repl = expression_undefined;
 }
 
-void 
-reset_substitute_expression_in_expression(void)
+void reset_substitute_expression_in_expression(void)
 {
     gen_free_list(already_subs); 
     already_subs = NIL;
 }
 
-void
-parser_macro_expansion(expression e)
+void parser_macro_expansion(expression e)
 {
     bool warned = FALSE;
     macro_t * def;
@@ -290,8 +287,7 @@ parser_macro_expansion(expression e)
 }
 
 
-void 
-parser_substitute_all_macros(statement s)
+void parser_substitute_all_macros(statement s)
 {
     if (current_macro_index>0 &&
         get_bool_property("PARSER_EXPAND_STATEMENT_FUNCTIONS"))
