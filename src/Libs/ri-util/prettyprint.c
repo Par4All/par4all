@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.151  2002/04/24 07:02:20  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.150  2002/04/23 19:43:43  phamdat
  * *** empty log message ***
  *
@@ -292,7 +295,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.150 2002/04/23 19:43:43 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.151 2002/04/24 07:02:20 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2270,6 +2273,13 @@ text_statement(
 	temp = text_instruction(module, label, margin, i,
 				statement_number(stmt)) ;
     }
+    {
+      string filename = "/users/tmp/phamdat/textout";
+      FILE * my_file = safe_fopen(filename, "w");
+      print_text(my_file, temp);
+      safe_fclose(my_file, filename);
+      free(filename);
+    }
 
     /* note about comments: they are duplicated here, but I'm pretty
      * sure that the free is NEVER performed as it should. FC.
@@ -2297,14 +2307,7 @@ text_statement(
       safe_fclose(my_file, filename);
       free(filename);
     }
-    attach_statement_information_to_text(r, stmt);
-    {
-      string filename = "/users/tmp/phamdat/textout";
-      FILE * my_file = safe_fopen(filename, "w");
-      print_text(my_file, r);
-      safe_fclose(my_file, filename);
-      free(filename);
-    }
+    /*attach_statement_information_to_text(r, stmt);*/
 
     ifdebug(1) {
 	if (instruction_sequence_p(i)) {
