@@ -11,12 +11,12 @@
  * More thoughts needed. 
  *
  * $RCSfile: stack.c,v $ version $Revision$
- * $Date: 1996/07/08 16:52:02 $, 
+ * $Date: 1997/07/17 22:14:35 $, 
  * got on %D%, %T%
  */
 
 #include <stdio.h>
-#include "malloc.h"
+#include <malloc.h>
 #include "newgen_assert.h"
 #include "newgen_stack.h"
 
