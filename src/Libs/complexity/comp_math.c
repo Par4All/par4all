@@ -67,11 +67,21 @@ complexity clower, cupper;
 
     if (complexity_zero_p(comp))
 	return (cresult);
-    else if ( COMPLEXITY_UNDEFINED_P(clower) || COMPLEXITY_UNDEFINED_P(cupper) ) {
-	if ( polynome_contains_var(complexity_polynome(comp), (Variable)index) )
+    else if ( COMPLEXITY_UNDEFINED_P(clower) || 
+	     COMPLEXITY_UNDEFINED_P(cupper) ) {
+	if ( polynome_contains_var(complexity_polynome(comp), 
+				   (Variable)index) )
 	    return (cresult);
 	else {
+	    /* FI: Too late to build a meaningful unknown range name! */
+	    /*
 	    ppsum = make_polynome(1.0, UNKNOWN_RANGE, 1);
+	    */
+	    entity ur = make_new_scalar_variable_with_prefix
+		(UNKNOWN_RANGE_NAME,
+		 get_current_module_entity(),
+		 MakeBasic(is_basic_int));
+	    ppsum = make_polynome(1.0, (Variable) ur, 1);
 	    cresult = polynome_to_new_complexity(ppsum); /*stats*/
 	    complexity_mult(&cresult, comp);
 	    
@@ -86,7 +96,8 @@ complexity clower, cupper;
 	if (FALSE) {
 	    fprintf(stderr, "summing ");
 	    prp(complexity_polynome(comp));
-	    fprintf(stderr, " %s running between ", module_local_name((entity)index));
+	    fprintf(stderr, " %s running between ", 
+		    module_local_name((entity)index));
 	    prp(pplower);
 	    fprintf(stderr, " and ");
 	    prp(ppupper);
@@ -139,6 +150,7 @@ complexity compsubst;
 	complexity_stats_add(&cresult, compsubst);
 
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
+	    (void) gen_consistent_p(cresult);
 	    fprintf(stderr,"complexity_var_subst, comp    is ");
 	    complexity_fprint(stderr, comp, FALSE, TRUE);
 	    fprintf(stderr,"complexity_var_subst, compsubst is ");
@@ -168,7 +180,10 @@ Ppolynome pp;
 
     ppdup = polynome_dup(pp);
     comp = make_complexity(ppdup, vc, rc, ic);
-    return(comp);
+    ifdebug(1) {
+	(void) gen_consistent_p(comp);
+    }
+    return comp;
 }
 
 /* make a complexity "f * var" with null statistics */
@@ -227,9 +242,15 @@ complexity comp;
     if ( COMPLEXITY_UNDEFINED_P(comp) ) 
 	pips_error("complexity_unknown_p", "undefined complexity");
 
-    if ( polynome_contains_var((Ppolynome)complexity_eval(comp), UNKNOWN_RANGE) ) 
+    /* FI: Management of unknown complexities, when polynomes are in
+       fact used to represent the value of a variables or an expression,
+       has to be revisited */
+    /*
+    if ( polynome_contains_var((Ppolynome)complexity_eval(comp), 
+			       UNKNOWN_RANGE) ) 
 	return (TRUE);
     else 
+    */
 	return (FALSE);
 }
 
@@ -270,6 +291,11 @@ float f;
 void complexity_stats_add(pcomp1, comp2)
 complexity *pcomp1, comp2;
 {
+    ifdebug (1) {
+	(void) gen_consistent_p(*pcomp1);
+	(void) gen_consistent_p(comp2);
+    }
+
     if ( COMPLEXITY_UNDEFINED_P(comp2) || COMPLEXITY_UNDEFINED_P(*pcomp1) )
 	pips_error("complexity_stats_add", "complexity undefined\n");
 
@@ -298,6 +324,10 @@ complexity *pcomp1, comp2;
 	ifcount_profiled(ic1) += ifcount_profiled(ic2);
 	ifcount_computed(ic1) += ifcount_computed(ic2);
 	ifcount_halfhalf(ic1) += ifcount_halfhalf(ic2);
+    }
+
+    ifdebug (1) {
+	(void) gen_consistent_p(*pcomp1);
     }
 }    
 
