@@ -228,10 +228,20 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
    char functionName[30];
    long long unsigned int constantValue = 0;
    int constantShift = 0;
-   int bitmask = (1 << (64 / argc)) - 1;
+   int bitmask;
 
    /* the function should not be called with an empty arguments list */
    assert((argc > 1) && (args != NIL));
+
+   /* Compute the bitmask with the formula:
+    *    bitmask = (1 << (64 / argc)) - 1
+    * There is a bug when argc = 2 on SPARC, thus we do it in two times,
+    * in order to never shift by 32 bits at a time
+    */
+   bitmask = 1;
+   bitmask <<= ((64/argc + 1) >> 1);
+   bitmask <<= ((64/argc) >> 1);
+   bitmask --;
 
    /* first, find out if the arguments are:
     *    - consecutive references to the same array
