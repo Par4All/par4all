@@ -106,8 +106,10 @@ Externals
 		/*NOSTRICT*/
 		dp = (union domain *)alloc( sizeof( union domain )) ;
 		dp->ex.type = EXTERNAL_DT ;
-		dp->ex.read = (char *(*)())NULL ;
-                dp->ex.write = dp->ex.free = (void (*)())NULL ;
+		dp->ex.read = (void *(*)(FILE*, int(*)(void))) NULL;
+                dp->ex.write = (void (*)(FILE*, void*)) NULL;
+		dp->ex.copy = (void*(*)(void*)) NULL;
+		dp->ex.free = (void (*)(void*)) NULL;
 		new_binding( $3, dp ) ;
 		}
 	|
@@ -329,8 +331,7 @@ Name	: IDENT	{
 
 /* Syntax error routines called by yacc. */
 
-void yyerror( s )
-char *s ;
+void yyerror(char * s)
 {
   int c;
 
