@@ -286,7 +286,7 @@ Psysteme ps1, ps2;
     ps1 = sc_dup(ps1);
     ps2 = sc_dup(ps2);
     ps = sc_safe_intersection(ps,ps1,ps2);
-    result = sc_faisabilite_ofl(ps);
+    result = !(sc_faisabilite_ofl(ps));
     sc_rm(ps1);
     sc_rm(ps2);
     sc_rm(ps);
