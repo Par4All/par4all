@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/18 15:59:09 $, 
+ * $Date: 1996/06/19 13:58:25 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -119,7 +119,23 @@ static bool pr_statement_flt(statement s)
     return crt_stat_filter(s);
 }
 
-/* static reductions reductions_from_callees */
+static void pr_statement_wrt(statement s)
+{
+    reductions rs = load_proper_reductions(s);
+
+    /* must check that the found reductions are
+     * (1) without side effects (no W on any other that accumulators)
+     * (2) compatible one with respect to the other...
+     * (3) not killed by proper effects on accumulators...
+     */
+    if (reductions_list(rs))
+    {
+	pips_user_warning("proper reductions check not implemented!\n");
+	
+    }
+
+    crt_stat_rewrite(s);
+}
 
 static void pr_call_rwt(call c)
 {
@@ -128,39 +144,28 @@ static void pr_call_rwt(call c)
     reduction red;
 
     if (call_proper_reduction_p(head, c, &red))
-    {
-	pips_debug(6, "stat 0x%x -> reduction on %s\n",
-		   (unsigned int) head, entity_name(reduction_variable(red)));
-	reductions_list(reds) = CONS(REDUCTION, red, reductions_list(reds));
-    }
-    else
-    {
-	/* very basic and false (commons forgotten) 
-	 * at the time, just to test it 
-	 * should be for all local calls inside, plus
-	 * to be checked afterwards... (references, compatibilities)
+	/* direct proper reduction 
 	 */
-	list lr = translate_reductions(c);
-
-	if (lr)
-	{
-	    pips_user_warning("reduction translation basic and false!\n");
-	    reductions_list(reds) = gen_nconc(lr, reductions_list(reds));
-	}
-    }
+	reductions_list(reds) = 
+	    CONS(REDUCTION, red, reductions_list(reds));
+    else
+	/* translated reductions 
+	 * ??? should check that the base call is functional!?
+	 * that is, only reduced variable are 
+	 */
+	reductions_list(reds) = 
+	    gen_nconc(translate_reductions(c), reductions_list(reds));
 }
 
 /* performs the computation of proper reductions for statement s.
  * this is a direct computation, throught gen_multi_recurse.
- * only call instructions must be visited, hence it is stopped on expressions
  */
 static void compute_proper_reductions(statement s)
 {
     make_crt_stat_stack();
     gen_multi_recurse(s,
-		      statement_domain, pr_statement_flt, crt_stat_rewrite,
+		      statement_domain, pr_statement_flt, pr_statement_wrt,
 		      call_domain, gen_true, pr_call_rwt,
-		      expression_domain, gen_false, gen_null,
 		      NULL);
     free_crt_stat_stack();
 }
