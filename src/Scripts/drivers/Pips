@@ -86,6 +86,7 @@ then
   else	PGM=$OPT_PGM
   fi
 else	
+  echo sourcing $PIPS_CURRENT_PROGRAM in `pwd` >&2
   . $PIPS_CURRENT_PROGRAM
   if [ "$OPT_PGM" ]
   then	
