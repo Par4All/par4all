@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/08 18:25:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/10 09:42:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/09/08 18:25:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/09/10 09:42:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -52,7 +52,8 @@ static hash_table nts = hash_table_undefined;
 static bool print_code_semantics();
 static text get_semantic_text();
 
-bool print_code_transformers(module_name)
+bool 
+print_code_transformers(module_name)
 char *module_name;
 {
     is_user_view = FALSE;
@@ -60,7 +61,8 @@ char *module_name;
     return print_code_semantics(module_name);
 }
 
-bool print_code_preconditions(module_name)
+bool 
+print_code_preconditions(module_name)
 char *module_name;
 {
     is_user_view = FALSE;
@@ -68,7 +70,8 @@ char *module_name;
     return print_code_semantics(module_name);
 }
 
-bool print_source_transformers(module_name)
+bool 
+print_source_transformers(module_name)
 char *module_name;
 {
     is_user_view = TRUE;
@@ -76,7 +79,8 @@ char *module_name;
     return print_code_semantics(module_name);
 }
 
-bool print_source_preconditions(module_name)
+bool 
+print_source_preconditions(module_name)
 char *module_name;
 {
     is_user_view = TRUE;
@@ -84,7 +88,8 @@ char *module_name;
     return print_code_semantics(module_name);
 }
 
-text get_text_transformers(module_name)
+text 
+get_text_transformers(module_name)
 char *module_name;
 {
     is_user_view = FALSE;
@@ -92,7 +97,8 @@ char *module_name;
     return get_semantic_text(module_name,FALSE);
 }
 
-text get_text_preconditions(module_name)
+text 
+get_text_preconditions(module_name)
 char *module_name;
 {
     is_user_view = FALSE;
@@ -100,7 +106,8 @@ char *module_name;
     return get_semantic_text(module_name,FALSE);
 }
 
-static bool print_code_semantics(module_name)
+static bool 
+print_code_semantics(module_name)
 char *module_name;
 {
     bool success = TRUE;
@@ -134,7 +141,8 @@ char *module_name;
     return success;
 }
 
-static text get_semantic_text(module_name,give_code_p)
+static text 
+get_semantic_text(module_name,give_code_p)
 char *module_name;
 bool give_code_p;
 {
@@ -232,11 +240,14 @@ bool give_code_p;
     reset_current_module_statement();
     reset_cumulated_rw_effects();
 
+    free_value_mappings();
+
     return r;
 }
 
 /* this function name is VERY misleading - it should be changed, sometime FI */
-text semantic_to_text(module, margin, stmt)
+text 
+semantic_to_text(module, margin, stmt)
 entity module;
 int margin;
 statement stmt;
@@ -268,14 +279,16 @@ statement stmt;
 
 
 /* It is used to sort arguments preconditions in text_transformer(). */
-static int wordcmp(s1,s2)
+static int 
+wordcmp(s1,s2)
 char **s1, **s2;
 {
     return strcmp(*s1,*s2);
 }
 
 /* The strange argument type is required by qsort(), deep down in the calls */
-static int is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+static int 
+is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
     /* The constant term is given the highest weight to push constant
        terms at the end of the constraints and to make those easy
@@ -315,7 +328,8 @@ static int is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
  */
 
 
-boolean add_to_current_line(crt_line, add_string, str_prefix, txt, first_line)
+boolean 
+add_to_current_line(crt_line, add_string, str_prefix, txt, first_line)
 string crt_line, add_string, str_prefix;
 text txt;
 boolean first_line;
@@ -362,7 +376,8 @@ boolean first_line;
  * buffer to build each constraint; we are restricted to constraints of
  * lengths smaller than the line length.
  */
-text text_transformer(transformer tran)
+text 
+text_transformer(transformer tran)
 {
   text txt = make_text(NIL);
   boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
@@ -635,7 +650,7 @@ text text_transformer(transformer tran)
   return(txt); 
 }
 
-
+
 /* ---------------------------------------------------------------- */
 /* to convert strings containing predicates to text of commentaries */
 /* BA, april 1994                                                   */
@@ -651,7 +666,8 @@ text text_transformer(transformer tran)
  *            comment_prefix.
  * modifies : str_pred;
  */
-text string_predicate_to_commentary(str_pred, comment_prefix)
+text 
+string_predicate_to_commentary(str_pred, comment_prefix)
 string str_pred;
 string comment_prefix;
 {
@@ -739,7 +755,8 @@ string comment_prefix;
  *            this list of strings, and beginning with comment_prefix.
  * modifies : nothing.
  */
-text words_predicate_to_commentary(w_pred, comment_prefix)
+text 
+words_predicate_to_commentary(w_pred, comment_prefix)
 list w_pred;
 string comment_prefix;
 {
@@ -762,7 +779,8 @@ string comment_prefix;
  *            beginning with the comment_prefix.
  * modifies : nothing
  */
-sentence make_pred_commentary_sentence(str_pred, comment_prefix)
+sentence 
+make_pred_commentary_sentence(str_pred, comment_prefix)
 string str_pred;
 string comment_prefix;
 {
