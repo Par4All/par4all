@@ -1,7 +1,7 @@
 dnl
 dnl GENERAL M4 MACROS
 dnl
-dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1994/09/21 17:24:31 $, )
+dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1995/09/07 11:29:47 $, )
 dnl version $Revision$
 dnl got on %D%, %T%
 dnl
@@ -52,6 +52,14 @@ dnl
 define(`M4_PVM_LENGTH',`dnl
 ifelse($1,`BYTE1',1,$1,`INTEGER2',2,$1,`INTEGER4',4,dnl
 $1,`REAL4',4,$1,`REAL8',8,$1,`COMPLEX8',8,$1,`COMPLEX16',16)')dnl
+define(`m4_type_name',`dnl
+ifelse($1,`BYTE1',byte*1,dnl
+$1,`INTEGER2',integer*2,dnl
+$1,`INTEGER4',integer*4,dnl
+$1,`REAL4',real*4,dnl
+$1,`REAL8',real*8,dnl
+$1,`COMPLEX8',complex*8,dnl
+$1,`COMPLEX16',complex*16)')dnl
 dnl
 dnl END OF GENERAL M4 MACROS
 dnl
