@@ -1,7 +1,7 @@
 %
 % Documentation de l'environnement de de'veloppement PIPS
 %
-% $RCSfile: dret146.ftex,v $ ($Date: 1994/05/19 16:43:02 $) version $Revision$, got on %D%, %T%
+% $RCSfile: dret146.ftex,v $ ($Date: 1994/05/20 12:32:36 $) version $Revision$, got on %D%, %T%
 % %A%
 %
 
@@ -27,7 +27,7 @@
 			Be'atrice APVRILLE 
 }
 %\newcommand{\docdate}{7 octobre 1993}
-\newcommand{\docdate}{$Date: 1994/05/19 16:43:02 $}
+\newcommand{\docdate}{$Date: 1994/05/20 12:32:36 $}
 
 \begin{document}
 
@@ -666,19 +666,10 @@ fonctionnement de cette nouvelle phase. Il ne faut pas oublier de les de'clarer
 dans le fichier de re'fe'rence des properties, {\tt properties-rc.f.tex}.
 
 \item ex\'ecuter la commande {\tt make all} pour d\'eriver de ce fichier de 
-r\`egles les fichiers {\tt phases.h} et {\tt resources.h} plac\'es dans {\tt 
-\$INCLUDEDIR}, et les fichiers {\tt pipsmake.rc}, {\tt wpips.rc} et {\tt 
-properties.rc} plac\'es dans {\tt \$LIBDIR}.
+r\`egles les fichiers {\tt phases.h} et {\tt resources.h} {\tt builder-map.h}
+plac\'es dans {\tt \$INCLUDEDIR}, et les fichiers {\tt pipsmake.rc}, {\tt
+wpips.rc} et {\tt properties.rc} plac\'es dans {\tt \$LIBDIR}.
 
-
-\item pour de'clarer l'existence de cette bibliothe`que {\em mylib} au
-gestionnaire des traitements {\em pipsmake}, exe'cuter la commande {\tt
-make-builder-map} qui de'rive automatiquement le fichier {\tt builder-map.h} du
-fichier {\tt pipsmake.rc}. Ainsi, pour la nouvelle phase {\em mylib}, il rajoutera~:
-
-\begin{verbatim}
-BUILDER_MYLIB, mylib,
-\end{verbatim}
 
 \end{itemize}
 
