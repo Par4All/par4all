@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1996/06/15 13:22:08 $, 
+ * $Date: 1996/06/15 18:11:18 $, 
  *
  * utilities for reductions.
  *
@@ -151,8 +151,108 @@ update_reduction_under_effect(
 
     return TRUE;
 }
-    
 
+/* looks for a reduction about var in reds, and returns it.
+ * tells whether it worths keeping on. It does not if there may be some 
+ * conflicts with other reduced variables...
+ */
+static bool 
+find_reduction_of_var(entity var, reductions reds, reduction *pr)
+{
+    MAP(REDUCTION, r,
+    {
+	entity red_var = reduction_variable(r);
+	if (red_var==var)
+	{
+	    *pr = copy_reduction(r);
+	    return TRUE;
+	}
+	else if (entity_conflict_p(red_var, var))
+	    return FALSE; /* I will not combine them... */
+    },
+	reductions_list(reds));
+    return TRUE;
+}
+
+/* merge two reductions into first so as to be compatible with both.
+ * deletes the second. tells whether they where compatibles
+ * quite basic at the time
+ */
+static bool 
+merge_two_reductions(reduction first, reduction second)
+{
+    pips_assert("same variable", 
+		reduction_variable(first)==reduction_variable(second));
+
+    if (reduction_operator_tag(reduction_op(first))!=
+	reduction_operator_tag(reduction_op(second)))
+    {
+	free_reduction(second);
+	return FALSE;
+    }
+
+    if (!reference_equal_p(reduction_reference(first), 
+			   reduction_reference(second)))
+    {
+	/* actually merges, very simple at the time 
+	 */
+	free_reference(reduction_reference(first));
+	reduction_reference(first) = 
+	    make_reference(reduction_variable(second), NIL);
+    }
+
+    free_reduction(second);
+    return TRUE;
+}
+
+/* what to do with reduction *pr for variable var 
+ * under effects le and reductions reds.
+ * - *pr==NULL => no candidates found yet.
+ * returns whether woth to go on.
+ * conditions:
+ */   
+bool 
+update_compatible_reduction(
+    reduction *pr,
+    entity var,
+    list /* of effect */ le,
+    reductions reds)
+{
+    reduction found = NULL;
+
+    if (!find_reduction_of_var(var, reds, &found)) 
+	return FALSE;
+
+    if (found)
+    {
+	if (*pr) /* some reduction already available */
+	    return merge_two_reductions(*pr, found);
+	else 
+	{
+	    *pr = found;
+	    return TRUE;
+	}
+    }
+    /* else 
+     * now no new reduction waas found, must check *pr against effects 
+     */
+    if (*pr) /* some reduction */
+    {
+	MAP(EFFECT, e,
+	    if (!update_reduction_under_effect(*pr, e))
+	        return FALSE,
+	    le);
+    }
+    else
+    {
+	MAP(EFFECT, e,
+	    if (entity_conflict_p(effect_variable(e), var))
+	        return FALSE,
+	    le);
+    }
+    
+    return TRUE;
+}
 
 /*************************************************** CALL PROPER REDUCTION */
 /* extract the proper reduction of a call (instruction) if any.
@@ -306,6 +406,9 @@ call_proper_reduction_p(
     tag op;
     bool comm;
 
+    pips_debug(7, "call to %s (0x%x)\n", 
+	       entity_name(call_function(c)), (unsigned int) s);
+
     if (!ENTITY_ASSIGN_P(call_function(c))) 
 	return FALSE;
 
@@ -339,6 +442,10 @@ call_proper_reduction_p(
      */
     if (!no_other_effects_on_references(s, lhs, other))
 	return FALSE;
+
+    pips_debug(7, "returning a %s reduction on %s\n",
+	       reduction_operator_tag_name(op), 
+	       entity_name(reference_variable(lhs)));
 
     /* well, it is ok for a reduction now! 
      */
