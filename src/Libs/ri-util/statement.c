@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.64  1999/05/25 15:45:46  irigoin
+    Error message improved in clear_label()
+
     Revision 1.63  1999/01/08 15:27:03  irigoin
     Function unstructured_does_return() updated so as not to return always TRUE!
 
@@ -1108,12 +1111,12 @@ void
 clear_label(s)
 statement s;
 {
-    statement_label(s) = entity_empty_label();
-
-
     if(format_statement_p(s)) {
-	user_error("clear_label", "Cannot clear FORMAT label!\n");
+	user_error("clear_label", "Cannot clear label for FORMAT %s!\n",
+		   label_local_name(statement_label(s)));
     }
+
+    statement_label(s) = entity_empty_label();
 
     if(instruction_loop_p(statement_instruction(s))) 
 	loop_label(instruction_loop(statement_instruction(s))) = 
