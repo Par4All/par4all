@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/02/16 10:03:43 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/03/08 14:43:40 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -444,13 +444,12 @@ cons *l;
     return(nlb);
 }
 
-cons *gen_last( l )
-cons *l ;
+list gen_last(l)
+list l;
 {
-    if( ENDP( l ) || ENDP( CDR( l ))) {
-	return( l ) ;
-    }
-    return( gen_last( CDR( l ))) ;
+    if (ENDP(l)) return(l);         /* NIL case */
+    while (!ENDP(CDR(l))) l=CDR(l); /* else go to the last */
+    return(l);
 }
 	
 void gen_remove( cpp, obj )
