@@ -191,14 +191,8 @@ MakeComplexConstantExpression(
 			      expression i)
 {
     expression cce = expression_undefined;
-    syntax rs = expression_syntax(r);
-    syntax is = expression_syntax(i);
 
-    if(syntax_call_p(rs) && syntax_call_p(is)) {
-	entity re = call_function(syntax_call(rs));
-	entity ie = call_function(syntax_call(is));
-	/* re and ie must denote numerical constants */
-	if(entity_constant_p(re) && entity_constant_p(ie)) {
+    if(signed_constant_expression_p(r) && signed_constant_expression_p(i)) {
 	basic rb = basic_of_expression(r);
 	basic ib = basic_of_expression(i);
 	int rsize = basic_type_size(rb);
@@ -207,8 +201,8 @@ MakeComplexConstantExpression(
 
 	cce = MakeBinaryCall(local_name_to_top_level_entity
 			     (size==4? IMPLIED_COMPLEX_NAME: IMPLIED_DCOMPLEX_NAME), r, i);
-	}
     }
+
     return cce;
 }
 
@@ -316,12 +310,43 @@ expression e;
     return make_value(is_value_symbolic, s);
 }
 
+bool
+signed_constant_expression_p(expression e)
+{
+    syntax es = expression_syntax(e);
+    bool ok = TRUE;
+
+    if(syntax_call_p(es)) {
+	entity ce = call_function(syntax_call(es));
+
+	if(!entity_constant_p(ce)) {
+	    list args = call_arguments(syntax_call(es));
+	    
+	    if(ce==CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME)) {
+		syntax arg = expression_syntax(EXPRESSION(CAR(args)));
+		if( syntax_call_p(arg)) {
+		    entity mce = call_function(syntax_call(arg));
+		    ok = entity_constant_p(mce);
+		}
+		else {
+		    ok = FALSE;
+		}
+	    }
+	    else {
+		ok = FALSE;
+	    }
+	}
+    }
+    return ok;
+}
+
 /* BEGIN_EOLE */ /* - please do not remove this line */
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
    in the EOLE project (JZ - 11/98) */
 
 
 /* whether the given function is a constant expression, whatever the type.
+ * FI -> JZ: unsigned numerical constant expression?
  */
 bool 
 expression_is_constant_p(expression e)
