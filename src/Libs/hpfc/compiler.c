@@ -1,6 +1,6 @@
 /* Fabien Coelho, May 1993
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/05/05 16:42:37 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/07/20 18:40:38 $, )
  * version $Revision$
  *
  * Compiler
@@ -47,9 +47,9 @@ statement *hoststatp,*nodestatp;
     (*hoststatp) = MakeStatementLike(stat, is_instruction_block);
     (*nodestatp) = MakeStatementLike(stat, is_instruction_block);
 
-    MAPL(cs,
+    MAP(STATEMENT, s,
      {
-	 hpf_compiler(STATEMENT(CAR(cs)),&hostcd,&nodecd);
+	 hpf_compiler(s,&hostcd,&nodecd);
 	 
 	 lhost = CONS(STATEMENT, hostcd, lhost);
 	 lnode = CONS(STATEMENT, nodecd, lnode);
@@ -274,15 +274,12 @@ statement *hoststatp,*nodestatp;
 	     ct,
 	     blocks);
 	
-	MAPL(cc,
+	MAP(CONTROL, c,
 	 {
-	     control
-		 c = CONTROL(CAR(cc));
-	     
 	     update_control_lists(c, hostmap);
 	     update_control_lists(c, nodemap);
 	 },
-	     blocks);
+	    blocks);
 
 	ifdebug(9)
 	{
@@ -293,9 +290,8 @@ statement *hoststatp,*nodestatp;
 
 	    fprintf(stderr, "[hpf_compile_unstructured] controls:\n");
 	    
-	    MAPL(cc,
+	    MAP(CONTROL, c_tmp,
 	     {
-		 c_tmp = CONTROL(CAR(cc));
 		 h_tmp = (control) GET_CONTROL_MAPPING(hostmap, c_tmp);
 		 n_tmp = (control) GET_CONTROL_MAPPING(nodemap, c_tmp);
 		 
