@@ -392,13 +392,11 @@ bool privatize_module(char *mod_name)
     debug_off();
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
 
-    hash_table_clear( get_enclosing_loops_map() );
-    
     reset_current_module_entity();
     reset_current_module_statement();
     reset_proper_rw_effects();
     reset_cumulated_rw_effects();
-    reset_enclosing_loops_map();
+    clean_enclosing_loops();
 
     return TRUE;
 }
