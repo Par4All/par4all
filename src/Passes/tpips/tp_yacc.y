@@ -42,7 +42,6 @@
 %type <status> i_apply
 %type <status> i_activate
 %type <status> i_display
-%type <status> i_set
 %type <status> i_get
 %type <name> rulename
 %type <name> filename
@@ -117,7 +116,6 @@ instruction:
 	| i_apply
 	| i_display
 	| i_activate
-	| i_set
 	| i_get
 	| error {$$ = FALSE;}
 	;
@@ -447,80 +445,6 @@ i_activate:
 		activate ($3);
 		$$ = TRUE;
 	    }
-	}
-	;
-
-i_set:
-	SET_PROPERTY
-	sep_list
-	PROPNAME
-	{ $$ = (int) yylval.name; /* bof */}
-	sep_list
-	SETVALUE
-	opt_sep_list
-	{
-	    property p ;
-	    bool status = TRUE;
-	    
-	    debug(7,"yyparse","reduce rule i_set(%s,%s)\n",
-		  $<name>4,yylval.name);
-
-	    if (tpips_execution_mode) {
-	    
-		p = get_property ($<name>4);
-		strupper (yylval.name,yylval.name);
-
-		user_log("set %s %s\n", $<name>4, yylval.name);
-
-		switch (property_tag(p))
-		{
-		case is_property_bool:
-		{
-		    if (!strcmp ("TRUE",yylval.name))
-			set_bool_property ($<name>4, TRUE);
-		    else if (!strcmp ("FALSE",yylval.name))
-			set_bool_property ($<name>4, FALSE);
-		    else {
-			yyerror ("type mismatch");
-			status = FALSE;
-		    }
-		    break;
-		}
-		case is_property_int:
-		{
-		    char *ptr;
-		    long l;
-		    
-		    l = strtol (yylval.name, &ptr, 10);
-		    if (*ptr != '\0') {
-			yyerror ("type mismatch");
-			status = FALSE;
-		    } else
-			set_int_property($<name>4, (int) l);
-		    break;
-		}
-		case is_property_string:
-		{
-		    char *q = strrchr(yylval.name, '"');
-		    if (!q)
-			user_error("set",
-				   "Did not find a quote in the string\n");
-		    *q = '\0';
-		    set_string_property($<name>4, yylval.name + 1);
-		    break;
-		}
-		}
-		if (status)
-		{
-		    print_property($<name>4,p);
-		    $$ = TRUE;
-		} else
-		    $$ = FALSE;
-	    }
-/*
-	    free (yylval.name);
-	    free ($<name>4);
-*/
 	}
 	;
 
