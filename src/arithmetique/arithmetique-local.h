@@ -44,11 +44,11 @@ typedef long long Value;
  * some faster checks with 0x7ffffff000 sg and so ? 
  */
 #define VALUE_TO_LONG(val) \
-    ((long)(val>=(Value)LONG_MIN&&val<=(Value)LONG_MAX)?val:abort())
+    ((long)((val)>=(Value)LONG_MIN&&(val)<=(Value)LONG_MAX)?(val):abort())
 #define VALUE_TO_INT(val) \
-    ((int)(val>=(Value)INT_MIN&&val<=(Value)INT_MAX)?val:abort())
-#define VALUE_TO_DOUBLE(val) ((double)val)
-#define VALUE_TO_FLOAT(val) ((float)val)
+    ((int)((val)>=(Value)INT_MIN&&(val)<=(Value)INT_MAX)?(val):abort())
+#define VALUE_TO_DOUBLE(val) ((double)(val))
+#define VALUE_TO_FLOAT(val) ((float)(val))
 /* end LINEAR_VALUE_IS_LONGLONG
  */
 #elif defined(LINEAR_VALUE_IS_LONG)
@@ -61,9 +61,9 @@ typedef long Value;
 #define VALUE_ONE  1L
 #define VALUE_MONE -1L
 #define VALUE_TO_LONG(val) (val)
-#define VALUE_TO_INT(val) ((int)val)
-#define VALUE_TO_FLOAT(val) ((float)val)
-#define VALUE_TO_DOUBLE(val) ((double)val)
+#define VALUE_TO_INT(val) ((int)(val))
+#define VALUE_TO_FLOAT(val) ((float)(val))
+#define VALUE_TO_DOUBLE(val) ((double)(val))
 /* end LINEAR_VALUE_IS_LONG
  */
 #elif defined(LINEAR_VALUE_IS_FLOAT)
@@ -75,10 +75,10 @@ typedef float Value;
 #define VALUE_ZERO 0.0
 #define VALUE_ONE  1.0
 #define VALUE_MONE -1.0
-#define VALUE_TO_LONG(val) ((long)val)
-#define VALUE_TO_INT(val) ((int)val)
-#define VALUE_TO_FLOAT(val) ((float)val)
-#define VALUE_TO_DOUBLE(val) ((double)val)
+#define VALUE_TO_LONG(val) ((long)(val))
+#define VALUE_TO_INT(val) ((int)(val))
+#define VALUE_TO_FLOAT(val) ((float)(val))
+#define VALUE_TO_DOUBLE(val) ((double)(val))
 /* end LINEAR_VALUE_IS_FLOAT
  */
 /* the purpose of the chars version is to detect invalid assignments
@@ -86,7 +86,7 @@ typedef float Value;
 #elif defined(LINEAR_VALUE_IS_CHARS)
 typedef union { char *s; long l; int i; float f; double d;} Value;
 #define VALUE_FMT "%s"
-#define VALUE_CONST(val) ((Value)val)
+#define VALUE_CONST(val) ((Value)(val))
 #define VALUE_MIN ((Value)(long)0xdeadbeef)
 #define VALUE_MAX ((Value)(long)0xfeedabee)
 #define VALUE_ZERO ((Value)0)
@@ -107,20 +107,20 @@ typedef int Value;
 #define VALUE_ZERO 0
 #define VALUE_ONE  1
 #define VALUE_MONE -1
-#define VALUE_TO_LONG(val) ((long)val)
-#define VALUE_TO_INT(val) ((int)val)
-#define VALUE_TO_FLOAT(val) ((float)val)
-#define VALUE_TO_DOUBLE(val) ((double)val)
+#define VALUE_TO_LONG(val) ((long)(val))
+#define VALUE_TO_INT(val) ((int)(val))
+#define VALUE_TO_FLOAT(val) ((float)(val))
+#define VALUE_TO_DOUBLE(val) ((double)(val))
 /* end LINEAR_VALUE_IS_INT
  */
 #endif 
 
 #define VALUE_NAN VALUE_MIN
 
-#define int_to_value(i) ((Value)i)
-#define long_to_value(l) ((Value)l)
-#define float_to_value(f) ((Value)f)
-#define double_to_value(d) ((Value)d)
+#define int_to_value(i) ((Value)(i))
+#define long_to_value(l) ((Value)(l))
+#define float_to_value(f) ((Value)(f))
+#define double_to_value(d) ((Value)(d))
 
 /* boolean operators on values
  */
@@ -145,8 +145,8 @@ typedef int Value;
 #define value_minus(v1,v2) ((v1)-(v2))
 #define value_pdiv(v1,v2)  (divide(v1,v2))
 #define value_pmod(v1,v2)  (modulo(v1,v2))
-#define value_min(v1,v2)   (value_le(v1,v2)? v1: v2)
-#define value_max(v1,v2)   (value_ge(v1,v2)? v1: v2)
+#define value_min(v1,v2)   (value_le(v1,v2)? (v1): (v2))
+#define value_max(v1,v2)   (value_ge(v1,v2)? (v1): (v2))
 
 /* assigments
  */
