@@ -52,8 +52,8 @@ list *plvect, *plkind;
 	e1 = reference_variable(r1),
 	e2 = reference_variable(r2);
     align
-	a1 = (align) GET_ENTITY_MAPPING(hpfalign, e1),
-	a2 = (align) GET_ENTITY_MAPPING(hpfalign, e2);
+	a1 = load_entity_align(e1),
+	a2 = load_entity_align(e2);
     bool
 	ok = TRUE;
     list
@@ -109,7 +109,7 @@ list *plvect, *plkind;
 	    baffin1, baffin2,
 	    bshift1, bshift2,
 	    bconst1, bconst2,
-	    blcnst2;
+	    blcnst2=0;
 
 	debug(8, "align_check",
 	      "considering dimension %d of %s\n",
@@ -218,13 +218,19 @@ list *plvect, *plkind;
 		    if ((index1!=index2) ||/* even in the constant case ! not aligned */
 			(r1!=r2) || (c1!=c2))
 		    {
-			*plkind = gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
-			*plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+			*plkind = 
+			    gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
+			*plvect = 
+			    gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
 		    }    
-		    else /* aligned... ??? bug if not 1: later on, because decl shift */
+		    else /* aligned... ??? 
+			  * bug if not 1: later on, because decl shift
+			  */
 		    {
-			*plkind = gen_nconc(*plkind, CONS(INT, aligned_star, NIL));
-			*plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+			*plkind = 
+			    gen_nconc(*plkind, CONS(INT, aligned_star, NIL));
+			*plvect = 
+			    gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
 		    }
 		}
 		else /* 4 cases study with bconst and bshift, plus the rates */
@@ -240,19 +246,24 @@ list *plvect, *plkind;
 		     * ??? what about rates!=1 ? decl shift problem added.
 		     */
 
-		    *plkind = gen_nconc(*plkind, CONS(INT, aligned_constant, NIL));
-		    *plvect = gen_nconc(*plvect, 
-					CONS(PVECTOR, 
-					     vect_add(vect_add(vect_new(DELTAV, d), 
-							       vect_new(TCST, shft2)), 
-						               vect_new(TEMPLATEV, t2)), 
-					     NIL));
+		    *plkind = 
+			gen_nconc(*plkind, CONS(INT, aligned_constant, NIL));
+		    *plvect = 
+			gen_nconc(*plvect, 
+				  CONS(PVECTOR, 
+				       vect_make(VECTEUR_NUL,
+						 DELTAV, d,
+						 TEMPLATEV, t2,
+						 TCST, shft2),
+				       NIL));
 		}
-		else
-		if ((rate1!=1) || (rate2!=1) || (index1!=index2)) /* say not aligned... */
+		else /* say not aligned... */
+		if ((rate1!=1) || (rate2!=1) || (index1!=index2)) 
 		{
-		    *plkind = gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
-		    *plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+		    *plkind = gen_nconc(*plkind, 
+					CONS(INT, not_aligned, NIL));
+		    *plvect = gen_nconc(*plvect, 
+					CONS(PVECTOR, VECTEUR_NUL, NIL));
 		}
 		else
 		if (bshift1 && bshift2)
@@ -266,18 +277,21 @@ list *plvect, *plkind;
 		    *plkind = gen_nconc(*plkind, CONS(INT, aligned_shift, NIL));
 		    *plvect = gen_nconc(*plvect, 
 					CONS(PVECTOR,
-					     vect_add(vect_new(TSHIFTV, shift),
-					     vect_add(vect_new(TCST, shft2),
-						      vect_new(index1, 1))), 
-						      NIL));
+					     vect_make(VECTEUR_NUL,
+						       TSHIFTV, shift,
+						       (Variable) index1, 1,
+						       TCST, shft2),
+					     NIL));
 		}
 		else /* ??? I should do something with blcnst2? */
 		{
 		    /* well, say not aligned, but one to many or many to one
 		     * communications may be used...
 		     */
-		    *plkind = gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
-		    *plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+		    *plkind = 
+			gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
+		    *plvect = 
+			gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
 		}			  	 
 	    }
 	}
@@ -292,19 +306,25 @@ list *plvect, *plkind;
 	    if (baffin2) /* may be used to generate RSDs */
 	    {
 		*plkind = gen_nconc(*plkind, CONS(INT, local_affine, NIL));
-		*plvect = gen_nconc(*plvect, CONS(PVECTOR, 
-						  vect_add(vect_new(TCST, shft2),
-							   vect_new(index2, affr2)), 
-						  NIL));
+		*plvect = 
+		    gen_nconc(*plvect, 
+			      CONS(PVECTOR, 
+				   vect_make(VECTEUR_NUL,
+					     (Variable) index2, affr2,
+					     TCST, shft2),
+				   NIL));
 	    }
 	    else
 	    if (bshift2)
 	    {
 		*plkind = gen_nconc(*plkind, CONS(INT, local_shift, NIL));
-		*plvect = gen_nconc(*plvect, CONS(PVECTOR, 
-						  vect_add(vect_new(TCST, shft2),
-							   vect_new(index2, 1)), 
-						  NIL));
+		*plvect = 
+		    gen_nconc(*plvect, 
+			      CONS(PVECTOR, 
+				   vect_make(VECTEUR_NUL,
+					     (Variable) index2, 1,
+					     TCST, shft2),
+				   NIL));
 	    }
 	    else
 	    if (bconst2)
