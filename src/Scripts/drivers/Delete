@@ -1,7 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: Delete,v $ (version $Revision$)
-# $Date: 1997/03/27 17:16:05 $, 
+# $Id$
 #
 # Delete removes a list of workspaces whose names are provided
 # after the command, no matter which the current workspace is.
@@ -17,10 +16,12 @@
 
 unset DEFAULT
 
+script=`basename $0`
+
 pips_current_program=${PIPS_CURRENT_PROGRAM:-.pipsprogram}
 
 verb()
-{ echo "$RCSfile: Delete,v $:" "$@" >&2 ; }
+{ echo "$script:" "$@" >&2 ; }
 
 if [ $# -eq 0 ] 
 then 
@@ -42,7 +43,9 @@ do
     exit 2
   else
     [ "$DEFAULT" ] && verb "Deleting $WS"
-    rm -r $WS || {
+
+    # was rm -r?
+    rm -rf $WS || {
       verb "Cannot remove $WS"
       exit 3
     }
