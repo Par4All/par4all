@@ -1,12 +1,12 @@
 /* package arithmetic
  *
  * $RCSfile: io.c,v $ (version $Revision$)
- * $Date: 1996/07/13 14:27:38 $, 
+ * $Date: 1996/07/13 14:31:44 $, 
  */
 #include <stdio.h>
 #include <strings.h>
-#include <assert.h>
 
+#include "assert.h"        /* abort version */
 #include "arithmetique.h"
 
 #define BUFFER_SIZE 21
@@ -58,7 +58,7 @@ static void timestwo(char *s)
 }
 
 /* returns a static pointer, thus must be strdup if necessary...
- * some format could be specified?
+ * some format could be specified? "x" -> BASE is 'f', "d" -> '9'...
  */
 char * Value_to_string(Value v)
 {
