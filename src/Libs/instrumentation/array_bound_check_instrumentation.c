@@ -13,7 +13,14 @@
  * For each bound check, we increase ARRAY_BOUND_CHECK_COUNT by one
  * If the module is the main program, we initialize 
  * ARRAY_BOUND_CHECK_COUNT equal to 0 and before the terminasion 
- * of program, we display the value of ARRAY_BOUND_CHECK_COUNT.  */
+ * of program, we display the value of ARRAY_BOUND_CHECK_COUNT. 
+ *
+ *
+ * Hypothese : there is no write effect on the array bound expression.
+ *
+ * There was a test for write effect on bound here but I put it away (in 
+ * effect_on_array_bound.c) because it takes time to calculate the effect
+ * but in fact this case is rare. */
 
 
 #include <stdio.h>
@@ -33,8 +40,6 @@
 #include "control.h"
 #include "properties.h"
 #include "semantics.h"
-#include "effects-generic.h"
-#include "effects-simple.h"
 #include "instrumentation.h"
 
 
@@ -447,143 +452,112 @@ static void  pips_code_abc_statement(statement module_statement)
 bool array_bound_check_instrumentation(char *module_name)
 { 
   statement module_statement;
-  list leffects = NIL,ldeclas = NIL;
-
-  /* In case of adjustable array, the value of variable that appears 
-   * in a dimension bound expression 
-   * can be changed by one or more write effects in the module
-   * (see ANSI X3.9-1978 FORTRAN 77 for more details).
-   * Here, we use the summary effects to calculate if a dimension 
-   * bound expression is modified 
-   * by effect(s) and if it is the case,  an user error message 
-   * will be displayed. 
-
-   * If we don't make this test, the dynamic array bound checks 
-   * added here are not correct any more. We 
-   * will change the approach if one day, we find it neccessary */
   
+  // add COMMON /ARRAY_BOUND_CHECK/ ARRAY_BOUND_CHECK_COUNT to the declaration
+  // if main program : DATA ARRAY_BOUND_CHECK_COUNT /0/
+
+  string new_decl = 
+    "      INTEGER*8 ARRAY_BOUND_CHECK_COUNT\n"
+    "      COMMON /ARRAY_BOUND_CHECK/ ARRAY_BOUND_CHECK_COUNT\n";
+  string new_decl_init = 
+    "      DATA ARRAY_BOUND_CHECK_COUNT /0/\n";
+  string old_decl;
+  basic b = make_basic_int(8);
+
   set_current_module_entity(local_name_to_top_level_entity(module_name));
+
+  mod_ent =  get_current_module_entity();
+
+  abccount = make_scalar_entity(ABC_COUNT,module_name,b);
+      
+  old_decl = code_decls_text(entity_code(mod_ent));
  
-  leffects = effects_to_list((effects) db_get_memory_resource(DBR_SUMMARY_EFFECTS, 
-							      module_name, TRUE));
-
-  ldeclas =  code_declarations(entity_code(get_current_module_entity()));
-
-  if (array_dimension_variable_changed_p(ldeclas,leffects)) 
-    {
-      user_error ("\t ARRAY BOUND CHECK", 
-		  "There are write effects on bounds of array!\n ");      
-      reset_current_module_entity();      
-      return TRUE; 
-    }
-  else
-    {
-      // add COMMON /ARRAY_BOUND_CHECK/ ARRAY_BOUND_CHECK_COUNT to the declaration
-      // if main program : DATA ARRAY_BOUND_CHECK_COUNT /0/
-
-      string new_decl = 
-	"      INTEGER*8 ARRAY_BOUND_CHECK_COUNT\n"
-	"      COMMON /ARRAY_BOUND_CHECK/ ARRAY_BOUND_CHECK_COUNT\n";
-      string new_decl_init = 
-	"      DATA ARRAY_BOUND_CHECK_COUNT /0/\n";
-      string old_decl;
-
-      basic b = make_basic_int(8);
-
-      mod_ent =  get_current_module_entity();
-
-      abccount = make_scalar_entity(ABC_COUNT,module_name,b);
-      
-      old_decl = code_decls_text(entity_code(mod_ent));
-
-      //      fprintf(stderr, "OLD = %s\n", old_decl);
-
-      if (entity_main_module_p(mod_ent))
-	// MAIN PROGRAM 
-	code_decls_text(entity_code(mod_ent))
-          = strdup(concatenate(old_decl, new_decl, new_decl_init,NULL));
-      else 
-	code_decls_text(entity_code(mod_ent)) 
-	  = strdup(concatenate(old_decl, new_decl, NULL));
-
-      free(old_decl), old_decl = NULL;
-
-      //   fprintf(stderr, "NEW = %s\n", code_decls_text(entity_code(mod_ent)));
-      
-      /* Begin the array bound check instrumentation phase. 
-       * Get the code from dbm (true resource) */
+  if (entity_main_module_p(mod_ent))
+    // MAIN PROGRAM 
+    code_decls_text(entity_code(mod_ent))
+      = strdup(concatenate(old_decl, new_decl, new_decl_init,NULL));
+  else 
+    code_decls_text(entity_code(mod_ent)) 
+      = strdup(concatenate(old_decl, new_decl, NULL));
   
-      module_statement= (statement) 
-	db_get_memory_resource(DBR_CODE, module_name, TRUE);
-
-      set_current_module_statement(module_statement);
+  free(old_decl), old_decl = NULL;
+  
+  //   fprintf(stderr, "NEW = %s\n", code_decls_text(entity_code(mod_ent)));
+  
+  /* Begin the array bound check instrumentation phase. 
+   * Get the code from dbm (true resource) */
+  
+  module_statement= (statement) 
+    db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  
+  set_current_module_statement(module_statement);
  
-      initialize_ordering_to_statement(module_statement);
+  initialize_ordering_to_statement(module_statement);
       
-      debug_on("ARRAY_BOUND_CHECK_INSTRUMENTATION_DEBUG_LEVEL");
+  debug_on("ARRAY_BOUND_CHECK_INSTRUMENTATION_DEBUG_LEVEL");
   
-      if (get_bool_property("INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION"))   
-	{
-	  // instrument the initial code 
-	  // Rewrite Implied_DO code 
+  if (get_bool_property("INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION"))   
+    {
+      // instrument the initial code 
+      // Rewrite Implied_DO code 
 
-	  /* Before running the array_bound_check phase, 
-	   * for the implied-DO expression (in statement 
-	   * READ, WRITE of Fortran), we will create new Pips' loops 
-	   * before the READ/WRITE statement, 
-	   * it means that instead of checking array references 
-	   * for implied-DO statement (which is not 
-	   * true if we do it like other statements), we will check 
-	   * array references in new loops added*/
-
-	  rewrite_implied_do(module_statement);     
-
-	  /* Reorder the module, because new loops have been added */
-	  
-	  module_reorder(module_statement);
-	  ifdebug(1)
-	    {
-	      debug(1, " Initial code array bound check instrumention",
-		    "Begin for %s\n", module_name);
-	      pips_assert("Statement is consistent ...", 
-			  statement_consistent_p(module_statement));
-	    }  
-	
-	  initial_code_abc_statement(module_statement);
-	}
-      if (get_bool_property("PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION"))
-	{
-	  ifdebug(1)
-	    {
-	      debug(1, "PIPS code array bound check instrumentation ",
-		    "Begin for %s\n", module_name);
-	      pips_assert("Statement is consistent ...", 
-			  statement_consistent_p(module_statement));
-	    }      
-
-	  pips_code_abc_statement(module_statement);
-	}
-
-      /* Reorder the module, because new statements have been added */
+      /* Before running the array_bound_check phase, 
+       * for the implied-DO expression (in statement 
+       * READ, WRITE of Fortran), we will create new Pips' loops 
+       * before the READ/WRITE statement, 
+       * it means that instead of checking array references 
+       * for implied-DO statement (which is not 
+       * true if we do it like other statements), we will check 
+       * array references in new loops added*/
+      
+      rewrite_implied_do(module_statement);     
+      
+      /* Reorder the module, because new loops have been added */
       
       module_reorder(module_statement);
-  
       ifdebug(1)
 	{
+	  debug(1, " Initial code array bound check instrumention",
+		"Begin for %s\n", module_name);
 	  pips_assert("Statement is consistent ...", 
 		      statement_consistent_p(module_statement));
-	  debug(1, "Array bound check instrumentation","End for %s\n", module_name);
-	}
-      debug_off(); 
-  
-      DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name),module_statement);
-
-      reset_current_module_statement();
- 
-      reset_current_module_entity();
+	}  
+	
+      initial_code_abc_statement(module_statement);
+    }
+  if (get_bool_property("PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION"))
+    {
+      ifdebug(1)
+	{
+	  debug(1, "PIPS code array bound check instrumentation ",
+		"Begin for %s\n", module_name);
+	  pips_assert("Statement is consistent ...", 
+		      statement_consistent_p(module_statement));
+	}      
       
-      return TRUE;
-    } 
+      pips_code_abc_statement(module_statement);
+    }
+  
+  /* Reorder the module, because new statements have been added */
+  
+  module_reorder(module_statement);
+  
+  ifdebug(1)
+    {
+      pips_assert("Statement is consistent ...", 
+		  statement_consistent_p(module_statement));
+      debug(1, "Array bound check instrumentation","End for %s\n", module_name);
+    }
+  debug_off(); 
+  
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name),module_statement);
+
+  reset_current_module_statement();
+  
+  reset_current_module_entity();
+      
+  return TRUE;
+ 
 }
 
 
