@@ -105,7 +105,7 @@ char *e;
        return( hash_get(s->table, (char *) e) == (char *) e) ;
        */
 
-    return hash_get(s->table, (char *) e);
+    return hash_get(s->table, (char *) e) != HASH_UNDEFINED_VALUE;
 }
 
 set set_union( s1, s2, s3 )
