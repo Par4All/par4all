@@ -263,7 +263,7 @@ typedef int Value;
 
 
 /************************************************* PROTECTED MULTIPLICATION */
-#include "arithmetic_errors.h"
+#include "arithmetic_error.h"
 
 /* (|v| < MAX / |w|) => v*w is okay
  * I could check ((v*w)/w)==v but a tmp would be useful
