@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/28 18:06:11 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/05/29 10:37:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/04/28 18:06:11 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/05/29 10:37:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -45,6 +45,14 @@ entity e;
     bool already_here = FALSE;
     string n = entity_local_name(e);
     string nom;
+    entity cm = get_current_module_entity();
+
+    /* Self recursive calls are not allowed */
+    if(e==cm) {
+	user_warning("update_called_modules", "Recursive call from %s to %s\n",
+		     entity_local_name(cm), entity_local_name(e));
+	ParserError("update_called_modules", "Recursive call are not supported\n");
+    }
 
     /* do not count intrinsics; user function should not be named
        like intrinsics */
