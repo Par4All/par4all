@@ -1,6 +1,6 @@
       program fractal
 
-      include 'hpfc_graphic_F.h'
+      include 'xpomp_graphic_F.h'
       
 c     Algorithm parameters:
       integer n_iteration
@@ -38,19 +38,20 @@ c     The zooming factor used when zooming with the button:
       real*8 zr, zrp, zi, cr, ci
       integer status
       
-      integer hpfc_open_display
-      external hpfc_open_display
-      integer hpfc_wait_mouse
-      external hpfc_wait_mouse
+c     Some HPF parallelism description:
+chpf$ processor pe(2, 2)
+chpf$ template space(0:x_size - 1, 0:y_size - 1)
+chpf$ distribute space(block, block)
+chpf$ align image with space
       
-      display = hpfc_open_display(x_display_size, y_display_size)
-      status = hpfc_set_color_map(display, 1, 1, 0, 0)
+      display = xpomp_open_display(x_display_size, y_display_size)
+      status = xpomp_set_color_map(display, 1, 1, 0, 0)
       
       xcenter = 0
       ycenter = 0
       zoom = 5
 
-      call hpfc_show_usage
+      call xpomp_show_usage
 
       print *, 'Use mouse button 1 to zoom in, button 2 to recenter'
       print *, '    and button 3 to zoom out'
@@ -58,39 +59,42 @@ c     The zooming factor used when zooming with the button:
 c     Main loop:
  10   continue
 
-chpf$ independent     
+c     Compute a fractal image:
+chpf$ independent, new(cr,ci,zr,zi,d,zrp)
       do 1 x = 0, x_size - 1
          cr = xcenter + (x - x_size/2)*zoom/x_size
-chpf$ independent     
+chpf$ independent
          do 2 y = 0, y_size - 1      
             ci = ycenter + (y - y_size/2)*zoom/y_size
             zr = cr
             zi = ci
-           do 3 k = 0, n_iteration - 1
+           do k = 0, n_iteration - 1
                d = zr*zr + zi*zi
                zrp = zr*zr - zi*zi + cr
                zi = distorsion*zr*zi + ci
                zr = zrp
-               if (d .gt. big_value) then 
-                goto 300
-               endif
- 3          continue
+               if (d .gt. big_value) goto 300
+ 3          enddo
  300        continue
             image(x, y) = CHAR(k)
  2       continue
  1    continue
-      
-      status = hpfc_flash(display, image, x_size, y_size, 
+
+c     Display the image:
+      status = xpomp_flash(display, image, x_size, y_size, 
      &     0, 0, x_display_zoom, y_display_zoom)
-      
-      button = hpfc_wait_mouse(display, x, y)
+
+c     Wait for user interaction:
+      button = xpomp_wait_mouse(display, x, y)
       xcenter = xcenter + (x/x_display_zoom - x_size/2)*zoom/x_size
       ycenter = ycenter + (y/y_display_zoom - y_size/2)*zoom/y_size
+      
       if (button.eq.1) then
        zoom = zoom/zooming_factor
       else if (button.eq.3) then
        zoom = zoom*zooming_factor
       endif
+
       print *, 'Position (', xcenter, ',', ycenter, '), zoom =', zoom
       goto 10
 
