@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.119  1998/07/24 10:46:56  irigoin
+ * Bug fix for unary minus
+ *
  * Revision 1.118  1998/06/03 06:42:03  irigoin
  * Prettyprint of whileloop added
  *
@@ -185,7 +188,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.118 1998/06/03 06:42:03 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.119 1998/07/24 10:46:56 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -745,11 +748,11 @@ words_unary_minus(call obj, int precedence, bool leftmost)
     expression e = EXPRESSION(CAR(call_arguments(obj)));
     int prec = words_intrinsic_precedence(obj);
 
-    if ( prec < precedence && !leftmost)
+    if ( prec < precedence || !leftmost)
 	pc = CHAIN_SWORD(pc, "(");
     pc = CHAIN_SWORD(pc, "-");
     pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
-    if ( prec < precedence && !leftmost)
+    if ( prec < precedence || !leftmost)
 	pc = CHAIN_SWORD(pc, ")");
 
     return(pc);
@@ -783,7 +786,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     list args = call_arguments(obj);
     int prec = words_intrinsic_precedence(obj);
     list we1 = words_subexpression(EXPRESSION(CAR(args)), prec, 
-				   precedence>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: TRUE);
+				   prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: TRUE);
     list we2;
 
     if ( strcmp(entity_local_name(call_function(obj)), "/") == 0 )
@@ -798,8 +801,10 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
 	else
 	    we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
     }
-    else
-	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec, FALSE);
+    else {
+	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec,
+				  prec<MINIMAL_ARITHMETIC_PRECEDENCE);
+    }
 
     
     if ( prec < precedence )
@@ -830,9 +835,11 @@ static struct intrinsic_handler {
 
     {"//", words_infix_binary_op, 30},
 
-    /* The Fortran 77 standard does not allow x*-3 or x+-3 */
-    /* {"--", words_unary_minus, 25}, */
-    {"--", words_unary_minus, 19},
+    /* The Fortran 77 standard does not allow x*-3 or x+-3, but this is dealt
+    * with by argument leftmost, not by prorities.
+    */
+    {"--", words_unary_minus, 25},
+    /* {"--", words_unary_minus, 19}, */
 
     {"*", words_infix_binary_op, 21},
     {"/", words_infix_binary_op, 21},
@@ -840,6 +847,9 @@ static struct intrinsic_handler {
     {"+", words_infix_binary_op, 20},
     {"-", words_infix_binary_op, 20},
 
+    /* Non-arithemtic operators have priorities lesser than MINIMAL_ARITHMETIC_PRECEDENCE
+     * leftmost is restaured to true for unary minus.
+     */
 
     {".LT.", words_infix_binary_op, 15},
     {".GT.", words_infix_binary_op, 15},
