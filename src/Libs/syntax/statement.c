@@ -611,14 +611,13 @@ entity i;
 
 /* this function creates an affectation statement. 
 
-l is a reference (the left hand side).
+   l is a reference (the left hand side).
 
-e is an expression (the right hand side). */
+   e is an expression (the right hand side).
+*/
 
 instruction 
-MakeAssignInst(l, e)
-syntax l;
-expression e;
+MakeAssignInst(syntax l, expression e)
 {
    expression lhs = expression_undefined;
    instruction i = instruction_undefined;
@@ -627,34 +626,49 @@ expression e;
      lhs = make_expression(l, normalized_undefined);
      i = make_assign_instruction(lhs, e);
    }
-   else {
-     if(syntax_call_p(l) &&
-	strcmp(entity_local_name(call_function(syntax_call(l))), 
-	       SUBSTRING_FUNCTION_NAME) == 0) {
-       list lexpr = CONS(EXPRESSION, e, NIL);
-       list asub = call_arguments(syntax_call(l));
-
-       call_arguments(syntax_call(l)) = NIL;
-       free_syntax(l);
-
-       i = make_instruction(is_instruction_call,
-			    make_call(entity_intrinsic(ASSIGN_SUBSTRING_FUNCTION_NAME),
-				      gen_append(asub, lexpr)));
-     }
-     else
-	 if(syntax_call_p(l)) {
-	     /* FI: we stumble here when a Fortran macro is used */
-	     user_warning("MakeAssignInst", "%s() appears as lhs\n",
-			  entity_local_name(call_function(syntax_call(l))));
-	     ParserError("MakeAssignInst",
-			 "bad lhs (function call or undeclared array) or "
-			 "PIPS unsupported Fortran macro\n");
-	 }
-	 else {
-	     FatalError("MakeAssignInst", "Unexpected syntax tag\n");
-	 }
+   else
+   {
+       if(syntax_call_p(l) &&
+	  strcmp(entity_local_name(call_function(syntax_call(l))), 
+		 SUBSTRING_FUNCTION_NAME) == 0) 
+       {
+	   list lexpr = CONS(EXPRESSION, e, NIL);
+	   list asub = call_arguments(syntax_call(l));
+	   
+	   call_arguments(syntax_call(l)) = NIL;
+	   free_syntax(l);
+	   
+	   i = make_instruction(is_instruction_call,
+	      make_call(entity_intrinsic(ASSIGN_SUBSTRING_FUNCTION_NAME),
+			gen_append(asub, lexpr)));
+       }
+       else
+       {
+	   if(syntax_call_p(l)) 
+	   {
+	       if (get_bool_property("PARSER_EXPAND_STATEMENT_FUNCTIONS"))
+	       {
+		   /* Let us keep it somewhere. */
+		   pips_user_warning("considering %s as a macro\n", 
+			     entity_name(call_function(syntax_call(l))));
+		   parser_add_a_macro(syntax_call(l), e);
+	       }
+	       else
+	       {
+		   /* FI: we stumble here when a Fortran macro is used. */
+		   user_warning("MakeAssignInst", "%s() appears as lhs\n",
+		       entity_local_name(call_function(syntax_call(l))));
+		   ParserError("MakeAssignInst",
+			       "bad lhs (function call or undeclared array)"
+			       " or PIPS unsupported Fortran macro\n");
+	       }
+	   }
+	   else {
+	       FatalError("MakeAssignInst", "Unexpected syntax tag\n");
+	   }
+       }
    }
-
+   
    return i;
 }
 
