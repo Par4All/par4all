@@ -1,8 +1,5 @@
-/* 	%A% ($Date: 1997/04/30 00:42:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1997/04/30 00:42:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
-#endif /* lint */
+/* $Id$
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -24,7 +21,8 @@ char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1997/04/30 00:42:18 $, ) version $
 static Menu compile_menu;
 
 void
-apply_on_each_compile_item(void (* function_to_apply_on_each_menu_item)(Menu_item))
+apply_on_each_compile_item(
+    void (* function_to_apply_on_each_menu_item)(Menu_item))
 {
    int i;
 
@@ -69,12 +67,13 @@ notify_hpfc_file_view(Menu menu,
 
 
 Menu
-generate_a_menu_with_HPF_output_files(Menu_item menu_item,
-                                      Menu_generate action)
+generate_a_menu_with_HPF_output_files(
+    Menu_item menu_item,
+    Menu_generate action)
 {
    int i;
    Menu menu;
-   char * file_names[ARGS_LENGTH];
+   gen_array_t file_names = gen_array_make(0);
    int file_number = 0;
 
    pips_debug(2, "Enter\n");
@@ -102,8 +101,7 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
         }
      
 
-        return_code = hpfc_get_file_list(&file_number,
-                                         file_names,
+        return_code = hpfc_get_file_list(file_names,
                                          &hpfc_directory);
         
         if (return_code == -1) {
@@ -115,19 +113,21 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
            menu = (Menu) xv_create(NULL, MENU,
                                    MENU_TITLE_ITEM,
                                    "Are you sure you used the HPF compiler ?",
-                                   MENU_ITEM, MENU_STRING, "*** No HPFC directory found ! ***", NULL,
+                                   MENU_ITEM, MENU_STRING, 
+				   "*** No HPFC directory found ! ***", NULL,
                                    NULL);
         }
         else if (file_number == 0) {
            user_warning("generate_a_menu_with_HPF_output_files",
                         "No file found in the directory \"%s\"... \n"
-                        " Have you run the HPFC compiler from the Compile menu?\n",
+                  " Have you run the HPFC compiler from the Compile menu?\n",
                         hpfc_directory);
 
            menu = (Menu) xv_create(NULL, MENU,
                                    MENU_TITLE_ITEM,
                                    "Are you sure you used the HPF compiler ?",
-                                   MENU_ITEM, MENU_STRING, "*** No HPFC file found ! ***", NULL,
+                                   MENU_ITEM, MENU_STRING, 
+				   "*** No HPFC file found ! ***", NULL,
                                    NULL);
         }
         else {
@@ -140,7 +140,8 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
            for(i = 0; i < file_number; i++)
               xv_set(menu, MENU_APPEND_ITEM,
                      xv_create(XV_NULL, MENUITEM,
-                               MENU_STRING, strdup(file_names[i]),
+                               MENU_STRING, 
+			       strdup(gen_array_item(file_names, i)),
                                MENU_RELEASE,
                                /* The strdup'ed string will also be
                                   freed when the menu is discarded: */
@@ -148,8 +149,7 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
                                NULL),
                      NULL);
 
-           args_free(&file_number,
-                     file_names);
+	   gen_array_full_free(file_names);
         }
         break;
      }
@@ -158,25 +158,24 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
        /* We cannot remove the menu here since the notify
           procedure is called afterward. */
        menu = (Menu) xv_get(menu_item, MENU_PULLRIGHT);
-       debug(2, "generate_a_menu_with_HPF_output_files", "MENU_DISPLAY_DONE\n");
+       pips_debug(2, "MENU_DISPLAY_DONE\n");
        break;
 
      case MENU_NOTIFY:
        /* Rely on the notify procedure. */
        menu = (Menu) xv_get(menu_item, MENU_PULLRIGHT);
-       debug(2, "generate_a_menu_with_HPF_output_files", "MENU_NOTIFY\n");
+       pips_debug(2, "MENU_NOTIFY\n");
        break;
 
      case MENU_NOTIFY_DONE:
        menu = (Menu) xv_get(menu_item, MENU_PULLRIGHT);
-       debug(2, "generate_a_menu_with_HPF_output_files", "MENU_NOTIFY_DONE\n");
+       pips_debug(2, "MENU_NOTIFY_DONE\n");
        break;
 
      default:
-       pips_error("generate_a_menu_with_HPF_output_files",
-                  "Unknown Menu_generate action: %d\n", action);
+       pips_internal_error("Unknown Menu_generate action: %d\n", action);
    }
-   debug(2, "generate_a_menu_with_HPF_output_files", "Exit\n");
+   pips_debug(2, "Exit\n");
    return menu;
 }
 
