@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/09 13:06:49 $, 
+ * $Date: 1997/04/10 16:52:55 $, 
  */
 
 #include <stdio.h>
@@ -37,7 +37,7 @@ bool tpips_execution_mode = TRUE;
 
 static bool use_readline;
 static FILE *logfile;
-static FILE * current_file;
+static FILE * current_file; /* current file being processed */
 extern int tgetnum();
 static char *usage = 
   "Usage: %s [-n] [-h/?] [-v] [-l logfilename] tpips-scripts\n";
@@ -62,6 +62,7 @@ static char **fun_completion();
 static char *fun_generator(char*,int);
 static char *param_generator(char*, int);
 static void initialize_readline();
+static char * tpips_read_a_line(char *);
 
 /***************************************************** Some static variables */
 
@@ -77,7 +78,8 @@ enum COMPLETION_TYPES {
     COMP_RULE,
     COMP_RESOURCE,
     COMP_PROPERTY,
-    COMP_HELP_TOPIC
+    COMP_HELP_TOPIC,
+    COMP_FILE_RSC
 };
 
 struct t_completion_scheme
@@ -146,15 +148,13 @@ static string tpips_user_request(fmt, args)
 char *fmt;
 va_list args;
 {
-    static char buf[TPIPS_REQUEST_BUFFER_LENGTH];
-
-    /* GO: Don't print the request if we are in batch mode */
     if (use_readline) {
-	fprintf(stderr,"\nWaiting for your response: ");
-	(void) vfprintf(stderr, fmt, args);
-	fflush(stderr);
+	(void) fprintf(stdout,"\nWaiting for your response: ");
+	(void) vfprintf(stdout, fmt, args);
+	fflush(stdout);
     }
-    return gets(buf);
+
+    return tpips_read_a_line(TPIPS_REQUEST_PROMPT);
 }
 
 /* Tpips user error */
@@ -555,12 +555,12 @@ static char * get_next_line(char * prompt)
 /* returns an allocated line read, including continuations.
  * may return NULL at end of file.
  */
-static char * tpips_read_a_line(void)
+static char * tpips_read_a_line(char * main_prompt)
 {
     char *line;
     int l;
 
-    line = get_next_line(TPIPS_PRIMARY_PROMPT);
+    line = get_next_line(main_prompt);
     
     /* handle backslash-style continuations
      */
@@ -671,7 +671,7 @@ static char * substitute_variables(char * line)
 
 /* processing command line per line
  */
-static void process_a_file()
+static void process_a_file(void)
 {
     char *last = NULL;
     char *line;
@@ -689,7 +689,7 @@ static void process_a_file()
 
     /*  interactive loop
      */
-    while ((line = tpips_read_a_line()))
+    while ((line = tpips_read_a_line(TPIPS_PRIMARY_PROMPT)))
     {
 	pips_debug(3, "considering line: %s\n", line? line: " --- empty ---");
 	if (setjmp(pips_top_level)) {
