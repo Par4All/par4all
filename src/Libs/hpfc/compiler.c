@@ -16,12 +16,9 @@ extern int fprintf();
 #include "genC.h"
 
 #include "ri.h"
-#include "mapping.h"
 #include "database.h"
 #include "hpf.h"
 #include "hpf_private.h"
-#include "entitymapping.h"
-#include "controlmapping.h"
 
 #include "misc.h"
 #include "ri-util.h"
@@ -247,10 +244,13 @@ statement *hoststatp, *nodestatp;
 
 		*hoststatp = make_continue_statement(entity_empty_label());
 		*nodestatp = overlapstat;
+		statement_comments(*nodestatp) = statement_comments(stat);
 	    }
 	    else
 	    {
 		debug(7, "hpfcompileloop", "overlap analysis is not ok...\n");
+
+		
 
 		hpfcompileparallelloop(stat, hoststatp, nodestatp);
 	    }
@@ -341,8 +341,8 @@ statement *hoststatp,*nodestatp;
 	
 	debug(7,"hpfcompilecall","no reference to distributed variable\n");
 
-	(*hoststatp)=MakeStatementLike(stat,is_instruction_call,hostgotos);
-	(*nodestatp)=MakeStatementLike(stat,is_instruction_call,nodegotos);
+	(*hoststatp)=MakeStatementLike(stat, is_instruction_call, hostgotos);
+	(*nodestatp)=MakeStatementLike(stat, is_instruction_call, nodegotos);
 	
 	instruction_call(statement_instruction((*hoststatp)))=
 	    make_call(call_function(c),leh);
@@ -363,16 +363,22 @@ statement *hoststatp,*nodestatp;
     if (ENTITY_ASSIGN_P(call_function(c)))
     {
 	list 
-	    lh=NULL,
-	    ln=NULL;
+	    lh = NIL,
+	    ln = NIL,
+	    args = call_arguments(c) ;
 	expression 
-	    w=EXPRESSION(CAR(call_arguments(c)));
+	    w = EXPRESSION(CAR(args)),
+	    r = EXPRESSION(CAR(CDR(args)));
 
-	pips_assert("hpfcompilecall",syntax_reference_p(expression_syntax(w)));
+	pips_assert("hpfcompilecall",
+		    syntax_reference_p(expression_syntax(w)));
 
 	if (array_distributed_p
 	    (reference_variable(syntax_reference(expression_syntax(w)))))
 	{
+
+	    /* !!! */
+
 	    /*
 	     * c1-alpha
 	     */
@@ -382,26 +388,52 @@ statement *hoststatp,*nodestatp;
 	}
 	else
 	{
-	    /*
-	     * c1-beta
+	    syntax 
+		s = expression_syntax(r);
+	    /* 
+	     * reductions are detected here. They are not handled otherwise
 	     */
-	    debug(8,"hpfcompilecall","c1-beta\n");
+	    
+	    if (syntax_call_p(s) && call_reduction_p(syntax_call(s)))
+	    {
+		statement
+		    sh = statement_undefined,
+		    sn = statement_undefined;
 
-	    generate_c1_beta(stat,&lh,&ln);
+		if (!compile_reduction(stat, &sh, &sn))
+		    pips_error("hpfcompilecall", "reduction compilation failed\n");
+
+		lh = CONS(STATEMENT, sh, NIL);
+		ln = CONS(STATEMENT, sn, NIL);
+	    }
+	    else
+	    {
+		/*
+		 * c1-beta
+		 */
+		debug(8,"hpfcompilecall","c1-beta\n");
+		
+		generate_c1_beta(stat, &lh, &ln);
+	    }
 	}
 
-	(*hoststatp)=MakeStatementLike(stat,is_instruction_block,hostgotos);
-	(*nodestatp)=MakeStatementLike(stat,is_instruction_block,nodegotos);
+	(*hoststatp) = MakeStatementLike(stat, is_instruction_block, hostgotos);
+	(*nodestatp) = MakeStatementLike(stat, is_instruction_block, nodegotos);
 	
-	instruction_block(statement_instruction(*hoststatp))=lh;
-	instruction_block(statement_instruction(*nodestatp))=ln;
+	instruction_block(statement_instruction(*hoststatp)) = lh;
+	instruction_block(statement_instruction(*nodestatp)) = ln;
 	
-	IFDBPRINT(8,"hpfcompilecall",hostmodule,(*hoststatp));
-	IFDBPRINT(8,"hpfcompilecall",nodemodule,(*nodestatp));
+	IFDBPRINT(8,"hpfcompilecall", hostmodule, (*hoststatp));
+	IFDBPRINT(8,"hpfcompilecall", nodemodule, (*nodestatp));
 	
 	return;
     }
-    
+
+    /*
+     * call to something with distributed variables, which is not
+     * an assignment. Since I do not use the effects as I should, nothing
+     * is done...
+     */
     user_warning("hpfcompilecall","not implemented yet\n");
 }
 
