@@ -316,7 +316,7 @@ generic_r_proper_effects_of_call(call c)
 	    /* hpfc specials are managed here... */
 	    le = NIL;
 	else
-	    pips_internal_error("unknown function %s\n", n);
+	    pips_internal_error("unknown function %s\n", entity_name(e));
         break;
 
     default:
