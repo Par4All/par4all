@@ -1,5 +1,4 @@
-/*
- * Align Checker
+/* Align Checker
  *
  * try to decide whether two references are aligned or not.
  * if not, gives back the alignement shift vector of the
@@ -9,33 +8,16 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1994/12/27 08:53:18 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1995/04/10 18:49:31 $, )
  * version $Revision$
- * got on %D%, %T%
  */
 
-
-#include <stdio.h>
-#include <values.h>
-
-extern int fprintf();
-
-#include "genC.h"
-
-#include "ri.h"
-#include "hpf.h"
-#include "hpf_private.h"
-#include "message.h"
-
-#include "ri-util.h"
-#include "misc.h"
-#include "effects.h"
-#include "hpfc.h"
 #include "defines-local.h"
 #include "access_description.h"
 
-/*
- * bool align_check(r1, r2, plint, pkind, pindx)
+#include "effects.h"
+
+/* bool align_check(r1, r2, plint, pkind, pindx)
  *
  * computes the shift vector that links the two references,
  * TRUE if every thing is ok, i.e. the vector is ok for the
