@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.129  1999/01/05 12:15:44  irigoin
+ * painful user_warning() in text_statement() transformed into a pips_debug()
+ * because it is OK for parsed code, before the controlizer is applied.
+ *
  * Revision 1.128  1998/12/21 15:08:03  ancourt
  * add a parameter to close_current_line
  *
@@ -225,7 +229,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.128 1998/12/21 15:08:03 ancourt Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.129 1999/01/05 12:15:44 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -2076,8 +2080,9 @@ text_statement(
 
     if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
        statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
-	/* we are in trouble with some kind of dead (?) code... */
-	pips_user_warning("I unexpectedly bumped into dead code?\n");
+	/* we are in trouble with some kind of dead (?) code... 
+	 but we might as well be dealing with some parsed_code */
+	pips_debug(1, "I unexpectedly bumped into dead code?\n");
     }
 
     if (same_string_p(label, RETURN_LABEL_NAME)) 
