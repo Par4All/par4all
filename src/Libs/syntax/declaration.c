@@ -323,11 +323,13 @@ value v;
     else
 	switch(type_tag(et)) {
 	case is_type_functional:
-	    if(d!=NIL)
-		user_error("DeclareVariable",
-			   "%s %s between lines %d and % d\n",
-			   "Attempt to dimension functional entity",
-			   entity_local_name(e), line_b_I, line_e_I);
+	    if(d!=NIL) {
+		user_warning("DeclareVariable",
+			     "%s %s between lines %d and % d\n",
+			     "Attempt to dimension functional entity",
+			     entity_local_name(e), line_b_I, line_e_I);
+		ParserError("DeclareVariable", "Likely name conflict\n");
+	    }
 	    if(t == type_undefined)
 		/* no new information: do nothing */
 		;
@@ -340,11 +342,14 @@ value v;
 		    functional_result(type_functional(et)) = nt;
 		    /* the old type should be gen_freed... */
 		}
-		else
-		    user_error("DeclareVariable",
-			       "%s %s between lines %d and % d\n",
-			       "Redefinition of functional type for entity",
-			       entity_local_name(e), line_b_I, line_e_I);
+		else {
+		    user_warning("DeclareVariable",
+				 "%s %s between lines %d and % d\n",
+				 "Redefinition of functional type for entity",
+				 entity_local_name(e), line_b_I, line_e_I);
+		    ParserError("DeclareVariable",
+				"Possible name conflict?\n");
+		}
 	    break;
 	case is_type_variable:
 	    etd = variable_dimensions(type_variable(et));
@@ -354,11 +359,13 @@ value v;
 		    variable_dimensions(type_variable(et)) = d;
 		else if (d==NIL)
 		    ;
-		else
-		    user_error("DeclareVariable",
-			       "%s %s between lines %d and % d\n",
-			       "Redefinition of dimension for entity",
-			       entity_name(e), line_b_I, line_e_I);
+		else {
+		    user_warning("DeclareVariable",
+				 "%s %s between lines %d and % d\n",
+				 "Redefinition of dimension for entity",
+				 entity_name(e), line_b_I, line_e_I);
+		    ParserError("DeclareVariable", "Name conflict?\n");
+		}
 	    }
 	    else {
 		pips_assert("DeclareVariable",
@@ -371,11 +378,13 @@ value v;
 			variable_dimensions(type_variable(et)) = d;
 		    else if (d==NIL)
 			;
-		    else
-			user_error("DeclareVariable",
-				   "%s %s between lines %d and % d\n",
-				   "Redefinition of dimension for entity",
-				   entity_local_name(e), line_b_I, line_e_I);
+		    else {
+			user_warning("DeclareVariable",
+				     "%s %s between lines %d and % d\n",
+				     "Redefinition of dimension for entity",
+				     entity_local_name(e), line_b_I, line_e_I);
+			ParserError("DeclareVariable", "Name conflict?\n");
+		    }
 		    /* update type */
 		    nt = MakeTypeVariable
 			(gen_copy_tree(variable_basic(type_variable(t))),
@@ -400,19 +409,26 @@ value v;
 			free_type(nt);
 		    }
 		}
-		else
-		    user_error("DeclareVariable",
-			       "%s %s between lines %d and % d\n",
-			       "Redefinition of type for entity",
-			       entity_local_name(e), line_b_I, line_e_I);
+		else {
+		    user_warning("DeclareVariable",
+				 "%s %s between lines %d and % d\n",
+				 "Redefinition of type for entity",
+				 entity_local_name(e), line_b_I, line_e_I);
+		    ParserError("DeclareVariable",
+				"Name conflict or declaration ordering "
+				"not supported by PIPS\n"
+				"Late typing of formal parameter and/or "
+				"interference with IMPLICIT\n");
+		}
 	    }
 	    break;
 	case is_type_area:
-	    user_error("DeclareVariable",
-		       "%s %s between lines %d and % d\n%s\n",
-		       "COMMON/VARIABLE homonymy for entity name",
-		       entity_local_name(e), line_b_I, line_e_I,
-		       "Rename your common.");
+	    user_warning("DeclareVariable",
+			 "%s %s between lines %d and % d\n%s\n",
+			 "COMMON/VARIABLE homonymy for entity name",
+			 entity_local_name(e), line_b_I, line_e_I,
+			 "Rename your common.");
+	    ParserError("DeclareVariable", "Name conflict\n");
 	    break;
 	default:
 	    pips_error("DeclareVariable",
@@ -599,12 +615,16 @@ void update_common_sizes()
 		       "set size %d for common %s\n", s, entity_name(c));
 	}
 	else if (area_size(ac) != s)
-/*	    user_error("update_common_sizes",
+/*	    user_warning("update_common_sizes",
 		       "inconsistent size (%d and %d) for common %s in %s\n",
 		       area_size(ac), s, entity_name(c), 
-		       CurrentPackage);*/
+		       CurrentPackage);
+		       ParserError("update_common_sizes", "
+*/
 	    user_warning("update_common_sizes",
-			 "inconsistent size (%d and %d) for common %s in %s\n",
+			 "inconsistent size (%d and %d) for common %s in %s\n"
+			 "Best results are obtained if all instances of a "
+			 "COMMON are declared the same way.",
 			 area_size(ac), s, entity_name(c), 
 			 CurrentPackage);
 	else {
@@ -725,6 +745,21 @@ entity e;
 		       "[implicit_type_p] illegal basic tag\n");
 	}
     return FALSE; /* to please gcc */
+}
+
+void retype_formal_parameters()
+{
+    entity m = get_current_module_entity();
+    list vars = code_declarations(value_code(entity_initial(m)));
+
+    MAP(ENTITY, v, {
+	if(formal_parameter_p(v)) {
+	    if(!implicit_type_p(v)) {
+		free_type(entity_type(v));
+		entity_type(v) = ImplicitType(v);
+	    }
+	}
+    }, vars);
 }
 
 /* this function creates a type that represents a fortran type. its basic
