@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/08/30 10:35:50 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/08/30 14:33:11 $, )
  * version $Revision$
  */
 
@@ -751,6 +751,9 @@ expression_number_for_index(entity index, list /* of expression */ le)
     return 0;
 }
 
+#define XDEBUG(msg) \
+  pips_debug(3, "%s and %s: " msg "\n", entity_name(e1), entity_name(e2))
+
 bool 
 references_aligned_p(reference r1, reference r2)
 {
@@ -766,9 +769,15 @@ references_aligned_p(reference r1, reference r2)
     /* both references must be aligned to the same template
      * and be of the same arity.
      */
-    if (align_template(a1)!=align_template(a2) ||
-	gen_length(le1)==gen_length(le2))
-	return FALSE;
+    if (align_template(a1)!=align_template(a2))
+    {
+	XDEBUG("template is different"); return FALSE;
+    }
+
+    if (gen_length(le1)!=gen_length(le2))
+    {
+	XDEBUG("arities are different"); return FALSE;
+    }
     
     MAP(EXPRESSION, ind, 
     {
@@ -779,13 +788,15 @@ references_aligned_p(reference r1, reference r2)
 	dim2 = expression_number_for_index(index, le2);
 
 	if (!alignments_compatible_p(e1, dim1, e2, dim2))
-	    return FALSE;
+	{
+	    XDEBUG("alignments are incompatible"); return FALSE;
+	}
 	
 	dim1++;
     },
 	le1);
 
-    return TRUE;
+    XDEBUG("aligned!"); return TRUE;
 }
 
 /*   that is all
