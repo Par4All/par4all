@@ -150,9 +150,9 @@ add_actual_return_code(list apl)
 
     if(substitute_rc_p && !ENDP(get_alternate_returns())) {
 	entity frc = GetReturnCodeVariable();
-	expression frcr = entity_to_expression(frc);
 
-	/* Type, storage and initial value may have been set up earlier in MakeFormalParameter() */
+	/* Type, storage and initial value may have been set up earlier in
+           MakeFormalParameter() */
 	if(type_undefined_p(entity_type(frc))) {
 	    string module_name = get_current_module_name();
 	    entity f = local_name_to_top_level_entity(module_name);
@@ -168,7 +168,7 @@ add_actual_return_code(list apl)
 
 	    entity_initial(frc) = MakeValueUnknown();
 	}
-	new_apl = gen_nconc(apl, CONS(EXPRESSION,frcr , NIL));
+	new_apl = gen_nconc(apl, CONS(EXPRESSION, entity_to_expression(frc), NIL));
     }
     return new_apl;
 }
