@@ -122,6 +122,8 @@ char *s ;
 /* MAX_TABULATED_ELEMENTS returns the maximum number of elements for 
    tabulated domains. */
 
+#define DEFAULT_MTE 12000
+
 int max_tabulated_elements(void)
 {
   static int max = -1 ;
@@ -130,10 +132,10 @@ int max_tabulated_elements(void)
   {
       char *s = getenv("NEWGEN_MAX_TABULATED_ELEMENTS");
 
-      if (s) /* value taken from the environment */
-	  max = atoi(s);
+      if (s) 
+	  max = atoi(s); /* value taken from the environment */
       else
-	  max = 12000; /* default value assume if nothing specified */
+	  max = DEFAULT_MTE; /* default value assume if nothing specified */
   }
 
   return max;
