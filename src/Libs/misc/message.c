@@ -58,11 +58,8 @@ void (* pips_log_handler)(char * fmt, va_list args) = default_user_log;
 void user_log(char * a_message_format, ...)
 {
     va_list some_arguments;
-
     va_start(some_arguments, a_message_format);
-
     (* pips_log_handler)(a_message_format, some_arguments);
-
     va_end(some_arguments);
 }
 
@@ -103,7 +100,6 @@ string user_request(char * a_message_format, ...)
 {
    string str;
    va_list some_arguments;
-
    va_start(some_arguments, a_message_format);
    str = (* pips_request_handler)(a_message_format, some_arguments);
    va_end(some_arguments);
@@ -131,29 +127,19 @@ default_user_warning(char * calling_function_name,
  * top-level (eg. wpips) may need a special user_warning proceedure; they 
  * should let pips_warning_handler point toward it.
  */
-void (* pips_warning_handler)(char *,
-                              char *,
-                              va_list *) = default_user_warning;
+void (* pips_warning_handler)
+    (char *, char *, va_list *) = default_user_warning;
 
-/* USER_WARNING(fonction, format [, arg] ... )
- * string fonction, format;
- */
-/*VARARGS2*/
 void
 user_warning(char * calling_function_name,
              char * a_message_format,
              ...)
 {
    va_list some_arguments;
-
    if (get_bool_property("NO_USER_WARNING")) return; /* FC */
-
    va_start(some_arguments, a_message_format);
-
-   (* pips_warning_handler)(calling_function_name,
-                            a_message_format,
-                            &some_arguments);
-
+   (* pips_warning_handler)
+       (calling_function_name, a_message_format, &some_arguments);
    va_end(some_arguments);
 }
 
@@ -161,12 +147,13 @@ user_warning(char * calling_function_name,
  */
 void 
 pips_user_warning_function(
-   char * format,
-   ...)
+    char * format,
+    ...)
 {
     va_list args;
+    if (get_bool_property("NO_USER_WARNING")) return; /* FC */
     va_start(args, format);
-    user_warning("unknown", format, args);
+    (* pips_warning_handler)(not_known, format, &args);
     va_end(args);
 }
 
@@ -177,7 +164,7 @@ pips_user_error_function(
 {
     va_list args;
     va_start(args, format);
-    user_error("unknown", format, args);
+    (*pips_error_handler)(not_known, format, &args);
     va_end(args);
 }
 
@@ -186,10 +173,14 @@ pips_internal_error_function(
    char * format,
    ...)
 {
-    va_list args;
-    va_start(args, format);
-    pips_error("unknown", format, args);
-    va_end(args);
+   va_list some_arguments;
+   (void) fprintf(stderr, "pips error in %s: ", not_known);
+   va_start(some_arguments, format);
+   (void) vfprintf(stderr, format, some_arguments); /* ??? */
+   va_end(some_arguments);
+
+   /* create a core file for debug */
+   (void) abort();
 }
 
 /* make sure the user has noticed something */
@@ -232,7 +223,7 @@ Modifications:
    But each user_error function should have the same functionalities.
 */
 
-void
+static void
 default_user_error(char * calling_function_name,
                    char * a_message_format,
                    va_list *some_arguments)
@@ -261,11 +252,6 @@ default_user_error(char * calling_function_name,
          user_error_called = TRUE;
       }
 
-      /*prompt_user schould be used... if it were implemented!*/
-      /*prompt_user("Something went wrong. Flash back to top_level.");*/
-      /*prompt_user("Something went wrong. Flash back to exception handler.");*/
-
-      /* longjmp(pips_top_level, 2); */
       ljbp = top_pips_context_stack();
       longjmp(*ljbp, 2);
    }
@@ -275,30 +261,19 @@ default_user_error(char * calling_function_name,
  * top-level (eg. wpips) may need a special user_error proceedure; they 
  * should let pips_error_handler point toward it.
  */
-void (* pips_error_handler)(char *,
-                            char *,
-                            va_list *) = default_user_error;
+void (* pips_error_handler)(char *, char *, va_list *) = default_user_error;
 
-/* USER_ERROR(fonction, format [, arg] ... )
- * string fonction, format;
- */
-/*VARARGS2*/
 void
 user_error(char * calling_function_name,
            char * a_message_format,
            ...)
 {
    va_list some_arguments;
-
    va_start(some_arguments, a_message_format);
-
-   (* pips_error_handler)(calling_function_name,
-                          a_message_format,
-                          &some_arguments);
-
+   (* pips_error_handler)
+       (calling_function_name, a_message_format, &some_arguments);
    va_end(some_arguments);
 }
-
 
 
 /* PIPS_ERROR is a function that should be called to terminate PIPS
@@ -309,25 +284,17 @@ where function is a string containing the name of the function
 calling PIPS_ERROR, and where format and arg-list are passed as
 arguments to vprintf. PIPS_ERROR terminates execution with abort.
 */
-/* PIPS_ERROR(fonction, format [, arg] ... )
- * string fonction, format;
- */
-/*VARARGS2*/
+
 void
-pips_error(char * calling_function_name,
-           char * a_message_format,
-           ...)
+pips_error(
+    char * calling_function_name,
+    char * a_message_format,
+    ...)
 {
    va_list some_arguments;
-
-   /* print name of function causing error */
    (void) fprintf(stderr, "pips error in %s: ", calling_function_name);
-
    va_start(some_arguments, a_message_format);
-
-   /* print out remainder of message */
    (void) vfprintf(stderr, a_message_format, some_arguments);
-
    va_end(some_arguments);
 
    /* create a core file for debug */
@@ -338,31 +305,13 @@ pips_error(char * calling_function_name,
 is issued and the program aborted. The first argument is the function name.
   pips_assert(function_name, boolean);
 */
-/*VARARGS1*/
-/*
-void pips_assert(va_alist)
-va_dcl
-{
-    va_list args;
-    char *function ;
 
-    va_start(args);
-    function = va_arg(args, char *) ;
-
-    if( va_arg( args, int ) == 0 ) {
-	(void) fprintf(stderr, "pips assertion failed in %s: ", function ) ;
-
-	va_end(args);
-
-	(void) abort();
-    }
-}
-*/
-
-/*  new version without varargs, FC 09/06/94
- */
-void pips_assert_function(char * function, int predicate,
-			  int line, char * file)
+void 
+pips_assert_function(
+    char * function, /* the name of the function if available */
+    int predicate,   /* predicate to be tested */
+    int line,        /* location of the assertion */
+    char * file)     /* location of the assertion */
 {
     /* print name of function causing error and
      * create a core file for debug 
