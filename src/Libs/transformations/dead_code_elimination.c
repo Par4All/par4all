@@ -7,6 +7,10 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.21  2000/07/05 08:46:16  coelho
+  bug fixed:
+  unstructured if with dead then or else... when branches where equal.
+
   Revision 1.20  2000/07/05 07:11:02  coelho
   new debug stuff
 
@@ -414,10 +418,10 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
    has no write proper effect. If x has a write effect, replace s with a
    statement as bool_var = x: (he', a french joke !)
    this_test_is_unstructured_p is a hint for the statistics.
-   TRUE means that you assert that the test is unstructured. */
-static void
-remove_if_statement_according_to_write_effects(statement s,
-					       bool this_test_is_unstructured_p)
+   TRUE means that you assert that the test is unstructured.
+ */
+static void remove_if_statement_according_to_write_effects
+(statement s, bool this_test_is_unstructured_p)
 {
    instruction i = statement_instruction(s);
 
@@ -447,6 +451,7 @@ remove_if_statement_according_to_write_effects(statement s,
       else
 	  dead_code_if_removed++;
    }
+
    /* Discard the IF: */
    free_instruction(i);
 }
@@ -569,7 +574,6 @@ dead_unstructured_test_filter(statement st)
     return test_status;
 }
 
-
 static void
 dead_recurse_unstructured(unstructured u)
 {
@@ -601,41 +605,42 @@ dead_recurse_unstructured(unstructured u)
 	    control false_control = CONTROL(CAR(CDR(control_successors(c))));
 
 	    switch (dead_unstructured_test_filter(st)) {
-		case then_is_dead :
-		  pips_debug(3, "\"Then\" is dead...");
-		/* Remove the link to the THEN control
-		   node. Rely on unspaghettify() to remove
-		   down this path later: */
-		gen_remove(&control_successors(c), true_control);
-		gen_remove(&control_predecessors(true_control), c);
-		/* Replace the IF with nothing or its expression: */
-		remove_if_statement_according_to_write_effects(control_statement(c), TRUE /* unstructured if */);
-                         
-		some_unstructured_ifs_have_been_changed = TRUE;
-		dead_code_unstructured_if_true_branch_removed++;
-		break;
+	    case then_is_dead :
+	      pips_debug(3, "\"Then\" is dead...");
+	      /* Remove the link to the THEN control
+		 node. Rely on unspaghettify() to remove
+		 down this path later: */
+	      gen_remove_once(&control_successors(c), true_control);
+	      gen_remove_once(&control_predecessors(true_control), c);
+	      /* Replace the IF with nothing or its expression: */
+	      remove_if_statement_according_to_write_effects
+		(control_statement(c), TRUE /* unstructured if */);
+	      
+	      some_unstructured_ifs_have_been_changed = TRUE;
+	      dead_code_unstructured_if_true_branch_removed++;
+	      break;
                          
 	    case else_is_dead :
 	      pips_debug(3, "\"Else\" is dead...");
-		/* Remove the link to the ELSE control
-		   node. Rely on unspaghettify() to remove
-		   down this path later: */
-		gen_remove(&control_successors(c), false_control);
-		gen_remove(&control_predecessors(false_control), c);
-		/* Replace the IF with nothing or its expression: */
-		remove_if_statement_according_to_write_effects(control_statement(c), TRUE /* unstructured if */);
-                         
-		some_unstructured_ifs_have_been_changed = TRUE;
-		dead_code_unstructured_if_false_branch_removed++;
-		break;
-                         
+	      /* Remove the link to the ELSE control
+		 node. Rely on unspaghettify() to remove
+		 down this path later: */
+	      gen_remove_once(&control_successors(c), false_control);
+	      gen_remove_once(&control_predecessors(false_control), c);
+	      /* Replace the IF with nothing or its expression: */
+	      remove_if_statement_according_to_write_effects
+		(control_statement(c), TRUE /* unstructured if */);
+	      
+	      some_unstructured_ifs_have_been_changed = TRUE;
+	      dead_code_unstructured_if_false_branch_removed++;
+	      break;
+	      
 	    case nothing_about_test :
 	      pips_debug(3, "Nothing about this test...");
-		break;
-                         
+	      break;
+	      
 	    default :
-		pips_error("dead_deal_with_test",
-			   "does not understand dead_test_filter()");
+	      pips_internal_error("does not understand dead_test_filter()");
 	    }
 	}
 	else
