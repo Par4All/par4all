@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/12/19 10:56:07 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/12/26 16:26:49 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -470,7 +470,7 @@ list gen_nthcdr(n, l )
 int n ;
 list l ;
 {
-    assert(n>=0);
+    message_assert("valid n", n>=0);
     for (; !ENDP(l) && n>0; l=CDR(l), n--);
     return(l);
 }
@@ -481,7 +481,9 @@ gen_chunk gen_nth(n, l)
 int n;
 list l;
 {
-    return(CAR(gen_nthcdr(n, l)));
+    list r = gen_nthcdr(n, l);
+    message_assert("not NIL", r);
+    return CAR(r);
 }
 
 list gen_once(item, l)
