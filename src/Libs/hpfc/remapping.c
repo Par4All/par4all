@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.66  1998/04/02 20:36:39  irigoin
+ * Call to NumberOfElements() replaced by call to element_number()
+ *
  * Revision 1.65  1998/03/17 16:52:23  coelho
  * clearer debug messages.
  *
@@ -360,7 +363,7 @@ processor_loop(
 		     contrainte_make
 		     (vect_make(VECTEUR_NUL,
 				hpfc_name_to_entity(MYLID), VALUE_ONE, 
-				TCST, int_to_value(- NumberOfElements
+				TCST, int_to_value(- element_number
       (variable_dimensions(type_variable(entity_type(psi))))))));
 
     DEBUG_SYST(5, "P simpler", simpler);
