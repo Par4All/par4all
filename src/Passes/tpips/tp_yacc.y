@@ -88,16 +88,16 @@ static void print_property(char*,property);
 
 /********************************************************** static variables */
 static t_file_list the_file_list;
-static execution_mode = TRUE;
+extern bool tpips_execution_mode;
 
 %}
 
 %union {
-	int status;
-	string name;
-	res_or_rule rn;
-	list owner;
-	t_file_list *args;
+    int status;
+    string name;
+    res_or_rule rn;
+    list owner;
+    t_file_list *args;
 }
 
 %%
@@ -132,7 +132,7 @@ i_open:
 
 	    debug(7,"yyparse","reduce rule i_open\n");
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		if (db_get_current_workspace_name() != NULL)
 		    close_workspace ();
 		if (( $$ = open_workspace (yylval.name)))
@@ -168,7 +168,7 @@ i_create:
 	    
 	    debug(7,"yyparse","reduce rule i_create\n");
 	    
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		if (workspace_exists_p($<name>4))
 		    user_error ("create",
 				"Workspace %s already exists. Delete it!\n",
@@ -213,7 +213,7 @@ i_close:
 	{
 	    debug(7,"yyparse","reduce rule i_close\n");
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		if (db_get_current_workspace_name() != NULL) {
 		    close_workspace ();
 		    $$ = TRUE;
@@ -238,7 +238,7 @@ i_delete:
 
 	    debug(7,"yyparse","reduce rule i_delete\n");
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		string wname = db_get_current_workspace_name();
 		if ((wname != NULL) && same_string_p(wname, t)) {
 		    user_error ("delete",
@@ -271,7 +271,7 @@ i_module:
 
 	    debug(7,"yyparse","reduce rule i_module\n");
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		if (db_get_current_workspace_name()) {
 		    lazy_open_module (strupper(t,t));
 		    $$ = TRUE;
@@ -298,7 +298,7 @@ i_make:
 
 	    debug(7,"yyparse","reduce rule i_make\n");
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		MAPL(e, {
 		    if (safe_make ($3.the_name, STRING(CAR(e))) == FALSE) {
 			result = FALSE;
@@ -335,7 +335,7 @@ i_apply:
 		user_error("apply", "Open or create a workspace first!\n");
 	    }
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		MAPL(e, {
 		    if (safe_apply ($3.the_name, STRING(CAR(e))) == FALSE) {
 			result = FALSE;
@@ -371,7 +371,7 @@ i_display:
 		user_error("display", "Open or create a workspace first!\n");
 	    }
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		string pager;
 
 		if ( (isatty(0)) || (!(pager = getenv("PAGER"))))
@@ -414,7 +414,7 @@ i_activate:
 		user_error("activate", "Open or create a workspace first!\n");
 	    }
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		user_log("Selecting rule: %s\n", $3);
 		activate ($3);
 		$$ = TRUE;
@@ -437,7 +437,7 @@ i_set:
 	    debug(7,"yyparse","reduce rule i_set(%s,%s)\n",
 		  $<name>4,yylval.name);
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 	    
 		p = get_property ($<name>4);
 		strupper (yylval.name,yylval.name);
@@ -507,7 +507,7 @@ i_get:
 	    debug(7,"yyparse","reduce rule i_get (%s)\n",
 		  yylval.name);
 	    
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		p = get_property (yylval.name);
 	    
 		print_property(yylval.name, p);
@@ -600,7 +600,7 @@ owner:
 
 	    debug(7,"yyparse","reduce rule owner (ALL)\n");
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		db_get_module_list(&nmodules, module_list);
 		message_assert("yyparse", nmodules>0);
 		for(i=0; i<nmodules; i++) {
@@ -619,7 +619,7 @@ owner:
 	{
 	    debug(7,"yyparse","reduce rule owner (PROGRAM)\n");
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		$$ = CONS(STRING, db_get_current_workspace_name (), NIL);
 	    }
 	}
@@ -635,7 +635,7 @@ owner:
 
 	    debug(7,"yyparse","reduce rule owner (MAIN)\n");
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		db_get_module_list(&nmodules, module_list);
 		message_assert("yyparse", nmodules>0);
 		for(i=0; i<nmodules; i++) {
@@ -661,7 +661,7 @@ owner:
 	{
 	    debug(7,"yyparse","reduce rule owner (MODULE)\n");
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		$$ = CONS(STRING, db_get_current_module_name (), NIL);
 	    }
 	}
@@ -677,7 +677,7 @@ owner:
 
 	    debug(7,"yyparse","reduce rule owner (CALLEES)\n");
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		if (safe_make(DBR_CALLEES, db_get_current_module_name())
 		    == FALSE) {
 		  pips_error("ana_syn.y", "Cannot make callees for %s\n",
@@ -707,7 +707,7 @@ owner:
 	    list result = NIL;
 
 	    debug(7,"yyparse","reduce rule owner (CALLERS)\n");
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		if (safe_make(DBR_CALLERS, db_get_current_module_name())
 		    == FALSE) {
 		  pips_error("ana_syn.y", "Cannot make callers for %s\n",
@@ -734,8 +734,8 @@ owner:
 	{
 	    debug(7,"yyparse","reduce rule owner (none)\n");
 
-	    if (execution_mode) {
-			$$ = CONS(STRING, db_get_current_module_name (), NIL);
+	    if (tpips_execution_mode) {
+		$$ = CONS(STRING, db_get_current_module_name (), NIL);
 	    }
 	}
 	;
@@ -749,7 +749,7 @@ list_of_owner_name:
 	    debug(7,"yyparse",
 		  "reduce rule owner list (name = %s)\n",$<name>2);
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		char *c = $<name>2;
 		strupper (c, c);
 		$$ = gen_nconc($4,CONS(STRING, c, NIL));
@@ -762,7 +762,7 @@ list_of_owner_name:
 	{
 	    debug(7,"yyparse","reduce rule owner list(name = %s)\n",$<name>2);
 
-	    if (execution_mode) {
+	    if (tpips_execution_mode) {
 		char *c = $<name>2;
 		strupper (c, c);
 		$$ = CONS(STRING, c, NIL);
@@ -831,10 +831,4 @@ static void print_property(char* pname, property p)
 		break;
     }
     }
-}
-
-void init_execution_mode()
-{
-    execution_mode = get_bool_property("TPIPS_NO_EXECUTION_MODE") ?
-	FALSE : TRUE ;
 }
