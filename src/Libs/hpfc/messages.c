@@ -1,6 +1,6 @@
 /* Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1996/07/23 15:08:29 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1996/09/21 12:22:26 $, )
  * version $Revision$
  * 
  * Fabien Coelho, August 1993
@@ -557,8 +557,8 @@ message m;
 	t = t*SizeOfIthDimension(processor, i) + VALUE_TO_INT(vi) ;
     }
 
-    message_neighbour(m) =
-	(gen_chunk*) vect_add(v, vect_new(TCST, int_to_value(t)));
+    message_neighbour_(m) =
+	newgen_Pvecteur(vect_add(v, vect_new(TCST, int_to_value(t))));
 
     return(m);
 }
