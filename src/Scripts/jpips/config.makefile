@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.11  1998/10/17 10:09:35  coelho
+# jar 1.2b4 not yet as expected.
+#
 # Revision 1.10  1998/10/17 10:01:51  coelho
 # simpler jar generation.
 #
@@ -135,8 +138,12 @@ $(JZIP): $(OJ_FILES)
 		$(ZIP) $(ZIPFLAGS) $$pwd/$@ $(package)/*.class
 
 # jar files are a little bigger than simple zip files.
+# $(JAR) $(JARFLAGS) $@ -C $(pkg_dir) $(pkg_dir)/$(package)/*.class
+
 $(JJAR): $(OJ_FILES)
-	$(JAR) $(JARFLAGS) $@ -C $(pkg_dir) $(pkg_dir)/$(package)/*.class
+	pwd=`pwd` ; cd $(pkg_dir); \
+		$(JAR) $(JARFLAGS) $$pwd/$@ $(package)/*.class
+
 
 zrun: $(JZIP)
 	CLASSPATH=$(JZIP) $(JAVA) $(JFLAGS) $(package).JPips
