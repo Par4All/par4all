@@ -48,14 +48,13 @@ void set_pips_context_stack()
 
 void pop_pips_context()
 {
-    message_assert("empty pips_context stack", pcsp >= 0);
-
-    if(pcsp>1) {
+    if(pcsp>=0) {
 	pcsp--;
 	set_debug_stack_pointer(pips_context_stack[pcsp].debug_stack_pointer);
     }
     else
-	/* Once PIPS is started, the stack should never be empty again */
+	/* Once PIPS is started, the stack should never be empty again...
+	 but tpips is easier to program with an empty stack... */
 	pips_error ("pop_pips_context",
 		    "No more handler for user_error()!\n");
 }
@@ -64,7 +63,7 @@ void push_pips_context(jmp_buf * pljb)
 {
     int dsp = get_debug_stack_pointer();
 
-    message_assert("push_pips_context", pcsp < PIPS_CONTEXT_STACK_DEPTH-1);
+    pips_assert("push_pips_context", pcsp < PIPS_CONTEXT_STACK_DEPTH-1);
 
     pcsp++;
     pips_context_stack[pcsp].long_jump_buffer = pljb;
