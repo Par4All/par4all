@@ -31,11 +31,11 @@ extern int iPrevComm;
 #define FORMATLENGTH (4096)
 #define LOCAL static
 
+#ifndef
 #define abs(v) (((v) < 0) ? -(v) : (v))
+#endif
 
-extern char * getenv();
-
-
+/* extern char * getenv(); */
 
 #define Warning(f,m) \
 (user_warning(f,"Warning between lines %d and %d\n%s\n",line_b_I,line_e_I,m) )
