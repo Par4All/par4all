@@ -122,6 +122,18 @@ basic b;
 /* this function computes the number of elements of a variable. ld is the
 list of dimensions of the variable */
 
+int
+element_number(list ld)
+{
+    int en = 0;
+
+    if(!NumberOfElements(ld, &en)) {
+	pips_error("element_number", "Probably varying size array\n");
+    }
+
+    return en;
+}
+
 bool
 NumberOfElements(list ld, int * n)
 {
