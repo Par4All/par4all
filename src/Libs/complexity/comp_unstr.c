@@ -103,7 +103,10 @@ list effects_list;
 
 	for (i=1; i<=n_controls; i++) {
 	    for (j=1; j<=n_controls; j++ ) {
-		FA(i-1,j-1) = (float)(ACCESS(B, n_controls, i, j))/DENOMINATOR(B);
+		Value n = ACCESS(B, n_controls, i, j),
+		      de = DENOMINATOR(B),
+		      r = value_div(n,de);
+		FA(i-1,j-1) = VALUE_TO_FLOAT(r);
 	    }
 	}
 
@@ -266,7 +269,10 @@ control control_array[];
     for (i=1; i<=n_controls; i++) {
 	n_succs = 0;
 	for (j=1; j<=n_controls; j++)
-	    n_succs += ACCESS(P, n_controls, i, j);
+	{ 
+	    Value a =ACCESS(P, n_controls, i, j);
+	    n_succs += VALUE_TO_INT(a);
+	}
 	if (n_succs > max_n_succs) 
 	    max_n_succs = n_succs;
     }
@@ -279,15 +285,20 @@ control control_array[];
     /* computes probabilities (0<=p<1) out of the matrix "is_successor_of" */
 
     
-    DENOMINATOR(P) = factorielle(max_n_succs);
+    DENOMINATOR(P) = int_to_value(factorielle(max_n_succs));
 
     for (i=1; i<=n_controls; i++) {
 	n_succs = 0;
-	for (j=1; j<=n_controls; j++)
-	    n_succs += ACCESS(P, n_controls, i, j);
+	for (j=1; j<=n_controls; j++) {
+	    Value a =ACCESS(P, n_controls, i, j);
+	    n_succs += VALUE_TO_INT(a);
+	}
 	if (n_succs>0)
 	    for (j=1; j<=n_controls; j++)
-		ACCESS(P, n_controls, i, j) *= DENOMINATOR(P)/n_succs; 
+	    {
+		Value x = value_div(DENOMINATOR(P),int_to_value(n_succs));
+		value_product(ACCESS(P, n_controls, i, j),x) ; 
+	    }
     }
 
     matrice_normalize(P, n_controls, n_controls);
@@ -337,7 +348,7 @@ boolean already_examined[];
 	}
 
 	/* Here, we give equal possibility , 1 for each one */
-	ACCESS(P, n_controls, i, j) = 1;
+	ACCESS(P, n_controls, i, j) = VALUE_ONE;
 	if (!already_examined[j])
 	    node_successors_to_matrix(succ, P, n_controls,
 				      control_array, already_examined);
