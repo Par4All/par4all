@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.4 2004/08/22 21:11:52 verdoolaege Exp $
+ * $Id: arithmetique.h,v 1.5 2005/02/28 13:32:25 loechner Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -70,7 +70,12 @@
 
 #define LINEAR_VALUE_STRING "long long int"
 typedef long long int Value;
-#define VALUE_FMT "%lld"
+#if defined(WIN32) && !defined(unix)
+    /* Mingw or Windows need an incompatible format string. */
+#   define VALUE_FMT "%I64d"
+#else
+#   define VALUE_FMT "%lld"
+#endif
 #define VALUE_CONST(val) (val##LL) 
 
 /* 
