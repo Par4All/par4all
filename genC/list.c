@@ -210,7 +210,8 @@ void gen_free_list(list l)
     list p, nextp ;
     for( p = l ; p != NIL ; p = nextp ) {
 	nextp = p->cdr ;
-	*p = NEWGEN_FREED; /* clean */
+	CAR(p).p = NEWGEN_FREED; /* clean */
+	CDR(p) = (struct cons*) NEWGEN_FREED;
 	free( p ) ;
     }
 }
@@ -414,7 +415,8 @@ static void gen_remove_from_list(list * pl, void * o, bool once)
     {
       list tmp = *pc;
       *pc = CDR(*pc);
-      *tmp = NEWGEN_FREED;
+      CAR(tmp).p = NEWGEN_FREED;
+      CDR(tmp) = NEWGEN_FREED;
       free(tmp);
       if (once) return;
     }
@@ -505,7 +507,7 @@ bool gen_once_p(list l)
  * @param p pointer to the zone to be freed.
  * @param size size in bytes.
  */
-void gen_free_area(void * p, int size)
+void gen_free_area(void ** p, int size)
 {
   int n = size/sizeof(void*);
   int i;
@@ -531,7 +533,7 @@ void gen_sort_list(list l, int (*compare)())
     list c;
     int n = gen_length(l);
     gen_chunk 
-	**table = (gen_chunk**) malloc(sizeof(gen_chunk*)*n),
+	**table = (gen_chunk**) malloc(n*sizeof(gen_chunk*)),
 	**point;
 
     /*   the list items are first put in the temporary table,
@@ -548,7 +550,7 @@ void gen_sort_list(list l, int (*compare)())
     for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
 	CHUNK(CAR(c)) = *point;
 
-    gen_free_area(table, n*sizeof(gen_chunk*)); 
+    gen_free_area((void**) table, n*sizeof(gen_chunk*)); 
 }
 
 /* void gen_closure(iterate, initial)
@@ -624,7 +626,8 @@ gen_list_and(list * a,
 	cons *aux = *a;
 
 	*a = CDR(*a);
-	*aux = NEWGEN_FREED;
+	CAR(aux).p = NEWGEN_FREED;
+	CDR(aux) = NEWGEN_FREED;
 	free(aux);
 	gen_list_and(a, b);
     }
@@ -635,8 +638,7 @@ gen_list_and(list * a,
 
 /* Compute A = A inter non B: */
 void
-gen_list_and_not(list * a,
-		 list b)
+gen_list_and_not(list * a, list b)
 {
     if (ENDP(*a))
 	return ;
@@ -646,7 +648,8 @@ gen_list_and_not(list * a,
 	cons *aux = *a;
 
 	*a = CDR(*a);
-	*aux = NEWGEN_FREED;
+	CAR(aux).p = NEWGEN_FREED;
+	CDR(aux) = NEWGEN_FREED;
 	free(aux);
 	gen_list_and_not(a, b);
     }
@@ -657,9 +660,7 @@ gen_list_and_not(list * a,
 
 /* Replace all the reference to x in list l by a reference to y: */
 void
-gen_list_patch(list l,
-	       void * x,
-	       void * y)
+gen_list_patch(list l, void * x, void * y)
 {
     MAPL(pc, {
 	 if (CAR(pc).p == (gen_chunk *) x)
