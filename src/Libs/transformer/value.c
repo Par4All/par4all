@@ -144,7 +144,8 @@ static hash_table hash_value_to_name = hash_table_undefined;
 static int local_intermediate_value_counter = 0;
 static int local_old_value_counter = 0;
 
-void reset_value_counters()
+void 
+reset_value_counters()
 {
     local_old_value_counter = 0;
     local_intermediate_value_counter = 0;
@@ -155,7 +156,8 @@ void reset_value_counters()
 /* static entity make_local_value_entity(int n, bool old): find or generate
  * an entity representing an old or an intermediate value of number n
  */
-static entity make_local_value_entity(n, old)
+static 
+entity make_local_value_entity(n, old)
 int n;
 bool old;
 {
@@ -187,31 +189,36 @@ bool old;
     return v;
 }
 
-static entity make_local_old_value_entity()
+static entity 
+make_local_old_value_entity()
 {
     return make_local_value_entity(local_old_value_counter++, TRUE);
 }
 
-static entity make_local_intermediate_value_entity()
+static entity 
+make_local_intermediate_value_entity()
 {
     return make_local_value_entity(local_intermediate_value_counter++, FALSE);
 }
 
-bool local_old_value_entity_p(e)
+bool 
+local_old_value_entity_p(e)
 entity e;
 {
     /* this is not a general test; it will only work for LOCAL values */
     return strncmp(entity_local_name(e), OLD_VALUE_PREFIX, 2) == 0;
 }
 
-bool local_intermediate_value_entity_p(e)
+bool 
+local_intermediate_value_entity_p(e)
 entity e;
 {
     /* this is not a general test; it will only work for LOCAL values */
     return strncmp(entity_local_name(e), INTERMEDIATE_VALUE_PREFIX, 2) == 0;
 }
 
-bool global_new_value_p(e)
+bool 
+global_new_value_p(e)
 entity e;
 {
     bool new = FALSE;
@@ -233,7 +240,8 @@ entity e;
     return new;
 }
 
-bool global_old_value_p(e)
+bool 
+global_old_value_p(e)
 entity e;
 {
     /* this is not a general test; it will only work for GLOBAL values */
@@ -247,7 +255,8 @@ entity e;
     return old;
 }
 
-bool global_intermediate_value_p(e)
+bool 
+global_intermediate_value_p(e)
 entity e;
 {
     /* this is not a general test; it will only work for GLOBAL values */
@@ -261,7 +270,8 @@ entity e;
     return intermediate;
 }
 
-entity global_new_value_to_global_old_value(entity v_new)
+entity 
+global_new_value_to_global_old_value(entity v_new)
 {
     entity v_old = entity_undefined;
 
@@ -276,10 +286,11 @@ entity global_new_value_to_global_old_value(entity v_new)
 					entity_domain);
     return v_old;
 }
-
+
 /* HASH TABLE USE */
 
-string external_value_name(e)
+string 
+external_value_name(e)
 entity e;
 {
     extern entity get_current_module_entity();
@@ -312,7 +323,8 @@ entity e;
     return s;
 }
 
-entity entity_to_new_value(e)
+entity 
+entity_to_new_value(e)
 entity e;
 {
     entity n;
@@ -323,7 +335,8 @@ entity e;
     return n;
 }
 
-entity entity_to_old_value(e)
+entity 
+entity_to_old_value(e)
 entity e;
 {
     entity o;
@@ -334,7 +347,8 @@ entity e;
     return o;
 }
 
-entity entity_to_intermediate_value(e)
+entity 
+entity_to_intermediate_value(e)
 entity e;
 {
     entity i;
@@ -345,7 +359,8 @@ entity e;
     return i;
 }
 
-bool entity_has_values_p(e)
+bool 
+entity_has_values_p(e)
 entity e;
 {
     /* is e variable whose value(s) (already) are analyzed?
@@ -360,7 +375,8 @@ entity e;
  * to the current module and its value hash tables.
  */
 
-bool new_value_entity_p(e)
+bool 
+new_value_entity_p(e)
 entity e;
 {
     /* since new values are always variable entities, hash_entity_to_new_value
@@ -372,7 +388,8 @@ entity e;
        == e;
 }
 
-bool old_value_entity_p(e)
+bool 
+old_value_entity_p(e)
 entity e;
 {
     string s = strstr(external_value_name(e), OLD_VALUE_SUFFIX);
@@ -380,7 +397,8 @@ entity e;
     return s!=NULL;
 }
 
-bool intermediate_value_entity_p(e)
+bool 
+intermediate_value_entity_p(e)
 entity e;
 {
     string s = strstr(external_value_name(e), INTERMEDIATE_VALUE_SUFFIX);
@@ -388,7 +406,8 @@ entity e;
     return s!=NULL;
 }
 
-bool value_entity_p(e)
+bool 
+value_entity_p(e)
 entity e;
 {
     /* tells if e is seen as a value in the current module */
@@ -403,11 +422,13 @@ entity e;
 }
 
 /* used with hash_table_fprintf */
-static string string_identity(s)
+static string 
+string_identity(s)
 string s;
 { return s;}
 
-void print_value_mappings()
+void 
+print_value_mappings()
 {
     (void) fprintf(stderr,"hash table value to name:\n");
     hash_table_fprintf(stderr, dump_value_name, string_identity,
@@ -430,7 +451,8 @@ void print_value_mappings()
 		       hash_entity_to_intermediate_value);
 }
 
-void allocate_value_mappings(int n, int o, int i)
+void 
+allocate_value_mappings(int n, int o, int i)
 {
     pips_assert("allocate_value_mappings",
 		hash_table_undefined_p(hash_entity_to_new_value) &&
@@ -447,7 +469,8 @@ void allocate_value_mappings(int n, int o, int i)
 	hash_table_make(hash_pointer, n + o + i);
 }
 
-void reset_value_mappings()
+static void 
+reset_value_mappings()
 {
     hash_entity_to_new_value = hash_table_undefined;
     hash_entity_to_old_value = hash_table_undefined;
@@ -455,14 +478,17 @@ void reset_value_mappings()
     hash_value_to_name = hash_table_undefined;
 }
 
-void free_value_mappings()
+void 
+free_value_mappings()
 {
     /* free previous hash tables, desallocate names; this implies ALL
        value names were malloced and were not pointer to a ri part */
 
     /* the three tables are assumed to be allocated all together */
-    if (!hash_table_undefined_p(hash_entity_to_old_value))
-    {
+    if (hash_table_undefined_p(hash_entity_to_old_value)) {
+	pips_error("free_value_mappings", "Attempt to free undefined mapping(s)\n");
+    }
+    else {
 	/* free names in hash_value_to_name; the other two hash tables
 	   contain pointers to the entity tabulated domain and thus need
 	   no value freeing */
@@ -481,7 +507,8 @@ void free_value_mappings()
 /* HASH TABLE INITIALIZATION */
 
 /* void add_new_value_name(entity e): add a new value name for entity e */
-static void add_new_value_name(e)
+static void 
+add_new_value_name(e)
 entity e;
 {
     string new_value_name = 
@@ -493,7 +520,8 @@ entity e;
 	free(new_value_name);
 }
 
-void add_new_value(e)
+void 
+add_new_value(e)
 entity e;
 {
     if(hash_get(hash_entity_to_new_value, (char *) e)
@@ -503,7 +531,8 @@ entity e;
     }
 }
 
-void add_new_alias_value(e,a)
+void 
+add_new_alias_value(e,a)
 entity e;
 entity a;
 {
@@ -518,7 +547,8 @@ entity a;
     /* add_new_value_name(e); */
 }
 
-entity external_entity_to_new_value(e)
+entity 
+external_entity_to_new_value(e)
 entity e;
 {
     /* there is no decisive test here; a necessary condition is used instead */
@@ -530,7 +560,8 @@ entity e;
     return e_new;
 }
 
-entity external_entity_to_old_value(e)
+entity 
+external_entity_to_old_value(e)
 entity e;
 {
     /* find the old value entity if possible or abort
@@ -549,7 +580,8 @@ entity e;
     return old_value;
 }
 
-void add_old_value(e)
+void 
+add_old_value(e)
 entity e;
 {
     entity old_value;
@@ -573,7 +605,8 @@ entity e;
     }
 }
 
-void add_old_alias_value(e,a)
+void 
+add_old_alias_value(e,a)
 entity e;
 entity a;
 {
@@ -588,7 +621,8 @@ entity a;
     /* add_new_value_name(e); */
 }
 
-void add_intermediate_value(e)
+void 
+add_intermediate_value(e)
 entity e;
 {
     entity intermediate_value;
@@ -608,7 +642,8 @@ entity e;
     }
 }
 
-void add_intermediate_alias_value(e,a)
+void 
+add_intermediate_alias_value(e,a)
 entity e;
 entity a;
 {
@@ -624,7 +659,8 @@ entity a;
     /* add_new_value_name(e); */
 }
 
-void add_local_old_value(e)
+void 
+add_local_old_value(e)
 entity e;
 {
     entity old_value;
@@ -642,7 +678,8 @@ entity e;
     }
 }
 
-void add_local_intermediate_value(e)
+void 
+add_local_intermediate_value(e)
 entity e;
 {
     entity intermediate_value;
@@ -662,7 +699,8 @@ entity e;
     }
 }
 
-void remove_entity_values(e, readonly)
+void 
+remove_entity_values(e, readonly)
 entity e;
 bool readonly;
 {
@@ -697,7 +735,8 @@ bool readonly;
     }
 }
 
-void add_synonym_values(e, eq, readonly)
+void 
+add_synonym_values(e, eq, readonly)
 entity e;
 entity eq;
 bool readonly;
@@ -733,7 +772,8 @@ bool readonly;
  * cope with translation issues.
  */
 
-entity value_to_variable(val)
+entity 
+value_to_variable(val)
 entity val;
 {
     entity var = entity_undefined;
@@ -792,7 +832,8 @@ entity val;
     return var;
 }
 
-entity old_value_to_new_value(o_val)
+entity 
+old_value_to_new_value(o_val)
 entity o_val;
 {
     entity var = entity_undefined;
@@ -805,7 +846,8 @@ entity o_val;
     return n_val;
 }
 
-entity new_value_to_old_value(n_val)
+entity 
+new_value_to_old_value(n_val)
 entity n_val;
 {
     entity o_val = entity_undefined;
@@ -823,7 +865,8 @@ entity n_val;
     return o_val;
 }
 
-entity value_alias(e)
+entity 
+value_alias(e)
 entity e;
 {
     entity a = entity_undefined;
