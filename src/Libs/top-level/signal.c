@@ -5,6 +5,9 @@
  * moved from misc to top level so as to interact with pipsmake/pipsdbm...
  *
  * $Log: signal.c,v $
+ * Revision 1.2  1998/05/25 17:24:34  coelho
+ * interruption with different behaviors...
+ *
  * Revision 1.1  1998/05/25 17:09:59  coelho
  * Initial revision
  *
@@ -15,22 +18,31 @@
 
 extern void checkpoint_workspace(void); /* in pipsmake */
 extern void interrupt_pipsmake_asap(void); /* in pipsdbm */
+extern void user_log(char *, ...); /* in misc */
 
 static void pips_signal_handler(int num)
 {
-    fprintf(stderr, "signal %d occurred!\n", num);
-    fflush(stderr);
+    user_log("interruption signal %d caught!\n", num);
 
     switch (num) 
     {
     case SIGINT:
     case SIGHUP:
     case SIGTERM:
-    case SIGUSR1:
+	user_log("interrupting pipsmake as soon as possible...\n");
 	interrupt_pipsmake_asap();
+    case SIGUSR1:
+	user_log("interruption for checkpointing...\n");
+	/* cold blooded. 
+	 * might be quite dangerous for the life of the process.
+	 * should not enter twice in there... 
+	 * might be convinient anyway.
+	 */
+	checkpoint_workspace();
 	break;
     case SIGUSR2:
-	checkpoint_workspace();
+	user_log("interruption for exiting...\n");
+	exit(2);
 	break;
     default:
 	fprintf(stderr, "[pips_signal_handler] unexpected signal %d\n", num);
