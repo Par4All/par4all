@@ -2,6 +2,9 @@
   $Id$
 
   $Log: ModuleManager.java,v $
+  Revision 1.3  1998/10/16 18:06:37  coelho
+  obscure bug tmp fix...
+
   Revision 1.2  1998/10/16 17:16:40  coelho
   attempt to port to jdk1.2b4
 
@@ -30,116 +33,108 @@ import com.sun.java.swing.border.*;
   */  
 public class ModuleManager implements JPipsComponent
 {
-    public	TPips		tpips;		//tpips instance
-    public	PList		list;		//contains the modules
-    public	PPanel		panel;		//jpips module panel
+  public TPips	tpips;		//tpips instance
+  public PList	list;		//contains the modules
+  public DefaultListModel modules;
+  public PPanel panel;		//jpips module panel
 
 
-    /** Sets the model of the list containing the modules names.
-	Sets the tpips instance.
-    */  
-    public ModuleManager(TPips tpips)
-    {
-	this.tpips = tpips;
-	buildPanel();
-    }
-    
+  /** Sets the model of the list containing the modules names.
+      Sets the tpips instance.
+  */  
+  public ModuleManager(TPips tpips)
+  {
+    this.tpips = tpips;
+    buildPanel();
+  }
 
-    /** Creates the module panel for jpips.
-     */  
-    public void buildPanel()
-    {
-	panel = new PPanel(new BorderLayout());
-	panel.setBorder(new TitledBorder("Modules"));
-	list = new PList(new DefaultListModel());
-	list.setSelectionMode(2);
-	PScrollPanel scrollPanel = new PScrollPanel((Component)list);
-	scrollPanel.setPreferredSize(new Dimension(200,100));
-	panel.add(scrollPanel,BorderLayout.WEST);
-	PButton b = new PButton("Select All");
-	ActionListener a = new ActionListener()
-        {
-	    public void actionPerformed(ActionEvent e) { setAllSelected(); }
-	};
-	b.addActionListener(a);
-	panel.add(b,BorderLayout.SOUTH);
-    }
-    
-    
-    /** @return the module panel for JPips
-     */  
-    public Component getComponent()
-    {
-	return (Component)panel;
-    }
-    
-    
-    
-    /** Sets as selected all the modules of the list.
-     */  
-    public void setAllSelected()
-    {
-	DefaultListModel dlm = (DefaultListModel) list.getModel();
-	int tab[] = new int[dlm.size()];
-	for(int i=0; i<dlm.size(); i++) tab[i] = i;
-	list.setSelectedIndices(tab);
-    }
-    
-    
-    /** @return the selected modules
-     */  
-    public Object[] getSelectedModules()
-    {
-	return list.getSelectedValues();
-    }
-    
-    
-  /** Sets the modules of tpips in the modules list.
-    */
-  public void setModules()
+  /** Creates the module panel for jpips.
+   */  
+  public void buildPanel()
+  {
+    panel = new PPanel(new BorderLayout());
+    panel.setBorder(new TitledBorder("Modules"));
+    modules = new DefaultListModel();
+    list = new PList(modules);
+    list.setSelectionMode(2);
+    PScrollPanel scrollPanel = new PScrollPanel((Component)list);
+    scrollPanel.setPreferredSize(new Dimension(200,100));
+    panel.add(scrollPanel,BorderLayout.WEST);
+    PButton b = new PButton("Select All");
+    b.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) { 
+	setAllSelected(); 
+      }
+    });
+    panel.add(b,BorderLayout.SOUTH);
+  }
+  
+  /** @return the module panel for JPips
+   */  
+  public Component getComponent()
+  {
+    return (Component)panel;
+  }
+  
+  /** Sets as selected all the modules of the list.
+   */  
+  public void setAllSelected()
   {
     DefaultListModel dlm = (DefaultListModel) list.getModel();
-    String modules = tpips.sendCommand("info modules");
-    if (modules != null)
+    int tab[] = new int[dlm.size()];
+    for(int i=0; i<dlm.size(); i++) tab[i] = i;
+    list.setSelectedIndices(tab);
+  }
+  
+  
+  /** @return the selected modules
+   */  
+  public Object[] getSelectedModules()
+  {
+    return list.getSelectedValues();
+  }
+  
+  /** Sets the modules of tpips in the modules list.
+   */
+  public void setModules()
+  {
+    //DefaultListModel dlm = (DefaultListModel) list.getModel();
+    String all_modules = tpips.sendCommand("info modules");
+    if (all_modules != null)
     {
-      StringTokenizer tok = new StringTokenizer(modules, " ", false);
+      StringTokenizer tok = new StringTokenizer(all_modules, " ", false);
       String module;
       while(tok.hasMoreTokens())
       {
 	module = tok.nextToken();
-	System.err.println("token: " + module);
-	dlm.addElement(module);
+	// quite obscure swing bug...
+	// modules.addElement(module);
+	modules.add(0, module); 
       }
     }
   }
 
-
   /** Clears the modules list.
     */
   public void unsetModules()
-    {
-      DefaultListModel dlm = (DefaultListModel) list.getModel();
-      dlm.removeAllElements();
-    }
-
+  {
+    DefaultListModel dlm = (DefaultListModel) list.getModel();
+    dlm.removeAllElements();
+  }
 
   public PMenu getMenu()
-    {
-      return null;
-    }
+  {
+    return null;
+  }
   
-  
-  public void setActivated(boolean yes) {}
-
+  public void setActivated(boolean yes) 
+  {
+    // nope.
+  }
 
   public void reset()
-    {
-      DefaultListModel dlm = (DefaultListModel) list.getModel();
-      dlm.removeAllElements();
-    }
-
-
-
+  {
+    DefaultListModel dlm = (DefaultListModel) list.getModel();
+    dlm.removeAllElements();
+  }
 }
-
-
