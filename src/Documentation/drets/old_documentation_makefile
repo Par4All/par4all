@@ -253,7 +253,8 @@ all: $(LIBDIR)/pipsmake.rc $(LIBDIR)/properties.rc $(LIBDIR)/wpips.rc
 
 $(LIBDIR)/pipsmake.rc: pipsmake-rc
 	@echo 'building pipsmake.rc'
-	@awk -f $(UTILDIR)/extract-pipsrules pipsmake-rc | \
+	# @awk -f $(UTILDIR)/extract-pipsrules pipsmake-rc | 
+	@$(UTILDIR)/filter_verbatim pipsmake-rc | \
 		cat $(INCLUDEDIR)/auto.h - > $(LIBDIR)/pipsmake.rc
 	@echo 'building resources.h'
 	@/lib/cpp $(LIBDIR)/pipsmake.rc | grep '>' | \
@@ -273,7 +274,8 @@ $(LIBDIR)/pipsmake.rc: pipsmake-rc
 $(LIBDIR)/properties.rc: properties-rc
 	@echo 'building properties.rc'
 	@sed 's/^[\/ ]\*\/*/# /' $(INCLUDEDIR)/auto.h > $(LIBDIR)/properties.rc
-	@awk -f $(UTILDIR)/extract-pipsrules properties-rc >> $(LIBDIR)/properties.rc
+	# awk -f $(UTILDIR)/extract-pipsrules 
+	@$(UTILDIR)/filter_verbatim properties-rc >> $(LIBDIR)/properties.rc
 
 pipsmake-rc: pipsmake-rc.f.tex
 	@expand pipsmake-rc.f.tex | sed 's/ *$$//' | sed '/^alias /d' | \
