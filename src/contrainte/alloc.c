@@ -180,3 +180,43 @@ char *f;
     /*FREE((char *)c,CONTRAINTE,f);*/
     free((char *)c);
 }
+
+/* Have a look at contrainte_dup and contraintes_dup which reverse the
+ * order of the list
+ * This copy version (including vect_copy, sc_copy) maintains the order
+ * (DN,24/6/02) 
+ */
+
+Pcontrainte contrainte_copy(c_in)
+Pcontrainte c_in;
+{	
+    Pcontrainte c_out = NULL;
+
+    if(c_in!=NULL) {
+	c_out = contrainte_new();
+	c_out->vecteur = vect_copy(c_in->vecteur);
+    }
+    return(c_out);
+}
+
+/* Pcontrainte contraintes_copy(Pcontrainte c_in)
+ * a list of constraints is copied with the same order
+ * In fact, here we only need to replace contrainte_dup by contrainte_copy
+ * Have a look at contrainte_copy (DN,24/6/02)
+ */
+Pcontrainte contraintes_copy(c_in)
+Pcontrainte c_in;
+{
+    Pcontrainte 
+	c_tmp = contrainte_copy(c_in),
+	c_out = c_tmp,
+	c = NULL;
+
+    for (c=(c_in==NULL?NULL:c_in->succ); 
+	 c!=NULL; 
+	 c=c->succ)
+	c_tmp->succ = contrainte_copy(c),
+	c_tmp = c_tmp->succ;
+
+    return(c_out);
+}
