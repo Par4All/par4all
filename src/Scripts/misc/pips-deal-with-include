@@ -1,14 +1,13 @@
 #! /bin/sh 
-# -*- perl -*-
-#
+#! perl
 # $RCSfile: pips-deal-with-include,v $ (version $Revision$)
-# $Date: 1996/09/21 16:59:11 $, 
+# $Date: 1996/09/21 17:14:49 $, 
 #
 
 # Load perl according to the $PATH:
-# Load perl according to the $PATH:
-eval "type perl | grep 'perl is' > /dev/null && exec perl -S $0 -- $* || echo Warning: Perl not found and thus $0 is not run! 1>&2; exit 0"
-    if $running_under_some_shell;
+
+eval "type perl | grep 'perl is' > /dev/null && exec perl -x $0 $* || echo Warning: Perl not found and thus $0 is not run! 1>&2; exit 0"
+    if 0;
 
 ###
 #
