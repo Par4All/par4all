@@ -169,7 +169,7 @@ resource:	NAME
 	;
 %%
 
-void yyerror(s)
+int yyerror(s)
 char * s;
 {
 	int c;
@@ -179,6 +179,7 @@ char * s;
 		putc(c, stderr);
 
 	exit(1);
+	return 1;
 }
 
 void fprint_virtual_resources(fd, dir, lrv)
