@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/17 17:11:30 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/20 11:33:05 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -30,11 +30,11 @@ PREFIX void close_##name() { close(name);}
 #define GENERIC_FUNCTION(PREFIX, name, type)\
 GENERIC_STATIC_STATUS(PREFIX, name, type, make_##type(), free_##type)\
 PREFIX void extend_##name(k,v) gen_chunk *k,*v;\
-       { fprintf(stderr, "E %s\n", entity_name(k)); extend_##type(name, k, v);}\
+       { extend_##type(name, k, v);}\
 PREFIX void update_##name(k,v) gen_chunk *k,*v;\
-       { fprintf(stderr, "U %s\n", entity_name(k)); update_##type(name, k, v);}\
-PREFIX gen_chunk *apply_##name(k) gen_chunk *k; \
-       { fprintf(stderr, "A %s\n", entity_name(k));return(apply_##type(name, k));}\
+       { update_##type(name, k, v);}\
+PREFIX gen_chunk *apply_##name(k) gen_chunk *k;\
+       { return(apply_##type(name, k));}\
 PREFIX bool apply_##name##_defined_p(k) gen_chunk *k; \
        { return(hash_get((name+1)->h, (char *)k)!=HASH_UNDEFINED_VALUE);}
 
