@@ -79,8 +79,12 @@ void BeginingOfParsing()
     called = TRUE;
 }
 
-bool parser(module)
-string module;
+/* parse "module.dbr_file"
+ */
+static bool 
+the_actual_parser(
+    string module,
+    string dbr_file)
 {
     extern void ssparse();
     debug_on("SYNTAX_DEBUG_LEVEL");
@@ -92,10 +96,11 @@ string module;
     ScanNewFile();
 
     pips_assert("parser", CurrentFN==NULL);
-    CurrentFN = strdup(concatenate(db_get_current_workspace_directory(),
-				   "/",
-				   db_get_file_resource(DBR_SOURCE_FILE, module, TRUE),
-				   NULL));
+    CurrentFN = 
+	strdup(concatenate(db_get_current_workspace_directory(),
+			   "/",
+			   db_get_file_resource(dbr_file, module, TRUE),
+			   NULL));
 
     /* yacc parser is called */
     ssin = safe_fopen(CurrentFN, "r");
@@ -113,3 +118,16 @@ string module;
     return TRUE;
 }
 
+/* parser for HPFC.
+ * just a different input file not to touch the original source file.
+ * this parser should be generated automatically.
+ */
+bool hpfc_parser(string module)
+{
+    return the_actual_parser(module, DBR_HPFC_FILTERED_FILE);
+}
+
+bool parser(string module)
+{
+    return the_actual_parser(module, DBR_SOURCE_FILE);
+}
