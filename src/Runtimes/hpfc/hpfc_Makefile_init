@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/10/24 11:54:21 $, )
+# ($Date: 1996/10/25 21:41:14 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -287,12 +287,12 @@ param_init.f: param_init.m4
 # LD IO: Link eDitor I/O (host & source)
 # LD PURE: Link eDitor PURE (all)
 
-LDF:=$(shell echo $(shell \
-	sed -n 's,^[Cc!\*][Ff][Cc][Dd]$$[ 	][ 	]*[Ll][Dd],ld,p' \
-		$(TARGET).f) | sort -u)
-
-LDIO:=$(shell echo $(LDF) | sed -n 's,^ld[ 	]*[Ii][Oo],,p')
-LDPURE:=$(shell echo $(LDF) | sed -n 's,^ld[ 	]*[Pp][Uu][Rr][Ee],,p')
+LDIO:=$(shell \
+  sed -n 's,^[Cc!\*][Ff][Cc][Dd]$$[ 	][ 	]*[Ll][Dd][ 	]*[Ii][Oo],,p'\
+		$(TARGET).f | sort -u)
+LDPURE:=$(shell \
+  sed -n 's,^[Cc!\*][Ff][Cc][Dd]$$[ 	][ 	]*[Ll][Dd][ 	]*[Pp][Uu][Rr][Ee],,p'\
+		$(TARGET).f | sort -u)
 
 $(HOST):  $(HEADERS) hpfc_main_host.o $(COMMON_OFILES) $(HOST_OFILES)
 	$(FC) $(FFLAGS) -o $@ hpfc_main_host.o \
