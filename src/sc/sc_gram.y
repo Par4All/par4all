@@ -1,3 +1,8 @@
+/* explicit types: Value may be larger than a pointer (e.g. long long)
+ */
+%type <Value> const
+%type <Variable> ident
+
 %{
 
 #include <stdio.h>
@@ -66,6 +71,11 @@ short int operat;    /* dernier operateur rencontre                 */
 %token VAR		/* mot reserve VAR introduisant la liste de variables */ 12
 %token VIRG		/* signe , */ 13
 
+%union {
+    Value Value;
+    Variable Variable;
+}
+
 
 %%
 system	: inisys defvar ACCOUVR l_eq virg_opt ACCFERM
@@ -114,7 +124,7 @@ debeq	:
                         eq = contrainte_new();
         		}
 	;
-
+
 feq     :{ 
 
            contrainte_free(eq); 
@@ -131,7 +141,7 @@ terme	: const ident
 			fac *=((cote == GAUCHE) ? 1 : -1);
                         /* ajout du couple (ident,const) a la contrainte 
                            courante                                     */
-                        vect_add_elem(&(eq->vecteur),(Variable) $2,fac*$1);
+                        vect_add_elem(&(eq->vecteur),$2,fac*$1);
                         /* duplication du couple (ident,const)
                            de la combinaison lineaire traitee           */ 
                         if (operat)
@@ -154,10 +164,9 @@ terme	: const ident
 		}
 	;
 
-
 ident	: IDENT
 		{
-		    $$ = (int) rec_ident(ps_yacc,yytext);
+		    $$ = rec_ident(ps_yacc,yytext);
 		}
 	;
 
@@ -209,7 +218,7 @@ op	: INF
                   cp = NULL;
                   b2 = 0;}
 	;
-
+
 addop	: PLUS
 		{ fac = 1; }
 	| MOINS
@@ -256,8 +265,7 @@ virg_opt : VIRG
          ; 
 %%
 
-void yyerror(s)
-char *s;
+int yyerror(char *s)
 {
 	/* procedure minimun de recouvrement d'erreurs */
 	int c;
@@ -267,4 +275,5 @@ char *s;
 		putchar(c);
 
 	syntax_error = TRUE;
+	return TRUE;
 }
