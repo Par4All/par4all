@@ -2,7 +2,7 @@
  * local definitions
  * 
  * SCCS stuff:
- * $RCSfile: hpfc-local.h,v $ ($Date: 1994/11/17 14:19:19 $, )
+ * $RCSfile: hpfc-local.h,v $ ($Date: 1994/12/28 08:23:24 $, )
  * version $Revision$,
  * got on %D%, %T%
  * $Id$
@@ -45,7 +45,3 @@
 extern entity
     host_module,
     node_module;
-
-/* in compile-decl.c */
-
-#define computer reference
