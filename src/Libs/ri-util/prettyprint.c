@@ -1,7 +1,14 @@
-/* 	%A% ($Date: 1997/05/28 18:26:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/*
+ * $Id$
+ *
+ * $Log: prettyprint.c,v $
+ * Revision 1.63  1997/06/02 06:52:55  coelho
+ * rcs headers, plus fixed commons pp for hpfc vs regions.
+ *
+ */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/05/28 18:26:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.63 1997/06/02 06:52:55 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -205,7 +212,11 @@ entity e, module;
 	     {
 		 if (comma) pc = CHAIN_SWORD(pc, ",");
 		 else comma = TRUE;
-		 pc = gen_nconc(pc, words_declaration(ee, TRUE));
+		 /* hpfc: dimension of common variables are specified
+		  * within the COMMON, not with the type. this is just
+		  * a personnal taste. FC.
+		  */
+		 pc = gen_nconc(pc, words_declaration(ee, prettyprint_hpfc));
 	     },
 		 entities);
 
