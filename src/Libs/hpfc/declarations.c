@@ -4,22 +4,14 @@
  * DECLARATIONS compilation
  *
  * SCCS stuff:
- * $RCSfile: declarations.c,v $ ($Date: 1994/12/22 16:52:28 $, ) version $Revision$,
+ * $RCSfile: declarations.c,v $ ($Date: 1995/03/14 14:43:20 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
- */
-
-/*
- * Standard includes
  */
  
 #include <stdio.h>
 #include <string.h> 
 extern fprintf();
-
-/*
- * Newgen stuff
- */
 
 #include "genC.h"
 
@@ -27,26 +19,13 @@ extern fprintf();
 #include "hpf.h" 
 #include "hpf_private.h"
 
-/*
- * PIPS stuff
- */
-
 #include "ri-util.h" 
 #include "misc.h" 
-#include "control.h"
-#include "regions.h"
-#include "semantics.h"
-#include "effects.h"
-
-/* 
- * my own local includes
- */
 
 #include "hpfc.h"
 #include "defines-local.h"
 
-/*
- *  local macros...
+/*  local macros...
  */
 
 #define normalized_dimension_p(dim) \
@@ -54,7 +33,7 @@ extern fprintf();
 
 /* -----------------------------------------------------------------
  *
- * New Declarations
+ *     NEW DECLARATIONS
  *
  */
 
@@ -69,24 +48,15 @@ static int ComputeNewSizeOfIthDimension(dim, i, array, newdeclp)
 dimension dim;
 int i;
 entity array;
-int *newdeclp;
+tag *newdeclp;
 {
-    align 
-	a = load_entity_align(array);
-    entity 
-	t = align_template(a);
-    distribute 
-	d = load_entity_distribute(t);
-
-    alignment 
-	al=NULL;
-    distribution 
-	di=NULL;
-    int 
-	rate,
-	param,
-	pdim = 1,
-	asize = SizeOfDimension(dim);
+    align a = load_entity_align(array);
+    entity t = align_template(a);
+    distribute d = load_entity_distribute(t);
+    alignment al = alignment_undefined;
+    distribution di = distribution_undefined;
+    int rate, param,
+	pdim = 1, asize = SizeOfDimension(dim);
     style st;
 
     debug(9,"ComputeNewSizeOfIthDimension",
@@ -97,28 +67,24 @@ int *newdeclp;
 	print_distribute(d);
     }
 
-    /*
-     * default: the new declaration is the same as the old one.
+    /* default: the new declaration is the same as the old one.
      */
-    (*newdeclp) = NO_NEW_DECLARATION;
+    (*newdeclp) = is_hpf_newdecl_none;
 
-    /*
-     * looking for the matching alignment...
+    /* looking for the matching alignment...
      */
     al = FindAlignmentOfDim(align_alignment(a), i);
 
-    /*
-     * no alignment => scratching of the dimension...
+    /* no alignment => scratching of the dimension...
      */
     if (al==alignment_undefined) 
     {
 	if (!normalized_dimension_p(dim)) 
-	    (*newdeclp) = ALPHA_NEW_DECLARATION;
+	    (*newdeclp) = is_hpf_newdecl_alpha;
 	return(asize);
     }
 
-    /*
-     * there is an alignment, but the rate is zero, so the whole
+    /* there is an alignment, but the rate is zero, so the whole
      * dimension has to be declared on every processors, despite the
      * fact that the dimension is mapped on only one element.
      */
@@ -126,12 +92,11 @@ int *newdeclp;
     if (rate==0) 
     {
 	if (!normalized_dimension_p(dim)) 
-	    (*newdeclp) = ALPHA_NEW_DECLARATION;
+	    (*newdeclp) = is_hpf_newdecl_alpha;
 	return(asize);
     }
     
-    /*
-     * looking for the matching distribution...
+    /* looking for the matching distribution...
      * pdim is the corresponding dimension of  processors p
      */
     di = FindDistributionOfDim(distribute_distribution(d),
@@ -140,8 +105,7 @@ int *newdeclp;
 			       
     st=distribution_style(di);
 
-    /*
-     * no style => scratching of the dimension...
+    /* no style => scratching of the dimension...
      */
     if (style_none_p(st)) 
     {
@@ -153,12 +117,11 @@ int *newdeclp;
 	 * alpha case
 	 */
 	if (!normalized_dimension_p(dim)) 
-	    (*newdeclp) = ALPHA_NEW_DECLARATION;
+	    (*newdeclp) = is_hpf_newdecl_alpha;
 	return(asize);
     }
     
-    /*
-     * and now, let's look at the different cases.
+    /* and now, let's look at the different cases.
      *
      * beta case
      */
@@ -173,18 +136,17 @@ int *newdeclp;
 	if (choice==asize)
 	{
 	    if (normalized_dimension_p(dim)) 
-		(*newdeclp) = NO_NEW_DECLARATION;
+		(*newdeclp) = is_hpf_newdecl_none;
 	    else
-		(*newdeclp) = ALPHA_NEW_DECLARATION;
+		(*newdeclp) = is_hpf_newdecl_alpha;
 	}
 	else
-	    (*newdeclp) = BETA_NEW_DECLARATION;
+	    (*newdeclp) = is_hpf_newdecl_beta;
 
 	return(choice);
     }
 
-    /*
-     * gamma case
+    /* gamma case
      *
      * ??? what about rate==-1 ?
      */
@@ -198,18 +160,17 @@ int *newdeclp;
 	if (choice==asize)
 	{
 	    if (normalized_dimension_p(dim)) 
-		(*newdeclp) = NO_NEW_DECLARATION;
+		(*newdeclp) = is_hpf_newdecl_none;
 	    else
-		(*newdeclp) = ALPHA_NEW_DECLARATION;
+		(*newdeclp) = is_hpf_newdecl_alpha;
 	}
 	else
-	    (*newdeclp) = GAMMA_NEW_DECLARATION;
+	    (*newdeclp) = is_hpf_newdecl_gamma;
 
 	return(choice);
     }
 
-    /*
-     * delta case
+    /* delta case
      */
     if (style_cyclic_p(st))
     {
@@ -223,21 +184,20 @@ int *newdeclp;
 	if (choice==asize)
 	{
 	    if (normalized_dimension_p(dim)) 
-		(*newdeclp) = NO_NEW_DECLARATION;
+		(*newdeclp) = is_hpf_newdecl_none;
 	    else
-		(*newdeclp) = ALPHA_NEW_DECLARATION;
+		(*newdeclp) = is_hpf_newdecl_alpha;
 	}
 	else
-	    (*newdeclp) = DELTA_NEW_DECLARATION;
+	    (*newdeclp) = is_hpf_newdecl_delta;
 
 	return(choice);
     }
 	
-    /*
-     * alpha case, if nothing matches, what shouldn't be the case :
+    /* alpha case, if nothing matches, what shouldn't be the case :
      */
     if (!normalized_dimension_p(dim)) 
-	(*newdeclp) = ALPHA_NEW_DECLARATION;
+	(*newdeclp) = is_hpf_newdecl_alpha;
     return(asize);
 }
 
@@ -251,13 +211,11 @@ int *newdeclp;
 static void NewDeclarationOfDistributedArray(array)
 entity array;
 {
-    entity 
-	newarray = load_entity_node_new(array);
-    int 
-	ithdim = 1,
-	newdecl = NEW_DECLARATION_UNDEFINED;
-    list 
-	ld=NIL;
+    entity newarray = load_entity_node_new(array);
+    int ithdim = 1,
+        newsize, p;
+    tag newdecl;
+    list ld = NIL;
     
     assert(array_distributed_p(array) && entity_variable_p(array));
 
@@ -266,17 +224,13 @@ entity array;
 	  entity_name(array),
 	  entity_name(newarray));
 
-    /*
-     * compute the new size for every dimension on the array,
+    /* compute the new size for every dimension on the array,
      * then update the dimensions of the newarray. remember
      * that the dimensions are shared between the old and new arrays.
      */
     MAPL(cd,
      {
-	 int newsize;
-	 int p;
-	 dimension
-	     dim = DIMENSION(CAR(cd));
+	 dimension dim = DIMENSION(CAR(cd));
 
 	 if (ith_dim_distributed_p(array, ithdim, &p))
 	 {
@@ -301,7 +255,7 @@ entity array;
 	     debug(8, "NewDeclarationOfDistributedArray",
 		   "dimension %d isn't touched\n", ithdim);
 
-	     newdecl = NO_NEW_DECLARATION;
+	     newdecl = is_hpf_newdecl_none;
 	     ld = gen_nconc(ld, CONS(DIMENSION, dim, NIL)); /* sharing ! */
 	 }
 	 
