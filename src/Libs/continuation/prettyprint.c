@@ -8,7 +8,6 @@
 #include <string.h>
 /* #include <stdlib.h> */
 
-#include "types.h"
 
 #include "genC.h"
 
