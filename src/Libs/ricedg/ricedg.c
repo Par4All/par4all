@@ -174,6 +174,17 @@ char *mod_name;
     return rice_dependence_graph(mod_name);
 }
 
+bool rice_regions_dependence_graph(mod_name)
+char *mod_name;
+{
+    if (!same_string_p(rule_phase(find_rule_by_resource("CHAINS")),
+		       "region_chains"))
+	pips_user_warning("Region chains not selected - using effects instead\n");
+
+    dg_type = DG_FAST;
+    return rice_dependence_graph(mod_name);
+}
+
 
 
 /*********************************************************************************/
