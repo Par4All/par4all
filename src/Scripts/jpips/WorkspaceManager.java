@@ -2,6 +2,9 @@
   $Id$
   
   $Log: WorkspaceManager.java,v $
+  Revision 1.6  1998/11/06 10:42:34  ancourt
+  allow xx*yy.f/F to be added
+
   Revision 1.5  1998/10/17 12:20:43  coelho
   borders++.
 
@@ -339,27 +342,26 @@ public class WorkspaceManager implements JPipsComponent
   {
     boolean ok = true;
     String abs_name = f.getAbsolutePath();
+    String file_name = f.getName();
 
     System.err.println("considering " + f + "/" + abs_name);
 
-    if (!f.isFile()) return;
-
-    if (abs_name.endsWith(".f") || abs_name.endsWith(".F"))
-    {
-      //DefaultListModel dlm = (DefaultListModel) filesList.getModel();
-
-      // drop if already there
-      for(int j=0; j<files.size(); j++)
-	if (abs_name.equals((String) files.elementAt(j))) 
-	  return;
-      
-      files.addElement(abs_name);
+    if ( f.isFile() || (file_name.indexOf('*') > 0 )
+	&& (abs_name.endsWith(".f") || abs_name.endsWith(".F"))) 
+    { 
+	//DefaultListModel dlm = (DefaultListModel) filesList.getModel();
+	// drop if already there
+	for(int j=0; j<files.size(); j++)
+	    if (abs_name.equals((String) files.elementAt(j))) 
+		return;
+	
+	files.addElement(abs_name);
     }
+    
     else
-    {
-      JOptionPane.showMessageDialog(frame, f + ": Invalid Fortran file!",
-				    "Error", JOptionPane.ERROR_MESSAGE);
-    }
+	JOptionPane.showMessageDialog(frame, f + ": Invalid Fortran file!",
+				      "Error", JOptionPane.ERROR_MESSAGE);
+    
   }
 
   /** Creates a workspace in tpips.
