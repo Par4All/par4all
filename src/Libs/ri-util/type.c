@@ -610,6 +610,9 @@ string
 basic_to_string(b)
 basic b;
 {
+    char char_decl[20];
+    int lng = 0;
+
     switch (basic_tag(b))
     {
     case is_basic_int:
@@ -643,7 +646,22 @@ basic b;
 	default: break;
 	}
     case is_basic_string:
-	return("STRING");
+	if(value_constant_p(basic_string(b))
+	   && constant_int_p(value_constant(basic_string(b)))) {
+	    lng = constant_int(value_constant(basic_string(b)));
+	    sprintf(&char_decl[0],"CHARACTER*%d", lng);
+	}
+	else if(value_symbolic_p(basic_string(b))
+	   && constant_int_p(symbolic_constant(value_symbolic(basic_string(b))))) {
+	    lng = constant_int(symbolic_constant(value_constant(basic_string(b))));
+	    sprintf(&char_decl[0],"CHARACTER*%d", lng);
+	}
+	else {
+	    lng = -1;
+	    sprintf(&char_decl[0],"CHARACTER**");
+	}
+	pips_assert("basic_to_string", strlen(char_decl)<20);
+	return(char_decl);
     case is_basic_overloaded:
 	return("OVERLOADED");
     default: break;
