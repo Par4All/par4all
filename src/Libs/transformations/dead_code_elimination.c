@@ -181,7 +181,7 @@ remove_loop_statement(statement s, instruction i, loop l)
   statement as;
   expression init_val;
 
-  init_val = (expression) gen_copy_tree(rl = range_lower(lr = loop_range(l))); 
+  init_val = copy_expression (rl = range_lower(lr = loop_range(l))); 
   /* Assume here that index is a scalar variable... :-) */
   pips_assert("dead_statement_filter", entity_scalar_p(loop_index(l)));
 
@@ -307,7 +307,7 @@ remove_dead_loop(statement s, instruction i, loop l)
   /* On va remplacer la boucle par l'initialisation de l'indice a`
      sa valeur initiale seulement. */
 
-  init_val = (expression) gen_copy_tree(rl = range_lower(lr = loop_range(l))); 
+  init_val = copy_expression(rl = range_lower(lr = loop_range(l))); 
   /*pips_assert("remove_dead_loop", gen_defined_p(init_val));*/
   /*expression init_val = expression_dup(range_lower(loop_range(l)));*/
 
@@ -338,7 +338,7 @@ remove_dead_loop(statement s, instruction i, loop l)
    statement as bool_var = x: (he', a french joke !)
    this_test_is_unstructured_p is a hint for the statistics.
    TRUE means that you assert that the test is unstructured. */
-void static
+static void
 remove_if_statement_according_to_write_effects(statement s,
 					       bool this_test_is_unstructured_p)
 {
@@ -375,7 +375,7 @@ remove_if_statement_according_to_write_effects(statement s,
 }
 
 
-bool static
+static bool
 dead_deal_with_test(statement s,
                     test t) 
 {  
@@ -853,7 +853,7 @@ suppress_dead_code(char * mod_name)
 
   ifdebug(1) {
       debug(1,"dead_code_elimination", "Begin for %s\n", mod_name);
-      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
+      pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
       /* Value names are needed to print preconditions in debug messages */
       set_cumulated_rw_effects((statement_effects)
 	      db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE));
@@ -895,7 +895,7 @@ suppress_dead_code(char * mod_name)
      unspaghettify(mod_name);
 
   ifdebug(1)
-      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
+      pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
   
   return TRUE;
 }
