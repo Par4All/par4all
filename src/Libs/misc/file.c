@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/28 14:11:35 $, 
+ * $Date: 1997/10/30 14:56:15 $, 
  */
 
 #include <unistd.h>
@@ -467,6 +467,29 @@ safe_cat(FILE * out, FILE * in)
     while ((c=getc(in))!=EOF) 
 	if (putc(c, out)==EOF)
 	    pips_internal_error("cat failed");
+}
+
+void 
+safe_append(FILE * out, string file, int margin)
+{
+    FILE * in = safe_fopen(file, "r");
+    bool first = TRUE;
+    int c, i;
+    while ((c=getc(in))!=EOF)
+    {
+	if (first) /* beginning of a line. */
+	{
+	    for (i=0; i<margin; i++) 
+		if (putc(' ', out)==EOF)
+		    pips_internal_error("append failed");
+	    first = FALSE;
+	}
+	if (c=='\n') 
+	    first = TRUE;
+	if (putc(c, out)==EOF)
+	    pips_internal_error("append failed");
+    }
+    safe_fclose(in, file);
 }
 
 void
