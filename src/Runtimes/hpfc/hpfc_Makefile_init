@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/12/27 11:36:49 $, )
+# ($Date: 1996/12/27 12:55:38 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -156,6 +156,7 @@ PVM_HLIB =
 PVM_NLIB =
 # 
 pvminc  = /usr/include/mpp
+pvmlib	=
 endif
 
 RUNTIME_LIBS	+= -lhpfcruntime
