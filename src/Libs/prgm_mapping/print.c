@@ -141,7 +141,7 @@ hash_table DtfToDist;
       for( ; df_l != NIL; df_l = CDR(df_l)) {
 	dataflow df = DATAFLOW(CAR(df_l));
 
-	fprint_dataflow(fp, sink_stmt, df);
+	fprint_dataflow(fp, sink_stmt, df, 0);
 
 	pp_dist = (Ppolynome) hash_get(DtfToDist, (char *) df);
 
@@ -168,7 +168,7 @@ hash_table DtfToWgh, DtfToStmt;
    {
     dataflow df = DATAFLOW(CAR(l));
     fprintf(fp, "Poids %d ***", (int) hash_get(DtfToWgh, (char *) df));
-    fprint_dataflow(fp, (int) hash_get(DtfToStmt, (char *) df), df);
+    fprint_dataflow(fp, (int) hash_get(DtfToStmt, (char *) df), df, 0);
    }
   fprintf(fp, "\n");
 }
