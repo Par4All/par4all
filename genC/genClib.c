@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/08/09 18:47:12 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/08/09 18:49:58 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -34,6 +34,11 @@
 #include "newgen_include.h"
 #include "genC.h"
 #include "genread.h"
+
+/* lex files
+ */
+extern FILE *genread_in, *genread_out;
+extern FILE *genspec_in, *genspec_out;
 
 #define GO (1)
 
@@ -2103,8 +2108,6 @@ gen_chunk *
 gen_read( file )
      FILE *file ;
 {
-  extern FILE *genread_in ;
-  
   genread_in = file ;
   genread_parse() ;
   return( Read_chunk ) ;
@@ -2118,7 +2121,6 @@ gen_read_tabulated( file, create_p )
 FILE *file ;
 int create_p ;
 {
-    extern FILE *genread_in ;
     /* gen_chunk *cp ; */
     int domain, index, max ;
     int i ;
