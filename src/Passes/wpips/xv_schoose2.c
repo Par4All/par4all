@@ -372,10 +372,9 @@ create_schoose_window()
 
    choice = xv_create(schoose_panel, PANEL_TEXT,
                       PANEL_LABEL_STRING, "Current choice",
-                      PANEL_VALUE_DISPLAY_LENGTH, 8,
+                      PANEL_VALUE_DISPLAY_LENGTH, 30,
                       PANEL_NOTIFY_PROC, schoose_ok_notify,
-                      XV_X, 10,
-                      XV_Y, 10,
+                      XV_X, xv_col(schoose_panel, 0),
                       NULL);
 
    choices = xv_create(schoose_panel, PANEL_LIST,
@@ -383,30 +382,26 @@ create_schoose_window()
                        PANEL_LIST_DISPLAY_ROWS, 5,
                        PANEL_NOTIFY_PROC, schoose_choice_notify,
                        PANEL_CHOOSE_ONE, TRUE,
-                       XV_X, 10,
-                       XV_Y, 40,
+                       XV_X, xv_col(schoose_panel, 0),
+                       XV_Y, xv_rows(schoose_panel, 1),
                        NULL);
-
-   help = xv_create(schoose_panel, PANEL_BUTTON,
-                    PANEL_LABEL_STRING, "Help",
-                    PANEL_NOTIFY_PROC, schoose_help_notify,
-                    XV_X, 250,
-                    XV_Y, 40,
-                    NULL);
-
-   cancel = xv_create(schoose_panel, PANEL_BUTTON,
-                      PANEL_LABEL_STRING, "Cancel",
-                      PANEL_NOTIFY_PROC, schoose_cancel_notify,
-                      XV_X, 250,
-                      XV_Y, 70,
-                      NULL);
 
    ok = xv_create(schoose_panel, PANEL_BUTTON,
                   PANEL_LABEL_STRING, "OK",
                   PANEL_NOTIFY_PROC, schoose_ok_notify,
-                  XV_X, 250,
-                  XV_Y, 100,
+                  XV_X, xv_col(schoose_panel, 5),
+                  XV_Y, xv_rows(schoose_panel, 5),
                   NULL);
+
+   cancel = xv_create(schoose_panel, PANEL_BUTTON,
+                      PANEL_LABEL_STRING, "Cancel",
+                      PANEL_NOTIFY_PROC, schoose_cancel_notify,
+                      NULL);
+
+   help = xv_create(schoose_panel, PANEL_BUTTON,
+                    PANEL_LABEL_STRING, "Help",
+                    PANEL_NOTIFY_PROC, schoose_help_notify,
+                    NULL);
 
    (void) xv_set(schoose_panel, PANEL_DEFAULT_ITEM, ok, NULL);
 
