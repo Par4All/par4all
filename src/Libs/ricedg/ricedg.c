@@ -148,7 +148,7 @@ static dg_type = DG_FAST;
 /* INTERFACE FUNCTIONS                                                           */
 /*********************************************************************************/
 
-static void rice_dependence_graph(char */*mod_name*/);
+static bool rice_dependence_graph(char */*mod_name*/);
 
 
 bool rice_fast_dependence_graph(mod_name)
@@ -2091,23 +2091,28 @@ effect ef1,ef2;
 bool print_whole_dependence_graph(mod_name)
 string mod_name;
 {
-    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS", FALSE);
-    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS", FALSE);
+    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS",
+		      FALSE);
+    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS",
+		      FALSE);
     return print_dependence_graph(mod_name);
 }
 
 bool print_effective_dependence_graph(mod_name)
 string mod_name;
 {
-    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS", TRUE);
-    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS", FALSE);
-    print_return dependence_graph(mod_name);
+    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS",
+		      TRUE);
+    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS",
+		      FALSE);
+    return print_dependence_graph(mod_name);
 }
 
 bool print_loop_carried_dependence_graph(mod_name)
 string mod_name;
 {
-    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS", TRUE);
+    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS",
+		      TRUE);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS",
 		      TRUE);
     return print_dependence_graph(mod_name);
