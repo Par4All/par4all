@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/07/27 12:03:09 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/10 12:11:47 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -22,6 +22,8 @@
 REAL_PIPSHOME=`(cd $PIPS_HOME/../pips;pwd)`
 
 #
+
+script=`basename $0`
 
 unset UPDATE VALIDOPT PERFORMANCE
 
@@ -87,8 +89,7 @@ alive()
 }
 
 #
-# gives the pips to be run
-#
+# echos the pips to be run
 
 which_executable()
 {
@@ -96,7 +97,12 @@ which_executable()
   then 
     echo $PWD/$1
   else
-    type $1 | sed "s,^$1 is ,,"
+    if [ -x $PIPS_BINDIR/$PIPS_ARCH/$1 ]
+    then
+      echo $PIPS_BINDIR/$PIPS_ARCH/$1
+    else
+      type $1 | sed "s,^$1 is ,,"
+    fi
   fi
 }
 
@@ -106,8 +112,8 @@ which_executable()
 validate_usage()
 {
   {
-    echo "Usage: $0 [-dsvpnhtVD] [-a address] [-u xx] [-r dir] [-l dir] "
-    echo "          [-x/y pips/tpips] [-i lines] [-f file] [Modules]"
+    echo "Usage: $script [-dsvpnhtVD] [-a address] [-u xx] [-r dir] [-l dir] "
+    echo "       [-x/y pips/tpips] [-i lines] [-f file] [Modules]"
     echo "   -d: debug"
     echo "   -D: more debug"
     echo "   -s: silent (default)"
@@ -123,8 +129,8 @@ validate_usage()
     echo "   -i lines: max number of lines for sending a full message"
     echo "   -l dir: lock directory (default .)"
     echo "   -f file: what file in a module (use with -n)"
-    echo "   -x pips: pips to be used (default . then Production)"
-    echo "   -y tpips: tpips to be used (default . then Production)"
+    echo "   -x pips: pips to be used (default ., \$PIPS_ARCH, type)"
+    echo "   -y tpips: tpips to be used (default .,\$PIPS_ARCH, type)"
   } >&2
   exit ${1:-1}
 }
