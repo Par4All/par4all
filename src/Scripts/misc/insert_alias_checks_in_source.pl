@@ -45,7 +45,7 @@ foreach $module (sort keys %modules)
     # load file
     $source = "$db/$module/$module.pref";
     open FILE, "< $source" or die $!;
-    @fortran = <FILE>;
+    @fortran = ('', <FILE>);
     close FILE or die $!;
 
     # create an index from orderings to line number
@@ -74,7 +74,7 @@ foreach $module (sort keys %modules)
 	    else
 	    {
 		&debug("appending $ordering to line $index{$ordering}\n");
-		$fortran[$index{$ordering}] .= $code;
+		$fortran[$index{$ordering}-1] .= $code;
 	    }
 	}
 	else
