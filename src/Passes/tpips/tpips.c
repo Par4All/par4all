@@ -483,26 +483,28 @@ static void parse_arguments(int argc, char * argv[])
 	    break;
 	}
 
-    if (argc == optind )
-    {
+    if (argc == optind ) {
 	use_readline = isatty(0);
 	pips_debug(1, "reading from stdin, which %s a tty\n",
 		   use_readline ? "is" : "is not");
 	current_file = stdin;
 	process_a_file();
     }
-    else
-    {
-	while (optind < argc )
-	{
-	    if (same_string_p(argv[optind], "-"))
-	    {
+    else {
+	while (optind < argc ) {
+	    if (same_string_p(argv[optind], "-")) {
 		current_file = stdin;
 		use_readline = isatty(0);
-	    } else {
-		       current_file = safe_fopen(argv[optind], "r");
-		       use_readline = FALSE;
-		   }
+	    }
+	    else {
+		if((current_file = fopen(argv[optind], "r"))==NULL) {
+		    perror("tpips");
+		    exit(1);
+		}
+		else {
+		    use_readline = FALSE;
+		}
+	    }
 	    
 	    pips_debug(1, "reading from file %s\n",argv[optind]);
 	    
