@@ -3,7 +3,16 @@
 #include <stdio.h>
 
 #include "genC.h"
+#include "linear.h"
+#include "ri.h"
 
+#include "resources.h"
+
+#include "misc.h"
+#include "ri-util.h"
+#include "pipsdbm.h"
+
+#include "sac-local.h"
 #include "sac.h"
 
 int patterns_yyerror(char* s);
@@ -88,14 +97,19 @@ static opcode make_opcode(char * name, int vecSize, int subwordSize);
 %%
 
 definitions:
-       operations_list patterns_list
+       definitions_list
        ;
 
-operations_list:
-       operations_list operation
+definitions_list:
+       definitions_list definition
      | 
        ;
 
+definition:
+       operation
+     | pattern
+       ;
+ 
 operation:
        IDENTIFIER_TOK '[' INTEGER_TOK ']' '{' opcodes_list '}' 
                                         { insert_operation($1, $3, $6); }
@@ -103,19 +117,13 @@ operation:
 opcodes_list:
        opcodes_list opcode              { $$ = CONS(OPCODE, $2, $1); }
      |                                  { $$ = NIL; }
-       ;
 
 opcode:
-       IDENTIFIER_TOK ':' INTEGER_TOK '*' INTEGER_TOK ';' 
+       IDENTIFIER_TOK ':' INTEGER_TOK ',' INTEGER_TOK ';'      
                                         { $$ = make_opcode($1, $3, $5); }
 
-patterns_list:
-       patterns_list pattern             
-     |
-       ;
-
 pattern:
-       IDENTIFIER_TOK ':' tokens_list merge_arguments ';' 
+       IDENTIFIER_TOK ':' tokens_list merge_arguments ';'      
                                         { insert_pattern($1, $3, $4); }
 
 tokens_list:
@@ -166,7 +174,7 @@ merge_arguments:
        ;
 
 arguments_list:
-       argument ',' arguments_list      { $$ = CONS(ARGUMENT, $1, $3); }
+       arguments_list ',' argument      { $$ = CONS(ARGUMENT, $3, $1); }
      | argument                         { $$ = CONS(ARGUMENT, $1, NIL); }
 
 argument:
