@@ -55,7 +55,8 @@ PATH="/usr/ucb:/usr/etc:/usr/bin:/usr/games:.:$PATH"
 
 MAIL=${PIPS_MAIL:-Mail}
 
-hostname=`hostname`
+# coulommiers.ensmp.fr -> coulommiers
+hostname=`hostname | sed 's/\..*//`
 user=`whoami`
 PWD=`absolute_name \`pwd\``
 
