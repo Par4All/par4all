@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 2000/11/17 16:37:09 $, 
+ * $Date: 2000/11/21 17:18:45 $, 
  */
 
 #include <stdio.h>
@@ -201,6 +201,7 @@ Psysteme *ps;
   if (!sc_rn_p(*ps) && !sc_empty_p(*ps))
     {
       Pbase b = base_dup(sc_base(*ps));
+      *ps = sc_sort_constraints_simplest_first(*ps, b);
       build_sc_nredund_1pass(ps);
       if (*ps == SC_EMPTY)
 	*ps = sc_empty(b);
