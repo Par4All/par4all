@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/12/30 16:49:10 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1995/03/14 18:50:27 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -333,6 +333,7 @@ set_resources_for_module (string module_name)
 	 the_callees);
 
     hpfc_init_run_time_entities();
+    reset_uniq_numbers();
 
     /*   STOP is to be translated into hpfc_{host,node}_end
      */
@@ -547,7 +548,7 @@ init_hpfc_for_program (void)
     the_modules = NIL;
     reset_hpf_object_lists();
 
-    hpfc_init_unique_numbers();
+    /* hpfc_init_unique_numbers(); */
 
     init_hpf_number_management();
     init_overlap_management();
