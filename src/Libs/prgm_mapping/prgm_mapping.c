@@ -76,7 +76,7 @@
 plc pfunc;		/* The placement function */
 graph the_dfg;		/* The data flow graph */
 bdt the_bdt;		/* The timing function */
-int nb_nodes,		/* The number of nodes in the DFG */
+vint nb_nodes,		/* The number of nodes in the DFG */
     nb_dfs;		/* The number of dataflows in the DFG */
 hash_table DtfToSink;	/* Mapping from a dataflow to its sink statement */
 hash_table DtfToDist;	/* Mapping from a dataflow to its distance */
@@ -486,7 +486,8 @@ void plc_make_distance()
 	pips_assert("plc_make_distance",
 	     gen_length(trans_l) == gen_length(source_ind_l));
 
-        if(get_debug_level() > 3) {
+        if(get_debug_level() > 3) 
+        {
           fprintf(stderr, "[plc_make_distance] \t for edge %d ->", source_stmt);
 	  fprint_dataflow(stderr, sink_stmt, df);
           fprintf(stderr, "\n");
@@ -827,7 +828,8 @@ void edge_weight()
 	  if(gov_pred != predicate_undefined)
 	    sc_trans = sc_append(sc_trans, (Psysteme) predicate_system(gov_pred));
 
- if(get_debug_level() > 3) {
+ if(get_debug_level() > 3) 
+{
     fprintf(stderr, "[edge_weight] \tfor edge: %d ->", source_stmt);
     fprint_dataflow(stderr, sink_stmt, df);
     fprintf(stderr, "\n");
@@ -1713,7 +1715,7 @@ list *sigma;
 
     /* We apply on this expression the substitution "sigma" */
     new_v = vvs_on_vecteur(sig, leg->vecteur);
-    if(get_debug_level() > 4) {
+    if(get_debug_level() > 1) {
       fprintf(stderr, "[solve_system_by_succ_elim] \t\tEqu after apply crt subs:");
       pu_vect_fprint(stderr, new_v);
       fprintf(stderr, "\n");
@@ -2263,11 +2265,9 @@ char*   module_name;
   if(get_debug_level() > 2) {
     fprint_dfg(stderr, the_dfg);
   }
-
   if(get_debug_level() > 0) {
     fprint_bdt(stderr, the_bdt);
   }
-
   /* First we count the number of nodes and dataflows */
   nb_nodes = 0;
   nb_dfs = 0;
@@ -2289,7 +2289,8 @@ char*   module_name;
    */
   graph_vertices(the_dfg) = sort_dfg_node(graph_vertices(the_dfg));
 
-  if(get_debug_level() > 2) {
+  if(get_debug_level() > 2)
+{
     fprintf(stderr, "[prgm_mapping] Nodes order:");
     for(l = graph_vertices(the_dfg); ! ENDP(l); POP(l))
       fprintf(stderr, " %d,", vertex_int_stmt(VERTEX(CAR(l))));
@@ -2305,7 +2306,8 @@ char*   module_name;
    */
   lambda = plc_make_proto();
 
-  if(get_debug_level() > 2) {
+  if(get_debug_level() > 2)
+{
     fprintf(stderr, "[prgm_mapping] Nodes prototypes:\n");
     plc_fprint_proto(stderr, the_dfg, StmtToProto);
     fprintf(stderr, "[prgm_mapping] LAMBDAS: ");
@@ -2388,7 +2390,8 @@ char*   module_name;
 
   /* We sort the dataflows in decreasing weight order */
   sorted_df_l = general_merge_sort(df_l, compare_dfs_weight);
-  if(get_debug_level() > 2) {
+  if(get_debug_level() > 2)
+ {
     fprintf(stderr, "[prgm_mapping] Edges order:\n");
     plc_fprint_dfs(stderr, sorted_df_l, DtfToSink, DtfToWgh);
   }
@@ -2400,7 +2403,8 @@ char*   module_name;
   /* We take into account the broadcast conditions */
   sigma = NIL;
   remnants_df_l = broadcast_conditions(lambda, sorted_df_l, &sigma);
-  if(get_debug_level() > 2) {
+  if(get_debug_level() > 2)
+  {
     fprintf(stderr, "[prgm_mapping] Dif Red restriction:\n");
     fprint_vvs(stderr, sigma);
     fprintf(stderr, "[prgm_mapping] Remnants :\n");
@@ -2410,16 +2414,18 @@ char*   module_name;
   for(sigma_p = sigma; !ENDP(sigma_p); POP(sigma_p))
     gen_remove(&lambda, (chunk *) var_val_variable(VAR_VAL(CAR(sigma_p))));
 
-if(get_debug_level() > 2) {
+  if(get_debug_level() > 2)
+  {
     fprintf(stderr, "[prgm_mapping] Prototypes after broadcast conditions:\n");
     plc_fprint_proto(stderr, the_dfg, StmtToProto);
     fprintf(stderr, "\n");
-}
+  }
 
   mu = NIL;
   sigma1 = partial_broadcast_coefficients(lambda, &mu);
 
-if(get_debug_level() > 3) {
+  if(get_debug_level() > 3)
+{
 fprintf(stderr, "[prgm_mapping] ******* Partial broadcast sub:");
 fprint_vvs(stderr, sigma1);
 fprintf(stderr, "\n");
@@ -2427,7 +2433,8 @@ fprintf(stderr, "\n");
 
   vvs_on_prototypes(sigma1);
 
-if(get_debug_level() > 2) {
+  if(get_debug_level() > 2) 
+{
     fprintf(stderr, "[prgm_mapping] Prototypes after partial broadcast sub:\n");
     plc_fprint_proto(stderr, the_dfg, StmtToProto);
     fprintf(stderr, "\n");
@@ -2465,7 +2472,8 @@ useful distances. */
    * out all the distances.
    */
   M_ps = cutting_conditions(remnants_df_l);
-  if(get_debug_level() > 2) {
+  if(get_debug_level() > 2)
+{
     fprintf(stderr, "[prgm_mapping] Matrix M:\n");
     fprint_psysteme(stderr, M_ps);
   }
@@ -2473,7 +2481,8 @@ useful distances. */
   sigma2 = NIL;
   (void) solve_system_by_succ_elim(M_ps, &sigma2);
 
-  if(get_debug_level() > 2) {
+  if(get_debug_level() > 2) 
+{
     fprintf(stderr, "Crt subs:\n");
     fprint_vvs(stderr, sigma2);
   }
@@ -2525,7 +2534,8 @@ fprintf(stderr, "\n");
   mu_lambda = gen_nconc(mu, lambda);
   xmu_lambda = partition_unknowns(&mu_lambda, dmax);
 
-if(get_debug_level() > 2) {
+  if(get_debug_level() > 2) 
+  {
     fprintf(stderr, "[prgm_mapping] \nRemaining unknowns\n");
     fprintf(stderr, "\tX COEFF: ");
     for(l = xmu_lambda; !ENDP(l); POP(l)) {
@@ -2550,7 +2560,8 @@ fprint_plc_pp_dims(stderr, pfunc);
 
     sigma3[i] = valuer(i, xmu_lambda, mu_lambda);
 
-    if(get_debug_level() > 2) {
+    if(get_debug_level() > 2) 
+    {
       fprintf(stderr, "[prgm_mapping] Plc dim %d, new subs is\n", i);
       fprint_vvs(stderr, sigma3[i]);
       fprintf(stderr, "\n");
