@@ -3,6 +3,9 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.70  1998/03/17 15:38:30  coelho
+ * statement number added
+ *
  * Revision 1.69  1997/09/26 11:10:30  coelho
  * fake resource updated.
  *
@@ -157,8 +160,9 @@ void fprint_entity_list(FILE *fp, list l);
 #define what_stat_debug(level, stat)\
  ifdebug(level) \
  { int so_ = statement_ordering(stat);\
-   pips_debug(level, "statement %p (%d,%d)\n",\
-   stat, ORDERING_NUMBER(so_), ORDERING_STATEMENT(so_));}
+   pips_debug(level, "statement %p (%d,%d:%d)\n",\
+   stat, ORDERING_NUMBER(so_), ORDERING_STATEMENT(so_), \
+   statement_number(stat));}
 
 /* Efficient I/O tags
  */
