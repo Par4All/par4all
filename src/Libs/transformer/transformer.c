@@ -3,6 +3,10 @@
   * $Id$
   *
   * $Log: transformer.c,v $
+  * Revision 1.44  2001/07/24 13:08:59  irigoin
+  * Function  transformer_safe_combine_with_warnings() added to cope with side
+  * effects in expressions. Bug fix in constant_constraint_check() for strings.
+  *
   * Revision 1.43  2001/07/19 18:09:37  irigoin
   * Lots of new functions used to support multiple value types, the general
   * derivation of a transformer from an expression. Plus some reformatting.
@@ -341,14 +345,64 @@ transformer transformer_combine(transformer t1, transformer t2)
 
     return t1;
 }
+
+/* Transformer tf1 and tf2 are supposed to be independent but they may
+   interfere, for instance because subexpressions have non-standard
+   conformant side effects. tf12 is a newly allocated transformer with no
+   sharing with tf1 or tf2 (theoretically). */
+transformer transformer_safe_combine_with_warnings(transformer tf1, transformer tf2)
+{
+  transformer tf12 = transformer_undefined;
+
+  /* Intersection is not powerful enough to cope with side effects. But
+     side effects can be dealt with only if the operation order is known
+     when the standard is violated. We assume here a right to left evaluation. */
+  if(transformer_safe_affect_transformer_p(tf1, tf2)) {
+    pips_debug(9, "Side effects of tf2 on tf1\n");
+    pips_user_warning("Non standard compliant code: side effect in part\n"
+                      "of an expression affect variables used in a later part\n");
+    tf12 = transformer_combine(tf1, tf2);
+  }
+  else if (transformer_safe_affect_transformer_p(tf2, tf1)){
+    pips_debug(9, "Side effects of tf2 on tf1\n");
+    pips_user_warning("Non standard compliant code: side effect in part\n"
+                      "of an expression affect variables used in an earlier part\n");
+    tf12 = transformer_combine(tf1, tf2);
+  }
+  else {
+    pips_debug(9, "No adversary side effects\n");
+    if(transformer_undefined_p(tf1)
+       || transformer_undefined_p(tf2)
+       || (ENDP(transformer_arguments(tf1)) && ENDP(transformer_arguments(tf2)))) {
+      /* No side effects at all */
+      pips_debug(9, "No side effects at all\n");
+      tf12 = transformer_safe_intersection(tf1, tf2);
+      free_transformer(tf1);
+    }
+    else {
+      pips_debug(9, "Side effects on other variables\n");
+      tf12 = transformer_combine(tf1, tf2);
+    }
+  }
+  return tf12;
+}
 
+/* Allocate a new transformer with constraints in t1 and t2.
+ *
+ * If t2 has no arguments, it restrains the doamin of t1. This
+ * is necessary if image_only is true.
+ *
+ * If not, the two transformers are supposed to be two separate
+ * abstraction of the same transformation and an intersection
+ * of the relation graphs is performed.
+ */
 static transformer transformer_general_intersection(transformer t1,
 						    transformer t2,
 						    bool image_only)
 {
   transformer t = transformer_identity();
   Psysteme s1 = sc_dup((Psysteme) predicate_system(transformer_relation(t1)));
-  Psysteme s2 = (Psysteme) predicate_system(transformer_relation(t2));
+  Psysteme s2 = sc_dup((Psysteme) predicate_system(transformer_relation(t2)));
 
   /*
   pips_debug(9, "begin with s1 and s2:\n");
@@ -754,10 +808,10 @@ transformer transformer_apply(transformer tf, transformer pre)
     pips_debug(8,"begin\n");
     pips_assert("tf is not undefined", tf!=transformer_undefined);
     pips_debug(8,"tf=%p\n", tf);
-    ifdebug(8) (void) print_transformer(tf);
+    ifdebug(8) (void) dump_transformer(tf);
     pips_assert("pre is not undefined", pre!=transformer_undefined);
     pips_debug(8,"pre=%p\n", pre);
-    ifdebug(8) (void) print_transformer(pre);
+    ifdebug(8) (void) dump_transformer(pre);
 
     /* post = tf o pre ; pre would be modified by transformer_combine */
     copy_pre = transformer_dup(pre);
@@ -765,7 +819,7 @@ transformer transformer_apply(transformer tf, transformer pre)
 
     pips_assert("post is not undefined", post!=transformer_undefined);
     pips_debug(8,"post=%p\n", post);
-    ifdebug(8) (void) print_transformer(post);
+    ifdebug(8) (void) dump_transformer(post);
     pips_assert("unexpected sharing",post != pre);
     pips_debug(8,"end\n");
 
@@ -1151,7 +1205,7 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
       pips_internal_error("Illegal number of strings in string constraint\n");
     if(is_equation_p) {
       if(i1+i2==0)
-	is_checked = (strcmp(s1, s2)==0);
+	is_checked = (fortran_string_compare(s1, s2)==0);
       else
 	pips_internal_error("Unexpected string coefficients i1=%d, i2=%d for equality\n",
 			    i1, i2);
