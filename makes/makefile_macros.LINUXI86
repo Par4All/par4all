@@ -1,20 +1,6 @@
 #
 # $Id$
 # 
-# $Log: makefile_macros.LINUXI86,v $
-# Revision 1.5  1997/09/09 13:10:13  coelho
-# shorter.
-#
-# Revision 1.4  1997/05/16 13:46:27  coelho
-# m4 is simply m4 under linux.
-#
-# Revision 1.2  1997/05/14 08:17:02  coelho
-# use bsd def...
-#
-# Revision 1.1  1997/05/12 21:20:53  coelho
-# Initial revision
-#
-#
 # this file contains macro definitions 
 
 include $(ROOT)/Include/makefile_macros.GNU
