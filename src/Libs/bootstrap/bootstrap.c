@@ -2089,14 +2089,12 @@ typing_function_t get_typing_function_for_intrinsic(string name)
     for(; pdt->name; pdt++)
     {
       hash_put(name_to_type_function, 
-	       (char*)pdt->name, (char*)pdt->type_function);
+	       (void*)pdt->name, (void*)pdt->type_function);
     }
   }
   
-  if (!hash_defined_p(name_to_type_function, name))
-  {
-    pips_internal_error("No type function for intrinsics %s\n", name);
-  }
+  pips_assert("typing function is defined", 
+	      hash_defined_p(name_to_type_function, name));
   
   return (typing_function_t) hash_get(name_to_type_function, name);
 }
@@ -2118,15 +2116,13 @@ switch_name_function get_switch_name_function_for_intrinsic(string name)
     for(; pdt->name; pdt++)
     {
       hash_put(name_to_switch_function, 
-	       (char*)pdt->name, (char*)pdt->name_function);
+	       (void*)pdt->name, (void*)pdt->name_function);
     }
   }
   
-  if (!hash_defined_p(name_to_switch_function, name))
-  {
-    pips_internal_error("No switch name function for intrinsics %s\n", name);
-  }
-  
+  pips_assert("switch function is defined",
+	      hash_defined_p(name_to_switch_function, name));
+
   return (switch_name_function) hash_get(name_to_switch_function, name);
 }
 
@@ -2242,4 +2238,3 @@ AddPackageToName(p, n)
   
   return(ps);
 }
-
