@@ -2212,6 +2212,9 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
   Matrix   *Mat = NULL, *Ray = NULL;
   SatMatrix *Sat = NULL;
   unsigned NbRay, NbCon, Dimension;
+
+  if (NbConstraints == 0)
+    return Polyhedron_Copy(Pol);
   
   CATCH(any_exception_error) {
     if (NewPol) Polyhedron_Free(NewPol);
