@@ -107,8 +107,11 @@ void checkpoint_workspace(void)
     if (db_get_current_workspace_name())
     {
 	user_log("Checkpoint of workspace.\n");
+	/* FC 25/06/2003
+	 * this seems to break pipsmake internal data...
 	pips_debug(3, "\tdeleting obsolete resources...\n");
 	delete_obsolete_resources();
+	*/
 	pips_debug(3, "\tsaving resources...\n");
 	db_checkpoint_workspace();
 	pips_debug(3, "\tproperties and makefile...\n");
