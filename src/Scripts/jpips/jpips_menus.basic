@@ -4,6 +4,9 @@
 # Basic menus for jpips.
 #
 # $Log: jpips_menus.basic,v $
+# Revision 1.2  1998/07/03 11:54:58  coelho
+# new attemps with menus...
+#
 # Revision 1.1  1998/07/03 08:14:59  coelho
 # Initial revision
 #
@@ -16,18 +19,34 @@ Analyses Option Panel
 ## one may have either "display" or "make" 
 ## (no display, but the resource is built)
 ##
-LABEL_WITH_CHOICE
-Mode
-checking lc
-m_or_d
-display generated files or just build them
+#LABEL_WITH_CHOICE
+#Build Mode
+#checking lc
+#m_or_d
+#display generated files or just build them
+#
+#	Display
+#	display
+#	..
+#
+#	Make
+#	make
+#	..
+#
+#CLOSE
 
-	Display
-	display
+LABEL_WITH_CHOICE
+Transformation Mode
+checking lc
+c_or_a
+whether to apply transformations of modules concurrently
+
+	Concurrent apply
+	capply
 	..
 
-	Make
-	make
+	Simple apply
+	apply
 	..
 
 CLOSE
@@ -40,7 +59,7 @@ SEPARATOR
 
 BUTTON_WITH_MENU
 Show Code with
-$TAGm_or_d PRINTED_FILE[$MODULES]
+display PRINTED_FILE[$MODULES]
 display sequential code with selected decorations
 
 	RADIOBUTTONGROUP
@@ -177,7 +196,7 @@ CLOSE
 
 BUTTON_WITH_MENU
 Show ICFG View with
-$TAGmarker ICFG_FILE[$MODULES]
+display ICFG_FILE[$MODULES]
 display interprocedural call graph with selected decorations
 
 	RADIOBUTTONGROUP
@@ -337,9 +356,14 @@ select parallelization algorithm
 
 CLOSE
 
+SINGLE_BUTTON
+Privatize Scalars
+$TAGc_or_a PRIVATIZER[$MODULES]
+privatization of scalar variables
+
 BUTTON_WITH_CHOICE
 Show Parallel Code
-$TAGm_or_d PARALLELPRINTED_FILE[$MODULES]
+display PARALLELPRINTED_FILE[$MODULES]
 check activate PARALLELPRINTED_FILE
 display parallel code using the selected syntax
 
