@@ -10,7 +10,7 @@ c     Ronan.Keryell@cri.ensmp.fr
 !ldf$ -u xpomp_open_display
 !fcd$ io
       print *, x, y
-      return x + y
+      xpomp_open_display = x + y
       end
       
       subroutine xpomp_close_display(d)
@@ -25,7 +25,7 @@ c     Ronan.Keryell@cri.ensmp.fr
 !ldf$ -u xpomp_get_current_default_display
 !fcd$ io
       read *, d
-      return d
+      xpomp_get_current_default_display=d
       end
       
       integer function xpomp_set_current_default_display(d)
@@ -35,7 +35,7 @@ c     Ronan.Keryell@cri.ensmp.fr
 !fcd$ io
       print *, d
       read *, r
-      return r
+      xpomp_set_current_default_display=r
       end
       
       integer function xpomp_get_depth()
@@ -43,7 +43,7 @@ c     Ronan.Keryell@cri.ensmp.fr
 !ldf$ -u xpomp_get_depth
 !fcd$ io
       read *, d
-      return d
+      xpomp_get_depth=d
       end
       
       integer function xpomp_set_color_map(screen,
@@ -54,7 +54,7 @@ c     Ronan.Keryell@cri.ensmp.fr
 !fcd$ io
       print *, screen, pal, cycle, start, clip
       read *, r
-      return r
+      xpomp_set_color_map=r
       end
       
       integer function xpomp_set_user_color_map(screen,
@@ -68,7 +68,7 @@ c     Ronan.Keryell@cri.ensmp.fr
          print *, screen, red(i), green(i), blue(i)
       enddo
       read *, r
-      return r
+      xpomp_set_user_color_map=r
       end
 
       integer function xpomp_wait_mouse(screen, X, Y)
@@ -78,7 +78,7 @@ c     Ronan.Keryell@cri.ensmp.fr
 !fcd$ io
       print *, screen
       read *, X, Y, r
-      return r
+      xpomp_wait_mouse=r
       end
 
       integer function xpomp_is_mouse(screen, X, Y)
@@ -86,12 +86,10 @@ c     Ronan.Keryell@cri.ensmp.fr
       integer r
 !ldf$ -u xpomp_is_mouse
 !fcd$ io
-      r = X+Y
       print *, screen
       read *, X, Y, r
-      return r
+      xpomp_is_mouse=r
       end
-
       
       integer function xpomp_flash(window,
      &     image,
@@ -115,7 +113,7 @@ c     Ronan.Keryell@cri.ensmp.fr
          enddo
       enddo
       read *, status
-      return status
+      xpomp_flash=status
       end
 
       integer function xpomp_show_real4(screen, image,
@@ -129,7 +127,7 @@ c     Ronan.Keryell@cri.ensmp.fr
       integer X_offset, Y_offset
       integer X_zoom_ratio, Y_zoom_ratio
       integer status
-      real*8 min_value, max_value;
+      real*8 min_value, max_value
       integer status, x, y
 !ldf$ -u xpomp_show_real4
 !fcd$ io
@@ -142,7 +140,7 @@ c     Ronan.Keryell@cri.ensmp.fr
          enddo
       enddo
       read *, status
-      return status
+      xpomp_show_real4=status
       end
 
       integer function xpomp_show_real8(screen, image,
@@ -156,7 +154,7 @@ c     Ronan.Keryell@cri.ensmp.fr
       integer X_offset, Y_offset
       integer X_zoom_ratio, Y_zoom_ratio
       integer status
-      real*8 min_value, max_value;
+      real*8 min_value, max_value
       integer status, x, y
 !ldf$ -u xpomp_show_real8
 !fcd$ io
@@ -169,7 +167,7 @@ c     Ronan.Keryell@cri.ensmp.fr
          enddo
       enddo
       read *, status
-      return status
+      xpomp_show_real8=status
       end
       
       subroutine xpomp_show_usage()
