@@ -30,6 +30,15 @@
 #define ICFG_DECOR_TOTAL_PRECONDITIONS 10
 #define ICFG_DECOR_FILTERED_PROPER_EFFECTS 11
 
+#define RW_FILTERED_EFFECTS "RW_FILTERED_EFFECTS"
+
+#define READ_ALL 0
+#define WRITE_ALL 1
+#define READWRITE_ALL 2
+#define READ_END 3
+#define WRITE_END 4
+#define READWRITE_END 5
+
 #include "dg.h"
 
 typedef dg_arc_label arc_label;
