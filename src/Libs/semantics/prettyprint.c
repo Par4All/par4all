@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/10 19:45:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/12 17:38:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/10/10 19:45:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/10/12 17:38:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -47,7 +47,6 @@ static bool is_transformer;
 static bool is_user_view;
 static hash_table nts = hash_table_undefined;
 
-static text text_transformer(transformer tran);
 static bool print_code_semantics();
 static text get_semantic_text();
 
@@ -245,7 +244,7 @@ statement stmt;
  * output   : a text containing commentaries representing the transformer
  * modifies : nothing.
  */
-static text text_transformer(transformer tran)
+text text_transformer(transformer tran)
 {
     text txt = make_text(NIL);
     boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
