@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/09 08:49:20 $ 
+# $Date: 1996/09/24 16:34:48 $ 
 
 CPPFLAGS+=	$(PIPS_X11_ADDED_CPPFLAGS)
 LDFLAGS+=	$(PIPS_X11_ADDED_LDFLAGS)
@@ -63,7 +63,12 @@ $(ARCH)/xpomp: $(ARCH)/xpomp.o gr.h
 	$(LINK) $@ $(ARCH)/xpomp.o $(X11LIB)
 
 # Deal with different Fortran to C interface call conventions (for strings)
-M4OPT=$(PVM_ROOT)/conf/$(PVM_ARCH).m4
+
+$(PVM_ARCH).m4:
+	cp $(PVM_ROOT)/conf/$(PVM_ARCH).m4 $@
+
+M4OPT=	$(PVM_ARCH).m4
+cgraphic.c:	$(PVM_ARCH).m4
 
 $(LIB):	$(OFILES) cgraphic.c gr.h
 	$(AR) $(ARFLAGS) $(LIB) $(OFILES)
