@@ -2,6 +2,9 @@
  * $Id$
  * 
  * $Log: Pawt.java,v $
+ * Revision 1.6  1998/10/16 16:53:06  coelho
+ * swing package updated.
+ *
  * Revision 1.5  1998/10/16 13:55:59  coelho
  * import fixed.
  *
@@ -37,13 +40,13 @@ import com.sun.java.swing.event.*;
   */
 interface Pawt
 {
-  class PComponent extends java.awt.swing.JComponent
+  class PComponent extends com.sun.java.swing.JComponent
   { 
     public String checking; 
     PComponent() { super(); } 
   }
   
-  class PFrame extends java.awt.swing.JFrame
+  class PFrame extends com.sun.java.swing.JFrame
   { 
     public Vector optionVector;
     PFrame(String name){ super(name); }
@@ -58,24 +61,24 @@ interface Pawt
     }
   }
 
-  class PDialog extends java.awt.swing.JDialog
+  class PDialog extends com.sun.java.swing.JDialog
     { PDialog(Frame f, String s, boolean b){ super(f, s, b); } }
   
-  class PPanel extends java.awt.swing.JPanel
+  class PPanel extends com.sun.java.swing.JPanel
   {
     PPanel(){ super(); }
     PPanel(LayoutManager l){ super(l); }
   }
   
-  class PMenuBar extends java.awt.swing.JMenuBar
+  class PMenuBar extends com.sun.java.swing.JMenuBar
   { PMenuBar(){ super(); } }
   
-  class PMenu extends java.awt.swing.JMenu
+  class PMenu extends com.sun.java.swing.JMenu
   { PMenu(){ super(); }
     PMenu(String name){ super(name); }
   }
   
-  class PMenuItem extends java.awt.swing.JMenuItem
+  class PMenuItem extends com.sun.java.swing.JMenuItem
   {
     public String command;
     public PTextField tf;
@@ -87,7 +90,7 @@ interface Pawt
   }
   
   class PCheckBox 
-    extends java.awt.swing.JCheckBox
+    extends com.sun.java.swing.JCheckBox
   {
     public String command,checking;
     public PCheckBoxMenuItem cbmi;
@@ -114,7 +117,7 @@ interface Pawt
     { this(name, null, null, null, null, frame); }
   }
   
-  class PCheckBoxMenuItem extends java.awt.swing.JCheckBoxMenuItem
+  class PCheckBoxMenuItem extends com.sun.java.swing.JCheckBoxMenuItem
   {
     public String command,checking;
     public PCheckBox cb;
@@ -139,7 +142,7 @@ interface Pawt
   }
 
   class PRadioButtonMenuItem 
-    extends java.awt.swing.JRadioButtonMenuItem
+    extends com.sun.java.swing.JRadioButtonMenuItem
     {
       public String command, checking;
       public PLabel label;
@@ -170,13 +173,13 @@ interface Pawt
 
 
   class PSeparator 
-    extends java.awt.swing.JSeparator
+    extends com.sun.java.swing.JSeparator
   { 
     PSeparator(){ super(); } 
   }
 
   class PButton 
-    extends java.awt.swing.JButton
+    extends com.sun.java.swing.JButton
   {
     public String 	command;
     public PTextField 	tf;
@@ -204,7 +207,7 @@ interface Pawt
   }
 
   class PLabel 
-    extends java.awt.swing.JLabel
+    extends com.sun.java.swing.JLabel
   {
     PLabel(String s, String tip)
       { 
@@ -216,23 +219,23 @@ interface Pawt
     PLabel() { super(); }
   }
     
-  class PTextField extends java.awt.swing.JTextField
+  class PTextField extends com.sun.java.swing.JTextField
     {
       PTextField(){ super(); }
       PTextField(String s){ super(s); }
     }
     
-  class PList extends java.awt.swing.JList
+  class PList extends com.sun.java.swing.JList
     {
-      PList(){ super(); }
-      PList(Vector v){ super(v); }
-      PList(DefaultListModel l){ super(l); }
+      PList() { super(); }
+      PList(Vector v) { super(v); }
+      PList(DefaultListModel l) { super(l); }
     }
 
   /** A PComboBox can send directly its command on selections,
     * or wait for some specific action to do the job (e.g. a button pressed).
     */
-  class PComboBox extends java.awt.swing.JComboBox
+  class PComboBox extends com.sun.java.swing.JComboBox
     {
       public String checking, marker;
       public boolean direct;
@@ -254,14 +257,14 @@ interface Pawt
     }
 
 
-  class PScrollPanel extends java.awt.swing.JScrollPane
+  class PScrollPanel extends com.sun.java.swing.JScrollPane
     {
       PScrollPanel(){ super(); } 
       PScrollPanel(Component c){ super(c); } 
     }
         
         
-  class PButtonGroup extends java.awt.swing.ButtonGroup
+  class PButtonGroup extends com.sun.java.swing.ButtonGroup
     {
       public String checking;
       PButtonGroup(String ch){ super(); checking = ch; }
@@ -275,7 +278,7 @@ interface Pawt
     }
         
         
-  class PTextFrame extends java.awt.swing.JFrame
+  class PTextFrame extends com.sun.java.swing.JFrame
     {
       boolean locked;
       boolean writable;
