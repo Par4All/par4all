@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/18 14:44:44 $, 
+ * $Date: 1996/06/18 15:57:09 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -12,7 +12,13 @@
 #include "semantics.h" /* for load_summary_effects() */
 
 /****************************************************** SUMMARY REDUCTIONS */
-
+/* Fortran 77 anti aliasing rules implies that sg that 
+ * looks like a reduction within a subroutine can be perceived as so
+ * from outside because no aliasing may cause the accumulator to be
+ * linked to the rhs of the accumulation... 
+ * thus summary reductions can be propagated with no harm...
+ * just the usual conditions must be checked (no other effect on the variable)
+ */
 reductions load_summary_reductions(entity f)
 {
     pips_assert("is a module", entity_module_p(f));
@@ -20,32 +26,15 @@ reductions load_summary_reductions(entity f)
 	(DBR_SUMMARY_REDUCTIONS, module_local_name(f), TRUE);
 }
 
-/* should rather check conflicts ??? */
+/* should rather check conflicts ? */
 static bool entity_in_effect_list_p(entity v, list /* of effect */ le)
 {
     MAP(EFFECT, e, if (effect_variable(e)==v) return TRUE, le);
     return FALSE;
 }
 
-/* allocates and returns the list of not conflicting entities */
-static list /* of entity */ 
-all_no_conflict_read_entity(entity var, list /* of effect */ le)
-{
-    list /* of entity */ lread = NIL;
-
-    MAP(EFFECT, e,
-    {
-	entity dep = effect_variable(e);
-	if (effect_read_p(e) && !entity_conflict_p(var, dep))
-	    lread = gen_once(dep, lread);
-    },
-	le);
-
-    return lread;
-}
-
-static reduction compute_one_summary_reduction(
-    reduction model, list /* of effect */ le)
+static reduction 
+compute_one_summary_reduction(reduction model, list /* of effect */ le)
 {
     reduction r = copy_reduction(model);
     entity var = reduction_variable(model);
@@ -55,21 +44,17 @@ static reduction compute_one_summary_reduction(
     MAP(ENTITY, e,
 	if (!entity_in_effect_list_p(e, le))
 	    remove_variable_from_reduction(r, e),
-	reduction_dependences(r));
+	reduction_dependences(model));
 
-    /* the dependences are updated to all touched exported vars 
-     * this is a conservative assumption. may be improved.
-     * when using this information, it must be checked that the 
-     * accumulator is not binded at call site to any of these...
-     */
     gen_free_list(reduction_dependences(r));
-    reduction_dependences(r) = all_no_conflict_read_entity(var, le);
+    reduction_dependences(r) = NIL;
 
     DEBUG_REDUCTION(3, "result\n", r);
     return r;
 }
 
-static reductions compute_summary_reductions(entity f)
+static reductions 
+compute_summary_reductions(entity f)
 {
     list /* of effect */ le = load_summary_effects(f);
     list /* of reduction */ lr = NIL, lc;
