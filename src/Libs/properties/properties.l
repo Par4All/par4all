@@ -335,6 +335,28 @@ set_int_property(string name, int i)
     property_int(p) = i;
 }
 
+void fprint_property_direct(FILE * fd, string pname)
+{
+    property p = get_property(pname, TRUE);
+    if (property_undefined_p(p)) 
+	fprintf(fd, "# undefined property %s\n", pname);
+    else
+	switch (property_tag(p)) {
+	case is_property_bool: 
+	    fprintf(fd, "%s", property_bool(p)? "TRUE": "FALSE");
+	    break;
+	case is_property_int:
+	    fprintf(fd, "%d", property_int(p));
+	    break;
+	case is_property_string:
+	    fprintf(fd, "%s", property_string(p));
+	    break;
+	default: 
+	    fprintf(fd, "# bad property type for %s\n", pname);
+	}
+    
+}
+
 void 
 fprint_property(FILE * fd, string pname)
 {
