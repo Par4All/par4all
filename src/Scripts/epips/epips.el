@@ -12,13 +12,14 @@
 ;; buffer-invisibility-spec and the cursor is no longer on a sensitive
 ;; text, the cursor shape is still x-sensitive-text-pointer-shape
 
-
 ;; To store the module name in a buffer:
 (make-variable-buffer-local 'epips-local-module-name)
 
 
 ;;; The faces used to display various informations. Use the
 ;;; hilit-lookup-face-create function from hilit19.el:
+;; To have hilit-lookup-face-create at least:
+(require 'hilit19)
 
 (if (x-display-color-p)
     (progn
