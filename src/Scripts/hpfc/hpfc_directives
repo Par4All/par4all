@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/01 12:00:43 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/06 17:08:25 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -65,7 +65,7 @@
 # _3: timeoff
 # _4: setbool // to change the compiler global behavior...
 # _5: setint  // dangerous and added for validation purposes...
-# _6: io      // declares an io function (host call only...)
+# _6: io/host // declares an io function (host call only...)
 #
 # (_ is hpfc)
 #
@@ -151,6 +151,7 @@ $SED '#
       s, local\(.*\),      i(I_LOCAL)\1      do I_LOCAL = 0\, 0,
       s, end[ ]*local,      enddo,
       s, io\(.*\),      6(\1),
+      s, host\(.*\),      6(\1),
       # io args shoud look like calls for pips
       /6(/s,\,,()\,,g;
       /6(/s,\([a-z0-9]\))$,\1()),;
@@ -192,7 +193,7 @@ $SED '#
       s, reduction,      r,g
       s, independent,      i,g
       #
-      # on errors...
+      # directives that may remain are errors:
       #
       s,, syntax error:,
       #
@@ -201,7 +202,7 @@ $SED '#
       s,\([123456abdeintpryu]\),call hpfc\1,g
       s,\([ck#s]\),hpfc\1,g' | 
 #
-# handles multi lines breaking (independent with new...)
+# handles multi lines breaking (independent/new/reduction...)
 #
 $TR '' '\012' |
 #
@@ -222,17 +223,17 @@ $SED "s,hpfc#,$NOP,g;
 # (common also appear in the declaration part of the program...)
 # (parameter??? I should check)
 
-LINE=`
-$SED -n '/^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
-         /^[^Cc\*!].... [ 	]*[Rr][Ee][Aa][Ll][ 	\*]/=
-         /^[^Cc\*!].... [ 	]*[Ss][Tt][Rr][Ii][Nn][Gg][ 	\*]/=
-         /^[^Cc\*!].... [ 	]*[Ss][Uu][Bb][Rr][Oo][Uu][Tt][Ii][Nn][Ee][ 	]/=
-         /^[^Cc\*!].... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	]/=
-         /^[^Cc\*!].... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
-         /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
-	 /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\*]/=
-	 /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	\*]/=
-         /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 |
+LINE=`$SED -n \
+    '/^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Rr][Ee][Aa][Ll][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Ss][Tt][Rr][Ii][Nn][Gg][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Ss][Uu][Bb][Rr][Oo][Uu][Tt][Ii][Nn][Ee][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	]/=
+     /^[^Cc\*!].... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 |
 $SED -n '$p'`
 
 [ "$LINE" ] || LINE=0
