@@ -1,9 +1,9 @@
-%	Rapport dret144
-%	Manuel Utilisateur du Paralle'liseur
-%	Version 1.0
-%	rendue le 07.01.91
-%	Version 1.1
-%	preparee a partir du 15.03.91 (apres la recette)
+%       Rapport dret144
+%       Manuel Utilisateur du Paralle'liseur
+%       Version 1.0
+%       rendue le 07.01.91
+%       Version 1.1
+%       preparee a partir du 15.03.91 (apres la recette)
 %
 % Il faudra faire evoluer ce manuel en tenant compte des remarques des
 % utilisateurs et au fur et a mesure de l'evolution de PIPS.
@@ -15,11 +15,11 @@
 \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
 \newcommand{\titre}{PROJET PIPS \\
-		Manuel Utilisateur du Paralle'liseur Batch (Version 2.1)}
+                Manuel Utilisateur du Paralle'liseur Batch (Version 2.1)}
 \newcommand{\auteur}{
-		Bruno BARON \\
-        	Franc,ois IRIGOIN \\
-        	Pierre JOUVELOT\\
+                Bruno BARON \\
+                Franc,ois IRIGOIN \\
+                Pierre JOUVELOT\\
 \vspace{0.5cm}
 {\it Le pre'sent document a e'te' e'tabli en exe'cution du contrat
 No.~88.017.01 passe' par la Direction des Recherches, Etudes et
@@ -787,34 +787,36 @@ de'tail dans le rapport EMP-CAI-I~E/103.
 Les restrictions essentielles au langage sont les suivantes:
 \begin{enumerate}
 
-  \item ENTRY 
+\item ENTRY
 
-  \item BLOCKDATA
+\item BLOCKDATA
 
-  \item ASSIGN et GOTO assigne'
+\item ASSIGN et GOTO assigne'
 
-  \item RETURN multiple
+\item RETURN multiple
 
-  \item GOTO calcule'
+\item GOTO calcule'
 
-  \item ope'rateur substring ``:''
+\item ope'rateur substring ``:''
 
-  \item initialisation de chai^nes de caracte`res de type Hollerith \\
-(par exemple \verb+DATA A /8HOPERATIN,8HG POINT /+ doit e^tre
-transforme' en \verb+DATA A /'OPERATIN','G POINT '/+; l'utilitaire
-\verb+ISTJS+ de Toolpack effectue cette conversion);
+\item initialisation de chai^nes de caracte`res de type Hollerith \\ (par
+  exemple \verb+DATA A /8HOPERATIN,8HG POINT /+ doit e^tre transforme' en
+  \verb+DATA A /'OPERATIN','G POINT '/+; l'utilitaire \verb+ISTJS+ de
+  Toolpack effectue cette conversion);
 
-  \item le caracte`re {\em double quote} est prohibe' comme dans la
-norme bien que de nombreux compilateurs acceptent un jeu de caracte`res
-plus grand que celui qui est spe'cifie' dans la norme;
+\item le caracte`re {\em double quote} est prohibe' comme dans la norme
+  bien que de nombreux compilateurs acceptent un jeu de caracte`res plus
+  grand que celui qui est spe'cifie' dans la norme;
 
-  \item les fonctions formules ne sont pas traite'es;
+\item les fonctions formules ne sont pas traite'es;
 
-  \item les constantes complexes doivent e^tre remplace'es par un appel
-a` \verb+CMPLX+;
+\item les constantes complexes doivent e^tre remplace'es par un appel a`
+  \verb+CMPLX+;
 
-  \item les de'clarations de COMMONs doivent apparai^tre apre`s
-	toutes les de'clarations de type.
+\item les de'clarations de COMMONs doivent apparai^tre apre`s toutes les
+  de'clarations de type.
+
+\item les de'clarations d'un m\^eme COMMON doivent avoir la m\^eme taille.
 
 \end{enumerate}
 
@@ -835,9 +837,9 @@ D'autres conseils donne's dans cet ouvrage permettront d'ame'liorer
 les re'sultats donne's par PIPS:
 \begin{itemize}
   \item utilisation de \verb+END+ sans \verb+STOP+ ni \verb+RETURN+
-	pour terminer les unite's de programme (M.IV.3, M.V.1, M.V.8, M.V.14);
+        pour terminer les unite's de programme (M.IV.3, M.V.1, M.V.8, M.V.14);
   \item de'finition uniforme des \verb+COMMONs+ dans tout un programme
-	(M.V.21)
+        (M.V.21)
 \end{itemize}
 
 % Il n'est pas non plus possible d'utiliser la me^me chai^ne de
@@ -880,7 +882,7 @@ suivante:
   \item de'claration des types et dimensions des variables;
 
   \item de'claration des externes, l'ordre EXTERNAL pre'ce'dant la
-	de'claration de type;
+        de'claration de type;
 
   \item de'claration des \verb+COMMON+s.
 
@@ -1016,9 +1018,9 @@ risquent d'engendrer des incohe'rences entre la base et son sche'ma.
 
 La syntaxe d'une re`gle du fichier pipsmake.rc est la suivante:
 \begin{verbatim}
-rule		> OWNER.resource
-		[> OWNER.resource]...
-	[< OWNER.resource]...
+rule            > OWNER.resource
+                [> OWNER.resource]...
+        [< OWNER.resource]...
 \end{verbatim}
 
 Ces re`gles ne doivent pas e^tre modifie'es, mais il est possible d'en
