@@ -189,7 +189,7 @@ Ppolynome ppinf, ppsup;
  */
 Ppolynome polynome_sort(ppp, is_inferior_var)
 Ppolynome *ppp;
-boolean (*is_inferior_var)();
+boolean (*is_inferior_var)(Pvecteur *, Pvecteur *);
 {
     Ppolynome ppcur;
     Ppolynome ppsearchmin;
