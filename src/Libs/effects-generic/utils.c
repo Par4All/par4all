@@ -468,4 +468,9 @@ generic_effects_reset_all_methods()
     db_put_summary_out_effects_func = (void_function) UNDEF;
     db_get_out_effects_func = (chunks_function) UNDEF;
     db_put_out_effects_func = (void_function) UNDEF;
+
+    set_contracted_proper_effects(TRUE);
+    set_contracted_rw_effects(TRUE);
+
+    set_descriptor_range_p(FALSE);
 }
