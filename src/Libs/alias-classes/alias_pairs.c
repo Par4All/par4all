@@ -101,7 +101,10 @@ add_parameter_aliases_for_this_call_site(call call_site,
     ifdebug(9)
 	{
 	    pips_debug(9,"regions:\n");
-	    print_regions(list_regions_callee);
+	    MAP(EFFECT, callee_region,
+		{
+		    print_region(callee_region);
+		}, list_regions_callee);
 	}
 
     for (r_args = real_args, arg_num = 1; r_args != NIL;
