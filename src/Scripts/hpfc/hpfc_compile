@@ -2,8 +2,11 @@
 #
 # HPFC driver, Fabien COELHO
 #
-# $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1997/01/18 16:58:01 $, 
+# $Id$
+# $Log: hpfc_compile,v $
+# Revision 1.50  1997/03/19 17:50:00  coelho
+# better RCS headers.
+#
 
 sh=`basename $0`
 STATUS='0'
