@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/17 23:32:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/22 18:41:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/17 23:32:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/22 18:41:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -601,7 +601,7 @@ int n;
 	}
 	else {
 	    pbeg = CHAIN_SWORD(NIL, "BEGIN BLOCK");
-	    pend = CHAIN_SWORD(NIL, "END   BLOCK");
+	    pend = CHAIN_SWORD(NIL, "END BLOCK");
 	    
 	    u = make_unformatted(strdup("C"), n, margin, pbeg);
 	    ADD_SENTENCE_TO_TEXT(r, 
@@ -1031,7 +1031,7 @@ text_unstructured(entity module,
                   int margin,
                   unstructured u, int num)
 {
-   text r ;
+   text r = make_text(NIL);
    hash_table labels = hash_table_make(hash_pointer, 0) ;
    set trail = set_make(set_pointer) ;
    control previous = control_undefined ;
@@ -1051,11 +1051,31 @@ text_unstructured(entity module,
                                               num);
    }
    else {
-      r = text_graph(module, margin, ct, &previous, trail, labels, cexit) ;
+       list pbeg, pend;
 
-      MERGE_TEXTS(r, text_control(module, margin, cexit,
-                                  &previous, set_make(set_pointer), labels,
-                                  cexit)) ;
+       if(get_bool_property("PRETTYPRINT_UNSTRUCTURED")) {
+	   pbeg = CHAIN_SWORD(NIL, "BEGIN UNSTRUCTURED");
+	    
+	   u = make_unformatted(strdup("C"), num, margin, pbeg);
+	   ADD_SENTENCE_TO_TEXT(r, 
+				make_sentence(is_sentence_unformatted, u));
+       }
+
+       MERGE_TEXTS(r,
+		   text_graph(module, margin, ct,
+			      &previous, trail, labels, cexit));
+
+       MERGE_TEXTS(r, text_control(module, margin, cexit,
+				   &previous, set_make(set_pointer), labels,
+				   cexit)) ;
+
+       if(get_bool_property("PRETTYPRINT_UNSTRUCTURED")) {
+	   pend = CHAIN_SWORD(NIL, "END UNSTRUCTURED");
+	    
+	   u = make_unformatted(strdup("C"), num, margin, pend);
+	   ADD_SENTENCE_TO_TEXT(r, 
+				make_sentence(is_sentence_unformatted, u));
+       }
    }
    
    if( get_debug_level() == 9 ) {
