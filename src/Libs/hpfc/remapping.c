@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/09/05 17:07:00 $, ) 
+ * ($Date: 1995/09/05 17:53:54 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -479,7 +479,8 @@ bool dist_p; /* true if must take care of lambda */
     entity lid = hpfc_name_to_entity(T_LID),
            p_src = array_to_processors(src),
            p_trg = array_to_processors(trg),
-           lambda = get_ith_temporary_dummy(3);
+           lambda = get_ith_temporary_dummy(3),
+           primary = load_primary_entity(src);
     statement copy, recv, send, receive, cont, result;
 
     pips_debug(3, "%s taking care of processor cyclic distribution\n", 
@@ -552,12 +553,19 @@ bool dist_p; /* true if must take care of lambda */
 
     /*   some comments to help understand the generated code
      */
-    statement_comments(result) =
-	strdup(concatenate("c remapping ", entity_local_name(src), 
-			   " -> ", entity_local_name(trg), "\n", NULL));
-    statement_comments(send) = strdup("c send part\n");
-    statement_comments(receive) = strdup("c receive part\n");
-    statement_comments(cont) = strdup("c end of remapping\n");
+    {
+	char buffer[128];
+	
+	sprintf(buffer, "c remapping %s[%d]: %s[%d] -> %s[%d]\n",
+		entity_local_name(primary), load_hpf_number(primary),
+		entity_local_name(src), load_hpf_number(src),
+		entity_local_name(trg), load_hpf_number(trg));
+	
+	statement_comments(result) = strdup(buffer);
+	statement_comments(send) = strdup("c send part\n");
+	statement_comments(receive) = strdup("c receive part\n");
+	statement_comments(cont) = strdup("c end of remapping\n");
+    }
     
     DEBUG_STAT(3, "result", result);
     
