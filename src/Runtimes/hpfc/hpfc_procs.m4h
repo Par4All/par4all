@@ -1,7 +1,7 @@
 !
 ! COMMON /HPFC PROCS/
 !
-! $RCSfile: hpfc_procs.m4h,v $ ($Date: 1996/09/07 16:56:02 $, )
+! $RCSfile: hpfc_procs.m4h,v $ ($Date: 1996/09/07 17:15:16 $, )
 ! version $Revision$
 ! got on %D%, %T%
 ! $Id$
@@ -24,7 +24,7 @@
      $     OUTSIDE SPAWN,
      $     MAIN PROGRAM NAME,
      $     NODE PROGRAM NAME,
-     $     NODEARCHITECTURE,
+     $     NODE ARCHITECTURE,
      $     HPFC GROUP NAME _CM5(`,
      $     CM HOST ID,
      $     CM MY ID,
@@ -47,7 +47,7 @@
       character*32 
      $     MAIN PROGRAM NAME,
      $     NODE PROGRAM NAME, 
-     $     NODEARCHITECTURE,
+     $     NODE ARCHITECTURE,
      $     HPFC GROUP NAME
 !
 !
