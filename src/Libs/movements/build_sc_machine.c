@@ -40,16 +40,18 @@
  *        0 <= ofs <= ls-1
 */
 
-Psysteme build_sc_machine(pn,bn,ls,sc_array_function,proc_id,bank_indices,entity_var)
-int pn,bn,ls;
-Psysteme sc_array_function;
-entity proc_id;
-Pbase bank_indices;
-entity entity_var;
+Psysteme build_sc_machine(
+    int pn,
+    int bn,
+    int ls,
+    Psysteme sc_array_function,
+    entity proc_id,
+    Pbase bank_indices,
+    entity entity_var)
 {
 
     type t = entity_type(entity_var);
-    int ms=0;
+    Value ms=0;
     Variable vbank,vligne,vofs;
     Psysteme sc = sc_init_with_sc(sc_array_function);
     Pcontrainte pc;
@@ -66,13 +68,12 @@ entity entity_var;
 	normalized norm1 = NORMALIZE_EXPRESSION(lower);
 	expression upper= dimension_upper(dim1);
 	normalized norm2 = NORMALIZE_EXPRESSION(upper);
-	int min_ms =0;
-	int max_ms=0;
+	Value min_ms =VALUE_ZERO, max_ms=VALUE_ZERO;
 	if (normalized_linear_p(norm1) && normalized_linear_p(norm2)) {
 	    min_ms = vect_coeff(TCST,(Pvecteur) normalized_linear(norm1));
 	    max_ms = vect_coeff(TCST,(Pvecteur) normalized_linear(norm2));
 	}
-	ms = max_ms - min_ms +1;
+	ms = value_plus(value_minus(max_ms,min_ms), VALUE_ONE);
 
 	bas = variable_basic(var);
 	/* Si l'on veut utiliser le nombre d'octets il faut remplacer l'equation 
@@ -94,7 +95,10 @@ entity entity_var;
 	
     }
 
-    ifdebug(8) { (void) fprintf(stderr," MS = %d \n",ms); }
+    ifdebug(8) {  
+	fprint_string_Value(stderr," MS = ",ms);
+	fprintf(stderr, " \n"); 
+    }
 
     vbank = vecteur_var(bank_indices);
     vligne = vecteur_var(bank_indices->succ);
@@ -113,59 +117,59 @@ entity entity_var;
        else build the constraint
        (VAR1-1) * ms + (VAR2-1) == bn*ls*L +ls*bank_id+O,
        VAR1 and VAR2 correspond to the image array function indices */
-    pv1 = vect_new(vbank,-ls);
-    vect_add_elem(&pv1,vligne,-bn*ls);
-    vect_add_elem(&pv1,vofs,-1);
+    pv1 = vect_new(vbank,int_to_value(-ls));
+    vect_add_elem(&pv1,vligne,int_to_value((-bn*ls)));
+    vect_add_elem(&pv1,vofs,VALUE_MONE);
     if (COLUMN_MAJOR)
 	pc = sc_array_function->inegalites;
     else pc = sc_array_function->inegalites->succ;
     /* to deal with MONO dimensional array */
-    if (pc==NULL) pc= contrainte_make(vect_new(TCST,1));
+    if (pc==NULL) pc= contrainte_make(vect_new(TCST,VALUE_ONE));
     pv2 = vect_dup(pc->vecteur);
-    vect_add_elem(&pv2,TCST,-1);
-    pv2 = vect_multiply(pv2,nb_bytes);
+    vect_add_elem(&pv2,TCST,VALUE_MONE);
+    pv2 = vect_multiply(pv2,int_to_value(nb_bytes));
     pv1 = vect_add(pv1,pv2);
     if (COLUMN_MAJOR)
 	pc = pc->succ;
     else pc =  sc_array_function->inegalites;    
     /* to deal with MONO dimensional array */
-    if (pc==NULL) pc=  contrainte_make(vect_new(TCST,1));
+    if (pc==NULL) pc=  contrainte_make(vect_new(TCST,VALUE_ONE));
     pv2 = vect_dup(pc->vecteur);
-    vect_add_elem(&pv2,TCST,-1);
-    pv2 = vect_multiply(pv2,ms * nb_bytes);
+    vect_add_elem(&pv2,TCST,VALUE_MONE);
+    pv2 = vect_multiply(pv2,value_mult(ms,int_to_value(nb_bytes)));
     pv1 = vect_add(pv1,pv2);
     pc = contrainte_make(pv1);
     sc_add_eg(sc,pc);
 
     /* build the constraints 0 <= bank_id <= bn-1 */
 
-    pv2 = vect_new(vbank, -1);
+    pv2 = vect_new(vbank, VALUE_MONE);
     pc = contrainte_make(pv2);
     sc_add_ineg(sc,pc);
-    pv2 = vect_new(vbank, 1);
-    vect_add_elem(&pv2,TCST,- bn+1);
+    pv2 = vect_new(vbank, VALUE_ONE);
+    vect_add_elem(&pv2,TCST,int_to_value(- bn+1));
     pc = contrainte_make(pv2);
     sc_add_ineg(sc,pc);
 
     /* build the constraints 0 <= proc_id <= pn-1 */
     sc->base = vect_add_variable(sc->base,(char *) proc_id);
     sc->dimension++;
-    pv2 = vect_new((char *) proc_id, -1);
+    pv2 = vect_new((char *) proc_id, VALUE_MONE);
     pc = contrainte_make(pv2);
     sc_add_ineg(sc,pc);
-    pv2 = vect_new((char *) proc_id, 1);
-    vect_add_elem(&pv2,TCST,- pn+1);
+    pv2 = vect_new((char *) proc_id, VALUE_ONE);
+    vect_add_elem(&pv2,TCST,int_to_value(- pn+1));
     pc = contrainte_make(pv2);
     sc_add_ineg(sc,pc);
 
 
     /* build the constraints 0 <= O <= ls -1 */
 
-    pv2 = vect_new(vofs, -1);
+    pv2 = vect_new(vofs, VALUE_MONE);
     pc = contrainte_make(pv2);
     sc_add_ineg(sc,pc);
-    pv2 = vect_new(vofs, 1);
-    vect_add_elem(&pv2,TCST,- ls +1);
+    pv2 = vect_new(vofs, VALUE_ONE);
+    vect_add_elem(&pv2,TCST,int_to_value(- ls +1));
     pc = contrainte_make(pv2);
     sc_add_ineg(sc,pc);
 
@@ -173,7 +177,7 @@ entity entity_var;
     /* build the constraints 0 <= L   */
  
  
-    pc = contrainte_make(vect_new(vligne,-1));
+    pc = contrainte_make(vect_new(vligne,VALUE_MONE));
     sc_add_ineg(sc,pc);
     ifdebug(8)  {
 	(void) fprintf(stderr,"Domain Machine :\n");
