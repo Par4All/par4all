@@ -135,7 +135,7 @@ void debug_unstructured (unstructured an_unstructured,
       list successors = control_successors(current_control);
       char temp[50];
       int i;
-      int ordering;
+      int ordering = 0;
 
       for (i=0; i<gen_length(predecessors); i++) {
 	ordering = statement_ordering(control_statement
@@ -388,4 +388,159 @@ int beautify_ordering (int an_ordering)
   int ordering_up = (an_ordering & 0xffff0000) >> 16;
   int ordering_down = (an_ordering & 0x0000ffff);
   return ordering_up + ((ordering_down-1) << 16);
+}
+
+void clean_statement_from_tags (string comment_portion,
+				statement stat) 
+{
+  string comments;
+  char*  next_line;
+  string searched_string;
+
+  if (!statement_with_empty_comment_p(stat)) {
+
+    string new_comments = NULL;
+ 
+    searched_string = strdup(comment_portion);
+    searched_string[strcspn(comment_portion, "%s")] = '\0';
+    comments = strdup(statement_comments(stat));
+    next_line = strtok (comments, "\n");
+    if (next_line != NULL) {
+      do {
+	if (strstr(next_line,searched_string) == NULL) {
+	  if (new_comments != NULL) {
+	    new_comments = strdup(concatenate(new_comments, next_line, "\n", NULL));
+	  }
+	  else {
+	    new_comments = strdup(concatenate("", next_line, "\n", NULL));
+	  }
+	}
+	next_line = strtok(NULL, "\n");
+      }
+      while (next_line != NULL);
+    }
+    
+    if (new_comments != NULL) {
+      statement_comments(stat) = new_comments;
+    }
+    else {
+      statement_comments(stat) = empty_comments;
+    }
+  }
+    
+}
+
+typedef struct {
+  string searched_string;
+  list list_of_statements;
+} statement_checking_context;
+
+static void check_if_statement_contains_comment(statement s, void* a_context)
+{
+  statement_checking_context* context = (statement_checking_context*)a_context;
+  string comments;
+
+  if (!statement_with_empty_comment_p(s)) {
+    
+    comments = strdup(statement_comments(s));
+    
+    /*pips_debug(5, "Searching comment: [%s] in [%s]\n", 
+      context->searched_string, comments);*/
+      
+    if (strstr(comments,context->searched_string) != NULL) {
+      context->list_of_statements
+	= CONS(STATEMENT,s,context->list_of_statements);
+    }
+  }
+}
+
+/**
+ *
+ */
+list get_statements_with_comments_containing (string comment_portion,
+					      statement stat)
+{
+  statement_checking_context context;
+
+  /* First, set searched_string (we remove format information)*/
+  context.searched_string = strdup(comment_portion);
+  context.searched_string[strcspn(comment_portion, "%s")] = '\0';
+
+  /* Reset list */
+  context.list_of_statements = NIL;
+  
+  /*ifdebug(5) {
+    pips_debug(5, "Searching statements with comments: %s\n",
+	       context.searched_string);      
+    pips_debug(5, "In statement:\n");      
+    print_statement(stat);
+    }*/
+
+  gen_context_recurse(stat, &context, statement_domain, gen_true, 
+		      check_if_statement_contains_comment);
+  
+  return context.list_of_statements;
+  
+}
+
+bool statement_is_contained_in_a_sequence_p (statement root_statement,
+					     statement searched_stat) 
+{
+  return (sequence_statement_containing (root_statement,
+					 searched_stat) != NULL);
+}
+
+typedef struct {
+  statement searched_statement;
+  statement found_sequence_statement;
+} sequence_searching_context;
+
+
+static void search_sequence_containing (statement s, 
+					void* a_context)
+{
+  sequence_searching_context* context 
+    = (sequence_searching_context*)a_context;
+  instruction i = statement_instruction(s);
+  
+  if (instruction_tag(i) == is_instruction_sequence) {
+    MAP (STATEMENT, s2, {
+      if (s2 == context->searched_statement) {
+	context->found_sequence_statement = s;
+      }
+    }, sequence_statements(instruction_sequence(i)));
+  }
+}
+
+statement sequence_statement_containing (statement root_statement,
+					 statement searched_stat)
+{
+  sequence_searching_context context;
+
+  context.searched_statement = searched_stat;
+  context.found_sequence_statement = NULL;
+
+  gen_context_recurse(root_statement, &context, 
+		      statement_domain, gen_true, 
+		      search_sequence_containing);
+
+  return context.found_sequence_statement;
+}
+
+void replace_in_sequence_statement_with (statement old_stat, 
+					 statement new_stat,
+					 statement root_stat) 
+{
+  statement sequence_statement = sequence_statement_containing (root_stat,
+								old_stat);
+  list stats_list;
+
+  pips_assert("Statement is contained in a sequence", 
+	      sequence_statement != NULL);
+
+  stats_list = sequence_statements(instruction_sequence(statement_instruction(sequence_statement)));
+
+  gen_insert_after (new_stat, old_stat, stats_list);
+  gen_remove (&stats_list, old_stat);
+  
 }
