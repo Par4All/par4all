@@ -1,5 +1,5 @@
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/07/15 19:02:50 $, 
+# $Date: 1996/07/15 21:01:14 $, 
 # (c) Fabien COELHO July 1996
 #
 # This makefile forwards make targets to sub-directories...
@@ -50,7 +50,7 @@ FWD_OUT		=
 # Report the result of the forward.
 %::
 	-@echo Forwarding $@ from $(FWD_ROOT) >&2;\
-	if test "$@" -eq "debug_forward_makefile"; then\
+	if test "$@" = debug_forward_makefile ; then\
 	  echo "FWD_DIRS=$(FWD_DIRS)"; echo "FWD_MSG=$(FWD_MSG)";\
 	  echo "FWD_ROOT=$(FWD_ROOT)"; echo "FWD_REPORT=$(FWD_REPORT)";\
 	  echo "FWD_OUT=$(FWD_OUT)"; fi;\
