@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.76  1998/01/24 10:06:06  coelho
+ * function to ask whether to behave as a shell.
+ *
  * Revision 1.75  1997/12/12 17:22:26  coelho
  * leaks--
  *
@@ -335,8 +338,7 @@ i_shell: TK_SHELL TK_ENDOFLINE
 
 i_unknown: TK_UNKNOWN TK_ENDOFLINE
 	{ 
-	    if (tpips_behaves_like_a_shell || 
-		get_bool_property("TPIPS_IS_A_SHELL"))
+	    if (tpips_behaves_like_a_shell())
 	    {
 		pips_user_warning("implicit shell command assumed!\n");
 		tp_system($1); 
@@ -347,7 +349,8 @@ i_unknown: TK_UNKNOWN TK_ENDOFLINE
 		    "\tMaybe you intended to execute a direct shell command.\n"
 		    "\tThis convenient feature is desactivated by default.\n"
 		    "\tTo enable it, you can run tpips with the -s option,\n"
-		    "\tor do \"setproperty TPIPS_IS_A_SHELL=TRUE\".\n"
+		    "\tor do \"setproperty TPIPS_IS_A_SHELL=TRUE\",\n"
+		    "\tor do \"setenv TPIPS_IS_A_SHELL=TRUE\".\n"
 		    "\tOtherwise use ! or \"shell\" as a command prefix.\n\n");
 	    }
 	    free($1);
