@@ -1,40 +1,28 @@
 # $Id$
 
+########################################################################## ROOT
+
 ifdef ROOT
 INSTALL_DIR	= $(ROOT)
 else
 $(error "no root directory!")
 endif # ROOT
 
-# set ARCH
-ifndef ARCH
-ifdef PIPS_ARCH
-ARCH	= $(PIPS_ARCH)
-else
-ifdef NEWGEN_ARCH
-ARCH	= $(NEWGEN_ARCH)
-else
-ifdef LINEAR_ARCH
-ARCH	= $(LINEAR_ARCH)
-else
-ARCH	= DEFAULT
-endif # LINEAR_ARCH
-endif # NEWGEN_ARCH
-endif # PIPS_ARCH
-endif # ARCH
+ifndef PIPS_ROOT
+PIPS_ROOT	= $(ROOT)/../pips
+endif # PIPS_ROOT
 
-# checks consistency?
-ifndef INSTALL_DIR
-$(error "INSTALL_DIR macro is not defined!")
-endif
+ifndef NEWGEN_ROOT
+NEWGEN_ROOT	= $(ROOT)/../newgen
+endif # NEWGEN_ROOT
 
-ifeq ($(INSTALL_DIR),)
-$(error "INSTALL_DIR macro is empty!")
-endif
+ifndef LINEAR_ROOT
+LINEAR_ROOT	= $(ROOT)/../linear
+endif # LINEAR_ROOT
 
-ifndef ARCH
-$(error "ARCH macro is not defined")
-endif
+ifndef EXTERN_ROOT
+EXTERN_ROOT	= $(ROOT)/../extern
+endif # EXTERN_ROOT
 
 # where to install stuff
 BIN.d	= $(INSTALL_DIR)/Bin/$(ARCH)
@@ -46,6 +34,28 @@ UTL.d	= $(INSTALL_DIR)/Utils
 SHR.d	= $(INSTALL_DIR)/Bin
 RTM.d	= $(INSTALL_DIR)/Runtime
 MAKE.d	= $(INSTALL_DIR)/makes
+
+########################################################################## ARCH
+
+ifndef ARCH
+ifdef PIPS_ARCH
+ARCH	= $(PIPS_ARCH)
+else
+ifdef NEWGEN_ARCH
+ARCH	= $(NEWGEN_ARCH)
+else
+ifdef LINEAR_ARCH
+ARCH	= $(LINEAR_ARCH)
+else
+ARCH	= $(shell $(MAKE.d)/arch.sh)
+endif # LINEAR_ARCH
+endif # NEWGEN_ARCH
+endif # PIPS_ARCH
+endif # ARCH
+
+ifndef ARCH
+$(error "ARCH macro is not defined")
+endif
 
 include $(MAKE.d)/$(ARCH).mk
 include $(MAKE.d)/svn.mk
