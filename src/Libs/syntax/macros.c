@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: macros.c,v $
+ * Revision 1.4  1997/09/20 22:06:58  coelho
+ * recurse if necessary only.
+ *
  * Revision 1.3  1997/09/18 17:11:23  coelho
  * does not subs twice...
  *
@@ -283,6 +286,7 @@ parser_macro_expansion(expression e)
 void 
 parser_substitute_all_macros(statement s)
 {
-    if (get_bool_property("PARSER_EXPAND_STATEMENT_FUNCTIONS"))
+    if (current_macros_index>0 &&
+        get_bool_property("PARSER_EXPAND_STATEMENT_FUNCTIONS"))
 	gen_recurse(s, expression_domain, gen_true, parser_macro_expansion);
 }
