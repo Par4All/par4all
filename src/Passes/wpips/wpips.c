@@ -210,7 +210,11 @@ wpips_xview_error(Xv_object object,
            xv_error_format(object, avlist));
    /* Cannot use pips_assert since it uses XView, neither
       get_bool_property for the same reason: */
-   assert(get_debug_level() < 1);
+   if (get_debug_level() > 0) {
+      fprintf(stderr, "wpips_xview_error is aborting as requested since WPIPS_DEBUG_LEVEL > 0...\n");
+      abort();
+   }
+   
    debug_off();
    
    return XV_OK;
