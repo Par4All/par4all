@@ -414,7 +414,7 @@ int l;
 
     ifdebug(8) {
 	debug(8, "FindAndTopSortSccs", "Dependence graph:\n");
-	print_graph(stderr, statement_undefined, g);
+	prettyprint_dependence_graph(stderr, statement_undefined, g);
     }
 
     debug(3, "FindAndTopSortSccs", "computing sccs ...\n");
