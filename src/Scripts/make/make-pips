@@ -1,6 +1,8 @@
 #! /bin/sh
 #! /bin/sh -vx
 
+umask 2
+
 # make-pips: global remake of PIPS libraries and passes to be used after
 # changes in data structures or global installation of sources.
 #
