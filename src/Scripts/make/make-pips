@@ -2,7 +2,7 @@
 #! /bin/sh -vx
 #
 # SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1995/09/25 13:08:00 $, )
+# $RCSfile: make-pips,v $ ($Date: 1995/10/05 09:14:38 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -26,17 +26,19 @@ umask 2
 # Modifications:
 #  - variable FAILURES is added to check the happy ending (FI, 18/07/92)
 
-USAGE="Usage: $0 [-p|d|a|r] [-n]"
+USAGE="Usage: $0 [-p|d|a|r] [-n] [-o]"
 
 MAKE_OPTION=""
 DEVELOPMENT=""
 PRODUCTION=TRUE
 RECOMPILE=""
 FAILURES=""
+KEEP_STDOUT=""
 
-while getopts dnpar opt
+while getopts odnpar opt
 do
 	case $opt in
+	o)	KEEP_STDOUT=TRUE;;
 	d)	DEVELOPMENT=TRUE
 		PRODUCTION="";;
 	n)	MAKE_OPTION="-n";;
@@ -54,25 +56,47 @@ done
 #echo DEVELOPMENT="$DEVELOPMENT"
 #echo MAKE_OPTION="$MAKE_OPTION"
 
-# Pips project libraries:
-# Libs have to be topologically ordered to generate header files before
-# they are needed; 
-# Library order does usualy not matter. In order not to forget any:
-LIBS=`(cd $PIPS_LIBSRCDIR; echo [!M]*)`
-
-#LIBS="misc properties text-util ri-util pipsdbm syntax effects control dg-util rice ricedg transformer semantics regions privatize prettyprint generation conversion complexity chains callgraph bootstrap loop_normalize atomizer transformations movements wp65 reductions pipsmake top-level"
-
-# obsolete (use "make bottom-up" instead)
-#LIBS=`analyze_libraries -p;order_libraries -b; sed 's/^lib//;s/.a$//' </tmp/libs.b`
-
-#LIBS=`(cd $PIPS_UTILDIR; make bottom-up >/dev/null 2>/dev/null); sed 's/^lib//;s/.a$//' < $PIPS_TEMPDIR/libs.b`
-
-echo LIBS=$LIBS
+# Prepare file redirections
+if [ -n "$KEEP_STDOUT" ]
+then
+	REDIRECT=""
+else
+	REDIRECT=" > /dev/null"
+fi
 
 # Pips project passes
 # Explicit definition of passes to avoid obsolete ones
 
 PASSES=${PIPS_PASSES}
+
+# Pips project libraries:
+# Libs have to be topologically ordered to generate header files before
+# they are needed; 
+# Library order does usualy not matter. In order not to forget any:
+# GO : ordering allow making of the .h files - if there where no cycles ... :-(
+#
+#LIBS=`(cd $PIPS_LIBSRCDIR; echo [!M]*)`
+
+echo analyzing libraries ...
+analyze_libraries -p
+
+echo ordering libraries ...
+order_libraries -b
+
+#build a regexp to avoid passes in libs
+
+AVOID_PASSES='(^'
+for lib in $PASSES ; do
+	AVOID_PASSES="${AVOID_PASSES}${lib}\$|^"
+done
+AVOID_PASSES="${AVOID_PASSES}\$)"
+
+#echo AVOID_PASSES=${AVOID_PASSES}
+
+# Get the lib list
+LIBS=`sed 's/^lib//;s/.a$//' ${PIPS_TEMPDIR}/libs.b | egrep -v ${AVOID_PASSES}`
+
+echo LIBS=$LIBS
 
 # build internal representation
 # echo "Making internal representation"
@@ -87,10 +111,10 @@ for lib in $LIBS ; do
 		echo "Making ${PIPS_LIBDIR}/lib${lib}.a"
 		if [ -n "$RECOMPILE" ]
 		then
-			make $MAKE_OPTION clean >/dev/null
-			make $MAKE_OPTION depend >/dev/null
+			eval make $MAKE_OPTION clean $REDIRECT
+			eval make $MAKE_OPTION depend $REDIRECT
 		fi ;
-		make $MAKE_OPTION recompile >/dev/null)
+		eval make $MAKE_OPTION recompile $REDIRECT)
 	if [ $? -ne 0 ] ; then
 		echo "Failed in building library $lib in Production"
 		FAILURES="$FAILURES $lib (P),"
@@ -105,7 +129,7 @@ for lib in $LIBS ; do
 	echo; echo
 	(echo cd ${PIPS_DEVEDIR}/Lib/${lib}; cd ${PIPS_DEVEDIR}/Lib/${lib}; 
 		echo "Making lib${lib}.a"
-		make $MAKE_OPTION recompile >/dev/null)
+		eval make $MAKE_OPTION recompile $REDIRECT)
 	if [ $? -ne 0 ] ; then
 		echo "Failed in building library $lib in Development"
 		FAILURES="$FAILURES $lib (D),"
@@ -127,10 +151,10 @@ for pass in $PASSES ; do
 		echo "Making ${PIPS_BINDIR}/${pass}"
 		if [ -n "$RECOMPILE" ]
 		then
-			make $MAKE_OPTION clean >/dev/null
-			make $MAKE_OPTION depend >/dev/null
+			eval make $MAKE_OPTION clean $REDIRECT
+			eval make $MAKE_OPTION depend $REDIRECT
 		fi ;
-		make $MAKE_OPTION recompile >/dev/null)
+		eval make $MAKE_OPTION recompile $REDIRECT)
 	if [ $? -ne 0 ] ; then
 		echo " Failed in building ${PIPS_BINDIR}/${pass}"
 		FAILURES="$FAILURES $pass (P),"
@@ -145,7 +169,7 @@ for pass in $PASSES ; do
 	echo; echo
 	(echo cd ${PIPS_DEVEDIR}/Passes/${pass} ; cd ${PIPS_DEVEDIR}/Passes/${pass};
 		echo "Making ${pass}"
-		make $MAKE_OPTION recompile >/dev/null)
+		eval make $MAKE_OPTION recompile $REDIRECT)
 	if [ $? -ne 0 ] ; then
 		echo " Failed in building pass $pass in Development"
 		FAILURES="$FAILURES $pass (D),"
