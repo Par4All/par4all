@@ -9,20 +9,8 @@
  * 
  */
 /*************************************************************************/
-/* system libraries */
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-/* #include <stdlib.h> */
 
-/* PiPs specific headers */
-#include "genC.h"
-#include "linear.h"
-#include "ri.h"
-#include "misc.h"
-/* To avoid a global variable to pass the dependence graph in flint.c: */
-#include "graph.h"
-#include "flint.h"
+#include "local.h"
 
 /* Print error message and exit from flint */
 #define FATAL(msg,value) {fprintf(stderr,msg,value);exit(1);}
