@@ -65,7 +65,7 @@ DEFINE_CURRENT_MAPPING(precondition, transformer)
 
 /* Functions to make transformers */
 
-void transformers_intra_fast(module_name)
+bool transformers_intra_fast(module_name)
 char * module_name;
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
@@ -74,10 +74,10 @@ char * module_name;
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
-    module_name_to_transformers(module_name);
+    return module_name_to_transformers(module_name);
 }
 
-void transformers_intra_full(module_name)
+bool transformers_intra_full(module_name)
 char * module_name;
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
@@ -86,10 +86,10 @@ char * module_name;
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
-    module_name_to_transformers(module_name);
+    return module_name_to_transformers(module_name);
 }
 
-void transformers_inter_fast(module_name)
+bool transformers_inter_fast(module_name)
 char * module_name;
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
@@ -98,10 +98,10 @@ char * module_name;
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
-    module_name_to_transformers(module_name);
+    return module_name_to_transformers(module_name);
 }
 
-void transformers_inter_full(module_name)
+bool transformers_inter_full(module_name)
 char * module_name;
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
@@ -110,17 +110,19 @@ char * module_name;
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
-    module_name_to_transformers(module_name);
+    return module_name_to_transformers(module_name);
 }
 
-void summary_transformer(module_name)
+bool summary_transformer(module_name)
 char * module_name;
 {
     /* there is a choice: do nothing and leave the effective computation
        in module_name_to_transformers, or move it here */
+
+    return TRUE;
 }
 
-void preconditions_intra(module_name)
+bool preconditions_intra(module_name)
 char * module_name;
 {
     /* nothing to do: transformers are preconditions for this
@@ -132,10 +134,10 @@ char * module_name;
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
-    module_name_to_preconditions(module_name);
+    return module_name_to_preconditions(module_name);
 }
 
-void preconditions_inter_fast(module_name)
+bool preconditions_inter_fast(module_name)
 char * module_name;
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
@@ -144,10 +146,10 @@ char * module_name;
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
-    module_name_to_preconditions(module_name);
+    return module_name_to_preconditions(module_name);
 }
 
-void preconditions_inter_full(module_name)
+bool preconditions_inter_full(module_name)
 char * module_name;
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
@@ -156,11 +158,11 @@ char * module_name;
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
-    module_name_to_preconditions(module_name);
+    return module_name_to_preconditions(module_name);
 }
 
 
-void summary_precondition(module_name)
+bool summary_precondition(module_name)
 char * module_name;
 {
     /* do not nothing because it has been computed by side effects;
@@ -196,6 +198,8 @@ char * module_name;
     }
 
     debug_off();
+
+    return TRUE;
 }
 
 
@@ -204,7 +208,7 @@ char * module_name;
  * compute a transformer for each statement of a module with a given
  * name; compute also the global transformer for the module
  */
-void module_name_to_transformers(module_name)
+bool module_name_to_transformers(module_name)
 char *module_name;
 {
     transformer t_intra;
@@ -261,6 +265,8 @@ char *module_name;
     reset_transformer_map();
 
     debug_off();
+
+    return TRUE;
 }
 
 
@@ -268,7 +274,7 @@ char *module_name;
  * compute a transformer for each statement of a module with a given
  * name; compute also the global transformer for the module
  */
-void module_name_to_preconditions(module_name)
+bool module_name_to_preconditions(module_name)
 char *module_name;
 {
     transformer t_inter;
@@ -393,6 +399,8 @@ char *module_name;
     reset_cumulated_effects_map();
 
     debug_off();
+
+    return TRUE;
 }
 
 
