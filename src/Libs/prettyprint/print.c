@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: print.c,v $
+ * Revision 1.19  1997/11/22 11:02:51  coelho
+ * print_parallelizedOMP_code added.
+ *
  * Revision 1.18  1997/11/21 13:17:58  coelho
  * cleaner headers.
  *
@@ -114,11 +117,8 @@ print_code_or_source(string mod_name)
     return success;
 }
     
-
-/************************************************************ PIPSMAKE HOOKS */
-
 static bool 
-print_parallelized_code(
+print_parallelized_code_common(
     string mod_name,
     string style)
 {
@@ -126,10 +126,12 @@ print_parallelized_code(
     text r = make_text(NIL);
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
-    string pp;
+    string pp = string_undefined;
 
-    pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
-    set_string_property(PRETTYPRINT_PARALLEL, style);
+    if (style) {
+	pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
+	set_string_property(PRETTYPRINT_PARALLEL, style);
+    }
 
     begin_attachment_prettyprint();
     
@@ -147,28 +149,15 @@ print_parallelized_code(
     success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
 				  PARALLEL_FORTRAN_EXT, r);
     end_attachment_prettyprint();
-    set_string_property(PRETTYPRINT_PARALLEL, pp); free(pp);
+    if (style) {
+	set_string_property(PRETTYPRINT_PARALLEL, pp); 
+	free(pp);
+    }
     return success;
 }
 
 
-bool 
-print_parallelized90_code(string mod_name)
-{
-    return print_parallelized_code(mod_name, "f90");
-}
-
-bool 
-print_parallelized77_code(string mod_name)
-{
-    return print_parallelized_code(mod_name, "doall");
-}
-
-bool 
-print_parallelizedHPF_code(string module_name)
-{
-    return print_parallelized_code(module_name, "hpf");
-}
+/************************************************************ PIPSMAKE HOOKS */
 
 bool 
 print_code(string mod_name)
@@ -182,4 +171,34 @@ print_source(string mod_name)
 {
   is_user_view = TRUE;
   return print_code_or_source(mod_name);
+}
+
+bool 
+print_parallelized_code(string mod_name)
+{
+    return print_parallelized_code_common(mod_name, NULL);
+}
+
+bool 
+print_parallelized90_code(string mod_name)
+{
+    return print_parallelized_code_common(mod_name, "f90");
+}
+
+bool 
+print_parallelized77_code(string mod_name)
+{
+    return print_parallelized_code_common(mod_name, "doall");
+}
+
+bool 
+print_parallelizedHPF_code(string module_name)
+{
+    return print_parallelized_code_common(module_name, "hpf");
+}
+
+bool 
+print_parallelizedOMP_code(string mod_name)
+{
+    return print_parallelized_code_common(mod_name, "omp");
 }
