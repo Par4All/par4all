@@ -8,7 +8,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1995/12/22 16:06:08 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1995/12/26 15:56:52 $, )
  * version $Revision$
  */
 
@@ -70,24 +70,24 @@ int *pi;
     case is_normalized_linear:
     {
 	Pvecteur
-	    v = (Pvecteur) normalized_linear(n),
+	    v = normalized_linear(n),
 	    vp = vect_del_var(v, TCST);
-	int
-	    s = vect_size(vp);
-	bool
-	    result;
+	int s = vect_size(vp);
+	bool result;
 
-	if (s!=1) return(FALSE);
+	if (s!=1) return FALSE;
 
 	result = ((entity_loop_index_p((entity)(vp->var)) && ((vp->val)==1)));
 
-	vect_rm(vp);
 	if (result) 
 	{
 	    *pe = (entity) (vp->var);
 	    *pi = vect_coeff(TCST, v);
 	}
-	return(result);
+
+	vect_rm(vp);
+
+	return result;
 	break;
     }
     default:
@@ -95,7 +95,7 @@ int *pi;
 	break;
     }
     
-    return(FALSE); /* just to avoid a gcc warning */
+    return FALSE; /* just to avoid a gcc warning */
 }
 
 /* true if the expression is an affine function
@@ -178,13 +178,15 @@ align_check(
     *plvect = NIL;
     *plkind = NIL;
 
-    pips_debug(7, "with references to %s, %d indices and %s, %d indices\n",
+    pips_debug(7, "with references to %s[DIM=%d] and %s[DIM=%d]\n",
 	  entity_name(e1), gen_length(li1), entity_name(e2), gen_length(li2));
 
     ne2dim = NumberOfDimension(e2);
     
     if (align_template(a1)!=align_template(a2))	
     {
+	pips_debug(5, "different templates");
+
 	for (i=1 ; i<=ne2dim ; i++)
 	    if (ith_dim_distributed_p(e2, i, &procdim))
 	    {
@@ -227,13 +229,12 @@ align_check(
 	    bconst1, bconst2,
 	    blcnst2=0;
 
-	debug(8, "align_check",
-	      "considering dimension %d of %s\n",
-	      i, entity_name(e2));
+	pips_debug(8, "considering dimension %d of %s\n", i, entity_name(e2));
 
 	indice2 = EXPRESSION(gen_nth(i-1, li2));
 
-	baffin2 = affine_expression_of_loop_index_p(indice2, &index2, &shft2, &affr2);
+	baffin2 = affine_expression_of_loop_index_p(indice2, 
+						    &index2, &shft2, &affr2);
 	bshift2 = shift_expression_of_loop_index_p(indice2, &index2, &shft2);
 	bconst2 = hpfc_integer_constant_expression_p(indice2, &shft2);
 	if (!(baffin2 || bshift2 || bconst2))
@@ -243,9 +244,10 @@ align_check(
 	{
 	    alignment
                 a2 = FindArrayDimAlignmentOfArray(e2, i),
-                a1 = FindTemplateDimAlignmentOfArray(e1, alignment_templatedim(a2));
+                a1 = FindTemplateDimAlignmentOfArray(e1,
+				 alignment_templatedim(a2));
 	    int
-                dim1  = ((a1!=alignment_undefined)?(alignment_arraydim(a1)):(-1)),
+                dim1=((a1!=alignment_undefined)?(alignment_arraydim(a1)):(-1)),
 		rate1, rate2, 
 		cnst1, cnst2;
 
@@ -255,9 +257,8 @@ align_check(
 	    if ((dim1<0) || /* replication, say it is not aligned */
 		((dim1==0) && (!bconst2))) /* replicated reference...*/
             {
-		debug(8, "align_check",
-		      "%s dim %d not aligned aff %d shift %d const %d\n",
-		      entity_name(e2), i, baffin2, bshift2, bconst2);
+		pips_debug(8, "%s[DIM=%d] not aligned aff %d shi %d cst %d\n",
+			   entity_name(e2), i, baffin2, bshift2, bconst2);
 
                 *plkind = gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
                 *plvect = gen_nconc(*plvect, CONS(PVECTOR, 
@@ -266,19 +267,16 @@ align_check(
 	    else
 	    if ((dim1==0) && (bconst2))
 	    {
-		/*
-		 * a(i) -> t(i,1), b(i,j)->t(i,j), should detect 
+		/* a(i) -> t(i,1), b(i,j)->t(i,j), should detect 
 		 * do i a(i) = b(i,1) as aligned...
 		 *
 		 * ??? this could be managed later in this function...
 		 */
 
-		int
-		    t1 = HpfcExpressionToInt(alignment_constant(a1)),
+		int t1 = HpfcExpressionToInt(alignment_constant(a1)),
 		    t2 = rate2*shft2+cnst2;
 		
-		/*
-		 * should be ok, even if a delta is induced, if it stays
+		/* should be ok, even if a delta is induced, if it stays
 		 * on the same processor along this dimension. The case
 		 * should also be managed downward, when playing with 
 		 * local updates. 
@@ -287,8 +285,7 @@ align_check(
 		 * should be...
 		 */
 
-		/*
-		 * it is checked later whether the data are on the same 
+		/* it is checked later whether the data are on the same 
 		 * processor or not.
 		 */
 
@@ -313,8 +310,7 @@ align_check(
 		bconst1 = hpfc_integer_constant_expression_p
 		    (indice1, &shft1);          
 
-		/*
-		 * now we have everything to check whether it is aligned or not,
+		/* now we have everything to check whether it is aligned...
 		 * and to compute the shift necessary to the overlap analysis.
 		 */
 
@@ -342,7 +338,7 @@ align_check(
 			    gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
 			*plvect = 
 			    gen_nconc(*plvect, CONS(PVECTOR, 
-						    (VECTOR) VECTEUR_NUL, NIL));
+					  (VECTOR) VECTEUR_NUL, NIL));
 		    }    
 		    else /* aligned... ??? 
 			  * bug if not 1: later on, because decl shift
@@ -352,7 +348,7 @@ align_check(
 			    gen_nconc(*plkind, CONS(INT, aligned_star, NIL));
 			*plvect = 
 			    gen_nconc(*plvect, CONS(PVECTOR,
-						    (VECTOR) VECTEUR_NUL, NIL));
+					 (VECTOR) VECTEUR_NUL, NIL));
 		    }
 		}
 		else /* 4 cases study with bconst and bshift, plus the rates */
@@ -466,13 +462,22 @@ align_check(
 		*plvect = 
 		    gen_nconc(*plvect, 
 			      CONS(PVECTOR,  (VECTOR)
-				   normalized_linear(expression_normalized(indice2)),
+		           normalized_linear(expression_normalized(indice2)),
 				   NIL));
 	    }
 	}
     }
 
-    return(ok);
+    ifdebug(8)
+    {
+	list l;
+	fprintf(stderr, "[align_check] returning: ");
+	for (l=*plkind; l; POP(l))
+	    fprintf(stderr, "%d, ", INT(CAR(l)));
+	fprintf(stderr, "\n");
+    }
+
+    return ok;
 }
 
 bool hpfc_integer_constant_expression_p(e, pi)
