@@ -553,11 +553,25 @@ expression e2;
     return syntax_equal_p(s1, s2);
 }
 
-bool same_expression_p(expression e1, expression e2)
+bool 
+same_expression_p(expression e1, expression e2)
 {
-    normalized
-	n1 = expression_normalized(e1),
-	n2 = expression_normalized(e2);
+    normalized n1, n2;
+
+    n1 = expression_normalized(e1);
+    n2 = expression_normalized(e2);
+
+    /* lazy normalization.
+     */
+    if (normalized_undefined_p(n1)) {
+	normalize_all_expressions_of(e1);
+        n1 = expression_normalized(e1);
+    }
+
+    if (normalized_undefined_p(n2)) {
+	normalize_all_expressions_of(e2);
+        n2 = expression_normalized(e2);
+    }
 
     if (normalized_linear_p(n1) && normalized_linear_p(n2))
 	return vect_equal(normalized_linear(n1), normalized_linear(n2));
