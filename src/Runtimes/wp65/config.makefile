@@ -1,13 +1,9 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1995/09/19 22:28:19 $ 
-#
+# $Date: 1995/11/30 14:42:53 $ 
 
-# How desperate I am to put that:-)
-# Otherwise the generated library will be in trouble for linking 
-# with SUN's f77... I would need to append the library path an other
-# related gcc linraries...
-CC=acc
-CFLAGS=-O -g
+CC	=	$(WP65_CC)
+CFLAGS	=	$(WP65_CFLAGS)
+CPPFLAGS=	$(WP65_CPPFLAGS) $(PIPS_CPPFLAGS) 
 
 LOCAL_LIB=	libwp65runtime.a
 CFILES=		lance_wp65.c
