@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/10/14 22:16:55 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/10/15 14:44:45 $, )
  * version $Revision$
  */
  
@@ -271,11 +271,11 @@ static void set_resources_for_module(entity module)
 	(effectsmap_to_listmap((statement_mapping)
 	 db_get_memory_resource(DBR_REGIONS, module_name, TRUE)));
 
-    /* EFFECTS 
+    /* REFERENCES...
      */
-    set_cumulated_references_map(
-      effectsmap_to_listmap((statement_mapping)
-	db_get_memory_resource(DBR_CUMULATED_REFEREMCES, module_name, TRUE)));
+    set_cumulated_references(
+	(statement_effects)
+	db_get_memory_resource(DBR_CUMULATED_REFERENCES, module_name, TRUE));
     
     /*   ONLY I/O
      */
@@ -321,7 +321,7 @@ reset_resources_for_module()
 {
     reset_current_module_statement();
     reset_local_regions_map();
-    reset_cumulated_references_map();
+    reset_cumulated_references();
     reset_precondition_map();
 
     free_only_io_map();
