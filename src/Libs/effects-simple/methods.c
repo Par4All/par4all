@@ -289,6 +289,36 @@ set_methods_for_simple_effects()
     set_methods_for_rw_effects_prettyprint(string_undefined);
 }
 
+void set_methods_for_inout_effects(string module_name)
+{
+  set_methods_for_simple_effects();
+
+  /* for intermediate values ??? FC 15/05/2002 
+   * I'm not really sure it is actually useful for simple effects...
+   */
+  /*
+  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  set_current_module_statement((statement)
+	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+
+  set_cumulated_rw_effects((statement_effects)
+     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+
+  module_to_value_mappings( local_name_to_top_level_entity(module_name));
+
+  reset_current_module_entity();
+  reset_current_module_statement();
+  */
+}
+
+void reset_methods_for_inout_effects()
+{
+  /*
+  reset_cumulated_rw_effects();
+  free_value_mappings();
+  */
+}
+
 void set_methods_for_rw_effects_prettyprint(string module_name)
 {
     effects_prettyprint_func = print_effects;
