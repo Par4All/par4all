@@ -1,5 +1,5 @@
 /* $RCSfile: pipsmake.c,v $ (version $Revision$)
- * $Date: 1997/09/26 07:25:55 $, 
+ * $Date: 1997/09/26 10:20:43 $, 
  * pipsmake: call by need (make),
  *
  * rule selection (activate),
@@ -197,6 +197,7 @@ static set up_to_date_resources = set_undefined;
 
 void reset_make_cache()
 {
+    pips_assert("set is defined", !set_undefined_p(up_to_date_resources));
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
 }
@@ -580,9 +581,8 @@ list lvr;
 
 /* compute all pre-transformations to apply a rule on an object 
  */
-static bool make_pre_transformation(oname, ru)
-rule ru;
-string oname;
+static bool 
+make_pre_transformation(string oname, rule ru)
 {
     list reals;
     bool success_p = TRUE;
@@ -615,20 +615,23 @@ string oname;
 	    /* actually the resource name is a phase name !! */
 	    string rrpn = real_resource_resource_name(rr);
 	    
-	    debug(3, "make_pre_transformation",
-		  "rule %s : applying %s to %s - recursive call\n",
-		  rule_phase(ru),
-		  rrpn,
-		  rron);
+	    pips_debug(3, "rule %s : applying %s to %s - recursive call\n",
+		       rule_phase(ru), rrpn, rron);
 	    
 	    if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
 		success_p = FALSE;
 	    
 	}, reals);
+
+	/* now we must drop the up_to_date cache */
+	if (reals) {
+	    reset_make_cache();
+	    init_make_cache();
+	}
     }
     return TRUE;
 }
-
+
 /* compute all resources needed to apply a rule on an object */
 static bool make_required(oname, ru)
 rule ru;
@@ -645,10 +648,8 @@ string oname;
 	string rron = real_resource_owner_name(rr);
 	string rrrn = real_resource_resource_name(rr);
 	
-	debug(3, "make_required", "rule %s : %s(%s) - recursive call\n",
-	      rule_phase(ru),
-	      rrrn,
-	      rron);
+	pips_debug(3, "rule %s : %s(%s) - recursive call\n",
+		   rule_phase(ru), rrrn, rron);
 	
 	if (!rmake(rrrn, rron)) {
 	    success_p = FALSE;
@@ -666,10 +667,9 @@ string oname;
     gen_free_list (reals);
     return success_p;
 }
-
-static void update_preserved_resources(oname, ru)
-rule ru;
-string oname;
+
+static void 
+update_preserved_resources(string oname, rule ru)
 {
     list reals;
 
@@ -756,9 +756,8 @@ check_physical_resource_up_to_date(string rname, string oname)
 	      (same_string_p(mod_rrrn, rrrn))) {
 	      /* we found it */
 	      res_in_modified_list_p = TRUE;
-	      debug(3, "check_resource_up_to_date",
-		    "resource %s(%s) is in the rule_modified list",
-		    rrrn, rron);
+	      pips_debug(3, "resource %s(%s) is in the rule_modified list",
+			 rrrn, rron);
 	      break;
 	  }
       }, reals2);
