@@ -103,6 +103,8 @@ static void
 add_interprocedural_value_entities(e)
 entity e;
 {
+    debug(8,"add_interprocedural_value_entities","for %s\n", 
+	  entity_name(e));
     if(!entity_has_values_p(e)) {
 	entity a = entity_undefined;
 	if((a=value_alias(e))==entity_undefined){
@@ -122,10 +124,14 @@ static void
 add_interprocedural_new_value_entity(e)
 entity e;
 {
+    debug(8,"add_interprocedural_new_value_entities","for %s\n", 
+	  entity_name(e));
     if(!entity_has_values_p(e)) {
 	entity a = entity_undefined;
 	if((a=value_alias(e))==entity_undefined){
 	    add_new_value(e);
+	    /* CA: information on aliasing variables erased*/
+	    add_or_kill_equivalenced_variables(e,TRUE);
 	}
 	else {
 	    add_new_alias_value(e,a);
@@ -136,6 +142,8 @@ entity e;
 static void 
 add_intraprocedural_value_entities_unconditionally(entity e)
 {
+    debug(8,"add_interprocedural__value_entities_unconditionally",
+	  "for %s\n", entity_name(e));
 	add_new_value(e);
 	add_local_old_value(e);
 	add_local_intermediate_value(e);
@@ -146,7 +154,9 @@ add_intraprocedural_value_entities_unconditionally(entity e)
  */
 static void 
 add_intraprocedural_value_entities(entity e)
-{
+{ 
+    debug(8,"add_interprocedural__value_entities",
+	  "for %s\n", entity_name(e));
     if(!entity_has_values_p(e)) {
 	add_intraprocedural_value_entities_unconditionally(e);
     }
@@ -162,7 +172,9 @@ bool readonly;
     /* look for equivalenced variables; forget dynamic aliasing
        between formal parameters */
     storage s;
-
+ 
+    debug(8,"add_or_kill_equivalenced_variables",
+	  "for %s\n", entity_name(e));
     s = entity_storage(e);
     if(storage_ram_p(s)) {
 	/* handle intraprocedural aliasing */
@@ -459,8 +471,11 @@ entity m;
 
     /* for debug, print hash tables */
     ifdebug(8) {
+	
 	(void) fprintf(stderr,"[module_to_value_mappings] hash tables\n");
 	print_value_mappings();
+	test_mapping_entry_consistency();
+	
     }
     pips_debug(8,"end\n");
 }
