@@ -1,0 +1,13 @@
+#
+# $Id$
+#
+# $Log: makefile_macros.GNUSOL2LLPROF,v $
+# Revision 1.1  1999/01/13 09:41:20  coelho
+# Initial revision
+#
+#
+
+include $(ROOT)/Include/makefile_macros.GNUSOL2LL
+
+CFLAGS	+= -pg
+LDFLAGS	+= -pg
