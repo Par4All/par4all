@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/09/15 15:54:08 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1995/10/05 11:32:24 $, ) 
  * version $Revision$
  */
 
@@ -185,7 +185,7 @@ string suffix, prefix;
     int dim_number = 1;
     Psysteme new_system = sc_new();
     
-    assert(entity_variable_p(ent));
+    pips_assert("variable", entity_variable_p(ent));
     
     /* system may be empty for scalars ???
      */
@@ -203,7 +203,7 @@ string suffix, prefix;
 	 bool bupper = hpfc_integer_constant_expression_p
 	     (dimension_upper(dim), &iupper);
 
-	 assert(blower && bupper);
+	 pips_assert("extent known", blower && bupper);
 	 
 	 /* now the dummy is to be used to generate two inequalities: 
 	  * -dummy + lower <= 0 and dummy - upper <= 0
@@ -238,7 +238,8 @@ entity e;
 			is_template ? THETA_PREFIX :
 			is_processor ? PSI_PREFIX : "ERROR");
 
-    assert(is_darray || is_array || is_template || is_processor);
+    pips_assert("valid object", 
+		is_darray || is_array || is_template || is_processor);
 
     return(compute_entity_to_declaration_constraints
 	   (e, local_prefix, HPFC_PACKAGE));
@@ -256,7 +257,7 @@ entity e;
     Psysteme 
 	p = load_entity_declaration_constraints(e);
 
-    assert(entity_variable_p(e));
+    pips_assert("variable", entity_variable_p(e));
 
     if (Psysteme_undefined_p(p))
     {
@@ -282,7 +283,7 @@ entity e;
     Psysteme new_system = sc_new();
     int i;
 
-    assert(array_distributed_p(e));
+    pips_assert("distributed array", array_distributed_p(e));
 
     for(i=1 ; i<=NumberOfDimension(template) ; i++)
     {
@@ -332,7 +333,7 @@ entity e;
     Psysteme new_system = sc_new();
     int i;
 
-    assert(array_distributed_p(e));
+    pips_assert("distributed array", array_distributed_p(e));
 
     for(i=1 ; i<=NumberOfDimension(template) ; i++)
     {
@@ -383,7 +384,7 @@ entity e;
 	ld = distribute_distribution(di);
     int j, i;
     
-    assert(entity_template_p(e));
+    pips_assert("template", entity_template_p(e));
 
     for(j=1 ; j<=NumberOfDimension(proc) ; j++)
     {
@@ -470,8 +471,8 @@ entity e;
     Psysteme 
 	p = load_entity_hpf_constraints(e);
 
-    assert(entity_variable_p(e) &&
-	   (array_distributed_p(e) || entity_template_p(e)));
+    pips_assert("template or distributed variable", entity_variable_p(e) &&
+		(array_distributed_p(e) || entity_template_p(e)));
 
     if (Psysteme_undefined_p(p))
     {
@@ -515,7 +516,7 @@ entity array;
     int	dim = NumberOfDimension(array);
     Psysteme syst = sc_rn(NULL);
 
-    assert(array_distributed_p(array));
+    pips_assert("distributed array", array_distributed_p(array));
 
     for (; dim>0; dim--)
     {
@@ -566,7 +567,7 @@ entity array;
 	     
 	     get_alignment(array, dim, &tdim, &a, &b);
 	     	     
-	     assert(a!=0 && tdim!=0);
+	     pips_assert("aligned dimension", a!=0 && tdim!=0);
 	     
 	     delta = get_ith_block_dummy(tdim);
 
@@ -622,10 +623,10 @@ entity array;
 		 n, plow, pup, tlow, tup, alow, aup;
 	     
 	     get_alignment(array, dim, &tdim, &a, &b);
-	     assert(abs(a)==1 && tdim!=0);
+	     pips_assert("stride-1 aligned", abs(a)==1 && tdim!=0);
 	     
 	     get_distribution(template, tdim, &pdim, &n);
-	     assert(pdim>0 && n>0);
+	     pips_assert("distributed dimension", pdim>0 && n>0);
 	     
 	     get_entity_dimensions(array, dim, &alow, &aup);
 	     get_entity_dimensions(template, tdim, &tlow, &tup);
@@ -667,10 +668,10 @@ entity array;
 		 n, icn, plow, pup, tlow, tup, alow, aup;
 	     
 	     get_alignment(array, dim, &tdim, &a, &b);
-	     assert(tdim!=0);
+	     pips_assert("aligned dimension", tdim!=0);
 	     
 	     get_distribution(template, tdim, &pdim, &n);
-	     assert(pdim>0 && n>0);
+	     pips_assert("distributed dimension", pdim>0 && n>0);
 	     
 	     get_entity_dimensions(array, dim, &alow, &aup);
 	     get_entity_dimensions(template, tdim, &tlow, &tup);
@@ -711,8 +712,7 @@ entity array;
 	     break;
 	 }
 	 default:
-	     pips_error("hpfc_compute_entity_to_new_declaration",
-			"unexpected new declaration tag\n");
+	     pips_internal_error("unexpected new declaration tag\n");
 	 }
      }
     
@@ -725,7 +725,7 @@ entity array;
 {
     Psysteme p = load_entity_new_declaration_constraints(array);
 
-    assert(array_distributed_p(array));
+    pips_assert("distributed array", array_distributed_p(array));
 
     if (Psysteme_undefined_p(p))
     {
@@ -783,7 +783,7 @@ entity v;
     Psysteme result = sc_rn(NULL);
     entity t, p;
 
-    assert(array_distributed_p(v));
+    pips_assert("distributed array", array_distributed_p(v));
 
     t = align_template(load_entity_align(v)),
     p = distribute_processors(load_entity_distribute(t));    
