@@ -115,7 +115,8 @@ db_get_directory_name_for_module(string name)
 		      (db_get_current_workspace_directory(), "/", name, 0));
     if (!directory_exists_p(dir_name))
 	if (!create_directory(dir_name)) /* MKDIR */
-	    pips_user_error("cannot create directory %s\n", dir_name);
+	    pips_user_irrecoverable_error
+		("cannot create directory %s\n", dir_name);
     return dir_name;
 }    
 
