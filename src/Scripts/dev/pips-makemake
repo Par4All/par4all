@@ -62,6 +62,10 @@
 #		Passage d'un Sed (?) en sed.
 #		Rajout des tags pour vi aussi... :-)
 #
+#	Transformation des << cp deledit >> en << edit cp delta >> car sinon
+#	on a des proble`mes de droit d'utilisateur. RK, 22/07/1993.
+#
+#
 # wish:
 #
 USAGE="Usage: $0 -l|p [-D|P] [-c|a] (default -D -c)"
@@ -204,10 +208,11 @@ $(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
 
 install: $(INC_TARGET) $(LIB_TARGET)
 	@if test \`ls *.a | wc -w\` -gt 1 ; then echo install failed: additional local libraries prevent it >&2; exit 1; fi
-	rm -f $(TARGETDIR)/* pips
 	if [ ! -d $(TARGETDIR) ] ; \\
 	then mkdir $(TARGETDIR) ; \\
 	fi
+	-cd $(TARGETDIR) ; sccs edit SCCS
+	rm -f $(TARGETDIR)/* pips
 	cp $(SOURCES) $(TARGETDIR)
 	echo ""; echo; \\
 	echo -n "Description of changes: " ; \\
@@ -219,7 +224,6 @@ install: $(INC_TARGET) $(LIB_TARGET)
 		then \\
 			echo sccs create \$\$module;  \\
 			sccs create \$\$module;  \\
-			sccs edit \$\$module; \\
 			if cmp -s ,\$\$module \$\$module ; \\
 			then echo sccs properly initialized for \$\$module ; \\
 				rm ,\$\$module ; \\
@@ -227,13 +231,13 @@ install: $(INC_TARGET) $(LIB_TARGET)
 				exit 1; \\
 			fi ; \\
 		else \\
-			echo sccs -y\"\$\$comments\" deledit \$\$module; \\
-			if sccs deledit -y"\$\$comments" \$\$module; \\
-			then echo sccs deledit succeeded; \\
+			echo sccs -y\"\$\$comments\" delta \$\$module; \\
+			if sccs delta -y"\$\$comments" \$\$module; \\
+			then echo sccs delta succeeded; \\
 			else status=\$\$? ; \\
 				if [ \$\$status -eq 255 ] ; \\
-					then echo sccs deledit return code \$\$status ; \\
-					else echo sccs deledit unusual return code \$\$status ; \\
+					then echo sccs delta return code \$\$status ; \\
+					else echo sccs delta unusual return code \$\$status ; \\
 						exit 1; \\
 				fi ; \\
 			fi ; \\
@@ -288,10 +292,11 @@ $(BIN_TARGET): $(OBJECTS)
 
 install: $(INC_TARGET) $(BIN_TARGET)
 	@if test \`ls *.a | wc -w\` -gt 1 ; then echo install failed: additional local libraries prevent it >&2; exit 1; fi
-	rm -f $(TARGETDIR)/*
 	if [ ! -d $(TARGETDIR) ] ; \\
 	then mkdir $(TARGETDIR) ; \\
 	fi
+	-cd $(TARGETDIR) ; sccs edit SCCS
+	rm -f $(TARGETDIR)/*
 	cp $(SOURCES) $(TARGETDIR)
 	echo ""; echo; \\
 	echo -n "Description of changes: " ; \\
@@ -303,7 +308,6 @@ install: $(INC_TARGET) $(BIN_TARGET)
 		then \\
 			echo sccs create \$\$module;  \\
 			sccs create \$\$module;  \\
-			sccs edit \$\$module; \\
 			if cmp -s ,\$\$module \$\$module ; \\
 			then echo sccs properly initialized for \$\$module ; \\
 				rm ,\$\$module ; \\
@@ -311,13 +315,13 @@ install: $(INC_TARGET) $(BIN_TARGET)
 				exit 1; \\
 			fi ; \\
 		else \\
-			echo sccs -y\"\$\$comments\" deledit \$\$module; \\
-			if sccs deledit -y"\$\$comments" \$\$module; \\
-			then echo sccs deledit succeeded; \\
+			echo sccs -y\"\$\$comments\" delta \$\$module; \\
+			if sccs delta -y"\$\$comments" \$\$module; \\
+			then echo sccs delta succeeded; \\
 			else status=\$\$? ; \\
 				if [ \$\$status -eq 255 ] ; \\
-					then echo sccs deledit return code \$\$status ; \\
-					else echo sccs deledit unusual return code \$\$status ; \\
+					then echo sccs delta return code \$\$status ; \\
+					else echo sccs delta unusual return code \$\$status ; \\
 						exit 1; \\
 				fi ; \\
 			fi ; \\
