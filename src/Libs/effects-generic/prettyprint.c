@@ -43,48 +43,6 @@
   return result;
 }*/
 
-text my_get_any_effects_text(string module_name)
-{
-  entity module;
-  statement module_stat;
-  text txt = make_text(NIL);
-
-  /* current entity
-   */
-  set_current_module_entity( local_name_to_top_level_entity(module_name));
-  module = get_current_module_entity();
-
-  /* current statement
-   */
-  set_current_module_statement((statement) db_get_memory_resource
-			       (DBR_CODE, module_name, TRUE));
-  module_stat = get_current_module_statement();
-
-  /* resources to be prettyprinted...
-   */
-  load_resources(module_name);
-  
-  debug_on("EFFECTS_DEBUG_LEVEL");
-
-  /* prepare the prettyprinting */
-  init_prettyprint(my_text_statement_any_effect_type);
-  
-  /* summary regions first */
-  MERGE_TEXTS(txt, my_text_summary_any_effect_type(module));
-    
-  /* then code with effects, using text_statement_any_effect_type */
-  MERGE_TEXTS(txt, text_module(module,  module_stat));
-
-  close_prettyprint();
-  
-  debug_off();
-  
-  reset_current_module_entity();
-  reset_current_module_statement();
-  
-  return txt;
-}
-
 /*********************************************************/
 
 /***************************************************** ACTION INTERPRETATION */
@@ -368,6 +326,51 @@ get_any_effects_text(
 
     return txt;
 }
+
+/**********written by Dat******************/
+text my_get_any_effects_text(string module_name)
+{
+entity module;
+    statement module_stat, user_stat = statement_undefined;
+    text txt = make_text(NIL);
+
+    /* current entity
+     */
+    set_current_module_entity( local_name_to_top_level_entity(module_name));
+    module = get_current_module_entity();
+
+    /* current statement
+     */
+    set_current_module_statement((statement) db_get_memory_resource
+				 (DBR_CODE, module_name, TRUE));
+    module_stat = get_current_module_statement();
+
+    /* resources to be prettyprinted...
+     */
+    load_resources(module_name);
+
+    debug_on("EFFECTS_DEBUG_LEVEL");
+
+    /* prepare the prettyprinting */
+    init_prettyprint(text_statement_any_effect_type);
+
+    /* summary regions first */
+    MERGE_TEXTS(txt, text_summary_any_effect_type(module));
+
+    /* then code with effects, using text_statement_any_effect_type */
+    MERGE_TEXTS(txt, text_module(module,
+				 is_user_view_p? user_stat : module_stat));
+    
+    close_prettyprint();
+
+    debug_off();
+
+    reset_current_module_entity();
+    reset_current_module_statement();
+
+    return txt;
+}
+/******************************************/
 
 /* generic engine for prettyprinting effects.
  */
