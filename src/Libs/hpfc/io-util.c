@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/04/02 14:36:39 $, )
+ * ($Date: 1996/06/11 13:53:38 $, )
  */
 
 #include "defines-local.h"
@@ -306,7 +306,7 @@ statement *psh, *psn;
 	/* proc_cond computation:
 	 * well, it may have been kept before the new loop bound computation?
 	 */
-	proc_decl = entity_to_declaration_constraints(proc),
+	proc_decl = entity_to_declaration_constraints(proc, 2),
 	proc_cond_tmp = sc_dup(proc_echelon),
 	proc_cond = (sc_nredund(&proc_cond_tmp),
 		     extract_nredund_subsystem(proc_cond_tmp, proc_decl));
