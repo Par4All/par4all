@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.12  2003/06/23 13:53:27  nguyen
+%% Add a C parser (preliminary version)
+%%
 %% Revision 1.11  2003/06/20 11:07:38  irigoin
 %% Reformatting to ease the derivation of resources.h
 %%
@@ -508,7 +511,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/06/20 11:07:38 $~$
+$~$Date: 2003/06/23 13:53:27 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1121,6 +1124,17 @@ hpfc_parser                     > MODULE.parsed_code
                                 > MODULE.callees
         < PROGRAM.entities
         < MODULE.hpfc_filtered_file
+\end{verbatim}
+
+\paragraph{Declaration of the C parser:}
+
+This draft parser is used to parse C code.  
+
+\begin{verbatim}
+c_parser                        > MODULE.parsed_code
+                                > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.source_file
 \end{verbatim}
 
 \subsection{Controlized Code}
