@@ -6,6 +6,8 @@
 
 #include <stdio.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "text.h"
 #include "text-util.h"
@@ -109,13 +111,13 @@ entity i ;
 range r ;
 {
     reference rf = syntax_reference( s ) ;
-    entity new_e ;
+    expression new_e;
     syntax new_s ;
 
     if( same_entity_p( reference_variable( rf ), i )) {
 	new_s = make_syntax(is_syntax_range,r) ;
 	new_e = make_expression(new_s, normalized_undefined) ;
-	set_add_element( vectors, vectors, (char *)new_e ) ;
+	set_add_element( vectors, vectors, (char *) new_e ) ;
 	return( new_e ) ;
     }
     else {
