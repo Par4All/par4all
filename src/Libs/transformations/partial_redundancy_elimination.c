@@ -1,9 +1,11 @@
 /******************************************************************
  *
+ * $Id$
+ *
  *          PARTIAL REDUNDANCY ELIMINATION
  *
  *
-*******************************************************************/
+ *******************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -216,7 +218,8 @@ boolean efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
   return retour;
 }
 
-static expression partial_redundancy_elimination_expression(expression e, Psysteme prec)
+static expression 
+partial_redundancy_elimination_expression(expression e, Psysteme prec)
 {
   if (relational_expression_p(e) || logical_operator_expression_p(e))
     { 
@@ -259,10 +262,11 @@ static expression partial_redundancy_elimination_expression(expression e, Psyste
 	   * The function sc_rational_feasibility_ofl_ctrl() is less expensive 
 	   * than the function sc_integer_feasibility_ofl_ctrl() 
 	   *
-	   * 4 December 2000 :  I (Nga Nguyen) try to replace sc_rational by sc_integer 
-	   * ===> re-measure the speed
-	   * But maybe sc_integer is suitable for PRE because our goal is to reduce the 
-	   * number of  array bound check as much as possible ? */	 
+	   * 4 December 2000 :  I (Nga Nguyen) try to replace sc_rational 
+	   * by sc_integer ===> re-measure the speed
+	   * But maybe sc_integer is suitable for PRE because our goal is to 
+	   * reduce the number of  array bound check as much as possible ?
+	   */	 
 	  normalized n1 = NORMALIZE_EXPRESSION(e1);
 	  normalized n2 = NORMALIZE_EXPRESSION(e2);	 
 	  if (normalized_linear_p(n1) && normalized_linear_p(n2))
@@ -527,7 +531,9 @@ static expression partial_redundancy_elimination_expression(expression e, Psyste
   return copy_expression(e);
 }
 
-static void partial_redundancy_elimination_rwt(statement s, persistant_statement_to_control map)
+static void 
+partial_redundancy_elimination_rwt(statement s, 
+				   persistant_statement_to_control map)
 {
   Psysteme prec = stmt_prec(s);
   if (!sc_empty_p(prec) && !sc_rn_p(prec))
@@ -726,7 +732,8 @@ static bool store_mapping(control c, persistant_statement_to_control map)
   return TRUE;
 }
 
-static void partial_redundancy_elimination_statement (statement module_statement)
+static void 
+partial_redundancy_elimination_statement(statement module_statement)
 {  
   persistant_statement_to_control map;  
   map = make_persistant_statement_to_control();  
