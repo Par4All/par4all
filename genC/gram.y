@@ -69,9 +69,9 @@ char *error_msg ;
 %token TABULATED
 %token PERSISTANT
 
-%term IDENT
-%term GRAM_FILE
-%term GRAM_INT
+%term <name> IDENT
+%term <name> GRAM_FILE
+%term <val> GRAM_INT
 
 %union {
   union domain *domain ;
@@ -125,7 +125,7 @@ Imports : Imports GRAM_IMPORT Name FROM File SEMI_COLUMN {
 	;
 
 File	: GRAM_FILE {
-		$$ = yylval.name ;
+		$$ = $1 ;
 		}
 	;
 
@@ -325,12 +325,12 @@ Dimensions
 		}				
 	;
 
-Int     : GRAM_INT   {$$ = yylval.val;}
+Int     : GRAM_INT   {$$ = $1;}
         ;
 
 Name	: IDENT	{
-		check_not_keyword( yylval.name ) ;
-		$$ = yylval.name;
+		check_not_keyword( $1 ) ;
+		$$ = $1;
 		}
 	;
 %%
