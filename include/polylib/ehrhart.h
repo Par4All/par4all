@@ -9,11 +9,6 @@
 /*  automatically, even when this is not defined)                  */
 /* #define USEALWAYSGMP */
 
-#ifdef GNUMP
-/* prints a warning on stderr if GNU-MP LIB is called              */
-#define MPWARNING
-#endif
-
 /* Print all overflow warnings, or just one per domain             */
 /* #define ALL_OVERFLOW_WARNINGS */
 
