@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.88  1998/05/22 11:41:11  coelho
+ * regex fixed.
+ *
  * Revision 1.87  1998/05/22 11:37:33  coelho
  * bug--
  *
@@ -207,17 +210,17 @@ pips_process_file(string file_name)
  * In particular, it does first columned tabbed lines.
  */
 #define CMPLX_RX \
-"^[^\t!\*Cc].....[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-+0-9eE\\. \t]*,[-+0-9eE\\. \t]*)"
+"^[^\t!*Cc].....[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-+0-9eE\\. \t]*,[-+0-9eE\\. \t]*)"
 
 #define CMPLX2_RX \
-"^[^\t!\*Cc].....[ \t]*\\((\\)[-+0-9eE\\. \t]*,[-+0-9eE\\. \t]*)"
+"^[^\t!*Cc].....[ \t]*\\((\\)[-+0-9eE\\. \t]*,[-+0-9eE\\. \t]*)"
 
 #define DCMPLX_RX \
-    "^[^\t!\*Cc].....[^\"']*[^a-zA-Z0-9_ \t][ \t]*" \
+    "^[^\t!*Cc].....[^\"']*[^a-zA-Z0-9_ \t][ \t]*" \
     "\\((\\)[-+0-9dDeE\\. \t]*,[-+0-9dDeE\\. \t]*)"
 
 #define DCMPLX2_RX \
-    "^[^\t!\*Cc].....[ \t]*\\((\\)[-+0-9dDeE\\. \t]*,[-+0-9dDeE\\. \t]*)"
+    "^[^\t!*Cc].....[ \t]*\\((\\)[-+0-9dDeE\\. \t]*,[-+0-9dDeE\\. \t]*)"
 
 #define GOTO_RX "g[ \t]*o[ \t]*t[ \t]*o[ \t]*"
 
