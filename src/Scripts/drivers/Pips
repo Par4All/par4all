@@ -3,15 +3,18 @@
 #
 # SCCS stuff:
 #
-# $RCSfile: Pips,v $ ($Date: 1994/03/08 13:29:48 $) version $Revision$, got on %D%, %T%
+# $RCSfile: Pips,v $ ($Date: 1994/03/08 13:44:38 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 
 # Test function
-check () { 
+
+check () 
+{ 
   FOO=	
   #foo $1
 }
+
 foo ()
 {
   echo $1
@@ -97,59 +100,64 @@ else
   else
     echo Workspace $PGM \(default\)
     if [ -z "$OPT_MOD" ]
-    then echo Module $MOD \(default\)
+    then 
+      echo Module $MOD \(default\)
     fi
   fi
 fi
 
 if [ "$OPT_MOD" ]
-then	MOD=$OPT_MOD
+then
+  MOD=$OPT_MOD
 fi
 
 if [ ! -r "$PGM.database" ]
-then	# case the program does not exist and must be created
-
-	# check that source file exists
-	if [ -z "$SOURCE_FILES" ]
-	then
-		echo $BAD_WORKSPACE \`$PGM\' >&2
-		exit 1
-	fi
-
-	# check that each source file is a readable file
-	TMP_IFS=$IFS
-	IFS=","
-	set $SOURCE_FILES
-	IFS=$TMP_IFS
-	SOURCE_FILES=""
-	for file in $*
-	do
-		if  [ ! -r "$file" ]
-		then
-			echo Cannot read $file; >&2
-			exit 1
-		else
-			SOURCE_FILES="$SOURCE_FILES -f $file"
-		fi
-	done
+then
+  # case the program does not exist and must be created
+  # check that source file exists
+  if [ -z "$SOURCE_FILES" ]
+  then
+    echo $BAD_WORKSPACE \`$PGM\' >&2
+    exit 1
+  fi
+  
+  # check that each source file is a readable file
+  TMP_IFS=$IFS
+  IFS=","
+  set $SOURCE_FILES
+  IFS=$TMP_IFS
+  SOURCE_FILES=""
+  for file in $*
+  do
+    if  [ ! -r "$file" ]
+    then
+      echo Cannot read $file; >&2
+      exit 1
+    else
+      SOURCE_FILES="$SOURCE_FILES -f $file"
+    fi
+  done
 else
-	# check owner
-	if [ -z "`find . -name $PGM.database -user \`logname\` -prune -print`" ]
-	then	echo WARNING: You are working on workspace \`$PGM\', created by another user. >&2
-	fi
-
-	if [ "$SOURCE_FILES" ]
-	then	echo Workspace $PGM already exists. Use \`Delete\' before creating a new one. >&2
-		exit 1
-	fi
+  # check owner
+  if [ -z "`find . -name $PGM.database -user \`logname\` -prune -print`" ]
+  then
+    echo WARNING: You are working on workspace \`$PGM\', created by another user. >&2
+  fi
+  
+  if [ "$SOURCE_FILES" ]
+  then
+    echo Workspace $PGM already exists. Use \`Delete\' before creating a new one. >&2
+    exit 1
+  fi
 fi
 
 check 10
 #
 # Manage aliases
 #
-rename () {
-sed -e " \
+rename () 
+{
+  echo "$1" | sed -e " \
         s/^PPF$/ParallelPrinted_File/; \
 	s/^CGF$/CallGraph_File/; \
 	s/^WPF$/WP65_compute_File/; \
@@ -189,16 +197,13 @@ sed -e " \
         s/^priv$/PRIVatize_module/; \
         s/^prv$/PRIVatizer/; \
 	s/^red$/REDuctions/; \
-	" <<%
-$1
-%
+        s/^hpfc$/HPFCompile/;" 
 }
 
 
-uppercase () {
-tr a-z A-Z <<%
-$*
-%
+uppercase () 
+{
+  echo "$*" |tr a-z A-Z
 }
 
 MOD=`uppercase $MOD`
@@ -211,79 +216,92 @@ check 20
 # Select rule if necessary.
 if [ "$SELECT_RULES" ]
 then
-	TMP_IFS=$IFS
-	IFS=","
-	set $SELECT_RULES
-	IFS=$TMP_IFS
-	SELECT_RULES=""
-	for rule in $*
-	do
-		RULE=`rename $rule`
-		RULE=`uppercase $RULE`
-		if [ \( $RULE != "DISTRIBUTER" \) \
-			-a \( $RULE != "PRIVATIZER" \) ]
-		then SELECT_RULES="$SELECT_RULES -s $RULE"
-		else	echo $RULE canNOT be selected. >&2
-			exit 1
-		fi
-	done
+  TMP_IFS=$IFS
+  IFS=","
+  set $SELECT_RULES
+  IFS=$TMP_IFS
+  SELECT_RULES=""
+  for rule in $*
+  do
+    RULE=`rename $rule`
+    RULE=`uppercase $RULE`
+    if [ \( $RULE != "DISTRIBUTER" \) \
+      -a \( $RULE != "PRIVATIZER" \) ]
+    then 
+      SELECT_RULES="$SELECT_RULES -s $RULE"
+    else	
+      echo $RULE canNOT be selected. >&2
+      exit 1
+    fi
+  done
 fi
+
 check 30
 # Verify $MOD is initialized
 if [ "$USING_RULE" -o "$BUILD_RES" ]
 then
-	if [ -z "$MOD" ]
-	then
-		echo One module must be specified. >&2
-		exit 1
-	elif [ -f $PGM.database/modules ]
-	then	
-		if test ! "`grep \"^$MOD\$\" $PGM.database/modules`"
-		then
-			echo Module $MOD does not exist in workspace $PGM >&2
-			exit 1
-		fi
-	fi
-	ARG_MOD="-m $MOD"
+  if [ -z "$MOD" ]
+  then
+    echo One module must be specified. >&2
+    exit 1
+  elif [ -f $PGM.database/modules ]
+  then	
+    if test ! "`grep \"^$MOD\$\" $PGM.database/modules`"
+    then
+      echo Module $MOD does not exist in workspace $PGM >&2
+      exit 1
+    fi
+  fi
+  ARG_MOD="-m $MOD"
 fi
+
 check 40
 # Perform rule when required
 if [ "$USING_RULE" ]
 then
-	USING_RULE=`rename $USING_RULE`
-	USING_RULE=-p\ `uppercase $USING_RULE`
+  USING_RULE=`rename $USING_RULE`
+  USING_RULE=-p\ `uppercase $USING_RULE`
 fi
+
 check 50
 # Build resource when required
 if [ "$BUILD_RES" ]
 then
-	BUILD_RES=`rename $BUILD_RES`
-	BUILD_RES=-b\ `uppercase $BUILD_RES`
+  BUILD_RES=`rename $BUILD_RES`
+  BUILD_RES=-b\ `uppercase $BUILD_RES`
 fi
+
 check 60
 #
 # Call PIPS
 #
-error () {
-echo "Exit code for pips: $?; exiting $0"
-exit 1;
+error () 
+{
+  echo "Exit code for pips: $?; exiting $0"
+  exit 1;
 }
+
 echo `which pips` $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM
 pips $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM || error
 
 # Build `modules'
 if [ "$SOURCE_FILES" ]
 then
-   cd $PGM.database
-   ls *.f | sed 's/.f$//' | tr a-z A-Z > modules
-   cd ..
+  cd $PGM.database
+  ls *.f | sed 's/.f$//' | tr a-z A-Z > modules
+  cd ..
 fi
 
 # Update file $PIPS_CURRENT_PROGRAM
 rm -f $PIPS_CURRENT_PROGRAM
 echo PGM=$PGM >$PIPS_CURRENT_PROGRAM
 if [ ! -z "$MOD" ]
-then	echo MOD=$MOD >>$PIPS_CURRENT_PROGRAM
+then
+  echo MOD=$MOD >>$PIPS_CURRENT_PROGRAM
 fi
 # change mod -> convention so that only the owner uses this file
 chmod u+x $PIPS_CURRENT_PROGRAM
+
+#
+# that's all
+#
