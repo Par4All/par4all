@@ -329,7 +329,7 @@ Psommet fonct;
 }
    
 Psysteme dual_positive(sys,fonct)
-Psysteme sys;
+Psysteme sys; /* Psommet ??? */
 Psommet fonct;
 {
 
