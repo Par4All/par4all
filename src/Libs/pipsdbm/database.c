@@ -309,12 +309,14 @@ db_get_memory_resource(string rname, string oname, bool pure)
 	db_save_resource(rname, oname, r); /* the pointer is still there... */
 
     if (!pure)
+    {
 	if (dbll_storable_p(rname)) {
             /* make as stored now... */
 	    db_resource_pointer(r) = string_undefined;
 	    db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
 	} else /* lost */
 	    db_delete_resource(rname, oname);
+    }
 
     ifdebug(7) pips_assert("resource is consistent", 
 			   dbll_check_resource(rname, oname, result));
