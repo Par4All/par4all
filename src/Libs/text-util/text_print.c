@@ -101,7 +101,7 @@ print_sentence(FILE * fd,
 	
 	/* first 6 columns (0-5)
 	 */
-	if (label != (char *) NULL) {
+	if (label != (char *) NULL && !string_undefined_p(label)) {
 	    /* Keep track of the attachment against the padding: */
 	    deal_with_attachments_in_this_string(label,
 						 position_in_the_output);
@@ -151,7 +151,7 @@ print_sentence(FILE * fd,
 			/* start a new line with its prefix */
 			putc_sentence('\n', fd);
 
-			if(label != (char *) NULL 
+			if(label != (char *) NULL && !string_undefined_p(label)
 			   && (strcmp(label,"CDIR$")==0
 			       || strcmp(label,"CDIR@")==0
 			       || strcmp(label,"CMIC$")==0)) {
