@@ -152,6 +152,8 @@ typedef struct
 }
     prettyprint_stuff, *p_prettyprint_stuff;
 
+static list /* of p_prettyprint_stuff */ lp = NIL;
+
 void 
 reset_generic_prettyprints(void)
 {
