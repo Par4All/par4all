@@ -105,8 +105,8 @@ Psysteme (*method)();
 	b1 = r1->base;
 	b2 = r2->base;
 	b = base_union(b1, b2);
-	base_rm((Pvecteur) b1);
-	base_rm((Pvecteur) b2);
+	base_rm(b1);
+	base_rm(b2);
 	/* b is duplicated because it may be later freed by (*method)()
 	 * FI->CA: To be changed when (*method)() is cleaned up
 	 */
