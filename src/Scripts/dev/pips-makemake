@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.325  1998/07/01 16:35:45  coelho
+# if no C files, does not attempt to generate an executable (for jpips).
+#
 # Revision 1.324  1998/04/16 08:21:51  coelho
 # typo.
 #
@@ -381,7 +384,6 @@ DEPFILE = \$(TMPFILE)
 #
 # default targets...
 all: generate_makefile_if_necessary_and_possible
-all: \$(ARCH) $ALL_RULE_TARGET
 #
 recompile: depend header all
 recompile: generate_makefile_if_necessary_and_possible
@@ -432,6 +434,11 @@ endif
 include \$(ROOT)/Include/define_libraries.make
 include \$(ROOT)/Include/makefile_macros.\$(ARCH)
 include \$(CONFIG)
+#
+# if some C files, there is a executable target to build.
+ifneq (\$(LIB_CFILES),)
+all: \$(ARCH) $ALL_RULE_TARGET
+endif
 #
 # The software architecture (compilers and options...) used.
 CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
@@ -566,6 +573,8 @@ cat >> $MAKEFILE <<%
 # prefixed objects:
 LIB_OBJECTS:=\$(addprefix \$(ARCH)/, \$(LIB_OBJECTS))
 #
+# if some C files...
+ifneq (\$(CFILES),)
 LIB_TARGET=	\$(ARCH)/lib\$(TARGET).a
 ifneq (\$(ARCH),.)
 lib\$(TARGET).a: \$(LIB_TARGET)
@@ -580,19 +589,20 @@ INSTALL_BIN+=	${btrg}
 
 .PRECIOUS: \$(LIB_TARGET) \$(BIN_TARGET)
 
-check_install:
-	@if test \`echo *.a | wc -w\` -gt 1 ; \\
-	then \\
-	  echo "install failed: additional local libraries prevented it" >&2;\\
-	  exit 1;\\
-	fi
-
 \$(LIB_TARGET): \$(INC_TARGET) \$(DERIVED_CFILES) \$(DERIVED_HEADERS)
 
 \$(LIB_TARGET): \$(LIB_OBJECTS) \$(TARGET_OBJECTS)
 	\$(RM) \$(LIB_TARGET)
 	\$(ARCHIVE) \$(LIB_TARGET) \$(LIB_OBJECTS) \$(TARGET_OBJECTS)
 	-\$(RANLIB) \$(LIB_TARGET)
+endif
+
+check_install:
+	@if test \`echo *.a | wc -w\` -gt 1 ; \\
+	then \\
+	  echo "install failed: additional local libraries prevented it" >&2;\\
+	  exit 1;\\
+	fi
 
 %
 
@@ -875,7 +885,6 @@ delta:
 	-test -d RCS && ci -u \`rlog -L -R RCS/*\``
 
 %
-
 
 
 ##############################################################################
