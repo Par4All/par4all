@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/10/05 11:32:38 $, ) 
+ * ($Date: 1995/10/05 11:53:47 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -961,7 +961,7 @@ generate_hpf_remapping_file(
 
     /* put it in a file
      */
-    file_name = strdup(concatenate(db_get_current_program_directory(),
+    file_name = strdup(concatenate(db_get_current_workspace_directory(),
 				   "/", remapping_file_name(r), NULL));
 
     f = safe_fopen(file_name, "w");
