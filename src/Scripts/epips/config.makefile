@@ -1,1 +1,2 @@
-FILES=	epips.el 
+SCRIPTS= 	epips
+FILES=		epips.el 
