@@ -34,10 +34,8 @@ FALSE			{return(TFALSE);}
 			 exit(1);
 			}
 %%
-yywrap()
-{
-    return(1) ;
-}
+int yywrap()
+{ return 1;}
 
 static void parse_properties()
 {
@@ -69,10 +67,10 @@ static void parse_properties()
 	  case TSTRING: {
 	      /* GO: We need to free(s) so the skeep now 
 		 the quote and do not use s+1 anymore*/
-            char *s = strdup(pptext + 1);
+            char *s = strdup(yytext + 1);
             char *q = strrchr(s, '"');
             if (q == NULL) {
-                fprintf(stderr,"[read_properties] bad string : %s\n", pptext);
+                fprintf(stderr,"[read_properties] bad string : %s\n", yytext);
 	        exit(1);
             }
             *q = '\0';            
