@@ -1,6 +1,6 @@
 /* Fabien Coelho, May 1993
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/04/21 14:50:05 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/05/05 16:42:37 $, )
  * version $Revision$
  *
  * Compiler
