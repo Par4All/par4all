@@ -61,12 +61,6 @@ static int gen_debug_indent = 0 ;
 
 static int disallow_undefined_tabulated = TRUE ;
 
-/* to be dropped... */
-list Gen_cp_[50];
-list * gen_cp_ = Gen_cp_;
-gen_chunk Gen_hash_[50] ;
-gen_chunk * gen_hash_ = Gen_hash_;
-
 /********************************************************************** MISC */
 
 /* GEN_TYPE returns the domain number for the object in argument
