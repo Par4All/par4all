@@ -48,7 +48,7 @@ static char *wspace = NULL;
 static char *module = NULL;
 static char *performed_rule = NULL;
 static list build_resource_names = NIL;
-static list source_files = NIL;
+static gen_array_t source_files = NULL;
 static list selected_rules = NIL;
 
 static void pips_parse_arguments(argc, argv)
@@ -58,6 +58,7 @@ char * argv[];
     int c;
     extern char *optarg;
     extern int optind;
+    source_files = gen_array_make(5);
 
     while ((c = getopt(argc, argv, "vf:m:s:p:b:1:0:")) != -1)
 	switch (c) {
@@ -65,8 +66,7 @@ char * argv[];
 	    fprintf(stderr, "pips: (ARCH=%s) %s\n", SOFT_ARCH, argv[0]);
 	    break;
 	case 'f':
-	    source_files = 
-		gen_nconc(source_files, CONS(STRING, optarg, NIL));
+	    gen_array_append(source_files, optarg);
 	    break;
 	case 'm':
 	    module= optarg;
@@ -172,45 +172,22 @@ int pips_main(int argc, char ** argv)
     else 
     {
 	push_pips_context(&pips_top_level);
-	/* push_performance_spy(); */
 
 	/* Initialize workspace
 	 */
-
-	if (source_files != NIL) {
-	    /* Workspace must be created */
+	if (gen_array_nitems(source_files)>0) {
 	    db_create_workspace(wspace);
-
-	    /* FI: The next lines should be replaced by a call to 
-	     * create_workspace()
-	     */
-
-	    open_log_file();
-	    set_entity_to_size();
-
-	    MAPL(f_cp, {
-		debug(1, "main", "processing file %s\n", STRING(CAR(f_cp)));
-		process_user_file( STRING(CAR(f_cp)) );
-	    }, source_files);
-
-	    wspace = db_get_current_workspace_name();
-	    user_log("Workspace %s created and opened\n", wspace);
-	}
-	else {
+	    create_workspace(source_files);
+	} else {
 	    /* Workspace must be opened */
-	    if (open_workspace(wspace) == 0) {
-		user_log("Cannot open workspace %s\n", wspace);
+	    if (!open_workspace(wspace)) {
+		user_log("Cannot open workspace %s!\n", wspace);
 		exit(1);
-	    }
-	    else {
-		/* user_log("Workspace %s opened\n", wspace); */
-		;
 	    }
 	}
 
 	/* Open module
 	 */
-
 	if (module != NULL) {
 	    /* CA - le 040293- remplacement de db_open_module(module) par */
 	    open_module(module);
@@ -221,7 +198,6 @@ int pips_main(int argc, char ** argv)
 
 	/* Activate rules
 	 */
-
 	if (success && selected_rules != NIL) {
 	    /* Select rules */
 	    MAPL(r_cp, {
@@ -231,7 +207,6 @@ int pips_main(int argc, char ** argv)
 
 	/* Perform applies
 	 */
-
 	if (success && performed_rule != NULL) {
 	    /* Perform rule */
 	    /*
@@ -251,7 +226,6 @@ int pips_main(int argc, char ** argv)
 
 	/* Build resources
 	 */
-
 	if (success && build_resource_names != NIL) {
 	    /* Build resource */
 	    MAPL(crn, {
@@ -282,5 +256,5 @@ int pips_main(int argc, char ** argv)
     return !success;
 }
 
-/* end of $RCSfile: pips.c,v $ 
+/* end of it.
  */
