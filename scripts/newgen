@@ -159,10 +159,13 @@ go () {
 	do
 	    include=`basename $i .newgen`$POSTFIX
 	    echo "$i $i" >> $DEP
-	    sed -n "s/^import .* from \"\(.*\)\".*/$i \1/p" $i >> $DEP
-	    domain=`egrep '^([a-zA-Z_]* =|external)' $i | wc -l | tr -cd '0-9'`
+	    sed -n "s/^import .* from \"\(.*\)\".*/\1 $i/p" $i >> $DEP
+	    # should I count imports??? I guess I could not...
+	    # however it depends on newgen renumerotation
+	    # so as to keep the synchronization right?
+	    # Let's try without...
+	    domain=`egrep '^([a-zA-Z_ ]* =|external)' $i | wc -l | tr -cd '0-9'`
 	    index=`grep '^tabulated' $i | wc -l | tr -cd '0-9'`
-	    test ! "$index" && index=0
 	    echo "$domain $index" > $include
 	done
 
@@ -222,7 +225,7 @@ q
 	done
 	
 	update_first $start `head -1 $ORDER` $POSTFIX
-	rm -f $DEP $ORDER $OK $FILES
+	rm -f $DEP $ORDER $OK
 }
 
 if [ $# -lt 2 ] ; then
