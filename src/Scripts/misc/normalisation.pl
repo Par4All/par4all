@@ -84,11 +84,11 @@ for ($i = 0; $i < $n and not $done; $i++)
 	if ($ndim>1) 
 	{
 	    if ($ligne !~ s/($array\([^()]*),[^,()]*\)/$1,$new\)/i) {
-		failed('1', $ligne);
+		failed('cannot fix last dim', $ligne);
 	    }
 	} else {
 	    if ($ligne !~ s/($array\()[^()]*\)/$1$new\)/i) {
-		failed('2', $ligne);
+		failed('cannot fix dim', $ligne);
 	    }
 	}
 
@@ -98,7 +98,7 @@ for ($i = 0; $i < $n and not $done; $i++)
     }
 }
 
-failed(3, '') if not $done;
+failed('declaration not found', '') if not $done;
 
 END {
     &save;
