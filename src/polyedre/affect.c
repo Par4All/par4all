@@ -113,10 +113,12 @@
 
 #include "polyedre.h"
 
-int vect_apply_exp(vec,exp)
+Value vect_apply_exp(vec,exp)
 Pvecteur vec,exp;
 {
-    return(vect_prod_scal(vec,exp)+vect_coeff(TCST,exp));
+    Value vs = vect_prod_scal(vec,exp),
+          vc = vect_coeff(TCST,exp);
+    return value_plus(vs,vc);
 }
 
  /* expr_inverse transforme une expression en son inverse
@@ -178,25 +180,25 @@ Variable v;
     Pvecteur new_pred = (Pvecteur) NULL;
     Pvecteur old_pred = eg->vecteur;
     /* coefficient associe a v dans exp */
-    int av = vect_coeff(v,exp);
+    Value av = vect_coeff(v,exp);
     /* coefficient associe a v dans eg->vecteur */
-    int tv = vect_coeff(v,old_pred);
+    Value tv = vect_coeff(v,old_pred);
     /* terme constant du predicat t, remis en partie gauche */
-    int tk = -vect_coeff(TCST,old_pred);
+    Value tk = value_uminus(vect_coeff(TCST,old_pred));
     /* terme constant du nouveau predicat t' */
-    int tkp ;
+    Value tkp ;
 
     /* comme le terme constant est implicitement a droite, il faut en
        changer le signe */
     vect_chg_coeff(&old_pred,TCST,tk);
 
-    new_pred = vect_cl2(av,old_pred,-tv,exp);
+    new_pred = vect_cl2(av,old_pred,value_uminus(tv),exp);
     /* ajout du vecteur de base tv ev */
     vect_chg_coeff(&new_pred,v,tv);
 
     /* passage du terme constant a droite */
     tkp = vect_coeff(TCST,new_pred);
-    vect_chg_coeff(&new_pred,TCST,-tkp);
+    vect_chg_coeff(&new_pred,TCST,value_uminus(tkp));
 
     vect_rm(old_pred);
     eg->vecteur = new_pred;
@@ -223,31 +225,31 @@ Variable v;
     Pvecteur new_pred = (Pvecteur) NULL;
     Pvecteur old_pred = ineg->vecteur;
     /* coefficient associe a v dans exp */
-    int av = vect_coeff(v,exp);
+    Value av = vect_coeff(v,exp);
     /* coefficient associe a v dans eg->vecteur */
-    int tv = vect_coeff(v,old_pred);
+    Value tv = vect_coeff(v,old_pred);
     /* terme constant du predicat t, remis en partie gauche */
-    int tk = -vect_coeff(TCST,old_pred);
+    Value tk = value_uminus(vect_coeff(TCST,old_pred));
     /* terme constant du nouveau predicat t' */
-    int tkp ;
+    Value tkp ;
 
     /* comme le terme constant est implicitement a droite, il faut en
        changer le signe dans le predicat; par contre, le signe du terme
        constant est correct dans l'expression */
     vect_chg_coeff(&old_pred,TCST,tk);
 
-    new_pred = vect_cl2(av,old_pred,-tv,exp);
+    new_pred = vect_cl2(av,old_pred,value_uminus(tv),exp);
     /* ajout du vecteur de base tv ev */
     vect_chg_coeff(&new_pred,v,tv);
 
     /* passage du terme constant a droite */
     tkp = vect_coeff(TCST,new_pred);
-    vect_chg_coeff(&new_pred,TCST,-tkp);
+    vect_chg_coeff(&new_pred,TCST,value_uminus(tkp));
 
     /* correction de signe si le predicat a ete multiplie par un
        nombre negatif */
-    if(av<0) 
-	(void) vect_multiply(new_pred,-1);
+    if(value_neg_p(av)) 
+	vect_chg_sgn(new_pred);
 
     vect_rm(old_pred);
     ineg->vecteur = new_pred;
@@ -270,14 +272,14 @@ Pvecteur exp;
 Variable v;
 
 {
-	int cv;
-	int c;
-	cv = expr_inverse(exp,v);
-	if ((c=vect_coeff(v,eg->vecteur))) {
-		affect_eg(eg,v,exp);
-		vect_chg_coeff(&(eg->vecteur),v,cv*c);
-	}
-	expr_remake(exp,v,cv);
+    Value cv;
+    Value c;
+    cv = expr_inverse(exp,v);
+    if ((c=vect_coeff(v,eg->vecteur))) {
+	affect_eg(eg,v,exp);
+	vect_chg_coeff(&(eg->vecteur),v,value_mult(cv,c));
+    }
+    expr_remake(exp,v,cv);
 }
 
 
@@ -299,14 +301,22 @@ Psommet s;
 Variable v;
 Pvecteur exp;
 {
-    int value,cv;
+    Value value,cv,den,tc,new_tc;
     cv = expr_inverse(exp,v);
-    vect_chg_coeff(&exp,TCST,sommet_denominateur(s)*vect_coeff(TCST,exp));
+
+    tc = vect_coeff(TCST,exp);
+    den = sommet_denominateur(s);
+    new_tc = value_mult(den,tc);
+    /* change the value in expr */
+    vect_chg_coeff(&exp,TCST,new_tc);
+
     value = vect_apply_exp(s->vecteur,exp);
-    vect_chg_coeff(&exp,TCST,vect_coeff(TCST,exp)/sommet_denominateur(s));
+
+    /* restore the initial value! */
+    vect_chg_coeff(&exp,TCST,tc);
     (void) vect_multiply(s->vecteur,cv);
     vect_chg_coeff(&(s->vecteur),v,value);
-    sommet_denominateur(s) *= abs(cv);
+    value_product(sommet_denominateur(s),value_abs(cv));
     expr_remake(exp,v,cv);
 }
 
@@ -315,10 +325,11 @@ Psommet s;
 Variable v;
 Pvecteur exp;
 {
-    int term_const = vect_coeff(TCST,exp);
-    vect_chg_coeff(&exp,TCST,sommet_denominateur(s)*term_const);
-    vect_chg_coeff(&(s->vecteur),v,
-		   vect_apply_exp(s->vecteur,exp));
+    Value term_const = vect_coeff(TCST,exp), ntc,ntv;
+    ntc = value_mult(sommet_denominateur(s),term_const);
+    vect_chg_coeff(&exp,TCST,ntc);
+    ntv = vect_apply_exp(s->vecteur,exp);
+    vect_chg_coeff(&(s->vecteur),v,ntv);
     vect_chg_coeff(&exp,TCST,term_const);
 }
 
@@ -348,7 +359,7 @@ Pray_dte rd;
 Variable v;
 Pvecteur exp;
 {
-    int value,cv;
+    Value value,cv;
     cv = expr_inverse(exp,v);
     value = vect_prod_scal(rd->vecteur,exp);
     (void) vect_multiply(rd->vecteur,cv);
