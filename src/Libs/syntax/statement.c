@@ -398,17 +398,14 @@ instruction MakeAssignInst(l, e)
 syntax l;
 expression e;
 {
-    if (!syntax_reference_p(l)) {
-	/* FI: we stumble here when a Fortran macro is used */
-	    FatalError("MakeAssignInst", "bad lhs or unsupported Fortran macro\n");
-	}
+   expression lhs = make_expression(l, normalized_undefined);
 
-    return(make_instruction(is_instruction_call,
-			    make_call(CreateIntrinsic(ASSIGN_OPERATOR_NAME),
-				      CONS(EXPRESSION, 
-					   make_expression(l, 
-							normalized_undefined), 
-					   CONS(EXPRESSION, e, NIL)))));
+   if (!syntax_reference_p(l)) {
+      /* FI: we stumble here when a Fortran macro is used */
+      FatalError("MakeAssignInst", "bad lhs or unsupported Fortran macro\n");
+   }
+
+   return make_assign_instruction(lhs, e);
 }
 
 
