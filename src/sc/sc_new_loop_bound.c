@@ -21,21 +21,22 @@
  *
  * Reference about the algorithm PPoPP'91
  */
-Psysteme new_loop_bound(scn, base_index)
-Psysteme scn;
-Pbase base_index;
+Psysteme new_loop_bound
+  (Psysteme scn,
+   Pbase base_index)
 {
     Psysteme
 	result = NULL,
 	condition = NULL,
 	enumeration = NULL;
 
-    algorithm_row_echelon(scn, base_index, &condition, &enumeration);
+    algorithm_row_echelon_generic(scn, base_index, 
+				  &condition, &enumeration, FALSE);
 
     sc_rm(scn);
     result = sc_fusion(condition, enumeration);
 
-    return(result);
+    return result;
 }
 
 /* Psysteme get_other_constraints(psyst, vars)
@@ -97,25 +98,17 @@ Pbase vars;
  *
  * (c) FC 16/05/94
  */
-/* Whether to remove all redundant constraints, or to keep some when in outer 
- * loops. Done the former way in OMEGA, IRISA. It is generally more efficient.
- */
-static boolean row_echelon_redundancy = FALSE ;
-void 
-sc_set_row_echelon_redundancy(boolean b)
-{
-    row_echelon_redundancy = b;
-}
 
 /* each variable should be at least within one <= and one >=;
  * scn IS NOT modified.
  */
 void 
-algorithm_row_echelon(
-    Psysteme scn,           /* initial system, which is not touched */
-    Pbase base_index,       /* enumeration variables, from outer to inner */
-    Psysteme *pcondition,   /* returned condition (what remains from scn) */
-    Psysteme *penumeration) /* returned enumeration system */
+algorithm_row_echelon_generic(
+    Psysteme scn,           /* initial system, which is not touched. */
+    Pbase base_index,       /* enumeration variables, from outer to inner. */
+    Psysteme *pcondition,   /* returned condition (what remains from scn). */
+    Psysteme *penumeration, /* returned enumeration system. */
+    boolean redundancy      /* whether to allow outwards redundancy. */)
 {
     int i, dimension = vect_size(base_index);
     Psysteme ps_interm, ps_project, ps_tmp;
@@ -181,7 +174,7 @@ algorithm_row_echelon(
      * because a constraint may be redundant with some not yet computed
      * projection...
      */
-    if (row_echelon_redundancy)
+    if (redundancy)
     {
 	*pcondition = get_other_constraints(&ps_interm, base_index);
 	sc_transform_ineg_in_eg(*pcondition); 
@@ -193,7 +186,8 @@ algorithm_row_echelon(
     /* ELSE remove redundancy in the system...
      *
      * include the original system again, to recover simple
-     * constraints that may have been removed. May not be interesting...
+     * constraints that may have been removed.
+     * May not be interesting...
      */
     ps_tmp =  sc_dup(scn);
     sc_transform_eg_in_ineg(ps_tmp);
@@ -210,6 +204,25 @@ algorithm_row_echelon(
      */
     assert(!SC_UNDEFINED_P(*pcondition) && !SC_UNDEFINED_P(*penumeration));
 }
+
+/* see comments above. 
+ */
+void 
+algorithm_row_echelon(
+    Psysteme scn,
+    Pbase base_index,
+    Psysteme *pcondition,
+    Psysteme *penumeration)
+{
+  algorithm_row_echelon_generic
+    (scn, base_index, pcondition, penumeration, FALSE);  
+}
+
+void sc_set_row_echelon_redundancy(boolean b)
+{
+  return;
+}
+
 
 /*----------------------------------------------------------
  *
@@ -239,18 +252,20 @@ algorithm_row_echelon(
  *      IN: syst, outer, inner
  *     OUT: pcondition, ptile_enum, piter_enum
  */
-void algorithm_tiling(syst, outer, inner, 
-		      pcondition, ptile_enum, piter_enum)
-Psysteme syst;
-Pbase outer, inner;
-Psysteme *pcondition, *ptile_enum, *piter_enum;
+void algorithm_tiling
+  (Psysteme syst,
+   Pbase outer,
+   Pbase inner,
+   Psysteme *pcondition,
+   Psysteme *ptile_enum,
+   Psysteme *piter_enum)
 {
     Psysteme sc = SC_UNDEFINED,	transfer = SC_UNDEFINED;
     Pbase b = BASE_NULLE;
 
     /* tiles iterations enumeration row echelon
      */
-    algorithm_row_echelon(syst, inner, &transfer, piter_enum);
+    algorithm_row_echelon_generic(syst, inner, &transfer, piter_enum, TRUE);
 
     if (sc_empty_p(transfer))
     {
@@ -272,7 +287,7 @@ Psysteme *pcondition, *ptile_enum, *piter_enum;
 
     /* tiles enumeration row echelon
      */
-    algorithm_row_echelon(sc, outer, pcondition, ptile_enum);
+    algorithm_row_echelon_generic(sc, outer, pcondition, ptile_enum, TRUE);
 
     if (sc_empty_p(*pcondition))
     {
@@ -293,4 +308,3 @@ Psysteme *pcondition, *ptile_enum, *piter_enum;
 
 /*   that is all
  */
-
