@@ -38,22 +38,22 @@ PREFIX void reset_##name##_stack()\
 PREFIX void name##_push(i)\
 type i;\
 {\
-  stack_push(i, name##_stack);\
+  stack_push((char *)i, name##_stack);\
 }\
 PREFIX type name##_replace(i)\
 type i;\
 {\
-  return(stack_replace(i, name##_stack));\
+  return(stack_replace((char *)i, name##_stack));\
 }\
 \
 PREFIX type name##_pop()\
 {\
-  return(stack_pop(name##_stack));\
+  return((type) stack_pop(name##_stack));\
 }\
 \
 PREFIX type name##_head()\
 {\
-  return(stack_head(name##_stack));\
+  return((type) stack_head(name##_stack));\
 }\
 \
 PREFIX bool name##_empty_p()\
@@ -69,9 +69,9 @@ PREFIX int name##_size()\
 static void check_##name##_stack()\
 {\
   stack s = get_##name##_stack();\
-  chunk\
-     *item_1 = (chunk *) check_##name##_stack,\
-     *item_2 = (chunk *) get_##name##_stack;\
+  char\
+     *item_1 = (char *) check_##name##_stack,\
+     *item_2 = (char *) get_##name##_stack;\
   \
   reset_##name##_stack();\
   make_##name##_stack();\
