@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1996/09/21 15:38:14 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1996/09/21 15:42:31 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -73,6 +73,6 @@ static int name##_generic_local_function_hack()\
          (int) store_##name & (int) name##_generic_local_function_hack;}
 
 #define GENERIC_GLOBAL_FUNCTION(name, type)\
-        GENERIC_FUNCTION(/**/, name, type)
+        GENERIC_FUNCTION(extern, name, type)
 
 #endif /* NEWGEN_GENERIC_FUNCTION_INCLUDED */
