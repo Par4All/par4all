@@ -1,3 +1,11 @@
+/* 	%A% ($Date: 1995/07/31 17:28:23 $, ) version $Revision$, got on %D%, %T% [%P%].
+        Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+static char vcid[] = "%A% ($Date: 1995/07/31 17:28:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
+
 /* Here are all the stuff to interface Pips with Emacs. */
 
 /* Ronan.Keryell@cri.ensmp.fr, 23/05/1995. */
@@ -122,9 +130,19 @@ send_user_warning_to_emacs(char * some_text)
 
 
 void
-send_view_to_emacs(char * view_name, char * some_text)
+send_view_to_emacs(char * view_name, char * the_file_name)
 {
-   send_command_to_emacs(view_name, some_text);
+   int number_of_characters_written;
+   char full_path[1000];
+   
+   /* Send a complete file path since the current directory in Emacs
+      is no the same a priori: */
+   (void) sprintf(full_path, "%s/%s%n", get_cwd(), the_file_name,
+                  &number_of_characters_written);
+   pips_assert("send_view_to_emacs",
+               number_of_characters_written < sizeof(full_path));
+   
+   send_command_to_emacs(view_name, full_path);
 }
 
 
