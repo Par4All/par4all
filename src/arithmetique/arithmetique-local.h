@@ -145,6 +145,7 @@ typedef int Value;
 #define value_division(ref,val) ref/=(val)
 #define value_pdivision(ref,val) value_assign(ref,value_pdiv(ref,val))
 #define value_oppose(ref) ref=value_uminus(ref)
+#define value_modulus(ref,val) ref%=(val)
 
 /* unary operators on values
  */
@@ -194,12 +195,12 @@ typedef int Value;
 #define value_div(v1,v2) value_fake_binary(v1,v2)
 #undef value_mod
 #define value_mod(v1,v2) value_fake_binary(v1,v2)
-#undef value_add
-#define value_add(v1,v2) value_assign(v1,value_plus(v1,v2))
-#undef value_sub
-#define value_sub(v1,v2) value_add(v1,v2)
-#undef value_prod
-#define value_prod(v1,v2) value_add(v1,v2)
+#undef value_addto
+#define value_addto(v1,v2) value_assign(v1,value_plus(v1,v2))
+#undef value_substract
+#define value_substract(v1,v2) value_add(v1,v2)
+#undef value_product
+#define value_product(v1,v2) value_add(v1,v2)
 #undef value_division
 #define value_division(v1,v2) value_add(v1,v2)
 #undef value_negz_p
