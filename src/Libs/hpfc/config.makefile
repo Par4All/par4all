@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/06/08 19:09:13 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/06/08 19:41:33 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -61,7 +61,6 @@ LIB_CFILES=	parser.c \
 		align-checker.c \
 		messages.c \
 		overlap.c \
-		normalize.c \
 		guard.c \
 		ranges.c \
 		message-utils.c \
