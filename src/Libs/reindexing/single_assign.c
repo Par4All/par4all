@@ -286,7 +286,7 @@ reference old_r;
   /* we duplicate this list */
   sl = subscripts;
 
-  num = malloc(32);
+  num = (string) malloc(32);
   (void) sprintf(num, "%d", n);
   if(kind == IS_TEMP)
     name = (string) strdup(concatenate(SA_MODULE_NAME, MODULE_SEP_STRING,
