@@ -21,6 +21,8 @@
 #include <limits.h>
 #include <stdlib.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
@@ -83,7 +85,7 @@ CreateArrays()
     make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 				 IO_EFFECTS_ARRAY_NAME),
 		MakeTypeArray(make_basic(is_basic_int,
-					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
+				  UUINT(IO_EFFECTS_UNIT_SPECIFIER_LENGTH)),
 			      CONS(DIMENSION,
 				   make_dimension
 				   (MakeIntegerConstantExpression("0"),
@@ -108,7 +110,7 @@ CreateArrays()
     make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 				 IO_EOF_ARRAY_NAME),
 		MakeTypeArray(make_basic(is_basic_logical,
-					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
+				 UUINT(IO_EFFECTS_UNIT_SPECIFIER_LENGTH)),
 			      CONS(DIMENSION,
 				   make_dimension
 				   (MakeIntegerConstantExpression("0"),
@@ -133,7 +135,7 @@ CreateArrays()
     make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 				 IO_ERROR_ARRAY_NAME),
 		MakeTypeArray(make_basic(is_basic_logical,
-					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
+				UUINT(IO_EFFECTS_UNIT_SPECIFIER_LENGTH)),
 			      CONS(DIMENSION,
 				   make_dimension
 				   (MakeIntegerConstantExpression("0"),
