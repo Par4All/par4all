@@ -89,7 +89,7 @@ extern gen_chunk *Read_chunk ;
 union domain {
   struct { /* EXTERNAL */
     int type ;
-    void* (*read)(FILE*) ;
+    void* (*read)(FILE*, int(*)(void)) ;
     void (*write)(FILE*, void*) ;
     void (*free)(void*) ;
     void* (*copy)(void*) ;
