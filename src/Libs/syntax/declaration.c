@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/16 15:21:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/17 14:36:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/16 15:21:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/17 14:36:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -972,20 +972,79 @@ implicit_type_p(entity e)
     return FALSE; /* to please gcc */
 }
 
+/* If an IMPLICIT statement is encountered, it must be applied to
+ * the formal parameters, and, if the current module is a function,
+ * to the function result type and to the variable used internally
+ * when a value is assigned to the function (see MakeCurrentFunction)
+ */
 void 
 retype_formal_parameters()
 {
     entity m = get_current_module_entity();
     list vars = code_declarations(value_code(entity_initial(m)));
+    type tm = entity_type(m);
+    type tr = type_undefined;
+
+    debug(8, "retype_formal_parameters", "Begin for module %s\n",
+	  module_local_name(m));
 
     MAP(ENTITY, v, {
 	if(!storage_undefined_p(entity_storage(v)) && formal_parameter_p(v)) {
 	    if(!implicit_type_p(v)) {
 		free_type(entity_type(v));
 		entity_type(v) = ImplicitType(v);
+
+		debug(8, "retype_formal_parameters", "Retype formal parameter %s\n",
+		      entity_local_name(v));
 	    }
 	}
     }, vars);
+
+    /* If the current module is a function, its type should be updated. */
+
+    pips_assert("Should be a functional type", type_functional_p(tm));
+
+    /* The function signature is computed later by  UpdateFunctionalType()
+     * called from EndOfProcedure: there should be no parameters in the type.
+     */
+    pips_assert("Parameter type list should be empty",
+                ENDP(functional_parameters(type_functional(tm))));
+
+    tr = functional_result(type_functional(tm));
+    if(type_variable_p(tr)) {
+	if(!implicit_type_p(m)) {
+	    entity r = entity_undefined;
+	    free_type(tr);
+	    functional_result(type_functional(tm)) = ImplicitType(m);
+	    debug(8, "retype_formal_parameters", "Retype result of function %s\n",
+		      module_local_name(m));
+
+	    /* Update type of internal variable used to store the function result */
+	    if((r=global_name_to_entity(module_local_name(m), module_local_name(m)))
+	       != entity_undefined) {
+		free_type(entity_type(r));
+		entity_type(r) = ImplicitType(r);
+		pips_assert("Result and function result types should be equal",
+			    type_equal_p(functional_result(type_functional(tm)),
+					 entity_type(r)));
+	    }
+	    else {
+		pips_error("retype_formal_parameters", "Result entity should exist!\n");
+	    }
+	}
+    }
+    else if (type_void_p(tr)) {
+	/* nothing to be done: subroutine or main */
+    }
+    else
+	pips_error("retype_formal_parameters", "Unexpected type with tag = %d\n",
+		   type_tag(tr));
+
+    pips_assert("Parameter type list should still be empty",
+                ENDP(functional_parameters(type_functional(tm))));
+
+    debug(8, "retype_formal_parameters", "End for module %s\n",
+	  module_local_name(m));
 }
 
 /* this function creates a type that represents a fortran type. its basic
