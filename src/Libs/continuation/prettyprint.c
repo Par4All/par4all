@@ -162,6 +162,8 @@ static text get_continuation_condition_text(char *module_name, bool give_code_p)
     reset_current_module_entity();
     reset_current_module_statement();
     free_cumulated_effects_map();
+    reset_must_continuation_map();
+    reset_may_continuation_map();
 
     return txt;
 }
@@ -403,8 +405,8 @@ static text text_continuation(transformer cont, bool is_must)
 					      strdup(crt_line)));
   }
   
-  ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					  strdup("\n")));
+  /* ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+					  strdup("\n"))); */
   
   return txt; 
 }
