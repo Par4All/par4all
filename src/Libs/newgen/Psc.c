@@ -24,15 +24,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-
+#include "linear.h"
 #include "genC.h"
 #include "ri.h"
-#include "ri-util.h"
 #include "misc.h"
+
+#include "newgen.h"
 
 /* Sigh, sigh, sigh:
    - either ri-util.h must be included, as well as all underlaying libraries
