@@ -1,3 +1,6 @@
+/* 
+ * Quite a poor code in my opinion. FC.
+ */
 #include <stdlib.h>
 #include <stdio.h>
 #include <setjmp.h>
@@ -13,14 +16,17 @@ list_to_arg(list li,
             char * argv[])
 {
    list l2=li;
+   int index=0;
 
-   *pargc = 0;
+   pips_assert("not too long", gen_length(li)<ARGS_LENGTH);
+
    while(l2!=NIL) {
-      argv[(*pargc)++] = STRING(CAR(l2));
-      l2= CDR(l2);
+       argv[index++] = STRING(CAR(l2));
+       l2= CDR(l2);
    }
-   gen_free_list(li);
-   li= NIL;
+
+   gen_free_list(li), li= NIL;
+   (*pargc) = index;
 }
 
 
@@ -28,45 +34,40 @@ list_to_arg(list li,
    array of string must have at least as much as strings as in the
    list. No free is done. */
 void
-update_list_from_arg(list l,
-		     char ** the_strings)
+update_list_from_arg(
+    list l,
+    char ** the_strings)
 {
     int i = 0;
-    MAPL(scons,
-	{
-	    STRING(CAR(scons)) = the_strings[i++];
-	},
-	l);
+    pips_assert("long enough", gen_length(l)<ARGS_LENGTH);
+    MAPL(scons, STRING(CAR(scons)) = the_strings[i++], l);
 }
 
 
-void args_free(pargc, argv)
-int *pargc;
-char *argv[];
+void 
+args_free(
+    int *pargc,
+    char *argv[])
 {
     int i;
+    pips_assert("length ok", *pargc<ARGS_LENGTH);
 
     for (i = 0; i < *pargc; i++)
 	free(argv[i]);
-
-    *pargc = 0;
+    (*pargc) = 0;
 }
 
 
 
-void args_add(pargc, argv, arg)
-int *pargc;
-char *argv[];
-char *arg;
+void 
+args_add(
+    int *pargc,
+    char *argv[],
+    char *arg)
 {
-    if (*pargc >= ARGS_LENGTH) {
-	user_warning("args_add", "too many arguments; recompile after \
-increasing ARGS_LENGTH in constants.h\n");
-    }
-
+    pips_assert("not too many", *pargc<ARGS_LENGTH);
     argv[*pargc] = arg;
-
-    *pargc += 1;
+    (*pargc) ++;
 }
 
 
@@ -95,13 +96,16 @@ args_sort(int argc,
 void
 sort_list_of_strings(list l)
 {
-    int arg_number;
-    int number_of_strings = gen_length(l);    
-    char ** the_strings = malloc(number_of_strings*sizeof(char *));
-    
-    list_to_arg(l, &arg_number, the_strings);
+    int arg_number = 0;
+    int number_of_strings = gen_length(l);
+    char * argsv[ARGS_LENGTH];
+
+    pips_assert("not too long", number_of_strings<ARGS_LENGTH);
+    list_to_arg(l, &arg_number, argsv);
+
     pips_assert("The size of the args and the list should be the same",
 		arg_number == number_of_strings);
-    args_sort(arg_number, the_strings);
-    update_list_from_arg(l, the_strings);
+
+    args_sort(arg_number, argsv);
+    update_list_from_arg(l, argsv);
 }
