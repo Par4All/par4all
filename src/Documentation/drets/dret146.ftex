@@ -1,7 +1,7 @@
 %
-% Documentation de l'environnement de de;veloppement PIPS
+% Documentation de l'environnement de de'veloppement PIPS
 %
-% $RCSfile: dret146.ftex,v $ ($Date: 1994/03/14 17:40:51 $) version $Revision$, got on %D%, %T%
+% $RCSfile: dret146.ftex,v $ ($Date: 1994/03/16 11:06:11 $) version $Revision$, got on %D%, %T%
 % %A%
 %
 
@@ -13,19 +13,20 @@
 
 \newcommand{\titre}{PROJET PIPS \\
 		ENVIRONNEMENT DE D\'EVELOPPEMENT\\
-		{\em Version 1.0}
+		{\em Version $Revision$}
 }
 
 \newcommand{\auteur}{
         	Franc,ois IRIGOIN \\
         	Pierre JOUVELOT \\
-		R\'emi TRIOLET \\
-		Arnauld LESERVOT \\
-		Alexis PLATONOFF \\
-		Ronan KERYELL
+			R\'emi TRIOLET \\
+			Arnauld LESERVOT \\
+			Alexis PLATONOFF \\
+			Ronan KERYELL \\
+			Fabien COELHO
 }
 %\newcommand{\docdate}{7 octobre 1993}
-\newcommand{\docdate}{%D%}
+\newcommand{\docdate}{$Date: 1994/03/16 11:06:11 $}
 
 \begin{document}
 
