@@ -130,7 +130,8 @@ graph                   dup_dg;
     dest_ver   = VERTEX(CAR( dest_ver_l ));
     dest_st    = adg_vertex_to_statement(dest_ver);
     dest_succ  = vertex_successors( dest_ver );
-    dest_nb    = dfg_vertex_label_statement(vertex_vertex_label( dest_ver ));
+    dest_nb    = dfg_vertex_label_statement
+	((statement) vertex_vertex_label( dest_ver ));
     dest_order = adg_number_to_ordering( dest_nb );
     dest_stco  = (static_control) GET_STATEMENT_MAPPING(stco_map, dest_st);
     dest_loops = static_control_loops(  dest_stco );
@@ -138,11 +139,13 @@ graph                   dup_dg;
     dest_lcl   = adg_get_loop_indices(  dest_loops );
 
     dest_pred = dfg_vertex_label_exec_domain(vertex_vertex_label(dest_ver));
-    if (!predicate_undefined_p(dest_pred)) dest_test_context = predicate_system( dest_pred );
+    if (!predicate_undefined_p(dest_pred)) 
+	dest_test_context = predicate_system( dest_pred );
     else dest_test_context = SC_RN;
 
     prov_pr = adg_get_predicate_of_loops(dest_loops);
-    if (prov_pr != predicate_undefined) dest_loop_context = predicate_system( prov_pr );
+    if (prov_pr != predicate_undefined) 
+	dest_loop_context = predicate_system( prov_pr );
     else dest_loop_context = SC_RN;
     dest_context = sc_append(sc_dup( dest_test_context ),dest_loop_context);
     if (dest_context != SC_UNDEFINED) adg_sc_update_base(&dest_context);
