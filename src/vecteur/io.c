@@ -17,7 +17,6 @@
 #include <malloc.h>
 #include <assert.h>
 #include <string.h>
-#include <strings.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -214,17 +213,17 @@ char *mult_symbol;
 	for (p = v; p != NULL; p = p->succ) {
 	    if (p->val==1) {
 		(void) sprintf(r, "%s", variable_name(p->var));
-		r = strchr(r, NULL);
+		r = strchr(r, '\0');
 	    }
 	    else {
 		(void) sprintf(r, "%s^", variable_name(p->var));
-		r = strchr(r, NULL);
+		r = strchr(r, '\0');
 		sprint_Value(r, p->val);
-		r = strchr(r, NULL);
+		r = strchr(r, '\0');
 	    }
 	    if (p->succ != NULL) {
 		(void) sprintf(r, "%s", mult_symbol);
-		r = strchr(r, NULL);
+		r = strchr(r, '\0');
 	    }
 	}
     }
@@ -239,7 +238,7 @@ char *mult_symbol;
 	    
 		if (!first_var) {
 		    (void) sprintf(r, "%s", mult_symbol);
-		    r = strchr(r, NULL);
+		    r = strchr(r, '\0');
 		}
 		else 
 		    first_var = FALSE;
@@ -247,13 +246,13 @@ char *mult_symbol;
 		if (exp > 0) {
 		    if (exp==1) {
 			(void) sprintf(r, "%s", variable_name(b->var));
-			r = strchr(r, NULL);
+			r = strchr(r, '\0');
 		    }
 		    else {
 			(void) sprintf(r,"%s^", variable_name(b->var));
-			r = strchr(r, NULL);
+			r = strchr(r, '\0');
 			sprint_Value(r, exp);
-			r = strchr(r, NULL);
+			r = strchr(r, '\0');
 		    }
 		}
 		else /* exp < 0 */ {
@@ -261,11 +260,11 @@ char *mult_symbol;
 		    first_var = FALSE;
 
 		    (void) sprintf(r, "%s^(", variable_name(b->var));
-		    r = strchr(r, NULL);
+		    r = strchr(r, '\0');
 		    sprint_Value(r, exp);
-		    r = strchr(r, NULL);
+		    r = strchr(r, '\0');
 		    (void) sprintf(r, ")");
-		    r = strchr(r, NULL);
+		    r = strchr(r, '\0');
 		}
 	    }
 	}
