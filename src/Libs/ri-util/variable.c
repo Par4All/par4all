@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: variable.c,v $
+ * Revision 1.48  2003/12/05 17:09:22  nguyen
+ * Replace entity_local_name by entity_user_name to handle entities in C language
+ *
  * Revision 1.47  2003/06/19 07:25:35  nguyen
  * Update calls to make_statement and make_variable with new RI for C
  *
@@ -984,20 +987,23 @@ bool formal_label_replacement_p(entity fp)
 bool actual_label_replacement_p(expression eap)
 {
   bool replacement_p = FALSE;
-  string ls = entity_local_name(call_function(syntax_call(expression_syntax(eap))));
-  string p = ls+1;
+  if (expression_call_p(eap))
+    {
+      string ls = entity_user_name(call_function(syntax_call(expression_syntax(eap))));
+      string p = ls+1;
 
-  replacement_p = (strlen(ls) >= 4
-    && *ls=='"' && *(ls+1)=='*' && *(ls+strlen(ls)-1)=='"');
-
-  if(replacement_p) {
-    for(p=ls+2; p<ls+strlen(ls)-1; p++) {
-      if(*p<'0'||*p>'9') {
-	replacement_p =FALSE;
-	break;
+      replacement_p = (strlen(ls) >= 4
+		       && *ls=='"' && *(ls+1)=='*' && *(ls+strlen(ls)-1)=='"');
+      
+      if(replacement_p) {
+	for(p=ls+2; p<ls+strlen(ls)-1; p++) {
+	  if(*p<'0'||*p>'9') {
+	    replacement_p =FALSE;
+	    break;
+	  }
+	}
       }
     }
-  }
   
   return replacement_p;
 }
@@ -1013,3 +1019,9 @@ bool call_contains_alternate_returns_p(call c)
 
   return contains_p;
 }
+
+
+
+
+
+
