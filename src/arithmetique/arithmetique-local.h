@@ -199,22 +199,7 @@ typedef int Value;
 
 
 /************************************************* PROTECTED MULTIPLICATION */
-
-#include <setjmp.h>
-extern jmp_buf overflow_error;
-
-/* TRY/CATCH/THROW/EXCEPTION: macros with a C++ look and feel.
- * EXCEPTION overflow_error;
- * CATCH(overflow_error) {
- *   ...
- * } TRY {
- *   ... THROW(overflow_error) ...
- * }
- */
-#define EXCEPTION jmp_buf
-#define CATCH(thrown) if (setjmp(thrown))
-#define TRY else
-#define THROW(thrown) longjmp(thrown,__LINE__) /* why not!? */
+#include "arithmetic_errors.h"
 
 /* (|v| < MAX / |w|) => v*w is okay
  * I could check ((v*w)/w)==v but a tmp would be useful
