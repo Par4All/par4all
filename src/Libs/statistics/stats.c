@@ -15,11 +15,11 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 
-#include "statistics.h"
+#include "statistics.h"     
 
-static int depth[1000], nbr_nested_loop, nbr_no_nested_loop,
-nbr_interested_loop,cpt, all ;
-static bool nested  ;
+static int depth, nbr_perfectly_nested_loop, nbr_no_perfectly_nested_loop, 
+nbr_interested_loop,cpt, nbr_nested_loop, nbr_depth[100], max_depth ;
+static bool perfectly_nested  ;
  
 static bool loop_flt( loop l)
 {
@@ -63,7 +63,7 @@ static bool loop_flt( loop l)
        if (( cond1) && (found))  nbr_interested_loop++ ;
      }; 
      cpt++;
-     depth[nbr_nested_loop]++;
+     depth++;
      if ( instruction_loop_p(lbi))
 	return TRUE;  
      else 
@@ -91,7 +91,7 @@ static bool loop_flt( loop l)
 
 		  if ( local) 
                   {
-                     nested=FALSE; if (cpt==1)
+                    perfectly_nested=FALSE; if (cpt==1)
                                     {
                                        cpt++; loop_rwt();
                                     }; 
@@ -121,16 +121,21 @@ bool loop_rwt( )
   cpt--;
   if (cpt==1)
     {
-      all++;
-      if (nested) 
-        nbr_nested_loop++;
+      nbr_nested_loop++;
+      if (perfectly_nested)
+        { 
+        nbr_perfectly_nested_loop++;
+        nbr_depth[depth]++;
+        if (depth >max_depth) max_depth =depth;
+	}
        else
 	 {
-	   nested=TRUE  ; 
-           depth[nbr_nested_loop]=0;
-           nbr_no_nested_loop++;
+	   perfectly_nested=TRUE  ; 
+           nbr_no_perfectly_nested_loop++;
          };
+      depth=0;
       cpt--;
+    
     };
   return TRUE;
 }
@@ -138,9 +143,10 @@ static void initialize ()
 {
   int i;
   for(i=0; i<=1000;i++)
-      depth[i]=0;
-   nbr_nested_loop=0; nbr_no_nested_loop=0;nbr_interested_loop=0;
-   cpt=0; all=0 ; nested =TRUE  ;
+   nbr_depth[i]=0;
+   depth=0;
+   nbr_perfectly_nested_loop=0; nbr_no_perfectly_nested_loop=0;nbr_interested_loop=0;
+   cpt=0; nbr_nested_loop=0 ; perfectly_nested =TRUE, max_depth=0  ;
   
 } 
 static void put_result(string filename)
@@ -152,11 +158,11 @@ static void put_result(string filename)
 	  "nested loops: %d\n"
 	  "perfectly nested loops: %d\n"
 	  "non perfectly nested loops: %d\n"
-	  "depth 2 non perfectly nested loops: %d\n",
-	  all, nbr_interested_loop, nbr_no_nested_loop, nbr_interested_loop);
+	  "non perfectly nested loops which we ca treat : %d\n",
+	  nbr_nested_loop, nbr_perfectly_nested_loop, nbr_no_perfectly_nested_loop, nbr_interested_loop);
 
-  for (i=0; i<=nbr_nested_loop-1; i++)
-    fprintf(file," depth of loop %d: %d\n", i+1, depth[i]);
+  for (i=1; i<= max_depth; i++)
+    fprintf(file," perfectly  nested loops of depth %d: %d \n", i, nbr_depth[i]);
 
   safe_fclose(file, filename);
 }
@@ -196,6 +202,18 @@ int loop_statistics(string name)
    
   return TRUE;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
