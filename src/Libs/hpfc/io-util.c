@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-util.c,v $ ($Date: 1995/04/21 10:28:20 $, )
+ * $RCSfile: io-util.c,v $ ($Date: 1995/04/21 14:50:09 $, )
  * version $Revision$,
  */
 
@@ -95,9 +95,8 @@ static statement hpfc_hcast()
 
 #define GENERATION(NAME, COLLECT, UPDATE)\
 static statement NAME(array, move) entity array; tag move;\
-{return((move==is_movement_collect) ? (COLLECT) :\
-       ((move==is_movement_update)  ? (UPDATE) : \
-       pips_error("GENERATION", "unexpected move tag"), statement_undefined));}
+{assert(move==is_movement_collect || move==is_movement_update);\
+ return((move==is_movement_collect) ? (COLLECT) : (UPDATE));}
 
 GENERATION(node_pre_io,
 	   hpfc_initsend(),
@@ -230,15 +229,8 @@ statement *psh, *psn;
     sc_rm(proc_cond_tmp),
     sc_rm(proc_cond);
 
-    ifdebug(5)
-    {
-	fprintf(stderr, 
-		"[generate_io_statements_for_distributed_array] result:\n");
-	fprintf(stderr, "Host:\n");
-	print_statement(*psh);
-	fprintf(stderr, "Node:\n");
-	print_statement(*psn);
-    }
+    DEBUG_STAT(5, "Host", *psh);
+    DEBUG_STAT(5, "Node", *psn);
 }
 
 /* generate_io_statements_for_shared_arrays
