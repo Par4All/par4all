@@ -346,6 +346,14 @@ int main() {
     Vector_Free(v);
     break;
 
+  case 23: /* SplitZPolyhedron */
+        
+    ZA=ZPolyhedron_Alloc(a,A);
+    ZC = SplitZpolyhedron(ZA,b);
+    ZDomainPrint(stdout,P_VALUE_FMT, ZC);
+    break;
+
+
   case 100: /* debug */
     
     ZA=ZPolyhedron_Alloc(a,A);

@@ -21,7 +21,8 @@ GENERAL_TESTS = convex1 convex2 simpl1 simpl2 \
 
 ZPOLYTESTS =  LatHNF1 LatHNF2 LatHNF3 LatInter1 LatInter2 \
 	LatInc1 LatInc2 ZEmpty1 ZEmpty2 ZInter1 ZInter2  ZInter3  ZUnion1 \
-	ZUnion2 ZDiff1 ZDiff2 ZImage1 ZPre1 ZPre2  ZPre3 ZImPre1 
+	ZUnion2 ZDiff1 ZDiff2 ZImage1 ZPre1 ZPre2  ZPre3 ZImPre1 SplitZpol1 \
+	SplitZpol2 SplitZpol3
 
 
 all_tests : general_tests pp$(EXEC_EXTRA_SUFFIX)_tests \
