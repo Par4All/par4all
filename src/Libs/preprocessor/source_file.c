@@ -462,15 +462,23 @@ static string process_thru_cpp(string name)
 
 /*************************************************** managing a user file */
 
+#define suffix ".pips.o"
+
 static void 
 check_fortran_syntax_before_pips(
     string file_name)
 {
     string pips_flint = getenv("PIPS_FLINT");
     user_log("Checking Fortran syntax of %s\n", file_name);
-    safe_system(concatenate(
-	pips_flint? pips_flint: "f77 -c -ansi ", file_name, 
-	" -o ", file_name, ".pips.o ; rm ", file_name, ".pips.o", NULL));
+    if (system(concatenate(
+	pips_flint? pips_flint: "f77 -c -ansi", " ", file_name, 
+	" -o ", file_name, suffix, " ; rm ", file_name, suffix, NULL)))
+
+	/* the error is detected if rm cannot remove the file;-)
+	 * f77 is rather silent on errors...
+	 */
+	pips_user_warning("\n\n\tFortran syntax errors in file %s!\007\n\n", 
+			  file_name);
 }
 
 bool process_user_file(
