@@ -1,17 +1,11 @@
 #! /bin/sh
 
-PIPS_INCLUDEDIR=${PIPS_ROOT}/Include
-export PIPS_INCLUDEDIR
-
 perl -e '
-$menu_dir = $ENV{"PIPS_INCLUDEDIR"};
 $program_name = $ARGV[0];
 print @ARGV;
 while (<>) {
     /\\begin{PipsMenu}{Transformations}/ && do {
 	$transformation_menu = 1;
-	open(STDOUT, ">" . $menu_dir . "/wpips_transform_menu_layout.h")
-	    || die("Cannot open new STDOUT"); 
 	print "/* The table that describes the transform menu: */\n";
 	print "/* It has been generated automatically from the pipsmake-rc.tex file with " . $program_name . ". */\n";
 	next;
