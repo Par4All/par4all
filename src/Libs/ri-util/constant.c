@@ -339,7 +339,32 @@ signed_constant_expression_p(expression e)
     }
     return ok;
 }
+
+basic constant_basic(entity c)
+{
+  basic b = variable_basic(type_variable(functional_result(type_functional(entity_type(c)))));
+  return b;
+}
+
+double float_constant_to_double(entity c)
+{
+  double d = 0.0;
+  int i = 0;
 
+  pips_assert("entity is constant", entity_constant_p(c));
+  pips_assert("constant is float", basic_float_p(constant_basic(c)));
+
+  i = sscanf(module_local_name(c), "%lf", &d);
+  if(i!=1)
+    i = sscanf(module_local_name(c), "%le", &d);
+  if(i!=1)
+    i = sscanf(module_local_name(c), "%lg", &d);
+  if(i!=1)
+    pips_internal_error("No adequate format for float constant");
+
+  return d;
+}
+
 /* BEGIN_EOLE */ /* - please do not remove this line */
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
    in the EOLE project (JZ - 11/98) */
