@@ -35,6 +35,7 @@
  epips-distributed-view-command-name "Distributed View"
  epips-emacs-sequential-view-command-name "Emacs Sequential View"
  epips-flint-view-command-name "Flint View"
+ epips-hpfc-file-view-command-name "HPFC File"
  epips-ICFG-view-command-name "ICFG View"
  epips-module-command-name "MODULE_NAME"
  epips-parallel-view-command-name "Parallel View"
@@ -298,25 +299,28 @@
                 (epips-sequential-view-command epips-command-name epips-command-content)
               (if (equal epips-command-name epips-flint-view-command-name)
                   (epips-sequential-view-command epips-command-name epips-command-content)
-                (if (equal epips-command-name epips-ICFG-view-command-name)
-                    (epips-ICFG-or-graph-view-command epips-command-name epips-command-content)
-                  (if (equal epips-command-name epips-parallel-view-command-name)
-                      (epips-sequential-view-command epips-command-name epips-command-content)
-                    (if (equal epips-command-name epips-placement-view-command-name)
-                        (epips-sequential-view-command epips-command-name epips-command-content)
-                      (if (equal epips-command-name epips-scheduling-view-command-name)
-                          (epips-sequential-view-command epips-command-name epips-command-content)
-                        (if (equal epips-command-name epips-sequential-view-command-name)
-                            (epips-sequential-view-command epips-command-name epips-command-content)
-                          (if (equal epips-command-name epips-user-view-command-name)
-                              (epips-sequential-view-command epips-command-name epips-command-content)
+		(if (equal epips-command-name epips-hpfc-file-view-command-name)
+		    (epips-sequential-view-command epips-command-name epips-command-content)
+		  (if (equal epips-command-name epips-ICFG-view-command-name)
+		      (epips-ICFG-or-graph-view-command epips-command-name epips-command-content)
+		    (if (equal epips-command-name epips-parallel-view-command-name)
+			(epips-sequential-view-command epips-command-name epips-command-content)
+		      (if (equal epips-command-name epips-placement-view-command-name)
+			  (epips-sequential-view-command epips-command-name epips-command-content)
+			(if (equal epips-command-name epips-scheduling-view-command-name)
+			    (epips-sequential-view-command epips-command-name epips-command-content)
+			  (if (equal epips-command-name epips-sequential-view-command-name)
+			      (epips-sequential-view-command epips-command-name epips-command-content)
+			    (if (equal epips-command-name epips-user-view-command-name)
+				(epips-sequential-view-command epips-command-name epips-command-content)
 					; Else, command unknown:
-                            (epips-user-error-command (concat "\nCommand name \""
-                                                              epips-command-name
-                                                              "\" with argument \""
-                                                              epips-command-content
-                                                              "\" not implemented !!!\n\n"))
-                            )
+			      (epips-user-error-command (concat "\nCommand name \""
+								epips-command-name
+								"\" with argument \""
+								epips-command-content
+								"\" not implemented !!!\n\n"))
+			      )
+			    )
                           )
                         )
 		      )
