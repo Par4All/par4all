@@ -644,8 +644,15 @@ Pvecteur pv;
 	    var = vecteur_var(pv1);
 	    vect_erase_var(&lvar_proj,var);
 	    for (pv2 = lvar_proj;!VECTEUR_NUL_P(pv2); pv2=pv2->succ) {
-		sc_projection_along_variable_ofl_ctrl
+		
+		CATCH(overflow_error) {
+		    sc_elim_var(sc2, vecteur_var(pv2));
+		}
+		TRY {
+		    sc_projection_along_variable_ofl_ctrl
 		    (&sc2,vecteur_var(pv2), NO_OFL_CTRL);
+		    UNCATCH(overflow_error);
+		}
 		sc2 = sc_normalize(sc2);
 		if (SC_EMPTY_P(sc2)) {
 		    sc2 = sc_empty(base_dup(sc->base));
@@ -746,7 +753,13 @@ Psysteme sc_projection(sc, v)
 Psysteme sc;
 Variable v;
 {
-    sc_projection_along_variable_ofl_ctrl(&sc,v, NO_OFL_CTRL);
+    CATCH(overflow_error) {
+	sc_elim_var(sc , v);
+    }
+    TRY {
+	sc_projection_along_variable_ofl_ctrl(&sc,v, NO_OFL_CTRL);
+	UNCATCH(overflow_error);
+    }
     if (sc_empty_p(sc)) {
 	sc_rm(sc);
 	sc = SC_EMPTY;
@@ -758,7 +771,7 @@ Psysteme sc_projection_ofl(sc, v)
 Psysteme sc;
 Variable v;
 {
-    sc_projection_along_variable_ofl_ctrl(&sc,v, FWD_OFL_CTRL);
+	sc_projection_along_variable_ofl_ctrl(&sc,v, FWD_OFL_CTRL);
     if (sc_empty_p(sc)) {
 	sc_rm(sc);
 	sc = SC_EMPTY;
@@ -772,11 +785,17 @@ Psysteme sc_projection_pure(sc,v)
 Psysteme sc;
 Variable v;
 {
-    sc_and_base_projection_along_variable_ofl_ctrl(&sc,v,NO_OFL_CTRL);
+    CATCH(overflow_error) {
+	sc_elim_var(sc , v);
+    }
+    TRY {
+	sc_and_base_projection_along_variable_ofl_ctrl(&sc,v,NO_OFL_CTRL);
+	UNCATCH(overflow_error);
+    }
     if (sc_empty_p(sc)) {
 	sc_rm(sc);
 	sc = SC_EMPTY;
-    }    
+    }   
     return(sc );
 }
 
