@@ -18,6 +18,49 @@
 static Textsw log_textsw;
 static Menu_item open_front, clear, close;
 
+/* Par de'faut, le fichier est ferme' : */
+FILE *log_file = NULL;
+
+
+  void
+close_log_file()
+{
+  if (log_file != NULL && get_bool_property("USER_LOG_P")==TRUE)
+    if (fclose(log_file) != 0) {
+      perror("close_log_file");
+      abort();
+    }
+  log_file = NULL;
+}
+
+
+  void
+open_log_file()
+{
+  char tampon[LARGE_BUFFER_LENGTH];
+  
+  if (log_file != NULL)
+    close_log_file();
+
+  if (get_bool_property("USER_LOG_P")==TRUE) {
+    sprintf(tampon, "%s.log", db_get_current_workspace());
+    if ((log_file = fopen(tampon, "a")) == NULL) {
+      perror("open_log_file");
+      abort();
+    }
+  }
+}
+
+  void
+log_on_file(char chaine[])
+{
+  if (log_file != NULL && get_bool_property("USER_LOG_P")==TRUE) {
+    if (fprintf(log_file, "%s", chaine)) != 1) {
+      perror("log_on_file");
+      abort();
+    }
+  }
+}
 
 
 int go_on_p(s)
@@ -141,6 +184,7 @@ char warning_buffer[];
 {
     int l = (int) xv_get(log_textsw, TEXTSW_LENGTH);
 
+    log_on_file(warning_buffer);
     xv_set(log_textsw, TEXTSW_INSERTION_POINT, l, NULL);
     textsw_insert(log_textsw, warning_buffer, strlen(warning_buffer));
     textsw_possibly_normalize(log_textsw, 
@@ -204,6 +248,7 @@ va_list args;
 
     (void) vsprintf(log_buffer, fmt, args);
 
+    log_on_file(log_buffer);
     xv_set(log_textsw, TEXTSW_INSERTION_POINT, l, NULL);
     textsw_insert(log_textsw, log_buffer, strlen(log_buffer));
     textsw_possibly_normalize(log_textsw, 
