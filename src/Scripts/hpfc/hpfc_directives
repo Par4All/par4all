@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1996/08/23 10:07:31 $, 
+# $Date: 1996/08/30 21:56:24 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -276,7 +276,7 @@ $TR '' '\012' |
 #
 $SED "s,hpfc#,$NOP,g;
       # clean template and processors declaration call (must not be scalar!)
-      /^      call hpfc[pt]/s/([0-9a-z_:\,]*)//g
+      /^      call hpfc[pt]/s/([-+*0-9a-z_:\,]*)//g
       # separation
       /^      call hpfc[ptu6]/w $TMP.1
       /^      call hpfc[ady45]/w $TMP.2
