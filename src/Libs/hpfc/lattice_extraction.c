@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: lattice_extraction.c,v $
+ * Revision 1.10  1999/05/25 13:27:20  coelho
+ * *** empty log message ***
+ *
  * Revision 1.9  1997/04/10 08:53:06  coelho
  * property name changed.
  *
@@ -270,7 +273,8 @@ extract_lattice(
     /* create nscanners-neq new scanning variables... they are the yr's.
      */
     for (i=0; i<nscanners-neq; i++)
-	lns = CONS(ENTITY, hpfc_new_variable(node_module, is_basic_int), lns);
+	lns = CONS(ENTITY, hpfc_new_variable(node_module, 
+					     MakeBasic(is_basic_int)), lns);
 
     byr = list_to_base(lns);
     bsorted = append_to(byr, bsorted); byr = BASE_NULLE;
