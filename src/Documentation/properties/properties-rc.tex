@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/04/25 23:39:44 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/04/28 13:53:24 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -210,6 +210,13 @@ CONTINUE statement to carry the label and have a label-free loop.
 
 \begin{verbatim}
 PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
+\end{verbatim}
+
+For debugging purposes, it is possible to print a summary of the symbol
+table. But this is not the default option.
+
+\begin{verbatim}
+PARSER_DUMP_SYMBOL_TABLE FALSE
 \end{verbatim}
 
 \subsection{Controlizer}
