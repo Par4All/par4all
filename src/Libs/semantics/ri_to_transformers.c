@@ -10,6 +10,9 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.57  2001/07/19 17:58:09  irigoin
+  * Two bug fixes + reformatting with a smaller indent
+  *
   * Revision 1.56  2001/07/13 15:02:58  irigoin
   * Restructured version with separate processing of loops and
   * expressions. Multitype version.
@@ -155,31 +158,31 @@ transformer filter_transformer(transformer t, list e)
 static transformer 
 block_to_transformer(list b)
 {
-    statement s;
-    transformer btf;
-    transformer stf = transformer_undefined;
-    list l = b;
+  statement s;
+  transformer btf;
+  transformer stf = transformer_undefined;
+  list l = b;
 
-    pips_debug(8,"begin\n");
+  pips_debug(8,"begin\n");
 
-    if(ENDP(l))
-	btf = transformer_identity();
-    else {
-	s = STATEMENT(CAR(l));
-	stf = statement_to_transformer(s);
-	btf = transformer_dup(stf);
-	for (POP(l) ; !ENDP(l); POP(l)) {
-	    s = STATEMENT(CAR(l));
-	    stf = statement_to_transformer(s);
-	    btf = transformer_combine(btf, stf);
-	    ifdebug(1) 
-	      pips_assert("consistent transformer", 
-			  transformer_consistency_p(btf));
-	}
+  if(ENDP(l))
+    btf = transformer_identity();
+  else {
+    s = STATEMENT(CAR(l));
+    stf = statement_to_transformer(s);
+    btf = transformer_dup(stf);
+    for (POP(l) ; !ENDP(l); POP(l)) {
+      s = STATEMENT(CAR(l));
+      stf = statement_to_transformer(s);
+      btf = transformer_combine(btf, stf);
+      ifdebug(1) 
+	pips_assert("consistent transformer", 
+		    transformer_consistency_p(btf));
     }
+  }
 
-    pips_debug(8, "end\n");
-    return btf;
+  pips_debug(8, "end\n");
+  return btf;
 }
 
 static void 
@@ -207,55 +210,55 @@ unstructured_to_transformers(unstructured u)
 static transformer 
 unstructured_to_transformer(unstructured u, list e) /* effects */
 {
-    transformer ctf;
-    transformer tf;
-    control c;
+  transformer ctf;
+  transformer tf;
+  control c;
 
-    pips_debug(8,"begin\n");
+  pips_debug(8,"begin\n");
 
-    pips_assert("unstructured_to_transformer", u!=unstructured_undefined);
+  pips_assert("unstructured_to_transformer", u!=unstructured_undefined);
 
-    c = unstructured_control(u);
-    if(control_predecessors(c) == NIL && control_successors(c) == NIL) {
-	/* there is only one statement in u; no need for a fix-point */
-	pips_debug(8,"unique node\n");
-	ctf = statement_to_transformer(control_statement(c));
-	tf = transformer_dup(ctf);
-    }
-    else {
-     statement exit = control_statement(unstructured_exit(u));
+  c = unstructured_control(u);
+  if(control_predecessors(c) == NIL && control_successors(c) == NIL) {
+    /* there is only one statement in u; no need for a fix-point */
+    pips_debug(8,"unique node\n");
+    ctf = statement_to_transformer(control_statement(c));
+    tf = transformer_dup(ctf);
+  }
+  else {
+    statement exit = control_statement(unstructured_exit(u));
       
-      pips_debug(8,"complex: based on effects\n");
+    pips_debug(8,"complex: based on effects\n");
       
-      unstructured_to_transformers(u);
+    unstructured_to_transformers(u);
       
-      tf = unstructured_to_accurate_transformer(u, e);
-    }
+    tf = unstructured_to_accurate_transformer(u, e);
+  }
 
-    pips_debug(8,"end\n");
+  pips_debug(8,"end\n");
 
-    return tf;
+  return tf;
 }
 
 list 
 effects_to_arguments(list fx) /* list of effects */
 {
-    /* algorithm: keep only write effects on scalar variable with values */
-    list args = NIL;
+  /* algorithm: keep only write effects on scalar variable with values */
+  list args = NIL;
 
-    MAP(EFFECT, ef, 
-    {
-	reference r = effect_reference(ef);
-	action a = effect_action(ef);
-	entity e = reference_variable(r);
+  MAP(EFFECT, ef, 
+  {
+    reference r = effect_reference(ef);
+    action a = effect_action(ef);
+    entity e = reference_variable(r);
 	
-	if(action_write_p(a) && entity_has_values_p(e)) {
-	    args = arguments_add_entity(args, e);
-	}
-    },
-	fx);
+    if(action_write_p(a) && entity_has_values_p(e)) {
+      args = arguments_add_entity(args, e);
+    }
+  },
+      fx);
 
-    return args;
+  return args;
 }
 
 /* The loop initialization is performed before tf */
@@ -511,184 +514,184 @@ refine_loop_transformer(transformer t, loop l)
 static transformer 
 whileloop_to_transformer(whileloop l, list e) /* effects of whileloop l */
 {
-    /* loop transformer tf = tfb* or tf = tfb+ or ... */
-    transformer tf;
-    /* loop body transformer */
-    transformer tfb;
-    expression cond = whileloop_condition(l);
-    statement s = whileloop_body(l);
+  /* loop transformer tf = tfb* or tf = tfb+ or ... */
+  transformer tf;
+  /* loop body transformer */
+  transformer tfb;
+  expression cond = whileloop_condition(l);
+  statement s = whileloop_body(l);
 
-    debug(8,"whileloop_to_transformer","begin\n");
+  debug(8,"whileloop_to_transformer","begin\n");
 
-    if(pips_flag_p(SEMANTICS_FIX_POINT)) {
-	/* compute the whileloop body transformer */
-	tfb = transformer_dup(statement_to_transformer(s));
+  if(pips_flag_p(SEMANTICS_FIX_POINT)) {
+    /* compute the whileloop body transformer */
+    tfb = transformer_dup(statement_to_transformer(s));
 
-	/* If the while entry condition is usable, it must be added
-	 * on the old values
-	 */
-	tfb = transformer_add_condition_information(tfb, cond, TRUE);
+    /* If the while entry condition is usable, it must be added
+     * on the old values
+     */
+    tfb = transformer_add_condition_information(tfb, cond, TRUE);
 
-	/* compute tfb's fix point according to pips flags */
-	if(pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
-	    tf = transformer_halbwachs_fix_point(tfb);
-	}
-	else if (transformer_empty_p(tfb)) {
-	  /* The loop is never entered */
-	  tf = transformer_identity();
-	}
-	else {
-	    transformer ftf = (* transformer_fix_point_operator)(tfb);
-
-	    if(*transformer_fix_point_operator==transformer_equality_fix_point) {
-		Psysteme fsc = predicate_system(transformer_relation(ftf));
-		Psysteme sc = SC_UNDEFINED;
-	    
-		/* Dirty looking fix for a fix point computation error:
-		 * sometimes, the basis is restricted to a subset of
-		 * the integer scalar variables. Should be useless with proper
-		 * fixpoint opertors.
-		 */
-		tf = effects_to_transformer(e);
-		sc = (Psysteme) predicate_system(transformer_relation(tf));
-
-		sc = sc_append(sc, fsc);
-
-		free_transformer(ftf);
-	    }
-	    else {
-		tf = ftf;
-	    }
-
-	    ifdebug(8) {
-		pips_debug(8, "intermediate fix-point tf=\n");
-		fprint_transformer(stderr, tf, external_value_name);
-	    }
-
-	}
-	/* we have a problem here: to compute preconditions within the
-	   whileloop body we need a tf using private variables; to return
-	   the loop transformer, we need a filtered out tf; only
-	   one hook is available in the ri..; let'a assume there
-	   are no private variables and that if they are privatizable
-	   they are not going to get in our way */
+    /* compute tfb's fix point according to pips flags */
+    if(pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
+      tf = transformer_halbwachs_fix_point(tfb);
+    }
+    else if (transformer_empty_p(tfb)) {
+      /* The loop is never entered */
+      tf = transformer_identity();
     }
     else {
-	/* basic cheap version: do not use the whileloop body transformer and
-	   avoid fix-points; local variables do not have to be filtered out
-	   because this was already done while computing effects */
+      transformer ftf = (* transformer_fix_point_operator)(tfb);
 
-	(void) statement_to_transformer(s);
+      if(*transformer_fix_point_operator==transformer_equality_fix_point) {
+	Psysteme fsc = predicate_system(transformer_relation(ftf));
+	Psysteme sc = SC_UNDEFINED;
+	    
+	/* Dirty looking fix for a fix point computation error:
+	 * sometimes, the basis is restricted to a subset of
+	 * the integer scalar variables. Should be useless with proper
+	 * fixpoint opertors.
+	 */
 	tf = effects_to_transformer(e);
-    }
+	sc = (Psysteme) predicate_system(transformer_relation(tf));
 
-    ifdebug(8) {
-	(void) fprintf(stderr,"%s: %s\n","whileloop_to_transformer",
-		       "resultat tf =");
-	(void) (void) print_transformer(tf);
+	sc = sc_append(sc, fsc);
+
+	free_transformer(ftf);
+      }
+      else {
+	tf = ftf;
+      }
+
+      ifdebug(8) {
+	pips_debug(8, "intermediate fix-point tf=\n");
+	fprint_transformer(stderr, tf, external_value_name);
+      }
+
     }
-    debug(8,"whileloop_to_transformer","end\n");
-    return tf;
+    /* we have a problem here: to compute preconditions within the
+       whileloop body we need a tf using private variables; to return
+       the loop transformer, we need a filtered out tf; only
+       one hook is available in the ri..; let'a assume there
+       are no private variables and that if they are privatizable
+       they are not going to get in our way */
+  }
+  else {
+    /* basic cheap version: do not use the whileloop body transformer and
+       avoid fix-points; local variables do not have to be filtered out
+       because this was already done while computing effects */
+
+    (void) statement_to_transformer(s);
+    tf = effects_to_transformer(e);
+  }
+
+  ifdebug(8) {
+    (void) fprintf(stderr,"%s: %s\n","whileloop_to_transformer",
+		   "resultat tf =");
+    (void) (void) print_transformer(tf);
+  }
+  debug(8,"whileloop_to_transformer","end\n");
+  return tf;
 }
 
 static transformer 
 test_to_transformer(test t, list ef) /* effects of t */
 {
-    statement st = test_true(t);
-    statement sf = test_false(t);
-    transformer tf;
+  statement st = test_true(t);
+  statement sf = test_false(t);
+  transformer tf;
 
-    debug(8,"test_to_transformer","begin\n");
+  debug(8,"test_to_transformer","begin\n");
 
-    /* the test condition cannot be used to improve transformers
-       it may be used later when propagating preconditions 
-       Francois Irigoin, 15 April 1990 
+  /* the test condition cannot be used to improve transformers
+     it may be used later when propagating preconditions 
+     Francois Irigoin, 15 April 1990 
 
-       Why?
-       Francois Irigoin, 31 July 1992
+     Why?
+     Francois Irigoin, 31 July 1992
 
-       Well, you can benefit from STOP statements.
-       But you do not know if the variable values in
-       the condition are the new or the old values...
-       Francois Irigoin, 8 November 1995
+     Well, you can benefit from STOP statements.
+     But you do not know if the variable values in
+     the condition are the new or the old values...
+     Francois Irigoin, 8 November 1995
 
-       */
+  */
 
-    if(pips_flag_p(SEMANTICS_FLOW_SENSITIVE)) {
-	/*
-	tft = statement_to_transformer(st);
-	tff = statement_to_transformer(sf);
-	tf = transformer_convex_hull(tft, tff);
-	*/
-	expression e = test_condition(t);
-	transformer tftwc;
-	transformer tffwc;
-	list ta = NIL;
-	list fa = NIL;
+  if(pips_flag_p(SEMANTICS_FLOW_SENSITIVE)) {
+    /*
+      tft = statement_to_transformer(st);
+      tff = statement_to_transformer(sf);
+      tf = transformer_convex_hull(tft, tff);
+    */
+    expression e = test_condition(t);
+    transformer tftwc;
+    transformer tffwc;
+    list ta = NIL;
+    list fa = NIL;
 
-	tftwc = transformer_dup(statement_to_transformer(st));
-	tffwc = transformer_dup(statement_to_transformer(sf));
+    tftwc = transformer_dup(statement_to_transformer(st));
+    tffwc = transformer_dup(statement_to_transformer(sf));
 
-	/* Look for variables modified in one branch only */
-	/* This is performed in transformer_convex_hull
-	ta = arguments_difference(transformer_arguments(tftwc),
-				  transformer_arguments(tffwc));
-	fa = arguments_difference(transformer_arguments(tffwc),
-				  transformer_arguments(tftwc));
+    /* Look for variables modified in one branch only */
+    /* This is performed in transformer_convex_hull
+       ta = arguments_difference(transformer_arguments(tftwc),
+       transformer_arguments(tffwc));
+       fa = arguments_difference(transformer_arguments(tffwc),
+       transformer_arguments(tftwc));
 
-	MAPL(ca, {
-	    entity v = ENTITY(CAR(ca));
+       MAPL(ca, {
+       entity v = ENTITY(CAR(ca));
 
-	    tffwc = transformer_add_identity(tffwc, v);
-	}, ta);
+       tffwc = transformer_add_identity(tffwc, v);
+       }, ta);
 
-	MAPL(ca, {
-	    entity v = ENTITY(CAR(ca));
+       MAPL(ca, {
+       entity v = ENTITY(CAR(ca));
 
-	    tftwc = transformer_add_identity(tftwc, v);
-	}, fa);
-	*/
+       tftwc = transformer_add_identity(tftwc, v);
+       }, fa);
+    */
 
-	tftwc = transformer_add_condition_information(tftwc, e, TRUE);
-	tffwc = transformer_add_condition_information(tffwc, e, FALSE);
+    tftwc = transformer_add_condition_information(tftwc, e, TRUE);
+    tffwc = transformer_add_condition_information(tffwc, e, FALSE);
 
-	tf = transformer_convex_hull(tftwc, tffwc);
-	transformer_free(tftwc);
-	transformer_free(tffwc);
-	free_arguments(ta);
-	free_arguments(fa);
-    }
-    else {
-	(void) statement_to_transformer(st);
-	(void) statement_to_transformer(sf);
-	tf = effects_to_transformer(ef);
-    }
+    tf = transformer_convex_hull(tftwc, tffwc);
+    transformer_free(tftwc);
+    transformer_free(tffwc);
+    free_arguments(ta);
+    free_arguments(fa);
+  }
+  else {
+    (void) statement_to_transformer(st);
+    (void) statement_to_transformer(sf);
+    tf = effects_to_transformer(ef);
+  }
 
-    debug(8,"test_to_transformer","end\n");
-    return tf;
+  debug(8,"test_to_transformer","end\n");
+  return tf;
 }
 
 static transformer 
 intrinsic_to_transformer(
     entity e, list pc, list ef) /* effects of intrinsic call */
 {
-    transformer tf;
-    /* should become a parameter, but one thing at a time */
-    transformer pre = transformer_undefined;
+  transformer tf;
+  /* should become a parameter, but one thing at a time */
+  transformer pre = transformer_undefined;
 
-    debug(8,"intrinsic_to_transformer","begin\n");
+  debug(8,"intrinsic_to_transformer","begin\n");
 
-    if(ENTITY_ASSIGN_P(e)) {
-	tf = any_assign_to_transformer(pc, ef, pre);
-    }
-    else if(ENTITY_STOP_P(e))
-	tf = transformer_empty();
-    else
-	tf = effects_to_transformer(ef);
+  if(ENTITY_ASSIGN_P(e)) {
+    tf = any_assign_to_transformer(pc, ef, pre);
+  }
+  else if(ENTITY_STOP_P(e))
+    tf = transformer_empty();
+  else
+    tf = effects_to_transformer(ef);
 
-    debug(8,"intrinsic_to_transformer","end\n");
+  debug(8,"intrinsic_to_transformer","end\n");
 
-    return tf;
+  return tf;
 }
 
 static transformer user_call_to_transformer(entity, list, list);
@@ -696,46 +699,46 @@ static transformer user_call_to_transformer(entity, list, list);
 static transformer 
 call_to_transformer(call c, list ef) /* effects of call c */
 {
-    transformer tf = transformer_undefined;
-    entity e = call_function(c);
-    cons *pc = call_arguments(c);
-    tag tt;
+  transformer tf = transformer_undefined;
+  entity e = call_function(c);
+  cons *pc = call_arguments(c);
+  tag tt;
 
-    pips_debug(8,"begin\n");
+  pips_debug(8,"begin\n");
 
-    switch (tt = value_tag(entity_initial(e))) {
-      case is_value_code:
-	/* call to an external function; preliminary version:
-	   rely on effects */
-	pips_debug(5, "external function %s\n", entity_name(e));
-	if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	    tf = user_call_to_transformer(e, pc, ef);
-	    reset_temporary_value_counter();
-	}
-	else
-	    tf = effects_to_transformer(ef);
-	break;
-      case is_value_symbolic:
-      case is_value_constant:
-	tf = transformer_identity();
-	break;
-      case is_value_unknown:
-	pips_internal_error("function %s has an unknown value\n", entity_name(e));
-	break;
-      case is_value_intrinsic:
-	  pips_debug(5, "intrinsic function %s\n", entity_name(e));
-	tf = intrinsic_to_transformer(e, pc, ef);
-	break;
-      default:
-	pips_internal_error("unknown tag %d\n", tt);
+  switch (tt = value_tag(entity_initial(e))) {
+  case is_value_code:
+    /* call to an external function; preliminary version:
+       rely on effects */
+    pips_debug(5, "external function %s\n", entity_name(e));
+    if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+      tf = user_call_to_transformer(e, pc, ef);
+      reset_temporary_value_counter();
     }
-    pips_assert("transformer tt is consistent", 
-		transformer_consistency_p(tf)); 
+    else
+      tf = effects_to_transformer(ef);
+    break;
+  case is_value_symbolic:
+  case is_value_constant:
+    tf = transformer_identity();
+    break;
+  case is_value_unknown:
+    pips_internal_error("function %s has an unknown value\n", entity_name(e));
+    break;
+  case is_value_intrinsic:
+    pips_debug(5, "intrinsic function %s\n", entity_name(e));
+    tf = intrinsic_to_transformer(e, pc, ef);
+    break;
+  default:
+    pips_internal_error("unknown tag %d\n", tt);
+  }
+  pips_assert("transformer tt is consistent", 
+	      transformer_consistency_p(tf)); 
 
 
-    pips_debug(8,"end\n");
+  pips_debug(8,"end\n");
 
-    return(tf);
+  return(tf);
 }
 
 transformer 
@@ -743,114 +746,115 @@ user_function_call_to_transformer(
 				  entity e, /* a value */
 				  expression expr) /* a call to a function */
 {
-    syntax s = expression_syntax(expr);
-    call c = syntax_call(s);
-    entity f = call_function(c);
-    list pc = call_arguments(c);
-    transformer t_caller = transformer_undefined;
-    basic rbt = basic_of_call(c);
-    list ef = expression_to_proper_effects(expr);
+  syntax s = expression_syntax(expr);
+  call c = syntax_call(s);
+  entity f = call_function(c);
+  list pc = call_arguments(c);
+  transformer t_caller = transformer_undefined;
+  basic rbt = basic_of_call(c);
+  list ef = expression_to_proper_effects(expr);
 
-    pips_debug(8, "begin\n");
-    pips_assert("s is a call", syntax_call_p(s));
+  pips_debug(8, "begin\n");
+  pips_assert("s is a call", syntax_call_p(s));
 
-    if(basic_int_p(rbt)) {
-	string fn = module_local_name(f);
-	entity rv = global_name_to_entity(fn, fn);
-	entity orv = entity_undefined;
-	Psysteme sc = SC_UNDEFINED;
-	Pcontrainte c = CONTRAINTE_UNDEFINED;
-	Pvecteur eq = VECTEUR_NUL;
-	transformer t_equal = transformer_undefined;
+  /* if(basic_int_p(rbt)) { */
+  if(basic_equal_p(rbt, variable_basic(type_variable(entity_type(e))))) {
+    string fn = module_local_name(f);
+    entity rv = global_name_to_entity(fn, fn);
+    entity orv = entity_undefined;
+    Psysteme sc = SC_UNDEFINED;
+    Pcontrainte c = CONTRAINTE_UNDEFINED;
+    Pvecteur eq = VECTEUR_NUL;
+    transformer t_equal = transformer_undefined;
 
-	pips_assert("rv is defined",
-		    !entity_undefined_p(rv));
+    pips_assert("rv is defined",
+		!entity_undefined_p(rv));
 
-	/* Build a transformer reflecting the call site */
-	t_caller = user_call_to_transformer(f, pc, ef);
+    /* Build a transformer reflecting the call site */
+    t_caller = user_call_to_transformer(f, pc, ef);
 
-	ifdebug(8) {
-	    pips_debug(8, "Transformer %p for callee %s:\n",
-		       t_caller, entity_local_name(f));
-	    dump_transformer(t_caller);
-	}
-
-	/* Build a transformer representing the equality of
-	 * the function value to e
-	 */
-	eq = vect_make(eq,
-		       (Variable) e, VALUE_ONE,
-		       (Variable) rv, VALUE_MONE,
-		       TCST, VALUE_ZERO);
-	c = contrainte_make(eq);
-	sc = sc_make(c, CONTRAINTE_UNDEFINED);
-	t_equal = make_transformer(NIL,
-				    make_predicate(sc));
-
-	/* Consistency cannot be checked on a non-local transformer */
-	/* pips_assert("t_equal is consistent",
-	   transformer_consistency_p(t_equal)); */
-
-	ifdebug(8) {
-	    pips_debug(8,
-		  "Transformer %p for equality of %s with %s:\n",
-		  t_equal, entity_local_name(e), entity_name (rv));
-	    dump_transformer(t_equal);
-	}
-
-	/* Combine the effect of the function call and of the equality */
-	t_caller = transformer_combine(t_caller, t_equal);
-	free_transformer(t_equal);
-
-	/* Get rid of the temporary representing the function's value */
-	orv = global_new_value_to_global_old_value(rv);
-	t_caller = transformer_filter(t_caller,
-				      CONS(ENTITY, rv, CONS(ENTITY, orv, NIL)));
-
-
-	ifdebug(8) {
-	    pips_debug(8,
-		  "Final transformer %p for assignment of %s with %s:\n",
-		  t_caller, entity_local_name(e), entity_name(rv));
-	    dump_transformer(t_caller);
-	}
-
-	/* FI: e is added in arguments because user_call_to_transformer()
-	 * uses effects to make sure arrays and non scalar integer variables
-	 * impact is taken into account
-	 */
-	/*
-	transformer_arguments(t_caller) =
-	    arguments_rm_entity(transformer_arguments(t_caller), e);
-	    */
-
-	/* FI, FI: il vaudrait mieux ne pas eliminer e d'abord1 */
-	/* J'ai aussi des free a decommenter */
-	/*
-	if(ENDP(transformer_arguments(t_caller))) {
-	    transformer_arguments(t_caller) = 
-		gen_nconc(transformer_arguments(t_caller), CONS(ENTITY, e, NIL));
-	}
-	else {
-	    t_caller = transformer_value_substitute(t_caller, rv, e);
-	}
-	*/
-	/* Not checkable with temporary variables
-	pips_assert("transformer t_caller is consistent", 
-		    transformer_consistency_p(t_caller));
-	*/
-    }
-    else {
-	pips_assert("transformer t_caller is undefined", 
-		    transformer_undefined_p(t_caller));
+    ifdebug(8) {
+      pips_debug(8, "Transformer %p for callee %s:\n",
+		 t_caller, entity_local_name(f));
+      dump_transformer(t_caller);
     }
 
-    gen_free_list(ef);
+    /* Build a transformer representing the equality of
+     * the function value to e
+     */
+    eq = vect_make(eq,
+		   (Variable) e, VALUE_ONE,
+		   (Variable) rv, VALUE_MONE,
+		   TCST, VALUE_ZERO);
+    c = contrainte_make(eq);
+    sc = sc_make(c, CONTRAINTE_UNDEFINED);
+    t_equal = make_transformer(NIL,
+			       make_predicate(sc));
 
-    pips_debug(8, "end with t_caller=%p\n", t_caller);
+    /* Consistency cannot be checked on a non-local transformer */
+    /* pips_assert("t_equal is consistent",
+       transformer_consistency_p(t_equal)); */
+
+    ifdebug(8) {
+      pips_debug(8,
+		 "Transformer %p for equality of %s with %s:\n",
+		 t_equal, entity_local_name(e), entity_name (rv));
+      dump_transformer(t_equal);
+    }
+
+    /* Combine the effect of the function call and of the equality */
+    t_caller = transformer_combine(t_caller, t_equal);
+    free_transformer(t_equal);
+
+    /* Get rid of the temporary representing the function's value */
+    orv = global_new_value_to_global_old_value(rv);
+    t_caller = transformer_filter(t_caller,
+				  CONS(ENTITY, rv, CONS(ENTITY, orv, NIL)));
+
+
+    ifdebug(8) {
+      pips_debug(8,
+		 "Final transformer %p for assignment of %s with %s:\n",
+		 t_caller, entity_local_name(e), entity_name(rv));
+      dump_transformer(t_caller);
+    }
+
+    /* FI: e is added in arguments because user_call_to_transformer()
+     * uses effects to make sure arrays and non scalar integer variables
+     * impact is taken into account
+     */
+    /*
+      transformer_arguments(t_caller) =
+      arguments_rm_entity(transformer_arguments(t_caller), e);
+    */
+
+    /* FI, FI: il vaudrait mieux ne pas eliminer e d'abord1 */
+    /* J'ai aussi des free a decommenter */
+    /*
+      if(ENDP(transformer_arguments(t_caller))) {
+      transformer_arguments(t_caller) = 
+      gen_nconc(transformer_arguments(t_caller), CONS(ENTITY, e, NIL));
+      }
+      else {
+      t_caller = transformer_value_substitute(t_caller, rv, e);
+      }
+    */
+    /* Not checkable with temporary variables
+       pips_assert("transformer t_caller is consistent", 
+       transformer_consistency_p(t_caller));
+    */
+  }
+  else {
+    pips_assert("transformer t_caller is undefined", 
+		transformer_undefined_p(t_caller));
+  }
+
+  gen_free_list(ef);
+
+  pips_debug(8, "end with t_caller=%p\n", t_caller);
 
     
-    return t_caller;
+  return t_caller;
 }
 
 /* transformer translation
@@ -860,79 +864,79 @@ transformer_intra_to_inter(
     transformer tf,
     list le)
 {
-    cons * lost_args = NIL;
-    /* Filtered TransFormer ftf */
-    transformer ftf = transformer_dup(tf);
-    cons * old_args = transformer_arguments(ftf);
-    Psysteme sc = SC_UNDEFINED;
-    Pbase b = BASE_UNDEFINED;
-    Pbase eb = BASE_UNDEFINED;
+  cons * lost_args = NIL;
+  /* Filtered TransFormer ftf */
+  transformer ftf = transformer_dup(tf);
+  cons * old_args = transformer_arguments(ftf);
+  Psysteme sc = SC_UNDEFINED;
+  Pbase b = BASE_UNDEFINED;
+  Pbase eb = BASE_UNDEFINED;
 
-    pips_debug(8,"begin\n");
-    pips_debug(8,"argument tf=%p\n",ftf);
-    ifdebug(8) (void) dump_transformer(ftf);
+  pips_debug(8,"begin\n");
+  pips_debug(8,"argument tf=%p\n",ftf);
+  ifdebug(8) (void) dump_transformer(ftf);
 
-    /* get rid of tf's arguments that do not appear in effects le */
+  /* get rid of tf's arguments that do not appear in effects le */
 
-    /* build a list of arguments to suppress */
-    /* FI: I do not understand anymore why corresponding old values do not have
-     * to be suppressed too (6 July 1993)
-     *
-     * FI: because only read arguments are eliminated, non? (12 November 1995)
-     */
-    MAPL(ca, 
-     {entity e = ENTITY(CAR(ca));
-      if(!effects_write_entity_p(le, e) &&
-	       !storage_return_p(entity_storage(e))) 
-	  lost_args = arguments_add_entity(lost_args, e);
-     },
-    old_args);
+  /* build a list of arguments to suppress */
+  /* FI: I do not understand anymore why corresponding old values do not have
+   * to be suppressed too (6 July 1993)
+   *
+   * FI: because only read arguments are eliminated, non? (12 November 1995)
+   */
+  MAPL(ca, 
+  {entity e = ENTITY(CAR(ca));
+  if(!effects_write_entity_p(le, e) &&
+     !storage_return_p(entity_storage(e))) 
+    lost_args = arguments_add_entity(lost_args, e);
+  },
+       old_args);
 
-    /* get rid of them */
-    ftf = transformer_projection(ftf, lost_args);
+  /* get rid of them */
+  ftf = transformer_projection(ftf, lost_args);
 
-    /* free the temporary list of entities */
-    gen_free_list(lost_args);
-    lost_args = NIL;
+  /* free the temporary list of entities */
+  gen_free_list(lost_args);
+  lost_args = NIL;
 
-    debug(8,"transformer_intra_to_inter","after first filtering ftf=%x\n",ftf);
-    ifdebug(8) (void) dump_transformer(ftf);
+  debug(8,"transformer_intra_to_inter","after first filtering ftf=%x\n",ftf);
+  ifdebug(8) (void) dump_transformer(ftf);
 
-    /* get rid of local read variables */
+  /* get rid of local read variables */
 
-    /* FI: why not use this loop to get rid of *all* local variables, read or written? */
+  /* FI: why not use this loop to get rid of *all* local variables, read or written? */
 
-    sc = (Psysteme) predicate_system(transformer_relation(ftf));
-    b = sc_base(sc);
-    for(eb=b; !BASE_UNDEFINED_P(eb); eb = eb->succ) {
-	entity e = (entity) vecteur_var(eb);
+  sc = (Psysteme) predicate_system(transformer_relation(ftf));
+  b = sc_base(sc);
+  for(eb=b; !BASE_UNDEFINED_P(eb); eb = eb->succ) {
+    entity e = (entity) vecteur_var(eb);
 
-	if(e != (entity) TCST) {
-	    entity v = value_to_variable(e);
+    if(e != (entity) TCST) {
+      entity v = value_to_variable(e);
 
-	    /* Variables with no impact on the caller world are eliminated.
-	     * However, the return value associated to a function is preserved.
-	     */
-	    if( ! effects_read_or_write_entity_p(le, v) &&
-		!storage_return_p(entity_storage(v)) &&
-		!entity_constant_p(v)) {
-		lost_args = arguments_add_entity(lost_args, e);
-	    }
-	}
+      /* Variables with no impact on the caller world are eliminated.
+       * However, the return value associated to a function is preserved.
+       */
+      if( ! effects_read_or_write_entity_p(le, v) &&
+	  !storage_return_p(entity_storage(v)) &&
+	  !entity_constant_p(v)) {
+	lost_args = arguments_add_entity(lost_args, e);
+      }
     }
+  }
 
-    /* get rid of them */
-    ftf = transformer_projection(ftf, lost_args);
+  /* get rid of them */
+  ftf = transformer_projection(ftf, lost_args);
 
-    /* free the temporary list of entities */
-    gen_free_list(lost_args);
-    lost_args = NIL;
+  /* free the temporary list of entities */
+  gen_free_list(lost_args);
+  lost_args = NIL;
 
-    debug(8,"transformer_intra_to_inter","return ftf=%x\n",ftf);
-    ifdebug(8) (void) dump_transformer(ftf);
-    debug(8,"transformer_intra_to_inter","end\n");
+  debug(8,"transformer_intra_to_inter","return ftf=%x\n",ftf);
+  ifdebug(8) (void) dump_transformer(ftf);
+  debug(8,"transformer_intra_to_inter","end\n");
 
-    return ftf;
+  return ftf;
 }
 
 /* Effects are necessary to clean up the transformer t_caller. For
@@ -1179,16 +1183,16 @@ user_call_to_transformer(
 transformer
 transformer_add_identity(transformer tf, entity v)
 {
-    entity v_new = entity_to_new_value(v);
-    entity v_old = entity_to_old_value(v);
-    Pvecteur eq = vect_new((Variable) v_new, (Value) 1);
+  entity v_new = entity_to_new_value(v);
+  entity v_old = entity_to_old_value(v);
+  Pvecteur eq = vect_new((Variable) v_new, (Value) 1);
 
-    vect_add_elem(&eq, (Variable) v_old, (Value) -1);
-    tf = transformer_equality_add(tf, eq);
-    transformer_arguments(tf) = 
-	arguments_add_entity(transformer_arguments(tf), v_new);
+  vect_add_elem(&eq, (Variable) v_old, (Value) -1);
+  tf = transformer_equality_add(tf, eq);
+  transformer_arguments(tf) = 
+    arguments_add_entity(transformer_arguments(tf), v_new);
 
-    return tf;
+  return tf;
 }
 
 
@@ -1206,33 +1210,33 @@ assigned_expression_to_transformer(
     entity v,
     expression expr)
 {
-    transformer tf = transformer_undefined;
+  transformer tf = transformer_undefined;
 
-    pips_debug(8, "begin\n");
+  pips_debug(8, "begin\n");
 
-    if(entity_has_values_p(v)) {
-      entity v_new = entity_to_new_value(v);
-      entity v_old = entity_to_old_value(v);
-      entity tmp = make_local_temporary_value_entity(entity_type(v));
-      list tf_args = CONS(ENTITY, v, NIL);
+  if(entity_has_values_p(v)) {
+    entity v_new = entity_to_new_value(v);
+    entity v_old = entity_to_old_value(v);
+    entity tmp = make_local_temporary_value_entity(entity_type(v));
+    list tf_args = CONS(ENTITY, v, NIL);
 
-      tf = any_expression_to_transformer(tmp, expr, transformer_undefined, TRUE);
-      reset_temporary_value_counter();
-      if(!transformer_undefined_p(tf)) {
-	tf = transformer_value_substitute(tf, v_new, v_old);
-	tf = transformer_value_substitute(tf, tmp, v_new);
-	tf = transformer_temporary_value_projection(tf);
-	transformer_arguments(tf) = tf_args;
-      }
+    tf = any_expression_to_transformer(tmp, expr, transformer_undefined, TRUE);
+    reset_temporary_value_counter();
+    if(!transformer_undefined_p(tf)) {
+      tf = transformer_value_substitute(tf, v_new, v_old);
+      tf = transformer_value_substitute(tf, tmp, v_new);
+      tf = transformer_temporary_value_projection(tf);
+      transformer_arguments(tf) = tf_args;
     }
-    else {
-      /* vect_rm(ve); */
-      tf = transformer_undefined;
-    }
+  }
+  else {
+    /* vect_rm(ve); */
+    tf = transformer_undefined;
+  }
 
-    pips_debug(8, "end with tf=%p\n", tf);
+  pips_debug(8, "end with tf=%p\n", tf);
 
-    return tf;
+  return tf;
 }
 
 transformer integer_assign_to_transformer(expression lhs,
@@ -1317,6 +1321,12 @@ transformer any_scalar_assign_to_transformer(entity v,
       if(entity_is_argument_p(v, transformer_arguments(tf))) {
 	/* Is it standard compliant? The assigned variable is modified by the rhs. */
 	transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
+	string s = words_to_string(words_syntax(expression_syntax(rhs)));
+
+	pips_user_warning("Variable %s in lhs is uselessly updated by the rhs '%s'\n",
+			  entity_local_name(v), s);
+
+	free(s);
 
 	tf = transformer_combine(tf, teq);
 	free_transformer(teq);
@@ -1388,128 +1398,128 @@ instruction_to_transformer(i, e)
 instruction i;
 cons * e; /* effects associated to instruction i */
 {
-    transformer tf = transformer_undefined;
-    test t;
-    loop l;
-    call c;
-    whileloop wl;
+  transformer tf = transformer_undefined;
+  test t;
+  loop l;
+  call c;
+  whileloop wl;
 
-    debug(8,"instruction_to_transformer","begin\n");
+  debug(8,"instruction_to_transformer","begin\n");
 
-    switch(instruction_tag(i)) {
-      case is_instruction_block:
-	tf = block_to_transformer(instruction_block(i));
-	break;
-      case is_instruction_test:
-	t = instruction_test(i);
-	tf = test_to_transformer(t, e);
-	break;
-      case is_instruction_loop:
-	l = instruction_loop(i);
-	tf = loop_to_transformer(l);
-	break;
-      case is_instruction_whileloop:
-	wl = instruction_whileloop(i);
-	tf = whileloop_to_transformer(wl, e);
-	break;
-      case is_instruction_goto:
-	pips_error("instruction_to_transformer",
-		   "unexpected goto in semantics analysis");
-	tf = transformer_identity();
-	break;
-      case is_instruction_call:
-	c = instruction_call(i);
-	tf = call_to_transformer(c, e);
-	break;
-      case is_instruction_unstructured:
-	tf = unstructured_to_transformer(instruction_unstructured(i), e);
-	  break ;
-      default:
-	pips_error("instruction_to_transformer","unexpected tag %d\n",
-	      instruction_tag(i));
-    }
-    debug(9,"instruction_to_transformer","resultat:\n");
-    ifdebug(9) (void) print_transformer(tf);
-    debug(8,"instruction_to_transformer","end\n");
-    return tf;
+  switch(instruction_tag(i)) {
+  case is_instruction_block:
+    tf = block_to_transformer(instruction_block(i));
+    break;
+  case is_instruction_test:
+    t = instruction_test(i);
+    tf = test_to_transformer(t, e);
+    break;
+  case is_instruction_loop:
+    l = instruction_loop(i);
+    tf = loop_to_transformer(l);
+    break;
+  case is_instruction_whileloop:
+    wl = instruction_whileloop(i);
+    tf = whileloop_to_transformer(wl, e);
+    break;
+  case is_instruction_goto:
+    pips_error("instruction_to_transformer",
+	       "unexpected goto in semantics analysis");
+    tf = transformer_identity();
+    break;
+  case is_instruction_call:
+    c = instruction_call(i);
+    tf = call_to_transformer(c, e);
+    break;
+  case is_instruction_unstructured:
+    tf = unstructured_to_transformer(instruction_unstructured(i), e);
+    break ;
+  default:
+    pips_error("instruction_to_transformer","unexpected tag %d\n",
+	       instruction_tag(i));
+  }
+  debug(9,"instruction_to_transformer","resultat:\n");
+  ifdebug(9) (void) print_transformer(tf);
+  debug(8,"instruction_to_transformer","end\n");
+  return tf;
 }
 
 
 transformer statement_to_transformer(s)
 statement s;
 {
-    instruction i = statement_instruction(s);
-    list e = NIL;
-    transformer t;
-    transformer te;
+  instruction i = statement_instruction(s);
+  list e = NIL;
+  transformer t;
+  transformer te;
 
-    pips_debug(8,"begin for statement %03d (%d,%d)\n",
-	       statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
-	       ORDERING_STATEMENT(statement_ordering(s)));
+  pips_debug(8,"begin for statement %03d (%d,%d)\n",
+	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
+	     ORDERING_STATEMENT(statement_ordering(s)));
 
-    e = load_cumulated_rw_effects_list(s);
-    t = load_statement_transformer(s);
+  e = load_cumulated_rw_effects_list(s);
+  t = load_statement_transformer(s);
 
-    /* it would be nicer to control warning_on_redefinition */
-    if (t == transformer_undefined) {
-	t = instruction_to_transformer(i, e);
+  /* it would be nicer to control warning_on_redefinition */
+  if (t == transformer_undefined) {
+    t = instruction_to_transformer(i, e);
 
-	/* add array references information */
-	if(get_bool_property("SEMANTICS_TRUST_ARRAY_REFERENCES")) {
-	    transformer_add_reference_information(t, s);
-	}
-
-	if(!transformer_consistency_p(t)) {
-	    int so = statement_ordering(s);
-	    (void) fprintf(stderr, "statement %03d (%d,%d):\n",
-			   statement_number(s),
-			   ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
-	    /* (void) print_transformer(load_statement_transformer(s)); */
-	    (void) print_transformer(t);
-	    dump_transformer(t);
-	    pips_internal_error("Inconsistent transformer detected\n");
-	}
-	ifdebug(1) {
-	  pips_assert("Transformer is internally consistent",
-		      transformer_internal_consistency_p(t));
-	}
-	store_statement_transformer(s, t);
-    }
-    else {
-	user_warning("statement_to_transformer","redefinition for statement %03d (%d,%d)\n",
-		     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
-		     ORDERING_STATEMENT(statement_ordering(s)));
-	pips_internal_error("transformer redefinition");
+    /* add array references information */
+    if(get_bool_property("SEMANTICS_TRUST_ARRAY_REFERENCES")) {
+      transformer_add_reference_information(t, s);
     }
 
+    if(!transformer_consistency_p(t)) {
+      int so = statement_ordering(s);
+      (void) fprintf(stderr, "statement %03d (%d,%d):\n",
+		     statement_number(s),
+		     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
+      /* (void) print_transformer(load_statement_transformer(s)); */
+      (void) print_transformer(t);
+      dump_transformer(t);
+      pips_internal_error("Inconsistent transformer detected\n");
+    }
     ifdebug(1) {
-	int so = statement_ordering(s);
-	transformer stf = load_statement_transformer(s);
-
-	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
-		       statement_number(s),
-		       ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-		       stf);
-	(void) print_transformer(stf);
-	pips_assert("same pointer", stf==t);
+      pips_assert("Transformer is internally consistent",
+		  transformer_internal_consistency_p(t));
     }
+    store_statement_transformer(s, t);
+  }
+  else {
+    user_warning("statement_to_transformer","redefinition for statement %03d (%d,%d)\n",
+		 statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
+		 ORDERING_STATEMENT(statement_ordering(s)));
+    pips_internal_error("transformer redefinition");
+  }
+
+  ifdebug(1) {
+    int so = statement_ordering(s);
+    transformer stf = load_statement_transformer(s);
+
+    (void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
+		   statement_number(s),
+		   ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
+		   stf);
+    (void) print_transformer(stf);
+    pips_assert("same pointer", stf==t);
+  }
 
 
-    /* If i is a loop, the expected transformer can be more complex (see
-       nga06) because the stores transformer is later used to compute the
-       loop body precondition. It cannot take into account the exit
-       condition. */
-    if(instruction_loop_p(i)) {
-      /* likely memory leak:-(. te should be allocated in both test
-         branches and freed at call site but I program everything under
-         the opposite assumption */
-      te = refine_loop_transformer(t, instruction_loop(i));
-    }
-    else {
-      te = t;
-    }
+  /* If i is a loop, the expected transformer can be more complex (see
+     nga06) because the stores transformer is later used to compute the
+     loop body precondition. It cannot take into account the exit
+     condition. */
+  if(instruction_loop_p(i)) {
+    /* likely memory leak:-(. te should be allocated in both test
+       branches and freed at call site but I program everything under
+       the opposite assumption */
+    te = refine_loop_transformer(t, instruction_loop(i));
+  }
+  else {
+    te = t;
+  }
 
-    pips_debug(8,"end with t=%p\n", t);
+  pips_debug(8,"end with t=%p\n", t);
 
-    return te;
+  return te;
 }
