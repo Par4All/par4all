@@ -14,22 +14,20 @@ SCRIPTS= 	hpfc \
 
 FILES=
 SFILES=		hpfc_interactive.c
-RFILES=		hpfc_interactive
+RFILES=		$(ARCH)/hpfc_interactive
 
 #
 # Some rules
 
-hpfc_interactive: hpfc_interactive.o
-	$(RM) hpfc_interactive
+$(ARCH)/hpfc_interactive: $(ARCH)/hpfc_interactive.o
+	$(RM) $(ARCH)/hpfc_interactive
 	$(LD) $(LDFLAGS) \
-		-o hpfc_interactive hpfc_interactive.o -lreadline -ltermcap
-	chmod a-w hpfc_interactive
-
-hpfc_interactive.o: hpfc_interactive.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c hpfc_interactive.c
+		-o $(ARCH)/hpfc_interactive \
+		$(ARCH)/hpfc_interactive.o -lreadline -ltermcap
+	chmod a-w $(ARCH)/hpfc_interactive
 
 clean:
-	$(RM) hpfc_interactive.o hpfc_interactive *~
+	$(RM) $(ARCH)/hpfc_interactive.o $(ARCH)/hpfc_interactive *~
 
 web: hpfc_directives
 	$(RM) $(HOME)/public_html/hpfc_directives
