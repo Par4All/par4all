@@ -522,6 +522,11 @@ call_to_transformer(call c, list ef) /* effects of call c */
     return(tf);
 }
 
+/* Effects ef re needed here to use user_call_to_transformer()
+ * although the general idea is to return an undefined transformer
+ * on failure rather than a transformer derived from effects
+ */
+
 static transformer 
 user_function_call_to_transformer(
     entity e, 
@@ -628,14 +633,13 @@ user_function_call_to_transformer(
 	    t_caller = transformer_value_substitute(t_caller, rv, e);
 	}
 	*/
+	pips_assert("transformer t_caller is consistent", 
+		    transformer_consistency_p(t_caller));
     }
-    /* else */
-	/* must be initialized! */
-	/*t_caller = transformer_empty(); */
-
-    pips_assert("transformer t_caller is consistent", 
-		!transformer_undefined_p(t_caller) &&
-		transformer_consistency_p(t_caller)); 
+    else {
+	pips_assert("transformer t_caller is undefined", 
+		    transformer_undefined_p(t_caller));
+    }
 
     pips_debug(8, "end with t_caller=%p\n", t_caller);
 
@@ -1244,10 +1248,6 @@ expression_to_transformer(
 	}
 	else if(user_function_call_p(expr) 
 		&& get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	    /* FI: I need effects ef here to use user_call_to_transformer()
-	     * although the general idea was to return an undefined transformer
-	     * on failure rather than a transformer derived from effects
-	     */
 	    tf = user_function_call_to_transformer(e, expr, ef);
 	}
 	else {
