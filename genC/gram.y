@@ -26,7 +26,7 @@
 
 #define YYMAXDEPTH 300
 
-struct binding Domains[ MAX_DOMAIN ] ;
+struct gen_binding Domains[ MAX_DOMAIN ] ;
 int Number_imports ;
 
 /* UPDATE_OP checks whether the just read OPerator is compatible with
@@ -138,7 +138,7 @@ Definitions
 
 Definition
 	: Tabulated Name EQUAL Domain SEMI_COLUMN {
-		struct binding *bp = new_binding( $2, $4 ) ;
+		struct gen_binding *bp = new_binding( $2, $4 ) ;
 
 		if( $1 ) {
 		    if( Current_index == MAX_TABULATED ) {
@@ -211,7 +211,7 @@ Domain	: Simple Constructed {
 		  dlp->domain->ba.type = BASIS ;
 		  dlp->domain->ba.constructor = $2->name ;
 		  /*NOSTRICT*/
-		  dlp->domain->ba.constructand = (struct binding *)UNIT_TYPE ;
+		  dlp->domain->ba.constructand = (struct gen_binding *)UNIT_TYPE ;
 	          }
 	      }
         ;
@@ -259,7 +259,7 @@ Basis   : Name {
 		$$->ba.type = BASIS ;
 		$$->ba.constructor = $1 ;
 		/*NOSTRICT*/
-		$$->ba.constructand = (struct binding *)$1 ;
+		$$->ba.constructand = (struct gen_binding *)$1 ;
 		}
 	| Name COLUMN Name {
 		/*NOSTRICT*/
@@ -267,7 +267,7 @@ Basis   : Name {
 		$$->ba.type = BASIS ;
 		$$->ba.constructor = $1 ;
 		/*NOSTRICT*/
-		$$->ba.constructand = (struct binding *)$3 ;
+		$$->ba.constructand = (struct gen_binding *)$3 ;
 		}
         ;
 
