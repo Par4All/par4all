@@ -172,7 +172,7 @@ hash_table hash_table_make(hash_key_type key_type, int size)
     htp->hash_size_limit = HASH_SIZE_LIMIT(size);
     htp->hash_array = (hash_entry_pointer) alloc(size*sizeof(hash_entry));
 
-    /** statistics */
+    /* initialize statistics */
     htp->n_put = 0;
     htp->n_get = 0;
     htp->n_del = 0;
@@ -189,15 +189,15 @@ hash_table hash_table_make(hash_key_type key_type, int size)
     switch(key_type)
     {
     case hash_string:
-	htp->hash_equal = (int(*)(void*,void*))hash_string_equal;
+	htp->hash_equal = (int(*)(void*,void*)) hash_string_equal;
 	htp->hash_rank = hash_string_rank;
 	break;
     case hash_int:
-	htp->hash_equal = (int(*)(void*,void*))hash_int_equal;
+	htp->hash_equal = (int(*)(void*,void*)) hash_int_equal;
 	htp->hash_rank = hash_int_rank;
 	break;
     case hash_chunk:
-	htp->hash_equal = (int(*)(void*,void*))hash_chunk_equal;
+	htp->hash_equal = (int(*)(void*,void*)) hash_chunk_equal;
 	htp->hash_rank = (unsigned int(*)(void*,int)) hash_chunk_rank;
 	break;
     case hash_pointer:
@@ -317,9 +317,9 @@ hash_delget(
 
 /* this function removes from the hash table pointed to by htp the
    couple whose key is equal to key. nothing is done if no such couple
-   exists. ??? shoudl abort ? (FC) */
-
-void *hash_del(hash_table htp, void *key)
+   exists. ??? should I abort ? (FC)
+ */
+void * hash_del(hash_table htp, void * key)
 {
     void * tmp;
     return hash_delget(htp, key, &tmp);
