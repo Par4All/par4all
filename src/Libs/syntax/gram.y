@@ -1007,7 +1007,7 @@ pointer_inst: TK_POINTER TK_LPAR entity_name TK_COMMA entity_name decl_tableau T
 				make_storage(is_storage_ram,
 					     make_ram(get_current_module_entity(),
 						      HeapArea,
-						      UNKOWN_RAM_OFFSET,
+						      UNKNOWN_RAM_OFFSET,
 						      NIL)),
 				value_undefined);
             }
