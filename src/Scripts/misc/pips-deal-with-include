@@ -35,7 +35,10 @@ open(STDOUT, ">$output_file_name")
 
 while ($input >= 1) {
     while (<$input>) {
-	/^\s*include\s*'([^']*)'/ && &include($1) && next;
+	# Execute the 'include':
+	/^\s+include\s*'([^']*)'/i && &include($1) && next;
+        # Put any 'implicit none' as comment.
+        /^(\s+implicit\s*none)/i && s/^/c Not yet implemented in Pips\nc  (it is MIL-STD-1553 Fortran and not Fortran 77):\nc/;
         print;
     }
     &end_include;
