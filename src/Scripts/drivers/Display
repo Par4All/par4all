@@ -5,30 +5,28 @@
 #
 # Option -l (last) also available to avoid call to Pips
 #
-# Option -s (less but l already used) to use less instead of more, FC, 130893
-#
 
 # Modifications
 # - uses less instead of more to avoid extra-characters when Display is run in background
 
-USAGE="Usage: Display [-w wspace] [-m module] [-v] [-l] [-s] [pretty-print]"
+USAGE="Usage: Display [-h] [-w wspace] [-m module] [-v] [-l] [pretty-print]"
 AVAILABLE_PRETTY_P="Available Pretty-prints: para77 para90 cray cmf craft adfg bdt plc code tran utran prec uprec comp regi inreg outreg prop cumu cg cgcomp cgprec cgtran cgprop cgcumu cgreg cgin cgout icfg icfgprec icfgcomp icfgl icfglprec icfglcomp icfgc icfgcprec icfgccomp dg edg lcdg wdg wp65 bank flint dead"
 
-MORE=less
+MORE=${PIPS_MORE:-less}
 
 #if [ $# -eq 0 ]
 #then	echo $USAGE >&2
 #	exit 2
 #fi
 
-while getopts w:m:vls opt
+while getopts w:m:vlh opt
 do
 	case $opt in
+	h)      echo "$USAGE" ; echo "$AVAILABLE_PRETTY_P" ;;
 	w)	OPT_PGM=$OPTARG;;
 	m)	OPT_MOD=$OPTARG;;
 	v)	VERBOSE=TRUE;;
 	l)	LAST=TRUE;;
-	s)	MORE=more;;
 	\?)	echo $USAGE >&2
 		exit 2;;
 	esac
