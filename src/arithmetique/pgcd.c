@@ -252,11 +252,11 @@ Value bezout(Value a, Value b, Value *x, Value *y)
     while (r!=0)
     {
 	q = value_div(a0,a1);
-	u = u0 - value_mult(u1,q);
+	u = value_minus(u0,value_mult(u1,q));
 
-	v = v0 - value_mult(v1,q);
+	v = value_minus(v0,value_mult(v1,q));
 	a0 = a1; a1 = r;
-	u0 = u1;u1 = u;
+	u0 = u1; u1 = u;
 	v0 = v1; v1 = v;
 
 	r = value_mod(a0,a1);
@@ -293,7 +293,7 @@ Value bezout_grl(Value a, Value b, Value *x, Value *y)
     Value a0,a1,u,v,r,q,c;
     Value sa,sb;               /* les signes de a et b */
 
-    sa = sb = 1;
+    sa = sb = VALUE_ONE;
     if (VALUE_NEG_P(a)){
 	sa = VALUE_MONE;
 	a = value_uminus(a);
@@ -338,9 +338,9 @@ Value bezout_grl(Value a, Value b, Value *x, Value *y)
 	while (VALUE_NOTZERO_P(r))
 	{
 	    q = value_div(a0,a1);
-	    u = u0 - value_mult(u1,q);
+	    u = value_minus(u0,value_mult(u1,q));
 
-	    v = v0 - value_mult(v1,q);
+	    v = value_minus(v0,value_mult(v1,q));
 	    a0 = a1; a1 = r;
 	    u0 = u1; u1 = u;
 	    v0 = v1; v1 = v;
