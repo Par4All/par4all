@@ -101,7 +101,7 @@ int main() {
     char str[1024];
     Matrix *C1, *P1;
     Polyhedron *C, *P;
-    Enumeration *en, *ee;
+    Enumeration *en;
     char **param_name;
   
 #ifdef EP_EVALUATION
@@ -152,14 +152,7 @@ int main() {
         }
 #endif /* EP_EVALUATION */
   
-    while( en )
-        {
-            free_evalue_refs( &(en->EP) );
-            Polyhedron_Free( en->ValidityDomain );
-            ee = en ->next;
-            free( en );
-            en = ee;
-        }
+    Enumeration_Free(en);
     for( i=0 ; i<C->Dimension ; i++ )
         free( param_name[i] );
     free(param_name);
