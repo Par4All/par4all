@@ -21,6 +21,8 @@
 
 #include "semantics.h"
 
+#include "transformer.h"
+
 #include "pipsdbm.h"
 #include "resources.h"
 
@@ -41,7 +43,6 @@ statement s;
     pips_debug(9, "statement %03d\n", statement_number(s));
     
     current_caller_stmt = s;
-    pips_debug(4, "repeat statement %03d\n", statement_number(current_caller_stmt));
     return(TRUE);
 }
 
