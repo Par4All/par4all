@@ -14,6 +14,8 @@ void gen_array_free(gen_array_t);
 void gen_array_full_free(gen_array_t);
 void gen_array_addto(gen_array_t, int, char *);
 void gen_array_dupaddto(gen_array_t, int, char *);
+void gen_array_append(gen_array_t, char *);
+void gen_array_dupappend(gen_array_t, char *);
 char **gen_array_pointer(gen_array_t);
 int gen_array_nitems(gen_array_t);
 int gen_array_size(gen_array_t);
