@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.75  2003/06/24 08:22:01  irigoin
+ * Improvements of debugging messages
+ *
  * Revision 1.74  2003/06/13 13:13:59  coelho
  * db_clean_all_required_resources() place...
  *
@@ -774,13 +777,13 @@ static bool rmake(string rname, string oname)
 	  res = db_get_resource_id(rrrn, rron);
 	  pips_debug(5, "resource %s(%s) added to up_to_date "
 		     "with time stamp %d\n",
-		     rname, oname, db_time_of_resource(rrrn, rron));
+		     rrrn, rron, db_time_of_resource(rrrn, rron));
 	  set_add_element(up_to_date_resources, 
 			  up_to_date_resources, res);
 	}
 	else {
 	  pips_internal_error("resource %s(%s) just built not found!\n",
-			      rname, oname);
+			      rrrn, rron);
 	}
       }, 
 	  lr);
