@@ -204,5 +204,20 @@
 #define loop_to_statement(l) instruction_to_statement(loop_to_instruction(l))
 #define test_to_statement(t) instruction_to_statement(test_to_instruction(t))
 
+
+/* For the control graph modifiers: */
+
+/* To specify the way that remove_a_control_from_a_list_and_relink
+   acts: */
+enum remove_a_control_from_a_list_and_relink_direction 
+{
+   /* Put some strange number to avoid random clash as much as
+      possible... */
+   source_is_predecessor_and_dest_is_successor = 119,
+      source_is_successor_and_dest_is_predecessor = -123
+      };
+typedef enum remove_a_control_from_a_list_and_relink_direction
+remove_a_control_from_a_list_and_relink_direction;
+
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
