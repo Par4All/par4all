@@ -75,7 +75,7 @@ static text get_any_effects_text_flt(string module_name)
 
   /* current statement
    */
-  set_current_module_statement((statement)db_get_memory_ressource(DBR_CODE, module_name, TRUE));
+  set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name, TRUE));
   module_stat = get_current_module_statement();
   
   /* resources to be printed...
