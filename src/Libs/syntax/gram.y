@@ -663,9 +663,14 @@ declaration: entity_name decl_tableau lg_fortran_type
 
 		    b = variable_basic(type_variable(CurrentType));
 
+		    /* character [*len1] foo [*len2]:
+		     * if len2 is unknown then len1
+		     */
 		    if(basic_string_p(b))
-			t = MakeTypeVariable(make_basic(is_basic_string, $3),
-					     NIL);
+			t = value_unknown_p($3)? 
+			    copy_type(t):
+				MakeTypeVariable
+				    (make_basic(is_basic_string, $3), NIL);
 
 		    DeclareVariable($1, t, $2,
 			storage_undefined, value_undefined);
@@ -1044,9 +1049,15 @@ fortran_basic_type: TK_INTEGER
 
 lg_fortran_type:
 	    {
-		$$ = make_value(is_value_constant,
-				make_constant(is_constant_int, 
-					      CurrentTypeSize));
+                   $$ = MakeValueUnknown(); 
+		/* was: $$ = make_value(is_value_constant,
+		 *      make_constant(is_constant_int, CurrentTypeSize)); 
+		 * then how to differentiate character*len1 foo[*len2]
+		 * if len2 is 1 or whatever... the issue is that 
+		 * there should be two lg_..., one for the default that
+		 * would change CurrentTypeSize at ival, and the other not...
+		 * FC, 13/06/96
+		 */
 	    }
 	| TK_STAR TK_LPAR TK_STAR TK_RPAR
 	    {
@@ -1056,7 +1067,7 @@ lg_fortran_type:
 	    {
 		    $$ = MakeValueSymbolic($3);
 	    }
-	| TK_STAR ival 
+	| TK_STAR ival
 	    {
 		    $$ = make_value(is_value_constant, 
 				    make_constant(is_constant_int,$2));
