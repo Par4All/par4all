@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/07/24 11:22:33 $, 
+ * $Date: 1996/07/24 11:23:10 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -508,7 +508,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     
     if (setjmp(overflow_error3))
     {
-	for(i=premier_hash ; i!=PTR_NIL; i=hashtable[i].succ)
+	for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
 	    hashtable[i].nom = 0 ;
 	if(NB_EQ > 0) {
 	    for(i=0 ; i<(3+DIMENSION) ; i++)
