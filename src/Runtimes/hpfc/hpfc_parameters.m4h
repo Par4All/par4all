@@ -2,29 +2,29 @@ c
 c parameters used to compile 
 c
 c $RCSfile: hpfc_parameters.m4h,v $ version $Revision$
-c ($Date: 1995/09/27 16:26:34 $, )
+c ($Date: 1996/09/07 15:53:14 $, )
 c
 c type declarations
 c
       integer
-     $     INTFLAG,
-     $     MAXNBOFARRAYS,
-     $     MAXNBOFTEMPLATES,
-     $     MAXNBOFPROCESSORS,
-     $     MAXMAXSIZEOFPROCS,
-     $     MAXMAXSIZEOFBUFFER
+     $     INT FLAG,
+     $     MAX NB OF ARRAYS,
+     $     MAX NB OF TEMPLATES,
+     $     MAX NB OF PROCESSORS,
+     $     MAX MAX SIZE OF PROCS,
+     $     MAX MAX SIZE OF BUFFER
 c
 c parameters
 c
-      parameter(INTFLAG = -1234567890)
-      parameter(MAXNBOFARRAYS = 100)
-      parameter(MAXNBOFTEMPLATES = 10)
-      parameter(MAXNBOFPROCESSORS = 10)
-      parameter(MAXMAXSIZEOFPROCS = 32)
+      parameter(INT FLAG = -1234567890)
+      parameter(MAX NB OF ARRAYS = 100)
+      parameter(MAX NB OF TEMPLATES = 10)
+      parameter(MAX NB OF PROCESSORS = 10)
+      parameter(MAX MAX SIZE OF PROCS = 32)
 c
 c MAXMAXSIZEOFBUFFER is around 1 MB
 c
-      parameter(MAXMAXSIZEOFBUFFER = 1000000)
+      parameter(MAX MAX SIZE OF BUFFER = 1000000)
 c
 c that s all
 c
