@@ -9,6 +9,7 @@ SCRIPTS = 	MakeExtern \
 		make-includes \
 		make-install-pips \
 		make-pips \
+		make-pips-menu \
 		makedep \
 		makemake \
 		install-pips-src \
