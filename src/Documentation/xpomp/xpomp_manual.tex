@@ -1,12 +1,12 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/01 21:56:02 $, 
+%% $Date: 1996/09/02 09:06:55 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html}
 \begin{document}
 
-\newcommand{\HPFC}{\htmladdnormallink{\texttt{hpfc}}
+\newcommand{\HPFC}{\htmladdnormallink{\texttt{HPFC}}
   {http://www.cri.ensmp.fr/pips/hpfc.html}\xspace}
 \newcommand{\xPOMP}{\htmladdnormallink{\textbf{xPOMP}}
   {http://www.cri.ensmp.fr/pips/xpomp_manual/xpomp_manual.html}\xspace}
@@ -531,17 +531,17 @@ Fortran:
 
 \section{Using the xPOMP interface with HPFC}
 
-\HPFC is the HPF prototype compiler included in the \PIPS project.
-It is developped by \FC. In order to compile an HPF program which uses
+\HPFC{} is the HPF prototype compiler included in the \PIPS project.  It has
+been developped by \FC{}. In order to compile an HPF program which uses
 \xPOMP, convinient headers, functions and extensions are provided.
 
 
 \subsection{XPOMP/HPFC headers}
 
-Firstly headers are provided (\verb|xpomp_graphics_F.h| file) that must be
+Firstly, headers are provided (\verb|xpomp_graphics_F.h| file) that must be
 included by all user HPF functions or subroutines that make use of the
-\xPOMP library. This header file simply lists the subroutines and
-declares them as I/O routines to the \HPFC compiler through the special
+\xPOMP{} library. This header file simply lists the subroutines and
+declares them as I/O routines to the \HPFC{} compiler through the special
 \verb|io| directive:
 \begin{verbatim}
 !fcd$ io xpomp_show_real4
@@ -559,12 +559,12 @@ provided, as described in the next section.
 
 \subsection{Fake functions}
 
-As \PIPS is an interprocedural compiler, fake functions sources
-for the \xPOMP routines (\verb|xpomp_fake.f| file)
-that simply mimic their effects on arguments are provided. 
-They must be compiled together with the HPF program through \PIPS in
-order to provide the compiler with the necessary information for
-using the \xPOMP display facilities. All \xPOMP functions are annoted
+As \PIPS{} is an interprocedural compiler, fake functions sources for the
+\xPOMP{} routines (\verb|xpomp_fake.f| file) that simply mimic their
+effects on arguments are provided.  They must be compiled together with
+the HPF program through \PIPS in order to provide the compiler with the
+necessary information for using the \xPOMP{} display facilities. All
+\xPOMP{} functions are annoted
 as \verb|io| and\verb|fake| with special \verb|!fcd$| %% $
 (\FC directives). The first directive tells that the function or
 subroutine performs only I/O. 
@@ -581,16 +581,16 @@ exemple one must write:
 
 \subsection{Linker extensions}
 
-Since the source files for the functions are fake ones (the functions
-are actually written in C), these functions must be provided latter on
-at link-time. The \HPFC compiler allows to give this information
+Since the source files for the functions are fake ones (the functions are
+actually written in C), these functions must be provided latter on at
+link-time. The \HPFC{} compiler allows to give this information
 with the \verb|!ldi$| %%$
 (Link eDitor I/o) special directive. This directive supplies aditionnal
-\verb|ld| options for linking the program with an I/O library (hence
-the library is just linked to the \emph{host} program.
-Assuming the \xPOMP library and executables being stored in
-a directory described by the \verb|$XPOMP_RUNTIME| environment
-variable, then the desired effect is achieved with: 
+\verb|ld| options for linking the program with an I/O library (hence the
+library is just linked to the \emph{host} program.  Assuming the 
+\xPOMP{} library and executables being stored in
+a directory described by the \verb|$XPOMP_RUNTIME| environment %%$
+variable, then the desired effect is achieved with:
 \begin{verbatim}
 !ldi$ -L$XPOMP_RUNTIME -lxpomp
 \end{verbatim}
