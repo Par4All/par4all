@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/09/04 10:50:06 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/09/06 12:50:40 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -381,7 +381,7 @@ check_os:
 	touch .quick-install
 
 tar:
-	$(TAR) cf $(TARGET).tar $(SOURCES)
+	$(TAR) cf $(TARGET).tar $(SOURCES) Makefile
 	$(ZIP) $(TARGET).tar
 
 install:  .install
