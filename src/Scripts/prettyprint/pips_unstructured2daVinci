@@ -1,0 +1,166 @@
+#!/usr/local/bin/perl
+
+$statement_number = 0;
+$unstructured_level = 0;
+#$depth_level = 0;
+
+sub indent_string {
+    local($i) = $indent_level;
+    local($string) = "";
+    while ($i > 0) {
+	$string .= " ";
+	$i --;
+    }
+    return $string;
+}
+
+
+sub output_indent {
+    print &indent_string;
+}
+
+
+sub indent_plus {
+    $indent_level += 2;
+}
+
+
+sub inc_depth_level {
+    $depth_level{$unstructured_level} ++;
+}
+
+
+sub dec_depth_level {
+    $depth_level{$unstructured_level} --;
+}
+
+
+sub inc_unstructured_level {
+    $unstructured_level ++;
+}
+
+
+sub dec_unstructured_level {
+    $unstructured_level --;
+}
+
+
+sub output_a_statement_begin {
+    local($label, $comment) = @_;
+    &output_indent;
+    print "l(\"$label\",\n";
+    $indent_level += 2;
+    &output_indent;
+    print "n(\"$comment\",\n";
+    $indent_level += 2;
+    &output_indent;
+    print "[ a(\"OBJECT\", \"";
+}
+
+
+sub output_a_statement_end {
+    &output_indent;
+    print "\") ],\n";
+}
+
+
+sub close_all_at_current_unstructured_level {
+    print $close_string{$unstructured_level};
+}
+
+
+sub push_close {
+    local($string) = @_;
+    $close_string{$unstructured_level} .= &indent_string . $string;
+}
+
+
+print "[\n";
+#&push_close("\n]\n");
+$indent_level = 2;
+
+&output_a_statement_begin("$statement_number", "Statement not from an unstructured");
+$statement_number ++;
+
+while (<>) {
+    #print;
+    chop;
+    ($a_command_line = $_) =~ s/.(.*)/$1/;
+
+    /\200/ && do {
+	# €Unstructured 0x3c79f0 end: 0x3c8f30
+	&output_a_statement_end;
+	(($unstructured = $_) =~ s/.*Unstructured (.*) end:.*/$1/);
+	&output_indent;
+	print "[\n";
+	&push_close("\n]\n");
+	&indent_plus ;
+	&output_indent;
+	print "e(\"Unstructured $unstructured\", [],\n";
+	&push_close("\n )\n");
+	&indent_plus ;
+	next;
+    };
+
+    /\201/ && do {
+	# Unstructured Edge 0x3c79a0 -> 0x3c79f0
+	(($from_to = $_) =~ s/.*Edge (.*)/$1/);
+	(($to = $_) =~ s/.*-> (.*)/$1/);
+	print "[ l(\"$from_to\", e(\"$a_command_line\", [], r(\"$to\"))),\n";
+	next;
+    };
+
+    /\202/ && do {
+	# ‚Unstructured End
+	$unstructured_level --;
+	$statement_number ++;
+	&output_a_statement_end;
+	&output_indent;
+	print "[\n";
+	&push_close("\n]\n");
+	&indent_plus ;
+	&output_a_statement_begin;
+	next;
+    };
+
+    /\206/ && do {
+	# †Unstructured Edge With Node 0x3c7a00 -> 0x3c7d40
+	(($from_to = $_) =~ s/.*Node (.*)/$1/);
+	(($to = $_) =~ s/.*-> (.*)/$1/);
+	print "[ l(\"$from_to\", e(\"$a_command_line\", [],\n  ";
+	next;
+    };
+
+    /\203/ && do {
+	# ƒUnstructured Item 0x3c79f0
+	(($control = $_) =~ s/.*Item (.*)/$1/);
+	&output_a_statement_begin($control, $a_command_line);
+	next;
+    };
+
+    /\204/ && do {
+	# „Unstructured Sons Begin 0x3c79f0 -> 0x3c7d30
+	(($control = $_) =~ s/.*Item (.*)/$1/);
+	# End the statements:
+#	print "\") ],\n [\n";
+	# Now wait for some edges...
+	next;
+    };
+
+    /\205/ && do {
+	# …Unstructured Sons End 0x3c79a0 -> 0x3c79f0
+
+	# „Unstructured Sons Begin 0x3c79f0 -> 0x3c7d30
+	(($control = $_) =~ s/.*Item (.*)/$1/);
+	# End the statements:
+#	print "]\n";
+	# Now wait for some edges...
+	next;
+    };
+
+    # By default, put the statement with a an explicit \ n for daVinci:
+    print "$_\\n";
+}
+
+&close_all_at_current_unstructured_level;
+
