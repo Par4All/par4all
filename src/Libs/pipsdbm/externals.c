@@ -60,7 +60,8 @@ pipsdbm_read_entities(FILE * fd)
 void
 pipsdbm_free_entities(char * p)
 {
-    gen_free_tabulated(entity_domain);
+  pips_assert("argument not used", p==p);
+  gen_free_tabulated(entity_domain);
 }
 
 /**************************************************** OLD STATEMENT MAPPING */
@@ -94,19 +95,19 @@ pipsdbm_write_statement_mapping(
     FILE * fd, /* file to write to */
     statement_mapping h /* hash table to dump */)
 {
-    fprintf(fd, "%d\n", statement_mapping_count(h));
-    STATEMENT_MAPPING_MAP(s, v,
-    {
-	statement key = (statement) s;
-	gen_chunkp val = (gen_chunkp) v;
-	int order = statement_ordering(key);
-	if (order!=STATEMENT_ORDERING_UNDEFINED) { /* save it! */
-	    fprintf(fd, "%d\n", order);
-	    gen_write(fd, (gen_chunkp) val);
-	} 
-	else pips_user_warning("statement with illegal ordering\n");
-    },
-	h);
+  fprintf(fd, "%d\n", statement_mapping_count(h));
+  STATEMENT_MAPPING_MAP(s, v,
+  {
+    statement key = (statement) s;
+    gen_chunkp val = (gen_chunkp) v;
+    int order = statement_ordering(key);
+    if (order!=STATEMENT_ORDERING_UNDEFINED) { /* save it! */
+      fprintf(fd, "%d\n", order);
+      gen_write(fd, (gen_chunkp) val);
+    } 
+    else pips_user_warning("statement with illegal ordering\n");
+  },
+			h);
 }
 
 hash_table
