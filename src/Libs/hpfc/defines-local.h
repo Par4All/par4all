@@ -1,3 +1,10 @@
+/*
+ * HPFC module by Fabien COELHO
+ *
+ * SCCS stuff:
+ * $RCSfile: defines-local.h,v $ ($Date: 1994/03/16 12:01:59 $, ) version $Revision$, got on %D%, %T%
+ * $Id$
+ */
 
 /*
  * Functions
@@ -117,3 +124,15 @@
 
 #define SEND	1
 #define RECEIVE 0
+
+/*
+ * debug macro
+ */
+#define IFDBPRINT(n, func, module, stat)                            \
+    ifdebug(n)                                                      \
+    {                                                               \
+       fprintf(stderr,                                              \
+	       "[%s] %s statement:\n",                              \
+	       func,entity_name(module));                           \
+       print_text(stderr,text_statement(module,0,stat));            \
+    }
