@@ -7,14 +7,17 @@
 #include "syntax.h"
 
 LOCAL entity end_label = entity_undefined;
-LOCAL char *end_label_local_name = "00000";
+LOCAL char *end_label_local_name = RETURN_LABEL_NAME;
 
 
 
-/* 
-this function creates a goto instruction to label end_label. this is
-done to eliminate return statements.
-*/
+/* This function creates a goto instruction to label end_label. this is
+ * done to eliminate return statements.
+ *
+ * Note: I was afraid the mouse trap would not work to analyze
+ * multiple procedures but there is no problem. I guess that MakeGotoInst()
+ * generates the proper label entity regardless of end_label. FI.
+ */
 
 instruction MakeReturn()
 {
