@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/04/12 12:40:54 $, 
+ * $Date: 1997/04/12 13:02:01 $, 
  *
  * adapted from what can be seen by FC 31/12/96
  * 
@@ -443,6 +443,7 @@ int fsplit(char * file_name, FILE *out)
  * bugs:
  *  - under special circonstances, the dilatation of the transformation
  *    may lead continuations to exceed the 19 lines limit. 
+ *  - blank padding of short lines missing?
  *
  * to improve:
  *  - hack for "real*8 hollerith", but should just forbids start after *?
