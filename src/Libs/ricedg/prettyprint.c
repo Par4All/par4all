@@ -71,7 +71,7 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
     fp = safe_fopen(dg_name, "w");
 
     /* for tracing variables */
-    variable_trace(fp, mod_stat, dg, mod_name);
+    variable_trace(mod_name);
 
     debug_on("RICEDG_DEBUG_LEVEL");
 
