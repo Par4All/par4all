@@ -1,7 +1,7 @@
 /* package arithmetique 
  *
  * $RCSfile: divide.c,v $ (version $Revision$)
- * $Date: 1996/07/18 19:30:06 $, 
+ * $Date: 1996/07/19 18:37:34 $, 
  */
 
 /*LINTLIBRARY*/
@@ -69,10 +69,10 @@ Value divide_fast(Value a, Value b)
        cette routine n'est-elle jamais appelee avec a=0 par le package vecteur?
        */
 
-    if (value_le(a, (Value)DIVIDE_MAX_A) && 
-	value_ge(a, (Value)-DIVIDE_MAX_A) &&
-	value_le(b, (Value)DIVIDE_MAX_B) &&
-	value_ge(b, (Value)-DIVIDE_MAX_B))
+    if (value_le(a, int_to_value(DIVIDE_MAX_A)) && 
+	value_ge(a, int_to_value(-DIVIDE_MAX_A)) &&
+	value_le(b, int_to_value(DIVIDE_MAX_B)) &&
+	value_ge(b, int_to_value(-DIVIDE_MAX_B)))
     {
 	/* direct table look up */
 	int bint = VALUE_TO_INT(b),
