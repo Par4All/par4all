@@ -49,24 +49,31 @@ my %identificator = ();
 sub get_identificators($)
 {
     my ($line) = @_;
-    # comment
-    return () if $line =~ /^[!Cc*]/;
+
+    # comments
+    return () if $line =~ /^[!Cc\*]/;
+
     # continuations
-    $line =~ s/^......//;
+    $line =~ s/^      \S//;
     # string constants
     $line =~ s/^([^\']*)\'[^\']*\'/$1/g;
     # numeric constants
     $line =~ s/\b[\+\-]?\d+\.?\d*([de][\+\-]?\d+)?\b//ig;
     # to lower case
     $line =~ tr/A-Z/a-z/;
+    #
+    print STDERR "standard line=$line" if $verbose>3;
+    my @cuts = split /[^a-z0-9_]+/, $line;
+    print STDERR "cut=@cuts\n" if $verbose>4;
     # get all identificators
+
     return grep (!/^(|if|do|end|endif|enddo|print|while|common
-		     |data|dimension|print|read|subroutine|integer
+		     |data|dimension|read|subroutine|integer
 		     |real|integer|logical|gt|le|lt|ge|eq|ne|\d.*
 		     |character|implicit|none|then|else|or|and|call
 		     |write|return|continue|format|parameter|double
-		     |precision|complex|equivalence)$/x,
-		 (split /[^a-z0-9_]+/, $line));
+		     |precision|complex|equivalence|goto)$/x,
+		 @cuts);
 }
 
 # include files already processed for identificators are not cached
@@ -122,7 +129,7 @@ sub load_include_file_identificators($)
 
 for my $file (@ARGV)
 {
-    print "considering file $file\n";
+    print STDERR "considering file $file\n";
 
     my @file_content = ();
     my %all_includes = ();
@@ -135,14 +142,15 @@ for my $file (@ARGV)
 
     open FILE, "<$file" or die $!;
 
-    print "reading file $file\n";
-    while (my $line = <FILE>)
+    print STDERR "reading file '$file'\n";
+    my $line;
+    while ($line = <FILE>)
     {
 	push @file_content, $line;
 
 	next if $line =~ /^[Cc!\*]/; # comment
 
-	print "line=$line" if $verbose>2;
+	print STDERR "read line=$line" if $verbose>2;
 
 	if ($line =~ /^      +include *['"]([^\'\"]*)["']/i) 
 	{
@@ -154,11 +162,11 @@ for my $file (@ARGV)
 
 	for my $id (get_identificators($line))
 	{
-	    print "ID=$id\n" if $verbose>2;
+	    print STDERR "ID=$id\n" if $verbose>2;
 	    if (exists $identificator{$id} and
 		exists $all_includes{$identificator{$id}})
 	    {
-		print "FOUND in '$identificator{$id}'\n" if $verbose>2;
+		print STDERR "FOUND in '$identificator{$id}'\n" if $verbose>2;
 		$useful_includes{$identificator{$id}} = 1;
 	    }
 	}
