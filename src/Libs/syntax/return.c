@@ -158,7 +158,7 @@ add_actual_return_code(list apl)
 	    entity f = local_name_to_top_level_entity(module_name);
 	    entity a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME); 
 
-	    entity_type(frc) = MakeTypeVariable(make_basic(is_basic_int, 4), NIL);
+	    entity_type(frc) = MakeTypeVariable(make_basic(is_basic_int, (void *) 4), NIL);
 
 	    entity_storage(frc) = 
 		make_storage(is_storage_ram,
@@ -235,7 +235,7 @@ generate_return_code_checks(list labels)
     /* reset_alternate_returns(); */
     gen_free_list(lln);
 
-    gen_consistent_p(i);
+    instruction_consistent_p(i);
 
     return i;
 }
@@ -282,7 +282,7 @@ instruction MakeReturn(expression e)
 	statement_number(jmp) = look_at_next_statement_number();
 	(void) get_next_statement_number();
 	inst = make_instruction_block(CONS(STATEMENT, src, CONS(STATEMENT, jmp, NIL)));
-	gen_consistent_p(inst);
+	instruction_consistent_p(inst);
     }
     else if(!expression_undefined_p(e) && substitute_stop_p && uses_alternate_return_p()) {
 	inst = MakeZeroOrOneArgCallInst("STOP", e);
@@ -316,7 +316,7 @@ GenerateReturn()
 	(void) get_next_statement_number();
 	*/
 	inst = make_instruction_block(CONS(STATEMENT, src, CONS(STATEMENT, jmp, NIL)));
-	gen_consistent_p(inst);
+	instruction_consistent_p(inst);
     }
     else {
 	strcpy(lab_I, end_label_local_name);
