@@ -1,4 +1,4 @@
-# $RCSfile: config.makefile,v $ ($Date: 1995/09/07 10:02:52 $, ) 
+# $RCSfile: config.makefile,v $ ($Date: 1995/10/10 15:22:35 $, ) 
 # version $Revision$
 # got on %D%, %T%
 # [%P%].
@@ -56,7 +56,7 @@ TARGET_CFILES=	emacs.c \
 #
 # Rajoute le directory icons :
 #
-TARGET_HEADERS=	xv_sizes.h wpips-local.h wpips-labels.h pips.icon icons
+TARGET_HEADERS=	xv_sizes.h wpips-local.h wpips-labels.h wpips_transform_menu_layout.h pips.icon icons
 #
 #
 TARGET_OBJECTS=	$(TARGET_CFILES:.c=.o)
