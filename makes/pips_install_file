@@ -5,30 +5,50 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1995/08/03 11:51:50 $, )
+# ($Date: 1995/08/07 13:48:36 $, )
 #
+
+RUN=':'
 
 usage()
 {
-  echo "usage: `basename $0` file_1 file_2 ($2)";
+  echo "usage: `basename $0` [-flx] directory files ($2)";
   exit ${1:-1}
 }
 
-[ $# -eq 2 ] || usage 2 "invalid number of arguments"
-[ -f $1 ] || usage 3 "$1 not found"
+while getopts flx opt
+do
+  case $opt in
+    f) RUN=':' ;;
+    l) RUN='ranlib' ;;
+    x) RUN='chmod a+x' ;;
+    *) usage 4 "unexpected option ($opt)" ;;
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+[ $# -lt 2 ] || usage 2 "invalid number of arguments"
+directory=$1
+shift
+[ -d $directory ] || usage 3 "$directory is not a directory"
 
 # test if different
 
-test -f $2 && cmp -s $1 $2 && 
-{
-  echo "$1 was not modified" 
-  exit 0
-}
+for file
+do
+  test -f $file && cmp -s $file $directory/$file && 
+  {
+    echo "$1 was not modified" 
+    exit 0
+  }
 
-# else
-
-echo "copying $1"
-cp $1 $2
+  # else
+  
+  echo "copying $1"
+  cp $file $directory
+  eval $RUN $directory/$file
+done
 
 # that is all
 #
