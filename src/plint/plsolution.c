@@ -39,7 +39,7 @@ int nb_som;
     Psommet ps1=NULL;
     Variable var =NULL;
     boolean result = TRUE;
-    int cv;
+    Value cv;
 #ifdef TRACE
     printf(" ** la solution est elle entiere ? \n");
 #endif
@@ -47,8 +47,8 @@ int nb_som;
     for (ps1 = sys; ps1!= NULL && result;ps1 = ps1->succ) {
 	var = coeff_no_ligne(lvbase,nb_som);
 	if (var != NULL 
-	    &&  (cv = vect_coeff(var,ps1->vecteur)) != 0 
-	    && ((-vect_coeff(TCST,ps1->vecteur) % cv) != 0))
+	    &&  value_notzero_p(cv = vect_coeff(var,ps1->vecteur))
+	    && value_notzero_p(value_mod(vect_coeff(TCST,ps1->vecteur),cv)))
 	    result = FALSE;
 	nb_som --;
     }
@@ -82,9 +82,9 @@ Pvecteur lvbase;
 int nb_som;
 {
     Psommet ps1=NULL;
-    int in1;
+    Value in1 = VALUE_ZERO;
     Variable var = NULL;
-    int b;
+    Value b;
     boolean result = TRUE;
 
 #ifdef TRACE
@@ -94,11 +94,11 @@ int nb_som;
     for (ps1 = sys; ps1!= NULL && result;ps1 = ps1->succ) {
 	var = coeff_no_ligne(lvbase,nb_som);
 	if (var != NULL) {
-	    int v1 = 0;  	
-	    b = -vect_coeff(TCST,ps1->vecteur);
-	    if ( (v1 = vect_coeff(var,ps1->vecteur)) != 0) 
-		in1 = b /v1;
-	    if (in1 <0) {
+	    Value v1 = 0;  	
+	    b = value_uminus(vect_coeff(TCST,ps1->vecteur));
+	    if ( value_notzero_p(v1 = vect_coeff(var,ps1->vecteur)))
+		in1 = value_div(b,v1);
+	    if (value_neg_p(in1)) {
 		result = FALSE; 
 		printf ("sol. negative \n");
 	    }
@@ -118,9 +118,9 @@ Pvecteur lvsup;
 int nb_som;
 {
     Psommet ps1=NULL;
-    int in1;
+    Value in1 = VALUE_ZERO;
     Variable var = NULL;
-    int b;
+    Value b;
     boolean result = TRUE;
 
 #ifdef TRACE
@@ -130,13 +130,14 @@ int nb_som;
     for (ps1 = sys; ps1!= NULL && result;ps1 = ps1->succ) {
 	var = coeff_no_ligne(lvbase,nb_som);
 	if (var != NULL) {
-	    int v1 = 0;  	
-
-	    b = -vect_coeff(TCST,ps1->vecteur);
-	    if ( (v1 = vect_coeff(var,ps1->vecteur)) != 0) 
-		in1 = b /v1;
-	    if ((in1 <0 && !vect_coeff(var,lvsup)) 
-		 || (in1 >0 && vect_coeff(var,lvsup))  ) {
+	    Value v1 = 0,tmp;  	
+	    b = value_uminus(vect_coeff(TCST,ps1->vecteur));
+	    if ( value_notzero_p(v1 = vect_coeff(var,ps1->vecteur)))
+		in1 = value_div(b,v1);
+	    tmp = vect_coeff(var,lvsup);
+	    if ((value_neg_p(in1) && value_zero_p(tmp))
+		 || (value_pos_p(in1) && value_notzero_p(tmp)))
+	    {
 		result = FALSE; 
 		printf ("sol. negative \n");
 	    }
@@ -184,7 +185,7 @@ int nb_som;
 	    sol1 = (Psolution)MALLOC(sizeof(Ssolution),
 				     SOLUTION,"sol_finale");
 	    sol1->var = var;
-	    sol1->val = -vect_coeff(TCST,ps1->vecteur);
+	    sol1->val = value_uminus(vect_coeff(TCST,ps1->vecteur));
 	    sol1->denominateur = vect_coeff(var,ps1->vecteur);
 	    sol1->succ = sol;
 	    sol = sol1;
