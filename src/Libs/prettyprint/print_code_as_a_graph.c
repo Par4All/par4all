@@ -27,85 +27,121 @@
 #include "prettyprint.h"
 
 
-void
+bool
 print_code_as_a_graph(char *mod_name)
 {
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
-  print_code(mod_name);
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+    bool success;
+
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
+    success = print_code(mod_name);
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+
+    return success;
 }
 
 
-void
+bool
 print_code_as_a_graph_transformers(char *mod_name)
 {
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
-  print_code_transformers(mod_name);
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+    bool success;
+
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
+    success = print_code_transformers(mod_name);
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+
+    return success;
 }
 
 
-void
+bool
 print_code_as_a_graph_complexities(char *mod_name)
 {
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
-  print_code_complexities(mod_name);
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+    bool success;
+
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
+    success = print_code_complexities(mod_name);
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+
+    return success;
 }
 
 
-void
+bool
 print_code_as_a_graph_preconditions(char *mod_name)
 {
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
-  print_code_preconditions(mod_name);
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+    bool success;
+
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
+    success = print_code_preconditions(mod_name);
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+
+    return success;
 }
 
 
-void
+bool
 print_code_as_a_graph_regions(char *mod_name)
 {
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
-  user_warning("print_code_as_a_graph_regions", "To be done...");
-  print_code/*_regions*/(mod_name);
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+    bool success;
+
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
+    user_warning("print_code_as_a_graph_regions", "To be done...");
+    success = print_code				/*_regions*/(mod_name);
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+
+    return success;
 }
 
 
-void
+bool
 print_code_as_a_graph_in_regions(char *mod_name)
 {
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
-  user_warning("print_code_as_a_graph_regions", "To be done...");
-  print_code/*_in_regions*/(mod_name);
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+    bool success;
+
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
+    user_warning("print_code_as_a_graph_regions", "To be done...");
+    success = print_code				/*_in_regions*/(mod_name);
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+
+    return success;
 }
 
 
-void
+bool
 print_code_as_a_graph_out_regions(char *mod_name)
 {
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
-  user_warning("print_code_as_a_graph_regions", "To be done...");
-  print_code/*_out_regions*/(mod_name);
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+    bool success;
+
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
+    user_warning("print_code_as_a_graph_regions", "To be done...");
+    success = print_code				/*_out_regions*/(mod_name);
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+
+    return success;
 }
 
 
-void
+bool
 print_code_as_a_graph_proper_effects(char *mod_name)
 {
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
-  print_code_proper_effects(mod_name);
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+    bool success;
+
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
+    success = print_code_proper_effects(mod_name);
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+
+    return success;
 }
 
 
-void
+bool
 print_code_as_a_graph_cumulated_effects(char *mod_name)
 {
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
-  print_code_cumulated_effects(mod_name);
-  set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+    bool success;
+
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
+    success = print_code_cumulated_effects(mod_name);
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+
+    return success;
 }
