@@ -869,6 +869,7 @@ statement s;
     /* nts is updated by side effect on number_to_statement */
     number_to_statement = hash_table_undefined;
     set_free(duplicate_numbers);
+    duplicate_numbers = set_undefined;
     return nts;
 }
 
