@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1994/06/03 14:14:50 $, ) version $Revision$,
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1994/06/08 15:53:32 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -184,90 +184,6 @@ expression ex;
     return(new);
 }
 
-/* old
-expression UpdateExpressionForModule(module, expr)
-entity module;
-expression expr;
-{
-    entity_mapping
-	map = hpfc_map_of_module(module);
-    syntax
-	s = expression_syntax(expr);
-    expression
-	e = expression_undefined;
-
-    debug(8, "UpdateExpressionForModule", "updating...\n");
-
-    switch(syntax_tag(s))
-    {
-    case is_syntax_reference:
-    {
-	reference 
-	    ref=syntax_reference(s);
-	entity 
-	    var=reference_variable(ref),
-	    newvar=(entity) GET_ENTITY_MAPPING(map,var);
-
-	debug(8, "UpdateExpressionForModule", "reference case\n");
-
-	if (newvar == (entity) HASH_UNDEFINED_VALUE)
-	{
-	    e = reference_to_expression
-		(make_reference(var, lUpdateExpr(module,
-						 reference_indices(ref))));
-	}
-	else
-	{
-	    debug(9,"UpdateExpressionForModule",
-		  "updating reference %s to %s\n",
-		  entity_name(var),
-		  entity_name(newvar));
-	    
-	    e = reference_to_expression
-		(make_reference(newvar, lUpdateExpr(module,
-						    reference_indices(ref))));
-	}
-	break;
-    }
-    case is_syntax_range:
-    {
-	range r=syntax_range(s);
-	
-	debug(8, "UpdateExpressionForModule", "range case\n");
-	
-	e=make_expression
-	    (make_syntax(is_syntax_range,
-			 make_range(UpdateExpressionForModule(module,
-							      range_lower(r)),
-				    UpdateExpressionForModule(module,
-							      range_upper(r)),
-				    UpdateExpressionForModule(module,
-							      range_increment(r)))),
-	    normalized_undefined); 
-	break;
-    }
-    case is_syntax_call:
-    {
-	call c=syntax_call(s);
-	
-	debug(8, "UpdateExpressionForModule", "call to %s case\n",
-	      entity_name(call_function(c)));
-
-	e=make_expression
-	    (make_syntax(is_syntax_call,
-			 make_call(call_function(c),
-				   lUpdateExpr(module,call_arguments(c)))),
-	    normalized_undefined); 
-	break;
-    }
-    default:
-	pips_error("UpdateExpressionForModule","unexpected syntax tag\n");
-	break;
-    }
-    debug(8, "UpdateExpressionForModule", "end of update.\n");
-    return(e);
-}
-*/
 
 list lUpdateExpr(module, l)
 entity module;
@@ -291,30 +207,6 @@ list l;
     return(new);
 }
 
-/* old
-list lUpdateExpr(module,lexpr)
-entity module;
-list lexpr;
-{
-    list 
-	l=NIL;
-
-    debug(8, "lUpdateExpr", "updating %d expressions\n", gen_length(lexpr));
-
-    MAPL(ce,
-     {
-	 expression
-	     etmp = UpdateExpressionForModule(module, EXPRESSION(CAR(ce)));
-
-	 l = gen_nconc(l, CONS(EXPRESSION, etmp, NIL));
-     },
-	 lexpr);
-
-    debug(8, "lUpdateExpr", "end of update\n");
-
-    return(l);
-}
-*/
 
 /* new
 list lNewVariableForModule(module, le)
