@@ -210,6 +210,7 @@ void gen_free_list(list l)
     list p, nextp ;
     for( p = l ; p != NIL ; p = nextp ) {
 	nextp = p->cdr ;
+	*p = NEWGEN_FREED; /* clean */
 	free( p ) ;
     }
 }
@@ -413,6 +414,7 @@ static void gen_remove_from_list(list * pl, void * o, bool once)
     {
       list tmp = *pc;
       *pc = CDR(*pc);
+      *tmp = NEWGEN_FREED;
       free(tmp);
       if (once) return;
     }
@@ -499,6 +501,20 @@ bool gen_once_p(list l)
     return TRUE;
 }
 
+/* free an area.
+ * @param p pointer to the zone to be freed.
+ * @param size size in bytes.
+ */
+void gen_free_area(void * p, int size)
+{
+  int n = size/sizeof(void*);
+  int i;
+  for (i=0; i<n; i++) {
+    *(p+i) = NEWGEN_FREED;
+  }
+  free(p);
+}
+
 /* Sorts a list of gen_chunks in place, to avoid mallocs. 
  * The list skeleton is not touched, but the items are replaced
  * within the list. If some of the cons are shared, it may trouble
@@ -532,7 +548,7 @@ void gen_sort_list(list l, int (*compare)())
     for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
 	CHUNK(CAR(c)) = *point;
 
-    free(table); 
+    gen_free_area(table, n*sizeof(gen_chunk*)); 
 }
 
 /* void gen_closure(iterate, initial)
@@ -595,7 +611,7 @@ list gen_cons(void * item, list next)
 }
 
 
-/* Compute A = A inter B: */
+/* Compute A = A inter B: complexity in O(n2) */
 void
 gen_list_and(list * a,
 	     list b)
@@ -608,6 +624,7 @@ gen_list_and(list * a,
 	cons *aux = *a;
 
 	*a = CDR(*a);
+	*aux = NEWGEN_FREED;
 	free(aux);
 	gen_list_and(a, b);
     }
@@ -629,6 +646,7 @@ gen_list_and_not(list * a,
 	cons *aux = *a;
 
 	*a = CDR(*a);
+	*aux = NEWGEN_FREED;
 	free(aux);
 	gen_list_and_not(a, b);
     }
