@@ -488,7 +488,7 @@ void plc_make_distance()
 
         if(get_debug_level() > 3) {
           fprintf(stderr, "[plc_make_distance] \t for edge %d ->", source_stmt);
-	  fprint_dataflow(stderr, sink_stmt, df, 0);
+	  fprint_dataflow(stderr, sink_stmt, df);
           fprintf(stderr, "\n");
 	}
 
@@ -829,7 +829,7 @@ void edge_weight()
 
  if(get_debug_level() > 3) {
     fprintf(stderr, "[edge_weight] \tfor edge: %d ->", source_stmt);
-    fprint_dataflow(stderr, sink_stmt, df, 0);
+    fprint_dataflow(stderr, sink_stmt, df);
     fprintf(stderr, "\n");
     fprintf(stderr, "[edge_weight] \ttrans system is:");
     fprint_psysteme(stderr, sc_trans);
@@ -2598,7 +2598,7 @@ fprint_plc_pp_dims(stderr, pfunc);
 	pp_dist = vvs_on_polynome(sigma3[i], pp_dist);
 
 	fprintf(stderr, "Dataflow ");
-	fprint_dataflow(stderr, stmt, df, 0);
+	fprint_dataflow(stderr, stmt, df);
 	fprintf(stderr, "\tDist = ");
 	polynome_fprint(stderr, pp_dist, pu_variable_name, pu_is_inferior_var);
 	fprintf(stderr, "\n");
