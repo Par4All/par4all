@@ -19,6 +19,7 @@
 #define UNROLL_TRANSFORM "Loop Unroll"
 #define STRIP_MINE_TRANSFORM "Strip Mining"
 #define LOOP_INTERCHANGE_TRANSFORM "Loop Interchange"
+#define DEAD_CODE_ELIMINATION_TRANSFORM "Dead Code Elimination"
 #define REDUCTIONS_TRANSFORM "Reductions"
 
 #define SEMANTICS_ANALYZE "Semantics"
