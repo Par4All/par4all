@@ -27,12 +27,13 @@ entity m;
 
     bool in_module_2 = entity_is_argument_p(v,decl);
 
-    if (!in_module_1 || !in_module_2) {
-	dump_arguments(decl);
-	fprintf (stderr,"variable_in_module_p,  variable %s not in declarations of %s\n", 
-		    entity_name(v),entity_name(m));
+    ifdebug(8) {
+	if (!in_module_1 || !in_module_2) {
+	    pips_debug(8, "variable %s not in declarations of %s\n", 
+		       entity_name(v),entity_name(m));
+	    dump_arguments(decl);
+	}
     }
-
     return (in_module_1 && in_module_2);
 }
 
