@@ -110,11 +110,11 @@ Ppolynome pp;
     else {
 	Ppolynome curpp, curpp2;
 
-	for (curpp = pp; curpp != NIL; curpp = polynome_succ(curpp)) {
+	for (curpp = pp; curpp != POLYNOME_NUL; curpp = polynome_succ(curpp)) {
 	    if ( !monome_check(polynome_monome(curpp)) ) {
 		return (FALSE);
 	    }
-	    for (curpp2 = polynome_succ(curpp); curpp2 != NIL;
+	    for (curpp2 = polynome_succ(curpp); curpp2 != POLYNOME_NUL;
 		 curpp2 = polynome_succ(curpp2))
 		if (monome_colin(polynome_monome(curpp),polynome_monome(curpp2))) 
 		    return (FALSE);
@@ -136,7 +136,7 @@ Ppolynome pp;
 {
     if ( ! polynome_check(pp) )
 	return (FALSE);
-    else if ( pp != NIL && polynome_succ(pp) == NIL )
+    else if ( pp != POLYNOME_NUL && polynome_succ(pp) == POLYNOME_NUL )
 	return (TRUE);
     else
 	return (FALSE);
