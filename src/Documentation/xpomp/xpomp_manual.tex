@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/02 18:28:52 $, 
+%% $Date: 1996/09/03 18:55:24 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html}
@@ -175,10 +175,11 @@ Fortran:
        call xpomp_open_display(X_window_size, Y_window_size, window)
 \end{verbatim}
 
-This function open a window with a user area of size
+This function open a window with a user area of pixel size
 \verb|X_window_size|$\times$\verb|X_window_size| and return a window
 handler in \verb|window|.
 
+The background color is set to color 1.
 
 
 \subsubsection{Closing a window}
@@ -261,7 +262,7 @@ type to directly control color or one with floating point type that is
 mapped on the color color map.
 
 
-\subsubsection{Displaying character array}
+\subsubsection{Displaying a character array}
 \label{sec:xpomp_flash}
 
 The following functions display an unsigned character vector
@@ -302,7 +303,7 @@ Fortran:
 \end{verbatim}
 
 
-\subsubsection{Displaying floating point array}
+\subsubsection{Displaying a floating point array}
 
 \xPOMP allows the representation of floating point array whose values
 are mapped to color map color 1 to 254 (and not 0 to 255 to spare some
@@ -473,7 +474,7 @@ These functions return 0 on success and $-1$ otherwise.
 The application program can get mouse button clicks in a blocking or
 non-blocking way. The number of the button (usually 1 for left button,
 2 for middle button and 3 for right button) pressed and the position
-$(\verb|X|,\verb|Y|)$ of the cursor in the user area are returned by
+$(\texttt{X},\texttt{Y})$ of the cursor in the user area are returned by
 the following functions.
 
 For advanced usage, the \verb|state| value of the \textbf{X11}
@@ -523,11 +524,57 @@ Fortran:
 If there is no mouse press down event, the value 0 is returned instead
 of the button number.
 
+
+
+\subsection{Scrolling a window}
+
+An \xPOMP window can be vertically scrolled by \verb|delta_Y| by using
+the following functions:\\
+C:
+\begin{verbatim}
+XPOMP_display window;
+int delta_Y;
+int status;
+status = XPOMP_scroll(window, delta_Y);
+\end{verbatim}
+Fortran:
+\begin{verbatim}
+      integer window, delta_y, status
+      call xpomp_scroll(window, delta_y, status)
+\end{verbatim}
+
+They returns $0$ on success and $-1$ on failure.
+
+
+
+\subsection{Drawing a frame with a title}
+
+The following functions are used to draw a frame on a window. The
+frame has its upper-left corner in $(\texttt{X0},\texttt{Y0})$ and its
+lower-right corner in $(\texttt{X1},\texttt{Y1})$, that means
+$\texttt{X0}\leq\texttt{X1}$ and $\texttt{Y0}\leq\texttt{Y1}$.
+
+C:\\
+\begin{verbatim}
+int
+status = XPOMP_draw_frame(XPOMP_display screen,
+         char * title,
+         int title_color,
+         int background_color,
+         int X0,
+         int Y0,
+         int X1,
+         int Y1,
+         int color);
+\end{verbatim}
+Fortran:
+
+
 \subsection{Display \xPOMP usage}
 
 It is useful for an application to display a small description of the
 keyboard usage of \xPOMP. This can be done by calling the following
-procedures.\\
+procedures\\
 C:
 \begin{verbatim}
 XPOMP_display window;
