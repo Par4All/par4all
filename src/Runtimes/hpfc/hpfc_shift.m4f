@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-! ($Date: 1997/01/22 18:47:15 $, )
+! ($Date: 1997/01/27 18:47:56 $, )
 !
 !
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -15,7 +15,7 @@
          if (ALIGN(array,i,1).eq.dim) tdim=i
       enddo
       debug(write (unit=0, fmt=*)
-     $     "hpfc tdim ", array, dim, template, tdim)
+     $     "[hpfc tdim] ", array, dim, template, tdim)
       end
 !
 !
@@ -31,7 +31,7 @@
          if (DIST(template,i,1).eq.tdim) pdim=i
       enddo
       debug(write (unit=0, fmt=*)
-     $     "hpfc pdim ", template, tdim, procs, pdim)
+     $     "[hpfc pdim] ", template, tdim, procs, pdim)
       end
 !
 !
@@ -107,7 +107,7 @@
      $     * (n-RANGEP(procs, pdim, 1)+1) - 1
      $     + RANGET(template, tdim, 1)
      $     - ALIGN(array, tdim,  3)) / ALIGN(array, tdim, 2)
-      debug(write (unit=0, fmt=*)
+      debug(write (unit=0, fmt=*) "[hpfc tdim] ",
      $     procs, "[", pdim, "](", n,  ") last ", last)
       end
 !
@@ -146,7 +146,7 @@
       integer glb, gub, glbd, gubd, p1, p2, last
 !
       debug(write (unit=0, fmt=*)
-     $     "hpfcshift array/dim/area: ", array, dim, lb, ub)
+     $     "[hpfcshift] array/dim/area: ", array, dim, lb, ub)
       call hpfc tdim(array, dim, template, tdim)
       call hpfc pdim(template, tdim, procs, pdim)
       call hpfc loop bounds(nlb, nub, llb, lb, ub, array, pdim)
@@ -160,7 +160,7 @@
          lb2=1
          ub2=0
          lid2=-1
-         debug(write (unit=0, fmt=*) "hpfcshift, nothing for ", MYLID)
+         debug(write (unit=0, fmt=*) "[hpfcshift] nothing for ", MYLID)
          return
       endif
       glb = llb+1
@@ -203,6 +203,8 @@ define(`LIST_NEW_SECTION',`
      $ l($1), u($1), 1')dnl
 define(`DO_LOOP',`
       do i$1 = l($1), u($1)')dnl
+define(`REVERSE_DO_LOOP',`
+      do i$1 = u($1), l($1), -1')dnl
 define(`ENDDO_LOOP',`
       enddo')dnl
 define(`ARRAY_DECL',`dl$1:du$1')dnl
@@ -260,6 +262,9 @@ SIMPLE_REPLICATE(LEVEL,`INIT_TABLE')dnl
          endif
       enddo
 
+!
+! SEND TO
+!
       li=l(dim)
       ui=u(dim)
       do j=1, 2
@@ -280,27 +285,33 @@ COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
          l(dim)=lp
          u(dim)=up
       end do
-      
+
+!
+! LOCAL
+!
       l(dim)=li
       u(dim)=ui
       do j=1, 2
          if (lid(j).eq.MY LID) then
-            debug(write (unit=0, fmt=*) MYLID, " copying Shift")
-!
-! the SHIFT is local
-!         
+            if (sh.lt.0) then
 REVERSE_REPLICATE(LEVEL,`DO_LOOP')
             array(COMMA_REPLICATE(LEVEL,`INDEX_REFSH'))=
      $         array(COMMA_REPLICATE(LEVEL,`INDEX_REF'))
 SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
+            else
+REVERSE_REPLICATE(LEVEL,`REVERSE_DO_LOOP')
+            array(COMMA_REPLICATE(LEVEL,`INDEX_REFSH'))=
+     $         array(COMMA_REPLICATE(LEVEL,`INDEX_REF'))
+SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
+            end if
          end if
          l(dim)=lp
          u(dim)=up
       enddo
-!
-! FROM
-!      
 
+!
+! RECEIVE FROM
+!      
       il(dim)=il(dim)+sh
       iu(dim)=iu(dim)+sh
       call hpfcshift
