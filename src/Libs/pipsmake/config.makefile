@@ -31,7 +31,7 @@ MAIN=		main
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
 LIB_CFILES=	pipsmake.c activate.c initializer.c callgraph.c \
-		openclose.c flags.c check.c
+		openclose.c
 # FI: I do not know why these files are in LIB_HEADERS; they are probably put here
 # to be copied in Production (my guess, 28 January 1992)
 # LIB_HEADERS=	readmakefile.l readmakefile.y pipsmake-local.h phases.h
