@@ -86,7 +86,7 @@ log_on_file(char chaine[])
 void
 pips_thanks(string name, string path)
 {
-    if (isatty(0))
+    if (isatty(fileno(stdout)))
     {
 	fprintf(stdout, PIPS_THANKS_STRING, name, path);
 	fflush(stdout);
