@@ -8,7 +8,6 @@
  */
 
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 #include "genC.h"
 #include "ri.h"
@@ -33,7 +32,7 @@ extern int fprintf();
  *
  * =============================================================================== */
 
-/* void private_regions(char *module_name) 
+/* void array_privatizer(char *module_name) 
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
@@ -77,7 +76,7 @@ char *module_name;
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)) );
     module_to_value_mappings(module);
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
 
     reset_current_module_entity();
     reset_current_module_statement();
