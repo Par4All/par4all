@@ -1,5 +1,5 @@
 /* $RCSfile: prettyprint.c,v $ (version $Revision$)
- * $Date: 1996/06/17 18:11:07 $, 
+ * $Date: 1996/06/18 11:45:40 $, 
  *
  * (pretty)print of reductions.
  *
@@ -8,13 +8,14 @@
 
 #include "local-header.h"
 #include "text.h"
+#include "text-util.h"
 #include "semantics.h"
 #include "prettyprint.h"
 
 #define REDUCTION_PREFIX "!"
 
-#define PROP_SUFFIX ".preds"
-#define CUMU_SUFFIX ".creds"
+#define PROP_SUFFIX ".proper_reductions"
+#define CUMU_SUFFIX ".cumulated_reductions"
 
 #define PROP_DECO "proper reductions"
 #define CUMU_DECO "cumulated reductions"
@@ -29,7 +30,7 @@ static string reduction_decoration = NULL;
 /* generates a short note to tell about the type of the statement
  * being decorated.
  */
-static string note_for_statement(statement s)
+string note_for_statement(statement s)
 {
     instruction i = statement_instruction(s);
     switch (instruction_tag(i))
@@ -150,6 +151,7 @@ print_any_reductions(
     string module_name, 
     string resource_name, 
     string decoration_name,
+    string summary_name,
     string file_suffix)
 {
     text t;
@@ -166,6 +168,17 @@ print_any_reductions(
     reduction_decoration = decoration_name;
 
     t = text_code_reductions(get_current_module_statement());
+
+    if (summary_name)
+    {
+	reductions rs = (reductions) 
+	    db_get_memory_resource(summary_name, module_name, TRUE);
+	text p = 
+	    words_predicate_to_commentary(words_reductions("summary ", rs), 
+					  REDUCTION_PREFIX);
+	MERGE_TEXTS(p, t); t=p;
+    }
+
     (void) make_text_resource(module_name, DBR_PRINTED_FILE, file_suffix, t);
 
     /* ??? some bug some not investigated yet, memory leak...
@@ -187,14 +200,18 @@ bool print_code_proper_reductions(string module_name)
 {
     return print_any_reductions(module_name,
 				DBR_PROPER_REDUCTIONS, 
-				PROP_DECO, PROP_SUFFIX);
+				PROP_DECO, 
+				NULL,
+				PROP_SUFFIX);
 }
 
 bool print_code_cumulated_reductions(string module_name)
 {
     return print_any_reductions(module_name, 
 				DBR_CUMULATED_REDUCTIONS, 
-				CUMU_DECO, CUMU_SUFFIX);
+				CUMU_DECO, 
+				DBR_SUMMARY_REDUCTIONS,
+				CUMU_SUFFIX);
 }
 
 /* end of $RCSfile: prettyprint.c,v $
