@@ -132,8 +132,7 @@ static struct Predicate_Translation
 
 /* initialization and closing*/
 
-void 
-region_translation_statistics_init(stat_p)
+void region_translation_statistics_init(bool stat_p)
 {
     int i,j;
 
@@ -313,7 +312,7 @@ region_translation_init(entity ent_1, reference rf_1,
     array_2 = ent_2;
     ref_1 = rf_1;
     ref_2 = rf_2;
-    reference_p = !(reference_undefined_p(ref_1) && reference_undefined_p(ref_2));
+    reference_p = ! (reference_undefined_p(ref_1) && reference_undefined_p(ref_2));
     offset = offset_1_m_2;
     
     dim_1 = NumberOfDimension(array_1);
@@ -853,9 +852,9 @@ static Psysteme array_translation_sc(bool *p_exact_translation_p)
     }
     else /* much more work must be done */
     {
-	if (!reference_p || i <= min(dim_1, dim_2)) 
+      if (!reference_p || i <= min(dim_1, dim_2)) 
 	{
-	    pips_debug(3, "linearization\n");
+	  pips_debug(3, "linearization\n");
 	    trans_sc = sc_safe_append
 		(trans_sc,
 		 arrays_last_dims_linearization_sc(i, p_exact_translation_p)); 
@@ -1360,7 +1359,7 @@ static Pvecteur global_to_last_dims_offset(int dim_min, bool *p_linear_p)
 	return(vect_make(VECTEUR_NUL, TCST, offset));
 
     /* here to avoid assert in case of a scalar entity */
-    pips_assert("feasible index\n", 0 < dim_min && dim_min <=dim_1);
+    /* pips_assert("feasible index\n", 0 < dim_min && dim_min <=dim_1);*/
 
     pv_offset = global_to_last_dims_offset(dim_min - 1, p_linear_p);
 
