@@ -576,6 +576,28 @@ void db_reset_current_module_name(void)
 
 /***************************************************************** CLEANING */
 
+void db_switch_not_stored_as_stored(void)
+{
+  DB_OK;
+
+  /* on checkpoints, status may be "loaded", but is is not true!
+   */
+  DB_RESOURCES_MAP(os, or,
+  {
+    DB_OWNED_RESOURCES_MAP(rs, r,
+    {
+      if (!db_resource_stored_p(r)) 
+      {
+	pips_debug(5, "resource %s[%s] set as store\n",
+		   db_symbol_name(os), db_symbol_name(rs));
+	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
+      }
+    },
+			   or)
+      },
+		   get_pips_database());
+}
+
 /* delete all obsolete resources before a close.
  * return the number of resources destroyed.
  */
