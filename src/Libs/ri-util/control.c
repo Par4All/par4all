@@ -198,13 +198,30 @@ discard_an_unstructured_without_its_statements(unstructured u)
 }
 
 
-/* Used to discard a control sequence without touching its statements. */
+/* Used to discard a control sequence without touching its statements.
+ It also removes the reference to the sequence from the predecessors
+ or the successors. */
 void
 discard_a_control_sequence_without_its_statements(control begin,
                                                   control end)
 {
    control c;
    list successor_list;
+
+   /* Unlink any extern reference to the control sequence: */
+   MAP(CONTROL, a_predecessor,
+       {
+          gen_remove(&control_successors(a_predecessor),
+                     begin);
+       },
+       control_predecessors(begin));
+   
+   MAP(CONTROL, a_successor,
+       {
+          gen_remove(&control_predecessors(a_successor) ,
+                     end);
+       },
+       control_successors(end));
    
    for(c = begin; ; c = CONTROL(CAR(successor_list))) {
       /* To pass through the free: */
