@@ -104,10 +104,6 @@ boolean is_test_Di;
 boolean Finds2s1;
 
 
-jmp_buf overflow_error;/* to deal with overflow errors occuring during the projection 
-                         * of a Psysteme along a variable */
-
-
 int Nbrdo;
 
 
@@ -1390,7 +1386,7 @@ Ptsg *gs,*gsop;
 
     tmp_base = base_dup(dep_syst->base);
 
-    if (setjmp(overflow_error)) 
+    CATCH(overflow_error)
     {
 	/* Some kind of arithmetic error, e.g. an integer overflow
 	 * has occured. Assume dependence to be conservative.
@@ -1410,7 +1406,7 @@ Ptsg *gs,*gsop;
 	}
 	dep_syst = sc_rn(dep_syst_base);
     }
-    else {
+    TRY {
 	if (sc_proj_optim_on_di_ofl(cl, &dep_syst) == FALSE) {	
 	    debug(4,"TestDependence",
 		  "projected system by sc_proj_optim_on_di() is not feasible\n");
@@ -1422,7 +1418,7 @@ Ptsg *gs,*gsop;
 		mem_spy_end("TestDependence: Step 1.h.a");
 		mem_spy_end("TestDependence-5");
 	    }
-
+	    UNCATCH(overflow_error);
 	    base_rm(tmp_base);
 	    return(NIL);
 	}
@@ -2395,11 +2391,11 @@ Psysteme dep_sc;
 	/* dans le cas d'une erreur d'overflow, on fait comme si le test 
 	 *  avait renvoye' true. bc.
 	 */  
-	if (setjmp(overflow_error)) 
+	CATCH(overflow_error)
 	{
 	    pips_debug(1, "overflow error.\n");
 	}
-	else
+	TRY
 	{
 	    if (! sc_integer_feasibility_ofl_ctrl(sub_sc, FWD_OFL_CTRL, TRUE))
 	    { 
@@ -2410,9 +2406,12 @@ Psysteme dep_sc;
 		ifdebug(1) {
 		    mem_spy_end("dependence_cone_positive: one iteration," 
 				" continue 1");
-		}
+		} 
+		UNCATCH(overflow_error);
 		continue;
 	    }
+	    else UNCATCH(overflow_error);
+	   
 	}
 	
 	if ((sub_sc = sc_normalize(sub_sc))== NULL)
