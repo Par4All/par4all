@@ -40,114 +40,92 @@
 */
 
 
-/* list words_region_no_action(effect reg)
- * input    : a region.
- * output   : a list of strings representing the region.
- * modifies : nothing.
- * comment  :	because of 'buffer', this function cannot be called twice
- * before
- * its output is processed. Also, overflows in relation_to_string() 
- * cannot be prevented. They are checked on return.
- * COPIED FROM THE FUNCTION words_region IN FILE effects-convex/prettyprint.c
- * AND MODIFIED TO NOT PRINT ACTION (IN/OUT)
- */
-static list
-words_region_no_action(region reg)
-{
-    static char buffer[REGION_BUFFER_SIZE];
-    
-    list pc = NIL;
-    reference r = effect_reference(reg);
-/*    action ac = effect_action(reg); */
-    approximation ap = effect_approximation(reg);
-    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-    Psysteme sc = region_system(reg);
-
-    buffer[0] = '\0';
-
-    if(!region_empty_p(reg) && !region_rn_p(reg))
-    {
-	Pbase sorted_base = region_sorted_base_dup(reg);
-	Psysteme sc = sc_dup(region_system(reg));
-	
-      /* sorts in such a way that constraints with phi variables come first */
-	region_sc_sort(sc, sorted_base);
-
-	strcat(buffer, "-");	
-	region_sc_to_string(buffer, sc);
-	sc_rm(sc);
-	base_rm(sorted_base);
-
-    }
-    else
-    {
-	strcat(buffer, "-");	
-	region_sc_to_string(buffer, sc);
-    }
-    pips_assert("words_region", strlen(buffer) < REGION_BUFFER_SIZE );
-
-    if (foresys)
-    {
-      pc = gen_nconc(pc, words_reference(r));
-      pc = CHAIN_SWORD(pc, ", RGSTAT(");
-/*      pc = CHAIN_SWORD(pc, action_read_p(ac) ? "R," : "W,"); */
-      pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "MAY), " : "EXACT), ");
-      pc = CHAIN_SWORD(pc, buffer);
-    }
-    else /* PIPS prettyprint */
-    {
-	pc = CHAIN_SWORD(pc, "<");
-	pc = gen_nconc(pc, effect_words_reference(r));
-	pc = CHAIN_SWORD(pc, "-");
-/*	pc = CHAIN_SWORD(pc, action_interpretation(action_tag(ac)));
- *      pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY" : "-EXACT");
-*/
-        pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "MAY" : "EXACT");
-	pc = CHAIN_SWORD(pc, buffer);
-	pc = CHAIN_SWORD(pc, ">");
-    }
-
-    return pc;
-}
-
-
 /* text text_region_no_action(effect reg)
  * input    : a region
  * output   : a text consisting of several lines of commentaries, 
- *            representing the region
+ *            representing the region BUT WITHOUT THE ACTION TAG (IN/OUT)
  * modifies : nothing
- * COPIED FROM THE FUNCTION tex_region IN FILE effects-convex/prettyprint.c
+ * COPIED FROM THE FUNCTION text_region IN FILE effects-convex/prettyprint.c
  * AND MODIFIED TO NOT PRINT ACTION (IN/OUT)
  */
+#define append(s) add_to_current_line(line_buffer, s, str_prefix, t_reg)
+
 static text 
 text_region_no_action(effect reg)
 {
-    text t_reg = make_text(NIL);
+    text t_reg;
     boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-    string str_prefix;
+    string str_prefix = foresys? 
+	FORESYS_CONTINUATION_PREFIX: PIPS_COMMENT_CONTINUATION;
+    char line_buffer[MAX_LINE_LENGTH];
+    reference r;
+/*    action ac; */
+    approximation ap;
+    Psysteme sc;
+    Pbase sorted_base;
+    list /* of string */ ls;
 
+    if(effect_undefined_p(reg))
+    {
+	user_log("[text_region] unexpected effect undefined\n");
+	return make_text(make_sentence(is_sentence_formatted,
+	   strdup(concatenate(str_prefix, "<REGION_UNDEFINED>\n", 0))));
+    }
+    /* else the effect is defined...
+     */
+
+    /* PREFIX
+     */
+    t_reg = make_text(NIL);
+    strcpy(line_buffer, foresys? REGION_FORESYS_PREFIX: PIPS_COMMENT_PREFIX);
+    if (!foresys) append("  <");
+
+    /* REFERENCE
+     */
+    r = effect_reference(reg);
+    ls = foresys? words_reference(r): effect_words_reference(r);
+
+    MAP(STRING, s, append(s), ls);
+    gen_map(free, ls); gen_free_list(ls); ls = NIL;
+
+    /* ACTION and APPROXIMATION
+     */
+/*    ac = effect_action(reg); */
+    ap = effect_approximation(reg);
+	
     if (foresys)
-	str_prefix = REGION_FORESYS_PREFIX;
-    else
-	str_prefix = PIPS_NORMAL_PREFIX;
-    
-    if(reg == effect_undefined)
     {
-	ADD_SENTENCE_TO_TEXT(t_reg, 
-			     make_pred_commentary_sentence
-			     (strdup("<REGION_UNDEFINED>"),
-			      str_prefix));
-	user_log("[region_to_string] unexpected effect undefined\n");
+	append(", RGSTAT(");
+/*	append(action_read_p(ac) ? "R," : "W,"); */
+	append(approximation_may_p(ap) ? "MAY), " : "EXACT), ");
     }
-    else
+    else /* PIPS prettyprint */
     {
-	gen_free(t_reg);
-	t_reg =
-	    words_predicate_to_commentary(words_region_no_action(reg),
-					  str_prefix);
+/*	append("-");
+	append(action_interpretation(action_tag(ac))); */
+	append(approximation_may_p(ap) ? "-MAY" : "-EXACT");
+	append("-");
     }
 
-    return(t_reg);   
+    /* SYSTEM
+     * sorts in such a way that constraints with phi variables come first.
+     */
+    sorted_base = region_sorted_base_dup(reg);
+    sc = sc_dup(region_system(reg));
+    region_sc_sort(sc, sorted_base);
+
+    system_sorted_text_format(line_buffer, str_prefix, t_reg, sc, 
+	       pips_region_user_name, vect_contains_phi_p, foresys);
+
+    sc_rm(sc);
+    base_rm(sorted_base);
+
+    /* CLOSE 
+     */
+    if (!foresys) append(">");
+    close_current_line(line_buffer, t_reg);
+
+    return t_reg;   
 }
 
 
@@ -207,7 +185,19 @@ aliases_text(string module_name, string resource_name)
 		al = alias_list;
 		MAP(EFFECT,alias,
 		    {
-			pips_debug(9,"make text for alias\n");
+			pips_debug(9,"make text for alias:\n");
+
+			ifdebug(9)
+			    {
+				set_action_interpretation(ACTION_IN,ACTION_OUT);
+				print_region(alias);
+				reset_action_interpretation();
+			    }
+
+/*		    set_action_interpretation(ACTION_IN,ACTION_OUT);
+			MERGE_TEXTS(txt,text_region(alias));
+		    reset_action_interpretation();
+		    */
 
 			MERGE_TEXTS(txt,text_region_no_action(alias));
 		    },
