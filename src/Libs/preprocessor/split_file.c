@@ -1,7 +1,13 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1996/12/31 15:04:37 $, 
+ * $Date: 1996/12/31 15:29:25 $, 
  *
- * diffs: static declarations; main -> function; stdout -> FILE* out;
+ * adapted from whta can be seen by FC 31/12/96
+ * 
+ * - static declarations; 
+ * - main -> function; 
+ * - stdout -> FILE* out;
+ * - include unistd added
+ * - exit -> return
  */
 
 /*
@@ -41,17 +47,18 @@
  */
 
 #ifndef lint
-char copyright[] =
+char fsplit_copyright[] =
 "@(#) Copyright (c) 1983 The Regents of the University of California.\n\
  All rights reserved.\n";
 #endif /* not lint */
 
 #ifndef lint
-static char sccsid[] = "@(#)fsplit.c	5.5 (Berkeley) 3/12/91";
+char fsplit_sccsid[] = "@(#)fsplit.c	5.5 (Berkeley) 3/12/91";
 #endif /* not lint */
 
 #include <ctype.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -92,9 +99,12 @@ static char 	x[]="zzz000.f",
 static int	extr = FALSE,
 	extrknt = -1,
 	extrfnd[100];
-static char	extrbuf[1000],
-	*extrnames[100];
+static char *extrnames[100];
 static struct stat sbuf;
+
+static char *look(), *skiplab(), *functs();
+static int scan_name();
+static void get_name();
 
 #define trim(p)	while (*p == ' ' || *p == '\t') p++
 
@@ -117,7 +127,7 @@ char *name;
 	return(0);
 }
 
-static int get_name(name, letters)
+static void get_name(name, letters)
 char *name;
 int letters;
 {
@@ -181,11 +191,11 @@ static int lend()
 		return 0 if comment card, 1 if found
 		name and put in arg string. invent name for unnamed
 		block datas and main programs.		*/
-static lname(s)
+static int lname(s)
 char *s;
 {
 #	define LINESIZE 80 
-	register char *ptr, *p, *sptr;
+	register char *ptr, *p;
 	char	line[LINESIZE], *iptr = line;
 
 	/* first check for comment cards */
@@ -323,16 +333,14 @@ int pips_fsplit(char * file_name, FILE *out)
 {
     register FILE *ofp;	/* output file */
     register rv;		/* 1 if got card in output file, 0 otherwise */
-    register char *ptr;
     int nflag,		/* 1 if got name of subprog., 0 otherwise */
 	retval,
 	i;
-    char name[20],
-	*extrptr = extrbuf;
+    char name[20];
 	
     if ((ifp = fopen(file_name, "r")) == NULL) {
-	fprintf(stderr, "fsplit: cannot open %s\n", argv[1]);
-	return FALSE;
+	fprintf(stderr, "fsplit: cannot open %s\n", file_name);
+	return 0;
     }
 
     for(;;) {
@@ -359,14 +367,14 @@ int pips_fsplit(char * file_name, FILE *out)
 				fprintf( stderr, "fsplit: %s not found\n",
 					extrnames[i]);
 			}
-		exit( retval );
+		return ( retval );
 	}
 	if (nflag) {			/* rename the file */
 		if(saveit(name)) {
 			if (stat(name, &sbuf) < 0 ) {
 				link(x, name);
 				unlink(x);
-				printf("%s\n", name);
+				fprintf(out, "%s\n", name);
 				continue;
 			} else if (strcmp(name, x) == 0) {
 				printf("%s\n", x);
@@ -384,5 +392,6 @@ int pips_fsplit(char * file_name, FILE *out)
 		unlink(x);
     }
 
-    return TRUE;
+    return 1;
 }
+
