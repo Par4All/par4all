@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/13 15:23:00 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/13 17:20:20 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -11,8 +11,8 @@
 #
 
 SCRIPT=`basename $0`
-USAGE="$SCRIPT [-h (HELP!)] [-l|p|s|r|i|n|d] [-D|P] [-c|a] (default -c)"
-VERBOSE=':'
+USAGE="$SCRIPT [-h (HELP!)] [-l|p|i|n|d] [-D|P]"
+verbose=':'
 
 MAKEFILE=Makefile
 CONFIG_FILE=config.makefile
@@ -25,28 +25,25 @@ help()
 	$USAGE
 	version $Revision$
 	Builds $MAKEFILE from $CONFIG_FILE for PIPS.
-	  -l|p|s|r|i|n|d: libraries|passes|scripts|runtime|linear|newgen|def...
+	  -l|p|i|n|d: libraries|passes|linear|newgen|default
 	  -D|P: for Development|Production directories
-	  -c|a: for the current|all directory(ies)
 	  -h: this help
 	  -v: verbose
 	  contextual defaults for first and second options.
-	Usefull macros in $CONFIG_FILE: DOCS and
+	Usefull macros in $CONFIG_FILE: 
 	 - libraries/passes/linear: LIB_{CFILES,HEADERS,OBJECTS}
 	   and maybe DERIVED_{HEADERS,CFILES,FILES}
-	 - scripts/runtime/default:
+	 - default:
  	   SOURCES
 	   SCRIPTS (runable files)
-	   INSTALL_{INC,LIB,BIN,DOC,SHR{,RUN},UTL{,RUN}} files to be installed
+	   INSTALL_{INC,LIB,BIN,DOC,SHR,UTL} files to be installed
 	Many default macros are defined and may be overwritten.
 	Many rules are also defined.
 	END_OF_HELP
 }
 
-verbose()
-{
-    echo "$SCRIPT" "$@"
-}
+verb()
+{ echo "$SCRIPT" "$@";}
 
 usage()
 {
@@ -56,35 +53,28 @@ usage()
 }
 
 warning()
-{
-  echo "$SCRIPT: warning, $@" >&2 
-}
+{ echo "$SCRIPT: warning, $@" >&2 ;}
 
 #
 # what is to be done...
 
 DIRSIDE=''
 DIRTYPE=''
-DIRS='.'
 ALL=''
 ALL_RULE_TARGET=''
 
-while getopts lpsrindDPcahv opt
+while getopts lpindDPhv opt
 do
   case $opt in
     l) DIRTYPE='Lib';
        PIPSMKMK_OPTION="$PIPSMKMK_OPTION -l" ;;
     p) DIRTYPE='Passes';
        PIPSMKMK_OPTION="$PIPSMKMK_OPTION -p" ;;
-    s) DIRTYPE='Scripts';
-       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -s" ;;
-    r) DIRTYPE='Runtime';
-       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -r" ;;
     i) DIRTYPE='Linear';
        PIPSMKMK_OPTION="$PIPSMKMK_OPTION -i" ;;
     n) DIRTYPE='Newgen';
        PIPSMKMK_OPTION="$PIPSMKMK_OPTION -n" ;;
-    d) DIRTYPE='';
+    d) DIRTYPE='Default';
        PIPSMKMK_OPTION="$PIPSMKMK_OPTION -d" ;;
     D) DIRSIDE="$PIPS_DEVEDIR" ;
        unset production ;
@@ -92,10 +82,8 @@ do
     P) DIRSIDE="$PIPS_SRCDIR"; 
        production='yes' ;
        PIPSMKMK_OPTION="$PIPSMKMK_OPTION -P" ;;
-    c) DIRS='.';;
-    a) ALL='1' ;;
     h) help ; exit 0 ;;
-    v) VERBOSE=verbose ;;
+    v) verbose=verb ;;
     *) usage 2 "invalid option ($opt)" ;;
   esac
 done
@@ -108,34 +96,43 @@ cd_dirname=`dirname $current_directory`
 
 # set defaults if necessary
 
-[ "${DIRTYPE}" ] || DIRTYPE=`basename $cd_dirname`
-[ "${DIRSIDE}" ] || 
+[ "${Parts}" ] ||
 {
-  if [ "`echo $cd_dirname | sed 's,^.*/Production/.*$,,'`" ]
-  then
-    DIRSIDE="$PIPS_DEVEDIR" ;
-  else
-    production='yes' ;
-    DIRSIDE="$PIPS_SRCDIR" ;
-  fi
+    PART=PIPS
+    [ "`echo $current_directory | grep Linear`" ] && PART=LINEAR 
+    [ "`echo $current_directory | grep Newgen`" ] && PART=NEWGEN
+    $verbose "default PART computed: $PART"
 }
 
-# delayed here to ensure that DIRTYPE is available
+[ "${DIRTYPE}" ] || 
+{
+    DIRTYPE=Default
+    for f in Linear Newgen Lib Passes ; do
+	[ "`echo $current_directory | grep $f`" ] && DIRTYPE=$f
+    done
+    $verbose "defaults DIRTYPE computed: $DIRTYPE"
+}
 
-[ "$ALL" ] && DIRS=${DIRSIDE}/${DIRTYPE}/*
+[ "${DIRSIDE}" ] || 
+{
+  if [ "`echo $current_directory | grep Development`" ]
+  then
+    DIRSIDE=$PIPS_DEVEDIR ;
+  else
+    production='yes' ;
+    DIRSIDE=$PIPS_ROOT/Src ;
+  fi
+  $verbose "default DIRSIDE computed: $DIRSIDE"
+}
 
-# directories for quick-install:
-#
-# install_file_dir for usual files
-# install_lib_dir for library files
-# install_bin_dir for executable files
+$verbose "defining vars..."
 
 PART=PIPS
 
 install_inc_dir='$(PIPS_ROOT)/Include'
 install_lib_dir='$(PIPS_ROOT)/Lib'
 install_bin_dir='$(PIPS_ROOT)/Bin'
-install_src_dir='$(PIPS_ROOT)/Src'/${DIRTYPE}
+install_src_dir='$(PIPS_ROOT)/Src'
 install_shr_dir='$(PIPS_ROOT)/Share'
 install_doc_dir='$(PIPS_ROOT)/Doc'
 install_rtm_dir='$(PIPS_ROOT)/Runtime' ;
@@ -173,31 +170,29 @@ case $DIRTYPE in
   *) usage 5 "unexpected directory type $DIRTYPE"
 esac
 
-$VERBOSE "PART: ${PART}"
-$VERBOSE "DIRS: ${DIRS}"
+$verbose "PART: ${PART}"
+$verbose "DIRSIDE: $DIRSIDE"
+$verbose "DIRTYPE: $DIRTYPE"
+$verbose "pwd: $current_directory"
 
-### main loop
-for dir in $DIRS
-do
-  [ -d $dir ] || continue
-  cd $current_directory
-  cd $dir
-  
-  [ -f $CONFIG_FILE ] || usage 6 "no $CONFIG_FILE in $dir" ;
+[ -f $CONFIG_FILE ] || usage 6 "no $CONFIG_FILE in $current_directory" ;
 
-  # needed because of f.. - in directory names...
-  dir_real_name=`basename \`pwd\``
-  dir_simple_name=`echo $dir_real_name | tr '-' '_'`
-    
-  echo making $DIRTYPE $MAKEFILE in $dir_real_name
+# needed because of f.. - in directory names...
+dir_real_name=`basename $current_directory`
+dir_simple_name=`echo $dir_real_name | tr '-' '_'`
 
-  rm -f $MAKEFILE
+# type sed
+target_dir=`echo "$current_directory" | sed 's,.*/Development/,,'`
+
+echo "Making $DIRTYPE $PART $MAKEFILE in $dir_real_name ($DIRSIDE $target_dir)"
+
+rm -f $MAKEFILE
 
 ##############################################################################
 
-    $VERBOSE "common part"
+$verbose "common part"
 
-    cat >> $MAKEFILE <<%
+cat >> $MAKEFILE <<%
 #	---------------------------------------------------------------
 #	---------------------------------------------------------------
 #
@@ -228,7 +223,7 @@ do
 # DEFAULTS, may be overwritten by the $CONFIG_FILE content.
 #
 TARGET=		${dir_real_name}
-TARGET_DIR=	${install_src_dir}/$(TARGET)
+TARGET_DIR=	${install_src_dir}/${target_dir}
 #
 # default architecture is taken from PIPS_ARCH env. variable
 ARCH=		$(PIPS_ARCH)
@@ -286,7 +281,7 @@ check_install:
 #
 $(ARCH):; mkdir $(ARCH)
 #
-include $(${PART}_INCLUDEDIR)/makefile_macros.$(ARCH)
+include $(${PART}_ROOT)/Include/makefile_macros.$(ARCH)
 include $CONFIG_FILE
 #
 # prefixed objects:
@@ -310,6 +305,12 @@ PROTOIZE=	$(PROTO) $(PRFLAGS) -E "$(PREPROC)"
 #
 $(ARCH)/%.o:	%.c 
 	$(COMPILE) \$< -o \$@
+#
+# MISC
+.runable: $(SCRIPTS)
+	-[ "$(SCRIPTS)" ] && chmod a+rx $(SCRIPTS)
+	touch .runable
+quick-install: .runable
 #
 %
 
@@ -349,35 +350,6 @@ $(LIB_TARGET): $(LIB_OBJECTS) $(TARGET_OBJECTS)
 	-$(RANLIB) $(LIB_TARGET)
 
 %
-
-
-
-##############################################################################
-
-[ $DIRTYPE = 'Scripts' ] && cat >> $MAKEFILE <<%
-
-all: $(RFILES)
-
-SOURCES+=	$(SCRIPTS) $(FILES) $(SFILES) $(CONFIG_FILE) $(DOCS)
-INSTALL_FILE+=	$(FILES)
-INSTALL_LIB+=
-INSTALL_SHR+=	$(SCRIPTS)
-INSTALL_BIN+=	$(RFILES)
-
-.runable: $(SCRIPTS)
-	-[ "$(SCRIPTS)" ] && chmod a+x $(SCRIPTS)
-	touch .runable
-
-.quick-install: .runable $(RFILES)
-
-clean-compiled:
-clean-all-compiled:
-
-clean:
-	-$(RM) *~ core
-
-%
-
 
 
 ##############################################################################
@@ -759,9 +731,6 @@ $PIPS_MAKE depend
 
 ### end good case
 echo
-
-### end main loop
-done
 
 # end of $RCSfile: pips-makemake,v $
 #
