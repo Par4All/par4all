@@ -15,9 +15,11 @@ all: pipsrc.sh pipsrc.csh
 
 pipsrc.sh: pipsrc.ref
 	$(SHELL) make-pipsrc.sh 
+	chmod a-w pipsrc.sh
 
 pipsrc.csh: pipsrc.sh
 	$(SHELL) make-pipsrc.csh 
+	chmod a-w pipsrc.csh
 
 # that is all
 #
