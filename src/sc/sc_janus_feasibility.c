@@ -26,6 +26,7 @@ FILE *fopen(), *fdebug;
 struct initpb I; 
 struct problem Z;
 
+#define INT_TO_VALUE(i) (int_to_value(i))
 #define FTRACE fdebug
 //sc must be consistant
 //return TRUE if janus can handle, FALSE if not
