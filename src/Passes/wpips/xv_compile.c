@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/22 17:25:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/27 15:49:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/09/22 17:25:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/09/27 15:49:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -79,7 +79,7 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
    char * file_names[ARGS_LENGTH];
    int file_number = 0;
 
-   pips_debug(1, "Enter\n");
+   pips_debug(2, "Enter\n");
    
    menu = (Menu) xv_get(menu_item, MENU_PULLRIGHT);
    
@@ -89,7 +89,7 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
         int return_code;
         char *hpfc_directory;
         
-        pips_debug(1, "MENU_DISPLAY\n");
+        pips_debug(2, "MENU_DISPLAY\n");
    
         /* Create a new menu with the content of the hpfc directory: */
         
@@ -160,25 +160,25 @@ generate_a_menu_with_HPF_output_files(Menu_item menu_item,
        /* We cannot remove the menu here since the notify
           procedure is called afterward. */
        menu = (Menu) xv_get(menu_item, MENU_PULLRIGHT);
-       debug(1, "generate_a_menu_with_HPF_output_files", "MENU_DISPLAY_DONE\n");
+       debug(2, "generate_a_menu_with_HPF_output_files", "MENU_DISPLAY_DONE\n");
        break;
 
      case MENU_NOTIFY:
        /* Rely on the notify procedure. */
        menu = (Menu) xv_get(menu_item, MENU_PULLRIGHT);
-       debug(1, "generate_a_menu_with_HPF_output_files", "MENU_NOTIFY\n");
+       debug(2, "generate_a_menu_with_HPF_output_files", "MENU_NOTIFY\n");
        break;
 
      case MENU_NOTIFY_DONE:
        menu = (Menu) xv_get(menu_item, MENU_PULLRIGHT);
-       debug(1, "generate_a_menu_with_HPF_output_files", "MENU_NOTIFY_DONE\n");
+       debug(2, "generate_a_menu_with_HPF_output_files", "MENU_NOTIFY_DONE\n");
        break;
 
      default:
        pips_error("generate_a_menu_with_HPF_output_files",
                   "Unknown Menu_generate action: %d\n", action);
    }
-   debug(1, "generate_a_menu_with_HPF_output_files", "Exit\n");
+   debug(2, "generate_a_menu_with_HPF_output_files", "Exit\n");
    return menu;
 }
 
