@@ -269,7 +269,8 @@ transformer tf;
 	    invariant_wrt_transformer(transformer_dup(pre),tf);
 	debug(8,"unstructured_to_postcondition",
 	      "complex: based on transformer\n");
-	(void) unstructured_to_postconditions(pre_u, u) ;
+	/* FI: I do not know if I should duplicate pre or not. */
+	(void) unstructured_to_postconditions(pre_u, pre, u) ;
 	post = transformer_apply(tf, pre);
     }
 
@@ -278,8 +279,9 @@ transformer tf;
     return post;
 }
 
-void unstructured_to_postconditions(pre, u)
+void unstructured_to_postconditions(pre, pre_first, u)
 transformer pre;
+transformer pre_first;
 unstructured u ;
 {
     cons *blocs = NIL ;
@@ -291,7 +293,17 @@ unstructured u ;
        I do not know if it's good or not but beware the bugs!!! */
     CONTROL_MAP(c, {
 	statement st = control_statement(c) ;
-	(void) statement_to_postcondition(pre, st) ;
+	if(c==ct && ENDP(control_predecessors(c))) {
+	    /* special case for the first node if it has no predecessor */
+	    /* this is pretty useless and should be generalized to the
+	       DAG part of the CFG */
+	    pips_assert("unstructured_to_postcondition", 
+			statement_test_p(st));
+	    (void) statement_to_postcondition(pre_first, st);
+	}
+	else {
+	    (void) statement_to_postcondition(pre, st);
+	}
     }, ct, blocs) ;
 
     gen_free_list(blocs) ;
