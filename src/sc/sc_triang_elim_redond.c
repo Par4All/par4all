@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1995/01/31 10:36:14 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1995/03/24 11:04:39 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -118,7 +118,7 @@ Pcontrainte *pc1, *pc2;
     Pvecteur
 	v1 = (*pc1)->vecteur,
 	v2 = (*pc2)->vecteur;
-    int null_1, null_2, i, irank=0, cost_1, cost_2, val_p;
+    int null_1, null_2, i, irank=0, cost_1, cost_2, val_p=0;
     Value val_1, val_2, val=0;
     Pbase b, high=NULL;
 
@@ -156,7 +156,7 @@ Pcontrainte *pc1, *pc2;
 
     /*   compare the coefficients for the base
      */
-    for (b=high->succ; !BASE_NULLE_P(b); b=b->succ)
+    for (b=high==NULL ? NULL : high->succ; !BASE_NULLE_P(b); b=b->succ)
     {
 	val_1 = vect_coeff(var_of(b), v1),
 	val_2 = vect_coeff(var_of(b), v2);
@@ -234,8 +234,6 @@ int *prank;
     return(result);
 }
 
-
-
 /*  sorts the constraints according to the compare function,
  *  and set the number of constraints for each index of the sort base
  */
@@ -265,8 +263,11 @@ int info[][2];
     for (i=0, pc=c; pc!=NULL; i++, pc=pc->succ)
     {
 	tc[i] = pc;
-	phrank = highest_rank_pvector(pc->vecteur, sort_base, &rank);
-	info[rank==-1 ? 0 : rank][rank==-1 ? 0 : (val_of(phrank)>0 ? 1 : 0)]++;
+	if (!BASE_NULLE_P(sort_base))
+	{
+	    phrank = highest_rank_pvector(pc->vecteur, sort_base, &rank);
+	    info[rank==-1?0:rank][rank==-1?0:(val_of(phrank)>0?1:0)]++;
+	}
     }
     
    qsort(tc, nb_of_constraints, sizeof(Pcontrainte), compare);
