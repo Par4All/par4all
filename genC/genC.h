@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1995/10/02 13:52:35 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1995/12/14 17:26:54 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -154,7 +154,8 @@ extern gen_chunk *gen_make_array GEN_PROTO(( int )) ;
 extern gen_chunk *gen_alloc GEN_PROTO((int, int, int, ...)) ; 
 extern void gen_init_external GEN_PROTO((int, 
 					 char *(*)(), void (*)(), 
-					 void (*)(), char *(*)() )) ;
+					 void (*)(), char *(*)(), 
+					 int (*)() )) ;
 extern gen_chunk *gen_check GEN_PROTO(( gen_chunk *, int )) ;
 extern int gen_type GEN_PROTO((gen_chunk *)) ;
 extern char *gen_domain_name GEN_PROTO((int)) ;
