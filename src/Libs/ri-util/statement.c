@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.75  2003/07/23 13:51:13  irigoin
+    New debugging function all_statements_defined_p() added
+
     Revision 1.74  2003/06/17 13:51:35  coelho
     hop.
 
@@ -2260,6 +2263,38 @@ list statement_to_implicit_target_labels(statement s)
   
   return ll;
 }
+
+/* Make sure that s and all its substatements are defined */
 
+static bool undefined_statement_found_p(statement s, bool * p_undefined_p)
+{
+  if(!(* p_undefined_p)) {
+    ifdebug(9) {
+      fprintf(stderr, "----\n");
+      /* The recursive descent in s is fatal when there is a problem. */
+      /* print_statement(s); */
+      if(statement_undefined_p(s)) {
+	/* You probably want a breakpoint here... */
+	abort();
+      }
+      else {
+	pips_debug(9,"checking statement %03d (%d,%d) with address %p:\n",
+		   statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
+		   ORDERING_STATEMENT(statement_ordering(s)), s);
+      }
+    }
+    * p_undefined_p = statement_undefined_p(s);
+  }
+  return !(* p_undefined_p);
+}
+
+bool all_statements_defined_p(statement s)
+{
+  bool undefined_p = FALSE;
+
+  gen_context_recurse(s, (void *) &undefined_p ,statement_domain,
+		      undefined_statement_found_p, gen_null);
+  return !undefined_p;
+}
 
 /* That's all folks */
