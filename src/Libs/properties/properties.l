@@ -1,3 +1,9 @@
+/* $RCSfile: properties.l,v $ (version $Revision$)
+ * $Date: 1997/01/13 20:44:17 $, 
+ * 
+ * - 01/96: PIPS_PROPERTIESRC added. FC.
+ */
+
 %{
 /* The syntax of a property list. */
 
@@ -122,24 +128,37 @@ bool property_equal_p(property p1, property p2)
 
 static void read_properties()
 {
-    string rc = PROPERTIES_LIB_FILE;
+    string rc;
 
     if (pl != (hash_table) NULL)
 	return;
+    else
+	pl = hash_table_make(hash_string, 0);
 
-    pl = hash_table_make(hash_string, 0);
-
-    if ((yyin = fopen(rc, "r")) == NULL) {
+    /* ${PIPS_ROOT}/Share/properties.rc
+     */
+    rc = PROPERTIES_LIB_FILE;
+    if ((yyin = fopen(rc, "r")) == NULL)
 	pips_internal_error("no default properties (%s)\n", rc);
-    }
     else
 	parse_properties();
-
     free(rc);
 
-    if ((yyin = fopen(PROPERTIES_FILE, "r")) != NULL) {
-	parse_properties();
+    /* ${PIPS_PROPERTIESRC}
+     */
+    rc = getenv("PIPS_PROPERTIESRC");
+    if (rc)
+    {
+	if ((yyin = fopen(rc, "r")) == NULL) 
+	    pips_internal_error("no properties (%s)\n", rc);
+	else
+	    parse_properties();
     }
+    
+    /* ./properties.rc
+     */
+    if ((yyin = fopen(PROPERTIES_FILE, "r")) != NULL)
+	parse_properties();
 }
 
 property get_property(name)
