@@ -1,5 +1,5 @@
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1997/04/26 10:00:22 $m 
+#
+# $Id$
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
@@ -22,7 +22,8 @@ LIB_CFILES=	util.c \
 		statement.c \
 		return.c \
 		malloc-info.c \
-		clean.c
+		clean.c \
+		macros.c
 
 LIB_HEADERS=	f77keywords \
 		f77symboles \
