@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.12  1999/05/28 09:15:37  coelho
+   cleaner and more comments.
+
    Revision 1.11  1999/05/27 16:51:01  ancourt
    also ICM direct expressions such as conditions and bounds.
 
@@ -40,9 +43,12 @@
    sequences (a sort of perfect loop nest).
 */
 
-/* option: whether to push the procedure statement.
+/* option: 
+   - whether to push the procedure statement (default no).
+   - whether to do ICM or not directly (default yes).
  */
-#define PUSH_BODY
+/* #define PUSH_BODY */
+/* #define NO_ICM */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,7 +72,7 @@
 
 #include "eole_private.h"
 
-extern char * itoa(int); /* in newgen */
+extern char * itoa(int); /* somewhere in newgen */
 
 /***************************************** COMMUTATIVE ASSOCIATIVE OPERATORS */
 
@@ -101,7 +107,7 @@ Is_Associatif_Commutatif(entity e)
 
 /* assumes:
    - cumulated effects (as a dependence abstraction).
-   - proper effects (?)
+   - proper effects for statements AND sub-expressions...
  */
 
 /* current nesting of code, bottom-up order, to determine level.
@@ -199,10 +205,17 @@ static int expr_level_of(expression e)
 }
 
 /* or for a statement. */
+/*
 static int stat_level_of(statement s)
 {
   list le = load_proper_rw_effects_list(s);
   return level_of(le);
+}
+*/
+
+static int current_level(void)
+{
+  return gen_length(nesting);
 }
 
 /* returns the statement of the specified level
@@ -210,17 +223,14 @@ static int stat_level_of(statement s)
  */
 static statement statement_of_level(int level)
 {
-  int n = gen_length(nesting)-1-level;
-  
+#if !defined(NO_ICM)
+  int n = current_level()-1-level;
+
   if (n>=0)
     return STATEMENT(gen_nth(n, nesting));
   else
+#endif
     return current_statement_head();
-}
-
-static int current_level(void)
-{
-  return gen_length(nesting);
 }
 
 static bool currently_nested_p(void)
@@ -245,7 +255,7 @@ static void insert_before_statement(statement news, statement s)
       pips_assert("inserted in block", statement_block_p(sb));
 
       /* statements are stored in reverse order...
-	 this will have to be fixed latter on.
+	 this will have to be fixed latter on. see #1#.
        */
       instruction_block(i) = CONS(STATEMENT, news, instruction_block(i));
     }
@@ -502,6 +512,8 @@ static void loop_rwt(loop l)
   statement sofl = current_statement_head();
   pop_nesting(sofl);
 
+  /* deal with loop bound expressions
+   */
   if (!currently_nested_p()) return;
   bounds = loop_range(l);
   level = current_level();
@@ -521,7 +533,7 @@ static void insert_rwt(statement s)
       sequence seq;
       pips_assert("it is a sequence", instruction_sequence_p(i));
 
-      /* reverse list */
+      /* reverse list of inserted statements (#1#) */
       seq = instruction_sequence(i);
       sequence_statements(seq) = gen_nreverse(sequence_statements(seq));
 
@@ -538,6 +550,7 @@ static void insert_rwt(statement s)
 
 /* perform ICM and association on operators.
    this is kind of an atomization.
+   many side effects: modifies the code, uses simple effects
  */
 void 
 perform_icm_association(
@@ -570,8 +583,8 @@ perform_icm_association(
   gen_multi_recurse(s,
       statement_domain, current_statement_filter, current_statement_rewrite,
       instruction_domain, gen_true, atomize_instruction,
-      test_domain, gen_true, atomize_test,
       loop_domain, loop_flt, loop_rwt,
+      test_domain, gen_true, atomize_test,
       whileloop_domain, gen_true, atomize_whileloop,
       /* could also push while loops... */
       expression_domain, gen_true, atomize_or_associate,
@@ -579,7 +592,7 @@ perform_icm_association(
       reference_domain, gen_false, gen_null,
 		    NULL);
 
-  /* insert moved code. */
+  /* insert moved code in statement. */
   gen_multi_recurse(s, statement_domain, gen_true, insert_rwt, NULL);
 
 #if defined(PUSH_BODY)
