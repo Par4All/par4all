@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/19 13:58:25 $, 
+ * $Date: 1996/06/19 16:31:02 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -124,7 +124,7 @@ static void pr_statement_wrt(statement s)
     reductions rs = load_proper_reductions(s);
 
     /* must check that the found reductions are
-     * (1) without side effects (no W on any other that accumulators)
+     * (1) without side effects (no W on any other than accumulators)
      * (2) compatible one with respect to the other...
      * (3) not killed by proper effects on accumulators...
      */
