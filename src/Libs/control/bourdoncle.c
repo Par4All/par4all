@@ -23,6 +23,9 @@
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.3  2002/06/05 14:42:02  irigoin
+ First good restructuring for semantics/Validation/unstruc10.f
+
  Revision 1.2  2002/06/04 16:07:04  irigoin
  Lots of new development. Still not working recursively. Only the deepest
  cycle in unstruc10.f is handled.
@@ -196,8 +199,39 @@ static void print_embedding_graph(control c)
 	
       }
 	  , control_successors(ec));
-     }
+    }
 	, embedding_control_list);
+
+    /* Make sure that no meaningful node only has meaningless successors */
+    MAP(CONTROL, ec, {
+      if(!meaningless_control_p(ec)) {
+	bool meaningless_p = !ENDP(control_successors(ec));
+      
+	MAP(CONTROL, succ, {
+	  if(!meaningless_control_p(succ)) {
+	    meaningless_p = FALSE;
+	  }
+	}, control_successors(ec));
+
+	if(meaningless_p) {
+	  consistent_embedding_graph_p = FALSE;
+	  fprintf(stderr, "Control %p only has meaningless successors\n",
+		  ec);
+	}
+      }
+    },  embedding_control_list);
+
+    /* Make sure that no node has any meaningless predecessor */
+    MAP(CONTROL, ec, {
+      MAP(CONTROL, pred, {
+	if(meaningless_control_p(pred)) {
+	  consistent_embedding_graph_p = FALSE;
+	  fprintf(stderr, "Control %p has meaningless predecessor %p\n",
+		  ec, pred);
+	}
+      }, control_predecessors(ec));
+    }, embedding_control_list);
+
     pips_assert("The embedding graph is consistent", consistent_embedding_graph_p);
     gen_free_list(embedding_control_list);
     embedding_control_list = NIL;
@@ -210,7 +244,7 @@ static list node_to_linked_nodes(control c)
 {
   list l = list_undefined;
   
-  pips_debug(2, "Linked nodes for vertex %p:\n", c);
+  pips_debug(8, "Linked nodes for vertex %p:\n", c);
   pips_assert("The embedding control list is NIL", embedding_control_list == NIL);
 
   gen_multi_recurse(c, statement_domain, gen_false, gen_null,
@@ -218,8 +252,8 @@ static list node_to_linked_nodes(control c)
   l = embedding_control_list;
   embedding_control_list = NIL;
 
-  ifdebug(2) {
-    pips_debug(2, "End with list:\n");
+  ifdebug(8) {
+    pips_debug(8, "End with list:\n");
     print_control_nodes(l);
   }
 
@@ -584,7 +618,7 @@ void intersect_successors_with_partition_or_complement(control c,
     pips_assert("The unique successor must be in partition",
 		gen_in_list_p(c, partition)==!complement_p);
   }
-  else if (gen_length(*succs)==2){
+  else if (gen_length(*succs)==2 && statement_test_p(control_statement(c))){
     /* Let's boldy assume the parent control node is associated to a test
        statement and preserve the number of successors. */
     MAPL(succ_c, 
@@ -678,8 +712,8 @@ static void update_successor_in_copy(control new_pred,
   list succ_c = list_undefined;
   list new_succ_c = list_undefined;
 
-  ifdebug(2) {
-    pips_debug(2, "Begin for new_pred=%p, pred=%p, c=%p, new_c=%p\n",
+  ifdebug(8) {
+    pips_debug(8, "Begin for new_pred=%p, pred=%p, c=%p, new_c=%p\n",
 	       new_pred, pred, c, new_c);
     print_control_node(new_pred);
     print_control_node(pred);
@@ -720,8 +754,8 @@ static void update_successor_in_copy(control new_pred,
   pips_assert("The leftover two successor lists still have same length",
 	      gen_length(succ_c) == gen_length(new_succ_c));
 
-  ifdebug(2) {
-    pips_debug(2, "End with new_pred=%p, pred=%p, c=%p, new_c=%p\n",
+  ifdebug(8) {
+    pips_debug(8, "End with new_pred=%p, pred=%p, c=%p, new_c=%p\n",
 	       new_pred, pred, c, new_c);
     print_control_node(new_pred);
     print_control_node(pred);
@@ -752,10 +786,14 @@ static void shallow_free_control(control c)
 
   free_control(c);
 }
-
+
 /* The nodes in scc partition but root must be removed. Replicated nodes
    must be added to build all input and output paths to and from root
-   using control nodes in partition. */
+   using control nodes in partition.
+
+   This is the key change to Bourdoncle's algorithm. When moving back up
+   in the recursion, the CFG is altered to obtain pure cycles with only
+   one entry and one exit nodes. */
 
 static unstructured scc_to_dag(control root, list partition, hash_table ancestor_map)
 {
@@ -767,9 +805,9 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
   int number_in = 0;
   int number_out = 0;
   int iteration = 0;
-  
-  ifdebug(2) {
-    pips_debug(2, "Begin for vertex %p and partition:\n", root);
+
+  ifdebug(3) {
+    pips_debug(3, "Begin for vertex %p and partition:\n", root);
     print_control_nodes(partition);
   }
 
@@ -793,7 +831,7 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
 				gen_copy_seq(control_successors(c)));
 	  add_child_parent_pair(ancestor_map, new_c1, c);
 
-	  pips_debug(2, "Allocate new input control node new_c1=%p as a copy of node %p\n",
+	  pips_debug(4, "Allocate new input control node new_c1=%p as a copy of node %p\n",
 		new_c1, c);
 	  
 	  /* Keep only predecessors out of partition for new_c1. */
@@ -837,17 +875,17 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
     }
 	, partition);
 
-    ifdebug(2) {
+    ifdebug(4) {
       if(number>0) {
-	pips_debug(2, "Embedding graph after replication"
+	pips_debug(4, "Embedding graph after replication"
 		   " of %d input control node(s) at iteration %d:\n",
 		   number, iteration);
 	print_embedding_graph(root);
-	pips_debug(2, "End of embedding graph after replication"
+	pips_debug(4, "End of embedding graph after replication"
 		   " of input control nodes\n");
       }
       else {
-	pips_debug(2, "No new input control node at iteration %d\n",
+	pips_debug(4, "No new input control node at iteration %d\n",
 		   iteration);
       }
     }
@@ -868,7 +906,7 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
 				gen_copy_seq(control_successors(c)));
 	  add_child_parent_pair(ancestor_map, new_c2, c);
 
-	  pips_debug(2, "Allocate new output control node new_c2=%p as a copy of node %p\n",
+	  pips_debug(4, "Allocate new output control node new_c2=%p as a copy of node %p\n",
 		new_c2, c);
 
 	  /* Keep only successors out of partition for new_c2. */
@@ -918,31 +956,31 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
     }
 	, partition);
 
-    ifdebug(2) {
+    ifdebug(3) {
       if(number>0) {
-	pips_debug(2, "Embedding graph after replication"
+	pips_debug(3, "Embedding graph after replication"
 		   " of output control nodes at iteration %d:\n", iteration);
 	print_embedding_graph(root);
-	pips_debug(2, "End of embedding graph after replication"
+	pips_debug(3, "End of embedding graph after replication"
 		   " of output control nodes\n");
       }
       else {
-	pips_debug(2, "No new input control node at iteration %d\n", iteration);
+	pips_debug(3, "No new input control node at iteration %d\n", iteration);
       }
     }
 
   }
 
-  ifdebug(2) {
+  ifdebug(3) {
     if(number_out>0) {
       pips_assert("At least two iterations", iteration>1);
-      pips_debug(2, "Final embedding graph after replication of all input and output paths (%d iterations)\n", iteration);
+      pips_debug(3, "Final embedding graph after replication of all input and output paths (%d iterations)\n", iteration);
       print_embedding_graph(root);
-      pips_debug(2, "End of final embedding graph after replication of all input and output paths\n");
+      pips_debug(3, "End of final embedding graph after replication of all input and output paths\n");
     }
     else {
       pips_assert("Only one iteration", iteration==1);
-      pips_debug(2, "No new output paths\n");
+      pips_debug(3, "No new output paths\n");
     }
   }
 
@@ -983,14 +1021,14 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
   }
       , partition);
   
-  ifdebug(2) {
+  ifdebug(3) {
     list l_root = node_to_linked_nodes(root);
     list l_new_root = node_to_linked_nodes(new_root);
     
-    pips_debug(2, "Nodes linked to root=%p\n", root);
+    pips_debug(3, "Nodes linked to root=%p\n", root);
     print_control_node(root);
     print_control_nodes(l_root);
-    pips_debug(2, "Nodes linked to new_root=%p\n", new_root);
+    pips_debug(3, "Nodes linked to new_root=%p\n", new_root);
     print_control_node(new_root);
     print_control_nodes(l_new_root);
     
@@ -1003,12 +1041,12 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
 		  ENDP(l_root));
     }
     
-    pips_debug(2, "Final embedding graph after replication and cycle removal\n");
+    pips_debug(3, "Final embedding graph after replication and cycle removal\n");
     print_embedding_graph(root);
-    pips_debug(2, "End of final embedding graph after replication and cycle removal\n");
-    pips_debug(2, "Final cycle graph\n");
+    pips_debug(3, "End of final embedding graph after replication and cycle removal\n");
+    pips_debug(3, "Final cycle graph\n");
     print_embedding_graph(new_root);
-    pips_debug(2, "End of final cycle graph\n");
+    pips_debug(3, "End of final cycle graph\n");
 
     /* All nodes are linked to an ancestor node or are an ancestor or are
        meaningless */
@@ -1023,8 +1061,8 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
     gen_free_list(l_new_root);
   }
    
-  ifdebug(2) {
-    pips_debug(2, "End with %d replicated control nodes:\n\n", number_in+number_out);
+  ifdebug(3) {
+    pips_debug(3, "End with %d replicated control nodes:\n\n", number_in+number_out);
     if(number_in>0){
       print_control_to_control_mapping("replicated_input_controls",
 				       replicated_input_controls);
@@ -1074,8 +1112,8 @@ unstructured bourdoncle_partition(unstructured u,
 
   new_u = unstructured_shallow_copy(u, ancestor_map);
 
-  ifdebug(2) {
-    pips_debug(2, "Copied unstructured new_u:\n");
+  ifdebug(3) {
+    pips_debug(3, "Copied unstructured new_u:\n");
     print_unstructured(new_u);
   }
       
@@ -1088,12 +1126,51 @@ unstructured bourdoncle_partition(unstructured u,
   root = unstructured_control(new_u);  
   (void) bourdoncle_visit(root, &partition, ancestor_map, scc_map);
     
+  /* Should the partition be translated? */
+
   free_vertex_stack();
   hash_table_free(dfn);
 
   ifdebug(2) {
+    int number_of_fix_points = 0;
+
     pips_debug(2, "End with partition:");
     print_control_nodes(partition);
+
+    pips_debug(2, "End with scc_map:\n");
+    HASH_MAP(h, uc, {
+      number_of_fix_points++;
+      fprintf(stderr, "head=%p with unstructured=%p\n", h, uc);
+    } , scc_map);
+    pips_debug(2, "End with %d fix points\n", number_of_fix_points);
+
+    /* Control nodes associated to a fix point */
+    pips_debug(2, "\nControl nodes associated to a fix point via a sub-unstructured:\n");
+    HASH_MAP(c_n, c_o, {
+      void * su;
+      if((su==hash_get(scc_map, c_o))!=HASH_UNDEFINED_VALUE) {
+	fprintf(stderr, "head=%p copy of %p with unstructured=%p\n", c_n, c_o, su);
+      }
+    }, ancestor_map);
+    
+    /* The hierarchy of fix points is/seems to be lost by scc_map... */
+    pips_debug(2, "End with %d sets of cycles:\n", number_of_fix_points);
+    number_of_fix_points = 0;
+    HASH_MAP(h, uc, {
+      number_of_fix_points++;
+      fprintf(stderr, "Cycles associated to head=%p with unstructured=%p (fix point %d)\n",
+	      h, uc, number_of_fix_points);
+      print_unstructured((unstructured) uc);
+      fprintf(stderr, "\n");
+    } , scc_map);
+
+    /* We also need the final embedding graph... which might be lost? Or
+       hanging from the first node in partition, the entry point, and hence from new_u. */
+    pips_debug(2, "Final embedding graph:\n");
+    print_unstructured(new_u);
+
+    pips_debug(2, "End. \n");
+    
   }
 
   *p_ancestor_map = ancestor_map;
@@ -1102,18 +1179,75 @@ unstructured bourdoncle_partition(unstructured u,
   return new_u;
 }
 
-static void update_partition(control vertex,
+/* FUNCTIONS FOR BOURDONCLE_COMPONENT()
+ */
+
+/* Check the existence of a path from b to e with all its element in partition */
+static bool partition_successor_p(control b, control e, list partition)
+{
+  bool path_p = FALSE;
+  list preds = CONS(CONTROL, b, NIL);
+  list succs = NIL;
+  list not_seen = gen_copy_seq(partition);
+  int length = 0;
+
+  pips_debug(8, "Begin with b=%p abd e=%p\n", b, e)
+
+  ifdebug(8) {
+    pips_assert("b is in partition", gen_in_list_p(b, partition));
+    pips_assert("e is in partition", gen_in_list_p(e, partition));
+    /* You might be interested in the existence of a cycle from b to b */
+    /* pips_assert("b is not e", b!=e); */
+  }
+
+  gen_remove(&not_seen, b);
+
+  while(!ENDP(preds)){
+    length++;
+    pips_debug(8, "Iteration %d\n", length);
+    MAP(CONTROL, pred, {
+      pips_debug(8, "\tpred=%p\n", pred);
+      MAP(CONTROL, succ, {
+	pips_debug(8, "\t\tsucc=%p\n", succ);
+	if(succ==e) {
+	  path_p = TRUE;
+	  goto end;
+	}
+	else if(gen_in_list_p(succ, not_seen)) {
+	  gen_remove(&not_seen, succ);
+	  succs = CONS(CONTROL, succ, succs);
+	}
+      } , control_successors(pred));
+    } , preds);
+    gen_free_list(preds);
+    preds = succs;
+    succs = NIL;
+  }
+
+ end:
+  gen_free_list(not_seen);
+  gen_free_list(preds);
+  gen_free_list(succs);
+
+  pips_debug(8, "End: path_p=%s\n", bool_to_string(path_p));
+  
+  return path_p;
+}
+
+static void update_partition(control root,
 			     list partition,
 			     hash_table ancestor_map)
 {
   /* Controls in partition may have been copied and may not appear anymore
-     in the graph embedding vertex. The input graph is modified to
+     in the graph embedding root. The input graph is modified to
      separate clean cycles with one entry-exit node, but Bourdoncle's
      algorithm is not aware of this.  */
-  list embedding_nodes = node_to_linked_nodes(vertex);
+  list embedding_nodes = node_to_linked_nodes(root);
   int changes = 0;
-
-  pips_assert("The head is in the partition", gen_in_list_p(vertex, partition));
+  int eliminations = 0;
+  list eliminated = NIL;
+  
+  pips_assert("The head is in the partition", gen_in_list_p(root, partition));
 
   ifdebug(2) {
     pips_debug(2, "Begin for partition:\n");
@@ -1135,10 +1269,13 @@ static void update_partition(control vertex,
 
       MAP(CONTROL, c_new, 
       {
-	control a_new = control_to_ancestor(c_new, ancestor_map);
-	if(a==a_new) {
-	  replacement_list = CONS(CONTROL, c_new, replacement_list);
+	if(!meaningless_control_p(c_new)) {
+	  control a_new = control_to_ancestor(c_new, ancestor_map);
+	  if(a==a_new) {
+	    replacement_list = CONS(CONTROL, c_new, replacement_list);
+	  }
 	}
+	
       }
 	  , embedding_nodes);
 
@@ -1162,16 +1299,70 @@ static void update_partition(control vertex,
 
   ifdebug(2) {
     if(changes==0) {
-      pips_debug(2, "End with same partition\n");
+      pips_debug(2, "No renaming\n");
     }
     else{
-      pips_debug(2, "End with new partition:\n");
+      pips_debug(2, "After renaming, new partition:\n");
+      print_control_nodes(partition);
+    }
+  }
+
+  /* Some nodes may no longer be part of the partition because they only
+     belonged to an inner cycle which has already been eliminated. */
+  eliminations = 0;
+  eliminated = NIL;
+  
+  MAP(CONTROL, c, {
+    if(c==root) {
+      pips_assert("There is a path from root to root in partition",
+		  partition_successor_p(c, root, partition));
+    }
+    else {
+      if(!partition_successor_p(c, root, partition)){
+	eliminated = CONS(CONTROL, c, eliminated);
+      }
+    }
+  } , partition);
+
+  eliminations = gen_length(eliminated);
+
+  ifdebug(2) {
+    if(eliminations>0) {
+      pips_debug(2, "Control(s) to be eliminated from partition:\n");
+      print_control_nodes(eliminated);
+    }
+  }
+
+  /* It does not make sense to use &partition but... */
+  pips_assert("root is the fist element in partition",
+	      CONTROL(CAR(partition))==root);
+  pips_assert("root is not eliminated",
+	      !gen_in_list_p(root, eliminated));
+  gen_list_and_not(&partition, eliminated);
+  
+  gen_free_list(eliminated);
+  
+  ifdebug(2) {
+    if(eliminations==0 && changes==0) {
+      pips_debug(2, "End with same partition (no renaming, no elimination\n");
+    }
+    else if(eliminations==0){
+      pips_debug(2, "End with renamed partition (%d renamings, no elimination)\n",
+		 changes);
+    }
+    else if(changes==0){
+      pips_debug(2, "End with reduced partition (no renamings, %d eliminations)\n",
+		 eliminations);
+    }
+    else{
+      pips_debug(2, "End with new partition (%d renamings, %d eliminations):\n",
+		 changes, eliminations);
       print_control_nodes(partition);
     }
   }
 }
 
-
+
 list bourdoncle_component(control vertex,
 			  hash_table ancestor_map,
 			  hash_table scc_map)
@@ -1204,7 +1395,12 @@ list bourdoncle_component(control vertex,
 
   /* The partition may have to be refreshed because of the previous
      recursive descent and its graph restructuring action. It is assumed
-     that vertex is still good. */
+     that vertex is still good because heads are not: however vertex is
+     not an ancestor because the input unstructured is copied right away
+     by bourdoncle_partition().
+
+     It might be better to recompute the smallest scc including
+     vertex... */
   update_partition(vertex, partition, ancestor_map);
   
   /* Update parent unstructured containing vertex and partition, remove
