@@ -1,10 +1,11 @@
 #
-# $RCSfile: config.makefile,v $ for stats
+# $Id$
 #
 
 SCRIPTS = 	print-dg-statistics \
-		print-regions-op-statistics\
-		print-regions-translation-statistics
+		print-regions-op-statistics \
+		print-regions-translation-statistics \
+		parallelization_statistics
 
 FILES =		dg-statistics.awk \
 		dg-statistics.texheader \
