@@ -1,6 +1,6 @@
 # PROJET PIPS: EXPLOITATION DE LA DOCUMENTATION
 # ---------------------------------------------
-# $RCSfile: old_documentation_makefile,v $ ($Date: 1996/02/16 08:46:30 $, )
+# $RCSfile: old_documentation_makefile,v $ ($Date: 1996/02/23 14:58:51 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -266,11 +266,11 @@ LOT9 = dret134.printed dret136.printed dret137.printed \
 
 # EXTRACTION DE FICHIERS C ET HTML A PARTIR DE FICHIERS LATEX
 
-all: documentation-html \
-	$(LIBDIR)/pipsmake.rc \
+all:	$(LIBDIR)/pipsmake.rc \
 	$(LIBDIR)/properties.rc \
 	$(LIBDIR)/wpips.rc \
-	$(INCLUDEDIR)/wpips_transform_menu_layout.h
+	$(INCLUDEDIR)/wpips_transform_menu_layout.h \
+	documentation-html 
 
 documentation-html: pipsmake-rc.dvi properties-rc.dvi
 	(cd public_html; $(MAKE))
