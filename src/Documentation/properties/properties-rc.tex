@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.114  1997/12/05 19:50:59  coelho
+%% comments added about PIPSMAKE_CHECKPOINTS.
+%%
 %% Revision 1.113  1997/12/05 17:34:26  coelho
 %% PIPSMAKE_CHECKPOINTS...
 %%
@@ -43,7 +46,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1997/12/05 17:34:26 $~$
+$~$Date: 1997/12/05 19:50:59 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -228,7 +231,15 @@ ACTIVATE_DEL_DERIVED_RES TRUE
 \end{verbatim}
 
 How often resources should be saved and freed. $0$ means never, and 
-a positive value means every $n$ applications of a rule.
+a positive value means every $n$ applications of a rule. This feature
+was added to allow long big automatic tpips scripts that can coredump and
+be restarted latter on close to the state before the core. As another side
+effect, it allows to free the memory and to keep memory consumption as
+moderate as possible, as opposed to usual tpips runs which keep all
+memory allocated. Note that it should not be too often saved, because it
+may last a long time, especially when entities are considered on big
+workspaces. The frequency may be adapted in a script, rarely at the
+beginning to more often latter.
 
 \begin{verbatim}
 PIPSMAKE_CHECKPOINTS 0
