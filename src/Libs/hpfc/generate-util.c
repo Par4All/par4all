@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/04/20 18:34:17 $, ) 
+ * ($Date: 1995/04/21 10:28:19 $, ) 
  */
 
 #include "defines-local.h"
@@ -39,7 +39,7 @@ entity (*creation)(/* int */);
  *
  * the le list of expression is used to generate the deducables.
  * The fields of interest are the variable which is referenced and 
- * the normalized filed which is the expression that is going to
+ * the normalized field which is the expression that is going to
  * be used to define the variable.
  */
 statement generate_deducables(le)
@@ -72,7 +72,7 @@ list le;
     return(make_block_statement(ls));
 }
 
-list hpfc_gen_n_vars_expr(creation, number)
+static list hpfc_gen_n_vars_expr(creation, number)
 entity (*creation)();
 int number;
 {
@@ -84,6 +84,13 @@ int number;
 		      result);
 
     return(result);
+}
+
+expression make_reference_expression(e, creation)
+entity e, (*creation)();
+{
+    return(reference_to_expression(make_reference(e,
+	   hpfc_gen_n_vars_expr(creation, NumberOfDimension(e)))));
 }
 
 /* the following functions generate the statements to appear in
@@ -101,43 +108,16 @@ statement hpfc_initsend()
 		   NIL))));
 }
 
-statement hpfc_pack(array, creation)
+statement hpfc_packing(array, creation, pack)
 entity array;
 entity (*creation)();
+bool pack;
 {
-    /* 5 args to pvmfpack
-     */
     return
 	(hpfc_make_call_statement
-	     (hpfc_name_to_entity(PVM_PACK),
+	     (hpfc_name_to_entity(pack ? PVM_PACK : PVM_UNPACK),
 	      CONS(EXPRESSION, pvm_what_option_expression(array),
-	      CONS(EXPRESSION, 
-		   reference_to_expression
-		   (make_reference(array, hpfc_gen_n_vars_expr
-				   (creation,
-				    NumberOfDimension(array)))),
-	      CONS(EXPRESSION, int_to_expression(1),
-	      CONS(EXPRESSION, int_to_expression(1),
-	      CONS(EXPRESSION, entity_to_expression(hpfc_name_to_entity(INFO)),
-		   NIL)))))));
-}
-
-statement hpfc_unpack(array, creation)
-entity array;
-entity (*creation)();
-{
-    /* 5 args to pvmfunpack
-     */
-    return
-	(hpfc_make_call_statement
-	     (hpfc_name_to_entity(PVM_UNPACK),
-	      CONS(EXPRESSION, pvm_what_option_expression(array),
-	      CONS(EXPRESSION, reference_to_expression
-		                  (make_reference
-				       (array, 
-					hpfc_gen_n_vars_expr(
-					    creation,
-					     NumberOfDimension(array)))),
+	      CONS(EXPRESSION, make_reference_expression(array, creation),
 	      CONS(EXPRESSION, int_to_expression(1),
 	      CONS(EXPRESSION, int_to_expression(1),
 	      CONS(EXPRESSION, entity_to_expression(hpfc_name_to_entity(INFO)),
@@ -157,34 +137,47 @@ int val, number;
     return(l);
 }
 
-/* static statement add_2(exp)
- *
- *       exp = exp + 2
+/* expr = expr + 2
  */
 statement hpfc_add_2(exp)
 expression exp;
 {
     entity plus = CreateIntrinsic(PLUS_OPERATOR_NAME);
-
-    return(make_assign_statement(expression_dup(exp),
-				 MakeBinaryCall(plus,
-						exp,
-						int_to_expression(2))));
+    return(make_assign_statement
+	   (expression_dup(exp), 
+	    MakeBinaryCall(plus, exp, int_to_expression(2))));
 
 }
 
+statement hpfc_message(tid, channel, send)
+expression tid, channel;
+bool send;
+{
+    expression 
+	third = entity_to_expression(hpfc_name_to_entity(send ? INFO : BUFID));
+    entity pvmf = hpfc_name_to_entity(send ? PVM_SEND : PVM_RECV);
 
-#define psi(i) entity_to_expression(get_ith_processor_dummy(i))
+    return(make_block_statement
+	   (CONS(STATEMENT, hpfc_make_call_statement(pvmf,
+				   CONS(EXPRESSION, tid,
+				   CONS(EXPRESSION, channel,
+				   CONS(EXPRESSION, third,
+					NIL)))),
+	    CONS(STATEMENT, hpfc_add_2(copy_expression(channel)),
+		 NIL))));				    
+}
+
+#define psi(i) entity_to_expression(creation(i))
 
 /* statement st_compute_lid(proc)
  *
  *       T_LID=CMP_LID(pn, pi...)
  */
-statement hpfc_compute_lid(proc)
-entity proc;
+statement hpfc_compute_lid(lid, proc, creation)
+entity lid, proc;
+entity (*creation)();
 {
     int     ndim = NumberOfDimension(proc);
-    entity  lid = hpfc_name_to_entity(T_LID);
 
     if (!get_bool_property("HPFC_EXPAND_CMPLID"))
     {
@@ -196,8 +189,7 @@ entity proc;
 		(cmp_lid,
 		 CONS(EXPRESSION, 
 		      int_to_expression(load_hpf_number(proc)),
-		      gen_nconc(hpfc_gen_n_vars_expr(get_ith_processor_dummy,
-						     ndim),
+		      gen_nconc(hpfc_gen_n_vars_expr(creation, ndim),
 				make_list_of_constant(0, 7-ndim))))));
     }
     else
@@ -231,9 +223,7 @@ entity proc;
 		 copy_expression(dimension_lower(FindIthDimension(proc, 1))),
 		 NIL)));
 	
-	for(i=2;
-	    i<=ndim;
-	    i++)
+	for(i=2; i<=ndim; i++)
 	{
 	    dimension
 		dim = FindIthDimension(proc, i);
