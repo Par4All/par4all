@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.4 2002/01/14 13:45:48 loechner Exp $
+# $Id: vars.mk,v 1.5 2002/01/16 17:51:00 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -67,8 +67,8 @@ RANLIB			= ranlib
 SHEXT  			= so
 
 # defines needed for arithmetic lib
-INT_AFLAGS = 
-LONG_AFLAGS = -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
+INT_AFLAGS = -DLINEAR_VALUE_IS_INT
+LONG_AFLAGS = -DLINEAR_VALUE_PROTECT_MULTIPLY 		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -DLINEAR_VALUE_IS_LONGLONG
 GMP_AFLAGS = -DGNUMP
 INT_BITS = 32
 LONG_BITS = 64
@@ -110,6 +110,6 @@ EXEC_EXTRA_LIBS= -L$(OBJ_DIR) -lpolylib$(BITS) $(LIBS)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 
-LIBS_TO_BUILD = gmp
-EXEC_TO_BUILD = gmp
+LIBS_TO_BUILD = 64
+EXEC_TO_BUILD = 64
 

@@ -584,7 +584,7 @@ int cherche_min(Value *min,Polyhedron *D,int pos) {
 	
   Value binf, bsup;	/* upper & lower bound */
   Value i;
-  int j,flag, maxiter;
+  int flag, maxiter;
   
   if(!D)
     return(1);

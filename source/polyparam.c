@@ -35,7 +35,7 @@
 
 #ifdef __STDC__
 static void traite_m_face(Polyhedron *, int *);
-static void scan_m_face(int,int,Polyhedron *,int *);
+static void scan_m_face(int,int,Polyhedron *,unsigned int *);
 #else
 static void traite_m_face();
 static void scan_m_face();
@@ -198,22 +198,23 @@ static int TestRank(Matrix *Mat) {
 typedef struct {
   unsigned int NbRows;
   unsigned int NbColumns;
-  int **p;
-  int *p_init;
+  unsigned int **p;
+  unsigned int *p_init;
 } SatMatrix; 
 
 static SatMatrix *SMAlloc(int rows,int cols) {
 
-  int **q, *p, i;
+  unsigned int **q, *p;
+  int i;
 
   SatMatrix *result = (SatMatrix *)malloc(sizeof(SatMatrix));
   assert (result != NULL);
 
   result->NbRows = rows;
   result->NbColumns = cols;
-  result->p = q = (int **)malloc(rows * sizeof(int *));
+  result->p = q = (unsigned int **)malloc(rows * sizeof(unsigned int *));
   assert (result->p != NULL);  
-  result->p_init = p = (int *)malloc(rows * cols * sizeof(int));
+  result->p_init = p = (unsigned int *)malloc(rows * cols * sizeof(unsigned int));
   assert (result->p_init != NULL);  
   
   for (i=0;i<rows;i++) {
@@ -478,9 +479,9 @@ int cntbit[256] = {				/* counts for 8 bits */
 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8 };
 
-static int count_sat (int *mf) {
+static int count_sat (unsigned int *mf) {
   
-  register int i, tmp, cnt=0;
+  register unsigned int i, tmp, cnt=0;
   
   for (i=0; i<nr; i++) {
     tmp = mf[i];
@@ -523,7 +524,7 @@ static int count_sat (int *mf) {
 /*      pos : the next candidate constraint position                    */
 /*    nb-un : number of saturated constraints needed to finish a face   */
 /*        D : the source polyhedron (context included )                 */
-/*       mf : bit-array marking rays which are satuarated so far        */
+/*       mf : bit-array marking rays which are saturated so far         */
 /* From Global area:                                                    */
 /* ----------------                                                     */
 /*        n : number of data indices                                    */
@@ -535,13 +536,13 @@ static int count_sat (int *mf) {
 /*                                                                      */
 /* Recursive function to find the rays and vertices of each m-face      */
 /*----------------------------------------------------------------------*/
-static void scan_m_face(int pos,int nb_un,Polyhedron *D,int *mf) {
+static void scan_m_face(int pos,int nb_un,Polyhedron *D,unsigned int *mf) {
   /* pos   - the next candidate constraint position */
   /* nb_un - the number of constraints needed to finish a face */
   /* D     - the source polyhedron */
   /* mf    - (bit vector) marks rays that are saturated so far */
-  
-  int *new_mf;
+
+  unsigned int *new_mf;
 
 #ifdef DEBUGPP4
   fprintf(stderr,"Start scan_m_face(pos=%d, nb_un=%d, n=%d, m=%d\n",
@@ -551,13 +552,13 @@ static void scan_m_face(int pos,int nb_un,Polyhedron *D,int *mf) {
     int i;
     for(i=0;i<nr;i++)
       fprintf(stderr,"%08X", mf[i]);
-    fprintf(stderr,"\negalite = [");
+    fprintf(stderr,"\nequality = [");
     for(i=0;i<D->NbConstraints;i++)
       fprintf(stderr," %1d",egalite[i]);
     fprintf(stderr,"]\n");
-  }	
+  }
 #endif
-  
+
   if(nb_un == 0) {	/* Base case */   
     int i,j;
     
@@ -565,28 +566,30 @@ static void scan_m_face(int pos,int nb_un,Polyhedron *D,int *mf) {
     /* if all these vertices also verify a previous constraint */
     /* which is NOT already selected, we eliminate this face */
     /* This keeps the lexicographically greatest selection */
-    for(i=0;i<pos;i++) {
-      if(egalite[i])
-	continue;       /* already selected */
+	for(i=0;i<pos-1;i++)
+	{
+		if(egalite[i])
+			continue;       /* already selected */
       
-      /* if Sat[i] & mf == mf then its redundant */
-      for (j=0;j<nr;j++) {
+		/* if Sat[i] & mf == mf then it's redundant */
+		for (j=0;j<nr;j++)
+		{
 	
 #ifdef DEBUGPP4
-	fprintf(stderr,"mf=%08X Sat[%d]=%08X &=%08X\n",mf[j],i,Sat->p[i][j],
-		(mf[j] & Sat->p[i][j]) );
+			fprintf(stderr,"mf=%08X Sat[%d]=%08X &=%08X\n",mf[j],i,Sat->p[i][j],
+				(mf[j] & Sat->p[i][j]) );
 #endif
-	
-	if ((mf[j] & Sat->p[i][j]) != mf[j])
-	  break;	/* it's not redundant */
-      }
+
+			if (((mf[j]) & (Sat->p[i][j])) != mf[j])
+				break;	/* it's not redundant */
+		}
       
 #ifdef DEBUGPP4
-      if (j==nr) fprintf(stderr, "Redundant with constraint %d\n", i);
+		if (j==nr) fprintf(stderr, "Redundant with constraint %d\n", i);
 #endif
     
-      if (j==nr) return;	/* it is redundant */
-    }
+		if (j==nr) return;	/* it is redundant */
+	}
     /********* END OF ELIMINATION OF DEGENERATE FACES *********/    
     /* if we haven't found a constraint verified by all */
     /* the rays, its OK, it's a new face. */
@@ -594,14 +597,14 @@ static void scan_m_face(int pos,int nb_un,Polyhedron *D,int *mf) {
     return;
   }
 
-  /* See if there enough constraints left to finish */
+  /* See if there are enough constraints left to finish */
   if((pos+nb_un)>D->NbConstraints) return;
   
   /* Recurring part of the procedure */
   /* Add the pos'th constraint, compute new saturation vector */
   {	
     int k;
-    new_mf  = (int *)malloc(nr*sizeof(int));
+    new_mf  = (unsigned int *)malloc(nr*sizeof(unsigned int));
     for (k=0; k<nr; k++)
       new_mf[k] = mf[k] & Sat->p[pos][k];
   }
@@ -616,11 +619,26 @@ fprintf(stderr,"new_mf = ");
  }
 #endif
 
- /* At least m_dim+1 rays must be saturated to add this constraint */
- if (count_sat(new_mf)>m_dim) {
-   egalite[pos]=1;		/* Try it with the pos-th constraint */
-   scan_m_face(pos+1,nb_un-1,D,new_mf);
- }
+  {
+ 	int c;
+	c = count_sat(new_mf);
+	/* optimization : at least m_dim+1 rays must be saturated to add this constraint */
+	if (c>m_dim )
+	{
+		/* if this constraint does not change anything do not decrement nb_un
+		   (it's a redundant equality). */
+		if( c==count_sat(mf) )
+		{
+			egalite[pos]=1;		/* Try it with the pos-th constraint */
+		   scan_m_face(pos+1,nb_un,D,new_mf);
+		}
+		else
+		{
+		   egalite[pos]=1;		/* Try it with the pos-th constraint */
+		   scan_m_face(pos+1,nb_un-1,D,new_mf);
+		}
+	}
+  }
  free(new_mf);
  egalite[pos]=0;		/* Try it without the pos-th constraint */
  if ((pos+nb_un)>=D->NbConstraints) return;
@@ -633,10 +651,11 @@ fprintf(stderr,"new_mf = ");
  * columns correspond to the rays of the polyhedron 'Pol'. Global variable 
  * 'nr' is set in the function.             
  */
-static SatMatrix *Poly2Sat(Polyhedron *Pol,int **L) { 
+static SatMatrix *Poly2Sat(Polyhedron *Pol,unsigned int **L) { 
   
   SatMatrix *Sat;
-  int i, j, k, kx, *Temp;
+  int i, j, k, kx;
+  unsigned int *Temp;
   Value *p1, *p2, p3,tmp;
   unsigned Dimension, NbRay, NbCon, bx;
   
@@ -650,9 +669,9 @@ static SatMatrix *Poly2Sat(Polyhedron *Pol,int **L) {
   /* Build the Sat matrix */
   nr      = (NbRay - 1)/(sizeof(int)*8) + 1;   /* Set globally */
   Sat     = SMAlloc(NbCon,nr);
-  Temp     = (int *)malloc(nr*sizeof(int));
+  Temp     = (unsigned int *)malloc(nr*sizeof(unsigned int));
   memset(Sat->p_init,0,nr*NbCon*sizeof(int));
-  memset(Temp,0,nr*sizeof(int));
+  memset(Temp,0,nr*sizeof(unsigned int));
   kx=0; bx=MSB;
   for (k=0; k<NbRay; k++) { 
     for (i=0; i<NbCon; i++) {
@@ -892,7 +911,8 @@ Polyhedron *Elim_Columns(Polyhedron *A,Polyhedron *E,int *p,int *ref) {
  */
 Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int working_space,Polyhedron **CEq,Matrix **CT) {	
   
-  int *mf, i, j;
+  unsigned int *mf;
+  int i, j;
   Polyhedron *D=*Di,
              *C1,         /* true context */
              *D1;         /* the combined polyhedron, including context C */
@@ -1089,6 +1109,9 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   Sat = Poly2Sat(D1,&mf);
 
 #ifdef DEBUGPP4
+/*  fprintf(stderr,"Sat = ");
+    Matrix_Print(stderr,"%08X ", Sat); */
+
   fprintf(stderr,"mf = ");
   for (i=0; i<nr; i++)
     fprintf(stderr,"%08X", mf[i]);
@@ -1120,7 +1143,7 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
 	
   /* D1->NbEq constraints already saturated ! */
   scan_m_face(D1->NbEq,(D1->Dimension - m_dim - D1->NbEq),D1,mf);
-  
+
   /* pos, number of constraints needed     */
 
 #ifdef DEBUGPP
@@ -1580,7 +1603,6 @@ Param_Polyhedron *Polyhedron2Param_Domain(Polyhedron *Din,Polyhedron *Cin,int wo
 Param_Polyhedron *Polyhedron2Param_SimplifiedDomain(Polyhedron **Din,Polyhedron *Cin,int working_space,Polyhedron **CEq,Matrix **CT) {
 						     
   Param_Polyhedron *result;
-  Param_Domain *D;
   
 #ifdef DEBUGPP
   fprintf(stderr,"Polyhedron2Param_Polyhedron algorithm starting at : %.2fs\n",
