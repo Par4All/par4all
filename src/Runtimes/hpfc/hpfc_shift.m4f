@@ -1,5 +1,5 @@
 c
-c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1995/04/21 17:01:48 $, )
+c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1995/09/06 13:33:13 $, )
 c version $Revision$
 c got on %D%, %T% 
 c
@@ -227,8 +227,6 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_SECTION')
       TYPE
      $ array(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
-      external hpfc_proc_dim
-      integer hpfc_proc_dim
       include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
