@@ -131,23 +131,25 @@ full_name(char * dir, char * name)
     return full;
 }
 
-static void get_name(name, letters)
+static void get_name(name)
 char *name;
-int letters;
 {
 	register char *ptr;
 
-	while (stat(name, &sbuf) >= 0) {
-		for (ptr = name + letters + 2; ptr >= name + letters; ptr--) {
-			(*ptr)++;
-			if (*ptr <= '9')
-				break;
-			*ptr = '0';
-		}
-		if(ptr < name + letters) {
-			fprintf( stderr, "fsplit: ran out of file names\n");
-			exit(1);
-		}
+	while (stat(name, &sbuf) >= 0) 
+	{
+	    ptr = name + strlen(name) - 1;
+	    while (!isdigit(*ptr--) && ptr>name);
+	    for (ptr++; isdigit(*ptr) && ptr>name; ptr--) {
+		(*ptr)++;
+		if (*ptr <= '9')
+		    break;
+		*ptr = '0';
+	    }
+	    if(ptr < name ) {
+		fprintf( stderr, "fsplit: ran out of file names\n");
+		exit(1);
+	    }
 	}
 }
 
@@ -252,12 +254,12 @@ char *s;
 	    it_is_a_main = 1;
 	    if(scan_name(s, ptr)) return(1);
 	    implicit_program_name = 1;
-	    get_name( mainp, 4);
+	    get_name( mainp);
 	    strcpy( s, mainp);
 	} else if((ptr = look(line, "blockdata")) != 0) {
 		if(scan_name(s, ptr)) return(1);
 		implicit_blockdata_name = 1;
-		get_name( blkp, 4);
+		get_name( blkp);
 		strcpy( s, blkp);
 	} else if((ptr = functs(line)) != 0) {
 		if(scan_name(s, ptr)) return(1);
@@ -265,7 +267,7 @@ char *s;
 	} else {
 	    implicit_program = 1;
 	    it_is_a_main = 1;
-		get_name( mainp, 4);
+		get_name( mainp);
 		strcpy( s, mainp);
 	}
 	return(1);
@@ -380,7 +382,7 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 
     for(;;) {
 	/* look for a temp file that doesn't correspond to an existing file */
-	get_name(x, 3);
+	get_name(x);
 	ofp = fopen(x, "w");
 	if (ofp==NULL) {
 	    fprintf(stderr, "%s %s -> %s\n", dir_name, file_name, x);
