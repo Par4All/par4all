@@ -60,7 +60,7 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
      & )
 _CM5(`      include "cmmd_fort.h"')
-      include "hpfc_commons.h"
+      include "hpfc_commons_pvm.h"
       include "hpfc_rtsupport.h"
       integer dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS')
@@ -124,7 +124,7 @@ ifelse(PVM_ARCH,`CM5',`dnl
 !
       TYPE function build_name(hred,LEVEL,PVMTYPE,NAME)()
 _CM5(`      include "cmmd_fort.h"')
-      include "hpfc_commons.h"
+      include "hpfc_commons_pvm.h"
       TYPE result(MAX MAX SIZE OF PROCS), final
       integer i
 !
@@ -239,7 +239,7 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
       subroutine build_name(hpost,NAME,PVMTYPE)(val, size)
       integer size
       TYPE val(size)
-      include "hpfc_commons.h"
+      include "hpfc_commons_pvm.h"
       external pvm_opname(NAME)
       integer info, bufid
 !
@@ -261,7 +261,7 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
       subroutine build_name(npost,NAME,PVMTYPE)(val, size)
       integer size
       TYPE val(size)
-      include "hpfc_commons.h"
+      include "hpfc_commons_pvm.h"
       external pvm_opname(NAME)
       integer info
 !
