@@ -25,6 +25,25 @@ Pvecteur v;
     return (nb_elem);
 }
 
+/* int vect_dimension(Pvecteur v): calcul du nombre de composantes non nulles
+ * et non constantes d'un vecteur
+ * 
+ * sum abs(sgn(v[i]))
+ *  i
+ */
+int vect_dimension(v)
+Pvecteur v;
+{
+    Pvecteur el;
+    int nb_elem = 0;
+
+    for (el=v; el != NULL; el=el->succ)
+	if(!term_cst(el)) 
+	    nb_elem++;
+
+    return (nb_elem);
+}
+
 /* Value vect_prod_scal(v1,v2): produit scalaire de v1 et de v2
  * 
  * sum v1[i] * v2[i]
