@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/09/20 17:22:54 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/09/21 10:23:54 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -732,7 +732,11 @@ check_sccs:
 
 # install installs sources, so depends on sources. FC
 # to insure the library is compiled before hand, a make is added.
-.install: \$(ALL_SOURCES) check_install check_sccs
+.install: \$(ALL_SOURCES) 
+	#
+	# first check
+	#
+	\$(MAKE) check_install check_sccs
 	#
 	# installing new source files 
 	#
