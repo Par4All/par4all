@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$,
-# ($Date: 1995/10/10 16:32:19 $, )
+# ($Date: 1995/11/02 18:04:23 $, )
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
@@ -28,7 +28,8 @@ LIB_CFILES=	directives.c \
 		generate-util.c \
 		remapping.c \
 		host_node_entities.c \
-		special_cases.c
+		special_cases.c \
+		lattice_extraction.c
 
 LIB_HEADERS=	warning.h \
 		hpfc-local.h \
