@@ -615,6 +615,10 @@ inv_entity_filter(entity e)
     return TRUE;
 }
 
+static bool ref_flt(reference r)
+{
+  return inv_entity_filter(reference_variable(r));
+}
 
 static bool
 expressions_invariant_p(list /* of expression */ le)
@@ -622,7 +626,7 @@ expressions_invariant_p(list /* of expression */ le)
     MAP(EXPRESSION, exp, {
 	expression_invariant = TRUE;
 
-	gen_recurse(exp, entity_domain, inv_entity_filter, gen_null);
+	gen_recurse(exp, reference_domain, ref_flt, gen_null);
 
 	if (!expression_invariant) {
 	    return FALSE;
@@ -1485,6 +1489,7 @@ invariant_code_motion(string module_name)
 	    fprintf(stderr," gen consistent ");
     }
 
+    module_reorder(mod_stat);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, mod_stat);
 
