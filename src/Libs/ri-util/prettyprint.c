@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.128  1998/12/21 15:08:03  ancourt
+ * add a parameter to close_current_line
+ *
  * Revision 1.127  1998/12/15 16:51:33  zory
  * modification of the inverse operator prettyprint
  *
@@ -222,7 +225,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.127 1998/12/15 16:51:33 zory Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.128 1998/12/21 15:08:03 ancourt Exp $";
 #endif /* lint */
 
  /*
@@ -1507,7 +1510,7 @@ text_directive(
 
     /* what about reductions? should be associated to the ri somewhere.
      */
-    close_current_line(buffer, t);
+    close_current_line(buffer, t,cont);
     free(dir);
     free(cont);
     return t;
