@@ -219,12 +219,12 @@ gen_set_closure_iterate(
 	{
 	    (void) set_union(seen, seen, curr);
 	    set_difference(curr, next, seen);
-	    set_clear(next);
 	}
 	else
 	{
 	    set_assign(curr, next);
 	}
+	set_clear(next);
     }
 
     set_free(curr);
