@@ -20,7 +20,6 @@
 #include "properties.h"
 #include "prettyprint.h"
 
-
 #include "dg.h"
 #include "transformations.h"
 #include "transformer.h"
@@ -60,7 +59,8 @@ entity make_start_ru_module (hash_table ht_params,
 			     list l_commons) 
 {
   entity start_ru_module;
-  entity func_id, unit_id;
+  entity func_id;
+  entity unit_id = NULL;
   string function_name;
   entity called_module;
   statement called_module_stat;
@@ -77,10 +77,12 @@ entity make_start_ru_module (hash_table ht_params,
 						     START_RU_MODULE_NAME,
 						     start_ru_module,
 						     1);
-  unit_id = create_integer_parameter_for_new_module (START_RU_PARAM2_NAME,
-						     START_RU_MODULE_NAME,
-						     start_ru_module,
-						     2);
+  if (number_of_deployment_units > 1) {
+    unit_id = create_integer_parameter_for_new_module (START_RU_PARAM2_NAME,
+						       START_RU_MODULE_NAME,
+						       start_ru_module,
+						       2);
+  }
   
   /* Declare CONTROL_DATA common to be visible here */
   declare_common_variables_in_module (global_common, start_ru_module);
@@ -196,15 +198,14 @@ entity make_start_ru_module (hash_table ht_params,
  * Build and store new module WAIT_RU.
  * Create statement module_statement
  */
-entity make_wait_ru_module (hash_table ht_params, 
-			    statement* module_statement, 
+entity make_wait_ru_module (statement* module_statement, 
 			    int number_of_deployment_units,
 			    entity global_common,
 			    list l_commons) 
 {
   entity wait_ru_module;
-  entity func_id, unit_id;
-  string function_name;
+  entity func_id;
+  entity unit_id = NULL;
   entity set_entity = get_current_module_entity();
 
   wait_ru_module = make_empty_subroutine(strdup(WAIT_RU_MODULE_NAME));
@@ -215,10 +216,12 @@ entity make_wait_ru_module (hash_table ht_params,
 						     WAIT_RU_MODULE_NAME,
 						     wait_ru_module,
 						     1);
-  unit_id = create_integer_parameter_for_new_module (WAIT_RU_PARAM2_NAME,
-						     WAIT_RU_MODULE_NAME,
-						     wait_ru_module,
-						     2);
+  if (number_of_deployment_units > 1) {
+    unit_id = create_integer_parameter_for_new_module (WAIT_RU_PARAM2_NAME,
+						       WAIT_RU_MODULE_NAME,
+						       wait_ru_module,
+						       2);
+  }
   
   /* Declare CONTROL_DATA common to be visible here */
   declare_common_variables_in_module (global_common, wait_ru_module);
@@ -271,28 +274,28 @@ static statement make_communication_statement (entity function,
       list inds = CONS(EXPRESSION, make_expression_from_entity(unit_id),NIL);
       if (is_receiving) {
 	return make_binary_call_statement (ASSIGN_OPERATOR_NAME,
-					   make_entity_expression(local_entity, inds),
 					   make_expression_from_entity(param),
+					   make_entity_expression(local_entity, inds),
 					   NULL);
       }
       else {
-	return make_binary_call_statement (ASSIGN_OPERATOR_NAME,
-					   make_expression_from_entity(param),
+ 	return make_binary_call_statement (ASSIGN_OPERATOR_NAME,
 					   make_entity_expression(local_entity, inds),
+					   make_expression_from_entity(param),
 					   NULL);
       }
     }
     else {
       if (is_receiving) {
 	return make_binary_call_statement (ASSIGN_OPERATOR_NAME,
-					   make_expression_from_entity(local_entity),
 					   make_expression_from_entity(param),
+					   make_expression_from_entity(local_entity),
 					   NULL);
       }
       else {
 	return make_binary_call_statement (ASSIGN_OPERATOR_NAME,
-					   make_expression_from_entity(param),
 					   make_expression_from_entity(local_entity),
+					   make_expression_from_entity(param),
 					   NULL);
       }
     }
@@ -317,7 +320,6 @@ static entity make_scalar_communication_module (variable var,
   entity new_module;
   entity func_id, param_id, param;
   entity unit_id = NULL;
-  string function_name;
   entity set_entity = get_current_module_entity();
 
   expression test_condition;
@@ -328,6 +330,7 @@ static entity make_scalar_communication_module (variable var,
   statement function_statement;
   sequence new_sequence;
   instruction sequence_instruction;
+  int param_nb = 1;
 
   new_module = make_empty_subroutine(module_name);
   pips_debug(2, "Creating module %s\n", entity_global_name(new_module));
@@ -336,23 +339,23 @@ static entity make_scalar_communication_module (variable var,
   func_id = create_integer_parameter_for_new_module (COM_MODULE_PARAM1_NAME,
 						     module_name,
 						     new_module,
-						     1);
+						     param_nb++);
   if (number_of_deployment_units > 1) {
     unit_id = create_integer_parameter_for_new_module (COM_MODULE_PARAM2_NAME,
 						       module_name,
 						       new_module,
-						       2);
+						       param_nb++);
   }
   param_id = create_integer_parameter_for_new_module (COM_MODULE_PARAM3_NAME,
 						      module_name,
 						      new_module,
-						      3);
+						      param_nb++);
 
   param = create_parameter_for_new_module (var,
 					   COM_MODULE_PARAM4_NAME,
 					   module_name,
 					   new_module,
-					   4);
+					   param_nb++);
   
   /* Declare CONTROL_DATA common to be visible here */
   declare_common_variables_in_module (global_common, new_module);
@@ -470,6 +473,30 @@ static entity make_scalar_communication_module (variable var,
 }
 
 /**
+ * Return DYN_VAR_PARAM_NAME name for a dynamic variable
+ */
+string get_dynamic_variable_name(entity dynamic_variable)
+{
+  char buffer[256];
+  sprintf(buffer,
+	  DYN_VAR_PARAM_NAME,
+	  entity_local_name(dynamic_variable));
+  return strdup(buffer);
+}
+
+/**
+ * Return REF_VAR_PARAM_NAME name for a dynamic variable
+ */
+string get_ref_var_param_name(entity reference_param)
+{
+  char buffer[256];
+  sprintf(buffer,
+	  REF_VAR_PARAM_NAME,
+	  entity_local_name(reference_param));
+  return strdup(buffer);
+}
+
+/**
  * Return SEND_PARAM module name for function and region
  */
 string get_send_param_module_name(entity function, region reg)
@@ -541,9 +568,9 @@ static list make_scalar_communication_modules (hash_table ht_communications,
  * (SEND_PARAMETERS...)
  */
 list make_send_scalar_params_modules (hash_table ht_in_communications,
-					     int number_of_deployment_units,
-					     entity global_common,
-					     list l_commons) 
+				      int number_of_deployment_units,
+				      entity global_common,
+				      list l_commons) 
 {
   return make_scalar_communication_modules (ht_in_communications,
 					    number_of_deployment_units,
@@ -568,9 +595,14 @@ list make_receive_scalar_params_modules (hash_table ht_out_communications,
 					    TRUE); 
 }
 
-static void compute_region_variables (region reg,
-				      list* l_reg_params,
-				      list* l_reg_variables) 
+/**
+ * Build and return parameters (PHI1,PHI2) and dynamic variables for
+ * region reg.  
+ * NOT IMPLEMENTED: suppress unused dynamic variables !!!!
+ */
+void compute_region_variables (region reg,
+			       list* l_reg_params,
+			       list* l_reg_variables) 
 {
   Psysteme ps_reg;
   Pbase ps_base;
@@ -610,82 +642,153 @@ static void compute_region_variables (region reg,
 }    
 
 /**
- * Internally used for making communication module for non-scalar region
- * and function
+ * Build statement doing data transfer between internal storage for
+ * externalized function and parameters from the caller.  This job is done
+ * using reg region and systeme_to_loop_nest(...) function
  */
-static entity compute_region_communications (entity function,
-					     region reg) 
-
+static statement make_array_communication_statement(entity function,
+						    entity module,
+						    region reg,
+						    entity unit_id,
+						    entity param,
+						    int number_of_deployment_units,
+						    boolean is_receiving,
+						    list l_reg_params,
+						    list l_reg_variables) 
 {
-  list l_reg_params;
-  list l_reg_variables;
   Psysteme ps_reg;
-  Pbase ps_base;
-  Pcontrainte ps_eg, ps_ineg;
-  entity equ, leq;
+  reference ref;
+  statement assignement_statement;
+  expression local_entity_exp;
+  expression param_exp;
+  list local_entity_inds;
+  list param_inds;
+  entity divide;
+  statement returned_statement;
+
+  entity local_entity = entity_in_module (get_common_param_name (region_entity(reg), function), module);
+  
+  ifdebug(2) {
+    pips_debug(2, "BEGIN make_array_communication_statement\n");
+    pips_debug(2, "Function: [%s]\n",entity_local_name(function));
+    pips_debug(2, "Module: [%s]\n",entity_local_name(module));
+    pips_debug(2, "Region: \n");
+    print_region(reg);
+    pips_debug(2, "Local entity: [%s]\n",entity_local_name(local_entity));
+  }
 
   ps_reg = region_system(reg);
-  ps_base = ps_reg->base;
-  ps_eg = ps_reg->egalites;
-  ps_ineg = ps_reg->inegalites;
 
-  equ = entity_intrinsic(EQUAL_OPERATOR_NAME);
-  leq = entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME);
+  ref = region_reference(reg);
+  param_inds = gen_copy_seq(reference_indices(ref));
+  if (number_of_deployment_units > 1) {
+    local_entity_inds = gen_nconc(gen_copy_seq(reference_indices(ref)),CONS(EXPRESSION, make_expression_from_entity(unit_id),NIL));
+  }
+  else {
+    local_entity_inds = gen_copy_seq(reference_indices(ref));
+  }
+  local_entity_exp = make_entity_expression(local_entity, local_entity_inds);
+  param_exp = make_entity_expression(param, param_inds);
 
-  compute_region_variables(reg,&l_reg_params,&l_reg_variables);
-  
-  ifdebug(3) {
-    string variables_string = "Variables: ";
-    MAP (ENTITY, e, {variables_string=strdup(concatenate(variables_string, " ", entity_local_name(e), NULL));}, l_reg_variables);
-    variables_string=strdup(concatenate(variables_string, "\nParameters: ", NULL));
-    MAP (ENTITY, e, {variables_string=strdup(concatenate(variables_string, " ", entity_local_name(e), NULL));}, l_reg_params);
-    pips_debug(2, "Region variables:\n%s\n",variables_string);
+  if (is_receiving) {
+    assignement_statement =
+      make_binary_call_statement (ASSIGN_OPERATOR_NAME,
+				  param_exp,
+				  local_entity_exp,
+				  NULL);
+  }
+  else {
+    assignement_statement =
+      make_binary_call_statement (ASSIGN_OPERATOR_NAME,
+				  local_entity_exp,
+				  param_exp,
+				  NULL);
   }
   
-  pips_debug(2, "Psysteme to expression:\n");
-  print_expression(Psysteme_to_expression(ps_reg));
+
+  pips_debug(2, "Loop Nest:\n");
+
+  /* !!! WARNING !!!  This divide function has to be redefined here to
+   * have a positive remainder ! Use an other custom integer division
+   * operation ! */
+  divide = entity_intrinsic(DIVIDE_OPERATOR_NAME);
+
+  returned_statement = systeme_to_loop_nest(ps_reg,
+					    l_reg_params, 
+					    assignement_statement, 
+					    divide);
   
-  pips_debug(2, "Egalites:\n");
-  MAP(EXPRESSION, exp, {
-    print_expression(exp);
-  }, Pcontrainte_to_expression_list(ps_eg, equ));
   
-  pips_debug(2, "Inegalites:\n");
-  MAP(EXPRESSION, exp, {
-    print_expression(exp);
-  }, Pcontrainte_to_expression_list(ps_ineg, leq));
+  MAP (ENTITY, dyn_var, {
+    pips_debug(2, "Replace: %s with: %s\n", 
+	       entity_global_name(dyn_var),
+	       get_dynamic_variable_name(dyn_var));
+    replace_entity (returned_statement,dyn_var,
+		    entity_in_module(get_dynamic_variable_name(dyn_var), module));
+
+  },l_reg_variables);
   
-  pips_debug(2, "loop nest:\n");
-  {
-    /* !!! WARNING !!!  This divide function has to be redefined here to
-     * have a positive remainder ! Use an other custom integer division
-     * operation ! */
-    entity divide = entity_intrinsic(DIVIDE_OPERATOR_NAME);
-    statement stat = systeme_to_loop_nest(ps_reg, l_reg_params, make_continue_statement(entity_empty_label()), divide);
-    print_statement(stat);
+  MAP (ENTITY, phi_param, {
+    pips_debug(2, "Replace: %s with: %s\n", 
+	       entity_global_name(phi_param),
+	       get_ref_var_param_name(phi_param));
+    replace_entity (returned_statement,phi_param,
+		    entity_in_module(get_ref_var_param_name(phi_param), module));
+
+  },l_reg_params);
+
+  ifdebug(2) {
+    pips_debug(2, "Make this statement:\n");
+    print_statement(returned_statement);
+    pips_debug(2, "END make_array_communication_statement\n");
   }
 
-  /* pips_debug(2, "elements_loop:\n");
-  {
-    list l_ind = CONS(ENTITY, make_scalar_integer_entity("IND",entity_local_name(get_current_module_entity())), NIL);
-    list l_scal = NIL;
-    statement stat = elements_loop (ps_reg, l_ind, l_scal, make_continue_statement(entity_empty_label()));
-    print_statement(stat);
-    }*/
+  return returned_statement;
+}
 
-  /*  pips_debug(2, "Region AFTER region_dynamic_var_elim: ");
-      {
-      region reg2 = copy_region(reg);
-      region_dynamic_var_elim(reg2);
-      print_region(reg2);
-      }
-      pips_debug(2, "Region AFTER region_remove_phi_variables: ");
-      {
-      region reg2 = copy_region(reg);
-      region_remove_phi_variables(reg2);
-      print_region(reg2);
-      }  */
+/**
+ * Creates an integer variable in specified module
+ */
+entity create_private_integer_variable_for_new_module (string new_name, 
+						       string new_module_name,
+						       entity module)
+{
+  entity new_variable;
+  entity a;
+  basic base;
   
+  if ((gen_find_tabulated(concatenate(new_module_name, 
+				      MODULE_SEP_STRING, 
+				      new_name, 
+				      NULL),
+			  entity_domain)) == entity_undefined) 
+    { 
+      /* This entity does not exist, we can safely create it */
+      
+      new_variable = make_entity (strdup(concatenate(new_module_name, 
+						     MODULE_SEP_STRING, 
+						     new_name, NULL)),
+				  MakeTypeVariable(MakeBasic(is_basic_int), NIL),
+				  storage_undefined,
+				  value_undefined);
+      a = global_name_to_entity(new_module_name, DYNAMIC_AREA_LOCAL_NAME); 
+      base = variable_basic(type_variable(entity_type(new_variable)));
+      entity_storage(new_variable) = 
+	make_storage(is_storage_ram,
+		     make_ram(module, a,
+			      (basic_tag(base)!=is_basic_overloaded)?
+			      (add_variable_to_area(a, new_variable)):(0),
+			      NIL));
+      /* Add to declarations.... */
+      add_variable_declaration_to_module(module, new_variable);
+      pips_debug(2, "Created new private variable: %s\n", entity_global_name(new_variable));
+      return new_variable;
+    }
+  else 
+    {
+      pips_error("Entity already exist: %s\n", new_name);
+      return NULL;
+    }
 }
 
 /**
@@ -700,19 +803,24 @@ static entity make_array_communication_module (entity function,
 					       boolean is_receiving)
 {
   entity new_module;
-  entity unit_id, param;
+  entity unit_id = NULL;
+  entity param;
   string module_name = is_receiving?get_receive_param_module_name(function,reg):get_send_param_module_name(function,reg);
   entity set_entity = get_current_module_entity();
   variable var = type_variable(entity_type(region_entity(reg)));
   statement module_statement;
+  list l_reg_params; /* list of entities: phi1, phi2,... */
+  list l_reg_variables; /* list of dynamic variables....*/
+  int param_nb = 1;
   
   new_module = make_empty_subroutine(module_name);
   pips_debug(2, "Creating module %s\n", entity_local_name(new_module));
   pips_debug(2, "Function [%s]\n", entity_local_name(function));
   pips_debug(2, "Region: ");
   print_region(reg);
+  
 
-  compute_region_communications (function, reg);
+  compute_region_variables(reg,&l_reg_params,&l_reg_variables);
 
   reset_current_module_entity();
   set_current_module_entity(new_module);
@@ -720,14 +828,32 @@ static entity make_array_communication_module (entity function,
     unit_id = create_integer_parameter_for_new_module (COM_MODULE_PARAM2_NAME,
 						       module_name,
 						       new_module,
-						       1);
+						       param_nb++);
   }
   param = create_parameter_for_new_module (var,
 					   COM_MODULE_PARAM4_NAME,
 					   module_name,
 					   new_module,
-					   2);
+					   param_nb++);
   
+  MAP (ENTITY, dyn_var, {
+    pips_debug(2, "New parameter: %s\n", get_dynamic_variable_name(dyn_var));
+    create_parameter_for_new_module (type_variable(entity_type(dyn_var)),
+				     get_dynamic_variable_name(dyn_var),
+				     module_name,
+				     new_module,
+				     param_nb++);
+  },l_reg_variables);
+  
+  MAP (ENTITY, phi_param, {
+    pips_debug(2, "New private variable: %s\n", get_ref_var_param_name(phi_param));
+    create_private_integer_variable_for_new_module (get_ref_var_param_name(phi_param),
+						    module_name,
+						    new_module);
+  },l_reg_params);
+  
+
+
   /* Declare CONTROL_DATA common to be visible here */
   declare_common_variables_in_module (global_common, new_module);
 
@@ -739,7 +865,16 @@ static entity make_array_communication_module (entity function,
     fprint_environment(stderr, new_module);
   }
   
-  module_statement = make_continue_statement(entity_empty_label());
+  module_statement 
+    = make_array_communication_statement(function,
+					 new_module,
+					 reg,
+					 unit_id,
+					 param,
+					 number_of_deployment_units,
+					 is_receiving,
+					 l_reg_params,
+					 l_reg_variables);
   
   store_new_module (module_name, new_module, module_statement);
   
