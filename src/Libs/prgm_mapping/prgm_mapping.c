@@ -76,7 +76,7 @@
 plc pfunc;		/* The placement function */
 graph the_dfg;		/* The data flow graph */
 bdt the_bdt;		/* The timing function */
-vint nb_nodes,		/* The number of nodes in the DFG */
+int nb_nodes,		/* The number of nodes in the DFG */
     nb_dfs;		/* The number of dataflows in the DFG */
 hash_table DtfToSink;	/* Mapping from a dataflow to its sink statement */
 hash_table DtfToDist;	/* Mapping from a dataflow to its distance */
