@@ -4,7 +4,7 @@
  *
  * SCCS stuff:
  * $RCSfile: system_to_code.c,v $ version $Revision$, 
- * ($Date: 1995/12/01 10:32:23 $, ) 
+ * ($Date: 1996/03/15 13:45:51 $, ) 
  */
 
 /* Standard includes
@@ -205,7 +205,7 @@ set_information_for_code_optimizations(
     {
 	if (vect_simple_definition_p(contrainte_vecteur(c), &var, &coe, &cst))
 	{
-	    val = DIVIDE(cst, coe);
+	    val = DIVIDE(-cst, coe);
 	    store_an_upper((entity) var, (int) val);
 	    store_a_lower((entity) var, (int) val);
 	}
