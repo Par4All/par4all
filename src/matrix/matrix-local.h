@@ -47,7 +47,7 @@ typedef struct Smatrix {
 #define MATRIX_UNDEFINED ((Pmatrix) NULL)
 
 /* Allocation et desallocation d'une matrice */
-#define matrix_free(m) (free((char *) (m)))
+#define matrix_free(m) (free((char *) (m)), (m)=(Pmatrix) NULL)
 
 /* Macros d'acces aux elements d'une matrice */
 
