@@ -104,7 +104,7 @@ set_env(string var, string val)
 {
     string ival = getenv(var);
     if (!ival || !same_string_p(val, ival))
-	putenv(strdup(concatenate(var, "=", val)));
+	putenv(strdup(concatenate(var, "=", val, 0)));
 }
 
 %}
