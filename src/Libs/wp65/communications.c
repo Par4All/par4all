@@ -7,20 +7,31 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "boolean.h"
+#include "arithmetique.h"
+#include "vecteur.h"
+#include "contrainte.h"
+#include "sc.h"
+#include "ray_dte.h"
+#include "sommet.h"
+#include "polyedre.h"
+#include "sg.h"
+
 #include "genC.h"
+
 #include "ri.h"
-#include "misc.h"
 #include "graph.h"
 #include "tiling.h"
 #include "database.h"
 #include "text.h"
 #include "dg.h"
+
+#include "misc.h"
 #include "rice.h"
 #include "properties.h"
-#include "arithmetique.h"
-#include "prettyprint.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "prettyprint.h"
 #include "resources.h"
 #include "pipsdbm.h"
 #include "movements.h"
@@ -433,7 +444,7 @@ array_scalar_access_to_compute_communication(
     Pvecteur tile_indices,Pvecteur tile_local_indices)
 {
    
-    list icode,lst,lrscc;
+    list icode,lst;
     icode  = array_indices_communication(compute_module,bank_indices,
 					 bn,ls,lt,
 					 load_code,var_id,loop_indices,tile,
@@ -578,7 +589,7 @@ static void insert_array_scalar_access_movement(entity compute_module,entity mem
 						Pbase loop_indices,tiling  tile,Pvecteur tile_delay, 
 				      Pvecteur tile_indices,  Pvecteur tile_local_indices)
 {
-    list ccode ;list lrscc;
+    list ccode ;
     ifdebug(8) {
 	fprintf(stderr,
 		" communication to be inserted at run time stat no %d: ",
