@@ -1,6 +1,6 @@
 #
-# $RCSfile: makefile_macros.GNULL,v $ (version $Revision$) 
-# $Date: 1996/07/15 18:37:03 $, 
+# $RCSfile: makefile_macros.GNULL,v $ (version $Revision$)
+# $Date: 1996/07/15 18:43:07 $, 
 #
 # this file contains macro definitions 
 
@@ -14,7 +14,7 @@ CC	= gcc
 CFLAGS	= -O2 -g -Wall -msupersparc -pipe
 CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -D__USE_FIXED_PROTOTYPES__ -nostdinc -I$(NEWGEN_INCDIR) -I$(LINEAR_INCDIR) -I$(PIPS_INCDIR) -I$(PIPS_EXTEDIR) -I$(GLIBC)/include -I$(GCCDIR)/include -I/usr/include 
 LD	= $(CC) 
-LDFLAGS	= -g -nostdlib $(GLIBC)/lib/crt0.o -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(GLIBC)/lib -L$(GCCDIR)/lib -L/usr/lib -lc -lgcc
+LDFLAGS	= -g -nostdlib $(GLIBC)/lib/crt0.o -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(PIPS_EXTEDIR) -L$(GLIBC)/lib -L$(GCCDIR)/lib -L/usr/lib -lc -lgcc
 RANLIB	= granlib
 LEX	= flex
 LFLAGS	= -l
@@ -28,7 +28,7 @@ PROTOIZE= cproto -vcf2
 ETAGS	= etags
 TAR	= gtar
 ZIP	= gzip -v9
-DIFF	= diff
+DIFF	= gdiff
 M4	= gm4
 
 # end of $RCSfile: makefile_macros.GNULL,v $
