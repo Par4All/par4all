@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/01/23 16:53:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/15 15:26:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_mchoose[] = "%A% ($Date: 1996/01/23 16:53:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_mchoose[] = "%A% ($Date: 1996/07/15 15:26:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* Multiple choices handling */
@@ -14,7 +14,6 @@ char vcid_xv_mchoose[] = "%A% ($Date: 1996/01/23 16:53:41 $, ) version $Revision
 #include <xview/panel.h>
 #include <xview/notice.h>
 #include <xview/notify.h>
-#include <types.h>
 
 #include "genC.h"
 #include "misc.h"
