@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.68  1997/12/11 16:08:02  coelho
+ * implicit shell added.
+ *
  * Revision 1.67  1997/12/10 12:28:57  coelho
  * internal cat for display.
  *
@@ -40,7 +43,7 @@
 %token TK_CDIR
 %token TK_INFO TK_PWD TK_HELP
 %token TK_SOURCE
-%token TK_SHELL TK_ECHO
+%token TK_SHELL TK_ECHO TK_UNKNOWN
 %token TK_QUIT TK_EXIT
 %token TK_LINE
 
@@ -61,13 +64,13 @@
 %token TK_A_STRING
 %token TK_ENDOFLINE
 
-%type <name>   TK_NAME TK_A_STRING TK_LINE propname phasename resourcename
+%type <name>   TK_NAME TK_A_STRING TK_LINE TK_UNKNOWN
 %type <status> command commands
 %type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd i_rm
 %type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help i_capply
-%type <status> i_checkpoint
-%type <name> rulename filename 
+%type <status> i_checkpoint i_unknown
+%type <name> rulename filename propname phasename resourcename
 %type <array> filename_list
 %type <rn> resource_id rule_id
 %type <array> owner list_of_owner_name
@@ -210,6 +213,18 @@ perform(bool (*what)(string, string), res_or_rule * res)
     return result;
 }
 
+static void 
+tp_system(string s)
+{
+    int status;
+    user_log("shell %s\n", s);
+    status = system(s);
+    fflush(stdout);
+    if (status) 
+	pips_user_warning("shell returned status (%d.%d)\n", 
+			  status%256, status/256);
+}
+
 %}
 
 %union {
@@ -251,6 +266,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| i_quit
 	| i_exit
 	| i_help
+	| i_unknown
 	| error {$$ = FALSE;}
 	;
 
@@ -289,14 +305,18 @@ i_setprop: TK_SET_PROPERTY TK_LINE TK_ENDOFLINE
 
 i_shell: TK_SHELL TK_ENDOFLINE 
 	{
-	    system("${SHELL:-sh}");
+	    tp_system("${SHELL:-sh}");
 	}
 	| TK_SHELL TK_LINE TK_ENDOFLINE 
 	{ 
-	    user_log("shell%s\n", $2);
-	    system($2); 
-	    fflush(stdout);
-	    free($2);
+	    tp_system($2); free($2);
+	}
+	;
+
+i_unknown: TK_UNKNOWN TK_ENDOFLINE
+	{ 
+	    pips_user_warning("implicit shell command assumed!\n");
+	    tp_system($1); free($1);
 	}
 	;
 
