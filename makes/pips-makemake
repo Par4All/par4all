@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/09/02 14:04:42 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/09/04 12:44:50 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -367,14 +367,15 @@ echo:; @echo $(ECHO)
 	\$(RM) -r \$* \$@ ; \
 	mkdir \$* ;\
 	\$(LX2HTML) $(L2HFLAGS) \$< ;\
-	chmod -R a+r-wx \$*/* ;	\
-	chmod a+rx,ug+w,o-w \$* ; \
 	$(RM) \$*/*.aux \$*/*.idx \$*/*.log \$*/*.pl \$*/*.tex \$*/*.css \
-	    \$*/.[A-Z]* ; \
-	test ! -f \$*.ps || ( cd \$* ; cp ../\$*.ps . ; $(ZIP) \$*.ps ; ) ; \
-	{ echo "<head><title>Html or Postscript</title></head>";\
-	  echo "<a href=\$@>Html</a> <a href=\$*.ps.gz>Postscript</a>";} \
-	  > \$*/index.html ;\
+	    \$*/.[A-Z]* ;
+	# local .ps.gz if available
+	test ! -f \$*.ps || { cp \$*.ps \$* ; $(ZIP) \$*/\$*.ps ; }
+	# index.html
+	{ cd \$* ; \
+	  ln -s \$@ index.html ; \
+	  chmod -R a+r-wx * ; \
+	  chmod a+rx,ug+w,o-w . ; } 
 	touch \$@
 #
 %.newgen: %.tex
