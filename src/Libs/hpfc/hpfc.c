@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/11/17 12:00:56 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/11/24 16:44:01 $, )
  * version $Revision$
  */
  
@@ -283,6 +283,7 @@ compile_module(entity module)
     set_resources_for_module(module);
     s = get_current_module_statement();
     make_host_and_node_modules(module);
+    hpfc_init_dummy_to_prime();
 
     /*   NORMALIZATIONS
      */
@@ -319,6 +320,7 @@ compile_module(entity module)
 
     /*   CLOSE
      */
+    hpfc_close_dummy_to_prime();
     reset_resources_for_module();
 }
 
