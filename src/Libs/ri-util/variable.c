@@ -21,6 +21,10 @@ variable_entity_p(entity e)
     return variable;
 }
 
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
 bool 
 symbolic_constant_entity_p(entity e)
 {
@@ -31,6 +35,8 @@ symbolic_constant_entity_p(entity e)
 
     return symbolic_constant;
 }
+
+/* END_EOLE */
 
 
 /* this function adds an entity to the list of variables of the
