@@ -901,7 +901,8 @@ static void free_obj_out(
 	}, h ) ;
 	hash_table_free( h ) ;
     }
-    next was: obj->p = (gen_chunk *)0 ;
+
+    obj->p = NEWGEN_FREED;
     /* gen_free_area(obj->p, SIZE NOT DIRECTLY AVAILABLE); */
     newgen_free((void *) obj) ;
 }
