@@ -340,7 +340,7 @@ $(TARGET)-local.h:
 
 $(INC_TARGET): $(TARGET)-local.h
 	$(UTILDIR)/cproto $(CPPFLAGS) $(TARGET_CFILES) \\
-		| Sed -e 's/int __builtin_va_alist//' \\
+		| sed -e 's/int __builtin_va_alist//' \\
 		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
 	mv $(INC_TARGET).tmp $(INC_TARGET)
 
