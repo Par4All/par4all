@@ -90,7 +90,7 @@ static text get_any_effects_text_flt(string module_name)
   
   /*close_prettyprint();*/
 
-  debug_off;
+  debug_off();
   
   reset_current_module_entity();
   reset_current_module_statement();
