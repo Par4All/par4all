@@ -9,7 +9,9 @@ INSTALL_SHR =	pips-deal-with-include \
 		subroutine_callgraph_level.pl \
 		normalisation.pl \
 		replace_file_name.pl \
-		insert_alias_checks_in_source.pl
+		insert_alias_checks_in_source.pl \
+		remove_useless_includes.pl
+
 
 UTL_SCRIPTS = 	filter_verbatim \
 		job-make \
