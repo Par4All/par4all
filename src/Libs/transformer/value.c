@@ -261,6 +261,22 @@ entity e;
 
     return intermediate;
 }
+
+entity global_new_value_to_global_old_value(entity v_new)
+{
+    entity v_old = entity_undefined;
+
+    /* There is no real test for global new values */
+
+    pips_assert("global_new_value_to_global_old_value",
+		strcmp(entity_module_name(v_new), SEMANTICS_MODULE_NAME) != 0);
+
+    v_old = (entity) gen_find_tabulated(concatenate(entity_name(v_new),
+						    OLD_VALUE_SUFFIX,
+						    NULL),
+					entity_domain);
+    return v_old;
+}
 
 /* HASH TABLE USE */
 
@@ -338,9 +354,8 @@ entity e;
 	!= HASH_UNDEFINED_VALUE;
 }
 
-/* the following three functions are not implemented because they are
- * inverse functions of hash mappings and because they are no longer 
- * used apparently
+/* the following three functions are directly or indirectly relative
+ * to the current module and its value hash tables.
  */
 
 bool new_value_entity_p(e)
@@ -706,6 +721,11 @@ bool readonly;
 				NEW_VALUE_SUFFIX, (char *) NULL)));
 }
 
+/* This function used to be restricted to values seen by the
+ * current module. It was extended to values in general to
+ * cope with translation issues.
+ */
+
 entity value_to_variable(val)
 entity val;
 {
@@ -715,17 +735,43 @@ entity val;
     string var_name;
     extern entity get_current_module_entity();
 
-    if(new_value_entity_p(val))
-	l_suffix = strlen(NEW_VALUE_SUFFIX);
-    else if(old_value_entity_p(val))
-	l_suffix = strlen(OLD_VALUE_SUFFIX);
-    else if(intermediate_value_entity_p(val))
-	l_suffix = strlen(INTERMEDIATE_VALUE_SUFFIX);
-    else
-	pips_error("value_to_variable",
-		   "%s is not a value\n", entity_name(val));
+    /* pips_assert("value_to_variable", s != HASH_UNDEFINED_VALUE); */
 
-    pips_assert("value_to_variable", s != HASH_UNDEFINED_VALUE);
+    /* pips_assert("value_to_variable",
+       strchr(entity_name(val), (int) SEMANTICS_SEPARATOR) != NULL); */
+
+    if(s == HASH_UNDEFINED_VALUE) {
+	/* this may be a value, but it is unknown in the current module */
+	string val_name = entity_name(val);
+
+	if(strstr(val_name, NEW_VALUE_SUFFIX) != NULL) 
+	    l_suffix = strlen(NEW_VALUE_SUFFIX);
+	else if(strstr(val_name, OLD_VALUE_SUFFIX) != NULL) 
+	    l_suffix = strlen(OLD_VALUE_SUFFIX);
+	else if(strstr(val_name, INTERMEDIATE_VALUE_SUFFIX) != NULL)
+	    l_suffix = strlen(INTERMEDIATE_VALUE_SUFFIX);
+	else if(strchr(val_name, (int) SEMANTICS_SEPARATOR) == NULL) {
+	    /* new values in fact have no suffixes... */
+	    l_suffix = 0;
+	}
+	else
+	    pips_error("value_to_variable",
+		       "%s is not a non-local value\n", entity_name(val));
+
+	s = val_name;
+    }
+    else {
+	if(new_value_entity_p(val))
+	    l_suffix = strlen(NEW_VALUE_SUFFIX);
+	else if(old_value_entity_p(val))
+	    l_suffix = strlen(OLD_VALUE_SUFFIX);
+	else if(intermediate_value_entity_p(val))
+	    l_suffix = strlen(INTERMEDIATE_VALUE_SUFFIX);
+	else
+	    pips_error("value_to_variable",
+		       "%s is not a locally visible value\n",
+		       entity_name(val));
+    }
 
     var_name = strdup(s);
     *(var_name+strlen(var_name)-l_suffix) = '\0';
@@ -733,7 +779,8 @@ entity val;
     free(var_name);
 
     if( var == entity_undefined )
-	pips_error("value_to_variable", "no related variable for val=%s\n", entity_name(val));
+	pips_error("value_to_variable",
+		   "no related variable for val=%s\n", entity_name(val));
 
     return var;
 }
