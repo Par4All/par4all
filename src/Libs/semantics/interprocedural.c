@@ -325,6 +325,7 @@ cons * le;
 
     /* get rid of them */
     pre = transformer_projection(pre, lost_values);
+    gen_free_list(lost_values);
 
     translate_global_values(callee, pre);
 
@@ -332,6 +333,7 @@ cons * le;
     /* we should not have to know about these internal objects, Psysteme
        and Pvecteur! */
     lost_values = NIL;
+    r = (Psysteme) predicate_system(transformer_relation(pre));
     for(b = r->base; b != NULL; b = b->succ)
 	values = arguments_add_entity(values, (entity) b->var);
 
