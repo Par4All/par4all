@@ -4,11 +4,10 @@
 
 /*LINTLIBRARY*/
 
+#include <sys/types.h>
 #include <stdio.h>
 #include <malloc.h>
 #include <stdarg.h>
-
-extern int fprintf();
 
 #include "boolean.h"
 #include "vecteur.h"
