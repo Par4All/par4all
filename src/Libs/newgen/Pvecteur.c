@@ -59,7 +59,7 @@ static string read_token(int (*f)())
 
   while ((c = f()) != -1 && c!=' ' && c!=')')
   {
-    if (index+1>bufsize)
+    if (index+1>=bufsize) /* for current char and ending 0 */
     {
       bufsize *= 2;
       buf = (char*) realloc(buf, bufsize * sizeof(char));
