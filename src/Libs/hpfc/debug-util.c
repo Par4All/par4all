@@ -1,5 +1,7 @@
-/*
- * this is a set of functions to help hpfc debugging
+/* this is a set of functions to help hpfc debugging
+ *
+ * $RCSfile: debug-util.c,v $ (version $Revision$)
+ * $Date: 1995/12/20 08:50:04 $, 
  *
  * Fabien Coelho, May 1993.
  */
@@ -171,7 +173,7 @@ statement stat;
 
     t = text_module(module, stat);
     print_text(file, t);
-    free_text(t);
+    /* free_text(t); */ /* ??? memory leak or core dump... */
     
     debug_off();
 }
