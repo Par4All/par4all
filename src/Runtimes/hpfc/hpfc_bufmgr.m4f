@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_bufmgr.m4f,v $ (version $Revision$)
-! $Date: 1996/10/17 13:55:13 $, 
+! $Date: 1997/01/07 11:49:54 $, 
 !
 ! First routines to fake the pack/unpack of data.
 ! The issue is to allow quite simply to measure the different
@@ -12,7 +12,6 @@ define(`GENERIC_BUFFER_PACK',`dnl
 pushdef(`PVMTYPE',$1)dnl
 fake_buffers(dnl
       subroutine build_name(PVMTYPE,hpfc fake bufpck)()
-      include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       SEND NOT INITIALIZED=.FALSE.
@@ -21,7 +20,6 @@ fake_buffers(dnl
       end)
       subroutine build_name(PVMTYPE,hpfc bufpck)()
       integer info, bufid
-      include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       if (SEND NOT INITIALIZED) then
@@ -40,7 +38,6 @@ pushdef(`PVMTYPE',$1)dnl
 fake_buffers(dnl
       subroutine build_name(PVMTYPE,hpfc fake bufupk)(lid)
       integer lid
-      include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       if (RECEIVED NOT PERFORMED) then
@@ -53,7 +50,6 @@ fake_buffers(dnl
       subroutine build_name(PVMTYPE,hpfc bufupk)(lid)
       integer lid
       integer info, bufid, length, tag, tid
-      include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       if (RECEIVED NOT PERFORMED) then
