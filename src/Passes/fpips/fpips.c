@@ -11,6 +11,11 @@
  * C macros of interest: FPIPS_WITHOUT_{,T,W}PIPS
  *
  * FC, Mon Aug 18 09:09:32 GMT 1997
+ *
+ * $Log: fpips.c,v $
+ * Revision 1.11  1998/07/21 17:46:06  coelho
+ * options with getopt. -v option added.
+ *
  */
 
 
@@ -84,7 +89,7 @@ static int name_end_p(char * name, char * ref)
 
 static int fpips_version(int ret)
 {
-    fprintf(stderr, "fpips (ARCH=" SOFT_ARCH ", DATE=" UTC_DATE ")\n");
+    fprintf(stderr, "fpips: (ARCH=" SOFT_ARCH ", DATE=" UTC_DATE ")\n");
     return ret;
 }
 
@@ -92,6 +97,8 @@ static int fpips_version(int ret)
 
 int fpips_main(int argc, char **  argv)
 {
+    int opt;
+
     debug_on("FPIPS_DEBUG_LEVEL");
     pips_debug(1, "considering %s for execution\n", argv[0]);
     debug_off();
@@ -100,38 +107,33 @@ int fpips_main(int argc, char **  argv)
 
     /* According to the shell or the debugger, the path may be
        complete or not... RK. */
-    if (name_end_p(argv[0], "tpips")) return TPIPS(argc, argv);
-    if (name_end_p(argv[0], "wpips")) return WPIPS(argc, argv);
-    if (name_end_p(argv[0], "/pips") || strcmp(argv[0], "pips") == 0)
+    if (name_end_p(argv[0], "tpips")) 
+	return TPIPS(argc, argv);
+    if (name_end_p(argv[0], "wpips")) 
+	return WPIPS(argc, argv);
+    if (name_end_p(argv[0], "/pips") || same_string_p(argv[0], "pips"))
 	return  PIPS(argc, argv);
 
     /* else look for the first option, if any.
      */
     if (argc<2) TPIPS(argc, argv);
 
-    /* options
+    /* options.
+     * parsing may be continuate by called version.
      */
-    if (same_string_p(argv[1], "-h")) 
-	return fpips_usage(0);
+    while ((opt = getopt(argc, argv, "hvPTW"))!=-1)
+    {
+	switch (opt)
+	{
+	case 'h': fpips_usage(0); break;
+	case 'v': fpips_version(0); break;
+	case 'P': return PIPS(argc, argv);
+	case 'T': return TPIPS(argc, argv);
+	case 'W': return WPIPS(argc, argv);
+	default:  return fpips_version(1);
+	}
+    }
 
-    if (same_string_p(argv[1], "-v"))
-	return fpips_version(0);
-
-    if (same_string_p(argv[1], "-P")) {
-	/* Do not forget to update what will become the new
-           argv[0]. Especially for X11 or XView in WPips which parse
-           the arguments later... RK. */
-	argv[1] = argv[0];
-	return  PIPS(argc-1, argv+1);
-    }
-    if (same_string_p(argv[1], "-T")) {
-	argv[1] = argv[0];
-	return TPIPS(argc-1, argv+1);
-    }
-    if (same_string_p(argv[1], "-W")) {
-	argv[1] = argv[0];
-	return WPIPS(argc-1, argv+1);
-    }
     /* else try tpips...
      */
     return TPIPS(argc, argv);
