@@ -479,10 +479,16 @@ DeclareVariable(
 		    functional_result(type_functional(et)) = nt;
 		    /* the old type should be gen_freed... */
 		}
-		else {
+		else if(type_equal_p(t, functional_result(type_functional(et)))) {
 		    user_warning("DeclareVariable",
 				 "%s %s between lines %d and % d\n",
 				 "Redefinition of functional type for entity",
+				 entity_local_name(e), line_b_I, line_e_I);
+		}
+		else {
+		    user_warning("DeclareVariable",
+				 "%s %s between lines %d and % d\n",
+				 "Modification of functional result type for entity",
 				 entity_local_name(e), line_b_I, line_e_I);
 		    ParserError("DeclareVariable",
 				"Possible name conflict?\n");
@@ -831,16 +837,42 @@ void
 AddVariableToCommon(c, v)
 entity c, v;
 {
+    entity new_v = entity_undefined;
+
     if (entity_storage(v) != storage_undefined) {
-	FatalError("AddVariableToCommon", "storage already defined\n");
+	if(intrinsic_entity_p(v)) {
+	    new_v = FindOrCreateEntity(get_current_module_name(),
+					      entity_local_name(v));
+	    user_warning("AddVariableToCommon",
+			 "Intrinsic %s overloaded by variable %s between line %d and %d\n",
+			 entity_name(v), entity_local_name(v), line_b_I, line_e_I);
+	    if(type_undefined_p(entity_type(new_v))) {
+		entity_type(new_v) = ImplicitType(new_v);
+	    }
+	}
+	else if(storage_rom_p(entity_storage(v))) {
+	    user_warning("AddVariableToCommon",
+			 "Module %s declared in common %s between line %d and %d\n",
+			 entity_local_name(v), module_local_name(c), line_b_I, line_e_I);
+	    ParserError("AddVariableToCommon",
+			"Ill. decl. of function or subroutine in a common\n");
+	}
+	else {
+	    user_warning("AddVariableToCommon", "Storage tag=%d for entity %s\n",
+			 storage_tag(entity_storage(v)), entity_name(v));
+	    FatalError("AddVariableToCommon", "storage already defined\n");
+	}
+    }
+    else {
+	new_v = v;
     }
 
-    DeclareVariable(v, 
+    DeclareVariable(new_v, 
 		    type_undefined, 
 		    NIL, 
 		    (make_storage(is_storage_ram,
 				  (make_ram(get_current_module_entity(), c, 
-					    CurrentOffsetOfArea(c ,v), 
+					    CurrentOffsetOfArea(c, new_v), 
 					    NIL)))),
 		    value_undefined);
 }
@@ -1679,4 +1711,103 @@ fprint_environment(FILE * fd, entity m)
 
     (void) fprintf(fd, "End of declarations for module %s\n\n",
 		   module_local_name(m));
+}
+
+/* Problem: A functional global entity may be referenced without
+   parenthesis or CALL keyword in a function or subroutine call as
+   functional parameter. FindOrCreateEntity() will return a local variable
+   which already is or will be in the ghost variable list. When ghost
+   variables are eliminted the data structure using this local variable
+   contain a pointer to nowhere.
+
+   However, SafeFindOrCreateEntity() does not solve this problem
+   entirely. The call with a functional parameter may occur before a call
+   to this functional parameter let us find out it is indeed functional.
+
+   Morevover, SafeFindOrCreateEntity() does create new problem because
+   intrinsic overloading is ignored. Fortran does not use reserved words
+   and a local variable may have the same name as an intrinsics. The
+   intrinsic entity returned by this function must later be converted into
+   a local variable when it is found out that the user really wanted a
+   local variable, for instance because it appears in a lhs.
+
+   This is yet another reason to split the building of the internal
+   representation into three phases. The first phase should not assume any
+   default type or storage. Then, type and storage are consolidated
+   together and default type and storage are only used when no information
+   is available. The last phase should be kind of a link edit. The
+   references to really global variables and intrinsics have to be fixed
+   by scanning the intermediate representation.
+
+   See also FindOrCreateEntity().  */
+
+entity 
+SafeFindOrCreateEntity(
+    string package, /* le nom du package */
+    string name /* le nom de l'entite */)
+{
+    entity e = entity_undefined;
+
+    if(strcmp(package, TOP_LEVEL_MODULE_NAME) == 0) {
+	/* This is a request for a global variable */
+	e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, 0));
+    }
+    else {
+	/* This is a request for a local or a global variable. If a local
+           variable with name "name" exists, return it. */
+	string full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
+	entity le = gen_find_tabulated(full_name, entity_domain);
+
+	if(entity_undefined_p(le)) {
+	    /* Does a global variable with the same name exist and is it
+	       in the package's scope? */
+	    
+	    /* let s hope concatenate s buffer lasts long enough... */
+	    string full_top_name = concatenate(TOP_LEVEL_MODULE_NAME,
+					       MODULE_SEP_STRING, name, 0);
+
+	    entity fe = gen_find_tabulated(full_top_name, entity_domain);
+
+	    if(entity_undefined_p(fe)) {
+		/* There is no such global variable. Let's make a new local variable */
+		full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
+		e = make_entity(strdup(full_name),
+				type_undefined, storage_undefined, value_undefined);
+	    }
+	    else {
+		if(entity_is_argument_p(e, 
+					code_declarations(entity_code(get_current_module_entity())))) {
+		    /* There is such a global variable and it is in the proper scope */
+		    e = fe;
+		}
+		else if(intrinsic_entity_p(fe)) {
+		    e = fe;
+		}
+		else {
+		    /* The global variable is not in the scope. A local
+		       variable must be created. */
+		    full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
+		    e = make_entity(strdup(full_name),
+				    type_undefined, storage_undefined, value_undefined);
+		}
+	    }
+	}
+	else {
+	    /* A local variable has been found */
+	    if(ghost_variable_entity_p(le)) {
+		string full_top_name = concatenate(TOP_LEVEL_MODULE_NAME,
+						   MODULE_SEP_STRING, name, 0);
+
+		entity fe = gen_find_tabulated(full_top_name, entity_domain);
+
+		pips_assert("Entity fe must be defined", entity_defined_p(fe));
+		e = fe;
+	    }
+	    else {
+		e = le;
+	    }
+	}
+    }
+
+    return e;
 }
