@@ -1,6 +1,9 @@
 /* 
  * $Id$
  * $Log: generate.c,v $
+ * Revision 1.17  1998/06/03 13:13:34  coelho
+ * fix for host when receiving mcasts from sender...
+ *
  * Revision 1.16  1997/03/20 10:20:35  coelho
  * RCS headers.
  *
@@ -321,7 +324,7 @@ list *lhp, *lnp;
     /* a receive from sender is generated, however replicated the variable is
      * FC 930623 (before was a call to st_receive_from(ref, ...))
      */
-    stathrcv = st_receive_from_sender(make_reference(temph, NIL));
+    stathrcv = st_receive_from(ref, make_reference(temph, NIL));
 
     (*lhp) = CONS(STATEMENT, stathco,
 	     CONS(STATEMENT, stathrcv,
@@ -825,13 +828,10 @@ reference ref;
 statement st_get_value_for_all(ref,goal)
 reference ref, goal;
 {
-    return(st_make_nice_test(condition_ownerp(),
-			     CONS(STATEMENT,
-				  st_get_value_locally_and_send(ref,goal),
-				  NIL),
-			     CONS(STATEMENT,
-				  st_receive_from(ref,goal),
-				  NIL)));
+    return
+	st_make_nice_test(condition_ownerp(),
+	 CONS(STATEMENT, st_get_value_locally_and_send(ref,goal), NIL),
+	 CONS(STATEMENT, st_receive_from(ref,goal), NIL));
 }
 
 statement st_get_value_for_computer(ref,goal)
@@ -855,9 +855,9 @@ statement st_receive_from(ref,goal)
 reference ref,goal;
 {
     if (replicated_p(reference_variable(ref)))
-	return(st_receive_from_sender(goal));
+	return st_receive_from_sender(goal);
     else
-	return(st_receive_mcast_from_sender(goal));
+	return st_receive_mcast_from_sender(goal);
 }
 
 /*   That is all
