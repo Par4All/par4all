@@ -1,0 +1,29 @@
+#! /bin/sh
+# 
+# $RCSfile: hpfc,v $ (version $Revision$)
+# $Date: 1995/04/19 11:05:39 $, 
+#
+# hpfc scripts front-end
+#
+
+script=`basename $0`
+
+usage()
+{
+  echo "usage: $script help|compile|clean|delete options" >&2
+  exit ${1:-1}
+}
+
+key=$1
+shift
+
+case $key in
+  help) usage 0 ;;
+  compile) hpfc "$@" ;;
+  clean) Delete "$@" ; hpfc_del "$@" ;;
+  delete) hpfc_del "$@" ;;
+  *) usage 2 ;;
+esac
+
+# that is all
+#
