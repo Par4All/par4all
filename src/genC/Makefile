@@ -1,14 +1,9 @@
-#
 # $Id$
 #
 # Newgen should be quite particular...
+#
 
-# LEX=flex
-YFLAGS+= -d -v
-
-all: $(ARCH)/newC $(ARCH)/libgenC.a
-
-recompile: all quick-install
+############################################################## STANDARD DEFINES
 
 LIB_HEADERS=\
         genC.h \
@@ -73,12 +68,26 @@ INSTALL_INC	= $(LIB_HEADERS) $(DERIVED_LIB_HEADERS)
 INSTALL_LIB	= $(ARCH)/libgenC.a
 INSTALL_BIN	= $(ARCH)/newC
 
-#
+################################################################## COMMON STUFF
+
+ifdef NEWGEN_ROOT
+ROOT	= $(NEWGEN_ROOT)
+else
+ROOT	= ../..
+endif
+include $(ROOT)/makes/base.mk
+
+# LEX=flex
+YFLAGS+= -d -v
+
+all: $(ARCH)/newC $(ARCH)/libgenC.a
+
+recompile: all quick-install
+
 # dependences.
 
 $(addprefix $(ARCH)/,$(OTHER_CFILES:.c=.o)) $(LIB_OBJECTS): $(DERIVED_HEADERS)
 
-#
 # local rules
 
 newgen_auto_%.h: %.c
@@ -128,5 +137,3 @@ local-clean:
 		y.tab.c y.tab.h y.output
 
 clean: clean-compiled local-clean
-#
-
