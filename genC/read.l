@@ -55,6 +55,26 @@ static void append_to_literal(string s)
     strcat(literal, s);
 }
 
+static int newgen_line_number;
+static int newgen_char_number;
+static int newgen_col_number;
+
+void newgen_start_lexer(FILE * in)
+{
+  if (in) { yyin = in; }
+  newgen_char_number = 0;
+  newgen_line_number = 1;
+  newgen_col_number = 0;
+}
+
+void newgen_lexer_position(FILE * out)
+{
+    fprintf(out, "newgen lexer at line %d (column %d, char %d)\n", 
+	    newgen_line_number,
+	    newgen_col_number,
+	    newgen_char_number);
+}
+
 %}
 
 %Start a_string
@@ -62,7 +82,7 @@ static void append_to_literal(string s)
 %%
 <a_string>\\\\          {append_to_literal("\\");}
 <a_string>\\\"		{append_to_literal("\"");}
-<a_string>[^\\"\n]*     {append_to_literal(yytext);}
+<a_string>[^\\"\n]*     {append_to_literal(yytext);} /* " */
 <a_string>[ \t\n]*      {append_to_literal(yytext);}
 <a_string>\"		{
 			  BEGIN 0 ;
@@ -97,15 +117,18 @@ static void append_to_literal(string s)
 			  BEGIN a_string ;
 			  append_to_literal("");
 			}
-[ \t\n]*	        ;
-.                       {fatal( "gen_read: Unknown character %x\n", 
+[ \t]*	                ;
+\n 			{ newgen_line_number++; newgen_col_number=0; }
+.                       { fatal("gen_read: Unknown character %x\n", 
 				 (int) yytext[0]);}
 %%
 
 #ifdef FLEX_SCANNER
 int yyinput()
 {
-    return( input()) ;
+    newgen_char_number++;
+    newgen_col_number++;
+    return input();
 }
 #endif
 
@@ -114,5 +137,6 @@ int yywrap(void)
 #ifdef FLEX_SCANNER
     yy_init = 1 ;
 #endif
-    return( 1 ) ;
+    newgen_start_lexer(NULL);
+    return 1;
 }
