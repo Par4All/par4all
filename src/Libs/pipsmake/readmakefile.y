@@ -346,20 +346,25 @@ makefile open_makefile(string name)
     FILE * fd;
     char * mkf_name;
 
-    if (!makefile_undefined_p(pipsmakefile)) 
-    {
-	free_makefile(pipsmakefile);
-	pipsmakefile = makefile_undefined;
-	pips_debug(1, "current makefile erased\n");
-    }
-
     mkf_name = build_pgm_makefile(name);
     fd = fopen(mkf_name, "r");
 
+    if (!makefile_undefined_p(pipsmakefile)) 
+    {
+      free_makefile(pipsmakefile);
+      pipsmakefile = makefile_undefined;
+      pips_debug(1, "current makefile erased\n");
+    }
+
     if (fd)
     {
-	pipsmakefile = read_makefile(fd);
-	safe_fclose(fd, mkf_name);
+      pipsmakefile = read_makefile(fd);
+      safe_fclose(fd, mkf_name);
+    }
+    else
+    {
+      pips_user_warning("pipsmake file not found in database...\n");
+      pipsmakefile = parse_makefile();
     }
 
     free(mkf_name);
