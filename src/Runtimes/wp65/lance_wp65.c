@@ -1,30 +1,56 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <setjmp.h>
+#include <varargs.h>
 
 #include "pvm3.h"
 
 #include "genC.h"
 #include "misc.h"
 
-#define MAXSIZEOFPROCS 8
+/* Dans #include "wp65.h" : */
+extern void get_model(int *ppn, int *pbn, int *pls);
+
+/*
+   #define MAXSIZEOFPROCS 8
+   #define MAXSIZEOFCONNECTED (MAXSIZEOFPROCS/2)
+*/
 
 #define ENV_DEBUG "LANCEWP65_DEBUG_LEVEL"
 
 #define IF_DEBUG(niveau, code) if (get_debug_level() >= niveau) { code; }
 
-int numero, banc, mytid, tids[MAXSIZEOFPROCS], limitecalcul;
+int numero, banc, mytid, pere;
 
-int nb_taches = MAXSIZEOFPROCS;
+/* Retient la « topologie » de la machine : */
+int *tids;
+
+/* Pour permettre la réception d'un paquet en plusieurs morceaux,
+   retient des tampons pour chaque PE (en fait si on considère que
+   dans WP65 un PE ne cause jamais à un autre PE, idem pour les bancs
+   mémoire). */
+/* On assume le fait que des données empaquetées en masse peuvent être
+   dépaquetées en plusieurs fois dans un tampon PVM. */
+#define TAMPON_VIDE -1
+int *bufid, *taille_restante;
+
+int nb_taches;
+int nb_procs;
+int nb_bancs;
+int max_bancs_procs;
+/* Inutilisée : */
+int largeur_banc;
 
 char chaine_nulle = '\0';
 char chaine[1000];
 char var[100];
 char valeur[900];
+char machine[100];
 
 /* Mis là simplement pour éviter une erreur au link. S'attendre donc à
-   des surprises... */
+   des surprises... :-) */
 jmp_buf pips_top_level;
+
 
 /*
    Routine qui affiche un message d'erreur si valeur de retour < 0 :
@@ -38,30 +64,123 @@ void testerreur(char *chaine, int retour)
 }
 
 
+void sort_erreur(format, va_alist)
+char *format;
+va_dcl
+{
+  va_list args;
+  
+  va_start(args);
+  (void) vfprintf(stderr, format, args);
+  abort();
+  va_end(args);
+}
+
+
+/* Affiche quelque chose dans l'entête d'un xterm et son icône :*/
+void affiche_entete_X(format, va_alist)
+char *format;
+va_dcl
+{
+  va_list args;
+  char chaine[1000];
+
+  va_start(args);
+  (void) vsprintf(chaine, format, args);
+  (void) fprintf(stderr, "]0;%s", chaine);
+  va_end(args);
+}
+
+
+char *basename(char *chaine)
+{
+  char *debut_basename, *p;
+  
+  debut_basename = p = chaine;
+  while(*p != '\0') {
+    if (*p == '/') debut_basename = p + 1;
+    /* Dans UNIX, un nom d'exécutable ne peut terminer par un "/". */
+    p++;
+  }
+  return debut_basename;
+}
+
+void init_params()
+{
+  int i;
+
+  get_model(&nb_procs, &nb_bancs, &largeur_banc);
+}
+
+
+void envoie_params()
+{
+  testerreur("pvm_pkint",
+	     pvm_pkint(&nb_procs, 1, 1));
+  testerreur("pvm_pkint",
+	     pvm_pkint(&nb_bancs, 1, 1));
+  testerreur("pvm_pkint",
+	     pvm_pkint(&largeur_banc, 1, 1));
+}
+
+
+void recoit_params()
+{
+  testerreur("pvm_upkint",
+	     pvm_upkint(&nb_procs, 1, 1));
+  testerreur("pvm_upkint",
+	     pvm_upkint(&nb_bancs, 1, 1));
+  testerreur("pvm_upkint",
+	     pvm_upkint(&largeur_banc, 1, 1));
+}
+
+
+void init_variables()
+{
+  int i;
+
+  nb_taches = nb_procs + nb_bancs;
+  max_bancs_procs = (nb_procs > nb_bancs) ? nb_procs : nb_bancs;
+  tids = (int *) calloc(nb_taches, sizeof(int));
+  bufid = (int *) calloc(max_bancs_procs, sizeof(int));
+  taille_restante = (int *) calloc(max_bancs_procs, sizeof(int));
+  
+  for(i = 0; i < max_bancs_procs; i++) {
+    bufid[i] = TAMPON_VIDE;
+    taille_restante[i] = 0;
+  }
+
+  testerreur("gethostname",
+	     gethostname(machine, sizeof(machine) - 1));
+}
+
+
 main(int argc, char *argv[])
 {      
   int i, nb_t;
   char *argv_fils[3], *debut_basename, *p, *chaine_env;
   int niveau_debug_pvm;
-
+  
   mytid = pvm_mytid();
-  tids[0] = pvm_parent();
+  pere = pvm_parent();
 
-  if (tids[0] < 0) {
-    /* Je suis le contro^leur de de'part... */
+  /* Augmente l'efficacité des communications : */
+  testerreur("pvm_advise",
+	     pvm_advise(PvmRouteDirect));
+  
+  if (pere < 0) {
+    /* Je suis le contrôleur de départ... */
     debug_on(ENV_DEBUG);
-    /* On va lancer l'exécutable de me^me nom comme fils : */
-    debut_basename = p = argv[0];
-    while(*p != '\0') {
-      if (*p == '/') debut_basename = p + 1;
-	/* Dans UNIX, un nom d'exécutable ne peut terminer par un "/". */
-      p++;
-    }
-    argv_fils[0] = debut_basename;
+    init_params();
+    init_variables();
+    tids[0] = mytid;
+    
+    /* On va lancer l'exécutable de même nom comme fils : */
+    argv_fils[0] = basename(argv[0]);
     argv_fils[1] = (char *) NULL;
     argv_fils[2] = (char *) NULL;
     /* Si on est sous X11 on passe le DISPLAY comme premier argument.
-       Magouille sordide pour faire marcher debugger légèrement
+       Magouille sordide pour faire marcher le debugger légèrement
        modifié... */
     chaine_env = getenv("DISPLAY");
     if (chaine_env != NULL)
@@ -72,53 +191,55 @@ main(int argc, char *argv[])
     else
       niveau_debug_pvm = PvmTaskDefault;
 
-    nb_t = pvm_spawn(debut_basename, argv_fils,
+    nb_t = pvm_spawn(argv_fils[0], argv_fils,
 		     niveau_debug_pvm, 
 		     "*", 
 		     nb_taches - 1, 
 		     &tids[1]);
          
     if (nb_t != nb_taches - 1)
-      testerreur("main : Incapable de lancer les ta^ches",
+      testerreur("main : Incapable de lancer les tâches",
 		 nb_t - (nb_taches - 1));
 
-    tids[0] = mytid;
-
-
-    /* Envoie des variables d'environnement a` tout les fils : */
-    chaine_env = getenv(ENV_DEBUG);
     testerreur("pvm_initsend",
 	       pvm_initsend(PvmDataDefault));
-
+  
+    /* Envoi du model.rc de la machine : */
+    envoie_params();
+    
+    /* Envoi de certaines variables d'environnement à tous les fils : */
+    chaine_env = getenv(ENV_DEBUG);
     if (chaine_env != NULL) {
-    testerreur("pvm_pkstr",
-	       pvm_pkstr(ENV_DEBUG));
-    testerreur("pvm_pkstr",
-	       pvm_pkstr(chaine_env));
+      testerreur("pvm_pkstr",
+		 pvm_pkstr(ENV_DEBUG));
+      testerreur("pvm_pkstr",
+		 pvm_pkstr(chaine_env));
     }
     testerreur("pvm_pkstr",
 	       pvm_pkstr(&chaine_nulle));
-    testerreur("pvm_mcast",
-	       pvm_mcast(&tids[1], nb_taches - 1, 0));
 
-
-    testerreur("pvm_initsend",
-	       pvm_initsend(PvmDataDefault));
     testerreur("pvm_pkint",
 	       pvm_pkint(&tids[1], nb_taches - 1, 1));
-      /*    Envoie le vecteur de tids a` tout le monde : */
-      testerreur("pvm_mcast",
-		 pvm_mcast(&tids[1], nb_taches - 1, 0));
-    /*     le contro^leur a le nume'ro 0 : */
+
+    /* Envoie le vecteur de tids à tout le monde : */
+    testerreur("pvm_mcast",
+	       pvm_mcast(&tids[1], nb_taches - 1, 0));
+    /*     le contrôleur a le numéro 0 : */
     numero = 0;
   }
   else {
-    /* Je suis un processeur de banc ou de calcul lance' par le
-       contro^leur... */
+    /* Je suis un processeur de banc ou de calcul lancé par le
+       contrôleur... */
 
-    /* Récupère des variables d'environnement passées par le père : */
+    /* Récupère du père... */
     testerreur("pvm_recv",
-	       pvm_recv(tids[0], 0));
+	       pvm_recv(pere, 0));
+
+    /* le model.rc : */
+    recoit_params();
+    init_variables();
+    
+    /* les variables d'environnement : */
     for(;;) {
       testerreur("pvm_upkstr",
 		 pvm_upkstr(var));
@@ -134,10 +255,9 @@ main(int argc, char *argv[])
 
     debug_on(ENV_DEBUG);
 
-    testerreur("pvm_recv",
-	       pvm_recv(tids[0], 0));
     testerreur("pvm_upkint",
 	       pvm_upkint(&tids[1], nb_taches - 1, 1));
+    tids[0] = pere;
   }
       
   if (get_debug_level() >= 2)
@@ -152,17 +272,19 @@ main(int argc, char *argv[])
       numero = i;
 
   /*     Reste maintenant a` se partager en noeud de calcul ou de me'moire : */
-  limitecalcul = nb_taches/2;
-
-  if (numero < limitecalcul) {
+  if (numero < nb_procs) {
     debug(2, "main",
 	  "Je suis le PE %d de tid 0x%x\n", numero, mytid);
+    if (get_debug_level() >= 1)
+      affiche_entete_X("%s:%s PE %d", machine, basename(argv[0]), numero);
     WP65_(&numero);
   }
   else {
-    banc = numero - limitecalcul;
+    banc = numero - nb_procs;
     debug(2, "main",
 	  "Je suis le banc %d de tid 0x%x\n", banc, mytid);
+    if (get_debug_level() >= 1)
+      affiche_entete_X("%s:%s Banc %d", machine, basename(argv[0]), banc);
     BANK_(&banc);
   }
 
@@ -177,23 +299,84 @@ void send_4(int tid, float *donnee, int taille)
 {
   testerreur("pvm_initsend",
 	     pvm_initsend(PvmDataDefault));
+  /* Envoie aussi la taille du message pour être capable de le lire
+     par morceaux : */
+  testerreur("pvm_pack",
+	     pvm_pkint(&taille, 1, 1));
   testerreur("pvm_pack",
 	     pvm_pkfloat(donnee, taille, 1));
+
   debug(5, "send_4",
 	"pvm_send de tid 0x%x vers tid 0x%x\n", mytid, tid);
+
   testerreur("pvm_send",
 	     pvm_send(tid, 0));
 }
 
 
-void receive_4(int tid, float *donnee, int taille)
+void receive_4(int tid, int proc_or_bank_id, float *donnee, int taille)
 {
+  int taille_recue;
+  int buf_id, old_buf;
+
   debug(5, "receive_4",
-	"pvm_recv de tid 0x%x depuis le tid 0x%x\n", mytid, tid);
-  testerreur("pvm_recv",
-	     (int) pvm_recv(tid, 0));
-  testerreur("pvm_unpack",
-	     pvm_upkfloat(donnee, taille, 1)); 
+	"pvm_recv de tid 0x%x depuis le tid 0x%x de %d données.\n",
+	mytid, tid, taille);
+
+  if(bufid[proc_or_bank_id] != TAMPON_VIDE) {
+    if (taille_restante[proc_or_bank_id] != 0) {
+      /* Il nous reste des choses à lire dans un ancien tampon. */
+      testerreur("pvm_setrbuf",
+		 old_buf = pvm_setrbuf(bufid[proc_or_bank_id]));
+      if (taille > taille_restante[proc_or_bank_id])
+	sort_erreur("Demande de lire %d données alors qu'il n'en reste que %d !\n",
+		    taille, taille_restante);
+      debug(5, "receive_4",
+	    "Lecture ancienne de %d données.\n", taille);
+      testerreur("pvm_unpack",
+		 pvm_upkfloat(donnee, taille, 1)); 
+      if ((taille_restante[proc_or_bank_id] -= taille) == 0) {
+	/* Le tampon est vide, on le libère : */
+	testerreur("pvm_freebuf",
+		   pvm_freebuf(bufid[proc_or_bank_id]));
+	bufid[proc_or_bank_id] = TAMPON_VIDE;
+	debug(5, "receive_4",
+	      "Libération du tampon %d...", proc_or_bank_id);
+       }
+      debug(5, "receive_4",
+	    "Reste %d données dans le tampon %d.\n",
+	    taille_restante[proc_or_bank_id], proc_or_bank_id);      
+    }
+    else {
+      sort_erreur("Inconsistence entre bufid[%s] et taille_restante[%s] !\n",
+		  proc_or_bank_id, proc_or_bank_id);
+    }
+  }
+  else {
+    /* Il nous reste rien à lire, il faut donc faire une « vraie »
+       réception : */
+    testerreur("pvm_recv",
+	       buf_id = pvm_recv(tid, 0));
+    testerreur("pvm_unpack",
+	       pvm_upkint(&taille_recue, 1, 1));
+    debug(5, "receive_4",
+	  "Nouvelle réception : arrivée de %d données.\n", taille_recue);
+
+    if (taille_recue < taille)
+      sort_erreur("Demande de recevoir %d données alors qu'on n'en n'a reçu que %d !\n",
+		  taille, taille_recue);
+    if (taille_recue != taille) {
+      /* On veut recevoir en plus petits morceaux. */
+      bufid[proc_or_bank_id] = buf_id;
+      taille_restante[proc_or_bank_id] = taille_recue - taille;
+      debug(5, "receive_4",
+	    "Découpe en petit morceaux : reste %d données à lire pour une prochaine fois.\n",
+	    taille_restante[proc_or_bank_id]);
+    }
+    /* Lit déjà ce qu'on veut : */
+    testerreur("pvm_unpack",
+	       pvm_upkfloat(donnee, taille, 1));
+  }
 }
 
 
@@ -210,7 +393,7 @@ void BANK_RECEIVE_4_(int *proc_id, float *donnee, int *taille)
   debug(4, "BANK_RECEIVE_4",
 	"Réception de banc %d <- PE %d, taille = %d\n",
 	banc, *proc_id, *taille);
-  receive_4(tids[*proc_id], donnee, *taille);
+  receive_4(tids[*proc_id], *proc_id, donnee, *taille);
 }
 
 
@@ -219,7 +402,7 @@ void WP65_SEND_4_(int *bank_id, float *donnee, int *taille)
   debug(4, "WP65_SEND_4",
 	"Envoi de PE %d -> banc %d, taille = %d\n",
 	numero, *bank_id, *taille);
-  send_4(tids[*bank_id + limitecalcul], donnee, *taille);
+  send_4(tids[*bank_id + nb_procs], donnee, *taille);
 }
 
 
@@ -228,12 +411,13 @@ void WP65_RECEIVE_4_(int *bank_id, float *donnee, int *taille)
   debug(4, "WP65_RECEIVE_4",
 	"Réception de PE %d <- banc %d, taille = %d\n",
 	numero, *bank_id, *taille);
-  receive_4(tids[*bank_id + limitecalcul], donnee, *taille);
+  receive_4(tids[*bank_id + nb_procs], *bank_id, donnee, *taille);
 }
 
 
 /* Horreur pour que la bibliothèque F77 soit contente : */
 void MAIN_()
 {
+  /* Jamais exécuté, je pense... */
   fprintf("Entrée dans MAIN_ !\n");
 }
