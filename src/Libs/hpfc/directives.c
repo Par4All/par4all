@@ -3,7 +3,7 @@
  * these functions deal with HPF directives.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/08/01 18:12:08 $, )
+ * ($Date: 1995/08/02 10:40:20 $, )
  */
 
 #include "defines-local.h"
@@ -18,9 +18,9 @@
  * can be parsed by PIPS F77 parser. It's a hack but it greatly reduced
  * the number of lines for the directive analysis, and it allowed quite
  * simply to figure out where a executable directive is in the code.
+ * However the syntax allowed in mapping directives is restricted to F77.
  */
-
-#define HPF_PREFIX "HPFC"
+#define HPF_PREFIX		"HPFC"
 
 #define BLOCK_SUFFIX		"K"
 #define CYCLIC_SUFFIX		"C"
@@ -131,12 +131,10 @@ static void new_dynamic(expression e)
 /*  TRUE if the template dimension subscript is an alignment.
  *  FALSE if the dimension is replicated. 
  */
-static bool 
-alignment_p(align_src, subscript, padim, prate, pshift)
-list /* of expressions */ align_src;
-expression subscript;
-int *padim;
-Value *prate, *pshift;
+static bool
+alignment_p(list /* of expressions */ align_src,
+	    expression subscript,
+	    int *padim, Value *prate, Value *pshift)
 {
     normalized n = expression_normalized(subscript);
     Pvecteur v, v_src;
@@ -195,11 +193,10 @@ Value *prate, *pshift;
  *  used by both align and realign management.
  */
 static align 
-extract_the_align(alignee, temp)
-reference alignee, temp;
+extract_the_align(reference alignee,
+		  reference temp)
 {
-    list
-	/* of alignments  */ aligns    = NIL,
+    list/* of alignments  */ aligns    = NIL,
 	/* of expressions */ align_src = reference_indices(alignee),
 	                     align_sub = reference_indices(temp);
     entity template = reference_variable(temp);
@@ -245,15 +242,13 @@ static void initial_alignment(statement s)
 }
 
 static void 
-one_align_directive(alignee, temp, dynamic)
-reference alignee, temp;
-bool dynamic;
+one_align_directive(reference alignee,
+		    reference temp,
+		    bool dynamic)
 {
-    entity 
-	template = reference_variable(temp),
-	array    = reference_variable(alignee);
-    align
-	a = extract_the_align(alignee, temp);
+    entity template = reference_variable(temp),
+	   array    = reference_variable(alignee);
+    align a = extract_the_align(alignee, temp);
 
     normalize_align(array, a);
     
@@ -282,10 +277,9 @@ bool dynamic;
 }
 
 static void 
-handle_align_and_realign_directive(f, args, dynamic)
-entity f;
-list /* of expressions */ args;
-bool dynamic;
+handle_align_and_realign_directive(entity f,
+				   list /* of expressions */ args,
+				   bool dynamic)
 {
     list last = gen_last(args);
     reference template;
@@ -310,9 +304,8 @@ bool dynamic;
 /* returns the expected style tag for the given distribution format,
  * plus a pointer to the list of arguments.
  */
-static tag distribution_format(e, pl)
-expression e;
-list /* of expressions */ *pl;
+static tag distribution_format(expression e,
+			       list /* of expressions */ *pl)
 {
     syntax s = expression_syntax(e);
     entity function;
@@ -347,13 +340,11 @@ list /* of expressions */ *pl;
 /*  builds the distribute from the distributee and processor references.
  */
 static distribute 
-extract_the_distribute(distributee, proc)
-reference distributee, proc;
+extract_the_distribute(reference distributee, reference proc)
 {
     expression parameter = expression_undefined;
     entity processor = reference_variable(proc);
-    list
-	/* of expressions */   lformat = reference_indices(distributee),
+    list/* of expressions */   lformat = reference_indices(distributee),
 	                       largs,
 	/* of distributions */ ldist = NIL;
     tag format;
@@ -393,9 +384,9 @@ reference distributee, proc;
 /*  handles a simple (one template) distribute or redistribute directive.
  */
 static void 
-one_distribute_directive(distributee, proc, dynamic)
-reference distributee, proc;
-bool dynamic;
+one_distribute_directive(reference distributee,
+			 reference proc,
+			 bool dynamic)
 {
     entity processor = reference_variable(proc),
            template  = reference_variable(distributee);
@@ -440,10 +431,9 @@ bool dynamic;
 /*  handles a full distribute or redistribute directive.
  */
 static void 
-handle_distribute_and_redistribute_directive(f, args, dynamic)
-entity f;
-list /* of expressions */ args;
-bool dynamic;
+handle_distribute_and_redistribute_directive(entity f,
+					     list /* of expressions */ args,
+					     bool dynamic)
 {
     list /* of expression */ last = gen_last(args);
     reference proc;
@@ -526,10 +516,7 @@ HANDLER_PROTOTYPE(distribute)
 HANDLER_PROTOTYPE(independent)
 {
     list /* of entities */ l = expression_list_to_entity_list(args);
-    instruction i;
-    entity index;
     statement s;
-    loop o;
 
     pips_debug(2, "%d index(es)\n", gen_length(l));
 
@@ -540,12 +527,12 @@ HANDLER_PROTOTYPE(independent)
     
     while(next_ctrl_graph_travel(&s))
     {
-	i = statement_instruction(s);
+	instruction i = statement_instruction(s);
 	
 	if (instruction_loop_p(i))  /* what we're looking for */
 	{
-	    o = instruction_loop(i);
-	    index = loop_index(o);
+	    loop o = instruction_loop(i);
+	    entity index = loop_index(o);
 
 	    if (ENDP(l)) /* simple independent case, first loop is tagged // */
 	    {
@@ -582,6 +569,7 @@ HANDLER_PROTOTYPE(independent)
  */
 HANDLER_PROTOTYPE(new)
 {
+    user_warning("handle_new_directive", "not implemented\n");
     return; /* (that's indeed a first implementation:-) */
 }
 
@@ -651,7 +639,7 @@ static struct DirectiveHandler handlers[] =
 /* returns the handler for directive name.
  * assumes the name should point to a directive.
  */
-static void (*directive_handler(string name))()
+static void (*directive_handler(string name))(entity, list)
 {
     struct DirectiveHandler *x=handlers;
     while (x->name!=(string) NULL && strcmp(name,x->name)!=0) x++;
