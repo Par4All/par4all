@@ -3529,7 +3529,7 @@ Polyhedron *DomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRay
 	      "diffdim", "operation on different dimensions");
     return (Polyhedron*) 0;
   }
-  if (emptyQ(Pol2))
+  if (emptyQ(Pol1) || emptyQ(Pol2))
     return (Domain_Copy(Pol1));
   d = (Polyhedron *)0;
   for (p2=Pol2; p2; p2=p2->next) {
