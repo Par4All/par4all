@@ -90,6 +90,7 @@ Psysteme * ps;
 {
     syst_in = f;
     sc_init_lex();
+    syst_restart(f);
     syst_parse();
     ps_yacc = sc_reversal(ps_yacc);
     *ps = ps_yacc;
