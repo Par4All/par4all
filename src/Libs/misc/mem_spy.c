@@ -41,7 +41,7 @@
 extern int etext;
 
 /* My own stack (do not rely on any package!) */
-#define TailleDeMaPile 20
+#define TailleDeMaPile 30
 typedef struct _MemSpyStack 
 {
     int index;
