@@ -174,6 +174,7 @@ approx_convert(region reg)
 	pips_debug(9,"scalar\n");
 
 	new_reg = reg;
+	effect_approximation_tag(new_reg) = is_approximation_exact;
     }
     else
     {
