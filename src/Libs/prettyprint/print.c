@@ -20,9 +20,9 @@
   *    LZ, 17/01/92
   */ 
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <values.h>
 
 #include "genC.h"
 #include "ri.h"
@@ -31,6 +31,7 @@
 
 #include "misc.h"
 #include "properties.h"
+#include "top-level.h"
 #include "text-util.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
@@ -40,6 +41,9 @@
 #include "resources.h"
 
 static bool is_user_view;	/* print_code or print_source */
+
+/* Are we working for emacs or not ? */
+extern bool is_emacs_prettyprint;
 
 void print_parallelized90_code(mod_name)
 char *mod_name;
@@ -106,6 +110,20 @@ char *mod_name;
   print_code_or_source(mod_name);
 }
 
+
+/* Idem as print_code but add some emacs properties in the output.
+   RK, 21/06/1995 */
+void
+emacs_print_code(char *mod_name)
+{
+  is_emacs_prettyprint = TRUE;
+  is_attachment_prettyprint = TRUE;
+  print_code(mod_name);
+  is_emacs_prettyprint = FALSE;  
+  is_attachment_prettyprint = FALSE;  
+}
+
+
 void print_code_or_source(mod_name)
 char *mod_name;
 {
@@ -133,6 +151,8 @@ char *mod_name;
 				  "/",
 				  mod_name,
 				  is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
+                                  is_emacs_prettyprint ? EMACS_FILE_EXT : "",
+                                  get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
 				  NULL));
 
     MERGE_TEXTS(r, text_module(module,mod_stat));
@@ -141,7 +161,9 @@ char *mod_name;
     print_text(fd, r);
     safe_fclose(fd, filename);
 
-    DB_PUT_FILE_RESOURCE(is_user_view? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE,
+    DB_PUT_FILE_RESOURCE(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? DBR_GRAPH_PRINTED_FILE
+                         : is_emacs_prettyprint ? DBR_EMACS_PRINTED_FILE :
+                         (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE),
 			 strdup(mod_name),
 			 filename);
     debug_off();
