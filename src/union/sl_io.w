@@ -586,7 +586,7 @@ char*     nomfic;
     (void) fprintf(stderr, "Ouverture du fichier %s impossible\n",nomfic);
     exit(4);
   }
-  sl_init_lex(); slx_parse(); fclose( sl_in );
+  sl_init_lex(); slx_parse(); fclose( slx_in );
   return( sl_yacc );
 }
 @| sl_fprint_tab sl_fprint sl_read @}
