@@ -105,9 +105,9 @@ statement s;
     pips_assert("statement_to_postcondition", tf != transformer_undefined);
     ifdebug(1) {
 	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %x:\n",
-		       statement_number(s), ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-		       (unsigned int) tf);
+	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
+		       statement_number(s), ORDERING_NUMBER(so),
+		       ORDERING_STATEMENT(so), tf);
 	(void) print_transformer(tf) ;
     }
 
