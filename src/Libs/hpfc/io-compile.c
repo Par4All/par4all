@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/09/03 15:19:36 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/11/17 14:19:16 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -221,8 +221,8 @@ statement stat, *hp, *np;
 	entity
 	    synchro = hpfc_name_to_entity(SYNCHRO);
 	
-	lh_io = CONS(STATEMENT, my_make_call_statement(synchro, NIL), lh_io);
-	ln_io = CONS(STATEMENT, my_make_call_statement(synchro, NIL), ln_io);
+	lh_io = CONS(STATEMENT, hpfc_make_call_statement(synchro, NIL), lh_io);
+	ln_io = CONS(STATEMENT, hpfc_make_call_statement(synchro, NIL), ln_io);
     }
 
     *hp = make_block_statement(gen_nconc(lh_collect,
