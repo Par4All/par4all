@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.17  2000/07/03 12:52:07  coelho
+   headers fixed.
+
    Revision 1.16  2000/07/03 12:51:16  coelho
    typo fixed.
 
@@ -80,7 +83,8 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
-#include "transformations.h"
+#include "transformations.h" /* out? */
+#include "expressions.h"
 
 #include "eole_private.h"
 
