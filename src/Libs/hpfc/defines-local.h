@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: defines-local.h,v $ ($Date: 1994/09/01 15:48:03 $, ) version $Revision$, got on %D%, %T%
+ * $RCSfile: defines-local.h,v $ ($Date: 1994/11/17 14:19:20 $, ) version $Revision$, got on %D%, %T%
  * $Id$
  */
 
@@ -279,7 +279,7 @@
 		 condition_computer_in_owners()))
 
 #define hpfc_name_to_stmt(s) \
-  (my_make_call_statement(hpfc_name_to_entity(s), NIL))
+  (hpfc_make_call_statement(hpfc_name_to_entity(s), NIL))
 
 #define st_init_host() hpfc_name_to_stmt(INIT_HOST)
 #define st_init_node() hpfc_name_to_stmt(INIT_NODE)
@@ -304,7 +304,7 @@
   hpfc_name_and_ref_to_stmt(SND_TO_A_BY_H, val)
 
 #define st_send_to_neighbour() \
-  my_make_call_statement(hpfc_name_to_entity(SND_TO_N), NIL)
+  hpfc_make_call_statement(hpfc_name_to_entity(SND_TO_N), NIL)
 
 #define st_send_to_owner(val) \
   hpfc_name_and_ref_to_stmt(SND_TO_O, val)
@@ -328,7 +328,7 @@
 /* RCV */
 
 #define st_receive_from_neighbour() \
-  my_make_call_statement(hpfc_name_to_entity(RCV_FR_N), NIL)
+  hpfc_make_call_statement(hpfc_name_to_entity(RCV_FR_N), NIL)
 
 #define st_receive_from_sender(goal) \
   hpfc_name_and_ref_to_stmt(RCV_FR_S, goal)
