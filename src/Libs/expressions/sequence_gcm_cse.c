@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.26  2000/08/21 14:02:18  phamdinh
+   comments added.
+
    Revision 1.25  2000/08/19 14:03:03  phamdinh
    Add comments in code!
 
@@ -1216,6 +1219,7 @@ typedef struct
      This list stores variables modified. It is used to avoid of creating 
      expression common containing variable modified.
      It shoud remove membre 'depends'!
+     It is a pointer into the global list 'w_effects'
    */
   list *w_effects; /* list of expression */ 
 }
