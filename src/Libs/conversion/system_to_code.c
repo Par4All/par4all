@@ -4,7 +4,7 @@
  *
  * SCCS stuff:
  * $RCSfile: system_to_code.c,v $ version $Revision$, 
- * ($Date: 1997/09/09 12:33:08 $, ) 
+ * ($Date: 1998/04/14 19:58:59 $, ) 
  */
 
 /* Standard includes
@@ -17,16 +17,11 @@
 /* Psystems stuff
  */
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
+#include "linear.h"
 
 /* Newgen stuff
  */
-
 #include "genC.h"
-
 #include "ri.h" 
 
 /* PIPS stuff
@@ -284,15 +279,19 @@ static Value vecteur_lower_bound(
 	    int il;
 	    Value vl,p;
 	    if (value_pos_p(val))
+	    {
 		if (!bound_lowers_p((entity) var)) 
 		    return VALUE_MIN;
 		else
 		    il = load_lowers((entity) var);
+	    }
 	    else /* val < 0, I guess */
+	    {
 		if (!bound_uppers_p((entity) var))
 		    return VALUE_MIN;
 		else
 		    il = load_uppers((entity) var);
+	    }
 	    
 	    vl = int_to_value(il);
 	    p = value_mult(val,vl);
