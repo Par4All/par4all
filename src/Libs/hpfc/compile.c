@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.68  1997/10/27 16:49:26  coelho
+ * db put updated to Src.
+ *
  * Revision 1.67  1997/10/27 09:50:27  coelho
  * local basename dropped.
  *
@@ -35,25 +38,8 @@
 
 extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
 
-static string 
-hpfc_local_name (string name, string suffix)
-{
-    static char buffer[100]; /* ??? should be enough */
-    (void) sprintf(buffer, "%s_%s", name, suffix);
-    return buffer;
-}
-
-static string 
-hpfc_host_local_name (string name)
-{
-    return(hpfc_local_name(name, HOST_NAME));
-}
-
-static string 
-hpfc_node_local_name (string name)
-{
-    return(hpfc_local_name(name, NODE_NAME));
-}
+#define src(name, suf) \
+	strdup(concatenate(WORKSPACE_SRC_SPACE "/", name, suf, 0))
 
 void 
 make_host_and_node_modules (entity module)
@@ -66,15 +52,22 @@ make_host_and_node_modules (entity module)
 
     if (entity_main_module_p(module))
     {
-	/* host = make_empty_program(HOST_NAME);
-	   node = make_empty_program(NODE_NAME); */
 	host = make_empty_subroutine(HOST_NAME);
 	node = make_empty_subroutine(NODE_NAME);
     }
     else
     {
-	host = make_empty_subroutine(hpfc_host_local_name(name));
-	node = make_empty_subroutine(hpfc_node_local_name(name));
+	string tmp;
+
+	/* HOST and NODE empty routines...
+	 */
+	tmp = strdup(concatenate(name, "_", HOST_NAME, 0));
+	host = make_empty_subroutine(tmp);
+	free(tmp);
+
+	tmp = strdup(concatenate(name, "_", NODE_NAME, 0));
+	node = make_empty_subroutine(tmp);
+	free(tmp);
 
 	/*  Arity and result
 	 */
@@ -177,11 +170,6 @@ create_bound_entity(
 
     AddEntityToDeclarations(result, module);
 
-    /*
-    code_declarations(EntityCode(module)) = 
-	gen_nconc(code_declarations(EntityCode(module)), 
-		  CONS(ENTITY, result, NIL)); */
-
     pips_debug(9, "creating %s in %s (arg %d)\n", 
 	       entity_name(result), entity_name(module), number);
 
@@ -249,9 +237,7 @@ add_bound_arguments(entity module) /* for the node */
     }
 }
 
-/* init_host_and_node_entities
- *
- * both host and node modules are initialized with the same
+/* both host and node modules are initialized with the same
  * declarations than the compiled module, but the distributed arrays
  * declarations... which are not declared in the case of the host_module,
  * and the declarations of which are modified in the node_module
@@ -336,11 +322,11 @@ FILE *
 hpfc_fopen(
     string name)
 {
-    string base = basename(name);
+    string base = basename(name, NULL);
     FILE *f = (FILE *) safe_fopen(name, "w");
     fprintf(f, "!\n! File %s\n! This file has been automatically generated " 
 	    "by the HPF compiler\n!\n", base);
-    free(base)
+    free(base);
     return f;
 }
 
@@ -349,7 +335,7 @@ hpfc_fclose(
     FILE *f,
     string name)
 {
-    string base = basename(name);
+    string base = basename(name, NULL);
     fprintf(f, "!\n! That is all for %s\n!\n", base);
     free(base);
     safe_fclose(f, name);
@@ -416,7 +402,6 @@ hpfc_print_code(
     debug_off();
 }
 
-#define string_cat(prefix, suffix) strdup(concatenate(prefix, suffix, NULL))
 #define full_name(dir, name) concatenate(dir, "/", name, NULL)
 
 void 
@@ -428,14 +413,13 @@ put_generated_resources_for_common(entity common)
 
     node_common = load_new_node(common),
     host_common = load_new_host(common);
-    
     prefix = module_local_name(common);
     dir_name = db_get_current_workspace_directory();
     
-    host_name = string_cat(prefix, HINC_SUFFIX);
-    node_name = string_cat(prefix, NINC_SUFFIX);
-    parm_name = string_cat(prefix, PARM_SUFFIX);
-    init_name = string_cat(prefix, INIT_SUFFIX);
+    host_name = src(prefix, HINC_SUFFIX);
+    node_name = src(prefix, NINC_SUFFIX);
+    parm_name = src(prefix, PARM_SUFFIX);
+    init_name = src(prefix, INIT_SUFFIX);
 
     host_file = hpfc_fopen(full_name(dir_name, host_name));
     hpfc_print_common(host_file, host_module, host_common);
@@ -475,16 +459,18 @@ put_generated_resources_for_common(entity common)
 void
 compile_a_special_io_function(entity module)
 {
-    string prefix, file_name, h_name, dir_name;
+    string prefix, file_name, h_name, dir_name, fs, ft;
 
     prefix = module_local_name(module);
-
     file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
     dir_name = db_get_current_workspace_directory();
-    h_name = string_cat(prefix, HOST_SUFFIX);
+    h_name = src(prefix, HOST_SUFFIX);
 
-    safe_system(concatenate("cp ", dir_name, "/", file_name, " ", 
-		                   dir_name, "/", h_name, NULL));
+    fs = strdup(concatenate(dir_name, "/", file_name, 0));
+    ft = strdup(concatenate(dir_name, "/", h_name, 0));
+    safe_copy(fs, ft);
+    free(fs);
+    free(ft);
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, prefix, h_name);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, NO_FILE);
@@ -497,20 +483,22 @@ compile_a_special_io_function(entity module)
 void
 compile_a_pure_function(entity module)
 {
-    string prefix, file_name, hn_name, dir_name;
+    string prefix, file_name, hn_name, dir_name, fs, ft;
 
     pips_debug(1, "compiling pure a function (%s)\n", entity_name(module));
 
     prefix = module_local_name(module);
     dir_name = db_get_current_workspace_directory();
     file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
-    hn_name = string_cat(prefix, BOTH_SUFFIX);
+    hn_name = src(prefix, BOTH_SUFFIX);
 
-    safe_system(concatenate("cp ", dir_name, "/", file_name, " ", 
-			           dir_name, "/", hn_name, NULL));
+    fs = strdup(concatenate(dir_name, "/", file_name, 0));
+    ft = strdup(concatenate(dir_name, "/", hn_name, 0));
+    safe_copy(fs, ft);
+    free(fs), free(ft);
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, prefix, hn_name);
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, hn_name);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, strdup(hn_name));
     DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, prefix, NO_FILE);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, prefix, NO_FILE);
 }
@@ -528,22 +516,22 @@ put_generated_resources_for_module(
     prefix = module_local_name(module);
     dir_name = db_get_current_workspace_directory();
 
-    host_name = string_cat(prefix, HOST_SUFFIX);
+    host_name = src(prefix, HOST_SUFFIX);
     host_file = hpfc_fopen(full_name(dir_name, host_name));
     hpfc_print_code(host_file, host_module, host_stat);
     hpfc_fclose(host_file, host_name);
 
-    node_name = string_cat(prefix, NODE_SUFFIX);
+    node_name = src(prefix, NODE_SUFFIX);
     node_file = hpfc_fopen(full_name(dir_name, node_name));
     hpfc_print_code(node_file, node_module, node_stat);
     hpfc_fclose(node_file, node_name);
 
-    parm_name = string_cat(prefix, PARM_SUFFIX);
+    parm_name = src(prefix, PARM_SUFFIX);
     parm_file = hpfc_fopen(full_name(dir_name, parm_name));
     create_parameters_h(parm_file, module);
     hpfc_fclose(parm_file, parm_name);
 
-    init_name = string_cat(prefix, INIT_SUFFIX);
+    init_name = src(prefix, INIT_SUFFIX);
     init_file = hpfc_fopen(full_name(dir_name, init_name));
     create_init_common_param_for_arrays(init_file, module);
     hpfc_fclose(init_file, init_name);
@@ -560,10 +548,10 @@ put_generated_resources_for_module(
 	hpfc_print_file(node_name);
     }
 
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, strdup(prefix), parm_name);
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, strdup(prefix), host_name);
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, strdup(prefix), node_name);
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, strdup(prefix), init_name);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, prefix, parm_name);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, prefix, host_name);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, node_name);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, prefix, init_name);
 }
 
 void 
@@ -574,8 +562,8 @@ put_generated_resources_for_program (string program_name)
 
     dir_name = db_get_current_workspace_directory();
 
-    comm = strdup(GLOBAL_PARAMETERS_H);
-    init = strdup(GLOBAL_INIT_H);
+    comm = src(GLOBAL_PARAMETERS_H, "");
+    init = src(GLOBAL_INIT_H, "");
 
     comm_file = hpfc_fopen(full_name(dir_name, comm));
     create_common_parameters_h(comm_file);
