@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/06/03 13:53:02 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/06/08 19:09:13 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -54,8 +54,7 @@ LIB_CFILES=	parser.c \
 		generate.c \
 		statement.c \
 		norm-code.c \
-		io.c \
-		io-effects.c \
+		io-runtime.c \
 		local-ri-util.c \
 		inits.c \
 		o-analysis.c \
