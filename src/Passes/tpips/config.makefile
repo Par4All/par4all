@@ -1,24 +1,27 @@
 #
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/23 09:27:35 $, 
+# $Id$
+#
 
 YFLAGS+=	-v -d
-#
-LIB_CFILES=	tpips.c
-LIB_HEADERS=	tpips-local.h \
-		ana_lex.l \
-		ana_syn.y \
-		build_completion_lists \
-		build_tpips_lex
-
-DERIVED_HEADERS= tp_yacc.h completion_list.h
-DERIVED_CFILES= tp_yacc.c tp_lex.c
-DERIVED_FILES= ana_lex_completed.l
-
-LIB_OBJECTS=	$(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o)
 
 #
-TARGET_LIBS= 	$(PIPS_LIBS) $(TPIPS_ADDED_LIBS)
+LIB_CFILES	=	tpips.c
+LIB_HEADERS	=	tpips-local.h \
+			ana_lex.l \
+			ana_syn. y \
+			build_completion_lists \
+			build_tpips_lex
+
+DERIVED_HEADERS	= 	tp_yacc.h completion_list.h
+DERIVED_CFILES	=	tp_yacc.c tp_lex.c
+DERIVED_FILES	= 	ana_lex_completed.l
+
+# INC_CFILES	= 	$(DERIVED_FILES)
+
+LIB_OBJECTS	=	$(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o)
+
+#
+TARGET_LIBS	= 	$(PIPS_LIBS) $(TPIPS_ADDED_LIBS)
 
 #
 #
