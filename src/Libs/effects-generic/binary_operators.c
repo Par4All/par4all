@@ -36,11 +36,13 @@
  * comment : ?
 */
 list
-list_of_effects_generic_binary_op(list l1, list l2,
-				  bool (*r1_r2_combinable_p)(effect,effect),
-				  list (*r1_r2_binary_op)(effect,effect),
-				  list (*r1_unary_op)(effect),
-				  list (*r2_unary_op)(effect))
+list_of_effects_generic_binary_op(
+    list l1,
+    list l2,
+    bool (*r1_r2_combinable_p)(effect,effect),
+    list (*r1_r2_binary_op)(effect,effect),
+    list (*r1_unary_op)(effect),
+    list (*r2_unary_op)(effect))
 {
     list l_res = NIL;
 
@@ -60,29 +62,32 @@ list_of_effects_generic_binary_op(list l1, list l2,
     MAP(EFFECT, r1,
      {
 	 list lr2 = l2;
-	 list prec_lr2;
+	 list prec_lr2 = NIL;
 	 bool combinable = FALSE;
 	 
-	 prec_lr2 = NIL;
+	 pips_debug(8, "r1: %s\n", entity_name(effect_variable(r1)));
+
 	 while(!combinable && !ENDP(lr2))
 	 {
 	     effect r2 = EFFECT(CAR(lr2));
 	     
+	     pips_debug(8, "r2: %s\n", entity_name(effect_variable(r2)));
+
 	     if ( (*r1_r2_combinable_p)(r1,r2) )
 	     {
 		 combinable = TRUE;
 		 l_res = gen_nconc(l_res, (*r1_r2_binary_op)(r1,r2));
+
 		 /* gen_remove(&l2, EFFECT(CAR(lr2))); */
 		 if (prec_lr2 != NIL)
 		     CDR(prec_lr2) = CDR(lr2);		     
 		 else
 		     l2 = CDR(lr2);
 
-		 free(lr2);
-		 lr2 = NIL;
+		 free(lr2); lr2 = NIL;
 		 /* */
-		 free_effect(r1); 
-		 free_effect(r2);
+		 free_effect(r1); r1=effect_undefined; 
+		 free_effect(r2); r2=effect_undefined;
 	     }
 	     else
 	     {
@@ -90,6 +95,13 @@ list_of_effects_generic_binary_op(list l1, list l2,
 		 lr2 = CDR(lr2);
 	     }
 	 }
+
+	 ifdebug(9)
+	 {
+	     pips_debug(9, "intermediate effects 1:\n");
+	     (*effects_prettyprint_func)(l_res);
+	 }
+
 	 if(!combinable)
 	 {
 	     /* r1 belongs to the remnants of l1 : it is combinable 
@@ -100,6 +112,11 @@ list_of_effects_generic_binary_op(list l1, list l2,
      },
 	l1);
     
+    ifdebug(9)
+    {
+	pips_debug(9, "intermediate effects 2:\n");
+	(*effects_prettyprint_func)(l_res);
+    }
 
     /* we must then deal with the remnants of l2 */
     MAP(EFFECT, r2,
@@ -111,7 +128,7 @@ list_of_effects_generic_binary_op(list l1, list l2,
         
     ifdebug(1)
     {
-	pips_debug(1, "final effects : \n");
+	pips_debug(1, "final effects:\n");
 	(*effects_prettyprint_func)(l_res);
     }
 
