@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.121  2003/09/03 14:22:14  coelho
+ * exception context init.
+ *
  * Revision 1.120  2003/08/18 09:42:09  coelho
  * exception handling with linear stuff.
  *
@@ -1000,6 +1003,7 @@ void tpips_init(void)
 
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
+    set_exception_callbacks(push_pips_context, pop_pips_context);
     /* initialize_signal_catcher(); */
 
     set_bool_property("ABORT_ON_USER_ERROR", FALSE); /* ??? */
