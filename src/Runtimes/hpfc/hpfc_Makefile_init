@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/09/07 16:56:17 $, )
+# ($Date: 1996/09/07 17:10:44 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -221,14 +221,8 @@ $(TARGET).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(TARGET)
 
 $(pvmbin):; mkdir -p $(pvmbin)
 
-$(pvmbin)/$(HOST): $(HOST) $(pvmbin)
-	$(COPY) $@ $(pvmbin)
-
-$(pvmbin)/$(MAIN): $(MAIN) $(pvmbin)
-	$(COPY) $@ $(pvmbin)
-
-$(pvmbin)/$(NODE): $(NODE) $(pvmbin)
-	$(COPY) $@ $(pvmbin)
+$(pvmbin)/%: % $(pvmbin)
+	$(COPY) $< $@
 
 install: $(pvmbin)/$(HOST) $(pvmbin)/$(NODE) $(pvmbin)/$(MAIN)
 	@echo files installed
