@@ -3,14 +3,16 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/08/31 17:34:29 $, 
+! $Date: 1996/08/31 17:53:20 $, 
 !
       program fractal
 
       implicit none
 
+! XPOMP library interface:
       include 'xpomp_graphic_F.h'
 
+! Tells HPFC where to link:
 !ldi$ -L$XPOMP_RUNTIME/. -L$PIPS_ROOT/Runtime/xpomp -lxpomp
       
 ! Algorithm parameters:
@@ -24,8 +26,8 @@
 
 ! Size of the iteration space:
       integer x_size, y_size
-      parameter(x_size = 200)     
-      parameter(y_size = 200)
+      parameter(x_size = 300)     
+      parameter(y_size = 300)
 
 ! The zooming ratio to display this iteration space:      
       integer x_display_zoom, y_display_zoom
@@ -43,7 +45,7 @@
       integer counter
       integer k, x, y
       integer display
-      character image(0:x_size - 1, 0:y_size - 1)
+      character image(0:x_size-1, 0:y_size-1)
       
       real*8 zoom, xcenter, ycenter
       real*8 zr, zrp, zi, cr, ci, d
@@ -52,7 +54,7 @@
 ! Some HPF distributions:
 ! cyclic would make more sense as far as load balancing is concerned
 ! However HPFC would not be very good at it...
-!hpf$ processors pe(2, 2)
+!hpf$ processors pe(2,4)
 !hpf$ template space(0:x_size - 1, 0:y_size - 1)
 !hpf$ distribute space(block, block) onto pe
 !hpf$ align image with space
