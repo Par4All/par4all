@@ -4,6 +4,9 @@
 # Basic menus for jpips.
 #
 # $Log: jpips_menus.basic,v $
+# Revision 1.7  1998/11/24 19:29:39  coelho
+# typo fixed.
+#
 # Revision 1.6  1998/11/20 18:15:57  coelho
 # menus reordered.
 #
@@ -470,7 +473,7 @@ Apply a global transformation
 	..
 
 	Cloning on Argument values
-	capply CLONE_ON_ARGUMENT[$MODULES]x
+	capply CLONE_ON_ARGUMENT[$MODULES]
 	..
 
 #	STF
