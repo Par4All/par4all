@@ -743,7 +743,9 @@ transformer user_function_call_to_transformer(entity e, expression expr,
 	/* Build a transformer representing the assignment of
 	 * the function value to e
 	 */
-	eq = vect_make(eq, (Variable) e, 1, (Variable) rv, -1, 0, 0);
+	eq = vect_make(eq, (Variable) entity_to_new_value(e), 1,
+		       (Variable) rv, -1,
+		       0, 0);
 	c = contrainte_make(eq);
 	sc = sc_make(c, CONTRAINTE_UNDEFINED);
 	/* FI: I do not understand why this is useful since the basis
@@ -1012,8 +1014,7 @@ list ef;
     }
 
     ifdebug(8) {
-	Psysteme s = 
-	    (Psysteme) predicate_system(transformer_relation(t_caller));
+	Psysteme s = predicate_system(transformer_relation(t_caller));
 	debug(8, "user_call_to_transformer", 
 	      "After binding formal/real parameters\n");
 	dump_transformer(t_caller);
