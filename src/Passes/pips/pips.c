@@ -121,85 +121,125 @@ void main(argc, argv)
 int argc;
 char * argv[];
 {
+    bool success = TRUE;
+
     initialize_newgen();
     initialize_sc((char*(*)(Variable)) entity_local_name); 
 
     parse_arguments(argc, argv);
 
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
+    debug_on("PIPS_DEBUG_LEVEL");
 
     initialize_signal_catcher();
 
-    if (source_files != NIL) {
-	/* Workspace must be created */
-	db_create_program(wspace);
-	
-	MAPL(f_cp, {
-	    debug(1, "main", "processing file %s\n", STRING(CAR(f_cp)));
-	    process_user_file( STRING(CAR(f_cp)) );
-	}, source_files);
-
-	wspace = db_get_current_program_name();
-	user_log("Workspace %s created and opened\n", wspace);
-    }
-    else {
-	/* Workspace must be opened */
-	if (make_open_program(wspace) == NULL) {
-	    user_log("Cannot open workspace %s\n", wspace);
-	    exit(1);
-	}
-	else {
-	    user_log("Workspace %s opened\n", wspace);
-	}
-    }
-
-    /* Open module */
-    if (module != NULL) {
-	/* CA - le 040293- remplacement de db_open_module(module) par */
-	open_module(module);
-    }
-    else {
-	open_module_if_unique();
-    }
-
-
-    /* Make everything */
     if(setjmp(pips_top_level)) {
 	/* no need to pop_pips_context() at top-level */
-	make_close_program();
-	exit(1);
+	/* FI: are you sure make_close_program() cannot call user_error() ? */
+	make_close_workspace();
+	success = FALSE;
     }
     else {
 	push_pips_context(&pips_top_level);
-	if (selected_rules != NIL) {
+
+	/*
+	 * Initialize workspace
+	 */
+
+	if (source_files != NIL) {
+	    /* Workspace must be created */
+	    db_create_workspace(wspace);
+	
+	    MAPL(f_cp, {
+		debug(1, "main", "processing file %s\n", STRING(CAR(f_cp)));
+		process_user_file( STRING(CAR(f_cp)) );
+	    }, source_files);
+
+	    wspace = db_get_current_workspace_name();
+	    user_log("Workspace %s created and opened\n", wspace);
+	}
+	else {
+	    /* Workspace must be opened */
+	    if (make_open_workspace(wspace) == NULL) {
+		user_log("Cannot open workspace %s\n", wspace);
+		exit(1);
+	    }
+	    else {
+		user_log("Workspace %s opened\n", wspace);
+	    }
+	}
+
+	/* 
+	 * Open module
+	 */
+
+	if (module != NULL) {
+	    /* CA - le 040293- remplacement de db_open_module(module) par */
+	    open_module(module);
+	}
+	else {
+	    open_module_if_unique();
+	}
+
+	/* 
+	 * Activate rules
+	 */
+
+	if (success && selected_rules != NIL) {
 	    /* Select rules */
 	    MAPL(r_cp, {
 		select_rule(STRING(CAR(r_cp)));
 	    }, selected_rules);
 	}
 
-	if (performed_rule != NULL) {
+	/*
+	 * Perform applies
+	 */
+
+	if (success && performed_rule != NULL) {
 	    /* Perform rule */
 	    user_log("Request: perform rule %s for module %s.\n", 
 		     performed_rule, module);
-	    apply(performed_rule, module);
-	    user_log("%s performed for %s.\n", performed_rule, module);
+	    success = safe_apply(performed_rule, module);
+		if (success) {
+		    user_log("%s performed for %s.\n", 
+			     performed_rule, module);
+		}
+		else {
+		    user_log("Cannot perform %s for %s.\n", 
+			     performed_rule, module);
+		}
 	}
 
-	if (build_resource_names != NIL) {
+	/*
+	 * Build resources
+	 */
+
+	if (success && build_resource_names != NIL) {
 	    /* Build resource */
 	    MAPL(crn, {
 		string build_resource_name = STRING(CAR(crn));
 		user_log("Request: build resource %s for module %s.\n", 
 			 build_resource_name, module);
-		make(build_resource_name, module);
-		user_log("%s build for %s.\n", build_resource_name, module);
+		success = safe_make(build_resource_name, module);
+		if (success) {
+		    user_log("%s built for %s.\n", 
+			     build_resource_name, module);
+		}
+		else {
+		    user_log("Cannot build %s for %s.\n", 
+			     build_resource_name, module);
+		    break;
+		}
 	    }, build_resource_names);
+	}
+
+	if (success) {
+	    make_close_workspace();
+	}
+	else {
+	    make_close_workspace();
 	}
     }
 
-    make_close_program();
-
-    /* without exit, program returns any value! */
-    exit(0);
+    exit(!success);
 }
