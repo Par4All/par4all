@@ -79,12 +79,18 @@ static double granularity = 0.;
 /* measurement chosen */
 static measurement_type measurement = NET_MEASURE;
 
-void mem_spy_init(int v, double g, measurement_type t)
+/* log2 of unit chosen: 0 = Byte, 10 = KB, 20 = MB */
+static int log_of_unit = 0;
+
+void mem_spy_init(int v, double g, measurement_type t, int unit)
 {
     assert(-1<=v && v<=2);
+    assert(0<=unit && unit<=20);
     verbosity = v;
     granularity = g;
     measurement = t;
+    log_of_unit = unit;
+
     MemSpyUsed = 1;
     current_size_stack = (MemSpyStack) malloc(sizeof(*current_size_stack));
     current_size_stack->index = -1;
@@ -94,6 +100,12 @@ void mem_spy_init(int v, double g, measurement_type t)
 
 void mem_spy_reset()
 {
+    /* Too many dynamic calls to mem_spy_begin()? */
+    if(current_size_stack->index!=1) {
+	fprintf(stderr,
+		"Too many calls to mem_spy_begin(), non-empty stack reset\n");
+    }
+
     if (MemSpyUsed == 1)
     {
 	MemSpyUsed = 0;
@@ -132,7 +144,7 @@ void mem_spy_begin()
 	current_size_stack->index += 1;
 
 	current_size_stack->elt[current_size_stack->index] = 
-	    (double) (measurement/(double)(1 << 20));
+	    (double) (memory_size/(double)(1 << log_of_unit));
 
 	/* Push 0 on the cumul_size_stack, since there are currently
          * no nested guarded code fragment 
@@ -153,6 +165,14 @@ char * s;
     {
 	struct mallinfo heap_info = mallinfo();
 	int memory_size = 0;
+	char * format;
+
+	/* Too many dynamic calls to mem_spy_end()? */
+	if(current_size_stack->index<0) {
+	    fprintf(stderr,
+		    "Too many calls to mem_spy_end(), stack underflow\n");
+	    abort();
+	}
 
 	switch(measurement) {
 	case SBRK_MEASURE: memory_size = sbrk(0) - etext;
@@ -165,8 +185,31 @@ char * s;
 	    abort();
 	}
 
+	switch(log_of_unit) {
+	case 0: format =
+	    "MEM_SPY "
+		"[%s] begin: %10.0f B end: %10.0f B diff: %10.0f B "
+		    "proper: %10.0f B\n";
+	    break;
+	case 10: format =
+	    "MEM_SPY "
+		"[%s] begin: %10.3f KB end: %10.3f KB diff: %10.3f KB "
+		    "proper: %10.3f KB\n";
+	    break;
+	case 20: format =
+	    "MEM_SPY "
+		"[%s] begin: %10.6f MB end: %10.6f MB diff: %10.6f MB "
+		    "proper: %10.6f MB\n";
+	    break;
+	default: format =
+	    "MEM_SPY (unknown unit %d) "
+		"[%s] begin: %10.6f (?) end: %10.6f (?) diff: %10.6f (?) "
+		    "proper: %10.6f (?)\n";
+	    break;
+	}
+
 	/* Pop memory size at entry of the code fragment */
-	current_end = measurement/(double)(1 << 20);
+	current_end = memory_size/(double)(1 << log_of_unit);
 	current_begin = current_size_stack->elt[current_size_stack->index];
 	current_size_stack->index -= 1;
 	
@@ -186,16 +229,7 @@ char * s;
 	    for (i=0; i<=current_size_stack->index; i++)
 		fprintf(stderr, "  ");
 
-	    /*
-	    fprintf(stderr, "MEM_SPY "
-		    "[%s] begin: %10.3fMB end: %10.3fMB diff: %10.3fMB "
-		    "proper: %10.3fMB\n",
-		    s, current_begin, current_end, diff, proper);
-		    */
-
-	    fprintf(stderr, "MEM_SPY "
-		    "[%s] begin: %10.6fMB end: %10.6fMB diff: %10.6fMB "
-		    "proper: %10.6fMB\n",
+	    fprintf(stderr, format,
 		    s, current_begin, current_end, diff, proper);
 	}
 
