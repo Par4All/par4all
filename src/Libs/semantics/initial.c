@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.12  1997/12/10 14:29:36  coelho
+ * free text.
+ *
  * Revision 1.11  1997/09/30 06:57:15  coelho
  * gen_array_* used...
  *
@@ -23,9 +26,6 @@
  *
  * Revision 1.5  1997/09/08 17:52:05  coelho
  * some version for testing.
- *
- * Revision 1.4  1997/09/08 09:39:11  coelho
- * *** empty log message ***
  *
  * Revision 1.3  1997/09/08 09:35:29  coelho
  * transformer -> precondition.
@@ -232,10 +232,8 @@ print_initial_precondition(string name)
 					  TRUE));
     module_to_value_mappings(module);
  
-    ok = make_text_resource(name,
-			    DBR_PRINTED_FILE,
-			    ".ipred",
-			    text_transformer(t));
+    ok = make_text_resource_and_free(name, DBR_PRINTED_FILE, ".ipred",
+				     text_transformer(t));
 
     reset_current_module_entity();
     reset_current_module_statement();
@@ -270,10 +268,8 @@ print_program_precondition(string name)
 					  TRUE));
     module_to_value_mappings(m);
  
-    ok = make_text_resource(name,
-			    DBR_PRINTED_FILE,
-			    ".pipred",
-			    text_transformer(t));
+    ok = make_text_resource_and_free(name, DBR_PRINTED_FILE, ".pipred",
+				     text_transformer(t));
 
     reset_current_module_entity();
     reset_current_module_statement();
