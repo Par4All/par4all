@@ -241,7 +241,7 @@ list *ell;
 	c = syntax_call( s );
 	if (!ENTITY_GREATER_OR_EQUAL_P(call_function( c ))) return( FALSE );
 	args = call_arguments( c );
-	return(splc_linear_expression_p(EXPRESSION(CAR(args)), *ell) &&
+	return(splc_linear_expression_p(EXPRESSION(CAR(args)), ell) &&
 	       expression_equal_integer_p( EXPRESSION(CAR(CDR(args))), 0 ) );
 }
 
