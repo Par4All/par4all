@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.74  1998/12/26 21:18:15  irigoin
+ * error_handler added
+ *
  * Revision 1.73  1998/04/14 20:42:15  coelho
  * *** empty log message ***
  *
@@ -656,6 +659,11 @@ hpfc_new_variable(
 /********************* EXTRACT NON VARIANT TERMS ON DISTRIBUTED DIMENSIONS */
 
 DEFINE_LOCAL_STACK(c_stmt, statement)
+
+void hpfc_compile_error_handler()
+{
+    error_reset_c_stmt_stack();
+}
 
 /* true if no written effect on any variables of e in loe 
  */
