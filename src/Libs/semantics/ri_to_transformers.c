@@ -387,7 +387,7 @@ cons * e; /* effects of loop l */
 		Pbase b_tmp, b_lb = make_base_from_vect(v_lb); 
 		entity i_init = entity_to_old_value(i);
 
-		vect_add_elem(&v_lb, (Variable) i_init, (Value) -1);
+		vect_add_elem(&v_lb, (Variable) i_init, VALUE_MONE);
 		eq = contrainte_make(v_lb);
 		/* The new variables in eq must be added to sc; otherwise,
 		 * further consistency checks core dump. bc.
@@ -652,7 +652,7 @@ list ef;
     pips_debug(8, "begin\n");
 
     if(entity_has_values_p(e)) {
-	Pvecteur ve = vect_new((Variable) e, (Value) 1);
+	Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
 	normalized n = NORMALIZE_EXPRESSION(expr);
 
 	if(normalized_linear_p(n)) {
@@ -1008,7 +1008,7 @@ list ef;
 			/* simple case: formal parameter e is not
 			   modified and can be replaced by actual
 			   argument expression */
-			vect_add_elem(&v, (Variable) e_new, (Value) -1);
+			vect_add_elem(&v, (Variable) e_new, VALUE_MONE);
 			t_caller = transformer_equality_add(t_caller,
 							    v);
 		    }
@@ -1098,14 +1098,14 @@ expression expr;
     if(integer_constant_expression_p(arg2)) {
 	int d = integer_constant_expression_value(arg2);
 	entity e_new = entity_to_new_value(e);
-	Pvecteur ub = vect_new((Variable) e_new, (Value) 1);
-	Pvecteur lb = vect_new((Variable) e_new, (Value) -1);
+	Pvecteur ub = vect_new((Variable) e_new, VALUE_ONE);
+	Pvecteur lb = vect_new((Variable) e_new, VALUE_MONE);
 	Pcontrainte clb = contrainte_make(lb);
 	Pcontrainte cub = CONTRAINTE_UNDEFINED;
 	cons * tf_args = CONS(ENTITY, e_new, NIL);
 
-	vect_add_elem(&ub, TCST, (Value) -(d-1));
-	vect_add_elem(&lb, TCST, (Value) (d-1));
+	vect_add_elem(&ub, TCST, int_to_value(1-d));
+	vect_add_elem(&lb, TCST, int_to_value(d-1));
 	cub = contrainte_make(ub);
 	clb->succ = cub;
 	tf = make_transformer(tf_args,
@@ -1146,7 +1146,7 @@ expression expr;
 	   renamed and checked at the same time by
 	   value_mappings_compatible_vector_p() */
 	Pvecteur vlb =
-	    vect_multiply(vect_dup(normalized_linear(n1)), (Value) -1); 
+	    vect_multiply(vect_dup(normalized_linear(n1)), VALUE_MONE); 
 	Pvecteur vub = vect_dup(normalized_linear(n1));
 	Pcontrainte clb = CONTRAINTE_UNDEFINED;
 	Pcontrainte cub = CONTRAINTE_UNDEFINED;
@@ -1158,9 +1158,9 @@ expression expr;
 				    (Variable) e_new,
 				    (Variable) e_old);
 
-	vect_add_elem(&vlb, (Variable) e_new, (Value) d);
-	vect_add_elem(&vub, (Variable) e_new, (Value) -d);
-	vect_add_elem(&vub, TCST, (Value) -(d-1));
+	vect_add_elem(&vlb, (Variable) e_new, int_to_value(d));
+	vect_add_elem(&vub, (Variable) e_new, int_to_value(-d));
+	vect_add_elem(&vub, TCST, int_to_value(1-d));
 	clb = contrainte_make(vlb);
 	cub = contrainte_make(vub);
 	clb->succ = cub;
@@ -1219,10 +1219,10 @@ bool minmax;
 	    (void) vect_variable_rename(v,
 					(Variable) e,
 					(Variable) e_old);
-	    vect_add_elem(&v, (Variable) e_new, (Value) -1);
+	    vect_add_elem(&v, (Variable) e_new, VALUE_MONE);
 
 	    if(minmax) {
-		v = vect_multiply(v, -1);
+		v = vect_multiply(v, VALUE_MONE);
 	    }
 
 	    cv = contrainte_make(v);
