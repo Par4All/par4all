@@ -8,7 +8,7 @@ YFLAGS+=	-v -d
 LIB_CFILES	=	tpips.c
 LIB_HEADERS	=	tpips-local.h \
 			ana_lex.l \
-			ana_syn. y \
+			ana_syn.y \
 			build_completion_lists \
 			build_tpips_lex
 
