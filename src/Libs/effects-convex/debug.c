@@ -63,7 +63,8 @@ bool region_consistent_p(region reg)
 	Pvecteur v;
 	for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ) 
 	{ 
-	    pips_assert("no hich coefficient in region system.\n",
+	  if (variable_phi_p((entity)vecteur_var(v)))
+	    pips_assert("no high coefficient for PHI variables in region system.\n", 
 			value_lt(vecteur_val(v),MY_MAX_CHECK));
 	}
 	c = c->succ;
@@ -74,7 +75,8 @@ bool region_consistent_p(region reg)
 	Pvecteur v;
 	for(v = c->vecteur; !VECTEUR_NUL_P(v); v = v->succ) 
 	{ 
-	    pips_assert("no hich coefficient in region system.\n",
+	  if (variable_phi_p((entity)vecteur_var(v)))
+	    pips_assert("no high coefficient for PHI variables in region system.\n",
 			value_lt(vecteur_val(v),MY_MAX_CHECK));
 	}
 	c = c->succ;
