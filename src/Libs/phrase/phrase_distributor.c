@@ -890,6 +890,8 @@ bool phrase_distributor(string module_name)
   distribute (module_stat, module);
   pips_debug(2, "END of PHRASE_DISTRIBUTOR\n");
 
+  print_statement(module_stat);
+
   pips_assert("Statement structure is consistent after PHRASE_DISTRIBUTOR", 
 	      gen_consistent_p((gen_chunk*)module_stat));
 	      
