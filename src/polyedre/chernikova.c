@@ -16,7 +16,11 @@
 #include "polyedre.h"
 
 /* IRISA  data structures */
-#include "polylib.h"
+#include "polylib/polylib.h"
+
+/* maximum number of rays allowed in chernikova... (was 20000)
+ */
+#define MAX_NB_RAYS (25000)
 
 /* Irisa is based on int. We would like to change this to 
  * some other type, say "long long" if desired, as VALUE may
@@ -425,7 +429,7 @@ Psysteme sc;
     /*  printf("\na =");
       Matrix_Print(stderr, "%4d", a); */
       
-    A = Constraints2Polyhedron(a, 20000);
+    A = Constraints2Polyhedron(a, MAX_NB_RAYS);
     Matrix_Free(a);
 
 /*    Polyhedron_Print(stderr, "%4d",A);
@@ -467,7 +471,7 @@ Ptsg sg;
 	/* printf("\na =");
 	Matrix_Print(stderr, "%4d,", a); */
 
-	A = Rays2Polyhedron(a, 20000);
+	A = Rays2Polyhedron(a, MAX_NB_RAYS);
 	Matrix_Free(a);
 
 /*	Polyhedron_Print(stderr, "%4d",A);
@@ -549,9 +553,9 @@ Psysteme sc1,sc2;
 	Matrix_Print(stderr, "%4d",a2);
     }
     
-    A1 = Constraints2Polyhedron(a1, 20000);
+    A1 = Constraints2Polyhedron(a1, MAX_NB_RAYS);
     Matrix_Free(a1); 
-    A2 = Constraints2Polyhedron(a2, 20000);
+    A2 = Constraints2Polyhedron(a2, MAX_NB_RAYS);
     Matrix_Free(a2);
 
     ifscdebug(8) {
@@ -686,7 +690,7 @@ Psysteme sc1,sc2;
 	/*    printf("\na =");
 		Matrix_Print(stderr, "%4d,",a); */
 
-	A = Rays2Polyhedron(a, 20000);
+	A = Rays2Polyhedron(a, MAX_NB_RAYS);
 /*	Polyhedron_Print(stderr, "%4d",A);
 */
 
