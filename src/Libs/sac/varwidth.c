@@ -11,102 +11,60 @@
 
 #include "sac.h"
 
-int effective_reference_width(reference r)
+
+static int g_varwidth;
+
+static bool variables_width_filter(reference r)
 {
    basic b;
+   int width;
    type t = entity_type(reference_variable(r));
 
    if (!type_variable_p(t))
-      return 1000; /* big number, to ensure no parallelization */
+      return TRUE;  /* keep searching recursively */
+
    b = variable_basic(type_variable(t));
 
+   /* do NOT forget to multiply the size by 8, to get it in
+    * bits instead of bytes....
+    */
    switch(basic_tag(b))
    {
       case is_basic_int:
-	 return basic_int(b);
+	 width = 8*basic_int(b);
+	 break;
 
       case is_basic_float:
-	 return basic_float(b);
+	 width = 8*basic_float(b);
+	 break;
 
       case is_basic_logical:
-	 return basic_logical(b);
+	 width = 8*basic_logical(b);
+	 break;
 
       default:
-	 return 1000; /* big number, to ensure no parallelization */
+	 return TRUE; /* don't know what to do with this... keep searching */
    }
+   printf( "Reference %s is %i bits wide\n",
+	   entity_name(reference_variable(r)), width );
+   
+   if (width > g_varwidth)
+      g_varwidth = width;
+
+   return FALSE; /* do not search recursively */
 }
 
-int effective_call_variables_width(call c)
+static void variables_width_rewrite(reference r)
 {
-   cons * args;
-   int maxArgsWidth;
-
-   maxArgsWidth = 0;
-
-   /* Look at each argument */
-   for( args = call_arguments(c);
-        args != NIL;
-	args = CDR(args) )
-   {
-      int curArgWidth;
-      syntax s;
-
-      /* make sure the argument is a reference */
-      s = expression_syntax(EXPRESSION(CAR(args)));
-      if (!syntax_reference_p(s))
-      {
-	 /* we are supposed to be in 3-form, so this should not happen */
-	 printf("WARNING: effective_variable_width called on non 3-form"
-		"call statemnent.\n");
-	 return 1000; /* big number, to ensure no parallelization */
-      }
-      
-      /* compute the actual width of the parameter */
-      curArgWidth = effective_reference_width(syntax_reference(s));
-
-      /* infer the maximum args width */
-      if (curArgWidth > maxArgsWidth)
-	 maxArgsWidth = curArgWidth;
-   }
-
-   return maxArgsWidth;
+   return;
 }
 
 int effective_variables_width(instruction i)
 {
-   switch(instruction_tag(i))
-   {
-      case is_instruction_sequence:
-      {
-	 cons * j;
-	 int maxVarWidth = 0;
+   g_varwidth = 0;
 
-	 for( j = sequence_statements(instruction_sequence(i));
-	      j != NIL;
-	      j = CDR(j) )
-	 {
-	    int varwidth = 
-	       effective_variables_width(statement_instruction(STATEMENT(CAR(j))));
+   gen_recurse( i, reference_domain, 
+		variables_width_filter, variables_width_rewrite);
 
-	    if (varwidth > maxVarWidth)
-	       maxVarWidth = varwidth;
-	 }
-	 
-	 return maxVarWidth;
-      }
-
-      case is_instruction_test:
-      case is_instruction_loop:
-      case is_instruction_whileloop:
-      case is_instruction_goto:
-      case is_instruction_unstructured:
-      default:
-	 printf("WARNING: complex loop !\n");
-	 return 1000; /* big number, to ensure no parallelization */
-
-      case is_instruction_call:
-	 return effective_call_variables_width(instruction_call(i));
-   }
+   return g_varwidth;
 }
-
-
