@@ -510,6 +510,7 @@ owner:	OPENPAREN OWNER_ALL CLOSEPAREN
 		    result = CONS(STRING, strdup(n), result);
 		}
 		gen_array_full_free(modules);
+		result = gen_nreverse(result);
 		pips_assert("length ok", nmodules==gen_length(result));
 		$$ = result;
 	    }
