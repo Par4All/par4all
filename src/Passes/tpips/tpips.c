@@ -46,6 +46,7 @@ static char *usage = "Usage: %s [-n] [-h] [-l logfilename] sourcefile...\n";
 #define TPIPS_REQUEST_BUFFER_LENGTH 100
 #define SHELL_ESCAPE "shell" 		/* ! used for history reference */
 #define CHANGE_DIR   "cd "
+#define SET_ENV	     "setenv "
 #define QUIT         "quit"
 #define HELP         "help"
 #define ECHO         "echo"
@@ -226,6 +227,13 @@ static void cdir_handler(char * line)
 	fprintf(stderr, "error while changing directory\n");
 }
 
+static void setenv_handler(char * line)
+{
+    user_log("%s\n", line);
+    if (putenv(line+strlen(SET_ENV)))
+	fprintf(stderr, "error while changing environment\n");
+}
+
 static void shell_handler(char * line)
 {
     line += strlen(SHELL_ESCAPE);
@@ -340,6 +348,11 @@ static void help_handler(char * line)
 	printf("cd       <dirname>\n");
 	if (*line) {
 	    printf("\tchange directory\n");
+	}
+    }if (PREFIX_EQUAL_P("setenv",line)) {
+	printf("setenv    <name>=<value>\n");
+	if (*line) {
+	    printf("\tchange environment\n");
 	}
     }
     if (PREFIX_EQUAL_P("echo",line)) {
@@ -526,6 +539,7 @@ static struct t_handler handlers[] =
 {
   { QUIT,		quit_handler },
   { CHANGE_DIR, 	cdir_handler },
+  { SET_ENV,		setenv_handler },
   { SHELL_ESCAPE, 	shell_handler },
   { HELP,		help_handler },
   { ECHO,		echo_handler },
