@@ -214,6 +214,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"LEN",                      no_write_effects},
     {"INDEX",                    no_write_effects},
     {"AIMAG",                    no_write_effects},
+    {"DIMAG",                    no_write_effects},
     {"CONJG",                    no_write_effects},
     {"SQRT",                     no_write_effects},
     {"DSQRT",                    no_write_effects},
