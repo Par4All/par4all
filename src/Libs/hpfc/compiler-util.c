@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compiler-util.c,v $ ($Date: 1994/06/03 14:14:27 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1994/09/03 15:19:34 $, )
  * got on %D%, %T%
  * $Id$
  *
@@ -54,29 +54,50 @@ list l;
 /*
  * update_control_lists
  */
-void update_control_lists(c,map)
+void update_control_lists(c, map)
 control c;
 control_mapping map;
 {
     control
 	cprime = (control) GET_CONTROL_MAPPING(map, c);
 
-    control_predecessors(cprime) = updated_control_list(control_predecessors(c),map);
-    control_successors(cprime) = updated_control_list(control_successors(c),map);
+    pips_assert("update_control_lists",
+		(control_predecessors(cprime)==NIL) &&
+		(control_successors(cprime)==NIL));
+
+    control_predecessors(cprime) = 
+	updated_control_list(control_predecessors(c), map);
+    control_successors(cprime) = 
+	updated_control_list(control_successors(c), map);
 }
 
 /*
  * updated_control_list
  */
-list updated_control_list(lc,map)
+list updated_control_list(lc, map)
 list lc;
 control_mapping map;
 {
-    return((ENDP(lc))?
-	   (NULL):
-	   (CONS(CONTROL,
-		 (control) GET_CONTROL_MAPPING(map, CONTROL(CAR(lc))),
-		 updated_control_list(CDR(lc),map))));
+    list
+	lc_result = NIL;
+    control
+	current = control_undefined,
+	new_c = control_undefined;
+
+    MAPL(cc,
+     {
+	 current = CONTROL(CAR(cc));
+	 new_c = (control) GET_CONTROL_MAPPING(map, current);
+
+	 pips_assert("updated_control_list",
+		     !control_undefined_p(current) ||
+		     !control_undefined_p(new_c));
+
+	 lc_result = CONS(CONTROL, new_c, lc_result);
+     },
+	 lc);
+
+    return(gen_nreverse(lc_result));
 }
 
 /*
