@@ -47,12 +47,6 @@ char *n;
 /**** End saved_makefile version ****/
 
 
-string make_open_program(name)
-string name;
-{
-    return make_open_workspace(name);
-}
-
 string make_open_workspace(name)
 string name;
 {
