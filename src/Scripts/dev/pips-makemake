@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.312  1997/08/19 15:00:07  coelho
+# fixes for fpips compilation if no wpips nor tpips.
+#
 # Revision 1.311  1997/08/19 11:17:39  coelho
 # forgotten protections.
 #
@@ -627,10 +630,10 @@ ftest: all
 	#
 	# building a local Full PIPS
 	#
-	\$(LINK) \$(ARCH)/fpips \$(WPIPS_ADDED_LDFLAGS) \\
+	\$(LINK) \$(ARCH)/fpips \$(FPIPS_ADDED_LDFLAGS) \\
 	    \$(ROOT)/Lib/\$(ARCH)/\$(FPIPS_MAIN) \\
-	    -lfpips -lpips -ltpips -lwpips \\
-	    \$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS) \$(WPIPS_ADDED_LIBS)
+	    -lfpips \$(FPIPS_ADDED_LIBS) \\
+	    \$(PIPS_LIBS) 
 	#
 	# creating links
 	#
