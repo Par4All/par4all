@@ -90,9 +90,7 @@ select_fix_point_operator()
 
 /* Functions to make transformers */
 
-bool 
-transformers_intra_fast(module_name)
-char * module_name;
+bool transformers_intra_fast(char * module_name)
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
@@ -103,9 +101,7 @@ char * module_name;
     return module_name_to_transformers(module_name);
 }
 
-bool 
-transformers_intra_full(module_name)
-char * module_name;
+bool transformers_intra_full(char * module_name)
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
@@ -116,9 +112,7 @@ char * module_name;
     return module_name_to_transformers(module_name);
 }
 
-bool 
-transformers_inter_fast(module_name)
-char * module_name;
+bool transformers_inter_fast(char * module_name)
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
@@ -129,9 +123,7 @@ char * module_name;
     return module_name_to_transformers(module_name);
 }
 
-bool 
-transformers_inter_full(module_name)
-char * module_name;
+bool transformers_inter_full(char * module_name)
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
@@ -142,9 +134,7 @@ char * module_name;
     return module_name_to_transformers(module_name);
 }
 
-bool 
-summary_transformer(module_name)
-char * module_name;
+bool summary_transformer(char * module_name)
 {
     /* there is a choice: do nothing and leave the effective computation
        in module_name_to_transformers, or move it here */
@@ -152,9 +142,7 @@ char * module_name;
     return TRUE;
 }
 
-bool 
-preconditions_intra(module_name)
-char * module_name;
+bool preconditions_intra(char * module_name)
 {
     /* nothing to do: transformers are preconditions for this
        intraprocedural option */
@@ -168,9 +156,7 @@ char * module_name;
     return module_name_to_preconditions(module_name);
 }
 
-bool 
-preconditions_inter_fast(module_name)
-char * module_name;
+bool preconditions_inter_fast(char * module_name)
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
@@ -181,9 +167,7 @@ char * module_name;
     return module_name_to_preconditions(module_name);
 }
 
-bool 
-preconditions_inter_full(module_name)
-char * module_name;
+bool preconditions_inter_full(char * module_name)
 {
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
@@ -195,9 +179,7 @@ char * module_name;
 }
 
 
-bool 
-old_summary_precondition(module_name)
-char * module_name;
+bool old_summary_precondition(char * module_name)
 {
     /* do not nothing because it has been computed by side effects;
      * or provide an empty precondition for root modules;
@@ -236,9 +218,7 @@ char * module_name;
     return TRUE;
 }
 
-bool 
-summary_precondition(module_name)
-char * module_name;
+bool summary_precondition(char * module_name)
 {
     /* Look for all call sites in the callers
      */
@@ -265,15 +245,19 @@ char * module_name;
 
     reset_call_site_number();
 
-    MAP(STRING, caller_name, {
-	entity caller = local_name_to_top_level_entity(caller_name);
-	t = update_precondition_with_call_site_preconditions(t, caller, callee);
+    MAP(STRING, caller_name, 
+    {
+      entity caller = local_name_to_top_level_entity(caller_name);
+      t = update_precondition_with_call_site_preconditions(t, caller, callee);
     }, callees_callees(callers));
 
-    if(transformer_undefined_p(t)) {
+    if (!callees_callees(callers) && !entity_main_module_p(callee))
+    {
+      /* no callers => empty precondition (but the main). */
+      t = transformer_empty();
+    } else if (transformer_undefined_p(t)) {
 	t = transformer_identity();
-    }
-    else {
+    } else {
 	/* try to eliminate redundancy */
 	t = transformer_normalize(t, 2);
     }
@@ -301,9 +285,7 @@ char * module_name;
  * compute a transformer for each statement of a module with a given
  * name; compute also the global transformer for the module
  */
-bool 
-module_name_to_transformers(module_name)
-char *module_name;
+bool module_name_to_transformers(char *module_name)
 {
     transformer t_intra;
     transformer t_inter;
@@ -377,9 +359,7 @@ char *module_name;
  * compute a transformer for each statement of a module with a given
  * name; compute also the global transformer for the module
  */
-bool 
-module_name_to_preconditions(module_name)
-char *module_name;
+bool module_name_to_preconditions(char *module_name)
 {
     transformer t_inter;
     transformer pre;
@@ -521,9 +501,7 @@ char *module_name;
 }
 
 
-transformer 
-load_summary_transformer(e)
-entity e;
+transformer load_summary_transformer(entity e)
 {
     /* FI: I had to add a guard db_resource_p() on Nov. 14, 1995.
      * I do not understand why the problem never occured before,
@@ -572,10 +550,7 @@ entity e;
  * t may be slightly modified by transformer_convex_hull
  * because of bad design (FI)
  */
-void 
-update_summary_precondition(e, t)
-entity e;
-transformer t;
+void update_summary_precondition(entity e, transformer t)
 {
     transformer t_old = transformer_undefined;
     transformer t_new = transformer_undefined;
@@ -616,9 +591,7 @@ transformer t;
 /* summary_preconditions are expressed in any possible frame, in fact the frame of
  * the last procedure that used/produced it
  */
-transformer 
-load_summary_precondition(e)
-entity e;
+transformer load_summary_precondition(entity e)
 {
     /* memoization could be used to improve efficiency */
     transformer t;
@@ -633,7 +606,7 @@ entity e;
 			       TRUE);
 
     pips_assert("load_summary_precondition", t != transformer_undefined);
-
+    
     ifdebug(8) {
 	debug(8, "load_summary_precondition", " precondition for %s:\n",
 	      module_local_name(e));
@@ -645,9 +618,7 @@ entity e;
 }
 
 
-list 
-load_summary_effects(e)
-entity e;
+list load_summary_effects(entity e)
 {
     /* memorization could be used to improve efficiency */
     list t;
@@ -664,9 +635,7 @@ entity e;
 }
 
 
-list 
-load_module_intraprocedural_effects(e)
-entity e;
+list load_module_intraprocedural_effects(entity e)
 {
     /* memoization could be used to improve efficiency */
     list t;
@@ -688,8 +657,7 @@ entity e;
 /* ca n'a rien a` faire ici, et en plus, il serait plus inte'ressant d'avoir 
  * une fonction void statement_map_print(statement_mapping htp)
  */
-void 
-cumulated_effects_map_print()
+void cumulated_effects_map_print(void)
 {
     FILE * f =stderr;
     statement_effects htp = get_cumulated_rw_effects();
