@@ -178,6 +178,8 @@
 					 ENTITY_NON_EQUAL_P(e) || \
 					 ENTITY_EQUAL_P(e) )
 
+#define ENTITY_CONTINUE_P(e) \
+    (strcmp(entity_local_name(e), CONTINUE_FUNCTION_NAME))
 
 #define SPECIAL_COMMON_P(e) \
     ((same_string_p(entity_local_name(e), DYNAMIC_AREA_LOCAL_NAME)) || \
