@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/03 22:27:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/30 15:16:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_reader[] = "%A% ($Date: 1997/02/03 22:27:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_reader[] = "%A% ($Date: 1997/04/30 15:16:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -147,7 +147,7 @@ int iPrevComm = 0;
  *      x est un caractere quelconque different de '
  *
  * Modifications: 
- *  - la quote peut-etre ' ou " pour faire plaisir a Fabien Coelho.
+ *  - la quote peut-etre simple-quote ou double-quote pour faire plaisir a Fabien Coelho.
  * L'information est stockee lors de la rentree dans une constante chaine
  * de caracteres (variable QuoteChar).
  *  - ajout de l'etat INQUOTEBACKSLASH pour traiter les extensions 
@@ -432,10 +432,10 @@ FILE * fp;
 	       in a string constant or not. You cannot convert the double
 	       quote into a simple quote because you may generate an illegal
 	       string constant. Maybe the best would be to uncomment the
-	       next test. FI, 21 February 1992
+	       next test. FI, 21 February 1992 
 	    if( c == '\"')
 		FatalError("GetChar","Illegal double quote character");
-		*/
+		" */
 	    /* FI: let's delay and do it in ReadLine:
 	     * if (islower(c)) c = toupper(c);
 	     */
