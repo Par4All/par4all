@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: JPips.java,v $
+ * Revision 1.8  1998/11/14 13:37:48  ancourt
+ * emacs jpips prop may be empty.
+ *
  * Revision 1.7  1998/11/12 17:20:36  coelho
  * basic emacs display.
  *
@@ -208,7 +211,9 @@ public class JPips
     graphDisplayer = new GraphDisplayer(frame);
     tpips.graphDisplayer = graphDisplayer;
 
-    if (System.getProperty("jpips.emacs").equals("true"))
+    String withemacs = System.getProperty("jpips.emacs");
+
+    if (withemacs!=null && withemacs.equals("true"))
     {
       emacsDisplayer = new EmacsDisplayer(System.out);
       tpips.emacsDisplayer = emacsDisplayer;
