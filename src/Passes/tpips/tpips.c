@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.93  1998/04/15 15:30:25  coelho
+ * graph.h not nedded.
+ *
  * Revision 1.92  1998/04/14 16:18:18  coelho
  * headers fixed.
  *
@@ -79,7 +82,6 @@
 #include "genC.h"
 #include "ri.h"
 #include "database.h"
-#include "graph.h"
 #include "makefile.h"
 
 #include "misc.h"
