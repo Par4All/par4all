@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: developer_guide.tex,v $
+%% Revision 1.10  2000/12/20 15:43:01  coelho
+%% pipsdbm updated when dealing with new resources.
+%%
 %% Revision 1.9  2000/02/02 14:57:46  irigoin
 %% PIPS environment variables have been updated... but not their documented
 %% use. Nga bumped into the problem.
@@ -34,13 +37,19 @@
 \end{tabular}
 }
 
-\date{August 1996}
+\date{August 1996 - December 2000}
 
 \renewcommand{\indexname}{Index}
 \makeindex
 
 \begin{document}
 \maketitle
+
+{\small
+\begin{verbatim}
+$Id$
+\end{verbatim}
+}
 
 \begin{latexonly}
   \clearpage
@@ -883,19 +892,17 @@ myphase > MODULE.res2
     
   \item Run the command {\tt make all} to now derive from {\tt
       pipsmake-rc.tex} the files {\tt phases.h}, {\tt resources.h} and
-    {\tt builder-map.h} and to copy them into {\tt \$PIPS\_INCLUDEDIR}
-    (i.e. {\tt \$PIPS\_ROOT/Include}); to also derive {\tt pipsmake.rc},
+    {\tt builder-map.h} and to copy them into {\tt \$PIPS\_ROOT/Include};
+    to also derive {\tt pipsmake.rc}, 
     {\tt properties.rc} and {\tt wpips.rc}, and to copy them into {\tt
-      \$PIPS\_LIBDIR}.
+      \$PIPS\_ROOT/Lib}.
     
   \end{itemize}
   
-\item In the directory {\tt \$PIPS\_BINSRCDIR} (i.e. {\tt
-    \$PIPS\_ROOT/Src/Passes}):
+\item In the directory {\tt \$PIPS\_ROOT/Src/Passes}:
 
-  Execute the command {\tt
-  make-pips -r}, to recompile and install updated versions of {\tt pips},
-  {\tt tpips} and {\tt wpips}.
+  Execute the command \texttt{make recompile} to recompile and install
+  updated versions of {\tt pips}, {\tt tpips} and {\tt wpips}.
   
 \end{itemize}
 
@@ -920,12 +927,12 @@ is available.
 
 \begin{itemize}
   
-\item In the directory {\tt \$PIPS\_DOCDIR}:
+\item In the directory \texttt{\$PIPS\_ROOT/Documentation}:
   
   \begin{itemize}
     
-  \item Declare the new resource {\tt myres} by modifying the file {\tt
-      pipsmake-rc.tex}. Each rule describes the
+  \item Declare the new resource \texttt{myres} by modifying the file 
+    \texttt{pipsmake-rc.tex}. Each rule describes the
     dependances between the input and output resources of each phase. Just
     have a look at hte other rules to build your owns. You can also add
     aliases to obtain nice menus in the \verb+wpips+ interface.
@@ -950,50 +957,43 @@ myphase > MODULE.myres
      
   \end{itemize}
   
-\item In the directory {\tt \$PIPS\_DEVEDIR/Lib/pipsdbm}: 
+\item In the directory \texttt{\$PIPS\_DEVEDIR/Libs/pipsdbm}: 
 
-  The new resource must be declared to the resource manager {\tt pipsdbm}:
+  The new resource (if any) must be declared to the resource manager
+  \texttt{pipsdbm}: 
   
   \begin{itemize}
     
-  \item Update the file {\tt module.c} by adding the line
+  \item Update the file {\tt methods.h} by adding a line for
+    the \texttt{DBR\_MYRES} resource. Macros are predefined 
+    for saving, loading, freeing and checking a resource if it is
+    a newgen domain, a string, aso. For instance a newgen resource
+    is simply declared as:
 \begin{verbatim}
-DBR_MYRES,    
+{ DBR_MYRES, NEWGEN_METHODS },
 \end{verbatim}
-    in the array {\tt load\_order[]} which defines the order in which the
-    resources must be unloaded when a module is closed (see the user manual).
-    
-  \item Update the file {\tt methods\_io.c} by adding the following line to
-    the array {\tt method\_map[]}:
+
+   For file resources, the pipsdbm data usually is a string representing
+   the file name within the pips database. All such resources are suffixed
+   with \texttt{\_FILE}. It is declared as~:
+
 \begin{verbatim}
-{DBR_MYRES,(chunk *(*)()) undefined_method, 
-           undefined_method,
-           undefined_method, 
-           (bool (*)()) undefined_check},
+{ DBR_MYRES_FILE, STRING_METHODS },
 \end{verbatim}
-    The arguments are the reading, writing, freeing and consitency testing
-    functions for the resource. Here they are undefined. But if the resource
-    is a newgen type, the declaration is:
-\begin{verbatim}
-{DBR_MYRES, gen_read, 
-            gen_write, 
-            gen_free, 
-            gen_consistent_p},
-\end{verbatim}
-    
-  \item If the new resource is a file resource (and not a data structure),
-    update the files {\tt disk.c} and {\tt module.c}.
-    
-  \item Run the commands {\tt make libpipsdbm.a} and {\tt make install}
-    to update {\tt pipsdbm} and install it.
+
+  \item Run the commands \texttt{make} then \texttt{make install}
+    to update \texttt{pipsdbm} and install it.
     
   \end{itemize}
-  
-\item In the directory {\tt \$PIPS\_BINSRCDIR}:
 
-  Execute the command {\tt
-  make-pips -r}, to recompile and install updated versions of {\tt pips},
-  {\tt tpips} and {\tt wpips}.
+\item In the \texttt{\$PIPS\_ROOT/Src/Libs/pipsmake}
+  Type \texttt{make recompile} so as to link pipsmake with the new phase
+  if necessary.
+
+\item In the directory \texttt{\$PIPS\_ROOT/Src/Passes}:
+
+  Execute the command \texttt{make recompile}, to recompile and install
+  updated versions of \texttt{pips}, \texttt{tpips} and \texttt{wpips}.
   
 \end{itemize}
 
@@ -1007,7 +1007,7 @@ DBR_MYRES,
 \subsection{Modification or addition of a new NewGen data structure}
 
 NewGen data strutures for PIPS are defined in \LaTeX{} files which are in
-the directory \verb+$PIPS_DEVEDIR/Documentation/newgen+. 
+the directory \texttt{\$PIPS\_DEVEDIR/Documentation/newgen}. 
 These files include both the NewGen specifications, and the comments in
 \LaTeX{} format. 
 DDL\footnote{Newgen types are called {\em domains\/} and are defined using a
