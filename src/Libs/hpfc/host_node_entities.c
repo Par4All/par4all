@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1994/12/06 14:42:52 $, ) version $Revision$,
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1994/12/22 16:52:28 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -66,8 +66,7 @@ GENERIC_CURRENT_MAPPING(node_old, entity, entity);
 void store_new_node_variable(new, old)
 entity new, old;
 {
-    pips_assert("store_new_node_variable",
-		(!entity_undefined_p(new)) || (!entity_undefined_p(old)));
+    assert(!entity_undefined_p(new) || !entity_undefined_p(old));
 
     store_entity_node_new(old, new);
     store_entity_node_old(new, old);
@@ -76,8 +75,7 @@ entity new, old;
 void store_new_host_variable(new, old)
 entity new, old;
 {
-    pips_assert("store_new_host_variable",
-		(!entity_undefined_p(new)) || (!entity_undefined_p(old)));
+    assert(!entity_undefined_p(new) || !entity_undefined_p(old));
 
     store_entity_host_new(old, new);
     store_entity_host_old(new, old);
@@ -237,7 +235,7 @@ entity common;
 	l = NIL,
 	lnew = NIL;
 
-    pips_assert("clean_common_declaration", type_area_p(t));
+    assert(type_area_p(t));
 
     l = area_layout(type_area(t));
 
