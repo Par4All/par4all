@@ -206,9 +206,9 @@ resource_text(
     }
 
     /*******************written by Dat****************/
-    my_effects_filter(l_eff, "KMAX");
+    my_effects_filter(&l_eff, "KMAX");
     /*************************************************/
-    l_eff_text = (*(pps->get_text))(&l_eff);
+    l_eff_text = (*(pps->get_text))(l_eff);
 
     /* (*attach_effects_decoration_to_text_func)(the_effect_text); */
 
