@@ -1,5 +1,9 @@
 /* $id$
    $Log: c_parser.c,v $
+   Revision 1.5  2003/09/05 14:18:25  nguyen
+   Put keywords and typedefs hash table into DECLARATIONS resource of each
+   compilation unit.
+
    Revision 1.4  2003/08/13 07:58:41  nguyen
    Add compilation_unit_parser
 
@@ -27,6 +31,8 @@
 #include "c_syntax.h"
 #include "cyacc.h"
 
+#include "c_parser_private.h"
+
 #include "resources.h"
 #include "database.h"
 #include "makefile.h"
@@ -36,8 +42,13 @@
 /* To avoid warnings */
 extern char *strdup(const char *s1);
 
+string compilation_unit_name; 
+
 statement ModuleStatement = statement_undefined;
   
+stack ContextStack = stack_undefined;
+
+
 hash_table keyword_typedef_table = hash_table_undefined;
 
 void init_keyword_typedef_table()
@@ -106,27 +117,30 @@ void CParserError(char *msg)
   pips_user_error(msg);
 }
 
-static bool is_compilation_unit(string module_name)
-{
-  /* To be modified, the static function also has FILE_SEP_STRING */
-  if (strstr(module_name,FILE_SEP_STRING) != NULL)
-    return TRUE;
-  return FALSE;
-}
-
-static bool actual_c_parser(string module_name, string dbr_file)
+static bool actual_c_parser(string module_name, string dbr_file, bool is_compilation_unit_parser)
 {
     string dir = db_get_current_workspace_directory();
     string file_name = strdup(concatenate(dir,"/",db_get_file_resource(dbr_file,module_name,TRUE),0));
-   
-    init_keyword_typedef_table();
     free(dir);
+
+    if (is_compilation_unit_parser)
+      {
+	compilation_unit_name = module_name;
+	init_keyword_typedef_table();
+      }
+    else
+      {
+	compilation_unit_name = compilation_unit_of_module(module_name);
+	keyword_typedef_table = (hash_table) db_get_memory_resource(DBR_DECLARATIONS,compilation_unit_name,TRUE); 
+      }
+    ContextStack = stack_make(c_parser_context_domain,0,0);
 
     debug_on("C_SYNTAX_DEBUG_LEVEL");
  
-    if (is_compilation_unit(module_name))
+    if (compilation_unit_p(module_name))
       {
-	MakeCurrentSourceFileEntity(module_name);
+	/* Special case, set the compilation unit as the current module */
+	MakeCurrentCompilationUnitEntity(module_name);
 	/* I do not know to put this where to avoid repeated creations*/
 	MakeTopLevelEntity(); 
       }
@@ -136,49 +150,62 @@ static bool actual_c_parser(string module_name, string dbr_file)
     c_parse();
     safe_fclose(c_in, file_name);
 
-    if (is_compilation_unit(module_name))
-      {
-	ResetCurrentSourceFileEntity();	
-	DB_PUT_MEMORY_RESOURCE(DBR_DECLARATIONS, 
-			       module_name, 
-			       (char *) "");    
-      }
- 
     pips_assert("Module statement is consistent",statement_consistent_p(ModuleStatement));
+
     ifdebug(2)
       {
 	pips_debug(2,"Module statement: \n");
 	print_statement(ModuleStatement);
-	pips_debug(2,"and declarations: \n");
+	pips_debug(2,"and declarations: ");
 	print_entities(statement_declarations(ModuleStatement));
+	printf("\n");
       }
-    DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE, 
-			   module_name, 
-			   (char *) ModuleStatement);
-    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, 
-			   module_name, 
-			   (char *) make_callees(NIL));
-    /* Should generate a list of callees called_modules */
+
+    if (compilation_unit_p(module_name))
+      {
+	ResetCurrentCompilationUnitEntity();	
+      }
   
+    if (is_compilation_unit_parser)
+      {
+	DB_PUT_MEMORY_RESOURCE(DBR_DECLARATIONS, 
+			       module_name, 
+			       (void *) keyword_typedef_table);   
+      }
+    else 
+      {
+	DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE, 
+			       module_name, 
+			       (char *) ModuleStatement);
+	DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, 
+			       module_name, 
+			       (char *) make_callees(NIL));
+	/* Should generate a list of callees called_modules */
+      }
     free(file_name);
     file_name = NULL;
-    reset_keyword_typedef_table();
+    /*  reset_keyword_typedef_table();*/
+    stack_free(&ContextStack);
     debug_off();
     return TRUE;
 }
 
 bool c_parser(string module_name)
 {
-  return actual_c_parser(module_name,DBR_C_SOURCE_FILE);
+  return actual_c_parser(module_name,DBR_C_SOURCE_FILE,FALSE);
 }
 
 bool c_parser_tmp(string module_name)
 {
-  return actual_c_parser(module_name,DBR_SOURCE_FILE);
+  return actual_c_parser(module_name,DBR_SOURCE_FILE,FALSE);
 }
 
 bool compilation_unit_parser(string module_name)
 {
-  return actual_c_parser(module_name,DBR_C_SOURCE_FILE);
+  return actual_c_parser(module_name,DBR_C_SOURCE_FILE,TRUE);
 }
+
+
+
+
 
