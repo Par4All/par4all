@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/12/06 12:07:54 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/12/22 11:27:08 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -225,19 +225,28 @@ statement *hoststatp, *nodestatp;
 
     if (execution_parallel_p(loop_execution(the_loop)))
     {
-	/*
-	 * should verify that only listed in labels and distributed
-	 * entities are defined inside the body of the loop
-	 */
+	entity var=entity_undefined;
+	list l=NIL;
 	bool
+	    is_sh = subarray_shift_p(stat, &var, &l),
+	    /* 
+	     * should verify that only listed in labels and distributed
+	     * entities are defined inside the body of the loop
+	     */
 	    at_ac = atomic_accesses_only_p(stat),
 	    in_in = indirections_inside_statement_p(stat);
 	
-	debug(5, "hpfcompileloop",
-	      "condition results: aa %d, in %d\n",
-	      at_ac, in_in);
+	debug(5, "hpfcompileloop", "condition results: sh %d, aa %d, in %d\n",
+	      is_sh, at_ac, in_in);
 
-	if (at_ac && !in_in)
+	if (is_sh)
+	{
+	    debug(4, "hpfcompileloop", "shift detected\n");
+	    
+	    *nodestatp = generate_subarray_shift(stat, var, l);
+	    *hoststatp = make_continue_statement(entity_empty_label());
+	}
+	else if (at_ac && !in_in)
 	{
 	    statement
 		overlapstat;
