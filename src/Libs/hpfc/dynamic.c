@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1995/10/04 17:34:06 $, )
+ * ($Date: 1995/10/05 11:32:25 $, )
  */
 
 #include "defines-local.h"
@@ -34,8 +34,7 @@ GENERIC_GLOBAL_FUNCTION(renamings, statement_renamings)
 entity safe_load_primary_entity(entity e)
 {
     if (!bound_dynamic_hpf_p(e))
-	user_error("safe_load_primary_entity",
-		   "%s is not dynamic\n", entity_local_name(e));
+	pips_user_error("%s is not dynamic\n", entity_local_name(e));
    
     return load_primary_entity(e);
 }
@@ -109,7 +108,7 @@ entity new_e, e;
 
     pips_debug(3, "%s as %s synonyms\n", entity_name(new_e), entity_name(e));
 
-    assert(dynamic_entity_p(e) && !dynamic_entity_p(new_e));
+    pips_assert("dynamicity", dynamic_entity_p(e) && !dynamic_entity_p(new_e));
 
     entities_list(es) = CONS(ENTITY, new_e, entities_list(es));
     store_dynamic_hpf(new_e, es);
@@ -178,7 +177,7 @@ distribute d1, d2;
 
     if (distribute_processors(d1)!=distribute_processors(d2)) return FALSE;
     
-    assert(gen_length(l1)==gen_length(l2));
+    pips_assert("valid distribution", gen_length(l1)==gen_length(l2));
 
     for(; !ENDP(l1); POP(l1), POP(l2))
     {
@@ -883,7 +882,7 @@ alive_arrays(
 {
     list /* of entities */ l = NIL, lseens = NIL; /* to tag seen primaries. */
 
-    assert(entity_template_p(t));
+    pips_assert("template", entity_template_p(t));
 
     /*   first the alive list is scanned.
      */
@@ -950,10 +949,10 @@ entity src, trg;
     entity module;
     int ndims, i;
 
-    assert(array_distributed_p(src) &&
-	   array_distributed_p(trg) &&
-	   type_variable_p(t) &&
-	   load_primary_entity(src)==load_primary_entity(trg)); /* ??? */
+    pips_assert("valid arguments",
+		array_distributed_p(src) && array_distributed_p(trg) &&
+		type_variable_p(t) &&
+		load_primary_entity(src)==load_primary_entity(trg)); /* ??? */
 
     dims = variable_dimensions(type_variable(t));
     ndims = gen_length(dims);
