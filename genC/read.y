@@ -254,57 +254,29 @@ Data	: Basis	{
 		}
 	;
   
-Basis	: READ_UNIT 	{
-	        $$.u = 1 ;
-		}
-	| READ_BOOL Int {
-		$$.b = $2 ;
-		}
-	| READ_CHAR	{
-		$$.c = $1 ;
-		}
-	| Int	{
-		$$.i = $1 ;
-		}
-	| READ_FLOAT {
-		$$.f = $1 ;
-		}
-	| String {
-	        $$ = *$1 ;
-		}
- 	| READ_EXTERNAL Int {
-		$$.s = read_external( $2 ) ;
-		}
-	| READ_DEF Int String Chunk {
-	        $$.p = make_def( $2, $3, $4 ) ;
-	        }
-	| READ_REF Int String {
-	        $$.p = make_ref( $2, $3 ) ;
-	        }
-	| READ_NULL {
-		$$.p = gen_chunk_undefined ;
-		}
+Basis	: READ_UNIT { $$.u = 1; }
+	| READ_BOOL Int { $$.b = $2; }
+	| READ_CHAR { $$.c = $1; }
+	| Int	{ $$.i = $1; }
+	| READ_FLOAT { $$.f = $1; }
+	| String { $$ = *$1 ; }
+ 	| READ_EXTERNAL Int 
+                { $$.s = read_external($2); }
+	| READ_DEF Int String Chunk 
+                { $$.p = make_def($2, $3, $4); }
+	| READ_REF Int String 
+                { $$.p = make_ref($2, $3) ; }
+	| READ_NULL 
+                { $$.p = gen_chunk_undefined ; }
 	;
 
-Int     : READ_INT   {
-  		$$ = $1 ;
-		}
+Int     : READ_INT   { $$ = $1 ; }
 	;
 
 String  : READ_STRING {
 		gen_chunk *obj = (gen_chunk *)alloc(sizeof(gen_chunk));
-		char * p;
-
-		/* special management of string_undefined... FC. 12/95.
-		 */
-		if (disk_string_undefined_p($1)) {
-		    free($1);
-		    p = string_undefined;
-		} else
-		    p = $1;
-
-		obj->s = p ;
-		$$ = obj ;
+		obj->s = $1;
+		$$ = obj;
 	    }
 		    
 %%
@@ -435,57 +407,55 @@ enter_tabulated_def(
 /* MAKE_DEF defines the object CHUNK of name STRING to be in the tabulation 
    table INT. */
 
-static gen_chunk *
-make_def( Int, String, Chunk )
-int Int ;
-gen_chunk *String, *Chunk ;
+static gen_chunk * make_def(int domain, gen_chunk* String, gen_chunk* gc)
 {
-    int domain ;
-    char *id ;
-
-    sscanf( String->s, "%d", &domain ) ;
-    id = strchr( String->s, HASH_SEPAR )+1 ;
-
-    return( enter_tabulated_def( Int, domain, id, Chunk, allow_forward_ref )) ;
+  char * id = String->s;
+  return enter_tabulated_def(Domains[domain].index, domain, id, gc, 
+			     allow_forward_ref) ;
 }
 
 /* MAKE_REF references the object of hash name STRING in the tabulation table
-   INT. Forward references are dealt with here. */
-
-static gen_chunk * make_ref(int Int, gen_chunk *String)
+   INT. Forward references are dealt with here.
+ */
+static gen_chunk * make_ref(int domain, gen_chunk * st)
 {
     gen_chunk *hash ;
     gen_chunk *cp ;
-    int domain;
+    int Int;
+    string String;
 
-    if( Gen_tabulated_[ Int ] == (gen_chunk *)NULL ) {
-	user( "read: Unloaded tabulated domain %s\n", Domains[ Int ].name ) ;
-    }
-
-    sscanf(String->s, "%d", &domain);
     domain = gen_type_translation_old_to_actual(domain);
+    Int = Domains[domain].index;
 
-    if( (hash=(gen_chunk *)gen_get_tabulated_name_direct(String->s))
-	== (gen_chunk *)HASH_UNDEFINED_VALUE ) {
-	if( allow_forward_ref ) {
-	    hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
-	    hash->i = -gen_find_free_tabulated( &Domains[ domain ] ) ;
+    if(Gen_tabulated_[Int]==(gen_chunk *)NULL) {
+      user( "read: Unloaded tabulated domain %s\n", Domains[domain].name ) ;
+    }
 
-	    gen_put_tabulated_name_direct(String->s, (char *)hash) ;
+    String = (char*) malloc(sizeof(char)*(strlen(st->s)+5));
+    sprintf(String, "%d|%s", domain, st->s);
 
-	    if((Gen_tabulated_[ Int ]+abs( hash->i ))->p != 
-	       gen_chunk_undefined) {
-	        fatal("make_ref: trying to re-allocate for %s\n", String->s) ;
-	    }
-	    (Gen_tabulated_[ Int ]+abs( hash->i ))->p = 
-		(gen_chunk *)alloc( gen_size( Domains+domain )* sizeof( gen_chunk )) ;
-        }
-	else {
-	    user("make_ref: Forward references to %s prohibited\n",
-		 String->s) ;
+    if((hash=(gen_chunk *)gen_get_tabulated_name_direct(String))
+	== (gen_chunk *) HASH_UNDEFINED_VALUE) 
+    {
+      if (allow_forward_ref) 
+      {
+	hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
+	hash->i = -gen_find_free_tabulated( &Domains[ domain ] ) ;
+	
+	gen_put_tabulated_name_direct(String, (char *)hash) ;
+	
+	if((Gen_tabulated_[ Int ]+abs( hash->i ))->p != 
+	   gen_chunk_undefined) {
+	  fatal("make_ref: trying to re-allocate for %s\n", String);
+	}
+	(Gen_tabulated_[ Int ]+abs( hash->i ))->p = 
+	  (gen_chunk *)alloc(gen_size(Domains+domain)*sizeof(gen_chunk));
+      }
+      else {
+	user("make_ref: Forward references to %s prohibited\n", String) ;
         }
     }
-    cp = (Gen_tabulated_[ Int ]+abs( hash->i ))->p ;
+    cp = (Gen_tabulated_[Int]+abs(hash->i))->p ;
     (cp+1)->i = abs( hash->i ) ;
-    return( cp ) ;
+    return cp;
 }
