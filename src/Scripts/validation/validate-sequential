@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1994/12/01 17:57:43 $, ) version $Revision$,
+# $RCSfile: validate-sequential,v $ ($Date: 1995/01/02 16:38:10 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -44,7 +44,7 @@
 
 pips_test_directory=$PIPSDIR/Tests/Validation
 default_file=defaults
-user=`whoami`
+RUNNER=`whoami`
 HOSTNAME=`hostname`
 PWD=`pwd`
 subject="PIPS Validation Suite Report"
@@ -52,6 +52,7 @@ failed=""
 
 VERBOSE=':'
 DEBUG=':'
+MAIL='/usr/ucb/mail'
 
 unset UNIQDIR pips_version RUNDIR LOCKFILE PERFORMANCE
 
@@ -160,7 +161,7 @@ report()
       echo "Validate Message from $HOSTNAME:"
       echo
       echo "$message" 
-    } | mail -s "$subject" $user
+    } | $MAIL -s "$subject" $RUNNER
 
     # beurk!
     int=`cat $errors`
