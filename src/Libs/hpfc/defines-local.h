@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/09/22 14:39:59 $, ) 
+ * ($Date: 1995/10/04 19:25:10 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -364,7 +364,7 @@ void fprint_entity_list(FILE *fp, list l);
 /*   WARNING
  */
 #define hpfc_warning \
-    if (!get_bool_property("HPFC_NO_WARNING")) user_warning
+    if (!get_bool_property("HPFC_NO_WARNING")) pips_user_warning
 
 /* that is all
  */
