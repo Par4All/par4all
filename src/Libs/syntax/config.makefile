@@ -9,6 +9,7 @@ endif
 
 # bison does not like this pips grammar for Fortran, it reports errors:-)
 YACC=yacc
+YFLAGS=
 
 PARSER_SRC= 
 
