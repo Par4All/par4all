@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: OptionParser.java,v $
+ * Revision 1.8  1998/07/03 22:14:50  coelho
+ * cleaner.
+ *
  * Revision 1.7  1998/07/03 17:42:37  coelho
  * checkbox width fixed.
  *
@@ -65,7 +68,8 @@ public class OptionParser
   public GridBagConstraints	c;	//layout of optionPanel
 						
   //these tags represents fonctionalities both used in the menu and the panel 
-  public final String	SINGLE_BUTTON		= "SINGLE_BUTTON", 	
+  public final String	SINGLE_BUTTON		= "SINGLE_BUTTON",
+                        LARGE_BUTTON		= "LARGE_BUTTON",
   			SINGLE_CHECKBOX		= "SINGLE_CHECKBOX",
 			SEPARATOR		= "SEPARATOR",
 			BUTTON_WITH_TEXT	= "BUTTON_WITH_TEXT",
@@ -133,7 +137,7 @@ public class OptionParser
       PLabel b = new PLabel();
       b.setPreferredSize(new Dimension(1,2));
 
-      add((Container)optionPanel,b,
+      add(optionPanel,b,
 	  0,position++,3,1,1,1,0.0,0.0,5,GridBagConstraints.HORIZONTAL,c);
       close = new PButton(closeButton);
       a = new ActionListener()
@@ -145,7 +149,7 @@ public class OptionParser
              } 
 	 };
       close.addActionListener(a);
-      add((Container)optionPanel,close,
+      add(optionPanel,close,
 	  0,position,3,1,1,1,0.0,0.0,0,GridBagConstraints.HORIZONTAL,c);
 
       WindowListener w = new WindowListener()
@@ -165,7 +169,7 @@ public class OptionParser
       Dimension opDim = opLayout.minimumLayoutSize(optionPanel);
       optionPanel.setPreferredSize(opDim);
 
-      add((Container)frame.getContentPane(),optionPanel,
+      add(frame.getContentPane(),optionPanel,
 	  0,0,1,1,1,1,0.0,0.0,0,GridBagConstraints.HORIZONTAL,cc);
 
       Dimension fDim = fLayout.minimumLayoutSize(frame);
@@ -190,7 +194,9 @@ public class OptionParser
       while(s != null && !s.equals(CLOSE))
         {
           if(s.equals(SINGLE_BUTTON))
-	    addSingleButton();
+	    addSingleButton(false);
+          else if(s.equals(LARGE_BUTTON))
+	    addSingleButton(true);
           else if(s.equals(SINGLE_CHECKBOX))
 	    addSingleCheckBox();
           else if(s.equals(SEPARATOR))
@@ -249,7 +255,7 @@ public class OptionParser
       c.ipadx = px;
       c.ipady = py;
       c.weightx = wex;
-      c.weightx = wex;
+      c.weighty = wey;
       c.fill = f;
       cont.add(comp,c);
       vector.addElement(comp);
@@ -260,7 +266,7 @@ public class OptionParser
     * Adds an executable menuItem to menu.
     * This method can be called everywhere in the tree structure.
     */
-  public void addSingleButton()
+  public void addSingleButton(boolean large)
     {
       String name, command, tip;
 
@@ -269,8 +275,9 @@ public class OptionParser
       tip = p.nextNonEmptyLine();
 
       PButton b = new PButton(name, command, tip);
-      add((Container)optionPanel,b,
-	  0,position++,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
+      add(optionPanel,b,
+	  0,position++,large? 3:1,1,1,1,0.0,0.0,2,
+	  GridBagConstraints.HORIZONTAL,c);
 
       PMenuItem mi = new PMenuItem(name,command);
       menu.add(mi);
@@ -294,7 +301,7 @@ public class OptionParser
       tip = p.nextNonEmptyLine();
 
       PCheckBox cb = new PCheckBox(name,command,checking,tip);
-      add((Container)optionPanel,cb,
+      add(optionPanel,cb,
 	  0,position++,3,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
       PCheckBoxMenuItem cbmi = new PCheckBoxMenuItem(name,command,checking,cb);
@@ -314,7 +321,7 @@ public class OptionParser
       PLabel b = new PLabel();
       b.setPreferredSize(new Dimension(1,2));
 
-      add((Container)optionPanel,b,
+      add(optionPanel,b,
 	  0,position++,3,1,1,1,0.0,0.0,5,GridBagConstraints.HORIZONTAL,c);
 
       PSeparator s = new PSeparator();
@@ -336,10 +343,10 @@ public class OptionParser
       PTextField tf = new PTextField();
       PButton b = new PButton(name, command, tip, tf, null);
       
-      add((Container)optionPanel,b,
+      add(optionPanel,b,
 	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
-      add((Container)optionPanel,tf,
+      add(optionPanel,tf,
 	  1,position++,2,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
 
       PMenuItem mi = new PMenuItem(name,command);
@@ -382,7 +389,7 @@ public class OptionParser
       parseCommand(m1, m2, l, null, null);
 
       mb.add(m1);
-      add((Container)optionPanel,mb,
+      add(optionPanel,mb,
 	  2,position++,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
     }
 
@@ -401,7 +408,7 @@ public class OptionParser
 
       PButton b = new PButton(name,command,tip);
       add(optionPanel,b,
-	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
+	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
       b.addActionListener(getBListener());
 
       addWithMenu(null);
@@ -423,8 +430,8 @@ public class OptionParser
       tip = p.nextNonEmptyLine();
 
       PLabel l1 = new PLabel(name, tip);
-      add((Container)optionPanel,l1,
-	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
+      add(optionPanel,l1,
+	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
 
       PMenu m2 = new PMenu(name);
       addWithMenu(m2);
@@ -446,8 +453,8 @@ public class OptionParser
       tip = p.nextNonEmptyLine();
 
       PButton b = new PButton(name, command, tip, null, null);
-      add((Container)optionPanel,b,
-	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
+      add(optionPanel,b,
+	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
 
       PComboBox cob = new PComboBox(checking, null, direct);
 
@@ -463,7 +470,7 @@ public class OptionParser
 	  name = p.nextNonEmptyLine();
 	}
 
-      add((Container)optionPanel,cob,
+      add(optionPanel,cob,
 	  1,position++,2,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
 
       b.addActionListener(getBCOBListener(cob));
@@ -487,7 +494,7 @@ public class OptionParser
 
       PLabel l = new PLabel(name, tip);
       add(optionPanel,l,
-	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
+	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
 
       PComboBox cob = new PComboBox(checking,mark,direct);
       state.addElement(cob);
@@ -519,7 +526,7 @@ public class OptionParser
       rbmi = (PRadioButtonMenuItem)cob.vRbmi.elementAt(0);
       rbmi.setSelected(true);
 
-      add((Container)optionPanel,cob,
+      add(optionPanel,cob,
 	  1,position++,2,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
       cob.addActionListener(getCOBListener());
 
@@ -556,12 +563,12 @@ public class OptionParser
       name = p.nextNonEmptyLine();
       tip = p.nextNonEmptyLine();
 
-      PPanel newp= new PPanel(new GridBagLayout());
+      PPanel newp = new PPanel(new GridBagLayout());
       newp.setBorder(BorderFactory.createTitledBorder(name));
       newp.setToolTipText(tip);
 
       add(optionPanel, newp, 
-	  0,position++,3,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
+	  0,position++,3,1,1,1,1.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
 
       PPanel saved = optionPanel;
       optionPanel = newp;
@@ -693,7 +700,7 @@ public class OptionParser
     */
   public ActionListener getBTListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
            public void actionPerformed(ActionEvent e)
 	     {
@@ -701,7 +708,6 @@ public class OptionParser
 	       tpips.sendCommand(b.command+b.tf.getText());
              }
 	 };
-      return a;
     }
     
 
@@ -709,12 +715,11 @@ public class OptionParser
     */
   public ActionListener getMIListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
            public void actionPerformed(ActionEvent e)
 	     { tpips.sendCommand(((PMenuItem)e.getSource()).command); }
 	 };
-      return a;
     }
     
 
@@ -722,7 +727,7 @@ public class OptionParser
     */
   public ActionListener getMITListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
            public void actionPerformed(ActionEvent e)
 	     {
@@ -730,7 +735,6 @@ public class OptionParser
 	       tpips.sendCommand(mi.command+mi.tf.getText());
              }
 	 };
-      return a;
     }
     
 
@@ -738,7 +742,7 @@ public class OptionParser
     */
   public ActionListener getCBListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
            public void actionPerformed(ActionEvent e)
 	     {
@@ -747,7 +751,6 @@ public class OptionParser
 	       tpips.sendCommand(cb.command);
 	     }
 	 };
-      return a;
     }
     
 
@@ -755,7 +758,7 @@ public class OptionParser
     */
   public ActionListener getCBMIListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
            public void actionPerformed(ActionEvent e)
 	     {
@@ -764,7 +767,6 @@ public class OptionParser
                cbmi.cb.setSelected(cbmi.isSelected());
 	     }
 	 };
-      return a;
     }
     
 
@@ -847,7 +849,7 @@ public class OptionParser
     */
   public ActionListener getRBMILListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
 	   public void actionPerformed(ActionEvent e)
 	     {
@@ -859,6 +861,5 @@ public class OptionParser
                tpips.sendCommand(rbmi.command);
              } 
 	 };
-      return a;
     }
 }
