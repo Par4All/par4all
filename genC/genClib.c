@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/10/02 13:52:29 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/10/09 15:37:33 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -986,7 +986,7 @@ gen_chunk *obj ;
 /* These functions are used to implement the copying of objects. A
    tabulated constructor has to stop recursive duplication. */
 
-static hash_table copy_table;		/* maps an object on its copy */
+static hash_table copy_table = NULL;/* maps an object on its copy */
 
 gen_chunk *copy_hsearch(key)
 gen_chunk *key;
@@ -1288,6 +1288,14 @@ gen_chunk *obj ;
 {
     gen_chunk *copy;
     struct driver dr ;
+    hash_table old_copy_table;
+
+    /* Save the old copy_table */
+    old_copy_table = copy_table;
+    
+    /* allocate a local copy_table
+     */
+    copy_table = hash_table_make( hash_pointer, 0 ) ;
 
     check_read_spec_performed();
 
@@ -1306,10 +1314,6 @@ gen_chunk *obj ;
      */
     shared_pointers( obj, FALSE ) ;
 
-    /* the copy_table is initialized 
-     */
-    if (copy_table == (hash_table) NULL)
-	copy_table = hash_table_make( hash_pointer, 0 ) ;
 
     /* recursive travel thru data structures begins ...
      */
@@ -1324,6 +1328,8 @@ gen_chunk *obj ;
     /* the copy_table is cleared
      */
     hash_table_clear(copy_table);	
+    hash_table_free(copy_table);
+    copy_table = old_copy_table;
 
     return(copy); 
 }
