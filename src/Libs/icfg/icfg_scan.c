@@ -49,7 +49,8 @@ DEFINE_LOCAL_STACK(current_stmt, statement)
 */
 GENERIC_LOCAL_MAPPING(icfg, text, statement)
 
-static void append_icfg_file(text t, string module_name)
+static void 
+append_icfg_file(text t, string module_name)
 {
     string filename = NULL;
     string localfilename = NULL;
@@ -84,6 +85,8 @@ static void append_icfg_file(text t, string module_name)
     safe_fclose (f_called, filename);
 }
 
+/* STATEMENT
+ */
 static bool statement_filter(statement s)
 {
     bool res = TRUE;
@@ -105,6 +108,8 @@ static void statement_rewrite(statement s)
     return;
 }
 
+/* CALL
+ */
 static void call_filter(call c)
 {
     entity e_callee = call_function(c);
@@ -176,6 +181,8 @@ static void call_filter(call c)
     return;
 }
 
+/* LOOP
+ */
 static bool loop_filter (loop l)
 {
     bool print_do = get_bool_property(ICFG_DOs);
@@ -203,6 +210,14 @@ static void loop_rewrite (loop l)
     inside_the_loop = (text) load_statement_icfg (loop_body (l));
     text_in_loop_p = some_text_p(inside_the_loop);
 
+    /* Print the text inside do expressions (before the DO!)
+     */
+    if (text_in_do_p) 
+    {
+	pips_debug(9, "something inside_the_do\n");
+	MERGE_TEXTS (t, inside_the_do);
+    }
+
     /* Print the DO 
      */
     if ((text_in_loop_p || text_in_do_p) && print_do) 
@@ -210,23 +225,6 @@ static void loop_rewrite (loop l)
 	sprintf(textbuf, "%*s" st_DO "\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
-    }
-
-    /* Print the text inside do expressions
-     */
-    if (text_in_do_p) 
-    {
-	pips_debug(9, "something inside_the_do\n");
-	MERGE_TEXTS (t, inside_the_do);
-
-	/* a blank line. not very wellcome to xtree, but allows to 
-	 * separate DO and BODY calls...
-	 */
-	if (print_do)
-	{
-	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-						  strdup("\n"))); 
-	}
     }
 
     /* Print the text inside the loop
@@ -251,6 +249,8 @@ static void loop_rewrite (loop l)
     return ;
 }
 
+/* INSTRUCTION
+ */
 static void instruction_rewrite (instruction i)
 {
     text t = make_text (NIL);
@@ -294,6 +294,24 @@ static void instruction_rewrite (instruction i)
     }
 }
 
+/* RANGE
+ * functions to avoid the indentation when dealing with DO expressions.
+ */
+static bool range_filter(range r)
+{
+    if (statement_loop_p(current_stmt_head()) && get_bool_property(ICFG_DOs))
+       current_margin -= ICFG_SCAN_INDENT;
+    return TRUE;
+}
+
+static void range_rewrite(range r)
+{
+    if (statement_loop_p(current_stmt_head()) && get_bool_property(ICFG_DOs))
+        current_margin += ICFG_SCAN_INDENT;
+}
+
+/* TEST
+ */
 static bool test_filter (test l)
 {
     bool print_if_p = get_bool_property (ICFG_IFs);
@@ -398,6 +416,7 @@ void print_module_icfg(entity module)
 	 loop_domain     , loop_filter     , loop_rewrite,
 	 instruction_domain    , gen_null  , instruction_rewrite,
 	 test_domain     , test_filter     , test_rewrite,
+         range_domain    , range_filter    , range_rewrite,
 	 NULL);
 
     pips_assert("stack is empty", current_stmt_empty_p());
