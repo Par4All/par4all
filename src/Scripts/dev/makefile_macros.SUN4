@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.SUN4,v $ (version $Revision$)
-# $Date: 1996/07/15 18:43:37 $, 
+# $Date: 1996/07/15 21:10:14 $, 
 #
 # this file contains macro definitions 
 
@@ -20,7 +20,8 @@ LINT	= lint
 LINTFLAGS= -habxu
 YACC	= yacc
 YFLAGS	=
-PROTOIZE= cproto -vcf2
+PROTO	= cproto
+PRFLAGS	= -evcf2
 ETAGS	= etags
 TAR	= gtar
 ZIP	= gzip -v9
