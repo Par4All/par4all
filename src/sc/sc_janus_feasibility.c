@@ -14,15 +14,14 @@
 
 /* Janus */
 #include <sys/types.h>
-//#include "Janus/sjanus.h"
-//#include "Janus/stask.h"
-//#include "Janus/rproblem.h"
-#include "Janus/iproblem.h"
+//#include "iproblem.h"
 /* Janus */
 
 FILE *fopen(), *fdebug;
-struct initpb I; 
-struct problem Z;
+//struct initpb I;
+//struct problem Z;
+initpb I; 
+problem Z;
 
 #define FTRACE fdebug
 //sc must be consistant
