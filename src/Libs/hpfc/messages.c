@@ -1,29 +1,13 @@
 /* Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1995/03/27 16:27:33 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1995/04/10 18:49:38 $, )
  * version $Revision$
  * 
  * Fabien Coelho, August 1993
  */
 
-#include <stdio.h>
-#include <string.h>
-
-extern int      fprintf();
-
-#include "genC.h"
-
-#include "ri.h"
-#include "hpf.h"
-#include "hpf_private.h"
-#include "message.h"
-
-#include "misc.h"
-#include "ri-util.h"
-#include "properties.h"
-#include "hpfc.h"
-#include "access_description.h"
 #include "defines-local.h"
+#include "access_description.h"
 
 entity CreateIntrinsic(string name); /* in syntax.h */
 
