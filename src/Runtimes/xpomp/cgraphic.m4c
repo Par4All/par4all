@@ -1,5 +1,5 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/08/30 17:12:40 $, 
+ * $Date: 1996/08/30 17:21:33 $, 
  */
 
 #include <stdlib.h>
@@ -135,9 +135,9 @@ static char * path_of(char * binary)
 
     /* checks for no "name" buffer overflow
      */
-    len = (xpomp? strlen(xpomp): 
-	   pipsr? strlen(pipsr)+strlen(XPOMP_DIR): 0) +
-	  (pipsa? strlen(pipsa): 0) + strlen(binary) + 4;
+    len = (xpomp? strlen(xpomp)+1: 
+	   pipsr? strlen(pipsr)+strlen(XPOMP_DIR)+2: 0) +
+	  (pipsa? strlen(pipsa)+1: 0) + strlen(binary) + 1;
 
     if (len>NAME_MAX_LENGTH) 
     {
