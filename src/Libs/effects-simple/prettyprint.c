@@ -181,6 +181,8 @@ simple_effects_to_text(
 	    update_an_effect_type(Wt, W, t), Wb = TRUE;
 	else
 	    pips_internal_error("unrecognized effect");
+
+	free(t);
     }
     
     close_current_line(r, rt);
