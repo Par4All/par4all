@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.46  2000/12/01 10:35:03  coelho
+ * suite du debug;-)
+ *
  * Revision 1.45  2000/12/01 10:32:07  ancourt
  * debug string_to_entity_list
  *
@@ -884,7 +887,7 @@ list /* of entity */ string_to_entity_list(string module, string names)
   string s, next_comma;
   for (s = names; s && *s && next_comma;)
     {
-      char * next_comma = strchr(s, ',');
+      next_comma = strchr(s, ',');
       if (next_comma)  *next_comma = '\0';
       le = CONS(ENTITY, FindOrCreateEntity(module, s), le);
       s += strlen(s)+1;
