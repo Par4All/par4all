@@ -288,10 +288,8 @@ boolean sc_weak_consistent_p(Psysteme sc)
 
     if(weak_consistent) {
 	weak_consistent = (sc->nb_eq == nb_elems_list(sc_egalites(sc)))
-	    && 
-		(sc->nb_ineq == nb_elems_list(sc_inegalites(sc)))
-		    &&
-			(sc_dimension(sc) == base_dimension(sc_base(sc)));
+	    && (sc->nb_ineq == nb_elems_list(sc_inegalites(sc)))
+		    && (sc_dimension(sc) == base_dimension(sc_base(sc)));
     }
 
     if(weak_consistent && sc_dimension(sc) != 0) {
@@ -315,6 +313,7 @@ boolean sc_weak_consistent_p(Psysteme sc)
 		    vect_chg_coeff(&diagonale,pv->var, VALUE_ONE);
 	}
 	weak_consistent =  base_included_p(diagonale, sc_base(sc));
+	base_rm(diagonale);
     }
 
     /* assert(weak_consistent); */
