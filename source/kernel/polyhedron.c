@@ -2306,7 +2306,8 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
     Ray->NbRows = NbRay;
 
     /* Copy rays of polyhedron 'Pol' to matrix 'Ray' */
-    Vector_Copy(Pol->Ray[0], Ray->p[0], NbRay * Dimension);  
+    if (NbRay)
+	Vector_Copy(Pol->Ray[0], Ray->p[0], NbRay * Dimension);  
     
     /* Create the saturation matrix 'Sat' from constraint matrix 'Mat' and */
     /* ray matrix 'Ray' .                                                  */ 
@@ -2617,7 +2618,8 @@ Polyhedron *AddRays(Value *AddedRays,unsigned NbAddedRays,Polyhedron *Pol,unsign
     }
     
     /* Copy rays of polyhedron 'Pol' to matrix 'Ray' */
-    Vector_Copy(Pol->Ray[0], Ray->p_Init, NbEle1);
+    if (NbRay)
+      Vector_Copy(Pol->Ray[0], Ray->p_Init, NbEle1);
     
     /* Add the new rays pointed by 'AddedRays' to matrix 'Ray' */
     Vector_Copy(AddedRays, Ray->p_Init+NbEle1, NbAddedRays * Dimension);
