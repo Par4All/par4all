@@ -1,12 +1,12 @@
 /* Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1995/09/15 12:58:37 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1995/09/22 13:21:45 $, )
  * version $Revision$
  */
 
 #include "defines-local.h"
-#include "loop_normalize.h"
+bool expression_constant_p(expression); /* in static_controlize */
 
 GENERIC_GLOBAL_FUNCTION(overlap_status, overlapsmap)
 
