@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 16:42:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/25 16:43:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1997/09/15 16:42:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1997/09/25 16:43:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -371,7 +371,10 @@ ComputeAddresses()
 		    r = storage_ram(entity_storage(e));
 
 		    if (adr != ram_offset(r)) {
-			FatalError("ComputeAddresses", "incompatible addresses\n");
+			user_warning("ComputeAddresses",
+				     "Two conflicting offsets for %s: %d and %d\n",
+				     entity_local_name(e), adr, ram_offset(r));
+			ParserError("ComputeAddresses", "incompatible addresses\n");
 		    }
 		}
 		else {
