@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1996/10/25 21:13:18 $, 
+# $Date: 1997/01/18 16:10:06 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -93,6 +93,7 @@
 # _7: host/end host // host section...
 # _8: kill // tell that the values of an array are dead...
 # _9: fake // tells that the function is fake.
+# _0: tell // print out a synchronized message
 #
 # (_ is hpfc)
 #
@@ -172,13 +173,6 @@ $SED "#
       /[][^'\"]*$/s,[ 	][ 	]*,\1,g;
       /[]/s,\([]\),\1 ,;
       #
-      # NO/END NO: to remove part of the code
-      / no/,/ endno/d;
-      # YES/END YES to enable part of the code (which is uncommented)
-      / yes/,/ endyes/s,^[!Cc\*],,;
-      / yes/d;
-      / endyes/d;
-      #
       # simple 1D FORALL instruction without continuation... 
       s,^\([^Cc!\*].... \)[ 	]*[Ff][Oo][Rr][Aa][Ll][Ll][ 	]*(\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\))\(.*\),\1do \2=\3\,\4\5enddo,
       # simple 2D FORALL instruction without continuation... 
@@ -208,8 +202,9 @@ $SED "#
       #
       s, synchro,1,
       s, time,2,
-      # end time and set{bool,int} may not be normalized
+      # end time, set{bool,int} and tell may not be normalized
       s, [ 	]*e[ 	]*n[ 	]*d[ 	]*t[ 	]*i[ 	]*m[ 	]*e,3,
+      s, [ 	]*t[ 	]*e[ 	]*l[ 	]*l,0,
       s, [ 	]*s[ 	]*e[ 	]*t[ 	]*b[ 	]*o[ 	]*o[ 	]*l,4,
       s, [ 	]*s[ 	]*e[ 	]*t[ 	]*i[ 	]*n[ 	]*t,5,
       s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
@@ -321,6 +316,7 @@ LINE=`$SED -n '
      /^[^Cc\*!].... [ 	]*[Cc][Hh][Aa][Rr][Aa][Cc][Tt][Ee][Rr][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Dd][Oo][Uu][Bb][Ll][Ee][Pp][Rr][Ee][Cc][Ii][Ss][Ii][Oo][Nn][ 	]/=
      /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 |
 $SED -n '$p'`
 
