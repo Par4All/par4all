@@ -1,12 +1,12 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/11 16:04:34 $, 
+# $Date: 1996/09/11 17:12:22 $, 
 #
 # this script allow to chose a directory in interactively
 #
 # wish is started by sh without its path:-) 
-sed '1,/###/d' $0 | `type wish | sed 's,wish is ,,'` ; exit
+sed '1,/###/d' $0 | `type wish | sed 's,wish is ,,'` "$@" ; exit
 #
 ###
 #
@@ -148,4 +148,12 @@ proc changedir { root currentdir } {
     return $changedir_result
 }
 
-puts [changedir "" . ]
+#
+# first 
+if {$argc == 0 } {
+    set dir .
+} else {
+    set dir [lindex $argv 1]
+}
+
+puts [changedir "" $dir ]
