@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: host_node_entities.c,v $ ($Date: 1995/04/10 18:49:50 $, ) 
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1995/07/20 18:40:51 $, ) 
  * version $Revision$
  */
 
@@ -144,9 +144,7 @@ call c;
 static void update_code_for_module_rewrite(c)
 code c;
 {
-    MAPL(ce,
- 	 update_for_module_rewrite(&ENTITY(CAR(ce))),
- 	 code_declarations(c));
+    MAPL(ce, update_for_module_rewrite(&ENTITY(CAR(ce))), code_declarations(c));
 }
 
 static void update_loop_for_module_rewrite(l)
@@ -200,9 +198,7 @@ void update_list_for_module(l, module)
 list l;
 entity module;
 {
-    MAPL(cx,
-	 update_object_for_module(CHUNK(CAR(cx)), module),
-	 l);
+    MAPL(cx, update_object_for_module(CHUNK(CAR(cx)), module), l);
 }
 
 /* removed unreferenced items in the common
@@ -212,27 +208,20 @@ entity module;
 void clean_common_declaration(common)
 entity common;
 {
-    entity
-	var = entity_undefined;
-    type
-	t = entity_type(common);
-    list
-	l = NIL,
-	lnew = NIL;
+    type t = entity_type(common);
+    list l = NIL, lnew = NIL;
 
     assert(type_area_p(t));
 
     l = area_layout(type_area(t));
 
-    MAPL(ce,
-     {
-	 var = ENTITY(CAR(ce));
-
-	 if (bound_referenced_variables_p(var) &&
-	     local_entity_of_module_p(var, common))
-	     lnew = CONS(ENTITY, var, lnew);
-     },
-	 l);
+    MAP(ENTITY, var,
+    {
+	if (bound_referenced_variables_p(var) &&
+	    local_entity_of_module_p(var, common))
+	    lnew = CONS(ENTITY, var, lnew);
+    },
+	l);
 
     gen_free_list(l);
     area_layout(type_area(t)) = lnew;
@@ -263,13 +252,8 @@ list l;
 {
     list new = NIL, rev = NIL;
 
-    MAPL(cx,
-     {
-	 rev = CONS(EXPRESSION,
-		    copy_expression(EXPRESSION(CAR(cx))),
-		    rev);
-     },
-	 l);
+    MAP(EXPRESSION, e,
+	rev = CONS(EXPRESSION, copy_expression(e), rev), l);
 
     new = gen_nreverse(rev); 
     update_list_for_module(new, module);    
