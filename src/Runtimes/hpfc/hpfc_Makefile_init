@@ -1,38 +1,310 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/08/21 17:10:50 $, )
+# ($Date: 1996/08/30 14:28:19 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
-#
+# Makefile for PVM and HPFC, Fabien COELHO, 08/06/94
 
-MAKEFILE = Makefile
-HPFC_MAKEFILE = hpfc_Makefile
-INCLUDED = hpfc_Makefile.include
-MOVE = mv
+ARCH=$(PVM_ARCH)
+all:
+
+ifdef HPFC_RUNTIME
+RT_DIR=	$(HPFC_RUNTIME)
+else
+RT_DIR= $(PIPS_ROOT)/Runtime/hpfc
+endif
+
+# the default is to use the same compilers and options as the library.
+include $(HPFC_RUNTIME)/$(ARCH)/compilers.make
 
 ifdef HPFC_M4
-M4	=	$(HPFC_M4)
+M4	= $(HPFC_M4)
 else
-M4 	=	m4
+M4	= m4
 endif
 
 #
-# M4 parameters are those of the library...
+# special options driven by defines:
+# USE_PVMe
+# USE_GNU
 
-M4FLAGS += -D ARCHITECTURE=$(PVM_ARCH) hpfc_architecture_m4_macros
+ifdef USE_PVMe
+all:	$(TARGET).cmd
+endif
 
 #
-# what to do
+# PVM arch dependent settings
 
-.INIT:	$(INCLUDED)
+ifeq ($(ARCH),CM5)
+MIMD = 1
+#FC	= f77
+#FFLAGS	= -fast -u
+CMLD = cmmd-ld
+# CMLD_FLAGS = -v
+CMLD_FLAGS =
+endif
 
-all:
+ifeq ($(ARCH),PGON)
+MIMD = 1
+PVM_HLIB	+= -lrpc
+PVM_NLIB	+= -lnx -lrpc
+ALL_NLIBS	+= $(PVMHOST)
+endif
 
-$(INCLUDED): $(HPFC_MAKEFILE)
-	$(M4) $(M4FLAGS) $(M4OPT) $(HPFC_MAKEFILE) > $(INCLUDED)
+ifeq ($(ARCH),SUN4)
+NETWORK = 1
+#FC	= f77
+#FFLAGS	= -fast -u
+endif
 
-include $(INCLUDED)
+ifeq ($(ARCH),SUN4SOL2)
+NETWORK = 1
+#FC	= f77
+#FFLAGS	= -fast -u
+endif
+
+ifeq ($(ARCH),SUNMP)
+NETWORK = 1
+#FC	= f77
+#FFLAGS	= -fast -u
+RUNTIME_LIBS     += -lnsl -lsocket -lthread
+endif
+
+ifeq ($(ARCH),ALPHA)
+NETWORK = 1
+#FC	= f77
+#FFLAGS	= -fast -u
+endif
+
+ifeq ($(ARCH),RS6K)
+NETWORK = 1
+#FC	= xlf
+#FFLAGS	= -O2 -u
+endif
+
+#
+# possible overwrite
+
+#ifdef USE_GNU
+#FC	= g77
+#FFLAGS 	= -O2 -pipe -Wimplicit
+#endif
+
+#
+# Directories... 
+
+PVM_BIN_DIR 	= $(HOME)/pvm3/bin/$(ARCH)
+PVM_LIB_DIR	= $(PVM_ROOT)/lib/$(ARCH)
+PVM_INC_DIR	= $(PVM_ROOT)/include
+
+ifdef USE_PVMe
+PVM_LIB_DIR	= $(PVM_ROOT)/lib
+PVM_INC_DIR	= $(PVM_ROOT)/lib
+PVMe_DIR	= /usr/lpp/ssp/css/libus)
+
+LIBS_DIR	+= -L$(PVMe_DIR)
+endif
+
+LIBS_DIR	+= -L. -L$(PVM_LIB_DIR) -L$(RT_DIR)/$(ARCH)
+
+#
+# Libraries
+
+ifdef MIMD
+PVMHOST = $(PVM_LIB_DIR)/pvmhost.o
+endif
+
+PVM_FLIB 	+= -lfpvm3
+PVM_GLIB 	+= -lgpvm3
+PVM_HLIB 	+= -lpvm3
+
+ifdef USE_PVMe
+PVM_GLIB	=
+ALL_NLIBS	+= -lcss -bI:$(PVM_LIB_DIR)/pvm3e.exp
+ALL_HLIBS	+= -lcss -bI:$(PVM_LIB_DIR)/pvm3e.exp
+endif
+
+ifdef NETWORK
+PVM_NLIB 	+= -lpvm3
+endif
+
+ifdef MIMD
+PVM_NLIB 	+= -lpvm3pe
+endif
+
+RUNTIME_LIBS	+= -lhpfcruntime
+
+PVM_HLIBS	+= $(PVM_FLIB) $(PVM_GLIB) $(PVM_HLIB)
+PVM_NLIBS 	+= $(PVM_FLIB) $(PVM_GLIB) $(PVM_NLIB)
+
+ALL_HLIBS	+= $(RUNTIME_LIBS) $(PVM_HLIBS) 
+ALL_NLIBS	+= $(RUNTIME_LIBS) $(PVM_NLIBS) 
+
+#
+# Other tools
+
+STRIP	=	strip
+COPY 	= 	cp
+
+#
+# Files (the wildcards are GNU make extensions:-)
+
+PVM_HEADERS 	= 	pvm3.h fpvm3.h
+HEADERS 	=	$(wildcard hpfc_*.h) $(PVM_HEADERS)
+
+COMMON_FFILES	=	param_init.f hpfc_check.f
+HOST_FFILES 	=	$(wildcard *_host.f)
+NODE_FFILES 	= 	$(wildcard *_node.f)
+
+COMMON_OFILES	=	$(COMMON_FFILES:.f=.o) 
+HOST_OFILES 	= 	$(HOST_FFILES:.f=.o)
+NODE_OFILES 	= 	$(NODE_FFILES:.f=.o)
+
+FTEST	=	$(TARGET).f
+OTEST	=	$(TARGET).o
+
+#
+# Executables
+
+RTEST	=	$(TARGET)_out
+HOST 	= 	$(TARGET)_host
+NODE 	= 	$(TARGET)_node
+
+RUNABLES = $(HOST) $(NODE) $(RTEST)
+DEDUCED = $(PVM_HEADERS) param_init.f
+
+#
+# Rules
+
+all:	$(RUNABLES) $(DEDUCED) 
+
+.SUFFIXES:	.f .o .m4
+
+#
+# make is the target asked for by pipsmake for HPFC_MAKE
+
+make: all install pvm
+
+.INIT: hpfc_files
+
+#
+# PVM quick control
+
+pvm:
+	# starting pvm daemon if needed...
+	@if [ -f /tmp/pvmd.$(shell id -u) ] ; \
+	then echo "PVM already running..." ; \
+	else echo quit | $(PVM_ROOT)/lib/pvm ; fi
+
+reset:
+	@echo "resetting PVM"
+	@echo reset | $(PVM_ROOT)/lib/pvm
+
+#
+# LoadLeveller...
+
+$(TARGET).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(TARGET)
+
+#
+# Installation to run
+
+$(PVM_BIN_DIR):; mkdir -p $(PVM_BIN_DIR)
+
+$(PVM_BIN_DIR)/$(HOST): $(HOST) $(PVM_BIN_DIR)
+	$(COPY)  $(HOST) $(PVM_BIN_DIR)
+
+$(PVM_BIN_DIR)/$(NODE): $(NODE) $(PVM_BIN_DIR)
+	$(COPY)  $(NODE) $(PVM_BIN_DIR)
+
+install: $(PVM_BIN_DIR)/$(HOST) $(PVM_BIN_DIR)/$(NODE)
+	@echo files installed
+	@echo 
+
+run: install pvm
+	$(PVM_BIN_DIR)/$(HOST)
+
+diff: $(RUNABLES) install pvm
+	$(PVM_BIN_DIR)/$(HOST) > parallel.out 2> parallel.err
+	$(RTEST) > sequential.out 2> sequential.err
+	@if cmp -s parallel.out sequential.out ; \
+	then echo "DIFF ON STDOUT: none!" ; \
+	else echo "DIFF ON STDOUT:" ; diff parallel.out sequential.out ; fi
+	@# make is stopped at the diff if different...
+	$(RM) parallel.out parallel.err sequential.out sequential.err
+
+#
+# Headers
+
+hpfc_files:
+	$(COPY) $(RT_DIR)/hpfc_*.h .
+
+pvm3.h:	$(PVM_INC_DIR)/pvm3.h
+	$(COPY) $(PVM_INC_DIR)/pvm3.h .
+
+fpvm3.h:$(PVM_INC_DIR)/fpvm3.h
+	$(COPY) $(PVM_INC_DIR)/fpvm3.h .
+
+#
+# Compilation
+
+param_init.m4:;	$(RT_DIR)/hpfc_generate_init -n $(TARGET) .
+
+param_init.f: param_init.m4
+	$(M4) -D PVM_ARCHITECTURE=$(ARCH) param_init.m4 > param_init.f
+
+%.o: %.f
+	$(FC) $(FFLAGS) $(FOPT) -c $< 
+
+#
+# Link
+
+$(HOST):  $(HEADERS) $(COMMON_OFILES) $(HOST_OFILES)
+	$(FC) $(FFLAGS) -o $(HOST) \
+		$(HOST_OFILES) \
+		$(COMMON_OFILES) \
+		$(LIBS_DIR) \
+		$(ALL_HLIBS)
+	$(STRIP) $(HOST)
+
+$(NODE):  $(HEADERS) $(COMMON_OFILES) $(NODE_OFILES) 
+
+$(NODE):
+	$(FC) $(FFLAGS) $(FOPT) -o $(NODE) \
+		$(NODE_OFILES) \
+		$(COMMON_OFILES) \
+		$(LIBS_DIR) \
+		$(ALL_NLIBS)
+	$(STRIP) $(NODE)
+
+ifdef ($(ARCH),CM5)
+$(NODE): $(HOST_OFILES)
+	$(CMLD) $(CMLD_FLAGS) \
+	   -comp $(FC) -o $(NODE) \
+	   -host \
+		$(HOST_OFILES) \
+		$(COMMON_OFILES) \
+		$(PVMHOST) \
+	 	$(LIBS_DIR) \
+		$(ALL_HLIBS) \
+	   -node \
+		$(NODE_OFILES) 
+		$(COMMON_OFILES) \
+		$(LIBS_DIR) \
+		$(ALL_NLIBS)
+	$(STRIP) $(NODE)
+endif
+
+$(RTEST):  $(FTEST)
+	$(FC) $(FFLAGS) -o $(RTEST) $(FTEST)
+	$(STRIP) $(RTEST)
+
+#
+# Cleaning
+
+clean:;	$(RM) *.o *~ *.trace $(DEDUCED) core
+
+clobber: clean; $(RM) $(RUNABLES) $(PVM_BIN_DIR)/$(HOST) $(PVM_BIN_DIR)/$(NODE)
 
 # that is all
 #
