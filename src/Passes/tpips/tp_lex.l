@@ -1,5 +1,11 @@
 %{
-/* $Id$
+/*
+ * $Id$
+ *
+ * $Log: tp_lex.l,v $
+ * Revision 1.29  1997/11/27 12:12:59  coelho
+ * ; as valid separator.
+ *
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,6 +74,7 @@ static int tpips_lex_input (void)
 #define RETURN(x)  pips_debug(8, "init %d\n", x); return x
 #define KEYWORD(x) pips_debug(8, "key %d\n", x); BEGIN INITIAL; return x
 #define SPECIAL(x) pips_debug(8, "spe %d\n", x); BEGIN SPEC; return x
+#define RESTART(x) pips_debug(8, "rst %d\n", x); BEGIN KEY; return x
 
 %}
 
@@ -111,12 +118,13 @@ static int tpips_lex_input (void)
 \,			{ RETURN(TK_COMMA); }
 = 			{ RETURN(TK_EQUAL); }
 
-<SPEC,INITIAL>\n	{ RETURN(TK_ENDOFLINE); }
+<SPEC,INITIAL>[\n;]	{ RESTART(TK_ENDOFLINE); }
+<SPEC,INITIAL><<EOF>>	{ RESTART(TK_ENDOFLINE); }
 
-<STR>[^\"]*\"		{ yylval.name = strdup(yytext);
+<STR>[^\"]*\"		{ /* " */ yylval.name = strdup(yytext);
 			  yylval.name[strlen(yytext)-1] = '\0';
 		  	  BEGIN INITIAL; RETURN(TK_A_STRING);}
-\"			{ BEGIN STR;} /* " */
+\"			{ /* " */ BEGIN STR;} 
 
 "$ALL"			{ RETURN(TK_OWNER_ALL); }
 "$PROGRAM"		{ RETURN(TK_OWNER_PROGRAM); }
