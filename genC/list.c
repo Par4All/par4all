@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1997/07/24 15:47:14 $, )
+ * $RCSfile: list.c,v $ ($Date: 1997/12/05 18:38:48 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -238,15 +238,11 @@ int domain ;
     return( l ) ;
 }
 
-void gen_free_list( l )
-cons *l ;
+void gen_free_list(list l)n
 {
-    cons *p, *nextp ;
-
-    for( p = l ; p != NIL ; p = nextp ) {
-	nextp = p->cdr ;
+    list p, nextp ;
+    for( p = l ; p != NIL ; p = nextp, nextp = p->cdr )
 	free( p ) ;
-    }
 }
 
 cons * gen_nconc( cp1, cp2 )
@@ -444,6 +440,21 @@ list gen_full_copy_list(list l)
     return nlb;
 }
 
+list /* of string */
+gen_copy_string_list(list /* of string */ ls)
+{
+    list l = NIL;
+    MAP(STRING, s, l = CONS(STRING, strdup(s), l), ls);
+    return gen_nreverse(l);
+}
+
+void
+gen_free_string_list(list /* of string */ ls)
+{
+    gen_map(free, ls);
+    gen_free_list(ls);
+}
+
 list gen_last(l)
 list l;
 {
@@ -527,9 +538,7 @@ list l;
  *
  * FC 27/12/94
  */
-void gen_sort_list(l, compare)
-list l;
-int (*compare)();
+void gen_sort_list(list l, int (*compare)())
 {
     list c;
     int n = gen_length(l);
