@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.8  1997/11/04 13:25:13  coelho
+ * more comments.
+ *
  * Revision 1.7  1997/11/04 10:36:58  coelho
  * more comments, plus assert to check coherency in perform...
  *
@@ -44,10 +47,12 @@
 #include "prettyprint.h"
 #include "semantics.h"
 
+
 #define DEBUG_ON   debug_on("CLONE_DEBUG_LEVEL")
 #define ALL_DECLS  "PRETTYPRINT_ALL_DECLARATIONS"
 #define STAT_ORDER "PRETTYPRINT_STATEMENT_NUMBER"
 #define undefined_number_p(n) ((n)==STATEMENT_NUMBER_UNDEFINED)
+
 
 /************************************************************ UPDATE CALLEES */
 
@@ -199,6 +204,7 @@ build_a_clone_for(
     return new_fun;
 }
 
+
 /********************************************* STORE ALREADY CLONED VERSIONS */
 
 /* already cloned version are kept in a dynamically allocated structure.
@@ -274,34 +280,18 @@ set_clone(entity the_ref, entity the_clone, int argn, int val)
     clones_index++;
 }
 
+
 /**************************************************** CLONING TRANSFORMATION */
 
-static void
-do_clone(
-    call c,            /* call to be replaced */
-    int argn, int val, /* arg number and associated value */
-    entity clonee      /* if provided */)
-{
-    entity cloned = call_function(c);
-    pips_debug(3, "%s cloned on argument %d for value %d\n", 
-	       entity_name(cloned), argn, val);
-    
-    /* first check whether the cloning was already performed.
-     */
-    if (entity_undefined_p(clonee))
-    {
-	clonee = get_clone(cloned, argn, val);
-	if (clonee==entity_undefined)
-	{
-	    clonee = build_a_clone_for(cloned, argn, val);
-	    if (argn!=0) set_clone(cloned, clonee, argn, val);
-	}
-    }
-
-    call_function(c) = clonee;
-}
-
+/* static structures used for driving the cloning transformation.
+ */
 DEFINE_LOCAL_STACK(stmt, statement)
+
+static entity module_to_clone = entity_undefined;
+static int argument_to_clone = 0;
+static int statement_to_clone = STATEMENT_NUMBER_UNDEFINED;
+static entity clonee_to_substitute = entity_undefined;
+static bool some_cloning_performed;
 
 /* returns if the expression is a constant, maybe thanks to the preconditions.
  */
@@ -344,10 +334,33 @@ this_expression_constant_p(
     return ok;
 }
 
-static entity module_to_clone = entity_undefined;
-static int argument_to_clone = 0;
-static int statement_to_clone = STATEMENT_NUMBER_UNDEFINED;
-static entity clonee_to_substitute = entity_undefined;
+/* perform a cloning for a given call
+ */
+static void
+do_clone(
+    call c,            /* call to be replaced */
+    int argn, int val, /* arg number and associated value */
+    entity clonee      /* if provided */)
+{
+    entity cloned = call_function(c);
+    pips_debug(3, "%s cloned on argument %d for value %d\n", 
+	       entity_name(cloned), argn, val);
+    
+    /* first check whether the cloning was already performed.
+     */
+    if (entity_undefined_p(clonee))
+    {
+	clonee = get_clone(cloned, argn, val);
+	if (clonee==entity_undefined)
+	{
+	    clonee = build_a_clone_for(cloned, argn, val);
+	    if (argn!=0) set_clone(cloned, clonee, argn, val);
+	}
+    }
+
+    some_cloning_performed = TRUE;
+    call_function(c) = clonee;
+}
 
 static void 
 clone_rwt(call c)
@@ -373,6 +386,7 @@ clone_rwt(call c)
 
 /* clone module calls on argument arg in caller.
  * formal parameter of module number argn must be an integer scalar.
+ * also used for user-directed cloning or substitution.
  */
 static void
 perform_clone(
@@ -407,6 +421,7 @@ perform_clone(
     argument_to_clone = argn;
     statement_to_clone = number;
     clonee_to_substitute = substitute;
+    some_cloning_performed = FALSE;
 
     /* perform cloning
      */
@@ -415,11 +430,14 @@ perform_clone(
 		      call_domain, gen_true, clone_rwt,
 		      NULL);
 
-    /* update CALLEES and CODE
+    /* update CALLEES and CODE if necessary.
      */
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name, stat);
-    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name,
-			   (char *) compute_callees(stat));
+    if (some_cloning_performed) 
+    {
+	DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name, stat);
+	DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name,
+			       (char *) compute_callees(stat));
+    }
 
     /* close 
      */
@@ -472,17 +490,11 @@ is_a_caller_or_error(
     string name,
     string caller)
 {
-    bool is_a_caller = FALSE;
-    callees callers;
-
-    callers = (callees) db_get_memory_resource(DBR_CALLERS, name, TRUE);
-    
+    callees callers = (callees)db_get_memory_resource(DBR_CALLERS, name, TRUE);
     MAP(STRING, s, 
-	is_a_caller |= same_string_p(s, caller),
+	if (same_string_p(s, caller)) return, /* ok */
 	callees_callees(callers));
-
-    if (!is_a_caller) 
-	pips_user_error("%s is not a caller of %s\n", caller, name);    
+    pips_user_error("%s is not a caller of %s\n", caller, name);    
 }
 
 
@@ -515,7 +527,7 @@ clone_on_argument(string name)
     callers = (callees) db_get_memory_resource(DBR_CALLERS, name, TRUE);
     argn = get_int_property(ARG_TO_CLONE);
 
-    if (argn==0)
+    if (argn<=0)
     {
 	do /* perform a user request to get the argument, 0 to stop */
 	{
@@ -571,7 +583,7 @@ clone_or_clone_substitute(
     bool clone_substitute_p)
 {
     entity module, substitute;
-    string caller, number_s, substitute_s;
+    string caller, number_s;
     int number;
 
     DEBUG_ON;
@@ -587,7 +599,7 @@ clone_or_clone_substitute(
 
     if (clone_substitute_p)
     {
-	substitute_s = user_request("replacement for %s?", name);
+	string substitute_s = user_request("replacement for %s?", name);
 	substitute = local_name_to_top_level_entity(substitute_s);
 	if (entity_undefined_p(substitute) || 
 	    !type_functional_p(entity_type(substitute)))
@@ -605,12 +617,16 @@ clone_or_clone_substitute(
     return TRUE;
 }
 
+/* clone name in one of its callers/statement number
+ */
 bool
 clone(string name)
 {
     return clone_or_clone_substitute(name, FALSE);
 }
 
+/* substitute name in one of its callers/statement number 
+ */
 bool
 clone_substitute(string name)
 {
