@@ -351,8 +351,7 @@ quast pip_solve_min_with_big(ps_dep, ps_context, pv_unknowns, big)
  extern 	quast quast_act;
  extern 	Pbase base_var_ref, old_base_var, base_ref, old_base;
  extern 	int ind_min_max;
- Pvecteur   pvect;
- int        i, infinite_num;
+ int        infinite_num;
 
  /* Pip variables */
  int        q, bigparm, ni, nvar, nq, non_vide, nparm, nc, p, xq;
