@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_generate_init,v $ ($Date: 1997/01/02 19:05:40 $, )
+# $RCSfile: hpfc_generate_init,v $ ($Date: 1997/06/26 08:25:18 $, )
 # version $Revision$
 #
 # generate the initialization file
@@ -59,7 +59,7 @@ key="${NAME}.`hostname`.`whoami`.`date +"%H.%M.%S.%j.%y"`"
     echo "      include \"`basename $file`\""
   done
   echo "! other initializations"
-  echo "      MAIN PROGRAM NAME=\"${NAME}_main\""
+  echo "      MAIN PROGRAM NAME=\"${NAME}_mainpvm\""
   echo "      NODE PROGRAM NAME=\"${NAME}_node\""
   echo "      NODE ARCHITECTURE=\"PVM_ARCH\""
   echo "      HPFC GROUP NAME=\"${NAME}_group\""
