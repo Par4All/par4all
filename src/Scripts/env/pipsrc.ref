@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/10/02 08:47:34 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/10/06 11:53:24 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -155,6 +155,20 @@ WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib -static'
 # Settings added for TPIPS (used for tpips and ttest)
 
 TPIPS_ADDED_LIBS='-lreadline -ltermcap'
+
+# 
+#        ######  #####      #    #####    ####
+#        #       #    #     #    #    #  #
+#        #####   #    #     #    #    #   ####
+#        #       #####      #    #####        #
+#        #       #          #    #       #    #
+#        ######  #          #    #        ####
+#
+# Settings added foe EPIPS (Emacs PIPS).
+# started with the epips command.
+
+EPIPS_EMACS='emacs'
+EPIPS_LISP="$PIPS_UTILDIR/epips.el" 
 
 #
 # 
