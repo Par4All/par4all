@@ -256,7 +256,9 @@ cons * args;
 	/* get rid of unwanted values in the relation r and in the basis */
 	MAPL(cea, { entity e = ENTITY(CAR(cea));
 		    if(base_contains_variable_p(r->base, (Variable) e)) {
-			r = sc_projection(r, (Variable) e);
+			/* r = sc_projection(r, (Variable) e); */
+                        sc_projection_along_variable_ofl_ctrl(&r, (Variable) e,
+                                                              NO_OFL_CTRL);
 			sc_base_remove_variable(r,(Variable) e);}},
 	     args);
 	r->dimension = vect_size(r->base);
