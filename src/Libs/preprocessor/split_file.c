@@ -362,6 +362,12 @@ static void print_name(FILE * o, char * name, int n) /* FC */
     while (n-->0) putc(*name++, o);
 }
 
+#define FREE_STRINGS					\
+  if (main_list) free(main_list), main_list = NULL;	\
+  if (x) free(x), x = NULL;				\
+  if (mainp) free(mainp), mainp = NULL;			\
+  if (blkp) free(blkp), blkp = NULL;
+
 int 
 fsplit(char * dir_name, char * file_name, FILE * out)
 {
@@ -371,6 +377,9 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 	retval;
    /* ??? 20 -> 80 because not checked... smaller than a line is ok ? FC */
     char name[80]; 
+
+    /* MALLOC STRINGS 
+     */
     char * main_list = full_name(dir_name, ".fsplit_main_list");
     x = full_name(dir_name, "zzz000.f");
     mainp = full_name(dir_name, "main000.f");
@@ -378,7 +387,7 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 	
     if ((ifp = fopen(file_name, "r")) == NULL) {
 	fprintf(stderr, "fsplit: cannot open %s\n", file_name);
-	return 0;
+	FREE_STRINGS; return 0;
     }
 
     for(;;) {
@@ -448,7 +457,7 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 		fprintf(stderr, "fclose(ifp) failed\n");
 		exit(2);
 	    }
-	    return ( retval );
+	    FREE_STRINGS; return ( retval );
 	}
 	if (nflag) {			/* rename the file */
 	    if(saveit(name)) 
@@ -482,7 +491,7 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 	fprintf(stderr, "fclose(ifp) failed\n");
 	exit(2);
     }
-    free(main_list), free(x), free(mainp), free(blkp);
+    FREE_STRINGS;
     return 1;
 }
 
