@@ -521,7 +521,7 @@ float file_factor;
 	
 	while (fgets(line, 99, fd) != NULL) {
 	    if (*line == '%')
-		sscanf(++line, "%f", &scale_factor);
+		sscanf(line+1, "%f", &scale_factor);
 	    else if ((*line != '#') && (*line != '\n')) {
 		sscanf(line, "%s %d %d %d %d %d", intrinsic_name,
 		       &int_cost, &float_cost, &double_cost,
