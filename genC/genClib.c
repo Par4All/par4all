@@ -2203,10 +2203,6 @@ void gen_read_spec(char * spec, ...)
 	}
     }
 
-    /* burk. turn CONS to functions? */
-    gen_cp_ = &Gen_cp_[ 0 ] ;
-    gen_hash_ = &Gen_hash_[ 0 ] ;
-
     Read_spec_mode = 0 ;
     Read_spec_performed = TRUE ;
 
