@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/04/10 18:49:44 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/04/12 15:49:31 $, )
  * version $Revision$
  */
  
@@ -236,8 +236,50 @@ entity module;
  *
  */
 
-/* the source code is transformed with hpfc_directives
- * into something that can be parsed with a standard f77 compiler.
+/* void hpfc_init(name)
+ * string name;
+ *
+ * what: initialize the hpfc status for a program.
+ * input: the program (workspace) name.
+ * output: none.
+ * side effects:
+ *  - the hpfc status is initialized and stored in the pips dbm.
+ * bugs or features:
+ *  - some callees are filtered out with a property, to deal with pipsmake.
+ *  - ??? not all is in the hpfc status. common entities problem.
+ */
+void hpfc_init(name)
+string name;
+{
+    debug_on("HPFC_DEBUG_LEVEL");
+    debug(1, "hpfc_init", "considering workspace %s\n", name);
+
+    set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
+    set_bool_property("PRETTYPRINT_HPFC", TRUE);
+
+    (void) make_empty_program(HPFC_PACKAGE);
+    make_update_common_map(); /* ?????? */
+
+    init_hpfc_status();
+    save_hpfc_status();
+
+    debug_off();
+}
+
+/* void hpfc_filter(name)
+ * string name;
+ *
+ * what: filter the source code for module name. to be called by pipsmake.
+ * how: call to a shell script, "hpfc_directives", that transforms 
+ *      hpf directives in "special" subroutine calls to be parsed by 
+ *      the fortran 77 parser.
+ * input: the module name.
+ * output: none.
+ * side effects:
+ *  - a new source code file is created for module name.
+ *  - the old one is added a "-".
+ * bugs or features:
+ *  - ??? not all hpf syntaxes are managable this way.
  */
 void hpfc_filter(name)
 string name;
@@ -259,25 +301,19 @@ string name;
     debug_off();
 }
 
-void hpfc_init(name)
-string name;
-{
-    debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfc_init", "considering workspace %s\n", name);
-
-    set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
-    set_bool_property("PRETTYPRINT_HPFC", TRUE);
-
-    init_hpfc_status();
-    (void) make_empty_program(HPFC_PACKAGE);
-
-    make_update_common_map(); /* ?????? */
-
-    save_hpfc_status();
-
-    debug_off();
-}
-
+/* void hpfc_directives(name)
+ * string name;
+ *
+ * what: deals with directives. to be called by pipsmake.
+ * input: the name of the module.
+ * output: none.
+ * side effects: (many)
+ *  - the module's code statement will be modified.
+ *  - the hpf mappings and so are stored in the compiler status.
+ * bugs or features:
+ *  - fortran library, reduction and hpfc special functions are skipped.
+ *  - ??? obscure problem with the update of common entities.
+ */
 void hpfc_directives(name)
 string name;
 {
@@ -314,7 +350,18 @@ string name;
     debug_off(); debug_off();
 }
 
-/* compiles MODULE name.
+/* void hpfc_compile(name)
+ * string name;
+ *
+ * what: hpf compile module name. to be called by pipsmake.
+ * input: the name of the module to compile.
+ * output: none
+ * side effects: (many)
+ *  - creates the statements for the host and nodes.
+ *  - store the generated resources.
+ * bugs or features:
+ *  - fortran library, reduction and hpfc special functions are skipped.
+ *  - a fake file is put as the generated resource for such modules.
  */
 void hpfc_compile(name)
 string name;
@@ -346,8 +393,17 @@ string name;
     debug_off();
 }
 
-/* closes the hpf compiler execution.
- * must deal with the commons, which are global to the program.
+/* void hpfc_close(name)
+ * string name;
+ *
+ * what: closes the hpf compiler execution. to be called by pipsmake.
+ * input: the program (workspace) name.
+ * output: none.
+ * side effects:
+ *  - deals with the commons.
+ *  - generates global files.
+ * bugs or features:
+ *  - ??? COMMON should be managable thru pipsmake ad-hoc rules.
  */
 void hpfc_close(name)
 string name;
@@ -368,5 +424,5 @@ string name;
     debug_off();
 }
 
-/* that's all
+/*   that is all
  */
