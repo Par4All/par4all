@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/03/20 11:17:56 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/03/20 14:33:07 $, )
  * version $Revision$
  */
 
@@ -247,6 +247,15 @@ char *key;
     
     return(hep->key!=FREE && hep->key!=FREE_FOR_PUT ? 
 	   hep->val : HASH_UNDEFINED_VALUE);
+}
+
+/* TRUE if key has e value in htp.
+ */
+bool hash_defined_p(htp, key)
+hash_table htp;
+char *key;
+{
+    return(hash_get(htp, key)!=HASH_UNDEFINED_VALUE);
 }
 
 /* update key->val in htp, that MUST be pre-existent.
