@@ -252,7 +252,7 @@ static void db_clean_db_resources()
 
       if (db_resource_required_p(r))
       {
-	pips_debug(1, "resource %s[%s] in state required...", rn, on);
+	pips_debug(1, "resource %s[%s] in state required...\n", rn, on);
 	/* to be deleted later on */
 	lr = CONS(STRING, rn, lr);
 	lo = CONS(STRING, on, lo);
@@ -262,7 +262,7 @@ static void db_clean_db_resources()
        */
       else if (dbll_stat_resource_file(rn, on, TRUE)==0)
       {
-	pips_debug(1, "resource %s[%s] file vanished! (checkpoint?)", rn, on);
+	pips_debug(1, "resource %s[%s] file vanished...\n", rn, on);
 	lr = CONS(STRING, rn, lr);
 	lo = CONS(STRING, on, lo);
       }
