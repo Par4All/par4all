@@ -337,7 +337,7 @@ entity module;
     /*MERGE_TEXTS(txt, text_summary_any_effect_type(module));*/
 
     /* then code with effects, using text_statement_any_effect_type */
-    MERGE_TEXTS(txt, text_module(module, module_stat));
+    MERGE_TEXTS(txt, my_text_named_module(module, module_stat));
     
     close_prettyprint();
 
