@@ -2,6 +2,10 @@
   $Id$
   
   $Log: Pawt.java,v $
+  Revision 1.9  1998/11/17 22:15:37  ancourt
+  new colors
+  ,
+
   Revision 1.8  1998/10/17 12:19:54  coelho
   re-indentation.
   colors fixed.
@@ -56,6 +60,8 @@ public abstract class Pawt
   static public Color text_fg = Color.black;
   static public Color comp_bg = new Color(200,200,255);
   static public Color comp_fg = Color.blue;
+  static public Color comp_fgr = Color.red;
+  static public Color comp_fgg = Color.black;
 
   static class PComponent extends com.sun.java.swing.JComponent
   { 
@@ -77,11 +83,11 @@ public abstract class Pawt
       super(name); 
       
       setBackground(comp_bg);
-      setForeground(comp_fg);
+       setForeground(comp_fg);
 
-      Container pane = getContentPane();
+     Container pane = getContentPane();
       pane.setBackground(comp_bg);
-      pane.setForeground(comp_fg);
+       pane.setForeground(comp_fg);
     }
     
     /** Disables or enables the Option objects of JPips.
@@ -116,7 +122,7 @@ public abstract class Pawt
       super(l); 
       
       setBackground(comp_bg);
-      setForeground(comp_fg);
+       setForeground(comp_fg);
     }
 
     PPanel()
@@ -132,7 +138,7 @@ public abstract class Pawt
       super(); 
       
       setBackground(comp_bg);
-      setForeground(comp_fg);
+      //    setForeground(comp_fg);
     } 
   }
   
@@ -264,7 +270,7 @@ public abstract class Pawt
       this.checking = checking;
 
       setBackground(comp_bg);
-      setForeground(comp_fg);
+      //    setForeground(comp_fg);
     }
     
     PRadioButtonMenuItem(String name)
@@ -310,7 +316,7 @@ public abstract class Pawt
   static public TitledBorder createTitledBorder(String name)
   {
     TitledBorder t = BorderFactory.createTitledBorder(name);
-    t.setTitleColor(comp_fg);
+    t.setTitleColor(comp_fgg);
     return t;
   }
 
@@ -322,7 +328,7 @@ public abstract class Pawt
       super(); 
 
       setBackground(comp_bg);
-      setForeground(comp_fg);
+      //    setForeground(comp_fg);
     } 
   }
 
@@ -368,7 +374,7 @@ public abstract class Pawt
       if (tip!=null) setToolTipText(tip);
       
       setBackground(comp_bg);
-      setForeground(comp_fg);
+      //     setForeground(comp_fg);
     }
     
     PLabel(String s) { this(s, null); }
@@ -420,7 +426,7 @@ public abstract class Pawt
       vChecking = new Vector();
 
       setBackground(comp_bg);
-      setForeground(comp_fg);
+      //   setForeground(comp_fg);
     }
     
     PComboBox()
@@ -555,7 +561,7 @@ public abstract class Pawt
   {
     JFileChooser chooser = new JFileChooser(dir);
     chooser.setBackground(comp_bg);
-    chooser.setForeground(comp_fg);
+     chooser.setForeground(comp_fg);
     return chooser;
   }
 
