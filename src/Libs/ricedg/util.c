@@ -337,10 +337,10 @@ prettyprint_dependence_graph_view(FILE * fd,
     }
     clean_enclosing_loops();
     debug_off();
-    fprintf(fd, "\n******** End of Dependence Graph ********\n");
+    fprintf(fd, "\n****************** End of Dependence Graph "
+	    "******************\n");
 }
 
-		    
 void 
 print_vect_in_vertice_val(fd,v,b)
 FILE *fd;
