@@ -21,6 +21,7 @@
 
 #endif /* FLEX_SCANNER */
 
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "genC.h"
