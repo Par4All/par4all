@@ -1,8 +1,8 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1997/03/17 12:59:00 $, 
+# $Date: 1997/03/17 13:12:42 $, 
 
-MANS =	Build \
+MANS =	Build.l \
 	Delete.l \
 	Display.l \
 	Init.l \
