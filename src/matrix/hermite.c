@@ -1,7 +1,6 @@
  /* package matrix */
 
 #include <stdio.h>
-#include <sys/stdtypes.h> /*for debug with dbmalloc */
 #include <malloc.h>
 
 #include "assert.h"
@@ -53,8 +52,8 @@ Pmatrix MAT;
 Pmatrix P;
 Pmatrix H;
 Pmatrix Q;
-int *det_p;
-int *det_q;
+Value *det_p;
+Value *det_q;
 {
     Pmatrix PN=NULL;
     Pmatrix QN=NULL;
@@ -67,17 +66,17 @@ int *det_q;
     /* niveau de la sous-matrice traitee */
     int level = 0;    
     
-    int ALL;				/* le plus petit element sur la diagonale                  */
-    int x;				/* la rest de la division par ALL                          */
+    Value ALL;/* le plus petit element sur la diagonale */
+    Value x=VALUE_ZERO;  /* la quotient de la division par ALL */
     boolean stop = FALSE;
     int i;
     
-    *det_p = *det_q = 1;
+    *det_p = *det_q = VALUE_ONE;
     /* if ((n>0) && (m>0) && MAT) */
     n = MATRIX_NB_LINES(MAT);
     m=MATRIX_NB_COLUMNS(MAT);
     assert(n >0 && m > 0);
-    assert(MATRIX_DENOMINATOR(MAT)==1);
+    assert(value_one_p(MATRIX_DENOMINATOR(MAT)));
 
     HN = matrix_new(n, m);
     PN = matrix_new(n, n);
@@ -112,19 +111,19 @@ int *det_q;
 	    if (ind_n > level + 1) {
 		matrix_swap_rows(H,level+1,ind_n);
 		matrix_swap_rows(PN,level+1,ind_n);
-		*det_p = *det_p * (-1);
+		*det_p = value_uminus(*det_p);
 	    }
 
 	    if (ind_m > level+1) {
 		matrix_swap_columns(H,level+1,ind_m);
 		matrix_swap_columns(QN,level+1,ind_m);	
-		*det_q = *det_q * (-1);
+		*det_q = value_uminus(*det_q);
 	    }
 
 	    if(matrix_line_el(H,level) != 0) {
 		ALL = SUB_MATRIX_ELEM(H,1,1,level);
 		for (i=level+2; i<=m; i++) {
-		    x = MATRIX_ELEM(H,level+1,i)/ALL;
+		    x = value_div(MATRIX_ELEM(H,level+1,i),ALL);
 		    matrix_subtraction_column(H,i,level+1,x);
 		    matrix_subtraction_column(QN,i,level+1,x);
 		}
