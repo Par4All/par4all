@@ -236,7 +236,8 @@ void fprint_entity_list(FILE *fp, list l);
 #define HOST_TID	"HOSTTID"
 #define NBTASKS		"MAXSIZEOFPROCS"
 #define MCASTHOST	"MCASTHOST"
-#define NODE_CHANNELS	"NODECHANNELS"
+#define SEND_CHANNELS	"SENDCHANNELS"
+#define RECV_CHANNELS	"RECVCHANNELS"
 #define HOST_CHANNEL	"HOSTCHANNEL"
 
 /*  Very Short and very local functions
