@@ -73,7 +73,7 @@ log_on_file(char chaine[])
 }
 
 #define PIPS_THANKS_STRING						\
-  "%s (ARCH=" SOFT_ARCH ")\n\n"						\
+  "%s (ARCH=" SOFT_ARCH ")\n  running as %s\n\n"			\
   "  (c) 1988-1998 Centre de Recherche en Informatique,\n"		\
   "                École des mines de Paris, France.\n\n"		\
   "  URL: http://www.cri.ensmp.fr/pips\n"				\
@@ -84,11 +84,11 @@ log_on_file(char chaine[])
 /* display pips thanks on startup, if it on a tty.
  */
 void
-pips_thanks(string name)
+pips_thanks(string name, string path)
 {
     if (isatty(0))
     {
-	fprintf(stdout, PIPS_THANKS_STRING, name);
+	fprintf(stdout, PIPS_THANKS_STRING, name, path);
 	fflush(stdout);
     }
 }
