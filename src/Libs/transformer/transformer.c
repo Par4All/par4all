@@ -3,6 +3,9 @@
   * $Id$
   *
   * $Log: transformer.c,v $
+  * Revision 1.46  2001/12/05 17:10:50  irigoin
+  * Reformatting + transformer_inverse_apply() added for total precondition computation
+  *
   * Revision 1.45  2001/10/22 16:00:02  irigoin
   * New functions added to help with the evaluation of transformers with
   * respect to preconditions. The transformer library should now be closer to
@@ -211,153 +214,152 @@ relation_to_transformer(entity op, entity e1, entity e2, bool veracity)
  */
 transformer transformer_combine(transformer t1, transformer t2)
 {
-    /* algorithm: 
-       let a1 be t1 arguments, a2 be t2 arguments,
-       let ints be the intersection of a1 and a2
-       let r1 be t1 relation and r2 be a copy of t2 relation
-       let a be a1 union a2
-       rename entities in ints in r1 (new->int) and r2 (old->int)
-       rename entities in a2-ints in r1 (new->old)
-       build a system b with r1 and r2
-       project b along ints
-       build t1 with a and b
-       */
-    cons * a1 = transformer_arguments(t1);
-    cons * a2 = transformer_arguments(t2);
-    /* Newgen does not generate the proper castings */
-    Psysteme r1 = (Psysteme) predicate_system(transformer_relation(t1));
-    Psysteme r2 = sc_dup((Psysteme)predicate_system(transformer_relation(t2)));
-    /* ints: list of intermediate value entities */
-    cons * ints = NIL;
-    /* local variable ce2: why don't you use MAPL :-)! */
-    cons * ce2;
+  /* algorithm: 
+     let a1 be t1 arguments, a2 be t2 arguments,
+     let ints be the intersection of a1 and a2
+     let r1 be t1 relation and r2 be a copy of t2 relation
+     let a be a1 union a2
+     rename entities in ints in r1 (new->int) and r2 (old->int)
+     rename entities in a2-ints in r1 (new->old)
+     build a system b with r1 and r2
+     project b along ints
+     build t1 with a and b
+  */
+  cons * a1 = transformer_arguments(t1);
+  cons * a2 = transformer_arguments(t2);
+  /* Newgen does not generate the proper castings */
+  Psysteme r1 = (Psysteme) predicate_system(transformer_relation(t1));
+  Psysteme r2 = sc_dup((Psysteme)predicate_system(transformer_relation(t2)));
+  /* ints: list of intermediate value entities */
+  cons * ints = NIL;
+  /* local variable ce2: why don't you use MAPL :-)! */
+  cons * ce2;
 
-    debug(8,"transformer_combine","begin\n");
+  pips_debug(8,"begin\n");
 
-    debug(8,"transformer_combine","arg. t1=%x\n",t1);
-    ifdebug(8) (void) dump_transformer(t1);
-    /* The consistencies of transformers t1 and t2 cannot be checked with
-       respect to the current environment because t1 or t2 may be relative
-       to a callee as in user_function_call_to_transformer(). Hence a
-       debug level of 10. */
-    ifdebug(10) pips_assert("consistent t1", transformer_consistency_p(t1));
+  pips_debug(8,"arg. t1=%p\n",t1);
+  ifdebug(8) (void) dump_transformer(t1);
+  /* The consistencies of transformers t1 and t2 cannot be checked with
+     respect to the current environment because t1 or t2 may be relative
+     to a callee as in user_function_call_to_transformer(). Hence a
+     debug level of 10. */
+  ifdebug(10) pips_assert("consistent t1", transformer_consistency_p(t1));
 
-    pips_debug(8,"arg. t2=%p\n",t2);
-    ifdebug(8) (void) dump_transformer(t2);
-    ifdebug(10) pips_assert("consistent t2", transformer_consistency_p(t2));
+  pips_debug(8,"arg. t2=%p\n",t2);
+  ifdebug(8) (void) dump_transformer(t2);
+  ifdebug(10) pips_assert("consistent t2", transformer_consistency_p(t2));
 
-    /* build new argument list and rename old and intermediate values,
-       as well as new (i.e. unmodified) variables in t1 */
+  /* build new argument list and rename old and intermediate values,
+     as well as new (i.e. unmodified) variables in t1 */
 
-    for(ce2 = a2; !ENDP(ce2); POP(ce2)) {
-	entity e2 = ENTITY(CAR(ce2));
-	if(entity_is_argument_p(e2, a1)) {
-	    /* renaming of intermediate values in r1 and r2 */
-	    entity e_int = entity_to_intermediate_value(e2);
-	    entity e_old = entity_to_old_value(e2);
-	    r1 = sc_variable_rename(r1, (Variable) e2, (Variable) e_int);
-	    r2 = sc_variable_rename(r2, (Variable) e_old, (Variable) e_int);
-	    ints = arguments_add_entity(ints, e_int);
-	}
-	else {
-	    /* if ever e2 is used as e2#new in r1 it must now be
-	       replaced by e2#old */
-	    entity e_old = entity_to_old_value(e2);
-	    if(base_contains_variable_p(r1->base, (Variable) e2))
-		r1 = sc_variable_rename(r1, (Variable) e2, (Variable) e_old);
-	    /* e2 must be appended to a1 as new t1's arguments;
-	       hopefully we are not iterating on a1; but 
-	       entity_is_argument_p() receives a longer argument each time;
-	       possible improvements? */
-	    a1 = gen_nconc(a1, CONS(ENTITY, e2, NIL));
-	}
+  for(ce2 = a2; !ENDP(ce2); POP(ce2)) {
+    entity e2 = ENTITY(CAR(ce2));
+    if(entity_is_argument_p(e2, a1)) {
+      /* renaming of intermediate values in r1 and r2 */
+      entity e_int = entity_to_intermediate_value(e2);
+      entity e_old = entity_to_old_value(e2);
+      r1 = sc_variable_rename(r1, (Variable) e2, (Variable) e_int);
+      r2 = sc_variable_rename(r2, (Variable) e_old, (Variable) e_int);
+      ints = arguments_add_entity(ints, e_int);
     }
-
-    /* build global linear system: r1 is destroyed, r2 is preserved
-     */
-    r1 = sc_append(r1, r2);
-
-    /* ??? The base returned may be empty... FC...
-     * boumbadaboum in the projection later on.
-     */
-    sc_rm(r2);
-    r2 = SC_UNDEFINED;
-    ifdebug(9) {
-	(void) fprintf(stderr, "%s: %s", "[transformer_combine]",
-		       "global linear system r1 before projection\n");
-	sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
-	sc_dump(r1);
+    else {
+      /* if ever e2 is used as e2#new in r1 it must now be
+	 replaced by e2#old */
+      entity e_old = entity_to_old_value(e2);
+      if(base_contains_variable_p(r1->base, (Variable) e2))
+	r1 = sc_variable_rename(r1, (Variable) e2, (Variable) e_old);
+      /* e2 must be appended to a1 as new t1's arguments;
+	 hopefully we are not iterating on a1; but 
+	 entity_is_argument_p() receives a longer argument each time;
+	 possible improvements? */
+      a1 = gen_nconc(a1, CONS(ENTITY, e2, NIL));
     }
+  }
+
+  /* build global linear system: r1 is destroyed, r2 is preserved
+   */
+  r1 = sc_append(r1, r2);
+
+  /* ??? The base returned may be empty... FC...
+   * boumbadaboum in the projection later on.
+   */
+  sc_rm(r2);
+  r2 = SC_UNDEFINED;
+  ifdebug(9) {
+    pips_debug(9, "global linear system r1 before projection\n");
+    sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
+    sc_dump(r1);
+  }
     
-    /* get rid of intermediate values, if any.
-     * ??? guard added to avoid an obscure bug, but I guess it should
-     * never get here with en nil base... FC
-     */
-    if (sc_base(r1)) {
-	MAP(ENTITY, e_temp,
-	{
-	    if (sc_expensive_projection_p(r1,(Variable) e_temp)) {
-		ifdebug(9) {
-		    pips_debug(9, "expensive projection on %s with\n",
-			       entity_local_name(e_temp));
-		    sc_fprint(stderr, r1, (char * (*)(Variable)) entity_local_name);
-		}
-		sc_elim_var(r1,(Variable) e_temp);
-		sc_base_remove_variable(r1,(Variable) e_temp);
-		ifdebug(9) {
-		    pips_debug(9, "simplified tranformer\n");
-		    sc_fprint(stderr, r1,(char * (*)(Variable)) entity_local_name);
-		}
-	    }
-	    else {		   
-		CATCH(overflow_error) 
-		    {
-			/* CA */
-		      pips_user_warning("overflow error in projection of %s, "
-					"variable eliminated\n",
-					entity_name(e_temp)); 
-			r1 = sc_elim_var(r1, (Variable) e_temp);
-		    }
-		TRY 
-		    {
-			sc_and_base_projection_along_variable_ofl_ctrl
-			    (&r1, (Variable) e_temp, NO_OFL_CTRL);
-			UNCATCH(overflow_error);
-		    }
+  /* get rid of intermediate values, if any.
+   * ??? guard added to avoid an obscure bug, but I guess it should
+   * never get here with en nil base... FC
+   */
+  if (sc_base(r1)) {
+    MAP(ENTITY, e_temp,
+    {
+      if (sc_expensive_projection_p(r1,(Variable) e_temp)) {
+	ifdebug(9) {
+	  pips_debug(9, "expensive projection on %s with\n",
+		     entity_local_name(e_temp));
+	  sc_fprint(stderr, r1, (char * (*)(Variable)) entity_local_name);
+	}
+	sc_elim_var(r1,(Variable) e_temp);
+	sc_base_remove_variable(r1,(Variable) e_temp);
+	ifdebug(9) {
+	  pips_debug(9, "simplified tranformer\n");
+	  sc_fprint(stderr, r1,(char * (*)(Variable)) entity_local_name);
+	}
+      }
+      else {		   
+	CATCH(overflow_error) 
+	  {
+	    /* CA */
+	    pips_user_warning("overflow error in projection of %s, "
+			      "variable eliminated\n",
+			      entity_name(e_temp)); 
+	    r1 = sc_elim_var(r1, (Variable) e_temp);
+	  }
+	TRY 
+	  {
+	    sc_and_base_projection_along_variable_ofl_ctrl
+	      (&r1, (Variable) e_temp, NO_OFL_CTRL);
+	    UNCATCH(overflow_error);
+	  }
 		
-		if (! sc_empty_p(r1)) {
-		    Pbase b = base_dup(sc_base(r1));
-		    r1 = sc_normalize(r1);
-		    if(SC_EMPTY_P(r1)) 
-			r1 = sc_empty(b);
-		    else
-			base_rm(b);
-		}
-	    }
-	},
-	    ints);
-    }
+	if (! sc_empty_p(r1)) {
+	  Pbase b = base_dup(sc_base(r1));
+	  r1 = sc_normalize(r1);
+	  if(SC_EMPTY_P(r1)) 
+	    r1 = sc_empty(b);
+	  else
+	    base_rm(b);
+	}
+      }
+    },
+	ints);
+  }
 
-    ifdebug(9) {
-	pips_debug(9, "global linear system r1 after projection\n");
-	sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
-	sc_dump(r1);
-    }
+  ifdebug(9) {
+    pips_debug(9, "global linear system r1 after projection\n");
+    sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
+    sc_dump(r1);
+  }
 
-    /* get rid of ints */
-    gen_free_list(ints);
-    ints = NIL;
+  /* get rid of ints */
+  gen_free_list(ints);
+  ints = NIL;
 
-    /* update t1 */
-    transformer_arguments(t1) = a1;
-    predicate_system(transformer_relation(t1)) = r1;
+  /* update t1 */
+  transformer_arguments(t1) = a1;
+  predicate_system(transformer_relation(t1)) = r1;
 
      
-    pips_debug(8,"res. t1=%p\n",t1);
-    ifdebug(8) dump_transformer(t1);
-    pips_debug(8,"end\n");
+  pips_debug(8,"res. t1=%p\n",t1);
+  ifdebug(8) dump_transformer(t1);
+  pips_debug(8,"end\n");
 
-    return t1;
+  return t1;
 }
 
 /* Transformer tf1 and tf2 are supposed to be independent but they may
@@ -548,7 +550,7 @@ transformer transformer_range(transformer tf)
 {
   transformer rtf = transformer_dup(tf);
   list args = NIL;
-  Psysteme sc = predicate_system(transformer_relation(tf));
+  Psysteme sc = predicate_system(transformer_relation(rtf));
   Pbase b = sc_base(sc);
 
   MAP(ENTITY, a, {
@@ -582,6 +584,60 @@ transformer transformer_safe_range(transformer tf)
   return rtf;
 }
 
+/* Return the domain of relation tf in a newly allocated transformer.
+ * Projection of all new values of modified variables. Renaming of old
+ * values as new values. The transformer returned is a predicate on the
+ * input state (i.e. not really a transformer).
+ *
+ */
+transformer transformer_to_domain(transformer tf)
+{
+  transformer dtf = transformer_dup(tf);
+  list new_args = NIL;
+  Psysteme sc = predicate_system(transformer_relation(dtf));
+  Pbase b = sc_base(sc);
+
+  MAP(ENTITY, a, {
+    entity nv = entity_to_new_value(a);
+
+    if(base_contains_variable_p(b, (Variable)  nv)) {
+      new_args = CONS(ENTITY, nv, new_args);
+    }
+  }, transformer_arguments(dtf));
+
+  /* dtf = transformer_projection(dtf, args); */
+  dtf = transformer_projection_with_redundancy_elimination(dtf, new_args,
+							   sc_identity);
+
+  /* Careful, sc and b have been updated by the projections */
+  sc = predicate_system(transformer_relation(dtf));
+  b = sc_base(sc);
+
+  MAP(ENTITY, a, {
+    entity ov = entity_to_old_value(a);
+    entity nv = entity_to_new_value(a);
+
+    /* A variable may be modified but its old value does not have to
+       appear in the basis. Although the opposite is wrong. */
+    if(base_contains_variable_p(b, (Variable)  ov)) {
+      dtf = transformer_value_substitute(dtf, ov, nv);
+    }
+  }, new_args);
+
+  gen_free_list(new_args);
+
+  return dtf;
+}
+transformer transformer_safe_domain(transformer tf)
+{
+  transformer dtf = transformer_undefined;
+
+  if(!transformer_undefined_p(tf)) {
+    dtf = transformer_to_domain(tf);
+  }
+  return dtf;
+}
+
 /* Restrict the range of relation tf with the range r.
  *
  * As a range, r is assumed to have no arguments.
@@ -598,10 +654,10 @@ transformer transformer_range_intersection(transformer tf, transformer r)
 static bool varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
     bool is_inferior = TRUE;
+    string s1 = generic_value_name((entity) vecteur_var(*pvarval1));
+    string s2 = generic_value_name((entity) vecteur_var(*pvarval2));
     
-	is_inferior = (strcmp(generic_value_name((entity) vecteur_var(*pvarval1)), 
-			      generic_value_name((entity) vecteur_var(*pvarval2)))
-		       > 0 );
+    is_inferior = (strcmp(s1, s2) > 0 );
 
     return is_inferior; 
 }
@@ -951,6 +1007,8 @@ transformer_projection_with_redundancy_elimination(
 /* transformer transformer_apply(transformer tf, transformer pre):
  * apply transformer tf on precondition pre to obtain postcondition post
  *
+ * post = tf(pre) = pre o tf
+ *
  * There is (should be!) no sharing between pre and tf. No sharing is
  * introduced between pre or tf and post. Neither pre nor tf are modified.
  */
@@ -979,6 +1037,7 @@ transformer transformer_apply(transformer tf, transformer pre)
 
     return post;
 }
+
 transformer transformer_safe_apply(transformer tf, transformer pre)
 {
   transformer post = transformer_undefined;
@@ -987,6 +1046,53 @@ transformer transformer_safe_apply(transformer tf, transformer pre)
     post = transformer_apply(tf, pre);
 
   return post;
+}
+
+/* transformer transformer_inverse_apply(transformer tf, transformer post):
+ * apply transformer tf on precondition pre to obtain postcondition post
+ *
+ * pre = post(tf) = tf o post
+ *
+ * There is (should be!) no sharing between post and tf. No sharing is
+ * introduced between post or tf and pre. Neither post nor tf are modified.
+ */
+transformer transformer_inverse_apply(transformer tf, transformer post)
+{
+    transformer pre = transformer_undefined;
+    transformer copy_tf = transformer_dup(tf);
+
+    pips_debug(8,"begin with\n");
+    pips_assert("tf is not undefined", tf!=transformer_undefined);
+    pips_debug(8,"tf=%p\n", tf);
+    ifdebug(8) (void) dump_transformer(tf);
+    pips_assert("post is not undefined", post!=transformer_undefined);
+    pips_debug(8,"post=%p\n", post);
+    ifdebug(8) {
+      (void) dump_transformer(post);
+      pips_assert("tf is consistent", transformer_consistency_p(tf));
+      pips_assert("post is consistent", transformer_consistency_p(post));
+    }
+
+    /* pre = post o tf ; tf would be modified by transformer_combine */
+    pre = transformer_combine(copy_tf, post);
+
+    pips_assert("pre is not undefined", pre!=transformer_undefined);
+    pips_debug(8,"return: pre=%p\n", pre);
+    ifdebug(8) (void) dump_transformer(pre);
+    pips_assert("unexpected sharing",post != pre);
+    pips_debug(8,"end\n");
+
+    return pre;
+}
+
+transformer transformer_safe_inverse_apply(transformer tf, transformer post)
+{
+  transformer pre = transformer_undefined;
+
+  if(!transformer_undefined_p(tf) && !transformer_undefined_p(pre))
+    pre = transformer_inverse_apply(tf, post);
+
+  return pre;
 }
 
 /* transformer transformer_filter(transformer t, cons * args):
