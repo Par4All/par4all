@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.30  2004/02/19 16:14:00  guerin
+%% New pipsmake-rc definition for PHRASE_DISTRIBUTOR
+%%
 %% Revision 1.29  2004/01/29 15:20:23  guerin
 %% New pipsmake-rc definition for FULL_FSM_GENERATION
 %%
@@ -569,7 +572,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2004/01/29 15:20:23 $~$
+$~$Date: 2004/02/19 16:14:00 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -3361,22 +3364,51 @@ The PHRASE project is an attempt to automatically (or semi-automatically)
 transform high-level language for partial evaluation in reconfigurable 
 logic (such as FPGAs or DataPaths).
 
-%%@UserManualDocumentation:  phrase_distributor
-This pass allow to split the code into portions of code delimited by 
+This phases allow to split the code into portions of code delimited by 
 PHRASE-pragmas (written by the programmer) and a control file managing 
 them. Those portions of code are intented, after transformations, to 
 be executed in reconfigurable logic (in PHRASE projects, reconfigurable 
 logic is synthetized with smalltalk code).
+
+\paragraph{Phrase Distributor Initialisation}
+\index{Phrase Distributor Initialisation}
+
+%%@UserManualDocumentation:  phrase_distributor_init
+This phase is a preparation phase for (Phrase Distributor or
+PHRASE\_DISTRIBUTOR): the portions of code to externalize are identified
+and isolated here. Comments are modified by this phase.
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+alias phrase_distributor_init 'PHRASE Distributor initialization'
+
+phrase_distributor_init                  > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
+
+
+\paragraph{Phrase Distributor}
+\index{Phrase Distributor}
+
+%%@UserManualDocumentation:  phrase_distributor
+This phase should be applied after the initialization (Phrase Distributor
+Initialisation or PHRASE\_DISTRIBUTOR\_INIT). The job of distribution is
+done here.
 %%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias phrase_distributor 'PHRASE Distributor'
 
-phrase_distributor                      > MODULE.code
+phrase_distributor                       > MODULE.code
+                                         > MODULE.callees      
+        ! MODULE.phrase_distributor_init
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.dg
 \end{verbatim}
-
 
 \section{Program Transformations}
 \label{section-program-transformations}
