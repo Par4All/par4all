@@ -1,4 +1,4 @@
-/* 	%A% ($Date: 1995/09/06 17:52:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/22 14:25:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 /*#define REGULAR_VERSION "Regular Version"
   #define PARALLEL_VERSION "Parallel Version"
@@ -35,6 +35,7 @@
 #define NEW_ATOMIZER_TRANSFORM "New Atomize"
 #define REDUCTIONS_TRANSFORM "! Reductions"
 #define STATIC_CONTROLIZE_TRANSFORM "Static Controlize"
+#define STF_TRANSFORM "Restructure with STF"
 
 #define SEMANTICS_ANALYZE "Semantics"
 #define CALLGRAPH_ANALYZE "Call Graph"
