@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.40  2003/12/04 16:04:12  irigoin
+ * % added to deal with C file declarations
+ *
  * Revision 1.39  2001/08/06 13:33:49  coelho
  * \r added.
  *
@@ -190,7 +193,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 <INITIAL>"%CALLERS"	{ RETURN(TK_OWNER_CALLERS); }
 <INITIAL>"%CALLEES"	{ RETURN(TK_OWNER_CALLEES); }
 
-<INITIAL>[/\.0-9A-Za-z_:-]+ 	{ yylval.name=strdup(yytext); RETURN(TK_NAME);}
+<INITIAL>[/\.0-9A-Za-z_:-][%/\.0-9A-Za-z_:-]* 	{ yylval.name=strdup(yytext); RETURN(TK_NAME);}
 
 .			{ pips_user_error("unexpected char %c\n", *yytext); }
 
