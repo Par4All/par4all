@@ -416,7 +416,7 @@ list lvr;
 	switch (vrt) {
 	case is_owner_program:
 	    result = gen_nconc(result, CONS(REAL_RESOURCE, 
-					    make_real_resource(vrn, db_get_current_program_name()),
+					    make_real_resource(vrn, db_get_current_workspace_name()),
 					    NIL));
 	    break;
 
