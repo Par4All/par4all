@@ -28,6 +28,7 @@
 #include "newgen_include.h"
 
 extern int gen_find_free_tabulated(struct gen_binding *);
+extern void newgen_lexer_position(FILE *);
 
 #define YYERROR_VERBOSE 1 /* better error messages by bison */
 
@@ -306,24 +307,23 @@ String  : READ_STRING {
 
 /* YYERROR manages a syntax error while reading an object. */
 
-void yyerror( s )
-char *s ;
+void yyerror(char * s)
 {
-  int c;
+  int c, n=40;
+  newgen_lexer_position(stderr);
+  fprintf(stderr, "%s before ", s);
 
-  fprintf( stderr, "%s before ", s ) ;
-	
-  while( (c=yyinput()) != EOF )
-    fprintf( stderr, "%c", c ) ;
+  while (n-->0  && ((c=yyinput()) != EOF))
+    putc(c, stderr);
 
-  fatal( "Incorrect object written by GEN_WRITE\n", (char *)NULL ) ;
+  fprintf(stderr, "\n\n");
+
+  fatal("Incorrect object written by GEN_WRITE\n", (char *) NULL);
 }
 
 /* READ_EXTERNAL reads external types on stdin */
 
-static char *
-read_external( which )
-int which ;
+static char * read_external(int which)
 {
     struct gen_binding *bp = &Domains[ which ] ;
     union domain *dp = bp->domain ;
