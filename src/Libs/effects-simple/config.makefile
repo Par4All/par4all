@@ -5,7 +5,7 @@
 # Do not include the main program source file.
 LIB_CFILES=  combine.c
 LIB_HEADERS= effects-simple-local.h
-LIB_OBJECTS= combine.o
+LIB_OBJECTS= combine.o 
 
 
 
