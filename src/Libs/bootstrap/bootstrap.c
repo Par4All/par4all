@@ -702,6 +702,22 @@ bool arguments_are_RD(call c, hash_table types)
     return TRUE;
 }
 
+bool arguments_are_IR(call c, hash_table types)
+{
+    basic b;
+    list args = call_arguments(c);
+
+    while (args != NIL)
+    {
+	b = GET_TYPE(types, EXPRESSION(CAR(args)));
+	if ( !basic_int_p(b) && !(basic_float_p(b) && basic_float(b)==4))
+	{
+	  return FALSE;
+	}
+	args = CDR(args);
+    }
+    return TRUE;
+}
 bool arguments_are_IRD(call c, hash_table types)
 {
     basic b;
@@ -823,19 +839,18 @@ bool arguments_are_compatible(call c, hash_table types)
 void typing_arguments(call c, hash_table types, basic b)
 {
     basic b1;
-    list args = call_arguments(c);
 
-    while (args != NIL)
-    {
-	b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
+    MAP(EXPRESSION, e,
+    { 
+	b1 = GET_TYPE(types, e);
 	if (!basic_equal_p(b, b1))
 	{
-	    EXPRESSION(CAR(args)) = insert_cast(b, b1, EXPRESSION(CAR(args)));
+	    e = insert_cast(b, b1, e);
 	    // Update hash table
-	    PUT_TYPE(types, EXPRESSION(CAR(args)), b);
+	    PUT_TYPE(types, e, b);
 	}
-	args = CDR(args);
     }
+	, call_arguments(c));
 }
 
 /***************************************************************************************** 
@@ -1348,6 +1363,40 @@ typing_function_conversion_to_dcomplex(call c, hash_table types)
 {
     return typing_function_conversion_to_numeric(c, types, make_basic_complex(16));
 }
+static basic
+typing_function_constant_complex(call c, hash_table types)
+{
+    entity function_called = call_function(c);
+
+    if(!arguments_are_IR(c, types))
+    {
+        // ERROR: Invalide of type
+        fprintf(stderr,"Intrinsic [%s]: Argument(s) is (are) not INT, REAL\n", 
+		entity_name(function_called));
+	return make_basic_float(4); // Just for return result
+    }
+    // Typing all arguments to REAL if necessary
+    typing_arguments(c, types, make_basic_float(4));
+
+    return make_basic_complex(8);
+}
+static basic
+typing_function_constant_dcomplex(call c, hash_table types)
+{
+    entity function_called = call_function(c);
+
+    if(!arguments_are_IRD(c, types))
+    {
+        // ERROR: Invalide of type
+        fprintf(stderr,"Intrinsic [%s]: Argument(s) is (are) not INT, REAL or DOUBLE\n", 
+		entity_name(function_called));
+	return make_basic_float(4); // Just for return result
+    }
+    // Typing all arguments to DOUBLE if necessary
+    typing_arguments(c, types, make_basic_float(8));
+
+    return make_basic_complex(16);
+}
 /***************************************************************************************** 
  * Special intrinsics - They have no value; e.g: STOP, CONTINUE, RETURN
  *
@@ -1661,15 +1710,15 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"CMPLX", (INT_MAX), overloaded_to_complex_type, 
      typing_function_conversion_to_complex, 0},
 
-    {"CMPLX_", (INT_MAX), overloaded_to_complex_type, /* PDSon: I.R. of constant complex*/
-     typing_function_conversion_to_complex, 0},
     {"DCMPLX", (INT_MAX), overloaded_to_doublecomplex_type, 
      typing_function_conversion_to_dcomplex, 0},
 
     /* (0.,1.) -> switched to a function call...
      */
-    { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type, 0, 0},
-    { IMPLIED_DCOMPLEX_NAME, 2, overloaded_to_doublecomplex_type, 0, 0},
+    { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type, 
+      typing_function_constant_complex, 0},
+    { IMPLIED_DCOMPLEX_NAME, 2, overloaded_to_doublecomplex_type, 
+      typing_function_constant_dcomplex, 0},
 
     {"ICHAR", 1, default_intrinsic_type, typing_function_char_to_int, 0},
     {"CHAR", 1, default_intrinsic_type, typing_function_int_to_char, 0},
