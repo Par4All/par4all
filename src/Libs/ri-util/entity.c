@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.45  2000/12/01 10:32:07  ancourt
+ * debug string_to_entity_list
+ *
  * Revision 1.44  2000/11/24 15:35:33  coelho
  * hop.
  *
@@ -878,15 +881,14 @@ bool some_main_entity_p(void)
 list /* of entity */ string_to_entity_list(string module, string names)
 {
   list le = NIL;
-  string s;
-  for (s = names; s && *s;)
-  {
-    char * next_comma = strchr(s, ',');
-    if (next_comma) *next_comma = '\0';
-    le = CONS(ENTITY, FindOrCreateEntity(module, s), le);
-    s += strlen(s);
-    if (next_comma) *next_comma = ',';
-  }
-  
+  string s, next_comma;
+  for (s = names; s && *s && next_comma;)
+    {
+      char * next_comma = strchr(s, ',');
+      if (next_comma)  *next_comma = '\0';
+      le = CONS(ENTITY, FindOrCreateEntity(module, s), le);
+      s += strlen(s)+1;
+      if (next_comma) *next_comma = ',';
+    }
   return le;
 }
