@@ -128,6 +128,7 @@ static void call_filter(call c)
     if (value_code_p(entity_initial(e_callee))) {
 	text r = (text) load_statement_icfg (current_stmt_head());
 
+	/* hum... pushes the current entity... */
 	entity e_caller = get_current_module_entity();
 	reset_current_module_entity();
 
@@ -142,17 +143,13 @@ static void call_filter(call c)
 	    break;
 	case ICFG_DECOR_PRECONDITIONS:
 	{
-	    transformer call_site_prec = 
-		call_site_to_module_precondition(e_caller,
-						 e_callee,
-						 current_stmt_head(),
-						 c);
+	    transformer call_site_prec = call_site_to_module_precondition
+		(e_caller, e_callee, current_stmt_head(), c);
 
 	    /* Then print the text for the caller preconditions */
 	    set_current_module_entity(e_caller);
 	    MERGE_TEXTS(r,text_transformer(call_site_prec));
 	    reset_current_module_entity();
-
 	    break;
 	}
 	case ICFG_DECOR_PROPER_EFFECTS:
