@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.92  1998/07/08 12:56:54  coelho
+ * user errors protect files to view.
+ *
  * Revision 1.91  1998/07/03 21:36:23  coelho
  * checkactive added.
  *
@@ -196,9 +199,22 @@ static bool display_a_resource(string rname, string mname)
     string fname, pager = getenv("PAGER");
     if (!isatty(fileno(stdout))) pager = NULL;
 
-    lazy_open_module (mname);
+    lazy_open_module(mname);
     fname = build_view_file(rname);
-    if (!fname) pips_user_error("Cannot build view file %s\n", rname);
+
+    if (!fname) 
+    {
+	pips_user_error("Cannot build view file %s\n", rname);
+	free(fname);
+	return FALSE;
+    }
+
+    if (!file_exists_p(fname))
+    {
+	pips_user_error("View file \"%s\" not found\n", fname);
+	free(fname);
+	return FALSE;
+    }
 
     if (jpips_is_running)
     {
@@ -217,6 +233,7 @@ static bool display_a_resource(string rname, string mname)
 	safe_cat(stdout, in);
 	safe_fclose(in, fname);
     }
+
     free(fname);
     return TRUE;
 }
