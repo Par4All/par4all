@@ -343,13 +343,69 @@ the code in a structured manner which as a unique statement. The entry
 node of the underlying CFG is in field \verb/control/, and the
 unique exit node is in field \verb/exit/. The exit node should not be
 modified by users of the unstructured\footnote{FI: I do not understand
-why...}.  See Figure~\ref{figure-untructured}.
+why...}.  See Figure~\ref{figure-unstructured}.
 
 The hierarchical structure is induced by the recursive nature of
 statements.  Each control node points towards a statement which can also
 contain an unstructured area of the code as well as structured
 part. Unstructured parts of the code can thus be contained as much as
 possible as well as be recursively decomposed.
+
+For instance, the two DO loops in:
+\begin{verbatim}
+      DO 200 I = 1, N
+100      CONTINUE
+         DO 300 J = 1, M
+            T(J) = T(J) + X
+300      CONTINUE
+         IF(X.GT.T(I)) GO TO 100
+200   CONTINUE
+\end{verbatim}
+are preserved as DO loops in spite of the GO~TO statement (see
+Figure~\ref{figure-hierarchical-control-flow-graph}).
+
+\begin{figure}
+
+\begin{center}
+
+\unitlength 3pt
+
+\begin{picture}(90,105)(0,0)
+\put(40,70){\circle*{3}}
+\put(50,70){DO 200}
+
+\put(30,35){\circle*{3}}
+\put(20,40){IF}
+\put(40,45){\circle*{3}}
+\put(50,45){100 CONTINUE}
+\put(50,35){\circle*{3}}
+\put(60,35){DO 300}
+
+\put(50,10){\circle*{3}}
+\put(60,10){T(J) = T(J) + X}
+
+% link between structured and unstructured parts
+\put(50,30){\line(0,-1){20}}
+\put(40,60){\line(0,-1){15}}
+\put(30,37){\line(1,3){8}}
+\put(50,37){\line(-1,3){8}}
+
+% control edges
+\thicklines
+\put(30,35){\vector(-1,0){15}}
+\put(31,36){\vector(1,1){8}}
+\put(41,44){\vector(1,-1){8}}
+\put(50,35){\vector(-1,0){18}}
+\thinlines
+
+% Draw the planes
+\multiput(0,0)(0,30){3}{\line(1,1){25}}
+\multiput(0,0)(0,30){3}{\line(1,0){105}}
+\end{picture}
+\end{center}
+\caption{Hierarchical Control Flow Graph}
+\label{figure-hierarchical-control-flow-graph}
+\end{figure}
 
 }
 
@@ -439,7 +495,7 @@ and \verb/statement/ (via \verb/instruction/).
 \begin{center}
 \mbox{\psfig{file=unstructured.idraw,width=\hsize}}
 \end{center}
-\caption{Hierarchical Control Flow Graph}
+\caption{Control Flow Graph}
 \label{figure-unstructured}
 \end{figure}
 
