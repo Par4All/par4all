@@ -1,7 +1,17 @@
-/* 	%A% ($Date: 1998/10/07 15:45:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/10/23 11:15:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+ *
+ * $Id$
+ *
+ * $Log: expression.c,v $
+ * Revision 1.13  1998/10/23 11:15:44  irigoin
+ * Bug fix in MakeAtom(): functional types were not always updated. See
+ * type01, 02 and 03 in Validation/Syntax
+ *
+ *
+ */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1998/10/07 15:45:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 1998/10/23 11:15:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -184,6 +194,10 @@ int HasParenthesis;
 		  if( !basic_string_p(variable_basic(type_variable(te)))
 		  || (fc==expression_undefined && lc==expression_undefined)) */ {
 		e = MakeExternalFunction(e, type_undefined);
+
+		/* use expression list to compute argument types */
+		update_functional_type_with_actual_arguments(e, indices);
+
 		/* FI: probleme here for character returning function! You have to know if
 		 * you are dealing with a substring operator or a function call.
 		 *
