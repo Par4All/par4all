@@ -580,6 +580,9 @@ entity get_ith_##lname##_prime(int i)\
 #define FORWARD_CONTROL_MAP( ctl, code, c, list ) \
     GENERIC_CONTROL_MAP( forward_control_map_get_blocs, ctl, code, c, list ) 
 
+#define WIDE_FORWARD_CONTROL_MAP( ctl, code, c, list ) \
+    GENERIC_CONTROL_MAP( wide_forward_control_map_get_blocs, ctl, code, c, list ) 
+
 #define GENERIC_CONTROL_MAP( get_controls, ctl, code, c, list ) \
 { \
     cons *_cm_list_init = (list) ; \
