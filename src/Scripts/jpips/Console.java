@@ -17,6 +17,9 @@
  * $Id$
  *
  * $Log: Console.java,v $
+ * Revision 1.5  1999/02/15 14:13:18  coelho
+ * javax
+ *
  * Revision 1.4  1998/10/30 15:44:56  ancourt
  * Jpanel resized
  *
@@ -58,8 +61,8 @@ package JPips;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
-import com.sun.java.swing.*;
-import com.sun.java.swing.border.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 
 /**
