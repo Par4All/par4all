@@ -1,22 +1,26 @@
 #! /bin/sh
 # 
 # $RCSfile: hpfc,v $ (version $Revision$)
-# $Date: 1995/04/24 13:37:41 $, 
+# $Date: 1995/04/24 15:36:22 $, 
 #
-# hpfc scripts very front-end
+# HPFC scripts very front-end.
 # just an easy way not to have to remember the name of some scripts.
+#
+# (c) Fabien COELHO 1993, 1994, 1995... I'm getting old!
+#
+# TODO: enhance the help capabilities. (That is write a doc:-)
 #
 
 script=`basename $0`
 
-# help message
+# HELP message
 
 usage()
 {
   cat >&2 <<-END
 	usage: $script [-vdq] function [options] [arguments]
-	  version is $Revision$, function among (3 significant characters):
-	  h|help: gives this help
+	  version is $Revision$, function among (3 significant characters:-):
+	  h|help: gives this help (but nothing more:-)
 	  c|compile: compile
 	  f|full: compile, compile and link
 	  D|debug: compile with debug option
@@ -27,14 +31,24 @@ usage()
 	  r|run: run...
 	  v|validate: used by the validation...
 	  p|pvm: pvm control
-	  i|interactive: interactive mode
+	  i|interactive: interactive mode (thanks to GNU readline library)
 	  s|ls: list directory content
-	  pwd: print working directory
+	  q|quit: does nothing...
+	  pwd: print working directory (but cannot change it:-)
 	END
   exit ${1:-1}
 }
 
-# default may be overwritten in the environment
+# DEFAULT MODE:
+#
+# May be overwritten in the environment, thus enabling several level of
+# hpfc thru the interactive option to share the same behavior.
+#
+# The default is demo (stderr silent, no warnings) because it does not
+# look nice to make some "hpfc -q ..." and to have to explain that it
+# is for demonstration purposes, in order to hide the generated warnings:-)
+# I was kind enough to generate these (many) warnings, as a reminder of
+# the (many) weaknesses of this prototype compiler.
 
 HPFC_MODE=${HPFC_MODE:-demo}
 export HPFC_MODE
@@ -53,14 +67,27 @@ done
 
 shift `expr $OPTIND - 1`
 
-# default: interactive
+# DEFAULT if no arguments: interactive. That makes sense.
 
 [ "$#" -eq 0 ] && exec hpfc_interactive
 
-# else exec the required command
+# ELSE exec the required command.
+#
+# if the argument is a file, the default is to compile it,
+# else the command is executed. I allowed this non homogeneous
+# feature to enable "hpfc file" to compile that file, in normal mode...
+# just a shorthand for MY personnal use. FC.
 
 key=$1
-shift
+if [ -f "$key" ] 
+then
+  HPFC_MODE=void
+  key=compile
+else
+  shift
+fi
+
+# The following should be coherent with the help...
 
 case $key in
   h|hel*) usage 0 ;;
@@ -68,15 +95,16 @@ case $key in
   f|ful*) hpfc_compile -k $HPFC_MODE -k full "$@" ;;
   D|deb*) hpfc_compile -k $HPFC_MODE "$@" ;;
   v|val*) hpfc_compile -k validate "$@" ;;
-  C|cle*) Delete "$@" ; hpfc_del "$@" ;;
+  C|cle*) Delete "$@" ; hpfc_delete "$@" ;;
   d|del*) hpfc_delete "$@" ;;
   F|fil*) hpfc_directives < "$@" ;;
   m|mak*) cd `basename $1 .hpfc`.hpfc ; make all ;;
-  r|run*) echo 'not implemented' ;;
+  r|run*) hpfc_run "$@" ;;
   p|pvm*) echo "$@" | pvm ; echo ;;
   i|int*) hpfc_interactive ;;
   s|ls*) ls ;;
   pwd*) pwd ;;
+  q|qui*) : ;;
   *) usage 2
 esac
 
