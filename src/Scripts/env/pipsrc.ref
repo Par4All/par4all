@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/24 10:21:57 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/30 19:04:56 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -131,6 +131,7 @@ PIPS_RELEASEDIR="${PIPS_DIR}/Release"
 # home directory for openwin (only used by the XView interface: wpips)
 #
 OPENWINHOME="/usr/openwin"
+X11_ROOT="$OPENWINHOME"
 
 # 
 #        ######  #####      #    #####    ####
@@ -143,7 +144,7 @@ OPENWINHOME="/usr/openwin"
 # Settings added for EPIPS (Emacs PIPS).
 # started with the epips command.
 #
-# emacs to be used by epips. 
+# emacs to be used by epips. should be gnu emacs.
 # you may change the default by defining this variable
 # default: EPIPS_EMACS='emacs'
 EPIPS_EMACS='xemacs'
@@ -209,6 +210,7 @@ PVMDIR=${PIPS_HOME}/pvm3.3
 DAVINCI_DIR=${PIPS_HOME}/daVinci/daVinci_V1.4_solaris_1
 GRAPHEDITOR_DIRECTORY=${DAVINCI_DIR}/grapheditor
 DAVINCI_ICONDIR=${DAVINCI_DIR}/images
+
 MANPATH=${MANPATH}:${DAVINCI_DIR}/man
 PATH=${PATH}:${DAVINCI_DIR}
 
@@ -264,7 +266,6 @@ NEWGEN_SHRDIR="${NEWGEN_PRODDIR}/Include"
 NEWGEN_SRCDIR="${NEWGEN_PRODDIR}/Src"
 NEWGEN_LIBDIR="${NEWGEN_PRODDIR}/Lib"
 NEWGEN_BINDIR="${NEWGEN_PRODDIR}/Bin"
-
 
 LINEAR_PRODDIR="${LINEAR_DIR}/Production"
 LINEAR_DOCDIR="${LINEAR_DIR}/Documentation"
