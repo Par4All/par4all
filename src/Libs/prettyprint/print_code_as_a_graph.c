@@ -80,6 +80,18 @@ print_code_as_a_graph_preconditions(char *mod_name)
     return success;
 }
 
+bool
+print_code_as_a_graph_total_preconditions(char *mod_name)
+{
+    bool success;
+
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", TRUE);
+    success = print_code_total_preconditions(mod_name);
+    set_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH", FALSE);
+
+    return success;
+}
+
 
 bool
 print_code_as_a_graph_regions(char *mod_name)
