@@ -152,16 +152,13 @@ Psysteme s2;
 	for(c = sc_inegalites(s2); c != (Pcontrainte) NULL; c = c->succ) {
 	    sc_add_inegalite(s1,contrainte_dup(c));
 	}
+
 	/* update s1 basis with s2's vectors */
-	b = s1->base;
-	for(coord = s2->base; !VECTEUR_NUL_P(coord); coord = coord->succ) {
-	    Variable v = vecteur_var(coord);
-	    b = vect_add_variable(b, v);
-	}
-	s1->base = b;
+	base_append(&s1->base, s2->base);
 	s1->dimension = vect_size(b);
     }
-    return(s1);
+
+    return s1;
 }
 
 
