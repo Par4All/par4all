@@ -48,7 +48,6 @@
 #include "wp65.h"
 
 extern entity MakeRunTimeSupportFunction();
-extern entity MakeExternalFunction(entity e, type r);
 
 DEFINE_CURRENT_MAPPING(fetch,list)
 DEFINE_CURRENT_MAPPING(store,list) 
@@ -75,14 +74,12 @@ static void translate_unary_into_binary_ref(statement stat)
 } 
 
 
-entity MakeEntityFunction(string sname)
+entity 
+MakeEntityFunction(string sname)
 {
-    /* MakeExternalFunction is in syntax... should be in ri-util? FC
-     */
-   return (entity) MakeExternalFunction
-       (FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, sname),
-	MakeIntegerResult());
+    entity f = make_empty_function(sname, MakeIntegerResult());
 
+    return f;
 }
 
 void print_ref(reference r)
