@@ -1,6 +1,6 @@
 #
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1997/04/10 17:50:23 $, 
+# $Id$
+#
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -46,7 +46,6 @@ resources.h: pipsmake.rc
 	#
 	# building $@
 	# 
-	cpp $< | \
 	sed '/>/!d;s/^.*MODULE\.//;s/^.*PROGRAM\.//;\
 		s/^.*ALL\.//;s/^.*MAIN\.//;' | \
 	tr '[a-z]' '[A-Z]' | sort -u | sed 's/.*/#define DBR_& "&"/' | \
@@ -62,7 +61,7 @@ phases.h: pipsmake.rc
 	#
 	# building $@
 	#
-	cpp $< | sed '/^[a-z]/!d;s/ .*//g;' | tr '[a-z]' '[A-Z]' | sort -u | \
+	sed '/^[a-z]/!d;s/ .*//g;' | tr '[a-z]' '[A-Z]' | sort -u | \
 	sed 's/.*/#define BUILDER_& "&"/' | cat $(AUTO).h - > $@
 
 builder_map.h: pipsmake.rc
@@ -78,10 +77,12 @@ epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_lay
 	#
 	generate_all_menu_documentation -layout < $<
 
+headers: $(DERIVED_INC)
+
 clean: local-clean
 
 local-clean:
 	$(RM) -r $(DERIVED_FILES) *.aux *.log *.ind *.idx *.toc *.ilg *.dvi
 
-# end of $RCSfile: config.makefile,v $
+# end of it.
 #
