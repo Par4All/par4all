@@ -22,7 +22,8 @@
 /* define this to print all the results */
 /* else, only a progress bar is printed */
 /* #define PRINT_ALL_RESULTS	 */
-
+/* define this to continue the test after first error found */
+/* #define DONT_BREAK_ON_ERROR */
 
 /* RANGE : normal range for evalutations (-RANGE -> RANGE) */
 #define RANGE 50
@@ -40,6 +41,10 @@
 #define VBIGDIM 8
 
 Value min, max;
+
+#ifdef DONT_BREAK_ON_ERROR
+#define PRINT_ALL_RESULTS
+#endif
 
 #ifndef PRINT_ALL_RESULTS
 int st;
@@ -107,8 +112,10 @@ int check_poly(Polyhedron *S,Polyhedron *C,Enumeration *en,
 	fprintf(stderr," while EP eval gives ");
 	value_print(stderr,VALUE_FMT,c);
 	fprintf(stderr,".\n");
+#ifndef DONT_BREAK_ON_ERROR
 	value_clear(c); value_clear(tmp);
 	return(0);
+#endif
       }
 
 #ifdef PRINT_ALL_RESULTS
