@@ -82,6 +82,7 @@ union domain {
 	void (*write)() ;
 	void (*free)() ;
 	char *(*copy)() ;
+	int (*allocated_memory)();
     } ex ;
     struct { 
 	int type ;
