@@ -284,9 +284,31 @@ list /* of effect */ effects_filter(list l_effs, list l_ents)
 	reference ref = effect_reference(eff);
 	entity ent = reference_variable(ref);
 	MAP(ENTITY, e_flt, {
-	    if (entity_conflict_p(e_flt, ent) && !action_read_p(ac)) {
-		ADD_ELEMENT_TO_LIST(l_flt, EFFECT, eff);
-		break;
+	    if (entity_conflict_p(e_flt, ent)) {
+	        bool found = FALSE;
+	        switch(get_int_property(RW_FILTERED_EFFECTS)) {
+		case READ_ALL:
+		case READ_END:
+		    if (action_read_p(ac)) {
+		        ADD_ELEMENT_TO_LIST(l_flt, EFFECT, eff);
+		        found = TRUE;
+		    }
+		    break;
+		case WRITE_ALL:
+		case WRITE_END:
+		    if (!action_read_p(ac)) {
+		        ADD_ELEMENT_TO_LIST(l_flt, EFFECT, eff);
+			found = TRUE;
+		    }
+		    break;
+		case READWRITE_ALL:
+		case READWRITE_END:
+		default:
+		    ADD_ELEMENT_TO_LIST(l_flt, EFFECT, eff);
+		    found = TRUE;
+		    break;
+		}
+		if (found) break;
 	    }
 	}, l_ents);
     }, l_effs);
