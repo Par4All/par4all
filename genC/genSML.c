@@ -63,12 +63,12 @@ struct gen_binding *bp ;
     int overhead = GEN_HEADER ;
 
     switch( bp->domain->ba.type ) {
-    case BASIS:
-    case ARRAY:
-    case LIST:
-    case SET:
+    case BASIS_DT:
+    case ARRAY_DT:
+    case LIST_DT:
+    case SET_DT:
 	return( overhead + 1 ) ;
-    case CONSTRUCTED:
+    case CONSTRUCTED_DT:
 	if( bp->domain->co.op == OR_OP )
 		return( overhead + 2 ) ;
 	else {
@@ -95,7 +95,7 @@ primitive_field( dp )
     static char buffer[ 1024 ];
 
     switch( dp->ba.type ) {
-    case BASIS: {
+    case BASIS_DT: {
 	struct gen_binding *bp = dp->ba.constructand ;
       
 	if( IS_INLINABLE( bp )) {
@@ -107,13 +107,13 @@ primitive_field( dp )
 	else sprintf( buffer, "chunk" ) ;
 	break ;
     }
-    case LIST:
+    case LIST_DT:
 	sprintf( buffer, "list" ) ;
 	break ;
-    case SET:
+    case SET_DT:
 	sprintf( buffer, "set" ) ;
 	break ;
-    case ARRAY: 
+    case ARRAY_DT: 
 	sprintf( buffer, "vector" ) ;
 	break ;
     default:
@@ -134,8 +134,8 @@ int offset ;
 {
     char *field = primitive_field( dp ) ;
 
-    if( dp->ba.type == BASIS && 
-       strcmp( dp->ba.constructand->name, UNIT_TYPE ) == 0 )
+    if( dp->ba.type == BASIS_DT && 
+       strcmp( dp->ba.constructand->name, UNIT_TYPE_NAME ) == 0 )
 	    return ;
 
     (void) printf( "fun %s_%s (vector node) = ", name, dp->ba.constructor ) ;
@@ -149,10 +149,10 @@ static char *
 gen_arg( dp )
 union domain *dp ;
 {
-    return( (dp->ba.type == BASIS) ? dp->ba.constructor :
-	    (dp->ba.type == LIST) ? dp->li.constructor :
-	    (dp->ba.type == SET) ? dp->se.constructor :
-	    (dp->ba.type == ARRAY) ? dp->ar.constructor :
+    return( (dp->ba.type == BASIS_DT) ? dp->ba.constructor :
+	    (dp->ba.type == LIST_DT) ? dp->li.constructor :
+	    (dp->ba.type == SET_DT) ? dp->se.constructor :
+	    (dp->ba.type == ARRAY_DT) ? dp->ar.constructor :
 	    (fatal( "gen_arg: Unknown type %s\n", itoa( dp->ba.type )), 
 	     (char *)NULL) ) ;
 }
@@ -253,7 +253,7 @@ gen_and( bp )
 }
 
 /* GEN_OR generates the manipulation function for an OR_OP type BP. Note
-   that for a UNIT_TYPE, no access function is defined since the value is
+   that for a UNIT_TYPE_NAME, no access function is defined since the value is
    meaningless. */
 
 void
@@ -364,7 +364,7 @@ struct gen_binding *bp ;
 	        bp->name, bp->name ) ;
     }
     switch( dp->ba.type ) {
-    case CONSTRUCTED:
+    case CONSTRUCTED_DT:
 	switch( dp->co.op ) {
 	case AND_OP: 
 	    gen_and( bp ) ;
@@ -376,16 +376,16 @@ struct gen_binding *bp ;
 	    fatal( "gen_domain: Unknown constructed %s\n", itoa( dp->co.op )) ;
 	}
 	break ;
-    case LIST:
+    case LIST_DT:
 	gen_list( bp ) ;
 	break ;
-    case SET:
+    case SET_DT:
 	gen_set( bp ) ;
 	break ;
-    case ARRAY:
+    case ARRAY_DT:
 	gen_array( bp ) ;
 	break ;
-    case EXTERNAL:
+    case EXTERNAL_DT:
 	gen_external( bp ) ;
 	break ;
     default:
