@@ -1,14 +1,9 @@
-/*
- * Messages handling
+/* Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1995/03/23 16:54:33 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1995/03/27 16:27:33 $, )
  * version $Revision$
  * 
  * Fabien Coelho, August 1993
- */
-
-/*
- * included files, from C libraries, newgen and pips libraries.
  */
 
 #include <stdio.h>
@@ -25,6 +20,7 @@ extern int      fprintf();
 
 #include "misc.h"
 #include "ri-util.h"
+#include "properties.h"
 #include "hpfc.h"
 #include "access_description.h"
 #include "defines-local.h"
