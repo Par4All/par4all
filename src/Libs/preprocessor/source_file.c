@@ -159,7 +159,7 @@ static string user_file_directory = NULL;
 #ifdef NO_RX_LIBRARY
 
 static bool
-pips_process_file(string file_name/*, string new_name*/)
+pips_process_file(string file_name)
 {
     int err = safe_system_no_abort(concatenate
        ("trap 'exit 123' 2; pips-process-module ", file_name, NULL));
@@ -457,6 +457,7 @@ pips_process_file(string file_name, string new_name)
     init_rx();
     out = safe_fopen(new_name, "w");
     ok = handle_file_name(out, file_name, FALSE);
+    fflush(out);
     safe_fclose(out, new_name);
     return ok;
 }
@@ -466,21 +467,12 @@ pips_process_file(string file_name, string new_name)
 bool
 filter_file(string mod_name)
 {
-    int len;
     string name, new_name, dir_name, abs_name, abs_new_name;
     name = db_get_memory_resource(DBR_INITIAL_FILE, mod_name, TRUE);
 
     /* directory is set for finding includes. */
     user_file_directory = 
-	strdup(db_get_memory_resource(DBR_USER_FILE, mod_name, TRUE));
-    len = strlen(user_file_directory);
-    while (len-->=0) {
-	if (user_file_directory[len]=='/') {
-	    user_file_directory[len]='\0';
-	    break;
-	}
-    }
-    
+	pips_dirname(db_get_memory_resource(DBR_USER_FILE, mod_name, TRUE));
     new_name = db_build_file_resource_name(DBR_SOURCE_FILE, mod_name, ".f");
     
     dir_name = db_get_current_workspace_directory();
@@ -488,7 +480,8 @@ filter_file(string mod_name)
     abs_new_name = strdup(concatenate(dir_name, "/", new_name, 0));
     free(dir_name);
     
-    if (!pips_process_file(abs_name, abs_new_name)) {
+    if (!pips_process_file(abs_name, abs_new_name)) 
+    {
 	pips_user_warning("initial file filtering of %s failed\n", mod_name);
 	free(abs_new_name); free(abs_name);
 	return FALSE;
