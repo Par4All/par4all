@@ -2,6 +2,12 @@
  * $Id$
  *
  * $Log: newgen_array.h,v $
+ * Revision 1.10  1999/05/27 15:19:05  zory
+ * gen_array_remove added !
+ *
+ * Revision 1.9  1998/12/29 16:10:05  coelho
+ * sort with a cmp.
+ *
  * Revision 1.8  1998/12/29 16:03:53  coelho
  * fixed type in map.
  *
@@ -31,6 +37,7 @@ gen_array_t gen_array_make(int);
 void gen_array_free(gen_array_t);
 void gen_array_full_free(gen_array_t);
 void gen_array_addto(gen_array_t, int, void *);
+void gen_array_remove(gen_array_t, int);
 void gen_array_dupaddto(gen_array_t, int, void *);
 void gen_array_append(gen_array_t, void *);
 void gen_array_dupappend(gen_array_t, void *);
@@ -39,6 +46,8 @@ int gen_array_nitems(gen_array_t);
 int gen_array_size(gen_array_t);
 void * gen_array_item(gen_array_t, int);
 void gen_array_sort(gen_array_t);
+void gen_array_sort_with_cmp(gen_array_t, int (*)(const void *, const void *));
+
 gen_array_t gen_array_from_list(list);
 list list_from_gen_array(gen_array_t);
 
