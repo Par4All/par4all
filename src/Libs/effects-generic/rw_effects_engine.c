@@ -223,6 +223,22 @@ rw_effects_of_call(call c)
     statement current_stat = effects_private_current_stmt_head();
     transformer context = (*load_context_func)(current_stat);
     list le = NIL;
+
+    if (transformer_undefined_p(context))
+    {
+	/* this happens to the CONTINUE statement of the exit node
+	 * even if unreachable. Thus transformer are not computed,
+	 * orderings are not set... however gen_multi_recurse goes there.
+	 * I just store NIL, what seems reasonnable an answer.
+	 * It seems to be sufficient for other passes. 
+	 * I should check that it is indeed the exit node?
+	 * FC.
+	 */
+	pips_debug(2, "call with undefined context... exit node?\n");
+	store_rw_effects_list(current_stat, NIL);
+	return;
+    }
+
     pips_debug(2, "begin\n");
 
     if (!(*empty_context_test)(context))
@@ -305,13 +321,13 @@ r_rw_effects_of_sequence(list l_inst)
 	rb_lrw = r_rw_effects_of_sequence(remaining_block);
 
 	ifdebug(5){
-	    pips_debug(2, "R/W effects of first statement: \n");
+	    pips_debug(5, "R/W effects of first statement: \n");
 	    (*effects_prettyprint_func)(s1_lrw);
-	    pips_debug(2, "R/W effects of remaining sequence: \n");
+	    pips_debug(5, "R/W effects of remaining sequence: \n");
 	    (*effects_prettyprint_func)(rb_lrw);
 	    if (!transformer_undefined_p(t1))
 	    {
-		pips_debug(2, "transformer of first statement: %s\n",
+		pips_debug(5, "transformer of first statement: %s\n",
 			   transformer_to_string(t1));		
 	    }
 	}
@@ -319,10 +335,11 @@ r_rw_effects_of_sequence(list l_inst)
 	rb_lrw = (*effects_transformer_composition_op)(rb_lrw, t1); 
 	    
 	ifdebug(5){
-	    
-	    pips_debug(2, "R/W effects of remaining sequence after composition: \n");
+	    pips_debug(5, "R/W effects of remaining sequence "
+		       "after composition: \n");
 	    (*effects_prettyprint_func)(rb_lrw);
 	}
+
 	/* RW(block) = RW(rest_of_block) U RW(S1) */
 	l_rw = (*effects_union_op)(rb_lrw, s1_lrw, effects_same_action_p);
     }	
@@ -430,8 +447,10 @@ rw_effects_engine(char *module_name)
     pips_debug(1, "end\n");
     debug_off();
 
-    (*db_put_rw_effects_func)(module_name, get_rw_effects());
-    (*db_put_invariant_rw_effects_func)(module_name, get_invariant_rw_effects());
+    (*db_put_rw_effects_func) 
+	(module_name, get_rw_effects());
+    (*db_put_invariant_rw_effects_func)
+	(module_name, get_invariant_rw_effects());
 
     reset_current_module_entity();
     reset_current_module_statement();
