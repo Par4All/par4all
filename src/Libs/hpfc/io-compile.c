@@ -1,42 +1,24 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1995/03/22 10:57:02 $, ) version $Revision$,
- * got on %D%, %T%
- * $Id$
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/03/23 16:54:35 $, )
+ * version $Revision$
  */
 
-/*
- * Standard includes
- */
- 
 #include <stdio.h>
 #include <string.h> 
 extern fprintf();
-
-/*
- * Psystems stuff
- */
 
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
 
-/*
- * Newgen stuff
- */
-
 #include "genC.h"
 
 #include "ri.h" 
 #include "hpf.h" 
 #include "hpf_private.h"
-
-/*
- * PIPS stuff
- */
 
 #include "ri-util.h" 
 #include "misc.h" 
@@ -66,10 +48,6 @@ void fprint_entity_list(FILE *fp, list l);
 #include "polyedre.h"
 
 #include "ricedg.h"      
-
-/* 
- * my own local includes
- */
 
 #include "hpfc.h"
 #include "defines-local.h"
@@ -134,16 +112,13 @@ statement stat, *hp, *np;
 	     continue;
 	 }
 
-	 /*
-	  * add array declaration on host if necessary
+	 /* add array declaration on host if necessary
 	  */
-	 if (array_distributed_p(array) && 
-	     (load_entity_host_new(array) == (entity) HASH_UNDEFINED_VALUE))
+	 if (array_distributed_p(array) && !bound_new_host_p(array))
 	     store_new_host_variable(AddEntityToModule(array, host_module), 
 				     array);
 
-	 /*
-	  * collect data if necessary
+	 /* collect data if necessary
 	  */
 	 if (array_distributed_p(array) && 
 	     (action_read_p(act) || 
@@ -158,8 +133,7 @@ statement stat, *hp, *np;
 	     ln_collect = CONS(STATEMENT, sn, ln_collect);
 	 }
 
-	 /*
-	  * update data if necessary
+	 /* update data if necessary
 	  */
 	 if (action_write_p(act))
 	 {
@@ -176,8 +150,7 @@ statement stat, *hp, *np;
 
     if (get_bool_property("HPFC_SYNCHRONIZE_IO"))
     {
-	/*
-	 * could do it only for write statements
+	/* could do it only for write statements
 	 */
 	entity
 	    synchro = hpfc_name_to_entity(SYNCHRO);
@@ -236,8 +209,7 @@ statement *psh, *psn;
 
     if (array_distributed_p(array))
     {
-	/*
-	 * SCANNING: Variables must be classified as:
+	/* SCANNING: Variables must be classified as:
 	 *   - parameters 
 	 *   - processors
 	 *   - scanner
@@ -1188,6 +1160,5 @@ tag move;
     *psc = (sc_rm(*psc), cleared);
 }
 
-/*
- * that's all
+/* that is all
  */
