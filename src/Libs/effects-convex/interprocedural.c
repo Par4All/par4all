@@ -54,7 +54,7 @@
 
 
 
-jmp_buf overflow_error;
+/* jmp_buf overflow_error;*/
 
 /************************************************************** INTERFACES  */
 
