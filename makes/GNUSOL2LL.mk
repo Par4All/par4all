@@ -6,4 +6,4 @@ AR	= ar
 RANLIB	= ranlib
 CFLAGS  += -msupersparc
 CANSI	=
-INSTALL	= INSTALL=cp install.sh
+INSTALL	= INSTALL=cp $(ROOT)/makes/install.sh
