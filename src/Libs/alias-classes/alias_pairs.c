@@ -107,7 +107,8 @@ add_parameter_aliases_for_this_call_site(call call_site,
 	 {
 /*	     entity callee_ent = region_entity(callee_region); */
 	     
-/*	     pips_debug(9,"\tand entity %s\n",entity_name(callee_ent)); */
+	     pips_debug(9,"\tand entity %s\n",
+			entity_name(region_entity(callee_region)));
 
 	     pips_debug(9,"begin map\n");
 
@@ -327,10 +328,16 @@ in_alias_pairs( string module_name )
     pips_debug(9,"begin for module %s\n",module_name);
 
     /* we need the IN summary regions*/
+    l_reg = effects_to_list((effects)
+			    db_get_memory_resource(DBR_IN_SUMMARY_REGIONS,
+					  module_name,
+					  TRUE));
+
+/* was
     l_reg = (list) db_get_memory_resource(DBR_IN_SUMMARY_REGIONS,
 					  module_name,
 					  TRUE);
-
+					  */
     
     l_pairs = alias_pairs(module_name, l_reg);
 
@@ -358,9 +365,16 @@ out_alias_pairs( string module_name )
     pips_debug(9,"begin for module %s\n",module_name);
 
     /* we need the OUT summary regions*/
+    l_reg = effects_to_list((effects)
+			    db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS,
+					  module_name,
+					  TRUE));
+
+/* was
     l_reg = (list) db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS,
 					  module_name,
 					  TRUE);
+					  */
 
     
     l_pairs = alias_pairs(module_name, l_reg);
