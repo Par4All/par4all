@@ -477,16 +477,16 @@ db_delete_obsolete_resources(bool (*keep_p)(string, string))
 gen_array_t
 db_get_module_list(void)
 {
-    int index = 0;
     gen_array_t a = gen_array_make(0);
     DB_OK;
 
     DB_RESOURCES_MAP(os, or, 
     {     
 	string on = db_symbol_name(os);
+	pips_assert("some symbol name", on);
 	pips_debug(9, "considering %s -> %p\n", on, or);
 	if (!same_string_p(on, ""))
-	    gen_array_dupaddto(a, index++, on);
+	    gen_array_dupappend(a, on);
     },
 	get_pips_database());
 
