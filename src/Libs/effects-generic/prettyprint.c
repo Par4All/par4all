@@ -27,6 +27,36 @@
 
 #include "effects-generic.h"
 
+/***************************************** READ/WRITE ACTION INTERPRETATION */
+
+static string read_action_interpretation = string_undefined;
+static string write_action_interpretation = string_undefined;
+
+void 
+set_action_interpretation(string r, string w)
+{
+    read_action_interpretation = r;
+    write_action_interpretation = w;
+}
+
+void
+reset_action_interpretation()
+{
+    read_action_interpretation = string_undefined;
+    write_action_interpretation = string_undefined;
+}
+
+
+string 
+action_interpretation(action a)
+{
+    return action_read_p(a) ? 
+	read_action_interpretation : write_action_interpretation;
+}
+
+
+/****************************************************************************/
+
 static bool is_user_view_p = FALSE;
 static hash_table nts = hash_table_undefined;
 
@@ -34,34 +64,6 @@ void
 set_is_user_view_p(bool user_view_p)
 {
     is_user_view_p = user_view_p;
-}
-
-
-static int write_action_interpretation;
-static int read_action_interpretation;
-
-void 
-set_write_action_interpretation(int which_write)
-{
-    write_action_interpretation = which_write;
-}
-
-int 
-get_write_action_interpretation()
-{
-    return(write_action_interpretation);
-}
-
-void 
-set_read_action_interpretation(int which_read)
-{
-    read_action_interpretation = which_read;
-}
-
-int 
-get_read_action_interpretation()
-{
-    return(read_action_interpretation);
 }
 
 static bool prettyprint_with_attachments_p = FALSE;
@@ -114,10 +116,11 @@ text_statement_any_effect_type(entity module, int margin, statement stat)
 
 
 text
-get_any_effect_type_text(string module_name,
-			 string resource_name,
-			 string summary_resource_name,
-			 bool give_code_p)
+get_any_effect_type_text(
+    string module_name,
+    string resource_name,
+    string summary_resource_name,
+    bool give_code_p)
 {
     list l_summary_eff = list_undefined;
     entity module;
@@ -138,9 +141,7 @@ get_any_effect_type_text(string module_name,
 
     /* load regions corresponding to the current module */
     set_rw_effects((statement_effects) 
-			   db_get_memory_resource
-			   (resource_name, module_name, TRUE) );
-
+		   db_get_memory_resource(resource_name, module_name, TRUE));
 
     debug_on("EFFECTS_DEBUG_LEVEL");
 
@@ -148,13 +149,12 @@ get_any_effect_type_text(string module_name,
     {
 	l_summary_eff = 
 	    effects_to_list((effects) db_get_memory_resource
-			    (summary_resource_name,
-			     module_name, TRUE));
+			    (summary_resource_name, module_name, TRUE));
 	ifdebug(1)
-	    {
-		pips_debug(1, "summary effects:\n");
-		(*effects_prettyprint_func)(l_summary_eff);
-	    }
+	{
+	    pips_debug(1, "summary effects:\n");
+	    (*effects_prettyprint_func)(l_summary_eff);
+	}
     }
 
 
@@ -167,9 +167,7 @@ get_any_effect_type_text(string module_name,
 	nts = build_number_to_statement(nts, module_stat);
 
 	ifdebug(1)
-	{
 	    print_number_to_statement(nts);
-	}
     }
 
     /* prepare the prettyprinting */
@@ -202,10 +200,11 @@ get_any_effect_type_text(string module_name,
 }
 
 bool
-print_source_or_code_with_any_effects_engine(string module_name,
-					     string resource_name,
-					     string summary_resource_name,
-					     string file_suffix)
+print_source_or_code_with_any_effects_engine(
+    string module_name,
+    string resource_name,
+    string summary_resource_name,
+    string file_suffix)
 {
     char *file_name, *file_resource_name;
     bool success = TRUE;
@@ -215,20 +214,23 @@ print_source_or_code_with_any_effects_engine(string module_name,
 				  ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
 				  GRAPH_FILE_EXT : "",
                                   NULL));
-    file_resource_name = get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
+    file_resource_name = 
+	get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
 	DBR_GRAPH_PRINTED_FILE : 
 	    (is_user_view_p ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE);
 
     if (prettyprint_with_attachments_p)
 	begin_attachment_prettyprint();
     
-    success = make_text_resource(module_name,
-				 file_resource_name,
-				 file_name,
-				 get_any_effect_type_text(module_name,
-							  resource_name,
-							  summary_resource_name,
-							  TRUE));
+    success = make_text_resource
+	(module_name,
+	 file_resource_name,
+	 file_name,
+	 get_any_effect_type_text(module_name,
+				  resource_name,
+				  summary_resource_name,
+				  TRUE));
+
     if (prettyprint_with_attachments_p)
 	end_attachment_prettyprint();
 
