@@ -1,14 +1,21 @@
 # $RCSfile: Makefile.compile_wp65,v $ (version $Revision$)
-# $Date: 1995/09/19 21:47:32 $, 
+# $Date: 1995/09/19 22:28:11 $, 
 #
 
 FC	=	f77
 # Fait des vérifications exhaustives :
+# (i.e. not very fast)
 FFLAGS	=	-g -U -u -C -e
 
 LD	= $(FC)
 LDFLAGS = $(PIPS_LDFLAGS) -L$(PVM_ROOT)/lib/$(PVM_ARCH)
-LDLIBS = -lwp65runtime -lgpvm3 -lpvm3 -lproperties -lmisc -lwp65 -lgenC -lF77 -lm
+
+#
+# Ronan links to 3 pips libraries (wp65, misc, properties) 
+# and to the newgen linrary (genC)...
+# I think that the wp65runtime should be standalone... FC:-)
+#
+LDLIBS= -lwp65runtime -lgpvm3 -lpvm3 -lwp65 -lF77 -lm -lmisc -lproperties -lgenC
 
 LINK	= $(LD) $(LDFLAGS) -o
 
