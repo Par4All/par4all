@@ -148,7 +148,6 @@ static void call_rwt(call c)
 
   /* hum... pushes the current entity... */
   entity e_caller = get_current_module_entity();
-  entity e_filter = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, "KMAX");
 
   reset_current_module_entity();
 
@@ -168,7 +167,7 @@ static void call_rwt(call c)
     break;
   case ICFG_DECOR_PROPER_EFFECTS:
     /*MERGE_TEXTS(r, get_text_proper_effects(callee_name));*/
-    MERGE_TEXTS(r, get_text_proper_effects_flt(callee_name, e_filter));
+    MERGE_TEXTS(r, get_text_proper_effects_flt(callee_name));
     break;
   case ICFG_DECOR_CUMULATED_EFFECTS:
     MERGE_TEXTS(r,get_text_cumulated_effects(callee_name));
