@@ -1,5 +1,5 @@
 dnl
-dnl $RCSfile: hpfc_architecture_m4_macros,v $ ($Date: 1995/09/06 13:46:07 $, )
+dnl $RCSfile: hpfc_architecture_m4_macros,v $ ($Date: 1995/09/06 13:59:08 $, )
 dnl version $Revision$
 dnl got on %D%, %T%
 dnl
@@ -13,14 +13,14 @@ define(`COM_PREFIX',`HPFC')dnl
 define(`_SUN4')dnl
 define(`_PGON')dnl
 define(`_CM5')dnl
-define(`_R6K')dnl
+define(`_RS6K')dnl
 define(`MIMD')dnl
 define(`NETWORK')dnl
 dnl
 ifelse(ARCHITECTURE,`CM5', `define(`MIMD',`$@')',
        ARCHITECTURE,`PGON',`define(`MIMD',`$@')')dnl
 ifelse(ARCHITECTURE,`SUN4',`define(`NETWORK',`$@')',
-       ARCHITECTURE,`R6K',`define(`NETWORK',`$@')')dnl
+       ARCHITECTURE,`RS6K',`define(`NETWORK',`$@')')dnl
 dnl
 dnl PECULIAR DEFINITIONS
 dnl 
@@ -28,7 +28,7 @@ ifelse(ARCHITECTURE,`CM5',`define(`COM_PREFIX',`CM')')dnl
 ifelse(ARCHITECTURE,`SUN4',`define(`_SUN4',`$@')',
        ARCHITECTURE,`PGON',`define(`_PGON',`$@')',
        ARCHITECTURE,`CM5',`define(`_CM5',`$@')',
-       ARCHITECTURE,`R6K',`define(`_R6K',`$@')')dnl
+       ARCHITECTURE,`RS6K',`define(`_R6K',`$@')')dnl
 dnl
 dnl THAT IS ALL
 dnl
