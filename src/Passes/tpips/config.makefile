@@ -14,7 +14,7 @@ LIB_HEADERS	=	tpips-local.h \
 
 DERIVED_HEADERS	= 	tp_yacc.h completion_list.h
 DERIVED_CFILES	=	tp_yacc.c tp_lex.c
-DERIVED_FILES	= 	ana_lex_completed.l
+DERIVED_FILES	= 	y.output
 
 # INC_CFILES	= 	$(DERIVED_FILES)
 
