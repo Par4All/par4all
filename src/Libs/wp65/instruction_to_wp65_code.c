@@ -361,7 +361,9 @@ translate_IO_ref(call c, hash_table v_to_esv, boolean loop_or_call_print)
 	    expression_syntax(exp)= make_syntax(is_syntax_reference,newr);
 	    result = ref1;
 	}
-    }
+    }  
+    else pips_user_error("function calls are not handled in this version\n");
+  
     return(result);
 }
 
