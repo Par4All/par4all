@@ -122,6 +122,8 @@ rule ru;
     for (pbm = builder_maps; pbm->builder_name != NULL; pbm++) {
 	if (same_string_p(pbm->builder_name, run)) {
 	    bool success_p = TRUE;
+	    bool print_memory_usage_p = get_bool_property("LOG_MEMORY_USAGE");
+	    double initial_memory_size = 0.;
 
 	    if (check_res_use_p)
 		init_resource_usage_check();
@@ -129,8 +131,11 @@ rule ru;
 	    if (print_timing_p)
 		init_log_timers();
 
+	    if (print_memory_usage_p) {
+		initial_memory_size = get_process_memory_size();
+	    }
+
 	    success_p = catch_user_error(pbm->builder_func, oname);
-	       
 
 	    if (print_timing_p) {
 		string time_with_io,io_time;
@@ -141,6 +146,13 @@ rule ru;
 		user_log (time_with_io);
 		user_log ("                                 IO time    ");
 		user_log (io_time);
+	    }
+
+	    if (print_memory_usage_p) {
+		double final_memory_size = get_process_memory_size();
+		user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
+			 final_memory_size,
+			 final_memory_size-initial_memory_size);
 	    }
 
 	    if (check_res_use_p)
@@ -197,7 +209,6 @@ string rname, oname;
     save_active_phases();
 
     success_p = rmake(rname, oname);
-
 
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
@@ -982,6 +993,9 @@ string res_n, module_n;
 {
     jmp_buf long_jump_buffer;
     bool success = FALSE;
+    bool print_timing_p = get_bool_property("LOG_TIMINGS");
+    bool print_memory_usage_p = get_bool_property("LOG_MEMORY_USAGE");
+    double initial_memory_size = 0.;
 
     if(find_rule_by_resource(res_n) == rule_undefined) {
 	user_warning("safe_make", "Unkown resource \"%s\"\n", res_n);
@@ -1002,11 +1016,40 @@ string res_n, module_n;
 	user_log("Request: build resource %s for module %s.\n", 
 		 res_n, module_n);
 
+	if (print_timing_p) {
+	    init_request_timers();
+	}
+
+	if (print_memory_usage_p) {
+	    initial_memory_size = get_process_memory_size();
+	}
+
 	pips_malloc_debug();
 
 	success = make(res_n, module_n);
 	if(success) {
 	    user_log("%s made for %s.\n", res_n, module_n);
+
+	    if (print_timing_p) {
+		string request_time, phase_time, dbm_time;
+
+		get_request_string_timers (&request_time, &phase_time,
+					   &dbm_time);
+
+		user_log ("                                 time       ");
+		user_log (request_time);
+		user_log ("                                 phase time ");
+		user_log (phase_time);
+		user_log ("                                 IO time    ");
+		user_log (dbm_time);
+	    }
+
+	    if (print_memory_usage_p) {
+		double final_memory_size = get_process_memory_size();
+		user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
+			 final_memory_size,
+			 final_memory_size-initial_memory_size);
+	    }
 	}
 	else {
 	    user_warning("safe_make",
@@ -1025,6 +1068,9 @@ string phase_n, module_n;
 {
     jmp_buf long_jump_buffer;
     bool success = FALSE;
+    bool print_timing_p = get_bool_property("LOG_TIMINGS");
+    bool print_memory_usage_p = get_bool_property("LOG_MEMORY_USAGE");
+    double initial_memory_size = 0.;
 
     if (find_rule_by_phase(phase_n) == rule_undefined) {
 	user_warning("safe_apply", "Unkown phase/rule \"%s\"\n", phase_n);
@@ -1046,10 +1092,39 @@ string phase_n, module_n;
 		 phase_n, module_n);
 	pips_malloc_debug();
 
+	if (print_timing_p) {
+	    init_request_timers();
+	}
+
+	if (print_memory_usage_p) {
+	    initial_memory_size = get_process_memory_size();
+	}
+
 	success = apply(phase_n, module_n);
 
 	if (success) {
 	    user_log("%s applied on %s.\n", phase_n, module_n);
+
+	    if (print_timing_p) {
+		string request_time, phase_time, dbm_time;
+
+		get_request_string_timers (&request_time, &phase_time,
+					   &dbm_time);
+
+		user_log ("                                 time       ");
+		user_log (request_time);
+		user_log ("                                 phase time ");
+		user_log (phase_time);
+		user_log ("                                 IO time    ");
+		user_log (dbm_time);
+	    }
+
+	    if (print_memory_usage_p) {
+		double final_memory_size = get_process_memory_size();
+		user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
+			 final_memory_size,
+			 final_memory_size-initial_memory_size);
+	    }
 	}
 	else {
 	    user_warning("safe_apply", 
