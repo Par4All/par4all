@@ -195,15 +195,15 @@ create_status_subwindow()
                 NULL);
    */
    directory_name_panel_item =
-      schoose_create_abbrev_menu_with_text(main_panel,
-                                           "Directory:",
-                                           61,
-                                           DECALAGE_STATUS,
-                                           xv_rows(main_panel, 2),
-                                           generate_directory_menu,
-                                /* Ignore the return code of
-                                   end_directory_notify: */
-                                           (void (*)(char *)) end_directory_notify);
+      schoose_create_abbrev_menu_with_text(
+	  main_panel,
+	  "Directory:",
+	  61,
+	  DECALAGE_STATUS,
+	  xv_rows(main_panel, 2),
+	  generate_directory_menu,
+	  /* Ignore the return code of end_directory_notify: */
+	  (void (*)(char *)) end_directory_notify); 
 
    xv_set(directory_name_panel_item,
           PANEL_VALUE_STORED_LENGTH, 512,
