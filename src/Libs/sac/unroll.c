@@ -93,7 +93,12 @@ static bool simple_simd_unroll_loop_filter(statement s)
    varwidths.max = 0;
    gen_context_recurse(iBody, &varwidths, statement_domain, gen_true, 
 		       compute_variable_size);
-   varwidth = varwidths.max;
+
+   /* Decide between min and max unroll factor */
+   if (get_bool_property("SIMD_AUTO_UNROLL_MINIMIZE_UNROLL"))
+      varwidth = varwidths.max;
+   else
+      varwidth = varwidths.min;
 
    /* Unroll as many times as needed by the variables width */
    if ((varwidth > 32) || (varwidth <= 0)) 
@@ -158,7 +163,12 @@ static bool full_simd_unroll_loop_filter(statement s)
    factor.max = 1;
    gen_context_recurse(iBody, &factor, statement_domain, gen_true, 
 		       compute_parallelism_factor);
-   loop_unroll(s, factor.min);
+
+   /* Decide between min and max unroll factor, and unroll */
+   if (get_bool_property("SIMD_AUTO_UNROLL_MINIMIZE_UNROLL"))
+      loop_unroll(s, factor.min);
+   else
+      loop_unroll(s, factor.max);
 
    /* Do not recursively analyse the loop */
    return FALSE;
@@ -166,15 +176,19 @@ static bool full_simd_unroll_loop_filter(statement s)
 
 void simd_unroll_as_needed(statement module_stmt)
 {
-#if 1
-   gen_recurse(module_stmt, statement_domain, 
-	       simple_simd_unroll_loop_filter, gen_null);
-#else
-   init_tree_patterns();
-   init_operator_id_mappings();
-   gen_recurse(module_stmt, statement_domain, 
-	       full_simd_unroll_loop_filter, gen_null);
-#endif
+   /* Choose algorithm to use, and use it */
+   if (get_bool_property("SIMD_AUTO_UNROLL_SIMPLE_CALCULATION"))
+   {
+      gen_recurse(module_stmt, statement_domain, 
+		  simple_simd_unroll_loop_filter, gen_null);
+   }
+   else
+   {
+      init_tree_patterns();
+      init_operator_id_mappings();
+      gen_recurse(module_stmt, statement_domain, 
+		  full_simd_unroll_loop_filter, gen_null);
+   }
 }
 
 bool simdizer_auto_unroll(char * mod_name)
