@@ -923,6 +923,7 @@ int use;
 {
     statement module_stat;
     instruction module_inst;
+    control module_cont = control_undefined ;
     graph module_graph;
     void print_graph() ;
 
@@ -937,9 +938,14 @@ int use;
     set_enclosing_loops_map( loops_mapping_of_statement(module_stat) );
 
     module_inst = statement_instruction(module_stat);
-    if (! instruction_unstructured_p(module_inst))
-	pips_error("chains", "unstructured expected\n");
 
+    if (! instruction_unstructured_p(module_inst)) {
+	module_cont = make_control(module_stat, NIL, NIL) ;
+
+	module_inst = make_instruction(is_instruction_unstructured,
+				       make_unstructured(module_cont,
+							 module_cont)) ;
+    }
     set_effects(module_name,use);
 
     module_graph = 
@@ -950,13 +956,11 @@ int use;
 
     debug_off();
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CHAINS, 
-			   strdup(module_name), 
-			   (char*) module_graph);
-    reset_effects();
-    reset_enclosing_loops_map();
-    reset_current_module_statement();
-    reset_current_module_entity();
+    if( !control_undefined_p( module_cont )) { gen_free( module_cont )
+	; } DB_PUT_MEMORY_RESOURCE(DBR_CHAINS, strdup(module_name),
+	(char*) module_graph); reset_effects();
+	reset_enclosing_loops_map(); reset_current_module_statement();
+	reset_current_module_entity();
 
     return TRUE;
 }
