@@ -160,7 +160,6 @@ static int is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 	    strcmp(transformer_variable_name((entity) vecteur_var(*pvarval1)),
 		   transformer_variable_name((entity) vecteur_var(*pvarval2)));
 
-
     return is_equal; 
 }
 
