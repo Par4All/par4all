@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/25 13:04:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/25 17:16:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/04/25 13:04:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/04/25 17:16:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1412,6 +1412,7 @@ int n;
     statement tb = test_true(obj);
     statement fb = test_false(obj);
 
+    /* 1st case: one statement in the true branch => logical IF */
     if(nop_statement_p(fb)
        && statement_call_p(tb)
        && entity_empty_label_p(statement_label(tb))
@@ -1420,9 +1421,11 @@ int n;
        && !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")) {
 	r = text_logical_if(module, label, margin, obj, n);
     }
+    /* 2nd case: one test in the false branch => ELSEIF block */
     else if(statement_test_p(fb)
 	    && empty_comments_p(statement_comments(fb))
-	    && entity_empty_label_p(statement_label(fb))) {
+	    && entity_empty_label_p(statement_label(fb))
+	    && !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")) {
 	r = text_block_ifthen(module, label, margin, obj, n);
 	MERGE_TEXTS(r, text_block_elseif(module, label, margin, statement_test(fb), n));
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
