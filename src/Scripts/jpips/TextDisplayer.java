@@ -2,6 +2,9 @@
 
 /** $Id$
   * $Log: TextDisplayer.java,v $
+  * Revision 1.3  1998/10/16 13:58:55  coelho
+  * *** empty log message ***
+  *
   * Revision 1.2  1998/06/30 15:03:02  didry
   * manages a new panel
   *
@@ -17,7 +20,9 @@ import java.applet.*;
 import java.net.*;
 import java.util.*;
 import java.io.*;
+
 import JPips.Pawt.*;
+
 import java.awt.event.*;
 import java.awt.*;
 
