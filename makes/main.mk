@@ -63,7 +63,7 @@ include $(MAKE.d)/svn.mk
 all: $(ARCH)
 
 UTC_DATE = $(shell date -u | tr ' ' '_')
-CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
+CPPFLAGS += -DSOFT_ARCH='"$(ARCH)"'
 
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
