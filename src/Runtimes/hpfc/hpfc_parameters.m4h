@@ -1,0 +1,28 @@
+c
+c parameters used to compile 
+c
+c max_parameters.h (94/04/08, 16:25:59)
+c version 1.1
+c got on 94/04/08, 16:26:00
+c @(#)max_parameters.h	1.1
+c
+c type declarations
+c
+      integer
+     $     INTFLAG,
+     $     MAXNBOFARRAYS,
+     $     MAXNBOFTEMPLATES,
+     $     MAXNBOFPROCESSORS,
+     $     MAXMAXSIZEOFPROCS
+
+c
+c parameters
+c
+      parameter(INTFLAG = -1234567890)
+      parameter(MAXNBOFARRAYS = 2)
+      parameter(MAXNBOFTEMPLATES = 1)
+      parameter(MAXNBOFPROCESSORS = 1)
+      parameter(MAXMAXSIZEOFPROCS = 4)
+c
+c that s all
+c
