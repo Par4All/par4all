@@ -4,6 +4,9 @@
  * scan the Abstract Syntax Tree of a program to count operations
  *
  * $Log: comp_scan.c,v $
+ * Revision 1.22  1998/04/14 19:25:41  coelho
+ * casts.
+ *
  * Revision 1.21  1997/09/11 08:33:22  coelho
  * missing header added.
  *
@@ -15,6 +18,8 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "ri.h"
@@ -180,8 +185,8 @@ char *module_name;
 	summary_comp_dup = copy_complexity(summary_comp);
     }
 
-    pips_assert("summary_complexity", gen_consistent_p(summary_comp));
-    pips_assert("summary_complexity", gen_consistent_p(summary_comp_dup));
+    pips_assert("summary_complexity", complexity_consistent_p(summary_comp));
+    pips_assert("summary_complexity", complexity_consistent_p(summary_comp_dup));
 
     trace_off();
 
@@ -243,7 +248,7 @@ list eff_list;
 
     /* Check and store the complexity in the statement_mapping */
     complexity_check_and_warn("statement_to_complexity", comp);   
-    pips_assert("statement_to_complexity", gen_consistent_p(comp));
+    pips_assert("statement_to_complexity", complexity_consistent_p(comp));
 
     /* SET_STATEMENT_MAPPING(get_complexity_map() , stat, (char *) comp); */
     store_statement_complexity(stat, comp);
