@@ -1,0 +1,12 @@
+#!/bin/sh
+
+grep define $PIPS_INCLUDEDIR/phases.h | \
+nawk 'BEGIN{print "static char *tp_phase_names[]={";}
+{print "\t",$3,",";}
+END{print "(char*)NULL};"}'
+
+grep define $PIPS_INCLUDEDIR/resources.h | \
+nawk 'BEGIN{print "static char *tp_resource_names[]={";}
+{print "\t",$3,",";}
+END{print "(char*)NULL};"}'
+
