@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS STuff
-# $RCSfile: make-tags,v $ ($Date: 1994/03/09 17:12:12 $) version $Revision$, got on %D%, %T%
+# $RCSfile: make-tags,v $ ($Date: 1994/03/10 11:50:39 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 # Tags computation for the PIPS project, using the Development version.
@@ -14,7 +14,7 @@
 #  - add recomputation of TAGS for Linear
 #  - PIPS_ETAGS variable used
 #  - awk -> cut
-#  - ,files removed
+#  - ,files, OLD, tmp, also removed
 
 HOME=`ypcat passwd | egrep '^pips:' | cut -d: -f 6`
 
@@ -27,7 +27,8 @@ PATHNAME_LIST="${HOME}/Newgen/genClib.c ${HOME}/Newgen/hash.c ${HOME}/Newgen/lis
 
 # On saute les SCCS, RK 28/9/93.
 find ${PATHNAME_LIST} -name '*.[cyhl]' -print | \
-	sed -e '/SCCS/d' -e '/,/d' > ${FILES} 2>/dev/null
+	sed -e "/\/SCCS\//d;/\/,/d;/\/[Oo][Ll][Dd]\//d;/\/tmp\//d;" \
+		> ${FILES} 2>/dev/null
 
 ${PIPS_ETAGS} -f ${TAGS} `cat ${FILES}` 2>/dev/null
 
