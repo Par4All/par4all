@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>      /* getenv */
-#include <varargs.h>
+#include <stdarg.h>
 
 #include "genC.h"
 #include "ri.h"
@@ -82,23 +82,12 @@ complexity comp;
 	user_warning(s,"Bad internal complexity representation!\n");
 }    
 
-void good_complexity_assert(va_alist)
-va_dcl
+void good_complexity_assert(char * function, complexity comp)
 {
-    va_list args;
-    complexity comp;
-    char *function ;
-
-    va_start(args);
-    function = va_arg(args, char *) ;
-    comp = va_arg(args, complexity);
-
     if (!complexity_check(comp))
 	pips_error(function, "bad internal complexity representation\n");
-
-    va_end(args);
 }
-
+
 /* duplicates complexity comp */
 complexity complexity_dup(comp)
 complexity comp;
@@ -701,17 +690,13 @@ entity e;
 	return (0.0);
     }
 }
-
+
 /* "trace on" */
 static int call_level=0;
-void trace_on(va_alist)
-va_dcl
+void trace_on(char * fmt, ...)
 {
-    extern int vfprintf();
-
     if (get_bool_property("COMPLEXITY_TRACE_CALLS")) {
 	va_list args;
-	char *fmt;
 	char *indentstring = malloc(99);
 	boolean b = (call_level >= 0);
 	int i,k=1;
@@ -727,8 +712,7 @@ va_dcl
 	}
 
 	fprintf(stderr, "%s>", indentstring);
-	va_start(args);
-	fmt = va_arg(args, char *);
+	va_start(args, fmt);
 	vfprintf(stderr, fmt, args);
 	fprintf(stderr, "\n");
 	va_end(args);
