@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/16 23:46:06 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/17 00:07:01 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -60,6 +60,11 @@ int Read_spec_mode ;
 bool Read_spec_performed = FALSE ;
 
 /* The debug flag can be changed by the user to check genClib code. */
+/* If you set gen_debug dynamically with gdb, do not forget to set
+ * gen_debug_indent to a positive enough value to avoid problems
+ * when gen_trav_obj() moves upwards the point it was when gen_debug
+ * was set
+ */
 
 int gen_debug = 0 ;
 static int gen_debug_indent = 0 ;
@@ -107,7 +112,8 @@ fprintf_spaces( fd, number )
 FILE *fd ;
 int number ;
 {
-    assert(number>=0);
+    /* assert(number>=0); */
+    number = number<0? 0: number;
     for( ; number ; number-- )
 	    (void) fprintf( fd, " " ) ;
 }
@@ -475,7 +481,10 @@ struct driver *dr ;
 	    fatal( "gen_trav_simple: Unknown type %s\n", itoa( dp->ba.type )) ;
 	}
 
-	if (gen_trav_stop_recursion) return;
+	if (gen_trav_stop_recursion) {
+	    if (gen_debug & GEN_DBG_TRAV_SIMPLE) gen_debug_indent-- ;
+	    return;
+	}
 	(*dr->simple_out)( obj, dp ) ;
     }
 
