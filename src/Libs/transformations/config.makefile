@@ -17,7 +17,6 @@ LIB_CFILES =	replace.c \
                 coarse_grain_parallelization.c\
 		dead_code_elimination.c \
                 trivial_test_elimination.c \
-                declaration_table_normalization.c \
 		privatize.c \
 		array_privatization.c \
 		standardize_structure.c \
@@ -26,7 +25,8 @@ LIB_CFILES =	replace.c \
 		declarations.c \
 		clone.c \
 	        transformation_test.c \
-		freeze_variables.c
+		freeze_variables.c \
+		bottom_up_array_declaration_normalization.c \
 
 #		optimize_misc.c
 
