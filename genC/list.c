@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/12/14 17:26:52 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/12/19 10:56:07 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -248,23 +248,6 @@ cons *l ;
 
     for( p = l ; p != NIL ; p = nextp ) {
 	nextp = p->cdr ;
-	free( p ) ;
-    }
-}
-
-void gen_full_free_list( l )
-cons *l ;
-{
-    cons *p, *nextp ;
-    bool keep = FALSE ;
-
-    for( p = l ; p != NIL ; p = nextp, keep = TRUE ) {
-	shared_pointers( CAR(p).p, keep ) ;
-	nextp = p->cdr ;
-    }
-    for( p = l ; p != NIL ; p = nextp ) {
-	nextp = p->cdr ;
-	gen_free_with_sharing( CAR(p).p ) ;
 	free( p ) ;
     }
 }
