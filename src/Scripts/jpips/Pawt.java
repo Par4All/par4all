@@ -2,6 +2,9 @@
  * $Id$
  * 
  * $Log: Pawt.java,v $
+ * Revision 1.4  1998/07/03 16:36:51  coelho
+ * PComboBox includes a direct field.
+ *
  * Revision 1.3  1998/07/03 08:13:33  coelho
  * simpler constructors. tips added to labels and buttons.
  *
@@ -130,14 +133,19 @@ interface Pawt
       }
     }
 
-  class PRadioButtonMenuItem extends java.awt.swing.JRadioButtonMenuItem
+  class PRadioButtonMenuItem 
+    extends java.awt.swing.JRadioButtonMenuItem
     {
-      public String command,
-                    checking;
+      public String command, checking;
       public PLabel label;
       public PComboBox cob;
       public Object o;
       public PRadioButtonMenuItem rbmi;
+
+      PRadioButtonMenuItem(String name, String command, 
+                           PComboBox cob, Object o, String checking)
+        { super(name); this.command = command; this.cob = cob; this.o = o;
+	  this.checking = checking; }
 
       PRadioButtonMenuItem(String name){ super(name); }
       PRadioButtonMenuItem(String name, String command)
@@ -153,10 +161,6 @@ interface Pawt
       PRadioButtonMenuItem(String name, String command,
                            PComboBox cob, Object o)
         { super(name); this.command = command; this.cob = cob; this.o = o; }
-      PRadioButtonMenuItem(String name, String command,
-                           PComboBox cob, Object o, String checking)
-        { super(name); this.command = command; this.cob = cob; this.o = o;
-	  this.checking = checking; }
     }
 
 
@@ -220,17 +224,28 @@ interface Pawt
       PList(DefaultListModel l){ super(l); }
     }
 
-    
+  /** A PComboBox can send directly its command on selections,
+    * or wait for some specific action to do the job (e.g. a button pressed).
+    */
   class PComboBox extends java.awt.swing.JComboBox
     {
-      public String checking,
-      		    marker;
+      public String checking, marker;
+      public boolean direct;
       public Vector vCommand = new Vector(),
                     vRbmi = new Vector(),
 		    vChecking = new Vector();
-      PComboBox(){ super(); }
-      PComboBox(String ch){ super(); checking = ch; }
-      PComboBox(String ch, String ma){ super(); checking = ch; marker = ma; }
+
+      PComboBox(String ch, String ma, boolean direct)
+      { 
+	super(); 
+	checking = ch; 
+	marker = ma; 
+	this.direct = direct;
+      }
+
+      PComboBox(){ this(null, null, true); }
+      PComboBox(String ch){ this(ch, null, true); }
+      PComboBox(String ch, String ma) { this(ch, ma, true); }
     }
 
 
@@ -243,7 +258,7 @@ interface Pawt
         
   class PButtonGroup extends java.awt.swing.ButtonGroup
     {
-      String checking;
+      public String checking;
       PButtonGroup(String ch){ super(); checking = ch; }
     }
         
