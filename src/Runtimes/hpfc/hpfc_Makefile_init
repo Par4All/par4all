@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/12/27 13:53:26 $, )
+# ($Date: 1996/12/27 15:18:32 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -196,7 +196,9 @@ NODE_LIBS 	+= $(PVM_NLIB)
 PVM_HEADERS 	= 	pvm3.h fpvm3.h
 HEADERS 	=	$(wildcard hpfc_*.h) $(PVM_HEADERS)
 
-COMMON_FFILES	=	param_init.f hpfc_check.f
+RT_INIT		= 	hpfc_initialize_runtime.f
+
+COMMON_FFILES	=	$(RT_INIT) hpfc_check.f
 HOST_FFILES 	=	$(wildcard [A-Z]*_host.f)
 NODE_FFILES 	= 	$(wildcard [A-Z]*_node.f)
 
@@ -216,7 +218,7 @@ NODE 	= 	$(TARGET)_node
 MAIN	=	$(TARGET)_main
 
 RUNABLES = $(HOST) $(NODE) $(RTEST) $(MAIN)
-DEDUCED = $(PVM_HEADERS) param_init.f $(RT_SRC_FILES)
+DEDUCED = $(PVM_HEADERS) $(RT_INIT) $(RT_SRC_FILES)
 
 #
 # Rules
@@ -289,10 +291,10 @@ fpvm3.h:$(pvminc)/fpvm3.h
 #
 # Compilation
 
-param_init.m4:;	$(RT_DIR)/hpfc_generate_init -n $(TARGET) .
+$(RT_INIT:.f=.m4):;	$(RT_DIR)/hpfc_generate_init -n $(TARGET) .
 
-param_init.f: param_init.m4
-	$(M4) -D PVM_ARCH=$(PVM_ARCH) param_init.m4 > param_init.f
+$(RT_INIT): $(RT_INIT:.f=.m4)
+	$(M4) -D PVM_ARCH=$(PVM_ARCH) $< > $@
 
 %.o: %.f; $(FC) $(FFLAGS) $(FOPT) -c $< 
 
