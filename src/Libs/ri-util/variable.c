@@ -444,6 +444,38 @@ int c;
     return(ce);
 }
 
+/* entity make_float_constant_entity(float c)
+ * make entity for float constant c
+ */
+entity 
+make_float_constant_entity(float c)
+{
+  entity ce;
+  char *num = (char*) malloc(sizeof(float));
+  string cn;
+
+  sprintf(num, "%f", c);
+  cn = concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,num,NULL);
+  ce = gen_find_entity(cn);
+  if (ce==entity_undefined) {		/* make entity for the constant c */ 
+    functional cf = 
+      make_functional(NIL, 
+		      make_type(is_type_variable, 
+				make_variable(make_basic(is_basic_float,(void *)sizeof(float)),
+					      NIL)));
+    type ct = make_type(is_type_functional, cf);
+    ce = make_entity(strdup(cn), ct, MakeStorageRom(),
+		     make_value(is_value_constant, 
+				make_constant(is_constant_litteral, UU)));
+  }
+    
+  else 
+    free(num);
+  
+  return(ce);
+}
+
+
 
 /* 
  * This function computes the current offset of the area a passed as
