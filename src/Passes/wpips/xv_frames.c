@@ -141,9 +141,19 @@ void place_frames()
 		(display_width-WPIPS_WIDTH)/2, 
 		(display_height-WPIPS_HEIGHT)/2);
      */
+    /* in the bottom left : */
+    place_frame(log_frame, 0, display_height);
+
+    frame_get_rect(log_frame, &rect);
+
+    main_t = rect.r_top;
+    main_w = rect.r_width;
+    main_h = rect.r_height;
+    main_l = rect.r_left;
+
     place_frame(main_frame, 
 		0, 
-		(display_height-WPIPS_HEIGHT)/2);
+		main_t - xv_get(main_frame, XV_HEIGHT) - Y_WM_DECOR_SIZE);
 
     frame_get_rect(main_frame, &rect);
 
@@ -155,8 +165,11 @@ void place_frames()
     main_center_t = main_t+main_h/2;
     main_center_l = main_l+main_w/2;
 
-    /* in the bottom left : */
-    place_frame(log_frame, 0, display_height);
+
+		/* Above the main frame : */
+    place_frame(properties_frame, 
+		0, 
+		main_t - xv_get(properties_frame, XV_HEIGHT) - Y_WM_DECOR_SIZE);
 
     /* in the upper right corner : */
     place_frame(edit_frame[0], display_width, 0);
