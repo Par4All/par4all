@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/14 10:54:04 $, 
+ * $Date: 1997/04/21 11:51:53 $, 
  */
 
 #include <stdio.h>
@@ -785,7 +785,8 @@ static void parse_arguments(int argc, char * argv[])
 	    }
 	    else {
 		if((current_file = fopen(argv[optind], "r"))==NULL) {
-		    perror("tpips");
+		    /* perror("tpips"); */
+		    perror(argv[optind]);
 		    exit(1);
 		}
 		else {
