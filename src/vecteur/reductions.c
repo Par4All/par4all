@@ -3,6 +3,7 @@
 /*LINTLIBRARY*/
 
 #include <stdio.h>
+#include <limits.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
