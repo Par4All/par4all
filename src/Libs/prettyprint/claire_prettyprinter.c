@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.12  2004/06/16 09:00:00  hurbain
+   Backup version. Is not compilable.
+
    Revision 1.11  2004/06/15 15:48:49  hurbain
    This is not a stable version, backup sync only.
 
@@ -489,7 +492,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
     }
     case is_syntax_call:{
       call c = syntax_call(sind);
-      claire_call_from_indice(c, &(offset_array[indice_nr]), paving_array[indice_nr]);
+      claire_call_from_indice(c, &(offset_array[indice_nr]), paving_array[indice_nr], fitting_array[indice_nr]);
       break;
     }
     default:{
@@ -503,7 +506,20 @@ static string claire_array_in_task(reference r, bool first, int task_number){
     result=strdup(concatenate(result, "vartype!(", offset_array[i],"), ", NULL));
   }
   result = strdup(concatenate(result, "vartype!(", offset_array[i], "))," NL, NULL));
-  result = strdup(concatenate(result, TAB, TAB, "fitting = list<list[VARTYPE]>(list()),", NL, NULL));
+  result = strdup(concatenate(result, TAB, TAB, "fitting = list<list[VARTYPE]>(list("));
+  for(i=0;i<gen_array_nitems(intern_indices_array) - 1; i++){
+    result = strdup(concatenate(result, "list(", NULL));
+    for(j = 0; j<(*index_of_array)-1; j++){
+      result = strdup(concatenate(result, "vartype!(", fitting_array[i][j], "), ", NULL));
+    }
+    result = strdup(concatenate(result, "vartype!(", fitting_array[i][j], ")),", NL, TAB, TAB, TAB, NULL));
+  }
+  result = strdup(concatenate(result, "list(", NULL));
+  for(j = 0; j<(*index_of_array)-1; j++){
+    result = strdup(concatenate(result, "vartype!(", fitting_array[i][j], "), ", NULL));
+  }
+  result = strdup(concatenate(result, "vartype!(", fitting_array[i][j], "))),", NL, TAB, TAB, NULL));
+
   result = strdup(concatenate(result, TAB, TAB, "paving = list<list[VARTYPE]>(", NULL));
   
  
@@ -520,7 +536,24 @@ static string claire_array_in_task(reference r, bool first, int task_number){
   }
   result = strdup(concatenate(result, "vartype!(", paving_array[i][j], "))),", NL, TAB, TAB, NULL));
   
-  result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = 1, ", NL, TAB, TAB, TAB, "upperBound = list<VARTYPE>(vartype!(1)), ", NL, TAB, TAB, TAB, "names = list<string>(\"m_i\"))))", NL, NULL)); 
+  result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", int_to_string(gen_array_nitems(intern_indices_array)), NL, TAB, TAB, TAB, NULL));
+  result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));
+  
+  for(i = 0; i<gen_array_nitems(intern_upperbound_array) - 1; i++){
+    result = strdup(concatenate(result, "vartype!(", gen_array_item(intern_upperbounds_array, i), "), ", NULL));
+  }
+
+  result = strdup(concatenate(result, "vartype!(", gen_array_item(intern_upperbounds_array, i), ")),", NULL));
+
+  result = strdup(concatenate(result, NL, TAB, TAB, TAB, "names = list<string>(", NULL));
+
+  for(i = 0; i<gen_array_nitems(intern_indices_array) - 1; i++){
+    result = strdup(concatenate(result, QUOTE, gen_array_item(intern_indices_array, i), QUOTE, ", ", NULL));
+  }
+
+  result = strdup(concatenate(result, QUOTE, gen_array_item(intern_indices_array, i), QUOTE, "),", NULL));
+
+\"m_i\"))))", NL, NULL)); 
   return result;
   
 }
