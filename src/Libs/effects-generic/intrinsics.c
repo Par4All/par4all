@@ -128,6 +128,11 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
     {"WRITE",     "END=",         is_action_read, is_approximation_must},
     {"WRITE",     "IOSTAT=",      is_action_write, is_approximation_may},
     {"WRITE",     "IOLIST=",      is_action_read, is_approximation_must},
+
+    /* C IO intrinsics */
+
+    {"printf",     "FMT=",        is_action_read, is_approximation_must},
+
     {0,           0,              0}
 };
 
@@ -295,6 +300,302 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {EOLE_SUM_OPERATOR_NAME,     no_write_effects },
     {EOLE_PROD_OPERATOR_NAME,    no_write_effects },
     {EOLE_FMA_OPERATOR_NAME,     no_write_effects },
+
+    // Here are C intrinsics 
+    
+    // ISO 6.5.2.3 structure and union members 
+    {".",                    no_write_effects},
+    {"->",                    no_write_effects},
+    // ISO 6.5.2.4 postfix increment and decrement operators, real or pointer type operand
+    {"post++",                    no_write_effects},
+    {"post--",                    no_write_effects},
+    // ISO 6.5.3.1 prefix increment and decrement operators, real or pointer type operand
+    {"++pre",                    no_write_effects},
+    {"--pre",                    no_write_effects},
+    // ISO 6.5.3.2 address and indirection operators, add pointer type
+    {"&",                    no_write_effects},
+    {"*indirection",                    no_write_effects},
+    // ISO 6.5.3.3 unary arithmetic operators
+    {"+unary",                    no_write_effects},
+    {"-unary",                    no_write_effects},
+    {"~",                    no_write_effects},
+    {"!",                    no_write_effects},
+    // ISO 6.5.5 multiplicative operators : ALREADY EXIST (FORTRAN)
+    //   {"*",                    no_write_effects},
+    //   {"/",                    no_write_effects},
+    {"%",                    no_write_effects},
+    // ISO 6.5.6 additive operators, arithmetic types or pointer + integer type
+    {"+C",                    no_write_effects},
+    {"-C",                    no_write_effects},
+    // ISO 6.5.7 bitwise shift operators
+    {"<<",                    no_write_effects},
+    {">>",                    no_write_effects},
+    // ISO 6.5.8 relational operators,arithmetic or pointer types 
+    {"<",                    no_write_effects},
+    {">",                    no_write_effects},
+    {"<=",                    no_write_effects},
+    {">=",                    no_write_effects},
+    // ISO 6.5.9 equality operators, return 0 or 1
+    {"==",                    no_write_effects},
+    {"!=",                    no_write_effects},
+    // ISO 6.5.10 bitwise AND operator 
+    {"&bitand",                    no_write_effects},
+    // ISO 6.5.11 bitwise exclusive OR operator 
+    {"^",                    no_write_effects},
+    // ISO 6.5.12 bitwise inclusive OR operator 
+    {"|",                    no_write_effects},
+    // ISO 6.5.13 logical AND operator 
+    {"&&",                    no_write_effects},
+    // ISO 6.5.14 logical OR operator 
+    {"||",                    no_write_effects},
+    // ISO 6.5.16.1 simple assignment : ALREADY EXIST (FORTRAN)
+    //   {"=",                    no_write_effects}, 
+    // ISO 6.5.16.2 compound assignments
+    {"*=",                    no_write_effects},
+    {"/=",                    no_write_effects},
+    {"%=",                    no_write_effects},
+    {"+=",                    no_write_effects},
+    {"-=",                    no_write_effects},
+    {"<<=",                   no_write_effects},
+    {">>=",                   no_write_effects},
+    {"&=",                    no_write_effects},
+    {"^=",                    no_write_effects},
+    {"|=",                    no_write_effects},
+    // ISO 6.5.17 comma operator
+    {",",                    no_write_effects}, 
+
+    // null statement
+    {";",                    no_write_effects},
+    {"break",                    no_write_effects},
+    {"case",                    no_write_effects},  
+    {"default",                    no_write_effects},
+    {"return",                    no_write_effects},
+
+    // #include <assert.h>
+    //    {"__assert",                    no_write_effects},
+
+    // #include <complex.h>
+
+    // #include <ctype.h>
+  /*   {"isalnum",                    no_write_effects}, 
+    {"isalpha",                    no_write_effects}, 
+    {"iscntrl",                    no_write_effects}, 
+    {"isdigit",                    no_write_effects}, 
+    {"isgraph",                    no_write_effects}, 
+    {"islower",                    no_write_effects}, 
+    {"isprint",                    no_write_effects}, 
+    {"ispunct",                    no_write_effects}, 
+    {"isspace",                    no_write_effects}, 
+    {"isupper",                    no_write_effects}, 
+    {"isxdigit",                    no_write_effects}, 
+    {"tolower",                    no_write_effects}, 
+    {"toupper",                    no_write_effects}, 
+    {"isascii",                    no_write_effects}, 
+    {"toascii",                    no_write_effects}, 
+    {"_tolower",                    no_write_effects}, 
+    {"_toupper",                    no_write_effects}, */
+  
+    // #include <errno.h>
+    //    {"errno",                    no_write_effects}, 
+
+    // #include <fenv.h>
+
+    // #include <float.h>
+    //   {"__flt_rounds",                    no_write_effects}, 
+
+    // #include <inttypes.h>
+
+    // #include <iso646.h>
+
+  /*   {"_sysconf",                    no_write_effects}, 
+    {"setlocale",                    no_write_effects},
+    {"localeconv",                    no_write_effects},
+    {"dcgettext",                    no_write_effects},
+    {"dgettext",                    no_write_effects},
+    {"gettext",                    no_write_effects},
+    {"textdomain",                    no_write_effects},
+    {"bindtextdomain",                    no_write_effects},
+    {"wdinit",                    no_write_effects}, 
+    {"wdchkind",                    no_write_effects}, 
+    {"wdbindf",                    no_write_effects}, 
+    {"wddelim",                    no_write_effects}, 
+    {"mcfiller",                    no_write_effects},
+    {"mcwrap",                    no_write_effects},*/
+
+    // #include <limits.h>
+
+    // #include <locale.h>
+
+    // #include <math.h>
+  /*    {"acos",                    no_write_effects},  
+    {"asin",                    no_write_effects}, 
+    {"atan",                    no_write_effects}, 
+    {"atan2",                    no_write_effects},   
+    {"cos",                    no_write_effects}, 
+    {"sin",                    no_write_effects}, 
+    {"tan",                    no_write_effects}, 
+    {"cosh",                    no_write_effects}, 
+    {"sinh",                    no_write_effects}, 
+    {"tanh",                    no_write_effects}, 
+    {"exp",                    no_write_effects}, 
+    {"frexp",                    no_write_effects},  
+    {"ldexp",                    no_write_effects},  
+    {"log",                    no_write_effects}, 
+    {"log10",                    no_write_effects}, 
+    {"modf",                    no_write_effects},   
+    {"pow",                    no_write_effects},   
+    {"sqrt",                    no_write_effects},  
+    {"ceil",                    no_write_effects},  
+    {"fabs",                    no_write_effects},  
+    {"floor",                    no_write_effects},  
+    {"fmod",                    no_write_effects},  
+    {"erf",                    no_write_effects}, 
+    {"erfc",                    no_write_effects}, 
+    {"gamma",                    no_write_effects}, 
+    {"hypot",                    no_write_effects}, 
+    {"isnan",                    no_write_effects},  
+    {"j0",                    no_write_effects}, 
+    {"j1",                    no_write_effects}, 
+    {"jn",                    no_write_effects}, 
+    {"lgamma",                    no_write_effects}, 
+    {"y0",                    no_write_effects}, 
+    {"y1",                    no_write_effects}, 
+    {"yn",                    no_write_effects}, 
+    {"acosh",                    no_write_effects}, 
+    {"asinh",                    no_write_effects}, 
+    {"atanh",                    no_write_effects}, 
+    {"cbrt",                    no_write_effects}, 
+    {"logb",                    no_write_effects}, 
+    {"nextafter",                    no_write_effects},   
+    {"remainder",                    no_write_effects},   
+    {"scalb",                    no_write_effects},   
+    {"expm1",                    no_write_effects}, 
+    {"ilogb",                    no_write_effects}, 
+    {"log1p",                    no_write_effects}, 
+    {"rint",                    no_write_effects}, 
+    {"matherr",                    no_write_effects},  
+    {"significand",                    no_write_effects}, 
+    {"copysign",                    no_write_effects},   
+    {"scalbn",                    no_write_effects}, 
+    {"modff",                    no_write_effects},  
+    {"sigfpe",                    no_write_effects},  
+    {"single_to_decimal",                    no_write_effects}, 
+    {"double_to_decimal",                    no_write_effects}, 
+    {"extended_to_decimal",                    no_write_effects},
+    {"quadruple_to_decimal",                    no_write_effects},
+    {"decimal_to_single",                    no_write_effects},
+    {"decimal_to_double",                    no_write_effects},
+    {"decimal_to_extended",                    no_write_effects},
+    {"decimal_to_quadruple",                    no_write_effects},
+    {"string_to_decimal",                    no_write_effects},
+    {"func_to_decimal",                    no_write_effects},
+    {"file_to_decimal",                    no_write_effects},
+    {"seconvert",                    no_write_effects},  
+    {"sfconvert",                    no_write_effects},  
+    {"sgconvert",                    no_write_effects},  
+    {"econvert",                    no_write_effects},  
+    {"fconvert",                    no_write_effects},  
+    {"gconvert",                    no_write_effects},  
+    {"qeconvert",                    no_write_effects},  
+    {"qfconvert",                    no_write_effects},  
+    {"qgconvert",                    no_write_effects},  
+    {"ecvt",                    no_write_effects},  
+    {"fcvt",                    no_write_effects},  
+    {"gcvt",                    no_write_effects},  
+    {"atof",                    no_write_effects},  
+    {"strtod",                    no_write_effects},  */
+
+    //#include <setjmp.h>
+
+  /*   {"setjmp",                    no_write_effects},
+    {"__setjmp",                    no_write_effects},
+    {"longjmp",                    no_write_effects},
+    {"__longjmp",                    no_write_effects},
+    {"sigsetjmp",                    no_write_effects},
+    {"siglongjmp",                    no_write_effects},*/
+
+    //#include <signal.h>
+    //#include <stdarg.h>
+    //#include <stdbool.h>
+    //#include <stddef.h>
+    //#include <stdint.h>
+    //#include <stdio.h>
+
+  /*    {"remove",                    no_write_effects},
+    {"rename",                    no_write_effects},
+    {"tmpfile",                    no_write_effects},
+    {"tmpnam",                    no_write_effects}, 
+    {"fclose",                    no_write_effects},
+    {"fflush",                    no_write_effects},
+    {"fopen",                    no_write_effects}, 
+    {"freopen",                    no_write_effects}, 
+    {"setbuf",                    no_write_effects},
+    {"setvbuf",                    no_write_effects},
+    {"fprintf",                    no_write_effects},
+    {"fscanf",                    no_write_effects},*/
+    {"printf",                    io_effects},
+  /*   {"scanf",                    no_write_effects},
+    {"sprintf",                    no_write_effects},
+    {"sscanf",                    no_write_effects},
+    {"vfprintf",                    no_write_effects},
+    {"vprintf",                    no_write_effects},
+    {"vsprintf",                    no_write_effects},
+    {"fgetc",                    no_write_effects},
+    {"fgets",                    no_write_effects}, 
+    {"fputc",                    no_write_effects},
+    {"fputs",                    no_write_effects},
+    {"getc",                    no_write_effects},
+    {"putc",                    no_write_effects},
+    {"getchar",                    no_write_effects},
+    {"putchar",                    no_write_effects},
+    {"gets",                    no_write_effects}, 
+    {"puts",                    no_write_effects},
+    {"ungetc",                    no_write_effects},
+    {"fread",                    no_write_effects}, 
+    {"fwrite",                    no_write_effects},
+    {"fgetpos",                    no_write_effects},
+    {"fseek",                    no_write_effects},
+    {"fsetpos",                    no_write_effects},
+    {"ftell",                    no_write_effects}, 
+    {"rewind",                    no_write_effects},
+    {"clearerr",                    no_write_effects},
+    {"feof",                    no_write_effects},
+    {"ferror",                    no_write_effects},
+    {"perror",                    no_write_effects},
+    {"__filbuf",                    no_write_effects},
+    {"__flsbuf",                    no_write_effects},
+    {"setbuffer",                    no_write_effects},
+    {"setlinebuf",                    no_write_effects},
+    {"snprintf",                    no_write_effects},
+    {"vsnprintf",                    no_write_effects},
+    {"fdopen",                    no_write_effects}, 
+    {"ctermid",                    no_write_effects}, 
+    {"fileno",                    no_write_effects},
+    {"popen",                    no_write_effects}, 
+    {"cuserid",                    no_write_effects}, 
+    {"tempnam",                    no_write_effects}, 
+    {"getopt",                    no_write_effects},
+    {"getsubopt",                    no_write_effects},
+    {"getw",                    no_write_effects},
+    {"putw",                    no_write_effects},
+    {"pclose",                    no_write_effects},
+    {"fseeko",                    no_write_effects},
+    {"ftello",                    no_write_effects},
+    {"fopen64",                    no_write_effects}, 
+    {"freopen64",                    no_write_effects},
+    {"tmpfile64",                    no_write_effects},
+    {"fgetpos64",                    no_write_effects},
+    {"fsetpos64",                    no_write_effects},
+    {"fseeko64",                    no_write_effects},
+    {"ftello64",                    no_write_effects},*/ 
+
+
+    //#include <stdlib.h>
+    //#include <string.h>
+    //#include <tgmath.h>
+    //#include <time.h>
+    //#include <wchar.h>
+    //#include <wctype.h>
 
     {NULL, 0}
 };
