@@ -113,12 +113,19 @@ static bool tp_set_current_module(string name)
   bool ok = lazy_open_module(name);
   if (!ok) 
   {
+    /* This is courageous, but makes debugging harder... */
     try_to_parse_everything_just_in_case();
     ok = lazy_open_module(name);
     if (!ok)
     {
-      safe_make(DBR_CODE, name);
-      ok = lazy_open_module(name);
+      /* Neglect the return code because lazy_open_module() should fail if
+         safe_make fails(). This is a stupid short cut... */
+      ok = safe_make(DBR_CODE, name);
+      if (ok) 
+      {
+	ok = lazy_open_module(name);
+	pips_assert("should be able to open module if code just made...", ok);
+      }
     }
   }
   return ok;
