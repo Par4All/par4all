@@ -15,7 +15,6 @@
 ;; To store the module name in a buffer:
 (make-variable-buffer-local 'epips-local-module-name)
 
-
 ;;; The faces used to display various informations. Use the
 ;;; hilit-lookup-face-create function from hilit19.el:
 ;; To have hilit-lookup-face-create at least:
@@ -328,7 +327,7 @@ If no buffer can be found, just return nil."
 (defun epips-daVinci-sentinel (process event)
   "Handler for daVinci process state change"
   (epips-debug (format "Process %s had event '%s'." process event))
-  ;; Just consider the daVinci process is no longet usable
+  (epips-debug "Just consider the daVinci process is no longet usable...")
   (setq epips-daVinci-process nil)
   )
 
@@ -396,9 +395,13 @@ If no buffer can be found, just return nil."
 
 (defun epips-send-command-to-daVinci (some-text)
   "Send a daVinci command"
-  (process-send-string epips-daVinci-process
-		       ;; Commands end with a '\n':
-		       (format "%s\n" some-text))
+  (let (
+	;; Commands end with a '\n':
+	(the-command (format "%s\n" some-text))
+	)
+    (epips-debug (format "epips-send-command-to-daVinci: %s" the-command))
+    (process-send-string epips-daVinci-process the-command)
+    )
   )
 
 
@@ -424,6 +427,7 @@ If no buffer can be found, just return nil."
 (defun epips-daVinci-view (epips-command-name epips-command-content)
   "Ask daVinci for displaying a graph in the current daVinci context"
   ;; Load the "-daVinci" file instead of the "-graph" one:
+  (epips-debug (format "epips-daVinci-view: %s" epips-command-content))
   (string-match "-graph$" epips-command-content)
   (let (
 	(graph-file-name (replace-match "-daVinci" t t epips-command-content))
@@ -1186,6 +1190,45 @@ such as the preconditions, the regions, etc."
 
 
 
+(defun epips-build-menu-from-layout (layout keymap menu-name menu-vector)
+  (setq keymap (make-sparse-keymap menu-name))
+  (let (
+	(length-of-list (length layout))
+	(i 0)
+	)
+    (while (< i length-of-list)
+      (define-key keymap (make-vector 1 (make-symbol (concat menu-name
+							     "-"
+							     i)))
+	'epips-deal-with-menu)
+      (setq i (1+ i))
+      )
+    )
+  (define-key epips-keymap [menu-bar epips-menu view]
+    (cons menu-name keymap))
+  )
+
+(defun epips-build-menu ()
+  "Add the automatically generated menus"
+  ;; Load the menu layout:
+  (load-file (or (getenv "EPIPS_VIEW_MENU_LAYOUT")
+		 (concat (getenv "PIPS_ROOT")
+			 "/Share/epips_view_menu_layout.el")
+		 )
+	     )
+  (epips-build-menu-from-layout epips-view-menu-layout
+				'epips-view-keymap
+				"epips view"
+				[epips-view-menu-name])
+
+  (load-file (or (getenv "EPIPS_TRANSFORM_MENU_LAYOUT")
+		 (concat (getenv "PIPS_ROOT")
+			 "/Share/epips_transform_menu_layout.el")
+		 )
+	     )
+)
+
+
 ;;; The property stuff:
 
 
@@ -1500,6 +1543,9 @@ Killing the Pips-Log buffer kills also the WPips process.
 It is useful to interrupt a core dump of 250 MBytes when it happens
 for example... :-)
 
+You can choose the wpips executable by setting the EPIPS_WPIPS 
+variable to its path.
+
 By the way, EPips assumes the use of hilit19...
 
 Special commands: 
@@ -1524,11 +1570,17 @@ Special commands:
 					; Create the display buffers:
   (epips-create-the-buffers)
 
+  (epips-build-menu)
+
   (let
       (
        (process-connection-type nil)	; Use a pipe to communicate
        )
-    (setq epips-process (start-process "WPips" "Pips-Log" "wpips" "-emacs"))
+    (setq epips-process (start-process "WPips"
+				       "Pips-Log"
+				       (or (getenv "EPIPS_WPIPS")
+					   "wpips")
+				       "-emacs"))
     ;;(setq epips-process (start-process "WPips" "Pips-Log" "/projects/Pips/Development/Libs/effects/wpips" "-emacs"))
 					;(goto-char (process-mark epips-process))
     (message "WPips process launched...")
