@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.21  1998/11/25 16:32:10  coelho
+ * dump expressions in davinci format.
+ *
  * Revision 1.20  1998/11/25 14:52:19  coelho
  * test/R10K...
  *
@@ -114,6 +117,35 @@ typedef struct
 /* current strategy.
  */
 static poptimization_strategy strategy = NULL;
+
+/************************************************************** EOLE PROCESS */
+
+/* file name prefixes to deal with eole.
+ * /tmp should be fast (may be mapped into memory).
+ */
+#define OUT_FILE_NAME 	"/tmp/pips_to_eole"
+#define IN_FILE_NAME	"/tmp/eole_to_pips"
+
+/* property names.
+ */
+#define EOLE		"EOLE"		/* eole binary */
+#define EOLE_FLAGS	"EOLE_FLAGS"	/* default options */
+#define EOLE_OPTIONS	"EOLE_OPTIONS"	/* additionnal options */
+
+/* returns the eole command to be executed in an allocated string.
+ */
+static string 
+get_eole_command
+  (string in, /* input file from eole. */
+   string out /* output file to eole. */)
+{
+  return strdup(concatenate(get_string_property(EOLE), " ", 
+			    get_string_property(EOLE_FLAGS), " ", 
+			    get_string_property(EOLE_OPTIONS), 
+			    " -S ", strategy->eole_strategy,
+			    " -o ", in, " ", out, NULL));
+}
+
 
 /********************************************************* INTERFACE TO EOLE */
 
@@ -317,32 +349,63 @@ swap_syntax_in_expression(  list /* of expression */ lcode,
     }
 }
 
-/************************************************************** EOLE PROCESS */
-
-/* file name prefixes to deal with eole.
- * /tmp should be fast (may be mapped into memory).
+/* apply eole on all expressions in s.
  */
-#define OUT_FILE_NAME 	"/tmp/pips_to_eole"
-#define IN_FILE_NAME	"/tmp/eole_to_pips"
-
-/* property names.
- */
-#define EOLE		"EOLE"		/* eole binary */
-#define EOLE_FLAGS	"EOLE_FLAGS"	/* default options */
-#define EOLE_OPTIONS	"EOLE_OPTIONS"	/* additionnal options */
-
-/* returns the eole command to be executed in an allocated string.
- */
-static string 
-get_eole_command
-  (string in, /* input file from eole. */
-   string out /* output file to eole. */)
+static void apply_eole_on_statement(string module_name, statement s)
 {
-  return strdup(concatenate(get_string_property(EOLE), " ", 
-			    get_string_property(EOLE_FLAGS), " ", 
-			    get_string_property(EOLE_OPTIONS), 
-			    " -S ", strategy->eole_strategy,
-			    " -o ", in, " ", out, NULL));
+  list /* of expression */ le, ln;
+
+  ln = NIL;
+  le = get_list_of_rhs(s);
+  
+  if (gen_length(le)) /* not empty list */
+  {
+    string in, out, cmd;
+
+    /* create temporary files */
+    in = safe_new_tmp_file(IN_FILE_NAME);
+    out = safe_new_tmp_file(OUT_FILE_NAME);
+    
+    /* write informations in out file for EOLE */
+    write_to_eole(module_name, le, out);
+    
+    /* run eole (Evaluation Optimization for Loops and Expressions) 
+     * as a separate process.
+     */
+    cmd = get_eole_command(in, out);
+    
+    pips_debug(2, "executing: %s\n", cmd);
+    
+    safe_system(cmd);
+    
+    /* read optimized expressions from eole */
+    ln = read_from_eole(module_name, in);
+    
+    /* replace the syntax values inside le by the syntax values from ln */
+    swap_syntax_in_expression(le, ln);
+    
+    /* must now free the useless expressions */
+    
+    
+    /* remove temorary files and free allocated memory.
+     */
+    safe_unlink(out);
+    safe_unlink(in);
+    
+    /* free strings */
+    free(out), out = NULL;
+    free(in), in = NULL;
+    free(cmd), cmd = NULL;
+  }
+  else 
+    pips_debug(3, "no expression for module %s\n", module_name);
+  
+
+  pips_debug(3,"EOLE transformations ... Done for module %s\n", module_name);
+
+  /* free lists */
+  gen_free_list(ln);
+  gen_free_list(le);
 }
 
 
@@ -749,6 +812,18 @@ static void reset_current_optimization_strategy(void)
 }
 
 
+/************************************************** DAVINCI DUMP EXPRESSIONS */
+
+static void davinci_dump_expressions(string phase, statement s)
+{
+  string filename = 
+    strdup(concatenate("optimize_expressions_", phase, ".daVinci", NULL));
+  FILE * out = safe_fopen(filename, "w");
+  davinci_dump_all_expressions(out, s);
+  safe_fclose(out, filename);
+  free(filename), filename = NULL;
+}
+
 /*************************************************** INTERFACE FROM PIPSMAKE */
 
 /* pipsmake interface.
@@ -768,81 +843,22 @@ bool optimize_expressions(string module_name)
 
     s = get_current_module_statement();
 
+    /* check consistency before optimizations */
+    pips_assert("consistency checking before optimizations",
+		statement_consistent_p(s));
+
+    ifdebug(1) davinci_dump_expressions("initial", s);
+
     /* do something here.
      */
 
     /* Could perform more optimizations here...
      */
 
-    /* check consistency before optimizations */
-    pips_assert("consistency checking before optimizations",
-		statement_consistent_p(s));
-
-    /* begin EOLE stuff
+    /* EOLE Stuff
      */
     if (strategy->apply_eole)
-    {
-      list /* of expression */ le, ln;
-      ln = NIL;
-      le = get_list_of_rhs(s);
-
-      if (gen_length(le)) /* not empty list */
-      {
-	string in, out, cmd;
-	
-	/* create temporary files */
-	in = safe_new_tmp_file(IN_FILE_NAME);
-	out = safe_new_tmp_file(OUT_FILE_NAME);
-	
-	/* write informations in out file for EOLE */
-	write_to_eole(module_name, le, out);
-	
-	/* run eole (Evaluation Optimization for Loops and Expressions) 
-	 * as a separate process.
-	 */
-	cmd = get_eole_command(in, out);
-	
-	pips_debug(2, "executing: %s\n", cmd);
-	
-	safe_system(cmd);
-	
-	/* read optimized expressions from eole */
-	ln = read_from_eole(module_name, in);
-	
-	/* replace the syntax values inside le by the syntax values from ln */
-	swap_syntax_in_expression(le, ln);
-	
-	/* must now free the useless expressions */
-	
-	
-	/* remove temorary files and free allocated memory.
-	 */
-	safe_unlink(out);
-	safe_unlink(in);
-	
-	/* free strings */
-	free(out), out = NULL;
-	free(in), in = NULL;
-	free(cmd), cmd = NULL;
-	
-      }
-      else 
-	pips_debug(3, "no expression for module %s\n", module_name);
-
-      /* free lists */
-      gen_free_list(ln);
-      gen_free_list(le);
-    }
-
-    pips_debug(3,"EOLE transformations ... Done for module %s\n", module_name);
-
-    /* end EOLE stuff.
-     */
-
-    /* check consistency after optimizations */
-    pips_assert("consistency checking after optimizations",
-		statement_consistent_p(s));
-    
+      apply_eole_on_statement(module_name, s);
 
     /* Could perform more optimizations here...
      */
@@ -852,10 +868,16 @@ bool optimize_expressions(string module_name)
       switch_nary_to_binary(s);
 
     if (strategy->apply_simplify)
-    optimize_simplify_patterns(s);
+      optimize_simplify_patterns(s);
 
     /* others?
      */
+          
+    /* check consistency after optimizations */
+    pips_assert("consistency checking after optimizations",
+		statement_consistent_p(s));
+
+    ifdebug(1) davinci_dump_expressions("final", s);
 
     /* return result to pipsdbm
      */
