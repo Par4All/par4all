@@ -2,6 +2,9 @@
   $Id$
   
   $Log: WorkspaceManager.java,v $
+  Revision 1.5  1998/10/17 12:20:43  coelho
+  borders++.
+
   Revision 1.4  1998/10/16 17:45:28  coelho
   ok.
 
@@ -82,7 +85,7 @@ public class WorkspaceManager implements JPipsComponent
   public void buildPanel()
     {
       panel = new PPanel(new BorderLayout());
-      panel.setBorder(new TitledBorder("Current workspace"));
+      panel.setBorder(Pawt.createTitledBorder("Current workspace"));
       tf = new PTextField();
       tf.setPreferredSize(new Dimension(200,20));
       tf.setEnabled(false);
@@ -172,62 +175,62 @@ public class WorkspaceManager implements JPipsComponent
     * Creates a workspace in tpips.
     */
   public void create()
-    {
-      dialog = new PDialog(frame, "New Workspace",true);
-      dialog.getContentPane().setLayout(new GridBagLayout());
-      GridBagConstraints c = new GridBagConstraints();
-      PButton b;
-      PPanel p;
-      ActionListener a;
+  {
+    dialog = new PDialog(frame, "New Workspace",true);
+    dialog.getContentPane().setLayout(new GridBagLayout());
+    GridBagConstraints c = new GridBagConstraints();
+    PButton b;
+    PPanel p;
+    ActionListener a;
+    
+    //name
+    p = new PPanel(new BorderLayout());
+    p.setBorder(Pawt.createTitledBorder("Name"));
+    editText = new PTextField();
+    editText.setPreferredSize(new Dimension(150,20));
+    p.add(editText, BorderLayout.WEST);
+    add((Container)dialog.getContentPane(),p,0,0,1,1,1,1,0.0,0.0,5,
+	GridBagConstraints.NONE,GridBagConstraints.WEST,c);
       
-      //name
-      p = new PPanel(new BorderLayout());
-      p.setBorder(new TitledBorder("Name"));
-      editText = new PTextField();
-      editText.setPreferredSize(new Dimension(150,20));
-      p.add(editText, BorderLayout.WEST);
-      add((Container)dialog.getContentPane(),p,0,0,1,1,1,1,0.0,0.0,5,
-          GridBagConstraints.NONE,GridBagConstraints.WEST,c);
-      
-      //list
-      p = new PPanel(new GridBagLayout());
-      p.setBorder(new TitledBorder("Attached files"));
-      GridBagConstraints cc = new GridBagConstraints();
-      files = new DefaultListModel();
-      filesList = new PList(files);
-      filesList.setSelectionMode
-	(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-      PScrollPanel s = new PScrollPanel((Component) filesList);
-      s.setPreferredSize(new Dimension(400,100));
-
-      filesList.addMouseListener(new MouseAdapter() {
-	public void mouseClicked(MouseEvent e) {
-	  if (e.getClickCount() == 2) {
-	    DefaultListModel dlm = (DefaultListModel) filesList.getModel();
-	    dlm.removeElement(filesList.getSelectedValue());
-	  }
+    //list
+    p = new PPanel(new GridBagLayout());
+    p.setBorder(Pawt.createTitledBorder("Attached files"));
+    GridBagConstraints cc = new GridBagConstraints();
+    files = new DefaultListModel();
+    filesList = new PList(files);
+    filesList.setSelectionMode
+      (ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    PScrollPanel s = new PScrollPanel((Component) filesList);
+    s.setPreferredSize(new Dimension(400,100));
+    
+    filesList.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+	if (e.getClickCount() == 2) {
+	  DefaultListModel dlm = (DefaultListModel) filesList.getModel();
+	  dlm.removeElement(filesList.getSelectedValue());
 	}
-      });
-
-      add((Container)p,s,0,0,2,1,1,1,1.0,1.0,0,
-          GridBagConstraints.BOTH,GridBagConstraints.WEST,cc);
-      
-      //add & remove
-      PPanel p2 = new PPanel(new GridLayout(1,0));
-      b = new PButton("Add...");
-      b.addActionListener(new ActionListener() {
-	public void actionPerformed(ActionEvent e)
+      }
+    });
+    
+    add((Container)p,s,0,0,2,1,1,1,1.0,1.0,0,
+	GridBagConstraints.BOTH,GridBagConstraints.WEST,cc);
+    
+    //add & remove
+    PPanel p2 = new PPanel(new GridLayout(1,0));
+    b = new PButton("Add...");
+    b.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e)
 	{
 	  File dir = new File(directoryManager.getDirectory());
 	  //if (dir==null) throw new Error("null directory");
-	  JFileChooser chooser = new JFileChooser(dir);
-
+	  JFileChooser chooser = Pawt.createFileChooser(dir);
+	  
 	  /*ExtensionFileFilter filter = new ExtensionFileFilter(); 
 	  filter.addExtension("f"); 
 	  filter.addExtension("F"); 
 	  filter.setDescription("Fortran"); 
 	  chooser.setFileFilter(filter); */
-
+	  
 	  if(chooser.showDialog(frame, "Add") == JFileChooser.APPROVE_OPTION)
 	  {
 	    System.err.println("Adding...");
@@ -246,89 +249,88 @@ public class WorkspaceManager implements JPipsComponent
 	    dialog.pack();
 	  }
 	}
-      });
-      p2.add(b);
-
-      b = new PButton("Remove");
-      b.addActionListener(new ActionListener() {
-	public void actionPerformed(ActionEvent e) {
-	  //DefaultListModel dlm = (DefaultListModel) filesList.getModel();
-	  if (files.size() > 0)
-	  {
-	    Object o[] = filesList.getSelectedValues();
-	    for(int i=0; i<o.length; i++) 
-	      files.removeElement(o[i]);
-	  }
-	  dialog.pack();
-	}
-      });
-
-      p2.add(b);
-      add(p,p2,0,1,2,1,1,1,1.0,1.0,5,
-          GridBagConstraints.BOTH,GridBagConstraints.WEST,c);
-      add((Container)dialog.getContentPane(),p,0,1,2,1,1,1,1.0,1.0,5,
-          GridBagConstraints.BOTH,GridBagConstraints.WEST,c);
-
-      //ok & cancel
-      p = new PPanel(new GridLayout(1,0));
-      b = new PButton("Ok");
-      a = new ActionListener() {
-	public void actionPerformed(ActionEvent e)
+    });
+    p2.add(b);
+    
+    b = new PButton("Remove");
+    b.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	//DefaultListModel dlm = (DefaultListModel) filesList.getModel();
+	if (files.size() > 0)
 	{
-	  //DefaultListModel dlm = (DefaultListModel) filesList.getModel();	      
-	  if(!editText.getText().equals(""))
+	  Object o[] = filesList.getSelectedValues();
+	  for(int i=0; i<o.length; i++) 
+	    files.removeElement(o[i]);
+	}
+	dialog.pack();
+      }
+    });
+    
+    p2.add(b);
+    add(p,p2,0,1,2,1,1,1,1.0,1.0,5,
+	GridBagConstraints.BOTH,GridBagConstraints.WEST,c);
+    add((Container)dialog.getContentPane(),p,0,1,2,1,1,1,1.0,1.0,5,
+	GridBagConstraints.BOTH,GridBagConstraints.WEST,c);
+    
+    //ok & cancel
+    p = new PPanel(new GridLayout(1,0));
+    b = new PButton("Ok");
+    a = new ActionListener() {
+      public void actionPerformed(ActionEvent e)
+      {
+	//DefaultListModel dlm = (DefaultListModel) filesList.getModel();	      
+	if(!editText.getText().equals(""))
+	{
+	  if(files.size() != 0)
 	  {
-	    if(files.size() != 0)
-	    {
-	      File f = new File(directoryManager.getDirectory()
-				+ "/" + editText.getText());
-	      File truefile
-	      = new File(f.getAbsolutePath()+".database");
-	      if(!truefile.exists())
-	      {		  
-		dialog.setVisible(false);
-		createWorkspace(f,filesList);
-		frame.pack();
-	      }
-	      else
-	      {
-		JOptionPane.showMessageDialog
-		(frame, "File " + editText.getText() + " exists!", "Error",
-		 JOptionPane.ERROR_MESSAGE);
-	      }
+	    File f = new File(directoryManager.getDirectory()
+			      + "/" + editText.getText());
+	    File truefile
+	    = new File(f.getAbsolutePath()+".database");
+	    if(!truefile.exists())
+	    {		  
+	      dialog.setVisible(false);
+	      createWorkspace(f,filesList);
+	      frame.pack();
 	    }
 	    else
 	    {
 	      JOptionPane.showMessageDialog
-	      (frame,"Add Fortan files!","Error",JOptionPane.ERROR_MESSAGE);
+	      (frame, "File " + editText.getText() + " exists!", "Error",
+	       JOptionPane.ERROR_MESSAGE);
 	    }
 	  }
 	  else
 	  {
 	    JOptionPane.showMessageDialog
-	    (frame, "Enter a name!","Error",JOptionPane.ERROR_MESSAGE);
+	    (frame,"Add Fortan files!","Error",JOptionPane.ERROR_MESSAGE);
 	  }
 	}
-      };
-      b.addActionListener(a);
-      p.add(b);
-      b = new PButton("Cancel");
-      a = new ActionListener() {
-	public void actionPerformed(ActionEvent e)
+	else
 	{
-	  dialog.setVisible(false); 
-	  frame.pack();
+	  JOptionPane.showMessageDialog
+	  (frame, "Enter a name!","Error",JOptionPane.ERROR_MESSAGE);
 	}
-      };
-      b.addActionListener(a);
-      p.add(b);
-      add((Container)dialog.getContentPane(),p,0,2,1,1,1,1,1.0,0.0,5,
-          GridBagConstraints.HORIZONTAL,GridBagConstraints.WEST,c);
-      
-      dialog.pack();
-      dialog.setLocationRelativeTo(frame);
-      dialog.setVisible(true);
-    }
+      }
+    };
+    b.addActionListener(a);
+    p.add(b);
+    b = new PButton("Cancel");
+    a = new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+	dialog.setVisible(false); 
+	frame.pack();
+      }
+    };
+    b.addActionListener(a);
+    p.add(b);
+    add((Container)dialog.getContentPane(),p,0,2,1,1,1,1,1.0,0.0,5,
+	GridBagConstraints.HORIZONTAL,GridBagConstraints.WEST,c);
+    
+    dialog.pack();
+    dialog.setLocationRelativeTo(frame);
+    dialog.setVisible(true);
+  }
   
   /** Add the specified file to the filesList, if *.[fF] and not there.
       @param f the file to be added.
@@ -388,7 +390,7 @@ public class WorkspaceManager implements JPipsComponent
     */
   public void choose()
   {
-    JFileChooser chooser = new JFileChooser
+    JFileChooser chooser = Pawt.createFileChooser
       (new File(directoryManager.getDirectory()));
 
     /*String st[] = new String[1]; st[0] = "database";
