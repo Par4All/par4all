@@ -29,7 +29,9 @@
  * NLCs and is integer linear, is not decomposed by the atomizer, ie. it is
  * considered as a constant.
  */
+#include <sdtlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 
 #include "genC.h"
