@@ -2159,11 +2159,8 @@ empty_convex_context_p(transformer context)
     return sc_empty_p(sc_context);
 }
 
-string 
-region_to_string(effect reg)
+string region_to_string(effect reg)
 {
     return strdup("[region_to_string] not more implemented\n");
 }
-
-
 
