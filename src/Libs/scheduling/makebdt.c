@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 #include "genC.h"
-#include "list.h"
 #include "ri.h"
 #include "constants.h"
 #include "ri-util.h"
@@ -21,6 +20,7 @@
 #include "sc.h"
 #include "polyedre.h"
 #include "union.h"
+#include "matrice.h"
 #include "matrix.h"
 #include "sparse_sc.h"
 
@@ -43,7 +43,6 @@
 #include "graph.h"
 #include "paf_ri.h"
 #include "paf-util.h"
-#include "mapping.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "array_dfg.h"
@@ -119,7 +118,7 @@ entity create_var_name(Type, source, dest, count)
 {
  char    *name;
 
- name = malloc(30);
+ name = (char*) malloc(30);
  sprintf(name, "%s_%d_%d_%d", Type, source, dest, count);
 
  return (create_named_entity(name));
@@ -366,7 +365,7 @@ list make_x_list(c)
  list     laux = NIL;
  int      i;
 
- name = malloc(10);
+ name = (char*) malloc(10);
 
  for (i = 0; i <= c; i++)
     {
@@ -478,7 +477,7 @@ list make_list_of_n(n, c)
  char    *name;
  int     i;
 
- name = malloc(10);
+ name = (char*) malloc(10);
 
  for (i = 1; i <= c; i++)
     {
@@ -802,7 +801,7 @@ Psysteme erase_trivial_ineg(p)
      for (cont = p->inegalites ; cont != NULL ; cont = cont->succ)
         {
          vect = cont->vecteur;
-         if ((vect != NULL)&&(vect->val <= 0)&&(vect->succ == NULL))
+         if ((vect != NULL)&&value_negz_p(vect->val)&&(vect->succ == NULL))
 	    {
              vect_rm(cont->vecteur);
 	     cont->vecteur = NULL;
@@ -848,7 +847,7 @@ Ppolynome include_trans_in_poly(s, p, l, d)
     lindice = static_control_to_indices(stct);
 
     lvar = NIL;
-    name = malloc(100);
+    name = (char*) malloc(100);
 
     /* replace all variables by a local one */
     for (lind = lindice; lind != NIL; lind = CDR(lind))
@@ -917,7 +916,7 @@ Psysteme transform_in_ineq(sc, l)
      if (base_contains_variable_p((Pbase)v, var))
 	{
          val = vect_coeff(var, v);
-         if (val <= 0)  vect_chg_sgn(c->vecteur);
+         if (value_negz_p(val))  vect_chg_sgn(c->vecteur);
          vect_erase_var(&c->vecteur, var);
         }
      c = c->succ;
@@ -952,7 +951,7 @@ int get_m_coef(e, de)
  expression    *e;
  int           *de;
 {
- int           d, mc = 0;
+    int d, mc = 0;
  Pvecteur      vect;
  expression    exp, e_aux = *e;
  entity        ent;
@@ -970,7 +969,7 @@ int get_m_coef(e, de)
             {
              ent = (entity)vect->var;
              if (!strncmp(entity_local_name(ent), "My_Own_Private_M", 16))
-                 mc = vect->val;
+                 mc = VALUE_TO_INT(vect->val);
             }
          vect = vect->succ;
         }
@@ -988,11 +987,11 @@ int get_m_coef(e, de)
             {
              ent = (entity)vect->var;
              if (!strncmp(entity_local_name(ent), "My_Own_Private_M", 16))
-                 mc = vect->val;
+                 mc = VALUE_TO_INT(vect->val);
             }
          vect = vect->succ;
         }
-     mc = mc/d;
+     mc/=d;
     }
 
  unnormalize_expression(e_aux);
@@ -1262,7 +1261,7 @@ Ppolynome make_polynome_Xe(xc, xe)
  entity     e;
  char       *n;
 
- n = malloc(10);
+ n = (char*) malloc(10);
  sprintf(n, "X%d", xc);
  e = create_named_entity(n);
  p = make_polynome((float)1, (Variable)e, 1);
@@ -1345,7 +1344,7 @@ Psysteme make_causal_internal(stat_dest, sys_dest, poly_dest, ldata,\
 
  p_source = include_trans_in_poly(stat_pred, p_source, ltrans, &d);
 
- ppc = ppcm(den, d);
+ ppc = sol_ppcm(den, d);
 
  if (get_debug_level() > 5)
     {
@@ -1483,7 +1482,7 @@ Psysteme make_causal_external(stat_dest, sys_dest, poly_dest, ldata,\
 
  p_source = include_trans_in_poly(stat_pred, p_source, ltrans, &d);
 
- ppc = ppcm(den, d);
+ ppc = sol_ppcm(den, d);
 
  if (get_debug_level() > 5)
     {
@@ -1586,7 +1585,8 @@ Psysteme make_causal_external(stat_dest, sys_dest, poly_dest, ldata,\
 
 list make_sched_proto(h, lin, col, lu)
 
- int        *h, lin, col;
+ matrice h;
+ int lin, col;
  list       lu;
 {
  list       p, lvp = NIL;
@@ -1597,7 +1597,8 @@ list make_sched_proto(h, lin, col, lu)
 
  while (p != NIL)
     {
-     ADD_ELEMENT_TO_LIST(lvp, INT, (Value)ACCESS(h,lin,i,1));
+	Value v = ACCESS(h,lin,i,1);
+	ADD_ELEMENT_TO_LIST(lvp, INT, VALUE_TO_INT(v));
      i++;
      p = CDR(p);
     }
@@ -1726,7 +1727,8 @@ static Psysteme make_primal(psys, lvar_u, lvp, lxe)
  Psysteme     psys;
  list         *lvar_u, *lvp, lxe;
 {
- int          lin, col, *G, *tG, *h, *f;
+ int          lin, col;
+ matrice G, tG, h, f;
  Pbase        base;
  Pcontrainte  cont;
 
@@ -2004,7 +2006,7 @@ Psysteme simplify_predicate(ps, ps_eq, l)
 {
  Pcontrainte  cti, cte = ps_eq->egalites;
  list         lv;
- int          coi, coe, ppc;
+ Value          coi, coe, ppc;
  Pvecteur     vi, ve;
  entity       ent;
 
@@ -2020,10 +2022,11 @@ Psysteme simplify_predicate(ps, ps_eq, l)
 	     coe = vect_coeff((Variable) ent, cte->vecteur);
              coi = vect_coeff((Variable) ent, cti->vecteur);
 	     ve = vect_dup(cte->vecteur);
-             ppc = abs(ppcm(coe, coi));
-             vi = vect_multiply(vi, abs(ppc/coi));
-             ve = vect_multiply(ve, abs(ppc/coe));
-             if ((coe*coi) >= 0) vi = vect_substract(vi,ve); 
+             ppc = value_abs(ppcm(coe, coi));
+             vi = vect_multiply(vi, value_abs(value_div(ppc,coi)));
+             ve = vect_multiply(ve, value_abs(value_div(ppc,coe)));
+             if (value_posz_p(value_mult(coe,coi)))
+		 vi = vect_substract(vi,ve); 
              else vi = vect_add(vi, ve);
 	     cti->vecteur = vi;
 	    }
@@ -2051,7 +2054,8 @@ list simplify_dimension(ld, ps_eq, l)
 {
  Pcontrainte  cte = ps_eq->egalites;
  list         lv, ln = NIL, ldi;
- int          coi, coe, ppc, d;
+ Value        coi, coe, ppc;
+ int d;
  Pvecteur     vi, ve;
  expression   exp, ex;
  entity       ent;
@@ -2101,9 +2105,10 @@ list simplify_dimension(ld, ps_eq, l)
              coi = vect_coeff((Variable) ent, vi);
              ve = vect_dup(cte->vecteur);
              ppc = ppcm(coe, coi);
-             vi = vect_multiply(vi, abs(ppc/coi));
-             ve = vect_multiply(ve, abs(ppc/coe));
-             if ((coe*coi) >= 0) vi = vect_substract(vi,ve);
+             vi = vect_multiply(vi, value_abs(value_div(ppc,coi)));
+             ve = vect_multiply(ve, value_abs(value_div(ppc,coe)));
+             if (value_posz_p(value_mult(coe,coi)))
+		 vi = vect_substract(vi,ve);
              else vi = vect_add(vi, ve);
             }
          /* try next variable */
@@ -2318,7 +2323,7 @@ static Pn_coef extract_stat_lunk(stat, lunk)
  int      len;
  entity   ent;
 
- name = malloc(20);
+ name = (char*) malloc(20);
  sprintf(name, "%s_%d", "MU", stat);
  len = strlen(name);
  lv_coef = NULL;
@@ -2408,7 +2413,7 @@ boolean is_mu_stat_in_sc(stat, sc)
  list      lbase;
  boolean   is_here = FALSE;
 
- name = malloc(20);
+ name = (char*) malloc(20);
  sprintf(name, "%s_%d", "MU", stat);
  len = strlen(name);
 
