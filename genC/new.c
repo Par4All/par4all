@@ -12,10 +12,7 @@
 
 	(C) Copyright Ecole des Mines de Paris, 1989
 
-*/
-
-/* $RCSfile: new.c,v $ (version $Revision$)
- * $Date: 1997/04/24 19:29:03 $, 
+	$Id$
  */
 
 #include <stdio.h>
