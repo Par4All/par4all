@@ -24,6 +24,8 @@
 #include "malloc.h"
 #include "newgen_include.h"
 
+#define YYERROR_VERBOSE 1 /* better error messages by bison */
+
 #define YYMAXDEPTH 300
 
 struct gen_binding Domains[ MAX_DOMAIN ] ;
