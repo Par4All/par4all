@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.227 2002/06/14 17:29:05 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.228 2002/06/17 13:47:18 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -477,9 +477,66 @@ words_reference(reference obj)
   return(pc);
 }
 
+/* Management of alternate returns */
+
+static list set_of_labels_required_for_alternate_returns = list_undefined;
+
+void set_alternate_return_set()
+{
+  ifdebug(1) {
+  pips_assert("The target list is undefined",
+	      list_undefined_p(set_of_labels_required_for_alternate_returns));
+  }
+  set_of_labels_required_for_alternate_returns = NIL;
+}
+
+void reset_alternate_return_set()
+{
+  ifdebug(1) {
+  pips_assert("The target list is initialized",
+	      !list_undefined_p(set_of_labels_required_for_alternate_returns));
+  }
+  gen_free_list(set_of_labels_required_for_alternate_returns);
+  set_of_labels_required_for_alternate_returns = list_undefined;
+}
+
+void add_target_to_alternate_return_set(entity l)
+{
+  ifdebug(1) {
+  pips_assert("The target list is initialized",
+	      !list_undefined_p(set_of_labels_required_for_alternate_returns));
+  }
+  set_of_labels_required_for_alternate_returns =
+    gen_once(l, set_of_labels_required_for_alternate_returns);
+}
+
+text generate_alternate_return_targets()
+{
+  text ral = text_undefined;
+
+  if(!ENDP(set_of_labels_required_for_alternate_returns)) {
+    list sl = NIL;
+    MAP(ENTITY, le, {
+      sentence s1 = sentence_undefined;
+      unformatted u1 =
+	make_unformatted
+	(strdup(label_local_name(le)),
+	 STATEMENT_NUMBER_UNDEFINED, 0, 
+	 CONS(STRING, strdup("CONTINUE"), NIL));
+
+      s1 = make_sentence(is_sentence_unformatted, u1);
+      sl = gen_nconc(sl, CONS(SENTENCE, s1, NIL));
+    }, set_of_labels_required_for_alternate_returns);
+    ral = make_text(sl);
+  }
+  else {
+    ral = make_text(NIL);
+  }
+  return ral;
+}
+
 /* words_regular_calls used for user subroutine and user function and
    intrinsics called like user function such as MOD(). */
-static list label_strings_required_for_alternate_returns = list_undefined;
 
 static list 
 words_regular_call(call obj, bool is_a_subroutine)
@@ -521,13 +578,6 @@ words_regular_call(call obj, bool is_a_subroutine)
      formal_label_replacement_p() because the called modules may not have
      been parsed yet. */
 
-  /* This is not always true, for instance when you are called for
-     intrinsics that are called like Fortran functions */
-  /*
-    pips_assert("No alternate returns have been considered yet",
-    label_strings_required_for_alternate_returns == NIL);
-  */
-
   if( !ENDP( call_arguments(obj))) {
     list pa = list_undefined;
     pc = CHAIN_SWORD(pc, "(");
@@ -536,20 +586,12 @@ words_regular_call(call obj, bool is_a_subroutine)
       expression eap = EXPRESSION(CAR(pa));
       if(get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
 	 && expression_call_p(eap) && actual_label_replacement_p(eap)) {
+	/* Alternate return actual argument have been replaced by
+           character strings by the parser. */
 	entity cf = call_function(syntax_call(expression_syntax(eap)));
 	string ls = entity_local_name(cf);
 	string ls1 = malloc(strlen(ls));
 	/* pips_assert("ls has at least four characters", strlen(ls)>=4); */
-
-	/*
-	pips_assert("Alternate return list is defined",
-		    label_strings_required_for_alternate_returns != list_undefined);
-	*/
-	if(label_strings_required_for_alternate_returns == list_undefined) {
-	  pips_debug(1, "Function name: %s\n", entity_name(f));
-	  pips_assert("Alternate return list is defined",
-		      label_strings_required_for_alternate_returns != list_undefined);
-	}
 
 	/* Get rid of initial and final quotes */
 	ls1 = strncpy(ls1, ls+1, strlen(ls)-2);
@@ -566,12 +608,15 @@ words_regular_call(call obj, bool is_a_subroutine)
 	    pc = CHAIN_SWORD(pc, ls1);
 	  }
 	  else {
-	    entity nl = make_new_label(get_current_module_name());
-	    pc = CHAIN_SWORD(pc, "*");
-	    pc = CHAIN_SWORD(pc, strdup(label_local_name(nl)));
-	    label_strings_required_for_alternate_returns = 
-	      gen_nconc(label_strings_required_for_alternate_returns,
-			CONS(STRING, label_local_name(nl), NIL));
+	    entity els1 = find_label_entity(get_current_module_name(), ls1+1);
+
+	    /* The assertion may be wrong if this piece of code is used to
+               print intermediate statements */
+	    pips_assert("Label els1 has been defined although it is not used anymore",
+			!entity_undefined_p(els1));
+
+	    pc = CHAIN_SWORD(pc, ls1);
+	    add_target_to_alternate_return_set(els1);
 	  }
 	}
       }
@@ -728,7 +773,7 @@ words_io_control(list *iol, int precedence, bool leftmost)
 
 	c = syntax_call(s);
 
-	if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
+	if (strcmp(entity_local_name(call_function(c)), IO_LIST_STRING_NAME) == 0) {
 	    *iol = CDR(pio);
 	    return(pc);
 	}
@@ -867,7 +912,7 @@ words_io_inst(call obj,
 	    unit_arg = arg;
 	    pio_write = CDR(CDR(pio_write));
 	}
-	else if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
+	else if (strcmp(entity_local_name(call_function(c)), IO_LIST_STRING_NAME) == 0) {
 	    iolist_reached = TRUE;
 	    pio_write = CDR(pio_write);
 	}
@@ -2237,29 +2282,12 @@ text_instruction(
     else {
       list sl = NIL;
 
-      label_strings_required_for_alternate_returns = NIL;
-
       u = make_unformatted(strdup(label), n, margin, 
 			   words_call(instruction_call(obj), 
 				      0, TRUE, TRUE));
 
       s = make_sentence(is_sentence_unformatted, u);
       sl = CONS(SENTENCE, s, sl);
-
-      /* Add continue to satisfy alternate returns if necessary */
-      MAP(STRING, ls, {
-	sentence s1 = sentence_undefined;
-	unformatted u1 =
-	  make_unformatted
-	  (strdup(ls),
-	   n, margin, 
-	   CONS(STRING, strdup("CONTINUE"), NIL));
-
-	s1 = make_sentence(is_sentence_unformatted, u1);
-	sl = gen_nconc(sl, CONS(SENTENCE, s1, NIL));
-      }, label_strings_required_for_alternate_returns);
-      gen_free_list(label_strings_required_for_alternate_returns);
-      label_strings_required_for_alternate_returns = list_undefined;
       r = make_text(sl);
     }
   }
@@ -2462,60 +2490,68 @@ text_named_module(
     entity module,
     statement stat)
 {
-    text r = make_text(NIL);
-    code c = entity_code(module);
-    string s = code_decls_text(c);
+  text r = make_text(NIL);
+  code c = entity_code(module);
+  string s = code_decls_text(c);
+  text ral = text_undefined;
 
-    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+  debug_on("PRETTYPRINT_DEBUG_LEVEL");
 
-    /* This guard is correct but could be removed if find_last_statement()
-     * were robust and/or if the internal representations were always "correct".
-     * See also the guard for reset_last_statement()
-     */
-    if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
-	set_last_statement(stat);
+  /* This guard is correct but could be removed if find_last_statement()
+   * were robust and/or if the internal representations were always "correct".
+   * See also the guard for reset_last_statement()
+   */
+  if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
+    set_last_statement(stat);
 
-    precedence_p = !get_bool_property("PRETTYPRINT_ALL_PARENTHESES");
+  precedence_p = !get_bool_property("PRETTYPRINT_ALL_PARENTHESES");
 
-    if ( strcmp(s,"") == 0 
-	|| get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") )
+  if ( strcmp(s,"") == 0 
+       || get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") )
     {
-	if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
-	    /* Add the original header comments if any: */
-	    ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
+      if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
+	/* Add the original header comments if any: */
+	ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
 	
-	ADD_SENTENCE_TO_TEXT(r, 
-	   attach_head_to_sentence(sentence_head(name), module));
+      ADD_SENTENCE_TO_TEXT(r, 
+			   attach_head_to_sentence(sentence_head(name), module));
 	
-	if (head_hook) 
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-						  head_hook(module)));
+      if (head_hook) 
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+					      head_hook(module)));
 	
-	if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
-	    /* Add the original header comments if any: */
-	    ADD_SENTENCE_TO_TEXT(r, get_declaration_comments(module));
+      if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
+	/* Add the original header comments if any: */
+	ADD_SENTENCE_TO_TEXT(r, get_declaration_comments(module));
 	
-	MERGE_TEXTS(r, text_declaration(module));
+      MERGE_TEXTS(r, text_declaration(module));
+      MERGE_TEXTS(r, text_initializations(module));
     }
-    else 
+  else 
     {
-        ADD_SENTENCE_TO_TEXT(r, 
-            attach_head_to_sentence(make_sentence(is_sentence_formatted, 
-						  strdup(s)),
-						  module));
+      ADD_SENTENCE_TO_TEXT(r, 
+			   attach_head_to_sentence(make_sentence(is_sentence_formatted, 
+								 strdup(s)),
+						   module));
     }
 
-    if (stat != statement_undefined) {
-        MERGE_TEXTS(r, text_statement(module, 0, stat));
-    }
+  set_alternate_return_set();
+
+  if (stat != statement_undefined) {
+    MERGE_TEXTS(r, text_statement(module, 0, stat));
+  }
     
-    ADD_SENTENCE_TO_TEXT(r, sentence_tail());
+  ral = generate_alternate_return_targets();
+  reset_alternate_return_set();
+  MERGE_TEXTS(r, ral);
 
-    if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
-	reset_last_statement();
+  ADD_SENTENCE_TO_TEXT(r, sentence_tail());
 
-    debug_off();
-    return(r);
+  if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
+    reset_last_statement();
+
+  debug_off();
+  return(r);
 }
 
 text
