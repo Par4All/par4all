@@ -137,6 +137,8 @@ text (*effects_to_text_func)(list);
 void (*attach_effects_decoration_to_text_func)(text);
 
 
+/* RESET all generic methods... should be called when pips is started...
+ */
 
 #define UNDEF abort
 
@@ -146,8 +148,6 @@ typedef list (*list_function)();
 typedef bool (*bool_function)();
 typedef descriptor (*descriptor_function)();
 
-/* reset all generic methods...
- */
 void 
 generic_effects_reset_all_methods()
 {
@@ -211,8 +211,14 @@ generic_effects_reset_all_methods()
 
     set_descriptor_range_p(FALSE);
 
+    /* PRETTYPRINT related functions and settings
+     */
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
+
+    effects_prettyprint_func = (void_function) UNDEF;
+    effects_to_text_func = (chunks_function) UNDEF;
+    attach_effects_decoration_to_text_func = (void_function) UNDEF;
 
     reset_generic_prettyprints();
 }
