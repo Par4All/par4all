@@ -2,7 +2,6 @@
   *
   */
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 
 #include "genC.h"
@@ -18,7 +17,6 @@ extern int fprintf();
 
 static bool module_coherent_p=TRUE;
 static entity checked_module = entity_undefined;
-
 
 bool variable_in_module_p2(v,m)
 entity v;
