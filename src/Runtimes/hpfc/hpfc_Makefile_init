@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/09/13 16:22:34 $, )
+# ($Date: 1996/10/17 14:27:35 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -39,7 +39,7 @@ include $(RT_DIR)/$(RT_ARCH)/compilers.make
 # USE_PVMe
 # USE_GNU
 
-ifdef USE_PVMe
+ifdef HPFC_USE_PVMe_
 all:	$(TARGET).cmd
 PVM=pvme
 endif
@@ -96,7 +96,7 @@ PVM_FLIB 	+= -lfpvm3
 PVM_GLIB 	+= -lgpvm3
 PVM_HLIB 	+= -lpvm3
 
-ifdef USE_PVMe
+ifdef _HPFC_USE_PVMe_
 pvmlib		= $(PVM_ROOT)/lib
 pvminc		= $(PVM_ROOT)/lib
 LIBS_DIR	+= -L/usr/lpp/ssp/css/libus
@@ -113,11 +113,17 @@ ifdef NETWORK
 PVM_NLIB 	+= -lpvm3
 endif
 
-ifdef MIMD
+ifeq ($(PVM_ARCH),CRAY)
+#
+# the CRAY T3D does not require any library
+#
+PVM_NLIB =
+PVM_FLIB =
+PVM_HLIB =
+PVM_NLIB =
 endif
 
 RUNTIME_LIBS	+= -lhpfcruntime
-
 
 COMMON_LIBS	+= $(RUNTIME_LIBS) $(PVM_FLIB) $(PVM_GLIB) 
 
