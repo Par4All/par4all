@@ -135,7 +135,8 @@ while (<>)
 	if (! $nlincs) {
 	    failed("includes not found for $incs", '');
 	} else {
-	    $fortran[$nlincs] .= "      INCLUDE \"$incs\"\n";
+	    # insert include in fortran code.
+	    splice @fortran, $nlincs, 0, "      INCLUDE \"$incs\"\n";
 	    $seen{"$module:$incs"} = 1;
 	}
     }
