@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/04/12 15:49:31 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/04/14 15:55:17 $, )
  * version $Revision$
  */
  
@@ -260,6 +260,11 @@ string name;
     (void) make_empty_program(HPFC_PACKAGE);
     make_update_common_map(); /* ?????? */
 
+    /*  to be put in the compiler status.
+     */
+    init_dynamic_hpf();
+    init_primary_entity();
+
     init_hpfc_status();
     save_hpfc_status();
 
@@ -318,7 +323,7 @@ void hpfc_directives(name)
 string name;
 {
     entity module = local_name_to_top_level_entity(name);
-    statement s = (statement) db_get_resource(DBR_CODE, name, FALSE);
+    statement s = (statement) db_get_resource(DBR_CODE, name, TRUE);
 
     debug_on("HPFC_DEBUG_LEVEL");
     debug(1, "hpfc_directives", "considering module %s\n", name);
@@ -330,14 +335,14 @@ string name;
     {
 	set_current_module_entity(module);
 	load_hpfc_status();
-	/* make_update_common_map(); */
+	/* make_update_common_map(); ??? */
 	
-	NormalizeCommonVariables(module, s); /* hmmm... */
+	NormalizeCommonVariables(module, s); /* ??? hmmm... */
 	build_full_ctrl_graph(s);
 	handle_hpf_directives(s);
 
 	clean_ctrl_graph();
-	/* free_update_common_map(); */
+	/* free_update_common_map(); ??? */
 	reset_current_module_entity();
 
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(name), s);
@@ -417,6 +422,11 @@ string name;
     gen_map(compile_common, get_the_commons());
 
     put_generated_resources_for_program(name);      /* global informations */
+
+    /*  to be put in the compiler status.
+     */
+    close_dynamic_hpf();
+    close_primary_entity();
 
     close_hpfc_status();
     db_unput_resources(DBR_HPFC_STATUS);            /* destroy hpfc status */
