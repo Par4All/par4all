@@ -2,6 +2,14 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.82  1997/12/12 12:28:09  coelho
+ * shell substitutions performed thru sh.
+ *  - so it's both simpler and more powerfull now.
+ * more help on -h.
+ * default automatic completion with file names.
+ * complementary options -s and -c added.
+ * default -s assumed for user "coelho".
+ *
  * Revision 1.81  1997/12/11 16:10:45  coelho
  * help about default rule.
  *
@@ -55,6 +63,7 @@
 /********************************************************** Static variables */
 
 bool tpips_execution_mode = TRUE;
+bool tpips_behaves_like_a_shell = FALSE;
 
 static bool use_readline = FALSE;
 static FILE * logfile;
@@ -63,36 +72,34 @@ static FILE * current_file; /* current file being processed */
 extern int tgetnum();
 extern void tp_restart( FILE * ); /* tp_lex.c */
 
-#define tpips_usage \
-  "Usage: %s [-n] [-h/?] [-v] [-l logfile] [-e tpips-cmds] tpips-scripts\n"
-
-#define before_initial_prompt \
-  "tpips (ARCH=" SOFT_ARCH ")\n\n" \
-  "  (c) 1988-1997 Centre de Recherche en Informatique,\n" \
-  "                École des mines de Paris, France.\n\n" \
-  "  URL: http://www.cri.ensmp.fr/pips\n" \
-  "  MAIL: pipsgroup@cri.ensmp.fr\n\n" \
-  "  This software is provided as is, under the terms of the GPL.\n" \
-  "  It includes software from GNU and Berkeley.\n\n"
-
 /*************************************************************** Some Macros */
+
+#define tpips_usage							\
+  "Usage: %s [-nscvh?] [-l logfile] [-e tpips-cmds] tpips-scripts\n"	\
+  "\t-n: no execution mode. just to check a script for syntax errors\n"	\
+  "\t-s: behaves like a shell. tpips commands simply extend a shell.\n"	\
+  "\t-c: behaves like a command, not a shell (it is the default).\n"	\
+  "\t-h: this help. (also -?)\n"					\
+  "\t-v: display version and architecture informations.\n"		\
+  "\t-l logfile: log to logfile\n"					\
+  "\t-e tpips-cmds: here tpips commands.\n"
+
+#define before_initial_prompt						\
+  "tpips (ARCH=" SOFT_ARCH ")\n\n"					\
+  "  (c) 1988-1997 Centre de Recherche en Informatique,\n"		\
+  "                École des mines de Paris, France.\n\n"		\
+  "  URL: http://www.cri.ensmp.fr/pips\n"				\
+  "  MAIL: pipsgroup@cri.ensmp.fr\n\n"					\
+  "  This software is provided as is, under the terms of the GPL.\n"	\
+  "  It includes software from GNU (readline, rx) and Berkeley (fsplit) .\n\n"
 
 #define SEPARATOR_P(c) (index (" \t", c))
 #define PREFIX_EQUAL_P(str, prf) (strncmp(str, prf, strlen(prf))==0)
 
 
-/********************************** Some static functions forward definition */
-static char **fun_completion();
-static char *fun_generator(char*,int);
-static char *param_generator(char*, int);
-static void initialize_readline();
-static char * tpips_read_a_line(char *);
-
-/***************************************************** Some static variables */
+/********************************************************** TPIPS COMPLETION */
 
 static char ** current_completion_array;
-
-/****************************************** Parameter Completion definitions */
 
 enum COMPLETION_TYPES {
     COMP_NONE,
@@ -135,7 +142,7 @@ static struct t_completion_scheme completion_scheme[] =
 { SET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { GET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { "info",       COMP_NONE,   	 COMP_NONE },
-{ (char*)NULL,  COMP_NONE,       COMP_NONE }
+{ (char*)NULL,  COMP_FILENAME,   COMP_FILENAME } /* default: files... */
 };
 
 static char *tp_help_topics[] = 
@@ -145,6 +152,234 @@ static char *tp_help_topics[] =
     CHANGE_DIR,QUIT,"source", HELP,"rule","resource","owner", "remove",
     "checkpoint", (char*)NULL
 };
+
+/* Generator function for command completion.  STATE lets us know whether
+ * to start from scratch; without any state (i.e. STATE == 0), then we
+ * start at the top of the list. 
+ */
+static char *
+fun_generator(char *texte, int state)
+{
+    static int list_index, len;
+    char *name;
+     
+    /* If this is a new word to complete, initialize now.  This includes
+       saving the length of TEXT for efficiency, and initializing the index
+       variable to 0. */
+    if (!state)
+    {
+	list_index = 0;
+	len = strlen (texte);
+    }
+     
+    /* Return the next name which partially matches from the command list. */
+    while ((name = completion_scheme[list_index].fun_name))
+    {
+	list_index++;
+     
+	if (strncmp (name, texte, len) == 0)
+	    return (strdup(name));
+    }
+     
+    /* If no names matched, then return NULL. */
+    return ((char *)NULL);
+}
+
+/* Generator function for param. completion.  STATE lets us know whether
+ * to start from scratch; without any state (i.e. STATE == 0), then we
+ * start at the top of the list. 
+ */
+static char *
+param_generator(char *texte, int state)
+{
+    static int list_index, len;
+    char *name;
+     
+    /* If this is a new word to complete, initialize now.  This includes
+       saving the length of TEXT for efficiency, and initializing the index
+       variable to 0. */
+    if (!state)
+    {
+	char **matches;
+	int number_of_sep = 0;
+	int current_pos = 0;
+	struct t_completion_scheme * cs = completion_scheme;
+	int completion_type;
+ 	matches = (char **)NULL;
+
+	pips_debug (9, "completing parameters\n\n");
+
+	/*We should count the number of separator before the actual pos*/
+	while (rl_line_buffer[current_pos])
+	{
+	    if (SEPARATOR_P(rl_line_buffer[current_pos]))
+	    {
+		number_of_sep ++;
+		current_pos++;
+		while ((rl_line_buffer[current_pos]) &&
+		       (SEPARATOR_P(rl_line_buffer[current_pos])))
+		    current_pos++;
+	    }
+	    else
+		current_pos++;
+	}
+	pips_debug (9, "%d separator have been found on line\n\n",
+		    number_of_sep);
+
+	/* We scan the array of function to find
+	   the used function */
+	while ((cs->fun_name) &&
+	       !PREFIX_EQUAL_P(rl_line_buffer, cs->fun_name))
+	{
+	    cs++;
+	    
+	    pips_debug (9, "text is '%s', function found is '%s'\n\n",
+			rl_line_buffer,
+			cs->fun_name!=NULL? cs->fun_name : "<none>");
+	}
+
+	/* Now we can determine the completion type */
+	if (number_of_sep == 1)
+	    completion_type = cs->first_completion_type;
+	else
+	    completion_type = cs->other_completion_type;
+
+	pips_debug (9, "completion type %d has been selected\n\n",
+		    completion_type);
+
+	switch (completion_type)
+	{
+	case COMP_NONE:
+	    current_completion_array = NULL;
+	    break;
+	case COMP_FILENAME:
+#define RESERVED_FOR_FILENAME (char**)"should not appear"
+	    current_completion_array = RESERVED_FOR_FILENAME;
+	    break;
+	case COMP_RULE:
+	    current_completion_array = tp_phase_names;
+	    break;
+	case COMP_RESOURCE:
+	    current_completion_array = tp_resource_names;
+	    break;
+	case COMP_PROPERTY:
+	    current_completion_array = tp_property_names;
+	    break;
+	case COMP_HELP_TOPIC:
+	    current_completion_array = tp_help_topics;
+	    break;
+	case COMP_FILE_RSC:
+	    current_completion_array = tp_file_rsc_names;
+	    break;
+	default:
+	    current_completion_array = NULL;
+	}
+	list_index = 0;
+	len = strlen (texte);
+    }
+
+    if (current_completion_array == NULL)
+	return NULL;
+    else if (current_completion_array == RESERVED_FOR_FILENAME)
+	return filename_completion_function(texte,state);
+    
+    /* Return the next name which partially matches from the command list. */
+    while ((name = current_completion_array[list_index]))
+    {
+	list_index++;
+     
+	if (strncmp (name, texte, len) == 0)
+	    return (strdup(name));
+    }
+     
+    /* If no names matched, then return NULL. */
+    return NULL;
+}
+
+/* Attempt to complete on the contents of TEXT.  START and END show the
+ * region of TEXT that contains the word to complete.  We can use the
+ * entire line in case we want to do some simple parsing.  Return the
+ * array of matches, or NULL if there aren't any. 
+ */
+static char **
+fun_completion(char *texte, int start, int end)
+{
+
+    char **matches;
+     
+    matches = (char **)NULL;
+     
+    /* If this word is at the start of the line, then it is a command
+       to complete.  Otherwise it is the name of a file in the current
+       directory. */
+    if (start == 0)
+    {
+	pips_debug (9, "completing function (START = %d, END= %d)\n\n",
+		    start, end);
+	matches = completion_matches (texte , fun_generator);
+    }
+    return (matches);
+}
+
+/* Tell the GNU Readline library how to complete.  We want to try to complete
+ * on command names if this is the first word in the line, or on filenames
+ * if not. 
+ */
+static void 
+initialize_readline(void)
+{
+    /* Allow conditional parsing of the ~/.inputrc file. */
+    rl_readline_name = "Tpips";
+
+    /* allow "." to separate words */
+    rl_basic_word_break_characters = " \t\n\"\\@$><=;|&{(";
+
+    /* Tell the completer that we want a crack first. */
+    rl_attempted_completion_function = (CPPFunction *) fun_completion;
+
+    /* function for completing parameters */
+    rl_completion_entry_function = (Function *) param_generator;
+}
+
+
+/*************************************************** FILE OR TTY INTERACTION */
+
+/* returns the next line from the input, interactive tty or file...
+ * the final \n does not appear.
+ */
+static char * get_next_line(char * prompt)
+{
+    return use_readline? readline(prompt): safe_readline(current_file);
+}
+
+/* returns an allocated line read, including continuations.
+ * may return NULL at end of file.
+ */
+static char * tpips_read_a_line(char * main_prompt)
+{
+    char *line;
+    int l;
+
+    line = get_next_line(main_prompt);
+    
+    /* handle backslash-style continuations
+     */
+    while (line && (l=strlen(line), l>1 && line[l-1]==TPIPS_CONTINUATION_CHAR))
+    {
+	char *tmp, *next = get_next_line(TPIPS_SECONDARY_PROMPT);
+	line[l-1] = '\0';
+	tmp = strdup(concatenate(line, next, NULL));
+	free(line); if (next) free(next);
+	line = tmp;
+    }
+
+    if (logfile && line)
+	fprintf(logfile,"%s\n",line);
+
+    pips_debug(3, "line is --%s--\n", line);
+
+    return line;
+}
 
 /************************************************* TPIPS HANDLERS FOR PIPS */
 static void 
@@ -217,45 +452,32 @@ tpips_user_error(string calling_function_name,
       longjmp(*ljbp, 2);
 }
 
-/*  returns the full tpips history file name, i.e.
+/*  returns the allocated full tpips history file name, i.e.
  *  - $TPIPS_HISTORY (if any)
  *  - $HOME/"TPIPS_HISTORY"
  */
 static string 
 default_hist_file_name(void)
 {
-    string home, hist = getenv(TPIPS_HISTENV), tmp;
-
-    if (hist) return hist;
-
-    /* else builds the default name. memory leak.
+    string home, hist = getenv(TPIPS_HISTENV);
+    if (hist) return strdup(hist);
+    /* else builds the default name. 
      */
     home = getenv("HOME");
-    tmp = (char*) malloc(sizeof(char)*(strlen(home)+strlen(TPIPS_HISTORY)+2));
-    if (!tmp) pips_exit(1, "memory exhausted\n");
-    (void) sprintf(tmp, "%s/%s", home, TPIPS_HISTORY);
-
-    return tmp;
+    return strdup(concatenate(home? home: "", "/", TPIPS_HISTORY, 0));
 }
 
-static string 
+static void
 initialize_tpips_history(void)
 {
-    HIST_ENTRY * last_entry;
-    char *file_name = default_hist_file_name();
+    string file_name = default_hist_file_name();
     
-    /*  initialize history: 
-     *  read the history file, then point to the last entry.
+    /* read the history file, then point to the last entry.
      */
     using_history();
     read_history(file_name);
+    free(file_name);
     history_set_pos(history_length);
-    last_entry = previous_history();
-
-    /* last points to the last history line of any.
-     * used to avoid to put twice the same line.
-     */
-    return last_entry ? last_entry->line : NULL ;
 }
 
 /* Handlers
@@ -369,8 +591,7 @@ tpips_help(string line)
 	    big_size++;
 	    /* get the number of colunms for 80 chars */
 	    columns = tgetnum ("co");
-	    debug (1,"help_handler","number of columns is %d\n",
-		   columns);
+	    pips_debug (1, "number of columns is %d\n", columns);
 	    columns = (columns > 0) ? columns /big_size : 1;
 	    count = 1;
 	    printf("\tList of available rules\n");
@@ -404,8 +625,7 @@ tpips_help(string line)
 	    /* get the number of colunms for 80 chars */
 	    columns = tgetnum ("co");
 	    big_size++;
-	    debug (1,"help_handler","number of columns is %d\n",
-		   columns);
+	    pips_debug (1, "number of columns is %d\n", columns);
 	    columns = (columns > 0) ? columns /big_size : 1;
 	    count = 1;
 	    printf("\tList of available resources\n");
@@ -467,134 +687,36 @@ handle(string line)
 
 /*************************************************************** DO THE JOB */
 
-/* returns the next line from the input, interactive of file...
- * the final \n does not appear.
+/* whether some substitutions are needed...
  */
-static char * get_next_line(char * prompt)
+static bool
+line_with_substitutions(string line)
 {
-    return use_readline? readline(prompt): safe_readline(current_file);
-}
-
-/* returns an allocated line read, including continuations.
- * may return NULL at end of file.
- */
-static char * tpips_read_a_line(char * main_prompt)
-{
-    char *line;
-    int l;
-
-    line = get_next_line(main_prompt);
-    
-    /* handle backslash-style continuations
-     */
-    while (line && (l=strlen(line), l>1 && line[l-1]==TPIPS_CONTINUATION_CHAR))
+    while (*line) 
     {
-	char *tmp, *next = get_next_line(TPIPS_SECONDARY_PROMPT);
-	line[l-1] = '\0';
-	tmp = strdup(concatenate(line, next, NULL));
-	free(line); if (next) free(next);
-	line = tmp;
+	if ((line[0]=='$' && line[1]=='{') || 
+	    line[0]=='`' || line[0]=='*' || line[0]=='?' || line[0]=='[')
+	    return TRUE;
+	line++;
     }
-
-    if (logfile && line)
-	fprintf(logfile,"%s\n",line);
-
-    pips_debug(3, "line is --%s--\n", line);
-
-    return line;
+    return FALSE;
 }
 
-/* simple direct dynamic buffer management. FC.
- * it can be used to accumulate chars, one by one of strings by strings.
+/* returns an allocated string after shell substitutions.
  */
-static char * sbuffer = NULL;
-static int sbufsize = 0;
-static void init_sbuffer(void)
-{ 
-    if (sbuffer) return;
-    sbufsize = 64; 
-    sbuffer = (char*) malloc(sbufsize); 
-    if (!sbuffer) pips_exit(3, "memory exhausted\n");
-}
-/* appends a char at pos
- */
-static int add_sbuffer_char(int pos, char c)
-{ 
-    if (pos>=sbufsize) { 
-	sbufsize*=2; 
-	sbuffer = realloc(sbuffer, sbufsize); 
-	if (!sbuffer) pips_exit(3, "memory exhausted\n");
-    }
-    sbuffer[pos] = c;
-    return pos+1;
-}
-/* appends a string at pos
- */
-static int add_sbuffer_string(int pos, char * word)
+static string
+tp_substitutions(string line)
 {
-    while (word && *word) {
-	pos = add_sbuffer_char(pos, *word);
-	word++;
-    }
-    return pos;
+    string substituted;
+
+    if (line_with_substitutions(line))
+	substituted = safe_system_substitute(line);
+    else
+	substituted = strdup(line);
+
+    pips_debug(2, "after substitution: %s\n", substituted);
+    return substituted;
 }
-/* looks for a {} enclosed name from env.
- * if found, returns a pointer to the name, and the line is skipped.
- * if not, returns a pointer to the initial position and NULL (for the name)
- */
-static char * skip_env_name(char * line, char** name)
-{
-    char * s = line;
-
-    if (s && *s && (s[0]!='$' || s[1]!='{')) {
-	*name = NULL;
-	return s;
-    }
-    
-    s+=2; *name=s;
-
-    while (*s && *s!='}') s++;
-
-    if (*s=='}') {
-	*s = '\0'; return s+1;
-    } else {
-	*name = NULL; return line;
-    }
-}
-/* substitute environemnt variables in line. 
- * returns a newly allocated string.
- */
-static char * substitute_variables(char * line)
-{
-    int pos=0;
-    init_sbuffer();
-    while (*line) {
-	if (*line!='$') {
-	    pos = add_sbuffer_char(pos, *line);
-	    line++;
-	} else { /* *line=='$' */
-	    char * name, * nl;
-	    nl = skip_env_name(line, &name);
-	    if (nl==line) { /* no name found */
-		pos = add_sbuffer_char(pos, *line);
-		line++;
-	    } else {
-		line=nl;
-		if (name) {
-		    pips_debug(1, "substituting $%s\n", name);
-		    pos = add_sbuffer_string(pos, getenv(name));
-		}
-	    }
-	}
-    }
-    add_sbuffer_char(pos, '\0');
-
-    pips_debug(1, "returning: %s\n", sbuffer);
-
-    return strdup(sbuffer);
-}
-
-static char * last = NULL;
 
 static bool tpips_init_done = FALSE;
 void 
@@ -646,18 +768,10 @@ tpips_exec(char * line)
 	char * sline; /* after environment variable substitution */
 	
 	push_pips_context(&pips_top_level);
-	/*   add to history if not the same as the last one.
-	 */
-	if (use_readline &&
-	    (line && *line && ((last && strcmp(last, line)!=0) || (!last))) &&
-	    (strncmp (line, QUIT, strlen(QUIT))))
-	{
-	    add_history(line);
-	    last = strdup(line);
-	}
 
-	/*   call the appropriate handler.
-	 */
+	if (use_readline && line)
+	    add_history(line);
+
 	pips_debug(2, "restarting tpips scanner\n");
 	tp_restart(tp_in);
 
@@ -672,7 +786,7 @@ tpips_exec(char * line)
 	    !blank_or_comment_line_p(line))
 	    tpips_init();
 	
-	sline = substitute_variables(line);
+	sline = tp_substitutions(line);
 	handle(sline);
 	free(sline), sline = (char*) NULL;
     }
@@ -694,16 +808,18 @@ tpips_process_a_file(FILE * file, bool use_rl)
     current_file = file;
     use_readline = use_rl;
 
-    if ((use_readline) && (readline_initialized == FALSE))
+    if (use_readline && !readline_initialized)
     {
-	initialize_readline ();
-	last = initialize_tpips_history();
+	initialize_readline();
+	initialize_tpips_history();
 	readline_initialized = TRUE;
 
 	fprintf(stdout, before_initial_prompt);
+	fflush(stdout);
     }
 
-    /* interactive loop */
+    /* interactive loop
+     */
     while ((line = tpips_read_a_line(TPIPS_PRIMARY_PROMPT)))
 	tpips_exec(line);
 
@@ -712,16 +828,31 @@ tpips_process_a_file(FILE * file, bool use_rl)
     use_readline = saved_use_rl;
 }
 
+extern char *optarg;
+extern int optind;
+
 static void 
 parse_arguments(int argc, char * argv[])
 {
     int c;
-    extern char *optarg;
-    extern int optind;
+    string user;
 
-    while ((c = getopt(argc, argv, "ne:l:h?v")) != -1) {
+    /* default for me is -s. FC.
+     * this is not done directly thru properties because 
+     * they should not be initialized to early.
+     */
+    user = getlogin();
+    tpips_behaves_like_a_shell = user && same_string_p(user, "coelho");
+
+    while ((c = getopt(argc, argv, "ne:l:h?vsc")) != -1) {
 	switch (c)
 	{
+	case 's':
+	    tpips_behaves_like_a_shell = TRUE;
+	    break;
+	case 'c':
+	    tpips_behaves_like_a_shell = FALSE;
+	    break;
 	case 'l':
 	    logfile = safe_fopen (optarg,"w");
 	    break;
@@ -832,198 +963,6 @@ tpips_main(int argc, char * argv[])
     return 0;			/* statement not reached ... */
 }
 
-
-/* Tell the GNU Readline library how to complete.  We want to try to complete
- * on command names if this is the first word in the line, or on filenames
- * if not. 
- */
-static void 
-initialize_readline(void)
-{
-    /* Allow conditional parsing of the ~/.inputrc file. */
-    rl_readline_name = "Tpips";
-
-    /* allow "." to separate words */
-    rl_basic_word_break_characters = " \t\n\"\\@$><=;|&{(";
-
-    /* Tell the completer that we want a crack first. */
-    rl_attempted_completion_function = (CPPFunction *)fun_completion;
-    /* function for completing parameters */
-    rl_completion_entry_function = (Function *)param_generator;
-}
-
-/* Attempt to complete on the contents of TEXT.  START and END show the
- * region of TEXT that contains the word to complete.  We can use the
- * entire line in case we want to do some simple parsing.  Return the
- * array of matches, or NULL if there aren't any. 
- */
-static char **
-fun_completion(char *texte, int start, int end)
-{
-
-    char **matches;
-     
-    matches = (char **)NULL;
-     
-    /* If this word is at the start of the line, then it is a command
-       to complete.  Otherwise it is the name of a file in the current
-       directory. */
-    if (start == 0)
-    {
-	debug (9,"fun_completion",
-	       "completing function (START = %d, END= %d)\n\n",
-	       start, end);
-	matches = completion_matches (texte , fun_generator);
-    }
-    return (matches);
-}
-
-/* Generator function for command completion.  STATE lets us know whether
- * to start from scratch; without any state (i.e. STATE == 0), then we
- * start at the top of the list. 
- */
-static char *
-fun_generator(char *texte, int state)
-{
-    static int list_index, len;
-    char *name;
-     
-    /* If this is a new word to complete, initialize now.  This includes
-       saving the length of TEXT for efficiency, and initializing the index
-       variable to 0. */
-    if (!state)
-    {
-	list_index = 0;
-	len = strlen (texte);
-    }
-     
-    /* Return the next name which partially matches from the command list. */
-    while ((name = completion_scheme[list_index].fun_name))
-    {
-	list_index++;
-     
-	if (strncmp (name, texte, len) == 0)
-	    return (strdup(name));
-    }
-     
-    /* If no names matched, then return NULL. */
-    return ((char *)NULL);
-}
-
-/* Generator function for param. completion.  STATE lets us know whether
- * to start from scratch; without any state (i.e. STATE == 0), then we
- * start at the top of the list. 
- */
-static char *
-param_generator(char *texte, int state)
-{
-    static int list_index, len;
-    char *name;
-     
-    /* If this is a new word to complete, initialize now.  This includes
-       saving the length of TEXT for efficiency, and initializing the index
-       variable to 0. */
-    if (!state)
-    {
-	char **matches;
-	int number_of_sep = 0;
-	int current_pos = 0;
-	struct t_completion_scheme * cs = completion_scheme;
-	int completion_type;
- 	matches = (char **)NULL;
-
-	debug (9,"param_generator",
-	       "completing parameters\n\n");
-
-	/*We should count the number of separator before the actual pos*/
-	while (rl_line_buffer[current_pos])
-	{
-	    if (SEPARATOR_P(rl_line_buffer[current_pos]))
-	    {
-		number_of_sep ++;
-		current_pos++;
-		while ((rl_line_buffer[current_pos]) &&
-		       (SEPARATOR_P(rl_line_buffer[current_pos])))
-		    current_pos++;
-	    }
-	    else
-		current_pos++;
-	}
-	debug (9,"param_generator",
-	       "%d separator have been found on line\n\n",
-	       number_of_sep);
-
-	/* We scan the array of function to find
-	   the used function */
-	while ((cs->fun_name) &&
-	       !PREFIX_EQUAL_P(rl_line_buffer, cs->fun_name))
-	{
-	    cs++;
-	    
-	    debug (9,"param_generator",
-		   "text is '%s', function found is '%s'\n\n",
-		   rl_line_buffer,
-		   cs->fun_name  != NULL? cs->fun_name : "<none>");
-	}
-
-	/* Now we can determine the completion type */
-	if (number_of_sep == 1)
-	    completion_type = cs->first_completion_type;
-	else
-	    completion_type = cs->other_completion_type;
-
-	debug (9,"param_generator",
-	       "completion type %d has been selected\n\n",
-	       completion_type);
-
-	switch (completion_type)
-	{
-	case COMP_NONE:
-	    current_completion_array = NULL;
-	    break;
-	case COMP_FILENAME:
-#define RESERVED_FOR_FILENAME (char**)"should not appear"
-	    current_completion_array = RESERVED_FOR_FILENAME;
-	    break;
-	case COMP_RULE:
-	    current_completion_array = tp_phase_names;
-	    break;
-	case COMP_RESOURCE:
-	    current_completion_array = tp_resource_names;
-	    break;
-	case COMP_PROPERTY:
-	    current_completion_array = tp_property_names;
-	    break;
-	case COMP_HELP_TOPIC:
-	    current_completion_array = tp_help_topics;
-	    break;
-	case COMP_FILE_RSC:
-	    current_completion_array = tp_file_rsc_names;
-	    break;
-	default:
-	    current_completion_array = NULL;
-	}
-	list_index = 0;
-	len = strlen (texte);
-    }
-
-    if (current_completion_array == NULL)
-	return NULL;
-    else if (current_completion_array == RESERVED_FOR_FILENAME)
-	return filename_completion_function(texte,state);
-    
-    /* Return the next name which partially matches from the command list. */
-    while ((name = current_completion_array[list_index]))
-    {
-	list_index++;
-     
-	if (strncmp (name, texte, len) == 0)
-	    return (strdup(name));
-    }
-     
-    /* If no names matched, then return NULL. */
-    return NULL;
-}
 
 /*************************************************************** IS IT A... */
 
