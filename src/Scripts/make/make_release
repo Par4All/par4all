@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/02 18:07:42 $, 
+# $Date: 1996/09/02 20:18:41 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -59,7 +59,7 @@ test -d $trgt || mkdir $trgt || error 4 "cannot mkdir $trgt"
 #
 # tmp files
 
-tmp=$trft/$script.`whoami`.$$
+tmp=$trgt/$script.`whoami`.$$
 rm -f $tmp.*
 
 $verb in `pwd`
