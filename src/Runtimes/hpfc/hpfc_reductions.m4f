@@ -2,7 +2,7 @@
 !     Reductions management 
 !
 ! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1997/03/03 14:46:56 $, )
+! ($Date: 1997/03/03 14:47:57 $, )
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -249,7 +249,7 @@ pushdef(`LEVEL',$3)dnl
 !
 ! send final result to nodes 
 !      
-      call pvmf initsend(PvmDataRaw, bufid)
+      call pvmf initsend(_HPFC_ENCODING_, bufid)
       call pvmf pack(PVMTYPE, val, size, 1, info)
       call pvmf mcast(NBOFTASKS, NODETIDS, MCASTHOST, info)
       MCASTHOST = MCASTHOST + 2
