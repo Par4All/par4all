@@ -1,0 +1,40 @@
+#
+# $RCSfile: makefile_macros.SOL2LL,v $ (version $Revision$)
+# $Date: 1996/09/19 11:31:58 $, 
+#
+# this file contains macro definitions 
+
+AR	= ar
+ARFLAGS	= rv
+CC	= cc
+CFLAGS	= -fast -xtarget=ultra/140 -xarch=v8plusa -g
+CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -D__USE_FIXED_PROTOTYPES__ -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
+LD	= $(CC) 
+LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L/$(EXTERN_ROOT)/Lib/$(ARCH)
+RANLIB	= ranlib
+LEX	= flex
+LFLAGS	= 
+FC	= f77
+FFLAGS	= -fast -u
+LINT	= lint
+LINTFLAGS= -habxu
+YACC	= bison
+YFLAGS	= -y
+PROTO	= cproto
+PRFLAGS	= -evcf2
+ETAGS	= etags
+TAR	= gtar
+ZIP	= gzip -v9
+DIFF	= gdiff
+M4	= gm4
+M4FLAGS	=
+LX2HTML	= latex2html
+L2HFLAGS= -link 8 -split 5
+LATEX	= latex
+BIBTEX	= bibtex
+MAKEIDX	= makeindex
+DVIPS	= dvips
+RMAN	= rman
+
+# end of $RCSfile: makefile_macros.SOL2LL,v $
+#
