@@ -531,8 +531,9 @@ list array_scalar_access_to_bank_communication(entity memory_module,Pbase  bank_
 	list tcode = constant_symbolic_communication(memory_module,
 						     lt,load_code,proc_id);
 	expression exp1 =make_vecteur_expression(vect_new(bank_indices->var,
-							  1));
-	expression exp2 = make_vecteur_expression(vect_new((Variable) var_id,1));
+							  VALUE_ONE));
+	expression exp2 = make_vecteur_expression(vect_new((Variable) var_id,
+							   VALUE_ONE));
 	expression test_bound = MakeBinaryCall(entity_intrinsic(EQUAL_OPERATOR_NAME),exp1,exp2);
 	statement testbody = make_block_statement(tcode);
 	test tst =  make_test(test_bound,testbody,
@@ -570,10 +571,10 @@ build_esv_list(list lt, hash_table v_to_esv, Pbase bank_indices)
     MAPL(ref, {
 	Variable var1 = (Variable) reference_variable(REFERENCE(CAR(ref)));
 	entity esv = (entity) hash_get(v_to_esv, (char *) var1); 
-	expression expr1 = make_vecteur_expression(vect_new((char *) bank_indices->succ->var,
-							    1));		    
-	expression expr2 = make_vecteur_expression(vect_new((char *) bank_indices->succ->succ->var,
-							    1));	
+	expression expr1 = make_vecteur_expression
+	    (vect_new((char *) bank_indices->succ->var, VALUE_ONE));
+	expression expr2 = make_vecteur_expression
+	    (vect_new((char *) bank_indices->succ->succ->var, VALUE_ONE));
 	list args = CONS(EXPRESSION,expr2, CONS(EXPRESSION,expr1,NIL));
 	reference ref1 =  make_reference((Variable) esv,args);
 	INSERT_AT_END(newlt,endlt,CONS(REFERENCE,ref1, NIL));
