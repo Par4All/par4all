@@ -25,7 +25,7 @@ fi
 
 >$global.$prefix
 for source in $workspace.database/*.f
-do
+do  
 	module=`basename $source .f`
 	module=`echo $module | tr a-z A-Z`
 	#echo module=$module
