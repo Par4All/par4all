@@ -9,8 +9,7 @@
   */
 
 #include <stdio.h>
-extern int fprintf();
-extern int atoi();
+#include <stdlib.h>
 #include <string.h>
 
 #include "boolean.h"
