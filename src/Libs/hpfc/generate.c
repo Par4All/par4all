@@ -1,4 +1,4 @@
-/* $RCSfile: generate.c,v $ ($Date: 1995/07/31 19:04:37 $, )
+/* $RCSfile: generate.c,v $ ($Date: 1995/09/13 14:14:16 $, )
  * version $Revision$
  * 
  * Fabien Coelho, May 1993
@@ -259,7 +259,7 @@ list *lcompp, *lnotcompp;
     reference ref = syntax_reference(s);
     entity tempn,
  	var = reference_variable(ref),
-	temp = NewTemporaryVariable(get_current_module_entity(), 
+	temp = make_new_scalar_variable(get_current_module_entity(), 
 				    entity_basic(var));
 
     assert(array_distributed_p(var));
@@ -300,7 +300,7 @@ list *lhp, *lnp;
     reference ref = syntax_reference(s);
     entity temph, tempn,
 	var = reference_variable(ref),
-	temp = NewTemporaryVariable(get_current_module_entity(), 
+	temp = make_new_scalar_variable(get_current_module_entity(), 
 				    entity_basic(var));
 
     assert(array_distributed_p(var));
@@ -535,7 +535,7 @@ list *lstatp, lw, lr;
 	 list lnotco = NIL;
 	 reference r = syntax_reference(s);
 	 entity var = reference_variable(r);
-	 entity temp = NewTemporaryVariable(get_current_module_entity(),
+	 entity temp = make_new_scalar_variable(get_current_module_entity(),
 					 entity_basic(var));
 	 entity tempn ;
 
@@ -694,7 +694,7 @@ list *lhstatp, *lnstatp;
     array    = reference_variable(r);
     newarray = load_new_node(array);
 
-    temp     = NewTemporaryVariable(get_current_module_entity(), 
+    temp     = make_new_scalar_variable(get_current_module_entity(), 
 				    entity_basic(array));
 
     AddEntityToHostAndNodeModules(temp);
