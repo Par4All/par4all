@@ -6,6 +6,9 @@
  * reset_ordering_to_statement.
  *
  * $Log: ordering.c,v $
+ * Revision 1.16  2003/12/05 17:04:00  nguyen
+ * Add a new kind of instruction : expression instruction
+ *
  * Revision 1.15  2003/09/05 14:29:19  nguyen
  * Remove the switch (multitest) case
  *
@@ -128,6 +131,7 @@ rinitialize_ordering_to_statement(hash_table ots, statement s)
       case is_instruction_call:
       case is_instruction_goto:
       case is_instruction_forloop:
+      case is_instruction_expression:
 	break;
 
       case is_instruction_unstructured: {
