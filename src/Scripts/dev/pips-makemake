@@ -4,6 +4,10 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.327  1998/07/02 10:57:16  coelho
+# fixes for jpips are useless, and buggy for properties which does not have
+# any c file...
+#
 # Revision 1.326  1998/07/01 17:06:01  coelho
 # attempt to debug...
 #
@@ -439,9 +443,7 @@ include \$(ROOT)/Include/makefile_macros.\$(ARCH)
 include \$(CONFIG)
 #
 # if some C files, there is a executable target to build.
-ifneq (\$(LIB_CFILES),)
 all: \$(ARCH) $ALL_RULE_TARGET
-endif
 #
 # The software architecture (compilers and options...) used.
 CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
@@ -467,11 +469,9 @@ echo:; @echo \$(ECHO)
 #
 # Default rules
 ifneq (\$(ARCH),.)
-ifneq (\$(LIB_CFILES),)
 %: \$(ARCH)/%
 %.o: \$(ARCH)/%.o
 %.a: \$(ARCH)/%.a
-endif
 endif
 # Java:
 %.class: %.java; javac \$<
@@ -579,7 +579,6 @@ cat >> $MAKEFILE <<%
 LIB_OBJECTS:=\$(addprefix \$(ARCH)/, \$(LIB_OBJECTS))
 #
 # if some C files...
-ifneq (\$(CFILES),)
 LIB_TARGET=	\$(ARCH)/lib\$(TARGET).a
 ifneq (\$(ARCH),.)
 lib\$(TARGET).a: \$(LIB_TARGET)
@@ -600,7 +599,6 @@ INSTALL_BIN+=	${btrg}
 	\$(RM) \$(LIB_TARGET)
 	\$(ARCHIVE) \$(LIB_TARGET) \$(LIB_OBJECTS) \$(TARGET_OBJECTS)
 	-\$(RANLIB) \$(LIB_TARGET)
-endif
 
 check_install:
 	@if test \`echo *.a | wc -w\` -gt 1 ; \\
