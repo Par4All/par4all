@@ -1,6 +1,6 @@
 dnl
 dnl $RCSfile: hpfc_architecture_m4_macros,v $ version $Revision$
-dnl ($Date: 1995/11/21 23:16:53 $, )
+dnl ($Date: 1996/08/30 13:32:48 $, )
 dnl
 dnl DEFAULT ARCHITECTURE
 dnl
@@ -15,15 +15,6 @@ define(`_PGON')dnl
 define(`_CM5')dnl
 define(`_RS6K')dnl
 define(`_ALPHA')dnl
-define(`MIMD')dnl
-define(`NETWORK')dnl
-dnl
-ifelse(ARCHITECTURE,`CM5', `define(`MIMD',`$@')',
-       ARCHITECTURE,`PGON',`define(`MIMD',`$@')')dnl
-ifelse(ARCHITECTURE,`SUN4',`define(`NETWORK',`$@')',
-       ARCHITECTURE,`SUNMP',`define(`NETWORK',`$@')',
-       ARCHITECTURE,`ALPHA',`define(`NETWORK',`$@')',
-       ARCHITECTURE,`RS6K',`define(`NETWORK',`$@')')dnl
 dnl
 dnl PECULIAR DEFINITIONS
 dnl 
@@ -38,17 +29,12 @@ dnl
 dnl GNU Fortran compiler g77
 dnl byte is not supported...
 dnl
-ifdef(`HPFC_GNU',`define(`_GNU',`$@')',`define(`_GNU',)')dnl
-ifdef(`HPFC_GNU',`define(`_NOGNU',)',`define(`_NOGNU',`$@')')dnl
+ifdef(`USE_GNU',`define(`_GNU',`$@')',`define(`_GNU',)')dnl
+ifdef(`USE_GNU',`define(`_NOGNU',)',`define(`_NOGNU',`$@')')dnl
 dnl
 dnl TO USE IBM PVMe IMPLEMENTATION
 dnl 
 ifdef(`USE_PVMe',`define(`_PVMe',`$@')',`define(`_PVMe',)')dnl
-dnl
-dnl
-define(`DEFAULTLINK',`$@')dnl
-ifelse(ARCHITECTURE,`CM5',`define(`DEFAULTLINK',)')dnl
-dnl
 dnl
 dnl THAT IS ALL
 dnl
