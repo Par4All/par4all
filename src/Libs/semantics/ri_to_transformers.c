@@ -7,6 +7,8 @@
   *
   * Francois Irigoin, April 1990
   *
+  * $Id$
+  *
   */
 
 #include <stdio.h>
@@ -41,6 +43,36 @@
 
 extern Psysteme sc_projection_by_eq(Psysteme sc, Pcontrainte eq, Variable v);
 
+transformer 
+effects_to_transformer(list e) /* list of effects */
+{
+    /* algorithm: keep only write effects on integer scalar variable */
+    transformer tf = transformer_identity();
+    cons * args = transformer_arguments(tf);
+    Pbase b = VECTEUR_NUL;
+    Psysteme s = sc_new();
+
+    MAPL(cef, { effect ef = EFFECT(CAR(cef));
+		reference r = effect_reference(ef);
+		action a = effect_action(ef);
+		entity v = reference_variable(r);
+
+		if(action_write_p(a) && entity_has_values_p(v)) {
+		    entity new_val = entity_to_new_value(v);
+		    args = arguments_add_entity(args, new_val);
+		    b = vect_add_variable(b, (Variable) new_val);}},
+ 	 e);
+
+    transformer_arguments(tf) = args;
+    s->base = b;
+    s->dimension = vect_size(b);
+    /* NewGen should generate proper cast for external types */
+    /* predicate_system(transformer_relation(tf)) = (Psysteme) s; */
+    predicate_system_(transformer_relation(tf)) = (char *) s;
+    return tf;
+}
+
+
 /* Recursive Descent in Data Structure Statement */
 
 /* SHARING : returns the transformer stored in the database. Make a copy 
@@ -52,103 +84,8 @@ extern Psysteme sc_projection_by_eq(Psysteme sc, Pcontrainte eq, Variable v);
  * BC, oct. 94 
  */
 
-transformer statement_to_transformer(s)
-statement s;
-{
-    instruction i = statement_instruction(s);
-    list e = NIL;
-    transformer t;
-
-    debug(8,"statement_to_transformer","begin for statement %03d (%d,%d)\n",
-	  statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
-	  ORDERING_STATEMENT(statement_ordering(s)));
-
-    e = load_cumulated_rw_effects_list(s);
-    t = load_statement_transformer(s);
-
-    /* it would be nicer to control warning_on_redefinition */
-    if (t == transformer_undefined) {
-	t = instruction_to_transformer(i, e);
-	if(!transformer_consistency_p(t)) {
-	    int so = statement_ordering(s);
-	    (void) fprintf(stderr, "statement %03d (%d,%d):\n",
-			   statement_number(s),
-			   ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
-	    /* (void) print_transformer(load_statement_transformer(s)); */
-	    (void) print_transformer(t);
-	    dump_transformer(t);
-	    pips_error("statement_to_transformer",
-		       "Inconsistent transformer detected\n");
-	}
-	store_statement_transformer(s, t);
-    }
-    else 
-	pips_error("statement_to_transformer","transformer redefinition");
-
-    ifdebug(1) {
-	int so = statement_ordering(s);
-	transformer stf = load_statement_transformer(s);
-
-	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
-		       statement_number(s),
-		       ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-		       stf);
-	(void) print_transformer(stf);
-	pips_assert("statement_to_transformer", stf==t);
-    }
-
-    debug(8,"statement_to_transformer","end with t=%p\n", t);
-
-    return(t);
-}
-
-transformer instruction_to_transformer(i, e)
-instruction i;
-cons * e; /* effects associated to instruction i */
-{
-    transformer tf = transformer_undefined;
-    test t;
-    loop l;
-    call c;
-
-    debug(8,"instruction_to_transformer","begin\n");
-
-    switch(instruction_tag(i)) {
-      case is_instruction_block:
-	tf = block_to_transformer(instruction_block(i));
-	break;
-      case is_instruction_test:
-	t = instruction_test(i);
-	tf = test_to_transformer(t, e);
-	break;
-      case is_instruction_loop:
-	l = instruction_loop(i);
-	tf = loop_to_transformer(l, e);
-	break;
-      case is_instruction_goto:
-	pips_error("instruction_to_transformer",
-		   "unexpected goto in semantics analysis");
-	tf = transformer_identity();
-	break;
-      case is_instruction_call:
-	c = instruction_call(i);
-	tf = call_to_transformer(c, e);
-	break;
-      case is_instruction_unstructured:
-	tf = unstructured_to_transformer(instruction_unstructured(i), e);
-	  break ;
-      default:
-	pips_error("instruction_to_transformer","unexpected tag %d\n",
-	      instruction_tag(i));
-    }
-    debug(9,"instruction_to_transformer","resultat:\n");
-    ifdebug(9) (void) print_transformer(tf);
-    debug(8,"instruction_to_transformer","end\n");
-    return tf;
-}
-
-transformer block_to_transformer(b)
-cons * b;
+static transformer 
+block_to_transformer(list b)
 {
     statement s;
     transformer btf;
@@ -177,9 +114,25 @@ cons * b;
     return btf;
 }
 
-transformer unstructured_to_transformer(u, e)
-unstructured u;
-cons * e; /* effects */
+static void 
+unstructured_to_transformers(unstructured u)
+{
+    cons *blocs = NIL ;
+    control ct = unstructured_control(u) ;
+
+    debug(8,"unstructured_to_transformers","begin\n");
+
+    CONTROL_MAP(c, {
+	statement st = control_statement(c) ;
+	(void) statement_to_transformer(st) ;
+    }, ct, blocs) ;
+
+    gen_free_list(blocs) ;
+
+    debug(8,"unstructured_to_transformers","end\n");
+}
+static transformer 
+unstructured_to_transformer(unstructured u, list e) /* effects */
 {
     transformer ctf;
     transformer tf;
@@ -213,70 +166,27 @@ cons * e; /* effects */
     return tf;
 }
 
-cons * effects_to_arguments(fx)
-cons * fx; /* list of effects */
+list 
+effects_to_arguments(list fx) /* list of effects */
 {
     /* algorithm: keep only write effects on integer scalar variable */
-    cons * args = NIL;
+    list args = NIL;
 
-    MAPL(cef, { effect ef = EFFECT(CAR(cef));
-		reference r = effect_reference(ef);
-		action a = effect_action(ef);
-		entity e = reference_variable(r);
-
-		if(action_write_p(a) && entity_integer_scalar_p(e)) {
-		    args = arguments_add_entity(args, e);}},
- 	 fx);
+    MAP(EFFECT, ef, 
+    {
+	reference r = effect_reference(ef);
+	action a = effect_action(ef);
+	entity e = reference_variable(r);
+	
+	if(action_write_p(a) && entity_integer_scalar_p(e)) {
+	    args = arguments_add_entity(args, e);
+	}
+    },
+	fx);
 
     return args;
 }
 
-transformer effects_to_transformer(e)
-cons * e; /* list of effects */
-{
-    /* algorithm: keep only write effects on integer scalar variable */
-    transformer tf = transformer_identity();
-    cons * args = transformer_arguments(tf);
-    Pbase b = VECTEUR_NUL;
-    Psysteme s = sc_new();
-
-    MAPL(cef, { effect ef = EFFECT(CAR(cef));
-		reference r = effect_reference(ef);
-		action a = effect_action(ef);
-		entity v = reference_variable(r);
-
-		if(action_write_p(a) && entity_has_values_p(v)) {
-		    entity new_val = entity_to_new_value(v);
-		    args = arguments_add_entity(args, new_val);
-		    b = vect_add_variable(b, (Variable) new_val);}},
- 	 e);
-
-    transformer_arguments(tf) = args;
-    s->base = b;
-    s->dimension = vect_size(b);
-    /* NewGen should generate proper cast for external types */
-    /* predicate_system(transformer_relation(tf)) = (Psysteme) s; */
-    predicate_system_(transformer_relation(tf)) = (char *) s;
-    return tf;
-}
-
-void unstructured_to_transformers(u)
-unstructured u ;
-{
-    cons *blocs = NIL ;
-    control ct = unstructured_control(u) ;
-
-    debug(8,"unstructured_to_transformers","begin\n");
-
-    CONTROL_MAP(c, {
-	statement st = control_statement(c) ;
-	(void) statement_to_transformer(st) ;
-    }, ct, blocs) ;
-
-    gen_free_list(blocs) ;
-
-    debug(8,"unstructured_to_transformers","end\n");
-}
 
 /* The transformer associated to a DO loop does not include the exit 
  * condition because it is used to compute the precondition for any 
@@ -286,9 +196,8 @@ unstructured u ;
  * for the bounded one.
  */
 
-transformer loop_to_transformer(l, e)
-loop l;
-cons * e; /* effects of loop l */
+static transformer 
+loop_to_transformer(loop l, list e) /* effects of loop l */
 {
     /* loop transformer tf = tfb* or tf = tfb+ or ... */
     transformer tf;
@@ -328,7 +237,8 @@ cons * e; /* effects of loop l */
 	     * new equations...
 	     */
 	    /* transformer ftf = transformer_equality_fix_point(tfb); */
-	    transformer ftf = get_bool_property("SEMANTICS_PATTERN_MATCHING_FIX_POINT")? 
+	    transformer ftf = 
+		get_bool_property("SEMANTICS_PATTERN_MATCHING_FIX_POINT")? 
 		transformer_pattern_fix_point(tfb)
 		: transformer_equality_fix_point(tfb);
 	    Psysteme fsc = predicate_system(transformer_relation(ftf));
@@ -342,7 +252,8 @@ cons * e; /* effects of loop l */
 
 	    /* compute the basis for tf and ftf */
 
-	    /* FI: just in case. I do not understand why sc_base(fsc) is not enough.
+	    /* FI: just in case.
+	     * I do not understand why sc_base(fsc) is not enough.
 	     * I do not understand why I used effects_to_transformer() instead
 	     * of transformer_indentity()...
 	     */
@@ -377,7 +288,7 @@ cons * e; /* effects of loop l */
 	    free_transformer(ftf);
 
 	    ifdebug(8) {
-		debug(8, "loop_to_transformer", "intermediate fix-point tf=\n");
+		pips_debug(8, "intermediate fix-point tf=\n");
 		fprint_transformer(stderr, tf, external_value_name);
 	    }
 
@@ -453,9 +364,8 @@ cons * e; /* effects of loop l */
     return tf;
 }
 
-transformer test_to_transformer(t, ef)
-test t;
-cons * ef; /* effects of t */
+static transformer 
+test_to_transformer(test t, list ef) /* effects of t */
 {
     statement st = test_true(t);
     statement sf = test_false(t);
@@ -529,10 +439,32 @@ cons * ef; /* effects of t */
     return tf;
 }
 
-transformer 
-call_to_transformer(c, ef)
-call c;
-cons * ef; /* effects of call c */
+static transformer assign_to_transformer(list, list);
+
+static transformer 
+intrinsic_to_transformer(
+    entity e, list pc, list ef) /* effects of intrinsic call */
+{
+    transformer tf;
+
+    debug(8,"intrinsic_to_transformer","begin\n");
+
+    if(ENTITY_ASSIGN_P(e))
+	tf = assign_to_transformer(pc, ef);
+    else if(ENTITY_STOP_P(e))
+	tf = transformer_empty();
+    else
+	tf = effects_to_transformer(ef);
+
+    debug(8,"intrinsic_to_transformer","end\n");
+
+    return tf;
+}
+
+static transformer user_call_to_transformer(entity, list, list);
+
+static transformer 
+call_to_transformer(call c, list ef) /* effects of call c */
 {
     transformer tf = transformer_undefined;
     entity e = call_function(c);
@@ -571,158 +503,8 @@ cons * ef; /* effects of call c */
     return(tf);
 }
 
-transformer intrinsic_to_transformer(e, pc, ef)
-entity e;
-cons * pc;
-cons * ef; /* effects of intrinsic call */
-{
-    transformer tf;
-
-    debug(8,"intrinsic_to_transformer","begin\n");
-
-    if(ENTITY_ASSIGN_P(e))
-	tf = assign_to_transformer(pc, ef);
-    else if(ENTITY_STOP_P(e))
-	tf = transformer_empty();
-    else
-	tf = effects_to_transformer(ef);
-
-    debug(8,"intrinsic_to_transformer","end\n");
-
-    return tf;
-}
-
-transformer assign_to_transformer(args, ef)
-cons *args; /* arguments for assign */
-cons * ef; /* effects of assign */
-{
-    /* algorithm: if lhs and rhs are linear expressions on scalar integer
-       variables, build the corresponding equation; else, use effects ef
-       
-       should be extended to cope with constant integer division as in
-       N2 = N/2
-       because it is used in real program; inequalities should be
-       generated in that case 2*N2 <= N <= 2*N2+1
-       
-       same remark for MOD operator
-       
-       implementation: part of this function should be moved into
-       transformer.c
-       */
-
-    expression lhs = EXPRESSION(CAR(args));
-    expression rhs = EXPRESSION(CAR(CDR(args)));
-    transformer tf = transformer_undefined;
-    normalized n = NORMALIZE_EXPRESSION(lhs);
-
-    pips_debug(8,"begin\n");
-    pips_assert("2 args to assign", CDR(CDR(args))==NIL);
-
-    if(normalized_linear_p(n)) {
-	Pvecteur vlhs = (Pvecteur) normalized_linear(n);
-	entity e = (entity) vecteur_var(vlhs);
-
-	if(entity_has_values_p(e) && integer_scalar_entity_p(e)) {
-	    /* FI: the initial version was conservative because
-	     * only affine scalar integer assignments were processed
-	     * precisely. But non-affine operators and calls to user defined
-	     * functions can also bring some information as soon as
-	     * *some* integer read or write effect exists
-	     */
-	    /* check that *all* read effects are on integer scalar entities */
-	    /*
-	    if(integer_scalar_read_effects_p(ef)) {
-		tf = expression_to_transformer(e, rhs, ef);
-	    }
-	    */
-	    /* Check that *some* read or write effects are on integer 
-	     * scalar entities. This is almost always true... Let's hope
-	     * expression_to_transformer() returns quickly for array
-	     * expressions used to initialize a scalar integer entity.
-	     */
-	    if(some_integer_scalar_read_or_write_effects_p(ef)) {
-		tf = expression_to_transformer(e, rhs, ef);
-	    }
-	}
-    }
-    /* if any condition was not met and transformer derivation failed */
-    if(tf==transformer_undefined)
-	tf = effects_to_transformer(ef);
-
-    pips_debug(6,"return tf=%lx\n", (unsigned long)tf);
-    ifdebug(6) (void) print_transformer(tf);
-    pips_debug(8,"end\n");
-    return tf;
-}
-
-/* transformer expression_to_transformer(entity e, expression expr, list ef):
- * returns a transformer abstracting the effect of assignment e = expr
- * if entity e and entities referenced in expr are accepted for
- * semantics analysis anf if expr is affine; else returns
- * transformer_undefined
- *
- * Note: it might be better to distinguish further between e and expr
- * and to return a transformer stating that e is modified when e
- * is accepted for semantics analysis.
- *
- * Bugs:
- *  - core dumps if entities referenced in expr are not accepted for
- *    semantics analysis
- *
- * Modifications:
- *  - MOD and / added for very special cases (but not as general as it should be)
- *    FI, 25/05/93
- *  - MIN, MAX and use function call added (for simple cases)
- *    FI, 16/11/95
- */
-transformer expression_to_transformer(e, expr, ef)
-entity e;
-expression expr;
-list ef;
-{
-    transformer tf = transformer_undefined;
-
-    pips_debug(8, "begin\n");
-
-    if(entity_has_values_p(e)) {
-	Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
-	normalized n = NORMALIZE_EXPRESSION(expr);
-
-	if(normalized_linear_p(n)) {
-	    tf = affine_assignment_to_transformer(e, (Pvecteur) normalized_linear(n));
-	}
-	else if(modulo_expression_p(expr)) {
-	    tf = modulo_to_transformer(e, expr);
-	}
-	else if(divide_expression_p(expr)) {
-	    tf = integer_divide_to_transformer(e, expr);
-	}
-	else if(min0_expression_p(expr)) {
-	    tf = min0_to_transformer(e, expr);
-	}
-	else if(max0_expression_p(expr)) {
-	    tf = max0_to_transformer(e, expr);
-	}
-	else if(user_function_call_p(expr) 
-		&& get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	    /* FI: I need effects ef here to use user_call_to_transformer()
-	     * although the general idea was to return an undefined transformer
-	     * on failure rather than a transformer derived from effects
-	     */
-	    tf = user_function_call_to_transformer(e, expr, ef);
-	}
-	else {
-	    vect_rm(ve);
-	    tf = transformer_undefined;
-	}
-    }
-
-    pips_debug(8, "end with tf=%p\n", tf);
-
-    return tf;
-}
-
-transformer user_function_call_to_transformer(
+static transformer 
+user_function_call_to_transformer(
     entity e, 
     expression expr,
     list ef)
@@ -834,10 +616,13 @@ transformer user_function_call_to_transformer(
 
     return t_caller;
 }
-
-transformer transformer_intra_to_inter(tf, le)
-transformer tf;
-cons * le;
+
+/* transformer translation
+ */
+transformer 
+transformer_intra_to_inter(
+    transformer tf,
+    list le)
 {
     cons * lost_args = NIL;
     /* Filtered TransFormer ftf */
@@ -913,10 +698,11 @@ cons * le;
     return ftf;
 }
 
-transformer user_call_to_transformer(f, pc, ef)
-entity f;
-list pc;
-list ef;
+static transformer 
+user_call_to_transformer(
+    entity f,
+    list pc,
+    list ef)
 {
     transformer t_callee = transformer_undefined;
     transformer t_caller = transformer_undefined;
@@ -1099,12 +885,71 @@ transformer_add_identity(transformer tf, entity v)
 
     vect_add_elem(&eq, (Variable) v_old, (Value) -1);
     tf = transformer_equality_add(tf, eq);
-    transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), v_new);
+    transformer_arguments(tf) = 
+	arguments_add_entity(transformer_arguments(tf), v_new);
 
     return tf;
 }
 
-transformer 
+static transformer 
+affine_to_transformer(entity e, Pvecteur a, bool assignment)
+{
+    transformer tf = transformer_undefined;
+    Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
+    entity e_new = entity_to_new_value(e);
+    entity e_old = entity_to_old_value(e);
+    cons * tf_args = CONS(ENTITY, e_new, NIL);
+    /* must be duplicated right now  because it will be
+       renamed and checked at the same time by
+       value_mappings_compatible_vector_p() */
+    Pvecteur vexpr = vect_dup(a);
+    Pcontrainte c;
+    Pvecteur eq = VECTEUR_NUL;
+
+    debug(8, "affine_to_transformer", "begin\n");
+
+    ifdebug(9) {
+	pips_debug(9, "\nLinearized expression:\n");
+	vect_dump(vexpr);
+    }
+
+    if(!assignment) {
+	vect_add_elem(&vexpr, (Variable) e, (Value) 1);
+
+	ifdebug(8) {
+	    pips_debug(8, "\nLinearized expression for incrementation:\n");
+	    vect_dump(vexpr);
+	}
+    }
+
+    if(value_mappings_compatible_vector_p(ve) &&
+       value_mappings_compatible_vector_p(vexpr)) {
+	ve = vect_variable_rename(ve,
+				  (Variable) e,
+				  (Variable) e_new);
+	(void) vect_variable_rename(vexpr,
+				    (Variable) e_new,
+				    (Variable) e_old);
+	eq = vect_substract(ve, vexpr);
+	vect_rm(ve);
+	vect_rm(vexpr);
+	c = contrainte_make(eq);
+	tf = make_transformer(tf_args,
+		      make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
+    }
+    else {
+	vect_rm(eq);
+	vect_rm(ve);
+	vect_rm(vexpr);
+	tf = transformer_undefined;
+    }
+
+    debug(8, "affine_to_transformer", "end\n");
+
+    return tf;
+}
+
+static transformer 
 affine_assignment_to_transformer(entity e, Pvecteur a)
 {
     transformer tf = transformer_undefined;
@@ -1124,65 +969,7 @@ affine_increment_to_transformer(entity e, Pvecteur a)
     return tf;
 }
 
-transformer 
-affine_to_transformer(entity e, Pvecteur a, bool assignment)
-{
-    transformer tf = transformer_undefined;
-    Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
-    entity e_new = entity_to_new_value(e);
-    entity e_old = entity_to_old_value(e);
-    cons * tf_args = CONS(ENTITY, e_new, NIL);
-    /* must be duplicated right now  because it will be
-       renamed and checked at the same time by
-       value_mappings_compatible_vector_p() */
-    Pvecteur vexpr = vect_dup(a);
-    Pcontrainte c;
-    Pvecteur eq = VECTEUR_NUL;
-
-    debug(8, "affine_to_transformer", "begin\n");
-
-    ifdebug(9) {
-	debug(9, "affine_to_transformer", "\nLinearized expression:\n");
-	vect_dump(vexpr);
-    }
-
-    if(!assignment) {
-	vect_add_elem(&vexpr, (Variable) e, (Value) 1);
-
-	ifdebug(8) {
-	    debug(8, "affine_to_transformer", "\nLinearized expression for incrementation:\n");
-	    vect_dump(vexpr);
-	}
-    }
-
-    if(value_mappings_compatible_vector_p(ve) &&
-       value_mappings_compatible_vector_p(vexpr)) {
-	ve = vect_variable_rename(ve,
-				  (Variable) e,
-				  (Variable) e_new);
-	(void) vect_variable_rename(vexpr,
-				    (Variable) e_new,
-				    (Variable) e_old);
-	eq = vect_substract(ve, vexpr);
-	vect_rm(ve);
-	vect_rm(vexpr);
-	c = contrainte_make(eq);
-	tf = make_transformer(tf_args,
-			      make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
-    }
-    else {
-	vect_rm(eq);
-	vect_rm(ve);
-	vect_rm(vexpr);
-	tf = transformer_undefined;
-    }
-
-    debug(8, "affine_to_transformer", "end\n");
-
-    return tf;
-}
-
-transformer 
+static transformer 
 modulo_to_transformer(e, expr)
 entity e;
 expression expr;
@@ -1209,7 +996,7 @@ expression expr;
 	cub = contrainte_make(ub);
 	clb->succ = cub;
 	tf = make_transformer(tf_args,
-			      make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
+		make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
     }
 
     ifdebug(8) {
@@ -1221,7 +1008,8 @@ expression expr;
    return tf;
 }
 
-transformer integer_divide_to_transformer(e, expr)
+static transformer 
+integer_divide_to_transformer(e, expr)
 entity e;
 expression expr;
 {
@@ -1265,7 +1053,7 @@ expression expr;
 	cub = contrainte_make(vub);
 	clb->succ = cub;
 	tf = make_transformer(tf_args,
-			      make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
+	       make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
     }
 
     ifdebug(8) {
@@ -1277,21 +1065,8 @@ expression expr;
     return tf;
 }
 
-transformer min0_to_transformer(e, expr)
-entity e;
-expression expr;
-{
-    return minmax_to_transformer(e, expr, TRUE);
-}
-
-transformer max0_to_transformer(e, expr)
-entity e;
-expression expr;
-{
-    return minmax_to_transformer(e, expr, FALSE);
-}
-
-transformer minmax_to_transformer(e, expr, minmax)
+static transformer 
+minmax_to_transformer(e, expr, minmax)
 entity e;
 expression expr;
 bool minmax;
@@ -1343,4 +1118,248 @@ bool minmax;
     }
 
     return tf;
+}
+
+static transformer 
+min0_to_transformer(e, expr)
+entity e;
+expression expr;
+{
+    return minmax_to_transformer(e, expr, TRUE);
+}
+
+static transformer 
+max0_to_transformer(e, expr)
+entity e;
+expression expr;
+{
+    return minmax_to_transformer(e, expr, FALSE);
+}
+
+/* transformer expression_to_transformer(entity e, expression expr, list ef):
+ * returns a transformer abstracting the effect of assignment e = expr
+ * if entity e and entities referenced in expr are accepted for
+ * semantics analysis anf if expr is affine; else returns
+ * transformer_undefined
+ *
+ * Note: it might be better to distinguish further between e and expr
+ * and to return a transformer stating that e is modified when e
+ * is accepted for semantics analysis.
+ *
+ * Bugs:
+ *  - core dumps if entities referenced in expr are not accepted for
+ *    semantics analysis
+ *
+ * Modifications:
+ *  - MOD and / added for very special cases (but not as general as it should be)
+ *    FI, 25/05/93
+ *  - MIN, MAX and use function call added (for simple cases)
+ *    FI, 16/11/95
+ */
+transformer 
+expression_to_transformer(
+    entity e,
+    expression expr,
+    list ef)
+{
+    transformer tf = transformer_undefined;
+
+    pips_debug(8, "begin\n");
+
+    if(entity_has_values_p(e)) {
+	Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
+	normalized n = NORMALIZE_EXPRESSION(expr);
+
+	if(normalized_linear_p(n)) {
+	    tf = affine_assignment_to_transformer(e,
+		       (Pvecteur) normalized_linear(n));
+	}
+	else if(modulo_expression_p(expr)) {
+	    tf = modulo_to_transformer(e, expr);
+	}
+	else if(divide_expression_p(expr)) {
+	    tf = integer_divide_to_transformer(e, expr);
+	}
+	else if(min0_expression_p(expr)) {
+	    tf = min0_to_transformer(e, expr);
+	}
+	else if(max0_expression_p(expr)) {
+	    tf = max0_to_transformer(e, expr);
+	}
+	else if(user_function_call_p(expr) 
+		&& get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+	    /* FI: I need effects ef here to use user_call_to_transformer()
+	     * although the general idea was to return an undefined transformer
+	     * on failure rather than a transformer derived from effects
+	     */
+	    tf = user_function_call_to_transformer(e, expr, ef);
+	}
+	else {
+	    vect_rm(ve);
+	    tf = transformer_undefined;
+	}
+    }
+
+    pips_debug(8, "end with tf=%p\n", tf);
+
+    return tf;
+}
+
+static transformer 
+assign_to_transformer(list args, /* arguments for assign */
+		      list ef) /* effects of assign */
+{
+    /* algorithm: if lhs and rhs are linear expressions on scalar integer
+       variables, build the corresponding equation; else, use effects ef
+       
+       should be extended to cope with constant integer division as in
+       N2 = N/2
+       because it is used in real program; inequalities should be
+       generated in that case 2*N2 <= N <= 2*N2+1
+       
+       same remark for MOD operator
+       
+       implementation: part of this function should be moved into
+       transformer.c
+       */
+
+    expression lhs = EXPRESSION(CAR(args));
+    expression rhs = EXPRESSION(CAR(CDR(args)));
+    transformer tf = transformer_undefined;
+    normalized n = NORMALIZE_EXPRESSION(lhs);
+
+    pips_debug(8,"begin\n");
+    pips_assert("2 args to assign", CDR(CDR(args))==NIL);
+
+    if(normalized_linear_p(n)) {
+	Pvecteur vlhs = (Pvecteur) normalized_linear(n);
+	entity e = (entity) vecteur_var(vlhs);
+
+	if(entity_has_values_p(e) && integer_scalar_entity_p(e)) {
+	    /* FI: the initial version was conservative because
+	     * only affine scalar integer assignments were processed
+	     * precisely. But non-affine operators and calls to user defined
+	     * functions can also bring some information as soon as
+	     * *some* integer read or write effect exists
+	     */
+	    /* check that *all* read effects are on integer scalar entities */
+	    /*
+	    if(integer_scalar_read_effects_p(ef)) {
+		tf = expression_to_transformer(e, rhs, ef);
+	    }
+	    */
+	    /* Check that *some* read or write effects are on integer 
+	     * scalar entities. This is almost always true... Let's hope
+	     * expression_to_transformer() returns quickly for array
+	     * expressions used to initialize a scalar integer entity.
+	     */
+	    if(some_integer_scalar_read_or_write_effects_p(ef)) {
+		tf = expression_to_transformer(e, rhs, ef);
+	    }
+	}
+    }
+    /* if any condition was not met and transformer derivation failed */
+    if(tf==transformer_undefined)
+	tf = effects_to_transformer(ef);
+
+    pips_debug(6,"return tf=%lx\n", (unsigned long)tf);
+    ifdebug(6) (void) print_transformer(tf);
+    pips_debug(8,"end\n");
+    return tf;
+}
+
+static transformer 
+instruction_to_transformer(i, e)
+instruction i;
+cons * e; /* effects associated to instruction i */
+{
+    transformer tf = transformer_undefined;
+    test t;
+    loop l;
+    call c;
+
+    debug(8,"instruction_to_transformer","begin\n");
+
+    switch(instruction_tag(i)) {
+      case is_instruction_block:
+	tf = block_to_transformer(instruction_block(i));
+	break;
+      case is_instruction_test:
+	t = instruction_test(i);
+	tf = test_to_transformer(t, e);
+	break;
+      case is_instruction_loop:
+	l = instruction_loop(i);
+	tf = loop_to_transformer(l, e);
+	break;
+      case is_instruction_goto:
+	pips_error("instruction_to_transformer",
+		   "unexpected goto in semantics analysis");
+	tf = transformer_identity();
+	break;
+      case is_instruction_call:
+	c = instruction_call(i);
+	tf = call_to_transformer(c, e);
+	break;
+      case is_instruction_unstructured:
+	tf = unstructured_to_transformer(instruction_unstructured(i), e);
+	  break ;
+      default:
+	pips_error("instruction_to_transformer","unexpected tag %d\n",
+	      instruction_tag(i));
+    }
+    debug(9,"instruction_to_transformer","resultat:\n");
+    ifdebug(9) (void) print_transformer(tf);
+    debug(8,"instruction_to_transformer","end\n");
+    return tf;
+}
+
+
+transformer statement_to_transformer(s)
+statement s;
+{
+    instruction i = statement_instruction(s);
+    list e = NIL;
+    transformer t;
+
+    pips_debug(8,"begin for statement %03d (%d,%d)\n",
+	       statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
+	       ORDERING_STATEMENT(statement_ordering(s)));
+
+    e = load_cumulated_rw_effects_list(s);
+    t = load_statement_transformer(s);
+
+    /* it would be nicer to control warning_on_redefinition */
+    if (t == transformer_undefined) {
+	t = instruction_to_transformer(i, e);
+	if(!transformer_consistency_p(t)) {
+	    int so = statement_ordering(s);
+	    (void) fprintf(stderr, "statement %03d (%d,%d):\n",
+			   statement_number(s),
+			   ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
+	    /* (void) print_transformer(load_statement_transformer(s)); */
+	    (void) print_transformer(t);
+	    dump_transformer(t);
+	    pips_internal_error("Inconsistent transformer detected\n");
+	}
+	store_statement_transformer(s, t);
+    }
+    else 
+	pips_internal_error("transformer redefinition");
+
+    ifdebug(1) {
+	int so = statement_ordering(s);
+	transformer stf = load_statement_transformer(s);
+
+	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
+		       statement_number(s),
+		       ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
+		       stf);
+	(void) print_transformer(stf);
+	pips_assert("same pointer", stf==t);
+    }
+
+    pips_debug(8,"end with t=%p\n", t);
+
+    return(t);
 }
