@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/21 18:08:42 $ 
+# $Date: 1996/08/21 18:19:23 $ 
 #
 
 CPPFLAGS+=	-D COMPILE_FOR_G77
@@ -17,7 +17,8 @@ OFILES=	$(addprefix $(PVM_ARCH)/, $(CFILES:.c=.o))
 #
 # installation
 
-INSTALL_LIB_DIR= $(INSTALL_RTM_DIR)/wp65/$(PVM_ARCH)
+INSTALL_RTM_DIR:= $(INSTALL_RTM_DIR)/wp65
+INSTALL_LIB_DIR= $(INSTALL_RTM_DIR)/$(PVM_ARCH)
 
 INSTALL_LIB=	$(LOCAL_LIB)
 INSTALL_RTM=	$(MFILE) $(SCRIPTS)
