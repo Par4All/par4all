@@ -4,13 +4,12 @@
  *  Bruno Baron - Corinne Ancourt - francois Irigoin
  */
 #include <stdio.h>
-extern int fprintf();
-extern int printf();
-extern int sscanf();
+extern int fprintf(FILE *, const char *, ...);
+extern int printf(const char *, ...);
+extern int sscanf(const char *, const char *, ...);
 #include <string.h>
 
 #include "genC.h"
-#include "hash.h"
 #include "ri.h"
 #include "database.h"
 #include "misc.h"
@@ -24,7 +23,8 @@ extern int sscanf();
 #include "pipsdbm.h"
 #include "resources.h"
 #include "control.h"
-#include "generation.h"
+#include "conversion.h"
+/* #include "generation.h" */
 #include "transformations.h"
 
 extern entity selected_label;
@@ -37,10 +37,7 @@ extern char *current_module_name;
  * Assumption:
  *  - a loop body can be a loop (no need for a block with one statement, a loop)
  */
-statement loop_strip_mine(loop_statement, chunk_size, chunk_number)
-statement loop_statement;
-int chunk_size;
-int chunk_number;
+statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_number)
 {
     loop l = instruction_loop(statement_instruction(loop_statement));
     loop new_l = loop_undefined;
@@ -143,8 +140,7 @@ int chunk_number;
 
 
 
-statement loop_chunk_size_and_strip_mine(lls)
-cons * lls;
+statement loop_chunk_size_and_strip_mine(cons *lls)
 {
 
     string resp;
@@ -192,8 +188,7 @@ cons * lls;
 /* Top-level function
  */
 
-void strip_mine(mod_name)
-char *mod_name;
+void strip_mine(char *mod_name)
 {
     statement mod_stmt;
     char lp_label[6];
