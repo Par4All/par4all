@@ -404,6 +404,14 @@ entity *pe1, *pe2;
 	return(strcmp(entity_name(*pe1), entity_name(*pe2)));
 }
 
+/* sorted in place.
+ */
+void 
+sort_list_of_entities(list l)
+{
+    gen_sort_list(l, compare_entities);
+}
+
 /*   TRUE if var1 <= var2
  */
 bool 
