@@ -29,7 +29,6 @@ typedef dg_vertex_label vertex_label;
 
 static graph dependence_graph;
 
-static statement_mapping the_proper_effects;
 
 static hash_table ordering_to_dg_mapping;
 
@@ -367,15 +366,13 @@ use_def_deal_if_useful(statement s)
    
    /* The possible reasons to have useful code: */
    /* - the statement does an I/O: */
-   this_statement_has_an_io_effect = statement_io_effect_p(the_proper_effects, s);
+   this_statement_has_an_io_effect = statement_io_effect_p(s);
    /* - the statement writes a procedure argument or the return
       variable of the function, so the value may be used by another
       procedure: */
    /* Regions out should be more precise: */
    this_statement_writes_a_procedure_argument =
-      statement_has_a_module_formal_argument_write_effect_p(s,
-                                                            get_current_module_entity(),
-                                                            the_proper_effects);
+       statement_has_a_formal_argument_write_effect_p(s);
    
    /* Avoid to remove formats in a first approach: */
    this_statement_is_a_format = instruction_format_p(statement_instruction(s));
@@ -487,11 +484,10 @@ use_def_elimination(char * module_name)
       (graph) db_get_memory_resource(DBR_CHAINS, module_name, TRUE);
 
    /* The proper effect to detect the I/O operations: */
-   the_proper_effects = effectsmap_to_listmap((statement_mapping)
-                                              db_get_memory_resource(
-                                                 DBR_PROPER_EFFECTS,
-                                                 module_name,
-                                                 TRUE)); 
+   set_proper_rw_effects((statement_effects)
+			 db_get_memory_resource(DBR_PROPER_EFFECTS,
+						module_name,
+						TRUE)); 
 
    set_current_module_statement(module_statement);
    set_current_module_entity(local_name_to_top_level_entity(module_name));
@@ -514,6 +510,7 @@ use_def_elimination(char * module_name)
 
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_statement);
 
+   reset_proper_rw_effects();
    reset_current_module_statement();
    reset_current_module_entity();
 
