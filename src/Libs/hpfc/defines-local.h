@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/08/31 13:45:02 $, ) 
+ * ($Date: 1995/09/01 14:06:54 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -216,6 +216,13 @@ void fprint_entity_list(FILE *fp, list l);
 
 #define SND_TO_N        "HPFC_SNDTO_N"
 #define RCV_FR_N        "HPFC_RCVFR_N"
+
+/* special FCD calls.
+ */
+#define HOST_TIMEON	"HPFC_HTIMEON"
+#define NODE_TIMEON	"HPFC_NTIMEON"
+#define HOST_TIMEOFF	"HPFC_HTIMEOFF"
+#define NODE_TIMEOFF	"HPFC_NTIMEOFF"
 
 /* PVM
  */
