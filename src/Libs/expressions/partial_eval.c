@@ -36,10 +36,10 @@ Des que l'evaluation n'est plus possible, il faut regenerer l'expression
 
 #include "text-util.h"
 #include "database.h"
-#include "pipsdbm.h"
 #include "resources.h"
 #include "control.h"
 #include "ri-util.h"
+#include "pipsdbm.h"
 #include "misc.h"
 
 #include "effects.h" /* for print_effects() */
