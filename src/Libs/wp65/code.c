@@ -1101,8 +1101,8 @@ Pbase *new_index_base;
 	pv1 = vect_dup(pv);
 	vect_chg_coeff(&pv1,TCST,VALUE_MONE);
 	pc1= contrainte_make(pv1);
-	sc_add_ineg(sc_domain,pc1)
-	    pv2 = vect_dup(pv);
+	sc_add_ineg(sc_domain,pc1);
+	pv2 = vect_dup(pv);
 	vect_chg_sgn(pv2);
 	pc2 = contrainte_make(pv2);
 	sc_add_ineg(sc_domain,pc2);
