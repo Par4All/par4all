@@ -1,29 +1,14 @@
-/*
- * Compiler Utilities
+/* Compiler Utilities
  *
  * Fabien Coelho, May 1993
  *
- * SCCS Stuff:
- * $RCSfile: compiler-util.c,v $ ($Date: 1995/03/27 16:25:58 $, )
- * got on %D%, %T%
- * $Id$
- *
+ * $RCSfile: compiler-util.c,v $ ($Date: 1995/04/10 18:49:31 $, )
+ * version $Revision$
  */
 
-#include <stdio.h>
-extern int fprintf();
-
-#include "genC.h"
-
-#include "ri.h"
-#include "hpf.h"
-
-#include "misc.h"
-#include "ri-util.h"
-#include "control.h"
-#include "hpfc.h"
 #include "defines-local.h"
-#include "properties.h"
+#include "control.h"
+
 
 bool hpfc_empty_statement_p(stat)
 statement stat;
