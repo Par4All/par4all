@@ -366,7 +366,7 @@ alias_lists( string module_name )
 
     l_alias_lists = NIL;
 
-    debug_on("ALIAS_DEBUG_LEVEL");
+    debug_on("ALIAS_LISTS_DEBUG_LEVEL");
     pips_debug(4,"begin for module %s\n",module_name);
 
     ifdebug(9)
@@ -398,37 +398,31 @@ alias_lists( string module_name )
      * (and each newgen structure of type effects
      * has one field called effects which is a list of elements
      * of type effect)
+     */
+
     in_alias_pairs =
 	effects_classes_classes((effects_classes)
 				db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
 						       module_name,
 						       TRUE));
-    MAP(EFFECTS, alias_pair_effects,
-	{
-	    list alias_pair = effects_effects(alias_pair_effects);
 
-	    ifdebug(9)
-		{
-		    pips_debug(9,"IN alias pair : \n");
-		    print_inout_regions(alias_pair);
-		}
 
-	    in_alias_pair = regions_dup(alias_pair);
-
-	    if ( ! add_pair_to_existing_list(in_alias_pair) )
-	    l_alias_lists =
-		gen_nconc(l_alias_lists,CONS(LIST,in_alias_pair,NIL));
-
-	    pips_debug(9,"IN pair added\n");
-		},
-	in_alias_pairs);
-     */
+/* wrong but did work:
 
     in_alias_pairs =
 	effects_to_list((effects)
 			db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
 					       module_name,
 					       TRUE));
+*/
+
+/* seems right but didn't work (gets 2nd element of each pair only):
+ 
+    MAP(EFFECTS, alias_pair_effects,
+	{
+	    list alias_pair = effects_effects(alias_pair_effects);
+
+*/
 
     MAP(LIST, alias_pair,
 	{
@@ -450,10 +444,10 @@ alias_lists( string module_name )
 
     /* make alias lists from the OUT_alias_pairs */
     out_alias_pairs =
-	effects_to_list((effects)
-			db_get_memory_resource(DBR_OUT_ALIAS_PAIRS,
-					       module_name,
-					       TRUE));
+	effects_classes_classes((effects_classes)
+				db_get_memory_resource(DBR_OUT_ALIAS_PAIRS,
+						       module_name,
+						       TRUE));
 
     MAP(LIST, alias_pair,
 	{
