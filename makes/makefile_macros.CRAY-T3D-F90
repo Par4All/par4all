@@ -1,10 +1,10 @@
 #
 # $RCSfile: makefile_macros.CRAY-T3D-F90,v $ (version $Revision$)
-# $Date: 1997/01/18 11:07:03 $, 
+# $Date: 1997/01/18 11:19:49 $, 
 #
 # this file contains macro definitions 
 
-include $(ROOT)/Include/makefilemacros.CRAY-T3D
+include $(ROOT)/Include/makefile_macros.CRAY-T3D
 
 FC	= TARGET=cray-t3d f90
 FFLAGS	= -O 3 -O scalar3 -O unroll2
