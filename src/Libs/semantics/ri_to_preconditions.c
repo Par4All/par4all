@@ -141,7 +141,7 @@ unstructured_to_postconditions(
      * unstructured structure. They are always duplicated and
      * the caller has to take care of their de-allocation.
      */
-    FORWARD_CONTROL_MAP(c, {
+    CONTROL_MAP(c, {
 	statement st = control_statement(c) ;
 	if(c==ct && ENDP(control_predecessors(c)) && statement_test_p(st)) {
 	    /* special case for the first node if it has no predecessor */
