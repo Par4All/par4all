@@ -20,11 +20,16 @@
 #define QUICK_QUIT "Quit without saving"
 #define CLOSE_QUIT "Close (save) the Workspace & Quit"
 #define DELETE_QUIT "Delete the Workspace & Quit"
-
+#define CD_HACK_QUIT "Change Directory (tcl/tk hack)"
 
 Panel_item quit_button;
 
 
+void
+cd_notify(Menu menu, Menu_item menu_item)
+{
+    direct_change_directory();
+}
 
 void
 quit_notify(Menu menu,
@@ -89,6 +94,7 @@ create_quit_button()
                     MENU_ACTION_ITEM, CLOSE_QUIT, quit_notify,
                     MENU_ACTION_ITEM, QUICK_QUIT, quit_notify,
                     MENU_ACTION_ITEM, DELETE_QUIT, quit_notify,
+		    MENU_ACTION_ITEM, CD_HACK_QUIT, cd_notify,
                     NULL);
 
    quit_button = xv_create(main_panel, PANEL_BUTTON,
