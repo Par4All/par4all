@@ -160,6 +160,27 @@ expression i;
     return e;
 }
 
+expression
+MakeComplexConstantExpression(
+			      expression r,
+			      expression i)
+{
+    expression cce = expression_undefined;
+    syntax rs = expression_syntax(r);
+    syntax is = expression_syntax(i);
+
+    if(syntax_call_p(rs) && syntax_call_p(is)) {
+	entity rc = call_function(syntax_call(rs));
+	entity ic = call_function(syntax_call(is));
+
+	if(entity_constant_p(rc) && entity_constant_p(ic)) {
+	    entity c = MakeComplexConstant(r, i);
+	    cce = entity_to_expression(c);
+	}
+    }
+    return cce;
+}
+
 /* this function creates an integer constant and then a call to that
 constant. */
 
