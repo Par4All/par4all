@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.94  1998/04/29 08:25:47  coelho
+ * help updated for show and info.
+ *
  * Revision 1.93  1998/04/15 15:30:25  coelho
  * graph.h not nedded.
  *
@@ -197,6 +200,7 @@ static struct t_completion_scheme completion_scheme[] =
 { SET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { GET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { "info",       COMP_NONE,   	 COMP_NONE },
+{ "show", 	COMP_RESOURCE,	 COMP_NONE },
 { (char*)NULL,  COMP_FILENAME,   COMP_FILENAME } /* default: files... */
 };
 
@@ -205,7 +209,7 @@ static char *tp_help_topics[] =
     "readline", "create","close","delete","echo","module","activate",
     "make","apply","capply","display",SET_ENV, SET_PROP,GET_PROP,SHELL_ESCAPE,
     CHANGE_DIR,QUIT,"source", HELP,"rule","resource","owner", "remove",
-    "checkpoint", (char*)NULL
+    "checkpoint", "info", "show", (char*)NULL
 };
 
 /* Generator function for command completion.  STATE lets us know whether
@@ -615,6 +619,10 @@ tpips_help(string line)
     TP_HELP("help", "help     (<help-item>)\n",
 	 "\tprint a list of all the commands or a \"detailled\""
 	 " description of one\n");
+    TP_HELP("show", "show     <resourcename([OWNER])>\n",
+	 "\treturns the file of this resource\n");
+    TP_HELP("info", "info\n",
+	 "\tprint information about current module and workspace\n");
     TP_HELP("shell", "shell   [<shell-function>]\n",
 	 "\tallow shell functions call\n");
     TP_HELP("owner", "- owner : variable*\n",
