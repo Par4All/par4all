@@ -5,12 +5,13 @@
 #include <xview/xview.h>
 #include <xview/panel.h>
 #include <xview/notice.h>
-#include <types.h>
 
 #include "genC.h"
 #include "database.h"
 #include "misc.h"
 #include "ri.h"
+
+#include "ri-util.h"
 #include "pipsdbm.h"
 #include "top-level.h"
 
