@@ -679,7 +679,6 @@ expression e;
     return val;
 }
 
-
 /* expression make_factor_expression(int coeff, entity vari)
  * make the expression "coeff*vari"  where vari is an entity.
  */
@@ -730,28 +729,33 @@ Pvecteur pv;
 	v = v_sorted;
     expression 	factor1, factor2;
     entity op_add, op_sub;
+    int coef;
 
     op_add = entity_intrinsic(PLUS_OPERATOR_NAME);
     op_sub = entity_intrinsic(MINUS_OPERATOR_NAME);
 
-    assert(!entity_undefined_p(op_add) && !entity_undefined_p(op_sub));
-    
     if (VECTEUR_NUL_P(v)) 
 	return make_integer_constant_expression(0);
 
-    factor1 = make_factor_expression((int) vecteur_val(v), 
-				     (entity) vecteur_var(v));
+    coef = VALUE_TO_INT(vecteur_val(v));
+    factor1 = make_factor_expression(ABS(coef), (entity) vecteur_var(v));
+    if (coef<0)
+    {
+	entity op_ums = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
+	factor1 = call_to_expression
+	    (make_call(op_ums, CONS(EXPRESSION, factor1, NIL)));
+    }
 
     for (v=v->succ; v!=NULL; v=v->succ)
     {
-	factor2 = make_factor_expression(ABS((int) vecteur_val(v)),
-					 (entity) vecteur_var(v));
-	factor1 = make_expression(make_syntax(is_syntax_call,
-		      make_call((vecteur_val(v)>0 ? op_add : op_sub),
-		CONS(EXPRESSION, factor1,
-		CONS(EXPRESSION, factor2,
-		     NIL)))),
-				  normalized_undefined);
+	coef = VALUE_TO_INT(vecteur_val(v));
+	pips_assert("some coefficient", coef!=0);
+	factor2 = make_factor_expression(ABS(coef), (entity) vecteur_var(v));
+	factor1 = call_to_expression
+	    (make_call(coef>0? op_add: op_sub,
+		       CONS(EXPRESSION, factor1,
+		       CONS(EXPRESSION, factor2,
+			    NIL))));
     }
 
     vect_rm(v_sorted);
@@ -770,10 +774,10 @@ Pvecteur_to_assign_statement(
 {
     statement result;
     Pvecteur vcopy;
-    int coef;
+    Value coef;
     
     coef = vect_coeff((Variable) var, v);
-    assert(abs(coef)<=1);
+    assert(value_le(value_abs(coef),VALUE_ONE));
 
     vcopy = vect_dup(v);
 	
