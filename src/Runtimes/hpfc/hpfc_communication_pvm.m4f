@@ -1,0 +1,20 @@
+c     
+c      
+c     
+
+c
+
+      subroutine hpfc init send (encoding, bufid) 
+      int encoding, bufid
+
+      call pvmfinitsend( encoding, bufid )
+
+
+      end 
+
+
+      subroutine hpfc send (
+      
+
+
+      call pvmfsend( tid, msgtag, info )
