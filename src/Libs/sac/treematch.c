@@ -13,12 +13,6 @@
 
 
 static bool patterns_initialized = FALSE;
-
-static hash_table opcodeClass_ids;   /* <string->int> */
-static opcodeClass* opcodeClasses = NULL;
-static int nbOpcodeClasses = 0;
-static int nbAllocatedOpcodeClasses = 0;
-
 static matchTree patterns_tree = NULL;
 
 static matchTree make_tree()
@@ -163,42 +157,12 @@ list match_statement(statement s)
 
 void insert_opcodeClass(char * s, int nbArgs, list opcodes)
 {
-   int id;
-
-   //Find an id for the opcodeClass
-   id = nbOpcodeClasses++;
-
-   //Add the id and name in the map
-   hash_put(opcodeClass_ids, (void *)s, (void *)id);
-
-   //Make room for the new opcodeClass if needed
-   if (nbOpcodeClasses > nbAllocatedOpcodeClasses)
-   {
-      nbAllocatedOpcodeClasses += 10;
-
-      opcodeClasses = (opcodeClass*)realloc((void*)opcodeClasses, 
-				      sizeof(opcodeClass)*nbAllocatedOpcodeClasses);
-
-      if (opcodeClasses == NULL)
-      {
-	 printf("Fatal error: could not allocate memory for opcodeClasses.\n");
-	 exit(-1);
-      }
-   }
-
-   //Initialize members
-   opcodeClasses[id] = make_opcodeClass(nbArgs, opcodes);
+   //Add the class and name in the map
+   make_opcodeClass(s, nbArgs, opcodes);
 }
 
-opcodeClass get_opcodeClass(int kind)
+char * get_opcodeClass_opcode(opcodeClass op, int vecSize, int subwordSize)
 {
-   return ((kind>=0) && (kind<nbOpcodeClasses)) ?
-      opcodeClasses[kind] : opcodeClass_undefined;
-}
-
-char * get_opcodeClass_opcode(int kind, int vecSize, int subwordSize)
-{
-   opcodeClass op = get_opcodeClass(kind);
    list opcodes;
 
    if (op == opcodeClass_undefined)
@@ -216,20 +180,18 @@ char * get_opcodeClass_opcode(int kind, int vecSize, int subwordSize)
    return NULL;
 } 
 
-int get_opcodeClass_id(char * s)
+opcodeClass get_opcodeClass(char * s)
 {
-   int id = (int)hash_get(opcodeClass_ids, (void*)s);
-
-   return (id == (int)HASH_UNDEFINED_VALUE) ? -1 : id;
+   return gen_find_opcodeClass(s);
 }
 
 void insert_pattern(char * s, list tokens, list args)
 {
-   int c = get_opcodeClass_id(s);
+   opcodeClass c = get_opcodeClass(s);
    patternx p;
    matchTree m = patterns_tree;
 
-   if (c < 0)
+   if (c == opcodeClass_undefined)
    {
       printf("Warning: defining pattern for an undefined opcodeClass (%s).",s);
       return;
@@ -266,7 +228,6 @@ void init_tree_patterns()
       patterns_initialized = TRUE;
 
       patterns_tree = make_tree();
-      opcodeClass_ids = hash_table_make(hash_string, 0);
 
       patterns_yyin = fopen("patterns.def", "r");
       patterns_yyparse();
