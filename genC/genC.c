@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1996/09/20 18:59:54 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1996/09/21 10:18:48 $, )
  * version $Revision$
  */
 
@@ -118,7 +118,7 @@ union domain *dp ;
 	    sprintf( buffer, "%c", *bp->name ) ;
 	}
 	else if( IS_EXTERNAL( bp )) {
-	    sprintf( buffer, "s" ) ;
+	    sprintf( buffer, "e" ) ;
 	}
 	else {
 	    sprintf( buffer, "p" ) ;
@@ -223,29 +223,39 @@ union domain *dp ;
 /* GEN_MEMBER generates a member access functions for domain DP and
    OFFSET. NAME is the domain of the defined domain. */
 
+/* this non casted version is ok for setting a field
+ */
 static void
-gen_member( name, dp, offset)
-char *name ;
-union domain *dp ;
-int offset ;
+gen_member(
+    char *name,
+    union domain *dp,
+    int offset)
 {
     char *cast = primitive_cast( dp ) ;
     char *field = primitive_field( dp ) ;
 
-    if( dp->ba.type == BASIS_DT && 
-       strcmp( dp->ba.constructand->name, UNIT_TYPE_NAME ) == 0 ) {
-	return ;
-    }
-    (void) printf( "#define %s_%s(node) ", name, dp->ba.constructor ) ;
+    if (dp->ba.type == BASIS_DT && 
+	strcmp( dp->ba.constructand->name, UNIT_TYPE_NAME ) == 0)
+	return;
+    
+    /* non casted version
+     */
+    printf( "#define %s_%s_(node) ", name, dp->ba.constructor ) ;
 
-    if( IS_NON_INLINABLE_BASIS( cast, field )) {
+    if( IS_NON_INLINABLE_BASIS( cast, field ))
 	printf("GEN_CHECK((%s(((node)+%d)->%s)),%s_domain)\n", 
 	       cast, offset, field, dp->ba.constructand->name ) ;
-    }
-    else {
-	printf( "(%s(((node)+%d)->%s))\n", /* cast */ " " , offset, field ) ;
-    }
+    else
+	printf("(((node)+%d)->%s)\n", offset, field) ;
+
+    /* casted version 
+     */
+    printf("#define %s_%s(node) (%s%s_%s_(node))\n", 
+	   name, dp->ba.constructor, cast, name, dp->ba.constructor);
+
+    return;
 }
+
 
 /* GEN_ARG returns the constructor name of domain DP. */
 
@@ -312,7 +322,7 @@ gen_and( bp )
     size = GEN_HEADER + IS_TABULATED( bp ) ;
 
     for( dlp=dom->co.components ; dlp != NULL ; dlp=dlp->cdr )
-	    gen_member( bp->name, dlp->domain, size++ ) ;
+	gen_member( bp->name, dlp->domain, size++);
 }
 
 /* GEN_OR generates the manipulation function for an OR_OP type BP. Note
@@ -341,6 +351,7 @@ gen_or( bp )
 	        name, dp->ba.constructor, offset ) ;
 	(void) printf( "#define %s_%s_p(or) ((%s_tag (or))==is_%s_%s)\n",
 	        name, dp->ba.constructor, name, name, dp->ba.constructor ) ;
+	
 	gen_member( name, dp, OR_TAG_OFFSET ) ;
     }
 }
@@ -463,10 +474,15 @@ struct gen_binding *bp ;
     (void) printf( "#ifndef _newgen_%s_defined\n", s ) ;
     (void) printf( "#define _newgen_%s_defined\n", s ) ;
 
-    (void) printf("#define ");
+    (void) printf("#define __");
     fprint_upper(stdout, s);
     (void) printf( " (%s+%d)\n", start, TYPE( bp )) ;
-    (void) printf( "#endif /* _newgen_%s_defined*/\n", s) ;
+
+    /* for externals, a cast macro is added to char* 
+     */
+    printf("#define newgen_%s(e) ((char*)e)\n", s);
+
+    (void) printf( "#endif /* _newgen_%s_defined */\n", s) ;
 }
 
 /* GEN_DOMAIN generates the manipulation functions for a type BP. This is
