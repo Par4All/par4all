@@ -36,10 +36,12 @@ extern int  simplex_arithmetic_error;
 #define exception_debug(msg, what) 1
 #endif
 
-#define exception_push(what) \
+#define exception_debug_push(what) \
   exception_debug("PUSH", global_exception_index, what)
-#define exception_pop(what) \
+#define exception_debug_pop(what) \
   exception_debug("POP", global_exception_index-1, what)
+#define exception_debug_throw(what) \
+  exception_debug("THROW", global_exception_index-1, what)
 
 #define EXCEPTION extern int
 
@@ -48,10 +50,10 @@ extern int  simplex_arithmetic_error;
      (print_exception_stack_error(0),1))
 
 #define THROW(what) \
-    (throw_exception(what))
+    (exception_debug_throw(what), throw_exception(what))
 
 #define PUSH_AND_FORWARD_EXCEPTION(what)				\
-    (exception_push(what), 						\
+    (exception_debug_push(what), 					\
       global_exception_index==MAX_STACKED_CONTEXTS?			\
      (print_exception_stack_error(1),1):	                        \
      (global_exception_type[global_exception_index]=what,		\
@@ -60,7 +62,7 @@ extern int  simplex_arithmetic_error;
 #define CATCH(what) if PUSH_AND_FORWARD_EXCEPTION(what)
 
 #define UNCATCH(what)						\
-    (exception_pop(what), 					\
+    (exception_debug_pop(what), 				\
      global_exception_type[global_exception_index_decr]!=what?	\
 	(print_exception_stack_error(2), 0): 1)
 
