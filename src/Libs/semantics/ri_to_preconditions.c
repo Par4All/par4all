@@ -658,15 +658,22 @@ statement_to_postcondition(
 	/* add equivalence equalities */
 	pre = tf_equivalence_equalities_add(pre);
 
-	/* eliminate redundancy */
+	/* eliminate redundancy, rational redundancy but not integer redundancy.  */
+
 	/* FI: nice... but time consuming! */
-	/* Version 3 is OK. Equations are over used and make
+	/* Version 3 is OK. Equations are over-used and make
 	 * inequalities uselessly conplex
 	 */
 	/* pre = transformer_normalize(pre, 3); */
 
 	/* pre = transformer_normalize(pre, 6); */
 	/* pre = transformer_normalize(pre, 7); */
+
+	/* The double normalization could be avoided with a non-heuristics
+           approach. For ocean, its overhead is 34s out of 782.97 to give
+           816.62s: 5 %. The double normalization is also useful for some
+           exit conditions of WHILE loops (w05, w06, w07). */
+	pre = transformer_normalize(pre, 4);
 	pre = transformer_normalize(pre, 4);
 
 	if(!transformer_consistency_p(pre)) {
