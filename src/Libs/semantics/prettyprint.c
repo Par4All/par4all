@@ -105,8 +105,7 @@ char *module_name;
 }
 
 static bool 
-print_code_semantics(module_name)
-char *module_name;
+print_code_semantics(string module_name)
 {
     bool success = TRUE;
     text t;
@@ -171,23 +170,16 @@ get_semantic_text(
 	nts = allocate_number_to_statement();
 	nts = build_number_to_statement(nts, mod_stat);
 
-	ifdebug(1) {
-	    print_number_to_statement(nts);
-	}
-	/* debug_off(); */
+	ifdebug(1) print_number_to_statement(nts);
     }
 
+    set_semantic_map((statement_mapping)
+       db_get_memory_resource(
+	   is_transformer? DBR_TRANSFORMERS: DBR_PRECONDITIONS,
+	   module_name, TRUE));
 
-    /* semantic information to print */
-    set_semantic_map( (statement_mapping)
-		     db_get_memory_resource(
-					    is_transformer? DBR_TRANSFORMERS 
-					    : DBR_PRECONDITIONS,
-					    module_name,
-					    TRUE) );
     summary = (transformer)
-	db_get_memory_resource(
-			       is_transformer? DBR_SUMMARY_TRANSFORMER
+	db_get_memory_resource(is_transformer? DBR_SUMMARY_TRANSFORMER
 			       : DBR_SUMMARY_PRECONDITION,
 			       module_name,
 			       TRUE);
@@ -238,10 +230,10 @@ get_semantic_text(
 
 /* this function name is VERY misleading - it should be changed, sometime FI */
 text 
-semantic_to_text(module, margin, stmt)
-entity module;
-int margin;
-statement stmt;
+semantic_to_text(
+    entity module,
+    int margin,
+    statement stmt)
 {
     transformer t;
     text txt;
