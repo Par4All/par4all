@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/11/24 16:44:01 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/11/29 11:26:00 $, )
  * version $Revision$
  */
  
@@ -420,7 +420,7 @@ bool hpfc_directives(string name)
 	!fortran_library_entity_p(module))
     {
 	statement s = (statement)
-	    db_get_memory_resource(DBR_CODE, name, FALSE);
+	    db_get_memory_resource(DBR_CODE, name, TRUE);
 
 	set_current_module_entity(module);
 	set_current_module_statement(s);
@@ -437,7 +437,6 @@ bool hpfc_directives(string name)
 	reset_current_module_statement();
 	reset_current_module_entity();
 	
-	db_unput_a_resource(DBR_CODE, name);
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(name), s);
     }
 
