@@ -88,7 +88,11 @@ in_summary_effects(string module_name)
 bool
 out_summary_effects(string module_name)
 {
-    return TRUE;
+    bool ok;
+    set_methods_for_simple_effects();
+    ok = summary_out_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 
@@ -105,7 +109,11 @@ in_effects(string module_name)
 bool
 out_effects(string module_name)
 {
-    return TRUE;
+    bool ok;
+    set_methods_for_simple_effects();
+    ok = out_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 /************************************************************* PRETTYPRINTS */
