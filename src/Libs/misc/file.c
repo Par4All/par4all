@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/05/22 12:38:33 $, 
+ * $Date: 1997/07/20 20:32:17 $, 
  */
 
 #include <stdlib.h>
@@ -47,9 +47,10 @@ char * filename;
 {
 	if(fclose(stream) == EOF) {
 	  if(errno==ENOSPC)
-	    user_error("safe_fclose","fclose failed on file %s (%s)\n",
-		       filename,
-		       sys_errlist[errno]);
+	    user_irrecoverable_error("safe_fclose",
+				     "fclose failed on file %s (%s)\n",
+				     filename,
+				     sys_errlist[errno]);
 	  else
 	    pips_error("safe_fclose","fclose failed on file %s (%s)\n",
 		       filename,
