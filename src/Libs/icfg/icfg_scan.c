@@ -405,8 +405,6 @@ void print_module_icfg(entity module)
     make_icfg_map();
     make_current_stmt_stack();
 
-    begin_attachment_prettyprint();
-    
     sprintf(buf,"%s\n",module_name);
     ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
 					    strdup(buf)));
@@ -436,8 +434,6 @@ void print_module_icfg(entity module)
 			".icfg"),
 		       txt);
     
-    end_attachment_prettyprint();
-
     free_text (txt);
     free_icfg_map();
     free_current_stmt_stack();
