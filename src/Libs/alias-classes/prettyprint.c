@@ -33,26 +33,40 @@ static text alias_pairs_text(string module_name,string resource_name)
     entity module;
     text txt = make_text(NIL);
 
-/*    debug_on("REGIONS_DEBUG_LEVEL"); */
+    pips_debug(8,"module %s resource %s\n",module_name,resource_name);
 
-    l_pairs = (list) db_get_memory_resource(resource_name, module_name, TRUE);    
+    l_pairs = (list) db_get_memory_resource(resource_name, module_name, TRUE);
+
+    pips_debug(8,"got pairs\n");
+
+    /* To set up the hash table to translate value into value names */       
 
     set_current_module_entity( local_name_to_top_level_entity(module_name));
     module = get_current_module_entity();
-
-    /* To set up the hash table to translate value into value names */       
     set_cumulated_rw_effects((statement_effects)
 	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings(module);
 
+    pips_debug(8,"hash table set up\n");
+
     MAP(LIST,pair,
 	{
-	    /* MERGE_TEXTS(txt, text_array_regions(pair)); */
-    ADD_SENTENCE_TO_TEXT(txt,make_sentence(is_sentence_formatted,strdup("\n")));
+	    if (pair != (list) HASH_UNDEFINED_VALUE && pair != list_undefined) 
+	    {
+		MAP(EFFECT, reg,
+		    {
+			MERGE_TEXTS(txt, text_region(reg));
+		    },
+			pair);
+		ADD_SENTENCE_TO_TEXT(
+		    txt,
+		    make_sentence(is_sentence_formatted,strdup("\n"))
+		    );
+	    }
 	},
-    l_pairs);
+	    l_pairs);
 
-/*    debug_off(); */
+    pips_debug(8,"made text\n");
 
     reset_current_module_entity();
     reset_cumulated_rw_effects();
@@ -67,31 +81,42 @@ print_alias_pairs( string module_name, string resource_name, string file_extn )
     char *file_resource_name;
     bool success = TRUE;
 
+    pips_debug(8,"module %s resource %s file extn %s\n",
+	       module_name,resource_name,file_extn);
+
     file_resource_name = DBR_ALIAS_FILE;
 
-    /*
-    begin_attachment_prettyprint();
-    */  
-    success = make_text_resource(module_name, file_resource_name,
+    success = make_text_resource(module_name,
+				 file_resource_name,
 				 file_extn,
-				 alias_pairs_text(module_name,
-				    resource_name));
-    /*
-    end_attachment_prettyprint();
-    */
-    return(TRUE);
+				 alias_pairs_text(module_name,resource_name));
+    return(success);
 }
 
 
 bool
 print_in_alias_pairs( string module_name )
 {
-return print_alias_pairs(module_name,DBR_IN_ALIAS_PAIRS,".in_alias");
+    bool success = TRUE;
+
+    pips_debug(8,"module %s\n",module_name);
+
+    success = print_alias_pairs(module_name,DBR_IN_ALIAS_PAIRS,".in_alias");
+    return(TRUE);
 }
 
 
 bool
 print_out_alias_pairs( string module_name )
 {
-return(TRUE);
+    bool success = TRUE;
+
+    debug_on("ALIAS_DEBUG_LEVEL");
+    pips_debug(8,"module %s\n",module_name);
+
+    success = print_alias_pairs(module_name,DBR_OUT_ALIAS_PAIRS,".out_alias");
+
+    debug_off();
+
+    return(TRUE);
 }
