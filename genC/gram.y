@@ -125,9 +125,7 @@ Imports : Imports GRAM_IMPORT Name FROM File SEMI_COLUMN {
 	;
 
 File	: GRAM_FILE {
-		$$ = alloc( strlen( yytext )) ;
-		strcpy( $$, yytext+1 ) ;
-		*( $$ + strlen( yytext+1 ) - 1 ) = '\0' ;
+		$$ = yylval.name ;
 		}
 	;
 
@@ -327,12 +325,12 @@ Dimensions
 		}				
 	;
 
-Int     : GRAM_INT   {$$ = atoi( yytext );}
+Int     : GRAM_INT   {$$ = yylval.val;}
         ;
 
 Name	: IDENT	{
-	        $$ = strdup(yytext); 
-		check_not_keyword( $$ ) ;
+		check_not_keyword( yylval.name ) ;
+		$$ = yylval.name;
 		}
 	;
 %%
