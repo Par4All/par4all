@@ -107,8 +107,8 @@ rice_loop(statement stat, int l)
 	int so = statement_ordering(stat);
 	user_warning("rice_loop", 
 		     "Cannot apply Allen & Kennedy's algorithm on "
-		     "Loop %s with index %s at Statement %d (%d, %d)"
-		     "because it contains either tests or goto statements"
+		     "loop %s with index %s at Statement %d (%d, %d)"
+		     " because it contains either tests or goto statements"
 		     " which prohibit loop distribution. You could activate the"
 		     " coarse_grain_parallelization rule.\n",
 		     label_local_name(loop_label(instruction_loop(istat))),
