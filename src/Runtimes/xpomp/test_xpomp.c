@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 #include <xpomp_graphic.h>
 
 enum {
@@ -63,9 +65,11 @@ main()
     }
 
     while(1) {
-	int button;
+	int button, state;
 	unsigned char color;
-	button = XPOMP_wait_mouse(d, &x, &y);
+	button = XPOMP_wait_mouse(d, &x, &y, &state);
+	printf("XPOMP_wait_mouse: X=%d, Y=%d, button=%d, state=%d\n",
+	       x, y, button, state);
 	switch(button) {
 	case 1:
 	    color = 0;
