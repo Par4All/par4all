@@ -161,10 +161,16 @@ aliases_text(string module_name, string resource_name)
 
     pips_debug(4,"module %s resource %s\n",module_name,resource_name);
 
-/*alias_lists = (list) db_get_memory_resource(resource_name, module_name, TRUE);*/
+/*alias_lists = (list) db_get_memory_resource(resource_name,module_name,TRUE);
+*/
 
-    alias_lists = effects_to_list(
+/*    alias_lists = effects_to_list(
 	(effects)
+	db_get_memory_resource(resource_name, module_name, TRUE));
+*/
+
+    alias_lists = effects_classes_classes(
+	(effects_classes)
 	db_get_memory_resource(resource_name, module_name, TRUE));
 
     pips_debug(9,"got aliases\n");
@@ -255,7 +261,7 @@ print_in_alias_pairs( string module_name )
 {
     bool success = TRUE;
 
-    debug_on("ALIAS_DEBUG_LEVEL");
+    debug_on("ALIAS_PAIRS_DEBUG_LEVEL");
     pips_debug(4,"module %s\n",module_name);
 
     success = print_aliases(module_name,DBR_IN_ALIAS_PAIRS,".in_alias");
@@ -272,7 +278,7 @@ print_out_alias_pairs( string module_name )
 {
     bool success = TRUE;
 
-    debug_on("ALIAS_DEBUG_LEVEL");
+    debug_on("ALIAS_PAIRS_DEBUG_LEVEL");
     pips_debug(4,"module %s\n",module_name);
 
     success = print_aliases(module_name,DBR_OUT_ALIAS_PAIRS,".out_alias");
@@ -288,7 +294,7 @@ print_alias_lists( string module_name )
 {
     bool success = TRUE;
 
-    debug_on("ALIAS_DEBUG_LEVEL");
+    debug_on("ALIAS_LISTS_DEBUG_LEVEL");
     pips_debug(4,"module %s\n",module_name);
 
     success = print_aliases(module_name,DBR_ALIAS_LISTS,".alias_lists");
@@ -304,7 +310,7 @@ print_alias_classes( string module_name )
 {
     bool success = TRUE;
 
-    debug_on("ALIAS_DEBUG_LEVEL");
+    debug_on("ALIAS_CLASSES_DEBUG_LEVEL");
     pips_debug(4,"module %s\n",module_name);
 
 
