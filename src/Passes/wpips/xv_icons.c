@@ -122,7 +122,7 @@ void set_pips_icon(Frame frame, int icon_number, char *icon_text)
     int height, width;
 
     image = pips_icon_server_image[icon_number];
-    image = create_status_window_pips_image();
+    /* image = create_status_window_pips_image(); */
     
     width = xv_get(image, XV_WIDTH);
     height = xv_get(image, XV_HEIGHT);
