@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/11/11 13:44:21 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/11/13 07:58:42 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -359,7 +359,7 @@ $VERBOSE "validating modules"
 for m in $MODULES
 do
   h=`available_host`
-  $VERBOSE " - validate $m on $h"
+  $VERBOSE " - validate $m on $h at `date`"
   send_validate $m $h
 done
 
@@ -372,7 +372,7 @@ while available_host ; do : ; done > /dev/null
 #
 #
 
-$VERBOSE "generating final report"
+$VERBOSE "generating final report at `date`"
 
 failed=`tr '\012' '-' < $FAILED`
 
