@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.173  2003/07/30 15:21:59  ferrand
+%% Add SAC_SIMD_REGISTER_WIDTH property to set the SIMD registers width.
+%%
 %% Revision 1.172  2003/07/30 14:57:04  ferrand
 %% Add properties for SAC (auto-unroll).
 %%
@@ -231,7 +234,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2003/07/30 14:57:04 $~$
+$~$Date: 2003/07/30 15:21:59 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2108,6 +2111,14 @@ ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
 \end{verbatim}
 
 \subsection{SAC - SIMD Architecture Compiler}
+
+This property is used to set the target register size, expressed in
+bits, for places where this is needed (for instance, auto-unroll with
+simple algorithm).
+
+\begin{verbatim}
+SAC_SIMD_REGISTER_WIDTH 64
+\end{verbatim}
 
 \subsubsection{Auto-Unroll}
 
