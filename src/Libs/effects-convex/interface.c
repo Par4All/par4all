@@ -22,7 +22,6 @@
 #include "text-util.h"
 #include "text.h"
 
-
 #include "properties.h"
 
 #include "transformer.h"
@@ -41,26 +40,16 @@
 /* bool summary_regions(char *module_name): computes the global
  * regions of a module : global regions only use formal or common variables.
  */
-bool summary_regions(char *module_name)
+bool 
+summary_regions(char *module_name)
 {
-
-    list sum_regions;
-
-    /* Get the regions of the module */
-    set_rw_effects( (statement_effects) 
-	db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
-
-    sum_regions = NIL;
-
-    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_REGIONS, 
-			   strdup(module_name),
-			   (char*) list_to_effects(sum_regions));
-
-    reset_rw_effects();
-    return(TRUE);
+    bool res;
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_summary_rw_regions;
+    effects_computation_reset_func = reset_convex_summary_rw_regions;
+    res = summary_rw_effects_engine(module_name);
+    return(res);
 }
-
-
 
 /* bool may_regions(char *module_name) 
  * input    : the name of the current module
@@ -68,12 +57,21 @@ bool summary_regions(char *module_name)
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
-bool may_regions(char *module_name)
+bool 
+may_regions(char *module_name)
 {
-    set_bool_property("MUST_REGIONS", FALSE);
-    regions(module_name);
+    bool res1, res2;
 
-    return(TRUE);
+    set_bool_property("MUST_REGIONS", FALSE);
+
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_rw_regions;
+    effects_computation_reset_func = reset_convex_rw_regions;
+
+    res1 = proper_effects_engine(module_name);
+    res2 = rw_effects_engine(module_name);
+   
+    return (res1 && res2);
 }
 
 
@@ -83,85 +81,24 @@ bool may_regions(char *module_name)
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
-bool must_regions(char *module_name)
+bool 
+must_regions(char *module_name)
 {
+    bool res1, res2;
+
     set_bool_property("MUST_REGIONS", TRUE);
-    regions(module_name);    
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_rw_regions;
+    effects_computation_reset_func = reset_convex_rw_regions;
 
-    return(TRUE);
+    res1 = proper_effects_engine(module_name);
+
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_rw_regions;
+    effects_computation_reset_func = reset_convex_rw_regions;
+    res2 = rw_effects_engine(module_name);
+    return (res1 && res2);
 }
-
-
-
-/* bool regions(char *module_name) 
- * input    : the name of the current module
- * output   : nothing.
- * modifies : computes the local regions of a module.
- * comment  : local regions can contain local variables.
- */
-bool regions(char *module_name)
-{
-
-    /* Get the code of the module. */
-    set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
-    
-    /* Get the transformers and preconditions of the module. */
-    set_transformer_map( (statement_mapping)
-	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );	
-    set_precondition_map( (statement_mapping) 
-	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
-
-    /* predicates defining summary regions from callees have to be 
-       translated into variables local to module */
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
-
-
-    set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-    module_to_value_mappings(get_current_module_entity());
-
-    /* Compute the regions of the module. */
-    init_rw_effects();
-    init_invariant_rw_effects();
-    init_proper_rw_effects();
-  
-    debug_on("REGIONS_DEBUG_LEVEL");
-    debug(1, "regions", "begin\n");
-
-    debug(1, "regions", "end\n");
-    debug_off();
-
-
-
-    DB_PUT_MEMORY_RESOURCE(DBR_REGIONS, 
-			   strdup(module_name),
-			   (char*) get_rw_effects());
-
-    DB_PUT_MEMORY_RESOURCE(DBR_INV_REGIONS, 
-			   strdup(module_name),
-			   (char*) get_invariant_rw_effects());
-
-    DB_PUT_MEMORY_RESOURCE(DBR_PROPER_REGIONS, 
-			   strdup(module_name),
-			   (char*) get_proper_rw_effects());
-
-
-    reset_current_module_entity();
-    reset_current_module_statement();
-    reset_transformer_map();
-    reset_precondition_map();
-    reset_cumulated_rw_effects();
-
-    reset_rw_effects();
-    reset_invariant_rw_effects();
-    reset_proper_rw_effects();
-
-
-    return(TRUE);
-}
-
-
 
 /*********************************************************************************/
 /* CONVEX IN REGIONS                                                             */
@@ -175,26 +112,16 @@ bool regions(char *module_name)
  * comment  : computes the summary in regions of the current module, using the
  *            regions of its embedding statement.	
  */
-bool in_summary_regions(module_name)
-char *module_name;
+bool 
+in_summary_regions(char *module_name)
 {
+    bool res;
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_summary_in_out_regions;
+    effects_computation_reset_func = reset_convex_summary_in_out_regions;
 
-    list in_sum_regions = NIL; 
-
-
-      /* Get the in_regions of the module: they are computed by the function
-       * in_regions() (see below).
-       */
-    set_rw_effects( (statement_effects) 
-	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE) );
-    
-    DB_PUT_MEMORY_RESOURCE(DBR_IN_SUMMARY_REGIONS, 
-			   strdup(module_name),
-			   (char*) list_to_effects(in_sum_regions));
-
-    reset_rw_effects();
-
-    return(TRUE);
+    res =  summary_in_effects_engine(module_name);
+    return res;
 }
 
 /* bool in_regions(char *module_name): 
@@ -203,83 +130,16 @@ char *module_name;
  * modifies : the database.
  * comment  : computes the in regions of the current module.	
  */
-bool in_regions(module_name)
-char *module_name;
+bool 
+in_regions(char *module_name)
 {
-    entity module;
-    statement module_stat;
-    list l_in;
+    bool res;
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_in_out_regions;
+    effects_computation_reset_func = reset_convex_in_out_regions;
 
-    debug_on("REGIONS_DEBUG_LEVEL");
-    debug(1, "in_regions", "begin\n");
-
-    /* Get the code of the module. */
-    set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
-    module_stat = get_current_module_statement();
-    
-    /* Get the transformers, preconditions and regions of the module. */
-    set_transformer_map( (statement_mapping)
-	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );	
-    set_precondition_map( (statement_mapping) 
-	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
-
-    set_rw_effects((statement_effects) 
-	db_get_memory_resource(DBR_REGIONS, module_name, TRUE) );
-    set_invariant_rw_effects((statement_effects) 
-	db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE));
-
-
-    /* initialise the maps for in regions */
-    init_in_effects();
-    init_invariant_in_effects();
-    init_cumulated_in_effects();
-  
-    /* predicates defining summary regions from callees have to be 
-       translated into variables local to module */
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
-    module = get_current_module_entity();
-
-    set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-    module_to_value_mappings(module);
-
-    /* Compute the regions of the module. */
-    l_in = NIL;      
-
-
-    debug(1, "in_regions", "end\n");
-
-    debug_off();
-
-    DB_PUT_MEMORY_RESOURCE(DBR_IN_REGIONS, 
-			   strdup(module_name),
-			   (char*) get_in_effects());
-
-    DB_PUT_MEMORY_RESOURCE(DBR_INV_IN_REGIONS, 
-			   strdup(module_name),
-			   (char*) get_invariant_in_effects());
-
-    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_IN_REGIONS, 
-			   strdup(module_name),
-			   (char*) get_cumulated_in_effects()); 
-
-    reset_current_module_entity();
-    reset_current_module_statement();
-    reset_transformer_map();
-    reset_precondition_map();
-
-    reset_cumulated_rw_effects();
-
-    reset_rw_effects();
-    reset_invariant_rw_effects();
-
-    reset_in_effects();
-    reset_invariant_in_effects();
-    reset_cumulated_in_effects();
-
-
-    return(TRUE);
+    res = in_effects_engine(module_name);
+    return res;
 }
 
 
@@ -287,124 +147,431 @@ char *module_name;
 /* CONVEX OUT REGIONS                                                            */
 /*********************************************************************************/
 
-/* bool out_summary_regions(module_name)
- * input    : the name of the current module.
- * output   : TRUE.
- * modifies : stores the out_summary_regions of the current module
- * comment  : new correct version: computes the out_summary_regions from
- *            the out_regions at the different call sites.
- */
 bool
 out_summary_regions(char * module_name)
 {
-    list l_reg = NIL;
-    /* Look for all call sites in the callers */
-    callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
-						       module_name,
-						       TRUE);
-    entity callee = local_name_to_top_level_entity(module_name);
+    bool res;
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_in_out_regions;
+    effects_computation_reset_func = reset_convex_in_out_regions;
 
-    debug_on("SUMMARY_REGIONS_DEBUG_LEVEL");
-
-    set_current_module_entity(callee);
-
-    l_reg = NIL;
-	
-    DB_PUT_MEMORY_RESOURCE(DBR_OUT_SUMMARY_REGIONS, 
-			   strdup(module_name),
-			   (char*) list_to_effects(l_reg));
-
-    reset_current_module_entity();
-    debug_off();
-    return(TRUE);
+    res =  summary_out_effects_engine(module_name);
+    return res;
 }
 
-
-/* bool out_regions(char *module_name): 
- * input    : the name of the current module.
- * output   : nothing !
- * modifies : the database.
- * comment  : computes the out regions of the current module.	
- */
-bool out_regions(module_name)
-char *module_name;
+bool
+out_regions(char *module_name)
 {
-    entity module;
-    statement module_stat;
-    list out_sum_regions = NIL;
+    bool res;
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_in_out_regions;
+    effects_computation_reset_func = reset_convex_in_out_regions;
 
-    debug_on("REGIONS_DEBUG_LEVEL");
-    debug(1, "out_regions", "begin\n");
-
-
-    /* Get the code of the module. */
-    set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
-    module_stat = get_current_module_statement();
-    
-    /* Get the transformers, preconditions, regions and cumulated in_regions 
-       of the module. */
-    set_transformer_map( (statement_mapping)
-	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );	
-    set_precondition_map( (statement_mapping) 
-	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
-
-    set_rw_effects((statement_effects) 
-	db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
-    set_invariant_rw_effects((statement_effects) 
-	db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE));
-
-    set_cumulated_in_effects( (statement_effects) 
-	db_get_memory_resource(DBR_CUMULATED_IN_REGIONS, module_name, TRUE) );
-    set_in_effects( (statement_effects) 
-	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE) );
-    set_invariant_in_effects( (statement_effects) 
-	db_get_memory_resource(DBR_INV_IN_REGIONS, module_name, TRUE) );
-
-    /* Get the out_summary_regions of the current module */
-    out_sum_regions = effects_to_list((effects)
-	    db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS, module_name, TRUE));
-
-    /* initialise the map for out regions */
-    init_out_effects();
-  
-    /* predicates defining summary regions from callees have to be 
-       translated into variables local to module */
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
-    module = get_current_module_entity();
-
-    set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-    module_to_value_mappings(module);
-
-    /* Compute the out_regions of the module. */
-
-    debug(1, "out_regions", "end\n");
-
-    debug_off();
-
-    DB_PUT_MEMORY_RESOURCE(DBR_OUT_REGIONS, 
-			   strdup(module_name),
-			   (char*) get_out_effects() );
-
-    reset_current_module_entity();
-    reset_current_module_statement();
-    reset_transformer_map();
-    reset_precondition_map();
-
-    reset_cumulated_rw_effects();
-
-    reset_rw_effects();
-    reset_invariant_rw_effects();
-
-    reset_in_effects();
-    reset_cumulated_in_effects();
-    reset_invariant_in_effects();
-    reset_out_effects();
-
-    return(TRUE);
+    res = out_effects_engine(module_name);
+    return res;
 }
 
+
+/*********************************************************************************/
+/* PRETTYPRINT                                                                   */
+/*********************************************************************************/
+
+bool
+print_code_proper_regions(char* module_name)
+{
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_summary_rw_regions;
+    effects_computation_reset_func = reset_convex_summary_rw_regions;
+
+    set_is_user_view_p(FALSE);
+    set_prettyprint_with_attachments(FALSE);
+    set_read_action_interpretation(READ_IS_READ);
+    set_write_action_interpretation(WRITE_IS_WRITE);
+    return (print_source_or_code_with_any_effects_engine(module_name,
+							 DBR_PROPER_REGIONS,
+							 string_undefined,
+							 ".preg"));
+}
+
+bool
+print_source_proper_regions(char* module_name)
+{
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_summary_rw_regions;
+    effects_computation_reset_func = reset_convex_summary_rw_regions;
+
+    set_is_user_view_p(TRUE);
+    set_prettyprint_with_attachments(FALSE);
+    set_read_action_interpretation(READ_IS_READ);
+    set_write_action_interpretation(WRITE_IS_WRITE);
+    return (print_source_or_code_with_any_effects_engine(module_name,
+							 DBR_PROPER_REGIONS,
+							 string_undefined,
+							 ".upreg"));
+}
+
+
+bool
+print_code_regions(char* module_name)
+{
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_summary_rw_regions;
+    effects_computation_reset_func = reset_convex_summary_rw_regions;
+
+    set_is_user_view_p(FALSE);
+    set_prettyprint_with_attachments(FALSE);
+    set_read_action_interpretation(READ_IS_READ);
+    set_write_action_interpretation(WRITE_IS_WRITE);
+    return (print_source_or_code_with_any_effects_engine(module_name,
+							 DBR_REGIONS,
+							 DBR_SUMMARY_REGIONS,
+							 ".reg"));
+}
+
+bool
+print_source_regions(char* module_name)
+{
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_summary_rw_regions;
+    effects_computation_reset_func = reset_convex_summary_rw_regions;
+
+    set_is_user_view_p(TRUE);
+    set_prettyprint_with_attachments(FALSE);
+    set_read_action_interpretation(READ_IS_READ);
+    set_write_action_interpretation(WRITE_IS_WRITE);
+    return (print_source_or_code_with_any_effects_engine(module_name,
+							 DBR_REGIONS,
+							 DBR_SUMMARY_REGIONS,
+							 ".ureg"));
+}
+
+bool
+print_code_in_regions(char* module_name)
+{
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_summary_in_out_regions;
+    effects_computation_reset_func = reset_convex_summary_in_out_regions;
+
+    set_is_user_view_p(FALSE);
+    set_prettyprint_with_attachments(FALSE);
+    set_read_action_interpretation(READ_IS_IN);
+    set_write_action_interpretation(WRITE_IS_OUT);
+    return (print_source_or_code_with_any_effects_engine(module_name,
+							 DBR_IN_REGIONS,
+							 DBR_IN_SUMMARY_REGIONS,
+							 ".inreg"));
+}
+
+bool
+print_source_in_regions(char* module_name)
+{
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_summary_in_out_regions;
+    effects_computation_reset_func = reset_convex_summary_in_out_regions;
+
+    set_is_user_view_p(TRUE);
+    set_prettyprint_with_attachments(FALSE);
+    set_read_action_interpretation(READ_IS_IN);
+    set_write_action_interpretation(WRITE_IS_OUT);
+    return (print_source_or_code_with_any_effects_engine(module_name,
+							 DBR_IN_REGIONS,
+							 DBR_IN_SUMMARY_REGIONS,
+							 ".uinreg"));
+}
+
+bool
+print_code_out_regions(char* module_name)
+{
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_summary_in_out_regions;
+    effects_computation_reset_func = reset_convex_summary_in_out_regions;
+
+    set_is_user_view_p(FALSE);
+    set_prettyprint_with_attachments(FALSE);
+    set_read_action_interpretation(READ_IS_IN);
+    set_write_action_interpretation(WRITE_IS_OUT);
+    return (print_source_or_code_with_any_effects_engine(module_name,
+							 DBR_OUT_REGIONS,
+							 DBR_OUT_SUMMARY_REGIONS,
+							 ".outreg"));
+}
+
+bool
+print_source_out_regions(char* module_name)
+{
+    set_methods_for_convex_effects();
+    effects_computation_init_func = init_convex_summary_in_out_regions;
+    effects_computation_reset_func = reset_convex_summary_in_out_regions;
+
+    set_is_user_view_p(TRUE);
+    set_prettyprint_with_attachments(FALSE);
+    set_read_action_interpretation(READ_IS_IN);
+    set_write_action_interpretation(WRITE_IS_OUT);
+    return (print_source_or_code_with_any_effects_engine(module_name,
+							 DBR_OUT_REGIONS,
+							 DBR_OUT_SUMMARY_REGIONS,
+							 ".uoutreg"));
+}
+
+
+
+/*********************************************************************************/
+/* PIPSDBM INTERFACES                                                            */
+/*********************************************************************************/
+
+statement_effects
+db_get_convex_proper_rw_regions(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_PROPER_REGIONS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+void
+db_put_convex_proper_rw_regions(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_PROPER_REGIONS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+statement_effects
+db_get_convex_rw_regions(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_REGIONS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+void
+db_put_convex_rw_regions(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_REGIONS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+statement_effects
+db_get_convex_invariant_rw_regions(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_INV_REGIONS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+void
+db_put_convex_invariant_rw_regions(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_INV_REGIONS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+
+list
+db_get_convex_summary_rw_regions(char *mod_name)
+{
+    list l_res = NIL;
+    
+    l_res = effects_to_list(
+	(effects) db_get_memory_resource(DBR_SUMMARY_REGIONS, mod_name, TRUE));
+    return l_res;
+}
+
+void
+db_put_convex_summary_rw_regions(char *mod_name, list l_eff)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_REGIONS,
+			   strdup(mod_name),
+			   (char *) list_to_effects(l_eff));
+}
+
+statement_effects
+db_get_convex_in_regions(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_IN_REGIONS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+void
+db_put_convex_in_regions(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_IN_REGIONS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+statement_effects
+db_get_convex_invariant_in_regions(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_INV_IN_REGIONS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+void
+db_put_convex_invariant_in_regions(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_INV_IN_REGIONS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+statement_effects
+db_get_convex_cumulated_in_regions(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_CUMULATED_IN_REGIONS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+void
+db_put_convex_cumulated_in_regions(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_IN_REGIONS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+
+list
+db_get_convex_summary_in_regions(char *mod_name)
+{
+    list l_res = NIL;
+    
+    l_res = effects_to_list(
+	(effects) db_get_memory_resource(DBR_IN_SUMMARY_REGIONS, mod_name, TRUE));
+    return l_res;
+}
+
+void
+db_put_convex_summary_in_regions(char *mod_name, list l_eff)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_IN_SUMMARY_REGIONS,
+			   strdup(mod_name),
+			   (char *) list_to_effects(l_eff));
+}
+
+statement_effects
+db_get_convex_out_regions(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_OUT_REGIONS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+void
+db_put_convex_out_regions(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_OUT_REGIONS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+
+list
+db_get_convex_summary_out_regions(char *mod_name)
+{
+    list l_res = NIL;
+    
+    l_res = effects_to_list(
+	(effects) db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS, mod_name, TRUE));
+    return l_res;
+}
+
+void
+db_put_convex_summary_out_regions(char *mod_name, list l_eff)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_OUT_SUMMARY_REGIONS,
+			   strdup(mod_name),
+			   (char *) list_to_effects(l_eff));
+}
+
+/*********************************************************************************/
+/* INTERFACES TO COMPUTE SIMPLE PROPER EFFECTS FROM OTHER PHASES                 */
+/*********************************************************************************/
+
+/* list proper_effects_of_expression(expression e)
+ * input    : an expression and the current context
+ * output   : the correpsonding list of effects.
+ * modifies : nothing.
+ * comment  :	
+ */
+list 
+regions_of_expression(expression e, transformer context)
+{
+    list le;
+
+    le = proper_regions_of_expression(e, context);
+    le = proper_regions_contract(le);
+    return(le);
+}
+
+/* list proper_effects_of_expression(expression e)
+ * input    : an expression and the current context
+ * output   : the correpsonding list of effects.
+ * modifies : nothing.
+ * comment  :	
+ */
+list 
+proper_regions_of_expression(expression e, transformer context)
+{
+    list le;
+    bool context_stack_defined_p = 
+	effects_private_current_context_stack_initialized_p();
+
+    if (!context_stack_defined_p)
+    {
+	set_methods_for_convex_effects();
+	make_effects_private_current_context_stack();
+    }
+    effects_private_current_context_push(context);
+    
+    le = generic_proper_effects_of_expression(e);
+    
+    effects_private_current_context_pop();
+
+    if (!context_stack_defined_p)
+    {
+	free_effects_private_current_context_stack();
+    }
+
+    return(le);
+}
+
+list 
+proper_regions_of_expressions(list l_exp, transformer context)
+{
+    list le = NIL;
+    MAP(EXPRESSION, exp,
+	{
+	    le = gen_nconc(le, proper_regions_of_expression(exp, context));
+	},
+	l_exp);
+    return le;
+}
 
 /*********************************************************************************/
 /* END                                                                           */
