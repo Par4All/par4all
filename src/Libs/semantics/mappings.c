@@ -71,21 +71,24 @@ static void add_equivalence_equality(entity e, entity eq)
 
 void add_equivalenced_values(entity e, entity eq, bool readonly)
 {
-    /* e and eq are assumed to be integer scalar variables */
-    /* eq will be seen as e, as far as values are concerned,
-       but for printing */
-    /* new equalities e#new == eq#new and e#old == eq#old
-       have to be added to the preconditions just before they
-       are stored; since eq should never be written no eq#old
-       should appear; thus the first equation is enough */
+  /* e and eq are assumed to be different scalar variables of the same
+     analyzed type */
+  /* eq will be seen as e, as far as values are concerned,
+     but for printing */
+  /* new equalities e#new == eq#new and e#old == eq#old
+     have to be added to the preconditions just before they
+     are stored; since eq should never be written no eq#old
+     should appear; thus the first equation is enough */
 
-    /* apparently the parser sees all variables as conflicting
-       with themselves */
-    if(e!=eq) {
-	add_synonym_values(e, eq, readonly);
-	/* add the equivalence equations */
-	add_equivalence_equality(e, eq);
-    }
+  /* By definition, all variables are conflicting
+     with themselves but this is assumed filtered out above. */
+
+  pips_assert("e is not eq", e!=eq);
+
+  add_synonym_values(e, eq, readonly);
+  /* add the equivalence equations */
+  add_equivalence_equality(e, eq);
+
 }
 
 /* ???? */
@@ -148,37 +151,50 @@ static void add_intraprocedural_value_entities(entity e)
     }
 }
 
-/*  */
+/* Look for variables equivalenced with e. e already has values associated
+ * although it may not be a canonical representative of its equivalence
+ * class...
+ *
+ * Forget dynamic aliasing between formal parameters.
+ *
+ * Handle intraprocedural aliasing only.
+ *
+ * Do not handle interprocedural aliasing: this does not seem to be the right place
+ * because too many synonyms, not visible from the current procedure, are
+ * introduced (global_shared = area_layout(type_area(t));
+ * */
 
 void add_or_kill_equivalenced_variables(entity e, bool readonly)
 {
-  /* look for equivalenced variables; forget dynamic aliasing
-     between formal parameters */
-  storage s;
+  storage s = entity_storage(e);
+  entity re = e; /* potential canonical representative for all variables equivalenced with e */
  
-  debug(8,"add_or_kill_equivalenced_variables",
-	"for %s\n", entity_name(e));
-  s = entity_storage(e);
+  pips_debug(8,	"Begin for %s %s\n", entity_name(e),
+	     readonly? "readonly" : "read/write");
+
+  pips_assert("e has values", entity_has_values_p(e));
+
   if(storage_ram_p(s)) {
-    /* handle intraprocedural aliasing */
     list local_shared = ram_shared(storage_ram(s));
-    /* handle interprocedural aliasing: this does not seem to be the right place
-     * because too many synonyms, not visible from the current procedure, are
-     * introduced */
-    /* list global_shared = NIL; */
     bool array_equivalenced = FALSE;
     entity sec = ram_section(storage_ram(s));
     type t = entity_type(sec);
+    list ce = list_undefined;
 
-    pips_assert("add_or_kill_equivalenced_variables", type_area_p(t));
+    pips_assert("t is an area", type_area_p(t));
 
-    /* global_shared = area_layout(type_area(t)); */
-
-    /* Is e intra or interprocedurally equivalenced/aliased with an array or a
-     * non-integer variable?
-     */
-    MAPL(ce, {
+    /* Is e intraprocedurally equivalenced/aliased with an array or a
+     * non-analyzable variable which would make e and all its aliased
+     * variables unanalyzable?  */
+    for(ce=local_shared; !ENDP(ce); POP(ce)) {
       entity eq = ENTITY(CAR(ce));
+
+      /* Since the equivalence is reflexive, no need to process e==eq again. */
+      if(e==eq) continue;
+      /* Since the equivalence is symetrical, eq may have been processed
+         already. */
+      if(entity_has_values_p(eq)) continue;
+
       /* this approximate test by Pierre Jouvelot should be
 	 replaced by an exact test but it does not really matter;
 	 an exact test could only be useful in presence of arrays;
@@ -192,6 +208,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
 	array_equivalenced = TRUE;
 	break;
       }
+
       if(entity_conflict_p(e, eq) && analyzable_scalar_entity_p(eq)) {
 	if(!type_equal_p(entity_type(e),entity_type(eq))) {
 	  pips_user_warning("Values for variable %s of type %s are not analyzed because "
@@ -204,44 +221,43 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
 	  break;
 	}
       }
-    },
-	 local_shared);
+      if(entity_conflict_p(e, eq) && strcmp(entity_name(eq), entity_name(re))<0) {
+	re = eq;
+      }
+    }
 
-    /* if it's not, go ahead */
+    /* if it's not, go ahead: it exists at least one eq such that e and eq
+       are different, are scalars and have the same analyzable type. All
+       eq conflicting with e meets these conditions. */
     if(!array_equivalenced) {
+
+      /* Declare values for the canonical representative re */
+      if(e!=re) {
+	pips_debug(8, "Canonical representative is %s\n", entity_local_name(re));
+	/* Give values to re which should have none and remove values of
+	   e. Assume that e and re are local variables. */
+	pips_assert("re has no values", !entity_has_values_p(re));
+	remove_entity_values(e, readonly);
+	add_new_value(re);
+	if(!readonly) {
+	  add_old_value(re);
+	  add_intermediate_value(re);
+	}
+      }
 
       /* If it is intra-procedurally equivalenced, set the synonyms as
        * read-only variables
        */
-      MAPL(ce, {
+      for(ce=local_shared; !ENDP(ce); POP(ce)) {
 	entity eq = ENTITY(CAR(ce));
-	if(entity_conflict_p(e, eq)) {
-	  if(entity_has_values_p(eq)) {
-	    /* if eq is an integer scalar variable it does not
-	       only have a destructive effect */
-	    add_equivalenced_values(e, eq, readonly);
-	  }
-	}
-      },
-	   local_shared); 
 
-      /* If it is inter-procedurally aliased, set the synonyms as
-       * regular variables
-       */
-      /* FI: This is damaging because too many equivalences are introduced;
-       * synonyms that are not visible from the current procedure are added
-       * because they are visible from the main, i.e. the whole program
-       * is (assumed) analyzed.
-       MAPL(ce, {
-       entity eq = ENTITY(CAR(ce));
-       if(entity_conflict_p(e, eq) && !entity_is_argument_p(eq, local_shared)) {
-       if(integer_scalar_entity_p(eq)) {
-       add_equivalenced_values(e, eq, FALSE);
-       }
-       }
-       },
-       global_shared); 
-      */
+	if(re==eq) continue;
+	if(entity_conflict_p(re, eq)) {
+	  /* if eq is an integer scalar variable it does not
+	     only have a destructive effect */
+	  add_equivalenced_values(re, eq, readonly);
+	}
+      }
     }
     else {
       /* Variable e is equivalenced with an array or a non-integer
@@ -262,6 +278,8 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
     ;
   else
     pips_internal_error("unproper storage = %d\n", storage_tag(s));
+ 
+  pips_debug(8,	"End for %s\n", entity_name(e));
 }
 
 static void allocate_module_value_mappings(entity m)
