@@ -163,6 +163,7 @@ i_create:
 	}
 	sep_list
 	filename_list /* list of fortran files */
+	opt_sep_list
 	{
 	    string main_module_name;
 	    
@@ -545,7 +546,7 @@ filename_list:
 	}
 	|
 	filename
-	opt_sep_list
+	/* opt_sep_list */
 	{ /* the opt_sep_list enables trailing blanks... */
 	    debug(7,"yyparse","reduce rule filename_list (%s)\n", $1);
 
