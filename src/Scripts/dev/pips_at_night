@@ -166,7 +166,7 @@ $debug "report=$report"
 	    name=PIPS_DIRECTORY_FOR_${a}_BINARIES
 	    test "`env | grep ${name}`" && {
 		dir=`eval echo \\\${$name}`
-		$debug cleaning Deve files of ${a} [${name}: ${dir}]
+		$verbose cleaning Deve files of ${a} [${name}: ${dir}]
 		find $dir/Deve \
 		    \( -name '*.[ao]' -o -name pips -o -name '[tw]pips' \) \
 		    -mtime +4 -print | xargs rm -rf
