@@ -159,7 +159,7 @@ prettyprint_dependence_graph(FILE * fd,
 
 		if(conflict_cone(c) != cone_undefined){
 		    if(sru_format_p && !statement_undefined_p(mod_stat)) {
-			fprintf(fd, " levels(");
+			fprintf(fd, " HERE levels(");
 			MAPL(pl, {
 			    fprintf(fd, pl==cone_levels(conflict_cone(c))? "%d" : ",%d",
 				    INT(CAR(pl)));
