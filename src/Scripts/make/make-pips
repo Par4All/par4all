@@ -3,6 +3,9 @@
 # $Id$
 #
 # $Log: make-pips,v $
+# Revision 1.44  1997/08/22 07:07:25  coelho
+# was broken by rcs conversion.
+#
 # Revision 1.43  1997/07/08 12:18:26  coelho
 # more debug...
 #
@@ -14,7 +17,7 @@
 #
 # changed a lot. it happens that -r does what you expect from it...
 # for building pips on installation, do make-pips -b
-# type '$RCSfile: make-pips,v $ -h' for help.
+# type 'make-pips -h' for help.
 
 umask 2
 script=`basename $0`
@@ -50,7 +53,7 @@ then
     . ${PIPS_ROOT}/Include/define_libraries.sh
 else
     # default for bootstraping pips?
-    PIPS_ORDERED_LIBS='Scripts dev'
+    PIPS_ORDERED_LIBS='Scripts dev make'
 fi
 
 #
@@ -61,7 +64,7 @@ usage()
     ret=$1
     shift
     cat >&2 <<-EOF
-	$script (version $Revision$): $@
+	$script: $@
 	usage: $script [options] [targets]
 	  -h: print this help and exit
 	  -v: verbose
