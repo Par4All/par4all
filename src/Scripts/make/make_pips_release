@@ -1,12 +1,12 @@
 #! /bin/sh
 #
-# $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1997/05/07 13:21:21 $, 
+# $Id$
 #
 # (c) Fabien COELHO 1996
 
 unset pack what dotar dozip zip name tostrip strip install addpublic tarname
 
+script=`basename $0`
 tar=${PIPS_TAR:-gtar}
 taropt=cf
 zip=${PIPS_ZIP:-"gzip -v9"}
@@ -14,7 +14,7 @@ verb=:
 cwd=`pwd`
 
 verbose()
-{ echo "$RCSfile: make_pips_release,v $: $@" >&2;}
+{ echo "$script: $@" >&2;}
 
 error()
 { ret=$1; shift; verbose "$@"; exit $ret;}
@@ -24,8 +24,8 @@ usage()
     ret=$1
     shift
     cat <<-EOF
-	$RCSfile: make_pips_release,v $ (version $Revision$): $@
-	usage: $RCSfile: make_pips_release,v $ [options] name
+	[$script]: $@
+	usage: $script [options] name
 	  misc:
 	    -h: this help
 	    -v: verbose
@@ -168,5 +168,5 @@ test "$install" &&
     }
 }
 
-# end of $RCSfile: make_pips_release,v $
+# end of it
 #
