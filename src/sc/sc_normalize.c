@@ -19,6 +19,78 @@
  * Normalisation de chaque contrainte, i.e. division par le pgcd des
  * coefficients (cf. ?!? )
  *
+ * Verification de la non redondance de chaque contrainte avec les autres:
+ *
+ * Pour les egalites, on elimine une equation si on a un systeme d'egalites
+ * de la forme :
+ * 
+ *   a1/    Ax - b == 0,            ou  b1/        Ax - b == 0,              
+ *          Ax - b == 0,                           b - Ax == 0,              
+ * 
+ * ou c1/ 0 == 0	 
+ * 
+ * Pour les inegalites, on elimine une inequation si on a un systeme de
+ * contraintes de la forme :
+ * 
+ *   a2/    Ax - b <= c,             ou   b2/     0 <= const  (avec const >=0)
+ *          Ax - b <= c             
+ * 
+ *   ou  c2/   Ax == b,	
+ *             Ax <= c        avec b <= c,
+ * 
+ *   ou  d2/    Ax <= b,
+ *              Ax <= c    avec c >= b ou b >= c
+ * 
+ * sc_normalize retourne NULL quand la normalisation a montre que le systeme
+ * etait non faisable
+ *
+ * FI: a revoir de pres; devrait retourner SC_EMPTY en cas de non faisabilite
+ */
+Psysteme sc_normalize(ps)
+Psysteme ps;
+{
+    Pcontrainte eq;
+    boolean is_sc_fais = TRUE;
+
+    ps = sc_kill_db_eg(ps);
+    if (ps) {
+	for (eq = ps->egalites;
+	     (eq != NULL) && is_sc_fais;
+	     eq=eq->succ) {
+	    /* normalisation de chaque equation */
+	    if (eq->vecteur)    {
+		vect_normalize(eq->vecteur);
+		if ((is_sc_fais = egalite_normalize(eq))== TRUE)
+		    is_sc_fais = sc_elim_simple_redund_with_eq(ps,eq);
+	    }
+	}
+	for (eq = ps->inegalites;
+	     (eq!=NULL) && is_sc_fais;
+	     eq=eq->succ) {
+	    if (eq->vecteur)    {
+		vect_normalize(eq->vecteur);
+		if ((is_sc_fais = inegalite_normalize(eq))== TRUE)
+		    is_sc_fais = sc_elim_simple_redund_with_ineq(ps,eq);
+	    }
+	}
+
+	ps = sc_kill_db_eg(ps);
+	sc_elim_empty_constraints(ps, TRUE);
+	sc_elim_empty_constraints(ps, FALSE);
+    }
+
+    if (!is_sc_fais) 
+	sc_rm(ps), ps=NULL;
+    
+    return(ps);
+}
+
+/* Psysteme sc_normalize2(Psysteme ps): normalisation d'un systeme d'equation
+ * et d'inequations lineaires en nombres entiers ps, en place.
+ *
+ * Normalisation de chaque contrainte, i.e. division par le pgcd des
+ * coefficients (cf. ?!? )
+ *
  * Propagation des constantes definies par les equations dans les
  * inequations. E.g. N==1.
  *
@@ -75,12 +147,12 @@
  * FI: a revoir de pres; devrait retourner SC_EMPTY en cas de non faisabilite
  *
  */
-Psysteme sc_normalize(ps)
+Psysteme sc_normalize2(ps)
 Psysteme ps;
 {
   Pcontrainte eq;
 
-  ps = sc_elim_db_constraints(ps);
+  ps = sc_elim_double_constraints(ps);
   sc_elim_empty_constraints(ps, TRUE);
   sc_elim_empty_constraints(ps, FALSE);
 
@@ -148,7 +220,7 @@ Psysteme ps;
       }
     }
 
-    ps = sc_elim_db_constraints(ps);
+    ps = sc_elim_double_constraints(ps);
     sc_elim_empty_constraints(ps, TRUE);
     sc_elim_empty_constraints(ps, FALSE);
   }
