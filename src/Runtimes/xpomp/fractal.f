@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/09/03 18:07:50 $, 
+! $Date: 1996/09/04 09:12:04 $, 
 !
       program fractal
 
@@ -23,13 +23,13 @@
 
 ! Size of the iteration space:
       integer x_size, y_size
-      parameter(x_size = 400)     
-      Parameter(y_size = 400)
+      parameter(x_size = 800)     
+      Parameter(y_size = 800)
 
 ! The zooming ratio to display this iteration space:      
       integer x_display_zoom, y_display_zoom
-      parameter(x_display_zoom = 2)     
-      parameter(y_display_zoom = 2)
+      parameter(x_display_zoom = 1)     
+      parameter(y_display_zoom = 1)
 
 ! The zooming factor used when zooming with the button:
       real*8 zooming_factor
