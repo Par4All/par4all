@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.149  2001/04/06 08:38:34  irigoin
+%% Nga Nguyen ne sais pas ce qu'elle a change...
+%%
 %% Revision 1.148  2000/11/29 14:59:57  irigoin
 %% Three properties added: PRETTYPRINT_INDENTATION, SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS and SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS
 %%
@@ -153,7 +156,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2000/11/29 14:59:57 $~$
+$~$Date: 2001/04/06 08:38:34 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -526,7 +529,7 @@ PARSER_TYPE_CHECK_CALL_SITES   FALSE
 \index{PARSER\_LINEARIZE\_LOOP\_BOUNDS}
 
 The PIPS implementation of Allen\&Kennedy algorithm cannot cope with
-labelled DO loops because the loop, and hence its label, may be
+labeled DO loops because the loop, and hence its label, may be
 replicated if the loop is distributed. The parser can generate an extra
 \verb/CONTINUE/ statement to carry the label and produce a label-free
 loop. This is not the standard option because \PIPS{} is designed to
@@ -704,7 +707,7 @@ parallelization process unless you manage to have them
 declared private with respect to all enclosing loops.
 
 This feature is not supported by PIPS user interfaces. Results may be
-hard to interprete. It is useful to print the dependence graph.
+hard to interpret. It is useful to print the dependence graph.
 
 \begin{verbatim}
 KEEP_READ_READ_DEPENDENCE FALSE
@@ -848,9 +851,9 @@ use and complexity of Fourier-Motzkin's pair-wise elimination (fields
   \item[43] numbers of independences found by the normalize test;
   \item[44] numbers of independences found by the lexico-positive test
              for constant Di variables;
-  \item[45] numbers of independences found during the projetion on Di
+  \item[45] numbers of independences found during the projection on Di
             variables by the elimination of equation;
-  \item[46] numbers of independences found during the projetion on Di
+  \item[46] numbers of independences found during the projection on Di
             variables by the Fourier-Motzkin's elimination;
   \item[47] numbers of independences found during the test of
             faisability of  Di sub-system by the elimination of equation;
@@ -876,7 +879,7 @@ use and complexity of Fourier-Motzkin's pair-wise elimination (fields
     So if no larger product exists, field 50 and 51 must be equal.
 \end{itemize}
 
-The results are stored in the currentworkspace in MODULE.resulttestfast,
+The results are stored in the current workspace in MODULE.resulttestfast,
 MODULE.resultesttestfull, or MODULE.resulttestseman according to the
 test selected.
 
@@ -884,7 +887,7 @@ test selected.
 RICEDG_PROVIDE_STATISTICS FALSE
 \end{verbatim}
 
-Provide the statistics above and counte all array reference pairs
+Provide the statistics above and count all array reference pairs
 including these involved in call statement.
 
 \begin{verbatim}
@@ -917,7 +920,7 @@ RICE_DATAFLOW_DEPENDENCE_ONLY FALSE
 
 Here are the properties used to control the printing of dependence
 graphs in a file called {\em module\_name}.{\tt dg}. These properties
-should not be used explictly because they are set implicitly by the
+should not be used explicitly because they are set implicitly by the
 different print-out procedures available in \verb/pipsmake.rc/. However,
 not all combinations are available from \verb/pipsmake.rc/.
 
@@ -1091,7 +1094,7 @@ not better than the previous one for induction variables but it can detect
 invariant equations and inequalities.
 
 A third fix point operator, called {\em derivative}, is based on finite
-differences. It was developped to handled DO loops desugared into WHILE
+differences. It was developed to handled DO loops desugared into WHILE
 loops as well as standard DO loops. The loop body transformer on variable
 values is projected onto their finite differences. Invariants, both
 equations and inequalities, are deduced directly from the constraints on
@@ -1162,7 +1165,7 @@ Output semantics results on stdout
 SEMANTICS_STDOUT FALSE
 \end{verbatim}
 
-Debug level for semantics ued to be controled by a property. A Shell
+Debug level for semantics used to be controlled by a property. A Shell
 variable, \verb/SEMANTICS_DEBUG_LEVEL/, is used instead.
 
 \subsection{Static Complexity Evaluation}
@@ -1203,8 +1206,8 @@ about basic execution times, e.g. time for a load or a store.
 \index{COMPLEXITY\_PRINT\_STATISTICS}
 
 It is possible to specify a list of variables which must remain
-litterally in the complexity formula, although their numerical values
-are known (this is OK) or although they have multiple unkown and
+literally in the complexity formula, although their numerical values
+are known (this is OK) or although they have multiple unknown and
 unrelated values during any execution (this leads to an incorrect
 result).
 
@@ -1225,7 +1228,7 @@ Controls the printing of {\em accuracy} statistics:
 \begin{itemize}
 
   \item 0: do not prettyprint any statistics with complexities (to give
-the user a false sense of accuracy and/or to avoid clutering his/her
+the user a false sense of accuracy and/or to avoid cluttering his/her
 display); this is the default value;
 
   \item 1: prettyprint statistics only for loop/block/test/unstr.
@@ -1302,7 +1305,7 @@ but it has at least two drawbacks:
 \begin{itemize}
 
   \item if a variable is used in different places with the same unknown
-value, each occurence will be replaced by a different unknown value
+value, each occurrence will be replaced by a different unknown value
 symbol (the infamous \verb+UU_xx+ symbols in formulae).
 
   \item since variables are replaced by numerical values as soon as
@@ -1368,9 +1371,11 @@ bounds. Both options have their advantages and drawbacks.
 REGIONS_WITH_ARRAY_BOUNDS FALSE
 \end{verbatim}
 
+Comments from Nga Nguyen: The explanation of this property is not clear
+
 I intend to compute disjunctions of regions. As I have already prepared basic
 operators for that purpose, I created two properties to switch between regions
-and disjuctions of regions. For the moment, they are always false.
+and disjunctions of regions. For the moment, they are always false.
 
 \begin{verbatim}
 DISJUNCT_REGIONS FALSE
@@ -1383,7 +1388,7 @@ DISJUNCT_IN_OUT_REGIONS FALSE
 Statistics may be obtained about the computation of array regions. When the first
 property ({\tt REGIONS\_OP\_STATISTICS}) is set to ({\tt TRUE}) statistics are
 provided about operators on regions (union, intersection,
-projection,\dots). The second property turns on the collection of statitics
+projection,\dots). The second property turns on the collection of statistics
 about the interprocedural translation.
 
 \begin{verbatim}
@@ -1532,7 +1537,7 @@ HPFC_BUFFER_SIZE 1000000
 HPFC_USE_BUFFERS TRUE
 \end{verbatim}
 
-Wheter to use in and out regions for input/output compiling
+Whether to use in and out regions for input/output compiling
 
 \begin{verbatim}
 HPFC_IGNORE_IN_OUT_REGIONS TRUE
@@ -1672,14 +1677,14 @@ GATHER_FORMATS_AT_END FALSE
 \index{ARRAY\_PRIV\_FALSE\_DEP\_ONLY}
 \index{ARRAY\_SECTION\_PRIV\_COPY\_OUT}
 
-This transfomation privatizes array sections. Several privitizability
+This transformation privatizes array sections. Several privitizability
 criterions could be applied, and its not clear which one should be used. The
 default case is to remove potential false dependences between
 iterations. The first option, when set to false, removes this
 constraint. It is useful for single assignment programs, to discover what
 section is really local to each iteration. When the second option is set to
 false, the copy-out problem is not considered, i.e. only array elements that
-are not further resued in the program continuation can be privatized. 
+are not further reused in the program continuation can be privatized. 
 
 \begin{verbatim}
 ARRAY_PRIV_FALSE_DEP_ONLY TRUE
@@ -1735,7 +1740,7 @@ TRANSFORMATION_CLONE_ON_ARGUMENT 0
 
 EOLE: Evaluation Optimization of Loops and Expressions. 
 Julien Zory stuff integrated within pips. It relies on an external tool
-named \texttt{eole}. The version and options set can be controled from
+named \texttt{eole}. The version and options set can be controlled from
 the following properties. The status is experimental. See the
 \texttt{OPTIMIZE\_EXPRESSION} pass for more details about the advanced
 transformations performed.
@@ -2146,7 +2151,7 @@ browser such as \PdaVinci{}:
 PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH FALSE
 \end{verbatim}
 
-and to have a decorated output with the hexadecimal adresses of the
+and to have a decorated output with the hexadecimal addresses of the
 control nodes:
 \begin{verbatim}
 PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE FALSE
@@ -2168,7 +2173,7 @@ The call graph is derived from the modules declarations. It does not
 really the parsed code per se, but the code must have been parsed to have
 up-to-date declarations in the symbol table.
 
-Because of printout limitations, the call graph is developped into a tree
+Because of printout limitations, the call graph is developed into a tree
 before it is printed. The sub-graph of a module appears as many times as
 is has callers. The resulting printout may be very long.
 
