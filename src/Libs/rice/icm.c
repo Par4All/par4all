@@ -5,12 +5,19 @@
  */
 
 
+/*
+ * Il faut tester la presence de dependance sur le graphe original et
+ * modifier une copie.
+ */
+
+
 #include "local.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 
 
-#define NB_SIMPLIFY_PASSES 2
+/* Set to 2 if we want to simplify in two passes */
+#define NB_SIMPLIFY_PASSES 1
 
 
 #define FLOW_DEPENDANCE 1
@@ -29,6 +36,7 @@ static string current_module_name; /* Bad hack to avoid an argument
 static bool expression_invariant = FALSE; 
 static set /* of entity */ invariant_entities = set_undefined;
 static set /* of statement */ statements_partialy_invariant = set_undefined;
+
 
 /*********************************************************** PRINT FUNCTIONS */
 
@@ -723,24 +731,24 @@ vertex_invariant_p(vertex v,
     if (statement_depend_of_indices_p(st,
 				      load_statement_has_indices(st),        
 				      level)) {
-//	ifdebug(6) { 
+	ifdebug(6) { 
 	    debug(6, "vertex_invariant_p", "");
 	    fprintf(stderr, 
 		    "statement %02d is not invariant (depend of indices).\n",
 		    statement_number(st));
-//	}
+	}
 
 	return FALSE;
     }
 
     /* If there is a flow dependance from v to v, then v is not variant */
     if (dependance_vertices_p(v, v, FLOW_DEPENDANCE, level)) {
-//	ifdebug(6) { 
+	ifdebug(6) { 
 	    debug(6, "vertex_invariant_p", "");
 	    fprintf(stderr, 
 		    "statement %02d is not invariant (self flow dep).\n",
 		    statement_number(st));
-//	}
+	}
 	return FALSE;
     }
 
@@ -753,26 +761,26 @@ vertex_invariant_p(vertex v,
 	    if (!set_belong_p(invariant, (char *) y_st) &&
 		set_belong_p(region, (char *) y_st)) {
 
-//		ifdebug(6) { 
+		ifdebug(6) { 
 		    debug(6, "vertex_invariant_p", "");
 		    fprintf(stderr, 
 			    "statement %02d is not invariant "
 			    "(dep. of %02d).\n",
 			    statement_number(st), 
 			    statement_number(y_st)); 
-//		}
+		}
 	    
 		return FALSE;
 	    }
 	}
     }, graph_vertices(g));
 
-//    ifdebug(6) { 
+    ifdebug(6) { 
 	debug(6, "vertex_invariant_p", "");
 	fprintf(stderr, 
 		"statement %02d is invariant.\n",
 		statement_number(st));
-//    }
+    }
 
     return TRUE;
 }
@@ -903,18 +911,18 @@ vertex_redundant_p(vertex v,
        of indicies after the loop is tiedous (setting the value to 
        the bound+1...) */
 /*
-    if (statement_depend_of_indices_p(st, 
-				      load_statement_has_indices(st),
-				      level)) {
-	ifdebug(6) { 
-	    debug(6, "vertex_redundant_p", "");
-	    fprintf(stderr, 
-		    "statement %02d is not redundant (depend of indices).\n",
-		    statement_number(st));
-	}
+  if (statement_depend_of_indices_p(st, 
+  load_statement_has_indices(st),
+  level)) {
+  ifdebug(6) { 
+  debug(6, "vertex_redundant_p", "");
+  fprintf(stderr, 
+  "statement %02d is not redundant (depend of indices).\n",
+  statement_number(st));
+  }
 
-	return FALSE;
-    }
+  return FALSE;
+  }
 */
 
     /* Test if we are not always writing at the same adress 
@@ -1093,34 +1101,6 @@ SupressDependances(graph g,
 		   int level,
 		   unsigned int count)
 {
-    /*
-     * Il y a un probleme avec l'exemple suivant :
-     *
-     *    DO I = 1, 100
-     *       A(I) = 10
-     *       T = A(1)
-     *       B(I) = T
-     *    ENDDO
-     *
-     * En effet apres la passe arriere (recherche des redondant), on arrive
-     * a separer la premiere instruction des deux suivantes.
-     *
-     *    DO I = 1, 100
-     *       A(I) = 10 
-     *    ENDDO
-     *    DO I = 1, 100
-     *       T = A(1)
-     *       B(I) = T
-     *    ENDDO 
-     *
-     * Mais si on applique a nouveau une passe avant (recherche des invariants)
-     * on n'est pas capable de trouver que T=A(1) est invariant, car l'on se 
-     * trouve dans la meme region... 
-     *
-     * Je pense qu'il faut limiter la recherche des invariant la la 
-     * composante conexe.
-     */
-
     list /* of scc */ lsccs;
     set /* of statement */ partially_invariant = set_make(set_pointer);
 
@@ -1132,11 +1112,9 @@ SupressDependances(graph g,
 
 
     /* Forward simplification */
-    fprintf(stderr, "\nFORWARD\n");
     g = DoInvariantsStatements(lsccs, g, region, level, partially_invariant);
 
     /* Backward simplification */
-    fprintf(stderr, "\nBACKWARD\n");
     lsccs = gen_nreverse(lsccs);
 
     g = DoRedundantsStatements(lsccs, g, region, level, partially_invariant);
@@ -1193,9 +1171,6 @@ static void pop_depending_index(loop l)
 
 static bool drop_it(loop l)
 {
-
-//    remove_dead_loop();
-
     if (execution_parallel_p(loop_execution(l)))
     {
 	depending_indices = NIL;
@@ -1214,6 +1189,53 @@ static bool drop_it(loop l)
 }
 
 
+/*
+ * Compute the final expression of the loop index.
+ * Follow the ANSI Fortran 77 normalization.
+
+ *  = m1 + MAX(INT((m2 - m1 + m3) / m3), 0) * m3
+
+ */
+static expression
+compute_final_index_value(expression m1, expression m2, expression m3)
+{
+    expression result;
+    expression E0 = make_op_exp("-", m2, m1);
+    expression E1 = make_op_exp("+", E0, m3);
+    expression E2 = make_op_exp("/", E1, m3);
+
+    if (expression_constant_p(E2)) {
+	int val_E2 = expression_to_int(E2);
+
+	/* max of (val_e2, 0) */
+	if (val_E2 > 0) {
+	    expression E3 = make_op_exp("*", E2, m3);
+	    result = make_op_exp("+", E3, m1);
+	}
+	else {
+	    result = m1;
+	}
+    }
+    else {
+	expression zero = make_integer_constant_expression(0);
+	expression p_int, E3, E4;
+
+	p_int = MakeUnaryCall(entity_intrinsic(INT_GENERIC_CONVERSION_NAME), 
+			      E2);
+
+	E3 = MakeBinaryCall(entity_intrinsic(MAX_OPERATOR_NAME),
+			    p_int, 
+			    zero);
+	E4 = make_op_exp("*", E3, m3);
+	result = make_op_exp("+", m1, E4);
+    }
+
+    /* memory leak */
+
+    return result;
+}
+
+
 static bool icm_loop_rwt(loop l)
 {
     statement head = stmt_head();
@@ -1226,14 +1248,39 @@ static bool icm_loop_rwt(loop l)
 
     if (drop_it(l))
     {
+	statement index_statement;
+	statement body = loop_body(l);
+	
+	expression index, m1, m2, m3;
+
+	m1 = copy_expression(range_lower(loop_range(l)));
+	m2 = copy_expression(range_upper(loop_range(l)));
+	m3 = copy_expression(range_increment(loop_range(l)));
+
+	/* Assume here that index is a scalar variable... :-) */
+	pips_assert("icm_loop_rwt", entity_scalar_p(loop_index(l)));
+
+	index = make_factor_expression(1, loop_index(l));
+
+	index_statement = 
+	    make_assign_statement(index,
+				  compute_final_index_value(m1, m2, m3));
+
+	statement_label(index_statement) = statement_label(head);
+
+	statement_instruction(head) =
+	    make_instruction_block(CONS(STATEMENT,
+					index_statement,
+					CONS(STATEMENT, body, NIL)));
+
+	statement_number(head) = statement_number(loop_body(l));
+	statement_label(head) = entity_empty_label();
+
 	ifdebug(5) {
 	    fprintf(stderr, "-> loop on %s removed (statement %02d)\n", 
 		    entity_name(loop_index(l)),
 		    statement_number(head));
 	}
-
-	statement_instruction(head) = statement_instruction(loop_body(l));
-	statement_number(head) = statement_number(loop_body(l));
 
 	/* memory leak... */
     }
@@ -1326,12 +1373,14 @@ icm_codegen(statement stat,
 
     simplyfied_graph = copy_graph(g);
 
-//    ifdebug(4) {
+    /* Definir le mapping entre les vertex originaux et les vertex copies */
+
+    ifdebug(4) {
 	fprintf(stderr, "Original graph:\n");
 	prettyprint_dependence_graph(stderr, 
 				     statement_undefined, 
 				     simplyfied_graph);    
-//    }
+    }
 
     invariant_entities = set_make(set_pointer);
 
@@ -1342,12 +1391,12 @@ icm_codegen(statement stat,
 
     set_free(invariant_entities);
 
-//    ifdebug(4) {
+    ifdebug(4) {
 	fprintf(stderr, "Simplified graph:\n");
 	prettyprint_dependence_graph(stderr, 
 				     statement_undefined, 
 				     simplyfied_graph);    
-//    }
+    }
 
     close_has_level();
     free_has_indices_map();
@@ -1367,12 +1416,10 @@ icm_codegen(statement stat,
 			   task_parallelize_p); 
     free_graph(simplyfied_graph);
 
-//    ifdebug(4) {
+    ifdebug(4) {
 	printf("\nIntermediate code:\n");
 	print_statement(result);
-//    }
-
-	abort();
+    }
 
     /* Remove dummy loops. */
     drop_dummy_loops(result);
