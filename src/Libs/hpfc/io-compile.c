@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/03/21 15:56:04 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/04/02 09:11:10 $, )
  * version $Revision$
  */
 
@@ -809,6 +809,17 @@ io_efficient_compile(
     pips_debug(1, "compiling!\n");
     pips_debug(2, "statement 0x%x, %d arrays\n", (unsigned int) stat, 
 	       gen_length(entities));
+
+    /* quicker for continue and so...
+     */
+    if (hpfc_empty_statement_p(stat))
+    {
+	pips_debug(3, "empty statement\n");
+	*hp = make_empty_statement();
+	*np = make_empty_statement();
+	debug_off();
+	return;
+    }
 
     MAP(EFFECT, e,
     {
