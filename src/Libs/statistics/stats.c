@@ -16,8 +16,9 @@
 
 static int depth, nbr_perfectly_nested_loop, nbr_no_perfectly_nested_loop, 
 nbr_interested_loop,cpt, nbr_nested_loop, nbr_perf_nest_loop_of_depth[100],
-nbr_no_perf_nest_loop_of_depth[100], max_depth, nbr_loop ;
-static bool perfectly_nested  ;
+  nbr_no_perf_nest_loop_of_depth[100], max_depth_perfect, nbr_loop,s,i,
+max_depth_no_perfect;
+static bool perfectly_nested ,first_turn ;
  
 static bool loop_flt( loop l)
 {
@@ -111,7 +112,7 @@ bool loop_rwt( )
       if (perfectly_nested){ 
           nbr_perfectly_nested_loop++;
           nbr_perf_nest_loop_of_depth[depth]++;
-          if (depth >max_depth) max_depth =depth;
+          if (depth >max_depth_perfect) max_depth_perfect =depth;
       }
       else{
 	   perfectly_nested=TRUE  ; 
@@ -125,39 +126,58 @@ bool loop_rwt( )
 }
  
 static bool loop_flt1( loop l)
-{
+{ 
+  int  k=0, position=0;
   instruction lbi = statement_instruction(loop_body(l));
-  int k,position;
+  first_turn =TRUE;
   nbr_loop++;
   cpt++;
-  printf( "debut \n"); 
-  if ( instruction_loop_p(lbi)) return TRUE;  
-  else {
-         if(instruction_sequence_p(lbi)) { 
+  if(instruction_sequence_p(lbi)) { 
               sequence seq = instruction_sequence(lbi);
               list l =sequence_statements(seq); 
               MAP(STATEMENT,s, {k++;if
               ( instruction_loop_p(statement_instruction(s)))
               position=k ; };, l); 
-	      if (position!=0 ) return TRUE;
-          
-	 };
-  };   
-  printf(" fon \n");           
-  if (cpt > depth )  {depth =cpt; printf(" lalalalalal %d \n", cpt);};
-
-  return FALSE; 
+              if (position!=0 ) {  
+                   k=0; 
+	            MAP(STATEMENT,s, 
+                   {k++; if (k!=position){  
+		              if(!instruction_call_p(statement_instruction(s)))
+                                   perfectly_nested =FALSE; 
+                              else{ 
+                                    call ca= instruction_call
+                                    (statement_instruction(s)) ;
+				    if(strcmp(  entity_name(call_function(ca))
+                                    ,"TOP-LEVEL:CONTINUE" )!=0)
+                                    perfectly_nested=FALSE ;
+                              }; 
+		   };  
+                    };, l);
+	       };
+                  
+  }
+   return  TRUE;
+}  
   
-}
+
+   
 bool loop_rwt1( )
-{
-  cpt--;
-  if (cpt==2) {
-     nbr_no_perf_nest_loop_of_depth[depth]++;
-     cpt=0;
+{  
+  if (first_turn) { 
+ 
+     if   (cpt > depth)  depth = cpt; 
+     first_turn= FALSE;
+  }; 
+   cpt--;
+   if (cpt==0) {
+     if ( ! perfectly_nested ) {
+        nbr_no_perf_nest_loop_of_depth[depth]++;
+        if (depth > max_depth_no_perfect) max_depth_no_perfect=depth;
+     };
+     perfectly_nested=TRUE;
      depth=0;
-  };
     
+   };     
   return TRUE ;
 }
 static void initialize ()
@@ -168,8 +188,8 @@ static void initialize ()
    depth=0;
    nbr_perfectly_nested_loop=0; nbr_no_perfectly_nested_loop=0;
    nbr_interested_loop=0;
-   cpt=0; nbr_nested_loop=0 ; perfectly_nested =TRUE, max_depth=0  ;
-   nbr_loop=0;
+   cpt=0; nbr_nested_loop=0 ; perfectly_nested =TRUE, max_depth_perfect=0  ;
+   nbr_loop=0;max_depth_no_perfect=0;first_turn=TRUE,s=0;
 } 
 static void put_result(string filename)
 {
@@ -180,15 +200,18 @@ static void put_result(string filename)
 	  "nested loops: %d\n"
 	  "perfectly nested loops: %d\n"
 	  "non perfectly nested loops: %d\n"
-	  "non perfectly nested loops which we ca treat : %d\n",
+	  "non perfectly nested loops which we can treat : %d\n",
 	  nbr_loop, nbr_nested_loop, nbr_perfectly_nested_loop,
           nbr_no_perfectly_nested_loop, nbr_interested_loop);
-  for (i=1; i<= max_depth; i++)
-  fprintf(file," perfectly  nested loops of depth %d: %d \n", i, 
+  for (i=1; i<= max_depth_perfect; i++)
+  if (nbr_perf_nest_loop_of_depth[i] !=0)
+  fprintf(file,"perfectly  nested loops of depth %d: %d \n", i, 
   nbr_perf_nest_loop_of_depth[i]);
-  for (i=1; i<= 3; i++)
-  fprintf(file,"non  perfectly  nested loops of depth %d: %d \n", i, 
+  for (i=1; i<= max_depth_no_perfect; i++)
+  if (nbr_no_perf_nest_loop_of_depth[i] !=0)
+  fprintf(file,"non perfectly  nested loops of depth %d: %d \n", i, 
   nbr_no_perf_nest_loop_of_depth[i]);
+ 
   safe_fclose(file, filename);
 }
 
@@ -209,14 +232,33 @@ int loop_statistics(string name)
 					      name, ".loop_stats");
   filename = strdup(concatenate(db_get_current_workspace_directory(), 
 				"/", localfilename, NULL));
+
+  /*  s=0;
+  for (i=1;i<=20;i++)
+    s=s+nbr_no_perf_nest_loop_of_depth[i];
+    if (s != nbr_no_perfectly_nested_loop) 
+    {
+      printf(" erreur \n %d %d", s,nbr_no_perfectly_nested_loop);
+      getchar();
+      };  */ 
   put_result(filename);
   free(filename);
   DB_PUT_FILE_RESOURCE(DBR_STATS_FILE, name, localfilename);
   reset_current_module_entity();
   pips_debug(1, "done.\n");
   debug_off();
+   
   return TRUE;
 }
+
+
+
+
+
+
+
+
+
 
 
 
