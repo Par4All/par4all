@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/09/15 11:31:58 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/09/23 16:46:04 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -207,12 +207,12 @@ PVMDIR=${PIPS_HOME}/pvm3.3
 #
 # For the daVinci Graph Viewer/Editor :
 
-DAVINCI_DIR="${PIPS_HOME}/daVinci/daVinci_V1.4_solaris_1"
-GRAPHEDITOR_DIRECTORY="${DAVINCI_DIR}/grapheditor"
-DAVINCI_ICONDIR="${DAVINCI_DIR}/images"
+DAVINCIHOME="${PIPS_HOME}/daVinci/daVinci_V2.0"
+GRAPHEDITOR_DIRECTORY="${DAVINCIHOME}/grapheditor"
+DAVINCI_ICONDIR="${DAVINCIHOME}/images"
 
-MANPATH="${MANPATH}:${DAVINCI_DIR}/man"
-PATH="${PATH}:${DAVINCI_DIR}"
+MANPATH="${MANPATH}:${DAVINCIHOME}/man"
+PATH="${PATH}:${DAVINCIHOME}"
 
 # Toolpack is used for STF
 TOOLPACK_DIR="$PIPS_HOME/Toolpack/toolpack1.2"
