@@ -277,7 +277,7 @@ char *argv[];
 
    close_log_file();
    
-   debug_off("WPIPS_DEBUG_LEVEL");
+   debug_off();
 
    exit(0);
 }
