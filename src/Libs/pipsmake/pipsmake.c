@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.79  2003/08/12 16:27:40  irigoin
+ * COMPILATION_UNIT added
+ *
  * Revision 1.78  2003/07/08 07:06:04  coelho
  * \n
  *
@@ -262,6 +265,23 @@ void reset_static_phase_variables()
   result = CONS(REAL_RESOURCE, \
 		make_real_resource(strdup(vrn), strdup(on)), result);
 
+/* Logically, this should be implemented in preprocessor, but the
+   preprocessor library is at a upper level than the pipsmake
+   library... */
+string compilation_unit_of_module(string module_name)
+{
+  /* Should only be called for C modules. */
+  string compilation_unit_name = string_undefined;
+  string source_file_name = db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
+  string simpler_file_name = pips_basename(source_file_name, ".cpp_processed.c");
+
+  /* It is not clear how robust it is going to be when file name conflicts occur. */
+  compilation_unit_name
+    = strdup(concatenate(COMPILATION_UNIT_PREFIX, simpler_file_name, FILE_SEP_STRING, NULL));
+
+  return compilation_unit_name;
+}
+
 /* Translate and expand a list of virtual resources into a potentially 
  * much longer list of real resources
  *
@@ -368,6 +388,7 @@ static list build_real_resources(string oname, list lvr)
 	    gen_free_string_list(lcallers);
 	    break;
 	}
+
 	case is_owner_all:
 	{
 	    /* some funny stuff here:
@@ -387,11 +408,21 @@ static list build_real_resources(string oname, list lvr)
 	    gen_array_full_free(modules);
 	    break;
 	}
+
 	case is_owner_select:
 	{
 	    /* do nothing ... */
 	    break;
 	}
+
+	case is_owner_compilation_unit:
+	  {
+	    string compilation_unit_name = compilation_unit_of_module(oname);
+	    add_res(vrn, compilation_unit_name);
+	    free(compilation_unit_name);
+	    break;
+	  }
+
 	default:
 	    pips_internal_error("unknown tag : %d\n", vrt);
 	}
