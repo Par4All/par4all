@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/15 18:13:56 $, 
+ * $Date: 1996/06/15 18:30:33 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -36,7 +36,8 @@ bool summary_reductions(string module)
 }
 
 /******************************************************* PROPER REDUCTIONS */
-
+/* Function storing Proper Reductions
+ */
 GENERIC_GLOBAL_FUNCTION(proper_reductions, pstatement_reductions)
 
 reductions sload_proper_reductions(statement s)
@@ -45,7 +46,7 @@ reductions sload_proper_reductions(statement s)
 	return load_proper_reductions(s);
     /* else */
     pips_user_warning("prop reduction not found for 0x%x\n", (unsigned int) s);
-    return make_reductions(NIL);
+    return make_reductions(NIL); /* ??? memory leak! */
 }
 
 DEFINE_LOCAL_STACK(crt_stat, statement)
@@ -70,6 +71,10 @@ static void pr_call_rwt(call c)
     }
 }
 
+/* performs the computation of proper reductions for statement s.
+ * this is a direct computation, throught gen_multi_recurse.
+ * only call instructions must be visited, hence it is stopped on expressions
+ */
 static void compute_proper_reductions(statement s)
 {
     make_crt_stat_stack();
@@ -81,6 +86,13 @@ static void compute_proper_reductions(statement s)
     free_crt_stat_stack();
 }
 
+/* handler for pipsmake
+ * input: module name
+ * output: TRUE
+ * side effects: some
+ * - requires CODE PROPER_EFFECTS and callees' SUMMARY_{EFFECTS,REDUCTIONS}
+ * - returns PROPER_REDUCTIONS to pips dbm
+ */
 bool proper_reductions(string module_name)
 {
     entity module;
@@ -120,6 +132,8 @@ bool proper_reductions(string module_name)
 
 /**************************************************** CUMULATED REDUCTIONS */
 
+/* Function storing Cumulated Reductions
+ */
 GENERIC_GLOBAL_FUNCTION(cumulated_reductions, pstatement_reductions)
 
 reductions sload_cumulated_reductions(statement s)
@@ -128,7 +142,7 @@ reductions sload_cumulated_reductions(statement s)
 	return load_cumulated_reductions(s);
     /* else */
     pips_user_warning("cumu reduction not found for 0x%x\n", (unsigned int) s);
-    return make_reductions(NIL);
+    return make_reductions(NIL); /* ??? memory leak */
 }
 
 /* list of entities that may be reduced
@@ -212,10 +226,15 @@ build_reductions_of_statement(
     gen_free_list(le);
 }
 
+/* Cumulated Reduction propagation functions for each possible instructions.
+ * Statement s cumulated reduction computation involves :
+ * - its own proper reductions and effects
+ * - the cumulated reductions and effects of its sons
+ * the computation is performed by build_reductions_of_statement.
+ */
 static void cr_sequence_rwt(sequence s)
 {
-    build_reductions_of_statement(crt_stat_head(),
-				  sequence_statements(s));
+    build_reductions_of_statement(crt_stat_head(), sequence_statements(s));
 }
 
 static void cr_loop_rwt(loop l)
@@ -247,6 +266,11 @@ static void cr_call_rwt(call c)
     store_cumulated_reductions(s, copy_reductions(load_proper_reductions(s)));
 }
 
+/* Perform the bottom-up propagation of cumulated reductions 
+ * for statement s, through gen_multi_recurse.
+ * only call instructions must be walked thru,
+ * hence it is stoped on expressions.
+ */
 static void compute_cumulated_reductions(statement s)
 {
     make_crt_stat_stack();
@@ -262,6 +286,13 @@ static void compute_cumulated_reductions(statement s)
     free_crt_stat_stack();
 }
 
+/* handler for pipsmake
+ * input: the module name
+ * output: TRUE
+ * side effects: some
+ * - requires CODE, PROPER_{EFFECTS,REDUCTIONS} and CUMULATED_EFFECTS
+ * - returns CUMULATED_REDUCTIONS to pips dbm
+ */
 bool cumulated_reductions(string module_name)
 {
     debug_on("REDUCTIONS_DEBUG_LEVEL");
