@@ -36,7 +36,8 @@
 typedef long long int Value;
 #define VALUE_FMT "%lld"
 #define VALUE_CONST(val) (val##LL)
-#define VALUE_MIN LONG_LONG_MIN
+#define VALUE_NAN LONG_LONG_MIN
+#define VALUE_MIN (LONG_LONG_MIN+1LL)
 #define VALUE_MAX LONG_LONG_MAX
 #define VALUE_SQRT_MIN long_to_value(LONG_MIN) /* ??? assumes 32 bit long */
 #define VALUE_SQRT_MAX long_to_value(LONG_MAX)
@@ -61,7 +62,8 @@ typedef long long int Value;
 typedef long Value;
 #define VALUE_FMT "%ld"
 #define VALUE_CONST(val) (val##L)
-#define VALUE_MIN LONG_MIN
+#define VALUE_NAN LONG_MIN
+#define VALUE_MIN (LONG_MIN+1L)
 #define VALUE_MAX LONG_MAX
 #define VALUE_ZERO 0L
 #define VALUE_ONE  1L
@@ -97,6 +99,7 @@ typedef float Value;
 typedef union { char *s; long l; int i; float f; double d;} Value;
 #define VALUE_FMT "%s"
 #define VALUE_CONST(val) ((Value)(val))
+#define VALUE_NAN ((Value)(long)0xdadeebee)
 #define VALUE_MIN ((Value)(long)0xdeadbeef)
 #define VALUE_MAX ((Value)(long)0xfeedabee)
 #define VALUE_ZERO ((Value)0)
@@ -113,7 +116,8 @@ typedef union { char *s; long l; int i; float f; double d;} Value;
 typedef int Value;
 #define VALUE_FMT "%d"
 #define VALUE_CONST(val) (val)
-#define VALUE_MIN INT_MIN
+#define VALUE_NAN INT_MIN
+#define VALUE_MIN (INT_MIN+1)
 #define VALUE_MAX INT_MAX
 #define VALUE_ZERO 0
 #define VALUE_ONE  1
@@ -125,8 +129,6 @@ typedef int Value;
 /* end LINEAR_VALUE_IS_INT
  */
 #endif 
-
-#define VALUE_NAN VALUE_MIN
 
 #define int_to_value(i) ((Value)(i))
 #define long_to_value(l) ((Value)(l))
