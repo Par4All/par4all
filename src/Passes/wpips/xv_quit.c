@@ -33,7 +33,7 @@ quit_notify(Menu menu,
    int result;
    database p;
 
-   if ((p = db_get_current_program()) != database_undefined ) {
+   if ((p = db_get_current_workspace()) != database_undefined ) {
       string pn = database_name(p);
       string fmt="Workspace %s not closed";
       char str[SMALL_BUFFER_LENGTH];
@@ -62,9 +62,9 @@ quit_notify(Menu menu,
       if (result == NOTICE_NO)
          return;
       else if (strcmp(menu_string, CLOSE_QUIT) == 0)
-         close_program();
+         close_workspace();
       else if (strcmp(menu_string, DELETE_QUIT) == 0)
-         delete_program(pn);
+         delete_workspace(pn);
    }
 
    /* Clear the log window to avoid the message about the edited
