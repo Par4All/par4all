@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/21 11:47:08 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/21 17:57:23 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -10,8 +10,8 @@
 # Fabien Coelho, 08/95
 #
 
-SCRIPT=`basename $0`
-USAGE="$SCRIPT [-h (HELP!)] [-l|p|i|n|d] [-D|P]"
+script=`basename $0`
+USAGE="$script [-hv] [-L|N|P] [-l|p|c|d] [-D|S]"
 verbose=':'
 
 MAKEFILE=Makefile
@@ -25,17 +25,18 @@ help()
 	$USAGE
 	version $Revision$
 	Builds $MAKEFILE from $CONFIG_FILE for PIPS.
-	  -l|p|i|n|d: libraries|passes|linear|newgen|default
-	  -D|P: for Development|Production directories
+	  -L|N|P: for Linear, Newgen or Pips.
+	  -l|p|c|d: libraries|passes|compiled|default
+	  -D|S: for Development|Production (Sources) directories
+	  contextual defaults for all these first options...
 	  -h: this help
 	  -v: verbose
-	  contextual defaults for first and second options.
 	Usefull macros in $CONFIG_FILE: 
-	 - libraries/passes/linear: LIB_{CFILES,HEADERS,OBJECTS}
+	 - libraries/passes: LIB_{CFILES,HEADERS,OBJECTS}
 	   and maybe DERIVED_{HEADERS,CFILES,FILES}
 	 - default:
-	   SOURCES
-	   SCRIPTS (runable files)
+	   SOURCES (config.makefile need not be included)
+	   SCRIPTS (runable files as shell scripts that must be chmoded)
 	   INSTALL_{INC,LIB,BIN,DOC,HTM,SHR,UTL} files to be installed
 	Many default macros are defined and may be overwritten.
 	Many rules are also defined.
@@ -43,7 +44,7 @@ help()
 }
 
 verb()
-{ echo "$SCRIPT" "$@";}
+{ echo "$script" "$@";}
 
 usage()
 {
@@ -53,7 +54,7 @@ usage()
 }
 
 warning()
-{ echo "$SCRIPT: warning, $@" >&2 ;}
+{ echo "$script: warning, $@" >&2 ;}
 
 #
 # what is to be done...
@@ -64,25 +65,19 @@ PART=''
 ALL=''
 ALL_RULE_TARGET=''
 
-while getopts lpindDPhv opt
+while getopts PLNlpcdDShv opt
 do
+  PIPSMKMK_OPTION="$PIPSMKMK_OPTION -$opt"
   case $opt in
-    l) DIRTYPE='Lib';
-       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -l" ;;
-    p) DIRTYPE='Passes';
-       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -p" ;;
-    i) DIRTYPE='Linear'; 
-       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -i" ;;
-    n) DIRTYPE='Newgen'; 
-       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -n" ;;
-    d) DIRTYPE='Default';
-       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -d" ;;
-    D) DIRSIDE="$PIPS_DEVEDIR" ;
-       unset production ;
-       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -D" ;;
-    P) DIRSIDE="$PIPS_SRCDIR"; 
-       production='yes' ;
-       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -P" ;;
+    P) PART=PIPS ;;
+    L) PART=LINEAR ;;
+    N) PART=NEWGEN ;;
+    l) DIRTYPE='Lib' ;;
+    p) DIRTYPE='Passes' ;;
+    c) DIRTYPE='Compiled' ;;
+    d) DIRTYPE='Default' ;;
+    D) unset production ;;
+    S) production='yes' ;;
     h) help ; exit 0 ;;
     v) verbose=verb ;;
     *) usage 2 "invalid option ($opt)" ;;
@@ -108,22 +103,17 @@ cd_dirname=`dirname $current_directory`
 [ "${DIRTYPE}" ] || 
 {
     DIRTYPE=Default
-    for f in Linear Newgen Lib Passes ; do
-	[ "`echo $current_directory | grep $f`" ] && DIRTYPE=$f
-    done
-    $verbose "defaults DIRTYPE computed: $DIRTYPE"
-}
 
-[ "${DIRSIDE}" ] || 
-{
-  if [ "`echo $current_directory | grep Development`" ]
-  then
-    DIRSIDE=$PIPS_DEVEDIR ;
-  else
-    production='yes' ;
-    DIRSIDE=$PIPS_ROOT/Src ;
-  fi
-  $verbose "default DIRSIDE computed: $DIRSIDE"
+    if [ $PART = LINEAR ] ;
+    then 
+	DIRTYPE=Lib ;
+    else
+        for f in Lib Passes ; do
+	    [ "`echo $current_directory | grep $f`" ] && DIRTYPE=$f
+        done
+    fi
+
+    $verbose "defaults DIRTYPE computed: $DIRTYPE"
 }
 
 $verbose "defining vars..."
@@ -131,15 +121,13 @@ $verbose "defining vars..."
 case $DIRTYPE in
   Lib) ALL_RULE_TARGET='$(ARCH)/lib$(TARGET).a' ;;
   Passes)  ALL_RULE_TARGET='$(ARCH)/$(TARGET)' ;;
-  Scripts) ALL_RULE_TARGET='.runable' ;;
-  Runtime) ALL_RULE_TARGET='' ;;
-  Linear)  ALL_RULE_TARGET='$(ARCH)/lib$(TARGET).a' ;
-           PART=LINEAR ;;
-  Newgen)  ALL_RULE_TARGET='' ;
-	   PART=NEWGEN ;;
-  Default) ALL_RULE_TARGET='';;
+  Compiled) ALL_RULE_TARGET='' ;;
+  Default) ALL_RULE_TARGET='.runable';;
   *) usage 5 "unexpected directory type $DIRTYPE"
 esac
+
+#
+# Where to install files:
 
 case $PART in
   PIPS) 
@@ -177,6 +165,18 @@ case $PART in
   *) usage 6 "unexpected PART=$PART" ;;
 esac
 
+[ "${DIRSIDE}" ] || 
+{
+  if [ "`echo $current_directory | grep Development`" ]
+  then
+    DIRSIDE=`eval echo '$'"${PART}_DEVEDIR"` ;
+  else
+    production='yes' ;
+    DIRSIDE=`eval echo '$'"${PART}_ROOT/Src"`;
+  fi
+  $verbose "default DIRSIDE computed: $DIRSIDE"
+}
+
 $verbose "PART: ${PART}"
 $verbose "DIRSIDE: $DIRSIDE"
 $verbose "DIRTYPE: $DIRTYPE"
@@ -195,6 +195,7 @@ target_dir=`echo "$current_directory" |
 echo "Making $DIRTYPE $PART $MAKEFILE in $dir_real_name ($DIRSIDE $target_dir)"
 
 rm -f $MAKEFILE
+
 
 ##############################################################################
 
@@ -218,23 +219,27 @@ cat >> $MAKEFILE <<%
 #	---------------------------------------------------------------
 #
 # Copyright (C) Ecole des Mines De Paris
-#               Centre d'Automatique et Informatique
-#               Section Informatique
+#               Centre de Recherche en Informatique
 #
 # This file is part of PIPS
 #
 # PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
 # WARRANTY.  No author or distributor accepts responsibility to anyone for
 # the consequences of using it or for whether it serves any particular
-# purpose or works at all, unless he says so in writing.
+# purpose or works at all, unless he/she says so in writing.
 #
 # DEFAULTS, may be overwritten by the $CONFIG_FILE content.
 #
 TARGET=		${dir_real_name}
 TARGET_DIR=	${install_src_dir}/${target_dir}
 #
-# default architecture is taken from PIPS_ARCH env. variable
-ARCH=		$(PIPS_ARCH)
+# default architecture is taken from PIPS_ARCH environment variable
+# if set, and . is chosen otherwise.
+ifdef PIPS_ARCH
+ARCH =	$(PIPS_ARCH)
+else
+ARCH =	.
+endif
 #
 # installation directories for quick-install
 #
@@ -284,7 +289,7 @@ get:; sccs get SCCS
 # to override SUN/GNU default rule
 .SCCS_GET:
 # %:SCCS/s.%:
-.SUFFIXED: .tex .dvi .ps .c .h .o .w .a .html .ftex .newgen
+.SUFFIXED: .tex .dvi .ps .c .h .o .w .a .html .ftex .newgen .m4h .m4c .m4f
 # .INIT is a SUN extension...
 .INIT: 
 check_install:
@@ -293,7 +298,7 @@ check_install:
 #
 $(ARCH):; mkdir $(ARCH)
 #
-include $(${PART}_ROOT)/Include/define_libraries
+include $(${PART}_ROOT)/Include/define_libraries.make
 include $(${PART}_ROOT)/Include/makefile_macros.$(ARCH)
 include $CONFIG_FILE
 #
@@ -306,6 +311,7 @@ LIB_OBJECTS:=$(addprefix $(ARCH)/, $(LIB_OBJECTS))
 #
 PREPROC=	$(CC) -E $(CPPFLAGS) $(CPPOPT) $(TARGET_ARCH)
 COMPILE=	$(CC) $(CFLAGS) $(COPT) $(CPPFLAGS) $(CPPOPT) $(TARGET_ARCH) -c
+F77COMPILE=	$(FC) $(FFLAGS) $(FOPT) -c
 LINK=		$(LD) $(LDFLAGS) $(LDOPT) -o
 SCAN=		$(LEX) $(LFLAGS) $(LOPT) -t
 TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
@@ -362,6 +368,21 @@ $(ARCH)/%.o:	%.c
 	$(RM) \$@
 	remove-latex-comments \$<
 	chmod a-w \$@
+#
+%.f: %.m4f
+	# building \$@ from \$<
+	$(M4) $(M4FLAGS) $(M4OPT) \$< > \$@
+#
+%.o: %.f
+	$(F77COMPILE) \$< -o \$@
+#
+%.c: %.m4c
+	# building \$@ from \$<
+	$(M4) $(M4FLAGS) $(M4OPT) \$< > \$@
+#
+%.h: %.m4h
+	# building \$@ from \$<
+	$(M4) $(M4FLAGS) $(M4OPT) \$< > \$@
 # MISC
 .runable: $(SCRIPTS)
 	[ ! "$(SCRIPTS)" ] || chmod a+rx $(SCRIPTS)
@@ -375,7 +396,9 @@ quick-install: .runable
 
 ##############################################################################
 
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Linear' ] && 
+$verbose "common to Lib and Passes"
+
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && 
 cat >> $MAKEFILE <<% 
 #
 LIB_TARGET=	$(ARCH)/lib$(TARGET).a
@@ -411,7 +434,9 @@ $(LIB_TARGET): $(LIB_OBJECTS) $(TARGET_OBJECTS)
 
 ##############################################################################
 
-[ $DIRTYPE = 'Linear' ] && cat >> $MAKEFILE <<% 
+$verbose "specific to Lib"
+
+[ $DIRTYPE = 'Lib' ] && cat >> $MAKEFILE <<% 
 
 CFILES=		$(LIB_CFILES)
 OBJECTS=	$(LIB_OBJECTS)
@@ -419,17 +444,27 @@ INCLUDES=	$(LIB_HEADERS)
 SOURCES+= 	$(INCLUDES) $(CFILES) $(DOCS)
 #
 
+clean-compiled:
+	$(RM) $(OBJECTS) $(LIB_TARGET) $(BIN_TARGET) \\
+		$(ARCH)/pips $(ARCH)/[tw]pips
+
+clean: generate_makefile_if_necessary_and_possible clean-compiled
+	-$(RM) TAGS $(BIN_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
+		$(DERIVED_FILES) *.~[0-9]~ $(LIB_IFILES) $(INC_TARGET) core
+
+INC_CFILES += $(LIB_CFILES)
+
 %
 
 
 ##############################################################################
 
-[ $DIRTYPE = 'Lib' ] && cat >> $MAKEFILE <<% 
+$verbose "specific to Lib for PIPS"
+
+[ $DIRTYPE = 'Lib' -a $PART = PIPS ] && cat >> $MAKEFILE <<% 
 #
-CFILES=		$(MAIN).c $(LIB_CFILES)
-OBJECTS=	$(MAIN).o $(LIB_OBJECTS)
-INCLUDES=	$(LIB_HEADERS)
-SOURCES+= 	$(INCLUDES) $(CFILES) $(DOCS)
+CFILES+=	$(MAIN).c 
+OBJECTS+=	$(MAIN).o 
 #
 
 test: all
@@ -457,27 +492,10 @@ clobber: clean
 
 %
 
-#############################################################################
-
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Linear' ] && cat >> $MAKEFILE <<% 
-#
-
-clean-compiled:
-	$(RM) $(OBJECTS) $(LIB_TARGET) $(BIN_TARGET) \\
-		$(ARCH)/pips $(ARCH)/[tw]pips
-
-clean: generate_makefile_if_necessary_and_possible clean-compiled
-	-$(RM) TAGS $(BIN_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
-		$(DERIVED_FILES) *.~[0-9]~ $(LIB_IFILES) $(INC_TARGET) core
-
-INC_CFILES += $(LIB_CFILES)
-
-%
-
-
-
 
 ##############################################################################
+
+$verbose "specific to Passes"
 
 [ $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<% 
 #
@@ -515,6 +533,8 @@ INC_CFILES += $(LIB_CFILES)
 
 ##############################################################################
 
+$verbose "specific to Default"
+
 [ $DIRTYPE = 'Default' ] && cat >> $MAKEFILE <<% 
 
 clean:
@@ -527,20 +547,22 @@ clean:
 
 ##############################################################################
 
-[ \( $DIRTYPE = 'Passes' -o $DIRTYPE = 'Lib' -o $DIRTYPE = 'Linear' \) -a "$production" ] &&
+$verbose "specific to Production/Lib and Passes"
+
+[ \( $DIRTYPE = 'Passes' -o $DIRTYPE = 'Lib' \) -a "$production" ] &&
 cat >> $MAKEFILE <<%
 
-.PRECIOUS: $(${PART}_LIBDIR)/$(LIB_TARGET) $(${PART}_BINDIR)/$(BIN_TARGET)
+.PRECIOUS: $(${PART}_ROOT)/Lib/$(LIB_TARGET) $(${PART}_ROOT)/Bin/$(BIN_TARGET)
 
-$(${PART}_INCLUDEDIR)/$(TARGET).h: header
+$(${PART}_ROOT)/Include/$(TARGET).h: header
 	@pips_install_file -f $(${PART}_INCLUDEDIR) $(TARGET).h
 
-$(${PART}_LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
+$(${PART}_ROOT)/Lib/$(LIB_TARGET): $(LIB_TARGET) 
 	@pips_install_file -r $(RANLIB) $(${PART}_LIBDIR)/$(ARCH) $(LIB_TARGET)
 
 $(LIB_OBJECTS): $(TARGET).h
 
-recompile: $(${PART}_INCLUDEDIR)/$(TARGET).h $(${PART}_LIBDIR)/$(LIB_TARGET) 
+recompile: $(${PART}_ROOT)/Include/$(TARGET).h $(${PART}_ROOT)/Lib/$(LIB_TARGET) 
 
 %
 
@@ -548,18 +570,20 @@ recompile: $(${PART}_INCLUDEDIR)/$(TARGET).h $(${PART}_LIBDIR)/$(LIB_TARGET)
 
 ##############################################################################
 
-[ $DIRTYPE = 'Passes' -a $DIRSIDE = $PIPS_SRCDIR ] &&
+$verbose "specific to PIPS/Production/Passes"
+
+[ $DIRTYPE = 'Passes' -a "$production" -a $PART = PIPS ] &&
 cat >> $MAKEFILE <<%
 
 $(TARGET_OBJECTS): $(TARGET).h
 
-$(PIPS_BINDIR)/$(ARCH):
+$(PIPS_ROOT)/Bin/$(ARCH):
 	mkdir \$@
 
-$(PIPS_BINDIR)/$(BIN_TARGET): $(BIN_TARGET) $(PIPS_BINDIR)/$(ARCH)
-	@pips_install_file -x $(PIPS_BINDIR)/$(ARCH) $(BIN_TARGET)
+$(PIPS_ROOT)/Bin/$(BIN_TARGET): $(BIN_TARGET) $(PIPS_ROOT)/Bin/$(ARCH)
+	@pips_install_file -x $(PIPS_ROOT)/Bin/$(ARCH) $(BIN_TARGET)
 
-recompile: $(PIPS_BINDIR)/$(BIN_TARGET)
+recompile: $(PIPS_ROOT)/Bin/$(BIN_TARGET)
 
 %
 
@@ -570,17 +594,19 @@ recompile: $(PIPS_BINDIR)/$(BIN_TARGET)
 # Common to all: installation and Makefile generation
 #
 
+$verbose "common to all again"
+
 cat >> $MAKEFILE <<%
 
 ALL_SOURCES =	$(SOURCES) $(CONFIG_FILE)
 
 $(TARGET_DIR):;	mkdir $(TARGET_DIR)
 
-check_os:
-	@if test -n "$(PIPS_CHECK_OS)"; \\
-	then echo "Cannot run make under this OS release"; \\
-	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
-	fi
+#check_os:
+#	@if test -n "$(PIPS_CHECK_OS)"; \\
+#	then echo "Cannot run make under this OS release"; \\
+#	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
+#	fi
 
 .quick-install: $(INSTALL_INC) $(INSTALL_LIB) $(INSTALL_BIN) $(INSTALL_SHR) \
 	$(INSTALL_DOC) $(INSTALL_UTL) $(INSTALL_RTM) $(INSTALL_HTM) 
@@ -588,16 +614,24 @@ check_os:
 	# installing files where needed
 	# 
 	# plain files
-	pips_install_file -f $(INSTALL_INC_DIR) $(INSTALL_INC) 
-	pips_install_file -f $(INSTALL_DOC_DIR) $(INSTALL_DOC) 
-	pips_install_file -f $(INSTALL_HTM_DIR) $(INSTALL_HTM) 
-	pips_install_file -f $(INSTALL_UTL_DIR) $(INSTALL_UTL) 
-	pips_install_file -f $(INSTALL_SHR_DIR) $(INSTALL_SHR)
-	pips_install_file -f $(INSTALL_RTM_DIR) $(INSTALL_RTM)
+	@test ! "$(INSTALL_INC)" || \\
+	    pips_install_file -f $(INSTALL_INC_DIR) $(INSTALL_INC) 
+	@test ! "$(INSTALL_DOC)" || \\
+	    pips_install_file -f $(INSTALL_DOC_DIR) $(INSTALL_DOC) 
+	@test ! "$(INSTALL_HTM)" || \\
+	    pips_install_file -f $(INSTALL_HTM_DIR) $(INSTALL_HTM) 
+	@test ! "$(INSTALL_UTL)" || \\
+	    pips_install_file -f $(INSTALL_UTL_DIR) $(INSTALL_UTL) 
+	@test ! "$(INSTALL_SHR)" || \\
+	    pips_install_file -f $(INSTALL_SHR_DIR) $(INSTALL_SHR)
+	@test ! "$(INSTALL_RTM)" || \\
+	    pips_install_file -f $(INSTALL_RTM_DIR) $(INSTALL_RTM)
 	# libs...
-	pips_install_file -r $(RANLIB) $(INSTALL_LIB_DIR) $(INSTALL_LIB)
+	@test ! "$(INSTALL_LIB)" || \\
+	    pips_install_file -r $(RANLIB) $(INSTALL_LIB_DIR) $(INSTALL_LIB)
 	# executables...
-	pips_install_file -x $(INSTALL_BIN_DIR) $(INSTALL_BIN)
+	@test ! "$(INSTALL_BIN)" || \\
+	    pips_install_file -x $(INSTALL_BIN_DIR) $(INSTALL_BIN)
 	touch .quick-install
 
 tar:
@@ -614,8 +648,8 @@ quick-install: .quick-install
 	touch .makefile
 
 generate_makefile_if_necessary_and_possible:
-	-@[ -x $(PIPS_UTILDIR)/pips-makemake ] && \\
-		$(MAKE) $(GMKNODIR)  .makefile 
+	@[ ! -x $(PIPS_ROOT)/Utils/pips-makemake ] || \\
+	    $(MAKE) $(GMKNODIR) .makefile 
 
 count:;	@wc -l $(ALL_SOURCES)
 
@@ -633,7 +667,9 @@ delta:;	@test ! "\`sccs tell\`" || sccs delget \`sccs tell\`
 ##############################################################################
 #
 
-[ "$production" ] && cat >> $MAKEFILE <<EOF
+$verbose "specific to Production"
+
+[ "$production" ] && cat >> $MAKEFILE <<%
 #
 # print out the files for a release...
 FWD_ROOT=.
@@ -641,12 +677,15 @@ RELEASE+= $(ALL_SOURCES) $(DEDUCED_CFILES) $(DEDUCED_HEADERS) Makefile
 
 release:; @for f in $(RELEASE) ; do echo $(FWD_ROOT)/\$\$f ; done
 	    
-EOF
+%
+
 
 ##############################################################################
 #
 # partie specifique a Development
 #
+
+$verbose "specific to Development"
 
 [ ! "$production" ] && cat >> $MAKEFILE <<%
 
@@ -664,7 +703,7 @@ check_sccs:
 	install_pips_sources \\
 		-rv -s \`pwd\` -t $(TARGET_DIR) -y "\$\$comments" \\
 		$(ALL_SOURCES)
-	-@cd $(TARGET_DIR) ; pips-makemake $PIPSMKMK_OPTION -P
+	-@cd $(TARGET_DIR) ; pips-makemake $PIPSMKMK_OPTION -S
 	touch .install
 	$(MAKE) quick-install
 
@@ -688,7 +727,9 @@ diff:
 #
 # La partie commune aux bibliotheques et aux passes :
 
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Linear' ] && 
+$verbose "common to Lib and Passes"
+
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && 
 cat >> $MAKEFILE <<%
 #
 
@@ -715,7 +756,10 @@ $(TARGET)-local.h:
 # includes...
 
 build-header-file:
-	@$(COPY) $(TARGET)-local.h $(INC_TARGET);
+	# 
+	# building the header file...
+	#
+	$(COPY) $(TARGET)-local.h $(INC_TARGET);
 	{ \\
 	echo "/* header file built by $(PROTO) */";\\
 	echo "#ifndef ${dir_simple_name}_header_included";\\
@@ -748,7 +792,10 @@ $(INC_TARGET): $(TARGET)-local.h
 
 ##############################################################################
 
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Newgen' -o $DIRTYPE = 'Linear' ] && cat >> $MAKEFILE <<%
+$verbose "all but Default"
+
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Compiled' ] && 
+cat >> $MAKEFILE <<%
 #
 
 # indirect depend bacause I do not trust make for the inclusion of
