@@ -12,31 +12,24 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <setjmp.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 
 #include "genC.h"
 #include "ri.h"
-#include "graph.h"
 #include "database.h"
 #include "makefile.h"
 
 #include "misc.h"
+
 #include "ri-util.h"
-#include "complexity_ri.h"
 #include "pipsdbm.h"
-#include "tiling.h"
 
 #include "constants.h"
 #include "resources.h"
 #include "phases.h"
 
-#include "parser_private.h"
-#include "dg.h"
 #include "property.h"
-#include "reduction.h"
-
 #include "pipsmake.h"
 
 #include "top-level.h"
@@ -206,6 +199,215 @@ FILE *fd;
     return(NULL);
 }
 
+/*************************** MODULE PROCESSING (INCLUDES and IMPLICIT NONE) */
+
+static string real_file_dir = NULL;
+static void reset_real_file_dir(void)
+{
+    free(real_file_dir);
+    real_file_dir = NULL;
+}
+static void set_real_file_dir(string path)
+{
+    int l = strlen(path);
+    if (real_file_dir) reset_real_file_dir();
+    real_file_dir = strdup(path);
+    while (l>0 && real_file_dir[l]!='/') l--;
+    real_file_dir[l]= '\0';
+}
+
+#ifdef NO_RX_LIBRARY
+
+static bool
+pips_process_file(string file_name)
+{
+    int err = safe_system_no_abort(concatenate
+       ("trap 'exit 123' 2; pips-process-module ", file_name, NULL));
+
+    if(err==123) {
+	user_warning("process_user_file",
+		     "pips-process-module interrupted by control-C\n");
+	return FALSE;
+    }
+    else if(err!=0) 
+	pips_internal_error
+	    ("Unexpected return code from pips-process-module: %d\n", err);
+
+    return TRUE;
+}
+
+#else
+
+#define MAX_LINE_LENGTH 100
+#include "rxposix.h"
+
+#define IMPLICIT_NONE_RX "implicit[[:blank:]]*none"
+#define INCLUDE_FILE_RX "include[[:blank:]]*['\"]\\([^'\"]*\\)['\"]"
+
+static regex_t implicit_none_rx, include_file_rx;
+static FILE *output_file;
+
+/* tries several path for a file to include...
+ */
+static string find_file(string name)
+{
+    string other;
+
+    other = strdup(concatenate(real_file_dir, "/", name, NULL));
+    if (file_exists_p(other))
+	return other;
+    free(other);
+
+    if (file_exists_p(name)) return strdup(name);
+
+    other = strdup(concatenate("../", name, NULL));
+    if (file_exists_p(other))
+	return other;
+    free(other);
+    
+    return NULL;
+}
+
+static void handle_file(FILE*);
+static void handle_file_name(char * file_name, bool comment)
+{
+    FILE * f;
+    string found = find_file(file_name);
+
+    pips_assert("some file found", found);
+    pips_debug(2, "including file \"%s\"\n", found);
+
+    if (comment)
+	fprintf(output_file, "! include \"%s\"\n", file_name);
+
+    f=safe_fopen(found, "r");
+    handle_file(f);
+    safe_fclose(f, found);
+
+    if (comment)
+	fprintf(output_file, "! end include \"%s\"\n", file_name);
+
+    free(found);
+}
+
+static void handle_file(FILE * f) /* process f for includes and nones */
+{
+    char line[MAX_LINE_LENGTH];
+    regmatch_t matches[2]; /* matched strings */
+
+    while (!feof(f))
+    {
+	line[0]='\0'; fgets(line, MAX_LINE_LENGTH, f);
+	
+	if (!regexec(&include_file_rx, line, 2, matches, 0))
+	{
+	    line[matches[1].rm_eo]='\0';
+	    handle_file_name(&line[matches[1].rm_so], TRUE);
+	}
+	else 
+	{
+	    if (!regexec(&implicit_none_rx, line, 0, matches, 0))
+		fprintf(output_file, "! MIL-STD-1553 Fortran not in PIPS\n! ");
+	    fprintf(output_file, "%s", line);
+	}
+    }
+}
+
+static void init_rx(void)
+{
+    if (regcomp(&implicit_none_rx, IMPLICIT_NONE_RX, REG_ICASE) ||
+	regcomp(&include_file_rx, INCLUDE_FILE_RX, REG_ICASE))
+	abort();
+}
+
+static void close_rx(void)
+{    
+    regfree(&implicit_none_rx);
+    regfree(&include_file_rx);
+}
+
+static bool
+pips_process_file(string file_name)
+{
+    string origin = strdup(concatenate(file_name, ".origin", NULL));
+    
+    if (rename(file_name, origin))
+	pips_internal_error("error while renaming %s as %s\n",
+			    file_name, origin);
+
+    pips_debug(2, "processing file %s\n", file_name);
+
+    output_file = safe_fopen(file_name, "w");
+    init_rx();
+    handle_file_name(origin, FALSE);
+    close_rx();
+    safe_fclose(output_file, origin);
+    free(origin);
+
+    return TRUE;
+}
+
+#endif
+
+#define MAX_NLINES 1000
+#define MAX_LENGTH 100
+static int cmp(char**x1, char**x2)
+{ return strcmp(*x1, *x2);}
+static void sort_file(string name)
+{
+    FILE *f;
+    char * lines[MAX_NLINES];
+    char line[MAX_LENGTH];
+    int i=0;
+
+    f=safe_fopen(name, "r");
+    while (!feof(f))
+    {
+	string sg = fgets(line, MAX_LENGTH, f);
+	pips_assert("not too many lines", i<MAX_NLINES);
+	if (sg) lines[i++]=strdup(sg);
+    }
+    safe_fclose(f, name);
+
+    qsort(lines, i, sizeof(char*), &cmp);
+
+    f=safe_fopen(name, "w");
+    while (i>0) {
+	fprintf(f, "%s", lines[--i]);
+	free(lines[i]);
+    }
+    safe_fclose(f, name);
+}
+
+static bool pips_split_file(string name, string tempfile)
+{
+#ifdef NO_INTERNAL_FSPLIT
+    int err = safe_system_no_abort
+	(concatenate("trap 'exit 123' 2;",
+		     "pips-split ", abspath,
+		     "| sed -e /zzz[0-9][0-9][0-9].f/d | sort -r > ",
+		     tempfile, "; /bin/rm -f zzz???.f", NULL));
+
+    if(err==123)
+	user_warning("process_user_file",
+		     "File splitting interrupted by control-C\n");
+    else if(err!=0)
+	pips_error("process_user_file",
+		   "Unexpected return code from pips-split: %d\n", err);
+
+    return err;
+#else
+    int err;
+    FILE * out = safe_fopen(tempfile, "w");
+    err = pips_fsplit(name, out);
+    safe_fclose(out, tempfile);
+
+    sort_file(tempfile);
+
+    return err;
+#endif
+}
+
 bool process_user_file(file)
 string file;
 {
@@ -233,16 +435,13 @@ string file;
     /* the absolute path of file is calculated */
     abspath = strdup((*file == '/') ? file : 
 		     concatenate(get_cwd(), "/", file, NULL));
-    /* Well, databases are even more relocatable if the absolute name of 
-       the user file names are stored in the database
-       */
-    /*
-    relpath = strdup((*file == '/') ? file : 
-		     concatenate("../", file, NULL));
-		     */
 
-    /* the new file is registered in the database */
+    set_real_file_dir(abspath);
+
+    /* the new file is registered in the database
+     */
     user_log("Registering file %s\n", file);
+
     /* FI: two problems here
        - the successive calls to DB_PUT_FILE_RESOURCE erase each other...
        - the wiring of the database_name prevents mv of the database (fixed)
@@ -251,20 +450,19 @@ string file;
     DB_PUT_FILE_RESOURCE(DBR_USER_FILE, "", abspath);
 
     /* the new file is splitted according to Fortran standard */
+
     user_log("Splitting file    %s\n", file);
+
     cwd = strdup(get_cwd());
-    /* chdir(database_directory(pgm)); */
     chdir(db_get_current_workspace_directory());
+
     /* reverse sort because the list of modules is reversed later */
     /* if two modules have the same name, the first splitted wins
        and the other one is hidden by the call to "sed" since
        fsplit gives it a zzz00n.f name */
     /* Let's hope no user module is called zzz???.f */
-    err = safe_system_no_abort
-	(concatenate("trap 'exit 123' 2;",
-		     "pips-split ", abspath,
-		     "| sed -e /zzz[0-9][0-9][0-9].f/d | sort -r > ",
-		     tempfile, "; /bin/rm -f zzz???.f", NULL));
+
+    err = pips_split_file(abspath, tempfile);
 
     /* Go back unconditionnally to regular directory for execution
      * or you are heading for trouble when the database is closed
@@ -272,20 +470,7 @@ string file;
     chdir(cwd);
     free(cwd);
 
-    if(err==123) {
-	/* Are we or not allowed to use user_error() in top-level? */
-	/* 
-	user_error("process_user_file",
-		   "File splitting interrupted by control-C\n");
-		   */
-	user_warning("process_user_file",
-		     "File splitting interrupted by control-C\n");
-	return FALSE;
-    }
-    else if(err!=0) {
-	pips_error("process_user_file",
-		   "Unexpected return code from pips-split: %d\n", err);
-    }
+    if (err) return FALSE;
 
     /* the newly created module files are registered in the database */
     fd = safe_fopen(tempfile, "r");
@@ -309,25 +494,11 @@ string file;
         /* Apply a cleaning procedure on each module: */
         cwd = strdup(get_cwd());
         chdir(db_get_current_workspace_directory());
-        err = safe_system_no_abort(concatenate("trap 'exit 123' 2;",
-                                               "pips-process-module ",
-                                               modrelfilename,
-                                               NULL));
+        if (!pips_process_file(modrelfilename))
+	    return FALSE;
         chdir(cwd);
         free(cwd);
 
-        if(err==123) {
-           user_warning("process_user_file",
-                        "pips-process-module interrupted by control-C\n");
-           return FALSE;
-	}
-        else if(err!=0) {
-	    pips_error("process_user_file",
-                      "Unexpected return code from pips-process-module: %d\n",
-		       err);
-        }
-        
-    
 	if(DB_PUT_NEW_FILE_RESOURCE(DBR_SOURCE_FILE, 
 				    modname, modrelfilename)
 	   == resource_undefined) {
@@ -346,6 +517,8 @@ string file;
 	user_warning("", "No module was found when splitting file %s.\n",
 		     abspath);
     }
+
+    reset_real_file_dir();
 
     return success_p;
 }
