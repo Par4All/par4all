@@ -23,6 +23,9 @@
  * - bang comment management added (to avoid the parser)
  *
  * $Log: split_file.c,v $
+ * Revision 1.40  1998/07/10 16:13:25  coelho
+ * fix of the fix about entry and implicit name interaction.
+ *
  * Revision 1.39  1998/07/10 15:59:04  coelho
  * fix for implicit main and data that interacted with entries.
  *
@@ -287,10 +290,9 @@ char *s;
 	    if(!scan_name(s, ptr)) 
 		strcpy( s, x);
 	} else if ((ptr = look(line, "entry")) != 0) {
-	    if(!scan_name(s, ptr)) {
 		it_is_an_entry = 1;
+	    if(!scan_name(s, ptr))
 		strcpy( s, x);
-	    }
 	} else if((ptr = look(line, "program")) != 0) {
 	    it_is_a_main = 1;
 	    if(!scan_name(s, ptr)) {
@@ -467,8 +469,9 @@ int fsplit(char * dir_name, char * file_name, FILE * out)
 	    if (nflag == 0) /* if no name yet, try and find one */
 		nflag = lname(name), newname=nflag;
 	    else { /* FC: some hack to deal with entry... */
-		someentry = lname(tmpname);
+		lname(tmpname);
 		newname = it_is_an_entry;
+		someentry = it_is_an_entry;
 		implicit_program = 0;
 		it_is_a_main = 0;
 		it_is_an_entry = 0;
