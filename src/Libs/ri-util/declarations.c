@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.12  1998/10/27 17:18:39  coelho
+ * prettyprint of symbolic sized character arrays added.
+ *
  * Revision 1.11  1998/10/09 11:33:19  irigoin
  * Test on heap_area_p() added in text_entity_declaration()
  *
@@ -1173,6 +1176,20 @@ text_entity_declaration(
 		    attach_declaration_type_to_words
 			(chars, "CHARACTER*(*)");
 		    ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		}
+		else if (value_symbolic_p(v))
+		{
+		  list chars = NIL;
+		  symbolic s = value_symbolic(v);
+		  chars = CHAIN_SWORD(chars, "CHARACTER*(");
+		  chars = gen_nconc(chars, 
+				    words_expression(symbolic_expression(s)));
+		  chars = CHAIN_SWORD(chars, ") ");
+		  chars = gen_nconc(chars, words_declaration(e, pp_dim));
+
+		  attach_declaration_type_to_words
+		    (chars, "CHARACTER*(*)");
+		  ADD_WORD_LIST_TO_TEXT(t_chars, chars);
 		}
 		else
 		    pips_internal_error("unexpected value\n");
