@@ -333,7 +333,7 @@ switch(instruction_tag(inst))
 				etl, swfl, Gcount_nlc);
     ln_of_statement(test_false(t), fst, ell,
 				etl, swfl, Gcount_nlc);
-    gen_remove(etl, (chunk*) test_condition( t ));
+    gen_remove(etl, (gen_chunk*) test_condition( t ));
     break;
     }
   case is_instruction_loop :
@@ -342,7 +342,7 @@ switch(instruction_tag(inst))
     ADD_ELEMENT_TO_LIST(*ell, LOOP, instruction_loop( inst ));  
     return_list = ln_of_loop(instruction_loop(inst), fst, ell,
 					 etl, swfl, Gcount_nlc);
-    gen_remove(ell, (chunk*) instruction_loop( inst ));
+    gen_remove(ell, (gen_chunk*) instruction_loop( inst ));
     break;
     }
   case is_instruction_call : 
