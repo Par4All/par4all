@@ -55,6 +55,11 @@
      (copy-face (hilit-lookup-face-create 'black/lightgreen)
 		'epips-face-transformers)
 
+     (copy-face (hilit-lookup-face-create 'black/dodgerblue1)
+		'epips-face-cumulated-effect)
+
+     (copy-face (hilit-lookup-face-create 'black/magenta-blue)
+		'epips-face-cumulated-effect)
      )
   (progn
      ; No...
@@ -1523,8 +1528,8 @@ Special commands:
       (
        (process-connection-type nil)	; Use a pipe to communicate
        )
-    (setq epips-process (start-process "WPips" "Pips-Log" "wpips" "-emacs"))
-    ;;(setq epips-process (start-process "WPips" "Pips-Log" "/projects/Pips/Development/Lib/ri-util/wpips" "-emacs"))
+    ;;(setq epips-process (start-process "WPips" "Pips-Log" "wpips" "-emacs"))
+    (setq epips-process (start-process "WPips" "Pips-Log" "/projects/Pips/Development/Libs/effects/wpips" "-emacs"))
 					;(goto-char (process-mark epips-process))
     (message "WPips process launched...")
     (setq epips-process-buffer (process-buffer epips-process))
