@@ -210,7 +210,7 @@ lieu lire_lieu()
 	    }
 	    fprintf(stderr, "Nom de cette nouvelle destination ? ");
 	    s = set_singleton( set_pointer, ld_string(stdin) ) ;
-	    set_add_element( s, s, "foo" ) ;
+	    set_add_element( s, s, strdup("foo") ) ;
 	    lieu_autre(l) = s ;
 	}
     } while (c != 'P' && c != 'S' && c != 'R' && c != 'A');
@@ -365,6 +365,7 @@ int main(void)
     fclose( fd ) ;
 
     gen_mapc_tabulated( print_date, date_domain ) ;
+    fprintf(stderr, "Mapc tabulated\n" ) ;
     gen_free( i ) ;
     fprintf( stderr, "I freed\n" ) ;
     gen_free_tabulated( date_domain ) ;
@@ -409,7 +410,7 @@ int main(void)
     gen_write( fd, ii ) ;
     fprintf( stderr, "End writing\n" ) ;
     fprintf( stderr, "Check sharing\n" ) ;
-/*    gen_debug = GEN_DBG_TRAV ; */
+    gen_debug = GEN_DBG_TRAV ; 
     l = indisponibilite_reservation( i ) ;
     l = CONS( RESERVATION, RESERVATION(CAR( l )), 
 	      CONS( RESERVATION, RESERVATION(CAR( l )), NIL)) ;
