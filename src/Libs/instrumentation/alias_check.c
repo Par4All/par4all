@@ -1614,6 +1614,8 @@ bool alias_check(char * module_name)
     print_list_of_alias_associations(l_module_aliases);
   current_mod = local_name_to_top_level_entity(module_name);
   old_decl = code_decls_text(entity_code(current_mod));
+  pips_assert("some old declaration", old_decl);
+
   debug_on("ALIAS_CHECK_DEBUG_LEVEL");
   ifdebug(1)
     fprintf(stderr, " \n Begin alias_check for %s \n", module_name); 
@@ -1725,7 +1727,8 @@ bool alias_check(char * module_name)
     user_log("\n No alias for this module \n"); 
   
   /* add the include file alias_common.h */
-  code_decls_text(entity_code(current_mod)) = strdup(concatenate(old_decl, new_decl, NULL));  
+  code_decls_text(entity_code(current_mod)) = 
+    strdup(concatenate(old_decl, new_decl, NULL));  
   free(old_decl), old_decl = NULL; 
 
   user_log("\n Total number of flags : %d\n", number_of_flags); 
