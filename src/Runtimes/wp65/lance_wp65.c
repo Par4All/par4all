@@ -34,6 +34,9 @@ int *tids;
 #define TAMPON_VIDE -1
 int *bufid, *taille_restante;
 
+/* Rajoute une estampille sur les paquets : */
+int *estampille;
+
 int nb_taches;
 int nb_procs;
 int nb_bancs;
@@ -144,6 +147,8 @@ void init_variables()
   tids = (int *) calloc(nb_taches, sizeof(int));
   bufid = (int *) calloc(max_bancs_procs, sizeof(int));
   taille_restante = (int *) calloc(max_bancs_procs, sizeof(int));
+  /* calloc met à 0 : */
+  estampille = (int *) calloc(2*nb_procs*nb_bancs, sizeof(int));
   
   for(i = 0; i < max_bancs_procs; i++) {
     bufid[i] = TAMPON_VIDE;
@@ -152,6 +157,14 @@ void init_variables()
 
   testerreur("gethostname",
 	     gethostname(machine, sizeof(machine) - 1));
+}
+
+
+/* Rajoute une sorte d'horloge pour chaque liaison : */
+/* direction = 0 en réception, 1 en émission. */
+int estampiller(int PE, int banc, int taille, int direction)
+{
+  return estampille[(direction*nb_procs + PE)*nb_bancs + banc] += taille;
 }
 
 
@@ -383,7 +396,9 @@ void receive_4(int tid, int proc_or_bank_id, float *donnee, int taille)
 void BANK_SEND_4_(int *proc_id, float *donnee, int *taille)
 {
   debug(4, "BANK_SEND_4",
-	"Envoi de banc %d -> PE %d, taille = %d\n", banc, *proc_id, *taille);
+	"Envoi de banc %d -> PE %d, taille = %d (estampille %d)\n",
+	banc, *proc_id, *taille,
+	estampiller(*proc_id, banc, *taille, 1));
   send_4(tids[*proc_id], donnee, *taille);
 }
 
@@ -391,8 +406,9 @@ void BANK_SEND_4_(int *proc_id, float *donnee, int *taille)
 void BANK_RECEIVE_4_(int *proc_id, float *donnee, int *taille)
 {
   debug(4, "BANK_RECEIVE_4",
-	"Réception de banc %d <- PE %d, taille = %d\n",
-	banc, *proc_id, *taille);
+	"Réception de banc %d <- PE %d, taille = %d (estampille %d)\n",
+	banc, *proc_id, *taille,
+	estampiller(*proc_id, banc, *taille, 0));
   receive_4(tids[*proc_id], *proc_id, donnee, *taille);
 }
 
@@ -400,8 +416,9 @@ void BANK_RECEIVE_4_(int *proc_id, float *donnee, int *taille)
 void WP65_SEND_4_(int *bank_id, float *donnee, int *taille)
 {
   debug(4, "WP65_SEND_4",
-	"Envoi de PE %d -> banc %d, taille = %d\n",
-	numero, *bank_id, *taille);
+	"Envoi de PE %d -> banc %d, taille = %d (estampille %d)\n",
+	numero, *bank_id, *taille,
+	estampiller(numero, *bank_id, *taille, 1));
   send_4(tids[*bank_id + nb_procs], donnee, *taille);
 }
 
@@ -409,8 +426,9 @@ void WP65_SEND_4_(int *bank_id, float *donnee, int *taille)
 void WP65_RECEIVE_4_(int *bank_id, float *donnee, int *taille)
 {
   debug(4, "WP65_RECEIVE_4",
-	"Réception de PE %d <- banc %d, taille = %d\n",
-	numero, *bank_id, *taille);
+	"Réception de PE %d <- banc %d, taille = %d (estampille %d)\n",
+	numero, *bank_id, *taille,
+	estampiller(numero, *bank_id, *taille, 0));
   receive_4(tids[*bank_id + nb_procs], *bank_id, donnee, *taille);
 }
 
