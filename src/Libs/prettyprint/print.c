@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: print.c,v $
+ * Revision 1.21  1997/12/10 12:17:23  coelho
+ * working free_text().
+ *
  * Revision 1.20  1997/12/08 14:17:43  coelho
  * make_text_resource_and_free() added.
  *
@@ -116,18 +119,19 @@ print_code_or_source(string mod_name)
 	db_get_memory_resource(is_user_view?
 			       DBR_PARSED_CODE:DBR_CODE, mod_name, TRUE);
 
-    begin_attachment_prettyprint();
-    
-    init_prettyprint(empty_text);
-
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
-    MERGE_TEXTS(r, text_module(module,mod_stat));
-    debug_off();
-    success = make_text_resource (mod_name, resource_name, file_ext, r);
 
+    begin_attachment_prettyprint();
+    init_prettyprint(empty_text);
+    MERGE_TEXTS(r, text_module(module,mod_stat));
+    success = make_text_resource(mod_name, resource_name, file_ext, r);
     end_attachment_prettyprint();
+
+    debug_off();
+
     set_string_property(PRETTYPRINT_PARALLEL, pp); free(pp);
 
+    free_text(r);
     free(resource_name);
     free(file_ext);
     return success;
@@ -164,11 +168,15 @@ print_parallelized_code_common(
 
     success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
 				  PARALLEL_FORTRAN_EXT, r);
+
     end_attachment_prettyprint();
+
     if (style) {
 	set_string_property(PRETTYPRINT_PARALLEL, pp); 
 	free(pp);
     }
+    
+    free_text(r);
     return success;
 }
 
