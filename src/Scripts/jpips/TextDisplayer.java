@@ -2,6 +2,9 @@
   $Id$
 
   $Log: TextDisplayer.java,v $
+  Revision 1.7  1998/10/30 15:42:42  ancourt
+  class extension moved in Displayer
+
   Revision 1.6  1998/10/17 12:20:33  coelho
   indentation fixed.
   Borders++.
@@ -61,14 +64,25 @@ public class TextDisplayer extends Displayer
   public void setInfos()
   {
     infos = new Vector();
-    infos.addElement(new Extension("pref","basic sequential view"));
-    infos.addElement(new Extension("tran","transformers sequential view"));
-    infos.addElement(new Extension("prec","preconditions sequential view"));
-    infos.addElement(new Extension("reg","regions sequential view"));
-    infos.addElement(new Extension("parf","parallel view"));
-    infos.addElement(new Extension("icfg","basic ICFG view"));
-    infos.addElement(new Extension("icfgl","loops ICFG view"));
-    infos.addElement(new Extension("icfgc","control ICFG view"));
+    infos.addElement(new Extension("pref","Basic sequential view"));
+    infos.addElement(new Extension("tran","Transformers sequential view"));
+    infos.addElement(new Extension("prec","Preconditions sequential view"));
+    infos.addElement(new Extension("reg","Regions sequential view"));
+    infos.addElement(new Extension("parf","Parallel view"));
+    infos.addElement(new Extension("icfg","Basic ICFG view"));
+    infos.addElement(new Extension("icfgl","Loops ICFG view"));
+    infos.addElement(new Extension("icfgc","Control ICFG view"));
+    infos.addElement(new Extension("cg","Call graph view"));
+    infos.addElement(new Extension("adfg_file","Array data flow graphview"));  
+    infos.addElement(new Extension("bdt_file","Scheduling view"));  
+    infos.addElement(new Extension("plc_file","Mapping view"));  
+    infos.addElement(new Extension("comp","Complexity program view"));  
+    infos.addElement(new Extension("inreg"," Regions IN view"));  
+    infos.addElement(new Extension("outreg","Regions OUT view"));  
+    infos.addElement(new Extension("prop","Proper effects view"));  
+    infos.addElement(new Extension("cumu","Cumulated effects view"));  
+    infos.addElement(new Extension("dg","Dependence graph view"));  
+    infos.addElement(new Extension("stco","Static control view"));  
   }
 
   /** Displays a text frame from a text file.
@@ -173,7 +187,7 @@ public class TextDisplayer extends Displayer
 	  public void windowDeactivated(WindowEvent e) {}
 	  public void windowIconified(WindowEvent e) {}
 	  public void windowDeiconified(WindowEvent e) {}
-        };
+        }; 
       f.addWindowListener(w);
     }
 
@@ -274,39 +288,4 @@ public class TextDisplayer extends Displayer
   }
 
 
-  /** A link between an extension and its representative string..
-   * @author Francois Didry
-   */
-  static public class Extension
-  {
-    
-    
-    public String		extension,	//extension 
-      info;		//information about the extension
-    
-    
-    /** Sets the extension and its info..
-     */
-    public Extension(String extension, String info)
-    {
-      this.extension = extension;
-      this.info = info;
-    }
-    
-    
-    /** @return the extension.
-     */
-    public String getExtension()
-    {
-      return extension;
-    }
-    
-    
-    /** @return the info.
-     */
-    public String getInfo()
-    {
-      return info;
-    }
-  }
 }
