@@ -1,4 +1,6 @@
-; Some variables used to store informations about an EPips buffer:
+; To store the EPips minor mode state in a buffer:
+(make-variable-buffer-local 'epips-mode)
+
 ; To store the module name in a buffer:
 (make-variable-buffer-local 'epips-local-module-name)
 
@@ -84,6 +86,7 @@
  epips-call-graph-view-command-name "Callgraph View"
  epips-dependance-graph-view-command-name "Dependence Graph View"
  epips-distributed-view-command-name "Distributed View"
+ epips-edit-view-command-name "Edit"
  epips-emacs-sequential-view-command-name "Emacs Sequential View"
  epips-flint-view-command-name "Flint View"
  epips-hpfc-file-view-command-name "HPFC File"
@@ -382,36 +385,41 @@
           (epips-ICFG-or-graph-view-command epips-command-name epips-command-content)
         (if (equal epips-command-name epips-dependance-graph-view-command-name)
             (epips-sequential-view-command epips-command-name epips-command-content)
-          (if (equal epips-command-name epips-distributed-view-command-name)
+          (if (equal epips-command-name epips-edit-view-command-name)
+					; The .f edit is not something
+					; special:
               (epips-sequential-view-command epips-command-name epips-command-content)
-            (if (equal epips-command-name epips-emacs-sequential-view-command-name)
-                (epips-sequential-view-command epips-command-name epips-command-content)
-              (if (equal epips-command-name epips-flint-view-command-name)
-                  (epips-sequential-view-command epips-command-name epips-command-content)
-		(if (equal epips-command-name epips-hpfc-file-view-command-name)
+	    (if (equal epips-command-name epips-distributed-view-command-name)
+		(epips-sequential-view-command epips-command-name epips-command-content)
+	      (if (equal epips-command-name epips-emacs-sequential-view-command-name)
+		  (epips-sequential-view-command epips-command-name epips-command-content)
+		(if (equal epips-command-name epips-flint-view-command-name)
 		    (epips-sequential-view-command epips-command-name epips-command-content)
-		  (if (equal epips-command-name epips-ICFG-view-command-name)
-		      (epips-ICFG-or-graph-view-command epips-command-name epips-command-content)
-		    (if (equal epips-command-name epips-parallel-view-command-name)
-			(epips-sequential-view-command epips-command-name epips-command-content)
-		      (if (equal epips-command-name epips-placement-view-command-name)
+		  (if (equal epips-command-name epips-hpfc-file-view-command-name)
+		      (epips-sequential-view-command epips-command-name epips-command-content)
+		    (if (equal epips-command-name epips-ICFG-view-command-name)
+			(epips-ICFG-or-graph-view-command epips-command-name epips-command-content)
+		      (if (equal epips-command-name epips-parallel-view-command-name)
 			  (epips-sequential-view-command epips-command-name epips-command-content)
-			(if (equal epips-command-name epips-scheduling-view-command-name)
+			(if (equal epips-command-name epips-placement-view-command-name)
 			    (epips-sequential-view-command epips-command-name epips-command-content)
-			  (if (equal epips-command-name epips-sequential-view-command-name)
+			  (if (equal epips-command-name epips-scheduling-view-command-name)
 			      (epips-sequential-view-command epips-command-name epips-command-content)
-			    (if (equal epips-command-name epips-user-view-command-name)
+			    (if (equal epips-command-name epips-sequential-view-command-name)
 				(epips-sequential-view-command epips-command-name epips-command-content)
+			      (if (equal epips-command-name epips-user-view-command-name)
+				  (epips-sequential-view-command epips-command-name epips-command-content)
 					; Else, command unknown:
-			      (epips-user-error-command (concat "\nCommand name \""
-								epips-command-name
-								"\" with argument \""
-								epips-command-content
-								"\" not implemented !!!\n\n"))
+				(epips-user-error-command (concat "\nCommand name \""
+								  epips-command-name
+								  "\" with argument \""
+								  epips-command-content
+								  "\" not implemented !!!\n\n"))
+				)
 			      )
 			    )
-                          )
-                        )
+			  )
+			)
 		      )
 		    )
 		  )
@@ -727,7 +735,36 @@
 
 ;(setq epips-menu-keymap (cons "Pips" (make-sparse-keymap "Pips")))
 ;(fset 'epips-menu epips-menu-keymap)
+
+; All the keys and menus for the EPips mode: 
+(defvar epips-keymap (make-sparse-keymap "The PIPS keymap")
+  "Keymap for the Emacs PIPS mode.")
+(defvar epips-menu-keymap (make-sparse-keymap "The PIPS menu")
+  "Keymap for the menu of the Emacs PIPS mode.")
+;(define-key epips-keymap "\C-C\C-K" 'epips-kill-the-buffers)
+(define-key epips-keymap "\C-C\C-L" 'epips-clear-log-buffer)
+(define-key epips-keymap "\C-C\C-Q" 'epips-kill-the-buffers)
+(define-key epips-keymap "\C-C\C-S" 'epips-save-to-seminal-file)
+(fset 'epips-main-menu epips-menu-keymap)
+(define-key epips-keymap [menu-bar epips-menu] '("EPips" . epips-main-menu))
+(define-key epips-menu-keymap [epips-save-to-seminal-file-menu-item]
+  '("Save the file after edit in the seminal .f" . epips-save-to-seminal-file))
+(define-key epips-menu-keymap [epips-kill-the-buffers-menu-item]
+  '("Quit and kill the Pips buffers" . epips-kill-the-buffers))
+(define-key epips-menu-keymap [epips-clear-log-buffer-menu-item]
+  '("Clear log buffer" . epips-clear-log-buffer))
+(define-key epips-keymap [S-down-mouse-1]
+  '("Go to module" . epips-mouse-module-select))
+(define-key epips-keymap [S-down-mouse-3] 'epips-main-menu)
+
+
 (defun epips-add-keymaps-and-menu-in-the-current-buffer ()
+  "This function add the menus and define some keyboard accelerators
+ to the current buffer"
+  (use-local-map epips-keymap)
+  )
+
+(defun epips-add-keymaps-and-menu-in-the-current-buffer2 ()
   "This function add the menus and define some keyboard accelerators
  to the current buffer"
   (local-set-key [menu-bar epips] (cons "Pips" (make-sparse-keymap "Pips")))
@@ -773,21 +810,29 @@
   
 
 
-; The function to created all the EPips buffers
 (defun epips-create-the-buffers ()
+  "The function to create all the EPips buffers"
   (setq epips-buffers (make-vector epips-buffer-number nil))
   (setq i 0)
   (while (< i epips-buffer-number)
 					; Create each window:
     (aset epips-buffers i (get-buffer-create
-			   (format "Emacs-Pips-%d" i)))
+			   (format "EPips-%d" i)))
     (setq i (1+ i))
     )		     
-  (print epips-buffers)
   )
 
 
-(defun epips-kill-the-buffers ()
+(defun epips-all-the-buffers ()
+  "Return all the buffers used by EPips"
+  (concat
+   epips-process-buffer
+   epips-xtree-input-buffer
+   epips-buffers)
+)
+
+
+(defun epips-kill-the-log-buffer ()
   "The function to kill the EPips Log buffer"
   (interactive)
   (kill-buffer epips-process-buffer)
@@ -797,7 +842,28 @@
 (defun epips-kill-the-buffers ()
   "The function to kill all the EPips buffers"
   (interactive)
-  (mapcar 'kill-buffer epips-buffers)
+  (mapcar 'kill-buffer (epips-all-the-buffers))
+)
+
+
+(defun epips-kill-the-local-variables (a-buffer)
+  "The function to kill the local variable in a buffer"
+  (save-excursion
+    (let (
+	  (old-buffer (current-buffer))
+	  )
+      (set-buffer a-buffer)
+					; Clean up the environment :
+      (kill-all-local-variables)
+      (set-buffer old-buffer)
+      )
+    )
+)
+
+
+(defun epips-kill-the-local-variables-in-the-buffers ()
+  "The function to kill the local variable in all the EPips buffers"
+  (mapcar 'epips-kill-the-local-variables (epips-all-the-buffers))
 )
 
 
@@ -805,6 +871,7 @@
 (setq epips-buffer-number 9)
 
 ; Launch the wpips process from Emacs:
+      
 (defun epips ()
   "The Emacs-PIPS mode.
 
@@ -837,11 +904,13 @@ It is useful to interrupt a core dump of 250 MBytes when it appends
 for example... :-)
 
 By the way, EPips assumes the use of hilit19...
+
+Special commands: 
+\\{epips-mode-keymap}
 "
 					; Just to have the function
 					; for the user :
   (interactive)
-  (kill-all-local-variables) ; Clean up the environment.
 					; Initialize the automaton
 					; that analyses the pips
 					; output:
@@ -867,6 +936,8 @@ By the way, EPips assumes the use of hilit19...
     (setq epips-process-buffer (process-buffer epips-process))
     (set-process-filter epips-process 'epips-output-filter)
     (epips-select-and-display-a-buffer epips-process-buffer)
+					; Clean up the environment :
+    (epips-kill-the-local-variables-in-the-buffers)
 					;(switch-to-buffer
 					; epips-process-buffer) Hum, I
 					; do not know why I need to
@@ -878,7 +949,27 @@ By the way, EPips assumes the use of hilit19...
     (set-marker (process-mark epips-process) (point))
     (epips-add-keymaps-and-menu)
     )
+					; The command loop display the
+					; returned value...
+  "Launching the WPips process..."
   )
+
+(defun epips-mode (no-possible-disable-yet)
+  "For EPips acting as a minor mode, add this function.
+But since I cannot see what quitting the minor mode epips means,
+the epips-mode cannot be quited.
+
+See the documentation about epips with
+\C-h f epips
+
+Special commands: 
+\\{epips-mode-keymap}"
+  (or (assq 'epips-mode minor-mode-alist)
+      (setq minor-mode-alist
+	    (cons '(epips-mode " Pips") minor-mode-alist)))
+  minor-mode-alist
+  )
+
 
 (defun v-epips-output-filter (a-process an-output-string)
   (let
@@ -901,3 +992,75 @@ By the way, EPips assumes the use of hilit19...
       )
     )
   )
+
+
+(defun print-help-return-message (&optional function)
+  "Display or return message saying how to restore windows after help command.
+Computes a message and applies the optional argument FUNCTION to it.
+If FUNCTION is nil, applies `message' to it, thus printing it."
+  (and (not (get-buffer-window standard-output))
+       (let ((first-message
+	      (cond ((or (member (buffer-name standard-output)
+				 special-display-buffer-names)
+			 (assoc (buffer-name standard-output)
+				special-display-buffer-names)
+			 (let (found
+			       (tail special-display-regexps)
+			       (name (buffer-name standard-output)))
+			   (while (and tail (not found))
+			     (if (or (and (consp (car tail))
+					  (string-match (car (car tail)) name))
+				     (and (stringp (car tail))
+					  (string-match (car tail) name)))
+				 (setq found t))
+			     (setq tail (cdr tail)))
+			   found))
+		     ;; If the help output buffer is a special display buffer,
+		     ;; don't say anything about how to get rid of it.
+		     ;; First of all, the user will do that with the window
+		     ;; manager, not with Emacs.
+		     ;; Secondly, the buffer has not been displayed yet,
+		     ;; so we don't know whether its frame will be selected.
+		     ;; Even the message about scrolling the help
+		     ;; might be wrong, but it seems worth showing it anyway.
+		     nil)
+		    ((not (one-window-p t))
+		     "Type \\[switch-to-buffer-other-window] RET to restore the other window.")
+		    (pop-up-windows
+		     "Type \\[delete-other-windows] to remove help window.")
+		    (t
+		     "Type \\[switch-to-buffer] RET to remove help window."))))
+	 (funcall (or function 'message)
+		  (concat
+		   (if first-message
+		       (substitute-command-keys first-message)
+		     "")
+		   (if first-message "  " "")
+		   ;; If the help buffer will go in a separate frame,
+		   ;; it's no use mentioning a command to scroll, so don't.
+		   (if (or (member (buffer-name standard-output)
+				   special-display-buffer-names)
+			   (assoc (buffer-name standard-output)
+				  special-display-buffer-names)
+			   (memq t (mapcar '(lambda (elt)
+					      (if (consp elt)
+						  (setq elt (car elt)))
+					      (string-match elt (buffer-name standard-output)))
+					   special-display-regexps)))
+		       nil
+		     (if (or (member (buffer-name standard-output)
+				     same-window-buffer-names)
+			     (assoc (buffer-name standard-output)
+				    same-window-buffer-names)
+			     (memq t (mapcar '(lambda (elt)
+						(if (consp elt)
+						    (setq elt (car elt)))
+						(string-match elt (buffer-name standard-output)))
+					     same-window-regexps)))
+			 ;; Say how to scroll this window.
+			 (substitute-command-keys
+			  "\\[scroll-up] to scroll the help.")
+		       ;; Say how to scroll some other window.
+		       (substitute-command-keys
+			"\\[scroll-other-window] to scroll the help."))))))))
+
