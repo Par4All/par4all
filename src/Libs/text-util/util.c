@@ -113,6 +113,9 @@ add_to_current_line(
     string continuation, /* prefix when breaking a line */
     text txt             /* where to append completed lines */)
 {
+	bool divide;
+	char tmp[MAX_LINE_LENGTH];
+	int last_cut;
     int lbuffer, lappend;
     lbuffer = strlen(buffer);
 
@@ -122,17 +125,16 @@ add_to_current_line(
 
     lappend = strlen(append);
 
+
     if (lbuffer + lappend + 2 > MAX_LINE_LENGTH) /* 2 = strlen("\n\0") */
     {   
 	/* cannot append the string. must go next line.
 	 */
-	bool divide;
-	char tmp[MAX_LINE_LENGTH];
-	int last_cut = last_comma_or_clopar(buffer);
+	last_cut = last_comma_or_clopar(buffer);
 
 	divide = (last_cut > 0)
 	    && (last_cut != lbuffer-1) 
-	    &&  (lbuffer - last_cut + lappend < MAX_LINE_LENGTH - 2);
+	    && (lbuffer - last_cut + lappend +strlen(continuation) < MAX_LINE_LENGTH - 2);
 
 	if (divide) 
 	{
@@ -146,17 +148,19 @@ add_to_current_line(
 	strcat(buffer, LINE_SUFFIX);
 	ADD_SENTENCE_TO_TEXT
 	    (txt, make_sentence(is_sentence_formatted, strdup(buffer)));
-
+	
 	/* now regenerate the beginning of the line */
 	strcpy(buffer, continuation);
+	
 	if (divide) strcat(buffer, tmp); /* get back saved part */
+	
     }
 
     if (strlen(buffer) + lappend + 2 > MAX_LINE_LENGTH)
 	/* this shouldn't happen. 
 	 * it can occur if lappend+lcontinuation is too large.
 	 */
-	pips_internal_error("something got wrong...");
+	pips_internal_error("something got wrong...\n");
 
     /* special case: do not append spaces to simple continuations.
      */
