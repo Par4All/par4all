@@ -177,8 +177,7 @@ string
 entity_minimal_name(e)
 entity e;
 {
-    entity 
-	m = get_current_module_entity();
+    entity m = get_current_module_entity();
 
     return (strcmp(module_local_name(m), entity_module_name(e)) == 0) ? 
 	entity_local_name(e) : entity_name(e) ;
