@@ -28,15 +28,6 @@
 #include "text-util.h"
 #include "icfg.h"
 
-/* Graph is defined here, for making daVinci graph */
-#include "dg.h"
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-#include "graph.h"
-#include "icfg-local.h"
-
-#define ICFG_SCAN_INDENT 4
-
 static int current_margin;
 
 #define st_DO	 	"do"
@@ -193,8 +184,6 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
     set_current_module_entity(e_caller);
 
     if (l_effs_flt != NIL) {
-        expression * exps = (expression *)call_arguments(c);
-
 	MAP(EXPRESSION, exp, {
 	    syntax syn = expression_syntax(exp);
 	    
@@ -212,7 +201,7 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
 		    }
 		}, list_vars_to_filter);
 	    }
-	}, exps);
+	}, call_arguments(c));
     }
 
     /* release the current module entity */
@@ -237,7 +226,7 @@ static void call_flt(call c)
 
 	/* hum... pushes the current entity... */
 	entity e_caller = get_current_module_entity();
-	/* written by Dat */
+	
 	vertex ver_child = get_vertex_by_string(callee_name, verlist);
 	if (ver_child != vertex_undefined)
 	    verlist = safe_make_successor(current_vertex, ver_child, verlist);
@@ -263,9 +252,6 @@ static void call_flt(call c)
 	case ICFG_DECOR_FILTERED_PROPER_EFFECTS:
 	    MERGE_TEXTS(r, get_real_call_filtered_proper_effects(c, e_caller));
 	    break;
-	case DVICFG_DECOR_FILTERED_PROPER_EFFECTS:
-	    fprintf(stderr, "hello");
-	    break;
 	case ICFG_DECOR_CUMULATED_EFFECTS:
 	    MERGE_TEXTS(r,get_text_cumulated_effects(callee_name));
 	    break;
@@ -287,6 +273,7 @@ static void call_flt(call c)
 	set_current_module_entity(e_caller);
 	/* append the callee' icfg */
 	/*append_icfg_file (r, callee_name);*/
+	append_marged_text(r, 0, CALL_MARK, callee_name);
 	/* store it to the statement mapping */
 	update_statement_icfg(current_stmt_head(), r);
     }
@@ -549,7 +536,7 @@ void print_module_icfg(entity module)
 {
     string module_name = module_local_name(module);
     statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,TRUE);
-    text txt = make_text (NIL);
+    text txt = make_text(NIL);
     append_marged_text(txt, 0, module_name, "");
     current_vertex = make_vertex((vertex_label)txt, NIL);
 
@@ -577,41 +564,45 @@ void print_module_icfg(entity module)
 
     pips_assert("stack is empty", current_stmt_empty_p());
 
-    /* print the name of module in some case */
-    if (get_int_property(ICFG_DECOR) != ICFG_DECOR_FILTERED_PROPER_EFFECTS) {
-      /*append_marged_text(txt, 0, module_name, "");*/
-    } else if ((text_sentences((text)load_statement_icfg(s)) != NIL) || (vertex_successors(current_vertex) != NIL)) {
-      /*append_marged_text(txt, 0, module_name, "");*/
-	verlist = safe_add_vertex_to_list(current_vertex, verlist);
+    if (get_int_property(ICFG_DECOR) == ICFG_DECOR_FILTERED_PROPER_EFFECTS) {
+        if (vertex_successors(current_vertex) == NIL) {
+	    bool found = FALSE;
+	    MAP(SENTENCE, sen, {
+	        string one_line = sentence_to_string(sen);
+		if (strstr(one_line, CALL_MARK) == NULL) {
+		    found = TRUE;
+		    break;
+		}
+	    }, text_sentences(load_statement_icfg(s)));
+	    if (found) {
+	        verlist = safe_add_vertex_to_list(current_vertex, verlist);
+	    } else {
+	        safe_free_vertex(current_vertex, verlist);
+		current_vertex = vertex_undefined;
+	    }
+	} else {
+	    verlist = safe_add_vertex_to_list(current_vertex, verlist);
+	}
     } else {
-        safe_free_vertex(current_vertex, verlist);
-	current_vertex = vertex_undefined;
+        verlist = safe_add_vertex_to_list(current_vertex, verlist);
     }
+    
+    if (!vertex_undefined_p(current_vertex))
+        MERGE_TEXTS(txt, (text)load_statement_icfg(s));
 
-    MERGE_TEXTS (txt, (text) load_statement_icfg (s));
+    make_resource_from_starting_node(module_name, DBR_ICFG_FILE,
+				     get_bool_property(ICFG_IFs) ? ".icfgc" :
+				     (get_bool_property(ICFG_DOs) ? ".icfgl" : 
+				      ".icfg"),
+				     current_vertex, verlist, TRUE);
 
-    make_text_resource(module_name, DBR_ICFG_FILE,
-		       get_bool_property(ICFG_IFs) ? ".icfgc" :
-		       (get_bool_property(ICFG_DOs) ? ".icfgl" : 
-			".icfg"),
-		       txt);
+    if (get_bool_property(ICFG_DV))
+        make_resource_from_starting_node(module_name, DBR_DVICFG_FILE, ".daVinci",
+				       current_vertex, verlist, FALSE);
 
-    /*free_text (txt);*/
     free_icfg_map();
     free_current_stmt_stack();
     reset_current_module_entity();
-
-    if (!vertex_undefined_p(current_vertex)) {
-        FILE * fd;
-        string localfilename = db_build_file_resource_name(DBR_ICFG_FILE, module_name, ".daVinci");
-	string dir = db_get_current_workspace_directory();
-	string filename = strdup(concatenate(dir, "/", localfilename, NULL));
-	free(dir);
-	fd = safe_fopen(filename, "w");
-	print_graph_daVinci_with_starting_node(fd, current_vertex);
-	safe_fclose(fd, filename);
-	free(filename);
-    }
 }
 
 /* parametrized by the decoration...
@@ -623,37 +614,3 @@ void print_module_icfg_with_decoration(
     decoration = deco;
     print_module_icfg(module);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
