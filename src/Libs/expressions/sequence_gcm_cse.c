@@ -2,6 +2,36 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.23  2000/07/28 14:12:20  phamdinh
+   	* Number of use of every new variable is counted (using the field
+   	'comments' of the statement defining it. This value is modified
+   	often, it may be increased but also be reduced!
+   	ex:
+   		x = a + b*c + d
+   		y = b*c + e
+
+   	==>	F_0 = b*c (Number of use = 2)
+   		x = F_0 + a + d
+   		y = F_0 + e
+
+   	But:
+   		x = a + b*c + d
+   		y = a + b*c + e
+
+   	==>	F_0 = b*c 	(Number of use F_0 = 1)
+   		F_1 = a + F_0	(Number of use F_1 = 2)
+   		x = F_1 + d
+   		y = F_1 + e
+   	Note: 	Before the creation of F_1, Number of use F_0 = 2. After
+   		the appaire of F_1, #F_0 = 1 because F_0 is contained in F_1
+
+   	==>> Code optimal:
+   		F_1 = a + b*c	(F_0 is removed)
+   		x = F_1 + d
+   		y = F_1 + e
+
+   *******	Summary: Code is more optimal!!!
+
    Revision 1.22  2000/07/27 14:33:04  phamdinh
    Debug: Constant, Unary minus, and "y = x + ..."
 
@@ -798,6 +828,27 @@ static void loop_rwt(loop l)
   do_atomize_if_different_level(range_increment(bounds), level);
 }
 
+/* PDSon: I use the field 'comments' of statement for counting its number of 
+ * use. Raison: The field 'comments' of new statement added is always empty!
+ * This function verifies if number of use is greater than 1 or not.
+ */
+static bool
+number_of_use_greater_1(statement s)
+{
+  char* comment = statement_comments(s);
+  int number = 0;
+
+  if(empty_comments_p(comment))
+  {
+    return FALSE;
+  }
+
+  sscanf((const char*)comment,"%d", &number);
+  return (number > 1);
+}
+
+/* Update the field 'comments' of a statement 
+ */
 static void
 set_comment_of_statement(statement s, char *new_comment)
 {
@@ -807,91 +858,118 @@ set_comment_of_statement(statement s, char *new_comment)
   }
   else
   {
-    // free old ...
     free(statement_comments(s));
     statement_comments(s) = new_comment;
   }
 }
 
-/* Set statement inserted for the statement container 
- * that defines 'ent' become a real one 
+/* Update the number of use of statement defining 'ent' which is a member 
+ * of list lst_stat with step up_down (up_down = 1 | 0 | -1).
+ * If ent is a variable of original code (ex: x, y), not new variable added
+ * (ex: F_0, F_1,..), there is not any statement in lst_stat defining ent.
+ * Return: statement updated
  */
-static void
-set_statement_to_a_real_one(entity ent, statement container)
+static statement
+update_number_of_use(entity ent, list lst_stat, int up_down)
 {
-
-  if(assign_statement_p(container))
+  MAP(STATEMENT, s,
   {
-    if (ent == left_side_of_assign_statement(container))
+    entity left_side = left_side_of_assign_statement(s);
+    if(ent == left_side) // s defines ent
     {
-      return; // Do nothing
-    }
-  }
+      if (up_down == 0)
+      {
+	return s;
+      }
 
+      /* First time, no value */
+      if (empty_comments_p(statement_comments(s)))
+      {
+	if (up_down == -1)
+	{
+	  pips_internal_error("Number of use of '%s' < 0 !!!\n", 
+			      entity_name(ent));
+	}
+	statement_comments(s) = strdup("1");
+      }
+      /* Update old value */
+      else
+      {
+	char new[20];
+	int number_use = 0;
+	char* comment = statement_comments(s);
+	sscanf((const char*)comment, "%d", &number_use);
+	
+	number_use += up_down;
+	sprintf(new, "%d", number_use);
+	set_comment_of_statement(s, strdup(new));
+      }
+      return s;
+    }
+  }, lst_stat);
+
+  return NULL;
+}
+
+/* Increase number of use of variable ent by one */
+static void
+increase_number_of_use_by_1(entity ent, statement container)
+{
   if (bound_inserted_p(container))
   {
-    statement sblock = load_inserted(container);
+    statement updated, sblock = load_inserted(container);
     instruction i = statement_instruction(sblock);
     sequence seq;
-    list lst;
+    int step;
     pips_assert("it is a sequence", instruction_sequence_p(i));
     
-    // reverse list of inserted statements (#1#)
     seq = instruction_sequence(i);
-    lst = sequence_statements(seq);
-    MAP(STATEMENT, s,
-    {
-      entity left_side = left_side_of_assign_statement(s);
-      if(ent == left_side) // s defines ent
-      {
-	/*
-	expression e = right_side_of_assign_statement(s);
-	syntax syn = expression_syntax(e);
-	if (syntax_call_p(syn))
-	{
-	  call c = syntax_call(syn);
-	  if (ENTITY_UNARY_MINUS_P(call_function(c)))
-	  {
-	    // This one is of type: F_x = -a
-	    // It is considered as a virtual one
-	    return;
-	  }
-	}
-	*/
 
-	/* This statement is a real one! */
-	set_comment_of_statement(s, string_undefined);
-	return;
+    step = +1;
+    if(assign_statement_p(container))
+    {
+      if (ent == left_side_of_assign_statement(container))
+      {
+	step = 0;
       }
-    }, lst);
+    }
+
+    if (!(updated = update_number_of_use(ent, sequence_statements(seq), step)))
+    {
+      pips_internal_error("No statement defines '%s'\n", entity_name(ent));    
+    }
+
+    //fprintf(stderr,"\n[increase..] :"); print_statement(updated);
+
+    /* Reduce by 1 number of use of variables contained by statement Updated */
+    {
+      expression exp = right_side_of_assign_statement(updated);
+      if (syntax_call_p(expression_syntax(exp)))
+      {
+	list args = call_arguments(syntax_call(expression_syntax(exp)));
+	MAP(EXPRESSION, arg,
+	{
+	  syntax syn = expression_syntax(arg);
+	  if(syntax_reference_p(syn))
+	  {
+	    entity en = reference_variable(syntax_reference(syn));
+	    update_number_of_use(en, sequence_statements(seq), -1);
+	  }
+	}, args);
+      }
+    }
   }
   else
   {
-    pips_internal_error("No statement inserted!");
+    pips_internal_error("No statement inserted!");    
   }
-  pips_internal_error("No statement defining '%s'\n", entity_name(ent));
 }
 
-/* Statement inserted with:
- *    Comment = V: is VIRTUAL statement (temporel)
- *    otherwise: is REAL statement
- * Statement of type: "F_x = -a" is always VIRTUAL
- */
-static bool
-real_statement(statement s)
-{
-  //if (TRUE) return TRUE; // just for TEST
-
-  if (!empty_comments_p(statement_comments(s)) && 
-      strcmp((const char*)statement_comments(s), "V") == 0)
-  {
-    return FALSE;
-  }
-  return TRUE;
-}
+static void
+remove_statement_redundant(statement s, list* inserted);
 
 static bool
-expression_flt(expression e, list* inserted)
+cse_expression_flt(expression e, list* inserted)
 {
   entity scala;
   /*
@@ -900,6 +978,7 @@ expression_flt(expression e, list* inserted)
   */
   if(!syntax_reference_p(expression_syntax(e)))
   {
+    /* Go down  */
     return TRUE;
   }
 
@@ -907,48 +986,62 @@ expression_flt(expression e, list* inserted)
   MAP(STATEMENT, s,
   {
     entity ent = left_side_of_assign_statement(s);
-    //print_statement(s);
-    
     if (scala == ent)
     {
-      if (real_statement(s))
+      if (number_of_use_greater_1(s))
       {
+	/* This statement is a real one. But it maybe contains a variable
+	 * temporal -> Continue remove redundant statement from this one 
+	 */
+	remove_statement_redundant(s, inserted);
+
+	/* Remove its comment for pretty look: It is visited! Not do again! */
+	set_comment_of_statement(s, string_undefined);
+
+	/* Go up */
 	return FALSE;
       }
-      else // s is a redundant statement
+      else if (string_undefined_p(statement_comments(s)))
       {
-	instruction i = statement_instruction(s);
-	list args = call_arguments(instruction_call(i));
-	expression exp = EXPRESSION(CAR(CDR(args)));
+	/* This statement is already visited! Not do again! Go up */
+	return FALSE;
+      }
+      else
+      {
+	/* s is a redundant statement. Replace e by the right side of 
+	 * the assign statement s 
+	 */
+	expression exp = right_side_of_assign_statement(s);
 	expression_syntax(e) = expression_syntax(exp);
-
 	expression_syntax(exp) = NULL;
 	
-	// Remove s from list
+	/* Remove s from list
+	 */
 	gen_remove_once(inserted, s);
 	
-	free_statement(s); // -> current_available is also modified
-	//fprintf(stderr,"\nS is REMOVED!!!\n");
+	free_statement(s);
+
+	/* Continue go down the new expression */
 	return TRUE;
       }
     }
   }, *inserted);
 
-  return FALSE;
-  
+  /* Nothing is done! Go up */
+  return FALSE;  
 }
 
-/* Call: x = ....
- * ==> Avoid of visit for left side (x)
+/* Avoid  visit the left side of assign statement
  */
 static bool
-call_flt(call c, list* inserted)
+cse_call_flt(call c, list* inserted)
 {
   if(ENTITY_ASSIGN_P(call_function(c)))
   {
     expression left = EXPRESSION(CAR(call_arguments(c)));
     gen_recurse_stop(left);    
   }
+  /* Go down! */
   return TRUE;
 }
 
@@ -958,19 +1051,18 @@ static void
 remove_statement_redundant(statement s, list* inserted)
 {
   gen_context_multi_recurse(s, inserted,
-			    call_domain, call_flt, gen_null,
-			    expression_domain, expression_flt, gen_null,
-			    NULL);
+			    call_domain, cse_call_flt, gen_null,
+			    expression_domain, cse_expression_flt, gen_null,
+			    NULL);  
 }
-
 
 static bool insert_reverse_order = TRUE;
 
-/* insert in front if some inserted.
+/* Insert the new statements created
  */
 static void insert_rwt(statement s)
 {  
-  /* Just pour comprendre code 
+  /* Just pour comprendre code
   fprintf(stderr,"\nBefore Insert: "); print_statement(s);
   */
 
@@ -980,21 +1072,20 @@ static void insert_rwt(statement s)
       instruction i = statement_instruction(sblock);
       sequence seq;
 
-      /*
-	fprintf(stderr,"\n\t Block: "); print_statement(sblock); 
-      */
+      /* fprintf(stderr,"\n\t Block: \n"); print_statement(sblock); 
+       */
 
       pips_assert("it is a sequence", instruction_sequence_p(i));
 
-      /* reverse list of inserted statements (#1#) */
+      /* Reverse list of inserted statements (#1#) */
       seq = instruction_sequence(i);
 
       /* Remove statements redundant */
       remove_statement_redundant(s, &sequence_statements(seq));
 
-      /*
-	fprintf(stderr,"\n\tAfter Remove: "); print_statement(sblock);
-      */
+
+      /* fprintf(stderr,"\n\tAfter Remove: \n"); print_statement(sblock);
+       */
 
       if (insert_reverse_order)
 	sequence_statements(seq) = gen_nreverse(sequence_statements(seq));
@@ -1008,7 +1099,7 @@ static void insert_rwt(statement s)
 
       statement_instruction(s) = i;
     }
-  /* Just pour comprendre code
+  /* Just pour comprendre code 
   fprintf(stderr,"\nAfter insert: "); print_statement(s);
   */
 }
@@ -1496,143 +1587,145 @@ static void atom_cse_expression(expression e)
     dump_aspt(aspt);
     */
 
-    if (aspt) /* some common expression found. */ {
+    if (aspt) /* some common expression found. */ 
+    {
       /*
       fprintf(stderr, "some similar expression found (%s: %d)\n", 
 	      entity_name(aspt->scalar), quality);
       print_expression(aspt->contents);
       */
       switch (syntax_tag(s))
+      {
+      case is_syntax_reference:
+	syntax_reference(s) = make_reference(aspt->scalar, NIL);
+	return;
+      case is_syntax_call:
 	{
-	case is_syntax_reference:
-	  syntax_reference(s) = make_reference(aspt->scalar, NIL);
-	  return;
-	case is_syntax_call:
+	  if (quality==MAX_SIMILARITY)
 	  {
-	    if (quality==MAX_SIMILARITY)
-	      {
-		/* identicals, just make a reference to the scalar.
-		   whatever the stuff stored inside.
-		 */
-		//fprintf(stderr, "AC-CSE is equal...\n");
-
-		syntax_tag(s) = is_syntax_reference;
-		syntax_reference(s) = make_reference(aspt->scalar, NIL);
-
-		/* Set the statement to status REAL */
-		set_statement_to_a_real_one(aspt->scalar, aspt->container);
-
-		return;
-	      }
-	    else /* partial common expression... */
-	      {
-		available_scalar_pt naspt;
-		call c = syntax_call(s), ca;
-		syntax sa = expression_syntax(aspt->contents);
-		entity op = call_function(c), scalar;
-		expression cse, cse2;
-		statement scse;
-		list /* of expression */ in_common, linit, lo1, lo2, old;
-
-		pips_assert("AC operator", 
-			 Is_Associatif_Commutatif(op) && op==aspt->operator);
-		pips_assert("contents is a call", syntax_call_p(sa));
-		ca = syntax_call(sa);
-
-		linit = call_arguments(ca);
-
-		/*
-		   there is a common part to build,
-		   and a CSE to substitute in both...
-		*/
-		in_common = common_expressions(call_arguments(c),
-					       aspt->available_contents);
-		/* Test
-		dump_common_exp(in_common);
-		*/
-
-		/* Case: in_common == aspt->contents 
-		 * =================================
-		 */
-		if (gen_length(linit)==gen_length(in_common))
-		{
-		  //fprintf(stderr, "AC-CSE is included...\n");
-		  /* just substitute lo1, don't build a new aspt. */
-		  lo1 = list_diff(call_arguments(c), in_common);
-		  free_arguments(call_arguments(c));
-		  call_arguments(c) = 
-		    gen_nconc(lo1, 
-			      CONS(EXPRESSION,
-				   entity_to_expression(aspt->scalar), NIL));
-
-		  /* Set the statement to status REAL */
-		  set_statement_to_a_real_one(aspt->scalar, aspt->container);
-
-		}
-		else
-		{
-		  //fprintf(stderr, "AC-CSE is shared...\n");
-		  
-		  lo1 = list_diff(call_arguments(c), in_common);
-		  lo2 = list_diff(linit, in_common);
-		
-		  cse = call_to_expression(make_call(aspt->operator, 
-						     in_common));
-		  scse = atomize_this_expression(hpfc_new_variable, cse);
-
-		  /* now cse is a reference to the newly created scalar. */
-		  pips_assert("a reference...",
-			      syntax_reference_p(expression_syntax(cse)));
-		  scalar = reference_variable(syntax_reference
-					      (expression_syntax(cse)));
-		  cse2 = copy_expression(cse);
-		  
-		  /* update both expressions... */
-		  old = call_arguments(c); /* in code */
-		  if (gen_length(call_arguments(c))==gen_length(in_common))
-		  {
-		    expression_syntax(e) = expression_syntax(cse);
-		    expression_normalized(e) = expression_normalized(cse);
-		  }
-		  else
-		  {
-		    call_arguments(c) = CONS(EXPRESSION, cse, lo1);
-		  }
-		  gen_free_list(old);
-		  
-		  old = call_arguments(ca);
-		  call_arguments(ca) = CONS(EXPRESSION, cse2, lo2);
-		  gen_free_list(old);
-
-		  insert_before_statement(scse, aspt->container, FALSE);
-		  
-		  /* don't visit it later. */
-		  gen_recurse_stop(scse);		  		  
-
-		  /* updates available contents... */
-		  aspt->depends = CONS(ENTITY, scalar, aspt->depends);
-		  old = aspt->available_contents; 
-		  aspt->available_contents = CONS(EXPRESSION, cse,
-						  list_diff(old, in_common));
-		  gen_free_list(old);
-		  
-		  /* add the new scalar as an available CSE. */
-		  naspt = make_available_scalar(scalar,
-						aspt->container,
-		           EXPRESSION(CAR(CDR(call_arguments(instruction_call
-				           (statement_instruction(scse)))))));
-
-		  current_availables = CONS(STRING, (char*)naspt, 
-					    current_availables);
-		}
-	      }
-	    break;
+	    /* identicals, just make a reference to the scalar.
+	       whatever the stuff stored inside.
+	    */
+	    //fprintf(stderr, "AC-CSE is equal...\n");
+	    
+	    syntax_tag(s) = is_syntax_reference;
+	    syntax_reference(s) = make_reference(aspt->scalar, NIL);
+	    
+	    /* Set the statement to status REAL */
+	    increase_number_of_use_by_1(aspt->scalar, aspt->container);
+	    
+	    return;
 	  }
-	case is_syntax_range:
-	default:
-	  /* nothing */
-	  return;
+	  else /* partial common expression... */
+	  {
+	    available_scalar_pt naspt;
+	    call c = syntax_call(s), ca;
+	    syntax sa = expression_syntax(aspt->contents);
+	    entity op = call_function(c), scalar;
+	    expression cse, cse2;
+	    statement scse;
+	    list /* of expression */ in_common, linit, lo1, lo2, old;
+	    
+	    pips_assert("AC operator", 
+			Is_Associatif_Commutatif(op) && op==aspt->operator);
+	    pips_assert("contents is a call", syntax_call_p(sa));
+	    ca = syntax_call(sa);
+	    
+	    linit = call_arguments(ca);
+	    
+	    /*
+	      there is a common part to build,
+	      and a CSE to substitute in both...
+	    */
+	    in_common = common_expressions(call_arguments(c),
+					   aspt->available_contents);
+	    /* Test
+	       dump_common_exp(in_common);
+	    */
+	    
+	    /* Case: in_common == aspt->contents 
+	     * =================================
+	     */
+	    if (gen_length(linit)==gen_length(in_common))
+	    {
+	      //fprintf(stderr, "AC-CSE is included...\n");
+	      /* just substitute lo1, don't build a new aspt. */
+	      lo1 = list_diff(call_arguments(c), in_common);
+	      free_arguments(call_arguments(c));
+	      call_arguments(c) = 
+		gen_nconc(lo1, 
+			  CONS(EXPRESSION,
+			       entity_to_expression(aspt->scalar), NIL));
+	      
+	      /* Set the statement to status REAL */
+	      increase_number_of_use_by_1(aspt->scalar, aspt->container);
+	      
+	    }
+	    else
+	    {
+	      //fprintf(stderr, "AC-CSE is shared...\n");
+	      
+	      lo1 = list_diff(call_arguments(c), in_common);
+	      lo2 = list_diff(linit, in_common);
+	      
+	      cse = call_to_expression(make_call(aspt->operator, 
+						 in_common));
+	      scse = atomize_this_expression(hpfc_new_variable, cse);
+	      
+	      /* now cse is a reference to the newly created scalar. */
+	      pips_assert("a reference...",
+			  syntax_reference_p(expression_syntax(cse)));
+	      scalar = reference_variable(syntax_reference
+					  (expression_syntax(cse)));
+	      cse2 = copy_expression(cse);
+	      
+	      /* update both expressions... */
+	      old = call_arguments(c); /* in code */
+	      if (gen_length(call_arguments(c))==gen_length(in_common))
+	      {
+		expression_syntax(e) = expression_syntax(cse);
+		expression_normalized(e) = expression_normalized(cse);
+	      }
+	      else
+	      {
+		call_arguments(c) = CONS(EXPRESSION, cse, lo1);
+	      }
+	      gen_free_list(old);
+	      
+	      old = call_arguments(ca);
+	      call_arguments(ca) = CONS(EXPRESSION, cse2, lo2);
+	      gen_free_list(old);
+	      
+	      set_comment_of_statement(scse, strdup("1"));
+	      insert_before_statement(scse, aspt->container, FALSE);
+	      increase_number_of_use_by_1(scalar, aspt->container);
+	      
+	      /* don't visit it later. */
+	      gen_recurse_stop(scse);		  		  
+	      
+	      /* updates available contents */
+	      aspt->depends = CONS(ENTITY, scalar, aspt->depends);
+	      old = aspt->available_contents; 
+	      aspt->available_contents = CONS(EXPRESSION, cse,
+					      list_diff(old, in_common));
+	      gen_free_list(old);
+	      
+	      /* add the new scalar as an available CSE. */
+	      naspt = make_available_scalar(scalar,
+					    aspt->container,
+		   EXPRESSION(CAR(CDR(call_arguments(
+		       instruction_call(statement_instruction(scse)))))));
+	      current_availables = CONS(STRING, (char*)naspt, 
+					current_availables);
+	    }
+	  }
+	  break;
 	}
+      case is_syntax_range:
+      default:
+	/* nothing */
+	return;
+      }
     }
   } while(aspt);
 
@@ -1657,7 +1750,7 @@ static void atom_cse_expression(expression e)
       }
     }
 
-    if (exp != e)// || TRUE)
+    if (exp != e)
     {
       statement atom;
 
@@ -1666,7 +1759,7 @@ static void atom_cse_expression(expression e)
       /* create a new atom... */
       atom = atomize_this_expression(hpfc_new_variable, e);
       /* At fisrt, this statement is set "virtual" */
-      set_comment_of_statement(atom,strdup("V"));
+      set_comment_of_statement(atom,strdup("1"));
       insert_before_statement(atom, current_statement, TRUE);
 
       /* don't visit it later, just in case... */
@@ -1710,7 +1803,7 @@ static void atom_cse_expression(expression e)
 				     rhs);
       expression_syntax(e) = ref;
       
-      set_comment_of_statement(assign,strdup("V"));
+      set_comment_of_statement(assign,strdup("1"));
       insert_before_statement(assign, current_statement, TRUE);
 
       aspt = make_available_scalar(scalar, current_statement, rhs);	
