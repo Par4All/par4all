@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/03/09 10:16:46 $) version $Revision$, got on %D%, %T%
+# $RCSfile: config.makefile,v $ ($Date: 1994/03/09 11:26:25 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 # The following macros define the value of commands that are used to
@@ -66,7 +66,9 @@ todo: init
 
 sccs_close:
 	@echo "closing the sccs session"
-	sccs delget `sccs tell -u`
+	@echo "Description of changes:"
+	@read comments
+	sccs delget -y"$comments" `sccs tell -u`
 
 # RUNABLES= Run RunHpfcTest add-includes filter-hpf
 # 
