@@ -2,6 +2,9 @@
   * $Id$
   *
   * $Log: module.c,v $
+  * Revision 1.32  1998/04/14 15:14:13  coelho
+  * linear.h and casts.
+  *
   * Revision 1.31  1997/12/02 16:18:14  coelho
   * order fixed.
   *
@@ -34,6 +37,8 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "text.h"
@@ -118,9 +123,9 @@ add_non_declared_reference_to_declaration(reference ref)
 		       entity_name(var), entity_name(checked_module)); 
 
 	    ent =  make_entity(name,
-			       gen_copy_tree(entity_type(var)),
-			       gen_copy_tree(entity_storage(var)),
-			       gen_copy_tree(entity_initial(var)));
+			       copy_type(entity_type(var)),
+			       copy_storage(entity_storage(var)),
+			       copy_value(entity_initial(var)));
 
 	    code_declarations(ce) = gen_nconc(decl,
 					      CONS(ENTITY, ent, NIL));
@@ -146,9 +151,9 @@ add_symbolic_constant_to_declaration(call c)
 			       entity_name(checked_module)); 
 
 	    ent =  make_entity( name,
-			       gen_copy_tree(entity_type(call_function(c))),
-			       gen_copy_tree(entity_storage(call_function(c))),
-			       gen_copy_tree(entity_initial(call_function(c))));
+				copy_type(entity_type(call_function(c))),
+			       copy_storage(entity_storage(call_function(c))),
+			       copy_value(entity_initial(call_function(c))));
 
 	    code_declarations(ce) = gen_nconc(decl,
 					      CONS(ENTITY, ent, NIL));
@@ -161,17 +166,17 @@ variable_declaration_coherency_p(entity module, statement st)
 {
     module_coherent_p = TRUE;
     checked_module = module;
-    gen_recurse(st,
+    gen_multi_recurse(st,
 		reference_domain,
 		gen_true,
-		add_non_declared_reference_to_declaration);
+		add_non_declared_reference_to_declaration, NULL);
     module_coherent_p = TRUE;
-    gen_recurse(st,
+    gen_multi_recurse(st,
 		call_domain,
 		gen_true,
-		add_symbolic_constant_to_declaration);
+		add_symbolic_constant_to_declaration, NULL);
     checked_module = entity_undefined;
-    return(module_coherent_p);
+    return module_coherent_p;
 }
 
 /********************************************************* CLEAN DECLARATION */
@@ -269,7 +274,7 @@ store_the_loop_index(loop l)
 }
 
 static void
-mark_referenced_entities(gen_chunk * p)
+mark_referenced_entities(void * p)
 {
     gen_multi_recurse(p,
 	call_domain, gen_true, store_a_call_function,
@@ -297,7 +302,7 @@ static void new_decl_ref(reference r)
 }
 
 static void
-recursive_update_new_decls(gen_chunk * p, list * pl)
+recursive_update_new_decls(void * p)
 {
     gen_multi_recurse(p,
 		      call_domain, gen_true, new_decl_call,
@@ -323,12 +328,12 @@ update_new_declaration_list(
 	 * maybe the transitive closure could be computed more cleanly?
 	 */
 	current_new_declaration = pl;
-	recursive_update_new_decls(symbolic_expression(value_symbolic(v)), pl);
+	recursive_update_new_decls(symbolic_expression(value_symbolic(v)));
     }
 }
 
 static int 
-gen_find_occurence(list l, gen_chunk* c)
+gen_find_occurence(list l, void * c)
 {
     int i;
     for (i=0; l; i++, POP(l))
@@ -345,15 +350,19 @@ cmp(const void * x1, const void * x2)
 	o2 = gen_find_occurence(initial_order, e2);
 
     if (o1==-1)
+    {
 	if (o2==-1)
 	    return strcmp(entity_name(e1), entity_name(e2));
 	else
 	    return -1;
+    }
     else 
+    {
 	if (o2==-1)
 	    return 1;
 	else
 	    return o1-o2;
+    }
     
 }
 static void 
