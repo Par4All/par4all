@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1995/03/24 11:04:39 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1995/09/14 20:07:04 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -11,8 +11,6 @@
 #include <string.h>
 #include <malloc.h>
 #include "assert.h"
-
-extern int fprintf();
 
 #include "boolean.h"
 #include "arithmetique.h"
