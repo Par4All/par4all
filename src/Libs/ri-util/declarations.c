@@ -3,6 +3,10 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.30  2004/02/18 10:13:56  nguyen
+ * Add c_words_entity to prettyprint C variables which can be recursive
+ * (function of pointers to functions, array of pointers to functions, ...)
+ *
  * Revision 1.29  2003/12/22 15:04:39  nguyen
  * Blanks are removed
  *
@@ -117,11 +121,13 @@
 #include "misc.h"
 #include "properties.h"
 #include "prettyprint.h"
+#include "c_syntax.h"
 
 /*===================== Variables and Function prototypes for C ===========*/
 
 extern bool is_fortran;
-static text c_text_entity_declaration(entity e, int margin);
+static text c_text_entity(entity e, int margin);
+static list c_words_entity(type t, list name);
 static list words_qualifier(list obj);
 static list words_dimensions(list dims);
 
@@ -176,7 +182,6 @@ words_parameters(entity e)
 
   for (i = 1; i <= nparams; i++) {
     entity param = find_ith_parameter(e, i);
-
     if (pc != NIL) {
       pc = CHAIN_SWORD(pc, ",");
     }
@@ -206,13 +211,7 @@ words_parameters(entity e)
 		/* We have to print variable's type, dimensions, ... with C
 		   This can be also a formal function */
 		type t = entity_type(param);
-		variable v = type_variable(t);  
-		/* problems with order: qualifier, basic, ... !*/
-		
-		pc = gen_nconc(pc,words_qualifier(variable_qualifiers(v)));
-		pc = gen_nconc(pc,words_basic(variable_basic(v)));
-		pc = CHAIN_SWORD(pc,entity_local_name(param));
-		pc = gen_nconc(pc,words_dimensions(variable_dimensions(v)));
+		pc = gen_nconc(pc,c_words_entity(t,CHAIN_SWORD(NIL,entity_local_name(param))));
 	      }
 	  }
       }
@@ -410,6 +409,7 @@ list words_basic(basic obj)
 	  pc = CHAIN_SWORD(pc,"int "); /* ignore if it is signed or unsigned */
 	  break;
 	}
+	/* The following code maybe redundant, because of tests in c_words_entity*/
       case is_basic_pointer:
 	{
 	  type t = basic_pointer(obj);
@@ -471,7 +471,7 @@ sentence_variable(entity e)
  * approximate BLOCK DATA / SUBROUTINE distinction also added. FC 09/97
  */
 sentence 
-sentence_head(entity e, bool normal_declaration)
+sentence_head(entity e)
 {
     list pc = NIL;
     type te = entity_type(e);
@@ -486,7 +486,7 @@ sentence_head(entity e, bool normal_declaration)
     
     fe = type_functional(te);
     tr = functional_result(fe);
-    
+   
     switch (type_tag(tr)) {
     case is_type_void: 
       {
@@ -533,10 +533,6 @@ sentence_head(entity e, bool normal_declaration)
     else if (type_variable_p(tr) || (!is_fortran && (type_unknown_p(tr) || type_void_p(tr)))) {
       pc = CHAIN_SWORD(pc, "()");
     }
-
-    /* This code is for functions declared in another function, so a ';' is needed*/
-    if (!normal_declaration) 
-      pc = CHAIN_SWORD(pc, ";");
 
     return(make_sentence(is_sentence_unformatted, 
 			 make_unformatted(NULL, 0, 0, pc)));
@@ -1757,6 +1753,10 @@ list words_type(type obj)
 	pc = CHAIN_SWORD(pc,"void ");
 	break;
       }
+    case is_type_unknown:
+      {
+	break;
+      }
     case is_type_struct:
       {
 	pc = CHAIN_SWORD(pc,"struct ");
@@ -1778,7 +1778,13 @@ list words_type(type obj)
 	pc = words_type(t);
 	break;
       }
+    case is_type_varargs:
+      {
+	pc = CHAIN_SWORD(pc,"...");
+	break;
+      }
     default:
+      pips_error("words_type", "unexpected tag\n");
     }
   return pc;
 }
@@ -1839,171 +1845,319 @@ static list words_dimensions(list dims)
     }  
   return pc; 
 }
+
+/* Here is the set of mapping functions, from the RI to C language types*/
+
+/* Returns TRUE if t is one of the following types : 
+   void, char, short, int, long, float, double, signed, unsigned, 
+   and there is no array dimensions, of course*/
+
+bool basic_type_p(type t)
+{
+  if (type_variable_p(t))
+    {
+      basic b = variable_basic(type_variable(t));
+      return ((variable_dimensions(type_variable(t)) == NIL) &&
+	      (basic_int_p(b) || basic_float_p(b) || basic_logical_p(b)
+	       || basic_overloaded_p(b) || basic_complex_p(b) || basic_string_p(b)
+	       || basic_bit_p(b)));
+    }
+  return (type_void_p(t) || type_unknown_p(t)) ;
+}
+
+bool array_type_p(type t)
+{
+  return (type_variable_p(t) && (variable_dimensions(type_variable(t)) != NIL));
+}
+
+bool pointer_type_p(type t)
+{
+  return (type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))
+	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+
+/* Returns TRUE if t is of type struct, union or enum. Need to distinguish 
+   with the case struct/union/enum in type in RI, these are the definitions 
+   of the struct/union/enum themselve, not a variable of this type. 
+
+   Example : struct foo var;*/
+
+bool derived_type_p(type t)
+{
+  return (type_variable_p(t) && basic_derived_p(variable_basic(type_variable(t))) 
+	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+
+/* Returns TRUE if t is a typedefED type. 
+   Example : Myint i;*/
+
+bool typedef_type_p(type t)
+{
+  return (type_variable_p(t) && basic_typedef_p(variable_basic(type_variable(t))) 
+	  && (variable_dimensions(type_variable(t)) == NIL));
+}
+
+
+/* This recursive function prints a C variable with its type. 
+   It can be a simple variable declaration such as "int a"
+   or complicated one such as "int (* forces[10])()" (an array of 
+   10 pointers, each pointer points to a function 
+   with no parameter and the return type is int)  */
+
+static list c_words_entity(type t, list name)
+{
+  list pc = NIL;
+  if (type_functional_p(t))
+    {
+      functional f = type_functional(t);
+      type t2 = functional_result(f);
+      list lparams = functional_parameters(f);
+      bool first = TRUE;   
+      list tmp = NIL;  
+
+      pips_debug(7,"Function type with name = %s and length %d\n", list_to_string(name), gen_length(name));
  
+      if ((gen_length(name) > 1) || ((gen_length(name) == 1) && (strcmp(STRING(CAR(name)),"*")==0)))
+	{
+	  /* Function name is an expression like *vfs[] in (*vfs[])() 
+	     (syntax = application), or an abstract function type, so parentheses must be added */
+	  tmp = CHAIN_SWORD(tmp,"(");
+	  tmp = gen_nconc(tmp,name);
+	  tmp = CHAIN_SWORD(tmp,")(");
+
+	}
+      else 
+	{
+	  /* Function name is a simple reference */
+	  tmp = CHAIN_SWORD(name,"(");
+	}
+      
+      MAP(PARAMETER,p,
+      {
+	type t1 = parameter_type(p);
+	pips_debug(3,"Parameter type %s\n ",words_to_string(words_type(t1)));
+	if (!first)
+	  tmp = gen_nconc(tmp,CHAIN_SWORD(NIL,","));
+	/* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
+	tmp = gen_nconc(tmp,c_words_entity(t1,NIL));
+	pips_debug(3,"List of parameters %s\n ",list_to_string(tmp));
+	first = FALSE;
+      },lparams);
+      
+      tmp = CHAIN_SWORD(tmp,")");
+      return c_words_entity(t2,tmp);
+    }
+  
+  /* Add type qualifiers if there are */
+  if (type_variable_p(t) && variable_qualifiers(type_variable(t)) != NIL)
+    pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
+  
+  if (basic_type_p(t))
+    {
+      pips_debug(7,"Basic type with name = %s\n", list_to_string(name));
+      pc = gen_nconc(pc,words_type(t));
+      pc = gen_nconc(pc,name);
+      if (bit_type_p(t))
+	{
+	  int i = basic_bit(variable_basic(type_variable(t)));
+	  pc = CHAIN_SWORD(pc,":");
+	  pc = CHAIN_IWORD(pc,i);
+	}
+      return pc;
+    }
+  if (array_type_p(t))
+    {
+      list dims = variable_dimensions(type_variable(t));
+      type t1 = copy_type(t);
+      list tmp = NIL; 
+      pips_debug(7,"Array type with name = %s\n", list_to_string(name));
+
+      if (gen_length(name) <= 1)
+	{
+	  /* Array name is a simple reference or empty (abstract array type) */
+	  tmp = name;
+	}
+      else 
+	{
+	  /* Array name is an expression like __ctype+1 in (__ctype+1)[*np]
+	     (syntax = subscript), parentheses must be added */
+	  tmp = CHAIN_SWORD(tmp,"(");
+	  tmp = gen_nconc(tmp,name);
+	  tmp = CHAIN_SWORD(tmp,")");
+	}
+      
+      variable_dimensions(type_variable(t1)) = NIL;
+      return gen_nconc(pc,c_words_entity(t1,gen_nconc(tmp,words_dimensions(dims))));
+    }
+  if (pointer_type_p(t))
+    {
+      type t1 = basic_pointer(variable_basic(type_variable(t)));
+      pips_debug(7,"Pointer type with name = %s\n", list_to_string(name));
+      return gen_nconc(pc,c_words_entity(t1,gen_nconc(CHAIN_SWORD(NIL,"*"),name)));
+    }
+  if (derived_type_p(t))
+    {
+      entity ent = basic_derived(variable_basic(type_variable(t)));
+      type t1 = entity_type(ent);
+      pips_debug(7,"Derived type with name = %s\n", list_to_string(name));
+      pc = gen_nconc(pc,words_type(t1));
+      pc = CHAIN_SWORD(pc,entity_user_name(ent));
+      pc = CHAIN_SWORD(pc," ");
+      return gen_nconc(pc,name);
+    }
+  if (typedef_type_p(t))
+    {
+      entity ent = basic_typedef(variable_basic(type_variable(t)));
+      pips_debug(7,"Typedef type with name = %s\n", list_to_string(name));
+      pc = CHAIN_SWORD(pc,entity_user_name(ent));
+      pc = CHAIN_SWORD(pc," ");
+      return gen_nconc(pc,name);
+    }  
+  if (type_varargs_p(t))
+    {
+      pips_debug(7,"Varargs type ... with name = %s\n", list_to_string(name));
+      pc = CHAIN_SWORD(pc,"...");
+      return gen_nconc(pc,name);
+    }  
+  pips_error("c_words_entity","unexpected case\n");
+  return NIL;
+}
+
 text c_text_entities(list ldecl, int margin)
 {
   text r = make_text(NIL);
   MAP(ENTITY,e,
   {
-    text tmp = c_text_entity_declaration(e, margin);
-    MERGE_TEXTS(r,tmp);
+    if (!intrinsic_entity_p(e))
+      {
+	text tmp = c_text_entity(e, margin);
+	MERGE_TEXTS(r,tmp);
+      }
   },ldecl);
   
   return r; 
 }
 
-static text c_text_entity_declaration(entity e, int margin)
+static text c_text_entity(entity e, int margin)
 {
   text r = make_text(NIL);
   string name = entity_user_name(e);
   type t = entity_type(e);
   storage s = entity_storage(e);
+  value val = entity_initial(e);
   list pc = NIL;
+ 
   pips_debug(5,"Print declaration for entity: %s\n",name);
-  /*  Many possible combinations */
-  
+
+  /* A declaration has two parts: declaration specifiers and declarator (even with initializer) 
+     In declaration specifiers, we can have : 
+     - storage specifiers : typedef, extern, static, auto, register
+     - type specifiers : void, char, short, int, long, float, double, signed, unsigned, 
+                         struct-or-union specifiers, enum specifier, typedef name 
+     - type qualifiers : const, restrict, volatile 
+     - function specifiers : inline */
+
+  /* This part is for storage specifiers */
   if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
+    pc = CHAIN_SWORD(pc,"typedef ");
+  if (storage_ram_p(s) && static_area_p(ram_section(storage_ram(s))))
+    pc = CHAIN_SWORD(pc,"static ");
+
+  /* This part is for type specifiers, type qualifiers, function specifiers and declarator
+     Three special cases for struct/union/enum definitions are treated here. 
+     Variable (scalar, array), pointer, function, variables of type struct/union/enum and typedef 
+     are treadted by function c_words_entity */
+
+  switch (type_tag(t)) {
+  case is_type_struct:
     {
-      /* This is a typedef name, what about typedef int myint[5] ??? */
-      pc = CHAIN_SWORD(pc,"typedef ");
-      pc = gen_nconc(pc,words_type(t));
-      pc = CHAIN_SWORD(pc,name);    
+      list l = type_struct(t);
+      text fields = c_text_entities(l,margin+INDENTATION);
+      pc = CHAIN_SWORD(pc,"struct ");
+      pc = CHAIN_SWORD(pc,name);
+      pc = CHAIN_SWORD(pc," {");
+      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+					    make_unformatted(NULL,0,margin,pc)));
+      MERGE_TEXTS(r,fields);
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
+      break;
+    }
+  case is_type_union:
+    {
+      list l = type_union(t);
+      text fields = c_text_entities(l,margin+INDENTATION);
+      pc = CHAIN_SWORD(pc,"union ");
+      pc = CHAIN_SWORD(pc,name);
+      pc = CHAIN_SWORD(pc," {");
+      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+					    make_unformatted(NULL,0,margin,pc)));
+      MERGE_TEXTS(r,fields);
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
+      break;
+    }
+  case is_type_enum:
+    {
+      list l = type_enum(t);
+      bool first = TRUE;
+      pc = CHAIN_SWORD(pc,"enum ");
+      pc = CHAIN_SWORD(pc,name);
+      pc = CHAIN_SWORD(pc," {");
+      MAP(ENTITY,ent,
+      { 
+	if (!first) 
+	  pc = CHAIN_SWORD(pc,", ");
+	pc = CHAIN_SWORD(pc,entity_user_name(ent));
+	first = FALSE;
+      },l);
+      pc = CHAIN_SWORD(pc,"};");
+      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+					    make_unformatted(NULL,0,margin,pc)));
+      break;
+    }
+  case is_type_variable:
+  case is_type_functional:
+  case is_type_void:
+  case is_type_unknown:
+    {
+      pc = gen_nconc(pc,c_words_entity(t,CHAIN_SWORD(NIL,name)));
+      /* This part is for declarator initialization if there is*/
+      if (!value_undefined_p(val))
+	{
+	  if (value_expression_p(val))
+	    {
+	      expression exp = value_expression(val);
+	      pc = CHAIN_SWORD(pc," = ");
+	      if (brace_expression_p(exp))
+		pc = gen_nconc(pc,words_brace_expression(exp));
+	      else 
+		pc = gen_nconc(pc,words_expression(exp));
+	    }
+	}
       pc = CHAIN_SWORD(pc,";");
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
 					    make_unformatted(NULL,0,margin,pc)));
+      break;
     }
-  else 
-    {
-      switch (storage_tag(s)) {
-	/*      case is_storage_rom: 
-	{
-	  value va = entity_initial(e);
-	  if (!value_undefined_p(va))
-	  {*/
-	      /* prettyprint something like: #define e 50 */
-	/* pc = CHAIN_SWORD(pc,"#define ");
-	      pc = CHAIN_SWORD(pc,name);  
-	      pc = gen_nconc(pc,words_value(va));
-	      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-						    make_unformatted(NULL,0,margin,pc)));
-	    }
-	  break;
-	}*/
-      case is_storage_ram: 
-	{
-	  ram r = storage_ram(s);
-	  entity sec = ram_section(r);
-	  if (static_area_p(sec))
-	    pc = CHAIN_SWORD(pc,"static ");
-	  break;
-	}
-      default: 
-      }
-      
-      switch (type_tag(t)) {
-      case is_type_variable:
-	{
-	  variable v = type_variable(t);  
-	  value val = entity_initial(e);
-	  
-	  /* problems with order: qualifier, basic, ... !*/
-	  ifdebug(5)
-	    {
-	      pips_debug(5,"Variable dimensions : \n");
-	      MAP(DIMENSION,d,
-	      {
-		print_expression(dimension_upper(d));
-		printf(",");
-	      },variable_dimensions(v));
-	    }
-	  
-	  pc = gen_nconc(pc,words_qualifier(variable_qualifiers(v)));
-	  pc = gen_nconc(pc,words_basic(variable_basic(v)));
-	  pc = CHAIN_SWORD(pc,name);
-	  if (variable_dimensions(v) != NIL)
-	    pc = gen_nconc(pc,words_dimensions(variable_dimensions(v)));
-	  
-	  if (!value_undefined_p(val))
-	    {
-	      if (value_expression_p(val))
-		{
-		  expression exp = value_expression(val);
-		  pc = CHAIN_SWORD(pc," = ");
-		  if (brace_expression_p(exp))
-		    pc = gen_nconc(pc,words_brace_expression(exp));
-		  else 
-		    pc = gen_nconc(pc,words_expression(exp));
-		}
-	    }
-	  if (basic_bit_p(variable_basic(v)))
-	    {
-	      int i = basic_bit(variable_basic(v));
-	      pips_debug(7,"Basic bit %d",i);
-	      pc = CHAIN_SWORD(pc,":");
-	      pc = CHAIN_IWORD(pc,i);
-	    }
-	  pc = CHAIN_SWORD(pc,";");
-	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-						make_unformatted(NULL,0,margin,pc)));
-	  break;
-	}
-      case is_type_struct:
-	{
-	  list l = type_struct(t);
-	  text fields = c_text_entities(l,margin+INDENTATION);
-	  pc = CHAIN_SWORD(pc,"struct ");
-	  pc = CHAIN_SWORD(pc,name);
-	  pc = CHAIN_SWORD(pc," {");
-	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-						make_unformatted(NULL,0,margin,pc)));
-	  MERGE_TEXTS(r,fields);
-	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
-	  break;
-	}
-      case is_type_union:
-	{
-	  list l = type_union(t);
-	  text fields = c_text_entities(l,margin+INDENTATION);
-	  pc = CHAIN_SWORD(pc,"union ");
-	  pc = CHAIN_SWORD(pc,name);
-	  pc = CHAIN_SWORD(pc," {");
-	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-						make_unformatted(NULL,0,margin,pc)));
-	  MERGE_TEXTS(r,fields);
-	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
-	  break;
-	}
-      case is_type_enum:
-	{
-	  list l = type_enum(t);
-	  bool first = TRUE;
-	  pc = CHAIN_SWORD(pc,"enum ");
-	  pc = CHAIN_SWORD(pc,name);
-	  pc = CHAIN_SWORD(pc," {");
-	  MAP(ENTITY,ent,
-	  { 
-	    if (!first) 
-	      pc = CHAIN_SWORD(pc,", ");
-	    pc = CHAIN_SWORD(pc,entity_user_name(ent));
-	    first = FALSE;
-	  },l);
-	  pc = CHAIN_SWORD(pc,"};");
-	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-						make_unformatted(NULL,0,margin,pc)));
-	  break;
-	}
-      case is_type_functional:
-	{
-	  pips_debug(5,"Print declaration of function %s inside another function\n",name);
-	  if (!intrinsic_entity_p(e))
-	    ADD_SENTENCE_TO_TEXT(r,sentence_head(e,FALSE));
-	  break;
-	}
-      default:
-      }
-    }
-  return r;
+  case is_type_varargs:
+  case is_type_statement:
+  case is_type_area:
+  default:
+    pips_error("c_text_entity", "unexpected type tag");
+  }
+  return r; 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
