@@ -42,7 +42,8 @@ Des que l'evaluation n'est plus possible, il faut regenerer l'expression
 #include "pipsdbm.h"
 #include "misc.h"
 
-#include "effects.h" /* for print_effects() */
+#include "effects-generic.h"
+#include "effects-simple.h" /* for print_effects() */
 #include "transformer.h"
 #include "semantics.h" /* for module_to_value_mappings() */
 
