@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-util.c,v $
+ * Revision 1.37  1997/07/28 14:29:47  keryell
+ * Removed conflict in concatenate().
+ *
  * Revision 1.36  1997/07/25 22:28:08  keryell
  * Avoid to put comments on sequences.
  *
@@ -380,22 +383,24 @@ statement *psh, *psn;
 
     sc_rm(proc_cond_tmp), sc_rm(proc_cond);
 
-    comment = concatenate("! ", 
-			  movement_update_p(move) ? "updating" : "collecting",
-			  " distributed variable ",
-			  entity_local_name(array), "\n", NULL);
+    comment = strdup(concatenate("! ", 
+				 movement_update_p(move) ? "updating" : "collecting",
+				 " distributed variable ",
+				 entity_local_name(array), "\n", NULL));
 
     insert_comments_to_statement(*psh, comment);
     insert_comments_to_statement(*psn, comment);
-
-    comment = concatenate("! end of ",
-			  movement_update_p(move) ? "update" : "collect",
-			  "\n", NULL);
+    free(comment);
+    
+    comment = strdup(concatenate("! end of ",
+				 movement_update_p(move) ? "update" : "collect",
+				 "\n", NULL));
     insert_comments_to_statement(h_cont, comment);
     /* Do not forget to move forbidden information associated with
        block: */
     insert_comments_to_statement(n_cont, comment);
-
+    free(comment);
+    
     DEBUG_STAT(5, "Host", *psh);
     DEBUG_STAT(5, "Node", *psn);
 }
@@ -483,10 +488,11 @@ void generate_io_statements_for_shared_arrays(
 
     /*   some comments are generated to help understand the code
      */
-    comment = concatenate("! updating shared variable ",
-			  entity_local_name(array), "\n", NULL);
+    comment = strdup(concatenate("! updating shared variable ",
+				 entity_local_name(array), "\n", NULL));
     insert_comments_to_statement(*psh, comment);
     insert_comments_to_statement(*psn, comment);
+    free(comment);
     insert_comments_to_statement(h_cont, "! end of update\n");
     insert_comments_to_statement(n_cont, "! end of update\n");
 }
