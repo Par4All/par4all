@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/31 11:46:18 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/31 11:53:21 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -309,9 +309,6 @@ include \$(ROOT)/Include/define_libraries.make
 include \$(ROOT)/Include/makefile_macros.\$(ARCH)
 include \$(CONFIG)
 #
-# prefixed objects:
-LIB_OBJECTS:=\$(addprefix \$(ARCH)/, \$(LIB_OBJECTS))
-#
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
 # a typical interesting example is to put -pg in {C,LD}OPT
@@ -411,6 +408,9 @@ $verbose "common to Libs and Passes"
 
 [ $DIRTYPE = 'Libs' -o $DIRTYPE = 'Passes' ] && 
 cat >> $MAKEFILE <<% 
+#
+# prefixed objects:
+LIB_OBJECTS:=\$(addprefix \$(ARCH)/, \$(LIB_OBJECTS))
 #
 LIB_TARGET=	\$(ARCH)/lib\$(TARGET).a
 BIN_TARGET=	\$(ARCH)/\$(TARGET)
