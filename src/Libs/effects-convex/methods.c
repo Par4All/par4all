@@ -8,6 +8,7 @@
  *
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "genC.h"
@@ -255,11 +256,6 @@ set_methods_for_convex_effects()
     effects_forward_translation_op = convex_regions_forward_translation;
     effects_local_to_global_translation_op = regions_dynamic_elim;
 
-    /* 
-       effects_prettyprint_func = print_regions;
-       effects_to_text_func = text_array_regions;
-    */
-
     load_context_func = load_statement_precondition;
     load_transformer_func = load_statement_transformer;
     empty_context_test = empty_convex_context_p;
@@ -400,7 +396,6 @@ reset_convex_summary_rw_regions(string module_name)
 {
     regions_end();
     reset_cumulated_rw_effects();
-
 }
 
 void
@@ -421,8 +416,8 @@ init_convex_summary_in_out_regions(string module_name)
 void 
 reset_convex_prettyprint(string module_name)
 {
-    effects_prettyprint_func = NULL;
-    effects_to_text_func = NULL;
+    effects_prettyprint_func = (generic_prettyprint_function) abort;
+    effects_to_text_func = (generic_text_function) abort;
 }
 
 void
