@@ -25,6 +25,9 @@
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.8  2003/06/19 08:25:58  irigoin
+ Improvements of debugging information
+
  Revision 1.7  2002/07/22 17:12:26  irigoin
  A few bug fixes, assertions added, plus support functions added for
  semantics/unstructured.c. Memory cleanup function still missing.
@@ -419,7 +422,7 @@ static void davinci_print_control_nodes(list l, string msg)
   gen_sort_list(sl, control_cons_compare);
   
   fprintf(f, "[\n");
-  fprintf(f, "l(\"%s\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"%s\\nSerial number for module %s: %d\")],\n\t[])),\n",
+  fprintf(f, "l(\"%s\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"%s\\nSerial number for module %s: %d\\nEntry node: double border\\nExit node: red\\nCycles: bold italic\\nTrue arc: green\\nFalse arc: red\")],\n\t[])),\n",
 	  msg, msg, get_current_module_name(), davinci_count);
   /*
   fprintf(f, "l(\"%d\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"serial number: %d\")],\n\t[])),\n",
@@ -472,7 +475,7 @@ static void davinci_print_non_deterministic_unstructured
   gen_sort_list(sl, control_cons_compare);
   
   fprintf(f, "[\n");
-  fprintf(f, "l(\"%s\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"%s\\nSerial number for module %s: %d\")],\n\t[])),\n",
+  fprintf(f, "l(\"%s\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"%s\\nSerial number for module %s: %d\\nEntry node: double border\\nExit node: red\\nCycles: bold italic\\nTrue arc: green\\nFalse arc: red\")],\n\t[])),\n",
 	  msg, msg, get_current_module_name(), davinci_count);
   /*
   fprintf(f, "l(\"%d\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"serial number: %d\")],\n\t[])),\n",
@@ -1714,11 +1717,19 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
       pips_assert("l_root and l_new_root have an empty intersection",
 		  ENDP(l_root));
     }
-
-    clean_up_embedding_graph(root);
-
-    clean_up_embedding_graph(new_root);
     
+    gen_free_list(l_root);
+    gen_free_list(l_new_root);
+  }
+
+  clean_up_embedding_graph(root);
+
+  clean_up_embedding_graph(new_root);
+
+  ifdebug(3) {
+    list l_root = node_to_linked_nodes(root);
+    list l_new_root = node_to_linked_nodes(new_root);
+
     pips_debug(3, "Final embedding graph after replication and cycle removal\n");
     sprintf(msg, "Final embedding graph after replication and cycle removal");
     print_embedding_graph(root, msg);
