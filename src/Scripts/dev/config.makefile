@@ -19,7 +19,8 @@ SCRIPTS = 	pips-makemake \
 MACROS=		makefile_macros.. \
 		makefile_macros.GNU \
 		makefile_macros.DEFAULT \
-		makefile_macros.SUN4
+		makefile_macros.SUN4 \
+		makefile_macros.GNULL
 
 FILES=		forward_gnu_makefile \
 		$(MACROS)
@@ -29,9 +30,9 @@ COPY=	cp -f
 quick-install: install_forward_makefiles install_macros
 
 install_macros:
-	$(COPY) $(MACROS) $(PIPS_INCLUDEDIR)
-	$(COPY) $(MACROS) $(NEWGEN_INCLUDEDIR)
-	$(COPY) $(MACROS) $(LINEAR_INCLUDEDIR)
+	$(COPY) $(MACROS) $(PIPS_SHRDIR)
+	$(COPY) $(MACROS) $(NEWGEN_SHRDIR)
+	$(COPY) $(MACROS) $(LINEAR_SHRDIR)
 
 install_forward_makefiles: 
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Makefile
