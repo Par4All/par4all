@@ -5,7 +5,7 @@
 # -l: last search is restored (this case, other options are NOT effective)
 # 
 # Le PATH de recherche est defini avec:
-# -P: search in $PIPSDIR (default)
+# -P: search in $PIPS_DIR (default)
 # -L: search in $LINEARDIR (default)
 # -N: search in $NEWGENDIR (default)
 # -d: directory from which search occures
@@ -135,7 +135,7 @@ else	if [ -z "$PIPS$LINEAR$NEWGEN" ]
 	fi
 fi
 if [ -n "$PIPS" ]
-then SEARCHPATH="$SEARCHPATH $PIPSDIR"
+then SEARCHPATH="$SEARCHPATH $PIPS_DIR"
 fi
 if [ -n "$LINEAR" ]
 then SEARCHPATH="$SEARCHPATH $LINEARDIR"
