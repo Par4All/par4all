@@ -86,17 +86,14 @@ void init_globals()
  * 
  * Modification:
  *  - utilisation des bases (FI, 13/12/89)
+ *  - symbols handled in sc_lex.l (FC, 02/05/2000)
  */
-void new_ident(ps,s)
-Psysteme ps;
-char * s;
+void new_ident(Psysteme ps, Variable s)
 {
     Pbase b = ps->base;
 
-    if(base_contains_variable_p(b, (Variable) s))
-	;
-    else {
-	ps->base = vect_add_variable(b, (Variable) strdup(s));
+    if (!base_contains_variable_p(b, s)) {
+	ps->base = vect_add_variable(b, s);
 	ps->dimension ++;
     }
 }
@@ -109,18 +106,19 @@ char * s;
  *  - parcours direct de la base avec strcmp pour eviter des problemes
  *    avec variable_equal() (FI, 3/1/90)
  */
-Variable rec_ident(ps,s)
-Psysteme ps;
-char * s;
+Variable rec_ident(Psysteme ps, Variable s)
 {
     Variable v;
 
-    v = base_find_variable_name(ps->base, (Variable) s, variable_default_name);
+    v = base_find_variable(ps->base, s);
+
     if(VARIABLE_UNDEFINED_P(v)) {
-	(void) fprintf(stderr,"Variable %s not declared. Add it to the VAR list!\n",
+	(void) fprintf(stderr,
+		       "Variable %s not declared. Add it to the VAR list!\n",
 		       variable_default_name(s));
 	exit(1);
     }
+
     return v;
 }
 
