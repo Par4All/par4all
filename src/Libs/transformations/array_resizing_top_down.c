@@ -189,7 +189,7 @@ entity make_new_integer_scalar_common_variable(string name, entity mod, entity c
 {
   string var_global_name = strdup(concatenate(module_local_name(mod),MODULE_SEP_STRING,
 					      name,NULL)); 
-  type var_type = make_type(is_type_variable, make_variable(make_basic_int(8), NIL));
+  type var_type = make_type(is_type_variable, make_variable(make_basic_int(8), NIL,NIL));
   storage var_storage = make_storage(is_storage_ram,
 				     (make_ram(mod,com,0,NIL)));
   value var_value = MakeValueUnknown();
