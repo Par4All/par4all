@@ -278,7 +278,12 @@ cons * e; /* effects of loop l */
 	   the loop increment expression must be linear to find inductive 
 	   variables related to the loop index */
 	if(!VECTEUR_UNDEFINED_P(v_incr = expression_to_affine(incr))) {
-	    tfb = transformer_add_loop_index(tfb, i, v_incr);
+	    if(entity_has_values_p(i))
+		tfb = transformer_add_loop_index(tfb, i, v_incr);
+	    else
+		user_warning("loop_to_transformer", 
+			     "non-integer loop index %s?\n",
+			     entity_local_name(i));
 	}
 
 	/* compute tfb's fix point according to pips flags */
@@ -324,7 +329,7 @@ cons * e; /* effects of loop l */
 	     * I change my mind: let's use the lower bound anyway since it
 	     * make sense as soon as i_init is eliminated in the transformer
 	     */
-	    if(normalized_linear_p(nlb)) {
+	    if(entity_has_values_p(i) && normalized_linear_p(nlb)) {
 		Pvecteur v_lb = vect_dup((Pvecteur) normalized_linear(nlb));
 		entity i_init = entity_to_old_value(i);
 
