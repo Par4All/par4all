@@ -272,9 +272,12 @@ char *argv[];
    disable_transform_selection();
    disable_compile_selection();
    disable_option_selection();
-   
+
    xv_main_loop(main_frame);
 
    close_log_file();
+   
+   debug_off("WPIPS_DEBUG_LEVEL");
+
    exit(0);
 }
