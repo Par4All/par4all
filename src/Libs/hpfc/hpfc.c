@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/12/19 15:52:37 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/12/22 16:06:14 $, )
  * version $Revision$
  */
  
