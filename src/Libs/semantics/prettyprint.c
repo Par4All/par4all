@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/03 15:23:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/05 12:47:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/10/03 15:23:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/10/05 12:47:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -107,7 +107,7 @@ char *module_name;
 
     /* prepare the prettyprintting */
     filename = strdup
-	(concatenate(db_get_current_program_directory(), 
+	(concatenate(db_get_current_workspace_directory(), 
 		     "/",
 		     module_name,
 		     is_transformer?
