@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: host_node_entities.c,v $
+ * Revision 1.26  1997/10/27 16:26:03  coelho
+ * referenced entities are not managed here any more...
+ *
  * Revision 1.25  1997/08/04 13:55:09  coelho
  * *** empty log message ***
  *
@@ -55,26 +58,23 @@ void init_entity_status()
     init_old_host();
     init_new_node();
     init_old_node();
-    init_referenced_variables(); /* in ri-util/module.x */
 }
 
 entity_status get_entity_status()
 {
-    return(make_entity_status(get_new_host(),
+    return make_entity_status(get_new_host(),
 			      get_new_node(),
 			      get_old_host(),
 			      get_old_node(),
-			      get_referenced_variables()));
+			      entity_int_undefined);
 }
 
-void set_entity_status(s)
-entity_status s;
+void set_entity_status(entity_status s)
 {
     set_new_host(entity_status_new_host(s));
     set_new_node(entity_status_new_node(s));
     set_old_host(entity_status_old_host(s));
     set_old_node(entity_status_old_node(s));
-    set_referenced_variables(entity_status_referenced(s));
 }
 
 void reset_entity_status()
@@ -83,7 +83,6 @@ void reset_entity_status()
     reset_old_host();
     reset_new_node();
     reset_old_node();
-    reset_referenced_variables();
 }
 
 void close_entity_status()
@@ -92,7 +91,6 @@ void close_entity_status()
     close_old_host();
     close_new_node();
     close_old_node();
-    close_referenced_variables();
 }
 
 string hpfc_module_suffix(module)
