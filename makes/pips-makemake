@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1994/11/24 17:06:10 $) version $Revision$, got on %D%, %T%
+# $RCSfile: pips-makemake,v $ ($Date: 1994/11/25 13:59:39 $) version $Revision$, got on %D%, %T%
 # %A%
 
 # Automatic generation of Makefile for the PIPS project
@@ -324,7 +324,7 @@ install: $(INC_TARGET) $(LIB_TARGET)
 	  $(RM) \$\$module ; \\
 	done ;
 	cp $(MAKEFILE) $(TARGETDIR)/Makefile
-	$(MAKE) -C $(TARGETDIR) depend
+	cd $(TARGETDIR) ; $(MAKE) depend
 	$(MAKE) quick-install
 
 quick-install:
@@ -419,7 +419,7 @@ install: $(INC_TARGET) $(BIN_TARGET)
 	  $(RM) \$\$module ; \\
 	done
 	cp $(MAKEFILE) $(TARGETDIR)/Makefile
-	$(MAKE) -C $(TARGETDIR) depend
+	cd $(TARGETDIR) ; $(MAKE) depend
 	$(MAKE) quick-install
 
 quick-install: $(BINDIR)
