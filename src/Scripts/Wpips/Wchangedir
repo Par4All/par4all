@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/12 10:55:21 $, 
+# $Date: 1996/09/12 11:17:34 $, 
 #
 # (c) FC September 1996
 #
@@ -147,7 +147,15 @@ proc changedir { root currentdir } {
     label $root.direct.lab -text "Directory: "
     entry $root.direct.entry -width 30 -relief sunken \
 	-textvariable changedir_dir 
-    bind  $root.direct.entry <Return> "$root.top.okay invoke"
+    # <Return> is okay
+    bind  $root.direct.entry <Return> {
+	$changedir_root.top.okay invoke
+    }
+    # <Tab> updates the displayed list
+    bind  $root.direct.entry <Tab> {
+	filldirlist $changedir_root.list.dirs $changedir_dir
+    }
+    # resize ???
     bind  $root.direct.entry <Configure> {
 	set l [winfo width $changedir_root.direct.lab]
         set d [winfo width $changedir_root.direct]
