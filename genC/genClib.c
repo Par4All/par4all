@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 19:59:23 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/26 11:33:19 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -99,8 +99,10 @@ gen_chunk *obj ;
 {
     message_assert("No NULL object", obj!=NULL);
     message_assert("No undefined object", obj!=gen_chunk_undefined);
-    check_domain(obj->i);
-    return(obj->i) ;
+    if ((obj->i)<0 || (obj->i)>=MAX_DOMAIN) 
+	fatal("Inconsistent domain number %d (0x%x) found\n", 
+	      obj->i, (unsigned int) obj);
+    return obj->i;
 }
 
 /* inlined version of domain_index. what is done by optimizing compilers?
