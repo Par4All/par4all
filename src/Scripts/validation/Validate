@@ -507,7 +507,7 @@ fi
 
 [ "$performance" ] && performance="$performance, end `local_date`"
 
-mailfinal "${user}" "${result}" "${final}" "${warning}" "${performance}"
+mailfinal "${user}" "${result} for ${PIPS_ARCH}" "${final}" "${warning}" "${performance}"
 
 #
 # that is all
