@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1995/12/05 13:52:31 $, 
+ * $Date: 1995/12/05 14:06:08 $, 
  */
 
 #include <stdlib.h>
@@ -344,7 +344,11 @@ char *name;
 
     if (directory_exists_p(name)) {
 	if(system(concatenate("/bin/rm -r ", name, (char*) NULL))) {
-	    user_warning("purge_directory", "cannot purge directory : %s\n",
+	    /* FI: this warning should be emitted by a higher-level
+	     * routine!
+	     */
+	    user_warning("purge_directory",
+			 "cannot purge directory %s. Check owner rights\n",
 			 name);
 	    success = FALSE;
 	}
@@ -353,7 +357,8 @@ char *name;
 	}
     }
     else {
-	success = FALSE;
+	/* Well, it's purged if it does not exist... */
+	success = TRUE;
     }
 
     return success;
