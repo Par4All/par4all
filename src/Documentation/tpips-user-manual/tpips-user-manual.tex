@@ -1,0 +1,1187 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{html,french}
+
+\title{Tpips: command line interpreter}
+
+\author{Guillaume Oget - Corinne Ancourt}
+
+\date{\today}
+
+
+\begin{document}
+\setlength{\parindent}{0in}
+
+\maketitle
+
+
+\tableofcontents
+
+\section{Introduction}
+
+
+{\tt tpips} is the {\bf line interface} and scripting language of the
+PIPS project. All PIPS functionalities are available, with
+on-line help and automatic completion.
+
+{\tt tpips} is more efficient than the pips based scripts ( Init,
+Display,...) because the database is not open, read, written and closed
+for each command. {\tt tpips} is less user-friendly than wpips and epips,
+although it provides the unique opportunity to apply a transformation or
+display some information on several modules with one command, using
+pipsmake metavariables, 
+\verb+%CALLERS+ and  \verb+%CALLEES+,  or environment  user defined variables such
+as \verb+$MODULES+ (see Example \ref{exm2}). The jpips future user
+interface will provide these pips/tpips functionalities too.
+
+{\tt tpips} is recommended for large benchmarks and experiments, when
+analysis and optimization results do not require interactive working. {\tt
+  tpips} is used for the validation of each new pips version.
+
+{\tt tpips} can be used to automatically replay a manual wpips or {\tt
+  tpips} session by using \verb+logfile_to_tpips+. The
+\verb+logfile_to_tpips+ command derives a {\tt tpips} script
+from a logfile in a workspace (see Example~\ref{exm2}). A PIPS beginner
+should start with a window interface, wpips or epips, and not with {\tt
+  tpips}.
+
+
+Access to Unix Shell and to PIPS properties is provided by {\tt tpips}.
+PIPS properties can be modified from {\tt tpips} , and only from {\tt
+  tpips} during a PIPS session (see Example\ref{exm3}). On the other hand,
+{\tt Wpips} reads at the
+beginning of the session the default properties and the new ones
+(re)defined in the {\tt properties.rc} file, but no change can be done
+afterwards.  Resetting properties during a session can be used to rebuild
+an application when some modules have been updated by PIPS, e.g. after
+partial evaluation.
+
+The {\tt tpips} commands are listed on-line by the help command.
+Possible arguments are completed or suggested by automatic
+completion (TAB and TAB/TAB). A command may be spread on
+several lines by guarding the line feed characters by
+backslashes.
+
+
+\section{Syntax}
+
+Different functions can be activated with the tpips commands. We decompose
+these functions in those related to the workspace, the analysis and
+transformation requests, the pips properties and options and the the environment. 
+Functions  and their arguments are presented in the next subsections. 
+
+
+\subsection{Workspace} 
+The commands for workspaces are: {\tt create} a new workspace (see
+pips command Init), {\tt open} an existing workspace, {\tt close} the
+current workspace, and {\tt delete} the current workspace or a
+specific one (see pips command Delete).
+
+These commands can be used several times during a session or
+within a {\tt tpips} script file.
+
+\begin{description}
+  
+\item [{\bf create} $<$workspace-name$>$ $<$file-name$>$] creates and
+  opens a new workspace from a source file - or set of source files
+  
+\item [ {\bf open} $<$workspace-name$>$] opens an existing workspace
+ 
+\item [ {\bf close} $<$workspace-name$>$] closes an opened workspace
+
+  
+\item [ {\bf delete} $<$workspace-name$>$] deletes a closed workspace
+  
+\item [ {\bf quit}] quit {\tt tpips}
+
+\end{description}
+
+
+\subsection{Requests} 
+
+To apply a transformation or request a particular resource, use the
+following tpips commands. 
+\begin{description}
+
+\item [ {\bf apply} $<$rule-descriptor$>$] applies a specified rule and
+  produces the associated resources.
+        
+\item [{\bf capply} $<$rule-descriptor$>$] applies concurrently a specified
+  rule on the different OWNERs of the $<$rule-descriptor$>$ and produces the
+  associated resources (see Example \ref{exm4}).
+  
+
+\item [ {\bf display} $<$resource-descriptor$>$] makes a printable resource
+  (if it does not exist) and prints it out. A printed resource is a ACSII
+  file with the \verb+_FILE+ extension.
+  
+
+  
+\item [ {\bf make} $<$resource-descriptor$>$] makes a resource according to
+  default rules
+  
+
+\end{description}
+
+\subsubsection*{Generic example:}
+
+A resource, i.e. any piece of information computed by PIPS,
+can be required by command:
+
+{\bf
+\begin{verbatim}
+make <resource>
+\end{verbatim}
+}
+
+or
+
+{\bf
+\begin{verbatim*}
+make <resource[owner]>
+\end{verbatim*}
+}
+
+which uses interproceduraly and recursively default rules
+(see pips command Build). Or it is produced by a specific
+rule:
+{\bf
+\begin{verbatim}
+apply <rule>
+\end{verbatim}
+}
+
+which will require all its resource arguments by recursively
+calling make (see pips command Perform).
+
+The owner of a resource is the module it is attached to. By
+default, the owner is assumed to be the current module.
+
+File resources can be displayed on screen:
+
+{\bf
+\begin{verbatim}
+display <printable_resource> 
+\end{verbatim}
+}
+as with the pips Display script.
+
+\subsection{PIPS properties and options} 
+
+\begin{description}
+\item [ {\bf activate} $<$rule-name$>$] activates a rule. Several rules
+  can be used to produce a resource. At any time one of these rules is the
+  default rule
+ 
+\item [ {\bf module} $<$module-name$>$] specifies the current module to
+  work on.
+  
+\item [ {\bf getproperty} $<$property-name$>$] prints the value of a Pips
+  property
+  
+\item [ {\bf setproperty} $<$property-name$>$ $<$value$>$] sets the value
+  of a property - after type check. Possible types are: boolean, int and
+  string.
+
+\item [{\bf checkpoint} $<$number$>$] checkpoints the current workspace
+  every $<$number$>$ pipsmake operations.
+
+\end{description}
+ 
+\subsubsection*{Generic example:}
+
+A specific current module is selected as current module with:
+{\bf
+\begin{verbatim}
+module MODULE_NAME
+\end{verbatim}
+}
+
+When several rules, i.e. functions, can be used to compute
+the same resource, for instance a parallel version of a
+module, the rule selection command is:
+
+{\bf
+\begin{verbatim}
+activate <rule>
+\end{verbatim}
+}
+
+It is equivalent to the pips Select command.
+
+\subsection{Environment}
+The {\tt tpips} Unix-related commands are: cd, setenv, getenv, echo, and
+shell.
+
+\begin{description}
+  
+\item [ {\bf shell} $<$sh-command$>$ $<$parameters$>$] Executes the line
+  as a shell command. With no arguments, run an inferior shell.
+  
+\item [ {\bf source} $<$filenames...$>$] reads {\tt tpips} commands from
+  files.
+  
+\item [ {\bf cd} $<$directory-name$>$] changes the default directory
+  
+
+\item [ {\bf echo} $<$string$>$] prints $<$string$>$
+
+\item [ {\bf getenv} $<$variable-name$>$] prints the value of $<$variable-name$>$ (equivalent to \verb+echo ${<variable-name>}+)
+\item  [ {\bf setenv} $<$variable-name$>$ = $<$value$>$] sets $<$value$>$ to $<$variable-name$>$
+
+
+\item [ {\bf help} $<$command$>$] prints out general help or detailed help
+  about an item
+
+\item [{\bf info} $<$name$>$]  print information about $<$name$>$. Here 
+        $<$name$>$ can be :  ``module'', ``modules'', ``workspace'' or 
+        ``directory'' words. 
+
+\end{description}
+  
+\subsection{Parameters}
+The parameters of the different commands are :
+\begin{description}
+\quote
+\item [$<$file-name$>$] Unix path and file name. \\ Shell syntax, such
+  as \verb+*.f+, can be used when \verb+s+ option is specified or \verb+TPIPS_IS_A_SHELL+ variable is set.
+          
+\item [$<$workspace-name$>$] Unix file name - no path.
+  
+\item [$<$module-name$>$] Fortran function name in capital letters.
+  
+\item [$<$rule-name$>$] rule name (see Section \ref{rules})
+          
+\item [$<$resource-descriptor$>$] It is a \verb+resource[OWNER]+
+  expression: a pipsmake resource name to be computed for each module
+  associated to OWNER (see Sections \ref{res} and \ref{resf}).
+  
+\item [$<$rule-descriptor$>$] It is a \verb+rulename[OWNER]+ expression: a  pipsmake instantiated
+  rule  to be applied  on each  module associated to OWNER (see Section \ref{rules}).
+
+
+\end{description}
+
+The OWNER - used in the previous $<$rule-descriptor$>$ and
+$<$ resource-descriptor$>$ - can take these formats:
+
+\begin{description}
+\quote
+        \item [module-name] the target module name.
+        \item [\%PROGRAM] the whole program (for global resource) . 
+        \item [\%MAIN] the main module of the program. 
+        \item [\%MODULE] the current  module.
+        \item [\$\{MODULES\}] the modules associated to the Shell variable
+          {\tt MODULES}. The different names are SPACE or/and TAB separated.
+        \item [\%ALL] All worksapce modules 
+        \item [\%CALLEES] All the callees of the current selected  module.
+        \item [\%CALLERS]  All  the callers of the current selected  module.
+
+\end{description}
+If no OWNER is specified, then the current  module is assumed. For
+generic owners, a  sign (\%) has been added to differentiate them
+from module names and environment variables.
+
+
+
+\section{Simple session} 
+
+A simple {\tt tpips} session is made of a few steps. First, a
+workspace must be created:
+{\bf
+\begin{verbatim}
+create work source1.f source2.f
+\end{verbatim}
+}
+
+and a subdirectory of the current directory, here
+work.database, is created to store and retrieve
+code and information computed by PIPS about subroutines and
+functions found in source1.f or source2.f.
+
+Then, you have to select a module, let say FOO, by typing:
+{\bf
+\begin{verbatim}
+
+module FOO
+\end{verbatim}
+}
+
+unless there is only one function or subroutine in the Fortran
+file(s) which were passed to the create command, in
+which case it is automatically selected.
+
+To keep it simple the first time, you should then try to
+display the sequential code of routine FOO by typing:
+
+{\bf
+\begin{verbatim}
+display PRINTED_FILE
+\end{verbatim}
+}
+
+Other resource names let you visualize the parallelized code
+(PARALLELPRINTED\_FILE), or the call graph (CALLGRAPH\_FILE)...
+Names for printable resources usually contain the string
+FILE. 
+
+The standard command to leave {\tt tpips} is {\tt quit} but a control-D
+or end-of-file condition are valid too.
+
+Interactive analysis of module MATMUL from source code pgmsrc.f,
+in workspace pgm:
+
+{\bf
+\begin{verbatim}
+$ tpips
+tpips > create pgm pgm-src.f
+
+tpips > module MATMUL
+
+tpips > display PARALLELPRINTED_FILE
+
+tpips > quit
+
+\end{verbatim}
+}
+
+\section{Examples}
+\subsection{Call Graph}
+\label{exm1}
+
+To visualize the  call graph of the application, the following tpips
+session can be executed. The call graph of each application routine is
+displayed. 
+
+This example presents a use of:
+
+\begin{itemize}
+\item environment variable: \verb+setenv PIPS_SRCPATH SRC+
+\item shell path file name expression that will be expanded: \verb+*.f+,
+\item a $<$resource-descriptor$>$ : \verb+CALLGRAPH_FILE[%ALL]+
+\end{itemize}
+This tpips example is useful to test Pips parsing   on each  new
+benchmark. 
+
+\begin{rawhtml}
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1  BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+\end{rawhtml}
+{\bf
+\begin{verbatim}
+setenv PIPS_SRCPATH SRC      # initiates the source file directory to SRC
+
+create wc *.f                 # creates the wc workspace for the
+                              # Fortran files of the  PIPS_SRCPATH 
+                              # directory
+
+display CALLGRAPH_FILE[%ALL]  # CONTROL GRAPH COMPUTATION for each routine
+
+close 
+quit
+
+\end{verbatim}
+}
+
+\begin{rawhtml}
+</TD></TR></TABLE>
+\end{rawhtml}
+\subsection{Dependences}
+\label{exm2}
+A programmer that would like to see the routines dependence graph to parallelize
+interprocedurally the application can executed the following tpips
+commands. 
+
+This example presents some Pips analyses and  use of 
+\begin{itemize}
+\item module selection: \verb+module TEST+,
+\item $<$rule-name$>$ : \verb+MUST_REGIONS+, \verb+REGION_CHAINS+ 
+\item \verb+logfile_to_tpips+ command
+\end{itemize}
+
+\begin{rawhtml}
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1  BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+\end{rawhtml}
+{\bf
+\begin{verbatim}
+
+sh>tpips                            # run tpips
+tpips> create wfoo essai.f          # create a workspace for the program essai.f
+tpips> module TEST                  # select the default module TEST
+tpips> display CALLGRAPH_FILE       # display the sub-callgraph for the
+                                       module TEST
+tpips> make PROPER_EFFECTS[%ALL]    # compute proper effects for every
+                                       modules
+tpips> activate MUST_REGIONS        # select the rule must_regions instead
+                                       of the default rule may_regions
+tpips> activate REGION_CHAINS       # select the rule regions_chains for
+                                       computing Use-Def chains in essai.f
+tpips> display DG_FILE[%ALL]        # display all the dependance graphs
+tpips> close wfoo                   # close the workspace
+tpips> quit                         # quit tpips
+\end{verbatim}
+}
+\begin{rawhtml}
+</TD></TR></TABLE>
+\end{rawhtml}
+
+To store this simple session in a {\tt tpips} file, use the command:
+
+\verb+logfile_to_tpips  wfoo > foo.tpips+
+
+that generates the following {\tt tpips} commands  in File  \verb+foo.tpips+. 
+
+\begin{rawhtml}
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1 BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+\end{rawhtml}
+{\bf
+\begin{verbatim}
+#
+# file generated by logfile_to_tpips for workspace wfoo
+#
+create wfoo essai.f
+module TEST
+display CALLGRAPH_FILE[TEST]
+display PROPER_EFFECTS[TEST]
+activate MUST_REGIONS
+activate REGION_CHAINS
+display DG_FILE[TEST]
+close
+quit
+# EOF
+\end{verbatim}
+}
+\begin{rawhtml}
+</TD></TR></TABLE>
+\end{rawhtml}
+
+Note that  expression  \verb+%ALL+ has been expanded by all
+program routines, in that example there is only one \verb+TEST+
+routine in \verb+essai.f+.
+
+\subsection{Transformations}
+\label{exm3}
+
+The following transformations are designed for application optimization.
+Specialization and code reduction eliminating useless instructions and
+declarations are performed.
+
+This example presents some pips transformations and use of 
+\begin{itemize}
+\item program restructuration, cloning, dead code elimination, useless
+  declaration elimination, and code regeneration, 
+\item pips property: \verb+PREPROCESSOR_MISSING_FILE_HANDLING "generate"+ , 
+\item transformation application : \verb+apply CLONE_ON_ARGUMENT[FUNCT]+.
+\item $<$rule-name$>$ : \verb+PRINT_CODE+,..
+\item $<$rule-descriptor$>$ :  \verb+SUPPRESS_DEAD_CODE[${modules}]+,  \verb+UNSPLIT[%PROGRAM]+,..
+\item $<$resource-descriptor$>$ :  \verb+PRINTED_FILE[FUNCT]+,  \verb+CALLGRAPH_FILE[%ALL]+,..
+\end{itemize}
+\begin{rawhtml}
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1  BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+\end{rawhtml}
+{\bf
+\begin{verbatim}
+# Delete Workspace clone in case  it already exists
+
+delete clone                      
+
+setenv PIPS_SRCPATH SRC
+
+# Stop as soon as the first user error occurs
+
+setproperty ABORT_ON_USER_ERROR TRUE   
+
+# Generates missing files  and routines 
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate" 
+
+# Substitute Fortran statement functions
+
+setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
+
+# Restructures the program to eliminate as many GOTO as possible
+
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+
+#
+# prettyprinter settings
+
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+# creates the workspace
+
+create clone *.f
+
+
+echo # initial version of FUNCT
+
+display PRINTED_FILE[FUNCT]
+
+#
+# just to insure that all routines are generated.
+
+make CALLGRAPH_FILE[%ALL]
+
+#
+# let us clone FUNCT on the second argument. 
+# no interprocedural analysis is needed. 
+
+setproperty TRANSFORMATION_CLONE_ON_ARGUMENT 2
+capply CLONE_ON_ARGUMENT[FUNCT]
+
+# The clone transformation generates 4 clones
+# because there are 4 different values for the second
+# argument of FUNCT
+
+setenv modules "FUNCT_0 FUNCT_1 FUNCT_2 FUNCT_3"
+
+#
+# suppress dead code must be applied twice...
+# eliminate dead code after cloning
+
+apply SUPPRESS_DEAD_CODE[${modules}]
+apply SUPPRESS_DEAD_CODE[${modules}]
+
+# Eliminates useless declaration after cloning and dead code
+# suppression
+
+apply CLEAN_DECLARATIONS[FUNCT ${modules}]
+
+echo # after cloning, dead code elimination and declarations cleaning
+
+make  PRINTED_FILE[${modules}]
+
+#
+# regenerates the source files with calls to cloned functions only
+# 
+
+activate PRINT_CODE
+apply UNSPLIT[%PROGRAM]
+
+close 
+\end{verbatim}
+}
+\begin{rawhtml}
+</TD></TR></TABLE>
+\end{rawhtml}
+
+\subsection{Analyses}
+\label{exm4}
+This example presents some classical pips analyzes: 
+
+\begin{itemize}
+\item computation of preconditions,
+\item transformers, 
+\item effects,
+\item regions, 
+\end{itemize}
+and a {\it concurrent} transformation
+application.  
+
+\verb+capply PARTIAL_EVAL[%ALL]+ 
+applies a partial evaluation on all routines concurrently without any
+verification process between two transformations. The partial evaluation
+of a routine does not modify other routine predicates, even if the code
+(one routine) has been modified by the transformation. It is not
+necessary to ask for a sequential application that will impose the
+analysis and re-computation of all routine predicates between two partial
+evaluations.
+
+\begin{rawhtml}
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1 BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+\end{rawhtml}
+{\bf
+\begin{verbatim}
+create foo *.f
+
+echo
+echo CALL_GRAPH[%ALL] Computation
+echo
+
+display CALLGRAPH_FILE[%ALL]
+
+# ask interprocedural information
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+module FUNCT
+
+capply PARTIAL_EVAL[%ALL]
+
+#echo
+#echo PRINT_CODE_PROPER_EFFECTS Activation
+#echo
+#
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE[%ALL]
+#
+#echo
+#echo PRINT_CODE_CUMULATED_EFFECTS Activation
+#echo
+#
+#activate PRINT_CODE_CUMULATED_EFFECTS
+#display PRINTED_FILE[%ALL]
+
+echo
+echo PRINT_CODE_TRANSFORMERS Activation
+echo
+
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+echo
+echo PRINT_CODE_PRECONDITIONS Activation
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+echo
+echo ICFG_WITH_LOOPS_REGIONS
+echo 
+
+activate PRINT_ICFG_WITH_LOOPS_REGIONS
+display ICFG_FILE[%ALL]
+
+echo 
+echo REGIONS Computation
+echo
+
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+
+
+close 
+quit
+\end{verbatim}
+}
+
+\begin{rawhtml}
+</TD></TR></TABLE>
+\end{rawhtml}
+
+\subsection{Graphical  Graph View}
+\label{exm5}
+This example presents a call to a graphical call graph view. 
+
+\begin{rawhtml}
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1 BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+\end{rawhtml}
+{\bf
+\begin{verbatim}
+# resize the entities table. Useful for  large benchmarks. 
+
+setenv NEWGEN_MAX_TABULATED_ELEMENTS 150000
+setenv MAINROUTINE  TOTO 
+
+delete DVCG
+create DVCG *.f
+
+
+echo
+echo CALLGRAPH_FILE[${MAINROUTINE}] Computation
+echo
+
+
+make CALLGRAPH_FILE[${MAINROUTINE}]
+
+
+echo
+echo DVCG_FILE[${MAINROUTINE}] Computation
+echo
+
+make DVCG_FILE[${MAINROUTINE}]
+
+# type DaVinci DVCG.database/${MAINROUTINE}/${MAINROUTINE}.daVinci
+# to  visualize 
+
+close 
+quit
+\end{verbatim}
+}
+\begin{rawhtml}
+</TD></TR></TABLE>
+\end{rawhtml}
+
+\subsection{Parallelization}
+\label{exm6}
+This example presents some classical analyses and transformations designed
+to parallelize benchmarks, for instance the adm program of the Perfect
+club. 
+
+\begin{rawhtml}
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1  BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+\end{rawhtml}
+{\bf
+\begin{verbatim}
+#
+# Perfect club ADM benchmark.
+
+echo Perfect/adm.f
+#
+delete adm
+create adm adm.f  cputim.f elapse.f 
+
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+setproperty PARALLELIZATION_STATISTICS=TRUE
+
+echo ADM scalar privatization...
+ 
+capply PRIVATIZE_MODULE[%ALL]
+
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+
+apply PARTIAL_EVAL[%ALL]
+
+echo ADM parallelization...
+make PARALLELPRINTED_FILE[%ALL]
+
+close
+quit
+\end{verbatim}
+}
+\begin{rawhtml}
+</TD></TR></TABLE>
+\end{rawhtml}
+
+\section{Rules - Pips options}
+\label{rules}
+Rules are used to compute resources. Several rules can be activated to
+compute a single resource. For instance a parallel version of a module may
+be computed from the interprocedural precondition
+(\verb+PRECONDITIONS_INTER_FULL+), interprocedural transformer
+(\verb+TRANSFORMERS_INTER_FULL+) and accurate
+dependencies (\verb+RICE_SEMANTICS_DEPENDENCE_GRAPH+). Rules are selected
+by \verb+activate+ or selected and applied by \verb+apply+ and \verb+capply+.
+More information on each particular rule is presented  in the pipsmake documentation.
+\begin{rawhtml}
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=2 WIDTH="100%" BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+\end{rawhtml}
+{\bf \begin{verbatim*}
+#### ANALYSES ####
+
+ATOMIC_CHAINS                    
+CONTINUATION_CONDITIONS  
+FLINTER  
+PROPER_REFERENCES
+
+### COMPLEXITITY 
+
+ANY_COMPLEXITIES  
+FP_COMPLEXITIES  
+UNIFORM_COMPLEXITIES
+SUMMARY_COMPLEXITY
+
+### PRIVATIZATION
+
+ARRAY_PRIVATIZER  
+ARRAY_SECTION_PRIVATIZER  
+DECLARATIONS_PRIVATIZER 
+PRIVATIZE_MODULE
+
+### EFFECTS
+
+CUMULATED_EFFECTS  
+CUMULATED_REDUCTIONS  
+CUMULATED_REFERENCES  
+IN_EFFECTS 
+IN_SUMMARY_EFFECTS 
+OUT_EFFECTS  
+OUT_SUMMARY_EFFECTS  
+PROPER_EFFECTS
+SUMMARY_EFFECTS
+
+
+### PRECONDITIONS
+
+PRECONDITIONS_INTER_FAST  
+PRECONDITIONS_INTER_FULL  
+PRECONDITIONS_INTRA  
+SUMMARY_PRECONDITION
+
+
+### TRANSFORMERS
+
+SUMMARY_TRANSFORMER
+TRANSFORMERS_INTER_FAST
+TRANSFORMERS_INTER_FULL
+TRANSFORMERS_INTRA_FAST
+TRANSFORMERS_INTRA_FULL
+
+
+### REGIONS 
+
+IN_OUT_REGIONS_CHAINS  
+IN_REGIONS 
+IN_SUMMARY_REGIONS 
+MAY_REGIONS 
+MUST_REGIONS
+OUT_REGIONS  
+OUT_SUMMARY_REGIONS  
+REGION_CHAINS
+SUMMARY_REGIONS
+
+### CALLGRAPH 
+
+FULL_GRAPH_OF_CALLS  
+CALLGRAPH  
+GRAPH_OF_CALLS 
+
+### DEPENDENCES
+
+RICE_ALL_DEPENDENCE
+RICE_CRAY
+RICE_DATA_DEPENDENCE
+RICE_FAST_DEPENDENCE_GRAPH
+RICE_FULL_DEPENDENCE_GRAPH
+RICE_REGIONS_DEPENDENCE_GRAPH
+RICE_SEMANTICS_DEPENDENCE_GRAPH
+
+### REDUCTIONS
+
+PROPER_REDUCTIONS
+SUMMARY_REDUCTIONS
+
+
+#### TRANSFORMATIONS #### 
+
+FORWARD_SUBSTITUTE            
+PARTIAL_EVAL 
+
+### RESTRUCTURATION 
+
+ATOMIZER  
+CLEAN_DECLARATIONS  
+CLONE  
+CLONE_ON_ARGUMENT  
+CLONE_SUBSTITUTE  
+RESTRUCTURE_CONTROL
+SUPPRESS_DEAD_CODE
+UNSPAGHETTIFY
+UNSPLIT
+USE_DEF_ELIMINATION
+
+### LOOP TRANSFORMATION
+
+DISTRIBUTER  
+FULL_UNROLL 
+LOOP_INTERCHANGE  
+LOOP_NORMALIZE  
+LOOP_REDUCTIONS  
+STRIP_MINE
+UNROLL
+
+### PARALLELIZATION
+
+COARSE_GRAIN_PARALLELIZATION  
+NEST_PARALLELIZATION 
+\end{verbatim}}
+
+\begin{rawhtml}
+</TD>
+
+<TD>
+<pre>
+\end{rawhtml}
+{\bf \begin{verbatim}
+#### PRETTYPRINT #### 
+
+### PRINT_CALL_GRAPH                          
+
+PRINT_CALL_GRAPH                          
+PRINT_CALL_GRAPH_WITH_COMPLEXITIES        
+PRINT_CALL_GRAPH_WITH_CUMULATED_EFFECTS   
+PRINT_CALL_GRAPH_WITH_IN_REGIONS          
+PRINT_CALL_GRAPH_WITH_OUT_REGIONS         
+PRINT_CALL_GRAPH_WITH_PRECONDITIONS       
+PRINT_CALL_GRAPH_WITH_PROPER_EFFECTS      
+PRINT_CALL_GRAPH_WITH_REGIONS             
+PRINT_CALL_GRAPH_WITH_TRANSFORMERS        
+
+### PRINT_CHAINS_GRAPH                        
+
+PRINT_CHAINS_GRAPH                        
+
+### PRINT_CODE  WITH ...                             
+
+PRINT_CODE                                
+PRINT_CODE_AS_A_GRAPH                     
+PRINT_CODE_AS_A_GRAPH_COMPLEXITIES        
+PRINT_CODE_AS_A_GRAPH_CUMULATED_EFFECTS   
+PRINT_CODE_AS_A_GRAPH_IN_REGIONS          
+PRINT_CODE_AS_A_GRAPH_OUT_REGIONS         
+PRINT_CODE_AS_A_GRAPH_PRECONDITIONS       
+PRINT_CODE_AS_A_GRAPH_PROPER_EFFECTS      
+PRINT_CODE_AS_A_GRAPH_REGIONS             
+PRINT_CODE_AS_A_GRAPH_TRANSFORMERS        
+PRINT_CODE_COMPLEMENTARY_SECTIONS         
+PRINT_CODE_COMPLEXITIES                   
+PRINT_CODE_CONTINUATION_CONDITIONS        
+PRINT_CODE_CUMULATED_EFFECTS              
+PRINT_CODE_CUMULATED_REDUCTIONS           
+PRINT_CODE_CUMULATED_REFERENCES           
+PRINT_CODE_IN_EFFECTS                     
+PRINT_CODE_IN_REGIONS                     
+PRINT_CODE_OUT_EFFECTS                    
+PRINT_CODE_OUT_REGIONS
+PRINT_CODE_PRECONDITIONS
+PRINT_CODE_PRIVATIZED_REGIONS
+PRINT_CODE_PROPER_EFFECTS
+PRINT_CODE_PROPER_REDUCTIONS
+PRINT_CODE_PROPER_REFERENCES
+PRINT_CODE_PROPER_REGIONS
+PRINT_CODE_REGIONS
+PRINT_CODE_STATIC_CONTROL
+PRINT_CODE_TRANSFORMERS
+
+### PRINT_DEPENDENCE_GRAPH
+
+PRINT_EFFECTIVE_DEPENDENCE_GRAPH
+PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
+PRINT_WHOLE_DEPENDENCE_GRAPH
+
+### PRINT_ICFG
+
+PRINT_ICFG
+PRINT_ICFG_WITH_COMPLEXITIES
+PRINT_ICFG_WITH_CONTROL
+PRINT_ICFG_WITH_CONTROL_COMPLEXITIES
+PRINT_ICFG_WITH_CONTROL_CUMULATED_EFFECTS
+PRINT_ICFG_WITH_CONTROL_IN_REGIONS
+PRINT_ICFG_WITH_CONTROL_OUT_REGIONS
+PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
+PRINT_ICFG_WITH_CONTROL_PROPER_EFFECTS
+PRINT_ICFG_WITH_CONTROL_REGIONS
+PRINT_ICFG_WITH_CONTROL_TRANSFORMERS
+PRINT_ICFG_WITH_CUMULATED_EFFECTS
+PRINT_ICFG_WITH_IN_REGIONS
+PRINT_ICFG_WITH_LOOPS
+PRINT_ICFG_WITH_LOOPS_COMPLEXITIES
+PRINT_ICFG_WITH_LOOPS_CUMULATED_EFFECTS
+PRINT_ICFG_WITH_LOOPS_IN_REGIONS
+PRINT_ICFG_WITH_LOOPS_OUT_REGIONS
+PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
+PRINT_ICFG_WITH_LOOPS_PROPER_EFFECTS
+PRINT_ICFG_WITH_LOOPS_REGIONS
+PRINT_ICFG_WITH_LOOPS_TRANSFORMERS
+PRINT_ICFG_WITH_OUT_REGIONS
+PRINT_ICFG_WITH_PRECONDITIONS
+PRINT_ICFG_WITH_PROPER_EFFECTS
+PRINT_ICFG_WITH_REGIONS
+PRINT_ICFG_WITH_TRANSFORMERS
+
+PRINT_INITIAL_PRECONDITION
+
+### PRINT_PARALLELIZED_CODE
+
+PRINT_PARALLELIZED77_CODE
+PRINT_PARALLELIZED90_CODE
+PRINT_PARALLELIZEDCMF_CODE
+PRINT_PARALLELIZEDCRAFT_CODE
+PRINT_PARALLELIZEDCRAY_CODE
+PRINT_PARALLELIZEDHPF_CODE
+PRINT_PARALLELIZEDOMP_CODE
+
+### PRINT_SOURCE
+
+PRINT_SOURCE
+PRINT_SOURCE_COMPLEXITIES
+PRINT_SOURCE_CONTINUATION_CONDITIONS
+PRINT_SOURCE_CUMULATED_EFFECTS
+PRINT_SOURCE_IN_EFFECTS
+PRINT_SOURCE_IN_REGIONS
+PRINT_SOURCE_OUT_EFFECTS
+PRINT_SOURCE_OUT_REGIONS
+PRINT_SOURCE_PRECONDITIONS
+PRINT_SOURCE_PROPER_EFFECTS
+PRINT_SOURCE_REGIONS
+PRINT_SOURCE_TRANSFORMERS
+\end{verbatim*}
+\begin{rawhtml}
+</TD></TR></TABLE>
+\end{rawhtml}
+
+\section{Resources}
+\label{res}
+The names of the current useful resources are given. These resources are
+computed by the \verb+make+ and \verb+display+ commands. These
+non-printable resources are encoded in internal data structures. The
+corresponding printable resources are listed in the following section.
+These resources are detailed in the pipsmake documentation.
+
+\begin{rawhtml}
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=3 WIDTH="100%" BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+\end{rawhtml}
+{\bf \begin{verbatim}
+
+CALLEES
+CALLERS
+CHAINS  
+COMPLEXITIES  
+DG      
+ENTITIES 
+SUMMARY_COMPLEXITY
+
+## CODE 
+
+CODE  
+PARALLELIZED_CODE
+PARSED_CODE
+
+
+## EFFECTS
+
+CUMULATED_EFFECTS
+CUMULATED_IN_EFFECTS
+IN_EFFECTS
+IN_SUMMARY_EFFECTS
+OUT_EFFECTS
+OUT_SUMMARY_EFFECTS
+PROPER_EFFECTS
+SUMMARY_EFFECTS
+\end{verbatim}}
+\begin{rawhtml}
+</TD>
+<TD>
+<pre>
+\end{rawhtml}
+{\bf \begin{verbatim}
+## REGIONS
+ 
+COPY_OUT_REGIONS                        
+CUMULATED_IN_REGIONS                    
+INV_IN_REGIONS                          
+INV_REGIONS                             
+IN_REGIONS
+IN_SUMMARY_REGIONS
+OUT_REGIONS
+OUT_SUMMARY_REGIONS
+PRIVATIZED_REGIONS
+PROPER_REGIONS
+REGIONS 
+SUMMARY_REGIONS
+
+## REDUCTIONS 
+
+CUMULATED_REDUCTIONS                    
+PROPER_REDUCTIONS
+SUMMARY_REDUCTIONS
+
+## REFERENCES
+
+CUMULATED_REFERENCES                    
+PROPER_REFERENCES
+\end{verbatim}}
+\begin{rawhtml}
+</TD>
+
+<TD>
+<pre>
+\end{rawhtml}
+{\bf \begin{verbatim}
+## PRECONDITION                   
+
+INITIAL_PRECONDITION                    
+PRECONDITIONS    
+PROGRAM_PRECONDITION
+SUMMARY_PRECONDITION
+
+## TRANSFORMERS 
+
+SUMMARY_TRANSFORMER
+TRANSFORMERS 
+
+## CONTINUATION 
+
+MAY_CONTINUATION
+MAY_SUMMARY_CONTINUATION
+MUST_CONTINUATION
+MUST_SUMMARY_CONTINUATION
+\end{verbatim}
+\begin{rawhtml}
+</TD></TR></TABLE>
+\end{rawhtml}
+
+\section{Printable resources}
+\label{resf}
+The printable resources usually contain the string FILE. They can be
+computed by invoking the \verb+display+ {\tt tpips} command. They are stored as
+human readable ASCII file in the workspace. The current resources which
+are printable follow, for more information see the pipsmake documentation.
+
+\begin{rawhtml}
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1 WIDTH="100%" BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+\end{rawhtml}
+\begin{verbatim}
+CALLGRAPH_FILE                   # call graph file
+DG_FILE                          # Dependence graph file         
+DVCG_FILE                        # Davinci Dependence graph file 
+FLINTED_FILE                     # source file with errors
+GRAPH_PRINTED_FILE               # control graph
+ICFG_FILE                        # interprocedural control flow graph       
+INITIAL_FILE                     # after splitting      
+PARALLELPRINTED_FILE             # parallel version
+PRINTED_FILE                     # annoted sequential version 
+SOURCE_FILE                      # after the preprocessing phase
+USER_FILE                        # after regeneration of user files
+\end{verbatim}
+\begin{rawhtml}
+</TD></TR></TABLE>
+\end{rawhtml}
+
+\section{Options}
+Usage: {\tt tpips} [-nscvh?jw] [-l logfile] [-r rcfile] [-e tpips-cmds] tpips-scripts
+\begin{description}
+
+\item [-n]  no execution mode. Just check the script syntax.
+\item [-s] behaves like a shell. {\tt tpips} commands simply extend a shell.
+\item [-c] behaves like a command, not a shell (it is the default option).
+\item [-v] displays version and architecture information.
+\item [-h or -?] provides some help.
+\item [-j] jpips special mode.
+\item [-w] starts with a wrapper (jpips special again)...
+\item [-l] $<$logfile$>$: log to $<$logfile$>$.
+\item [-r] $<$rcfile$>$: source the $<$rcfile$>$ file. (default {\tilde}/.tpipsrc)
+\item [-e] tpips-cmds: executes the $<$tpips-cmds$>$ commands.
+\end{description}
+
+
+\section{Environment}
+
+
+Before using {\tt tpips}, you need to add a PIPS root directory to
+your path and to set some PIPS environment variables. In
+order to do that, you can execute the shell script
+Pips/pipsrc.sh for any sh compatible shell, e.g. ksh or
+bash, or Pips/pipsrc.csh for any csh compatible shell, e.g.
+tcsh.
+
+\end{document}
