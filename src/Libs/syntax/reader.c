@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/30 15:16:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/30 17:13:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_reader[] = "%A% ($Date: 1997/04/30 15:16:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_reader[] = "%A% ($Date: 1997/04/30 17:13:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -239,7 +239,8 @@ LOCAL char tmp_lab_I[6];
 
 static bool parser_warn_for_columns_73_80 = TRUE;
 
-void init_parser_reader_properties()
+void 
+init_parser_reader_properties()
 {
   parser_warn_for_columns_73_80 = get_bool_property("PARSER_WARN_FOR_COLUMNS_73_80");
 }
@@ -268,7 +269,8 @@ void FindIf();
 void FindAutre();
 void FindPoints();
 
-int syn_wrap()
+int 
+syn_wrap()
 {
 	return(1);
 }
@@ -276,7 +278,8 @@ int syn_wrap()
 /*
  * La fonction a appeler pour l'analyse d'un nouveau fichier.
  */
-void ScanNewFile()
+void 
+ScanNewFile()
 {
     register int i;
     static int FirstCall = TRUE;
@@ -316,7 +319,8 @@ void ScanNewFile()
  * des mot clefs. Elle recherche si le mot 's' est un mot clef, retourne sa
  * valeur si oui, et indique une erreur si non.
  */
-int IsCapKeyword(s)
+int 
+IsCapKeyword(s)
 char * s;
 {
     register int i, c;
@@ -356,7 +360,8 @@ char * s;
 }
 
 /* Routine de lecture pour l'analyseur lexical, lex ou flex */
-int PipsGetc(fp)
+int 
+PipsGetc(fp)
 FILE * fp;
 {
     int eof = FALSE;
@@ -401,13 +406,35 @@ FILE * fp;
     return((eof) ? EOF : UNQUOTE(c));
 }
 
-/* Routine de lecture physique */
-int GetChar(fp)
+/* Routine de lecture physique
+ *
+ * In case an error occurs, buffer must be emptied. Since ibuffer and lbuffer
+ * cannot be touched by the error handling routine, changes of fp are tracked
+ * in GetChar() and dynamically tested. Kludge suggested by Fabien Coelho to
+ * avoid adding more global variables. (FI)
+ */
+int 
+GetChar(fp)
 FILE * fp;
 {
     int c = UNDEF;
     static int buffer[LINELENGTH], ibuffer = UNDEF, lbuffer = UNDEF;
     static col = 0;
+    static FILE * previous_fp = NULL;
+
+    if( previous_fp != fp ) {
+	/* If a file has just been opened */
+	if( ibuffer < lbuffer ) {
+	    /* if the buffer is not empty, which may never occur if 
+	     * previous_fp == NULL, perform a buffer reset
+	     */
+	    ibuffer = lbuffer;
+	    user_warning("GetChar", 
+			 "Unexpected buffer reset.\n"
+			 "A parser error must have occured previously.\n");
+	}
+	previous_fp = fp;
+    }
 
     /* on lit toute une ligne d'un coup pour traiter le cas des
      * tabulations et des lignes vides.
@@ -511,7 +538,8 @@ FILE * fp;
 }
 
 /* regroupementde la ligne initiale et des lignes suite en un unique buffer, Line */
-int ReadLine(fp)
+int 
+ReadLine(fp)
 FILE * fp;
 {
     static char QuoteChar = '\000';
@@ -573,8 +601,10 @@ FILE * fp;
 		    label[ilabel++] = c;
 		}
 		else {
+		    user_warning("ReadLine", 
+				 "Unexpected character '%c' (0x%x)\n", c, (int) c);
 		    ParserError("ReadLine",
-			       "[scanner] non numeric character in label !!!\n");
+				"non numeric character in label!\n");
 		}
 	    }
 	    c = GetChar(fp);
@@ -655,7 +685,8 @@ FILE * fp;
 }
 
 /* regroupement des lignes du statement en une unique ligne sans continuation */
-int ReadStmt(fp)
+int 
+ReadStmt(fp)
 FILE * fp;
 {
     static int EofSeen = FALSE;
@@ -718,7 +749,8 @@ FILE * fp;
     return(result);
 }
 
-void CheckParenthesis()
+void 
+CheckParenthesis()
 {
     register int i;
     int parenthese = 0;
@@ -754,7 +786,8 @@ void CheckParenthesis()
     }
 }
 
-int FindDo()
+int 
+FindDo()
 {
     int result = FALSE;
 
@@ -766,7 +799,8 @@ int FindDo()
     return(result);
 }
 
-int FindImplicit()
+int 
+FindImplicit()
 {
     int result = FALSE;
 
@@ -785,7 +819,8 @@ int FindImplicit()
     return(result);
 }
 
-int FindIfArith()
+int 
+FindIfArith()
 {
     int result = FALSE;
 
@@ -800,7 +835,8 @@ int FindIfArith()
     return(result);
 }
 
-void FindIf()
+void 
+FindIf()
 {
     if (StmtEqualString("IF(", iStmt)) {
 	int i = FindMatchingPar(iStmt+2)+1;
@@ -818,7 +854,8 @@ void FindIf()
     }
 }
 
-void FindAutre()
+void 
+FindAutre()
 {
     if (!ProfZeroEgal) {
 	int i = NeedKeyword();
@@ -845,7 +882,8 @@ void FindAutre()
     }
 }
 
-int FindAssign()
+int 
+FindAssign()
 {
     int result = FALSE;
 
@@ -867,7 +905,8 @@ int FindAssign()
     return(result);
 }
 
-void FindPoints()
+void 
+FindPoints()
 {
     register int i = iStmt;
 
@@ -894,7 +933,8 @@ void FindPoints()
     }
 }
 
-int FindProfZero(c)
+int 
+FindProfZero(c)
 int c;
 {
     register int i;
@@ -913,7 +953,8 @@ int c;
     return((i == lStmt) ? UNDEF : i);
 }
 
-int FindMatchingPar(i)
+int 
+FindMatchingPar(i)
 int i;
 {
     int parenthese;
@@ -934,7 +975,8 @@ int i;
     return((i == lStmt) ? UNDEF : i-1);
 }
 
-int StmtEqualString(s, i)
+int 
+StmtEqualString(s, i)
 char *s;
 int i;
 {
@@ -953,7 +995,8 @@ int i;
     return(result);
 }
 
-int CapitalizeStmt(s, i)
+int 
+CapitalizeStmt(s, i)
 char s[];
 int i;
 {
@@ -975,7 +1018,8 @@ int i;
     return(i);
 }
 
-int NeedKeyword()
+int 
+NeedKeyword()
 {
     register int i, j;
     char * kwcour;
