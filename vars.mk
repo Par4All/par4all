@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.15 2002/08/23 14:39:15 loechner Exp $
+# $Id: vars.mk,v 1.16 2002/08/29 17:56:59 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -110,10 +110,10 @@ EXEC_EXTRA_LIBS= -L${exec_prefix}/lib -lpolylib$(BITS) $(LIBS)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 
-LIBS_TO_BUILD = 64
-EXEC_TO_BUILD = 64
-BITS=64
-AFLAGS=-DLINEAR_VALUE_PROTECT_MULTIPLY 		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -DLINEAR_VALUE_IS_LONGLONG
+LIBS_TO_BUILD = 32 64 gmp
+EXEC_TO_BUILD = 32 64 gmp
+BITS=32
+AFLAGS=-DLINEAR_VALUE_IS_INT
 
 
 OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)
