@@ -4,6 +4,14 @@
   * transformer package - convex hull computation
   *
   * Francois Irigoin, 21 April 1990
+  *
+  * $Id$
+  *
+  * $Log: convex_hull.c,v $
+  * Revision 1.18  2001/07/19 18:06:52  irigoin
+  * Log of transformations added in header.
+  *
+  *
   */
 
 #include <stdio.h>
