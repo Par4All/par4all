@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.84  1997/12/12 13:56:21  coelho
+ * typo fixed.
+ *
  * Revision 1.83  1997/12/12 12:50:29  coelho
  * substitution errors result in warnings.
  *
@@ -94,7 +97,7 @@ extern void tp_restart( FILE * ); /* tp_lex.c */
   "  URL: http://www.cri.ensmp.fr/pips\n"				\
   "  MAIL: pipsgroup@cri.ensmp.fr\n\n"					\
   "  This software is provided as is, under the terms of the GPL.\n"	\
-  "  It includes software from GNU (readline, rx) and Berkeley (fsplit) .\n\n"
+  "  It includes software from GNU (readline, rx) and Berkeley (fsplit).\n\n"
 
 #define SEPARATOR_P(c) (index (" \t", c))
 #define PREFIX_EQUAL_P(str, prf) (strncmp(str, prf, strlen(prf))==0)
