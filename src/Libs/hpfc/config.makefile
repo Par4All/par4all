@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/03/09 11:26:25 $) version $Revision$, got on %D%, %T%
+# $RCSfile: config.makefile,v $ ($Date: 1994/03/09 12:01:41 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 # The following macros define the value of commands that are used to
@@ -45,7 +45,8 @@ LIB_CFILES=	parser.c parser-util.c debug-util.c hpfc-util.c \
 		compile.c run-time.c generate.c statement.c  norm-code.c \
 		io.c io-effects.c local-ri-util.c inits.c o-analysis.c \
 		align-checker.c messages.c overlap.c normalize.c guard.c \
-		ranges.c message-utils.c reduction.c build-system.c 
+		ranges.c message-utils.c reduction.c build-system.c \
+		only-io.c
 
 LIB_HEADERS=	f77keywords f77symboles hpfkeywords gram.y scanner.l \
 		warning.h hpfc-local.h defines-local.h compiler_parameters.h \
