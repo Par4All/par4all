@@ -5,7 +5,11 @@
 ! (c) Fabien COELHO, 09/95
 !
 ! $Id$
+!
 ! $Log: hpfc_stubs.f,v $
+! Revision 1.11  1997/05/02 11:29:08  coelho
+! more args to hpfc8 for regions.
+!
 ! Revision 1.10  1997/03/19 17:52:42  coelho
 ! better RCS headers
 !
@@ -37,10 +41,10 @@
       print *, 'hpfc7: '
       end
 ! dead FC directive. one argument, why not...
-      subroutine hpfc8(x)
+      subroutine hpfc8(x1,x2,x3,x4,x5,x6,x7,x8,x9,x0)
 !!fcd$ fake
       integer x
-      print *, 'hpfc8: ', x
+      print *, 'hpfc8: ', x1,x2,x3,x4,x5,x6,x7,x8,x9,x0
       end
 !
 ! That is all
