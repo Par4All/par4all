@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.33  2003/09/03 13:35:34  coelho
+ * no more callback.
+ *
  * Revision 1.32  2003/08/18 14:55:38  coelho
  * callback fix.
  *
@@ -85,7 +88,7 @@ const unsigned int any_exception_error = ~0;
 
 #define CATCH(what) 							\
    if (setjmp(*push_exception_on_stack(what, __CURRENT_FUNCTION_NAME__,	\
-				     __FILE__, __LINE__, NULL)))
+				     __FILE__, __LINE__)))
 
 #define UNCATCH(what)						\
      (pop_exception_from_stack(what, __CURRENT_FUNCTION_NAME__,	\
