@@ -33,31 +33,32 @@
 static string actual_fortran_string_to_compare(string fs, int * plength)
 {
   int len;
+  string s = fs;
 
   /* skip TOP-LEVEL header */
-  if (strncmp(fs, TOP_LEVEL_MODULE_NAME, strlen(TOP_LEVEL_MODULE_NAME))==0)
-    fs += strlen(TOP_LEVEL_MODULE_NAME);
+  if (strncmp(s, TOP_LEVEL_MODULE_NAME, strlen(TOP_LEVEL_MODULE_NAME))==0)
+    s += strlen(TOP_LEVEL_MODULE_NAME);
 
   /* skip : header */
-  if (strncmp(fs, MODULE_SEP_STRING, strlen(MODULE_SEP_STRING))==0)
-    fs += strlen(MODULE_SEP_STRING);
+  if (strncmp(s, MODULE_SEP_STRING, strlen(MODULE_SEP_STRING))==0)
+    s += strlen(MODULE_SEP_STRING);
 
-  len = strlen(fs);
+  len = strlen(s);
 
   /* skip surrounding quotes */
   if (len>=2 &&
-      ((fs[0]=='\'' && fs[len-1]=='\'') || (fs[0]=='"' && fs[len-1]=='"')))
+      ((s[0]=='\'' && s[len-1]=='\'') || (s[0]=='"' && s[len-1]=='"')))
   {
-    fs++; 
+    s++; 
     len -= 2;
   }
 
   /* skip trailing *spaces* (are these blanks?) if any. */
-  while (len>0 && fs[len-1]==' ') 
+  while (len>0 && s[len-1]==' ') 
     len--;
 
   *plength = len;
-  return fs;
+  return s;
 }
 
 /* compare pips fortran string constants from the fortran point of view.
@@ -79,16 +80,17 @@ static string actual_fortran_string_to_compare(string fs, int * plength)
 int fortran_string_compare(string fs1, string fs2)
 {
   int l1, l2, i, c = 0;
+  string s1, s2;
 
   /* skip headers, trailers... */
-  fs1 = actual_fortran_string_to_compare(fs1, &l1);
-  fs2 = actual_fortran_string_to_compare(fs2, &l2);
+  s1 = actual_fortran_string_to_compare(fs1, &l1);
+  s2 = actual_fortran_string_to_compare(fs2, &l2);
 
   /* collating sequence comparison. */
   for (i=0; c!=0 && i<l1 && i<l2; i++)
   {
-    if (fs1[i] < fs2[i]) c = -i-1;
-    if (fs1[i] > fs2[i]) c = i+1;
+    if (s1[i] < s2[i]) c = -i-1;
+    if (s1[i] > s2[i]) c = i+1;
   }
 
   /* equal string header case. */
