@@ -1,9 +1,10 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/07/10 21:17:33 $, )
+# ($Date: 1996/07/11 12:47:45 $, )
 # 
 # what to do at night...
+# (c) Fabien COELHO July 1996
 #
 # source environment if needed.
 
@@ -25,15 +26,17 @@ usage()
     shift
     cat <<-EOF
 	$script (version $Revision$) - "$@"
-	  -v : verbose
+	  -h: this help
+	  -v: verbose
 	  -a email : report to this address
 EOF
     exit $ret
 }
 
-while getopts va: OPT
+while getopts hva: OPT
 do
     case $OPT in
+	h) usage 0 "some help" ;;
 	a) email=$OPTARG ;;
 	v) verbose=verb ;;
 	*) usage 2 "invalid option" ;;
@@ -43,56 +46,47 @@ done
 REPORT=/tmp/${script}.${user}.$$
 rm -f ${REPORT}
 
+#
+# do the job
+
 {
-    $verbose starting $script for $email 
-    $verbose date: `date`
+$verbose starting $script for $email 
+$verbose date: `date`
 
-    $verbose deleting old workspaces...
-    find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +7 -print | 
-	xargs ${PIPS_UTILDIR}/Delete
+$verbose deleting old workspaces...
+find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +7 -print | 
+    xargs ${PIPS_UTILDIR}/Delete
 
-    $verbose removing core files older than one week
-    find ${PIPS_HOME}/Pips -name core -mtime +7 -print | 
-	xargs rm -f
+$verbose removing core files older than one week
+find ${PIPS_HOME}/Pips -name core -mtime +7 -print | 
+    xargs rm -f
 
-    $verbose recompiling NEWGEN - Production
+$verbose recompiling NEWGEN - Production
+{
+make-pips -no ${REPORT} FWD_MSG='Newgen:[P,SUN4]' ARCH=SUN4 clean recompile
+make-pips -no ${REPORT} FWD_MSG='Newgen:[P,.]' ARCH=. clean recompile
+} 2>&1 | mail -s "$script: newgen recompile night report" $email
 
-    {   cd ${NEWGEN_SRCDIR} ;
-	${PIPS_MAKE} FWD_MSG='Newgen:P[.]' FWD_REPORT=${REPORT} clean ; 
-        ${PIPS_MAKE} FWD_MSG='Newgen:P[SUN4]' FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' clean ;
-	${PIPS_MAKE} FWD_MSG='Newgen:P[.]' FWD_REPORT=${REPORT} recompile ;
-        ${PIPS_MAKE} FWD_MSG='Newgen:P[SUN4]' FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' recompile ;
-    } 2>&1 | mail -s "$script: newgen recompile night report" $email
+$verbose recompiling LINEAR - Production
+{
+make-pips -lo ${REPORT} FWD_MSG='Linear:[P,SUN4]' ARCH=SUN4 clean recompile
+make-pips -lo ${REPORT} FWD_MSG='Linear:[P,.]' ARCH=. clean recompile
+} 2>&1 | mail -s "$script: linear recompile night report" $email
 
+$verbose recompiling PIPS - Production
+{
+make-pips -po ${REPORT} FWD_MSG='Pips:[P,SUN4]' ARCH=SUN4 clean recompile
+make-pips -po ${REPORT} FWD_MSG='Pips:[P,.]' ARCH=. clean recompile
+} 2>&1 | mail -s "$script: pips recompile night report" $email
 
-    $verbose recompiling LINEAR - Production
-    {   cd ${LINEAR_SRCDIR} ; 
-	${PIPS_MAKE} FWD_MSG='Linear:P[.]' FWD_REPORT=${REPORT} clean ; 
-        ${PIPS_MAKE} FWD_MSG='Linear:P[SUN4]' FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' clean ;
-	${PIPS_MAKE} FWD_MSG='Linear:P[.]' FWD_REPORT=${REPORT} recompile ;
-        ${PIPS_MAKE} FWD_MSG='Linear:P[SUN4]' FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' recompile ;
-    } 2>&1 | mail -s "$script: linear recompile night report" $email
+# summary
+mail -s "$script: recompile night report summary" $email < ${REPORT}
+rm -f ${REPORT}
 
+# Validate Pips
+$verbose Validating PIPS
+Validate -vti 50 -a ${email}
 
-    $verbose recompiling PIPS - Production
-    # Runtime/{hpfc,wp65} will be also recompiled!
-    {   cd ${PIPS_SRCDIR} ;
-        DIRS="Lib Passes Scripts Runtime ${PIPS_ORDERED_LIBS}"
-	${PIPS_MAKE} FWD_MSG='Pips:P[.]' FWD_REPORT=${REPORT} clean ; 
-        ${PIPS_MAKE} FWD_MSG='Pips:P[SUN4]' FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' clean ;
-	${PIPS_MAKE} FWD_MSG='Pips:P[.]' PWD_DIRS="$DIRS" FWD_REPORT=${REPORT} recompile ;
-        ${PIPS_MAKE} FWD_MSG='Pips:P[SUN4]' PWD_DIRS="$DIRS" FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' recompile ;
-    } 2>&1 | mail -s "$script: pips recompile night report" $email
-
-
-    # summary
-    mail -s "$script: recompile night report summary" $email < ${REPORT}
-    rm -f ${REPORT}
-
-    # Validate Pips
-    $verbose Validating PIPS
-    Validate -vti 50 -a ${email}
-
-    $verbose date: `date`
-    $verbose end of  $script for $email 
+$verbose date: `date`
+$verbose end of  $script for $email 
 } 2>&1 | mail -s "$script: night report" ${email}
