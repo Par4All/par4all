@@ -143,25 +143,24 @@ case ${job} in
 	${verb} "USUAL stuff" ;
 	general ${sun4} GNUSOL1 ;
 	covalid ${sol2} GNUSOL2LL ;
-	covalid ${sun4} GNUSOL1 ;
 	covalid ${i386} LINUXI86 ;
 	compile ${sol2} SOL2LL ;
-	compile ${sun4}	"GNU SUN4" ;;
+	compile ${sun4} GNUSOL1 ;;
 
     long)
-	${verb} "LONG stuff (more compilations)" ;
+	${verb} "LONG stuff (more compilations and validations)" ;
 	general ${sun4} GNUSOL1 ;
-	covalid ${sun4} GNU ;
+	covalid ${sun4} GNUSOL1 ;
 	covalid ${sol2} GNUSOL2LL ;
 	covalid ${i386} LINUXI86 ;
 	compile ${sol2} SOL2LL ;
-	compile ${sun4} "GNUSOL1 SUN4 GPROF" ;;
+	compile ${sun4} "GNU SUN4 GPROF" ;;
 
     short)
 	${verb} "SHORT stuff (one validation)" ;
-	covalid ${sun4} GNUSOL1 ;
+	covalid ${i386} LINUXI86 ;;
 	compile ${sol2} GNUSOL2LL ;
-	compile ${i386} LINUXI86 ;;
+	compile ${sun4} GNUSOL1 ;
 
     compile)
 	${verb} "COMPILE stuff" ;
