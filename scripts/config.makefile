@@ -1,7 +1,10 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/02 19:51:13 $, 
+# $Date: 1996/07/10 18:21:09 $, 
 
 all: .runable
+recompile: .quick-install
+clean:
+	$(RM) *~
 
 SCRIPTS=\
 	make_all_specs\
