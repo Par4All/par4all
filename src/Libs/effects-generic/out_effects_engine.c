@@ -728,7 +728,8 @@ out_effects_engine(char *module_name)
     debug_on("OUT_EFFECTS_DEBUG_LEVEL");
     debug(1, "out_effects", "begin\n");
 
-
+    make_effects_private_current_context_stack();
+   
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     module = get_current_module_entity();
 
@@ -779,6 +780,8 @@ out_effects_engine(char *module_name)
     reset_invariant_in_effects();
     reset_out_effects();
     (*effects_computation_reset_func)(module_name);
+
+    free_effects_private_current_context_stack();
 
     return TRUE;
 }
