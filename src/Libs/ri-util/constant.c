@@ -135,6 +135,8 @@ tag bt;
 
     e = make_constant_entity(name, bt, DefaultLengthOfBasic(bt));
 
+    /* The LengthOfBasic should be updated for type "string" */
+
     return e;
 }
 
