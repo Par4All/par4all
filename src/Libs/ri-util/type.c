@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.33  1998/11/05 13:50:45  zory
+ * new EOLE automatic inclusion tags added
+ *
  * Revision 1.32  1998/10/07 15:34:45  irigoin
  * $log$ added
  *
@@ -54,6 +57,11 @@ MakeTypeVoid()
     return(make_type(is_type_void, NIL));
 }
 
+
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
 type 
 MakeTypeVariable(b, ld)
 basic b;
@@ -61,6 +69,8 @@ cons * ld;
 {
     return(make_type(is_type_variable, make_variable(b, ld)));
 }
+
+/* END_EOLE */
 
 /*
  *
