@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/26 11:33:19 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/28 17:32:39 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -141,13 +141,12 @@ static char * build_unique_tabulated_name(int domain, char * name)
     static int size = 0;
     static char * buffer = 0;
     
-    if (!buffer) {
-	size = 100, buffer = (char*) malloc(sizeof(char)*size);
+    if (len+30>size) {
+	size = len+30;
+	if (buffer) free(buffer);
+	buffer = (char*) malloc(sizeof(char)*size);
 	if (!buffer) fatal("build_unique_tabulated_name: memory exhausted\n");
     }
-
-    if (len+10<size)
-	size = len+10, buffer = (char*) realloc(buffer, sizeof(char)*size);
 
     sprintf(buffer, "%d%c%s", domain, HASH_SEPAR, name);
     return buffer;
@@ -207,6 +206,9 @@ void gen_put_tabulated_name_direct(char * key, char * val)
     check_Gen_tabulated_names();
     hash_put(Gen_tabulated_names, key, val);
 }
+
+
+
 
 /* FPRINTF_SPACES prints NUMBER spaces on the FD file descriptor.`
  */
@@ -1570,7 +1572,7 @@ gen_free_tabulated(int domain)
     for (i=0; i<size; i++)
     {
 	if (t[i].p && !gen_chunk_undefined_p(t[i].p)) {
-	    /* fprintf(stderr, "freeing [%d] (0x%x) %s \n", i,
+	    /*fprintf(stderr, "freeing [%d] (0x%x) %s \n", i,
 		    (unsigned int) t[i].p, ((t[i].p)+2)->s); */
 
 	    gen_free(t[i].p), t[i].p = gen_chunk_undefined;
@@ -1646,6 +1648,9 @@ struct driver *dr ;
     struct gen_binding *bp = &Domains[ quick_domain_index( obj ) ] ;
     union domain *dp = bp->domain ;
     int data = 1+IS_TABULATED( bp ) ;
+
+    /* fprintf(stderr, "object 0x%x type %s\n", (unsigned int) obj, bp->name); 
+     */
 
     if( shared_obj( obj, write_define_shared_node, write_shared_node ))
 	    return( !GO) ;
@@ -1847,10 +1852,6 @@ gen_write(fd, obj)
 FILE *fd ;
 gen_chunk *obj ;
 {
-/*
-    static bool is_already_in = FALSE;
-    bool first_in_stack = FALSE;
-*/
     struct driver dr ;
 
     check_read_spec_performed();
@@ -1866,15 +1867,6 @@ gen_chunk *obj ;
 
     user_file = fd ;
 
-    /*
-    if (!is_already_in)
-    {
-	first_in_stack = TRUE;
-	push_gen_trav_env();
-	is_already_in = TRUE;
-    }
-    */
-
     push_gen_trav_env();
 
     shared_pointers(obj, FALSE) ;
@@ -1883,12 +1875,6 @@ gen_chunk *obj ;
 
     pop_gen_trav_env() ;
 
-/*    if (first_in_stack)
-    {
-
-	is_already_in = FALSE;
-    }
-*/
 }
 
 /* GEN_WRITE_WITHOUT_SHARING writes the OBJect on the stream FD. Sharing
@@ -1944,11 +1930,16 @@ struct gen_binding *bp ;
 	    fatal( "write_tabulated_leaf_in: Zero index in domain %s\n", 
 		   bp->name ) ;
 	}
+
+	/* fprintf(stderr, "writing %d %s\n", number, (obj->p+HASH_OFFSET)->s);
+	 */
 	if( number >= 0 ) {
 	    (void) fprintf( user_file ,"#]def %d \"%d%c", 
 		     bp->index, bp-Domains, HASH_SEPAR ) ;
 	    write_string( "", (obj->p+HASH_OFFSET)->s, "\" " ) ;
-	    (obj->p+1)->i = - (obj->p+1)->i ;
+	    
+	    /* once written the domain number sign is inverted... */ 
+	    (obj->p+1)->i = - (obj->p+1)->i ; 
 	    return( GO) ;
 	}
     }
@@ -1996,14 +1987,15 @@ int domain ;
     return( domain ) ;
 }
 
+
+
 #ifdef BSD
 static char *strdup( s )
 char *s ;
 {
-    char *new = alloc( strlen( s )+1 ) ;
-
+    char *new = (char*) malloc( strlen( s )+1 ) ;
     strcpy( new, s ) ;
-    return( new ) ;
+    return new;
 }
 #endif
 
@@ -2289,7 +2281,7 @@ static void open_black_hole()
 {
     if (black_hole == NULL)  
 	if ((black_hole=fopen("/dev/null", "r")) == NULL) 
-	    fatal("Cannot open /dev/null !", "") ; /* not reached */
+	    fatal("Cannot open /dev/null !") ; /* not reached */
 }
 
 /* GEN_CONSISTENT_P dynamically checks the type correctness of OBJ. 
@@ -2308,6 +2300,26 @@ gen_chunk *obj ;
     gen_write( black_hole, obj ) ;
     gen_debug = old_gen_debug ;
     return( error_seen  == 0 ) ;
+}
+
+int
+gen_tabulated_consistent_p(int domain)
+{
+    struct gen_binding *bp = &Domains[ domain ];
+    gen_chunk * t = Gen_tabulated_[bp->index];
+    int i, size = max_tabulated_elements();
+
+    for (i=0; i<size; i++)
+    {
+	if (t[i].p && !gen_chunk_undefined_p(t[i].p)) {
+	    /* fprintf(stderr, "consistence of [%d] (0x%x) %s \n", i,
+		    (unsigned int) t[i].p, ((t[i].p)+2)->s); */
+	    
+	    gen_consistent_p(t[i].p);
+	}
+    }
+
+    return 1;
 }
 
 /* GEN_DEFINED_P checks that the OBJect is fully defined 
