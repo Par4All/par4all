@@ -26,6 +26,10 @@
 #include "pipsdbm.h"
 #include "resources.h"
 
+#include "vecteur.h"
+/* #include "ricedg.h" */
+extern Psysteme sc_restricted_to_variables_transitive_closure(Psysteme /*sc*/, Pbase /*variables*/);
+
 #define BACKWARD TRUE
 #define FORWARD FALSE
 
@@ -35,6 +39,160 @@ static list list_regions_callee = NIL;
 static statement current_caller_stmt = statement_undefined;
 static list list_pairs = NIL;
 
+/*
+static Pbase
+make_base_phi_variables(region reg)
+{
+    Pbase phi_variables;
+    int dim;
+    int dim_max;
+    entity e;
+
+    pips_debug(4,"begin\n");
+
+    phi_variables = BASE_NULLE;
+    e = reference_variable(region_reference(reg));
+    dim_max = NumberOfDimension(e);
+
+    for (dim = 1; dim<=dim_max; dim ++)
+    {
+	entity phi = make_phi_entity(dim);
+	base_add_variable(phi_variables, (Variable) phi);
+    }
+
+    pips_debug(4,"end\n");
+
+    return phi_variables;
+}
+*/
+
+
+static Pbase
+make_base_phi_variables(region reg)
+{
+    Pbase phi_variables;
+    list indices;
+
+    pips_debug(4,"begin\n");
+    phi_variables = BASE_NULLE;
+
+    indices = reference_indices(region_reference(reg));
+    MAP(EXPRESSION, index,
+	{
+	    entity e;
+
+	    e = reference_variable(syntax_reference(expression_syntax(index)));
+	    if (variable_phi_p(e))
+	    {
+		pips_debug(9,"add: %s\n",entity_local_name(e));
+
+		phi_variables = base_add_variable(phi_variables,(Variable) e);
+	    }
+	},
+	    indices);
+
+    pips_debug(4,"end\n");
+
+    return phi_variables;
+}
+
+
+static region
+restrict_to_phi_constraints(region reg)
+{
+    Pbase phi_variables;
+    Psysteme sc;
+    region new_reg;
+ 
+    pips_debug(4,"begin\n");
+
+
+    sc = region_system(reg);
+    phi_variables = make_base_phi_variables(reg);
+    new_reg = region_dup(reg);
+
+/* meme si on laisse new_reg comme ceci, on a tjs le probleme Newgen */
+
+    ifdebug(9)
+	{
+	    set_action_interpretation(ACTION_IN,ACTION_OUT);
+	    pips_debug(9,"call sc_restricted_to_variables_transitive_closure for:\t\n");
+	    print_region(reg);
+	}
+
+    region_system(new_reg) =
+	sc_restricted_to_variables_transitive_closure(sc,phi_variables);
+
+    ifdebug(9)
+	{
+	    pips_debug(9,"restricted region:\n\t");
+	    print_region(new_reg);
+	    reset_action_interpretation();
+	}
+
+    pips_debug(4,"end\n");
+
+    return new_reg;
+}
+
+
+static region
+convert_exact_to_exact_may(region reg)
+{
+    region new_reg;
+
+    pips_debug(4,"begin\n");
+
+    new_reg = restrict_to_phi_constraints(reg);
+    effect_approximation_tag(new_reg) = is_approximation_exact;
+
+    pips_debug(4,"end\n");
+
+    return(new_reg);
+}
+
+
+static region
+approx_convert_may_to_approx_may(region reg)
+{
+    region new_reg;
+
+    pips_debug(4,"begin\n");
+
+    new_reg = restrict_to_phi_constraints(reg);
+    effect_approximation_tag(new_reg) = is_approximation_may;
+
+    pips_debug(4,"end\n");
+
+    return(new_reg);
+}
+
+
+static region
+approx_convert(region reg)
+{
+    region new_reg;
+
+    pips_debug(4,"begin\n");
+
+    if (region_scalar_p(reg))
+    {
+	pips_debug(9,"scalar\n");
+
+	new_reg = reg;
+    }
+    else
+    {
+	if ( effect_exact_p(reg) )
+	    new_reg = convert_exact_to_exact_may(reg);
+	else
+	    new_reg = approx_convert_may_to_approx_may(reg);
+    }
+    pips_debug(4,"end\n");
+
+    return new_reg;
+}
+	
 
 /* modifies global var current_caller_stmt */
 static bool stmt_filter(s)
@@ -125,14 +283,15 @@ add_parameter_aliases_for_this_call_site(call call_site,
 		 {
 		    reference real_ref = syntax_reference(real_syn);
 		    entity real_ent = reference_variable(real_ref);
-		    region real_reg;
+		    region trans;
+		    region formal;
+		    region actual;
 		    list pair;
-		    /* list new_pair; */
 
 		    pips_debug(9,"arg refers to entity\n");
 		    pips_debug(9,"\t%s\n",entity_name(real_ent));
 
-		    real_reg =
+		    trans =
 			region_translation(
 			    callee_region,
 			    callee,
@@ -143,7 +302,7 @@ add_parameter_aliases_for_this_call_site(call call_site,
 			    VALUE_ZERO,
 			    BACKWARD);
 
-		    pair = CONS(EFFECT,real_reg,NIL);
+		    pair = CONS(EFFECT,trans,NIL);
 
 		    ifdebug(9)
 			{
@@ -154,9 +313,7 @@ add_parameter_aliases_for_this_call_site(call call_site,
 		    /* the actual parameter must be expressed relative to
 		       the store at the point of entry of the caller, so
 		       that it can be compared to other regions */
-		    /* pair =
-			convex_regions_inverse_transformer_compose(pair,
-								   context);*/
+
 		    pair =
 			convex_regions_transformer_compose(pair,context);
 
@@ -166,16 +323,27 @@ add_parameter_aliases_for_this_call_site(call call_site,
 			    print_inout_regions(pair);
 			}
 
-		    /* express in global variables only
-		    pair = regions_dynamic_elim(pair);
+		    actual = approx_convert(EFFECT(CAR(pair)));
+
+		    pair = CONS(EFFECT,actual,NIL);
 
 		    ifdebug(9)
 			{
-			    pips_debug(9,"with local variables removed:\n\t");
+			    pips_debug(9,"restricted to:\n\t");
 			    print_inout_regions(pair);
-			}*/
+			}
 
-		    pair = CONS(EFFECT,region_dup(callee_region),pair);
+/* donne erreur Newgen
+   formal = approx_convert(callee_region); */
+		    formal = approx_convert(region_dup(callee_region));
+
+		    pair = CONS(EFFECT,formal,pair);
+
+		    ifdebug(9)
+			{
+			    pips_debug(9,"alias pair:\n\t");
+			    print_inout_regions(pair);
+			}
 
 		    list_pairs = CONS(EFFECTS,make_effects(pair),list_pairs);
 		}
@@ -203,25 +371,26 @@ add_alias_pairs_for_this_call_site(call call_site)
 
     pips_debug(4,"begin\n");
 
-    pips_debug(9,
+/*    pips_debug(9,
 	       "try load_statement_precondition for statement %03d\n",
 	       statement_number(current_caller_stmt));
+	       */
 
     context = load_statement_precondition(current_caller_stmt);
 
-    pips_debug(9,"got context:\n\t%s\n",transformer_to_string(context));
+/* transformer_to_string no longer implemented */
+/*    pips_debug(9,"got context:\n\t%s\n",transformer_to_string(context)); */
 
-    pips_debug(9,"try call_arguments\n");
+/*    pips_debug(9,"try call_arguments\n"); */
 
     real_args = call_arguments(call_site);
 
-    pips_debug(9,"try set_interprocedural_translation_context_sc\n");
-
-    pips_debug(9,"\tfor callee %s\n",entity_name(callee));
+/*    pips_debug(9,"try set_interprocedural_translation_context_sc\n");
+    pips_debug(9,"\tfor callee %s\n",entity_name(callee)); */
 
     set_interprocedural_translation_context_sc(callee, real_args);
 
-    pips_debug(9,"try set_backward_arguments_to_eliminate\n");
+/*    pips_debug(9,"try set_backward_arguments_to_eliminate\n"); */
 
     set_backward_arguments_to_eliminate(callee);
 
