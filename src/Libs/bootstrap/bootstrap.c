@@ -1,14 +1,14 @@
 /* Symbol table initialization with Fortran operators, commands and intrinsics
-
+   
    More information is provided in effects/effects.c
-
+   
    Remi Triolet
-
+   
    Modifications:
    - add intrinsics according to Fortran standard Table 5, pp. 15.22-15-25,
    Francois Irigoin, 02/06/90
    - add .SEQ. to handle ranges outside of arrays [pj]
-
+   
    Bugs:
    - intrinsics are not properly typed
    */
@@ -28,7 +28,8 @@
 
 #include "misc.h"
 #include "pipsdbm.h"
-
+#include "parser_private.h"
+#include "syntax.h"
 #include "constants.h"
 #include "resources.h"
 
@@ -42,11 +43,57 @@ void CreateAreas()
 		make_storage(is_storage_rom, UU),
 		make_value(is_value_unknown, UU));
 
+
     make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME, 
 				 STATIC_AREA_LOCAL_NAME),
 		make_type(is_type_area, make_area(0, NIL)),
 		make_storage(is_storage_rom, UU),
 		make_value(is_value_unknown, UU));
+}
+
+void CreateArrays()
+{
+    /* First a dummy function - close to C one "crt0()" - in order to
+       - link the next entity to its ram
+       - make an unbounded dimension for this entity
+       */
+
+    entity ent;
+
+    ent = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,TOP_LEVEL_MODULE_NAME),
+		      make_type(is_type_functional,
+				make_functional(NIL,make_type(is_type_void,NIL))),
+		      make_storage(is_storage_rom, UU),
+		      make_value(is_value_code,make_code(NIL, "")));
+
+    set_current_module_entity(ent);
+
+    /* GO: entity for io effects : It is an array which*/
+    make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
+				 IO_EFFECTS_ARRAY_NAME),
+		MakeTypeArray(make_basic(is_basic_int,
+					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
+			      CONS(DIMENSION,
+				   make_dimension
+				   (MakeIntegerConstantExpression("0"),
+				    /*
+				       MakeNullaryCall
+				       (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+				       */
+				    MakeIntegerConstantExpression("2000")
+				    ),
+				   NIL)),
+		/* make_storage(is_storage_ram,
+		   make_ram(entity_undefined, DynamicArea, 0, NIL))
+		   */
+		make_storage(is_storage_ram,
+			     make_ram(ent,
+				      global_name_to_entity(TOP_LEVEL_MODULE_NAME, 
+							    STATIC_AREA_LOCAL_NAME),
+				      0, NIL)),
+		make_value(is_value_unknown, UU));
+
+    reset_current_module_entity();
 }
 
 /* the following data structure describes an intrinsic function: its
@@ -260,6 +307,7 @@ string program;
 {
     CreateIntrinsics();
     CreateAreas();
+    CreateArrays();
 
     /* DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(program), NULL); */
     /* FI, Could also be:
