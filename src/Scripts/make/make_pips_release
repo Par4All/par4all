@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/13 16:42:33 $, 
+# $Date: 1996/09/13 16:43:45 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -131,9 +131,9 @@ test "$tz" &&
 {
     cd $cwd
     $verb "taring ($tar $taropt) and zipping ($zip)"
-    $tar $taropt $base.tar $base
-    $zip $base.tar
-    rm -rf $base
+    $tar $taropt $name.tar $name
+    $zip $name.tar
+    rm -rf $name
 }
 
 # end of $RCSfile: make_pips_release,v $
