@@ -2,20 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
-# Revision 1.113  1997/05/14 13:17:08  coelho
-# *** empty log message ***
+# Revision 1.114  1997/05/22 17:01:11  coelho
+# PIPS_DIRECTORY_FOR_BINARIES added.
 #
-# Revision 1.112  1997/05/14 13:14:41  coelho
-# *** empty log message ***
-#
-# Revision 1.111  1997/05/14 12:36:58  coelho
-# *** empty log message ***
-#
-# Revision 1.110  1997/05/14 12:32:57  coelho
-# *** empty log message ***
-#
-# Revision 1.109  1997/05/13 20:39:56  coelho
-# *** empty log message ***
 #
 # Revision 1.108  1997/05/13 20:30:12  coelho
 # some settings for Linux.
@@ -148,6 +137,12 @@ PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
 # redefine this variable if you wish to change the default path or the name...
 # PIPS_MAKE='gmake'
 
+# PIPS_DIRECTORY_FOR_BINARIES
+# where to put binaries (maybe on some other disk...)
+# default is directly in a subdirectory
+
+test "${PIPS_ARCH}" = LINUXI86 && \
+	PIPS_DIRECTORY_FOR_BINARIES=/usr/local/misc/pips/LINUXI86
 
 ############################################################ DEVELOPPING PIPS
 
