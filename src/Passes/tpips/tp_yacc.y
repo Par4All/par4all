@@ -186,7 +186,7 @@ i_create:
 		    {
 			/* string wname = db_get_current_workspace_name();*/
 			db_close_workspace();
-			delete_workspace($<name>4);
+			(void) delete_workspace($<name>4);
 			user_error("create", "Could not create workspace"
 					" %s\n", $<name>4);
 		    }
@@ -255,15 +255,21 @@ i_delete:
 				wname);
 		    $$ = FALSE;
 		} else {
-		    if(delete_workspace (t)) {
-			/* In case of problem, user_error() has been
-			   called, so it is OK now !!*/
-			user_log ("Workspace %s deleted.\n", t);
-			$$ = TRUE;
+		    if(workspace_exists_p(t)) {
+			if(delete_workspace (t)) {
+			    /* In case of problem, user_error() has been
+			       called, so it is OK now !!*/
+			    user_log ("Workspace %s deleted.\n", t);
+			    $$ = TRUE;
+			}
+			else {
+			    user_error("delete",
+				       "Could not delete workspace %s\n", t);
+			}
 		    }
 		    else {
-			user_error("delete",
-				   "Could not delete workspace %s\n", t);
+			    user_error("delete",
+				       "%s: No such workspace\n", t);
 		    }
 		}
 	    }
