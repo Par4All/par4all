@@ -12,6 +12,14 @@
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
+
+#include "dg.h"
+
+/* Instantiation of the dependence graph: */
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
+
 #include "database.h"
 
 #include "misc.h"
@@ -25,12 +33,6 @@
 #include "text-util.h"
 #include "control.h"
 #include "effects-simple.h"
-#include "dg.h"
-
-/* Instantiation of the dependence graph: */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-#include "graph.h"
 
 #include "ricedg.h"
 #include "semantics.h"
