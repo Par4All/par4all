@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/10/19 11:40:43 $, )
+# ($Date: 1996/10/19 11:52:55 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -14,7 +14,7 @@ PIPS_ARCH=.
 endif
 
 # the RT architecture relies both on PVM and PIPS architectures,
-# because of obscure issues related to naming conventions...
+# because of obscure issues related to naming conventions when g77 is used...
 
 ifeq ($(PIPS_ARCH),.)
 RT_ARCH=$(PVM_ARCH)
@@ -33,16 +33,6 @@ endif
 
 # the default is to use the same compilers and options as the library.
 include $(RT_DIR)/$(RT_ARCH)/compilers.make
-
-#
-# special options driven by defines:
-# USE_PVMe
-# USE_GNU
-
-ifdef _HPFC_USE_PVMe_
-all:	$(TARGET).cmd
-PVM=pvme
-endif
 
 #
 # PVM arch dependent settings
@@ -99,6 +89,13 @@ PVM_GLIB 	+= -lgpvm3
 PVM_HLIB 	+= -lpvm3
 
 ifdef _HPFC_USE_PVMe_
+# we're using pvme, that's sure!
+PVM=pvme
+# for requesting nodes on the SP2: pvmd3e -ip -share cpu 8 &
+# load leveller command files:
+all:	$(TARGET).cmd
+# the directory organization is fun with IBM: 
+# e.g. headers are in /lib (I guess this is IBM standard:-)
 pvmlib		= $(PVM_ROOT)/lib
 pvminc		= $(PVM_ROOT)/lib
 PVM_GLIB	=
@@ -124,12 +121,14 @@ endif
 
 ifeq ($(PVM_ARCH),CRAY)
 #
-# the CRAY T3D does not require any library
+# the CRAY T3D does not require any library... 
 #
 PVM_FLIB =
 PVM_GLIB =
 PVM_HLIB =
 PVM_NLIB =
+# 
+pvminc  = /usr/include/mpp
 endif
 
 RUNTIME_LIBS	+= -lhpfcruntime
@@ -250,8 +249,7 @@ param_init.m4:;	$(RT_DIR)/hpfc_generate_init -n $(TARGET) .
 param_init.f: param_init.m4
 	$(M4) -D PVM_ARCH=$(PVM_ARCH) param_init.m4 > param_init.f
 
-%.o: %.f
-	$(FC) $(FFLAGS) $(FOPT) -c $< 
+%.o: %.f; $(FC) $(FFLAGS) $(FOPT) -c $< 
 
 #
 # Link
