@@ -6,7 +6,7 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/07/20 18:40:37 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/08/01 15:02:40 $, )
  * version $Revision$
  */
 
@@ -53,9 +53,9 @@ void reset_dynamic_status()
 
 dynamic_status get_dynamic_status()
 {
-    return(make_dynamic_status(get_dynamic_hpf(),
-			       get_primary_entity(),
-			       get_renamings()));
+    return make_dynamic_status(get_dynamic_hpf(), 
+			       get_primary_entity(), 
+			       get_renamings());
 }
 
 void set_dynamic_status(d)
@@ -136,7 +136,7 @@ entity e;
     AddEntityToDeclarations(new_e, get_current_module_entity());
 
     add_dynamic_synonym(new_e, e);
-    return(new_e);
+    return new_e;
 }
 
 /*  builds a new synonym for array a, the alignment of which 
@@ -149,7 +149,7 @@ align al;
     entity new_a = new_synonym(a);
     set_array_as_distributed(new_a);
     store_entity_align(new_a, al);
-    return(new_a);
+    return new_a;
 }
 
 /*  builds a new synonym for template t, the distribution of which
@@ -162,7 +162,7 @@ distribute di;
     entity new_t = new_synonym(t);
     set_template(new_t);
     store_entity_distribute(new_t, di);
-    return(new_t);
+    return new_t;
 }
 
 /*  comparison of DISTRIBUTE.
@@ -173,7 +173,7 @@ distribute d1, d2;
     list /* of distributions */ l1 = distribute_distribution(d1),
                                 l2 = distribute_distribution(d2);
 
-    if (distribute_processors(d1)!=distribute_processors(d2)) return(FALSE);
+    if (distribute_processors(d1)!=distribute_processors(d2)) return FALSE;
     
     assert(gen_length(l1)==gen_length(l2));
 
@@ -185,14 +185,14 @@ distribute d1, d2;
 	      s2 = distribution_style(i2);
 	tag t1 = style_tag(s1);
 
-	if (t1!=style_tag(s2)) return(FALSE);
+	if (t1!=style_tag(s2)) return FALSE;
 	if (t1!=is_style_none &&
 	    !expression_equal_p(distribution_parameter(i1),
 				distribution_parameter(i2)))
-	    return(FALSE);
+	    return FALSE;
     }
 
-    return(TRUE);
+    return TRUE;
 }
 
 /*  comparison of ALIGN.
@@ -207,14 +207,14 @@ list /* of alignments */ l;
     MAP(ALIGNMENT, b,
     {
 	if (adim==alignment_arraydim(b) && tdim==alignment_templatedim(b))
-	    return(expression_equal_p(alignment_rate(a), 
+	    return expression_equal_p(alignment_rate(a), 
 				      alignment_rate(b)) &&
 		   expression_equal_p(alignment_constant(a), 
-				      alignment_constant(b)));
+				      alignment_constant(b));
     },
 	l);
 
-    return(FALSE);
+    return FALSE;
 }
 
 static bool same_align_p(a1, a2)
@@ -223,13 +223,13 @@ align a1, a2;
     list /* of alignments */ l1 = align_alignment(a1),
                              l2 = align_alignment(a2);
 
-    if (align_template(a1)!=align_template(a2)) return(FALSE);
+    if (align_template(a1)!=align_template(a2)) return FALSE;
 
     MAP(ALIGNMENT, a,
-	if (!same_alignment_in_list_p(a, l2)) return(FALSE),
+	if (!same_alignment_in_list_p(a, l2)) return FALSE,
 	l1);
 
-    return(TRUE);
+    return TRUE;
 }
 
 /* entity array_synonym_aligned_as(array, a)
@@ -259,13 +259,13 @@ align a;
 	if (same_align_p(load_entity_align(ar), a))
 	{
 	    free_align(a);
-	    return(ar);    /* the one found is returned */
+	    return ar;    /* the one found is returned */
 	}
     }
 
     /*  else no compatible array does exist, so one must be created
      */
-    return(new_synonym_array(array, a));
+    return new_synonym_array(array, a);
 }
 
 align new_align_with_template(a, t)
@@ -274,7 +274,7 @@ entity t;
 {
     align b = copy_align(a);
     align_template(b) = t;
-    return(b);
+    return b;
 }
 
 /* entity template_synonym_distributed_as(temp, d)
@@ -303,13 +303,13 @@ distribute d;
 	if (same_distribute_p(load_entity_distribute(t), d))
 	{
 	    free_distribute(d);
-	    return(t);    /* the one found is returned */
+	    return t;    /* the one found is returned */
 	}
     }
 
     /*  else no compatible template does exist, so one must be created
      */
-    return(new_synonym_template(temp, d));
+    return new_synonym_template(temp, d);
 }
 
 /* DYNAMIC LOCALS
@@ -319,7 +319,6 @@ GENERIC_LOCAL_FUNCTION(used_dynamics, statement_entities);
 GENERIC_LOCAL_FUNCTION(remapping_graph, controlmap);
 GENERIC_LOCAL_FUNCTION(reaching_mappings, statement_entities);
 GENERIC_LOCAL_FUNCTION(leaving_mappings, statement_entities);
-GENERIC_LOCAL_FUNCTION(propagated, statement_entities);
 GENERIC_LOCAL_FUNCTION(remapped, statement_entities);
 
 void init_dynamic_locals()
@@ -328,7 +327,6 @@ void init_dynamic_locals()
     init_used_dynamics();
     init_reaching_mappings();
     init_leaving_mappings();
-    init_propagated();
     init_remapped();
     init_remapping_graph();
 }
@@ -339,7 +337,6 @@ void close_dynamic_locals()
     close_used_dynamics();
     close_reaching_mappings();
     close_leaving_mappings();
-    close_propagated();
     close_remapped();
 
     /*  can't close it directly...
@@ -463,7 +460,7 @@ statement s;
     what_stat_debug(8, s);
 
     if (!instruction_call_p(i)) 
-	return(TRUE);
+	return TRUE;
     else
     {
 	call c = instruction_call(i);
@@ -483,7 +480,7 @@ statement s;
 		     */
 		    reference_variable(r) = new_variable;
 		    add_as_a_closing_statement(s);
-		    return(FALSE);
+		    return FALSE;
 		}
 	    },
 		call_arguments(c));
@@ -509,13 +506,13 @@ statement s;
 				new_variable;
 		    
 		    add_as_a_closing_statement(s);
-		    return(FALSE);
+		    return FALSE;
 		}
 	    },
 		call_arguments(c));
 	}
 
-	return(TRUE);
+	return TRUE;
     }
 }
 
@@ -584,77 +581,13 @@ statement s;
     store_reaching_mappings(s, make_entities(le));
     store_remapped(s, make_entities(lp));
     store_leaving_mappings(s, make_entities(ll));
-    store_propagated(s, make_entities(NIL));
-}
-
-/* for statements in lc
- * - array is a reaching mapping
- * - if added, to be checked
- * C_b = q
- */
-static list /* of statements */ 
-propagate_reaching_array(array, lc, ls)
-entity array;
-list /* of controls */ lc;
-list /* of statements */ ls;
-{
-    entity primary = load_primary_entity(array);
-
-    MAP(CONTROL, c,
-    {
-	statement s = control_statement(c);
-	entities es = load_reaching_mappings(s);
-	list lr = entities_list(es);
-	
-	if (gen_in_list_p(primary, entities_list(load_remapped(s))) &&
-	    !gen_in_list_p(array, lr))
-	{
-	    ls = gen_once(s, ls);
-	    entities_list(es) = CONS(ENTITY, array, lr);
-	}
-    },
-	lc);
-
-    return(ls);
-}
-
-/* C_c = m*r*C_b
- */
-static list /* of statements */ 
-propagate_all_unsused(s, ls)
-statement s;
-list /* of statements */ ls;
-{
-    entities propagated = load_propagated(s),
-             leaving = load_leaving_mappings(s);
-    list /* of entities */ lp = entities_list(propagated), /* gonna be the Q */
-                           le = entities_list(load_used_dynamics(s)),
-         /* of controls */ lc = control_successors(load_remapping_graph(s));
-
-    MAP(ENTITY, array,
-    {
-	entity primary = load_primary_entity(array);
-	
-	if (!gen_in_list_p(primary, le) && !gen_in_list_p(array, lp))
-	{
-	    what_stat_debug(4, s);
-	    pips_debug(4, "propagating %s\n", entity_name(array));
-	    
-	    ls = propagate_reaching_array(array, lc, ls);
-	    entities_list(leaving) = gen_once(array, entities_list(leaving));
-	    entities_list(propagated) = 
-		CONS(ENTITY, array, entities_list(propagated));
-	}
-    },
-	entities_list(load_reaching_mappings(s)));
-    
-    return(ls);
 }
 
 /* {sh,c}ould be integrated in the mapping propagation phase ?
  * C_d = m
  */
-static void remove_not_remapped_leavings(s)
+static void 
+remove_not_remapped_leavings(s)
 statement s;
 {
     entities leaving  = load_leaving_mappings(s);
@@ -662,7 +595,6 @@ statement s;
 	ll = entities_list(leaving),
 	ln = gen_copy_seq(ll),
 	lr = entities_list(load_remapped(s)),
-	li = entities_list(load_reaching_mappings(s)),
 	lu = entities_list(load_used_dynamics(s));
     entity primary;
 
@@ -670,9 +602,8 @@ statement s;
     {
 	primary = load_primary_entity(array);
 	
-	if (!gen_in_list_p(primary, lu) && /* NOT USED and */
-	    gen_in_list_p(primary, lr) && /* REMAPPED and */
-	    !gen_in_list_p(array, li))     /* NOT REACHED */
+	if (gen_in_list_p(primary, lr) && /* REMAPPED and */
+	    !gen_in_list_p(primary, lu))  /* NOT USED */
 	{
 	    what_stat_debug(4, s);
 	    pips_debug(4, "removing %s\n", entity_name(array));
@@ -684,36 +615,79 @@ statement s;
     gen_free_list(ll), entities_list(leaving) = ln;
 }
 
-/* A remapped from x and no reaching x ->
- * not from x, and no leaving x if remapped but not used...
- */
-/* C_e = q
- */
-static bool reached_mapping_p(array, lc)
-entity array;
-list /* of controls */ lc;
+static void
+reinitialize_reaching_mappings(s)
+statement s;
 {
-    MAP(CONTROL, c,
-	if (gen_in_list_p(array, 
-			  entities_list(load_leaving_mappings
-			   (control_statement(c)))))
-	     return(TRUE),
-	 lc);
+    entities er = load_reaching_mappings(s);
+    list /* of entity */ newr = NIL, /* new reachings */
+                         lrem = entities_list(load_remapped(s));
 
-    return(FALSE);
+    gen_free_list(entities_list(er));
+
+    MAP(CONTROL, c,
+    {
+	MAP(ENTITY, e,
+	{
+	    if (gen_in_list_p(load_primary_entity(e), lrem))
+		newr = gen_once(e, newr);
+	},
+	    entities_list(load_leaving_mappings(control_statement(c))));
+    },
+	control_predecessors(load_remapping_graph(s)));
+
+    entities_list(er) = newr;
 }
 
-/* C_f = q
- */
 static list /* of statements */
-add_successors(s, ls)
+propagate_used_arrays(s, ls)
 statement s;
 list /* of statements */ ls;
 {
-    list /* of controls */ lc = control_successors(load_remapping_graph(s));
-    MAP(CONTROL, c, ls = gen_once(control_statement(c), ls), lc);
-    return(ls);
+    bool touched = FALSE;
+    entities er = load_reaching_mappings(s);
+    list /* of entity */
+	lrem = entities_list(load_remapped(s)),
+	lrea = entities_list(er);
+    control current = load_remapping_graph(s);
+
+    MAP(CONTROL, c,
+    {
+	statement sc = control_statement(c);
+	list /* of entity */ lp_rem = entities_list(load_remapped(sc));
+	list /* idem      */ lp_use = entities_list(load_used_dynamics(sc));
+
+	MAP(ENTITY, e,
+	{
+	    entity prim = load_primary_entity(e);
+
+	    if (gen_in_list_p(prim, lrem) && 
+		gen_in_list_p(prim, lp_rem) &&
+		!gen_in_list_p(prim, lp_use) &&
+		!gen_in_list_p(e, lrea))
+	    {
+		lrea = CONS(ENTITY, e, lrea);
+		touched = TRUE;
+	    }
+	},
+	    entities_list(load_reaching_mappings(sc)));
+    },
+	control_predecessors(current));
+
+    /* if Reachings(current) was modified, the successors of current
+     * may have to be recomputed at the next stage. quite rough.
+     */
+    if (touched)
+    {
+	entities_list(er) = lrea;
+	MAP(CONTROL, c, 
+	    ls = gen_once(control_statement(c), ls), 
+	    control_successors(current));
+    }
+
+    return ls;
 }
+
 
 /* C_g = r (if tests all the remaps for the primary, but 1 if primaries).
  */
@@ -735,7 +709,8 @@ entities es;
 
 /* C_h = m*C_g
  */
-static void remove_unused_remappings(s)
+static void 
+remove_unused_remappings(s)
 statement s;
 {
     entities remapped = load_remapped(s),
@@ -756,47 +731,6 @@ statement s;
 	le);
 
     gen_free_list(le);
-}
-
-/* C_i = m*r*(C_e+C_f)
- */
-static list /* of statements */
-kill_dead_remappings(s, ls)
-statement s;
-list /* of statements */ ls;
-{
-    entity primary;
-    entities reaching = load_reaching_mappings(s),
-             leaving = load_leaving_mappings(s);
-    list /* of controls */ lc = control_predecessors(load_remapping_graph(s)),
-         /* of entities */ le = gen_copy_seq(entities_list(reaching)),
-                           lu = entities_list(load_used_dynamics(s)),
-                           lr = entities_list(load_remapped(s));
-
-    if (s==get_current_module_statement()) return(ls); 
-
-    MAP(ENTITY, array,
-    {
-	primary = load_primary_entity(array);
-	
-	if (!reached_mapping_p(array, lc))
-	{
-	    what_stat_debug(4, s);
-	    pips_debug(4, "killing reaching %s\n", entity_name(array));
-	    
-	    gen_remove(&entities_list(reaching), array);
-	    
-	    if (!gen_in_list_p(primary, lu) && gen_in_list_p(primary, lr))
-	    {
-		gen_remove(&entities_list(leaving), array);
-		ls = add_successors(s, ls);
-	    }
-	}	     
-    }, 
-	le);
-
-    gen_free_list(le); 
-    return(ls);
 }
 
 /* C_j = m*r
@@ -843,7 +777,7 @@ list_of_remapping_statements()
 {
     list /* of statements */ l = NIL;
     CONTROLMAP_MAP(s, c, l = CONS(STATEMENT, s, l), get_remapping_graph());
-    return(l);
+    return l;
 }
 
 /* functions used for debug.
@@ -894,28 +828,28 @@ statement s;
  *    assumes fast sets instead of lists, with O(1) tests/add/del...
  *    closure: O(n^2*vertex_operation) (if it is a simple propagation...)
  *    map: O(n*vertex_operation)
- *    C = n + n*m + n^2*m*r*q + n*m + n*m*r + n^2*m*r*q + n*m*r = O(n^2*m*r*q)
+ *    C = 
  */
 void simplify_remapping_graph()
 {
     list /* of statements */ ls = list_of_remapping_statements();
-    statement root = get_current_module_statement(); /* C_k */
-
+    statement root = get_current_module_statement();
     what_stat_debug(4, root);
 
-    gen_map(initialize_reaching_propagation, ls); /* n*C_a */
+    gen_map(initialize_reaching_propagation, ls);
 
     ifdebug(4) gen_map(dump_remapping_graph_info, ls);
 
-    gen_closure(propagate_all_unsused, ls);    /* n^2*C_c */
-    gen_map(remove_not_remapped_leavings, ls); /* n*C_d */
+    gen_map(remove_not_remapped_leavings, ls);
+    gen_map(reinitialize_reaching_mappings, ls);
+    gen_closure(propagate_used_arrays, ls);
 
     ifdebug(4) gen_map(dump_remapping_graph_info, ls);
 
-    if (bound_remapped_p(root))	remove_unused_remappings(root); /* n*C_h */
-    gen_closure(kill_dead_remappings, ls); /* n^2*C_i */
+    if (bound_remapped_p(root))	remove_unused_remappings(root);
 
-    gen_map(regenerate_renamings, ls); /* n*C_j */
+    gen_map(regenerate_renamings, ls);
+
     gen_map(gen_free, load_renamings(root)),
     gen_free_list(load_renamings(root)), 
     (void) delete_renamings(root);
@@ -966,7 +900,7 @@ entity t;
     },
 	list_of_distributed_arrays());
 
-    gen_free_list(lseens); return(l);
+    gen_free_list(lseens); return l;
 }
 
 /* statement generate_copy_loop_nest(src, trg)
@@ -1036,7 +970,7 @@ entity src, trg;
     DEBUG_STAT(7, concatenate(entity_name(src), " -> ", entity_name(trg), NULL),
 	       current);
 
-    return(current);
+    return current;
 }
 
 /* that is all
