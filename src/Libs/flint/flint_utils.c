@@ -14,7 +14,6 @@
 #include <string.h>
 #include <ctype.h>
 /* #include <stdlib.h> */
-extern int      fprintf();
 
 /* PiPs specific headers */
 #include "genC.h"
