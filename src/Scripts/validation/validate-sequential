@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/03/27 18:57:03 $, ) 
+# ($Date: 1997/03/29 11:00:47 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -230,7 +230,7 @@ make_diff()
   cp $tmpout $refresult.out
 
   # diff -e $aspect/$name.result/$module $tmpout > $diffout_e
-  diff $refresult $tmpout > $diffout
+  ${PIPS_DIFF:-diff} $refresult $tmpout > $diffout
   status=$?
   lines=`wc -l $diffout | sed 's,^ *\([0-9][0-9]*\)[^0-9].*,\1,'`
   if [ $lines -gt $MAX_NB_LINES ] 
