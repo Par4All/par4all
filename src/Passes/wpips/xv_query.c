@@ -27,11 +27,11 @@ success (*func)();
     Display *dpy;
     Window query_xwindow;
 
-    xv_set(query_frame, FRAME_LABEL, window_title, 0);
+    xv_set(query_frame, FRAME_LABEL, window_title, NULL);
 
-    xv_set(query_pad, PANEL_LABEL_STRING, query_title, 0);
+    xv_set(query_pad, PANEL_LABEL_STRING, query_title, NULL);
 
-    xv_set(query_pad, PANEL_VALUE, "", 0);
+    xv_set(query_pad, PANEL_VALUE, "", NULL);
 
     query_help_topic = help_topic;
 
@@ -101,7 +101,7 @@ Event *event;
 
 void create_query_window()
 {
-    query_panel = xv_create(query_frame, PANEL, 0);
+    query_panel = xv_create(query_frame, PANEL, NULL);
 
     xv_set(canvas_paint_window(query_panel), 
 	   WIN_CONSUME_EVENT, LOC_WINENTER, 
@@ -113,21 +113,23 @@ void create_query_window()
     query_pad = xv_create(query_panel, PANEL_TEXT, 
 			  PANEL_VALUE_DISPLAY_LENGTH, 20,
 			  PANEL_VALUE_STORED_LENGTH, 128,
-			  0);
+			  NULL);
 
-    (void) xv_create(query_panel, PANEL_BUTTON,
+    xv_set(query_panel, PANEL_DEFAULT_ITEM,
+		xv_create(query_panel, PANEL_BUTTON,
 		     PANEL_LABEL_STRING, " OK ",
 		     XV_Y, xv_row(query_panel, 2),
 		     XV_X, QUERY_WIDTH/2-100,
 		     PANEL_NOTIFY_PROC, end_query_notify,
-		     0);
+		     NULL),NULL);
+
     (void) xv_create(query_panel, PANEL_BUTTON,
 		     PANEL_LABEL_STRING, "Help",
 		     PANEL_NOTIFY_PROC, help_query_notify,
-		     0);
+		     NULL);
 
     (void) xv_create(query_panel, PANEL_BUTTON,
 		     PANEL_LABEL_STRING, "Cancel",
 		     PANEL_NOTIFY_PROC, cancel_query_notify,
-		     0);
+		     NULL);
 }
