@@ -8,6 +8,9 @@
 # $Id$
 #
 # $Log: pips_set_directory_for_binaries,v $
+# Revision 1.8  1997/11/17 07:37:40  coelho
+# remove depend files as well.
+#
 # Revision 1.7  1997/08/19 07:29:47  coelho
 # cleaner...
 #
@@ -154,7 +157,7 @@ verb "Cleaning sources from ${arch} direct"
 find 	${PIPS_ROOT}/Src   ${PIPS_DEVEDIR} \
 	${LINEAR_ROOT}/Src ${LINEAR_DEVEDIR} \
 	${NEWGEN_ROOT}/Src ${NEWGEN_DEVEDIR} \
-	-name "${arch}" -print |
+	\( -name "${arch}" -o -name "Makefile.depend.${arch}" \) -print |
 xargs rm -rf 
 
 #
