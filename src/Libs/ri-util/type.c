@@ -91,29 +91,99 @@ cons * ld;
 
 parameter MakeOverloadedParameter()
 {
-    return(make_parameter((MakeTypeArray(make_basic(is_basic_overloaded, 
-						    UU), NIL)),
+  return MakeAnyScalarParameter(is_basic_overloaded, UU);
+}
+
+parameter MakeIntegerParameter()
+{
+  return MakeAnyScalarParameter(is_basic_int, DEFAULT_REAL_TYPE_SIZE);
+}
+
+parameter MakeRealParameter()
+{
+  return MakeAnyScalarParameter(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
+}
+
+parameter MakeDoubleprecisionParameter()
+{
+  return MakeAnyScalarParameter(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
+}
+
+parameter MakeLogicalParameter()
+{
+  return MakeAnyScalarParameter(is_basic_logical, DEFAULT_LOGICAL_TYPE_SIZE);
+}
+
+parameter MakeComplexParameter()
+{
+  return MakeAnyScalarParameter(is_basic_complex, DEFAULT_COMPLEX_TYPE_SIZE);
+}
+
+parameter MakeCharacterParameter()
+{
+  return make_parameter(MakeTypeArray(make_basic(is_basic_string, 
+						 make_value(is_value_constant,
+							    make_constant(is_constant_int,
+									  DEFAULT_CHARACTER_TYPE_SIZE))),
+				      NIL),
+			make_mode(is_mode_value, UU));
+}
+
+parameter MakeAnyScalarParameter(tag t, int size)
+{
+    return(make_parameter((MakeTypeArray(make_basic(t, 
+						    size), NIL)),
 			  make_mode(is_mode_value, UU)));
 }
 
-/* this function creates a fortran operator result, i.e. a zero
-dimension variable with an overloaded basic type. */
-
+/* this function creates a default fortran operator result, i.e. a zero
+ * dimension variable with an overloaded basic type.
+ */
 type MakeOverloadedResult()
 {
-    return(MakeTypeArray(make_basic(is_basic_overloaded, UU), NIL));
+    return MakeAnyScalarResult(is_basic_overloaded, UU);
 }
 
-/*
- * MakeIntegerResult
- *
- * made after MakeOverloadedResult in ri-util/type.c
- */
 type MakeIntegerResult()
 {
-    return(MakeTypeArray(make_basic(is_basic_int, 4), NIL));
+    return MakeAnyScalarResult(is_basic_int, DEFAULT_INTEGER_TYPE_SIZE);
 }
 
+type MakeRealResult()
+{
+    return MakeAnyScalarResult(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
+}
+
+type MakeDoubleprecisionResult()
+{
+    return MakeAnyScalarResult(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
+}
+
+type MakeLogicalResult()
+{
+    return MakeAnyScalarResult(is_basic_logical, DEFAULT_LOGICAL_TYPE_SIZE);
+}
+
+type MakeComplexResult()
+{
+    return MakeAnyScalarResult(is_basic_complex, DEFAULT_COMPLEX_TYPE_SIZE);
+}
+
+type MakeCharacterResult()
+{
+  return MakeTypeArray(make_basic(is_basic_string, 
+				  make_value(is_value_constant,
+					     make_constant(is_constant_int,
+							   DEFAULT_CHARACTER_TYPE_SIZE))),
+		       NIL);
+}
+
+type MakeAnyScalarResult(tag t, int size)
+{
+    return(MakeTypeArray(make_basic(t, size), NIL));
+}
+
+
 bool type_equal_p(t1, t2)
 type t1;
 type t2;
