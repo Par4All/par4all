@@ -8,6 +8,10 @@
 #define _polyparam_H_
 #if (defined(__STDC__) || defined(__cplusplus))
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 extern void Compute_PDomains ( Param_Domain *PD, int nb_domains, int
                                working_space );
 extern Param_Polyhedron *GenParamPolyhedron (Polyhedron *Pol);
@@ -32,6 +36,10 @@ extern Param_Polyhedron *Polyhedron2Param_Vertices ( Polyhedron *Din,
 extern void Print_Domain ( FILE *DST, Polyhedron *D, char **param_names );
 extern void Print_Vertex ( FILE *DST, Matrix *V, char **param_names );
 extern Matrix *VertexCT( Matrix *V, Matrix *CT );
+
+#if defined(__cplusplus)
+}
+#endif
 
 #else /* (defined(__STDC__) || defined(__cplusplus)) */
 

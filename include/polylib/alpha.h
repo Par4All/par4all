@@ -8,6 +8,10 @@
 #define _alpha_h_
 #if (defined(__STDC__) || defined(__cplusplus))
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 extern int GaussSimplify ( Matrix *M, Matrix *M2 );
 extern int PolyhedronLTQ ( Polyhedron *P1, Polyhedron *P2, int INDEX, int
                            PDIM, int MAXRAYS );
@@ -16,6 +20,9 @@ extern int PolyhedronTSort ( Polyhedron ** L, unsigned int n, unsigned
                              int * pvect, unsigned int MAXRAYS );
 extern int Polyhedron_Not_Empty ( Polyhedron *P, Polyhedron *C, int
                                   MAXRAYS );
+#if defined(__cplusplus)
+}
+#endif
 
 #else /* (defined(__STDC__) || defined(__cplusplus)) */
 

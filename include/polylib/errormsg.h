@@ -8,7 +8,15 @@
 #define _errormsg_H_
 #if (defined(__STDC__) || defined(__cplusplus))
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 extern void errormsg1(char *f, char *msgname, char *msg);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #else /* (defined(__STDC__) || defined(__cplusplus)) */
 

@@ -2,7 +2,15 @@
 #define _param_H_
 #if (defined(__STDC__) || defined(__cplusplus))
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 extern char **Read_ParamNames(FILE *in, int m);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #else /* (defined(__STDC__) || defined(__cplusplus)) */
 

@@ -9,6 +9,10 @@
 #define _Zpolyhedron_h_
 #if (defined(__STDC__) || defined(__cplusplus))
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 extern void CanonicalForm(ZPolyhedron *Zpol, ZPolyhedron **Result,
 			  Matrix **Basis);
 extern ZPolyhedron *EmptyZPolyhedron (int dimension);
@@ -28,6 +32,9 @@ extern Bool ZPolyhedronIncludes ( ZPolyhedron *A, ZPolyhedron *B );
 extern ZPolyhedron *ZPolyhedron_Alloc ( Lattice *Lat, Polyhedron *Poly );
 extern ZPolyhedron *SplitZpolyhedron(/*ZPolyhedron *ZPol, Lattice *B */);
 
+#if defined(__cplusplus)
+}
+#endif
 
 #else /* (defined(__STDC__) || defined(__cplusplus)) */
 

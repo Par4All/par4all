@@ -8,6 +8,10 @@
 #define _Matop_h_
 #if (defined(__STDC__) || defined(__cplusplus))
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 extern Matrix *AddANullColumn ( Matrix *M );
 extern Matrix *AddANullRow ( Matrix *M );
 extern void ExchangeColumns ( Matrix *M, int Column1, int Column2 );
@@ -25,6 +29,10 @@ extern void PutRowLast ( Matrix *X, int Rownumber );
 extern Matrix *RemoveColumn ( Matrix *M, int Columnnumber );
 extern Matrix *RemoveRow ( Matrix *M, int Rownumber );
 extern Matrix *Transpose ( Matrix *A );
+
+#if defined(__cplusplus)
+}
+#endif
 
 #else /* (defined(__STDC__) || defined(__cplusplus)) */
 

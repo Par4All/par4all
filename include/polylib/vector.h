@@ -8,6 +8,10 @@
 #define _vector_H_
 #if (defined(__STDC__) || defined(__cplusplus))
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 extern void Factorial(int n,Value *result);
 extern void Binomial(int n,int p,Value *result);
 extern void CNP(int a,int b,Value *result);
@@ -44,6 +48,10 @@ extern void Vector_Normalize_Positive(Value *p,int length,
 extern void Vector_Reduce(Value *p,unsigned length,
                   void(*f)(Value,Value *),Value *result);
 extern void Vector_Sort(Value *vector,unsigned n);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #else /* (defined(__STDC__) || defined(__cplusplus)) */
 

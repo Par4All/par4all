@@ -8,7 +8,15 @@
 #define _SolveDio_h_
 #if (defined(__STDC__) || defined(__cplusplus))
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 extern int SolveDiophantine ( Matrix *M, Matrix **U, Vector **X );
+
+#if defined(__cplusplus)
+}
+#endif
 
 #else /* (defined(__STDC__) || defined(__cplusplus)) */
 
