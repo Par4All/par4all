@@ -28,9 +28,7 @@ extern fprintf();
 #include "hpfc.h"
 #include "defines-local.h"
 
-extern instruction MakeAssignInst(syntax l, expression r);
 extern entity CreateIntrinsic(string name); /* in syntax.h */
-
 
 /*
  * ??? this should work (but that is not the case yet),
@@ -76,9 +74,9 @@ list *lhp, *lnp;
     w = EXPRESSION(CAR(call_arguments(the_call)));
     
     pips_assert("generate_c1_beta",
-		(syntax_reference_p(expression_syntax(w)) &&
-		 (!array_distributed_p
-		  (reference_variable(syntax_reference(expression_syntax(w)))))));
+	      (syntax_reference_p(expression_syntax(w)) &&
+	      (!array_distributed_p
+	      (reference_variable(syntax_reference(expression_syntax(w)))))));
 
     /*
      * references to distributed arrays:
@@ -110,20 +108,20 @@ list *lhp, *lnp;
      * then updated statements are to be added to both host and nodes:
      */
 
-    staths = mere_statement(make_instruction 			
+    staths = make_stmt_of_instr(make_instruction 			
 			  (is_instruction_call, 			
-			   make_call(call_function(the_call), 				
-				     lUpdateExpr(oldtonewhostvar,
+			   make_call(call_function(the_call),
+				     lUpdateExpr(host_module,
 						 call_arguments(the_call)))));
 
-    statns = mere_statement(make_instruction 			
+    statns = make_stmt_of_instr(make_instruction 			
 			  (is_instruction_call, 			
-			   make_call(call_function(the_call), 				
-				     lUpdateExpr(oldtonewnodevar,
+			   make_call(call_function(the_call),
+				     lUpdateExpr(node_module,
 						 call_arguments(the_call)))));
 
-    IFDBPRINT(9, "generate_c1_beta", hostmodule, staths);
-    IFDBPRINT(9, "generate_c1_beta", nodemodule, statns);
+    IFDBPRINT(9, "generate_c1_beta", host_module, staths);
+    IFDBPRINT(9, "generate_c1_beta", node_module, statns);
 
     (*lhp) = gen_nconc((*lhp), CONS(STATEMENT, staths, NIL));
     (*lnp) = gen_nconc((*lnp), CONS(STATEMENT, statns, NIL));
@@ -215,17 +213,17 @@ list *lhp, *lnp;
      * then the updated statement is to be added to node:
      */
     ref = syntax_reference(expression_syntax(writtenexpr));
-    newarray  =  (entity) GET_ENTITY_MAPPING(oldtonewnodevar, reference_variable(ref));
+    newarray  =  load_entity_node_new(reference_variable(ref));
     generate_compute_local_indices(ref, &lstat, &linds);
     newref = make_reference(newarray, linds);
     newreadexpr = 
-	UpdateExpressionForModule(oldtonewnodevar,
+	UpdateExpressionForModule(node_module,
 				  EXPRESSION(CAR(CDR(call_arguments(the_call)))));
 
 
     statcomputation = 
-	mere_statement(MakeAssignInst(make_syntax(is_syntax_reference, newref),
-				      newreadexpr));
+	make_assign_statement(reference_to_expression(newref), 
+			      newreadexpr);
 
     lstatcomp = gen_nconc(lstatcomp, lstat);
     lstatcomp = gen_nconc(lstatcomp, CONS(STATEMENT, statcomputation, NIL));
@@ -247,7 +245,7 @@ list *lhp, *lnp;
 				       lstatcomp,
 				       lstatnotcomp);
 
-    IFDBPRINT(8,"generate_c1_alpha", nodemodule, statifcomputer);
+    IFDBPRINT(8,"generate_c1_alpha", node_module, statifcomputer);
 
 
     (*lnp) = CONS(STATEMENT, statcomputecomputer, CONS(STATEMENT, statifcomputer, NIL));
@@ -345,7 +343,7 @@ list *lcompp, *lnotcompp;
 		(array_distributed_p(var)));
 
     AddEntityToHostAndNodeModules(temp);
-    tempn = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, temp);
+    tempn = load_entity_node_new(temp);
 
     statcompco = st_compute_current_owners(ref);
     statcompgv = st_get_value_for_computer(ref, make_reference(tempn, NIL));
@@ -354,8 +352,8 @@ list *lcompp, *lnotcompp;
 		CONS(STATEMENT, statcompgv, NIL));
 
 /*
-    IFDBPRINT(9, "generate_read_of_ref_for_computer", hostmodule, statcompco);
-    IFDBPRINT(9, "generate_read_of_ref_for_computer", hostmodule, statcompgv);
+    IFDBPRINT(9, "generate_read_of_ref_for_computer", host_module, statcompco);
+    IFDBPRINT(9, "generate_read_of_ref_for_computer", host_module, statcompgv);
 */
     statnotcompco = st_compute_current_owners(ref);
     statnotcompmaysend = st_send_to_computer_if_necessary(ref);
@@ -367,9 +365,9 @@ list *lcompp, *lnotcompp;
 
 /*
     IFDBPRINT(9, "generate_read_of_ref_for_computer", 
-    nodemodule, statnotcompco);
+    node_module, statnotcompco);
     IFDBPRINT(9, "generate_read_of_ref_for_computer", 
-    nodemodule, statnotcompmaysend);
+    node_module, statnotcompmaysend);
 */
     /*
      * the new variable is inserted in the expression...
@@ -405,8 +403,8 @@ list *lhp, *lnp;
     pips_assert("generate_read_of_ref_for_all", (array_distributed_p(var)));
     
     AddEntityToHostAndNodeModules(temp);
-    temph = (entity) GET_ENTITY_MAPPING(oldtonewhostvar, temp); 
-    tempn = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, temp);
+    temph = load_entity_host_new(temp); 
+    tempn = load_entity_node_new(temp);
 
     /*
      * the receive statement is built for host:
@@ -423,8 +421,8 @@ list *lhp, *lnp;
 
     (*lhp) = CONS(STATEMENT, stathco, CONS(STATEMENT, stathrcv, NIL));
 
-    IFDBPRINT(9, "generate_read_of_ref_for_all", hostmodule, stathco);
-    IFDBPRINT(9, "generate_read_of_ref_for_all", hostmodule, stathrcv);
+    IFDBPRINT(9, "generate_read_of_ref_for_all", host_module, stathco);
+    IFDBPRINT(9, "generate_read_of_ref_for_all", host_module, stathrcv);
 
     /*
      * the code for node is built, in order that temp has the
@@ -449,8 +447,8 @@ list *lhp, *lnp;
 
     (*lnp) = CONS(STATEMENT, statnco, CONS(STATEMENT, statngv, NIL));
 
-    IFDBPRINT(9, "generate_read_of_ref_for_all", nodemodule, statnco);
-    IFDBPRINT(9, "generate_read_of_ref_for_all", nodemodule, statngv);
+    IFDBPRINT(9, "generate_read_of_ref_for_all", node_module, statnco);
+    IFDBPRINT(9, "generate_read_of_ref_for_all", node_module, statngv);
 
     /*
      * the new variable is inserted in the expression... 
@@ -494,7 +492,7 @@ list *lsp, *lindsp;
 	    syntax s;
 	    
 	    stat = st_compute_ith_local_index(array, i, EXPRESSION(CAR(inds)), &s);
-	    IFDBPRINT(9, "generate_compute_local_indexes", nodemodule, stat);
+	    IFDBPRINT(9, "generate_compute_local_indexes", node_module, stat);
 	    
 	    (*lsp) = gen_nconc((*lsp), CONS(STATEMENT, stat, NIL));
 	    (*lindsp) =
@@ -504,7 +502,7 @@ list *lsp, *lindsp;
 	else
 	{
 	    expression expr = 
-		UpdateExpressionForModule(oldtonewnodevar, EXPRESSION(CAR(inds)));
+		UpdateExpressionForModule(node_module, EXPRESSION(CAR(inds)));
 
 	    (*lindsp) =
 		gen_nconc((*lindsp),  		
@@ -515,7 +513,7 @@ list *lsp, *lindsp;
 
     debug(8, "generate_compute_local_indices", "result:\n");
     MAPL(cs, {IFDBPRINT(8, "generate_compute_local_indices",
-		       nodemodule, STATEMENT(CAR(cs)));}, (*lsp));
+		       node_module, STATEMENT(CAR(cs)));}, (*lsp));
 	      
 }
 
@@ -554,7 +552,7 @@ list *lstatp;
 	expr;
     entity 
 	array = reference_variable(ref),
- 	newarray = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, array);
+ 	newarray = load_entity_node_new(array);
     list 
 	ls = NIL,
 	newinds = NIL;
@@ -563,9 +561,9 @@ list *lstatp;
 
     generate_compute_local_indices(ref, &ls, &newinds);
     expr = reference_to_expression(make_reference(newarray, newinds));
-    stat = mere_statement(MakeAssignInst(make_syntax(is_syntax_reference, goal), expr));
+    stat = make_assign_statement(reference_to_expression(goal), expr);
 
-    IFDBPRINT(9, "generate_get_value_locally", nodemodule, stat);
+    IFDBPRINT(9, "generate_get_value_locally", node_module, stat);
 
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, stat, NIL));
 }
@@ -583,7 +581,7 @@ list *lstatp;
 	statsnd;
     entity 
 	array = reference_variable(ref),
- 	newarray = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, array);
+ 	newarray = load_entity_node_new(array);
     list 
 	ls = NIL,
 	newinds = NIL;
@@ -593,7 +591,7 @@ list *lstatp;
     generate_compute_local_indices(ref, &ls, &newinds);
     statsnd = st_send_to_computer(make_reference(newarray, newinds));
 
-    IFDBPRINT(9, "generate_send_to_computer", nodemodule, statsnd);
+    IFDBPRINT(9, "generate_send_to_computer", node_module, statsnd);
     
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, statsnd, NIL));
 }
@@ -611,7 +609,7 @@ list *lstatp;
 	statrcv;
     entity 
 	array = reference_variable(ref), 
- 	newarray = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, array);
+ 	newarray = load_entity_node_new(array);
     list 
 	ls = NIL,
 	newinds = NIL;
@@ -621,7 +619,7 @@ list *lstatp;
     generate_compute_local_indices(ref, &ls, &newinds);
     statrcv = st_receive_from_computer(make_reference(newarray, newinds));
     
-    IFDBPRINT(9, "st_receive_val_from_computer", nodemodule, statrcv);
+    IFDBPRINT(9, "st_receive_val_from_computer", node_module, statrcv);
 
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, statrcv, NIL));
 }
@@ -669,10 +667,10 @@ list *lstatp, lw, lr;
 /*
     debug(7, "generate_parallel_body", "read for computer:\n");
     MAPL(cs, {IFDBPRINT(7, "generate_parallel_body", 
-		       nodemodule, STATEMENT(CAR(cs)));}, lcompr);
+		       node_module, STATEMENT(CAR(cs)));}, lcompr);
     debug(7, "generate_parallel_body", "read for not computer:\n");
     MAPL(cs, {IFDBPRINT(7, "generate_parallel_body", 
-		       nodemodule, STATEMENT(CAR(cs)));}, lnotcompr);
+		       node_module, STATEMENT(CAR(cs)));}, lnotcompr);
 */
 
     MAPL(cs,
@@ -694,7 +692,7 @@ list *lstatp, lw, lr;
 	     tempn ;
 
 	 AddEntityToHostAndNodeModules(temp);
-	 tempn = (entity) GET_ENTITY_MAPPING(oldtonewnodevar,  temp);
+	 tempn = load_entity_node_new( temp);
 
 	 if (comp == s)
 	 {
@@ -706,7 +704,7 @@ list *lstatp, lw, lr;
 	     list
 		 linds = NIL;
 	     entity
-		 newarray = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, var);
+		 newarray = load_entity_node_new(var);
 							
 
 	     generate_compute_local_indices(r, &lstat, &linds);
@@ -714,13 +712,11 @@ list *lstatp, lw, lr;
 		 gen_nconc
 		     (lstat,
 		      CONS(STATEMENT,
-			   mere_statement
-			   (MakeAssignInst
-			    (make_syntax(is_syntax_reference,
-					 make_reference(newarray, 
-							linds)),
-			     reference_to_expression(make_reference(tempn, 
-								    NIL)))),
+			   make_assign_statement
+			     (reference_to_expression(make_reference(newarray, 
+								     linds)),
+			      reference_to_expression(make_reference(tempn, 
+								     NIL))),
 			   NIL));
 									      
 	     generate_update_values_on_nodes(r, 
@@ -755,7 +751,7 @@ list *lstatp, lw, lr;
 	MAPL(cs,
 	 {
 	     IFDBPRINT(8,"generate_parallel_body",
-		       nodemodule,STATEMENT(CAR(cs)));
+		       node_module,STATEMENT(CAR(cs)));
 	 },
 	     lcompw);
     }
@@ -769,13 +765,13 @@ list *lstatp, lw, lr;
 	MAPL(cs,
 	 {
 	     IFDBPRINT(8,"generate_parallel_body",
-		       nodemodule,STATEMENT(CAR(cs)));
+		       node_module,STATEMENT(CAR(cs)));
 	 },
 	     lnotcompw);
     }
 
-    statbody = UpdateStatementForModule(oldtonewnodevar, body);
-    IFDBPRINT(7, "generate_parallel_body", nodemodule, statbody);
+    statbody = UpdateStatementForModule(node_module, body);
+    IFDBPRINT(7, "generate_parallel_body", node_module, statbody);
 
     lcomp = gen_nconc(lcompr, CONS(STATEMENT, statbody, lcompw));
     lnotcomp = gen_nconc(lnotcompr, lnotcompw);
@@ -790,7 +786,7 @@ list *lstatp, lw, lr;
 
     debug(6, "generate_parallel_body", "final statement:\n");
     MAPL(cs,{IFDBPRINT(6,"generate_parallel_body",
-		       nodemodule,STATEMENT(CAR(cs)));},(*lstatp));
+		       node_module,STATEMENT(CAR(cs)));},(*lstatp));
 }
 
 
@@ -808,7 +804,7 @@ list *lscompp, *lsnotcompp;
 { 
     entity
 	array = reference_variable(ref),
-	newarray = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, array);
+	newarray = load_entity_node_new(array);
     statement
 	statif,
 	statcompif,
@@ -830,20 +826,11 @@ list *lscompp, *lsnotcompp;
     statcompco = st_compute_current_owners(ref);
     generate_compute_local_indices(ref, &lstatcomp, &lindscomp);
 
-/*
-    debug(8, "generate_update_values_on_computer_and_nodes","lstatcomp:\n");
-    MAPL(cs,{IFDBPRINT(8,"generate_update_values_on_computer_and_nodes",
-		       nodemodule,STATEMENT(CAR(cs)));}, lstatcomp);
-*/
-
     statcompassign = 
-	mere_statement(MakeAssignInst(make_syntax(is_syntax_reference,
-						  make_reference(newarray,lindscomp)),
-				      reference_to_expression(val)));   
-/*
-    IFDBPRINT(8,"generate_update_values_on_computer_and_nodes",
-	      nodemodule,statcompassign);
-*/
+	make_assign_statement
+	    (reference_to_expression(make_reference(newarray, lindscomp)),
+	     reference_to_expression(val));   
+
     if (replicated_p(array))
     {
 	statsndtoOO = st_send_to_other_owners(val);
@@ -866,7 +853,7 @@ list *lscompp, *lsnotcompp;
 					NIL));
 /*
     IFDBPRINT(8, "generate_update_values_on_computer_and_nodes",
-	      nodemodule, statcompif);
+	      node_module, statcompif);
 */
     statco = st_compute_current_owners(ref);
     generate_compute_local_indices(ref, &lstat, &linds);
@@ -886,11 +873,11 @@ list *lscompp, *lsnotcompp;
 /*
     debug(8, "generate_update_values_on_computer_and_nodes","result for computer:\n");
     MAPL(cs,{IFDBPRINT(8,"generate_update_values_on_computer_and_nodes",
-		       nodemodule,STATEMENT(CAR(cs)));},(*lscompp));
+		       node_module,STATEMENT(CAR(cs)));},(*lscompp));
 
     debug(8, "generate_update_values_on_computer_and_nodes","result for not computer:\n");
     MAPL(cs,{IFDBPRINT(8,"generate_update_values_on_computer_and_nodes",
-		       nodemodule,STATEMENT(CAR(cs)));},(*lsnotcompp));
+		       node_module,STATEMENT(CAR(cs)));},(*lsnotcompp));
 */
 }
 
@@ -922,13 +909,13 @@ list *lhstatp, *lnstatp;
 		(array_distributed_p(reference_variable(syntax_reference(s)))));
 
     array    = reference_variable(r);
-    newarray = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, array);
+    newarray = load_entity_node_new(array);
 
     temp     = NewTemporaryVariable(get_current_module_entity(), 
 				    entity_basic(array));
 
     AddEntityToHostAndNodeModules(temp);
-    temph = (entity) GET_ENTITY_MAPPING(oldtonewhostvar, temp);
+    temph = load_entity_host_new(temp);
 
     generate_compute_local_indices(r, &lnstat, &linds);
     stnrcv = st_receive_from_host(make_reference(newarray, linds));
@@ -965,8 +952,8 @@ list *lhstatp, *lnstatp;
 {
     entity
 	var  = reference_variable(syntax_reference(s)),
-	varn = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, var),
-	varh = (entity) GET_ENTITY_MAPPING(oldtonewhostvar, var);
+	varn = load_entity_node_new(var),
+	varh = load_entity_host_new(var);
     
     pips_assert("generate_update_private_value_from_host", 
 		(!array_distributed_p(reference_variable(syntax_reference(s)))));
