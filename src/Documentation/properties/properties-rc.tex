@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.174  2004/01/12 16:48:30  guerin
+%% Adding new property for FSM generation in PHRASE project
+%%
 %% Revision 1.173  2003/07/30 15:21:59  ferrand
 %% Add SAC_SIMD_REGISTER_WIDTH property to set the SIMD registers width.
 %%
@@ -234,7 +237,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2003/07/30 15:21:59 $~$
+$~$Date: 2004/01/12 16:48:30 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -843,7 +846,21 @@ implicitly in the controlizer phase.
 UNSPAGHETTIFY_IN_CONTROLIZER   TRUE
 \end{verbatim}
 
+\subsection{Spaghettifier}
+\index{Spaghettifier}
+\index{DESTRUCTURE\_TESTS}
+\index{DESTRUCTURE\_LOOPS}
+\index{DESTRUCTURE\_WHILELOOPS}
+\index{DESTRUCTURE\_FORLOOPS}
 
+Thoses properties allow to fine tune \verb|spaghettify| phase
+
+\begin{verbatim}
+DESTRUCTURE_TESTS TRUE 
+DESTRUCTURE_LOOPS TRUE
+DESTRUCTURE_WHILELOOPS TRUE
+DESTRUCTURE_FORLOOPS TRUE
+\end{verbatim}
 
 \subsection{Chains}
 \index{Use-Def Chains}
@@ -1899,6 +1916,16 @@ GATHER_FORMATS_AT_BEGINNING FALSE
 GATHER_FORMATS_AT_END FALSE
 \end{verbatim}
 
+\subsubsection{FSM Generation}
+\index{FSM Generation}
+\index{FSMIZE\_WITH\_GLOBAL\_VARIABLE}
+
+Control the fact that the same global variable (global to the
+current module) must be used for each FSMized statements.
+
+\begin{verbatim}
+FSMIZE_WITH_GLOBAL_VARIABLE FALSE
+\end{verbatim}
 
 \subsection{Array Privatization}
 \index{Privatization}
@@ -2676,9 +2703,9 @@ July 12, 1989,
 \htmladdnormallink{Tech. Report A/???.}{newgen-manual/newgen-manual.html}
 
 \bibitem{Z94} Lei Zhou,
-{\em Analyse statique et dynamique de la complÈxitÈ  des programmes
+{\em Analyse statique et dynamique de la complÅÈxitÅÈ  des programmes
 scientifiques}, 
-ThËse de doctorat de l'universitÈ Pierre et Marie Curie, 14
+ThÅËse de doctorat de l'universitÅÈ Pierre et Marie Curie, 14
 septembre 1994. Technical Report A/255.
 
 \end{thebibliography}
