@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:32:47 $, )
+# ($Date: 1996/08/21 17:36:18 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -211,7 +211,7 @@ ifeq ($(PVM_ARCH),CM5)
 all: $(CMMD_F77_H) 
 endif
 
-all:	$(PVM_HEADERS) $(DDC_HEADERS) $(DDC_FFILES) $(LIB_TARGET) 
+all: $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_FFILES) $(LIB_OBJECTS) $(LIB_TARGET) 
 
 #
 # get pvm headers
