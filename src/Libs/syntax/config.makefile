@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/10 16:01:35 $m 
+# $Date: 1996/08/11 20:41:03 $m 
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
@@ -71,7 +71,9 @@ keywtbl.h: warning.h f77keywords
 	  echo "};" ; } > keywtbl.h
 
 tokyacc.h: warning.h f77keywords f77symboles
-	cat f77keywords f77symboles | nl -s: | cat warning.h - | sed "s/\([^:]*\):\(.*\)/%token TK_\2 \1/" > tokyacc.h
+	{ cat warning.h ; \
+	sed 's,\([^A-Z]*\)\(.*\),%token \1 TK_\2,' f77keywords f77symboles ;\
+	} > tokyacc.h
 
 # end of $RCSfile: config.makefile,v $
 #
