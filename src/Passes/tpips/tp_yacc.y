@@ -618,10 +618,8 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 	| TK_OPENPAREN TK_OWNER_PROGRAM TK_CLOSEPAREN
 	{
 	    pips_debug(7,"reduce rule owner (PROGRAM)\n");
-	    if (tpips_execution_mode) {
-		string n = db_get_current_workspace_name();
-		$$ = n? CONS(STRING, strdup(n), NIL): NIL;
-	    }
+	    if (tpips_execution_mode)
+		$$ = CONS(STRING, strdup(PROGRAM_RESOURCE_OWNER), NIL);
 	}
 	| TK_OPENPAREN TK_OWNER_MAIN TK_CLOSEPAREN
 	{
