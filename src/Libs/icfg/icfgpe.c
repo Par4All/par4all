@@ -27,6 +27,74 @@
 #include "text-util.h"
 #include "icfg.h"
 
+static bool found_filter = FALSE;
+
+static text 
+text_block(
+    entity module,
+    string label,
+    int margin,
+    list objs,
+    int n)
+{
+    text r = make_text(NIL);
+    list pbeg, pend ;
+
+    pend = NIL;
+
+    if (ENDP(objs) && !get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")) {
+	return(r) ;
+    }
+
+
+    if(!empty_local_label_name_p(label)) {
+	pips_internal_error("Illegal label \"%s\". "
+			    "Blocks cannot carry a label\n",
+			    label);
+    }
+    
+    if (get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
+	get_bool_property("PRETTYPRINT_BLOCKS")) {
+	unformatted u;
+	
+	if (get_bool_property("PRETTYPRINT_FOR_FORESYS")){
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+						  strdup("C$BB\n")));
+	}
+	else {
+	    pbeg = CHAIN_SWORD(NIL, "BEGIN BLOCK");
+	    pend = CHAIN_SWORD(NIL, "END BLOCK");
+	    
+	    u = make_unformatted(strdup("C"), n, margin, pbeg);
+	    ADD_SENTENCE_TO_TEXT(r, 
+				 make_sentence(is_sentence_unformatted, u));
+	}
+    }
+
+    for (; objs != NIL; objs = CDR(objs)) {
+	statement s = STATEMENT(CAR(objs));
+
+	text t = text_statement(module, margin, s);
+	/**********written by Dat************/
+	if (found_filter) {
+	  text_sentences(r) = 
+	    gen_nconc(text_sentences(r), text_sentences(t));
+	}
+	text_sentences(t) = NIL;
+	free_text(t);
+    }
+
+    if (!get_bool_property("PRETTYPRINT_FOR_FORESYS") &&
+	(get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
+	 get_bool_property("PRETTYPRINT_BLOCKS"))) 
+    {
+	unformatted u = make_unformatted(strdup("C"), n, margin, pend);
+	ADD_SENTENCE_TO_TEXT(r, 
+			     make_sentence(is_sentence_unformatted, u));
+    }
+    return r;
+}
+
 typedef struct
 {
   string name;
@@ -74,7 +142,29 @@ resource_text_flt(entity module, int margin, statement stat)
   return l_eff_text;
 }
 
-static text get_any_effects_text_flt(string module_name)
+/*text text_statement_flt(entity module, int margin, statement stmt)
+{
+  instruction i = statement_instruction(stmt);
+  text r = make_text(NIL);
+  text temp = text_instruction(module, margin, i, statement_number(stmt));
+  found_filter = FALSE;
+  if (!ENDP(text_sentences(temp))) {
+    text t = init_text_statement(module, margin, stmt);
+    if (!ENDP(text_sentences(t))) {
+      MERGE_TEXTS(r, t);
+      MERGE_TEXTS(r, temp);
+      found_filter = TRUE;
+    } else {
+      MERGE_TEXTS(r, temp);
+    }
+  } else {
+    free(temp);
+  }
+  return r;
+}*/
+
+static text
+get_any_effects_text_flt(string module_name)
 {
   entity module;
   statement module_stat;
