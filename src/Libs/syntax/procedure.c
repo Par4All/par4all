@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1997/02/03 22:27:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/02/03 22:27:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
 #include <stdio.h>
 #include "string.h"
 
@@ -89,7 +95,7 @@ void EndOfProcedure()
     remove_ghost_variable_entities();
 
     /* we generate the last statement to carry a label or a comment */
-    if (strcmp(lab_I, "") != 0 /* || iPrevComm != 0 */ ) {
+    if (strlen(lab_I) != 0 /* || iPrevComm != 0 */ ) {
 	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
     }
 
