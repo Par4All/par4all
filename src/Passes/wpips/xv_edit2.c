@@ -105,16 +105,18 @@ Menu_item menu_item;
 }
 
 
-Xv_opaque view_notify(menu, menu_item)
+void view_notify(menu, menu_item)
 Menu menu;
 Menu_item menu_item;
 {
   char string_modulename[SMALL_BUFFER_LENGTH], bank_view_name[SMALL_BUFFER_LENGTH];
+  char busy_label[SMALL_BUFFER_LENGTH];
+  char *busy_label_format = "*Computing %s * ...";
   char *print_type, *print_type_2 = NULL;
   char *label = (char *) xv_get(menu_item, MENU_STRING);
   char *modulename = db_get_current_module_name();
   int win1, win2;
-
+  
   if (modulename == NULL) {
     prompt_user("No module selected");
     return;
@@ -152,11 +154,12 @@ Menu_item menu_item;
     pips_error("view_notify", "bad label : %s\n", label);
   }
 
+  (void) sprintf(busy_label, busy_label_format, label);
   /* Display the file name and the module name. RK, 2/06/1993 : */
   sprintf(string_modulename, "Module: %s", modulename);
   xv_set(edit_frame[win1], FRAME_LABEL, "Xview Pips Display Facility",
 	 FRAME_SHOW_FOOTER, TRUE,
-	 FRAME_LEFT_FOOTER, label,
+	 FRAME_LEFT_FOOTER, busy_label,
 	 FRAME_RIGHT_FOOTER, string_modulename,
 	 FRAME_BUSY, TRUE,
 	 NULL);
@@ -168,6 +171,7 @@ Menu_item menu_item;
 	 NULL);
 
   xv_set(edit_frame[win1],
+	 FRAME_LEFT_FOOTER, label,
 	 FRAME_BUSY, FALSE,
 	 NULL);
 	 
@@ -181,10 +185,11 @@ Menu_item menu_item;
 
 
     /* Display the file name and the module name. RK, 2/06/1993 : */
-    sprintf(bank_view_name, "%s (bank view)", label);
+    (void) sprintf(bank_view_name, "%s (bank view)", label);
+    (void) sprintf(busy_label, busy_label_format, bank_view_name);
     xv_set(edit_frame[win2], FRAME_LABEL, "Xview Pips Display Facility",
 	   FRAME_SHOW_FOOTER, TRUE,
-	   FRAME_LEFT_FOOTER, bank_view_name,
+	   FRAME_LEFT_FOOTER, busy_label,
 	   FRAME_RIGHT_FOOTER, string_modulename,
 	   FRAME_BUSY, TRUE,
 	   NULL);
@@ -196,6 +201,7 @@ Menu_item menu_item;
 	   NULL);
     
     xv_set(edit_frame[win2],
+	   FRAME_LEFT_FOOTER, bank_view_name,
 	   FRAME_BUSY, FALSE,
 	   NULL);
   }
@@ -212,7 +218,7 @@ Menu_item menu_item;
 }
 
 void edit_close_notify(menu, menu_item)
-Menu menu;
+     Menu menu;
 Menu_item menu_item;
 {
     if (! (bool)xv_get(edit_textsw[0], TEXTSW_MODIFIED))
