@@ -208,7 +208,20 @@ int
 db_time_of_resource(string rname, string oname)
 {
     db_resource r = get_db_resource(rname, oname);
-    return db_resource_undefined_p(r)? -1: db_resource_time(r);
+    if (db_resource_undefined_p(r))
+	return -1;
+    if (db_resource_loaded_p(r) && displayable_file_p(rname)) {
+	int time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
+	if (time!=db_resource_file_time(r)) {
+	    pips_user_warning("file %s has been edited...\n", 
+			      db_resource_pointer(r));
+	    db_resource_file_time(r) = time;
+	    db_inc_logical_time();
+	    db_resource_time(r) = db_get_logical_time();
+	    db_inc_logical_time();
+	}
+    }
+    return db_resource_time(r);
 }
 
 static void
@@ -216,7 +229,7 @@ db_save_resource(string rname, string oname, db_resource r)
 {
     pips_debug(7, "saving %s of %s\n", rname, oname);
     pips_assert("resource loaded", db_resource_loaded_p(r));
-    if (!dbll_storable_p(rname)) pips_internal_error("cannot store %s\n",rname);
+    if (!dbll_storable_p(rname))pips_internal_error("cannot store %s\n",rname);
     dbll_save_resource(rname, oname, db_resource_pointer(r));
     db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
     db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
@@ -247,6 +260,9 @@ db_load_resource(string rname, string oname, db_resource r)
     db_resource_pointer(r) = dbll_load_resource(rname, oname);
     db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
     db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, FALSE);
+    if (displayable_file_p(rname)) /* time the resource, not the stored */
+	db_resource_file_time(r) =
+	    dbll_stat_local_file(db_resource_pointer(r), FALSE);
 }
 
 /* some way to identify a resource... count be an id...
@@ -323,6 +339,10 @@ db_put_or_update_memory_resource(
     db_resource_pointer(r) = p;
     db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
     db_resource_time(r) = db_get_logical_time();
+
+    if (displayable_file_p(rname))
+	db_resource_file_time(r) =
+	    dbll_stat_local_file(db_resource_pointer(r), FALSE);
 
     debug_db_resource(9, rname, oname, r);
     debug_off();
@@ -431,8 +451,11 @@ db_delete_obsolete_resources(bool (*keep_p)(string, string))
 	get_pips_database());
 
     /* delete the resources. */
-    for(lrp=lr, lop=lo; !ENDP(lrp); POP(lrp), POP(lop))
-	db_delete_resource(STRING(CAR(lrp)), STRING(CAR(lop)));
+    for(lrp=lr, lop=lo; !ENDP(lrp); POP(lrp), POP(lop)) {
+	string rname = STRING(CAR(lrp)), oname = STRING(CAR(lop));
+	db_delete_resource(rname, oname);
+	dbll_unlink_resource_file(rname, oname, FALSE);
+    }
 
     gen_free_list(lr);
     gen_free_list(lo);
