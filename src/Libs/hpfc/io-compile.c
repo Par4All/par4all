@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-compile.c,v $
+ * Revision 1.47  1997/07/21 13:56:44  keryell
+ * Replaced %x format by %p.
+ *
  * Revision 1.46  1997/05/24 09:44:50  coelho
  * more determinism when sorting conditions.
  *
@@ -927,7 +930,7 @@ io_efficient_compile(
 
     debug_on("HPFC_IO_DEBUG_LEVEL");
     pips_debug(1, "compiling!\n");
-    pips_debug(2, "statement 0x%x, %d arrays\n", (unsigned int) stat, 
+    pips_debug(2, "statement %p, %d arrays\n", stat, 
 	       gen_length(entities));
 
     /* quicker for continue and so...
