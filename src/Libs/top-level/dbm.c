@@ -12,8 +12,7 @@
 
 #include "top-level.h"
 
-void default_update_props()
-{}
+void default_update_props() {}
 
 /* default assignment of pips_update_props_handler is default_update_props.
  * Some top-level (eg. wpips) may need a special update_props proceedure; they 
@@ -35,8 +34,7 @@ char *argv[];
     bool success = FALSE;
 
     /* since db_create_workspace() must have been called before... */
-    pips_assert("create_workspace",
-		db_get_current_workspace()!=database_undefined);
+    pips_assert("some current workspace", db_get_current_workspace_name());
 
     open_log_file();
     set_entity_to_size();
@@ -50,7 +48,7 @@ char *argv[];
     if (success) {
 	(* pips_update_props_handler)();
 
-	name = database_name(db_get_current_workspace());
+	name = db_get_current_workspace_name();
 	user_log("Workspace %s created and opened\n", name);
 
 	success = open_module_if_unique();
@@ -75,8 +73,7 @@ open_module_if_unique()
     int  module_list_length = 0;
     bool success = TRUE;
 
-    pips_assert("open_module_if_unique",
-		db_get_current_workspace()!=database_undefined);
+    pips_assert("open_module_if_unique", db_get_current_workspace_name());
 
     /* First parse the makefile to avoid writing
        an empty one */
@@ -97,12 +94,10 @@ open_module(name)
 char *name;
 {
     bool success;
-    string current_name = NULL;
+    pips_assert("open_module", db_get_current_workspace_name());
 
-    pips_assert("open_module",
-		db_get_current_workspace()!=database_undefined);
-
-    current_name = db_get_current_module_name();
+    if (db_get_current_module_name()) /* reset if needed */
+	db_reset_current_module_name();
 
     success = db_set_current_module_name(name);
     reset_unique_variable_numbers();
@@ -122,19 +117,18 @@ lazy_open_module(name)
 char *name;
 {
     bool success = TRUE;
-    char *current_name = NULL;
 
-    pips_assert("lazy_open_module",
-		db_get_current_workspace()!=database_undefined);
+    pips_assert("lazy_open_module", db_get_current_workspace_name());
+    pips_assert("cannot lazy_open no module", name != NULL);
 
-    message_assert("cannot lazy_open no module", name != NULL);
-
-    current_name = db_get_current_module_name();
-
-    if (current_name == NULL || strcmp(current_name, name) != 0)
+    if (db_get_current_module_name()) {
+	char * current_name = db_get_current_module_name();
+	if (strcmp(current_name, name) != 0)
+	    success = open_module(name);
+	else 
+	    user_log ("Module %s already active\n", name);
+    } else
 	success = open_module(name);
-    else if (current_name != NULL)
-	user_log ("Module %s already active\n", name);
 
     return success;
 }
@@ -143,61 +137,18 @@ char *name;
 /* Used when a worspace is closed since it is useless and dangerous to
    save on disk some no longer valid resources... */
 void
-free_any_non_up_to_date_resource_in_memory()
+free_any_non_up_to_date_resource_in_memory(void)
 {
-    list non_up_to_date_resources = NIL;
-    list up_to_date_resources = NIL;
-
-    debug_on("PIPSDBM_DEBUG_LEVEL");
-    /* For all the resources of the current workspace: */
-    user_log("Selecting obsolete resources\n");
-    if(FALSE) {
-    MAP(RESOURCE, r, {
-	string rn = resource_name(r);
-	string on = resource_owner_name(r);
-	if (status_memory_p(resource_status(r))
-	    /* Quite inefficient... */
-	    && !real_resource_up_to_date_p(rn, on)) {
-	    /* Add this resource to the list of useless ones: */
-	    non_up_to_date_resources =
-		CONS(RESOURCE, r, non_up_to_date_resources);
-	    debug(2, "free_any_non_up_to_date_resource_in_memory",
-		  "mark %s(%s) as non up to date\n", rn, on);
-	}
-	else {
-	    up_to_date_resources =
-		CONS(RESOURCE, r, up_to_date_resources);
-	    debug(2, "free_any_non_up_to_date_resource_in_memory",
-		  "keep %s(%s) as up to date resource or on disk\n", rn, on);
-	}
-    }, database_resources(db_get_current_workspace()));
-    }
-
-    check_resources(&non_up_to_date_resources, &up_to_date_resources);
-
-    /* Free all the non up to date resources in memory: */
-    user_log("Destroying %d obsolete resource(s)\n", 
-	     gen_length(non_up_to_date_resources));
-    MAP(RESOURCE, r, {
-	free_resource_content(r);
-    },
-	non_up_to_date_resources);
-    gen_full_free_list(non_up_to_date_resources);
-    
-    /* Keep the useful resources: */
-    gen_free_list(database_resources(db_get_current_workspace()));
-    /* Put the useful resources in the original order: */
-    database_resources(db_get_current_workspace()) =
-	gen_nreverse(up_to_date_resources);
-
-    debug_off();
+    int ndeleted;
+    user_log("Deleting obsolete resources\n");
+    ndeleted = delete_obsolete_resources(); /* done by pipsmake... */
+    user_log("%d obsolete resource%s destroyed\n",
+	     ndeleted, ndeleted>1? "s": "");
 }
-
 
 /* should be: success (cf wpips.h) */
 bool 
-open_workspace(name)
-char *name;
+open_workspace(char *name)
 {
     bool success;
 
@@ -221,7 +172,7 @@ char *name;
 }
 
 bool 
-close_workspace()
+close_workspace(void)
 {
     bool success;
 
@@ -238,7 +189,8 @@ bool
 delete_workspace(string wname)
 {
     int failure;
-    database p;
+    string current = db_get_current_workspace_name();
+
     /* FI: No check whatsoever about the current workspace, no information
        about deleting the non-current workspace vs deleting the current
        workspace... */
@@ -246,13 +198,9 @@ delete_workspace(string wname)
     /* Yes but at least close the LOGFILE if we delete the current
        workspace since it will fail on NFS because of the open file
        descriptor (creation of .nfs files). RK */
-    if ((p = db_get_current_workspace()) != database_undefined) {
-	string name = database_name(p);
-	if (strcmp(wname, name) == 0)
-	    /* Trying to delete the current workspace! Close the
-               LOGFILE first... */
-	    close_log_file();
-    }
+
+    if (current && same_string_p(wname, current))
+	close_log_file();
 
     if ((failure=safe_system_no_abort(concatenate("Delete ", wname, NULL))))
 	pips_user_warning("exit code for Delete is %d\n", failure);
