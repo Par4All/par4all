@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.13  1998/11/18 22:43:06  coelho
+ * switch_nary_to_binary and optimize_simplify_patterns are called.
+ *
  * Revision 1.12  1998/11/09 14:50:35  zory
  * use make_constant function instead of specific float and integer
  * make_float/integer_constant_entity funcions
@@ -366,23 +369,30 @@ bool optimize_expressions(string module_name)
 
     }
     else 
-      pips_debug(3,"no expression for module %s \n", module_name);
+      pips_debug(3, "no expression for module %s\n", module_name);
 
 
     /* free lists */
     gen_free_list(ln);
     gen_free_list(le);
 
-    pips_debug(3,"EOLE transformations ... Done for module %s \n", module_name);
+    pips_debug(3,"EOLE transformations ... Done for module %s\n", module_name);
 
     /* end EOLE stuff.
      */
 
     /* check consistency after optimizations */
-    pips_assert("consistency checking after optimizations \n",statement_consistent_p(s));
+    pips_assert("consistency checking after optimizations",
+		statement_consistent_p(s));
     
 
     /* Could perform more optimizations here...
+     */
+    /* CSE/ICM + atom
+     */
+    switch_nary_to_binary(s);
+    optimize_simplify_patterns(s);
+    /* others?
      */
 
     /* return result to pipsdbm
