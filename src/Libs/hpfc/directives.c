@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/09/22 14:48:22 $, )
+ * ($Date: 1995/10/04 17:34:23 $, )
  */
 
 #include "defines-local.h"
@@ -408,29 +408,43 @@ one_distribute_directive(reference distributee,
 	 */
 	MAP(ENTITY, array,
 	{
-	    align a = new_align_with_template(load_entity_align(array), new_t);
-	    entity new_array = array_synonym_aligned_as(array, a);
+	    align a;
+	    entity new_array;
+
+	    pips_debug(7, "array 0x%x\n", (unsigned int) array);
+	    pips_debug(7, "alived array %s\n", entity_name(array));
+	    
+	    a = new_align_with_template(load_entity_align(array), new_t);
+	    new_array = array_synonym_aligned_as(array, a);
 	    
 	    propagate_synonym(current, array, new_array);
 	    update_renamings(current, 
 			     CONS(RENAMING, make_renaming(array, new_array),
 				  load_renamings(current)));
+
+	    pips_debug(9, "done with %s->%s\n", 
+		       entity_name(array), entity_name(new_array));
 	 },
 	    alive_arrays(current, template));
     }
     else
 	store_entity_distribute(template, d);
+
+    pips_debug(4, "out\n");
 }
 
 /*  handles a full distribute or redistribute directive.
  */
 static void 
-handle_distribute_and_redistribute_directive(entity f,
-					     list /* of expressions */ args,
-					     bool dynamic)
+handle_distribute_and_redistribute_directive(
+    entity f,
+    list /* of expressions */ args,
+    bool dynamic)
 {
     list /* of expression */ last = gen_last(args);
     reference proc;
+
+    if (dynamic) store_renamings(current_stmt_head(), NIL);
 
     /* last points to the last item of args, which should be the processors
      */
