@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1994/12/21 17:34:52 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1995/08/09 16:45:35 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -14,7 +14,6 @@
  
 #include <stdio.h>
 #include <string.h> 
-extern fprintf();
 
 /*
  * Psystems stuff
@@ -66,13 +65,15 @@ Psysteme systeme;
     entity
 	equ = local_name_to_top_level_entity(EQUAL_OPERATOR_NAME),
 	leq = local_name_to_top_level_entity(LESS_OR_EQUAL_OPERATOR_NAME);
-    list
-	conjonction = 
-	    gen_nconc
-		(Pcontrainte_to_expression_list(sc_egalites(systeme), equ),
-		 Pcontrainte_to_expression_list(sc_inegalites(systeme), leq));
-    expression
-	result = expression_list_to_conjonction(conjonction);
+    list conjonction;
+    expression result;
+
+    conjonction = 
+	gen_nconc
+	    (Pcontrainte_to_expression_list(sc_egalites(systeme), equ),
+	     Pcontrainte_to_expression_list(sc_inegalites(systeme), leq));
+
+    result = expression_list_to_conjonction(conjonction);
 
     gen_free_list(conjonction);
     return(result);
@@ -146,6 +147,7 @@ entity divide;
     result = expression_undefined;
   list
     le = NIL;
+  Psysteme s;
   
   debug(5, "constraints_to_loop_bound",
 	"computing %ser bound for variable %s\n",
@@ -159,9 +161,16 @@ entity divide;
 
   assert(!CONTRAINTE_UNDEFINED_P(c));
 
+  /*  the constraints are sorted first, to ensure a deterministic result
+   *  ??? the sorting criterion is rather strange:-)
+   */
+  s = sc_make(NULL, contraintes_dup(c));
+  vect_sort(sc_base(s), compare_Pvecteur);
+  sc_sort_constraints(s, sc_base(s));
+
   /*  each contraint is considered in turn to generate the bound
    */
-  for(;
+  for(c=sc_inegalites(s);
       c!=(Pcontrainte) NULL;
       c=c->succ)
     {
@@ -199,6 +208,7 @@ entity divide;
   result = len==1? EXPRESSION(CAR(le)): make_call_expression(operator, le);
 
   if (len==1) gen_free_list(le);
+  sc_rm(s);
 
   return(result);
 }
@@ -268,13 +278,17 @@ entity divide; /* I have to give the divide entity to be called */
     statement 
 	assign,
 	current = body;
+    Psysteme s;
     
     if (ENDP(vars)) return(body);
 
-    c = contraintes_dup(sc_inegalites(sc));
+    s = sc_dup(sc);
+    sc_transform_eg_in_ineg(s);  /* ??? could do a better job with = */
+    c = sc_inegalites(s);
+
     reverse = gen_nreverse(gen_copy_seq(vars));
 
-    assert(sc_nbre_egalites(sc)==0);
+    assert(sc_nbre_egalites(s)==0);
     
     MAPL(ce,
      {
@@ -330,7 +344,7 @@ entity divide; /* I have to give the divide entity to be called */
 	 reverse);
     
     gen_free_list(reverse);
-    contraintes_free(c);
+    sc_inegalites(s)=c, sc_rm(s);
 
     return(current);
 }
