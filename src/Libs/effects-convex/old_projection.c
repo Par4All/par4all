@@ -1512,8 +1512,10 @@ int ofl_ctrl;
 
     if (!VECTEUR_NUL_P(pv)) {
 	for (pv1 = pv;!VECTEUR_NUL_P(pv1) && !SC_UNDEFINED_P(*psc); pv1=pv1->succ) {
-	    sc_projection_along_variable_ofl_ctrl(psc,vecteur_var(pv1), 
-						       ofl_ctrl);
+	  sc_projection_along_variable_ofl_ctrl_timeout_ctrl(psc,vecteur_var(pv1), 
+	     ofl_ctrl);
+	  /* DN sc_projection_along_variable_ofl_ctrl(psc,vecteur_var(pv1), 
+	     ofl_ctrl);*/
 	    if (!SC_UNDEFINED_P(*psc)) {
 		sc_base_remove_variable(*psc,vecteur_var(pv1));
 		/* *psc = region_sc_normalize(*psc,2);	 */
