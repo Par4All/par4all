@@ -2,6 +2,11 @@
  * Runtime Support Functions Management
  *
  * Fabien Coelho, May and June 1993
+ *
+ * SCCS stuff:
+ * $RCSfile: run-time.c,v $ ($Date: 1994/04/11 11:47:39 $, ) version $Revision$,
+ * got on %D%, %T%
+ * $Id$
  */
 
 #include <stdio.h>
