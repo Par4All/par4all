@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/10/13 12:55:42 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/10/13 13:06:08 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1096,15 +1096,15 @@ union domain *dp ;
     bool inlinable, persistant;
 
     inlinable = IS_INLINABLE(dp->li.element);
+    tabulated = IS_TABULATED(dp->li.element);
     persistant = dp->li.persistant;
-
     new_l = NIL;
 
     for (old_p = old_l ; old_p != NIL ; old_p = old_p->cdr) {
 	pc = (cons *)alloc( sizeof(struct cons) ) ;
 
 	/* the cons cell is updated */
-	if (inlinable || persistant)
+	if (inlinable || persistant || tabulated)
 		pc->car = old_p->car;
 	else {
 	    pc->car.p = copy_hsearch( old_p->car.p ) ;
