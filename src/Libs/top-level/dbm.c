@@ -146,6 +146,8 @@ free_any_non_up_to_date_resource_in_memory()
 
     debug_on("PIPSDBM_DEBUG_LEVEL");
     /* For all the resources of the current workspace: */
+    user_log("Selecting obsolete resources\n");
+    if(FALSE) {
     MAP(RESOURCE, r, {
 	string rn = resource_name(r);
 	string on = resource_owner_name(r);
@@ -165,8 +167,13 @@ free_any_non_up_to_date_resource_in_memory()
 		  "keep %s(%s) as up to date resource or on disk\n", rn, on);
 	}
     }, database_resources(db_get_current_workspace()));
+    }
+
+    check_resources(&non_up_to_date_resources, &up_to_date_resources);
 
     /* Free all the non up to date resources in memory: */
+    user_log("Destroying %d obsolete resource(s)\n", 
+	     gen_length(non_up_to_date_resources));
     MAP(RESOURCE, r, {
 	free_resource_content(r);
     },
