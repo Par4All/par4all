@@ -1,7 +1,5 @@
-/* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1998/11/18 12:30:49 $, 
- * got on %D%, %T%
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/* 
+ * $Id$
  * 
  * This file provides functions to test the feasibility of a system 
  * of constraints. 
@@ -100,18 +98,34 @@ int ofl_ctrl;
 boolean ofl_res;
 {
     int
-	n_var = sc->dimension,
-	n_cont=0, n_ref=0;
+      n_var = sc->dimension,
+      n_cont_eq = 0, n_ref_eq = 0,
+      n_cont_in = 0, n_ref_in = 0;
     boolean 
-	ok = FALSE,
-	use_simplex = FALSE, 
-	catch_performed = FALSE;
+      ok = FALSE,
+      use_simplex = FALSE, 
+      catch_performed = FALSE;
 
-    decision_data(sc_egalites(sc), &n_cont, &n_ref, 2);
-    decision_data(sc_inegalites(sc), &n_cont, &n_ref, 1);
+    decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, 2);
+    decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, 1);
 
-    use_simplex = (n_cont >= NB_CONSTRAINTS_MAX_FOR_FM || 
-		   (n_cont>=10 && n_ref>2*n_cont));
+    /* a little discussion about what to decide (FC, 05/07/2000)
+     *
+     * - FM is good at handling equalities which are simply projected, 
+     *   but may explode with many inequalities when they are combined.
+     *   it is quite fast with few inequalities anyway.
+     *
+     * - SIMPLEX switches every eq to 2 inequalities, adding hyperplanes.
+     *   thus it is not that good with equalities.
+     *   it is quite slow with small systems because of the dense matrix
+     *   to build and manipulate.
+     *
+     * suggestion to be implemented and tested : 
+     *  1/ project equalities as much as possible.
+     *  2/ chose between FM and Simplex after that?
+     */
+    use_simplex = (n_cont_in >= NB_CONSTRAINTS_MAX_FOR_FM || 
+		   (n_cont_in>=10 && n_ref_in>2*n_cont_in));
 
     if (sc_rn_p(sc)) 
 	return TRUE;
@@ -132,9 +146,9 @@ boolean ofl_res;
 	     *   FC 30/01/95
 	     */
 	    fprintf(stderr, "[sc_feasibility_ofl_ctrl] "
-		    "arithmetic error (%s[%d,%d,%d]) -> %s\n",
+		    "arithmetic error (%s[%d,%deq/%dref,%din/%dref]) -> %s\n",
 		    use_simplex ? "Simplex" : "Fourier-Motzkin", 
-		    n_var, n_cont, n_ref,
+		    n_var, n_cont_eq, n_ref_eq, n_cont_in, n_ref_in,
 		    ofl_res ? "TRUE" : "FALSE");
 	    break;
 	}		
@@ -154,7 +168,7 @@ boolean ofl_res;
     }
     }
 
-    return(ok);
+    return ok;
 }
 
 /* chose the next variable in base b for projection in system s.
