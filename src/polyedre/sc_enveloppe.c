@@ -114,7 +114,7 @@ int ofl_ctrl;
     Psysteme s = SC_UNDEFINED;
     boolean catch_performed = FALSE;
     /* mem_spy_begin(); */
-
+   
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
 
     switch (ofl_ctrl) 
@@ -138,8 +138,9 @@ int ofl_ctrl;
 	    if (SC_RN_P(s2) || sc_rn_p(s2) || sc_dimension(s2)==0
 		|| sc_empty_p(s1) || !sc_faisabilite_ofl(s1)) 
 	    {
-		Psysteme sc2 = sc_dup(s2);
+		Psysteme sc2 = sc_dup(s2); 
 		sc2 = sc_elim_redond(sc2);
+		if (SC_UNDEFINED_P(sc2)) printf(" S2 UNDEFINED\n");
 		s = SC_UNDEFINED_P(sc2)? sc_empty(base_dup(sc_base(s2))): 
 		    sc2;
 	    }
@@ -148,7 +149,8 @@ int ofl_ctrl;
 		    || sc_empty_p(s2) || !sc_faisabilite_ofl(s2)) 
 		{
 		    Psysteme sc1 = sc_dup(s1);
-		    sc1 = sc_elim_redond(sc1);
+		    sc1 = sc_elim_redond(sc1); 
+		    if (SC_UNDEFINED_P(sc1)) printf(" S1 UNDEFINED\n");
 		    s = SC_UNDEFINED_P(sc1)? 
 			sc_empty(base_dup(sc_base(s1))): sc1;
 		}
@@ -442,7 +444,10 @@ sc_common_projection_convex_hull_with_base_ordering
     Psysteme s1p = sc_dup(s1);
     Psysteme s2p = sc_dup(s2);
     Psysteme hp = SC_UNDEFINED;
-    Pcontrainte eq;
+    Psysteme s1pp = SC_UNDEFINED;
+    Psysteme s2pp = SC_UNDEFINED;
+    Pcontrainte eq,leq;
+    Pcontrainte listeq = contraintes_dup(sc_egalites(s1p));
     Pbase b;
     int d;
     boolean feasible_p = TRUE;
@@ -460,7 +465,7 @@ sc_common_projection_convex_hull_with_base_ordering
     }
     /* */
 
-    for(eq = sc_egalites(s1p); !CONTRAINTE_UNDEFINED_P(eq) && feasible_p; eq = eq->succ) {
+    for(eq = listeq; !CONTRAINTE_UNDEFINED_P(eq) && feasible_p; eq = eq->succ) {
 	if(egalite_in_liste(eq, sc_egalites(s2p))) {
 	    if(egalite_normalize(eq)) {
 		if(CONTRAINTE_NULLE_P(eq)) {
@@ -476,7 +481,7 @@ sc_common_projection_convex_hull_with_base_ordering
 		    /* Keep eq in s0 */
 
 		    new_eq = contrainte_dup(eq);
-		    sc_add_egalite(s0, new_eq);
+		   
 
 		    /* Use eq to eliminate a variable */
 
@@ -499,13 +504,39 @@ sc_common_projection_convex_hull_with_base_ordering
 		     * use a copy!
 		     */
 		    def = contrainte_dup(eq);
-		    s1p = 
+		    s1pp = sc_dup(s1p);
+		    s2pp = sc_dup(s2p);
+
+		    CATCH(overflow_error) {
+		      contrainte_rm(new_eq);
+		      sc_rm(s1pp);
+		      sc_rm(s2pp);
+		      contrainte_rm(def);
+		    }
+		    TRY { 
+		    
+		      s1pp = 
 			sc_simple_variable_substitution_with_eq_ofl_ctrl
-			    (s1p, def, v, NO_OFL_CTRL);
-		    s2p = 
+			(s1pp, def, v, NO_OFL_CTRL);
+		      s2pp = 
 			sc_simple_variable_substitution_with_eq_ofl_ctrl
-			    (s2p, def, v, NO_OFL_CTRL);
-		    contrainte_rm(def);
+			(s2pp, def, v, NO_OFL_CTRL);
+ 
+		      for (leq = listeq; !CONTRAINTE_UNDEFINED_P(leq);
+			  leq = contrainte_succ(leq)) {
+			(void) contrainte_subst_ofl_ctrl(v, def, leq, TRUE, NO_OFL_CTRL);
+		      }
+
+		      sc_rm(s1p);
+		      sc_rm(s2p);
+		      s1p = s1pp;
+		      s2p = s2pp;
+		      contrainte_rm(def); 
+		      sc_add_egalite(s0, new_eq);
+		      UNCATCH(overflow_error);
+		    }
+		    
+		
 		}
 	    }
 	    else {
@@ -515,6 +546,8 @@ sc_common_projection_convex_hull_with_base_ordering
 	    }
 	}
     }
+
+    contraintes_free(listeq);
 
     /* Keep track of the full bases for the convex hull */
     sc_base(s0) = base_union(sc_base(s1), sc_base(s2));
