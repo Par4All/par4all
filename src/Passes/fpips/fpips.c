@@ -48,12 +48,12 @@ extern int wpips_main(int, char**);
 
 /******************************************************************** UTILS */
 
-static int
-fpips_usage(int ret)
+static int fpips_usage(int ret)
 {
     fprintf(stderr, 
-	    "Usage: fpips [-hPTW] (other options and arguments...)\n"
+	    "Usage: fpips [-hvPTW] (other options and arguments...)\n"
 	    "\t-h: this help...\n"
+	    "\r-v: version\n"
 	    "\t-P: pips\n"
 	    "\t-T: tpips\n"
 	    "\t-W: wpips\n"
@@ -62,8 +62,9 @@ fpips_usage(int ret)
     return ret;
 }
 
-int /* non static to avoid a gcc warning if not called. */
-fpips_error(char * what, int argc, char ** argv)
+/* non static to avoid a gcc warning if not called.
+ */
+int fpips_error(char * what, int argc, char ** argv)
 {
     fprintf(stderr, "[fpips] sorry, %s not available (" SOFT_ARCH ")\n", what);
     return fpips_usage(1);
@@ -71,8 +72,7 @@ fpips_error(char * what, int argc, char ** argv)
 
 /* returns wether name ends with ref 
  */
-static int
-name_end_p(char * name, char * ref)
+static int name_end_p(char * name, char * ref)
 {
     int nlen = strlen(name), rlen = strlen(ref);
     if (nlen<rlen) return FALSE;
@@ -82,11 +82,15 @@ name_end_p(char * name, char * ref)
     return TRUE;
 }
 
+static int fpips_version(int ret)
+{
+    fprintf(stderr, "fpips (ARCH=" SOFT_ARCH ", DATE=" UTC_DATE")\n");
+    return ret;
+}
 
 /********************************************************************* MAIN */
 
-int 
-fpips_main(int argc, char **  argv)
+int fpips_main(int argc, char **  argv)
 {
     debug_on("FPIPS_DEBUG_LEVEL");
     pips_debug(1, "considering %s for execution\n", argv[0]);
@@ -107,7 +111,11 @@ fpips_main(int argc, char **  argv)
 
     /* options
      */
-    if (same_string_p(argv[1], "-h")) return  fpips_usage(0);
+    if (same_string_p(argv[1], "-h")) 
+	return fpips_usage(0);
+
+    if (same_string_p(argv[1], "-v"))
+	return fpips_version(0);
 
     if (same_string_p(argv[1], "-P")) {
 	/* Do not forget to update what will become the new
