@@ -1,13 +1,14 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/06/14 16:23:48 $, 
+# $Date: 1996/06/18 14:28:20 $, 
 # Source, header and object files used to build the library.
 
 LIB_CFILES=	stub.c \
 		reductions.c \
 		utils.c \
 		transformation.c \
-		prettyprint.c
+		prettyprint.c \
+		call.c
 
 # should have LIB_LISPFILES
 # they sould be put somewhere for execution
