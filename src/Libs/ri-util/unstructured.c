@@ -4,6 +4,9 @@
   * Prettyprint unstructured
   *
   * $Log: unstructured.c,v $
+  * Revision 1.9  1998/04/14 15:23:28  coelho
+  * linear.h
+  *
   * Revision 1.8  1997/12/11 10:58:46  coelho
   * missing strdup added.
   *
@@ -15,6 +18,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "text.h"
