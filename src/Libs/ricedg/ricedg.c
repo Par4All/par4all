@@ -288,8 +288,8 @@ char *mod_name;
 	set_precondition_map( (statement_mapping)
 	    db_get_memory_resource(DBR_PRECONDITIONS, mod_name, TRUE) );
 
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE)) );
+    set_cumulated_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE) );
 
     debug_on("RICEDG_DEBUG_LEVEL");
     debug(1, "rice_dependence_graph", "finding enclosing loops ...\n");
@@ -391,8 +391,7 @@ char *mod_name;
     reset_current_module_entity();
     reset_current_module_statement();
     reset_precondition_map();
-    /* An auxiliary hash table was allocated by effects_to_list_map */
-    free_cumulated_effects_map();
+    reset_cumulated_rw_effects();
     reset_enclosing_loops_map();
 
     return TRUE;
@@ -2479,7 +2478,7 @@ statement stat;
 	 if( action_write_p( effect_action( ef )) && entity_integer_scalar_p( en )) 
 	     lv = gen_nconc(lv, CONS(ENTITY, en, NIL));
      }, 
-	 load_statement_cumulated_effects(stat) ) ;
+	 load_cumulated_rw_effects_list(stat) ) ;
     
     l = statement_loop(stat);
     locals = loop_locals(l);
