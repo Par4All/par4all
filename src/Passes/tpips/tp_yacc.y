@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.73  1997/12/12 14:48:19  coelho
+ * leaks--.
+ *
  * Revision 1.72  1997/12/12 12:56:46  coelho
  * typo fixed.
  *
@@ -181,7 +184,7 @@ remove_a_resource(string rname, string mname)
     return TRUE;
 }
 
-/* apply what to all resources in res
+/* apply what to all resources in res. res is freed.
  */
 static bool
 perform(bool (*what)(string, string), res_or_rule * res)
@@ -449,8 +452,8 @@ i_open:	TK_OPEN TK_NAME TK_ENDOFLINE
 			lazy_open_module(main_module_name);
 		    }
 		}
-		free($2);
 	    }
+	    free($2);
 	}
 	;
 
@@ -479,7 +482,6 @@ i_create: TK_CREATE TK_NAME /* workspace name */
 			pips_user_error("Could not create workspace %s\n", $2);
 		      }
 
-		      free($2);
 		      main_module_name = get_first_main_module();
 		      
 		      if (!string_undefined_p(main_module_name)) {
@@ -496,6 +498,7 @@ i_create: TK_CREATE TK_NAME /* workspace name */
 		  }
 		}
 	    }
+	    free($2);
 	    gen_array_full_free($3);
 	}
 	;
@@ -548,6 +551,7 @@ i_delete: TK_DELETE TK_NAME /* workspace name */ TK_ENDOFLINE
 		    }
 		}
 	    }
+	    free($2);
 	}
 	;
 
