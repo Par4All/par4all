@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/04/14 17:57:28 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/04/15 10:14:04 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -374,7 +374,7 @@ tag move, act;
      * some variables are not used, they are removed here.
      */
     /* result = sc_elim_redond(result); */
-    result = sc_nredund(result);
+    sc_nredund(&result);
     base_rm(sc_base(result));
     sc_base(result) = NULL;
     sc_creer_base(result);
@@ -537,7 +537,7 @@ tag move;
      * some variables are not used, they are removed here.
      */
     /* syst = sc_elim_redond(syst); */
-    syst = sc_nredund(syst);
+    sc_nredund(&syst);
     base_rm(sc_base(syst));
     sc_base(syst) = NULL;
     sc_creer_base(syst);
@@ -670,7 +670,7 @@ list *plparam, *plproc, *plscan, *plrebuild;
     }
 
     /* syst = sc_elim_redond(syst); */
-    syst = sc_nredund(syst);
+    sc_nredund(&syst);
     base_rm(sc_base(syst));
     sc_base(syst) = NULL;
     sc_creer_base(syst);
