@@ -15,6 +15,7 @@
  * - bug name[20] overflow not checked in lname (20 -> 80)
  * - hollerith constants conversion;-)
  * - LINESIZE 80 -> 200...
+ * - "PROGRAM MAIN..." added if implicit name.
  */
 
 static void hollerith(char *);
