@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1994/03/08 15:14:26 $) version $Revision$, got on %D%, %T%
+# $RCSfile: validate-sequential,v $ ($Date: 1994/03/08 15:32:37 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 # A small Validation Suite test program for PIPS.
@@ -48,7 +48,7 @@ which_pips()
 
 if [ -x pips ] ; 
 then
-  pips_version=$PWD/`ls -F pips`
+  pips_version=`pwd`/`ls -F pips`
 else
   pips_version=`which_pips`
 fi
