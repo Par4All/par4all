@@ -4,7 +4,7 @@
 
 SCRIPTS = 	Validate \
 		validate-sequential \
-		accept \
+		Accept \
 		manual_accept \
 		bug-to-validate \
 		dir-to-validate
