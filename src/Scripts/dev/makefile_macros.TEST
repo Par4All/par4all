@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.TEST,v $ (version $Revision$)
-# $Date: 1996/07/24 14:08:36 $, 
+# $Date: 1996/07/26 11:52:28 $, 
 #
 # this file contains macro definitions 
 # the purpose is to test some options and so.
@@ -12,7 +12,7 @@ AR	= gar
 ARFLAGS	= rv
 CC	= gcc
 CFLAGS	= -O2 -g -Wall -msupersparc -pipe
-CPPFLAGS= -DLINEAR_VALUE_IS_CHARS -DLINEAR_NO_OVERFLOW_CONTROL -D__USE_FIXED_PROTOTYPES__ -D__USE_GNU -D__USE_BSD -nostdinc -I$(NEWGEN_INCDIR) -I$(LINEAR_INCDIR) -I$(PIPS_INCDIR) -I$(PIPS_EXTEDIR) -I$(GLIBC)/include -I$(GCCDIR)/include -I/usr/include
+CPPFLAGS= -DLINEAR_VALUE_IS_CHARS -DLINEAR_NO_OVERFLOW_CONTROL -D__USE_FIXED_PROTOTYPES__ -D__USE_GNU -D__USE_BSD -nostdinc -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR) -I$(GLIBC)/include -I$(GCCDIR)/include -I/usr/include
 LD	= $(CC) 
 LDFLAGS	= -g -nostdlib $(GLIBC)/lib/crt0.o -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(PIPS_EXTEDIR) -L$(GLIBC)/lib -L$(GCCDIR)/lib -L/usr/lib -lc -lgcc
 RANLIB	= granlib
