@@ -143,7 +143,7 @@ int	  in_ct;
 			list blocs = NIL;
 			unstructured u = instruction_unstructured( inst );
 
-        		get_blocs(unstructured_control(u), &blocs ) ;
+        		control_map_get_blocs(unstructured_control(u), &blocs ) ;
         		blocs = gen_nreverse( blocs ) ;
         		MAPL( ctl_ptr,  {
                 		statement stmt = control_statement(
