@@ -74,6 +74,7 @@ int l ;
 	  }
 	  break;
       }
+      case is_instruction_whileloop:
       case is_instruction_goto: 
       case is_instruction_call: 
 	break;
