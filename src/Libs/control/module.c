@@ -52,7 +52,7 @@ bool controlizer(string module_name)
 				 MAKE_ORDERING(0,1),
 				 empty_comments,
 				 make_instruction(is_instruction_unstructured,
-						  control_graph(module_stat)));
+						  control_graph(module_stat)),NIL,NULL);
     ifdebug(5) {
 	statement_consistent_p(module_stat);
     }
