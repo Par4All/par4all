@@ -56,9 +56,46 @@ Although linear algebra algorithms are appealing as simple and fast proof
 engines, their usage in a compiler is not as straightforward as it seems
 at first.
 
+To analyze programs, we need to approximate unbounded sets and predicates
+and operators on sets, such as union, intersection, difference,... , as
+well as functions and relations and their operators, such as combining,
+applying and fixpoint (i.e. transitive closure). The exact set theory
+operators can be used to write dataflow equations. These equations must
+then be refined using under- and over-approximated sets and operators
+which is difficult.
+
+The dynamic behavior of programs is often controlled by integers, booleans
+and character strings. They all can be mapped on integers whereas linear
+algebra is mostly based on real and rational numbers. Linear algebra does
+not provide exact set operators very often. So different implementation of
+a set operator by linear lagebra algorithms can be exact, over- or
+under-approximation and be compared for accuracy and speed.
+
 \section{Fourier-Motzkin Elimination and Feasability}
 
+Fourier-Motzkin elimination can be used to check that a set is empty or
+not empty, or that a property holds or not since these two checks are
+identical.
+
+For convex sets of integer, a Fourier-Motzkin proves that a set is empty
+but it cannot prove in general that a set is non-empty, unless additional
+conditions are met~\cite{CA91}.
+
+Decomposition: $\Omega$-library
+
 \section{Simplexe}
+
+\section{Redundancy Elimination}
+
+On the integer or rational domain...
+
+Using Fourier-Motzkin...
+
+Using the simplexe...
+
+Using Chernikova and a canonical generating system...
+
+Keeping all information or ready to lose some to avoid all redundancy...
 
 \section{Convex Hull or Union}
 
