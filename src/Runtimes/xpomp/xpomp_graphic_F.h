@@ -1,5 +1,5 @@
 ! $RCSfile: xpomp_graphic_F.h,v $ (version $Revision$)
-! $Date: 1996/08/30 21:56:14 $, 
+! $Date: 1996/08/30 22:01:02 $, 
 !
 !  The fortran headers for the HPFC graphical library.
 
@@ -58,7 +58,7 @@ c     Return -1 if it fails, 0 if not:
       integer xpomp_flash
       external xpomp_flash
 
-c     Show a float array and interpolate color between min_value
+c     Show a float/double array and interpolate color between min_value
 c     tomax_value. If min_value = max_value = 0, 
 c     automatically scale the colors:
 !fcd$ io xpomp_show_real4
@@ -69,14 +69,7 @@ c     automatically scale the colors:
       integer xpomp_show_real8
       external xpomp_show_real8
 
-c     Show a double array and interpolate color between 
-c     min_value to max_value. If min_value = max_value = 0, 
-c     automatically scale the colors:
-!fcd$ io xpomp_show_double
-      integer xpomp_show_double
-      external xpomp_show_double
-
-c      Print out a small help about keyboard usage in xHPFC:
+c      Print out a small help about keyboard usage in xPOMP:
 c     xpomp_show_usage
 !fcd$ io xpomp_show_usage
 
