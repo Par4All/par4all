@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1997/12/05 18:38:48 $, )
+ * $RCSfile: list.c,v $ ($Date: 1997/12/05 18:42:19 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -238,11 +238,13 @@ int domain ;
     return( l ) ;
 }
 
-void gen_free_list(list l)n
+void gen_free_list(list l)
 {
     list p, nextp ;
-    for( p = l ; p != NIL ; p = nextp, nextp = p->cdr )
+    for( p = l ; p != NIL ; p = nextp ) {
+	nextp = p->cdr ;
 	free( p ) ;
+    }
 }
 
 cons * gen_nconc( cp1, cp2 )
