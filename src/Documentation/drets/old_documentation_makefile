@@ -1,6 +1,6 @@
 # PROJET PIPS: EXPLOITATION DE LA DOCUMENTATION
 # ---------------------------------------------
-# $RCSfile: old_documentation_makefile,v $ ($Date: 1995/05/10 12:55:09 $, )
+# $RCSfile: old_documentation_makefile,v $ ($Date: 1995/08/10 13:16:58 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -38,6 +38,14 @@
 # debugging
 # .INIT:
 #	rm -f *.listing *.datastructure
+
+#
+# quick fix to use new PIPS_'ed environment variables.
+
+LIBDIR		=	$(PIPS_LIBDIR)
+INCLUDEDIR	=	$(PIPS_INCLUDEDIR)
+UTILDIR		= 	$(PIPS_UTILDIR)
+LIBSRCDIR	= 	$(PIPS_LIBSRCDIR)
 
 # GENERATION DE FICHIERS LATEX A INCLURE DANS LES RAPPORTS
 
