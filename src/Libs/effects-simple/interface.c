@@ -21,52 +21,74 @@
 #include "effects-simple.h"
 
 
-/*********************************************************************************/
-/* PIPSMAKE INTERFACES                                                           */
-/*********************************************************************************/
+/****************************************************** PIPSMAKE INTERFACES */
 
 /* SPECIFIC INTERFACES */
 
 bool 
-cumulated_references( char *module_name)
+cumulated_references(char * module_name)
 {
+    bool ok;
     set_methods_for_cumulated_references();
-    return(rw_effects_engine(module_name));
+    ok = rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 bool 
-proper_effects(char *module_name)
+proper_references(char * module_name)
+{
+    bool ok;
+    set_methods_for_proper_references();
+    ok = proper_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool 
+proper_effects(char * module_name)
 {
     bool res1, res2;
 
     set_methods_for_proper_references();
     res1 = proper_effects_engine(module_name);
+    generic_effects_reset_all_methods();
 
     set_methods_for_proper_simple_effects();
     res2 = proper_effects_engine(module_name);
+    generic_effects_reset_all_methods();
     
-    return (res1 && res2);
+    return res1 && res2;
 }
 
 bool 
 summary_effects(string module_name)
 {
-   set_methods_for_simple_effects();
-   return summary_rw_effects_engine(module_name);
+    bool ok;
+    set_methods_for_simple_effects();
+    ok = summary_rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 bool 
 cumulated_effects(string module_name)
 {
+    bool ok;
     set_methods_for_simple_effects();
-    return rw_effects_engine(module_name);
+    ok = rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 bool
 in_summary_effects(char *module_name)
 {
+    bool ok;
     set_methods_for_simple_effects();
-    return summary_in_effects_engine(module_name);
+    ok = summary_in_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 bool
@@ -79,8 +101,11 @@ out_summary_effects(char *module_name)
 bool
 in_effects(char *module_name)
 {
+    bool ok;
     set_methods_for_simple_effects();
-    return in_effects_engine(module_name);
+    ok = in_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 bool
@@ -93,111 +118,135 @@ out_effects(char *module_name)
 bool
 print_code_proper_effects(char *module_name)
 {
+    bool ok;
     set_methods_for_proper_simple_effects();
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(TRUE);
     set_read_action_interpretation(READ_IS_READ);
     set_write_action_interpretation(WRITE_IS_WRITE);
-    return (print_source_or_code_with_any_effects_engine(module_name,
+    ok = (print_source_or_code_with_any_effects_engine(module_name,
 							 DBR_PROPER_EFFECTS,
 							 string_undefined,
 							 ".prop"));
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 bool
 print_code_cumulated_effects(char* module_name)
 {
+    bool ok;
     set_methods_for_simple_effects();
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(TRUE);
     set_read_action_interpretation(READ_IS_READ);
     set_write_action_interpretation(WRITE_IS_WRITE);
-    return (print_source_or_code_with_any_effects_engine(module_name,
+    ok = (print_source_or_code_with_any_effects_engine(module_name,
 							 DBR_CUMULATED_EFFECTS,
 							 DBR_SUMMARY_EFFECTS,
 							 ".cumu"));
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 bool
 print_code_in_effects(char *module_name)
 {
+    bool ok;
     set_methods_for_simple_effects();
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
     set_read_action_interpretation(READ_IS_IN);
-    return (print_source_or_code_with_any_effects_engine(module_name,
-							 DBR_IN_EFFECTS,
-							 DBR_IN_SUMMARY_EFFECTS,
-							 ".ineff"));
+    ok = print_source_or_code_with_any_effects_engine(module_name,
+						      DBR_IN_EFFECTS,
+						      DBR_IN_SUMMARY_EFFECTS,
+						      ".ineff");
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 bool
 print_code_out_effects(char *module_name)
 {
+    bool ok;
     set_methods_for_simple_effects();
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
     set_write_action_interpretation(WRITE_IS_OUT);
-    return (print_source_or_code_with_any_effects_engine(module_name,
-							 DBR_OUT_EFFECTS,
-							 DBR_OUT_SUMMARY_EFFECTS,
-							 ".uouteff"));
+    ok = print_source_or_code_with_any_effects_engine(module_name,
+						      DBR_OUT_EFFECTS,
+						      DBR_OUT_SUMMARY_EFFECTS,
+						      ".uouteff");
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 
 bool
 print_source_proper_effects(char *module_name)
 {
+    bool ok;
     set_methods_for_proper_simple_effects();
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(TRUE);
     set_read_action_interpretation(READ_IS_READ);
     set_write_action_interpretation(WRITE_IS_WRITE);
-    return (print_source_or_code_with_any_effects_engine(module_name,
-							 DBR_PROPER_EFFECTS,
-							 string_undefined,
-							 ".uprop"));
+    ok = print_source_or_code_with_any_effects_engine(module_name,
+						      DBR_PROPER_EFFECTS,
+						      string_undefined,
+						      ".uprop");
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 bool
 print_source_cumulated_effects(char* module_name)
 {
+    bool ok;
     set_methods_for_simple_effects();
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(TRUE);
     set_read_action_interpretation(READ_IS_READ);
     set_write_action_interpretation(WRITE_IS_WRITE);
-    return (print_source_or_code_with_any_effects_engine(module_name,
-							 DBR_CUMULATED_EFFECTS,
-							 DBR_SUMMARY_EFFECTS,
-							 ".ucumu"));
+    ok = print_source_or_code_with_any_effects_engine(module_name,
+						      DBR_CUMULATED_EFFECTS,
+						      DBR_SUMMARY_EFFECTS,
+						      ".ucumu");
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 
 bool
 print_source_in_effects(char *module_name)
 {
+    bool ok;
     set_methods_for_simple_effects();
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
     set_read_action_interpretation(READ_IS_IN);
-    return (print_source_or_code_with_any_effects_engine(module_name,
-							 DBR_IN_EFFECTS,
-							 DBR_IN_SUMMARY_EFFECTS,
-							 ".uineff"));
+    ok = print_source_or_code_with_any_effects_engine(module_name,
+						      DBR_IN_EFFECTS,
+						      DBR_IN_SUMMARY_EFFECTS,
+						      ".uineff");
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 bool
 print_source_out_effects(char *module_name)
 {
+    bool ok;
     set_methods_for_simple_effects();
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
     set_write_action_interpretation(WRITE_IS_OUT);
-    return (print_source_or_code_with_any_effects_engine(module_name,
-							 DBR_OUT_EFFECTS,
-							 DBR_OUT_SUMMARY_EFFECTS,
-							 ".uouteff"));
+    ok = print_source_or_code_with_any_effects_engine(module_name,
+						      DBR_OUT_EFFECTS,
+						      DBR_OUT_SUMMARY_EFFECTS,
+						      ".uouteff");
+    generic_effects_reset_all_methods();
+    return ok;
 }
 
 text
@@ -227,238 +276,7 @@ get_text_cumulated_effects(string module_name)
 }
 
 
-
-/*********************************************************************************/
-/* PIPSDBM INTERFACES                                                            */
-/*********************************************************************************/
-
-statement_effects
-db_get_proper_references(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_PROPER_REFERENCES,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-void
-db_put_proper_references(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_PROPER_REFERENCES,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-list
-db_get_summary_references(char *mod_name)
-{
-    list l_res = NIL;
-    
-    l_res = effects_to_list(
-	(effects) db_get_memory_resource(DBR_SUMMARY_EFFECTS, mod_name, TRUE));
-    return l_res;
-}
-
-/* summary references are never computed */
-void
-db_put_summary_references(char *mod_name, list l_eff)
-{
-    return;
-}
-
-statement_effects
-db_get_cumulated_references(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_REFERENCES,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-void
-db_put_cumulated_references(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_REFERENCES,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-statement_effects
-db_get_invariant_references(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_REFERENCES,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-void
-db_put_invariant_references(char *mod_name, statement_effects eff_map)
-{
-    return;
-}
-
-
-
-
-statement_effects
-db_get_simple_proper_rw_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_PROPER_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-void
-db_put_simple_proper_rw_effects(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_PROPER_EFFECTS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-statement_effects
-db_get_simple_invariant_rw_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-void
-db_put_simple_invariant_rw_effects(char *mod_name, statement_effects eff_map)
-{
-   return;
-}
-
-statement_effects
-db_get_simple_rw_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-void
-db_put_simple_rw_effects(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_EFFECTS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-list
-db_get_simple_summary_rw_effects(char *mod_name)
-{
-    list l_res = NIL;
-    
-    l_res = effects_to_list(
-	(effects) db_get_memory_resource(DBR_SUMMARY_EFFECTS, mod_name, TRUE));
-    return l_res;
-}
-
-void
-db_put_simple_summary_rw_effects(char *mod_name, list l_eff)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_EFFECTS,
-			   strdup(mod_name),
-			   (char *) list_to_effects(l_eff));
-}
-
-statement_effects
-db_get_simple_in_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_IN_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-void
-db_put_simple_in_effects(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_IN_EFFECTS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-statement_effects
-db_get_simple_cumulated_in_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_IN_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-void
-db_put_simple_cumulated_in_effects(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_IN_EFFECTS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-
-statement_effects
-db_get_simple_invariant_in_effects(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_IN_EFFECTS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-void
-db_put_simple_invariant_in_effects(char *mod_name, statement_effects eff_map)
-{
-    return;
-}
-
-
-list
-db_get_simple_summary_in_effects(char* mod_name)
-{
-    list l_res = NIL;
-    
-    l_res = effects_to_list(
-	(effects) db_get_memory_resource(DBR_IN_SUMMARY_EFFECTS, mod_name, TRUE));
-    return l_res;
-}
-
-void
-db_put_simple_summary_in_effects(char *mod_name, list l_eff)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_IN_SUMMARY_EFFECTS,
-			   strdup(mod_name),
-			   (char *) list_to_effects(l_eff));
-}
-
-
-/*********************************************************************************/
-/* INTERFACES TO COMPUTE SIMPLE PROPER EFFECTS FROM OTHER PHASES                 */
-/*********************************************************************************/
+/*********** INTERFACES TO COMPUTE SIMPLE PROPER EFFECTS FROM OTHER PHASES */
 
 /* list proper_effects_of_expression(expression e)
  * input    : an expression and the current context
@@ -573,6 +391,7 @@ statement s;
     reset_proper_rw_effects();
     reset_rw_effects();
     reset_invariant_rw_effects();
+    generic_effects_reset_all_methods();
 
     return(l_eff);
 }
