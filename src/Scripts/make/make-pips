@@ -1,210 +1,119 @@
 #! /bin/sh
-#! /bin/sh -vx
 #
-# SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1996/07/01 08:47:31 $, )
-# version $Revision$
-# got on %D%, %T%
+# $RCSfile: make-pips,v $ version $Revision$
+# $Date: 1996/07/11 11:59:41 $, 
 #
+# (c) Fabien COELHO 07/96
+#
+# changed a lot. it happens that -r does what you expect from it...
+# for building pips on installation, do make-pips -b
 
 umask 2
+script=`basename $0`
+unset sides parts commands dirs libs pips newgen linear
+verb=':'
+job=$PIPS_MAKE
 
-# make-pips: global remake of PIPS libraries and passes to be used after
-# changes in data structures or global installation of sources.
-#
-# recompile-pips replaced by make-pips -r (bb, 16.10.91)
+usage()
+{
+    ret=$1
+    shift
+    cat >&2 <<-EOF
+	$script (version $Revision$): $@
+	usage: $script [options] [targets]
+	  -h: print this help and exit
+	  -v: verbose
+	  -N: do nothing, print what would be done
+	 possible softs
+	  -p: Pips (default)
+	  -l: Linear
+	  -n: Newgen
+	 possible sides
+	  -P: Production (default)
+	  -R: Release
+	  -D: Development
+	 misc
+	  -b: build pips (Production, Pips+Linear+Newgen, recompile)
+	  -r: full recompile (Production, Pips+Linear+Newgen, clean+recompile)
+	  -d dir: specifies a directory
+	  -o file: log file to report to (default is /dev/tty)
+	 targets: make targets to require (e.g. clean all recompile diff...)
+EOF
+    exit $ret
+}
 
-# Options are available:
-#  -n: do nothing but show what would be done
-#  -p: take care of Production (default)
-#  -d: take care of Development
-#  -a: do everything (Production + Development)
-#  -r: recompile (for global installation of sources)
+verbose()
+{
+    echo "$script: $@" >&2
+}
 
-# X, Francois Irigoin, Corinne Ancourt
-
-# Modifications:
-#  - variable FAILURES is added to check the happy ending (FI, 18/07/92)
-
-USAGE="Usage: $0 [-p|d|a|r|b] [-n] [-o]"
-
-BOOTSTRAP=""
-MAKE_OPTION=""
-DEVELOPMENT=""
-PRODUCTION=TRUE
-RECOMPILE=""
-FAILURES=""
-KEEP_STDOUT=""
-
-while getopts odnparb opt
+while getopts hvNRPDplnbd:o: OPT
 do
-	case $opt in
-	b)	BOOTSTRAP=TRUE
-		RECOMPILE=TRUE;;
-	o)	KEEP_STDOUT=TRUE;;
-	d)	DEVELOPMENT=TRUE
-		PRODUCTION="";;
-	n)	MAKE_OPTION="-n";;
-	p)	PRODUCTION=TRUE
-		DEVELOPMENT="";;
-	a)	DEVELOPMENT=TRUE
-		PRODUCTION=TRUE;;
-	r)	RECOMPILE=TRUE;;
-	\?)	echo $USAGE >&2
-		exit 2;;
-	esac
+    case $OPT in
+	h) usage 0 "here is some help!" ;;
+	v) verb=verbose ;;
+	N) job="echo $PIPS_MAKE" ;;
+	R) sides="$sides RELEASE" ;;
+	P) sides="$sides SRCDIR" ;;
+	D) sides="$sides DEVEDIR" ;;
+	p) parts="$parts PIPS" ; pips='1' ;;
+	l) parts="$parts LINEAR" ; linear='1' ;;
+	n) parts="$parts NEWGEN" ; newgen='1' ;;
+	b) commands="$commands recompile" ;
+	   parts="NEWGEN LINEAR PIPS" ;
+	   sides="SRCDIR" ;
+	   pips='1' ; linear='1' ; newgen='1' ;;
+	r) commands="$commands clean recompile" ;
+	   parts="NEWGEN LINEAR PIPS" ;
+	   sides="SRCDIR" ;
+	   pips='1' ; linear='1' ; newgen='1' ;;
+	o) commands="FWD_REPORT=$OPTARG $commands" ;;
+	d) dirs="$dirs $OPTARG" ;;
+	*) usage 2 "invalid option" ;;
+    esac
 done
+shift `expr $OPTIND - 1`
 
-#echo PRODUCTION="$PRODUCTION"
-#echo DEVELOPMENT="$DEVELOPMENT"
-#echo MAKE_OPTION="$MAKE_OPTION"
+commands="$commands $@"
 
-# Prepare file redirections
-if [ -n "$KEEP_STDOUT" ]
-then
-	REDIRECT=""
-else
-	REDIRECT=" > /dev/null"
-fi
-
-# Pips project passes
-# Explicit definition of passes to avoid obsolete ones
-
-PASSES=${PIPS_PASSES}
-
-# Pips project libraries:
-# Libs have to be topologically ordered to generate header files before
-# they are needed; 
-# Library order does usualy not matter. In order not to forget any:
-# GO : ordering allow making of the .h files - if there where no cycles ... :-(
 #
+# defaults:
+
+[ "$sides" ] || sides="SRCDIR"
+[ "$parts" ] || { parts="PIPS" ; pips='1' ; }
+
+[ "$pips" ] && libs="$libs Lib Passes Scripts Runtime $PIPS_ORDERED_LIBS"
+[ "$linear" ] && libs="$libs $LINEAR_ORDERED_LIBS"
+[ "$newgen" ] && libs="$libs $NEWGEN_ORDERED_LIBS"
+[ "$libs" ]  && libs="FWD_DIRS=\"$libs\""
+
 #
+# build the directories to visit
 
-if [ -n "$BOOTSTRAP" ]
-then
+$verb "sides=$sides"
+$verb "parts=$parts"
 
-	LIBS=`(cd $PIPS_LIBSRCDIR; echo [!M]*)`
-
-else
-
-	echo analyzing libraries ...
-	analyze_libraries -p
-
-	echo ordering libraries ...
-	order_libraries -b
-
-	#build a regexp to avoid passes in libs
-
-	AVOID_PASSES='(^'
-	for lib in $PASSES ; do
-		AVOID_PASSES="${AVOID_PASSES}${lib}\$|^"
-	done
-	AVOID_PASSES="${AVOID_PASSES}\$)"
-
-	# Get the lib list
-	LIBS=`sed 's/^lib//;s/.a$//' ${PIPS_TEMPDIR}/libs.b | egrep -v ${AVOID_PASSES}`
-
-fi
-
-echo LIBS=$LIBS
-
-# build internal representation
-# echo "Making internal representation"
-# (cd ${INCLUDEDIR} ; make internal_representation)
-
-# build .a file for all libraries in Production
-if [ -n "$PRODUCTION" ]
-then
-
-if [ -n "$RECOMPILE" ]
-then
-	echo Cleaning libraries ...
-	for lib in $LIBS ; do
-		(cd ${PIPS_LIBSRCDIR}/${lib}; 
-			eval $PIPS_MAKE $MAKE_OPTION clean $REDIRECT
-			eval $PIPS_MAKE $MAKE_OPTION depend $REDIRECT)
-		if [ $? -ne 0 ] ; then
-			echo "Failed in cleaning library $lib in Production"
-			FAILURES="$FAILURES $lib (clean - P),"
-		fi
-	done
-fi
-
-for lib in $LIBS ; do
-	echo
-	(echo cd ${PIPS_LIBSRCDIR}/${lib} ; cd ${PIPS_LIBSRCDIR}/${lib}; 
-		echo "Making ${PIPS_LIBDIR}/lib${lib}.a"
-		eval $PIPS_MAKE $MAKE_OPTION recompile $REDIRECT)
-	if [ $? -ne 0 ] ; then
-		echo "Failed in building library $lib in Production"
-		FAILURES="$FAILURES $lib (P),"
-	fi
+for p in $parts ;
+do 
+    for s in $sides ;
+    do
+	dirs="$dirs "`eval echo \$"${p}_${s}"`
+    done
 done
 
-fi
+#
+# do the job here
 
-# build .a file for all libraries in Development
-if [ -n "$DEVELOPMENT" ]
-then
-for lib in $LIBS ; do
-	echo; echo
-	(echo cd ${PIPS_DEVEDIR}/Lib/${lib}; cd ${PIPS_DEVEDIR}/Lib/${lib}; 
-		echo "Making lib${lib}.a"
-		eval $PIPS_MAKE $MAKE_OPTION recompile $REDIRECT)
-	if [ $? -ne 0 ] ; then
-		echo "Failed in building library $lib in Development"
-		FAILURES="$FAILURES $lib (D),"
-	fi
+$verb "commands=$commands"
+$verb "dirs=$dirs"
+
+for d in $dirs
+do
+    $verb "dealing with $d"
+    $job -C $d $libs $commands
 done
-fi
 
-# build passes
-if [ -n "$PRODUCTION" ]
-then
-	if test ! -d ${PIPS_BINDIR}
-	then
-		mkdir ${PIPS_BINDIR}
-	fi
-	if [ -n "$RECOMPILE" ]
-	then
-		echo Cleaning passes...
-		for pass in $PASSES ; do
-			(cd ${PIPS_BINSRCDIR}/${pass}; 
-				eval $PIPS_MAKE $MAKE_OPTION clean $REDIRECT
-				eval $PIPS_MAKE $MAKE_OPTION depend $REDIRECT)
-			if [ $? -ne 0 ] ; then
-				echo " Failed in building ${PIPS_BINDIR}/${pass}"
-				FAILURES="$FAILURES $pass (clean - P),"
-			fi
-		done
-	fi
+#verb "done"
 
-	for pass in $PASSES ; do
-		echo; echo
-		(echo cd ${PIPS_BINSRCDIR}/${pass}; cd ${PIPS_BINSRCDIR}/${pass}; 
-			echo "Making ${PIPS_BINDIR}/${pass}"
-			eval $PIPS_MAKE $MAKE_OPTION recompile $REDIRECT)
-		if [ $? -ne 0 ] ; then
-			echo " Failed in building ${PIPS_BINDIR}/${pass}"
-			FAILURES="$FAILURES $pass (P),"
-		fi
-	done
-fi
-
-# build passes
-if [ -n "$DEVELOPMENT" ]
-then
-for pass in $PASSES ; do
-	echo; echo
-	(echo cd ${PIPS_DEVEDIR}/Passes/${pass} ; cd ${PIPS_DEVEDIR}/Passes/${pass};
-		echo "Making ${pass}"
-		eval $PIPS_MAKE $MAKE_OPTION recompile $REDIRECT)
-	if [ $? -ne 0 ] ; then
-		echo " Failed in building pass $pass in Development"
-		FAILURES="$FAILURES $pass (D),"
-	fi
-done
-fi
-
-echo Failures: $FAILURES
-
+# end of $RCSfile: make-pips,v $
+#
