@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: newgen.c,v $
+ * Revision 1.20  2003/06/16 15:00:51  coelho
+ * db_void added.
+ *
  * Revision 1.19  1998/04/14 16:01:37  coelho
  * moved to an independent directory.
  *
@@ -22,6 +25,7 @@ typedef void * void_star;
 /*typedef void * vertex;*/
 typedef void * arc_label;
 typedef void * vertex_label;
+typedef void * db_void;
 
 #include "linear.h"
 #include "matrice.h"
@@ -95,4 +99,12 @@ void initialize_newgen()
 		      (void (*)()) gen_null,
 		      (char *(*)()) gen_identity,
 		      (int (*)()) gen_false);
+
+    /* do nothing! */
+    gen_init_external(DB_VOID_NEWGEN_EXTERNAL,
+		      (char* (*)()) gen_false, /* read */
+		      (void (*)()) gen_null, /* write */
+		      (void (*)()) gen_null, /* free */
+		      (char* (*)()) gen_false, /* copy */
+		      (int (*)()) gen_true); /* size */
 }
