@@ -35,14 +35,16 @@
 
 static Pcontrainte equivalence_equalities = CONTRAINTE_UNDEFINED;
 
-static void reset_equivalence_equalities()
+static void 
+reset_equivalence_equalities()
 {
     if(equivalence_equalities != CONTRAINTE_UNDEFINED) {
 	equivalence_equalities = contraintes_free(equivalence_equalities);
     }
 }
 
-transformer tf_equivalence_equalities_add(tf)
+transformer 
+tf_equivalence_equalities_add(tf)
 transformer tf;
 {
     /* I need here a contraintes_dup() that is not yet available
@@ -53,7 +55,8 @@ transformer tf;
     return tf;
 }
 
-static void add_equivalence_equality(e, eq)
+static void 
+add_equivalence_equality(e, eq)
 entity e;
 entity eq;
 {
@@ -69,7 +72,8 @@ entity eq;
     equivalence_equalities = c;
 }
 
-void add_equivalenced_values(e, eq, readonly)
+void 
+add_equivalenced_values(e, eq, readonly)
 entity e;
 entity eq;
 bool readonly;
@@ -95,7 +99,8 @@ bool readonly;
 
 /* void add_interprocedural_value_entities 
  */
-static void add_interprocedural_value_entities(e)
+static void 
+add_interprocedural_value_entities(e)
 entity e;
 {
     if(!entity_has_values_p(e)) {
@@ -113,7 +118,8 @@ entity e;
 	}
     }
 }
-static void add_interprocedural_new_value_entity(e)
+static void 
+add_interprocedural_new_value_entity(e)
 entity e;
 {
     if(!entity_has_values_p(e)) {
@@ -148,7 +154,8 @@ add_intraprocedural_value_entities(entity e)
 
 /*  */
 
-void add_or_kill_equivalenced_variables(e, readonly)
+void 
+add_or_kill_equivalenced_variables(e, readonly)
 entity e;
 bool readonly;
 {
@@ -243,7 +250,8 @@ bool readonly;
 		   "unproper storage = %d\n", storage_tag(s));
 }
 
-static void allocate_module_value_mappings(m)
+static void 
+allocate_module_value_mappings(m)
 entity m;
 {
     /* this routine tries to estimate the sizes of the hash tables,
@@ -297,10 +305,38 @@ entity m;
 }
 
 /* void module_to_value_mappings(entity m): build hash tables between
- * variables and values, and values and names for module m, as well as
- * equivalence equalities
- */
-void module_to_value_mappings(m)
+ * variables and values (old, new and intermediate), and between values
+ * and names for module m, as well as equivalence equalities
+ *
+ * NW:
+ * before calling "module_to_value_mappings"
+ * to set up the hash table to translate value into value names
+ * for module with name (string) module_name
+ * do:
+ *
+ * set_current_module_entity( local_name_to_top_level_entity(module_name) );
+ *
+ * (the following call is only necessary if a variable of type entity
+ * such as "module" is not already set)
+ * module = get_current_module_entity();
+ *
+ * set_current_module_statement( (statement)
+ * 			      db_get_memory_resource(DBR_CODE,
+ * 						     module_name,
+ * 						     TRUE) );
+ * set_cumulated_rw_effects((statement_effects)
+ * 			 db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+ * 						module_name,
+ * 						TRUE));
+ * 
+ * (that's it, but we musn't forget to reset everything
+ * after the call to "module_to_value_mappings", as below)
+ *
+ * reset_current_module_statement();
+ * reset_cumulated_rw_effects();
+ * reset_current_module_entity(); */
+void 
+module_to_value_mappings(m)
 entity m;
 {
     cons * module_inter_effects;
@@ -428,7 +464,8 @@ entity m;
  * Ugly because it has a hidden side effect on v and because it's
  * implementation dependent on type Pvecteur
  */
-bool value_mappings_compatible_vector_p(v)
+bool 
+value_mappings_compatible_vector_p(v)
 Pvecteur v;
 {
     for(;!VECTEUR_NUL_P(v); v = v->succ) {
