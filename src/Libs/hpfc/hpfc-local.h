@@ -1,18 +1,13 @@
-/*
- * local definitions
+/* local definitions
  * 
- * SCCS stuff:
- * $RCSfile: hpfc-local.h,v $ ($Date: 1995/03/22 11:13:09 $, )
+ * $RCSfile: hpfc-local.h,v $ ($Date: 1995/03/27 16:22:35 $, )
  * version $Revision$,
- * got on %D%, %T%
- * $Id$
  */
 
+/* hmmm... shouldn't be necessary
+ */
 #include <ctype.h>
-
 #include "genC.h"
-#include "mapping.h"
-
 #include "ri.h"
 #include "text-util.h"
 #include "hpf.h"
@@ -21,8 +16,12 @@
 
 #define HPFC_PACKAGE "HPFC-PACKAGE"
 
+#define hpfc_warning \
+    if (!get_bool_property("HPFC_NO_WARNING")) user_warning
+
 extern entity /* in compiler.c */
     host_module,
     node_module;
 
-extern void hpfc_warning();
+/*  end of $RCSfile: hpfc-local.h,v $
+ */
