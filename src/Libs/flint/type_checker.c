@@ -343,7 +343,7 @@ convert_constant(call c, basic to_basic)
  * Cast an expression constant to the basic to_basic.
  * Return TRUE if OK
  */
-expression
+static expression
 cast_constant(expression exp_constant, basic to_basic, type_context_p context)
 {
   entity function_called;
@@ -567,7 +567,7 @@ get_cast_function_for_basic(basic cast, basic from)
  * Cast an expression
  * e.g: x --> INT(x)
  */
-expression 
+static expression 
 insert_cast(basic cast, basic from, expression exp, type_context_p context)
 {
   call c;
@@ -845,7 +845,7 @@ check_loop_range(range r, hash_table types)
  * Typing range of loop to the type of index loop. 
  * This range is already verified 
  */
-void
+static void
 type_loop_range(basic index, range r, type_context_p context)
 {
   basic lower, upper, incr;
