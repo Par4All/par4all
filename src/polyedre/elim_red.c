@@ -270,7 +270,7 @@ int *t1, *t2;
 int l;	/* longueur des tableaux */
 {
     int i,ident=1;
-    int more_0;
+    int more_0=0;
     for(i=0;i<=l && ident==1;i++) {
 	if ( (t1[i]==0 && t2[i]!=0) || (t1[i]!=0 && t2[i]==0) ) {
 	    ident = 0;
