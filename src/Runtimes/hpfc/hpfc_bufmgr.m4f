@@ -2,6 +2,9 @@
 ! $Id$
 !
 ! $Log: hpfc_bufmgr.m4f,v $
+! Revision 1.13  1997/05/02 16:36:18  coelho
+! global buffer id shared with reception.
+!
 ! Revision 1.12  1997/04/17 11:55:22  coelho
 ! better headers.
 !
@@ -11,6 +14,10 @@
 ! overheads in the enumaration/packing/message stuff.
 ! Counts the number of calls, say for some statistics.
 ! The the routines for doing the job...
+!
+! ??? the routines are used for I/O communication with the reception
+! already performed, hence the use of a global BUFFER ID...
+! 
 !
 define(`GENERIC_BUFFER_PACK',`dnl
 pushdef(`PVMTYPE',$1)dnl
@@ -53,18 +60,18 @@ fake_buffers(dnl
       end)
       subroutine build_name(PVMTYPE,hpfc bufupk)(lid)
       integer lid
-      integer info, bufid, length, tag, tid
+      integer info, length, tag, tid
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       if (RECEIVED NOT PERFORMED) then
          debug(write (unit=0, fmt=*) 
      $        "RCV from ", lid, RECVCHANNELS(lid))
-         call pvmfrecv(NODETIDS(lid), RECVCHANNELS(lid), bufid)
+         call pvmfrecv(NODETIDS(lid), RECVCHANNELS(lid), BUFFER ID)
          RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
          RECEIVED NOT PERFORMED = .FALSE.
          debug(write (unit=0, fmt=*) "RCV done")
       endif
-      call pvmfbufinfo(bufid, length, tag, tid, info)
+      call pvmfbufinfo(BUFFER ID, length, tag, tid, info)
       SIZEOFRECEIVEDBUFFER = length / M4_PVM_LENGTH(PVMTYPE)
       call pvmfunpack(PVMTYPE, build_name(PVMTYPE,BUFF),
      $     SIZEOFRECEIVEDBUFFER, 1, info)
