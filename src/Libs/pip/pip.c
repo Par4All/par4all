@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <stdlib.h>
 #include "types.h"
 
 /* Newgen includes 	*/
@@ -55,14 +56,6 @@
 #include "text.h"
 #include "paf-util.h"
 #include "pip.h"
-
-extern int fprintf();
-extern int fflush();
-extern int fork();
-extern int execlp();
-extern int wait();
-extern int fclose();
-extern int scanf();
 
 /* Macros and functions Used by the old_pip_solve version 	*/
 #define PIP_BIN "pip4"
