@@ -20,16 +20,16 @@ error()
 
 echo "all sources [Pips (including Validation), Newgen, Linear]"
 move pips_sources
-make_pips_release -CS -D Examples -F Validation/exportonly -pnle -rsz \
-	pips_sources || error 1 "ret $?"
+make_pips_release -CS -D Examples -F Validation/exportonly -pnle \
+    -rszf pips_sources PIPS || error 1 "ret $?"
 
 echo "Newgen sources"
 move newgen_sources
-make_pips_release -CS -n -rsz newgen_sources || error 2 "ret $?"
+make_pips_release -CS -n -rszf newgen_sources NEWGEN || error 2 "ret $?"
 
 echo "Linear sources"
 move linear_sources
-make_pips_release -CS -l -rsz linear_sources || error 3 "ret $?"
+make_pips_release -CS -l -rszf linear_sources LINEAR || error 3 "ret $?"
 
 echo "Xpomp sources"
 move xpomp_sources
@@ -44,20 +44,20 @@ make_pips_release -rz -D Doc/xpomp_manual.ps \
 
 echo "SunOS4 binary version"
 move pips_GNU
-make_pips_release -CB GNU -D Examples -pe -rsz pips_GNU || 
+make_pips_release -CB GNU -D Examples -pe -rszf pips_GNU PIPS || 
 	error 5 "ret $?"
 
 echo "Solaris 2 binary version "
 move pips_GNUSOL2LL
-make_pips_release -CB GNUSOL2LL -D Examples -pe -rz pips_GNUSOL2LL || 
+make_pips_release -CB GNUSOL2LL -D Examples -pe -rzf pips_GNUSOL2LL PIPS || 
 	error 6 "ret $?"
 
 echo "Solaris 2 public softs (big!)"
 move public_GNUSOL2LL
-make_pips_release -P -rz public_GNUSOL2LL ||
+make_pips_release -P -rzf public_GNUSOL2LL PIPS ||
 	error 7 "ret $?"
 
-# make_pips_release -CB IBMAIX -D Examples -pe -rz pips_IBMAIX 
+# make_pips_release -CB IBMAIX -D Examples -pe -rzf pips_IBMAIX PIPS
 
 echo done
 
