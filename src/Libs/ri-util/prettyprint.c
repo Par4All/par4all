@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.127  1998/12/15 16:51:33  zory
+ * modification of the inverse operator prettyprint
+ *
  * Revision 1.126  1998/12/15 13:11:39  zory
  * new prettyprint for inverse operator and fma operator
  *
@@ -219,7 +222,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.126 1998/12/15 13:11:39 zory Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.127 1998/12/15 16:51:33 zory Exp $";
 #endif /* lint */
 
  /*
@@ -870,7 +873,8 @@ words_unary_minus(call obj, int precedence, bool leftmost)
    (e.g. a*1/b without parentheses). Moreover, the MAXIMAL precedence is
    used for the (x) subterm (e.g. 1/(a*b) 1/(-2) ...). However, 1/x**2 may
    be a correct prettyprint in Fortran (?) */
-
+/* WARNING : the floating point division is used wether b is an int or not
+   ! (1.0/b) -- in fact b should not be an int ! */
 static list /* of string */ 
 words_inverse_op(call obj, int precedence, bool leftmost)
 {
@@ -881,7 +885,7 @@ words_inverse_op(call obj, int precedence, bool leftmost)
   
   if ( prec < precedence)
     pc = CHAIN_SWORD(pc, "(");
-  pc = CHAIN_SWORD(pc, "1/");
+  pc = CHAIN_SWORD(pc, "1./");
   pc = gen_nconc(pc, words_subexpression(e, MAXIMAL_PRECEDENCE , 
 					 FALSE));
 
