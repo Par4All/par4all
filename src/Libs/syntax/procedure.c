@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.63  2002/06/20 15:46:32  irigoin
+ * New handling of DATA statements thru the initializations field in code
+ *
  * Revision 1.62  2002/06/08 16:20:56  irigoin
  * Replacement of formal return labels by formal strings
  *
@@ -70,7 +73,7 @@ static list called_modules = list_undefined;
 
 /* statement of current function */
 static statement function_body = statement_undefined;
-
+
 /*********************************************************** GHOST VARIABLES */
 
 /* list of potential local or top-level variables that turned out to be useless.
@@ -413,7 +416,587 @@ AbortOfProcedure()
 
     (void) ResetBlockStack() ;
 }
+
+static list implicit_do_index_set = list_undefined;
 
+static bool gather_implicit_indices(call c)
+{
+  entity idf = call_function(c);
+
+  if(ENTITY_IMPLIEDDO_P(idf)) {
+    expression ie = EXPRESSION(CAR(call_arguments(c)));
+    entity i = reference_variable(syntax_reference(expression_syntax(ie)));
+    implicit_do_index_set = gen_once(i, implicit_do_index_set);
+  }
+  return TRUE;
+}
+
+static bool fix_storage(reference r)
+{
+  entity v = reference_variable(r);
+
+  /*
+    if(entity_variable_p(v)) {
+    if(!gen_in_list_p(v, implicit_do_index_set)) {
+    save_initialized_variable(v);
+    }
+    }
+  */
+
+  if(!gen_in_list_p(v, implicit_do_index_set)) {
+    pips_debug(8, "Storage for entity %s must be static or made static\n",
+	       entity_name(v));
+      
+    if(storage_undefined_p(entity_storage(v))) {
+      entity_storage(v) =
+	make_storage(is_storage_ram,
+		     (make_ram(get_current_module_entity(),
+			       StaticArea, 
+			       UNKNOWN_RAM_OFFSET,
+			       NIL)));
+    }
+    else if(storage_ram_p(entity_storage(v))) {
+      entity s = ram_section(storage_ram(entity_storage(v)));
+      entity m = get_current_module_entity();
+	
+      if(dynamic_area_p(s)) {
+	if(entity_blockdata_p(m)) {
+	  pips_user_warning
+	    ("Variable %s is declared dynamic in a BLOCKDATA\n",
+	     entity_local_name(v));
+	  ParserError("fix_storage",
+		      "No dynamic variables in BLOCKDATA\n");
+	}
+	else {
+	  SaveEntity(v);
+	}
+      }
+      else {
+	/* Variable is in static area or in a user declared common */
+	if(entity_blockdata_p(m)) {
+	  /* Variable must be in a user declared common */
+	  if(static_area_p(s)) {
+	    pips_user_warning
+	      ("DATA for variable %s declared is impossible:"
+	       " it should be declared in a COMMON instead\n",
+	       entity_local_name(v));
+	    ParserError("fix_storage",
+			"Improper DATA declaration in BLOCKDATA");
+	  }
+	}
+	else {
+	  /* Variable must be in static area */
+	  if(!static_area_p(s)) {
+	    pips_user_warning
+	      ("DATA for variable %s declared in COMMON %s:"
+	       " not standard compliant,"
+	       " use a BLOCKDATA\n",
+	       entity_local_name(v), module_local_name(s));
+	    if(!get_bool_property("PARSER_ACCEPT_ANSI_EXTENSIONS")) {
+	      ParserError("fix_storage",
+			  "Improper DATA declaration, use a BLOCKDATA"
+			  " or set property PARSER_ACCEPT_ANSI_EXTENSIONS");
+	    }
+	  }
+	}
+      }
+    }
+    else {
+      pips_user_warning("DATA initialization for non RAM variable %s "
+		   "(storage tag = %d)\n",
+		   entity_name(v), storage_tag(entity_storage(v)));
+      ParserError("fix_storage", 
+		  "DATA statement initializes non RAM variable\n");
+    }
+  }
+  /* No need to go down */
+  return FALSE;
+}
+
+static int expression_reference_number(expression e)
+{
+  int nvp = 0; /* Number of Value Positions */
+  static int implied_do_reference_number(expression);
+
+  pips_debug(2, "Begin\n");
+
+  if(expression_reference_p(e)) {
+    entity v = reference_variable(expression_reference(e));
+
+    if(entity_scalar_p(v)) {
+      /* A scalar is referenced */
+      pips_user_warning("Scalar variable %s initialized by an DATA implied do",
+			entity_local_name(v));
+      ParserError("expression_reference_number",
+		  "Scalar variable initialized by an DATA implied do");
+    }
+    else if(!ENDP(reference_indices(expression_reference(e)))) {
+      /* An array element is referenced */
+      nvp++;
+    }
+    else {
+      /* A whole array is initialized */
+      int ne = -1;
+ 
+      if(!NumberOfElements(variable_dimensions(type_variable(entity_type(v))),
+			   &ne)) {
+	pips_user_warning("Varying size of array \"%s\"\n", entity_name(v));
+	ParserError("expression_reference_number", 
+		    "Fortran standard prohibit varying size array in DATA statements.\n");
+      }
+      nvp += ne;
+    }
+  }
+  else if(expression_call_p(e)) {
+    entity f = call_function(syntax_call(expression_syntax(e)));
+
+    if(strcmp(entity_local_name(f), IMPLIED_DO_NAME)==0) {
+      int lvp = implied_do_reference_number(e);
+
+      if(lvp<=0) {
+	pips_user_warning("Cannot deal with non-constant loop bounds\n");
+      }
+
+      nvp += lvp;
+    }
+    else if(strcmp(entity_local_name(f), SUBSTRING_FUNCTION_NAME)==0) {
+      /* substring is equivalent to one reference */
+      nvp++;
+    }
+    else if(strcmp(entity_local_name(f), IO_LIST_STRING_NAME)==0) {
+      /* substring is equivalent to one reference */
+      nvp=0;
+    }
+    else {
+      pips_user_warning("Unexpected call to function %s\n", entity_module_name(f));
+      ParserError("expression_reference_number", "Unexpected function call");
+    }
+  }
+  else {
+    ParserError("expression_reference_number", "Unexpected range");
+  }
+
+  pips_debug(2, "End with nvp = %d\n", nvp);
+
+  return nvp;
+}
+
+static int implied_do_reference_number(expression e)
+{
+  /* Must be an implied DO */
+  entity f = call_function(syntax_call(expression_syntax(e)));
+  list args = call_arguments(syntax_call(expression_syntax(e)));
+  int lvp = 0; /* local value position */
+
+  pips_debug(2, "Begin\n");
+
+  pips_assert("This is an implied DO", (strcmp(entity_local_name(f), IMPLIED_DO_NAME)==0));
+  pips_assert("This is an implied DO", gen_length(args)>=3);
+
+  MAP(EXPRESSION, se, {
+    int llvp = -1;
+
+    llvp = expression_reference_number(se);
+
+    if(llvp>0) {
+      lvp += llvp;
+    }
+    else {
+      lvp = -1;
+      break;
+    }
+  }, CDR(CDR(args)));
+
+  if(lvp>0) {
+    expression re = EXPRESSION(CAR(CDR(args)));
+    range r = syntax_range(expression_syntax(re));
+    int c = -1;
+
+    ifdebug(2) 
+      pips_assert("The second argument of an implied do is a range",
+		  syntax_range_p(expression_syntax(re)));
+      
+    if(range_count(r, &c)) {
+      lvp *= c;
+    }
+    else {
+      pips_user_warning("Between line %d and %d:\n"
+			"Only constant loop bounds with non-zero increment" 
+			" are supported by the PIPS parser in DATA statement\n",
+			line_b_I, line_e_I);
+      lvp = -1;
+    }
+  }
+
+  pips_debug(2, "End with lvp = %d\n", lvp);
+
+  return lvp;
+}
+
+static list find_target_position(list cvl, int ctp, int * pmin_cp, int * pmax_cp, expression * pcve)
+{
+  list lcvl = cvl; /* Local Current Value expression List*/
+
+  pips_debug(2, "Begin for target ctp=%d with window [%d, %d]\n", ctp, *pmin_cp, *pmax_cp);
+  pips_debug(2, "and with %d value sets\n", gen_length(cvl));
+
+  while(ctp > *pmax_cp) {
+    expression vs = expression_undefined; /* Value Set */
+
+    pips_debug(2, "Iterate for target ctp=%d with window [%d, %d]\n", ctp, *pmin_cp, *pmax_cp);
+
+    if(ENDP(lcvl)) {
+      pips_user_warning("Looking for %dth value, could find only %d\n",
+			ctp, *pmax_cp);
+      ParserError("find_target_position", "Not enough values in DATA statement");
+    }
+
+    vs = EXPRESSION(CAR(lcvl)); /* Value Set */
+
+    lcvl = POP(lcvl);
+    *pmin_cp = *pmax_cp+1;
+
+    if(expression_call_p(vs)) {
+      /* Find the repeat factor */
+      call c = syntax_call(expression_syntax(vs));
+      entity rf = call_function(c);
+      list args = call_arguments(c);
+      expression rfe = expression_undefined; /* Repeat Factor Expression */
+      expression cve = expression_undefined; /* Constant Value Expression */
+
+      pips_assert("The repeat function is called", ENTITY_REPEAT_VALUE_P(rf));
+      pips_assert("The repeat function is called with two arguments", gen_length(args)==2);
+
+      rfe = EXPRESSION(CAR(args));
+      cve = EXPRESSION(CAR(CDR(args)));
+
+      pips_assert("A constant value expression is a call", expression_call_p(cve));
+      *pcve = cve;
+      *pmax_cp += expression_to_int(rfe);
+    }
+    else if(expression_call_p(vs)){
+      /* The value is directly available */
+      expression cve = vs; /* Constant Value Expression */
+
+      
+
+
+      pips_assert("A constant value expression is a call", expression_call_p(cve));
+      *pcve = cve;
+      *pmax_cp = *pmax_cp+1;
+    }
+    else {
+      pips_internal_error("Call expression expected");
+    }
+    pips_debug(2, "ctp=%d, *pmin_cp=%d, *pmax_cp=%d\n", ctp, *pmin_cp, *pmax_cp);
+  }
+
+  pips_debug(2, "End for target ctp=%d with window [%d, %d]\n", ctp, *pmin_cp, *pmax_cp);
+
+  return lcvl;
+}
+
+/* Integer and boolean initial values are stored as int, float, string and
+maybe complex initial values are stored as entities. Type coercion should
+be implemented as required in the Fortran standard. */
+static void store_initial_value(entity var, expression val)
+{
+  type var_t = entity_type(var);
+  /* type val_t = type_of_expression(val); */
+  variable var_vt = type_variable(var_t);
+  basic var_bt = variable_basic(var_vt);
+  /* variable val_vt = type_variable(val_t); */
+  expression coerced_val = expression_undefined;
+  basic val_bt = basic_of_expression(val);  /* to be freed */
+  value fv = value_undefined;
+
+  ifdebug(2) {
+    pips_debug(2, "Begin for variable %s and expression\n",
+	       entity_local_name(var));
+    print_expression(val);
+
+    pips_assert("var is a scalar variable", entity_scalar_p(var));
+    /* The semantics of expression_constant_p() is a call to a constant
+       entity and not a constant expression(), i.e. an expression whose
+       terms are all recursively constant */
+    /* pips_assert("val is a constant expression", expression_constant_p(val)); */
+  }
+
+  /* return; */
+
+  /* Type coercion */
+  if(!basic_equal_p(var_bt, val_bt)) {
+    pips_user_warning("Type coercion needed for variable %s and its DATA expression value\n",
+		      entity_local_name(var));
+    print_expression(val);
+    coerced_val = expression_undefined;
+    /* Voir avec Fabien les procedures de Son, type_this_chunk() et typing_of_expressions() */
+  }
+  else {
+    coerced_val = val;
+  }
+
+  /* Has an initialization already been defined for var? */
+  if(!value_unknown_p(entity_initial(var))) {
+    value v = entity_initial(var);
+    constant c = value_constant(v);
+    extern char * itoa(int);
+
+    pips_assert("value must be constant", value_constant_p(v));
+    pips_assert("constant must be int or call",
+		constant_int_p(c) || constant_call_p(c));
+    pips_user_warning("Redefinition of the DATA value for variable %s\n",
+		      entity_local_name(var));
+    pips_user_warning("Defined with value %s and redefined by expression\n",
+		      constant_int_p(c)?
+		      itoa(constant_int(c))
+		      : entity_local_name(constant_call(c)));
+    print_expression(val);
+    ParserError("store_initial_value", "Conflicting DATA statements");
+  }
+  else {
+    free_value(entity_initial(var));
+    entity_initial(var) = value_undefined;
+  }
+
+  /* An evaluation function should evaluate any well-typed expression and
+     return a value. Find below a very limited evaluation procedure for
+     backward compatibility with PIPS previous implementation for integer
+     expressions */
+
+  /* Storage if a proper initial value has been found */
+  if(!expression_undefined_p(coerced_val)) {
+    int b = -1;
+    int sign = 1;
+    call c = syntax_call(expression_syntax(coerced_val));
+    entity f = call_function(c);
+
+    pips_assert("The constant value expression is a CALL",
+		expression_call_p(coerced_val));
+
+    /* Is there a leading unary minus? */
+    if(ENTITY_UNARY_MINUS_P(f)) {
+      sign = -1;
+      coerced_val = EXPRESSION(CAR(call_arguments(c)));
+      pips_assert("The constant value expression is still a CALL",
+		  expression_call_p(coerced_val));
+      c = syntax_call(expression_syntax(coerced_val));
+      f = call_function(c);
+    }
+
+    switch(basic_tag(var_bt)) {
+    case is_basic_int:
+      sscanf(entity_local_name(f), "%d", &b);
+      fv = make_value(is_value_constant,
+		     make_constant(is_constant_int, (value *) (sign*b)));
+      break;
+    case is_basic_logical:
+      if(ENTITY_TRUE_P(f)) {
+	b = 1;
+      }
+      else if(ENTITY_FALSE_P(f)) {
+	b = 0;
+      }
+      else{
+	pips_user_warning("LOGICAL variable %s cannot be initialized with expression",
+			  entity_local_name(var));
+	print_expression(coerced_val);
+	ParserError("store_initial_value", "Illegal initialization of a LOGICAL variable");
+      }
+      fv = make_value(is_value_constant,
+		     make_constant(is_constant_int, (value *) b));
+      break;
+    case is_basic_float:
+    case is_basic_complex:
+    case is_basic_string:
+      if(sign==1) {
+	fv = make_value(is_value_constant,
+			make_constant(is_constant_call, f));
+      }
+      else {
+	/* For real and complex, I should allocate "-f" and forget about
+           calls to unary minus */
+	fv = make_value(is_value_unknown, UU);
+      }
+      break;
+    case is_basic_overloaded:
+      pips_internal_error("A Fortran variable cannot have the OVERLOADED internal type");
+      break;
+    default:
+      pips_internal_error("Unexpected basic tag=%d\n", basic_tag(var_bt));
+      break;
+    }
+  }
+  else {
+    fv = make_value(is_value_unknown, UU);
+  }
+  entity_initial(var) = fv;
+  free_basic(val_bt);
+}
+
+static void process_value_list(list vl, list isvs, list svps)
+{
+  /* Find a value in vl at the monotonically increasing position given in
+     svps for the variable in isvs. All lists are assumed non-empty. */
+  int ctp = -1; /* current target position */
+  /* The current position is a window because of the repeat operator */
+  int min_cp = -1; /* minimal current position */
+  int max_cp = -1; /* maximal current position */
+  list cvp = list_undefined;
+  list cvl = vl; /* Current Value List */
+  list civl = list_undefined; /* Current Initialized Variable List */
+  expression cve = expression_undefined; /* Current Value Expression */
+
+  for(cvp=svps, civl = isvs;!ENDP(cvp);POP(cvp), POP(civl)) {
+    entity cvar = ENTITY(CAR(civl));
+    ctp = INT(CAR(cvp));
+
+    if(ctp>max_cp) {
+      cvl = find_target_position(cvl, ctp, &min_cp, &max_cp, &cve);
+      pips_assert("The value window is not empty", min_cp<=max_cp);
+      if(ctp>=min_cp && ctp <= max_cp) {
+	/* Store value */
+	store_initial_value(cvar, cve);
+      }
+      else {
+	/* Not enough values in vl */
+	pips_user_warning("No value in value list for variable %s and the following ones.\n",
+			  entity_local_name(cvar));
+	ParserError("process_value_list", "Not enough values for reference list");
+      }
+    }
+    else if(ctp>=min_cp) {
+      /* reuse the same value cve*/
+	/* Store value */
+	store_initial_value(cvar, cve);
+    }
+    else {
+      pips_internal_error("ctp is smaller than the current value window,"
+			  " it should have been satisfied earlier\n");
+    }
+  }
+}
+
+static void process_static_initialization(call c)
+{
+  entity ife = call_function(c);
+  list args = call_arguments(c);
+  list isvs = NIL; /* Initialized Scalar VariableS */
+  list svps = NIL; /* Scalar Value PositionS */
+  int cvp = 0; /* Current Variable Position */
+  list al = args; /* Value list from the second element on */
+  list rl = list_undefined; /* Reference list, hanging from call to DATA LIST function */
+  entity rlf = entity_undefined; /* DATA LIST function */
+  expression rle = expression_undefined; /* reference list expression, with call to DATA LIST */
+  list vl = list_undefined; /* Value List, with repeat operator */
+
+  pips_debug(2, "Begin with %d arguments\n", gen_length(args));
+
+  pips_assert("This is a call to the static initialization function",
+	      ENTITY_STATIC_INITIALIZATION_P(ife));
+
+  /* Look for initialized scalar variables and for their positions in the reference list */
+  rle = EXPRESSION(CAR(al));
+  vl = CDR(al); /* Move al to the first value, passing the reference list */
+  pips_assert("The first argument is a call", expression_call_p(rle));
+  rlf = call_function(syntax_call(expression_syntax(rle)));
+  pips_assert("This is the DATA LIST function", ENTITY_DATA_LIST_P(rlf));
+  rl = call_arguments(syntax_call(expression_syntax(rle)));
+
+  for(; !ENDP(rl); POP(rl)) {
+    int nr = -1;
+    expression e  = EXPRESSION(CAR(rl));
+    if(expression_reference_p(e)) {
+      entity v = reference_variable(expression_reference(e));
+
+      if(entity_scalar_p(v)) {
+	/* A scalar is referenced */
+	if(gen_in_list_p(v, isvs)) {
+	  pips_user_warning("Variable %s appears twice in a DATA statement",
+			    entity_local_name(v));
+	  ParserError("", "Redundant/Conflicting initialization");
+	}
+	nr = 1;
+	pips_debug(2, "Variable %s with value at position %d\n",
+		   entity_local_name(v), cvp);
+	isvs = gen_nconc(isvs, CONS(ENTITY, v, NIL));
+	svps = gen_nconc(svps, CONS(INT,cvp, NIL));
+      }
+      else {
+	nr = expression_reference_number(e);
+      }
+    }
+    else {
+      nr = expression_reference_number(e);
+    }
+    if(nr>=0) { /* 0 is returned for call to IO LIST */
+      cvp += nr;
+    }
+    else {
+      cvp = -1;
+      break;
+    }
+  }
+
+  ifdebug(2) {
+    list lp = svps;
+    pips_assert("The variable and positions lists have the same length",
+		gen_length(isvs)==gen_length(svps));
+    if(gen_length(isvs)>0) {
+      pips_debug(2, "List of initialized scalar variables with value positions:\n");
+      MAP(ENTITY, v, {
+	int pos = INT(CAR(lp));
+	fprintf(stderr, "Variable %s has value at position %d\n",
+		entity_local_name(v), pos);
+	POP(lp);
+      }, isvs);
+    }
+    pips_debug(2, "The DATA statement is %s decoded (cvp=%d)\n",
+	       ((gen_length(isvs)==0)? "not" : ((cvp==-1)? "partially" : "fully")), cvp);
+  }
+
+  /* Process the value list */
+
+  if(!ENDP(isvs)) {
+    if(ENDP(vl)) {
+      ParserError("process_static_initialization",
+		  "Empty value list in DATA statement\n");
+    }
+    else {
+      process_value_list(vl, isvs, svps);
+    }
+  }
+
+  pips_debug(2, "End\n");
+}
+
+static void process_static_initializations()
+{
+  sequence iseq =
+    code_initializations(value_code(entity_initial(get_current_module_entity())));
+
+  /* Variables appearing in a static initialization cannot be in the
+     dynamic area, nor in the heap_area nor in the stack_area. They must
+     be moved to the static area if this happens unless they are implied
+     do indices. */
+  implicit_do_index_set = NIL;
+  gen_recurse(iseq, call_domain, gather_implicit_indices, gen_null);
+  gen_recurse(iseq, reference_domain, fix_storage, gen_null);
+  gen_free_list(implicit_do_index_set);
+  implicit_do_index_set = list_undefined;
+
+  MAP(STATEMENT, is, {
+    if(statement_call_p(is)) {
+      call c = statement_call(is);
+      process_static_initialization(c);
+    }
+    else {
+      pips_internal_error("Initialization statements are call statements");
+    }
+  }, sequence_statements(iseq));
+
+}
+
 /* This function is called when the parsing of a procedure is completed.
  * It performs a few calculations which cannot be done on the fly such
  * as address computations.
@@ -472,6 +1055,8 @@ EndOfProcedure()
      */
     UpdateFunctionalType(CurrentFunction,
 			 FormalParameters);
+
+    process_static_initializations();
 
     /* Must be performed before equivalence resolution, for user declared
        commons whose declarations are stronger than equivalences */
@@ -814,7 +1399,7 @@ MakeCurrentFunction(
     PushBlock(icf, "INITIAL");
 
     function_body = instruction_to_statement(icf);
-    entity_initial(cf) = make_value(is_value_code, make_code(NIL, NULL));
+    entity_initial(cf) = make_value(is_value_code, make_code(NIL, NULL, make_sequence(NIL)));
 
     set_current_module_entity(cf);
 
@@ -1192,7 +1777,7 @@ MakeEntry(
 
     /* This depends on what has been done in LocalToGlobal and SafeLocalToGlobal */
     if(value_undefined_p(entity_initial(fe))) {
-	entity_initial(fe) = make_value(is_value_code, make_code(lefp, strdup("")));
+	entity_initial(fe) = make_value(is_value_code, make_code(lefp, strdup(""), make_sequence(NIL)));
     }
     else {
 	value val = entity_initial(fe);
@@ -1201,13 +1786,13 @@ MakeEntry(
 	if(value_unknown_p(val)) {
 	    /* A call site for fe has been encountered in another module */
 	    entity_initial(fe) = make_value(is_value_code,
-					    make_code(lefp, strdup("")));
+					    make_code(lefp, strdup(""), make_sequence(NIL)));
 	}
 	else {
 	    pips_assert("value is code", value_code_p(val));
 	    c = value_code(entity_initial(fe));
 	    if(code_undefined_p(c)) {
-		value_code(entity_initial(fe)) = make_code(lefp, strdup(""));
+		value_code(entity_initial(fe)) = make_code(lefp, strdup(""), make_sequence(NIL));
 	    }
 	    else if(ENDP(code_declarations(c))) {
 		/* Should now be the normal case... */
@@ -1346,7 +1931,8 @@ ProcessEntry(
     statement es = statement_undefined; /* so as not to compute anything
 					   before the debugging message is printed out */
     statement ces = statement_undefined;
-    list decls = NIL;
+    list decls = list_undefined;
+    list init_stmt = list_undefined;
     text txt = text_undefined;
     bool line_numbering_p = FALSE;
     extern void unspaghettify_statement(statement);
@@ -1367,6 +1953,7 @@ ProcessEntry(
      */
 
     /* Collect local and global variables of cm that may be visible from entry e */
+    decls = NIL;
     MAP(ENTITY, v, {
 	if(!storage_formal_p(entity_storage(v))) {
 	    decls = arguments_add_entity(decls, v);
@@ -1399,6 +1986,7 @@ ProcessEntry(
      * Cheat with the declarations because of text_named_module().
      */
     entity_declarations(e) = gen_nconc(entity_declarations(e), decls);
+    decls = list_undefined;
 
     ifdebug(2) {
       (void) fprintf(stderr, "Declarations of all variables for entry %s:\n",
@@ -1408,6 +1996,9 @@ ProcessEntry(
 
     decls = entity_declarations(cm);
     entity_declarations(cm) = entity_declarations(e);
+    /* DATA statements should not be replicated in each entry code */
+    init_stmt = sequence_statements(code_initializations(value_code(entity_initial(cm))));
+    sequence_statements(code_initializations(value_code(entity_initial(cm)))) = NIL;
 
     ifdebug(1) {
       fprint_environment(stderr, cm);
@@ -1417,7 +2008,11 @@ ProcessEntry(
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
     txt = text_named_module(e, cm, ces);
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", line_numbering_p);
+
     entity_declarations(cm) = decls;
+    decls = list_undefined;
+    sequence_statements(code_initializations(value_code(entity_initial(cm)))) = init_stmt;
+    init_stmt = list_undefined;
 
     pips_assert("statement ces is consistent", statement_consistent_p(ces));
 
@@ -1608,7 +2203,7 @@ SafeLocalToGlobal(entity e, type r)
 	    }
 	    if(value_undefined_p(entity_initial(fe))) {
 		entity_initial(fe) = make_value(is_value_code,
-						make_code(NIL, strdup("")));
+						make_code(NIL, strdup(""), make_sequence(NIL)));
 	    }
 
 	    pips_debug(1, "external function %s re-declared as %s\n",
