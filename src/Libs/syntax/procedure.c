@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.54  1998/12/02 13:46:55  irigoin
+ * No reset_current_module_entity() in BeginingOfProcedure()
+ *
  * Revision 1.53  1998/11/27 14:54:23  irigoin
  * debug statement added in EndOfProcedure()
  *
@@ -291,7 +294,7 @@ ghost_variable_entity_p(entity e)
 void 
 BeginingOfProcedure()
 {
-    reset_current_module_entity();
+    /* reset_current_module_entity(); */
     InitImplicit();
     called_modules = NIL;
 }
