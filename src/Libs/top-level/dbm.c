@@ -100,3 +100,11 @@ void close_program()
 
     /*clear_props();*/
 }
+
+void delete_program(string wname)
+{
+    int status;
+    
+    if ((status = safe_system_no_abort (concatenate("Delete ", wname, NULL))))
+	user_error("delete_program", "exit code for Delete is %d\n", status);
+}
