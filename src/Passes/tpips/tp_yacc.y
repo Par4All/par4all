@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.72  1997/12/12 12:56:46  coelho
+ * typo fixed.
+ *
  * Revision 1.71  1997/12/12 12:54:43  coelho
  * clearer warning.
  *
@@ -334,7 +337,7 @@ i_unknown: TK_UNKNOWN TK_ENDOFLINE
 	    {
 		pips_user_warning("\n\n"
 		    "\tMaybe you intended to execute a direct shell command.\n"
-		    "\tThis convinient feature is desactivated by default.\n"
+		    "\tThis convenient feature is desactivated by default.\n"
 		    "\tTo enable it, you can run tpips with the -s option,\n"
 		    "\tor do \"setproperty TPIPS_IS_A_SHELL=TRUE\".\n"
 		    "\tOtherwise use ! or \"shell\" as a command prefix.\n\n");
