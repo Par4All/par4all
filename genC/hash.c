@@ -41,13 +41,13 @@ struct __hash_entry {
 };
 
 struct __hash_table {
-  hash_key_type hash_type;               /* the type of keys... */
-  int hash_size;                         /* size of actual array */
-  int hash_entry_number;                 /* number of associations stored */
-  unsigned int (*hash_rank)(void*, int); /* how to compute rank for key */
-  int (*hash_equal)(void*, void*);       /* how to compare keys */
-  hash_entry *hash_array;                /* actual array */
-  int hash_size_limit;         /* number of entry for which to reallocate */
+  hash_key_type type;               /* the type of keys... */
+  int size;                         /* size of actual array */
+  int n_entry;                      /* number of associations stored */
+  unsigned int (*rank)(void*, int); /* how to compute rank for key */
+  int (*equals)(void*, void*);      /* how to compare keys */
+  hash_entry *array;                /* actual array */
+  int limit;                        /* max entries before reallocation */
 
   /* keep statistics on the life time of the hash table... FC 04/06/2003 */
   unsigned int n_put, n_get, n_del, n_upd;
@@ -162,7 +162,7 @@ void hash_dont_warn_on_redefinition(void)
 
 bool hash_warn_on_redefinition_p(void)
 {
-    return(should_i_warn_on_redefinition);
+    return should_i_warn_on_redefinition;
 }
 
 /* this function makes a hash table of size size. if size is less or
@@ -179,11 +179,11 @@ hash_table hash_table_make(hash_key_type key_type, int size)
     size = get_next_hash_table_size(size);
 
     htp = (hash_table) alloc(sizeof(struct __hash_table));
-    htp->hash_type = key_type;
-    htp->hash_size = size;
-    htp->hash_entry_number = 0;
-    htp->hash_size_limit = hash_size_limit(size);
-    htp->hash_array = (hash_entry_pointer) alloc(size*sizeof(hash_entry));
+    htp->type = key_type;
+    htp->size = size;
+    htp->n_entry = 0;
+    htp->limit = hash_size_limit(size);
+    htp->array = (hash_entry_pointer) alloc(size*sizeof(hash_entry));
 
     /* initialize statistics */
     htp->n_put = 0;
@@ -197,32 +197,32 @@ hash_table hash_table_make(hash_key_type key_type, int size)
     htp->n_upd_iter = 0;
 
     for (i = 0; i < size; i++) 
-	htp->hash_array[i].key = HASH_ENTRY_FREE;
+	htp->array[i].key = HASH_ENTRY_FREE;
     
     switch(key_type)
     {
     case hash_string:
-	htp->hash_equal = (int(*)(void*,void*)) hash_string_equal;
-	htp->hash_rank = hash_string_rank;
+	htp->equals = (int(*)(void*,void*)) hash_string_equal;
+	htp->rank = hash_string_rank;
 	break;
     case hash_int:
-	htp->hash_equal = (int(*)(void*,void*)) hash_int_equal;
-	htp->hash_rank = hash_int_rank;
+	htp->equals = (int(*)(void*,void*)) hash_int_equal;
+	htp->rank = hash_int_rank;
 	break;
     case hash_chunk:
-	htp->hash_equal = (int(*)(void*,void*)) hash_chunk_equal;
-	htp->hash_rank = (unsigned int(*)(void*,int)) hash_chunk_rank;
+	htp->equals = (int(*)(void*,void*)) hash_chunk_equal;
+	htp->rank = (unsigned int(*)(void*,int)) hash_chunk_rank;
 	break;
     case hash_pointer:
-	htp->hash_equal = hash_pointer_equal;
-	htp->hash_rank = hash_pointer_rank;
+	htp->equals = hash_pointer_equal;
+	htp->rank = hash_pointer_rank;
 	break;
     default:
 	fprintf(stderr, "[make_hash_table] bad type %d\n", key_type);
 	abort();
     }
 
-    return(htp);
+    return htp;
 }
 
 static int max_size_seen = 0;
@@ -233,18 +233,18 @@ void hash_table_clear(hash_table htp)
     register hash_entry_pointer p ;
     register hash_entry_pointer end ;
 
-    if (htp->hash_size > max_size_seen) {
-	max_size_seen = htp->hash_size;
+    if (htp->size > max_size_seen) {
+	max_size_seen = htp->size;
 #ifdef DBG_HASH
 	fprintf(stderr, "[hash_table_clear] maximum size is %d\n", 
 		max_size_seen);
 #endif
     }
 
-    end = htp->hash_array + htp->hash_size ;
-    htp->hash_entry_number = 0 ;
+    end = htp->array + htp->size ;
+    htp->n_entry = 0 ;
 
-    for ( p = htp->hash_array ; p < end ; p++ ) {
+    for ( p = htp->array ; p < end ; p++ ) {
 	p->key = HASH_ENTRY_FREE ;
     }
 }
@@ -254,7 +254,7 @@ void hash_table_clear(hash_table htp)
 
 void hash_table_free(hash_table htp)
 {
-  gen_free_area((void**) htp->hash_array, htp->hash_size*sizeof(hash_entry));
+  gen_free_area((void**) htp->array, htp->size*sizeof(hash_entry));
   gen_free_area((void**) htp, sizeof(struct __hash_table));
 }
 
@@ -275,7 +275,7 @@ void hash_put(hash_table htp, void * key, void * val)
   unsigned int rank;
   hash_entry_pointer hep;
     
-  if (htp->hash_entry_number+1 >= (htp->hash_size_limit)) 
+  if (htp->n_entry+1 >= (htp->limit)) 
     hash_enlarge_table(htp);
   
   message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
@@ -288,12 +288,12 @@ void hash_put(hash_table htp, void * key, void * val)
   if (hep->key != HASH_ENTRY_FREE && hep->key != HASH_ENTRY_FREE_FOR_PUT) {
     if (should_i_warn_on_redefinition && hep->val != val) {
       (void) fprintf(stderr, "[hash_put] key redefined: %s\n", 
-		     hash_print_key(htp->hash_type, key));
+		     hash_print_key(htp->type, key));
     }
     hep->val = val;
   }
   else {
-    htp->hash_entry_number += 1;
+    htp->n_entry += 1;
     hep->key = key;
     hep->val = val;
   }
@@ -320,8 +320,8 @@ hash_delget(
     if (hep->key != HASH_ENTRY_FREE && hep->key != HASH_ENTRY_FREE_FOR_PUT) {
 	val = hep->val;
 	*pkey = hep->key;
-	htp->hash_array[rank].key = HASH_ENTRY_FREE_FOR_PUT;
-	htp->hash_entry_number -= 1;
+	htp->array[rank].key = HASH_ENTRY_FREE_FOR_PUT;
+	htp->n_entry -= 1;
 	return val;
     }
 
@@ -352,7 +352,7 @@ void * hash_get(hash_table htp, void * key)
   message_assert("legal input key", key!=HASH_ENTRY_FREE &&
 		 key!=HASH_ENTRY_FREE_FOR_PUT);
   
-  if (!htp->hash_entry_number) 
+  if (!htp->n_entry) 
     return HASH_UNDEFINED_VALUE;
   
   /* else may be there */
@@ -382,7 +382,7 @@ void hash_update(hash_table htp, void * key, void * val)
   htp->n_upd++;
   hep = hash_find_entry(htp, key, &n, hash_get_op, &htp->n_upd_iter);
 
-  message_assert("no previous entry", htp->hash_equal(hep->key, key));
+  message_assert("no previous entry", htp->equals(hep->key, key));
   
   hep->val = val ;
 }
@@ -392,15 +392,15 @@ void hash_update(hash_table htp, void * key, void * val)
  */
 void hash_table_print_header(hash_table htp, FILE *fout)
 {
-  fprintf(fout, "hash_key_type:     %d\n", htp->hash_type);
-  fprintf(fout, "hash_size:         %d\n", htp->hash_size);
+  fprintf(fout, "hash_key_type:     %d\n", htp->type);
+  fprintf(fout, "size:         %d\n", htp->size);
   /* to be used by pips, we should not print this
      as it is only for debugging NewGen and it is not important data
      I (go) comment it.
      
-     fprintf(fout, "hash_size_limit    %d\n", htp->hash_size_limit);
+     fprintf(fout, "limit    %d\n", htp->limit);
   */
-  fprintf(fout, "hash_entry_number: %d\n", htp->hash_entry_number);
+  fprintf(fout, "n_entry: %d\n", htp->n_entry);
 }
  
 /* this function prints the content of the hash_table pointed to by htp
@@ -412,14 +412,14 @@ void hash_table_print(hash_table htp)
   
   hash_table_print_header (htp,stderr);
   
-  for (i = 0; i < htp->hash_size; i++) {
+  for (i = 0; i < htp->size; i++) {
     hash_entry he;
     
-    he = htp->hash_array[i];
+    he = htp->array[i];
     
     if (he.key != HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT) {
       fprintf(stderr, "%d %s %x\n", 
-	      i, hash_print_key(htp->hash_type, he.key),
+	      i, hash_print_key(htp->type, he.key),
 	      (unsigned int) he.val);
     }
   }
@@ -439,10 +439,10 @@ void hash_table_fprintf(
 
     hash_table_print_header (htp,f);
 
-    for (i = 0; i < htp->hash_size; i++) {
+    for (i = 0; i < htp->size; i++) {
 	hash_entry he;
 
-	he = htp->hash_array[i];
+	he = htp->array[i];
 
 	if (he.key != HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT) {
 	    fprintf(f, "%s -> %s\n", 
@@ -462,18 +462,17 @@ hash_enlarge_table(hash_table htp)
   hash_entry_pointer old_array;
   int i, old_size;
   
-  old_size = htp->hash_size;
-  old_array = htp->hash_array;
+  old_size = htp->size;
+  old_array = htp->array;
   
-  htp->hash_size++;
-    /* Get the next prime number in the table */
-  htp->hash_size = get_next_hash_table_size(htp->hash_size);
-  htp->hash_array = (hash_entry_pointer) 
-    alloc(htp->hash_size* sizeof(hash_entry));
-  htp->hash_size_limit = hash_size_limit(htp->hash_size);
+  htp->size++;
+  /* Get the next prime number in the table */
+  htp->size = get_next_hash_table_size(htp->size);
+  htp->array = (hash_entry_pointer) alloc(htp->size* sizeof(hash_entry));
+  htp->limit = hash_size_limit(htp->size);
   
-  for (i = 0; i < htp->hash_size ; i++)
-    htp->hash_array[i].key = HASH_ENTRY_FREE;
+  for (i = 0; i < htp->size ; i++)
+    htp->array[i].key = HASH_ENTRY_FREE;
   
   for (i = 0; i < old_size; i++) 
   {
@@ -492,7 +491,7 @@ hash_enlarge_table(hash_table htp)
 	fprintf(stderr, "[hash_enlarge_table] fatal error\n");
 	abort();
       }    
-      htp->hash_array[rank] = he;
+      htp->array[rank] = he;
     }
   }
   gen_free_area((void**)old_array, old_size*sizeof(hash_entry));
@@ -607,7 +606,7 @@ hash_find_entry(hash_table htp,
 		unsigned int * stats)
 {
   register unsigned int
-    r_init = (*(htp->hash_rank))(key, htp->hash_size),
+    r_init = (*(htp->rank))(key, htp->size),
     r = r_init,
     /* history of r_inc value
      * RT: 1
@@ -639,7 +638,7 @@ hash_find_entry(hash_table htp,
      */
     if (stats) (*stats)++;
     
-    he = htp->hash_array[r];
+    he = htp->array[r];
     
     if (he.key == HASH_ENTRY_FREE)
       break;
@@ -652,13 +651,13 @@ hash_find_entry(hash_table htp,
       break;
     
     if (he.key != HASH_ENTRY_FREE_FOR_PUT &&
-	(*(htp->hash_equal))(he.key, key))
+	(*(htp->equals))(he.key, key))
       break;
     
     /* GO: it is not anymore the next slot, we skip some of them depending
      * on the reckonned increment 
      */
-    r = (r + r_inc) % htp->hash_size;
+    r = (r + r_inc) % htp->size;
     
     /* FC: ??? this may happen in a hash_get after many put and del,
      * if the table contains no FREE, but many FREE_FOR_PUT instead!
@@ -670,7 +669,7 @@ hash_find_entry(hash_table htp,
   }
   
   *prank = r;
-  return &(htp->hash_array[r]);
+  return &(htp->array[r]);
 }
 
 /* now we define observers in order to
@@ -678,17 +677,17 @@ hash_find_entry(hash_table htp,
  */
 int hash_table_entry_count(hash_table htp)
 {
-    return htp->hash_entry_number;
+    return htp->n_entry;
 }
 
 int hash_table_size(hash_table htp)
 {
-    return htp->hash_size;
+    return htp->size;
 }
 
 hash_key_type hash_table_type(hash_table htp)
 {
-    return htp->hash_type;
+    return htp->type;
 }
 
 /*
@@ -704,10 +703,10 @@ hash_table_scan(hash_table htp,
 		void ** pkey,
 		void ** pval)
 {
-    hash_entry_pointer hend = htp->hash_array + htp->hash_size;
+    hash_entry_pointer hend = htp->array + htp->size;
 
     if (!hentryp)
-	hentryp = htp->hash_array;
+	hentryp = htp->array;
 
     while (hentryp < hend)
     {
@@ -727,7 +726,7 @@ hash_table_scan(hash_table htp,
 int hash_table_own_allocated_memory(hash_table htp)
 {
     return htp ? 
-      sizeof(struct __hash_table) + sizeof(hash_entry)*(htp->hash_size) : 0 ;
+      sizeof(struct __hash_table) + sizeof(hash_entry)*(htp->size) : 0 ;
 }
 
 /***************************************************************** MAP STUFF */
