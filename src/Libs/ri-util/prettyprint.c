@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.114  1998/03/10 16:48:01  irigoin
+ * New property added to control parentheses:
+ * PRETTYPRINT_ALL_PARENTHESES. Requested by Julien Zory.
+ *
  * Revision 1.113  1998/03/08 20:43:28  irigoin
  * Improved pips error message
  *
@@ -163,7 +167,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.113 1998/03/08 20:43:28 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.114 1998/03/10 16:48:01 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -741,7 +745,7 @@ words_goto_label(string tlabel)
 }
 
 /* 
- * If the infix operator is either "-" or "/", I perfer not to delete 
+ * If the infix operator is either "-" or "/", I prefer not to delete 
  * the parentheses of the second expression.
  * Ex: T = X - ( Y - Z ) and T = X / (Y*Z)
  *
@@ -763,7 +767,7 @@ words_infix_binary_op(call obj, int precedence)
 	if ( expression_call_p(exp) &&
 	     words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >= 
 	     intrinsic_precedence("*") )
-	    /* precedence is greter than * or / */
+	    /* precedence is greater than * or / */
 	    we2 = words_subexpression(exp, prec);
 	else
 	    we2 = words_subexpression(exp, 100);
@@ -787,8 +791,13 @@ words_infix_binary_op(call obj, int precedence)
  * According to the Precedence of Operators 
  * Arithmetic > Character > Relational > Logical
  * Added by Lei ZHOU    Nov. 4,91
+ *
+ * A precedence is a integer in [0..MAXIMAL_PRECEDENCE]
  */
-struct intrinsic_handler {
+
+#define MAXIMAL_PRECEDENCE 100
+
+static struct intrinsic_handler {
     char * name;
     list (*f)();
     int prec;
@@ -797,7 +806,9 @@ struct intrinsic_handler {
 
     {"//", words_infix_binary_op, 30},
 
-    {"--", words_unary_minus, 25},
+    /* The Fortran 77 standard does not allow x*-3 or x+-3 */
+    /* {"--", words_unary_minus, 25}, */
+    {"--", words_unary_minus, 19},
 
     {"*", words_infix_binary_op, 21},
     {"/", words_infix_binary_op, 21},
@@ -850,6 +861,8 @@ struct intrinsic_handler {
     {NULL, null, 0}
 };
 
+static bool precedence_p = TRUE;
+
 static list 
 words_intrinsic_call(call obj, int precedence)
 {
@@ -897,8 +910,10 @@ words_call(
     list pc;
     entity f = call_function(obj);
     value i = entity_initial(f);
-    pc = (value_intrinsic_p(i)) ? words_intrinsic_call(obj, precedence) : 
-	                          words_regular_call(obj);
+    pc = (value_intrinsic_p(i)) ? 
+	words_intrinsic_call(obj, (precedence_p||precedence<=1)? precedence : MAXIMAL_PRECEDENCE)
+	: 
+	words_regular_call(obj);
     return pc;
 }
 
@@ -1821,6 +1836,8 @@ text_named_module(
      */
     if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
 	set_last_statement(stat);
+
+    precedence_p = !get_bool_property("PRETTYPRINT_ALL_PARENTHESES");
 
     if ( strcmp(s,"") == 0 
 	|| get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") )
