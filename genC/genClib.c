@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/07/24 15:53:02 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/10/02 12:57:20 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2160,20 +2160,17 @@ int create_p ;
 	user( "Incorrect second data for gen_read_tabulated: %d\n", i ) ;
 	exit( 1 ) ;
     }
+
     max = genread_lval.val ;
 
-    /* (void) fscanf( file, "%d %d", &domain, &max ) ; */
-
-    if( max != max_tabulated_elements()) {
-	user( "gen_read_tabulated: Getting %d, expecting %d elements\n\n", 
-	       max,  max_tabulated_elements()) ;
-	if(max > max_tabulated_elements()) {
-	    user("Current limit (%d) can be redefined by setting environment "
-		 "variable NEWGEN_MAX_TABULATED_ELEMENTS\n",
-		 max_tabulated_elements());
-	  exit(1);
-	}
+    if( max > max_tabulated_elements()) {
+	/* the file was created with more elements, maybe... */
+	user("Current limit (%d) can be redefined by setting environment "
+	     "variable NEWGEN_MAX_TABULATED_ELEMENTS\n",
+	     max_tabulated_elements());
+	exit(1);
     }
+
     if( create_p ) {
 	if( Gen_tabulated_[ index = Domains[ domain ].index ] == NULL ) {
 	    user( "gen_read_tabulated: Trying to read untabulated domain %s\n",
