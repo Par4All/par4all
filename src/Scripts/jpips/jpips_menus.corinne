@@ -24,7 +24,7 @@ Options
 Options for program  analyses and transformations
 
 GROUP
-Parser Options
+PARSER Options
 set fortran parser options
 
 LABEL_WITH_CHOICE
@@ -123,7 +123,7 @@ CLOSE
 ##
 
 GROUP
-Prettyprint Options
+PRETTYPRINT Options
 Code display
 
 LABEL_WITH_CHOICE
@@ -165,7 +165,7 @@ CLOSE
 ##
 
 GROUP
-Semantic Options
+SEMANTIC Options
 Semantical analyses
 
 LABEL_WITH_CHOICE
@@ -235,7 +235,7 @@ CLOSE
 ## temporary place
 
 LABEL_WITH_CHOICE
-Array Bounds
+Regions with Array Bounds
 getproperty REGIONS_WITH_ARRAY_BOUNDS
 ..
 whether to include array bounds when computing regions
@@ -271,7 +271,7 @@ CLOSE
 
 
 GROUP
-Parallelization Options
+PARALLELIZATION Options
 Management of parallelization
 
 LABEL_WITH_CHOICE
@@ -341,35 +341,12 @@ select parallelization algorithm
 
 CLOSE
 
-IBUTTON_WITH_CHOICE
-Privatize
-not used
-..
-privatization of variables or anything
-
-	Scalars
-	$TAGc_or_a PRIVATIZE_MODULE[$MODULES]
-	..
-
-	Scalars and Arrays
-	$TAGc_or_a ARRAY_PRIVATIZER[$MODULES]
-	..
-
-	Array Sections
-	$TAGc_or_a ARRAY_SECTION_PRIVATIZER[$MODULES]
-	..
-
-	Declarations
-	$TAGc_or_a DECLARATIONS_PRIVATIZER[$MODULES]
-	..
-
-CLOSE
 
 ## end of parallelization options
 CLOSE
 
 GROUP
-Running Options
+RUNNING Options
 set running options
 
 LABEL_WITH_CHOICE
@@ -441,7 +418,7 @@ Views & Transformations
 Views and Transformations  Panel
 
 GROUP
-Views
+VIEWS : Select First and Show
 Program information and views
 
 BUTTON_WITH_MENU
@@ -792,7 +769,7 @@ CLOSE
 
 
 GROUP
-Transformations
+TRANSFORMATIONS : Select First and Apply
 Apply transformations on Program or Loop Nest 
 
 
@@ -845,7 +822,7 @@ CLOSE
 SEPARATOR
 
 IBUTTON_WITH_CHOICE
-Program 
+Apply the program transformation:
 not used
 ..
 Apply a global transformation
@@ -885,9 +862,9 @@ Apply a global transformation
 	capply CLONE_ON_ARGUMENT[$MODULES]x
 	..
 
-	STF
-	capply STF[$MODULES]
-	..
+#	STF
+#	capply STF[$MODULES]
+#	..
 
 	Code regeneration
 	apply UNSPLIT
@@ -895,7 +872,7 @@ Apply a global transformation
 CLOSE
 
 IBUTTON_WITH_CHOICE
-Loop Nest
+Apply the Loop Nest transformation:
 not used
 ..
 Apply a loop nest transformation
@@ -940,7 +917,7 @@ Apply a loop nest transformation
 CLOSE	
 
 IBUTTON_WITH_CHOICE
-Privatization
+Apply Privatization on:
 not used
 ..
 Privatization of variables or anything
@@ -977,10 +954,10 @@ Options ++
 Options for Pips developers
 
 GROUP
-Parser Options
+PARSER Options
 set unusual parser options
 
-ILABEL_WITH_CHOICE
+LABEL_WITH_CHOICE
 Check Fortran Syntax Before Pips
 getproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS
 ..
@@ -1014,16 +991,16 @@ CLOSE
 
 LABEL_WITH_CHOICE
 Simplify Labelled Loop
-getproperty PARSER_SIMPLIFY_LABELLED_LOOP
+getproperty PARSER_SIMPLIFY_LABELLED_LOOPS
 ..
-Choice for PARSER_SIMPLIFY_LABELLED_LOOP
+Choice for PARSER_SIMPLIFY_LABELLED_LOOPS
 
 	Yes
-	setproperty PARSER_SIMPLIFY_LABELLED_LOOP TRUE
+	setproperty PARSER_SIMPLIFY_LABELLED_LOOPS TRUE
 	TRUE
 
 	No
-	setproperty PARSER_SIMPLIFY_LABELLED_LOOP FALSE
+	setproperty PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
 	FALSE
 
 CLOSE
@@ -1047,7 +1024,7 @@ CLOSE
 CLOSE
 
 GROUP
-Regions Options
+REGIONS Options
 set Regions options
 
 LABEL_WITH_CHOICE
@@ -1085,7 +1062,7 @@ CLOSE
 CLOSE
 
 GROUP
-Chains Options
+CHAINS Options
 set Chains options
 
 LABEL_WITH_CHOICE
@@ -1156,22 +1133,6 @@ Choice for CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS
 CLOSE
 CLOSE
 
-LABEL_WITH_CHOICE
-TPIPS is a SHELL
-getproperty TPIPS_IS_A_SHELL
-..
-Choice for TPIPS_IS_A_SHELL
-
-	No
-	setproperty TPIPS_IS_A_SHELL FALSE
-	FALSE
-
-	Yes
-	setproperty TPIPS_IS_A_SHELL TRUE
-	TRUE
-
-CLOSE
-
 CLOSE
 
 TOP_MENU
@@ -1179,7 +1140,7 @@ Stat. & warning ++
 Stat. & warning options 
 
 GROUP
-Statistics Options
+STATISTICS Options
 set Statistics  options
 
 LABEL_WITH_CHOICE
@@ -1312,7 +1273,7 @@ CLOSE
 CLOSE
 
 GROUP
-Log and Warning Options
+LOG and WARNING Options
 set debug options
 
 LABEL_WITH_CHOICE
@@ -1452,7 +1413,7 @@ Prettyprint ++
 Prettyprint options
 
 GROUP
-Prettyprint Options
+PRETTYPRINT Options
 set prettyprint  options
 
 
@@ -1701,4 +1662,3 @@ CLOSE
 
 CLOSE
 CLOSE
-
