@@ -95,6 +95,7 @@ static int tpips_lex_input (void)
 <KEY>quit 		{ KEYWORD(TK_QUIT); }
 <KEY>exit 		{ KEYWORD(TK_EXIT); }
 <KEY>help 		{ KEYWORD(TK_HELP); }
+<KEY>remove 		{ KEYWORD(TK_REMOVE); }
 
 <KEY>setproperty	{ SPECIAL(TK_SET_PROPERTY); }
 <KEY>set		{ SPECIAL(TK_SET_PROPERTY); }
