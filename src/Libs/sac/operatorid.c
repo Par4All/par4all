@@ -8,7 +8,7 @@
 #include "ri-util.h"
 
 #include "sac.h"
-
+#include "patterns.tab.h"
 
 typedef struct {
       char* name;
@@ -106,6 +106,9 @@ static void insert_mapping(oper_id_mapping* item)
 void init_operator_id_mappings()
 {
    int i;
+
+   if (mappings != NULL)
+      return;
 
    mappings = make_operator_id_tree();
    for(i=0; operators[i].name != NULL; i++)
