@@ -1406,6 +1406,11 @@ statement Tiling_buffer_allocation ()
 
 	      lis= NULL;
               lis1=NULL;
+	      lis=CONS(DIMENSION, make_dimension(int_to_expression(0), int_to_expression(1)), lis);
+	      pos=position_one_element(P1,j);
+	      pv= vect_make(VECTEUR_NUL ,itert[pos-1], VALUE_ONE,TCST,VALUE_ZERO);
+	      exp= binary_intrinsic_expression ("MOD",Pvecteur_to_expression(pv ),Value_to_expression(2));
+	      lis1 =CONS(EXPRESSION, exp,lis1);
 	      for (k=1;k<=j-1;k++)
 		{
 		  lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus 
@@ -1433,6 +1438,8 @@ statement Tiling_buffer_allocation ()
 		  exp=Pvecteur_to_expression(pv);
 		  lis1 =CONS(EXPRESSION, exp,lis1);
 		}
+	      
+	      
 	      name= make_new_array_variable(i+1,j,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
 	      buf_ref[i][j-1]=make_reference(name,lis1);
 	      ref[i][j-1]=name;
@@ -1578,7 +1585,7 @@ statement Tiling_buffer_allocation ()
 		  expression exp;
 		  reference ref;
 		   
-		    ref=copy_reference (buf_ref[i-1][l]);
+		  ref=copy_reference (buf_ref[i-1][l]);
 		  exp=reference_to_expression(ref);
                   for (r=0;r<=depth-1;r++)
 		    {
@@ -1602,16 +1609,30 @@ statement Tiling_buffer_allocation ()
 			  ExpressionReplaceReference(exp,
 						     make_reference((entity) iter[r],NIL), delai_plus);
 			}
-
-		      
-
-		      /*  Pvecteur pv;
-		      expression delai_plus;
-		      pv = vect_make(VECTEUR_NUL,iter[r], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],r+1,1));
-		      delai_plus=Pvecteur_to_expression(pv);
-		      ExpressionReplaceReference(exp,
-		      make_reference((entity) iter[r],NIL), delai_plus);   */
 		    }
+
+		  
+		  r=0;
+		  MAP(EXPRESSION,exp,{  
+		   
+		    if (r==depth)
+		      {
+			 
+			int pos;
+			Pvecteur delai_plus;
+			pos=position_one_element(P1,l+1);
+			pv= vect_make(VECTEUR_NUL ,itert[pos-1], VALUE_ONE,TCST,-VALUE_ONE);
+			delai_plus=Pvecteur_to_expression(pv);
+			ExpressionReplaceReference(exp,
+						   make_reference((entity) itert[pos-1],NIL), delai_plus);
+
+
+
+
+		      };
+		    r++;
+		  },reference_indices(ref)) 
+
 		  stemp[l]=make_assign_statement(reference_to_expression(regi[i][k]),reference_to_expression(ref));
 		};
 	      s=  stemp[depth];
@@ -1824,6 +1845,28 @@ statement Tiling_buffer_allocation ()
 			}
 		    
 		}
+	      r=0;
+	      MAP(EXPRESSION,exp,{  
+		
+		if (r==depth)
+		  {
+		    int pos;
+		    Pvecteur delai_plus;
+		    pos=position_one_element(P1,l+1);
+                    
+		 
+		    pv= vect_make(VECTEUR_NUL ,itert[pos-1], VALUE_ONE,TCST,-VALUE_ONE);
+		 
+		    delai_plus=Pvecteur_to_expression(pv);
+		    ExpressionReplaceReference(exp,
+					       make_reference((entity) itert[pos-1],NIL), delai_plus);
+		    
+
+		  
+		  };
+		r++;
+	      },reference_indices(ref));
+	      
 	      stemp[l]=make_assign_statement(reference_to_expression(regi[i][k]),reference_to_expression(ref));
 	    };
 	  s=  stemp[depth];
