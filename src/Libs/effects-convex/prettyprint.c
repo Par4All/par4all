@@ -327,6 +327,48 @@ text text_copyinout_array_regions(list l)
 text text_private_array_regions(list l)
 { return text_array_regions(l, ACTION_PRIVATE, ACTION_PRIVATE);}
 
+/*********************************************************** ABSOLETE MAYBE? */
+
+/* CALLGRAPH/ICFG stuff (should be OBSOLETE?)
+ */
+#define is_RW
+#define is_IN
+#define is_OUT
+
+static text 
+get_text_regions_for_module(
+    string module_name, 
+    string resource_name,
+    string ifread,
+    string ifwrite)
+{
+    list /* of effect */ le = effects_effects((effects) 
+	db_get_memory_resource(resource_name, module_name, TRUE));
+    text t;
+    t = text_array_regions(le, ifread, ifwrite);
+    return t;
+}
+
+text 
+get_text_regions(string module_name)
+{
+    return get_text_regions_for_module
+	(module_name, DBR_SUMMARY_REGIONS, ACTION_READ, ACTION_WRITE);
+}
+
+text 
+get_text_in_regions(string module_name)
+{
+    return get_text_regions_for_module
+	(module_name, DBR_IN_SUMMARY_REGIONS, ACTION_IN, ACTION_OUT);
+}
+
+text 
+get_text_out_regions(string module_name)
+{
+    return get_text_regions_for_module
+	(module_name, DBR_OUT_SUMMARY_REGIONS, ACTION_IN, ACTION_OUT);
+}
 
 /*********************************************************** DEBUG FUNCTIONS */
 
