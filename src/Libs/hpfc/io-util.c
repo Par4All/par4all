@@ -1,8 +1,7 @@
-/*
- * HPFC module by Fabien COELHO
+/* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-util.c,v $ ($Date: 1995/09/15 21:40:59 $, )
- * version $Revision$,
+ * $RCSfile: io-util.c,v $ version $Revision$,
+ * ($Date: 1995/10/04 10:54:01 $, )
  */
 
 #include "defines-local.h"
@@ -12,6 +11,96 @@
 #include "semantics.h"
 #include "effects.h"
 #include "conversion.h"
+
+/************************************************** ONLY_IO MAP DEFINITION */
+
+/* this is enough for the distribution purpose, because more clever
+ * analysis would be as checking for the distributablity of the enclosed
+ * code. A distribution code dedicated to IO will be implemented later on.
+ */
+
+GENERIC_CURRENT_MAPPING(only_io, bool, statement)
+
+static statement_mapping 
+  stat_bool_map = hash_table_undefined;
+
+#define Load(stat) \
+    ((bool) (hash_get(stat_bool_map, (char*) stat)))
+
+#define Store(stat, val) \
+    (hash_put(stat_bool_map, (char*) (stat), (char*) (val)))
+
+static void 
+only_io_rewrite(
+    statement st)
+{
+    instruction i = statement_instruction(st);
+    bool is_io = TRUE;
+
+    switch (instruction_tag(i))
+    {
+    case is_instruction_block:
+	MAP(STATEMENT, s, is_io = (is_io && Load(s)), instruction_block(i));
+        break;
+    case is_instruction_test:
+    {
+	test t = instruction_test(i);
+
+	is_io = (Load(test_true(t)) && Load(test_false(t)));
+
+        break;
+    }
+    case is_instruction_loop:
+	is_io = Load(loop_body(instruction_loop(i)));
+        break;
+    case is_instruction_goto:
+	pips_error("only_io_rewrite", "unexpected goto encountered");
+        break;
+    case is_instruction_call:
+	/* ??? something else should be done?
+	 * other kind of statements should not modify this status?
+	 */
+	is_io = IO_CALL_P(instruction_call(i));
+        break;
+    case is_instruction_unstructured:
+    {
+	control c = unstructured_control(instruction_unstructured(i));
+	list blocks = NIL;
+
+	CONTROL_MAP(ct, is_io=is_io && Load(control_statement(ct)), c, blocks);
+
+	gen_free_list(blocks);
+
+        break;
+    }
+    default:
+        pips_error("only_io_rewrite", "unexpected instruction tag\n");
+        break;
+    }
+
+    Store(st, is_io);
+}
+
+statement_mapping 
+only_io_mapping(
+    statement program,
+    statement_mapping map)
+{
+    stat_bool_map = map;
+    gen_recurse(program, statement_domain, gen_true, only_io_rewrite);
+    return stat_bool_map;
+}
+
+void 
+only_io_mapping_initialize(
+    statement program)
+{
+    set_only_io_map(only_io_mapping(program, MAKE_STATEMENT_MAPPING()));
+}
+
+
+
+/********************************************* GENERATION OF IO STATEMENTS */
 
 /*       T_LID=CMP_LID(pn, pi...)
  *       PVM_{SEND,RECV}(NODETIDS(T_LID), {SEND,RECV}_CHANNELS(T_LID), INFO)
