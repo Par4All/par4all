@@ -116,8 +116,8 @@ include vars.mk
 ### If you choose this, you won't be able to build other packages
 ### such as the VisuDomain tool (well indeed you can by making
 ### naughty changes in its makefile :-)
-INSTALL_LIB = 
-EXEC_EXTRA_LIBS = $(LIB)
+##INSTALL_LIB = 
+##EXEC_EXTRA_LIBS = $(LIB)
 
 ### Define this in combination with 2, 3, or 4 below
 ### (2. 3. and 4. -needed) general static/shared defines
@@ -308,13 +308,13 @@ install-static: lib-static
 
 install-include:
 	$(mkinstalldirs) $(INCLUDEDIR)/polylib
-	$(INSTALL_DATA) ./include/polylib/* $(INCLUDEDIR)/polylib
+	$(INSTALL_DATA) ./include/polylib/*.h $(INCLUDEDIR)/polylib
 
 install-man:
 # to be done...
 install-docs:
 	$(mkinstalldirs) $(DOCSDIR)
-	$(INSTALL_DATA) README CHANGES LICENSING polylib-doc.ps.gz $(DOCSDIR)/
+	$(INSTALL_DATA) doc/* $(DOCSDIR)/
 	$(mkinstalldirs) $(DOCSDIR)/examples/ehrhart
 	$(INSTALL_DATA) Test/ehrhart/*.in $(DOCSDIR)/examples/ehrhart
 
