@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/13 10:47:19 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/15 15:41:17 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -16,6 +16,10 @@ set -a
 #
 
 NEWGEN_MAX_TABULATED_ELEMENTS=12007
+
+# we should rather have
+# x_DIR for the installed version (instead of x_PRODDIR)
+# x_HOME used for x_DIR (with /Dev... and /Prod...)
 
 NEWGEN_DIR="/projects/Newgen"
 
@@ -58,7 +62,8 @@ LINEAR_SRCDIR="${LINEAR_PRODDIR}/Src"
 LINEAR_LIBDIR="${LINEAR_PRODDIR}/Lib"
 LINEAR_BINDIR="${LINEAR_PRODDIR}/Bin"
 
-LINEAR_LIBS='-lplint -lmatrice  -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique'
+# removed because not used by pips: plint
+LINEAR_LIBS='-lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique'
 
 LINEAR_ORDERED_LIBS="arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre plint sparse_sc union"
 
