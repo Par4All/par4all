@@ -62,7 +62,7 @@ void CreateArrays()
 
     entity ent;
 
-    ent = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,TOP_LEVEL_MODULE_NAME),
+    ent = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,IO_EFFECTS_PACKAGE_NAME),
 		      make_type(is_type_functional,
 				make_functional(NIL,make_type(is_type_void,NIL))),
 		      make_storage(is_storage_rom, UU),
@@ -71,7 +71,7 @@ void CreateArrays()
     set_current_module_entity(ent);
 
     /* GO: entity for io logical units: It is an array which*/
-    make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
+    make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 				 IO_EFFECTS_ARRAY_NAME),
 		MakeTypeArray(make_basic(is_basic_int,
 					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
@@ -90,13 +90,13 @@ void CreateArrays()
 		   */
 		make_storage(is_storage_ram,
 			     make_ram(ent,
-				      global_name_to_entity(TOP_LEVEL_MODULE_NAME, 
+				      global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, 
 							    STATIC_AREA_LOCAL_NAME),
 				      0, NIL)),
 		make_value(is_value_unknown, UU));
 
     /* GO: entity for io logical units: It is an array which*/
-    make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
+    make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 				 IO_EOF_ARRAY_NAME),
 		MakeTypeArray(make_basic(is_basic_int,
 					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
@@ -115,13 +115,13 @@ void CreateArrays()
 		   */
 		make_storage(is_storage_ram,
 			     make_ram(ent,
-				      global_name_to_entity(TOP_LEVEL_MODULE_NAME, 
+				      global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, 
 							    STATIC_AREA_LOCAL_NAME),
 				      0, NIL)),
 		make_value(is_value_unknown, UU));
 
     /* GO: entity for io logical units: It is an array which*/
-    make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
+    make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 				 IO_ERROR_ARRAY_NAME),
 		MakeTypeArray(make_basic(is_basic_int,
 					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
@@ -140,7 +140,7 @@ void CreateArrays()
 		   */
 		make_storage(is_storage_ram,
 			     make_ram(ent,
-				      global_name_to_entity(TOP_LEVEL_MODULE_NAME, 
+				      global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, 
 							    STATIC_AREA_LOCAL_NAME),
 				      0, NIL)),
 		make_value(is_value_unknown, UU));
