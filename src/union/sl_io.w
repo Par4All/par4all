@@ -113,7 +113,6 @@ Avec pour fichier d'ent\^ete :
 @D gram inludes @{
 #include <stdio.h>
 #include <string.h>
-extern char* strdup(const char *);
 
 #include "boolean.h"
 #include "arithmetique.h"
