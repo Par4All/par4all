@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/15 04:43:05 $, 
+ * $Date: 1997/10/21 12:42:04 $, 
  */
 
 #include <unistd.h>
@@ -329,6 +329,13 @@ nth_path(string path_list, int n)
     return result;
 }
 
+static string 
+relative_name_if_necessary(string name)
+{
+    if (name[0]=='/') return strdup(name);
+    else return strdup(concatenate("./", name, 0));
+}
+
 /* returns an allocated string pointing to the file, possibly 
  * with an additional path taken from colon-separated dir_path.
  * returns NULL if no file was found.
@@ -341,19 +348,21 @@ find_file_in_directories(string file_name, string dir_path)
     pips_assert("some file name", file_name);
 
     if (file_exists_p(file_name))
-	return strdup(file_name);
+	return relative_name_if_necessary(file_name);
 
     if (!dir_path || file_name[0]=='/')
 	return (string) NULL;
 
     /* looks for the file with an additionnal path ahead.
      */
-    while ((path=nth_path(dir_path, n++))) {
-	string name = strdup(concatenate(path, "/", file_name, 0));
+    while ((path=nth_path(dir_path, n++))) 
+    {
+	string name = strdup(concatenate(path, "/", file_name, 0)), res=NULL;
 	free(path);
-	if (file_exists_p(name))
-	    return name;
+	if (file_exists_p(name)) 
+	    res = relative_name_if_necessary(name);
 	free(name);
+	if (res) return res;
     }
 
     return (string) NULL;
