@@ -10,6 +10,9 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.50  2000/07/20 13:55:40  irigoin
+  * cleaning...
+  *
   * Revision 1.49  2000/05/25 08:37:55  coelho
   * no more successor when adding an eq of ineq.
   *
@@ -185,6 +188,84 @@ unstructured_to_transformers(unstructured u)
 
     debug(8,"unstructured_to_transformers","end\n");
 }
+
+/* This function is also used when computing preconditions if the exit
+   node is not reached. It assumes that transformers for all statements in
+   the unstructured have already been computed. */
+transformer 
+unstructured_to_global_transformer(
+    unstructured u)
+{
+  /* Assume any reachable node is executed at each iteration. A fix-point
+     of the result can be used to approximate the node preconditions. Some
+     nodes can be discarded because they do not modify the store such as
+     IF statements (always) and CONTINUE statements (if they do not link
+     the entry and the exit nodes). */
+
+    cons *nodes = NIL;
+    /* Entry node */
+    control entry_node = unstructured_control(u);
+    control exit_node = unstructured_exit(u);
+    transformer tf_u = transformer_empty();
+    transformer fp_tf_u = transformer_undefined;
+
+    debug(8,"unstructured_to_global_transformer","begin\n");
+
+    FORWARD_CONTROL_MAP(c, {
+	statement st = control_statement(c);
+	/* transformer_convex_hull has side effects on its arguments:-( */
+	/* Should be fixed now, 29 June 2000 */
+	/* transformer tf_st = copy_transformer(load_statement_transformer(st)); */
+	transformer tf_st = load_statement_transformer(st);
+	transformer tf_old = tf_u;
+
+	if(statement_test_p(st)) {
+	  /* Any side effect? */
+	  if(!ENDP(transformer_arguments(tf_st))) {
+	    tf_u = transformer_convex_hull(tf_old, tf_st); /* test */
+	      free_transformer(tf_old);
+	  }
+	}
+	else {
+	  if(continue_statement_p(st)) {
+	    if(gen_find_eq(entry_node, control_predecessors(c))!=chunk_undefined
+	       && gen_find_eq(exit_node, control_successors(c))!=chunk_undefined) {
+	      tf_u = transformer_convex_hull(tf_old, tf_st); /* continue */
+	      free_transformer(tf_old);
+	    }
+	  }
+	  else {
+	    tf_u = transformer_convex_hull(tf_old, tf_st); /* other */
+	    free_transformer(tf_old);
+	  }
+	}
+
+    }, entry_node, nodes) ;
+
+    gen_free_list(nodes) ;
+
+    /* fp_tf_u = transformer_derivative_fix_point(tf_u); */
+    /* Some of the fix-point operators are bugged because they drop part
+       of the basis. The problem was not fixed in the fix-point
+       computation but in whileloop handling:-(. The derivative version
+       should be ok. */
+    /* transformer_basic_fix_point() is not defined in fix_point.c:
+    dropping all constraints is correct!; Hence,
+    transformer_fix_point_operator is not initialized unless
+    SEMANTICS_FIX_POINT is set... and this is not the default option.  To
+    be redesigned... */
+    /* fp_tf_u = (*transformer_fix_point_operator)(tf_u); */
+    fp_tf_u = transformer_derivative_fix_point(tf_u);
+
+    debug(8,"unstructured_to_global_transformer","Result for one step tf_u:\n");
+    ifdebug(8) (void) print_transformer(tf_u);
+    debug(8,"unstructured_to_global_transformer","Result for fix-point fp_tf_u:\n");
+    ifdebug(8) (void) print_transformer(fp_tf_u);
+    debug(8,"unstructured_to_global_transformer","end\n");
+
+    return fp_tf_u;
+}
+
 static transformer 
 unstructured_to_transformer(unstructured u, list e) /* effects */
 {
@@ -218,10 +299,12 @@ unstructured_to_transformer(unstructured u, list e) /* effects */
 
 	if(load_statement_transformer(exit)!=transformer_undefined) {
 	    /* The exit node has been reached */
-	    tf = effects_to_transformer(e);
+	  /* tf = effects_to_transformer(e); */
+	  tf = unstructured_to_global_transformer(u);
 	}
 	else {
-	    /* Never ending loop in transformer */
+	    /* Never ending loop in unstructured... unless a call to STOP
+               occurs */
 	    tf = transformer_empty();
 	}
     }
@@ -1409,7 +1492,7 @@ expression_to_transformer(
     pips_debug(8, "begin\n");
 
     if(entity_has_values_p(e)) {
-	Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
+        /* Pvecteur ve = vect_new((Variable) e, VALUE_ONE); */
 	normalized n = NORMALIZE_EXPRESSION(expr);
 
 	if(normalized_linear_p(n)) {
@@ -1433,7 +1516,7 @@ expression_to_transformer(
 	    tf = user_function_call_to_transformer(e, expr, ef);
 	}
 	else {
-	    vect_rm(ve);
+	    /* vect_rm(ve); */
 	    tf = transformer_undefined;
 	}
     }
