@@ -120,7 +120,7 @@ statement s;
 	  gen_free_list( blocs ); 
 	  break;
       }
-
+      case is_instruction_whileloop:
       case is_instruction_call:
       case is_instruction_goto:	
 	break;
