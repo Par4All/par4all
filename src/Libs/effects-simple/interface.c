@@ -122,11 +122,8 @@ print_code_effects(
 {
     bool ok;
 
-    effects_computation_init_func = is_rw?
-	set_methods_for_rw_effects_prettyprint:
-        set_methods_for_inout_effects_prettyprint;
-    effects_computation_reset_func = 
-	reset_methods_for_effects_prettyprint;
+    if (is_rw) set_methods_for_rw_effects_prettyprint(module_name);
+    else       set_methods_for_inout_effects_prettyprint(module_name);
 
     set_is_user_view_p(is_user_view);
     set_prettyprint_with_attachments(is_attached);
