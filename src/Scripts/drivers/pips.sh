@@ -2,8 +2,10 @@
 #
 # $Id$
 #
-# find out actual *pips for the current $PIPS_ARCH...
+# Find out actual *pips for the current $PIPS_ARCH...
 # it is always better to use the executable directly. 
+# This shell script is expected to be executer as pips/tpips or wpips.
+# This can be achieve by providing such links in the Share directory.
 #
 
 what=`basename $0 .sh`
