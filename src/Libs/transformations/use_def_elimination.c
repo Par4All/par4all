@@ -402,7 +402,7 @@ remove_this_statement_if_useless(statement s)
       gen_free(statement_instruction(s));
       statement_instruction(s) = make_instruction_block(NIL);
       /* Since the RI need to have no label on instruction block: */
-      fix_label_and_comment_in_empty_block(s);
+      fix_sequence_statement_attributes(s);
       if (get_debug_level() >= 6)
          fprintf(stderr, "remove_this_statement_if_useless removes statement %p (%#x).\n", s, statement_ordering(s));
    }
