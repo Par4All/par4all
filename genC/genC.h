@@ -158,7 +158,7 @@ extern void gen_type_translation_read GEN_PROTO((string));
 extern void gen_type_translation_write GEN_PROTO((string));
 
 extern void gen_init_external GEN_PROTO((int, 
-					 void*(*)(FILE*), 
+					 void*(*)(FILE*, int(*)(void)), 
 					 void (*)(FILE*, void*), 
 					 void (*)(void*), 
 					 void* (*)(void*), 
