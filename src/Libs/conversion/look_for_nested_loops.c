@@ -1,6 +1,6 @@
 /* Package generation (for the hyperplane transformation?)
  * $RCSfile: look_for_nested_loops.c,v $ version $Revision$, 
- * ($Date: 1998/04/14 19:58:16 $, ) 
+ * ($Date: 1998/10/13 07:13:58 $, ) 
  */
 
 #include <stdio.h>
@@ -67,7 +67,7 @@ bool (*loop_predicate)();
 	    ifdebug(9) {
 		debug(9, "look_for_nested_loop_statements",
 		      "After transformation:\n");
-		pips_assert("look_for_nested_loop_statement", gen_consistent_p(new_s));
+		pips_assert("look_for_nested_loop_statement", statement_consistent_p(new_s));
 		debug_on("ZERO_DEBUG_LEVEL");
 		print_text(stderr,text_statement(entity_undefined,0,new_s));
 		debug_off();
