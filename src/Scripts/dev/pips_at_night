@@ -1,15 +1,19 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/07/11 13:48:36 $, )
+# ($Date: 1996/07/12 08:58:02 $, )
+# (c) Fabien COELHO July 1996
 # 
 # what to do at night...
-# (c) Fabien COELHO July 1996
 #
-# source environment if needed.
 
-[ "$PIPS_DIR" ] || . /projects/Pips/pipsrc.sh
+# source environment if needed (as from cron)
+test -d $HOME/.profile && . $HOME/.profile
+test "$PIPS_DIR" || . /projects/Pips/pipsrc.sh
 
+unset no_cleaning no_newgen no_linear no_pips no_validation
+
+arch=.
 user=`whoami`
 email=${REPLYTO:-$user}
 script=`basename $0`
@@ -28,23 +32,43 @@ usage()
 	$script (version $Revision$) - "$@"
 	  -h: this help
 	  -v: verbose
+	  -c arch: compile for arch (may be a list, default is .)
 	  -a email : report to this address
+	  -C: skip cleaning
+	  -N: skip newgen
+	  -L: skip linear
+	  -P: skip pips
+	  -V: skip validation
 EOF
     exit $ret
 }
 
-while getopts hva: OPT
+# compile what[nlp] name[...] report[filename] arch...
+compile()
+{
+    what=$1; name=$2; report=$3; shift 3
+    for a in "$@"; do
+	make-pips -$what -o $report -m $a ARCH=$a clean recompile
+    done 2>&1 | mail -s "$script: $name recompile night report" $email
+}
+
+while getopts hvCNLPVc:a: OPT
 do
     case $OPT in
 	h) usage 0 "some help" ;;
 	a) email=$OPTARG ;;
+	c) arch="$OPTARG" ;;
 	v) verbose=verb ;;
+	C) no_cleaning=1 ;;
+	N) no_newgen=1 ;;
+	P) no_pips=1 ;;
+	V) no_validation=1 ;;
 	*) usage 2 "invalid option" ;;
     esac
 done
 
-REPORT=/tmp/${script}.${user}.$$
-rm -f ${REPORT}
+report=/tmp/${script}.${user}.$$
+rm -f ${report}
 
 #
 # do the job
@@ -53,39 +77,46 @@ rm -f ${REPORT}
 $verbose starting $script for $email 
 $verbose date: `date`
 
-$verbose deleting old workspaces...
-find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +7 -print | 
+test "$no_cleaning" ||
+{
+  $verbose deleting old workspaces...
+  find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +7 -print | 
     xargs ${PIPS_UTILDIR}/Delete
 
-$verbose removing core files older than one week
-find ${PIPS_HOME}/Pips -name core -mtime +7 -print | 
+  $verbose removing core files older than one week
+  find ${PIPS_HOME}/Pips -name core -mtime +7 -print | 
     xargs rm -f
+}
 
-$verbose recompiling NEWGEN - Production
+test "$no_newgen" ||
 {
-make-pips -no ${REPORT} -m SUN4 ARCH=SUN4 clean recompile
-make-pips -no ${REPORT} -m . ARCH=. clean recompile
-} 2>&1 | mail -s "$script: newgen recompile night report" $email
+  $verbose recompiling NEWGEN - Production
+  compile n newgen $report $arch
+}
 
-$verbose recompiling LINEAR - Production
+test "$no_linear" ||
 {
-make-pips -lo ${REPORT} -m SUN4 ARCH=SUN4 clean recompile
-make-pips -lo ${REPORT} -m . ARCH=. clean recompile
-} 2>&1 | mail -s "$script: linear recompile night report" $email
+  $verbose recompiling LINEAR - Production
+  compile l linear $report $arch
+}
 
-$verbose recompiling PIPS - Production
+test "$no_pips" ||
 {
-make-pips -po ${REPORT} -m SUN4 ARCH=SUN4 clean recompile
-make-pips -po ${REPORT} -m . ARCH=. clean recompile
-} 2>&1 | mail -s "$script: pips recompile night report" $email
+  $verbose recompiling PIPS - Production
+  compile p pips $report $arch
+}
 
 # summary
-mail -s "$script: recompile night report summary" $email < ${REPORT}
-rm -f ${REPORT}
+test "$no_newgen$no_linear$no_pips" -eq 111 ||
+{
+  grep 'failed$' $report |
+  mail -s "$script: recompile night report summary" $email 
+  rm -f $report
+}
 
 # Validate Pips
-$verbose Validating PIPS
-Validate -vti 50 -a ${email}
+test "$no_validation" || 
+{ $verbose Validating PIPS ; Validate -vti 50 -a ${email} ; }
 
 $verbose date: `date`
 $verbose end of  $script for $email 
