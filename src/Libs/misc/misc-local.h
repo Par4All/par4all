@@ -1,8 +1,11 @@
+/* hmmm...
+ */
 #ifndef _STDARG_H
 /* If we have already used stdarg.h do not include: */
 #include <varargs.h>
 #endif
 #include <setjmp.h>
+
 
 #define ifdebug(l) if(the_current_debug_level>=(l))
 
@@ -11,10 +14,15 @@
 #ifdef __GNUC__
 #define pips_debug(level, format, args...)\
  ifdebug(level) fprintf(stderr, "[" __FUNCTION__  "] " format, ##args);
+#define pips_user_warning(format, args...)\
+  user_warning(__FUNCTION__, format, ##args)
 #else
 #define pips_debug pips_debug_function
+#define pips_user_warning pips_user_warning_function
 #endif
 
+/* USE message_assert or assert instead, defined in newgen.
+ */
 #define pips_assert(f, p) pips_assert_function((f), (p), __LINE__, __FILE__)
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
@@ -27,5 +35,7 @@
 #define MAXPATHLEN 1024
 #endif
 
+/* hmmm. ???
+ */
 extern char *re_comp();
 extern int re_exec();
