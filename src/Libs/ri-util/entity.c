@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.44  2000/11/24 15:35:33  coelho
+ * hop.
+ *
  * Revision 1.43  1999/05/21 12:10:29  irigoin
  * Comment refined for CreateIntrinsic()
  *
@@ -865,4 +868,25 @@ bool some_main_entity_p(void)
 		modules);
   gen_array_full_free(modules);
   return some_main;
+}
+
+/* @return the list of entities in module the name of which is given
+ * warning: the entity is created if it does not exist!
+ * @param module the name of the module for the entities
+ * @param names a string of comma-separated of entity names
+ */
+list /* of entity */ string_to_entity_list(string module, string names)
+{
+  list le = NIL;
+  string s;
+  for (s = names; s && *s;)
+  {
+    char * next_comma = strchr(s, ',');
+    if (next_comma) *next_comma = '\0';
+    le = CONS(ENTITY, FindOrCreateEntity(module, s), le);
+    s += strlen(s);
+    if (next_comma) *next_comma = ',';
+  }
+  
+  return le;
 }
