@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # $RCSfile: remove-latex-comments,v $ (version $Revision$)
-# $Date: 1996/08/21 11:04:02 $, 
+# $Date: 1996/11/13 10:11:36 $, 
 #
 # Conversion d'un fichier Latex en un fichier NewGen
 #
