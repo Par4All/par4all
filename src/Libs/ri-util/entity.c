@@ -387,7 +387,9 @@ string m;
 string n;
 {
 
-    entity global_name = 
+    entity global_name;
+
+    global_name = 
 	gen_find_tabulated(concatenate(m,
 				       MODULE_SEP_STRING,
 				       n,
