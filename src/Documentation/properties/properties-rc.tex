@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/30 21:32:46 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/02/06 09:11:11 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -984,7 +984,11 @@ PRETTYPRINT_SCALAR_REGIONS FALSE
 
 \subsubsection{Display Internals for Debugging}
 
-All these debugging options should be set to FALSE for normal operation.
+All these debugging options should be set to FALSE for normal operation,
+when the prettyprinter is expected to produce code as close as possible to
+the input form.
+When they are turned on, the output is closer to the PIPS internal
+representation.
 
 Sequences are implicit in Fortran and in many programming languages but
 they are internally represented. It is possible to print pieces of
@@ -1053,6 +1057,42 @@ redundant with the IO statement itself.
 PRETTYPRINT_CHECK_IO_STATEMENTS FALSE
 \end{verbatim}
 
+Manage internal RETURNs correctly if set to TRUE.  This results in a
+slightly ugly (but correct) prettyprint, compared to a nicer (but
+possibly incorrect) default one. Internal returns are converted by the
+parser into GO~TO's the final and unique return.
+
+\begin{verbatim}
+PRETTYPRINT_INTERNAL_RETURN TRUE
+\end{verbatim}
+
+Print the final RETURN statement, although this is useless according to
+Fortran standard. Note that comments attached to the final return are
+lost if it is not printed. Note also that the final RETURN may be part
+of an unstructured in which case the previous property is required.
+
+\begin{verbatim}
+PRETTYPRINT_FINAL_RETURN FALSE
+\end{verbatim}
+
+The internal representation is based on a standard IF structure, known as
+{\em block if} in Fortran jargon. When possible, the prettyprinter uses
+the {\em logical if} syntactical form to save lines and to produce an
+output assumed  closer to the input. When statements are decorated,
+information gathered by PIPS may be lost. This property can be turned on
+to have an output closer to the internal representation.
+
+\begin{verbatim}
+PRETTYPRINT_BLOCK_IF_ONLY FALSE
+\end{verbatim}
+
+\subsubsection{Declarations}
+
+By default, module declarations are preserved as huge strings to produce
+an output as close as possible to the input (see field \verb/decls_text/
+in type \verb/code/). However, large program transformations and code
+generation phases, e.g. hpfc,a require updated declarations.
+
 Regenerate all variable declarations, including those variables not
 declared in the user program. By default, when possible, the user
 declaration {\em text} is used to preserve comments.
@@ -1076,23 +1116,7 @@ Whether to regenerate the commons in the declarations or not.
 PRETTYPRINT_COMMONS TRUE
 \end{verbatim}
 
-Manage internal RETURNs correctly if set to TRUE.  This results in a
-slightly ugly (but correct) prettyprint, compared to a nicer (but
-possibly incorrect) default one. Internal returns are converted by the
-parser into GO~TO's the final and unique return.
-
-\begin{verbatim}
-PRETTYPRINT_INTERNAL_RETURN TRUE
-\end{verbatim}
-
-Print the final RETURN statement, although this is useless according to
-Fortran standard. Note that comments attached to the final return are
-lost if it is not printed. Note also that the final RETURN may be part
-of an unstructured in which case the previous property is required.
-
-\begin{verbatim}
-PRETTYPRINT_FINAL_RETURN FALSE
-\end{verbatim}
+\verb/DATA/ declarations are not handled presently.
 
 \subsubsection{FORESYS Interface}
 
