@@ -457,15 +457,14 @@ list lvr;
 
 	case is_owner_main:
 	{
-	    int nmodules = 0;
-	    char *module_list[ARGS_LENGTH];
 	    int i;
 	    int number_of_main = 0;
+	    gen_array_t a = db_get_module_list();
+	    int nmodules = gen_array_nitems(a);
 
-	    db_get_module_list(&nmodules, module_list);
-	    pips_assert("build_real_resources", nmodules>0);
+	    pips_assert("some modules...", nmodules>0);
 	    for(i=0; i<nmodules; i++) {
-		string on = module_list[i];
+		string on = gen_array_item(a, i);
 
 		if (entity_main_module_p
 		    (local_name_to_top_level_entity(on)) == TRUE)
@@ -478,10 +477,12 @@ list lvr;
 		    debug(8, "build_real_resources", "Main is %s\n", on);
 		    result = gen_nconc(result, 
 				       CONS(REAL_RESOURCE, 
-					    make_real_resource(vrn, on),
+				       make_real_resource(vrn, strdup(on)),
 					    NIL));
 		}
 	    }
+
+	    gen_array_full_free(a);
 	    break;
 	}
 	case is_owner_callees:
@@ -548,22 +549,20 @@ list lvr;
 	}
 	case is_owner_all:
 	{
-	    int nmodules = 0;
-	    char *module_list[ARGS_LENGTH];
-	    int i;
+	    gen_array_t modules = db_get_module_list();
+	    int nmodules = gen_array_nitems(modules), i;
 
-	    db_get_module_list(&nmodules, module_list);
-	    pips_assert("build_real_resource", nmodules>0);
+	    pips_assert("some modules", nmodules>0);
 	    for(i=0; i<nmodules; i++) {
-		string on = module_list[i];
-
-		debug(8, "build_real_resources", "\t%s\n", on);
-
+		string on = gen_array_item(modules, i);
+		pips_debug(8, "\t%s\n", on);
 		result = gen_nconc(result, 
 				   CONS(REAL_RESOURCE, 
-					make_real_resource(vrn, on),
+					make_real_resource(vrn, strdup(on)),
 					NIL));
 	    }
+
+	    gen_array_full_free(modules);
 	    break;
 	}
 	case is_owner_select:
