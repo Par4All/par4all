@@ -18,9 +18,9 @@
 
 #include "polyedre.h"
 
-extern int sc_to_sg_debug_level;
+/* extern int sc_to_sg_debug_level; */
 
-main(argc,argv)
+int main(argc,argv)
 int argc;
 char * argv[];
 {
@@ -49,6 +49,7 @@ char * argv[];
 
     /* lecture du systeme */
     if(sc_fscan(f,&s)) {
+	/* sc_dump(s); */
 	fprintf(stderr,"syntaxe correcte dans %s\n",filename);
 	sc_fprint(stdout,s, variable_default_name);
     }
@@ -58,7 +59,9 @@ char * argv[];
     }
 
     /* conversion */
-    sc_to_sg_debug_level = 9;
-    sg = sc_to_sg(s);
-    sg_fprint(stdout, sg, variable_default_name);
+    /* sc_to_sg_debug_level = 9; */
+    sg = sc_to_sg_chernikova(s);
+    sg_fprint(stdout, sg, variable_dump_name);
+
+    return 0;
 }
