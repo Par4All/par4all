@@ -225,6 +225,7 @@ void fprint_entity_list(FILE *fp, list l);
 /* Variables
  */
 #define T_LID		"T_LID"
+#define T_LIDp		"T_LIDp"
 #define INFO		"HPFC_INFO"
 #define BUFID		"HPFC_BUFID"
 
