@@ -52,7 +52,7 @@ Value val;
     if (val!=0) {
 	for (vect=(*pvect);vect!=NULL;vect=vect->succ) {
 	    if (var_of(vect)==var) {
-		value_add(val_of(vect), val);
+		value_addto(val_of(vect), val);
 		if (value_zero_p(val_of(vect)))
 		    vect_erase_var(pvect, var_of(vect));
 		return;
@@ -219,7 +219,7 @@ Pvecteur vect;
     if ( vect->var == TCST )
 	return val;
     for (vect = vect; vect != NULL ; vect = vect->succ) {
-	value_add(val,vecteur_val(vect));
+	value_addto(val,vecteur_val(vect));
 	assert(value_notzero_p(val_of(vect)));
     }
     return val;
@@ -240,7 +240,7 @@ Pvecteur v;
     Pvecteur coord;
 
     for(coord = v; coord!=NULL; coord=coord->succ)
-	val_of(coord) = (Value) value_sign(val_of(coord));
+	val_of(coord) = int_to_value(value_sign(val_of(coord)));
 
     return v;
 }
