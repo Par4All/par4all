@@ -5,16 +5,19 @@
 
    */
 
-/* 	%A% ($Date: 1998/03/19 21:07:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/04/14 19:34:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 1998/03/19 21:07:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_clean_up_sequences[] = "%A% ($Date: 1998/04/14 19:34:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
 #include <stdlib.h> 
 #include <stdio.h> 
 #include <malloc.h> 
+
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
