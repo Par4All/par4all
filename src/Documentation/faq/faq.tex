@@ -4,6 +4,9 @@
 %% PIPS faq
 %%
 %% $Log: faq.tex,v $
+%% Revision 1.9  1999/01/12 21:14:43  irigoin
+%% Comments added about loop parallelization and induction variables.
+%%
 %% Revision 1.8  1999/01/11 09:13:44  irigoin
 %% Because of EDF, section of code clean up added.
 %%
@@ -124,7 +127,7 @@ not applied by default. The corresponding properties must be set (see \PROPERTIE
 
 \end{itemize}
 
-Formal functional are still unsupported ($Date: 1999/01/11 09:13:44 $) and
+Formal functional are still unsupported ($Date: 1999/01/12 21:14:43 $) and
 the internal representation of DATA statements is unsatisfactory.
 
 Recursivity, which is not in Fortran 77 standard, is not supported.
@@ -317,12 +320,14 @@ perform a scalar or array privatization followed by a parallelization.
 Finally, dependence tests use more or less information. If contextual
 information is necessary to find out that a loop is parallel, a dependence
 test using preconditions (\verb/rice_semantics_dependence_graph/) or
-regions (\verb/rice_regions_dependence_graph/) should be
-selected. Furthermore, regions depend on transformers which, like
-preconditions, may be computed in different ways. The most accurate
-information is gathered with the two selections
-\verb/transformers_inter_full/
-and \verb/preconditions_inter_full/.
+regions (\verb/rice_regions_dependence_graph/) should be selected.
+Furthermore, regions depend on transformers which, like preconditions, may
+be computed in different ways. The most accurate information is gathered
+with the two selections \verb/transformers_inter_full/ and
+\verb/preconditions_inter_full/. Induction variables are found and can be
+visualized in preconditions and used in dependence tests. But they are not
+substituted and may carry the last dependence arc which prevents a loop
+parallelization.
 
 \section{This loop should not be parallelized!}
 \index{Parallelization}
