@@ -174,7 +174,7 @@ expression e;
  *                       FALSE, otherwise 
 */
 
-bool expression_in_list_p(expression e, list le)
+bool same_expression_in_list_p(expression e, list le)
 {
   MAP(EXPRESSION, f, if (same_expression_p(e,f)) return TRUE, le);
   return FALSE;
@@ -221,7 +221,7 @@ bool logical_expression_p(expression e)
    *   entities using parentheses and the logical operators 
    *   .NOT.,.AND.,.OR.,.EQV.,.NEQV. */
 
-  /* In fact, I didn't use the PIPS function : basic_of_expression because of 2 reasons : 
+  /* NN:  In fact, I didn't use the PIPS function : basic_of_expression because of 2 reasons : 
    * - the function basic_of_intrinsic use the macro : ENTITY_LOGICAL_OPERATOR_P 
    *   which is not like the Fortran Standard definition (the above comments)
    * - the case where an expression is a range is not considered here for a 
