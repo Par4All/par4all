@@ -460,7 +460,6 @@ type r; /* type of result */
     else if (type_functional_p(tfe)) 
     {
 	type tr = functional_result(type_functional(tfe));
-	/* FI: the next test should be osfter to take into account overloaded type */
 	if(r != type_undefined && !type_equal_p(tr, r)) {
 	    /* a bug is detected here: MakeExternalFunction, as its name
 	       implies, always makes a FUNCTION, even when the symbol
@@ -468,9 +467,10 @@ type r; /* type of result */
 	       infered from ImplicitType() - see just above -;
 	       let's use implicit_type_p() again, whereas the unknown type
 	       should have been used */
-	    if(implicit_type_p(fe))
+	  if(implicit_type_p(fe) || overloaded_type_p(tr)) {
 		/* memory leak of tr */
 		functional_result(type_functional(tfe)) = r;
+	    } 
 	    else {
 		user_warning("MakeExternalFunction",
 			     "Type redefinition for %s.\n", entity_name(fe));
