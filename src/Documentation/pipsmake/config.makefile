@@ -1,11 +1,10 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/23 22:13:44 $, 
+# $Date: 1996/08/23 22:21:50 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
-		make-builder-map \
-		auto.h
+		make-builder-map
 
 INSTALL_SHR=	pipsmake.rc \
 		wpips.rc
@@ -13,12 +12,9 @@ INSTALL_SHR=	pipsmake.rc \
 DERIVED_INC=	resources.h \
 		phases.h \
 		builder_map.h \
-		wpips_transform_menu_layout.h \
-		auto-dash.h \
-		auto-number.h
+		wpips_transform_menu_layout.h
 
-INSTALL_INC=	auto.h \
-		$(DERIVED_INC)
+INSTALL_INC=	$(DERIVED_INC)
 
 INSTALL_DOC=	pipsmake-rc.ps
 
@@ -28,12 +24,6 @@ INSTALL_HTM=	pipsmake-rc.html \
 DERIVED_FILES=	$(INSTALL_SHR) $(DERIVED_INC) $(INSTALL_DOC) $(INSTALL_HTM)
 
 all: $(DERIVED_FILES)
-
-auto-dash.h: auto.h
-	sed 's,^...,-- ,;s,^..,--,' $< > $@
-
-auto-number.h: auto.h
-	sed 's,^...,#  ,;s,^..,# ,' $< > $@
 
 pipsmake.rc: pipsmake-rc.tex
 	#
