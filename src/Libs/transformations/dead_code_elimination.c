@@ -880,6 +880,9 @@ suppress_dead_code(char * mod_name)
   reset_current_module_entity();
   reset_precondition_map();
   reset_proper_rw_effects();
+  ifdebug(1) {
+      free_value_mappings();
+  }
 
   debug(1,"dead_code_elimination", "End for %s\n", mod_name);
   
