@@ -1,12 +1,13 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/09/07 17:21:14 $, )
+# ($Date: 1996/09/13 16:22:34 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
 # Makefile for PVM and HPFC, Fabien COELHO, 08/06/94
 
 SHELL=/bin/sh
+PVM=pvm
 
 ifndef PIPS_ARCH
 PIPS_ARCH=.
@@ -40,6 +41,7 @@ include $(RT_DIR)/$(RT_ARCH)/compilers.make
 
 ifdef USE_PVMe
 all:	$(TARGET).cmd
+PVM=pvme
 endif
 
 #
@@ -47,8 +49,6 @@ endif
 
 ifeq ($(PVM_ARCH),CM5)
 MIMD = 1
-#FC	= f77
-#FFLAGS	= -fast -u
 CMLD = cmmd-ld
 # CMLD_FLAGS = -v
 CMLD_FLAGS =
@@ -63,75 +63,50 @@ endif
 
 ifeq ($(PVM_ARCH),SUN4)
 NETWORK = 1
-#FC	= f77
-#FFLAGS	= -fast -u
 endif
 
 ifeq ($(PVM_ARCH),SUN4SOL2)
 NETWORK = 1
-#FC	= f77
-#FFLAGS	= -fast -u
 endif
 
 ifeq ($(PVM_ARCH),SUNMP)
 NETWORK = 1
-#FC	= f77
-#FFLAGS	= -fast -u
 RUNTIME_LIBS     += -lnsl -lsocket -lthread
 endif
 
 ifeq ($(PVM_ARCH),ALPHA)
 NETWORK = 1
-#FC	= f77
-#FFLAGS	= -fast -u
 endif
 
 ifeq ($(PVM_ARCH),RS6K)
 NETWORK = 1
-#FC	= xlf
-#FFLAGS	= -O2 -u
 endif
 
 #
-# possible overwrite
-
-#ifdef USE_GNU
-#FC	= g77
-#FFLAGS 	= -O2 -pipe -Wimplicit
-#endif
-
-#
 # Directories... 
+# libraries...
 
 pvmbin 	= $(HOME)/pvm3/bin/$(PVM_ARCH)
 pvmlib	= $(PVM_ROOT)/lib/$(PVM_ARCH)
 pvminc	= $(PVM_ROOT)/include
 
-ifdef USE_PVMe
-pvmlib	= $(PVM_ROOT)/lib
-pvminc	= $(PVM_ROOT)/lib
-PVMe_DIR	= /usr/lpp/ssp/css/libus)
-
-LIBS_DIR	+= -L$(PVMe_DIR)
-endif
-
 LIBS_DIR	+= -L. -L$(pvmlib) -L$(RT_DIR)/$(RT_ARCH)
-
-#
-# Libraries
-
-ifdef MIMD
-PVMHOST = $(pvmlib)/pvmhost.o
-endif
 
 PVM_FLIB 	+= -lfpvm3
 PVM_GLIB 	+= -lgpvm3
 PVM_HLIB 	+= -lpvm3
 
 ifdef USE_PVMe
+pvmlib		= $(PVM_ROOT)/lib
+pvminc		= $(PVM_ROOT)/lib
+LIBS_DIR	+= -L/usr/lpp/ssp/css/libus
 PVM_GLIB	=
-ALL_NLIBS	+= -lcss -bI:$(pvmlib)/pvm3e.exp
-ALL_HLIBS	+= -lcss -bI:$(pvmlib)/pvm3e.exp
+COMMON_LIBS	+= -lmpci -bI:$(pvmlib)/pvm3e.exp
+endif
+
+ifdef MIMD
+PVMHOST = $(pvmlib)/pvmhost.o
+PVM_NLIB 	+= -lpvm3pe
 endif
 
 ifdef NETWORK
@@ -139,16 +114,15 @@ PVM_NLIB 	+= -lpvm3
 endif
 
 ifdef MIMD
-PVM_NLIB 	+= -lpvm3pe
 endif
 
 RUNTIME_LIBS	+= -lhpfcruntime
 
-PVM_HLIBS	+= $(PVM_FLIB) $(PVM_GLIB) $(PVM_HLIB)
-PVM_NLIBS 	+= $(PVM_FLIB) $(PVM_GLIB) $(PVM_NLIB)
 
-ALL_HLIBS	+= $(RUNTIME_LIBS) $(PVM_HLIBS) 
-ALL_NLIBS	+= $(RUNTIME_LIBS) $(PVM_NLIBS) 
+COMMON_LIBS	+= $(RUNTIME_LIBS) $(PVM_FLIB) $(PVM_GLIB) 
+
+HOST_LIBS	+= $(PVM_HLIB)
+NODE_LIBS 	+= $(PVM_NLIB) 
 
 #
 # Other tools
@@ -187,7 +161,7 @@ DEDUCED = $(PVM_HEADERS) param_init.f
 #
 # Rules
 
-all:	$(RUNABLES) $(DEDUCED) 
+all:	$(DEDUCED) $(HOST) $(NODE)
 
 .SUFFIXES:	.f .o .m4
 
@@ -205,11 +179,11 @@ pvm:
 	# starting pvm daemon if needed...
 	@if [ -f /tmp/pvmd.$(shell id -u) ] ; \
 	then echo "PVM already running..." ; \
-	else echo quit | $(PVM_ROOT)/lib/pvm ; fi
+	else echo quit | $(PVM) ; fi
 
 reset:
 	@echo "resetting PVM"
-	@echo reset | $(PVM_ROOT)/lib/pvm
+	@echo reset | $(PVM)
 
 #
 # LoadLeveller...
@@ -223,6 +197,12 @@ $(pvmbin):; mkdir -p $(pvmbin)
 
 $(pvmbin)/%: % $(pvmbin)
 	$(COPY) $< $@
+
+host: $(pvmbin)/$(HOST) 
+node: $(pvmbin)/$(NODE)
+
+hostnode: host node
+main: $(pvmbin)/$(MAIN)
 
 install: $(pvmbin)/$(HOST) $(pvmbin)/$(NODE) $(pvmbin)/$(MAIN)
 	@echo files installed
@@ -284,7 +264,8 @@ $(HOST):  $(HEADERS) hpfc_main_host.o $(COMMON_OFILES) $(HOST_OFILES)
 		$(HOST_OFILES) \
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
-		$(ALL_HLIBS) \
+		$(COMMON_LIBS) \
+		$(HOST_LIBS) \
 		$(LDIO) $(LDPURE)
 	$(STRIP) $@
 
@@ -293,7 +274,8 @@ $(NODE):  $(HEADERS) hpfc_main_node.o $(COMMON_OFILES) $(NODE_OFILES)
 		$(NODE_OFILES) \
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
-		$(ALL_NLIBS)\
+		$(COMMON_LIBS) \
+		$(NODE_LIBS) \
 		$(LDPURE)
 	$(STRIP) $@
 
@@ -303,8 +285,8 @@ $(MAIN): $(HEADERS) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
 		$(NODE_OFILES) \
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
-		$(ALL_HLIBS) \
-		$(ALL_NLIBS)\
+		$(COMMON_LIBS) \
+		$(NODE_LIBS)\
 		$(LDIO) $(LDPURE)
 	$(STRIP) $@
 
