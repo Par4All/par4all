@@ -117,11 +117,15 @@ list loop_list;
  */
 static hash_table STS;
 
+#if defined(HAS_ADGYY)
+
 /* The file read in by the scanner */
 extern FILE *adgyyin;
 
 /* The parsing function created by Yacc */
 extern int adgyyparse();
+
+#endif
 
 
 /* Internal variables 	*/
@@ -184,8 +188,17 @@ char * s;
      exit(1);
    }
 
+#if defined(HAS_ADGYY)
+
  adgyyin = paf_file;
  (void) adgyyparse();
+
+#else
+
+ pips_internal_error("not adgyy{in,parse} compiled in (HAS_ADGYY undef)\n");
+
+#endif
+
  fclose(paf_file);
 
  set_current_stco_map(STS);
