@@ -79,7 +79,7 @@ void BeginingOfParsing()
     called = TRUE;
 }
 
-void parser(module)
+bool parser(module)
 string module;
 {
     extern void ssparse();
@@ -98,6 +98,12 @@ string module;
     ssparse();
     safe_fclose(ssin, CurrentFN);
 
+    /* This debug_off() occurs too late since pipsdbm has been called
+     * before. Initially, the parser was designed to parse more than
+     * one subroutine/function/program at a time.
+     */
     debug_off();
+
+    return TRUE;
 }
 
