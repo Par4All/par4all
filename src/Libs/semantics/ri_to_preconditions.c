@@ -699,7 +699,8 @@ bool upwards;
     cons * ef = proper_effects_of_expression(c, is_action_read);
 
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
-	debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,"transformer_add_condition_information_updown", 
+	debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
+	      "transformer_add_condition_information_updown", 
 	      "begin upwards=%s veracity=%s c=", 
 	      bool_to_string(upwards), bool_to_string(veracity));
 	print_expression(c);
@@ -857,6 +858,27 @@ bool upwards;
     return newpre;
 }
 
+/* Renaming of variables in v according to transformations occuring
+ * later. If a variable is modified by post, its old value must
+ * be used in v
+ */
+
+static void
+upwards_vect_rename(Pvecteur v, transformer post)
+{
+    /* FI: it would probably ne more efficient to
+     * scan va and vb than the argument list...
+     */
+    list modified_values = transformer_arguments(post);
+    
+    MAP(ENTITY, v_new, {
+	entity v_init = new_value_to_old_value(v_new);
+	
+	(void) vect_variable_rename(v, (Variable) v_new,
+				    (Variable) v_init);
+    }, modified_values);
+}
+
 transformer transformer_add_relation_information(pre, relop, e1, e2, veracity, upwards)
 transformer pre;
 entity relop;
@@ -891,6 +913,9 @@ bool upwards;
 	   (ENTITY_NON_EQUAL_P(relop) && !veracity)) {
 	    /* v1 - v2 == 0 */
 	    Pvecteur v = vect_substract(v1, v2);
+	    if(upwards) {
+		upwards_vect_rename(v, pre);
+	    }
 	    newpre = transformer_equality_add(pre, v);
 	}
 	else if((ENTITY_EQUAL_P(relop) && !veracity) ||
@@ -907,14 +932,13 @@ bool upwards;
 	    vect_add_elem(&vb, TCST, 1);
 	    /* FI: I think that this should be programmed (see comment above)
 	     * but I'm waiting for a bug to occur... (6 July 1993)
+	     *
+	     * FI: Well, the bug was eventually seen:-) (8 November 1995)
 	     */
-	    /*
 	    if(upwards) {
-		list old_values = transformer_arguments(pre);
-		rename_old_values_in_vector(old_values, va);
-		rename_old_values_in_vector(old_values, vb);
+		upwards_vect_rename(va, pre);
+		upwards_vect_rename(vb, pre);
 	    }
-	    */
 	    prea = transformer_inequality_add(prea, va);
 	    preb = transformer_inequality_add(preb, vb);
 	    newpre = transformer_convex_hull(prea, preb);
@@ -926,18 +950,27 @@ bool upwards;
 	    /* v2 - v1 + 1 <= 0 */
 	    Pvecteur v = vect_substract(v2, v1);
 	    vect_add_elem(&v, TCST, 1);
+	    if(upwards) {
+		upwards_vect_rename(v, pre);
+	    }
 	    newpre = transformer_inequality_add(pre, v);
 	}
 	else if ((ENTITY_GREATER_THAN_P(relop) && !veracity) ||
 		 (ENTITY_LESS_OR_EQUAL_P(relop) && veracity)) {
 	    /* v1 - v2 <= 0 */
 	    Pvecteur v = vect_substract(v1, v2);
+	    if(upwards) {
+		upwards_vect_rename(v, pre);
+	    }
 	    newpre = transformer_inequality_add(pre, v);
 	}
 	else if ((ENTITY_GREATER_OR_EQUAL_P(relop) && veracity) ||
 		 (ENTITY_LESS_THAN_P(relop) && !veracity)) {
 	    /* v2 - v1 <= 0 */
 	    Pvecteur v = vect_substract(v2, v1);
+	    if(upwards) {
+		upwards_vect_rename(v, pre);
+	    }
 	    newpre = transformer_inequality_add(pre, v);
 	}
 	else if ((ENTITY_GREATER_OR_EQUAL_P(relop) && !veracity) ||
@@ -945,6 +978,9 @@ bool upwards;
 	    /* v1 - v2 + 1 <= 0 */
 	    Pvecteur v = vect_substract(v1, v2);
 	    vect_add_elem(&v, TCST, 1);
+	    if(upwards) {
+		upwards_vect_rename(v, pre);
+	    }
 	    newpre = transformer_inequality_add(pre, v);
 	}
 	else
