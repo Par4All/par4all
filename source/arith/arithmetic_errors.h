@@ -1,5 +1,5 @@
 /* 
- * $Id: arithmetic_errors.h,v 1.1 2002/10/14 15:08:03 olaru Exp $
+ * $Id: arithmetic_errors.h,v 1.2 2002/10/15 10:02:06 kienhuis Exp $
  *
  * managing arithmetic errors...
  * detecting and managing arithmetic errors on Values should be
@@ -9,8 +9,8 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
- * Revision 1.1  2002/10/14 15:08:03  olaru
- * New structurated version
+ * Revision 1.2  2002/10/15 10:02:06  kienhuis
+ * version of arith for new release
  *
  * Revision 1.2  2002/01/22 16:15:58  olaru
  * cygwin variable added

@@ -1,12 +1,12 @@
 /*
-  $Id: errors.c,v 1.1 2002/10/14 15:08:03 olaru Exp $
+  $Id: errors.c,v 1.2 2002/10/15 10:02:07 kienhuis Exp $
 
   Exception management.
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
-  Revision 1.1  2002/10/14 15:08:03  olaru
-  New structurated version
+  Revision 1.2  2002/10/15 10:02:07  kienhuis
+  version of arith for new release
 
   Revision 1.2  2002/08/12 13:11:27  loechner
   union ehrhart, first complete version
