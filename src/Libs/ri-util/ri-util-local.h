@@ -200,9 +200,11 @@
 
 #define loop_to_instruction(l) make_instruction(is_instruction_loop, l)
 #define test_to_instruction(t) make_instruction(is_instruction_test, t)
+#define call_to_instruction(c) make_instruction(is_instruction_call, c)
 
 #define loop_to_statement(l) instruction_to_statement(loop_to_instruction(l))
 #define test_to_statement(t) instruction_to_statement(test_to_instruction(t))
+#define call_to_statement(c) instruction_to_statement(call_to_instruction(c))
 
 #define entity_constant_p(e) (type_functional_p(entity_type(e)) && \
   storage_rom_p(entity_storage(e)) && value_constant_p(entity_initial(e)))
