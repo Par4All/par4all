@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.27  1999/05/06 07:06:00  zory
+ * test strategy modified !!
+ *
  * Revision 1.26  1998/12/30 16:52:50  zory
  * atomize transformations added in strategies
  *
@@ -832,10 +835,10 @@ static optimization_strategy
   },
   {
     "test",
-    FALSE, NULL, FALSE,
+    TRUE, expression_gravity, TRUE,
     TRUE, "0",
-    FALSE, 
-    TRUE
+    TRUE, 
+    FALSE
   },
   {
     "R10K",
