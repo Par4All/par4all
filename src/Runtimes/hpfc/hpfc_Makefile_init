@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/10/17 15:46:53 $, )
+# ($Date: 1996/10/18 21:20:26 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -167,7 +167,7 @@ DEDUCED = $(PVM_HEADERS) param_init.f
 #
 # Rules
 
-all:	$(DEDUCED) $(HOST) $(NODE)
+all:	$(DEDUCED)
 
 .SUFFIXES:	.f .o .m4
 
@@ -204,11 +204,11 @@ $(pvmbin):; mkdir -p $(pvmbin)
 $(pvmbin)/%: % $(pvmbin)
 	$(COPY) $< $@
 
+hostnode: host node
 host: $(pvmbin)/$(HOST) 
 node: $(pvmbin)/$(NODE)
-
-hostnode: host node
 main: $(pvmbin)/$(MAIN)
+out: $(RTEST)
 
 install: $(pvmbin)/$(HOST) $(pvmbin)/$(NODE) $(pvmbin)/$(MAIN)
 	@echo files installed
