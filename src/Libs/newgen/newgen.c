@@ -1,9 +1,9 @@
-/* %A% ($Date: 1996/09/21 16:06:05 $, ) 
+/* %A% ($Date: 1997/07/24 16:00:40 $, ) 
     version $Revision$, got on %D%, %T% [%P%].
    Copyright (c) - École des Mines de Paris Proprietary.  */
 
 #ifndef lint
-char top_level_newgen_c_vcid[] = "%A% ($Date: 1996/09/21 16:06:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char top_level_newgen_c_vcid[] = "%A% ($Date: 1997/07/24 16:00:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,4 +74,11 @@ void initialize_newgen()
 		      (void (*)()) sg_rm,
 		      (char *(*)()) sg_dup,
 		      (int (*)()) NULL); /* can't get the size... FC */
+
+    gen_init_external(VOID_STAR_NEWGEN_EXTERNAL,
+		      (char *(*)()) gen_core,
+		      (void (*)()) gen_core, 
+		      (void (*)()) gen_null,
+		      (char *(*)()) gen_identity,
+		      (int (*)()) gen_false);
 }
