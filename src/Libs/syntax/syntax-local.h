@@ -16,9 +16,9 @@ extern entity StaticArea;
 extern cons * FormalParameters;
 extern char lab_I[];
 extern char FormatValue[];
-extern char sstext[]; /* interface between the scanner and the parser */
-extern int ssleng; /* the length of the string in sstext  */
-extern FILE * ssin; /* the file read in by the scanner */
+extern char syn_text[]; /* interface between the scanner and the parser */
+extern int syn_leng; /* the length of the string in sstext  */
+extern FILE * syn_in; /* the file read in by the scanner */
 extern int line_b_I, line_e_I, line_b_C, line_e_C;
 extern char Comm[]; /* the current comment */
 extern char PrevComm[]; /* the previous comment */
