@@ -14,7 +14,6 @@
 extern int      fprintf();
 
 #include "genC.h"
-#include "entitymapping.h"
 
 #include "ri.h"
 #include "hpf.h"
