@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.58  1997/05/29 15:07:31  coelho
+# adapted to t3e.
+#
 # Revision 1.57  1997/05/29 13:55:56  zory
 # *** empty log message ***
 #
@@ -176,14 +179,17 @@ ifeq ($(PVM_ARCH),CRAY)
 # CRAY PVM is does not have pvm_version
 # also no need to link to the pvm library
 #
-pvminc	= /usr/include/mpp
 M4FLAGS	+= 	-D _HPFC_NO_PVM_VERSION_ \
 		-D _HPFC_NO_BYTE1_ \
 		-D _HPFC_NO_INTEGER2_ \
 		-D _HPFC_NO_REAL4_ \
 		-D _HPFC_NO_COMPLEX8_
 PVM_ENCODING_OPTION =	PvmDataRaw
-HPFC_MAX_NPES =		128
+HPFC_MAX_NPES	= 512
+#
+# T3D:
+# pvminc	= /usr/include/mpp
+# HPFC_MAX_NPES =		128
 endif
 
 #
