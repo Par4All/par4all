@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.1 2004/01/31 22:17:46 verdoolaege Exp $
+# $Id: Makefile.am,v 1.2 2004/07/01 18:36:52 verdoolaege Exp $
 #
 
 OBJ_DIR = $(top_builddir)
@@ -41,6 +41,7 @@ EHRHART =  \
 	t31.in\
 	t3.in\
 	t4.in\
+	t12.in\
 	tpar.in
 
 EXTRA_DIST = $(EHRHART) \
@@ -48,7 +49,7 @@ EXTRA_DIST = $(EHRHART) \
 
 # These do not pass in 32 bits mode (integer overflow): isnm isnm2 e16
 if BITS32
-  OVER = isnm.in isnm2.in e16.in
+  OVER = isnm.in isnm2.in e16.in t12.in
 endif
 
 EHRHART_TESTS = $(filter-out $(LONG_EHRHART_TESTS) $(OVER), $(EHRHART))
