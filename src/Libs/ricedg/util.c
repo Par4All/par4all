@@ -100,12 +100,16 @@ graph mod_graph;
     Ptsg gs;
     int banner_number = 0;
     bool sru_format_p = get_bool_property("PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT");
+    persistant_statement_to_int s_to_l = persistant_statement_to_int_undefined;
+    int dl = -1;
 
     debug_on("RICEDG_DEBUG_LEVEL");
 
     if(sru_format_p) {
 	/* compute line numbers for statements */
-    }
+	s_to_l = statement_to_line_number(mod_stat);
+	dl = module_to_declaration_length(get_current_module_entity());
+     }
     else {
 	banner_number =
 	    get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") +
@@ -139,8 +143,14 @@ graph mod_graph;
 		   (effect_reference(conflict_source(c))))) {
 		   */
 		if(sru_format_p) {
+		    int l1 = dl + apply_persistant_statement_to_int(s_to_l, s1);
+		    int l2 = dl + apply_persistant_statement_to_int(s_to_l, s2);
+
+		    fprintf(fd, "%d,%d ", l1, l2);
+		    /*
 		    fprintf(fd, "%d,%d ", 
 		    statement_number(s1), statement_number(s2));
+		    */
 		    fprintf(fd, "%c,%c ", 
 			    action_read_p(effect_action(conflict_source(c)))? 'R' : 'W',
 			    action_read_p(effect_action(conflict_sink(c)))? 'R' : 'W');
@@ -206,14 +216,17 @@ graph mod_graph;
 		}
 		else {
 		    if(sru_format_p) 
-			fprintf(fd, "levels()");
+			fprintf(fd, " levels()");
 		}
 		fprintf(fd, "\n");
 	    }
 	}
     } 
 
-    if(!sru_format_p) {
+    if(sru_format_p) {
+	free_persistant_statement_to_int(s_to_l);
+    }
+    else {
 	fprintf(fd, "\n****************** End of Dependence Graph ******************\n");
     }
 
