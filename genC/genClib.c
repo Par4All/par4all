@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 12:51:37 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 16:45:20 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -985,8 +985,14 @@ free_obj_in(
 
 	if( IS_TABULATED( bp )) 
 	{
-	    char local[512];
+	    char local[1024];
+
+	    message_assert("static buffer size", 
+			  strlen((obj+HASH_OFFSET)->s)<1000);
+
 	    sprintf(local, "%d%c%s", dom, HASH_SEPAR, (obj+HASH_OFFSET)->s) ;
+
+    /* fprintf(stderr, "freeing 0x%x (%s)\n", (unsigned int) obj, local); */
 
 	    if (!Gen_tabulated_names) 
 		fatal("free_obj_out: Null tabulated names for %s\n", bp->name);
@@ -1457,108 +1463,40 @@ gen_copy_tree_with_sharing(
 }
 
 
-/* FREE_TABULATED */
-
-static int 
-free_tabulated_obj_in( obj )
-gen_chunk *obj ;
-{
-    if( shared_obj( obj, gen_null, gen_null )) {
-	return( !GO) ;
-    }
-    return( GO ) ;
-}
-
-/* FREE_TABULATED_LEAF_IN frees tabulated leaf OBJ of domain BP only once. */
-
-static int
-free_tabulated_leaf_in( obj, bp )
-gen_chunk *obj ;
-struct gen_binding *bp ;
-{
-    if ( IS_TABULATED( bp )) {
-	char local[1024];
-
-	if ( obj->p == gen_chunk_undefined ) {
-	    return( !GO) ;
-	}
-	{
-	int dom = quick_domain_index(obj->p);
-	sprintf(local, "%d%c%s", dom, HASH_SEPAR, (obj->p+HASH_OFFSET)->s) ;
-
-	if (!Gen_tabulated_names) 
-	    fatal("free_obj_out: Null tabulated names for %s\n", bp->name);
-	
-	/* freed here because the name is freed before free_obj_out
-	 */
-	if (hash_del(Gen_tabulated_names, local)==HASH_UNDEFINED_VALUE)
-	    fatal("free_tabulated_leaf_in: clearing unexisting \"%s\"\n", 
-		 local);
-
-	return( GO ) ;
-	}
-/*
-	free_obj_out( obj->p, bp ) ;
-	obj->p = gen_chunk_undefined ;
-	return( !GO) ;*/
-    }
-    return( GO ) ;
-}
+/*********************************************************** FREE_TABULATED */
 
 /* GEN_FREE_TABULATED frees all the elements of the tabulated table of
    BINDING. */
 
-int
-gen_free_tabulated( domain )
-int domain ;
+int 
+gen_free_tabulated(int domain)
 {
-    struct gen_binding *bp = &Domains[ domain ] ;
-    int index = bp->index ;
-    gen_chunk *fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof( gen_chunk ),
-				0,
-			        Tabulated_bp-Domains,
-			        Gen_tabulated_[ index ] ) ;
-    struct driver dr ;
-    int i ;
-
+    struct gen_binding *bp = &Domains[ domain ];
+    gen_chunk * t = Gen_tabulated_[bp->index];
+    int i;
+    
     check_read_spec_performed();
 
-    Tabulated_bp->domain->ar.element = bp ;
-    dr.null = gen_null ;
+    message_assert("not initialized", !free_already_seen);
+    free_already_seen = hash_table_make(hash_pointer, 0);
 
-    dr.obj_in = free_tabulated_obj_in ;
-    dr.simple_in = persistant_simple_in ;
-    dr.leaf_in = free_tabulated_leaf_in ;
+    /* fprintf(stderr, " -- domain %d (%d allocated)\n", domain, bp->alloc); */
 
-    dr.obj_out = free_obj_out ;
-    dr.simple_out = free_simple_out ;
-    dr.array_leaf = gen_array_leaf ;
-    dr.leaf_out = free_leaf_out ;
+    for (i=0; i<bp->alloc; i++)
+    {
+	if (t[i].p && !gen_chunk_undefined_p(t[i].p)) {
+	    /* fprintf(stderr, "freeing [%d] (0x%x) %s \n", i,
+		    (unsigned int) t[i].p, ((t[i].p)+2)->s); */
 
-    push_gen_trav_env() ;
-
-    shared_pointers( fake_obj, FALSE ) ;
-#ifdef DBG_HASH
-    (void) fprintf( stderr, "Gen_freeing_tabulated\n" ) ;
-    hwrite( Gen_tabulated_names ) ;
-#endif
-    gen_trav_obj( fake_obj, &dr ) ;
-
-    pop_gen_trav_env() ;
-
-#ifdef DBG_HASH
-    (void) fprintf( stderr, "After gen_free_tabulated\n" ) ;
-    hwrite( Gen_tabulated_names ) ;
-#endif
-
-    bp->alloc = 1 ;
-    Gen_tabulated_[ bp->index ] = 
-	    (gen_chunk *)alloc( max_tabulated_elements()*sizeof( gen_chunk )) ;
-    
-    for( i=0 ; i<max_tabulated_elements() ; i++ ) {
-	(Gen_tabulated_[ bp->index ]+i)->p = gen_chunk_undefined ;
+	    gen_free(t[i].p), t[i].p = gen_chunk_undefined;
+	}
     }
-    return( domain ) ;
+
+    hash_table_free(free_already_seen);
+    free_already_seen = NULL;
+
+    bp->alloc = 0;
+    return domain;
 }
 
 /* GEN_CLEAR_TABULATED_ELEMENT only clears the entry for object OBJ in the
@@ -1582,6 +1520,9 @@ gen_chunk *obj  ;
 	    fatal( "clear_tabulated: Null tabulated names for %s\n", 
 		  bp->name ) ;
 	}
+
+	fprintf(stderr, "c freeing 0x%x (%s)\n", (unsigned int) obj, local);
+
 	if( hash_del( Gen_tabulated_names, local ) == HASH_UNDEFINED_VALUE ) {
 	    fatal( "gen_clear_tabulated_element: clearing unexisting %s\n", 
 		  local ) ;
