@@ -22,44 +22,33 @@
 /*
  * This function prints out a graph that contains callees only
  */
-void print_icfg(module_name)
-string module_name;
+static void print_any_icfg(string module_name, int decor_type)
 {
     set_bool_property(ICFG_IFs, FALSE);
     set_bool_property(ICFG_DOs, FALSE);
+    set_int_property(ICFG_DECOR, decor_type);
     generic_print_icfg(module_name);
 }
 
 /*
  * This function prints out a graph that contains DO's 
  */
-void print_icfg_with_loops(module_name)
-string module_name;
+static void print_any_icfg_with_loops(string module_name, int decor_type)
 {
     set_bool_property(ICFG_DOs, TRUE);
     set_bool_property(ICFG_IFs, FALSE);
+    set_int_property(ICFG_DECOR, decor_type);
     generic_print_icfg(module_name);
 }
-
-/*
- * This function prints out a graph that contains DO's
-void print_icfg_with_noempty_loops(module_name)
-string module_name;
-{
-    set_bool_property(ICFG_DOs, TRUE);
-    set_bool_property(ICFG_IFs, FALSE);
-    generic_print_icfg(module_name);
-}
- */
 
 /* 
  * This function prints out a graph that contains both IF's and DO's 
  */
-void print_icfg_with_control(module_name)
-string module_name;
+static void print_any_icfg_with_control(string module_name, int decor_type)
 {
     set_bool_property(ICFG_IFs, TRUE);
     set_bool_property(ICFG_DOs, TRUE);
+    set_int_property(ICFG_DECOR, decor_type);
     generic_print_icfg(module_name);
 }
 
@@ -76,3 +65,83 @@ string module_name;
 
     debug_off();
 }
+
+void print_icfg(string module_name)
+{print_any_icfg(module_name,ICFG_DECOR_NONE);}
+
+void print_icfg_with_preconditions(string module_name)
+{print_any_icfg(module_name,ICFG_DECOR_PRECONDITIONS);}
+
+void print_icfg_with_transformers(string module_name)
+{print_any_icfg(module_name,ICFG_DECOR_TRANSFORMERS);}
+
+void print_icfg_with_proper_effects(string module_name)
+{print_any_icfg(module_name,ICFG_DECOR_PROPER_EFFECTS);}
+
+void print_icfg_with_cumulated_effects(string module_name)
+{print_any_icfg(module_name,ICFG_DECOR_CUMULATED_EFFECTS);}
+
+void print_icfg_with_regions(string module_name)
+{print_any_icfg(module_name,ICFG_DECOR_REGIONS);}
+
+void print_icfg_with_in_regions(string module_name)
+{print_any_icfg(module_name,ICFG_DECOR_IN_REGIONS);}
+
+void print_icfg_with_out_regions(string module_name)
+{print_any_icfg(module_name,ICFG_DECOR_OUT_REGIONS);}
+
+/* ICFGs with loops */
+
+void print_icfg_with_loops(string module_name)
+{print_any_icfg_with_loops(module_name,ICFG_DECOR_NONE);}
+
+void print_icfg_with_loops_preconditions(string module_name)
+{print_any_icfg_with_loops(module_name,ICFG_DECOR_PRECONDITIONS);}
+
+void print_icfg_with_loops_transformers(string module_name)
+{print_any_icfg_with_loops(module_name,ICFG_DECOR_TRANSFORMERS);}
+
+void print_icfg_with_loops_proper_effects(string module_name)
+{print_any_icfg_with_loops(module_name,ICFG_DECOR_PROPER_EFFECTS);}
+
+void print_icfg_with_loops_cumulated_effects(string module_name)
+{print_any_icfg_with_loops(module_name,ICFG_DECOR_CUMULATED_EFFECTS);}
+
+void print_icfg_with_loops_regions(string module_name)
+{print_any_icfg_with_loops(module_name,ICFG_DECOR_REGIONS);}
+
+void print_icfg_with_loops_in_regions(string module_name)
+{print_any_icfg_with_loops(module_name,ICFG_DECOR_IN_REGIONS);}
+
+void print_icfg_with_loops_out_regions(string module_name)
+{print_any_icfg_with_loops(module_name,ICFG_DECOR_OUT_REGIONS);}
+
+/* ICFGs with controls */
+
+void print_icfg_with_control(string module_name)
+{print_any_icfg_with_control(module_name,ICFG_DECOR_NONE);}
+
+void print_icfg_with_control_preconditions(string module_name)
+{print_any_icfg_with_control(module_name,ICFG_DECOR_PRECONDITIONS);}
+
+void print_icfg_with_control_transformers(string module_name)
+{print_any_icfg_with_control(module_name,ICFG_DECOR_TRANSFORMERS);}
+
+void print_icfg_with_control_proper_effects(string module_name)
+{print_any_icfg_with_control(module_name,ICFG_DECOR_PROPER_EFFECTS);}
+
+void print_icfg_with_control_cumulated_effects(string module_name)
+{print_any_icfg_with_control(module_name,ICFG_DECOR_CUMULATED_EFFECTS);}
+
+void print_icfg_with_control_regions(string module_name)
+{print_any_icfg_with_control(module_name,ICFG_DECOR_REGIONS);}
+
+void print_icfg_with_control_in_regions(string module_name)
+{print_any_icfg_with_control(module_name,ICFG_DECOR_IN_REGIONS);}
+
+void print_icfg_with_control_out_regions(string module_name)
+{print_any_icfg_with_control(module_name,ICFG_DECOR_OUT_REGIONS);}
+
+
+
+
