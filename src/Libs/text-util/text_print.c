@@ -59,14 +59,19 @@ fprintf_sentence(FILE * fd,
 
 /* print_sentence:
  *
- * FI: I had to change this module to handle string longer than the space available
- * on one line; I tried to preserve as much as I could of the previous behavior to
+ * FI: I had to change this module to handle string longer than the space 
+ * available on one line; 
+ * I tried to preserve as much as I could of the previous behavior to
  * avoid pseudo-hyphenation at the wrong place and to avoid extensicve problems
  * with validate; the resulting code is lousy, of course; FI, 15 March 1993
  * 
  * RK: the print_sentence could print lower case letter according to
  * a property... 17/12/1993.
  */
+
+#define MAX_END_COLUMN 		(72)
+#define MAX_START_COLUMN 	(42)
+
 void
 print_sentence(FILE * fd,
 	       sentence s)
@@ -81,17 +86,21 @@ print_sentence(FILE * fd,
 						    position_in_the_output);
 	    ps++;
 	}
-   }
-    else {
+    }
+    else 
+    {
+	/* col: the next column number, starting from 1.
+	 * it means tha columns 1 to col-1 have been output. I guess. FC.
+	 */
+	int col, i, line_num = 1;
 	unformatted u = sentence_unformatted(s);
-	int col;
-	int i;
-	int line_num = 1;
 	string label = unformatted_label(u);
 	int em = unformatted_extra_margin(u);
 	int n = unformatted_number(u);
 	cons *lw = unformatted_words(u);
-
+	
+	/* first 6 columns (0-5)
+	 */
 	if (label != (char *) NULL) {
 	    /* Keep track of the attachment against the padding: */
 	    deal_with_attachments_in_this_string(label,
@@ -101,21 +110,22 @@ print_sentence(FILE * fd,
 	else {
 	    fprintf_sentence(fd, "      ");
 	}
-
+	
 	/* FI: do not indent too much (9 June 1995) */
-	em = em > 42 ? 42 : em;
-
+	em = (em > MAX_START_COLUMN) ? MAX_START_COLUMN : em;
+	
 	for (i = 0; i < em; i++) 
 	    putc_sentence(' ', fd);
+	
 	col = 7+em;
-
-	pips_assert("less than 72 columns", col <= 72);
-
+	
+	pips_assert("not too many columns", col <= MAX_END_COLUMN);
+	
 	while (lw) {
 	    string w = STRING(CAR(lw));
 	    STRING(CAR(lw)) = NULL;
 	    lw = CDR(lw);
-
+	    
 	    /* if the string fits on the current line: no problem */
 	    if (col + strlen(w) <= 70) {
 		deal_with_attachments_in_this_string(w,
@@ -131,11 +141,13 @@ print_sentence(FILE * fd,
 			/* Complete current line with the statement
                            line number, if it is significative: */
 			if (n > 0 &&
-			    get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
-			    for (i = col; i <= 72; i++) putc_sentence(' ', fd);
+			    get_bool_property("PRETTYPRINT_STATEMENT_NUMBER"))
+			{
+			    for (i = col; i <= MAX_END_COLUMN; i++) 
+				putc_sentence(' ', fd);
 			    fprintf_sentence(fd, "%04d", n);
 			}
-
+			
 			/* start a new line with its prefix */
 			putc_sentence('\n', fd);
 
@@ -144,7 +156,8 @@ print_sentence(FILE * fd,
 			       || strcmp(label,"CDIR@")==0
 			       || strcmp(label,"CMIC$")==0)) {
 			    /* Special label for Cray directives */
-			    fprintf_sentence(fd, "%s%d", label, (++line_num)%10);
+			    fprintf_sentence(fd, "%s%d", label, 
+					     (++line_num)%10);
 			}
 			else
 			    fprintf_sentence(fd, "     &");
@@ -154,8 +167,8 @@ print_sentence(FILE * fd,
 
 			col = 7+em;
 		    }
-		    deal_with_attachments_in_this_string(w,
-							 position_in_the_output);
+		    deal_with_attachments_in_this_string
+			(w, position_in_the_output);
 		    col += fprintf_sentence(fd, "%s", w);
 		}
 	    /* if the string has to be broken in at least two lines: 
@@ -166,26 +179,22 @@ print_sentence(FILE * fd,
 		    int ncar;
 
 		    /* complete the current line */
-		    ncar = 72 - col + 1;
-		    deal_with_attachments_in_this_string_length(line,
-								position_in_the_output,
-								ncar);
-		    fprintf_sentence(fd,"%.*s", ncar, line);
+		    ncar = MAX_END_COLUMN - col + 1;
+		    deal_with_attachments_in_this_string_length
+			(line, position_in_the_output,ncar);
+		    fprintf_sentence(fd, "%.*s", ncar, line);
 		    line += ncar;
-		    col = 73;
+		    col = MAX_END_COLUMN;
+		    
+		    pips_debug(9, "line to print, col=%d\n", col);
 
-		    /*
-		       if (n > 0) {
-		       for (i = col; i <= 72; i++) putc(' ', fd);
-		       fprintf(fd, "%04d", n);
-		       }
-		       */
-
-		    while(strlen(line)!=0) {
-			ncar = MIN(72 - 7 +1, strlen(line));
+		    while(strlen(line)!=0) 
+		    {
+			ncar = MIN(MAX_END_COLUMN - 7 + 1, strlen(line));
 
 			/* start a new line with its prefix but no indentation
-			 * since string constants may be broken onto two lines */
+			 * since string constants may be broken onto two lines
+			 */
 			putc_sentence('\n', fd);
 
 			if(label != (char *) NULL 
@@ -193,15 +202,15 @@ print_sentence(FILE * fd,
 			       || strcmp(label,"CDIR@")==0
 			       || strcmp(label,"CMIC$")==0)) {
 			    /* Special label for Cray directives */
-			    (void) fprintf_sentence(fd, "%s%d", label, (++line_num)%10);
+			    (void) fprintf_sentence
+				(fd, "%s%d", label, (++line_num)%10);
 			}
 			else
 			    (void) fprintf_sentence(fd, "     &");
 
 			col = 7 ;
-			deal_with_attachments_in_this_string_length(line,
-								    position_in_the_output,
-								    ncar);
+			deal_with_attachments_in_this_string_length
+			    (line, position_in_the_output, ncar);
 			(void) fprintf_sentence(fd, "%.*s", ncar, line);
 			line += ncar;
 			col += ncar;
@@ -210,12 +219,14 @@ print_sentence(FILE * fd,
 	    free(w);
 	}
 
-	pips_assert("print_sentence", col <= 72);
+	pips_debug(9, "line completed, col=%d\n", col);
+	pips_assert("not too many columns", col <= MAX_END_COLUMN+1);
 
 	/* Output the statement line number on the right end of the
            line: */
 	if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
-	    for (i = col; i <= 72; i++) putc_sentence(' ', fd);
+	    for (i = col; i <= MAX_END_COLUMN; i++) 
+		putc_sentence(' ', fd);
 	    fprintf_sentence(fd, "%04d", n);
 	}
 	putc_sentence('\n', fd);
@@ -226,15 +237,13 @@ void dump_sentence(sentence s)
 {
     print_sentence(stderr, s);
 }
-
+
 void print_text(fd, t)
 FILE *fd;
 text t;
 {
     print_sentence_init();
-    MAPL(cs, 
-	 print_sentence(fd, SENTENCE(CAR(cs))), 
-	 text_sentences(t));
+    MAP(SENTENCE, s, print_sentence(fd, s), text_sentences(t));
 }
 
 /* FI: print_text() should be fprint_text() and dump_text(), print_text() */
