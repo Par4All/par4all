@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/06/15 19:15:29 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/08/21 16:02:38 $, )
  * version $Revision$
  */
  
@@ -673,7 +673,8 @@ bool hpfc_make(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
 
-    safe_system(concatenate("cd ", dir, "/hpfc ; $HPFC_MAKE make &", NULL));
+    safe_system(concatenate("cd ", dir, 
+			    "/hpfc ; ${HPFC_MAKE:-gmake} make &", NULL));
 
     debug_off();
     return TRUE;
@@ -697,7 +698,8 @@ bool hpfc_run(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
 
-    safe_system(concatenate("cd ", dir, "/hpfc ; $HPFC_MAKE run &", NULL));
+    safe_system(concatenate("cd ", dir, 
+			    "/hpfc ; ${HPFC_MAKE:-gmake} run &", NULL));
 
     debug_off();
     return TRUE;
