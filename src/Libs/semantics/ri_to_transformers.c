@@ -62,6 +62,13 @@ statement s;
 	  statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 	  ORDERING_STATEMENT(statement_ordering(s)));
 
+    /* some fix for HPFC... */
+    if (e==list_undefined)
+    {
+	pips_user_warning("undefined list -> NIL\n");
+	e = NIL;
+    }
+
     t = load_statement_transformer(s);
 
     /* it would be nicer to control warning_on_redefinition */
