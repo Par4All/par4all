@@ -211,7 +211,7 @@ effect_to_string(effect eff)
 {
     list /* of string */ ls = effect_words_reference(eff);
     string result = words_to_string(ls);
-    gen_map(free, ls), gen_free_list(ls);
+    gen_free_string_list(ls);
     return result;
 }
 
