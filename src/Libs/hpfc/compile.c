@@ -1,9 +1,7 @@
-/* HPFC
- * 
- * Fabien Coelho, May 1993
+/* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/09/21 09:02:10 $, )
+ * ($Date: 1995/10/05 11:32:21 $, )
  */
 
 #include "defines-local.h"
@@ -85,7 +83,7 @@ make_host_and_node_modules (entity module)
 		var = gen_find_tabulated(var_name, entity_domain),
 		new = entity_undefined;
 
-	    assert(!entity_undefined_p(var));
+	    pips_assert("defined", !entity_undefined_p(var));
 
 	    tmp_name = entity_local_name(host);
 	    new = find_or_create_scalar_entity(tmp_name, tmp_name, 
@@ -350,8 +348,8 @@ void
 hpfcompile (char *module_name)
 {
     debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfcompile", "module: %s\n", module_name);
-    pips_error("hpfcompile", "obsolete\n");
+    pips_debug(1, "module: %s\n", module_name);
+    pips_internal_error("obsolete\n");
     debug_off();
 }
 
