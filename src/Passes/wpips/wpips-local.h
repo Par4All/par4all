@@ -40,7 +40,8 @@ extern Frame main_frame,
     log_frame, 
     edit_frame[2], 
     help_frame, 
-    query_frame;
+    query_frame,
+	properties_frame;
 
 extern Panel main_panel,
     status_panel,
