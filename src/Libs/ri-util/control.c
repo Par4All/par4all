@@ -9,7 +9,7 @@
  */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 2001/07/19 11:36:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 2002/06/27 14:36:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -231,7 +231,7 @@ display_linked_control_nodes(control c) {
 	fprintf(stderr, "), ");
 	ifdebug(8) {
 	    pips_debug(0, "Statement of control %p:\n", ctl);
-	    print_statement(control_statement(ctl));
+	    safe_print_statement(control_statement(ctl));
 	}
     }, c, blocs);
     gen_free_list(blocs);
@@ -710,15 +710,36 @@ fuse_2_control_nodes(control first,
 	/* If the second node has 2 successors, it is a test node. The
 	   fused node has 2 successors and must be a test too. So, the
 	   only thing I can do is to remove the first statement, just
-	   keeping its comments: */
+	   keeping its comments. And how about the label? It might be
+	   useful for syntactic reasons and only reachable via END=nnn
+	   after prettyprinting (see Validation/redlec2.f) */
 	string first_comment =
 	    gather_all_comments_of_a_statement(control_statement(first));
+	entity first_label = statement_to_label(control_statement(first));
+
+	if(!entity_empty_label_p(first_label)) {
+	  entity second_label = statement_to_label(control_statement(second));
+	    pips_user_warning("Useless label %s\n",
+			      entity_name(first_label));
+	  if(!entity_empty_label_p(second_label)) {
+	    /* A return might be OK?!? What does the caller expect? The
+               first label must be useless and is dropped. */
+	    /* pips_user_warning("Useless label %s\n",
+	       entity_name(first_label)); */
+	    /* pips_internal_error("Two labels for one control node"); */
+	    ;
+	  }
+	  else {
+	    statement_label(control_statement(second)) = first_label;
+	    ;
+	  }
+	}
 	insert_comments_to_statement(control_statement(second),
 				     first_comment);
 	control_statement(first) = control_statement(second);	
     }
     else {
-	/* If not, build a block with the 2 statements: */
+	/* If not, build a block with the two statements: */
 	statement st = make_empty_statement();
 	statement_instruction(st) =
 	    make_instruction_block(CONS(STATEMENT,
