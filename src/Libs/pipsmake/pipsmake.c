@@ -232,8 +232,9 @@ string rname, oname;
     /* is it up to date ? */
     if (res != resource_undefined) {
 	if(set_belong_p(up_to_date_resources, (char *) res)) {
-	    debug(8, "rmake", "resource %s(%s) found in up_to_date\n",
-		  rname, oname);
+	    debug(5, "rmake", "resource %s(%s) found in up_to_date "
+		      "with time stamp %d\n",
+		      rname, oname, resource_time(res));
 	    return TRUE;
 	}
     }
@@ -275,7 +276,7 @@ string rname, oname;
 	    res = db_find_resource(rrrn, rron);
 
 	    if (res != resource_undefined) {
-		debug(5, "rmake", "resource %s(%s) added to up_to_date"
+		debug(5, "rmake", "resource %s(%s) added to up_to_date "
 		      "with time stamp %d\n",
 		      rname, oname, resource_time(res));
 		set_add_element(up_to_date_resources,
