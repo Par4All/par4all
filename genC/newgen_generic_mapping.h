@@ -27,7 +27,7 @@
  *
  * FC, Feb 21, 1994
  *
- * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1996/09/21 15:31:10 $, )
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1996/09/21 15:38:34 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -83,7 +83,7 @@ PREFIX void update_##type##_##name(type s, result t)\
   hash_update((hash_table) name##_map, (char*) s, (char*) t);}
 
 #define GENERIC_CURRENT_MAPPING(name, result, type) \
-        GENERIC_MAPPING(auto, name, result, type)
+        GENERIC_MAPPING(/**/, name, result, type)
 
 /*  to allow mappings local to a file.
  *  it seems not to make sense, but I like the interface.
