@@ -19,7 +19,6 @@
 #include "ri-util.h"
 #include "dg.h"
 #include "control.h"
-#include "chains.h"
 #include "pipsdbm.h"
 
 #include "resources.h"
@@ -32,6 +31,7 @@ typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
 
 #include "graph.h"
+#include "chains.h"
 
 /* PRIVATIZABLE checks whether the entity E is privatizable. */
 
