@@ -236,10 +236,8 @@ bool delete_workspace(string wname)
        about deleting the non-current workspace vs deleting the current
        workspace... */
 
-    if ((failure=safe_system_no_abort (concatenate("Delete ", wname, NULL)))) {
-	user_warning("delete_workspace",
-		     "exit code for Delete is %d\n", failure);
-    }
+    if ((failure=safe_system_no_abort(concatenate("Delete -s ", wname, NULL))))
+	pips_user_warning("exit code for Delete is %d\n", failure);
 
     return !failure;
 }
