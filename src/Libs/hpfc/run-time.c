@@ -4,7 +4,7 @@
  * Fabien Coelho, May and June 1993
  *
  * SCCS stuff:
- * $RCSfile: run-time.c,v $ ($Date: 1994/09/01 15:47:58 $, ) version $Revision$,
+ * $RCSfile: run-time.c,v $ ($Date: 1994/09/03 15:19:37 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -368,14 +368,8 @@ list l;
 void add_pvm_init_and_end(phs, pns)
 statement *phs, *pns;
 {
-    statement
-	stinithost = st_init_host();
-    
-    statement_comments(stinithost) = 
-	strdup("c initializes host and spawns nodes\n");
-
     (*phs) = make_block_statement(CONS(STATEMENT,
-				       stinithost,
+				       st_init_host(),
 				       CONS(STATEMENT,
 					    (*phs),
 					    CONS(STATEMENT,
