@@ -534,8 +534,8 @@ graph dg;
 		    (void) fputc('\n',stderr);
 		}
 
-		if( (( r11 == r1) &&  (r21 == r2))
-		   || ((r11 == r2) && (r21 == r1)) ) {
+		if( (reference_equal_p(r11,r1) &&  reference_equal_p(r21,r2))
+		   || (reference_equal_p(r11,r2) && reference_equal_p(r21,r1)) ) {
 		    debug(8,"reference_conflicting_p","return TRUE\n");
 		    return TRUE;
 		}
