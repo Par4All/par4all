@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/15 19:27:40 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/15 19:38:47 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -283,7 +283,7 @@ WP65_LIBRARY=$PIPS_EXTEDIR
 
 # headers are built for this ARCH. GNU because more ANSI than others
 # (the GNU makefile includes gnu libc for instance...)
-HEADER_ARCH='ARCH=GNU'
+HEADER_ARCH="ARCH=GNU"
 
 # An absolute file name is necessary for LISP
 LISP=/usr/local/bin/cl
