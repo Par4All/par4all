@@ -248,11 +248,11 @@ prettyprint_dependence_graph_view(FILE * fd,
     set_enclosing_loops_map( loops_mapping_of_statement(mod_stat) );
 
     debug_on("RICEDG_DEBUG_LEVEL");
-    {
-    /*    for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {*/
-        pv1 = graph_vertices(mod_graph);
-        pv1 = CDR(pv1);
 
+    pv1 = graph_vertices(mod_graph);
+    pv1 = CDR(pv1);
+    /*    for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {*/
+    {
 	vertex v1 = VERTEX(CAR(pv1));
 	statement s1 = vertex_to_statement(v1);
 	list loops1 = load_statement_enclosing_loops(s1);
