@@ -20,6 +20,12 @@
  * - dir_name for localizing files...
  * - \r skipped
  * - last line may not be \n'ed.
+ * - bang comment management added (to avoid the parser)
+ *
+ * $Log: split_file.c,v $
+ * Revision 1.35  1998/05/29 13:18:58  coelho
+ * bang comment skipped... (beurk).
+ *
  */
 
 static void hollerith_and_bangcomments(char *);
@@ -176,24 +182,34 @@ static int getline()
 	return (1);
 }
 
+static char * skip_comment_if_any(char * lines)
+{
+    int i = 0;
+
+    while (lines[i]=='c' || lines[i]=='C' || lines[i]=='*' || lines[i]=='!')
+    {
+	while (lines[i]!='\0' && lines[i]!='\n') i++;
+	if (lines[i]=='\n') i++;
+    }
+
+    return lines+i;
+}
+
 /* return 1 for 'end' alone on card (up to col. 72),  0 otherwise */
 static int lend()
 {
-	register char *p;
+	register char *p, * lbuf;
 	int tab = FALSE;
 
-	/* if ((p = skiplab(buf)) == 0)
-	    return (0) ; */ 
+	lbuf = skip_comment_if_any(buf);
 
-	if (buf[0]!=' ' && buf[0]!='\t') 
-	    return 0; /* a comment */
-	for (p=buf; p<&buf[6] && !tab; p++)
+	for (p=lbuf; p<&lbuf[6] && !tab; p++)
 	{
 	    if (*p=='\0') return 0;
 	    if (*p=='\t') tab=TRUE;
 	}
 	
-	if (!tab && (buf[5]!=' ' && buf[5]!='\t')) 
+	if (!tab && (lbuf[5]!=' ' && lbuf[5]!='\t')) 
 	    return 0; /* a continuation */
 	    
 	trim(p);
@@ -224,26 +240,28 @@ static int lname(s)
 char *s;
 {
 	register char *ptr, *p;
-	char	line[LINESIZE], *iptr = line;
+	char	line[LINESIZE], *iptr = line, * lbuf;
 
 	implicit_program = 0;
 	implicit_blockdata_name = 0;
 	implicit_program_name = 0;
 	it_is_a_main = 0;
 
+	lbuf = skip_comment_if_any(buf);
+
 	/* first check for comment cards */
-	if(buf[0]=='c' || buf[0]=='C' || buf[0]=='*' || buf[0]=='!') return 0;
-	ptr = buf;
+	if(lbuf[0]=='c' || lbuf[0]=='C' || lbuf[0]=='*' || lbuf[0]=='!') 
+	    return 0;
+	ptr = lbuf;
 	while (*ptr == ' ' || *ptr == '\t') ptr++;
 	if(*ptr == '\n') return(0);
 
-
-	ptr = skiplab(buf);
+	ptr = skiplab(lbuf);
 	if (ptr == 0) return (0);
 
 	/*  copy to buffer and converting to lower case */
 	p = ptr;
-	while (*p && p <= &buf[71] ) {
+	while (*p && p <= &lbuf[71] ) {
 	   *iptr = isupper(*p) ? tolower(*p) : *p;
 	   iptr++;
 	   p++;
