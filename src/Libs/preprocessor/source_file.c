@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.104  2003/08/14 08:47:54  irigoin
+ * Compatibility with LINUX for strdup() declaration
+ *
  * Revision 1.103  2003/08/11 13:57:16  coelho
  * hop.
  *
@@ -104,7 +107,7 @@
 
 #include "preprocessor.h"
 
-extern string strdup(string);
+extern char * strdup(const char *);
 extern int putenv(char *); /* Supposedly in stdlib.h */
 
 static bool dot_c_file_p(string);
