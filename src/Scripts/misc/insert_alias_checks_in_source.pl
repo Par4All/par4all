@@ -53,7 +53,7 @@ foreach $module (sort keys %modules)
     %index = ();
     for ($i=0; $i<@fortran; $i++)
     {
-	if ($fortran[$i] =~ /C (\(\d+,\d+\))\n/)
+	if ($fortran[$i] =~ /C +(\(\d+,\d+\))\n/)
 	{
 	    $index{$1} = $i;
 	}
