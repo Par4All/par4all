@@ -141,6 +141,51 @@ Pcontrainte ineg;
     return (result);
 }
 
+/* int sc_check_inequality_redundancy(Pcontrainte ineq, Psysteme ps)
+ * Check if an inequality ineq, possibly part of ps, is trivially
+ * infeasible (return 2), redundant (return 1), potentially useful
+ * (return 0) with respect to inequalities in ps.
+ *
+ * Neither ps nor ineq are modified. ineq may be one of ps constraints.
+ */
+int sc_check_inequality_redundancy(Pcontrainte ineq, Psysteme ps)
+{
+    Pcontrainte c = CONTRAINTE_UNDEFINED;
+    int code = 0;
+
+    for(c = sc_inegalites(ps);
+	code ==0 && !CONTRAINTE_UNDEFINED_P(c);
+	c = contrainte_succ(c)) {
+
+	if(c!=ineq) {
+	    int b;
+
+	    if(eq_smg(c, ineq)) {
+		b = eq_diff_const(c, ineq);
+		if(b < 0) {
+		    /* c is redundant with ineq */
+		    ;
+		}
+		else {
+		    /* ineq is redundant with c */
+		    code = 1;
+		}
+	    }
+	    else if (inequalities_opposite_p(c, ineq)) {
+		b = eq_sum_const(c, ineq);
+		if(b <= 0) {
+		    /* c and ineq define a non-empty interval */
+		    ;
+		}
+		else {
+		    /* ineq and c are incompatible */
+		    code = 2;
+		}
+	    }
+	}
+    }
+    return code;
+}
 
 
 /* void sc_elim_empty_constraints(Psysteme ps, boolean process_equalities):
