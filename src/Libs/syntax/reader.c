@@ -75,6 +75,9 @@
  *    case as before while keeping comments in their original case
  *    (Function check_first_statement). See minuscule.f in Validation
  *    (Francois Irigoin, 7 June 1995)
+ *
+ *  - double quotes can be used instead of simple quotes for character
+ *    string constants (Francois Irigoin, 11 novembre 1996)
  */
 
 /*-------------------------------------------------------------------------*/
@@ -132,6 +135,10 @@ int iPrevComm = 0;
  *                +----------------------x-------------------------+
  *
  *      x est un caractere quelconque different de '
+ *
+ * Modification: la quote peut-etre ' ou " pour faire plaisir a Fabien Coelho.
+ * L'information est stockee lors de la rentree dans une constante chaine
+ * de caracteres (variable QuoteChar).
  */
 LOCAL int EtatQuotes;
 #define NONINQUOTES 1
@@ -461,6 +468,7 @@ FILE * fp;
 int ReadLine(fp)
 FILE * fp;
 {
+    static char QuoteChar = '\000';
     int TypeOfLine;
     int i, c;
     char label[6];
@@ -569,11 +577,18 @@ FILE * fp;
 	 */
 
 	while ((c = GetChar(fp)) != '\n') {
-	    if (c == '\'') {
+	    if (c == '\'' || c == '"') {
 		if (EtatQuotes == INQUOTES)
-		    EtatQuotes = INQUOTEQUOTE;
-		else
+		    if(c == QuoteChar)
+		        EtatQuotes = INQUOTEQUOTE;
+		    else {
+		        if (EtatQuotes == INQUOTEQUOTE)
+			    EtatQuotes = NONINQUOTES;
+		    }
+		else {
 		    EtatQuotes = INQUOTES;
+		    QuoteChar = c;
+		}
 	    }
 	    else {
 		if (EtatQuotes == INQUOTEQUOTE)
