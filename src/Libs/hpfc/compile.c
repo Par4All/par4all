@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/12/26 10:29:55 $, )
+ * ($Date: 1996/12/26 16:07:55 $, )
  */
 
 #include "defines-local.h"
@@ -337,6 +337,68 @@ hpfc_fclose(
 {
     fprintf(f, "!\n! That is all for %s\n!\n", basename(name));
     safe_fclose(f, name);
+}
+
+/* old name of obj while in module now.
+ */
+static string 
+old_name(
+    entity module, /* module in which obj appears */
+    entity obj)    /* obj */
+{
+    return module_local_name
+        (module==host_module ? load_old_host(obj) : load_old_node(obj));
+}
+
+/* to be used by the prettyprinter at the head of a file.
+ * inclusion of needed runtime headers.
+ */
+static string
+hpfc_head_hook(
+    entity m) /* module */
+{
+    return strdup(concatenate
+        ("      implicit none\n"
+	 "      include \"fpvm3.h\"\n"
+	 "      include \"real_parameters.h\"\n"
+	 "      include \"hpfc_commons.h\"\n"
+	 "      include \"hpfc_includes.h\"\n"
+	 "      include \"", old_name(m, m), "_parameters.h\"\n", NULL));
+}
+
+/* to be used by the prettyprinter when dealing with a common.
+ * inclusion of the parameters and commons...
+ */
+static string 
+hpfc_common_hook(
+    entity module,
+    entity common)
+{
+    return strdup(concatenate
+        ("      include \"", old_name(module, common), "_parameters.h\"\n"
+	 "      include \"", old_name(module, common),  
+	 module==host_module ? "_host.h\"\n" : "_node.h\"\n", NULL));
+}
+
+void 
+hpfc_print_code(
+    FILE* file,
+    entity module,
+    statement stat)
+{
+    text t;
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+
+    set_prettyprinter_head_hook(hpfc_head_hook);
+    set_prettyprinter_common_hook(hpfc_common_hook);
+
+    t = text_module(module, stat);
+    print_text(file, t); /* t is freed as a side effect... */
+    
+    reset_prettyprinter_common_hook();
+    reset_prettyprinter_head_hook();
+
+    debug_off();
 }
 
 #define string_cat(prefix, suffix) strdup(concatenate(prefix, suffix, NULL))
