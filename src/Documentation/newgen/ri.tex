@@ -1192,18 +1192,18 @@ control in \verb+unstructured+ like C*, C9 and C10 are lost by the
 representations of the program.
 
 An \verb+unstructured+ object can be walked by function
-\verb+gen_multi_recurse+ and nodes C1 to C7 are visited, because the
-entry and exit nodes are used to perform a transitive closure. It can be
-walked by macro \verb+CONTROL_MAP+ and nodes C1 to C6 are visited
-because the undirected transitive closure starts at the entry node
-C1. This macro is used to compute the ordering and, if they exist, nodes
-such as C6 and C7 are oredered. Nodes C1 to C5 only could be visited by
-performing a forward transitive closure on the entry
-node. Transformation \verb+unspaghettify+, which should be included in
-the \verb+controlizer+, eliminates surious nodes such as C6 and C7 and
-makes all walks equal, but for the visiting order. Note that a fourth
-kind of walk is implemented by the \verb+prettyprinter+. It can bump
-into nodes not visited by \verb+CONTROL_MAP+.
+\verb+gen_multi_recurse+ and nodes C1 to C7 are visited, because the entry
+and exit nodes are used to perform a transitive closure. It can be walked
+by macro \verb+CONTROL_MAP+ and nodes C1 to C6 are visited because the
+undirected transitive closure starts at the entry node C1. This macro is
+used to compute the ordering and, if they exist, nodes such as C6 and C7
+are ordered. Nodes C1 to C5 only could be visited by performing a forward
+transitive closure on the entry node. Transformation \verb+unspaghettify+,
+which is optionally included in the \verb+controlizer+ (property
+\verb/UNSPAGHETTIFY_IN_CONTROLIZER/), eliminates spurious nodes such as C6
+and C7 and makes all walks equal, but for the visiting order. Note that a
+fourth kind of walk is implemented by the \verb+prettyprinter+. It can
+bump into nodes not visited by \verb+CONTROL_MAP+.
 
 The hierarchical structure is induced by the recursive nature of
 statements.  Each control node points towards a statement which can also
@@ -1481,11 +1481,20 @@ unlimited number of precedessors.
 The value of the exit node when it is not reachable is unclear. This is
 a minor problem since PIPS isn't supposed to deal with faulty programs.
 
-All reachable nodes of a CFG can be visited in a meaningless order using the
-\verb/CONTROL_MAP/ macro. Look for an example in library \verb/control/
-because an auxiliary data structure, a block list, must be declared and
-freed. They can also be visited with \verb/gen_recurse()/, in a
-meaningless order, but regardless of their reachability.
+Note that the two successors of a test can be identical since the two
+branches of a test can contain a GOTO to the same label. Hence, a node can
+have two identical predecessors. The lists of predecessors and successors
+cannot be handled like sets, in general. Use
+\verb/check_control_coherency()/ to make sure that the predecessor and
+successor lists can be interpreted as a multiset of arcs.
+
+All reachable nodes of a CFG can be visited in a meaningless order using
+the \verb/CONTROL_MAP/ macro. Look for an example in library
+\verb/control/ because an auxiliary data structure, a block list, must be
+declared and freed. They can also be visited with \verb/gen_recurse()/, in
+a meaningless order, but regardless of their reachability. Two more
+macros, \verb/FORWARD_CONTROL_MAP/ and \verb/BACKWARD_CONTROL_MAP/ are
+available for ordered walks.
 
 Note that the data structure used for the CFG is obsolete. A generic
 structure for oriented graphs, \verb/graph/, should be used instead so
