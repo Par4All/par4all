@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.69  1997/09/03 14:44:07  coelho
+ * no assert.
+ *
  * Revision 1.68  1997/08/04 16:56:49  coelho
  * *** empty log message ***
  *
@@ -23,7 +26,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.68 1997/08/04 16:56:49 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.69 1997/09/03 14:44:07 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1420,8 +1423,9 @@ statement stmt;
 
     attach_statement_information_to_text(r, stmt);
 
-    if (instruction_sequence_p(i)) {
-	pips_assert("This statement should be labelless, numberless and commentless.",
+    ifdebug(1) if (instruction_sequence_p(i)) {
+	pips_assert("This statement should be labelless, numberless"
+		    " and commentless.",
 		    statement_with_empty_comment_p(stmt)
 		    && statement_number(stmt) == STATEMENT_NUMBER_UNDEFINED
 		    && unlabelled_statement_p(stmt));
@@ -1432,7 +1436,7 @@ statement stmt;
        
     return(r);
 }
-
+
 text 
 text_test(module, label, margin, obj, n)
 entity module;
