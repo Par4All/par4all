@@ -157,7 +157,7 @@ call c;
 
     return make_call(f, new_args);
 }
-
+
 expression expression_mult(ex)
 expression ex;
 {
@@ -228,7 +228,6 @@ expression e1,e2,e3;
 		    NULL)))));
 }
 
-
 /* predicates on expressions */
 
 bool expression_call_p(e)
