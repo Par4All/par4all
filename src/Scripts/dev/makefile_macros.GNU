@@ -1,11 +1,11 @@
 #
 # $RCSfile: makefile_macros.GNU,v $ (version $Revision$)
-# $Date: 1996/07/15 21:09:34 $, 
+# $Date: 1996/07/16 11:17:15 $, 
 #
 # this file contains macro definitions 
 
 GLIBC	= /usr5/gnu/SPARC/glibc
-GCCDIR	= $(GCC_EXEC_PREFIX)/sparc-sun-sunos4.1.4/2.7.2.f.1
+GCCDIR	= $(GCC_EXEC_PREFIX)sparc-sun-sunos4.1.4/2.7.2.f.1
 
 AR	= gar
 ARFLAGS	= rv
