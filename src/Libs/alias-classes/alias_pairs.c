@@ -16,9 +16,14 @@
 
 #include "effects.h"
 #include "regions.h"
+#include "semantics.h"
 
 #include "pipsdbm.h"
 #include "resources.h"
+
+#define BACKWARD TRUE
+#define FORWARD FALSE
+
 
 static entity current_callee;
 static list list_regions_callee;
@@ -65,7 +70,7 @@ statement s;
 static void
 add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 {
-    list real_regions = NIL, r_args;
+    list r_args;
     int arg_num;
     list real_args;
 
@@ -94,15 +99,16 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 		 if (syntax_reference_p(real_syn)) 
 		 {
 		    reference real_ref = syntax_reference(real_syn);
-		    list real_inds = reference_indices(real_ref);
 		    entity real_ent = reference_variable(real_ref);
 		    region real_reg;
 		    list pair;
 
 		    real_reg =
-			region_translation(callee_region, current_callee, reference_undefined,
-				  real_ent, get_current_module_entity(), real_ref,
-				  VALUE_ZERO, BACKWARD);
+			region_translation(callee_region, current_callee,
+					   reference_undefined,
+					   real_ent, get_current_module_entity(),
+					   real_ref,
+					   VALUE_ZERO, BACKWARD);
 		    
 		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
 		    pair = gen_nconc(pair,CONS(EFFECT,real_reg,NIL));
@@ -111,6 +117,9 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 	     }
 	 }, list_regions_callee);
     }
+
+    pips_debug(8, "end\n");
+       
 }
 
 
@@ -118,12 +127,15 @@ static bool
 call_site_to_alias_pairs(call call_site)
 {
     transformer context;
+    list real_args;
+
 
     if (call_function(call_site) != current_callee) return TRUE;
 
-    context = load_statement_precondition(current_stmt);
+    context = load_statement_precondition(current_caller_stmt);
+    real_args = call_arguments(call_site);
 
-    set_interprocedural_translation_context_sc(current_callee,real_args);
+    set_interprocedural_translation_context_sc(current_callee, real_args);
     set_backward_arguments_to_eliminate(current_callee);
 
     add_parameter_aliases_for_this_call_site(call_site,context);
@@ -161,16 +173,22 @@ caller_to_alias_pairs( entity caller, entity callee)
 		      call_domain, call_site_to_alias_pairs, gen_null,
 		      NULL);
   
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+    reset_precondition_map();
+
     reset_current_module_entity();
     set_current_module_entity(callee);    
+
+
 }
 
-static bool
+static list
 alias_pairs( string module_name, list l_reg )
 {
 
     callees callers;
-    list l_pairs = NIL;
+    entity module;
 
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     module = get_current_module_entity();
@@ -182,29 +200,39 @@ alias_pairs( string module_name, list l_reg )
 					       module_name,
 					       TRUE);
 
-    /* we scan the callers to find the call sites */
+    /* we scan the callers to find the call sites, and fill in the list of alias
+     * pairs (list_pairs). 
+     */
+    list_pairs = NIL;
     MAP(STRING, caller_name,
     {
 	entity caller = local_name_to_top_level_entity(caller_name);
-	list_pairs = NIL;
 	caller_to_alias_pairs(caller, module);
     },
 	callees_callees(callers));
 
-
     reset_current_module_entity();
-    return TRUE;
+    return list_pairs;
 }
 
 bool 
 in_alias_pairs( string module_name )
 {
-    list l_reg;
+    list l_reg, l_pairs;
 
     /* we need the IN summary regions*/
     l_reg = (list) db_get_memory_resource(DBR_IN_SUMMARY_REGIONS,
 					  module_name,
 					  TRUE);
-    return alias_pairs(module_name, l_reg);
+
+    
+    l_pairs = alias_pairs(module_name, l_reg);
+
+    DB_PUT_MEMORY_RESOURCE(DBR_IN_ALIAS_PAIRS, 
+			   strdup(module_name),
+			   (char*) make_effects_classes(l_pairs));
+
+    return(TRUE);
+
 }
 
