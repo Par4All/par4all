@@ -2171,7 +2171,7 @@ static gtt_p gtt_read(string filename)
   /* read data */
   for (i=0; 
        i<MAX_DOMAIN &&
-	 (items[i].name = gen_read_string(file, ' ')) &&
+	 (items[i].name = gen_read_string(file, '\t')) &&
 	 fscanf(file, "%d", &items[i].number) &&
 	 (items[i].definition = gen_read_string(file, '\n'));
        i++);
@@ -2233,6 +2233,15 @@ static gtt_p gtt_read(string filename)
       table->old_to_actual[oindex] = i;
       table->actual_to_old[i] = oindex;
     }
+  }
+
+  /* debug */
+  fprintf(stderr, "type translation table:\n");
+  for (i=0; i<MAX_DOMAIN; i++) 
+  {
+    fprintf(stderr, "%s %d <- %d\n",
+	    Domains[i].name? Domains[i].name: "<null>",
+	    i, table->actual_to_old[i]);
   }
 
   return table;
