@@ -98,24 +98,22 @@ add_parameter_aliases_for_this_call_site(call call_site,
 
 /*    real_args = call_arguments(call_site); */
 
+    ifdebug(9)
+	{
+	    pips_debug(9,"regions:\n");
+	    print_regions(list_regions_callee);
+	}
+
     for (r_args = real_args, arg_num = 1; r_args != NIL;
 	 r_args = CDR(r_args), arg_num++) 
     {
-	pips_debug(9,"formal parameter arg_num %03d\n",arg_num);
-
-	pips_debug(9,"regions:\n");
-
-	MAP(EFFECT, callee_region,
-	 {
-	     pips_debug(9,"%s\n",region_to_string(callee_region));
-		 }, list_regions_callee);
+	pips_debug(9,"compare formal parameter arg_num %03d\n",arg_num);
 
 	MAP(EFFECT, callee_region,
 	 {
 	     entity callee_ent = region_entity(callee_region);
 	     
-	     pips_debug(9,"callee_region %s\n",
-			region_to_string(callee_region));
+	     pips_debug(9,"\tand entity %s\n",entity_name(callee_ent));
 
 	     /* If the formal parameter corresponds to the real argument then
 	      * we perform the translation.
@@ -152,7 +150,10 @@ add_parameter_aliases_for_this_call_site(call call_site,
 			    VALUE_ZERO,
 			    BACKWARD);
 		    
-		    pips_debug(9,"\t%s\n",region_to_string(real_reg));
+		    ifdebug(9)
+			{
+			    print_region(EFFECT(real_reg));
+			}
 
 		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
 		    pair = gen_nconc(pair,CONS(EFFECT,real_reg,NIL));
