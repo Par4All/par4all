@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 16:51:42 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 19:29:00 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -31,8 +31,8 @@
 #include <stdlib.h>
 #include <setjmp.h>
 
-#include "newgen_include.h"
 #include "genC.h"
+#include "newgen_include.h"
 #include "genread.h"
 
 /* lex files
@@ -59,10 +59,9 @@ gen_chunk *gen_hash_ = (gen_chunk*) NULL ;
 
 gen_chunk *Gen_tabulated_[ MAX_TABULATED ] ;
 struct gen_binding *Tabulated_bp ;
-hash_table Gen_tabulated_names ;
 
 int Read_spec_mode ;
-bool Read_spec_performed = FALSE ;
+static bool Read_spec_performed = FALSE ;
 
 /* The debug flag can be changed by the user to check genClib code. */
 /* If you set gen_debug dynamically with gdb, do not forget to set
@@ -110,6 +109,90 @@ gen_chunk *obj ;
   (((! (obj)) || ((obj)==gen_chunk_undefined) || \
     ((obj)->i<0) || ((obj)->i>MAX_DOMAIN)) ? \
    domain_index(obj) : (obj)->i) /* prints the error message or returns */
+
+
+/***************************************************** GEN_TABULATED_NAMES */
+
+static hash_table Gen_tabulated_names = 0;
+
+void gen_init_Gen_tabulated_names(void)
+{
+    message_assert("NULL table", !Gen_tabulated_names)
+    Gen_tabulated_names = hash_table_make(hash_string, 1000);
+}
+
+void gen_close_Gen_tabulated_names(void)
+{
+    message_assert("defined table", Gen_tabulated_names);
+    hash_table_free(Gen_tabulated_names);
+    Gen_tabulated_names = 0;
+}
+
+#define check_Gen_tabulated_names() \
+  message_assert("Gen_tabulated_names defined", Gen_tabulated_names)
+
+static char * build_unique_tabulated_name(int domain, char * name)
+{
+    int len = strlen(name);
+
+    /* permanent buffer */
+    static int size = 0;
+    static char * buffer = 0;
+    
+    if (!buffer) {
+	size = 100, buffer = (char*) malloc(sizeof(char)*size);
+	if (!buffer) fatal("build_unique_tabulated_name: memory exhausted\n");
+    }
+
+    if (len+10<size)
+	size = len+10, buffer = (char*) realloc(buffer, sizeof(char)*size);
+
+    sprintf(buffer, "%d%c%s", domain, HASH_SEPAR, name);
+    return buffer;
+}
+
+static char * build_unique_tabulated_name_for_obj(gen_chunk * obj)
+{
+    char * name = (obj+HASH_OFFSET)->s;
+    int domain = quick_domain_index(obj);
+    return build_unique_tabulated_name(domain, name);
+}	
+
+/* deletes obj from the tabulated names...
+ */
+void gen_delete_tabulated_name(gen_chunk * obj)
+{
+    char * key = build_unique_tabulated_name_for_obj(obj);
+    char * okey, * val;
+    check_Gen_tabulated_names();
+    
+    if ((val=hash_delget(Gen_tabulated_names, key, &okey)) == 
+	HASH_UNDEFINED_VALUE)
+	fatal("gen_delete_tabulated_name: clearing unexisting (%s)\n", key);
+
+    free(okey); free(val);
+}
+
+char * gen_get_tabulated_name_basic(int domain, char * id)
+{
+    char * key = build_unique_tabulated_name(domain, id);
+    check_Gen_tabulated_names();
+    return hash_get(Gen_tabulated_names, key);
+}
+
+char * gen_get_tabulated_name(gen_chunk * obj)
+{
+    char * key = build_unique_tabulated_name_for_obj(obj);
+    check_Gen_tabulated_names();
+    return hash_get(Gen_tabulated_names, key);
+}
+
+void gen_put_tabulated_name(int domain, char * name, char * val)
+{
+    char * key = build_unique_tabulated_name(domain, name);
+    check_Gen_tabulated_names();
+    hash_put(Gen_tabulated_names, strdup(key), val);
+}
 
 /* FPRINTF_SPACES prints NUMBER spaces on the FD file descriptor.`
  */
@@ -188,7 +271,7 @@ array_own_allocated_memory(
    The slot 0 is unused (see write_tabulated_leaf_in) */
 
 int
-find_free_tabulated( bp )
+gen_find_free_tabulated( bp )
 struct gen_binding *bp ;
 {
     int i ;
@@ -985,23 +1068,7 @@ free_obj_in(
 
 	if( IS_TABULATED( bp )) 
 	{
-	    char local[1024];
-
-	    message_assert("static buffer size", 
-			  strlen((obj+HASH_OFFSET)->s)<1000);
-
-	    sprintf(local, "%d%c%s", dom, HASH_SEPAR, (obj+HASH_OFFSET)->s) ;
-
-    /* fprintf(stderr, "freeing 0x%x (%s)\n", (unsigned int) obj, local); */
-
-	    if (!Gen_tabulated_names) 
-		fatal("free_obj_out: Null tabulated names for %s\n", bp->name);
-	
-	    /* freed here because the name is freed before free_obj_out
-	     */
-	    if (hash_del(Gen_tabulated_names, local)==HASH_UNDEFINED_VALUE)
-		fatal("free_obj_in: clearing unexisting \"%s\"\n", local);
-	
+	    gen_delete_tabulated_name(obj);
 	    (Gen_tabulated_[bp->index]+abs((obj+1)->i))->p=gen_chunk_undefined;
 	}
     }
@@ -1513,24 +1580,7 @@ gen_chunk *obj  ;
     struct gen_binding *bp = &Domains[ quick_domain_index( obj ) ] ;
 
     if( IS_TABULATED( bp )) {
-	static char local[ 1024 ] ;
-	    
-	(void) sprintf(local, "%d%c%s", 
-		       quick_domain_index( obj ),
-		       HASH_SEPAR, 
-		       (obj+HASH_OFFSET)->s ) ;
-
-	if( Gen_tabulated_names == (hash_table)NULL ) {
-	    fatal( "clear_tabulated: Null tabulated names for %s\n", 
-		  bp->name ) ;
-	}
-
-	fprintf(stderr, "c freeing 0x%x (%s)\n", (unsigned int) obj, local);
-
-	if( hash_del( Gen_tabulated_names, local ) == HASH_UNDEFINED_VALUE ) {
-	    fatal( "gen_clear_tabulated_element: clearing unexisting %s\n", 
-		  local ) ;
-	}
+	gen_delete_tabulated_name(obj);
 	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = 
 	    gen_chunk_undefined ;
     }
@@ -2006,12 +2056,8 @@ gen_read_spec(char * spec, ...)
 	    for( i=0 ; i<max_tabulated_elements() ; i++ ) {
 		(Gen_tabulated_[ bp->index ]+i)->p = gen_chunk_undefined ;
 	    }
-	    if( Gen_tabulated_names == NULL ) {
-		Gen_tabulated_names = 
-		    hash_table_make(hash_string,
-				    MAX_TABULATED*max_tabulated_elements());
-	    }
-
+	    if( Gen_tabulated_names == NULL )
+		gen_init_Gen_tabulated_names();
 	}
     }
     gen_cp_ = &Gen_cp_[ 0 ] ;
@@ -2151,8 +2197,6 @@ gen_read_and_check_tabulated( file, create_p )
 FILE *file ;
 int create_p ;
 {
-    /* int i ; */
-    extern hash_table Gen_tabulated_names ;
     int domain ;
 
     domain = gen_read_tabulated( file, create_p ) ;
