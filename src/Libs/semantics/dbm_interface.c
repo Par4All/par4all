@@ -162,7 +162,7 @@ char * module_name;
 }
 
 
-bool summary_precondition(module_name)
+bool old_summary_precondition(module_name)
 char * module_name;
 {
     /* do not nothing because it has been computed by side effects;
@@ -197,6 +197,50 @@ char * module_name;
 	debug(8, "summary_precondition", "end\n");
     }
 
+    debug_off();
+
+    return TRUE;
+}
+
+bool summary_precondition(module_name)
+char * module_name;
+{
+    /* Look for all call sites in the callers
+     */
+    callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
+						       module_name,
+						       TRUE);
+    entity callee = local_name_to_top_level_entity(module_name);
+    /* transformer t = transformer_identity(); */
+    transformer t = transformer_undefined;
+
+    debug_on(SEMANTICS_DEBUG_LEVEL);
+
+    set_current_module_entity(callee);
+
+    debug(8, "summary_precondition", "begin\n");
+
+    MAP(STRING, caller_name, {
+	entity caller = local_name_to_top_level_entity(caller_name);
+	t = update_precondition_with_call_site_preconditions(t, caller, callee);
+    }, callees_callees(callers));
+
+    if(transformer_undefined_p(t)) {
+	t = transformer_identity();
+    }
+
+    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
+			   strdup(module_name), (char * )t);
+
+    ifdebug(8) {
+	debug(8, "summary_precondition", 
+	      "initial summary precondition %x for %s:\n",
+	      t, module_name);
+	dump_transformer(t);
+	debug(8, "summary_precondition", "end\n");
+    }
+
+    reset_current_module_entity();
     debug_off();
 
     return TRUE;
@@ -557,11 +601,3 @@ void cumulated_effects_map_print()
     },
 	     htp);
 }
-
-
-
-
-
-
-
-
