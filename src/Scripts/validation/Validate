@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/01/13 21:22:37 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/01/13 21:29:23 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -28,7 +28,7 @@ REAL_PIPSHOME=`(cd $PIPS_HOME/../pips;pwd)`
 
 script=`basename $0`
 
-unset VALIDOPT PERFORMANCE
+unset valid_option warning performance
 
 vdir="$PIPS_VALIDDIR"
 VALID="$PIPS_ROOT/Utils/validate-sequential"
@@ -210,11 +210,11 @@ send_validate()
   $DEBUG " |   -l $RESULT \ "
   $DEBUG " |   -x $pips_version \ "
   $DEBUG " |   -y $tpips_version \ "
-  $DEBUG " |   -u $VALIDOPT $validate_module"
+  $DEBUG " |   -u $valid_option $validate_module"
 
   rsh $validate_host \
   $VALID -r $RUNDIR -l $RESULT -x "$pips_version" -y "$tpips_version" \
-         -u $VALIDOPT $validate_module &
+         -u $valid_option $validate_module &
 
   echo "$validate_module" > $WAITING.$validate_host
 }
@@ -226,11 +226,11 @@ while getopts DVdtsvpnhr:l:x:y:i:a: opt
 do
   case $opt in
     d) DEBUG="debug" ;;
-    D) DEBUG="debug"; DEBUG2="debug";  VALIDOPT="$VALIDOPT -d" ;;
-    t) PERFORMANCE="begin `local_date`"; VALIDOPT="$VALIDOPT -t";;
+    D) DEBUG="debug"; DEBUG2="debug";  valid_option="$valid_option -d" ;;
+    t) performance="begin `local_date`"; valid_option="$valid_option -t";;
     v) VERBOSE='verbose' ;;
-    V) VERBOSE='verbose' ; VALIDOPT="$VALIDOPT -v";;
-    i) VALIDOPT="$VALIDOPT -i $OPTARG" ;;
+    V) VERBOSE='verbose' ; valid_option="$valid_option -v";;
+    i) valid_option="$valid_option -i $OPTARG" ;;
     s) VERBOSE=':' ;;
     p) parallel="1" ;;
     n) parallel="" ;;
@@ -239,7 +239,7 @@ do
     x) pips_version="$OPTARG" ;;
     y) tpips_version="$OPTARG" ;;
     h) validate_usage 0 ;;
-    a) user="$OPTARG" ; VALIDOPT="$VALIDOPT -a $user" ;;
+    a) user="$OPTARG" ; valid_option="$valid_option -a $user" ;;
     *) echo  ; validate_usage 1
   esac
 done
@@ -250,18 +250,25 @@ shift `expr $OPTIND - 1`
 
 if [ "$PIPS_PROPERTIESRC" ]
 then
-    VALIDOPT="$VALIDOPT -p $PIPS_PROPERTIESRC"
+    valid_option="$valid_option -p $PIPS_PROPERTIESRC"
+    warning="$PIPS_PROPERTIESRC used! $warning"
 else
-    test -f ./properties.rc && VALIDOPT="$VALIDOPT -p $PWD/properties.rc"
+    test -f ./properties.rc && {
+	valid_option="$valid_option -p $PWD/properties.rc"
+	warning="./properties.rc used! $warning"
+    }
 fi
 
 #################################################################### PipsMake
 
 if [ "$PIPS_PIPSMAKERC" ]
 then
-    VALIDOPT="$VALIDOPT -p $PIPS_PIPSMAKERC"
+    valid_option="$valid_option -p $PIPS_PIPSMAKERC"
+    warning="$PIPS_PIPSMAKERC used! $warning"
 else
-    test -f ./pipsmake.rc && VALIDOPT="$VALIDOPT -m $PWD/pipsmake.rc"
+    test -f ./pipsmake.rc && 
+	valid_option="$valid_option -m $PWD/pipsmake.rc"
+	warning="./pipsmake.rc used! $warning"
 fi
 
 
@@ -348,9 +355,9 @@ $VERBOSE "Hosts: $VALHOSTS"
   $DEBUG "exec $VALID \ "
   $DEBUG "   -r $RUNDIR \ "
   $DEBUG "   -x $pips_version \ "
-  $DEBUG "   -u $VALIDOPT $MODULES"
+  $DEBUG "   -u $valid_option $MODULES"
 
-  exec $VALID -r $RUNDIR -x "$pips_version" -u $VALIDOPT $MODULES
+  exec $VALID -r $RUNDIR -x "$pips_version" -u $valid_option $MODULES
 }
 
 #
@@ -408,7 +415,7 @@ else
   finalsubject="$subject: succeeded"
 fi
 
-[ "$PERFORMANCE" ] && PERFORMANCE="$PERFORMANCE, end `local_date`"
+[ "$performance" ] && performance="$performance, end `local_date`"
 
 cat >> $MSG <<%
 
@@ -420,7 +427,9 @@ $final
 pips:  $pips_version
 tpips: $tpips_version
 
-$PERFORMANCE
+$warning
+
+$performance
 
 In case of problems, contact coelho@cri.ensmp.fr
 %
