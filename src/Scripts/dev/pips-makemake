@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/07 16:49:06 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/07 16:59:38 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -704,13 +704,14 @@ depend: $(INC_TARGET) .depend
 # default rule if the dependence file is not there...
 # forces the regeneration.
 $MAKEFILE.depend.$(ARCH):
-	touch \$@
-	$(RM) .depend
-	$(MAKE) depend
+	@touch \$@
+	@$(RM) .depend
+	$(MAKE) --no-print-directory depend
 
 #
 # dependences are stored in another file which is simply included.
-include $MAKEFILE.depend
+# the file differs for each "architectures"
+include $MAKEFILE.depend.$(ARCH)
 %
 
 
