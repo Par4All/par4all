@@ -112,7 +112,7 @@ Psysteme s2;
 int ofl_ctrl;
 {
     Psysteme s = SC_UNDEFINED;
-  
+    boolean catch_performed = FALSE;
     /* mem_spy_begin(); */
 
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
@@ -121,6 +121,7 @@ int ofl_ctrl;
     {
     case OFL_CTRL :
 	ofl_ctrl = FWD_OFL_CTRL;
+	catch_performed = TRUE;
 	CATCH(overflow_error) {
 	    /* 
 	     *   PLEASE do not remove this warning.
@@ -157,7 +158,8 @@ int ofl_ctrl;
 		    s = sc_convex_hull(s1,s2);
 		    /* printf("systeme final \n"); sc_dump(s);  */
 		}
-	    UNCATCH(overflow_error);
+	    if (catch_performed)
+		UNCATCH(overflow_error);
 	}
     }
     /* mem_spy_end("sc_enveloppe_chernikova_ofl_ctrl"); */
