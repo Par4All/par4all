@@ -792,6 +792,7 @@ Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol) {
     paramVertex->next=result->V;
     result->V=paramVertex;
   }
+  Matrix_Free(rays);
   
   /* Build the parametric domains (only one here) */
   if (nbRows > 1)
