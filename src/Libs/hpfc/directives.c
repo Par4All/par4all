@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1997/01/18 16:43:29 $, )
+ * ($Date: 1997/02/18 10:07:52 $, )
  */
 
 #include "defines-local.h"
@@ -1070,6 +1070,8 @@ void handle_hpf_directives(statement s, bool dyn)
     pips_debug(1, "starting optimization phase\n");
     simplify_remapping_graph();
     clean_ctrl_graph();
+
+    hpfc_check_for_similarities(get_the_dynamics());
 
     close_dynamic_locals();
     close_the_dynamics();
