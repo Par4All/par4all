@@ -24,9 +24,10 @@
 
 #include "linear.h"
 #include "ri.h"
-#include "graph.h"
 #include "dg.h"
-#include "tiling.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h" 
 
 #include "ri-util.h"
 #include "text-util.h"
@@ -37,9 +38,9 @@
 #include "arithmetique.h"
 
 #include "matrice.h"
+#include "tiling.h"
 
 #include "wp65.h"
-typedef dg_arc_label arc_label;
 
 /* loop_nest_to_local_variables():
  *
