@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-compile.c,v $
+ * Revision 1.49  1997/09/13 12:58:24  coelho
+ * *** empty log message ***
+ *
  * Revision 1.48  1997/08/04 13:56:52  coelho
  * new generic effects includes.
  *
@@ -939,7 +942,7 @@ io_efficient_compile(
     /* quicker for continue and so...
      */
     
-    if (hpfc_empty_statement_p(stat))   /* Empty statement */
+    if (empty_code_p(stat))   /* Empty statement */
     {
 	pips_debug(3, "empty statement\n");
 	*hp = copy_statement(stat);
