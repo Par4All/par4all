@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: makefile_macros.GNULL,v $
+# Revision 1.28  1998/01/23 09:33:50  coelho
+# more macros to try define long long constants...
+#
 # Revision 1.27  1997/11/13 12:53:01  keryell
 # Added include $(ROOT)/Include/makefile_macros.DEFAULT
 #
@@ -21,6 +24,9 @@ include $(ROOT)/Include/makefile_macros.ll
 
 # -ansi -petantic-errors and long long int is not a good idea.
 CANSI=
+
+# must force definition of long long int constants:
+CPPFLAGS+= -D__GNU_LIBRARY__ -D__USE_GNU
 
 # end of it!
 #
