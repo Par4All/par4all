@@ -849,7 +849,7 @@ string statement_identification(statement s)
 			instruction_tag(statement_instruction(s)));
     }
 
-    sprintf(buffer, "%d (%d, %d) at 0x%x:%s\n",
+    sprintf(buffer, "%d (%d, %d) at 0x%x: %s\n",
 	    statement_number(s),
 	    ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so),
