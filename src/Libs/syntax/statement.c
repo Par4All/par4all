@@ -933,6 +933,17 @@ MakeCallInst(
     instruction i = instruction_undefined;
     list ar = get_alternate_returns();
     list ap = add_actual_return_code(l);
+    type s = entity_storage(e);
+
+    if(!storage_undefined_p(s)) {
+	if(storage_formal_p(s)) {
+	    pips_user_warning("entity %s is a formal functional parameter\n",
+			      entity_name(e));
+	    ParserError("MakeCallInst",
+			"Formal functional parameters are not supported "
+			"by PIPS.\n");
+	}
+    }
 
     update_called_modules(e);
 
