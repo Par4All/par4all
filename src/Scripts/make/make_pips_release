@@ -1,11 +1,11 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/03 12:46:09 $, 
+# $Date: 1996/09/03 12:56:46 $, 
 #
 # (c) Fabien COELHO 1996
 
-unset pack what tz zip name tostrip strip
+unset pack what tz zip name tostrip strip install
 
 tar=${PIPS_TAR:-gtar}
 taropt=cf
@@ -28,6 +28,7 @@ usage()
 	  misc:
 	    -h: this help
 	    -v: verbose
+	    -r: add proper installation and readme files in the root
 	    -s: strip binaries
 	    -z: tar and zip
 	    -w: additional options for make_release
@@ -48,11 +49,12 @@ usage()
 # having the full Doc is too much for binary releases?
 what="-d Share -d Doc -d Runtime -d Examples" 
 
-while getopts hvszw:SB:L:pnle opt
+while getopts hvrszw:SB:L:pnle opt
 do
     case $opt in
 	h) usage 0 some help ;;
 	v) verb=verbose ; what="$what -v" ; taropt=cvf ;;
+	r) install='1' ;;
 	s) strip='strip' ;;
 	z) tz='1' ;;
 	w) what="$what $OPTARG" ;;
@@ -73,6 +75,7 @@ shift `expr $OPTIND - 1 `
 
 # default: //"%H""%M""%S"
 name=${1:-${PIPS_DIR}/Release/pips_${name}_`date +"%y""%m""%d"`}
+base=`basename $name`
 
 $verb "target release name: $name"
 
@@ -108,13 +111,23 @@ do
 done
 
 #
+# installation
+
+test "$install" &&
+{
+    $verb "copying installation software and doc"
+    cp ${PIPS_ROOT}/Utils/install_pips $name/install_pips
+    cp ${PIPS_ROOT}/Utils/install.README $name/README
+    cp ${PIPS_ROOT}/Utils/install.INSTALL $name/INSTALL
+}
+
+#
 # tar and zip if required
 
 test "$tz" && 
 {
-    $verb "taring ($tar $taropt) and zipping ($zip)"
     cd `dirname $name`
-    base=`basename $name`
+    $verb "taring ($tar $taropt) and zipping ($zip)"
     $tar $taropt $base.tar $base
     $zip $base.tar
     rm -rf $base
