@@ -3,8 +3,8 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
-# Revision 1.269  1997/03/11 18:32:15  coelho
-# *** empty log message ***
+# Revision 1.270  1997/03/11 18:34:14  coelho
+# SCCS -> RCS
 #
 #
 # Automatic generation of Makefile for the PIPS project
@@ -746,7 +746,10 @@ $verbose "specific to Development"
 [ ! "$production" ] && cat >> $MAKEFILE <<%
 
 check_sccs:
-	@[ ! "\`sccs tell\`" ] || \\
+	@[ -d SCCS -a ! "\`sccs tell\`" ] || \\
+	{ echo; echo "sccs files being edited, cannot install"; echo; \\
+	  exit 1;}
+	@[ -d RCS -a ! "\`rlog -LR RCS/*\`" ] || \\
 	{ echo; echo "sccs files being edited, cannot install"; echo; \\
 	  exit 1;}
 
