@@ -150,8 +150,12 @@ missing_file_initializer(string module_name)
 		      module_name);
 
     if(entity_undefined_p(m))
-	pips_internal_error("No entity defined for module %s although it must"
-			    " have been encountered at a call site\n");
+    {
+      pips_internal_error(
+	"No entity defined for module %s although it must"
+	" have been encountered at a call site\n", module_name);
+      return FALSE;
+    }
     
     /* pips' current directory is just above the workspace
      */
