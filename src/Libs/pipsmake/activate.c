@@ -266,22 +266,18 @@ rule r;
 
     return FALSE;
 }
-
+
 /*
  * Delete the resources derived from a given one 
  */
-static void delete_derived_resources (res)
-virtual_resource res;
+static void delete_derived_resources (virtual_resource res)
 {
     set s = set_make (set_pointer);
     string vrn = virtual_resource_name(res);
-
     /* Get the set of virtual resource to destroy */
-    get_more_derived_resources (vrn, s);
-
-    SET_MAP(se, {
-	delete_named_resources((string) se);
-    }, s);
+    get_more_derived_resources(vrn, s);
+    SET_MAP(se, delete_named_resources((string) se), s);
+    set_free(s);
 }
 
 
