@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.308  1997/08/19 07:29:25  coelho
+# binary links to be ok for relative links.
+#
 # Revision 1.307  1997/08/18 13:11:46  coelho
 # fixes for main_ in Production/Passes.
 #
@@ -376,15 +379,17 @@ check_install:
 # somewhere else even if it looks like a local subdirectory.
 # else the default is simply to make a subdir.
 #
-PIPS_DIRECTORY_FOR_BINARIES=\$(PIPS_DIRECTORY_FOR_\$(ARCH)_BINARIES)
-ifneq (\$(PIPS_DIRECTORY_FOR_BINARIES),)
-\$(ARCH):
-	# creating remote \$(ARCH) directory...
-	rdir=\$(PIPS_DIRECTORY_FOR_BINARIES)/${SIDE}/${PART}/${target_dir};\\
-	test -d \$\$rdir || mkdir \$\$rdir ; \\
-	ln -s \$\$rdir \$(ARCH);
-else
+BIN_DIRECTORIES=\$(PIPS_DIRECTORY_FOR_\$(ARCH)_BINARIES)
+ifeq (\$(BIN_DIRECTORIES),)
+# nowhere to link
 \$(ARCH):; test -d \$(ARCH) || mkdir \$(ARCH)
+else
+# somewhere to link!
+\$(ARCH):
+	# creating remote \$(ARCH) directory... (arch added for relative links)
+	rdir=\$(BIN_DIRECTORIES)/${SIDE}/${PART}/${target_dir}/\$(ARCH);\\
+	test -d \$\$rdir || mkdir -p \$\$rdir ; \\
+	ln -s \$\$rdir \$(ARCH);
 endif
 #
 include \$(ROOT)/Include/define_libraries.make
