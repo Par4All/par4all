@@ -452,7 +452,7 @@ DeclareVariable(
 	else {
 	    type nt;
 	    nt = MakeTypeVariable
-		(gen_copy_tree(variable_basic(type_variable(t))),
+		(copy_basic(variable_basic(type_variable(t))),
 		 d);
 	    entity_type(e) = nt;
 	}
@@ -474,7 +474,7 @@ DeclareVariable(
 		if (implicit_type_p(e)) {
 		    /* update functional type */
 		    type nt = MakeTypeVariable
-			(gen_copy_tree(variable_basic(type_variable(t))),
+			(copy_basic(variable_basic(type_variable(t))),
 			 NIL);
 		    functional_result(type_functional(et)) = nt;
 		    /* the old type should be gen_freed... */
@@ -526,7 +526,7 @@ DeclareVariable(
 		    }
 		    /* update type */
 		    nt = MakeTypeVariable
-			(gen_copy_tree(variable_basic(type_variable(t))),
+			(copy_basic(variable_basic(type_variable(t))),
 			 variable_dimensions(type_variable(et)));
 		    
 		    if(!same_basic_and_scalar_p(entity_type(e), nt))
@@ -1003,11 +1003,11 @@ entity e;
     case is_basic_float:
     case is_basic_logical:
     case is_basic_complex:
-	t = MakeTypeVariable(make_basic(tag_implicit[i], int_implicit[i]), NIL);
+	t = MakeTypeVariable(make_basic(tag_implicit[i], (void *) int_implicit[i]), NIL);
 	break;
     case is_basic_string:
 	v = make_value(is_value_constant,
-		       make_constant(is_constant_int, int_implicit[i]));
+		       make_constant(is_constant_int, (void *) int_implicit[i]));
 	t = MakeTypeVariable(make_basic(tag_implicit[i], v), NIL);
 	break;
     case is_basic_overloaded:
@@ -1187,14 +1187,14 @@ value v;
 	if (v == value_undefined) {
 	    l = DefaultLengthOfBasic(t);
 	    v = make_value(is_value_constant,
-			   make_constant(is_constant_int, l));
+			   make_constant(is_constant_int, (void *) l));
 	}
 	b = make_basic(t, v);
     }
     else {
 	l = (v == value_undefined) ? DefaultLengthOfBasic(t) : 
 	constant_int(value_constant(v));
-	b = make_basic(t, l);
+	b = make_basic(t, (void *) l);
     }
 
     return(MakeTypeVariable(b, NIL));
@@ -1365,7 +1365,7 @@ print_common_layout(FILE * fd, entity c)
     list members = common_members_of_module(c, mod , FALSE);
     list equiv_members = NIL;
 
-    (void) fprintf(fd,"\nLayout for common /%s/ of size %d (or %d):\n",
+    (void) fprintf(fd,"\nLayout for common /%s/ of size %d:\n",
 		   module_local_name(c), area_size(type_area(entity_type(c))));
 
     if(ENDP(members)) {
@@ -1429,6 +1429,15 @@ print_common_layout(FILE * fd, entity c)
     gen_free_list(members);
 }
 
+/* (Re)compute offests of all variables allocated in common c from module m
+ * and update (if necessary) the size of common c for the *whole* program or
+ * set of modules in the current workspace. As a consequence, warning messages
+ * unfortunately depend on the parsing order.
+ *
+ * Offsets are computed a first time when the common declaration is
+ * encountered, but the variables may be typed or dimensionned *later*.
+ */
+
 bool 
 update_common_layout(m, c)
 entity m;
@@ -1441,6 +1450,7 @@ entity c;
      *    (i.e. declarations are concatenated on a module basis)
      *  - variables wich are located in the common thru an EQUIVALENCE statement
      *    are *not* (yet) in its layout
+     * It also was wrongly assumed that each common would have at least two members.
      */
 
     list members = area_layout(type_area(entity_type(c)));
@@ -1466,8 +1476,25 @@ entity c;
 	    pips_assert("update_common_layout",
 			storage_ram_p(entity_storage(current)));
 
-	    if(!variable_in_module_p(current, m))
+	    if(!variable_in_module_p(current, m)) {
+		/* If c really is a common, check its size because it may have increased.
+		 * Note that decreases are not taken into account although they might
+		 * occur as well.
+		 */
+		/* This piece of code might be useful if we were not dealing with the
+		 * last parsed module.
+		if(top_level_entity_p(c)) {
+		    int s = common_to_size(c);
+		    int new_s = ram_offset(storage_ram(entity_storage(previous)))
+			+SafeSizeOfArray(previous);
+		    if(s < new_s) {
+			(void) update_common_to_size(c, new_s);
+		    }
+		}
+		updated = TRUE;
+		*/
 		break;
+	    }
 
 	    if(ram_offset(storage_ram(entity_storage(previous)))+SafeSizeOfArray(previous) >
 	       ram_offset(storage_ram(entity_storage(current)))) {
@@ -1483,6 +1510,10 @@ entity c;
 		 * Note that decreases are not taken into account although they might
 		 * occur as well.
 		 */
+		/* Too late, if the common only contains one element because the MAPL
+		 * has not been entered at all if we are dealing wih te last parsed
+		 * module... which is always the case up to now!
+		 */
 		if(top_level_entity_p(c)) {
 		    int s = common_to_size(c);
 		    int new_s = ram_offset(storage_ram(entity_storage(current)))
@@ -1497,6 +1528,28 @@ entity c;
 	    previous = current;
 	} , members);
 
+
+	/* Special case: only one element in the common for the current procedure
+	 * (and the current procedure is last one declared - which is not so
+	 * special)
+	 */
+	if(ENDP(members)) {
+	  pips_assert("Previous must in declared in the current module",
+		      variable_in_module_p(previous, m));
+	  /* If c really is a common, check its size because it may have increased.
+	   * Note that decreases are not taken into account although they might
+	   * occur as well.
+	   */
+	  if(top_level_entity_p(c)) {
+	    int s = common_to_size(c);
+	    int new_s = ram_offset(storage_ram(entity_storage(previous)))
+	      +SafeSizeOfArray(previous);
+	    if(s < new_s) {
+	      (void) update_common_to_size(c, new_s);
+	      updated = TRUE;
+	    }
+	  }
+	}
     }
 
     return updated;
