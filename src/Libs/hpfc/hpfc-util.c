@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/09/03 15:19:35 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/02 15:01:00 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -32,15 +32,15 @@ extern int fprintf();
  * Predicates
  */
 
-
-
-/*
- * ref_to_dist_array_p
+/* TRUE if there is a reference to a distributed array within obj
  */
-bool ref_to_dist_array_p(expr)
-expression expr;
+bool ref_to_dist_array_p(obj)
+chunk* obj;
 {
-    return(FindRefToDistArray(expr)!=NULL);
+    list l = FindRefToDistArray(obj);
+    bool b = (l!=NIL);
+
+    gen_free_list(l); return(b);
 }
 
 /*
@@ -244,51 +244,37 @@ list lexpr;
 
     return(l);
 }
-	     
 
-list FindRefToDistArray(expr)
-expression expr;
+static list
+    found_syntaxes = NIL;
+
+static void FindRefToDistArray_syntax_rewrite(s)
+syntax s;
 {
-    syntax the_syntax=expression_syntax(expr);
+    if (syntax_reference_p(s))
+	if (array_distributed_p
+	    (reference_variable(syntax_reference(s))))
+	    found_syntaxes = 
+		CONS(SYNTAX, s, found_syntaxes);
+}
 
-    switch(syntax_tag(the_syntax))
-    {
-    case is_syntax_reference:
-	if (array_distributed_p(reference_variable(syntax_reference(the_syntax))))
-	{
-	    return(CONS(SYNTAX,the_syntax,NULL));
-	}
-	break;
-    case is_syntax_range:
-    {
-	list 
-	    ll=NULL,
-	    lu=NULL,
-	    li=NULL,
-	    lt=NULL;
-	
-	ll=FindRefToDistArray(range_lower(syntax_range(the_syntax)));
-	lu=FindRefToDistArray(range_upper(syntax_range(the_syntax)));
-	li=FindRefToDistArray(range_increment(syntax_range(the_syntax)));
-	lt=gen_nconc(ll,gen_nconc(lu,li));
+list FindRefToDistArray(obj)
+chunk* obj;
+{
+    list
+	result = NIL,
+	saved = found_syntaxes;
 
-	return(lt);
-	break;
-    }
-    case is_syntax_call:
-    {
-	list
-	    lt=FindRefToDistArrayFromList(call_arguments(syntax_call(the_syntax)));
+    found_syntaxes = NIL;
 
-	return(lt);
-	break;
-    }
-    default:
-	pips_error("FindRefToDistArray","unexpected syntax tag\n");
-	break;
-    }
+    gen_recurse(obj,
+		syntax_domain,
+		gen_true,
+		FindRefToDistArray_syntax_rewrite);
 
-    return(NULL);
+    result = found_syntaxes, found_syntaxes = saved;
+
+    return(result);
 }
 
 /* -------------------------------------------------------------
