@@ -16,7 +16,10 @@
 #include "properties.h"  /* get_bool_property */
 #include "misc.h"
 #include "database.h"
+#include "effects.h"
+#include "regions.h"
 #include "resources.h"
+#include "semantics.h"
 #include "pipsdbm.h"      /* DB_PUT_FILE_RESOURCE is defined there */
 #include "icfg.h"
 
@@ -35,7 +38,7 @@ entity module;
 {
     string module_name = module_local_name(module);
     statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,TRUE);
-    string filename;
+    string filename = NULL;
     text r = make_text(NIL);
 
     if ( s == statement_undefined )
