@@ -297,6 +297,18 @@ hash_table used_labels;
 	pips_error("controlize", 
 		    "Unknown instruction tag %d\n", instruction_tag(i));
     }
+
+    ifdebug(5) {
+	cons *blocs = NIL ;
+	CONTROL_MAP(ctl, {
+	    pips_debug(1, "\n");
+	    print_text(stderr, text_statement(get_current_module_entity(), 0, st));
+	    fprintf(stderr, "---\n");
+	    print_text(stderr, text_statement(get_current_module_entity(), 0, control_statement(ctl)));
+	}, c_res, blocs);
+	gen_free_list(blocs);
+    }
+    
     update_used_labels(used_labels, label, st);
     return(controlized);
 }
@@ -358,8 +370,8 @@ statement loop_test(statement sl)
 			       NIL)));
   test t = make_test(make_expression(make_syntax(is_syntax_call, c),
 				     normalized_undefined), 
-		     MAKE_CONTINUE_STATEMENT(), 
-		     MAKE_CONTINUE_STATEMENT());
+		     make_empty_statement(), 
+		     make_empty_statement());
   string csl = statement_comments(sl);
   string prev_comm = empty_comments_p(csl)? "" : strdup(csl);
   string lab = string_undefined;
@@ -559,7 +571,7 @@ hash_table used_labels;
 			 control_successors(Unreachable)) ;
 	}
 	if(controlized) {
-	    control c_in = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+	    control c_in = make_control(make_empty_statement(), NIL, NIL);
 	    
 	    ctls = CONS(CONTROL, c_in, ctls);
 	    control_predecessors(c_in) = control_predecessors(c_next);
@@ -570,7 +582,7 @@ hash_table used_labels;
 	}
 	else {
 	    pred = (unreachable) ? 
-		    make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL) :
+		    make_control(make_empty_statement(), NIL, NIL) :
 		    c_res;
 	}
 	c_res = c_next ; 
@@ -692,8 +704,8 @@ hash_table used_labels;
 	UPDATE_CONTROL(c_res, st, 
 		        ADD_PRED(pred, c_res),
 		        CONS(CONTROL, c1, CONS(CONTROL, c2, NIL)));
-	test_true(t) = MAKE_CONTINUE_STATEMENT();
-	test_false(t) = MAKE_CONTINUE_STATEMENT();
+	test_true(t) = make_empty_statement();
+	test_false(t) = make_empty_statement();
 	control_predecessors(succ) = ADD_PRED(c_join, succ);
 	control_successors(c_join) = CONS(CONTROL, succ, NIL);
 	controlized = TRUE;
