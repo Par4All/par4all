@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/12 09:00:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* $Id$ */
 
 #ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 1997/09/12 09:00:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "%A% ($Date: 1997/09/20 12:15:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -273,7 +273,7 @@ char *aliased_phase;
       pips_error("options_select", "aliases badly managed !!!\n");
    }
    else {
-      if ( db_get_current_workspace()==database_undefined ) {
+      if ( !db_get_current_workspace_name()) {
          prompt_user("No workspace opened. Options not accounted.\n");
       }
       else {
