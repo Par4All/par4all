@@ -5,7 +5,6 @@
 */
 
 #include <stdio.h>
-extern int fprintf();
 
 #include "genC.h"
 #include "text.h"
