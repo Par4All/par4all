@@ -21,5 +21,8 @@ pipsrc.csh: pipsrc.sh
 	$(SHELL) make-pipsrc.csh 
 	chmod a-w pipsrc.csh
 
+clean:
+	$(RM) pipsrc.sh pipsrc.csh
+
 # that is all
 #
