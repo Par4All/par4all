@@ -6,7 +6,7 @@
  */
 #ifndef _Lattice_h_
 #define _Lattice_h_
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern void AffineHermite ( Lattice *A, Lattice **H, Matrix **U );
 extern void AffineSmith ( Lattice *A, Lattice **U, Lattice **V, Lattice
@@ -35,7 +35,7 @@ extern Bool sameAffinepart ( Lattice *A, Lattice *B );
 extern Bool sameLattice ( Lattice *A, Lattice *B );
 extern LatticeUnion *Lattice2LatticeUnion(/* Lattice *X,Lattice *Y*/);
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern void AffineHermite (/* Lattice *A, Lattice **H, Matrix **U */);
 extern void AffineSmith (/* Lattice *A, Lattice **U, Lattice **V, Lattice
@@ -64,5 +64,5 @@ extern Bool sameAffinepart (/* Lattice *A, Lattice *B */);
 extern Bool sameLattice (/* Lattice *A, Lattice *B */);
 extern LatticeUnion *Lattice2LatticeUnion(/* Lattice *X,Lattice *Y*/);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _Lattice_h_ */

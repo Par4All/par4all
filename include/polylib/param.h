@@ -1,12 +1,12 @@
 #ifndef _param_H_
 #define _param_H_
-#ifdef __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern char **Read_ParamNames(FILE *in, int m);
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern char **Read_ParamNames(/* FILE *in, int m */);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _param_H_ */

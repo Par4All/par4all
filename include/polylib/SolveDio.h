@@ -6,13 +6,13 @@
  */
 #ifndef _SolveDio_h_
 #define _SolveDio_h_
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern int SolveDiophantine ( Matrix *M, Matrix **U, Vector **X );
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern int SolveDiophantine (/* Matrix *M, Matrix **U, Vector **X */);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _SolveDio_h_ */

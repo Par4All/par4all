@@ -6,19 +6,19 @@
  */
 #ifndef _eval_ehrhart_H_
 #define _eval_ehrhart_H_
-#ifdef __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern double compute_evalue ( evalue *e, Value *list_args );
 extern Value *compute_poly (Enumeration *en, Value *list_args);
 extern int in_domain(Polyhedron *P, Value *list_args);
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern double compute_evalue (/* evalue *e, Value *list_args */);
 extern Value *compute_poly (/* Enumeration *en, Value *list_args */);
 extern int in_domain(/* Polyhedron *P, Value *list_args */);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _eval_ehrhart_H_ */
 
 

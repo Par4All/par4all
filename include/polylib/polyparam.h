@@ -6,7 +6,7 @@
  */
 #ifndef _polyparam_H_
 #define _polyparam_H_
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern void Compute_PDomains ( Param_Domain *PD, int nb_domains, int
                                working_space );
@@ -33,7 +33,7 @@ extern void Print_Domain ( FILE *DST, Polyhedron *D, char **param_names );
 extern void Print_Vertex ( FILE *DST, Matrix *V, char **param_names );
 extern Matrix *VertexCT( Matrix *V, Matrix *CT );
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern void Compute_PDomains (/* Param_Domain *PD, int nb_domains, int
                                working_space */);
@@ -60,5 +60,5 @@ extern void Print_Domain (/* FILE *DST, Polyhedron *D, char **param_names */);
 extern void Print_Vertex (/* FILE *DST, Matrix *V, char **param_names */);
 extern Matrix *VertexCT(/* Matrix *V, Matrix *CT */);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _polyparam_H_ */

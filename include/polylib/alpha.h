@@ -6,7 +6,7 @@
  */
 #ifndef _alpha_h_
 #define _alpha_h_
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern int GaussSimplify ( Matrix *M, Matrix *M2 );
 extern int PolyhedronLTQ ( Polyhedron *P1, Polyhedron *P2, int INDEX, int
@@ -17,7 +17,7 @@ extern int PolyhedronTSort ( Polyhedron ** L, unsigned int n, unsigned
 extern int Polyhedron_Not_Empty ( Polyhedron *P, Polyhedron *C, int
                                   MAXRAYS );
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern int GaussSimplify (/* Matrix *M, Matrix *M2 */);
 extern int PolyhedronLTQ (/* Polyhedron *P1, Polyhedron *P2, int INDEX,
@@ -28,5 +28,5 @@ extern int PolyhedronTSort (/* Polyhedron ** L, unsigned int n, unsigned
 extern int Polyhedron_Not_Empty (/* Polyhedron *P, Polyhedron *C, int
                                   MAXRAYS */);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _alpha_h_ */

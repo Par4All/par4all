@@ -6,7 +6,7 @@
  */
 #ifndef _vector_H_ 
 #define _vector_H_
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern void Factorial(int n,Value *result);
 extern void Binomial(int n,int p,Value *result);
@@ -45,7 +45,7 @@ extern void Vector_Reduce(Value *p,unsigned length,
                   void(*f)(Value,Value *),Value *result);
 extern void Vector_Sort(Value *vector,unsigned n);
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern void Factorial(/*int n,Value *result*/);
 extern void Binomial(/*int n,int p,Value *result*/);
@@ -85,7 +85,7 @@ extern void Vector_Reduce(/*Value *p,unsigned length,
 extern void Vector_Sort(/*Value *vector,unsigned n*/);
 
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _vector_H_ */
 
 

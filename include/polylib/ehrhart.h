@@ -15,7 +15,7 @@ extern int overflow_warning_flag;
 #endif
 
 
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern void count_points ( int pos, Polyhedron *P, Value *context, Value *res );
 extern void eadd ( evalue *e1, evalue *res );
@@ -30,7 +30,7 @@ extern void print_evalue ( FILE *DST, evalue *e, char **pname );
 extern void reduce_evalue (evalue *e);
 extern void Enumeration_Free(Enumeration *en);
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern void count_points (/* int pos, Polyhedron *P, Value *context, Value *res */);
 extern void eadd (/* evalue *e1, evalue *res */);
@@ -45,5 +45,5 @@ extern void print_evalue (/* FILE *DST, evalue *e, char **pname */);
 extern void reduce_evalue (/* evalue *e */);
 extern void Enumeration_Free(/* Enumeration *en */);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _ehrhart_H_ */

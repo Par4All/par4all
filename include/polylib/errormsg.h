@@ -6,13 +6,13 @@
  */
 #ifndef _errormsg_H_
 #define _errormsg_H_
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern void errormsg1(char *f, char *msgname, char *msg);
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern void errormsg1 (/* char *f, char *msgname, char *msg */);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _errormsg_H_ */

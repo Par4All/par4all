@@ -1,12 +1,21 @@
 #ifndef _EXT_EHRHART_H_
 #define _EXT_EHRHART_H_
 
-extern Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS, char **pn);
+#ifndef PARAMS
+# if (defined(__STDC__) || defined(__cplusplus))
+#  define PARAMS(protos) protos
+# else /* no (defined(__STDC__) || defined(__cplusplus)) */
+#  define PARAMS(protos) ()
+# endif /* no (defined(__STDC__) || defined(__cplusplus)) */
+#endif
 
-extern 
-Enumeration *Domain_Image_Enumerate(Polyhedron *D,  Polyhedron *C,Matrix *T, unsigned MAXRAYS, char **par_name) ;
+extern Enumeration *Domain_Enumerate
+    PARAMS((Polyhedron *D, Polyhedron *C, unsigned MAXRAYS, char **pn));
 
-extern
-void new_eadd(evalue *e1,evalue *res);
+extern Enumeration *Domain_Image_Enumerate
+    PARAMS((Polyhedron *D,  Polyhedron *C,Matrix *T, 
+            unsigned MAXRAYS, char **par_name));
+
+extern void new_eadd PARAMS((evalue *e1,evalue *res));
 
 #endif

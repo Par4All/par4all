@@ -7,7 +7,7 @@
 
 #ifndef _Zpolyhedron_h_
 #define _Zpolyhedron_h_
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern void CanonicalForm(ZPolyhedron *Zpol, ZPolyhedron **Result,
 			  Matrix **Basis);
@@ -29,7 +29,7 @@ extern ZPolyhedron *ZPolyhedron_Alloc ( Lattice *Lat, Polyhedron *Poly );
 extern ZPolyhedron *SplitZpolyhedron(/*ZPolyhedron *ZPol, Lattice *B */);
 
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern void CanonicalForm (/* ZPolyhedron *Zpol, ZPolyhedron **Result,
                             Matrix **Basis */);
@@ -51,5 +51,5 @@ extern Bool ZPolyhedronIncludes (/* ZPolyhedron *A, ZPolyhedron *B */);
 extern ZPolyhedron *ZPolyhedron_Alloc (/* Lattice *Lat, Polyhedron *Poly */);
 extern ZPolyhedron *SplitZpolyhedron(/*ZPolyhedron *ZPol, Lattice *B */);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _Zpolyhedron_h_ */

@@ -6,7 +6,7 @@
  */
 #ifndef _polyhedron_H_
 #define _polyhedron_H_
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,
 				   Polyhedron *Pol,unsigned NbMaxRays );
@@ -67,7 +67,7 @@ extern Polyhedron *SubConstraint(Value *Con,Polyhedron *Pol,
 				 unsigned NbMaxRays, int Pass);
 extern Polyhedron *Universe_Polyhedron (unsigned Dimension);
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern Polyhedron *AddConstraints(/*Value *Con,unsigned NbConstraints,
 				   Polyhedron *Pol,unsigned NbMaxRays */);
@@ -126,5 +126,5 @@ extern Polyhedron *SubConstraint(/*Value *Con,Polyhedron *Pol,
 extern Polyhedron *Universe_Polyhedron (/*unsigned Dimension*/);
 
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _polyhedron_H_ */

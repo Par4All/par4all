@@ -6,7 +6,7 @@
  */
 #ifndef _Matop_h_
 #define _Matop_h_
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern Matrix *AddANullColumn ( Matrix *M );
 extern Matrix *AddANullRow ( Matrix *M );
@@ -26,7 +26,7 @@ extern Matrix *RemoveColumn ( Matrix *M, int Columnnumber );
 extern Matrix *RemoveRow ( Matrix *M, int Rownumber );
 extern Matrix *Transpose ( Matrix *A );
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern Matrix *AddANullColumn (/* Matrix *M */);
 extern Matrix *AddANullRow (/* Matrix *M */);
@@ -46,5 +46,5 @@ extern Matrix *RemoveColumn (/* Matrix *M, int Columnnumber */);
 extern Matrix *RemoveRow (/* Matrix *M, int Rownumber */);
 extern Matrix *Transpose (/* Matrix *A */);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _Matop_h_ */

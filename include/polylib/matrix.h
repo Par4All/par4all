@@ -6,7 +6,7 @@
  */
 #ifndef _matrix_H_
 #define _matrix_H_
-#if __STDC__
+#if (defined(__STDC__) || defined(__cplusplus))
 
 extern Matrix *Matrix_Alloc(unsigned NbRows, unsigned NbColumns);
 extern void Matrix_Free(Matrix *Mat);
@@ -24,7 +24,7 @@ extern void Vector_Matrix_Product(Value *p1,Matrix *mat,Value *p2);
 extern void Matrix_Product(Matrix *mat1,Matrix *mat2,Matrix *mat3);
 extern int Matrix_Inverse(Matrix *Mat,Matrix *MatInv);
 
-#else /* __STDC__ */
+#else /* (defined(__STDC__) || defined(__cplusplus)) */
 
 extern Matrix *Matrix_Alloc(/* unsigned NbRows, unsigned NbColumns */);
 extern void Matrix_Free(/* Matrix *Mat */);
@@ -42,5 +42,5 @@ extern void Vector_Matrix_Product(/* Value *p1,Matrix *mat,Value *p2 */);
 extern void Matrix_Product(/* Matrix *mat1,Matrix *mat2,Matrix *mat3 */);
 extern int Matrix_Inverse(/* Matrix *Mat,Matrix *MatInv */);
 
-#endif /* __STDC__ */
+#endif /* (defined(__STDC__) || defined(__cplusplus)) */
 #endif /* _matrix_H_ */
