@@ -70,7 +70,16 @@ quit_notify(Menu menu,
       else if (strcmp(menu_string, CLOSE_QUIT) == 0)
          close_workspace();
       else if (strcmp(menu_string, DELETE_QUIT) == 0)
-         delete_workspace(pn);
+      {
+	  int win = 0;
+	  
+	  /* Destroy all the windows (close open files) */
+	  for (win = 0; win < number_of_wpips_windows ; win++)
+	      xv_destroy(edit_frame[win]);
+	  
+	  check_delete_workspace(pn, FALSE);
+      }
+
    }
 
    /* Clear the log window to avoid the message about the edited
