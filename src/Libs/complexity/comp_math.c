@@ -390,7 +390,7 @@ complexity *pcomp1, comp2;
 	Ppolynome ppdiv;
 	ppdiv = polynome_div(complexity_eval(*pcomp1), complexity_eval(comp2));
 /*	polynome_rm(&(complexity_eval(*pcomp1))); */
-	(Ppolynome) complexity_eval(*pcomp1) = (Ppolynome) ppdiv;
+	complexity_eval(*pcomp1) = (Ppolynome) ppdiv;
 	complexity_stats_add(pcomp1, comp2);
     }
 }
