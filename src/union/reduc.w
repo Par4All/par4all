@@ -223,9 +223,9 @@ Pvecteur in_v1, in_v2;
   enum hspara_elem    ret_sle = unpara;
   boolean             first     = TRUE;
   boolean             same_sign = FALSE;
-  int                 gcd1, gcd2;   /* gcd of each vector                 */
-  int                 l1, l2;       /* length of each vector without TCST */
-  int                 b1, b2, diff; /* value of TCST and their diff       */
+  Value                 gcd1, gcd2;   /* gcd of each vector                 */
+  int                 l1, l2;   /* length of each vector without TCST */
+  Value               b1, b2, diff; /* value of TCST and their diff       */
 
   if (!in_v1 || !in_v2) return unpara;
 
@@ -241,16 +241,16 @@ Pvecteur in_v1, in_v2;
 
   /* get gcd of each vector and constant linked to TCST */
 
-  l1 = 0; b1 = 0; gcd1 = ABS(val_of(in_v1));
+  l1 = 0; b1 = 0; gcd1 = value_abs(val_of(in_v1));
   for (v1 = in_v1; v1 != NULL; v1 = v1->succ) {
-    gcd1 = pgcd( gcd1, ABS(val_of(v1)) );
+    gcd1 = pgcd( gcd1, value_abs(val_of(v1)) );
     if(var_of(v1)==TCST) b1 = val_of(v1); 
     else l1++;
   }
 
-  l2 = 0; b2 = 0; gcd2 = ABS(val_of(in_v2));
+  l2 = 0; b2 = 0; gcd2 = value_abs(val_of(in_v2));
   for (v2 = in_v2; v2 != NULL; v2 = v2->succ) {
-    gcd2 = pgcd( gcd2, ABS(val_of(v2)) );
+    gcd2 = pgcd( gcd2, value_abs(val_of(v2)) );
     if(var_of(v2)==TCST) b2 = val_of(v2);
     else l2++;
   }
@@ -261,17 +261,17 @@ Pvecteur in_v1, in_v2;
   /* Determine what kind of parallel hyperplane we are in */
   for (v2 = in_v2; v2 != NULL; v2 = v2->succ) {
     Variable  var2  = var_of(v2);
-    int       val2  = val_of(v2);
+    Value     val2  = val_of(v2);
     boolean   found = FALSE;
 
     if (var2 == TCST) continue;
 
     for (v1 = in_v1; v1 != NULL; v1 = v1->succ) {
       if (var_of(v1) == var2) {
-	int      i1 = gcd2 * val_of(v1);
-	int      i2 = gcd1 * val2;
-	boolean  ss = (i1 ==  i2);
-	boolean  op = (i1 == -i2);
+	Value      i1 = value_mult(gcd2,val_of(v1));
+	Value     i2 = value_mult(gcd1,val2);
+	boolean  ss = value_eq(i1,i2);
+	boolean  op = value_eq(i1,value_uminus(i2));
 	
 	if (!ss && !op) return unpara;
 	if (first) {first = FALSE; same_sign = (ss)?ss:op ;}
@@ -286,10 +286,14 @@ Pvecteur in_v1, in_v2;
 	
 
   /* compute return value */
-  diff = (same_sign) ? gcd1*b2 - gcd2*b1 : -gcd1*b2 - gcd2*b1;
-  if      (diff == 0) ret_sle = (same_sign) ? sszero  : opzero  ;
-  else if (diff >  0) ret_sle = (same_sign) ? ssplus  : opplus  ;
-  else if (diff <  0) ret_sle = (same_sign) ? ssminus : opminus ;
+  {
+      Value p1 = value_mult(gcd1,b2),
+            p2 = value_uminus(value_mult(gcd2,b1));
+      diff = (same_sign)? value_plus(p1,p2): value_minus(p2,p1);
+  }
+  if      (value_zero_p(diff)) ret_sle = (same_sign) ? sszero  : opzero  ;
+  else if (value_pos_p(diff)) ret_sle = (same_sign) ? ssplus  : opplus  ;
+  else if (value_neg_p(diff)) ret_sle = (same_sign) ? ssminus : opminus ;
   else ret_sle = unpara;
 
   /* debuging */
@@ -1040,7 +1044,7 @@ Pcomplist   comp;
 @}
 @D contrainte commune @{
 /* We are looking for a common hyperplan */
-vect_1 = vect_new(TCST, 1); common_cons = NULL;
+vect_1 = vect_new(TCST, VALUE_ONE); common_cons = NULL;
 
 for(cons = (lcomp->psys)->inegalites;
 	(cons != NULL)&&(lcomp->succ != NULL);cons = cons->succ){
