@@ -83,9 +83,6 @@ extern FILE * yyin;
 /* Default comand to print a file (if $PAGER is not set) */
 #define CAT_COMMAND "cat"
 
-/********************************************************** static functions */
-static void print_property(char*,property);
-
 /********************************************************** static variables */
 static t_file_list the_file_list;
 extern bool tpips_execution_mode;
@@ -483,20 +480,13 @@ i_get:
 	PROPNAME
 	opt_sep_list
 	{
-	    property p;
-
 	    debug(7,"yyparse","reduce rule i_get (%s)\n",
 		  yylval.name);
 	    
 	    if (tpips_execution_mode) {
-		p = get_property (yylval.name);
-	    
-		print_property(yylval.name, p);
+		fprint_property(stdout, yylval.name);
 		$$ = TRUE;
 	    }
-/*
-	    free (yylval.name);
-*/
 	}
 	;
 
@@ -774,33 +764,4 @@ void close_workspace_if_opened()
 {
     if (db_get_current_workspace_name() != NULL)
 	close_workspace ();
-}
-
-static void print_property(char* pname, property p)
-{
-    switch (property_tag(p))
-    {
-    case is_property_bool:
-    {
-		fprintf (stderr, "%s = %s\n",
-			pname,
-			get_bool_property (pname) == TRUE ?
-			"TRUE" : "FALSE");
-		break;
-    }
-    case is_property_int:
-    {
-		fprintf (stderr, "%s = %d\n",
-			pname,
-			get_int_property (pname));
-		break;
-    }
-    case is_property_string:
-    {
-		fprintf (stderr, "%s = %s\n",
-			pname,
-			get_string_property (pname));
-		break;
-    }
-    }
 }
