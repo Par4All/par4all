@@ -1,5 +1,5 @@
-/* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/07/22 13:37:55 $, 
+/*
+ * $Id$
  *
  * adapted from what can be seen by FC 31/12/96
  * 
@@ -212,6 +212,8 @@ static int lend()
 	return (0);
 }
 
+static int implicit_program_name; /* FC */
+
 /*		check for keywords for subprograms	
 		return 0 if comment card, 1 if found
 		name and put in arg string. invent name for unnamed
@@ -221,6 +223,8 @@ char *s;
 {
 	register char *ptr, *p;
 	char	line[LINESIZE], *iptr = line;
+
+	implicit_program_name = 0;
 
 	/* first check for comment cards */
 	if(buf[0]=='c' || buf[0]=='C' || buf[0]=='*' || buf[0]=='!') return 0;
@@ -260,6 +264,7 @@ char *s;
 		if(scan_name(s, ptr)) return(1);
 		strcpy( s, x);
 	} else {
+	    implicit_program_name = 1;
 		get_name( mainp, 4);
 		strcpy( s, mainp);
 	}
@@ -355,7 +360,7 @@ char *s, *m;
 main(argc, argv)
 char **argv;
 */
-int fsplit(char * file_name, FILE *out)
+int fsplit(char * file_name, FILE * out)
 {
     register FILE *ofp;	/* output file */
     register rv;	/* 1 if got card in output file, 0 otherwise */
@@ -382,12 +387,18 @@ int fsplit(char * file_name, FILE *out)
 	rv = 0;
 	while (getline() > 0) {
 	    hollerith(buf); /* FC */
-		rv = 1;
-		fprintf(ofp, "%s", buf);
-		if (lend())		/* look for an 'end' statement */
-			break;
-		if (nflag == 0)		/* if no name yet, try and find one */
-			nflag = lname(name);
+	    if (nflag == 0) /* if no name yet, try and find one */
+		nflag = lname(name);
+	    if (nflag!=0 && implicit_program_name==1) /* FC again */ {
+		fprintf(ofp, "! next line added by fsplit() in pips\n"
+			"      PROGRAM %c%c%c%c%c%c%c\n", name[0], name[1], 
+			name[2], name[3], name[4], name[5], name[6]);
+		implicit_program_name = 0; /* now we gave it a name! */
+	    }
+	    rv = 1;
+	    fprintf(ofp, "%s", buf);
+	    if (lend())		/* look for an 'end' statement */
+		break;
 	}
 	if (fclose(ofp)) {
 	    fprintf(stderr, "fclose(ofp) failed\n");
