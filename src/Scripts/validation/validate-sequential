@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1996/07/27 12:03:26 $, ) 
+# ($Date: 1996/07/27 15:52:46 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -40,7 +40,7 @@ default_file=defaults
 RUNNER=`whoami`
 HOSTNAME=`hostname`
 PWD=`pwd`
-subject="PIPS Validation: "
+subject="PIPS Validation:"
 failed=""
 
 # to be used by report for subject generation
