@@ -427,16 +427,35 @@ instruction MakeAssignInst(l, e)
 syntax l;
 expression e;
 {
-   expression lhs = make_expression(l, normalized_undefined);
+   expression lhs = expression_undefined;
+   instruction i = instruction_undefined;
 
-   if (!syntax_reference_p(l)) {
-      /* FI: we stumble here when a Fortran macro is used */
-      ParserError("MakeAssignInst",
-		  "bad lhs (function call or undeclared array) or "
-		  "unsupported Fortran macro\n");
+   if(syntax_reference_p(l)) {
+     lhs = make_expression(l, normalized_undefined);
+     i = make_assign_instruction(lhs, e);
+   }
+   else {
+     if(syntax_call_p(l) &&
+	strcmp(entity_local_name(call_function(syntax_call(l))), 
+	       SUBSTRING_FUNCTION_NAME) == 0) {
+       list lexpr = CONS(EXPRESSION, e, NIL);
+       list asub = call_arguments(syntax_call(l));
+
+       call_arguments(syntax_call(l)) = NIL;
+       free_syntax(l);
+
+       i = make_instruction(is_instruction_call,
+			    make_call(entity_intrinsic(ASSIGN_SUBSTRING_FUNCTION_NAME),
+				      gen_append(asub, lexpr)));
+     }
+     else
+       /* FI: we stumble here when a Fortran macro is used */
+       ParserError("MakeAssignInst",
+		   "bad lhs (function call or undeclared array) or "
+		   "unsupported Fortran macro\n");
    }
 
-   return make_assign_instruction(lhs, e);
+   return i;
 }
 
 
