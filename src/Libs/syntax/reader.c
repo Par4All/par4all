@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: reader.c,v $
+ * Revision 1.33  2002/06/21 13:49:40  irigoin
+ * Correct handling of comment lines in between continuation lines
+ *
  * Revision 1.32  2002/06/12 10:39:40  irigoin
  * function dump_current_statement() added
  *
@@ -795,8 +798,7 @@ ReadLine(FILE * fp)
 		    label[ilabel++] = c;
 		}
 		else {
-		    user_warning("ReadLine", 
-				 "Unexpected character '%c' (0x%x)\n", 
+		    pips_user_warning("Unexpected character '%c' (0x%x)\n", 
 				 c, (int) c);
 		    ParserError("ReadLine",
 				"non numeric character in label!\n");
@@ -968,12 +970,9 @@ ReadStmt(FILE * fp)
 	    }
 	}
 
-	line_b_I = tmp_b_I; line_e_I = tmp_e_I;
-	line_b_C = tmp_b_C; line_e_C = tmp_e_C;
+	line_b_I = tmp_b_I;
+	line_b_C = tmp_b_C;
 	strcpy(lab_I, tmp_lab_I);
-
-	tmp_b_I = tmp_e_I = UNDEF;
-	tmp_b_C = tmp_e_C = UNDEF;
 		
 	lStmt = 0;
 	do {
@@ -984,6 +983,15 @@ ReadStmt(FILE * fp)
 		stmt_buffer[lStmt++] = line_buffer[iLine++];
 	    }
 	    lLine = 0;
+
+	    /* Update the current final lines for instruction and comments */
+	    line_e_I = tmp_e_I;
+	    line_e_C = tmp_e_C;
+
+	    /* Initialize temporary beginning and end line numbers */
+	     tmp_b_I = tmp_e_I = UNDEF;
+	     tmp_b_C = tmp_e_C = UNDEF;
+
 	} while ((TypeOfLine = ReadLine(fp)) == CONTINUATION_LINE) ;
 
 	stmt_buffer[lStmt++] = '\n';
@@ -996,7 +1004,12 @@ ReadStmt(FILE * fp)
 
 	result = 1;
 
-	/* pips_debug(7, "stmt: (%d) --%s--\n", lStmt, Stmt); */
+	ifdebug(7) {
+	  int i;
+	  pips_debug(7, "stmt: (%d)\n", lStmt);
+	  for(i=0; i<lStmt; i++)
+	    putc((int) stmt_buffer[i], stderr);
+	}
     }
 
     return(result);
