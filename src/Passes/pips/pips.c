@@ -148,9 +148,7 @@ static void pips_user_log(char *fmt, va_list args)
     fflush(stderr);
 }
 
-int main(argc, argv)
-int argc;
-char * argv[];
+int pips_main(int argc, char ** argv)
 {
     bool success = TRUE;
 
