@@ -44,3 +44,6 @@ extern int get_bool_property();
 /* This variable is used to indicate wether wpips is in the Emacs
    mode: */
 extern bool wpips_emacs_mode;
+
+/* Define the menu separator: */
+#define WPIPS_MENU_SEPARATOR MENU_ITEM, MENU_STRING, "", MENU_INACTIVE, TRUE, NULL
