@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: JPips.java,v $
+ * Revision 1.4  1998/10/16 17:17:18  coelho
+ * updates for 1.2b4
+ *
  * Revision 1.3  1998/07/03 11:55:17  coelho
  * workspace menu moved to workspace.
  *
@@ -15,17 +18,19 @@
 
 package JPips;
 
-import java.awt.event.*;
-import java.applet.*;
 import java.lang.*;
 import java.util.*;
 import java.io.*;
+
+import java.awt.event.*;
+import java.applet.*;
 import java.awt.*;
-import java.awt.swing.*;
-import java.awt.swing.preview.*;
-import java.awt.swing.event.*;
-import java.awt.swing.text.*;
-import java.awt.swing.border.*;
+
+//import java.awt.swing.preview.*;
+import com.sun.java.swing.*;
+import com.sun.java.swing.event.*;
+import com.sun.java.swing.text.*;
+import com.sun.java.swing.border.*;
 
 import JPips.Pawt.*;
 
