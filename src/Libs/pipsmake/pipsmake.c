@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.62  1998/05/04 13:33:52  coelho
+ * set/reset pips current computation.
+ *
  * Revision 1.61  1998/04/14 21:21:20  coelho
  * linear.h
  *
@@ -78,7 +81,7 @@
 #include "pipsmake.h"
 
 static bool 
-catch_user_error(bool (*f)(char *), string oname)
+catch_user_error(bool (*f)(char *), string rname, string oname)
 {
     jmp_buf pipsmake_jump_buffer;
     bool success = FALSE;
@@ -88,9 +91,14 @@ catch_user_error(bool (*f)(char *), string oname)
     }
     else {
 	push_pips_context (&pipsmake_jump_buffer);
+	set_pips_current_computation(rname, oname);
+
 	success = (*f)(oname);
     }
+
     pop_pips_context();
+    reset_pips_current_computation();
+
     return success;
 }
 
@@ -385,7 +393,7 @@ apply_a_rule(string oname, rule ru)
 
     /* DO IT HERE!
      */
-    success_p = catch_user_error(builder, oname);
+    success_p = catch_user_error(builder, run, oname);
 
     if (print_timing_p) {
 	string time_with_io,io_time;
