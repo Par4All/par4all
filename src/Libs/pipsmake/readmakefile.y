@@ -363,8 +363,9 @@ makefile open_makefile(string name)
 
 
 /**** Begin saved_makefile version ****/
-void close_makefile(string name)
+bool close_makefile(string name)
 {
+    bool status;
     FILE *fd;
 
     fd = safe_fopen(build_pgm_makefile(name), "w");
@@ -375,5 +376,7 @@ void close_makefile(string name)
 
     free_makefile(pipsmakefile);
     pipsmakefile = makefile_undefined;
+
+    return status;
 }
 /**** End saved_makefile version ****/
