@@ -188,7 +188,7 @@ extern int Current_op ;
 
 extern int Number_imports ;
 extern int Current_start ;
-extern int Current_first ;
+/* extern int Current_first ; */
 extern int Read_spec_mode ;
 
 /* For tabulated domains, their index in the Gen_tabulated_ table. */
