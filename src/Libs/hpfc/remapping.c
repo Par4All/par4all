@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/10/10 11:38:21 $, ) 
+ * ($Date: 1995/11/02 18:03:46 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -580,9 +580,9 @@ remapping_stats(
 		  NIL))));
 
     statement_comments(result) = 
-	strdup(concatenate("c - ", (what & LZY) ? "lazy " : "",
-	   t==CPY ? "copy" : t==SND ? "send" : t==RCV ? "receiv" :
-			   t==BRD ? "broadcast" : "?",  "ing\n", NULL));
+	catdup("c - ", (what & LZY) ? "lazy " : "",
+	       t==CPY ? "copy" : t==SND ? "send" : t==RCV ? "receiv" :
+	       t==BRD ? "broadcast" : "?",  "ing\n", NULL);
 
     return result;
 }
@@ -782,10 +782,8 @@ print_rusage_delta(FILE * buffer,
 
     va_list args;
     va_start(args, format);
-    if (buffer)
-        vfprintf(buffer, format, args);
-    else
-        user_log(format, args);
+    if (buffer) vfprintf(buffer, format, args);
+    else user_log(format, args);
     va_end(args);
 
     u_seconds = out->ru_utime.tv_sec - in->ru_utime.tv_sec;
@@ -970,8 +968,8 @@ generate_hpf_remapping_file(
 
     /* put it in a file
      */
-    file_name = strdup(concatenate(db_get_current_workspace_directory(),
-				   "/", remapping_file_name(r), NULL));
+    file_name = catdup(db_get_current_workspace_directory(),
+		       "/", remapping_file_name(r), NULL);
 
     f = safe_fopen(file_name, "w");
     print_text(f, t);
@@ -993,8 +991,7 @@ generate_remapping_include(
 
     result = make_empty_statement();
     statement_comments(result) =
-	strdup(concatenate("      include '",
-			   remapping_file_name(r), "'\n", NULL));
+	catdup("      include '", remapping_file_name(r), "'\n", NULL);
 
     return result;
 }
@@ -1016,7 +1013,6 @@ void remapping_compile(
 {
     list /* of statements */ l = NIL;
     
-
     debug_on("HPFC_REMAPPING_DEBUG_LEVEL");
     pips_debug(1, "dealing with statement 0x%x\n", (unsigned int) s);
 
