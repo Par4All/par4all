@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-! ($Date: 1997/01/07 11:51:09 $, )
+! ($Date: 1997/01/22 18:47:15 $, )
 !
 !
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -232,7 +232,7 @@ COMMA_REPLICATE(LEVEL, `LIST_SECTION')
       include "hpfc_includes.h"
       integer COMMA_REPLICATE(LEVEL, `INDEX_REF')
       integer info, tmp, i, lid(2), j, bufid
-      integer l(LEVEL), u(LEVEL), lp, up, il(LEVEL), iu(LEVEL)
+      integer l(LEVEL), u(LEVEL), lp, up, li, ui, il(LEVEL), iu(LEVEL)
       integer s(LEVEL)
 SIMPLE_REPLICATE(LEVEL,`INIT_TABLE')dnl      
 !
@@ -259,6 +259,30 @@ SIMPLE_REPLICATE(LEVEL,`INIT_TABLE')dnl
             s(i)=sh
          endif
       enddo
+
+      li=l(dim)
+      ui=u(dim)
+      do j=1, 2
+         if (lid(j).ne.MY LID.and.lid(j).gt.0) then
+            debug(write (unit=0, fmt=*)
+     $           MYLID, " sending Shift to ", lid(j))
+!
+! the SHIFT is to another processor
+!
+            call pvmfinitsend(PVMDATARAW, bufid)
+            call build_name(HPFCPACK,PVMTYPE,LEVEL)
+     $           (array, dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
+COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
+            call pvmfsend(NODETIDS(lid(j)),SENDCHANNELS(lid(j)),info)
+            SENDCHANNELS(lid(j))=SENDCHANNELS(lid(j))+2
+         endif
+         l(dim)=lp
+         u(dim)=up
+      end do
+      
+      l(dim)=li
+      u(dim)=ui
       do j=1, 2
          if (lid(j).eq.MY LID) then
             debug(write (unit=0, fmt=*) MYLID, " copying Shift")
@@ -266,31 +290,17 @@ SIMPLE_REPLICATE(LEVEL,`INIT_TABLE')dnl
 ! the SHIFT is local
 !         
 REVERSE_REPLICATE(LEVEL,`DO_LOOP')
-      array(COMMA_REPLICATE(LEVEL,`INDEX_REFSH'))=
-     $       array(COMMA_REPLICATE(LEVEL,`INDEX_REF'))
+            array(COMMA_REPLICATE(LEVEL,`INDEX_REFSH'))=
+     $         array(COMMA_REPLICATE(LEVEL,`INDEX_REF'))
 SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
-         else
-            if (lid(j).gt.0) then
-               debug(write (unit=0, fmt=*)
-     $              MYLID, " sending Shift to ", lid(j))
-!
-! the SHIFT is to another processor
-!
-               call pvmfinitsend(PVMDATARAW, bufid)
-               call build_name(HPFCPACK,PVMTYPE,LEVEL)
-     $            (array, dnl
-COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
-COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
-               call pvmfsend(NODETIDS(lid(j)),SENDCHANNELS(lid(j)),info)
-               SENDCHANNELS(lid(j))=SENDCHANNELS(lid(j))+2
-            endif
-         endif
+         end if
          l(dim)=lp
          u(dim)=up
       enddo
 !
 ! FROM
 !      
+
       il(dim)=il(dim)+sh
       iu(dim)=iu(dim)+sh
       call hpfcshift
