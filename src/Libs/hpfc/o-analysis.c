@@ -552,7 +552,7 @@ list lpref, lkref;
 	if ((ta==aligned_shift) && (shift!=0))
 	    set_overlap(array, 
 			i, 
-			((shift<0)?(LOWER):(UPPER)), 
+			((shift<0)?(0):(1)), 
 			abs(shift));
 
 	i++;
@@ -646,7 +646,7 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
     entity
 	array = reference_variable(the_written_reference);
     int
-	an = get_hpf_number(array);
+	an = load_entity_hpf_number(array);
     entity_mapping
 	new_indexes = MAKE_ENTITY_MAPPING(),
 	old_indexes = MAKE_ENTITY_MAPPING();
@@ -690,20 +690,22 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
 		 oldidxvl = NewTemporaryVariable(node_module, 
 						 MakeBasic(is_basic_int));
 
-	     boundcomp = gen_nconc(boundcomp,
-				   CONS(STATEMENT,
-					statement_compute_bounds(newlobnd,
-								 newupbnd,
-								 oldidxvl,
-								 lb, ub, an, p),
-					NIL));
+	     boundcomp = 
+		 gen_nconc(boundcomp,
+			   CONS(STATEMENT,
+				statement_compute_bounds(newlobnd,
+							 newupbnd,
+							 oldidxvl,
+							 lb, ub, an, p),
+				NIL));
 
-	     newloops = gen_nconc(newloops,
-				  CONS(LOOP,
-				       make_loop_skeleton(newindex, 
-							  entity_to_expression(newlobnd),
-							  entity_to_expression(newupbnd)),
-				       NIL));
+	     newloops = 
+		 gen_nconc(newloops,
+		   CONS(LOOP,
+			make_loop_skeleton(newindex, 
+					   entity_to_expression(newlobnd),
+					   entity_to_expression(newupbnd)),
+			NIL));
 
 	     SET_ENTITY_MAPPING(new_indexes, index, newindex);
 	     SET_ENTITY_MAPPING(old_indexes, index, oldidxvl);
@@ -734,14 +736,82 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
      * and now generates the code...
      */
     
+    initialize_variable_used_map_for_statement(innerbody);
+
+    if (hpfc_overlap_kill_unused_scalars(innerbody))
+    {
+	close_variable_used_map_for_statement();
+	initialize_variable_used_map_for_statement(innerbody);
+    }
+
     newnest = make_loop_nest_for_overlap(lloop, newloops, 
 					 new_indexes, old_indexes, 
 					 innerbody);
+    close_variable_used_map_for_statement();
 
     
     (*pstat) = make_block_statement(gen_nconc(boundcomp, CONS(STATEMENT, newnest, NIL)));
 
     return(TRUE);
+}
+
+/*  To Kill scalar definitions within the generated code
+ *  recognize if only one reference. 
+ */
+static bool hpfc_killed_scalar;
+
+static void hpfc_overlap_kill_unused_scalars_rewrite(stat)
+statement stat;
+{
+    instruction
+	i = statement_instruction(stat);
+    expression
+	e = expression_undefined;
+    entity
+	var = entity_undefined;
+
+    if (!instruction_assign_p(i)) return;
+
+    e = EXPRESSION(CAR(call_arguments(instruction_call(i))));
+
+    pips_assert("hpfc_overlap_kill_unused_scalars_rewrite",
+		expression_reference_p(e));
+
+    var = reference_variable(syntax_reference(expression_syntax(e)));
+
+    debug(5, "hpfc_overlap_kill_unused_scalars_rewrite",
+	  "considering definition of %s (statement 0x%x)\n",
+	  entity_name(var), stat);
+
+    if (entity_integer_scalar_p(var) &&
+	load_entity_variable_used(var)==1)
+    {
+	debug(3, "hpfc_overlap_kill_unused_scalars_rewrite",
+	      "killing definition of %s (statement 0x%x)\n",
+	      entity_name(var), stat);
+
+	hpfc_killed_scalar = TRUE;
+	statement_instruction(stat) =  /* ??? memory leak */
+	    make_continue_instruction();
+    }
+}
+
+/*   true if one statement was killed
+ */
+bool hpfc_overlap_kill_unused_scalars(stat)
+statement stat;
+{
+    pips_assert("hpfc_overlap_kill_unused_scalars",
+		get_variable_used_map()!=hash_table_undefined);
+
+    hpfc_killed_scalar = FALSE;
+
+    gen_recurse(stat,
+		statement_domain,
+		gen_true,
+		hpfc_overlap_kill_unused_scalars_rewrite);
+
+    return(hpfc_killed_scalar);
 }
 
 /*
@@ -997,11 +1067,9 @@ statement innerbody;
 					 entity_to_expression(oldindexvalue)),
 	    incr = make_increment_statement(index);
 
-	loop_body(newloop) = make_block_statement(CONS(STATEMENT,
-						       incr,
-						       CONS(STATEMENT,
-							    body,
-							    NIL)));
+	loop_body(newloop) = make_block_statement(CONS(STATEMENT, incr,
+						  CONS(STATEMENT, body,
+						       NIL)));
 
 	return(make_block_statement
 	       (CONS(STATEMENT, init,
@@ -1028,37 +1096,62 @@ entity index;
 /*
  * bool variable_used_in_statement_p(ent, stat)
  *
- * true if ent is referenced in statement stat.
+ * not 0 if ent is referenced in statement stat.
  * yes, I know, proper effects may be called several
  * times for the same statement...
+ *
+ * ??? I should have used cumulated/proper effects to be computed on
+ * the statement being generated, but It would not have been as easy
+ * to compute and to use.
  */
+
+static statement 
+  current_variable_used_statement = statement_undefined;
+
+GENERIC_CURRENT_MAPPING(variable_used, int, entity);
+
+static void variable_used_rewrite(r)
+reference r;
+{
+    entity 
+	v = reference_variable(r);
+    int
+	n = load_entity_variable_used(v);
+
+    store_entity_variable_used(v, int_undefined_p(n) ? 1 : n+1);
+}
+
+void initialize_variable_used_map_for_statement(stat)
+statement stat;
+{
+    make_variable_used_map();
+
+    current_variable_used_statement = stat;
+    gen_recurse(stat,
+		reference_domain,
+		gen_true,
+		variable_used_rewrite);
+}
+
+void close_variable_used_map_for_statement()
+{
+    free_variable_used_map();
+    current_variable_used_statement = statement_undefined;
+}
+
 bool variable_used_in_statement_p(ent, stat)
 entity ent;
 statement stat;
 {
-    list
-	l = proper_effects_of_statement(stat);
+    bool
+	result;
 
-    MAPL(ce,
-     {
-	 effect
-	     e = EFFECT(CAR(ce));
+    pips_assert("variable_used_in_statement_p",
+		stat == current_variable_used_statement);
 
-	 if (reference_variable(effect_reference(e))==ent)
-	 {
-	     debug(7, "variable_used_in_statement_p",
-		   "returning TRUE for variable %s\n", entity_name(ent));
-	     gen_free_list(l);
-	     return(TRUE);
-	 }
-     },
-	 l);
-
-    debug(7, "variable_used_in_statement_p",
-	  "returning FALSE for variable %s\n", entity_name(ent));
-
-    gen_free_list(l);
-    return(FALSE);
+    result = (!entity_variable_used_undefined_p(ent));
+    
+    return(result);
 }
 
 /*
