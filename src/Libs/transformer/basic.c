@@ -33,7 +33,7 @@ transformer t_in;
 	(cons *) gen_copy_seq(transformer_arguments(t_in));
     sc = (Psysteme) predicate_system(transformer_relation(t_in));
     pips_assert("transformer_dup", !SC_UNDEFINED_P(sc));
-    predicate_system(transformer_relation(t_out)) = 
+    predicate_system_(transformer_relation(t_out)) = 
 	(char *) sc_dup(sc);
 
     return t_out;
@@ -57,7 +57,7 @@ transformer t;
 
     s = (Psysteme) predicate_system(transformer_relation(t));
     sc_rm(s);
-    predicate_system(transformer_relation(t)) = (char *) SC_UNDEFINED;
+    predicate_system_(transformer_relation(t)) = (char *) SC_UNDEFINED;
     /* gen_free should stop before trying to free a Psysteme and
        won't free entities in arguments because they are tabulated */
     /* commented out for DRET demo */
@@ -225,7 +225,10 @@ transformer t;
     bool consistent = TRUE;
 
     /* The NewGen data structure must be fully defined */
-    consistent = gen_defined_p(t);
+    ifdebug(1)
+	consistent = gen_defined_p(t);
+    else
+	consistent = TRUE;
 
     /* The predicate must be weakly consistent. Every variable
      * in the constraints must be in the basis (but not the other
