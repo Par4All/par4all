@@ -2,6 +2,9 @@
   $Id$
  
   $Log: Listener.java,v $
+  Revision 1.7  1998/10/16 14:48:18  coelho
+  typo.
+
   Revision 1.6  1998/10/16 14:42:00  coelho
   fixed again.
 
@@ -35,7 +38,7 @@ import java.applet.*;
 public class Listener 
   implements Runnable
 {
-  public final String listener = "listener   : ",
+  public final String listener = "listener   : ";
   public final String signal = "[tpips_wrapper] killing tpips...";
 
   public Resetable jpips;
