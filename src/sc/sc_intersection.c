@@ -11,6 +11,7 @@
 #include "contrainte.h"
 #include "sc.h"
 #include "malloc.h"
+
 /* Psysteme sc_fusion(Psysteme s1, Psysteme s2): fusion de deux systemes
  * de contraintes afin d'obtenir un systeme contenant les egalites
  * et les inegalites des deux systemes donnes; aucune elimination de
@@ -295,3 +296,17 @@ Psysteme ps1, ps2;
     return result;
 }
 
+/* returns the common subsystem if appropriate...
+ * s1 and s2 are modified accordingly.
+ */
+Psysteme extract_common_syst(Psysteme s1, Psysteme s2)
+{
+  Pcontrainte 
+    e = extract_common_constraints(&s1->egalites, &s2->egalites, TRUE),
+    i = extract_common_constraints(&s1->inegalites, &s2->inegalites, FALSE);
+
+  sc_fix(s1);
+  sc_fix(s2);
+
+  return sc_make(e, i);
+}
