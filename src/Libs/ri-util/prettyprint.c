@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/03/21 15:56:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/11 13:36:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/03/21 15:56:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/11 13:36:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -32,6 +32,7 @@ char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/03/21 15:56:17 $, ) ve
 #include "text.h"
 #include "text-util.h"
 #include "ri.h"
+#include "word_attachment.h"
 #include "ri-util.h"
 
 #include "misc.h"
@@ -1625,10 +1626,12 @@ cons *words_reference(obj)
 reference obj;
 {
     cons *pc = NIL;
+    string begin_attachment;
+    
     entity e = reference_variable(obj);
 
     pc = CHAIN_SWORD(pc, entity_local_name(e));
-/*    attach_something_to_last_word(pc, e); */
+    begin_attachment = STRING(CAR(gen_last(pc)));
     
     if (reference_indices(obj) != NIL) {
 	pc = CHAIN_SWORD(pc,"(");
@@ -1639,6 +1642,8 @@ reference obj;
 	}, reference_indices(obj));
 	pc = CHAIN_SWORD(pc,")");
     }
+    attach_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
+			make_attachee(is_attachee_entity, e));
 
     return(pc);
 }
