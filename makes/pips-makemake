@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.316  1997/09/24 15:23:58  coelho
+# XXX -> $(ARCH)/XXX if necessary for FI.
+#
 # Revision 1.315  1997/08/27 11:42:36  coelho
 # *** empty log message ***
 #
@@ -126,7 +129,7 @@ help()
 	    generated. The impact is to use the corresponding _ROOT and _ARCH
 	    variables for finding includes libraries and so. Within the 
 	    makefile, the ARCH and ROOT macros holds the expected values.
-	    The definition of ARCH first relies on the part's _ARCH variable
+	    The definition of ARCH first relies on the parts _ARCH variable
 	    (for instance \$NEWGEN_ARCH), then if not set the \$PIPS_ARCH
 	    variable is used, and finally . (dot) is used as a default.
 	    The ROOT and ARCH macros are used for installing files: for 
@@ -546,6 +549,9 @@ cat >> $MAKEFILE <<%
 LIB_OBJECTS:=\$(addprefix \$(ARCH)/, \$(LIB_OBJECTS))
 #
 LIB_TARGET=	\$(ARCH)/lib\$(TARGET).a
+ifneq(\$(ARCH),.)
+lib\$(TARGET).a: $(LIB_TARGET)
+endif
 BIN_TARGET=	\$(ARCH)/\$(TARGET)
 INC_TARGET=	\$(TARGET).h
 #
@@ -700,6 +706,10 @@ clean: clean-compiled
 		\$(DERIVED_FILES) *.~[0-9]~ core
 
 INC_CFILES += \$(LIB_CFILES)
+
+ifneq(\$(ARCH),.)
+\$(TARGET): \$(ARCH)/\$(TARGET)
+endif
 
 %
 
