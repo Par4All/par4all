@@ -9,7 +9,7 @@
  */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1998/04/14 15:20:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1998/09/08 13:32:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -162,40 +162,54 @@ display_linked_control_nodes(control c) {
    for example in order not to delete them. */
 void
 remove_unreachable_following_control(control c,
-				     control do_not_delete_node)
+				     control do_not_delete_node,
+                                     control do_not_delete_node_either)
 {
-    /* If this is the do_not_delete_node node: stop deleting: */
-    if (c == do_not_delete_node)
+    list the_successors;
+ 
+    /* If this is the do_not_delete_node nodes: stop deleting: */
+    if (c == do_not_delete_node || c == do_not_delete_node_either)
 	return;
-    /* If this is not or no more a sequence, stop deleting: */
-    if (gen_length(control_predecessors(c)) > 1)
+    /* If this is not or no more the begin of a sequence, stop deleting: */
+    if (control_predecessors(c) != NIL)
 	return;
     /* If there is a FORMAT inside a control node, just stop deleting
        the control nodes since we cannot decide locally if the FORMAT
        is useful or not: */
     if (format_inside_statement_p(control_statement(c)))
 	return;
-    
+
+    /* Save the successor list since we iterate o it and discard it at
+       the same time: */
+    the_successors = gen_copy_seq(control_successors(c));
     /* Ok, we can delete. For each successor of c: */
     MAP(CONTROL, a_successor, {
-	remove_unreachable_following_control(a_successor, do_not_delete_node);
-	/* Remove any predecessor reference of itself in this
-	   successor: */
-	gen_remove(&control_predecessors(a_successor), c);
-    }, control_successors(c));
+       /* Remove any predecessor reference of itself in this
+          successor: */
+       unlink_2_control_nodes(c, a_successor);
+       remove_unreachable_following_control(a_successor,
+                                            do_not_delete_node,
+                                            do_not_delete_node_either);
+    }, the_successors);
+    gen_free_list(the_successors);
+    
     /* Discard the control node itself: */
     pips_debug(7, "Discarding control node %p.\n", c);
-    gen_free_list(control_predecessors(c));
-    control_predecessors(c) = NIL;
-    gen_free_list(control_successors(c));
-    control_successors(c) = NIL;
+    ifdebug(7) {
+	display_linked_control_nodes(c);
+    } 
     free_control(c);
 }
 
 
-/* Remove all the control sequences that are unreachable: */
+/* Remove all the control sequences that are unreachable and that
+   begin with a node without any predecessor. It is an old version and
+   a normal user should use
+   remove_all_unreachable_controls_of_an_unstructured() instead.
+
+   It is still buggy on Validation/Syntax/asgoto.f... */
 void
-remove_the_unreachable_controls_of_an_unstructured(unstructured u)
+remove_some_unreachable_controls_of_an_unstructured(unstructured u)
 {
     list blocs = NIL;
     list control_remove_list = NIL;
@@ -234,7 +248,7 @@ remove_the_unreachable_controls_of_an_unstructured(unstructured u)
     /* Now remove all the marqued sequences from the entry_node: */
     MAP(CONTROL, c,
 	{
-	    remove_unreachable_following_control(c, entry_node);
+	    remove_unreachable_following_control(c, entry_node, exit_node);
 	},
 	control_remove_list);
     gen_free_list(control_remove_list);
@@ -262,11 +276,94 @@ remove_the_unreachable_controls_of_an_unstructured(unstructured u)
 	/* Now remove all the marqued sequences from the entry_node: */
 	MAP(CONTROL, c,
 	    {
-		remove_unreachable_following_control(c, exit_node);
+		remove_unreachable_following_control(c, entry_node, exit_node);
 	    },
 	    control_remove_list);
 	gen_free_list(control_remove_list);
     }   
+}
+
+
+/* Remove all control nodes that are not forward reachable from the
+   entry node. Warning: useful FORMAT that are unreachable are also
+   discarded, so... */
+void
+remove_all_unreachable_controls_of_an_unstructured(unstructured u)
+{
+    list blocs = NIL;
+
+    set useful_controls = set_make(set_pointer);
+    set unreachable_controls = set_make(set_pointer);
+    
+    /* The entry point of the unstructured: */
+    control entry_node = unstructured_control(u);
+    control exit_node = unstructured_exit(u);
+    pips_debug(7, "From control %p, exit %p.\n", entry_node, exit_node);
+    ifdebug(7) {
+	display_linked_control_nodes(entry_node);
+    }
+
+    /* Mark all the forward-reachable nodes: */
+    FORWARD_CONTROL_MAP(c, {
+       pips_debug(5, "Forward visiting control node %p.\n", c);
+       set_add_element(useful_controls,
+                       useful_controls,
+                       (char *) c);
+    },
+       entry_node,
+       blocs);
+    gen_free_list(blocs);
+    blocs = NIL;
+
+    /* Now build the remove list from all the non-marked nodes: */
+    CONTROL_MAP(c, {
+       pips_debug(5, "Testing control node %p.\n", c);
+       if (! set_belong_p(useful_controls, (char *) c)) {
+          pips_debug(5, "Adding to the removing list control node %p.\n", c);
+          set_add_element(unreachable_controls,
+                          unreachable_controls,
+                          (char *) c);
+       }       
+    },
+       entry_node,
+       blocs);
+    gen_free_list(blocs);
+    blocs = NIL;
+
+    /* The same thing from the exit node that may be not reachable
+       from the entry node: */
+    CONTROL_MAP(c, {
+       pips_debug(5, "Testing from exit control node %p.\n", c);
+       if (! set_belong_p(useful_controls, (char *) c)) {
+          pips_debug(5, "From exit node: Adding to the removing list control node %p.\n", c);
+          set_add_element(unreachable_controls,
+                          unreachable_controls,
+                          (char *) c);
+       }
+    },
+       entry_node,
+       blocs);
+    gen_free_list(blocs);
+
+    /* And delete them: */
+    SET_MAP(cc, {
+       control c = (control) cc;
+       if (c == exit_node) {
+          pips_debug(5, "Skipping discarding exit control node %p.\n", c);
+       }
+       else {
+          pips_debug(5, "Discarding control node %p.\n", c);
+          if (format_inside_statement_p(control_statement(c)))
+             pips_user_warning("Discarding an unreachable FORMAT that may be "
+                               "usefull. "
+                               "Try to use the GATHER_FORMATS_AT_BEGINNING "
+                               "property.");
+          remove_a_control_from_an_unstructured_without_relinking(c);
+       }      
+    },
+       unreachable_controls);
+    set_free(useful_controls);
+    set_free(unreachable_controls);
 }
 
 
@@ -362,6 +459,30 @@ remove_a_control_from_an_unstructured(control c)
                                            source_is_successor_and_dest_is_predecessor);
    
    /* Remove the control node: */
+   free_control(c);
+}
+
+
+/* It removes a control node from its successor and predecessor. Can
+   apply to unstructured "IF". */
+void
+remove_a_control_from_an_unstructured_without_relinking(control c)
+{
+   /* Use a copy since we iterate and discard at the same time: */
+   list the_predecessors = gen_copy_seq(control_predecessors(c));
+   list the_successors = gen_copy_seq(control_successors(c));
+
+   MAP(CONTROL, a_predecessor, {
+      unlink_2_control_nodes(a_predecessor, c);
+   }, the_predecessors);
+   gen_free_list(the_predecessors);
+    
+   MAP(CONTROL, a_successor, {
+      unlink_2_control_nodes(c, a_successor);
+   }, the_successors);
+   gen_free_list(the_successors);
+
+   /* Remove the control node itself: */
    free_control(c);
 }
 
