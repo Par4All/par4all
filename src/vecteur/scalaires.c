@@ -37,7 +37,7 @@ Value x;
 	Pvecteur coord;
 
 	for (coord = v ;coord!=NULL;coord=coord->succ) {
-	    value_pdivide(val_of(coord),x); 
+	    value_pdivision(val_of(coord),x); 
 	}
     }
     return vect_clean(v);
