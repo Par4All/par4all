@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/12/30 09:05:06 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/03/22 10:56:55 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -257,12 +257,11 @@ statement *hoststatp,*nodestatp;
 	return;
     }
 
-    /*
-     * call to something with distributed variables, which is not
-     * an assignment. Since I do not use the effects as I should, nothing
-     * is done...
+    /* call to something with distributed variables, which is not an
+     * assignment. Since I do not use the effects as I should, nothing is
+     * done...
      */
-    user_warning("hpf_compile_call","not implemented yet\n");
+    hpfc_warning("hpf_compile_call","not implemented yet\n");
 }
 
 static void hpf_compile_unstructured(stat,hoststatp,nodestatp)
