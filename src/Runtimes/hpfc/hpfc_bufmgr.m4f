@@ -2,6 +2,9 @@
 ! $Id$
 !
 ! $Log: hpfc_bufmgr.m4f,v $
+! Revision 1.20  1997/07/03 11:00:57  zory
+! pvm types replaced by hpfc type
+!
 ! Revision 1.19  1997/06/09 13:00:43  zory
 ! bufid has been deleted in recv calls
 !
@@ -40,14 +43,14 @@
 define(`GENERIC_BUFFER_PACK',`dnl
 pushdef(`PVMTYPE',$1)dnl
 fake_buffers(dnl
-      subroutine build_name(PVMTYPE,hpfc fake bufpck)()
+      subroutine build_name(PVMTYPE,fake bufpck)()
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       SEND NOT INITIALIZED=.FALSE.
       BUFINDEX=0
       hpfc fake bufpck=hpfc fake bufpck+1
       end)
-      subroutine build_name(PVMTYPE,hpfc bufpck)()
+      subroutine build_name(PVMTYPE,bufpck)()
       integer info, bufid
       include "hpfc_commons.h"
       include "hpfc_includes.h"
@@ -65,7 +68,7 @@ popdef(`PVMTYPE')')dnl
 define(`GENERIC_BUFFER_UPCK',`dnl
 pushdef(`PVMTYPE',$1)dnl
 fake_buffers(dnl
-      subroutine build_name(PVMTYPE,hpfc fake bufupk)(lid)
+      subroutine build_name(PVMTYPE,fake bufupk)(lid)
       integer lid
       include "hpfc_commons.h"
       include "hpfc_includes.h"
@@ -76,7 +79,7 @@ fake_buffers(dnl
       SIZEOFRECEIVEDBUFFER=build_name(PVMTYPE,BUFFSIZE)
       hpfc fake bufupk=hpfc fake bufupk+1
       end)
-      subroutine build_name(PVMTYPE,hpfc bufupk)(lid)
+      subroutine build_name(PVMTYPE,bufupk)(lid)
       integer lid
       integer info, length, tag, tid
       include "hpfc_commons.h"
@@ -101,13 +104,14 @@ define(`GENERIC_BUFFER',`
 GENERIC_BUFFER_PACK($1)
 GENERIC_BUFFER_UPCK($1)')
 
-ifdef(`_HPFC_NO_BYTE1_',,`GENERIC_BUFFER(BYTE1)')
-ifdef(`_HPFC_NO_INTEGER2_',,`GENERIC_BUFFER(INTEGER2)')
-ifdef(`_HPFC_NO_INTEGER4_',,`GENERIC_BUFFER(INTEGER4)')
-ifdef(`_HPFC_NO_REAL4_',,`GENERIC_BUFFER(REAL4)')
-ifdef(`_HPFC_NO_REAL8_',,`GENERIC_BUFFER(REAL8)')
-ifdef(`_HPFC_NO_COMPLEX8_',,`GENERIC_BUFFER(COMPLEX8)')
-ifdef(`_HPFC_NO_COMPLEX16_',,`GENERIC_BUFFER(COMPLEX16)')
+ifdef(`_HPFC_NO_BYTE1_',,`GENERIC_BUFFER(HPFC BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`GENERIC_BUFFER(HPFC INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`GENERIC_BUFFER(HPFC INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`GENERIC_BUFFER(HPFC REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`GENERIC_BUFFER(HPFC REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`GENERIC_BUFFER(HPFC COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`GENERIC_BUFFER(HPFC COMPLEX16)')
+ifdef(`_HPFC_NO_STRING_',,`GENERIC_BUFFER(HPFC STRING)')
 
 !
 ! that is all
