@@ -2,6 +2,10 @@
 
 /** $Id$
   * $Log: TextDisplayer.java,v $
+  * Revision 1.4  1998/10/17 09:42:01  coelho
+  * frame title now includes the date (to check for recomputations).
+  * more comments.
+  *
   * Revision 1.3  1998/10/16 13:58:55  coelho
   * *** empty log message ***
   *
@@ -34,77 +38,82 @@ import java.awt.*;
   */
 public class TextDisplayer extends Displayer
 {
-
-
-  public	Vector	infos;		//contains the extensions
-  public	PFrame	frame;		//frame of jpips
+  public Vector	infos;		//contains the extensions
+  public PFrame	frame;		//frame of jpips
   
-
   /** Sets the number of displayed windows to 0.
     * Creates the vector of windows.
     */
   public TextDisplayer(PFrame frame)
-    {
-      super();
-      this.frame = frame;
-      setInfos();
-    }
-
-
+  {
+    super();
+    this.frame = frame;
+    setInfos();
+  }
+0
   /** Sets the extension info table.
     */
   public void setInfos()
-    {
-      infos = new Vector();
-      infos.addElement(new Extension("pref","basic sequential view"));
-      infos.addElement(new Extension("tran","transformers sequential view"));
-      infos.addElement(new Extension("prec","preconditions sequential view"));
-      infos.addElement(new Extension("reg","regions sequential view"));
-      infos.addElement(new Extension("parf","parallel view"));
-      infos.addElement(new Extension("icfg","basic ICFG view"));
-      infos.addElement(new Extension("icfgl","loops ICFG view"));
-      infos.addElement(new Extension("icfgc","control ICFG view"));
-    }
-
+  {
+    infos = new Vector();
+    infos.addElement(new Extension("pref","basic sequential view"));
+    infos.addElement(new Extension("tran","transformers sequential view"));
+    infos.addElement(new Extension("prec","preconditions sequential view"));
+    infos.addElement(new Extension("reg","regions sequential view"));
+    infos.addElement(new Extension("parf","parallel view"));
+    infos.addElement(new Extension("icfg","basic ICFG view"));
+    infos.addElement(new Extension("icfgl","loops ICFG view"));
+    infos.addElement(new Extension("icfgc","control ICFG view"));
+  }
 
   /** Displays a text frame from a text file.
-    */
+      @param file the file to display.
+      @param locked whether the display is locked.
+      @param writable whether the text can be edited.
+      @return whether a new frame was created to display the file.
+   */
   public boolean display(File file, boolean locked, boolean writable)
+  {
+    // the title includes the description, the filename and a date.
+    String title = 
+      getInfo(file) + ": " + file.getName() + " (" + file.lastModified() + ")";
+
+    // first look for a frame with already holds this file.
+    for(int i=0; i<frameVector.size(); i++)
     {
-      String title = getInfo(file)+" : "+file.getName();
-      for(int i=0; i<frameVector.size(); i++)
-        {
-	  PTextFrame f = (PTextFrame)frameVector.elementAt(i);
-	  if(title.equals(f.getTitle()))
-	    {
-	      f.setVisible(true);
-	      f.toFront();
-	      return false;
-	    }
-	}
-      PTextFrame f = getFreeFrame();
-      String text = getText(file);
-      if(text != null)
-        {
-          if(f != null)
-            {
-	      f.setTitle(title);
-	      f.ta.setText(text);
-	      f.panelButton.setText(title);
-	      f.locked = locked;
-	      f.writable = writable;
-	    }
-          else
-            {
-	      f = new PTextFrame(title, text, locked, writable);
-              register(f);
-              f.setVisible(true);
-	    }
-        }
-      return true;
+      PTextFrame f = (PTextFrame) frameVector.elementAt(i);
+      if(title.equals(f.getTitle()))
+      {
+	f.setVisible(true);
+	f.toFront();
+	return false;
+      }
     }
 
+    PTextFrame frame = getFreeFrame();
+    String text = getText(file);
 
+    if(text != null)
+    {
+      if(frame != null)
+      {
+	frame.setTitle(title);
+	frame.ta.setText(text);
+	frame.panelButton.setText(title);
+	frame.locked = locked;
+	frame.writable = writable;
+      }
+      else
+      {
+	frame = new PTextFrame(title, text, locked, writable);
+	register(frame);
+	frame.setVisible(true);
+      }
+    }
+    return true;
+  }
+  
+  
   /** Displays a text frame from a string.
     */
   public void display(String title, String text,
