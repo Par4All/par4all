@@ -15,11 +15,6 @@
 
 #include "sac.h"
 
-typedef struct {
-      expression result;
-      expression operand[2];
-} statement_arguments;
-
 /* Computes the optimal opcode for simdizing 'argc' statements of the
  * 'kind' operation, applied to the 'args' arguments
  */
@@ -480,8 +475,7 @@ typedef struct {
 } _argument_info, * argument_info;
 
 typedef struct {
-      statement_info ssi;
-      int vector;  //index of the vector
+      entity e;
       int element; //index of the element in the vector
 } _vector_element, * vector_element;
 #define VECTOR_ELEMENT(x) ((vector_element)((x).p))
@@ -490,7 +484,7 @@ static argument_info arguments = NULL;
 static int nbArguments = 0;
 static int nbAllocatedArguments = 0;
 
-static void reset_argument_info()
+void reset_argument_info()
 {
    nbArguments = 0;
 }
@@ -545,8 +539,7 @@ static vector_element make_vector_element(statement_info ssi, int vector, int el
 {
    vector_element v = (vector_element)malloc(sizeof(_vector_element));
    
-   v->ssi = ssi;
-   v->vector = vector;
+   v->e = ssi->vectors[vector];
    v->element = element;
 
    return v;
@@ -748,27 +741,13 @@ static list merge_available_places(list l1, list l2, int element)
 	 vector_element ei = VECTOR_ELEMENT(CAR(i));
 	 vector_element ej = VECTOR_ELEMENT(CAR(j));
 
-	 if ( (ei->ssi == ej->ssi) &&
-	      (ei->vector == ej->vector) &&
+	 if ( (ei->e == ej->e) &&
 	      (ei->element == element) )
 	    res = CONS(, ej, NIL);
       }
    }
 
    return res;
-}
-
-void print_places(list l)
-{
-   while(l != NIL)
-   {
-      vector_element e = VECTOR_ELEMENT(CAR(l));
-
-      printf("   ssi=0x%x, vector=%i, element=%i\n", 
-	     e->ssi, e->vector, e->element);
-      
-      l = CDR(l);
-   }
 }
 
 static statement generate_load_statement(statement_info si, int line)
@@ -794,7 +773,7 @@ static statement generate_load_statement(statement_info si, int line)
    if (sources != NIL)
    {
       vector_element vec = VECTOR_ELEMENT(CAR(sources));
-      si->vectors[line] = vec->ssi->vectors[vec->vector];
+      si->vectors[line] = vec->e;
       return NULL;
    }
    else
