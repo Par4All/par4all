@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.335  1999/03/30 09:19:55  coelho
+# umask fi fixed;-)
+#
 # Revision 1.334  1998/09/28 15:42:18  ancourt
 # add css files to the kept file list
 #
@@ -404,7 +407,7 @@ MAKEFILE= ${MAKEFILE}
 # the umask within pips is fixed here!
 # however I cannot fix the group at this level.
 UMASK   = 002
-SHELL	= umask $(UMASK) ; exec /bin/sh
+SHELL	= umask \$(UMASK) ; exec /bin/sh
 COPY	= cp
 MOVE	= mv -f
 GMKNODIR= --no-print-directory
