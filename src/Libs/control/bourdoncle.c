@@ -25,6 +25,9 @@
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.11  2003/07/23 13:50:02  irigoin
+ Bug fix in bourdoncle_unstructured_free()
+
  Revision 1.10  2003/07/16 15:39:54  irigoin
  New debugging statements to locate a bug revealed by unstruc12.f and
  unstruc12b.f. The bug turned out to be in gen_position(), a newgen
@@ -2314,8 +2317,11 @@ static void suppress_statement_reference(control c)
 
 static void bourdoncle_unstructured_free(unstructured u)
 {
-  /* Suppress references to statements */
-  gen_recurse(u, control_domain, gen_true, suppress_statement_reference);
+  /* Suppress references to statements, but do not go down recursively
+     into nested unstructured. */
+  gen_multi_recurse(u,
+		    statement_domain, gen_false, gen_null,
+		    control_domain, gen_true, suppress_statement_reference);
 
   free_unstructured(u);
 }
