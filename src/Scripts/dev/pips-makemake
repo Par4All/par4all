@@ -2,7 +2,7 @@
 # for debug, try:
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 17:37:26 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 18:12:01 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -86,21 +86,21 @@ current_directory=`pwd`
 # install_lib_dir for library files
 # install_exe_dir for executable files
 
-install_file_dir=$PIPS_INCLUDEDIR
-install_lib_dir=$PIPS_LIBDIR
-install_exe_dir=$PIPS_BINDIR
+install_file_dir='$(PIPS_INCLUDEDIR)'
+install_lib_dir='$(PIPS_LIBDIR)'
+install_exe_dir='$(PIPS_BINDIR)'
 
 case $DIRTYPE in
   Lib) ALL_RULE_TARGET='lib$(TARGET).a' ;;
   Passes) ALL_RULE_TARGET='$(TARGET)' ;;
   Scripts) ALL_RULE_TARGET='.runable' ;
-           install_file_dir=$PIPS_UTILDIR ;
-           install_lib_dir=$PIPS_UTILDIR ;
-           install_exe_dir=$PIPS_UTILDIR ;;
+           install_file_dir='$(PIPS_UTILDIR)' ;
+           install_lib_dir='$(PIPS_UTILDIR)' ;
+           install_exe_dir='$(PIPS_UTILDIR)' ;;
   Runtime) ALL_RULE_TARGET='' ;
-           install_file_dir=$PIPS_EXTEDIR ;
-           install_exe_dir=$PIPS_EXTEDIR ;
-           install_lib_dir=$PIPS_EXTEDIR ;;
+           install_file_dir='$(PIPS_EXTEDIR)' ;
+           install_exe_dir='$(PIPS_EXTEDIR)' ;
+           install_lib_dir='$(PIPS_EXTEDIR)' ;;
   *) usage 5 "unexpected directory type $DIRTYPE"
 esac
 
