@@ -132,8 +132,7 @@ instruction *inst;
     case is_instruction_call: {
 	/* case where there is a unique assignment in do-enddo loop nest*/
 	 *nested_level = gen_length(*list_loop_statement);
-	 *inst =make_instruction(is_instruction_block,
-				 CONS(STATEMENT,s,NIL));  
+	 *inst =make_instruction_block(CONS(STATEMENT,s,NIL));  
 	 *blocks =CONS(STATEMENT,s,NIL);
         return;
 	   }
