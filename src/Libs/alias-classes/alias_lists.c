@@ -167,10 +167,9 @@ make_alias_lists_for_sub_regions(string module_name)
 */
 
 static bool
-add_pair_to_existing_list(alias_pair)
+add_pair_to_existing_list(list alias_pair)
 {
-    list *rest_alias_lists;
-    list alias_list;
+    list rest_alias_lists, alias_list;
     region reg, alias_reg;
     Psysteme reg_sys, alias_reg_sys;
     bool result = FALSE;
@@ -186,11 +185,11 @@ add_pair_to_existing_list(alias_pair)
 	    print_region(reg);
 	}
     
-    rest_alias_lists = &l_alias_lists;
+    rest_alias_lists = l_alias_lists;
     if (l_alias_lists != NIL)
 	do {
-	    alias_list = LIST( CAR(*rest_alias_lists) );
-	    alias_reg = LIST( CAR(alias_list) );
+	    alias_list = LIST( CAR(rest_alias_lists) );
+	    alias_reg = EFFECT( CAR(alias_list) );
 
 	    ifdebug(9)
 		{
@@ -208,11 +207,16 @@ add_pair_to_existing_list(alias_pair)
 
 		    pips_debug(4,"same region\n");
 
-		    alias_list = gen_nconc(alias_list,CDR(alias_pair));
+		    alias_list = gen_nconc(
+			alias_list,
+			CONS(EFFECT,
+			     region_dup(EFFECT(CAR(CDR(alias_pair)))),
+			     NIL)
+			    );
 		}
 	    }
-	    rest_alias_lists = &CDR(*rest_alias_lists);
-	} while (*rest_alias_lists != NIL && result == FALSE);
+	    rest_alias_lists = CDR(rest_alias_lists);
+	} while (rest_alias_lists != NIL && result == FALSE);
 
     ifdebug(9) 
 	{
@@ -262,7 +266,7 @@ alias_lists( string module_name )
 					    TRUE));
     MAP(EFFECTS, alias_pair_effects,
 	{
-	    list alias_pair = regions_dup(effects_to_list(alias_pair_effects));
+	    list alias_pair = effects_to_list(alias_pair_effects);
 
 	    ifdebug(9)
 		{
@@ -271,7 +275,7 @@ alias_lists( string module_name )
 		}
 
 	    if ( ! add_pair_to_existing_list(alias_pair) )
-	    l_alias_lists = gen_nconc(l_alias_lists,CONS(LIST,alias_pair,NIL));
+	    l_alias_lists = gen_nconc(l_alias_lists,regions_dup(alias_pair));
 
 	    pips_debug(9,"IN pair added\n");
 		},
