@@ -1,19 +1,16 @@
 /* package sc 
  * $RCSfile: sc_elim_simple_redund.c,v $ (version $Revision$)
- * $Date: 1996/07/18 19:15:54 $, 
+ * $Date: 1996/08/07 13:41:37 $, 
  */
 
 #include <stdio.h>
 #include <string.h>
-#include <setjmp.h>
 
 #include "arithmetique.h"
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-
-jmp_buf overflow_error;
 
 /* boolean sc_elim_simple_redund_with_eq(Psysteme ps, Pcontrainte eg):
  * elimination en place des contraintes d'un systeme ps, qui sont redondantes
