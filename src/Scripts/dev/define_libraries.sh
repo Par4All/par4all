@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.28  1998/04/16 12:03:48  coelho
+# pip is part of paf*
+#
 # Revision 1.27  1998/04/16 09:07:18  coelho
 # paf-related libs moved out.
 #
@@ -81,10 +84,10 @@ PIPS_DOCS='Documentation constants help manl newgen'
 
 PIPS_ORDERED_LIBS='xpomp text-util properties misc ri-util newgen conversion movements pipsdbm comp_sections transformer bootstrap control hyperplane flint syntax prettyprint static_controlize effects effects-generic effects-simple semantics complexity continuation reductions regions effects-convex alias-classes callgraph icfg paf-util pip ricedg array_dfg prgm_mapping scheduling reindexing chains rice transformations hpfc atomizer wp65 preprocessor pipsmake top-level pips tpips wpips fpips'
 
-paf_libs='-lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize'
+paf_libs='-lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lpip'
 
 # all libraires for pips
-PIPS_LIBS='-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lsyntax -leffects-simple -leffects-convex -leffects-generic -lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer -lpip -lpreprocessor -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lnewgen $(NEWGEN_LIBS) $(LINEAR_LIBS) -lm -lrx'
+PIPS_LIBS='-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lsyntax -leffects-simple -leffects-convex -leffects-generic -lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer -lpreprocessor -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lnewgen $(NEWGEN_LIBS) $(LINEAR_LIBS) -lm -lrx'
 
 
 #
