@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: lattice_extraction.c,v $
+ * Revision 1.9  1997/04/10 08:53:06  coelho
+ * property name changed.
+ *
  * Revision 1.8  1997/04/08 06:41:22  coelho
  * useless var removed.
  *
@@ -127,7 +130,7 @@ extract_lattice(
 
     neq = sc_nbre_egalites(s);
 
-    if (neq==0 || !get_bool_property("HPFC_LATTICE_EXTRACTION")) 
+    if (neq==0 || !get_bool_property("HPFC_EXTRACT_LATTICE")) 
     {
 	/* void implementation: nothing done!
 	 */
