@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.4  1997/05/02 16:35:59  coelho
+! global; buffer id shared with latter unpacking.
+!
 ! Revision 1.3  1997/04/17 11:51:23  coelho
 ! comments and debug added.
 !
@@ -26,9 +29,9 @@
 !
       subroutine HPFC NCAST
       include "hpfc_commons.h"
-      integer info
+      integer bufid
       debug(print *, "ncast ", MY LID, " - ", MCAST HOST)
-      call pvmfrecv(HOST TID, MCAST HOST, INFO)
+      call pvmfrecv(HOST TID, MCAST HOST, bufid)
       MCAST HOST = MCAST HOST + 2
       debug(print *, "ncast done")
       end
@@ -48,9 +51,8 @@
 !
       subroutine HPFC RCV FROM HOST
       include "hpfc_commons.h"
-      integer info
       debug(print *, "rcv from host ", MY LID, " - ", HOST RCV CHANNEL)
-      call pvmfrecv(HOST TID, HOST RCV CHANNEL, info)
+      call pvmfrecv(HOST TID, HOST RCV CHANNEL, BUFFER ID)
       HOST RCV CHANNEL = HOST RCV CHANNEL+2
       debug(print *, "rcv from host done")
       end
@@ -72,9 +74,8 @@
       subroutine HPFC RCV FROM NODE(lid)
       include "hpfc_commons.h"
       integer lid
-      integer bufid
       debug(print *, "rcv from node ", lid, " - ", RECV CHANNELS(lid))
-      call pvmfrecv(NODE TIDS(lid), RECV CHANNELS(lid), bufid)
+      call pvmfrecv(NODE TIDS(lid), RECV CHANNELS(lid), BUFFER ID)
       RECV CHANNELS(lid) = RECV CHANNELS(lid)+2
       debug(print *, "rcv from node done")
       end
