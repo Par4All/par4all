@@ -18,6 +18,9 @@ OPTEMPTY (([ \t\n])*)
 #include "tpips.h"
 #include "tp_yacc.h"
 
+#define skip_blanks(str) \
+  while (*str && (*str==' ' || *str=='\t' || *str=='\n')) str++
+
 /* now get the characters from a string, not from a file */
 #ifndef FLEX_SCANNER
 
@@ -37,6 +40,54 @@ void yyrestart(FILE *f){ yyin = f;}
 }
 
 #endif
+
+static char * line_to_parse;
+static char * line_parsed;
+
+void tpips_set_line_to_parse(char * line)
+{
+    skip_blanks(line);
+
+    /* store line pointer */
+    line_parsed = line_to_parse = line;
+
+    /* cut line at the beginning of comments */
+    while (*line)
+    {
+	if ((*line) == TPIPS_COMMENT_PREFIX)
+	{
+	    *line = 0;
+	    break;
+	}
+	line++;
+    }
+}
+
+char * tpips_get_line_to_parse(void)
+{
+    return line_to_parse;
+}
+
+static void tpips_lex_unput(int c)
+{
+    pips_debug(9,"unput char '%c'(0x%2x)\n", c,c);
+    pips_assert("some place to unput a char", line_parsed<line_to_parse);
+    *(--line_to_parse) = (char) c;
+}
+
+static void tpips_lex_print_pos(FILE* fout)
+{
+    fprintf(fout,"%s\n",line_parsed);
+    fprintf(fout,"%*s^\n",(int)((long) line_to_parse - (long)line_parsed),"");
+}
+
+static int tpips_lex_input (void)
+{
+    char c = *line_to_parse;
+    pips_debug(9,"input char '%c'(0x%2x) from input\n", c, c);
+    if (c) line_to_parse++;
+    return (int) c;
+}
 
 %}
 
