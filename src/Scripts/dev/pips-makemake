@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.278  1997/04/28 08:37:05  coelho
+# *** empty log message ***
+#
 # Revision 1.277  1997/04/17 18:58:35  coelho
 # *** empty log message ***
 #
@@ -356,13 +359,13 @@ echo:; @echo \$(ECHO)
 # Default rules
 ifneq (\$(ARCH),.)
 %: \$(ARCH)/%
+%.o: \$(ARCH)/%.o
+%.a: \$(ARCH)/%.a
 endif
 # C:
-\$(ARCH)/%.o:	%.c 
-	\$(COMPILE) \$< -o \$@
+\$(ARCH)/%.o: %.c ; \$(COMPILE) \$< -o \$@
 # Fortran 77:
-\$(ARCH)/%.o:	%.f
-	\$(F77COMPILE) \$< -o \$@
+\$(ARCH)/%.o: %.f ; \$(F77COMPILE) \$< -o \$@
 
 # if LATEX, MAKEIDX, LX2HTML, DVIPS RMAN and so are not avaible, 
 # the following rules would not prevent compilation...
