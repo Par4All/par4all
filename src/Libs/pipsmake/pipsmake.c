@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.71  2002/04/05 15:36:59  coelho
+ * hop.
+ *
  * Revision 1.70  2002/04/05 15:36:10  coelho
  * hop.
  *
@@ -404,7 +407,7 @@ static void update_preserved_resources(string oname, rule ru)
 static bool apply_a_rule(string oname, rule ru)
 {
     static int number_of_applications_of_a_rule = 0;
-    static bool checkpoint_workspace_being_done = false;
+    static bool checkpoint_workspace_being_done = FALSE;
 
     double initial_memory_size = 0.;
     string run = rule_phase(ru), rname, rowner;
@@ -429,9 +432,9 @@ static bool apply_a_rule(string oname, rule ru)
 	 apply_a_rule ! 
 	 * maybe it would be better treater in checkpoint_workspace?
       */
-      checkpoint_workspace_being_done = true;
+      checkpoint_workspace_being_done = TRUE;
       checkpoint_workspace();
-      checkpoint_workspace_being_done = false;
+      checkpoint_workspace_being_done = FALSE;
       number_of_applications_of_a_rule = 0;
     }
 
