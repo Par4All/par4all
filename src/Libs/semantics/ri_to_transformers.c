@@ -72,7 +72,9 @@ statement s;
 	    (void) fprintf(stderr, "statement %03d (%d,%d):\n",
 			   statement_number(s),
 			   ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
-	    (void) print_transformer(load_statement_transformer(s));
+	    /* (void) print_transformer(load_statement_transformer(s)); */
+	    (void) print_transformer(t);
+	    dump_transformer(t);
 	    pips_error("statement_to_transformer",
 		       "Inconsistent transformer detected\n");
 	}
