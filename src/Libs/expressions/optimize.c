@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.38  2000/05/26 11:10:41  coelho
+ * check for manageable expressions...
+ *
  * Revision 1.37  2000/05/25 15:39:21  coelho
  * hop.
  *
@@ -215,76 +218,107 @@ get_eole_command
 			    " -o ", in, " ", out, NULL));
 }
 
+/************************************************ EOLE MANAGEABLE EXPRESSION */
+
+static bool is_string_constant(entity e)
+{
+  basic b = entity_basic(e);
+
+  if (type_functional_p(entity_type(e)) && 
+      value_constant_p(entity_initial(e)) && 
+      !basic_undefined_p(b))
+    return basic_string_p(b);
+
+  return FALSE;
+}
+
+static void eole_okay_call_rwt(call c, bool * okay)
+{
+  if (is_string_constant(call_function(c)))
+    *okay = FALSE;
+
+  /* IMPLIED-DO ? others ? */
+}
+
+static bool eole_manageable_expression(expression e)
+{
+  bool okay = TRUE;
+  gen_context_multi_recurse(e, &okay,
+			    call_domain, gen_true, eole_okay_call_rwt,
+			    NULL);
+  return okay;
+} 
 
 /********************************************************* INTERFACE TO EOLE */
 
-/* the list of right hand side expressions.
+/* extract expressions with loop level information.
  */
-static list /* of expressionwithlevel */ rhs;
-
-/* the current list of loop indices for the expression (not used yet).
- */
-static list /* of entity */ indices; 
-
-static void add_one_more_expression(expression e)
+typedef struct 
 {
-  expressionwithlevel ewl = make_expressionwithlevel(gen_nreverse(gen_copy_seq(indices)), e);
-  rhs = CONS(EXPRESSIONWITHLEVEL, ewl, rhs);
+  list /* expressionwithlevel */ rhs; /* the list of RHS expressions. */
+  list /* entity */ indices; /* the list of loop indices (not used yet). */
+} extract_expr_t, * extract_expr_p;
+
+static void add_one_more_expression(expression e, extract_expr_p context)
+{
+  expressionwithlevel ewl = 
+    make_expressionwithlevel(gen_nreverse(gen_copy_seq(context->indices)), e);
+  context->rhs = CONS(EXPRESSIONWITHLEVEL, ewl, context->rhs);
 }
 
-static bool loop_flt(loop l)
+static bool loop_flt(loop l, extract_expr_p context)
 {
   entity index = loop_index(l);
-  indices = CONS(ENTITY, index, indices);
+  context->indices = CONS(ENTITY, index, context->indices);
   return TRUE; /* keep on. */
 }
 
-static void loop_rwt(loop l)
+static void loop_rwt(loop l, extract_expr_p context)
 {
-  list tmp = indices;
-  pips_assert("same index", ENTITY(CAR(indices))==loop_index(l));
-  indices = CDR(indices);
+  list tmp = context->indices;
+  pips_assert("same index", ENTITY(CAR(context->indices))==loop_index(l));
+  context->indices = CDR(context->indices);
   CDR(tmp) = NIL;
   gen_free_list(tmp);
 }
 
 /* rhs expressions of assignments.
  */
-static bool call_filter(call c)
+static bool call_filter(call c, extract_expr_p context)
 {
-  if (ENTITY_ASSIGN_P(call_function(c)))
-  {
-    expression e = EXPRESSION(CAR(CDR(call_arguments(c))));
-    add_one_more_expression(e);
-  }
+  /* put all manageable expressions arguments... */
+  MAP(EXPRESSION, e, 
+      if (eole_manageable_expression(e)) add_one_more_expression(e, context), 
+      call_arguments(c));
   return FALSE;
 }
 
 /* other expressions may be found in loops and so?
  */
-static bool expr_filter(expression e)
+static bool expr_filter(expression e, extract_expr_p context)
 {
-  add_one_more_expression(e);
+  if (eole_manageable_expression(e))
+    add_one_more_expression(e, context);
   return FALSE;
 }
 
 static list /* of expressionwithlevel */ 
 get_list_of_rhs(statement s)
 {
-  list result;
+  extract_expr_t context;
 
-  rhs = NIL;
-  indices = NIL;
-  gen_multi_recurse(s,
-		    expression_domain, expr_filter, gen_null,
-		    call_domain, call_filter, gen_null,
-		    loop_domain, loop_flt, loop_rwt,
-		    NULL);
+  context.rhs = NIL;
+  context.indices = NIL;
+
+  gen_context_multi_recurse(s, &context,
+			    expression_domain, expr_filter, gen_null,
+			    call_domain, call_filter, gen_null,
+			    loop_domain, loop_flt, loop_rwt,
+			    NULL);
+
+  pips_assert("no indices", context.indices==NIL);
   
-  result = gen_nreverse(rhs);
-  rhs = NIL;
-  indices = NIL;
-  return result;
+  return gen_nreverse(context.rhs);
 }
 
 /* export a list of expression of the current module.
