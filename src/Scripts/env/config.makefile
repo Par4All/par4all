@@ -6,7 +6,9 @@ SCRIPTS =
 
 SFILES =	pipsrc.ref \
 		make-pipsrc.sh \
-		make-pipsrc.csh
+		make-pipsrc.csh \
+		Xressources \
+		xinitrc
 
 RFILES = 	pipsrc.sh \
 		pipsrc.csh
