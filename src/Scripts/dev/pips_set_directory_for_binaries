@@ -5,11 +5,12 @@
 # this allows to move them on some other disk...
 # PIPS_ARCH and PIPS_DIRECTORY_FOR_BINARIES should be kept coherent...
 #
-# usage: x [-g group] [-h] [dir [arch]]
-#
-# $id$
+# $Id$
 #
 # $Log: pips_set_directory_for_binaries,v $
+# Revision 1.3  1997/05/22 20:17:12  coelho
+# *** empty log message ***
+#
 # Revision 1.2  1997/05/22 20:07:43  coelho
 # *** empty log message ***
 #
@@ -36,12 +37,21 @@ error()
     exit ${1:-1}
 }
 
+usage()
+{
+	cat <<-EOF
+	Usage: $script [-g group] [-h] [dir [arch]]
+	  $@
+	EOF
+    exit ${1:-0}
+}
+
 md()
 {
     for d in "$@"
     do 
-       verb 
-       test -d $d || mkdir $d ;
+       verb "[md] ${d}"
+       test -d ${d} || mkdir ${d} || error 6 "[md] cannot on ${d}" ;
     done
 }
 
@@ -79,7 +89,9 @@ md 	${dir} \
 	${dir}/${arch} 
 
 for x in Prod Deve ; do
+    md ${dir}/${arch}/${x}
     for s in PIPS NEWGEN LINEAR EXTERN ; do
+	md ${dir}/${arch}/${x}/${s}
         for d in Bin Lib ; do
             md ${dir}/${arch}/${x}/${s}/${d}
         done
@@ -95,7 +107,7 @@ done
 test "${group}" && {
 
     verb "Group ${group}"
-    find ${dir}/${arch} -type d -print | chgrp ${group}
+    find ${dir}/${arch} -type d -print | xargs chgrp ${group}
 
     verb "Rights rwxrwsr-x"
     find ${dir}/${arch} -type d -print | xargs chmod ug+rwx,g+s,o+rx-w 
