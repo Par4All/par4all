@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: OptionParser.java,v $
+ * Revision 1.5  1998/07/03 16:36:24  coelho
+ * new INDIRECT label and button with choice...
+ *
  * Revision 1.4  1998/07/03 08:12:45  coelho
  * tip line added.
  *
@@ -64,6 +67,8 @@ public class OptionParser
 			LABEL_WITH_MENU		= "LABEL_WITH_MENU",
 			BUTTON_WITH_CHOICE	= "BUTTON_WITH_CHOICE",
 			LABEL_WITH_CHOICE	= "LABEL_WITH_CHOICE",
+			IBUTTON_WITH_CHOICE	= "IBUTTON_WITH_CHOICE",
+                        ILABEL_WITH_CHOICE	= "ILABEL_WITH_CHOICE",
 			MENU			= "MENU",
 			RADIOBUTTONGROUP	= "RADIOBUTTONGROUP",
 			RADIOBUTTON		= "RADIOBUTTON",
@@ -191,9 +196,13 @@ public class OptionParser
           else if(s.equals(LABEL_WITH_MENU))
 	    addLabelWithMenu();
           else if(s.equals(BUTTON_WITH_CHOICE))
-	    addButtonWithChoice();
+	    addButtonWithChoice(true);
+          else if(s.equals(IBUTTON_WITH_CHOICE))
+	    addButtonWithChoice(false);
           else if(s.equals(LABEL_WITH_CHOICE))
-	    addLabelWithChoice();
+	    addLabelWithChoice(true);
+          else if(s.equals(ILABEL_WITH_CHOICE))
+	    addLabelWithChoice(false);
           else if(s.equals(RADIOBUTTON))
 	    addRadioButtonMenuItem(m1, m2, l, bg1, bg2);
 
@@ -216,10 +225,14 @@ public class OptionParser
 
   /** A short add method for a GridBagLayout.
     */
-  public void add(Container cont, Component comp,
-		  int x, int y, int w, int h,
-		  int px, int py, double wex, double wey, int in,
-		  int f, GridBagConstraints c)
+  public void add(Container cont, 
+		  Component comp,
+		  int x, int y, 
+		  int w, int h,
+		  int px, int py, 
+		  double wex, double wey, 
+		  int in, int f, 
+		  GridBagConstraints c)
     {
       c.anchor = GridBagConstraints.EAST;
       c.insets = new Insets(in,in,in,in);
@@ -243,10 +256,11 @@ public class OptionParser
     */
   public void addSingleButton()
     {
-      String 
-	  name = p.nextNonEmptyLine(),
-	  command = p.nextNonEmptyLine(),
-	  tip = p.nextNonEmptyLine();
+      String name, command, tip;
+
+      name = p.nextNonEmptyLine();
+      command = p.nextNonEmptyLine();
+      tip = p.nextNonEmptyLine();
 
       PButton b = new PButton(name, command, tip);
       add((Container)optionPanel,b,
@@ -266,11 +280,12 @@ public class OptionParser
     */
   public void addSingleCheckBox()
     {
-      String
-	  name = p.nextNonEmptyLine(),
-	  command = p.nextNonEmptyLine(),
-	  checking = p.nextNonEmptyLine(),
-	  tip = p.nextNonEmptyLine();
+      String name, command, checking, tip;
+
+      name = p.nextNonEmptyLine();
+      command = p.nextNonEmptyLine();
+      checking = p.nextNonEmptyLine();
+      tip = p.nextNonEmptyLine();
 
       PCheckBox cb = new PCheckBox(name,command,checking,tip);
       add((Container)optionPanel,cb,
@@ -284,7 +299,6 @@ public class OptionParser
       cbmi.addActionListener(getCBMIListener());
     }
     
-
   /** Adds a line to optionPanel.
     * Adds a separator to menu.
     * This method can be called everywhere in the tree structure.
@@ -307,10 +321,11 @@ public class OptionParser
     */
   public void addButtonWithText()
     {
-      String 
-	  name = p.nextNonEmptyLine(),
-	  command = p.nextNonEmptyLine(),
-	  tip = p.nextNonEmptyLine();
+      String name, command, tip;
+
+      name = p.nextNonEmptyLine();
+      command = p.nextNonEmptyLine();
+      tip = p.nextNonEmptyLine();
 	     
       PTextField tf = new PTextField();
       PButton b = new PButton(name, command, tip, tf, null);
@@ -423,7 +438,7 @@ public class OptionParser
     * Adds an executable menuItem to menu.
     * This method can only be called the root of the tree structure.
     */
-  public void addButtonWithChoice()
+  public void addButtonWithChoice(boolean direct)
     {
       String name, command, checking, tip;
 
@@ -436,7 +451,7 @@ public class OptionParser
       add((Container)optionPanel,b,
 	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
-      PComboBox cob = new PComboBox(checking);
+      PComboBox cob = new PComboBox(checking, null, direct);
 
       PMenuItem mi = new PMenuItem(name,command);
       menu.add(mi);
@@ -453,7 +468,7 @@ public class OptionParser
       add((Container)optionPanel,cob,
 	  1,position++,2,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
 
-      b.addActionListener(getBListener());
+      b.addActionListener(getBCOBListener(cob));
       cob.addActionListener(getSingleCOBListener());
       mi.addActionListener(getMIListener());
     }
@@ -463,7 +478,7 @@ public class OptionParser
     * Adds a menu to menu.
     * This method can only be called the root of the tree structure.
     */
-  public void addLabelWithChoice()
+  public void addLabelWithChoice(boolean direct)
     {
       String name, checking, mark, tip;
 
@@ -473,10 +488,10 @@ public class OptionParser
       tip = p.nextNonEmptyLine();
 
       PLabel l = new PLabel(name, tip);
-      add((Container)optionPanel,l,
+      add(optionPanel,l,
 	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
-      PComboBox cob = new PComboBox(checking,mark);
+      PComboBox cob = new PComboBox(checking,mark,direct);
       state.addElement(cob);
       
       PMenu m = new PMenu(name);
@@ -533,11 +548,29 @@ public class OptionParser
       if(m2 != null) m2.add(newm2);
     }
     
+  /** group some stuff together in the panel.
+    */
   public void addGroup(PMenu m1, PMenu m2, PLabel l, 
 		       PButtonGroup bg1, PButtonGroup bg2)
     {
-      String name = p.nextNonEmptyLine();
+      String name, tip;
+
+      name = p.nextNonEmptyLine();
+      tip = p.nextNonEmptyLine();
+
+      PPanel newp= new PPanel(new GridBagLayout());
+      newp.setBorder(BorderFactory.createTitledBorder(name));
+      newp.setToolTipText(tip);
+
+      add(optionPanel, newp, 
+	  0,position++,3,1,1,1,0.0,0.0,2,GridBagConstraints.HORIZONTAL,c);
+
+      PPanel saved = optionPanel;
+      optionPanel = newp;
+
       parseCommand(m1, m2, l, bg1, bg2);
+
+      optionPanel = saved;
     }
 
   /** Sets the beggining of a button group.
@@ -616,14 +649,47 @@ public class OptionParser
     */
   public ActionListener getBListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
            public void actionPerformed(ActionEvent e)
 	     { tpips.sendCommand(((PButton)e.getSource()).command); }
 	 };
-      return a;
     }
     
+  /** an action on a comboboxed button.
+    */
+  class BCOBActionListener 
+    implements ActionListener
+  {
+    private PComboBox cob;
+    
+    BCOBActionListener(PComboBox cob) { this.cob = cob; }
+    
+    /** a button of a combobox is pressed.
+      * its action depends on whether cob is direct or not.
+      */
+    public void actionPerformed(ActionEvent e)
+      {
+	PButton b = (PButton) e.getSource();
+	if (cob.direct)
+	  {
+	    tpips.sendCommand(((PButton)e.getSource()).command);
+	  }
+	else
+	  {
+	    int selectedIndex = cob.getSelectedIndex();
+	    String command = (String)cob.vCommand.elementAt(selectedIndex);
+	    tpips.sendCommand(command);
+	  }
+      }
+  }
+
+  /** @return an ActionListener for a button in a combobox.
+    */
+  public ActionListener getBCOBListener(PComboBox cob)
+    {
+      return new BCOBActionListener(cob);
+    }
 
   /** @return an ActionListener for a button with a text
     */
@@ -708,18 +774,20 @@ public class OptionParser
     */
   public ActionListener getSingleCOBListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
            public void actionPerformed(ActionEvent e)
 	     {
 	       PComboBox cob = (PComboBox)e.getSource();
-	       int selectedIndex = cob.getSelectedIndex();
-               String command = 
-	         (String)cob.vCommand.elementAt(selectedIndex);
-	       tpips.sendCommand(command);
+	       if (cob.direct) 
+		 {
+		   int selectedIndex = cob.getSelectedIndex();
+		   String command = 
+		     (String)cob.vCommand.elementAt(selectedIndex);
+		   tpips.sendCommand(command);
+		 }
 	     }
 	 };
-      return a;
     }
     
 
@@ -727,7 +795,7 @@ public class OptionParser
     */
   public ActionListener getCOBListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
            public void actionPerformed(ActionEvent e)
 	     {
@@ -736,20 +804,21 @@ public class OptionParser
 	       PRadioButtonMenuItem rbmi = 
 	         (PRadioButtonMenuItem)cob.vRbmi.elementAt(selectedIndex);
 	       rbmi.setSelected(true);
-
-               String command = (String)cob.vCommand.elementAt(selectedIndex);
-               tpips.sendCommand(command);
+	       if (cob.direct)
+		 {
+		   String command = (String)
+		     cob.vCommand.elementAt(selectedIndex);
+		   tpips.sendCommand(command);
+		 }
 	     }
 	 };
-      return a;
     }
-    
 
   /** @return an ActionListener for a radiobuttonmenuitem linked to a combobox
     */
   public ActionListener getComplexRBMIListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
            public void actionPerformed(ActionEvent e)
 	     {
@@ -758,15 +827,13 @@ public class OptionParser
                tpips.sendCommand(rbmi.command);
 	     }
 	 };
-      return a;
     }
-    
 
   /** @return an ActionListener for a radiobuttonmenuitem on its own
     */
   public ActionListener getSingleRBMILListener()
     {
-      ActionListener a = new ActionListener()
+      return new ActionListener()
          {
 	   public void actionPerformed(ActionEvent e)
 	     {
@@ -775,7 +842,6 @@ public class OptionParser
                tpips.sendCommand(rbmi.command);
              } 
 	 };
-      return a;
     }
 
 
