@@ -25,7 +25,7 @@
 # Francois Irigoin, 3 February 1992
 
 file=$1
-workspace=`basename $file .f`
+workspace=`${PIPS_BASENAME:-basename} $file .f`
 module=`echo $workspace | tr a-z A-Z`
 library=`pwd|sed 's;/.*/;;'`
 echo file=$file module=$module workspace=$workspace library=$library
