@@ -641,12 +641,7 @@ dead_statement_rewrite(statement s)
    }
 
    case is_instruction_unstructured:
-       unspaghettify_rewrite_unstructured(s);
-       ifdebug(8) {
-          fprintf(stderr, "After dead_rewrite_unstructured:\n");
-          print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-          fprintf(stderr, "-----\n");
-       }
+       /* Rely on the unspaghettify() at end: */
        break;
 
    case is_instruction_call:
