@@ -1,7 +1,19 @@
 %{
 #include <stdlib.h>
 #include <string.h>
+
 #include "genC.h"
+#include "linear.h"
+#include "ri.h"
+
+#include "resources.h"
+
+#include "misc.h"
+#include "ri-util.h"
+#include "pipsdbm.h"
+
+#include "sac-local.h"
+#include "sac.h"
 #include "patterns.tab.h"
 
 int patterns_yyerror(char* s);
@@ -45,7 +57,7 @@ int patterns_yyerror(char* s);
 "=="			return EQUAL_OPERATOR_TOK;
 [0-9]+                  { patterns_yylval.iVal = atoi(patterns_yytext); return INTEGER_TOK; }
 [A-Za-z][0-9A-Za-z_]*   { patterns_yylval.strVal = strdup(patterns_yytext); return IDENTIFIER_TOK; }
-[:;,]                   return *patterns_yytext;
 [ \t\n]                 ;
-.                       { patterns_yyerror("Unknown token\n"); return UNKNOWN_TOK; }
+"#".*                   ;
+.                       return *patterns_yytext;
 %%
