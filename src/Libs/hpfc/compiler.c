@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/12/22 11:27:08 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/12/22 16:52:15 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -119,14 +119,13 @@ statement stat;
 statement *hoststatp,*nodestatp;
 {
     list 
-	lhost=NULL,
-	lnode=NULL;
+	lhost=NIL,
+	lnode=NIL;
     statement 
 	hostcd,
 	nodecd;
 
-    pips_assert("hpfcompileblock",
-		(instruction_block_p(statement_instruction(stat))));
+    assert(instruction_block_p(statement_instruction(stat)));
 
     (*hoststatp) =
 	MakeStatementLike(stat,
@@ -169,8 +168,7 @@ statement *hoststatp,*nodestatp;
     expression condition;
 	
     
-    pips_assert("hpfcompiletest",
-		(instruction_test_p(statement_instruction(stat))));
+    assert(instruction_test_p(statement_instruction(stat)));
 
     the_test = instruction_test(statement_instruction(stat));
     condition = test_condition(the_test);
@@ -221,7 +219,7 @@ statement *hoststatp, *nodestatp;
     loop
 	the_loop = instruction_loop(statement_instruction(stat));
 
-    pips_assert("hpfcompileloop", (statement_loop_p(stat)));
+    assert(statement_loop_p(stat));
 
     if (execution_parallel_p(loop_execution(the_loop)))
     {
@@ -290,8 +288,7 @@ void hpfcompilegoto(stat,hoststatp,nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
-    pips_assert("hpfcompilegoto",
-		(instruction_goto_p(statement_instruction(stat))));
+    assert(instruction_goto_p(statement_instruction(stat)));
 
     /*
      * nothing is done here, but the corresponding statement is to be
@@ -325,8 +322,7 @@ statement *hoststatp,*nodestatp;
     call 
 	c = instruction_call(statement_instruction(stat));
 
-    pips_assert("hpfcompilecall",
-		(instruction_call_p(statement_instruction(stat))));
+    assert(instruction_call_p(statement_instruction(stat)));
 
     debug(7,"hpfcompilecall", "function %s\n", entity_name(call_function(c)));
 
@@ -395,8 +391,7 @@ statement *hoststatp,*nodestatp;
 	    w = EXPRESSION(CAR(args)),
 	    r = EXPRESSION(CAR(CDR(args)));
 
-	pips_assert("hpfcompilecall",
-		    syntax_reference_p(expression_syntax(w)));
+	assert(syntax_reference_p(expression_syntax(w)));
 
 	if (array_distributed_p
 	    (reference_variable(syntax_reference(expression_syntax(w)))))
@@ -479,8 +474,7 @@ statement *hoststatp,*nodestatp;
 {
     instruction inst=statement_instruction(stat);
 
-    pips_assert("hpfcompileunstructured",
-		(instruction_unstructured_p(inst)));
+    assert(instruction_unstructured_p(inst));
 
     if (one_statement_unstructured(instruction_unstructured(inst)))
     {
@@ -600,9 +594,8 @@ statement *hoststatp,*nodestatp;
 	new_ct = (control) GET_CONTROL_MAPPING(hostmap, ct);
 	new_ce = (control) GET_CONTROL_MAPPING(hostmap, ce);
 
-	pips_assert("hpfcompileunstructured",
-		    !control_undefined_p(new_ct) || 
-		    !control_undefined_p(new_ce));
+	assert(!control_undefined_p(new_ct) || 
+	       !control_undefined_p(new_ce));
 
 	ifdebug(9)
 	{
@@ -634,9 +627,8 @@ statement *hoststatp,*nodestatp;
 	new_ct = (control) GET_CONTROL_MAPPING(nodemap, ct);
 	new_ce = (control) GET_CONTROL_MAPPING(nodemap, ce);
 
-	pips_assert("hpfcompileunstructured",
-		    !control_undefined_p(new_ct) || 
-		    !control_undefined_p(new_ce));
+	assert(!control_undefined_p(new_ct) || 
+	       !control_undefined_p(new_ce));
 	instruction_unstructured(statement_instruction(*nodestatp)) =
 	    make_unstructured(new_ct, new_ce);
 
@@ -725,8 +717,6 @@ statement stat, *hoststatp, *nodestatp;
 	upper=range_upper(r),
 	increment=range_increment(r);
     
-    pips_assert("hpfcompilesequentialloop",TRUE);
-
     hpfcompiler(body,&hostbody,&nodebody);
     
     if (hpfc_empty_statement_p(hostbody))
@@ -794,8 +784,7 @@ statement stat, *hoststatp, *nodestatp;
 	upper=range_upper(r),
 	increment=range_increment(r);
     
-    pips_assert("hpfcompileparallelloop",
-		execution_parallel_p(loop_execution(the_loop)));
+    assert(execution_parallel_p(loop_execution(the_loop)));
 
     if ((instruction_loop_p(bodyinst)) &&
 	(execution_parallel_p(loop_execution(instruction_loop(bodyinst)))))
