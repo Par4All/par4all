@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/21 11:45:33 $, 
+# $Date: 1996/09/21 11:54:54 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -102,7 +102,14 @@ test "$edit" &&
 $verb copying files in $trgt
 $verb taring...
 
-$tar $taropt $tmp.tar `cat $tmp.list`
+# well, the list is potentially too big for being put as an argument:-(
+# hence this very slow version...
+
+cat $tmp.list |
+while read file 
+do
+    $tar $taropt $tmp.tar $file
+done
 
 # ls -l $tmp.tar 
 
