@@ -5,8 +5,7 @@
  */
 
 #if defined(__GNUC__)
-#warning the "matrice" library is obsolete! 
-#warning use the "matrix" library instead!
+#warning matrice is obsolete, use matrix instead.
 #endif
 
 /* Les matrices sont des matrices pleines, a coefficients rationnels.
