@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: special_cases.c,v $
+ * Revision 1.28  1998/04/02 20:37:47  irigoin
+ * Call to NumberOfElements() replaced by call to element_number()
+ *
  * Revision 1.27  1997/09/13 12:58:41  coelho
  * *** empty log message ***
  *
@@ -335,7 +338,7 @@ compile_one_reduction(
 	(make_call(make_new_reduction_function
 	    (hpfc_reductions_operator(red), prolog, host, entity_basic(var)),
 	     CONS(EXPRESSION, entity_to_expression(var), 
-	     CONS(EXPRESSION, int_to_expression(NumberOfElements(
+	     CONS(EXPRESSION, int_to_expression(element_number(
 		 variable_dimensions(type_variable(entity_type(var))))),
 		  NIL))));
 }
