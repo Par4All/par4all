@@ -1,7 +1,10 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1997/01/07 11:22:15 $, ) 
+ * $Id$
+ * $Log: generate-util.c,v $
+ * Revision 1.18  1997/03/20 10:25:10  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
