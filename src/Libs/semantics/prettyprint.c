@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/12 18:51:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/16 23:41:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/10/12 18:51:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/11/16 23:41:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -35,6 +35,7 @@ static char vcid[] = "%A% ($Date: 1995/10/12 18:51:20 $, ) version $Revision$, g
 #include "effects.h"
 
 #include "semantics.h"
+extern void qsort();
 
 #define PREC_FORESYS_PREFIX "C$PREC"
 #define TRAN_FORESYS_PREFIX "C$TRAN"
@@ -242,44 +243,285 @@ statement stmt;
 }
 
 
+/* It is used to sort arguments preconditions in text_transformer(). */
+static int wordcmp(s1,s2)
+char **s1, **s2;
+{
+    return strcmp(*s1,*s2);
+}
+
+/* The strange argument type is required by qsort(), deep down in the calls */
+static int is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+{
+    /* The constant term is given the highest weight to push constant
+       terms at the end of the constraints and to make those easy
+       to compare. If not, constant 0 will be handled differently from
+       other constants. However, it would be nice to give constant terms
+       the lowest weight to print simple constraints first...
+
+       Either I define two comparison functions, or I cheat somewhere else.
+       Let's cheat? */
+    int is_equal = 0;
+    
+    if (term_cst(*pvarval1) && !term_cst(*pvarval2))
+	is_equal = 1;
+    else if (term_cst(*pvarval1) && term_cst(*pvarval2))
+	is_equal = 0;
+    else if(term_cst(*pvarval2))
+	is_equal = -1;
+    else
+	is_equal = 
+	    strcmp(pips_user_value_name((entity) vecteur_var(*pvarval1)),
+		   pips_user_value_name((entity) vecteur_var(*pvarval2)));
+
+
+    return is_equal; 
+}
+
+
+#define LINE_SUFFIX "\n"
+#define MAX_LINE_LENGTH 70
+
+
+boolean add_to_current_line(crt_line, add_string, str_prefix, txt, first_line)
+string crt_line, add_string, str_prefix;
+text txt;
+boolean first_line;
+{
+  boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+  
+  if(strlen(crt_line) + strlen(add_string) > MAX_LINE_LENGTH-2) {
+    (void) strcat(crt_line, LINE_SUFFIX);
+    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+					    strdup(crt_line)));
+    
+    if(first_line) {
+      first_line = FALSE;
+      if(foresys) {
+	str_prefix = strdup(str_prefix);
+	str_prefix[0] = '\0';
+	(void) strcat(str_prefix, FORESYS_CONTINUATION_PREFIX);
+      }
+    }
+    
+    crt_line[0] = '\0'; (void) strcat(crt_line, str_prefix); 
+    (void) strcat(crt_line, "    ");
+    if(strlen(crt_line) + strlen(add_string) > MAX_LINE_LENGTH-2)
+      pips_error("text_transformer", "line buffer too small");
+  }
+  (void) strcat(crt_line, add_string);
+
+  return(first_line);
+}
+
 /* text text_transformer(transformer tran) 
  * input    : a transformer representing a transformer or a precondition 
  * output   : a text containing commentaries representing the transformer
  * modifies : nothing.
+ *
+ * Modification: AP, Nov 10th, 1995. Instead of building a (very long)
+ * string, I directly use the transformer to build the prettyprint in text
+ * format. This is to avoid the problem occuring when the buffer used in
+ * transformer[precondition]_to_string() is too small. I also use a static
+ * buffer to build each constraint; we are restricted to constraints of
+ * lengths smaller than the line length.
  */
 text text_transformer(transformer tran)
 {
-    text txt = make_text(NIL);
-    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-    string str_tran, str_prefix;
+  text txt = make_text(NIL);
+  boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+  string str_prefix;
+  static char crt_line[MAX_LINE_LENGTH];
+  static char aux_line[MAX_LINE_LENGTH];
+  Pcontrainte peq;
+  Psysteme ps;
+  boolean first_line = TRUE;
 
-    if(tran != (transformer) HASH_UNDEFINED_VALUE && 
-       tran != (transformer) list_undefined) {
-	if (is_transformer){
-	    str_tran = transformer_to_string(tran);
-	    if (foresys) 
-		str_prefix = TRAN_FORESYS_PREFIX;
-	    else 
-		str_prefix = PIPS_NORMAL_PREFIX;
-	}
-	else { 
-	    str_tran = precondition_to_string(tran);
-	    if (foresys) 
-		str_prefix = PREC_FORESYS_PREFIX;
-	    else 
-		str_prefix = PIPS_NORMAL_PREFIX;
-	}
-	
-	if (get_bool_property("PRETTYPRINT_LOOSE"))
-	    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-						    strdup("\n")));
-	MERGE_TEXTS(txt, 
-		    string_predicate_to_commentary(str_tran, str_prefix));
-	if (get_bool_property("PRETTYPRINT_LOOSE"))
-	    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-						strdup("\n")));
+  if (is_transformer) {
+    if (foresys) 
+      str_prefix = TRAN_FORESYS_PREFIX;
+    else 
+      str_prefix = PIPS_NORMAL_PREFIX;
+  }
+  else {
+    if (foresys) 
+      str_prefix = PREC_FORESYS_PREFIX;
+    else 
+      str_prefix = PIPS_NORMAL_PREFIX;
+  }
+
+  ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+					  strdup("\n")));
+
+  crt_line[0] = '\0'; (void) strcat(crt_line, str_prefix);
+  (void) strcat(crt_line, " ");
+
+  if(tran != (transformer) HASH_UNDEFINED_VALUE && 
+     tran != (transformer) list_undefined) {
+    if(tran==transformer_undefined) {
+      if (is_transformer)
+	(void) strcat(crt_line, " TRANSFORMER: TRANSFORMER_UNDEFINED");
+      else
+	(void) strcat(crt_line, " PRECONDITION: TRANSFORMER_UNDEFINED");
     }
-    return txt; 
+    else {
+      list args;
+      int j=0, provi_length = 1;
+      char *provi[100];
+
+      aux_line[0] = '\0';
+      if (is_transformer)
+	(void) strcat(aux_line, " T(");
+      else
+	(void) strcat(aux_line, " P(");
+      if(strlen(crt_line) + strlen(aux_line) > MAX_LINE_LENGTH - 2)
+	pips_error("text_transformer", "line buffer too small");
+
+      (void) strcat(crt_line, aux_line);
+
+      args = transformer_arguments(tran);
+      if(!ENDP(args)) {
+	MAPL(c, {entity e = ENTITY(CAR(c));
+		 if (e==entity_undefined) 
+		   provi[j] = (char*) "entity_undefined";
+		 else
+		   provi[j] = (char*) entity_local_name(e);
+		 j++;
+	       },
+	     args);
+	provi_length = j;
+    
+	qsort(provi, provi_length, sizeof provi[0], wordcmp);
+	if ( provi_length > 1 ) {
+	  for (j=0; j < provi_length-1; j++) {
+	    aux_line[0] = '\0';
+	    (void) strcat(aux_line, provi[j]);
+	    strcat(aux_line,",");
+	    first_line = add_to_current_line(crt_line, aux_line,
+					     str_prefix, txt, first_line);
+	  }
+	}
+	aux_line[0] = '\0';
+	(void) strcat(aux_line, provi[provi_length-1]);
+	strcat(aux_line, ")");
+	if (foresys)
+	  (void) strcat(aux_line, ",");
+	first_line = add_to_current_line(crt_line, aux_line,
+					 str_prefix, txt, first_line);
+      }
+      else
+	strcat(crt_line, ")");
+
+      if(strlen(crt_line)+1 > MAX_LINE_LENGTH-2) {
+	(void) strcat(crt_line, LINE_SUFFIX);
+	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+						strdup(crt_line)));
+
+	if(first_line) {
+	  first_line = FALSE;
+	  if(foresys) {
+	    str_prefix = strdup(str_prefix);
+	    str_prefix[0] = '\0';
+	    (void) strcat(str_prefix, FORESYS_CONTINUATION_PREFIX);
+	  }
+	}
+
+	crt_line[0] = '\0'; (void) strcat(crt_line, str_prefix); 
+	(void) strcat(crt_line, "    ");
+      }
+      else 
+	(void) strcat(crt_line, " ");
+
+      ps = (Psysteme) predicate_system(transformer_relation(tran));
+
+      if (ps != NULL) {
+	boolean first_constraint = TRUE, last_constraint = FALSE;
+	
+	sc_lexicographic_sort(ps, is_inferior_pvarval);
+
+	for (peq = ps->egalites; peq!=NULL; peq=peq->succ) {
+	  last_constraint = ((peq->succ == NULL) &&
+			     (ps->inegalites == NULL));
+	  aux_line[0] = '\0';
+	  if (foresys) {
+	    (void) strcat(aux_line, "(");
+	    (void) egalite_sprint_format(aux_line, peq,
+					 pips_user_value_name, foresys);
+	    (void) strcat(aux_line, ")");
+	    if(! last_constraint)
+	      (void) strcat(aux_line, ".AND."); 
+	  }
+	  else {
+	    if(first_constraint) {
+	      (void) strcat(aux_line, "{");
+	      first_constraint = FALSE;
+	    }
+	    (void) egalite_sprint_format(aux_line, peq,
+					 pips_user_value_name, foresys);
+	    if(! last_constraint)
+	      (void) strcat(aux_line, ", ");
+	    else
+	      (void) strcat(aux_line, "}");
+	  }
+
+	  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+					   txt, first_line);
+	}
+
+	for (peq = ps->inegalites; peq!=NULL; peq=peq->succ) {
+	  last_constraint = (peq->succ == NULL);
+	  aux_line[0] = '\0';
+	  if (foresys) {
+	    (void) strcat(aux_line, "(");
+	    (void) inegalite_sprint_format(aux_line, peq,
+					   pips_user_value_name, foresys);
+	    (void) strcat(aux_line, ")");
+	    if(! last_constraint)
+	      (void) strcat(aux_line, ".AND."); 
+	  }
+	  else {
+	    if(first_constraint) {
+	      (void) strcat(aux_line, "{");
+	      first_constraint = FALSE;
+	    }
+	    (void) inegalite_sprint_format(aux_line, peq,
+					   pips_user_value_name, foresys);
+	    if(! last_constraint)
+	      (void) strcat(aux_line, ", ");
+	    else
+	      (void) strcat(aux_line, "}");
+	  }
+
+	  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+					   txt, first_line);
+	}
+
+	/* If there is no constraint */
+	if((ps->egalites == NULL) && (ps->inegalites == NULL)) {
+	  aux_line[0] = '\0';
+	  (void) strcat(aux_line, "{}");
+	  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+					   txt, first_line);
+	}
+      }
+      else {
+	aux_line[0] = '\0';
+	(void) strcat(aux_line, "SC_UNDEFINED");
+	first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+					 txt, first_line);
+      }
+    }
+
+    /* Save last line */
+    (void) strcat(crt_line, LINE_SUFFIX);
+    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+					    strdup(crt_line)));
+  }
+
+  ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+					  strdup("\n")));
+
+  return txt; 
 }
 
 
