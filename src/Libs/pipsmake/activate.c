@@ -265,9 +265,11 @@ rule r;
 	    string vrn2 = virtual_resource_name(vr);
 	    owner vro = virtual_resource_owner(vr);
 
-	    /* We do not check callers and callees */
-	    if ( owner_callers_p(vro) || owner_callees_p(vro) ) {}
-	    else if (same_string_p(vrn, vrn2))
+	    /* We DO check callers and callees (DB,08/96) */
+            /* if ( owner_callers_p(vro) || owner_callees_p(vro) ) {}
+	    else
+	    */ 
+            if (same_string_p(vrn, vrn2))
 		return TRUE;
 	}, (list) rule_required( r ) );
 
@@ -292,3 +294,9 @@ virtual_resource res;
 	delete_named_resources((string) se);
     }, s);
 }
+
+
+
+
+
+
