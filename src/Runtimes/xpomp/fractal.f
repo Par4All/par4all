@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/10/10 21:00:40 $, 
+! $Date: 1996/10/21 19:02:38 $, 
 !
       program fractal
 
@@ -54,9 +54,8 @@
 ! However HPFC would not be very good at it...
 ! No communication -> block distribution on the second dimension
 !   for best cache effects 
-      integer nproc
-      parameter (nproc=8)
-!hpf$ processors pe(nproc)
+!
+!hpf$ processors pe(number_of_processors())
 !hpf$ distribute image(*,block) onto pe
       
 
