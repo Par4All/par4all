@@ -36,9 +36,7 @@ endif
 
 if ($?erreur == 1) exit 1
 
-setenv LIBDIR $PIPSDIR/Production/Lib
-
-make -f $LIBDIR/Makefile.compile_wp65 SOURCES.f="$argv" CIBLE.f="$1"
+make -f $EXTEDIR/Makefile.compile_wp65 SOURCES.f="$argv" CIBLE.f="$1"
 
 if ($status == 0) then
 	cat << USAGE
