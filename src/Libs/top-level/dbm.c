@@ -58,6 +58,9 @@ char *argv[];
 	/* FI: in fact, the whole workspace should be deleted!
 	 The file and the directory should be removed, and the current
 	 database become undefined... */
+        /* DB: free the hash_table, otherwise core dump during the next
+         call to create_workspace */
+        reset_entity_to_size();
 	close_log_file();
     }
 
