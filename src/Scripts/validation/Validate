@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1994/03/23 16:43:21 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1994/03/23 17:41:57 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -289,8 +289,13 @@ $VERBOSE "Hosts: $VALHOSTS"
 [ ! "$PARALLEL" ] && \
 {
   $VERBOSE "sequential validation"
-  $VERBOSE $VALID -r $RUNDIR $VALIDOPT $MODULES
-  exec $VALID -r $RUNDIR -x "$pips_version" -u  $VALIDOPT $MODULES
+
+  $DEBUG "exec $VALID \ "
+  $DEBUG "   -r $RUNDIR \ "
+  $DEBUG "   -x $pips_version \ "
+  $DEBUG "   -u $VALIDOPT $MODULES"
+
+  exec $VALID -r $RUNDIR -x "$pips_version" -u $VALIDOPT $MODULES
 }
 
 #
