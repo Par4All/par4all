@@ -18,6 +18,7 @@ CPPFLAGS +=	-DLARGE_FONTS \
 
 # Current version of XView is not quite ANSI... :-)
 # CANSI = -pedantic
+CANSI	=
 
 LDFLAGS  +=	$(WPIPS_ADDED_LDFLAGS) \
 		$(PIPS_X11_ADDED_LDFLAGS)
