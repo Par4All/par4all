@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: run-time.c,v $
+ * Revision 1.40  1997/10/21 13:29:03  coelho
+ * prettier.
+ *
  * Revision 1.39  1997/10/20 19:58:29  irigoin
  * Typo fixed
  *
@@ -38,17 +41,11 @@
  * modify 27/09/93, in order not to attempt to redeclare an already declared
  * subroutine. 
  */
-entity MakeRunTimeSupportSubroutine(local_name, number_of_arguments)
-string local_name;
-int number_of_arguments;
+entity 
+MakeRunTimeSupportSubroutine(
+    string local_name,
+    int number_of_arguments)
 {
-    /*
-    string full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
-				   MODULE_SEP_STRING, local_name, NULL);
-    entity e = gen_find_tabulated(full_name, entity_domain);
-
-    return (e==entity_undefined) ? make_empty_subroutine(local_name) : e;
-    */
     return make_empty_subroutine(local_name);
 }
 
@@ -59,10 +56,10 @@ int number_of_arguments;
  * ??? an integer shouldn't always be returned
  */
 entity 
-MakeRunTimeSupportFunction(local_name, number_of_arguments, return_type)
-string local_name;
-int number_of_arguments;
-tag return_type;
+MakeRunTimeSupportFunction(
+    string local_name,
+    int number_of_arguments,
+    tag return_type)
 {
     entity f = make_empty_function(local_name,
 				   (return_type==is_basic_int ? /* ??? rough */
