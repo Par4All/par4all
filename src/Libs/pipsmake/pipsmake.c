@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.82  2003/12/19 17:39:12  irigoin
+ * function get_first_main_module() extended to cope with main modules in C
+ *
  * Revision 1.81  2003/08/18 08:43:35  coelho
  * CATCH/TRY/UNCATCH used.
  *
@@ -1185,12 +1188,18 @@ void delete_all_resources(void)
     up_to_date_resources = set_make(set_pointer);
 }
 
+/* Should be able to handle Fortran applications, C applications and
+   mixed Fortran/C applications. */
 string get_first_main_module(void)
 {
-    string dir_name = db_get_current_workspace_directory(), main_name, name;
+    string dir_name = db_get_current_workspace_directory();
+    string main_name;
+    string name = string_undefined;
+
     debug_on("PIPSMAKE_DEBUG_LEVEL");
+
+    /* Let's look for a Fortran main */
     main_name = strdup(concatenate(dir_name, "/.fsplit_main_list", 0));
-    free(dir_name);
 
     if (file_exists_p(main_name)) 
     {
@@ -1198,8 +1207,17 @@ string get_first_main_module(void)
 	name = safe_readline(tmp_file);
 	safe_fclose(tmp_file, main_name);
     }
-    else name = string_undefined;
     free(main_name);
+
+    if(string_undefined_p(name)) {
+      /* Let's now look for a C main */
+      main_name = strdup(concatenate(dir_name, "/main/main.c", 0));
+      if (file_exists_p(main_name)) 
+	name = strdup("main");
+      free(main_name);
+    }
+
+    free(dir_name);
     debug_off();
     return name;
 }
