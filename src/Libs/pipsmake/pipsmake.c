@@ -986,7 +986,9 @@ safe_make(string res_n, string module_n)
     }
 
     if( setjmp(long_jump_buffer) ) {
+	/* global variables that have to be reset after user-error*/
 	reset_make_cache();
+	retrieve_active_phases();
 	user_warning("safe_make",
 		     "Request aborted in pipsmake: "
 		     "build resource %s for module %s.\n", 
