@@ -12,6 +12,10 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.123  1998/06/24 09:20:38  irigoin
+%% String property SEMANTICS_FIX_POINT_OPERATOR added to replace boolean
+%% property SEMANTICS_PATTERN_MATCHING_FIX_POINT
+%%
 %% Revision 1.122  1998/06/05 07:06:31  irigoin
 %% comments added because I could not find the way to prettyprint all
 %% CONTINUE statements: the property of interest is a more extensive property
@@ -72,7 +76,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/06/05 07:06:31 $~$
+$~$Date: 1998/06/24 09:20:38 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -839,24 +843,39 @@ user-selectable. Its default value is {\em false}.
 SEMANTICS_FIX_POINT FALSE
 \end{verbatim}
 
-The default fix point operator is good for induction variables but it is
-not good for all kinds of code. The default fix point operator is based on
-the transition function associated to a loop body. A computation of
-eigenvectors for eigenvalue 1 is used to detect loop invariants. This
-fails when no transition function but only a transition relation is
-available. Only equations can be found.
+The default fix point operator, called {\em transfer}, is good for
+induction variables but it is not good for all kinds of code. The default
+fix point operator is based on the transition function associated to a
+loop body. A computation of eigenvectors for eigenvalue 1 is used to
+detect loop invariants. This fails when no transition function but only a
+transition relation is available. Only equations can be found.
 
-The second fix point operator is based on a pattern matching of elementary
-equations and inequalities of the loop body transformer. Obvious
-invariants are detected. This fix point operator is not better than the
-previous one for induction variables but it can detect invariant equations
-and inequalities.
+The second fix point operator, called {\em pattern}, is based on a pattern
+matching of elementary equations and inequalities of the loop body
+transformer. Obvious invariants are detected. This fix point operator is
+not better than the previous one for induction variables but it can detect
+invariant equations and inequalities.
 
-This property is user selectable and its default value is FALSE.
+A third fix point operator, called {\em derivative}, is based on finite
+differences. It was developped to handled DO loops desugared into WHILE
+loops as well as standard DO loops. The loop body transformer on variable
+values is projected onto their finite differences. Invariants, both
+equations and inequalities, are deduced directly from the constraints on
+the differences and after integration. This third fix point operator
+should be able to find at least as many invariants as the two previous
+one, but at least some inequalities are missed because of the technique
+used. For instance, constraints on a flip-flop variable can be missed.
+Unlike Cousot-Halbwachs fix point (see below), it does not use Chernikova
+steps and it should not slow down analyses.
+
+This property is user selectable and its default value is {\em transfer}.
 
 \begin{verbatim}
-SEMANTICS_PATTERN_MATCHING_FIX_POINT FALSE
+SEMANTICS_FIX_POINT_OPERATOR "transfer"
 \end{verbatim}
+
+The property \verb+SEMANTICS_PATTERN_MATCHING_FIX_POINT+ has been removed
+and replaced by option {\em pattern} of the previous property.
 
 This property was defined to select one of Cousot-Halbwachs's heuristics
 and to compute fix points with inequalities and equalities for loops.
