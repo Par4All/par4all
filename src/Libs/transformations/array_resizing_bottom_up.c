@@ -33,30 +33,11 @@
 
 static int number_of_right_array_declarations = 0;
 static string current_mod ="";
+static int opt = 0; /* 0 <= opt <= 7*/
+static file_name = "";
+static FILE * instrument_file; /*To store new array declarations*/
 
-#define PREFIX_DEC  "$DEC"
-
-void bottom_up_print_array_declaration(entity e)
-{
-  /* This function prints only the dimensions of an array 
-   => to use the script $PIPS_ROOT/Src/Script/misc/normalization.pl*/
-  variable v = type_variable(entity_type(e));   
-  list l_dims = variable_dimensions(v);
-  user_log("(");
-  while (!ENDP(l_dims)) 
-    {
-      dimension dim = DIMENSION(CAR(l_dims));
-      string s = words_to_string(words_dimension(dim));
-      user_log("%s", s);  
-      l_dims = CDR(l_dims);
-      if (l_dims == NIL) 
-	user_log(")");
-      else
-	user_log(",");
-      free(s);
-    }
-}
-
+#define PREFIX "$ARRAY_DECLARATION"
 
 static bool
 parameter_p(entity e)
@@ -438,7 +419,7 @@ sc_min_max_of_variable(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *mi
   return (FALSE);
 }
 
-void new_array_declaration_from_region(region reg, entity e, Psysteme pre)
+static void new_array_declaration_from_region(region reg, entity e, Psysteme pre)
 {  
   variable v = type_variable(entity_type(e));   
   list l_dims = variable_dimensions(v);
@@ -447,6 +428,7 @@ void new_array_declaration_from_region(region reg, entity e, Psysteme pre)
   entity phi = make_phi_entity(length);
   expression upper = expression_undefined;
   Pvecteur min,max;
+  dimension last_dim = find_ith_dimension(l_dims,length);
   if (!region_undefined_p(reg))
     {
       /* there are cases when there is no region for one array */
@@ -458,20 +440,19 @@ void new_array_declaration_from_region(region reg, entity e, Psysteme pre)
   if (expression_undefined_p(upper))
     upper = make_unbounded_expression();   
   if (!unbounded_expression_p(upper))
-    number_of_right_array_declarations++;
-  
-  user_log("%s\t%s\t%s\t%s\t%d\t%s\t", PREFIX_DEC, 
-	   db_get_memory_resource(DBR_USER_FILE,current_mod,TRUE), 
-	   current_mod,entity_local_name(e),length,words_to_string(words_expression(upper)));  
-  bottom_up_print_array_declaration(e);
-  user_log("\n");
-  user_log("---------------------------------------------------------------------------------------\n");  
+    {
+      number_of_right_array_declarations++;
+      fprintf(instrument_file,"%s\t%s\t%s\t%s\t%d\t%s\t%s\n",PREFIX,file_name, 
+	      current_mod,entity_local_name(e),length,
+	      words_to_string(words_expression(dimension_upper(last_dim))),
+	      words_to_string(words_expression(upper)));  
+    }
+  dimension_upper(last_dim) = upper;
 }
 
-
-/*This function finds in the list of regions the read and write regions of e.
-  If there are 2 regions, it returns the union region */
-region find_union_regions(list l_regions,entity e)
+/* This function finds in the list of regions the read and write regions of e.
+   If there are 2 regions, it returns the union region */
+static region find_union_regions(list l_regions,entity e)
 {
   region reg = region_undefined;
   while (!ENDP(l_regions))
@@ -491,21 +472,28 @@ region find_union_regions(list l_regions,entity e)
   return reg;
 }
 
-
-/* This phase do array resizing for all kind of arrays: formal or local
-   You can have a property to make array resizing for unnormalized array only
-   or for all arrays.
-   So we need REGIONS, which is longer than SUMMARY_REGIONS but it is the only 
-   solution for POINTER, like in COXINEL*/
+/* This phase do array resizing for all kind of arrays: formal or local, 
+   unnormalized or not, depending on choosen option.*/
 
 bool array_resizing_bottom_up(char* mod_name)
 {
+  /* instrument_file is used to store new array declarations and will be used by 
+     a script to insert these declarations in the source code in xxx.database/Src/file_name.f
+
+     file_name gives the file containing the current module in xxx.database/Src/ */
+
   entity mod_ent = local_name_to_top_level_entity(mod_name);
   list l_decl = code_declarations(entity_code(mod_ent)), l_regions = NIL; 
-  statement  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  statement stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
   transformer mod_pre;
   Psysteme pre;
- 
+  string dir_name = db_get_current_workspace_directory();
+  string instrument_file_name = strdup(concatenate(dir_name, "/BU_instrument.out", 0));
+  string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
+  string base_name = pips_basename(user_file, NULL);
+  instrument_file = safe_fopen(instrument_file_name, "a");  
+  file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), 
+				 "/",base_name,0));
   current_mod = mod_name;  
   set_precondition_map((statement_mapping)
 		       db_get_memory_resource(DBR_PRECONDITIONS,mod_name,TRUE));
@@ -514,24 +502,91 @@ bool array_resizing_bottom_up(char* mod_name)
   regions_init(); 
   debug_on("ARRAY_RESIZING_BOTTOM_UP_DEBUG_LEVEL");
   debug(1," Begin bottom up array resizing for %s\n", mod_name);
-    l_regions = load_rw_effects_list(mod_stmt);  
-  mod_pre = load_statement_precondition(mod_stmt);
+    l_regions = load_rw_effects_list(stmt);  
+  mod_pre = load_statement_precondition(stmt);
   pre = predicate_system(transformer_relation(mod_pre));
-  user_log("\n-------------------------------------------------------------------------------------\n");
-  user_log("Prefix \tFile \tModule \tArray \tNdim \tNew declaration\tOld declaration\n");
-  user_log("---------------------------------------------------------------------------------------\n");
-  
+
+  opt = get_int_property("ARRAY_RESIZING_BOTTOM_UP_OPTION");
+
+  /* opt in {0,1,2,3} => Do not compute new declarations for instrumented array (I_PIPS_MODULE_ARRAY)
+     opt in {4,5,6,7} => Compute new declarations for instrumented array (I_PIPS_MODULE_ARRAY) 	 
+     => (opt mod 8) <= 3 or not  
+     
+     opt in {0,1,4,5} => Compute new declarations for assumed-size and one arrays only
+     opt in {2,3,6,7} => Compute new declarations for all kinds of arrays
+     => (opt mod 4) <= 1 or not 
+     
+     opt in {0,2,4,6} => Do not compute new declarations for local array arguments
+     opt in {1,3,5,7} => Compute new declarations for local array arguments also
+     => (opt mod 2) = 0 or not */
+
   while (!ENDP(l_decl))
     {
       entity e = ENTITY(CAR(l_decl));
-      if (unnormalized_array_p(e))
-	{
-	  region reg = find_union_regions(l_regions,e);
-	  new_array_declaration_from_region(reg,e,pre);
-	}
+      if (opt%8 <= 3)
+	  {
+	    /* Do not compute new declarations for instrumented array (I_PIPS_MODULE_ARRAY)*/
+	    if (opt%4 <= 1)
+	      {
+		/* Compute new declarations for assumed-size and one arrays only */
+		if (opt%2 == 0)
+		  {
+		    /* Do not compute new declarations for local array arguments */
+		    if (unnormalized_array_p(e) && formal_parameter_p(e))
+		      {
+			region reg = find_union_regions(l_regions,e);
+			new_array_declaration_from_region(reg,e,pre);
+		      }
+		  }
+		else 
+		  {
+		    /*  Compute new declarations for local array arguments also*/
+		    if (unnormalized_array_p(e))
+		      {
+			region reg = find_union_regions(l_regions,e);
+			new_array_declaration_from_region(reg,e,pre);
+		      }
+		  }
+	      }
+	    else 
+	      {
+		/* Compute new declarations for all kinds of arrays
+		   To be modified, the whole C code: assumed-size bound if not success, ... 
+		   How about multi-dimensional array ? replace all upper bounds ?
+		   => different script, ...*/
+
+		user_log("This option has not been implemented yet\n");
+		
+		//	if ((opt%2 == 0) && formal_parameter_p(e))
+		// {
+		    /* Do not compute new declarations for local array arguments */
+		//  region reg = find_union_regions(l_regions,e);
+		//   new_array_declaration_from_region(reg,e,pre);
+		// }
+		//	else 
+		// {
+		    /* Compute new declarations for local array arguments also*/
+		//  region reg = find_union_regions(l_regions,e);
+		//  new_array_declaration_from_region(reg,e,pre);
+		// }
+
+	      }
+	  }
+	else
+	  {
+	    /* Compute new declarations for instrumented array (I_PIPS_MODULE_ARRAY) 
+	       Looking for arrays that contain I_PIPS in the last upper bound declaration
+	       Attention: this case excludes some other cases */
+	    //if (pips_instrumented_array_p(e))
+	    // { 
+	    //	region reg = find_union_regions(l_regions,e);
+	    //	new_array_declaration_from_region(reg,e,pre);
+	    // }
+	    user_log("This option has not been implemented yet\n");
+	  }
       l_decl = CDR(l_decl);
     }
-  user_log(" \n The total number of right array declarations : %d \n"
+  user_log("* Number of right array declarations replaced: %d *\n"
 	   ,number_of_right_array_declarations );
   
   debug(1,"End bottom up array resizing for %s\n", mod_name);
@@ -539,8 +594,12 @@ bool array_resizing_bottom_up(char* mod_name)
   regions_end();
   reset_precondition_map();
   reset_rw_effects();
+  safe_fclose(instrument_file,instrument_file_name);
+  free(dir_name), dir_name = NULL;
+  free(instrument_file_name), instrument_file_name = NULL;
+  free(file_name), file_name = NULL;
   current_mod = "";
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, stmt);
   return TRUE;
 }
 
