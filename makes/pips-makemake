@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/02 17:37:31 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/03 11:51:29 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -120,6 +120,7 @@
 # - install and quick-install modified, idem.
 # - header en Makefile entry added, idem.
 # - Makefile added to special .INIT target, idem.
+# - no installation of header files if not modified. FC 03/08/95
 #
 # wish:
 #
@@ -308,9 +309,11 @@ install: $(SOURCES)
 	$(MAKE) quick-install
 
 # quick-install installs lib and so, so depends on these. FC
+# header installed only if different.
+# should avoid some recompilations if headers are not touched.
 quick-install: $(INC_TARGET) $(LIB_TARGET)
-	cp -r $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
-	cp $(LIB_TARGET) $(LIBDIR)
+	@pips_install_file $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
+	@pips_install_file $(LIB_TARGET) $(LIBDIR)/$(LIB_TARGET) 
 	ranlib $(LIBDIR)/$(LIB_TARGET)
 	touch quick-install
 
@@ -370,8 +373,8 @@ install: $(SOURCES)
 	$(MAKE) quick-install
 
 quick-install: $(INC_TARGET) $(BIN_TARGET) $(BINDIR)
-	cp $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
-	cp $(BIN_TARGET) $(BINDIR)
+	@pips_install_file $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
+	@pips_install_file $(BIN_TARGET) $(BINDIR)/$(BIN_TARGET)
 	touch quick-install
 
 clean:
