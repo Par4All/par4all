@@ -202,6 +202,7 @@ Psysteme s1, s2;
  * Its intersection with i == 2 is i == 2.
  * 
  */
+/*
 Psysteme sc_fast_convex_hull(s1, s2)
 Psysteme s1;
 Psysteme s2;
@@ -216,13 +217,6 @@ Psysteme s2;
     extern char * dump_value_name();
 
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
-
-    /* 
-    (void) fprintf(stderr, "sc_fast_convex_hull: begin\ns1:\n");
-    sc_fprint(stderr, s1, dump_value_name);
-    (void) fprintf(stderr, "s2:\n");
-    sc_fprint(stderr, s2, dump_value_name);
-    */
 
     for(eq = sc_egalites(s1); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
 	if(egalite_in_liste(eq, sc_egalites(s2))) {
@@ -278,21 +272,7 @@ Psysteme s2;
     sc_dimension(s2p) = d;
     sc_base(s0) = base_union(sc_base(s1), sc_base(s2));
 
-    /*
-    (void) fprintf(stderr, "sc_fast_convex_hull: new systems\ns1p:\n");
-    sc_fprint(stderr, s1p, dump_value_name);
-    (void) fprintf(stderr, "s2p:\n");
-    sc_fprint(stderr, s2p, dump_value_name);
-    (void) fprintf(stderr, "s0:\n");
-    sc_fprint(stderr, s0, dump_value_name);
-    */
-
     hp = sc_enveloppe(s1p, s2p);
-
-    /*
-    (void) fprintf(stderr, "sc_fast_convex_hull: small enveloppe\nhp:\n");
-    sc_fprint(stderr, hp, dump_value_name);
-    */
 
     hp = sc_append(hp, s0);
 
@@ -300,13 +280,9 @@ Psysteme s2;
     sc_rm(s1p);
     sc_rm(s2p);
 
-    /*
-    (void) fprintf(stderr, "sc_fast_convex_hull: end\nreturn hp:\n");
-    sc_fprint(stderr, hp, dump_value_name);
-    */
-
     return hp;
 }
+*/
 
 /* Psysteme sc_fast_convex_hull(Psysteme s1, Psysteme s2):
  *
