@@ -50,22 +50,6 @@ cons **gen_cp_ = (cons**) NULL ;
 gen_chunk Gen_hash_[ MAX_NESTED_HASH ] ;
 gen_chunk *gen_hash_ = (gen_chunk*) NULL ; 
 
-/* GEN_TABULATED maps any bp->index to the tabulation table. TABULATED_BP is
- * the fake domain that helps writing tabulation tables. GEN_TABULATED_NAMES
- * maps any name <domain_number|name> to its offset in the Gen_tabulated
- * of the domain number.
- */
-/*
-typedef struct {
-  int size;
-  int used;
-  gen_chunk * table;
-} 
-  gen_tabulated_t, * gen_tabulated_p;
-*/
-
-gen_chunk * Gen_tabulated_[MAX_TABULATED];
-
 struct gen_binding *Tabulated_bp ;
 
 int Read_spec_mode ;
@@ -98,7 +82,12 @@ static int disallow_undefined_tabulated = TRUE ;
   message_assert("gen_read_spec not performed prior to use", \
 		 Read_spec_performed);
 
+#define check_index(i) \
+  message_assert("valid tabulated index", (i)>=0 && (i)<MAX_TABULATED);
+
 #define newgen_free(p) (*((char*)(p))='\0',free(p)) /* just to hide bugs */
+
+/********************************************************************** MISC */
 
 /* DOMAIN_INDEX returns the index in the Domain table for object OBJ.
  */
@@ -120,6 +109,205 @@ gen_chunk *obj ;
     ((obj)->i<0) || ((obj)->i>MAX_DOMAIN)) ? \
    domain_index(obj) : (obj)->i) /* prints the error message or returns */
 
+
+/*********************************************************** TABULATED STUFF */
+
+/* table of tabulated elements.
+ */
+#define TABULATED_ELEMENTS_SIZE (1000)
+#define TABULATED_ELEMENTS_INCR (10000)
+
+typedef struct
+{
+  int domain;           /* domain number */
+  int index;            /* index in table */
+  int size;		/* current allocated size */
+  int used;		/* how many are used */
+  gen_chunk * table;	/* actual table */
+} 
+  gen_tabulated_t, * gen_tabulated_p;
+
+static gen_tabulated_p all_tabulateds = NULL;
+
+#define all_tabulateds_initialized() \
+  message_assert("all tabulated is initialized", all_tabulateds)
+
+static void init_tabulated(int index)
+{
+  int i;
+  gen_chunk * t;
+
+  all_tabulateds[index].size = TABULATED_ELEMENTS_SIZE;
+  all_tabulateds[index].used = 0;
+  all_tabulateds[index].index = index;
+  all_tabulateds[index].domain = -1; /* not assigned yet. */
+  t = (gen_chunk*) alloc(sizeof(gen_chunk)*all_tabulateds[index].size);
+  
+  for (i=0; i<TABULATED_ELEMENTS_SIZE; i++)
+    t[i] = gen_chunk_undefined;
+  
+  all_tabulateds[index].table = t;
+}
+
+static void init_all_tabulateds(void)
+{
+  int i;
+  message_assert("all tabulated not initialized", !all_tabulateds);
+
+  all_tabulateds = (gen_tabulated_p) 
+    alloc(sizeof(gen_tabulated_t)*MAX_TABULATED);
+
+  for (i=0; i<MAX_TABULATED; i++)
+    init_tabulated(i);
+}
+
+static void extends_tabulated(int index)
+{
+  int nsize, i;
+  gen_chunk * t;
+  check_index(index);
+
+  nsize = all_tabulateds[index].size + TABULATED_ELEMENTS_INCR;
+
+  t = (gen_chunk*) 
+    realloc(all_tabulateds[index].table, sizeof(gen_chunk)*nsize);
+
+  message_assert("realloc ok", t);
+
+  for (i=all_tabulateds[index].size; i<nsize; i++)
+    t[i] = gen_chunk_undefined;
+  
+  all_tabulateds[index].size = nsize;
+  all_tabulateds[index].table = t;
+}
+
+gen_chunk * gen_tabulated_table_of(int domain)
+{
+  int index = Domain[domain].index;
+  check_index[index];
+  return all_tabulateds[index].table;
+}
+
+void gen_tabulated_table_set(int domain, int number, gen_chunk * gc)
+{
+  abort();
+  return;
+}
+
+
+/* ENTER_TABULATED_DEF enters a new definition (previous refs are allowed if
+   ALLOW_REF) in the INDEX tabulation table of the DOMAIN, with the unique
+   ID and value CHUNKP. */
+
+gen_chunk * 
+gen_enter_tabulated_def(
+    int index,
+    int domain,
+    char *id,
+    gen_chunk *chunkp,
+    int allow_ref)
+{
+  gen_chunk *hash ;
+  
+  if( Gen_tabulated_[ index ] == (gen_chunk *)NULL ) {
+    fatal( "enter_tabulated_def: Uninitialized %s\n", 
+	   Domains[ domain ].name ) ;
+  }
+  
+  if ((hash=(gen_chunk *) gen_get_tabulated_name_basic(domain, id)) !=
+      (gen_chunk *)HASH_UNDEFINED_VALUE ) {
+    
+    /* redefinitions of tabulated should not be allowed...
+     * but you cannot be user it is a redefinition if allow_ref
+     */
+    if(!allow_ref)
+      (void) fprintf(stderr, "[make_%s] warning: %s redefined\n", 
+		     Domains[domain].name, id);
+    
+    /* actually very obscure there... seems that negative domain
+     * numbers are used to encode something... already used/seen ???
+     */
+    if( allow_ref && hash->i < 0 ) 
+      {
+	int i, size = gen_size( Domains+domain ) ;
+	gen_chunk *cp, *gp ;
+	
+	hash->i = -hash->i ;
+	
+	if( (gp=(Gen_tabulated_[ index ]+hash->i)->p) == NULL ) {
+	  fatal( "make_def: Null for %d%c%s\n", domain, HASH_SEPAR, id);
+	}
+	for( cp=chunkp, i=0 ; i<size ; i++ ) {
+	  *gp++ = *cp++ ;
+	}
+	((Gen_tabulated_[ index ]+hash->i)->p+1)->i = hash->i ;
+	return( (Gen_tabulated_[ index ]+hash->i)->p ) ;
+      } 
+    else {
+      if (hash_warn_on_redefinition_p()) {
+	user("Tabulated entry %d%c%s already defined: updating\n",
+	     domain, HASH_SEPAR, id);
+      }
+    }
+  }
+  else {
+    hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
+    hash->i = gen_find_free_tabulated( &Domains[ domain ] ) ;
+    gen_put_tabulated_name(domain, id, (char *)hash);
+  }
+  (Gen_tabulated_[ index ]+hash->i)->p = chunkp ;
+  (chunkp+1)->i = hash->i ;
+  return chunkp;
+}
+    
+void gen_mapc_tabulated(void (*fp)(), int binding)
+{
+    struct gen_binding *bp = &Domains[ binding ] ;
+    gen_chunk *table = Gen_tabulated_[ bp->index ] ;
+    int i ;
+
+    if( table == NULL ) {
+	user( "gen_mapc_tabulated: non tabulated domain %s\n", bp->name ) ;
+	return ;
+    }
+    for( i = 0 ; i < max_tabulated_elements() ; i++ ) {
+	if( (table+i)->p != gen_chunk_undefined ) 
+		(*fp)( (table+i)->p ) ;
+    }
+}
+
+void * gen_find_tabulated(char * key, int domain)
+{
+    gen_chunk *hash ;
+
+    if( (hash=(gen_chunk *)gen_get_tabulated_name_basic(domain, key))
+	== (gen_chunk *)HASH_UNDEFINED_VALUE ) {
+	return( gen_chunk_undefined ) ;
+    }
+    return (void*) 
+	((Gen_tabulated_[ Domains[ domain ].index ]+abs( hash->i ))->p);
+}
+
+list gen_filter_tabulated(int (*filter)(), int domain)
+{
+    struct gen_binding *bp = &Domains[ domain ] ;
+    gen_chunk *table = Gen_tabulated_[ bp->index ] ;
+    int i ;
+    cons *l ;
+
+    if( table == NULL ) {
+	user( "gen_filter_tabulated: non tabulated domain %s\n", bp->name ) ;
+	return( NIL ) ;
+    }
+    for( i = 0, l = NIL ; i < max_tabulated_elements() ; i++ ) {
+	gen_chunk *obj = (table+i)->p ;
+
+	if( obj != gen_chunk_undefined && (*filter)( obj )) {
+	    l = CONS( CHUNK, obj, l ) ;
+	}
+    }
+    return l;
+}
 
 /***************************************************** GEN_TABULATED_NAMES */
 
