@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/03/20 19:09:45 $, )
+ * ($Date: 1996/03/20 19:37:04 $, )
  */
 
 #include "defines-local.h"
@@ -373,7 +373,27 @@ hpfc_call_with_distributed_args_p(call c)
     return FALSE;
 }
 
+static list /* of renaming */ 
+add_once_to_renaming_list(
+    list /* of renaming */ l,
+    entity o,
+    entity n)
+{
+    MAP(RENAMING, r,
+    {
+	if (renaming_old(r)==o)
+	{
+	    pips_assert("same required mapping", renaming_new(r)==n);
+	    return l;
+	}
+    },
+	l);
+
+    return CONS(RENAMING, make_renaming(o, n), l);
+}
+
 /* ??? only simple calls are handled. imbrication may cause problems.
+ * ??? should recurse thru all the calls at a call instruction...
  */
 void
 hpfc_translate_call_with_distributed_args(
@@ -416,19 +436,13 @@ hpfc_translate_call_with_distributed_args(
 	    pips_debug(3, "%s (arg %d) %s -> %s\n", entity_name(arg), i, 
 		       entity_name(passed), entity_name(copy));
 
-	    /* substitute the copy array if necessary 
+	    /* the substitution in the call will be performed at the 
+	     * propagation phase of dynamic arrays, later on.
 	     */
-	    if (copy!=passed)
-	    {
-		syntax sy = expression_syntax(e);
-		pips_assert("reference", syntax_reference_p(sy));
-		reference_variable(syntax_reference(sy)) = copy;
-	    }
-	    
-	    /* add the renaming in the list 
+	    /* add the renaming in the list.
 	     * ??? should be added only once! what about call(A,A)...
 	     */
-	    lr = CONS(RENAMING, make_renaming(passed, copy), lr);
+	    lr = add_once_to_renaming_list(lr, passed, copy);
 	}
     }
 
@@ -615,9 +629,12 @@ static void add_alive_synonym(
 
 static void ref_rwt(reference r)
 {
-    if (reference_variable(r)==old_variable)
-	reference_variable(r) = new_variable,
+    entity var = reference_variable(r);
+    if (var==old_variable || var==new_variable)
+    {
+	reference_variable(r) = new_variable;
 	array_used = TRUE;
+    }
 }
 
 static void 
@@ -688,8 +705,6 @@ continue_propagation_p(statement s)
 
 	    if (safe_load_primary_entity(array)==primary)
 	    {
-		fprintf(stderr, "some bug there???\n");
-		array_used = TRUE; /* ??? */
 		add_alive_synonym(s, new_variable);
 		add_as_a_closing_statement(s);
 		return FALSE;
