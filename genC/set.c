@@ -35,8 +35,8 @@ void set_clear(), set_free();
 
 /* Implementation of the Set package. */
     
-set set_make( type )
-set_type type ;
+set set_make( typ )
+set_type typ ;
 {
     set hp = (set)malloc( sizeof( set_chunk )) ;
 
@@ -44,8 +44,8 @@ set_type type ;
 	(void) fprintf( stderr, "set_make: cannot allocate\n" ) ;
 	exit( 1 ) ;
     }
-    hp->table = hash_table_make( type, INITIAL_SET_SIZE ) ;
-    hp->type = type ;
+    hp->table = hash_table_make( typ, INITIAL_SET_SIZE ) ;
+    hp->type = typ ;
     return( hp ) ;
 }
 
