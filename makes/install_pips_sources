@@ -3,20 +3,30 @@
 # $Id$
 # 
 # $Log: install_pips_sources,v $
+# Revision 1.13  1997/05/20 14:48:40  coelho
+# ok for both RCS and SCCS?
+#
 # Revision 1.12  1997/03/26 13:50:25  coelho
 # RCS headers.
 #
 #
 
 script=`basename $0`
-VERBOSE=':'
-DEBUG=':'
+verb=':'
+debg=':'
 
-#VERBOSE='verbose'
-#DEBUG='debug'
+verb='verbose'
+debg='debug'
 
-unset SOURCE_DIR TARGET_DIR COMMENT OPTIONS CLEAN_SCCS FILES
-ONLYDIFF=':'
+unset source_dir target_dir comment OPTIONS clean_cs files 
+only_diff=':'
+
+#
+# prefer rcs files
+#
+
+subdir=RCS
+export subdir
 
 verbose()
 {
@@ -34,18 +44,52 @@ error()
   exit 2
 }
 
+is_rcs()
+{
+   test $subdir = RCS
+   return $?
+}
+
+is_sccs()
+{
+   test $subdir = SCCS
+   return $?
+}
+
+cs_tell()
+{
+    is_sccs && sccs tell
+    is_rcs && { rlog -L -R RCS/* | sed 's/RCS\/\([a-zA-Z0-9-_\.]*\),v/\1/g' ;}
+}
+
+cs_all()
+{
+    is_sccs && { ls SCCS/s.* | sed 's,SCCS/s\.,,g' }
+    is_rcs && { ls RCS/*,v | sed 's/RCS\/\(.*\),v/\1/g' }
+}
+
+move_old()
+{
+    for i ; do
+	$verb moving $i RCS/SCCS file to OLD
+	is_sccs && mv SCCS/s.$i OLD/
+	is_rcs && mv RCS/${i},v OLD/
+	rm -f $i
+    done
+}
+
 usage()
 {
   cat 1>&2 <<-EOM
-	Usage: $RCSfile: install_pips_sources,v $ [-hvdaDr] [-y comment] [-t dir] [-s dir] files
+	Usage: install_pips_sources [-hvdaDr] [-y comment] [-t dir] [-s dir] files
 	  version $Revision$
 	  -h: help
 	  -v: verbose
 	  -d: install only if different. (default)
 	  -a: install all files.
-	  -r: clean not installed files from SCCS
+	  -r: clean not installed files from SCCS/RCS
 	  -D: debug
-	  -t dir: target directory (default image of source in \$PIPS_SRCDIR)
+	  -t dir: target directory (default image of source in \$PIPS_ROOT/Src)
 	  -s dir: source directory (default .)
 	  -y comment: comment for the installation
 	EOM
@@ -56,14 +100,19 @@ while getopts hvDdart:s:y: OPT
 do
   case $OPT in
     h) usage 0 ;;
-    v) VERBOSE='verbose' ; OPTIONS="$OPTIONS -v" ;;
-    D) DEBUG='debug' ; OPTIONS="$OPTIONS -D" ;;
-    d) ONLYDIFF=':' ; OPTIONS="$OPTIONS -d" ;;
-    a) ONLYDIFF= ; OPTIONS="$OPTIONS -a" ;;
-    r) CLEAN_SCCS='yes' ; OPTIONS="$OPTIONS -r" ;;
-    t) TARGET_DIR="$OPTARG" ;;
-    s) SOURCE_DIR="$OPTARG" ;;
-    y) COMMENT="$OPTARG" ;;
+    v) verb='verbose' ; 
+       OPTIONS="$OPTIONS -v" ;;
+    D) debg='debug' ; 
+       OPTIONS="$OPTIONS -D" ;;
+    d) only_diff=':' ; 
+       OPTIONS="$OPTIONS -d" ;;
+    a) only_diff= ; 
+       OPTIONS="$OPTIONS -a" ;;
+    r) clean_cs='yes' ; 
+       OPTIONS="$OPTIONS -r" ;;
+    t) target_dir="$OPTARG" ;;
+    s) source_dir="$OPTARG" ;;
+    y) comment="$OPTARG" ;;
     *) usage 1 ;;
   esac
 done
@@ -72,117 +121,157 @@ shift `expr $OPTIND - 1`
 
 #
 # default values
+#
 
-[ "$COMMENT" ] || COMMENT='none'
-[ "$SOURCE_DIR" ] || SOURCE_DIR=`pwd`
-[ "$TARGET_DIR" ] || 
-  TARGET_DIR=$PIPS_SRCDIR/`echo "$SOURCE_DIR" | sed 's,.*/\([^/]*/[^/]*\)$,\1,'`
+[ "$comment" ] || comment='none'
+[ "$source_dir" ] || source_dir=`pwd`
+[ "$target_dir" ] || 
+  target_dir=$PIPS_ROOT/Src/`echo "$source_dir" | sed 's,.*/\([^/]*/[^/]*\)$,\1,'`
 
-$DEBUG "source directory is $SOURCE_DIR"
-$DEBUG "target directory is $TARGET_DIR"
+$debg "source directory is $source_dir"
+$debg "target directory is $target_dir"
 
 #
-# main loop
+# needed subdirectories...  
+#
 
-$VERBOSE "entering directory $TARGET_DIR [$@]"
+$verb "entering directory $target_dir [$@]"
 
-[ -d "$TARGET_DIR" ] || mkdir $TARGET_DIR 
-cd $TARGET_DIR
+[ -d "$target_dir" ] || mkdir $target_dir 
+cd $target_dir
 [ -d OLD ] || mkdir OLD
-[ -d SCCS ] || mkdir SCCS
 
-[ "$ONLYDIFF" ] ||
+[ -d SCCS ] && subdir=SCCS
+[ -d $subdir ] || mkdir $subdir
+
+[ "$only_diff" ] ||
 {
-  sccs edit SCCS
-  rm -f `sccs tell`
+  #
+  # EDIT ALL
+  #
+  is_sccs && sccs edit SCCS 
+  is_rcs && co -l RCS/*
+  rm -f `cs_tell` ; 
 }
 
-# cd $TARGET_DIR
+#
+# main loop over all items...
+#
 
 for item
 do
-  $VERBOSE "dealing with $item"
-  src_item="$SOURCE_DIR/$item"
-  trg_item="$TARGET_DIR/$item"
+  $verb "dealing with $item"
+  src_item="$source_dir/$item"
+  trg_item="$target_dir/$item"
 
   if [ "`echo $item | sed 's,[^/],,g'`" ] 
   then
-    $VERBOSE "something in a directory, recursing"
-    eval $0 $OPTIONS -y "$COMMENT" \
+    #
+    # ITEM IN SUBDIRECTORY
+    #
+    $verb "something in a directory, recursing"
+    eval $0 $OPTIONS -y "$comment" \
     	-s "`dirname $src_item`" -t "`dirname $trg_item`" \
 	"`basename $item`"
-    $DEBUG "end of recursion"
+    $debg "end of recursion"
     continue
   fi
 
   # else
+
   if [ -d "$src_item" ]
   then
-    $VERBOSE "directory, recursing"
-    $0 $OPTIONS -y "$COMMENT" -s "$src_item" -t "$trg_item" \
-    	`cd $src_item ; ls -d * | sed '/~/d;/SCCS/d;/OLD/d'`
-    $DEBUG "end of recursion"
+    #
+    # SUBDIRECTORY
+    #
+    $verb "directory, recursing"
+    $0 $OPTIONS -y "$comment" -s "$src_item" -t "$trg_item" \
+    	`cd $src_item ; ls -d * | sed '/~/d;/SCCS/d;/RCS/d;/OLD/d'`
+    $debg "end of recursion"
     continue
   fi
 
   #else
   
-  FILES="$FILES $item"
+  files="$files $item"
 
   if [ -f $src_item ] 
   then
-    if [ "$ONLYDIFF" -a -f $trg_item ]
+    if [ "$only_diff" -a -f $trg_item ]
     then
+
+      #
+      # CS EDIT
+      #
       cmp -s $src_item $trg_item  && continue
-      sccs edit $item 
+      is_sccs && sccs edit $item 
+      is_rcs && co -l $item
       rm -f $item
     fi
 
     cp $src_item $trg_item
 
-    if [ -f "$TARGET_DIR/SCCS/s.$item" ]
+    if [ -f "$target_dir/SCCS/s.$item" -o -f "$target_dir/RCS/$item,v" ]
     then
-      sccs delget -y"$COMMENT" "$item"
+
+      #
+      # CS DELTA
+      #
+      is_sccs && sccs delget -y"$comment" "$item"
+      is_rcs && ci -u -m"$comment" "$item" 
     else
-      sccs create "$item"
-      cmp -s $item ,$item && rm -f ,$item
+
+      #
+      # CS CREATION
+      #
+      is_sccs && {
+	sccs create "$item"
+	cmp -s $item ,$item && rm -f ,$item
+      }
+      is_rcs && { 
+	ci -u "$item"
+	rcs -ko "$item"
+      }
     fi
   else
     error "$item is neither a file nor a directory"
   fi
 done
 
-LOST_FILES="`sccs tell`"
-[ "$LOST_FILES" ] &&
+#
+# some files have desappeared from the sources...
+#
+LOST_files="`cs_tell`"
+[ "$LOST_files" ] &&
 {
-  $VERBOSE "no more $LOST_FILES"
-  sccs unedit $LOST_FILES
-  rm -f $LOST_FILES
+  $verb "no more $LOST_files"
+  is_sccs && sccs unedit $LOST_files
+  is_rcs && ci $LOST_files
+  rm -f $LOST_files
 
   #
   # clean the SCCS directory as well
 
-  for f in $LOST_FILES ; 
-  do 
-    $VERBOSE "moving SCCS/s.$f in OLD"
-    mv SCCS/s.$f OLD
-  done
+  move_old $LOST_files
 }
 
-[ "$CLEAN_SCCS" ] &&
+#
+# ???
+#
+[ "$clean_cs" ] && 
 {
-  [ "`sccs tell`" ] && error "some files being edited!"
+  [ "`cs_tell`" ] && error "some files being edited!"
 
-  for item in `ls SCCS/s.* | sed 's,SCCS/s\.,,g'` ;
+  for item in `cs_all` ;
   do
-    $DEBUG "whether $item was installed"
-    if [ ! "`echo $FILES | grep $item`" ]
-    then
-      $VERBOSE "moving $item SCCS file in OLD"
-      mv SCCS/s.$item OLD
-      rm -f $item
-    fi
+    $debg "whether $item was installed"
+    [ ! "`echo $files | grep $item`" ] && 
+	move_old $item
   done
 }
 
-$VERBOSE "done"
+$verb "done"
+
+#
+# end of file.
+#
