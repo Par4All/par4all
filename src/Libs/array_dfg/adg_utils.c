@@ -44,8 +44,11 @@
 #include "misc.h"
 #include "transformer.h"
 #include "semantics.h"
-#include "effects.h"
-#include "regions.h"
+
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
+
 #include "pipsdbm.h"
 #include "resources.h"
 #include "static_controlize.h"
