@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.9  1998/10/16 17:16:54  coelho
+# updated for 1.2b4
+#
 # Revision 1.8  1998/07/03 08:57:48  coelho
 # basic menu forgotten...
 #
@@ -30,7 +33,7 @@
 #
 #
 
-jdk_dir	=	/usr/local/jdk1.2beta3
+jdk_dir	=	/usr/local/jdk1.2beta4
 jdk_bin	=	$(jdk_dir)/bin
 jdk_lib	=	$(jdk_dir)/lib
 pkg_dir	= 	classes
@@ -93,10 +96,11 @@ OJ_FILES=	$(addprefix $(d)/, $(J_FILES:.java=.class))
 
 # local stuff
 
-swing	=	/usr/local/swing/swingall.jar
-jdk	=	$(jdk_lib)/classes.zip
+#swing	=	/usr/local/swing/swingall.jar
+#jdk	=	$(jdk_lib)/classes.zip
 
-JENV	=	CLASSPATH=.:classes:$(swing):$(jdk)
+JENV	=	CLASSPATH=.:classes
+#:$(swing):$(jdk)
 JAVAC	=	$(jdk_bin)/javac
 JCFLAGS	=	-g -deprecation -d $(pkg_dir)
 
