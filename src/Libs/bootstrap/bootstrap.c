@@ -1270,14 +1270,18 @@ typing_function_t get_typing_function_for_intrinsic(string name)
   {
     IntrinsicDescriptor * pdt = IntrinsicDescriptorTable;
 
-    name_to_type_function = hash_table_make(hash_pointer, 0);
+    name_to_type_function = hash_table_make(hash_string, 0);
     
     for(; pdt->name; pdt++)
-      hash_put(name_to_type_function, (char*)pdt->name, (char*)pdt->type_function);
+    {
+        hash_put(name_to_type_function, (char*)pdt->name, (char*)pdt->type_function);
+    }
   }
 
   if (!hash_defined_p(name_to_type_function, name))
-    pips_internal_error("no type function for intrinsics %s", name);
+    {
+      pips_internal_error("No type function for intrinsics %s\n", name);
+    }
 
   return (typing_function_t) hash_get(name_to_type_function, name);
 }
