@@ -43,6 +43,7 @@ jmp_buf overflow_error;
  *
  * Il faudrait traiter proprement les cas particuliers SC_RN et SC_EMPTY
  */
+/*
 Psysteme sc_enveloppe(s1, s2)
 Psysteme s1;
 Psysteme s2;
@@ -56,11 +57,9 @@ Psysteme s2;
 
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
 
-    /* duplication de s1 et de s2 */
     s1 = sc_dup(s1);
     s2 = sc_dup(s2);
 
-    /* calcul d'une base unique pour s1 et s2 */
     b = s1->base;
     for(coord=s2->base; !VECTEUR_NUL_P(coord); coord = coord->succ) {
 	b = vect_add_variable(b, vecteur_var(coord));
@@ -87,15 +86,11 @@ Psysteme s2;
 	sc_rm(s2);
     }
     else {
-	/* cas general */
-	/* conversion en polyedres */
 	p1 = sc_to_poly(s1);
 	p2 = sc_to_poly(s2);
 
-	/* calcul de l'enveloppe convexe */
 	p = env(p1, p2);
 
-	/* recuperation du systeme lineaire et desallocation du polyedre */
 	s = p->sc;
 	p->sc = SC_UNDEFINED;
 	poly_rm(p);
@@ -103,6 +98,7 @@ Psysteme s2;
 
     return s;
 }
+*/
 
 
 /* Psysteme sc_enveloppe_chernikova_ofl_ctrl(Psysteme s1, s2, int ofl_ctrl)
