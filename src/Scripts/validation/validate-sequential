@@ -302,6 +302,7 @@ test_aspect()
      then 
 	ffile=$aspect/$name.f
      elif test -r $aspect/$name.F
+     then
 	ffile=$aspect/$name.F
      else
 	ffile=$aspect/$name.c
