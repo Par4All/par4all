@@ -1,0 +1,17 @@
+#! /bin/sh
+
+MOTIF="$1"
+shift
+
+for f
+do
+  dir=`dirname $f`
+  file=`basename $f`
+  echo doing $file in $dir
+  ( cd $dir 
+    sccs edit $file
+    sed "/$MOTIF/d" < $file > $file.tmp
+    mv -f $file.tmp $file
+    sccs delget -y"$0: $MOTIF" $file
+  )
+done
