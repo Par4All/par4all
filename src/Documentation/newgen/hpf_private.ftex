@@ -1,13 +1,14 @@
-\documentstyle{article}
+%% $RCSfile: hpf_private.ftex,v $ (version $Revision$)
+%% $Date: 1996/08/21 10:35:38 $, 
 
-\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\documentstyle[newgen_domain]{article}
+
+%%\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
 \title{HPFC \\ (High Performance Fortran Compiler) \\ datastructure}
 \author{Fabien Coelho\\
                 \\
         CRI, E'cole des mines de Paris}
-
-\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{{#2}}}
 
 \begin{document}
 \maketitle
@@ -20,14 +21,14 @@
 \domain{import entity from "ri.newgen"}
 \domain{import entity\_int from "ri.newgen"}
 \domain{import statement from "ri.newgen"}
-\domain{import reduction_operator from "reductions_private.newgen"}
+\domain{import reduction\_operator from "reductions\_private.newgen"}
 
 \domain{entities = list:entity*}
-\domain{entity_entities = entity->entities}
+\domain{entity\_entities = entity->entities}
 
 \domain{renaming = old:entity x new:entity}
-\domain{statement_renamings = persistant statement->renaming*}
-\domain{statement_entities = persistant statement->entities}
+\domain{statement\_renamings = persistant statement->renaming*}
+\domain{statement\_entities = persistant statement->entities}
 
 \domain{entitymap = entity->entity}
 
@@ -41,19 +42,18 @@
 \domain{distributemap = entity->distribute}
 \domain{newdeclmap = entity->hpf\_newdecls}
 
-\domain{entity\_status = new\_host:entitymap x new\_node:entitymap x old\_host:entitymap x old\_node:entitymap x referenced:entity_int}
+\domain{entity\_status = new\_host:entitymap x new\_node:entitymap x old\_host:entitymap x old\_node:entitymap x referenced:entity\_int}
 
 \domain{data\_status = newdeclmap x alignmap x distributemap x arrays:entity* x templates:entity* x processors:entity*}
 
 \domain{numbers\_status = numbermap:entity\_int x arrays:int x templates:int x processors:int}
 
-\domain{dynamic\_status = dynamics:entity_entities x primary:entitymap x renamings:statement\_renamings x tokeep:statement\_entities}
+\domain{dynamic\_status = dynamics:entity\_entities x primary:entitymap x renamings:statement\_renamings x tokeep:statement\_entities}
 
 \domain{remapping = renaming x referenced:entity*}
 
 \domain{hpfc\_status = overlapsmap x data\_status x numbers\_status x entity\_status x commons:entity* x dynamic\_status x pures:entity* x ios:entity* x computed:remapping* x reductions:statement\_entities}
 
-\domain{hpfc\_reductions = initial:entity x replacement:entity x operator:reduction_operator}
+\domain{hpfc\_reductions = initial:entity x replacement:entity x operator:reduction\_operator}
 
 \end{document}
-\end
