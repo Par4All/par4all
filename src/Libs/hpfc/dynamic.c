@@ -6,7 +6,7 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/04/25 18:56:32 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/05/05 16:42:36 $, )
  * version $Revision$
  */
 
@@ -315,6 +315,51 @@ distribute d;
     return(new_synonym_template(temp, d));
 }
 
+/* DYNAMIC LOCALS
+ */
+GENERIC_LOCAL_FUNCTION(alive_synonym, statement_entities);
+GENERIC_LOCAL_FUNCTION(used_dynamics, statement_entities);
+GENERIC_LOCAL_FUNCTION(remapping_graph, controlmap);
+GENERIC_LOCAL_FUNCTION(reaching_mappings, statement_entities);
+GENERIC_LOCAL_FUNCTION(leaving_mappings, statement_entities);
+GENERIC_LOCAL_FUNCTION(propagated, statement_entities);
+GENERIC_LOCAL_FUNCTION(remapped, statement_entities);
+
+void init_dynamic_locals()
+{
+    init_alive_synonym();
+    init_used_dynamics();
+    init_reaching_mappings();
+    init_leaving_mappings();
+    init_propagated();
+    init_remapped();
+    init_remapping_graph();
+}
+
+void close_dynamic_locals()
+{
+    close_alive_synonym();
+    close_used_dynamics();
+    close_reaching_mappings();
+    close_leaving_mappings();
+    close_propagated();
+    close_remapped();
+
+    /*  can't close it directly...
+     */
+    CONTROLMAP_MAP(s, c, 
+      {
+	  what_stat_debug(9, s);
+
+	  control_statement(c) = statement_undefined;
+	  gen_free_list(control_successors(c)); control_successors(c) = NIL;
+	  gen_free_list(control_predecessors(c)); control_predecessors(c) = NIL;
+      },
+		   get_remapping_graph());
+
+    close_remapping_graph();
+}
+
 /* void propagate_synonym(s, old, new)
  * statement s;
  * entity old, new;
@@ -331,37 +376,6 @@ distribute d;
  *    several synonyms at the same time...
  *  - what is done on an "incorrect" code is not clear.
  */
-GENERIC_LOCAL_FUNCTION(alive_synonym, statement_entities);
-GENERIC_LOCAL_FUNCTION(used_dynamics, statement_entities);
-GENERIC_LOCAL_FUNCTION(remapping_graph, controlmap);
-
-void init_dynamic_locals()
-{
-    init_alive_synonym();
-    init_remapping_graph();
-    init_used_dynamics();
-}
-
-void close_dynamic_locals()
-{
-    close_alive_synonym();
-    close_used_dynamics();
-
-    /*  can't close it directly...
-     */
-    CONTROLMAP_MAP(s, c, 
-      {
-	  debug(9, "close_dynamic_locals", "statement 0x%x\n",
-		(unsigned int) s);
-
-	  control_statement(c) = statement_undefined;
-	  gen_free_list(control_successors(c)); control_successors(c) = NIL;
-	  gen_free_list(control_predecessors(c)); control_predecessors(c) = NIL;
-      },
-		   get_remapping_graph());
-
-    close_remapping_graph();
-}
 
 static entity 
     old_variable = entity_undefined, /* entity to be replaced */
@@ -387,10 +401,16 @@ statement s;
 static void add_as_a_closing_statement(s)
 statement s;
 {
-    control c = load_remapping_graph(initial_statement);
-    lazy_initialize_for_statement(s);
-    control_successors(c) = 
-	gen_once(load_remapping_graph(s), control_successors(c));
+    control 
+	c = load_remapping_graph(initial_statement),
+	n = (lazy_initialize_for_statement(s), load_remapping_graph(s));
+
+    what_stat_debug(6, s);
+
+    control_successors(c) = gen_once(load_remapping_graph(s),
+				     control_successors(c));
+    control_predecessors(n) = gen_once(load_remapping_graph(initial_statement), 
+				       control_predecessors(n));
 }
 
 static void add_as_a_used_variable(e)
@@ -442,6 +462,8 @@ static bool continue_propagation_p(s)
 statement s;
 {
     instruction i = statement_instruction(s);
+
+    what_stat_debug(8, s);
 
     if (!instruction_call_p(i)) 
 	return(TRUE);
@@ -509,8 +531,8 @@ entity old, new;
 {
     statement current;
 
-    debug(3, "propagate_array_synonym", "%s -> %s from statement 0x%x\n",
-	  entity_name(old), entity_name(new), (unsigned int) s);
+    what_stat_debug(3, s);
+    pips_debug(3, "%s -> %s\n", entity_name(old), entity_name(new));
 
     old_variable = load_primary_entity(old), new_variable = new, 
     array_propagation = array_distributed_p(old),
@@ -543,130 +565,374 @@ entity old, new;
  *  - ??? the convergence is not actually proved. 
  *    I guess it is ok only if the dynamic code is "static"...
  */
-static list /* of statements */ list_of_remapping_statements()
+
+/* To be put in Newgen.
+ */
+
+/* UNUSED PROPAGATION
+ */
+/* for statement s
+ * - remapped arrays
+ * - reaching mappings (1 per array if static)
+ * - leaving mappings (1 per remapped array)
+ * - none propagated.
+ */
+static void 
+initialize_reaching_propagation(s)
+statement s;
+{
+    list /* of entities */ le = NIL, lp = NIL, ll = NIL;
+    entity old, new;
+    renaming r;
+
+    what_stat_debug(4, s);
+
+    MAPL(cr,
+     {
+	 r = RENAMING(CAR(cr));
+	 old = renaming_old(r);
+	 new = renaming_new(r);
+
+	 le = CONS(ENTITY, old, le);
+	 lp = gen_once(load_primary_entity(old), lp);
+	 ll = CONS(ENTITY, new, ll);
+     },	 
+	 load_renamings(s));
+
+    store_reaching_mappings(s, make_entities(le));
+    store_remapped(s, make_entities(lp));
+    store_leaving_mappings(s, make_entities(ll));
+    store_propagated(s, make_entities(NIL));
+}
+
+/* for statements in lc
+ * - array is a reaching mapping
+ * - if added, to be checked
+ */
+static list /* of statements */ 
+propagate_reaching_array(array, lc, ls)
+entity array;
+list /* of controls */ lc;
+list /* of statements */ ls;
+{
+    entity primary = load_primary_entity(array);
+
+    MAPL(cc,
+     {
+	 statement s = control_statement(CONTROL(CAR(cc)));
+	 entities es = load_reaching_mappings(s);
+	 list lr = entities_list(es);
+
+	 if (gen_in_list_p(primary, entities_list(load_remapped(s))) &&
+	     !gen_in_list_p(array, lr))
+	 {
+	     ls = gen_once(s, ls);
+	     entities_list(es) = CONS(ENTITY, array, lr);
+	 }
+     },
+	 lc);
+
+    return(ls);
+}
+
+static list /* of statements */ 
+propagate_all_unsused(s, ls)
+statement s;
+list /* of statements */ ls;
+{
+    entities propagated = load_propagated(s),
+             leaving = load_leaving_mappings(s);
+    list /* of entities */ lp = entities_list(propagated), /* gonna be the Q */
+                           le = entities_list(load_used_dynamics(s)),
+         /* of controls */ lc = control_successors(load_remapping_graph(s));
+
+    MAPL(ce,
+     {
+	 entity array = ENTITY(CAR(ce));
+	 entity primary = load_primary_entity(array);
+
+	 if (!gen_in_list_p(primary, le) && !gen_in_list_p(array, lp))
+	 {
+	     what_stat_debug(4, s);
+	     pips_debug(4, "propagating %s\n", entity_name(array));
+
+	     ls = propagate_reaching_array(array, lc, ls);
+	     entities_list(leaving) = gen_once(array, entities_list(leaving));
+	     entities_list(propagated) = 
+		 CONS(ENTITY, array, entities_list(propagated));
+	 }
+     },
+	 entities_list(load_reaching_mappings(s)));
+    
+    return(ls);
+}
+
+/* {sh,c}ould be integrated in the mapping propagation phase ?
+ */
+static void remove_not_remapped_leavings(s)
+statement s;
+{
+    entities leaving  = load_leaving_mappings(s);
+    list /* of entities */ 
+	ll = entities_list(leaving),
+	ln = gen_copy_seq(ll),
+	lr = entities_list(load_remapped(s)),
+	li = entities_list(load_reaching_mappings(s)),
+	lu = entities_list(load_used_dynamics(s));
+    entity array, primary;
+
+    MAPL(ce,
+     {
+	 array = ENTITY(CAR(ce));
+	 primary = load_primary_entity(array);
+
+	 if (!gen_in_list_p(primary, lu) && /* NOT USED and */
+	      gen_in_list_p(primary, lr) && /* REMAPPED and */
+	     !gen_in_list_p(array, li))     /* NOT REACHED */
+	 {
+	     what_stat_debug(4, s);
+	     pips_debug(4, "removing %s\n", entity_name(array));
+	     gen_remove(&ln, array);	    /* => NOT LEAVED */
+	 }
+     },
+	 ll);
+
+    gen_free_list(ll), entities_list(leaving) = ln;
+}
+
+/* A remapped from x and no reaching x ->
+ * not from x, and no leaving x if remapped but not used...
+ */
+
+static bool reached_mapping_p(array, lc)
+entity array;
+list /* of controls */ lc;
+{
+    MAPL(cc,
+	 if (gen_in_list_p(array, 
+	     entities_list(load_leaving_mappings
+			   (control_statement(CONTROL(CAR(cc)))))))
+	     return(TRUE),
+	 lc);
+
+    return(FALSE);
+}
+
+static list /* of statements */
+add_successors(s, ls)
+statement s;
+list /* of statements */ ls;
+{
+    list /* of controls */ lc = control_successors(load_remapping_graph(s));
+    
+    MAPL(cc, ls = gen_once(control_statement(CONTROL(CAR(cc))), ls), lc);
+
+    return(ls);
+}
+
+static void remove_from_entities(primary, es)
+entity primary;
+entities es;
+{
+    list /* of entity(s) */ le = gen_copy_seq(entities_list(es));
+
+    MAPL(ce,
+     {
+	 entity array = ENTITY(CAR(ce));
+
+	 if (load_primary_entity(array)==primary)
+	     gen_remove(&entities_list(es), array);
+     },
+	 le);
+
+    gen_free_list(le);
+}
+
+static void remove_unused_remappings(s)
+statement s;
+{
+    entities remapped = load_remapped(s),
+             reaching = load_reaching_mappings(s),
+             leaving = load_leaving_mappings(s);
+    list /* of entity(s) */ le = gen_copy_seq(entities_list(remapped)),
+                            lu = entities_list(load_used_dynamics(s));
+    entity primary;
+
+    MAPL(ce,
+     {
+	 primary = ENTITY(CAR(ce));
+
+	 if (!gen_in_list_p(primary, lu))
+	 {
+	     remove_from_entities(primary, remapped);
+	     remove_from_entities(primary, reaching);
+	     remove_from_entities(primary, leaving);
+	 }
+     },
+	 le);
+
+    gen_free_list(le);
+}
+
+static list /* of statements */
+kill_dead_remappings(s, ls)
+statement s;
+list /* of statements */ ls;
+{
+    entity primary, array;
+    entities reaching = load_reaching_mappings(s),
+             leaving = load_leaving_mappings(s);
+    list /* of controls */ lc = control_predecessors(load_remapping_graph(s)),
+         /* of entities */ le = gen_copy_seq(entities_list(reaching)),
+                           lu = entities_list(load_used_dynamics(s)),
+                           lr = entities_list(load_remapped(s));
+
+    if (s==get_current_module_statement()) return(ls); 
+
+    /* but I should clean the initial??? */
+
+    MAPL(ce,
+     {
+	 array = ENTITY(CAR(ce));
+	 primary = load_primary_entity(array);
+	 
+	 if (!reached_mapping_p(array, lc))
+	 {
+	     what_stat_debug(4, s);
+	     pips_debug(4, "killing reaching %s\n", entity_name(array));
+
+	     gen_remove(&entities_list(reaching), array);
+
+	     if (!gen_in_list_p(primary, lu) && gen_in_list_p(primary, lr))
+	     {
+		 gen_remove(&entities_list(leaving), array);
+		 ls = add_successors(s, ls);
+	     }
+	 }	     
+     }, 
+	 le);
+
+    gen_free_list(le); 
+    return(ls);
+}
+
+static void regenerate_renamings(s)
+statement s;
+{
+    list /* of entity(s) */
+	lr = entities_list(load_reaching_mappings(s)),
+	ll = entities_list(load_leaving_mappings(s)),
+	ln = NIL;
+    entity target, source, primary;
+    
+    what_stat_debug(4, s);
+
+    MAPL(cl,
+     {
+	 target = ENTITY(CAR(cl));
+	 primary = load_primary_entity(target);
+
+	 MAPL(cr,
+	  {
+	      source = ENTITY(CAR(cr));
+
+	      if (load_primary_entity(source)==primary && source!=target)
+	      {
+		  pips_debug(4, "%s -> %s\n", 
+			     entity_name(source), entity_name(target));
+		  ln = CONS(RENAMING, make_renaming(source, target), ln);
+	      }
+	  },
+	      lr);
+     },
+	 ll);
+
+    {
+	list /* of renaming(s) */ l = load_renamings(s);
+	gen_map(gen_free, l), gen_free_list(l); /* ??? */
+	update_renamings(s, ln);
+    }
+}
+
+static list /* of statements */ 
+list_of_remapping_statements()
 {
     list /* of statements */ l = NIL;
 
-    CONTROLMAP_MAP(s, c, 
-	{
-	    debug(10, "list_of_remapping_statements", 
-		  "statement 0x%x, control 0x%x\n", 
-		  (unsigned int) s, (unsigned int) c);
-	    
-	    l = CONS(STATEMENT, s, l);
-	}, get_remapping_graph());
+    CONTROLMAP_MAP(s, c, l = CONS(STATEMENT, s, l), get_remapping_graph());
 
     return(l);
 }
 
-/* each successor of s is looked for a renaming new_var -> X,
- * and new_var is switched to old_var if so.
- */
-static void change_renaming(s, old_var, new_var, pm)
-statement s;
-entity old_var, new_var;
-list /* of statements */ *pm; /* the list is modified */
+static void print_control_orderings(lc)
+list /* of controls */ lc;
 {
-    MAPL(cc,
-     {
-	 statement succ = control_statement(CONTROL(CAR(cc)));
+    int so;
 
-	 MAPL(cr,
-	  {
-	      renaming r = RENAMING(CAR(cr));
-	      
-	      if (renaming_old(r)==new_var)
-	      {
-		  renaming_old(r) = old_var;
-		  *pm = gen_once(succ, *pm);
-	      }
-	  },
-	      load_renamings(succ));
+    MAPL(cc, 
+     {
+	 so = statement_ordering(control_statement(CONTROL(CAR(cc))));
+	 fprintf(stderr, "(%d,%d), ", 
+		 ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
      },
-	 control_successors(load_remapping_graph(s)));
+	 lc);
 }
 
-/* the statement is looked for unusefull remappings.
- * those found are propagated and the touch remapping statements are returned.
- */
-static void simplify_remapping_for_statement(s, pmodified)
+static void dump_remapping_graph_info(s)
 statement s;
-list /* of statements */ *pmodified; /* the list is modified */
 {
-    list /* of renamings */ lr = load_renamings(s),
-         /* of entities */  le = entities_list(load_used_dynamics(s));
+    control c = load_remapping_graph(s);
 
-    MAPL(cr,
-     {
-	 renaming r = RENAMING(CAR(cr));
-	 entity new_var = renaming_new(r);
-	 entity old_var = renaming_old(r);
-	 entity primary = load_primary_entity(new_var);
+    what_stat_debug(1, s);
 
-	 if (!gen_in_list_p(primary, le) && old_var!=new_var)
-	 {
-	     /* something to change 
-	      */
-	     debug(3, "simplify_remapping_for_statement",
-		   "forwarding unused %s -> %s\n",
-		   entity_local_name(old_var), entity_local_name(new_var));
+    fprintf(stderr, "predecessors: ");
+    print_control_orderings(control_predecessors(c));
+    fprintf(stderr, "\nsuccessors: ");
+    print_control_orderings(control_successors(c));
+    fprintf(stderr, "\n");
 
-	     change_renaming(s, old_var, new_var, pmodified);
-	     renaming_new(r) = old_var;
-	 }	     
-     },
-	 lr);
+    DEBUG_ELST(1, "remapped", entities_list(load_remapped(s)));
+    DEBUG_ELST(1, "used", entities_list(load_used_dynamics(s)));
+    DEBUG_ELST(1, "reaching", entities_list(load_reaching_mappings(s)));
+    DEBUG_ELST(1, "leaving", entities_list(load_leaving_mappings(s)));
 }
 
-/* 1/ A -> A' (not used) and A' -> A''  =>  A -> A and A -> A''.
- * 2/ A -> A  =>  (void).
+/* 
+ * what:
+ * how:
+ * input:
+ * output:
+ * side effects:
+ *  - 
+ *  - 
+ * bugs or features:
  */
 void simplify_remapping_graph()
 {
-    list /* of statements */
-	to_check = list_of_remapping_statements(),
-	to_clean = gen_copy_seq(to_check);
+    list /* of statements */ ls = list_of_remapping_statements();
+    statement root = get_current_module_statement();
 
-    /*  transitive simplification if the intermediate array is not used.
-     *  in the code section. 
-     *  propagate unused remappings till remapping graph stability.
-     *  the convergence should be proved. I guess it is okay if the code
-     *  is static, but a formal proof would be nice...
-     */
-    while (to_check!=NIL)
-    {
-	list /* of statements */ modified = NIL;
+    what_stat_debug(3, root);
 
-	MAPL(cs,
-	     simplify_remapping_for_statement(STATEMENT(CAR(cs)), &modified), 
-	     to_check);
-	     
-	gen_free_list(to_check), to_check = modified;
-    }
+    gen_map(initialize_reaching_propagation, ls);
 
-    /* remove A -> A
-     */
-    MAPL(cs,
-     {
-	 statement s = STATEMENT(CAR(cs));
-	 list /* of renamings */ lr = load_renamings(s);
-	 list /* of renamings */ ln = NIL;
+    ifdebug(2) gen_map(dump_remapping_graph_info, ls);
 
-	 MAPL(cr,
-	  {
-	      renaming r = RENAMING(CAR(cr));
-	      if (renaming_old(r)!=renaming_new(r))
-		  ln = CONS(RENAMING, r, ln);
-	      else 
-		  free_renaming(r);
-	  },
-	      lr);
+    gen_closure(propagate_all_unsused, ls);
+    gen_map(remove_not_remapped_leavings, ls);
 
-	 gen_free_list(lr); update_renamings(s, ln);
-     },
-	 to_clean);
+    ifdebug(2) gen_map(dump_remapping_graph_info, ls);
 
-    gen_free_list(to_clean);
+    if (bound_remapped_p(root))
+	remove_unused_remappings(root);
+    gen_closure(kill_dead_remappings, ls);
+
+    gen_map(regenerate_renamings, ls);
+    gen_map(gen_free, load_renamings(root)),
+    gen_free_list(load_renamings(root)), 
+    (void) delete_renamings(root);
+
+    gen_free_list(ls);
 }
 
 /* list alive_arrays(s, t);
@@ -683,10 +949,8 @@ list /* of entities */ alive_arrays(s, t)
 statement s;
 entity t;
 {
+    list /* of entities */ l = NIL,lseens = NIL; /* to tag seen primaries. */
     entity array;
-    list /* of entities */ 
-	l = NIL,
-	lseens = NIL; /* primary entities already seen. just to tag them. */
 
     assert(entity_template_p(t));
 
