@@ -42,15 +42,15 @@ open_log_file(void)
 
     if (get_bool_property("USER_LOG_P") == TRUE) 
     {
-	char * log_file_name =
-	    strdup(concatenate(
-		db_get_current_workspace_directory(), "/", LOG_FILE, NULL));
+	string 
+	    dir = db_get_current_workspace_directory(),
+	    log_file_name = strdup(concatenate(dir, "/", LOG_FILE, 0));
+	free(dir);
 	
 	if ((log_file = fopen(log_file_name, "a")) == NULL) {
-	    perror("open_log_file");
-	    user_error("open_log_file", 
-		       "Cannot open log file in workspace %s. "
-		       "Check access rights.");
+	    perror("[open_log_file]");
+	    pips_user_error("Cannot open log file in workspace %s. "
+			    "Check access rights.");
 	}
 
 	free(log_file_name);
