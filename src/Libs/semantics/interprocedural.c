@@ -572,7 +572,8 @@ entity v;
 			 module_local_name(m));
 	    if(entity_is_argument_p(v, transformer_arguments(tf))) {
 		entity v_old = global_new_value_to_global_old_value(v);
-		transformer_projection(tf, CONS(ENTITY, v_old, NIL));
+		/* transformer_projection(tf, CONS(ENTITY, v_old, NIL)); */
+		(void) transformer_filter(tf, CONS(ENTITY, v_old, NIL));
 	    }
 	    transformer_projection(tf, CONS(ENTITY, v, NIL));
 	    return;
