@@ -21,6 +21,11 @@ static hash_table OrderingToStatement = (hash_table) NULL;
 
 
 
+bool ordering_to_statement_initialized_p()
+{
+    return OrderingToStatement != (hash_table) NULL;
+}
+
 void initialize_ordering_to_statement(s)
 statement s;
 {
