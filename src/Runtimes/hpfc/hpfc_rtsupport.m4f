@@ -2,8 +2,7 @@
 ! Runtime Support Functions for the High Performance Fortran Compiler
 ! by Fabien COELHO.
 !
-! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/05/29 15:46:49 $, )
+! $Id$
 !
 !-----------------
 !
@@ -749,11 +748,8 @@ _CM5(
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
-      print *,"hpfc receive from sender", SLID
       call HPFC RECEIVE(SENDERTID, RECVCHANNELS(SLID), bufid)
-      print *,"HPFC RCVFR S - Unpack data"
       call HPFC UNPACK(what, goal, 1, 1, info)
-      print *,"data unpacked"
       RECVCHANNELS(SLID) = RECVCHANNELS(SLID) + 2
       end
 !
