@@ -12,6 +12,10 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.150  2001/04/06 08:51:59  irigoin
+%% New property PARSER_ACCEPT_ANSI_EXTENSIONS added. The previous change by
+%% Nga fixed typos and spelling mistakes.
+%%
 %% Revision 1.149  2001/04/06 08:38:34  irigoin
 %% Nga Nguyen ne sais pas ce qu'elle a change...
 %%
@@ -156,7 +160,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2001/04/06 08:38:34 $~$
+$~$Date: 2001/04/06 08:51:59 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -454,6 +458,7 @@ WARN_ABOUT_EMPTY_SEQUENCES FALSE
 
 
 \subsection{Preprocessing}
+\label{subsection-preprocessing}
 \index{Preprocessing}
 \index{CHECK\_FORTRAN\_SYNTAX\_BEFORE\_PIPS}
 \index{PREPROCESSOR\_MISSING\_FILE\_HANDLING}
@@ -506,6 +511,27 @@ if some characters are encountered in this comment field.
 \begin{verbatim}
 PARSER_WARN_FOR_COLUMNS_73_80   TRUE
 \end{verbatim}
+
+\subsubsection{ANSI extension}
+\index{PARSER\_ACCEPT\_ANSI\_EXTENSIONS}
+\index{correctness}
+
+PIPS has been initially developped to parse correct Fortran compliant
+programs only. Real applications use lots of ANSI extensions... and they
+are not always correct! To make sure that PIPS output is correct, the
+input code should be checked against ANSI extensions using property 
+\begin{quote}
+CHECK\_FORTRAN\_SYNTAX\_BEFORE\_PIPS
+\end{quote}
+(see Section~\ref{subsection-preprocessing}) and the property below should
+be set to false.
+
+\begin{verbatim}
+PARSER_ACCEPT_ANSI_EXTENSIONS TRUE
+\end{verbatim}
+
+Currently, this property is not used often enough in PIPS parser which let
+go many mistakes... as expected by real users!
 
 \subsubsection{Type Checking}
 \index{Type Checking}
