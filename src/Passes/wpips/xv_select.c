@@ -93,33 +93,40 @@ Event *event;
 success continue_create_program_notify(name)
      char *name;
 {
-  char *fortran_list[ARGS_LENGTH];
-    int  fortran_list_length = 0;
-  extern jmp_buf pips_top_level;
+   char *fortran_list[ARGS_LENGTH];
+   int  fortran_list_length = 0;
+   extern jmp_buf pips_top_level;
 
 
-    if( setjmp(pips_top_level) ) {
+   if( setjmp(pips_top_level) ) {
       xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
       xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
       return(FALSE);
-    }
-    else {
+   }
+   else {
       xv_set(create_pgm, MENU_INACTIVE, TRUE, 0);
       xv_set(open_pgm, MENU_INACTIVE, TRUE, 0);
 
       pips_get_fortran_list(&fortran_list_length, fortran_list);
 
       if (fortran_list_length == 0) {
-	prompt_user("No Fortran files in this directory");
-	longjmp(pips_top_level, 1);
+         prompt_user("No Fortran files in this directory");
+         longjmp(pips_top_level, 1);
       }
       else {
-	/* Code added to confirm for a database destruction before
-	   opening a database with the same name.
-	   RK 18/05/1993. */
-	if (workspace_exists_p(name))
-	  {
+         /* Code added to confirm for a database destruction before
+            opening a database with the same name.
+            RK 18/05/1993. */
+         if (workspace_exists_p(name))
+         {
 	    int result;
+            /* Send to emacs if we are in the emacs mode: */
+            if (wpips_emacs_mode) 
+               send_notice_prompt_to_emacs("The database",
+                                           name,
+                                           "already exists!",
+                                           "Do you really want to remove it?",
+                                           NULL);
 	    result = notice_prompt(xv_find(main_frame, WINDOW, 0),
 				   NULL,
 				   NOTICE_MESSAGE_STRINGS,
@@ -130,18 +137,18 @@ success continue_create_program_notify(name)
 				   NOTICE_BUTTON_NO,   "No, cancel",
 				   NULL);
 	    if (result == NOTICE_NO)
-	      return(FALSE);
-	  }
+               return(FALSE);
+         }
 
-	db_create_program(name);
-	open_log_file();
-	mchoose("Create Workspace", 
-		fortran_list_length, fortran_list, 
-		end_create_program_notify);
-	args_free(&fortran_list_length, fortran_list);
-	return(TRUE);
+         db_create_program(name);
+         open_log_file();
+         mchoose("Create Workspace", 
+                 fortran_list_length, fortran_list, 
+                 end_create_program_notify);
+         args_free(&fortran_list_length, fortran_list);
+         return(TRUE);
       }
-    }
+   }
 }
 
 
