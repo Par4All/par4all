@@ -148,7 +148,6 @@ void my_print(text t)
   safe_fclose(my_file, filename);
   free(filename);
 }
-/*************************************************/
 
 /***************written by Dat********************/
 text my_text_named_module(entity module, statement stat)
