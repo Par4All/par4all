@@ -162,29 +162,7 @@ vect_make(Pvecteur v, ...)
     return(v);
 }
 
-/* direct duplication. The initial Pbase is assumed to be valid.
- */
-Pbase base_dup(Pbase b)
-{
-  Pbase n = BASE_NULLE, p = BASE_NULLE, r = BASE_NULLE;
 
-  for (; b!=BASE_NULLE; b=b->succ)
-  {
-    n = (Pvecteur) MALLOC(sizeof(Svecteur),VECTEUR,"base_dup");
-    if (n == NULL) {
-      fprintf(stderr,"[base_dup] out of memory space\n");
-      abort();
-    }
-    var_of(n) = var_of(b);
-    val_of(n) = VALUE_ONE;
-    n->succ = NULL;
-    if (r==BASE_NULLE) r = n;
-    if (p!=BASE_NULLE) p->succ = n;
-    p = n;
-  }
-
-  return r;
-}
 
 /* direct duplication. 
  * vect_dup() and vect_reversal() do the same thing : 
@@ -214,6 +192,37 @@ Pbase vect_copy(Pvecteur b)
 
   return r;
 }
+
+/* Pbase base_dup(Pbase b) 
+ * Note: this function changes the value of the pointer.
+ * Use base_copy instead. Should become a link, not a function.
+ * For the moment, it's a function, because of the sc.h cannot be updated
+ * without installation, due to decision of integration of Janus or not? DN 12/5/03
+ */
+Pbase base_dup(Pbase b)
+{
+  /* return base_copy(b);*/
+
+  Pbase n = BASE_NULLE, p = BASE_NULLE, r = BASE_NULLE;
+
+  for (; b!=BASE_NULLE; b=b->succ)
+  {
+    n = (Pvecteur) MALLOC(sizeof(Svecteur),VECTEUR,"base_dup");
+    if (n == NULL) {
+      fprintf(stderr,"[base_dup] out of memory space\n");
+      abort();
+    }
+    var_of(n) = var_of(b);
+    val_of(n) = VALUE_ONE;
+    n->succ = NULL;
+    if (r==BASE_NULLE) r = n;
+    if (p!=BASE_NULLE) p->succ = n;
+    p = n;
+  }
+  return r;
+}
+
+
 
 /* Direct duplication. The initial Pbase is assumed to be valid.
  * Absolutely the same with base_dup, but base_up is the only function
