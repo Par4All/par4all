@@ -6,8 +6,6 @@
 #include "misc.h"
 #include "ri-util.h"
 
-#include "control.h"
-
 extern int Nbrdo;
 
 
