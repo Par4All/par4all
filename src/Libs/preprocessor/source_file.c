@@ -36,6 +36,7 @@
 
 #include "property.h"
 #include "pipsmake.h"
+#include "pipsdbm.h"
 
 #include "top-level.h"
 
@@ -595,7 +596,7 @@ static bool pips_split_file(string name, string tempfile)
 
 /********************************************** managing .F files with cpp */
 
-#define CPP_FILTERED_SUFFIX 	".cpp_processed"
+#define CPP_FILTERED_SUFFIX 	"_cpp_processed.f"
 
 /* pre-processor and added options from environment
  */
@@ -616,9 +617,16 @@ static bool dot_F_file_p(string name)
 /* returns the newly allocated name */
 static string process_thru_cpp(string name)
 {
-    string new_name = strdup(concatenate(name, CPP_FILTERED_SUFFIX, NULL));
-    string cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
-    string cpp = getenv(CPP_PIPS_ENV);
+    string dir_name, new_name, simpler, cpp_options, cpp;
+
+    dir_name = db_get_current_workspace_directory();
+    simpler = basename(name, ".F");
+    new_name = 
+	strdup(concatenate(dir_name, "/", simpler, CPP_FILTERED_SUFFIX, 0));
+    free(simpler);
+
+    cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
+    cpp = getenv(CPP_PIPS_ENV);
 
     safe_system(concatenate(cpp? cpp: CPP_CPP, 
 			    CPP_CPPFLAGS, cpp_options? cpp_options: "", " ",
