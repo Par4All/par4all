@@ -3,7 +3,7 @@
  * these functions deal with HPF directives.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/06/09 16:53:19 $, )
+ * ($Date: 1995/07/20 18:40:49 $, )
  */
 
 #include "defines-local.h"
@@ -239,18 +239,16 @@ statement s;
 {
     entity array;
 
-    MAPL(ce,
-     {
-	 array = ENTITY(CAR(ce));
-
-	 if (array_distributed_p(array))
-	 {
-	     propagate_synonym(s, array, array);
-	     update_renamings(s, CONS(RENAMING, make_renaming(array, array),
-				      load_renamings(s)));
-	 }
-     },
-	 get_the_dynamics());
+    MAP(ENTITY, array,
+    {
+	if (array_distributed_p(array))
+        {
+	    propagate_synonym(s, array, array);
+	    update_renamings(s, CONS(RENAMING, make_renaming(array, array),
+				     load_renamings(s)));
+	}
+    },
+	get_the_dynamics());
 }
 
 static void one_align_directive(alignee, temp, dynamic)
@@ -427,9 +425,8 @@ bool dynamic;
 
 	/*  all arrays aligned to template are propagated in turn.
 	 */
-	MAPL(ce,
+	MAP(ENTITY, array,
 	 {
-	     entity array = ENTITY(CAR(ce));
 	     align a = new_align_with_template(load_entity_align(array), new_t);
 	     entity new_array = array_synonym_aligned_as(array, a);
 
@@ -438,7 +435,7 @@ bool dynamic;
 			      CONS(RENAMING, make_renaming(array, new_array),
 				   load_renamings(current)));
 	 },
-	     alive_arrays(current, template));
+	    alive_arrays(current, template));
     }
     else
 	store_entity_distribute(template, d);
@@ -711,17 +708,16 @@ statement s;
 	debug(4, "clean_statement",
 	      "remapping statement 0x%x\n", (unsigned int) s);
 
-	MAPL(cr,
-	 {
-	     renaming r = RENAMING(CAR(cr));
-	     entity o = renaming_old(r);
-	     entity n = renaming_new(r);
-
-	     debug(5, "clean_statement", 
-		   "%s -> %s\n", entity_name(o), entity_name(n));
-	     block = CONS(STATEMENT, generate_copy_loop_nest(o, n), block);
-	 },
-	     lr);
+	MAP(RENAMING, r,
+	{
+	    entity o = renaming_old(r);
+	    entity n = renaming_new(r);
+	    
+	    debug(5, "clean_statement", 
+		  "%s -> %s\n", entity_name(o), entity_name(n));
+	    block = CONS(STATEMENT, generate_copy_loop_nest(o, n), block);
+	},
+	    lr);
 
 	free_instruction(i);
 	statement_instruction(s) =
