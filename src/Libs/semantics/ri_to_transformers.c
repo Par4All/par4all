@@ -10,6 +10,9 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.59  2001/07/24 13:21:55  irigoin
+  * Formatting added
+  *
   * Revision 1.58  2001/07/24 13:18:00  irigoin
   * Cleanup of test_to_transformer() to handle side effects in test conditions
   *
@@ -110,7 +113,7 @@ transformer effects_to_transformer(list e) /* list of effects */
 
   return make_transformer(args, make_predicate(s));
 }
-
+
 transformer filter_transformer(transformer t, list e) 
 {
   /* algorithm: keep only information about scalar variables with values
@@ -146,7 +149,7 @@ transformer filter_transformer(transformer t, list e)
   return make_transformer(args, make_predicate(s));
 }
 
-
+
 /* Recursive Descent in Data Structure Statement */
 
 /* SHARING : returns the transformer stored in the database. Make a copy 
@@ -187,7 +190,7 @@ block_to_transformer(list b)
   pips_debug(8, "end\n");
   return btf;
 }
-
+
 static void 
 unstructured_to_transformers(unstructured u)
 {
@@ -242,7 +245,7 @@ unstructured_to_transformer(unstructured u, list e) /* effects */
 
   return tf;
 }
-
+
 list 
 effects_to_arguments(list fx) /* list of effects */
 {
@@ -263,7 +266,7 @@ effects_to_arguments(list fx) /* list of effects */
 
   return args;
 }
-
+
 /* The loop initialization is performed before tf */
 transformer transformer_add_loop_index_initialization(transformer tf, loop l)
 {
@@ -378,7 +381,7 @@ transformer transformer_add_loop_index_incrementation(transformer tf, loop l)
  * There is only one attachment for the unbounded transformer and
  * for the bounded one.
  */
-
+
 static transformer 
 loop_to_transformer(loop l)
 {
@@ -429,7 +432,7 @@ loop_to_transformer(loop l)
 
   return tf;
 }
-
+
 /* The index variable is always initialized and then the loop is either
    entered and exited or not entered */
 transformer 
@@ -506,7 +509,7 @@ refine_loop_transformer(transformer t, loop l)
 
   return tf;
 }
-
+
 /* This function computes the effect of K loop iteration, with K positive.
  * This function does not take the loop exit into account because its result
  * is used to compute the precondition of the loop body.
@@ -651,7 +654,7 @@ test_to_transformer(test t, list ef) /* effects of t */
   debug(8,"test_to_transformer","end\n");
   return tf;
 }
-
+
 static transformer 
 intrinsic_to_transformer(
     entity e, list pc, list ef) /* effects of intrinsic call */
@@ -1160,7 +1163,8 @@ user_call_to_transformer(
 
   return t_caller;
 }
-
+
+/* SHould be moved into the transformer library */
 transformer
 transformer_add_identity(transformer tf, entity v)
 {
@@ -1373,7 +1377,7 @@ transformer any_assign_to_transformer(list args, /* arguments for assign */
   pips_debug(8,"end\n");
   return tf;
 }
-
+
 static transformer 
 instruction_to_transformer(i, e)
 instruction i;
