@@ -130,7 +130,7 @@ static void statement_rwt(statement s)
 
 /* CALL
  */
-static void call_flt(call c)
+static bool call_flt(call c)
 {
     entity e_callee = call_function(c);
     string callee_name = module_local_name(e_callee);
@@ -186,7 +186,7 @@ static void call_flt(call c)
 	/* store it to the statement mapping */
 	update_statement_icfg (current_stmt_head(), r);
     }
-    return;
+    return value_code_p(entity_initial(e_callee);
 }
 
 static void call_rwt(call c)
