@@ -6,21 +6,7 @@
  * Functions for the manipulations and modifications of the control graph.
  */
 
-#include <stdio.h>
-#include <string.h>
-
-#include "genC.h"
-
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-/* #include "database.h"*/
-
-#include "ri-util.h"
-#include "constants.h"
-#include "misc.h"
-
-#include "atomizer.h"
+#include "local.h"
 
 /*============================================================================*/
 /* void modify_blocks(control c): Adds a node to the control graph when the
