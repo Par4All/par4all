@@ -53,9 +53,7 @@ static list build_resource_names = NIL;
 static gen_array_t source_files = NULL;
 static list selected_rules = NIL;
 
-static void pips_parse_arguments(argc, argv)
-int argc;
-char * argv[];
+static void pips_parse_arguments(int argc, char * argv[])
 {
     int c;
     extern char *optarg;
@@ -65,7 +63,8 @@ char * argv[];
     while ((c = getopt(argc, argv, "vf:m:s:p:b:1:0:")) != -1)
 	switch (c) {
 	case 'v':
-	    fprintf(stderr, "pips: (ARCH=%s) %s\n", SOFT_ARCH, argv[0]);
+	    fprintf(stderr, "pips: (ARCH=" SOFT_ARCH 
+		    ", DATE=" UTC_DATE ") %s\n", argv[0]);
 	    break;
 	case 'f':
 	    gen_array_append(source_files, optarg);
