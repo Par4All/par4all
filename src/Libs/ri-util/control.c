@@ -4,10 +4,10 @@
    Ronan Keryell.
    */
 
-/* 	%A% ($Date: 1997/05/27 14:01:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/18 12:37:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1997/05/27 14:01:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1997/07/18 12:37:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -81,14 +81,14 @@ check_control_coherency(control c)
 	/* Test the coherency of the successors: */
 	MAP(CONTROL, cc, {	    
 	    if (!is_control_in_list_p(ctl, control_predecessors(cc))) {
-		pips_debug(0, "Control node %#x not in the predecessor list of %#x\n", (unsigned int) ctl, (unsigned int) cc);
+		pips_debug(0, "Control node %#p not in the predecessor list of %#p\n", ctl, cc);
 		ifdebug(9)
 		    pips_assert("Control incorrect", 0);
 	    }
 	}, control_successors(ctl));
 	MAP(CONTROL, cc, {
 	    if (!is_control_in_list_p(ctl, control_successors(cc))) {
-		pips_debug(0, "Control node %#x not in the successor list of %#x\n", (unsigned int) ctl, (unsigned int) cc);
+		pips_debug(0, "Control node %#p not in the successor list of %#p\n", ctl, cc);
 		ifdebug(9)
 		    pips_assert("Control incorrect", 0);
 	    }
@@ -104,7 +104,7 @@ display_address_of_control_nodes(list cs)
 {
 	MAP(CONTROL, cc,
 	    {
-		fprintf(stderr, "%#x,", (unsigned int) cc);
+		fprintf(stderr, "%#p,", cc);
 	    }, cs);
 }
 
@@ -114,14 +114,14 @@ void
 display_linked_control_nodes(control c) {
     list blocs = NIL;
     CONTROL_MAP(ctl, {
-	fprintf(stderr, "%#x (pred (#%d)=", (unsigned int) ctl,
+	fprintf(stderr, "%#p (pred (#%d)=", ctl,
 		gen_length(control_predecessors(ctl)));
 	display_address_of_control_nodes(control_predecessors(ctl));
 	fprintf(stderr, " succ (#%d)=", gen_length(control_successors(ctl)));
 	display_address_of_control_nodes(control_successors(ctl));
 	fprintf(stderr, "), ");
 	ifdebug(8) {
-	    pips_debug(0, "Statement of control %#x:\n", (unsigned int) ctl);
+	    pips_debug(0, "Statement of control %#p:\n", ctl);
 	    print_statement(control_statement(ctl));
 	}
     }, c, blocs);
