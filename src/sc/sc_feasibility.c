@@ -210,15 +210,15 @@ chose_variable_to_project_for_feasability(Psysteme s, Pbase b, boolean ineq)
  * using equalities or both equalities and inequalities.
 */
 static boolean sc_fm_project_variables
-(Psysteme s1, boolean integer_p, boolean use_eq_only, int ofl_ctrl)
+(Psysteme * ps1, boolean integer_p, boolean use_eq_only, int ofl_ctrl)
 {
-  Pbase b = base_dup(sc_base(s1));
+  Pbase b = base_dup(sc_base(*ps1));
   Variable var;
   boolean faisable = TRUE;
     
   while (b && faisable)
   {
-    var = chose_variable_to_project_for_feasability(s1, b, !use_eq_only);
+    var = chose_variable_to_project_for_feasability(*ps1, b, !use_eq_only);
 
     /* if use_eq_only */
     if (!var) break;
@@ -230,27 +230,27 @@ static boolean sc_fm_project_variables
 	fprintf(stderr, 
 		"[sc_fm_project_variables] system before %s projection:\n", 
 		var);
-	sc_fprint(stderr, s1, default_variable_to_string);
+	sc_fprint(stderr, *ps1, default_variable_to_string);
       }
 	    
-    sc_projection_along_variable_ofl_ctrl(&s1, var, ofl_ctrl);
+    sc_projection_along_variable_ofl_ctrl(ps1, var, ofl_ctrl);
 
     ifscdebug(8)
     {
       fprintf(stderr, 
 	      "[sc_fm_project_variables] system after projection:\n");
-      sc_fprint(stderr, s1, default_variable_to_string);
+      sc_fprint(stderr, *ps1, default_variable_to_string);
     }
 	    
-    if (sc_empty_p(s1))
+    if (sc_empty_p(*ps1))
     {
       faisable = FALSE;
       break;
     }
 
     if (integer_p) {
-      s1 = sc_normalize(s1);
-      if (SC_EMPTY_P(s1)) 
+      *ps1 = sc_normalize(*ps1);
+      if (SC_EMPTY_P(*ps1)) 
       { 
 	faisable = FALSE; 
 	break;
@@ -276,7 +276,7 @@ static boolean internal_sc_feasibility
   if ((method & PROJECT_EQ_METHOD))
   {
     w = sc_dup(sc);
-    ok = sc_fm_project_variables(w, int_p, TRUE, ofl_ctrl);
+    ok = sc_fm_project_variables(&w, int_p, TRUE, ofl_ctrl);
   }
 
   /* maybe the S/FM should be chosen again as #ref has changed... */
@@ -442,7 +442,7 @@ int ofl_ctrl;
     base_rm(sc_base(s1));
     sc_creer_base(s1);
 
-    faisable = sc_fm_project_variables(s1, integer_p, FALSE, ofl_ctrl);
+    faisable = sc_fm_project_variables(&s1, integer_p, FALSE, ofl_ctrl);
 	
     sc_rm(s1);
   }
