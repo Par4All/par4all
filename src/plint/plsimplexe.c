@@ -51,35 +51,43 @@ int *no_som;
     Psommet result = NULL;
     double ncoeff = 0;
     double min = 0;
-    int mod = 0;
-    int mod2 = 0;
-    int cst = 0;
+    Value mod = 0;
+    Value mod2 = 0;
+    Value cst = 0;
 
 #ifdef TRACE 
     printf (" **** alg. primal - recherche ligne pivot \n");
 #endif
     for (ps = sys; 
-	 ps != NULL && ((vect_coeff(var,ps->vecteur)<=0) 
-			|| (vect_coeff(TCST,ps->vecteur)> 0));
+	 ps != NULL && (value_negz_p(vect_coeff(var,ps->vecteur))
+			|| value_pos_p(vect_coeff(TCST,ps->vecteur)));
 	 ps = ps->succ,nb_som --);
 
     /* initialisation du minimum 	*/
     if (ps != NULL)
     {
-	int cv1 = 0;
-	min = (double) - vect_coeff(TCST,ps->vecteur)/vect_coeff(var,ps->vecteur);
-	mod = - vect_coeff(TCST,ps->vecteur) % vect_coeff(var,ps->vecteur);
+	Value cv1 = 0;
+	Value tmp1 = value_uminus(vect_coeff(TCST,ps->vecteur)),
+	      tmp2 = vect_coeff(var,ps->vecteur),tmp;
+	tmp = value_div(tmp1,tmp2);
+	min = VALUE_TO_DOUBLE(tmp);
+	mod = value_mod(tmp1,tmp2);
 	*no_som = nb_som;
 	result = ps;
 	nb_som --;
-	printf ("min = %f, mod = %d, nb_som = %d\n",min,mod,nb_som+1);
+
+	printf ("min = %f, mod = ",min);
+	print_Value(mod); printf(", nb_som = %d\n",nb_som+1);
+
 	for (ps = ps->succ; ps != NULL; ps = ps->succ) {
 	    cv1 = vect_coeff(var,ps->vecteur);
-	    cst = -vect_coeff(TCST,ps->vecteur);
-	    if (cv1 >0 && cst >=0)  { 
-		ncoeff = (double) cst /cv1;
-		mod2 = cst % cv1 ;
-		if ( ncoeff<min  || ( ncoeff ==min && mod2 < mod)) {
+	    cst = value_uminus(vect_coeff(TCST,ps->vecteur));
+	    if (value_pos_p(cv1) && value_posz_p(cst))  { 
+		Value tmp = value_div(cst,cv1);
+		ncoeff = VALUE_TO_DOUBLE(tmp);
+		mod2 = value_mod(cst,cv1) ;
+		if ( ncoeff<min  || ( ncoeff ==min && 
+				     value_lt(mod2,mod))) {
 		    min = ncoeff;
 		    mod = mod2;
 		    result = ps;
@@ -109,8 +117,8 @@ Psommet fonct;
 {
     Pvecteur pv1 = NULL;
     Pvecteur pv2 = NULL;
-    int coeff = 0;
-    int min = 0;
+    Value coeff = 0;
+    Value min = 0;
     Variable var = NULL;
 
 #ifdef TRACE
@@ -119,7 +127,7 @@ Psommet fonct;
 
     if (fonct != NULL) {
 	if (fonct->vecteur->succ != NULL) {
-	    int cst = vect_coeff(TCST,fonct->vecteur);
+	    Value cst = vect_coeff(TCST,fonct->vecteur);
 	    Pvecteur pv3;
 	    vect_chg_coeff(&(fonct->vecteur),TCST,0);
 	    pv1 = vect_sort(fonct->vecteur, vect_compare);
@@ -128,7 +136,7 @@ Psommet fonct;
 	}
 	else pv1 = fonct->vecteur;
 	for (;pv1 != NULL 
-	     && ((pv1->var == NULL) || (pv1->val >= 0)) ; 
+	     && ((pv1->var == NULL) || value_posz_p(pv1->val)) ; 
 	     pv1=pv1->succ);
 
 	/* initialisation du minimum	*/
@@ -137,8 +145,8 @@ Psommet fonct;
 	    var = pv1->var;
 	}
 	for (pv2 = pv1; pv2 != NULL; pv2 = pv2->succ) {
-	    if ( (pv2->var != NULL) && ((coeff = pv2->val) < 0)
-		&& (coeff < min)) {
+	    if ( (pv2->var != NULL) && value_neg_p((coeff = pv2->val))
+		&& (value_lt(coeff,min))) {
 		min = coeff;
 		var = pv2->var;
 	    }
@@ -178,7 +186,7 @@ Psommet fonct;
 {
     Psommet lpivot =NULL;
     Psommet ps = sys;
-    Pvecteur pv;
+    Pvecteur pv = VECTEUR_NUL;
     Variable var_entrant = NULL;
     int no_som = 0;
     boolean non_borne = FALSE;
@@ -205,13 +213,13 @@ Psommet fonct;
 #endif
 	    non_borne = TRUE;
 	}
-	if ((ps2 = som_sys_conv(ps)) != NULL)
+	if (((ps2 = som_sys_conv(ps))) != NULL)
 	    sc_fprint(stdout,ps2,*variable_default_name);
     }
 
     if (fonct)
 	for (pv = fonct->vecteur;
-	     ((pv!=NULL) && ((pv->var == NULL) || (pv->val >= 0)));
+	     ((pv!=NULL) && ((pv->var == NULL) || value_posz_p(pv->val)));
 	     pv=pv->succ);
 #ifdef TRACE
     if (pv == NULL)
