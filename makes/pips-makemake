@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/22 16:55:30 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/22 16:58:20 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -309,6 +309,7 @@ LIB_OBJECTS:=\$(addprefix \$(ARCH)/, \$(LIB_OBJECTS))
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
 # a typical interesting example is to put -pg in {C,LD}OPT
 #
+INSTALL= pips_install_file
 PREPROC=  \$(CC) -E \$(CPPFLAGS) \$(CPPOPT) \$(TARGET_ARCH)
 COMPILE=  \$(CC) \$(CFLAGS) \$(COPT) \$(CPPFLAGS) \$(CPPOPT) \$(TARGET_ARCH) -c
 F77COMPILE=\$(FC) \$(FFLAGS) \$(FOPT) -c
@@ -556,10 +557,10 @@ cat >> $MAKEFILE <<%
 .PRECIOUS: \$(${PART}_ROOT)/Lib/\$(LIB_TARGET) \$(${PART}_ROOT)/Bin/\$(BIN_TARGET)
 
 \$(${PART}_ROOT)/Include/\$(TARGET).h: header
-	@pips_install_file -f \$(${PART}_INCLUDEDIR) \$(TARGET).h
+	@\$(INSTALL) -f \$(${PART}_INCLUDEDIR) \$(TARGET).h
 
 \$(${PART}_ROOT)/Lib/\$(LIB_TARGET): \$(LIB_TARGET) 
-	@pips_install_file -r \$(RANLIB) \$(${PART}_LIBDIR)/\$(ARCH) \$(LIB_TARGET)
+	@\$(INSTALL) -r \$(RANLIB) \$(${PART}_LIBDIR)/\$(ARCH) \$(LIB_TARGET)
 
 \$(LIB_OBJECTS): \$(TARGET).h
 
@@ -582,7 +583,7 @@ cat >> $MAKEFILE <<%
 	mkdir \$@
 
 \$(PIPS_ROOT)/Bin/\$(BIN_TARGET): \$(BIN_TARGET) \$(PIPS_ROOT)/Bin/\$(ARCH)
-	@pips_install_file -x \$(PIPS_ROOT)/Bin/\$(ARCH) \$(BIN_TARGET)
+	@\$(INSTALL) -x \$(PIPS_ROOT)/Bin/\$(ARCH) \$(BIN_TARGET)
 
 recompile: \$(PIPS_ROOT)/Bin/\$(BIN_TARGET)
 
@@ -609,30 +610,31 @@ ALL_SOURCES =	\$(SOURCES) \$(CONFIG_FILE)
 #	     echo "\$(PIPS_CHECK_OS)"; exit 1; \\
 #	fi
 
-.quick-install: \$(INSTALL_INC) \$(INSTALL_LIB) \$(INSTALL_BIN) \$(INSTALL_SHR) \
-	\$(INSTALL_DOC) \$(INSTALL_UTL) \$(INSTALL_RTM) \$(INSTALL_HTM) 
+.quick-install: \$(INSTALL_INC) \$(INSTALL_LIB) \$(INSTALL_BIN) \\
+	\$(INSTALL_SHR) \$(INSTALL_DOC) \$(INSTALL_UTL) \$(INSTALL_RTM) \\
+	\$(INSTALL_HTM) 
 	#
 	# installing files where needed
 	# 
 	# plain files
 	@test ! "\$(INSTALL_INC)" || \\
-	    pips_install_file -f \$(INSTALL_INC_DIR) \$(INSTALL_INC) 
+	    \$(INSTALL) -f \$(INSTALL_INC_DIR) \$(INSTALL_INC) 
 	@test ! "\$(INSTALL_DOC)" || \\
-	    pips_install_file -f \$(INSTALL_DOC_DIR) \$(INSTALL_DOC) 
+	    \$(INSTALL) -f \$(INSTALL_DOC_DIR) \$(INSTALL_DOC) 
 	@test ! "\$(INSTALL_HTM)" || \\
-	    pips_install_file -f \$(INSTALL_HTM_DIR) \$(INSTALL_HTM) 
+	    \$(INSTALL) -f \$(INSTALL_HTM_DIR) \$(INSTALL_HTM) 
 	@test ! "\$(INSTALL_UTL)" || \\
-	    pips_install_file -f \$(INSTALL_UTL_DIR) \$(INSTALL_UTL) 
+	    \$(INSTALL) -f \$(INSTALL_UTL_DIR) \$(INSTALL_UTL) 
 	@test ! "\$(INSTALL_SHR)" || \\
-	    pips_install_file -f \$(INSTALL_SHR_DIR) \$(INSTALL_SHR)
+	    \$(INSTALL) -f \$(INSTALL_SHR_DIR) \$(INSTALL_SHR)
 	@test ! "\$(INSTALL_RTM)" || \\
-	    pips_install_file -f \$(INSTALL_RTM_DIR) \$(INSTALL_RTM)
+	    \$(INSTALL) -f \$(INSTALL_RTM_DIR) \$(INSTALL_RTM)
 	# libs...
 	@test ! "\$(INSTALL_LIB)" || \\
-	    pips_install_file -r \$(RANLIB) \$(INSTALL_LIB_DIR) \$(INSTALL_LIB)
+	    \$(INSTALL) -r \$(RANLIB) \$(INSTALL_LIB_DIR) \$(INSTALL_LIB)
 	# executables...
 	@test ! "\$(INSTALL_BIN)" || \\
-	    pips_install_file -x \$(INSTALL_BIN_DIR) \$(INSTALL_BIN)
+	    \$(INSTALL) -x \$(INSTALL_BIN_DIR) \$(INSTALL_BIN)
 	touch .quick-install
 
 tar:
