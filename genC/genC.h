@@ -158,9 +158,11 @@ extern void gen_type_translation_read GEN_PROTO((string));
 extern void gen_type_translation_write GEN_PROTO((string));
 
 extern void gen_init_external GEN_PROTO((int, 
-					 char *(*)(), void (*)(), 
-					 void (*)(), char *(*)(), 
-					 int (*)() )) ;
+					 void*(*)(FILE*), 
+					 void (*)(FILE*, void*), 
+					 void (*)(void*), 
+					 void* (*)(void*), 
+					 int (*)(void*))) ;
 extern gen_chunk *gen_check GEN_PROTO(( gen_chunk *, int )) ;
 extern bool gen_sharing_p GEN_PROTO((gen_chunk *, gen_chunk *));
 extern int gen_type GEN_PROTO((gen_chunk *)) ;
