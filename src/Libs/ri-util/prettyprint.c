@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.96  1997/11/08 17:25:10  coelho
+ * extension for cloning (name different from actual module)
+ *
  * Revision 1.95  1997/11/04 17:36:48  coelho
  * strdup of comments added.
  *
@@ -106,7 +109,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.95 1997/11/04 17:36:48 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.96 1997/11/08 17:25:10 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1670,8 +1673,10 @@ last_statement_p(statement s) {
  * if possible. Otherwise, the function text_declaration is called.
  */
 text
-text_module(entity module,
-	    statement stat)
+text_named_module(
+    entity name, /* the name of the module */
+    entity module,
+    statement stat)
 {
     text r = make_text(NIL);
     code c = entity_code(module);
@@ -1694,7 +1699,8 @@ text_module(entity module,
 	    ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
 	
 	ADD_SENTENCE_TO_TEXT(r, 
-	   attach_head_to_sentence(sentence_head(module), module));
+	   attach_head_to_sentence(sentence_head(name), module));
+	
 	if (head_hook) 
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 						  head_hook(module)));
@@ -1705,7 +1711,8 @@ text_module(entity module,
 	
 	MERGE_TEXTS(r, text_declaration(module));
     }
-    else {
+    else 
+    {
 	ADD_SENTENCE_TO_TEXT(r, 
             attach_head_to_sentence(make_sentence(is_sentence_formatted, s),
 				    module));
@@ -1722,6 +1729,14 @@ text_module(entity module,
 
     debug_off();
     return(r);
+}
+
+text
+text_module(
+    entity module,
+    statement stat)
+{
+    return text_named_module(module, module, stat);
 }
 
 text text_graph(), text_control() ;
