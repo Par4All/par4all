@@ -1,7 +1,7 @@
 /* package arithmetique
  * 
  * $RCSfile: ppcm.c,v $ (version $Revision$)
- * $Date: 1996/07/13 13:06:55 $, 
+ * $Date: 1996/07/16 22:04:39 $, 
  */
 
 /*LINTLIBRARY*/
@@ -17,14 +17,14 @@
  */
 Value ppcm(Value i, Value j)
 {
-    if (VALUE_NEG_P(i)) i = -i;
-    if (VALUE_NEG_P(j)) j = -j;
+    if (VALUE_NEG_P(i)) i = value_uminus(i);
+    if (VALUE_NEG_P(j)) j = value_uminus(j);
 
     if (VALUE_ZERO_P(i) || VALUE_ZERO_P(j)) 
 	return VALUE_ZERO;
     else {
 	Value d = pgcd(i,j);
-	return (i/d)*j;
+	return value_mult(value_div(i,d),j);
     }
 }
 
