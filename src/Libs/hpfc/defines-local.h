@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1996/06/15 14:27:02 $, ) 
+ * ($Date: 1996/07/23 11:59:17 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -12,6 +12,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <values.h>
 #include <ctype.h>
 #include <string.h>
