@@ -248,6 +248,10 @@ test ${uname_s} = Linux && \
 test ${uname_s} = Linux && \
 	PIPS_TAR="tar"
 
+# under solaris basename is refexpr based.
+test ${uname_s} = SunOS && \
+	PIPS_BASENAME="/usr/ucb/basename"
+
 test ${uname_s} = Linux && \
 	PIPS_FLINT="g77 -c -Wall -Wimplicit"
 
