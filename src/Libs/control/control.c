@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/10 10:17:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/10 19:52:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/04/10 10:17:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/04/10 19:52:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -532,10 +532,6 @@ compact_list(list ctls,
 	fprintf(stderr, "\n");
     }
 
-    /* There is a bug if ctls order is incoherent with c_res order
-       later. Problem in controlize_list_1() ? */
-    return c_end;
-
     if( ENDP( ctls )) {
 	return( c_last ) ;
     }
@@ -574,9 +570,6 @@ compact_list(list ctls,
 	succ_st = control_statement(succ);
 	set_add_element(processed_nodes, processed_nodes, (char *) succ);
 	
-	if(succ == c_end) {
-	    c_last = c_res;
-	}
 	if(!instruction_block_p(i=statement_instruction(st))) {
 	    i = make_instruction_block(CONS(STATEMENT, st, NIL));
 	    control_statement(c_res) =
@@ -610,9 +603,25 @@ compact_list(list ctls,
 	control_predecessors(succ) = NIL;
 	control_statement(succ) = statement_undefined;
 	free_control(succ);
+	
+	if(/* We are at the end... */
+	   succ == c_end
+	   || (/* ...or next time we will reach this end */
+	       gen_length(control_successors(c_res)) == 1
+	       && CONTROL(CAR(control_successors(c_res))) == c_end)) {
+	    c_last = c_res;
+	    /* Hmmm... I think it is dangerous to go further because
+               in some case ctls go on before the entry node and thus
+               c_last will no longer point to the exit node!  Of
+               course, there are many assumptions in this
+               assertion... :-( The minor one is that unreachable code
+               is not fused, but since it is unreachable and optimized
+               anyway in unspaghettify... RK */
+	    break;
+	}
     }
     set_free(processed_nodes);
-    return( c_last ) ;
+    return c_last;
 }
 
 
