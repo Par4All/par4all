@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:16:51 $, )
+# ($Date: 1996/08/21 17:24:48 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -165,8 +165,7 @@ DDC_HEADERS 	= $(LIB_M4FFILES:.m4f=.h) \
 LIB_HEADERS	= $(CORE_HEADERS) \
 		  $(DDC_HEADERS)
 
-LIB_OBJECTS	= $(DDC_FFILES:.f=.o) \
-		  $(DDC_CFILES:.c=.o) 
+LIB_OBJECTS = $(addprefix $(PVM_ARCH), $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
 
 M4_MACROS 	= hpfc_lib_m4_macros hpfc_architecture_m4_macros
 HPFC_MAKEFILES 	= hpfc_Makefile hpfc_Makefile_init 
@@ -242,6 +241,12 @@ $(LIB_TARGET):	$(PVM_HEADERS) $(LIB_HEADERS) $(LIB_OBJECTS)
 	./hpfc_generate_h < $< > $@
 	./hpfc_add_warning $@
 
+$(PVM_ARCH)/%.o: %.c
+	$(COMPILE) $< -o $@
+
+$(PVM_ARCH)/%.o: %.f
+	$(F77COMPILE) $< -o $@
+
 hpfc_includes.h: $(LIB_M4FFILES:.m4f=.h) 
 	{\
 	  for i in $(LIB_M4FFILES:.m4f=.h) ;\
@@ -254,7 +259,7 @@ hpfc_includes.h: $(LIB_M4FFILES:.m4f=.h)
 clean: local-clean
 local-clean: 
 	$(RM) *~ $(LIB_OBJECTS) $(PVM_HEADERS) \
-		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES)
+		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) $(LIB_TARGET)
 
 # that is all
 #
