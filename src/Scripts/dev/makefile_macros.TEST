@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.TEST,v $ (version $Revision$)
-# $Date: 1996/08/13 15:36:39 $, 
+# $Date: 1996/08/20 17:24:58 $, 
 #
 # this file contains macro definitions 
 # the purpose is to test some options and so.
@@ -31,6 +31,10 @@ TAR	= gtar
 ZIP	= gzip -v9
 DIFF	= gdiff
 M4	= gm4
+LX2HTML	= :
+LATEX	= :
+MAKEIDX	= :
+DVIPS	= :
 
 # end of $RCSfile: makefile_macros.TEST,v $
 #
