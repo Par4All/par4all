@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/11 20:48:03 $m 
+# $Date: 1996/08/11 20:51:03 $m 
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
@@ -11,8 +11,6 @@ endif
 
 # I wanna the header file for the lexer
 YFLAGS+=-d
-
-PARSER_SRC= 
 
 LIB_CFILES=	util.c \
 		declaration.c \
@@ -46,12 +44,11 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 # filtred here.
 
 syn_yacc.c syn_yacc.h: tokyacc.h gram.y
-	{ echo "# line 1 "tokyacc.h"; cat tokyacc.h ;\
-	  echo "# line 1 "gram.y"; cat gram.y; } > yacc.in
+	cat tokyacc.h gram.y > yacc.in
 	$(PARSE) yacc.in
 	sed 's/YY/SYN_/g;s/yy/syn_/g' y.tab.c > syn_yacc.c
 	sed 's/YY/SYN_/g;s/yy/syn_/g' y.tab.h > syn_yacc.h
-	$(RM) y.tab.c y.tab.h yacc.in
+	$(RM) y.tab.c y.tab.h
 
 
 # For gcc: lex generated array initializations are reformatted with sed to
