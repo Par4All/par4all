@@ -521,8 +521,8 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 	    if_debug_sc_strong_normalize_2 {
 		fprintf(stderr,
 			"[sc_strong_normalize2]: After call to sc_normalize\n");
-		fprintf(stderr, "[sc_strong_normalize2]: Input system %x\n",
-			(unsigned int) ps);
+		fprintf(stderr, "[sc_strong_normalize2]: Input system %p\n",
+			ps);
 		sc_dump(ps);
 	    }
 
@@ -601,11 +601,11 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 		if_debug_sc_strong_normalize_2 {
 		    fprintf(stderr,
 			    "Print the two systems at each elimination step:\n");
-		    fprintf(stderr, "[sc_strong_normalize2]: Input system %x\n",
-			    (unsigned int) ps);
+		    fprintf(stderr, "[sc_strong_normalize2]: Input system %p\n",
+			    ps);
 		    sc_dump(ps);
-		    fprintf(stderr, "[sc_strong_normalize2]: New system %x\n",
-			    (unsigned int) new_ps);
+		    fprintf(stderr, "[sc_strong_normalize2]: New system %xpn",
+			    new_ps);
 		    sc_dump(new_ps);
 		}
 
@@ -619,11 +619,11 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 	    if_debug_sc_strong_normalize_2 {
 		fprintf(stderr,
 			"Print the three systems after inequality normalization:\n");
-		fprintf(stderr, "[sc_strong_normalize2]: Input system %x\n",
-			(unsigned int) ps);
+		fprintf(stderr, "[sc_strong_normalize2]: Input system %p\n",
+			ps);
 		sc_dump(ps);
-		fprintf(stderr, "[sc_strong_normalize2]: New system %x\n",
-			(unsigned int) new_ps);
+		fprintf(stderr, "[sc_strong_normalize2]: New system %p\n",
+			new_ps);
 		sc_dump(new_ps);
 	    }
 	}
@@ -662,8 +662,8 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 
     if_debug_sc_strong_normalize_2 {
 	fprintf(stderr,
-		"[sc_strong_normalize2]: Final value of new system %x:\n",
-		(unsigned int) new_ps);
+		"[sc_strong_normalize2]: Final value of new system %p:\n",
+		new_ps);
 	sc_dump(new_ps);
 	fprintf(stderr, "[sc_strong_normalize2]: End\n");
     }
@@ -738,8 +738,8 @@ int level)
 
     if_debug_sc_strong_normalize_and_check_feasibility2 {
 	fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Begin\n");
-	fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %x\n",
-		    (unsigned int) ps);
+	fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %p\n",
+		    ps);
 	    sc_dump(ps);
     }
 
@@ -769,8 +769,8 @@ int level)
 	if_debug_sc_strong_normalize_and_check_feasibility2 {
 	    fprintf(stderr,
 		    "[sc_strong_normalize_and_check_feasibility2]: After call to sc_normalize\n");
-	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system after normalization %x\n",
-		    (unsigned int) ps);
+	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system after normalization %p\n",
+		    ps);
 	    sc_dump(ps);
 	}
 
@@ -909,11 +909,11 @@ int level)
 	    if_debug_sc_strong_normalize_and_check_feasibility2 {
 		fprintf(stderr,
 			"Print the two systems at each nvar=%d step:\n", nvar);
-		fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %x\n",
-			(unsigned int) ps);
+		fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %p\n",
+			ps);
 		sc_dump(ps);
-		fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: New system %x\n",
-			(unsigned int) new_ps);
+		fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: New system %p\n",
+			new_ps);
 		sc_dump(new_ps);
 	    }
 	}
@@ -929,11 +929,11 @@ int level)
 	if_debug_sc_strong_normalize_and_check_feasibility2 {
 	    fprintf(stderr,
 		    "Print the three systems after inequality normalization:\n");
-	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %x\n",
-		    (unsigned int) ps);
+	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %p\n",
+		    s);
 	    sc_dump(ps);
-	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: New system %x\n",
-		    (unsigned int) new_ps);
+	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: New system %p\n",
+		    new_ps);
 	    sc_dump(new_ps);
 	}
     }
@@ -956,8 +956,8 @@ int level)
 
     if_debug_sc_strong_normalize_and_check_feasibility2 {
 	fprintf(stderr,
-		"[sc_strong_normalize_and_check_feasibility2]: Final value of new system %x:\n",
-		(unsigned int) new_ps);
+		"[sc_strong_normalize_and_check_feasibility2]: Final value of new system %p:\n",
+		new_ps);
 	sc_dump(new_ps);
 	fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: End\n");
     }
