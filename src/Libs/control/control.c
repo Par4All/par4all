@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/12/12 14:20:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/12/12 17:18:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/12/12 14:20:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/12/12 17:18:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -236,7 +236,8 @@ hash_table used_labels;
 
 bool controlize(
     statement st,
-    control pred, succ,
+    control pred, 
+    control succ,
     control c_res,
     hash_table used_labels)
 {
