@@ -664,10 +664,10 @@ declaration: entity_name decl_tableau lg_fortran_type
 		    b = variable_basic(type_variable(CurrentType));
 
 		    /* character [*len1] foo [*len2]:
-		     * if len2 is unknown then len1
+		     * if len2 is "default" then len1
 		     */
 		    if(basic_string_p(b))
-			t = value_unknown_p($3)? 
+			t = value_intrinsic_p($3)? /* ??? default */
 			    copy_type(t):
 				MakeTypeVariable
 				    (make_basic(is_basic_string, $3), NIL);
@@ -1010,7 +1010,14 @@ opt_fortran_type: fortran_type
 	;
 
 fortran_type: fortran_basic_type lg_fortran_type
-	    {
+            {
+                if (value_intrinsic_p($2)) /* ??? default! */
+                {
+		    free_value($2);
+		    $2 = make_value(is_value_constant,
+		       make_constant(is_constant_int, CurrentTypeSize));
+		}
+
 		$$ = CurrentType = MakeFortranType($1, $2);
 	    }
 	;
@@ -1049,7 +1056,7 @@ fortran_basic_type: TK_INTEGER
 
 lg_fortran_type:
 	    {
-                   $$ = MakeValueUnknown(); 
+                   $$ = make_value(is_value_intrinsic, UU); /* ??? default! */
 		/* was: $$ = make_value(is_value_constant,
 		 *      make_constant(is_constant_int, CurrentTypeSize)); 
 		 * then how to differentiate character*len1 foo[*len2]
@@ -1059,7 +1066,7 @@ lg_fortran_type:
 		 * FC, 13/06/96
 		 */
 	    }
-	| TK_STAR TK_LPAR TK_STAR TK_RPAR
+	| TK_STAR TK_LPAR TK_STAR TK_RPAR /* CHARACTER *(*) */
 	    {
 		    $$ = MakeValueUnknown();
 	    }
