@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/09/19 18:33:57 $, ) 
+ * ($Date: 1995/10/03 15:34:36 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -590,10 +590,11 @@ remapping_stats(
 }
 
 void 
-sc_separate_on_vars(s, b, pwith, pwithout)
-Psysteme s;
-Pbase b;
-Psysteme *pwith, *pwithout;
+sc_separate_on_vars(
+    Psysteme s,
+    Pbase b,
+    Psysteme *pwith,
+    Psysteme *pwithout)
 {
     Pcontrainte i_with, e_with, i_without, e_without;
 
@@ -605,11 +606,17 @@ Psysteme *pwith, *pwithout;
 }
 
 static statement
-generate_remapping_code(src, trg, procs, locals, l, lp, ll, ldiff, ld, dist_p)
-entity src, trg;
-Psysteme procs, locals;
-list /* of entities */ l, lp, ll, ldiff, /* of expressions */ ld;
-bool dist_p; /* true if must take care of lambda */
+generate_remapping_code(
+    entity src,
+    entity trg,
+    Psysteme procs,
+    Psysteme locals,
+    list /* of entity */ l,
+    list lp,
+    list ll,
+    list ldiff,
+    list /* of expression */ ld,
+    bool dist_p) /* true if must take care of lambda */
 {
     entity lid = hpfc_name_to_entity(T_LID),
            p_src = array_to_processors(src),
@@ -714,9 +721,10 @@ bool dist_p; /* true if must take care of lambda */
  * ENDDIF
  */
 static statement
-generate_remapping_guard(src, trg, the_code)
-entity src, trg;
-statement the_code;
+generate_remapping_guard(
+    entity src,
+    entity trg,
+    statement the_code)
 {
     int src_n = load_hpf_number(src), /* source, target and primary numbers */
         trg_n = load_hpf_number(trg),
@@ -794,8 +802,9 @@ print_rusage_delta(FILE * buffer,
 /*  remaps src to trg.
  */
 static statement 
-hpf_remapping(src, trg)
-entity src, trg;
+hpf_remapping(
+    entity src,
+    entity trg)
 {
     Psysteme p, proc, enume;
     statement s;
@@ -815,6 +824,8 @@ entity src, trg;
     /*   builds and simplifies the systems.
      */
     p = generate_remapping_system(src, trg);
+    set_information_for_code_optimizations(p);
+
     remapping_variables(p, src, trg, &l, &lp, &ll, &lrm, &ld, &lo);
     clean_the_system(&p, &lrm, &lo);
     lddc = simplify_deducable_variables(p, ll, &left);
@@ -850,6 +861,8 @@ entity src, trg;
     gen_free_list(scanners);
     gen_free_list(l), gen_free_list(lp), gen_free_list(ld);
     gen_map(gen_free, lddc), gen_free_list(lddc);  /* ??? */
+
+    reset_information_for_code_optimizations();
     
     if (time_remapping)
     {
@@ -974,9 +987,13 @@ void remapping_compile(
     statement *nsp)   /* idem Node */
 {
     list /* of statements */ l = NIL;
+    
 
     debug_on("HPFC_REMAPPING_DEBUG_LEVEL");
     pips_debug(1, "dealing with statement 0x%x\n", (unsigned int) s);
+
+    sc_set_row_echelon_redundancy
+	(get_bool_property("HPFC_REDUNDANT_SYSTEMS_FOR_REMAPS"));
 
     *hsp = make_empty_statement(); /* nothing for host */
 
