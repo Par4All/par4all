@@ -350,6 +350,10 @@ entity e;
 		token = MINIMUM;
 	else if (strcmp(entity_local_name(e), MAX0_OPERATOR_NAME) == 0)
 		token = MAXIMUM;
+	else if (strcmp(entity_local_name(e), MIN_OPERATOR_NAME) == 0)
+		token = MINIMUM;
+	else if (strcmp(entity_local_name(e), MAX_OPERATOR_NAME) == 0)
+		token = MAXIMUM;
 	else
 		token = -1;
 
