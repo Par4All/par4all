@@ -28,7 +28,7 @@ FILES=/tmp/PIPS-FILES
 # only directories in this variable
 #
 
-PATHNAME_LIST="${PIPS_DEVEDIR}/Libs/[a-z]* ${PIPS_DEVEDIR}/Passes/[a-z]* ${PIPS_INCLUDEDIR} ${PIPS_EXTEDIR} ${NEWGEN_DEVEDIR}/genC ${LINEAR_DEVEDIR}/*"
+PATHNAME_LIST="${PIPS_DEVEDIR}/Libs/[a-z]* ${PIPS_DEVEDIR}/Passes/[a-z]* ${PIPS_INCLUDEDIR} ${PIPS_EXTEDIR} ${NEWGEN_DEVEDIR}/genC ${LINEAR_DEVEDIR}/* ${PIPS_ROOT}/Include"
 
 rm -f $FILES $TAGS
 
