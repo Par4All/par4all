@@ -675,13 +675,13 @@ int gen_position(void * item, list l)
   list c_item = list_undefined;
   int rank = 0;
 
-  for(c_item = l; !ENDP(l); POP(l)) {
+  for(c_item = l; !ENDP(c_item); POP(c_item)) {
     rank++;
     if(item==CHUNK(CAR(c_item))) {
-      break;
+      return rank;
     }
   }
-  return rank;
+  return 0;
 }
 
 
