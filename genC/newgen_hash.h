@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 1995/04/12 15:50:49 $, )
+/* $RCSfile: newgen_hash.h,v $ ($Date: 1995/05/18 10:20:05 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -22,7 +22,7 @@
 #ifndef HASH_INCLUDED
 #define HASH_INCLUDED
 
-#define HASH_DEFAULT_SIZE 17
+#define HASH_DEFAULT_SIZE 7
 
 typedef enum hash_key_type { 
     hash_string, hash_int, hash_pointer, hash_chunk } hash_key_type;
