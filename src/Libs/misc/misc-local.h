@@ -26,19 +26,3 @@
 
 extern char *re_comp();
 extern int re_exec();
-
-/*VARARGS2*/
-extern void debug();
-/* The next function should not be used. Use the pips_debug macro. */
-extern void pips_debug_function();
-extern void pips_error();
-extern void user_warning();
-extern void user_log();
-extern void user_error();
-
-/*VARARGS0*/
-extern char * concatenate();
-
-extern void (* pips_log_handler)(char * fmt, va_list args);
-extern void (* pips_warning_handler)();
-extern void (* pips_error_handler)();
