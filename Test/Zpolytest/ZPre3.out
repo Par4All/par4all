@@ -16,7 +16,7 @@ Inequality: [   -3    0   -1   98 ]
 Inequality: [   -4   -2    2   99 ]
 Rays 5 5
 Line:   [    1   -5   -3 ]
-Vertex: [    0   97   -2 ]/2
-Vertex: [    0   -1   -1 ]/1
 Vertex: [    0   98   98 ]/1
+Vertex: [    0   -1   -1 ]/1
+Vertex: [    0   97   -2 ]/2
 Vertex: [    0  295  196 ]/2

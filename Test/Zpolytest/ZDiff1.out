@@ -11,8 +11,8 @@ POLYHEDRON Dimension:2
 Constraints 4 4
 Inequality: [    1    0   -1 ]
 Inequality: [    2   -1   10 ]
-Inequality: [   -2    0   19 ]
 Inequality: [   -2    1   -2 ]
+Inequality: [   -2    0   19 ]
 Rays 4 4
 Vertex: [    1    4 ]/1
 Vertex: [    1   12 ]/1

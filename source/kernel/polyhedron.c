@@ -743,14 +743,8 @@ static int Chernikova (Matrix *Mat,Matrix *Ray,SatMatrix *Sat, unsigned NbBid, u
   return 0;
 } /* Chernikova */
 
-/*  
- * Compute a minimal system of equations using Gausian elimination method.
- * 'Mat' is a matrix of constraints in which the first 'Nbeq' constraints
- * are equations. The dimension of the homogenous system is 'Dimension'. 
- * The function returns the rank of the matrix 'Mat'. 
- */
-int Gauss(Matrix *Mat,int NbEq,int Dimension) {
-
+static int Gauss4(Value **p, int NbEq, int NbRows, int Dimension)
+{
   int i, j, k, pivot, Rank;
   int *column_index = NULL;
   Value gcd,tmp,*cp;
@@ -764,11 +758,6 @@ int Gauss(Matrix *Mat,int NbEq,int Dimension) {
   }
   Rank=0;
   
-#ifdef POLY_DEBUG
-  fprintf(stderr, "[Gauss : Input]\nRay =");
-  Matrix_Print(stderr,0,Mat);
-#endif
-
   CATCH(any_exception_error) {
     if (column_index)
       free(column_index);
@@ -781,20 +770,20 @@ int Gauss(Matrix *Mat,int NbEq,int Dimension) {
       for (i=Rank; i<NbEq; i++)      /* starting at diagonal, look down */
 	
 	/* if (Mat->p[i][j] != 0) */
-	if (value_notzero_p(Mat->p[i][j])) 
+	if (value_notzero_p(p[i][j])) 
 	  break;                    /* Find the first non zero element  */    
       if (i!=NbEq) {                /* If a non-zero element is found?  */
 	if (i!=Rank)                /* If it is found below the diagonal*/
-          Vector_Exchange(Mat->p[Rank]+1,Mat->p[i]+1,Dimension);
+          Vector_Exchange(p[Rank]+1,p[i]+1,Dimension);
 	
 	/* Normalize the pivot row by dividing it by the gcd */      
-	/* gcd = Vector_Gcd(Mat->p[Rank]+1,Dimension) */
-	Vector_Gcd(Mat->p[Rank]+1,Dimension,&gcd);
+	/* gcd = Vector_Gcd(p[Rank]+1,Dimension) */
+	Vector_Gcd(p[Rank]+1,Dimension,&gcd);
 	
 	/* if (gcd >= 2) */
 	value_set_si(tmp,2);
 	if (value_ge(gcd,tmp)) { 
-	  cp = &Mat->p[Rank][1];
+	  cp = &p[Rank][1];
 	  for (k=0; k<Dimension; k++) {
 	    value_division (*cp,*cp,gcd);       /* *cp /= gcd */    
 	    cp++;
@@ -802,8 +791,8 @@ int Gauss(Matrix *Mat,int NbEq,int Dimension) {
 	}
 	
 	/* if (Mat->p[Rank][j] < 0) */
-	if (value_neg_p(Mat->p[Rank][j])) { 
-	  cp = Mat->p[Rank]+1;	
+	if (value_neg_p(p[Rank][j])) { 
+	  cp = p[Rank]+1;	
 	  for (k=0; k<Dimension; k++) { 
 	    value_set_si(tmp,-1);
 	    value_multiply (*cp,*cp,tmp); /* *cp *= -1 */ 
@@ -816,8 +805,8 @@ int Gauss(Matrix *Mat,int NbEq,int Dimension) {
 	for (i=pivot+1; i<NbEq; i++) {  /* Zero out the rest of the column */
 	  
 	  /* if (Mat->p[i][j] != 0) */
-	  if (value_notzero_p(Mat->p[i][j]))
-	    Combine(Mat->p[i],Mat->p[Rank],Mat->p[i],j,Dimension);
+	  if (value_notzero_p(p[i][j]))
+	    Combine(p[i],p[Rank],p[i],j,Dimension);
 	}
 	
         /* For each row with non-zero entry Mat->p[Rank], store the column */
@@ -832,21 +821,21 @@ int Gauss(Matrix *Mat,int NbEq,int Dimension) {
     /* Back Substitution -- normalize the system of equations */
     for (k=Rank-1; k>=0; k--) { 
       j = column_index[k];
-      
+
       /* Normalize the equations */
       for (i=0; i<k; i++) { 
 	
 	/* if (Mat->p[i][j] != 0) */
-	if (value_notzero_p(Mat->p[i][j]))
-	  Combine(Mat->p[i],Mat->p[k],Mat->p[i],j,Dimension);
+	if (value_notzero_p(p[i][j]))
+	  Combine(p[i],p[k],p[i],j,Dimension);
       }
       
       /* Normalize the inequalities */
-      for (i=NbEq;i<Mat->NbRows;i++) { 
+      for (i=NbEq;i<NbRows;i++) { 
 	
 	/* if (Mat->p[i][j] != 0) */
-	if (value_notzero_p(Mat->p[i][j]))
-	  Combine(Mat->p[i],Mat->p[k],Mat->p[i],j,Dimension);
+	if (value_notzero_p(p[i][j]))
+	  Combine(p[i],p[k],p[i],j,Dimension);
       }
     }
   } /* end of TRY */
@@ -854,14 +843,34 @@ int Gauss(Matrix *Mat,int NbEq,int Dimension) {
   UNCATCH(any_exception_error);
   free(column_index), column_index = NULL;
   
+  value_clear(gcd); value_clear(tmp);
+  return Rank;
+} /* Gauss */
+
+/*  
+ * Compute a minimal system of equations using Gausian elimination method.
+ * 'Mat' is a matrix of constraints in which the first 'Nbeq' constraints
+ * are equations. The dimension of the homogenous system is 'Dimension'. 
+ * The function returns the rank of the matrix 'Mat'. 
+ */
+int Gauss(Matrix *Mat, int NbEq, int Dimension)
+{
+  int Rank;
+
+#ifdef POLY_DEBUG
+  fprintf(stderr, "[Gauss : Input]\nRay =");
+  Matrix_Print(stderr,0,Mat);
+#endif
+
+  Rank = Gauss4(Mat->p, NbEq, Mat->NbRows, Dimension);
+
 #ifdef POLY_DEBUG
   fprintf(stderr, "[Gauss : Output]\nRay =");
   Matrix_Print(stderr,0,Mat);
 #endif
-  
-  value_clear(gcd); value_clear(tmp);
+
   return Rank;
-} /* Gauss */
+}
 
 /*
  * Given 'Mat' - a matrix of equations and inequalities, 'Ray' - a matrix of 
@@ -1292,7 +1301,7 @@ static Polyhedron *Remove_Redundants(Matrix *Mat,Matrix *Ray,SatMatrix *Sat,unsi
     
     /* 
      * STEP(5): Perform Gaussian elimination on the lineality space to obtain
-     * a minimal basis of lines. Use this basis to reduce the represeentation
+     * a minimal basis of lines. Use this basis to reduce the representation
      * of the uniderectional rays. Set 'NbBid2' to the rank of the system of 
      * lines. 
      */
@@ -3806,6 +3815,87 @@ int lower_upper_bounds(int pos,Polyhedron *P,Value *context,Value *LBp,Value *UB
 } /* lower_upper_bounds */
 
 /*
+ *  C = A x B
+ */
+static void Rays_Mult(Value **A, Matrix *B, Value **C, unsigned NbRays)
+{
+  int i, j, k;
+  unsigned Dimension1, Dimension2;
+  Value Sum, tmp;
+
+  value_init(Sum); value_init(tmp);
+
+  CATCH(any_exception_error) {
+    value_clear(Sum); value_clear(tmp);
+    RETHROW();
+  }
+  TRY {
+    Dimension1 = B->NbRows;
+    Dimension2 = B->NbColumns;
+
+    for (i=0; i<NbRays; i++) {
+      value_assign(C[i][0],A[i][0]);
+      for (j=0; j<Dimension2; j++) {
+	value_set_si(Sum,0);
+	for (k=0; k<Dimension1; k++) {
+	  
+	  /* Sum+=A[i][k+1] * B->p[k][j]; */
+	  value_multiply(tmp,A[i][k+1],B->p[k][j]);
+	  value_addto(Sum,Sum,tmp);
+	}
+	value_assign(C[i][j+1],Sum);
+      }
+      Vector_Gcd(C[i]+1, Dimension2, &tmp);
+      if (value_notone_p(tmp))
+	  Vector_AntiScale(C[i]+1, C[i]+1, tmp, Dimension2);
+    }
+  }
+  UNCATCH(any_exception_error);
+  value_clear(Sum); value_clear(tmp);
+}
+
+/*
+ *  C = A x B^T
+ */
+static void Rays_Mult_Transpose(Value **A, Matrix *B, Value **C, 
+                                unsigned NbRays)
+{
+  int i, j, k;
+  unsigned Dimension1, Dimension2;
+  Value Sum, tmp;
+
+  value_init(Sum); value_init(tmp);
+
+  CATCH(any_exception_error) {
+    value_clear(Sum); value_clear(tmp);
+    RETHROW();
+  }
+  TRY {
+    Dimension1 = B->NbColumns;
+    Dimension2 = B->NbRows;
+
+    for (i=0; i<NbRays; i++) {
+      value_assign(C[i][0],A[i][0]);
+      for (j=0; j<Dimension2; j++) {
+	value_set_si(Sum,0);
+	for (k=0; k<Dimension1; k++) {
+	  
+	  /* Sum+=A[i][k+1] * B->p[j][k]; */
+	  value_multiply(tmp,A[i][k+1],B->p[j][k]);
+	  value_addto(Sum,Sum,tmp);
+	}
+	value_assign(C[i][j+1],Sum);
+      }
+      Vector_Gcd(C[i]+1, Dimension2, &tmp);
+      if (value_notone_p(tmp))
+	  Vector_AntiScale(C[i]+1, C[i]+1, tmp, Dimension2);
+    }
+  }
+  UNCATCH(any_exception_error);
+  value_clear(Sum); value_clear(tmp);
+}
+
+/*
  * Given a polyhedron 'Pol' and a transformation matrix 'Func', return the 
  * polyhedron which when transformed by mapping function 'Func' gives 'Pol'. 
  * 'NbMaxRays' is the maximum number of rays that can be in the ray matrix 
@@ -3816,15 +3906,10 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
   Matrix *Constraints = NULL;
   Polyhedron *NewPol = NULL;
   unsigned NbConstraints, Dimension1, Dimension2;
-  int i, j, k;
-  Value Sum,tmp;
-  
-  value_init(Sum); value_init(tmp);
   
   CATCH(any_exception_error) {
     if (Constraints) Matrix_Free(Constraints);
     if (NewPol) Polyhedron_Free(NewPol);
-    value_clear(Sum); value_clear(tmp);
     RETHROW();
   }
   TRY {
@@ -3835,7 +3920,6 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
     if (Dimension1!=(Func->NbRows)) {
       errormsg1("Polyhedron_Preimage", "dimincomp", "incompatable dimensions");
       UNCATCH(any_exception_error);
-      value_clear(Sum); value_clear(tmp);
       return Empty_Polyhedron(Dimension2-1);
     }
     
@@ -3852,31 +3936,17 @@ Polyhedron *Polyhedron_Preimage(Polyhedron *Pol,Matrix *Func,unsigned NbMaxRays)
       errormsg1("Polyhedron_Preimage", "outofmem", "out of memory space\n");
       Pol_status = 1;
       UNCATCH(any_exception_error);
-      value_clear(Sum); value_clear(tmp);
       return 0;
     }
     
     /* The new constraint matrix is the product of constraint matrix of the */
     /* polyhedron and the function matrix.                                  */
-    for (i=0; i<NbConstraints; i++) {
-      value_assign(Constraints->p[i][0],Pol->Constraint[i][0]);
-      for (j=0; j<Dimension2; j++) {
-	value_set_si(Sum,0);
-	for (k=0; k<Dimension1; k++) {
-	  
-	  /* Sum+=Pol->Constraint[i][k+1] * Func->p[k][j]; */
-	  value_multiply(tmp,Pol->Constraint[i][k+1],Func->p[k][j]);
-	  value_addto(Sum,Sum,tmp);
-	}
-	value_assign(Constraints->p[i][j+1],Sum);
-      }
-    }
+    Rays_Mult(Pol->Constraint, Func, Constraints->p, NbConstraints);
     NewPol = Constraints2Polyhedron(Constraints, NbMaxRays);
     Matrix_Free(Constraints), Constraints = NULL;
     
   } /* end of TRY */
   
-  value_clear(Sum); value_clear(tmp);
   UNCATCH(any_exception_error);
   
   return NewPol;
@@ -3921,15 +3991,10 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
   Matrix *Rays = NULL;
   Polyhedron *NewPol = NULL;
   unsigned NbRays, Dimension1, Dimension2;
-  int i, j, k;
-  Value Sum, tmp;
   
-  value_init(Sum); value_init(tmp);
-
   CATCH(any_exception_error) {
     if (Rays) Matrix_Free(Rays);
     if (NewPol) Polyhedron_Free(NewPol);
-    value_clear(Sum); value_clear(tmp);
     RETHROW();
   }
   TRY {
@@ -3940,7 +4005,6 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
     if (Dimension1!=Func->NbColumns) {
       errormsg1("Polyhedron_Image", "dimincomp", "incompatable dimensions");
       UNCATCH(any_exception_error);
-      value_clear(Sum); value_clear(tmp);
       return Empty_Polyhedron(Dimension2-1);
     }
     
@@ -3952,39 +4016,64 @@ Polyhedron *Polyhedron_Image(Polyhedron *Pol, Matrix *Func,unsigned NbMaxConstrs
      Pol->Rays  \       Func /               Rays
 
     */
-    
-    
-    /* Allocate space for the resultant ray matrix */
-    Rays = Matrix_Alloc(NbRays, Dimension2+1);
-    if (!Rays) {
-      errormsg1("Polyhedron_Image", "outofmem", "out of memory space\n");
-      UNCATCH(any_exception_error);
-      value_clear(Sum); value_clear(tmp);
-      return 0;
-    }
-    
-    /* The new ray space is the product of ray matrix of the polyhedron and */
-    /* the transpose matrix of the mapping function.                        */
-    for (i=0; i<NbRays; i++) {
-      value_assign(Rays->p[i][0],Pol->Ray[i][0]);
-      for (j=0; j<Dimension2; j++) {
-	value_set_si(Sum,0);
-	for (k=0; k<Dimension1; k++) {
-	  
-	  /* Sum+=Pol->Ray[i][k+1] * Func->p[j][k]; */
-	  value_multiply(tmp,Pol->Ray[i][k+1],Func->p[j][k]);
-	  value_addto(Sum,Sum,tmp);
+
+    if (Dimension1 == Dimension2) {
+	Matrix *M, *M2;
+	int ok;
+	M = Matrix_Copy(Func);
+	M2 = Matrix_Alloc(Dimension2, Dimension1);
+	if (!M2) {
+	  errormsg1("Polyhedron_Image", "outofmem", "out of memory space\n");
+	  UNCATCH(any_exception_error);
+	  return 0;
 	}
-	value_assign(Rays->p[i][j+1],Sum);
-      }
+
+	ok = Matrix_Inverse(M, M2);
+	Matrix_Free(M);
+	if (ok) {
+	    NewPol = Polyhedron_Alloc(Pol->Dimension, Pol->NbConstraints,
+				      Pol->NbRays);
+	    if (!NewPol) {
+	      errormsg1("Polyhedron_Image", "outofmem", 
+			"out of memory space\n");
+	      UNCATCH(any_exception_error);
+	      return 0;
+	    }
+	    Rays_Mult_Transpose(Pol->Ray, Func, NewPol->Ray, NbRays);
+	    Rays_Mult(Pol->Constraint, M2, NewPol->Constraint, 
+		      Pol->NbConstraints);
+	    NewPol->NbEq = Pol->NbEq;
+	    NewPol->NbBid = Pol->NbBid;
+	    if (NewPol->NbEq)
+	      Gauss4(NewPol->Constraint, NewPol->NbEq, NewPol->NbConstraints,
+		     NewPol->Dimension+1);
+	    if (NewPol->NbBid)
+	      Gauss4(NewPol->Ray, NewPol->NbBid, NewPol->NbRays,
+		     NewPol->Dimension+1);
+	}
+	Matrix_Free(M2);
     }
-    NewPol = Rays2Polyhedron(Rays, NbMaxConstrs);
-    Matrix_Free(Rays), Rays = NULL;
+    
+    
+    if (!NewPol) {
+	/* Allocate space for the resultant ray matrix */
+	Rays = Matrix_Alloc(NbRays, Dimension2+1);
+	if (!Rays) {
+	  errormsg1("Polyhedron_Image", "outofmem", "out of memory space\n");
+	  UNCATCH(any_exception_error);
+	  return 0;
+	}
+	
+	/* The new ray space is the product of ray matrix of the polyhedron and */
+	/* the transpose matrix of the mapping function.                        */
+	Rays_Mult_Transpose(Pol->Ray, Func, Rays->p, NbRays);
+	NewPol = Rays2Polyhedron(Rays, NbMaxConstrs);
+	Matrix_Free(Rays), Rays = NULL;
+    }
     
   } /* end of TRY */
-  
+
   UNCATCH(any_exception_error);
-  value_clear(Sum); value_clear(tmp);
   return NewPol;
 } /* Polyhedron_Image */
 
