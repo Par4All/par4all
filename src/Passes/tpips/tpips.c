@@ -535,7 +535,7 @@ int main(int argc, char * argv[])
     debug_on("PIPS_DEBUG_LEVEL");
 
     initialize_newgen();
-    initialize_sc(entity_local_name);
+    initialize_sc((char*(*)(Variable))entity_local_name);
 
     set_bool_property("ABORT_ON_USER_ERROR",FALSE);
     pips_log_handler = tpips_user_log;
