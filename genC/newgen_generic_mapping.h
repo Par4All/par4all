@@ -27,7 +27,7 @@
  *
  * FC, Feb 21, 1994
  *
- * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1995/10/13 17:13:15 $, )
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1996/09/21 15:31:10 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -56,8 +56,9 @@
 static type##_mapping name##_map = hash_table_undefined;\
 PREFIX bool name##_map_undefined_p()\
 { return name##_map == hash_table_undefined;}\
-PREFIX void set_##name##_map(m) type##_mapping m;\
-{ assert(name##_map == hash_table_undefined); name##_map = m;}\
+PREFIX void set_##name##_map(type##_mapping m)\
+{ message_assert("mapping undefined", name##_map == hash_table_undefined);\
+  name##_map = m;}\
 PREFIX type##_mapping get_##name##_map() \
 { return name##_map;}\
 PREFIX void reset_##name##_map()\
@@ -66,18 +67,23 @@ PREFIX void free_##name##_map() \
 { hash_table_free(name##_map); name##_map = hash_table_undefined;}\
 PREFIX void make_##name##_map() \
 { name##_map = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);}\
-PREFIX result load_##type##_##name(s)type s;\
-{ result t; assert(s != type##_undefined);\
+PREFIX result load_##type##_##name(type s)\
+{ result t; message_assert("key defined", s != type##_undefined);\
   t = (result) hash_get((hash_table) (name##_map), (char*) (s));\
   if (t ==(result) HASH_UNDEFINED_VALUE) t = result##_undefined; return t;}\
-PREFIX bool type##_##name##_undefined_p(s) type s;\
+PREFIX bool type##_##name##_undefined_p(type s)\
 { return(load_##type##_##name(s)==result##_undefined);}\
-PREFIX void store_##type##_##name(s,t) type s; result t;\
-{ assert(s != type##_undefined && t != result##_undefined);\
-  hash_put((hash_table) name##_map, (char*) s, (char*) t);}
+PREFIX void store_##type##_##name(type s, result t)\
+{ message_assert("key defined", s != type##_undefined);\
+  message_assert("value defined", t != result##_undefined);\
+  hash_put((hash_table) name##_map, (char*) s, (char*) t);}\
+PREFIX void update_##type##_##name(type s, result t)\
+{ message_assert("key defined", s != type##_undefined);\
+  message_assert("value defined", t != result##_undefined);\
+  hash_update((hash_table) name##_map, (char*) s, (char*) t);}
 
 #define GENERIC_CURRENT_MAPPING(name, result, type) \
-        GENERIC_MAPPING(/**/, name, result, type)
+        GENERIC_MAPPING(auto, name, result, type)
 
 /*  to allow mappings local to a file.
  *  it seems not to make sense, but I like the interface.
@@ -90,7 +96,8 @@ static int name##_hack_to_avoid_warnings()\
 	 (int) reset_##name##_map & (int) free_##name##_map &\
 	 (int) make_##name##_map & (int) load_##type##_##name &\
 	 (int) type##_##name##_undefined_p & (int) store_##type##_##name &\
-	 (int) name##_hack_to_avoid_warnings & (int) name##_map_undefined_p;}
+	 (int) name##_hack_to_avoid_warnings & (int) name##_map_undefined_p &\
+         (int) update_##type##_##name ;}
 
 /* end GENERIC_MAPPING_INCLUDED */
 #endif
