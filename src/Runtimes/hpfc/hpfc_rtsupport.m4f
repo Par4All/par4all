@@ -2,13 +2,13 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/16 17:04:28 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/16 17:25:21 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
 c
-include("m4_macros")dnl
+include(`m4_macros')dnl
 c
 c-----------------
 c
