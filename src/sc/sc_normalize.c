@@ -855,7 +855,7 @@ int level)
 			    def = contrainte_dup(eq);
 			    ps = 
 			    sc_simple_variable_substitution_with_eq_ofl_ctrl
-			    (ps, def, v, FWD_OFL_CTRL);
+			    (ps, def, v, NO_OFL_CTRL);
 			    contrainte_rm(def);
 			}
 			else {
