@@ -4,6 +4,11 @@
   * $Id$
   *
   * $Log: expression.c,v $
+  * Revision 1.9  2003/12/19 16:31:02  irigoin
+  * Call to entity_module_name() replaced by call to entity_local_name() for
+  * constant string entities, following some change performed by Nga to
+  * accomodate C
+  *
   * Revision 1.8  2003/07/24 10:02:09  irigoin
   * Warning avoided for modulo_to_transformer()
   *
@@ -297,7 +302,7 @@ static transformer constant_to_transformer(entity v,
 	    string n = malloc(llhs+3);
 	    entity f1 = entity_undefined;
 
-	    n = strncpy(n, module_local_name(f), llhs+1);
+	    n = strncpy(n, entity_local_name(f), llhs+1);
 	    *(n+llhs+1) = *n;
 	    pips_assert("A simple or a double quote is used", *n=='"' || *n=='\'');
 	    *(n+llhs+2) = 0;
