@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1995/03/21 08:18:13 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1995/04/28 12:07:35 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -93,7 +93,7 @@ which_pips()
 {
   if [ -x pips ]
   then 
-    echo $PWD/`ls -F pips`
+    echo $PWD/pips
   else
     type pips | sed 's,^pips is ,,'
   fi
