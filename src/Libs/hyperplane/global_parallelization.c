@@ -44,7 +44,7 @@ string module_name;
 
     debug_off();
 
-    module_body_reorder(s);
+    module_reorder(s);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, 
 			   strdup(module_name), 
