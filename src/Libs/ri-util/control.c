@@ -9,7 +9,7 @@
  */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1998/12/08 12:40:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 2000/07/21 07:18:42 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -74,6 +74,39 @@ cons **l ;
     MAPL( cs,
 	  {forward_control_map_get_blocs( CONTROL( CAR( cs )), l );},
 	  control_successors( c )) ;
+}
+
+/* Same as above, but follows successors by minimal path lengths. It is OK
+   if there is only one path length when computing transformers and/or
+   preconditions. However, if a node is reached by several paths, the node
+   with the minimal maximal path length should come first. This last
+   condition assumes infinite path length for nodes in cycles. It is not
+   implemented. */
+
+void
+wide_forward_control_map_get_blocs( c, l )
+control c ;
+cons **l ;
+{
+  list nodes = NIL;
+  list frontier = CONS( CONTROL, c, NIL );
+  list new_frontier = NIL;
+
+  while(!ENDP(frontier)) {
+    MAP(CONTROL,c ,{
+      MAP(CONTROL, cp, {
+	if(!is_control_in_list_p(cp, nodes)
+	   && !is_control_in_list_p(cp, frontier)
+	   && !is_control_in_list_p(cp, new_frontier))
+	  new_frontier = CONS(CONTROL, cp, new_frontier);
+      }, control_successors(c));
+    }, frontier);
+    nodes = gen_append(nodes, frontier);
+    frontier = new_frontier;
+    new_frontier = NIL;
+  }
+
+  *l = nodes;
 }
 
 /* Test if a control node is in a list of control nodes: */
