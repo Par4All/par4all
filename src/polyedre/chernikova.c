@@ -427,7 +427,7 @@ Psysteme sc;
     sc_to_matrix(sc,a);
     
     /*  printf("\na =");
-      Matrix_Print("%4d", a); */
+      Matrix_Print(stderr, "%4d", a); */
       
     A = Constraints2Polyhedron(a, 20000);
     Matrix_Free(a);
@@ -469,7 +469,7 @@ Ptsg sg;
 	sg_to_polyhedron(sg,a);	 
    
 	/* printf("\na =");
-	Matrix_Print("%4d,", a); */
+	Matrix_Print(stderr, "%4d,", a); */
 
 	A = Rays2Polyhedron(a, 20000);
 	Matrix_Free(a);
@@ -478,7 +478,7 @@ Ptsg sg;
 	a= Polyhedron2Constraints(A);
 	Polyhedron_Free(A);
 	/* printf("\na =");
-		Matrix_Print("%4d", a); 	*/
+		Matrix_Print(stderr, "%4d", a); 	*/
 
 	matrix_to_sc(a,sc);
 	Matrix_Free(a);
@@ -533,24 +533,24 @@ Psysteme sc1,sc2;
     nbcolumns1 = sc1->dimension +2;
     a1 = Matrix_Alloc(nbrows1, nbcolumns1);
     sc_to_matrix(sc1,a1);
-   
+    
     /*     printf("\na1 =");
-	   Matrix_Print("%4d,",a1);  */
+	   Matrix_Print(stderr, "%4d",a1);   */
     
     nbrows2 = sc2->nb_eq + sc2->nb_ineq + 1;
     nbcolumns2 = sc2->dimension +2;
     a2 = Matrix_Alloc(nbrows2, nbcolumns2);
     sc_to_matrix(sc2,a2);   
     /*  printf("\na2 =");
-	Matrix_Print("%4d,",a2); */
+	Matrix_Print(stderr, "%4d,",a2); */
 
     A1 = Constraints2Polyhedron(a1, 20000);
     Matrix_Free(a1); 
     A2 = Constraints2Polyhedron(a2, 20000);
     Matrix_Free(a2);
 
-    /*    Polyhedron_Print("%4d",A1);
-	  Polyhedron_Print("%4d",A2);  */
+   /*    Polyhedron_Print(stderr, "%4d",A1);
+	  Polyhedron_Print(stderr, "%4d",A2);  */
     
 
     sc->base = base_dup(sc1->base);
@@ -675,18 +675,18 @@ Psysteme sc1,sc2;
 	Polyhedron_Free(A1);
 	Polyhedron_Free(A2);
 	
-	/*	printf("\na =");
-		Matrix_Print("%4d,",a); */
+	/*    printf("\na =");
+		Matrix_Print(stderr, "%4d,",a); */
 
 	A = Rays2Polyhedron(a, 20000);
-	/*	    Polyhedron_Print("%4d",A);*/
+	/*	    Polyhedron_Print(stderr, "%4d",A); */
 
 	a= Polyhedron2Constraints(A);    
 	Polyhedron_Free(A);
     }
 
-    /*   printf("\na =");
-	 Matrix_Print("%4d", a); 	*/
+   /*    printf("\na =");
+	 Matrix_Print(stderr, "%4d", a); 	*/
     matrix_to_sc(a,sc);
     Matrix_Free(a);
     sc=sc_normalize(sc);
@@ -700,7 +700,7 @@ Psysteme sc1,sc2;
 	}
 
     /*    printf(" impression du systeme \n"); 
-	  sc_dump(sc);*/
+	  sc_dump(sc); */
 
     /* mem_spy_end("sc_convex_hull"); */
 
