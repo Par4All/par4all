@@ -1,7 +1,9 @@
  /* $RCSfile: module.c,v $ (version $Revision$)
-  * $Date: 1997/04/20 15:56:38 $, 
+  * $Date: 1997/07/18 12:30:08 $, 
   */
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 
 #include "genC.h"
