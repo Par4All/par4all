@@ -142,7 +142,8 @@ ParserError(char * f, char * m)
 	CleanLocalEntities(mod);
     }
 
-    reset_current_module_entity();
+    /* The error may occur before the current module entity is defined */
+    error_reset_current_module_entity();
     safe_fclose(syn_in, CurrentFN);
     free(CurrentFN);
     CurrentFN = NULL;
