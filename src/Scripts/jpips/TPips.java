@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: TPips.java,v $
+ * Revision 1.7  1998/10/16 17:17:33  coelho
+ * updates for 1.2b4
+ *
  * Revision 1.6  1998/10/16 13:58:34  coelho
  * import fixed.
  *
@@ -49,7 +52,7 @@ public class TPips
   public	PList		list;		//contains the modules
 
   public	PrintWriter	out;		//output stream to tpips
-  public	DataInputStream	in,		//input stream from tpips
+  public	BufferedReader	in,		//input stream from tpips
   				inErr;		//input stream from tpips
 				
   public	Vector		optionVector;	//the options of jpips
@@ -104,8 +107,10 @@ public class TPips
           System.out.println("starting tpips...");
 	  tpips = Runtime.getRuntime().exec(execute);
           out = new PrintWriter(tpips.getOutputStream());
-          in = new DataInputStream(tpips.getInputStream());
-	  inErr = new DataInputStream(tpips.getErrorStream());
+          in = new BufferedReader
+	    (new InputStreamReader(tpips.getInputStream()));
+	  inErr = new BufferedReader
+	    (new InputStreamReader(tpips.getErrorStream()));
 
 	  // listen to tpips error
 	  Thread listener = new Thread(new Listener(inErr,jpips));
