@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1996/06/19 16:31:59 $, 
+ * $Date: 1996/06/22 10:32:10 $, 
  *
  * utilities for reductions.
  *
@@ -170,7 +170,10 @@ update_reduction_under_effect(
  * conflicts with other reduced variables...
  */
 static bool 
-find_reduction_of_var(entity var, reductions reds, reduction *pr)
+find_reduction_of_var(
+    entity var,
+    reductions reds,
+    reduction *pr)
 {
     MAP(REDUCTION, r,
     {
@@ -216,6 +219,34 @@ merge_two_reductions(reduction first, reduction second)
 
     free_reduction(second);
     return TRUE;
+}
+
+/* update *pr according to r for variable var
+ * r is not touched.
+ */
+bool 
+update_compatible_reduction_with(
+    reduction *pr,
+    entity var,
+    reduction r)
+{
+    if (reduction_variable(r)!=var)
+	return !entity_conflict_p(var, reduction_variable(r));
+
+    /* else same var and no conflict */
+    if (reduction_none_p(*pr))
+    {
+	free_reduction(*pr);
+	*pr = copy_reduction(r);
+	return TRUE;
+    }
+    /* else are they compatible? 
+     */
+    if (reduction_tag(*pr)!=reduction_tag(r))
+	return FALSE;
+    /* ok, let us merge them
+     */
+    return merge_two_reductions(*pr, copy_reduction(r));
 }
 
 /* what to do with reduction *pr for variable var 
@@ -474,7 +505,7 @@ equal_reference_in_expression_p(
 /* checks that the references are the only touched within this statement.
  * I trust the proper effects to store all references...
  */
-static bool
+bool
 no_other_effects_on_references(
     statement s,
     list /* of reference on the same variable */ lr)
@@ -509,7 +540,9 @@ call_proper_reduction_p(
     call c,         /* the call of interest */
     reduction *red) /* the returned reduction (if any) */
 {
-    list /* of expression */ le, /* of reference */ lr;
+    list /* of expression */ le, 
+         /* of reference */ lr, 
+         /* of Preference */ lp;
     expression elhs, erhs;
     reference lhs, other;
     tag op;
@@ -557,14 +590,19 @@ call_proper_reduction_p(
 	gen_free_list(lr);
 	return FALSE;
     }
-    gen_free_list(lr);
+    /* lr is used latter on */
     pips_debug(8, "no other effects\n");
+
+    lp = NIL;
+    MAP(REFERENCE, r, lp = CONS(PREFERENCE, make_preference(r), lp), lr);
+    gen_free_list(lr), lr = NIL;
 
     /* well, it is ok for a reduction now! 
      */
     *red = make_reduction(copy_reference(lhs),
 			  make_reduction_operator(op, UU), 
-			  referenced_variables(lhs));
+			  referenced_variables(lhs),
+			  lp);
 
     DEBUG_REDUCTION(7, "returning\n", *red);
     return TRUE;
