@@ -38,13 +38,13 @@ typedef struct hash_table {
     int hash_size_limit;
 } *hash_table;
 
-#define hash_table_undefined ((hash_table)chunk_undefined)  
+#define hash_table_undefined ((hash_table)gen_chunk_undefined)  
 
 /* value returned by hash_get() when the key is not found; could also be
    called HASH_KEY_NOT_FOUND, but it's semantically a value; this bottom
    value will be user-definable in a future release of NewGen */
 
-#define HASH_UNDEFINED_VALUE ((char *) chunk_undefined)
+#define HASH_UNDEFINED_VALUE ((char *) gen_chunk_undefined)
 
 #define hash_table_empty_p(htp) ((htp)->hash_entry_number == 0)
 
