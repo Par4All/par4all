@@ -35,6 +35,8 @@
 #include <stdlib.h>      /* getenv */
 #include <stdarg.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "database.h"
 #include "ri.h"
