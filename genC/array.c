@@ -32,13 +32,16 @@ gen_array_make(int size)
 }
 
 static void
-gen_array_resize(gen_array_t a)
+gen_array_resize(gen_array_t a, int min)
 {
-    int nsize = a->size+GEN_ARRAY_SIZE_INCREMENT, i;
-    a->array = (void**) realloc(a->array, sizeof(void*)*nsize);
-    message_assert("realloc ok", a->array);
-    for (i=a->size; i<nsize; i++) a->array[i] = (void*) NULL;
-    a->size = nsize;
+  int N = GEN_ARRAY_SIZE_INCREMENT;
+  int nsize = ((min%N)==0)?min:((int)(min/N) +1)*N;
+  int i;
+  /* int nsize = a->size+GEN_ARRAY_SIZE_INCREMENT, i;*/
+  a->array = (void**) realloc(a->array, sizeof(void*)*nsize);
+  message_assert("realloc ok", a->array);
+  for (i=a->size; i<nsize; i++) a->array[i] = (void*) NULL;
+  a->size = nsize;
 }
 
 void
@@ -60,11 +63,19 @@ gen_array_full_free(gen_array_t a)
 void
 gen_array_addto(gen_array_t a, int i, void * what)
 {
-    if (i==a->size) gen_array_resize(a);
+    if (i>=a->size) gen_array_resize(a,i+1);
     message_assert("valid index", 0<=i && i<a->size);
-    if (a->array[i]) a->nitems--;
+    if (a->array[i]!=(void *)NULL) a->nitems--;
     a->array[i] = what;
-    if (a->array[i]) a->nitems++;
+    if (a->array[i]!=(void *)NULL) a->nitems++;
+}
+
+void 
+gen_array_remove(gen_array_t a, int i) 
+{
+  message_assert("valid index", 0<=i && i<a->size);
+  if (a->array[i]!=(void *)NULL) a->nitems--;
+  a->array[i] = (void *)NULL;
 }
 
 void 
@@ -147,3 +158,7 @@ list_from_gen_array(gen_array_t a)
     GEN_ARRAY_MAP(s, ls = CONS(STRING, strdup(s), ls), a);
     return ls;
 }
+
+
+
+
