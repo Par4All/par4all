@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/12/22 16:06:14 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/12/26 16:17:20 $, )
  * version $Revision$
  */
  
@@ -15,7 +15,7 @@
 
 /* fake resources...
  */
-#define NO_FILE "dummy-file"
+#define NO_FILE (strdup("fake file name"))
 
 /****************************************************************** COMMONS */
 
