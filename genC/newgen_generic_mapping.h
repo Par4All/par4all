@@ -27,7 +27,7 @@
  *
  * FC, Feb 21, 1994
  *
- * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1994/12/30 13:58:50 $, )
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1994/12/30 14:50:29 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -101,10 +101,10 @@ result t;\
     hash_put((hash_table) (name##_map), (char *)(s), (char *)(t));\
 }\
 \
-static void check_##name()\
+static void check_##name##_mapping()\
 {\
-  type item = (type) check_##name;\
-  result r = (result)check_##name;\
+  type item = (type) check_##name##_mapping;\
+  result r = (result)check_##name##_mapping;\
   type##_mapping saved = get_##name##_map();\
 \
   reset_##name##_map();\
