@@ -20,6 +20,7 @@ char vcid_semantics_prettyprint[] = "$Id$";
 
 #include "top-level.h"
 
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 
