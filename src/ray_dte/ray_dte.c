@@ -16,7 +16,6 @@
  */
 
 #include <stdio.h>
-#include <sys/stdtypes.h>  /* for debug with dbmalloc */
 #include <malloc.h>
 
 #include "boolean.h"
