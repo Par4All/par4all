@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: special_cases.c,v $
+ * Revision 1.30  1998/12/26 21:20:38  irigoin
+ * error_handler added
+ *
  * Revision 1.29  1998/04/14 20:43:28  coelho
  * generic void *.
  *
@@ -756,6 +759,12 @@ statement generate_subarray_shift(statement s, entity var, list lshift)
 static statement simple_found;
 static bool ok;
 DEFINE_LOCAL_STACK(current_stmt, statement)
+
+void hpfc_special_cases_error_handler()
+{
+    error_reset_current_stmt_stack();
+    error_reset_current_call_stack();
+}
 
 static bool not_simple(void * x)
 {
