@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1995/03/22 10:56:54 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1995/03/23 16:54:29 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -47,34 +47,6 @@ extern int system();
 extern char *getenv();
 extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
 
-/*  GLOBAL VARIABLES
- */
-static list the_callees = NIL;
-
-/*    global list of encountered commons and modules
- */
-static list the_commons = NIL;
-static list the_modules = NIL;
-
-GENERIC_LOCAL_MAPPING(hpfc_already_compiled, bool, entity);
-
-static string
-hpfc_find_a_not_compiled_module()
-{
-    entity module;
-    
-    MAPL(ce,
-     {
-         module = ENTITY(CAR(ce));
-         
-         if (entity_hpfc_already_compiled_undefined_p(module))
-             return(module_local_name(module));
-     },
-         the_modules);
-
-    return(string_undefined);
-}
-
 #define generate_file_name(filename, prefix, suffix)\
   filename = strdup(concatenate(db_get_current_program_directory(),\
 				"/", prefix, suffix, NULL));
@@ -82,25 +54,6 @@ hpfc_find_a_not_compiled_module()
 #define add_warning(filename)\
   system(concatenate("$HPFC_TOOLS/hpfc_add_warning ", filename, NULL));
 
-
-static void 
-reset_resources_for_module (string module_name)
-{
-    debug(5, "reset_resources_for_module",
-	  "resetting resources of module %s\n", module_name);
-
-    reset_current_module_entity();
-    reset_current_module_statement();
-    reset_cumulated_effects_map();
-    reset_proper_effects_map();
-    reset_local_regions_map();
-    reset_precondition_map();
-
-    free_only_io_map();
-    free_postcondition_map();
-
-    gen_free_list(the_callees), the_callees = NIL;
-}
 
 static string 
 hpfc_local_name (string name, string suffix)
@@ -131,7 +84,7 @@ make_host_and_node_modules (entity module)
 	host = entity_undefined,
 	node = entity_undefined;
 
-    if (!entity_node_new_undefined_p(module))
+    if (bound_new_node_p(module))
 	return;
 
     if (entity_main_module_p(module))
@@ -199,8 +152,8 @@ init_host_and_node_entities (void)
     entity
 	current_module = get_current_module_entity();
 
-    host_module = load_entity_host_new(current_module);
-    node_module = load_entity_node_new(current_module);
+    host_module = load_new_host(current_module);
+    node_module = load_new_node(current_module);
 
     /*  First, the commons are updated
      */
@@ -270,92 +223,6 @@ init_host_and_node_entities (void)
 	debug_on("HPFC_DEBUG_LEVEL");
     }
 }
-		     
-static void 
-set_resources_for_module (string module_name)
-{
-    entity
-	module = local_name_to_top_level_entity(module_name),
-	stop = entity_undefined;
-
-    db_set_current_module_name(module_name);
-    set_current_module_entity(module);
-    set_current_module_statement
-	((statement) db_get_memory_resource(DBR_CODE, module_name, FALSE));
-
-    /*   PRECONDITIONS
-     */
-    set_precondition_map
-	((statement_mapping)
-	 db_get_memory_resource(DBR_PRECONDITIONS, module_name, FALSE));
-
-    /*   POSTCONDITIONS
-     */
-    set_postcondition_map
-	(compute_postcondition(get_current_module_statement(),
-			       MAKE_STATEMENT_MAPPING(),
-			       get_precondition_map()));
-
-    /*   REGIONS
-     */
-    set_local_regions_map
-	(effectsmap_to_listmap((statement_mapping)
-	 db_get_memory_resource(DBR_REGIONS, module_name, FALSE)));
-    
-    /*
-     * Initialize mappings
-     */
-    only_io_mapping_initialize(get_current_module_statement());
-
-    /*   CALLEES
-     */
-    the_callees = entity_to_callees(module);
-
-    make_host_and_node_modules(module);
-
-    MAPL(ce,
-     {
-	 entity callee = ENTITY(CAR(ce));
-
-	 assert(entity_module_p(callee));
-
-	 if (!value_intrinsic_p(entity_initial(callee)) &&
-	     !hpfc_entity_reduction_p(callee) &&
-	     !hpfc_intrinsic_like_function(callee))
-	 {
-	     debug(4, "set_resources_for_module", 
-		   "callee %s to be {host,node}ify\n", entity_name(callee));
-
-	     make_host_and_node_modules(callee);
-	     if (gen_find_eq(callee, the_modules)!=callee)
-		 the_modules = CONS(ENTITY, callee, the_modules);
-	 }
-     },
-	 the_callees);
-
-    hpfc_init_run_time_entities();
-    reset_unique_numbers();
-
-    /*   STOP is to be translated into hpfc_{host,node}_end
-     */
-    stop = local_name_to_top_level_entity(STOP_FUNCTION_NAME);
-    store_new_host_variable(hpfc_name_to_entity(HOST_END), stop);
-    store_new_node_variable(hpfc_name_to_entity(NODE_END), stop);
-
-    debug(1, "set_resources_for_module", 
-	  "building %s.hpf in %s\n",
-	  module_name,
-	  db_get_current_program_directory());
-
-    system(concatenate("$HPFC_TOOLS/hpfc_filter < ",
-		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
-		       " > ",
-		       db_get_current_program_directory(),
-		       "/",
-		       module_name,
-		       ".hpf",
-		       NIL));
-}
 
 void 
 put_generated_resources_for_common (entity common)
@@ -372,8 +239,8 @@ put_generated_resources_for_common (entity common)
 	parm_filename,
 	init_filename;
     entity
-	node_common = load_entity_node_new(common),
-	host_common = load_entity_host_new(common);
+	node_common = load_new_node(common),
+	host_common = load_new_host(common);
     
     generate_file_name(host_filename, prefix, "_host.h");
     generate_file_name(node_filename, prefix, "_node.h");
@@ -543,138 +410,6 @@ string program_name;
     free(init_filename);
 }
 
-static void 
-init_hpfc_for_program (void)
-{
-    /* HPFC-PACKAGE is used to put dummy variables in, and other things
-     */
-    (void) make_empty_program(HPFC_PACKAGE);
-
-    the_commons = NIL;
-    the_modules = NIL;
-    reset_hpf_object_lists();
-
-    /* hpfc_init_unique_numbers(); */
-
-    init_hpf_number_status();
-    init_overlap_status();
-
-    make_align_map();       /* ??? memory leak */
-    make_distribute_map();  /* ??? memory leak */
-    make_host_node_maps();
-    make_hpfc_already_compiled_map();
-    make_hpfc_current_mappings();
-    make_new_declaration_map();
-    make_referenced_variables_map();
-    make_update_common_map();
-}
-
-static void 
-close_hpfc_for_program (void)
-{
-    gen_free_list(the_commons), the_commons = NIL;
-    gen_free_list(the_modules), the_modules = NIL;
-    free_hpf_object_lists();
-
-    close_hpf_number_status();
-    close_overlap_status();
-
-    free_align_map();
-    free_distribute_map();
-    free_host_node_maps();
-    free_hpfc_already_compiled_map();
-    free_hpfc_current_mappings();
-    free_new_declaration_map();
-    free_referenced_variables_map(); 
-    free_update_common_map();
-}
-
-static void 
-hpfcompile_common (common)
-entity common;
-{
-    declaration_with_overlaps_for_module(common);
-    clean_common_declaration(load_entity_host_new(common));
-    put_generated_resources_for_common(common);
-
-    store_entity_hpfc_already_compiled(common, TRUE);
-}
-
-static void 
-ReadHpfDir (string module_name)
-{
-    debug(8,"ReadHpfDir", "module: %s\n", module_name);
-    hpfcparser(module_name);    /* filter */
-}
-
-static void 
-hpfcompile_module (string module_name)
-{
-    entity 
-	module = entity_undefined;
-    statement   
-	module_stat,
-	host_stat,
-	node_stat;
-    
-    db_set_current_module_name(module_name);
-    set_resources_for_module(module_name);
-
-    module = get_current_module_entity();
-    module_stat = get_current_module_statement();
-
-    /* what is to be done 
-     * filter the source for the directives
-     * read them
-     * get the code,
-     * hpf_normalize the code,
-     * get the effects on the normalized code, !!!!
-     * touch the declarations,
-     * initiate both host and node,
-     * generate the run-time data structure,
-     * compile,
-     * then put in the db the results of the compiler,
-     * and find a way to print it!
-     */
-
-    NormalizeCommonVariables(module, module_stat);
-    ReadHpfDir(module_name);
-    NormalizeHpfDeclarations();
-    NormalizeCodeForHpfc(module_stat);
-
-    /* put here because the current module is updated with some external
-     * declarations 
-     */
-    init_host_and_node_entities(); 
-    
-    host_stat = statement_undefined, node_stat = statement_undefined;
-
-    /*   Actual compilation
-     */
-    hpf_compiler(module_stat, &host_stat, &node_stat);
-    
-    if (entity_main_module_p(module))
-	add_pvm_init_and_end(&host_stat, &node_stat);
-
-    declaration_with_overlaps_for_module(module);
-
-    update_object_for_module(node_stat, node_module);
-    update_object_for_module(entity_code(node_module), node_module);
-    insure_declaration_coherency(node_module, node_stat);
-
-    update_object_for_module(host_stat, host_module);
-    update_object_for_module(entity_code(host_module), host_module);
-    insure_declaration_coherency(host_module, host_stat);
-
-    put_generated_resources_for_module(module_stat, host_stat, node_stat);
-    
-    reset_resources_for_module(module_name);
-
-    /*   Now the module is compiled
-     */
-    store_entity_hpfc_already_compiled(module, TRUE);
-}
-
 /*
  * hpfcompile
  *
@@ -683,37 +418,9 @@ hpfcompile_module (string module_name)
 void 
 hpfcompile (char *module_name)
 {
-    string name = NULL;
-
     debug_on("HPFC_DEBUG_LEVEL");
-
     debug(1, "hpfcompile", "module: %s\n", module_name);
-
-    set_bool_property("PRETTYPRINT_COMMONS", FALSE); 
-    set_bool_property("PRETTYPRINT_HPFC", TRUE);
-
-    init_hpfc_for_program();
-
-    /*    MAIN
-     */
-    hpfcompile_module(module_name);
-
-    /*    FUNCTIONS AND SUBROUTINES
-     */
-    while(!string_undefined_p(name=hpfc_find_a_not_compiled_module()))
-    {
-        hpfcompile_module(name);
-    }
-
-    /*    COMMONS
-     */
-    set_bool_property("PRETTYPRINT_COMMONS", TRUE); 
-    db_set_current_module_name(module_name);
-    gen_map(hpfcompile_common, the_commons);
-    put_generated_resources_for_program(module_name);
-
-    close_hpfc_for_program();
-
+    pips_error("hpfcompile", "obsolete\n");
     debug_off();
 }
 
