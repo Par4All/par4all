@@ -1,4 +1,6 @@
-
+/* $RCSfile: tpips-local.h,v $ (version $Revision$)
+ * $Date: 1996/08/08 17:12:44 $, 
+ */
 #define FILE_LIST_MAX_LENGTH 10
 
 typedef struct _t_file_list {
@@ -18,3 +20,11 @@ extern void tp_init_lex();
 extern void tp_begin_key();
 extern void tp_begin_fname();
 extern void close_workspace_if_opened();
+
+FILE * tp_in;
+#ifdef FLEX_SCANNER
+void tp_restart(FILE *);
+#endif
+
+/* end of $RCSfile: tpips-local.h,v $ 
+ */
