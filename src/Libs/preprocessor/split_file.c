@@ -248,8 +248,8 @@ char *s;
 	if ((ptr = look(line, "subroutine")) != 0 ||
 	    (ptr = look(line, "function")) != 0 ||
 	    (ptr = functs(line)) != 0) {
-		if(scan_name(s, ptr)) return(1);
-		strcpy( s, x);
+	    if(scan_name(s, ptr)) return(1);
+	    strcpy( s, x);
 	} else if((ptr = look(line, "program")) != 0) {
 	    it_is_a_main = 1;
 	    if(scan_name(s, ptr)) return(1);
@@ -257,18 +257,18 @@ char *s;
 	    get_name( mainp);
 	    strcpy( s, mainp);
 	} else if((ptr = look(line, "blockdata")) != 0) {
-		if(scan_name(s, ptr)) return(1);
-		implicit_blockdata_name = 1;
-		get_name( blkp);
-		strcpy( s, blkp);
+	    if(scan_name(s, ptr)) return(1);
+	    implicit_blockdata_name = 1;
+	    get_name( blkp);
+	    strcpy( s, blkp);
 	} else if((ptr = functs(line)) != 0) {
-		if(scan_name(s, ptr)) return(1);
-		strcpy( s, x);
+	    if(scan_name(s, ptr)) return(1);
+	    strcpy( s, x);
 	} else {
 	    implicit_program = 1;
 	    it_is_a_main = 1;
-		get_name( mainp);
-		strcpy( s, mainp);
+	    get_name( mainp);
+	    strcpy( s, mainp);
 	}
 	return(1);
 }
@@ -358,6 +358,7 @@ char *s, *m;
 
 static void print_name(FILE * o, char * name, int n) /* FC */
 {
+    name = name + strlen(name) - n - 2;
     while (n-->0) putc(*name++, o);
 }
 
@@ -441,32 +442,39 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 	    exit(2);
 	}
 	if (rv == 0) {			/* no lines in file, forget the file */
-		unlink(x);
-		retval = 0;
-		if (fclose(ifp)) {
-		    fprintf(stderr, "fclose(ifp) failed\n");
-		    exit(2);
-		}
-		return ( retval );
+	    unlink(x);
+	    retval = 0;
+	    if (fclose(ifp)) {
+		fprintf(stderr, "fclose(ifp) failed\n");
+		exit(2);
+	    }
+	    return ( retval );
 	}
 	if (nflag) {			/* rename the file */
-		if(saveit(name)) {
-		    char * nname = full_name(dir_name, name);
-		    if (stat(nname, &sbuf) < 0 ) {
-			link(x, nname);
-			unlink(x);
-			fprintf(out, "%s\n", name);
-		    } else if (strcmp(nname, x) == 0) {
-				printf("%s\n", x);
-		    }
-		    else 
-			printf("%s already exists, put in %s\n", nname, x);
-		    free(nname);
-		    continue;
-		} else
+	    if(saveit(name)) 
+	    {
+		if (strncmp(dir_name, name,strlen(dir_name))!=0) 
+		{
+		    char * full = full_name(dir_name, name);
+		    strcpy(name, full);
+		    free(full);
+		}
+		if (strcmp(name, x) == 0) {
+		    printf("%s\n", x);
+		}
+		else if (stat(name, &sbuf) < 0 ) 
+		{
+		    link(x, name);
 		    unlink(x);
+		    fprintf(out, "%s\n", name);
+		}
+		else 
+		    printf("%s already exists, put in %s\n", name, x);
 		continue;
-	}
+	    } else
+		unlink(x);
+	    continue;
+        }
 	fprintf(out, "%s\n", x);
     }
 
