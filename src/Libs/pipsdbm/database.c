@@ -144,7 +144,7 @@ static void dump_db_resource(string rname, string oname, db_resource r)
 
 void dump_all_db_resource_status(FILE * file, string where)
 {
-  pips_debug(1, "doint at %s\n", where);
+  pips_debug(1, "doing at '%s'\n", where);
 
   DB_RESOURCES_MAP(os, or,
   {
