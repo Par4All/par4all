@@ -2,16 +2,23 @@
    chooser. */
 
 
-/* 	%A% ($Date: 1996/07/12 15:03:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/12/03 17:21:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_directory_menu[] = "%A% ($Date: 1996/07/12 15:03:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_directory_menu[] = "%A% ($Date: 1996/12/03 17:21:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <xview/xview.h>
 #include <xview/panel.h>
+/* To have SunOS 5.5 happy about MAXNAMELEN (in SunOS 4, it is already
+   defined in sys/dirent.h): */
+#include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/dirent.h>
+/* To have SunOS4 still working: */
+#ifndef MAXNAMELEN
+#define MAXNAMELEN MAXNAMLEN
+#endif
 #include "genC.h"
 #include "misc.h"
 #include "database.h"
@@ -19,6 +26,7 @@ char vcid_directory_menu[] = "%A% ($Date: 1996/07/12 15:03:07 $, ) version $Revi
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "wpips.h"
+
 
 enum {MENU_PATH_DATA_HANDLER = 54829,
 /* Maximum size of the directory menu of the main frame: */
@@ -40,7 +48,7 @@ directory_gen_pullright(Menu_item menu_item,
    Menu menu;
    
    if (op == MENU_DISPLAY) {
-      char directory[MAXNAMLEN + 1];
+      char directory[MAXNAMELEN + 1];
       char * parent_directory;
       Menu parent = xv_get(menu_item, MENU_PARENT);
 
@@ -80,7 +88,7 @@ directory_gen_pullright(Menu_item menu_item,
 static void
 generate_a_directory_menu_notify(Menu menu, Menu_item menu_item)
 {
-   char full_directory_name[MAXNAMLEN + 1];
+   char full_directory_name[MAXNAMELEN + 1];
    char * directory_name = (char *) xv_get(menu_item, MENU_STRING);
    char * parent_path_name =
       (char *) xv_get(menu, XV_KEY_DATA, MENU_PATH_DATA_HANDLER);
@@ -156,7 +164,7 @@ generate_a_directory_menu(char * directory)
             /* Skip the "." directory: */
             if (strcmp(file_list[i], ".") != 0) {
                struct stat buf;
-               char complete_file_name[MAXNAMLEN + 1];
+               char complete_file_name[MAXNAMELEN + 1];
 
                Menu_item menu_item =
                   xv_create(XV_NULL, MENUITEM,
