@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/20 13:38:53 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/20 14:57:48 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -29,14 +29,14 @@ PREFIX void close_##name() { close(name);}
 
 #define GENERIC_FUNCTION(PREFIX, name, type, ktype, vtype)\
 GENERIC_STATIC_STATUS(PREFIX, name, type, make_##type(), free_##type)\
-PREFIX void extend_##name(k,v) ktype k; vtype v;\
+PREFIX void store_##name(k,v) ktype k; vtype v;\
        { extend_##type(name, k, v);}\
 PREFIX void update_##name(k,v) ktype k; vtype v;\
        { update_##type(name, k, v);}\
-PREFIX vtype apply_##name(k) ktype k;\
+PREFIX vtype load_##name(k) ktype k;\
        { return(apply_##type(name, k));}\
-PREFIX bool apply_##name##_defined_p(k) ktype k; \
-       { return(apply_##type(name, k)!=HASH_UNDEFINED_VALUE);}
+PREFIX bool bound_##name##_p(k) ktype k; \
+       { return(bound_##type##_p(name, k));}
 
 #define GENERIC_LOCAL_FUNCTION(name, type, ktype, vtype)\
         GENERIC_FUNCTION(static, name, type, ktype, vtype)
