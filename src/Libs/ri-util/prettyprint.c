@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/18 11:40:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/10 17:15:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/10/18 11:40:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/11/10 17:15:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -945,6 +945,7 @@ output_a_graph_view_of_the_unstructured(text r,
                                         unstructured u,
                                         int num)
 {
+   bool exit_node_has_been_displayed = FALSE;
    list blocs = NIL;
    control begin_control = unstructured_control(u);
    control end_control = unstructured_exit(u);
@@ -962,10 +963,22 @@ output_a_graph_view_of_the_unstructured(text r,
                                                                      module,
                                                                      margin,
                                                                      c);
+                  if (c == end_control)
+                     exit_node_has_been_displayed = TRUE;
                },
                   begin_control,
                   blocs);
    gen_free_list(blocs);
+
+   /* If we have not displayed the exit node, that mean that it is not
+      connex with the entry node and so the code is
+      unreachable. Anyway, it has to be displayed as for the classical
+      Sequential View: */
+   if (! exit_node_has_been_displayed)
+      output_a_graph_view_of_the_unstructured_successors(r,
+                                                         module,
+                                                         margin,
+                                                         end_control);
 
    add_one_unformated_printf_to_text(r, "%s %#x end: %#x\n",
                                      PRETTYPRINT_UNSTRUCTURED_END_MARKER,
@@ -1003,13 +1016,14 @@ text_unstructured(entity module,
                                               u,
                                               num);
    }
-   else {      
+   else {
       r = text_graph(module, margin, ct, &previous, trail, labels, cexit) ;
+
       MERGE_TEXTS(r, text_control(module, margin, cexit,
                                   &previous, set_make(set_pointer), labels,
                                   cexit)) ;
    }
-
+   
    if( get_debug_level() == 9 ) {
       fprintf(stderr,"Unstructured %x (%x, %x)\n", 
               (unsigned int) u, (unsigned int) ct, (unsigned int) cexit ) ;
