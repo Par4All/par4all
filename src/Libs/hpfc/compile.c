@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compile.c,v $ ($Date: 1995/04/10 18:49:30 $) version $Revision$
+ * $RCSfile: compile.c,v $ ($Date: 1995/07/20 18:40:35 $) version $Revision$
  */
 
 #include "defines-local.h"
@@ -128,12 +128,9 @@ init_host_and_node_entities (void)
 
     /*  First, the commons are updated
      */
-    MAPL(ce,
+    MAP(ENTITY, e,
      {
-	 entity 
-	     e = ENTITY(CAR(ce));
-	 type
-	     t = entity_type(e);
+	 type t = entity_type(e);
 
 	 if (type_area_p(t) && !SPECIAL_COMMON_P(e))
 	 {
@@ -151,12 +148,9 @@ init_host_and_node_entities (void)
 
     /*   Then, the other entities
      */
-    MAPL(ce,
+    MAP(ENTITY, e,
      {
-	 entity 
-	     e = ENTITY(CAR(ce));
-	 type
-	     t = entity_type(e);
+	 type t = entity_type(e);
 
 	 /* parameters are selected. I think they may be either
 	  * functional of variable (if declared...) FC 15/09/93
