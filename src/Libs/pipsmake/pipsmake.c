@@ -566,8 +566,8 @@ string oname;
     bool status = TRUE;
 
     /* we select some resources */
-    MAPL(prr, {
-	real_resource rr = VIRTUAL_RESOURCE(CAR(prr));
+    MAPL(pvr, {
+	virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
 	string vrn = virtual_resource_name(vr);
 	tag vrt = owner_tag(virtual_resource_owner(vr));
 
@@ -582,7 +582,7 @@ string oname;
 		break;
 	    }
 	}
-    }, reals);
+    }, rule_pre_transformation(ru));
     
     
     if (status) {
