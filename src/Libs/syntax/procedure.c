@@ -607,10 +607,6 @@ MakeExternalFunction(
 	}
     }
     else {
-	/* e may have been created for a common declaration and put in the
-	 * ghost variable list
-	 */
-	reify_ghost_variable_entity(e);
 	fe = e;
     }
 
