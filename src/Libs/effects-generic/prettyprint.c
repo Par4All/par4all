@@ -352,8 +352,12 @@ list /* of string */ effect_words_reference(reference obj)
     list pc = NIL;
     string begin_attachment;
     entity e = reference_variable(obj);
-
-    pc = CHAIN_SWORD(pc, entity_minimal_name(e));
+   
+    if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")  
+	&& entity_in_common_p(e)) {
+	pc = CHAIN_SWORD(pc, (string) entity_and_common_name(e));
+    } else 
+	pc = CHAIN_SWORD(pc, entity_minimal_name(e));
     begin_attachment = STRING(CAR(pc));
 
     if (reference_indices(obj) != NIL) {
