@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1996/09/07 16:42:42 $, 
+ * $Date: 1996/12/17 18:04:33 $, 
  */
 
 #include "defines-local.h"
@@ -403,8 +403,7 @@ statement s;
 	 if (reference_variable(effect_reference(e)) == var)
 	 {
 	     if (!approximation_must_p(effect_approximation(e)) ||
-		 !rectangular_region_p(predicate_system
-			    (transformer_relation(effect_context(e)))))
+		 !rectangular_region_p(effect_system(e)))
 	     {
 		 pips_debug(6, "FALSE\n"); return FALSE;
 	     }
@@ -617,7 +616,7 @@ Psysteme get_read_effect_area(list le, entity var)
      {
 	 if (action_read_p(effect_action(e)) &&
 	     reference_variable(effect_reference(e))==var)
-	     return predicate_system(transformer_relation(effect_context(e)));
+	     return effect_system(e);
      },
 	 le);
 
