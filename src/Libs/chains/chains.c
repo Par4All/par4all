@@ -32,6 +32,7 @@ extern int fprintf();
 #include "control.h"
 #include "prettyprint.h"
 #include "effects.h"
+#include "regions.h"
 #include "chains.h"
 #include "pipsdbm.h"
 
@@ -100,6 +101,9 @@ static hash_table Vertex_statement ;	/* Vertex_statement maps each
 static bool one_trip_do ;
 static bool keep_read_read_dependences ;
 
+static void set_effects(char *module_name, int use);
+static void reset_effects();
+static list load_statement_effects(statement st);
 
 static void local_print_statement_set(char *msg, set s);
 
@@ -149,8 +153,8 @@ statement st ;
 	if (get_debug_level() > 0) {
 	    fprintf(stderr, "Init statement %d with effects %x\n", 
 		    statement_number( st ), 
-		    load_statement_cumulated_effects(st) );
-	    print_effects( load_statement_cumulated_effects(st) ) ;
+		    load_statement_effects(st) );
+	    print_effects( load_statement_effects(st) ) ;
 	}
 	hash_put( Gen, (char *)st, (char *)MAKE_STATEMENT_SET()) ;
 	hash_put( Ref, (char *)st, (char *)MAKE_STATEMENT_SET()) ;
@@ -179,7 +183,7 @@ statement st ;
 		   approximation_must_p( effect_approximation( e ))) {
 		    add_entity_to_defs( effect_entity( e ), st );
 		}
-	    }, load_statement_cumulated_effects(st) ) ;
+	    }, load_statement_effects(st) ) ;
 	}
     }
     else {
@@ -288,7 +292,7 @@ cons *idxs ;
 				    the_write = effect_approximation( e ) ;
 				    nb_writes++ ;
 				}},
-			  load_statement_cumulated_effects(def) ) ;
+			  load_statement_effects(def) ) ;
 		     pips_assert( "kill_call", nb_writes > 0 ) ;
 
 		     if(nb_writes == 1 && 
@@ -331,7 +335,7 @@ statement st ;
 	}
 	does_write |= action_write_p( a ) ;
 	does_read |= action_read_p( a ) ;
-    }, load_statement_cumulated_effects(st) ) ;
+    }, load_statement_effects(st) ) ;
 
     if( does_write ) {
 	set_add_element( gen, gen, (char *)st ) ;
@@ -378,7 +382,7 @@ cons *l ;
 	       gen_find_eq( effect_entity( f ), l ) == entity_undefined) {
 		mask = FALSE ;
 		break ;
-	    }}, load_statement_cumulated_effects(s) ) ;
+	    }}, load_statement_effects(s) ) ;
 	if( mask ) {
 	    to_mask = CONS( STATEMENT, s, to_mask ) ;
 	}}, s ) ;
@@ -795,8 +799,8 @@ bool (*which)() ;
 {
     vertex vin ;
     vertex vout = vertex_statement( stout ) ;
-    cons *effect_ins = load_statement_cumulated_effects( stin ) ;
-    cons *effect_outs = load_statement_cumulated_effects( stout ) ;
+    cons *effect_ins = load_statement_effects( stin ) ;
+    cons *effect_outs = load_statement_effects( stout ) ;
     cons *cs = NIL ;
 
     if (get_debug_level() > 0) {
@@ -893,6 +897,7 @@ control c ;
 
 #define USE_PROPER_EFFECTS 1
 #define USE_REGIONS 2
+#define USE_IN_OUT_REGIONS 3
 
 void atomic_chains(module_name)
 char *module_name;
@@ -905,6 +910,13 @@ char *module_name;
 {
     chains(module_name, USE_REGIONS);
 }
+
+void in_out_regions_chains(module_name)
+char *module_name;
+{
+    chains(module_name, USE_IN_OUT_REGIONS);
+}
+
 
 void chains(module_name, use)
 char *module_name;
@@ -927,15 +939,7 @@ int use;
     if (! instruction_unstructured_p(module_inst))
 	pips_error("chains", "unstructured expected\n");
 
-    switch(use) {
-    case USE_PROPER_EFFECTS: set_cumulated_effects_map( (statement_mapping) 
-	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE) );
-	break;
-    case USE_REGIONS: set_cumulated_effects_map( (statement_mapping) 
-	db_get_memory_resource(DBR_REGIONS, module_name, TRUE) );
-	break;
-    default: pips_error("chains", "ill. parameter use = %d\n", use);
-    }
+    set_effects(module_name,use);
 
     module_graph = 
 	dependence_graph(instruction_unstructured(module_inst));
@@ -948,7 +952,7 @@ int use;
     DB_PUT_MEMORY_RESOURCE(DBR_CHAINS, 
 			   strdup(module_name), 
 			   (char*) module_graph);
-    reset_cumulated_effects_map();
+    reset_effects();
     reset_enclosing_loops_map();
     reset_current_module_statement();
     reset_current_module_entity();
@@ -986,6 +990,109 @@ unstructured u ;
     return( dg ) ;
 }
 
+
+/* functions for effects maps */
+
+static bool rgch = FALSE;
+static bool iorgch = FALSE;
+
+static list load_statement_effects(st)
+statement st;
+{
+    instruction inst = statement_instruction( st );
+    tag t = instruction_tag( inst );
+    tag call_t;
+    list le = NIL;
+    
+    switch( t ) {
+    case is_instruction_call: 
+	call_t = value_tag(entity_initial(call_function( instruction_call( inst ))));
+	if (rgch && (call_t == is_value_code)) 
+	{
+	    le = load_statement_local_regions(st);
+	    break;
+	}
+	if ( iorgch && (call_t == is_value_code)) 
+	{
+	    list l_in = load_statement_in_regions(st); 
+	    list l_out = load_statement_out_regions(st);
+	    le = gen_append(l_in,l_out);
+	    break;
+	}
+    case is_instruction_block: 
+    case is_instruction_test: 
+    case is_instruction_loop: 
+    case is_instruction_goto: 
+    case is_instruction_unstructured:
+	le = load_statement_proper_effects(st);
+	break ;
+    default:
+	pips_error( "load_statement_effects", "Unknown tag %d\n", t ) ;
+    }
+    
+    return le;
+}
+
+
+static void set_effects(module_name, use)
+char *module_name;
+int use;
+{
+    switch(use) {
+
+    case USE_PROPER_EFFECTS: 
+	rgch = FALSE;
+	iorgch = FALSE;
+	set_proper_effects_map(
+             effectsmap_to_listmap( (statement_mapping) 
+               db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE) ));
+	break;
+
+    case USE_REGIONS: 
+	rgch = TRUE;
+	iorgch = FALSE;
+	set_proper_effects_map(
+              effectsmap_to_listmap( (statement_mapping) 
+	       db_get_memory_resource(DBR_PROPER_REGIONS, module_name, TRUE) ));
+	set_local_regions_map(effectsmap_to_listmap( (statement_mapping) 
+	       db_get_memory_resource(DBR_REGIONS, module_name, TRUE) ));
+			      
+	break;
+
+    case USE_IN_OUT_REGIONS: 
+	rgch = FALSE;
+	iorgch = TRUE;
+	set_proper_effects_map(
+              effectsmap_to_listmap( (statement_mapping) 
+	       db_get_memory_resource(DBR_PROPER_REGIONS, module_name, TRUE) ));
+	set_in_regions_map( 
+              effectsmap_to_listmap( (statement_mapping) 
+	       db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE) ));
+	set_out_regions_map( 
+              effectsmap_to_listmap( (statement_mapping) 
+	       db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE) ));
+
+	break;    
+
+    default: pips_error("set_effects", "ill. parameter use = %d\n", use);
+    }
+
+}
+
+
+static void reset_effects()
+{
+    reset_proper_effects_map();
+    if (rgch) {
+	reset_local_regions_map();
+    }
+    if (iorgch) {
+	reset_in_regions_map();
+	reset_out_regions_map();
+    }
+}
+
+
 /* Acces functions for debug only */
 
 /* PRINT_STATEMENT_SET displays on stderr, the MSG followed by the set
