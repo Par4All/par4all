@@ -18,7 +18,7 @@
 #include <assert.h>
 #include <string.h>
 
-extern char *strdup(char *);
+extern char *strdup(const char *);
 
 #include "boolean.h"
 #include "arithmetique.h"
