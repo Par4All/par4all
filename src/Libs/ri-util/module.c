@@ -1,5 +1,5 @@
  /* $RCSfile: module.c,v $ (version $Revision$)
-  * $Date: 1997/10/24 16:44:03 $, 
+  * $Date: 1997/10/27 08:01:52 $, 
   */
 #include <stdlib.h>
 #include <stdio.h>
@@ -213,10 +213,10 @@ store_a_call_function(call c)
     pips_debug(5, "call to %s\n", entity_name(called));
 
     if (type_functional_p(t) && 
-	((value_code_p(v) || value_unknown_p(v) /* not parsed callee */) && 
+	(((value_code_p(v) || value_unknown_p(v) /* not parsed callee */) && 
 	 storage_rom_p(s) && 
 	 !type_void_p(functional_result(type_functional(t)))) ||
-	value_symbolic_p(v))
+	 value_symbolic_p(v)))
 	store_this_entity(called); /* it is an EXTERNAL or a PARAMETER */
 }
 
