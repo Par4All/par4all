@@ -33,7 +33,7 @@
 #include "transformer.h"
 #include "semantics.h"
 
-#include "icfg.h"
+#include "icfg-local.h"
 
 /* get all the callees of the module module_name,return the no-empty
    list of string.
