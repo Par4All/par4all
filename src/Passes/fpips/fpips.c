@@ -84,7 +84,7 @@ static int name_end_p(char * name, char * ref)
 
 static int fpips_version(int ret)
 {
-    fprintf(stderr, "fpips (ARCH=" SOFT_ARCH ", DATE=" UTC_DATE")\n");
+    fprintf(stderr, "fpips (ARCH=" SOFT_ARCH ", DATE=" UTC_DATE ")\n");
     return ret;
 }
 
