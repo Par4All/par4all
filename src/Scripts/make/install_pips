@@ -1,63 +1,266 @@
 #! /bin/sh
 #
+# $RCSfile: install_pips,v $ (version $Revision$)
+# $Date: 1996/09/03 13:34:54 $, 
+#
+# installation for pips softwares and automatic generation of pipsrc
+#
+
+################################################################# FUNCTIONS
 
 error()
-{ ret=$1 ; shift ; echo "$@" >&2 ; exit $ret ; }
-
-test -d ./Pips   || error 2 "no Pips root"
-test -d ./Newgen || error 3 "no Newgen root"
-test -d ./Linear || error 4 "no Linear root"
-test -d ./Extern || errot 5 "no Extern root"
-
-PWD=`pwd`
-
-PIPS_ROOT=$PWD/Pips
-NEWGEN_ROOT=$PWD/Newgen
-LINEAR_ROOT=$PWD/Linear
-EXTERN_ROOT=$PWD/Extern
-
-PIPS_ARCH=`ls $PIPS_ROOT/Lib | head -1`
-
-test "$OPENWINHOME" || OPENWINHOME=/usr/openwin
-
-test -d $OPENWINHOME ||
 {
-   echo "openwin not found!"
-   echo "enter the directory"
-   read OPENWINHOME
+    ret=$1 ; 
+    shift ; 
+    echo "$RCSfile: install_pips,v $:" "$@" >&2 ; 
+    exit $ret ; 
 }
 
-added="\$PIPS_ROOT/Share:\$PIPS_ROOT/Bin/\$PIPS_ARCH
-
+# question mesg
+question()
 {
-    echo "# automatically generated local pipsrc:"
-    echo "PIPS_ARCH=$PIPS_ARCH"
-    echo "PIPS_ROOT=$PIPS_ROOT"
-    echo "NEWGEN_ROOT=$NEWGEN_ROOT"
-    echo "LINEAR_ROOT=$LINEAR_ROOT"
-    echo "EXTERN_ROOT=$EXTERN_ROOT"
-    echo "OPENWINHOME=$OPENWINHOME"
-    echo "PATH=$added:\$PATH"
-    echo "export PIPS_ARCH PIPS_ROOT"
-    echo "export NEWGEN_ROOT LINEAR_ROOT EXTERN_ROOT"
-    echo "export OPENWINHOME"
+    echo
+    echo -n "$RCSfile: install_pips,v $:" "$@" "[y/n]: "
+    read answer
+    if [ ${answer:-y} = n ]
+    then
+	return 1
+    else
+	return 0
+    fi
+}
+
+# query VAR mesg
+query() 
+{
+    var=$1
+    shift
+    echo "$RCSfile: install_pips,v $:" "$@"
+    read $var
+}
+
+verb()
+{
+    echo "$RCSfile: install_pips,v $:" "$@"
+}
+
+verbn()
+{
+    echo -n "$RCSfile: install_pips,v $:" "$@"
+}
+
+warning()
+{
+    echo "$@" ""
+}
+
+# executable foo what-for what-if-not-there
+executable()
+{
+    verbn "looking for $1 ($2): "
+    if test "`type $1 | grep 'not found'`"
+    then
+	warning "not found!"
+	verb "$3"
+    else
+	echo "ok!"
+    fi
+}
+
+# check for environment variables
+environment()
+{
+    verbn "looking for ""$""$1 ($2): "
+    if test "`echo \\$$1`"
+    then
+	echo "ok!"
+    else
+	warning "not set!"
+	verb "$3"
+    fi
+}
+
+################################################################## SOFTWARES
+
+pwd=`pwd`
+
+verbn "looking for Pips: "
+if test -d ./Pips 
+then
+    echo found
+    PIPS_ROOT=$pwd/Pips
+    ARCH=`ls $PIPS_ROOT/Lib | head -1`
+else
+    warning "not found!"
+fi
+
+verbn "looking for Newgen: "
+if test -d ./Newgen
+then
+    echo found
+    NEWGEN_ROOT=$pwd/Newgen
+else
+    warning "not found!"
+fi
+
+verbn "looking for Linear: "
+if test -d ./Linear 
+then
+    echo found
+    LINEAR_ROOT=$pwd/Linear
+else
+    warning "not found!"
+fi
+
+verbn "looking for Extern: "
+if test -d ./Extern
+then
+    echo found
+    EXTERN_ROOT=$pwd/Extern
+else
+    warning "not found!"
+fi
+
+
+##################################################################### PIPSRC
+
+cat > pipsrc.tmp <<-EOF
+	#
+	# Environment variables for PIPS.
+	#
+	# Pips root directory
+	PIPS_ROOT=$PIPS_ROOT
+	#
+	# Newgen root directory
+	NEWGEN_ROOT=$NEWGEN_ROOT
+	#
+	# Linear root directory
+	LINEAR_ROOT=$LINEAR_ROOT
+	#
+	# Extern root directory
+	# external libraries and so expected for building tpips
+	EXTERN_ROOT=$EXTERN_ROOT
+	#
+	# PATH and MANPATH updates
+	PATH=\$PIPS_ROOT/Share:\$PIPS_ROOT/Bin/\$PIPS_ARCH:\$PIPS_ROOT/Utils:\$EXTERN_ROOT/Share:\$EXTERN_ROOT/Bin/\$PIPS_ARCH:\$PATH
+	MANPATH=\$PIPS_ROOT/Doc:\$MANPATH
+	#
+	# Other variables of interest (and their default):
+	# EPIPS_EMACS (emacs)
+	# EPIPS_LISP (\$PIPS_ROOT/Share/epips.el)
+	# HPFC_RUNTIME (\$PIPS_ROOT/Runtime/hpfc)
+	# HPFC_SED (gsed)
+	# HPFC_TR (tr)
+	# HPFC_MAKE (gmake)
+	# HPFC_M4 (gm4)
+	# XPOMP_RUNTIME (\$PIPS_ROOT/Runtime/xpomp)
+	# WP65_LIBRARY (\$PIPS_ROOT/Runtime/wp65)
+	# PIPS_VALIDDIR (\$PIPS_ROOT/Validation)
+	# PIPS_HOSTS (\`hostname\`)
+	#
+	# External sofwares:
+	# Toolpack is used for STF (restructurer)
+	# TOOLPACK_DIR (???/Toolpack/toolpack1.2) (pips)
+	# PVMDIR (hpfc/wp65)
+	# X11_ROOT (xpomp)
+	# DAVINCI_DIR GRAPHEDITOR_DIRECTORY DAVINCI_ICONDIR (davinci)
+	# OPENWINHOME (wpips)
+EOF
+
+verb "generating pipsrc.sh"
+{
+    echo "# automatically generated pipsrc.sh:"
+    echo "PIPS_ARCH=\${PIPS_ARCH:-$ARCH}"
+    echo "export PIPS_ARCH"
+    cat pipsrc.tmp
+    sed 's,^\([-A-Za-z0-9_]*\)=.*,export \1,;' pipsrc.tmp
 } > pipsrc.sh
 
-sed 's,\(.*\)=\(.*\),setenv \1 \2,;/^export/d;' pipsrc.sh > pipsrc.csh
+verb "generating pipsrc.csh"
+{
+    echo "# automatically generated pipsrc.csh:"
+    echo "if \(\$?PIPS_ARCH\) setenv PIPS_ARCH $ARCH"
+    sed 's,\(.*\)=\(.*\),setenv \1 \2,;' pipsrc.tmp
+} > pipsrc.csh
 
-PATH=$added:$PATH
+rm -f pipsrc.tmp
+
+##################################################################### CHECK
+
+free="'  freeware - see http://www.cri.ensmp.fr/pips/distribution.html'"
+unix="'  should be available on any un*x'"
+
+question "do you plan to run PIPS? -- should be yes!" &&
+{
+    executable /bin/sh "mandatory" $unix
+    executable /bin/csh "alas useful" $unix
+    executable fsplit "mandatory" $free
+    executable perl "very very useful" $free
+    environment TOOLPACK_DIR "useful" $free
+}
+
+question "do you plan to run WPIPS?" &&
+{
+    executable xtree "useful" $free
+    executable daVinci "nice" $free
+    environment DAVINCI_DIR "nice" 
+    environment GRAPHEDITOR_DIRECTORY "nice"
+    environment DAVINCI_ICONDIR "nice"
+}
+
+question "do you plan to run EPIPS?" &&
+{
+    executable emacs "mandatory" $free
+}
+
+question "do you plan to run HPFC?" &&
+{
+    executable gsed "GNU sed! mandatory" $free
+}
+
+question "do you plan to run HPFC generated codes?" &&
+{
+    executable pvm "mandatory" $free
+    environment PVM_ROOT "mandatory" 
+    environment PVM_ARCH "mandatory" 
+    executable gm4 "GNU m4 -- mandatory" $free
+    executable gmake "GNU make -- mandatory" $free
+}
+
+question "do you plan to compile HPFC runtime?" &&
+{
+    environment PVM_ROOT "mandatory" 
+    environment PVM_ARCH "mandatory" 
+    executable gm4 "GNU m4 -- mandatory" $free
+    executable gmake "GNU make -- mandatory" $free
+}
+
+question "do you plan to compile PIPS, NEWGEN or LINEAR?" &&
+{
+    # externals
+    environment OPENWINHOME "mandatory for wpips" "???"
+
+    # compile
+    executable gmake "mandatory" $free
+    executable cproto "mandatory?" $free
+    executable flex "GNU Fast lex -- mandatory?" $free
+    executable bison "GNU yacc -- not mandatory" $free
+    executable gcc "GNU cc -- useful" $free
+    executable g77 "GNU f77 -- nice" $free
+
+    # doc
+    executable latex "useful" $free
+    executable makeindex "useful" $free
+    executable bibtex "useful" $free
+    executable latex2html "useful" $free
+    executable rman "useful" $free
+
+    # misc
+    executable awk "useful" $unix
+}
 
 #
-# should check for various executables
-# perl
-# fsplit
-# flex
-# bison
-# gcc
-# g77? f77?
-# gmake
-# pvm
-# gm4
-# gsed
+# done
 
-gmake link
+echo
+verb "source pipsrc.{sh,csh} as appropriate to your shell"
