@@ -2,9 +2,14 @@
  * $Id$
  */
 
+/* Storage for arguments of tpips commands. E.g.
+ display PRINTED_FILE[MOD_A, MOD_B]
+ display PRINTED_FILE
+*/
 typedef struct {
-    gen_array_t the_owners;
-    string the_name;
+  gen_array_t the_owners; /* MOD_A, MOD_B, %ALL after expansion, default
+                             value can be PROGRAM or current_module */
+  string the_name; /* e.g. PRINTED_FILE */
 } res_or_rule;
 
 extern int tp_lex();
