@@ -1,6 +1,6 @@
 
 # @Author: Bart Kienhuis
-# $Id: vars.mk,v 1.23 2002/10/15 14:58:16 olaru Exp $
+# $Id: vars.mk,v 1.24 2002/10/16 13:57:29 olaru Exp $
 
 VERSION = 5.11.1
 
@@ -8,7 +8,7 @@ VERSION = 5.11.1
 # edit vars.mk.in, which is read by configure
 
 # Default top-level directory.
-prefix =	
+prefix =	/.amd/terre/export/home/terre/d03/r2d2/olaru/TEMP/Polylib/Polylib
 
 # Usually the same as prefix. 
 # exec_prefix is part of the autoconf standard.
@@ -24,7 +24,7 @@ BIN_INSTALL_DIR =	$(exec_prefix)/bin
 CC	             	= gcc
 CFLAGS                  = -g -O2
 EXTRA_FLAGS             = 
-DEFINES         	= -DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_UNISTD_H=1 -DHAVE_LIMITS_H=1 -DHAVE_UNISTD_H=1 -DSIZEOF_INT=4 -DSIZEOF_LONG_INT=4 -DSIZEOF_LONG_LONG_INT=8  
+DEFINES         	=  -DSTDC_HEADERS=1 -DHAVE_LIMITS_H=1 -DHAVE_UNISTD_H=1 -DSIZEOF_INT=4 -DSIZEOF_LONG_INT=4 -DSIZEOF_LONG_LONG_INT=8  
 
 # Linker flags and defines, both static and shared lib
 LD 	        	= gcc
@@ -48,10 +48,10 @@ LONG_BITS = 64
 GMP_BITS = gmp
 
 # Library type to install
-INSTALL_LIB = install-static
+INSTALL_LIB = install-static install-shared
 
 # Commands used to install scripts and data
-INSTALL =		/usr/local/bin/gnu/ginstall -c
+INSTALL =		/usr/bin/install -c
 INSTALL_PROGRAM =	${INSTALL}
 INSTALL_DATA =		${INSTALL} -m 644
 
@@ -60,17 +60,17 @@ EXTRA_INCLUDES=
 EXTRA_LIBS=-lgmp 
 
 # Platform specific variables
-OSTYPE	= solaris2.7
-HOST    = sun
-BUILD   = sparc
+OSTYPE	= linux-gnu
+HOST    = pc
+BUILD   = i686
 
 
 EXEC_EXTRA_SUFFIX = 
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
-SHAREDLIB_FLAG          = -G
-LDCONFIG = 
+SHAREDLIB_FLAG          = -shared
+LDCONFIG = ldconfig
 
 LIBS_TO_BUILD = 64
 EXEC_TO_BUILD = 64
