@@ -1,8 +1,11 @@
-/* 	%A% ($Date: 2000/07/07 16:12:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+/* 	%A% ($Date: 2002/06/20 15:47:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: expression.c,v $
+ * Revision 1.20  2002/06/20 15:47:23  irigoin
+ * explicit constant "IOLIST=" replaced by preprocessor constant
+ *
  * Revision 1.19  2000/07/07 16:12:48  irigoin
  * call to pips_assert() replaced by call to ParserError() in MakeAtom() if
  * an array section is parsed.
@@ -32,7 +35,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 2000/07/07 16:12:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 2002/06/20 15:47:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -397,7 +400,7 @@ cons *l;
 		
     pc = l;
     while (pc != NULL) {
-        expression e = MakeCharacterConstantExpression("IOLIST=");
+        expression e = MakeCharacterConstantExpression(IO_LIST_STRING_NAME);
 	cons *p = CONS(EXPRESSION, e, NIL);
 
 	CDR(p) = pc;
