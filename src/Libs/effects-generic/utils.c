@@ -396,3 +396,76 @@ statement_has_a_formal_argument_write_effect_p(statement s)
    return write_effect_on_a_module_argument_found;
 
 }
+
+#define UNDEF abort
+
+typedef void (*void_function)();
+typedef gen_chunk* (*chunks_function)();
+typedef list (*list_function)();
+typedef bool (*bool_function)();
+typedef descriptor (*descriptor_function)();
+
+/* reset all generic methods...
+ */
+void 
+generic_effects_reset_all_methods()
+{
+    effects_computation_init_func = (void_function) UNDEF;
+    effects_computation_reset_func = (void_function) UNDEF;
+
+    effect_dup_func = (chunks_function) UNDEF;
+    effect_free_func = (void_function) UNDEF;
+
+    effect_union_op = (chunks_function) UNDEF;
+    effects_union_op = (list_function) UNDEF;
+    effects_test_union_op = (list_function) UNDEF;
+    effects_intersection_op = (list_function) UNDEF;
+    effects_sup_difference_op = (list_function) UNDEF;
+    effects_inf_difference_op = (list_function) UNDEF;
+    effects_transformer_composition_op = (list_function) UNDEF;
+    effects_transformer_inverse_composition_op = (list_function) UNDEF;
+    effects_precondition_composition_op = (list_function) UNDEF;
+    effects_descriptors_variable_change_func = (list_function) UNDEF;
+
+    effects_loop_normalize_func = (list_function) UNDEF;
+    effects_union_over_range_op = (list_function) UNDEF;
+
+    reference_to_effect_func = (chunks_function) UNDEF;
+    loop_descriptor_make_func = (chunks_function) UNDEF;
+    vector_to_descriptor_func = (chunks_function) UNDEF;
+
+    effects_backward_translation_op = (list_function) UNDEF;
+    effects_forward_translation_op = (list_function) UNDEF;
+    effects_local_to_global_translation_op = (list_function) UNDEF;
+    effects_prettyprint_func = (void_function) UNDEF;
+    effects_to_text_func = (chunks_function) UNDEF;
+
+    attach_effects_decoration_to_text_func = (void_function) UNDEF;
+
+    load_context_func = (chunks_function) UNDEF;
+    load_transformer_func = (chunks_function) UNDEF;
+    empty_context_test = (bool_function) UNDEF;
+    proper_to_summary_effect_func = (descriptor_function) UNDEF;
+    effects_descriptor_normalize_func = (void_function) UNDEF;
+
+    db_get_proper_rw_effects_func = (chunks_function) UNDEF;
+    db_put_proper_rw_effects_func = (void_function) UNDEF;
+    db_get_invariant_rw_effects_func = (chunks_function) UNDEF;
+    db_put_invariant_rw_effects_func = (void_function) UNDEF;
+    db_get_rw_effects_func = (chunks_function) UNDEF;
+    db_put_rw_effects_func = (void_function) UNDEF;
+    db_get_summary_rw_effects_func = (list_function) UNDEF;
+    db_put_summary_rw_effects_func = (void_function) UNDEF;
+    db_get_in_effects_func = (chunks_function) UNDEF;
+    db_put_in_effects_func = (void_function) UNDEF;
+    db_get_cumulated_in_effects_func = (chunks_function) UNDEF;
+    db_put_cumulated_in_effects_func = (void_function) UNDEF;
+    db_get_invariant_in_effects_func = (chunks_function) UNDEF;
+    db_put_invariant_in_effects_func = (void_function) UNDEF;
+    db_get_summary_in_effects_func = (list_function) UNDEF;
+    db_put_summary_in_effects_func = (void_function) UNDEF;
+    db_get_summary_out_effects_func = (list_function) UNDEF;
+    db_put_summary_out_effects_func = (void_function) UNDEF;
+    db_get_out_effects_func = (chunks_function) UNDEF;
+    db_put_out_effects_func = (void_function) UNDEF;
+}
