@@ -188,7 +188,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"ABS",                      no_write_effects},
     {"DABS",                     no_write_effects},
     {"CABS",                     no_write_effects},
-    {"CDABS",                     no_write_effects},
+    {"CDABS",                    no_write_effects},
 
     {"MOD",                      no_write_effects},
     {"AMOD",                     no_write_effects},
@@ -217,6 +217,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"AIMAG",                    no_write_effects},
     {"DIMAG",                    no_write_effects},
     {"CONJG",                    no_write_effects},
+    {"DCONJG",                   no_write_effects},
     {"SQRT",                     no_write_effects},
     {"DSQRT",                    no_write_effects},
     {"CSQRT",                    no_write_effects},
