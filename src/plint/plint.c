@@ -54,7 +54,7 @@ Pbase *b;
     double d1;
     int no_som =0;
     Variable var2 = 0;
-    int in1;
+    Value in1;
     boolean non_fin = TRUE;
     boolean non_stop = TRUE;
     boolean degenere = FALSE;
@@ -80,18 +80,20 @@ Pbase *b;
 	    {
 		if ((sol_entiere(sys1,*lvbase,*nb_som)==FALSE))
 		{
-		    int f0,fden;
+		    Value f0 = VALUE_ZERO,fden;
 
 		    while (non_fin)
 		    {
-			f0 = - vect_coeff(TCST,fonct->vecteur);
+			f0 = value_uminus(vect_coeff(TCST,fonct->vecteur));
 			fden = fonct->denominateur;
-			d1 = (double)f0 / (double)fden;
-			in1 = f0 / fden;
+			d1 = VALUE_TO_DOUBLE(f0) / VALUE_TO_DOUBLE(fden);
+			in1 = value_div(f0,fden);
 
 			/* test de degenerescence */
-			if ((d1 != in1) || (in1 ==0) || (cout_nul(fonct,*lvbase,*nbvars,*b) ==
-							 FALSE) || degenere) {
+			if ((d1 != VALUE_TO_DOUBLE(in1)) || 
+			    value_zero_p(in1) ||
+			    (cout_nul(fonct,*lvbase,*nbvars,*b) ==
+			     FALSE) || degenere) {
 			    degenere = FALSE;
 
 			    while (non_stop)
@@ -255,7 +257,7 @@ Pbase *b;
  *  int nbvars 	   : nombre de variables du systeme
  *  Pbase b : liste des  variables du systeme
  */
-plint_degen(sys,fonct,nb_som,lvbase,nbvars,b)
+boolean plint_degen(sys,fonct,nb_som,lvbase,nbvars,b)
 Psommet *sys;
 Psommet fonct;
 int  *nb_som;
@@ -298,19 +300,19 @@ Pbase *b;
        dont on a elimine les variables h.base de cout non nul */
 
     fonct2 = (Psommet)MALLOC(sizeof(Ssommet),SOMMET,"plint_degen");
-    fonct2->denominateur = 1;
-    fonct2->vecteur = vect_new(vecteur_var(*b),1);
+    fonct2->denominateur = VALUE_ONE;
+    fonct2->vecteur = vect_new(vecteur_var(*b),VALUE_ONE);
     for (i =1,pv2 = (*b)->succ ; i< *nbvars && !VECTEUR_NUL_P(pv2); 
 	 i++, pv2=pv2->succ)
-	vect_add_elem(&(fonct2->vecteur),vecteur_var(pv2),1);
+	vect_add_elem(&(fonct2->vecteur),vecteur_var(pv2),VALUE_ONE);
 
     for (pv= lvhb_de_cnnul;pv!=NULL;pv=pv->succ)
-   vect_chg_coeff(&(fonct2->vecteur),pv->var,0);
+   vect_chg_coeff(&(fonct2->vecteur),pv->var,VALUE_ZERO);
   
-    vect_chg_coeff(&(fonct2->vecteur),TCST,0);
+    vect_chg_coeff(&(fonct2->vecteur),TCST,VALUE_ZERO);
 
     fonct2->eq_sat = (int *)MALLOC(sizeof(int),INTEGER,"plint_degen");
-    *(fonct2->eq_sat) = NULL;
+    *(fonct2->eq_sat) = 0;
     fonct2->succ = NULL;
 
     /* recherche d'une solution entiere pour ce nouveau systeme */
@@ -336,13 +338,13 @@ sys1 = plint_pas(sys1,fonct2,lvbase,nb_som,nbvars,b);
 
 	eq_for_ndegen = vect_dup(lvhb_de_cnnul);
 	for (pv = eq_for_ndegen; pv!= NULL; pv = pv->succ)
-	  vect_chg_coeff(&pv,pv->var,-1);
-	vect_chg_coeff(&eq_for_ndegen,TCST,1);
+	    vect_chg_coeff(&pv,pv->var,VALUE_MONE);
+	vect_chg_coeff(&eq_for_ndegen,TCST,VALUE_ONE);
 	eq_coupe = (Psommet) MALLOC(sizeof(Ssommet),SOMMET,"plint_degen");
 	eq_coupe->vecteur = eq_for_ndegen;
 	eq_coupe->eq_sat = (int *)MALLOC(sizeof(int),INTEGER,"plint_degen");
 	*(eq_coupe->eq_sat) = -1;
-	eq_coupe->denominateur = 1;
+	eq_coupe->denominateur = VALUE_ONE;
 	eq_coupe->succ=NULL;
 	sommet_add(sys,eq_coupe,nb_som);
 
@@ -371,6 +373,7 @@ sys1 = plint_pas(sys1,fonct2,lvbase,nb_som,nbvars,b);
     vect_rm(lvhb_de_cnnul);
     sommets_rm(sys1);
     sommets_rm(fonct2);
+
     return(result);
 }
 
