@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/24 13:05:14 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/24 23:12:43 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -8,16 +8,19 @@
 # and more efficient, but I'm not very good at it:-) Looks like an exercice
 # of style, "yes I can do it with seds and trs";-)
 # It may be thought as clever or stupid:-)
-# Only one subroutine or function should be put in the pipe. 
-# ??? I do not deal with "R E A L" like Fortran lexical problems.
-# ??? There may be problems with if and do instructions...
-#     that is IF () & DO with a directive comment would not work.
-# independent, new and reduction are orthogonal.
-# Ctrl-L, Ctrl-G and Ctrl-V are used as intermediate characters, 
-# thus should not appear in the program, otherwise troubles...
-# some default value is assigned to number of processors...
 #
-# (c) Fabien Coelho February 95 and later.
+# Notes:
+#
+# - Only one subroutine or function should be put in the pipe. 
+# - I do not deal with "R E A L" like Fortran lexical problems.
+# - There may be problems with if and do instructions...
+#   that is IF () & DO with a directive comment would not work.
+# - independent, new and reduction are orthogonal.
+# - Ctrl-L, Ctrl-G and Ctrl-V are used as intermediate characters, 
+#   thus should not appear in the program, otherwise troubles...
+# - some default value is assigned to number of processors...
+#
+# (c) Fabien Coelho, February 95 and later.
 #
 # F77 and HPF directives -> 
 # calls to HPFC special subroutines and functions -> 
@@ -88,14 +91,12 @@ $RM -f $TMP.*
 # FCD are simply translated into hpf-like prefixed directives
 # ??? maybe should I add some option to avoid this translation?
 # directive-origin are switched to ctrl-V
+# lower case letters for directives...
+# normalization of spaces...
 #
 $SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,\1,;
-      s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,' |
-#
-# lower case letters for directives *only*
-# normalization of spaces
-#
-$SED '//s,A,a,g;//s,B,b,g;//s,C,c,g;//s,D,d,g;
+      s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,;
+      //s,A,a,g;//s,B,b,g;//s,C,c,g;//s,D,d,g;
       //s,E,e,g;//s,F,f,g;//s,G,g,g;//s,H,h,g;
       //s,I,i,g;//s,J,j,g;//s,K,k,g;//s,L,l,g;
       //s,M,m,g;//s,N,n,g;//s,O,o,g;//s,P,p,g;
@@ -256,6 +257,7 @@ $RM -f $TMP.*
 # error if some directives where not analyzed
 
 #[ "$STILL_SOME_DIRECTIVES" ] && exit 1 ;
+exit 0
 
 # That is all
 #
