@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/30 14:55:00 $, )
+# ($Date: 1996/08/30 19:09:19 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -8,12 +8,10 @@
 # + USE_PVMe
 # + USE_GNU
 
-# this settings may be edited
-# I prefer to use free gnu compilers...
-# USE_GNU=1
+RTARCH=$(PVM_ARCH)-$(ARCH)
 
+#
 # additional defs for m4
-
 ifeq ($(FC),g77)
 M4FLAGS	+= -D USE_GNU
 USE_GNU = 1
@@ -189,7 +187,7 @@ DDC_HEADERS 	= $(LIB_M4FFILES:.m4f=.h) \
 LIB_HEADERS	= $(CORE_HEADERS) \
 		  $(DDC_HEADERS)
 
-LIB_OBJECTS= $(addprefix $(PVM_ARCH)/, $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
+LIB_OBJECTS= $(addprefix $(RTARCH)/, $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
 
 M4_MACROS 	= hpfc_lib_m4_macros hpfc_architecture_m4_macros
 HPFC_MAKEFILES 	= hpfc_Makefile_init 
@@ -208,18 +206,18 @@ SOURCES = 	$(M4_MACROS) \
 		$(DOCS) \
 		$(SCRIPTS)
 
-LIB_TARGET = $(PVM_ARCH)/libhpfcruntime.a
-MKI_TARGET = $(PVM_ARCH)/compilers.make
+LIB_TARGET = $(RTARCH)/libhpfcruntime.a
+MKI_TARGET = $(RTARCH)/compilers.make
 
-# $(LIB_OBJECTS) $(LIB_TARGET): $(PVM_ARCH)
+# $(LIB_OBJECTS) $(LIB_TARGET): $(RTARCH)
 
-$(PVM_ARCH):; mkdir $@
+$(RTARCH):; mkdir $@
 
 #
 # Installation:
 
 INSTALL_INC_DIR:=$(INSTALL_RTM_DIR)/hpfc
-INSTALL_LIB_DIR:=$(INSTALL_RTM_DIR)/hpfc/$(PVM_ARCH)
+INSTALL_LIB_DIR:=$(INSTALL_RTM_DIR)/hpfc/$(RTARCH)
 
 INSTALL_INC =	$(CORE_HEADERS) \
 		$(DDC_HEADERS) \
@@ -241,7 +239,7 @@ $(CMMD_F77_H):	$(CMMD_INDIR)/cm/$(CMMD_F77_H)
 	$(COPY) $(CMMD_INDIR)/cm/$(CMMD_F77_H) .
 endif
 
-all: $(PVM_ARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
+all: $(RTARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
 		$(LIB_OBJECTS) $(LIB_TARGET) $(MKI_TARGET)
 
 #
@@ -266,13 +264,13 @@ $(LIB_TARGET):	$(PVM_HEADERS) $(LIB_HEADERS) $(LIB_OBJECTS)
 	./hpfc_generate_h < $< > $@
 	./hpfc_add_warning $@
 
-$(PVM_ARCH)/%.o: %.c
+$(RTARCH)/%.o: %.c
 	$(COMPILE) $< -o $@
 
-$(PVM_ARCH)/%.o: %.f
+$(RTARCH)/%.o: %.f
 	$(F77COMPILE) $< -o $@
 
-$(PVM_ARCH)/compilers.make:
+$(RTARCH)/compilers.make:
 	#
 	# building $@
 	#
@@ -297,7 +295,7 @@ local-clean:
 	$(RM) *~ $(LIB_OBJECTS) $(PVM_HEADERS) \
 		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) \
 		$(LIB_TARGET)   $(MKI_TARGET)
-	test ! -d $(PVM_ARCH) || rmdir $(PVM_ARCH)
+	test ! -d $(RTARCH) || rmdir $(RTARCH)
 
 # that is all
 #
