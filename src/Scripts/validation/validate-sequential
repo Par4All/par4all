@@ -95,25 +95,24 @@ which_executable()
 
 usage()
 {
-  {
-    echo "Usage: $0 [-uvdsth] [-a address] [-[lf] file] [-x pips] [-r dir] [modules]"
-    echo "  -u: uniq directory to be used"
-    echo "  -t: timing"
-    echo "  -h: help"
-    echo "  -v: verbose"
-    echo "  -s: silent (default)"
-    echo "  -d: debug"
-    echo "  -a address: mail destination"
-    echo "  -l file: lockfile name where to report"
-    echo "  -f file: fortran files"
-    echo "  -x pips: pips to be used (default as Validate)"
-    echo "  -y tpips: tpips to be used (idem)"
-    echo "  -r dir: directory where to run (default .)"
-    # echo "  -c dir: directory where to communicate (default -r then .)"
-    echo "  -i lines: max number of lines for sendig a full message"
-    echo "  -p file: properties.rc file"
-    echo "  -m file: pipsmake.rc file"
-  } >&2
+  cat 1>&2 <<-EOF
+	$0 [-uvdsth] [-a address] [-[lf] file] [-x pips] [-r dir] [modules]
+	  -u: uniq directory to be used
+	  -t: timing
+	  -h: help
+	  -v: verbose
+	  -s: silent (default)
+	  -d: debug
+	  -a address: mail destination
+	  -l file: lockfile name where to report
+	  -f file: fortran files
+	  -x pips: pips to be used (default as Validate)
+	  -y tpips: tpips to be used (idem)
+	  -r dir: directory where to run (default .)
+	  -i lines: max number of lines for sendig a full message
+	  -p file: properties.rc file
+	  -m file: pipsmake.rc file
+EOF
   exit ${1:-1}
 }
 
