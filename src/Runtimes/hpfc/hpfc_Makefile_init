@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.58  1997/05/03 16:46:44  coelho
+# *** empty log message ***
+#
 # Revision 1.57  1997/05/03 16:45:33  coelho
 # *** empty log message ***
 #
@@ -16,7 +19,7 @@
 #
 #
 # This is the initial makefile for HPFC compilation
-# a NAME macro is expected somewhere...
+# a NAME macro is expected somewhere... could be derived automatically?
 # Makefile for PVM and HPFC, Fabien COELHO, 08/06/94
 
 SHELL=/bin/sh
@@ -24,8 +27,10 @@ SHELL=/bin/sh
 #
 # usual default target is to build and install the seq and par versions
 all: out main install
+	#
 	# $(NAME)_out sequential version compiled
 	# $(NAME)_main parallel version compiled and installed
+	#
 
 #
 # help target
