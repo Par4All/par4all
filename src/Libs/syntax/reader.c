@@ -524,7 +524,7 @@ GetChar(FILE * fp)
 	    else {
 		col += 1;
 		if(col > 72 && !LineTooLong && !in_comment && 
-		   parser_warn_for_columns_73_80) {
+		   parser_warn_for_columns_73_80 && !(c==' ' || c=='\t')) {
 		    user_warning("GetChar",
 				 "Line %d truncated, col=%d and lbuffer=%d\n",
 				 LineNumber, col, lbuffer);
