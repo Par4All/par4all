@@ -321,7 +321,8 @@ statement *hoststatp,*nodestatp;
     pips_assert("hpfcompilecall",
 		(instruction_call_p(statement_instruction(stat))));
 
-    debug(7,"hpfcompilecall","function %s\n",entity_name(call_function(c)));
+    debug(7,"hpfcompilecall", "function %s\n", 
+	  entity_name(call_function(c)));
 
     /*
      * {"WRITE", (MAXINT)},
