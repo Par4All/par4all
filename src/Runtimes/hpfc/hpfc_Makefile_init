@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/08/30 19:20:34 $, )
+# ($Date: 1996/08/31 12:39:29 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -29,7 +29,7 @@ RT_DIR= $(PIPS_ROOT)/Runtime/hpfc
 endif
 
 # the default is to use the same compilers and options as the library.
-include $(HPFC_RUNTIME)/$(RT_ARCH)/compilers.make
+include $(RT_DIR)/$(RT_ARCH)/compilers.make
 
 ifdef HPFC_M4
 M4	= $(HPFC_M4)
