@@ -135,6 +135,7 @@ char *module_name;
     MERGE_TEXTS(txt, text_summary_complexity( get_current_module_entity() ));
     MERGE_TEXTS(txt, text_module(mod,get_current_module_statement()));
 
+    close_prettyprint();
 
     success = make_text_resource(module_name,
 				 resource_name,
