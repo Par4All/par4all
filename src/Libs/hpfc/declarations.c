@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: declarations.c,v $
+ * Revision 1.19  1998/04/02 20:54:14  irigoin
+ * Call to SizeOfDimension() modified
+ *
  * Revision 1.18  1997/10/30 17:09:31  coelho
  * comes with old var instead of new... ???
  *
@@ -454,8 +457,10 @@ ComputeNewSizeOfIthDimension(
     distribute d = load_hpf_distribution(t);
     alignment al = alignment_undefined;
     distribution di = distribution_undefined;
-    int rate, param, pdim = 1, asize = SizeOfDimension(dim);
+    int rate, param, pdim = 1, asize = 0;
     style st;
+
+    (void) SizeOfDimension(dim, &asize);
 
     pips_debug(9, "dimension %d of array %s\n", i, entity_name(array));
     ifdebug(9)
