@@ -422,7 +422,9 @@ void quit_handler(char * line)
 void default_handler(char * line)
 {
     /* skip blanks */
-    while (((*line) == ' ') ||((*line) == '\t'))
+    while (((*line) == ' ') ||
+	   ((*line) == '\t') ||
+	   ((*line) == '\n'))
 	line++;
 
     /* store line pointer */
@@ -547,23 +549,25 @@ void process_a_file()
      */
     while ((line = read_a_line(TPIPS_PROMPT)))
     {
-	if (setjmp(pips_top_level))
-	    continue;
-
-	/*   add to history if not the same as the last one.
-	 */
-	if (use_readline &&
-	    (line && *line && ((last && strcmp(last, line)!=0) || (!last))) &&
-	    (strncmp (line,QUIT,strlen (QUIT))))
-	{
-	    add_history(line);
-	    if (last)
-		free (last);
-	    last = strdup(line);
+	if (setjmp(pips_top_level)) {
+	    pop_pips_context();
 	}
-	/*   calls the appropriate handler.
-	 */
-	(find_handler(line))(line);
+	else {
+	    push_pips_context(&pips_top_level);
+	    /*   add to history if not the same as the last one.
+	     */
+	    if (use_readline &&
+		(line && *line && ((last && strcmp(last, line)!=0) || (!last))) &&
+		(strncmp (line,QUIT,strlen (QUIT))))
+	    {
+		add_history(line);
+		last = strdup(line);
+	    }
+	    /*   calls the appropriate handler.
+	     */
+	    (find_handler(line))(line);
+	}
+	pop_pips_context();
     }
 }
 
@@ -571,7 +575,7 @@ void process_a_file()
  */
 int main(int argc, char * argv[])
 {
-    debug_on("PIPS_DEBUG_LEVEL");
+    debug_on("TPIPS_DEBUG_LEVEL");
 
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
@@ -592,7 +596,7 @@ int tpips_lex_input ()
 {
     char c =*line_to_parse;
 
-    debug(8,"tpips_lex_input","input char '%c'(0x%2x) from input\n", c, c);
+    debug(9,"tpips_lex_input","input char '%c'(0x%2x) from input\n", c, c);
     if (c)
 	line_to_parse++;
     return (int) c;
@@ -601,7 +605,7 @@ int tpips_lex_input ()
 void tpips_lex_unput(int c)
 {
 
-    debug(8,"tpips_lex_unput","unput char '%c'(0x%2x)\n",
+    debug(9,"tpips_lex_unput","unput char '%c'(0x%2x)\n",
 	  c,c);
     *(--line_to_parse) = (char) c;
 }
