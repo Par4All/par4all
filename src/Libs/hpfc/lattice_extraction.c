@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: lattice_extraction.c,v $
+ * Revision 1.5  1997/04/07 11:39:48  coelho
+ * tmp fix...
+ *
  * Revision 1.4  1997/04/07 09:27:10  coelho
  * lattice extraction seems ok... (maybe some momery leaks and implicit
  * assumptions are not checked yet...)
@@ -127,6 +130,9 @@ extract_lattice(
     
     constraints_to_matrices(sc_egalites(s), bsorted, FM, V);
 
+    DEBUG_MTRX(4, "FM", FM);
+    DEBUG_MTRX(4, "V", V);
+
     /* Fs + Mo + V == 0
      */
     F = matrix_new(neq, nscanners);
@@ -137,6 +143,9 @@ extract_lattice(
 
     matrix_free(FM);
 
+    DEBUG_MTRX(4, "F", F);
+    DEBUG_MTRX(4, "M", M);
+
     /* H = P * F * Q
      */
     H = matrix_new(neq, nscanners);
@@ -145,6 +154,10 @@ extract_lattice(
 
     matrix_hermite(F, P, H, Q, &det_P, &det_Q);
 
+    DEBUG_MTRX(4, "H", H);
+    DEBUG_MTRX(4, "P", P);
+    DEBUG_MTRX(4, "Q", Q);
+
     message_assert("P == I", matrix_diagonal_p(P) && det_P==1);
 
     /* H = (Hl 0)
@@ -152,6 +165,17 @@ extract_lattice(
     Hl = matrix_new(neq, neq);
     ordinary_sub_matrix(H, Hl, 1, neq, 1, neq);
     matrix_free(H);
+
+    DEBUG_MTRX(4, "Hl", Hl);
+
+    if (!matrix_triangular_unimodular_p(Hl, TRUE)) {
+	pips_user_warning("fast exit, some yes/no lattice skipped\n");
+	/* and memory leak, by the way 
+	 */
+	*newscs = gen_copy_seq(scanners);
+	*ddc = NIL;
+	return;
+    }
 
     message_assert("Hl is lower triangular unimodular", 
 		   matrix_triangular_unimodular_p(Hl, TRUE));
@@ -162,6 +186,8 @@ extract_lattice(
     matrix_unimodular_triangular_inversion(Hl, Hli, TRUE);
     matrix_free(Hl);
 
+    DEBUG_MTRX(4, "Hli", Hli);
+
     /* Q = (Ql Qr) 
      */
     Ql = matrix_new(nscanners, neq);
@@ -169,6 +195,9 @@ extract_lattice(
 
     ordinary_sub_matrix(Q, Ql, 1, nscanners, 1, neq);
     ordinary_sub_matrix(Q, Qr, 1, nscanners, neq+1, nscanners);
+
+    DEBUG_MTRX(4, "Ql", Ql);
+    DEBUG_MTRX(4, "Qr", Qr);
 
     matrix_free(Q);
 
