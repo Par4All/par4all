@@ -560,6 +560,10 @@ GetChar(FILE * fp)
 
     init_getchar_buffer();
 
+    /* This section (probably) is made obsolete by the new function 
+     * parser_reset_all_reader_buffers(). The user_warning() is replaced
+     * by a pips_error(). Test: Cachan/bug10
+     */
     if( previous_fp != fp ) {
 	/* If a file has just been opened */
 	if( i_getchar < l_getchar ) {
@@ -567,16 +571,14 @@ GetChar(FILE * fp)
 	     * previous_fp == NULL, perform a buffer reset
 	     */
 	    i_getchar = l_getchar;
-	    user_warning("GetChar", 
-			 "Unexpected buffer reset.\n"
-			 "A parser error must have occured previously.\n");
+	    pips_error("GetChar", 
+		       "Unexpected buffer reset.\n"
+		       "A parser error must have occured previously.\n");
 	}
 	previous_fp = fp;
     }
 
-    /* on lit toute une ligne d'un coup pour traiter le cas des
-     * tabulations et des lignes vides.
-     */
+    /* A whole input line is read to process TABs and empty lines */
     while (i_getchar >= l_getchar && c != EOF) {
 	int EmptyBuffer = TRUE;
 	int LineTooLong = FALSE;
@@ -694,8 +696,9 @@ GetChar(FILE * fp)
     return(c);
 }
 
-/* regroupementde la ligne initiale et des lignes suite en un unique buffer,
- * Line 
+/* All physical lines of a statement are put together in a unique buffer 
+ * called "Line". Each character in each physical line is retrieved with
+ * GetChar().
  */
 int 
 ReadLine(FILE * fp)
