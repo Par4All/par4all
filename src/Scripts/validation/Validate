@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1994/03/23 13:22:55 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1994/03/23 16:35:36 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -178,6 +178,28 @@ absolute_name()
 }
 
 #
+# validate
+#
+send_validate()
+{
+  validate_module=$1
+  validate_host=$2
+
+  $DEBUG " | rsh $validate_host \ "
+  $DEBUG " | $VALID \ "
+  $DEBUG " |   -r $RUNDIR \ "
+  $DEBUG " |   -l $RESULT \ "
+  $DEBUG " |   -x $pips_version \ "
+  $DEBUG " |   -u $VALIDOPT $validate_module"
+
+  rsh $validate_host \
+  $VALID -r $RUNDIR -l $RESULT -x "$pips_version" \
+         -u $VALIDOPT $validate_module &
+
+  echo "$validate_module" > $WAITING.$validate_host
+}
+
+#
 # get options
 
 while getopts DVudtsvpnhr:l:x: opt
@@ -293,15 +315,8 @@ $VERBOSE "validating modules"
 for m in $MODULES
 do
   h=`available_host`
-  $VERBOSE " - validate $m on $h "
-  $DEBUG " | rsh $h \ "
-  $DEBUG " | $VALID \ "
-  $DEBUG " |   -r $RUNDIR \ "
-  $DEBUG " |   -l $RESULT \ "
-  $DEBUG " |   -x $pips_version \ "
-  $DEBUG " |   -u $VALIDOPT $m"
-  rsh $h $VALID -r $RUNDIR -l $RESULT -x "$pips_version" -u $VALIDOPT $m &
-  touch $WAITING.$h
+  $VERBOSE " - validate $m on $h"
+  send_validate $m $h
 done
 
 #
