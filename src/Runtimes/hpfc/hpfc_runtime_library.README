@@ -1,4 +1,4 @@
-$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1997/01/07 11:10:00 $, 
+$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1997/01/07 11:14:12 $, 
 
  (c) Centre de Recherche en Informatique,
      Ecole des mines de Paris, 
@@ -38,7 +38,7 @@ M4OPT:
  _HPFC_DEBUG_         (verbose run)
  _HPFC_SYNC_EXIT_     (synchronize on exit, needed by old PVM versions)
  _HPFC_USE_PVMe_      (for IBM's PVM. a PVM3_ROOT is expected if set)
- _HPFC_PVM_ENCODING_  (PvmDataRaw or PvmDataInPlace)
+ _HPFC_ENCODING_      (PvmDataRaw or PvmDataInPlace)
  _HPFC_FAKE_BUFFERS_  (whether to generate fake broadcast/bufpck/bufupk
                    subroutines. Were used to measure PVM overheads...)
 
