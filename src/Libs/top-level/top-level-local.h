@@ -49,5 +49,7 @@
  
 #define EMACS_FILE_EXT "-emacs"
  
+#define GRAPH_FILE_EXT "-graph"
+
 /* say that's all
  */
