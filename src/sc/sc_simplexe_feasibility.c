@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1997/09/08 19:25:35 $, 
+ * $Date: 1998/10/24 14:45:27 $, 
  */
 
 /* test du simplex : 
@@ -33,31 +33,31 @@ static int NB_INEQ = 0;
 /* debug macros may be trigered with -DDEBUG{,1,2}
  */
 #ifndef DEBUG
-#define DEBUG(code)
+#define DEBUG(code) { }
 #else 
 #undef DEBUG
-#define DEBUG(code) code
+#define DEBUG(code) { code }
 #endif
 
 #ifndef DEBUG1
-#define DEBUG1(code)
+#define DEBUG1(code) { }
 #else 
 #undef DEBUG1
-#define DEBUG1(code) code
+#define DEBUG1(code) { code } 
 #endif
 
 #ifndef DEBUG2
-#define DEBUG2(code)
+#define DEBUG2(code) { } 
 #else 
 #undef DEBUG2
-#define DEBUG2(code) code
+#define DEBUG2(code) { code }
 #endif
 
 #ifndef DEBUG3
-#define DEBUG3(code)
+#define DEBUG3(code) { } 
 #else 
 #undef DEBUG3
-#define DEBUG3(code) code
+#define DEBUG3(code) { code }
 #endif
 
 
