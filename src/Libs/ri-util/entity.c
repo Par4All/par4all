@@ -495,7 +495,7 @@ value MakeValueUnknown()
 {
     return(make_value(is_value_unknown, NIL));
 }
-
+
 /* returns a range expression containing e's i-th bounds */
 expression entity_ith_bounds(e, i)
 entity e;
@@ -507,5 +507,18 @@ int i;
                                       gen_copy_tree(dimension_upper(d)),
                                       make_expression_1()));
     return(make_expression(s, normalized_undefined));
+}
+
+/* true if e is an io instrinsic
+ */
+bool
+io_intrinsic_p(
+    entity e)
+{
+    return top_level_entity_p(e) &&
+       (ENTITY_WRITE_P(e) || ENTITY_REWIND_P(e) || ENTITY_OPEN_P(e) ||
+	ENTITY_CLOSE_P(e) || ENTITY_READ_P(e) || ENTITY_BUFFERIN_P(e) ||
+        ENTITY_BUFFEROUT_P(e) || ENTITY_ENDFILE_P(e) || ENTITY_IMPLIEDDO_P(e) ||
+	ENTITY_FORMAT_P(e)) ;
 }
 
