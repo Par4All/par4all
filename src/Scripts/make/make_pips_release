@@ -1,11 +1,11 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1997/03/25 23:32:27 $, 
+# $Date: 1997/03/27 15:14:40 $, 
 #
 # (c) Fabien COELHO 1996
 
-unset pack what tz zip name tostrip strip install addpublic
+unset pack what dotar dozip zip name tostrip strip install addpublic
 
 tar=${PIPS_TAR:-gtar}
 taropt=cf
@@ -31,6 +31,7 @@ usage()
 	    -v: verbose
 	    -r: add proper installation and readme files in the root
 	    -s: strip binaries
+	    -t: tar
 	    -z: tar and zip
 	    -w: additional options for make_release
 	        (e.g. -w -e to enable manual editing of the list of files)
@@ -54,14 +55,15 @@ usage()
 #
 # get options
 
-while getopts hvrszw:CSB:L:D:pnleP opt
+while getopts hvrstzw:CSB:L:D:pnleP opt
 do
     case $opt in
 	h) usage 0 some help ;;
 	v) verb=verbose ; what="$what -v" ; taropt=cvf ;;
 	r) install='1' ;;
 	s) strip='strip' ;;
-	z) tz='1' ;;
+	t) dotar=1 ;;
+	z) dotar=1 ; dozip=1 ;;
 	w) what="$what $OPTARG" ;;
 	C) what="$what -d Share -d Doc -d Examples" ;
 	   name="${name}C" ;;
@@ -145,13 +147,17 @@ test "$install" &&
 #
 # tar and zip if required
 
-test "$tz" && 
+[ "$dotar" ] && 
 {
     cd $cwd
-    $verb "taring ($tar $taropt) and zipping ($zip)"
+    $verb "taring ($tar $taropt)..."
     $tar $taropt $name.tar $name || error 3 "$tar returned $?"
     rm -rf $name || error 4 "rm returned $?"
-    $zip $name.tar || error 5 "$zip returned $?"
+    [ "$dozip" ] && 
+    {
+	$verb "zipping ($zip)..."
+	$zip $name.tar || error 5 "$zip returned $?"
+    }
 }
 
 # end of $RCSfile: make_pips_release,v $
