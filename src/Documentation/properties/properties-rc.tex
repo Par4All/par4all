@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1996/05/31 13:52:11 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1996/08/20 16:28:57 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -965,6 +965,15 @@ declaration {\em text} is used to preserve comments.
 
 \begin{verbatim}
 PRETTYPRINT_ALL_DECLARATIONS FALSE
+\end{verbatim}
+
+If the prettyprint of the header and the declarations are done by
+PIPS, try to display the genuine comments. Unfortunately, there is no
+longer order relation between the comments and the declarations since
+these are sorted by PIPS. By default, do not try to display the
+comments when PIPS is generating the header.
+\begin{verbatim}
+PRETTYPRINT_HEADER_COMMENTS FALSE
 \end{verbatim}
 
 Whether to regenerate the commons in the declarations or not.
