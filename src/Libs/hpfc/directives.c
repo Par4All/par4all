@@ -3,7 +3,7 @@
  * these functions deal with HPF directives.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/04/25 18:56:34 $, )
+ * ($Date: 1995/05/05 16:42:38 $, )
  */
 
 #include "defines-local.h"
@@ -13,7 +13,7 @@
 #include "bootstrap.h"
 #include "control.h"
 
-/*  directive names encoding
+/*  directive names encoding: HPF_PREFIX + one character
  */
 #define HPF_PREFIX     "HPFC"
 
@@ -37,6 +37,15 @@
  *   UTILITIES
  *
  */
+/* local primary dynamics
+ */
+GENERIC_STATIC_STATUS(/**/, the_dynamics, list, NIL, gen_free_list)
+
+void add_a_dynamic(c)
+entity c;
+{
+    the_dynamics = gen_once(c, the_dynamics);
+}
 
 /*  the local stack is used to retrieve the current statement while 
  *  scanning the AST with gen_recurse.
@@ -115,6 +124,7 @@ expression e;
 {
     entity a = expression_to_entity(e);
     set_entity_as_dynamic(a);
+    add_a_dynamic(a);
 
     debug(3, "new_dynamic", "entity is %s\n", entity_name(a));
 }
@@ -219,6 +229,28 @@ reference alignee, temp;
     /* built align is returned. should be normalized?
      */
     return(make_align(aligns, template));
+}
+
+/* handle s as the initial alignment...
+ * to be called after the dynamics arrays...
+ */
+static void initial_alignment(s)
+statement s;
+{
+    entity array;
+
+    MAPL(ce,
+     {
+	 array = ENTITY(CAR(ce));
+
+	 if (array_distributed_p(array))
+	 {
+	     propagate_synonym(s, array, array);
+	     update_renamings(s, CONS(RENAMING, make_renaming(array, array),
+				      load_renamings(s)));
+	 }
+     },
+	 get_the_dynamics());
 }
 
 static void one_align_directive(alignee, temp, dynamic)
@@ -759,14 +791,18 @@ statement s;
 {
     make_current_stmt_stack();
     init_dynamic_locals();
+    init_the_dynamics();
 
     to_be_cleaned = NIL;
+    store_renamings(s, NIL);
 
     gen_multi_recurse(s,
         statement_domain,  stmt_filter,      stmt_rewrite, /* STATEMENT */
 	expression_domain, gen_false,        gen_null,     /* EXPRESSION */
 	call_domain,       directive_filter, gen_null,     /* CALL */
 		      NULL);
+
+    initial_alignment(s);
 
     DEBUG_STAT(7, "intermediate code", s);
 
@@ -777,6 +813,7 @@ statement s;
     gen_free_list(to_be_cleaned), to_be_cleaned=NIL;
     free_current_stmt_stack();
     close_dynamic_locals();
+    close_the_dynamics();
 
     DEBUG_CODE(5, "resulting code", get_current_module_entity(), s);
 }
