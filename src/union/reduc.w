@@ -1258,8 +1258,13 @@ int ofl_ctrl;
   boolean   result;
   Ppath     chemin = pa_make(ps1, sl_append_system(NULL, ps2));
   
-  CATCH(overflow_error) {result = FALSE; }
-  TRY {result = ! (pa_feasibility_ofl_ctrl(chemin, ofl_ctrl));}
+  CATCH(overflow_error) {
+    result = FALSE; 
+  }
+  TRY {
+    result = ! (pa_feasibility_ofl_ctrl(chemin, ofl_ctrl));
+    UNCATCH(overflow_error);
+  }
   chemin = pa_free1(chemin); 
   return(result);
 }
@@ -1337,10 +1342,13 @@ boolean   ofl_res;
   chemin = pa_make(conv_hull,sl_append_system(sl_append_system(NULL,ps1),ps2));
   
   if (ofl_ctrl==OFL_CTRL) {
-	CATCH(overflow_error) 
+	CATCH(overflow_error) {
             result = ofl_res;
-        TRY
+        }
+        TRY {
             result = !(pa_feasibility_ofl_ctrl(chemin, local_ofl_ctrl));
+            UNCATCH(overflow_error);
+        }
   }
   else
       result = !(pa_feasibility_ofl_ctrl(chemin, local_ofl_ctrl));
