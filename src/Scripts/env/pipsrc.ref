@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.137  1998/04/02 14:38:58  coelho
+# PIPS_CPP fixed for gcc-2.8.0 if g77 is not installed.
+#
 # Revision 1.136  1998/03/21 12:10:06  coelho
 # actual path to pips bins dropped. shell wrapper to be used instead.
 #
@@ -201,7 +204,7 @@ LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PIPS_ROOT}/Lib/${PIPS_ARCH}"
 #
 # to get some determinism...
 
-PIPS_CPP='gcc -E'
+PIPS_CPP='gcc -E -x c'
 
 # Additional options to pass to cpp for .F files:
 # default: PIPS_CPP_FLAGS=""
