@@ -37,6 +37,26 @@
 #define REGION_FORESYS_PREFIX "C$REG"
 #define PIPS_NORMAL_PREFIX "C"
 
+/***************************************************** ACTION INTERPRETATION */
+
+static string read_action_interpretation = string_undefined;
+static string write_action_interpretation = string_undefined;
+static void set_action_interpretation(string r, string w)
+{
+    read_action_interpretation = r;
+    write_action_interpretation = w;
+}
+static void reset_action_interpretation(void)
+{
+    read_action_interpretation = string_undefined;
+    write_action_interpretation = string_undefined;
+}
+static string action_interpretation(action a)
+{
+    return action_read_p(a) ? 
+	read_action_interpretation : write_action_interpretation;
+}
+
 
 /* char * pips_region_user_name(entity ent)
  * output   : the name of entity.
@@ -260,20 +280,22 @@ text_region(effect reg)
 }
 
 
-/* text text_array_regions(list l_reg)
+/* text text_array_regions(list l_reg, string ifread, string ifwrite)
  * input    : a list of regions
  * output   : a text representing this list of regions.
  * comment  : if the number of array regions is not nul, and if 
  *            PRETTYPRINT_LOOSE is TRUE, then empty lines are
  *            added before and after the text of the list of regions.
  */
-text
-text_array_regions(list l_reg)
+static text
+text_array_regions(list l_reg, string ifread, string ifwrite)
 {
     text reg_text = make_text(NIL);
     /* in case of loose_prettyprint, at least one region to print? */
     boolean loose_p = get_bool_property("PRETTYPRINT_LOOSE");
     boolean one_p = FALSE;  
+
+    set_action_interpretation(ifread, ifwrite);
 
     /* GO: No redundant test anymore, see  text_statement_array_regions */
     if (l_reg != (list) HASH_UNDEFINED_VALUE && l_reg != list_undefined) 
@@ -302,18 +324,38 @@ text_array_regions(list l_reg)
 				 make_sentence(is_sentence_formatted, 
 					       strdup("\n")));
     }
-    return(reg_text);
+
+    reset_action_interpretation();
+    return reg_text;
 }
 
+/* practical interfaces 
+ */
+text text_inout_array_regions(list l)
+{ return text_array_regions(l, ACTION_IN, ACTION_OUT);}
+
+text text_rw_array_regions(list l)
+{ return text_array_regions(l, ACTION_READ, ACTION_WRITE);}
+
+text text_copyinout_array_regions(list l)
+{ return text_array_regions(l, ACTION_COPYIN, ACTION_COPYOUT);}
+
+text text_private_array_regions(list l)
+{ return text_array_regions(l, ACTION_PRIVATE, ACTION_PRIVATE);}
+
+
+/*********************************************************** DEBUG FUNCTIONS */
 
 /* void print_regions(list pc)
  * input    : a list of regions.
  * modifies : nothing.
  * comment  : prints the list of regions on stderr .
  */
-void print_regions(list pc)
+static void 
+print_regions_with_action(list pc, string ifread, string ifwrite)
 {
     list lr;
+    set_action_interpretation(ifread, ifwrite);
 
     if (pc == NIL) {
 	fprintf(stderr,"\t<NONE>\n");
@@ -325,7 +367,25 @@ void print_regions(list pc)
 	    fprintf(stderr,"\n");
         }
     }
+
+    reset_action_interpretation();
 }
+
+/* external interfaces
+ */
+void print_rw_regions(list l)
+{ print_regions_with_action(l, ACTION_READ, ACTION_WRITE);}
+
+void print_inout_regions(list l)
+{ print_regions_with_action(l, ACTION_IN, ACTION_OUT);}
+
+void print_copyinout_regions(list l)
+{ print_regions_with_action(l, ACTION_COPYIN, ACTION_COPYOUT);}
+
+void print_private_regions(list l)
+{ print_regions_with_action(l, ACTION_PRIVATE, ACTION_PRIVATE);}
+
+void print_regions(list l) { print_rw_regions(l);}
 
 /* void print_regions(effect r)
  * input    : a region.
