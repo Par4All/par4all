@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/22 18:32:16 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/22 20:23:44 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -24,10 +24,10 @@ help()
   cat <<-END_OF_HELP
 	$USAGE
 	version $Revision$
-	Builds $MAKEFILE from $CONFIG_FILE for PIPS.
-	  -L|N|P: for Linear, Newgen or Pips.
-	  -l|p|c|d: libraries|passes|compiled|default
-	  -D|S: for Development|Production (Sources) directories
+	Builds $MAKEFILE from $CONFIG_FILE for the PIPS software
+	  -L|N|P:   part is Linear, Newgen or Pips.
+	  -l|p|c|d: type is library|pass|compile|default
+	  -D|S:     side is Development|Source
 	  contextual defaults for all these first options...
 	  -h: this help
 	  -v: verbose
@@ -483,10 +483,9 @@ ttest: all
 # obsolete rule I guess. test is better. FC.
 \$(BIN_TARGET): \$(LIB_TARGET) \$(ARCH)/\$(MAIN).o
 	#
-	# building $@
+	# building \$@
 	#
-	\$(LINK) \$(BIN_TARGET) \$(ARCH)/\$(MAIN).o \\
-		\$(LIB_TARGET) \$(PIPS_LIBS)
+	\$(LINK) \$(BIN_TARGET) \$< \$(PIPS_LIBS)
 	@echo 
 
 clobber: clean ; -Delete
@@ -513,8 +512,7 @@ INCLUDES=	\$(LIB_HEADERS)
 SOURCES+= 	\$(INCLUDES) \$(CFILES) \$(DOCS)
 #
 
-\$(PIPS_BINDIR):
-	mkdir \$(PIPS_BINDIR)
+\$(PIPS_BINDIR):; mkdir \$(PIPS_BINDIR)
 
 \$(BIN_TARGET): \$(INC_TARGET) \$(LIB_TARGET)
 	\$(LINK) \$(BIN_TARGET) \$(LIB_TARGET) \$(TARGET_LIBS)
@@ -539,8 +537,8 @@ $verbose "specific to Default"
 [ $DIRTYPE = 'Default' ] && cat >> $MAKEFILE <<% 
 
 clean:
-	\$(RM) core *~ *.aux *.log *.toc *.idx *.ind *.ilg *.lof *.lot \
-		*.bbl *.blg
+	\$(RM) core *~ \
+	    *.aux *.log *.toc *.idx *.ind *.ilg *.lof *.lot *.bbl *.blg
 
 %
 
@@ -646,8 +644,7 @@ quick-install: .quick-install
 	# 
 	# regenerating Makefile
 	#
-	pips-makemake ${PIPSMKMK_OPTION}
-	touch .makefile
+	pips-makemake ${PIPSMKMK_OPTION}; touch .makefile
 
 generate_makefile_if_necessary_and_possible:
 	@[ ! -x \$(PIPS_ROOT)/Utils/pips-makemake ] || \\
@@ -714,12 +711,10 @@ check_sccs:
 
 install:  .install
 
-#
 # diff between dev and prod sources:
-
 diff:
 	#
-	# showing diff between the local and installed version
+	# showing diff between the local and installed versions
 	#
 	-@for f in \$(ALL_SOURCES) ; do \\
 	  echo "DIFFERENCES BETWEEN DEV AND PROD FOR \$\$f:" ; \\
@@ -740,12 +735,9 @@ $verbose "common to Lib and Passes"
 cat >> $MAKEFILE <<%
 #
 
-\$(${PART}_LIBDIR):
-	mkdir \$(${PART}_LIBDIR)
+\$(${PART}_LIBDIR):; mkdir \$(${PART}_LIBDIR)
 
-lint:
-	\$(TYPECHECK) \$(CFILES) | 
-		sed '/possible pointer alignment/d;/gen_alloc/d'
+lint:; \$(TYPECHECK) \$(CFILES)|sed '/possible pointer alignm/d;/gen_alloc/d'
 
 TAGS: \$(INCLUDES) \$(CFILES)
 	etags \$(INCLUDES) \$(CFILES)
