@@ -537,9 +537,10 @@ transformer context;
     list l_formal = NIL;
     list r_args = real_args;
     list l_sum_rw_reg = 
-	effects_to_list( (effects) db_get_memory_resource(DBR_SUMMARY_REGIONS,
-							  module_local_name(func),
-							  TRUE));
+	effects_to_list((effects) db_get_memory_resource
+			(DBR_SUMMARY_REGIONS,
+			 module_local_name(func),
+			 TRUE));
     
     /* for each actual parameter expression, we search in the actual regions 
      * the corresponding elements. If it exists, we make the corresponding 
@@ -565,19 +566,20 @@ transformer context;
 	     {
 		 entity reg_ent = region_entity(reg);
 
-		 pips_debug(8, " real = %s, formal = %s \n", entity_name(real_ent),
-		       entity_name(reg_ent));
+		 pips_debug(8, " real = %s, formal = %s \n", 
+			    entity_name(real_ent), entity_name(reg_ent));
 		 
 		 if (same_entity_p(reg_ent , real_ent)) 
 		 {
 		     region formal_reg;
-		     formal_reg =
-			 region_translation(reg, caller, real_ref,
-					    formal_ent, func, reference_undefined, 
-					    VALUE_ZERO, FORWARD);		     
-		     l_formal = RegionsMustUnion(l_formal, 
-						 CONS(EFFECT, formal_reg, NIL), 
-						 regions_same_action_p);
+		     formal_reg = region_translation(
+			 reg, caller, real_ref,
+			 formal_ent, func, reference_undefined, 
+			 VALUE_ZERO, FORWARD);		     
+		     l_formal = RegionsMustUnion(
+			 l_formal, 
+			 CONS(EFFECT, formal_reg, NIL), 
+			 regions_same_action_p);
 		 }
 	     }, l_reg);
 	    
@@ -586,11 +588,12 @@ transformer context;
 	{
 	    /* REVOIR ICI */
 	    list l_exp_reg = regions_of_expression(real_exp, context);
-	    list l_real_exp = RegionsIntersection(l_exp_reg, regions_dup(l_reg),
-						  regions_same_action_p);
+	    list l_real_exp = 
+		RegionsIntersection(l_exp_reg, regions_dup(l_reg),
+				    regions_same_action_p);
 
 	    pips_debug(8, "real argument is a complex expression \n" 
-		       "\tit can not correspond to a written formal parameter.\n");
+		"\tit can not correspond to a written formal parameter.\n");
 	    
 	    if (!ENDP(l_real_exp)) 
 	    {
@@ -607,8 +610,8 @@ transformer context;
 	
     } /* for */
     
-    /* il faut calculer l'intersection avec les summary regions de la fonction pour
-     * e'viter certains proble`mes comme avec:
+    /* il faut calculer l'intersection avec les summary regions de la 
+     * fonction pour e'viter certains proble`mes comme avec:
      *
      *      <A(PHI1)-OUT-MUST-{PHI1==I}
      *      CALL TOTO(A(I), A(I))
@@ -617,8 +620,8 @@ transformer context;
      *      SUBROUTINE TOTO(I,J)
      *
      * si on ne fait pas attention, on obtient <I-OUT-MUST-{}>, <J-OUT-MUST>
-     * ve'rifier que c'est compatible avec la norme. Inutile de faire des choses 
-     * inutiles. 
+     * ve'rifier que c'est compatible avec la norme. Inutile de faire des 
+     * choses inutiles. 
      */
     l_formal = RegionsIntersection(l_formal, regions_dup(l_sum_rw_reg),
 				   regions_same_action_p);
@@ -627,7 +630,8 @@ transformer context;
 }
 
 
-/* static list common_regions_forward_translation(entity func, list real_regions)
+/* static list common_regions_forward_translation
+ *                              (entity func, list real_regions)
  * input    : the called function, the list of real arguments at call site, and
  *            the list of regions to translate.
  * output   : the translated list of regions.
@@ -737,7 +741,8 @@ static list common_region_translation(entity callee, region reg,
      * if not, we have to deterministically choose an arbitrary function
      * in which the common is declared. It will be our reference.
      * By deterministically, I mean that this function shall be chosen whenever
-     * we try to translate from this common to a routine where it is not declared.
+     * we try to translate from this common to a routine where it is not 
+     * declared.
      */
     ccommon = ram_section(storage_ram(entity_storage(reg_ent)));
     l_com_ent = area_layout(type_area(entity_type(ccommon)));
@@ -765,8 +770,9 @@ static list common_region_translation(entity callee, region reg,
 	    local_name_to_top_level_entity(module_name(entity_name(ent)));
 	ifdebug(6)
 	{
-	    pips_debug(6, "common not declared in caller,\n\t using %s declarations "
-		       "instead\n", entity_name(entity_target_func));
+	    pips_debug(6, "common not declared in caller,\n"
+		       "\t using %s declarations instead\n", 
+		       entity_name(entity_target_func));
 	}
     }
 
@@ -775,8 +781,9 @@ static list common_region_translation(entity callee, region reg,
     reg_ent_begin_offset = ram_offset(storage_ram(entity_storage(reg_ent)));
     reg_ent_end_offset = reg_ent_begin_offset + reg_ent_size - 1;
 
-    pips_debug(6, "\n\t reg_ent: size = %d, offset_begin = %d, offset_end = %d \n",
-	      reg_ent_size, reg_ent_begin_offset, reg_ent_end_offset); 
+    pips_debug(6,
+	       "\n\treg_ent: size = %d, offset_begin = %d, offset_end = %d\n",
+	       reg_ent_size, reg_ent_begin_offset, reg_ent_end_offset); 
 
     /* then, we perform the translation */
     ccommon = ram_section(storage_ram(entity_storage(reg_ent)));
@@ -800,7 +807,7 @@ static list common_region_translation(entity callee, region reg,
 
 	    pips_debug(6, "\n\t new_ent: size = %d, "
 		       "offset_begin = %d, offset_end = %d \n",
-		       new_ent_size, new_ent_begin_offset, new_ent_end_offset); 
+		     new_ent_size, new_ent_begin_offset, new_ent_end_offset); 
 	    
 	    if ((new_ent_begin_offset <= reg_ent_end_offset) && 
 		(reg_ent_begin_offset <= new_ent_end_offset ))
