@@ -81,6 +81,12 @@ Psysteme s;
 	stored_s = s;
 
     pips_assert("sc_gen_write",!SC_UNDEFINED_P(stored_s));
+    
+    /*
+      ifdebug(10){
+      fprintf(stderr, "[sc_gen_write] sys 0x%x\n", (unsigned int) s);
+      syst_debug(s); }
+      */
 
     (void) fputc('(',fd);
 
