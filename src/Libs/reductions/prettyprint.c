@@ -1,5 +1,5 @@
 /* $RCSfile: prettyprint.c,v $ (version $Revision$)
- * $Date: 1996/06/17 17:43:47 $, 
+ * $Date: 1996/06/17 18:11:07 $, 
  *
  * (pretty)print of reductions.
  *
@@ -93,6 +93,16 @@ static list /* of string */ words_reductions(string note, reductions rs)
     return ls? CONS(STRING, strdup(note), ls): NIL;
 }
 
+void print_reduction(reduction r)
+{
+    reference ref = reduction_reference(r);
+    fprintf(stderr, "reduction is %s[", 
+	    reduction_operator_tag_name
+	        (reduction_operator_tag(reduction_op(r))));
+    if (!reference_undefined_p(ref)) print_reference(ref);
+    fprintf(stderr, "]\n");
+}
+
 /************************************************* REDUCTION PRETTY PRINT */
 
 /* function to allocate and returns a text, passed to the prettyprinter
@@ -135,7 +145,7 @@ static text text_code_reductions(statement s)
  * ??? what about summary reductions? 
  * should be pprinted with cumulated regions. 
  */
-static void 
+static bool
 print_any_reductions(
     string module_name, 
     string resource_name, 
@@ -175,14 +185,16 @@ print_any_reductions(
  */
 bool print_code_proper_reductions(string module_name)
 {
-    print_any_reductions(module_name, DBR_PROPER_REDUCTIONS, 
-			 PROP_DECO, PROP_SUFFIX);
+    return print_any_reductions(module_name,
+				DBR_PROPER_REDUCTIONS, 
+				PROP_DECO, PROP_SUFFIX);
 }
 
 bool print_code_cumulated_reductions(string module_name)
 {
-    print_any_reductions(module_name, DBR_CUMULATED_REDUCTIONS, 
-			 CUMU_DECO, CUMU_SUFFIX);
+    return print_any_reductions(module_name, 
+				DBR_CUMULATED_REDUCTIONS, 
+				CUMU_DECO, CUMU_SUFFIX);
 }
 
 /* end of $RCSfile: prettyprint.c,v $
