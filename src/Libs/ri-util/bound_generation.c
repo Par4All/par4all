@@ -1,5 +1,11 @@
 /*
  * $Id$
+ *
+ * $Log: bound_generation.c,v $
+ * Revision 1.10  1998/10/26 10:35:39  irigoin
+ * Function bound_generation() slightly updated. Constraints are not yet
+ * sorted. The MIN and MAX expressions are not deterministics.
+ *
  */
 
 #include <stdio.h>
@@ -108,23 +114,22 @@ expression *upper;
 
     /* compute the rank d of the  index in the basis */  
     rank_index = base_find_variable_rank(base,index,nom_de_variable);
-    debug(7,"make_bound_expression","index :%s\n",nom_de_variable(index));
-    debug(8,"make_bound_expression","rank_index = %d\n",rank_index);
+    debug(7, "make_bound_expression", "index :%s\n", nom_de_variable(index));
+    debug(8, "make_bound_expression", "rank_index = %d\n", rank_index);
 
     /*search constraints referencing "index" and create the list of 
       expressions for lower and upper bounds */
-    for (pc=sc->inegalites; pc!=NULL; pc=pc->succ) 
-    {
+    for (pc=sc->inegalites; pc!=NULL; pc=pc->succ) {
 	i = level_contrainte(pc, base);
 	debug(8,"make_bound_expression","level: %d\n",i);
 	if (ABS(i)==rank_index){	/* found */
-	    if (get_debug_level()>=7) {
-		fprintf(stderr, "\n constraint before :");
+	    ifdebug(7) {
+		(void) fprintf(stderr, "\n constraint before :");
 		contrainte_fprint(stderr, pc, TRUE, 
 				  (variable_name_type) entity_local_name);
 	    }
 	    ex = make_contrainte_expression(pc, (Variable) index);
-	    ifdebug(7){
+	    ifdebug(7) {
 		fprintf(stderr, "\n expression after :");
 		print_expression(ex);
 	    }
@@ -148,19 +153,25 @@ expression *upper;
     pips_assert("some entities",
 		min != entity_undefined && max != entity_undefined);
 
-    if (gen_length(ll) > 1)
+    if (gen_length(ll) > 1) {
 	*lower = make_expression(make_syntax(is_syntax_call,
 					     make_call(max,ll)),
 				 normalized_undefined);
-    else 
+    }
+    else {
 	*lower = EXPRESSION(CAR(ll)); /* and memory leak... (cons lost) */
+	gen_free_list(ll);
+    }
 
-    if (gen_length(lu) > 1 )
+    if (gen_length(lu) > 1 ) {
 	*upper = make_expression(make_syntax(is_syntax_call,
 					     make_call(min,lu)),
 				 normalized_undefined );
-    else
+    }
+    else {
 	*upper = EXPRESSION(CAR(lu)); /* idem... */
+	gen_free_list(lu);
+    }
 
     ifdebug(9) {
 	pips_debug(9, "returning: \n");
