@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/03/21 15:56:01 $, )
+ * ($Date: 1996/03/29 18:22:03 $, )
  */
 
 #include "defines-local.h"
@@ -72,20 +72,19 @@ make_host_and_node_modules (entity module)
 		var_name = concatenate(name, MODULE_SEP_STRING, name, NULL),
 		tmp_name;
 	    entity
-		var = gen_find_tabulated(var_name, entity_domain),
-		new = entity_undefined;
+		var = gen_find_tabulated(var_name, entity_domain), nev;
 
 	    pips_assert("defined", !entity_undefined_p(var));
 
 	    tmp_name = entity_local_name(host);
-	    new = find_or_create_scalar_entity(tmp_name, tmp_name, 
+	    nev = find_or_create_scalar_entity(tmp_name, tmp_name, 
 					       is_basic_overloaded);
-	    store_new_host_variable(new, var);
+	    store_new_host_variable(nev, var);
 
 	    tmp_name = entity_local_name(node);
-	    new = find_or_create_scalar_entity(tmp_name, tmp_name, 
+	    nev = find_or_create_scalar_entity(tmp_name, tmp_name, 
 					       is_basic_overloaded);
-	    store_new_node_variable(new, var);
+	    store_new_node_variable(nev, var);
 	}		
     }
 
