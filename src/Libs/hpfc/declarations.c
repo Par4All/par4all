@@ -4,7 +4,7 @@
  * DECLARATIONS compilation
  *
  * SCCS stuff:
- * $RCSfile: declarations.c,v $ ($Date: 1994/09/01 15:48:13 $, ) version $Revision$,
+ * $RCSfile: declarations.c,v $ ($Date: 1994/12/22 16:52:28 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -259,9 +259,7 @@ entity array;
     list 
 	ld=NIL;
     
-    pips_assert("NewDeclarationOfDistributedArray",
-		((array_distributed_p(array)) && 
-		 (entity_variable_p(array))));
+    assert(array_distributed_p(array) && entity_variable_p(array));
 
     debug(6,"NewDeclarationOfDistributedArray",
 	  "considering array %s, new %s\n",
