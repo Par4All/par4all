@@ -3548,7 +3548,7 @@ Polyhedron *Polyhedron_Scan(Polyhedron *D, Polyhedron *C,unsigned NbMaxRays) {
   
   int i, j, dim ;
   Matrix *Mat;
-  Polyhedron *C1, *C2, *D1;
+  Polyhedron *C1, *C2, *D1, *D2;
   Polyhedron *res, *last, *tmp;
   
   dim = D->Dimension - C->Dimension;
@@ -3565,13 +3565,16 @@ Polyhedron *Polyhedron_Scan(Polyhedron *D, Polyhedron *C,unsigned NbMaxRays) {
   if(!C1) {
     return 0;
   }
+  /* Vin100, aug 16, 2001:  The context is intersected with D */
+  D2 = DomainIntersection( C1, D, NbMaxRays);
+
   for (i=0; i<dim; i++) {
-    Vector_Set(Mat->p_Init,0,D->Dimension*(D->Dimension + 2));
+    Vector_Set(Mat->p_Init,0,D2->Dimension*(D2->Dimension + 2));
     for (j=i+1; j<dim; j++) {
       value_set_si(Mat->p[j-i-1][j+1],1);
     }
     Mat->NbRows = dim-i-1;
-    D1 = Mat->NbRows ? DomainAddRays(D, Mat, NbMaxRays) : D;
+    D1 = Mat->NbRows ? DomainAddRays(D2, Mat, NbMaxRays) : D2;
     tmp = DomainSimplify(D1, C1, NbMaxRays);
     if (!last) res = last = tmp;
     else { last->next = tmp; last = tmp; }

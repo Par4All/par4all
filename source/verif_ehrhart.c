@@ -230,14 +230,8 @@ int main(int argc,char *argv[]) {
   value_set_si(p[i],1);
 
   /* S = scanning list of polyhedra */
-  /* S needs to contain the context in scan if there are equalities
-     between indices*/
-  /* changed by vin100, 14/08/01, g13 now passes */
-  /* was S = Polyhedron_Scan(P,C,MAXRAYS); */
-   S = Polyhedron_Scan(
-         DomainIntersection(P,align_context(C,P->Dimension,MAXRAYS),MAXRAYS),
-       C,MAXRAYS);
-  
+  S = Polyhedron_Scan(P,C,MAXRAYS);
+
 #ifndef PRINT_ALL_RESULTS
   if(C->Dimension > 0) {
     value_substract(tmp,max,min);
