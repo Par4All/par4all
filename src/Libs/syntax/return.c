@@ -3,6 +3,7 @@
 #include "genC.h"
 #include "parser_private.h"
 #include "ri.h"
+#include "ri-util.h"
 
 #include "syntax.h"
 
