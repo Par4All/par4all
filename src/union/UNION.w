@@ -352,11 +352,9 @@ extern char* (*union_variable_name)();
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <setjmp.h>
 #include <assert.h>
 #include <time.h>
 #include <sys/time.h>
-jmp_buf overflow_error;
 
 /* Linear includes      */
 #include "boolean.h"
