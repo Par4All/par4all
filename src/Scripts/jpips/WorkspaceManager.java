@@ -2,6 +2,9 @@
   $Id$
   
   $Log: WorkspaceManager.java,v $
+  Revision 1.7  1998/11/20 18:01:22  coelho
+  fix of file management...
+
   Revision 1.6  1998/11/06 10:42:34  ancourt
   allow xx*yy.f/F to be added
 
@@ -344,10 +347,16 @@ public class WorkspaceManager implements JPipsComponent
     String abs_name = f.getAbsolutePath();
     String file_name = f.getName();
 
-    System.err.println("considering " + f + "/" + abs_name);
+    System.err.println("dealing with " + f);
 
-    if ( f.isFile() || (file_name.indexOf('*') > 0 )
-	&& (abs_name.endsWith(".f") || abs_name.endsWith(".F"))) 
+    /* + " / " + abs_name + 
+       " * " + abs_name.indexOf('*') + f.isFile() +
+       abs_name.endsWith(".f") +
+       abs_name.endsWith(".F"));
+    */
+
+    if ((f.isFile() || (abs_name.indexOf('*')>0)) && 
+	(abs_name.endsWith(".f") || abs_name.endsWith(".F"))) 
     { 
 	//DefaultListModel dlm = (DefaultListModel) filesList.getModel();
 	// drop if already there
@@ -357,7 +366,6 @@ public class WorkspaceManager implements JPipsComponent
 	
 	files.addElement(abs_name);
     }
-    
     else
 	JOptionPane.showMessageDialog(frame, f + ": Invalid Fortran file!",
 				      "Error", JOptionPane.ERROR_MESSAGE);
