@@ -1,7 +1,7 @@
 %
 % Documentation de l'environnement de de'veloppement PIPS
 %
-% $RCSfile: dret146.ftex,v $ ($Date: 1994/04/13 15:20:05 $) version $Revision$, got on %D%, %T%
+% $RCSfile: dret146.ftex,v $ ($Date: 1994/05/19 16:01:28 $) version $Revision$, got on %D%, %T%
 % %A%
 %
 
@@ -12,21 +12,22 @@
 \newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
 
 \newcommand{\titre}{PROJET PIPS \\
-		ENVIRONNEMENT DE D\'EVELOPPEMENT\\
+		ENVIRONNEMENT DE DE'VELOPPEMENT\\
 		{\em Version $Revision$}
 }
 
 \newcommand{\auteur}{
-        	Franc,ois IRIGOIN \\
+        	Franc,ois IRIGOIN \\ 
         	Pierre JOUVELOT \\
-			R\'emi TRIOLET \\
+			Re'mi TRIOLET \\
 			Arnauld LESERVOT \\
 			Alexis PLATONOFF \\
 			Ronan KERYELL \\
-			Fabien COELHO
+			Fabien COELHO \\
+			Be'atrice APVRILLE 
 }
 %\newcommand{\docdate}{7 octobre 1993}
-\newcommand{\docdate}{$Date: 1994/04/13 15:20:05 $}
+\newcommand{\docdate}{$Date: 1994/05/19 16:01:28 $}
 
 \begin{document}
 
@@ -669,26 +670,15 @@ r\`egles les fichiers {\tt phases.h} et {\tt resources.h} plac\'es dans {\tt
 \$INCLUDEDIR}, et les fichiers {\tt pipsmake.rc}, {\tt wpips.rc} et {\tt 
 properties.rc} plac\'es dans {\tt \$LIBDIR}.
 
-\end{itemize}
 
-\item dans le r\'epertoire {\tt \$DEVEDIR/Lib/pipsmake}~:
-
-\begin{itemize}
-
-\item d\'eclarer l'existence de cette biblioth\`eque {\em mylib} au
-gestionnaire des traitements {\em pipsmake}. Pour cela il faut mettre \`a
-jour le fichier {\tt make.c} en augmentant le tableau {\tt builder\_maps[]} de
-la ligne suivante~:
+\item pour d\'eclarer l'existence de cette bibliothe`que {\em mylib} au
+gestionnaire des traitements {\em pipsmake}, exe'cuter la commande {\tt
+make-builder-map} qui de'rive automatiquement le fichier {\tt builder-map.h} du
+fichier {\tt pipsmake.rc}. Ainsi, pour la nouvelle phase {\em mylib}, il rajoutera~:
 
 \begin{verbatim}
 BUILDER_MYLIB, mylib,
 \end{verbatim}
-
-De plus, dans ce m\^eme fichier, il faut rajouter un ``{include}'' sur le 
-``header'' ({\tt mylib.h}) de notre nouvelle biblioth\`eque.
-
-\item ex\'ecuter les commandes {\tt make libpipsmake.a} et {\tt make install}
-afin de mettre \`a jour {\em pipsmake} et de l'installer.
 
 \end{itemize}
 
