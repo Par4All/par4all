@@ -3,6 +3,8 @@
 # $Id$
 #
 # what to do at night from the pips account at cri on chailly.
+# dispatch cleanings, compilations and validations on different
+# architectures and machines. 
 #
 
 
@@ -16,6 +18,11 @@ remote=rsh
 verb=:
 add=
 
+# main machines for each os.
+
+sun4="chailly  /projects/Pips/Experiments"
+sol2="recanati /projects/Pips/Experiments2"
+i386="tirnanog /projects/Pips/Experiments3"
 
 
 #
@@ -130,48 +137,47 @@ function covalid()
 #
 # DO THE JOB!
 
-
 case ${job} in
 
     usual)
 	${verb} "USUAL stuff" ;
-	general chailly 	/projects/Pips GNUSOL1 ;
-	covalid recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;
-	covalid chailly 	/projects/Pips GNUSOL1 ;
-	covalid coulommiers 	/tmp LINUXI86 ;
-	compile recanati 	/projects/Pips/Experiments2 SOL2LL ;
-	compile chailly 	/projects/Pips "GNU SUN4" ;;
+	general ${sun4} GNUSOL1 ;
+	covalid ${sol2} GNUSOL2LL ;
+	covalid ${sun4} GNUSOL1 ;
+	covalid ${i386} LINUXI86 ;
+	compile ${sol2} SOL2LL ;
+	compile ${sun4}	"GNU SUN4" ;;
 
     long)
 	${verb} "LONG stuff (more compilations)" ;
-	general chailly 	/projects/Pips GNUSOL1 ;
-	covalid chailly 	/projects/Pips GNU ;
-	covalid recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;
-	covalid coulommiers 	/tmp LINUXI86 ;
-	compile recanati 	/projects/Pips SOL2LL ;
-	compile chailly 	/projects/Pips "GNUSOL1 SUN4 GPROF" ;;
+	general ${sun4} GNUSOL1 ;
+	covalid ${sun4} GNU ;
+	covalid ${sol2} GNUSOL2LL ;
+	covalid ${i386} LINUXI86 ;
+	compile ${sol2} SOL2LL ;
+	compile ${sun4} "GNUSOL1 SUN4 GPROF" ;;
 
     short)
 	${verb} "SHORT stuff (one validation)" ;
-	covalid chailly 	/projects/Pips GNUSOL1 ;
-	compile recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;
-	compile coulommiers 	/tmp LINUXI86 ;;
+	covalid ${sun4} GNUSOL1 ;
+	compile ${sol2} GNUSOL2LL ;
+	compile ${i386} LINUXI86 ;;
 
     compile)
 	${verb} "COMPILE stuff" ;
-	compile coulommiers 	/tmp LINUXI86 ;
-	compile chailly 	/projects/Pips "GNU GNUSOL1 SUN4 GPROF" ;
-	compile recanati 	/projects/Pips "GNUSOL2LL SOL2LL" ;;
+	compile ${i386} LINUXI86 ;
+	compile ${sun4} "GNU GNUSOL1 SUN4 GPROF" ;
+	compile ${sol2} "GNUSOL2LL SOL2LL" ;;
 
     validate)
 	${verb} "VALIDATE stuff (with necessary compilation)" ;
-	covalid chailly 	/projects/Pips GNUSOL1 ;
-	covalid coulommiers 	/tmp LINUXI86 ;
-	covalid recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;;
+	covalid ${sun4} GNUSOL1 ;
+	covalid ${i386} LINUXI86 ;
+	covalid ${sol2} GNUSOL2LL ;;
 
     debug)
 	${verb} "DEBUG stuff..." ;
-	validate chailly 	/projects/Pips GNUSOL1 ;;
+	validate ${sun4} GNUSOL1 ;;
 
     *)
 	${verb} "unexpected job=${job}" ;
