@@ -27,6 +27,9 @@ extern char * toupper();
  * on one line; I tried to preserve as much as I could of the previous behavior to
  * avoid pseudo-hyphenation at the wrong place and to avoid extensicve problems
  * with validate; the resulting code is lousy, of course; FI, 15 March 1993
+ * 
+ * RK: the print_sentence could print lower case letter according to
+ * a property... 17/12/1993.
  */
 void print_sentence(fd, s)
 FILE *fd;
@@ -36,7 +39,7 @@ sentence s;
 	string ps = sentence_formatted(s);
 	while (*ps) {
 	    char c = *ps++;
-	    putc((islower(c) ? toupper(c) : c), fd);
+	    (void) putc((islower((int) c) ? (char) toupper((int) c) : c), fd);
 	}
     }
     else {
