@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/21 12:42:04 $, 
+ * $Date: 1997/10/27 09:58:08 $, 
  */
 
 #include <unistd.h>
@@ -467,4 +467,38 @@ safe_cat(FILE * out, FILE * in)
     while ((c=getc(in))!=EOF) 
 	if (putc(c, out)==EOF)
 	    pips_internal_error("cat failed");
+}
+
+/* /some/path/to/file.suffix -> file
+ */
+string 
+basename(string fullpath, string suffix)
+{
+    int len = strlen(fullpath)-1, i, j;
+    string result;
+    if (suffix) /* drop the suffix */
+    {
+	int ls = strlen(suffix)-1, le = len;
+	while (suffix[ls]==fullpath[le] && ls>=0 && le>=0) ls--, le--;
+	if (ls<0) /* ok */ len=le;
+    }
+    for (i=len; i>=0; i--) if (fullpath[i]=='/') break;
+    /* fullpath[i+1:len] */
+    result = (char*) malloc(sizeof(char)*(len-i));
+    for (i++, j=0; i<=len; i++, j++) 
+	result[j] = fullpath[i];
+    result[j++] = '\0';
+    return result;
+}
+
+/* /some/path/to/file.suffix -> /some/path/to
+ */
+string 
+dirname(string fullpath)
+{
+    string result = strdup(fullpath);
+    int len = strlen(result);
+    while (result[--len]!='/' && len>=0);
+    result[len] = '\0';
+    return result;
 }
