@@ -151,7 +151,7 @@ complexity compsubst;
 	complexity_stats_add(&cresult, compsubst);
 
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	    (void) gen_consistent_p(cresult);
+	    (void) complexity_consistent_p(cresult);
 	    fprintf(stderr,"complexity_var_subst, comp    is ");
 	    complexity_fprint(stderr, comp, FALSE, TRUE);
 	    fprintf(stderr,"complexity_var_subst, compsubst is ");
@@ -182,7 +182,7 @@ Ppolynome pp;
     ppdup = polynome_dup(pp);
     comp = make_complexity(ppdup, vc, rc, ic);
     ifdebug(1) {
-	(void) gen_consistent_p(comp);
+	(void) complexity_consistent_p(comp);
     }
     return comp;
 }
@@ -295,8 +295,8 @@ void complexity_stats_add(pcomp1, comp2)
 complexity *pcomp1, comp2;
 {
     ifdebug (1) {
-	(void) gen_consistent_p(*pcomp1);
-	(void) gen_consistent_p(comp2);
+	(void) complexity_consistent_p(*pcomp1);
+	(void) complexity_consistent_p(comp2);
     }
 
     if ( COMPLEXITY_UNDEFINED_P(comp2) || COMPLEXITY_UNDEFINED_P(*pcomp1) )
@@ -331,7 +331,7 @@ complexity *pcomp1, comp2;
     }
 
     ifdebug (1) {
-	(void) gen_consistent_p(*pcomp1);
+	(void) complexity_consistent_p(*pcomp1);
     }
 }    
 
