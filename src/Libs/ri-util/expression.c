@@ -408,15 +408,13 @@ int r;
    necessary and if a memory leak occurs; wait till syntax/expression.c
    is merged with ri-util/expression.c 
 */
-expression int_to_expression(i)
-int i;
+expression 
+int_to_expression(int i)
 {
-    static char constant_name[12];
+    char constant_name[12];
     expression e;
-
     (void) sprintf(constant_name,"%d",i);
     e = MakeIntegerConstantExpression(strdup(constant_name));
-
     return e;
 }
 
