@@ -1,14 +1,14 @@
 dnl
 dnl GENERAL M4 MACROS
 dnl
-dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1995/11/21 23:31:47 $, )
+dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1996/09/07 15:48:36 $, )
 dnl version $Revision$
 dnl got on %D%, %T%
 dnl
 dnl THIS MACRO BUILDS A NAME FROM ITS ARGUMENTS, SEPARATED BY _
 dnl
 define(`build_name',dnl
-`ifelse($#,0,,$#,1,``$1'',``$1_''`build_name(shift($@))')')dnl
+`ifelse($#,0,,$#,1,``$1'',``$1 ''`build_name(shift($@))')')dnl
 dnl
 dnl FOR MACRO FROM M4 DOCUMENTATION
 dnl
