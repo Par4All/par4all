@@ -322,7 +322,8 @@ entity e;
 		token = OR;
 	else if (strcmp(entity_local_name(e), ".AND.") == 0)
 		token = AND;
-	else if (same_string_p(entity_local_name(e), IMPLIED_COMPLEX_NAME))
+	else if (same_string_p(entity_local_name(e), IMPLIED_COMPLEX_NAME) ||
+		 same_string_p(entity_local_name(e), IMPLIED_DCOMPLEX_NAME))
 	        token = CAST;
 	else
 		token = -1;
