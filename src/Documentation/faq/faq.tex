@@ -4,6 +4,9 @@
 %% PIPS faq
 %%
 %% $Log: faq.tex,v $
+%% Revision 1.2  1998/07/27 13:47:21  irigoin
+%% Latex bugs fixed
+%%
 %% Revision 1.1  1998/07/27 11:21:48  irigoin
 %% Initial revision
 %%
@@ -84,12 +87,13 @@ preprocessing sections in \PIPSMAKERC{}.
 
 The transformed code is stored in the current workspace by an explicit
 close or by exiting \PIPS{}. The best way to do it is to open the
-workspace with \TPIPS{}
+workspace with \TPIPS{}.
 
 \section{How can I replay a session?}
+\index{logfile\_to\_tpips}
 
 Each PIPS workspace contains a log. This log can be processed using the
-{\tt logfile_to_tpips} Shell script. The output is a {\tt tpips} script
+{\tt logfile\_to\_tpips} Shell script. The output is a {\tt tpips} script
 which can be replayed with the {\tt tpips} interface.
 
 Some commands, such as {\tt cd}, {\tt open}, {\tt close}, {\tt delete},
@@ -158,14 +162,14 @@ behavior of PIPS. This fine tuning was not intended for PIPS users but for
 PIPS developpers. However the property mechanism has been used to extend
 PIPS parser and users should be able to define {\em some} properties (see
 the
-\htmladdnormallink{\emph{property}}{http://www.cri.ensmp.fr/pips/properties-rc}}
+\htmladdnormallink{\emph{property}}{http://www.cri.ensmp.fr/pips/properties-rc}
 documentation.
 
 Default values for properties are defined in file
-\verb+$PIPS_ROOT/Share/properties.rc+. when \PIPS is installed. However,
+\verb+$PIPS_ROOT/Share/properties.rc+. when \PIPS{} is installed. However,
 they can be modified in every directory by creating a file called {\tt
   properties.rc}. Properties can also be modified dynamically with the
-most recent \PIPS user interfaces, \TPIPS and jpips.
+most recent \PIPS user interfaces, \TPIPS{} and jpips.
 
 \TPIPS users can also modifies the property in their home directory using
 a file called \verb+.tpipsrc+.
