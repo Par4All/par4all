@@ -1,8 +1,11 @@
-/* 	%A% ($Date: 1998/11/30 20:00:32 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+/* 	%A% ($Date: 1998/12/18 19:44:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: expression.c,v $
+ * Revision 1.16  1998/12/18 19:44:13  irigoin
+ * Improved error messages in MakeParameter(): follow-up of adventures at EDF
+ *
  * Revision 1.15  1998/11/30 20:00:32  irigoin
  * Error checking added in MakeParameter()
  *
@@ -18,7 +21,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1998/11/30 20:00:32 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 1998/12/18 19:44:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -52,9 +55,16 @@ expression x;
 	entity_storage(e) = MakeStorageRom();
     }
     else {
-	user_warning("MakeParameter", "Variable %s redefined as parameter\n",
-		     entity_local_name(e));
-	ParserError("MakeParameter", "A variable cannot be redefined as a parameter\n");
+	if(storage_ram_p(entity_storage(e))) {
+	    user_warning("MakeParameter", "Variable %s redefined as parameter\n",
+			 entity_local_name(e));
+	    ParserError("MakeParameter", "A variable cannot be redefined as a parameter\n");
+	}
+	else {
+	    user_warning("MakeParameter", "Symbol %s redefined as parameter\n",
+			 entity_local_name(e));
+	    ParserError("MakeParameter", "A symbol cannot be redefined as a parameter\n");
+	}
     }
     if(value_undefined_p(entity_initial(e)) || value_unknown_p(entity_initial(e))) {
 	entity_initial(e) = MakeValueSymbolic(x);
