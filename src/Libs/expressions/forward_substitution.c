@@ -20,6 +20,9 @@
  * An important issue is to only perform the substitution only if correct.
  *
  * $Log: forward_substitution.c,v $
+ * Revision 1.4  1998/03/31 17:56:25  coelho
+ * fixed a bug (free of maybe NULL value).
+ *
  * Revision 1.3  1998/03/31 17:53:15  coelho
  * special case "x = a(i); a(j) = x+1;" is substituted before stopping.
  *
@@ -131,7 +134,7 @@ cool_enough_for_a_last_substitution(statement s)
 {
     p_substitution x = substitution_candidate(s, FALSE);
     bool ok = (x!=NULL);
-    free(x);
+    if (x) free(x);
     return ok;
 }
 
