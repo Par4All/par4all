@@ -304,6 +304,104 @@ void insure_declaration_coherency(
     debug_off();
 }
 
+
+/*  Look for the end of header comments: */
+static string
+get_end_of_header_comments(string the_comments)
+{
+    string end_of_comment = the_comments;
+    
+    for(;;) {
+	string next_line;
+	/* If we are at the end of string or the line is not a comment
+           (it must be a PROGRAM, FUNCTION,... line), it is the end of
+           the header comment: */
+	if (!comment_string_p(end_of_comment))
+	    break;
+
+	if ((next_line = strchr(end_of_comment, '\n')) != NULL
+	    || *end_of_comment !=  '\0')
+	    /* Look for next line */
+	    end_of_comment = next_line + 1;
+	else
+	    /* No return char: it is the last line and it is a
+               comment... Should never happend in a real program
+               without any useful header! */
+	    pips_assert("get_end_of_header_comments found only comments!",
+			FALSE);
+    }
+    return end_of_comment;
+}
+
+
+/* Get the header comments (before PROGRAM, FUNCTION,...) from the
+   text declaration: */
+sentence
+get_header_comments(entity module)
+{
+    int length;
+    string end_of_comment;
+    string extracted_comment;
+    /* Get the textual header: */
+    string the_comments = code_decls_text(entity_code(module));
+
+    end_of_comment = get_end_of_header_comments(the_comments);
+    /* Keep room for the trailing '\0': */
+    length = end_of_comment - the_comments;
+    extracted_comment = malloc(length + 1);
+    (void) strncpy(extracted_comment, the_comments, length);
+    extracted_comment[length] = '\0';
+    return make_sentence(is_sentence_formatted, extracted_comment);  
+}
+
+
+/* Get all the declaration comments, that are comments from the
+   PROGRAM, FUNCTION,... stuff up to the end of the declarations: */
+sentence
+get_declaration_comments(entity module)
+{
+    string comment;
+    string old_extracted_comments;
+    string extracted_comments = strdup("");
+    /* Get the textual header: */
+    string the_comments = code_decls_text(entity_code(module));
+    
+    comment = get_end_of_header_comments(the_comments);
+    /* Now, gather all the comments: */
+    for(;;) {
+	string next_line;
+	if (*comment == '\0')
+	    break;
+	next_line = strchr(comment, '\n');
+	if (comment_string_p(comment)) {
+	    string the_comment;
+	    /* Add it to the extracted_comments: */
+	    if (next_line == NULL)
+		/* There is no newline, so this is the last
+		   comment line: */
+		the_comment = strdup(comment);
+	    else {
+		/* Build a string that holds the comment: */
+		the_comment = malloc(next_line - comment + 2);
+		(void) strncpy(the_comment, comment, next_line - comment + 1);
+		the_comment[next_line - comment + 1] = '\0';
+	    }
+	    old_extracted_comments = extracted_comments;
+	    extracted_comments = strdup(concatenate(old_extracted_comments,
+						    the_comment,
+						    NULL));
+	    free(old_extracted_comments);
+	    free(the_comment);
+	}
+	/* Have a look to next line if any... */
+	if (next_line == NULL)
+	    break;
+	comment = next_line + 1;
+    }
+    
+    return make_sentence(is_sentence_formatted, extracted_comments);
+}
+
 /*
  *  that is all
  */
