@@ -2,7 +2,7 @@
 #! /bin/sh -vx
 #
 # SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1995/10/11 09:08:09 $, )
+# $RCSfile: make-pips,v $ ($Date: 1995/10/11 10:00:16 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -78,7 +78,7 @@ PASSES=${PIPS_PASSES}
 #LIBS=`(cd $PIPS_LIBSRCDIR; echo [!M]*)`
 
 echo analyzing libraries ...
-#analyze_libraries -p
+analyze_libraries -p
 
 echo ordering libraries ...
 order_libraries -b
