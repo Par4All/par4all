@@ -223,6 +223,7 @@ typedef hash_table control_mapping;
 #define ENTITY_MIN0_P(e) entity_an_operator_p(e, MIN0)
 #define ENTITY_MAX0_P(e) entity_an_operator_p(e, MAX0)
 #define ENTITY_MIN_OR_MAX_P(e) (ENTITY_MIN_P(e) || ENTITY_MAX_P(e) )
+#define ENTITY_IABS_P(e) entity_an_operator_p(e, IABS)
 
 #define ENTITY_AND_P(e) entity_an_operator_p(e, AND)
 
