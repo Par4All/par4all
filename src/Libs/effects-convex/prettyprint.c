@@ -11,16 +11,16 @@
 #include <string.h>
 #include <values.h>
 
-#include "genC.h"
 #include "linear.h"
+
+#include "genC.h"
 #include "ri.h"
+#include "text.h"
 #include "database.h"
 
 #include "misc.h"
 #include "ri-util.h"
 #include "top-level.h"
-#include "text.h"
-
 #include "properties.h"
 
 #include "transformer.h"
@@ -419,10 +419,12 @@ effect_compare(effect *peff1, effect *peff2)
 
     /* same entity case: sort on action */
     if (same_entity_p(ent1,ent2))
+    {
 	if (effect_read_p(*peff1)) 
 	    return(-1);
 	else
 	    return(1);
+    }
     
     /* sort on module name */
     eff1_pos = strcmp(entity_module_name(ent1), entity_module_name(ent2));
