@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # $RCSfile: remove-latex-comments,v $ (version $Revision$)
-# $Date: 1996/11/13 10:11:36 $, 
+# $Date: 1997/03/28 08:32:15 $, 
 #
 # Conversion d'un fichier Latex en un fichier NewGen
 #
@@ -38,13 +38,14 @@ cat > $output <<!
 --	   --------------------------------------------------------
 !
 
-# keep domain definitions
+# keep domain definitions 
+# (2 seds instead of 1 because of a bug on sunos)
 #
-sed    '/^\\domain{/s,^\\domain{ *\(.*\)} *$,\1 ;,p
-        1,/^\\begin{domain}/d
-        /^\\end{domain}/,/^\\begin{domain}/d
-	/^\\end{domain}/,$d' $input |
-sed    "s,\\\\,,g;
+sed -n '/^\\domain{/s,^\\domain{ *\(.*\)} *$,\1 ;,p;
+        /^\\begin{domain}/,/^\\end{domain}/p' $input |
+sed    "/^\\begin{domain}/d;
+	/^\\end{domain}/d;
+	s,\\\\,,g;
         # stupid uppercase letters as the first char must be removed...
 	s,^A,a,;s,^B,b,;s,^C,c,;s,^D,d,;s,^E,e,;s,^F,f,;s,^G,g,;s,^H,h,;
 	s,^I,i,;s,^J,j,;s,^K,k,;s,^L,l,;s,^M,m,;s,^N,n,;s,^O,o,;s,^P,p,;
