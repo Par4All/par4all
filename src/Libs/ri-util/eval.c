@@ -26,14 +26,14 @@ range: a range is not evaluated.
 
 #include "operator.h"
 
-value EvalExpression(e)
-expression e;
+value 
+EvalExpression(expression e)
 {
     return(EvalSyntax(expression_syntax(e)));
 }
 
-value EvalSyntax(s)
-syntax s;
+value 
+EvalSyntax(syntax s)
 {
 	value v;
 
@@ -56,7 +56,8 @@ syntax s;
 /* only calls to constant, symbolic or intrinsic functions might be
  * evaluated. recall that intrinsic functions are not known.
  */
-value EvalCall(call c)
+value 
+EvalCall(call c)
 {
     value vout, vin;
     entity f;
@@ -92,8 +93,8 @@ value EvalCall(call c)
     return(vout);
 }
 
-value EvalConstant(c) 
-constant c;
+value 
+EvalConstant(constant c) 
 {
     return((constant_int_p(c)) ?
 	   make_value(is_value_constant, make_constant(is_constant_int,
@@ -112,9 +113,8 @@ e is the intrinsic function.
 la is the list of arguments.
 */
 
-value EvalIntrinsic(e, la)
-entity e;
-cons *la;
+value 
+EvalIntrinsic(entity e, list la)
 {
     value v;
     int token;
@@ -131,9 +131,8 @@ cons *la;
     return(v);
 }
 
-value EvalUnaryOp(t, la)
-int t;
-cons *la;
+value 
+EvalUnaryOp(int t, list la)
 {
 	value vout, v;
 	int arg;
@@ -157,7 +156,8 @@ cons *la;
 	return(vout);
 }
 
-value EvalBinaryOp(int t, list la)
+value 
+EvalBinaryOp(int t, list la)
 {
     value v;
     int argl, argr;
@@ -225,9 +225,8 @@ value EvalBinaryOp(int t, list la)
     return(v);
 }
 
-value EvalNaryOp(t, la)
-int t;
-cons *la;
+value 
+EvalNaryOp(int t, list la)
 {
     value v = value_undefined;
     value w = value_undefined;
@@ -269,8 +268,8 @@ cons *la;
 }
 
 /* FI: These string constants are defined in ri-util.h */
-int IsUnaryOperator(e)
-entity e;
+int 
+IsUnaryOperator(entity e)
 {
 	int token;
 
@@ -285,8 +284,8 @@ entity e;
 }
 
 /* FI: These string constants are defined in ri-util.h */
-int IsBinaryOperator(e)
-entity e;
+int 
+IsBinaryOperator(entity e)
 {
 	int token;
 
@@ -330,8 +329,9 @@ entity e;
 
 	return(token);
 }
-int IsNaryOperator(e)
-entity e;
+
+int 
+IsNaryOperator(entity e)
 {
 	int token;
 
@@ -350,8 +350,8 @@ entity e;
 }
 
 /* FI: such a function should exist in Linear/arithmetique */
-int ipow(vg, vd)
-int vg, vd;
+int 
+ipow(int vg, int vd)
 {
 	int i = 1;
 
@@ -368,9 +368,8 @@ int vg, vd;
   returns TRUE if an integer value has been found and placed in pval.
   returns FALSE otherwise.
 */
-bool expression_integer_value(e, pval)
-expression e;
-int *pval;
+bool 
+expression_integer_value(expression e, int * pval)
 {
     bool is_int = FALSE;
     value v = EvalExpression(e);
@@ -381,7 +380,7 @@ int *pval;
     }
 
     gen_free(v);
-    return(is_int);
+    return is_int;
 }
 
 /* returns TRUE if v is not NULL and is constant */
@@ -390,8 +389,8 @@ int *pval;
  * The Linear version returns 0 when a null vector is passed as argument.
  * Francois Irigoin, 16 April 1990
  */
-static bool vect_const_p(v)
-Pvecteur v;
+static bool 
+vect_const_p(Pvecteur v)
 {
     pips_assert("vect_const_p", v != NULL);
     return vect_size(v) == 1 && value_notzero_p(vect_coeff(TCST, v));
@@ -402,8 +401,8 @@ Pvecteur v;
   linear or NULL otherwise. 
   the result is built from pv1 or pv2 and the other vector is removed.
 */
-Pvecteur vect_product(pv1, pv2)
-Pvecteur *pv1, *pv2;
+Pvecteur 
+vect_product(Pvecteur * pv1, Pvecteur * pv2)
 {
     Pvecteur vr;
 
