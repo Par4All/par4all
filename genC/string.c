@@ -142,6 +142,19 @@ concatenate(string next, ...)
     return buffer;
 }
 
+string 
+catdup(string next, ...)
+{
+    string result;
+    va_list args;
+
+    va_start(args, next);
+    result = strdup(concatenate(next, args));
+    va_end(args);
+
+    return result;
+}
+
 char *strupper(s1, s2)
 char *s1, *s2;
 {
