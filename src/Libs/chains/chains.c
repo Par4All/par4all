@@ -31,6 +31,9 @@
 #include "control.h"
 #include "prettyprint.h"
 
+/* #include "ricedg.h" */
+extern void prettyprint_dependence_graph(FILE*, statement, graph);
+
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
