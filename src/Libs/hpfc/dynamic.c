@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.44  1997/04/17 15:28:38  coelho
+ * shorten similarity check if already done;-)
+ *
  * Revision 1.43  1997/04/15 15:28:37  creusil
  * statement_effects used for proper effects. bc.
  *
@@ -212,6 +215,9 @@ check_for_similarity(
     pips_debug(3, "of %s\n", entity_name(a));
 
     if (!array_distributed_p(a)) /* no templates! */
+	return;
+
+    if (bound_similar_mapping_p(a)) /* job already done */
 	return;
 
     /* look for copies with similar mappings for latter update
