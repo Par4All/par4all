@@ -31,7 +31,7 @@ Pvecteur v;
     fprintf(fd, "(");
 
     for (p = v; p != NULL; p = p->succ) {
-	fprint_Value(fd, val_of(v));
+	fprint_Value(fd, val_of(p));
 	(void) fprintf(fd," %s ", 
 		       (p->var == (Variable) 0) ? TCST_NAME : 
 		       entity_name((entity) p->var));
