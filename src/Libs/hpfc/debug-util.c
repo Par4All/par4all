@@ -18,6 +18,39 @@ extern int fprintf();
 #include "hpfc.h"
 #include "defines-local.h"
 
+extern char *flint_print_basic();
+
+/*
+ * print_entity_variable(e)
+ * 
+ * if it is just a variable, the type is printed,
+ * otherwise just the entity name is printed
+ */
+
+static void print_dimension(d)
+dimension d;
+{
+    fprintf(stderr,"dimension :\n");
+    print_expression(dimension_lower(d));
+    print_expression(dimension_upper(d));
+}
+
+void print_entity_variable(e)
+entity e;
+{
+    variable v;
+
+    (void) fprintf(stderr,"name: %s\n",entity_name(e));
+    
+    if (!type_variable_p(entity_type(e)))
+	return;
+
+    v = type_variable(entity_type(e));
+
+    fprintf(stderr,"basic %s\n",flint_print_basic(variable_basic(v)));
+    MAPL(cd,{print_dimension(DIMENSION(CAR(cd)));},variable_dimensions(v));
+}
+
 void print_align(a)
 align a;
 {
@@ -49,24 +82,25 @@ void print_aligns()
 	 entity a=ENTITY(CAR(ce));
 
 	 (void) fprintf(stderr, "of array %s\n", entity_name(a));
-	 print_align((align)GET_ENTITY_MAPPING(hpfalign, a));
+	 print_align(load_entity_align(a));
 	 (void) fprintf(stderr,"\n");
      },
-	 distributedarrays);
+	 list_of_distributed_arrays());
 }
 
 void print_distributes()
 {
     fprintf(stderr,"Distributes:\n");
+
     MAPL(ce,
      {
 	 entity t=ENTITY(CAR(ce));
 
 	 (void) fprintf(stderr, "of template %s\n", entity_name(t));
-	 print_distribute((distribute)GET_ENTITY_MAPPING(hpfdistribute, t));
+	 print_distribute(load_entity_distribute(t));
 	 (void) fprintf(stderr,"\n");
      },
-	 templates);
+	 list_of_templates());
     
 }
 
@@ -74,7 +108,13 @@ void print_distribute(d)
 distribute d;
 {
     (void) fprintf(stderr,"distributed\n");
-    MAPL(cd,{print_distribution(DISTRIBUTION(CAR(cd)));},distribute_distribution(d));
+
+    MAPL(cd,
+     {
+	 print_distribution(DISTRIBUTION(CAR(cd)));
+     }, 
+	 distribute_distribution(d));
+
     (void) fprintf(stderr, "to processors %s\n\n", 
 		   entity_name(distribute_processors(d)));    
 }
@@ -122,19 +162,34 @@ void print_hpf_dir()
 void print_templates()
 {
     (void) fprintf(stderr,"Templates:\n");
-    MAPL(ce,{print_entity_variable(ENTITY(CAR(ce)));},templates);
+
+    MAPL(ce,
+     {
+	 print_entity_variable(ENTITY(CAR(ce)));
+     },
+	 list_of_templates());
 }
 
 void print_processors()
 {
     (void) fprintf(stderr,"Processors:\n");
-    MAPL(ce,{print_entity_variable(ENTITY(CAR(ce)));},processors);
+
+    MAPL(ce,
+     {
+	 print_entity_variable(ENTITY(CAR(ce)));
+     },
+	 list_of_processors());
 }
 
 void print_distributed_arrays()
 {
     (void) fprintf(stderr,"Distributed Arrays:\n");
-    MAPL(ce,{print_entity_variable(ENTITY(CAR(ce)));},distributedarrays);
+
+    MAPL(ce,
+     {
+	 print_entity_variable(ENTITY(CAR(ce)));
+     },
+	 list_of_distributed_arrays());
 }
 
 
