@@ -16,6 +16,8 @@
 #include "properties.h"
 #include "constants.h"
 
+#include "misc.h"
+
 /* interface with pipsdbm and pipsmake */
 
 bool controlizer(string module_name)
@@ -48,6 +50,9 @@ bool controlizer(string module_name)
 				 empty_comments,
 				 make_instruction(is_instruction_unstructured,
 						  control_graph(module_stat)));
+    ifdebug(5) {
+	statement_consistent_p(module_stat);
+    }
 
     /* By setting this property, we try to unspaghettify the control
        graph of the module: */
@@ -66,7 +71,11 @@ bool controlizer(string module_name)
 	reset_current_module_statement();
 	reset_current_module_entity();
     }
-    
+
+    ifdebug(5) {
+	statement_consistent_p(module_stat);
+    }
+
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
 
     return TRUE;
