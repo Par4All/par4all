@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1995/11/02 17:03:36 $, 
+ * $Date: 1995/11/02 17:07:03 $, 
  */
 
 /* hmmm...
