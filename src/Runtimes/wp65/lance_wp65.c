@@ -1,9 +1,10 @@
-/* $RCSfile: lance_wp65.c,v $ ($Revision$)
+/* $RCSfile: lance_wp65.c,v $ (version $Revision$)
+ * ($Date: 1995/09/19 22:28:35 $, )
  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <setjmp.h>
-#include <varargs.h>
+#include <stdarg.h>
 
 #include "pvm3.h"
 
@@ -73,13 +74,11 @@ void testerreur(char *chaine, int retour)
 }
 
 
-void sort_erreur(format, va_alist)
-char *format;
-va_dcl
+void sort_erreur(char * format, ...)
 {
   va_list args;
   
-  va_start(args);
+  va_start(args, format);
   (void) vfprintf(stderr, format, args);
   abort();
   va_end(args);
@@ -87,14 +86,12 @@ va_dcl
 
 
 /* Affiche quelque chose dans l'entête d'un xterm et son icône :*/
-void affiche_entete_X(format, va_alist)
-char *format;
-va_dcl
+void affiche_entete_X(char * format, ...)
 {
   va_list args;
   char chaine[1000];
 
-  va_start(args);
+  va_start(args, format);
   (void) vsprintf(chaine, format, args);
   (void) fprintf(stderr, "]0;%s", chaine);
   va_end(args);
@@ -116,8 +113,6 @@ char *basename(char *chaine)
 
 void init_params()
 {
-  int i;
-
   get_model(&nb_procs, &nb_bancs, &largeur_banc);
 }
 
@@ -345,6 +340,19 @@ void send_4(int tid, float *donnee, int taille)
 	     pvm_send(tid, 0));
 }
 
+void send_8(int tid, double *donnee, int taille)
+{
+  testerreur("pvm_initsend", pvm_initsend(WP65_PVM_DATA));
+  /* Envoie aussi la taille du message pour être capable de le lire
+     par morceaux : */
+  testerreur("pvm_pack", pvm_pkint(&taille, 1, 1));
+  testerreur("pvm_pack", pvm_pkdouble(donnee, taille, 1));
+
+  debug(5, "send_8", "pvm_send de tid 0x%x vers tid 0x%x\n", mytid, tid);
+
+  testerreur("pvm_send", pvm_send(tid, 0));
+}
+
 
 void receive_4(int tid, int proc_or_bank_id, float *donnee, int taille)
 {
@@ -411,6 +419,65 @@ void receive_4(int tid, int proc_or_bank_id, float *donnee, int taille)
   }
 }
 
+void receive_8(int tid, int proc_or_bank_id, double *donnee, int taille)
+{
+  int taille_recue;
+  int buf_id, old_buf;
+
+  debug(5, "receive_8",
+	"pvm_recv de tid 0x%x depuis le tid 0x%x de %d données.\n",
+	mytid, tid, taille);
+
+  if(bufid[proc_or_bank_id] != TAMPON_VIDE) {
+    if (taille_restante[proc_or_bank_id] != 0) {
+      /* Il nous reste des choses à lire dans un ancien tampon. */
+      testerreur("pvm_setrbuf",
+		 old_buf = pvm_setrbuf(bufid[proc_or_bank_id]));
+      if (taille > taille_restante[proc_or_bank_id])
+	sort_erreur("Demande de lire %d données alors qu'il n'en reste que %d !\n",
+		    taille, taille_restante[proc_or_bank_id]);
+      debug(5, "receive_8",
+	    "Lecture ancienne de %d données.\n", taille);
+      testerreur("pvm_unpack", pvm_upkdouble(donnee, taille, 1)); 
+      if ((taille_restante[proc_or_bank_id] -= taille) == 0) {
+	/* Le tampon est vide, on le libère : */
+	testerreur("pvm_freebuf", pvm_freebuf(bufid[proc_or_bank_id]));
+	bufid[proc_or_bank_id] = TAMPON_VIDE;
+
+	debug(5, "receive_8", "Libération du tampon %d...", proc_or_bank_id);
+    }
+
+      debug(5, "receive_8", "Reste %d données dans le tampon %d.\n",
+	    taille_restante[proc_or_bank_id], proc_or_bank_id);      
+    }
+    else {
+      sort_erreur("Inconsistence entre bufid[%s] et taille_restante[%s] !\n",
+		  proc_or_bank_id, proc_or_bank_id);
+    }
+  }
+  else {
+    /* Il nous reste rien à lire, il faut donc faire une « vraie »
+       réception : */
+    testerreur("pvm_recv", buf_id = pvm_recv(tid, 0));
+    testerreur("pvm_unpack", pvm_upkint(&taille_recue, 1, 1));
+    debug(5, "receive_8",
+	  "Nouvelle réception : arrivée de %d données.\n", taille_recue);
+
+    if (taille_recue < taille)
+      sort_erreur("Demande de recevoir %d données alors qu'on n'en n'a reçu que %d !\n",
+		  taille, taille_recue);
+    if (taille_recue != taille) {
+      /* On veut recevoir en plus petits morceaux. */
+      bufid[proc_or_bank_id] = buf_id;
+      taille_restante[proc_or_bank_id] = taille_recue - taille;
+      debug(5, "receive_8",
+	    "Découpe en petit morceaux : reste %d données à lire pour une prochaine fois.\n",
+	    taille_restante[proc_or_bank_id]);
+    }
+    /* Lit déjà ce qu'on veut : */
+    testerreur("pvm_unpack", pvm_upkdouble(donnee, taille, 1));
+  }
+}
 
 void BANK_SEND_4_(int *proc_id, float *donnee, int *taille)
 {
@@ -421,7 +488,15 @@ void BANK_SEND_4_(int *proc_id, float *donnee, int *taille)
   send_4(tids[*proc_id], donnee, *taille);
 }
 
-      
+void BANK_SEND_8_(int *proc_id, double *donnee, int *taille)
+{
+  debug(4, "BANK_SEND_8",
+	"Envoi de banc %d -> PE %d, taille = %d (estampille %d)\n",
+	banc, *proc_id, *taille,
+	estampiller(*proc_id, banc, *taille, 1));
+  send_8(tids[*proc_id], donnee, *taille);
+}
+
 void BANK_RECEIVE_4_(int *proc_id, float *donnee, int *taille)
 {
   debug(4, "BANK_RECEIVE_4",
@@ -431,6 +506,14 @@ void BANK_RECEIVE_4_(int *proc_id, float *donnee, int *taille)
   receive_4(tids[*proc_id], *proc_id, donnee, *taille);
 }
 
+void BANK_RECEIVE_8_(int *proc_id, double *donnee, int *taille)
+{
+  debug(4, "BANK_RECEIVE_8",
+	"Réception de banc %d <- PE %d, taille = %d (estampille %d)\n",
+	banc, *proc_id, *taille,
+	estampiller(*proc_id, banc, *taille, 0));
+  receive_8(tids[*proc_id], *proc_id, donnee, *taille);
+}
 
 void WP65_SEND_4_(int *bank_id, float *donnee, int *taille)
 {
@@ -441,6 +524,15 @@ void WP65_SEND_4_(int *bank_id, float *donnee, int *taille)
   send_4(tids[*bank_id + nb_procs], donnee, *taille);
 }
 
+void WP65_SEND_8_(int *bank_id, double *donnee, int *taille)
+{
+  debug(4, "WP65_SEND_8",
+	"Envoi de PE %d -> banc %d, taille = %d (estampille %d)\n",
+	numero, *bank_id, *taille,
+	estampiller(numero, *bank_id, *taille, 1));
+  send_8(tids[*bank_id + nb_procs], donnee, *taille);
+}
+
 
 void WP65_RECEIVE_4_(int *bank_id, float *donnee, int *taille)
 {
@@ -449,6 +541,15 @@ void WP65_RECEIVE_4_(int *bank_id, float *donnee, int *taille)
 	numero, *bank_id, *taille,
 	estampiller(numero, *bank_id, *taille, 0));
   receive_4(tids[*bank_id + nb_procs], *bank_id, donnee, *taille);
+}
+
+void WP65_RECEIVE_8_(int *bank_id, double *donnee, int *taille)
+{
+  debug(4, "WP65_RECEIVE_8",
+	"Réception de PE %d <- banc %d, taille = %d (estampille %d)\n",
+	numero, *bank_id, *taille,
+	estampiller(numero, *bank_id, *taille, 0));
+  receive_8(tids[*bank_id + nb_procs], *bank_id, donnee, *taille);
 }
 
 int idiv_(int * i, int * j)
