@@ -27,6 +27,7 @@ LIB_CFILES =	replace.c \
 		clone.c \
 		forward_substitution.c \
 		optimize.c \
+		sequence_gcm_cse.c \
 		transformation_test.c 
 
 #		optimize_misc.c
