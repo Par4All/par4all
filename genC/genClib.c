@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/03/17 17:11:28 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/03/20 11:17:55 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -517,11 +517,6 @@ int data ;
 	gen_trav_simple(dlp->domain, obj+data+1, dr);
 	break ;
     }
-	/* well, what's given is *directly* the object,
-	 * not a chunk to the object, otherwise you can't make
-	 * the function works, that is retrieve the needed values...
-	 * FC
-	 */
     case ARROW_OP: 
     {
 	union domain 
