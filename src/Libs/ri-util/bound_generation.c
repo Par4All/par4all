@@ -29,17 +29,15 @@ Pcontrainte pc;
 Variable index;
 {    
     Pvecteur pv;
-    Pvecteur index_element;
     expression ex1,ex2,ex;
     entity div;
     Value coeff;
 
     /*search the couple (var,val) where var is equal to index and extract it */
     pv = vect_dup(pc->vecteur);
-    index_element = vect_dup(vect_elem(pv, index));
+    coeff = vect_coeff(index,pv);
     vect_erase_var(&pv,index);
 
-    coeff = index_element->val;
     if (value_pos_p(coeff)) 
 	vect_chg_sgn(pv);
     else
