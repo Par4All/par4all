@@ -248,6 +248,8 @@ char *argv[];
    /* If we are in the emacs mode, initialize some things: */
    initialize_emacs_mode();
    
+   display_memory_usage();
+
    xv_main_loop(main_frame);
 
    close_log_file();
