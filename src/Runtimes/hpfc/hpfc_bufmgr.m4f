@@ -2,6 +2,9 @@
 ! $Id$
 !
 ! $Log: hpfc_bufmgr.m4f,v $
+! Revision 1.14  1997/05/28 12:46:03  zory
+! replace pvm calls by hpfc subroutines
+!
 ! Revision 1.13  1997/05/02 16:36:18  coelho
 ! global buffer id shared with reception.
 !
@@ -34,12 +37,12 @@ fake_buffers(dnl
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       if (SEND NOT INITIALIZED) then
-         call pvmfinitsend(BUFFER ENCODING, bufid)
+         call HPFC INIT SEND(BUFFER ENCODING, bufid)
          debug(if (bufid.lt.0) 
      $        write (unit=0,fmt=*) "pvm initsend error")
          SEND NOT INITIALIZED=.FALSE.
       endif
-      call pvmfpack(PVMTYPE, build_name(PVMTYPE,BUFF),
+      call HPFC PACK(PVMTYPE, build_name(PVMTYPE,BUFF),
      $     BUFINDEX, 1, info)
       BUFINDEX=0
       end
@@ -66,14 +69,14 @@ fake_buffers(dnl
       if (RECEIVED NOT PERFORMED) then
          debug(write (unit=0, fmt=*) 
      $        "RCV from ", lid, RECVCHANNELS(lid))
-         call pvmfrecv(NODETIDS(lid), RECVCHANNELS(lid), BUFFER ID)
+         call HPFC RECEIVE(NODETIDS(lid), RECVCHANNELS(lid), BUFFER ID)
          RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
          RECEIVED NOT PERFORMED = .FALSE.
          debug(write (unit=0, fmt=*) "RCV done")
       endif
-      call pvmfbufinfo(BUFFER ID, length, tag, tid, info)
+      call HPFC MESSAGE INFO(BUFFER ID, length, tag, tid, info)
       SIZEOFRECEIVEDBUFFER = length / M4_PVM_LENGTH(PVMTYPE)
-      call pvmfunpack(PVMTYPE, build_name(PVMTYPE,BUFF),
+      call HPFC UNPACK(PVMTYPE, build_name(PVMTYPE,BUFF),
      $     SIZEOFRECEIVEDBUFFER, 1, info)
       end
 popdef(`PVMTYPE')')dnl
