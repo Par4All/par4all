@@ -49,7 +49,6 @@ typedef struct Ssysteme {
 	Pbase base;
 	} *Psysteme,Ssysteme;
 
-
 /* - Traitement des overflows :
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~ 
  * Pour ne pas dupliquer trop de fonctions pour le traitement des
