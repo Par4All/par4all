@@ -75,7 +75,7 @@ string  make_open_workspace(string name)
 
 /* FI->GO: could be in top-level, no?
  */
-bool make_close_workspace(void)
+bool make_close_workspace(bool is_quit)
 {
     bool res = TRUE;
     string name;
@@ -88,7 +88,7 @@ bool make_close_workspace(void)
 
     res &= close_makefile(name);
     save_properties();
-    res &= db_close_workspace();
+    res &= db_close_workspace(is_quit);
 
     if(res)
 	user_log("Workspace %s closed.\n\n", name);
