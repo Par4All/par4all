@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/03 22:27:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/21 13:50:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/02/03 22:27:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/04/21 13:50:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -586,10 +586,13 @@ void remove_ghost_variable_entities()
     MAPL(ce, {
 	entity e = ENTITY(CAR(ce));
 
+	/* The debugging message must use the variable name before it is freed */
+	debug(1, "remove_ghost_variable_entities",
+	      "entity '%s'\n",
+	      entity_name(e));
 	remove_variable_entity(e);
-	    debug(1, "remove_ghost_variable_entities",
-		  "entity %s destroyed\n",
-		  entity_name(e));
+	debug(1, "remove_ghost_variable_entities",
+	      " destroyed\n");
 	}, ghost_variable_entities);
 
     ghost_variable_entities = list_undefined;
