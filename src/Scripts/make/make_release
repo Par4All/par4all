@@ -119,8 +119,8 @@ done
 # clean the list of file of obviously useless stuff.
 
 sed '/\/OLD/d;/\/SCCS/d;/\/RCS/d;/~/d;/\.database/d;/\.out$/d;/core/d;
-     /\.pipsprogram/d;/#/d;/\.old$/d;/\.log$/d;/\.dvi$/d;/\.toc$/d;
-     /\.aux$/d;/\/\./d;' \
+     /\.pipsprogram/d;/#/d;/\.old$/d;/\.log$/d;/\.dvi$/d;/\.toc$/d;/\.aux$/d;
+     /\/\./d;/Validation\/.*\/pips$/d;/Validation\/.*\/[twf]pips$/d;' \
     $tmp.tmp | sort -u > $tmp.list
 
 rm -f $tmp.tmp
