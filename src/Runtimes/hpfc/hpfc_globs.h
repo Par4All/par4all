@@ -1,10 +1,10 @@
 !
 ! COMMON /HPFC GLOBS/
 !
-! $RCSfile: hpfc_globs.h,v $ ($Date: 1996/09/07 16:22:33 $, )
-! version $Revision$
-! got on %D%, %T%
 ! $Id$
+! $Log: hpfc_globs.h,v $
+! Revision 1.4  1997/03/20 07:51:13  coelho
+! better RCS headers.
 !
 !
       common /HPFC GLOBS/
