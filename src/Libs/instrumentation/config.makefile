@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: config.makefile,v $
+# Revision 1.9  2002/01/11 12:41:49  nguyen
+# Add new analysis: used_before_set
+#
 # Revision 1.8  2001/05/25 09:49:44  nguyen
 # Add new phases : alias_propagation and alias_check
 # Move to transformation : partial_redundancy_elimination,
@@ -39,7 +42,8 @@ LIB_CFILES 	= \
 	array_bound_check_instrumentation.c \
 	array_bound_check_interprocedural.c \
 	alias_propagation.c \
-	alias_check.c
+	alias_check.c \
+	used_before_set.c
 
 LIB_HEADERS	= instrumentation-local.h
 
