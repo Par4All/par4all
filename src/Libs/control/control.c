@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 2002/07/09 14:58:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2002/10/07 09:56:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2002/07/09 14:58:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2002/10/07 09:56:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -31,6 +31,9 @@ char vcid_control_control[] = "%A% ($Date: 2002/07/09 14:58:20 $, ) version $Rev
  * $Id$
  *
  * $Log: control.c,v $
+ * Revision 1.35  2002/10/07 09:56:41  irigoin
+ * Bug fix in controlize_whileloop(). See Validation/redlec.f
+ *
  * Revision 1.34  2002/07/09 14:58:20  irigoin
  * Function add_proper_successor_to_predecessor() added. Reformatting,
  * comments improved, debugging improved, bug fix in handling of IF
@@ -617,18 +620,21 @@ statement whileloop_test(statement sl)
     string csl = statement_comments(sl);
     /* string prev_comm = empty_comments_p(csl)? "" : strdup(csl); */
     string prev_comm = empty_comments_p(csl)? strdup("") : strdup(csl);
-    string lab = string_undefined;
 
-    if(entity_empty_label_p(whileloop_label(l)))
-	lab = "";
-    else 
-	lab = label_local_name(whileloop_label(l));
-
-    cs = strdup(concatenate(prev_comm,
-			    "C     DO WHILE loop ",
-			    lab,
-			    " with GO TO exit had to be desugared\n",
-			    NULL));
+    if(entity_empty_label_p(whileloop_label(l))) {
+      cs = strdup(concatenate(prev_comm,
+			      "C     DO WHILE loop ",
+			      "with GO TO exit had to be desugared\n",
+			      NULL));
+    }
+    else {
+      string lab = label_local_name(whileloop_label(l));
+      cs = strdup(concatenate(prev_comm,
+			      "C     DO WHILE loop ",
+			      lab,
+			      " with GO TO exit had to be desugared\n",
+			      NULL));
+    }
 
     ts = make_statement(entity_empty_label(), 
 			statement_number(sl),
@@ -690,15 +696,20 @@ hash_table used_labels;
 	control_statement(c_res) = whileloop_test(st);
 	/* control_predecessors(c_res) =
 	   CONS(CONTROL, pred, control_predecessors(c_res)); */
-	ADD_PRED(pred, c_res);
+	/* ADD_PRED(pred, c_res); */
+	control_predecessors(c_res) =
+	   gen_once(pred, control_predecessors(c_res));
 	control_successors(c_res) =
 		CONS(CONTROL, succ, control_successors(c_res));
 	controlized = TRUE ;
-	ifdebug(5) check_control_coherency(c_res);
+	/* Cannot be consistent yet! */
+	/* ifdebug(5) check_control_coherency(c_res); */
     }
     control_predecessors(succ) = ADD_PRED(c_res, succ);
     add_proper_successor_to_predecessor(pred, c_res);
     /* control_successors(pred) = ADD_SUCC(c_res, pred); */
+
+    ifdebug(5) check_control_coherency(c_res);
 
     union_used_labels( used_labels, loop_used_labels);
     hash_table_free(loop_used_labels);
