@@ -122,25 +122,24 @@ static char *tp_help_topics[] =
 };
 
 /************************************************* TPIPS HANDLERS FOR PIPS */
-static void tpips_user_log(char *fmt, va_list args)
+static void 
+tpips_user_log(char *fmt, va_list args)
 {
     FILE * log_file = get_log_file();
 
-    if(log_file!=NULL) {
-	if (vfprintf(log_file, fmt, args) <= 0) {
-	    perror("tpips_user_log");
-	    abort();
-	}
-	else
-	    fflush(log_file);
-    }
-
-    if(get_bool_property("USER_LOG_P")==FALSE)
+    if (!log_file || !get_bool_property("USER_LOG_P"))
 	return;
+
+    if (vfprintf(log_file, fmt, args) <= 0) {
+	perror("tpips_user_log");
+	abort();
+    }
+    else fflush(log_file);
 
     /* It goes to stderr to have only displayed files on stdout */
     /* if no logfile, nowhere. FC. */
-    (void) vfprintf(stderr, fmt, args); fflush(stderr);
+    vfprintf(stderr, fmt, args); 
+    fflush(stderr);
 }
 
 /* Tpips user request */
@@ -262,24 +261,6 @@ static void pwd_handler(char * line)
     user_log("pwd\n");
     fprintf(stdout, "current working directory: %s\n", 
 	    (char*) getwd(pathname));
-}
-
-static void setenv_handler(char * line)
-{
-    user_log("%s\n", line);
-    if (putenv(skip_first_word(line)))
-	fprintf(stderr, "error while changing environment\n");
-}
-
-static void getenv_handler(char * line)
-{
-    char *var = skip_first_word(line), *val = getenv(var);
-    user_log("%s\n", line);
-    if (val)
-	fprintf(stdout, "%s=%s\n", var, val);
-    else
-	fprintf(stdout, "%s is not defined\n", var);
-    
 }
 
 /* was set in the grammar, moved here as setenv.
@@ -552,8 +533,6 @@ static struct t_handler handlers[] =
   { QUIT,		quit_handler },
   { "exit",		exit_handler }, /* exit is a synonymous for quit */
   { CHANGE_DIR, 	cdir_handler },
-  { SET_ENV,		setenv_handler },
-  { GET_ENV, 		getenv_handler },
   { SET_PROP,   	setproperty_handler },
   { "set ",		setproperty_handler }, /* compatibility */
   { SHELL_ESCAPE, 	shell_handler },
@@ -701,7 +680,29 @@ static char * substitute_variables(char * line)
 
 static char * last = NULL;
 
-void tpips_exec(char * line)
+static bool tpips_init_done = FALSE;
+static void 
+tpips_init(void)
+{
+    if (tpips_init_done) return;
+
+    pips_checks();
+
+    initialize_newgen();
+    initialize_sc((char*(*)(Variable))entity_local_name);
+    initialize_signal_catcher();
+
+    set_bool_property("ABORT_ON_USER_ERROR", FALSE); /* ??? */
+
+    pips_log_handler = tpips_user_log;
+    pips_request_handler = tpips_user_request;
+    pips_error_handler = tpips_user_error;
+
+    tpips_init_done = TRUE;
+}
+
+void 
+tpips_exec(char * line)
 {
     jmp_buf pips_top_level;
 
@@ -732,6 +733,16 @@ void tpips_exec(char * line)
 	pips_debug(2, "restarting tpips scanner\n");
 	tp_restart(tp_in);
 	skip_blanks(line);
+
+	/* leading setenv/getenv in a tpips script are performed
+	 * PRIOR to pips initialization, hence the environment variable
+	 * NEWGEN_MAX_TABULATED_ELEMENTS can be taken into account 
+	 * for a run. little of a hack.
+	 */
+	if (!tpips_init_done &&
+	    strncmp(line, SET_ENV, strlen(SET_ENV))!=0 &&
+	    strncmp(line, GET_ENV, strlen(GET_ENV))!=0)
+	    tpips_init();
 	
 	sline = substitute_variables(line);
 	(find_handler(sline))(sline);
@@ -743,7 +754,8 @@ void tpips_exec(char * line)
 
 /* processing command line per line
  */
-static void process_a_file(void)
+static void 
+process_a_file(void)
 {
     static readline_initialized = FALSE;
     char * line;
@@ -763,7 +775,8 @@ static void process_a_file(void)
 	tpips_exec(line);
 }
 
-static void parse_arguments(int argc, char * argv[])
+static void 
+parse_arguments(int argc, char * argv[])
 {
     int c;
     extern char *optarg;
@@ -824,31 +837,14 @@ static void parse_arguments(int argc, char * argv[])
     }
 }
 
-void tpips_init(void)
-{
-    pips_checks();
-
-    initialize_newgen();
-    initialize_sc((char*(*)(Variable))entity_local_name);
-    initialize_signal_catcher();
-
-    set_bool_property("ABORT_ON_USER_ERROR", FALSE);
-
-    pips_log_handler = tpips_user_log;
-    pips_request_handler = tpips_user_request;
-    pips_error_handler = tpips_user_error;
-}
-
 /* MAIN: interactive loop and history management.
  */
-int tpips_main(int argc, char * argv[])
+int 
+tpips_main(int argc, char * argv[])
 {
     debug_on("TPIPS_DEBUG_LEVEL");
-
-    tpips_init();
-
+    pips_log_handler = tpips_user_log;
     parse_arguments(argc, argv);
-
     fprintf(stdout, "\n");	/* for Ctrl-D terminations */
     quit_handler("quit");
     return 0;			/* statement not reached ... */
@@ -859,7 +855,8 @@ int tpips_main(int argc, char * argv[])
  * on command names if this is the first word in the line, or on filenames
  * if not. 
  */
-static void initialize_readline ()
+static void 
+initialize_readline(void)
 {
     /* Allow conditional parsing of the ~/.inputrc file. */
     rl_readline_name = "Tpips";
@@ -878,7 +875,8 @@ static void initialize_readline ()
  * entire line in case we want to do some simple parsing.  Return the
  * array of matches, or NULL if there aren't any. 
  */
-static char **fun_completion(char *texte, int start, int end)
+static char **
+fun_completion(char *texte, int start, int end)
 {
 
     char **matches;
@@ -898,12 +896,12 @@ static char **fun_completion(char *texte, int start, int end)
     return (matches);
 }
 
-/*
- * Generator function for command completion.  STATE lets us know whether
+/* Generator function for command completion.  STATE lets us know whether
  * to start from scratch; without any state (i.e. STATE == 0), then we
  * start at the top of the list. 
  */
-static char *fun_generator(char *texte, int state)
+static char *
+fun_generator(char *texte, int state)
 {
     static int list_index, len;
     char *name;
@@ -930,12 +928,12 @@ static char *fun_generator(char *texte, int state)
     return ((char *)NULL);
 }
 
-/*
- * Generator function for param. completion.  STATE lets us know whether
+/* Generator function for param. completion.  STATE lets us know whether
  * to start from scratch; without any state (i.e. STATE == 0), then we
  * start at the top of the list. 
  */
-static char *param_generator(char *texte, int state)
+static char *
+param_generator(char *texte, int state)
 {
     static int list_index, len;
     char *name;
