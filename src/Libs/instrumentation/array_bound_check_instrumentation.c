@@ -22,15 +22,11 @@
  * effect_on_array_bound.c) because it takes time to calculate the effect
  * but in fact this case is rare. */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "genC.h"
-
 #include "linear.h"
-
 #include "ri.h"
 #include "ri-util.h"
 #include "database.h"
@@ -48,12 +44,10 @@
 static int initial_code_abc_reference(reference r);
 static int initial_code_abc_expression (expression e);
 static int initial_code_abc_call(call cal);
-
 static entity abccount;
 static entity mod_ent;
 
 /* context data structure for array_bound_check_instrumentation newgen recursion */
-
 typedef struct 
 {
   persistant_statement_to_control map;
@@ -68,7 +62,6 @@ typedef struct
 } 
   abc_number_of_operators_context_t, 
 * abc_number_of_operators_context_p;
-
 
 static int initial_code_abc_reference(reference r)
 {  
@@ -96,35 +89,27 @@ static int initial_code_abc_reference(reference r)
 static int initial_code_abc_expression (expression e)
 {
   /* the syntax of an expression can be a reference, a range or a call*/ 
-  int retour = 0;
   if (!expression_implied_do_p(e))
     {
       syntax s = expression_syntax(e);
       tag t = syntax_tag(s);
       switch (t){ 
       case is_syntax_call:  
-	{
-	  retour = initial_code_abc_call(syntax_call(s));
-	  break;
-	}
+	return initial_code_abc_call(syntax_call(s));
       case is_syntax_reference:
-	{ 
-	  retour = initial_code_abc_reference(syntax_reference(s));
-	  break;
-	}
+	return initial_code_abc_reference(syntax_reference(s));
       case is_syntax_range:
 	/* There is nothing to check here*/
-	break;     
+	return 0;
       }
     }    
-  return retour;
+  return 0;
 }
 
 static int initial_code_abc_call(call cal)
 {
   list args = call_arguments(cal);
-  int retour = 0;
-  
+  int retour = 0;  
   while (!ENDP(args))
     {
       expression e = EXPRESSION(CAR(args));
@@ -139,20 +124,19 @@ static statement make_abc_count_statement(int n)
 {  
   expression left = reference_to_expression(make_reference(abccount, NIL));
   expression right = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-						 left,int_to_expression(n));
-
-  statement retour = make_assign_statement(left,right);  
-     
-  return retour;    
+						 left,
+						 int_to_expression(n));
+  return make_assign_statement(left,right);  
 }
  
 statement array_bound_check_display()
 { 
   string message = "      PRINT *,\'Number of bound checks:\', ARRAY_BOUND_CHECK_COUNT\n" ;
-
-  statement retour = make_call_statement(CONTINUE_FUNCTION_NAME,
-					 NIL,entity_undefined,message);
-  return retour;
+  /* Attention : no strdup => newgen error */
+  //  statement retour = make_call_statement(CONTINUE_FUNCTION_NAME,
+  //				 NIL,entity_undefined,message);
+  return  make_call_statement(CONTINUE_FUNCTION_NAME,
+			      NIL,entity_undefined,strdup(message));
 }
 
 static void abc_instrumentation_insert_before_statement(statement s, statement s1,
@@ -162,8 +146,7 @@ static void abc_instrumentation_insert_before_statement(statement s, statement s
      when inserting s1 before s.  */
   if (bound_persistant_statement_to_control_p(context->map, s))
     {
-      /* take the control that  has s as its statement  */
-      
+      /* take the control that  has s as its statement  */      
       control c = apply_persistant_statement_to_control(context->map, s);
       if (stack_size(context->uns)>0)
 	{	
@@ -175,62 +158,48 @@ static void abc_instrumentation_insert_before_statement(statement s, statement s
 	      fprintf(stderr, "Unstructured case: \n");
 	      print_statement(s);
 	    }  
-       
 	  /* for a consistent unstructured, a test must have 2 successors, 
 	     so if s1 is a test, we transform it into sequence in order 
 	     to avoid this constraint. 
-	  
 	     Then we create a new control for it, with the predecessors 
 	     are those of c and the only one successor is c. 
-	     The new predecessors of c are only the new control*/
-	  
+	     The new predecessors of c are only the new control*/	  
 	  if (statement_test_p(s1))
 	    {
 	      list seq = CONS(STATEMENT,s1,NIL);
 	      statement s2=instruction_to_statement(make_instruction(is_instruction_sequence,
-								       make_sequence(seq))); 
-	      
+								       make_sequence(seq))); 	      
 	      newc = make_control(s2, control_predecessors(c), CONS(CONTROL, c, NIL));
 	    }
 	  else 
 	    newc = make_control(s1, control_predecessors(c), CONS(CONTROL, c, NIL));
-
 	  // replace c by  newc as successor of each predecessor of c 
-
 	  MAP(CONTROL, co,
 	  {
 	    MAPL(lc, 
 	    {
 	      if (CONTROL(CAR(lc))==c) CONTROL(CAR(lc)) = newc;
 	    }, control_successors(co));
-	  },control_predecessors(c));
-
-	 
+	  },control_predecessors(c)); 
 	  control_predecessors(c) = CONS(CONTROL,newc,NIL);
-
 	  /* if c is the entry node of the correspond unstructured u, 
 	     the newc will become the new entry node of u */
-	      
 	  if (unstructured_control(u)==c) 
 	    unstructured_control(u) = newc;	 
 	}
       else
-	{
-	  // there is no unstructured (?)
-	  insert_statement(s,s1,TRUE);
-	}
+	// there is no unstructured (?)
+	insert_statement(s,s1,TRUE);
     }
   else
     // structured case 
     insert_statement(s,s1,TRUE);     
 }
 
-
 static void initial_code_abc_statement_rwt(statement s,abc_instrumentation_context_p context )
 { 
   instruction i = statement_instruction(s);
   tag t = instruction_tag(i);  
-
   switch(t){
   case is_instruction_call:
     {	
@@ -240,6 +209,8 @@ static void initial_code_abc_statement_rwt(statement s,abc_instrumentation_conte
 	{       
 	  statement sta = make_abc_count_statement(n);
 	  abc_instrumentation_insert_before_statement(s,sta,context);
+	  message_assert("statement is consistent",
+			 statement_consistent_p(s));
 	}
       if (stop_statement_p(s) || (entity_main_module_p(mod_ent) && return_statement_p(s)) )
 	{
@@ -248,9 +219,10 @@ static void initial_code_abc_statement_rwt(statement s,abc_instrumentation_conte
 	   2. END statement in main program
 	   ( PIPS considers the END statement of MAIN PROGRAM as a RETURN statement)
 	   we display the counter of bound checks before these kinds of statement */
-
 	  statement tmp = array_bound_check_display();
 	  abc_instrumentation_insert_before_statement(s,tmp,context);
+	  message_assert("statement is consistent",
+			 statement_consistent_p(s));
 	}
       break;
     }
@@ -259,14 +231,14 @@ static void initial_code_abc_statement_rwt(statement s,abc_instrumentation_conte
       whileloop wl = instruction_whileloop(i);    
       expression e1 = whileloop_condition(wl);
       int n = initial_code_abc_expression(e1);
-
       /* This code is not correct !
 	 The counting statement must be inserted in the body of the loop !*/
-
       if (n>0)
 	{ 
 	  statement sta = make_abc_count_statement(n);
-	  abc_instrumentation_insert_before_statement(s,sta,context);		     
+	  abc_instrumentation_insert_before_statement(s,sta,context);	
+	  message_assert("statement is consistent",
+			 statement_consistent_p(s));
 	}	 
       break;
     }
@@ -284,18 +256,16 @@ static void initial_code_abc_statement_rwt(statement s,abc_instrumentation_conte
 	      print_statement(sta);
 	      print_statement(s);
 	    }
-
-	  /* bug Example abc_ins.f : there is STOP statement in the branch of if statement
-	     
+	  /* bug Example abc_ins.f : there is STOP statement in the branch of if statement	     
 	     IF (A(1).GE.L)
 	       ...
 	       STOP
 	     ENDIF
 	     free_instruction(s) in insert_statement will be not consistent => core dumped 
 	     Solution : like pips_code_abc_statement_rwt */
-
-
-	  abc_instrumentation_insert_before_statement(s,sta,context);	           
+	  abc_instrumentation_insert_before_statement(s,sta,context);	  
+	  message_assert("statement is consistent",
+			 statement_consistent_p(s));
 	}	
       break;
     }
@@ -349,7 +319,6 @@ static int  number_of_logical_operators(expression e)
 		      expression_domain,
 		      number_of_operators_flt,
 		      gen_null);
-  //  fprintf(stderr, "num= %d \n",context.number );
   return context.number;
 }
 
@@ -357,7 +326,6 @@ static void pips_code_abc_statement_rwt(statement s, abc_instrumentation_context
 { 
   instruction i = statement_instruction(s);
   tag t = instruction_tag(i);  
-
   switch(t){
   case is_instruction_test:
     {
@@ -366,24 +334,18 @@ static void pips_code_abc_statement_rwt(statement s, abc_instrumentation_context
       if (abc_bound_violation_stop_statement_p(true_branch))
 	{
 	  /* s is a bound check generated by PIPS which has this form:
-     
 	     IF (e) THEN
 	        STOP "Bound violation ...."
 	     ENDIF
-	     
 	     we replace it by:
-
 	     ARRAY_BOUND_CHECK_COUNT = ARRAY_BOUND_CHECK_COUNT + n
 	     IF (e) THEN
 	        PRINT *,'Number of bound checks : ', ARRAY_BOUND_CHECK_COUNT
 	        STOP "Bound violation ...."
-	     ENDIF */
-	  
+	     ENDIF */	  
 	  expression e = test_condition(it);
 	  int n = number_of_logical_operators(e);
-	  //  fprintf(stderr, " number of logical op  %i \n", n);
-	  statement sta = make_abc_count_statement(n);  
-	  
+	  statement sta = make_abc_count_statement(n);  	  
 	  statement s1 = array_bound_check_display();
 	  list ls1 = CONS(STATEMENT,s1,CONS(STATEMENT,true_branch,NIL));	
 	  list ls2;
@@ -405,9 +367,7 @@ static void pips_code_abc_statement_rwt(statement s, abc_instrumentation_context
 	   2. END statement in main program
 	   ( PIPS considers the END statement of MAIN PROGRAM as a RETURN statement)
 	   we display the counter of bound checks before these kinds of statement 
-
 	   The case of STOP "Bound violation" is done separately */
-	  
 	  statement tmp = array_bound_check_display();
 	  abc_instrumentation_insert_before_statement(s,tmp,context);
 	}
@@ -476,13 +436,11 @@ static void  pips_code_abc_statement(statement module_statement)
 }
 
 
-bool nga_array_bound_check_instrumentation(char *module_name)
+bool array_bound_check_instrumentation(char *module_name)
 { 
-  statement module_statement;
-  
+  statement module_statement;  
   /* add COMMON ARRAY_BOUND_CHECK_COUNT to the declaration
      if main program : DATA ARRAY_BOUND_CHECK_COUNT 0*/
-
   string new_decl = 
     "      INTEGER*8 ARRAY_BOUND_CHECK_COUNT\n"
     "      COMMON /ARRAY_BOUND_CHECK/ ARRAY_BOUND_CHECK_COUNT\n";
@@ -490,39 +448,28 @@ bool nga_array_bound_check_instrumentation(char *module_name)
     "      DATA ARRAY_BOUND_CHECK_COUNT /0/\n";
   string old_decl;
   basic b = make_basic_int(8);
-
   set_current_module_entity(local_name_to_top_level_entity(module_name));
-
   mod_ent =  get_current_module_entity();
-
   abccount = make_scalar_entity(ABC_COUNT,module_name,b);
-      
   old_decl = code_decls_text(entity_code(mod_ent));
- 
+  // user_log("Old declaration = %s\n", code_decls_text(entity_code(mod_ent)));  
   if (entity_main_module_p(mod_ent))
     // MAIN PROGRAM 
     code_decls_text(entity_code(mod_ent))
       = strdup(concatenate(old_decl, new_decl, new_decl_init,NULL));
   else 
     code_decls_text(entity_code(mod_ent)) 
-      = strdup(concatenate(old_decl, new_decl, NULL));
-  
-  free(old_decl), old_decl = NULL;
-  
-  //   fprintf(stderr, "NEW = %s\n", code_decls_text(entity_code(mod_ent)));
-  
+      = strdup(concatenate(old_decl, new_decl, NULL));  
+  free(old_decl), old_decl = NULL; 
+  // user_log("New declaration = %s\n", code_decls_text(entity_code(mod_ent)));  
+  //   fprintf(stderr, "NEW = %s\n", code_decls_text(entity_code(mod_ent)));  
   /* Begin the array bound check instrumentation phase. 
-   * Get the code from dbm (true resource) */
-  
+   * Get the code from dbm (true resource) */  
   module_statement= (statement) 
-    db_get_memory_resource(DBR_CODE, module_name, TRUE);
-  
-  set_current_module_statement(module_statement);
- 
-  initialize_ordering_to_statement(module_statement);
-      
-  debug_on("ARRAY_BOUND_CHECK_INSTRUMENTATION_DEBUG_LEVEL");
-  
+    db_get_memory_resource(DBR_CODE, module_name, TRUE);  
+  set_current_module_statement(module_statement); 
+  initialize_ordering_to_statement(module_statement);      
+  debug_on("ARRAY_BOUND_CHECK_INSTRUMENTATION_DEBUG_LEVEL");  
   if (get_bool_property("INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION"))   
     {
       // instrument the initial code 
@@ -538,9 +485,7 @@ bool nga_array_bound_check_instrumentation(char *module_name)
        * array references in new loops added*/
       
       // rewrite_implied_do(module_statement);     
-      
-      /* Reorder the module, because new loops have been added */
-      
+      /* Reorder the module, because new loops have been added */      
       // module_reorder(module_statement);
       ifdebug(1)
 	{
@@ -548,8 +493,7 @@ bool nga_array_bound_check_instrumentation(char *module_name)
 		"Begin for %s\n", module_name);
 	  pips_assert("Statement is consistent ...", 
 		      statement_consistent_p(module_statement));
-	}  
-	
+	}  	
       initial_code_abc_statement(module_statement);
     }
   if (get_bool_property("PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION"))
@@ -563,12 +507,9 @@ bool nga_array_bound_check_instrumentation(char *module_name)
 	}      
       
       pips_code_abc_statement(module_statement);
-    }
-  
-  /* Reorder the module, because new statements have been added */
-  
-  module_reorder(module_statement);
-  
+    }  
+  /* Reorder the module, because new statements have been added */  
+  module_reorder(module_statement);  
   ifdebug(1)
     {
       pips_assert("Statement is consistent ...", 
@@ -576,53 +517,17 @@ bool nga_array_bound_check_instrumentation(char *module_name)
       debug(1, "Array bound check instrumentation","End for %s\n", module_name);
     }
   debug_off(); 
-  
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name),module_statement);
-
+  reset_ordering_to_statement();
   reset_current_module_statement();
-  
   reset_current_module_entity();
-      
   return TRUE;
- 
 }
 
 
-bool array_bound_check_instrumentation(char *module_name)
-{
-  entity module_ent = local_name_to_top_level_entity(module_name);
-  list l_decl = code_declarations(entity_code(module_ent));
 
-  debug_on("ALIAS_DEBUG_LEVEL");
-  fprintf(stderr, " \n Begin  alias analysis  for %s \n", module_name);   
-  
-  while(!ENDP(l_decl))
-    {
-      entity e = ENTITY(CAR(l_decl));
-      if (entity_variable_p(e))
-	{
-	  variable v = type_variable(entity_type(e));   
-	  storage s = entity_storage(e);
-	  if (storage_ram_p(s)) 
-	    {
-	      ram r = storage_ram(s);
-	      list l = ram_shared(r);
-	      if (!ENDP(l))
-		{
-		  fprintf(stderr," \n The following variable : ");
-		  fprintf(stderr, "%s ", entity_name(e));
-		  fprintf(stderr,"  has the list of aliased variables : ");
-		  my_print_list_entities(l);
-		}
-	    }
-	}
-      l_decl = CDR(l_decl);
-    }
 
-  fprintf(stderr, " \n End  alias analysis for %s \n", module_name);
-  debug_off();
-  return TRUE; 
-}
+
 
 
 
