@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1996/07/23 11:59:17 $, ) 
+ * ($Date: 1996/09/07 15:40:27 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -137,65 +137,65 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* Run-time support functions and subroutine names
  */
-#define SND_TO_C        "HPFC_SNDTO_C"
-#define SND_TO_H        "HPFC_SNDTO_H"
-#define SND_TO_A        "HPFC_SNDTO_A"
-#define SND_TO_A_BY_H   "HPFC_HSNDTO_A"
-#define SND_TO_O        "HPFC_SNDTO_O"
-#define SND_TO_OS       "HPFC_SNDTO_OS"
-#define SND_TO_OOS      "HPFC_SNDTO_OOS"
-#define SND_TO_HA       "HPFC_SNDTO_HA"
-#define SND_TO_NO       "HPFC_SNDTO_NO"
-#define SND_TO_HNO      "HPFC_SNDTO_HNO"
+#define SND_TO_C        "HPFC SNDTO C"
+#define SND_TO_H        "HPFC SNDTO H"
+#define SND_TO_A        "HPFC SNDTO A"
+#define SND_TO_A_BY_H   "HPFC HSNDTO A"
+#define SND_TO_O        "HPFC SNDTO O"
+#define SND_TO_OS       "HPFC SNDTO OS"
+#define SND_TO_OOS      "HPFC SNDTO OOS"
+#define SND_TO_HA       "HPFC SNDTO HA"
+#define SND_TO_NO       "HPFC SNDTO NO"
+#define SND_TO_HNO      "HPFC SNDTO HNO"
 
-#define RCV_FR_S        "HPFC_RCVFR_S"
-#define RCV_FR_H        "HPFC_RCVFR_H"
-#define RCV_FR_C        "HPFC_RCVFR_C"
-#define RCV_FR_mCS      "HPFC_RCVFR_mCS"
-#define RCV_FR_mCH      "HPFC_RCVFR_mCH"
+#define RCV_FR_S        "HPFC RCVFR S"
+#define RCV_FR_H        "HPFC RCVFR H"
+#define RCV_FR_C        "HPFC RCVFR C"
+#define RCV_FR_mCS      "HPFC RCVFR mCS"
+#define RCV_FR_mCH      "HPFC RCVFR mCH"
 
 #define CMP_COMPUTER    "HPFC_CMPCOMPUTER"
-#define CMP_OWNERS      "HPFC_CMPOWNERS"
-#define CMP_NEIGHBOUR   "HPFC_CMPNEIGHBOUR"
-#define CMP_LID		"HPFC_CMPLID"
+#define CMP_OWNERS      "HPFC CMPOWNERS"
+#define CMP_NEIGHBOUR   "HPFC CMPNEIGHBOUR"
+#define CMP_LID		"HPFC CMPLID"
 
-#define TWIN_P		"HPFC_TWIN_P"
+#define TWIN_P		"HPFC TWIN P"
 
-#define CND_SENDERP     "HPFC_SENDERP"
-#define CND_OWNERP      "HPFC_OWNERP"
-#define CND_COMPUTERP   "HPFC_COMPUTERP"
-#define CND_COMPINOWNP  "HPFC_COMPUTERINOWNERSP"
+#define CND_SENDERP     "HPFC SENDERP"
+#define CND_OWNERP      "HPFC OWNERP"
+#define CND_COMPUTERP   "HPFC COMPUTERP"
+#define CND_COMPINOWNP  "HPFC COMPUTERINOWNERSP"
 
-#define LOCAL_IND       "HPFC_LOCALIND"
-#define LOCAL_IND_GAMMA "HPFC_LOCALINDGAMMA"
-#define LOCAL_IND_DELTA "HPFC_LOCALINDDELTA"
+#define LOCAL_IND       "HPFC LOCALIND"
+#define LOCAL_IND_GAMMA "HPFC LOCALINDGAMMA"
+#define LOCAL_IND_DELTA "HPFC LOCALINDDELTA"
 
-#define INIT_NODE       "HPFC_INIT_NODE"
-#define INIT_HOST       "HPFC_INIT_HOST"
-#define NODE_END        "HPFC_NODE_END"
-#define HOST_END        "HPFC_HOST_END"
+#define INIT_NODE       "HPFC INIT NODE"
+#define INIT_HOST       "HPFC INIT HOST"
+#define NODE_END        "HPFC NODE END"
+#define HOST_END        "HPFC HOST END"
 
-#define LOOP_BOUNDS     "HPFC_LOOP_BOUNDS"
-#define SYNCHRO		"HPFC_SYNCHRO"
-#define IDIVIDE		"HPFC_DIVIDE"
+#define LOOP_BOUNDS     "HPFC LOOP BOUNDS"
+#define SYNCHRO		"HPFC SYNCHRO"
+#define IDIVIDE		"HPFC DIVIDE"
 
-#define SND_TO_N        "HPFC_SNDTO_N"
-#define RCV_FR_N        "HPFC_RCVFR_N"
+#define SND_TO_N        "HPFC SNDTO N"
+#define RCV_FR_N        "HPFC RCVFR N"
 
 /* hpfc packing and unpacking
  */
-#define BUFPCK		"_HPFC_BUFPCK"
-#define BUFUPK		"_HPFC_BUFUPK"
+#define BUFPCK		" HPFC BUFPCK"
+#define BUFUPK		" HPFC BUFUPK"
 
-#define BROADCAST	"HPFC_BROADCAST_"
-#define GUARDED_BRD	"HPFC_REMAPBRD_"
+#define BROADCAST	"HPFC BROADCAST "
+#define GUARDED_BRD	"HPFC REMAPBRD "
 
 /* special FCD calls.
  */
-#define HOST_TIMEON	"HPFC_HTIMEON"
-#define NODE_TIMEON	"HPFC_NTIMEON"
-#define HOST_TIMEOFF	"HPFC_HTIMEOFF"
-#define NODE_TIMEOFF	"HPFC_NTIMEOFF"
+#define HOST_TIMEON	"HPFC HTIMEON"
+#define NODE_TIMEON	"HPFC NTIMEON"
+#define HOST_TIMEOFF	"HPFC HTIMEOFF"
+#define NODE_TIMEOFF	"HPFC NTIMEOFF"
 
 #define RENAME_SUFFIX	"_rename"
 
@@ -237,23 +237,23 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* common /hpfc_buffers/
  */
-#define BUFFER		"_BUFF"
-#define BUFSZ		"_BUFFSIZE"
-#define BUFFER_INDEX	"BUFINDEX"
-#define BUFFER_SIZE	"SIZEOFBUFFER"
-#define BUFFER_RCV_SIZE	"SIZEOFRECEIVEDBUFFER"
-#define LAZY_SEND	"LAZY_SEND"
-#define LAZY_RECV	"LAZY_RECV"
-#define SND_NOT_INIT	"SEND_NOT_INITIALIZED"
-#define RCV_NOT_PRF	"RECEIVED_NOT_PERFORMED"
-#define BUFFER_ENCODING	"BUFFER_ENCODING"
+#define BUFFER		" BUFF"
+#define BUFSZ		" BUFF SIZE"
+#define BUFFER_INDEX	"BUF INDEX"
+#define BUFFER_SIZE	"SIZE OF BUFFER"
+#define BUFFER_RCV_SIZE	"SIZE OF RECEIVED BUFFER"
+#define LAZY_SEND	"LAZY SEND"
+#define LAZY_RECV	"LAZY RECV"
+#define SND_NOT_INIT	"SEND NOT INITIALIZED"
+#define RCV_NOT_PRF	"RECEIVED NOT PERFORMED"
+#define BUFFER_ENCODING	"BUFFER ENCODING"
 
 /* Variables
  */
-#define T_LID		"T_LID"
-#define T_LIDp		"T_LIDp"
-#define INFO		"HPFC_INFO"
-#define BUFID		"HPFC_BUFID"
+#define T_LID		"T LID"
+#define T_LIDp		"T LIDp"
+#define INFO		"HPFC INFO"
+#define BUFID		"HPFC BUFID"
 
 /*************************************************************** PROPERTY */
 
