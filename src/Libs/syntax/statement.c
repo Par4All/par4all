@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.48  1998/11/27 14:59:38  irigoin
+ * MakeIoInstA() is reformatted and modified because UNIT is not a mandatory
+ * field for INQUIRE.
+ *
  * Revision 1.47  1998/11/09 16:33:56  keryell
  * Added a copy_expression to avoid a false sharing in assigned gotos.
  *
@@ -1371,8 +1375,8 @@ MakeEndifInst()
     }
 
     if (iPrevComm != 0) {
-      /* generate a CONTINUE to carry the comments */
-      LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+	/* generate a CONTINUE to carry the comments */
+	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
     }
 
     if (BlockStack[CurrentBlock-1].l != NULL &&
@@ -1477,17 +1481,17 @@ int token;
 statement 
 make_check_io_statement(string n, expression u, entity l)
 {
-  entity a = global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, n);
-  reference r = make_reference(a, CONS(EXPRESSION, u, NIL));
-  expression c = reference_to_expression(r);
-  statement b = instruction_to_statement(make_goto_instruction(l));
-  instruction t = make_instruction(is_instruction_test,
-				   make_test(c, b, make_empty_block_statement()));
-  statement check = instruction_to_statement(t);
+    entity a = global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, n);
+    reference r = make_reference(a, CONS(EXPRESSION, u, NIL));
+    expression c = reference_to_expression(r);
+    statement b = instruction_to_statement(make_goto_instruction(l));
+    instruction t = make_instruction(is_instruction_test,
+				     make_test(c, b, make_empty_block_statement()));
+    statement check = instruction_to_statement(t);
 
-  statement_consistent_p(check);
+    statement_consistent_p(check);
 
-  return check;
+    return check;
 }
 
 /* this function creates an IO statement. keyword indicates which io
@@ -1505,15 +1509,15 @@ int keyword;
 cons *lci;
 cons *lio;
 {
-  cons *l;
-  /* The composite IO with potential branches for ERR and END */
-  instruction io = instruction_undefined;
-  /* The pure io itself */
-  instruction io_call = instruction_undefined;
-  /* virtual tests to implement ERR= and END= clauses */
-  statement io_err = statement_undefined;
-  statement io_end = statement_undefined;
-  expression unit = expression_undefined;
+    cons *l;
+    /* The composite IO with potential branches for ERR and END */
+    instruction io = instruction_undefined;
+    /* The pure io itself */
+    instruction io_call = instruction_undefined;
+    /* virtual tests to implement ERR= and END= clauses */
+    statement io_err = statement_undefined;
+    statement io_end = statement_undefined;
+    expression unit = expression_undefined;
 
     for (l = lci; l != NULL; l = CDR(CDR(l))) {
 	syntax s1;
@@ -1524,7 +1528,7 @@ cons *lio;
 	e1 = call_function(syntax_call(s1));
 
 	if (strcmp(entity_local_name(e1), "UNIT=") == 0) {
-	  unit = copy_expression(EXPRESSION(CAR(CDR(l))));
+	    unit = copy_expression(EXPRESSION(CAR(CDR(l))));
 	}
     }
 
@@ -1542,7 +1546,7 @@ cons *lio;
 	e1 = call_function(syntax_call(s1));
 	pips_assert("MakeIoInstA", value_constant_p(entity_initial(e1)));
 	pips_assert("MakeIoInstA", 
-	       constant_litteral_p(value_constant(entity_initial(e1))));
+		    constant_litteral_p(value_constant(entity_initial(e1))));
 
 	if (strcmp(entity_local_name(e1), "ERR=") == 0 || 
 	    strcmp(entity_local_name(e1), "END=") == 0 ||
@@ -1553,25 +1557,32 @@ cons *lio;
 		    if (constant_int_p(value_constant(entity_initial(e2)))) {
 			/* here is a label */
 			call_function(syntax_call(s2)) = 
-				MakeLabel(entity_local_name(e2));
+			    MakeLabel(entity_local_name(e2));
 		    }
 		}
 		e2 = call_function(syntax_call(s2));
+		if (strcmp(entity_local_name(e1), "FMT=") != 0
+		    && expression_undefined_p(unit)) {
+		    /* UNIT is not defined for INQUIRE (et least)
+		     * Let's use LUN 0 by default for END et ERR.
+		     */
+		    unit = int_to_expression(0);
+		}
 		if (strcmp(entity_local_name(e1), "ERR=") == 0) {
-		  io_err = make_check_io_statement(IO_ERROR_ARRAY_NAME, unit, e2);
+		    io_err = make_check_io_statement(IO_ERROR_ARRAY_NAME, unit, e2);
 		}
 		else if (strcmp(entity_local_name(e1), "END=") == 0) {
-		  io_end = make_check_io_statement(IO_EOF_ARRAY_NAME, unit, e2);
+		    io_end = make_check_io_statement(IO_EOF_ARRAY_NAME, unit, e2);
 		}
 	    }
 	}
     }
 
     /*
-    for (l = lci; CDR(l) != NULL; l = CDR(l)) ;
+      for (l = lci; CDR(l) != NULL; l = CDR(l)) ;
 
-    CDR(l) = lio;
-    l = lci;
+      CDR(l) = lio;
+      l = lci;
     */
 
     lci = gen_nconc(lci, lio);
@@ -1581,19 +1592,19 @@ cons *lio;
 					 lci));
 
     if(statement_undefined_p(io_err) && statement_undefined_p(io_end)) {
-      io = io_call;
+	io = io_call;
     }
     else {
-      list ls = NIL;
-      if(!statement_undefined_p(io_err)) {
-	ls = CONS(STATEMENT, io_err, ls);
-      }
-      if(!statement_undefined_p(io_end)) {
-	ls = CONS(STATEMENT, io_end, ls);
-      }
-      ls = CONS(STATEMENT, MakeStatement(entity_empty_label(), io_call), ls);
-      io = make_instruction(is_instruction_sequence, make_sequence(ls));
-      instruction_consistent_p(io);
+	list ls = NIL;
+	if(!statement_undefined_p(io_err)) {
+	    ls = CONS(STATEMENT, io_err, ls);
+	}
+	if(!statement_undefined_p(io_end)) {
+	    ls = CONS(STATEMENT, io_end, ls);
+	}
+	ls = CONS(STATEMENT, MakeStatement(entity_empty_label(), io_call), ls);
+	io = make_instruction(is_instruction_sequence, make_sequence(ls));
+	instruction_consistent_p(io);
     }
     
     return io;
