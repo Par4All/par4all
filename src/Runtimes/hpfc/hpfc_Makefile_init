@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/08/31 18:14:11 $, )
+# ($Date: 1996/09/01 21:39:16 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -274,11 +274,15 @@ param_init.f: param_init.m4
 #
 # Link
 
+# also insures that a directive is there only once? should be ok?
+# what about continuations?
 # LDI: Link eDitor I/O (host & source)
 # LDP: Link eDitor Pure (all)
 
-LDI:=$(shell echo $(shell sed -n 's/^![Ll][Dd][Ii].//p' $(TARGET).f))
-LDP:=$(shell echo $(shell sed -n 's/^![Ll][Dd][Pp].//p' $(TARGET).f))
+LDI:=$(shell echo $(shell sed -n 's/^[Cc!\*][Ll][Dd][Ii].//p' $(TARGET).f | \
+		sort -u))
+LDP:=$(shell echo $(shell sed -n 's/^[Cc!\*][Ll][Dd][Pp].//p' $(TARGET).f | \
+		sort -u))
 
 $(HOST):  $(HEADERS) $(COMMON_OFILES) $(HOST_OFILES)
 	$(FC) $(FFLAGS) -o $(HOST) \
