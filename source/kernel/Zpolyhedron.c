@@ -1,4 +1,5 @@
 #include <polylib/polylib.h> 
+#include <stdlib.h>
 
 static ZPolyhedron * ZPolyhedronIntersection(ZPolyhedron *, ZPolyhedron *);
 static ZPolyhedron *ZPolyhedron_Copy(ZPolyhedron *A);
