@@ -8,7 +8,8 @@ INSTALL_SHR =	pips-deal-with-include \
 		pips-unsplit-workspace \
 		subroutine_callgraph_level.pl \
 		normalisation.pl \
-		replace_file_name.pl
+		replace_file_name.pl \
+		insert_alias_checks_in_source.pl
 
 UTL_SCRIPTS = 	filter_verbatim \
 		job-make \
