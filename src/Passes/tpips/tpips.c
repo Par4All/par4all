@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.79  1997/12/05 13:28:37  coelho
+ * capply stuff added.
+ *
  * Revision 1.78  1997/12/02 17:47:13  coelho
  * don't initialize of blank or comment line...
  *
@@ -37,8 +40,9 @@
 #include "constants.h"
 #include "resources.h"
 #include "pipsmake.h"
-
+#include "preprocessor.h"
 #include "top-level.h"
+
 #include "tpips.h"
 #include "completion_list.h"
 
@@ -116,6 +120,7 @@ static struct t_completion_scheme completion_scheme[] =
 { "module",     COMP_NONE,       COMP_NONE },
 { "make",       COMP_RESOURCE,   COMP_NONE },
 { "apply",      COMP_RULE,       COMP_NONE },
+{ "capply",      COMP_RULE,       COMP_NONE },
 { "display",    COMP_FILE_RSC,   COMP_NONE },
 { "activate",   COMP_RULE,       COMP_NONE },
 { SET_ENV,	COMP_NONE,	 COMP_NONE },
@@ -288,6 +293,11 @@ tpips_help(string line)
 	 "\t\t apply HPFC_CLOSE(my_module)"
 	 "\t\t apply PRINT_CODE($ALL)\n"
 	 "\t\t apply PRINT_ICFG($CALLEES)\n");
+    TP_HELP("capply", "capply    <rulename[(OWNER)]>\n",
+	 "\tconcurrently apply a transformation rule\n"
+	 "\n\tExamples:\n\n"
+	 "\t\t apply SUPPRESS_DEAD_CODE($ALL)\n"
+	 "\t\t apply PARTIAL_EVAL($CALLEES)\n");
     TP_HELP("display", "display  <resourcename[(OWNER)]>\n",
 	 "\tprint a resource\n"
 	 "\n\tExamples:\n\n"
