@@ -2,7 +2,7 @@
  * Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1995/03/13 17:33:22 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1995/03/13 17:44:44 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -63,8 +63,10 @@ int dim, side, width;
     overlap o;
     int current;
 
+    assert(dim>0);
+
     if (entity_overlaps_undefined_p(ent)) create_overlaps(ent);
-    o = OVERLAP(gen_nth(dim, overlaps_dimensions(load_entity_overlaps(ent))));
+    o = OVERLAP(gen_nth(dim-1, overlaps_dimensions(load_entity_overlaps(ent))));
 
     if (side) /* upper */
     {
@@ -89,8 +91,10 @@ int dim, side;
 {
     overlap o;
 
+    assert(dim>0);
+
     if (entity_overlaps_undefined_p(ent)) create_overlaps(ent);
-    o = OVERLAP(gen_nth(dim, overlaps_dimensions(load_entity_overlaps(ent))));
+    o = OVERLAP(gen_nth(dim-1, overlaps_dimensions(load_entity_overlaps(ent))));
     return(side ? overlap_upper(o) : overlap_lower(o));
 }
 
