@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/10/24 13:38:40 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/12/10 10:26:43 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -90,7 +90,7 @@ static int disallow_undefined_tabulated = TRUE ;
   message_assert("gen_read_spec not performed prior to use", \
 		 Read_spec_performed);
 
-#define newgen_free(p) (*(char*)(p)='\0', free(p))
+#define newgen_free(p) free(p)
 
 /* DOMAIN_INDEX returns the index in the Domain table for object OBJ.
  */
@@ -1715,9 +1715,9 @@ string init, s, end ;
    according to the format, else recurse. */
 
 static int
-write_leaf_in( obj, bp )
-gen_chunk *obj ;
-struct gen_binding *bp ;
+write_leaf_in(
+    gen_chunk *obj,
+    struct gen_binding *bp)
 {
     if( IS_TABULATED( bp )) {
 	if( obj->p == gen_chunk_undefined ) {
@@ -1809,18 +1809,18 @@ union domain *dp ;
 /* WRITE_ARRAY_LEAF only writes non-null elements, in a sparse way. */
 
 static void
-write_array_leaf( bp, i, obj, dr )
-struct gen_binding *bp ;
-int i ;
-gen_chunk *obj ;
-struct driver *dr ;
+write_array_leaf( 
+    struct gen_binding *bp,
+    int i,
+    gen_chunk *obj,
+    struct driver *dr)
 {
     if( IS_INLINABLE( bp ) || IS_EXTERNAL( bp )) {
 	gen_trav_leaf( bp, obj, dr ) ;
     }
-    else if( obj->p != gen_chunk_undefined ) {
+    else if( obj->p != gen_chunk_undefined ) 
+    {
 	fprintf( user_file, "%d ", i ) ;
-	    
 	gen_trav_leaf( bp, obj, dr ) ;
     }
 }
@@ -1830,9 +1830,9 @@ struct driver *dr ;
 
 /*ARGSUSED*/
 static void
-write_simple_out( obj, dp )
-gen_chunk *obj ;
-union domain *dp ;
+write_simple_out(
+    gen_chunk *obj,
+    union domain *dp)
 {
     switch( dp->ba.type ) {
     case SET_DT:
@@ -1916,9 +1916,9 @@ gen_chunk *obj ;
    then recurse. */
 
 static int
-write_tabulated_leaf_in( obj, bp )
-gen_chunk *obj ;
-struct gen_binding *bp ;
+write_tabulated_leaf_in(
+    gen_chunk *obj, 
+    struct gen_binding *bp)
 {
     if( IS_TABULATED( bp )) {
 	int number ;
@@ -1934,13 +1934,18 @@ struct gen_binding *bp ;
 
 	/* fprintf(stderr, "writing %d %s\n", number, (obj->p+HASH_OFFSET)->s);
 	 */
-	if( number >= 0 ) {
+	if( number >= 0 ) 
+	{
 	    (void) fprintf( user_file ,"#]def %d \"%d%c", 
 		     bp->index, bp-Domains, HASH_SEPAR ) ;
 	    write_string( "", (obj->p+HASH_OFFSET)->s, "\" " ) ;
 	    
-	    /* once written the domain number sign is inverted... */ 
-	    (obj->p+1)->i = - (obj->p+1)->i ; 
+	    /* once written the domain number sign is inverted,
+	     * to tag the object has been written, so that
+	     * its definition is not written twice on disk. The second
+	     * time a simple reference is written instead. FC.
+	     */ 
+	    (obj->p+1)->i = - (obj->p+1)->i ;
 	    return( GO) ;
 	}
     }
@@ -1955,14 +1960,17 @@ gen_write_tabulated( fd, domain )
 FILE *fd ;
 int domain ;
 {
-    int index =  Domains[ domain ].index ;
+    int index =  Domains[ domain ].index, i, size;
     gen_chunk *fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof( gen_chunk ),
-				0,
+				0, 
 				Tabulated_bp-Domains,
 			        Gen_tabulated_[ index ] ) ;
     struct driver dr ;
+    gen_chunk * t;
 
     check_read_spec_performed();
+
+    size = max_tabulated_elements();
 
     Tabulated_bp->domain->ar.element = &Domains[ domain ] ;
     dr.null = write_null ;
@@ -1976,16 +1984,21 @@ int domain ;
     user_file = fd ;
 
     push_gen_trav_env() ;
-
     shared_pointers( fake_obj, FALSE ) ;
-    (void) fprintf(fd, "%d %d %d ", 
-		   domain, max_tabulated_elements(), shared_number ) ;
+    fprintf(fd, "%d %d %d ", domain, size, shared_number) ;
     gen_trav_obj( fake_obj, &dr ) ;
-
     pop_gen_trav_env() ;
 
     newgen_free((char *) fake_obj ) ;
-    return( domain ) ;
+
+    /* restore the index sign which was changed to tag it as seen.
+     */
+    t = Gen_tabulated_[index];
+    for (i=0; i<size; i++)
+	if (t[i].p && !gen_chunk_undefined_p(t[i].p)) 
+	    if ((t[i].p+1)->i<0) (t[i].p+1)->i = -(t[i].p+1)->i;
+
+    return domain;
 }
 
 
