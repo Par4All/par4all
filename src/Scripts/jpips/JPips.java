@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: JPips.java,v $
+ * Revision 1.3  1998/07/03 11:55:17  coelho
+ * workspace menu moved to workspace.
+ *
  * Revision 1.2  1998/07/01 15:55:22  coelho
  * jpips.menus property used for the menus file.
  *
@@ -37,28 +40,31 @@ public class JPips
 {
 
 
-  public final	String	source = "jpips.menus",	//the parsed text for the menu
-			TOP_MENU = "TOP_MENU";	//tag to delimit a menu
+  static public final String	
+      source = "jpips.menus",	//the parsed text for the menu
+      TOP_MENU = "TOP_MENU";	//tag to delimit a menu
 
   public DirectoryManager	directoryManager;	//manages the directory
   public WorkspaceManager	workspaceManager;	//manages the workspace
   public ModuleManager		moduleManager;		//manages the modules
   
-  public TPips		tpips;		//tpips instance
-  public TextDisplayer 	textDisplayer;	//regulates the displayed windows
-  public Vector		optionVector;	//contains the components for JPips
+  public TPips		tpips;		// tpips instance
+  public TextDisplayer 	textDisplayer;	// regulates the displayed windows
+  public Vector		optionVector;	// contains the components for JPips
 			
-  public PMenuBar	menu;		//menu of JPips
+  public PMenuBar	menu;		// menu of JPips
 
-  public static boolean	console;	//notifies the use of a console
-  public static	PFrame	frame;		//main frame
-  
-  public static String	title = "JPips",
-			noConsole = "-n";
+  static public boolean	console;	// notifies the use of a console
+  static public	PFrame	frame;		// main frame
 
-  
-  
-  
+  public PPanel		filePanel;      // main panel...
+  public PMenuBar 	mb;
+
+  static public final String title = "JPips";
+  static public final String noConsole = "-n";
+
+  public JPips() { super(); }
+
   /** Creates the main frame with JPips inside.
     */
   static public void main(String args[]) 
@@ -71,7 +77,6 @@ public class JPips
       JPips jpips = new JPips();
       jpips.init();
     }
-  
 
   /** Launches TPips.
     * Builds the JPips main frame.
@@ -85,12 +90,14 @@ public class JPips
 
       GridBagConstraints c = new GridBagConstraints();
       optionVector = new Vector();
-      
+  
+      buildJPipsPanel();
       buildOptionVector();
       frame.setJMenuBar(getMenuBar());
       add((Container)frame.getContentPane(),getJPipsPanel(),
           0,0,1,1,1,1,1.0,1.0,5,
           GridBagConstraints.BOTH,GridBagConstraints.WEST,c);
+
       frame.lock(true);
       frame.pack();
       frame.setVisible(true);
@@ -113,7 +120,7 @@ public class JPips
     */
   public void buildOptionVector()
     {
-      optionVector.addElement(getWorkspaceOption());
+      optionVector.addElement(workspaceManager.getOption());
       
       try
         {
@@ -157,8 +164,12 @@ public class JPips
     */
   public PPanel getJPipsPanel()
     {
-    
-      PPanel filePanel = new PPanel(new GridBagLayout());
+      return filePanel;
+    }
+
+  public void buildJPipsPanel()
+    {
+      filePanel = new PPanel(new GridBagLayout());
       GridBagConstraints c = new GridBagConstraints();
       PPanel p;
       PButton b;
@@ -187,7 +198,7 @@ public class JPips
       
       //workspace
       workspaceManager = new WorkspaceManager(tpips, frame, directoryManager,
-                               moduleManager, textDisplayer, optionVector);
+                               moduleManager, textDisplayer);
       p = (PPanel)workspaceManager.getComponent();
       add((Container)filePanel,p,0,1,1,1,1,1,0.0,0.0,5,
           GridBagConstraints.NONE,GridBagConstraints.WEST,c);
@@ -200,114 +211,7 @@ public class JPips
               "TPips console"),0,3,3,1,1,1,1.0,0.0,5,
           GridBagConstraints.BOTH,GridBagConstraints.WEST,c);
 	}
-
-      return filePanel;
     }
-
-
-  /** @return the option object for the workspace menu
-    */
-  public Option getWorkspaceOption()
-    {
-      PMenu m;
-      PMenuItem mi;
-      PCheckBoxMenuItem cbmi;
-      ActionListener a;
-      Vector v1 =new Vector();
-      Vector v2 =new Vector();
-
-      //create
-      m = new PMenu("Workspace");
-      mi = (PMenuItem) m.add(new PMenuItem("Create"));
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
-	    { workspaceManager.create(); }
-	};
-      mi.addActionListener(a);
-      v1.addElement(mi);
-
-      //open
-      mi = (PMenuItem) m.add(new PMenuItem("Open"));
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
-	    { workspaceManager.choose(); }
-	};
-      mi.addActionListener(a);
-      v1.addElement(mi);
-
-      //checkpoint
-      mi = (PMenuItem) m.add(new PMenuItem("Checkpoint"));
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
-	    { workspaceManager.checkPoint(); }
-	};
-      mi.addActionListener(a);
-      mi.setEnabled(false);
-      v2.addElement(mi);
-
-      //close
-      mi = (PMenuItem) m.add(new PMenuItem("Close"));
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
-	    { workspaceManager.close(false); }
-	};
-      mi.addActionListener(a);
-      mi.setEnabled(false);
-      v2.addElement(mi);
-      
-      //quit
-      mi = (PMenuItem) m.add(new PMenuItem("Quit"));
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
-	    { tpips.quit(); System.exit(0); }
-	};
-      mi.addActionListener(a);
-      v1.addElement(mi);
-
-      //close & quit
-      mi = (PMenuItem) m.add(new PMenuItem("Close & Quit"));
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
-	    { workspaceManager.close(false); tpips.quit(); System.exit(0);}
-	};
-      mi.addActionListener(a);
-      mi.setEnabled(false);
-      v2.addElement(mi);
-      
-      //close & delete & quit
-      mi = (PMenuItem) m.add(new PMenuItem("Delete & Quit"));
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
-	    {
-	      workspaceManager.close(true);
-	      tpips.quit();
-	      System.exit(0);
-	    }
-	};
-      mi.addActionListener(a);
-      mi.setEnabled(false);
-      v2.addElement(mi);
-      
-      //exit
-      mi = (PMenuItem) m.add(new PMenuItem("Exit"));
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
-	    { tpips.exit(); System.exit(0); }
-	};
-      mi.addActionListener(a);
-      mi.setForeground(Color.red);
-      
-      return new Option(m.getName(), m, null, null, null, v1, v2);
-    }
-
 
   /** @return the option object for the help menu
     */
@@ -322,7 +226,6 @@ public class JPips
       
       return new Option(m.getName(), m, null, null, null);
     }
-
 
   /** A short add method for a GridBagLayout.
     */
@@ -343,8 +246,4 @@ public class JPips
       c.anchor = a;
       cont.add(comp,c);
     }
-
-
 }
-
-
