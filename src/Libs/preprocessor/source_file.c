@@ -717,14 +717,13 @@ bool process_user_file(
         chdir(cwd);
         free(cwd);
 
-	if(DB_PUT_NEW_FILE_RESOURCE(DBR_SOURCE_FILE, 
-				    modname, modrelfilename)
-	   == resource_undefined) {
-	    user_warning("process_user_file", 
+	DB_PUT_NEW_FILE_RESOURCE(DBR_SOURCE_FILE, modname, modrelfilename);
+
+	/* ignored at the time... */
+	/* user_warning("process_user_file", 
 			 "Two source codes for module %s."
 			 "The second occurence in file %s is ignored\n",
-			 modname, file);
-	}
+			 modname, file); */
     }
     safe_fclose(fd, tempfile);
 
