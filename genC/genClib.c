@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/17 00:07:01 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/18 19:11:07 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -91,9 +91,8 @@ static int disallow_undefined_tabulated = TRUE ;
 static int domain_index( obj )
 gen_chunk *obj ;
 {
-    message_assert("Trying to use a NULL object", obj!=NULL);
-    message_assert("Trying to use an undefined object", 
-		   obj!=gen_chunk_undefined);
+    message_assert("No NULL object", obj!=NULL);
+    message_assert("No undefined object", obj!=gen_chunk_undefined);
     check_domain(obj->i);
     return(obj->i) ;
 }
@@ -112,10 +111,10 @@ fprintf_spaces( fd, number )
 FILE *fd ;
 int number ;
 {
-    /* assert(number>=0); */
-    number = number<0? 0: number;
-    for( ; number ; number-- )
-	    (void) fprintf( fd, " " ) ;
+    number = number<0 ? 0 : number;
+    number = number<40 ? number : 40; /* limited indentation */
+    for(; number ; number-- )
+	(void) fprintf( fd, " " ) ;
 }
 
 #ifdef DBG_READ
@@ -591,7 +590,7 @@ gen_trav_obj( obj, dr )
 	if( gen_debug & GEN_DBG_TRAV_OBJECT )
 	{
 	    fprintf_spaces( stderr, gen_debug_indent++ ) ;
-	    (void) fprintf( stderr, "trav_obj dealing with " ) ;
+	    (void) fprintf( stderr, "trav_obj (0x%x) ", (unsigned int) obj) ;
 	    print_domain( stderr, dp ) ;
 	    (void) fprintf( stderr, "\n" ) ;
 	}
@@ -646,6 +645,15 @@ static char *seen_once = (char *)NULL ;
  */
 
 static hash_table obj_table = (hash_table)NULL ;
+
+/* returns the number of byte allocated for obj_table.
+ * for FI and debugging purposes...
+ * FC
+ */
+int current_shared_obj_table_size()
+{
+    return hash_table_own_allocated_memory(obj_table);
+}
 
 /* The running counter of shared objects number.
  */
@@ -712,23 +720,23 @@ shared_obj_in( obj, dr )
 gen_chunk *obj ;
 struct driver *dr ;
 {
-    char *seen ;
+    char *seen = hash_get( obj_table, (char *)obj );
 
-    if( (seen=hash_get( obj_table, (char *)obj )) != HASH_UNDEFINED_VALUE ) {
-	if( seen == first_seen ) {
-	    hash_del( obj_table, (char *)obj ) ;
-
+    if(seen!=HASH_UNDEFINED_VALUE)
+    {
+	if(seen == first_seen) 
+	{
 	    shared_number++;
-	    message_assert("Too many shared objects", 
+	    message_assert("shared table not full",
 			   shared_number<MAX_SHARED_OBJECTS);
-
-	    hash_put( obj_table, (char *)obj, first_seen+shared_number ) ;
+	    
+	    hash_update( obj_table, (char *)obj, first_seen+shared_number ) ;
 	}
-	return( !GO) ;
+	return(!GO) ;
     }
 
-    hash_put( obj_table, (char *)obj, first_seen ) ;
-    return( GO) ;
+    hash_put(obj_table, (char *)obj, first_seen ) ;
+    return(GO) ;
 }
 
 static int
@@ -783,19 +791,16 @@ bool keep ;
   dr.array_leaf = gen_array_leaf ;
   dr.leaf_in = tabulated_leaf_in ;
 
-  if (obj_table == (hash_table)NULL) {
-    fatal( "shared_pointers: NULL obj_table\n" ) ;
-  }
+  message_assert("obj_table not null", obj_table!=(hash_table)NULL);
+
   if(!keep) {
       hash_table_clear(obj_table) ;
       shared_number = 0 ;
   } 
-  else {
-    fatal( "shared_pointers: keep = TRUE, not implemented\n" ) ;
-  }
-  gen_trav_obj( obj, &dr ) ;
+  /* else the obj_table is kept as it is.
+   */
 
-  if (!keep) hash_table_clear(obj_table);
+  gen_trav_obj( obj, &dr ) ;
 }
 
 /* SHARED_OBJ manages the OBJect modulo sharing (the OBJ_TABLE has to be
@@ -812,21 +817,21 @@ void (*others)() ;
     char *shared ;
     int shared_number ;
 
-    message_assert("Undefined obj_table", obj_table!=(hash_table)NULL);
+    message_assert("Defined obj_table", obj_table!=(hash_table)NULL);
 
-    if((shared=hash_get( obj_table, (char *)obj)) == HASH_UNDEFINED_VALUE) {
-	return( !GO) ;
-    }
-    if( shared == first_seen ) {
-	return( !GO) ;
-    }
-    else if( FIRST_SEEN( shared )) {
+    shared = hash_get( obj_table, (char *)obj);
+
+    if(shared==HASH_UNDEFINED_VALUE || shared == first_seen ) 
+	return(!GO) ;
+    else 
+    if( FIRST_SEEN( shared )) 
+    {
 	(*first)( shared_number = shared-first_seen ) ;
-	hash_del( obj_table, (char *)obj ) ;
-	hash_put( obj_table, (char *)obj, seen_once+shared_number ) ;
+	hash_update( obj_table, (char *)obj, seen_once+shared_number ) ;
 	return( !GO) ;
     }
-    else {
+    else 
+    {
 	(*others)( shared - seen_once ) ;
 	return( GO) ;
     }
@@ -842,9 +847,26 @@ gen_chunk *obj ;
 }
 
 
+/********************************************************************* FREE */
 
 /* These functions are used to implement the freeing of objects. A
    tabulated constructor has to stop recursive freeing. */
+
+static hash_table free_already_seen = (hash_table) NULL;
+
+static bool 
+free_already_seen_p(
+    gen_chunk *obj)
+{
+    message_assert("hash_table defined", free_already_seen);
+    
+    if (hash_get(free_already_seen, (char *)obj)==(char*)TRUE)
+	return TRUE;
+    /* else seen for next time !
+     */
+    hash_put(free_already_seen, (char *)obj, (char *) TRUE);
+    return FALSE;
+}
 
 /* A tabulated domain BP prohibits its OBJ to be recursively freed. */
 
@@ -853,7 +875,7 @@ free_leaf_in( obj, bp )
 gen_chunk *obj ;
 struct gen_binding *bp ;
 {
-    return( !IS_TABULATED( bp ) && !shared_obj( obj, gen_null, gen_null )) ;
+    return !IS_TABULATED(bp) && !free_already_seen_p(obj) ;
 }
 
 /* FREE_LEAF_OUT manages external types. */
@@ -932,9 +954,13 @@ struct driver *dr ;
 	}
 	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = gen_chunk_undefined; 
     }
+
     if((dp=bp->domain)->ba.type == CONSTRUCTED_DT && dp->co.op == ARROW_OP) {
 	hash_table h = (obj+1 + IS_TABULATED( bp ))->h ;
 
+	/* hmmm... I'm not sure this is a good idea. 
+	 * may forget non persistent data in there ?
+	 */
 	HASH_MAP( k, v, {
 	    free( (void *)k ) ;
 	    free( (void *)v ) ;
@@ -954,25 +980,35 @@ union domain *dp ;
 {
     switch( dp->ba.type ) {
     case BASIS_DT:
-	return( !dp->ba.persistant ) ;
+	return( !dp->ba.persistant && obj->i) ; /* ??? */
     case LIST_DT:
-	return( !dp->li.persistant && obj->l != list_undefined ) ;
+	return( !dp->li.persistant && obj->l && obj->l != list_undefined ) ;
     case SET_DT:
-	return( !dp->se.persistant && obj->t != set_undefined ) ;
+	return( !dp->se.persistant && obj->t && obj->t != set_undefined ) ;
     case ARRAY_DT:
-	return( !dp->ar.persistant && obj->p != array_undefined ) ;
+	return( !dp->ar.persistant && obj->p && obj->p != array_undefined ) ;
     }
     fatal( "persistant_simple_in: unknown type %s\n", itoa( dp->ba.type )) ;
 
     return(-1); /* just to avoid a gcc warning */
 }
 
-
-static void
-gen_local_free( obj, keep )
-gen_chunk *obj ;
-bool keep ;
+static int
+free_obj_in(
+    gen_chunk *obj,
+    struct driver *dr)
 {
+    return !free_already_seen_p(obj);
+}
+
+/* version withouy shared_pointers.
+ * automatic re-entry allowed. FC.
+ */
+void
+gen_free(
+    gen_chunk *obj)
+{
+    bool first_in_stack = (free_already_seen==(hash_table)NULL);
     struct driver dr ;
 
     check_read_spec_performed();
@@ -980,43 +1016,45 @@ bool keep ;
     dr.null = gen_null ;
     dr.leaf_out = free_leaf_out ;
     dr.leaf_in = free_leaf_in ;
-    dr.obj_in = shared_go ;
+    dr.obj_in = free_obj_in ; /* shared_go */
     dr.simple_in = persistant_simple_in ;
     dr.array_leaf = gen_array_leaf ;
     dr.simple_out = free_simple_out ;
     dr.obj_out = free_obj_out ;
 
-    if (!keep) 
-    {
-	push_gen_trav_env() ;
-	shared_pointers( obj, FALSE ) ;
-    }
+    if (first_in_stack)
+	free_already_seen = hash_table_make(hash_pointer, 0);
 
     gen_trav_obj( obj, &dr ) ;
 
-    if (!keep)
-	pop_gen_trav_env() ;
+    if (first_in_stack)
+    {
+	hash_table_free(free_already_seen);
+	free_already_seen = NULL;
+    }
 }
 
-/* GEN_FREE frees the object OBJ. */ 
-
-void
-gen_free( obj )
-gen_chunk *obj ;
+void 
+gen_full_free_list(
+    list l)
 {
-    gen_local_free(obj, FALSE) ;
-}
+    list p, nextp ;
+    bool first_in_stack = (free_already_seen==(hash_table)NULL);
 
-/* GEN_FREE_WITH_SHARING frees the object OBJ. */ 
+    if (first_in_stack)
+	free_already_seen = hash_table_make(hash_pointer, 0);
 
-/* Should be used when freeing a newgen_object declared
- * as external, I guess. FC.
- */
-void
-gen_free_with_sharing(obj)
-gen_chunk *obj ;
-{
-    gen_local_free( obj, TRUE ) ;
+    for( p = l ; p != NIL ; p = nextp ) {
+	nextp = p->cdr ;
+	gen_free( CAR(p).p ) ;
+	free( p ) ;
+    }
+
+    if (first_in_stack)
+    {
+	hash_table_free(free_already_seen);
+	free_already_seen = NULL;
+    }
 }
 
 /********************************************************************* COPY */
@@ -1347,19 +1385,14 @@ struct driver *dr ;
 
 /* GEN_COPY_TREE makes a copy of the object OBJ */ 
 
-gen_chunk *gen_copy_tree( obj )
-gen_chunk *obj ;
+static gen_chunk *
+gen_local_copy_tree(
+    gen_chunk *obj, 
+    bool keep) /* whether to keep the copy and sharing tables... */
 {
     gen_chunk *copy;
     struct driver dr ;
-    hash_table old_copy_table;
-
-    /* Save the old copy_table */
-    old_copy_table = copy_table;
-    
-    /* allocate a local copy_table
-     */
-    copy_table = hash_table_make( hash_pointer, 0 ) ;
+    hash_table old_copy_table = hash_table_undefined;
 
     check_read_spec_performed();
 
@@ -1372,30 +1405,47 @@ gen_chunk *obj ;
     dr.simple_out = copy_simple_out ;
     dr.obj_out = copy_obj_out;
 
-    push_gen_trav_env() ;
-
-    /* sharing is computed
+    /* Save the old copy_table if required...
      */
-    shared_pointers( obj, FALSE ) ;
+    if (!keep)
+    {
+	old_copy_table = copy_table;
+	copy_table = hash_table_make( hash_pointer, 0 ) ;
+	push_gen_trav_env() ;
+    }
 
-
-    /* recursive travel thru data structures begins ...
+    /* actual job. First sharing is computed, then the recursion.
      */
-    gen_trav_obj(obj,&dr) ;
-
-    pop_gen_trav_env() ;
-
-    /* the result is extracted from the copy_table 
-     */
+    shared_pointers(obj, keep);
+    gen_trav_obj(obj, &dr) ;
     copy = copy_hsearch( (char *)obj ) ;
 
-    /* the copy_table is cleared
-     */
-    hash_table_clear(copy_table);	
-    hash_table_free(copy_table);
-    copy_table = old_copy_table;
+    if (!keep)
+    {	
+	pop_gen_trav_env() ;
+	hash_table_free(copy_table);
+	copy_table = (hash_table) NULL;
+	copy_table = old_copy_table;
+    }
 
-    return(copy); 
+    return copy; 
+}
+
+gen_chunk *
+gen_copy_tree(
+    gen_chunk *obj)
+{
+    return gen_local_copy_tree(obj, FALSE);
+}
+
+/* for re-entry only in gen_copy_tree... 
+ * ??? FC.
+ */
+gen_chunk *
+gen_copy_tree_with_sharing(
+    gen_chunk *obj)
+{
+    return gen_local_copy_tree(obj, TRUE);
 }
 
 
@@ -1739,6 +1789,10 @@ gen_write(fd, obj)
 FILE *fd ;
 gen_chunk *obj ;
 {
+/*
+    static bool is_already_in = FALSE;
+    bool first_in_stack = FALSE;
+*/
     struct driver dr ;
 
     check_read_spec_performed();
@@ -1751,20 +1805,37 @@ gen_chunk *obj ;
     dr.simple_out = write_simple_out ;
     dr.obj_in = write_obj_in ;
     dr.obj_out = write_obj_out ;
+
     user_file = fd ;
 
-    push_gen_trav_env() ;
+    /*
+    if (!is_already_in)
+    {
+	first_in_stack = TRUE;
+	push_gen_trav_env();
+	is_already_in = TRUE;
+    }
+    */
 
-    shared_pointers( obj, FALSE ) ;
+    push_gen_trav_env();
+
+    shared_pointers(obj, FALSE) ;
     (void) fprintf( fd, "%d ", shared_number ) ;
-
     gen_trav_obj( obj, &dr ) ;
 
     pop_gen_trav_env() ;
+
+/*    if (first_in_stack)
+    {
+
+	is_already_in = FALSE;
+    }
+*/
 }
 
 /* GEN_WRITE_WITHOUT_SHARING writes the OBJect on the stream FD. Sharing
-   is NOT managed.*/
+   is NOT managed.
+*/
 
 void
 gen_write_without_sharing( fd, obj )
@@ -2198,7 +2269,7 @@ gen_chunk *obj ;
     gen_debug = old_gen_debug ;
     return( error_seen  == 0 ) ;
 }
-	    
+
 /* GEN_DEFINED_P checks that the OBJect is fully defined 
 */
 static void
@@ -2464,6 +2535,8 @@ allocated_memory_simple_in(
     return -1; /* just to avoid a gcc warning */
 }
 
+/* re-entry is automatic for this function.
+ */
 int /* in bytes */
 gen_allocated_memory(
     gen_chunk *obj)
@@ -2523,8 +2596,9 @@ gen_allocated_memory(
  *  - when it is false, to stop the recursion on some types
  */
 void gen_null(gen_chunk *p){}
-bool gen_true(gen_chunk *c){ return TRUE;}
-bool gen_false(gen_chunk *c){ return FALSE;}
+bool gen_true(gen_chunk *p){ return TRUE;}
+bool gen_false(gen_chunk *p){ return FALSE;}
+void gen_core(gen_chunk *p){ abort();}
 
 /* GLOBAL VARIABLES: to deal with decision tables
  *
