@@ -9,10 +9,11 @@
    Francois Irigoin, 02/06/90
    - add .SEQ. to handle ranges outside of arrays [pj]
    - add intrinsic DFLOAT. bc. 13/1/96.
-   - add pseudo-intrinsics SUBSTR and ASSIGN_SUBSTR to handle strings, fi, 25/12/96
+   - add pseudo-intrinsics SUBSTR and ASSIGN_SUBSTR to handle strings,
+   fi, 25/12/96
    Bugs:
    - intrinsics are not properly typed
-   */
+*/
 
 #include <stdio.h>
 #include <string.h>
@@ -185,7 +186,8 @@ default_intrinsic_type(int n)
     ft = make_functional(NIL, MakeOverloadedResult());
     t = make_type(is_type_functional, ft);
 
-    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeOverloadedParameter);
     return t;
 }
 
@@ -196,7 +198,8 @@ overloaded_to_integer_type(int n)
     functional ft = functional_undefined;
 
     ft = make_functional(NIL, MakeIntegerResult());
-    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeOverloadedParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -209,7 +212,8 @@ overloaded_to_real_type(int n)
     functional ft = functional_undefined;
 
     ft = make_functional(NIL, MakeRealResult());
-    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeOverloadedParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -222,7 +226,8 @@ overloaded_to_double_type(int n)
     functional ft = functional_undefined;
 
     ft = make_functional(NIL, MakeDoubleprecisionResult());
-    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeOverloadedParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -235,7 +240,8 @@ overloaded_to_complex_type(int n)
     functional ft = functional_undefined;
 
     ft = make_functional(NIL, MakeComplexResult());
-    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeOverloadedParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -248,7 +254,8 @@ overloaded_to_logical_type(int n)
     functional ft = functional_undefined;
 
     ft = make_functional(NIL, MakeLogicalResult());
-    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeOverloadedParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -261,7 +268,8 @@ integer_to_integer_type(int n)
     functional ft = functional_undefined;
 
     ft = make_functional(NIL, MakeIntegerResult());
-    functional_parameters(ft) = make_parameter_list(n, MakeIntegerParameter);
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeIntegerParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -339,7 +347,8 @@ double_to_integer_type(int n)
     functional ft = functional_undefined;
 
     ft = make_functional(NIL, MakeIntegerResult());
-    functional_parameters(ft) = make_parameter_list(n, MakeDoubleprecisionParameter);
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeDoubleprecisionParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -352,7 +361,8 @@ double_to_real_type(int n)
     functional ft = functional_undefined;
 
     ft = make_functional(NIL, MakeRealResult());
-    functional_parameters(ft) = make_parameter_list(n, MakeDoubleprecisionParameter);
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeDoubleprecisionParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -365,7 +375,8 @@ double_to_double_type(int n)
     functional ft = functional_undefined;
 
     ft = make_functional(NIL, MakeDoubleprecisionResult());
-    functional_parameters(ft) = make_parameter_list(n, MakeDoubleprecisionParameter);
+    functional_parameters(ft) = 
+	make_parameter_list(n, MakeDoubleprecisionParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -582,6 +593,11 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"SNGL", 1, overloaded_to_real_type},
     {"DBLE", 1, overloaded_to_double_type},
     {"CMPLX", (INT_MAX), overloaded_to_complex_type},
+
+    /* (0.,1.) -> switched to a function call...
+     */
+    { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type},
+
     {"ICHAR", 1, default_intrinsic_type},
     {"CHAR", 1, default_intrinsic_type},
     {"AINT", 1, real_to_real_type},
