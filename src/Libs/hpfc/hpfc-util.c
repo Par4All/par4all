@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/02 15:01:00 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/06 12:07:56 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -44,39 +44,26 @@ chunk* obj;
 }
 
 /*
- * call_ref_to_dist_array_p
- */
-bool call_ref_to_dist_array_p(c)
-call c;
-{
-    MAPL(ce,
-     {
-	 if (ref_to_dist_array_p(EXPRESSION(CAR(ce)))) return(TRUE);
-     },
-	 call_arguments(c));
-
-    return(FALSE);
-}
-
-/*
  * written_effects_to_dist_arrays_p
  */
 bool written_effects_to_dist_arrays_p(expr)
 expression expr;
 {
-    bool written=FALSE;
-    list leffects_to_dist_arrays=DistArraysEffects(expr);
+    list
+	l,
+	leffects_to_dist_arrays=DistArraysEffects(expr);
 
-    MAPL(ce,
-     {
-	 if (action_write_p(effect_action(EFFECT(CAR(ce))))) 
-	     written=TRUE;
-     },
-	 leffects_to_dist_arrays);
+    for(l=leffects_to_dist_arrays;
+	!ENDP(l);
+	l=CDR(l))
+	if  (action_write_p(effect_action(EFFECT(CAR(l)))))
+	{
+	    gen_free_list(leffects_to_dist_arrays);
+	    return(TRUE);
+	}
 
     gen_free_list(leffects_to_dist_arrays);
-
-    return(written);
+    return(FALSE);
 }
 
 
@@ -91,32 +78,27 @@ bool replicated_p(e)
 entity e;
 {
     int i;
-    bool replicated=FALSE;
     align a;
-    list la,ld;
+    list la, ld;
     entity template;
     distribute d;
 
     pips_assert("replicated_p", array_distributed_p(e));
 
-    a=load_entity_align(e);
-    la=align_alignment(a);    
-    template=align_template(a);
-    d=load_entity_distribute(template);
-    ld=distribute_distribution(d);
+    a = load_entity_align(e);
+    la = align_alignment(a);    
+    template = align_template(a);
 
-    for(i=1;i<=NumberOfDimension(template);i++)
-    {
-	replicated = (replicated || 
-		      ith_dim_replicated_p(template,
-					   i,
-					   la,
-					   DISTRIBUTION(CAR(ld))));
+    d = load_entity_distribute(template);
+    ld = distribute_distribution(d);
 
-	ld=CDR(ld);
-    }
-    
-    return(replicated);
+    for(i=1;
+	i<=NumberOfDimension(template);
+	i++, ld=CDR(ld))
+	if (ith_dim_replicated_p(template, i, la, DISTRIBUTION(CAR(ld))))
+	    return(TRUE);
+
+    return(FALSE);
 }
 
 /*
