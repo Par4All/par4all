@@ -97,21 +97,21 @@ char *module_name;
 bool print_code_or_source_comp(module_name)
 char *module_name;
 {
-    FILE *fd;
+    bool success = TRUE;
     entity mod;
     statement mod_stat,user_stat;
-    char *fn = strdup
-	(concatenate
-	 (db_get_current_program_directory(), 
-	  "/",
-	  module_name,
+    char *file_ext = strdup
+	(concatenate(
 	  is_user_view? ".ucomp" : ".comp",
 	  get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
 	  GRAPH_FILE_EXT : "",
 	  NULL));
+    char * resource_name =
+	get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
+	    DBR_GRAPH_PRINTED_FILE
+		: is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE;
     text txt = make_text(NIL);
 
-    
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     mod_stat = get_current_module_statement();
@@ -132,19 +132,15 @@ char *module_name;
 
     init_prettyprint(text_complexity);
 
-    fd = (FILE *)safe_fopen(fn, "w");
     MERGE_TEXTS(txt, text_summary_complexity( get_current_module_entity() ));
     MERGE_TEXTS(txt, text_module(mod,get_current_module_statement()));
 
-    print_text(fd, txt);
-    safe_fclose(fd, fn);
 
-    DB_PUT_FILE_RESOURCE
-	(get_bool_property
-	 ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? DBR_GRAPH_PRINTED_FILE
-	 : is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE,
-	 strdup(module_name),
-	 fn);
+    success = make_text_resource(module_name,
+				 resource_name,
+				 file_ext,
+				 txt);
+    free(file_ext);
 
     if(is_user_view) {
 	hash_table_free(nts);
@@ -181,14 +177,15 @@ entity module;
     return (t);
 }
 
+text get_text_complexities(module_name)
+char *module_name;
+{
+    /* FI: different kind of complexities should later be made
+       available.  Instead of the module intrinsic complexity, it would
+       be interesting to have its contextual complexity. The same is
+       true for the icfg
+       */
+    entity module = local_name_to_top_level_entity(module_name);
 
-
-
-
-
-
-
-
-
-
-
+    return text_summary_complexity(module);
+}
