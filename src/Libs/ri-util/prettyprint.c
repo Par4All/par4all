@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.232 2003/08/06 13:43:52 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.233 2003/08/07 14:40:05 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -692,7 +692,12 @@ words_assign_op(call obj, int precedence, bool leftmost)
     int prec = words_intrinsic_precedence(obj);
 
     pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
-    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+    /* FI->NN: I revert to the previous version to keep the SPACES
+       surrounding the assignment operator.Do not forget the strdup or
+       nothing can later be freed. */
+    /* pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj))); */
+    pc = CHAIN_SWORD(pc, strdup(is_fortran? " = "
+				: entity_local_name(call_function(obj))));
     pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
     return(pc);
 }
@@ -1051,7 +1056,7 @@ words_prefix_unary_op(call obj, int precedence, bool leftmost)
 	  else
 	    if (strcmp(fun,"-unary") == 0) 
 	      fun = "-";
-    pc = CHAIN_SWORD(pc,fun);
+    pc = CHAIN_SWORD(pc,strdup(fun));
     pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
 
     return(pc);
@@ -1127,7 +1132,7 @@ words_goto_label(string tlabel)
 	pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
     }
     else {
-      pc = CHAIN_SWORD(pc, is_fortran?"GOTO ":"goto ");
+      pc = CHAIN_SWORD(pc, strdup(is_fortran?"GOTO ":"goto "));
       pc = CHAIN_SWORD(pc, tlabel);
       if (!is_fortran)
 	pc = CHAIN_SWORD(pc, ";");
@@ -1354,7 +1359,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     if ( prec < precedence )
 	pc = CHAIN_SWORD(pc, "(");
     pc = gen_nconc(pc, we1);
-    pc = CHAIN_SWORD(pc, fun);
+    pc = CHAIN_SWORD(pc, strdup(fun));
     pc = gen_nconc(pc, we2);
     if ( prec < precedence )
 	pc = CHAIN_SWORD(pc, ")");
@@ -1630,7 +1635,7 @@ words_subexpression(
 static sentence 
 sentence_tail(void)
 {
-  return MAKE_ONE_WORD_SENTENCE(0, is_fortran?"END":"}");
+  return MAKE_ONE_WORD_SENTENCE(0, strdup(is_fortran?"END":"}"));
 }
 
 /* exported for unstructured.c */
@@ -2478,7 +2483,8 @@ text_instruction(
       else {
 	u = make_unformatted(strdup(label), n, margin, 
 			     CHAIN_SWORD(words_call(instruction_call(obj), 
-						    0, TRUE, TRUE),";"));
+						    0, TRUE, TRUE),
+					 strdup(is_fortran? "" : ";")));
 	s = make_sentence(is_sentence_unformatted, u);
 	r = make_text(CONS(SENTENCE, s, NIL));
       }
@@ -2702,9 +2708,7 @@ text_named_module(
   text ral = text_undefined;
 
   debug_on("PRETTYPRINT_DEBUG_LEVEL");
-  is_fortran = TRUE;
-  if (get_bool_property("PRETTYPRINT_C_CODE"))
-    is_fortran = FALSE;
+  is_fortran = !get_bool_property("PRETTYPRINT_C_CODE");
   
   /* This guard is correct but could be removed if find_last_statement()
    * were robust and/or if the internal representations were always "correct".
@@ -2767,9 +2771,9 @@ text_named_module(
   reset_alternate_return_set();
   MERGE_TEXTS(r, ral);
   
-  if (strstr(entity_name(name),FILE_SEP_STRING) == NULL)
+  if (strstr(entity_name(name),FILE_SEP_STRING) == NULL || is_fortran)
     {
-      /* No need to print TAIL (}) if the current module is a compilation unit*/
+      /* No need to print TAIL (}) if the current module is a C compilation unit*/
       ADD_SENTENCE_TO_TEXT(r, sentence_tail());
     }
   
