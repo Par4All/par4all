@@ -74,9 +74,9 @@ plc obj;
     stmt = placement_statement(func);
     dims = placement_dims(func);
 
-    /* Mod by AP, sep 13th 95: the number of the instruction is the
-       statement_number. */
-    fprintf(fp, "Ins_%d :", statement_number(ordering_to_statement(adg_number_to_ordering(stmt))));
+    /* Mod by AP, oct 6th 95: the number of the instruction is the
+       vertex number minus BASE_NODE_NUMBER. */
+    fprintf(fp, "Ins_%d :", stmt-BASE_NODE_NUMBER);
 
     for(d = dims; d != NIL; d = CDR(d)) {
       expression exp = EXPRESSION(CAR(d));
