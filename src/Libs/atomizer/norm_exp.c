@@ -18,29 +18,11 @@
  *
  * For more information about NLCs, see loop_normalize package.
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "genC.h"
-
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-/* #include "database.h" */
-
-#include "ri-util.h"
-#include "control.h"
-#include "constants.h"
-#include "misc.h"
-#include "text.h"
-#include "text-util.h"
-
 /* #include "loop_normalize.h" */
 #define NLC_PREFIX 			"NLC"
 #define ENTITY_NLC_P(e) (strncmp(entity_local_name(e), NLC_PREFIX, 3) == 0)
 
-#include "atomizer.h"
+#include "local.h"
 
 
 /*============================================================================*/
