@@ -1,7 +1,7 @@
  /* 
   *  Functions for the expressions
   *
-  *  Yi-Qing YANG, Lei ZHOU, Francois IRIGOIN
+  *  Yi-Qing YANG, Lei ZHOU, Francois IRIGOIN, Fabien Coelho
   *
   *  12, Sep, 1991
   *
@@ -23,7 +23,6 @@
 
 #include "ri-util.h"
 
-entity CreateIntrinsic(string name); /* in syntax.h */
 
 
 /*  a BASIC tag is returned for the expression
@@ -713,8 +712,8 @@ Pvecteur pv;
     expression 	factor1, factor2;
     entity op_add, op_sub;
 
-    op_add = CreateIntrinsic(PLUS_OPERATOR_NAME);
-    op_sub = CreateIntrinsic(MINUS_OPERATOR_NAME);
+    op_add = entity_intrinsic(PLUS_OPERATOR_NAME);
+    op_sub = entity_intrinsic(MINUS_OPERATOR_NAME);
 
     assert(!entity_undefined_p(op_add) && !entity_undefined_p(op_sub));
     
@@ -827,10 +826,10 @@ list l;
     int
 	len = gen_length(l);
     entity
-	and = CreateIntrinsic(AND_OPERATOR_NAME);
+	and = entity_intrinsic(AND_OPERATOR_NAME);
 
     return(len==0? 
-	   MakeNullaryCall(CreateIntrinsic(".TRUE.")):
+	   MakeNullaryCall(entity_intrinsic(".TRUE.")):
 	   expression_list_to_binary_operator_call(l, and));
 }
 
