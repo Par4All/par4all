@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/25 16:36:38 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/25 20:17:04 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -33,13 +33,22 @@ help()
 	by defining standard macros within the configuration part as described
 	bellow. 
 	Options:
-	  -L|N|P:   part is Linear, Newgen or Pips.
+	  -L|N|P:   part is Linear, Newgen or Pips. (default is automagic:-)
+	    The part is just the software for which the makefile is to be
+	    generated. The impact is to use the corresponding _ROOT and _ARCH
+	    variables for finding includes libraries and so. Within the 
+	    makefile, the ARCH and ROOT macros holds the expected values.
+	    The definition of ARCH first relies on the part's _ARCH variable
+	    (for instance \$NEWGEN_ARCH), then if not set the \$PIPS_ARCH
+	    variable is used, and finally . (dot) is used as a default.
+	    The ROOT and ARCH macros are used for installing files: for 
+	    instance libraires are installed to \$(ROOT)/Lib/\$(ARCH).
 	  -l|p|c|d: type is library|pass|compile|default
 	  -D|S:     side is Development|Source
 	  contextual defaults for all these first options...
 	  -h: this help
 	  -v: verbose
-	Usefull macros in $CONFIG_FILE: 
+	Useful macros in $CONFIG_FILE: 
 	 - libraries/passes: LIB_{CFILES,HEADERS,OBJECTS}
 	   and maybe DERIVED_{HEADERS,CFILES,FILES}
 	 - default:
