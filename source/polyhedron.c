@@ -2296,12 +2296,12 @@ int PolyhedronIncludes(Polyhedron *Pol1,Polyhedron *Pol2) {
 	value_addto(p3,p3,tmp);
 	p1++; p2++;
       }
-      
+     
       /* If (p3 < 0) or (p3 > 0 and (constraint(k) is equality
                                      or ray(i) is a line)), return 0 */
       if(value_neg_p(p3) ||
           (value_notzero_p(p3)
-             && (value_zero_p(Pol1->Constraint[k][0] || value_zero_p(Pol2->Ray[i][0]))))) {
+             && (value_zero_p(Pol1->Constraint[k][0]) || (value_zero_p(Pol2->Ray[i][0]))   ) )) {
 	value_clear(p3); value_clear(tmp);
 	return 0;
       }
@@ -3335,6 +3335,11 @@ Polyhedron *DomainUnion(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRays) {
     return (Polyhedron*) 0;
   }
 
+
+
+
+
+
   /* Copy 'Pol1' to 'PolA' */
   PolA = PolEndA = (Polyhedron *)0;
   for (p1=Pol1; p1; p1=p1->next) {
@@ -3344,7 +3349,10 @@ Polyhedron *DomainUnion(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRays) {
     for (p2=Pol2; p2; p2=p2->next) {
       if (PolyhedronIncludes(p2, p1) ) { /* p2 covers p1 */ 
 	Redundant = 1;
+	
+
 	break;
+
       }
     }
     if (!Redundant) {
@@ -3356,6 +3364,7 @@ Polyhedron *DomainUnion(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRays) {
 	PolEndA->next = Polyhedron_Copy(p1);
 	PolEndA = PolEndA->next;
       }
+
     }
   }
 
@@ -3380,6 +3389,8 @@ Polyhedron *DomainUnion(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRays) {
 	PolEndB->next = Polyhedron_Copy(p2);
 	PolEndB = PolEndB->next;
       }
+
+
     }
   }
 
