@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1995/11/02 17:03:23 $, 
+ * $Date: 1995/12/05 13:52:31 $, 
  */
 
 #include <stdlib.h>
@@ -317,25 +317,46 @@ char *name;
 }
 
 
-void create_directory(name)
+bool create_directory(name)
 char *name;
 {
+    bool success;
+
     if (directory_exists_p(name)) {
 	pips_error("create_directory", "existing directory : %s\n", name);
     }
 
     if (mkdir(name, 0777) == -1) {
-	user_error("create_directory", "cannot create directory : %s\n", name);
+	user_warning("create_directory", "cannot create directory : %s\n",
+		     name);
+	success = FALSE;
     }
+    else {
+	success = TRUE;
+    }
+    return success;
 }
 
-void purge_directory(name)
+bool purge_directory(name)
 char *name;
 {
+    bool success = TRUE;
+
     if (directory_exists_p(name)) {
-	if(system(concatenate("rm -r ", name, (char*) NULL)))
-	    user_error("purge_directory", "cannot purge directory : %s\n", name);
+	if(system(concatenate("/bin/rm -r ", name, (char*) NULL))) {
+	    user_warning("purge_directory", "cannot purge directory : %s\n",
+			 name);
+	    success = FALSE;
+	}
+	else {
+	    success = TRUE;
+	}
     }
+    else {
+	success = FALSE;
+    }
+
+    return success;
 }
 
 /* returns the current working directory
