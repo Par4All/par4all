@@ -14,8 +14,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-extern int      fprintf();
-extern int      vfprintf();
 
 /* PiPs specific headers */
 #include "genC.h"
