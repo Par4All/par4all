@@ -1,7 +1,7 @@
 %
 % Documentation de l'environnement de de'veloppement PIPS
 %
-% $RCSfile: dret146.ftex,v $ ($Date: 1994/03/16 11:06:11 $) version $Revision$, got on %D%, %T%
+% $RCSfile: dret146.ftex,v $ ($Date: 1994/04/13 15:20:05 $) version $Revision$, got on %D%, %T%
 % %A%
 %
 
@@ -26,7 +26,7 @@
 			Fabien COELHO
 }
 %\newcommand{\docdate}{7 octobre 1993}
-\newcommand{\docdate}{$Date: 1994/03/16 11:06:11 $}
+\newcommand{\docdate}{$Date: 1994/04/13 15:20:05 $}
 
 \begin{document}
 
@@ -84,6 +84,10 @@ sous-re'pertoires portant les noms des bibliothe`ques. Il contient aussi
 un makefile permettant de recompiler toutes les bibliothe`ques. Ce makefile
 n'est pas ge'ne're' automatiquement et il n'est donc pas force'ment a` jour.
 
+\item {\tt \bf Runtime.}
+Ce re'pertoire contient les sources des bibliothe`ques utilise'es a`
+l'exe'cution des codes ge'ne're's par le PIPS.
+
 \end{itemize}
 
 \item {\tt \bf Documentation.}
@@ -112,6 +116,10 @@ sous-re'pertoires portant les noms des passes.
 \item {\tt \bf Src/Lib.}
 Ce re'pertoire contient les sources des diffe'rentes bibliothe`ques dans des
 sous-re'pertoires portant leurs noms.
+
+\item  {\tt \bf Src/Runtime.}
+Ce re'pertoire contient les sources des diffe'rentes bibliothe`ques et
+autres codes utilise's a` l'exe'cution par les codes produits.
 
 \item {\tt \bf Bin.}
 Ce re'pertoire contient les versions exe'cutables des passes de Pips ainsi
@@ -216,7 +224,7 @@ et Linear.
 	de \verb+pipsrc.ref+. Ce shell-script est appele' dans
 	\verb+$PIPSDIR/Makefile+.
 
-  \item \verb+validate+: non-regression test; see ?!?;
+  \item \verb+Validate+: non-regression test; see ?!?;
 
 	The arguments are names of subdirectories in
 	\verb+Pips/Tests/Validation+.
@@ -239,7 +247,7 @@ et Linear.
 
 	To run it in background, redirect stderr on /dev/null. Example:
 	\begin{quote}
-	\verb+validate DemoStd 2>/dev/null &+
+	\verb+Validate DemoStd 2>/dev/null &+
 	\end{quote}
 
 	When a bug is corrected, run \verb+bug-to-validate+ to move the
@@ -1076,9 +1084,9 @@ ve'rifier que la correction a e'limine' le bug.
 Dans la suite, nous nous placerons dans la bibliothe`que en
 developpement : ~/Development/Lib/xxx/.
 
-Lancer \verb+validate xxx+ pour ve'rifier la cohe'rence de la
+Lancer \verb+Validate xxx+ pour ve'rifier la cohe'rence de la
 bibliothe`que xxx avec notre correction.
-Lancer (the'oriquement...) \verb+validate Pips+.
+Lancer (the'oriquement...) \verb+Validate Pips+.
 Lancer \verb+make install+, afin de compiler les diffe'rentes sources et
 de les passer dans la nouvelle version en production. Attention :
 actuellement (07.09.92), cette commande ne produit pas une nouvelle
@@ -1121,7 +1129,7 @@ un script-shell a` l'instar de \verb+bug-to-validate+, afin de
 transfe'rer les fichiers ade'quats dans Validation/xxx/.
 Puis ensuite de cre'er bug.test (comprenant toutes les ope'rations
 pips effectue'es : voir les /Validation/xxx/*.test), afin d'indiquer a`
-\verb+validate+ le test correct a` effectuer.
+\verb+Validate+ le test correct a` effectuer.
 Si le test est commun a` tout un repertoire (ex : /Validation/Flint), il faut
 creer dans ce repertoire le fichier ge'ne'rique \verb+default_test+. Dans ce
 fichier, a` l'image de bug.test, les noms ge'ne'riques de'signant les
@@ -1142,7 +1150,7 @@ ge'ne'ral.
 
 \subsection{Autre validation}
 
-Une commande \verb+validate+ permet de mesurer l'impact de modifications
+Une commande \verb+Validate+ permet de mesurer l'impact de modifications
 par rapport au comportement pre'ce'dent de PIPS.
 
 To use it to check the parallelization process, put your test file, say
@@ -1170,19 +1178,19 @@ After a while, if you want to check that PIPS still does that it was
 supposed to do, go into Validation and type
 
 \begin{verbatim}
-validate kludge
+Validate kludge
 \end{verbatim}
 
 If there is any problem, you will get a mail message that tells you want
 the problem is. You can also type
 
-	validate
+	Validate
 
 to check everything.
 
 \begin{itemize}
-  \item \verb+validate+ sans argument valide les directories qui se trouve dans le
-  fichier Validation/defaults.
+  \item \verb+Validate+ sans argument valide les re'pertoires qui se trouvent
+  dans le fichier Validation/defaults.
 
   \item Quand on valide un sous-directory de Validation, si pour le programme
   foo.f existe un fichier foo.test, celui est execute' et son output est
