@@ -2,7 +2,7 @@ c
 c     Reductions management 
 c
 c $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-c ($Date: 1996/09/07 16:32:21 $, )
+c ($Date: 1996/09/07 17:15:00 $, )
 c
 c     it is supposed that the reduction is computed on a full
 c     array, which is nor replicated anyway. If used on a part,
@@ -105,7 +105,7 @@ SIMPLE_REPLICATE(LEVEL, `ENDDO_LOOP')
 c
 c send partial result to host, and get the final result
 c
-ifelse(ARCHITECTURE,`CM5',`dnl
+ifelse(PVM_ARCH,`CM5',`dnl
       if (0.ne.CMMD_send(
      $     CM HOST ID,
      $     HOST CHANNEL,
@@ -134,7 +134,7 @@ c
 c get partial results
 c
       do i=1, MAX SIZE OF PROCS
-ifelse(ARCHITECTURE,`CM5',`dnl
+ifelse(PVM_ARCH,`CM5',`dnl
          if (0.ne.CMMD_receive(
      $     CM NODE IDS(i),
      $     RECV CHANNELS(i),
@@ -160,7 +160,7 @@ DISJUNCTION(``
 c
 c send final result to nodes 
 c      
-ifelse(ARCHITECTURE,`CM5',`dnl
+ifelse(PVM_ARCH,`CM5',`dnl
       call CMMD_bc_from_host(final, M4_PVM_LENGTH(PVMTYPE))',`dnl 
       call HPFC HSNDTO A(PVMTYPE, final)')
       build_name(hred,LEVEL,PVMTYPE,NAME) = final
