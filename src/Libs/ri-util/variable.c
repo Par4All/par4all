@@ -387,3 +387,19 @@ entity a_module;
     free(s);
     code_decls_text(c) = strdup("");
 }
+
+/* Returns a numbered entity the name of which is suffix + number,
+ * the module of which is prefix. Used by some macros to return
+ * dummy and primed variables for system of constraints.
+ *
+ * moved to ri-util from hpfc on BC's request. FC 08/09/95
+ */
+entity get_ith_dummy(prefix, suffix, i)
+string prefix, suffix;
+int i;
+{
+    char buffer[100]; 
+    assert(i>=1 && i<=7);
+    (void) sprintf(buffer, "%s%d", suffix, i);
+    return(find_or_create_scalar_entity(buffer, prefix, is_basic_int));
+}
