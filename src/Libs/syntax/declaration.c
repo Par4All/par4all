@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/28 22:07:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/05/02 08:56:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/04/28 22:07:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/05/02 08:56:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -648,7 +648,7 @@ update_common_sizes()
 	    user_warning("update_common_sizes",
 			 "inconsistent size (%d and %d) for common %s in %s\n"
 			 "Best results are obtained if all instances of a "
-			 "COMMON are declared the same way.",
+			 "COMMON are declared the same way.\n",
 			 area_size(ac), s, entity_name(c), 
 			 CurrentPackage);
 	else {
