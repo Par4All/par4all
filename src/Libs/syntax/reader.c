@@ -1,5 +1,11 @@
 /*
  * $Id$
+ *
+ * $Log: reader.c,v $
+ * Revision 1.28  1998/10/07 16:04:03  irigoin
+ * Reset of variable EofSeen added in paser_reset_all_reader_buffers(). This
+ * fixes a bug in Parsererror() when its call occured after EofSeen had been set.
+ *
  */
 
 #include <stdio.h>
@@ -128,6 +134,7 @@
 char * Comm = NULL, * PrevComm = NULL, * CurrComm;
 int iComm = 0, iPrevComm = 0, iCurrComm = 0;
 static int CommSize = 0;
+static int EofSeen = FALSE;
 
 /* lazy initialization of the comment buffer
  */
@@ -275,6 +282,7 @@ parser_reset_all_reader_buffers(void)
     iComm = 0;
     iPrevComm = 0;
     i_getchar = UNDEF, l_getchar = UNDEF;
+    EofSeen = FALSE;
 }
 
 /*
@@ -891,7 +899,6 @@ ReadLine(FILE * fp)
 int 
 ReadStmt(FILE * fp)
 {
-    static int EofSeen = FALSE;
     int TypeOfLine;	
     int result;
 
