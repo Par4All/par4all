@@ -139,6 +139,19 @@ static bool call_flt(call c)
     return value_code_p(entity_initial(e_callee));
 }
 
+/******written by Dat***********************/
+text my_get_text_proper_effects(string module_name)
+{
+    text t;
+
+    set_methods_for_rw_effects_prettyprint(module_name);
+    t = my_get_any_effect_type_text(module_name, DBR_PROPER_EFFECTS);
+
+    reset_methods_for_effects_prettyprint(module_name);
+    return t;
+}
+/*******************************************/
+
 static void call_rwt(call c)
 {
   entity e_callee = call_function(c);
