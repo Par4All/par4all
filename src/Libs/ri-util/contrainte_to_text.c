@@ -20,14 +20,14 @@
 #include "ri.h"
 #include "ri-util.h"
 
-void inegalite_debug(c)
-Pcontrainte c;
+void 
+inegalite_debug(Pcontrainte c)
 {
     inegalite_fprint(stderr, c, entity_local_name);
 }
 
-void egalite_debug(c)
-Pcontrainte c;
+void 
+egalite_debug(Pcontrainte c)
 {
     egalite_fprint(stderr, c, entity_local_name);
 }
@@ -45,53 +45,71 @@ contrainte_gen_allocated_memory(
 
 /******************************************** FOR PRETTYPRINTING CONSTRAINTS */
 
-
-
-void 
-constante_to_textline(
-    char * operation_line,
-    Value constante,
+static string
+the_operator(
     boolean is_inegalite, 
     boolean a_la_fortran)
 {
-    operation_line[0]='\0';
-    (void) sprint_operator(operation_line+strlen(operation_line), 
-			   is_inegalite, a_la_fortran);
-    (void) sprint_Value(operation_line+strlen(operation_line), 
-			constante);
+    return is_inegalite? (a_la_fortran? ".LE.": "<="): 
+	(a_la_fortran? ".EQ.": "==");
 }
 
-void
+static void
+add_Value_to_current_line(
+    string buffer,
+    Value v,
+    string continuation,
+    text t)
+{
+    add_to_current_line(buffer, Value_to_string(v), continuation, t);
+}
+
+static void 
+constante_to_textline(
+    string buffer,
+    Value constante,
+    boolean is_inegalite, 
+    boolean a_la_fortran,
+    string continuation,
+    text t)
+{
+    add_to_current_line(buffer, the_operator(is_inegalite, a_la_fortran),
+			continuation, t);
+    add_Value_to_current_line(buffer, constante, continuation, t);
+}
+
+static void
 unsigned_operation_to_textline(
-    char * operation_line,
+    string buffer,
     Value coeff,
     Variable var,
-    char * (*variable_name)(Variable))
+    char * (*variable_name)(Variable),
+    string continuation,
+    text t)
 {
     if (value_notone_p(ABS(coeff)) || var==TCST)
-	(void) sprint_Value(operation_line+strlen(operation_line), coeff);
-    (void) sprintf(operation_line+strlen(operation_line),"%s", 
-		   variable_name(var));
-
+	add_Value_to_current_line(buffer, coeff, continuation, t);
+    add_to_current_line(buffer, variable_name(var), continuation, t);
 }
 
-void
+static void
 signed_operation_to_textline(
-    char * operation_line,
-    char signe,
+    string buffer,
+    string signe,
     Value coeff,
     Variable var,
-    char * (*variable_name)(Variable))
+    char * (*variable_name)(Variable),
+    string continuation,
+    text t)
 {
-   
-    (void) sprintf(operation_line+strlen(operation_line),"%c",signe);
-    unsigned_operation_to_textline(operation_line,coeff,var,variable_name);
-
+    add_to_current_line(buffer, signe, continuation, t);
+    unsigned_operation_to_textline(buffer,coeff,var,variable_name,
+				   continuation, t);
 }
 
 static char * 
 contrainte_to_text_1(
-    string aux_line,
+    string buffer,
     string continuation,
     text txt,
     Pvecteur v,
@@ -102,32 +120,32 @@ contrainte_to_text_1(
 {
     short int debut = 1;
     Value constante = VALUE_ZERO;
-    char operation_line[MAX_LINE_LENGTH];
 	
-    while (!VECTEUR_NUL_P(v)) {
+    while (!VECTEUR_NUL_P(v)) 
+    {
 	Variable var = var_of(v);
 	Value coeff = val_of(v);
-	operation_line[0]='\0';
 
 	if (var!=TCST) {
-	    char signe;
+	    string signe;
 
 	    if (value_notzero_p(coeff)) {
 		if (value_pos_p(coeff))
-		    signe =  '+';
+		    signe =  "+";
 		else {
-		    signe = '-';
+		    signe = "-";
 		    coeff = value_uminus(coeff);
 		};
 		if (value_pos_p(coeff) && debut)
-		    unsigned_operation_to_textline(operation_line,coeff,var,
-						   variable_name);
+		    unsigned_operation_to_textline(buffer,coeff, var,
+						   variable_name,
+						   continuation, txt);
 		else 
-		    signed_operation_to_textline(operation_line,signe,coeff,
-						 var, variable_name);
+		    signed_operation_to_textline(buffer, signe, coeff,
+						 var, variable_name,
+						 continuation, txt);
 		debut = 0;
 	    }
-	    add_to_current_line(aux_line, operation_line, continuation, txt);
 	}
 	else
 	    /* on admet plusieurs occurences du terme constant!?! */
@@ -135,15 +153,14 @@ contrainte_to_text_1(
 
 	v = v->succ;
     }
-    constante_to_textline(operation_line,value_uminus(constante),is_inegalite,
-			  a_la_fortran);
-    add_to_current_line(aux_line, operation_line, continuation, txt);
-    return aux_line;
+    constante_to_textline(buffer,value_uminus(constante),is_inegalite,
+			  a_la_fortran, continuation, txt);
+    return buffer;
 }
 
 static char * 
 contrainte_to_text_2(
-    string aux_line,
+    string buffer,
     string continuation,
     text txt,
     Pvecteur v,
@@ -158,8 +175,7 @@ contrainte_to_text_2(
     int negative_terms = 0;
     Value const_coeff = 0;
     boolean const_coeff_p = FALSE;
-    char signe;
-    char operation_line[MAX_LINE_LENGTH];
+    string signe;
    
     if(!is_inegalite) {
 	for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
@@ -178,41 +194,38 @@ contrainte_to_text_2(
     for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
 	Value coeff = vecteur_val(coord);
 	Variable var = vecteur_var(coord);
-	operation_line[0]='\0';
 
 	if (value_pos_p(coeff)) {
 	    positive_terms++;
-	     if(!term_cst(coord)|| is_inegalite) {
-		 signe =  '+';
+	     if(!term_cst(coord)|| is_inegalite) 
+	     {
+		 signe =  "+";
 		 if (debut)
-		     unsigned_operation_to_textline(operation_line,coeff,var,
-				       variable_name);
+		     unsigned_operation_to_textline(buffer,coeff,var,
+						    variable_name,
+						    continuation, txt);
 		 else 
-		     signed_operation_to_textline(operation_line,signe,
-						  coeff,var,variable_name);
+		     signed_operation_to_textline(buffer,signe,
+						  coeff,var,variable_name,
+						  continuation, txt);
 		 debut=FALSE;
 
 	    }
 	     else  positive_terms--;
-	       
-	     add_to_current_line(aux_line, operation_line, continuation,txt);
 	}
     }
 
-    operation_line[0]='\0';
-    if(positive_terms == 0) 	
-	(void) sprintf(operation_line+strlen(operation_line), "0"); 
-    
-    (void) sprint_operator(operation_line+strlen(operation_line), 
-			   is_inegalite, a_la_fortran);
-    
-    add_to_current_line(aux_line,operation_line, continuation,txt);
+    if(positive_terms == 0)
+	add_to_current_line(buffer, "0", continuation, txt);
+
+    add_to_current_line(buffer, the_operator(is_inegalite, a_la_fortran),
+			continuation, txt);
 
     debut = TRUE;
-    for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) {
+    for(coord = v; !VECTEUR_NUL_P(coord); coord = coord->succ) 
+    {
 	Value coeff = vecteur_val(coord);
 	Variable var = var_of(coord);
-	operation_line[0]='\0';
 
 	if(term_cst(coord) && !is_inegalite) {
 	    /* Save the constant term for future use */
@@ -221,40 +234,37 @@ contrainte_to_text_2(
 	    /* And now, a lie... In fact, rhs_terms++ */
 	    negative_terms++;
 	}
-	else if (value_neg_p(coeff)) {
+	else if (value_neg_p(coeff))
+	{
 	    negative_terms++;
-	    signe = '+';
+	    signe = "+";
 	    if (debut) {
-		unsigned_operation_to_textline(operation_line, 
-					       value_uminus(coeff),var,
-					       variable_name);
+		unsigned_operation_to_textline
+		    (buffer, value_uminus(coeff), var, variable_name,
+		     continuation, txt);
 		debut=FALSE;
 	    }
 	    else 
-		signed_operation_to_textline(operation_line,signe,
-					     value_uminus(coeff),var,
-					     variable_name);
+		signed_operation_to_textline
+		    (buffer, signe, value_uminus(coeff),var, variable_name,
+		     continuation, txt);
 	    
 	}
-	add_to_current_line(aux_line, operation_line, continuation,txt); 
     }
-    operation_line[0]='\0';
-    if(negative_terms == 0) {
-	(void) sprintf(operation_line+strlen(operation_line), "0"); 
-        add_to_current_line(aux_line,operation_line, continuation,txt);
-    }
-      else if(const_coeff_p) {
+
+    if(negative_terms == 0)
+        add_to_current_line(buffer, "0", continuation, txt);
+
+    else if(const_coeff_p) 
+    {
 	assert(value_notzero_p(const_coeff));
-	
 	if  (!debut && value_neg_p(const_coeff))
-	    (void) sprintf(operation_line+strlen(operation_line), "+"); 
-	(void) sprint_Value(operation_line+strlen(operation_line), 
-			    value_uminus(const_coeff));
-
-	add_to_current_line(aux_line,operation_line, continuation,txt);
+	    add_to_current_line(buffer, "+", continuation, txt);
+	add_Value_to_current_line(buffer, value_uminus(const_coeff),
+				  continuation, txt);
     }
 
-    return aux_line;
+    return buffer;
 }
 
 
