@@ -7,38 +7,15 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/03/24 15:02:09 $, ) version $Revision$,
- * got on %D%, %T%
- * $Id$
+ * $RCSfile: build-system.c,v $ ($Date: 1995/04/10 18:49:32 $, ) 
+ * version $Revision$
  */
 
-/*
- * Standard includes
- */
- 
-#include <stdio.h>
-#include <string.h> 
-extern fprintf();
+#include "defines-local.h"
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-
-#include "genC.h"
-
-#include "ri.h" 
-#include "hpf.h" 
-#include "hpf_private.h"
-
-#include "ri-util.h" 
-#include "misc.h" 
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
-
-#include "hpfc.h"
-#include "defines-local.h"
 
 #define ALPHA_PREFIX "ALPHA"
 #define LALPHA_PREFIX "LALPHA"
