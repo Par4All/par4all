@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "genC.h"
 #include "text.h"
@@ -535,7 +536,7 @@ write_an_attachment_file(string file_name)
 	    
 	    /* Just backslashify the '"' and '\': */
 	    if (c == '"' || c == '\\')
-		(void) putc('\\', file_stream);
+		(void) putc('\\', emacs_file_stream);
 	    
 	    (void) putc(c, emacs_file_stream);	  
 	}
