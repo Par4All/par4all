@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.117  1997/05/23 09:50:52  coelho
+# *** empty log message ***
+#
 # Revision 1.116  1997/05/22 17:10:47  coelho
 # improved selection of arch.
 #
@@ -149,6 +152,9 @@ PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
 
 test "${PIPS_ARCH}" = LINUXI86 && \
 	PIPS_DIRECTORY_FOR_BINARIES=/usr/local/misc/pips/LINUXI86
+
+test "${PIPS_ARCH}" = GNUSOL2LL && \
+	PIPS_DIRECTORY_FOR_BINARIES=/home/recanati/baraque1/pips/GNUSOL2LL
 
 ############################################################ DEVELOPPING PIPS
 
