@@ -510,11 +510,11 @@ bool array_bound_check_instrumentation(char *module_name)
        * true if we do it like other statements), we will check 
        * array references in new loops added*/
       
-      rewrite_implied_do(module_statement);     
+      // rewrite_implied_do(module_statement);     
       
       /* Reorder the module, because new loops have been added */
       
-      module_reorder(module_statement);
+      // module_reorder(module_statement);
       ifdebug(1)
 	{
 	  debug(1, " Initial code array bound check instrumention",
