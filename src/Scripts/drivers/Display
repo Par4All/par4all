@@ -177,10 +177,10 @@ if [ -z "$LAST" ]
 then
 if [ -z "$VERBOSE" ]
 then
-	$UTILDIR/Pips -w "$OPT_PGM" -m "$OPT_MOD" \
+	$PIPS_UTILDIR/Pips -w "$OPT_PGM" -m "$OPT_MOD" \
 			$SELECT $PERFORM -b $RESOURCE 1>/dev/null || exit 1;
 else
-	$UTILDIR/Pips -w "$OPT_PGM" -m "$OPT_MOD" \
+	$PIPS_UTILDIR/Pips -w "$OPT_PGM" -m "$OPT_MOD" \
 			$SELECT $PERFORM -b $RESOURCE 1>&2 || exit 1;
 fi
 fi
