@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: cyacc.y,v $
+   Revision 1.3  2003/08/06 14:12:19  nguyen
+   Upgraded version of C parser
+
    Revision 1.2  2003/08/04 14:20:24  nguyen
    Preliminary version of the C parser
 
@@ -71,6 +74,8 @@
   
 #include "c_syntax.h"
 
+/* To avoid warnings */
+extern char *strdup(const char *s1);
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 
@@ -88,8 +93,8 @@ static string CurrentScope = NULL;
 static type CurrentType = type_undefined; 
 static storage CurrentStorage = storage_undefined;
 static list CurrentQualifiers = NIL;
-static string CurrentDerivedName = NULL; /* to remember the name of a struct and add it to the member prefix name*/
-static int CurrentMode = 0; /* to know the mode of the formal parameter : by value or by reference*/
+static string CurrentDerivedName = NULL; /* to remember the name of a struct/union and add it to the member prefix name*/
+static int CurrentMode = 0; /* to know the mode of the formal parameter: by value or by reference*/
 
 static bool is_external = TRUE; /* to know if the variable is declared inside or outside a function */
 static bool is_typedef = FALSE; /* to know if this is a typedef name or not */
@@ -97,8 +102,7 @@ static bool is_static = FALSE; /* to know if the variable/function is declared s
 static bool is_formal = FALSE; /* to know if the entity is a formal parameter or not */
 
 static int offset = 0; /* to know the offset of the formal argument*/
-
-static int enum_counter = 0;
+static int enum_counter = 0; /* to compute the enumerator value: val(i) = val(i-1) + 1*/
 
 extern int derived_counter;
 extern int loop_counter; 
@@ -106,14 +110,6 @@ extern bool is_loop;
 extern expression CurrentSwitchController; 
 extern list CurrentSwitchGotoStatements;
 
-/* All the following global variables must be replaced by functions, once we have the preprocessor for C */
-extern string CurrentSourceFile; 
-extern entity CurrentSourceFileEntity;
-extern entity CurrentSourceFileStaticArea;
-extern int CurrentSourceFileStaticAreaOffset;
-
-extern entity DynamicArea;
-extern int CurrentDynamicAreaOffset;
 %}
 
 /* Bison declarations */
@@ -218,7 +214,7 @@ extern int CurrentDynamicAreaOffset;
 /* Non-terminals informations */
 %start interpret
 %type <liste> file interpret globals
-%type <> global
+%type <liste> global
 %type <liste> attributes attributes_with_asm asmattr
 %type <statement> statement
 %type <entity> constant
@@ -281,27 +277,43 @@ extern int CurrentDynamicAreaOffset;
 
 interpret: file TK_EOF
                         {YYACCEPT};
-file: globals			 /* do nothing */	
+file: globals			
+                        {
+			  /* To handle special case: compilation unit module */
+			  if ($1 != NIL)
+			    ModuleStatement = make_statement(entity_empty_label(), 
+							     STATEMENT_NUMBER_UNDEFINED, 
+							     STATEMENT_ORDERING_UNDEFINED, 
+							     string_undefined,
+							     make_instruction_block(NIL),
+							     $1,NULL);
+			}
 ;
+
 globals:
-    /* empty */         {}       /* do nothing */             
-|   global globals      {}       /* do nothing */           
-|   TK_SEMICOLON globals{}       /* do nothing */            
+    /* empty */         { $$ = NIL; }            
+|   global globals
+                        { $$ = gen_nconc($1,$2); }            
+|   TK_SEMICOLON globals
+                        { $$ = $2; }                 
 ;
 
 location:
     /* empty */         {}  %prec TK_IDENT
 
-
 /*** Global Definition ***/
 global:
     declaration         { }                 
-|   function_def        { }
+|   function_def        { $$ = NIL; }
 |   TK_ASM TK_LPAREN string_constant TK_RPAREN TK_SEMICOLON
-                        { CParserError("ASM not implemented\n"); }
+                        { 
+			  CParserError("ASM not implemented\n");
+			  $$ = NIL;
+			}
 |   TK_PRAGMA attr			
                         { 
 			  CParserError("PRAGMA not implemented\n"); 
+			  $$ = NIL;
 			}
 /* Old-style function prototype. This should be somewhere else, like in
    "declaration". For now we keep it at global scope only because in local
@@ -312,9 +324,9 @@ global:
 			     entity ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
 			     list paras = make_parameter_list($3,$5);
 			     functional f = make_functional(paras,make_type_unknown());
-			     entity_type(ent) = make_type_functional(f);
-			  */
-			  CParserError("Old-style function prototype not implemented\n");			 
+			     entity_type(ent) = make_type_functional(f);*/
+			  CParserError("Old-style function prototype not implemented\n");	
+			  $$ = NIL;
 			}
 /* Old style function prototype, but without any arguments */
 |   TK_IDENT TK_LPAREN TK_RPAREN TK_SEMICOLON
@@ -323,20 +335,24 @@ global:
 			     entity ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
 			     functional f = make_functional(NIL,make_type_unknown());*/
 			  CParserError("Old-style function prototype not implemented\n"); 
+			  $$ = NIL;
 			}
 /* transformer for a toplevel construct */
 |   TK_AT_TRANSFORM TK_LBRACE global TK_RBRACE TK_IDENT /*to*/ TK_LBRACE globals TK_RBRACE 
                         { 
 			  CParserError("CIL AT not implemented\n"); 
+			  $$ = NIL;
 			}
 /* transformer for an expression */
 |   TK_AT_TRANSFORMEXPR TK_LBRACE expression TK_RBRACE TK_IDENT /*to*/ TK_LBRACE expression TK_RBRACE 
                         { 
 			  CParserError("CIL AT not implemented\n"); 
+			  $$ = NIL;
 			}
 |   location error TK_SEMICOLON 
                         { 
 			  CParserError("Parse error: location error TK_SEMICOLON \n");
+			  $$ = NIL;
 			}
 ;
 
@@ -681,7 +697,10 @@ one_string:
 init_expression:
     expression          { }
 |   TK_LBRACE initializer_list_opt TK_RBRACE
-			{ $$ = MakeBraceExpression($2); }
+			{
+			  /* Deduce the size of an array by its initialization ?*/
+			  $$ = MakeBraceExpression($2); 
+			}
 
 initializer_list:    /* ISO 6.7.8. Allow a trailing COMMA */
     initializer 
@@ -839,7 +858,7 @@ local_label_names:
 statement:
     TK_SEMICOLON
                     	{
-			  $$ = MakeNullStatement();
+			  $$ = MakeNullStatement(entity_empty_label());
 			}
 |   comma_expression TK_SEMICOLON
 	        	{
@@ -1029,13 +1048,6 @@ decl_spec_list:                         /* ISO 6.7 */
 |   TK_AUTO decl_spec_list_opt           
                         {
 			  /* Make dynamic storage for current entity */
-			  ram r = make_ram(get_current_module_entity(),
-					   DynamicArea,
-					   CurrentDynamicAreaOffset,
-					   NIL);
-			  /* the offset must be recomputed lately, when we know the size of the variable */
-			  /* block number ? */
-			  CurrentStorage = make_storage_ram(r);
 			  $$ = $2;
 			}
 |   TK_REGISTER decl_spec_list_opt        
@@ -1420,7 +1432,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
                         { 
 			 /* Declare the variable array, what can be attributes  ??? 
 			    Why comma_expression ??? when this comma_expression is empty,
-			    the array is of unknown size => can be determined by the intialization ?*/
+			    the array is of unknown size => can be determined by the intialization ? TO BE DONE*/
 			  type t = entity_type($1);
 			  ifdebug(3) 
 			    {
@@ -1684,12 +1696,14 @@ abs_direct_decl_opt:
 ;
 
 function_def:  /* (* ISO 6.9.1 *) */
-    function_def_start block   
+    function_def_start { InitializeBlock(); } block   
                         {
 			  /* Make value_code for current module here 
 			     Attention with execution order ? */
-			  InitializeBlock($2);	  
+			  /* False ??? InitializeBlock too late, make it earlier*/
+			  ModuleStatement = $3;
 			  ResetCurrentModule(); 
+			  is_external = TRUE;
 			}	
 
 function_def_start:  /* (* ISO 6.9.1 *) */
@@ -1704,8 +1718,8 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  is_static = FALSE;
 			  is_external = FALSE; 
 			  /* The current module entity is created with declarator */
-			  pips_debug(2,"Case 1 Create module entity: %s\n",entity_local_name($2));
-			  CreateCurrentModule($2);
+			  pips_debug(2,"Create module entity: %s\n",entity_local_name($2));
+			  MakeCurrentModule($2);
 			}	
 /* (* Old-style function prototype *) */
 |   decl_spec_list old_proto_decl 
@@ -1728,11 +1742,12 @@ function_def_start:  /* (* ISO 6.9.1 *) */
                         { 
 			  /* Create the current function */
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  /* Functional type is unknown or int (by default) or void ?*/
 			  functional f = make_functional($3,make_type_unknown());
 			  entity_type(e) = make_type_functional(f);
 			  is_external = FALSE; 
-			  pips_debug(2,"Case 2 Create module entity: %s\n",$1);
-			  CreateCurrentModule(e);
+			  pips_debug(2,"Create module entity %s with no return type\n",$1);
+			  MakeCurrentModule(e);
 			}	
 /* (* No return type and old-style parameter list *) */
 |   TK_IDENT TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list
@@ -1747,11 +1762,12 @@ function_def_start:  /* (* ISO 6.9.1 *) */
                         { 
 			  /* Create the current function */
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  /* Functional type is unknown or int (by default) or void ?*/
 			  functional f = make_functional(NIL,make_type_unknown());
 			  entity_type(e) = make_type_functional(f);
 			  is_external = FALSE; 
-			  pips_debug(2,"Case 3 Create module entity: %s\n",$1);
-			  CreateCurrentModule(e);
+			  pips_debug(2,"Create module entity %s with no return type and no parameters\n",$1);
+			  MakeCurrentModule(e);
 			}	
 ;
 
