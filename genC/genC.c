@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1995/03/28 15:05:32 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1995/05/05 15:30:01 $, )
  * version $Revision$
  */
 
@@ -366,6 +366,11 @@ struct gen_binding *bp ;
     (void) printf("#define extend_%s(hash, var, val) ", name ) ;
     (void) printf("(HASH_EXTEND(%s", primitive_field(start));
     (void) printf(",%s,((hash)+%d)->h,(var),(val)))\n",
+		  primitive_field(image), data ) ;
+
+    (void) printf("#define delete_%s(hash, var) ", name ) ;
+    (void) printf("(HASH_DELETE(%s", primitive_field(start));
+    (void) printf(",%s,((hash)+%d)->h,(var)))\n",
 		  primitive_field(image), data ) ;
 
     /* key and value types
