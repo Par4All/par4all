@@ -599,6 +599,9 @@ If no buffer can be found, just return nil."
 					; nodes at the same depth:
       (goto-char (point-min))
       (perform-replace "^\\(C.*\\)\012\\( *\\)" "\\2\\1\012\\2" nil t nil)
+      ;; Remove the new leading space from Fabien :
+      (goto-char (point-min))
+      (perform-replace "^ " "" nil t nil)
 					; Send the file content to the
 					; xtree process:
       (process-send-region epips-xtree-process (point-min) (point-max))
