@@ -1,5 +1,6 @@
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/24 16:34:48 $ 
+# 
+# $Id$
+# 
 
 CPPFLAGS+=	$(PIPS_X11_ADDED_CPPFLAGS)
 LDFLAGS+=	$(PIPS_X11_ADDED_LDFLAGS)
@@ -14,15 +15,13 @@ CFILES=		xpomp.c
 M4CFILES=	cgraphic.m4c
 DEMO=		test_xpomp.c fractal.f wave.f wave_parameters.h
 HPFC=		xpomp_stubs.f
-DOC=		xpomp_manual.tex xPOMP_window_explained.eps
 
 SOURCES=	$(LOCAL_HEADERS) \
 		$(EXPORT_HEADERS) \
 		$(CFILES) \
 		$(M4CFILES) \
 		$(DEMO) \
-		$(HPFC) \
-		$(DOC)
+		$(HPFC)
 
 OFILES=		$(ARCH)/cgraphic.o
 
@@ -35,21 +34,14 @@ INSTALL_BIN_DIR:=$(INSTALL_RTM_DIR)/$(ARCH)
 INSTALL_BIN=	$(BIN) $(LIB)
 INSTALL_RTM=	$(EXPORT_HEADERS)
 INSTALL_SHR=	$(HPFC) xpomp_graphic_F.h xpomp_stubs.direct
-INSTALL_DOC=	xpomp_manual.ps 
-INSTALL_HTM=	xpomp_manual
 
 # 
 # compilation and so
 
 DRUN =	$(LIB) $(BIN) $(ARCH)/fractal $(ARCH)/test_xpomp $(ARCH)/wave
-DDOC =	$(INSTALL_DOC) xpomp_manual.html xpomp_manual/fractal.f
 
-all: run xpomp_stubs.direct doc
+all: run xpomp_stubs.direct
 run: $(DRUN)
-doc: $(DDOC)
-
-xpomp_manual/fractal.f: xpomp_manual.html fractal.f
-	cp fractal.f xpomp_manual
 
 # cproto:; $(PROTOIZE) xpomp.c
 
@@ -74,7 +66,6 @@ $(LIB):	$(OFILES) cgraphic.c gr.h
 	$(AR) $(ARFLAGS) $(LIB) $(OFILES)
 	ranlib $(LIB)
 
-
 $(ARCH)/test_xpomp : $(ARCH)/test_xpomp.o $(LIB) 
 	$(LINK) $@ $+ -lm $(LIB)
 
@@ -88,7 +79,6 @@ clean: local-clean
 local-clean:
 	$(RM) cgraphic.c $(ARCH)/*.o $(DRUN) \
 		xpomp_manual.dvi xpomp_stubs.direct 
-	$(RM) -r $(DDOC) 
 
 # that is all
 #
