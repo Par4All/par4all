@@ -8,27 +8,7 @@
  * Laurent Aniort & Fabien Coelho 1992
  */
 
-/************************************************************/
-/* IO includes */
-#include <stdio.h>
-#include <values.h>
-
-#include "malloc.h"
-
-/* PiPs specific includes */
-#include "genC.h"
-#include "linear.h"
-#include "ri.h"
-
-#include "ri-util.h"
-
-/* To avoid a global variable to pass the dependence graph in flint.c: */
-#include "graph.h"
-
-/* Flint specific header */
-#include "flint.h"
-
-#include "control.h"
+#include "local.h"
 
 /************************************************************/
 
