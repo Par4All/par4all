@@ -53,7 +53,8 @@ int number_of_lower_bounds,loop_rank;
     expression expr,ex1,ex2, lower=expression_undefined ;
     cons * lex2,* lexpr = NIL;
     entity max = local_name_to_top_level_entity("MAX");
-    int higher_rank, coeff, nlb = 0;
+    int higher_rank,nlb = 0; 
+    Value coeff;
     boolean reductible = FALSE;
  
     debug_on("MOVEMENT_DEBUG_LEVEL");
@@ -64,7 +65,7 @@ int number_of_lower_bounds,loop_rank;
 	     !CONTRAINTE_UNDEFINED_P(ineq); 
 	     ineq=ineq->succ) {
 	    Variable var2;
-	    int coeff2,coeff3;
+	    Value coeff2,coeff3;
 	    reductible = FALSE;
 	    higher_rank=search_higher_rank(ineq->vecteur,index_base);
 	    if (higher_rank > loop_rank ) {
@@ -73,10 +74,11 @@ int number_of_lower_bounds,loop_rank;
 		coeff2 = vect_coeff(var2,ineq->vecteur);
 		coeff3 = vect_coeff(var2,pc2->vecteur);
 		
-		if (ABS(coeff2) ==1 || ABS(coeff3)==1) {
+		if (value_one_p(value_abs(coeff2)) || 
+		    value_one_p(value_abs(coeff3))) {
 		    reductible = TRUE;
-		    pv2 = vect_cl2(ABS(coeff2),pc2->vecteur,
-				   ABS(coeff3),ineq->vecteur);
+		    pv2 = vect_cl2(value_abs(coeff2),pc2->vecteur,
+				   value_abs(coeff3),ineq->vecteur);
 		    ineq= ineq->succ;
 		}
 	    }
@@ -84,15 +86,17 @@ int number_of_lower_bounds,loop_rank;
 	    if (higher_rank <= loop_rank || reductible ) {  
 		/* this condition is TRUE if the constraint constrains 
 		   directly the variable */
-		if ((coeff= vect_coeff(var,pv2)) != -1) 
-		    vect_add_elem(&pv2,0,-coeff -1);
-		vect_chg_coeff(&pv2,var,0);
+		if (value_notmone_p(coeff= vect_coeff(var,pv2)))
+		    vect_add_elem(&pv2, TCST,
+				  value_uminus(value_plus(coeff, VALUE_ONE)));
+		vect_chg_coeff(&pv2,var,VALUE_ZERO);
 		expr = ex1 = make_vecteur_expression(pv2);
-    		if (coeff != -1) {
-		    ex2 = make_integer_constant_expression(ABS(coeff));
+    		if (value_notmone_p(coeff)) {
+		    ex2 = make_integer_constant_expression(
+			VALUE_TO_INT(value_abs(coeff)));
 		    lex2 =CONS(EXPRESSION,ex2,NIL);
 		    expr=make_div_expression(ex1,lex2);
-		    vect_add_elem(&pv2,0,coeff+1);
+		    vect_add_elem(&pv2,TCST,value_plus(coeff,VALUE_ONE));
 		}
 	    }
 	    else {				
@@ -134,7 +138,8 @@ int number_of_upper_bounds, loop_rank;
 {
     Pcontrainte ineq; 
     Pvecteur pv2=VECTEUR_NUL;
-    int higher_rank,coeff, nub = 0;
+    int higher_rank, nub = 0;
+    Value coeff;
     Variable var = variable_of_rank(index_base,loop_rank);
     expression expr, ex2, ex1, upper = expression_undefined;
     cons * lex2,* lexpr = NIL;
@@ -150,17 +155,18 @@ int number_of_upper_bounds, loop_rank;
 	     !CONTRAINTE_UNDEFINED_P(ineq); 
 	     ineq=ineq->succ) {
 	    Variable var2;
-	    int coeff2,coeff3;
+	    Value coeff2,coeff3;
 	    reductible = FALSE;
 	    higher_rank=search_higher_rank(ineq->vecteur,index_base);
 	    if (higher_rank > loop_rank ) {
 		var2 = variable_of_rank(index_base,higher_rank);
 		coeff2 = vect_coeff(var2,ineq->vecteur);
 		coeff3 = vect_coeff(var2,(ineq->succ)->vecteur);
-		if (ABS(coeff2) ==1 || ABS(coeff3)==1) {
+		if (value_one_p(value_abs(coeff2)) || 
+		    value_one_p(value_abs(coeff3))) {
 		    reductible = TRUE;
-		    pv2 = vect_cl2(ABS(coeff2),(ineq->succ)->vecteur,
-				   ABS(coeff3),ineq->vecteur);
+		    pv2 = vect_cl2(value_abs(coeff2),(ineq->succ)->vecteur,
+				   value_abs(coeff3),ineq->vecteur);
 
 		    ineq= ineq->succ;
 		}
@@ -172,12 +178,13 @@ int number_of_upper_bounds, loop_rank;
 		   directly the variable */
 		coeff= vect_coeff(var,pv2);
 		vect_chg_sgn(pv2);
-		vect_chg_coeff(&pv2,var,0);
+		vect_chg_coeff(&pv2,var,VALUE_ZERO);
 		expr = ex1 =make_vecteur_expression(pv2);
 		vect_chg_sgn(pv2);
 	      
-		if (coeff != 1) {
-		    ex2 = make_integer_constant_expression(ABS(coeff));
+		if (value_notone_p(coeff)) {
+		    ex2 = make_integer_constant_expression(
+			VALUE_TO_INT(value_abs(coeff)));
 		    lex2 = CONS(EXPRESSION,ex2,NIL);
 		    expr= make_div_expression(ex1,lex2);
 		}
@@ -219,7 +226,8 @@ Pbase index_base;
 {
 
     Pcontrainte ineq,right_ineq,left_ineq;
-    int rank,coeff;
+    int rank;
+    Value coeff;
     Variable var;
     boolean debut;
     expression expr,ex1,ex2,ex3,ex4;
@@ -242,7 +250,7 @@ Pbase index_base;
 	rank = search_higher_rank(ineq->vecteur,index_base);
 	var = variable_of_rank(index_base,rank);
 
-	if ((coeff= vect_coeff(var,ineq->vecteur)) >0) {
+	if (value_pos_p(coeff= vect_coeff(var,ineq->vecteur))) {
 	    right_ineq = contrainte_dup(ineq);
 	    left_ineq = contrainte_dup(ineq->succ);
 	} 
@@ -252,28 +260,32 @@ Pbase index_base;
 	}
 
 	/* generation of the left hand side of the guard */	    
-	if ((coeff= vect_coeff(var,left_ineq->vecteur)) != -1)
-	    vect_add_elem(&(left_ineq->vecteur),0,-coeff -1);
+	if (value_notmone_p(coeff= vect_coeff(var,left_ineq->vecteur)))
+	    vect_add_elem(&(left_ineq->vecteur),TCST,
+			  value_uminus(value_plus(coeff,VALUE_ONE)));
 	
-	vect_chg_coeff(&(left_ineq->vecteur),var,0);
+	vect_chg_coeff(&(left_ineq->vecteur),var,VALUE_ZERO);
 	ex1 = make_vecteur_expression(left_ineq->vecteur);
-	if (coeff != -1) {
-	    ex2 = make_integer_constant_expression(ABS(coeff));
+	if (value_notmone_p(coeff)) {
+	    ex2 = make_integer_constant_expression(
+		VALUE_TO_INT(value_abs(coeff)));
 	    lex2 = CONS(EXPRESSION,ex2,NIL);
 	    exl = make_div_expression(ex1,lex2);	
-	    vect_add_elem(&(left_ineq->vecteur),0,coeff+1);
+	    vect_add_elem(&(left_ineq->vecteur),TCST,
+			  value_plus(coeff,VALUE_ONE));
 	}
 
 	/* generation of the right hand side of the guard */	    
 
 	coeff= vect_coeff(var,right_ineq->vecteur);
 	vect_chg_sgn(right_ineq->vecteur);
-	vect_chg_coeff(&(right_ineq->vecteur),var,0);
+	vect_chg_coeff(&(right_ineq->vecteur),var,VALUE_ZERO);
 	ex3= make_vecteur_expression(right_ineq->vecteur);
 	vect_chg_sgn(right_ineq->vecteur);
     
-	if (coeff != 1) {
-	    ex4 = make_integer_constant_expression(ABS(coeff));
+	if (value_notone_p(coeff)) {
+	    ex4 = make_integer_constant_expression(
+		VALUE_TO_INT(value_abs(coeff)));
 	    lex2 =CONS(EXPRESSION,ex4,NIL);
 	    exr = make_div_expression(ex3,lex2);	
 	}
