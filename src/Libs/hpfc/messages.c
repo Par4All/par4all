@@ -1,6 +1,6 @@
 /* Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1995/04/10 18:49:38 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1995/07/20 18:40:42 $, )
  * version $Revision$
  * 
  * Fabien Coelho, August 1993
@@ -436,32 +436,20 @@ message m;
 static list messages_atomization(lm1)
 list lm1;
 {
-    list
-	lm2 = NIL;
+    list lm2 = NIL;
 
-    MAPL(cm,
-     {
-	 message
-	     m = MESSAGE(CAR(cm));
-	 
-	 lm2 = gen_nconc(atomize_one_message(m), lm2);
-     },
-	 lm1);
+    MAP(MESSAGE, m, lm2 = gen_nconc(atomize_one_message(m), lm2), lm1);
 
-    return(lm2);
+    return lm2;
 }
 
 static list keep_non_empty_messages_with_destination(l)
 list l;
 {
-    list
-	result = NIL;
+    list result = NIL;
 
-    MAPL(cm,
+    MAP(MESSAGE, m,
      {
-	 message
-	     m = MESSAGE(CAR(cm));
-
 	 if ((!VECTEUR_NUL_P((Pvecteur) message_neighbour(m))) &&
 	     (!empty_section_p(message_content(m))))
 	     result = CONS(MESSAGE, m, result);
@@ -478,11 +466,8 @@ list l;
     list
 	result = NIL;
     
-    MAPL(cm,
+    MAP(MESSAGE, m,
      {
-	 message
-	     m = MESSAGE(CAR(cm));
-	 
 	 if (!empty_section_p(message_dom(m)))
 	     result = CONS(MESSAGE, m, result);
 	 /* ??? else memory leak */
@@ -558,17 +543,9 @@ message m;
 static list messages_shaping(l)
 list l;
 {
-    list
-	result = NIL;
+    list result = NIL;
     
-    MAPL(cm,
-     {
-	 message
-	     m = MESSAGE(CAR(cm));
-
-	 result = CONS(MESSAGE, shape_one_message(m), result);
-     },
-	 l);
+    MAP(MESSAGE, m, result = CONS(MESSAGE, shape_one_message(m), result), l);
 
     return(result);
 }
@@ -618,17 +595,11 @@ message m;
 static list messages_guards_and_neighbour(l)
 list l;
 {
-    list
-	result = NIL;
+    list result = NIL;
 
-    MAPL(cm,
-     {
-	 message
-	     m = MESSAGE(CAR(cm));
-	 
-	 result = CONS(MESSAGE, one_message_guards_and_neighbour(m), result);
-     },
-	 l);
+    MAP(MESSAGE, m,
+	result = CONS(MESSAGE, one_message_guards_and_neighbour(m), result),
+	l);
     
     return(result);
 }
@@ -657,19 +628,15 @@ message send;
 static list receive_messages_generation(lms)
 list lms;
 {
-    list
-	lmr = NIL;
+    list lmr = NIL;
 
-    MAPL(cm,
-     {
-	 message
-	     send = MESSAGE(CAR(cm));
-
-	 lmr = gen_nconc(lmr, CONS(MESSAGE,
-				   one_receive_message(send),
-				   NIL));
-     },
-	 lms);
+    MAP(MESSAGE, send,
+    {
+	lmr = gen_nconc(lmr, CONS(MESSAGE,
+				  one_receive_message(send),
+				  NIL));
+    },
+	lms);
 
     return(lmr);
 }
@@ -733,16 +700,11 @@ static list generate_the_messages(lm, bsend)
 list lm;
 bool bsend;
 {
-    list
-	l = NIL;
+    list l = NIL;
 
-    MAPL(cm,
-     {
-	 l = CONS(STATEMENT, st_one_message(MESSAGE(CAR(cm)), bsend), l);
-     },
-	 lm);
+    MAP(MESSAGE, m, l = CONS(STATEMENT, st_one_message(m, bsend), l), lm);
 
-    return(l);
+    return l;
 }
 
 /* list remove_stammering_messages(lm)
@@ -752,21 +714,19 @@ bool bsend;
 static list remove_stammering_messages(lm)
 list lm;
 {
-    list
-	kept = NIL;
+    list kept = NIL;
 
     MAPL(cm,
-     {
-	 message
-	     m = MESSAGE(CAR(cm));
-	 
-	 if (!larger_message_in_list(m, kept) &&
-	     !larger_message_in_list(m, CDR(cm)))
-	     kept = CONS(MESSAGE, m, kept);
-     },
-	 lm);
+    {
+	message m = MESSAGE(CAR(cm));
 
-    return(kept);
+	if (!larger_message_in_list(m, kept) &&
+	    !larger_message_in_list(m, CDR(cm)))
+	    kept = CONS(MESSAGE, m, kept);
+    },
+	lm);
+
+    return kept;
 }
 
 /* every required conditions are supposed to be verified in this function.
