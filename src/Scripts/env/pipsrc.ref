@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/12 18:24:30 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/13 15:45:26 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -15,30 +15,18 @@ set -a
 #         #    #  ######  #    #   ####   ######  #    #
 #
 
-NEWGEN_MAX_TABULATED_ELEMENTS=12007
+# the maximum number of tabulated elements (entities for pips)
+# can be extended by defining this variable.
+# NEWGEN_MAX_TABULATED_ELEMENTS=12007
 
-# we should rather have
-# x_DIR for the installed version (instead of x_PRODDIR)
-# x_HOME used for x_DIR (with /Dev... and /Prod...)
+NEWGEN_DIR=/projects/Newgen
+NEWGEN_ROOT=${NEWGEN_DIR}/Production
 
-NEWGEN_DIR="/projects/Newgen"
-
-NEWGEN_PRODDIR="${NEWGEN_DIR}/Production"
 NEWGEN_DEVEDIR="${NEWGEN_DIR}/Development"
-NEWGEN_DOCDIR="${NEWGEN_DIR}/Documentation"
-NEWGEN_RELEASEDIR="${NEWGEN_DIR}/Release"
-
-NEWGEN_INCLUDEDIR="${NEWGEN_PRODDIR}/Include"
-NEWGEN_SHRDIR="${NEWGEN_PRODDIR}/Include"
-NEWGEN_SRCDIR="${NEWGEN_PRODDIR}/Src"
-NEWGEN_LIBDIR="${NEWGEN_PRODDIR}/Lib"
-NEWGEN_BINDIR="${NEWGEN_PRODDIR}/Bin"
-
+NEWGEN_ORDERED_LIBS="genC"
 NEWGEN_LIBS='-lgenC'
 
-NEWGEN_ORDERED_LIBS="genC"
-
-PATH="${PATH}:${NEWGEN_BINDIR}"
+PATH="${PATH}:${NEWGEN_ROOT}/Share:${NEWGEN_ROOT}/Bin:"
 
 #
 #         #          #    #    #  ######    ##    #####
@@ -49,22 +37,13 @@ PATH="${PATH}:${NEWGEN_BINDIR}"
 #         ######     #    #    #  ######  #    #  #    #
 #
 
-LINEAR_DIR="/projects/C3/Linear"
+LINEAR_DIR=/projects/C3/Linear
+LINEAR_ROOT=${LINEAR_DIR}/Production
 
-LINEAR_PRODDIR="${LINEAR_DIR}/Production"
+
 LINEAR_DEVEDIR="${LINEAR_DIR}/Development"
-LINEAR_DOCDIR="${LINEAR_DIR}/Documentation"
-LINEAR_RELEASEDIR="${LINEAR_DIR}/Release"
-
-LINEAR_INCLUDEDIR="${LINEAR_PRODDIR}/Include"
-LINEAR_SHRDIR="${LINEAR_PRODDIR}/Include"
-LINEAR_SRCDIR="${LINEAR_PRODDIR}/Src"
-LINEAR_LIBDIR="${LINEAR_PRODDIR}/Lib"
-LINEAR_BINDIR="${LINEAR_PRODDIR}/Bin"
-
 # removed because not used by pips: plint
 LINEAR_LIBS='-lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique'
-
 LINEAR_ORDERED_LIBS="arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre plint sparse_sc union"
 
 # 
@@ -76,111 +55,74 @@ LINEAR_ORDERED_LIBS="arithmetique vecteur contrainte sc matrice matrix ray_dte s
 #         #          #    #        ####
 # 
 
-# space for temporary files
-PIPS_TEMPDIR="/tmp"
-
-# hosts for Validate
-PIPS_HOSTS="chailly:episy:aiguebelette"
+############################################################### PIPS LOCATION
 
 # Pips project sources and binaries
 PIPS_HOME=/users/soft/pips
 PIPS_DIR=/projects/Pips
 
-# scripts and programs created to manage the project
-PIPS_UTILDIR="${PIPS_DIR}/Utilities"
+# space for temporary files
+PIPS_TEMPDIR="/tmp"
 
-# 
-PIPS_EXPERIMENTSDIR="${PIPS_DIR}/Experiments"
-PIPS_TESTSDIR="${PIPS_DIR}/Tests"
+################################################################ RUNNING PIPS
 
-# empty string if make can be run in this environment
-# (else: error message)
-PIPS_CHECK_OS="`${PIPS_UTILDIR}/check_os`"
+PIPS_ROOT="${PIPS_DIR}/Production"
 
-# current production version - sources and binaries
-PIPS_PRODDIR="${PIPS_DIR}/Production"
+# man pages?
+MANPATH=${MANPATH}:${PIPS_ROOT}/Doc
+PATH=${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}
 
-# binaries
-PIPS_BINDIR="${PIPS_PRODDIR}/Bin"
+############################################################## COMPILING PIPS
 
-# libraries
-PIPS_LIBDIR="${PIPS_PRODDIR}/Lib"
-
-# complexity cost tables directory
-PIPS_COSTDIR="${PIPS_LIBDIR}/complexity"
-
-# sources
-PIPS_SRCDIR="${PIPS_PRODDIR}/Src"
-
-# sources of libraries
-PIPS_LIBSRCDIR="${PIPS_SRCDIR}/Lib"
-
-# sources of passes
-PIPS_BINSRCDIR="${PIPS_SRCDIR}/Passes"
-
-# runtime sources
-PIPS_RTSRCDIR="${PIPS_SRCDIR}/Runtime"
-
-# headers
-PIPS_INCLUDEDIR="${PIPS_PRODDIR}/Include"
-PIPS_SHRDIR="${PIPS_PRODDIR}/Include"
-
-# current development version - sources and binaries
-PIPS_DEVEDIR="${PIPS_DIR}/Development"
-
-# cri's libraries which are not part of Pips project
-PIPS_EXTEDIR="${PIPS_DIR}/Externals"
-
-# current demo version - binaries only
-PIPS_RELEASEDIR="${PIPS_DIR}/Release"
-
-# where documents are stored
-PIPS_DOCDIR="${PIPS_DIR}/Documentation"
-
-# where Public software sources are stored
-PIPS_PUBLICDIR=${PIPS_DIR}/Public
-
-# Validation directory
-PIPS_VALIDDIR=${PIPS_DIR}/Tests/Validation
-
-MANPATH=${MANPATH}:${PIPS_DOCDIR}
-PATH=${PATH}:${PIPS_BINDIR}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
-
-#
-# default architcture for building pips
+# default architecture for building pips
 # the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
 PIPS_ARCH="."
 
 # all defined "architectures" (i.e. existing makefile_macro suffixes)
+# this is used by the "full-clean" entry.
 PIPS_ALL_ARCH=". SUN4 GNU GNULL DEFAULT TEST GNUSOL2LL"
 
 # make MUST be gmake...
 PIPS_MAKE='gmake'
-	
-# file name in which pips current program is stored (for batch version).
 
-PIPS_CURRENT_PROGRAM=".pipsprogram"
-
-# list of PIPS libraries 
-#
-# Dynamic memory allocation (last item in PIPS_LIBS):
-#  - debug malloc for SUNOS: /usr/lib/debug/malloc.o
-#  - public domain debug malloc: -ldbmalloc
-#   (implies a special "malloc.h" in PIPS_EXTEDIR)
-#
-
-PIPS_PASSES='pips wpips tpips'
+# libraries which are not part of Pips project
+# note that Newgen and the C3/Linear library are considered part
+# of the pips project, hence should be installed beforehand.
+# the readline library is expected here for instance.
+PIPS_EXTEDIR="${PIPS_DIR}/Externals"
 
 # static ordering for bootstraping PIPS...
-
 PIPS_ORDERED_LIBS="text-util properties misc ri-util conversion movements pipsdbm comp_sections transformer bootstrap control hyperplane flint syntax prettyprint static_controlize effects semantics complexity continuation reductions regions callgraph icfg paf-util pip ricedg array_dfg prgm_mapping scheduling reindexing chains rice transformations hpfc atomizer wp65 pipsmake top-level pips tpips wpips"
 
 # all libraires for pips
-
 PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcomp_sections -lcontrol -lsemantics -lcontinuation -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint ${NEWGEN_LIBS} ${LINEAR_LIBS} -lm"
 
-# can be added explicitely to LDopt if required
-# PIPS_MALLOC='/usr/lib/debug/malloc.o'
+
+############################################################ DEVELOPPING PIPS
+
+# current development version - sources and binaries
+PIPS_DEVEDIR="${PIPS_DIR}/Development"
+
+# scripts and programs created to manage the project
+PIPS_UTILDIR="${PIPS_DIR}/Utilities"
+
+# other executables...
+PATH=${PATH}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
+
+
+################################################################ TESTING PIPS
+
+# Validation directory
+PIPS_VALIDDIR=${PIPS_DIR}/Tests/Validation
+
+# hosts for Validate
+PIPS_HOSTS="chailly:episy:aiguebelette"
+
+# PIPS_EXPERIMENTSDIR="${PIPS_DIR}/Experiments"
+PIPS_TESTSDIR="${PIPS_DIR}/Tests"
+
+# current demo version - binaries only ???
+PIPS_RELEASEDIR="${PIPS_DIR}/Release"
 
 #
 #         #    #  #####      #    #####    ####
@@ -195,6 +137,7 @@ PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -l
 # home directory for openwin (only used by the XView interface: wpips)
 OPENWINHOME="/usr/openwin"
 
+# should not be in the environment ?
 WPIPS_ADDED_CPPFLAGS='-I$(OPENWINHOME)/include -Iicons'
 WPIPS_ADDED_LIBS='-lxview -lolgx -lX11'
 WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib'
@@ -219,11 +162,11 @@ TPIPS_ADDED_LIBS='-lreadline -ltermcap'
 #        #       #          #    #       #    #
 #        ######  #          #    #        ####
 #
-# Settings added foe EPIPS (Emacs PIPS).
+# Settings added for EPIPS (Emacs PIPS).
 # started with the epips command.
 
-EPIPS_EMACS='emacs'
-EPIPS_LISP="$PIPS_UTILDIR/epips.el" 
+EPIPS_EMACS='xemacs'
+EPIPS_LISP="${PIPS_SHRDIR}/epips.el" 
 
 #
 # 
@@ -238,22 +181,15 @@ EPIPS_LISP="$PIPS_UTILDIR/epips.el"
 
 HPFC_DIR=$PIPS_DEVEDIR/Lib/hpfc
 
-HPFC_INCLUDE=$PIPS_EXTEDIR
-HPFC_LIBS=$PIPS_EXTEDIR
-HPFC_TOOLS=$PIPS_UTILDIR
+HPFC_INCLUDE=$PIPS_RUNTIMEDIR/hpfc
+HPFC_LIBS=$PIPS_RUNTIMEDIR/hpfc
+HPFC_TOOLS=$PIPS_SHRDIR
 
 HPFC_RUNTIME_M4_PARAMS='-D HPFC_GNU -D DEMO -D DIRECT'
 HPFC_SED='gsed'
 HPFC_TR='tr'
 HPFC_M4='gm4'
 HPFC_MAKE='gmake'
-
-
-# HPFC_FC='f77'
-# HPFC_FFLAGS='-fast -O3 -u'
-#
-# HPFC_FC='g77'
-# HPFC_FFLAGS='-O2 -Wimplicit -pipe'
 
 #
 #                         #####  #######
@@ -289,7 +225,7 @@ WP65_LIBRARY=$PIPS_EXTEDIR
 LISP=/usr/local/bin/cl
 
 # PVM directory
-PVMDIR="${PIPS_PUBLICDIR}/pvm3.3"
+PVMDIR="${PIPS_RUNTIMEDIR}/pvm3.3"
 
 #
 # For the daVinci Graph Viewer/Editor :
@@ -313,9 +249,90 @@ TOOLPACK_DIR="$PIPS_HOME/Toolpack/toolpack1.2"
 #
 # OBSOLETE variables
 
+# test `whoami` != coelho && {
+
 LINEARDIR=$LINEAR_DIR
 NEWGENDIR=$NEWGEN_DIR
 
-# that is all
+# empty string if make can be run in this environment
+# PIPS_CHECK_OS="`${PIPS_UTILDIR}/check_os`"
+# sources of libraries
+# PIPS_LIBSRCDIR="${PIPS_SRCDIR}/Lib"
+# sources of passes
+# PIPS_BINSRCDIR="${PIPS_SRCDIR}/Passes"
+# runtime sources
+# PIPS_RTSRCDIR="${PIPS_SRCDIR}/Runtime"
 #
+# file name in which pips current program is stored (for batch version).
+# this is the default value assume. It can be overwritten by defining
+# this variable to some other value: PIPS_CURRENT_PROGRAM=".pipsprogram"
+#
+# Dynamic memory allocation (last item in PIPS_LIBS):
+#  - debug malloc for SUNOS: /usr/lib/debug/malloc.o
+#  - public domain debug malloc: -ldbmalloc
+#   (implies a special "malloc.h" in PIPS_EXTEDIR)
+# PIPS_PASSES='pips wpips tpips'
+#
+# can be added explicitely to LDopt if required
+# PIPS_MALLOC='/usr/lib/debug/malloc.o'
+#
+# complexity cost tables directory
+# PIPS_COSTDIR="${PIPS_SHRDIR}/complexity"
 
+NEWGEN_PRODDIR="${NEWGEN_DIR}/Production"
+NEWGEN_DOCDIR="${NEWGEN_DIR}/Documentation"
+NEWGEN_RELEASEDIR="${NEWGEN_DIR}/Release"
+
+NEWGEN_INCLUDEDIR="${NEWGEN_PRODDIR}/Include"
+NEWGEN_SHRDIR="${NEWGEN_PRODDIR}/Include"
+NEWGEN_SRCDIR="${NEWGEN_PRODDIR}/Src"
+NEWGEN_LIBDIR="${NEWGEN_PRODDIR}/Lib"
+NEWGEN_BINDIR="${NEWGEN_PRODDIR}/Bin"
+
+
+LINEAR_PRODDIR="${LINEAR_DIR}/Production"
+LINEAR_DOCDIR="${LINEAR_DIR}/Documentation"
+LINEAR_RELEASEDIR="${LINEAR_DIR}/Release"
+LINEAR_INCLUDEDIR="${LINEAR_PRODDIR}/Include"
+LINEAR_SHRDIR="${LINEAR_PRODDIR}/Include"
+LINEAR_SRCDIR="${LINEAR_PRODDIR}/Src"
+LINEAR_LIBDIR="${LINEAR_PRODDIR}/Lib"
+LINEAR_BINDIR="${LINEAR_PRODDIR}/Bin"
+
+# PIPS
+#
+# current production version - sources and binaries
+PIPS_PRODDIR="${PIPS_DIR}/Production"
+
+# scripts and files for running pips 
+# Pips and so...
+# various rc files... icons...
+# help...
+# hpfc scripts...
+# cost tables and so...
+PIPS_SHRDIR="${PIPS_ROOT}/Share"
+
+# binaries
+PIPS_BINDIR="${PIPS_ROOT}/Bin"
+
+# documentation
+PIPS_DOCDIR="${PIPS_ROOT}/Documentation"
+
+# headers
+PIPS_INCLUDEDIR="${PIPS_ROOT}/Include"
+
+# libraries
+PIPS_LIBDIR="${PIPS_ROOT}/Lib"
+
+# sources
+PIPS_SRCDIR="${PIPS_ROOT}/Src"
+
+# where Public software sources are stored
+PIPS_PUBLICDIR=${PIPS_SRCDIR}/Public
+
+PIPS_RUNTIMEDIR="${PIPS_ROOT}/Runtime"
+
+# }
+
+# that is all for $RCSfile: pipsrc.ref,v $
+#
