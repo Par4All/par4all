@@ -28,9 +28,11 @@
 #include "tpips.h"
 #include "completion_list.h"
 
+/********************************************************** Static variables */
 
 static bool use_readline;
-
+static FILE *logfile;
+static FILE * current_file;
 extern int tgetnum();
 
 /*************************************************************** Some Macros */
@@ -38,6 +40,7 @@ extern int tgetnum();
 #define TPIPS_PROMPT "tpips> " 		/* prompt for readline  */
 #define TPIPS_HISTENV "TPIPS_HISTORY"	/* history file env variable */
 #define TPIPS_HISTORY_LENGTH 100	/* max length of history file */
+#define TPIPS_COMMENT_PREFIX '#'	/* comment prefix */
 #define HIST ".tpips.history" 		/* default history file */
 #define TPIPS_REQUEST_BUFFER_LENGTH 100
 #define SHELL_ESCAPE "shell" 		/* ! used for history reference */
@@ -379,6 +382,8 @@ void help_handler(char * line)
 
 void quit_handler(char * line)
 {
+    debug_off();
+
     /*   close history: truncate list and write history file
      */
     if (use_readline)
@@ -390,17 +395,33 @@ void quit_handler(char * line)
     }    
 
     close_workspace_if_opened();
+    if (logfile) {
+	safe_fclose (logfile, "the log file");
+	logfile = NULL;
+    }
     exit(0);
 }
 
 void default_handler(char * line)
 {
-    if (!(*line))
-	return;
-
     line_parsed = line_to_parse = line;
-    tp_init_lex ();
-    tp_parse ();
+
+    while (*line)
+    {
+	if ((*line) == TPIPS_COMMENT_PREFIX)
+	{
+	    *line = 0;
+	    break;
+	}
+	line++;
+    }
+    if (*line_to_parse) {
+	tp_init_lex ();
+	tp_parse ();
+    }
+    if (*line_to_parse) {
+ 	tp_error("syntax error");
+    }
 }
 
 static void (*find_handler(char* line))(char *)
@@ -410,61 +431,81 @@ static void (*find_handler(char* line))(char *)
     return x->function;
 }
 
-/* where to read characters from
- */
-char * current_file_name = (char *) NULL;
-
-static void 
-parse_arguments(int argc, char * argv[])
+static void parse_arguments(int argc, char * argv[])
 {
-    if (argc<2) return;
+    if (argc >= 3) {
+	if (same_string_p(argv[1],"-l")) {
+	    logfile = safe_fopen (argv[2],"w");
+	    argc -= 2;
+	}
+    } else if (argc >= 2)
+	if (same_string_p(argv[1],"-h")) {
+	    printf("Usage: %s [-h] [-l logfile] [files...]\n", argv[0]);
+	    return;
+	}
 
-    current_file_name = argv[1];
-    safe_fclose(stdin, "stdin !");
-    (void) safe_freopen(argv[1], "r", stdin);
-    use_readline = FALSE;
+    if (argc == 1)
+    {
+	use_readline = isatty(0);
+	pips_debug(1, "reading from stdin, which %s a tty\n",
+		   use_readline ? "is" : "is not");
+	current_file = stdin;
+	process_a_file();
+    } else
+    {
+	int i = 1;
 
-    pips_debug(1, "reading from file %s\n", current_file_name);
+	while (--argc) {
+	    if (same_string_p(argv[i], "-")) {
+		current_file = stdin;
+		use_readline = isatty(0);
+	    } else {
+		current_file = safe_fopen(argv[i], "r");
+		use_readline = FALSE;
+	    }
+	    
+	    pips_debug(1, "reading from file %s\n",argv[i]);
+	    
+	    process_a_file ();
+	    if (!same_string_p(argv[i], "-"))
+		safe_fclose(current_file, argv[i]);
+	    
+	    i++;
+	}
+    }
 }
 
-static char * 
-read_a_line(char * prompt)
+static char * read_a_line(char * prompt)
 {
 #define MAX_LINE_LENGTH  1024
     static char line[MAX_LINE_LENGTH];
+    char *logline;
 
     if (use_readline)
-	return readline(prompt);
-    
-    return safe_fgets(line, MAX_LINE_LENGTH, stdin, current_file_name);
+	logline = readline(prompt);
+    else
+	/* GO: Please FC don't put safe_fgets here or Validate it !! */
+	logline = fgets(line, MAX_LINE_LENGTH, current_file);
+
+    if (logfile && logline)
+	fprintf(logfile,"%s\n",logline);
+
+    return logline;
 }
 
-/* MAIN: interactive loop and history management.
- */
-int main(int argc, char * argv[])
+void process_a_file()
 {
     char *last = NULL;
     char *line;
-
     extern jmp_buf pips_top_level;
-
-    debug_on("PIPS_DEBUG_LEVEL");
-
-    use_readline = isatty(0);
-    parse_arguments(argc, argv);
-
-    initialize_newgen();
-    initialize_sc(entity_local_name);
+    static readline_initialized = FALSE;
 
     (void) setjmp(pips_top_level);
 
-    set_bool_property("ABORT_ON_USER_ERROR",FALSE);
-    pips_log_handler = tpips_user_log;
-    pips_request_handler = tpips_user_request;
-
-    if (use_readline) {
+    if ((use_readline) && (readline_initialized == FALSE)) {
 	initialize_readline ();
 	last = initialize_tpips_history();
+	readline_initialized = TRUE;
     }
 
     /*  interactive loop
@@ -486,19 +527,35 @@ int main(int argc, char * argv[])
 	 */
 	(find_handler(line))(line);
     }
+}
+/* MAIN: interactive loop and history management.
+ */
+int main(int argc, char * argv[])
+{
+    debug_on("PIPS_DEBUG_LEVEL");
+
+    initialize_newgen();
+    initialize_sc(entity_local_name);
+
+    set_bool_property("ABORT_ON_USER_ERROR",FALSE);
+    pips_log_handler = tpips_user_log;
+    pips_request_handler = tpips_user_request;
+
+    parse_arguments(argc, argv);
 
     fprintf(stdout, "\n");	/* for Ctrl-D terminations */
-    quit_handler(line);
-    debug_off();
-    return 0; 
+    quit_handler("quit");
+    exit (0);			/* statement not reached ... */
 }
 
 int tpips_lex_input ()
 {
-    debug(8,"tpips_lex_input","input char '%c'(0x%2x) from input\n",
-	  *line_to_parse, *line_to_parse);
-	
-    return (int) *(line_to_parse++);
+    char c =*line_to_parse;
+
+    debug(8,"tpips_lex_input","input char '%c'(0x%2x) from input\n", c, c);
+    if (c)
+	line_to_parse++;
+    return (int) c;
 }
 
 void tpips_lex_unput(int c)
