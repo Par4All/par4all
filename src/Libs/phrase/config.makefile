@@ -3,6 +3,9 @@
 # 
 
 LIB_CFILES =    phrase_distributor.c \
+		phrase_distributor_control_code.c \
+		phrase_distributor_communication.c \
+		distribution_context.c \
 		fsm_generation.c \
 		print_code_smalltalk.c \
 		fsm_merge_states.c \
@@ -15,8 +18,7 @@ LIB_CFILES =    phrase_distributor.c \
 		spaghettify.c \
 		full_spaghettify.c \
 		fsm_tools.c \
-		phrase_tools.c \
-		phrase_distributor_control_code.c 
+		phrase_tools.c
 
 LIB_HEADERS = 	phrase-local.h \
 		smalltalk-defs.h \
