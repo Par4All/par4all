@@ -1,12 +1,13 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/09/13 16:23:58 $, )
+# ($Date: 1996/10/17 14:27:25 $, )
 #
 # depends on 
 # + PVM_ARCH 
 # + PVM_ROOT
-# + USE_PVMe
-# + USE_GNU
+# + _HPFC_USE_PVMe_
+
+M4FLAGS+= -D _HPFC_DIMENSIONS_=3
 
 ifeq ($(PIPS_ARCH),.)
 RT_ARCH=$(PVM_ARCH)
@@ -17,21 +18,22 @@ endif
 #
 # additional defs for m4
 ifeq ($(FC),g77)
-M4FLAGS	+= -D USE_GNU
-USE_GNU = 1
+M4FLAGS	+=	-D _HPFC_NO_BYTE1_ \
+		-D _HPFC_NO_INTEGER2_
+_HPFC_USE_GNU_ = 1
 endif
 
-M4FLAGS	+= -D DEMO
-M4FLAGS	+= -D DIRECT
-# M4FLAGS	+= -D DEBUG
+M4FLAGS	+= -D _HPFC_DEMO_
+M4FLAGS	+= -D _HPFC_DIRECT_
+# M4FLAGS	+= -D _HPFC_DEBUG_
 
 # the default on IBM is to use PVMe
 ifeq ($(PVM_ARCH),RS6K)
-USE_PVMe = 1
+_HPFC_USE_PVMe_ = 1
 endif
 
-ifdef USE_PVMe
-M4FLAGS	+= -D USE_PVMe
+ifdef _HPFC_USE_PVMe_
+M4FLAGS	+= -D _HPFC_USE_PVMe_
 endif
 
 
@@ -44,12 +46,6 @@ SCRIPTS =	hpfc_llcmd \
 
 #
 # Default compilers and options
-#
-#CC		= gcc
-#CFLAGS		= -O2 -pipe -ansi -pedantic -Wall
-#CPPFLAGS	= -D__USE_FIXED_PROTOTYPES__
-#FC 		= f77
-#FFLAGS		= -O2 -u
 
 #
 # others
@@ -118,7 +114,7 @@ CFLAGS	= -O4
 endif
 
 # ??? this env. dependence is not very convincing...
-ifdef USE_GNU
+ifdef _HPFC_USE_GNU_
 #
 # GNU Compilers
 # if set, overwrites the architecture dependent defaults...
@@ -140,22 +136,35 @@ MOVE 		= mv
 #
 # I distinguish between PVM{3,e}_ROOT...
 
-PVM_INC		= $(PVM_ROOT)/include
-PVM_CONF	= $(PVM_ROOT)/conf
+pvminc		= $(PVM_ROOT)/include
+pvmconf	= $(PVM_ROOT)/conf
 
-ifdef USE_PVMe
+ifdef _HPFC_USE_PVMe_
 #
 # if another PVM is used, I still need PVM 3 m4 macros...
 # IBM puts includes in lib:-(
-PVM_INC		= $(PVM_ROOT)/lib
-PVM_CONF	= $(PVM3_ROOT)/conf
+pvminc	= $(PVM_ROOT)/lib
+pvmconf	= $(PVM3_ROOT)/conf
 #
+endif
+
+ifeq ($(PVM_ARCH),CRAY)
+#
+# CRAY PVM is does not have pvm_version
+# also no need to link to the pvm library
+#
+pvminc	= /usr/include/mpp
+M4FLAGS	+= 	-D _HPFC_NO_PVM_VERSION_ \
+		-D _HPFC_NO_BYTE1_ \
+		-D _HPFC_NO_INTEGER2_ \
+		-D _HPFC_NO_REAL4_ \
+		-D _HPFC_NO_COMPLEX8_
 endif
 
 #
 # pvm3 portability macros for Fortran calls to C functions:
 
-M4FLAGS	+=	$(PVM_ARCH).m4
+M4CFLAGS	+=	$(PVM_ARCH).m4
 
 PVM_HEADERS	= pvm3.h fpvm3.h
 LIB_M4FFILES = 	hpfc_packing.m4f \
@@ -165,7 +174,10 @@ LIB_M4FFILES = 	hpfc_packing.m4f \
 		hpfc_bufmgr.m4f \
 		hpfc_broadcast.m4f
 LIB_M4CFILES =	hpfc_misc.m4c
-LIB_FFILES =	hpfc_check.f hpfc_main.f hpfc_main_host.f hpfc_main_node.f
+LIB_FFILES =	hpfc_check.f \
+		hpfc_main.f \
+		hpfc_main_host.f \
+		hpfc_main_node.f
 
 M4_HEADERS 	= hpfc_procs.m4h \
 		  hpfc_buffers.m4h 
@@ -245,14 +257,14 @@ all: $(RT_ARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
 # get pvm headers
 #
 
-pvm3.h:	$(PVM_INC)/pvm3.h
+pvm3.h:	$(pvminc)/pvm3.h
 	$(COPY) $< $@
 
-fpvm3.h:$(PVM_INC)/fpvm3.h
+fpvm3.h:$(pvminc)/fpvm3.h
 	$(COPY) $< $@
 
 $(PVM_ARCH).m4:
-	$(COPY) $(PVM_CONF)/$(PVM_ARCH).m4 $@
+	$(COPY) $(pvmconf)/$(PVM_ARCH).m4 $@
 
 #
 
@@ -269,8 +281,14 @@ $(LIB_TARGET):	$(PVM_HEADERS) $(LIB_HEADERS) $(LIBOBJECTS)
 $(RT_ARCH)/%.o: %.c
 	$(COMPILE) $< -o $@
 
+ifeq ($(PVM_ARCH),CRAY)
+$(RT_ARCH)/%.o: %.f
+	$(F77COMPILE) $<
+	mv $*.o $@
+else
 $(RT_ARCH)/%.o: %.f
 	$(F77COMPILE) $< -o $@
+endif
 
 $(RT_ARCH)/compilers.make:
 	#
@@ -282,8 +300,7 @@ $(RT_ARCH)/compilers.make:
 	  echo "CFLAGS=$(CFLAGS)";\
 	  echo "CPPFLAGS=$(CPPFLAGS)";\
 	  echo "M4=$(M4)";\
-	  echo "USE_GNU=$(USE_GNU)";\
-	  echo "USE_PVMe=$(USE_PVMe)";} > $@
+	  echo "_HPFC_USE_PVMe_=$(_HPFC_USE_PVMe_)";} > $@
 
 hpfc_includes.h: $(LIB_M4FFILES:.m4f=.h) 
 	#
