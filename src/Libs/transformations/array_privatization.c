@@ -116,6 +116,7 @@ char *module_name;
 
     reset_current_module_entity();
     reset_current_module_statement();
+    reset_transformer_map();
     reset_precondition_map();
     reset_cumulated_effects_map();
     reset_local_regions_map();
