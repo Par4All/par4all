@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/04/24 13:13:35 $, 
+ * $Date: 1995/04/24 15:43:58 $, 
  */
 
 #include <stdio.h>
@@ -26,15 +26,31 @@ int main()
     
     while ((line=readline(HPFC_PROMPT)))
     {
-	if (strncmp(line, QUIT, 3)==0) 
+	if ((strlen(line)+strlen(HPFC_PROMPT))>=BUFFER_SIZE) /* woh! */
+	{
+	    fprintf(stderr, "line too long\n");
+	    continue;
+	}	    
+
+	if (strncmp(line, QUIT, 3)==0) /* berk */
 	    break;
 
+	/*   calls a script:-)
+	 *   All this stuff could be taken care of in the C, but shell
+	 *   scripts are much easier to develop. 
+	 */
 	system(sprintf(buffer, "hpfc %s", line));
-	add_history(line);
+
+	/*   maybe a memory leak, history is not very well documented.
+	 */
+	add_history(line); 
     }
 
     write_history(FILE_NAME);
 
-    fprintf(stdout, "\n");
+    fprintf(stdout, "\n"); /* usefull for Ctrl-D terminations */
     return(0);
 }
+
+/*   that is all
+ */
