@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/23 15:41:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/12 01:19:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1995/10/23 15:41:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1995/11/12 01:19:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -274,6 +274,11 @@ enable_module_selection()
 {
    xv_set(module_item, MENU_INACTIVE, FALSE, NULL);
    xv_set(module_name_panel_item, PANEL_INACTIVE, FALSE, NULL);
+   /* Well, after a workspace creation without automatic module
+      selection successful, there is no module selected and thus the
+      following menus are not very interestiong, except for the option
+      part of the option selection. Anyway, there is a guard in each
+      of these menu, so, just do nothing... :-) */
    enable_view_selection();
    enable_transform_selection();
    enable_compile_selection();
