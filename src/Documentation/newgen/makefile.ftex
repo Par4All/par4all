@@ -82,17 +82,16 @@ partiellement cycliques). }
 
 \section{De'finition d'une re`gle particulie`re}
 
-\domain{Rule = phase:string x required:virtual\_resource* x produced:virtual\_resource* x preserved:virtual\_resource* x modified:virtual\_resource* x pre\_transformation:virtual\_resource* x select:string* }
-
+\domain{Rule = phase:string x required:virtual\_resource* x produced:virtual\_resource* x preserved:virtual\_resource* x modified:virtual\_resource* x pre\_transformation:virtual\_resource*}
 {Le domaine {\tt rule} permet de de'crire les actions des phases de
   Pips sur les ressources ge're'es par pips-db. Chaque phase
   ne'cessite que certaines ressources soient disponibles ({\tt
-    required}), elle commence par rendre certaines phases actives
-  ({\tt select}), effectuer d'e'ventuelles transformations ({\tt
-    pre_transformation}), puis produit une ou plusieurs ressources
-  ({\tt produced}), et en modifie d'autres ({\tt modified}). La
-  diffe'rence entre les ressources produites et celles modifie'es
-  permet au driver d'enchainer les phases dans le bon ordre.
+    required}), elle commence par effectuer d'e'ventuelles
+  transformations ({\tt pre_transformation}), puis produit une ou
+  plusieurs ressources ({\tt produced}), et en modifie d'autres ({\tt
+    modified}). La diffe'rence entre les ressources produites et
+  celles modifie'es permet au driver d'enchainer les phases dans le
+  bon ordre.
 
 Les phases de transformation agissent sur le code des modules ce qui
 implique ge'ne'ralement que les informations qui de'corent ce module
@@ -157,7 +156,7 @@ Wolfe};
 \end{description}
 }
 
-\domain{Owner = \{ program , module , main , callees , callers , all \}}
+\domain{Owner = \{ program , module , main , callees , callers , all , select \}}
 {Le domaine {\tt owner} permet de pre'ciser dans une re`gle de
 de'pendances a quels modules sont rattache'es les ressources lues,
 e'crites, produites ou pre'serve'es. Ce peut e^tre le module lui-me^me
@@ -176,6 +175,8 @@ permet au top-level driver de ge'rer les appels multiples rendus
 ne'cessaires par l'interproce'duralite' de Pips et d'e'liminer
 l'auto-re'cursion du gestionnaire de la base de donne'es.
 
+\verb+select+ is a fake owner, to be used to select (or activate) rules
+from other pipsmake rules. Should only be used with the bang rules?
 }
 
 \section{Ressources re'elles}
