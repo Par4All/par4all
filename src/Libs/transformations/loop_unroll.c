@@ -3,6 +3,10 @@
   $Id$
 
   $Log: loop_unroll.c,v $
+  Revision 1.21  2000/03/16 09:28:13  irigoin
+  Full loop unrolling with pragma added. Draft version installed because
+  Fabien needs it!
+
   Revision 1.20  1999/05/05 15:47:46  irigoin
   Error message improved in full_loop_unroll()
 
@@ -380,16 +384,13 @@ void full_loop_unroll(statement loop_statement)
                ub = range_upper(lr),
                inc = range_increment(lr);
     expression rhs_expr, expr;
-    string module_name = db_get_current_module_name();
-    entity mod_ent = local_name_to_top_level_entity(module_name);
     statement stmt;
     instruction block;
     int lbval, ubval, incval;
     int iter;
 
     debug(2, "full_loop_unroll", "begin\n");
-    pips_assert("full_loop_unroll", mod_ent != entity_undefined);
-    /* "module entity undefined\n"); */
+
     if(get_debug_level()==7) {
 	/* Start debug in Newgen */
 	gen_debug |= GEN_DBG_CHECK;
@@ -735,4 +736,89 @@ full_unroll(char * mod_name)
     debug_off();
 
     return return_status;
+}
+
+
+
+static int number_of_unrolled_loops = 0;
+static int number_of_requested_unrollings = 0;
+
+/* Trailing spaces and tabs are not accepted. C must be a capital C... but
+   it does not have to be in column 1! This should be improved with
+   regular expressions. */
+#define FULL_UNROLL_PRAGMA "Cxxx\n"
+
+bool find_unroll_pragma_and_fully_unroll(statement s)
+{
+    instruction inst = statement_instruction (s);
+    bool go_on = TRUE;
+
+    if(!empty_comments_p(statement_comments(s))
+       && strstr(statement_comments(s), FULL_UNROLL_PRAGMA)!=NULL) {
+      number_of_requested_unrollings++;
+      if(instruction_loop_p(inst)) {
+	/* full_loop_unroll() does not work all the time! */
+	full_loop_unroll(s);
+	number_of_unrolled_loops++;
+	go_on = TRUE;
+      }
+      else {
+	/* The full unroll pragma must comment a DO instruction */
+	;
+	go_on = FALSE;
+      }
+    }
+
+    return go_on;
+}
+
+bool full_unroll_pragma(char * mod_name)
+{
+  statement mod_stmt = statement_undefined;
+  bool return_status = FALSE;
+
+  debug_on("FULL_UNROLL_DEBUG_LEVEL");
+
+  debug(1,"full_unroll_pragma","Fully unroll loops with pragma in module %s\n",
+	mod_name);
+
+  /* Keep track of effects on code */
+  number_of_unrolled_loops = 0;
+  number_of_requested_unrollings = 0;
+
+  /* Perform the loop unrollings */
+  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+
+  // gen_recurse (mod_stmt, statement_domain, 
+  // find_unroll_pragma_and_fully_unroll, gen_null);
+
+  /* Perform the transformation bottom up to reduce the scanning and the
+     number of unrollings */
+  gen_recurse (mod_stmt, statement_domain, 
+	       gen_true, find_unroll_pragma_and_fully_unroll);
+
+  /* Reorder the module, because new statements have been generated. */
+  module_reorder(mod_stmt);
+
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+
+  /* Provide statistics about changes performed */
+  if(number_of_unrolled_loops == number_of_requested_unrollings) {
+    user_log("%d loop%s unrolled as requested\n", number_of_unrolled_loops,
+	     number_of_unrolled_loops>1?"s":"");
+    return_status = TRUE;
+  }
+  else {
+    int failures = number_of_requested_unrollings - number_of_unrolled_loops;
+    user_log("%d loop%s unrolled as requested\n", number_of_unrolled_loops,
+	     number_of_unrolled_loops>1?"s":"");
+    user_log("%d loop%s could not be unrolled as requested\n", failures,
+	     failures>1?"s":"");
+    return_status = FALSE;
+  }
+
+  debug(1,"full_unroll_pragma","done for %s\n", mod_name);
+  debug_off();
+
+  return return_status;
 }
