@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.91  2003/12/18 21:40:39  nguyen
+ * Replace entity_local_name to entity_user_name to handle C
+ *
  * Revision 1.90  2003/12/09 16:01:35  nguyen
  * Change FILE_SEP_STRING to "!", UNION_PREFIX to "'" and BLOCK_SEP_STRING to
  * "`" to avoid confusion with other prefixes
@@ -141,6 +144,8 @@ typedef hash_table control_mapping;
 #define MAIN_PREFIX 			"%"
 #define COMMON_PREFIX 			"~"
 #define BLOCKDATA_PREFIX 		"&"
+
+#define FILE_SEP 		        '!'
 
 #define FILE_SEP_STRING 		"!"
 #define BLOCK_SEP_STRING 		"`"
@@ -353,7 +358,7 @@ typedef hash_table control_mapping;
 
 /* IO Management
  */
-#define ENTITY_NAME_P(e, name)(same_string_p(entity_local_name(e),name))
+#define ENTITY_NAME_P(e, name)(same_string_p(entity_user_name(e),name))
 
 #define ENTITY_WRITE_P(e) ENTITY_NAME_P(e, "WRITE")
 #define ENTITY_REWIND_P(e) ENTITY_NAME_P(e, "REWIND")
