@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.CRAY-T3D,v $ (version $Revision$)
-# $Date: 1997/11/12 14:14:56 $, 
+# $Date: 1997/11/12 14:48:00 $, 
 #
 # this file contains macro definitions 
 
@@ -22,7 +22,6 @@ LINT	= lint
 LINTFLAGS= -habxu
 YACC	= yacc
 YFLAGS	=
-PRFLAGS	= -evcf2
 ETAGS	= etags
 TAR	= tar
 ZIP	= compress
