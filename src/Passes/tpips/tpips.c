@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/22 10:57:26 $, 
+ * $Date: 1997/04/30 11:50:08 $, 
  */
 
 #include <stdio.h>
@@ -249,7 +249,8 @@ static void pwd_handler(char * line)
 {
     char pathname[MAXPATHLEN];
     user_log("pwd\n");
-    fprintf(stdout, "current working directory: %s\n", getwd(pathname));
+    fprintf(stdout, "current working directory: %s\n", 
+	    (char*) getwd(pathname));
 }
 
 static void setenv_handler(char * line)
