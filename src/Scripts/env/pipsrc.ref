@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.110  1997/05/14 12:32:57  coelho
+# *** empty log message ***
+#
 # Revision 1.109  1997/05/13 20:39:56  coelho
 # *** empty log message ***
 #
@@ -239,6 +242,11 @@ test ${uname_s} = SunOS && \
 # default: HPFC_TR='tr'
 # default: HPFC_MAKE='gmake'
 # default: HPFC_M4='gm4'
+
+test ${uname_s} = Linux && { 
+	PIPS_SED=sed
+	PIPS_M4=m4
+}
 
 #
 #                         #####  #######
