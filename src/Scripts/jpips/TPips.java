@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: TPips.java,v $
+ * Revision 1.9  1998/10/30 15:36:22  ancourt
+ * add an entry to display davinci graph
+ *
  * Revision 1.8  1998/10/28 18:45:44  coelho
  * + user request.
  * fixed a bug in method getText() when dealing with tpips.
@@ -61,6 +64,7 @@ public class TPips
 				
   public	Vector		optionVector;	//the options of jpips
   public	TextDisplayer	textDisplayer;	//textdisplayer instance
+  public	GraphDisplayer	graphDisplayer;	//graphdisplayer instance
   public	PFrame		frame;		//frame of jpips
   public	File		directory;	//current directory
   
@@ -91,7 +95,8 @@ public class TPips
   				TO_TPIPS = "to tpips   : ",
 				FROM_TPIPS = "from tpips : ",
 				moduleMessage = "No modules selected!",
-				error = "Error";
+				error = "Error",
+                                GRAPH="-graph";
 				
 				
   /** Sets the necessary instances.
@@ -214,12 +219,16 @@ public class TPips
 	      }
 	      else if(response.equals(SHOW))
 	      {
-		String path = t.nextToken(EOL);
+		  String path = t.nextToken(EOL);
 		if(path.substring(1,2).equals(DIR))
-		  path = path.substring(2);
+		    path = path.substring(2);
 		File f= new File(directory.getAbsolutePath()+path);
 		System.out.println(f.getAbsolutePath());
-		textDisplayer.display(f,true,true);
+		
+		 if (graphDisplayer.davinciExtension(f))
+		     graphDisplayer.display(f,true,true);
+		else 
+		    textDisplayer.display(f,true,true);
 	      }
 	      else if(response.equals(BEGIN_ERROR))
 	      {
