@@ -114,6 +114,8 @@ void BeginingOfParsing()
     called = TRUE;
 }
 
+extern void syn_parse();
+
 /* parse "module.dbr_file"
  */
 static bool 
@@ -121,7 +123,6 @@ the_actual_parser(
     string module,
     string dbr_file)
 {
-    extern void ssparse();
     debug_on("SYNTAX_DEBUG_LEVEL");
 
     /* parser is initialized */
