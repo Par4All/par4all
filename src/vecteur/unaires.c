@@ -392,6 +392,36 @@ Variable var;
 }
 
 
+int
+vect_lexicographic_compare(Pvecteur v1, Pvecteur v2, 
+			   int (*compare)(Pvecteur*, Pvecteur*))
+{
+    /* it is assumed that vectors v1 and v2 are already
+       lexicographically sorted */
+    int cmp = 0;
+    Pvecteur pv1 = VECTEUR_UNDEFINED;
+    Pvecteur pv2 = VECTEUR_UNDEFINED;
+
+    for(pv1 = v1, pv2 = v2; 
+	!VECTEUR_UNDEFINED_P(pv1) && !VECTEUR_UNDEFINED_P(pv2) && cmp == 0;
+	pv1 = pv1->succ, pv2= pv2->succ) {
+	cmp = compare(&pv1, &pv2);
+    }
+
+    if(VECTEUR_UNDEFINED_P(pv1))
+	if(VECTEUR_UNDEFINED_P(pv2))
+	    ;
+	else
+	    cmp = 1;
+    else
+	if(VECTEUR_UNDEFINED_P(pv2))
+	    cmp = -1;
+	else
+	    assert(cmp!=0);
+
+    return cmp;
+}
+
 
 /*
  * that is all
