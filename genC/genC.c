@@ -19,16 +19,16 @@
 
    This file includes the function used to implement user types in C.
 
-   The implementation is based on vectors of chunks. The first one always
+   The implementation is based on vectors of gen_chunks. The first one always
    holds, when considered as an integer, the index in the Domains table of the
    type of the object.
 
-   . An inlined value is simply stored inside one chunk,
+   . An inlined value is simply stored inside one gen_chunk,
    . A list is a (CONS *),
    . A sey is a SET,
    . An array is a (CHUNK *),
-   . Components values of an AND_OR value are stored in the following chunks.
-   . An OR_OP value has 2 more chunks. The second on is the OR_TAG
+   . Components values of an AND_OR value are stored in the following gen_chunks.
+   . An OR_OP value has 2 more gen_chunks. The second on is the OR_TAG
      (an integer). The third is the component value. */
 
 #include <stdio.h>
@@ -45,14 +45,14 @@
 
 static char start[ 1024 ] ;
 
-/* GEN_SIZE returns the size (in chunks) of an object of type defined by
+/* GEN_SIZE returns the size (in gen_chunks) of an object of type defined by
    the BP type. */
 
 int
 gen_size( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
-    int overhead = HEADER+IS_TABULATED( bp ) ;
+    int overhead = GEN_HEADER+IS_TABULATED( bp ) ;
 
     switch( bp->domain->ba.type ) {
     case BASIS:
@@ -78,6 +78,7 @@ struct binding *bp ;
 	}
     default:
 	fatal( "gen_size: Unknown type %s\n", itoa( bp->domain->ba.type )) ;
+	return(-1); /* to avoid a gcc warning */
 	/*NOTREACHED*/
     }
 }
@@ -93,7 +94,7 @@ union domain *dp ;
 
     switch( dp->ba.type ) {
     case BASIS: {
-	struct binding *bp = dp->ba.constructand ;
+	struct gen_binding *bp = dp->ba.constructand ;
       
 	if( IS_INLINABLE( bp )) {
 	    sprintf( buffer, "%c", *bp->name ) ;
@@ -134,7 +135,7 @@ union domain *dp ;
 
   switch( dp->ba.type ) {
   case BASIS: {
-      struct binding *bp = dp->ba.constructand ;
+      struct gen_binding *bp = dp->ba.constructand ;
       
       if( IS_INLINABLE( bp )) {
 	  sprintf( buffer, "" ) ;
@@ -157,7 +158,7 @@ union domain *dp ;
     if( dp->ar.dimensions->cdr != NULL ) {
 	    struct intlist *dim = dp->ar.dimensions ;
      
-	    sprintf( buffer, "(chunk (*)" ) ;
+	    sprintf( buffer, "(gen_chunk (*)" ) ;
 
 	    for( dim = dim->cdr ; dim != NULL ; dim = dim->cdr ) {
 		    strcat( buffer, "[" ) ;
@@ -167,7 +168,7 @@ union domain *dp ;
 	    strcat( buffer, ")" ) ;
     }
     else {
-	sprintf( buffer, "(chunk *)" ) ;
+	sprintf( buffer, "(gen_chunk *)" ) ;
     }
     break ; 
   default:
@@ -236,12 +237,12 @@ struct domainlist *dlp ;
     return( buffer ) ;
 }
 
-/* GEN_MAKE generates the gen_alloc call for bindings BD with SIZE user
+/* GEN_MAKE generates the gen_alloc call for gen_bindings BD with SIZE user
    members and ARGS as list of arguments. */
 
 static void
 gen_make( bp, size, args )
-struct binding *bp ;
+struct gen_binding *bp ;
 int size ;
 char *args ;
 {
@@ -250,18 +251,17 @@ char *args ;
     (void) printf("#define %s_domain (%s+%d)\n",
 		  bp->name, start, TYPE( bp )) ;
     (void) printf("#define make_%s(%s) ", bp->name, args ) ;
-    (void) printf("(%s)gen_alloc(%d+%d*sizeof(chunk),%s,%s_domain%s%s)\n", 
-		  bp->name, HEADER_SIZE, size+IS_TABULATED( bp ), 
+    (void) printf("(%s)gen_alloc(%d+%d*sizeof(gen_chunk),%s,%s_domain%s%s)\n", 
+		  bp->name, GEN_HEADER_SIZE, size+IS_TABULATED( bp ), 
 		  "GEN_CHECK_ALLOC", bp->name,
-		  (strlen(args) == 0) ? "" : ",",
-		  args ) ;
+		  (strlen(args) == (int)0) ? "" : ",",  args ) ;
 }
 
 /* GEN_AND generates the manipulation functions for an AND type BP. */
 
 void
 gen_and( bp )
-     struct binding *bp ;
+     struct gen_binding *bp ;
 {
     union domain *dom = bp->domain ;
     struct domainlist *dlp ;
@@ -271,7 +271,7 @@ gen_and( bp )
 
     gen_make( bp, size, gen_args( dom->co.components )) ;
 
-    size = HEADER + IS_TABULATED( bp ) ;
+    size = GEN_HEADER + IS_TABULATED( bp ) ;
 
     for( dlp=dom->co.components ; dlp != NULL ; dlp=dlp->cdr )
 	    gen_member( bp->name, dlp->domain, size++ ) ;
@@ -283,7 +283,7 @@ gen_and( bp )
 
 void
 gen_or( bp )
-     struct binding *bp ;
+     struct gen_binding *bp ;
 {
     extern int printf();
     char *name = bp->name ;
@@ -312,12 +312,12 @@ gen_or( bp )
 
 void
 gen_arrow( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     char *name = bp->name ;
     union domain *dom = bp->domain ;
     union domain *image, *start ;
-    int data = HEADER + IS_TABULATED( bp ) ;
+    int data = GEN_HEADER + IS_TABULATED( bp ) ;
 
     gen_make( bp, 1, "" ) ;
 
@@ -346,12 +346,12 @@ struct binding *bp ;
 
 void
 gen_list( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     extern int printf();
     char *name = bp->name ;
     union domain *dom = bp->domain ;
-    int data = HEADER + IS_TABULATED( bp ) ;
+    int data = GEN_HEADER + IS_TABULATED( bp ) ;
 
     gen_make( bp, 1, "ar" ) ;
     (void) printf( "#define %s_%s(li) ", name, dom->li.constructor ) ;
@@ -363,12 +363,12 @@ struct binding *bp ;
 
 void
 gen_set( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     extern int printf();
     char *name = bp->name ;
     union domain *dom = bp->domain ;
-    int data = HEADER + IS_TABULATED( bp ) ;
+    int data = GEN_HEADER + IS_TABULATED( bp ) ;
 
     gen_make( bp, 1, "ar" ) ;
     (void) printf( "#define %s_%s(se) ", name, dom->se.constructor ) ;
@@ -380,12 +380,12 @@ struct binding *bp ;
 
 void
 gen_array( bp )
-     struct binding *bp ;
+     struct gen_binding *bp ;
 {
     extern int printf();
     char *name = bp->name ;
     union domain *dom = bp->domain ;
-    int data = HEADER + IS_TABULATED( bp ) ;
+    int data = GEN_HEADER + IS_TABULATED( bp ) ;
 
     gen_make( bp, 1, "ar" ) ;
     (void) printf( "#define %s_%s(ar) ", name, dom->ar.constructor ) ;
@@ -399,7 +399,7 @@ gen_array( bp )
 
 void
 gen_external( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     extern int printf();
     char *s = bp->name ;
@@ -419,30 +419,33 @@ struct binding *bp ;
 
 void
 gen_domain( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     extern int printf();
     union domain *dp = bp->domain ;
     char *s = bp->name ;
 
-    if( !IS_EXTERNAL( bp )) {
-	for( (void) printf( "#define " ) ; *s ; s++ ) {
+    if( !IS_EXTERNAL( bp )) 
+    {
+	for( (void) printf( "#define " ) ; *s ; s++ ) 
 	    (void) printf( "%c", UPPER( *s )) ;
-	}
+
 	(void) printf( "(x) ((x).p)\n" ) ;
-	(void) printf( "typedef chunk *%s ;\n", bp->name ) ;
-	(void) printf("#define %s_undefined ((%s)chunk_undefined)\n", 
+	(void) printf( "typedef gen_chunk *%s ;\n", bp->name ) ;
+	(void) printf("#define %s_undefined ((%s)gen_chunk_undefined)\n", 
 		      bp->name, bp->name ) ;
 	(void) printf("#define %s_undefined_p(x) ((x)==%s_undefined)\n", 
 		      bp->name, bp->name ) ;
-	(void) printf("#define copy_%s(x) ((%s)gen_copy_tree((chunk *)x))\n", 
+	(void) printf("#define copy_%s(x) ((%s)gen_copy_tree((gen_chunk *)x))\n", 
 		      bp->name, bp->name ) ;
 	(void) printf("#define write_%s(fd,obj) %s\n",
-		      bp->name, "(gen_write(fd,(chunk *)obj))" ) ;
+		      bp->name, "(gen_write(fd,(gen_chunk *)obj))" ) ;
 	(void) printf("#define read_%s(fd) ((%s)gen_read(fd))\n", 
 		      bp->name, bp->name ) ;
-	(void) printf("#define free_%s(o) (gen_free((chunk *)o))\n", 
+	(void) printf("#define free_%s(o) (gen_free((gen_chunk *)o))\n", 
 		      bp->name ) ;
+	(void) printf("#define check_%s(o) (gen_check((gen_chunk *)o, %s_domain))\n",
+		      bp->name, bp->name);
     }
     switch( dp->ba.type ) {
     case CONSTRUCTED:
@@ -484,7 +487,7 @@ void
 gencode( file )
 char *file ;
 {
-    struct binding *bp = Domains ;
+    struct gen_binding *bp = Domains ;
 
     sprintf( start, "_gen_%s_start", file ) ;
 
