@@ -41,7 +41,7 @@ extern FILE *genspec_in, *genspec_out;
 
 #define GO (1)
 
-extern int max_tabulated_elements();
+extern int max_tabulated_elements(void);
 extern gen_chunk *enter_tabulated_def();
 
 cons *Gen_cp_[ MAX_NESTED_CONS ] ;
@@ -55,8 +55,17 @@ gen_chunk *gen_hash_ = (gen_chunk*) NULL ;
  * maps any name <domain_number|name> to its offset in the Gen_tabulated
  * of the domain number.
  */
+/*
+typedef struct {
+  int size;
+  int used;
+  gen_chunk * table;
+} 
+  gen_tabulated_t, * gen_tabulated_p;
+*/
 
-gen_chunk *Gen_tabulated_[ MAX_TABULATED ] ;
+gen_chunk * Gen_tabulated_[MAX_TABULATED];
+
 struct gen_binding *Tabulated_bp ;
 
 int Read_spec_mode ;
@@ -292,18 +301,18 @@ gen_find_free_tabulated( bp )
 struct gen_binding *bp ;
 {
     int i ;
+    int mte = max_tabulated_elements();
 
     if( Gen_tabulated_[ bp->index ] == gen_chunk_undefined ) {
 	fatal( "find_free_tabulated: Uninitialized %s\n", bp->name ) ;
     }
-    i = ((bp->alloc == max_tabulated_elements()-1) ? 1 : bp->alloc)+1 ;
+    i = ((bp->alloc == mte-1) ? 1 : bp->alloc)+1 ;
 
-    for( ; ; i = (i == max_tabulated_elements()-1) ? 1 : i+1 ) {
+    for( ; ; i = (i == mte-1) ? 1 : i+1 ) {
 	if( i == bp->alloc ) {
 	    user( "Too many elements in tabulated domain %s\n", bp->name ) ;
 	    user("Current limit (%d) can be redefined by setting environment "
-		 "variable NEWGEN_MAX_TABULATED_ELEMENTS\n",
-		 max_tabulated_elements());
+		 "variable NEWGEN_MAX_TABULATED_ELEMENTS\n", mte);
 	    exit(1);
 	}
 	if( (Gen_tabulated_[ bp->index ]+i)->p == gen_chunk_undefined ) {
@@ -1849,10 +1858,10 @@ write_array_leaf(
     if( IS_INLINABLE( bp ) || IS_EXTERNAL( bp )) {
 	gen_trav_leaf( bp, obj, dr ) ;
     }
-    else if( obj->p != gen_chunk_undefined ) 
+    else if (obj->p != gen_chunk_undefined) 
     {
       fputi(i, user_file);           /* write array index */
-      gen_trav_leaf( bp, obj, dr ) ; /* write array value at index */
+      gen_trav_leaf(bp, obj, dr); /* write array value at index */
     }
 }
 
@@ -1985,59 +1994,66 @@ write_tabulated_leaf_in(
   return write_leaf_in(obj, bp);
 }
 
-/* GEN_WRITE_TABULATED writes the tabulated object TABLE on FD. Sharing is 
-   managed */
-
-int
-gen_write_tabulated(FILE * fd, int domain)
+/* GEN_WRITE_TABULATED writes the tabulated object TABLE on FD.
+   Sharing is managed.
+ */
+int gen_write_tabulated(FILE * fd, int domain)
 {
-    int index =  Domains[domain].index, i, size, wdomain;
-    gen_chunk *
-      fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof(gen_chunk),
-			   0, Tabulated_bp-Domains, Gen_tabulated_[index]) ;
-    struct driver dr ;
-    gen_chunk * t;
+  struct gen_binding * bp = Domains+domain;
+  int index =  Domains[domain].index, i, size, wdomain;
+  gen_chunk 
+    * tt = Gen_tabulated_[index],
+    * fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof(gen_chunk),
+			 0, Tabulated_bp-Domains, tt);
+  struct driver dr ;
+  
+  check_read_spec_performed();
+  
+  size = max_tabulated_elements();
+  wdomain = gen_type_translation_actual_to_old(domain);
+  
+  Tabulated_bp->domain->ar.element = &Domains[domain]; 
+  dr.null = write_null;
+  dr.leaf_out = gen_null ;
+  dr.leaf_in = write_tabulated_leaf_in ;
+  dr.simple_in = write_simple_in ;
+  dr.array_leaf = write_array_leaf ;
+  dr.simple_out = write_simple_out ;
+  dr.obj_in = write_obj_in ;
+  dr.obj_out = write_obj_out ;
+  user_file = fd ;
+  
+  push_gen_trav_env();
+  shared_pointers(fake_obj, FALSE);
+  
+  /* headers: #shared, tag, domain number, 
+   */
+  fputi(shared_number, fd);
+  putc('*', fd);
+  fputi(wdomain, fd);
+  
+  for (i=0; i<size; i++)
+  {
+    if (tt[i].p && !gen_chunk_undefined_p(tt[i].p))
+      gen_trav_leaf(bp, &tt[i], &dr);
+  }
 
-    check_read_spec_performed();
+  putc(')', fd);
 
-    size = max_tabulated_elements();
+  /* gen_trav_obj(fake_obj, &dr); */
+    
+  pop_gen_trav_env();
 
-    Tabulated_bp->domain->ar.element = &Domains[ domain ] ;
-    dr.null = write_null;
-    dr.leaf_out = gen_null ;
-    dr.leaf_in = write_tabulated_leaf_in ;
-    dr.simple_in = write_simple_in ;
-    dr.array_leaf = write_array_leaf ;
-    dr.simple_out = write_simple_out ;
-    dr.obj_in = write_obj_in ;
-    dr.obj_out = write_obj_out ;
-    user_file = fd ;
+  newgen_free(fake_obj);
 
-    push_gen_trav_env();
-    shared_pointers(fake_obj, FALSE);
-    wdomain = gen_type_translation_actual_to_old(domain);
+  /* restore the index sign which was changed to tag as seen.
+   */
+  for (i=0; i<size; i++)
+    if (tt[i].p && !gen_chunk_undefined_p(tt[i].p)) 
+      if ((tt[i].p+1)->i<0) (tt[i].p+1)->i = -(tt[i].p+1)->i;
 
-    fputi(wdomain, fd);
-    fputi(size, fd);
-    fputi(shared_number, fd);
-
-    gen_trav_obj(fake_obj, &dr);
-
-    pop_gen_trav_env();
-
-    newgen_free(fake_obj);
-
-    /* restore the index sign which was changed to tag as seen.
-     */
-    t = Gen_tabulated_[index];
-    for (i=0; i<size; i++)
-	if (t[i].p && !gen_chunk_undefined_p(t[i].p)) 
-	    if ((t[i].p+1)->i<0) (t[i].p+1)->i = -(t[i].p+1)->i;
-
-    return domain;
+  return domain;
 }
-
-
 
 #ifdef BSD
 static char *strdup( s )
@@ -2488,28 +2504,7 @@ int gen_read_tabulated(FILE * file, int create_p)
 
     newgen_start_lexer(file);
 
-    if ((i=genread_lex()) != READ_INT ) {
-	user("Incorrect data for gen_read_tabulated: %d\n", i);
-	exit(1);
-    }
-
-    domain = gen_type_translation_old_to_actual(genread_lval.val);
-
-    if ((i=genread_lex()) != READ_INT) {
-	user("Incorrect second data for gen_read_tabulated: %d\n", i);
-	exit(1);
-    }
-
-    max = genread_lval.val;
-
-    if (max > max_tabulated_elements()) {
-	/* the file was created with more elements, maybe... */
-	user("Current limit (%d) can be redefined by setting environment "
-	     "variable NEWGEN_MAX_TABULATED_ELEMENTS\n",
-	     max_tabulated_elements());
-	exit(1);
-    }
-
+/*
     if (create_p) {
 	if( Gen_tabulated_[ index = Domains[domain].index ] == NULL ) {
 	    user( "gen_read_tabulated: Trying to read untabulated domain %s\n",
@@ -2521,13 +2516,14 @@ int gen_read_tabulated(FILE * file, int create_p)
 	    (Gen_tabulated_[ index ]+i)->p = gen_chunk_undefined ;
 	}
     }
+*/
+
     newgen_allow_forward_ref = TRUE;
     genread_parse();
     newgen_allow_forward_ref = FALSE;
 
-    /* free hack array. */
-    newgen_free((char *) ((Read_chunk+1)->p) ) ;
-    newgen_free((char *) Read_chunk ) ;
+    domain = Read_chunk->i;
+    newgen_free((char *) Read_chunk);
 
     return domain;
 }
@@ -2584,8 +2580,7 @@ gen_check(
  * 
  * FC 29/12/94
  */
-int
-gen_type(gen_chunk *obj)
+int gen_type(gen_chunk *obj)
 {
     int dom;
     message_assert("no domain for NULL object", obj!=(gen_chunk*)NULL);
@@ -2600,8 +2595,7 @@ gen_type(gen_chunk *obj)
  *  
  *  FC 29/12/94
  */
-char *
-gen_domain_name(int t)
+char * gen_domain_name(int t)
 {
     check_domain(t); return(Domains[t].name);
 }
