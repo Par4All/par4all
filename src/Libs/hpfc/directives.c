@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/10/22 12:00:54 $, )
+ * ($Date: 1995/12/19 15:52:39 $, )
  */
 
 #include "defines-local.h"
@@ -130,7 +130,7 @@ static void array_as_template(entity array)
                                            Value_to_expression(1),
                                            Value_to_expression(0)), l);
 
-    store_entity_align(array, make_align(l, array));
+    store_hpf_alignment(array, make_align(l, array));
 }
 
 /* one simple ALIGN directive is handled.
@@ -319,7 +319,7 @@ one_align_directive(reference alignee,
     else
     {
 	set_array_as_distributed(array);
-	store_entity_align(array, a);
+	store_hpf_alignment(array, a);
     }       
 }
 
@@ -492,7 +492,7 @@ one_distribute_directive(reference distributee,
 	    pips_debug(7, "array 0x%x\n", (unsigned int) array);
 	    pips_debug(7, "alived array %s\n", entity_name(array));
 	    
-	    a = new_align_with_template(load_entity_align(array), new_t);
+	    a = new_align_with_template(load_hpf_alignment(array), new_t);
 	    new_array = array_synonym_aligned_as(array, a);
 	    
 	    propagate_synonym(current, array, new_array);
@@ -506,7 +506,7 @@ one_distribute_directive(reference distributee,
 	    alive_arrays(current, template));
     }
     else
-	store_entity_distribute(template, d);
+	store_hpf_distribution(template, d);
 
     pips_debug(4, "out\n");
 }
