@@ -161,11 +161,23 @@ int HasParenthesis;
 
     if (type_variable_p(te)) {
 	if (lc == expression_undefined && fc == expression_undefined) {
-	    s = make_syntax(is_syntax_reference, 
-			    make_reference(e, indices));
+	    if((gen_length(indices)==0) ||
+	       (gen_length(indices)==
+		gen_length(variable_dimensions(type_variable(te))))) {
+		s = make_syntax(is_syntax_reference, 
+				make_reference(e, indices));
+	    }
+	    else {
+		user_warning("MakeAtom",
+			     "Too many or too few subscript expressions"
+			     " for reference to %s\n",
+			     entity_local_name(e));
+		ParserError("MakeAtom", "Illegal array reference\n");
+	    }
+
 	}
 	else {
-	    ParserError("MakeAtom", "substrings are not implemented\n");
+	    ParserError("MakeAtom", "Substrings are not implemented\n");
 	}
     }
     else if (type_functional_p(te)) {
