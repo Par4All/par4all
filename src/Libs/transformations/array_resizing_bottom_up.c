@@ -22,7 +22,6 @@
 #include "semantics.h"
 #include "transformer.h"
 #include "pipsmake.h"
-#include "instrumentation.h"
 #include "abc_private.h"
 #include "effects-generic.h"
 #include "effects-convex.h"
@@ -31,6 +30,7 @@
 #include "text-util.h" /* for words_to_string*/
 
 #include "instrumentation.h"
+#include "transformations.h"
 
 static int number_of_right_array_declarations = 0;
 static string current_mod ="";
@@ -530,7 +530,7 @@ static region find_union_regions(list l_regions,entity e)
   return reg;
 }
 
-bool bottom_up_array_declaration_normalization(char* mod_name)
+bool array_resizing_bottom_up(char* mod_name)
 {
   entity mod_ent = local_name_to_top_level_entity(mod_name);
   list l_decl = code_declarations(entity_code(mod_ent)), l_regions = NIL; 
