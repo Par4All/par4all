@@ -138,7 +138,7 @@ string module_name;
 				"/", module_name, ".adfg_file", NULL));
 
   fd = safe_fopen(filename, "w");
-  local_fprint_dfg(fd, dfg);
+  fprint_dfg(fd, dfg);
   safe_fclose(fd, filename);
   
   DB_PUT_FILE_RESOURCE(DBR_ADFG_FILE, strdup(module_name), filename);
