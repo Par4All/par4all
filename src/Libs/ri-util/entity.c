@@ -652,6 +652,7 @@ common_members_of_module(
  */
 static bool 
 comparable_entity_in_list_p(
+    entity common,
     entity v, 
     list l)
 {
@@ -678,8 +679,8 @@ comparable_entity_in_list_p(
 
     /* same OFFSET?
      */
-    if (ok) ok = so = ram_offset(storage_ram(entity_storage(v))) ==
-		ram_offset(storage_ram(entity_storage(ref)));
+    if (ok) ok = so = (ram_offset(storage_ram(entity_storage(v))) ==
+		ram_offset(storage_ram(entity_storage(ref))));
 
     /* same TYPE?
      */
@@ -688,6 +689,15 @@ comparable_entity_in_list_p(
     pips_debug(4, "%s ~ %s? %d: n=%d,o=%d,t=%d\n", entity_name(v),
 	       entity_undefined_p(ref)? "<undef>": entity_name(ref), 
 	       ok, sn, so, st);
+
+    /* temporary for CA
+     */
+    if (!ok) {
+	pips_debug(1, "common /%s/: %s != %s (n=%d,o=%d,t=%d)\n",
+		   entity_name(common), entity_name(v), 
+		   entity_undefined_p(ref)? "<undef>": entity_name(ref),
+		   sn, so, st);
+    }
 
     return ok;
 }
@@ -715,7 +725,7 @@ check_common_inclusion(entity common)
     {
 	entity v = ENTITY(CAR(lv));
 	if (ram_function(storage_ram(entity_storage(v)))!=ref)
-	    ok = comparable_entity_in_list_p(v, lref);
+	    ok = comparable_entity_in_list_p(common, v, lref);
 	POP(lv);
     }
 
