@@ -26,14 +26,13 @@ Psommet fonct_init()
 {
     Psommet fonct_eco;
 
-
 #ifdef TRACE
     printf(" ** creation fonction economique de base \n");
 #endif
     fonct_eco = sommet_new();
-    fonct_eco->denominateur =1;
+    fonct_eco->denominateur =VALUE_ONE;
     fonct_eco->eq_sat = (int *)MALLOC(sizeof(int),INTEGER,"fonct_init");
-    *(fonct_eco->eq_sat) = NULL;
+    *(fonct_eco->eq_sat) = 0;
     return (fonct_eco);
 }
 
@@ -55,10 +54,10 @@ Pbase b;
     Psommet fonct_eco;
 
     fonct_eco = sommet_new();
-    fonct_eco->denominateur =1;
-    fonct_eco->vecteur = vect_new(vecteur_var(b),1);
+    fonct_eco->denominateur = VALUE_ONE;
+    fonct_eco->vecteur = vect_new(vecteur_var(b),VALUE_ONE);
     fonct_eco->eq_sat = (int *)MALLOC(sizeof(int),INTEGER,"fonct_min");
-    *(fonct_eco->eq_sat) = NULL;
+    *(fonct_eco->eq_sat) = 0;
     return (fonct_eco);
 }
 
@@ -70,10 +69,10 @@ Pbase b;
     Psommet fonct_eco;
 
     fonct_eco = sommet_new();
-    fonct_eco->denominateur =1;
-    fonct_eco->vecteur = vect_new(vecteur_var(b),-1);
+    fonct_eco->denominateur = VALUE_ONE;
+    fonct_eco->vecteur = vect_new(vecteur_var(b),VALUE_MONE);
     fonct_eco->eq_sat = (int *)MALLOC(sizeof(int),INTEGER,"fonct_max");
-    *(fonct_eco->eq_sat) = NULL;
+    *(fonct_eco->eq_sat) = 0;
     return (fonct_eco);
 }
 
@@ -102,14 +101,14 @@ Pbase b;
     printf(" ** creation fonction economique \n");
 #endif
     fonct_eco =sommet_new();
-    fonct_eco->denominateur =1;
-    fonct_eco->vecteur = vect_new(vecteur_var(b),1);
-    for (i = 1, pv= b->succ;i< nbvars & !VECTEUR_NUL_P(pv); i++, pv=pv->succ)
-	vect_add_elem (&(fonct_eco->vecteur),vecteur_var(pv),1);
+    fonct_eco->denominateur = VALUE_ONE;
+    fonct_eco->vecteur = vect_new(vecteur_var(b),VALUE_ONE);
+    for (i = 1, pv= b->succ;i< nbvars && !VECTEUR_NUL_P(pv); i++, pv=pv->succ)
+	vect_add_elem (&(fonct_eco->vecteur),vecteur_var(pv),VALUE_ONE);
 	
     fonct_eco->eq_sat = (int *)MALLOC(sizeof(int),
 				      INTEGER,"fonct_min_all");
-    *(fonct_eco->eq_sat) = NULL;
+    *(fonct_eco->eq_sat) = 0;
     return (fonct_eco);
 }
 
@@ -130,19 +129,18 @@ int nbvars;
 Pbase b;
 {
 	Psommet fonct_eco;
-	register int i=0;
-Pvecteur pv = VECTEUR_NUL;
+	Pvecteur pv = VECTEUR_NUL;
 #ifdef TRACE
 	printf(" ** creation fonction economique \n");
 #endif
 	fonct_eco =sommet_new();
-	fonct_eco->denominateur =1;
-	fonct_eco->vecteur = vect_new(vecteur_var(b),-1);
+	fonct_eco->denominateur = VALUE_ONE;
+	fonct_eco->vecteur = vect_new(vecteur_var(b),VALUE_MONE);
 	for (pv= b->succ;!VECTEUR_NUL_P(pv);pv=pv->succ)
-		vect_add_elem (&(fonct_eco->vecteur),vecteur_var(pv),-1);
+	    vect_add_elem (&(fonct_eco->vecteur),vecteur_var(pv),VALUE_MONE);
 	fonct_eco->eq_sat = (int *)MALLOC(sizeof(int),
 					  INTEGER,"fonct_max_all");
-	*(fonct_eco->eq_sat) = NULL;
+	*(fonct_eco->eq_sat) = 0;
 	return (fonct_eco);
 }
 
@@ -165,11 +163,11 @@ Pbase b;
 	Psommet fonct_eco;
 
 	fonct_eco =sommet_new();
-	fonct_eco->denominateur =1;
-	fonct_eco->vecteur = vect_new(vecteur_var(b),1);
-	vect_add_elem(&(fonct_eco->vecteur),vecteur_var(b->succ),-1);
+	fonct_eco->denominateur = VALUE_ONE;
+	fonct_eco->vecteur = vect_new(vecteur_var(b),VALUE_ONE);
+	vect_add_elem(&(fonct_eco->vecteur),vecteur_var(b->succ),VALUE_MONE);
 	fonct_eco->eq_sat = (int *)MALLOC(sizeof(int),INTEGER,"fonct_min_d");
-	*(fonct_eco->eq_sat) = NULL;
+	*(fonct_eco->eq_sat) = 0;
 	return (fonct_eco);
 }
 
@@ -190,11 +188,11 @@ Pbase b;
     Psommet fonct_eco;
 
     fonct_eco =sommet_new();
-    fonct_eco->denominateur =1;
-    fonct_eco->vecteur = vect_new(vecteur_var(b),-1);
-    vect_add_elem(&(fonct_eco->vecteur),vecteur_var(b->succ),1);
+    fonct_eco->denominateur = VALUE_ONE;
+    fonct_eco->vecteur = vect_new(vecteur_var(b),VALUE_MONE);
+    vect_add_elem(&(fonct_eco->vecteur),vecteur_var(b->succ),VALUE_ONE);
     fonct_eco->eq_sat = (int *)MALLOC(sizeof(int),INTEGER,"fonct_max_d");
-    *(fonct_eco->eq_sat) = NULL;
+    *(fonct_eco->eq_sat) = 0;
     return (fonct_eco);
 }
 
@@ -213,25 +211,25 @@ Pbase b;
 {
 	Psommet fonct_eco;
 	register int i=0;
-	int d;
+	Value d;
 Pvecteur pv;
 
 	fonct_eco =sommet_new();
-	fonct_eco->denominateur =1;
+	fonct_eco->denominateur = VALUE_ONE;
 	printf (" *** creation d'une fonction economique \n");
 	printf (" pour la premiere variable : 1 ou -1 ");
-	scanf( "%d",&d);
+	scan_Value(&d);
 	fonct_eco->vecteur = vect_new(vecteur_var(b),d);
-	for (i = 1 ,pv= b->succ;i< nbvars && !VECTEUR_NUL_P(pv); i++,pv=pv->succ)
+	for (i = 1 ,pv= b->succ;i< nbvars && !VECTEUR_NUL_P(pv); 
+	     i++,pv=pv->succ)
 	{
 		printf (" pour l'indice %d : 1 ou -1 ",i+1);
-		scanf( "%d",&d);
+		scan_Value(&d);
 		vect_add_elem (&(fonct_eco->vecteur),vecteur_var(pv),d);
 	}
 	printf ("\n");
 
-
 	fonct_eco->eq_sat = (int *)MALLOC(sizeof(int),INTEGER,"fonct_read");
-	*(fonct_eco->eq_sat) = NULL;
+	*(fonct_eco->eq_sat) = 0;
 	return (fonct_eco);
 }
