@@ -13,7 +13,8 @@ LIB_CFILES = \
 	reorder.c \
 	unspaghettify.c \
 	cfg.c \
-	unreachable.c
+	unreachable.c \
+	bourdoncle.c
 
 LIB_HEADERS =	control-local.h
 
