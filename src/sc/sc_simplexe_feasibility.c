@@ -38,8 +38,8 @@ static int NB_INEQ = 0;
 /* #define NB_INEQ sc->nb_ineq */
 /* #define NB_EQ sc->nb_eq */
 #define DIMENSION sc->dimension
-#define SIMPL(A,B) {if(A!=1 && B!=1){long I1,J1,K;I1=A,J1=B;while((K=I1%J1)!=0)I1=J1,J1=K;A=A/J1;B=B/J1;if(B<0)A=-A,B=-B;}}
-#define G(J1,A,B) {long I1,K;if(B>1){I1=A,J1=B;while((K=I1%J1)!=0)I1=J1,J1=K;if(J1<0)J1=-J1;}else J1=B;}
+#define SIMPL(A,B) {if(A!=1 && B!=1){Value I1,J1,K;I1=A,J1=B;while((K=I1%J1)!=0)I1=J1,J1=K;A=A/J1;B=B/J1;if(B<0)A=-A,B=-B;}}
+#define G(J1,A,B) {Value I1,K;if(B>1){I1=A,J1=B;while((K=I1%J1)!=0)I1=J1,J1=K;if(J1<0)J1=-J1;}else J1=B;}
 #define SIMPLIFIE(FRAC) SIMPL(FRAC.num,FRAC.den)
 #define NUMERO hashtable[h].numero
 /*#define MAX_VAR 197 nombre max de variables */
@@ -59,21 +59,21 @@ static int NB_INEQ = 0;
 #define DIV(x,y,z) {if(y.num==0)x.num=0,x.den=1;else{x.num=y.num*z.den;x.den=y.den*z.num;SIMPLIFIE(x);}}
 #define MUL(x,y,z) {if(y.num==0||z.num==0)x.num=0,x.den=1;else{x.num=y.num*z.num;x.den=y.den*z.den;SIMPLIFIE(x);}}
    /* Pivot :  x = a - b c / d    */
-#define PIVOT(X,A,B,C,D) {if(A.num==0){if(B.num==0||C.num==0||D.den==0)X.num=0, X.den=1;else if(B.den<MAXVAL && C.den<MAXVAL && D.num<MAXVAL){X.num=-B.num*C.num*D.den;X.den=B.den*C.den*D.num;SIMPLIFIE(X);}else{frac uu;if(DEBUG2)printf("++ %ld/%ld %ld/%ld %ld/%ld %ld/%ld \n",A.num,A.den,B.num,B.den,C.num,C.den,D.num,D.den);MUL(uu,B,C);DIV(X,uu,D);X.num=-X.num;if(DEBUG2)printf("%ld/%ld\n",X.num,X.den);}} \
+#define PIVOT(X,A,B,C,D) {if(A.num==0){if(B.num==0||C.num==0||D.den==0)X.num=0, X.den=1;else if(B.den<MAXVAL && C.den<MAXVAL && D.num<MAXVAL){X.num=-B.num*C.num*D.den;X.den=B.den*C.den*D.num;SIMPLIFIE(X);}else{frac uu;if(DEBUG2)printf("++ "),printfrac(A),printfrac(B),printfrac(C),printfrac(D),printf(" \n");MUL(uu,B,C);DIV(X,uu,D);X.num=-X.num;if(DEBUG2)printfrac(X);}} \
 else if(B.num==0||C.num==0||D.den==0)X.num=A.num,X.den=A.den; \
 else if(D.num==1&&A.den==1&&B.den==1&&C.den==1)X.den=1,X.num=A.num-B.num*C.num*D.den; \
 else if(A.den<MAXVAL && B.den<MAXVAL && C.den<MAXVAL && D.num<MAXVAL){X.num=A.num*B.den*C.den*D.num-A.den*B.num*C.num*D.den;X.den=A.den*B.den*C.den*D.num;SIMPLIFIE(X);} \
-else{frac uu,vv,ww;if(DEBUG2)printf("%ld/%ld %ld/%ld %ld/%ld %ld/%ld \n",A.num,A.den,B.num,B.den,C.num,C.den,D.num,D.den); \
+else{frac uu,vv,ww;if(DEBUG2)printfrac(A),printfrac(B),printfrac(C),printfrac(D),printf(" \n"); \
 uu.num=B.num;vv.num=C.num;ww.num=D.den;uu.den=B.den;vv.den=C.den;ww.den=D.num; \
 SIMPL(uu.num,vv.den);SIMPL(uu.num,ww.den);SIMPL(vv.num,uu.den);SIMPL(vv.num,ww.den);SIMPL(ww.num,uu.den);SIMPL(ww.num,vv.den); \
 vv.num*=uu.num*ww.num;vv.den*=uu.den*ww.den; \
-SUB(X,A,vv);if(DEBUG2)printf("%ld/%ld\n",X.num,X.den);}\
+SUB(X,A,vv);if(DEBUG2)printfrac(X);}\
 }
 #define SUB(X,A,B) { \
 if(A.num==0)X.num=-B.num,X.den=B.den; \
 else if(B.num==0)X.num=A.num,X.den=A.den; \
 else if(A.den==1&&B.den==1)X.num=A.num-B.num,X.den=1; \
-else{long GDEN,AD,BD;AD=A.den,BD=B.den; \
+else{Value GDEN,AD,BD;AD=A.den,BD=B.den; \
   if(A.den>B.den)G(GDEN,AD,BD) \
   else G(GDEN,BD,AD); \
   if(GDEN!=1)AD=AD/GDEN,BD=BD/GDEN; \
@@ -86,27 +86,27 @@ else{long GDEN,AD,BD;AD=A.den,BD=B.den; \
 
 
 #define MULTOFL(RES,A,B) {if ((B==0) || (ABS(A)<INT_MAX/ABS(B))) RES=A*B; else longjmp(overflow_error3, 5);}
-#define SIMPLOFL(A,B) {if(A!=1 && B!=1){long I1,J1,K;I1=A,J1=B;if(!J1)longjmp(overflow_error3,6);while((K=I1%J1)!=0) I1=J1,J1=K;if(!J1)longjmp(overflow_error3,6); A=A/J1; B=B/J1;if(B<0)A=-A,B=-B;}}
-#define GOFL(J1,A,B) {long I1,K;if(B>1){I1=A,J1=B;if(!J1)longjmp(overflow_error3,6);while((K=I1%J1)!=0)I1=J1,J1=K;if(J1<0)J1=-J1;}else J1=B;}
+#define SIMPLOFL(A,B) {if(A!=1 && B!=1){Value I1,J1,K;I1=A,J1=B;if(!J1)longjmp(overflow_error3,6);while((K=I1%J1)!=0) I1=J1,J1=K;if(!J1)longjmp(overflow_error3,6); A=A/J1; B=B/J1;if(B<0)A=-A,B=-B;}}
+#define GOFL(J1,A,B) {Value I1,K;if(B>1){I1=A,J1=B;if(!J1)longjmp(overflow_error3,6);while((K=I1%J1)!=0)I1=J1,J1=K;if(J1<0)J1=-J1;}else J1=B;}
 #define SIMPLIFIEOFL(FRAC) SIMPLOFL(FRAC.num,FRAC.den)
 #define DIVOFL(x,y,z) {if(y.num==0)x.num=0,x.den=1;else{MULTOFL(x.num,y.num,z.den);MULTOFL(x.den,y.den,z.num);SIMPLIFIEOFL(x);}}
 #define MULOFL(x,y,z) {if(y.num==0||z.num==0)x.num=0,x.den=1;else{MULTOFL(x.num,y.num,z.num);MULTOFL(x.den,y.den,z.den);SIMPLIFIEOFL(x);}}
    /* Pivot :  x = a - b c / d    */
-#define PIVOTOFL(X,A,B,C,D) {if(A.num==0){if(B.num==0||C.num==0||D.den==0)X.num=0, X.den=1;else if(B.den<MAXVAL && C.den<MAXVAL && D.num<MAXVAL) {MULTOFL(tp,C.num,D.den);MULTOFL(X.num,-B.num,tp);MULTOFL(tp,C.den,D.num);MULTOFL( X.den,B.den,tp);SIMPLIFIEOFL(X);}else{frac uu;if(DEBUG2)printf("++ %ld/%ld %ld/%ld %ld/%ld %ld/%ld \n",A.num,A.den,B.num,B.den,C.num,C.den,D.num,D.den);MULOFL(uu,B,C);DIVOFL(X,uu,D);X.num=-X.num;if(DEBUG2)printf("%ld/%ld\n",X.num,X.den);}} \
+#define PIVOTOFL(X,A,B,C,D) {if(A.num==0){if(B.num==0||C.num==0||D.den==0)X.num=0, X.den=1;else if(B.den<MAXVAL && C.den<MAXVAL && D.num<MAXVAL) {MULTOFL(tp,C.num,D.den);MULTOFL(X.num,-B.num,tp);MULTOFL(tp,C.den,D.num);MULTOFL( X.den,B.den,tp);SIMPLIFIEOFL(X);}else{frac uu;if(DEBUG2)printf("++ "),printfrac(A),printfrac(B),printfrac(C),printfrac(D),printf(" \n");MULOFL(uu,B,C);DIVOFL(X,uu,D);X.num=-X.num;if(DEBUG2)printfrac(X);}} \
 else if(B.num==0||C.num==0||D.den==0)X.num=A.num,X.den=A.den; \
 else if(D.num==1&&A.den==1&&B.den==1&&C.den==1) {X.den=1;MULTOFL(tp,C.num,D.den);MULTOFL(tp,B.num,tp);X.num=A.num-tp;} \
 else if(A.den<MAXVAL && B.den<MAXVAL && C.den<MAXVAL && D.num<MAXVAL) {MULTOFL(tp,C.den,D.num); MULTOFL(tp,B.den,tp);MULTOFL(tp,A.num,tp);MULTOFL(tp1,C.num,D.den);MULTOFL(tp1,B.num,tp1);MULTOFL(tp1,A.den,tp1);X.num=tp-tp1;MULTOFL(tp,C.den,D.num);MULTOFL(tp,B.den,tp);MULTOFL(X.den,A.den,tp);SIMPLIFIEOFL(X);} \
-else{frac uu,vv,ww;if(DEBUG2)printf("%ld/%ld %ld/%ld %ld/%ld %ld/%ld \n",A.num,A.den,B.num,B.den,C.num,C.den,D.num,D.den); \
+else{frac uu,vv,ww;if(DEBUG2)printfrac(A),printfrac(B),printfrac(C),printfrac(D),printf(" \n"); \
 uu.num=B.num;vv.num=C.num;ww.num=D.den;uu.den=B.den;vv.den=C.den;ww.den=D.num; \
 SIMPLOFL(uu.num,vv.den);SIMPLOFL(uu.num,ww.den);SIMPLOFL(vv.num,uu.den);SIMPLOFL(vv.num,ww.den);SIMPLOFL(ww.num,uu.den);SIMPLOFL(ww.num,vv.den); \
 MULTOFL(tp,uu.num,ww.num);MULTOFL(vv.num,vv.num,tp);MULTOFL(tp,uu.den,ww.den);MULTOFL(vv.den,vv.den,tp); \
-SUBOFL(X,A,vv);if(DEBUG2)printf("%ld/%ld\n",X.num,X.den);} \
+SUBOFL(X,A,vv);if(DEBUG2)printfrac(X);} \
 }
 #define SUBOFL(X,A,B) { \
 if(A.num==0)X.num=-B.num,X.den=B.den; \
 else if(B.num==0)X.num=A.num,X.den=A.den; \
 else if(A.den==1&&B.den==1)X.num=A.num-B.num,X.den=1; \
-else{long GDEN,AD,BD;AD=A.den,BD=B.den; \
+else{Value GDEN,AD,BD;AD=A.den,BD=B.den; \
   if(A.den>B.den)GOFL(GDEN,AD,BD) \
   else GOFL(GDEN,BD,AD); \
   if(!GDEN)longjmp(overflow_error3,8);/* just before the fault */\
@@ -132,15 +132,19 @@ frac frac0={0,0,0} ;
 
 
 static void printfrac(frac x) {
-    printf(" %3.1ld/%-3.1ld",x.num,x.den) ;
+    printf(" ");
+    print_Value(x.num);
+    printf("/");
+    print_Value(x.den);
+    /* printf(" %3.1ld/%-3.1ld",x.num,x.den) ; */
 }
 
 void dump_tableau(tableau *t,int colonnes) {
     int i,j, k, w;
-    long max=0;
+    int max=0;
     for(i=0;i<colonnes;i++) 
       if(t[i].colonne[t[i].taille-1].numero>max)max=t[i].colonne[t[i].taille-1].numero ; 
-    printf("Dump du tableau ------ %d colonnes  %ld lignes\n",colonnes,max) ;
+    printf("Dump du tableau ------ %d colonnes  %d lignes\n",colonnes,max) ;
     printf("%d Variables  visibles :\n",colonnes-2) ;
     for(i=0;i<colonnes-2;i++) printf("%7d",variables[i]) ;
     printf("\n") ;
@@ -152,14 +156,14 @@ if(DEBUG){
       if(t[i].existe != 0) {
         printf("Colonne %d Existe=%d Taille=%d\n",i,t[i].existe,t[i].taille) ;
         for(j=0 ; j<t[i].taille ; j++)
-          printf("ligne %ld valeur %ld/%ld\n",
-            t[i].colonne[j].numero,t[i].colonne[j].num,
-            t[i].colonne[j].den) ;
+	    printf("ligne %d valeur", t[i].colonne[j].numero),
+	    printfrac(t[i].colonne[j]),
+	    printf("\n");
       }
     }
 } /* DEBUG */
   
-    printf("Nb lignes: %ld\n", max);
+    printf("Nb lignes: %d\n", max);
     for(j=0;j<=max;j++) { printf("\nLigne %d ",j) ;
         for(i=0;i<colonnes;i++) {
             w=1 ;
@@ -752,7 +756,7 @@ else {
     if(i0<t[0].taille && t[jj].colonne[i].numero> t[0].colonne[i0].numero) i0++ ;
 if(i1<t[1].taille && t[jj].colonne[i].numero > t[1].colonne[i1].numero) i1++ ;
 }
-	    if(DEBUG)printf("i=%ld i0=%ld i1=%ld   %ld %ld %ld\n",i,i0,i1,t[jj].colonne[i].numero,t[0].colonne[i0].numero,t[1].colonne[i1].numero) ;
+	    if(DEBUG)printf("i=%ld i0=%ld i1=%ld   %d %d %d\n",i,i0,i1,t[jj].colonne[i].numero,t[0].colonne[i0].numero,t[1].colonne[i1].numero) ;
         }
         /* Cas d'impossibilite'  */
 if(ii==-1) {
@@ -811,7 +815,7 @@ if(ii==-1) {
 			if(i==0||nlle_colonne[k].num!=0) {
 			    nlle_colonne[k].numero = t[j].colonne[i].numero ;
 			    if(DEBUG)printfrac(nlle_colonne[k]) ;
-			    if(DEBUG)printf(" ligne numero %ld ", nlle_colonne[k].numero) ;
+			    if(DEBUG)printf(" ligne numero %d ", nlle_colonne[k].numero) ;
 			    if(DEBUG)printf("\n") ;
 			    k++ ;
 			}
@@ -820,8 +824,9 @@ if(ii==-1) {
 		    else if(i>=t[j].taille || (i1<t[jj].taille && t[j].colonne[i].numero > t[jj].colonne[i1].numero))
 		    {  
  if(DEBUG)printf("t[j].colonne[i].numero > t[jj].colonne[i1].numero , k=%ld, j=%ld, i=%ld i1=%ld\n",k,j,i,i1);
-			if(DEBUG)printf("j = %ld  t[j].taille=%d , t[jj].taille=%d\n",j,t[j].taille,t[jj].taille);
-			if(DEBUG)printf("t[j].colonne[i].numero=%ld , t[jj].colonne[i1].numero=%ld\n",t[j].colonne[i].numero,t[jj].colonne[i1].numero);
+			if(DEBUG){ printf("j = %ld  t[j].taille=%d , t[jj].taille=%d\n",j,t[j].taille,t[jj].taille);
+				   printf("t[j].colonne[i].numero=%d , t[jj].colonne[i1].numero=%d\n",
+					  t[j].colonne[i].numero,t[jj].colonne[i1].numero);}
                         /* 0 en colonne j  ligne t[jj].colonne[i1].numero */
 			if(t[jj].colonne[i1].numero == ii) {
 			    AFF(nlle_colonne[k],frac0)
@@ -833,23 +838,20 @@ if(ii==-1) {
 			}
 			if(i==0||nlle_colonne[k].num!=0) {
 			    nlle_colonne[k].numero = t[jj].colonne[i1].numero ;
-			    if(DEBUG)printfrac(nlle_colonne[k]) ;
-			    if(DEBUG)printf(" ligne numero %ld ", nlle_colonne[k].numero) ;
-			    if(DEBUG)printf("\n") ;
+			    if(DEBUG){printfrac(nlle_colonne[k]); printf(" ligne numero %d ", nlle_colonne[k].numero);printf("\n");}
 			    k++ ;
 			}
 			if(i1<t[jj].taille) i1++ ; else i++ ;
 }
 else if(i1>=t[jj].taille || t[j].colonne[i].numero < t[jj].colonne[i1].numero)
 		    {       /* 0 en colonne jj  ligne t[j].colonne[i].numero */
-		if(DEBUG)printf("t[j].colonne[i].numero < t[jj].colonne[i1].numero , k=%ld, j=%ld, i=%ld i1=%ld\n",k,j,i,i1);
-			if(DEBUG)printf("j = %ld  t[j].taille=%d , t[jj].taille=%d\n",j,t[j].taille,t[jj].taille);
+			if(DEBUG){ printf("t[j].colonne[i].numero < t[jj].colonne[i1].numero , k=%ld, j=%ld, i=%ld i1=%ld\n",k,j,i,i1);
+				   printf("j = %ld  t[j].taille=%d , t[jj].taille=%d\n",j,t[j].taille,t[jj].taille);}
 			AFF(nlle_colonne[k],t[j].colonne[i]) ;
 			if(DEBUG)printfrac(nlle_colonne[k]) ;
 			if(i==0||nlle_colonne[k].num!=0) {
 			    nlle_colonne[k].numero = t[j].colonne[i].numero ;
-			    if(DEBUG)printf(" ligne numero %ld ", nlle_colonne[k].numero) ;
-			    if(DEBUG)printf("\n") ;
+			    if(DEBUG)printf(" ligne numero %d \n", nlle_colonne[k].numero) ;
 			    k++ ;
 			}
 			if(i<t[j].taille) i++ ; else i1++ ;
@@ -861,8 +863,7 @@ else if(i1>=t[jj].taille || t[j].colonne[i].numero < t[jj].colonne[i1].numero)
 		t[w].colonne=nlle_colonne ;
 		nlle_colonne = colo ;
 		t[w].taille=k ;
-		if(DEBUG)printf("w = %ld  t[w].taille=%d \n",w,t[w].taille);
-                if(DEBUG)dump_tableau(t, compteur) ;
+		if(DEBUG){ printf("w = %ld  t[w].taille=%d \n",w,t[w].taille); dump_tableau(t, compteur);}
 }
         }
 	
