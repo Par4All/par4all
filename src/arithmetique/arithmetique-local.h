@@ -146,8 +146,10 @@ typedef int Value;
  */
 #define value_assign(ref,val) ref=(val)
 #define value_addto(ref,val) ref+=(val)
+#define value_increment(ref) ref++
 #define value_product(ref,val) ref*=(val)
 #define value_substract(ref,val) ref-=(val)
+#define value_decrement(ref) ref--
 #define value_division(ref,val) ref/=(val)
 #define value_modulus(ref,val) ref%=(val)
 #define value_pdivision(ref,val) value_assign(ref,value_pdiv(ref,val))
