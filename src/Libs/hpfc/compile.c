@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/10/14 22:10:20 $, )
+ * ($Date: 1996/10/14 22:15:09 $, )
  */
 
 #include "defines-local.h"
@@ -649,7 +649,7 @@ static bool loop_flt(loop l)
 	return TRUE;
 
     s = c_stmt_head();
-    loce = load_statement_cumulated_references(s);
+    loce = load_statement_cumulated_references(s); 
 
     MAP(EFFECT, e,
     {
