@@ -5,6 +5,10 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.80  2002/06/13 13:43:26  irigoin
+ * Pseudo-intrinsic STATIC-INITIALIZATION() added to encode DATA statements
+ * as CALLs to STATIC_INITIALIZATION()
+ *
  * Revision 1.79  2002/06/13 12:59:29  irigoin
  * Pseudo-intrinsic REPEAT_VALUE() added to encode DATA statements as CALL to REPEAT_VALUE()
  *
@@ -121,6 +125,7 @@ typedef hash_table control_mapping;
 #define UNBOUNDED_DIMENSION_NAME 	"UNBOUNDED-DIMENSION"
 #define IMPLIED_DO_NAME 		"IMPLIED-DO"
 #define REPEAT_VALUE_NAME 		"REPEAT-VALUE"
+#define STATIC_INITIALIZATION_NAME 	"STATIC-INITIALIZATION"
 #define RETURN_LABEL_NAME 		"00000"
 
 #define IMPLIED_COMPLEX_NAME		"CMPLX_"
@@ -304,6 +309,7 @@ typedef hash_table control_mapping;
 #define ENTITY_ENDFILE_P(e) ENTITY_NAME_P(e, "ENDFILE")
 #define ENTITY_IMPLIEDDO_P(e) ENTITY_NAME_P(e, IMPLIED_DO_NAME)
 #define ENTITY_REPEAT_VALUE_P(e) ENTITY_NAME_P(e, REPEAT_VALUE_NAME)
+#define ENTITY_STATIC_INITIALIZATION_P(e) ENTITY_NAME_P(e, STATIC_INITIALIZATION_NAME)
 #define ENTITY_FORMAT_P(e) ENTITY_NAME_P(e, "FORMAT")
 
 #define ENTITY_IMPLIED_CMPLX_P(e) ENTITY_NAME_P(e, IMPLIED_COMPLEX_NAME)
