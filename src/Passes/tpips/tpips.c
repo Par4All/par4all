@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/10 17:57:45 $, 
+ * $Date: 1997/04/10 18:03:16 $, 
  */
 
 #include <stdio.h>
@@ -103,7 +103,7 @@ static struct t_completion_scheme completion_scheme[] =
 { "module",     COMP_NONE,       COMP_NONE },
 { "make",       COMP_RESOURCE,   COMP_NONE },
 { "apply",      COMP_RULE,       COMP_NONE },
-{ "display",    COMP_RESOURCE,   COMP_NONE },
+{ "display",    COMP_FILE_RSC,   COMP_NONE },
 { "activate",   COMP_RULE,       COMP_NONE },
 { SET_ENV,	COMP_NONE,	 COMP_NONE },
 { SET_PROP,     COMP_PROPERTY,   COMP_NONE },
@@ -989,6 +989,9 @@ static char *param_generator(char *texte, int state)
 	    break;
 	case COMP_HELP_TOPIC:
 	    current_completion_array = tp_help_topics;
+	    break;
+	case COMP_FILE_RSC:
+	    current_completion_array = tp_file_rsc_names;
 	    break;
 	default:
 	    current_completion_array = NULL;
