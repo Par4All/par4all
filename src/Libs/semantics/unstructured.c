@@ -61,6 +61,11 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.7  2001/07/19 17:59:56  irigoin
+  * Improved debugging messages. Bug fix for Validation/tilt.f and tilt3.f:
+  * secondary_entries were not passed down or computed correcty and internal
+  * cycles were missed.
+  *
   * Revision 1.6  2001/02/07 18:16:17  irigoin
   * Lots of improvement to handle recursion in fixpoint computation. Should
   * still be improved. Subscc should be handled like scc by enumerating paths
@@ -710,6 +715,13 @@ static transformer control_node_set_to_fix_point
   ifdebug(5) {
     pips_debug(5, "Begin for set:\n");
     print_control_nodes(set);
+    if(ENDP(secondary_entries)) {
+      pips_debug(5, "without secondary entries.\n");
+    }
+    else {
+      pips_debug(5, "with %d secondary entries:\n", gen_length(secondary_entries));
+      print_control_nodes(secondary_entries);
+    }
   }
 
   MAP(CONTROL, c, {
@@ -779,6 +791,8 @@ static transformer control_node_sequence_to_fix_point
   ifdebug(5) {
     pips_debug(5, "Begin for sequence:");
     print_control_nodes(seq);
+    pips_debug(5, "with secondary entries:");
+    print_control_nodes(secondary_entries);
   }
 
   MAP(CONTROL, c, {
@@ -1240,6 +1254,10 @@ static list head_to_subcycle(list cycle, control h, list * new_secondary_entries
     }
   }
 
+  /* FI: fishing for something; new_secondary_entries should be consistent
+     with subcycle since both are returned... */
+  *new_secondary_entries = subscc_to_cycle_heads(subcycle, h);
+
   ifdebug(5) {
     pips_debug(5, "Subcycle contains %d nodes:\n", gen_length(subcycle));
     print_control_nodes(subcycle);
@@ -1332,7 +1350,17 @@ static void cycle_to_postconditions(list cycle,
   transformer post = copy_transformer(pre);
   list cc;
 
-  pips_debug(5, "Begin\n");
+  ifdebug(5) {
+    pips_debug(5, "Begin for cycle:\n");
+    print_control_nodes(cycle);
+    if(ENDP(secondary_entries)) {
+      pips_debug(5, "without secondary entries.\n");
+    }
+    else {
+      pips_debug(5, "with %d secondary entries:\n", gen_length(secondary_entries));
+      print_control_nodes(secondary_entries);
+    }
+  }
 
   for(cc= cycle;!ENDP(cc); POP(cc)){
     control c = CONTROL(CAR(cc));
@@ -1502,7 +1530,7 @@ static void subcycle_to_postconditions(list cycle,
     pre = load_predecessor_postcondition(h, CONTROL(CAR(tail)), control_postcondition_map);
     pips_assert("As h is part of the main cycle, its precondition must has been defined",
 		!transformer_undefined_p(pre));
-    cycle_to_postconditions(tail, pre, fp_map, secondary_entries, control_postcondition_map);
+    cycle_to_postconditions(tail, pre, fp_map, new_secondary_entries, control_postcondition_map);
   }
 
   gen_free_list(subcycle);
@@ -1792,7 +1820,7 @@ static void add_control_to_cycle(list scc, list cycle, control succ,
     if(succ==gen_find_eq(succ, cycle)) {
       /* we have found a sub-cycle in a cycle :-( */
       ifdebug(6) {
-	debug(6,"Sub-cycle starts at: %s",
+	pips_debug(6,"Sub-cycle starts at: %s",
 	      statement_identification(control_statement(succ)));
 	print_control_nodes(cycle);
       }
