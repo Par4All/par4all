@@ -305,7 +305,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 			    pv = vecteur_succ(pv)) {
 			    if(!term_cst(pv)) {
 				v = vecteur_var(pv);
-				if(vecteur_val(pv)==1) {
+				if(value_one_p(vecteur_val(pv))) {
 				    break;
 				}
 			    }
@@ -558,7 +558,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 			    pv = vecteur_succ(pv)) {
 			    if(!term_cst(pv)) {
 				v = vecteur_var(pv);
-				if(vecteur_val(pv)==1) {
+				if(value_one_p(vecteur_val(pv))) {
 				    break;
 				}
 			    }
@@ -831,7 +831,7 @@ int level)
 				if(!term_cst(pv)) {
 				    nv = vecteur_var(pv);
 				    v2 = (v2==TCST)? nv : v2;
-				    if(vecteur_val(pv)==1) {
+				    if (value_one_p(vecteur_val(pv))) {
 					if(v1==TCST) {
 					    v1 = nv;
 					}
