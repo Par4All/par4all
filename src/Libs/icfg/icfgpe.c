@@ -65,7 +65,7 @@ void add_a_icfgpe_print(string resource_name, get_text_function gt)
 static text get_any_effects_text_flt(string module_name)
 {
   entity module;
-  statement module_stat, user_stat = statement_undefined;
+  statement module_stat;
   text txt = make_text(NIL);
   
   /* current entity
