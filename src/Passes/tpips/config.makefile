@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/10 12:02:16 $, 
+# $Date: 1996/08/23 09:27:35 $, 
 
 YFLAGS+=	-v -d
 #
@@ -24,9 +24,9 @@ TARGET_LIBS= 	$(PIPS_LIBS) $(TPIPS_ADDED_LIBS)
 #
 
 ana_lex_completed.l:	ana_lex.l \
-			$(PIPS_INCLUDEDIR)/resources.h \
-			$(PIPS_INCLUDEDIR)/phases.h \
-			$(PIPS_LIBDIR)/properties.rc
+			$(PIPS_ROOT)/Include/resources.h \
+			$(PIPS_ROOT)/Include/phases.h \
+			$(PIPS_ROOT)/Share/properties.rc
 	sh ./build_tpips_lex ana_lex.l > ana_lex_completed.l
 
 # lex takes 100 times more time to process this file compared to flex
@@ -43,9 +43,9 @@ tp_yacc.c tp_yacc.h: ana_syn.y
 	sed -e 's/YY/TP_/g;s/yy/tp_/g' y.tab.h > tp_yacc.h
 	$(RM) y.output y.tab.c y.tab.h
 
-completion_list.h :	$(PIPS_INCLUDEDIR)/resources.h \
-			$(PIPS_INCLUDEDIR)/phases.h \
-			$(PIPS_LIBDIR)/properties.rc
+completion_list.h :	$(PIPS_ROOT)/Include/resources.h \
+			$(PIPS_ROOT)/Include/phases.h \
+			$(PIPS_ROOT)/Share/properties.rc
 	sh ./build_completion_lists > completion_list.h
 
 # for bootstraping the dependences...
