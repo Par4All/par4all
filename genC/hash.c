@@ -54,6 +54,7 @@ struct __hash_table {
   unsigned int n_get;
   unsigned int n_del;
   unsigned int n_upd;
+
   unsigned int n_put_iter;
   unsigned int n_get_iter;
   unsigned int n_del_iter;
@@ -74,11 +75,14 @@ struct __hash_table {
 #define RANK(key, size) (((unsigned int)(key))%(size))
 
 /* define the increment of the hash_function in case of a hit (heat;-)
- * The old version can be achieved by setting
- * this macro to ((int) 1)
+ * The old version can be achieved by setting this macro to ((int) 1)
  */
 #define HASH_FUNCTION_INCREMENT(key, size) \
-    (1 + (((unsigned int)(key)&0x7fffffff)%((size) - 1)))
+    (1 + (((unsigned int)(key)&0x7fffffff)%((size) - 1))) 
+
+/* (1+(((unsigned int)(key))%91)) */
+
+
 
 /* Set of the different operations 
  */
@@ -561,7 +565,7 @@ hash_find_entry(hash_table htp,
   int r_increment;
   
   r_init = r = (*(htp->hash_rank))(key, htp->hash_size);
-  r_increment = HASH_FUNCTION_INCREMENT(key, htp->hash_size);
+  r_increment = HASH_FUNCTION_INCREMENT(r_init, htp->hash_size);
   
   while (1) 
   {
@@ -583,9 +587,8 @@ hash_find_entry(hash_table htp,
 	(*(htp->hash_equal))(he.key, key))
       break;
     
-    /* GO: it is not anymore the next slot
-     * we skip some of them depending on the
-     * reckonned increment 
+    /* GO: it is not anymore the next slot, we skip some of them depending
+     * on the reckonned increment 
      */
     r = (r + r_increment) % htp->hash_size;
     
