@@ -101,13 +101,15 @@ sub load_include_file_identificators($)
 	    if (exists $identificator{$id} and 
 		$identificator{$id} ne $filename)
 	    {
-		print STDERR "id $id in $identificator{$id} and $filename\n"
-		    if $verbose>1;
-		${$declaration_dependencies{$identificator{$id}}}{$filename}=1;
+		print STDERR 
+		    "id $id in '$identificator{$id}' and '$filename'\n"
+			if $verbose>1;
+		${$declaration_dependencies{$filename}}{$identificator{$id}}=1;
 	    }
 	    else
 	    {
-		print STDERR "set id $id in $filename\n" if $verbose>1;
+		print STDERR "set id $id in '$filename'\n"
+		    if $verbose>1;
 		$identificator{$id} = $filename;
 	    }
 	}
@@ -164,13 +166,23 @@ for my $file (@ARGV)
     my $n_useful = keys %useful_includes;
     my $n_total = keys %all_includes;
 
+    print STDERR 
+	"before transitive closure on dependencies\n",
+	" - useful: ", (join ' ', keys %useful_includes), "\n",
+	" - all: ", (join ' ', keys %all_includes), "\n"
+	    if $verbose>1;
+
     # inefficient transitive closure
     while ($old_n_useful!=$n_useful and $n_useful<$n_total)
     {
 	for my $f (keys %useful_includes)
 	{
+	    print STDERR "checking for '$f' dependencies\n"
+		if $verbose>2;
 	    for my $nf (keys %{$declaration_dependencies{$f}})
 	    {
+		print STDERR "considering '$f' -> '$nf' dep\n"
+		    if $verbose>2;
 		if (not exists $useful_includes{$nf} and
 		    # if not, it is pretty strange... shoud I warn?
 		    exists $all_includes{$nf})
@@ -182,6 +194,13 @@ for my $file (@ARGV)
 	$old_n_useful = $n_useful;
 	$n_useful = keys %useful_includes;
     }
+
+    print STDERR 
+	"after transitive closure on dependencies\n",
+	" - useful: ", (join ' ', keys %useful_includes), "\n",
+	" - all: ", (join ' ', keys %all_includes), "\n"
+	    if $verbose>2;
+
 
     print STDOUT 
 	"$file summary: keep $n_useful from $n_total\n",
