@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.67  1997/10/27 09:50:27  coelho
+ * local basename dropped.
+ *
  * Revision 1.66  1997/09/15 19:21:41  coelho
  * fixed for new common prefix.
  *
@@ -329,20 +332,15 @@ init_host_and_node_entities ()
     }
 }
 
-static string basename(string s)
-{
-    string fin = s + strlen(s);
-    while (fin>s && *(fin-1)!='/') fin--;
-    return fin;
-}
-
 FILE *
 hpfc_fopen(
     string name)
 {
+    string base = basename(name);
     FILE *f = (FILE *) safe_fopen(name, "w");
     fprintf(f, "!\n! File %s\n! This file has been automatically generated " 
-	    "by the HPF compiler\n!\n", basename(name));
+	    "by the HPF compiler\n!\n", base);
+    free(base)
     return f;
 }
 
@@ -351,7 +349,9 @@ hpfc_fclose(
     FILE *f,
     string name)
 {
-    fprintf(f, "!\n! That is all for %s\n!\n", basename(name));
+    string base = basename(name);
+    fprintf(f, "!\n! That is all for %s\n!\n", base);
+    free(base);
     safe_fclose(f, name);
 }
 
