@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: cyacc.y,v $
+   Revision 1.4  2003/08/13 08:01:08  nguyen
+   Take into account the old-style function prototype
+
    Revision 1.3  2003/08/06 14:12:19  nguyen
    Upgraded version of C parser
 
@@ -96,10 +99,12 @@ static list CurrentQualifiers = NIL;
 static string CurrentDerivedName = NULL; /* to remember the name of a struct/union and add it to the member prefix name*/
 static int CurrentMode = 0; /* to know the mode of the formal parameter: by value or by reference*/
 
-static bool is_external = TRUE; /* to know if the variable is declared inside or outside a function */
 static bool is_typedef = FALSE; /* to know if this is a typedef name or not */
 static bool is_static = FALSE; /* to know if the variable/function is declared static */
+static bool is_auto = FALSE; /* to know if the variable is declared auto */
 static bool is_formal = FALSE; /* to know if the entity is a formal parameter or not */
+
+static bool is_external = TRUE; /* to know if the variable is declared inside or outside a function */
 
 static int offset = 0; /* to know the offset of the formal argument*/
 static int enum_counter = 0; /* to compute the enumerator value: val(i) = val(i-1) + 1*/
@@ -109,6 +114,18 @@ extern int loop_counter;
 extern bool is_loop;
 extern expression CurrentSwitchController; 
 extern list CurrentSwitchGotoStatements;
+
+static void ResetGlobalVariables()
+  {
+    CurrentScope = NULL;
+    CurrentType = type_undefined;
+    CurrentStorage = storage_undefined; 
+    CurrentQualifiers = NIL;
+    is_typedef = FALSE;
+    is_static = FALSE;
+    is_auto = FALSE;
+  }
+
 
 %}
 
@@ -236,8 +253,6 @@ extern list CurrentSwitchGotoStatements;
 %type <entity> type_spec
 %type <liste> struct_decl_list
 
-
-%type <> old_proto_decl
 %type <parameter> parameter_decl
 %type <entity> enumerator
 %type <liste> enum_list
@@ -248,6 +263,8 @@ extern list CurrentSwitchGotoStatements;
 %type <statement> block
 %type <liste> local_labels local_label_names
 %type <liste> old_parameter_list_ne
+%type <liste> old_pardef_list
+%type <liste> old_pardef
 
 %type <entity> init_declarator
 %type <liste> init_declarator_list
@@ -318,23 +335,37 @@ global:
 /* Old-style function prototype. This should be somewhere else, like in
    "declaration". For now we keep it at global scope only because in local
    scope it looks too much like a function call */
-|   TK_IDENT TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list TK_SEMICOLON
+|   TK_IDENT TK_LPAREN
                         { 
-			  /* Make a function entity here 
-			     entity ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
-			     list paras = make_parameter_list($3,$5);
-			     functional f = make_functional(paras,make_type_unknown());
-			     entity_type(ent) = make_type_functional(f);*/
-			  CParserError("Old-style function prototype not implemented\n");	
+			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  is_formal = TRUE;
+			  is_external = FALSE;
+			  pips_debug(2,"Create module %s with old-style function prototype\n",$1);
+			  MakeCurrentModule(e);
+			  $<entity>$ = e;
+			} 
+    old_parameter_list_ne TK_RPAREN old_pardef_list TK_SEMICOLON
+                        { 
+			  list paras = MakeParameterList($4,$6);
+			  functional f = make_functional(paras,make_type_unknown());
+			  entity_type($<entity>3) = make_type_functional(f);
+			  is_formal = FALSE;
+			  is_external = TRUE;
+			  ResetCurrentModule();
 			  $$ = NIL;
 			}
 /* Old style function prototype, but without any arguments */
 |   TK_IDENT TK_LPAREN TK_RPAREN TK_SEMICOLON
                         {
-			  /* Make a function entity here 
-			     entity ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
-			     functional f = make_functional(NIL,make_type_unknown());*/
-			  CParserError("Old-style function prototype not implemented\n"); 
+			  /* Make a function entity here */
+			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  functional f = make_functional(NIL,make_type_unknown());
+			  pips_debug(2,"Create module %s with old-style prototype but without any argument\n",$1);
+			  entity_type(e) = make_type_functional(f); 
+			  entity_storage(e) = make_storage_return(entity_undefined);
+			  entity_initial(e) = make_value(is_value_code, 
+							   make_code(NIL,strdup(""),make_sequence(NIL)));	       	
+			  /* Do not need MakeCurrentModule() and ResetCurrentModule() ? */
 			  $$ = NIL;
 			}
 /* transformer for a toplevel construct */
@@ -468,7 +499,9 @@ expression:
 			}
 |   expression TK_LPAREN arguments TK_RPAREN
 			{
-			  /* Call expression: the function name is an expression !!!*/
+			  /* Call expression: the function name is an expression !!!
+			     Create the corresponding external function entity 
+			   */
 			  entity ent = ExpressionToEntity($1);
 			  $$ = make_call_expression(ent,$3);
 			}
@@ -709,7 +742,7 @@ initializer_list:    /* ISO 6.7.8. Allow a trailing COMMA */
 			}
 |   initializer TK_COMMA initializer_list_opt
                         { 
-			  $$ = gen_nconc(CONS(EXPRESSION,$1,NIL),$3);
+			  $$ = CONS(EXPRESSION,$1,$3);
 			}
 ;
 initializer_list_opt:
@@ -775,7 +808,7 @@ comma_expression:
 			}
 |   expression TK_COMMA comma_expression 
                         {
-			  $$ = gen_nconc(CONS(EXPRESSION,$1,NIL),$3);
+			  $$ = CONS(EXPRESSION,$1,$3);
 			}
 |   error TK_COMMA comma_expression      
                         {
@@ -838,7 +871,7 @@ statement_list:
     /* empty */         { $$ = NIL; }
 |   statement statement_list
                         {
-			  $$ = gen_nconc(CONS(STATEMENT,$1,NIL),$2);
+			  $$ = CONS(STATEMENT,$1,$2);
 			}
 /*(* GCC accepts a label at the end of a block *)*/
 |   TK_IDENT TK_COLON	{ CParserError("gcc not implemented\n"); }
@@ -983,24 +1016,12 @@ for_clause:
 declaration:                                /* ISO 6.7.*/
     decl_spec_list init_declarator_list TK_SEMICOLON
                         {
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
+			  ResetGlobalVariables();
 			  $$ = gen_nconc($1,$2);
 			}
 |   decl_spec_list TK_SEMICOLON	
                         {
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
+			  ResetGlobalVariables();
 			  $$ = $1;
 			}
 ;
@@ -1012,7 +1033,7 @@ init_declarator_list:                       /* ISO 6.7 */
 			}
 |   init_declarator TK_COMMA init_declarator_list
                         {
-			  $$ = gen_nconc(CONS(ENTITY,$1,NIL),$3);
+			  $$ = CONS(ENTITY,$1,$3);
 			}
 
 ;
@@ -1048,6 +1069,7 @@ decl_spec_list:                         /* ISO 6.7 */
 |   TK_AUTO decl_spec_list_opt           
                         {
 			  /* Make dynamic storage for current entity */
+			  is_auto = TRUE;
 			  $$ = $2;
 			}
 |   TK_REGISTER decl_spec_list_opt        
@@ -1063,7 +1085,7 @@ decl_spec_list:                         /* ISO 6.7 */
 |   type_spec decl_spec_list_opt_no_named
                         {
 			  if (!entity_undefined_p($1))
-			    $$ = gen_nconc(CONS(ENTITY,$1,NIL),$2);
+			    $$ = CONS(ENTITY,$1,$2);
 			  else
 			    $$ = $2;
 			}	
@@ -1161,7 +1183,7 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_STRUCT id_or_typename                           
                         {
 			  /* Find the entity associated to the struct, current scope can be [file%][module:][block]*/
-			  entity ent = FindEntityFromLocalNameAndPrefix($2,STRUCT_PREFIX);
+			  entity ent = FindOrCreateEntityFromLocalNameAndPrefix($2,STRUCT_PREFIX,is_external);
 			  /* Specify the type of the variable that follows this declaration specifier */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  CurrentType = make_type_variable(v);
@@ -1191,7 +1213,7 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_UNION id_or_typename 
                         {
 			  /* Find the entity associated to the union, current scope can be [file%][module:][block]*/
-			  entity ent = FindEntityFromLocalNameAndPrefix($2,UNION_PREFIX);
+			  entity ent = FindOrCreateEntityFromLocalNameAndPrefix($2,UNION_PREFIX,is_external);
 			  /* Specify the type of the variable that follows this declaration specifier */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  CurrentType = make_type_variable(v); 
@@ -1219,7 +1241,7 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_ENUM id_or_typename   
                         {
                           /* Find the entity associated to the enum */
-			  entity ent = FindEntityFromLocalNameAndPrefix($2,ENUM_PREFIX);
+			  entity ent = FindOrCreateEntityFromLocalNameAndPrefix($2,ENUM_PREFIX,is_external);
 			  /* Specify the type of the variable that follows this declaration specifier */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  CurrentType = make_type_variable(v);
@@ -1244,7 +1266,7 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_NAMED_TYPE  
                         {
-			  entity ent = FindEntityFromLocalNameAndPrefix($1,TYPEDEF_PREFIX);	
+			  entity ent = FindOrCreateEntityFromLocalNameAndPrefix($1,TYPEDEF_PREFIX,is_external);	
 			  /* Specify the type of the variable that follows this declaration specifier */
 			  if (is_typedef)
 			    {
@@ -1288,15 +1310,9 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  pips_debug(4,"Member name: %s\n",entity_name(ent));
 			  entity_storage(ent) = make_storage_rom();
 			  entity_type(ent) = CurrentType; 
-			  $$ = gen_nconc(CONS(ENTITY,ent,NIL),$3); 
+			  $$ = CONS(ENTITY,ent,$3); 
 			  
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
+			  ResetGlobalVariables();
 			}             
 |   decl_spec_list
                         {
@@ -1308,13 +1324,7 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
                         {
 			  /* Create the list of member entities */
 			  $$ = gen_nconc($3,$5);
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
+			  ResetGlobalVariables();
 			}
 |   error TK_SEMICOLON struct_decl_list
                         {
@@ -1329,7 +1339,7 @@ field_decl_list: /* (* ISO 6.7.2 *) */
 			}
 |   field_decl TK_COMMA field_decl_list    
                         {
-			  $$ = gen_nconc(CONS(ENTITY,$1,NIL),$3);
+			  $$ = CONS(ENTITY,$1,$3);
 			}
 ;
 
@@ -1421,7 +1431,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
     id_or_typename
                        {
 			 $$  = MakeCurrentEntity($1,CurrentScope,CurrentStorage,CurrentType,CurrentQualifiers,
-						 is_typedef,is_static,is_external,is_formal,offset);
+						 is_external,is_typedef,is_static,is_auto,is_formal,offset);
 		       }
 |   TK_LPAREN attributes declarator TK_RPAREN
                         {
@@ -1452,7 +1462,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 				else 
 				  d = make_dimension(int_to_expression(0),MakeBinaryCall(CreateIntrinsic("-C"),e,
 											 int_to_expression(1)));
-				l = gen_nconc(CONS(DIMENSION,d,NIL),l);
+				l = CONS(DIMENSION,d,l);
 			      },$4);
 			      if (l == NIL)
 				l = CONS(DIMENSION,make_dimension(int_to_expression(0),make_unbounded_expression()),NIL);
@@ -1470,23 +1480,25 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			}
 |   direct_decl parameter_list_startscope rest_par_list TK_RPAREN
                         {
-			  /* Update the function entity */ 
 			  functional f = make_functional($3,CurrentType);
 			  entity_type($1) = make_type_functional(f);
-			  entity_storage($1) = make_storage_return(entity_undefined);
 			  $$ = $1;
 			}
 ;
 
 parameter_list_startscope: 
-    TK_LPAREN           { offset = 1;}
+    TK_LPAREN 
+                        { 
+			  is_external = FALSE; 
+			  offset = 1;
+			}
 ;
 
 rest_par_list:
     /* empty */         { $$ = NIL; }
 |   parameter_decl rest_par_list1
                         {
-			  $$ = gen_nconc(CONS(PARAMETER,$1,NIL),$2);
+			  $$ = CONS(PARAMETER,$1,$2);
 			}
 ;
 rest_par_list1: 
@@ -1497,46 +1509,27 @@ rest_par_list1:
 			}
 |   TK_COMMA { offset++; } parameter_decl rest_par_list1 
                         {
-			  $$ = gen_nconc(CONS(PARAMETER,$3,NIL),$4);
+			  $$ = CONS(PARAMETER,$3,$4);
 			}  
 ;    
 
 parameter_decl: /* (* ISO 6.7.5 *) */
     decl_spec_list {is_formal = TRUE; } declarator 
                         {
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
-			  is_formal = FALSE;
 			  $$ = make_parameter(entity_type($3),make_mode(CurrentMode,UU));
-			 /* Set CurentMode where ???? */
+			  /* Set CurentMode where ???? */
+			  ResetGlobalVariables();
 			}
 |   decl_spec_list abstract_decl 
                         {
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
 			  $$ = make_parameter(CurrentType,make_mode(CurrentMode,UU));
+			  ResetGlobalVariables();
 			}
 |   decl_spec_list              
                         {
-			  /* function prototype*/
-			    /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
 			  $$ = make_parameter(CurrentType,make_mode(CurrentMode,UU));
+			  /* function prototype*/
+			  ResetGlobalVariables();
 			}
 |   TK_LPAREN parameter_decl TK_RPAREN    
                         { $$ = $2; } 
@@ -1544,30 +1537,42 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 
 /* (* Old style prototypes. Like a declarator *) */
 old_proto_decl:
-    pointer_opt direct_old_proto_decl 
-                        {
-			  CParserError("Old-style function prototype not implemented\n");
-			}
+    pointer_opt direct_old_proto_decl { }
 ;
+
 direct_old_proto_decl:
-    direct_decl TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list
+    direct_decl TK_LPAREN
                         { 
-			  CParserError("Old-style function prototype not implemented\n");
+			  is_external = FALSE; 
+			  is_formal = TRUE;   
+			  pips_debug(2,"Create module %s with old-style function prototype\n",entity_local_name($1));
+			  MakeCurrentModule($1);
+			} 
+    old_parameter_list_ne TK_RPAREN old_pardef_list
+                        { 
+			  list paras = MakeParameterList($4,$6);
+			  functional f = make_functional(paras,CurrentType);
+			  entity_type($1) = make_type_functional(f);
+			  is_formal = FALSE;
 			}
 |   direct_decl TK_LPAREN TK_RPAREN
-                        {
-			  CParserError("Old-style function prototype not implemented\n");
+                        { 
+			  functional f = make_functional(NIL,CurrentType);
+			  entity_type($1) = make_type_functional(f);
+			  is_external = FALSE;
+			  pips_debug(2,"Create module %s with old-style prototype and without parameters\n",entity_local_name($1));
+			  MakeCurrentModule($1);
 			}
 ;
 
 old_parameter_list_ne:
     TK_IDENT            
                         {
-			  CParserError("Old-style function prototype not implemented\n");
+			  $$ = CONS(STRING,$1,NIL);
 			}
 |   TK_IDENT TK_COMMA old_parameter_list_ne   
                         {
-			  CParserError("Old-style function prototype not implemented\n");
+			  $$ = CONS(STRING,$1,$3);
 			}
 ;
 
@@ -1575,36 +1580,26 @@ old_pardef_list:
     /* empty */         {}
 |   decl_spec_list old_pardef TK_SEMICOLON TK_ELLIPSIS
                         {
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
-			  CParserError("Old-style function prototype not implemented\n");
+			  ResetGlobalVariables();
+			  $$ = gen_nconc($1,$2);
 			}
 |   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list  
                         {
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
-			  CParserError("Old-style function prototype not implemented\n");
+			  ResetGlobalVariables();
+			  
+			  /* Can we have struct/union definition in $1 ?*/
+			  $$ = gen_nconc($1,gen_nconc($2,$4));
 			} 
 ;
 
 old_pardef: 
     declarator            
                         {
-			  CParserError("Old-style function prototype not implemented\n");
+			  $$ = CONS(ENTITY,$1,NIL);
 			}
 |   declarator TK_COMMA old_pardef   
                         {
-			  CParserError("Old-style function prototype not implemented\n");
+			  $$ = CONS(ENTITY,$1,$3);
 			}
 |   error       
                         {
@@ -1629,23 +1624,11 @@ pointer_opt:
 type_name: /* (* ISO 6.7.6 *) */
     decl_spec_list abstract_decl
                         {
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
+			  ResetGlobalVariables();
 			}
 |   decl_spec_list      
                         {
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
+			  ResetGlobalVariables();
 			}
 ;
 
@@ -1698,9 +1681,7 @@ abs_direct_decl_opt:
 function_def:  /* (* ISO 6.9.1 *) */
     function_def_start { InitializeBlock(); } block   
                         {
-			  /* Make value_code for current module here 
-			     Attention with execution order ? */
-			  /* False ??? InitializeBlock too late, make it earlier*/
+			  /* Make value_code for current module here */
 			  ModuleStatement = $3;
 			  ResetCurrentModule(); 
 			  is_external = TRUE;
@@ -1709,64 +1690,55 @@ function_def:  /* (* ISO 6.9.1 *) */
 function_def_start:  /* (* ISO 6.9.1 *) */
     decl_spec_list declarator   
                         { 
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
-			  is_external = FALSE; 
-			  /* The current module entity is created with declarator */
-			  pips_debug(2,"Create module entity: %s\n",entity_local_name($2));
+			  ResetGlobalVariables();
+			  pips_debug(2,"Create module %s\n",entity_local_name($2));
 			  MakeCurrentModule($2);
 			}	
 /* (* Old-style function prototype *) */
 |   decl_spec_list old_proto_decl 
                         { 
-			  /* Where to put is_external = FALSE; ???
-			     ATTENTION: conflicts with the above rule when using mid-rule actions */
-
-			  /* Reset the global variables */
-			  CurrentScope = NULL;
-			  CurrentType = type_undefined;
-			  CurrentStorage = storage_undefined; 
-			  CurrentQualifiers = NIL;
-			  is_typedef = FALSE;
-			  is_static = FALSE;
-			  is_external = FALSE; 
-			  CParserError("Old-style function prototype not implemented\n"); 
+			  ResetGlobalVariables();
 			}	
 /* (* New-style function that does not have a return type *) */
-|   TK_IDENT parameter_list_startscope rest_par_list TK_RPAREN 
-                        { 
-			  /* Create the current function */
+|   TK_IDENT parameter_list_startscope 
+                        {
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
-			  /* Functional type is unknown or int (by default) or void ?*/
-			  functional f = make_functional($3,make_type_unknown());
-			  entity_type(e) = make_type_functional(f);
-			  is_external = FALSE; 
-			  pips_debug(2,"Create module entity %s with no return type\n",$1);
+			  pips_debug(2,"Create module %s with no return type\n",$1);
 			  MakeCurrentModule(e);
+			  $<entity>$ = e;
+			}
+    rest_par_list TK_RPAREN 
+                        { 
+			  /* Functional type is unknown or int (by default) or void ?*/
+			  functional f = make_functional($4,make_type_unknown());
+			  entity_type($<entity>3) = make_type_functional(f);
 			}	
 /* (* No return type and old-style parameter list *) */
-|   TK_IDENT TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list
-                        { 
-			  /* Where to put is_external = FALSE; ???
-			     ATTENTION: conflicts with the above rule when using mid-rule actions */
+|   TK_IDENT TK_LPAREN
+                        {
+			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
+			  is_formal = TRUE;
 			  is_external = FALSE; 
-			  CParserError("Old-style function prototype not implemented\n"); 
+			  pips_debug(2,"Create module %s with no return type and old-style parameter list\n",$1);
+			  MakeCurrentModule(e);	
+			  $<entity>$ = e;
+			}
+     old_parameter_list_ne TK_RPAREN old_pardef_list
+                        { 
+			  list paras = MakeParameterList($4,$6);
+			  functional f = make_functional(paras,make_type_unknown());
+			  entity_type($<entity>3) = make_type_functional(f); 
+			  is_formal = FALSE;
 			}	
 /* (* No return type and no parameters *) */
 |   TK_IDENT TK_LPAREN TK_RPAREN
                         { 
-			  /* Create the current function */
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
 			  /* Functional type is unknown or int (by default) or void ?*/
 			  functional f = make_functional(NIL,make_type_unknown());
 			  entity_type(e) = make_type_functional(f);
 			  is_external = FALSE; 
-			  pips_debug(2,"Create module entity %s with no return type and no parameters\n",$1);
+			  pips_debug(2,"Create module %s with no return type and no parameters\n",$1);
 			  MakeCurrentModule(e);
 			}	
 ;
