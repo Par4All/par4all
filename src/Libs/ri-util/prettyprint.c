@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.118  1998/06/03 06:42:03  irigoin
+ * Prettyprint of whileloop added
+ *
  * Revision 1.117  1998/04/14 13:03:35  coelho
  * cleaner.
  *
@@ -182,7 +185,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.117 1998/04/14 13:03:35 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.118 1998/06/03 06:42:03 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -1342,6 +1345,63 @@ text_loop(
     return r;
 }
 
+text 
+text_whileloop(
+    entity module,
+    string label,
+    int margin,
+    whileloop obj,
+    int n)
+{
+    list pc = NIL;
+    sentence first_sentence;
+    unformatted u;
+    text r = make_text(NIL);
+    statement body = whileloop_body( obj ) ;
+    entity the_label = whileloop_label(obj);
+    string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
+    bool structured_do = empty_local_label_name_p(do_label);
+    bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
+
+
+    /* Show the initial label of the loop to name it...
+     * FI: I believe this is useless for while loops since they cannot
+     * be parallelized.
+     */
+    if(!structured_do && do_enddo_p)
+    {
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+	  strdup(concatenate("!     INITIALLY: DO ", do_label, "\n", NULL))));
+    }
+
+    /* LOOP prologue.
+     */
+    pc = CHAIN_SWORD(NIL, "DO " );
+    
+    if(!structured_do && !do_enddo_p) {
+	pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
+    }
+    pc = CHAIN_SWORD(pc, "WHILE (");
+    pc = gen_nconc(pc, words_expression(whileloop_condition(obj)));
+    pc = CHAIN_SWORD(pc, ")");
+    u = make_unformatted(strdup(label), n, margin, pc) ;
+    ADD_SENTENCE_TO_TEXT(r, first_sentence = 
+			 make_sentence(is_sentence_unformatted, u));
+
+    /* loop BODY
+     */
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
+
+    /* LOOP postlogue
+     */
+    if (structured_do) {
+	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
+    }
+
+    /* attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj); */
+    return r;
+}
+
 /* exported for unstructured.c 
  */
 text 
@@ -1625,6 +1685,9 @@ text_instruction(
     }
     else if (instruction_loop_p(obj)) {
 	r = text_loop(module, label, margin, instruction_loop(obj), n);
+    }
+    else if (instruction_whileloop_p(obj)) {
+	r = text_whileloop(module, label, margin, instruction_whileloop(obj), n);
     }
     else if (instruction_goto_p(obj)) {
 	r = make_text(CONS(SENTENCE, 
