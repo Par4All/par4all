@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1994/04/13 15:37:56 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1994/06/07 19:35:20 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -10,32 +10,52 @@
 
 # defaults
 
-WD=`pwd`
+SCRIPT=`basename $0`
 
-unset DIRECTORY SRCDIR BASEDIR REFFILE
+unset DIRECTORY SRCDIR BASEDIR REFFILE TOINSTALL TOMAKE
 
 VERBOSE=':'
 DEBUG=':'
-SRCDIR=$EXTEDIR
+SRCDIR=${HPFC_INCLUDE:-$EXTEDIR}
+MAKE='gmake'
 
-if [ -f .pipsprogram ] 
+#
+
+if [ -f "${PIPS_CURRENT_PROGRAM:-.pipsprogram}" ] 
 then
-  BASEDIR="$WD/`sed -n 's,^PGM=\(.*\)\$,\1,p' .pipsprogram`.database"
+  BASEDIR="$PWD/`sed -n 's,^PGM=\(.*\)\$,\1,p' .pipsprogram`.database"
 fi
 
 # get options
 
 usage()
 {
-  echo "Usage: $0 [-vd] [-r file] [-t dir] [-s dir] [-b dir]" 2>&1
+  cat <<-EOF
+	Usage: $SCRIPT [options]
+	   version $Revision$
+	   -h: help
+	   -i: install
+	   -m: make
+	   -v: verbose
+	   -d: debug
+	   -q: quiet
+	   -t dir: target directory
+	   -b dir: database (default current database)
+	   -s dir: where other sources are (default HPFC_INCLUDE then EXTEDIR)
+	   -r file: reference file (default none)
+	EOF
   exit ${1:-1}
 }
 
-while getopts vdt:s:b:r: OPT
+while getopts himvdqt:s:b:r: OPT
 do
   case $OPT in
+    h) usage 0 ;;
+    i) TOINSTALL=1 ;;
+    m) TOMAKE=1 ;;
     v) VERBOSE='echo' ;;
     d) DEBUG='echo' ;;
+    q) VERBOSE=':' ;;
     t) DIRECTORY="$OPTARG" ;;
     s) SRCDIR="$OPTARG" ;;
     b) BASEDIR="$OPTARG" ;;
@@ -46,27 +66,54 @@ done
 
 shift `expr $OPTIND - 1`
 
+#
+$DEBUG checking
+
 [ $# -eq 0 ] || usage
 [ "$BASEDIR" ] || usage
 
 [ "$DIRECTORY" ] ||
 {
-  DIRECTORY=$WD/tmp
-  mkdir $DIRECTORY
+  DIRECTORY=$BASEDIR/hpfc
+  [ ! -d "$DIRECTORY" ] && mkdir $DIRECTORY
 }
 
 #
+$DEBUG installation
 
-$VERBOSE "cleaning $DIRECTORY"
-rm -f $DIRECTORY/*
+if [ "$TOINSTALL" ]
+then
+  $VERBOSE "installing in $DIRECTORY"
 
-$VERBOSE "copying files in $DIRECTORY"
-cp $SRCDIR/hpfc_*.h $SRCDIR/hpfc_*.f $DIRECTORY
-cp $SRCDIR/hpfc_Makefile $DIRECTORY/Makefile
-cp $PVM_ROOT/include/*.h $DIRECTORY
-cp $BASEDIR/host.f $BASEDIR/node.f $BASEDIR/init_param.f \
-	$BASEDIR/parameters.h $DIRECTORY
-[ "$REFFILE" ] && cp $REFFILE $DIRECTORY
+  $VERBOSE "cleaning $DIRECTORY"
+  rm -f $DIRECTORY/*
+  
+  $VERBOSE "copying files in $DIRECTORY"
+  cp $SRCDIR/hpfc_*.h \
+     $SRCDIR/hpfc_*.f \
+     $SRCDIR/hpfc_Makefile \
+     $PVM_ROOT/include/*.h \
+     $BASEDIR/host.f \
+     $BASEDIR/node.f \
+     $BASEDIR/init_param.f \
+     $BASEDIR/parameters.h \
+     $PVM_ROOT/include/*.h \
+     $DIRECTORY
+
+  [ "$REFFILE" ] && cp $REFFILE $DIRECTORY
+
+  chmod ug+w $DIRECTORY/*
+fi
+
+#
+$DEBUG make
+
+if [ "$TOMAKE" ] 
+then
+  $VERBOSE "making"
+  cd $DIRECTORY
+  $MAKE -f ./hpfc_Makefile all
+fi
 
 #
 # that is all
