@@ -1,5 +1,5 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/09/07 17:07:14 $, 
+ * $Date: 1996/09/26 13:53:20 $, 
  */
 
 #include <unistd.h>
@@ -10,11 +10,18 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/time.h>
-#include <signal.h>
 #include <memory.h>
 #include <malloc.h>
-#include <alloca.h>
 #include <math.h>
+
+/* Some silly AIX stuff: */
+#ifndef _AIX
+#include <alloca.h>
+#else
+#define _NO_PROTO
+/* signal definition is wrong: void (*signal(int, void (*)(int)))(int) */
+#endif
+#include <signal.h>
 
 #include "gr.h"
 #include "xpomp_graphic.h"
@@ -77,13 +84,22 @@ identify_wm()
 	return NONE;
 }
 
+
+#ifndef _AIX
 static void
 sigusr2(int sig,
-	int code,
-	struct sigcontext * scp,
-	char * addr)
+        int code,
+        struct sigcontext * scp,
+        char * addr)
+#else
+static void
+sigusr2(int sig,
+        int code,
+        struct sigcontext * scp)
+#endif
 {
 }
+
 
 static int
 get_tab_entry()
@@ -244,6 +260,7 @@ int pc_basic_opendisplay(int X,
 		case 0 :    /* child's subprocess */
 		    fprintf(stderr, "executing %s\n", argv[0]);
 		    execvp(argv[0],argv);
+		    perror("Exec failed");
 		    exit(0);
 		}
 		while(sh_h[i]->lock) sigpause(0);
@@ -620,13 +637,13 @@ XPOMP_is_mouse(XPOMP_display screen,
    fails, 0 if not: */
 int
 XPOMP_flash(XPOMP_display screen,
-	   unsigned char * data_array,
-	   int X_data_array_size,
-	   int Y_data_array_size,
-	   int X_offset,
-	   int Y_offset,
-	   int X_zoom_ratio,
-	   int Y_zoom_ratio)
+	    unsigned char * data_array,
+	    int X_data_array_size,
+	    int Y_data_array_size,
+	    int X_offset,
+	    int Y_offset,
+	    int X_zoom_ratio,
+	    int Y_zoom_ratio)
 {
     char *p;
     
@@ -934,7 +951,9 @@ FUNCTION(xpompfscroll)(XPOMP_display * screen,
 }
 
 
-/* Deal with nasty conventions with strings between Fortran and C: */
+/* Deal with nasty conventions with strings between Fortran and
+C. null title is represented in Fortran by ' ' (1 blank string)
+instead of "": */
 void
 FUNCTION(xpompfdrawframe) ARGS(`screen, STRING_ARG(title), title_color, background_color, X0, Y0, X1, Y1, color, return_value')
 XPOMP_display * screen;
@@ -948,6 +967,7 @@ int * Y1;
 int * color;
 int * return_value;
 {
+    char * the_title;
     char * c_title = malloc(STRING_LEN(title) + 1);
     (void) memcpy(c_title, STRING_PTR(title), STRING_LEN(title));
     c_title[STRING_LEN(title)] = '\0';
@@ -955,8 +975,17 @@ int * return_value;
     /* printf("'%s'->'%s' %d\n", 
 	      STRING_PTR(title), c_title, STRING_LEN(title)); */
 
+    /* Note this is a string with one blank character in Fortran~77
+       because the Fortran~77 does not allow a string with no
+       character in it... */
+    if (strcmp(c_title, " ") == 0)
+	the_title = "";
+    else
+	the_title = c_title;
+    
     *return_value = XPOMP_draw_frame(*screen,
-				     c_title, *title_color, *background_color,
+				     the_title,
+				     *title_color, *background_color,
 				     *X0, *Y0,
 				     *X1, *Y1,
 				     *color);
