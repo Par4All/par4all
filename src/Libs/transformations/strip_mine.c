@@ -61,7 +61,7 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
 
     if(get_debug_level()>=9) {
 	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
-	pips_assert("loop_strip_mine", gen_consistent_p(loop_statement));
+	pips_assert("loop_strip_mine", statement_consistent_p(loop_statement));
     }
 
     /* compute the expression for the chunk size */
@@ -122,7 +122,7 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
     ifdebug(9) {
 	(void) fprintf(stderr, "new inner loop");
 	print_text(stderr,text_statement(entity_undefined,0,new_s));
-	pips_assert("loop_strip_mine", gen_consistent_p(new_s));
+	pips_assert("loop_strip_mine", statement_consistent_p(new_s));
     }
     
     /* update the outer loop */
@@ -132,7 +132,7 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
 
     if(get_debug_level()>=9) {
 	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
-	pips_assert("loop_strip_mine", gen_consistent_p(loop_statement));
+	pips_assert("loop_strip_mine", statement_consistent_p(loop_statement));
     }
 
     debug(9, "loop_strip_mine", "end\n");
