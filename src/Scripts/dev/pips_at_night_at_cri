@@ -21,7 +21,7 @@ add=
 # main machines for each os.
 
 sun4="chailly   /projects/Pips/Experiments"
-sol2="deauville /projects/Pips/Experiments2"
+sol2="chailly99 /projects/Pips/Experiments2"
 i386="tirnanog  /projects/Pips/Experiments3"
 i586="loreto    /projects/Pips/Experiments3"
 
@@ -39,7 +39,7 @@ function usage()
 	    -v: verbose
 	    -V: verbose forwarded to pips_at_night
 	    -n: do nothing in pips_at_night
-	    keyword: usual|long|short|compile|validate|debug
+	    keyword: usual|long|short|compile|validate|gnusol2ll|debug
 	    return status is ${1:-1}
 	EOF
     exit ${1:-1}
@@ -175,6 +175,10 @@ case ${job} in
 	${verb} "VALIDATE stuff (with necessary compilations)" ;
 	covalid ${sun4} GNUSOL1 ;
 	covalid ${i586} LINUXI86LL ;
+	covalid ${sol2} GNUSOL2LL ;;
+
+    gnusol2ll)
+	${verb} "VALIDATE stuff (with necessary compilations)" ;
 	covalid ${sol2} GNUSOL2LL ;;
 
     debug)
