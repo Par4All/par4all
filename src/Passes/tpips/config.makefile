@@ -2,9 +2,9 @@ YFLAGS=		$(PIPS_YFLAGS) -v -d
 LEX=		flex
 LFLAGS=         -l
 #
-TARGET_CFILES=	tpips.c
-TARGET_HEADERS=	tpips-local.h ana_lex.l ana_syn.y
-TARGET_OBJECTS=	$(TARGET_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o)
+LIB_CFILES=	tpips.c
+LIB_HEADERS=	tpips-local.h ana_lex.l ana_syn.y
+LIB_OBJECTS=	$(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o)
 #
 TARGET_LIBS= 	$(PIPS_LIBS) $(TPIPS_ADDED_LIBS)
 
