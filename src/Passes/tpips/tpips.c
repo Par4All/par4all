@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.83  1997/12/12 12:50:29  coelho
+ * substitution errors result in warnings.
+ *
  * Revision 1.82  1997/12/12 12:28:09  coelho
  * shell substitutions performed thru sh.
  *  - so it's both simpler and more powerfull now.
@@ -710,7 +713,14 @@ tp_substitutions(string line)
     string substituted;
 
     if (line_with_substitutions(line))
+    {
 	substituted = safe_system_substitute(line);
+	if (!substituted)
+	{
+	    pips_user_warning("error in shell substitutions...\n");
+	    substituted = strdup(line);
+	}
+    }
     else
 	substituted = strdup(line);
 
