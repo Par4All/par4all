@@ -917,6 +917,11 @@ cons *cfs ;
 {
     conflict c ;
 
+    /* FI: This is a bottleneck for large modules with lors of callees and
+       long effect lists. Let's assume that the pairs (fin, fout) are
+       always unique because the effects are sets. */
+
+    /*
     MAPL( cs, {
 	conflict c = CONFLICT( CAR( cs )) ;
 
@@ -924,6 +929,7 @@ cons *cfs ;
 	    return( cfs ) ;
 	}
     }, cfs ) ;
+    */
     c = make_conflict( fin, fout, cone_undefined) ;
     ifdebug(2) {
 	fprintf( stderr, "Adding %s->%s\n", 
@@ -981,6 +987,17 @@ bool (*which)() ;
 		(which == ud) ? "ud" : "dd_du" ) ;
     }
     vin = vertex_statement( stin ) ;
+
+    /* To speed up pushnew_conflict() without damaging the integrity of
+       the use-def chains */
+    ifdebug(1) {
+	if(!gen_once_p(effect_ins)) {
+	    pips_error("add_conflicts", "effect_ins are redundant\n");
+	}
+	if(!gen_once_p(effect_outs)) {
+	    pips_error("add_conflicts", "effect_outs are redundant\n");
+	}
+    }
 
     MAPL( fins, {
 	effect fin = EFFECT( CAR( fins )) ;
