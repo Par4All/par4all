@@ -58,7 +58,6 @@ static void update_preserved_resources();
 static bool rmake();
 static bool apply_a_rule();
 static bool apply_without_reseting_up_to_date_resources();
-static bool up_date_without_reseting_up_to_date_p();
 static bool make_pre_transformation();
 static bool make_required();
 
@@ -252,7 +251,7 @@ string rname, oname;
     if (!make_required(oname, ru))
 	return FALSE;
 
-    if (up_date_without_reseting_up_to_date_p (rname,oname)) {
+    if (check_resource_up_to_date (rname,oname)) {
 	
 	debug (8,"rmake",
 	       "Resource %s(%s) becomes up-to-date after applying"
@@ -692,6 +691,9 @@ string oname;
     gen_free_list (reals);
 }
 
+/* To be used at top-level
+ * It creates a new up_to_date list to check is a resource is OK 
+ */
 bool real_resource_up_to_date_p(rname, oname)
 string rname, oname;
 {
@@ -706,7 +708,7 @@ string rname, oname;
 
     dont_interrupt_pipsmake_asap();
 
-    result = up_date_without_reseting_up_to_date_p(rname,oname);
+    result = check_resource_up_to_date(rname,oname);
 
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
@@ -716,7 +718,10 @@ string rname, oname;
     return result;
 }
 
-static bool up_date_without_reseting_up_to_date_p(rname, oname)
+/* To be used in a rule. use and update the up_to_dat list
+ * created by makeapply 
+ */
+bool check_resource_up_to_date(rname, oname)
 string rname, oname;
 {
     resource res;
@@ -736,7 +741,7 @@ string rname, oname;
 
     /* We get the active rule to build this resource */
     if ((ru = find_rule_by_resource(rname)) == rule_undefined) {
-	pips_error("up_date_without_reseting_up_to_date_p",
+	pips_error("check_resource_up_to_date",
 		   "could not find a rule for %s\n", rname);
     }
 
@@ -772,7 +777,7 @@ string rname, oname;
 		(same_string_p(mod_rrrn, rrrn))) {
 		/* we found it */
 		res_in_modified_list_p = TRUE;
-		debug(3, "up_date_without_reseting_up_to_date_p",
+		debug(3, "check_resource_up_to_date",
 		      "resource %s(%s) is in the rule_modified list",
 		      rrrn, rron);
 		break;
@@ -789,23 +794,23 @@ string rname, oname;
 	    resource resp = db_find_resource(rrrn, rron);
 
 	    if (resp == resource_undefined) {
-		debug(5, "up_date_without_reseting_up_to_date_p",
+		debug(5, "check_resource_up_to_date",
 		      "resource %s(%s) is not present and not in the rule_modified list",
 		      rrrn, rron);
 		result = FALSE;
 		break;
 	    } else {
 		/* Check if this resource is up to date */
-		if (up_date_without_reseting_up_to_date_p(rrrn, rron)
+		if (check_resource_up_to_date(rrrn, rron)
 		    == FALSE) {
-		    debug(5, "up_date_without_reseting_up_to_date_p",
+		    debug(5, "check_resource_up_to_date",
 			  "resource %s(%s) is not up to date", rrrn, rron);
 		    result = FALSE;
 		    break;
 		}
 		/* Check if the timestamp is OK */
 		if (resource_time(res) < resource_time(resp)) {
-		    debug(5, "up_date_without_reseting_up_to_date_p",
+		    debug(5, "check_resource_up_to_date",
 			  "resource %s(%s) with time stamp %ld is newer "
 			  "than resource %s(%s) with time stamp %ld\n",
 			  rrrn, rron,
@@ -824,7 +829,7 @@ string rname, oname;
 
     /* If the resource is up to date then add it in the set */
     if (result == TRUE) {
-	debug(5, "up_date_without_reseting_up_to_date_p",
+	debug(5, "check_resource_up_to_date",
 	      "resource %s(%s) added to up_to_date "
 	      "with time stamp %d\n",
 	      rname, oname, resource_time(res));
