@@ -53,7 +53,7 @@ Psommet som;
  * liberation de l'espace memoire alloue a une liste de sommets
  *
  */
-sommets_rm(ps)
+void sommets_rm(ps)
 Psommet ps;
 {
     Psommet p1,p2;
