@@ -144,6 +144,7 @@ the_actual_parser(
     string module,
     string dbr_file)
 {
+    string dir;
     debug_on("SYNTAX_DEBUG_LEVEL");
 
     /* set up parser properties */
@@ -157,11 +158,11 @@ the_actual_parser(
     ScanNewFile();
 
     pips_assert("the_actual_parser", CurrentFN==NULL);
+    dir = db_get_current_workspace_directory();
     CurrentFN = 
-	strdup(concatenate(db_get_current_workspace_directory(),
-			   "/",
-			   db_get_file_resource(dbr_file, module, TRUE),
-			   NULL));
+	strdup(concatenate(dir, "/",
+			   db_get_file_resource(dbr_file, module, TRUE), 0));
+    free(dir);
 
     /* yacc parser is called */
     syn_in = safe_fopen(CurrentFN, "r");
