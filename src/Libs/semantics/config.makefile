@@ -43,7 +43,8 @@ LIB_CFILES=	misc.c \
 		prettyprint.c \
 		postcondition.c \
 		utils.c \
-		initial.c
+		initial.c \
+		unstructured.c
 
 LIB_HEADERS=	semantics-local.h
 
