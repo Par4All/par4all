@@ -2,6 +2,7 @@
 #define FORTRAN_DIV(n,d) (SIGN_EQ((n),(d)) ? ABS(n)/ABS(d) : -(ABS(n)/ABS(d)))
 #define FORTRAN_MOD(n,m) (SIGN_EQ((n),(m)) ? ABS(n)%ABS(m) : -(ABS(n)%ABS(m)))
 
+
 /*
  * EFORMAT: the expression format used in recursiv evaluations.
  * = ((ICOEF * EXPR) + ISHIFT)
