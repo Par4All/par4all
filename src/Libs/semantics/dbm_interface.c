@@ -542,9 +542,7 @@ void cumulated_effects_map_print()
     FILE * f =stderr;
     hash_table htp = get_cumulated_effects_map();
 
-    fprintf(f, "hash_key_type:     %d\n", htp->hash_type);
-    fprintf(f, "hash_size:         %d\n", htp->hash_size);
-    fprintf(f, "hash_entry_number: %d\n", htp->hash_entry_number);
+    hash_table_print_header (htp,f);
 
     HASH_MAP(k, v, {
 	fprintf(f, "\n\n%d", statement_ordering((statement) k));
