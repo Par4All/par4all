@@ -115,7 +115,7 @@ static void reset_global_variables()
     char_entities = list_undefined;
 }
 
-static  entity build_new_variable(entity module, tag t)
+static  entity build_new_variable(entity module, basic b)
 {
     entity ent = make_new_module_variable(module,0);
     add_variable_declaration_to_module(module, ent); 
