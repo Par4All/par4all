@@ -685,7 +685,7 @@ Psysteme ps;
 Variable var;
 {
     complexity comp = make_zero_complexity();
-    int var_coeff=1; 
+    Value var_coeff=VALUE_ONE; 
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	sc_fprint(stderr,ps,noms_var);
@@ -697,16 +697,18 @@ Variable var;
 	for  ( ; !VECTEUR_NUL_P(v); v=v->succ ) {
 	    if ( v->var != TCST ) {
 		if ( v->var != (Variable)var ) {
-		    complexity c = make_single_var_complexity((float)v->val,v->var);
+		    complexity c = make_single_var_complexity
+			(VALUE_TO_FLOAT(v->val),v->var);
 		    complexity_add(&comp, c);
 		    complexity_rm(&c);
 		}
 		else {
-		    var_coeff = - v->val;
+		    var_coeff = value_uminus(v->val);
 		}
 	    }
 	    else {
-		complexity c = make_constant_complexity((float)v->val);
+		complexity c = make_constant_complexity
+		    (VALUE_TO_FLOAT(v->val));
 		complexity_add(&comp, c);
 		complexity_rm(&c);
 	    }
@@ -733,7 +735,7 @@ Variable var;
 	}
     }
 
-    complexity_scalar_mult(&comp,1.0/(float)var_coeff);
+    complexity_scalar_mult(&comp,1.0/VALUE_TO_FLOAT(var_coeff));
     varcount_unknown(complexity_varcount(comp)) ++;
 
     return (comp);
