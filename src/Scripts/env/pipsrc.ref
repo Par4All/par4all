@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1994/04/13 15:35:39 $, ) version $Revision$, 
+# $RCSfile: pipsrc.ref,v $ ($Date: 1994/06/03 15:18:51 $, ) version $Revision$, 
 # got on %D%, %T%
 # $Id$
 #
@@ -138,7 +138,7 @@ PIPS_ETAGS='/usr5/gnu/bin-sparc/etags'
 #  - public domain debug malloc: -ldbmalloc (implies a special "malloc.h" in
 # EXTEDIR)
 
-PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lgeneration -lprettyprint -lsyntax -latomizer -lpaf-util -lstatic_controlize -lregions -lcontrol -lsemantics -lrice -lricedg -leffects -lpipsdbm -ltransformer -lri-util -lproperties -ltext-util -lmisc -lproperties -lgenC -lplint -lmatrice  -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique -lreductions -lflint -lm /usr/lib/debug/malloc.o"
+PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -lsyntax -latomizer -lpaf-util -lstatic_controlize -lregions -lcontrol -lsemantics -lrice -lricedg -leffects -lpipsdbm -ltransformer -lri-util -lproperties -ltext-util -lmisc -lproperties -lgenC -lplint -lmatrice  -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique -lreductions -lflint -lm /usr/lib/debug/malloc.o"
 		
 # file name in which pips current program is stored (for batch version).
 PIPS_CURRENT_PROGRAM=".pipsprogram"
