@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1994/06/03 14:14:29 $, ) version $Revision$,
+ * $RCSfile: build-system.c,v $ ($Date: 1994/09/01 15:47:38 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -124,7 +124,6 @@ void free_hpfc_current_mappings()
     free_declaration_constraints_map();
     free_hpf_constraints_map();
     free_new_declaration_constraints_map();
-    free_only_io_map();
 }
 
 entity get_ith_dummy(prefix, suffix, i)
