@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/04/28 20:17:41 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/05/03 16:23:12 $, ), version $Revision$,
 #
 
 #
@@ -28,6 +28,14 @@ else
   REAL_PIPSHOME=
 fi
 
+#
+# to avoid nfs problems
+#
+absolute_name()
+{
+  echo $1 | sed "s,^$REAL_PIPSHOME,$PIPS_HOME,"
+}
+
 ping=${PIPS_PING:-ping}
 
 #
@@ -44,7 +52,7 @@ PATH="/usr/ucb:/usr/etc:/usr/sbin:/usr/bin:$PATH"
 
 hostname=`hostname`
 user=`whoami`
-PWD=`pwd`
+PWD=`absolute_name \`pwd\``
 
 # defaults
 
@@ -104,7 +112,7 @@ alive()
 
 which_executable()
 {
-  PATH="$PWD:$PWD/$PIPS_ARCH:$PIPS_ROOT/Bin/$PIPS_ARCH:$PATH" \
+  PATH="${PWD}/${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}:${PWD}:${PATH}" \
     type $1 | sed "s,.* is ,,"
 }
 
@@ -207,14 +215,6 @@ available_host()
 # date taken for timing
 #
 local_date() { date +"%h %d %y, %T";}
-
-#
-# to avoid nfs problems
-#
-absolute_name()
-{
-  echo $1 | sed "s,^$REAL_PIPSHOME,$PIPS_HOME,"
-}
 
 #
 # validate
