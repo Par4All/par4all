@@ -26,9 +26,6 @@ void start_query(window_title, query_title, help_topic, ok_func, cancel_func)
      success (*ok_func)();
      success (*cancel_func)();
 {
-  Display *dpy;
-  Window query_xwindow;
-
   xv_set(query_frame, FRAME_LABEL, window_title, NULL);
   /*	     PANEL_NOTIFY_PROC, cancel_query_notify, */
 
@@ -46,10 +43,14 @@ void start_query(window_title, query_title, help_topic, ok_func, cancel_func)
   unhide_window(query_frame);
 
   /* move the pointer to the center of the query window */
-  dpy = (Display *)xv_get(main_frame, XV_DISPLAY);
-  query_xwindow = (Window) xv_get(query_frame, XV_XID);
-  XWarpPointer(dpy, None, query_xwindow, None, None, None, None, 
-	       QUERY_WIDTH/2, QUERY_HEIGHT/2);
+  pointer_in_center_of_frame(query_frame);
+
+  /* Valide le focus sur l'entrée : */
+  /* J'ai l'impression que le code pre'ce'dent est pluto^t obsole`te... RK. */
+  /* Mais pourquoi cela ne marche pas ??? */
+  win_set_kbd_focus(query_frame, xv_get(query_panel, XV_XID));
+  /* xv_set(query_xwindow , WIN_SET_FOCUS, NULL); */
+  xv_set(query_panel, PANEL_CARET_ITEM, query_pad, NULL);
 }
 
 void query_canvas_event_proc(window, event)
