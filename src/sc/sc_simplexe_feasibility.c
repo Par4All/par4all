@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/07/24 11:33:53 $, 
+ * $Date: 1996/07/30 15:34:43 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -395,7 +395,8 @@ static void dump_tableau(tableau *t,int colonnes) {
     int i,j, k, w;
     int max=0;
     for(i=0;i<colonnes;i++) 
-      if(t[i].colonne[t[i].taille-1].numero>max)max=t[i].colonne[t[i].taille-1].numero ; 
+      if(t[i].colonne[t[i].taille-1].numero>max)
+	  max=t[i].colonne[t[i].taille-1].numero ; 
     printf("Dump du tableau ------ %d colonnes  %d lignes\n",colonnes,max) ;
     printf("%d Variables  visibles :\n",colonnes-2) ;
     for(i=0;i<colonnes-2;i++) printf("%7d",variables[i]) ;
@@ -404,7 +405,8 @@ static void dump_tableau(tableau *t,int colonnes) {
     for(i=0;i<nbvariables;i++) printf("%7d",variablescachees[i]) ;
     printf("\n") ;
 
-    DEBUG(for(i=0;i<colonnes;i++) {
+    DEBUG(
+	for(i=0;i<colonnes;i++) {
 	    if(t[i].existe != 0) {
 		printf("Colonne %d Existe=%d Taille=%d\n",i,
 		       t[i].existe,t[i].taille) ;
@@ -414,17 +416,18 @@ static void dump_tableau(tableau *t,int colonnes) {
 		    printf("\n");
 		}
 	    }
-	}) /* DEBUG */
-  
+	}
+	); /* DEBUG */
+	
     printf("Nb lignes: %d\n", max);
     for(j=0;j<=max;j++) { printf("\nLigne %d ",j) ;
-        for(i=0;i<colonnes;i++) {
-            w=1 ;
-            for(k=0;k<t[i].taille;k++)
-                if(t[i].colonne[k].numero==j)
-		    printfrac(t[i].colonne[k]) , w=0 ;
-            if(w!=0)printfrac(frac0) ;
-        }
+    for(i=0;i<colonnes;i++) {
+	w=1 ;
+	for(k=0;k<t[i].taille;k++)
+	    if(t[i].colonne[k].numero==j)
+		printfrac(t[i].colonne[k]) , w=0 ;
+	if(w!=0)printfrac(frac0) ;
+    }
     }
     printf("\n");
 } /* dump_tableau */
@@ -438,7 +441,6 @@ static int hash(Variable s)
   return (i) ;
 }
 
-                 
 /* fonction de calcul de la faisabilite' d'un systeme
  * d'equations et d'inequations
  * Auteur : Robert Mahl, Date : janvier 1994
@@ -527,20 +529,20 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    longjmp(overflow_error,5);
 	return TRUE; 
     }
-    else
+
+    if(NB_EQ != 0)
     {
-	if(NB_EQ != 0)
+	eg=(tableau*)malloc((3+DIMENSION)*sizeof(tableau)) ;
+	for(i=0 ; i<(3+DIMENSION) ; i++)
 	{
-	    eg=(tableau*)malloc((3+DIMENSION)*sizeof(tableau)) ;
-	    for(i=0 ; i<(3+DIMENSION) ; i++)
-	    {
-		eg[i].colonne=(frac*)malloc(NB_EQ*sizeof(frac)) ;
-		eg[i].existe = 0 ;
-		eg[i].taille = 0 ;
-	    }
+	    eg[i].colonne=(frac*)malloc(NB_EQ*sizeof(frac)) ;
+	    eg[i].existe = 0 ;
+	    eg[i].taille = 0 ;
 	}
-    /* Determination d'un numero pour chaque variable */
-    
+    }
+
+    /* Determination d'un numero pour chaque variable
+     */
     for(pc=sc->egalites, ligne=1 ; pc!=0; pc=pc->succ, ligne++)
     {
 	pv=pc->vecteur;
@@ -1212,7 +1214,6 @@ sc_simplexe_feasibility_ofl_ctrl(
 	free(t);
 	free(nlle_colonne);
 	return (soluble) ;
-    }
 }     /* main */
 
 /* (that is all, folks!:-)
