@@ -11,10 +11,11 @@
  * More thoughts needed. 
  *
  * $RCSfile: stack.c,v $ version $Revision$
- * $Date: 1997/07/17 22:14:35 $, 
+ * $Date: 1997/07/22 12:58:36 $, 
  * got on %D%, %T%
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
 #include "newgen_assert.h"
@@ -288,7 +289,7 @@ void stack_info(f, s)
 FILE *f;
 stack s;
 {
-    fprintf(f, "stack_info about stack 0x%x\n", (unsigned int) s);
+    fprintf(f, "stack_info about stack %p\n", s);
 
     if (STACK_NULL_P(s))
     {
