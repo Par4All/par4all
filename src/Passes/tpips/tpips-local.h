@@ -1,9 +1,9 @@
 /* $Id$
  */
 
-typedef struct _res_or_rule {
-	list the_owners;
-	string the_name;
+typedef struct {
+    list /* of string */ the_owners;
+    string the_name;
 } res_or_rule;
 
 extern int tp_lex();
