@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/04/21 10:28:19 $, ) 
+ * ($Date: 1995/07/20 18:40:50 $, ) 
  */
 
 #include "defines-local.h"
@@ -47,26 +47,25 @@ list le;
 {
     list rev = gen_nreverse(gen_copy_seq(le)), ls = NIL;
 
-    MAPL(ce,
-     {
-	 expression e = EXPRESSION(CAR(ce));
-	 entity var = reference_variable(expression_reference(e));
-	 Pvecteur v = vect_dup(normalized_linear(expression_normalized(e)));
-	 int coef = vect_coeff((Variable) var, v);
-
-	 assert(abs(coef)==1);
-
-	 vect_erase_var(&v, (Variable) var);
-	 if (coef==1) vect_chg_sgn(v);
-
+    MAP(EXPRESSION, e,
+    {
+	entity var = reference_variable(expression_reference(e));
+	Pvecteur v = vect_dup(normalized_linear(expression_normalized(e)));
+	int coef = vect_coeff((Variable) var, v);
+	
+	assert(abs(coef)==1);
+	
+	vect_erase_var(&v, (Variable) var);
+	if (coef==1) vect_chg_sgn(v);
+	
 	 ls = CONS(STATEMENT,
 		   make_assign_statement(entity_to_expression(var),
 					 make_vecteur_expression(v)),
 		   ls);	
-
-	 vect_rm(v);
-     },
-	 rev);
+	
+	vect_rm(v);
+    },
+	rev);
 
     gen_free_list(rev);
     return(make_block_statement(ls));
