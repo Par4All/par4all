@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/08/10 18:06:19 $, 
+# $Date: 1995/08/30 14:02:07 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -16,7 +16,7 @@ MAKE=':'
 PIPS='pips'
 TMP="/tmp/hpfc_tmp.`hostname`.$$"
 PIPSARGS='-s MUST_REGIONS'
-HPFC='-p HPFC_CLOSE'
+HPFC='-p HPFC_INSTALL'
 TIMEPROP=
 PIPSPROP=
 
