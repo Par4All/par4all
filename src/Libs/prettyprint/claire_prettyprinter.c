@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.22  2004/10/20 12:31:43  hurbain
+   Added a conditional debug
+
    Revision 1.21  2004/10/08 13:01:56  irigoin
    No idea about the changes. Emergency for Isabelle and Nicolas. Sorry.
 
@@ -792,7 +795,7 @@ static string claire_call_from_loopnest(call c, int task_number){
     result = strdup(concatenate("data = list<DATA>(", result, first_result, NULL));
   }
   if(!output_provided){
-    result = strdup(concatenate(result, ", dummyDATA", NULL));
+    result = strdup(concatenate(result, " dummyDATA)", NULL));
   }
   result = strdup(concatenate(result, TAB, ")", NL, NULL));
   return result;
@@ -1105,9 +1108,10 @@ static string claire_code_string(entity module, statement stat)
   tasks       = claire_tasks(stat);
   
   result = strdup(concatenate(decls, NL, tasks, NL, NULL));
-
-  printf("%s", result);
-
+  ifdebug(2)
+    {
+      printf("%s", result);
+    }
   return result;
 }
 
