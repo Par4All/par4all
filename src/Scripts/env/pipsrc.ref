@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.147  2000/03/21 15:26:15  coelho
+# maj PIPS_HOSTS.
+#
 # Revision 1.146  1999/01/13 09:44:59  coelho
 # GNUSOL2LLPROF added.
 #
@@ -296,7 +299,7 @@ PATH="${PATH}:${PIPS_ROOT}/Utils:/usr5/gnu/bin-sparc"
 
 # hosts for Validate:
 test "${PIPS_ARCH}" = GNUSOL2LL && \
-	PIPS_HOSTS="deauville:rhune:blonville"
+	PIPS_HOSTS="forges:lavaur:panfou:rhune:blonville:chailly99:viroflay"
 
 test "${PIPS_ARCH}" = . -o "${PIPS_ARCH}" = GNU && \
 	PIPS_HOSTS="chailly:episy:aiguebelette:roazhon"
