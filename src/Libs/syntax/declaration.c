@@ -1,3 +1,10 @@
+/* 	%A% ($Date: 1997/02/03 11:24:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/02/03 11:24:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
+
  /* Functions to handle all declarations, but some related to functional
   * entities
   *
