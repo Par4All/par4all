@@ -14,6 +14,11 @@
 
 */
 
+/* SCCS stuff:
+ * $RCSfile: list.c,v $ ($Date: 1995/02/16 10:03:43 $, )
+ * version $Revision$
+ * got on %D%, %T%
+ */
 
 /* -- list.c
 
@@ -86,10 +91,12 @@ int gen_length( cp )
     ;
   return( i ) ;
 }
-    
+
+/*   MAP
+ */
 void gen_mapl( fp, cp )
-     void (*fp)() ;
-     cons *cp ;
+void (*fp)() ;
+cons *cp ;
 {
   for( ; cp != NIL ; cp = cp->cdr )
     (*fp)( cp ) ;
@@ -99,7 +106,8 @@ void gen_map(fp, l)
 void (*fp)();
 list l;
 {
-    for (; !ENDP(l); l=CDR(l)) (*fp)(CHUNK(CAR(l)));
+    for (; !ENDP(l); l=CDR(l))
+	(*fp)(CHUNK(CAR(l)));
 }
 
 char * gen_reduce( r, fp, cp )
@@ -124,6 +132,8 @@ cons *cp ;
     return( NIL ) ;
 }
 
+/*  SPECIAL INSERTION
+ */
 static gen_chunk *gen_chunk_of_cons_of_gen_chunk = gen_chunk_undefined;
 static bool cons_of_gen_chunk(cp)
 cons *cp;
@@ -271,33 +281,42 @@ gen_chunk *a, *b ;
     *a = *b ;
 }
 
-gen_chunk *gen_find_if(test, seq, extract)
-bool (*test)();
-cons *seq;
-gen_chunk *(*extract)();
+gen_chunk *gen_car(l)
+list l;
 {
-    cons *pc;
-
-    for (pc = seq; pc != NIL; pc = pc->cdr ) {
-	if ((*test)((*extract)(CAR(pc))))
-		return((*extract)(CAR(pc)));
-    }
-
-    return( gen_chunk_undefined );
+    return(CHUNK(CAR(l)));
 }
 
-gen_chunk *gen_find_if_from_end(test, seq, extract)
+gen_chunk *gen_identity(x)
+gen_chunk *x;
+{
+    return(x);
+}
+
+gen_chunk *gen_find_if(test, pc, extract)
 bool (*test)();
-cons *seq;
+cons *pc;
 gen_chunk *(*extract)();
 {
-    cons *pc;
+    for (; pc!=NIL; pc=pc->cdr)
+	if ((*test)((*extract)(CAR(pc))))
+	    return((*extract)(CAR(pc)));
+
+    return(gen_chunk_undefined);
+}
+
+/*  the last match is returned
+ */
+gen_chunk *gen_find_if_from_end(test, pc, extract)
+bool (*test)();
+cons *pc;
+gen_chunk *(*extract)();
+{
     gen_chunk *e = gen_chunk_undefined ;
 
-    for (pc = seq; pc != NIL; pc = pc->cdr ) {
+    for (; pc!=NIL; pc=pc->cdr)
 	if ((*test)((*extract)(CAR(pc))))
-		e = (*extract)(CAR(pc));
-    }
+	    e = (*extract)(CAR(pc));
 
     return(e);
 }
