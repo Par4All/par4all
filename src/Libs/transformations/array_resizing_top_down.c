@@ -98,13 +98,15 @@ static entity current_callee = entity_undefined;
 static entity current_caller = entity_undefined;
 static entity current_dummy_array = entity_undefined;
 static entity current_variable_caller = entity_undefined;
-static FILE * out2;
+static FILE * instrument_file; /*To store new array declarations and assignments*/
 static int number_of_unnormalized_arrays_without_caller = 0;
 static int number_of_replaced_array_declarations = 0;
 static int number_of_instrumented_array_declarations = 0;
 static int number_of_array_size_assignments = 0;
 static int number_of_processed_modules = 0;
 static string file_name_caller= NULL;
+
+static int opt = 0; /* 0 <= opt <= 7*/
 
 bool module_is_called_by_main_program_p(entity mod)
 {
@@ -288,41 +290,11 @@ bool unnormalized_array_p(entity e)
   return FALSE;
 }
 
-void print_array_declaration(entity e)
-{
-  /* This function prints only the dimensions of an array 
-   => to use the script $PIPS_ROOT/Src/Script/misc/normalization.pl*/
-  variable v = type_variable(entity_type(e));   
-  list l_dims = variable_dimensions(v);
-  fprintf(out2,"(");
-  while (!ENDP(l_dims)) 
-    {
-      dimension dim = DIMENSION(CAR(l_dims));
-      string s = words_to_string(words_dimension(dim));
-      fprintf(out2,"%s",s);
-      l_dims = CDR(l_dims);
-      if (l_dims == NIL) 
-	fprintf(out2,")");
-      else
-	fprintf(out2,",");
-      free(s);
-    }
-}
-
 void print_entities(list l)
 {
   MAP(ENTITY, e, { 
     fprintf(stderr, "%s ", entity_name(e));
   }, l);
-}
-
-list words_dimension(dimension obj)
-{   
-  list pc;
-  pc = words_expression(dimension_lower(obj));
-  pc = CHAIN_SWORD(pc,":");
-  pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
-  return(pc);
 }
 
 static list my_list_intersection(list l1, list l2)
@@ -716,9 +688,9 @@ static list translate_to_callee_frame(expression e, transformer context)
 		 1. if add pips variable declaration for current module => add for all callees 
 		 where the array is passed ???
 		 2. Filter when using script array_resizing_instrumentation => simpler ??? */
-	      fprintf(out2,"%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name,callee_name,0,1);
-	      fprintf(out2,new_decl);
-	      fprintf(out2,"%s\n",PREFIX3);
+	      fprintf(instrument_file,"%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name,callee_name,0,1);
+	      fprintf(instrument_file,new_decl);
+	      fprintf(instrument_file,"%s\n",PREFIX3);
 	      free(file_name), file_name = NULL;
 	      free(new_decl), new_decl = NULL;
 	      l = gen_nconc(l,CONS(EXPRESSION,e,NIL));
@@ -1341,8 +1313,8 @@ static void instrument_call_rwt(call c)
 		  actual_array_size = size_of_actual_array(actual_array,l_actual_ref,0);
 		}
 	      else
-		pips_user_warning(" The array declaration in the caller %s is unnormalized.\n",
-				  module_local_name(current_caller)); 
+		pips_user_warning("Array %s in module %s has unnormalized declaration\n",
+				  entity_local_name(actual_array),module_local_name(current_caller)); 
 	      /* How to instrument code ??? Pointer cases ??? 
 		 Caller is not called by the main program => already excluded*/
 	    }
@@ -1367,7 +1339,7 @@ static void instrument_call_rwt(call c)
 		    }
 		  else 
 		    /* Abnormal case*/
-		    pips_user_warning(" \n Actual argument is not an array, not a scalar variable, not a string.\n");
+		    pips_user_warning("Actual argument %s is not an array, not a scalar variable, not a string.\n",entity_local_name(actual_array));
 		}
 	    }
 	  if (!expression_undefined_p(actual_array_size))
@@ -1401,7 +1373,7 @@ static void instrument_call_rwt(call c)
 	      /* As we can not modify ALL.code, we cannot use a function like :
 		 insert_statement(stmt,new_s,TRUE).
 		 Instead, we have to stock the assignment as weel as the ordering 
-		 of the call site in a special file, named instrument.out, and 
+		 of the call site in a special file, named TD_instrument.out, and 
 		 then use a script to insert the assignment before the call site.*/
 	      ifdebug(2)
 		{
@@ -1409,10 +1381,10 @@ static void instrument_call_rwt(call c)
 		  print_statement(new_s);
 		  print_statement(stmt);
 		}
-	      fprintf(out2, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,
+	      fprintf(instrument_file, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,
 		      module_local_name(current_caller),ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
-	      print_text(out2, text_statement(entity_undefined,0,new_s));
-	      fprintf(out2,"%s\n",PREFIX3);
+	      print_text(instrument_file, text_statement(entity_undefined,0,new_s));
+	      fprintf(instrument_file,"%s\n",PREFIX3);
 	      number_of_array_size_assignments++;
 	    }
 	}
@@ -1494,11 +1466,10 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 	{
 	  string caller_name = STRING(CAR(l));
 	  current_caller = local_name_to_top_level_entity(caller_name);
-	  if (get_bool_property("ARRAY_RESIZING_USING_MAIN_PROGRAM") &&
-	      (! module_is_called_by_main_program_p(current_caller)))
+	  if ( (opt%8 >= 4) && (! module_is_called_by_main_program_p(current_caller)))
 	    /* If the current caller is never called by the main program => 
 	       no need to follow this caller*/
-	    pips_user_warning("Module %s is not called by the main program \n",caller_name);
+	    pips_user_warning("Module %s is not called by the main program\n",caller_name);
 	  else
 	    {
 	      list l_values_of_one_caller = top_down_adn_caller_array();
@@ -1603,9 +1574,9 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 	     code_decls_text(entity_code(current_callee)));  
 	     free(old_decl), old_decl = NULL; */
 	  
-	  fprintf(out2,"%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name,callee_name,0,1);
-	  fprintf(out2,new_decl);
-	  fprintf(out2,"%s\n",PREFIX3);
+	  fprintf(instrument_file,"%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name,callee_name,0,1);
+	  fprintf(instrument_file,new_decl);
+	  fprintf(instrument_file,"%s\n",PREFIX3);
 	  
 	  /* Insert new declaration and assignments in callers that are called by the main program*/
 	  l = gen_copy_seq(l_callers);
@@ -1613,11 +1584,10 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 	    {
 	      string caller_name = STRING(CAR(l));
 	      current_caller = local_name_to_top_level_entity(caller_name);
-	      if (get_bool_property("ARRAY_RESIZING_USING_MAIN_PROGRAM") &&
-		  (! module_is_called_by_main_program_p(current_caller)))
+	      if ((opt%8 >= 4)&& (! module_is_called_by_main_program_p(current_caller)))
 		/* If the current caller is never called by the main program => 
 		   no need to follow this caller*/
-		pips_user_warning("Module %s is not called by the main program \n",caller_name);
+		pips_user_warning("Module %s is not called by the main program\n",caller_name);
 	      else
 		{
 		  string user_file_caller = db_get_memory_resource(DBR_USER_FILE,caller_name,TRUE);
@@ -1626,9 +1596,9 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 							"/",base_name_caller,0));
 		  current_variable_caller = make_new_integer_scalar_common_variable(pips_variable_name,current_caller,
 										    pips_common);
-		  fprintf(out2, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,caller_name,0,1);
-		  fprintf(out2, new_decl);
-		  fprintf(out2, "%s\n",PREFIX3);
+		  fprintf(instrument_file, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,caller_name,0,1);
+		  fprintf(instrument_file, new_decl);
+		  fprintf(instrument_file, "%s\n",PREFIX3);
 		  
 		  /* insert "I_PIPS_SUB_ARRAY = actual_array_size" before each call site*/
 		  instrument_caller_array();
@@ -1641,13 +1611,10 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 	  number_of_instrumented_array_declarations++;
 	  free(new_decl), new_decl = NULL;
 	}
-      fprintf(out2,"%s\t%s\t%s\t%s\t%d\t",PREFIX1,file_name,
-	      callee_name,entity_local_name(current_dummy_array),length);    
-      // print new bound
-      fprintf(out2,"%s\t",words_to_string(words_expression(new_value)));
-      // print old declaration
-      print_array_declaration(current_dummy_array);
-      fprintf(out2,"\n");
+      fprintf(instrument_file,"%s\t%s\t%s\t%s\t%d\t%s\t%s\n",PREFIX1,file_name,
+	      callee_name,entity_local_name(current_dummy_array),length,
+	      words_to_string(words_expression(dimension_upper(last_dim))),
+	      words_to_string(words_expression(new_value)));
       dimension_upper(last_dim) = new_value;
       l_arrays = CDR(l_arrays);
     }
@@ -1692,15 +1659,19 @@ Algorithm : For each module that is called by the main program
 
 bool array_resizing_top_down(char *module_name)
 { 
-  /* The file out1 is used to save the new declarations
-     The file out2 is used to save the assignments to be inserted/instrumented*/
-  FILE * out1;
+  /* instrument_file is used to store new array declarations and assignments which
+     will be used by a script to insert these declarations in the source code in:
+     xxx.database/Src/file_name.f
+
+     declaration_file is only used to make the top-down mechanics of pipsmake possible*/
+
+  FILE * declaration_file;
   string new_declarations = db_build_file_resource_name(DBR_NEW_DECLARATIONS, 
 							module_name,NEW_DECLARATIONS);
   string dir_name = db_get_current_workspace_directory();
-  string file_name1 = strdup(concatenate(dir_name, "/", new_declarations, NULL));
-  string file_name2 = strdup(concatenate(dir_name, "/instrument.out", 0));
-  out2 = safe_fopen(file_name2, "a");  
+  string declaration_file_name = strdup(concatenate(dir_name, "/", new_declarations, NULL));
+  string instrument_file_name = strdup(concatenate(dir_name, "/TD_instrument.out", 0));
+  instrument_file = safe_fopen(instrument_file_name, "a");  
   current_callee = local_name_to_top_level_entity(module_name);
 
   number_of_processed_modules++;
@@ -1713,37 +1684,69 @@ bool array_resizing_top_down(char *module_name)
       set_current_module_entity(current_callee);		   
       l_callee_decl = code_declarations(entity_code(current_callee));  
  
-      /* search for unnormalized formal array declarations in the declaration list */
+      opt = get_int_property("ARRAY_RESIZING_TOP_DOWN_OPTION");
+      /* opt in {0,1,2,3} => Do not use MAIN program 
+	 opt in {4,5,6,7} => Use MAIN program 	 
+	 => (opt mod 8) <= 3 or not  
+
+	 opt in {0,1,4,5} => Compute new declarations for assumed-size and one arrays only
+	 opt in {2,3,6,7} => Compute new declarations for all formal array arguments
+	 => (opt mod 4) <= 1 or not 
+	 
+	 opt in {0,2,4,6} => Compute new declarations for assumed-size and one arrays 
+	 opt in {1,3,5,7} => Compute new declarations for assumed-size arrays only
+	 => (opt mod 2) = 0 or not */
+
+      /* Depending on the option, take the list of arrays to treat*/
+
       MAP(ENTITY, e,{
-	if (unnormalized_array_p(e) && formal_parameter_p(e))
-	  l_formal_unnorm_arrays = gen_nconc(l_formal_unnorm_arrays,CONS(ENTITY,e,NIL));
+	if (opt%4 <= 1)
+	  {
+	    /* Compute new declarations for assumed-size and one arrays only */
+	    if (opt%2 == 0)
+	      {
+		/* Compute new declarations for assumed-size and one arrays */
+		if (unnormalized_array_p(e) && formal_parameter_p(e))
+		  l_formal_unnorm_arrays = gen_nconc(l_formal_unnorm_arrays,CONS(ENTITY,e,NIL));
+	      }
+	    else 
+	      {
+		/* Compute new declarations for assumed-size arrays only*/
+		if (assumed_size_array_p(e) && formal_parameter_p(e))
+		  l_formal_unnorm_arrays = gen_nconc(l_formal_unnorm_arrays,CONS(ENTITY,e,NIL));
+	      }
+	  }
+	else
+	  {
+	    /* Compute new declarations for all formal array arguments 
+	       To be modified, the whole C code: instrumentation, assumed-size checks,...
+	       How about multi-dimensional array ? replace all upper bounds ?
+	       => different script, ...*/
+
+	    // if (array_entity_p(e) && formal_parameter_p(e))
+	    // l_formal_unnorm_arrays = gen_nconc(l_formal_unnorm_arrays,CONS(ENTITY,e,NIL));
+	    user_log("\n This option has not been implemented yet");
+	  }
       }, l_callee_decl);     
       
       if (l_formal_unnorm_arrays != NIL)
 	{
-	  /* There are several options: 
-	     1. If the current module is never called by the main program => do nothing
-	     2. If there is no main program (libraries, for example) => try to do thing
-	     It is up to users to choose among these options. 
-	     But of course, with all options, we can do nothing with modules that have no 
-	     callers at all, because this is a top-down approach ! */
-	  
-	  if (get_bool_property("ARRAY_RESIZING_USING_MAIN_PROGRAM") &&
-	      (!module_is_called_by_main_program_p(current_callee)))
+	  if ((opt%8 >= 4) && (!module_is_called_by_main_program_p(current_callee)))
 	    {
+	      /* Use MAIN program */
 	      pips_user_warning("Module %s is not called by the main program\n",module_name);
 	      number_of_unnormalized_arrays_without_caller += 
 		gen_length(l_formal_unnorm_arrays);
 	    }
 	  else
 	    {
-	      /* ARRAY_RESIZING_USING_MAIN_PROGRAM = FALSE or module_is_called_by_main_program.
+	      /* Do not use MAIN program or module_is_called_by_main_program.
 		 Take all callers of the current callee*/
 	      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,module_name,TRUE);
 	      list l_callers = callees_callees(callers); 
 	      if (l_callers == NIL)
 		{
-		  pips_user_warning("Module %s has no caller \n",module_name);
+		  pips_user_warning("Module %s has no caller\n",module_name);
 		  number_of_unnormalized_arrays_without_caller += 
 		    gen_length(l_formal_unnorm_arrays);
 		}
@@ -1763,14 +1766,13 @@ bool array_resizing_top_down(char *module_name)
       reset_current_module_entity();
     }
   display_array_resizing_top_down_statistics();
-  /* save to file */
-  out1 = safe_fopen(file_name1, "w");
-  fprintf(out1, "/* Top down array resizing for module %s. */\n", module_name);
-  safe_fclose(out1, file_name1);
-  safe_fclose(out2, file_name2);
+  declaration_file = safe_fopen(declaration_file_name, "w");
+  fprintf(declaration_file, "/* Top down array resizing for module %s. */\n", module_name);
+  safe_fclose(declaration_file, declaration_file_name);
+  safe_fclose(instrument_file, instrument_file_name);
   free(dir_name), dir_name = NULL;
-  free(file_name1), file_name1 = NULL;
-  free(file_name2), file_name2 = NULL;
+  free(declaration_file_name), declaration_file_name = NULL;
+  free(instrument_file_name), instrument_file_name = NULL;
   current_callee = entity_undefined;
   DB_PUT_FILE_RESOURCE(DBR_NEW_DECLARATIONS, module_name, new_declarations);
   ifdebug(1)
