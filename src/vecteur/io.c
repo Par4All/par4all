@@ -136,27 +136,31 @@ FILE * f;
 Pvecteur v;
 Pbase b;
 {
-/* FI: some work needed!!!
-    Pvecteur p;
+    if(vect_in_basis_p(v, b)) {
+	Pvecteur coord;
 
-    if(v==NULL) 
-	(void) fprintf(f,"vecteur nul\n");
-    else
-	for (p = v; p != NULL; p = p->succ)
-	{
-	    if (p->var != TCST) {
-		(void) fprintf(f,"%d * %s ", p->val, variable_name(p->var));
+	fputc('(', f);
+
+	for(coord = b; !VECTEUR_NUL_P(coord); coord = coord->succ) {
+	    Variable var = vecteur_var(coord);
+
+	    if(VARIABLE_DEFINED_P(var)) {
+		fprintf(f, "%d", vect_coeff(var, v));
+		if(VECTEUR_NUL_P(coord->succ)) {
+		    fputc(')', f);
+		}
+		else {
+		    fputc(',', f);
+		}
 	    }
 	    else {
-		(void) fprintf(f,"%d ", p->val);
+		/* I do not know what should be done for constant terms... */
+		abort();
 	    }
-
-	    if (p->succ != NULL) {
-		(void) fprintf(f,"+ ");}
-	    else {
-		(void) fprintf(f,"\n");}
 	}
-*/
+    }
+    else
+	abort();
 }
 
 /* void vect_fprint_as_monome(FILE * f, Pvecteur v, Pbase b,
