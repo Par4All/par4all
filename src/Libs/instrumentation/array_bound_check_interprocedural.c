@@ -35,14 +35,6 @@
   rule , so we have to multiply the array size by its element size in order to compare 
   2 arrays*/
 
-/* ATTENTION : depend on the debugging need, we can chose make_print_statement(msg)
-   or make_stop_statement(msg) 
-   
-   IF (I.LT.1) PRINT *,"Array bound violation ...."
-
-   IF (I.LT.1) STOP "Array bound violation ...." */
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -182,8 +174,8 @@ static expression size_of_dummy_array(entity dummy_array,int i)
       else 
 	{
 	  size_j = binary_intrinsic_expression(MINUS_OPERATOR_NAME,upper_j,lower_j);
-	  size_j =  binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-						copy_expression(size_j),int_to_expression(1));
+	  size_j = binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+					       copy_expression(size_j),int_to_expression(1));
 	}
       if (expression_undefined_p(e))
 	e = copy_expression(size_j);
@@ -336,8 +328,7 @@ static expression interprocedural_abc_arrays(call c, entity actual_array,
   /* Compute the number of same dimensions of the actual array, dummy array 
      and actual array element, based on association information, common variables,  
      preconditions for more informations) */
-  while (same_dimension_p(actual_array,dummy_array,l_actual_ref,
-			  same_dim+1,context))
+  while (same_dimension_p(actual_array,dummy_array,l_actual_ref,same_dim+1,context))
     same_dim ++;
   ifdebug(2)
     fprintf(stderr, "\n Number of same dimensions : %d \n",same_dim);  
@@ -518,18 +509,32 @@ static statement make_interprocedural_abc_tests(array_test at)
     { 
       entity a = ENTITY(CAR(la));
       expression e = EXPRESSION(CAR(le));     
-      string message = strdup(concatenate("\"Bound violation:array ", 
+      string stop_message = strdup(concatenate("\"Bound violation: array ", 
 					  entity_name(a),"\"", NULL));
+      string print_message = strdup(concatenate("\'BV array ",entity_name(a)," with ",
+						words_to_string(words_syntax(expression_syntax(e))),
+						"\'",print_variables(e), NULL));
       statement smt = statement_undefined;
       if (true_expression_p(e))
 	{
-	  // There exists bound violation, we put a stop statement 
+	  /* There is a bound violation, we can return a stop statement immediately, 
+	     but for debugging purpose, it is better to display all bound violations */
 	  number_of_bound_violations++;
-	  return make_print_statement(message);	  
+	  if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))   
+	    smt = make_print_statement(print_message);	  
+	  else
+	    smt = make_stop_statement(stop_message);	
 	}
-      number_of_added_tests++;
-      smt = test_to_statement(make_test(e, make_print_statement(message),
-					make_block_statement(NIL)));
+      else
+	{
+	  number_of_added_tests++;
+	  if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))   
+	    smt = test_to_statement(make_test(e, make_print_statement(print_message),
+					      make_block_statement(NIL)));
+	  else
+	    smt = test_to_statement(make_test(e, make_stop_statement(stop_message),
+					      make_block_statement(NIL)));
+	}
       if (statement_undefined_p(retour))
 	retour = copy_statement(smt);
       else 
@@ -737,7 +742,7 @@ bool array_bound_check_interprocedural(char *module_name)
       debug(1, "Interprocedural array bound check","End for %s\n", module_name);
     }
   debug_off(); 
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name),module_statement);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE,module_name,module_statement);
   reset_ordering_to_statement();
   reset_precondition_map();
   reset_current_module_entity();
