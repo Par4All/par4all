@@ -67,7 +67,7 @@ debg=':'
 #MAIL='/usr/ucb/mail'
 #test ! -x $MAIL && MAIL=mail
 
-MAIL=Mail
+MAIL=${PIPS_MAIL:-Mail}
 
 MAX_NB_LINES='100'
 
