@@ -6,13 +6,12 @@
  *  - declaration de Ppoly et Spoly utilisant Psysteme au lieu de struct
  *    Ssysteme * (FI, 3/1/90)
  */
-#ifndef POLY
-#define POLY	100
-
 #include "ray_dte.h"
-
 #include "sg.h"
 
+/* obsolete (not maintained)
+ */
+/*
 
 typedef struct ssinter {
 	int val_sat,sv;
@@ -29,6 +28,7 @@ typedef struct Spoly {
 	Ptsg sg;
 	} *Ppoly,Spoly;
 
+
 #define POLYEDRE_UNDEFINED ((Ppoly) NULL)
 #define POLYEDRE_UNDEFINED_P(p) ((p)==POLYEDRE_UNDEFINED)
 
@@ -36,11 +36,12 @@ typedef struct Spoly {
 
 #define print_lineq_sat(lineq,nb_s,nb_r) \
     fprint_lineq_sat(stdout,lineq,nb_s,nb_r)
+*/
 
 /* macro d'acces aux champs et sous-champs d'un polyedre, de son systeme
  * generateur sg et de son systeme de contraintes sc
  */
-
+/*
 #define poly_inegalites(p) ((p)->sc->inegalites)
 #define poly_egalites(p) ((p)->sc->egalites)
 #define poly_sommets(p) (sg_sommets((p)->sg))
@@ -53,8 +54,5 @@ typedef struct Spoly {
 
 #define poly_nbre_egalites(p) (sc_nbre_egalites((p)->sc))
 #define poly_nbre_inegalites(p) (sc_nbre_inegalites((p)->sc))
-
-
-#endif /* POLY */
-
+*/
 
