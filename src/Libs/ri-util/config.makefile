@@ -4,12 +4,8 @@
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
 #
-# old: matrice.c 
 
-LIB_CFILES=	Psc.c \
-		Ppolynome.c \
-		Pvecteur.c \
-		Pcontrainte.c \
+LIB_CFILES=	contrainte_to_text.c \
 		eval.c \
 		size.c \
 		util.c \
@@ -38,6 +34,7 @@ LIB_CFILES=	Psc.c \
 		hpfc.c
 
 LIB_HEADERS=	ri-util-local.h operator.h
+
 LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
 
 # that is all
