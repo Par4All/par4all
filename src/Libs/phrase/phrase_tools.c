@@ -342,14 +342,25 @@ statement make_binary_call_statement (string operator_name,
 		 CONS(EXPRESSION, 
 		      expression1, 
 		      CONS(EXPRESSION, expression2, NIL)));
-  
-  return make_statement(entity_empty_label(),
-			statement_number(stat),
-			statement_ordering(stat),
-			empty_comments,
-			make_instruction (is_instruction_call,
-					  assignment_call),
-			NIL,NULL);  
+
+  if (stat == NULL) {
+    return make_statement(entity_empty_label(),
+			  STATEMENT_NUMBER_UNDEFINED,
+			  STATEMENT_ORDERING_UNDEFINED,
+			  empty_comments,
+			  make_instruction (is_instruction_call,
+					    assignment_call),
+			  NIL,NULL);  
+  }
+  else {
+    return make_statement(entity_empty_label(),
+			  statement_number(stat),
+			  statement_ordering(stat),
+			  empty_comments,
+			  make_instruction (is_instruction_call,
+					    assignment_call),
+			  NIL,NULL);  
+  }
 }
 
 /**
@@ -545,41 +556,39 @@ void replace_in_sequence_statement_with (statement old_stat,
   
 }
 
+/**
+ * Return a list of references corresponding to a list of regions
+ */
 list references_for_regions (list l_regions)
 {
   list l_ref = NIL;
   
   MAP (EFFECT, reg, {
-    cell c = effect_cell(reg);
-    reference ref = NULL;
-    if (cell_tag(c) == is_cell_preference) {
-      ref = preference_reference(cell_preference(c));
-    }
-    else if (cell_tag(c) == is_cell_reference) {
-      ref = cell_reference(c);
-    }
+    reference ref = region_reference(reg);
     l_ref = CONS (REFERENCE, ref, l_ref);
     print_reference(ref);
-    pips_debug(2,"Entity: %s\n", entity_local_name(reference_variable(ref)));
+    pips_debug(4,"Entity: %s\n", entity_local_name(reference_variable(ref)));
   },l_regions);
 
   return l_ref;
 }
 
-list union_references_for_regions (list l1, list l2)
+/**
+ * Return the reference of a region
+ */
+reference region_reference (effect reg)
 {
-  return NIL;
-}
+  reference ref = NULL;
 
-list intersection_references_for_regions (list l1, list l2)
-{
-  return NIL;
-}
+  cell c = effect_cell(reg);
+  if (cell_tag(c) == is_cell_preference) {
+    ref = preference_reference(cell_preference(c));
+  }
+  else if (cell_tag(c) == is_cell_reference) {
+    ref = cell_reference(c);
+  }
 
-
-list differences_references_for_regions (list l1, list l2)
-{
-  return NIL;
+  return ref;
 }
 
 
