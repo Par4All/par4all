@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1994/11/26 13:35:51 $, 
+# $Date: 1994/11/30 11:55:22 $, 
 # got on %D%, %T%
 #
 
@@ -9,6 +9,7 @@ script=`basename $0`
 VERBOSE=':'
 DEBUG=':'
 DELETE=':'
+MAKE=':'
 PIPS='pips'
 INSTALL="$HPFC_TOOLS/hpfc_install"
 PIPSARGS='-s MUST_REGIONS -p HPFCOMPILE'
@@ -18,12 +19,13 @@ unset HPFFILE MODULE WORKSPACE
 usage()
 {
   cat 2>&1 <<-EOF
-	Usage: $script [-vDdh] [ -w ws ] [ -m mod ] [-n n | file[.f]]
+	Usage: $script [-vDdhM] [ -w ws ] [ -m mod ] [-n n | file[.f]]
 	  version is $Revision$
 	  -v: verbose
 	  -D: debug
 	  -d: delete
 	  -h: help
+	  -M: make
 	  -w ws: workspace ws
 	  -m mod: module mod
 	  -n n: source number n
@@ -42,12 +44,13 @@ debug()
   echo "$script: $@" 1>&2
 }
 
-while getopts vDdn:hm:w: OPT
+while getopts vDdMn:hm:w: OPT
 do
   case $OPT in
     v) VERBOSE='verbose' ;;
     D) DEBUG='debug' ;;
     d) DELETE='Delete' ;;
+    M) MAKE='gmake' ;;
     n) HPFFILE="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
     m) MODULE="$OPTARG" ;;
     w) WORKSPACE="$OPTARG" ;;
@@ -75,7 +78,17 @@ $VERBOSE "installing generated codes"
 [ -d "$WORKSPACE.hpfc" ] || mkdir $WORKSPACE.hpfc
 ${INSTALL} -b $WORKSPACE.database -r $HPFFILE -i -t $WORKSPACE.hpfc -n $MODULE
 
-$DELETE $WORKSPACE
+[ "$DELETE" = : ] ||
+{
+  $VERBOSE "Deleting $WORKSPACE"
+  $DELETE $WORKSPACE
+}
+
+[ "$MAKE" = : ] ||
+{
+  $VERBOSE "Making $WORKSPACE"
+  (cd $WORKSPACE.hpfc ; $MAKE all )
+}
 
 $VERBOSE "done"
 
