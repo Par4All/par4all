@@ -505,13 +505,14 @@ use_def_elimination(char * module_name)
       for pretty print... :-) */
    module_reorder(module_statement);
 
+   debug(2, "use_def_elimination", "done for %s\n", module_name);
+
+   debug_off();
+
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_statement);
 
    reset_current_module_statement();
    reset_current_module_entity();
-
-   debug(2, "use_def_elimination", "done for %s\n", module_name);
-   debug_off();
 
    /* Should have worked: */
    return TRUE;
