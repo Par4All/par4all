@@ -422,7 +422,7 @@ int i;
 expression Value_to_expression(v)
 Value v;
 {
-    return(int_to_expression((int) v));
+    return(int_to_expression(VALUE_TO_INT(v)));
 }
 
 /* conversion of an expression into a list of references; references are
