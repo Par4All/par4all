@@ -738,13 +738,16 @@ Pvecteur pv;
 	return make_integer_constant_expression(0);
 
     coef = VALUE_TO_INT(vecteur_val(v));
-    factor1 = make_factor_expression(ABS(coef), (entity) vecteur_var(v));
-    if (coef<0)
+
+    if (coef==-1) /* let us avoid -1*v */
     {
+	factor1 = make_factor_expression(1, (entity) vecteur_var(v));
 	entity op_ums = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
 	factor1 = call_to_expression
 	    (make_call(op_ums, CONS(EXPRESSION, factor1, NIL)));
     }
+    else
+	factor1 = make_factor_expression(coef, (entity) vecteur_var(v));
 
     for (v=v->succ; v!=NULL; v=v->succ)
     {
