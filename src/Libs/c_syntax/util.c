@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: util.c,v $
+   Revision 1.4  2003/08/13 08:00:00  nguyen
+   Modify MakeCurrentEntity by taking into account the function case
+
    Revision 1.3  2003/08/06 14:00:08  nguyen
    Replace global variables such as CurrentSourceFile, static and dynamic
    ares by function calls
@@ -358,6 +361,16 @@ bool static_module_p(entity e)
   return (strstr(entity_name(e), FILE_SEP_STRING) != NULL);
 }
 
+entity FindOrCreateEntityFromLocalNameAndPrefix(string name,string prefix, bool is_external)
+{
+  entity e; 
+  if ((e = FindEntityFromLocalNameAndPrefix(name,prefix)) != entity_undefined) 
+    return e;
+      
+  pips_user_warning("FindEntityFromLocalNameAndPrefix","cannot find entity %s\n",name);
+  return CreateEntityFromLocalNameAndPrefix(name,prefix,is_external);
+}
+
 entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 {
   /* Find an entity from its local name and prefix.
@@ -400,8 +413,7 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   pips_debug(3,"Entity global name is %s\n",global_name);
   if ((ent = gen_find_tabulated(global_name,entity_domain)) != entity_undefined) 
     return ent;
-  
-  pips_error("FindEntityFromLocalNameAndPrefix","cannot find entity %s\n",name);
+
   return entity_undefined;
 }
 
@@ -535,9 +547,10 @@ entity MakeCurrentEntity(string name,
 			 storage CurrentStorage,
 			 type CurrentType,
 			 list CurrentQualifiers,
+			 bool is_external,
 			 bool is_typedef,
 			 bool is_static,
-			 bool is_external,
+			 bool is_auto,
 			 bool is_formal, 
 			 int offset)
 {
@@ -545,7 +558,15 @@ entity MakeCurrentEntity(string name,
 
   /*************************** Scope part ***************************************/
 
-  pips_debug(2,"Entity local name %s\n",name);
+  ifdebug(2)
+    {
+      pips_debug(2,"Entity local name %s\n",name);
+      pips_debug(2,"is_external: %d\n",is_external);
+      pips_debug(2,"is_typedef: %d\n",is_typedef);
+      pips_debug(2,"is_static: %d\n",is_static);      
+      pips_debug(2,"is_auto: %d\n",is_auto);
+      pips_debug(2,"is_formal: %d\n",is_formal);
+    }
   if (is_typedef)
     {
       /* Tell the lexer about the new type names : add to keyword_typedef_table */
@@ -570,7 +591,8 @@ entity MakeCurrentEntity(string name,
 	    }
 	  else 
 	    {
-	      /* Add block scope here */
+	      /* This can be module's variable : add block scope here 
+		 or external function declarations ? */
 	      if (static_module_p(get_current_module_entity()))
 		ent = find_or_create_entity(strdup(concatenate(get_current_source_file_name(),FILE_SEP_STRING,
 							       get_current_module_name(),MODULE_SEP_STRING,
@@ -616,7 +638,9 @@ entity MakeCurrentEntity(string name,
 	  else 
 	    {
 	      /* This must be a variable, not a function/typedef/struct/union/enum. 
-		 The variable is declared outside any function, and hence is global */
+		 The variable is declared outside any function, and hence is global
+
+		 THIS CAN BE FUNTION ? */
 	      r = make_ram(get_top_level_entity(),
 			   get_top_level_entity(), 
 			   ComputeAreaOffset(get_top_level_entity(),ent),
@@ -638,28 +662,31 @@ entity MakeCurrentEntity(string name,
 	  else
 	    { 
 	      /* ADD BLOCK SCOPE */
-	      ram r; 
 	      if (is_static)
 		{
-		  r = make_ram(get_current_module_entity(),
-			       StaticArea,
-			       ComputeAreaOffset(StaticArea,ent),
-			       NIL);
+		  ram r = make_ram(get_current_module_entity(),
+				   StaticArea,
+				   ComputeAreaOffset(StaticArea,ent),
+				   NIL);
 		  /*the offset must be recomputed lately, when we know the size of the variable */
+		  entity_storage(ent) = make_storage_ram(r);
 		}
 	      else
 		{
-		  r = make_ram(get_current_module_entity(),
-			       DynamicArea,
-			       ComputeAreaOffset(DynamicArea,ent),
-			       NIL);
-		  /* the offset must be recomputed lately, when we know the size of the variable */
+		  if (is_auto)
+		    {
+		      ram r = make_ram(get_current_module_entity(),
+				       DynamicArea,
+				       ComputeAreaOffset(DynamicArea,ent),
+				       NIL);
+		      /* the offset must be recomputed lately, when we know the size of the variable */
+		      entity_storage(ent) = make_storage_ram(r);
+		    }
 		}
-	      entity_storage(ent) = make_storage_ram(r);
 	    }
 	}
     }
-
+  
   return ent;
 }
 
@@ -678,3 +705,44 @@ int ComputeAreaOffset(entity a, entity v)
   area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
   return offset;
 }
+
+list MakeParameterList(list l1, list l2)
+{
+  /* l1 is a list of parameter names and it represents the exact order in the parameter list
+     l2 is a list of entities with their type, storage,... and the order can be different from l1
+     
+     We create the list of parameters with the order of l1, and the parameter type and mode 
+     are retrived from l2. 
+
+     Since the offset of formal argument in l2 can be false, we have to update it here by using l1 */
+  list l = NIL;
+  int offset = 1;
+  MAP(STRING, s,
+  {
+    parameter p = FindParameterEntity(s,offset,l2);
+    l = CONS(PARAMETER,p,l);
+    offset++;
+  },l1);
+  return l;
+}
+
+parameter FindParameterEntity(string s, int offset, list l)
+{
+  MAP(ENTITY,e,
+  {
+    string name = entity_user_name(e);
+    if (strcmp(name,s)==0)
+      {
+	type t = entity_type(e);
+	mode m = make_mode_reference(); /* to be verified in C, when by reference, when by value*/
+	storage st = entity_storage(e);
+	formal f;
+	pips_assert("formal storage",storage_formal_p(st));
+	f = storage_formal(st);
+	formal_offset(f) = offset;
+	return make_parameter(t,m);
+      }
+  },l);
+  return parameter_undefined;
+}
+
