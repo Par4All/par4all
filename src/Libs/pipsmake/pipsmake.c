@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.58  1997/12/05 15:54:17  coelho
+ * checkpoint_workspace added.
+ *
  * Revision 1.57  1997/12/05 09:51:03  coelho
  * cleaner, and new concurrent_apply...
  *
@@ -832,6 +835,16 @@ check_physical_resource_up_to_date(string rname, string oname)
   return result;
 }
 
+static int
+delete_obsolete_resources(void)
+{
+    int ndeleted;
+    init_make_cache();
+    ndeleted =db_delete_obsolete_resources(check_physical_resource_up_to_date);
+    reset_make_cache();
+    return ndeleted;
+}
+
 /* this is quite ugly, but I wanted to put the enumeration down to pipsdbm.
  */
 void
@@ -842,12 +855,9 @@ delete_some_resources(void)
 
     user_log("Deletion of %s resources: ", what);
 
-    if (same_string_p(what, "obsolete")) {
-	int ndeleted;
-	init_make_cache();
-	ndeleted = 
-	    db_delete_obsolete_resources(check_physical_resource_up_to_date); 
-	reset_make_cache();
+    if (same_string_p(what, "obsolete")) 
+    {
+	int ndeleted = delete_obsolete_resources();
 	if (ndeleted>0) user_log("%d destroyed.\n", ndeleted);
 	else user_log("none destroyed.\n");
     } else if (same_string_p(what, "all")) {
@@ -857,6 +867,15 @@ delete_some_resources(void)
 	pips_internal_error("unexpected delete request %s\n", what);
 }
 
+void
+checkpoint_workspace(void)
+{
+    user_log("Checkpoint of workspace.\n");
+    pips_debug(3, "\tdeleting obsolete resources...\n");
+    delete_obsolete_resources();
+    pips_debug(3, "\tsaving resources...\n");
+    db_checkpoint_workspace();
+}
 
 /* To be used in a rule. use and update the up_to_dat list
  * created by makeapply 
