@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/29 12:23:07 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/29 15:22:04 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -217,7 +217,7 @@ c
 c HOST PART
 c
 cdecl      external build_name(hred2,PVMTYPE,NAME)
-cdecl      TYPEbuild_name(hred2,PVMTYPE,NAME)
+cdecl      TYPE build_name(hred2,PVMTYPE,NAME)
       TYPE function build_name(hred2,PVMTYPE,NAME)()
       include ''`fpvm3.h''`
       include ''`hpfc_commons.h''`
