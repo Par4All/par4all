@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL1,v $ (version $Revision$)
-# $Date: 1996/08/25 20:21:38 $, 
+# $Date: 1996/09/02 13:04:39 $, 
 #
 # this file contains macro definitions 
 
@@ -34,6 +34,7 @@ ETAGS	= etags
 #
 # tools for the documentation
 LX2HTML	= latex2html
+L2HFLAGS= -link 8 -split 5
 LATEX	= latex
 BIBTEX	= bibtex
 MAKEIDX	= makeindex
