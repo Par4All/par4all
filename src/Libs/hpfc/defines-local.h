@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: defines-local.h,v $ ($Date: 1994/06/03 14:14:45 $, ) version $Revision$, got on %D%, %T%
+ * $RCSfile: defines-local.h,v $ ($Date: 1994/09/01 15:48:03 $, ) version $Revision$, got on %D%, %T%
  * $Id$
  */
 
@@ -33,7 +33,27 @@
 #define max(a,b) (((a)>(b))?(a):(b))
 
 /* integer ceiling function */
-#define iceil(a,b) (((a-1)/b)+1)
+#define iceil(a,b) ((((a)-1)/(b))+1)
+
+/*  update a subroutine to a function
+ */
+
+#define entity_result_type(e)\
+    functional_result(type_functional(entity_type(e)))
+
+#define update_result_type_as_model(e, model) \
+    free_type(entity_result_type(e)), \
+    entity_result_type(e) = copy_type(entity_result_type(model));
+
+#ifndef bool_undefined
+#define bool_undefined ((bool) (-15))
+#define bool_undefined_p(b) ((b)==bool_undefined)
+#endif
+
+#ifndef int_undefined
+#define int_undefined ((int) (-15))
+#define int_undefined_p(i) ((i)==int_undefined)
+#endif
 
 /*
  * Constants
@@ -116,8 +136,8 @@
  * Overlap
  */
 
-#define UPPER 1
-#define LOWER 0
+#define UPPER "UP"
+#define LOWER "LO"
 
 #define SEND	1
 #define RECEIVE 0
