@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/23 21:55:39 $, 
+# $Date: 1996/08/23 22:11:43 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -30,10 +30,10 @@ DERIVED_FILES=	$(INSTALL_SHR) $(DERIVED_INC) $(INSTALL_DOC) $(INSTALL_HTM)
 all: $(DERIVED_FILES)
 
 auto-dash.h: auto.h
-	sed 's,/^..,--,' $< > $@
+	sed 's,^..,--,' $< > $@
 
 auto-number.h: auto.h
-	sed 's,/^..,# ,' $< > $@
+	sed 's,^..,# ,' $< > $@
 
 pipsmake.rc: pipsmake-rc.tex
 	#
