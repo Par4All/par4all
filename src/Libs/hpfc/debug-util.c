@@ -8,8 +8,7 @@
 
 extern char *flint_print_basic();
 
-/*
- * print_entity_variable(e)
+/* print_entity_variable(e)
  * 
  * if it is just a variable, the type is printed,
  * otherwise just the entity name is printed
@@ -66,25 +65,21 @@ alignment a;
 void print_aligns()
 {
     fprintf(stderr,"Aligns:\n");
-    MAPL(ce,
+    MAP(ENTITY, a,
      {
-	 entity a=ENTITY(CAR(ce));
-
 	 (void) fprintf(stderr, "of array %s\n", entity_name(a));
 	 print_align(load_entity_align(a));
 	 (void) fprintf(stderr,"\n");
      },
-	 list_of_distributed_arrays());
+	list_of_distributed_arrays());
 }
 
 void print_distributes()
 {
     fprintf(stderr,"Distributes:\n");
 
-    MAPL(ce,
+    MAP(ENTITY, t,
      {
-	 entity t=ENTITY(CAR(ce));
-
 	 (void) fprintf(stderr, "of template %s\n", entity_name(t));
 	 print_distribute(load_entity_distribute(t));
 	 (void) fprintf(stderr,"\n");
@@ -242,17 +237,15 @@ list l;
 {
     bool firstrange = TRUE;
 
-    MAPL(cr,
+    MAP(RANGE, r,
      {
-	 range r = RANGE(CAR(cr));
-
 	 if (!firstrange)
 	     (void) fprintf(file, ", ");
 
 	 firstrange = FALSE;
 	 fprint_range(file, r);
      },
-	 l);
+	l);
 }
 
 void fprint_message(file, m)
@@ -276,7 +269,7 @@ list l;
     if (ENDP(l))
 	fprintf(file, "message list is empty\n");
     else
-	MAPL(cm, fprint_message(file, MESSAGE(CAR(cm))), l);
+	MAP(MESSAGE, m, fprint_message(file, m), l);
 }
 
 /*  that is all
