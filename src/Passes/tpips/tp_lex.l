@@ -113,7 +113,8 @@ static int tpips_lex_input (void)
 
 <SPEC,INITIAL>\n	{ RETURN(TK_ENDOFLINE); }
 
-<STR>[^\"]*\"		{ yylval.name = strdup(concatenate("\"", yytext, 0));
+<STR>[^\"]*\"		{ yylval.name = strdup(yytext);
+			  yylval.name[strlen(yytext)-1] = '\0';
 		  	  BEGIN INITIAL; RETURN(TK_A_STRING);}
 \"			{ BEGIN STR;} /* " */
 
