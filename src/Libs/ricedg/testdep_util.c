@@ -215,7 +215,7 @@ entity e;
     return(0);
 }
 
-
+
 
 /*
 this function replaces each occurrence of variable e in system s by
@@ -236,13 +236,19 @@ Psysteme s;
 int li;
 {
     Variable v = (Variable) GetDiVar(l);
+    Value vli = int_to_value(li);
     Pcontrainte pc;
+
     for (pc = s->egalites; pc != NULL; pc = pc->succ) {
-	vect_add_elem(&(pc->vecteur), v, li*vect_coeff((Variable) e, pc->vecteur));
+	Value ve = vect_coeff((Variable) e, pc->vecteur);
+	value_product(ve, vli);
+	vect_add_elem(&(pc->vecteur), v, ve);
     }
 
     for (pc = s->inegalites; pc != NULL; pc = pc->succ) {
-	vect_add_elem(&(pc->vecteur), v, li*vect_coeff((Variable) e, pc->vecteur));
+	Value ve = vect_coeff((Variable) e, pc->vecteur);
+	value_product(ve, vli);
+	vect_add_elem(&(pc->vecteur), v, ve);
     }
 }
 
@@ -492,7 +498,6 @@ Psysteme *psc;
 boolean sc_faisabilite_optim(sc)
 Psysteme sc;
 {
-
     debug(6, "sc_faisabilite_optim", "begin\n");
     sc = sc_normalize(sc);
     if (sc != NULL) {	
@@ -500,14 +505,15 @@ Psysteme sc;
 	is_test_Di = FALSE;
 	
 	if (setjmp(overflow_error)) {
-	    debug(7,"sc_faisabilite_optim", "overflow error, returning TRUE. \n"); 
+	    pips_debug(7, "overflow error, returning TRUE. \n"); 
 	    sc_rm(sc1);
 	    debug(6, "sc_faisabilite_optim", "end\n");
 	    return(TRUE);
 	    
 	}
 	else {
-	    sc1 = sc_projection_optim_along_vecteur_ofl(sc1,base_dup(sc1->base));
+	    sc1 = sc_projection_optim_along_vecteur_ofl(sc1,
+							base_dup(sc1->base));
 	    if (sc_empty_p(sc1)) {
 		debug(7, "sc_faisabilite_optim", "system not feasible\n");
 		debug(6, "sc_faisabilite_optim", "end\n");
@@ -541,7 +547,8 @@ Variable v;
     Psysteme sc1;
     Pcontrainte pos, neg, nul;
     Pcontrainte pc, pcp, pcn;
-    int c, nnul,np,nn;
+    Value c;
+    int nnul,np,nn, i;
 
     pc = sc->inegalites;
 
@@ -556,11 +563,11 @@ Variable v;
     while (pc != NULL) {
 	Pcontrainte pcs = pc->succ;
 
-	if ((c = vect_coeff(v,pc->vecteur)) > 0) {
+	if (value_pos_p(c = vect_coeff(v,pc->vecteur))) {
 	    pc->succ = pos;
 	    pos = pc;
 	}
-	else if (c < 0) {
+	else if (value_neg_p(c)) {
 	    pc->succ = neg;
 	    neg = pc;
 	}
@@ -578,7 +585,7 @@ Variable v;
     np = nb_elems_list(pos); 
     nn = nb_elems_list(neg); 
 
-    if ((c = np*nn)<=16) FMComp[c]++;
+    if ((i = np*nn)<=16) FMComp[i]++;
     else FMComp[17]++;
 
     for (pcp = pos; pcp != NULL; pcp = pcp->succ) {
@@ -647,7 +654,8 @@ Pvecteur pv;
     Pcontrainte eq;
     Pvecteur pv1,prv,pve;    
     Variable v;
-    int coeff,syst_size_init;
+    Value coeff;
+    int syst_size_init;
     Pbase base_sc = base_dup(sc->base);
 
     pve = vect_dup(pv);
@@ -663,7 +671,7 @@ Pvecteur pv;
 	while (!VECTEUR_NUL_P(pv1) && (sc->nb_eq!=0)) {
 	    v = pv1->var; 
 	    eq = contrainte_var_min_coeff(sc->egalites, v, &coeff, FALSE);
-	    if ((eq == NULL) || (coeff != 1)){
+	    if ((eq == NULL) || value_notone_p(coeff)){
 		prv = pv1;
 		pv1 = pv1->succ;
 	    }
@@ -903,8 +911,8 @@ Value *pmin, *pmax;
     Pbase b;
     Pvecteur pv = NULL;
 
-    *pmax =  INT_MAX;
-    *pmin = INT_MIN;
+    *pmax =  VALUE_MAX;
+    *pmin = VALUE_MIN;
 
     if (sc_value_of_variable(ps, var, &val) == TRUE) {
 	*pmin = val;
@@ -943,19 +951,19 @@ Value *pmin, *pmax;
 
 	
 	for (pc = ps->inegalites; pc != NULL; pc = pc->succ) {
-	    int cv = vect_coeff(var, pc->vecteur);
-	    int cc = - vect_coeff(TCST, pc->vecteur);
+	    Value cv = vect_coeff(var, pc->vecteur);
+	    Value cc = value_uminus(vect_coeff(TCST, pc->vecteur));
 	    
-	    if (cv > 0) {
+	    if (value_pos_p(cv)) {
 		/* cette contrainte nous donne une borne max */
-		int bs = DIVIDE(cc,cv);
-		if (bs < *pmax) 
+		Value bs = value_pdiv(cc,cv);
+		if (value_lt(bs,*pmax))
 		    *pmax = bs;
 	    }
-	    else if (cv < 0) {
+	    else if (value_neg_p(cv)) {
 		/* cette contrainte nous donne une borne min */
-		int bi = DIVIDE(cc,cv);
-		if (bi > *pmin) 
+		Value bi = value_pdiv(cc,cv);
+		if (value_gt(bi,*pmin))
 		    *pmin = bi;
 	    }
 	}
@@ -963,7 +971,7 @@ Value *pmin, *pmax;
 	vect_rm(pv);
     }
 
-    if(*pmax < *pmin)
+    if(value_lt(*pmax,*pmin))
 	return FALSE;
 
     sc_rm(ps);
@@ -1003,14 +1011,11 @@ Pvecteur  *ppv;
 Variable var;
 {
     Pvecteur pvcour;
-    int value;
 
-    for (pvcour = (*ppv); pvcour != NULL; pvcour = pvcour->succ) {
-	if (pvcour->var == var) {
-	    value = pvcour->val;
-	    pvcour->val = (-1)*value;
-	}
-    }
+    for (pvcour = (*ppv); pvcour != NULL; pvcour = pvcour->succ)
+	if (pvcour->var == var)
+	    value_oppose(pvcour->val);
+
     return;
 }
 
