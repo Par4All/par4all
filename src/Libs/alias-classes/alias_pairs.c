@@ -105,11 +105,11 @@ add_parameter_aliases_for_this_call_site(call call_site,
 
 	MAP(EFFECT, callee_region,
 	 {
+	     entity callee_ent = region_entity(callee_region);
+	     
 	     pips_debug(9,"callee_region %s\n",
 			region_to_string(callee_region));
 
-	     entity callee_ent = region_entity(callee_region);
-	     
 	     /* If the formal parameter corresponds to the real argument then
 	      * we perform the translation.
 	      */
