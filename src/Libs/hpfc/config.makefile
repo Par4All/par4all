@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/06/09 16:43:29 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/08/24 12:18:45 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -88,10 +88,11 @@ DERIVED_HEADERS=toklex.h keywtbl.h tokyacc.h
 DERIVED_CFILES= y.tab.c scanner.c
 LIB_OBJECTS= $(DERIVED_CFILES:.c=.o)  $(LIB_CFILES:.c=.o) 
 
-# todo: init
-# init: toklex.h keywtbl.h scanner.c y.tab.c
+#
+# this dependence is false to avoid regenerating often the .h and
+# thus recompiling everything.
 
-$(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
+$(TARGET).h: hpfc-local.h
 
 sccs_close:
 	@echo "closing the sccs session"
