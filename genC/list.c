@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1998/12/08 09:23:37 $, )
+ * $RCSfile: list.c,v $ ($Date: 1998/12/08 11:49:52 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -69,6 +69,7 @@
    . GEN_SORT_LIST(L, compare) sorts L in place with compare (see man qsort)
    . GEN_ONCE(ITEM, L) adds ITEM to L if not already there.
    . GEN_IN_LIST_P(ITEM, L) checks that item ITEM appears in list L
+   . GEN_OCCURENCES(ITEM, L) returns the number of occurences of item ITEM in list L
    . GEN_ONCE_P(L) checks that each item in list L appears only once
    . GEN_CLOSURE()
    . GEN_MAKE_LIST(DOMAIN, ...) makes an homogeneous list of the varargs (but
@@ -473,6 +474,17 @@ bool gen_in_list_p(void * vo, list l)
 	if (CHUNK(CAR(l))==item) return(TRUE); /* found! */
 
     return(FALSE); /* else no found */
+}
+
+int gen_occurences(void * vo, list l)
+{
+    list c;
+    int n = 0;
+    gen_chunk * item = (gen_chunk*) vo;
+    for (c=l; !ENDP(c); POP(c))
+	if (CHUNK(CAR(c))==item) n++;
+
+    return n;
 }
 
 bool gen_once_p(list l)
