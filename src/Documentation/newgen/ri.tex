@@ -756,19 +756,34 @@ Summary Data Flow Information, et des re'gions.
 Le sous-domaine {\tt reference} indique sur quelle variable, scalaire ou
 tableau, a lieu un effet, le sous-domaine {\tt action} pre'cise si la
 re'fe'rence est lue ou e'crite, et le sous-domaine {\tt approximation}
-permet de savoir si la re'fe'rence est lue ou e'crite a` coup su^r ou
-non.
+permet de savoir si la re'fe'rence (pour les effets) ou l'ensemble des
+e'le'ments de tableaux de'fini par le contexte (pour les re'gions) est lu ou
+e'crit a` coup su^r ou non. 
 
-Le sous-domaine {\tt reference} est de pre'ciser qu'un effet n'a lieu
-que sur un sous-tableau en utilisant un {\tt range} comme expression
-d'indice. Ceci est utilise' lors de la traduction des effets cumule's
-d'un proce'dure en les effets propres d'un call site.
+Lors de la traduction interproce'durale des effets ou des re'gions portant
+sur une variable globale non de'clare'e dans le module appelant ou sur une
+variable statique apparaissant dans un {\tt SAVE}, il est important de
+re'cupe'rer une re'fe'rence qui sera la me^me pour tous les sites d'appels.
+Pour cela on choisit un module de re'fe'rence (dans lequel le common ou le
+save est de'clare'), dont le nom pre'fixera le nom de la variable. Le choix
+de ce module n'est pas trivial. A` l'heure actuel. il s'agit du nom du
+module de la premie`re variable apparaissant dans la liste des variables du
+common ({\tt ram_section(storage_ram(entity_storage(<my_common>)))}). Selon
+l'ordre dans lequel les modules dont analyse's, le nom de module trouve'
+sera diffe'rent. Il faudrait en re'alite' prendre le premier nom de module
+dans l'ordre lexicographique des modules appele's (callees).
 
-Le sous-domaine {\tt context} n'est utilise' que pour les effets
-cumule's. Le contexte indique quelles relations line'aires entre les
-variables du programme sont ve'rifie'es au moment ou` l'instruction est
-exe'cute'e.  Il permet de repre'senter les effets des instructions par
-des re'gions (telles que de'finies par Re'mi Triolet).
+Le sous-domaine {\tt reference} permet de pre'ciser qu'un effet n'a lieu que
+sur un sous-tableau en utilisant un {\tt range} comme expression d'indice.
+Ceci est utilise' lors de la traduction des effets cumule's d'un proce'dure
+en les effets propres d'un call site. Pour les re'gions, ce sous-domaine
+pre'cise l'entite' concerne'e ainsi que la liste des variables $\phi$ qui
+de'crivent ses dimensions.
+
+Le sous-domaine {\tt context} n'est utilise' que pour repre'senter les
+effets des instructions par des re'gions (telles que de'finies par Re'mi
+Triolet).
+
 }
 
 \subsection{Nature of an Effect}
