@@ -53,6 +53,9 @@ Menu_item menu_item;
 	else if (strcmp(label,LOOP_INTERCHANGE_TRANSFORM) == 0) {
 	    safe_apply(BUILDER_LOOP_INTERCHANGE, modulename);
 	}
+	else if (strcmp(label, DEAD_CODE_ELIMINATION_TRANSFORM) == 0) {
+	    safe_apply(BUILDER_DEAD_CODE_ELIMINATION, modulename);
+	}
 	else if (strcmp(label, REDUCTIONS_TRANSFORM) == 0) {
 	    safe_apply(BUILDER_REDUCTIONS, modulename);
 	}
@@ -74,6 +77,7 @@ void create_transform_menu()
 		     MENU_ACTION_ITEM, UNROLL_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, STRIP_MINE_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, LOOP_INTERCHANGE_TRANSFORM, transform_notify,
+		     MENU_ACTION_ITEM, DEAD_CODE_ELIMINATION_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, REDUCTIONS_TRANSFORM, transform_notify,
 		     NULL);
 
