@@ -1,5 +1,5 @@
 /* $RCSfile: system.c,v $ version $Revision$
- * ($Date: 1995/10/04 13:36:53 $, )
+ * ($Date: 1995/10/06 20:46:52 $, )
  *
  * a safe system call. abort if fails.
  * FC 09/95
@@ -18,7 +18,7 @@ safe_system(
     int status = system(command);
     
     if (status)
-	pips_error("safe_system", "Failed (sig: %d, ret: %d) for %s\n", 
+	pips_error("safe_system", "Failed (ret: %d, sig: %d) for %s\n", 
 		   (status/0x100) & 0xff, status & 0xff, command);
 }
 
