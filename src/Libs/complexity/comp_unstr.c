@@ -104,9 +104,10 @@ list effects_list;
 	for (i=1; i<=n_controls; i++) {
 	    for (j=1; j<=n_controls; j++ ) {
 		Value n = ACCESS(B, n_controls, i, j),
-		      de = DENOMINATOR(B),
-		      r = value_div(n,de);
-		FA(i-1,j-1) = VALUE_TO_FLOAT(r);
+		      de = DENOMINATOR(B);
+		float f1 = VALUE_TO_FLOAT(n),
+		      f2 = VALUE_TO_FLOAT(de);
+		FA(i-1,j-1) = f1/f2;
 	    }
 	}
 
@@ -270,7 +271,7 @@ control control_array[];
 	n_succs = 0;
 	for (j=1; j<=n_controls; j++)
 	{ 
-	    Value a =ACCESS(P, n_controls, i, j);
+	    Value a = ACCESS(P, n_controls, i, j);
 	    n_succs += VALUE_TO_INT(a);
 	}
 	if (n_succs > max_n_succs) 
@@ -290,7 +291,7 @@ control control_array[];
     for (i=1; i<=n_controls; i++) {
 	n_succs = 0;
 	for (j=1; j<=n_controls; j++) {
-	    Value a =ACCESS(P, n_controls, i, j);
+	    Value a = ACCESS(P, n_controls, i, j);
 	    n_succs += VALUE_TO_INT(a);
 	}
 	if (n_succs>0)
