@@ -869,7 +869,7 @@ Ptsg *gs, *gsop;
 	user_warning("TestCoupleOfReferences",
 		     "Dependence between differents variables: "
 		     "%s and %s\nDependence assumed\n",
-		     entity_local_name(e1), entity_local_name(e2));
+		     entity_minimal_name(e1), entity_minimal_name(e2));
 	
     }
 	
