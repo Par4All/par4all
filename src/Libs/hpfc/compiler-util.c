@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: compiler-util.c,v $
+ * Revision 1.23  1997/05/30 13:14:20  coelho
+ * less warnings...
+ *
  * Revision 1.22  1997/03/20 10:19:06  coelho
  * RCS headers.
  *
@@ -289,9 +292,10 @@ list lsyn;
 bool atomic_accesses_only_p(stat)
 statement stat;
 {
-    hpfc_warning("not  implemented, returning TRUE\n");
+    ifdebug(1)
+	hpfc_warning("not  implemented, returning TRUE\n");
 
-    return(TRUE);
+    return TRUE;
 }
 
 /* indirections_inside_statement_p
@@ -302,8 +306,9 @@ statement stat;
 bool indirections_inside_statement_p(stat)
 statement stat;
 {
-    hpfc_warning("not implemented yet, returning FALSE\n");
-    return(FALSE);
+    ifdebug(1)
+	hpfc_warning("not implemented yet, returning FALSE\n");
+    return FALSE;
 }
 
 /* ------------------------------------------------------------------
