@@ -48,10 +48,20 @@ char FormatValue[FORMATLENGTH];
 
 extern void syn_reset_lex(void);
 
-void 
+bool InParserError = FALSE;
+
+bool
 ParserError(char * f, char * m)
 {
     entity mod = get_current_module_entity();
+
+    /* Maybe a routine called by ParserError() may call ParserError()
+     * e.g. AbortOfProcedure() thru remove_ghost_variables()
+     */
+    if(InParserError)
+	return FALSE;
+
+    InParserError = TRUE;
 
     uses_alternate_return(FALSE);
     ResetReturnCodeVariable();
@@ -82,6 +92,7 @@ ParserError(char * f, char * m)
     }
 
     reset_current_module_entity();
+    safe_fclose(syn_in, CurrentFN);
     free(CurrentFN);
     CurrentFN = NULL;
 
@@ -96,14 +107,18 @@ ParserError(char * f, char * m)
     reset_common_size_map_on_error();
     parser_reset_all_reader_buffers();
     parser_reset_StmtHeap_buffer();
-    safe_fclose(syn_in, CurrentFN);
     AbortOfProcedure();
+
+    InParserError = FALSE;
 
     /* FI: let catch_error() take care of this in pipsmake since debug_on()
        was not activated in ParserError */
     /* debug_off(); */
     user_error(f,"Parser error between lines %d and %d\n%s\n",
 	       line_b_I,line_e_I,m);
+
+    /* Should never be executed */
+    return TRUE;
 }
 
 
