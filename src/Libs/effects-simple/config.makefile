@@ -11,7 +11,8 @@ LIB_CFILES	= \
 	methods.c \
 	interprocedural.c \
 	prettyprint.c \
-	unary_operators.c
+	unary_operators.c \
+	filter_proper_effects.c
 
 LIB_HEADERS	= effects-simple-local.h
 
