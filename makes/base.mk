@@ -151,46 +151,80 @@ clean: arch-clean
 arch-clean:; -$(RMDIR) $(ARCH)
 
 # multiphase compilation
-phase1: install_inc install_shr install_utl
-phase2:	install_lib install_bin
-phase3: install_doc
 phase4: install_rtm
 phase5: install_htm 
 
 # includes
+ifdef INC_TARGET
 INSTALL_INC	+=   $(INC_TARGET)
+endif
+
+ifdef INSTALL_INC
+phase1: install_inc
 
 $(INC.d):; $(MKDIR) $(INC.d)
 
 install_inc: $(INSTALL_INC) $(INC.d)
 	$(INSTALL) $(INSTALL_INC) $(INC.d)
+endif # INSTALL_INC
 
 # libraries
 ifdef LIB_TARGET
 INSTALL_LIB	+=   $(LIB_TARGET)
 endif
 
+ifdef INSTALL_LIB
+phase2:	install_lib
+
 $(LIB.d):; $(MKDIR) $(LIB.d)
 
 install_lib: $(INSTALL_LIB) $(LIB.d)
 	$(INSTALL) $(INSTALL_LIB) $(LIB.d)
+endif # INSTALL_LIB
 
 # binaries
 ifdef BIN_TARGET
 INSTALL_BIN	+=   $(BIN_TARGET)
 endif
 
+ifdef INSTALL_BIN
+phase2: install_bin
+
 $(BIN.d):; $(MKDIR) $(BIN.d)
 
 install_bin: $(INSTALL_BIN) $(BIN.d)
 	$(INSTALL) $(INSTALL_BIN) $(BIN.d)
+endif # INSTALL_BIN
 
 # documentation
+ifdef INSTALL_DOC
+phase3: install_doc
+
 $(DOC.d):; $(MKDIR) $(DOC.d)
 
 install_doc: $(INSTALL_DOC) $(DOC.d)
 	$(INSTALL) $(INSTALL_DOC) $(DOC.d)
+endif # INSTALL_DOC
 
+# shared
+ifdef INSTALL_SHR
+phase1: install_shr 
+
+$(SHR.d):; $(MKDIR) $(SHR.d)
+
+install_shr: $(INSTALL_SHR) $(SHR.d)
+	$(INSTALL) $(INSTALL_SHR) $(SHR.d)
+endif # INSTALL_SHR
+
+# utils
+ifdef INSTALL_UTL
+phase1: install_utl
+
+$(UTL.d):; $(MKDIR) $(UTL.d)
+
+install_utl: $(INSTALL_UTL) $(UTL.d)
+	$(INSTALL) $(INSTALL_UTL) $(UTL.d)
+endif # INSTALL_UTL
 
 # clean installation. TOO ROUGH!
 uninstall:
