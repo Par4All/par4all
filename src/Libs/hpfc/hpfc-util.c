@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: hpfc-util.c,v $
+ * Revision 1.51  1997/03/28 19:16:24  coelho
+ * unused i removed.
+ *
  * Revision 1.50  1997/03/28 19:10:57  coelho
  * obscure bug on AIX hacked around.
  *
@@ -840,7 +843,7 @@ static void loop_rewrite(loop l)
     if (expression_equal_p(range_lower(r), range_upper(r)))
     {
 	statement s = current_stmt_head();
-	instruction i = statement_instruction(s);
+	/* instruction i = statement_instruction(s); */
 	pips_debug(5, "loop on %s simplified\n", entity_name(loop_index(l)));
 
 	statement_instruction(s) = 
