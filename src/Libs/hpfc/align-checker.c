@@ -8,8 +8,11 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1996/09/21 15:40:13 $, )
- * version $Revision$
+ * $Id$
+ * $Log: align-checker.c,v $
+ * Revision 1.21  1997/03/20 10:22:37  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
