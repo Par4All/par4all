@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.55  1997/05/28 15:48:14  zory
+# *** empty log message ***
+#
 # Revision 1.54  1997/05/28 15:47:49  zory
 # -ansi added to g77.
 #
@@ -110,7 +113,7 @@ ifeq ($(PVM_ARCH),RS6K)
 #
 FC	= xlf
 # FFLAGS	= -O2 -u
-FFLAGS	= -O2 -qarch=pwr2 -qtune=pwr2 -qhot -u
+FFLAGS	= -O2 -qarch=pwr2 -qhot -u
 CC	= xlc
 CFLAGS	= -O2
 #
