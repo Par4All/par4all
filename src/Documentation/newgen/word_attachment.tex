@@ -24,11 +24,14 @@ interface.
 
 Are only a list of {\tt attachment}s:
 
-\domain{attachments = attachment*}
+\domain{attachments = persistent attachment*}
+
+{\tt attachment} is persistent because an attachment is referenced
+twice.
 
 \section{Attachment}
 
-Here is what we can attach to a word:
+Here is what can be attached to a word:
 
 \domain{attachment = attachee x begin:int x end:int}
 
@@ -36,7 +39,7 @@ Here is what we can attach to a word:
 file and {\tt end} the position of its end.
 
 The various objects that can be attached:
-\domain{attachee = persistant entity + unknown:unit}
+\domain{attachee = persistent entity + unknown:unit}
 
 Persistance is need because we do not want the RI to be broken when
 the attachments are freed.
@@ -47,6 +50,10 @@ the attachments are freed.
 %\domain{attachment_to_word = attachment->string}
 
 Each word can have a list of attachments:
-\domain{word_to_attachments = string->attachments}
+\domain{word_to_attachments = persistent string->attachments}
+
+The {\tt string} is persistent since it is already freed by the
+prettyprinter (in fact in \verb|print_sentence()|.
+
 
 \end{document}
