@@ -253,7 +253,11 @@ typedef int Value;
  */
 #define value_uminus(val)  (-(val))
 #define value_not(val)	(~(val))
-#define value_abs(val)     (value_ge(val,VALUE_ZERO)? (val): value_uminus(val))
+#define value_abs(val) (value_posz_p(val)? \
+    (val) :                                \
+    (value_ne((val), VALUE_NAN) ?          \
+      value_uminus(val) :                  \
+      (THROW (overflow_error), VALUE_NAN )))
 
 #define value_pos_p(val)      value_gt(val,VALUE_ZERO)
 #define value_neg_p(val)      value_lt(val,VALUE_ZERO)
@@ -380,7 +384,19 @@ typedef int Value;
 #define value_increment(v) value_addto(v,VALUE_ONE)
 #undef value_decrement
 #define value_decrement(v) value_addto(v,VALUE_MONE)
-#endif
+#undef value_orto
+#define value_orto(ref,val) value_addto(v1,v2)
+#undef value_andto
+#define value_andto(ref,val) value_addto(v1,v2)	
+#undef value_or
+#define value_or(v1,v2) value_fake_binary(v1,v2)
+#undef value_and
+#define value_and(v1,v2) value_fake_binary(v1,v2)
+#undef value_lshift
+#define value_lshift(v1,v2) value_fake_binary(v1,v2)
+#undef value_rshift
+#define value_rshift(v1,v2) value_fake_binary(v1,v2)
+#endif 
 
 
 /* valeur absolue
