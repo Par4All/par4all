@@ -1,5 +1,5 @@
 /* $RCSfile: properties.l,v $ (version $Revision$)
- * $Date: 1997/01/13 20:44:17 $, 
+ * $Date: 1997/01/21 20:31:45 $, 
  * 
  * - 01/96: PIPS_PROPERTIESRC added. FC.
  */
@@ -139,7 +139,8 @@ static void read_properties()
      */
     rc = PROPERTIES_LIB_FILE;
     if ((yyin = fopen(rc, "r")) == NULL)
-	pips_internal_error("no default properties (%s)\n", rc);
+	user_error("read_properties",
+                   "no default properties (%s), check PIPS installation!\n", rc);
     else
 	parse_properties();
     free(rc);
@@ -150,7 +151,8 @@ static void read_properties()
     if (rc)
     {
 	if ((yyin = fopen(rc, "r")) == NULL) 
-	    pips_internal_error("no properties (%s)\n", rc);
+	    user_error("read_properties",
+                       "no properties (%s), check Shell variable $PIPS_PROPERTIESRC\n", rc);
 	else
 	    parse_properties();
     }
