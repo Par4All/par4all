@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1995/03/20 15:35:27 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1995/03/21 08:18:13 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -203,7 +203,7 @@ send_validate()
 
   rsh $validate_host \
   $VALID -r $RUNDIR -l $RESULT -x "$pips_version" \
-         -u $VALIDOPT -f "FILES" $validate_module &
+         -u $VALIDOPT $validate_module &
 
   echo "$validate_module" > $WAITING.$validate_host
 }
@@ -211,9 +211,7 @@ send_validate()
 #
 # get options
 
-unset FILES
-
-while getopts DVudtsvpnhr:l:f:x: opt
+while getopts DVudtsvpnhr:l:x: opt
 do
   case $opt in
     d) DEBUG="debug" ;;
@@ -226,7 +224,6 @@ do
     n) PARALLEL="" ;;
     r) RUNDIR="$OPTARG" ;;
     l) LOCKDIR="$OPTARG" ;;
-    f) FILES="$FILES $OPTARG" ;;
     x) pips_version="$OPTARG" ;;
     h) validate_usage 0 ;;
     u) UPDATE="$OPTARG" ;;
@@ -311,7 +308,7 @@ $VERBOSE "Hosts: $VALHOSTS"
   $DEBUG "   -x $pips_version \ "
   $DEBUG "   -u $VALIDOPT $MODULES"
 
-  exec $VALID -r $RUNDIR -x "$pips_version" -u $VALIDOPT -f "$FILES" $MODULES
+  exec $VALID -r $RUNDIR -x "$pips_version" -u $VALIDOPT $MODULES
 }
 
 #
