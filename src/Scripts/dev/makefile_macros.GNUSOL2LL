@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL2LL,v $ (version $Revision$)
-# $Date: 1996/08/07 18:20:31 $, 
+# $Date: 1996/08/08 20:11:35 $, 
 #
 # this file contains macro definitions 
 
@@ -14,7 +14,7 @@ LD	= $(CC)
 LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L/opt/FSFgdb/lib
 RANLIB	= ranlib
 LEX	= lex
-LFLAGS	= -l
+LFLAGS	= 
 FC	= g77
 FFLAGS	= -O2 -g -Wimplicit -pipe
 LINT	= lint
