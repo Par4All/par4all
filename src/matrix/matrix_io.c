@@ -29,10 +29,14 @@ Pmatrix	a;
 
     for(loop1=1; loop1<=n; loop1++) {
 	for(loop2=1; loop2<=m; loop2++)
-	    matrix_pr_quot(f, MATRIX_ELEM(a,loop1,loop2), MATRIX_DENOMINATOR(a));
+	    matrix_pr_quot(f, 
+			   MATRIX_ELEM(a,loop1,loop2), 
+			   MATRIX_DENOMINATOR(a));
 	(void) fprintf(f,"\n\n");
     }
-    (void) fprintf(f," ......denominator = %d\n",MATRIX_DENOMINATOR(a));
+    (void) fprintf(f," ......denominator = ");
+    (void) fprint_Value(f, MATRIX_DENOMINATOR(a));
+    (void) fprint_Value(f, "\n");
 }
 
 /* void matrix_print(matrice a): print an (nxm) rational matrix
@@ -85,16 +89,16 @@ int * m;			/* row size */
     *a = matrix_new(*n,*m); 
 
     /* read denominator */
-    n_read = fscanf(f," %d",&(MATRIX_DENOMINATOR(*a)));
+    n_read = fscan_Value(f,&(MATRIX_DENOMINATOR(*a)));
     assert(n_read == 1);
     /* necessaires pour eviter les divisions par zero */
-    assert(MATRIX_DENOMINATOR(*a)!=0);
+    assert(value_notzero_p(MATRIX_DENOMINATOR(*a)));
     /* pour "normaliser" un peu les representations */
-    assert(MATRIX_DENOMINATOR(*a) > 0);
+    assert(value_pos_p(MATRIX_DENOMINATOR(*a)));
 
     for(r = 1; r <= *n; r++) 
 	for(c = 1; c <= *m; c++) {
-	    n_read = fscanf(f," %d",&MATRIX_ELEM(*a,r,c));
+	    n_read = fscan_Value(f, &MATRIX_ELEM(*a,r,c));
 	    assert(n_read == 1);
 	}
 }
@@ -108,11 +112,12 @@ int * m;			/* row size */
 /*ARGSUSED*/
 void matrix_pr_quot(f,a,b)
 FILE * f;
-int a;
-int b;
+Value a;
+Value b;
 {	
-    if (a < 0) 
-	(void) fprintf(f," %d ",a);
-    else 
-	(void) fprintf(f,"  %d ",a);
+    if (value_pos_p(a))
+	fprintf(f, " ");
+    fprintf(f, " ");
+    fprint_Value(f, a);
+    fprintf(f, " ");
 }
