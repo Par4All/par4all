@@ -316,7 +316,7 @@ boolean ofl_res;
   if (sc_rn_p(sc)) /* shortcut */
     return TRUE;
 
-  decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, 2);
+  decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, 1);
   decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, 1);
 
   /* else
