@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.21  2003/08/18 14:15:17  coelho
+  callback added.
+
   Revision 1.20  2003/08/18 09:55:09  coelho
   get_exception_name added...
 
@@ -169,7 +172,8 @@ push_exception_on_stack(
     int what,
     char * function,
     char * file,
-    int line)
+    int line,
+    void (*callback)(int))
 {
   exception_debug_trace("PUSH ");
 
@@ -188,6 +192,8 @@ push_exception_on_stack(
   exception_stack[exception_index].file = file;
   exception_stack[exception_index].line = line;
 
+  if (callback) callback(exception_index);
+
   return & exception_stack[exception_index++].where;
 }
 
@@ -203,7 +209,8 @@ pop_exception_from_stack(
     int what,
     char * function,
     char * file,
-    int line)
+    int line,
+    void (*callback)(int))
 {  
   exception_debug_trace("POP  ");
 
@@ -236,6 +243,8 @@ pop_exception_from_stack(
     dump_exception_stack();
     abort();
   }
+
+  if (callback) callback(exception_index);
 }
 
 /* throws an exception of a given type by searching for 
@@ -245,7 +254,8 @@ void throw_exception(
     int what,
     char * function,
     char * file,
-    int line)
+    int line,
+    void (*callback)(int))
 {
   int i;
   
@@ -276,7 +286,9 @@ void throw_exception(
 		exception_stack[i].file,
 		exception_stack[i].line);
 
-      longjmp(exception_stack[i].where,0);
+      if (callback) callback(i);
+
+      longjmp(exception_stack[i].where, 0);
     }
   }
 
@@ -288,3 +300,4 @@ void throw_exception(
   dump_exception_stack();
   abort();
 }
+
