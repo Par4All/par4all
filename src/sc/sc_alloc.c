@@ -48,11 +48,17 @@ Psysteme sc_new(void)
  */
 Pbase sc_to_minimal_basis(Psysteme ps)
 {
-  linear_hashtable_pt seen = linear_hashtable_make();
+  linear_hashtable_pt seen;
   Pbase b = BASE_NULLE;
   Pcontrainte c;
   Pvecteur v;
-  
+
+  /* great optimization */
+  if (!ps->egalites && !ps->inegalites)
+    return BASE_NULLE;
+
+  seen = linear_hashtable_make();
+
   for (c = ps->egalites; c!=NULL; c=c->succ) {
     for (v = c->vecteur; v!=VECTEUR_NUL; v=v->succ) {
       Variable var = var_of(v);
