@@ -179,7 +179,11 @@ number_of_ordered_statements(hash_table h)
 {
     int n = 0;
     STATEMENT_FUNCTION_MAP(s, x, 
-        if (statement_ordering(s)!=STATEMENT_ORDERING_UNDEFINED) n++, h);
+    {
+      pips_assert("variable not used", x==x);
+      if (statement_ordering(s)!=STATEMENT_ORDERING_UNDEFINED) n++;
+    }, 
+			   h);
     return n;
 }
 
@@ -187,7 +191,7 @@ bool
 pipsdbm_consistent_statement_function(gen_chunkp map)
 {
     hash_table h = (map+1)->h;
-    STATEMENT_FUNCTION_MAP(s, not_used, 
+    STATEMENT_FUNCTION_MAP(s, x, 
     {
 	if (gen_type((void*)s)!=statement_domain) return FALSE;
 	if (!gen_consistent_p((void*)x)) return FALSE;
