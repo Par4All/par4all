@@ -15,6 +15,23 @@
 
 #include "sac.h"
 
+#include "dg.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+#include "graph.h"
+
+#include "ray_dte.h"
+#include "sommet.h"
+#include "sg.h"
+#include "polyedre.h"
+
+#include "ricedg.h"
+#include "semantics.h"
+#include "transformations.h"
+
+static graph dependence_graph;
 
 /* Tell if the statement is a "simple statement", ie a statement of the form:
  * X = Y oper Z, X = Y or X = -Y, where arguments are all references or 
@@ -125,34 +142,74 @@ static bool isomorphic_p(statement s1, statement s2)
    return TRUE;
 }
 
-/* Tell if the two statements are independants.
- */
-static bool independant_p(statement s1, statement s2)
+static hash_table successors;
+
+static list statement_successors(statement s)
 {
-   list le1 = load_proper_rw_effects_list(s1);
-   list le2 = load_proper_rw_effects_list(s2);
-
-   for( ; le1 != NIL; le1 = CDR(le1))
+   MAP(VERTEX,
+       a_vertex,
    {
-      for( ; le2 != NIL; le2 = CDR(le2))
+      statement s1 = vertex_to_statement(a_vertex);
+
+      if (s1 == s)
+	 return vertex_successors(a_vertex);
+   },
+       graph_vertices(dependence_graph));
+
+   printf("\n\nno vertice for statement:");
+   print_statement(s);
+   return NIL;
+}
+
+void init_statement_successors_map(list l)
+{
+   successors = hash_table_make(hash_pointer, 0);
+
+   MAP(STATEMENT,
+       s, 
+   {
+      list succ = statement_successors(s);
+
+      if (succ != NIL)
+	 hash_put(successors, (void *)s, (void *)succ);
+   },
+       l);
+}
+
+void free_statement_successors_map()
+{
+   hash_table_free(successors);
+}
+
+/* is s2 a successor of s1 ? */
+bool successor_p(statement s1, statement s2)
+{
+   list succ;
+
+   succ = (list)hash_get(successors, (void*)s1);
+
+   if (succ != HASH_UNDEFINED_VALUE)
+   {
+      MAP(SUCCESSOR, 
+	  s,
       {
-	 effect e1 = EFFECT(CAR(le1));
-	 effect e2 = EFFECT(CAR(le2));
+	 if (vertex_to_statement(successor_vertex(s)) == s2)
+	    return TRUE;
+      }, 
+	  succ);
+   }
+   return FALSE;
+}
 
-	 /* if the statements affect the same variable, both effects must
-	  * be READ effects. 
-	  */
-	 if ( effects_same_variable_p(e1, e2) &&
-	      !(effect_read_p(e1) && effect_read_p(e2)) )
-	 {
-	    fprintf(stderr, "\ns1:\t");
-            print_words(stderr, words_effect(e1));
-            fprintf(stderr, "\ns2:\t");
-            print_words(stderr, words_effect(e2));
+/* WARNING: will most likely crash if s is not in group */
+static bool move_allowed_p(list group, statement s)
+{ 
+   cons * i;
 
-	    return FALSE;
-	 }
-      }
+   for(i = group; STATEMENT(CAR(i)) != s; i = CDR(i))
+   {
+      if (successor_p(STATEMENT(CAR(i)), s))
+	 return FALSE;
    }
 
    return TRUE;
@@ -168,6 +225,7 @@ static bool independant_p(statement s1, statement s2)
 static void simdize_simple_statements(statement s)
 {
    cons * i;
+   list seq;
 
    if (!instruction_sequence_p(statement_instruction(s)))
       /* not much we can do with a single statement, or with
@@ -175,8 +233,11 @@ static void simdize_simple_statements(statement s)
        */
       return;
 
+   seq = sequence_statements(instruction_sequence(statement_instruction(s)));
+   init_statement_successors_map(seq);
+
    /* Traverse to list to group isomorphic statements */
-   for( i = sequence_statements(instruction_sequence(statement_instruction(s)));
+   for( i = seq;
 	i != NIL;
 	i = CDR(i) )
    {
@@ -184,6 +245,7 @@ static void simdize_simple_statements(statement s)
       cons * group_first, * group_last;
       statement si = STATEMENT(CAR(i));
 
+      /* Initialize current group */
       group_first = i;
       group_last = i;
 
@@ -209,7 +271,7 @@ static void simdize_simple_statements(statement s)
 	  * keep searching.
 	  */
 	 if ( isomorphic_p(si,sj) &&
-	      independant_p(si, sj) )
+	      move_allowed_p(group_first, sj) )
 	    /* would also need to check if the move is legal */
 	 {
 	    if (j != CDR(group_last))
@@ -270,7 +332,8 @@ static void simdize_simple_statements(statement s)
       /* skip what has already been matched */
       i = group_last;
    }
-
+   
+   free_statement_successors_map();
 }
 
 static bool simd_simple_sequence_filter(statement s)
@@ -317,6 +380,8 @@ bool simdizer(char * mod_name)
       db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
    set_precondition_map((statement_mapping)
       db_get_memory_resource(DBR_PRECONDITIONS, mod_name, TRUE));
+   dependence_graph = 
+      (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
 
    debug_on("SIMDIZER_DEBUG_LEVEL");
    /* Now do the job */
