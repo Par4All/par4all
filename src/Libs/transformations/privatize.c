@@ -78,7 +78,7 @@ static void scan_statement(statement s, list loops)
 	        gen_find_eq( e, locals ) == entity_undefined ) {
 		locals = CONS( ENTITY, e, locals ) ;
 	    }
-	}, load_statement_cumulated_effects( b )) ;
+	}, load_cumulated_rw_effects_list( b )) ;
 	loop_locals( l ) = CONS( ENTITY, loop_index( l ), locals ) ;
 	scan_statement( b, new_loops ) ;
 	hash_del(get_enclosing_loops_map(), (char *) s) ;
@@ -353,11 +353,11 @@ bool privatize_module(char *mod_name)
 	pips_error("privatize_module", "unstructured expected\n");
 	*/
 
-    set_proper_effects_map( effectsmap_to_listmap((statement_mapping) 
-	db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE)) );
+    set_proper_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
 
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE)) );
+    set_cumulated_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE) );
 
     mod_graph = (graph)
 	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
@@ -382,7 +382,7 @@ bool privatize_module(char *mod_name)
 	    if( action_write_p( effect_action( f ))) {
 		try_privatize( v, st, f, e ) ;
 	    }
-	}, load_statement_proper_effects( st )) ;
+	}, load_proper_rw_effects_list( st )) ;
     }, graph_vertices( mod_graph )) ;
 
     debug_off();
@@ -392,8 +392,8 @@ bool privatize_module(char *mod_name)
     
     reset_current_module_entity();
     reset_current_module_statement();
-    reset_proper_effects_map();
-    reset_cumulated_effects_map();
+    reset_proper_rw_effects();
+    reset_cumulated_rw_effects();
     reset_enclosing_loops_map();
 
     return TRUE;
