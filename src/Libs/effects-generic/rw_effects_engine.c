@@ -359,20 +359,25 @@ static list r_rw_effects_of_sequence(list l_inst)
 	t1 = (*load_transformer_func)(first_statement);    
 	rb_lrw = r_rw_effects_of_sequence(remaining_block);
 
-	ifdebug(5){
-	    pips_debug(5, "R/W effects of first statement: \n");
+	ifdebug(3){
+	    pips_debug(3, "R/W effects of first statement: \n");
 	    (*effects_prettyprint_func)(s1_lrw);
-	    pips_debug(5, "R/W effects of remaining sequence: \n");
+	    pips_debug(3, "R/W effects of remaining sequence: \n");
 	    (*effects_prettyprint_func)(rb_lrw);
-	    if (!transformer_undefined_p(t1))
+	    /* if (!transformer_undefined_p(t1))
 	    {
-		pips_debug(5, "transformer of first statement: %s\n",
+		pips_debug(3, "transformer of first statement: %s\n",
 			   transformer_to_string(t1));		
-	    }
+	    }*/
 	}
-    	    
+    	if (rb_lrw !=NIL)    
 	rb_lrw = (*effects_transformer_composition_op)(rb_lrw, t1); 
-	    
+	else {
+	  ifdebug(3){
+	    pips_debug(3, "warning - no effect on  remaining block\n");
+	   
+	  }
+	}
 	ifdebug(5){
 	    pips_debug(5, "R/W effects of remaining sequence "
 		       "after composition: \n");
