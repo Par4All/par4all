@@ -285,9 +285,9 @@ test_aspect()
   
   (
    for file in ${FILES:-`ls $aspect/*.[cfF]`} ; do
-     name=`basename $file .f`
-     name=`basename $name .F`
-     name=`basename $name .c`
+     name=`basename $file '\.f'`
+     name=`basename $name '\.F'`
+     name=`basename $name '\.c'`
      u_name=`echo $name | tr [a-z] [A-Z]`
      program=$name
 
