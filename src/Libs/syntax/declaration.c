@@ -105,7 +105,8 @@ entity e;
 {
     entity g = local_name_to_top_level_entity(entity_local_name(e));
 
-    if(!entity_undefined_p(g)) {
+    if(!entity_undefined_p(g)
+       && variable_in_module_p(g, get_current_module_entity())) {
 	user_warning("SaveEntity", 
 		     "Ambiguity between external %s and local %s forbidden by Fortran standard\n",
 		     entity_name(g), entity_name(e));
@@ -1246,7 +1247,7 @@ entity c;
     list members = area_layout(type_area(entity_type(c)));
     list equiv_members = NIL;
 
-    (void) fprintf(stderr,"\nLayout for common %s:\n", entity_name(c));
+    (void) fprintf(stderr,"\nLayout for common /%s/:\n", module_local_name(c));
 
     if(ENDP(members)) {
 	(void) fprintf(stderr, "\t* empty area *\n\n");
