@@ -471,8 +471,11 @@ ci: name TK_EQUALS expression
 		free($1);
 
 		if(strcmp(buffer,"END")==0||strcmp(buffer,"ERR")==0) {
+		  /*
 		  Warning("parser", 
 			  "Control effects of IO clauses END and ERR are ignored\n");
+			  */
+		  ;
 		}
 
 		(void) strcat(buffer, "=");
