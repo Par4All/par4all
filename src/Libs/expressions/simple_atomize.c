@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1998/12/26 20:25:01 $, 
+ * $Date: 1998/12/30 13:07:54 $, 
  */
 
 #include <stdio.h>
@@ -15,20 +15,22 @@
 #include "control.h" /* for CONTROL_MAP() */
 #include "transformations.h"
 
-/* void atomize_as_required(stat, expr_decide, func_decide, test_decide, new)
+/* void atomize_as_required(stat, ref_decide, call_decide, test_decide, range_decide, while_decide, new)
  * statement stat;
- * bool (*expr_decide)(ref r, expression e);
- * bool (*func_decide)(ref r, expression e);
- * bool (*test_decide)(expression e);
+ * bool (*ref_decide)(ref r, expression e);
+ * bool (*call_decide)(call r, expression e);
+ * bool (*test_decide)(test t, expression e);
+ * bool (*range_decide)(range r, expression e), 
+ * bool (*while_decide)(whileloop w, expression e), 
  * entity (*new)(entity m, tag t);
  *
  * atomizes the given statement as driven by the given functions.
  * ??? does not care of any side effect and so.
  * 
- * - expr_decide tells whether or not to atomize for reference r
+ * - ref_decide tells whether or not to atomize for reference r
  *   and expression indice e of this reference. If yes, expression e
  *   is computed outside.
- * - func_decide tells whether or not to atomize for call c
+ * - call_decide tells whether or not to atomize for call c
  *   and argument expression e...
  * - test_decide tells whether expression condition e of a test
  *   should be atomized or not.
@@ -40,10 +42,14 @@ static void atomize_object(gen_chunk*);
 
 /* static functions used
  */
-static bool (*expr_atomize_decision)(/* ref r, expression e */) = NULL;
-static bool (*func_atomize_decision)(/* call c, expression e */)= NULL;
+static bool (*ref_atomize_decision)(/* ref r, expression e */) = NULL;
+static bool (*call_atomize_decision)(/* call c, expression e */)= NULL;
 static bool (*test_atomize_decision)(/* expression e */) = NULL;
+static bool (*range_atomize_decision)(/* range r, expression e */)= NULL;
+static bool (*while_atomize_decision)(/* whileloop w, expression e */)= NULL;
+
 static entity (*create_new_variable)(/* entity m, tag t */) = NULL;
+
 
 /* the stack of the encoutered statements is maintained
  * to be able to insert the needed computations just before the
@@ -60,32 +66,6 @@ void simple_atomize_error_handler()
 {
     error_reset_current_statement_stack();
     error_reset_current_control_stack();
-}
-
-static bool cont_filter(c)
-control c;
-{
-    current_control_push(c);
-    return(TRUE);
-}
-
-static void cont_rewrite(c)
-control c;
-{
-    (void) current_control_pop();
-}
-
-static bool stat_filter(s)
-statement s;
-{
-    current_statement_push(s);
-    return(TRUE);
-}
-
-static void stat_rewrite(s)
-statement s;
-{
-    (void) current_statement_pop();
 }
 
 /* s is inserted before the current statement. 
@@ -194,7 +174,7 @@ reference r;
      {
 	 expression *pe = (expression*) REFCAR(ce);
 	 
-	 if ((*expr_atomize_decision)(r, *pe))
+	 if ((*ref_atomize_decision)(r, *pe))
 	 {
 	     syntax saved = expression_syntax(*pe);
 
@@ -217,7 +197,7 @@ call c;
      {
 	 expression *pe = (expression*) REFCAR(ce);
 
-	 if ((*func_atomize_decision)(c, *pe))
+	 if ((*call_atomize_decision)(c, *pe))
 	 {
 	     syntax saved = expression_syntax(*pe);
 
@@ -230,13 +210,60 @@ call c;
     return(TRUE);
 }
 
+
+static void exp_range_filter (range r, expression e)			     
+{
+  expression *pe = &e;
+  
+  if ((*range_atomize_decision)(r, *pe))
+    {
+      syntax saved = expression_syntax(*pe);
+	     
+      compute_before_current_statement(pe);
+      atomize_object(saved);
+    }
+}
+
+static bool range_filter(range r)
+{
+  /* lower */
+  exp_range_filter(r, range_lower(r));
+
+  /* upper */
+  exp_range_filter(r, range_upper(r));
+
+  /* increment */
+  exp_range_filter(r, range_increment(r));
+
+  return(TRUE);
+}
+
+
 static bool test_filter(t)
 test t;
 {
     expression *pe = &test_condition(t);
 
-    if ((*test_atomize_decision)(*pe)) 
-    {
+    if ((*test_atomize_decision)(t, *pe)) 
+      {
+	syntax saved = expression_syntax(*pe);
+
+	/*   else I have to break the condition
+	 *   and to complete the recursion.
+	 */
+	compute_before_current_statement(pe);
+	atomize_object(saved);
+    }
+
+    return(TRUE);
+}
+
+static bool whileloop_filter(whileloop w)
+{
+  expression *pe = &whileloop_condition(w);
+
+  if ((*while_atomize_decision)(w, *pe)) 
+      {
 	syntax saved = expression_syntax(*pe);
 
 	/*   else I have to break the condition
@@ -254,33 +281,43 @@ gen_chunk *obj;
 {
     gen_multi_recurse
 	(obj,
-	 control_domain, cont_filter, cont_rewrite,   /* CONTROL */
-	 statement_domain, stat_filter, stat_rewrite, /* STATEMENT */
+	 control_domain, current_control_filter, 
+	                 current_control_rewrite,     /* CONTROL */
+	 statement_domain, current_statement_filter, 
+                         current_statement_rewrite,   /* STATEMENT */
 	 reference_domain, ref_filter, gen_null,      /* REFERENCE */
 	 test_domain, test_filter, gen_null,          /* TEST */
          call_domain, call_filter, gen_null,          /* CALL */
+	 range_domain, range_filter, gen_null,        /* RANGE */
+	 whileloop_domain, whileloop_filter, gen_null,/* WHILELOOP */
 	 NULL);
 }
 
-void atomize_as_required(stat, expr_decide, func_decide, test_decide, new)
-statement stat;
-bool (*expr_decide)();
-bool (*func_decide)();
-bool (*test_decide)();
-entity (*new)();
+void atomize_as_required(
+  statement stat, 
+  bool (*ref_decide)(reference, expression), /* reference */
+  bool (*call_decide)(call, expression), /* call */
+  bool (*test_decide)(test, expression), /* test */
+  bool (*range_decide)(range, expression), /* range */
+  bool (*while_decide)(whileloop, expression), /* whileloop */
+  entity (*new)())
 {
     make_current_statement_stack();
     make_current_control_stack();
-    expr_atomize_decision = expr_decide;
-    func_atomize_decision = func_decide;
+    ref_atomize_decision = ref_decide;
+    call_atomize_decision = call_decide;
     test_atomize_decision = test_decide;
+    range_atomize_decision = range_decide;
+    while_atomize_decision = while_decide;
     create_new_variable = new;
     
     atomize_object(stat);
 
-    expr_atomize_decision = NULL;
-    func_atomize_decision = NULL;
+    ref_atomize_decision = NULL;
+    call_atomize_decision = NULL;
     test_atomize_decision = NULL;
+    range_atomize_decision = NULL;
+    while_atomize_decision = NULL;
     create_new_variable = NULL;
     free_current_statement_stack();
     free_current_control_stack();
@@ -288,3 +325,7 @@ entity (*new)();
 
 /*  that is all
  */
+
+
+
+
