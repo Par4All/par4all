@@ -189,13 +189,11 @@ un temps raisonnable */
 #define NB_INEQ_MAX2  50
 
 /*  Nombre de contraintes au dela duquel l'algorithme du simplexe
-    est preferable a l'algorithme de Fourier-Motzkin: 20
+    est preferable a l'algorithme de Fourier-Motzkin:
     (However, the average optimal is lower, or another decision
     procedure should be investigated)
 */
 #define NB_CONSTRAINTS_MAX_FOR_FM 20
-
-
 
 /* ensemble de macros permettant de compiler les programmes utilisant
 les anciens noms des fonctions */
@@ -231,7 +229,5 @@ les anciens noms des fonctions */
  sc_integer_projection_along_variables((fsc),(sc),(ib),(pv),(ti),(dim),(n))
 #define integer_projection(sci,sc,v) \
  sc_integer_projection_along_variable((sci),(sc),(v))
-
-
 
 #endif SYSTEME
