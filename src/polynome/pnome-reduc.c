@@ -5,8 +5,11 @@
  */
 
 #include <stdio.h>
-#include <sys/stdtypes.h> /*for debug with dbmalloc */
+/*for debug with dbmalloc */
+/*
+#include <sys/stdtypes.h>
 #include <malloc.h>
+*/
 #include <assert.h>
 
 #include "boolean.h"
@@ -160,23 +163,31 @@ Ppolynome pp;
  */
 Pbase polynome_used_var(pp, is_inferior_var)
 Ppolynome pp;
-boolean (*is_inferior_var)();
+boolean (*is_inferior_var)(Pvecteur *, Pvecteur *);
 {
-    Pbase b = (Pbase) VECTEUR_NUL;
-    Pbase b2;
+    Pbase b = BASE_NULLE;
+    Pbase b2 = BASE_NULLE;
+    Ppolynome pm = POLYNOME_UNDEFINED;
 
     if (!POLYNOME_UNDEFINED_P(pp)) {
-	for ( ; !POLYNOME_NUL_P(pp); pp = polynome_succ(pp)) {
-	    b2 = base_union(b, (Pbase) monome_term(polynome_monome(pp)));
+	for (pm = pp; !POLYNOME_NUL_P(pm); pm = polynome_succ(pm)) {
+	    b2 = base_union(b, (Pbase) monome_term(polynome_monome(pm)));
 	    b = b2;
 	}
     
+	/* FI: I do not understand what has been done here! (20/09/95) */
 	/* b2 = (Pbase) vect_tri((Pvecteur) b, is_inferior_var); */
-	b2 = (Pbase) vect_sort((Pvecteur) b, vect_compare);
+	/* FI: vect_compare() seems only good when Value=char * */
+	/* b2 = (Pbase) vect_sort((Pvecteur) b, vect_compare); */
+	b2 = (Pbase) vect_sort((Pvecteur) b, is_inferior_var);
 	vect_rm((Pvecteur) b);
-
-	return (b2);
     }
+    else {
+	polynome_error("polynome_used_var", 
+		       "POLYNOME_UNDEFINED out of domain\n");
+	b2 = BASE_UNDEFINED;
+    }
+    return b2;
 }
 
 
@@ -214,4 +225,6 @@ Ppolynome pp1,pp2;
     
 
     /* TO BE CONTINUED */
+    polynome_error ("polynome_equal", "To be implemented!\n");
+    return FALSE;
 }
