@@ -149,6 +149,7 @@ Menu_item menu_item;
   char *label = (char *) xv_get(menu_item, MENU_STRING);
   char *modulename = db_get_current_module_name();
   int win1, win2;
+  Icon icon_number, icon_number2;
 
   if (modulename == NULL) {
     prompt_user("No module selected");
@@ -160,25 +161,32 @@ Menu_item menu_item;
     prompt_user("None of the text-windows is available");
     return;
   }
-
+  icon_number = icon_number2 = -1;
   if (strcmp(label, USER_VIEW) == 0) {
     print_type = DBR_PARSED_PRINTED_FILE;
+    icon_number = user_ICON;
   }
   else if (strcmp(label, SEQUENTIAL_VIEW) == 0) {
     print_type = DBR_PRINTED_FILE;
+    icon_number = sequential_ICON;
   }
   else if (strcmp(label, PARALLEL_VIEW) == 0) {
     print_type = DBR_PARALLELPRINTED_FILE;
+    icon_number = parallel_ICON;
   }
   else if (strcmp(label, CALLGRAPH_VIEW) == 0) {
     print_type = DBR_CALLGRAPH_FILE;
+    icon_number = callgraph_ICON;
   }
   else if (strcmp(label, ICFG_VIEW) == 0) {
     print_type = DBR_ICFG_FILE;
+    icon_number = ICFG_ICON;
   }
   else if (strcmp(label, DISTRIBUTED_VIEW) == 0) {
     print_type = DBR_WP65_COMPUTE_FILE;
+    icon_number = WP65_PE_ICON;
     print_type_2 = DBR_WP65_BANK_FILE;
+    icon_number2 = WP65_bank_ICON;
   }
   else if (strcmp(label, DEPENDENCE_GRAPH_VIEW) == 0) {
     print_type = DBR_DG_FILE;
@@ -200,6 +208,8 @@ Menu_item menu_item;
 	 FRAME_BUSY, TRUE,
 	 NULL);
 	
+  set_pips_icon(edit_frame[win1], icon_number, modulename);
+
   xv_set(edit_textsw[win1], 
 	 TEXTSW_FILE, build_view_file(print_type),
 	 TEXTSW_BROWSING, TRUE,
@@ -230,6 +240,8 @@ Menu_item menu_item;
 	   FRAME_BUSY, TRUE,
 	   NULL);
     
+    set_pips_icon(edit_frame[win2], icon_number2, modulename);
+
     xv_set(edit_textsw[win2], 
 	   TEXTSW_FILE, build_view_file(print_type_2),
 	   TEXTSW_BROWSING, TRUE,
