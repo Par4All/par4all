@@ -107,6 +107,9 @@ while (%changed)
 
 #print STDERR "RESULTS:\n";
 
+# module -> count in how many cycles it appears
+my %vertex_count = ();
+
 foreach my $module (keys %indirect_callees)
 {
     #print STDERR "$module: ",
@@ -115,6 +118,15 @@ foreach my $module (keys %indirect_callees)
 
     if (exists ${$indirect_callees{$module}}{$module})
     {
-	print STDOUT "recursion on $module: ${$indirect_callees{$module}}{$module}\n";
+	my $cycle = ${$indirect_callees{$module}}{$module};
+	print STDOUT "recursion on $module: $cycle\n";
+        foreach my $m (split /->/, $cycle) {
+	    $vertex_count{$m}++;
+	}       
     }
+}
+
+for my $module (keys %vertex_count)
+{
+    print STDOUT "$module count is $vertex_count{$module}\n";
 }
