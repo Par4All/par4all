@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/31 08:58:25 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/31 11:13:41 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -428,7 +428,6 @@ header:
 	echo "#define ${dir_simple_name}_header_included" ;\\
 	cat $(TARGET)-local.h ;\\
 	$(PROTOIZE)  $(INC_CFILES) \\
-		| sed 's|,[ 	]*/\*\.\.\.\*/|, ...|g;s,int .*__builtin_va_alist.*\([,\)]\),\1,' ;\\
 	echo "#endif" ; \\
 	} > $(INC_TARGET).tmp
 	mv $(INC_TARGET).tmp $(INC_TARGET)
