@@ -184,6 +184,65 @@ entity e;
 }
 
 
+/* a hash table to map entities to their numbers of elements
+ *
+ * This table is critical to compute use-def chains at an acceptable
+ * speed because the computation of a variable allocated space
+ * is very slow. Declaration are preserved in PIPS and constant
+ * expressions must be evaluated.
+ *
+ * Note: the current implementation is not safe. The hash table
+ * may be kept from module to module (which should be OK) and 
+ * from workspace to workspace, which is not.
+ *
+ * This is an unusual object because it's life time is the
+ * workspace life time and not the module analysis life time.
+ * This hash table acts as a cache of the symbol table.
+ */
+static hash_table entity_to_size = hash_table_undefined;
+
+void set_entity_to_size()
+{
+    if (entity_to_size != hash_table_undefined) {
+	user_warning("set_entity_to_size",
+		     "hash table should have been deallocated\n");
+	hash_table_clear(entity_to_size);
+    }
+
+    entity_to_size = hash_table_make(hash_pointer, 0);
+}
+
+void reset_entity_to_size()
+{
+    if (entity_to_size == hash_table_undefined) {
+	user_warning("reset_entity_to_size",
+		     "hash table should have been allocated\n");
+    }
+    else {
+	hash_table_clear(entity_to_size);
+	entity_to_size = hash_table_undefined;
+    }
+}
+
+int storage_space_of_variable(entity v)
+{
+    /* Storage size is expressed in bytes */
+    int l;
+
+    if (entity_to_size == hash_table_undefined) {
+	user_warning("storage_space_of_variable",
+		     "hash table should have been allocated\n");
+	entity_to_size = hash_table_make(hash_pointer, 0);
+    }
+
+    if ((l = (int) hash_get(entity_to_size, (char *) v))
+	== (int) HASH_UNDEFINED_VALUE) {
+	l = SizeOfArray(v);
+	hash_put(entity_to_size, (char *) v, (char *) l);
+    }
+
+    return l;
+}
 
 #define INTERVAL_INTERSECTION(a,b,c,d) (!((b) <= (c) || (d) <= (a)))
 
@@ -194,10 +253,6 @@ this function returns TRUE if e1 and e2 have some memory locations in common
 bool entity_conflict_p(e1, e2)
 entity e1, e2;
 {
-    /* a hash table to map entities to their number of elements */
-    /* FI: how do you reset this table when a workspace is closed? */
-    /* static hash_table entity_to_size = (hash_table) NULL; */
-
     bool intersect_p = FALSE;
     storage s1, s2;
     ram r1 = ram_undefined, r2 = ram_undefined;
@@ -212,19 +267,7 @@ entity e1, e2;
     if (! (storage_ram_p(s1) && storage_ram_p(s2)))
 	return intersect_p;
 
-    /*
-    if (entity_to_size == (hash_table) NULL)
-	entity_to_size = hash_table_make(hash_pointer, 0);
-	*/
-
-    /*
-    if ((l1 = (int) hash_get(entity_to_size, (char *) e1)) == (int) HASH_UNDEFINED_VALUE) {
-	l1 = SizeOfArray(e1);
-	hash_put(entity_to_size, (char *) e1, (char *) l1);
-    }
-    */
-
-    l1 = SizeOfArray(e1);
+    l1 = storage_space_of_variable(e1);
 
     r1 = storage_ram(s1);
     f1 = ram_function(r1);
@@ -232,14 +275,7 @@ entity e1, e2;
     o1 = ram_offset(r1);
     l1 = l1+o1-1;
 
-    /*
-    if ((l2 = (int) hash_get(entity_to_size, (char *) e2)) == (int) HASH_UNDEFINED_VALUE) {
-	l2 = SizeOfArray(e2);
-	hash_put(entity_to_size, (char *) e2, (char *) l2);
-    }
-    */
-
-    l2 = SizeOfArray(e2);
+    l2 = storage_space_of_variable(e2);
 
     r2 = storage_ram(s2);
     f2 = ram_function(r2);
