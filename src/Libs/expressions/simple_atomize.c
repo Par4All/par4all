@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1998/12/30 13:07:54 $, 
+ * $Date: 1998/12/30 16:53:55 $, 
  */
 
 #include <stdio.h>
@@ -82,12 +82,12 @@ statement s;
 
     if (!control_undefined_p(cc) && control_statement(cc)==cs)
     {
-	/* it is in an unstructured, and s is to be inserted properly
-	 */
+      /* it is in an unstructured, and s is to be inserted properly
+       */
 	bool seen;
 	control newc;
 
-	debug(8, "insert_before_current_statement", "unstructured\n");
+	pips_debug(8, "unstructured\n");
 
 	newc = make_control(s, control_predecessors(cc), 
 			    CONS(CONTROL, cc, NIL));
@@ -120,11 +120,15 @@ statement s;
     }
     else
     {
-	debug(7, "insert_before_current_statement", "statement\n");
-
-	if (instruction_block_p(i))
-	    instruction_block(i) =
-		CONS(STATEMENT, s, instruction_block(i));
+	pips_debug(7, "statement\n");
+	
+	if (instruction_block_p(i)) {
+	  list /* of statement */ block = instruction_block(i);
+	  /* insert statement before the last one */
+	  block = gen_insert_before(s, 
+				    STATEMENT(CAR(gen_last(block))), 
+				    block);
+	}
 	else
 	    statement_instruction(cs) =
 		make_instruction_block(
@@ -167,7 +171,7 @@ expression *pe;
     insert_before_current_statement(stat);
 }
 
-static bool ref_filter(r)
+static void ref_rwt(r)
 reference r;
 {
     MAPL(ce, 
@@ -176,104 +180,99 @@ reference r;
 	 
 	 if ((*ref_atomize_decision)(r, *pe))
 	 {
-	     syntax saved = expression_syntax(*pe);
-
-	     compute_before_current_statement(pe);
-	     atomize_object(saved);
+	   /* syntax saved = expression_syntax(*pe);*/
+	   compute_before_current_statement(pe);
+	   /* atomize_object(saved); */
 	 }
      },
 	 reference_indices(r));
 
-    return(FALSE);
+    /* return(FALSE);*/
 }
 
-static bool call_filter(c)
-call c;
+static void call_rwt(call c)
 {
-    if (same_string_p(entity_local_name(call_function(c)), IMPLIED_DO_NAME))
-	return(FALSE); /* (panic mode:-) */
-
-    MAPL(ce, 
-     {
+  if (same_string_p(entity_local_name(call_function(c)), IMPLIED_DO_NAME))
+    return; /* (panic mode:-) */
+  
+  MAPL(ce, 
+       {
 	 expression *pe = (expression*) REFCAR(ce);
 
 	 if ((*call_atomize_decision)(c, *pe))
-	 {
-	     syntax saved = expression_syntax(*pe);
-
+	   {
+	     /* syntax saved = expression_syntax(*pe);*/
+	     
 	     compute_before_current_statement(pe);
-	     atomize_object(saved);
-	 }
-     },
+	     /* atomize_object(saved); */
+	   }
+       },
 	 call_arguments(c));
-
-    return(TRUE);
 }
 
 
-static void exp_range_filter (range r, expression e)			     
+static void exp_range_rwt (range r, expression * pe)			     
 {
-  expression *pe = &e;
   
   if ((*range_atomize_decision)(r, *pe))
     {
-      syntax saved = expression_syntax(*pe);
+      /* syntax saved = expression_syntax(*pe); */
 	     
       compute_before_current_statement(pe);
-      atomize_object(saved);
+      /* atomize_object(saved);*/
     }
 }
 
-static bool range_filter(range r)
+static void range_rwt(range r)
 {
   /* lower */
-  exp_range_filter(r, range_lower(r));
+  exp_range_rwt(r, &range_lower(r));
 
   /* upper */
-  exp_range_filter(r, range_upper(r));
+  exp_range_rwt(r, &range_upper(r));
 
   /* increment */
-  exp_range_filter(r, range_increment(r));
+  exp_range_rwt(r, &range_increment(r));
 
-  return(TRUE);
+  /* return(TRUE);*/
 }
 
 
-static bool test_filter(t)
+static void test_rwt(t)
 test t;
 {
     expression *pe = &test_condition(t);
 
     if ((*test_atomize_decision)(t, *pe)) 
       {
-	syntax saved = expression_syntax(*pe);
+	/* syntax saved = expression_syntax(*pe);*/
 
 	/*   else I have to break the condition
 	 *   and to complete the recursion.
 	 */
 	compute_before_current_statement(pe);
-	atomize_object(saved);
+	/* atomize_object(saved); */
     }
 
-    return(TRUE);
+    /* return(TRUE);*/
 }
 
-static bool whileloop_filter(whileloop w)
+static void whileloop_rwt(whileloop w)
 {
   expression *pe = &whileloop_condition(w);
 
   if ((*while_atomize_decision)(w, *pe)) 
       {
-	syntax saved = expression_syntax(*pe);
+	/* syntax saved = expression_syntax(*pe); */
 
 	/*   else I have to break the condition
 	 *   and to complete the recursion.
 	 */
 	compute_before_current_statement(pe);
-	atomize_object(saved);
+	/* atomize_object(saved);*/
     }
 
-    return(TRUE);
+  /* return(TRUE);*/
 }
 
 static void atomize_object(obj)
@@ -285,11 +284,11 @@ gen_chunk *obj;
 	                 current_control_rewrite,     /* CONTROL */
 	 statement_domain, current_statement_filter, 
                          current_statement_rewrite,   /* STATEMENT */
-	 reference_domain, ref_filter, gen_null,      /* REFERENCE */
-	 test_domain, test_filter, gen_null,          /* TEST */
-         call_domain, call_filter, gen_null,          /* CALL */
-	 range_domain, range_filter, gen_null,        /* RANGE */
-	 whileloop_domain, whileloop_filter, gen_null,/* WHILELOOP */
+	 reference_domain, gen_true, ref_rwt,      /* REFERENCE */
+	 test_domain, gen_true, test_rwt,          /* TEST */
+         call_domain, gen_true, call_rwt,          /* CALL */
+	 range_domain, gen_true, range_rwt,        /* RANGE */
+	 whileloop_domain, gen_true, whileloop_rwt,/* WHILELOOP */
 	 NULL);
 }
 
