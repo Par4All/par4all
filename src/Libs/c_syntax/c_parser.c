@@ -1,5 +1,8 @@
 /* $id$
    $Log: c_parser.c,v $
+   Revision 1.4  2003/08/13 07:58:41  nguyen
+   Add compilation_unit_parser
+
    Revision 1.3  2003/08/06 14:12:55  nguyen
    Upgraded version of C parser
 
@@ -103,6 +106,13 @@ void CParserError(char *msg)
   pips_user_error(msg);
 }
 
+static bool is_compilation_unit(string module_name)
+{
+  /* To be modified, the static function also has FILE_SEP_STRING */
+  if (strstr(module_name,FILE_SEP_STRING) != NULL)
+    return TRUE;
+  return FALSE;
+}
 
 static bool actual_c_parser(string module_name, string dbr_file)
 {
@@ -114,20 +124,26 @@ static bool actual_c_parser(string module_name, string dbr_file)
 
     debug_on("C_SYNTAX_DEBUG_LEVEL");
  
-    if (strstr(module_name,FILE_SEP_STRING) != NULL)
+    if (is_compilation_unit(module_name))
       {
-	/* Special case : compilation unit module */
 	MakeCurrentSourceFileEntity(module_name);
+	/* I do not know to put this where to avoid repeated creations*/
+	MakeTopLevelEntity(); 
       }
-
-    /* I do not know to put this where to avoid repeated creations*/
-    MakeTopLevelEntity(); 
 
     /* yacc parser is called */
     c_in = safe_fopen(file_name, "r");
     c_parse();
     safe_fclose(c_in, file_name);
-    
+
+    if (is_compilation_unit(module_name))
+      {
+	ResetCurrentSourceFileEntity();	
+	DB_PUT_MEMORY_RESOURCE(DBR_DECLARATIONS, 
+			       module_name, 
+			       (char *) "");    
+      }
+ 
     pips_assert("Module statement is consistent",statement_consistent_p(ModuleStatement));
     ifdebug(2)
       {
@@ -143,10 +159,7 @@ static bool actual_c_parser(string module_name, string dbr_file)
 			   module_name, 
 			   (char *) make_callees(NIL));
     /* Should generate a list of callees called_modules */
-
-    if (strstr(module_name,FILE_SEP_STRING) != NULL)
-      ResetCurrentSourceFileEntity();
-
+  
     free(file_name);
     file_name = NULL;
     reset_keyword_typedef_table();
@@ -163,3 +176,9 @@ bool c_parser_tmp(string module_name)
 {
   return actual_c_parser(module_name,DBR_SOURCE_FILE);
 }
+
+bool compilation_unit_parser(string module_name)
+{
+  return actual_c_parser(module_name,DBR_C_SOURCE_FILE);
+}
+
