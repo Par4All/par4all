@@ -494,6 +494,13 @@ reset_value_mappings(void)
     hash_value_to_name = hash_table_undefined;
 }
 
+/* To be called by error handler only. Potential memory leak. */
+void 
+error_reset_value_mappings(void)
+{
+    reset_value_mappings();
+}
+
 /* Normal call to free the mappings */
 
 void 
