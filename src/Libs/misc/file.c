@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/30 14:56:15 $, 
+ * $Date: 1997/10/30 16:18:10 $, 
  */
 
 #include <unistd.h>
@@ -470,14 +470,18 @@ safe_cat(FILE * out, FILE * in)
 }
 
 void 
-safe_append(FILE * out, string file, int margin)
+safe_append(
+    FILE * out        /* where to output the file content */, 
+    string file       /* the content of which is appended */, 
+    int margin        /* number of spaces for shifting */ ,
+    bool but_comments /* do not shift F77 comment lines */)
 {
     FILE * in = safe_fopen(file, "r");
     bool first = TRUE;
     int c, i;
     while ((c=getc(in))!=EOF)
     {
-	if (first) /* beginning of a line. */
+	if (first && (!but_comments || (c!='C' && c!='c' && c!='*' && c!='!')))
 	{
 	    for (i=0; i<margin; i++) 
 		if (putc(' ', out)==EOF)
