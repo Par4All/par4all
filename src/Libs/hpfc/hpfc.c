@@ -1,7 +1,10 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1997/01/18 16:28:02 $, )
- * version $Revision$
+ * $Id$
+ * $Log: hpfc.c,v $
+ * Revision 1.92  1997/03/20 10:11:38  coelho
+ * better RCS headers.
+ *
  */
  
 #include "defines-local.h"
