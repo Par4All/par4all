@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.121  1998/05/08 14:49:12  irigoin
+%% Property SEMANTICS_FILTERED_PRECONDITIONS added
+%%
 %% Revision 1.120  1998/03/17 16:13:16  coelho
 %% HPFC_OPTIMIZE_REMAPPINGS added.
 %%
@@ -64,7 +67,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/03/17 16:13:16 $~$
+$~$Date: 1998/05/08 14:49:12 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -863,6 +866,17 @@ selectable.
 
 \begin{verbatim}
 SEMANTICS_INEQUALITY_INVARIANT FALSE
+\end{verbatim}
+
+\subsubsection{Prettyprint}
+
+Preconditions reflect by default all knowledge gathered about the current
+state (i.e. store). However, it is possible to restrict the information to
+variables actually read or written, directly or indirectly, by the
+statement following the precondition.
+
+\begin{verbatim}
+SEMANTICS_FILTERED_PRECONDITIONS FALSE
 \end{verbatim}
 
 \subsubsection{Debugging}
