@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.46  1998/10/19 15:44:10  irigoin
+ * Comments for ELSEIF construct moved up into the previous block for
+ * easier/better prettyprint when the code is structured.
+ *
  * Revision 1.45  1998/10/15 16:18:56  irigoin
  * Update to handle labelled ELSEIFs for EDF
  *
@@ -1316,12 +1320,17 @@ MakeElseInst(bool is_else_p)
     if (strcmp("ELSE", BlockStack[CurrentBlock-1].l))
 	ParserError("MakeElseInst", "block if statement badly nested\n");
 
-    if (is_else_p && has_comments_p) {
+    if (has_comments_p) {
 	/* Generate a CONTINUE to carry the comments but not the label
            because the ELSE is not represented in the IR and cannot carry
-           comments whereas the ELSEIF is transformed into an IF which can
-           carry comments and label. The current label is temporarily
-           hidden. */
+           comments. The ELSEIF is transformed into an IF which can carry
+           comments and label but the prettyprint of structured code is
+           nicer if the comments are carried by a CONTINUE in the previous
+           block. Of course, this is not good for unstructured code since
+           comments end up far from their intended target or attached to
+	   a dead CONTINUE if the previous block ends up with a GO TO.
+
+	   The current label is temporarily hidden. */
 	string ln = strdup(get_current_label_string());
 	reset_current_label_string();
 	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
