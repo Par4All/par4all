@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.67  2000/05/09 14:54:50  phamdinh
+    add_one_line_of_comment function added.
+
     Revision 1.66  2000/05/09 14:52:36  nguyen
     2 functions added
 
@@ -2099,6 +2102,44 @@ statement update_statement_instruction(statement s,instruction i)
       statement_instruction(s) = i;
     }
   return s;
+}
+
+/* as name indicate, a comment is added.
+ */
+#define ERROR_PREFIX "!ERROR: "
+#define BUFSIZE 1024
+
+void add_one_line_of_comment(statement s, string format, ...)
+{
+  char buffer[BUFSIZE];
+  int error;
+  va_list some_arguments;
+
+  va_start(some_arguments, format);
+  error = vsnprintf(buffer, BUFSIZE, format, some_arguments);
+  if (error<0) {
+      pips_internal_error("buffer too small");
+  }
+  va_end(some_arguments);
+
+  if (s) 
+  {
+      if (string_undefined_p(statement_comments(s)) || statement_comments(s)==NULL) 
+      {
+	  statement_comments(s) = strdup(concatenate(ERROR_PREFIX, buffer, "\n", NULL));
+      }
+      else 
+      {
+	  string newcom = 
+	      strdup(concatenate(statement_comments(s), ERROR_PREFIX, buffer, "\n", NULL));
+	  free(statement_comments(s));
+	  statement_comments(s) = newcom;
+      }
+  }
+  else
+  {
+      fprintf(stderr, ERROR_PREFIX "%s\n", buffer);
+  }
 }
 
 
