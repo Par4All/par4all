@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 2000/02/29 15:19:53 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 2000/04/12 12:26:16 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2126,6 +2126,116 @@ int (*allocated_memory)() ;
 	dp->ex.copy = copy ;
 	dp->ex.allocated_memory = allocated_memory ;
 }
+
+/**************************************************** Type Translation Table */
+
+typedef struct 
+{
+  int size;
+  int old_to_actual[MAX_DOMAIN];
+  int actual_to_old[MAX_DOMAIN];
+} gen_type_translation_t, * gen_type_translation_p;
+
+static gen_type_translation_t 
+gen_type_translation_default_table(void)
+{
+  gen_type_translation_t table;
+  int i;
+
+  table.size=MAX_DOMAIN;
+
+  for (i=0; i<MAX_DOMAIN; i++)
+  {
+    table.old_to_actual[i] = i;
+    table.actual_to_old[i] = i;
+  }
+
+  return table;
+}
+
+/* returns the allocated line read, whatever its length.
+ * returns NULL on EOF. also some asserts. FC 09/97.
+ */
+char * gen_read_string(FILE * file, char upto)
+{
+    int i=0, size = 20, c;
+    char * buf = (char*) malloc(sizeof(char)*size), * res;
+    message_assert("malloc ok", buf);
+    while((c=getc(file)) && c!=EOF && c!=upto)
+    {
+	if (i==size-1) /* larger for trailing '\0' */
+	{
+	    size+=20; 
+	    buf = (char*) realloc((char*) buf, sizeof(char)*size);
+	    message_assert("realloc ok", buf);
+	}
+	buf[i++] = (char) c;
+    }
+    if (c==EOF && i==0) { res = NULL; free(buf); }
+    else { buf[i++] = '\0'; res = strdup(buf); free(buf); }
+
+    return res;
+}
+
+static gen_type_translation_p
+gen_type_translation_read_table(string filename)
+{
+  gen_type_translation_t table;
+  FILE * file;
+  int i, j, k;
+
+  struct {
+    string name;
+    int number;
+    string definition;
+  } items[MAX_DOMAIN];
+
+  file = fopen(filename, "r");
+
+  if (!file) 
+    user("cannot open type translation file \"%s\"\n", file);
+
+  if (!fscanf(file, "%d", &table.size))
+    user("type translation file format error");
+
+  if (table.size>MAX_DOMAIN)
+    user("too many types in translation table");
+
+  /* set to 0 */
+  for (i=0; i<MAX_DOMAIN; i++)
+  {
+    items[i].name = NULL;
+    items[i].number = -1;
+    items[i].definition = NULL;
+  }
+
+  /* read data */
+  for (i=0; 
+       i<table.size &&
+	 (items[i].name = gen_read_string(file, ' ')) &&
+	 fscanf(file, "%d", &items[i].number) &&
+	 (items[i].definition = gen_read_string(file, '\n'));
+       i++);
+
+  /* build conversion... */
+  for (i=0; i<MAX_DOMAIN; i++)
+  {
+    /* quick check for identity */
+    if (items[i].number!=-1 && items[i].name && 
+	Domains[i].name && Domains[i].index)
+      ;
+  }
+
+  /* missing */
+  return NULL;
+}
+
+static void 
+gen_type_translation_write_table(string file, gen_type_translation_t table)
+{
+  return;
+}
+
 
 /* GEN_MAKE_ARRAY allocates an initialized array of NUM gen_chunks. */
 
