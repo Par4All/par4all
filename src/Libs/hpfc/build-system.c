@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/12/19 15:52:32 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1996/02/15 14:17:43 $, ) 
  * version $Revision$
  */
 
@@ -547,18 +547,14 @@ entity array;
 	      * (|a|!=1) |a| * (LALPHA_i - 1) + IOTA_j == DELTA_j
 	      *           0 <= IOTA_j < |a|
 	      */
-	     entity
-		 delta = entity_undefined;
-	     int 
-		 tdim = -1,
-		 a = 0,
-		 b = 0;
+	     entity delta, template = array_to_template(array);
+	     int tdim, pdim, a, b, n;
 	     
 	     get_alignment(array, dim, &tdim, &a, &b);
-	     	     
 	     pips_assert("aligned dimension", a!=0 && tdim!=0);
+	     get_distribution(template, tdim, &pdim, &n);
 	     
-	     delta = get_ith_block_dummy(tdim);
+	     delta = get_ith_block_dummy(pdim);
 
 	     if (abs(a)==1)
 	     {
@@ -571,8 +567,7 @@ entity array;
 	     }
 	     else
 	     {
-		 entity
-		     iota = get_ith_shift_dummy(tdim);
+		 entity iota = get_ith_shift_dummy(pdim);
 		 Pvecteur
 		     v1 = vect_make(VECTEUR_NUL,
 				    (Variable) lalpha, 	abs(a),
@@ -581,7 +576,6 @@ entity array;
 				    TCST, 	-abs(a));
 
 		 sc_add_egalite(syst, contrainte_make(v1));
-		 
 		 sc_add_inegalite(syst,
 				  contrainte_make(vect_new((Variable) iota, 
 						  -1)));
@@ -604,11 +598,7 @@ entity array;
 		 template = array_to_template(array),
 		 processor = template_to_processors(template);
 	     int 
-		 gamma_0 = 0,
-		 tdim = -1,
-		 pdim = -1,
-		 a = 0,
-		 b = 0,
+		 gamma_0 = 0, tdim = -1, pdim = -1, a = 0, b = 0,
 		 n, plow, pup, tlow, tup, alow, aup;
 	     
 	     get_alignment(array, dim, &tdim, &a, &b);
@@ -621,8 +611,8 @@ entity array;
 	     get_entity_dimensions(template, tdim, &tlow, &tup);
 	     get_entity_dimensions(processor, pdim, &plow, &pup);
 
-	     delta = get_ith_block_dummy(tdim);
-	     gamma = get_ith_cycle_dummy(tdim);
+	     delta = get_ith_block_dummy(pdim);
+	     gamma = get_ith_cycle_dummy(pdim);
 
 	     gamma_0 = (a*alow + b - tlow) % (n * (pup - plow + 1));
 
@@ -649,11 +639,7 @@ entity array;
 		 template = array_to_template(array),
 		 processor = template_to_processors(template);
 	     int 
-		 gamma_0 = 0,
-		 tdim = -1,
-		 pdim = -1,
-		 a = 0,
-		 b = 0,
+		 gamma_0 = 0, tdim = -1, pdim = -1, a = 0, b = 0,
 		 n, icn, plow, pup, tlow, tup, alow, aup;
 	     
 	     get_alignment(array, dim, &tdim, &a, &b);
@@ -666,10 +652,10 @@ entity array;
 	     get_entity_dimensions(template, tdim, &tlow, &tup);
 	     get_entity_dimensions(processor, pdim, &plow, &pup);
 
-	     sigma = get_ith_auxiliary_dummy(tdim);
-	     iota = get_ith_shift_dummy(tdim);
-	     delta = get_ith_block_dummy(tdim);
-	     gamma = get_ith_cycle_dummy(tdim);
+	     sigma = get_ith_auxiliary_dummy(pdim);
+	     iota = get_ith_shift_dummy(pdim);
+	     delta = get_ith_block_dummy(pdim);
+	     gamma = get_ith_cycle_dummy(pdim);
 
 	     gamma_0 = (a*alow + b - tlow) % (n * (pup - plow + 1));
 	     icn = iceil(n, abs(a));
