@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/12/26 10:51:32 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/12/26 16:07:57 $, )
  * version $Revision$
  */
  
@@ -356,6 +356,16 @@ reset_resources_for_module()
 
 }
 
+/* removes DOALL ???
+ */
+static void loop_rwt(loop l) 
+{ execution_tag(loop_execution(l)) = is_execution_sequential;}
+static void
+clean_the_code(statement s)
+{
+    gen_recurse(s, loop_domain, gen_true, loop_rwt);
+}
+
 static void 
 compile_module(entity module)
 {
@@ -380,6 +390,8 @@ compile_module(entity module)
     /*   ACTUAL COMPILATION
      */
     hpf_compiler(s, &host_stat, &node_stat);
+    clean_the_code(host_stat);
+    clean_the_code(node_stat);
 
     if (entity_main_module_p(module))
 	add_pvm_init_and_end(&host_stat, &node_stat);
