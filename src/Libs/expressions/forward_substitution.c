@@ -20,6 +20,9 @@
  * An important issue is to only perform the substitution only if correct.
  *
  * $Log: forward_substitution.c,v $
+ * Revision 1.3  1998/03/31 17:53:15  coelho
+ * special case "x = a(i); a(j) = x+1;" is substituted before stopping.
+ *
  * Revision 1.2  1998/03/31 17:17:45  coelho
  * cleaner + debug level.
  *
@@ -45,11 +48,15 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
-typedef struct {
-    statement source;
-    entity var;
-    expression val;
-} t_substitution, * p_substitution;
+/* structure to hold a substitution to be performed forward.
+ */
+typedef struct
+{
+    statement source; /* the statement where the definition was found. */
+    entity var;       /* maybe could be a reference to allow arrays? */
+    expression val;   /* the result of the substitution. */
+}
+    t_substitution, * p_substitution;
 
 #define DEBUG_NAME "FORWARD_SUBSTITUTION_DEBUG_LEVEL"
 
@@ -78,7 +85,7 @@ functionnal_on(
  * (4) there are no side effects in the expression
  */
 static p_substitution
-substitution_candidate(statement s)
+substitution_candidate(statement s, bool only_scalar)
 {
     list /* of expression */ args;
     call c;
@@ -91,26 +98,41 @@ substitution_candidate(statement s)
     
     c = instruction_call(i);
     fun = call_function(c);
-    args = call_arguments(c);
 
     if (!ENTITY_ASSIGN_P(fun)) return NULL; /* ASSIGN */
 
+    args = call_arguments(c);
     pips_assert("2 args to =", gen_length(args)==2);
     svar = expression_syntax(EXPRESSION(CAR(args)));
     pips_assert("assign to a reference", syntax_reference_p(svar));
     var = reference_variable(syntax_reference(svar));
 
-    if (!entity_scalar_p(var)) return NULL; /* SCALAR */
+    if (only_scalar && !entity_scalar_p(var)) return NULL; /* SCALAR */
 
     if (!functionnal_on(var, s)) return NULL; /* NO SIDE EFFECTS */
 
     subs = (p_substitution) malloc(sizeof(t_substitution));
 
     subs->source = s;
-    subs->var = var;
+    subs->var = var; /* ?? could be the expression for array propagation? */
     subs->val = EXPRESSION(CAR(CDR(args)));
 
     return subs;
+}
+
+/* x = a(i) ; a(j) = x;
+ * we can substitute x but it cannot be continued.
+ * just a hack for this very case at the time. 
+ * maybe englobing parallel loops or dependence information could be use for 
+ * a better decision? I'll think about it on request only.
+ */
+static bool
+cool_enough_for_a_last_substitution(statement s)
+{
+    p_substitution x = substitution_candidate(s, FALSE);
+    bool ok = (x!=NULL);
+    free(x);
+    return ok;
 }
 
 /* do perform the substution var -> val everywhere in s
@@ -170,8 +192,7 @@ some_conflicts_between(statement s1, statement s2)
     return FALSE;
 }
 
-/* forward substitution in SEQUENCES only.
- * MUST be top down, hence done in flt;
+/* top-down forward substitution of scalars in SEQUENCE only.
  */
 static bool
 seq_flt(sequence s)
@@ -179,7 +200,7 @@ seq_flt(sequence s)
     MAPL(ls, 
     {
 	statement first = STATEMENT(CAR(ls));
-	p_substitution subs = substitution_candidate(first);
+	p_substitution subs = substitution_candidate(first, TRUE);
 	if (subs)
 	{
 	    /* scan following statements and substitute while no conflicts.
@@ -187,11 +208,21 @@ seq_flt(sequence s)
 	    MAP(STATEMENT, anext,
 	    {
 		if (some_conflicts_between(subs->source, anext))
-		    break; /* stop propagation */
+		{
+		    /* for some special case the substitution is performed.
+		     */
+		    if (cool_enough_for_a_last_substitution(anext))
+			perform_substitution(subs->var, subs->val, anext);
+
+		    /* now STOP propagation!
+		     */
+		    break; 
+		}
 		else
 		    perform_substitution(subs->var, subs->val, anext);
 	    },   
 		CDR(ls));
+
 	    free(subs);
 	}
     },
@@ -210,6 +241,8 @@ forward_substitute(string module_name)
 
     debug_on(DEBUG_NAME);
 
+    /* set require resources.
+     */
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     set_current_module_statement((statement)
         db_get_memory_resource(DBR_CODE, module_name, TRUE));
@@ -220,8 +253,12 @@ forward_substitute(string module_name)
 
     stat = get_current_module_statement();
 
+    /* do the job here:
+     */
     gen_recurse(stat, sequence_domain, seq_flt, gen_null);
 
+    /* return result and clean.
+     */
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stat);
 
     reset_cumulated_rw_effects();
