@@ -1,0 +1,34 @@
+#! /bin/sh
+
+#
+# Build [-w wspace] [-m module] resource
+#
+
+USAGE="Usage: Build [-w wspace] [-m module] resource"
+
+if [ $# -eq 0 ]
+then	echo $USAGE >&2
+	exit 2
+fi
+
+while getopts w:m: opt
+do
+	case $opt in
+	w)	OPT_PGM=$OPTARG;;
+	m)	OPT_MOD=$OPTARG;;
+	\?)	echo $USAGE >&2
+		exit 2;;
+	esac
+done
+shift `expr $OPTIND - 1`
+
+if [ $# -eq 1 ]
+then
+	RES=$1
+	shift
+else
+	echo $USAGE >&2
+	exit 1
+fi
+
+Pips -w "$OPT_PGM" -m "$OPT_MOD" -b $RES || exit 1;
