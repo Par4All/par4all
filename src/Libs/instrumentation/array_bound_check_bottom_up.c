@@ -1023,7 +1023,7 @@ static void bottom_up_abc_statement(statement module_statement)
 
 
 
-bool bottom_up_array_bound_check(char *module_name)
+bool array_bound_check_bottom_up(char *module_name)
 { 
   statement module_statement;  
   set_current_module_entity(local_name_to_top_level_entity(module_name));
