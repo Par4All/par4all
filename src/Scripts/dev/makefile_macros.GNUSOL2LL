@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL2LL,v $ (version $Revision$)
-# $Date: 1996/08/07 10:53:40 $, 
+# $Date: 1996/08/07 10:57:15 $, 
 #
 # this file contains macro definitions 
 
@@ -8,7 +8,7 @@ AR	= gar
 ARFLAGS	= rv
 CC	= gcc
 CFLAGS	= -O2 -g -Wall -msupersparc -pipe
-CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -D__USE_FIXED_PROTOTYPES__ -nostdinc -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR)
+CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -D__USE_FIXED_PROTOTYPES__ -I. -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR)
 LD	= $(CC) 
 LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(PIPS_EXTEDIR) 
 RANLIB	= granlib
