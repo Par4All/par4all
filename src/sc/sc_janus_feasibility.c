@@ -28,6 +28,7 @@ struct problem Z;
 
 #define FTRACE fdebug
 //sc must be consistant
+//return TRUE if janus can handle, FALSE if not
 static boolean 
 sc_to_iproblem(Psysteme sc)
 {
@@ -35,7 +36,7 @@ sc_to_iproblem(Psysteme sc)
   // int nbrows, nbcolumns; // common temporary counter i,j 
   Pcontrainte peq;
   Pvecteur pv;
-  //  Value v;
+  Value v;
 
   //Janus 
   // int p6,p5,p4,p3,p2,p1;
@@ -152,11 +153,13 @@ sc_to_iproblem(Psysteme sc)
     {      
       for (pv=sc->base,j=1; !VECTEUR_NUL_P(pv); pv=pv->succ,j++)
 	{     
-	  v = value_uminus(vect_coeff(vecteur_var(pv),peq->vecteur));
-	  I.a[i][j] = v;	 
+	  value_assign(v,value_uminus(vect_coeff(vecteur_var(pv),peq->vecteur)));
+	  I.a[i][j] = VALUE_TO_INT(v);
+	  if (value_ne(INT_TO_VALUE(I.a[i][j]),v)) {return FALSE;} //coeff exceeds the limit of type int
 	}
-       v = vect_coeff(TCST,peq->vecteur);
-       I.d[i]= v;
+       value_assign(v,vect_coeff(TCST,peq->vecteur));
+       I.d[i]= VALUE_TO_INT(v);
+       if (value_ne(INT_TO_VALUE(I.d[i]),v)) {return FALSE;} //coeff exceeds the limit of type int
     }
 	
   //inegalites
@@ -164,11 +167,13 @@ sc_to_iproblem(Psysteme sc)
     {      
       for (pv=sc->base,j=1; !VECTEUR_NUL_P(pv); pv=pv->succ,j++)
 	{     
-	  v = value_uminus(vect_coeff(vecteur_var(pv),peq->vecteur));
-	  I.a[i][j] = v;	 
+	  value_assign(v,value_uminus(vect_coeff(vecteur_var(pv),peq->vecteur)));
+	  I.a[i][j] = VALUE_TO_INT(v);
+	  if (value_ne(INT_TO_VALUE(I.a[i][j]),v)) {return FALSE;} //coeff exceeds the limit of type int
 	}
-       v = vect_coeff(TCST,peq->vecteur);
-       I.d[i]= v;
+       value_assign(v,vect_coeff(TCST,peq->vecteur));
+       I.d[i]= VALUE_TO_INT(v);
+       if (value_ne(INT_TO_VALUE(I.d[i]),v)) {return FALSE;} //coeff exceeds the limit of type int
     }   
      
   /**************** END to insert MATRIX into structure *********************/ 
@@ -186,6 +191,7 @@ sc_janus_feasibility(Psysteme sc)
   
   /**************** BEGIN execution simplexe entier classique */
   if (ok) r = isolve(&I,&Z,0);
+  else return(9); //means Janus is not ready for this sc
   /*
   if (r==VRFIN) printf("solution finie\n") ;
   else if (r==VRVID) printf("polyedre vide\n") ;
