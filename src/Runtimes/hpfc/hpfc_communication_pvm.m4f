@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.16  1997/06/06 14:46:13  zory
+! another too long line
+!
 ! Revision 1.15  1997/06/06 14:44:15  zory
 ! one line was too long :-(
 !
@@ -561,7 +564,8 @@ _CM5(
       include "hpfc_commons.h"
       integer info
       debug(print *, "hcast - ", MCAST HOST)
-      call HPFC BCAST ROOT(MAX SIZE OF PROCS, NODE TIDS(1), MCAST HOST, info)
+      call HPFC BCAST ROOT(MAX SIZE OF PROCS, NODE TIDS(1), MCAST HOST,
+     $     info)
       MCAST HOST = MCAST HOST + 2
       debug(print *, "hcast done")
       end
