@@ -651,15 +651,15 @@ typing_arguments_of_user_function(call c, type_context_p context)
   else if (na < nt)
   {
     add_one_line_of_comment((statement) stack_head(context->stats), 
-			    "Too few argument(s) to '%s'!",
-			    entity_local_name(call_function(c)));
+			    "Too few argument(s) to '%s' (%d<%d)!",
+			    entity_local_name(call_function(c)), na, nt);
     context->number_of_error++;
   }
   else
   {
     add_one_line_of_comment((statement) stack_head(context->stats), 
-			    "Too many argument(s) to '%s'!",
-			    entity_local_name(call_function(c)));	
+			    "Too many argument(s) to '%s' (%d>%d)!",
+			    entity_local_name(call_function(c)), na, nt);
     context->number_of_error++;
   }
   
