@@ -8,9 +8,13 @@
 #include "contrainte.h"
 #include "sc.h"
 
-/* Psysteme sc_elim_redund(Psysteme ps):
- * elimination des contraintes lineaires redondantes dans le systeme par test
- * de faisabilite
+/* Psysteme sc_inequations_elim_redund(Psysteme ps):
+ *
+ * Elimination des contraintes lineaires redondantes dans le systeme par
+ * test de faisabilite. Le polyedre rationnel definit par ps peut etre
+ * augmente par cette procedure qui utilise contrainte_reverse() et un
+ * test de faisabilite: E(ps) peut etre strictement inclu dans E(ps'). Les
+ * sommets rationnels du systeme generateur de ps ne sont pas respectes.
  *
  * Remarque: il ne faut pas appliquer de normalisation du systeme apres
  *  inversion de la contrainte et avant le test de faisabilite en RATIONELS, 
