@@ -134,7 +134,7 @@ done
 $verb getting raw ${addpublic}:
 for p in ${addpublic}
 do
-    (cd `dirname $p`; gtar cf - `basename $p`) | (cd $cwd/$name; gtar xf -)
+    (cd `dirname $p`; $tar cf - `basename $p`) | (cd $cwd/$name; $tar xf -)
 done
 
 #
