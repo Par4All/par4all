@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/07/15 13:15:02 $, )
+# ($Date: 1996/08/07 15:24:54 $, )
 #
 
 RUN=':'
@@ -13,17 +13,17 @@ SCRIPT=`basename $0`
 
 usage()
 {
-  echo "usage: $SCRIPT [-flx] directory files ($2)";
+  echo "usage: $SCRIPT -(f|l|x|r prgm)  directory files ($2)";
   exit ${1:-1}
 }
 
-while getopts flx opt
+while getopts flxr opt
 do
   case $opt in
     f) RUN=':' ;;
-    l) if test "`type granlib|grep 'not found'`" ; 
-       then RUN=ranlib; else RUN=granlib; fi;;
+    l) RUN='ranlib' ;;
     x) RUN='chmod a+x' ;;
+    r) RUN="$OPTARG" ;;
     *) usage 4 "unexpected option ($opt)" ;;
   esac
 done
