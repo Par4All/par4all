@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1996/09/14 17:41:48 $, ) 
+ * ($Date: 1996/10/17 10:50:33 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -154,7 +154,7 @@ void fprint_entity_list(FILE *fp, list l);
 #define RCV_FR_mCS      "HPFC RCVFR mCS"
 #define RCV_FR_mCH      "HPFC RCVFR mCH"
 
-#define CMP_COMPUTER    "HPFC_CMPCOMPUTER"
+#define CMP_COMPUTER    "HPFC CMPCOMPUTER"
 #define CMP_OWNERS      "HPFC CMPOWNERS"
 #define CMP_NEIGHBOUR   "HPFC CMPNEIGHBOUR"
 #define CMP_LID		"HPFC CMPLID"
