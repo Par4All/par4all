@@ -1,8 +1,6 @@
-/* 	%A% ($Date: 1997/07/25 13:34:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char vcid_syntax_reader[] = "%A% ($Date: 1997/07/25 13:34:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
+/*
+ * $Id$
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -123,14 +121,54 @@ char vcid_syntax_reader[] = "%A% ($Date: 1997/07/25 13:34:37 $, ) version $Revis
 LOCAL int Stmt[STMTLENGTH];
 LOCAL int iStmt, lStmt; 
 
-/*
- * le buffer contenant le commentaire courant, l'indice courant.
+/*********************************************************** COMMENT BUFFER */
+
+/* le buffer contenant le commentaire courant, l'indice courant.
  */
-#define COMMLENGTH (8192)
-char Comm[COMMLENGTH];
-char PrevComm[COMMLENGTH];
-int iComm = 0;
-int iPrevComm = 0;
+
+#define INITIAL_COMMENT_BUFFER_SIZE (1024)
+char * Comm = NULL, * PrevComm = NULL;
+int iComm = 0, iPrevComm = 0;
+static int CommSize = 0;
+
+/* lazy initialization of the comment buffer
+ */
+static void 
+init_comment_buffers(void)
+{
+    if (CommSize!=0) return;
+
+    CommSize = INITIAL_COMMENT_BUFFER_SIZE;
+    Comm = (char*) malloc(CommSize);
+    PrevComm = (char*) malloc(CommSize);
+    pips_assert("malloc ok", Comm && PrevComm);
+}
+
+static void
+resize_comment_buffers(void)
+{
+    int NewCommSize = CommSize*2;
+    char * tmp;
+
+    pips_assert("comment buffer is initialized", CommSize!=0);
+    
+    /* Comm */
+    tmp = (char*) malloc(NewCommSize);
+    strncpy(tmp, Comm, CommSize);
+    free(Comm);
+    Comm = tmp;
+
+    /* PrevComm */
+    tmp = (char*) malloc(NewCommSize);
+    strncpy(tmp, PrevComm, CommSize);
+    free(PrevComm);
+    PrevComm = tmp;
+
+    CommSize = NewCommSize;
+
+    pips_assert("malloc ok", Comm && PrevComm);
+}
+
 
 /*
  * Une variable pour traiter les quotes. Petit automate a 3 etats:
@@ -247,7 +285,9 @@ static bool parser_warn_for_columns_73_80 = TRUE;
 void 
 init_parser_reader_properties()
 {
-  parser_warn_for_columns_73_80 = get_bool_property("PARSER_WARN_FOR_COLUMNS_73_80");
+    parser_warn_for_columns_73_80 = 
+	get_bool_property("PARSER_WARN_FOR_COLUMNS_73_80");
+    init_comment_buffers();
 }
 
 
@@ -275,16 +315,15 @@ void FindAutre();
 void FindPoints();
 
 int 
-syn_wrap()
+syn_wrap(void)
 {
 	return(1);
 }
 
-/*
- * La fonction a appeler pour l'analyse d'un nouveau fichier.
+/* La fonction a appeler pour l'analyse d'un nouveau fichier.
  */
 void 
-ScanNewFile()
+ScanNewFile(void)
 {
     register int i;
     static int FirstCall = TRUE;
@@ -319,20 +358,20 @@ ScanNewFile()
     iLine = lLine = UNDEF;
 }
 
-/*
- * Fonction appelee par sslex sur la reduction de la regle de reconnaissance
+/* Fonction appelee par sslex sur la reduction de la regle de reconnaissance
  * des mot clefs. Elle recherche si le mot 's' est un mot clef, retourne sa
  * valeur si oui, et indique une erreur si non.
  */
 int 
-IsCapKeyword(s)
-char * s;
+IsCapKeyword(char * s)
 {
     register int i, c;
     char *kwcour, *t;
-    static char buffer[32];
+    char buffer[32];
 
     debug(9, "IsCapKeyword", "%s\n", s);
+    
+    pips_assert("not too long keyword", strlen(s)<32);
 
     /* la chaine s est mise en majuscules */
     t = buffer;
@@ -366,8 +405,7 @@ char * s;
 
 /* Routine de lecture pour l'analyseur lexical, lex ou flex */
 int 
-PipsGetc(fp)
-FILE * fp;
+PipsGetc(FILE * fp)
 {
     int eof = FALSE;
     int c;
@@ -422,8 +460,7 @@ FILE * fp;
  * replaced by the string "\n".
  */
 int 
-GetChar(fp)
-FILE * fp;
+GetChar(FILE * fp)
 {
     int c = UNDEF;
     static int buffer[LINELENGTH], ibuffer = UNDEF, lbuffer = UNDEF;
@@ -486,7 +523,8 @@ FILE * fp;
 	    }
 	    else {
 		col += 1;
-		if(col > 72 && !LineTooLong && !in_comment && parser_warn_for_columns_73_80) {
+		if(col > 72 && !LineTooLong && !in_comment && 
+		   parser_warn_for_columns_73_80) {
 		    user_warning("GetChar",
 				 "Line %d truncated, col=%d and lbuffer=%d\n",
 				 LineNumber, col, lbuffer);
@@ -495,7 +533,9 @@ FILE * fp;
 		/* buffer[lbuffer++] = (col > 72) ? ' ' : c; */
 		/* buffer[lbuffer++] = (col > 72) ? '\n' : c; */
 		if(col <= 72 || in_comment) {
-		  /* last columns cannot be copied because we might be inside a character string */
+		  /* last columns cannot be copied because we might be 
+		   * inside a character string
+		   */
 		  buffer[lbuffer++] = c;
 		}
 		if (c != ' ')
@@ -558,10 +598,11 @@ FILE * fp;
     return(c);
 }
 
-/* regroupementde la ligne initiale et des lignes suite en un unique buffer, Line */
+/* regroupementde la ligne initiale et des lignes suite en un unique buffer,
+ * Line 
+ */
 int 
-ReadLine(fp)
-FILE * fp;
+ReadLine(FILE * fp)
 {
     static char QuoteChar = '\000';
     int TypeOfLine;
@@ -572,13 +613,13 @@ FILE * fp;
     /* on entre dans ReadLine avec Column = 1 */
     pips_assert("ReadLine", Column == 1);
 
-    /*
-     * on lit le label et le caractere de continuation de la premiere
+    /* on lit le label et le caractere de continuation de la premiere
      * ligne non vide et non ligne de commentaire.
      *
      * Modification:
      *  - an empty line is assumed to be a comment line
      */
+
     if(iComm!=0) {
 	Comm[iComm] = '\0';
 	(void) strcpy(PrevComm, Comm);
@@ -590,45 +631,25 @@ FILE * fp;
 	iPrevComm = iComm;
 	PrevComm[0] = '\0';
     }
+
     while (strchr(START_COMMENT_LINE,(c = GetChar(fp))) != NULL) {
 	if (tmp_b_C == UNDEF)
 	    tmp_b_C = LineNumber;
 
-	/* Modif by AP: oct 18th 1995
-
-	   Deals with comment buffer overflow. If the buffer is full, we
-	   just skip everything else. */
-	/*
-	if(iComm >= COMMLENGTH-2)
-	    while((c = GetChar(fp)) != '\n') 
-		continue;
-	else {
-	    do {
-		Comm[iComm++] = c;
-	    } while((c = GetChar(fp)) != '\n' && iComm < COMMLENGTH-2);
-	    if(iComm >= COMMLENGTH-2)
-		while((c = GetChar(fp)) != '\n')
-		    continue;
-	    else
-		Comm[iComm++] = c;
-	}
-	*/
 	ifdebug(8) {
 	    if(c=='\n')
 		debug(8, "ReadLine", "Empty comment line detected\n");
 	}
+
 	while(c!=EOF) {
-	    if(iComm < COMMLENGTH-2)
-		Comm[iComm++] = c;
-	    if(c=='\n')
-		break;
+	    if (iComm >= CommSize-2)
+		resize_comment_buffers();
+	    Comm[iComm++] = c;
+	    if(c=='\n') break;
 	    c = GetChar(fp);
 	}
 
     }
-    if(iComm >= COMMLENGTH-2)
-	user_warning("ReadLine", 
-		     "Too many comment lines. Truncation occured.\n");
 
     if (c != EOF) {
 	/*
@@ -642,7 +663,8 @@ FILE * fp;
 		}
 		else {
 		    user_warning("ReadLine", 
-				 "Unexpected character '%c' (0x%x)\n", c, (int) c);
+				 "Unexpected character '%c' (0x%x)\n", 
+				 c, (int) c);
 		    ParserError("ReadLine",
 				"non numeric character in label!\n");
 		}
