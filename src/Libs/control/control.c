@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/06/03 08:26:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/06/05 14:36:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1998/06/03 08:26:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1998/06/05 14:36:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -91,8 +91,14 @@ cons *l;
     return(CONS(CONTROL, x, l));
 }
 
+/* Add control "pred" to the predecessor set of control c */
 #define ADD_PRED(pred,c) (pushnew(pred,control_predecessors(c)))
+/* Make a one element list from succ */
 #define ADD_SUCC(succ,c) (CONS(CONTROL, succ, NIL))
+/* Update control c by setting its statement to s, by unioning its predecessor
+ * set with pd, and by setting its successor set to sc (i.e. previous successors
+ * are lost, but not previous predecessors).
+ */
 #define UPDATE_CONTROL(c,s,pd,sc) { \
 	control_statement(c)=s; \
 	MAPL(preds, {control_predecessors(c) = \
@@ -254,7 +260,7 @@ bool controlize(
 	   "(st = %p, pred = %p, succ = %p, c_res = %p)\nst at entry:\n",
 		   st, pred, succ, c_res);
 	print_statement(st);
-	pips_debug(1, "Successors of c_res:\n");
+	pips_debug(1, "Successors of c_res %p:\n", c_res);
 	display_linked_control_nodes(c_res);
 	check_control_coherency(pred);
 	check_control_coherency(succ);
@@ -322,7 +328,7 @@ bool controlize(
     ifdebug(5) {
 	pips_debug(1, "st at exit:\n");
 	print_statement(st);
-	pips_debug(1, "Successors of c_res at exit:\n");
+	pips_debug(1, "Successors of c_res %p at exit:\n", c_res);
 	display_linked_control_nodes(c_res);
 	fprintf(stderr, "---\n");
 	check_control_coherency(pred);
@@ -333,7 +339,7 @@ bool controlize(
     update_used_labels(used_labels, label, st);
     return(controlized);
 }
-	
+
 /* CONTROLIZE_CALL controlizes the call C of statement ST in C_RES. The deal
    is to correctly manage STOP; since we don't know how to do it, so we
    assume this is a usual call !! */
@@ -567,13 +573,20 @@ hash_table used_labels;
     pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	       st, pred, succ, c_res);
     
-    /* c_res = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL); */
     controlize(whileloop_body(l), c_res, c_res, c_body, loop_used_labels);
 
     if(covers_labels_p(whileloop_body(l),loop_used_labels)) {
 	whileloop new_l = make_whileloop(whileloop_condition(l),
 					 control_statement(c_body),
 					 whileloop_label(l));
+
+	/* The edges between c_res and c_body, created by the above call to 
+	 * controlize are useless. The edge succ
+	 * from c_res to c_body is erased by the UPDATE_CONTROL macro.
+	 */
+	gen_remove(&control_successors(c_body), c_res);
+	gen_remove(&control_predecessors(c_body), c_res);
+	gen_remove(&control_predecessors(c_res), c_body);
 
 	UPDATE_CONTROL(c_res,
 		       make_statement(statement_label(st),
