@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/25 20:17:04 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/26 12:08:13 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -158,11 +158,8 @@ install_utl_dir='$(ROOT)/Utils';
 
 case $PART in
   PIPS) ;;
-  NEWGEN)
-    # ??? the html doc is installed with pips
-    install_utl_dir='$(ROOT)/Share' ;;
-  LINEAR)
-    install_utl_dir='$(ROOT)/Share' ;;
+  NEWGEN) ;;
+  LINEAR) ;;
   *) usage 6 "unexpected PART=$PART" ;;
 esac
 
@@ -660,14 +657,14 @@ tar:
 
 quick-install: .quick-install
 
-.makefile: \$(PIPS_ROOT)/Utils/pips-makemake
+.makefile: \$(ROOT)/Utils/pips-makemake
 	# 
 	# regenerating Makefile
 	#
 	pips-makemake ${PIPSMKMK_OPTION}; touch .makefile
 
 generate_makefile_if_necessary_and_possible:
-	@[ ! -x \$(PIPS_ROOT)/Utils/pips-makemake ] || \\
+	@[ ! -x \$(ROOT)/Utils/pips-makemake ] || \\
 	    \$(MAKE) \$(GMKNODIR) .makefile 
 
 count:;	@wc -l \$(ALL_SOURCES)
