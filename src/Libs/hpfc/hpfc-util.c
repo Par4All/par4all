@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/08/30 15:20:47 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/09/12 14:34:30 $, )
  * version $Revision$
  */
 
@@ -246,10 +246,10 @@ gen_chunk* obj;
  */
 
 static int 
-    unique_integer_number,
-    unique_float_number,
-    unique_logical_number,
-    unique_complex_number;
+    unique_integer_number = 0,
+    unique_float_number = 0,
+    unique_logical_number = 0,
+    unique_complex_number = 0;
 
 void reset_unique_numbers()
 {
@@ -279,8 +279,8 @@ basic base;
 	case is_basic_logical:
 	    sprintf(buffer,"%s%d", HPFLOGICALPREFIX, unique_logical_number++);
 	    break;
-    case is_basic_complex:
-	    sprintf(buffer,"%s%d",HPFCOMPLEXPREFIX, unique_complex_number++);
+	case is_basic_complex:
+	    sprintf(buffer,"%s%d", HPFCOMPLEXPREFIX, unique_complex_number++);
 	    break;
 	default:
 	    pips_error("NewTemporaryVariable", "basic not welcomed, %d\n",
@@ -295,7 +295,7 @@ basic base;
     pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(base));
 
     e = make_scalar_entity(buffer, module_local_name(module), base);
-    AddEntityToDeclarations(e,module);
+    AddEntityToDeclarations(e, module);
     
     return e;
 }
