@@ -1,7 +1,3 @@
-/* explicit types: Value may be larger than a pointer (e.g. long long)
- */
-%type <Value> const
-%type <Variable> ident
 
 %{
 
@@ -15,13 +11,13 @@
 #include "contrainte.h"
 #include "sc.h"
 
-extern char yytext[]; /* dialogue avec l'analyseur lexical */
+extern int yyerror(char*);
+extern int yylex(void);
+
+boolean yysyntax_error;
 
 Psysteme ps_yacc;
 
-boolean syntax_error;
-
-Value valcst;
 Value fac;        /* facteur multiplicatif suivant qu'on analyse un terme*/
                       /* introduit par un moins (-1) ou par un plus (1) */
 
@@ -38,7 +34,6 @@ Pcontrainte eq;   /* pointeur sur l'egalite ou l'inegalite
    
 Pvecteur cp ;   /* pointeur sur le membre courant             */ 
 
-
 short int operat;    /* dernier operateur rencontre                 */
 
 
@@ -53,25 +48,30 @@ short int operat;    /* dernier operateur rencontre                 */
 #define GAUCHE 2
 #define NULL 0
 %}
-
-%token ACCFERM		/* accolade fermante */ 1
-%token ACCOUVR		/* accolade ouvrante */ 2
-%token CONSTANTE	/* constante entiere sans signe a recuperer dans yytext */ 3
-%token EGAL		/* signe == */ 4
-%token IDENT		/* identificateur de variable a recuperer dans yytext */ 5
-%token INF		/* signe < */ 6
-%token INFEGAL		/* signe <= */ 7
-%token MOINS		/* signe - */ 8
-%token PLUS		/* signe + */ 9
-%token SUP		/* signe > */ 10
-%token SUPEGAL		/* signe >= */ 11
-%token VAR		/* mot reserve VAR introduisant la liste de variables */ 12
-%token VIRG		/* signe , */ 13
 
 %union {
     Value Value;
     Variable Variable;
 }
+
+/* explicit types: Value may be larger than a pointer (e.g. long long)
+ */
+%type <Value> const
+%type <Variable> ident
+
+%token ACCFERM		/* accolade fermante */ 
+%token ACCOUVR		/* accolade ouvrante */ 
+%term <Value> CONSTANTE	/* constante entiere sans signe  */ 
+%token EGAL		/* signe == */
+%term <Variable> IDENT		/* identificateur de variable */
+%token INF		/* signe < */ 
+%token INFEGAL		/* signe <= */
+%token MOINS		/* signe - */
+%token PLUS		/* signe + */
+%token SUP		/* signe > */ 
+%token SUPEGAL		/* signe >= */
+%token VAR	     /* mot reserve VAR introduisant la liste de variables */
+%token VIRG	     /* signe , */
 
 
 %%
@@ -84,7 +84,7 @@ inisys	:
                    
                        ps_yacc = sc_new();
 		       init_globals();
-		       syntax_error = FALSE;
+		       yysyntax_error = FALSE;
                 }
 	;
 
@@ -170,13 +170,15 @@ terme	: const ident
 
 ident	: IDENT
 		{
-		    $$ = rec_ident(ps_yacc,yytext);
+		    $$ = rec_ident(ps_yacc,$1);
+		    free($1);
 		}
 	;
 
 newid	: IDENT
 		{
-			new_ident(ps_yacc,yytext);
+			new_ident(ps_yacc,$1);
+			free($1);
 		}
 	;
 
@@ -185,8 +187,7 @@ newid	: IDENT
  */
 const	: CONSTANTE
 		{ 
-		    sscan_Value(yytext,&valcst);
-		    $$ = valcst;
+		    $$ = $1;
 		}
 	;
 
@@ -269,15 +270,3 @@ virg_opt : VIRG
          ; 
 %%
 
-int yyerror(char *s)
-{
-	/* procedure minimun de recouvrement d'erreurs */
-	int c;
-
-	(void) fprintf(stderr,"%s near %s\n",s,yytext);
-	while ((c = getchar()) != EOF)
-		putchar(c);
-
-	syntax_error = TRUE;
-	return TRUE;
-}
