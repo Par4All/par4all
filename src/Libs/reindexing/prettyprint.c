@@ -75,7 +75,7 @@ statement make_layout_statement(ae, serial, news)
   statement    stat;
   int i;
 
-  comment = malloc(64);
+  comment = (char*) malloc(64);
   sprintf(comment,"CMF$  LAYOUT %s(", entity_local_name(ae));
   for(i = 0; i < serial; i++) { 
     sprintf(comment, "%s:SERIAL", comment); 
