@@ -604,7 +604,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 		    fprintf(stderr, "[sc_strong_normalize2]: Input system %p\n",
 			    ps);
 		    sc_dump(ps);
-		    fprintf(stderr, "[sc_strong_normalize2]: New system %p\",
+		    fprintf(stderr, "[sc_strong_normalize2]: New system %p\n",
 			    new_ps);
 		    sc_dump(new_ps);
 		}
