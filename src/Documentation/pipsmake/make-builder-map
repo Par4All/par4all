@@ -4,7 +4,7 @@
 
 # Francois Irigoin, 8 October 1993
 
-functions=`/lib/cpp $LIBDIR/pipsmake.rc | grep '^[a-z]' | \
+functions=`/lib/cpp $PIPS_LIBDIR/pipsmake.rc | grep '^[a-z]' | \
 		sed 's/ .*//' |	sort | uniq `
 
 # echo $functions
@@ -34,6 +34,6 @@ cat >>map$$ <<EOF
 };
 EOF
 
-cat $INCLUDEDIR/auto.h decl$$ map$$ >$INCLUDEDIR/builder_map.h
+cat $PIPS_INCLUDEDIR/auto.h decl$$ map$$ >$PIPS_INCLUDEDIR/builder_map.h
 
 /bin/rm -f decl$$ map$$
