@@ -17,9 +17,11 @@
  *    les versions C3 et PIPS ne necessite plus cette distinction; il y a
  *    tellement peu de code a ecrire pour les variables et les valeurs
  *    qu'il est inutile d'avoir une directory differente pour lui
-  *  - rapatriement de la definition du terme constant TCST et de la macro
+ *  - rapatriement de la definition du terme constant TCST et de la macro
  *    term_cst (du package contrainte) (PB, 06/06/90)
-*/
+ *
+ * - trop creux a mon avis. il faudrait une liste de petits tableaux ? FC.
+ */
 
 #ifndef NEWGEN
 #define VECTEUR 1006	/* constante associee a un vecteur	*/
@@ -32,12 +34,13 @@ typedef char * Variable;
 #define VARIABLE_UNDEFINED_P(v) ((v)==VARIABLE_UNDEFINED)
 #define VARIABLE_DEFINED_P(v) ((v)!=VARIABLE_UNDEFINED)
 
-/* le type des coefficients dans les vecteurs */
-typedef int Value;
+/* le type des coefficients dans les vecteurs: 
+ * Value est defini dans le package arithmetique
+ */
 
-/* STRUCTURE D'UN VECTEUR */
-
-/* Un vecteur est defini par une suite de couples Variable (i.e. element
+/* STRUCTURE D'UN VECTEUR 
+ *
+ * Un vecteur est defini par une suite de couples Variable (i.e. element
  * de la base) et Valeur (valeur du coefficient correspondant). Les
  * coordonnees nulles ne sont pas representees et n'existe qu'implicitement
  * par rapport a une base (hypothetique) definie via la package "variable".
@@ -56,11 +59,11 @@ typedef struct Svecteur {
     Variable var;
     Value val;
     struct Svecteur *succ; 
-} Svecteur,*Pvecteur;
+} Svecteur, *Pvecteur;
 
-/* STRUCTURE D'UNE BASE */
-
-/* Une base est definie par son vecteur diagonal
+/* STRUCTURE D'UNE BASE 
+ *
+ * Une base est definie par son vecteur diagonal
  *
  * Les tests d'appartenance sont effectues par comparaison des pointeurs 
  * et non par des strcmp.
