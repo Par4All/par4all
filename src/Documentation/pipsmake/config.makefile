@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/12/17 16:57:41 $, 
+# $Date: 1996/12/17 16:58:18 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -69,7 +69,7 @@ epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_lay
 	# 
 	# building menu layout files:
 	#
-	wpips-epips-user-manual/generate_all_menu_documentation -layout < $<
+	generate_all_menu_documentation -layout < $<
 
 clean: local-clean
 
