@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.61  2001/07/13 12:00:06  coelho
+ * debug -> pips_debug
+ *
  * Revision 1.60  2001/04/06 11:50:36  irigoin
  * additional testing to detect conflicting storage and DATA statements
  *
@@ -329,8 +332,7 @@ AnalyzeData(list ldvr, list ldvl)
      * pips_assert("AnalyseData", gen_length(ldvr) == gen_length(ldvl));
      */
 
-    debug(8, "AnalyzeData", "number of reference groups: %d\n", 
-	  gen_length(ldvr));
+    pips_debug(8, "number of reference groups: %d\n", gen_length(ldvr));
 
     pcl = ldvl;
     dvl = DATAVAL(CAR(pcl));
@@ -339,9 +341,8 @@ AnalyzeData(list ldvr, list ldvl)
 	entity e = datavar_variable(dvr);
 	int i = datavar_nbelements(dvr);
 	
-	debug(8, "AnalyzeData", 
-	      "Storage for entity %s must be static or made static\n",
-	      entity_name(e));
+	pips_debug(8, "Storage for entity %s must be static or made static\n",
+		   entity_name(e));
 
 	if(storage_undefined_p(entity_storage(e))) {
 	    entity_storage(e) =
@@ -406,8 +407,8 @@ AnalyzeData(list ldvr, list ldvl)
 			"DATA statement initializes non RAM variable\n");
 	}
 
-	debug(8, "AnalyzeData", "needs %d elements for entity %s\n", 
-	      i, entity_name(e));
+	pips_debug(8, "needs %d elements for entity %s\n", 
+		   i, entity_name(e));
 
 	pips_assert("AnalyzeData", dataval_nboccurrences(dvl) > 0);
 
@@ -420,7 +421,7 @@ AnalyzeData(list ldvr, list ldvl)
 		entity_initial(e) = make_value(is_value_constant, 
 					       dataval_constant(dvl));
 
-		debug(1, "AnalyzeData", "%s %d\n", 
+		pips_debug(1, "%s %d\n", 
 		      entity_name(e), constant_int(dataval_constant(dvl)));
 	      }
 	      else {
@@ -438,7 +439,7 @@ AnalyzeData(list ldvr, list ldvl)
 
 	while (i > 0 && pcl != NIL) {
 	    if (i <= dataval_nboccurrences(dvl)) {
-		debug(8, "AnalyzeData", "uses %d values out of %d\n",
+		pips_debug(8, "uses %d values out of %d\n",
 		      i, dataval_nboccurrences(dvl));
 		dataval_nboccurrences(dvl) -= i;
 		i = 0;
@@ -454,7 +455,7 @@ AnalyzeData(list ldvr, list ldvl)
 		if ((pcl = CDR(pcl)) != NIL) {
 			dvl = DATAVAL(CAR(pcl));
 
-			debug(8, "AnalyzeData", "use next dataval\n");
+			pips_debug(8, "use next dataval\n");
 		    }
 	    }
 	    datavar_nbelements(dvr) = i;
@@ -470,7 +471,6 @@ AnalyzeData(list ldvr, list ldvl)
 	ParserError("AnalyzeData", "too few initializers\n");
     }
 }
-
 
 /* type_equal_p -> same_basic_and_scalar_p in latter... FC.
  */
