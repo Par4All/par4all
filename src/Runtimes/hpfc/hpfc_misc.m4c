@@ -2,7 +2,7 @@
  * a set a functions to print the host and node status in PVM,
  * called from a Fortran subroutine.
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1994/06/07 18:44:48 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1994/09/03 13:09:27 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -64,12 +64,12 @@ void print_host_info_ ()
     /*
      * print hosts
      */
-    fprintf(stdout, "%d machines:\n", nhost);
+    fprintf(stderr, "%d machines:\n", nhost);
     for( i=0 ; i<nhost ; i++ )
-	fprintf(stdout, "%s (%s)\n", 
+	fprintf(stderr, "%s (%s)\n", 
 		hostp[i].hi_name,
 		hostp[i].hi_arch);
-    fprintf(stdout, "\n");
+    fprintf(stderr, "\n");
 }
 
 void print_task_info_ (number, tids, hosttid)
@@ -106,19 +106,19 @@ int *number, *tids, *hosttid;
     /*
      * print tasks
      */
-    fprintf(stdout, "host running on %s\n",
+    fprintf(stderr, "host running on %s\n",
 	    host_name(which_task((*hosttid), ntask, taskp).ti_host,
 		      nhost, hostp));
 
-    fprintf(stdout, "%d nodes:\n", (*number));
+    fprintf(stderr, "%d nodes:\n", (*number));
 
     for( i=0 ; i<(*number) ; i++ )
-	fprintf(stdout, 
+	fprintf(stderr, 
 		"%d running on %s\n",
 		i+1,
 		host_name(which_task(tids[i], ntask, taskp).ti_host, 
 			  nhost, hostp));
 
-    fprintf(stdout, "\n");	
+    fprintf(stderr, "\n");	
 }
 
