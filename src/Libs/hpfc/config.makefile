@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$,
-# ($Date: 1995/11/02 18:04:23 $, )
+# ($Date: 1996/02/26 11:28:29 $, )
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
@@ -34,7 +34,8 @@ LIB_CFILES=	directives.c \
 LIB_HEADERS=	warning.h \
 		hpfc-local.h \
 		defines-local.h \
-		access_description.h 
+		access_description.h \
+		version.h
 
 # should be automatically derived ?
 
