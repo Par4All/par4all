@@ -1,17 +1,19 @@
 /*
- * $Id$
- *
- * $Log: DirectoryManager.java,v $
- * Revision 1.3  1998/10/16 14:55:44  coelho
- * chooser fixed to 1.2b4.
- *
- * Revision 1.2  1998/07/01 07:02:57  coelho
- * cleaner (wrt my standards).
- *
- * Revision 1.1  1998/06/30 17:35:33  coelho
- * Initial revision
- *
- */
+  $Id$
+ 
+  $Log: DirectoryManager.java,v $
+  Revision 1.4  1998/10/16 17:16:20  coelho
+  nope.
+
+  Revision 1.3  1998/10/16 14:55:44  coelho
+  chooser fixed to 1.2b4.
+ 
+  Revision 1.2  1998/07/01 07:02:57  coelho
+  cleaner (wrt my standards).
+ 
+  Revision 1.1  1998/06/30 17:35:33  coelho
+  Initial revision
+*/
 
 package JPips;
 
@@ -46,6 +48,7 @@ public class DirectoryManager implements JPipsComponent
   {
     this.frame = frame;
     this.tpips = tpips;
+    //this.directory = new File(".");
     buildPanel();
     check();
   }
@@ -70,8 +73,7 @@ public class DirectoryManager implements JPipsComponent
     panel.setBorder(new TitledBorder("Current directory"));
     tf = new PTextField();
     tf.setFont(new Font("Monospaced", Font.PLAIN, 12));
-    ActionListener a = new ActionListener()
-    {
+    ActionListener a = new ActionListener() {
       public void actionPerformed(ActionEvent e)
       {
 	PTextField tf = (PTextField)e.getSource();
@@ -84,8 +86,8 @@ public class DirectoryManager implements JPipsComponent
 	}
 	else
 	{
-	  JOptionPane.showMessageDialog(frame,
-	     "Invalid directory","Error",JOptionPane.ERROR_MESSAGE);
+	  JOptionPane.showMessageDialog
+	  (frame, "Invalid directory","Error",JOptionPane.ERROR_MESSAGE);
 	  tf.setText(directory.getAbsolutePath());
 	}
       }
