@@ -1,7 +1,7 @@
 /* MEM_SPY : Package to track memory usage.
  * Beatrice Creusillet - August 1995 
  * $RCSfile: mem_spy.c,v $ (version $Revision$)
- * $Date: 1995/12/19 10:55:13 $, .
+ * $Date: 1996/07/25 15:06:46 $, .
  */
 /* Usage:
  *
@@ -121,20 +121,22 @@ void mem_spy_reset()
 static int 
 current_memory_size()
 {
-    struct mallinfo heap_info;
+    /* struct mallinfo heap_info; */
     int memory_size;
     
-    heap_info = mallinfo();
+    /* heap_info = mallinfo(); */
 
     switch(measurement) {
     case SBRK_MEASURE: 
 	memory_size = sbrk(0) - etext;
 	break;
     case NET_MEASURE: 
-	memory_size = heap_info.uordblks-8*heap_info.ordblks;
+	/* memory_size = heap_info.uordblks-8*heap_info.ordblks; */
+	memory_size = -1;
 	break;
     case GROSS_MEASURE: 
-	memory_size = heap_info.uordbytes;
+	/* memory_size = heap_info.uordbytes; */
+	memory_size = -1;
 	break;
     default:
 	abort();
@@ -246,7 +248,8 @@ char * s;
 /* To print mallinfo, for debugging memory leaks*/
 void mem_spy_info()
 {
-    struct mallinfo heap_info = mallinfo();
+    /* 
+       struct mallinfo heap_info = mallinfo();
 
     fprintf(stderr, "total space in arena: \t%d", heap_info.arena);
     fprintf(stderr, "number of ordinary blocks: \t%d", heap_info.ordblks);
@@ -264,4 +267,5 @@ void mem_spy_info()
     fprintf(stderr, "space (including overhead) allocated in ord. blks: \t%d", heap_info.uordbytes);
     fprintf(stderr, "number of ordinary blocks allocated: \t%d", heap_info.allocated);
     fprintf(stderr, "bytes used in maintaining the free tree: \t%d", heap_info.treeoverhead);
+    */
 }
