@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: macros.c,v $
+ * Revision 1.6  1998/04/14 21:28:17  coelho
+ * linear.h
+ *
  * Revision 1.5  1997/09/23 15:21:39  coelho
  * typo:[3~
  *
@@ -27,6 +30,7 @@
 
 #include "genC.h"
 #include "parser_private.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 
