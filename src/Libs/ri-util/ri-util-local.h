@@ -162,48 +162,36 @@ typedef hash_table control_mapping;
 #define DI_VAR_MODULE_NAME "DI-VAR"
 
 /* macros */
-#define ENTITY_ASSIGN_P(e) (strcmp(entity_local_name(e), \
-				   ASSIGN_OPERATOR_NAME) == 0)
-#define ENTITY_STOP_P(e) (strcmp(entity_local_name(e), \
-				   STOP_FUNCTION_NAME) == 0)
-#define ENTITY_PLUS_P(e) (strcmp(entity_local_name(e), \
-				   PLUS_OPERATOR_NAME) == 0)
-#define ENTITY_MINUS_P(e) (strcmp(entity_local_name(e), \
-				   MINUS_OPERATOR_NAME) == 0)
-#define ENTITY_UNARY_MINUS_P(e) (strcmp(entity_local_name(e), \
-				   UNARY_MINUS_OPERATOR_NAME) == 0)
-#define ENTITY_MULTIPLY_P(e) (strcmp(entity_local_name(e), \
-				   MULTIPLY_OPERATOR_NAME) == 0)
-#define ENTITY_MODULO_P(e) (strcmp(entity_local_name(e), \
-				   MODULO_OPERATOR_NAME) == 0)
-#define ENTITY_POWER_P(e) (strcmp(entity_local_name(e), \
-				   POWER_OPERATOR_NAME) == 0)
-#define ENTITY_DIVIDE_P(e) (strcmp(entity_local_name(e), \
-				   DIVIDE_OPERATOR_NAME) == 0)
-#define ENTITY_MIN_P(e) (strcmp(entity_local_name(e), \
-				MIN_OPERATOR_NAME) == 0)
-#define ENTITY_MAX_P(e) (strcmp(entity_local_name(e), \
-				MAX_OPERATOR_NAME) == 0)
-#define ENTITY_MIN0_P(e) (strcmp(entity_local_name(e), \
-				MIN0_OPERATOR_NAME) == 0)
-#define ENTITY_MAX0_P(e) (strcmp(entity_local_name(e), \
-				MAX0_OPERATOR_NAME) == 0)
-#define ENTITY_MIN_OR_MAX_P(e) (ENTITY_MIN_P(e) || \
-				 ENTITY_MAX_P(e) )
+#define entity_an_operator_p(e,name) \
+  (strcmp(entity_local_name(e), name##_OPERATOR_NAME)==0)
+#define entity_a_function_p(e,name) \
+  (strcmp(entity_local_name(e), name##_FUNCTION_NAME)==0)
 
-#define ENTITY_AND_P(e) (strcmp(entity_local_name(e), \
-				   AND_OPERATOR_NAME) == 0)
+#define ENTITY_CONTINUE_P(e) entity_a_function_p(e, CONTINUE)
+#define ENTITY_STOP_P(e) entity_a_function_p(e, STOP)
+#define ENTITY_RETURN_P(e) entity_a_function_p(e, RETURN)
 
-#define ENTITY_OR_P(e) (strcmp(entity_local_name(e), \
-                        OR_OPERATOR_NAME) == 0)
-#define ENTITY_NOT_P(e) (strcmp(entity_local_name(e), \
-                        NOT_OPERATOR_NAME) == 0)
-#define ENTITY_NON_EQUAL_P(e) (strcmp(entity_local_name(e), \
-                        NON_EQUAL_OPERATOR_NAME) == 0)
-#define ENTITY_EQUIV_P(e) (strcmp(entity_local_name(e), \
-                        EQUIV_OPERATOR_NAME) == 0)
-#define ENTITY_NON_EQUIV_P(e) (strcmp(entity_local_name(e), \
-                        NON_EQUIV_OPERATOR_NAME) == 0)
+#define ENTITY_ASSIGN_P(e) entity_an_operator_p(e, ASSIGN)
+#define ENTITY_PLUS_P(e) entity_an_operator_p(e, PLUS)
+#define ENTITY_MINUS_P(e) entity_an_operator_p(e, MINUS)
+#define ENTITY_UNARY_MINUS_P(e) entity_an_operator_p(e, UNARY_MINUS)
+#define ENTITY_MULTIPLY_P(e) entity_an_operator_p(e, MULTIPLY)
+#define ENTITY_MODULO_P(e) entity_an_operator_p(e, MODULO)
+#define ENTITY_POWER_P(e) entity_an_operator_p(e, POWER)
+#define ENTITY_DIVIDE_P(e) entity_an_operator_p(e, DIVIDE)
+#define ENTITY_MIN_P(e) entity_an_operator_p(e, MIN)
+#define ENTITY_MAX_P(e) entity_an_operator_p(e, MAX)
+#define ENTITY_MIN0_P(e) entity_an_operator_p(e, MIN0)
+#define ENTITY_MAX0_P(e) entity_an_operator_p(e, MAX0)
+#define ENTITY_MIN_OR_MAX_P(e) (ENTITY_MIN_P(e) || ENTITY_MAX_P(e) )
+
+#define ENTITY_AND_P(e) entity_an_operator_p(e, AND)
+
+#define ENTITY_OR_P(e) entity_an_operator_p(e, OR)
+#define ENTITY_NOT_P(e) entity_an_operator_p(e, NOT)
+#define ENTITY_NON_EQUAL_P(e) entity_an_operator_p(e, NON_EQUAL)
+#define ENTITY_EQUIV_P(e) entity_an_operator_p(e, EQUIV)
+#define ENTITY_NON_EQUIV_P(e) entity_an_operator_p(e, NON_EQUIV)
 
 #define ENTITY_LOGICAL_OPERATOR_P(e) ( ENTITY_RELATIONAL_OPERATOR_P(e) || \
                                        ENTITY_AND_P(e) || \
@@ -213,22 +201,15 @@ typedef hash_table control_mapping;
                                        ENTITY_EQUIV_P(e) || \
                                        ENTITY_NON_EQUIV_P(e) )
 
-#define ENTITY_TRUE_P(e) (strcmp(entity_local_name(e), \
-				 TRUE_OPERATOR_NAME) == 0)
-#define ENTITY_FALSE_P(e) (strcmp(entity_local_name(e), \
-				 FALSE_OPERATOR_NAME) == 0)
+#define ENTITY_TRUE_P(e) entity_an_operator_p(e, TRUE)
+#define ENTITY_FALSE_P(e) entity_an_operator_p(e, FALSE)
 
-#define ENTITY_GREATER_OR_EQUAL_P(e) (strcmp(entity_local_name(e), \
-				   GREATER_OR_EQUAL_OPERATOR_NAME) == 0)
-#define ENTITY_GREATER_THAN_P(e) (strcmp(entity_local_name(e), \
-				   GREATER_THAN_OPERATOR_NAME) == 0)
-#define ENTITY_LESS_OR_EQUAL_P(e) (strcmp(entity_local_name(e), \
-				   LESS_OR_EQUAL_OPERATOR_NAME) == 0)
-#define ENTITY_LESS_THAN_P(e) (strcmp(entity_local_name(e), \
-				   LESS_THAN_OPERATOR_NAME) == 0)
+#define ENTITY_GREATER_OR_EQUAL_P(e) entity_an_operator_p(e, GREATER_OR_EQUAL)
+#define ENTITY_GREATER_THAN_P(e)  entity_an_operator_p(e, GREATER_THAN)
+#define ENTITY_LESS_OR_EQUAL_P(e) entity_an_operator_p(e, LESS_OR_EQUAL)
+#define ENTITY_LESS_THAN_P(e) entity_an_operator_p(e, LESS_THAN)
 
-#define ENTITY_EQUAL_P(e) (strcmp(entity_local_name(e), \
-				   EQUAL_OPERATOR_NAME) == 0)
+#define ENTITY_EQUAL_P(e) entity_an_operator_p(e, EQUAL)
 
 #define ENTITY_RELATIONAL_OPERATOR_P(e) ( \
 					 ENTITY_GREATER_OR_EQUAL_P(e) || \
@@ -237,9 +218,6 @@ typedef hash_table control_mapping;
 					 ENTITY_LESS_THAN_P(e) || \
 					 ENTITY_NON_EQUAL_P(e) || \
 					 ENTITY_EQUAL_P(e) )
-
-#define ENTITY_CONTINUE_P(e) \
-    (same_string_p(entity_local_name(e), CONTINUE_FUNCTION_NAME))
 
 #define SPECIAL_COMMON_P(e) \
     ((same_string_p(entity_local_name(e), DYNAMIC_AREA_LOCAL_NAME)) || \
