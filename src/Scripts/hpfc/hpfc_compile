@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/04/22 14:39:19 $, 
+# $Date: 1995/08/08 09:14:34 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -17,6 +17,7 @@ PIPS='pips'
 TMP="/tmp/hpfc_tmp.`hostname`.$$"
 INSTALL="$HPFC_TOOLS/hpfc_install"
 PIPSARGS='-s MUST_REGIONS -p HPFC_CLOSE'
+TIMEPROP=
 PIPSPROP=
 
 unset HPFFILES MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR REDIRECT \
@@ -52,7 +53,7 @@ default_module()
 usage()
 {
   cat <<-EOF
-	Usage: $sh [-vxDdhMqstir] [-k K] [-p P] [-w W] [-m M] [-n N|file[.f]]
+	Usage: $sh [-vxDdhMqstirT] [-k K] [-p P] [-w W] [-m M] [-n N|file[.f]]
 	  version is $Revision$
 	  -t: test (dump the resulting files)
 	  -i: no installation
@@ -66,6 +67,7 @@ usage()
 	  -M: make (compile and link) the generated codes
 	  -q: quiet  (stdout=/dev/null)
 	  -s: silent (stderr=/dev/null - for demonstations:-)
+	  -T: with timings (LOG_TIMINGS TRUE)
 	  -w W: workspace W is used for pips and hpfc
 	  -m M: module M is compiled (should be the main)
 	  -n N: source number n
@@ -78,7 +80,7 @@ usage()
 #
 # the keyword control enables a global control of the switches
 
-while getopts rtivxDdMqsn:hm:w:p:k: OPT
+while getopts rtivxDdMqsTn:hm:w:p:k: OPT
 do
   case $OPT in
     t) DUMPFILES='1' ;;
@@ -92,6 +94,7 @@ do
     M) MAKE='gmake' ;;
     q) STDOUT='/dev/null' ;;
     s) STDERR='/dev/null' ;;
+    T) TIMEPROP='-1 LOG_TIMINGS' ;;
     n) HPFFILES="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
     m) MODULE="$OPTARG" ;;
     w) WORKSPACE="$OPTARG" ;;
@@ -113,7 +116,7 @@ do
 	 debug)
 	     VERBOSEARG='-v'
 	     DEBUGARG='-d'
-	     PIPSPROP='-0 HPFC_NO_WARNING -0 NO_USER_WARNING' ;
+	     PIPSPROP='-0 HPFC_NO_WARNING -0 NO_USER_WARNING -1 LOG_TIMINGS' ;
 	     VERBOSE='verbose' ;
 	     DEBUG='debug' ;
 	     DELETE=':'	;
@@ -150,7 +153,7 @@ $DEBUG "`type $PIPS`"
 
 [ "$DEBUG" != : ] && set -x
 
-eval $PIPS $FILES $PIPSARGS $PIPSPROP -m $MODULE $WORKSPACE \
+eval $PIPS $FILES $PIPSARGS $PIPSPROP $TIMEPROP -m $MODULE $WORKSPACE \
 	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
 
 STATUS="$?"
