@@ -158,17 +158,12 @@ void init(void)
     /* Tabulated_bp hack is statically allocated here. */
     {
       static union domain d ;
-      static struct intlist il ;
-      
-      il.val = -1; /* max_tabulated_elements() */
-      il.cdr = (struct intlist *) NULL ;
-      
       bp->name = "Name for tabulated domain" ;
       bp->domain = &d ;
       d.ba.type = ARRAY_DT ;
       d.ar.constructor = "Constructor for tabulated domain" ;
-      d.ar.element = (struct gen_binding *)NULL ;
-      d.ar.dimensions = &il ;
+      d.ar.element = (struct gen_binding *) NULL ;
+      d.ar.dimensions = (struct intlist *) NULL;
       Tabulated_bp = bp ;
     }
     
@@ -298,10 +293,7 @@ union domain *dp ;
    This is done before the compilation so (STRUCT BINDING *) members are
    still strings. */
 
-void
-print_domain( out, dp )
-FILE *out ;
-union domain *dp ;
+void print_domain(FILE * out, union domain * dp)
 {
     if (!dp) {
 	fprintf(out, " NULL union domain");
