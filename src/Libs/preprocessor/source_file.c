@@ -602,7 +602,7 @@ pips_split_file(string name, string tempfile)
 
 /********************************************** managing .F files with cpp */
 
-#define CPP_FILTERED_SUFFIX 	".cpp_processed.f"
+#define CPPED		 	".cpp_processed.f"
 
 /* pre-processor and added options from environment
  */
@@ -611,34 +611,42 @@ pips_split_file(string name, string tempfile)
 
 /* default preprocessor and basic options
  */
-#define CPP_CPP			"cpp"
+#define CPP_CPP			"cpp" /* alternative value: "gcc -E" */
 #define CPP_CPPFLAGS		" -P -C -D__PIPS__ -D__HPFC__ "
 
-static bool dot_F_file_p(string name)
+static bool 
+dot_F_file_p(string name)
 {
     int l = strlen(name);
     return l>=2 && name[l-1]=='F' && name[l-2]=='.';
 }
 
 /* returns the newly allocated name */
-static string process_thru_cpp(string name)
+static string 
+process_thru_cpp(string name)
 {
-    string dir_name, new_name, simpler, cpp_options, cpp;
+    string dir_name, new_name, simpler, cpp_options, cpp, tmp_file;
 
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".F");
-    new_name = 
-	strdup(concatenate(dir_name, "/", simpler, CPP_FILTERED_SUFFIX, 0));
+    new_name = strdup(concatenate(dir_name, "/", simpler, CPPED, 0));
+    tmp_file = strdup(concatenate(dir_name, "/", simpler, ".tmp.c", 0));
     free(simpler);
     free(dir_name);
 
-    cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
     cpp = getenv(CPP_PIPS_ENV);
+    cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
 
-    safe_system(concatenate(cpp? cpp: CPP_CPP, 
-			    CPP_CPPFLAGS, cpp_options? cpp_options: "", " ",
-			    name, " > ", new_name, NULL));
+    /* some C compilers do not like to cpp a .F file.
+     * hence the tmp_file used here as a work around.
+     */
+    safe_system(concatenate(
+	"cp ", name, " ", tmp_file, " && ",
+	cpp? cpp: CPP_CPP, 
+	CPP_CPPFLAGS, cpp_options? cpp_options: "", " ",
+	tmp_file, " > ", new_name, " && rm ", tmp_file, 0));
 
+    free(tmp_file);
     return new_name;
 }
 
