@@ -134,21 +134,53 @@ end_attachment_prettyprint()
 }
 
 
-/* Use to create or extend the attachment list of a word: */
+/* Use to create or extend the attachment list of a character: */
 #define ADD_AN_ATTACHMENT_TO_A_MAPPING(a,			\
-				       a_word,			\
+				       a_char,			\
 				       a_mapping)		\
-if (bound_##a_mapping##_p(a_word)) {				\
-    attachments ats = load_##a_mapping((int) a_word);		\
+if (bound_##a_mapping##_p(a_char)) {				\
+    attachments ats = load_##a_mapping((int) a_char);		\
     list l = attachments_attachment(ats);			\
     l = CONS(ATTACHMENT, a, l);					\
     attachments_attachment(ats) = l;				\
 }								\
 else {								\
-    store_##a_mapping((int) a_word,				\
+    store_##a_mapping((int) a_char,				\
 		      make_attachments(CONS(ATTACHMENT,		\
 					    a,			\
 					    NIL)));		\
+}
+
+
+/* Attach something from begin_char up to end_char: */
+static void
+attach_to_character_region(char * begin_char,
+			   char * end_char,
+			   attachee at) 
+{
+    /* We do not know the position of the attachement in the output
+       file yet: */
+    attachment a = make_attachment(at,
+				   POSITION_UNDEFINED,
+				   POSITION_UNDEFINED);
+
+    debug_on("ATTACHMENT_DEBUG_LEVEL");
+    debug(6, "attach_to_character_region",
+	  "Attach attachment %#x (attachee %#x) from \"%c\" (%#x) to \"%c\" (%#x)\n",
+	  (unsigned int) a, (unsigned int) at,
+	  *begin_char, (unsigned int) begin_char,
+	  *end_char, (unsigned int) end_char);
+
+    /* Attach the begin to the first character: */
+    ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
+				   begin_char,
+				   word_to_attachments_begin);
+
+    /* Attach the end to the last character: */
+    ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
+				   end_char,
+				   word_to_attachments_end);
+    debug_off();
 }
 
 
@@ -158,25 +190,18 @@ attach_to_word_list(string begin_word,
 		    string end_word,
 		    attachee at) 
 {
-    /* We do not know the position of the attachement in the output
-       file yet: */
-    attachment a = make_attachment(at,
-				   POSITION_UNDEFINED,
-				   POSITION_UNDEFINED);
-
     debug_on("ATTACHMENT_DEBUG_LEVEL");
     debug(6, "attach_to_word_list",
-	  "Attach attachment %#x (attachee %#x) from \"%s\" (%#x) to \"%s\" (%#x)\n",
-	  (unsigned int) a, (unsigned int) at,
+	  "Attach attachee %#x from \"%s\" (%#x) to \"%s\" (%#x)\n",
+	  (unsigned int) at,
 	  begin_word, (unsigned int) begin_word,
-	  end_word, (unsigned int)end_word);
-    ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
-				   begin_word,
-				   word_to_attachments_begin);
+	  end_word, (unsigned int) end_word);
 
-    ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
-				   end_word,
-				   word_to_attachments_end);
+    /* Attach from the first character of the first word up to the
+       last character of the last word: */
+    attach_to_character_region(begin_word,
+			       end_word + strlen(end_word) - 1,
+			       at);
     debug_off();
 }
 
@@ -346,78 +371,101 @@ attach_transformers_decoration_to_text(text t)
 }
 
 
-/* Try to find some attachments in the words that are printed out. If
-   any, note the begin position: */
+/* Try to find some attachments in the given character. If any, note
+   the boundary position, that is a start or an end according to the
+   functions given in parameters: */
 void
-deal_with_sentence_word_begin(string a_word,
-			      int position_in_the_output)
+deal_with_attachment_boundary(char * a_character,
+			      int position_in_the_output,
+			      attachments (* load_word_to_attachments_boundary)(int),
+			      bool (* bound_word_to_attachments_boundary_p)(int))
 {
-    if (is_emacs_pretty_print_asked) {	    
-	debug_on("ATTACHMENT_DEBUG_LEVEL");
+    debug(8, "deal_with_attachment_boundary",
+	  "Looking for \"%c\" (%#x) at %d\n",
+	  *a_character, (int) a_character, position_in_the_output);
 
-	debug(8, "deal_with_sentence_word_begin",
-	      "Looking for \"%s\" (%#x) at %d\n",
-	      a_word, a_word, position_in_the_output);
+    if (bound_word_to_attachments_boundary_p((int) a_character)) {
+	/* Well, this word is an attachment boundary: */
+	list some_attachments =
+	    attachments_attachment(load_word_to_attachments_boundary((int) a_character));
+	MAP(ATTACHMENT, an_attachment,
+	    {
+		debug(4, "deal_with_attachment_boundary",
+		      "*** Found attachment = %#x for \"%c\" (%#x) at %d\n",
+		      an_attachment, *a_character,
+		      (int) a_character, position_in_the_output);
 
-	if (bound_word_to_attachments_begin_p((int) a_word)) {
-	    /* Well, this word is an attachment begin: */
-	    list some_attachments =
-		attachments_attachment(load_word_to_attachments_begin((int) a_word));
-	    debug(4, "deal_with_sentence_word_begin", "begin = %d:\n",
-		  position_in_the_output);
-
-	    MAP(ATTACHMENT, an_attachment,
-		{
-		    debug(4, "deal_with_sentence_word_begin",
-			  "attachment = %#x:\n", an_attachment);
-
-		    /* Remind the position of the begin of the
-		       attachment: */
+		/* Remind the position of the boundary of the
+		   attachment: */
+		if (load_word_to_attachments_boundary
+		    == load_word_to_attachments_begin)
 		    attachment_begin(an_attachment) = position_in_the_output;
-		},
-		some_attachments);
-	};
-    
-	debug_off();
-    }
+		else
+		    attachment_end(an_attachment) = position_in_the_output;
+	    },
+	    some_attachments);
+    };
 }
 
 
-/* Try to find some attachments in the words that are printed out. If
-   any, note the end position: */
+/* Try to find some attachments in the given character that are printed out. If
+   any, note the boundary position. */
 void
-deal_with_sentence_word_end(string a_word,
-			    int position_in_the_output)
+deal_with_attachments_at_this_character(char * a_character,
+					int position_in_the_output)
 {
-    if (is_emacs_pretty_print_asked) {	    
+    if (is_emacs_pretty_print_asked) {
 	debug_on("ATTACHMENT_DEBUG_LEVEL");
 
-	debug(8, "deal_with_sentence_word_end",
-	      "Looking for \"%s\" (%#x) at %d\n",
-	      a_word, a_word, position_in_the_output);
-
-	if (bound_word_to_attachments_end_p((int) a_word)) {
-	    /* Well, this word is an attachment end: */
-	    list some_attachments = attachments_attachment(load_word_to_attachments_end((int) a_word));
-	    debug(4, "deal_with_sentence_word_end",
-		  "end = %d:\n", position_in_the_output);
-
-	    MAP(ATTACHMENT, an_attachment,
-		{
-		    debug(4, "deal_with_sentence_word_end",
-			  "attachment = %#x:\n", an_attachment);
-
-		    /* Remind the position of the end of the
-		       attachment: */
-		    attachment_end(an_attachment) = position_in_the_output;
-		},
-		some_attachments);
-	};
-    
+	/* Look for attachment starts: */
+	debug(8, "deal_with_attachment_boundaries",
+	      "Looking for attachment starts\n");
+	deal_with_attachment_boundary(a_character,
+				      position_in_the_output,
+				      load_word_to_attachments_begin,
+				      bound_word_to_attachments_begin_p);
+	/* Look for attachment ends: */
+	debug(8, "deal_with_attachment_boundaries",
+	      "Looking for attachment ends\n");
+	deal_with_attachment_boundary(a_character,
+				      position_in_the_output,
+				      load_word_to_attachments_end,
+				      bound_word_to_attachments_end_p);    
 	debug_off();
     }
 }
 
+
+/* Try to find some attachments in the given string. If any, note the
+   boundary position. */
+void
+deal_with_attachments_in_this_string(string a_string,
+				     int position_in_the_output)
+{
+    int i;
+    
+    for(i = 0; a_string[i] != '\0'; i++)
+	deal_with_attachments_at_this_character(&a_string[i],
+						position_in_the_output + i);
+}
+
+
+/* Try to find some attachments in the a_length first characters of
+   the given string. If any, note the boundary position. */
+void
+deal_with_attachments_in_this_string_length(string a_string,
+					    int position_in_the_output,
+					    int a_length)
+{
+    int i;
+    
+    for(i = 0; i < a_length; i++) {
+	pips_assert("Length is too big since end of string encountered",
+		    a_string[i] != '\0');
+	deal_with_attachments_at_this_character(&a_string[i],
+						position_in_the_output + i);
+    }
+}
 
 
 /* Output an attachment to the output file: */
@@ -436,8 +484,10 @@ output_an_attachment(FILE * output_file,
 		begin != POSITION_UNDEFINED && end != POSITION_UNDEFINED);
 		
     /* Begin an Emacs Lisp properties. + 1 since in a buffer (and not
-       a string). Use backquoting to evaluate keymaps later: */
-    fprintf(output_file, "(add-text-properties %d %d `(", begin + 1, end + 1);
+       a string). (end + 1) + 1 since the property is set between
+       start and end in Emacs.Use backquoting to evaluate keymaps
+       later: */
+    fprintf(output_file, "(add-text-properties %d %d `(", begin + 1, end + 2);
 
     switch(attachee_tag(at))
     {
