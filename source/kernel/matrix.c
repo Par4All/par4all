@@ -43,18 +43,17 @@ Matrix *Matrix_Alloc(unsigned NbRows,unsigned NbColumns) {
     Mat->p_Init= (Value *)0;
   }  
   else {
-    q = (Value **)malloc(NbRows * sizeof(*q));
-    if(!q) {
-      free(Mat);
-      errormsg1("Matrix_Alloc", "outofmem", "out of memory space");
-      return 0;
-    }
     if(NbColumns==0) {
       Mat->p = (Value **)0;
       Mat->p_Init= (Value *)0;
-      free(q);
     }
     else {
+      q = (Value **)malloc(NbRows * sizeof(*q));
+      if(!q) {
+	free(Mat);
+	errormsg1("Matrix_Alloc", "outofmem", "out of memory space");
+	return 0;
+      }
       p = (Value *)malloc(NbRows * NbColumns * sizeof(Value));
       if(!p) {
 	free(q);
