@@ -2,8 +2,11 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1996/11/19 18:36:46 $, )
- * version $Revision$
+ * $Id$
+ * $Log: o-analysis.c,v $
+ * Revision 1.36  1997/03/20 10:22:04  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
