@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/03/19 14:36:49 $, )
+ * ($Date: 1996/03/21 15:56:01 $, )
  */
 
 #include "defines-local.h"
@@ -103,7 +103,7 @@ drop_distributed_arguments(entity module) /* of the host */
     type t = entity_type(module);
     functional f;
     list /* of parameter */ le = NIL, lp;
-    int len, i;
+    int len, i, n /* number of next kept parameter */;
 
     message_assert("functional", type_functional_p(t));
     f = type_functional(t);
@@ -112,7 +112,7 @@ drop_distributed_arguments(entity module) /* of the host */
 
     pips_debug(8, "considering %d arg(s) of %s\n", len, entity_name(module));
 
-    for (i=1; i<=len; i++, POP(lp))
+    for (i=1, n=1; i<=len; i++, POP(lp))
     {
 	entity ent = find_ith_parameter(module, i);
 	
@@ -120,15 +120,113 @@ drop_distributed_arguments(entity module) /* of the host */
 	{
 	    le = CONS(PARAMETER, PARAMETER(CAR(lp)), le);
 	    pips_debug(8, "keeping %d argument %s\n", i, entity_name(ent));
+
+	    formal_offset(storage_formal(entity_storage(ent))) = n;
+	    n++;
 	}
 	else
+	{
+	    if (!entity_undefined_p(ent))
+		formal_offset(storage_formal(entity_storage(ent))) = MAXINT;
+
 	    pips_debug(8, "dropping %d argument %s\n", i, 
 		       entity_undefined_p(ent)? "undefined": entity_name(ent));
+	}
     }
 
     lp = functional_parameters(f);
     functional_parameters(f) = gen_nreverse(le);
     gen_free_list(lp);
+}
+
+static entity 
+create_bound_entity(
+    entity module,
+    entity array,
+    bool upper,
+    int dim,
+    int number)
+{
+    entity result = argument_bound_entity(module, array, upper, dim);
+
+    free_storage(entity_storage(result));
+    entity_storage(result) = 
+	make_storage(is_storage_formal, make_formal(module, number));
+
+    pips_assert("formal variable", type_variable_p(entity_type(result)));
+
+    AddEntityToDeclarations(result, module);
+
+    /*
+    code_declarations(EntityCode(module)) = 
+	gen_nconc(code_declarations(EntityCode(module)), 
+		  CONS(ENTITY, result, NIL)); */
+
+    pips_debug(9, "creating %s in %s (arg %d)\n", 
+	       entity_name(result), entity_name(module), number);
+
+    return result;
+}
+
+static list 
+add_one_bound_argument(
+    list /* of parameter */ lp,
+    entity module,
+    entity array,
+    bool upper,
+    int dim,
+    int formal_number)
+{
+    (void) create_bound_entity(module, array, upper, dim, formal_number);
+    lp = CONS(PARAMETER, 
+	      make_parameter(make_type(is_type_variable, 
+		   make_variable(MakeBasic(is_basic_int), NIL)),
+			     make_mode(is_mode_value, UU)), lp);
+    return lp;
+}
+
+static void
+add_bound_arguments(entity module) /* for the node */
+{
+    type t = entity_type(module);
+    functional f;
+    list /* of parameter */ le = NIL, lp;
+    int len, i, next;
+
+    message_assert("functional", type_functional_p(t));
+    f = type_functional(t);
+    lp = functional_parameters(f);
+    len = gen_length(lp);
+    next = len+1;
+
+    for(i=1; i<=len; i++)
+    {
+	entity arg = find_ith_parameter(module, i),
+               old = load_old_node(arg);
+	pips_debug(8, "array %s\n", entity_name(old));
+
+	if (array_distributed_p(old))
+	{
+	    int dim, ndim;
+	    ndim = NumberOfDimension(arg);
+
+	    for(dim=1; dim<=ndim; dim++)
+	    {	    
+		if (ith_dim_overlapable_p(old, dim))
+		{
+		    le = add_one_bound_argument
+			(le, module, arg, FALSE, dim, next++);
+		    le = add_one_bound_argument
+			(le, module, arg, TRUE, dim, next++);
+		}
+	    }
+	}
+    }
+
+    if (le)
+    {
+	functional_parameters(f) = gen_nconc(lp, le);
+    }
 }
 
 /* init_host_and_node_entities
@@ -190,6 +288,7 @@ init_host_and_node_entities ()
     NewDeclarationsOfDistributedArrays();    
 
     drop_distributed_arguments(host_module);
+    add_bound_arguments(node_module);
 
     ifdebug(3)
     {
