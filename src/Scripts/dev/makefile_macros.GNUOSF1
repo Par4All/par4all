@@ -1,0 +1,13 @@
+#
+# $Id$
+#
+# $Log: makefile_macros.GNUOSF1,v $
+# Revision 1.1  1997/09/09 12:30:36  coelho
+# Initial revision
+#
+#
+
+include $(ROOT)/Include/makefile_macros.GNU
+
+# end of it!
+#
