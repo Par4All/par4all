@@ -1,10 +1,11 @@
 !
 ! COMMON /HPFC PARAM/
 !
-! $RCSfile: hpfc_param.h,v $ ($Date: 1996/09/07 16:24:12 $, )
-! version $Revision$
-! got on %D%, %T%
 ! $Id$
+! $Log: hpfc_param.h,v $
+! Revision 1.7  1997/03/20 07:50:40  coelho
+! better RCS headers.
+!
 !
 ! the following files has to be included:
 !     include 'parameters.h'
