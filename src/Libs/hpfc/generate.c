@@ -1,4 +1,4 @@
-/* $RCSfile: generate.c,v $ ($Date: 1995/04/10 18:49:34 $, )
+/* $RCSfile: generate.c,v $ ($Date: 1995/04/21 14:50:06 $, )
  * version $Revision$
  * 
  * Fabien Coelho, May 1993
@@ -21,15 +21,10 @@ void generate_c1_beta(stat, lhp, lnp)
 statement stat; 
 list *lhp, *lnp; 
 { 
-    statement
- 	staths,
- 	statns;
-    expression 
-	w; 
-    call 
-	the_call; 
-    list
-	lreftodistarray = NIL;
+    statement staths, statns;
+    expression w; 
+    call the_call; 
+    list lreftodistarray = NIL;
     
     (*lhp) = NIL;
     (*lnp) = NIL;
@@ -48,15 +43,13 @@ list *lhp, *lnp;
 	   (!array_distributed_p
 	    (reference_variable(syntax_reference(expression_syntax(w))))));
 
-    /*
-     * references to distributed arrays:
+    /* references to distributed arrays:
      * w(A(I)) = B(I)
      * so the whole list is to be considered. 
      */
     lreftodistarray = FindRefToDistArrayFromList(call_arguments(the_call));
 
-    /*
-     * generation of the code 
+    /* generation of the code 
      */ 
     MAPL(cs,
      { 	 
@@ -90,8 +83,8 @@ list *lhp, *lnp;
 				     lUpdateExpr(node_module,
 						 call_arguments(the_call)))));
 
-    IFDBPRINT(9, "generate_c1_beta", host_module, staths);
-    IFDBPRINT(9, "generate_c1_beta", node_module, statns);
+    DEBUG_STAT(9, entity_name(host_module), staths);
+    DEBUG_STAT(9, entity_name(node_module), statns);
 
     (*lhp) = gen_nconc((*lhp), CONS(STATEMENT, staths, NIL));
     (*lnp) = gen_nconc((*lnp), CONS(STATEMENT, statns, NIL));
@@ -195,8 +188,7 @@ list *lhp, *lnp;
     lstatcomp = gen_nconc(lstatcomp, lstat);
     lstatcomp = gen_nconc(lstatcomp, CONS(STATEMENT, statcomputation, NIL));
 
-    /*
-     * Update the values of the defined distributed variable
+    /* Update the values of the defined distributed variable
      * if necessary... 
      */
     generate_update_values_on_nodes(ref, newref, &lupdatecomp, &lupdatenotcomp);
@@ -204,25 +196,24 @@ list *lhp, *lnp;
     lstatcomp = gen_nconc(lstatcomp, lupdatecomp);
     lstatnotcomp = gen_nconc(lstatnotcomp, lupdatenotcomp);
 
-    /*
-     * the overall statements are generated.
+    /* the overall statements are generated.
      */
     statcomputecomputer = st_compute_current_computer(ref);
     statifcomputer = st_make_nice_test(condition_computerp(),
 				       lstatcomp,
 				       lstatnotcomp);
 
-    IFDBPRINT(8,"generate_c1_alpha", node_module, statifcomputer);
+    DEBUG_STAT(8, entity_name(node_module), statifcomputer);
 
-
-    (*lnp) = CONS(STATEMENT, statcomputecomputer, CONS(STATEMENT, statifcomputer, NIL));
+    (*lnp) = CONS(STATEMENT, statcomputecomputer,
+	     CONS(STATEMENT, statifcomputer,
+		  NIL));
     (*lhp) = NIL;
 
     return;
  }
 
-/*
- * generate_update_values_on_nodes
+/* generate_update_values_on_nodes
  *
  * computer is doing the job
  */
@@ -317,32 +308,21 @@ list *lcompp, *lnotcompp;
     (*lcompp) = CONS(STATEMENT, statcompco, 
 		CONS(STATEMENT, statcompgv, NIL));
 
-/*
-    IFDBPRINT(9, "generate_read_of_ref_for_computer", host_module, statcompco);
-    IFDBPRINT(9, "generate_read_of_ref_for_computer", host_module, statcompgv);
-*/
     statnotcompco = st_compute_current_owners(ref);
     statnotcompmaysend = st_send_to_computer_if_necessary(ref);
 
 
     (*lnotcompp) = 
 	CONS(STATEMENT, statnotcompco, 
-	CONS(STATEMENT, statnotcompmaysend, NIL));
+	CONS(STATEMENT, statnotcompmaysend,
+	     NIL));
 
-/*
-    IFDBPRINT(9, "generate_read_of_ref_for_computer", 
-    node_module, statnotcompco);
-    IFDBPRINT(9, "generate_read_of_ref_for_computer", 
-    node_module, statnotcompmaysend);
-*/
-    /*
-     * the new variable is inserted in the expression...
+    /* the new variable is inserted in the expression...
      */
     syntax_reference(s) = make_reference(temp, NIL); 
 }
 
-/*
- * generate_read_of_ref_for_all
+/* generate_read_of_ref_for_all
  *
  * this function organise the read of the given reference
  * for all the nodes, and for host. 
@@ -372,26 +352,26 @@ list *lhp, *lnp;
     temph = load_new_host(temp); 
     tempn = load_new_node(temp);
 
-    /*
-     * the receive statement is built for host:
+    /* the receive statement is built for host:
      *
      * COMPUTE_CURRENT_OWNERS(ref)
      * temp = RECEIVEFROMSENDER(...)
      */
     stathco = st_compute_current_owners(ref);
-    /*
-     * a receive from sender is generated, however replicated the variable is
+
+    /* a receive from sender is generated, however replicated the variable is
      * FC 930623 (before was a call to st_receive_from(ref, ...))
      */
     stathrcv = st_receive_from_sender(make_reference(temph, NIL));
 
-    (*lhp) = CONS(STATEMENT, stathco, CONS(STATEMENT, stathrcv, NIL));
+    (*lhp) = CONS(STATEMENT, stathco,
+	     CONS(STATEMENT, stathrcv,
+		  NIL));
 
-    IFDBPRINT(9, "generate_read_of_ref_for_all", host_module, stathco);
-    IFDBPRINT(9, "generate_read_of_ref_for_all", host_module, stathrcv);
+    DEBUG_STAT(9, entity_name(host_module), stathco);
+    DEBUG_STAT(9, entity_name(host_module), stathrcv);
 
-    /*
-     * the code for node is built, in order that temp has the
+    /* the code for node is built, in order that temp has the
      * wanted value. 
      *
      * COMPUTE_CURRENT_OWNERS(ref)
@@ -413,8 +393,8 @@ list *lhp, *lnp;
 
     (*lnp) = CONS(STATEMENT, statnco, CONS(STATEMENT, statngv, NIL));
 
-    IFDBPRINT(9, "generate_read_of_ref_for_all", node_module, statnco);
-    IFDBPRINT(9, "generate_read_of_ref_for_all", node_module, statngv);
+    DEBUG_STAT(9, entity_name(node_module), statnco);
+    DEBUG_STAT(9, entity_name(node_module), statngv);
 
     /*
      * the new variable is inserted in the expression... 
@@ -452,7 +432,7 @@ list *lsp, *lindsp;
 	    statement stat = st_compute_ith_local_index(array, i, 
 					      EXPRESSION(CAR(inds)), &s);
 	    
-	    IFDBPRINT(9, "generate_compute_local_indexes", node_module, stat);
+	    DEBUG_STAT(9, entity_name(node_module), stat);
 	    
 	    (*lsp) = gen_nconc((*lsp), CONS(STATEMENT, stat, NIL));
 	    (*lindsp) =
@@ -471,8 +451,8 @@ list *lsp, *lindsp;
     }
 
     debug(8, "generate_compute_local_indices", "result:\n");
-    MAPL(cs, {IFDBPRINT(8, "generate_compute_local_indices",
-		       node_module, STATEMENT(CAR(cs)));}, (*lsp));
+    MAPL(cs, DEBUG_STAT(8, entity_name(node_module), STATEMENT(CAR(cs))),
+	 (*lsp));
 	      
 }
 
@@ -522,7 +502,7 @@ list *lstatp;
     expr = reference_to_expression(make_reference(newarray, newinds));
     stat = make_assign_statement(reference_to_expression(goal), expr);
 
-    IFDBPRINT(9, "generate_get_value_locally", node_module, stat);
+    DEBUG_STAT(9, entity_name(node_module), stat);
 
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, stat, NIL));
 }
@@ -550,7 +530,7 @@ list *lstatp;
     generate_compute_local_indices(ref, &ls, &newinds);
     statsnd = st_send_to_computer(make_reference(newarray, newinds));
 
-    IFDBPRINT(9, "generate_send_to_computer", node_module, statsnd);
+    DEBUG_STAT(9, entity_name(node_module), statsnd);
     
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, statsnd, NIL));
 }
@@ -578,7 +558,7 @@ list *lstatp;
     generate_compute_local_indices(ref, &ls, &newinds);
     statrcv = st_receive_from_computer(make_reference(newarray, newinds));
     
-    IFDBPRINT(9, "st_receive_val_from_computer", node_module, statrcv);
+    DEBUG_STAT(9, entity_name(node_module), statrcv);
 
     (*lstatp) = gen_nconc(ls, CONS(STATEMENT, statrcv, NIL));
 }
@@ -623,40 +603,23 @@ list *lstatp, lw, lr;
      },
 	 lr);
 
-/*
-    debug(7, "generate_parallel_body", "read for computer:\n");
-    MAPL(cs, {IFDBPRINT(7, "generate_parallel_body", 
-		       node_module, STATEMENT(CAR(cs)));}, lcompr);
-    debug(7, "generate_parallel_body", "read for not computer:\n");
-    MAPL(cs, {IFDBPRINT(7, "generate_parallel_body", 
-		       node_module, STATEMENT(CAR(cs)));}, lnotcompr);
-*/
-
     MAPL(cs,
      {
-	 list
-	     lco = NIL;
-	 list
-	     lnotco = NIL;
-	 syntax
-	     s = SYNTAX(CAR(cs));
-	 reference 
-	     r = syntax_reference(s);
-	 entity
-	     var = reference_variable(r);
-	 entity
-	     temp = NewTemporaryVariable(get_current_module_entity(),
+	 list lco = NIL;
+	 list lnotco = NIL;
+	 syntax s = SYNTAX(CAR(cs));
+	 reference r = syntax_reference(s);
+	 entity var = reference_variable(r);
+	 entity temp = NewTemporaryVariable(get_current_module_entity(),
 					 entity_basic(var));
-	 entity
-	     tempn ;
+	 entity tempn ;
 
 	 AddEntityToHostAndNodeModules(temp);
 	 tempn = load_new_node( temp);
 
 	 if (comp == s)
 	 {
-	     /*
-	      * we are sure that computer is one of the owners
+	     /* we are sure that computer is one of the owners
 	      */
 	     list
 		 lstat = NIL;
@@ -708,10 +671,7 @@ list *lstatp, lw, lr;
     ifdebug(8)
     {
 	MAPL(cs,
-	 {
-	     IFDBPRINT(8,"generate_parallel_body",
-		       node_module,STATEMENT(CAR(cs)));
-	 },
+	     DEBUG_STAT(8, entity_name(node_module), STATEMENT(CAR(cs))),
 	     lcompw);
     }
 
@@ -722,15 +682,12 @@ list *lstatp, lw, lr;
     ifdebug(8)
     {
 	MAPL(cs,
-	 {
-	     IFDBPRINT(8,"generate_parallel_body",
-		       node_module,STATEMENT(CAR(cs)));
-	 },
+	     DEBUG_STAT(8, entity_name(node_module),STATEMENT(CAR(cs))),
 	     lnotcompw);
     }
 
     statbody = UpdateStatementForModule(node_module, body);
-    IFDBPRINT(7, "generate_parallel_body", node_module, statbody);
+    DEBUG_STAT(7, entity_name(node_module), statbody);
 
     lcomp = gen_nconc(lcompr, CONS(STATEMENT, statbody, lcompw));
     lnotcomp = gen_nconc(lnotcompr, lnotcompw);
@@ -743,9 +700,13 @@ list *lstatp, lw, lr;
 					    lnotcomp),
 			  NIL));
 
-    debug(6, "generate_parallel_body", "final statement:\n");
-    MAPL(cs,{IFDBPRINT(6,"generate_parallel_body",
-		       node_module,STATEMENT(CAR(cs)));},(*lstatp));
+    ifdebug(6)
+    {
+	debug(6, "generate_parallel_body", "final statement:\n");
+	MAPL(cs,
+	     DEBUG_STAT(6, entity_name(node_module),STATEMENT(CAR(cs))),
+	     (*lstatp));
+    }
 }
 
 
@@ -810,10 +771,7 @@ list *lscompp, *lsnotcompp;
 				   CONS(STATEMENT,
 					statsndtoO,
 					NIL));
-/*
-    IFDBPRINT(8, "generate_update_values_on_computer_and_nodes",
-	      node_module, statcompif);
-*/
+
     statco = st_compute_current_owners(ref);
     generate_compute_local_indices(ref, &lstat, &linds);
     statrcvfromcomp = 
@@ -829,40 +787,18 @@ list *lscompp, *lsnotcompp;
 		    CONS(STATEMENT, statcompif, NIL));
     (*lsnotcompp)=CONS(STATEMENT, statco,
 		       CONS(STATEMENT,statif,NIL));
-/*
-    debug(8, "generate_update_values_on_computer_and_nodes","result for computer:\n");
-    MAPL(cs,{IFDBPRINT(8,"generate_update_values_on_computer_and_nodes",
-		       node_module,STATEMENT(CAR(cs)));},(*lscompp));
-
-    debug(8, "generate_update_values_on_computer_and_nodes","result for not computer:\n");
-    MAPL(cs,{IFDBPRINT(8,"generate_update_values_on_computer_and_nodes",
-		       node_module,STATEMENT(CAR(cs)));},(*lsnotcompp));
-*/
 }
 
-/*
- * generate_update_distributed_value_from_host
+/* generate_update_distributed_value_from_host
  */
 void generate_update_distributed_value_from_host(s, lhstatp, lnstatp)
 syntax s;
 list *lhstatp, *lnstatp;
 {
-    reference
-	r = syntax_reference(s);
-    entity
-	array,
-	newarray,
-	temp,
-	temph;
-    statement
-	statnco,
-	stathco,
-	stnrcv,
-	stnif,
-	sthsnd;
-    list
-	linds = NIL,
-	lnstat = NIL;
+    reference r = syntax_reference(s);
+    entity array, newarray, temp, temph;
+    statement statnco, stathco, stnrcv, stnif, sthsnd;
+    list linds = NIL, lnstat = NIL;
 
     assert(array_distributed_p(reference_variable(syntax_reference(s))));
 
@@ -882,8 +818,7 @@ list *lhstatp, *lnstatp;
 					CONS(STATEMENT, stnrcv, NIL)),
 			      NIL);
     
-    /*
-     * call the necessary communication function
+    /* call the necessary communication function
      */
 
     sthsnd = (replicated_p(array) ? 
