@@ -470,11 +470,12 @@ type r; /* type of result */
 	    if(implicit_type_p(fe))
 		/* memory leak of tr */
 		functional_result(type_functional(tfe)) = r;
-	    else
+	    else {
 		user_warning("MakeExternalFunction",
 			     "Type redefinition for %s.\n", entity_name(e));
 		ParserError("MakeExternalFunction",
 			   "Functional type redefinition.\n");
+	    }
 	}
     }
     else if (type_variable_p(tfe)) {
