@@ -138,9 +138,9 @@ the_actual_parser(
 			   NULL));
 
     /* yacc parser is called */
-    ssin = safe_fopen(CurrentFN, "r");
-    ssparse();
-    safe_fclose(ssin, CurrentFN);
+    syn_in = safe_fopen(CurrentFN, "r");
+    syn_parse();
+    safe_fclose(syn_in, CurrentFN);
     free(CurrentFN);
     CurrentFN = NULL;
 
