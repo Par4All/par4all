@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL1,v $ (version $Revision$)
-# $Date: 1996/07/15 14:44:56 $, 
+# $Date: 1996/07/15 14:45:24 $, 
 #
 # this file contains macro definitions 
 
@@ -12,14 +12,14 @@ CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDI
 LD	= $(CC) 
 LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)
 RANLIB	= granlib
-LEX	= lex
-LFLAGS	=
+LEX	= flex
+LFLAGS	= -l
 FC	= g77
 FFLAGS	= -O2 -g -Wimplicit -pipe
 LINT	= lint
 LINTFLAGS= -habxu
-YACC	= yacc
-YFLAGS	=
+YACC	= bison
+YFLAGS	= -y
 PROTOIZE= cproto -vcf2
 ETAGS	= etags
 TAR	= gtar
