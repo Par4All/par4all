@@ -704,10 +704,12 @@ basic_of_expression(expression exp)
     switch(syntax_tag(sy)) {
     case is_syntax_reference:
     {
-	type exp_type = entity_type(reference_variable(syntax_reference(sy)));
+	entity v = reference_variable(syntax_reference(sy));
+	type exp_type = entity_type(v);
 
 	if (type_tag(exp_type) != is_type_variable)
-	    pips_error("basic_of_expression", "Bad reference type tag");
+	    pips_error("basic_of_expression", "Bad reference type tag %d\n",
+		       type_tag(exp_type));
 	b = copy_basic(variable_basic(type_variable(exp_type)));
 	break;
     }
@@ -722,6 +724,8 @@ basic_of_expression(expression exp)
 	/* Never go there... */
 	b = make_basic(is_basic_overloaded, UUINT(4));
     }
+
+    debug(6, "basic_of_expression", "returns with %s\n", basic_to_string(b));
 
     return b;
 }
