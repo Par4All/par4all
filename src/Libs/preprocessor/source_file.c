@@ -485,7 +485,8 @@ check_fortran_syntax_before_pips(
 {
     string pips_flint = getenv("PIPS_FLINT");
     user_log("Checking Fortran syntax of %s\n", file_name);
-    if (system(concatenate(
+
+    if (safe_system_no_abort(concatenate(
 	pips_flint? pips_flint: "f77 -c -ansi", " ", file_name, 
 	" -o ", file_name, suffix, " ; rm ", file_name, suffix, NULL)))
 
