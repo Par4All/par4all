@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.67  2003/08/02 14:04:33  irigoin
+ * One step to accomodate formal parameters. Some reformatting and additional
+ * comments as well.
+ *
  * Revision 1.66  2003/06/19 07:38:19  nguyen
  * Update calls to make_statement and make_variable with new RI for C
  *
@@ -129,11 +133,13 @@ substitute_ghost_variable_in_expression(
                because it is going to fail again. Well, substitution won't be
 	       tried from AbortOfProcedure()... */
 	    /* ghost_variable_entities = NIL; */
-	    user_warning("substitute_ghost_variable_in_expression",
-			 "Functional variable %s is used as a functional argument\n",
-			 module_local_name(f));
-	    ParserError("substitute_ghost_variable_in_expression",
-			"Functional parameters are not (yet) supported by PIPS\n");
+	    pips_user_warning(
+			      "Functional variable %s is used as an actual argument\n"
+			      "This is not yet fully supported by PIPS.\n",
+			      module_local_name(f));
+	    /* ParserError("substitute_ghost_variable_in_expression",
+	       "Functional parameters are not (yet) supported by PIPS\n"); */
+	    reference_variable(ref)=f;
 	}
 	MAP(EXPRESSION, e, {
 	    substitute_ghost_variable_in_expression(e, v, f);
@@ -2079,6 +2085,8 @@ ProcessEntries()
     text txt = text_undefined;
     bool line_numbering_p = get_bool_property("PRETTYPRINT_STATEMENT_NUMBER");
     bool data_statements_p = get_bool_property("PRETTYPRINT_DATA_STATEMENTS");
+    /* To avoid an include of the prettyprint library and/or a compiler warning. */
+    extern bool make_text_resource_and_free(string, string, string, text);
 
     /* The declarations for cm are likely to be incorrect. They must be
      * synthesized by the prettyprinter.
@@ -2171,8 +2179,16 @@ MakeResultType(
 	    /* e is a function that was implicitly declared as a variable. 
 	       this may happen in Fortran. */
 	    pips_debug(2, "variable --> fonction\n");
-	    pips_assert("undefined type", r == type_undefined);
-	    new_r = copy_type(te);
+	    /* pips_assert("undefined type", r == type_undefined); */
+	    if(type_undefined_p(r))
+	      new_r = copy_type(te);
+	    else {
+	      /* The variable may have been typed, for instance
+		 implicitly, but then it appears in a CALL statement and
+		 its new type is void. Added for formal parameters. */
+	      pips_assert("The new result type is void", type_void_p(r));
+	      new_r = r;
+	    }
 	}
 	else if (type_functional_p(te)) {
 	    /* Well... this should be useless because e is already typed.
@@ -2260,11 +2276,12 @@ SafeLocalToGlobal(entity e, type r)
 	    }
 	}
 	else if(storage_formal_p(s)){
-	    pips_user_warning("entity %s is a formal functional parameter\n",
+	    pips_user_warning("Variable %s is a formal functional parameter.\n"
+			      "They are not (yet) supported by PIPS.\n",
 			      entity_name(e));
-	    ParserError("LocalToGlobal",
+	    /* ParserError("LocalToGlobal",
 			"Formal functional parameters are not supported "
-			"by PIPS.\n");
+			"by PIPS.\n"); */
 	    fe = e;
 	}
 	else {
@@ -2275,13 +2292,13 @@ SafeLocalToGlobal(entity e, type r)
     else {
 	fe = e;
     }
-    pips_assert("Entity is global", top_level_entity_p(fe));
+    pips_assert("Entity is global or it is a formal functional parameter",
+		top_level_entity_p(fe) || storage_formal_p(entity_storage(fe)));
     return fe;
 }
 
-void
-TypeFunctionalEntity(entity fe,
-		     type r)
+void TypeFunctionalEntity(entity fe,
+			  type r)
 {
     type tfe = entity_type(fe);
 
@@ -2338,7 +2355,21 @@ TypeFunctionalEntity(entity fe,
 	    }
 	}
     } else if (type_variable_p(tfe)) {
+      /* This may be an undeclared formal functional argument, initially
+         assumed to be a variable. Since it is not declared as an array
+         but appears with arguments, it must be a functional entity. */
+      storage sfe = entity_storage(fe);
+
+      if(storage_formal_p(sfe)) {
+	/* I do not know how to get the argument types. Let's hope it's
+           performed later...*/
+	free_type(entity_type(fe));
+	entity_type(fe) = make_type(is_type_functional, 
+				    make_functional(NIL, r));
+      }
+      else {
 	pips_internal_error("Fortran does not support global variables\n");
+      }
     } else {
 	pips_internal_error("Unexpected type for a global name %s\n",
 			    entity_name(fe));
@@ -2403,7 +2434,7 @@ MakeExternalFunction(
     fe = LocalToGlobal(e);
 
     /* Assertion: fe is a (functional) global entity and the type of its 
-       result is new_r */
+       result is new_r, or it is a formal functional parameter */
 
     TypeFunctionalEntity(fe, new_r);
 
@@ -2417,13 +2448,14 @@ MakeExternalFunction(
 	else {
 	    pips_user_warning("unsupported formal function %s\n", 
 			 entity_name(fe));
+	    /*
 	    ParserError("MakeExternalFunction",
-			"Formal functions are not supported by PIPS.\n");
+	    "Formal functions are not supported by PIPS.\n"); */
 	}
 
-    /* an external function has an unknown initial value, else code would be temporarily
-     * undefined which is avoided (theoretically forbidden) in PIPS.
-     */
+    /* an external function has an unknown initial value, else code would
+     * be temporarily undefined which is avoided (theoretically forbidden)
+     * in PIPS.  */
     if(entity_initial(fe) == value_undefined)
 	entity_initial(fe) = MakeValueUnknown();
 
@@ -2437,24 +2469,35 @@ MakeExternalFunction(
 
 entity 
 DeclareExternalFunction(
-    entity e /* entity to be turned into external function or subroutine */)
+    entity e /* entity to be turned into external function or subroutine,
+	      except if it is a formal functional parameter. */)
 {
-  /* It might be better to declare an unknown type as result type but I
-     decided to fix the problem later. When a call is later encountered,
-     the result type is set to void. */
-    entity fe = MakeExternalFunction(e, type_undefined);
+  entity fe = entity_undefined;
+
+  if(!type_undefined_p(entity_type(e))
+     && storage_defined_p(entity_storage(e))
+     && type_functional_p(entity_type(e))
+     && storage_formal_p(entity_storage(e))) {
+    fe = e;
+  }
+  else {
+    /* It might be better to declare an unknown type as result type but I
+       decided to fix the problem later. When a call is later encountered,
+       the result type is set to void. */
+    fe = MakeExternalFunction(e, type_undefined);
 
     if(value_intrinsic_p(entity_initial(fe))) {
-	pips_user_warning(
-	    "Name conflict between user declared module %s and intrinsic %s\n",
-	    module_local_name(fe), module_local_name(fe));
-	ParserError("DeclareExternalFunction",
-		    "Name conflict with intrinsic because PIPS does not support"
-		    " a specific name space for intrinsics. "
-		    "Please change your function or subroutine name.");
+      pips_user_warning(
+			"Name conflict between user declared module %s and intrinsic %s\n",
+			module_local_name(fe), module_local_name(fe));
+      ParserError("DeclareExternalFunction",
+		  "Name conflict with intrinsic because PIPS does not support"
+		  " a specific name space for intrinsics. "
+		  "Please change your function or subroutine name.");
     }
+  }
 
-    return fe;
+  return fe;
 }
 
 /* This function transforms an untyped entity into a formal parameter. 
