@@ -14,8 +14,9 @@
 # Delete `pwd`/foo.database
 # Delete = Delete *.database
 
-unset DEFAULT
+unset default ws 
 
+verbose=1
 script=`basename $0`
 
 pips_current_program=${PIPS_CURRENT_PROGRAM:-.pipsprogram}
@@ -23,30 +24,47 @@ pips_current_program=${PIPS_CURRENT_PROGRAM:-.pipsprogram}
 verb()
 { echo "$script:" "$@" >&2 ; }
 
+usage()
+{ echo "$script [-s] [workspace names]" >&2 ; exit 1;}
+
+while getopts s opt
+do
+    case ${opt} in
+    s) verbose= ;;
+    *) usage ;;
+    esac 
+done
+
+shift `expr $OPTIND - 1`
+
 if [ $# -eq 0 ] 
 then 
-  DEFAULT=yes
+  default=yes
   verb "deleting all databases in $PWD"
   set *.database
 fi
 
-for WS 
+for ws 
 do
-  WS=`echo $WS | sed 's/\/$//'`
+  ws=`echo $ws | sed 's/\/$//'`
   # delete .PIPS_CURRENT_PROGRAM
-  rm -f `dirname $WS`/$pips_current_program
+  rm -f `dirname $ws`/$pips_current_program
   # so that both zzz.database and zzz are good workspace names
-  WS=`dirname $WS`/`basename $WS .database`.database
-  if [ ! -d "$WS" ]
+  ws=`dirname $ws`/`basename $ws .database`.database
+
+  if [ ! -d "$ws" ]
   then
-    verb "No such directory \`$WS\'"
-    exit 2
+    if [ "${verbose}" ] 
+    then
+	verb "No such directory \`$ws\'"
+	exit 2
+    fi
   else
-    [ "$DEFAULT" ] && verb "Deleting $WS"
+    [ "$default" ] && verb "Deleting $ws"
 
     # was rm -r?
-    rm -rf $WS || {
-      verb "Cannot remove $WS"
+    rm -rf $ws || {
+      verb "Cannot remove $ws"
       exit 3
     }
   fi
