@@ -15,10 +15,7 @@
 
 */
 
-
-/* read.y 
-
-   The syntax of objects printed by GEN_WRITE. */
+/* read.y: The syntax of objects printed by GEN_WRITE. */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +24,6 @@
 #include "genC.h"
 #include "newgen_include.h"
 
-extern int gen_find_free_tabulated(struct gen_binding *);
 extern void newgen_lexer_position(FILE *);
 
 #define YYERROR_VERBOSE 1 /* better error messages by bison */
@@ -41,7 +37,9 @@ extern FILE * yyin;
 
 /* set to 10000 by BC - necessary in PIPS for DYNA */
 /* Should be a compilation option ? */
-/* CA: pb avec COX si a 10000... p'tet mauvaise recursion dans le parser de newgen? */
+/* CA: pb avec COX si a 10000... 
+   p'tet mauvaise recursion dans le parser de newgen? 
+*/
 #define YYMAXDEPTH 100000
 
 /* User selectable options. */
@@ -54,7 +52,7 @@ gen_chunk *Read_chunk ;
 
 /* The SHARED_TABLE maps a shared pointer number to its gen_chunk pointer value. */
 
-static gen_chunk **shared_table ;
+static gen_chunk ** shared_table ;
 
 /* The GEN_TABULATED_NAMES hash table maps ids to index in the table of
    the tabulated domains. In case of multiple definition, if the previous
@@ -65,7 +63,7 @@ static gen_chunk **shared_table ;
 
 int newgen_allow_forward_ref = FALSE ;
 
-static char * read_external(int);
+static void * read_external(int);
 static gen_chunk * make_def(gen_chunk *);
 static gen_chunk * make_ref(int, gen_chunk *);
 
@@ -140,7 +138,7 @@ Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP
 	    cons *cp ;
 
 	    assert($3>=0 && $3<MAX_DOMAIN);
-	    size = gen_size(Domains+$3);
+	    size = gen_size($3);
 
 	    $$ = (gen_chunk *)alloc(size*sizeof(gen_chunk));
 
@@ -152,9 +150,10 @@ Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP
 	    for(i=size-1, cp=$4; i>0 && cp; i--, cp=cp->cdr)
 	      *($$+i) = cp->car;
 
-	    message_assert("all data copied", !cp && (i==0 || i==1));
+	    message_assert("all data copied", 
+			   !cp && (i==0 || (i==1 && Domains[$3].index>=0)));
 
-	    if (i==1) ($$+1)->i = -1; /* tabulated number... */
+	    if (i==1) ($$+1)->i = 0; /* tabulated number... */
 	    gen_free_list($4);
 	  }
 	;
@@ -245,9 +244,9 @@ Basis	: READ_UNIT { $$.u = 1; }
 	| Int	{ $$.i = $1; }
 	| READ_FLOAT { $$.f = $1; }
 	| String { $$ = *$1 ; }
- 	| READ_EXTERNAL Int { $$.s = read_external($2); }
+ 	| READ_EXTERNAL Int { $$.s = (char*) read_external($2); }
 	| READ_DEF Chunk { $$.p = make_def($2); }
-	| READ_REF Int String { $$.p = make_ref($2, $3) ; }
+	| READ_REF Type String { $$.p = make_ref($2, $3) ; }
 	| READ_NULL { $$.p = gen_chunk_undefined ; }
 	;
 
@@ -280,7 +279,7 @@ void yyerror(char * s)
 
 /* READ_EXTERNAL reads external types on stdin */
 
-static char * read_external(int which)
+static void * read_external(int which)
 {
   struct gen_binding *bp;
   union domain *dp;
@@ -325,19 +324,14 @@ static char * read_external(int which)
   return (*(dp->ex.read))(yyin, yyinput);
 }
 
-extern gen_chunk * 
-  gen_enter_tabulated_def(int, int, char *, gen_chunk *, int);
-
 /* MAKE_DEF defines the object CHUNK of name STRING to be in the tabulation 
    table INT. domain translation is handled before in Chunk.
  */
 static gen_chunk * make_def(gen_chunk * gc)
 {
   int domain = gc->i;
-  char * id = strdup((gc+2)->s);
-  message_assert("domain is tabulated", Domains[domain].index!=-1);
-  return gen_enter_tabulated_def(Domains[domain].index, domain, id, gc, 
-				 newgen_allow_forward_ref) ;
+  string id = (gc+2)->s;
+  return gen_enter_tabulated(domain, id, gc, newgen_allow_forward_ref);
 }
 
 /* MAKE_REF references the object of hash name STRING in the tabulation table
@@ -345,42 +339,22 @@ static gen_chunk * make_def(gen_chunk * gc)
  */
 static gen_chunk * make_ref(int domain, gen_chunk * st)
 {
-    gen_chunk *hash ;
-    gen_chunk *cp ;
-    int Int;
-    string String;
+  gen_chunk * cp = gen_find_tabulated(st->s, domain);
 
-    domain = gen_type_translation_old_to_actual(domain);
-    Int = Domains[domain].index;
-
-    if(Gen_tabulated_[Int]==(gen_chunk *)NULL) {
-      user( "read: Unloaded tabulated domain %s\n", Domains[domain].name ) ;
-    }
-
-    String = strdup(gen_build_unique_tabulated_name(domain, st->s));
-
-    if((hash=(gen_chunk *)gen_get_tabulated_name_direct(String))
-	== (gen_chunk *) HASH_UNDEFINED_VALUE) 
+  if (gen_chunk_undefined_p(cp))
+  {
+    if (newgen_allow_forward_ref) 
     {
-      if (newgen_allow_forward_ref) 
-      {
-	hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
-	hash->i = -gen_find_free_tabulated( &Domains[ domain ] ) ;
-	
-	gen_put_tabulated_name_direct(String, (char *)hash) ;
-	
-	if((Gen_tabulated_[ Int ]+abs( hash->i ))->p != 
-	   gen_chunk_undefined) {
-	  fatal("make_ref: trying to re-allocate for %s\n", String);
-	}
-	(Gen_tabulated_[ Int ]+abs( hash->i ))->p = 
-	  (gen_chunk *)alloc(gen_size(Domains+domain)*sizeof(gen_chunk));
-      }
-      else {
-	user("make_ref: Forward references to %s prohibited\n", String) ;
-        }
+      cp = (gen_chunk*) alloc(sizeof(gen_chunk)*gen_size(domain));
+      cp->i = domain;
+      cp = gen_do_enter_tabulated(domain, st->s, cp, TRUE);
     }
-    cp = (Gen_tabulated_[Int]+abs(hash->i))->p ;
-    (cp+1)->i = abs( hash->i ) ;
-    return cp;
+    else 
+    {
+      user("make_ref: forward references to %s prohibited\n", st->s) ;
+    }
+  }
+
+  free(st->s), free(st);
+  return cp;
 }
