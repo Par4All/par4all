@@ -3,8 +3,11 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1996/12/27 09:17:15 $, )
- * version $Revision$,
+ * $Id$
+ * $Log: inits.c,v $
+ * Revision 1.23  1997/03/20 10:21:40  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
