@@ -47,3 +47,13 @@ extern bool wpips_emacs_mode;
 
 /* Define the menu separator: */
 #define WPIPS_MENU_SEPARATOR MENU_ITEM, MENU_STRING, "", MENU_INACTIVE, TRUE, NULL
+
+/* Here are the X ressource stuff: */
+/* The Log Window: */
+#define WPIPS_LOG_WINDOW_WIDTH_RESSOURCE_NAME "wpips.logwindow.width"
+#define WPIPS_LOG_WINDOW_WIDTH_RESSOURCE_CLASS "Wpips.Logwindow.Width"
+#define WPIPS_LOG_WINDOW_WIDTH_DEFAULT DIALOG_WIDTH
+
+#define WPIPS_LOG_WINDOW_HEIGHT_RESSOURCE_NAME "wpips.logwindow.height"
+#define WPIPS_LOG_WINDOW_HEIGHT_RESSOURCE_CLASS "Wpips.Logwindow.Height"
+#define WPIPS_LOG_WINDOW_HEIGHT_DEFAULT DIALOG_HEIGHT
