@@ -5,6 +5,10 @@
  * with the I/O in hpf programs.
  *
  * Fabien COELHO, Feb/Mar 94
+ *
+ * SCCS Stuff:
+ * $RCSfile: build-system.c,v $ ($Date: 1994/03/09 11:57:00 $) version $Revision$, got on %D%, %T%
+ * %A%
  */
 
 /*
@@ -105,10 +109,11 @@ extern fprintf();
 GENERIC_CURRENT_MAPPING(declaration_constraints, Psysteme, entity);
 GENERIC_CURRENT_MAPPING(hpf_constraints, Psysteme, entity);
 
-void reset_hpfc_static_mappings()
+void free_hpfc_static_mappings()
 {
-    reset_declaration_constraints_map();
-    reset_hpf_constraints_map();
+    free_declaration_constraints_map();
+    free_hpf_constraints_map();
+    free_only_io_map();
 }
 
 entity get_ith_dummy(prefix, suffix, i)
@@ -122,7 +127,8 @@ int i;
     return(find_or_create_scalar_entity(buffer, prefix, is_basic_int));
 }
 
-/*
+/* ------------------------------------------------------------------
+ *
  * DECLARATION CONSTRAINTS GENERATION
  */
 
@@ -239,7 +245,8 @@ entity e;
     return(p);
 }
 
-/*
+/* ------------------------------------------------------------------
+ *
  * HPF CONSTRAINTS GENERATION
  */
 
@@ -507,4 +514,3 @@ entity e;
 
     return(p);
 }
-
