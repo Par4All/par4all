@@ -1,4 +1,4 @@
-WPIPS.comment1: #	%A% ($Date: 1995/09/28 15:53:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+WPIPS.comment1: #	%A% ($Date: 1995/10/09 14:00:45 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
 !
 WPIPS.comment2:
 WPIPS.comment3: Add some stuff to have a coherent WPips behaviour:
@@ -32,8 +32,8 @@ OpenWindows.WindowColor:	LightSteelBlue1
 WPIPS.comment5: Be careful ! This size is allocated for all the WPips text windows ! :-(
 *Text.MaxDocumentSize:	1000000
 *Text.againLimit: 50
-*boldFont:	-*-lucidatypewriter-bold-r-*-*-14-*-*-*-*-*-*-*
-*font:  -*-lucidatypewriter-medium-r-*-*-14-*-*-*-*-*-*-*
+wpips*boldFont:	-*-lucidatypewriter-bold-r-*-*-14-*-*-*-*-*-*-*
+wpips*font:  -*-lucidatypewriter-medium-r-*-*-14-*-*-*-*-*-*-*
 !
 WPIPS.comment6: Some typical Wpips parameters:
 !
