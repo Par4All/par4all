@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "genC.h"
 #include "newgen_include.h"
 
 struct inlinable Inline[] = {
