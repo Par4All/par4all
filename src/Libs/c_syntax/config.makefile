@@ -1,8 +1,11 @@
 # This is config makefile for C syntax, using Flex and Bison 
-$Id$
-$Log: config.makefile,v $
-Revision 1.1  2003/06/24 07:19:02  nguyen
-Initial revision
+# $Id$
+# $Log: config.makefile,v $
+# Revision 1.2  2003/08/04 14:20:35  nguyen
+# Preliminary version of the C parser
+#
+# Revision 1.1  2003/06/24 07:19:02  nguyen
+# Initial revision
 
 
 ifeq ($(CC),gcc)
@@ -14,6 +17,7 @@ endif
 YFLAGS+=-d
 
 LIB_CFILES=	c_parser.c \
+		statement.c \
 		util.c
 
 LIB_HEADERS=	cyacc.y \
