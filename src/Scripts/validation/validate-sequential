@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/05/27 08:49:03 $, ) 
+# ($Date: 1997/05/27 11:28:19 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -51,7 +51,7 @@ else
 fi
 
 RUNNER=`whoami`
-HOSTNAME=`hostname`
+hostname=`hostname`
 PWD=`pwd`
 subject="PIPS Validation:"
 failed=""
@@ -63,8 +63,8 @@ program=
 export directory
 export program
 
-VERBOSE=':'
-DEBUG=':'
+verb=':'
+debg=':'
 
 MAIL='/usr/ucb/mail'
 test ! -x $MAIL && MAIL=mail
@@ -73,6 +73,16 @@ MAX_NB_LINES='100'
 
 export MAX_NB_LINES
 unset UNIQDIR pips_version tpips_version RUNDIR LOCKFILE PERFORMANCE
+
+verbose()
+{
+    echo [validate-sequential:$hostname] "$@"
+}
+
+debug()
+{
+    echo [validate-sequential:$hostname] "$@" >&2
+}
 
 #
 # echos the pips to be run
@@ -108,7 +118,7 @@ usage()
 }
 
 error()
-{ ret=$1; shift; echo "$RCSfile: validate-sequential,v $:" "$@" >&2 ; exit $ret; }
+{ ret=$1; shift; echo "[validate-sequential]:" "$@" >&2 ; exit $ret; }
 
 #
 # get options
@@ -119,10 +129,10 @@ while getopts tuvsdhx:y:r:f:l:i:a:p:m: opt
 do
   case $opt in
     t) PERFORMANCE="begin: `date`" ;;
-    v) VERBOSE='echo' ;;
-    s) VERBOSE=':' ;;
-    d) DEBUG='debug' ;;
-    u) UNIQDIR=".validate_directory.$HOSTNAME.$$" ;;
+    v) verb='verbose' ;;
+    s) verb=':' ;;
+    d) debg='debug' ;;
+    u) UNIQDIR=".validate_directory.$hostname.$$" ;;
     x) pips_version="$OPTARG" ;;
     y) tpips_version="$OPTARG" ;;
     r) RUNDIR="$OPTARG" ;;
@@ -146,11 +156,8 @@ shift `expr $OPTIND - 1`
 # FC, Tue Mar  8 14:19:50 MET 1994
 #
 
-debug()
-{ echo "$@" >&2;}
-
 RUNDIR=${RUNDIR:-$PWD}
-cd $RUNDIR || error 2 "canot cd $RUNDIR ($?)"
+cd $RUNDIR || error 2 "cannot cd $RUNDIR ($?)"
 
 # COMDIR=${COMDIR:-${RUNDIR}}
 # test -d $COMDIR || error 2 "no communication dir $COMDIR"
@@ -160,15 +167,15 @@ tpips_version=${tpips_version:=`which_executable tpips`}
 
 export pips_version tpips_version
 
-$VERBOSE "pips to be used: $pips_version"
-$VERBOSE "tpips to be used: $tpips_version"
+$verb "pips to be used: $pips_version"
+$verb "tpips to be used: $tpips_version"
 
 #
 # a special directory is used when the -u option is set.
 #
 [ "$UNIQDIR" ] && { mkdir $UNIQDIR ; cd $UNIQDIR;}
 
-$VERBOSE "running in directory `pwd`"
+$verb "running in directory `pwd`"
 
 tmpout=${tdir}/validate.$$
 tmperr=${tdir}/validate_err.$$
@@ -184,7 +191,7 @@ report()
   result=$1
   message=$2
   
-  $DEBUG " || report $1 suggested"
+  $debg " || report $1 suggested"
 
   if [ $result -ne 0 ] 
   then
@@ -198,7 +205,7 @@ report()
 	cat $tmperr
 	echo "--";
       }
-      echo "Validate Message from $HOSTNAME:"
+      echo "Validate Message from $hostname:"
       echo
       echo "PIPS: $pips_version"
       echo "TPIPS: $tpips_version"
@@ -228,7 +235,7 @@ make_diff()
   if [ ! -f $refresult ] 
   then
     report 1 "Cannot open result file $aspect/$name.result/$module"
-    [ "$LOCKFILE" ] && echo "$aspect:$name:$module" > $LOCKFILE.$HOSTNAME
+    [ "$LOCKFILE" ] && echo "$aspect:$name:$module" > $LOCKFILE.$hostname
     exit 1
   fi
 
@@ -284,7 +291,7 @@ test_aspect()
 
        report $STATUS \
          "Execution of $aspect/$name.test failed" || \
-         { $DEBUG " || error"; continue;}
+         { $debg " || error"; continue;}
        
        make_diff $aspect $name test
        continue
@@ -302,7 +309,7 @@ test_aspect()
        
        report $STATUS \
          "Execution of $aspect/$name.tpips failed" || \
-         { $DEBUG " || error"; continue;}
+         { $debg " || error"; continue;}
 
        make_diff $aspect $name test
        continue
@@ -322,7 +329,7 @@ test_aspect()
        [ -f core ] && rm -f core
 
        report $STATUS "Execution of $aspect/default_test on $name.f failed" ||
-	    { $DEBUG " || error"; rm -f $aspect/$name.test; continue;}
+	    { $debg " || error"; rm -f $aspect/$name.test; continue;}
        
        rm -f $aspect/$name.test
        make_diff $aspect $name test
@@ -344,7 +351,7 @@ test_aspect()
 	[ -f core ] && rm -f core
 
         report $STATUS "Execution of $aspect/default_tpips on $file failed" ||
-	    { $DEBUG " || error"; continue;}
+	    { $debg " || error"; continue;}
        
 	make_diff $aspect $name test
 	continue
@@ -389,12 +396,12 @@ esac
 # if [ -f pipsmake.rc ] 
 # then
 #   report 2 "validate cannot be run with a local pipsmake.rc."
-#   [ "$LOCKFILE" ] && echo "validate:$HOSTNAME" > $LOCKFILE.$HOSTNAME
+#   [ "$LOCKFILE" ] && echo "validate:$hostname" > $LOCKFILE.$hostname
 #   exit 4
 # elif [ -f properties.rc ]
 # then
 #   report 3 "validate cannot be run with a local properties.rc."
-#   [ "$LOCKFILE" ] && echo "validate:$HOSTNAME" > $LOCKFILE.$HOSTNAME
+#   [ "$LOCKFILE" ] && echo "validate:$hostname" > $LOCKFILE.$hostname
 #   exit 5
 # fi
 
@@ -422,7 +429,7 @@ do
   "validate should not be run with a properties.rc in $vdir/$i."
   else
 
-    $VERBOSE "validating $i"
+    $verb "validating $i"
 
     test_aspect $vdir/$i
   fi
@@ -460,7 +467,7 @@ program=
 
 if [ "$LOCKFILE" ]
 then
-  echo $failed > "$LOCKFILE.$HOSTNAME"
+  echo $failed > "$LOCKFILE.$hostname"
 else
   report 1 \
   "Your Validation Suite Test for
@@ -468,7 +475,7 @@ else
 $aspects ${FILES:+($FILES)}
   
 $final
-   on $HOSTNAME
+   on $hostname
 
 $PERFORMANCE
 
