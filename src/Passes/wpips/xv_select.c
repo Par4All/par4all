@@ -27,22 +27,24 @@
 void
 select_a_module_by_default()
 {
-   char *module_name = db_get_current_module_name();
+    char *module_name = db_get_current_module_name();
 
-   if (module_name == NULL) {
-      /* Ok, no current module, then find a main module (PROGRAM): */
-      string main_module_name = get_first_main_module();
+    if (module_name == NULL) {
+	/* Ok, no current module, then find a main module (PROGRAM): */
+	string main_module_name = get_first_main_module();
       
-      if (main_module_name != string_undefined) {
-         /* Ok, we got it ! Now we select it: */
-         module_name = main_module_name;
-         user_log("Main module PROGRAM \"%s\" found.", module_name);
-         end_select_module_notify(module_name);
-      }
-   }
+	if (!string_undefined_p(main_module_name)) {
+	    /* Ok, we got it ! Now we select it: */
+	    module_name = main_module_name;
+	    user_log("Main module PROGRAM \"%s\" found.", module_name);
+	    end_select_module_notify(module_name);
+	    /* GO: show_module() has already been called so return now */
+	    return;
+	}
+    }
 
-   /* Refresh the module name on the status window: */
-   show_module();
+    /* Refresh the module name on the status window: */
+    show_module();
 }
 
 
