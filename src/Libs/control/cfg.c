@@ -6,6 +6,8 @@
 #include <stdlib.h> 
 #include <stdio.h> 
 
+#include "linear.h"
+
 #include "genC.h"
 #include "misc.h"
 #include "ri.h"
