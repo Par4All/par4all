@@ -5,6 +5,9 @@
 # a shell wrapper for "JPips", the java-based pips interface.
 #
 # $Log: jpips,v $
+# Revision 1.4  1998/07/03 07:06:01  coelho
+# default menu is "basic" now.
+#
 # Revision 1.3  1998/07/02 17:10:34  coelho
 # -d option added.
 #
@@ -58,7 +61,8 @@ shift `expr $OPTIND - 1`
 
 forward="${forward} $@"
 
-men=jpips_menus.${menu_type:-test}
+# default menu is jpips_menus.basic.
+men=jpips_menus.${menu_type:-basic}
 
 #
 # which jpips.zip file
@@ -112,6 +116,7 @@ PATH="${JAVA_ROOT:-/usr/local/jdk1.2beta3}/bin:${PATH}"
 
 export CLASSPATH
 
+# verbose execution...
 set -x
 CLASSPATH=${jpips}
 exec java ${props} JPips.JPips ${forward}
