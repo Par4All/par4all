@@ -112,11 +112,13 @@ transformer t;
  *
  * t = intersection(t, i#new = i#old + incr)
  *
+ * incr is supposed to be compatible with the value mappings
+ *
  * Pvecteur incr should not be used after a call to transformer_add_index
  * because it is shared by t and modified
  */
 transformer 
-transformer_add_loop_index(t, i, incr)
+transformer_add_variable_incrementation(t, i, incr)
 transformer t;
 entity i;
 Pvecteur incr;
