@@ -22,8 +22,5 @@ LDFLAGS += -g
 # getopt() => posix2
 
 CPPFLAGS += \
-	-D_POSIX_C_SOURCE=2 \
-	-D_BSD_SOURCE \
-	-D_SVID_SOURCE \
 	-D__USE_FIXED_PROTOTYPES__
 
