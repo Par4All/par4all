@@ -4,6 +4,10 @@
   * $Id$
   *
   * $Log: expression.c,v $
+  * Revision 1.7  2003/07/24 09:02:26  irigoin
+  * Better handling of absolute value intrinsic, more debugging statements,
+  * more filtering to decide if integer variables should be analyzed or not.
+  *
   * Revision 1.6  2001/12/05 17:14:59  irigoin
   * Maybe less accurate handling of conditions (if side effects) but faster
   * than previous implementation which required too many projections to
@@ -98,6 +102,8 @@ generic_minmax_to_transformer(entity e,
 
   pips_debug(8, "begin\n");
 
+  pips_assert("At least one argument", gen_length(args)>=1);
+
   /* pips_assert("Precondition is unused", transformer_undefined_p(pre)); */
 
   for(cexpr = args; !ENDP(cexpr); POP(cexpr)) {
@@ -137,7 +143,13 @@ generic_minmax_to_transformer(entity e,
        constraints ( I do not understand why the new and the old value
        of e both appear... so it may not be necessary for the
        consistency check... I'm lost, FI, 6 Jan. 1999) */
-    tf_acc = transformer_inequalities_add(tf_acc, cl);
+    if(!transformer_undefined_p(tf_acc)) {
+      tf_acc = transformer_inequalities_add(tf_acc, cl);
+    }
+    else {
+      /* cl could be kept but would be always projected later */
+      contraintes_free(cl);
+    }
     tf = tf_acc;
   }
 
@@ -188,9 +200,14 @@ generic_unary_operation_to_transformer(
     bool is_internal)
 {
   transformer tf = transformer_undefined;
+  static transformer generic_abs_to_transformer(entity, expression, transformer, bool);
 
   if(ENTITY_UNARY_MINUS_P(op)) {
     tf = unary_minus_operation_to_transformer(e, e1, pre, is_internal);
+  }
+  else if(ENTITY_IABS_P(op) || ENTITY_ABS_P(op) || ENTITY_DABS_P(op)
+	  || ENTITY_CABS_P(op)) {
+    tf = generic_abs_to_transformer(e, e1, pre, is_internal);
   }
 
   return tf;
@@ -874,6 +891,38 @@ static transformer iabs_to_transformer(entity v, /* assumed to be a value */
 
   return tf;
 }
+
+/* Copy of iabs_to_transformer(), which is probably never called anymore */
+static transformer generic_abs_to_transformer(entity v, /* assumed to be a value */
+					      expression expr,
+					      transformer pre,
+					      bool is_internal)
+{
+  transformer tf = transformer_identity();
+  entity tv = make_local_temporary_value_entity(entity_type(v));
+  transformer etf = any_expression_to_transformer(tv, expr, pre, is_internal);
+  Pvecteur vlb1 = vect_new((Variable) tv, VALUE_ONE);
+  Pvecteur vlb2 = vect_new((Variable) tv, VALUE_MONE);
+
+  pips_debug(8, "begin\n");
+
+
+  vect_add_elem(&vlb1, (Variable) v, VALUE_MONE);
+  vect_add_elem(&vlb2, (Variable) v, VALUE_MONE);
+
+  tf = transformer_inequality_add(tf, vlb1);
+  tf = transformer_inequality_add(tf, vlb2);
+  tf = transformer_safe_image_intersection(tf, etf);
+  free_transformer(etf);
+
+  ifdebug(8) {
+    pips_debug(8, "result:\n");
+    dump_transformer(tf);
+    pips_debug(8, "end\n");
+  }
+
+  return tf;
+}
 
 /* More could be done along the line of
    integer_multiply_to_transformer()... when need arises.*/
@@ -1310,7 +1359,7 @@ integer_call_expression_to_transformer(
   transformer tf = transformer_undefined;
   int arity = gen_length(args);
 
-  pips_debug(8, "Begin\n");
+  pips_debug(8, "Begin with precondition %p\n", pre);
 
   /* tests are organized to trap 0-ary user-defined functions as well as
      binary min and max */
@@ -1362,7 +1411,7 @@ integer_expression_to_transformer(
   normalized n = NORMALIZE_EXPRESSION(expr);
   syntax sexpr = expression_syntax(expr);
 
-  pips_debug(8, "begin for expression: ");
+  pips_debug(8, "begin with precondition %p for expression: ", pre);
   ifdebug(8) print_expression(expr);
 
   /* Assume: e is a value */
@@ -1982,6 +2031,7 @@ any_expression_to_transformer(
       || (basic_float_p(bv) && basic_int_p(be))) {
     switch(basic_tag(be)) {
     case is_basic_int:
+      if(integer_analyzed_p()) {
       if(basic_int_p(bv)) {
 	tf = integer_expression_to_transformer(v, expr, pre, is_internal);
       }
@@ -1992,20 +2042,24 @@ any_expression_to_transformer(
 	/* Redundant with explicit type coercion also available in PIPS */
 	/* To be done later */
       }
+      }
       break;
     case is_basic_logical:
-      tf = logical_expression_to_transformer(v, expr, pre, is_internal);
+      if(boolean_analyzed_p())
+	tf = logical_expression_to_transformer(v, expr, pre, is_internal);
       break;
     case is_basic_float:
       /* PIPS does not represent negative constants: call to unary_minus */
-      tf = float_expression_to_transformer(v, expr, pre, is_internal);
+      if(float_analyzed_p())
+	tf = float_expression_to_transformer(v, expr, pre, is_internal);
       break;
     case is_basic_complex:
       /* PIPS does not represent complex constants: call to CMPLX */
       break;
     case is_basic_string:
       /* Only constant string are processed */
-      tf = string_expression_to_transformer(v, expr);
+      if(string_analyzed_p())
+	tf = string_expression_to_transformer(v, expr);
       break;
     case is_basic_overloaded:
       /* The overloading is supposed to have been lifted by
@@ -2024,6 +2078,10 @@ any_expression_to_transformer(
   }
 
   /* tf may be transformer_undefined when no information is derived */
+  ifdebug(1) {
+    if(!transformer_undefined_p(pre)) 
+      pips_assert("No obvious aliasing between tf and pre", tf!=pre);
+  }
   pips_debug(8, "end with tf=%p\n", tf);
 
   return tf;
