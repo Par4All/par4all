@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.66  1997/12/05 16:50:03  coelho
+ * i_checkpoint added.
+ *
  * Revision 1.65  1997/12/05 13:28:20  coelho
  * capply rule added.
  *
@@ -18,6 +21,7 @@
 %token TK_OPEN
 %token TK_CREATE
 %token TK_CLOSE
+%token TK_CHECKPOINT
 %token TK_DELETE
 %token TK_MODULE
 %token TK_MAKE
@@ -59,6 +63,7 @@
 %type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd i_rm
 %type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help i_capply
+%type <status> i_checkpoint
 %type <name> rulename filename 
 %type <array> filename_list
 %type <rn> resource_id rule_id
@@ -214,6 +219,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| i_create
   	| i_close
 	| i_delete
+	| i_checkpoint
 	| i_module
 	| i_make
 	| i_apply
@@ -345,6 +351,18 @@ i_setenv: TK_SET_ENVIRONMENT TK_NAME TK_NAME TK_ENDOFLINE
 	{ set_env_log_and_free($2, $3);	}
 	| TK_SET_ENVIRONMENT TK_NAME TK_EQUAL TK_A_STRING TK_ENDOFLINE
 	{ set_env_log_and_free($2, $4);	}
+	;
+
+i_checkpoint: TK_CHECKPOINT TK_ENDOFLINE
+	{
+	    if (tpips_execution_mode) 
+	    {
+		if (db_get_current_workspace_name())
+		    checkpoint_workspace();
+		else
+		    pips_user_error("Cannot checkpoint, no workspace!\n");
+	    }
+	}
 	;
 
 i_open:	TK_OPEN TK_NAME TK_ENDOFLINE
