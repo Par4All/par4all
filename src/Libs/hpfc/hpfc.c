@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/08/10 17:02:50 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/09/04 18:08:10 $, )
  * version $Revision$
  */
  
@@ -15,7 +15,7 @@
 
 /* fake resources...
  */
-#define NO_FILE "no file name"
+#define NO_FILE "dummy-file"
 
 /*  COMMONS
  */
@@ -96,7 +96,7 @@ static void load_hpfc_status() /* SET them */
 {
     string name = db_get_current_program_name();
     hpfc_status	s = (hpfc_status) 
-	db_get_resource(DBR_HPFC_STATUS, name, TRUE);
+	db_get_memory_resource(DBR_HPFC_STATUS, name, TRUE);
 
     set_entity_status(hpfc_status_entity_status(s));
     set_overlap_status(hpfc_status_overlapsmap(s));
@@ -123,10 +123,15 @@ static void close_hpfc_status()
 /*  COMPILATION
  */
 
+static void automatic_translation(entity old, entity host, entity node)
+{
+    store_new_host_variable(host, old);
+    store_new_node_variable(node, old);
+}
+
 static void set_resources_for_module(entity module)
 {
     string module_name = module_local_name(module);
-    entity stop;
 
     /*   STATEMENT
      */
@@ -166,11 +171,21 @@ static void set_resources_for_module(entity module)
      */
     hpfc_init_run_time_entities();
 
-    /*   STOP is to be translated into hpfc_{host,node}_end
+    /*   STOP is to be translated into hpfc_{host,node}_end.
+     *   the special FCD calls.
      */
-    stop = local_name_to_top_level_entity(STOP_FUNCTION_NAME);
-    store_new_host_variable(hpfc_name_to_entity(HOST_END), stop);
-    store_new_node_variable(hpfc_name_to_entity(NODE_END), stop);
+    automatic_translation(local_name_to_top_level_entity(STOP_FUNCTION_NAME),
+			  hpfc_name_to_entity(HOST_END),
+			  hpfc_name_to_entity(NODE_END));
+    automatic_translation(hpfc_name_to_entity(HPF_PREFIX SYNCHRO_SUFFIX),
+			  hpfc_name_to_entity(SYNCHRO),
+			  hpfc_name_to_entity(SYNCHRO));
+    automatic_translation(hpfc_name_to_entity(HPF_PREFIX TIMEON_SUFFIX),
+			  hpfc_name_to_entity(HOST_TIMEON),
+			  hpfc_name_to_entity(NODE_TIMEON));
+    automatic_translation(hpfc_name_to_entity(HPF_PREFIX TIMEOFF_SUFFIX),
+			  hpfc_name_to_entity(HOST_TIMEOFF),
+			  hpfc_name_to_entity(NODE_TIMEOFF));
 }
 
 static void 
@@ -285,7 +300,7 @@ void hpfc_init(string name)
  */
 void hpfc_filter(string name)
 {
-    string file_name = db_get_resource(DBR_SOURCE_FILE, name, TRUE);
+    string file_name = db_get_file_resource(DBR_SOURCE_FILE, name, TRUE);
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
@@ -313,7 +328,7 @@ void hpfc_filter(string name)
 void hpfc_directives(string name)
 {
     entity module = local_name_to_top_level_entity(name);
-    statement s = (statement) db_get_resource(DBR_CODE, name, FALSE);
+    statement s = (statement) db_get_memory_resource(DBR_CODE, name, FALSE);
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
@@ -329,7 +344,6 @@ void hpfc_directives(string name)
 	make_update_common_map(); 
 	
 	NormalizeCommonVariables(module, s);
-	/* debug_print_referenced_entities(s); */
 	build_full_ctrl_graph(s);
 	handle_hpf_directives(s);
 
