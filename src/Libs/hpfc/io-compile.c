@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/12/28 09:17:05 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/12/29 14:05:26 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -269,9 +269,9 @@ statement *psh, *psn;
 	/*  the sorting is done again at the code generation,
 	 *  but this phase will ensure more determinism in the debug messages
 	 */
-	sc_vect_sort(condition, lexicographic_order_p);
-	sc_vect_sort(proc_echelon, lexicographic_order_p);
-	sc_vect_sort(tile_echelon, lexicographic_order_p);
+	sc_vect_sort(condition, compare_Pvecteur);
+	sc_vect_sort(proc_echelon, compare_Pvecteur);
+	sc_vect_sort(tile_echelon, compare_Pvecteur);
 
 	if (!sc_empty_p(proc_echelon) && !sc_empty_p(tile_echelon))
 	{
@@ -314,8 +314,8 @@ statement *psh, *psn;
 	/*  the sorting is done again at the code generation,
 	 *  but this phase will ensure more determinism in the debug messages
 	 */
-	sc_vect_sort(condition, lexicographic_order_p);
-	sc_vect_sort(row_echelon, lexicographic_order_p);
+	sc_vect_sort(condition, compare_Pvecteur);
+	sc_vect_sort(row_echelon, compare_Pvecteur);
 
 	if (!sc_empty_p(row_echelon))
 	{
@@ -371,7 +371,7 @@ tag move, act;
 	result = clean_shared_io_system(result, array, move);
     }
 
-    sc_vect_sort(result, lexicographic_order_p);
+    sc_vect_sort(result, compare_Pvecteur);
 
     /*
      * Final DEBUG message
@@ -523,7 +523,7 @@ tag move, act;
      * the noisy system is cleaned
      * some variables are not used, they are removed here.
      */
-    sc_nredund(&result);
+    build_sc_nredund_2pass(&result);
     base_rm(sc_base(result));
     sc_base(result) = NULL;
     sc_creer_base(result);
@@ -582,21 +582,25 @@ list lvars;
 	 Variable
 	     var = (Variable) ENTITY(CAR(ce));
 	 int
-	     coeff = 0;
-	 
-	 /*
-	  * Yi-Qing Stuff in ricedg is used
-	  */
-	 if ((void) eq_v_min_coeff(sc_egalites(syst), var, &coeff), coeff==1)
+	     coeff = -1;
+
+	 (void) contrainte_var_min_coeff(sc_egalites(syst), var, &coeff, FALSE);
+
+	 if (coeff==1)
 	 {
 	     Pvecteur
 		 v = vect_new(var, 1);
+	     bool 
+		 exact = TRUE;
 	     
 	     debug(7, "remove_variables_if_possible", 
 		   "removing variable %s\n", 
 		   entity_local_name((entity) var));
 	     
-	     syst = sc_projection_optim_along_vecteur(syst, v);
+	     sc_projection_along_variables_with_test_ofl_ctrl(&syst, v, 
+							      &exact, 
+							      NO_OFL_CTRL);
+	     assert(exact);
 	     vect_rm(v);
 	 }
      }, 
@@ -656,7 +660,13 @@ tag move;
     /*
      * Remove variables that have to be removed
      */
-    MAPL(ce, {sc_projection(syst, (Variable) ENTITY(CAR(ce)));}, remove);
+    MAPL(ce, 
+     {
+	 sc_projection_along_variable_ofl_ctrl(&syst,
+					       (Variable) ENTITY(CAR(ce)),
+					       NO_OFL_CTRL);
+     },
+	 remove);
     
     /*
      * Try to remove other unusefull variables
@@ -667,7 +677,7 @@ tag move;
      * the noisy system is cleaned
      * some variables are not used, they are removed here.
      */
-    sc_nredund(&syst);
+    build_sc_nredund_2pass(&syst);
     base_rm(sc_base(syst));
     sc_base(syst) = BASE_NULLE;
     sc_creer_base(syst);
@@ -797,7 +807,13 @@ tag move;
     /*
      * Remove variables that have to be removed
      */
-    MAPL(ce, {sc_projection(syst, (Variable) ENTITY(CAR(ce)));}, remove);
+    MAPL(ce, 
+     {
+	 sc_projection_along_variable_ofl_ctrl(&syst,
+					       (Variable) ENTITY(CAR(ce)),
+					       NO_OFL_CTRL);
+     },
+	 remove);
     
     /*
      * Try to remove other unusefull variables
@@ -808,7 +824,7 @@ tag move;
      * the noisy system is cleaned
      * some variables are not used, they are removed here.
      */
-    sc_nredund(&syst);
+    build_sc_nredund_2pass(&syst);
     base_rm(sc_base(syst));
     sc_base(syst) = BASE_NULLE;
     sc_creer_base(syst);
@@ -940,9 +956,9 @@ list *plparam, *plproc, *plscan, *plrebuild;
 	     lrebuild);
     }
 
-    /* syst = sc_elim_redond(syst); */
+    /* syst = sc_elim_redund(syst); */
 
-    sc_nredund(psyst);
+    build_sc_nredund_2pass(psyst);
     sc_base(*psyst) = (base_rm(sc_base(*psyst)), BASE_NULLE);
     sc_creer_base(*psyst);
 
@@ -991,7 +1007,9 @@ list vars, *pleftvars;
 						      vect_dup(eq->vecteur))), 
 		      result);
 
-	     syst = sc_projection_by_eq(syst, eq, (Variable) dummy);
+	     syst = sc_variable_substitution_with_eq_ofl_ctrl(syst, eq, 
+							      (Variable) dummy,
+							      FWD_OFL_CTRL);
 	 }
 	 else
 	 {
@@ -1166,7 +1184,7 @@ tag move;
 {
     Psysteme
 	true = statement_context(stat, move),
-	cleared = non_redundent_subsystem(*psc, true);
+	cleared = extract_nredund_subsystem(*psc, true);
 
     *psc = (sc_rm(*psc), cleared);
 }
