@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.23  1998/10/26 14:36:13  coelho
+ * constants explicitely defined in .h.
+ *
  * Revision 1.22  1998/10/24 15:18:26  coelho
  * THROW macro updated to tell its source.
  *
@@ -33,11 +36,11 @@
 
 /* the index points to the first available chunck for a new context...
  */
-extern const unsigned int overflow_error;
-extern const unsigned int simplex_arithmetic_error;
-extern const unsigned int user_exception_error;
-extern const unsigned int parser_exception_error;
-extern const unsigned int any_exception_error;
+const unsigned int overflow_error = 1;
+const unsigned int simplex_arithmetic_error = 2;
+const unsigned int user_exception_error = 4;
+const unsigned int parser_exception_error = 8;
+const unsigned int any_exception_error = ~0;
 
 /* use gnu cpp '__FUNCTION__' extension if possible.
  */
