@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/03 22:27:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/04 18:39:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_statement[] = "%A% ($Date: 1997/02/03 22:27:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_statement[] = "%A% ($Date: 1997/02/04 18:39:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -325,7 +325,12 @@ instruction i;
       }
       else {
 	statement_instruction(s) = i;
+	/* 
 	statement_number(s) = (instruction_goto_p(i)||instruction_block_p(i))?
+	  STATEMENT_NUMBER_UNDEFINED : get_next_statement_number();
+	  */
+	/* Let's number labelled GOTO because a CONTINUE is derived later from them */
+	statement_number(s) = (instruction_block_p(i))?
 	  STATEMENT_NUMBER_UNDEFINED : get_next_statement_number();
       }
     }
@@ -389,6 +394,8 @@ bool number_it;
 
     if (iPrevComm != 0 && !instruction_block_p(i)) {
 	statement_comments(s) = strdup(PrevComm);
+	PrevComm[0] = '\0';
+	iPrevComm = 0;
     }
 
     pc = CONS(STATEMENT, s, NULL);
@@ -513,8 +520,30 @@ entity i;
 					  make_test(cond,
 						    instruction_to_statement(g),
 						    make_empty_statement()));
-	statement s =  make_stmt_of_instr(iif);
-	
+	statement s = statement_undefined;
+
+	if(ENDP(CDR(cl)) && strcmp(lab_I,"")) {
+	    /* If this is the last generated test (i.e. the first one since they are
+	     * generated backwards) and if the computed GO TO has a label, do something
+	     * about it
+	     */
+	    entity lab = MakeLabel(strdup(lab_I));
+
+	    if ((s = LabelToStmt(entity_name(lab))) == statement_undefined) {
+		s = instruction_to_statement(iif);
+		NewStmt(lab, s);
+	    }
+	    else {
+		pips_assert("Instruction field must be undefined", 
+			    instruction_undefined_p(statement_instruction(s)));
+		statement_instruction(s) = iif;
+	    }
+	    lab_I[0] = '\0';
+	}
+	else {
+	    s = instruction_to_statement(iif);
+	}
+
 	statement_number(s) = look_at_next_statement_number();
 	cs = CONS(STATEMENT, s, cs);
     }
