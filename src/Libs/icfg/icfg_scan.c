@@ -52,7 +52,7 @@ GENERIC_LOCAL_MAPPING(icfg, text, statement)
  */
 
 static bool 
-    print_dos = FALSE, 
+    print_do_loops = FALSE, 
     print_ifs = FALSE;
 static text (*decoration)(string) = NULL;
 
@@ -68,7 +68,7 @@ append_icfg_file(text t, string module_name)
     /* create filename */
     localfilename = 
 	strdup(concatenate(module_name,
-	       print_ifs ? ".icfgc" : print_dos ? ".icfgl" : ".icfg" ,
+	       print_ifs ? ".icfgc" : print_do_loops ? ".icfgl" : ".icfg" ,
 			   NULL));
     filename = 
 	strdup(concatenate(db_get_current_workspace_directory(), 
@@ -189,7 +189,7 @@ static void call_filter(call c)
 static bool loop_filter (loop l)
 {
     pips_debug (5, "Loop begin\n");
-    if (print_dos) current_margin += ICFG_SCAN_INDENT;
+    if (print_do_loops) current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
@@ -203,7 +203,7 @@ static void loop_rewrite (loop l)
 
     pips_debug (5,"Loop end\n");
 
-    if (print_dos) current_margin -= ICFG_SCAN_INDENT;
+    if (print_do_loops) current_margin -= ICFG_SCAN_INDENT;
 
     inside_the_do = (text) load_statement_icfg (current_stmt_head());
     text_in_do_p = some_text_p(inside_the_do);
@@ -221,9 +221,10 @@ static void loop_rewrite (loop l)
 
     /* Print the DO 
      */
-    if ((text_in_loop_p || text_in_do_p) && print_dos) 
+    if ((text_in_loop_p || text_in_do_p) && print_do_loops) 
     {
-	sprintf(textbuf, "%*s" st_DO "\n", current_margin, "");
+	sprintf(textbuf, "%*s" st_DO " %s\n", current_margin, "",
+		entity_local_name(loop_index(l)));
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
     }
@@ -237,7 +238,7 @@ static void loop_rewrite (loop l)
 
     /* Print the ENDDO 
      */
-    if ((text_in_loop_p || text_in_do_p) && print_dos) 
+    if ((text_in_loop_p || text_in_do_p) && print_do_loops) 
     {
 	sprintf(textbuf, "%*s" st_ENDDO "\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
@@ -301,7 +302,7 @@ static bool range_filter(range r)
 {
     statement s = current_stmt_head();
 
-    if (statement_loop_p(s) && loop_range(statement_loop(s)) && print_dos)
+    if (statement_loop_p(s) && loop_range(statement_loop(s)) && print_do_loops)
        current_margin -= ICFG_SCAN_INDENT;
     return TRUE;
 }
@@ -310,7 +311,7 @@ static void range_rewrite(range r)
 {
     statement s = current_stmt_head();
 
-    if (statement_loop_p(s) && loop_range(statement_loop(s)) && print_dos)
+    if (statement_loop_p(s) && loop_range(statement_loop(s)) && print_do_loops)
         current_margin += ICFG_SCAN_INDENT;
 }
 
@@ -410,7 +411,7 @@ void print_module_icfg(entity module)
 
     current_margin = ICFG_SCAN_INDENT;
 
-    print_dos = get_bool_property(ICFG_DOs);
+    print_do_loops = get_bool_property(ICFG_DOs);
     print_ifs = get_bool_property(ICFG_IFs);
 
     gen_multi_recurse
