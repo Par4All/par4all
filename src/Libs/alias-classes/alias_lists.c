@@ -13,6 +13,16 @@
 #include "misc.h"
 #include "text.h"
 
+#include "boolean.h"
+#include "vecteur.h"
+#include "contrainte.h"
+#include "sc.h"
+#include "sommet.h"
+#include "ray_dte.h"
+#include "sg.h"
+#include "polyedre.h"
+#include "union.h"
+
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
@@ -166,12 +176,85 @@ make_alias_lists_for_sub_regions(string module_name)
 }
 */
 
+/* tests if reg1 and reg2 are the same,
+ * ignoring their action_tags (read/write)
+ */
+static bool
+same_reg(region reg1, region reg2)
+    {
+    Psysteme reg1_sys, reg2_sys;
+    bool result = FALSE;
+
+    pips_debug(4,"begin\n");
+
+    if (effect_undefined_p(reg1) || effect_undefined_p(reg2))
+	return result;
+
+	if (effect_entity(reg1) == effect_entity(reg2))
+	    {
+		reg1_sys = region_system(reg1);
+		reg2_sys = region_system(reg2);
+		if ( sc_equal_p_ofl(reg1_sys,reg2_sys) )
+		{
+		    result = TRUE;
+
+		    pips_debug(4,"same region\n");
+		}
+	    }
+	pips_debug(4,"end\n");
+
+	return result;
+    }
+
+
+/* tests if reg and any member of reg_list
+ * are same_reg
+ */
+static bool
+member(region reg, list reg_list)
+    {
+	region elem;
+	list rest_list;
+	bool result = FALSE;
+
+	pips_debug(4,"begin\n");
+
+	rest_list = reg_list;
+
+	if (reg_list != NIL)
+
+			do{
+			    elem = EFFECT(CAR(reg_list));
+			    if (same_reg(elem,reg))
+				{
+				    result = TRUE;
+
+				    pips_debug(4,"is member\n");
+				}
+
+			    rest_list = CDR(rest_list);
+			}while (rest_list != NIL && result == FALSE);
+
+	pips_debug(4,"end\n");
+
+	return result;
+    }
+
+
+static void
+add_if_not_present(region reg, list reg_list)
+    {
+	if (!member(reg,reg_list))
+	    reg_list = gen_nconc(reg_list,
+				 CONS(EFFECT,region_dup(reg),NIL));
+    }
+
+
 static bool
 add_pair_to_existing_list(list alias_pair)
 {
     list rest_alias_lists, alias_list;
-    region reg, alias_reg;
-    Psysteme reg_sys, alias_reg_sys;
+    region reg, alias_reg, trans_reg;
     bool result = FALSE;
 
     pips_debug(4,"begin\n");
@@ -197,24 +280,17 @@ add_pair_to_existing_list(list alias_pair)
 		    print_region(alias_reg);
 		}
 
-	    if ( effects_same_action_p(reg,alias_reg) )
+	    if ( same_reg(reg,alias_reg) )
 	    {
-		reg_sys = region_system(reg);
-		alias_reg_sys = region_system(alias_reg);
-		if ( sc_equal_p_ofl(reg_sys,alias_reg_sys) )
-		{
 		    result = TRUE;
-
-		    pips_debug(4,"same region\n");
-
-		    alias_list = gen_nconc(
-			alias_list,
-			CONS(EFFECT,
-			     region_dup(EFFECT(CAR(CDR(alias_pair)))),
-			     NIL)
-			    );
+		    trans_reg = EFFECT(CAR(CDR(alias_pair)));
+		    ifdebug(9)
+			{
+			    pips_debug(9,"add region:\n\t");
+			    print_region(trans_reg);
+			}
+		    add_if_not_present(trans_reg,alias_list);
 		}
-	    }
 	    rest_alias_lists = CDR(rest_alias_lists);
 	} while (rest_alias_lists != NIL && result == FALSE);
 
@@ -312,6 +388,7 @@ alias_lists( string module_name )
 
     ifdebug(9)
 	{
+	    free_value_mappings();
 	    reset_current_module_statement();
 	    reset_cumulated_rw_effects();
 	    reset_current_module_entity();
