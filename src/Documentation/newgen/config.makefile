@@ -30,11 +30,12 @@ SOURCES = $(ETEXF) $(FTEXF) unstructured.idraw newgen_domain.sty
 
 NGENS =	$(ETEXF:.tex=.newgen) $(FTEXF:.ftex=.newgen)
 HEADS = $(NGENS:.newgen=.h)
+CGENS = $(NGENS:.newgen=.c)
 SPECS =	$(NGENS:.newgen=.spec)
 
 ALLHS =	all_newgen_headers.h specs.h
 
-INSTALL_INC=	$(HEADS) $(SPECS) $(ALLHS)
+INSTALL_INC=	$(HEADS) $(NGENS) $(CGENS) $(SPECS) $(ALLHS)
 INSTALL_DOC=	$(NGENS:.newgen=.ps)
 INSTALL_HTM=	ri dg
 
@@ -43,13 +44,14 @@ all: $(ALLHS) $(INSTALL_DOC) ri.html dg.html
 dvi: $(NGENS:.newgen=.dvi)
 ps: $(NGENS:.newgen=.ps)
 newgen: $(NGENS)
+allhs: $(ALLHS)
 
-all_newgen_headers.h: $(NGENS)
+all_newgen_headers.h: specs.h
 	#
-	# building $@
+	# building $@ (ordered as specs.h!)
 	#
 	$(RM) $@
-	for f in $(HEADS) ; do echo "#include \"$$f\"" ; done > $@
+	sed -n 's,^\(.*\)_spec.*,#include "\1.h",p' $< > $@
 	chmod a+r-w $@
 
 specs.h: $(NGENS)
