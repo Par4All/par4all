@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.136  1998/03/21 12:10:06  coelho
+# actual path to pips bins dropped. shell wrapper to be used instead.
+#
 # Revision 1.135  1998/01/27 14:38:55  coelho
 # recanati moved out.
 #
@@ -174,7 +177,7 @@ PIPS_ROOT="${pips_dir}/Production"
 
 # man pages?
 MANPATH="${MANPATH}:${PIPS_ROOT}/Doc"
-PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
+PATH="${PATH}:${PIPS_ROOT}/Share"
 
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PIPS_ROOT}/Lib/${PIPS_ARCH}"
 
