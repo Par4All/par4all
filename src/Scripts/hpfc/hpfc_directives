@@ -1,7 +1,10 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1997/03/07 19:02:49 $, 
+# $Id$
+# $Log: hpfc_directives,v $
+# Revision 1.75  1997/03/19 17:48:20  coelho
+# better RCS headers.
+#
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
