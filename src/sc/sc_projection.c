@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -476,6 +477,42 @@ int ofl_ctrl;
     return(sc);
 }
 
+/* Psysteme sc_simple_variable_substitution_with_eq_ofl_ctrl(Psysteme sc, Pcontrainte def,
+ *                                                    Variable v, int ofl_ctrl) 
+ * input    : a system of contraints sc, a contraint eq that must belong to sc,
+ *            and a variable v that appears in the constraint eq.
+ * output   : a Psysteme which is the projection of sc along v using the equation
+ *            eq.
+ * modifies : sc.
+ * comment  : The case ofl_ctrl == OFL_CTRL is not handled, because it would
+ *            have no sense here.
+ *
+ *            Trivial constraints and trivially non-feasible constraints
+ *            are not tested but intentionnally left in sc
+ */
+Psysteme sc_simple_variable_substitution_with_eq_ofl_ctrl(sc, def, v, ofl_ctrl)
+Psysteme sc;
+Pcontrainte def;
+Variable v;
+int ofl_ctrl;
+{
+    /* Assume no aliasing between def and sc! */
+    Pcontrainte eq = CONTRAINTE_UNDEFINED;
+    Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+
+    assert(!SC_UNDEFINED_P(sc));
+
+    for(eq = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(eq);
+	eq = contrainte_succ(eq)){
+	(void) contrainte_subst_ofl_ctrl(v, def, eq, TRUE, ofl_ctrl);
+    }
+
+    for(ineq = sc_inegalites(sc); !CONTRAINTE_UNDEFINED_P(ineq);
+	ineq = contrainte_succ(ineq)){
+	(void) contrainte_subst_ofl_ctrl(v, def, ineq, FALSE, ofl_ctrl);
+    }
+    return sc;
+}
 
 
 /* boolean sc_fourier_motzkin_variable_elimination_ofl_ctrl(Psysteme sc, 
