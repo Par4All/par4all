@@ -25,7 +25,7 @@
 #define FORWARD FALSE
 
 
-static entity current_callee;
+static entity callee;
 static list list_regions_callee;
 static statement current_caller_stmt = statement_undefined;
 static list list_pairs;
@@ -42,7 +42,7 @@ statement s;
 /* static void
  * add_parameter_aliases_for_this_call_site(call call_site,transformer context)
  * input    : parameters: a call site and the calling context
- *            global variables: current_callee,list_regions_callee,list_pairs
+ *            global variables: callee,list_regions_callee,list_pairs
  * output   : void
  * modifies : for each region in list_regions_callee which is a region of a
  *            formal parameter (of the callee) and for which the corresponding
@@ -55,7 +55,7 @@ statement s;
  * Algorithm :
  * -----------
  *    let list_regions_callee be the list of the regions on variables
- *    of current_callee
+ *    of callee
  *    let list_pairs be the list of alias pairs for the callee
  *
  *    FOR each expression real_exp IN real_args
@@ -92,7 +92,7 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 	     /* If the formal parameter corresponds to the real argument then
 	      * we perform the translation.
 	      */
-	     if (ith_parameter_p(current_callee, callee_ent, arg_num))
+	     if (ith_parameter_p(callee, callee_ent, arg_num))
 	     {
 		 expression real_exp = EXPRESSION(CAR(r_args));
 		 syntax real_syn = expression_syntax(real_exp);
@@ -108,7 +108,7 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 		    list pair;
 
 		    real_reg =
-			region_translation(callee_region, current_callee,
+			region_translation(callee_region, callee,
 					   reference_undefined,
 					   real_ent, get_current_module_entity(),
 					   real_ref,
@@ -129,7 +129,7 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 
 /* static void
  * add_common_aliases_for_this_call_site()
- * input    : global variables: current_callee,list_regions_callee,list_pairs
+ * input    : global variables: callee,list_regions_callee,list_pairs
  * output   : void
  * modifies : for each region in list_regions_callee which is a region of a
  *            COMMON (declared in the callee), this function performs
@@ -150,10 +150,12 @@ add_common_aliases_for_this_call_site()
          * (cf. region_of_module). */
 	if (storage_ram_p(entity_storage(region_entity(callee_region))))
 	{
-	    real_regions = common_region_translation(current_callee, callee_region, BACKWARD);
+	    real_regions = common_region_translation(callee, callee_region, BACKWARD);
 
 	    MAP(EFFECT, real_reg,
 		{
+		    list pair;
+
 		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
 		    pair = gen_nconc(pair,CONS(EFFECT,real_reg,NIL));
 		    list_pairs = gen_nconc(list_pairs,CONS(LIST,pair,NIL));
@@ -172,13 +174,13 @@ call_site_to_alias_pairs(call call_site)
     list real_args;
 
 
-    if (call_function(call_site) != current_callee) return TRUE;
+    if (call_function(call_site) != callee) return TRUE;
 
     context = load_statement_precondition(current_caller_stmt);
     real_args = call_arguments(call_site);
 
-    set_interprocedural_translation_context_sc(current_callee, real_args);
-    set_backward_arguments_to_eliminate(current_callee);
+    set_interprocedural_translation_context_sc(callee, real_args);
+    set_backward_arguments_to_eliminate(callee);
 
     add_parameter_aliases_for_this_call_site(call_site,context);
     add_common_aliases_for_this_call_site();
@@ -235,7 +237,7 @@ alias_pairs( string module_name, list l_reg )
 
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     module = get_current_module_entity();
-    current_callee = module;
+    callee = module;
     list_regions_callee = l_reg;
 
     /* we need the callers of the current module  */
