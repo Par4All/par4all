@@ -195,6 +195,19 @@ entity_minimal_name(entity e)
 	    entity_local_name(e) : entity_name(e) ;
 }
 
+string 
+entity_and_common_name(entity e)
+{
+    entity m = get_current_module_entity();
+    string name ;
+    pips_assert("some current entity", !entity_undefined_p(m));
+   
+    name = concatenate(entity_local_name(ram_section(storage_ram(entity_storage(e)))),
+		       MODULE_SEP_STRING,entity_name(e),NIL);
+    
+    return name +strlen(COMMON_PREFIX); 
+}
+
 bool 
 entity_empty_label_p(entity e)
 {
