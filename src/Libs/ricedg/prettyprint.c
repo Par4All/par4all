@@ -70,9 +70,6 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
 				 "/", local_dg_name, NULL));
     fp = safe_fopen(dg_name, "w");
 
-    /* for tracing variables */
-    variable_trace(mod_name);
-
     debug_on("RICEDG_DEBUG_LEVEL");
 
     if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") || 
@@ -88,6 +85,9 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
     
     DB_PUT_FILE_RESOURCE(DBR_DG_FILE, strdup(mod_name), local_dg_name);
     
+    /* for tracing variables */
+    variable_trace(mod_name);
+
     reset_current_module_statement();
     reset_current_module_entity();
     reset_ordering_to_statement();
