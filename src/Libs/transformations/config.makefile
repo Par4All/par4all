@@ -28,6 +28,8 @@ LIB_CFILES =	replace.c \
 		forward_substitution.c \
 		optimize.c
 
+#		optimize_misc.c
+
 LIB_HEADERS =	transformations-local.h
 
 LIB_OBJECTS =	$(LIB_CFILES:%.c=%.o)
