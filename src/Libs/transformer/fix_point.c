@@ -1083,7 +1083,7 @@ transformer_derivative_fix_point(transformer tf)
 
     /* For each equation, keep an equation if the constant term is zero
      * or transform it in an inequality if not. The constant term of the
-     * inequality must be zero because T* is conputed, not T+
+     * inequality must be zero because T* is computed, not T+
      */
     for(ceq = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(ceq); ceq = contrainte_succ(ceq)) {
 	Pvecteur eq = vect_dup(contrainte_vecteur(ceq));
@@ -1198,6 +1198,7 @@ transformer_derivative_fix_point(transformer tf)
     base_rm(sc_base(sc));
     sc_base(sc) = ib;
     sc_dimension(sc) = vect_size(ib);
+    base_rm(b);
 
     ifdebug(8) {
 	debug(8, "transformer_derivative_fix_point",
