@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.52  1997/10/28 09:36:59  coelho
+ * nope.
+ *
  * Revision 1.51  1997/08/05 16:31:35  coelho
  * more debug, and fixed use of effects...
  *
@@ -159,11 +162,8 @@ static void add_dynamic_synonym(
     entity e)
 {
     entities es = load_dynamic_hpf(e);
-
     pips_debug(3, "%s as %s synonyms\n", entity_name(new_e), entity_name(e));
-
     pips_assert("dynamicity", dynamic_entity_p(e) && !dynamic_entity_p(new_e));
-    
     entities_list(es) = CONS(ENTITY, new_e, entities_list(es));
     store_dynamic_hpf(new_e, es);
     store_primary_entity(new_e, load_primary_entity(e));
