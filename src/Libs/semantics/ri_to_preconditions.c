@@ -400,41 +400,45 @@ entity m;
 transformer 
 all_data_to_precondition(entity m) 
 {
-    transformer pre = transformer_identity();
-    Pbase b = (Pbase) VECTEUR_NUL;
-
-    pips_debug(8, "begin for %s\n", module_local_name(m));
-
-    /* look for entities with an integer initial value. */
-    MAP(ENTITY, e,
+  transformer pre = transformer_identity();
+  Pbase b = (Pbase) VECTEUR_NUL;
+  
+  pips_debug(8, "begin for %s\n", module_local_name(m));
+  
+  /* look for entities with an integer initial value. */
+  MAP(ENTITY, e,
+  {
+    value val = entity_initial(e);
+    if(value_constant_p(val))
     {
-	value val = entity_initial(e);
-	if(value_constant_p(val) && constant_int_p(value_constant(val))) 
+      constant c = value_constant(val);
+      if (constant_int_p(c))
+      {
+	int int_val = constant_int(value_constant(val));
+	if(entity_has_values_p(e)
+	   && !base_contains_variable_p(b, (Variable) e)) 
 	{
-	    int int_val = constant_int(value_constant(val));
-	    if(entity_has_values_p(e)
-	       && !base_contains_variable_p(b, (Variable) e)) 
-	    {
-		Pvecteur v = vect_new((Variable) e, VALUE_ONE);
-		vect_add_elem(&v, TCST, int_to_value(-int_val));
-		pre = transformer_equality_add(pre, v);
-		b = vect_add_variable(b, (Variable) e);
-	    }
+	  Pvecteur v = vect_new((Variable) e, VALUE_ONE);
+	  vect_add_elem(&v, TCST, int_to_value(-int_val));
+	  pre = transformer_equality_add(pre, v);
+	  b = vect_add_variable(b, (Variable) e);
 	}
-    },
-	code_declarations(entity_code(m)));
-
-    base_rm(b);
-    pips_assert("some transformer", pre != transformer_undefined);
-
-    ifdebug(8) {
-	dump_transformer(pre);
-	pips_debug(8, "end for %s\n", module_local_name(m));
+      }
     }
-
-    return pre;
+  },
+      code_declarations(entity_code(m)));
+      
+  base_rm(b);
+  pips_assert("some transformer", pre != transformer_undefined);
+  
+  ifdebug(8) {
+    dump_transformer(pre);
+    pips_debug(8, "end for %s\n", module_local_name(m));
+  }
+  
+  return pre;
 }
-
+
 static transformer 
 instruction_to_postcondition(
     transformer pre,
