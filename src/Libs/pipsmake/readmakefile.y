@@ -341,8 +341,7 @@ void add_rule(rule r)
 					     CONS(RULE, r, NIL));
 }
 
-makefile 
-open_makefile(string name)
+makefile open_makefile(string name)
 {
     FILE * fd;
     char * mkf_name;
