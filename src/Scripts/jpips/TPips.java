@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: TPips.java,v $
+ * Revision 1.8  1998/10/28 18:45:44  coelho
+ * + user request.
+ * fixed a bug in method getText() when dealing with tpips.
+ *
  * Revision 1.7  1998/10/16 17:17:33  coelho
  * updates for 1.2b4
  *
@@ -174,101 +178,104 @@ public class TPips
   public String getResponse()
     {
       try
-        {
-	  String result = null;
-    	  String s = in.readLine();
-	  while(s!=null)
+      {
+	String result = null;
+	String s = in.readLine();
+	while(s!=null)
+	{
+	  System.out.println(FROM_TPIPS + s);
+	  StringTokenizer t = new StringTokenizer(s,SPACE,false);
+	  if(t.hasMoreTokens())
+	  {
+	    String response = t.nextToken();
+	    if(response.equals(JPIPS))
 	    {
-              System.out.println(FROM_TPIPS + s);
-	      StringTokenizer t = new StringTokenizer(s,SPACE,false);
-	      if(t.hasMoreTokens())
-	        {
-                  String response = t.nextToken();
-                  if(response.equals(JPIPS))
-	            {
-	              response = t.nextToken();
-		      if(response.equals(DONE)) 
-			{
-			  return result;
-			}
-                      else if(response.equals(DIRECTORY))
-                        {
-	                  result = t.nextToken(EOL).substring(1);
-	                }
-                      else if(response.equals(WORKSPACE))
-                        {
-	                  result = t.nextToken(EOL).substring(1);
-			  if(result.equals(NONE)) result = null;
-	                }
-                      else if(response.equals(MODULES))
-                        {
-	                  result = t.nextToken(EOL).substring(1);
-	                }
-                      else if(response.equals(RESULT))
-                        {
-	                  result = t.nextToken(EOL).substring(1);
-	                }
-                      else if(response.equals(SHOW))
-                        {
-			  String path = t.nextToken(EOL);
-			  if(path.substring(1,2).equals(DIR))
-			      path = path.substring(2);
-			  File f= new File(directory.getAbsolutePath()+path);
-			  System.out.println(f.getAbsolutePath());
-			  textDisplayer.display(f,true,true);
-	                }
-		      else if(response.equals(BEGIN_ERROR))
-		        {
-                          JOptionPane.showMessageDialog(frame,
-		            getText(END_ERROR),error,
-			    JOptionPane.ERROR_MESSAGE);
-		        }
-		      else if(response.equals(BEGIN_REQUEST))
-		        {
-		          String text = getText(END_REQUEST);
-		        }
-	            }
-		}
-              s = in.readLine();
+	      response = t.nextToken();
+	      if(response.equals(DONE)) 
+	      {
+		return result;
+	      }
+	      else if(response.equals(DIRECTORY))
+	      {
+		result = t.nextToken(EOL).substring(1);
+	      }
+	      else if(response.equals(WORKSPACE))
+	      {
+		result = t.nextToken(EOL).substring(1);
+		if(result.equals(NONE)) result = null;
+	      }
+	      else if(response.equals(MODULES))
+	      {
+		result = t.nextToken(EOL).substring(1);
+	      }
+	      else if(response.equals(RESULT))
+	      {
+		result = t.nextToken(EOL).substring(1);
+	      }
+	      else if(response.equals(SHOW))
+	      {
+		String path = t.nextToken(EOL);
+		if(path.substring(1,2).equals(DIR))
+		  path = path.substring(2);
+		File f= new File(directory.getAbsolutePath()+path);
+		System.out.println(f.getAbsolutePath());
+		textDisplayer.display(f,true,true);
+	      }
+	      else if(response.equals(BEGIN_ERROR))
+	      {
+		JOptionPane.showMessageDialog(frame,
+					      getText(END_ERROR),error,
+					      JOptionPane.ERROR_MESSAGE);
+	      }
+	      else if(response.equals(BEGIN_REQUEST))
+	      {
+		String text = getText(END_REQUEST);
+		//System.err.println("question: "+ text);
+		String answer = JOptionPane.showInputDialog
+		  (frame, text, "TPIPS Input", JOptionPane.QUESTION_MESSAGE);
+		out.println(answer);
+		out.flush();
+	      }
 	    }
+	  }
+	  s = in.readLine();
 	}
+      }
       catch(IOException e)
-        {
-	  System.out.println(e);
-	}
+      {
+	System.out.println(e);
+      }
       return null;            
     }
 
 
   /** Parses the messages of tpips until the tag is reached.
-    * @param expected the expected tag for the response
-    * @return the tpips response
-    */  
+      The tag is expected after a leading JPIPS...
+      @param expected the expected tag for the response
+      @return the tpips response
+  */  
   public String getText(String expected)
     {
+      expected = JPIPS + " " + expected;
       try
-        {
-	  String text = "";
-	  while(true)
-	    {
-	      String s = in.readLine();
-	      if(s != null && !s.equals(""))
-	        {
-                  if(s.equals(expected))
-	            {
-		      return text;
-		    }
-                  else
-                    {
-	              text = text + s;
-		    }
-	        }
-	    }
+      {
+	String text = "";
+	while(true)
+	{
+	  String s = in.readLine();
+	  if(s != null && !s.equals(""))
+	  {
+	    if(s.equals(expected))
+	      return text;
+	    else
+	      text += s;
+	  }
 	}
+      }
       catch(IOException e)
-        {
-	  System.out.println(e);
-	}
+      {
+	System.out.println(e);
+      }
       return null;            
     }
 
