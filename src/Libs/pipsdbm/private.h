@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+typedef void * db_void;
+
 #include "linear.h"
 
 #include "resources.h"
@@ -24,5 +26,3 @@
 
 #include "database.h" /* for obsolete functions... */
 #include "pipsdbm.h"
-
-typedef void * db_void;
