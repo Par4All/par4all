@@ -1288,7 +1288,8 @@ void recursiv_partial_eval(statement stmt)
 /* Top-level function
  */
 
-bool partial_eval(char *mod_name)
+bool 
+partial_eval(char *mod_name)
 {
     entity module;
     statement mod_stmt;
@@ -1362,6 +1363,7 @@ bool partial_eval(char *mod_name)
     reset_proper_rw_effects();
     reset_current_module_entity();
     reset_current_module_statement();
+    free_value_mappings();
 
     return TRUE;
 }
