@@ -119,15 +119,18 @@ meta_data_db_file_name(string data)
 }
 
 static void
-save_meta_data(void)
+save_meta_data(bool do_free)
 {
     string file_name;
     FILE * file;
 
+    fprintf(stderr, "save_meta_data %d\n", do_free);
+
     pips_debug(2, "saving database status\n");
     file_name = meta_data_db_file_name(DATABASE_STATUS);
     file = safe_fopen(file_name, "w");
-    db_close_pips_database(file);
+    db_save_pips_database(file);
+    if (do_free) db_close_pips_database();
     safe_fclose(file, file_name);
     free(file_name);
 
@@ -135,7 +138,7 @@ save_meta_data(void)
     file_name = meta_data_db_file_name(DATABASE_SYMBOLS);
     file = safe_fopen(file_name, "w");
     gen_write_tabulated(file, db_symbol_domain);
-    gen_free_tabulated(db_symbol_domain);
+    if (do_free) gen_free_tabulated(db_symbol_domain);
     safe_fclose(file, file_name);
     free(file_name);
 
@@ -251,7 +254,7 @@ db_close_module(string what, string oname)
 }
 
 static void
-db_save_workspace(string what)
+db_save_workspace(string what, bool do_free)
 {
     gen_array_t a;
 
@@ -264,7 +267,7 @@ db_save_workspace(string what)
     db_close_module(what, ""); /* ENTITIES are saved here... */
 
     user_log("%s workspace.\n", what);
-    save_meta_data();
+    save_meta_data(do_free);
 }
 
 void
@@ -273,8 +276,7 @@ db_checkpoint_workspace(void)
     debug_on(PIPSDBM_DEBUG_LEVEL);
     pips_debug(1, "Checkpointing workspace %s\n", 
 	       db_get_current_workspace_name());
-    db_save_workspace("Saving");
-    load_meta_data();
+    db_save_workspace("Saving", FALSE);
     /* load ENTITIES (since no one ask for them as they should;-) */
     if (db_resource_p(DBR_ENTITIES, "")) 
 	(void) db_get_memory_resource(DBR_ENTITIES, "", TRUE);
@@ -287,7 +289,7 @@ db_close_workspace(void)
     debug_on(PIPSDBM_DEBUG_LEVEL);
     pips_debug(1, "Closing workspace %s\n", db_get_current_workspace_name());
 
-    db_save_workspace("Closing");
+    db_save_workspace("Closing", TRUE);
     db_reset_current_workspace_name();
     
     pips_debug(1, "done\n");
