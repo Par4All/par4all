@@ -61,6 +61,10 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.10  2002/07/03 11:07:19  irigoin
+  * check "!get_bool_property("SEMANTICS_ANALYZE_UNSTRUCTURED")" added to
+  * circumvent an EDF bug in emergency for Corinne.
+  *
   * Revision 1.9  2001/12/05 17:19:38  irigoin
   * First plug to handle total preconditions
   *
@@ -2563,6 +2567,11 @@ transformer unstructured_to_accurate_transformer(unstructured u, transformer pre
     else if(gen_length(succs)>SEMANTICS_MAX_CFG_SIZE1) {
       pips_user_warning("\nControl flow graph too large for an accurate analysis (%d nodes)\n"
 			"Have you fully restructured your code?\n", gen_length(succs));
+      tf = unstructured_to_global_transformer(u);
+    }
+    else if(!get_bool_property("SEMANTICS_ANALYZE_UNSTRUCTURED")) {
+      pips_user_warning("\nControl flow graph not analyzed accurately"
+			" because property SEMANTICS_ANALYZE_UNSTRUCTURED is not set\n");
       tf = unstructured_to_global_transformer(u);
     }
     else {
