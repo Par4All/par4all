@@ -1,16 +1,19 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/09/18 13:23:29 $, ) 
+ * ($Date: 1995/09/19 18:33:57 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
- * ??? should drop the remapping domain.
+ * ??? should drop the renaming domain?
  */
 
 #include <stdarg.h>
 #include "defines-local.h"
+
 #include "conversion.h"
+#include "resources.h"
+#include "pipsdbm.h"
 
 /* for USAGE information
  */
@@ -27,12 +30,12 @@ entity CreateIntrinsic(string name); /* in syntax */
  * Special care is taken about the declaration shifts.
  */
 static Pcontrainte
-partial_linearization(array, distributed, var, psize, create_var)
-entity array;
-bool distributed;
-entity var;
-int *psize;
-entity (*create_var)(/* int */);
+partial_linearization(
+    entity array,
+    bool distributed,
+    entity var,
+    int *psize,
+    entity (*create_var)(int))
 {
     entity proc = array_to_processors(array);
     int dim = NumberOfDimension(proc), low, up, size;
@@ -88,9 +91,12 @@ full_linearization(
     return contrainte_make(v);
 }
 
+/* should allow a stupid system with some property?
+ */
 static Psysteme 
-generate_work_sharing_system(src, trg)
-entity src, trg;
+generate_work_sharing_system(
+    entity src, 
+    entity trg)
 {
     entity psi_r = get_ith_temporary_dummy(1),
            psi_d = get_ith_temporary_dummy(2),
@@ -157,15 +163,16 @@ entity src, trg;
 /*   ??? assumes that there are no parameters. what should be the case...
  */
 static void 
-remapping_variables(s, a1, a2, pl, plp, pll, plrm, pld, plo)
-Psysteme s;
-entity a1, a2;
-list *pl, 	/* P */
-     *plp, 	/* P' */
-     *pll, 	/* locals */
-     *plrm, 	/* to remove */
-     *pld,      /* diffusion processor variables */
-     *plo;	/* others */
+remapping_variables(
+    Psysteme s,
+    entity a1,
+    entity a2,
+    list *pl, 	/* P */
+    list *plp, 	/* P' */
+    list *pll, 	/* locals */
+    list *plrm, 	/* to remove */
+    list *pld,      /* diffusion processor variables */
+    list *plo)	/* others */
 {
     entity
 	t1 = array_to_template(a1),
@@ -774,11 +781,11 @@ print_rusage_delta(FILE * buffer,
 
     u_seconds = out->ru_utime.tv_sec - in->ru_utime.tv_sec;
     u_micros = out->ru_utime.tv_usec - in->ru_utime.tv_usec;
-    if (u_micros<0) u_seconds++, u_micros+=1000000;
+    if (u_micros<0) u_seconds--, u_micros+=1000000;
 
     s_seconds = out->ru_stime.tv_sec - in->ru_stime.tv_sec;
     s_micros = out->ru_stime.tv_usec - in->ru_stime.tv_usec;
-    if (s_micros<0) s_seconds++, s_micros+=1000000;
+    if (s_micros<0) s_seconds--, s_micros+=1000000;
 
     fprintf(buffer, "%ld.%suser ",  u_seconds, string_micros(u_micros));
     fprintf(buffer, "%ld.%ssystem\n", s_seconds, string_micros(s_micros));
@@ -856,6 +863,101 @@ entity src, trg;
     return s;
 }
 
+/* {module}_{array}_{src}_{trg}_node.h
+ */
+static string
+remapping_file_name(
+    renaming remap)
+{
+    static char buffer[80]; /* ??? stupid static buffer... */
+    entity src = renaming_old(remap), trg = renaming_new(remap);
+    string module, array;
+
+    module = strdup(entity_module_name(src));
+    array  = strdup(entity_local_name(load_primary_entity(src)));
+
+    sprintf(buffer, "%s_%s_%x_%x_node.h", module, array,
+	    load_hpf_number(src), load_hpf_number(trg));
+
+    free(module);
+    free(array);
+
+    return buffer;
+}
+
+/* quick recursion to find the entities referenced in a statement.
+ * the list is allocated and returned.
+ */
+static list /* of entity */ l_found;
+static void loop_rwt(loop l)
+{ l_found = gen_once(loop_index(l), l_found);}
+static void reference_rwt(reference r)
+{ l_found = gen_once(reference_variable(r), l_found);}
+
+static list
+list_of_referenced_entities(
+    statement s)
+{
+    l_found = NIL;
+    gen_multi_recurse(s,
+		      loop_domain, gen_true, loop_rwt,
+		      reference_domain, gen_true, reference_rwt,
+		      NULL);
+    return l_found;
+}
+
+static void
+generate_hpf_remapping_file(
+    renaming r)
+{
+    string file_name;
+    FILE * f;
+    statement remap;
+    text t;
+    list /* of entity */ l;
+
+    /* generates the remapping code and text
+     */
+    remap = hpf_remapping(renaming_old(r), renaming_new(r));
+    update_object_for_module(remap, node_module);
+    t = text_statement(entity_undefined, 0, remap);
+
+    /* stores the remapping as computed
+     */
+    l = list_of_referenced_entities(remap);
+    add_remapping_as_computed(r, l);
+
+    /* put it in a file
+     */
+    file_name = strdup(concatenate(db_get_current_program_directory(),
+				   "/", remapping_file_name(r), NULL));
+
+    f = safe_fopen(file_name, "w");
+    print_text(f, t);
+    safe_fclose(f, file_name);
+
+    free(file_name);
+    free_statement(remap);
+    free_text(t);
+    gen_free_list(l);
+}
+
+/* just a hack because pips does not have 'include'
+ */
+static statement
+generate_remapping_include(
+    renaming r)
+{
+    statement result;
+
+    result = make_empty_statement();
+    statement_comments(result) =
+	strdup(concatenate("      include '",
+			   remapping_file_name(r), "'\n", NULL));
+
+    return result;
+}
+
 /* void remapping_compile(s, hsp, nsp)
  * statement s, *hsp, *nsp;
  *
@@ -866,8 +968,10 @@ entity src, trg;
  * side effects: (none?)
  * bugs or features:
  */
-void remapping_compile(s, hsp, nsp)
-statement s, *hsp /* Host Statement Pointer */, *nsp /* idem Node */;
+void remapping_compile(
+    statement s, 
+    statement *hsp,   /* Host Statement Pointer */
+    statement *nsp)   /* idem Node */
 {
     list /* of statements */ l = NIL;
 
@@ -877,7 +981,13 @@ statement s, *hsp /* Host Statement Pointer */, *nsp /* idem Node */;
     *hsp = make_empty_statement(); /* nothing for host */
 
     MAP(RENAMING, r,
-	l = CONS(STATEMENT, hpf_remapping(renaming_old(r), renaming_new(r)), l),
+    {
+	if (!remapping_already_computed_p(r))
+	    generate_hpf_remapping_file(r);
+
+	add_remapping_as_used(r);
+	l = CONS(STATEMENT, generate_remapping_include(r), l);
+    },
 	load_renamings(s));
 
     *nsp = make_block_statement(l); /* block of remaps for the nodes */
