@@ -1,8 +1,6 @@
  /* interface with pipsmake */
 
 #include <stdio.h>
-extern int fprintf(FILE *, const char *, ...);
-extern int sscanf(const char *, const char *, ...);
 #include <string.h>
 
 #include "genC.h"
