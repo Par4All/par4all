@@ -5,10 +5,10 @@
 
    */
 
-/* 	%A% ($Date: 1997/02/01 20:06:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/03 22:29:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 1997/02/01 20:06:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_clean_up_sequences[] = "%A% ($Date: 1997/02/03 22:29:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -42,19 +42,22 @@ display_clean_up_sequences_statistics()
 {
     if (get_bool_property("CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS")
 	&&
-	clean_up_empty_block_removed
+	(clean_up_empty_block_removed
 	+ clean_up_fused_sequences
-	+ clean_up_1_statement_sequence != 0) {
-	printf("Statistics about cleaning up sequences:\n");
+	+ clean_up_1_statement_sequence) != 0) {
+	user_log("Statistics about cleaning up sequences:\n");
 	if(clean_up_empty_block_removed)
-	  printf("\t%d empty sequences or useless CONTINUE removed.\n",
-		 clean_up_empty_block_removed);
+	  user_log("\t%d empty sequence%s or useless CONTINUE removed.\n",
+		 clean_up_empty_block_removed,
+		 clean_up_empty_block_removed==1? "" : "s");
 	if(clean_up_fused_sequences)
-	  printf("\t%d sequences have been fused.\n",
-		 clean_up_fused_sequences);
+	  user_log("\t%d %s been fused.\n",
+		   clean_up_fused_sequences,
+		   clean_up_fused_sequences==1? "sequence has" : "sequences have");
 	if(clean_up_1_statement_sequence)
-	  printf("\t%d sequences of only 1 statement have been removed.\n",
-		 clean_up_1_statement_sequence);
+	  user_log("\t%d sequence%s of only 1 statement have been removed.\n",
+		 clean_up_1_statement_sequence,
+		 clean_up_1_statement_sequence==1? "" : "s");
     }
 }
 
