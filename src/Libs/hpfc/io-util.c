@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-util.c,v $ ($Date: 1995/09/04 13:16:22 $, )
+ * $RCSfile: io-util.c,v $ ($Date: 1995/09/12 21:06:03 $, )
  * version $Revision$,
  */
 
@@ -102,8 +102,8 @@ GENERATION(node_pre_io,
 	   hpfc_initsend(FALSE),
 	   hpfc_nrecv(FALSE));
 GENERATION(node_in_io,
-	   hpfc_packing(array, get_ith_local_dummy, TRUE),
-	   hpfc_packing(array, get_ith_local_dummy, FALSE));
+	   hpfc_pvm_packing(array, get_ith_local_dummy, TRUE),
+	   hpfc_pvm_packing(array, get_ith_local_dummy, FALSE));
 GENERATION(node_post_io,
 	   hpfc_nsend(),
 	   make_empty_statement());
@@ -111,8 +111,8 @@ GENERATION(host_pre_io,
 	   hpfc_hmessage(array_to_processors(array), FALSE),
 	   hpfc_initsend(FALSE));
 GENERATION(host_in_io,
-	   hpfc_packing(array, get_ith_array_dummy, FALSE),
-	   hpfc_packing(array, get_ith_array_dummy, TRUE));
+	   hpfc_pvm_packing(array, get_ith_array_dummy, FALSE),
+	   hpfc_pvm_packing(array, get_ith_array_dummy, TRUE));
 GENERATION(host_post_io,
 	   make_empty_statement(),
 	   hpfc_hmessage(array_to_processors(array), TRUE));
@@ -295,11 +295,11 @@ statement *psh, *psn;
 	n_cont = make_empty_statement(),
 	h_pre = hpfc_initsend(FALSE),
 	h_rebuild = generate_deducables(rebuild),
-	h_pack = hpfc_packing(array, get_ith_array_dummy, TRUE),
+	h_pack = hpfc_pvm_packing(array, get_ith_array_dummy, TRUE),
 	h_cast = hpfc_hcast(),
 	n_rcv = hpfc_nrecv(TRUE),
 	n_rebuild = generate_deducables(rebuild),
-	n_unpack = hpfc_packing(array, get_ith_local_dummy, FALSE),
+	n_unpack = hpfc_pvm_packing(array, get_ith_local_dummy, FALSE),
 	h_scan = systeme_to_loop_nest
 	             (echelon, 
 		      scanners,
