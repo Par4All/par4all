@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/07/31 17:29:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/10/23 11:11:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/07/31 17:29:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/10/23 11:11:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -193,9 +193,11 @@ static void
 fuse_sequences_in_unstructured(statement s)
 {
     control the_successor;
-    unstructured u = instruction_unstructured(statement_instruction(s));
+    int number_of_successors_of_the_successor;
+    int number_of_predecessors_of_the_successor;   
     list blocs = NIL;
     list control_nodes_to_fuse = NIL;
+    unstructured u = instruction_unstructured(statement_instruction(s));
 
     /* The entry point of the unstructured: */
     control entry_node = unstructured_control(u);
@@ -214,25 +216,31 @@ fuse_sequences_in_unstructured(statement s)
    
     CONTROL_MAP(c,
 		{
-		    int number_of_successors_of_the_successor;
-		    int number_of_predecessors_of_the_successor;
-   
 		    ifdebug (1)
 			pips_assert("control inconsistants...",
 				    gen_consistent_p(c));
-
+		    pips_debug(3, "Looking for control %p...\n", c);
 		    /* Select a node with only one successor: */      
 		    if (gen_length(control_successors(c)) == 1) {
 			the_successor = CONTROL(CAR(control_successors(c)));
 
 			number_of_successors_of_the_successor = gen_length(control_successors(the_successor));
 			number_of_predecessors_of_the_successor = gen_length(control_predecessors(the_successor));
-			debug(3, "fuse_sequences_in_unstructured",
-			      "(gen_length(control_successors(c)) == 1), number_of_successors_of_the_successor = %d, number_of_predecessors_of_the_successor = %d, the successor is the entry node: %d, empty_statement_or_continue_p(control_statement(c)) = %d\n",
-			      number_of_successors_of_the_successor,
-			      number_of_predecessors_of_the_successor,
-			      the_successor == entry_node,
-			      empty_statement_or_continue_p(control_statement(c)));
+			pips_debug(3, "Control %p: (gen_length(control_successors(c)) == 1), number_of_successors_of_the_successor = %d, number_of_predecessors_of_the_successor = %d, the successor is the entry node: %d, empty_statement_or_continue_p(control_statement(c)) = %d\n",
+				   c,
+				   number_of_successors_of_the_successor,
+				   number_of_predecessors_of_the_successor,
+				   the_successor == entry_node,
+				   empty_statement_or_continue_p(control_statement(c)));
+			/* Since I use an O(n) algorithm instead of an
+                           O(n^2) all this condition must be checked
+                           again later since these topological and
+                           semantical properties may have changed
+                           during the fusion phase. I think it is true
+                           because the fused graph is included into
+                           the former graph but I am too lazy to write
+                           a proof... :-( Have a look to
+                           Valdation/Control/create.f. */
 			if ((number_of_successors_of_the_successor <= 1
 			     /* ...Accept the exit node */
 			     && the_successor != entry_node
@@ -268,9 +276,8 @@ fuse_sequences_in_unstructured(statement s)
 			}
 		    }
 		    else {
-			debug(3, "fuse_sequences_in_unstructured",
-			      "(gen_length(control_successors(c)) == %d)\n",
-			      gen_length(control_successors(c)));
+			pips_debug(3, "(gen_length(control_successors(c)) == %d)\n",
+				   gen_length(control_successors(c)));
 		    }
 		},
 		entry_node,
@@ -284,7 +291,6 @@ fuse_sequences_in_unstructured(statement s)
        their successors, do the fusion: */
     MAP(CONTROL, the_original_control, {
 	control a_control_to_fuse;
-	control its_successor;
 	char * its_address_now;
 	char * old_address;
 	       
@@ -327,14 +333,14 @@ fuse_sequences_in_unstructured(statement s)
 	    pips_assert("control a_control_to_fuse inconsistants...",
 			gen_consistent_p(a_control_to_fuse));
                
-	its_successor = CONTROL(CAR(control_successors(a_control_to_fuse)));
+	the_successor = CONTROL(CAR(control_successors(a_control_to_fuse)));
 	ifdebug (3)
-	    fprintf(stderr, " with control %p\n", its_successor);
+	    fprintf(stderr, " with control %p\n", the_successor);
 	ifdebug (1)
-	    pips_assert("control its_successor inconsistants...",
-			gen_consistent_p(its_successor));
+	    pips_assert("control the_successor inconsistants...",
+			gen_consistent_p(the_successor));
 
-	if (a_control_to_fuse == its_successor)
+	if (a_control_to_fuse == the_successor)
 	    debug(3, "fuse_sequences_in_unstructured",
 		  "\tA loop of control has been found... Do not fuse the control %p\n", a_control_to_fuse);     
 
@@ -344,28 +350,28 @@ fuse_sequences_in_unstructured(statement s)
 	    debug(3, "fuse_sequences_in_unstructured",
 		  "\tOk fuse them.\n");
 
-	    fuse_2_control_nodes(a_control_to_fuse, its_successor);
+	    fuse_2_control_nodes(a_control_to_fuse, the_successor);
 	    /* make st with the statements of 2 following nodes: */
 
-	    if (its_successor == entry_node)
+	    if (the_successor == entry_node)
 		/* Update the entry node if we fuse with it: */
 		entry_node = a_control_to_fuse;		      
-	    if (its_successor == exit_node)
+	    if (the_successor == exit_node)
 		exit_node = a_control_to_fuse;
 		  
-	    /* If the node "its_successor" is in the fuse list,
+	    /* If the node "the_successor" is in the fuse list,
 	       we want to keep track of its new place, that is
 	       in fact fused in "a_control_to_fuse", so that an
 	       eventual fusion will use "a_control_to_fuse"
-	       instead of "its_successor": */
+	       instead of "the_successor": */
 	    if (hash_defined_p(controls_to_fuse_with_their_successors,
-			       (char *) its_successor)) {
-		/* Ok, "its_successor" is a node to fuse or that has
+			       (char *) the_successor)) {
+		/* Ok, "the_successor" is a node to fuse or that has
 		   been already fused (in this case the following is
 		   useless, but anyway...). Thus we keep track of
 		   its new location: */
 		hash_update(controls_to_fuse_with_their_successors,
-			    (char *) its_successor,
+			    (char *) the_successor,
 			    (char *) a_control_to_fuse);
 	    }
 	}
