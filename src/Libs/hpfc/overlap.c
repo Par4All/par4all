@@ -1,7 +1,7 @@
 /* Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1995/09/22 13:21:45 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1996/12/26 10:49:45 $, )
  * version $Revision$
  */
 
@@ -136,11 +136,40 @@ list l;
 	 l);
 }
 
+/* updates overlaps for similar arrays that are going to be merged
+ */
+static void deal_with_similars(list le)
+{
+    MAP(ENTITY, array,
+    {
+	if (entity_dynamic_p(array) && load_similar_mapping(array)!=array)
+	{
+	    entity sim = load_similar_mapping(array);
+	    int dim;
+
+	    pips_debug(8, "translating overlaps from %s to %s\n",
+		       entity_name(array), entity_name(sim));
+
+	    for (dim=variable_entity_dimension(array); dim>0; dim--)
+	    {
+		int o;
+
+		o = get_overlap(array, dim, 0);
+		set_overlap(sim, dim, 0, o);
+		o = get_overlap(array, dim, 1);
+		set_overlap(sim, dim, 1, o);
+	    }
+	}
+    },
+       le);
+}
+
 void declaration_with_overlaps_for_module(module)
 entity  module;
 {
     list l = list_of_distributed_arrays_for_module(module);
 
+    deal_with_similars(l);
     declaration_with_overlaps(l);
     gen_free_list(l);
 }
