@@ -437,10 +437,6 @@ generic_effects_reset_all_methods()
     effects_backward_translation_op = (list_function) UNDEF;
     effects_forward_translation_op = (list_function) UNDEF;
     effects_local_to_global_translation_op = (list_function) UNDEF;
-    effects_prettyprint_func = (void_function) UNDEF;
-    effects_to_text_func = (chunks_function) UNDEF;
-
-    attach_effects_decoration_to_text_func = (void_function) UNDEF;
 
     load_context_func = (chunks_function) UNDEF;
     load_transformer_func = (chunks_function) UNDEF;
@@ -477,5 +473,5 @@ generic_effects_reset_all_methods()
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
 
-    reset_action_interpretation();
+    reset_generic_prettyprints();
 }
