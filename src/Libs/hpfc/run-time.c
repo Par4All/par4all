@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1996/04/01 11:36:37 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1996/07/23 11:58:09 $, )
  * version $Revision$,
  */
 
@@ -485,14 +485,11 @@ basic base;
 int nargs;
 {
     char buffer[100], *buf = buffer;
+    sprintf(buf, "%s_%s_%s_%d", 
+	    prefix, (kind ? "PACK" : "UNPACK"), pvm_what_options(base), ndim);
+    buf += strlen(buf);
 
-    buf += strlen(sprintf(buf, "%s_%s_%s_%d", 
-			  prefix, 
-			  (kind ? "PACK" : "UNPACK"),
-			  pvm_what_options(base),
-			  ndim));
-
-    return(MakeRunTimeSupportSubroutine(buffer, nargs));
+    return MakeRunTimeSupportSubroutine(buffer, nargs);
 }
 
 /************************************************* HPFC ENTITIES MANAGEMENT */
