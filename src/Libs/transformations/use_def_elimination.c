@@ -17,11 +17,11 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "graph.h"
 #include "dg.h"
 /* Instantiation of the dependence graph: */
 typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
+#include "graph.h"
 /* Just to be able to use ricedg.h: */
 #include "ray_dte.h"
 #include "sommet.h"
@@ -219,7 +219,7 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
 }
 
 
-void static
+static void
 free_statement_to_statement_dependence_mapping()
 {
    HASH_MAP(key, value,
@@ -230,7 +230,7 @@ free_statement_to_statement_dependence_mapping()
 }
 
 
-void static
+static void
 mark_this_node_and_its_predecessors_in_the_dg_as_useful(set s,
                                                         vertex v)
 {
@@ -255,8 +255,8 @@ mark_this_node_and_its_predecessors_in_the_dg_as_useful(set s,
                  /* Something is useful for the current statement if
                     it writes something that is used in the current
                     statement: */
-                 if (action_read_p(conflict_source(a_conflict))
-                     && action_write_p(conflict_sink(a_conflict))) {
+		  if (effect_read_p(conflict_source(a_conflict))
+                     && effect_write_p(conflict_sink(a_conflict))) {
                     /* Mark the node that generate something useful
                        for the current statement as useful: */
                     mark_this_node_and_its_predecessors_in_the_dg_as_useful(s,
