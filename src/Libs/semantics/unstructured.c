@@ -61,6 +61,9 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.9  2001/12/05 17:19:38  irigoin
+  * First plug to handle total preconditions
+  *
   * Revision 1.8  2001/10/22 15:47:27  irigoin
   * New interface to cope with transformers computed using preconditions
   *
@@ -2385,6 +2388,34 @@ transformer unstructured_to_accurate_postconditions
   list succs = NIL;
   control head = unstructured_control(u);
   /* control tail = unstructured_exit(u); */
+
+  forward_control_map_get_blocs(head, &succs);
+
+  if(gen_length(succs)>SEMANTICS_MAX_CFG_SIZE1) {
+      pips_user_warning("\nControl flow graph too large for an accurate analysis (%d nodes)\n"
+			"Have you fully restructured your code?\n", gen_length(succs));
+    post = unstructured_to_postconditions(pre_u, pre, u);
+  }
+  else {
+    post = unstructured_to_accurate_postconditions_or_transformer
+      (pre_u, pre, u, TRUE);
+  }
+  gen_free_list(succs);
+
+  pips_assert("Postcondition for unstructured is consistent",
+	      transformer_consistency_p(post));
+
+  return post;
+}
+transformer unstructured_to_accurate_total_preconditions
+(transformer pre_u, transformer pre, unstructured u)
+{
+  transformer post = transformer_undefined;
+  list succs = NIL;
+  control head = unstructured_control(u);
+  /* control tail = unstructured_exit(u); */
+
+  pips_assert("Not implemented yet", FALSE);
 
   forward_control_map_get_blocs(head, &succs);
 
