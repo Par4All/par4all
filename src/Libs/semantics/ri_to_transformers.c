@@ -488,7 +488,7 @@ call_to_transformer(call c, list ef) /* effects of call c */
 	tf = transformer_identity();
 	break;
       case is_value_unknown:
-	pips_internal_error("unknown function %s\n", entity_name(e));
+	pips_internal_error("function %s has an unknown value\n", entity_name(e));
 	break;
       case is_value_intrinsic:
 	  pips_debug(5, "intrinsic function %s\n", entity_name(e));
