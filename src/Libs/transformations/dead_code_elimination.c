@@ -16,7 +16,8 @@
 #include "resources.h"
 #include "properties.h"
 
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 #include "transformer.h"
 #include "semantics.h"
 #include "control.h"
