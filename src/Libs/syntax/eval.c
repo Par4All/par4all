@@ -13,6 +13,9 @@ to a constant function is evaluated if its basic type is integer.
 
 range: a range is not evaluated. */
 
+#include "genC.h"
+#include "ri.h"
+#include "parser_private.h"
 #include "syntax.h"
 #include "toklex.h"
 
