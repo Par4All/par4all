@@ -69,7 +69,7 @@ int get_debug_stack_pointer()
     return idls;
 }
 
-void set_debug_stack_pointer(i)
+void set_debug_stack_pointer(int i)
 {
     if(i >= 0 && i <= idls) {
 	if (i!=idls) {
