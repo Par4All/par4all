@@ -6,6 +6,7 @@
 #include "genC.h"
 #include "misc.h"
 #include "constants.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "database.h"
