@@ -1,10 +1,54 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/01 09:06:29 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/02 19:55:29 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
 # A restricted version of this file should be defined for pips users.
 
 set -a
+
+# 
+#         #    #  ######  #    #   ####   ######  #    #
+#         ##   #  #       #    #  #    #  #       ##   #
+#         # #  #  #####   #    #  #       #####   # #  #
+#         #  # #  #       # ## #  #  ###  #       #  # #
+#         #   ##  #       ##  ##  #    #  #       #   ##
+#         #    #  ######  #    #   ####   ######  #    #
+#
+
+NEWGEN_MAX_TABULATED_ELEMENTS=12007
+
+NEWGEN_DIR="/projects/Newgen"
+
+NEWGEN_PRODDIR="${NEWGEN_DIR}/Production"
+NEWGEN_DEVEDIR="${NEWGEN_DIR}/Development"
+
+NEWGEN_INCLUDEDIR="${NEWGEN_PRODDIR}/Include"
+NEWGEN_LIBDIR="${NEWGEN_PRODDIR}/Lib"
+NEWGEN_SRCDIR="${NEWGEN_PRODDIR}/Src"
+NEWGEN_BINDIR="${NEWGEN_PRODDIR}/Bin"
+
+NEWGEN_LIBS='-lgenC'
+
+#
+#         #          #    #    #  ######    ##    #####
+#         #          #    ##   #  #        #  #   #    #
+#         #          #    # #  #  #####   #    #  #    #
+#         #          #    #  # #  #       ######  #####
+#         #          #    #   ##  #       #    #  #   #
+#         ######     #    #    #  ######  #    #  #    #
+#
+
+LINEAR_DIR="/projects/C3/Linear"
+
+LINEAR_PRODDIR="${LINEAR_DIR}/Production"
+LINEAR_DEVEDIR="${LINEAR_DIR}/Development"
+
+LINEAR_INCLUDEDIR="${LINEAR_PRODDIR}/Include"
+LINEAR_LIBDIR="${LINEAR_PRODDIR}/Lib"
+LINEAR_SRCDIR="${LINEAR_PRODDIR}/Src"
+LINEAR_BINDIR="${LINEAR_PRODDIR}/Bin"
+
+LINEAR_LIBS='-lplint -lmatrice  -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique'
 
 # 
 #         #####      #    #####    ####
@@ -111,8 +155,8 @@ PIPS_CFLAGS_SUN4="-fast -Xc -g"
 #
 # CPP FLAGS
 #
-PIPS_CPPFLAGS="-D__USE_FIXED_PROTOTYPES__ -I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
-PIPS_CPPFLAGS_SUN4="-I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
+PIPS_CPPFLAGS_SUN4="-I${PIPS_INCLUDEDIR} -I${NEWGEN_INCLUDEDIR} -I${LINEAR_INCLUDEDIR} -I${PIPS_EXTEDIR}"
+PIPS_CPPFLAGS="-D__USE_FIXED_PROTOTYPES__ ${PIPS_CPPFLAGS_SUN4}"
 # 
 # LD
 #
@@ -121,7 +165,7 @@ PIPS_LD_SUN4="${PIPS_CC_SUN4} -bsdmalloc"
 #
 # LD FLAGS
 #
-PIPS_LDFLAGS='-g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)'
+PIPS_LDFLAGS='-g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)'
 PIPS_LDFLAGS_SUN4="-fast ${PIPS_LDFLAGS}"
 #
 # others
@@ -158,7 +202,7 @@ PIPS_CURRENT_PROGRAM=".pipsprogram"
 
 PIPS_PASSES='pips wpips tpips'
 
-PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcomp_sections -lcontrol -lsemantics -lcontinuation -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lgenC -lplint -lmatrice  -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique -lreductions -lflint -lm"
+PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcomp_sections -lcontrol -lsemantics -lcontinuation -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint ${NEWGEN_LIBS} ${LINEAR_LIBS} -lm"
 
 PIPS_MALLOC='/usr/lib/debug/malloc.o'
 
@@ -269,10 +313,6 @@ WP65_LIBRARY=$PIPS_EXTEDIR
 # 
 #
 # EXTERNAL softwares
-
-LINEAR_DIR=/projects/C3/Linear
-NEWGEN_DIR=/projects/Newgen
-NEWGEN_MAX_TABULATED_ELEMENTS=12007
 
 # An absolute file name is necessary for LISP
 LISP=/usr/local/bin/cl
