@@ -5,6 +5,7 @@
   * utilise lui-meme des routines sur les polyedres.
   *
   * Francois Irigoin, Janvier 1990
+  * Corinne Ancourt, Fabien Coelho from time to time (1999/2000)
   */
 
 #include <stdio.h>
@@ -142,8 +143,28 @@ static Psysteme actual_convex_union(Psysteme s1, Psysteme s2)
  */
 Psysteme elementary_convex_union(Psysteme s1, Psysteme s2)
 {
-  if (sc_empty_p(s1) || sc_empty_p(s2))
+  boolean
+    b1 = sc_empty_p(s1),
+    b2 = sc_empty_p(s2);
+    
+  if (b1 && b2)
     return sc_empty(base_union(sc_base(s1), sc_base(s2)));
+
+  if (b1) {
+    Psysteme s = sc_dup(s2);
+    Pbase b = base_union(sc_base(s1), sc_base(s2));
+    base_rm(sc_base(s));
+    sc_base(s) = b;
+    return s;
+  }
+  
+  if (b2) {
+    Psysteme s = sc_dup(s1);
+    Pbase b = base_union(sc_base(s1), sc_base(s2));
+    base_rm(sc_base(s));
+    sc_base(s) = b;
+    return s;
+  }
   
   if (sc_rn_p(s1) || sc_rn_p(s2) || 
       !vect_common_variables_p(sc_base(s1), sc_base(s2)))
@@ -311,7 +332,7 @@ transitive_closure_from_two_bases(Psysteme s, Pbase b1, Pbase b2)
  */
 Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
 {
-  Psysteme s1, s2, sc, stc, su;
+  Psysteme s1, s2, sc, stc, su, scsaved;
 
   s1 = sc_dup(is1);
   s2 = sc_dup(is2);
@@ -319,6 +340,7 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
   /* CA: extract common disjoint part.
    */
   sc = extract_common_syst(s1, s2);
+  scsaved = sc_dup(sc);
   stc = transitive_closure_from_two_bases(sc, s1->base, s2->base);
 
   /* FI: in sc_common_projection_convex_hull
@@ -342,9 +364,26 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
 	  sc_nbre_inegalites(sc),
 	 sc_nbre_inegalites(sc)+sc_nbre_inegalites(s1)+sc_nbre_inegalites(s2));
   */
-
   su = elementary_convex_union(s1, s2);
+  
+  /* usually we use V (convex hull) as a U (set union) approximation.
+   * as we have : (A n B1) U (A n B2) \in A
+   * the common part of both systems is an approximation of the union!
+   * sc_rn is returned on overflows (and some other case).
+   * I don't think that the result is improved apart when actual overflow occurs. FC/CA.
+   */
+  if (SC_RN_P(su) || sc_rn_p(su)) 
+  {
+    if (su) sc_rm(su), su = NULL;
+    if (sc) sc_rm(sc), sc = NULL;
+    sc = scsaved;
+  }
+  else
+  {
+    sc_rm(scsaved);
+  }
 
+  scsaved = NULL; /* dead. either rm or moved as sc. */
   sc_rm(s1); 
   sc_rm(s2);
 
@@ -352,12 +391,13 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
    * normalizes the system and removes redundancy, what is not done
    * if part of the system is separated. Other calls may be considered here?
    */
-  sc_transform_ineg_in_eg(sc);
-  sc_project_very_simple_equalities(sc);
+  sc_transform_ineg_in_eg(sc); /* ok, it will look better. */
+  sc_project_very_simple_equalities(sc); /* not really projected. { x==y, y==3 } => { x==3, y==3 } */
 
-  /* sc, su: fast union of disjoint */
+  /* sc, su: fast union of disjoint. */
   sc = sc_fusion(sc, su);
 
+  /* regenerate the expected base. */
   sc_fix(sc);
   if (sc_base(sc)) base_rm(sc_base(sc));
   sc_base(sc) = base_union(sc_base(is1), sc_base(is2));
