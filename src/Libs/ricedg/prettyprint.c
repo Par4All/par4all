@@ -75,9 +75,8 @@ string mod_name;
     return print_dependence_graph(mod_name);
 }
 
-bool 
-print_dependence_graph(mod_name)
-string mod_name;
+static bool 
+print_dependence_or_chains_graph(string mod_name, bool with_dg)
 {
     string dg_name = NULL;
     string local_dg_name = NULL;
@@ -91,7 +90,10 @@ string mod_name;
     mod_stat = get_current_module_statement();
     initialize_ordering_to_statement(mod_stat);
 
-    dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+    /* get the dg or chains... */
+    dg = (graph) db_get_memory_resource(
+	with_dg? DBR_DG: DBR_CHAINS, mod_name, TRUE);
+
     local_dg_name = db_build_file_resource_name(DBR_DG, mod_name, ".dg");
     dg_name = strdup(concatenate(db_get_current_workspace_directory(), 
 				 "/", local_dg_name, NULL));
@@ -110,14 +112,23 @@ string mod_name;
     safe_fclose(fp, dg_name);
     free(dg_name);
     
-    DB_PUT_FILE_RESOURCE(DBR_DG_FILE, strdup(mod_name), 
- 			 local_dg_name);
+    DB_PUT_FILE_RESOURCE(DBR_DG_FILE, strdup(mod_name), local_dg_name);
     
     reset_current_module_statement();
     reset_current_module_entity();
     reset_ordering_to_statement();
 
     return TRUE;
+}
+
+bool print_dependence_graph(string name)
+{
+    return print_dependence_or_chains_graph(name, TRUE);
+}
+
+bool print_chains_graph(string name)
+{
+    return print_dependence_or_chains_graph(name, FALSE);
 }
 
 /* That's all */
