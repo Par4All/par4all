@@ -3,10 +3,12 @@
 
 /* Modif:
   -- entity_local_name is replaced by module_local_name. LZ 230993
+  -- MAXINT replaced by INT_MAX, -MAXINT by INT_MIN FI 1/12/95
 */
 
 #include <stdio.h>
-/* #include <values.h>   */   /* MAXINT is defined there */
+/* #include <values.h>   */ 
+#include <limits.h>
 #include <string.h>
 
 #include "genC.h"
@@ -531,13 +533,13 @@ int maximize;
     predicate pred = transformer_relation(precond);
     Psysteme psyst = (Psysteme) predicate_system(pred);
 #define MAXINT ((~( (1 << 30) -1 )) + (~( (1 << 30) -1 )) + 1)
-    int min = (MAXINT);     /*  2^31 - 1 */
-    int max = (-MAXINT);
+    int min = (INT_MAX);     /*  2^31 - 1 */
+    int max = (INT_MIN);
     boolean faisable;
     complexity comp = make_zero_complexity();
 
-#define maxint_p(i) ((i) == MAXINT)
-#define minint_p(i) ((i) == (-MAXINT))
+#define maxint_p(i) ((i) == INT_MAX)
+#define minint_p(i) ((i) == (INT_MIN))
     
     trace_on("variable %s -> pnome, maximize %d ", entity_name(var), maximize);
 
@@ -603,15 +605,15 @@ int maximize;
 	    fprintf(stderr,"min is %d, max is %d, maximize is %d\n", min, max,maximize);
 	}
 
-	if ( faisable && ((min != -MAXINT) || (max != MAXINT)) ) {
+	if ( faisable && ((min != INT_MIN) || (max != INT_MAX)) ) {
 
-	    if ( (max != MAXINT) && TAKE_MAX(maximize) ) {
+	    if ( (max != INT_MAX) && TAKE_MAX(maximize) ) {
 		comp = simplify_sc_to_complexity(ps,(Variable)var);
 		if ( complexity_zero_p(comp) )
 		    comp = make_constant_complexity( (float)(max) );
 		varcount_bounded(complexity_varcount(comp)) ++;
 	    }
-	    else if ( (min != -MAXINT) && TAKE_MIN(maximize) ) {
+	    else if ( (min != INT_MIN) && TAKE_MIN(maximize) ) {
 		comp = simplify_sc_to_complexity(ps,(Variable)var);
 		if ( complexity_zero_p(comp) )
 		    comp = make_constant_complexity( (float)(min) );
@@ -619,13 +621,13 @@ int maximize;
 	    }
 
 	    /* for the inner loop 28/06/91 example p.f */
-	    else if ( (max == MAXINT) && TAKE_MAX(maximize) ) {
+	    else if ( (max == INT_MAX) && TAKE_MAX(maximize) ) {
 		comp = simplify_sc_to_complexity(ps,(Variable)var);
 		if ( complexity_zero_p(comp) )
 		    comp = make_constant_complexity( (float)(max) );
 		varcount_bounded(complexity_varcount(comp)) ++;
 	    }
-	    else if ( (min == -MAXINT) && TAKE_MIN(maximize) ) {
+	    else if ( (min == INT_MIN) && TAKE_MIN(maximize) ) {
 		comp = simplify_sc_to_complexity(ps,(Variable)var);
 		if ( complexity_zero_p(comp) )
 		    comp = make_constant_complexity( (float)(min) );
@@ -641,7 +643,7 @@ int maximize;
 		    fprintf(stderr,"max = min = %d\n",max);
 		}
 	    }
-	    else if ( (min != -MAXINT) && (max !=  MAXINT) ) {
+	    else if ( (min != INT_MIN) && (max !=  INT_MAX) ) {
 		comp = simplify_sc_to_complexity(ps,(Variable)var);
 	    }
 	    else {
