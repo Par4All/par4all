@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_generate_init,v $ ($Date: 1995/09/20 19:21:26 $, )
+# $RCSfile: hpfc_generate_init,v $ ($Date: 1995/09/20 19:22:31 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -39,7 +39,9 @@ NAME=`echo $NAME | tr 'A-Z' 'a-z'`
   echo "      subroutine HPFC_INIT_COMMON_PARAM()"
   echo "      include \"hpfc_commons.h\""
   #
-  # must avoid the hpfc_ version. pips generates uppercase files.
+  # must avoid the hpfc_ version. 
+  # pips generates uppercase file names...
+  #
   for file in $dirname/[A-Z]*_parameters.h
   do
     echo "      include \"`basename $file`\""
