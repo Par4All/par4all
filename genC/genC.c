@@ -4,6 +4,9 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.52  2000/04/12 13:10:33  coelho
+ * new make functions...
+ *
  * Revision 1.51  2000/04/12 12:22:31  coelho
  * tag numbering per type.
  * additionnal typed constructors to avoid void* direct use...
@@ -363,19 +366,36 @@ static void generate_make(
     {
 	for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr)
 	{
+	  /* check for unit... */
 	  string field = dlp->domain->ba.constructor;
 	  string typen = newgen_argument_type_name(dlp->domain);
-	  
-	  /* header */
-	  fprintf(header, "extern %s make_%s_%s(%s);\n",
-		  name, name, field, typen);
 
-	  /* code */
-	  fprintf(code, 
-		  "%s make_%s_%s(%s _field_)"
-		  " { return make_%s(is_%s_%s, (void*) _field_);}\n",
-		  name, name, field, typen,
-		  name, name, field);
+	  if(!strcmp(typen, UNIT_TYPE_NAME))
+	  {
+	    /* UNIT case */
+	    /* header */
+	    fprintf(header, "extern %s make_%s_%s(void);\n", 
+		    name, name, field);
+	    
+	    /* code */
+	    fprintf(code, 
+		    "%s make_%s_%s(void)\n"
+		    "{ return make_%s(is_%s_%s, UU);}\n",
+		    name, name, field, name, name, field);
+	  }
+	  else
+	  {
+	    /* header */
+	    fprintf(header, "extern %s make_%s_%s(%s);\n",
+		    name, name, field, typen);
+	    
+	    /* code */
+	    fprintf(code, 
+		    "%s make_%s_%s(%s _field_)\n"
+		    "{ return make_%s(is_%s_%s, (void*) _field_);}\n",
+		    name, name, field, typen,
+		    name, name, field);
+	  }
 	}
     }
 
