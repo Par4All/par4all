@@ -1,6 +1,10 @@
 #
-# $RCSfile: makefile_macros.IBMAIX,v $ (version $Revision$)
-# $Date: 1996/09/26 14:37:21 $, 
+# $Id$
+#
+# $Log: makefile_macros.IBMAIX,v $
+# Revision 1.9  1997/03/26 14:06:05  coelho
+# ansi option added for newgen.
+#
 #
 # this file contains macro definitions 
 
@@ -11,7 +15,8 @@ AR	= ar
 ARFLAGS	= rv
 CC	= cc
 # -ma to allow alloca():
-CFLAGS	= -g -O2 -qmaxmem=8192 -ma
+# ansi required for newgen (otherwise __STDC__ or __STRICT_ANSI__ not def).
+CFLAGS	= -g -O2 -qmaxmem=8192 -qlanglvl=ansi -ma
 # if -E is ommitted, the file is *compiled*:-(
 CMKDEP	= -E -M
 CPPFLAGS= 	-I. \
