@@ -17,10 +17,12 @@ Value pgcd_slow(Value a, Value b)
     Value m;
 
     if (value_zero_p(a))
+    {
 	if (value_zero_p(b))
 	    return VALUE_ONE;    /* a==0, b==0 */
         else
 	    return value_abs(b); /* a==0, b!=0 */
+    }
     else
 	if (value_zero_p(b))
 	    return value_abs(a); /* a!=0, b==0 */
