@@ -7,6 +7,7 @@
 #include <xview/xview.h>
 #include <xview/panel.h>
 #include <xview/text.h>
+#include <xview/svrimage.h>
 #include <types.h>
 
 #include "genC.h"
@@ -25,6 +26,7 @@ static Panel_item directory_name, program_name,
 memory_name, message, window_number;
 Panel_item module_name_panel_item;
 
+Server_image status_window_pips_image;
 
 /* Strange, "man end" says that end is a function! */
 extern etext, edata, end;
@@ -45,15 +47,19 @@ display_memory_usage()
 }
 
 
-void window_number_notify(Panel_item item, int value, Event *event)
+void
+window_number_notify(Panel_item item, int value, Event *event)
 {
-  number_of_wpips_windows = (int) xv_get(item, PANEL_VALUE);
+   number_of_wpips_windows = (int) xv_get(item, PANEL_VALUE);
+   display_memory_usage();
 }
 
 
-void show_directory()
+void
+show_directory()
 {
-    xv_set(directory_name, PANEL_VALUE, get_cwd(), 0);
+   xv_set(directory_name, PANEL_VALUE, get_cwd(), 0);
+   display_memory_usage();
 }
 
 
@@ -68,6 +74,7 @@ show_program()
       name = none;
 
    xv_set(program_name, PANEL_VALUE, name, 0);
+   display_memory_usage();
 }
 
 
@@ -81,10 +88,12 @@ show_module()
       module_name_content = none;
 
    xv_set(module_name_panel_item, PANEL_VALUE, module_name_content, 0);
+   display_memory_usage();
 }
 
 
-void show_message(string message_buffer /*, ...*/)
+void
+show_message(string message_buffer /*, ...*/)
 {
    /* va_list some_arguments;
    static char message_buffer[SMALL_BUFFER_LENGTH]; */
@@ -94,80 +103,94 @@ void show_message(string message_buffer /*, ...*/)
    /* (void) vsprintf(message_buffer, a_printf_format, some_arguments);*/
 
    xv_set(message, PANEL_VALUE, message_buffer, 0);
+   display_memory_usage();
 }
 
 
-void create_status_subwindow()
+void
+create_status_subwindow()
 {
-  /* Maintenant on n'utilise plus qu'un seul panel pour la fene^tre
-     principale.  En effet, sinon il y a des proble`mes de retrac,age
-     sur e'cran couleur. RK, 15/03/1994. */
-  
-  message = 
-    xv_create(main_panel, PANEL_TEXT, 
-	      PANEL_VALUE_X, DECALAGE_STATUS,
-	      PANEL_VALUE_Y, xv_rows(main_panel, 1),
-	      PANEL_LABEL_STRING, "Message:",
-	      PANEL_READ_ONLY, TRUE,
-	      PANEL_VALUE_DISPLAY_LENGTH, 64,
-	      PANEL_VALUE_STORED_LENGTH, 1000,
-	      NULL);
+   /* Maintenant on n'utilise plus qu'un seul panel pour la fene^tre
+      principale.  En effet, sinon il y a des proble`mes de retrac,age
+      sur e'cran couleur. RK, 15/03/1994. */
+   Server_image pips_icon_server_image;
+   
+   message = 
+      xv_create(main_panel, PANEL_TEXT, 
+                PANEL_VALUE_X, DECALAGE_STATUS,
+                PANEL_VALUE_Y, xv_rows(main_panel, 1),
+                PANEL_LABEL_STRING, "Message:",
+                PANEL_READ_ONLY, TRUE,
+                PANEL_VALUE_DISPLAY_LENGTH, 64,
+                PANEL_VALUE_STORED_LENGTH, 1000,
+                NULL);
 
-  directory_name = 
-    xv_create(main_panel, PANEL_TEXT, 
-	      PANEL_VALUE_X, DECALAGE_STATUS,
-	      PANEL_VALUE_Y, xv_rows(main_panel, 2),
-	      PANEL_LABEL_STRING, "Directory:",
-	      PANEL_READ_ONLY, TRUE,
-	      PANEL_VALUE_DISPLAY_LENGTH, 64,
-	      PANEL_VALUE_STORED_LENGTH, 256,
-	      NULL);
+   directory_name = 
+      xv_create(main_panel, PANEL_TEXT, 
+                PANEL_VALUE_X, DECALAGE_STATUS,
+                PANEL_VALUE_Y, xv_rows(main_panel, 2),
+                PANEL_LABEL_STRING, "Directory:",
+                PANEL_READ_ONLY, TRUE,
+                PANEL_VALUE_DISPLAY_LENGTH, 64,
+                PANEL_VALUE_STORED_LENGTH, 256,
+                NULL);
 
-  program_name = schoose_create_abbrev_menu_with_text(main_panel,
-                                                     "Workspace:",
-                                                     20,
-                                                     DECALAGE_STATUS,
-                                                     xv_rows(main_panel, 3),
-                                                     generate_workspace_menu,
-                                                     open_or_create_workspace);
+   program_name = schoose_create_abbrev_menu_with_text(main_panel,
+                                                       "Workspace:",
+                                                       20,
+                                                       DECALAGE_STATUS,
+                                                       xv_rows(main_panel, 3),
+                                                       generate_workspace_menu,
+                                                       open_or_create_workspace);
 
-  module_name_panel_item =
-     schoose_create_abbrev_menu_with_text(main_panel,
-                                          "Module:",
-                                          20,
-                                          DECALAGE_STATUS,
-                                          xv_rows(main_panel, 4),
-                                          generate_module_menu,
-                                          end_select_module_notify);
+   module_name_panel_item =
+      schoose_create_abbrev_menu_with_text(main_panel,
+                                           "Module:",
+                                           20,
+                                           DECALAGE_STATUS,
+                                           xv_rows(main_panel, 4),
+                                           generate_module_menu,
+                                           end_select_module_notify);
 
-  memory_name = 
-    xv_create(main_panel, PANEL_TEXT,
-	      PANEL_ITEM_X_GAP, DECALAGE_STATUS,
-              PANEL_VALUE_X, xv_col(main_panel, 60),
-              PANEL_VALUE_Y, xv_rows(main_panel, 3),
-	      PANEL_LABEL_STRING, "Memory (MB):",
-	      PANEL_VALUE_DISPLAY_LENGTH, 9,
-	      PANEL_READ_ONLY, TRUE,
-	      NULL);
+   memory_name = 
+      xv_create(main_panel, PANEL_TEXT,
+                PANEL_ITEM_X_GAP, DECALAGE_STATUS,
+                PANEL_VALUE_X, xv_col(main_panel, 50),
+                PANEL_VALUE_Y, xv_rows(main_panel, 3),
+                PANEL_LABEL_STRING, "Memory (MB):",
+                PANEL_VALUE_DISPLAY_LENGTH, 9,
+                PANEL_READ_ONLY, TRUE,
+                NULL);
 
- window_number = 
-    xv_create(main_panel, PANEL_NUMERIC_TEXT,
-	      /*PANEL_ITEM_X_GAP, DECALAGE_STATUS,
-	      PANEL_VALUE_Y, xv_rows(main_panel, 4),*/
-              PANEL_VALUE_X, xv_col(main_panel, 60),
-	      PANEL_VALUE_Y, xv_rows(main_panel, 4),
-	      PANEL_LABEL_STRING, "# windows:",
-	      PANEL_MIN_VALUE, 1,
-	      PANEL_MAX_VALUE, MAX_NUMBER_OF_WPIPS_WINDOWS,
-	      PANEL_VALUE, number_of_wpips_windows,
-	      PANEL_VALUE_DISPLAY_LENGTH, 2,
-	      PANEL_NOTIFY_PROC, window_number_notify,
-	      NULL);
+   window_number = 
+      xv_create(main_panel, PANEL_NUMERIC_TEXT,
+                /*PANEL_ITEM_X_GAP, DECALAGE_STATUS,
+                  PANEL_VALUE_Y, xv_rows(main_panel, 4),*/
+                PANEL_VALUE_X, xv_col(main_panel, 50),
+                PANEL_VALUE_Y, xv_rows(main_panel, 4),
+                PANEL_LABEL_STRING, "# windows:",
+                PANEL_MIN_VALUE, 1,
+                PANEL_MAX_VALUE, MAX_NUMBER_OF_WPIPS_WINDOWS,
+                PANEL_VALUE, number_of_wpips_windows,
+                PANEL_VALUE_DISPLAY_LENGTH, 2,
+                PANEL_NOTIFY_PROC, window_number_notify,
+                NULL);
+   
+   pips_icon_server_image = create_status_window_pips_image();
+   
+   status_window_pips_image = xv_create(main_panel, PANEL_MESSAGE,
+                                        PANEL_LABEL_IMAGE,
+                                        pips_icon_server_image,
+                                /* Put the Pixmap above the Help button: */
+                                        XV_X, xv_get(quit_button, XV_X) + (xv_get(quit_button, XV_WIDTH) - xv_get(pips_icon_server_image, XV_WIDTH))/2,
+                                        XV_Y, xv_rows(main_panel, 3) - 10,
+                                        NULL);
+   
+   window_fit(main_panel);
+   window_fit(main_frame);
 
-  window_fit(main_panel);
-  window_fit(main_frame);
-
-  show_directory();
-  show_program();
-  show_module();
+   show_directory();
+   show_program();
+   show_module();
+   display_memory_usage();
 }
