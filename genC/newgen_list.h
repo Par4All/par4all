@@ -28,7 +28,7 @@
 #include "malloc.h"
 
 typedef struct cons { 
-  chunk car; 
+  gen_chunk car; 
   struct cons *cdr ;
 } cons ;
 typedef cons *list ;
@@ -72,18 +72,19 @@ IN_STACK(gen_cp_, &Gen_cp_[MAX_NESTED_CONS], \
 
 extern cons *gen_append GEN_PROTO(( cons *, cons *)) ;
 extern cons *gen_concatenate GEN_PROTO(( cons *, cons * )) ;
-extern void gen_copy GEN_PROTO(( chunk *, chunk *)) ;
+extern void gen_copy GEN_PROTO(( gen_chunk *, gen_chunk *)) ;
 extern cons *gen_copy_seq GEN_PROTO(( cons * )) ;
-extern int gen_eq GEN_PROTO(( chunk *, chunk * )) ;
-extern chunk *gen_find GEN_PROTO((chunk *, cons *, 
-				  bool (*)(), chunk *(*)() )) ;
-extern chunk *gen_find_from_end GEN_PROTO((chunk *, cons *, 
-				  bool (*)(), chunk *(*)() )) ;
-extern chunk *gen_find_eq GEN_PROTO(( chunk *, cons * )) ;
-extern chunk *gen_find_if GEN_PROTO(( bool (*)(), cons *, chunk *(*)())) ;
-extern chunk *gen_find_if_from_end GEN_PROTO((bool (*)(), cons *, 
-					      chunk *(*)())) ;
-extern chunk *gen_find_tabulated GEN_PROTO(( char *, int )) ;
+extern int gen_eq GEN_PROTO(( gen_chunk *, gen_chunk * )) ;
+extern gen_chunk *gen_find GEN_PROTO((gen_chunk *, cons *, 
+				  bool (*)(), gen_chunk *(*)() )) ;
+extern gen_chunk *gen_find_from_end GEN_PROTO((gen_chunk *, cons *, 
+				  bool (*)(), gen_chunk *(*)() )) ;
+extern gen_chunk *gen_find_eq GEN_PROTO(( gen_chunk *, cons * )) ;
+extern gen_chunk *gen_find_if GEN_PROTO(( bool (*)(), cons *,
+					 gen_chunk *(*)())) ;
+extern gen_chunk *gen_find_if_from_end GEN_PROTO((bool (*)(), cons *, 
+					      gen_chunk *(*)())) ;
+extern gen_chunk *gen_find_tabulated GEN_PROTO(( char *, int )) ;
 extern cons *gen_filter_tabulated GEN_PROTO(( int (*)(), int )) ;
 extern void gen_free_list GEN_PROTO(( cons *)) ;
 extern cons *gen_last GEN_PROTO(( cons * )) ;
@@ -92,12 +93,12 @@ extern void gen_mapc_tabulated GEN_PROTO(( void (*)(), int )) ;
 extern void gen_mapl GEN_PROTO(( void (*)(), cons * )) ;
 extern cons *gen_nconc GEN_PROTO(( cons *, cons * )) ;
 extern cons *gen_nreverse GEN_PROTO(( cons * )) ;
-extern chunk gen_nth GEN_PROTO(( int, list )) ;
+extern gen_chunk gen_nth GEN_PROTO(( int, list )) ;
 extern cons *gen_nthcdr GEN_PROTO(( int, list )) ;
 extern char *gen_reduce GEN_PROTO(( char *, char *(*)(), cons * )) ;
-extern void gen_remove GEN_PROTO(( cons **, chunk * )) ;
+extern void gen_remove GEN_PROTO(( cons **, gen_chunk * )) ;
 extern cons *gen_some  GEN_PROTO(( bool (*)(), cons * )) ;
-extern void gen_insert_after GEN_PROTO((chunk *, chunk *, cons *)) ;
+extern void gen_insert_after GEN_PROTO((gen_chunk *, gen_chunk *, cons *)) ;
 extern void gen_sort_list GEN_PROTO((list, int (*)())) ;
 
 #endif
