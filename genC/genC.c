@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1995/09/16 22:10:16 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1995/10/02 13:52:29 $, )
  * version $Revision$
  */
 
@@ -50,6 +50,16 @@
 
 static char start[ 1024 ] ;
 
+
+static void 
+fprint_upper(
+    FILE *file,
+    char *s)
+{
+    for(; *s; s++) fprintf(file, "%c", UPPER(*s));
+}
+
+
 /* GEN_SIZE returns the size (in gen_chunks) of an object of type defined by
    the BP type. */
 
@@ -60,12 +70,12 @@ struct gen_binding *bp ;
     int overhead = GEN_HEADER+IS_TABULATED( bp ) ;
 
     switch( bp->domain->ba.type ) {
-    case BASIS:
-    case ARRAY:
-    case LIST:
-    case SET:
+    case BASIS_DT:
+    case ARRAY_DT:
+    case LIST_DT:
+    case SET_DT:
 	return( overhead + 1 ) ;
-    case CONSTRUCTED:
+    case CONSTRUCTED_DT:
 	if( bp->domain->co.op == OR_OP ) {
 	    return( overhead + 2 ) ;
 	}
@@ -101,7 +111,7 @@ union domain *dp ;
     static char buffer[ 1024 ];
 
     switch( dp->ba.type ) {
-    case BASIS: {
+    case BASIS_DT: {
 	struct gen_binding *bp = dp->ba.constructand ;
       
 	if( IS_INLINABLE( bp )) {
@@ -115,13 +125,13 @@ union domain *dp ;
 	}
 	break ;
     }
-    case LIST:
+    case LIST_DT:
 	sprintf( buffer, "l" ) ;
 	break ;
-    case SET:
+    case SET_DT:
 	sprintf( buffer, "t" ) ;
 	break ;
-    case ARRAY: 
+    case ARRAY_DT: 
 	sprintf( buffer, "p" ) ;
 	break ;
     default:
@@ -139,21 +149,22 @@ union domain *dp;
     
     switch( dp->ba.type )
     {
-    case BASIS: 
+    case BASIS_DT: 
 	sprintf(buffer, dp->ba.constructand->name);
 	break;
-    case ARRAY: 
-    case EXTERNAL:
-    case IMPORT:
+    case ARRAY_DT: 
+    case EXTERNAL_DT:
+    case IMPORT_DT:
 	sprintf(buffer, "(I don't know what to generate - FC:-)");
 	break;
-    case LIST:
+    case LIST_DT:
 	sprintf(buffer, "list");
 	break;
-    case SET:
+    case SET_DT:
 	sprintf(buffer, "set");
 	break;
     default:
+	break;
     }
     
     return(buffer);
@@ -169,7 +180,7 @@ union domain *dp ;
   static char buffer[ 1024 ];
 
   switch( dp->ba.type ) {
-  case BASIS: 
+  case BASIS_DT: 
   {
       struct gen_binding *bp = dp->ba.constructand ;
       
@@ -179,13 +190,13 @@ union domain *dp ;
 
       break ;
   }
-  case EXTERNAL:
-  case IMPORT:
-  case LIST:
-  case SET:
+  case EXTERNAL_DT:
+  case IMPORT_DT:
+  case LIST_DT:
+  case SET_DT:
 	  sprintf(buffer, "");
 	  break ;
-  case ARRAY: 
+  case ARRAY_DT: 
     if( dp->ar.dimensions->cdr != NULL ) {
 	    struct intlist *dim = dp->ar.dimensions ;
      
@@ -221,8 +232,8 @@ int offset ;
     char *cast = primitive_cast( dp ) ;
     char *field = primitive_field( dp ) ;
 
-    if( dp->ba.type == BASIS && 
-       strcmp( dp->ba.constructand->name, UNIT_TYPE ) == 0 ) {
+    if( dp->ba.type == BASIS_DT && 
+       strcmp( dp->ba.constructand->name, UNIT_TYPE_NAME ) == 0 ) {
 	return ;
     }
     (void) printf( "#define %s_%s(node) ", name, dp->ba.constructor ) ;
@@ -242,10 +253,10 @@ static char *
 gen_arg( dp )
 union domain *dp ;
 {
-    return( (dp->ba.type == BASIS) ? dp->ba.constructor :
-	    (dp->ba.type == LIST) ? dp->li.constructor :
-	    (dp->ba.type == SET) ? dp->se.constructor :
-	    (dp->ba.type == ARRAY) ? dp->ar.constructor :
+    return( (dp->ba.type == BASIS_DT) ? dp->ba.constructor :
+	    (dp->ba.type == LIST_DT) ? dp->li.constructor :
+	    (dp->ba.type == SET_DT) ? dp->se.constructor :
+	    (dp->ba.type == ARRAY_DT) ? dp->ar.constructor :
 	    (fatal( "gen_arg: Unknown type %s\n", itoa( dp->ba.type )), 
 	     (char *)NULL) ) ;
 }
@@ -306,7 +317,7 @@ gen_and( bp )
 }
 
 /* GEN_OR generates the manipulation function for an OR_OP type BP. Note
-   that for a UNIT_TYPE, no access function is defined since the value is
+   that for a UNIT_TYPE_NAME, no access function is defined since the value is
    meaningless. */
 
 void
@@ -384,9 +395,8 @@ struct gen_binding *bp ;
     
     /* XX_MAP
      */
-    for( (void) printf( "#define " ), s=name ; *s ; s++ ) /* beurk */
-	    (void) printf( "%c", UPPER( *s )) ;
-
+    (void) printf("#define ");
+    fprint_upper(stdout, name);
     (void) printf("_MAP(k, v, code, fun) FUNCTION_MAP(%s, ", name);
     (void) printf("%s, ", primitive_field(start));
     (void) printf("%s, k, v, code, fun)\n", primitive_field(image));
@@ -454,11 +464,10 @@ struct gen_binding *bp ;
     (void) printf( "#ifndef _newgen_%s_defined\n", s ) ;
     (void) printf( "#define _newgen_%s_defined\n", s ) ;
 
-    for( (void) printf( "#define " ) ; *s ; s++ ) {
-	(void) printf( "%c", UPPER( *s )) ;
-    }
+    (void) printf("#define ");
+    fprint_upper(stdout, s);
     (void) printf( " (%s+%d)\n", start, TYPE( bp )) ;
-    (void) printf( "#endif\n" ) ;
+    (void) printf( "#endif /* _newgen_%s_defined*/\n", s) ;
 }
 
 /* GEN_DOMAIN generates the manipulation functions for a type BP. This is
@@ -469,14 +478,17 @@ gen_domain( bp )
 struct gen_binding *bp ;
 {
     union domain *dp = bp->domain ;
-    char *s = bp->name ;
 
     if( !IS_EXTERNAL( bp )) 
     {
-	for( (void) printf( "#define " ) ; *s ; s++ ) 
-	    (void) printf( "%c", UPPER( *s )) ;
+	(void) printf("#define ");
+	fprint_upper(stdout, bp->name);
+	(void) printf( "(x) ((x).p)\n" );
 
-	(void) printf( "(x) ((x).p)\n" ) ;
+	(void) printf("#define ");
+	fprint_upper(stdout, bp->name);
+	(void) printf("_TYPE gen_chunkp\n");
+	
 	(void) printf( "typedef gen_chunk *%s ;\n", bp->name ) ;
 	(void) printf("#define %s_undefined ((%s)gen_chunk_undefined)\n", 
 		      bp->name, bp->name ) ;
@@ -496,7 +508,7 @@ struct gen_binding *bp ;
 		      bp->name, bp->name);
     }
     switch( dp->ba.type ) {
-    case CONSTRUCTED:
+    case CONSTRUCTED_DT:
 	switch( dp->co.op ) {
 	case AND_OP: 
 	    gen_and( bp ) ;
@@ -511,16 +523,16 @@ struct gen_binding *bp ;
 	    fatal( "gen_domain: Unknown constructed %s\n", itoa( dp->co.op )) ;
 	}
 	break ;
-    case LIST:
+    case LIST_DT:
 	gen_list( bp ) ;
 	break ;
-    case SET:
+    case SET_DT:
 	gen_set( bp ) ;
 	break ;
-    case ARRAY:
+    case ARRAY_DT:
 	gen_array( bp ) ;
 	break ;
-    case EXTERNAL:
+    case EXTERNAL_DT:
 	gen_external( bp ) ;
 	break ;
     default:
