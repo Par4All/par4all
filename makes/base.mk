@@ -110,6 +110,17 @@ $(ARCH)/%.o: $(ARCH)
 ################################################################## DEPENDENCIES
 
 phase0: depend
+depend:	
+
+ifdef CFILES
+need_depend	= 1
+endif # CFILES
+
+ifdef DERIVED_CFILES
+need_depend	= 1
+endif # DERIVED_CFILES
+
+ifdef need_depend
 
 DEPEND	= .depend.$(ARCH)
 
@@ -127,6 +138,8 @@ depend:
 clean: depend-clean
 
 depend-clean:; $(RM) .depend.*
+
+endif # need_depend
 
 ####################################################################### HEADERS
 
