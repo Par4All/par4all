@@ -1,4 +1,6 @@
-/* package sc : sc_feasibility.c
+/* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
+ * date: $Date: 1995/01/31 10:36:12 $, 
+ * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
  * This file provides functions to test the feasibility of a system 
@@ -61,12 +63,28 @@ boolean ofl_res;
     return sc_feasibility_ofl_ctrl(sc, TRUE, ofl_ctrl, ofl_res);
 }
 
-
-
-
 /*
  * LOW LEVEL FUNCTIONS 
  */
+/*  just a test to improve the Simplex/FM decision.
+ */
+static void decision_data(c, pc, pv, weight)
+Pcontrainte c;
+int *pc, *pv, weight;
+{
+    Pvecteur v;
+    
+    for(; c!=NULL; c=c->succ)
+    {
+	v=c->vecteur;
+	if (v!=NULL) 
+	{
+	    (*pc)+=weight;
+	    for(; v!=NULL; v=v->succ) 
+		if (var_of(v)!=TCST) (*pv)+=weight;
+	}
+    }
+}
 
 boolean sc_feasibility_ofl_ctrl(sc, integer_p, ofl_ctrl, ofl_res)
 Psysteme sc;
@@ -74,31 +92,57 @@ boolean integer_p;
 int ofl_ctrl;
 boolean ofl_res;
 {
-    boolean ok = FALSE;
+    int
+	n_var = sc->dimension,
+	n_cont=0, n_ref=0;
+    boolean 
+	ok = FALSE,
+	use_simplex = FALSE;
 
-    if (sc_rn_p(sc))
-	ok = TRUE;
-    else {
-	switch (ofl_ctrl) {
-	case OFL_CTRL :
-	    ofl_ctrl = FWD_OFL_CTRL;
-	    if (setjmp(overflow_error)) {
-		ok = ofl_res;
-		break;
-	    }		
-	default:
-	    if (sc_nbre_egalites(sc)+sc_nbre_inegalites(sc) >= 
-		NB_CONSTRAINTS_MAX_FOR_FM)
-		ok = sc_simplexe_feasibility_ofl_ctrl(sc, ofl_ctrl);
-	    else 
-		ok = sc_fourier_motzkin_feasibility_ofl_ctrl(sc, integer_p, 
-							     ofl_ctrl);
-	}
+    decision_data(sc_egalites(sc), &n_cont, &n_ref, 2);
+    decision_data(sc_inegalites(sc), &n_cont, &n_ref, 1);
+
+    use_simplex = (n_cont >= NB_CONSTRAINTS_MAX_FOR_FM || 
+		   (n_cont>=10 && n_ref>2*n_cont));
+
+/*
+    fprintf(stderr, "[sc_feasibility_ofl_ctrl] %s=[%d,%d,%d]\n",
+	   use_simplex ? "S" : "FM", n_var, n_cont, n_ref);
+*/
+
+    if (sc_rn_p(sc)) 
+	return(TRUE);
+
+    /* else
+     */
+    switch (ofl_ctrl) 
+    {
+    case OFL_CTRL :
+	ofl_ctrl = FWD_OFL_CTRL;
+	if (setjmp(overflow_error)) {
+	    ok = ofl_res;
+	    /* 
+	     *   PLEASE do not remove this warning.
+	     *
+	     *   FC 30/01/95
+	     */
+	    fprintf(stderr, 
+      "[sc_feasibility_ofl_ctrl] arithmetic error (%s[%d,%d,%d]) -> %s\n",
+		    use_simplex ? "Simplex" : "Fourier-Motzkin", 
+		    n_var, n_cont, n_ref,
+		    ofl_res ? "TRUE" : "FALSE");
+	    break;
+	}		
+    default:
+	if (use_simplex)
+	    ok = sc_simplexe_feasibility_ofl_ctrl(sc, ofl_ctrl);
+	else 
+	    ok = sc_fourier_motzkin_feasibility_ofl_ctrl(sc, integer_p, 
+							 ofl_ctrl);
     }
-    return ok;
+
+    return(ok);
 }
-
-
 
 /* boolean sc_fourier_motzkin_faisabilite_ofl(Psysteme s):
  * test de faisabilite d'un systeme de contraintes lineaires, par projections
