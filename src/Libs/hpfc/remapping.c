@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.67  1998/04/14 20:55:06  coelho
+ * casts.
+ *
  * Revision 1.66  1998/04/02 20:36:39  irigoin
  * Call to NumberOfElements() replaced by call to element_number()
  *
@@ -1367,7 +1370,6 @@ remapping_compile(
 
     /* remapping codes (indirect thru include)
      */
-    pips_debug(7, "considering %d renamings\n", gen_length(load_renamings(s)));
     MAP(RENAMING, r,
     {
 	pips_debug(7, "remapping %s -> %s\n", entity_name(renaming_old(r)),
