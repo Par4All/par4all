@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/05 12:52:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/29 13:37:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 1995/10/05 12:52:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "%A% ($Date: 1995/11/29 13:37:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -733,7 +733,7 @@ create_options_menu_and_window()
 
    build_aliases();
    build_options_menu_and_panel(options_menu, options_panel);
-
+   
    (void) xv_create(main_panel, PANEL_BUTTON,
                     PANEL_LABEL_STRING, "Options",
                     PANEL_ITEM_MENU, options_menu,
