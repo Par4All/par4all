@@ -1,4 +1,13 @@
- /* package semantics */
+/* package semantics
+ * 
+ * $Id$
+ *
+ * $Log: interprocedural.c,v $
+ * Revision 1.28  1999/01/07 16:43:06  irigoin
+ * Bug fix in translated_global_value() to resist aliasing between a global variable and a formal parameter. See spice01.f in Validation.
+ *
+ *
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -680,10 +689,47 @@ entity v;
 	    /* e has already been introduced and v eliminated;
 	       this happens when a COMMON variable is
 	       also passed as real argument */
+	    /* FI: v may still appear in the constraints as in spice.f
+               (Perfect Club) and spice01.f (Validation) */
+	    Pvecteur subst = vect_new((Variable) v, (Value) 1);
+	    Pcontrainte eq = CONTRAINTE_UNDEFINED;
+	    list args = CONS(ENTITY, v, NIL);
+
+	    vect_add_elem(&subst, (Variable) e, (Value) -1);
+	    eq = contrainte_make(subst);
+	    sc_add_egalite(sc, eq);
+
 	    debug(7, "translate_global_value", 
 		  "%s has already been translated into %s\n",
 		  entity_name(v), entity_name(e));
-	    sc_base_remove_variable(sc,(Variable) v);
+
+	    user_warning("translate_global_value",
+			 "Variable %s is probably aliased with a formal parameter"
+			 " by the current call to %s from %s.\n"
+			 "This is forbidden by the Fortran 77 standard.\n",
+			 entity_name(v), entity_module_name(v), module_local_name(m));
+
+	    ifdebug(7) {
+		debug(7, "translate_global_value", 
+		  "%s should again be translated into %s by projection of %s\n",
+		  entity_name(v), entity_name(e), entity_name(v));
+		dump_transformer(tf);
+	    }
+
+	    if(entity_is_argument_p(v, transformer_arguments(tf))) {
+		transformer_arguments(tf) = 
+		    arguments_add_entity(transformer_arguments(tf), e);
+	    }
+
+	    tf = transformer_projection(tf, args);
+	    gen_free_list(args);
+
+	    ifdebug(7) {
+		debug(7, "translate_global_value", 
+		  "After projection of %s\n",
+		  entity_name(v));
+		dump_transformer(tf);
+	    }
 	}
 	else {
 	    debug(7, "translate_global_value", 
