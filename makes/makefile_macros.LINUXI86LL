@@ -1,0 +1,14 @@
+#
+# $Id$
+# 
+# $Log: makefile_macros.LINUXI86LL,v $
+# Revision 1.1  1997/05/12 12:58:47  coelho
+# Initial revision
+#
+#
+# this file contains macro definitions 
+
+include $(ROOT)/Include/makefile_macros.GNULL
+
+# end of it!
+#
