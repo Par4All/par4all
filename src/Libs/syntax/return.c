@@ -22,14 +22,20 @@
  * If alternate returns are substituted, the code declarations should
  * be regenerated. The corresponding property should be checked.
  */
-static bool substitute_p = FALSE;
+static bool substitute_rc_p = FALSE;
+static bool substitute_stop_p = FALSE;
 
 void
-SubstituteAlternateReturns(bool do_it)
+SubstituteAlternateReturns(string option)
 {
-    substitute_p = do_it;
+    substitute_rc_p = (strcmp(option, "RC")==0);
+    substitute_stop_p = (strcmp(option, "STOP")==0);
 
-    if(do_it && !get_bool_property("PRETTYPRINT_ALL_DECLARATIONS"))
+    pips_assert("Three options for alternate return handling",
+		substitute_rc_p || substitute_stop_p || strcmp(option, "NO")==0);
+
+    if((substitute_rc_p || substitute_stop_p) 
+       && !get_bool_property("PRETTYPRINT_ALL_DECLARATIONS"))
 	user_warning("SubstituteAlternateReturns",
 		     "Module declarations should be regenerated."
 		     " Set property PRETTYPRINT_ALL_DECLARATIONS.\n");
@@ -38,7 +44,7 @@ SubstituteAlternateReturns(bool do_it)
 bool
 SubstituteAlternateReturnsP()
 {
-    return substitute_p;
+    return substitute_rc_p;
 }
 
 
@@ -99,6 +105,15 @@ uses_alternate_return_p()
 void
 uses_alternate_return(bool use)
 {
+    if(use && strcmp(get_string_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"), "NO")==0) {
+	pips_user_warning
+	    ("Lines %d-%d: Alternate return not processed with current option \"%s\". "
+	     "Formal label * ignored.\n"
+	     "See property PARSER_SUBSTITUTE_ALTERNATE_RETURNS for other options\n",
+	     line_b_I, line_e_I, get_string_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"));
+	ParserError("uses_alternate_return", "Alternate returns prohibited by user\n");
+    }
+
      current_module_uses_alternate_returns = use;
 }
 
@@ -113,7 +128,7 @@ add_formal_return_code(list fpl)
 {
     list new_fpl = fpl;
 
-    if(substitute_p && uses_alternate_return_p()) {
+    if(substitute_rc_p && uses_alternate_return_p()) {
 	entity frc = GetReturnCodeVariable();
 
 	/* Type, storage and initial value are set up later in MakeFormalParameter() */
@@ -127,7 +142,7 @@ add_actual_return_code(list apl)
 {
     list new_apl = apl;
 
-    if(substitute_p && !ENDP(get_alternate_returns())) {
+    if(substitute_rc_p && !ENDP(get_alternate_returns())) {
 	entity frc = GetReturnCodeVariable();
 	expression frcr = entity_to_expression(frc);
 
@@ -163,7 +178,7 @@ add_alternate_return(string label_name)
 {
     entity l = entity_undefined;
 
-    if(substitute_p) {
+    if(substitute_rc_p) {
 	l = MakeLabel(label_name);
 	alternate_returns = arguments_add_entity(alternate_returns, l);
     }
@@ -234,18 +249,18 @@ instruction MakeReturn(expression e)
 {
     instruction inst = instruction_undefined;
 
-    if(!expression_undefined_p(e) && !substitute_p) {
-	user_warning("MakeReturn", 
-		     "Lines %d-%d: Alternate return not supported. "
-		     "Standard return generated\n",
-		     line_b_I,line_e_I);
+    if(!expression_undefined_p(e) && !substitute_rc_p && !substitute_stop_p) {
+	user_error("MakeReturn", 
+		   "Lines %d-%d: Alternate return not supported. "
+		   "Standard return generated\n",
+		   line_b_I,line_e_I);
     }
 
     if (end_label == entity_undefined) {
 	end_label = MakeLabel(end_label_local_name);
     }
 
-    if(substitute_p && uses_alternate_return_p()) {
+    if(substitute_rc_p && uses_alternate_return_p()) {
 	/* Assign e to the return code variable, but be sure not to count
 	 * this assignment as a user instruction. Wrap if with the Go To
 	 * in a block and return the block instruction.
@@ -262,6 +277,9 @@ instruction MakeReturn(expression e)
 	inst = make_instruction_block(CONS(STATEMENT, src, CONS(STATEMENT, jmp, NIL)));
 	gen_consistent_p(inst);
     }
+    else if(!expression_undefined_p(e) && substitute_stop_p && uses_alternate_return_p()) {
+	inst = MakeZeroOrOneArgCallInst("STOP", e);
+    }
     else {
 	inst = MakeGotoInst(end_label_local_name);
     }
@@ -277,7 +295,7 @@ GenerateReturn()
     /* statement c = MakeStatement(l, make_continue_instruction()); */
 
 
-    if(substitute_p && uses_alternate_return_p()) {
+    if(substitute_rc_p && uses_alternate_return_p()) {
 	entity l = MakeLabel(strdup(end_label_local_name));
 	expression rc = int_to_expression(0);
 	statement src = make_assign_statement(entity_to_expression(GetReturnCodeVariable()), rc);
