@@ -122,7 +122,7 @@ entity
 make_new_scalar_variable(entity module,
                          basic b)
 {
-   string module_name = entity_module_name(module);
+   string module_name = module_local_name(module);
    char buffer[20];
    entity e;
    
@@ -156,7 +156,7 @@ make_new_scalar_variable(entity module,
    
    pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(b));
    
-   e = make_scalar_entity(buffer, module_name, b);
+   e = make_scalar_entity(&buffer[0], module_name, b);
    AddEntityToDeclarations(e, module);
    
    return e;
