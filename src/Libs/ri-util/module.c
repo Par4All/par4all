@@ -1,5 +1,5 @@
- /* 
-  *
+ /* $RCSfile: module.c,v $ (version $Revision$)
+  * $Date: 1996/12/27 09:10:08 $, 
   */
 #include <stdio.h>
 #include <string.h>
@@ -81,11 +81,8 @@ void add_non_declared_reference_to_declaration(reference ref)
 	    NULL));
 	if ((ent = gen_find_tabulated(name,entity_domain)) ==entity_undefined)
 	{
-	    ifdebug(8) 
-		(void) fprintf(stderr,
-			       "ajout de la variable symbolique %s au module %s\n",
-			       entity_name(var), 
-			       entity_name(checked_module)); 
+	    pips_debug(8, "ajout de la variable symbolique %s au module %s\n",
+		       entity_name(var), entity_name(checked_module)); 
 
 	    ent =  make_entity(name,
 			       gen_copy_tree(entity_type(var)),
@@ -219,7 +216,7 @@ void insure_declaration_coherency(
     statement stat,
     list /* of entity */ le) /* added entities, for includes... */
 {
-    list decl = entity_declarations(module), new_decl = NIL, added = NIL;
+    list decl = entity_declarations(module), new_decl = NIL, ahead = NIL;
 
     debug_on("RI_UTIL_DEBUG_LEVEL");
 
@@ -244,58 +241,55 @@ void insure_declaration_coherency(
 
     /*    checks each declared variable for a reference
      */
-    MAPL(ce,
-     {
-	 entity var = ENTITY(CAR(ce));
-
-	 if (!entity_variable_p(var) ||
-	     !local_entity_of_module_p(var, module) ||
-	     storage_formal_p(entity_storage(var)) ||
-	     value_symbolic_p(entity_initial(var)) ||
-	     (bound_referenced_variables_p(var) &&
-	      !bound_declared_variables_p(var)))
-	 {
-	     pips_debug(7, "declared variable %s is referenced, kept\n",
-			entity_name(var));
-	     new_decl = CONS(ENTITY, var, new_decl);
-	     store_declared_variables(var, TRUE);
-	 }
-	 else
-	 {
-	     pips_debug(7, "declared variable %s not referenced, removed\n",
-			entity_name(var));
-	 }
-     },
+    MAP(ENTITY, var,
+    {
+	if (value_symbolic_p(entity_initial(var)))
+	{
+	    /* some variables must be kept in order */
+	    ahead = CONS(ENTITY, var, ahead);
+	    store_declared_variables(var, TRUE);
+	}
+	else
+	    if (!entity_variable_p(var) ||
+		storage_formal_p(entity_storage(var)) ||
+		!local_entity_of_module_p(var, module) ||
+		(bound_referenced_variables_p(var) &&
+		 !bound_declared_variables_p(var)))
+	    {
+		pips_debug(7, "declared variable %s is referenced, kept\n",
+			   entity_name(var));
+		new_decl = CONS(ENTITY, var, new_decl);
+		store_declared_variables(var, TRUE);
+	    }
+	    else
+	    {
+		pips_debug(7, "declared variable %s not referenced, removed\n",
+			   entity_name(var));
+	    }
+    },
 	 decl);
 
     /*    checks each referenced variable for a declaration 
      */
-    MAPL(ce,
-     {
-	 entity var = ENTITY(CAR(ce));
+    MAP(ENTITY, var,
+    {
+	if (!bound_declared_variables_p(var) &&
+	    !basic_overloaded_p(entity_basic(var)))
+	{
+	    pips_debug(7, "referenced var %s added\n", entity_name(var));
+	    new_decl = CONS(ENTITY, var, new_decl);
+	    store_declared_variables(var, TRUE);
+	}
+	else
+	{
+	    pips_debug(7, "referenced var %s declared\n", entity_name(var));
+	}
+    },
+	referenced_variables_list);
 
-	 if (!bound_declared_variables_p(var) &&
-	     !basic_overloaded_p(entity_basic(var)))
-	 {
-	     pips_debug(7, "referenced var %s added\n", entity_name(var));
-	     added = CONS(ENTITY, var, added);
-	     store_declared_variables(var, TRUE);
-	 }
-	 else
-	 {
-	     pips_debug(7, "referenced var %s declared\n", entity_name(var));
-	 }
-     },
-	 referenced_variables_list);
-
-    new_decl = gen_nreverse(new_decl); /* back to initial order */
-    new_decl = gen_nconc(new_decl, added);
-
-    /*  More determinism: the declarations are sorted
-     * ??? bug: parameters cannot be sorted...
-     */
-    /* gen_sort_list(new_decl, compare_entities); */
-    entity_declarations(module) = new_decl; /* rough! */
+    ahead = gen_nreverse(ahead); /* back to initial order */
+    gen_sort_list(new_decl, compare_entities); /* sorted for determinism */
+    entity_declarations(module) = gen_nconc(ahead, new_decl); 
 
     /* the temporaries are cleaned
      */
