@@ -47,7 +47,7 @@
 #define REDUCE_DEGREE
 
 /***************************************************************************/
-/* define this to prints one warning message per domain overflow           */
+/* define this to print one warning message per domain overflow            */
 /* these overflows should no longer happen since version 4.20              */
 #define ALL_OVERFLOW_WARNINGS
 
@@ -623,8 +623,8 @@ int cherche_min(Value *min,Polyhedron *D,int pos) {
     value_set_si(binf,0);
   
   /* Loop from 0 (or binf if positive) to bsup */
-  for(maxiter=0,((flag&LB_INFINITY) || value_neg_p(binf)) ? 
-	value_set_si(i,0) : value_assign(i,binf);
+  for(maxiter=0,(((flag&LB_INFINITY) || value_neg_p(binf)) ? 
+	value_set_si(i,0) : value_assign(i,binf));
       ((flag&UB_INFINITY) || value_le(i,bsup)) && maxiter<MAXITER ;
       value_increment(i,i),maxiter++) {
     
@@ -638,9 +638,9 @@ int cherche_min(Value *min,Polyhedron *D,int pos) {
   
   /* Descending loop from -1 (or bsup if negative) to binf */
   if((flag&LB_INFINITY) || value_neg_p(binf))
-    for(maxiter=0,((flag&UB_INFINITY) || value_pos_p(bsup))?
+    for(maxiter=0,(((flag&UB_INFINITY) || value_pos_p(bsup))?
 	  value_set_si(i,-1)
-	  :value_assign(i,bsup);
+	  :value_assign(i,bsup));
 	((flag&LB_INFINITY) || value_ge(i,binf)) && maxiter<MAXITER  ;
 	value_decrement(i,i),maxiter++) {
 
@@ -653,6 +653,8 @@ int cherche_min(Value *min,Polyhedron *D,int pos) {
     }
   value_clear(binf); value_clear(bsup);
   value_clear(i);
+
+  value_assign(min[pos],0);
   return(0);	     /* not found :-( */
 } /* cherche_min */
 
@@ -693,7 +695,7 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value size,unsigned MAXRAYS) {
   fprintf(stderr,"\n");
 #endif
 
-  /* Aditionnal constraints */
+  /* Additionnal constraints */
   for(i=0;i<D->NbConstraints;i++) {
     if(value_zero_p(D->Constraint[i][0])) {
       fprintf(stderr,"Polyhedron_Preprocess: ");
@@ -838,7 +840,7 @@ Polyhedron *Polyhedron_Preprocess2(Polyhedron *D,Value *size,Value *lcm,unsigned
   value_print(stderr,VALUE_FMT,*lcm);
   fprintf(stderr,", size = ");
   value_print(stderr,VALUE_FMT,*size);
-  fprintf("\n");
+  fprintf(stderr,"\n");
 #endif
   
   for(i=0;i<D->Dimension;i++) {
@@ -1816,7 +1818,8 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS) 
     
     /* Before scanning, add constraints to ensure at least hdim*lcm */
     /* points in every dimension */
-    value_set_si(hdv,hdim);
+/* modified, vin100, Aug 22, 2001 : hdv should not include the parameters */
+    value_set_si(hdv,hdim-nb_param);
     value_multiply(m1,hdv,lcm);
     
 #ifdef EDEBUG2 
@@ -1824,8 +1827,9 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS) 
     value_print(stderr,VALUE_FMT,m1);
     fprintf(stderr,"\n");
 #endif 
-    
-    value_sub_int(m1,m1,2);
+
+/* removed, vin100, Aug 22, 2001 */
+/*    value_sub_int(m1,m1,2); */
     
     CATCH(overflow_error) {
       
@@ -1837,7 +1841,8 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS) 
       CQ2 = Polyhedron_Preprocess(CQ,m1,MAXRAYS);
       
 #ifdef EDEBUG2
-      fprintf(stderr,"R2\n");
+      fprintf(stderr,"After preprocess, CQ2 = ");
+      Polyhedron_Print(stderr,P_VALUE_FMT,CQ2);
 #endif
       
       UNCATCH(overflow_error);
@@ -1848,7 +1853,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS) 
     if ((!CQ2 || emptyQ(CQ2)) && CQ->NbBid==0) {
       int r;
       
-#ifdef EDEBUG62
+#ifdef EDEBUG2
       fprintf(stderr,"Trying to call Polyhedron_Preprocess2 : CQ = \n");
       Polyhedron_Print(stderr,P_VALUE_FMT,CQ);
 #endif
@@ -1867,6 +1872,9 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS) 
       }
     }		
     if (!CQ2 || emptyQ(CQ2)) {
+#ifdef EDEBUG2
+      fprintf(stderr,"Degenerate.\n");
+#endif
       fprintf(stdout,"Degenerate Domain. Can not continue.\n");
       value_init(res->EP.d);
       value_init(res->EP.x.n);
@@ -1878,6 +1886,14 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS) 
 #ifdef EDEBUG2
       fprintf(stderr,"CQ2 = \n");
       Polyhedron_Print(stderr,P_VALUE_FMT,CQ2);
+      if( ! PolyhedronIncludes(CQ, CQ2) )
+	fprintf( stderr,"CQ does not include CQ2 !\n");
+      else
+	fprintf( stderr,"CQ includes CQ2.\n");
+      if( ! PolyhedronIncludes(res->ValidityDomain, CQ2) )
+	fprintf( stderr,"CQ2 is *not* included in validity domain !\n");
+      else
+	fprintf( stderr,"CQ2 is included in validity domain.\n");
 #endif
       
       /* L is used in counting the number of points in the base cases */
