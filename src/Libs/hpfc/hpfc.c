@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/10/02 16:37:57 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/10/05 11:32:36 $, )
  * version $Revision$
  */
  
@@ -59,8 +59,7 @@ GENERIC_STATIC_STATUS(static, computed_remaps, list, NIL, gen_free_list)
  */
 
 bool 
-remapping_already_computed_p(
-    renaming x)
+remapping_already_computed_p(renaming x)
 {
     entity src = renaming_old(x), trg = renaming_new(x);
 
@@ -108,7 +107,7 @@ add_remapping_as_used(
     },
 	get_computed_remaps());
 
-    assert(!remapping_undefined_p(p));
+    pips_assert("defined remapping", !remapping_undefined_p(p));
 
     MAP(ENTITY, e, include_entities = gen_once(e, include_entities), 
 	remapping_referenced(p));
