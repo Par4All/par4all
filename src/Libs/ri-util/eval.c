@@ -388,7 +388,7 @@ static bool vect_const_p(v)
 Pvecteur v;
 {
     pips_assert("vect_const_p", v != NULL);
-    return(vect_size(v) == 1 && vect_coeff(TCST, v) != 0);
+    return vect_size(v) == 1 && value_notzero_p(vect_coeff(TCST, v));
 }
 
 /* 
