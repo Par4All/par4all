@@ -20,7 +20,8 @@
  * Fabien COELHO
  */
 
-#include <limits.h>
+/* to be included for _MIN and _MAX: #include <limits.h>
+ */
 
 #ifdef VALUE_IS_LONGLONG
 typedef long long Value;
