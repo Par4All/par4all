@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.115  1998/03/19 16:27:28  irigoin
+ * leftmost argument added to handle unary minuses in front of expressions
+ *
  * Revision 1.114  1998/03/10 16:48:01  irigoin
  * New property added to control parentheses:
  * PRETTYPRINT_ALL_PARENTHESES. Requested by Julien Zory.
@@ -167,7 +170,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.114 1998/03/10 16:48:01 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.115 1998/03/19 16:27:28 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -221,6 +224,10 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 #include "properties.h"
 #include "prettyprint.h"
 
+/* operator precedences are in the [0,100] range */
+
+#define MAXIMAL_PRECEDENCE 100
+
 /* Define the markers used in the raw unstructured output when the
    PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH property is true: */
 #define PRETTYPRINT_UNSTRUCTURED_BEGIN_MARKER "\200Unstructured"
@@ -229,7 +236,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 #define PRETTYPRINT_UNSTRUCTURED_SUCC_MARKER "\203Unstructured Successor ->"
 #define PRETTYPRINT_UNREACHABLE_EXIT_MARKER "\204Unstructured Unreachable"
 
-
+
 /******************************************************************* STYLES */
 
 static bool 
@@ -286,9 +293,9 @@ words_loop_range(range obj)
     list pc;
     call c = syntax_call(expression_syntax(range_increment(obj)));
 
-    pc = words_subexpression(range_lower(obj), 0);
+    pc = words_subexpression(range_lower(obj), 0, TRUE);
     pc = CHAIN_SWORD(pc,", ");
-    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0));
+    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0, TRUE));
     if (/*  expression_constant_p(range_increment(obj)) && */
 	 strcmp( entity_local_name(call_function(c)), "1") == 0 )
 	return(pc);
@@ -334,7 +341,7 @@ words_reference(reference obj)
     if (reference_indices(obj) != NIL) {
 	pc = CHAIN_SWORD(pc,"(");
 	MAPL(pi, {
-	    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(pi)), 0));
+	    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(pi)), 0, TRUE));
 	    if (CDR(pi) != NIL)
 		pc = CHAIN_SWORD(pc,",");
 	}, reference_indices(obj));
@@ -387,20 +394,20 @@ words_regular_call(call obj)
 }
 
 static list 
-words_assign_op(call obj, int precedence)
+words_assign_op(call obj, int precedence, bool leftmost)
 {
     list pc = NIL, args = call_arguments(obj);
     int prec = words_intrinsic_precedence(obj);
 
-    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec));
+    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
     pc = CHAIN_SWORD(pc, " = ");
-    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec));
+    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
 
     return(pc);
 }
 
 static list 
-words_substring_op(call obj, int precedence)
+words_substring_op(call obj, int precedence, bool leftmost)
 {
   /* The substring function call is reduced to a syntactic construct */
     list pc = NIL;
@@ -417,18 +424,18 @@ words_substring_op(call obj, int precedence)
     l = EXPRESSION(CAR(CDR(call_arguments(obj))));
     u = EXPRESSION(CAR(CDR(CDR(call_arguments(obj)))));
 
-    pc = gen_nconc(pc, words_subexpression(r,  prec));
+    pc = gen_nconc(pc, words_subexpression(r,  prec, TRUE));
     pc = CHAIN_SWORD(pc, "(");
-    pc = gen_nconc(pc, words_subexpression(l, prec));
+    pc = gen_nconc(pc, words_subexpression(l, prec, TRUE));
     pc = CHAIN_SWORD(pc, ":");
-    pc = gen_nconc(pc, words_subexpression(u, prec));
+    pc = gen_nconc(pc, words_subexpression(u, prec, TRUE));
     pc = CHAIN_SWORD(pc, ")");
 
     return(pc);
 }
 
 static list 
-words_assign_substring_op(call obj, int precedence)
+words_assign_substring_op(call obj, int precedence, bool leftmost)
 {
   /* The assign substring function call is reduced to a syntactic construct */
     list pc = NIL;
@@ -439,15 +446,15 @@ words_assign_substring_op(call obj, int precedence)
 
     e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj))))));
 
-    pc = gen_nconc(pc, words_substring_op(obj,  prec));
+    pc = gen_nconc(pc, words_substring_op(obj,  prec, TRUE));
     pc = CHAIN_SWORD(pc, " = ");
-    pc = gen_nconc(pc, words_subexpression(e, prec));
+    pc = gen_nconc(pc, words_subexpression(e, prec, TRUE));
 
     return(pc);
 }
 
 static list 
-words_nullary_op(call obj, int precedence)
+words_nullary_op(call obj, int precedence, bool leftmost)
 {
     list pc = NIL;
 
@@ -457,7 +464,7 @@ words_nullary_op(call obj, int precedence)
 }
 
 static list 
-words_io_control(list *iol, int precedence)
+words_io_control(list *iol, int precedence, bool leftmost)
 {
     list pc = NIL;
     list pio = *iol;
@@ -495,7 +502,7 @@ words_io_control(list *iol, int precedence)
 }
 
 static list 
-words_implied_do(call obj, int precedence)
+words_implied_do(call obj, int precedence, bool leftmost)
 {
     list pc = NIL;
 
@@ -531,7 +538,7 @@ words_implied_do(call obj, int precedence)
 }
 
 static list 
-words_unbounded_dimension(call obj, int precedence)
+words_unbounded_dimension(call obj, int precedence, bool leftmost)
 {
     list pc = NIL;
 
@@ -541,7 +548,7 @@ words_unbounded_dimension(call obj, int precedence)
 }
 
 static list 
-words_list_directed(call obj, int precedence)
+words_list_directed(call obj, int precedence, bool leftmost)
 {
     list pc = NIL;
 
@@ -552,7 +559,7 @@ words_list_directed(call obj, int precedence)
 
 static list 
 words_io_inst(call obj,
-	      int precedence)
+	      int precedence, bool leftmost)
 {
     list pc = NIL;
     list pcio = call_arguments(obj);
@@ -671,7 +678,7 @@ words_io_inst(call obj,
 	pc = CHAIN_SWORD(pc, " (");
 	/* FI: missing argument; I use "precedence" because I've no clue;
 	   see LZ */
-	pc = gen_nconc(pc, words_io_control(&pcio, precedence));
+	pc = gen_nconc(pc, words_io_control(&pcio, precedence, leftmost));
 	pc = CHAIN_SWORD(pc, ") ");
 	/* 
 	   free_words(fmt_words);
@@ -695,36 +702,36 @@ words_io_inst(call obj,
 }
 
 static list 
-null(call obj, int precedence)
+null(call obj, int precedence, bool leftmost)
 {
     return(NIL);
 }
 
 static list
-words_prefix_unary_op(call obj, int precedence)
+words_prefix_unary_op(call obj, int precedence, bool leftmost)
 {
     list pc = NIL;
     expression e = EXPRESSION(CAR(call_arguments(obj)));
     int prec = words_intrinsic_precedence(obj);
 
     pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-    pc = gen_nconc(pc, words_subexpression(e, prec));
+    pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
 
     return(pc);
 }
 
 static list 
-words_unary_minus(call obj, int precedence)
+words_unary_minus(call obj, int precedence, bool leftmost)
 {
     list pc = NIL;
     expression e = EXPRESSION(CAR(call_arguments(obj)));
     int prec = words_intrinsic_precedence(obj);
 
-    if ( prec < precedence )
+    if ( prec < precedence && !leftmost)
 	pc = CHAIN_SWORD(pc, "(");
     pc = CHAIN_SWORD(pc, "-");
-    pc = gen_nconc(pc, words_subexpression(e, prec));
-    if ( prec < precedence )
+    pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
+    if ( prec < precedence && !leftmost)
 	pc = CHAIN_SWORD(pc, ")");
 
     return(pc);
@@ -752,28 +759,28 @@ words_goto_label(string tlabel)
  * Lei ZHOU       Nov. 4 , 1991
  */
 static list 
-words_infix_binary_op(call obj, int precedence)
+words_infix_binary_op(call obj, int precedence, bool leftmost)
 {
     list pc = NIL;
     list args = call_arguments(obj);
     int prec = words_intrinsic_precedence(obj);
-    list we1 = words_subexpression(EXPRESSION(CAR(args)), prec);
+    list we1 = words_subexpression(EXPRESSION(CAR(args)), prec, leftmost);
     list we2;
 
     if ( strcmp(entity_local_name(call_function(obj)), "/") == 0 )
-	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), 100);
+	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), MAXIMAL_PRECEDENCE, FALSE);
     else if ( strcmp(entity_local_name(call_function(obj)), "-") == 0 ) {
 	expression exp = EXPRESSION(CAR(CDR(args)));
 	if ( expression_call_p(exp) &&
 	     words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >= 
 	     intrinsic_precedence("*") )
 	    /* precedence is greater than * or / */
-	    we2 = words_subexpression(exp, prec);
+	    we2 = words_subexpression(exp, prec, FALSE);
 	else
-	    we2 = words_subexpression(exp, 100);
+	    we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
     }
     else
-	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec);
+	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec, FALSE);
 
     
     if ( prec < precedence )
@@ -794,8 +801,6 @@ words_infix_binary_op(call obj, int precedence)
  *
  * A precedence is a integer in [0..MAXIMAL_PRECEDENCE]
  */
-
-#define MAXIMAL_PRECEDENCE 100
 
 static struct intrinsic_handler {
     char * name;
@@ -864,14 +869,14 @@ static struct intrinsic_handler {
 static bool precedence_p = TRUE;
 
 static list 
-words_intrinsic_call(call obj, int precedence)
+words_intrinsic_call(call obj, int precedence, bool leftmost)
 {
     struct intrinsic_handler *p = tab_intrinsic_handler;
     char *n = entity_local_name(call_function(obj));
 
     while (p->name != NULL) {
 	if (strcmp(p->name, n) == 0) {
-	    return((*(p->f))(obj, precedence));
+	    return((*(p->f))(obj, precedence, leftmost));
 	}
 	p++;
     }
@@ -905,13 +910,16 @@ words_intrinsic_precedence(call obj)
 list 
 words_call(
     call obj,
-    int precedence)
+    int precedence,
+    bool leftmost)
 {
     list pc;
     entity f = call_function(obj);
     value i = entity_initial(f);
     pc = (value_intrinsic_p(i)) ? 
-	words_intrinsic_call(obj, (precedence_p||precedence<=1)? precedence : MAXIMAL_PRECEDENCE)
+	(words_intrinsic_call(obj, 
+			     (precedence_p||precedence<=1)? precedence : MAXIMAL_PRECEDENCE,
+			     leftmost))
 	: 
 	words_regular_call(obj);
     return pc;
@@ -931,7 +939,7 @@ words_syntax(syntax obj)
 	pc = words_range(syntax_range(obj));
     }
     else if (syntax_call_p(obj)) {
-	pc = words_call(syntax_call(obj), 0);
+	pc = words_call(syntax_call(obj), 0, TRUE);
     }
     else {
 	pips_error("words_syntax", "tag inconnu");
@@ -953,12 +961,13 @@ words_expression(expression obj)
 list 
 words_subexpression(
     expression obj,
-    int precedence)
+    int precedence,
+    bool leftmost)
 {
     list pc;
     
     if ( expression_call_p(obj) )
-	pc = words_call(syntax_call(expression_syntax(obj)), precedence);
+	pc = words_call(syntax_call(expression_syntax(obj)), precedence, leftmost);
     else 
 	pc = words_syntax(expression_syntax(obj));
     
@@ -1386,7 +1395,7 @@ text_logical_if(
     pc = CHAIN_SWORD(pc, "IF (");
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
     pc = CHAIN_SWORD(pc, ") ");
-    pc = gen_nconc(pc, words_call(c, 0));
+    pc = gen_nconc(pc, words_call(c, 0, TRUE));
 
     ADD_SENTENCE_TO_TEXT(r, 
 			 make_sentence(is_sentence_unformatted, 
@@ -1619,7 +1628,7 @@ text_instruction(
 	}
 	else {
 	    u = make_unformatted(strdup(label), n, margin, 
-				 words_call(instruction_call(obj), 0));
+				 words_call(instruction_call(obj), 0, TRUE));
 
 	    s = make_sentence(is_sentence_unformatted, u);
 
