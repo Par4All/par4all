@@ -4,7 +4,7 @@ c High Performance Fortran Compiler
 c by Fabien COELHO.
 c
 c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-c ($Date: 1995/11/21 23:30:02 $, )
+c ($Date: 1995/11/21 23:33:55 $, )
 c
 c-----------------
 c
@@ -911,7 +911,7 @@ c
 
       NBOFTASKS = MAXSIZEOFPROCS
 
-      direct(call HPFC_DIRECT_ROUTE_IF_POSSIBLE)
+      _direct(call HPFC_DIRECT_ROUTE_IF_POSSIBLE)
 
       call HPFC_INIT_COMMON_PROCS
       call HPFC_INIT_COMMON_BUFFER
@@ -997,7 +997,7 @@ c-----------------
 c
 c HPFC_DIRECT_ROUTE_IF_POSSIBLE
 c
-direct(`'
+_direct(`'
       subroutine HPFC_DIRECT_ROUTE_IF_POSSIBLE
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -1007,7 +1007,7 @@ direct(`'
       if (nhost.ge.NBOFTASKS) then
          call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
       else
-         print *, "Warning: no direct route, not enough processors..."
+         print *, "Warning: no direct route (not enough processors)..."
       endif
       end
 )
@@ -1033,7 +1033,7 @@ c
       HOSTTID = MYTID
       NBOFTASKS = MAXSIZEOFPROCS
 
-      direct(call HPFC_DIRECT_ROUTE_IF_POSSIBLE)
+      _direct(call HPFC_DIRECT_ROUTE_IF_POSSIBLE)
 
       call HPFC_INIT_COMMON_PARAM
 
