@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/11/12 10:01:57 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/11/14 14:36:40 $, )
  * version $Revision$
  */
 
@@ -12,6 +12,7 @@
 #include "semantics.h"
 #include "effects.h"
 #include "conversion.h"
+#include "regions.h"
 
 /* Yi-Qing stuff
  */
@@ -23,19 +24,75 @@
 /************************************************* IO EFFICIENT COMPILATION */
 
 
-/* use def chains are used to verify that a new def chains exist 
-*/
-static bool 
-def_chains()
+
+/* OUT Regions(effects) are used to verify if the entity current_entity is 
+read in another statement later
+(note that we don't need to know which statement is reading current_entity)*/
+
+static bool
+current_entity_is_used_later_p(statement stat, entity current_entity)
 {
+    list list_out; 
+
+    if (get_bool_property("HPFC_IGNORE_IN_OUT_REGIONS"))
+	/*IN & OUT Regions are not used*/
+	return TRUE;
+
+
+/* get OUT Regions(Effects) list for the io statement */
+    list_out = load_statement_out_regions(stat);
+
+    ifdebug(2)
+    {
+	pips_debug(3, "OUT regions: \n");
+	print_regions(list_out);
+    }
+
+/* for all OUT Regions (Effects) for the statement stat, 
+ test if reference in current_effect is egal to current_entity */
+
+    MAP(EFFECT, current_effect,
+	{
+	    if (effect_variable(current_effect)==current_entity)
+		return TRUE;
+	},
+	list_out);
+    
     return FALSE;
 }
 
+/* IN Regions(effects) are used to verify if the entity current_entity is 
+initialized before it's used in the io statement*/
 
+static bool
+current_entity_is_updated_before_p(statement stat, entity current_entity)
+{
+    list list_in; 
 
+    if (get_bool_property("HPFC_IGNORE_IN_OUT_REGIONS"))	/* & OUT Regions are not used*/
+	return TRUE;
 
+/* get IN Regions(Effects) list for the io statement */
+    list_in = load_statement_in_regions(stat);
 
+    ifdebug(2)
+    {
+	pips_debug(3, "IN regions: \n");
+	print_regions(list_in);
+    }
 
+/* for all IN Regions (Effects) for the statement stat, 
+ test if reference in current_effect is egal to current_entity */
+
+    MAP(EFFECT, current_effect,
+	{
+	    if (effect_variable(current_effect)==current_entity)
+		return TRUE;
+	},
+	list_in);
+    
+    return FALSE;
+}
 
 static Psysteme 
 statement_context(
@@ -900,7 +957,8 @@ io_efficient_compile(
 	
 	/* collect data if necessary
 	 */
-	if (array_distributed_p(array) && 
+	if (array_distributed_p(array) &&
+	    current_entity_is_updated_before_p(stat,array) &&
 	    (action_read_p(act) || 
 	     (action_write_p(act) && 
 	      approximation_may_p(apr) && 
@@ -914,10 +972,10 @@ io_efficient_compile(
 	}
 	
 	/* update data if necessary
-	   action = write and data may be used later (def chains notion) 
+	   action = write and data may be used later (out regions) 
 	 */
-	fprintf(stderr, "update data if necessary:\n   ");
-	if (action_write_p(act) && def_chains())
+	if (action_write_p(act) && 
+	    current_entity_is_used_later_p(stat,array))
 	{
 	    generate_io_collect_or_update(array, stat, 
 					  is_movement_update, 
