@@ -181,14 +181,15 @@ char * (*variable_name)();
 	contrainte_fprint(fp,ineg,TRUE,variable_name);
 }
 
-static void
+void
 sprint_operator(char *s, boolean is_inegalite, boolean a_la_fortran)
 {
     (void) sprintf(s, "%s",(is_inegalite? (a_la_fortran? ".LE.": "<="):
 			    (a_la_fortran? ".EQ.": "==")));
 }
 
-static char * heuristique_1(s, v, is_inegalite, variable_name, a_la_fortran)
+static char * 
+heuristique_1(s, v, is_inegalite, variable_name, a_la_fortran)
 char * s;
 Pvecteur v;
 boolean is_inegalite;
@@ -231,7 +232,8 @@ boolean a_la_fortran;
     return s;
 }
 
-static char * heuristique_3(s, v, is_inegalite, variable_name, a_la_fortran)
+static char * 
+heuristique_3(s, v, is_inegalite, variable_name, a_la_fortran)
 char * s;
 Pvecteur v;
 boolean is_inegalite;
@@ -383,7 +385,8 @@ boolean a_la_fortran;
  *  - suppression de l'impression de la virgule de separation en fin
  *    de chaine (Francois Irigoin, 7 mai 1990)
  */
-char * contrainte_sprint(s, c, is_inegalite, variable_name)
+char * 
+contrainte_sprint(s, c, is_inegalite, variable_name)
 char * s;
 Pcontrainte c;
 boolean is_inegalite;
@@ -426,7 +429,8 @@ contrainte_sprint_format(
  * impression d'une egalite eg dans la chaine s avec des noms de
  * variables donnes par variable_name; voir contrainte_sprint
  */
-char * egalite_sprint(s, eg, variable_name)
+char * 
+egalite_sprint(s, eg, variable_name)
 char *s;
 Pcontrainte eg;
 char * (*variable_name)();
@@ -434,7 +438,8 @@ char * (*variable_name)();
     return contrainte_sprint(s, eg, FALSE, variable_name);
 }
 
-char * inegalite_sprint(s, ineg, variable_name)
+char * 
+inegalite_sprint(s, ineg, variable_name)
 char * s;
 Pcontrainte ineg;
 char * (*variable_name)();
@@ -442,7 +447,8 @@ char * (*variable_name)();
     return contrainte_sprint(s, ineg, TRUE, variable_name);
 }
 
-char * egalite_sprint_format(s, eg, variable_name, a_la_fortran)
+char * 
+egalite_sprint_format(s, eg, variable_name, a_la_fortran)
 char *s;
 Pcontrainte eg;
 char * (*variable_name)();
@@ -452,7 +458,8 @@ boolean a_la_fortran;
 	(s, eg, FALSE, variable_name, a_la_fortran);
 }
 
-char * inegalite_sprint_format(s, ineg, variable_name, a_la_fortran)
+char * 
+inegalite_sprint_format(s, ineg, variable_name, a_la_fortran)
 char * s;
 Pcontrainte ineg;
 char * (*variable_name)();
@@ -461,3 +468,7 @@ boolean a_la_fortran;
     return contrainte_sprint_format
 	(s, ineg, TRUE, variable_name, a_la_fortran);
 }
+
+
+
+
