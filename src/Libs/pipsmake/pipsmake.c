@@ -818,7 +818,7 @@ delete_some_resources(void)
     string what = get_string_property("PIPSDBM_RESOURCES_TO_DELETE");
     dont_interrupt_pipsmake_asap();
 
-    user_log("Deleting %s resources\n", what);
+    user_log("Deletion of %s resources: ", what);
 
     if (same_string_p(what, "obsolete")) {
 	int ndeleted;
@@ -826,11 +826,11 @@ delete_some_resources(void)
 	ndeleted = 
 	    db_delete_obsolete_resources(check_physical_resource_up_to_date); 
 	reset_make_cache();
-	user_log("%d obsolete resource%s destroyed\n",
-		 ndeleted, ndeleted>1? "s": "");
+	if (ndeleted>0) user_log("%d destroyed.\n", ndeleted);
+	else user_log("none destroyed.\n"
     } else if (same_string_p(what, "all")) {
 	db_delete_all_resources();
-	user_log("all resources destroyed\n");
+	user_log("done.\n");
     } else
 	pips_internal_error("unexpected delete request %s\n", what);
 }
