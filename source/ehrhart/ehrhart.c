@@ -1192,7 +1192,7 @@ void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
 	if(value_notmone_p(c))
 	    value_addto(*res, *res, c);
 	else {
-	    value_set_si(*res, 0);
+	    value_set_si(*res, -1);
 	    break;
         }
     }
