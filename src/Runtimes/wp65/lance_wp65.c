@@ -50,6 +50,8 @@ char var[100];
 char valeur[900];
 char machine[100];
 
+char *groupe_final = "Rendez-vous au point d'orgue";
+
 /* Mis là simplement pour éviter une erreur au link. S'attendre donc à
    des surprises... :-) */
 jmp_buf pips_top_level;
@@ -177,6 +179,9 @@ main(int argc, char *argv[])
   mytid = pvm_mytid();
   pere = pvm_parent();
 
+  /* Semble planter si on fait un pvm_exit avant que les paquets
+     soient réellement partis. Rajout d'une barrière de synchro à la
+     fin pour cela... */
   /* Augmente l'efficacité des communications : */
   testerreur("pvm_advise",
 	     pvm_advise(PvmRouteDirect));
@@ -272,7 +277,11 @@ main(int argc, char *argv[])
 	       pvm_upkint(&tids[1], nb_taches - 1, 1));
     tids[0] = pere;
   }
-      
+  
+  /* Pour une fin synchrone : */
+  testerreur("pvm_joingroup",
+	     pvm_joingroup(groupe_final));
+  
   if (get_debug_level() >= 2)
     for(i = 0; i <= nb_taches - 1; i++)
       fprintf(stderr,"PE %d a un tid 0x%x\n", i, tids[i]);
@@ -300,6 +309,12 @@ main(int argc, char *argv[])
       affiche_entete_X("%s:%s Banc %d", machine, basename(argv[0]), banc);
     BANK_(&banc);
   }
+
+  /* Rajout d'une barrière car il semble que PVM puisse perdre des émissions
+     finales si on fait un pvm_exit trop tôt. */
+  debug(2, "main", "Attente de la barrière finale pour terminer.\n");
+  testerreur("pvm_barrier",
+	     pvm_barrier(groupe_final, nb_taches));
 
   debug_off();
   pvm_exit();
@@ -343,7 +358,7 @@ void receive_4(int tid, int proc_or_bank_id, float *donnee, int taille)
 		 old_buf = pvm_setrbuf(bufid[proc_or_bank_id]));
       if (taille > taille_restante[proc_or_bank_id])
 	sort_erreur("Demande de lire %d données alors qu'il n'en reste que %d !\n",
-		    taille, taille_restante);
+		    taille, taille_restante[proc_or_bank_id]);
       debug(5, "receive_4",
 	    "Lecture ancienne de %d données.\n", taille);
       testerreur("pvm_unpack",
