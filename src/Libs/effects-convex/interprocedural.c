@@ -131,6 +131,7 @@ list out_regions_from_caller_to_callee(entity caller, entity callee)
     reset_precondition_map();
     reset_out_effects();
     reset_current_module_statement();
+    free_value_mappings();
     pips_debug(2, "end\n");
     return(l_sum_out_reg);
 }
