@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.39  2001/08/06 13:33:49  coelho
+ * \r added.
+ *
  * Revision 1.38  1998/07/03 21:27:01  coelho
  * check active token added.
  *
@@ -146,7 +149,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 <KEY>shell 		{ LITTERAL(TK_SHELL); }
 <KEY>!			{ LITTERAL(TK_SHELL); }
 
-<KEY,INITIAL>[ \t]+	/* skip blanks... */
+<KEY,INITIAL>[ \t\r]+	/* skip blanks... */
 
 <UNK>[^\n]*		{ yylval.name = strdup(concatenate(unk, yytext, 0));
 			  KEYWORD(TK_UNKNOWN); }
