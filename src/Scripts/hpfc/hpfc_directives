@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1996/08/31 14:35:34 $, 
+# $Date: 1996/08/31 18:11:31 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -265,7 +265,8 @@ $SED "#
       # SWITCH to special hpfc functions...
       #
       s,\([123456789abdeintpryu]\),      call hpfc\1,g
-      s,\([ck#s]\),hpfc\1,g" | 
+      s,\([ck#s]\),hpfc\1,g
+      s,hpfc#,$NOP,g;" | 
 #
 # handles multi lines breaking (independent/new/reduction...)
 #
@@ -274,9 +275,10 @@ $TR '' '\012' |
 # number_of_processors substitution.
 # separates static directives from others.
 #
-$SED "s,hpfc#,$NOP,g;
-      # clean template and processors declaration call (must not be scalar!)
-      /^      call hpfc[pt]/s/([-+*0-9a-z_:\,]*)//g
+$SED "# clean template and processors declaration calls
+      : while
+      /      call hpfc[pt]/s/\((.*\)([^)(]*)/\1/;
+      t while
       # separation
       /^      call hpfc[ptu69]/w $TMP.1
       /^      call hpfc[ady45]/w $TMP.2
