@@ -1,4 +1,4 @@
-$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/11/22 20:52:34 $, 
+$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/12/01 13:38:07 $, 
 
  (c) Centre de Recherche en Informatique,
      Ecole des mines de Paris, 
@@ -33,7 +33,6 @@ PIPS_M4 (gm4) and HPFC_M4 (gm4)
 PVM_ROOT and PVM_ARCH
 HPFC_RUNTIME_M4_PARAMS:
  -D HPFC_GNU	  (uses the GNU compilers: gcc/g77)
-  * some files cannot be compiled by g77 beta, they must be split by hand.
  -D DEMO          (print some messages when launched)
  -D DIRECT        (use direct connexions, if enough pes...)
  -D DEBUG         (verbose run)
