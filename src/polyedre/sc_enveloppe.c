@@ -392,14 +392,22 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
    * if part of the system is separated. Other calls may be considered here?
    */
   sc_transform_ineg_in_eg(sc); /* ok, it will look better. */
-  sc_project_very_simple_equalities(sc); /* not really projected. { x==y, y==3 } => { x==3, y==3 } */
+  /* not really projected. { x==y, y==3 } => { x==3, y==3 } */
+  sc_project_very_simple_equalities(sc);
 
   /* sc, su: fast union of disjoint. */
   sc = sc_fusion(sc, su);
 
   /* regenerate the expected base. */
-  sc_fix(sc);
-  if (sc_base(sc)) base_rm(sc_base(sc));
+  if (sc) 
+  {
+    sc_fix(sc);
+    if (sc_base(sc)) base_rm(sc_base(sc));
+  }
+  else
+  {
+      sc = sc_rn(NULL);
+  }
   sc_base(sc) = base_union(sc_base(is1), sc_base(is2));
   sc_dimension(sc) = vect_size(sc_base(sc));
   
