@@ -12,8 +12,7 @@ HTMS =	index.html \
 	regions.html \
 	summary_hpfc.html \
 	windows-interface.html \
-	wp65_summary.html \
-	wpips.html
+	wp65_summary.html
 
 SOURCES= $(HTMS)
 
