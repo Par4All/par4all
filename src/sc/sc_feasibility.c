@@ -868,7 +868,7 @@ Psysteme sc;
 boolean ofl_ctrl;
 {
   Psysteme w = NULL;
-  int ok;
+  int ok=0;
 
   //DN: We should be sure that the sc is not null in the sc_feasibility_ofl_ctrl, but for direct call of Janus ... 
   if (sc) {
@@ -936,26 +936,27 @@ boolean ofl_ctrl;
 
   if (ok<3) {    
     // result found
-      if (w) sc_rm(w);
-      if (ok > 0) return TRUE;
-      else return FALSE;
+    if (w) sc_rm(w);
+    if (ok > 0) return TRUE;
+    else return FALSE;
+  } else {
+    // result not found
+    ifscdebug(5) {
+      if (ok ==7) fprintf(stderr,"TRIED JANUS BUT OVERFLOW !!\n");
+      if (ok ==6) fprintf(stderr,"TRIED JANUS BUT BUG OF PROGRAMMATION IN JANUS !!\n");
+      if (ok ==5) fprintf(stderr,"TRIED JANUS BUT WRONG PARAMETER !!\n");
+      if (ok ==4) fprintf(stderr,"TRIED JANUS BUT ARRAY OUT OF BOUNDARY !!\n");
+      if (ok ==3) fprintf(stderr,"TRIED JANUS BUT NUMBER OF PIVOTAGE TOO BIG, MIGHT BOUCLE !!\n");
+      if (ok ==8) fprintf(stderr,"TRIED JANUS BUT pivot anormally small !!\n");
+      if (ok ==9) fprintf(stderr,"Janus is not ready for this system of constraints !!\n");//DN20112002
+    }
+    if (w) sc_rm(w);
+    if (ofl_ctrl == FWD_OFL_CTRL) {
+      THROW(overflow_error);
     } else {
-      // result not found
-      ifscdebug(5) {
-	if (ok ==7) fprintf(stderr,"TRIED JANUS BUT OVERFLOW !!\n");
-	if (ok ==6) fprintf(stderr,"TRIED JANUS BUT BUG OF PROGRAMMATION IN JANUS !!\n");
-	if (ok ==5) fprintf(stderr,"TRIED JANUS BUT WRONG PARAMETER !!\n");
-	if (ok ==4) fprintf(stderr,"TRIED JANUS BUT ARRAY OUT OF BOUNDARY !!\n");
-	if (ok ==3) fprintf(stderr,"TRIED JANUS BUT NUMBER OF PIVOTAGE TOO BIG, MIGHT BOUCLE !!\n");
-	if (ok ==8) fprintf(stderr,"TRIED JANUS BUT pivot anormally small !!\n");
-	if (ok ==9) fprintf(stderr,"Janus is not ready for this system of constraints !!\n");//DN20112002
-      }
-      if (w) sc_rm(w);
-      if (ofl_ctrl == FWD_OFL_CTRL) {
-	THROW(overflow_error);
-      } else {
-	fprintf(stderr,"\nWARNING [sc_janus_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
-	return TRUE;// default is feasible
-      }
-    }  
+      fprintf(stderr,"\nWARNING [sc_janus_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
+      return TRUE;// default is feasible
+    }
+  }
+  return(ok);
 }
