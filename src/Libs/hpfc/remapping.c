@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.58  1997/05/24 11:03:41  coelho
+ * lambda upper bound constraint added?
+ *
  * Revision 1.57  1997/05/24 10:25:33  coelho
  * *** empty log message ***
  *
@@ -152,6 +155,12 @@ generate_work_sharing_system(
 	 */
 	sc_add_inegalite(sharing, contrainte_make
 	   (vect_make(VECTEUR_NUL, delta, VALUE_MONE, TCST, VALUE_ZERO)));
+
+	/* delta <= -((size_d-1)/size_r) // not really necessary, but may help.
+	 */
+	sc_add_inegalite(sharing, contrainte_make
+	   (vect_make(VECTEUR_NUL, delta, VALUE_ONE, 
+		      TCST, int_to_value(-((size_d-1)/size_r)))));
     }
     else
     {
