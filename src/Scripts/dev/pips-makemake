@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/13 10:01:41 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/13 15:23:00 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -11,7 +11,7 @@
 #
 
 SCRIPT=`basename $0`
-USAGE="$SCRIPT [-h (HELP!)] [-l|p|s|r|i|n] [-D|P] [-c|a] (default -c)"
+USAGE="$SCRIPT [-h (HELP!)] [-l|p|s|r|i|n|d] [-D|P] [-c|a] (default -c)"
 VERBOSE=':'
 
 MAKEFILE=Makefile
@@ -25,20 +25,19 @@ help()
 	$USAGE
 	version $Revision$
 	Builds $MAKEFILE from $CONFIG_FILE for PIPS.
-	  -l|p|s|r|i|n: libraries|passes|scripts|runtime|linear|newgen
+	  -l|p|s|r|i|n|d: libraries|passes|scripts|runtime|linear|newgen|def...
 	  -D|P: for Development|Production directories
 	  -c|a: for the current|all directory(ies)
 	  -h: this help
 	  -v: verbose
 	  contextual defaults for first and second options.
 	Usefull macros in $CONFIG_FILE: DOCS and
-	 - libraries: LIB_{CFILES,HEADERS,OBJECTS}
+	 - libraries/passes/linear: LIB_{CFILES,HEADERS,OBJECTS}
 	   and maybe DERIVED_{HEADERS,CFILES,FILES}
-	 - passes: idem.
-	 - scripts: SCRIPTS, FILES, SFILES, RFILES
-	 - runtime: SOURCES, INSTALL_{FILES,LIBS,EXE}
-	 - c3/linear: 
-	 - newgen:
+	 - scripts/runtime/default:
+ 	   SOURCES
+	   SCRIPTS (runable files)
+	   INSTALL_{INC,LIB,BIN,DOC,SHR{,RUN},UTL{,RUN}} files to be installed
 	Many default macros are defined and may be overwritten.
 	Many rules are also defined.
 	END_OF_HELP
@@ -70,7 +69,7 @@ DIRS='.'
 ALL=''
 ALL_RULE_TARGET=''
 
-while getopts lpsrinDPcahv opt
+while getopts lpsrindDPcahv opt
 do
   case $opt in
     l) DIRTYPE='Lib';
@@ -85,6 +84,8 @@ do
        PIPSMKMK_OPTION="$PIPSMKMK_OPTION -i" ;;
     n) DIRTYPE='Newgen';
        PIPSMKMK_OPTION="$PIPSMKMK_OPTION -n" ;;
+    d) DIRTYPE='';
+       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -d" ;;
     D) DIRSIDE="$PIPS_DEVEDIR" ;
        unset production ;
        PIPSMKMK_OPTION="$PIPSMKMK_OPTION -D" ;;
@@ -127,39 +128,48 @@ cd_dirname=`dirname $current_directory`
 #
 # install_file_dir for usual files
 # install_lib_dir for library files
-# install_exe_dir for executable files
+# install_bin_dir for executable files
 
 PART=PIPS
-install_file_dir='$(PIPS_INCLUDEDIR)'
-install_lib_dir='$(PIPS_LIBDIR)'
-install_exe_dir='$(PIPS_BINDIR)'
-install_src_dir="$(PIPS_SRCDIR)/${DIRTYPE}"
 
-[ $DIRTYPE = 'Src' ] && DIRTYPE='Newgen'
+install_inc_dir='$(PIPS_ROOT)/Include'
+install_lib_dir='$(PIPS_ROOT)/Lib'
+install_bin_dir='$(PIPS_ROOT)/Bin'
+install_src_dir='$(PIPS_ROOT)/Src'/${DIRTYPE}
+install_shr_dir='$(PIPS_ROOT)/Share'
+install_doc_dir='$(PIPS_ROOT)/Doc'
+install_rtm_dir='$(PIPS_ROOT)/Runtime' ;
+
+install_utl_dir='$(PIPS_UTILDIR)'
+
+# [ $DIRTYPE = 'Src' ] && DIRTYPE='Newgen'
 
 case $DIRTYPE in
   Lib) ALL_RULE_TARGET='$(ARCH)/lib$(TARGET).a' ;;
   Passes)  ALL_RULE_TARGET='$(ARCH)/$(TARGET)' ;;
-  Scripts) ALL_RULE_TARGET='.runable' ;
-           install_file_dir='$(PIPS_UTILDIR)' ;
-           install_lib_dir='$(PIPS_UTILDIR)' ;
-           install_exe_dir='$(PIPS_UTILDIR)' ;;
-  Runtime) ALL_RULE_TARGET='' ;
-           install_file_dir='$(PIPS_EXTEDIR)' ;
-           install_exe_dir='$(PIPS_EXTEDIR)' ;
-           install_lib_dir='$(PIPS_EXTEDIR)' ;;
+  Scripts) ALL_RULE_TARGET='.runable' ;;
+  Runtime) ALL_RULE_TARGET='' ;;
   Linear)  ALL_RULE_TARGET='$(ARCH)/lib$(TARGET).a' ;
            PART=LINEAR ;
-	   install_src_dir='$(LINEAR_SRCDIR)';
-           install_file_dir='$(LINEAR_INCLUDEDIR)' ;
-           install_exe_dir='$(LINEAR_BINDIR)' ;
-           install_lib_dir='$(LINEAR_LIBDIR)' ;;
+	   install_src_dir='$(LINEAR_ROOT)/Src';
+           install_inc_dir='$(LINEAR_ROOT)/Include' ;
+           install_bin_dir='$(LINEAR_ROOT)/Bin' ;
+           install_lib_dir='$(LINEAR_ROOT)/Lib' ;
+	   install_doc_dir='$(LINEAR_ROOT)/Doc' ;
+	   install_utl_dir='$(LINEAR_ROOT)/Share' ;
+	   install_shr_dir='$(LINEAR_ROOT)/Share';
+	   install_rtm_dir='$(LINEAR_ROOT)/Runtime' ;;
   Newgen)  ALL_RULE_TARGET='' ;
 	   PART=NEWGEN ;
-	   install_src_dir='$(NEWGEN_SRCDIR)';
-           install_file_dir='$(NEWGEN_INCLUDEDIR)' ;
-           install_exe_dir='$(NEWGEN_BINDIR)' ;
-           install_lib_dir='$(NEWGEN_LIBDIR)' ;;
+	   install_src_dir='$(NEWGEN_ROOT)/Src';
+           install_inc_dir='$(NEWGEN_ROOT)/Include' ;
+           install_bin_dir='$(NEWGEN_ROOT)/Bin' ;
+	   install_doc_dir='$(NEWGEN_ROOT)/Doc' ;
+	   install_utl_dir='$(NEWGEN_ROOT)/Share' ;
+           install_lib_dir='$(NEWGEN_ROOT)/Lib' ;
+	   install_shr_dir='$(NEWGEN_ROOT)/Share' ;
+	   install_rtm_dir='$(NEWGEN_ROOT)/Runtime' ;;
+  Default) ALL_RULE_TARGET='';;
   *) usage 5 "unexpected directory type $DIRTYPE"
 esac
 
@@ -220,15 +230,18 @@ do
 TARGET=		${dir_real_name}
 TARGET_DIR=	${install_src_dir}/$(TARGET)
 #
-# installation directories for quick-install
-#
-#
+# default architecture is taken from PIPS_ARCH env. variable
 ARCH=		$(PIPS_ARCH)
 #
-INSTALL_FILE_DIR= ${install_file_dir}
-INSTALL_LIB_DIR=  ${install_lib_dir}/$(ARCH)
-INSTALL_SHR_DIR=  ${install_exe_dir}
-INSTALL_EXE_DIR=  ${install_exe_dir}/$(ARCH)
+# installation directories for quick-install
+#
+INSTALL_INC_DIR= ${install_inc_dir}
+INSTALL_SHR_DIR= ${install_shr_dir}
+INSTALL_DOC_DIR= ${install_doc_dir}
+INSTALL_UTL_DIR= ${install_utl_dir}
+INSTALL_RTM_DIR= ${install_rtm_dir}
+INSTALL_LIB_DIR= ${install_lib_dir}/$(ARCH)
+INSTALL_BIN_DIR= ${install_bin_dir}/$(ARCH)
 # (obsolete?)
 MAIN=		main
 #
@@ -311,10 +324,9 @@ LIB_TARGET=	$(ARCH)/lib$(TARGET).a
 BIN_TARGET=	$(ARCH)/$(TARGET)
 INC_TARGET=	$(TARGET).h
 #
-INSTALL_FILE+=	$(INC_TARGET)
+INSTALL_INC+=	$(INC_TARGET)
 INSTALL_LIB+=	$(LIB_TARGET)
-INSTALL_SHR+=	
-INSTALL_EXE+=	`if [ $DIRTYPE = 'Passes' ] ; then echo '$(BIN_TARGET)' ; fi`
+INSTALL_BIN+=	`if [ $DIRTYPE = 'Passes' ] ; then echo '$(BIN_TARGET)' ; fi`
 #
 
 .PRECIOUS: $(LIB_TARGET) $(BIN_TARGET)
@@ -350,7 +362,7 @@ SOURCES+=	$(SCRIPTS) $(FILES) $(SFILES) $(CONFIG_FILE) $(DOCS)
 INSTALL_FILE+=	$(FILES)
 INSTALL_LIB+=
 INSTALL_SHR+=	$(SCRIPTS)
-INSTALL_EXE+=	$(RFILES)
+INSTALL_BIN+=	$(RFILES)
 
 .runable: $(SCRIPTS)
 	-[ "$(SCRIPTS)" ] && chmod a+x $(SCRIPTS)
@@ -529,11 +541,21 @@ check_os:
 	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
 	fi
 
-.quick-install: $(INSTALL_FILE) $(INSTALL_LIB) $(INSTALL_EXE) $(INSTALL_SHR)
-	@pips_install_file -f $(INSTALL_FILE_DIR) $(INSTALL_FILE)
+.quick-install: $(INSTALL_INC) $(INSTALL_LIB) $(INSTALL_BIN) $(INSTALL_SHR) \
+	$(INSTALL_DOC) $(INSTALL_UTL) $(INSTALL_RTM) 
+	#
+	# installing files where needed
+	# 
+	# plain files
+	@pips_install_file -f $(INSTALL_INC_DIR) $(INSTALL_INC) 
+	@pips_install_file -f $(INSTALL_DOC_DIR) $(INSTALL_DOC) 
+	@pips_install_file -f $(INSTALL_UTL_DIR) $(INSTALL_UTL) 
+	@pips_install_file -f $(INSTALL_SHR_DIR) $(INSTALL_SHR)
+	@pips_install_file -f $(INSTALL_RTM_DIR) $(INSTALL_RTM)
+	# libs...
 	@pips_install_file -r $(RANLIB) $(INSTALL_LIB_DIR) $(INSTALL_LIB)
-	@pips_install_file -x $(INSTALL_SHR_DIR) $(INSTALL_SHR)
-	@pips_install_file -x $(INSTALL_EXE_DIR) $(INSTALL_EXE)
+	# executables...
+	@pips_install_file -x $(INSTALL_BIN_DIR) $(INSTALL_BIN)
 	touch .quick-install
 
 tar:
