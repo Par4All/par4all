@@ -18,7 +18,7 @@
 
 #include "wpips.h"
 
-static Panel_item directory_name, program_name, module_name, message;
+static Panel_item directory_name, program_name, module_name, memory_name, message;
 
 void show_directory()
 {
@@ -92,6 +92,9 @@ void create_status_subwindow()
     status_panel = (Panel) xv_create(main_frame, PANEL,
 				     WIN_X, 0,
 				     WIN_BELOW, main_panel,
+				     /* Corrige un bug de peinture en
+                                        couleur. */
+				     PANEL_ITEM_X_GAP, 200,
 				     NULL);
 
     /* PANEL_VALUE_Y used to be unset before we shifted to xview.3, Apr. 92 */
@@ -127,6 +130,16 @@ void create_status_subwindow()
 		  PANEL_VALUE_X, 85,
 		  PANEL_VALUE_Y, xv_rows(status_panel, 3),
 		  PANEL_LABEL_STRING, "Module:",
+		  PANEL_READ_ONLY, TRUE,
+		  PANEL_VALUE_DISPLAY_LENGTH, 10,
+		  NULL);
+
+    memory_name = 
+	xv_create(status_panel, PANEL_TEXT, 
+/*		  PANEL_VALUE_X, xv_col(status_panel, 2), */
+		  PANEL_VALUE_X, 255,
+		  PANEL_VALUE_Y, xv_rows(status_panel, 3),
+		  PANEL_LABEL_STRING, "Memory:",
 		  PANEL_READ_ONLY, TRUE,
 		  PANEL_VALUE_DISPLAY_LENGTH, 10,
 		  NULL);
