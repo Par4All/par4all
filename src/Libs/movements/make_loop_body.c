@@ -36,8 +36,8 @@
 #include "rice.h"
 
 
-extern int  offset_dim1;
-extern int  offset_dim2;
+extern Value offset_dim1;
+extern Value offset_dim2;
 
 boolean 
 variable_in_declaration_module_p(m, v)
@@ -172,7 +172,8 @@ int number_of_lower_bounds,number_of_upper_bounds;
     statement stat,stat1,stat2,lbody;
     Pvecteur  pvt,ofs = local_indices;
     type tp = entity_type(ent);
-    int  pmin,pmax,nb_bytes = 0;
+    Value  pmin,pmax;
+    int nb_bytes = 0;
     text t;  
     test test1;
      cons * args, * args2, * lex2, * lex3;
@@ -246,7 +247,7 @@ int number_of_lower_bounds,number_of_upper_bounds;
     expr_ind1 = make_vecteur_expression(pvt);	
 
     pvt =(!VECTEUR_NUL_P(ofs->succ))  ? 
-	vect_add(vect_new(vecteur_var(ofs->succ),1), 
+	vect_add(vect_new(vecteur_var(ofs->succ), VALUE_ONE), 
 		 vect_new(TCST,offset_dim2)):
 		     vect_new(TCST,offset_dim2);
     args2 = CONS(EXPRESSION,
@@ -273,8 +274,11 @@ int number_of_lower_bounds,number_of_upper_bounds;
 
 
     b2 = sc_minmax_of_variable(sctmp, vecteur_var(ofs), &pmin, &pmax);
-    ifdebug(4)
-	fprintf(stderr,"borne min %d, borne sup %d\n",pmin,pmax);
+    ifdebug(4) {
+	fprint_string_Value(stderr, "borne min ", pmin);
+	fprint_string_Value(stderr, ", borne sup ", pmax);
+	fprintf(stderr,"\n");
+    }
     /* if (pmin == INT_MIN || pmax == INT_MAX || pmax > pmin) { */
 	new_ind1=find_entity(module, ofs,SUFFIX_FOR_TEMP_VAR1_IN_INNER_LOOP);
 
@@ -404,12 +408,12 @@ Pbase var_id;              /* corresponds to the Pvecteur belonging Prod_id
   
     args = CONS(EXPRESSION,make_expression_1(),NIL);
     pvt =(!VECTEUR_NUL_P(ofs->succ))  ? 
-	vect_add(vect_new(vecteur_var(ofs->succ),1), 
+	vect_add(vect_new(vecteur_var(ofs->succ),VALUE_ONE), 
 		 vect_new(TCST,offset_dim2)):
 		     vect_new(TCST,offset_dim2);
 
    args2 = CONS(EXPRESSION,make_vecteur_expression(pvt),NIL);
-    pvt =vect_new(vecteur_var(ofs),1); 
+    pvt =vect_new(vecteur_var(ofs),VALUE_ONE); 
     vect_add_elem(&pvt,TCST,offset_dim1);
     args2 = CONS(EXPRESSION,make_vecteur_expression(pvt), 
 		 args2);
@@ -492,7 +496,8 @@ entity var_id;
     
     args = CONS(EXPRESSION,expr,lexp1);
     args = CONS(EXPRESSION,
-		make_vecteur_expression(vect_new((Variable)var_id,1)),args);
+		make_vecteur_expression(vect_new((Variable)var_id,
+						 VALUE_ONE)),args);
     /* generate the send or the receive call */
    
     lbody =  (receive_code) ? 
