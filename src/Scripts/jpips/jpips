@@ -5,6 +5,9 @@
 # a shell wrapper for "JPips", the java-based pips interface.
 #
 # $Log: jpips,v $
+# Revision 1.5  1998/10/16 17:17:08  coelho
+# updated and fixes for 1.2b4
+#
 # Revision 1.4  1998/07/03 07:06:01  coelho
 # default menu is "basic" now.
 #
@@ -41,8 +44,8 @@ error()
 
 unset jpips forward menu_type
 
-props="-Djava.compiler=sunwjit"
-java_root=${JAVA_ROOT:-/usr/local/jdk1.2beta3}
+props="";
+java_root=${JAVA_ROOT:-/usr/local/jdk1.2beta4}
 zip=jpips.zip
 gif=DownArrow.gif
 
@@ -52,7 +55,7 @@ do
 	m) menu_type=$OPTARG ;;
 	h) usage ;;
 	n) forward="${forward} -n" ;;
-	d) props="";;
+	d) props="-Djava.compiler=NONE";;
 	*) error 1 "unexpected option ${opt}" ;;
     esac
 done
@@ -118,5 +121,5 @@ export CLASSPATH
 
 # verbose execution...
 set -x
-CLASSPATH=${jpips}
-exec java ${props} JPips.JPips ${forward}
+CLASSPATH=${jpips}:${java_root}/lib/classes.zip:${CLASSPATH}
+exec ${java_root}/bin/java ${props} JPips.JPips ${forward}
