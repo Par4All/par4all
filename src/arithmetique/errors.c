@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.25  2003/09/03 13:35:06  coelho
+  no more callback.
+
   Revision 1.24  2003/08/18 14:56:14  coelho
   *** empty log message ***
 
@@ -127,9 +130,6 @@ typedef struct
   char * function;
   char * file;
   int    line;
-
-  /* useful callback to do something else on throw or pop... */
-  void (* callback)(int);
 } 
   linear_exception_holder;
 
@@ -154,13 +154,12 @@ void dump_exception_stack_to_file(FILE * f)
   for (i=0; i<exception_index; i++)
   {
     fprintf(f, 
-	    "%d: [%s:%d in %s (%d) %p]\n",
+	    "%d: [%s:%d in %s (%d)]\n",
 	    i, 
 	    exception_stack[i].file,
 	    exception_stack[i].line,
 	    exception_stack[i].function,
-	    exception_stack[i].what,
-	    exception_stack[i].callback);
+	    exception_stack[i].what);
   }
   fprintf(f, "\n");
 }
@@ -185,8 +184,7 @@ push_exception_on_stack(
     int what,
     char * function,
     char * file,
-    int line,
-    void (*callback)(int))
+    int line)
 {
   exception_debug_trace("PUSH ");
 
@@ -204,7 +202,6 @@ push_exception_on_stack(
   exception_stack[exception_index].function = function;
   exception_stack[exception_index].file = file;
   exception_stack[exception_index].line = line;
-  exception_stack[exception_index].callback = callback;
 
   return & exception_stack[exception_index++].where;
 }
@@ -293,9 +290,6 @@ void throw_exception(
 		exception_stack[i].function, 
 		exception_stack[i].file,
 		exception_stack[i].line);
-
-      if (exception_stack[i].callback)
-	exception_stack[i].callback(i);
 
       longjmp(exception_stack[i].where, 0);
     }
