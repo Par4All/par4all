@@ -153,7 +153,6 @@ char * argv[];
     pips_parse_arguments(argc, argv);
 
     debug_on("PIPS_DEBUG_LEVEL");
-
     initialize_signal_catcher();
     pips_log_handler = pips_user_log;
 
@@ -163,11 +162,12 @@ char * argv[];
 	close_workspace();
 	success = FALSE;
     }
-    else {
+    else 
+    {
 	push_pips_context(&pips_top_level);
+	/* push_performance_spy(); */
 
-	/*
-	 * Initialize workspace
+	/* Initialize workspace
 	 */
 
 	if (source_files != NIL) {
@@ -201,8 +201,7 @@ char * argv[];
 	    }
 	}
 
-	/* 
-	 * Open module
+	/* Open module
 	 */
 
 	if (module != NULL) {
@@ -213,8 +212,7 @@ char * argv[];
 	    open_module_if_unique();
 	}
 
-	/* 
-	 * Activate rules
+	/* Activate rules
 	 */
 
 	if (success && selected_rules != NIL) {
@@ -224,8 +222,7 @@ char * argv[];
 	    }, selected_rules);
 	}
 
-	/*
-	 * Perform applies
+	/* Perform applies
 	 */
 
 	if (success && performed_rule != NULL) {
@@ -245,8 +242,7 @@ char * argv[];
 		}
 	}
 
-	/*
-	 * Build resources
+	/* Build resources
 	 */
 
 	if (success && build_resource_names != NIL) {
@@ -268,14 +264,12 @@ char * argv[];
 		}
 	    }, build_resource_names);
 	}
-
-	if (success) {
-	    close_workspace();
-	}
-	else {
-	    close_workspace();
-	}
+	
+	/* whether success or not... */
+	close_workspace();
+	/* pop_performance_spy(stderr, "pips"); */
     }
 
+    debug_off();
     exit(!success);
 }
