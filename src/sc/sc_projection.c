@@ -542,6 +542,7 @@ int ofl_ctrl;
 
     pos = neg = nul = NULL;
     nnul = 0;
+    
     while (pc != NULL) {
 	Pcontrainte pcs = pc->succ;
 	c = vect_coeff(v,pc->vecteur);
@@ -563,10 +564,11 @@ int ofl_ctrl;
     }
     sc->inegalites = NULL;
     sc->nb_ineq = 0;
-
-    for (pcp = pos; pcp != NULL; pcp = pcp->succ) {
+    
+    for (pcp = pos; pcp != NULL; pcp = pcp->succ) {     
 	for (pcn = neg; pcn != NULL; pcn = pcn->succ) {
-	    Pcontrainte pcnew;
+	  
+	    Pcontrainte pcnew;	    
 
 	    if (integer_test_p) {
 		boolean int_comb_p;
@@ -597,9 +599,8 @@ int ofl_ctrl;
 		nnul++;
 	    }
 	}
-    }
-
-
+    }//of for
+    
     /* apres les combinaisons eliminer les elements devenus inutiles */
     contraintes_free(pos);
     contraintes_free(neg);
@@ -934,8 +935,9 @@ void sc_extract_exact_common_equalities
     Variable v = vect_one_coeff_if_any(eq->vecteur);
     if (v) 
     {
-      /* unlink eq */
+      /* unlink eq and update count. */
       if (peq) peq->succ = neq; else sc_egalites(cl) = neq;
+      sc_nbre_egalites(cl)--;
 
       /* put equality back in common. */
       eq->succ = sc_egalites(common);
