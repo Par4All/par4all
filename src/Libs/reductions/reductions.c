@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/19 16:31:02 $, 
+ * $Date: 1996/06/22 10:32:11 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -111,7 +111,161 @@ bool summary_reductions(string module_name)
  */
 GENERIC_GLOBAL_FUNCTION(proper_reductions, pstatement_reductions)
 
+/************************************************ LIST OF REDUCED ENTITIES */
+
+/* list of entities that may be reduced
+ */
+static list /* of entity */
+add_reduced_variables(
+    list /* of entity */ le,
+    reductions rs)
+{
+    MAP(REDUCTION, r, 
+	le = gen_once(reduction_variable(r), le), 
+	reductions_list(rs));
+    return le;
+}
+ 
+static list /* of entity */ 
+list_of_reduced_variables(
+    statement node, 
+    list /* of statement */ls)
+{
+    list /* of entity */ le = NIL;
+    le = add_reduced_variables(le, load_proper_reductions(node));
+    MAP(STATEMENT, s, 
+	le = add_reduced_variables(le, load_cumulated_reductions(s)),
+	ls);
+    return le;
+}
+
+/*********************************************************** CHECK PROPERS */
+
+static reduction /* NULL of not ok */
+compatible_reduction_of_var(
+    entity var, 
+    reductions rs)
+{
+    reduction rnew = make_none_reduction(var);
+    
+    MAP(REDUCTION, r,
+    {
+	if (!update_compatible_reduction_with(&rnew, var, r))
+	{
+	    free_reduction(rnew); 
+	    return NULL;
+	}
+    },
+	reductions_list(rs));
+
+    return rnew;
+}
+
+/* returns NIL on any problem */
+static list 
+list_of_compatible_reductions(reductions rs)
+{
+    list lnr=NIL, le = add_reduced_variables(NIL, rs);
+
+    MAP(ENTITY, var,
+    {
+	reduction r = compatible_reduction_of_var(var, rs);
+	if (r)
+	    lnr = CONS(REDUCTION, r, lnr);
+	else
+	{
+	    gen_free_list(le); 
+	    gen_full_free_list(lnr);
+	    return NIL;
+	}
+    },
+	le);
+    gen_free_list(le);
+    
+    return lnr;
+}
+
+static list list_of_trusted_references(reductions rs)
+{
+    list lr = NIL;
+    MAP(REDUCTION, r,
+    {
+	MAP(PREFERENCE, p, 
+	    lr = CONS(REFERENCE, preference_ref(p), lr), 
+	    reduction_trusted(r));
+	lr = CONS(REFERENCE, reduction_reference(r), lr); /* ??? */
+    },
+	reductions_list(rs));
+    return lr;
+}
+
+/* argh... what about side effect related reductions ???
+ * There are no relevant pointer to trust in such a case...
+ * What I can do as a (temporary) fix is not to check
+ * direct side effects (that is "call foo" ones) because
+ * they do not need to be checked...
+ */
+static bool safe_effects_for_reductions(statement s, reductions rs)
+{
+    list /* of effect */ le = load_statement_proper_effects(s),
+         /* of reference */ lr = list_of_trusted_references(rs);
+
+    MAP(EFFECT, e,
+    {
+	if ((effect_write_p(e) && !gen_in_list_p(effect_reference(e), lr)) ||
+	    io_effect_entity_p(effect_variable(e)))
+	{
+	    pips_debug(8, "effect on %s (ref 0x%x) not trusted\n",
+		       entity_name(effect_variable(e)), 
+		       (unsigned int) effect_reference(e));
+
+	    gen_free_list(lr);
+	    return FALSE;
+	}
+    },
+	le);
+
+    gen_free_list(lr);
+    return TRUE;
+}
+
+/* must check that the found reductions are
+ * (1) without side effects (no W on any other than accumulators)
+ * (2) compatible one with respect to the other.
+ * (3) not killed by other proper effects on accumulators.
+ * to avoid these checks, I can stop on expressions...
+ */
+static void check_proper_reductions(statement s)
+{
+    reductions rs = load_proper_reductions(s);
+    list /* of reduction */ lr = reductions_list(rs), lnr;
+
+    if (ENDP(lr)) return;
+
+    /* all must be compatible, otherwise some side effect! 
+     */
+    lnr = list_of_compatible_reductions(rs); /* checks (2) */
+
+    /* now lnr is the new list of reductions.
+     */
+    if (lnr && !safe_effects_for_reductions(s, rs)) /* checks (1) and (3) */
+    {
+	gen_full_free_list(lnr);
+	lnr = NIL;
+    }
+
+    gen_full_free_list(lr);
+    reductions_list(rs) = lnr;
+}
+
 DEFINE_LOCAL_STACK(crt_stat, statement)
+
+/* hack: no check for direct translations ("call foo")
+ * thus in this case effects reductions will be okay...
+ * the reason for the patch is that I do not know how to preserve easily 
+ * such "invisible" reductions against proper effects. FC. 
+ */
+static call last_translated_module_call = call_undefined;
 
 static bool pr_statement_flt(statement s)
 {
@@ -121,23 +275,14 @@ static bool pr_statement_flt(statement s)
 
 static void pr_statement_wrt(statement s)
 {
-    reductions rs = load_proper_reductions(s);
-
-    /* must check that the found reductions are
-     * (1) without side effects (no W on any other than accumulators)
-     * (2) compatible one with respect to the other...
-     * (3) not killed by proper effects on accumulators...
-     */
-    if (reductions_list(rs))
-    {
-	pips_user_warning("proper reductions check not implemented!\n");
-	
-    }
-
+    instruction i = statement_instruction(s);
+    if (instruction_call_p(i) && 
+	instruction_call(i)!=last_translated_module_call)
+	check_proper_reductions(s);
     crt_stat_rewrite(s);
 }
 
-static void pr_call_rwt(call c)
+static bool pr_call_flt(call c)
 {
     statement head = crt_stat_head();
     reductions reds = load_proper_reductions(head);
@@ -148,13 +293,14 @@ static void pr_call_rwt(call c)
 	 */
 	reductions_list(reds) = 
 	    CONS(REDUCTION, red, reductions_list(reds));
-    else
-	/* translated reductions 
-	 * ??? should check that the base call is functional!?
-	 * that is, only reduced variable are 
-	 */
+    else if (entity_module_p(call_function(c)))
+    {
+	last_translated_module_call = c;
 	reductions_list(reds) = 
 	    gen_nconc(translate_reductions(c), reductions_list(reds));
+    }
+
+    return TRUE;
 }
 
 /* performs the computation of proper reductions for statement s.
@@ -165,7 +311,7 @@ static void compute_proper_reductions(statement s)
     make_crt_stat_stack();
     gen_multi_recurse(s,
 		      statement_domain, pr_statement_flt, pr_statement_wrt,
-		      call_domain, gen_true, pr_call_rwt,
+		      call_domain, pr_call_flt, gen_null,
 		      NULL);
     free_crt_stat_stack();
 }
@@ -220,34 +366,6 @@ bool proper_reductions(string module_name)
  */
 GENERIC_GLOBAL_FUNCTION(cumulated_reductions, pstatement_reductions)
 
-/************************************************ LIST OF REDUCED ENTITIES */
-
-/* list of entities that may be reduced
- */
-static list /* of entity */
-add_reduced_variables(
-    list /* of entity */ le,
-    reductions rs)
-{
-    MAP(REDUCTION, r, 
-	le = gen_once(reduction_variable(r), le), 
-	reductions_list(rs));
-    return le;
-}
- 
-static list /* of entity */ 
-list_of_reduced_variables(
-    statement node, 
-    list /* of statement */ls)
-{
-    list /* of entity */ le = NIL;
-    le = add_reduced_variables(le, load_proper_reductions(node));
-    MAP(STATEMENT, s, 
-	le = add_reduced_variables(le, load_cumulated_reductions(s)),
-	ls);
-    return le;
-}
-
 /************************************** CUMULATED REDUCTIONS OF STATEMENT */
 
 /* returns a r reduction of any compatible with { node } u ls
@@ -264,7 +382,7 @@ build_reduction_of_variable(
     *pr = make_reduction
 	(reference_undefined,
 	 make_reduction_operator(is_reduction_operator_none, UU),
-	 NIL);
+	 NIL, NIL);
 
     if (!update_compatible_reduction
 	(pr, var, load_statement_proper_effects(node),
