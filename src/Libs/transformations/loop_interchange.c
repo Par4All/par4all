@@ -32,8 +32,6 @@ bool loop_interchange(string module_name)
     statement s;
     string resp;
 
-    debug_on("LOOP_INTERCHANGE_DEBUG_LEVEL");
-
     pips_assert("loop_interchange", entity_module_p(module));
 
     /* DBR_CODE will be changed: argument "pure" should take FALSE but
@@ -50,6 +48,8 @@ bool loop_interchange(string module_name)
     if (selected_label==entity_undefined) {
 	user_error("loop_interchange", "loop label `%s' does not exist\n", lp_label);
     }
+
+    debug_on("LOOP_INTERCHANGE_DEBUG_LEVEL");
 
     look_for_nested_loop_statements(s, interchange,selected_loop_p);
 
