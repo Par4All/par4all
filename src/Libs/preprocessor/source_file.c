@@ -368,8 +368,8 @@ static bool zzz_file_p(string s) /* zzz???.f */
 { return strlen(s)==8 && s[0]=='z' && s[1]=='z' && s[2]=='z' &&
       s[6]=='.' && s[7]=='f'; }
 #define MAX_NLINES 1000
-static int cmp(char**x1, char**x2)
-{ return strcmp(*x1, *x2);}
+static int cmp(const void * x1, const void * x2)
+{ return strcmp(*(char**)x1, *(char**)x2);}
 static void sort_file(string name)
 {
     FILE *f;
