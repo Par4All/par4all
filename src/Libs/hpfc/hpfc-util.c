@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/04/02 15:02:14 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/04/02 15:04:22 $, )
  * version $Revision$
  */
 
@@ -780,23 +780,25 @@ static void test_rewrite(test t)
     entity e = expression_to_entity(test_condition(t));
     if (ENTITY_TRUE_P(e))
     {
+	instruction i = statement_instruction(current_stmt_head());
 	pips_debug(5, "true test simplified\n");
 
 	statement_instruction(current_stmt_head()) = 
 	    statement_instruction(test_true(t));
 
 	statement_instruction(test_true(t)) = instruction_undefined;
-	free_test(t);
+	free_instruction(i);
     }
     else if (ENTITY_FALSE_P(e))
     {	
+	instruction i = statement_instruction(current_stmt_head());
 	pips_debug(5, "false test simplified\n");
 
 	statement_instruction(current_stmt_head()) = 
 	    statement_instruction(test_false(t));
 
 	statement_instruction(test_false(t)) = instruction_undefined;
-	free_test(t);
+	free_instruction(i);
     }
 }
 
@@ -805,6 +807,7 @@ static void loop_rewrite(loop l)
     range r = loop_range(l);
     if (expression_equal_p(range_lower(r), range_upper(r)))
     {
+	instruction i = statement_instruction(current_stmt_head());
 	pips_debug(5, "loop on %s simplified\n", entity_name(loop_index(l)));
 
 	statement_instruction(current_stmt_head()) = 
@@ -816,7 +819,7 @@ static void loop_rewrite(loop l)
 		   NIL)));
 
 	loop_body(l) = statement_undefined;
-	free_loop(l);
+	free_instruction(i);
     }
 }
 
