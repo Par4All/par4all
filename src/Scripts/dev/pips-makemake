@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1997/01/14 08:46:52 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1997/01/14 08:48:34 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -680,7 +680,7 @@ tar:
 	# taring \$(TARGET)
 	cd ..; \\
 	    \$(TAR) cf \$(TARGET).tar \\
-		\$(addprefix \$(TARGET),\$(ALL_SOURCES) Makefile) ; \\
+		\$(addprefix \$(TARGET)/,\$(ALL_SOURCES) Makefile) ; \\
 	    \$(ZIP) \$(TARGET).tar
 
 quick-install: .quick-install
