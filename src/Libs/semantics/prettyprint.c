@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1995/09/05 16:45:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+static char vcid[] = "%A% ($Date: 1995/09/05 16:45:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
  /* package semantics - prettyprint interface */
 
 #include <stdio.h>
@@ -11,7 +17,7 @@
 #include "text.h"
 #include "text-util.h"
 
-#include "constants.h"
+#include "top-level.h"
 
 #include "ri.h"
 #include "ri-util.h"
@@ -108,7 +114,8 @@ char *module_name;
 				   SEQUENTIAL_TRANSFORMER_SUFFIX ) :
 				  (is_user_view? USER_PRECONDITION_SUFFIX :
 				   SEQUENTIAL_PRECONDITION_SUFFIX),
-				  NULL));
+				  get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
+                                  NULL));
     fd = safe_fopen(filename, "w");
 
     print_text(fd, get_semantic_text(module_name,TRUE));
@@ -117,8 +124,9 @@ char *module_name;
 
     /* Let's assume that value_mappings will be somehow sometime freed... */
 
-    DB_PUT_FILE_RESOURCE((is_user_view? DBR_PARSED_PRINTED_FILE :
-			  DBR_PRINTED_FILE),
+    DB_PUT_FILE_RESOURCE(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? DBR_GRAPH_PRINTED_FILE :
+                         (is_user_view? DBR_PARSED_PRINTED_FILE :
+                          DBR_PRINTED_FILE),
 			 strdup(module_name),
  			 filename);
 }
