@@ -78,7 +78,7 @@ auto-number.h: auto.h
 
 define_libraries.make: define_libraries.sh
 	# make macros and sh variables can be initialized nearly the same way
-	sed "s,$<,$@,g;s,',,g" $< > $@
+	sed "s,$<,$@,g;s,',,g;/^#/d" $< > $@
 
 clean: local-clean
 local-clean:; $(RM) $(DDC_MACROS)
