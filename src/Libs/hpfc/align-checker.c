@@ -87,9 +87,9 @@ list *plvect, *plkind;
 
     ifdebug(8)
 	 {
-	     fprintf(stderr, "[align_check]\nreferences are:\n");
+	     fprintf(stderr, "[align_check] references are: ");
 	     print_reference(r1);
-	     fprintf(stderr, "\n");
+	     fprintf(stderr, " and ");
 	     print_reference(r2);
 	     fprintf(stderr, "\n");
 	 }
@@ -133,10 +133,17 @@ list *plvect, *plkind;
                 dim1  = ((a1!=alignment_undefined)?(alignment_arraydim(a1)):(-1)),
 		rate1, rate2, 
 		cnst1, cnst2;
-            
+
+            rate2   = HpfcExpressionToInt(alignment_rate(a2));
+	    cnst2   = HpfcExpressionToInt(alignment_constant(a2));
+
 	    if ((dim1<0) || /* replication, say it is not aligned */
 		((dim1==0) && (!bconst2))) /* replicated reference...*/
             {
+		debug(8, "align_check",
+		      "%s dim %d not aligned aff %d shift %d const %d\n",
+		      entity_name(e2), i, baffin2, bshift2, bconst2);
+
                 *plkind = gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
                 *plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
             }
@@ -144,17 +151,36 @@ list *plvect, *plkind;
 	    if ((dim1==0) && (bconst2))
 	    {
 		/*
-		 * I give up, but something smart could be done here.
-		 * the problem is that I do not see how deep it modifications
-		 * should go. In this case, I've not chosen the good 
-		 * written reference, and the one chosen won't generate
-		 * the relevent guards before the loop nest.
-		 * I gonna try a smarter choice of The Reference somewhere else.
+		 * a(i) -> t(i,1), b(i,j)->t(i,j), should detect 
+		 * do i a(i) = b(i,1) as aligned...
 		 *
-		 * let's say it is not aligned.
+		 * ??? this could be managed later in this function...
 		 */
-		*plkind = gen_nconc(*plkind, CONS(INT, not_aligned, NIL));
-                *plvect = gen_nconc(*plvect, CONS(PVECTOR, VECTEUR_NUL, NIL));
+
+		int
+		    t1 = HpfcExpressionToInt(alignment_constant(a1)),
+		    t2 = rate2*shft2+cnst2;
+		
+		/*
+		 * should be ok, even if a delta is induced, if it stays
+		 * on the same processor along this dimension. The case
+		 * should also be managed downward, when playing with 
+		 * local updates. 
+		 * ??? maybe there is also a consequence on the 
+		 * send/receive symetry, in order to put the message where it
+		 * should be...
+		 */
+
+		/*
+		 * it is checked later whether the data are on the same 
+		 * processor or not.
+		 */
+
+		*plkind = gen_nconc(*plkind, CONS(INT, aligned_constant, NIL));
+		*plvect = gen_nconc(*plvect, CONS(PVECTOR, 
+						  vect_add(vect_new(TEMPLATEV, t2),
+							   vect_new(DELTAV, t2-t1)),
+						  NIL));
 	    }
 	    else
 	    {
@@ -162,8 +188,6 @@ list *plvect, *plkind;
 
 		rate1   = HpfcExpressionToInt(alignment_rate(a1));
 		cnst1   = HpfcExpressionToInt(alignment_constant(a1));
-		rate2   = HpfcExpressionToInt(alignment_rate(a2));
-		cnst2   = HpfcExpressionToInt(alignment_constant(a2));
 
 		baffin1 = affine_expression_of_loop_index_p
 		    (indice1, &index1, &shft1, &affr1);
