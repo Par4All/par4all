@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNU,v $ (version $Revision$)
-# $Date: 1996/08/08 16:23:06 $, 
+# $Date: 1996/08/09 10:58:18 $, 
 #
 # this file contains macro definitions 
 
@@ -10,9 +10,8 @@ GCCDIR	= $(GCC_EXEC_PREFIX)sparc-sun-sunos4.1.4/2.7.2.f.1
 AR	= gar
 ARFLAGS	= rv
 CC	= gcc
-# flex/bison generated code and -ansi are not compatible:-(
-CFLAGS	= -O2 -g -pedantic -Wall -msupersparc -pipe
-CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -nostdinc -I$(NEWGEN_INCDIR) -I$(LINEAR_INCDIR) -I$(PIPS_INCDIR) -I$(PIPS_EXTEDIR) -I$(GLIBC)/include -I$(GCCDIR)/include -I/usr/include 
+CFLAGS	= -O2 -ansi -g -pedantic -Wall -msupersparc -pipe
+CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -nostdinc -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR) -I$(GLIBC)/include -I$(GCCDIR)/include -I/usr/include 
 LD	= $(CC) 
 LDFLAGS	= -g -nostdlib $(GLIBC)/lib/crt0.o -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(PIPS_EXTEDIR) -L$(GLIBC)/lib -L$(GCCDIR)/lib -L/usr/lib -lc -lgcc
 RANLIB	= granlib
