@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1998/10/24 16:28:25 $, 
+ * date: $Date: 1998/11/18 12:30:49 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -308,17 +308,19 @@ int ofl_ctrl;
 
     s1 = sc_elim_db_constraints(s1);
 
-    /* a small basis if possible... (FC).
-     */
-    base_rm(sc_base(s1));
-    sc_creer_base(s1);
 
     if (s1 != NULL)
     {
-	/* projection successive selon les  variables du systeme
-	 */
+	
+       /* projection successive selon les  variables du systeme
+	*/
 	Variable var;
-	Pbase b = base_dup(sc_base(s1));
+	Pbase b = BASE_NULLE;
+        /* a small basis if possible... (FC).
+	 */
+	base_rm(sc_base(s1));
+	sc_creer_base(s1);
+	b = base_dup(sc_base(s1));
 	
 	while (b && faisable)
 	{
