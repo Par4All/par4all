@@ -7,7 +7,7 @@
 \title{Attachment of some information to text words\\Data structures}
 \author{Ronan Keryell\\
                 \\
-        CRI, E'cole des mines de Paris}
+        CRI, École des mines de Paris}
 
 \begin{document}
 
@@ -41,7 +41,7 @@ Here is what can be attached to a word:
 file and {\tt end} the position of its end.
 
 The various objects that can be attached:
-\domain{attachee = statement_line_number:int + persistent reference + persistent declaration:entity + type:string + persistent loop + persistent module_head:entity + complementary_sections:unit + complexities:unit + continuation_conditions:unit + cumulated_effects:unit + out_regions:unit + preconditions:unit + privatized_regions:unit + proper_effects:unit + proper_regions:unit + regions:unit + static_control:unit + transformers:unit + decoration:unit + comment:unit}
+\domain{attachee = statement_line_number:int + persistent reference + persistent call + persistent declaration:entity + type:string + persistent loop + persistent module_head:entity + complementary_sections:unit + complexities:unit + continuation_conditions:unit + cumulated_effects:unit + out_regions:unit + preconditions:unit + privatized_regions:unit + proper_effects:unit + proper_regions:unit + regions:unit + static_control:unit + transformers:unit + decoration:unit + comment:unit}
 
 Persistence is need because we do not want the RI to be broken when
 the attachments are freed.
