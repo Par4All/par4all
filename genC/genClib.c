@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/14 10:38:23 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/14 17:26:50 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -162,6 +162,13 @@ init_array( dp )
     ar[ sizarray-1 ].p = gen_chunk_undefined ;
 
   return( ar ) ;
+}
+
+static int 
+array_own_allocated_memory(
+    union domain *dp)
+{
+    return sizeof(gen_chunk)*array_size(dp->ar.dimensions);
 }
 
 /* FIND_FREE_TABULATED finds a free slot for the tabulated domain BP.
@@ -987,7 +994,7 @@ gen_chunk *obj ;
     gen_local_free( obj, TRUE ) ;
 }
 
-
+/********************************************************************* COPY */
 
 /* These functions are used to implement the copying of objects. A
    tabulated constructor has to stop recursive duplication. */
@@ -1043,8 +1050,16 @@ struct driver *dr ;
 	size = gen_size(bp)*sizeof(gen_chunk);
 	new_obj = (gen_chunk *)alloc(size);
 
-	/* the object obj is copied into the new one */
-	(void) memcpy((char *) new_obj, (char *) obj, size);
+	/* the object obj is copied into the new one
+	 */
+	if (IS_INLINABLE(bp) && strcmp(bp->name, "string")==0)
+	{
+	    new_obj->s = strdup(obj->s);
+	}
+	else /* the value is copied */
+	{
+	    (void) memcpy((char *) new_obj, (char *) obj, size);
+	}
 
 	/* hash table copy_table is updated */
 	copy_hput(copy_table, (char *)obj, (char *)new_obj);
@@ -1927,12 +1942,13 @@ gen_read_spec(char * spec, ...)
    of external types */
 
 void
-gen_init_external( which, read, write, free, copy )
+gen_init_external( which, read, write, free, copy, allocated_memory )
 int which ;
 char *(*read)() ;
 void (*write)() ;
 void (*free)() ;
 char *(*copy)() ;
+int (*allocated_memory)() ;
 {
 	struct gen_binding *bp = &Domains[ which ] ;
 	union domain *dp = bp->domain ;
@@ -1950,6 +1966,7 @@ char *(*copy)() ;
 	dp->ex.write = write ;
 	dp->ex.free = free ;
 	dp->ex.copy = copy ;
+	dp->ex.allocated_memory = allocated_memory ;
 }
 
 /* GEN_MAKE_ARRAY allocates an initialized array of NUM gen_chunks. */
@@ -2292,10 +2309,178 @@ gen_chunk *obj1, *obj2 ;
 
   return(found) ;
 }
+
+/******************************************************************** SIZE */
+
+/* returns the number of bytes allocated for a given structure
+ * may need additional fonctions for externals...
+ * May be called recursively. If so, already_seen_objects table kept.
+ */
+
+static int current_size;
+static hash_table already_seen_objects = NULL;
+
+/*  true if obj was already seen in this recursion, and put it at TRUE
+ */
+static bool 
+allocated_memory_already_seen_p(obj)
+gen_chunk * obj;
+{
+    if (hash_get(already_seen_objects, (char *)obj)==(char*)TRUE)
+	return TRUE;
+    hash_put(already_seen_objects, (char *)obj, (char *) TRUE);
+    return FALSE;
+}
+
+/* manages EXTERNALS
+ */
+static int
+allocated_memory_leaf_in( obj, bp )
+gen_chunk *obj ;
+struct gen_binding *bp ;
+{
+    if (IS_TABULATED(bp) ||
+	allocated_memory_already_seen_p(obj)) 
+	return FALSE;
+
+    if (IS_EXTERNAL(bp))
+    {
+	if (bp->domain->ex.allocated_memory)
+	    current_size += (*(bp->domain->ex.allocated_memory))(obj->s);
+	else
+	    fprintf(stderr, "[gen_allocated_memory] warning: "
+		    "external with no allocated memory function\n");
+		
+	return FALSE;
+    }
+
+    return TRUE;
+}
+
+/* manages newgen objects and strings...
+ */
+static int
+allocated_memory_obj_in(
+    gen_chunk *obj,
+    struct driver *dr)
+{
+    struct gen_binding *bp = &Domains[quick_domain_index(obj)];
+
+    if (allocated_memory_already_seen_p(obj) ||
+	IS_TABULATED(&Domains[quick_domain_index(obj)]))
+	return !GO;
+
+    current_size += gen_size(obj);
+
+    if (IS_INLINABLE(bp))
+    {
+	if (strcmp(bp->name, "string")==0)
+	    current_size += strlen(obj->s) + 1; /* under approximation! */
+	return !GO;
+    }
+
+    return GO;
+}
+
+/* manages newgen simples (list, set, array)
+ */
+static int
+allocated_memory_simple_in(
+    gen_chunk *obj,
+    union domain *dp)
+{
+    if (dp->se.persistant) return FALSE;
+
+    switch( dp->ba.type ) {
+    case BASIS_DT:
+	return( GO) ; /* !GO ??? */
+    case LIST_DT:
+    {
+	list l = obj->l;
+	
+	if (l!=list_undefined && l)
+	{
+	    current_size += list_own_allocated_memory(l);
+	    return TRUE;
+	}
+	else
+	    return FALSE;
+    }
+    case SET_DT:
+    {
+	set s = obj->t;
+	if (s != set_undefined)
+	{
+	    current_size += set_own_allocated_memory(s);
+	    return TRUE;
+	}
+	else
+	    return FALSE;
+    }
+    case ARRAY_DT:
+    {
+	gen_chunk *p = obj->p;
+
+	if (p != array_undefined)
+	{
+	    current_size += array_own_allocated_memory(dp);
+	    return TRUE;
+	}
+	else
+	    return FALSE;
+    }
+    }
+
+    fatal("allocated_memory_simple_in: unknown type %s\n", itoa(dp->ba.type));
+    return -1; /* just to avoid a gcc warning */
+}
+
+int /* in bytes */
+gen_allocated_memory(
+    gen_chunk *obj)
+{
+    bool first_on_stack = (already_seen_objects==NULL);
+    int result, saved_size;
+    struct driver dr;
+
+    /* save current status 
+     */
+    saved_size = current_size;
+    current_size = 0;
+    if (first_on_stack) 
+	already_seen_objects = hash_table_make(hash_pointer, 0);
+    
+    /* build driver for gen_trav...
+     */
+    dr.null 		= gen_null,
+    dr.leaf_in 		= allocated_memory_leaf_in,
+    dr.leaf_out  	= gen_null,
+    dr.simple_in 	= allocated_memory_simple_in,
+    dr.array_leaf 	= gen_array_leaf,
+    dr.simple_out 	= gen_null,
+    dr.obj_in 		= allocated_memory_obj_in,
+    dr.obj_out 		= gen_null;
+
+    /* recursion from obj
+     */
+    gen_trav_obj(obj, &dr);
+
+    /* restores status and returns result
+     */
+    result = current_size;
+    current_size = saved_size;
+    if (first_on_stack) 
+    {
+	hash_table_free(already_seen_objects); 
+	already_seen_objects = NULL;
+    }
+    
+    return result;
+}
   
 /* -------------------------------------------------------------
  *
- *    Quick and Intelligent Recursion Thru Gen_Multi_Recurse
+ *    quick and Intelligent Recursion Thru Gen_Multi_Recurse
  *
  *    Fabien COELHO, Jun-Sep-Dec 94
  *
@@ -2308,28 +2493,11 @@ gen_chunk *obj1, *obj2 ;
  *  - when the filter is always yes
  *  - when it is false, to stop the recursion on some types
  */
-void
-gen_null(p)
-gen_chunk *p;
-{
-}
-    
-bool
-gen_true(c)
-gen_chunk *c;
-{
-    return TRUE;
-}
+void gen_null(gen_chunk *p){}
+bool gen_true(gen_chunk *c){ return TRUE;}
+bool gen_false(gen_chunk *c){ return FALSE;}
 
-bool
-gen_false(c)
-gen_chunk *c;
-{
-    return FALSE;
-}
-
-/*
- * GLOBAL VARIABLES: to deal with decision tables
+/* GLOBAL VARIABLES: to deal with decision tables
  *
  *   number_of_domains: 
  *     the number of domains managed by newgen, max is MAX_DOMAIN.
