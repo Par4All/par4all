@@ -129,8 +129,9 @@ print_sentence(FILE * fd,
 		if(strlen(w) < 70-7-em) {
 		    if (col + strlen(w) > 70) {
 			/* Complete current line with the statement
-                           line number: */
-			if (n > 0) {
+                           line number, if it is significative: */
+			if (n > 0 &&
+			    get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
 			    for (i = col; i <= 72; i++) putc_sentence(' ', fd);
 			    fprintf_sentence(fd, "%04d", n);
 			}
@@ -213,7 +214,7 @@ print_sentence(FILE * fd,
 
 	/* Output the statement line number on the right end of the
            line: */
-	if (n > 0) {
+	if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
 	    for (i = col; i <= 72; i++) putc_sentence(' ', fd);
 	    fprintf_sentence(fd, "%04d", n);
 	}
