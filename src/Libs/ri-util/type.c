@@ -1,4 +1,9 @@
+/*
+ * $Id$
+ */
 #include <stdio.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "ri.h"
@@ -62,16 +67,16 @@ int the_tag;
     switch(the_tag)
     {
     case is_basic_int: 
-	return(make_basic(is_basic_int, 4));
+	return(make_basic(is_basic_int, UUINT(4)));
 	break;
     case is_basic_float: 
-	return(make_basic(is_basic_float, 4));
+	return(make_basic(is_basic_float, UUINT(4)));
 	break;
     case is_basic_logical: 
-	return(make_basic(is_basic_logical, 4));
+	return(make_basic(is_basic_logical, UUINT(4)));
 	break;
     case is_basic_complex: 
-	return(make_basic(is_basic_complex, 8));
+	return(make_basic(is_basic_complex, UUINT(8)));
 	break;
     case is_basic_overloaded: 
 	return(make_basic(is_basic_overloaded, UU));
@@ -101,7 +106,7 @@ cons * ld;
 parameter 
 MakeOverloadedParameter()
 {
-  return MakeAnyScalarParameter(is_basic_overloaded, UU);
+    return MakeAnyScalarParameter(is_basic_overloaded, 0);
 }
 
 parameter 
@@ -144,9 +149,9 @@ parameter
 MakeCharacterParameter()
 {
   return make_parameter(MakeTypeArray(make_basic(is_basic_string, 
-						 make_value(is_value_constant,
-							    make_constant(is_constant_int,
-									  DEFAULT_CHARACTER_TYPE_SIZE))),
+	 make_value(is_value_constant,
+		    make_constant(is_constant_int,
+				  UUINT(DEFAULT_CHARACTER_TYPE_SIZE)))),
 				      NIL),
 			make_mode(is_mode_reference, UU));
 }
@@ -154,8 +159,7 @@ MakeCharacterParameter()
 parameter 
 MakeAnyScalarParameter(tag t, int size)
 {
-    return(make_parameter((MakeTypeArray(make_basic(t, 
-						    size), NIL)),
+    return(make_parameter((MakeTypeArray(make_basic(t, UUINT(size)), NIL)),
 			  make_mode(is_mode_reference, UU)));
 }
 
@@ -165,7 +169,7 @@ MakeAnyScalarParameter(tag t, int size)
 type 
 MakeOverloadedResult()
 {
-    return MakeAnyScalarResult(is_basic_overloaded, UU);
+    return MakeAnyScalarResult(is_basic_overloaded, 0);
 }
 
 type 
@@ -208,16 +212,16 @@ type
 MakeCharacterResult()
 {
   return MakeTypeArray(make_basic(is_basic_string, 
-				  make_value(is_value_constant,
-					     make_constant(is_constant_int,
-							   DEFAULT_CHARACTER_TYPE_SIZE))),
+	 make_value(is_value_constant,
+		    make_constant(is_constant_int,
+				  UUINT(DEFAULT_CHARACTER_TYPE_SIZE)))),
 		       NIL);
 }
 
 type 
 MakeAnyScalarResult(tag t, int size)
 {
-    return(MakeTypeArray(make_basic(t, size), NIL));
+    return MakeTypeArray(make_basic(t, UUINT(size)), NIL);
 }
 
 
@@ -269,12 +273,10 @@ type t2;
     return FALSE; /* just to avoid a warning */
 }
 
-type 
-make_scalar_integer_type(n)
-int n;
+type make_scalar_integer_type(int n)
 {
     type t = make_type(is_type_variable,
-		       make_variable(make_basic(is_basic_int, n), NIL));
+		       make_variable(make_basic(is_basic_int, UUINT(n)), NIL));
     return t;
 }
 
@@ -661,8 +663,9 @@ basic b;
 	    sprintf(&char_decl[0],"CHARACTER*%d", lng);
 	}
 	else if(value_symbolic_p(basic_string(b))
-      && constant_int_p(symbolic_constant(value_symbolic(basic_string(b))))) {
-       lng = constant_int(symbolic_constant(value_constant(basic_string(b))));
+      && constant_int_p(symbolic_constant(value_symbolic(basic_string(b))))) 
+	{
+       lng = constant_int(symbolic_constant(value_symbolic(basic_string(b))));
 	sprintf(&char_decl[0],"CHARACTER*%d", lng);
 	}
 	else {
@@ -717,7 +720,7 @@ basic_of_expression(expression exp)
     break;
   default: pips_error("basic_of_expression", "Bad syntax tag");
     /* Never go there... */
-    b = make_basic(is_basic_overloaded, 4);
+    b = make_basic(is_basic_overloaded, UUINT(4));
   }
 
   return b;
@@ -804,7 +807,7 @@ basic_of_intrinsic(call c)
   call_func = call_function(c);
 
   if(ENTITY_LOGICAL_OPERATOR_P(call_func))
-    rb = make_basic(is_basic_logical, 4);
+    rb = make_basic(is_basic_logical, UUINT(4));
   else
     {
       list call_args = call_arguments(c);
@@ -911,7 +914,7 @@ basic_union(expression exp1, expression exp2)
 	int s1 = basic_logical(b1);
 	int s2 = basic_logical(b2);
 
-	b = make_basic(is_basic_logical,s1>s2?s1:s2);
+	b = make_basic(is_basic_logical,UUINT(s1>s2?s1:s2));
       }
       else
 	b = make_basic(is_basic_overloaded, UU);
@@ -922,7 +925,7 @@ basic_union(expression exp1, expression exp2)
 	int s1 = SizeOfElements(b1);
 	int s2 = SizeOfElements(b2);
 
-	b = make_basic(is_basic_complex, s1>s2?s1:s2);
+	b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
       }
       else
 	b = make_basic(is_basic_overloaded, UU);
@@ -933,13 +936,13 @@ basic_union(expression exp1, expression exp2)
 	int s1 = SizeOfElements(b1);
 	int s2 = SizeOfElements(b2);
 
-	b = make_basic(is_basic_complex, s1>s2?s1:s2);
+	b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
       }
       else if(basic_float_p(b2) || basic_int_p(b2)) {
 	int s1 = SizeOfElements(b1);
 	int s2 = SizeOfElements(b2);
 
-	b = make_basic(is_basic_float, s1>s2?s1:s2);
+	b = make_basic(is_basic_float, UUINT(s1>s2?s1:s2));
       }
       else
 	b = make_basic(is_basic_overloaded, UU);
@@ -950,13 +953,13 @@ basic_union(expression exp1, expression exp2)
 	int s1 = SizeOfElements(b1);
 	int s2 = SizeOfElements(b2);
 
-	b = make_basic(basic_tag(b2), s1>s2?s1:s2);
+	b = make_basic(basic_tag(b2), UUINT(s1>s2?s1:s2));
       }
       else if(basic_int_p(b2)) {
 	int s1 = SizeOfElements(b1);
 	int s2 = SizeOfElements(b2);
 
-	b = make_basic(is_basic_int, s1>s2?s1:s2);
+	b = make_basic(is_basic_int, UUINT(s1>s2?s1:s2));
       }
       else
 	b = make_basic(is_basic_overloaded, UU);
@@ -1064,7 +1067,7 @@ simple_basic_dup(basic b)
     /* so we duplicate them the same manner: with basic_int. */
     if (basic_int_p(b)     || basic_float_p(b) || 
 	basic_logical_p(b) || basic_complex_p(b))
-	return(make_basic(basic_tag(b), basic_int(b)));
+	return(make_basic(basic_tag(b), UUINT(basic_int(b))));
     else if (basic_overloaded_p(b))
 	return(make_basic(is_basic_overloaded, UU));
     else {
@@ -1073,7 +1076,7 @@ simple_basic_dup(basic b)
 	if (basic_string_p(b))
 	    fprintf(stderr, "string: value tag = %d\n", 
 		             value_tag(basic_string(b)));
-	return (make_basic(basic_tag(b), basic_int(b))); 
+	return (make_basic(basic_tag(b), UUINT(basic_int(b)))); 
     }
 }
 
