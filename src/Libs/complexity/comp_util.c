@@ -980,7 +980,7 @@ entity module;
 hash_table hash_complexity_params;
 {
     string module_name = module_local_name(module);
-    list sefs_list;
+    list sefs_list = list_undefined;
 
     pips_assert("add_common_variables_to_hash_table",
 		entity_module_p(module));
@@ -988,6 +988,12 @@ hash_table hash_complexity_params;
     sefs_list = effects_to_list( (effects)
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
 
+    ifdebug(5) {
+	debug(5, "add_common_variables_to_hash_table",
+	      "Effect list for %s\n",
+	      module_name);
+	print_effects(sefs_list);
+    }
 
     MAPL(ce, { 
 	effect obj = EFFECT(CAR(ce));
