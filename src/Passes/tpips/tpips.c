@@ -722,19 +722,13 @@ parse_arguments(int argc, char * argv[])
 	    }
 	    else
 	    {
-		string dir, new_srcpath;
-		saved_srcpath = getenv("PIPS_SRCPATH");
-		saved_srcpath = strdup(saved_srcpath? saved_srcpath: "");
-		tps = find_file_in_directories(argv[optind], saved_srcpath);
-		dir = pips_dirname(tps);
-		new_srcpath = strdup
-		    (concatenate("PIPS_SRCPATH=", saved_srcpath, ":", dir, 0));
-		free(dir), dir = NULL;
-
-		pips_debug(1, "PIPS_SRCPATH=%s\n", new_srcpath);
-
 		/* the tpips dirname is appended to PIPS_SRCPATH */
-		putenv(new_srcpath);
+		string dir;
+		tps = find_file_in_directories(argv[optind], 
+					       getenv("PIPS_SRCPATH"));
+		dir = pips_dirname(tps);
+		saved_srcpath = pips_srcpath_append(dir);
+		free(dir), dir = NULL;
 
 		if ((toprocess = fopen(tps, "r"))==NULL)
 		{
@@ -755,7 +749,7 @@ parse_arguments(int argc, char * argv[])
 		free(tps), tps = NULL;
 	    if (saved_srcpath) 
 	    {
-		putenv(strdup(concatenate("PIPS_SRCPATH=", saved_srcpath, 0)));
+		pips_srcpath_set(saved_srcpath);
 		free(saved_srcpath), saved_srcpath = NULL;
 	    }
 	    
@@ -773,7 +767,7 @@ tpips_main(int argc, char * argv[])
     pips_log_handler = tpips_user_log;
     {
 	string pid = (char*) malloc(sizeof(char)*20);
-	sprintf(pid, "PID=%d", getpid());
+	sprintf(pid, "PID=%d", (int) getpid());
 	pips_assert("not too long", strlen(pid)<20);
 	putenv(pid);
     }
