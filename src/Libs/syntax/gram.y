@@ -56,6 +56,10 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.63  2002/06/21 13:48:42  irigoin
+  * Complexification of DATA handling. The repeat function is no longer
+  * systematically called when the repeat factor is 1.
+  *
   * Revision 1.62  2002/06/20 15:49:59  irigoin
   * New handling of DATA, replacement of datavar and dataval by
   * expression. Complex constants are now lost as in regular expressions.
@@ -221,7 +225,7 @@ static dataval MakeDataVal(expression n, expression c)
 }
 
 static expression MakeDataValueSet(expression n, expression c)
-{
+  {
     expression repeat_factor = expression_undefined;
     expression value_set = expression_undefined;
     entity repeat_value = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
@@ -232,16 +236,21 @@ static expression MakeDataValueSet(expression n, expression c)
 
     vc = EvalExpression(c);
     if (! value_constant_p(vc)) {
-	ParserError("MakeDataValueSet", "data value must be a constant\n");
+      ParserError("MakeDataValueSet", "data value must be a constant\n");
     }
 
-    repeat_factor = (n == expression_undefined) ? int_to_expression(1) : n;
-    value_set = make_call_expression(repeat_value,
-				     CONS(EXPRESSION, repeat_factor,
-					  CONS(EXPRESSION, c, NIL)));
+    if(expression_undefined_p(n)) {
+      value_set = c;
+    }
+    else {
+      repeat_factor = (n == expression_undefined) ? int_to_expression(1) : n;
+      value_set = make_call_expression(repeat_value,
+				       CONS(EXPRESSION, repeat_factor,
+					    CONS(EXPRESSION, c, NIL)));
+    }
 
     return value_set;
-}
+  }
 
 
 
