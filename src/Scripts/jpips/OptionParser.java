@@ -1,17 +1,15 @@
-
-/** $Id$
-  * $Log: OptionParser.java,v $
-  * Revision 1.1  1998/06/30 17:35:33  coelho
-  * Initial revision
-  *
-  * Revision 1.1  1998/05/27 06:46:17  didry
-  * Initial revision
-  *
-  */
-
+/*
+ * $Id$
+ *
+ * $Log: OptionParser.java,v $
+ * Revision 1.2  1998/07/01 07:08:01  coelho
+ * cleaner.
+ *
+ * Revision 1.1  1998/06/30 17:35:33  coelho
+ * Initial revision
+ */
 
 package JPips;
-
 
 import java.lang.*;
 import java.util.*;
@@ -19,18 +17,17 @@ import java.io.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.awt.swing.*;
-import JPips.Pawt.*;
 
+import JPips.Pawt.*;
 
 /** A parser manager that uses a Parser object.
   * It creates a menu and a panel from a part of a text file.
+  *
   * @see Parser
   * @author Francois Didry
   */
 public class OptionParser
 {
-
-
   public TPips		tpips;		//tpips instance
 
   public String		title;		//title of the menu
@@ -734,6 +731,4 @@ public class OptionParser
 	 };
       return a;
     }
-
-
 }
