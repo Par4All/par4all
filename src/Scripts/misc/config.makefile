@@ -10,7 +10,8 @@ SCRIPTS = 	check_os \
 		trunc \
 		unjustify
 
-FILES =		trunc.awk
+FILES =		trunc.awk \
+		extract-doc.awk
 
 # that is all
 #
