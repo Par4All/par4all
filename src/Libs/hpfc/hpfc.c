@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/04/02 14:35:41 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/06/06 18:26:19 $, )
  * version $Revision$
  */
  
@@ -12,6 +12,9 @@
 #include "resources.h"
 #include "pipsdbm.h"
 #include "control.h"
+
+/*************************************************************** REDUCTIONS */
+GENERIC_GLOBAL_FUNCTION(hpf_reductions, statement_entities)
 
 /****************************************************************** COMMONS */
 
@@ -142,6 +145,7 @@ static void init_hpfc_status()
     init_the_pures();
     init_the_ios();
     init_computed_remaps();
+    init_hpf_reductions();
 
     chs = make_hpfc_status(get_overlap_status(),
 			   get_data_status(),
@@ -151,7 +155,8 @@ static void init_hpfc_status()
 			   get_dynamic_status(),
 			   get_the_pures(),
 			   get_the_ios(),
-			   get_computed_remaps());    
+			   get_computed_remaps(),
+			   get_hpf_reductions());
 }
 
 static void reset_hpfc_status()
@@ -165,6 +170,7 @@ static void reset_hpfc_status()
     reset_the_pures();
     reset_the_ios();
     reset_computed_remaps();
+    reset_hpf_reductions();
 
     chs = (hpfc_status) NULL;
 }
@@ -182,6 +188,7 @@ static void save_hpfc_status() /* GET them */
     hpfc_status_pures(chs) = get_the_pures();
     hpfc_status_ios(chs) = get_the_ios();
     hpfc_status_computed(chs) = get_computed_remaps();
+    hpfc_status_reductions(chs) = get_hpf_reductions();
 
     DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, "", chs);
 
@@ -201,6 +208,7 @@ static void load_hpfc_status() /* SET them */
     set_the_pures(hpfc_status_pures(chs));
     set_the_ios(hpfc_status_ios(chs));
     set_computed_remaps(hpfc_status_computed(chs));
+    set_hpf_reductions(hpfc_status_reductions(chs));
 }
 
 /* never called... memory to be freed by pipsdbm...
@@ -218,6 +226,7 @@ static void close_hpfc_status()
     close_the_pures();
     close_the_ios();
     close_computed_remaps();
+    close_hpf_reductions();
 }
 
 /************************************************************** COMPILATION */
