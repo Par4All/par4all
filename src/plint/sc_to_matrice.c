@@ -84,19 +84,19 @@ int nbl;
     Pbase b;
     Pbase b1;
     int i,j;
-    int den = 1;
+    Value den;
 
     for(i = 1; i <= nbl; i++)
 	creat_new_var(ps);
 
-    if((den = MATRIX_DENOMINATOR(B)) != 0) {
+    if(value_notzero_p(den = MATRIX_DENOMINATOR(B))) {
 	for (i=1, b = ps->base;i<=m && !VECTEUR_NUL_P(b); i++, b = b->succ) {
 	    cp = contrainte_new();
 	    pv = vect_new(vecteur_var(b),den);
 
 	    for (j=1, b1 = b; j<=nbl && !VECTEUR_NUL_P(b1); j++, b1=b1->succ)
 		vect_chg_coeff(&pv, vecteur_var(b1), 
-			       -1 * MATRIX_ELEM(B,i,j+1));
+			       value_uminus(MATRIX_ELEM(B,i,j+1)));
 
 	    vect_chg_coeff(&pv,TCST,MATRIX_ELEM(B,i,1));
 	    cp->vecteur = pv;
@@ -149,7 +149,7 @@ Pbase b;
 
     matrix_nulle(a);
 
-    for(ligne=0;!CONTRAINTE_NULLE_P(leg); leg->succ, ligne++) {
+    for(ligne=0;!CONTRAINTE_NULLE_P(leg); leg=leg->succ, ligne++) {
 	assert(ligne<n);
 	for(v = contrainte_vecteur(leg); !VECTEUR_UNDEFINED_P(v); 
 	    v = v->succ) 
