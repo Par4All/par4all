@@ -35,7 +35,7 @@
 /* Ansi includes 	*/
 #include <stdio.h>
 #include <string.h>
-#include <varargs.h>
+/* #include <varargs.h> */ /* (not ANSI but SUN:-) */
 
 /* Newgen includes 	*/
 #include "genC.h"
