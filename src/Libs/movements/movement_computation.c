@@ -40,8 +40,11 @@
  */
 
 
-Pbase build_image_base(boolean bank_code,Pbase proc_id,Pbase bank_indices,
-Pbase tile_indices)
+Pbase build_image_base(
+    boolean bank_code,
+    Pbase proc_id,
+    Pbase bank_indices,
+    Pbase tile_indices)
 {
     Pvecteur pb,ti;
     Pbase invt = base_reversal(tile_indices);
@@ -53,18 +56,18 @@ Pbase tile_indices)
     ti = (COLUMN_MAJOR) ? dupt:invt ;
     
     if (bank_code)
-	pb = vect_new(vecteur_var(bank_indices->succ->succ),1); 
+	pb = vect_new(vecteur_var(bank_indices->succ->succ),VALUE_ONE); 
     else 
-	pb = vect_new(ti->var,1);
-    vect_add_elem(&pb,vecteur_var(bank_indices->succ),1);
+	pb = vect_new(ti->var,VALUE_ONE);
+    vect_add_elem(&pb,vecteur_var(bank_indices->succ),VALUE_ONE);
     
     if (!VECTEUR_NUL_P(ti->succ))
-	vect_add_elem(&pb,vecteur_var(ti->succ),1);
+	vect_add_elem(&pb,vecteur_var(ti->succ),VALUE_ONE);
     
     if (bank_code) 
-	vect_add_elem(&pb,vecteur_var(proc_id),1);
+	vect_add_elem(&pb,vecteur_var(proc_id),VALUE_ONE);
     else 
-	vect_add_elem(&pb,vecteur_var(bank_indices),1);
+	vect_add_elem(&pb,vecteur_var(bank_indices),VALUE_ONE);
     
     vect_rm(dupt);
     vect_rm(invt);
@@ -132,17 +135,17 @@ Pbase ppid;
 	print_fullname_base(*loop_body_indices); }
 
     for (pv = bank_indices; !VECTEUR_NUL_P(pv); pv = pv->succ)
-	vect_chg_coeff(const_base,pv->var,0);
+	vect_chg_coeff(const_base,pv->var, VALUE_ZERO);
 
-    vect_chg_coeff(const_base,ppid->var,0);
+    vect_chg_coeff(const_base,ppid->var, VALUE_ZERO);
 
     if (bank_code) 
-	vect_chg_coeff(const_base,vecteur_var(bank_indices),1);
+	vect_chg_coeff(const_base,vecteur_var(bank_indices), VALUE_ONE);
     else 
-	vect_chg_coeff(const_base,vecteur_var(ppid),1);
+	vect_chg_coeff(const_base,vecteur_var(ppid), VALUE_ONE);
 
     for (pv = tile_indices; !VECTEUR_NUL_P(pv); pv = pv->succ)
-	vect_chg_coeff(const_base,pv->var,0);
+	vect_chg_coeff(const_base,pv->var, VALUE_ZERO);
 
     for (pv = *loop_body_indices;  !VECTEUR_NUL_P(pv); pv = pv->succ)
 	vect_erase_var(const_base,pv->var);
@@ -268,8 +271,8 @@ code  ce;
     MAPL(p,{
 	entity e = ENTITY(CAR(p));
 	if (BASE_UNDEFINED_P(b))
-	    b = vect_new((Variable) e,1);
-	else vect_add_elem(&b,(Variable) e,1);
+	    b = vect_new((Variable) e, VALUE_ONE);
+	else vect_add_elem(&b,(Variable) e, VALUE_ONE);
     }, code_declarations(ce));
 
     return(b);
@@ -284,7 +287,10 @@ code  ce;
  */
 
 
-statement movement_computation(module,used_def,bank_code,receive_code,private_entity,sc_image,const_base,bank_indices,tile_indices,ppid,loop_body_indices,n,dim_h)
+statement movement_computation(
+    module,used_def,bank_code,receive_code,private_entity,
+    sc_image,const_base,bank_indices,tile_indices,ppid,loop_body_indices,
+    n,dim_h)
 entity module;
 boolean used_def;
 boolean bank_code;         /* is TRUE if it is the generation of code for bank
@@ -505,7 +511,7 @@ int dim_h;
     }
 	  
     var_id = (bank_code) ? vect_dup(ppid) : 
-    vect_new(vecteur_var(bank_indices),1);
+    vect_new(vecteur_var(bank_indices), VALUE_ONE);
     stat = bound_generation(module,bank_code,receive_code,
 			    private_entity,
 			    loop_body_offsets,var_id,
@@ -561,10 +567,11 @@ int *n,*dim_h;
     Pvecteur pvi=VECTEUR_NUL;
 	   
     Pbase pbv, list_new_var=BASE_NULLE;
-    int	*A,*B,*F0,*P,*HERM,*HERF,*R;
-    int *F = 0;
-    int *Q = NULL;
-    int n1,mb,det_p, det_q,i;
+    matrice A,B,F0,P,HERM,HERF,R;
+    matrice F = 0;
+    matrice Q = NULL;
+    int n1,mb,i;
+    Value det_p, det_q;
     int n2 = 0;
     int ma =0;
     Variable new_var;
@@ -610,7 +617,7 @@ int *n,*dim_h;
 	for (pv1 = *const_base, mb=1; 
 	     !VECTEUR_NUL_P(pv1);
 	     mb ++, pv1 = pv1->succ);
-
+	
 	sc_image = sc_new();
 	n1 = sc_domain2->nb_ineq;
 	n2 = sc_array_function->nb_ineq;
@@ -668,10 +675,10 @@ int *n,*dim_h;
 	for (i = 1; i<= ma;i++) { 
 	    new_var = sc_add_new_variable_name(module,sc_image); 
 	    if (i==1) {
-		new_index_base= vect_new(new_var,1);
+		new_index_base= vect_new(new_var,VALUE_ONE);
 		pvi = new_index_base;
 	    }
-	    else { pvi->succ = vect_new(new_var,1);
+	    else { pvi->succ = vect_new(new_var,VALUE_ONE);
 		   pvi=pvi->succ;
 	       }
 	}
@@ -682,9 +689,13 @@ int *n,*dim_h;
 	     i<= ma && !CONTRAINTE_UNDEFINED_P(pc) && !VECTEUR_NUL_P(pbv);
 	     i++,pc =pc->succ,pbv=pbv->succ) { 
 	    if (vect_size(pc->vecteur) == 1 && pc->vecteur->var == TCST) {
-		pvnew = vect_make(NULL,pbv->var,1,TCST,-pc->vecteur->val);
+		pvnew = vect_make(NULL,
+				  pbv->var,VALUE_ONE,
+				  TCST,value_uminus(pc->vecteur->val));
 		sc_add_inegalite(sc_image,contrainte_make(pvnew));
-		pvnew = vect_make(NULL,pbv->var,-1,TCST,pc->vecteur->val);
+		pvnew = vect_make(NULL,
+				  pbv->var,VALUE_MONE,
+				  TCST,pc->vecteur->val);
 		sc_add_inegalite(sc_image,contrainte_make(pvnew));
 	    }
 	}
