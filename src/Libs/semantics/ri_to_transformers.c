@@ -864,6 +864,11 @@ user_call_to_transformer(
     gen_free_list(transformer_arguments(t_caller));
     */
     transformer_arguments(t_caller) = all_args;
+    /* The relation basis must be updated too */
+    MAP(ENTITY, v, {
+	Psysteme sc = (Psysteme) predicate_system(transformer_relation(t_caller));
+	sc_base_add_variable(sc, (Variable) v);
+    }, transformer_arguments(t_effects));
     
 
     ifdebug(8) {
@@ -873,6 +878,7 @@ user_call_to_transformer(
 	dump_transformer(t_caller);
     }
 
+    pips_assert("transformer t_caller is consistent", transformer_consistency_p(t_caller));
     return t_caller;
 }
 
