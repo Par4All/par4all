@@ -1717,6 +1717,12 @@ Summary Data Flow Information.
         code instead of the code to avoid display troubles introduced by
         the controlizer; FI, 3 February 1994
 
+      \item in {\tt statement\_to\_transformer}, the transformer is not
+        copied before being stored in the statement mapping and is then
+        returned to the caller. {\tt loop\_to\_transformer} modifies it by
+        side effect. The transformer and the preconditions computed with it
+        where wrong in some cases (see {\tt
+        Validation/Semantics/li92\_1.f}. BC, oct. 94.
 \end{enumerate}
 
 \subsection{Wishes:}
