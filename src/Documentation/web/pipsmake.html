@@ -71,6 +71,7 @@ parser                 &gt MODULE.parsed_code
     &lt MODULE.source_file
 
 hpfc_close             &gt PROGRAM.hpfc_commons
+    ! SELECT.hpfc_parser
     ! ALL.hpfc_directives
     # PROGRAM.entities
     # PROGRAM.hpfc_status
@@ -89,7 +90,8 @@ compiler. It will create the resource <tt>hpfc_commons</tt> for the
 program. It requires the resource <tt>hpfc_host</tt> of the main
 function and it will destroy the resources <tt>entities</tt> and
 <tt>hpfc_status</tt>. Morover it will first run the transformation
-called <tt>hpfc_directives</tt>.
+called <tt>hpfc_directives</tt>. Also it requires the code to be parsed
+by <tt>hpfc_parser</tt> instead of the usual parser.
 
 </P>
 
@@ -105,7 +107,6 @@ hpfc_filter            &gt MODULE.source_file
 
 hpfc_directives        &gt MODULE.code
                        &gt PROGRAM.hpfc_status
-    ! MODULE.hpfc_filter
     &lt PROGRAM.entities
     &lt PROGRAM.hpfc_status
     &lt MODULE.code
@@ -121,8 +122,7 @@ it will update the source file of the desired module.
 
 The last example - used by the rule <tt>hpfc_close</tt> - is a
 transformation updating the <tt>code</tt> and the
-<tt>hpfc_status</tt>. It will need the entities and will first run the
-- previously defined - transformation <tt>hpfc_filter </tt>.
+<tt>hpfc_status</tt>.
 
 </P>
 
@@ -206,13 +206,14 @@ runtime. For a given module name, resources <b>owner</b> may be:
 <br>
 
 <UL>
-	<LI><b>PROGRAM</b>: the complete program (i.e. all modules in the source files)
-	<LI><b>MODULE</b>: the module itself
-	<LI><b>MAIN</b>: the main module (if any)
-	<LI><b>ALL</b>: all the modules
-	<LI><b>CALLERS</b>: the set of calling modules (of the current
-one)
-	<LI><b>CALLEES</b>: the set of called modules (by the current one)
+<LI><b>PROGRAM</b>: the complete program (i.e. all modules in the source files)
+<LI><b>MODULE</b>: the module itself
+<LI><b>MAIN</b>: the main module (if any)
+<LI><b>ALL</b>: all the modules
+<LI><b>CALLERS</b>: the set of calling modules (of the current one)
+<LI><b>CALLEES</b>: the set of called modules (by the current one)
+<LI><b>SELECT</b>: allows to force a selection, if several rules may produce
+  a same resource. does only make sense with the bang syntax.
 </UL>
 
 A resource is referenced by both its - lowercase- <b>name</b> and its -
