@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.81  1997/12/11 16:10:45  coelho
+ * help about default rule.
+ *
  * Revision 1.80  1997/12/05 16:50:31  coelho
  * checkpoint added.
  *
@@ -337,7 +340,7 @@ tpips_help(string line)
 	 " description of one\n");
     TP_HELP("shell", "shell   [<shell-function>]\n",
 	 "\tallow shell functions call\n");
-    TP_HELP("owner", "* owner : variable*\n",
+    TP_HELP("owner", "- owner : variable*\n",
 	 "\tList of available owners:\n"
 	 "\t\t$MODULE\n"
 	 "\t\t$ALL\n"
@@ -345,6 +348,8 @@ tpips_help(string line)
 	 "\t\t$CALLEES\n"
 	 "\t\t$CALLERS\n"
 	 "\t\t<module_name>\n");
+    TP_HELP("*", "* default rule...\n",
+	    "\tan implicit \"shell\" is assumed.\n");
 
     if (!*line || PREFIX_EQUAL_P(line,"rulename") ||
 	PREFIX_EQUAL_P(line,"rule")) {
@@ -420,7 +425,8 @@ tpips_help(string line)
     fflush(stdout);
 }
 
-void tpips_close(void)
+void 
+tpips_close(void)
 {
     /*   close history: truncate list and write history file
      */
