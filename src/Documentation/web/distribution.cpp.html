@@ -4,37 +4,41 @@
 
 <h1>PIPS Distribution</h1>
 
-The PIPS software is distributed both in an executable form (for SUNOS4 and
-for SOLARIS2) and at the source level. Note that the source code level is
-fragile and big (200,000 lines of C code) and its compilation requires
-many tools to be installed, thus we recommand that you rather download 
-the compiled version if you do not plan to use pips as a base for
-developing new analyses or transformations phases within the compiler.
+The PIPS software is distributed both in an executable form (for SUNOS4
+and for SOLARIS2) and source code. Note that the source code is not
+bullet-proof and is large (200,000 lines of C code). Its compilation
+requires many public-domain tools to be installed, thus we recommend that
+you download the compiled version if you do not plan to use <a
+href=http://www.cri.ensmp.fr/pips>PIPS</a> as a base for developing new
+analyses or transformations phases. <p>
 
-When installing PIPS on your system, please read the INSTALL file at the
-root directory of the distribution for further instructions on how to run
-or compile pips. For help mail to <code>pipsgroup@cri.ensmp.fr</code>.
+When installing PIPS on your system, please read the README and INSTALL
+files at the root directory of the distribution for further instructions
+on how to run or compile PIPS. For help mail to
+<code>pipsgroup@cri.ensmp.fr</code>.
 
 <h2>PIPS executables</h2>
 
-PIPS executables are available for SUN workstations, whether under SunOS
+PIPS executables are available for SUN workstations, under SunOS
 or Solaris.
 
 <ul>
 <li> <a href=distribution/pips_CBGNUpnle_961022.tar.gz>PIPS for SunOS4</a>
-<li> <a href=distribution/pips_CBGNUSOL2LLpnle_961022.tar.gz>PIPS for SOLARIS2 (Ultra Sparc 64 bit integers version)</a>
+<li>
+ <a href=distribution/pips_CBGNUSOL2LLpnle_961022.tar.gz>PIPS for SOLARIS2</a>
+     (Ultra Sparc <code>long long</code> integers version)
 </ul>
 
 <h2>PIPS and tools at the source level</h2>
 
-PIPS and tools PIPS is built upon are available at the source level.
-Note that the code is distributed as is with no warranty, even implicit,
-of any kind. It is distributed under the term of the GNU general license
-that you may find quite easily on the net.
+PIPS and public domain tools PIPS is built upon are available at the
+source level.  Note that the code is distributed as is with no warranty,
+even implicit, of any kind. It is distributed under the term of the GNU
+general license that you may find quite easily on the net. <p>
 
-GNU make, cproto, flex, bison and some other tools are mandatory for
-compiling PIPS. See the next section for pointers on how to find and
-download these tools. 
+GNU make, cproto, flex, bison and some other tools are required to
+PIPS. See the next section for pointers on how to find and download these
+tools which are not included in the basic distribution.
 
 <ul> 
 <li><a href=distribution/pips_CSpnle_961022.tar.gz>PIPS sources</a>
@@ -42,21 +46,21 @@ download these tools.
 <li><a href=distribution/pips_CSn_961022.tar.gz>NEWGEN</a>
 	(software engineering tool)
 <li><a href=distribution/pips_CSl_961022.tar.gz>LINEAR C3 library</a> 
-	(integer linear programming)
+	(integer linear programming modules)
 <li><a href=distribution/pips_DDDp_961022.tar.gz>XPOMP</a>
 	 (X-based 2D data graphical display)
 </ul>
 
 <h2>Other softwares of interest</h2>
 
-Here are pointers to some external softwares that are used by PIPS or by
-PIPS generated codes or for building the PIPS softwares. These sofwares
-are generaly freely distributed. 
+Here are pointers to some external software that is used by PIPS or by
+PIPS generated codes or for building the PIPS software. This sofware
+is generally freely distributed. 
 <ul>
 <li> <a href=http://www.netlib.org/pvm3>PVM 3.3</a>: for the runtime of 
      <a href=http://www.cri.ensmp.fr/pips/hpfc.html>HPFC</a> and
      <a href=http://www.cri.ensmp.fr/pips/wp65.html>WP65</a>.
-<li> <a href=ftp://prep.ai.mit.edu/pub/gnu>GNU softwares</a>
+<li> <a href=ftp://prep.ai.mit.edu/pub/gnu>GNU software</a>
      (gmake gm4 gtar gzip gcc emacs readline malloc gsed).
 <li> <a href=http://www.informatik.uni-bremen.de/~inform/forschung/daVinci>
   Da Vinci</a> graph displayer.
@@ -66,9 +70,9 @@ are generaly freely distributed.
    (conversion of man pages to html).
 <li> <a href=distribution/Public/fsplit.tar.gz>Fortran Split</a>
    (split a Fortran file into one file per function).
-<li> LaTeX2Html might also be help.
+<li> LaTeX2Html is also be helpful.
 <li> <a href=ftp://ftp.germany.eu.net/pub/utils/toolpack>Toolpack</a>
-     (kit of Fortran to Fortran transformations structurations and so,
+     (kit of Fortran to Fortran transformations structurations and so on,
       written in Fortran). 
 </ul>
 
