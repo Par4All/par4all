@@ -210,7 +210,7 @@ statement st ;
 hash_table used_labels;
 {
     if( get_debug_level() >= 5 ) {
-	fprintf( "Statement %d: \n ", statement_number( st )) ;
+	fprintf(stderr, "Statement %d: \n ", statement_number( st )) ;
 	print_text(stderr, text_statement(entity_undefined,0, st)) ;
     }
     HASH_MAP(name, sts, {
