@@ -34,7 +34,6 @@
  *
  * FC, Feb 21, 1994
  */
-#include "mapping.h"
 
 /*  special characters
  */
