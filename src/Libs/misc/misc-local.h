@@ -72,9 +72,6 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
 
-/* Constant used to dimension arrays in wpips and pipsmake */
-#define ARGS_LENGTH 512
-
 /* MAXPATHLEN is defined in <sys/param.h> for SunOS... but not for all OS! */
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
