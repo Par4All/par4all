@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: developer_guide.tex,v $
+%% Revision 1.11  2001/05/28 08:39:49  nguyen
+%% yes
+%%
 %% Revision 1.10  2000/12/20 15:43:01  coelho
 %% pipsdbm updated when dealing with new resources.
 %%
@@ -37,7 +40,7 @@
 \end{tabular}
 }
 
-\date{August 1996 - December 2000}
+\date{August 1996 - May 2001}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -813,9 +816,10 @@ Here are now the steps to install a new library named {\tt mylib}:
 \begin{itemize}
 
 \item Create a new directory {\tt mylib} in {\tt \$PIPS\_DEVEDIR/Lib} with
-  the fiels {\tt mylib.c} (where the code for the C {\tt mylib()}, which
-  corresponds to the phase to add, generally is) and  {\tt
-    main.c} (with the empty function {\tt main()}).
+  the files {\tt mylib.c} (where the code for the C {\tt boolean
+    mylib(string name)}, which
+  corresponds to the phase to add, generally is).
+%% and  {\tt main.c} (with the empty function {\tt main()}).
   
 \item In the directoty {\tt \$PIPS\_DEVEDIR/Lib/mylib}:
   
@@ -827,10 +831,10 @@ Here are now the steps to install a new library named {\tt mylib}:
   \item Run the command {\tt pips-makemake} (option -l) to automatically 
     build the local {\tt Makefile} file.
     
-  \item Then run the commands {\tt make libmylib.a} and {\tt make install}, to
+  \item Then run the commands \texttt{make} and {\tt make install}, to
     install the library in the {\bf \tt Production} hierarchy.  The file {\tt
       mylib.h} is installed in \verb|$PIPS_ROOT/Include|, %% $
-    and {\tt mylib.a} in \verb|$PIPS_ROOT/Lib/$PIPS_ARCH|. The library
+    and {\tt libmylib.a} in \verb|$PIPS_ROOT/Lib/$PIPS_ARCH|. The library
     functions are now accessible by the other libraries and passes.
     
     Notice that the local {\tt Makefile} uses the command {\tt cproto} 
@@ -903,6 +907,10 @@ myphase > MODULE.res2
 
   Execute the command \texttt{make recompile} to recompile and install
   updated versions of {\tt pips}, {\tt tpips} and {\tt wpips}.
+  
+\item In the directory {\tt \$PIPS\_ROOT/Src/Libs/pipsmake}:
+
+Execute the command \texttt{make recompile} to recompile the pipsmake library.
   
 \end{itemize}
 
