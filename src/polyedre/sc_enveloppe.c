@@ -53,7 +53,8 @@ int ofl_ctrl;
     case OFL_CTRL :
 	ofl_ctrl = FWD_OFL_CTRL;
 	catch_performed = TRUE;
-	CATCH(overflow_error) {
+	CATCH(overflow_error|timeout_error) {
+	  //CATCH(overflow_error) {
 	    /* 
 	     *   PLEASE do not remove this warning.
 	     *
@@ -90,7 +91,7 @@ int ofl_ctrl;
 		    /* printf("systeme final \n"); sc_dump(s);  */
 		}
 	    if (catch_performed)
-		UNCATCH(overflow_error);
+		UNCATCH(overflow_error|timeout_error);
 	}
     }
     /* mem_spy_end("sc_enveloppe_chernikova_ofl_ctrl"); */
