@@ -464,7 +464,7 @@ void init_cost_table()
     char *token, *comma, *file = malloc(80);
     float file_factor;
 
-    char *cost_dir = strdup(getenv("PIPS_COSTDIR"));
+    char *cost_dir = getenv("PIPS_COSTDIR");
     char *cost_table = strdup(get_string_property("COMPLEXITY_COST_TABLE"));
     char *cost_data = strdup(COST_DATA);
     char *tmp=malloc(20);
@@ -472,6 +472,8 @@ void init_cost_table()
     if (!cost_dir) /* the default value: PIPS_ROOT/Share/complexity */
 	cost_dir = strdup(concatenate(getenv("PIPS_ROOT"),
 				      "/Share/complexity", NULL));
+    else
+	cost_dir = strdup(cost_dir);
 
     pips_assert("some directory and table", cost_dir && cost_table);
     token = strtok(cost_data, sep_chars);
