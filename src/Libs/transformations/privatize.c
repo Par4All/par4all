@@ -166,28 +166,52 @@ static void update_locals(list prefix, list ls, entity e)
 static bool expression_implied_do_index_p(expression exp,entity e)
 {
   bool li=FALSE;
+  bool dep=FALSE;
   if (expression_implied_do_p(exp))
     {
       list args = call_arguments(syntax_call(expression_syntax(exp)));
       expression arg1 = EXPRESSION(CAR(args)); /* loop index */
+      expression arg2 = EXPRESSION(CAR(CDR(args))); /* loop range */
       entity index = reference_variable(syntax_reference(expression_syntax(arg1)));
+      range r = syntax_range(expression_syntax(arg2));
+      list range_effects;
 
       debug(5,"expression_implied_do_index_p","begin\n");
       debug(7,"expression_implied_do_index_p",
 	    "%s implied do index ? index: %s\n",
 		entity_name(e),entity_name(index));
 
-  if (same_entity_p(e,index)) li=TRUE;
-  else 
-    MAP(EXPRESSION,expr,{
-      syntax s = expression_syntax(expr);
-      if(syntax_call_p(s))
+      range_effects = proper_effects_of_range(r, is_action_read);
+
+      MAP(EFFECT, eff, 
+	  {
+printf("variable d'effet : %s\n",entity_name(reference_variable(effect_reference(eff))));
+	    if (reference_variable(effect_reference(eff)) == e &&
+		action_read_p(effect_action(eff))) 
+	      {
+			
+		debug(7, "expression_implied_do_index_p", 
+			      "index read in range expressions\n");
+		dep=TRUE;
+			
+	      }
+	   }, range_effects);
+      free_effects(make_effects(range_effects));
+  
+      if (!dep)
 	{
-	  debug(5,"expression_implied_do_index_p","Nested implied do\n");
-	  if (expression_implied_do_index_p(expr,e))
-	    li=TRUE;
+	  if (same_entity_p(e,index)) li=TRUE;
+	  else 
+	    MAP(EXPRESSION,expr,{
+	      syntax s = expression_syntax(expr);
+	      if(syntax_call_p(s))
+		{
+		  debug(5,"expression_implied_do_index_p","Nested implied do\n");
+		  if (expression_implied_do_index_p(expr,e))
+		    li=TRUE;
+		}
+	    },CDR(CDR(args)));
 	}
-    },CDR(CDR(args)));
   debug(5,"expression_implied_do_index_p","end\n");
 }
   return li;
@@ -201,7 +225,7 @@ bool is_implied_do_index(entity e, instruction ins)
 {
   bool li = FALSE;
   debug(5,"is_implied_do_index","entity name: %s\n", entity_name( e )) ;
-  if(instruction_call_p(ins))
+  if (instruction_call_p(ins))
     MAP(EXPRESSION,exp,{
       if (expression_implied_do_index_p(exp,e)) li=TRUE;
     },call_arguments( instruction_call( ins ) ));
@@ -233,7 +257,7 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 	    (dg_arc_label)successor_arc_label( succ ) ;
 	statement succ_st = 
 	    ordering_to_statement(dg_vertex_label_statement(succ_l));
-	instruction succ_i = statement_instruction( st ) ;
+	instruction succ_i = statement_instruction( succ_st ) ;
 	cons *succ_ls = load_statement_enclosing_loops( succ_st ) ;
 		  
 	if( v == succ_v ) {
@@ -248,15 +272,17 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 	    if(!entity_conflict_p( e, effect_entity( sc )) ||
 	       !entity_conflict_p( e, effect_entity( sk )) ||
 	       action_write_p( effect_action( sk))) {
+	        debug(5,"try_privatize","pas bonne var\n");
 		continue ;
 	    }
 	    /* PC dependance and the sink is a loop index */
 	    if(action_read_p( effect_action( sk )) &&
-	       (instruction_loop_p( succ_i ) || 
-		 is_implied_do_index(e,succ_i ))) {
+	       (instruction_loop_p( succ_i) ||
+	       is_implied_do_index( e, succ_i))) {
+	        debug(5,"try_privatize","compteur de boucle %d\n",statement_number(succ_st));
 		continue ;
 	    }
-
+	    debug(5,"try_privatize","update...\n");
 	    prefix = loop_prefix( ls, succ_ls ) ;
 	    update_locals( prefix, ls, e ) ;
 	    update_locals( prefix, succ_ls, e ) ;
