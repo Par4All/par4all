@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1997/04/15 17:27:32 $, 
+ * $Date: 1997/04/16 11:45:05 $, 
  *
  * utilities for reductions.
  *
@@ -514,7 +514,7 @@ no_other_effects_on_references(
     entity var;
     if (ENDP(lr)) return TRUE;
 
-    le = load_statement_proper_references(s);
+    le = effects_effects(load_proper_references(s));
     var = reference_variable(REFERENCE(CAR(lr)));
 
     MAP(EFFECT, e,
