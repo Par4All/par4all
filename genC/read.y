@@ -23,10 +23,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "newgen_include.h"
+
 #include "genC.h"
+#include "newgen_include.h"
+
+extern int gen_find_free_tabulated(struct gen_binding *);
 
 #define YYERROR_VERBOSE 1 /* better error messages by bison */
+
+extern int yyinput(void);
+extern void yyerror(char*);
 
 extern FILE * yyin;
 
@@ -54,7 +60,7 @@ static int shared_number ;
    value is negative, then it came from a REF (by READ_TABULATED) and
    no error is reported. */
 
-hash_table Gen_tabulated_names = (hash_table)NULL ;
+extern hash_table Gen_tabulated_names;
 
 /* Management of forward references in read */
 
@@ -306,7 +312,7 @@ String  : READ_STRING {
 
 /* YYERROR manages a syntax error while reading an object. */
 
-yyerror( s )
+void yyerror( s )
 char *s ;
 {
   int c;
@@ -375,28 +381,22 @@ char *id ;
 gen_chunk *chunkp ;
 int allow_ref ;
 {
-    static char local[ 1024 ] ;
     gen_chunk *hash ;
-    
-    sprintf( local, "%d%c%s", domain, HASH_SEPAR, id ) ;
 
     if( Gen_tabulated_[ index ] == (gen_chunk *)NULL ) {
 	fatal( "enter_tabulated_def: Uninitialized %s\n", 
 	       Domains[ domain ].name ) ;
     }
-    if( Gen_tabulated_names == NULL ) {
-	fatal( "enter_tabulated_def: Gen_tabulated_names on %s\n", 
-	       Domains[ domain ].name ) ;
-    }
-    if((hash=(gen_chunk *)hash_get( Gen_tabulated_names, local )) != 
-       (gen_chunk *)HASH_UNDEFINED_VALUE ) {
+    
+    if ((hash=(gen_chunk *) gen_get_tabulated_name_basic(domain, id)) !=
+	(gen_chunk *)HASH_UNDEFINED_VALUE ) {
 	
 	/* redefinitions of tabulated should not be allowed...
 	 * but you cannot be user it is a redefinition if allow_ref
 	 */
-      if(!allow_ref)
-	(void) fprintf(stderr, "[make_%s] warning: %s redefined\n", 
-		       Domains[domain].name, id);
+	if(!allow_ref)
+	    (void) fprintf(stderr, "[make_%s] warning: %s redefined\n", 
+			   Domains[domain].name, id);
 
 	/* actually very obscure there... seems that negative domain
 	 * numbers are used to encode something... already used/seen ???
@@ -408,7 +408,7 @@ int allow_ref ;
 	    hash->i = -hash->i ;
 
 	    if( (gp=(Gen_tabulated_[ index ]+hash->i)->p) == NULL ) {
-		fatal( "make_def: Null for %s\n", local ) ;
+		fatal( "make_def: Null for %d%c%s\n", domain, HASH_SEPAR, id);
 	    }
 	    for( cp=chunkp, i=0 ; i<size ; i++ ) {
 		*gp++ = *cp++ ;
@@ -418,18 +418,15 @@ int allow_ref ;
 	} 
 	else {
 	    if (hash_warn_on_redefinition_p()) {
-		user("Tabulated entry %s already defined: updating\n",
-		     local );
+		user("Tabulated entry %d%c%s already defined: updating\n",
+		     domain, HASH_SEPAR, id);
 	    }
 	}
     }
     else {
-	char *new_key = alloc( strlen( local )+1 ) ;
-
-	strcpy( new_key, local ) ;
 	hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
 	hash->i = find_free_tabulated( &Domains[ domain ] ) ;
-	hash_put( Gen_tabulated_names, new_key, (char *)hash ) ;
+	gen_put_tabulated_name(domain, id, (char *)hash);
     }
     (Gen_tabulated_[ index ]+hash->i)->p = chunkp ;
     (chunkp+1)->i = hash->i ;
