@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1995/03/24 16:47:51 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1995/04/14 09:00:03 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -47,7 +47,7 @@ typedef cons *list ;
 #define MAX_NESTED_CONS 10
 
 extern cons *Gen_cp_[] ;
-cons **gen_cp_ ;
+static cons **gen_cp_ ;
 
 #define CAR(pcons) ((pcons)->car)
 #define CDR(pcons) ((pcons)->cdr)
@@ -107,7 +107,7 @@ extern void gen_remove GEN_PROTO(( cons **, gen_chunk * )) ;
 extern cons *gen_some  GEN_PROTO(( bool(*)(), cons * )) ;
 extern void gen_insert_after GEN_PROTO((gen_chunk *, gen_chunk *, cons *)) ;
 extern list gen_once GEN_PROTO((gen_chunk *, list));
-extern bool gen_in_lisp_p GEN_PROTO((gen_chunk *, list));
+extern bool gen_in_list_p GEN_PROTO((gen_chunk *, list));
 extern void gen_sort_list GEN_PROTO((list, int (*)())) ;
 
 #endif
