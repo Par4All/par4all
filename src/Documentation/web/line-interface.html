@@ -1,186 +1,1242 @@
-<html>
-
-<head><title>PIPS: Tpips</title></head>
-
-<body>
-
-<H1><IMG SRC=images/logo-pips.small.gif> Tpips: command line interpreter</H1>
-
-Author: <a href="/~oget">Guillaume Oget</a><p>
-
-<HR>
-
-<H2>Contents</H2>
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//FR">
+<!--Converted with LaTeX2HTML 97.1 (release) (July 13th, 1997)
+ by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippman, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Tpips: command line interpreter</TITLE>
+<META NAME="description" CONTENT="Tpips: command line interpreter">
+<META NAME="keywords" CONTENT="tpips">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso_8859_1">
+<LINK REL="STYLESHEET" HREF="tpips.css">
+</HEAD>
+<BODY >
+<!--Navigation Panel-->
+<IMG HEIGHT="36" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="http://www.cri.ensmp.fr/~httpd/icons/latex2html/next_motif_gr.gif"> 
+<IMG HEIGHT="36" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="http://www.cri.ensmp.fr/~httpd/icons/latex2html/up_motif_gr.gif"> 
+<IMG HEIGHT="36" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="http://www.cri.ensmp.fr/~httpd/icons/latex2html/previous_motif_gr.gif"> 
+<IMG HEIGHT="36" ALIGN="BOTTOM" BORDER="0" ALT="next_group"
+ SRC="http://www.cri.ensmp.fr/~httpd/icons/latex2html/next_group_motif_gr.gif"> 
+<IMG HEIGHT="36" ALIGN="BOTTOM" BORDER="0" ALT="previous_group"
+ SRC="http://www.cri.ensmp.fr/~httpd/icons/latex2html/previous_group_motif_gr.gif">   
+<BR>
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<P><H1 ALIGN="CENTER">Tpips: command line interpreter</H1>
+<P ALIGN="CENTER"><STRONG>Guillaume Oget - Corinne Ancourt</STRONG></P>
+<P ALIGN="CENTER"><STRONG>5 octobre 1998</STRONG></P>
+<P ALIGN="LEFT"></P>
+<P>
+<BR>
+<H2><A NAME="SECTION00010000000000000000">
+Table des mati&egrave;res</A>
+</H2>
+<!--Table of Contents-->
 <UL>
-	<LI> <A HREF="#INTRO">1) Introduction</A>
-	<LI> <A HREF="#CONCEPTS">2) Basic concepts</A>
-	<LI> <A HREF="#KEY">3) Keyboard bindings</A>
-	<LI> <A HREF="#GRAMMAR">4) Language</A>
-	<LI> <A HREF="#EXAMPLE">5) Example</A>
-	<LI> <A HREF="#REF">6) Related Work</A>
-</UL>
-
-<HR>
-
-<H2><A NAME="INTRO">1) Introduction</A></H2>
-
-<b>Tpips</b> is a command line interpreter for <a href="/~pips"
-><b>PIPS</b></a>, developped by Guillaume Oget. It allows the user to send
-elementary orders to <a href="/~pips" ><b>PIPS</b></a>. <b>Tpips</b> is more
-general and convenient than the usual scripts like <b>Init</b>,
-<b>Perform</b>, <b>Display</b>, <b>Select</b> or <b>Delete</b>, because it
-does not close the workspace on which you work after each command. It is
-quite similar to <b>Wpips</b> - The XWindow interface for <a href="/~pips"
-><b>PIPS</b></a>.<p>
-
-By processing a logfile from <b>Wpips</b>, it is possible to get the
-corresponding <b>Tpips</b> script. It makes <b>Wpips</b> - and
-<b>Tpips</b> - validation easier.
-
-<HR>
-
-<H2><A NAME="CONCEPTS">2) Basic concepts</A></H2>
-
-See <a href="pipsmake.html"><b>Pipsmake</b></a> ;=)<p>
-
-<HR>
-
-<H2><A NAME="KEY">3) Keyboard bindings</A></H2>
-
-See <a href="readline.html#sect8">readline manual page</a><p>
-
-<HR>
-
-<H2><A NAME="GRAMMAR">4) Language</A></H2>
-
-The commands and their parameters are :<br>
-
+<LI><A NAME="tex2html25"
+ HREF="tpips.html#SECTION00010000000000000000">
+Table des mati&egrave;res</A>
+<LI><A NAME="tex2html26"
+ HREF="tpips.html#SECTION00020000000000000000">
+1 Introduction</A>
+<LI><A NAME="tex2html27"
+ HREF="tpips.html#SECTION00030000000000000000">
+2 Syntax</A>
 <UL>
-	<LI> <b>create</b> <i>&lt;workspace-name&gt;</i>
-<i>&lt;file-name&gt;...</i><br>
-	creates and opens a new workspace from a source file - or set of source files
-
-	<LI> <b>open</b> <i>&lt;workspace-name&gt;</i><br>
-	opens an existing workspace
-
-	<LI> <b>close</b> <i>&lt;workspace-name&gt;</i><br>
-	closes an opened workspace
-
-	<LI> <b>delete</b> <i>&lt;workspace-name&gt;</i><br>
-	deletes a closed workspace
-
-	<LI> <b>module</b> <i>&lt;module-name&gt;</i><br>
-	specifies the current module
-
-	<LI> <b>activate</b> <i>&lt;rule-name&gt;</i><br>
-	activates a rule. Several rules can be used to produce a
-resource. At any time one of these rules is the default rule
-
-	<LI> <b>make</b> <i>&lt;resource-descriptor&gt;</i><br>
-	makes a resource according to default rules
-
-	<LI> <b>apply</b> <i>&lt;rule-descriptor&gt;</i><br>
-	applies a specified rule using other default rules
-
-	<LI> <b>display</b> <i>&lt;resource-descriptor&gt;</i><br>
-	makes a printable resource and prints it out
-
-	<LI> <b>get</b> <i>&lt;property-name&gt;</i><br>
-	prints the value of a property
-
-	<LI> <b>set</b> <i>&lt;property-name&gt;</i>
-<i>&lt;value&gt;</i><br>
-	sets the value of a property - after type check
-
-	<LI> <b>cd</b> <i>&lt;directory-name&gt;</i><br>
-	changes the default directory
-
-	<LI> <b>shell</b> [<i>&lt;sh-command&gt;</i>
-<i>&lt;parameters&gt;...</i>]<br>
-	Execute the rest of the line as a shell command. With no
-arguments, run an inferior shell.
-
-	<LI> <b>help</b> [<i>&lt;command&gt;</i>]<br>
-	prints out general help or detailled help about an item
-
-	<LI> <b>quit</b><br>
-	quit <b>Tpips</b>
-
+<LI><A NAME="tex2html28"
+ HREF="tpips.html#SECTION00031000000000000000">
+2.1 Workspace</A>
+<LI><A NAME="tex2html29"
+ HREF="tpips.html#SECTION00032000000000000000">
+2.2 Requests</A>
+<LI><A NAME="tex2html30"
+ HREF="tpips.html#SECTION00033000000000000000">
+2.3 PIPS properties and options</A>
+<LI><A NAME="tex2html31"
+ HREF="tpips.html#SECTION00034000000000000000">
+2.4 Environment</A>
+<LI><A NAME="tex2html32"
+ HREF="tpips.html#SECTION00035000000000000000">
+2.5 Parameters</A>
 </UL>
-
-The parameters of the previous functions are :<br>
-
+<LI><A NAME="tex2html33"
+ HREF="tpips.html#SECTION00040000000000000000">
+3 Simple session</A>
+<LI><A NAME="tex2html34"
+ HREF="tpips.html#SECTION00050000000000000000">
+4 Examples</A>
 <UL>
-	<LI> <b><i>&lt;file-name&gt;</i></b> : Unix path and file name
-
-	<LI> <b><i>&lt;workspace-name&gt;</i></b>: Unix file name - no
-path
-
-	<LI> <b><i>&lt;module-name&gt;</i></b> : Fortran function name
-
-	<LI> <b><i>&lt;rule-name&gt;</i></b> : <a
-href="pipsmake.html#DESCRIP">Pipsmake</a> rule name
-
-	<LI> <b><i>&lt;resource-descriptor&gt;</i></b> : <a
-href="pipsmake.html#DESCRIP">Pipsmake</a> resource name - format
-<i>resource[(OWNER)]</i>.
-
-	<LI> <b><i>&lt;rule-descriptor&gt;</i></b> : <a
-href="pipsmake.html#DESCRIP">Pipsmake</a> instanciated rule - format
-<i>rulename[(OWNER)]</i>. This means that this rule is considered for
-the specified resources owners.
-
+<LI><A NAME="tex2html35"
+ HREF="tpips.html#SECTION00051000000000000000">
+4.1 Call Graph</A>
+<LI><A NAME="tex2html36"
+ HREF="tpips.html#SECTION00052000000000000000">
+4.2 Dependences</A>
+<LI><A NAME="tex2html37"
+ HREF="tpips.html#SECTION00053000000000000000">
+4.3 Transformations</A>
+<LI><A NAME="tex2html38"
+ HREF="tpips.html#SECTION00054000000000000000">
+4.4 Analyses</A>
+<LI><A NAME="tex2html39"
+ HREF="tpips.html#SECTION00055000000000000000">
+4.5 Graphical  Graph View</A>
+<LI><A NAME="tex2html40"
+ HREF="tpips.html#SECTION00056000000000000000">
+4.6 Parallelization</A>
 </UL>
+<LI><A NAME="tex2html41"
+ HREF="tpips.html#SECTION00060000000000000000">
+5 Rules - Pips options</A>
+<LI><A NAME="tex2html42"
+ HREF="tpips.html#SECTION00070000000000000000">
+6 Resources</A>
+<LI><A NAME="tex2html43"
+ HREF="tpips.html#SECTION00080000000000000000">
+7 Printable resources</A>
+<LI><A NAME="tex2html44"
+ HREF="tpips.html#SECTION00090000000000000000">
+8 Options</A>
+<LI><A NAME="tex2html45"
+ HREF="tpips.html#SECTION000100000000000000000">
+9 Environment</A>
+</UL>
+<!--End of Table of Contents-->
+<H1><A NAME="SECTION00020000000000000000">
+1 Introduction</A>
+</H1>
+<P><TT>tpips</TT> is the <B>line interface</B> and scripting language of the
+PIPS project. All PIPS functionalities are available, with
+on-line help and automatic completion.
+<P><TT>tpips</TT> is more efficient than the pips based scripts ( Init,
+Display,...) because the database is not open, read, written and closed
+for each command. <TT>tpips</TT> is less user-friendly than wpips and epips,
+although it provides the unique opportunity to apply a transformation or
+display some information on several modules with one command, using
+pipsmake metavariables, 
+<code>%CALLERS</code> and  <code>%CALLEES</code>,  or environment  user defined variables such
+as <code>$MODULES</code> (see Example <A HREF="tpips.html#exm2">4.2</A>). The jpips future user
+interface will provide these pips/tpips functionalities too.
+<P><TT>tpips</TT> is recommended for large benchmarks and experiments, when
+analysis and optimization results do not require interactive working. <TT>
+  tpips</TT> is used for the validation of each new pips version.
+<P><TT>tpips</TT> can be used to automatically replay a manual wpips or <TT>
+  tpips</TT> session by using <code>logfile_to_tpips</code>. The
+<code>logfile_to_tpips</code> command derives a <TT>tpips</TT> script
+from a logfile in a workspace (see Example&nbsp;<A HREF="tpips.html#exm2">4.2</A>). A PIPS beginner
+should start with a window interface, wpips or epips, and not with <TT>
+  tpips</TT>.
+<P>
+Access to Unix Shell and to PIPS properties is provided by <TT>tpips</TT>.
+PIPS properties can be modified from <TT>tpips</TT> , and only from <TT>
+  tpips</TT> during a PIPS session (see Example<A HREF="tpips.html#exm3">4.3</A>). On the other hand,
+<TT>Wpips</TT> reads at the
+beginning of the session the default properties and the new ones
+(re)defined in the <TT>properties.rc</TT> file, but no change can be done
+afterwards.  Resetting properties during a session can be used to rebuild
+an application when some modules have been updated by PIPS, e.g. after
+partial evaluation.
+<P>
+The <TT>tpips</TT> commands are listed on-line by the help command.
+Possible arguments are completed or suggested by automatic
+completion (TAB and TAB/TAB). A command may be spread on
+several lines by guarding the line feed characters by
+backslashes.
+<P><H1><A NAME="SECTION00030000000000000000">
+2 Syntax</A>
+</H1>
+<P>
+Different functions can be activated with the tpips commands. We decompose
+these functions in those related to the workspace, the analysis and
+transformation requests, the pips properties and options and the the environment. 
+Functions  and their arguments are presented in the next subsections.
+<P><H2><A NAME="SECTION00031000000000000000">
+2.1 Workspace</A>
+</H2> 
+The commands for workspaces are: <TT>create</TT> a new workspace (see
+pips command Init), <TT>open</TT> an existing workspace, <TT>close</TT> the
+current workspace, and <TT>delete</TT> the current workspace or a
+specific one (see pips command Delete).
+<P>
+These commands can be used several times during a session or
+within a <TT>tpips</TT> script file.
+<P><DL>
+<DT><STRONG><B>create</B> &lt;workspace-name&gt; &lt;file-name&gt;</STRONG>
+<DD>creates and
+opens a new workspace from a source file - or set of source files
+<P><DT><STRONG><B>open</B> &lt;workspace-name&gt;</STRONG>
+<DD>opens an existing workspace
+<P><DT><STRONG><B>close</B> &lt;workspace-name&gt;</STRONG>
+<DD>closes an opened workspace
+<P><DT><STRONG><B>delete</B> &lt;workspace-name&gt;</STRONG>
+<DD>deletes a closed workspace
+<P><DT><STRONG><B>quit</B></STRONG>
+<DD>quit <TT>tpips</TT>
+<P></DL><H2><A NAME="SECTION00032000000000000000">
+2.2 Requests</A>
+</H2>
+<P>
+To apply a transformation or request a particular resource, use the
+following tpips commands. 
+<DL>
+<DT><STRONG><B>apply</B> &lt;rule-descriptor&gt;</STRONG>
+<DD>applies a specified rule and
+produces the associated resources.
+<P><DT><STRONG><B>capply</B> &lt;rule-descriptor&gt;</STRONG>
+<DD>applies concurrently a specified
+  rule on the different OWNERs of the &lt;rule-descriptor&gt; and produces the
+  associated resources (see Example <A HREF="tpips.html#exm4">4.4</A>).
+<P><DT><STRONG><B>display</B> &lt;resource-descriptor&gt;</STRONG>
+<DD>makes a printable resource
+  (if it does not exist) and prints it out. A printed resource is a ACSII
+  file with the <code>_FILE</code> extension.
+<P><DT><STRONG><B>make</B> &lt;resource-descriptor&gt;</STRONG>
+<DD>makes a resource according to
+  default rules
+<P></DL><H3><A NAME="SECTION00032100000000000000">
+Generic example:</A>
+</H3>
+<P>
+A resource, i.e. any piece of information computed by PIPS,
+can be required by command:
+<P><B>
+<PRE>
+make &lt;resource&gt;
+</PRE>
+</B>
+<P>
+or
+<P><B>
+<PRE>
+make &lt;resource[owner]&gt;
+</PRE>
+</B>
+<P>
+which uses interproceduraly and recursively default rules
+(see pips command Build). Or it is produced by a specific
+rule:
+<B>
+<PRE>
+apply &lt;rule&gt;
+</PRE>
+</B>
+<P>
+which will require all its resource arguments by recursively
+calling make (see pips command Perform).
+<P>
+The owner of a resource is the module it is attached to. By
+default, the owner is assumed to be the current module.
+<P>
+File resources can be displayed on screen:
+<P><B>
+<PRE>
+display &lt;printable_resource&gt;
+</PRE>
+</B>
+as with the pips Display script.
+<P><H2><A NAME="SECTION00033000000000000000">
+2.3 PIPS properties and options</A>
+</H2>
+<P><DL>
+<DT><STRONG><B>activate</B> &lt;rule-name&gt;</STRONG>
+<DD>activates a rule. Several rules
+can be used to produce a resource. At any time one of these rules is the
+  default rule
+<P><DT><STRONG><B>module</B> &lt;module-name&gt;</STRONG>
+<DD>specifies the current module to
+  work on.
+<P><DT><STRONG><B>getproperty</B> &lt;property-name&gt;</STRONG>
+<DD>prints the value of a Pips
+  property
+<P><DT><STRONG><B>setproperty</B> &lt;property-name&gt; &lt;value&gt;</STRONG>
+<DD>sets the value
+  of a property - after type check. Possible types are: boolean, int and
+  string.
+<P><DT><STRONG><B>checkpoint</B> &lt;number&gt;</STRONG>
+<DD>checkpoints the current workspace
+  every &lt;number&gt; pipsmake operations.
+<P></DL><H3><A NAME="SECTION00033100000000000000">
+Generic example:</A>
+</H3>
+<P>
+A specific current module is selected as current module with:
+<B>
+<PRE>
+module MODULE_NAME
+</PRE>
+</B>
+<P>
+When several rules, i.e. functions, can be used to compute
+the same resource, for instance a parallel version of a
+module, the rule selection command is:
+<P><B>
+<PRE>
+activate &lt;rule&gt;
+</PRE>
+</B>
+<P>
+It is equivalent to the pips Select command.
+<P><H2><A NAME="SECTION00034000000000000000">
+2.4 Environment</A>
+</H2>
+The <TT>tpips</TT> Unix-related commands are: cd, setenv, getenv, echo, and
+shell.
+<P><DL>
+<DT><STRONG><B>shell</B> &lt;sh-command&gt; &lt;parameters&gt;</STRONG>
+<DD>Executes the line
+as a shell command. With no arguments, run an inferior shell.
+<P><DT><STRONG><B>source</B> &lt;filenames...&gt;</STRONG>
+<DD>reads <TT>tpips</TT> commands from
+  files.
+<P><DT><STRONG><B>cd</B> &lt;directory-name&gt;</STRONG>
+<DD>changes the default directory
+<P><DT><STRONG><B>echo</B> &lt;string&gt;</STRONG>
+<DD>prints &lt;string&gt;
+<P><DT><STRONG><B>getenv</B> &lt;variable-name&gt;</STRONG>
+<DD>prints the value of &lt;variable-name&gt; (equivalent to <code>echo ${&lt;variable-name&gt;}</code>)
+<DT><STRONG><B>setenv</B> &lt;variable-name&gt; = &lt;value&gt;</STRONG>
+<DD>sets &lt;value&gt; to &lt;variable-name&gt;
+<P><DT><STRONG><B>help</B> &lt;command&gt;</STRONG>
+<DD>prints out general help or detailed help
+  about an item
+<P><DT><STRONG><B>info</B> &lt;name&gt;</STRONG>
+<DD>print information about &lt;name&gt;. Here 
+        &lt;name&gt; can be :  ``module'', ``modules'', ``workspace'' or 
+        ``directory'' words.
+<P></DL><H2><A NAME="SECTION00035000000000000000">
+2.5 Parameters</A>
+</H2>
+The parameters of the different commands are :
+<DL>
+<BLOCKQUOTE>
+<DT><STRONG>&lt;file-name&gt;</STRONG>
+<DD>Unix path and file name. <BR>
+Shell syntax, such
+as <code>*.f</code>, can be used when <code>s</code> option is specified or <code>TPIPS_IS_A_SHELL</code> variable is set.
+<P><DT><STRONG>&lt;workspace-name&gt;</STRONG>
+<DD>Unix file name - no path.
+<P><DT><STRONG>&lt;module-name&gt;</STRONG>
+<DD>Fortran function name in capital letters.
+<P><DT><STRONG>&lt;rule-name&gt;</STRONG>
+<DD>rule name (see Section <A HREF="tpips.html#rules">5</A>)
+<P><DT><STRONG>&lt;resource-descriptor&gt;</STRONG>
+<DD>It is a <code>resource[OWNER]</code>
+  expression: a pipsmake resource name to be computed for each module
+  associated to OWNER (see Sections <A HREF="tpips.html#res">6</A> and <A HREF="tpips.html#resf">7</A>).
+<P><DT><STRONG>&lt;rule-descriptor&gt;</STRONG>
+<DD>It is a <code>rulename[OWNER]</code> expression: a  pipsmake instantiated
+  rule  to be applied  on each  module associated to OWNER (see Section <A HREF="tpips.html#rules">5</A>).
+<P></DL></BLOCKQUOTE>
+<P>
+The OWNER - used in the previous &lt;rule-descriptor&gt; and
+&lt; resource-descriptor&gt; - can take these formats:
+<P><DL>
+<BLOCKQUOTE>
+<DT><STRONG>module-name</STRONG>
+<DD>the target module name.
+        <DT><STRONG>%PROGRAM</STRONG>
+<DD>the whole program (for global resource) . 
+        <DT><STRONG>%MAIN</STRONG>
+<DD>the main module of the program. 
+        <DT><STRONG>%MODULE</STRONG>
+<DD>the current  module.
+        <DT><STRONG>${MODULES}</STRONG>
+<DD>the modules associated to the Shell variable
+          <TT>MODULES</TT>. The different names are SPACE or/and TAB separated.
+        <DT><STRONG>%ALL</STRONG>
+<DD>All worksapce modules 
+        <DT><STRONG>%CALLEES</STRONG>
+<DD>All the callees of the current selected  module.
+        <DT><STRONG>%CALLERS</STRONG>
+<DD>All  the callers of the current selected  module.
+<P></DL></BLOCKQUOTE>
+If no OWNER is specified, then the current  module is assumed. For
+generic owners, a  sign (%) has been added to differentiate them
+from module names and environment variables.
+<P><H1><A NAME="SECTION00040000000000000000">
+3 Simple session</A>
+</H1>
+<P>
+A simple <TT>tpips</TT> session is made of a few steps. First, a
+workspace must be created:
+<B>
+<PRE>
+create work source1.f source2.f
+</PRE>
+</B>
+<P>
+and a subdirectory of the current directory, here
+work.database, is created to store and retrieve
+code and information computed by PIPS about subroutines and
+functions found in source1.f or source2.f.
+<P>
+Then, you have to select a module, let say FOO, by typing:
+<B>
+<PRE>
+module FOO
+</PRE>
+</B>
+<P>
+unless there is only one function or subroutine in the Fortran
+file(s) which were passed to the create command, in
+which case it is automatically selected.
+<P>
+To keep it simple the first time, you should then try to
+display the sequential code of routine FOO by typing:
+<P><B>
+<PRE>
+display PRINTED_FILE
+</PRE>
+</B>
+<P>
+Other resource names let you visualize the parallelized code
+(PARALLELPRINTED_FILE), or the call graph (CALLGRAPH_FILE)...
+Names for printable resources usually contain the string
+FILE.
+<P>
+The standard command to leave <TT>tpips</TT> is <TT>quit</TT> but a control-D
+or end-of-file condition are valid too.
+<P>
+Interactive analysis of module MATMUL from source code pgmsrc.f,
+in workspace pgm:
+<P><B>
+<PRE>
+$ tpips
+tpips &gt; create pgm pgm-src.f
 
+tpips &gt; module MATMUL
 
-The owner - used in the previous <i>&lt;rule-descriptor&gt;</i> and
-<i>&lt;resource-descriptor&gt;</i> - can take these formats:<br>
+tpips &gt; display PARALLELPRINTED_FILE
 
+tpips &gt; quit
+</PRE>
+</B>
+<P><H1><A NAME="SECTION00050000000000000000">
+4 Examples</A>
+</H1>
+<H2><A NAME="SECTION00051000000000000000">
+4.1 Call Graph</A>
+</H2>
+<A NAME="exm1">&#160;</A>
+To visualize the  call graph of the application, the following tpips
+session can be executed. The call graph of each application routine is
+displayed.
+<P>
+This example presents a use of:
+<P><UL>
+<LI> environment variable: <code>setenv PIPS_SRCPATH SRC</code>
+<LI> shell path file name expression that will be expanded: <code>*.f</code>,
+<LI> a &lt;resource-descriptor&gt; : <code>CALLGRAPH_FILE[%ALL]</code>
+</UL>
+This tpips example is useful to test Pips parsing   on each  new
+benchmark.
+<P><TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1  BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<B>
+<PRE>
+setenv PIPS_SRCPATH SRC      # initiates the source file directory to SRC
+
+create wc *.f                 # creates the wc workspace for the
+                              # Fortran files of the  PIPS_SRCPATH 
+                              # directory
+
+display CALLGRAPH_FILE[%ALL]  # CONTROL GRAPH COMPUTATION for each routine
+
+close 
+quit
+</PRE>
+</B>
+<P></TD></TR></TABLE>
+<H2><A NAME="SECTION00052000000000000000">
+4.2 Dependences</A>
+</H2>
+<A NAME="exm2">&#160;</A>A programmer that would like to see the routines dependence graph to parallelize
+interprocedurally the application can executed the following tpips
+commands.
+<P>
+This example presents some Pips analyses and  use of 
 <UL>
-	<LI> <b>$PROGRAM</b>
-	<LI> <b>$MODULE</b>
-	<LI> <b>$ALL</b>
-	<LI> <b>$CALLEES</b>
-	<LI> <b>$CALLERS</b>
-	<LI> <b>$MAIN</b>
-	<LI> <b>&lt;module-name&gt;</b>
-	<LI> <b>&lt;module-name&gt;,&lt;module-name&gt;, ...</b>
+<LI> module selection: <code>module TEST</code>,
+<LI> &lt;rule-name&gt; : <code>MUST_REGIONS</code>, <code>REGION_CHAINS</code>
+<LI> <code>logfile_to_tpips</code> command
 </UL>
+<P><TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1  BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<B>
+<PRE>
+sh&gt;tpips                            # run tpips
+tpips&gt; create wfoo essai.f          # create a workspace for the program essai.f
+tpips&gt; module TEST                  # select the default module TEST
+tpips&gt; display CALLGRAPH_FILE       # display the sub-callgraph for the
+                                       module TEST
+tpips&gt; make PROPER_EFFECTS[%ALL]    # compute proper effects for every
+                                       modules
+tpips&gt; activate MUST_REGIONS        # select the rule must_regions instead
+                                       of the default rule may_regions
+tpips&gt; activate REGION_CHAINS       # select the rule regions_chains for
+                                       computing Use-Def chains in essai.f
+tpips&gt; display DG_FILE[%ALL]        # display all the dependance graphs
+tpips&gt; close wfoo                   # close the workspace
+tpips&gt; quit                         # quit tpips
+</PRE>
+</B>
+</TD></TR></TABLE>
+<P>
+To store this simple session in a <TT>tpips</TT> file, use the command:
+<P><code>logfile_to_tpips  wfoo &gt; foo.tpips</code>
+<P>
+that generates the following <TT>tpips</TT> commands  in File  <code>foo.tpips</code>.
+<P><TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1 BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<B>
+<PRE>
+#
+# file generated by logfile_to_tpips for workspace wfoo
+#
+create wfoo essai.f
+module TEST
+display CALLGRAPH_FILE[TEST]
+display PROPER_EFFECTS[TEST]
+activate MUST_REGIONS
+activate REGION_CHAINS
+display DG_FILE[TEST]
+close
+quit
+# EOF
+</PRE>
+</B>
+</TD></TR></TABLE>
+<P>
+Note that  expression  <code>%ALL</code> has been expanded by all
+program routines, in that example there is only one <code>TEST</code>
+routine in <code>essai.f</code>.
+<P><H2><A NAME="SECTION00053000000000000000">
+4.3 Transformations</A>
+</H2>
+<A NAME="exm3">&#160;</A>
+The following transformations are designed for application optimization.
+Specialization and code reduction eliminating useless instructions and
+declarations are performed.
+<P>
+This example presents some pips transformations and use of 
+<UL>
+<LI> program restructuration, cloning, dead code elimination, useless
+  declaration elimination, and code regeneration,
+<LI> pips property: <code>PREPROCESSOR_MISSING_FILE_HANDLING &quot;generate&quot;</code> ,
+<LI> transformation application : <code>apply CLONE_ON_ARGUMENT[FUNCT]</code>.
+<LI> &lt;rule-name&gt; : <code>PRINT_CODE</code>,..
+<LI> &lt;rule-descriptor&gt; :  <code>SUPPRESS_DEAD_CODE[${modules}]</code>,  <code>UNSPLIT[%PROGRAM]</code>,..
+<LI> &lt;resource-descriptor&gt; :  <code>PRINTED_FILE[FUNCT]</code>,  <code>CALLGRAPH_FILE[%ALL]</code>,..
+</UL>
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1  BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<B>
+<PRE>
+# Delete Workspace clone in case  it already exists
 
-If no owner is specified, then the default module is assumed. For
-generic owners, a dollar sign ($) has been added to differentiate them
-from module names.<p>
+delete clone                      
 
-<HR>
+setenv PIPS_SRCPATH SRC
 
-<H2><A NAME="EXAMPLE">5) Example</A></H2>
+# Stop as soon as the first user error occurs
 
+setproperty ABORT_ON_USER_ERROR TRUE   
+
+# Generates missing files  and routines 
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING &quot;generate&quot; 
+
+# Substitute Fortran statement functions
+
+setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
+
+# Restructures the program to eliminate as many GOTO as possible
+
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+
+#
+# prettyprinter settings
+
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+
+# creates the workspace
+
+create clone *.f
+
+
+echo # initial version of FUNCT
+
+display PRINTED_FILE[FUNCT]
+
+#
+# just to insure that all routines are generated.
+
+make CALLGRAPH_FILE[%ALL]
+
+#
+# let us clone FUNCT on the second argument. 
+# no interprocedural analysis is needed. 
+
+setproperty TRANSFORMATION_CLONE_ON_ARGUMENT 2
+capply CLONE_ON_ARGUMENT[FUNCT]
+
+# The clone transformation generates 4 clones
+# because there are 4 different values for the second
+# argument of FUNCT
+
+setenv modules &quot;FUNCT_0 FUNCT_1 FUNCT_2 FUNCT_3&quot;
+
+#
+# suppress dead code must be applied twice...
+# eliminate dead code after cloning
+
+apply SUPPRESS_DEAD_CODE[${modules}]
+apply SUPPRESS_DEAD_CODE[${modules}]
+
+# Eliminates useless declaration after cloning and dead code
+# suppression
+
+apply CLEAN_DECLARATIONS[FUNCT ${modules}]
+
+echo # after cloning, dead code elimination and declarations cleaning
+
+make  PRINTED_FILE[${modules}]
+
+#
+# regenerates the source files with calls to cloned functions only
+# 
+
+activate PRINT_CODE
+apply UNSPLIT[%PROGRAM]
+
+close
+</PRE>
+</B>
+</TD></TR></TABLE>
+<P><H2><A NAME="SECTION00054000000000000000">
+4.4 Analyses</A>
+</H2>
+<A NAME="exm4">&#160;</A>This example presents some classical pips analyzes:
+<P><UL>
+<LI> computation of preconditions,
+<LI> transformers,
+<LI> effects,
+<LI> regions, 
+</UL>
+and a <I>concurrent</I> transformation
+application.
+<P><code>capply PARTIAL_EVAL[%ALL]</code> 
+applies a partial evaluation on all routines concurrently without any
+verification process between two transformations. The partial evaluation
+of a routine does not modify other routine predicates, even if the code
+(one routine) has been modified by the transformation. It is not
+necessary to ask for a sequential application that will impose the
+analysis and re-computation of all routine predicates between two partial
+evaluations.
+<P><TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1 BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<B>
+<PRE>
+create foo *.f
+
+echo
+echo CALL_GRAPH[%ALL] Computation
+echo
+
+display CALLGRAPH_FILE[%ALL]
+
+# ask interprocedural information
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+module FUNCT
+
+capply PARTIAL_EVAL[%ALL]
+
+#echo
+#echo PRINT_CODE_PROPER_EFFECTS Activation
+#echo
+#
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE[%ALL]
+#
+#echo
+#echo PRINT_CODE_CUMULATED_EFFECTS Activation
+#echo
+#
+#activate PRINT_CODE_CUMULATED_EFFECTS
+#display PRINTED_FILE[%ALL]
+
+echo
+echo PRINT_CODE_TRANSFORMERS Activation
+echo
+
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+echo
+echo PRINT_CODE_PRECONDITIONS Activation
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+echo
+echo ICFG_WITH_LOOPS_REGIONS
+echo 
+
+activate PRINT_ICFG_WITH_LOOPS_REGIONS
+display ICFG_FILE[%ALL]
+
+echo 
+echo REGIONS Computation
+echo
+
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALL]
+
+
+close 
+quit
+</PRE>
+</B>
+<P></TD></TR></TABLE>
+<P><H2><A NAME="SECTION00055000000000000000">
+4.5 Graphical  Graph View</A>
+</H2>
+<A NAME="exm5">&#160;</A>This example presents a call to a graphical call graph view.
+<P><TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1 BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<B>
+<PRE>
+# resize the entities table. Useful for  large benchmarks. 
+
+setenv NEWGEN_MAX_TABULATED_ELEMENTS 150000
+setenv MAINROUTINE  TOTO 
+
+delete DVCG
+create DVCG *.f
+
+
+echo
+echo CALLGRAPH_FILE[${MAINROUTINE}] Computation
+echo
+
+
+make CALLGRAPH_FILE[${MAINROUTINE}]
+
+
+echo
+echo DVCG_FILE[${MAINROUTINE}] Computation
+echo
+
+make DVCG_FILE[${MAINROUTINE}]
+
+# type DaVinci DVCG.database/${MAINROUTINE}/${MAINROUTINE}.daVinci
+# to  visualize 
+
+close 
+quit
+</PRE>
+</B>
+</TD></TR></TABLE>
+<P><H2><A NAME="SECTION00056000000000000000">
+4.6 Parallelization</A>
+</H2>
+<A NAME="exm6">&#160;</A>This example presents some classical analyses and transformations designed
+to parallelize benchmarks, for instance the adm program of the Perfect
+club.
+<P><TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1  BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<B>
+<PRE>
+#
+# Perfect club ADM benchmark.
+
+echo Perfect/adm.f
+#
+delete adm
+create adm adm.f  cputim.f elapse.f 
+
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+setproperty PARALLELIZATION_STATISTICS=TRUE
+
+echo ADM scalar privatization...
+ 
+capply PRIVATIZE_MODULE[%ALL]
+
+
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+
+apply PARTIAL_EVAL[%ALL]
+
+echo ADM parallelization...
+make PARALLELPRINTED_FILE[%ALL]
+
+close
+quit
+</PRE>
+</B>
+</TD></TR></TABLE>
+<P><H1><A NAME="SECTION00060000000000000000">
+5 Rules - Pips options</A>
+</H1>
+<A NAME="rules">&#160;</A>Rules are used to compute resources. Several rules can be activated to
+compute a single resource. For instance a parallel version of a module may
+be computed from the interprocedural precondition
+(<code>PRECONDITIONS_INTER_FULL</code>), interprocedural transformer
+(<code>TRANSFORMERS_INTER_FULL</code>) and accurate
+dependencies (<code>RICE_SEMANTICS_DEPENDENCE_GRAPH</code>). Rules are selected
+by <code>activate</code> or selected and applied by <code>apply</code> and <code>capply</code>.
+More information on each particular rule is presented  in the pipsmake documentation.
+<TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=2 WIDTH="100%" BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<B><PRE>
+#### ANALYSES ####
+
+ATOMIC_CHAINS                    
+CONTINUATION_CONDITIONS  
+FLINTER  
+PROPER_REFERENCES
+
+### COMPLEXITITY 
+
+ANY_COMPLEXITIES  
+FP_COMPLEXITIES  
+UNIFORM_COMPLEXITIES
+SUMMARY_COMPLEXITY
+
+### PRIVATIZATION
+
+ARRAY_PRIVATIZER  
+ARRAY_SECTION_PRIVATIZER  
+DECLARATIONS_PRIVATIZER 
+PRIVATIZE_MODULE
+
+### EFFECTS
+
+CUMULATED_EFFECTS  
+CUMULATED_REDUCTIONS  
+CUMULATED_REFERENCES  
+IN_EFFECTS 
+IN_SUMMARY_EFFECTS 
+OUT_EFFECTS  
+OUT_SUMMARY_EFFECTS  
+PROPER_EFFECTS
+SUMMARY_EFFECTS
+
+
+### PRECONDITIONS
+
+PRECONDITIONS_INTER_FAST  
+PRECONDITIONS_INTER_FULL  
+PRECONDITIONS_INTRA  
+SUMMARY_PRECONDITION
+
+
+### TRANSFORMERS
+
+SUMMARY_TRANSFORMER
+TRANSFORMERS_INTER_FAST
+TRANSFORMERS_INTER_FULL
+TRANSFORMERS_INTRA_FAST
+TRANSFORMERS_INTRA_FULL
+
+
+### REGIONS 
+
+IN_OUT_REGIONS_CHAINS  
+IN_REGIONS 
+IN_SUMMARY_REGIONS 
+MAY_REGIONS 
+MUST_REGIONS
+OUT_REGIONS  
+OUT_SUMMARY_REGIONS  
+REGION_CHAINS
+SUMMARY_REGIONS
+
+### CALLGRAPH 
+
+FULL_GRAPH_OF_CALLS  
+CALLGRAPH  
+GRAPH_OF_CALLS 
+
+### DEPENDENCES
+
+RICE_ALL_DEPENDENCE
+RICE_CRAY
+RICE_DATA_DEPENDENCE
+RICE_FAST_DEPENDENCE_GRAPH
+RICE_FULL_DEPENDENCE_GRAPH
+RICE_REGIONS_DEPENDENCE_GRAPH
+RICE_SEMANTICS_DEPENDENCE_GRAPH
+
+### REDUCTIONS
+
+PROPER_REDUCTIONS
+SUMMARY_REDUCTIONS
+
+
+#### TRANSFORMATIONS #### 
+
+FORWARD_SUBSTITUTE            
+PARTIAL_EVAL 
+
+### RESTRUCTURATION 
+
+ATOMIZER  
+CLEAN_DECLARATIONS  
+CLONE  
+CLONE_ON_ARGUMENT  
+CLONE_SUBSTITUTE  
+RESTRUCTURE_CONTROL
+SUPPRESS_DEAD_CODE
+UNSPAGHETTIFY
+UNSPLIT
+USE_DEF_ELIMINATION
+
+### LOOP TRANSFORMATION
+
+DISTRIBUTER  
+FULL_UNROLL 
+LOOP_INTERCHANGE  
+LOOP_NORMALIZE  
+LOOP_REDUCTIONS  
+STRIP_MINE
+UNROLL
+
+### PARALLELIZATION
+
+COARSE_GRAIN_PARALLELIZATION  
+NEST_PARALLELIZATION
+</PRE></B>
+<P></TD>
+
+<TD>
 <pre>
-sh>tpips                            <i>// run tpips</i>
-tpips> create wfoo essai.f          <i>// create a workspace</i>
-tpips> module TEST                  <i>// select the default module</i>
-tpips> activate must_regions        <i>// select the rule must_regions instead</i>
-                                    <i>   of the default rule may_regoins</i>
-tpips> display callgraph_file       <i>// display the sub-callgraph for the</i>
-                                    <i>   module TEST</i>
-tpips> make proper_effects($ALL)    <i>// compute proper effects for every</i>
-                                    <i>   module</i>
-tpips> activate region_chains       <i>// select the rule regions_chains for</i>
-                                    <i>   computing Use-Def chainsin essai.f</i>
-tpips> display dg_file($ALL)        <i>// display all the dependance graphs</i>
-tpips> close wfoo                   <i>// close the workspace</i>
-tpips> delete wfoo                  <i>// delete the workspace</i>
-tpips> quit                         <i>// quit tpips</i>
+<B><PRE>
+#### PRETTYPRINT #### 
 
-</pre>
+### PRINT_CALL_GRAPH                          
 
-<HR>
+PRINT_CALL_GRAPH                          
+PRINT_CALL_GRAPH_WITH_COMPLEXITIES        
+PRINT_CALL_GRAPH_WITH_CUMULATED_EFFECTS   
+PRINT_CALL_GRAPH_WITH_IN_REGIONS          
+PRINT_CALL_GRAPH_WITH_OUT_REGIONS         
+PRINT_CALL_GRAPH_WITH_PRECONDITIONS       
+PRINT_CALL_GRAPH_WITH_PROPER_EFFECTS      
+PRINT_CALL_GRAPH_WITH_REGIONS             
+PRINT_CALL_GRAPH_WITH_TRANSFORMERS        
 
-<H2><A NAME="REF">6) Related Work</A></H2>
+### PRINT_CHAINS_GRAPH                        
 
-none ;=)<p>
+PRINT_CHAINS_GRAPH                        
 
-<HR>
+### PRINT_CODE  WITH ...                             
 
-</body> </html>
+PRINT_CODE                                
+PRINT_CODE_AS_A_GRAPH                     
+PRINT_CODE_AS_A_GRAPH_COMPLEXITIES        
+PRINT_CODE_AS_A_GRAPH_CUMULATED_EFFECTS   
+PRINT_CODE_AS_A_GRAPH_IN_REGIONS          
+PRINT_CODE_AS_A_GRAPH_OUT_REGIONS         
+PRINT_CODE_AS_A_GRAPH_PRECONDITIONS       
+PRINT_CODE_AS_A_GRAPH_PROPER_EFFECTS      
+PRINT_CODE_AS_A_GRAPH_REGIONS             
+PRINT_CODE_AS_A_GRAPH_TRANSFORMERS        
+PRINT_CODE_COMPLEMENTARY_SECTIONS         
+PRINT_CODE_COMPLEXITIES                   
+PRINT_CODE_CONTINUATION_CONDITIONS        
+PRINT_CODE_CUMULATED_EFFECTS              
+PRINT_CODE_CUMULATED_REDUCTIONS           
+PRINT_CODE_CUMULATED_REFERENCES           
+PRINT_CODE_IN_EFFECTS                     
+PRINT_CODE_IN_REGIONS                     
+PRINT_CODE_OUT_EFFECTS                    
+PRINT_CODE_OUT_REGIONS
+PRINT_CODE_PRECONDITIONS
+PRINT_CODE_PRIVATIZED_REGIONS
+PRINT_CODE_PROPER_EFFECTS
+PRINT_CODE_PROPER_REDUCTIONS
+PRINT_CODE_PROPER_REFERENCES
+PRINT_CODE_PROPER_REGIONS
+PRINT_CODE_REGIONS
+PRINT_CODE_STATIC_CONTROL
+PRINT_CODE_TRANSFORMERS
+
+### PRINT_DEPENDENCE_GRAPH
+
+PRINT_EFFECTIVE_DEPENDENCE_GRAPH
+PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
+PRINT_WHOLE_DEPENDENCE_GRAPH
+
+### PRINT_ICFG
+
+PRINT_ICFG
+PRINT_ICFG_WITH_COMPLEXITIES
+PRINT_ICFG_WITH_CONTROL
+PRINT_ICFG_WITH_CONTROL_COMPLEXITIES
+PRINT_ICFG_WITH_CONTROL_CUMULATED_EFFECTS
+PRINT_ICFG_WITH_CONTROL_IN_REGIONS
+PRINT_ICFG_WITH_CONTROL_OUT_REGIONS
+PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
+PRINT_ICFG_WITH_CONTROL_PROPER_EFFECTS
+PRINT_ICFG_WITH_CONTROL_REGIONS
+PRINT_ICFG_WITH_CONTROL_TRANSFORMERS
+PRINT_ICFG_WITH_CUMULATED_EFFECTS
+PRINT_ICFG_WITH_IN_REGIONS
+PRINT_ICFG_WITH_LOOPS
+PRINT_ICFG_WITH_LOOPS_COMPLEXITIES
+PRINT_ICFG_WITH_LOOPS_CUMULATED_EFFECTS
+PRINT_ICFG_WITH_LOOPS_IN_REGIONS
+PRINT_ICFG_WITH_LOOPS_OUT_REGIONS
+PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
+PRINT_ICFG_WITH_LOOPS_PROPER_EFFECTS
+PRINT_ICFG_WITH_LOOPS_REGIONS
+PRINT_ICFG_WITH_LOOPS_TRANSFORMERS
+PRINT_ICFG_WITH_OUT_REGIONS
+PRINT_ICFG_WITH_PRECONDITIONS
+PRINT_ICFG_WITH_PROPER_EFFECTS
+PRINT_ICFG_WITH_REGIONS
+PRINT_ICFG_WITH_TRANSFORMERS
+
+PRINT_INITIAL_PRECONDITION
+
+### PRINT_PARALLELIZED_CODE
+
+PRINT_PARALLELIZED77_CODE
+PRINT_PARALLELIZED90_CODE
+PRINT_PARALLELIZEDCMF_CODE
+PRINT_PARALLELIZEDCRAFT_CODE
+PRINT_PARALLELIZEDCRAY_CODE
+PRINT_PARALLELIZEDHPF_CODE
+PRINT_PARALLELIZEDOMP_CODE
+
+### PRINT_SOURCE
+
+PRINT_SOURCE
+PRINT_SOURCE_COMPLEXITIES
+PRINT_SOURCE_CONTINUATION_CONDITIONS
+PRINT_SOURCE_CUMULATED_EFFECTS
+PRINT_SOURCE_IN_EFFECTS
+PRINT_SOURCE_IN_REGIONS
+PRINT_SOURCE_OUT_EFFECTS
+PRINT_SOURCE_OUT_REGIONS
+PRINT_SOURCE_PRECONDITIONS
+PRINT_SOURCE_PROPER_EFFECTS
+PRINT_SOURCE_REGIONS
+PRINT_SOURCE_TRANSFORMERS
+</PRE>
+</TD></TR></TABLE>
+<P></B><H1><A NAME="SECTION00070000000000000000">
+6 Resources</A>
+</H1>
+<A NAME="res">&#160;</A>The names of the current useful resources are given. These resources are
+computed by the <code>make</code> and <code>display</code> commands. These
+non-printable resources are encoded in internal data structures. The
+corresponding printable resources are listed in the following section.
+These resources are detailed in the pipsmake documentation.
+<P><TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=3 WIDTH="100%" BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<B><PRE>
+CALLEES
+CALLERS
+CHAINS  
+COMPLEXITIES  
+DG      
+ENTITIES 
+SUMMARY_COMPLEXITY
+
+## CODE 
+
+CODE  
+PARALLELIZED_CODE
+PARSED_CODE
+
+
+## EFFECTS
+
+CUMULATED_EFFECTS
+CUMULATED_IN_EFFECTS
+IN_EFFECTS
+IN_SUMMARY_EFFECTS
+OUT_EFFECTS
+OUT_SUMMARY_EFFECTS
+PROPER_EFFECTS
+SUMMARY_EFFECTS
+</PRE></B>
+</TD>
+<TD>
+<pre>
+<B><PRE>
+## REGIONS
+ 
+COPY_OUT_REGIONS                        
+CUMULATED_IN_REGIONS                    
+INV_IN_REGIONS                          
+INV_REGIONS                             
+IN_REGIONS
+IN_SUMMARY_REGIONS
+OUT_REGIONS
+OUT_SUMMARY_REGIONS
+PRIVATIZED_REGIONS
+PROPER_REGIONS
+REGIONS 
+SUMMARY_REGIONS
+
+## REDUCTIONS 
+
+CUMULATED_REDUCTIONS                    
+PROPER_REDUCTIONS
+SUMMARY_REDUCTIONS
+
+## REFERENCES
+
+CUMULATED_REFERENCES                    
+PROPER_REFERENCES
+</PRE></B>
+</TD>
+
+<TD>
+<pre>
+<B><PRE>
+## PRECONDITION                   
+
+INITIAL_PRECONDITION                    
+PRECONDITIONS    
+PROGRAM_PRECONDITION
+SUMMARY_PRECONDITION
+
+## TRANSFORMERS 
+
+SUMMARY_TRANSFORMER
+TRANSFORMERS 
+
+## CONTINUATION 
+
+MAY_CONTINUATION
+MAY_SUMMARY_CONTINUATION
+MUST_CONTINUATION
+MUST_SUMMARY_CONTINUATION
+</PRE>
+</TD></TR></TABLE>
+<P></B><H1><A NAME="SECTION00080000000000000000">
+7 Printable resources</A>
+</H1>
+<A NAME="resf">&#160;</A>The printable resources usually contain the string FILE. They can be
+computed by invoking the <code>display</code> <TT>tpips</TT> command. They are stored as
+human readable ASCII file in the workspace. The current resources which
+are printable follow, for more information see the pipsmake documentation.
+<P><TABLE BORDER=2 CELLSPACING=4 CELLPADDING=10 COLS=1 WIDTH="100%" BGCOLOR="#FFFFFF" NOSAVE >
+<TR>
+<TD>
+<PRE>
+CALLGRAPH_FILE                   # call graph file
+DG_FILE                          # Dependence graph file         
+DVCG_FILE                        # Davinci Dependence graph file 
+FLINTED_FILE                     # source file with errors
+GRAPH_PRINTED_FILE               # control graph
+ICFG_FILE                        # interprocedural control flow graph       
+INITIAL_FILE                     # after splitting      
+PARALLELPRINTED_FILE             # parallel version
+PRINTED_FILE                     # annoted sequential version 
+SOURCE_FILE                      # after the preprocessing phase
+USER_FILE                        # after regeneration of user files
+</PRE>
+</TD></TR></TABLE>
+<P><H1><A NAME="SECTION00090000000000000000">
+8 Options</A>
+</H1>
+Usage: <TT>tpips</TT> [-nscvh?jw] [-l logfile] [-r rcfile] [-e tpips-cmds] tpips-scripts
+<DL>
+<DT><STRONG>-n</STRONG>
+<DD>no execution mode. Just check the script syntax.
+<DT><STRONG>-s</STRONG>
+<DD>behaves like a shell. <TT>tpips</TT> commands simply extend a shell.
+<DT><STRONG>-c</STRONG>
+<DD>behaves like a command, not a shell (it is the default option).
+<DT><STRONG>-v</STRONG>
+<DD>displays version and architecture information.
+<DT><STRONG>-h or -?</STRONG>
+<DD>provides some help.
+<DT><STRONG>-j</STRONG>
+<DD>jpips special mode.
+<DT><STRONG>-w</STRONG>
+<DD>starts with a wrapper (jpips special again)...
+<DT><STRONG>-l</STRONG>
+<DD>&lt;logfile&gt;: log to &lt;logfile&gt;.
+<DT><STRONG>-r</STRONG>
+<DD>&lt;rcfile&gt;: source the &lt;rcfile&gt; file. (default ~/.tpipsrc)
+<DT><STRONG>-e</STRONG>
+<DD>tpips-cmds: executes the &lt;tpips-cmds&gt; commands.
+</DL><H1><A NAME="SECTION000100000000000000000">
+9 Environment</A>
+</H1>
+<P>
+Before using <TT>tpips</TT>, you need to add a PIPS root directory to
+your path and to set some PIPS environment variables. In
+order to do that, you can execute the shell script
+Pips/pipsrc.sh for any sh compatible shell, e.g. ksh or
+bash, or Pips/pipsrc.csh for any csh compatible shell, e.g.
+tcsh.
+<P><H1><A NAME="SECTION000110000000000000000">
+&Agrave;propos de ce document... </A>
+</H1> 
+ <STRONG>Tpips: command line interpreter</STRONG><P>
+This document was generated using the
+<A HREF="http://www-dsed.llnl.gov/files/programs/unix/latex2html/manual/"><STRONG>LaTeX</STRONG>2<tt>HTML</tt></A> translator Version 97.1 (release) (July 13th, 1997)
+<P>
+Copyright &#169; 1993, 1994, 1995, 1996, 1997,
+<A HREF="http://cbl.leeds.ac.uk/nikos/personal.html">Nikos Drakos</A>, 
+Computer Based Learning Unit, University of Leeds.
+<P>
+The command line arguments were: <BR>
+ <STRONG>latex2html</STRONG> <tt>-split 0 tpips.tex</tt>.
+<P>
+The translation was initiated by Corinne ANCOURT on 10/5/1998<HR>
+<!--Navigation Panel-->
+<IMG HEIGHT="36" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="http://www.cri.ensmp.fr/~httpd/icons/latex2html/next_motif_gr.gif"> 
+<IMG HEIGHT="36" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="http://www.cri.ensmp.fr/~httpd/icons/latex2html/up_motif_gr.gif"> 
+<IMG HEIGHT="36" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="http://www.cri.ensmp.fr/~httpd/icons/latex2html/previous_motif_gr.gif"> 
+<IMG HEIGHT="36" ALIGN="BOTTOM" BORDER="0" ALT="next_group"
+ SRC="http://www.cri.ensmp.fr/~httpd/icons/latex2html/next_group_motif_gr.gif"> 
+<IMG HEIGHT="36" ALIGN="BOTTOM" BORDER="0" ALT="previous_group"
+ SRC="http://www.cri.ensmp.fr/~httpd/icons/latex2html/previous_group_motif_gr.gif">   
+<BR>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<I>Corinne ANCOURT</I>
+<BR><I>10/5/1998</I>
+</ADDRESS>
+</BODY>
+</HTML>
+
