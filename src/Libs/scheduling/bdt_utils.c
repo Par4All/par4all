@@ -46,6 +46,7 @@
 #include "resources.h"
 #include "array_dfg.h"
 #include "pip.h"
+#include "static_controlize.h"
 #include "scheduling.h"
 
 /* Local defines */
