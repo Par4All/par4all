@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: newgen.c,v $
+ * Revision 1.21  2003/06/16 15:24:50  coelho
+ * void*
+ *
  * Revision 1.20  2003/06/16 15:00:51  coelho
  * db_void added.
  *
@@ -45,66 +48,66 @@ void initialize_newgen()
      * re-entry in newgen because of the graph stuff...
      */  
     gen_init_external(ARC_LABEL_NEWGEN_EXTERNAL, 
-		      (char *(*)()) gen_read, 
+		      (void* (*)()) gen_read, 
 		      (void (*)()) gen_write,
 		      (void (*)()) gen_free, 
-		      (char *(*)()) gen_copy_tree_with_sharing,
+		      (void* (*)()) gen_copy_tree_with_sharing,
 		      (int (*)()) gen_allocated_memory);
 
     gen_init_external(VERTEX_LABEL_NEWGEN_EXTERNAL, 
-		      (char *(*)()) gen_read, 
+		      (void* (*)()) gen_read, 
 		      (void (*)()) gen_write,
 		      (void (*)()) gen_free, 
-		      (char *(*)()) gen_copy_tree_with_sharing,
+		      (void* (*)()) gen_copy_tree_with_sharing,
 		      (int (*)()) gen_allocated_memory);
 
     gen_init_external(PPOLYNOME_NEWGEN_EXTERNAL, 
-		      (char *(*)()) polynome_gen_read, 
+		      (void* (*)()) polynome_gen_read, 
 		      (void (*)()) polynome_gen_write, 
 		      (void (*)()) polynome_gen_free,
-		      (char *(*)()) polynome_gen_copy_tree,
+		      (void* (*)()) polynome_gen_copy_tree,
 		      (int (*)()) polynome_gen_allocated_memory);
 
     gen_init_external(PVECTEUR_NEWGEN_EXTERNAL, 
-		      (char *(*)()) vect_gen_read, 
+		      (void* (*)()) vect_gen_read, 
 		      (void (*)()) vect_gen_write, 
 		      (void (*)()) vect_gen_free,
-		      (char *(*)()) vect_gen_copy_tree,
+		      (void* (*)()) vect_gen_copy_tree,
 		      (int (*)()) vect_gen_allocated_memory);
 
     gen_init_external(PSYSTEME_NEWGEN_EXTERNAL, 
-		      (char *(*)()) sc_gen_read, 
+		      (void* (*)()) sc_gen_read, 
 		      (void (*)()) sc_gen_write, 
 		      (void (*)()) sc_gen_free,
-		      (char *(*)()) sc_gen_copy_tree,
+		      (void* (*)()) sc_gen_copy_tree,
 		      (int (*)()) sc_gen_allocated_memory);
 
     gen_init_external(MATRICE_NEWGEN_EXTERNAL, 
-		      (char *(*)()) gen_core,
+		      (void* (*)()) gen_core,
 		      (void (*)()) gen_core, 
 		      (void (*)()) free,
-		      (char *(*)()) gen_core,
+		      (void* (*)()) gen_core,
 		      (int (*)()) NULL); /* can't get the size... FC */
 
     gen_init_external(PTSG_NEWGEN_EXTERNAL,
-		      (char *(*)()) gen_core,
+		      (void* (*)()) gen_core,
 		      (void (*)()) gen_core, 
 		      (void (*)()) sg_rm,
-		      (char *(*)()) sg_dup,
+		      (void* (*)()) sg_dup,
 		      (int (*)()) NULL); /* can't get the size... FC */
 
     gen_init_external(VOID_STAR_NEWGEN_EXTERNAL,
-		      (char *(*)()) gen_core,
+		      (void* (*)()) gen_core,
 		      (void (*)()) gen_core, 
 		      (void (*)()) gen_null,
-		      (char *(*)()) gen_identity,
+		      (void* (*)()) gen_identity,
 		      (int (*)()) gen_false);
 
     /* do nothing! */
     gen_init_external(DB_VOID_NEWGEN_EXTERNAL,
-		      (char* (*)()) gen_false, /* read */
+		      (void* (*)()) gen_false, /* read */
 		      (void (*)()) gen_null, /* write */
 		      (void (*)()) gen_null, /* free */
-		      (char* (*)()) gen_false, /* copy */
+		      (void* (*)()) gen_false, /* copy */
 		      (int (*)()) gen_true); /* size */
 }
