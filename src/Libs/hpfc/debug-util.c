@@ -4,18 +4,6 @@
  * Fabien Coelho, May 1993.
  */
 
-#include <stdio.h>
-extern int fprintf();
-
-#include "genC.h"
-#include "ri.h"
-#include "hpf.h"
-#include "hpf_private.h"
-#include "message.h"
-
-#include "ri-util.h"
-#include "misc.h"
-#include "hpfc.h"
 #include "defines-local.h"
 
 extern char *flint_print_basic();
