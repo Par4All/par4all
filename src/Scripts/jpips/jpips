@@ -5,6 +5,9 @@
 # a shell wrapper for "JPips", the java-based pips interface.
 #
 # $Log: jpips,v $
+# Revision 1.11  1998/11/20 18:44:53  coelho
+# jpips fixed.
+#
 # Revision 1.10  1998/11/18 12:19:22  coelho
 # beta4 used.
 #
@@ -40,7 +43,7 @@
 usage()
 {
     cat <<-EOF >&2
-	jpips [-m menu] [-h] [-n] [-d] [-e]
+	jpips [-m menu] [-hnde]
 	-m menu: the type of menu that should be used (default: test)
 	-h: some help
 	-n: no console with jpips
@@ -134,15 +137,21 @@ PATH="${JAVA_ROOT:-/usr/local/jdk1.2beta4}/bin:${PATH}"
 #
 # now do the job
 
+if [ -d ${java_root} ] 
+then
+    java_bin="${java_root}/bin/"
+else
+    java_bin=''
+fi
+
 export CLASSPATH
 
 # always as a shell...
 
 TPIPS_IS_A_SHELL=1
-
 export TPIPS_IS_A_SHELL
 
 # verbose execution...
 set -x
 CLASSPATH=${jpips}:${java_root}/lib/classes.zip:${CLASSPATH}
-exec ${java_root}/bin/java ${props} JPips.JPips ${forward}
+exec ${java_bin}java ${props} JPips.JPips ${forward}
