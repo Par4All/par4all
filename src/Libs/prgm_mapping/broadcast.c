@@ -23,7 +23,7 @@
 #include "sc.h"
 #include "polyedre.h"
 #include "union.h"
-/*#include "matrice.h"   Obsolete */
+#include "matrice.h"
 #include "matrix.h"
 
 #include "ri.h"
