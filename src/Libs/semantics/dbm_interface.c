@@ -350,11 +350,11 @@ bool summary_precondition(char * module_name)
 			 module_name, (char * )t);
 
   ifdebug(1) {
-    debug(1, "summary_precondition", 
-	  "initial summary precondition %x for %s (%d call sites):\n",
+    pips_debug(1,
+	  "initial summary precondition %p for %s (%d call sites):\n",
 	  t, module_name, get_call_site_number());
     dump_transformer(t);
-    debug(1, "summary_precondition", "end\n");
+    pips_debug(1, "end for module %s\n", module_name);
   }
 
   reset_current_module_entity();
@@ -556,8 +556,10 @@ bool module_name_to_preconditions(char *module_name)
 	     * local frame as defined by value mappings (FI, 31 January 1994) 
 	     */
 	  ifdebug(1) {
+	    /* An external-transformer_consistency_p() is needed.
 	    pips_assert("The summary precondition is consistent",
 			transformer_consistency_p(ip));
+	    */
 	  }
 	    translate_global_values(get_current_module_entity(), ip);
 	    ifdebug(8) {
@@ -565,7 +567,9 @@ bool module_name_to_preconditions(char *module_name)
 			     "module_name_to_preconditions\n"
 			     "\t summary_precondition %p after translation:\n",
 			       ip);
-		(void) print_transformer(ip);
+		print_transformer(ip);
+		pips_assert("The summary precondition is consistent",
+			    transformer_consistency_p(ip));
 	    }
 	    /* pre = ip o pre */
 	    pre = transformer_combine(transformer_dup(ip), pre);
