@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.77  1997/09/17 12:56:57  coelho
+ * implicit DCMPLX ignored.
+ *
  * Revision 1.76  1997/09/16 11:50:55  coelho
  * implied complex is hidden.
  *
@@ -44,7 +47,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.76 1997/09/16 11:50:55 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.77 1997/09/17 12:56:57 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -389,9 +392,9 @@ words_regular_call(call obj)
 	pc = CHAIN_SWORD(pc, "CALL ");
     }
 
-    /* the implied complex operator is hidden... CMPLX_(x,y) -> (x,y)
+    /* the implied complex operator is hidden... [D]CMPLX_(x,y) -> (x,y)
      */
-    if (!ENTITY_IMPLIED_CMPLX_P(f))
+    if (!ENTITY_IMPLIED_CMPLX_P(f) && !ENTITY_IMPLIED_DCMPLX_P(f))
 	pc = CHAIN_SWORD(pc, entity_local_name(f));
 
     if( !ENDP( call_arguments(obj))) {
