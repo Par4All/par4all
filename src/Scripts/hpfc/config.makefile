@@ -26,7 +26,9 @@ $(ARCH)/hpfc_interactive: $(ARCH)/hpfc_interactive.o
 		$(ARCH)/hpfc_interactive.o -lreadline -ltermcap
 	chmod a-w $(ARCH)/hpfc_interactive
 
-clean:
+clean: local-clean
+
+local-clean:
 	$(RM) $(ARCH)/hpfc_interactive.o $(ARCH)/hpfc_interactive *~
 
 web: hpfc_directives
