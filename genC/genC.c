@@ -4,6 +4,9 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.57  2003/06/19 15:54:44  coelho
+ * no warning
+ *
  * Revision 1.56  2000/04/20 18:51:46  coelho
  * gen_size proto is nicer.
  *
@@ -852,10 +855,12 @@ static FILE * fopen_suffix(string prefix, string suffix)
  */
 void gencode(string file)
 {
+    int no_warning = (int)sharp_ifopt + (int)sharp_else + (int) sharp_endif;
     int i;
     FILE * header, * code;
 
-    if (file==NULL) fatal("[gencode] no file name specified\n");
+    if (file==NULL) 
+      fatal("[gencode] no file name specified (%d)\n", no_warning);
 
     if (sizeof(void *)!=sizeof(gen_chunk))
 	fatal("[gencode] newgen fundamental layout hypothesis broken\n");
