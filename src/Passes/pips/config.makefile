@@ -15,9 +15,10 @@
 #
 # Source, header and object files used to build the target
 #
-LIB_CFILES=	pips.c
-LIB_HEADERS=	pips-local.h 
-LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
+LIB_CFILES	= pips.c
+LIB_HEADERS	= pips-local.h 
+LIB_OBJECTS	= $(LIB_CFILES:.c=.o)
+LIB_MAIN	= pips_main.c
 #
-TARGET_LIBS= 	$(PIPS_LIBS)
+TARGET_LIBS	= $(PIPS_LIBS)
 #
