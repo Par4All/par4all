@@ -272,20 +272,28 @@ instruction instr;
 			  instr));
 }
 
-statement make_assign_statement(l, r)
-expression l, r;
+instruction 
+make_assign_instruction(expression l,
+                        expression r)
 {
-    call c = make_call(entity_intrinsic(ASSIGN_OPERATOR_NAME),
-		       CONS(EXPRESSION, l, CONS(EXPRESSION, r, NIL)));
+   call c = call_undefined;
+   instruction i = instruction_undefined;
 
-    pips_assert("make_assign_statement",
-		syntax_reference_p(expression_syntax(l)));
+   pips_assert("make_assign_statement",
+               syntax_reference_p(expression_syntax(l)));
+   c = make_call(entity_intrinsic(ASSIGN_OPERATOR_NAME),
+                 CONS(EXPRESSION, l, CONS(EXPRESSION, r, NIL)));
+   i = make_instruction(is_instruction_call, c);
 
-    return(make_statement(entity_empty_label(), 
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  string_undefined,
-			  make_instruction(is_instruction_call, c)));
+   return i;
+}
+
+
+statement
+make_assign_statement(expression l,
+                      expression r)
+{
+    return make_stmt_of_instr(make_assign_instruction(l, r));
 }
 
 /* FI: make_block_statement_with_stop is obsolete, do not use */
