@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/08/01 09:13:45 $, ) 
+ * ($Date: 1995/08/01 11:33:55 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -92,10 +92,8 @@ entity src, trg;
     
     /* psi_d = psi_r + |psi_r| delta
      */
-    sc_add_egalite(sharing, contrainte_make(vect_make(VECTEUR_NUL, 
-						      psi_d, -1, 
-						      psi_r, 1,
-						      delta, size_r)));
+    sc_add_egalite(sharing, contrainte_make(vect_make
+	(VECTEUR_NUL, psi_d, -1, psi_r, 1, delta, size_r, TCST, 0)));
 
     if (size_d >= size_r)
     {
@@ -346,12 +344,14 @@ statement true, false;
 
 /* builds the diffusion loop.
  *
- * DO ldiff in sr
- *   LID computation(...)
- *   IF (MYLID.NE.LID) send to LID
- * ENDDO
+ * [ IF (LAZY_SEND) THEN ]
+ *   DO ldiff in sr
+ *     LID computation(...)
+ *     IF (MYLID.NE.LID) send to LID
+ *   ENDDO
+ * [ ENDIF ]
  */
-static statement diffuse(lid, proc, sr, ldiff, lazy)
+static statement broadcast(lid, proc, sr, ldiff, lazy)
 entity lid, proc;
 Psysteme sr;
 list /* of entity */ ldiff;
@@ -386,12 +386,12 @@ pre(t, lid)
 int t;
 entity lid;
 {
-    return(t==CPY ? make_empty_statement() :
+    return t==CPY ? make_empty_statement() :
 	   t==SND || t==BRD ? hpfc_initsend(lazy_message_p()) :
            t==RCV ? (lazy_message_p() ? 
 		    set_logical(hpfc_name_to_entity(LAZY_RECV), TRUE) :
 		    hpfc_generate_message(lid, FALSE, FALSE)) :
-	   statement_undefined);
+	   statement_undefined;
 }
 
 static statement 
@@ -417,10 +417,10 @@ entity lid, proc;
 Psysteme sr;
 list /* of entities */ ldiff;
 {
-    return(t==CPY || t==RCV ? make_empty_statement() :
+    return t==CPY || t==RCV ? make_empty_statement() :
            t==SND ? hpfc_generate_message(lid, TRUE, lazy_message_p()) :
-           t==BRD ? diffuse(lid, proc, sr, ldiff, lazy_message_p()) :
-	   statement_undefined);
+           t==BRD ? broadcast(lid, proc, sr, ldiff, lazy_message_p()) :
+	   statement_undefined;
 }
 
 static statement 
@@ -599,7 +599,7 @@ statement the_code;
 
 /*  remaps src to trg.
  */
-statement 
+static statement 
 hpf_remapping(src, trg)
 entity src, trg;
 {
