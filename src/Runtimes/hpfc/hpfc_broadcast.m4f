@@ -1,11 +1,14 @@
 c
 c $RCSfile: hpfc_broadcast.m4f,v $ (version $Revision$)
-c $Date: 1995/12/01 11:47:27 $, 
+c $Date: 1996/03/11 17:10:33 $, 
 c
 c management of broadcasts
 c typical call: hpfc_broadcast_x(lid, [number, step]*x)
 c broadcast the current message to the described set of pe.
 c fake version added...
+c special guarded version for remappings:
+c typical call: hpfc_remapbrd_x(an, lid, [number, step]*x)
+c   where an is the source array arrangement of the remapping.
 c
 define(`LIST_DECL_AREA',`
      $     n$1, s$1')dnl
@@ -49,6 +52,28 @@ COMMA_REPLICATE(LEVEL,`LIST_INDEX_DECL')`'LEVEL_ZERO(,``,'')
       include "hpfc_commons.h"
 SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
       if (i`'LEVEL.ne.MYLID) then
+         debug(write (unit=0, fmt=*)
+     $        "BRD to ", i`'LEVEL, SENDCHANNELS(i`'LEVEL))
+         call pvmfsend(NODETIDS(i`'LEVEL), 
+     $        SENDCHANNELS(i`'LEVEL), info)
+         SENDCHANNELS(i`'LEVEL) = SENDCHANNELS(i`'LEVEL) + 2
+      endif
+SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
+      end
+      subroutine build_name(hpfc_remapbrd,LEVEL)(
+     $     an, i0`'LEVEL_ZERO(,``,'') dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA'))
+      integer
+     $     an, i0, dnl
+COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA')`'LEVEL_ZERO(,``,'')dnl
+COMMA_REPLICATE(LEVEL,`LIST_INDEX_DECL')`'LEVEL_ZERO(,``,'')
+     $     info
+      include "fpvm3.h"
+      include "hpfc_commons.h"
+      external HPFC_TWIN_P
+      logical HPFC_TWIN_P
+SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
+      if (i`'LEVEL.ne.MYLID.and..not.HPFC_TWIN_P(an, i`'LEVEL)) then
          debug(write (unit=0, fmt=*)
      $        "BRD to ", i`'LEVEL, SENDCHANNELS(i`'LEVEL))
          call pvmfsend(NODETIDS(i`'LEVEL), 
