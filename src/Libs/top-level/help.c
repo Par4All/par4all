@@ -1,3 +1,7 @@
+/* $RCSfile: help.c,v $ (version $Revision$)
+ * $Date: 1997/04/14 10:48:11 $, 
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -40,7 +44,7 @@ char *argv[];
 
     fclose(fd);
 }
-
+
 void get_help_topic(topic, pargc, argv)
 char *topic;
 int *pargc;
@@ -97,3 +101,12 @@ char *argv[];
 
     fclose(fd);
 }
+
+/* add checkings here
+ */
+void pips_checks(void)
+{
+    if (!getenv("PIPS_ROOT"))
+	pips_user_error("PIPS_ROOT environment variable not set\n");
+}
+
