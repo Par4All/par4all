@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 13:34:39 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 13:52:58 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1736,9 +1736,10 @@ write_leaf_in(
 	    }
 	}
 	else {
-	    (void) fprintf( user_file ,"#]ref %d \"%d%c", 
-		     bp->index, bp-Domains, HASH_SEPAR ) ;
-	    write_string( "", (obj->p+HASH_OFFSET)->s, "\" " ) ;
+	  int type_number = gen_type_translation_actual_to_old(bp->index);
+	  (void) fprintf( user_file ,"#]ref %d \"%d%c", 
+			  type_number, bp-Domains, HASH_SEPAR ) ;
+	  write_string( "", (obj->p+HASH_OFFSET)->s, "\" " ) ;
 	}
 	return( !GO) ;
     }
@@ -1942,9 +1943,10 @@ write_tabulated_leaf_in(
 	 */
 	if( number >= 0 ) 
 	{
-	    (void) fprintf( user_file ,"#]def %d \"%d%c", 
-		     bp->index, bp-Domains, HASH_SEPAR ) ;
-	    write_string( "", (obj->p+HASH_OFFSET)->s, "\" " ) ;
+	  int type_number = gen_type_translation_actual_to_old(bp->index);
+	  (void) fprintf( user_file ,"#]def %d \"%d%c", 
+			  type_number, bp-Domains, HASH_SEPAR);
+	  write_string( "", (obj->p+HASH_OFFSET)->s, "\" " );
 	    
 	    /* once written the domain number sign is inverted,
 	     * to tag the object has been written, so that
@@ -2220,7 +2222,29 @@ gtt_write_table(string filename, gen_type_translation_p table)
 }
 
 /* exported... */
-gen_type_translation_p gen_current_type_translation_table = NULL;
+static gen_type_translation_p gen_current_type_translation_table = NULL;
+
+int gen_type_translation_old_to_actual(int n)
+{
+  int nn;
+  message_assert("valid old type number", n>=0 && n<MAX_DOMAIN);
+  if (!gen_current_type_translation_table) return n;
+  nn = gen_current_type_translation_table->old_to_actual[n];
+  if (nn==-1) fatal("old type number %d not available", n);
+  message_assert("valid new type number", nn>=0 && nn<MAX_DOMAIN);
+  return nn;
+}
+
+int gen_type_translation_actual_to_old(int n)
+{
+  int on;
+  message_assert("valid new type number", n>=0 && n<MAX_DOMAIN);
+  if (!gen_current_type_translation_table) return n;
+  on = gen_current_type_translation_table->actual_to_old[n];
+  if (on==-1) fatal("new type number %d not available", n);
+  message_assert("valid new type number", on>=0 && on<MAX_DOMAIN);
+  return on;
+}
 
 void gen_type_translation_reset(void)
 {
