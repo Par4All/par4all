@@ -11,7 +11,6 @@
 
 #include "genC.h"
 #include "ri.h"
-#include "graph.h"
 #include "makefile.h"
 #include "properties.h"
 
@@ -165,7 +164,7 @@ pips_main(int argc, char ** argv)
     initialize_signal_catcher();
     pips_log_handler = pips_user_log;
 
-    if(setjmp(pips_top_level)) {
+    if (setjmp(pips_top_level)) {
 	/* no need to pop_pips_context() at top-level */
 	/* FI: are you sure make_close_program() cannot call user_error() ? */
 	close_workspace();
@@ -204,9 +203,7 @@ pips_main(int argc, char ** argv)
 	 */
 	if (success && selected_rules) 
 	{
-	    MAPL(r_cp, { /* Select rules */
-		select_rule(STRING(CAR(r_cp)));
-	    }, selected_rules);
+	    MAP(STRING, r, select_rule(r), selected_rules);
 	}
 
 	/* Perform applies
