@@ -409,10 +409,37 @@ static bool pips_split_file(string name, string tempfile)
 #endif
 }
 
-bool process_user_file(file)
-string file;
+/********************************************** managing .F files with cpp */
+
+#define CPP_FILTERED_SUFFIX 	".cpp_processed"
+#define CPP_PIPS_OPTIONS_ENV 	"PIPS_CPP_FLAGS"
+#define CPP_CPPFLAGS		"cpp -P -C -D__PIPS__ -D__HPFC__ "
+
+static bool dot_F_file_p(string name)
+{
+    int l = strlen(name);
+    return l>=2 && name[l-1]=='F' && name[l-2]=='.';
+}
+
+/* returns the newly allocated name */
+static string process_thru_cpp(string name)
+{
+    string new_name = strdup(concatenate(name, CPP_FILTERED_SUFFIX, NULL));
+    string cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
+
+    safe_system(concatenate(CPP_CPPFLAGS, cpp_options? cpp_options: "", " ",
+			    name, " > ", new_name, NULL));
+
+    return new_name;
+}
+
+/*************************************************** managing a user file */
+
+bool process_user_file(
+    string file)
 {
     bool success_p = FALSE;
+    bool cpp_processed_p;
     database pgm;
     FILE *fd;
     char *cwd;
@@ -422,14 +449,27 @@ string file;
     static char *tempfile = NULL;
     static int number_of_files = 0;
     static int number_of_modules = 0;
+    string initial_file = file;
     int err;
 
     number_of_files++;
     pips_debug(1, "file %s (number %d)\n", file, number_of_files);
 
+
     if (! file_exists_p(file)) {
 	pips_user_warning("Cannot open file : %s\n", file);
 	return FALSE;
+    }
+
+
+    /* CPP
+     */
+    cpp_processed_p = dot_F_file_p(file);
+
+    if (cpp_processed_p)
+    {
+	pips_debug(1, "file %s preprocessed thru cpp\n", file);
+	file = process_thru_cpp(initial_file);
     }
 
     if (tempfile == NULL) {
@@ -438,7 +478,8 @@ string file;
 
     pgm = db_get_current_workspace();
 
-    /* the absolute path of file is calculated */
+    /* the absolute path of file is calculated
+     */
     abspath = strdup((*file == '/') ? file : 
 		     concatenate(get_cwd(), "/", file, NULL));
 
@@ -446,7 +487,7 @@ string file;
 
     /* the new file is registered in the database
      */
-    user_log("Registering file %s\n", file);
+    user_log("Registering file %s\n", initial_file);
 
     /* FI: two problems here
        - the successive calls to DB_PUT_FILE_RESOURCE erase each other...
@@ -516,8 +557,13 @@ string file;
     }
     safe_fclose(fd, tempfile);
 
-    unlink(tempfile);
-    tempfile = NULL;
+    unlink(tempfile); tempfile = NULL;
+
+    if (cpp_processed_p) 
+    { 
+	unlink(file); /* remove .cpp_filtered file */
+	/* free(file); ??? */ 
+    }
 
     if(!success_p) {
 	user_warning("", "No module was found when splitting file %s.\n",
