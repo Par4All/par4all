@@ -65,7 +65,7 @@ jmp_buf pips_top_level;
  * AC 94/03/30
  */
 
-void print_bdt(module_name)
+boolean print_bdt(module_name)
 
  char     *module_name;
 {
@@ -92,6 +92,8 @@ void print_bdt(module_name)
      fprintf(stderr, "\n\n *** PRINT_BDT DONE\n");
 
  debug_off();
+
+ return(TRUE);
 }
 
 /*==================================================================*/
@@ -104,7 +106,7 @@ void print_bdt(module_name)
  * AC 93/10/30
  */
 
-void scheduling(mod_name)
+boolean scheduling(mod_name)
 char            *mod_name;
 {
   graph           dfg, rdfg;
@@ -168,4 +170,6 @@ char            *mod_name;
   reset_current_module_entity();
 
   debug_off();
+
+  return(TRUE);
 }
