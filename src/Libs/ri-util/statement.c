@@ -1104,11 +1104,11 @@ statement_identification(statement s)
 			instruction_tag(statement_instruction(s)));
     }
 
-    sprintf(buffer, "%d (%d, %d) at 0x%x: %s\n",
+    sprintf(buffer, "%d (%d, %d) at %p: %s\n",
 	    statement_number(s),
 	    ORDERING_NUMBER(so),
 	    ORDERING_STATEMENT(so),
-	    (unsigned int) s,
+	    s,
 	    instrstring);
 
     return buffer;
@@ -1315,7 +1315,8 @@ fix_label_and_comment_in_empty_block(statement s)
     statement_label(s) = entity_empty_label();
     statement_comments(continue_s) = statement_comments(s);
     statement_comments(s) = string_undefined;
-    
+    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+
     instructions = CONS(STATEMENT, continue_s, instructions);
     instruction_block(statement_instruction(s)) = instructions;
 }
