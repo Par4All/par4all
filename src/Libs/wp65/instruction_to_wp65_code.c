@@ -214,11 +214,15 @@ instruction_to_wp65_code(entity module, list l, graph dg,int pn,int bn,int ls,in
 				       memory_module, emulator,
 				       fetch_map,store_map,mod_stat);
 		break;}
-	    case is_instruction_call:  { 
-		call_to_wp65_code(s1,compute_module,
-				  memory_module,
-				  (entity) bank_indices->var,proc_id,
-				  computational,emulator, fetch_map,store_map,v_to_esv);
+	    case is_instruction_call:  {     
+		if (!return_statement_p(s1)) {
+  
+		     call_to_wp65_code(s1,compute_module,
+				      memory_module,
+				      (entity) bank_indices->var,proc_id,
+				      computational,emulator, fetch_map,
+				      store_map,v_to_esv);
+		}
 		break;
 	    } 
 	    case is_instruction_unstructured: {
@@ -254,6 +258,8 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
     instruction i; 
     call c = instruction_call(statement_instruction(s));
     /* To deal with implied_do and I/Os */
+
+
     if (strcmp(entity_local_name(call_function(c)), "WRITE") == 0) {
 	generate_io_wp65_code(s,s,v_to_esv,FALSE);
 	i = statement_instruction(emulator);
@@ -261,7 +267,7 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
 					 CONS(STATEMENT, 
 					      gen_copy_tree(s), NIL));
     }
-    else { /* communications for variables having to be 
+     else { /* communications for variables having to be 
 	      loaded in local memories  for assignments */
 	if ((lrefs = (list) GET_STATEMENT_MAPPING(fetch_map,s))
 	    != (list) HASH_UNDEFINED_VALUE) { 
@@ -295,7 +301,7 @@ call_to_wp65_code(statement s, entity compute_module, entity memory_module,
 	    include_constant_symbolic_communication(memory_module,lrefs,
 						    !load_code,emulator,bank_id);
 	} 
-    }
+     }
 }
 
 /* This function extracts from an implied_do expression the 
@@ -363,7 +369,7 @@ translate_IO_ref(call c, hash_table v_to_esv, boolean loop_or_call_print)
 	if (syntax_reference_p(s)) {
 	    syntax sy1 = expression_syntax(exp);
 	    reference ref1 = syntax_reference(sy1);
-	    list indic = reference_indices(ref1);
+	    list indic = gen_full_copy_list(reference_indices(ref1));
 	    entity ent1=(entity)hash_get(v_to_esv,
 					 (char *) reference_variable(ref1));
 	    reference newr = make_reference(ent1,indic);
@@ -402,7 +408,7 @@ generate_io_wp65_code(statement s1,statement body,hash_table v_to_esv,boolean lo
     }
     else 
 	c= instruction_call(inst);
-    r = translate_IO_ref(c,v_to_esv,loop_or_call_print);
+     r = translate_IO_ref(c,v_to_esv,loop_or_call_print);
     rv = reference_variable(r);
     esv_ref = (entity) hash_get(v_to_esv,(char *) rv); 
     rvt = entity_type(esv_ref);
@@ -423,14 +429,16 @@ generate_io_wp65_code(statement s1,statement body,hash_table v_to_esv,boolean lo
 	implied_do_range_list = NIL;
 	implied_do_ranges(result);
 	implied_do_range_list = gen_nreverse(implied_do_range_list);
-	for (i=1,pl = implied_do_range_list; !ENDP(pl); POP(pl),i++) {
+	 for (i=1,pl = implied_do_range_list; !ENDP(pl); POP(pl),i++) {
 	    range r1 = RANGE(CAR(pl));
 	    list ldim = gen_nthcdr(i-1,rvld); 
-	    expression low = dimension_lower(DIMENSION(CAR(ldim)));
-	    expression up = dimension_upper(DIMENSION(CAR(ldim)));
+	    expression low = copy_expression(
+		dimension_lower(DIMENSION(CAR(ldim))));
+	    expression up = copy_expression(
+		dimension_upper(DIMENSION(CAR(ldim))));
 	    range_lower(r1)=low; 
-	    range_upper(r1)=up;
-	}
+	    range_upper(r1)=up; 
+	} 
     }
     return(result);
 }
@@ -501,7 +509,7 @@ loop_nest_movement_generation(
     debug_on("WP65_DEBUG_LEVEL");
     /* the list of data having to be store into the global memory 
        is the concatenation  of store_map sets of the internal loops */
-        
+     
     concat_data_list(&fetch_data_list,&fetch_reference_list,
 		     loop_nest,fetch_map,fully_parallel); 
     concat_data_list(&store_data_list , &store_reference_list ,
