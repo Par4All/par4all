@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/12 08:49:33 $, 
+# $Date: 1996/09/12 10:52:19 $, 
 #
 # (c) FC September 1996
 #
@@ -94,6 +94,7 @@ proc changedir { root currentdir } {
     # the global local variables:-)
     #
     global changedir_result changedir_dir changedir_root changedir_home
+    global changedir_entrywidth
 
     set changedir_dir  $currentdir
     set changedir_root $root
@@ -146,6 +147,18 @@ proc changedir { root currentdir } {
     entry $root.direct.entry -width 30 -relief sunken \
 	-textvariable changedir_dir 
     bind  $root.direct.entry <Return> "$root.top.okay invoke"
+    bind  $root.direct.entry <Configure> {
+	set l [winfo width $changedir_root.direct.lab]
+        set d [winfo width $changedir_root.direct]
+	# well, the formula is not convincing...
+	# it is not sure to be stable if sg is changed...
+	set n [expr ($d-$l-24)/7]
+	set w [%W cget -width]
+	if {$n!=$w} {
+	    $changedir_root.direct.entry configure -width $n
+	}
+    }
+
     pack  $root.direct.lab -side left -padx 1m -pady 1m -ipadx 2 -ipady 2 
     pack  $root.direct.entry -side left \
 	-padx 1m -pady 1m -ipadx 2 -ipady 2 -fill y -expand true
@@ -177,7 +190,7 @@ proc changedir { root currentdir } {
 
     # set initial display
     filldirlist $root.list.dirs $changedir_dir
-    seeentryend $changedir_root.direct.entry
+    seeentryend $root.direct.entry
 
     if {$root != ""} {
 	# focus and interaction...
