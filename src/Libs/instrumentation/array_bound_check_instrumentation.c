@@ -170,6 +170,11 @@ static void abc_instrumentation_insert_before_statement(statement s, statement s
 	  /* take the unstructured correspond to the control c */
 	  unstructured u = (unstructured) stack_head(context->uns);
 	  control newc;
+	  ifdebug(2) 
+	    {
+	      fprintf(stderr, "Unstructured case: \n");
+	      print_statement(s);
+	    }  
        
 	  /* for a consistent unstructured, a test must have 2 successors, 
 	     so if s1 is a test, we transform it into sequence in order 
@@ -184,6 +189,7 @@ static void abc_instrumentation_insert_before_statement(statement s, statement s
 	      list seq = CONS(STATEMENT,s1,NIL);
 	      statement s2=instruction_to_statement(make_instruction(is_instruction_sequence,
 								       make_sequence(seq))); 
+	      
 	      newc = make_control(s2, control_predecessors(c), CONS(CONTROL, c, NIL));
 	    }
 	  else 
@@ -253,6 +259,10 @@ static void initial_code_abc_statement_rwt(statement s,abc_instrumentation_conte
       whileloop wl = instruction_whileloop(i);    
       expression e1 = whileloop_condition(wl);
       int n = initial_code_abc_expression(e1);
+
+      /* This code is not correct !
+	 The counting statement must be inserted in the body of the loop !*/
+
       if (n>0)
 	{ 
 	  statement sta = make_abc_count_statement(n);
@@ -267,7 +277,24 @@ static void initial_code_abc_statement_rwt(statement s,abc_instrumentation_conte
       int n = initial_code_abc_expression(e1);
       if (n>0)
 	{ 
-	  statement sta = make_abc_count_statement(n);     
+	  statement sta = make_abc_count_statement(n);    
+	  ifdebug(3) 
+	    {	  
+	      fprintf(stderr, "\n Statement to be inserted before a test: ");    
+	      print_statement(sta);
+	      print_statement(s);
+	    }
+
+	  /* bug Example abc_ins.f : there is STOP statement in the branch of if statement
+	     
+	     IF (A(1).GE.L)
+	       ...
+	       STOP
+	     ENDIF
+	     free_instruction(s) in insert_statement will be not consistent => core dumped 
+	     Solution : like pips_code_abc_statement_rwt */
+
+
 	  abc_instrumentation_insert_before_statement(s,sta,context);	           
 	}	
       break;
@@ -449,12 +476,12 @@ static void  pips_code_abc_statement(statement module_statement)
 }
 
 
-bool array_bound_check_instrumentation(char *module_name)
+bool nga_array_bound_check_instrumentation(char *module_name)
 { 
   statement module_statement;
   
-  /* add COMMON /ARRAY_BOUND_CHECK/ ARRAY_BOUND_CHECK_COUNT to the declaration
-     if main program : DATA ARRAY_BOUND_CHECK_COUNT /0/*/
+  /* add COMMON ARRAY_BOUND_CHECK_COUNT to the declaration
+     if main program : DATA ARRAY_BOUND_CHECK_COUNT 0*/
 
   string new_decl = 
     "      INTEGER*8 ARRAY_BOUND_CHECK_COUNT\n"
@@ -560,6 +587,42 @@ bool array_bound_check_instrumentation(char *module_name)
  
 }
 
+
+bool array_bound_check_instrumentation(char *module_name)
+{
+  entity module_ent = local_name_to_top_level_entity(module_name);
+  list l_decl = code_declarations(entity_code(module_ent));
+
+  debug_on("ALIAS_DEBUG_LEVEL");
+  fprintf(stderr, " \n Begin  alias analysis  for %s \n", module_name);   
+  
+  while(!ENDP(l_decl))
+    {
+      entity e = ENTITY(CAR(l_decl));
+      if (entity_variable_p(e))
+	{
+	  variable v = type_variable(entity_type(e));   
+	  storage s = entity_storage(e);
+	  if (storage_ram_p(s)) 
+	    {
+	      ram r = storage_ram(s);
+	      list l = ram_shared(r);
+	      if (!ENDP(l))
+		{
+		  fprintf(stderr," \n The following variable : ");
+		  fprintf(stderr, "%s ", entity_name(e));
+		  fprintf(stderr,"  has the list of aliased variables : ");
+		  my_print_list_entities(l);
+		}
+	    }
+	}
+      l_decl = CDR(l_decl);
+    }
+
+  fprintf(stderr, " \n End  alias analysis for %s \n", module_name);
+  debug_off();
+  return TRUE; 
+}
 
 
 
