@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/20 19:24:00 $, 
+# $Date: 1996/08/20 19:24:42 $, 
 
 MANS =	Delete.l \
 	Display.l \
@@ -12,7 +12,7 @@ MANS =	Delete.l \
 
 SOURCES = $(MANS)
 
-INSTALL_DOC_DIR=$(PIPS_ROOT)/Doc/Man
+INSTALL_DOC_DIR=$(PIPS_ROOT)/Doc/manl
 INSTALL_DOC=$(MANS)
 
 # end of $RCSfile: config.makefile,v $
