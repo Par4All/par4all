@@ -2,6 +2,9 @@
   $Id$
 
   $Log: Displayer.java,v $
+  Revision 1.6  1999/02/15 14:15:12  coelho
+  *** empty log message ***
+
   Revision 1.5  1998/10/30 15:43:21  ancourt
   class Entension moved from TextDisplayer and toString added
 
@@ -26,8 +29,8 @@ import java.util.*;
 
 import JPips.Pawt.*;
 
-import com.sun.java.swing.*;
-import com.sun.java.swing.border.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 
 /** A window manager.
