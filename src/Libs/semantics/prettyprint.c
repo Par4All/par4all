@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/09 23:30:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/26 19:02:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/07/09 23:30:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/07/26 19:02:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -238,7 +238,8 @@ statement stmt;
     text txt;
 
     if(is_user_view) {
-	statement i = (statement) hash_get(nts, (char *) statement_number(stmt));
+	statement i = (statement) 
+	    hash_get(nts, (char *) statement_number(stmt));
 
 	if(i!=(statement) HASH_UNDEFINED_VALUE) {
 	    t = load_statement_semantic(i);
@@ -434,7 +435,7 @@ text text_transformer(transformer tran)
       if(strlen(crt_line)+1 > MAX_LINE_LENGTH-2) {
 	(void) strcat(crt_line, LINE_SUFFIX);
 	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-						strdup(crt_line)));
+q						strdup(crt_line)));
 
 	if(first_line) {
 	  first_line = FALSE;
@@ -452,6 +453,11 @@ text text_transformer(transformer tran)
 	(void) strcat(crt_line, " ");
 
       ps = (Psysteme) predicate_system(transformer_relation(tran));
+
+      ifdebug(9) {
+	  fprintf(stderr, "[text_transformer] sys 0x%x\n", (unsigned int) ps);
+	  syst_debug(ps);
+      }
 
       if (ps != NULL) {
 	boolean first_constraint = TRUE, last_constraint = FALSE;
