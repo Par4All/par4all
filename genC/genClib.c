@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/06/11 09:16:37 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/06/11 10:05:22 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2676,17 +2676,6 @@ int domain;
 
     not_used[domain]=FALSE;
 
-    /* Add the domain itself because a gen_recurse filter is called if
-       the decision is true in quick_multi_recurse_simple_in(). RK,
-       11/06/1996: */
-    if (gen_debug & GEN_DBG_RECURSE)
-	fprintf(stderr, 
-		" - including %s (%d) itself\n", 
-		Domains[domain].name, domain);
-    DecisionTables[domain][domain] = TRUE;
-
-    
-
     /*   now the closure is computed
      */
     
@@ -3062,6 +3051,12 @@ void gen_multi_recurse(gen_chunk * obj, ...)
 	    new_decision_table[i] |= (*p_table)[i];
     }
 
+    /* updates the decision table for entering list and so of visited domains 
+     * in the simple_in function
+     */
+    for (i=0; i<number_of_domains; i++)
+	if (new_domain_table[i]) new_decision_table[i]=TRUE;
+    
     va_end(pvar);
 
     new_mrc.seen      = hash_table_make(hash_pointer, 0),
