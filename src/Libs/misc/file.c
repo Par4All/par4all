@@ -642,10 +642,15 @@ safe_system_substitute(char * what)
 
 /* @return a new temporary file name, starting with "prefix".
  * the nme is freshly allocated.
+ *
+ * FI: mkstemp() is being deprecated and it returns an integer, usable as
+ * file descriptor, not a character string. 
+ *
  */
 char * 
 safe_new_tmp_file(char * prefix)
 {
     string name = strdup(concatenate(prefix, ".XXXXXX", NULL));
+    pips_assert("Dubious cast of int to char *", FALSE);
     return mkstemp(name);
 }
