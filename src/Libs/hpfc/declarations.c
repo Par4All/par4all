@@ -4,7 +4,7 @@
  * normalization of HPF declarations.
  *
  * $RCSfile: declarations.c,v $ version $Revision$
- * ($Date: 1995/10/04 10:54:04 $, )
+ * ($Date: 1995/10/05 11:32:37 $, )
  */
  
 #include "defines-local.h"
@@ -147,7 +147,7 @@ void close_hpf_number_status()
  */
 void GiveToHpfObjectsTheirNumber()
 {
-    debug(7, "GiveToHpfObjectsTheirNumber", "Here I am!\n");
+    pips_debug(7, "Here I am!\n");
 
     MAP(ENTITY, e,
     {
@@ -192,7 +192,7 @@ entity e;
 	     entity_local_name(in_common ? ram_section(r) : ram_function(r)) :
 	     "DEFAULT");
 
-    assert(entity_variable_p(e) && in_ram);
+    pips_assert("ram variable", entity_variable_p(e) && in_ram);
 
     return(MakeCharacterConstantExpression
 	   (strdup(concatenate("n_", prefix, "_", suffix, NULL))));
@@ -214,13 +214,14 @@ int dim;
 {
     tag t;
 
-    assert(dim>0 && dim<=7 && array_distributed_p(array));
+    pips_assert("valid dimension and distributed array",
+		dim>0 && dim<=7 && array_distributed_p(array));
 
     t = hpf_newdecl_tag
 	(HPF_NEWDECL(gen_nth(dim-1, 
 	 hpf_newdecls_dimensions(load_entity_new_declaration(array)))));
 
-    debug(1, "new_declaration", "%s[%d]: %d\n", entity_name(array), dim, t);
+    pips_debug(1, "%s[%d]: %d\n", entity_name(array), dim, t);
 
     return(t);
 }
@@ -232,7 +233,7 @@ entity e;
     list l = NIL;
     int ndim;
 
-    assert(type_variable_p(t));
+    pips_assert("variable", type_variable_p(t));
     
     ndim = gen_length(variable_dimensions(type_variable(t)));
 
@@ -249,7 +250,8 @@ tag what;
 {
     hpf_newdecl n;
 
-    assert(dim>0 && dim<=7 && array_distributed_p(array));
+    pips_assert("valid dimension and distributed array",
+		dim>0 && dim<=7 && array_distributed_p(array));
 
     if (entity_new_declaration_undefined_p(array))
 	create_new_declaration(array);
@@ -266,7 +268,8 @@ int i, *pmin, *pmax;
 {
     dimension d = entity_ith_dimension(load_new_node(array), i);
 
-    assert((array_distributed_p(array)) && (entity_variable_p(array)));
+    pips_assert("distributed array",
+		array_distributed_p(array) && entity_variable_p(array));
 
     *pmin = HpfcExpressionToInt(dimension_lower(d));
     *pmax = HpfcExpressionToInt(dimension_upper(d));
@@ -357,7 +360,7 @@ int *templdimp, *procsdimp;
 		    int_expr(iceil(szoftempldim, szofprocsdim));
 		break;
 	    default:
-		pips_error("NormalizeHpfDistribute","undefined style tag\n");
+		pips_internal_error("undefined style tag\n");
 		break;
 	    }
 	}
@@ -375,9 +378,8 @@ int *templdimp, *procsdimp;
 		int minvalue = iceil(szoftempldim, szofprocsdim);
 		
 		if (paramvalue<minvalue) 
-		    user_error("NormalizeHpfDistribute",
-			   "too small a block parameter in %s distribution\n",
-			       entity_name(templ));
+		    pips_user_error("block too small in %s distribution\n",
+				    entity_name(templ));
 		break;
 	    }
 	    default:
@@ -404,8 +406,7 @@ distribute d;
 	NormalizeOneTemplateDistribution(di, t, &tdim, p, &pdim), ld);
 
     if ((pdim-1)!=NumberOfDimension(p))
-	user_error("normalize_distribute", 
-		   "%s not enough distributions\n", entity_name(t));
+	pips_user_error("%s not enough distributions\n", entity_name(t));
 		   
 }
 
@@ -611,7 +612,8 @@ NewDeclarationOfDistributedArray(
      */
     if (!bound_new_node_p(array)) return;
     newarray = load_new_node(array);
-    assert(array_distributed_p(array) && entity_variable_p(array));
+    pips_assert("distributed array",
+		array_distributed_p(array) && entity_variable_p(array));
 
     pips_debug(6, "considering array %s, new %s\n",
 	       entity_name(array), entity_name(newarray));
@@ -679,14 +681,14 @@ entity e;
     list o=NIL;
     int n;
 
-    assert(type_variable_p(t));
+    pips_assert("variable", type_variable_p(t));
 
     n = gen_length(variable_dimensions(type_variable(t)));
     for(; n>=1; n--) o = CONS(OVERLAP, make_overlap(0, 0), o);
 
     store_overlap_status(e, o);
 
-    assert(bound_overlap_status_p(e));
+    pips_assert("overlap stored", bound_overlap_status_p(e));
 }
 
 /* set_overlap(ent, dim, side, width)
@@ -702,7 +704,7 @@ int dim, side, width;
     overlap o;
     int current;
 
-    assert(dim>0);
+    pips_assert("valid dimension", dim>0);
 
     if (!bound_overlap_status_p(ent)) create_overlaps(ent);
     o = OVERLAP(gen_nth(dim-1, load_overlap_status(ent)));
@@ -730,10 +732,10 @@ int dim, side;
 {
     overlap o;
 
-    assert(dim>0);
+    pips_assert("valid dimension", dim>0);
 
     if (!bound_overlap_status_p(ent)) create_overlaps(ent);
-    assert(bound_overlap_status_p(ent));
+    pips_assert("overlap ok", bound_overlap_status_p(ent));
 
     o = OVERLAP(gen_nth(dim-1, load_overlap_status(ent)));
     return(side ? overlap_upper(o) : overlap_lower(o));
@@ -774,7 +776,7 @@ list l;
 	 ent = load_new_node(oldent);
 	 ndim = variable_entity_dimension(ent);
 
-	 assert(type_variable_p(entity_type(ent)));
+	 pips_assert("variable", type_variable_p(entity_type(ent)));
 
 	 for (i=1 ; i<=ndim ; i++)
 	 {
@@ -782,9 +784,8 @@ list l;
 	     lower_overlap = get_overlap(oldent, i, 0);
 	     upper_overlap = get_overlap(oldent, i, 1);
 
-	     debug(8, "declaration_with_overlaps", 
-		   "%s(DIM=%d): -%d, +%d\n", 
-		   entity_name(ent), i, lower_overlap, upper_overlap);
+	     pips_debug(8, "%s(DIM=%d): -%d, +%d\n", 
+			entity_name(ent), i, lower_overlap, upper_overlap);
 
 	     if (lower_overlap!=0) 
 		 overlap_redefine_expression(&dimension_lower(the_dim),
