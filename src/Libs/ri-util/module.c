@@ -2,6 +2,9 @@
   * $Id$
   *
   * $Log: module.c,v $
+  * Revision 1.27  1997/11/22 16:55:52  coelho
+  * more debug...
+  *
   * Revision 1.26  1997/11/22 16:24:26  coelho
   * missing assert added.
   *
@@ -335,6 +338,12 @@ insure_global_declaration_coherency(
 
     gen_sort_list(new_decl, compare_entities); /* sorted for determinism */
     entity_declarations(module) = new_decl;
+
+    ifdebug(2) {
+	pips_debug(2, "resulting declarations for %s: ", entity_name(module));
+	MAP(ENTITY, e, fprintf(stderr, "%s, ", entity_name(e)), new_decl);
+	fprintf(stderr, "\n");
+    }
 
     /* the temporaries are cleaned
      */
