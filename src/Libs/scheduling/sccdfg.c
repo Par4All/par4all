@@ -1,4 +1,11 @@
+/* 	$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/sccdfg.c,v 1.5 1997/07/22 12:59:22 keryell Exp $ \n Copyright (c) École des Mines de Paris Proprietary	 */
+
+#ifndef lint
+char vcid_scheduling_sccdfg[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/sccdfg.c,v 1.5 1997/07/22 12:59:22 keryell Exp $ \n Copyright (c) École des Mines de Paris Proprietary";
+#endif /* lint */
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 #include <values.h>
 
