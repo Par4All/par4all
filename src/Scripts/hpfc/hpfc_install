@@ -2,8 +2,11 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1997/01/17 11:15:46 $, )
-# version $Revision$
+# $Id$
+# $Log: hpfc_install,v $
+# Revision 1.32  1997/03/19 17:51:37  coelho
+# better RCS headers
+#
 #
 
 # defaults
