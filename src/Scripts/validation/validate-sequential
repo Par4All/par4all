@@ -1,8 +1,6 @@
 #!/bin/sh
 #
-# SCCS Stuff:
-# $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/05/27 11:52:10 $, ) 
+# $Id$
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -66,8 +64,10 @@ export program
 verb=':'
 debg=':'
 
-MAIL='/usr/ucb/mail'
-test ! -x $MAIL && MAIL=mail
+#MAIL='/usr/ucb/mail'
+#test ! -x $MAIL && MAIL=mail
+
+MAIL=Mail
 
 MAX_NB_LINES='100'
 
