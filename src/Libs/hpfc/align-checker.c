@@ -8,7 +8,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1995/10/05 11:32:23 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1995/12/19 15:52:31 $, )
  * version $Revision$
  */
 
@@ -42,8 +42,8 @@ align_check(
 
     e1 = reference_variable(r1),
     e2 = reference_variable(r2);
-    a1 = load_entity_align(e1),
-    a2 = load_entity_align(e2);
+    a1 = load_hpf_alignment(e1),
+    a2 = load_hpf_alignment(e2);
     li1 = reference_indices(r1),
     li2 = reference_indices(r2);
     *plvect = NIL;
