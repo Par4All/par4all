@@ -1,6 +1,6 @@
-\documentstyle{article}
+\documentstyle[newgen_domain]{article}
 
-\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+%%\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
 \title{PIPS: Me'canisme de gestion de la cohe'rence et d'enchai^nement
 automatique des phases (pipsmake)}
@@ -10,10 +10,9 @@ automatique des phases (pipsmake)}
 \\
     CAI, Ecole des Mines de Paris}
 
-\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
 \begin{document}
 \maketitle
-\sloppy
+%% \sloppy
 
 \section*{Introduction}
 
@@ -87,7 +86,7 @@ partiellement cycliques). }
   Pips sur les ressources ge're'es par pips-db. Chaque phase
   ne'cessite que certaines ressources soient disponibles ({\tt
     required}), elle commence par effectuer d'e'ventuelles
-  transformations ({\tt pre_transformation}), puis produit une ou
+  transformations ({\tt pre\_transformation}), puis produit une ou
   plusieurs ressources ({\tt produced}), et en modifie d'autres ({\tt
     modified}). La diffe'rence entre les ressources produites et
   celles modifie'es permet au driver d'enchainer les phases dans le
@@ -111,7 +110,6 @@ Kennedy},
 \item[dgwolfe] calcul du graphe de de'pendances avec les {\em vecteurs
 de direction de Wolfe},
 \end{description}
-}
 
 \section{De'finition d'une ressource virtuelle}
 
