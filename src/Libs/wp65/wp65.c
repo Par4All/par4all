@@ -325,15 +325,15 @@ statement * pemulator;
     i = statement_instruction(computational);
     instruction_block(i) = gen_nconc(instruction_block(i), 
 				     CONS(STATEMENT, 
-					  make_return_statement(), 
+					  make_return_statement(compute_module), 
 					  NIL));
     i = statement_instruction(emulator);
     instruction_block(i) = gen_nconc(instruction_block(i), 
 				     CONS(STATEMENT, 
-					  make_return_statement(),
+					  make_return_statement(memory_module),
 					  NIL));
 
-    
+  
     fs = STATEMENT(CAR(instruction_block(statement_instruction(computational))));
     statement_comments(fs) = 
 	strdup(concatenate("\nC     WP65 DISTRIBUTED CODE FOR ",
@@ -341,7 +341,7 @@ statement * pemulator;
 			   (string_undefined_p(statement_comments(fs)) 
 			    ? NULL :statement_comments(fs)),
 			   NULL));
-
+    module_reorder(fs);
     fs = STATEMENT(CAR(instruction_block(statement_instruction(emulator))));
     statement_comments(fs) =
 	strdup(concatenate("\nC     BANK DISTRIBUTED CODE FOR ",
@@ -349,7 +349,10 @@ statement * pemulator;
 			   (string_undefined_p(statement_comments(fs)) 
 			    ? NULL :statement_comments(fs)),
 			   NULL));
-
+    module_reorder(fs);
+    /* kill_statement_number_and_ordering(computational);
+    kill_statement_number_and_ordering(emulator);*/
+    
 
     ifdebug(1) {
 	(void) fprintf(stderr,"Final code for the computational module:\n");
@@ -360,7 +363,7 @@ statement * pemulator;
 
     hash_table_free(v_to_esv);
     hash_table_free(v_to_nlv);
-
+   
     /* return results */
     * pcompute_module = compute_module;
     * pcomputational = computational;
