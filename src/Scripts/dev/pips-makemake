@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.292  1997/08/18 08:21:54  coelho
+# forgotten Pass link.
+#
 # Revision 1.291  1997/08/18 07:45:26  coelho
 # ftest/fpips additions.
 #
@@ -618,8 +621,9 @@ SOURCES  += 	\$(INCLUDES) \$(CFILES) \$(DOCS)
 
 \$(PIPS_BINDIR):; mkdir \$(PIPS_BINDIR)
 
-\$(BIN_TARGET): \$(INC_TARGET) \$(LIB_TARGET)
-	\$(LINK) \$(BIN_TARGET) \$(LIB_TARGET) \$(TARGET_LIBS)
+\$(BIN_TARGET): \$(INC_TARGET) \$(LIB_MAIN:.c=.o) \$(LIB_TARGET)
+	\$(LINK) \$(BIN_TARGET) \\
+	    \$(LIB_MAIN:.c=.o) \$(LIB_TARGET) \$(TARGET_LIBS)
 	@echo 
 
 clean-compiled:
