@@ -36,7 +36,7 @@ Pmatrix	a;
     }
     (void) fprintf(f," ......denominator = ");
     (void) fprint_Value(f, MATRIX_DENOMINATOR(a));
-    (void) fprint_Value(f, "\n");
+    (void) fprintf(f, "\n");
 }
 
 /* void matrix_print(matrice a): print an (nxm) rational matrix
