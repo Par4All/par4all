@@ -31,6 +31,7 @@ Paradigme at SuperComputing '95 </a></STRONG>
 <ul>
   <li> <a href="index.html#introduction">Introduction</a>
   <li> <a href="index.html#tech">Technical Pages</a>
+  <li> <a href="index.html#man">Man Pages</a>
   <li> <a href="index.html#team"><b>PIPS</b> Team</a>
   <li> <a href="index.html#history"><b>PIPS</b> History</a>
   <li> <a href="index.html#rwork">Related Work</a>
@@ -63,10 +64,11 @@ demand to perform the analyses or transformations required by the user.
 
 <p>
 
-Three user interfaces are available: a Shell interface <em>(Pips)</em>,
-a line interface <a href="line-interface.html><em>(Tpips)</em></a> and a X-window
-interface <em>(wpips)</em> to the parallelizer which is the best suited
-for users.
+Three user interfaces are available: 
+a Shell interface <a href="dret144/dret144.html"><em>(Pips)</em></a>,
+a line interface <a href="line-interface.html><em>(Tpips)</em></a> and 
+a X-window interface <em>(wpips)</em> to the parallelizer 
+which is the best suited for users.
 
 <p>
 
@@ -81,11 +83,14 @@ functionalities have been added since.
 
 <p>
 
-<b>PIPS</b> is built on top of two tools. The first one is
-<em>Newgen</em> which manages data structures a la <em>IDL</em>. It
-provides basic manipulation functions for data structures described in a
-declaration file. It supports persistent data and type hierachies. All
-<b>PIPS</b> data-types are based on <em>Newgen</em>.
+<b>PIPS</b> is built on top of two tools. The first one is <a
+href="newgen-manual/newgen-manual.html"><em>Newgen</em></a> which
+manages data structures a la <em>IDL</em>. It provides basic
+manipulation functions for data structures described in a declaration
+file. It supports persistent data and type hierachies. All <b>PIPS</b>
+data-types are based on <em>Newgen</em>. A description of PIPS internal
+representation is available in a <a href="ri/ri.html">technical
+report</a>.
 
 <p>
 
@@ -120,10 +125,20 @@ user.
 Seven years after its inception, PIPS as a workbench is still alive and
 well. PIPS provides a robust infrastructure for new experiments in
 compilation, program analysis, optimisation, transformation and
-parallelization. PIPS can also be used as a reverse engineering
-tool. Region analyses provide useful summaries of procedure effects,
-while precondition-based partial evaluation and dead code elimination
-reduce code size. PIPS is available on request.
+parallelization. The PIPS developper environment is described in a <a
+href="dret146/dret146.html">technical report</a>, written in
+French. 
+
+<p>
+
+PIPS can also be used as a reverse engineering tool. Region
+analyses provide useful summaries of procedure effects, while
+precondition-based partial evaluation and dead code elimination reduce
+code size. 
+
+<p>
+
+PIPS is available on request.
 
 <p>
 
@@ -154,6 +169,25 @@ reduce code size. PIPS is available on request.
   <li> <a href="properties-rc/properties-rc.html">Properties</a>,
 
   <li> <a href="wp65.html"><b>WP65</b></a>: A prototype to generate distributed code.
+
+</ul>
+
+<hr>
+
+<a name="man"><h2>Man Pages</h2></a>
+
+<ul>
+
+  <li> <a href="wpips.html><b>Wpips</b></a> X-window user interface.
+
+  <li> <a href="pips.html><b>Pips</b></a> unfriendly raw user interface, 
+	improved by the following Shell scripts:
+       <a href="Init.html">Init</a>,
+       <a href="Display.html">Display</a>,
+       <a href="Perform.html">Perform</a>,
+       <a href="Select.html">Select</a>,
+       <a href="Delete.html">Delete</a>.
+
 </ul>
 
 <hr>
@@ -271,7 +305,7 @@ Rapport de DEA, Juillet 1991, TR E/157.
 
   <li> B. Baron, F. Irigoin, P. Jouvelot,
 <em> Projet PIPS. Manuel utilisateur du parall&eacuteliseur batch</em>,
-Rapport interne EMP-CRI-E144, janvier 1991
+Rapport interne <a href="dret144/dret144.html">EMP-CRI-E144</a>, janvier 1991
 
   <li> P. Berthomier,
 <em> Static Comparison of Different Program Versions</em>,
@@ -346,12 +380,12 @@ July, 1992
   <li> F. Irigoin, P. Jouvelot, 
 <em> Projet PIPS: manuel d'utilisation du parall&eacuteliseur batch
  (VERSION 1.0)</em>.
-15 Décembre 1990, TR E/144
+15 Décembre 1990, <a href="dret146/dret146.html">TR E/144</a>.
 
   <li> F. Irigoin, P. Jouvelot, R. Triolet,
 <em> PIPS: Repr&eacutesentation Interm&eacutediaire</em>,
 documentation interne du projet PIPS, septembre 1988.
-New version, May 1992, TR E/166.
+New version, May 1992, <a href="ri/ri.html">TR E/166.</a>
 
   <li> F. Irigoin, P. Jouvelot, R. Triolet,  <em> Semantical
 Interprocedural Parallelization: An Overview of the PIPS Project</em>,
@@ -359,7 +393,7 @@ Interprocedural Parallelization: An Overview of the PIPS Project</em>,
 
   <li> F. Irigoin, P. Jouvelot, R. Triolet,
 <em> Projet PIPS: environnement de d&eacuteveloppement version 1.0</em>
-Décembre 1990, TR E/146
+Décembre 1990, <a href="dret146/dret146.html">TR E/146</a>
 
   <li> F. Irigoin, R. Triolet,
 <em> Supernodes and Alliant FX/8 Minisupercomputer</em>,
@@ -382,6 +416,9 @@ San Diego, California, January 13-15, pp. 319-329, 1988
   <li> F. Irigoin, R. Triolet, <em> Dependence Approximation and Global
 Parallel Code Generation for Nested Loops</em>, International Workshop
 Parallel and Distributed Algorithms, Bonas, France, October 3-6, 1988
+
+ <li> P. Jouvelot, R. Triolet, <em> NewGen User Manual</em>. December
+1990, <a href="newgen-manual/newgen-manual.html">Tech. Report A/???.</a>
 
  <li> P. Jouvelot, R. Triolet, <em> NewGen: A Language-Independent
 Program Generator</em>. July 12, 1989, Tech. Report A/191.
