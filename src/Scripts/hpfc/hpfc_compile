@@ -3,20 +3,24 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/03/24 15:36:28 $, 
+# $Date: 1995/03/27 17:17:59 $, 
 
 sh=`basename $0`
 STATUS='0'
 VERBOSE=':'
+VERBOSEARG=
 DEBUG=':'
+DEBUGARG=
 DELETE=':'
 MAKE=':'
 PIPS='pips'
 TMP="/tmp/hpfc_tmp.`hostname`.$$"
 INSTALL="$HPFC_TOOLS/hpfc_install"
 PIPSARGS='-s MUST_REGIONS -p HPFC_CLOSE'
+PIPSPROP=
 
-unset HPFFILE MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR REDIRECT
+unset HPFFILES MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR REDIRECT \
+	FILES
 rm -f $TMP.*
 
 #
@@ -65,7 +69,7 @@ usage()
 	  -w W: workspace W is used for pips and hpfc
 	  -m M: module M is compiled (should be the main)
 	  -n N: source number n
-	  -k K: keyword control (demo|full,validate)
+	  -k K: keyword control (demo|full,validate,debug)
 	  file: source file
 	EOF
   exit ${1:-1}
@@ -80,7 +84,7 @@ do
     t) DUMPFILES='1' ;;
     i) NOINSTALL='1' ;;
     p) PIPS="$OPTARG" ;;
-    r) REDIRECT='1' ;;
+    r) REDIRECT=':' ;;
     v) VERBOSE='verbose' ;;
     x) VERBOSE=':' ;;
     D) DEBUG='debug' ;;
@@ -88,21 +92,30 @@ do
     M) MAKE='gmake' ;;
     q) STDOUT='/dev/null' ;;
     s) STDERR='/dev/null' ;;
-    n) HPFFILE="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
+    n) HPFFILES="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
     m) MODULE="$OPTARG" ;;
     w) WORKSPACE="$OPTARG" ;;
     k) case $OPTARG in
 	 demo|full)
 	     DELETE=Delete ;
 	     STDERR='/dev/null' ;
+	     PIPSPROP='-1 HPFC_NO_WARNING' ;
 	     VERBOSE='verbose' ;
 	     MAKE='gmake' ;;
 	 validate) 
-	     DUMPFILES='1' ;
-	     NOINSTALL='1' ;
-	     REDIRECT='1' ;
+	     DUMPFILES=':' ;
+	     NOINSTALL=':' ;
+	     REDIRECT=':' ;
 	     VERBOSE=':' ;
 	     DELETE='Delete' ;;
+	 debug)
+	     VERBOSEARG='-v'
+	     DEBUGARG='-d'
+	     PIPSPROP='-0 HPFC_NO_WARNING' ;
+	     VERBOSE='verbose' ;
+	     DEBUG='debug' ;
+	     DELETE=':'	;
+	     REDIRECT=':' ;;
 	 *)  echo "no $OPTARG keyword" ;
 	     usage 3 ;;
        esac ;;
@@ -112,20 +125,33 @@ done
 
 shift `expr $OPTIND - 1`
 
-[ "$#" -eq 1 ] && { HPFFILE=`dirname $1`/`basename $1 .f`.f ; shift; }
-[ "$#" -eq 0 ] || usage 2
+[ "$#" -ne 0 ] &&
+for f
+do
+  HPFFILES="$HPFFILES `dirname $f`/`basename $f`"
+done
 
-[ "$MODULE" ] || MODULE=`default_module $HPFFILE .f`
+[ "$HPFFILES" ] || usage 2
+[ "$MODULE" ] || MODULE=`default_module $HPFFILES .f`
 [ "$WORKSPACE" ] || WORKSPACE=`echo $MODULE | tr 'A-Z' 'a-z'`
 
-$VERBOSE "applying hpfc on file $HPFFILE"
+for f in $HPFFILES
+do
+  FILES="$FILES -f $f"
+done
+
+$VERBOSE "applying hpfc on file(s) $HPFFILES"
 $DEBUG "`type $PIPS`"
 
 #
 # PIPS execution with possible redirections...
 
-eval $PIPS -f $HPFFILE $PIPSARGS -m $MODULE $WORKSPACE \
+[ "$DEBUG" != : ] && set -x
+
+eval $PIPS $FILES $PIPSARGS $PIPSPROP -m $MODULE $WORKSPACE \
 	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
+
+set +x
 
 STATUS="$?"
 
@@ -134,7 +160,8 @@ STATUS="$?"
   $VERBOSE "installing generated codes"
   
   [ -d "$WORKSPACE.hpfc" ] || mkdir $WORKSPACE.hpfc
-  ${INSTALL} -b $WORKSPACE.database -r $HPFFILE -i -t $WORKSPACE.hpfc -n $MODULE
+  eval ${INSTALL} -b $WORKSPACE.database $FILES -i \
+	$VERBOSEARG $DEBUGARG -t $WORKSPACE.hpfc -n $MODULE
 }
 
 [ "$DUMPFILES" ] &&
@@ -174,7 +201,9 @@ STATUS="$?"
 [ "$MAKE" = : ] ||
 {
   $VERBOSE "making $WORKSPACE"
-  (cd $WORKSPACE.hpfc ; $MAKE all) > $STDOUT 2> $STDERR
+  cd $WORKSPACE.hpfc
+  eval $MAKE all \
+  	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
 }
 
 $VERBOSE "done"
