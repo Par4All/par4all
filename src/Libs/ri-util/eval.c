@@ -385,6 +385,42 @@ expression_integer_value(expression e, int * pval)
     return is_int;
 }
 
+/* The range count only can be evaluated if the three range expressions
+ * are constant and if the increment is non zero. On failure, a zero
+ * count is returned. See also SizeOfRange().
+ */
+
+bool
+range_count(range r, int * pcount)
+{
+    bool success = FALSE;
+    int l, u, inc;
+
+    if(expression_integer_value(range_lower(r), &l)
+       && expression_integer_value(range_upper(r), &u)
+       && expression_integer_value(range_increment(r), &inc)
+       && inc != 0 ) {
+
+	if(inc<0) {
+	    * pcount = ((l-u)/(-inc))+1;
+	}
+	else /* inc>0 */ {
+	    * pcount = ((u-l)/inc)+1;
+	}
+
+	if(* pcount < 0) 
+	    *pcount = 0;
+
+	success = TRUE;
+    }
+    else {
+	* pcount = 0;
+	success = FALSE;
+    }
+
+    return success;
+}
+
 /* returns TRUE if v is not NULL and is constant */
 /* I make it "static" because it conflicts with a Linear library function.
  * Both functions have the same name but a slightly different behavior.
