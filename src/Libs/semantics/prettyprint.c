@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/26 20:22:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/10/16 17:57:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/07/26 20:22:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/10/16 17:57:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -136,7 +136,7 @@ static text get_semantic_text(module_name,give_code_p)
 char *module_name;
 bool give_code_p;
 {
-    text r = make_text(NIL);
+    text r = make_text(NIL), txt_summary;
     entity mod;
     statement mod_stat;
     transformer summary = transformer_undefined;
@@ -195,7 +195,13 @@ bool give_code_p;
     /* print_text(fd, text_statement(mod, 0, mod_stat)); */
 
     /* summary information first */
-    MERGE_TEXTS(r,text_transformer(summary)); 
+    txt_summary = text_transformer(summary);
+    ifdebug(7){
+	dump_text(txt_summary);
+	pips_debug(7, "summary text consistent? %s\n",
+		   text_consistent_p(txt_summary)? "YES":"NO"); 
+    }
+    MERGE_TEXTS(r,txt_summary ); 
     attach_decoration_to_text(r);
     if (is_transformer)
 	attach_transformers_decoration_to_text(r);
@@ -306,29 +312,33 @@ string crt_line, add_string, str_prefix;
 text txt;
 boolean first_line;
 {
-  boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-  
-  if(strlen(crt_line) + strlen(add_string) > MAX_LINE_LENGTH-2) {
-    (void) strcat(crt_line, LINE_SUFFIX);
-    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					    strdup(crt_line)));
+    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
     
-    if(first_line) {
-      first_line = FALSE;
-      if(foresys) {
-	str_prefix = strdup(str_prefix);
-	str_prefix[0] = '\0';
-	(void) strcat(str_prefix, FORESYS_CONTINUATION_PREFIX);
-      }
-    }
-    
-    crt_line[0] = '\0'; (void) strcat(crt_line, str_prefix); 
-    (void) strcat(crt_line, "    ");
     if(strlen(crt_line) + strlen(add_string) > MAX_LINE_LENGTH-2)
-      pips_error("text_transformer", "line buffer too small");
-  }
-  (void) strcat(crt_line, add_string);
-
+    {
+	(void) strcat(crt_line, LINE_SUFFIX);
+	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+						strdup(crt_line)));
+	
+	if(first_line)
+	{
+	    first_line = FALSE;
+	    if(foresys)
+	    {
+		str_prefix = strdup(str_prefix);
+		str_prefix[0] = '\0';
+		(void) strcat(str_prefix, FORESYS_CONTINUATION_PREFIX);
+	    }
+	}
+	
+	crt_line[0] = '\0'; 
+	(void) strcat(crt_line, str_prefix); 
+	(void) strcat(crt_line, "    ");
+	if(strlen(crt_line) + strlen(add_string) > MAX_LINE_LENGTH-2)
+	    pips_error("text_transformer", "line buffer too small");
+    }
+    (void) strcat(crt_line, add_string);
+    
   return(first_line);
 }
 
@@ -373,181 +383,248 @@ text text_transformer(transformer tran)
       ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
 					      strdup("\n")));
 
-  crt_line[0] = '\0'; (void) strcat(crt_line, str_prefix);
+  crt_line[0] = '\0';
+  (void) strcat(crt_line, str_prefix);
   (void) strcat(crt_line, " ");
 
   if(tran != (transformer) HASH_UNDEFINED_VALUE && 
-     tran != (transformer) list_undefined) {
-    if(tran==transformer_undefined) {
-      if (is_transformer)
-	(void) strcat(crt_line, " TRANSFORMER: TRANSFORMER_UNDEFINED");
-      else
-	(void) strcat(crt_line, " PRECONDITION: TRANSFORMER_UNDEFINED");
-    }
-    else {
-      list args;
-      int j=0, provi_length = 1;
-      char *provi[100];
-
-      aux_line[0] = '\0';
-      if (is_transformer)
-	(void) strcat(aux_line, " T(");
-      else
-	(void) strcat(aux_line, " P(");
-      if(strlen(crt_line) + strlen(aux_line) > MAX_LINE_LENGTH - 2)
-	pips_error("text_transformer", "line buffer too small");
-
-      (void) strcat(crt_line, aux_line);
-
-      args = transformer_arguments(tran);
-      if(!ENDP(args)) {
-	MAPL(c, {entity e = ENTITY(CAR(c));
-		 if (e==entity_undefined) 
-		   provi[j] = (char*) "entity_undefined";
-		 else
-		   provi[j] = (char*) entity_local_name(e);
-		 j++;
-	       },
-	     args);
-	provi_length = j;
-    
-	qsort(provi, provi_length, sizeof provi[0], wordcmp);
-	if ( provi_length > 1 ) {
-	  for (j=0; j < provi_length-1; j++) {
-	    aux_line[0] = '\0';
-	    (void) strcat(aux_line, provi[j]);
-	    strcat(aux_line,",");
-	    first_line = add_to_current_line(crt_line, aux_line,
-					     str_prefix, txt, first_line);
-	  }
-	}
-	aux_line[0] = '\0';
-	(void) strcat(aux_line, provi[provi_length-1]);
-	strcat(aux_line, ")");
-	if (foresys)
-	  (void) strcat(aux_line, ",");
-	first_line = add_to_current_line(crt_line, aux_line,
-					 str_prefix, txt, first_line);
+     tran != (transformer) list_undefined)
+  {
+      if(tran==transformer_undefined)
+      {
+	  if (is_transformer)
+	      (void) strcat(crt_line, " TRANSFORMER: TRANSFORMER_UNDEFINED");
+	  else
+	      (void) strcat(crt_line, " PRECONDITION: TRANSFORMER_UNDEFINED");
       }
       else
-	strcat(crt_line, ")");
-
-      if(strlen(crt_line)+1 > MAX_LINE_LENGTH-2) {
-	(void) strcat(crt_line, LINE_SUFFIX);
-	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-						strdup(crt_line)));
-
-	if(first_line) {
-	  first_line = FALSE;
-	  if(foresys) {
-	    str_prefix = strdup(str_prefix);
-	    str_prefix[0] = '\0';
-	    (void) strcat(str_prefix, FORESYS_CONTINUATION_PREFIX);
-	  }
-	}
-
-	crt_line[0] = '\0'; (void) strcat(crt_line, str_prefix); 
-	(void) strcat(crt_line, "    ");
-      }
-      else 
-	(void) strcat(crt_line, " ");
-
-      ps = (Psysteme) predicate_system(transformer_relation(tran));
-
-      ifdebug(9) {
-	  fprintf(stderr, "[text_transformer] sys 0x%x\n", (unsigned int) ps);
-	  syst_debug(ps);
-      }
-
-      if (ps != NULL) {
-	boolean first_constraint = TRUE, last_constraint = FALSE;
-	
-	sc_lexicographic_sort(ps, is_inferior_pvarval);
-
-	for (peq = ps->egalites; peq!=NULL; peq=peq->succ) {
-	  last_constraint = ((peq->succ == NULL) &&
-			     (ps->inegalites == NULL));
+      {
+	  list args;
+	  int j=0, provi_length = 1;
+	  char **provi;
+	  
 	  aux_line[0] = '\0';
-	  if (foresys) {
-	    (void) strcat(aux_line, "(");
-	    (void) egalite_sprint_format(aux_line, peq,
-					 pips_user_value_name, foresys);
-	    (void) strcat(aux_line, ")");
-	    if(! last_constraint)
-	      (void) strcat(aux_line, ".AND."); 
-	  }
-	  else {
-	    if(first_constraint) {
-	      (void) strcat(aux_line, "{");
-	      first_constraint = FALSE;
-	    }
-	    (void) egalite_sprint_format(aux_line, peq,
-					 pips_user_value_name, foresys);
-	    if(! last_constraint)
-	      (void) strcat(aux_line, ", ");
-	    else
-	      (void) strcat(aux_line, "}");
-	  }
+	  if (is_transformer)
+	      (void) strcat(aux_line, " T(");
+	  else
+	      (void) strcat(aux_line, " P(");
+	  if(strlen(crt_line) + strlen(aux_line) > MAX_LINE_LENGTH - 2)
+	      pips_error("text_transformer", "line buffer too small");
+	  
+	  (void) strcat(crt_line, aux_line);
+	  
+	  args = transformer_arguments(tran);
+	  pips_debug(6, "Number of arguments = %d\n", gen_length(args));
 
-	  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+	  if(!ENDP(args))
+	  {
+	      provi = (char **) malloc(sizeof(char *) * gen_length(args));
+		  
+	      j = 0;
+	      MAP(ENTITY, e,
+		   {
+		       if (entity_undefined_p(e)) 
+		       {
+			   pips_debug(7, "undefined entity\n");
+			   provi[j] = (char*) "entity_undefined";
+		       }
+		       else
+		       {
+			   provi[j] = (char*) entity_local_name(e); 
+		       }
+		       j++;
+		   },
+		       args);
+	      provi_length = j;
+	      
+	      qsort(provi, provi_length, sizeof provi[0], wordcmp);
+	      pips_debug(7, "Building text for arguments\n");
+	      if ( provi_length > 1 )
+	      {
+		  for (j=0; j < provi_length-1; j++)
+		  {
+		      aux_line[0] = '\0';
+		      (void) strcat(aux_line, provi[j]);
+		      strcat(aux_line,",");
+		      first_line = add_to_current_line(crt_line, aux_line,
+						       str_prefix, txt, first_line);
+		      ifdebug(8){
+			  pips_debug(8, "%d-th argument %s\n current txt"
+				     " (consistent? %s): \n",
+				     j+1, provi[j],
+				     text_consistent_p(txt)? "YES":"NO");
+			  dump_text(txt);
+		      }
+			  
+		  }
+	      }
+	      aux_line[0] = '\0';
+	      (void) strcat(aux_line, provi[provi_length-1]);
+	      strcat(aux_line, ")");
+	      if (foresys)
+		  (void) strcat(aux_line, ",");
+	      first_line = add_to_current_line(crt_line, aux_line,
+					       str_prefix, txt, first_line);
+	      ifdebug(8){
+		  pips_debug(8, "%d-th argument %s\n current txt: \n",
+			     provi_length-1, provi[provi_length-1]);
+		  dump_text(txt);
+	      }
+	      free(provi);
+	  }
+	  else
+	      strcat(crt_line, ")");
+	  
+	  if(strlen(crt_line)+1 > MAX_LINE_LENGTH-2) {
+	      (void) strcat(crt_line, LINE_SUFFIX);
+	      ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+						      strdup(crt_line)));
+	      
+	      
+	      if(first_line) {
+		  first_line = FALSE;
+		  if(foresys) {
+		      str_prefix = strdup(str_prefix);
+		      str_prefix[0] = '\0';
+		      (void) strcat(str_prefix, FORESYS_CONTINUATION_PREFIX);
+		  }
+	      }
+	      
+	      crt_line[0] = '\0';
+	      (void) strcat(crt_line, str_prefix); 
+	      (void) strcat(crt_line, "    ");
+	  }
+	  else 
+	      (void) strcat(crt_line, " ");
+	  ifdebug(7){
+	      pips_debug(7, "current txt before dealing with system: \n");
+	      dump_text(txt);
+	  }	  
+	  ps = (Psysteme) predicate_system(transformer_relation(tran));
+	  
+	  ifdebug(7) {
+	      pips_debug(7, "sys 0x%x\n", (unsigned int) ps);
+	      syst_debug(ps);
+	  }
+	  
+	  if (ps != NULL) {
+	      boolean first_constraint = TRUE, last_constraint = FALSE;
+	      
+	      sc_lexicographic_sort(ps, is_inferior_pvarval);
+	      
+	      pips_debug(7, " equalities first\n");
+
+	      for (peq = ps->egalites, j=1; peq!=NULL; peq=peq->succ, j=j+1)
+	      {
+		  last_constraint = ((peq->succ == NULL) &&
+				     (ps->inegalites == NULL));
+		  aux_line[0] = '\0';
+		  if (foresys)
+		  {
+		      (void) strcat(aux_line, "(");
+		      (void) egalite_sprint_format(aux_line, peq,
+						   pips_user_value_name, foresys);
+		      (void) strcat(aux_line, ")");
+		      if(! last_constraint)
+			  (void) strcat(aux_line, ".AND."); 
+		  }
+		  else
+		  {
+		      if(first_constraint)
+		      {
+			  (void) strcat(aux_line, "{");
+			  first_constraint = FALSE;
+		      }
+		      (void) egalite_sprint_format(aux_line, peq,
+						   pips_user_value_name, foresys);
+		      if(! last_constraint)
+			  (void) strcat(aux_line, ", ");
+		      else
+			  (void) strcat(aux_line, "}");
+		  }
+		  
+		  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+						   txt, first_line);
+
+		  ifdebug(7){
+		      pips_debug(7, "%d-th equality\n current txt: \n", j);
+		      dump_text(txt);
+		  }  
+	      }
+	      
+	      pips_debug(7, " inequalities \n");
+	      
+	      for (peq = ps->inegalites, j=1; peq!=NULL; peq=peq->succ,j=j+1)
+	      {
+		  last_constraint = (peq->succ == NULL);
+		  aux_line[0] = '\0';
+		  if (foresys)
+		  {
+		      (void) strcat(aux_line, "(");
+		      (void) inegalite_sprint_format(aux_line, peq,
+						     pips_user_value_name, foresys);
+		      (void) strcat(aux_line, ")");
+		      if(! last_constraint)
+			  (void) strcat(aux_line, ".AND."); 
+		  }
+		  else {
+		      if(first_constraint)
+		      {
+			  (void) strcat(aux_line, "{");
+			  first_constraint = FALSE;
+		      }
+		      (void) inegalite_sprint_format(aux_line, peq,
+						     pips_user_value_name, foresys);
+		      if(! last_constraint)
+			  (void) strcat(aux_line, ", ");
+		      else
+			  (void) strcat(aux_line, "}");
+		  }
+		  
+		  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+						   txt, first_line);
+
+		  ifdebug(7){
+		      pips_debug(7, "%d-th inequality\n current txt: \n", j);
+		      dump_text(txt);
+		  }  
+	      }
+	      
+	      /* If there is no constraint */
+	      if((ps->egalites == NULL) && (ps->inegalites == NULL))
+	      {
+		  aux_line[0] = '\0';
+		  (void) strcat(aux_line, "{}");
+		  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
 					   txt, first_line);
-	}
-
-	for (peq = ps->inegalites; peq!=NULL; peq=peq->succ) {
-	  last_constraint = (peq->succ == NULL);
-	  aux_line[0] = '\0';
-	  if (foresys) {
-	    (void) strcat(aux_line, "(");
-	    (void) inegalite_sprint_format(aux_line, peq,
-					   pips_user_value_name, foresys);
-	    (void) strcat(aux_line, ")");
-	    if(! last_constraint)
-	      (void) strcat(aux_line, ".AND."); 
+	      }
 	  }
-	  else {
-	    if(first_constraint) {
-	      (void) strcat(aux_line, "{");
-	      first_constraint = FALSE;
-	    }
-	    (void) inegalite_sprint_format(aux_line, peq,
-					   pips_user_value_name, foresys);
-	    if(! last_constraint)
-	      (void) strcat(aux_line, ", ");
-	    else
-	      (void) strcat(aux_line, "}");
+	  else
+	  {
+	      aux_line[0] = '\0';
+	      (void) strcat(aux_line, "SC_UNDEFINED");
+	      first_line = add_to_current_line(crt_line, aux_line, str_prefix,
+					       txt, first_line);
 	  }
-
-	  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
-					   txt, first_line);
-	}
-
-	/* If there is no constraint */
-	if((ps->egalites == NULL) && (ps->inegalites == NULL)) {
-	  aux_line[0] = '\0';
-	  (void) strcat(aux_line, "{}");
-	  first_line = add_to_current_line(crt_line, aux_line, str_prefix,
-					   txt, first_line);
-	}
       }
-      else {
-	aux_line[0] = '\0';
-	(void) strcat(aux_line, "SC_UNDEFINED");
-	first_line = add_to_current_line(crt_line, aux_line, str_prefix,
-					 txt, first_line);
-      }
-    }
-
-    /* Save last line */
-    (void) strcat(crt_line, LINE_SUFFIX);
-    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+      
+      /* Save last line */
+      (void) strcat(crt_line, LINE_SUFFIX);
+      ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
 					    strdup(crt_line)));
   }
   
   if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
       ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					      strdup("\n")));
+					      strdup("\n")));  
 
-  return txt; 
+  
+  ifdebug(7){
+      pips_debug(7, "final txt: \n");
+      dump_text(txt);
+  }  
+
+  return(txt); 
 }
 
 
