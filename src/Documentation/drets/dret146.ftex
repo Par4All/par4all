@@ -1,7 +1,7 @@
 %
 % Documentation de l'environnement de de'veloppement PIPS
 %
-% $RCSfile: dret146.ftex,v $ ($Date: 1994/05/20 12:32:36 $) version $Revision$, got on %D%, %T%
+% $RCSfile: dret146.ftex,v $ ($Date: 1994/05/20 17:38:04 $) version $Revision$, got on %D%, %T%
 % %A%
 %
 
@@ -27,7 +27,7 @@
 			Be'atrice APVRILLE 
 }
 %\newcommand{\docdate}{7 octobre 1993}
-\newcommand{\docdate}{$Date: 1994/05/20 12:32:36 $}
+\newcommand{\docdate}{$Date: 1994/05/20 17:38:04 $}
 
 \begin{document}
 
@@ -578,22 +578,24 @@ parfois directement visibles des utilisateurs par le biais de
 \verb+pipsmake+. La suite de ce paragraphe ne se comprend qu'apre`s
 avoir pris connaissance de la documentation correspondante.
 
-Une biblioth\`eque {\em mylib} de Pips est repr\'esent\'ee par une fonction C
-(nomm\'ee {\tt mylib}) n'ayant qu'un argument en entr\'ee, une cha\^{\i}ne de
-caract\`eres repr\'esentant le nom d'un module Fortran \`a analyser.
-Elle doit mettre en place les variables globales ne'cessaires a` son
-exe'cution a` l'aide des \verb+properties+ et acque'rir les resources
-ne'cessaires par des appels a` \verb+pipsdbm+. Aucun appel a` \verb+pipsmake+
-n'est (pour le moment) autorise' a` ce niveau.
+Une phase {\em myphase} de Pips est repr\'esent\'ee par une fonction C (nomm\'ee
+{\tt myphase}) n'ayant qu'un argument en entr\'ee, une cha\^{\i}ne de
+caract\`eres repr\'esentant le nom d'un module Fortran \`a analyser. Elle se
+trouve dans beaucoup de cas dans une bibliothe`que de nom {\tt myphase}, mais ce
+n'est pas obligatoire.  Elle doit mettre en place les variables globales
+ne'cessaires a` son exe'cution a` l'aide des \verb+properties+ et acque'rir les
+resources ne'cessaires par des appels a` \verb+pipsdbm+. Aucun appel a`
+\verb+pipsmake+ n'est (pour le moment) autorise' a` ce niveau.
 
-Voici, les \'etapes \`a suivre pour installer la nouvelle
-biblioth\`eque {\em mylib}~:
+Voici, les \'etapes \`a suivre pour installer une nouvelle
+biblioth\`eque de nom {\em mylib}~:
 
 \begin{itemize}
 
 \item cr\'eer un r\'epertoire {\tt mylib} dans {\tt \$DEVEDIR/Lib} contenant 
-les fichiers {\tt mylib.c} (o\`u se trouve le code de la fonction C {\tt 
-mylib()}) et {\tt main.c} (contenant une fonction {\tt main()} vide).
+les fichiers {\tt mylib.c} (o\`u se trouve ge'ne'ralement le code de la fonction
+C {\tt mylib()} qui correspond a` la phase que l'on veut ajouter) et {\tt
+main.c} (contenant une fonction {\tt main()} vide).
 
 \item dans le r\'epertoire {\tt \$DEVEDIR/Lib/mylib}~:
 
@@ -641,56 +643,56 @@ d'environnement {\tt pipsrc.sh} et {\tt pipsrc.csh}.
 
 \begin{itemize}
 
-\item d\'eclarer l'existence de cette nouvelle biblioth\`eque en modifiant le 
-fichier de r\`egles {\tt pipsmake-rc.f.tex}. Chaque r\`egle indique les 
-d\'ependances sur les ressources en entr\'ee et en sortie de chaque 
-biblioth\`eque. Dans la pratique, il faut s'inspirer des autres r\`egles 
-d\'ej\`a d\'efinies dans le fichier. On peut y ajouter une d\'eclaration 
+\item de'clarer l'existence de la nouvelle phase en modifiant le 
+fichier de re`gles {\tt pipsmake-rc.f.tex}. Chaque re`gle indique les 
+de'pendances sur les ressources en entre'e et en sortie de chaque 
+bibliothe`que. Dans la pratique, il faut s'inspirer des autres re`gles 
+de'ja` de'finies dans le fichier. On peut y ajouter une de'claration 
 d'alias pour obtenir de plus jolis menus sous \verb+wpips+, l'interface 
 multifene^tre.
 
-Par exemple, pour une biblioth\`eque {\em lib} qui lit une ressource {\em res1}
-et \'ecrit une ressource {\em res2} du module cela donne~:
+Par exemple, pour une phase {\em phase} qui lit une ressource {\em res1}
+et e'crit une ressource {\em res2} du module cela donne~:
 
 \begin{verbatim}
-lib                            > MODULE.res2
+phase                            > MODULE.res2
         < PROGRAM.entities
         < MODULE.res1
 \end{verbatim}
 
-Il faut noter qu'en r\`egle g\'en\'erale, une biblioth\`eque utilise toujours
+Il faut noter qu'en re`gle ge'ne'rale, une bibliothe`que utilise toujours
 les {\em entities} du programme.
 
 \item Une se'rie de nouvelles ``{properties}'' peut e^tre ne'cessaire pour le 
 fonctionnement de cette nouvelle phase. Il ne faut pas oublier de les de'clarer
 dans le fichier de re'fe'rence des properties, {\tt properties-rc.f.tex}.
 
-\item ex\'ecuter la commande {\tt make all} pour d\'eriver de ce fichier de 
-r\`egles les fichiers {\tt phases.h} et {\tt resources.h} {\tt builder-map.h}
-plac\'es dans {\tt \$INCLUDEDIR}, et les fichiers {\tt pipsmake.rc}, {\tt
-wpips.rc} et {\tt properties.rc} plac\'es dans {\tt \$LIBDIR}.
+\item exe'cuter la commande {\tt make all} pour d\'eriver de ce fichier de 
+re`gles les fichiers {\tt phases.h}, {\tt resources.h} et {\tt builder-map.h}
+place's dans {\tt \$INCLUDEDIR}, et les fichiers {\tt pipsmake.rc}, {\tt
+wpips.rc} et {\tt properties.rc} place's dans {\tt \$LIBDIR}.
 
 
 \end{itemize}
 
-\item dans le r\'epertoire {\tt \$BINSRCDIR/pips}, ex\'ecuter successivement 
-les commandes {\tt make clean}, {\tt make production-depend} et {\tt make 
-\$BINDIR/pips}, qui recompilent et installent une nouvelle version de 
-l'ex\'ecutable {\tt pips}.
+\item dans le r\'epertoire {\tt \$BINSRCDIR}, ex\'ecuter 
+la commande {\tt make-pips -r}, qui recompile et installe une nouvelle version
+des ex\'ecutables {\tt pips} et {\tt wpips}.
 
 \end{itemize}
 
 Il peut aussi s'ave'rer ne'cessaire de mettre a` jour les script shell
-qui se trouvent dans \verb+Utilities+ (Build, Init, Select, Perform).
+qui se trouvent dans \verb+Utilities+ (Build, Init, Select, Perform, Display).
 
 Cette section ne traitait pas le cas o\`u une nouvelle ressource doit \^etre
 introduite, c'est l'objet de la section suivante.
 
 \subsection{Mise en place d'une nouvelle ressource}
 
-Une ressource {\em myres} de Pips est d\'eclar\'ee par son utilisation ou sa 
-production par l'une des r\`egles du fichier {\tt pipsmake-rc.f.tex} (cf. 
-ci-dessous). Voici, les \'etapes \`a suivre pour installer la nouvelle 
+Une ressource {\em myres} de Pips est de'clare'e par son utilisation ou sa 
+production par l'une des re`gles du fichier {\tt pipsmake-rc.f.tex} (cf. 
+ci-dessous). La phase {\tt phase} ayant e'te' de'clare'e comme indique'
+pre'ce'dememnt, voici, les e'tapes a` suivre pour installer la nouvelle 
 ressource {\em myres}~:
 
 \begin{itemize}
@@ -699,30 +701,37 @@ ressource {\em myres}~:
 
 \begin{itemize}
 
-\item d\'eclarer l'existence de cette nouvelle ressource en modifiant le 
-fichier de r\`egles {\tt pipsmake-rc.f.tex}. Chaque r\`egle indique les 
-d\'ependances sur les ressources en entr\'ee et en sortie de chaque 
-biblioth\`eque. Dans la pratique, il faut s'inspirer des autres r\`egles 
-d\'ej\`a d\'efinies dans le fichier.
+\item d'eclarer l'existence de cette nouvelle ressource en modifiant le 
+fichier de r`egles {\tt pipsmake-rc.f.tex}. Chaque re`gle indique les 
+de'pendances sur les ressources en entre'e et en sortie de chaque 
+bibliothe`que. Dans la pratique, il faut s'inspirer des autres re`gles 
+de'ja` de'finies dans le fichier. Exemple~: 
+\begin{verbatim}
+phase                            > MODULE.myres
+        < PROGRAM.entities
+        < MODULE.une_autre_res
+\end{verbatim}
+On suppose que la fonction {\tt void phase(char *module_name)} a de'ja` e'te'
+de'clare'e dans une des bibliothe`ques.
 
-\item ex\'ecuter la commande {\tt make all} pour d\'eriver de ce fichier de 
-r\`egles les fichiers {\tt phases.h} et {\tt resources.h} plac\'es dans {\tt 
-\$INCLUDEDIR}, et les fichiers {\tt pipsmake.rc} et {\tt wpips.rc} plac\'es 
-dans {\tt \$LIBDIR}.
+\item exe'cuter la commande {\tt make all} pour de'river de ce fichier de 
+re`gles les fichiers {\tt phases.h}, {\tt resources.h} et {\tt builder_map.h}
+place's dans {\tt \$INCLUDEDIR}, et les fichiers {\tt pipsmake.rc} et {\tt
+wpips.rc} place's dans {\tt \$LIBDIR}.
 
 \end{itemize}
 
-\item dans le r\'epertoire {\tt \$DEVEDIR/Lib/pipsdbm}~: il faut d\'eclarer 
+\item dans le re'pertoire {\tt \$DEVEDIR/Lib/pipsdbm}~: il faut de'clarer 
 l'existence de cette nouvelle ressource {\em myres} au gestionnaire des 
 ressources {\em pipsdbm}~:
 
 \begin{itemize}
 
-\item mettre \`a jour le fichier {\tt module.c} en ajoutant une ligne contenant
-\verb+DBR_MYRES,+ dans le tableau {\tt load\_order[]} qui d\'efinit les
-ressources \`a d\'echarger lors de la fermeture d'un module.
+\item mettre a` jour le fichier {\tt module.c} en ajoutant une ligne contenant
+\verb+DBR_MYRES,+ dans le tableau {\tt load\_order[]} qui de'finit les
+ressources a` de'charger lors de la fermeture d'un module.
 
-\item mettre \`a jour le fichier {\tt methods\_io.c} en augmentant le tableau
+\item mettre a` jour le fichier {\tt methods\_io.c} en augmentant le tableau
 {\tt method\_map[]} de la ligne suivante~:
 
 {
@@ -732,9 +741,9 @@ ressources \`a d\'echarger lors de la fermeture d'un module.
 \end{verbatim}
 }
 
-Les arguments correspondent aux fonctions de lecture, d'\'ecriture, de
+Les arguments correspondent aux fonctions de lecture, d'e'criture, de
 destruction et de test de cette ressource (ici, elles sont non
-d\'efinies).
+de'finies).
 
 \item mettre a` jour les fichiers {\tt disk.c} et {\tt module.c} si la
 nouvelle ressource est un fichier et non une structure de donne'es.
@@ -744,13 +753,16 @@ afin de mettre \`a jour {\em pipsdbm} et de l'installer.
 
 \end{itemize}
 
-\item dans le r\'epertoire {\tt \$BINSRCDIR/pips}, ex\'ecuter successivement 
-les commandes {\tt make clean}, {\tt make production-depend} et {\tt make 
-\$BINDIR/pips}, qui recompilent et installent une nouvelle version de 
-l'ex\'ecutable {\tt pips}.
+\item dans le r\'epertoire {\tt \$BINSRCDIR}, ex\'ecuter 
+la commande {\tt make-pips -r}, qui recompile et installe une nouvelle version
+des ex\'ecutables {\tt pips} et {\tt wpips}.
 
 \end{itemize}
 
+Remarque~: il est important de recompiler {\tt pips} avant tout essai car le
+fait de changer les fichiers {\tt *.h} gene're's a` partir de {\tt
+pipsmake-rc.f.tex} peut provoquer des inconsistances qui n'apparaissent qu'a`
+l'exe'cution (impossibilite' de cre'er la {\em database} par exemple).
 
 \subsection{Modification ou ajout d'une structure de donne'es NewGen}
 
