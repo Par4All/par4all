@@ -2,7 +2,7 @@
  * local definitions
  * 
  * SCCS stuff:
- * $RCSfile: hpfc-local.h,v $ ($Date: 1995/02/27 18:35:16 $, )
+ * $RCSfile: hpfc-local.h,v $ ($Date: 1995/03/22 11:13:09 $, )
  * version $Revision$,
  * got on %D%, %T%
  * $Id$
@@ -21,12 +21,8 @@
 
 #define HPFC_PACKAGE "HPFC-PACKAGE"
 
-/*
- * Global variables
- */
-
-/* in compiler.c */
-
-extern entity
+extern entity /* in compiler.c */
     host_module,
     node_module;
+
+extern void hpfc_warning();
