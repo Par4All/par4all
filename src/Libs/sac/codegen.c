@@ -523,7 +523,7 @@ static void pack_instructions(int kind, opcode oc, list* args, cons** instr)
    free(operands);
 }
 
-#define MAX_PACK 8
+#define MAX_PACK 16
 
 cons* make_simd_statements(list kinds, cons* first, cons* last)
 {
