@@ -82,7 +82,7 @@ char *mod_name;
     mod_stat = (statement)
 	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, TRUE);
     
-    filename = strdup(concatenate(db_get_current_program_directory(), 
+    filename = strdup(concatenate(db_get_current_workspace_directory(), 
 				  "/", mod_name, PARALLEL_FORTRAN_EXT, NULL));
 
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
@@ -154,7 +154,7 @@ char *mod_name;
 	db_get_memory_resource(is_user_view?DBR_PARSED_CODE:DBR_CODE, mod_name, TRUE);
   
     filename = strdup
-	(concatenate(db_get_current_program_directory(), 
+	(concatenate(db_get_current_workspace_directory(), 
 		     "/",
 		     mod_name,
 		     is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
@@ -192,7 +192,7 @@ text texte;
     char *filename;
     FILE *fd;
     
-    filename = strdup(concatenate(db_get_current_program_directory(), 
+    filename = strdup(concatenate(db_get_current_workspace_directory(), 
 				  "/", mod_name, file_ext, NULL));
 
     fd = safe_fopen(filename, "w");
