@@ -1,6 +1,6 @@
 
 # @Author: Bart Kienhuis
-# $Id: vars.mk,v 1.24 2002/10/16 13:57:29 olaru Exp $
+# $Id: vars.mk,v 1.25 2002/10/16 14:35:48 olaru Exp $
 
 VERSION = 5.11.1
 
@@ -8,7 +8,7 @@ VERSION = 5.11.1
 # edit vars.mk.in, which is read by configure
 
 # Default top-level directory.
-prefix =	/.amd/terre/export/home/terre/d03/r2d2/olaru/TEMP/Polylib/Polylib
+prefix =	$(PWD)
 
 # Usually the same as prefix. 
 # exec_prefix is part of the autoconf standard.
@@ -48,10 +48,10 @@ LONG_BITS = 64
 GMP_BITS = gmp
 
 # Library type to install
-INSTALL_LIB = install-static install-shared
+INSTALL_LIB = install-static
 
 # Commands used to install scripts and data
-INSTALL =		/usr/bin/install -c
+INSTALL =		/usr/local/bin/gnu/ginstall -c
 INSTALL_PROGRAM =	${INSTALL}
 INSTALL_DATA =		${INSTALL} -m 644
 
@@ -60,17 +60,17 @@ EXTRA_INCLUDES=
 EXTRA_LIBS=-lgmp 
 
 # Platform specific variables
-OSTYPE	= linux-gnu
-HOST    = pc
-BUILD   = i686
+OSTYPE	= solaris2.7
+HOST    = sun
+BUILD   = sparc
 
 
 EXEC_EXTRA_SUFFIX = 
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
-SHAREDLIB_FLAG          = -shared
-LDCONFIG = ldconfig
+SHAREDLIB_FLAG          = -G
+LDCONFIG = 
 
 LIBS_TO_BUILD = 64
 EXEC_TO_BUILD = 64
