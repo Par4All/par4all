@@ -15,7 +15,7 @@ GetOptions("directory=s", "suffix=s", "help")
 if ($opt_help) {
     print STDERR
 	"Usage: normalisation.pl [-d dir] [-s suf] [-h] Logfile\n" .
-	"\t-d dir: directory sources\n" .
+	"\t-d dir: directory of sources\n" .
 	"\t-s suffix: suffix for old file (default 'old')\n" .
 	"\t-h: this help\n";
     exit;
@@ -34,20 +34,7 @@ while (<>)
     ($file, $module, $array, $ndim, $new, $old) = (split /\t/)[1..6];
     
     # fix file with source directory if appropriate
-    $file = $opt_directory . $file;
-
-    # FIX file, to be commented out...
-    $file = $module;
-    $file =~ tr/A-Z/a-z/;
-    $file = $opt_directory . $file;
-    if ( -f "$file.F" ) {
-	$file .= '.F';
-    } elsif ( -f "$file.f" ) {
-	$file .= '.f';
-    } else {
-	error("no file found for $module\n");
-	$file = '';
-    }
+    $file = "$opt_directory/$file" if $opt_directory;
 
     print STDERR "CONSIDERING $file $module $array $ndim $new $old\n";
     
