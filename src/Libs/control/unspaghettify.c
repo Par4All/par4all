@@ -2,9 +2,12 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 2003/05/26 15:43:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 /*
  * $Log: unspaghettify.c,v $
+ * Revision 1.44  2004/01/23 13:55:04  keryell
+ * Added simple_restructure_statement(statement mod_stmt)
+ *
  * Revision 1.43  2003/05/26 15:43:12  keryell
  * Added debug messages.
  *
@@ -18,7 +21,7 @@
  */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 2003/05/26 15:43:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -207,7 +210,7 @@ clean_up_exit_node(unstructured u)
 
 /* Try to transform each sequence in a single statement instead of a
    list of control nodes: */
-static void
+void
 fuse_sequences_in_unstructured(statement s)
 {
     list blocs = NIL;
@@ -1140,6 +1143,18 @@ unspaghettify_statement(statement mod_stmt)
        get_bool_property("UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION");
    
    unspaghettify_or_restructure_statement(mod_stmt);
+}
+
+
+/* A simple cleaning of the control graph without major topological
+   restructuring. Used by example by PHRASE. */
+void
+simple_restructure_statement(statement mod_stmt)
+{
+  currently_apply_test_restructuring = FALSE;
+  currently_apply_recursive_decomposition = FALSE;
+   
+  unspaghettify_or_restructure_statement(mod_stmt);
 }
 
 
