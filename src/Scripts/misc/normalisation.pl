@@ -65,19 +65,20 @@ $n = @fortran;
 $done = 0;
 $insub = 0;
 
-# bug: must first find the function or subroutine in the file
 for ($i = 0; $i < $n and not $done; $i++)
 {
     $ligne = $fortran[$i];
 
+    # insure that we're in the right routine
     $insub = 0 if $ligne =~ /^[^Cc\*!].*(function|subroutine)/i;
     $insub = 1 if $ligne =~ /^[^Cc\*!].*(function|subroutine)[ \t]*$module/i;
 
     next if not $insub;
 
+    # first occurence of ARRAY( is supposed to be its dimension declaration!
     if ($ligne =~ /[ ,]$array\(/i)
     {
-	print STDERR "1 $array(in $module): $ligne";
+	print STDERR "? $array(in $module): $ligne";
 	$done = 1;
 	
 	if ($ndim>1) 
@@ -91,8 +92,7 @@ for ($i = 0; $i < $n and not $done; $i++)
 	    }
 	}
 
-	print STDERR "2 $array(in $module): $ligne";
-	#print STDERR "ERROR TOO LONG\n" if length($ligne) > 72;	
+	print STDERR "! $array(in $module): $ligne";
 
 	$fortran[$i] = $ligne;
     }
