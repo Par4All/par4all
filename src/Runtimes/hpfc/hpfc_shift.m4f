@@ -1,5 +1,5 @@
 c
-c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1994/12/23 08:40:36 $, )
+c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1995/04/21 17:01:48 $, )
 c version $Revision$
 c got on %D%, %T% 
 c
@@ -282,8 +282,8 @@ c
      $            (array, dnl
 COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
-               call pvmfsend(NODETIDS(lid(j)),NODECHANNELS(lid(j)),info)
-               NODECHANNELS(lid(j))=NODECHANNELS(lid(j))+2
+               call pvmfsend(NODETIDS(lid(j)),SENDCHANNELS(lid(j)),info)
+               SENDCHANNELS(lid(j))=SENDCHANNELS(lid(j))+2
             endif
          endif
          l(dim)=lp
@@ -305,8 +305,8 @@ c
 c
 c the SHIFT is to another processor
 c
-             call pvmfrecv(NODETIDS(lid(j)),NODECHANNELS(lid(j)),info)
-             NODECHANNELS(lid(j))=NODECHANNELS(lid(j))+2
+             call pvmfrecv(NODETIDS(lid(j)),RECVCHANNELS(lid(j)),info)
+             RECVCHANNELS(lid(j))=RECVCHANNELS(lid(j))+2
              call build_name(HPFC_UNPACK,PVMTYPE,LEVEL)
      $            (array, dnl
 COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
