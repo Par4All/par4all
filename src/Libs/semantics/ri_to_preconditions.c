@@ -893,14 +893,14 @@ whileloop_to_postcondition(
 	    debug(8, "whileloop_to_postcondition", "The loop certainly is executed\n");
 
 	    /* propagate preconditions in the loop body */
-	    precondition_add_condition_information(preb, c, TRUE);
+	    preb = precondition_add_condition_information(preb, c, TRUE);
 	    (void) statement_to_postcondition(preb, s);
 
 	    ntl = transformer_apply(tf, pre);
 	    /* Let's execute the last iteration since it certainly exists */
 	    post = transformer_apply(tb, ntl);
 	    free_transformer(ntl);
-	    precondition_add_condition_information(post, c, FALSE);
+	    post = precondition_add_condition_information(post, c, FALSE);
 	}
 	else {
 	    /* Assume the loop is entered or not and perform
@@ -917,7 +917,7 @@ whileloop_to_postcondition(
 
 	    post_al = transformer_apply(tf, preb);
 	    post = transformer_convex_hull(post_ne, post_al);
-	    precondition_add_condition_information(post, c, FALSE);
+	    post = precondition_add_condition_information(post, c, FALSE);
 	    transformer_free(post_ne);
 	    transformer_free(post_al);
 	}
@@ -956,10 +956,10 @@ bool eval_condition_wrt_precondition_p(expression c, transformer pre, bool verac
     transformer f = transformer_dup(pre);
 
     if(veracity) {
-	precondition_add_condition_information(f, c, FALSE);
+	f = precondition_add_condition_information(f, c, FALSE);
     }
     else {
-	precondition_add_condition_information(f, c, TRUE);
+	f = precondition_add_condition_information(f, c, TRUE);
     }
 
     result = transformer_empty_p(f);
