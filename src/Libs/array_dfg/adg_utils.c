@@ -604,8 +604,8 @@ Ppath 	in_pa;
 boolean take_last;
 {
   quast_value	in_qv = NULL, in_qv2 = NULL;
-  int 		dep = NULL, dep2 = NULL;
-  int		nb = NULL, nb2 = NULL, max_depth = NULL;
+  int 		dep = 0, dep2 = 0;
+  int		nb = 0, nb2 = 0, max_depth = 0;
   leaf_label	ll = NULL, ll2 = NULL;
   quast		ret_q = quast_undefined;
   quast_leaf 	ql = NULL, ql2 = NULL;
@@ -613,7 +613,7 @@ boolean take_last;
   Psysteme	delt_sc = NULL, delt_sc1 = NULL, delt_sc2 = NULL;
   Ppath		new_pa1 = NULL, new_pa2 = NULL, new_pa = NULL;
   Pvecteur	pvec = NULL, pv1 = NULL, pv2 = NULL, diff = NULL;
-  boolean 	cut_space = NULL, after2 = NULL, after1 = NULL, tt = NULL;
+  boolean 	cut_space=FALSE, after2=FALSE, after1=FALSE, tt=FALSE;
 
   debug(9, "adg_max_of_leaves", "begin\n");
 
@@ -1065,7 +1065,7 @@ list in_list;
     ADD_ELEMENT_TO_LIST( prov_l, VERTEX, ver );
     
     while( cont ) {
-      int 	order2 = NULL;
+	int 	order2 = 0;
       
       /* ret_list is presently empty : we initialize it
        * with the new vertex ver	*/
