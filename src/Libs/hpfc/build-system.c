@@ -7,8 +7,9 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1994/03/10 12:28:14 $) version $Revision$, got on %D%, %T%
- * %A%
+ * $RCSfile: build-system.c,v $ ($Date: 1994/03/25 17:45:55 $, ) version $Revision$,
+ * got on %D%, %T%
+ * $Id$
  */
 
 /*
@@ -91,12 +92,12 @@ extern fprintf();
 /*
  * variable names:
  *
- * PHI{1-7}: array dimensions, 
+ * ALPHA{1-7}: array dimensions, 
  * THETA{1-7}: template dimensions,
  * PSI{1-7}: processor dimensions,
  * GAMMA{1-7}: cycles,
  * DELTA{1-7}: local offsets,
- * LPHI{1-7}: local array dimensions, if specified...
+ * LALPHA{1-7}: local array dimensions, if specified...
  */
 
 /*
@@ -108,18 +109,24 @@ extern fprintf();
 #endif
 GENERIC_CURRENT_MAPPING(declaration_constraints, Psysteme, entity);
 GENERIC_CURRENT_MAPPING(hpf_constraints, Psysteme, entity);
+GENERIC_CURRENT_MAPPING(new_declaration, Psysteme, entity);
 
 void make_hpfc_current_mappings()
 {
     make_declaration_constraints_map();
     make_hpf_constraints_map();
-    make_only_io_map();
+    make_new_declaration_map();
+    /* make_only_io_map(); 
+     *
+     * done on initialization
+     */
 }
 
 void free_hpfc_current_mappings()
 {
     free_declaration_constraints_map();
     free_hpf_constraints_map();
+    free_new_declaration_map();
     free_only_io_map();
 }
 
@@ -213,7 +220,7 @@ entity e;
 	is_template = entity_template_p(e),
 	is_processor = entity_processor_p(e);
     string
-	local_prefix = (is_array ? PHI_PREFIX :
+	local_prefix = (is_array ? ALPHA_PREFIX :
 			is_template ? THETA_PREFIX :
 			is_processor ? PSI_PREFIX : "ERROR");
 
@@ -221,7 +228,7 @@ entity e;
 		(is_array || is_template || is_processor));
 
     return(compute_entity_to_declaration_constraints
-	   (e, HPFC_PACKAGE, local_prefix));
+	   (e, local_prefix, HPFC_PACKAGE));
 }
 
 /*
@@ -260,7 +267,7 @@ entity e;
 entity get_ith_array_dummy(i)
 int i;
 {
-    return(get_ith_dummy(HPFC_PACKAGE, PHI_PREFIX, i));
+    return(get_ith_dummy(HPFC_PACKAGE, ALPHA_PREFIX, i));
 }
 
 entity get_ith_template_dummy(i)
@@ -290,7 +297,7 @@ int i;
 entity get_ith_local_dummy(i)
 int i;
 {
-    return(get_ith_dummy(HPFC_PACKAGE, LPHI_PREFIX, i));
+    return(get_ith_dummy(HPFC_PACKAGE, LALPHA_PREFIX, i));
 }
 
 /*
@@ -521,3 +528,122 @@ entity e;
 
     return(p);
 }
+
+/*
+ * effect entity_to_region(stat, ent, act)
+ * statement stat;
+ * entity ent; 
+ * tag act;
+ *
+ * gives the region of ent with action act in statement stat.
+ *
+ */
+effect entity_to_region(stat, ent, act)
+statement stat;
+entity ent; 
+tag act;
+{
+    list
+	l = load_statement_local_regions(stat);
+
+    MAPL(ce,
+     {
+	 effect 
+	     e = EFFECT(CAR(ce));
+
+	 if ((reference_variable(effect_reference(e))==ent) &&
+	     (action_tag(effect_action(e))==act))
+	     return(e);
+     },
+	 l);
+
+    return(effect_undefined);
+}
+
+/* ---------------------------------------------------
+ *
+ * NEW DECLARATIONS AS CONSTRAINTS IF POSSIBLE...
+ *
+ */
+
+Psysteme hpfc_compute_entity_to_new_declaration(array)
+entity array;
+{
+    list
+	nd = GET_ENTITY_MAPPING(newdeclarations, array);
+    int
+	dim = 1;
+    Psysteme
+	syst = sc_rm(NULL);
+
+    pips_assert("hpfc_compute_entity_to_new_declaration",
+		array_distributed_p(array));
+
+    MAPL(ci,
+     {
+	 int 
+	     newdecl = INT(CAR(ci));
+	 entity
+	     lalpha = get_ith_local_dummy(dim);
+	 entity
+	     alpha = get_ith_array_dummy(dim);
+
+	 switch (newdecl)
+	 {
+	 case  NO_NEW_DECLARATION:
+	     /*
+	      * LALPHAi == ALPHAi
+	      */
+	     sc_add_egalite(syst, 
+			    contrainte_make(vect_add(vect_new(alpha, 1),
+						     vect_new(lalpha, -1))));
+	     break;
+	 case ALPHA_NEW_DECLARATION:
+	     /*
+	      * LALPHAi = ALPHAi + offset
+	      */
+	     break;
+	 case BETA_NEW_DECLARATION:
+	     /*
+	      * LALPHAi == DELTAj + 1
+	      */
+	     break;
+	 case GAMMA_NEW_DECLARATION:
+	     break;
+	 case DELTA_NEW_DECLARATION:
+	     break;
+	 default:
+	     pips_error("hpfc_compute_entity_to_new_declaration",
+			"unexpected new declaration tag\n");
+	 }
+
+	 dim++;
+     },
+	 nd);
+
+    sc_creer_base(syst);
+    return(syst);
+}
+
+
+Psysteme entity_to_new_declaration(array)
+entity array;
+{
+    Psysteme 
+	p = load_entity_new_declaration(array);
+
+    pips_assert("entity_to_new_declaration",
+		array_distributed_p(array));
+
+    if (Psysteme_undefined_p(p))
+    {
+	p = hpfc_compute_entity_to_new_declaration(array);
+	store_entity_new_declaration(array, p);
+    }
+
+    return(p);
+}
+
+/*
+ * that's all
+ */
