@@ -2,9 +2,12 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 2002/06/27 14:49:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2003/05/26 15:43:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 /*
  * $Log: unspaghettify.c,v $
+ * Revision 1.43  2003/05/26 15:43:12  keryell
+ * Added debug messages.
+ *
  * Revision 1.42  2002/06/27 14:49:44  irigoin
  * Function fuse_sequences_in_unstructured() updated to keep track of
  * implicit target label appearing in IO statement after an END= or ERR=
@@ -15,7 +18,7 @@
  */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 2002/06/27 14:49:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 2003/05/26 15:43:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -682,6 +685,12 @@ take_out_the_exit_node_if_not_a_continue(statement s)
 		"i != statement_instruction(s) || u != instruction_unstructured(i) !",
 		instruction_unstructured_p(i)
 		&& u == instruction_unstructured(i));
+
+    ifdebug(5) {
+      pips_debug(5,
+		 "Statement at entry:\n");
+      print_statement(s);
+    }
 
     /* First, linearize the exit statement since
        fuse_sequences_in_unstructured() may have gathered many
