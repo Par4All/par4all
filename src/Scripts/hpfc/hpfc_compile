@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/01/27 09:42:49 $, 
+# $Date: 1995/03/23 17:29:58 $, 
 # got on %D%, %T%
 #
 
@@ -11,10 +11,19 @@ DEBUG=':'
 DELETE=':'
 MAKE=':'
 PIPS='pips'
+TMP="/tmp/hpfc_tmp.`hostname`.$$"
 INSTALL="$HPFC_TOOLS/hpfc_install"
-PIPSARGS='-s MUST_REGIONS -p HPFCOMPILE'
+PIPSARGS='-s MUST_REGIONS -p HPFC_CLOSE'
 
 unset HPFFILE MODULE WORKSPACE
+rm -f $TMP.*
+
+# for suff in a b c d e i k n p s t y ;
+# do 
+#   echo "      subroutine hpfc$suff"
+#   echo "      print *, 'hpfc$suff'"
+#   echo "      end"
+# done > $TMP.1
 
 #
 # functions
