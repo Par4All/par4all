@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.12  1997/11/04 20:35:43  coelho
+ * more comments added to clonee, when cloning on an argument.
+ *
  * Revision 1.11  1997/11/04 20:18:04  coelho
  * comment added in front of generated clones. free the text...
  *
@@ -129,15 +132,20 @@ build_statement_for_clone(
 
     if (argn>0) 
     {
+	entity arg = find_ith_parameter(cloned, argn);
+
 	/* IF (PARAM#ARGN.NE.VAL) STOP
 	 */
 	check_arg_value = test_to_statement
 	   (make_test(MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
-	     entity_to_expression(find_ith_parameter(cloned, argn)), 
-	     int_to_expression(val)), 
+	     entity_to_expression(arg), int_to_expression(val)), 
 		       call_to_statement(make_call(entity_intrinsic
 						   (STOP_FUNCTION_NAME), NIL)),
 		       make_continue_statement(entity_undefined)));
+
+	statement_comments(check_arg_value) = strdup(concatenate(
+	    "!! PIPS: ", entity_local_name(arg),
+	    " is assumed a constant reaching value\n", 0));	    
     }
     else
 	check_arg_value = make_continue_statement(entity_undefined);
