@@ -1,11 +1,12 @@
-/* 	%A% ($Date: 1996/07/26 14:19:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/09/11 18:55:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1996/07/26 14:19:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1996/09/11 18:55:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -102,11 +103,40 @@ end_directory_text_notify(Panel_item text_item,
    (void) end_directory_notify((char *) xv_get(text_item, PANEL_VALUE));
 }
 
+/* FC: uses an external wish script 
+ * I do not know how to activate this function safely...
+ */
+void
+direct_change_directory()
+{
+    static char newdir[256];
+    char * tmp = strdup("/tmp/wpips.dir.XXXXXX");
+    int i;
+    char c;
+    FILE * tmph;
+
+    (void) mktemp(tmp);
+
+    safe_system(concatenate("Wchangedir ", get_cwd(), " > ", tmp));
+
+    tmph = safe_fopen(tmp, "r");
+    i=0;
+    while ((c=getc(tmph))!=EOF)
+	newdir[i++]=c;
+    newdir[i-1]='\0'; /* last in \n */
+    safe_fclose(tmph, tmp);
+
+    end_directory_notify(newdir);
+
+    unlink(tmp); free(tmp);
+
+    return /* generate_workspace_menu(); */ ;
+}
 
 Menu
 generate_directory_menu()
 {
-   return generate_a_directory_menu(get_cwd());
+    return generate_a_directory_menu(get_cwd());
 }
 
 
@@ -116,7 +146,8 @@ prompt_user_not_allowed_to_change_directory(Panel_item text_item,
 {
    /* First untype whatever the user typed: */
    show_directory();
-   prompt_user("You have to close the current workspace before changing directory.");
+   prompt_user("You have to close the current workspace"
+	       " before changing directory.");
 }
 
                                             
