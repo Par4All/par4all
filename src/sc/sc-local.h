@@ -23,13 +23,7 @@
 
 #include "arithmetique.h"
 
-/* Le systeme vide "sc_empty" est represente par l'egalite "0==-1".
- * le systeme representant l'espace Rn "sc_rn" correspond au  systeme 
- * ne contenant aucune contrainte. 
- * Avant ces deux systemes etaient representes par Le pointeur (Psysteme) NULL.
- * Progressivement, les (Psysteme) NULL sont replaces par des appels aux
- *  fonctions sc_empty et sc_rn. 
- *
+/*
  * Le champ dimension donne le nombre de variables utilisees dans les egalites
  * et les inegalites, ou si l'on prefere, la dimension de l'espace dans
  * lequel est defini le polyedre correspondant. Le terme constant ne
@@ -52,6 +46,74 @@ typedef struct Ssysteme {
 	} *Psysteme,Ssysteme;
 
 /* MACROS */
+
+/* - Traitement des overflows :
+ *  ~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+ * Pour ne pas dupliquer trop de fonctions pour le traitement des
+ * overflows, nous avons fait une seule fonction prenant en parame`tre ofl_ctrl.
+ *
+ * NO_OFL_CTRL : pas de traitement des overflows.
+ * 
+ * FWD_OFL_CTRL : les overflows doivent e^tre re'cupe're's par les
+ * fonctions appelantes.
+ * OFL_CTRL : le setjmp est fait dans la fonction appele'e, et donc il est
+ * inutile de faire un setjmp dans la fonction appelante. Cette dernie`re
+ * option n'est pas disponible dans toutes les fonctions, car pour cela,
+ * il faut rajouter un parame`tre permettant de savoir quoi retourner en
+ * cas d'overflow, et ce n'e'tait pas toujours possible. Voir les
+ * commentaires au dessus des fonctions pour cela.
+ * 
+ * Toutes les fonctions qui acceptent ces valeurs en (dernier) parame`tre
+ * ont leur nom qui finit par _ofl_ctrl.
+ * 
+ * Ceci concerne quasiment toutes les fonctions de projection, les
+ * fonctions de test de faisabilite', la fonction du simplexe, les
+ * fonctions d'e'limination de redondances, la fonction de valeur absolue
+ * (abs_ofl_ctrl), les fonctions de combinaisons line'aires de vecteurs.
+ * Ceci n'est pas force'ment exhaustif...
+ * 
+ * 
+ * - SC_EMPTY, SC_RN, sc_empty, sc_rn
+ *   ~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~
+  * Le systeme vide "sc_empty" est represente par l'egalite "0==-1".
+ * le systeme representant l'espace Rn "sc_rn" est un  systeme 
+ * ne contenant aucune contrainte. 
+ * Avant ces deux systemes etaient representes par Le pointeur (Psysteme) NULL.
+ * Progressivement, les (Psysteme) NULL sont replaces par des appels aux
+ *  fonctions sc_empty et sc_rn. 
+ * SC_EMPTY et SC_RN representent des valeurs obsoletes qu'ils faudraient 
+ * remplacer par les sc_empty et sc_rn.
+ * 
+ * - entier ou rationnel ?
+ *   ~~~~~~~~~~~~~~~~~~~~~
+ * Les tests de faisabilite' e'taient fait en entier. Les deux tests
+ * (entier et rationnel) sont maintenant disponibles (voir
+ * sc_feasibility.c, il y a des commentaires).  Le test appele' par
+ * l'ancienne fonction sc_faisabilite est celui en rationnel.
+ * 
+ * Les fonctions d'elimination des contraintes redondantes utilisent 
+ * toujours la meme technique : inversion de la contrainte et ajout de 
+ * la constante 1, avant de tester la faisabilite de cette contrainte inversee
+ *  dans le contexte choisi. Ce contexte est soit le systeme entier pour 
+ * "sc_elim_redund" ou le  systeme non redondant prealablement construit 
+ * pour les fonctions  "build_sc_nredund..." et "sc_triang_elim_redund". 
+ * Le test de faisabilite qui est applique est en rationnel pour les 
+ * fonctions "build_sc_nredund..." et en entiers pour les 
+ * "sc_triang_elim_redund". L'utilisation du test rationel permet de conserver 
+ * des contraintes qui reduisent l'ensemble convexe des points entiers du 
+ * polyedre. Ces contraintes peuvent etre redondantes en entiers, mais utiles 
+ * si l'on veut tester l'exactitude de la projection. Ce type de contraintes 
+ * est  considere comme redondant par "sc_triang_elim_redund".  
+ * "sc_triang_elim_redund" est principalement utilise
+ * pour parcourir les nids de boucles. En cas de projection non exacte, 
+ * l'une des bornes inf. peut alors etre superieure a une borne sup. 
+ * L'utilisation d'un test rationel pour "sc_triang_elim_redund" peut conduire 
+ * a conserver des contraintes redondantes.
+ * 
+ * 
+ * 
+*/
+
 
 /* #define sc_print(sc,f) sc_fprint(stdout,sc,f) */
 
@@ -128,6 +190,8 @@ un temps raisonnable */
     procedure should be investigated)
 */
 #define NB_CONSTRAINTS_MAX_FOR_FM 20
+
+
 
 /* ensemble de macros permettant de compiler les programmes utilisant
 les anciens noms des fonctions */
