@@ -2,5 +2,4 @@
 # config.makefile for prettyprint scripts
 #
 
-SCRIPTS= pips_unstructured2daVinci \
-	display_pips_daVinci
+SCRIPTS= pips_graph2daVinci
