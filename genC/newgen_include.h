@@ -204,17 +204,14 @@ extern hash_table Gen_tabulated_names ;
 #define HASH_SEPAR '|'
 
 /* External routines. */
-
-/* extern char *strcpy() ; bb, 92.06.24 */
-/* extern float atof() ; fi */
 extern char *alloc() ;
 extern void user() ;
 #ifdef flex_scanner
-extern char *zztext ;
-extern char *xxtext ;
+extern char *genspec_text ;
+extern char *genread_text ;
 #else
-extern char zztext[] ;
-extern char xxtext[] ;
+extern char genspec_text[] ;
+extern char genread_text[] ;
 #endif
 extern void gencode() ;
 extern void fatal() ;
@@ -222,12 +219,7 @@ extern char *itoa() ;
 extern void print_domains() ;
 extern void init() ;
 extern void compile() ;
-/* extern char *malloc() ; bb, 92.06.24 */
-/* FI: for genClib.c */
 extern int gen_size();
-extern int zzparse();
-extern int xxparse();
+extern int genspec_parse();
+extern int genread_parse();
 extern void print_domain();
-/* FI: for list.c */
-/* extern void shared_pointers(); */
-/* extern void gen_free_with_sharing(); */
