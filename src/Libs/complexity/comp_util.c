@@ -830,6 +830,15 @@ hash_table hash_complexity_params;
     }, decl);
 }
 
+hash_table free_callees_complexities(hash_table h)
+{
+    /* Modified copies of the summary complexities are stored */
+    hash_table_clear(h);
+    hash_table_free(h);
+
+    return hash_table_undefined;
+}
+
 hash_table fetch_callees_complexities(module_name)
 char *module_name;
 {
@@ -893,7 +902,7 @@ char *module_name;
 
 	    hash_put(hash_callees_comp, (char *)callee, (char *)new_comp);
 	    if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-		fprintf(stderr, "fetched complexity for callee %s",
+		fprintf(stderr, "translated complexity for callee %s",
 			         callee_name);
 		fprintf(stderr, " of module %s:\n", module_name);
 		complexity_fprint(stderr, new_comp, 
@@ -1111,6 +1120,19 @@ string oldname,newname;
     Pbase pbcur = BASE_UNDEFINED;
     complexity comp = make_zero_complexity();
     complexity old_comp = complexity_dup(callee_comp);
+
+    if(BASE_NULLE_P(pb)) {
+	/* constant complexity */
+	comp = complexity_dup(callee_comp);
+	return comp;
+    }
+
+    /* The basis associated to a polynomial includes the constant term! */
+    if(base_dimension(pb)==1 && term_cst(pb)) {
+	/* constant complexity */
+	comp = complexity_dup(callee_comp);
+	return comp;
+    }
 
     for (pbcur=pb; pbcur != VECTEUR_NUL ; pbcur = pbcur->succ ) {
 	Variable var = pbcur->var;
