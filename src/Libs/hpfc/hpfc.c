@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/07/19 13:49:51 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/08/03 11:53:23 $, )
  * version $Revision$
  */
  
@@ -15,22 +15,18 @@
 
 #define NO_FILE "no file name"
 
-/*---------------------------------------------------------------------
- *
- *  COMMONS
- *
+
+/*  COMMONS
  */
 
 GENERIC_STATIC_STATUS(/**/, the_commons, list, NIL, gen_free_list)
 
-void add_a_common(c)
-entity c;
+void add_a_common(entity c)
 {
     the_commons = gen_once(c, the_commons);
 }
 
-static void compile_common(c)
-entity c;
+static void compile_common(entity c)
 {
     declaration_with_overlaps_for_module(c);
     clean_common_declaration(load_new_host(c));
@@ -39,23 +35,20 @@ entity c;
 
 GENERIC_STATIC_STATUS(/**/, the_pures, list, NIL, gen_free_list)
 
-void add_a_pure(f)
-entity f;
+void add_a_pure(entity f)
 {
     the_pures = gen_once(f, the_pures);
 }
 
 /* ??? some intrinsics should also be considered as pure. all of them ?
  */
-bool hpf_pure_p(f)
-entity f;
+bool hpf_pure_p(entity f)
 {
     return(gen_in_list_p(f, the_pures));
 }
 
-/*---------------------------------------------------------------------
- *
- *  COMPILER STATUS MANAGEMENT
+
+/*  COMPILER STATUS MANAGEMENT
  */
 /* initialization of data that belongs to the hpf compiler status
  */
@@ -126,14 +119,10 @@ static void close_hpfc_status()
     reset_hpfc_status();
 }
 
-/*---------------------------------------------------------------------
- *
- *  COMPILATION
- *
+/*  COMPILATION
  */
 
-static void set_resources_for_module(module)
-entity module;
+static void set_resources_for_module(entity module)
 {
     string module_name = module_local_name(module);
     entity stop;
@@ -196,8 +185,8 @@ reset_resources_for_module()
     free_hpfc_current_mappings();
 }
 
-static void compile_module(module)
-entity module;
+static void 
+compile_module(entity module)
 {
     statement s, 
         host_stat = statement_undefined, 
@@ -246,10 +235,8 @@ entity module;
     reset_resources_for_module();
 }
 
-/*---------------------------------------------------------------------
- *
- *  FUNCTIONS CALLED BY PIPSMAKE
- *
+
+/*  FUNCTIONS CALLED BY PIPSMAKE
  */
 
 /* void hpfc_init(name)
@@ -263,8 +250,7 @@ entity module;
  * bugs or features:
  *  - some callees are filtered out with a property, to deal with pipsmake.
  */
-void hpfc_init(name)
-string name;
+void hpfc_init(string name)
 {
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
@@ -292,23 +278,18 @@ string name;
  * output: none.
  * side effects:
  *  - a new source code file is created for module name.
- *  - the old one is added a "-".
+ *  - the old one is saved...
  * bugs or features:
  *  - ??? not all hpf syntaxes are managable this way.
  */
-void hpfc_filter(name)
-string name;
+void hpfc_filter(string name)
 {
     string file_name = db_get_resource(DBR_SOURCE_FILE, name, TRUE);
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
 
-    system(concatenate("mv ", file_name, " ", file_name, "- ; ",
-		       "$HPFC_TOOLS/hpfc_directives", 
-		       " < ", file_name, "-", 
-		       " > ", file_name, " ;",
-		       NULL));
+    system(concatenate("$HPFC_TOOLS/hpfc_filter ", file_name, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_SOURCE_FILE, strdup(name), file_name);
 
@@ -328,8 +309,7 @@ string name;
  *  - fortran library, reduction and hpfc special functions are skipped.
  *  - ??? obscure problem with the update of common entities.
  */
-void hpfc_directives(name)
-string name;
+void hpfc_directives(string name)
 {
     entity module = local_name_to_top_level_entity(name);
     statement s = (statement) db_get_resource(DBR_CODE, name, FALSE);
@@ -379,8 +359,7 @@ string name;
  *  - fortran library, reduction and hpfc special functions are skipped.
  *  - a fake file is put as the generated resource for such modules.
  */
-void hpfc_compile(name)
-string name;
+void hpfc_compile(string name)
 {
     entity module = local_name_to_top_level_entity(name);
 
@@ -425,8 +404,7 @@ string name;
  * bugs or features:
  *  - never called by pipsmake (:-)
  */
-void hpfc_common(name)
-string name;
+void hpfc_common(string name)
 {
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering common %s\n", name);
@@ -453,8 +431,7 @@ string name;
  * bugs or features:
  *  - ??? COMMON should be managable thru pipsmake ad-hoc rules.
  */
-void hpfc_close(name)
-string name;
+void hpfc_close(string name)
 {
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
