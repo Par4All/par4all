@@ -30,8 +30,8 @@
 
 /***************************************************** ACTION INTERPRETATION */
 
-static string read_action_interpretation = string_undefined;
-static string write_action_interpretation = string_undefined;
+static string read_action_interpretation = "read";
+static string write_action_interpretation = "write";
 void set_action_interpretation(string r, string w)
 {
     read_action_interpretation = r;
@@ -39,8 +39,8 @@ void set_action_interpretation(string r, string w)
 }
 void reset_action_interpretation(void)
 {
-    read_action_interpretation = string_undefined;
-    write_action_interpretation = string_undefined;
+    read_action_interpretation = "read";
+    write_action_interpretation = "write";
 }
 string action_interpretation(int tag)
 {
