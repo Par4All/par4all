@@ -42,9 +42,142 @@ static list l_alias_lists, l_alias_classes;
 static list l_lists, new_class, rest_list, rest_lists;
 
 
+/* tests if reg1 and reg2 are the same,
+ * ignoring their action_tags (IN/OUT)
+ * but checking their precision (may/exact)
+ */
+static bool
+same_reg_ignore_action(region reg1, region reg2)
+    {
+    Psysteme reg1_sys, reg2_sys;
+    bool result = FALSE;
+
+    pips_debug(4,"begin\n");
+
+    if (effect_undefined_p(reg1) || effect_undefined_p(reg2)) return result;
+
+    if (effect_entity(reg1) == effect_entity(reg2))
+    {
+/*	pips_debug(1,"same entity\n"); */
+
+	if (effect_approximation_tag(reg1) == 
+		effect_approximation_tag(reg2))
+	    {
+/*		pips_debug(1,"same approx\n"); */
+
+	    ifdebug(1)
+		{
+		    set_action_interpretation(ACTION_IN,ACTION_OUT);
+		    pips_debug(1,"compare:\n\t");
+		    print_region(reg1);
+		    pips_debug(1,"with:\n\t");
+		    print_region(reg2);
+		    reset_action_interpretation();
+		}
+
+		reg1_sys = region_system(reg1);
+		reg2_sys = region_system(reg2);
+		if ( sc_equal_p_ofl(reg1_sys,reg2_sys) )
+		{
+		    result = TRUE;
+
+		    pips_debug(1,"same region\n");
+		}
+		else
+		    pips_debug(1,"not same region\n");
+	    }
+	}
+    pips_debug(4,"end\n");
+
+    return result;
+    }
+
+
+/* tests if reg and any member of reg_list
+ * are same_reg_ignore_action
+ */
+static bool
+member(region reg, list reg_list)
+    {
+	region elem;
+	list rest_list;
+	bool result = FALSE;
+
+	pips_debug(4,"begin\n");
+
+/*
+	    ifdebug(9)
+		{
+		    set_action_interpretation(ACTION_IN,ACTION_OUT);
+		    pips_debug(9,"test if:\n\t");
+		    print_region(reg);
+		    pips_debug(9,"is in:\n\t");
+		    print_inout_regions(reg_list);
+		    reset_action_interpretation();
+		}
+		*/
+
+	rest_list = reg_list;
+
+	if (reg_list != NIL)
+
+			do{
+			    elem = EFFECT(CAR(rest_list));
+			    if (same_reg_ignore_action(elem,reg))
+				{
+				    result = TRUE;
+
+				    pips_debug(4,"is member\n");
+				}
+
+			    rest_list = CDR(rest_list);
+			}while (rest_list != NIL && result == FALSE);
+
+	pips_debug(4,"end\n");
+
+	return result;
+    }
+
+
+/* adds reg as final element on the end of reg_list
+ * unless reg is already present in reg_list
+ * i.e. is same_reg_ignore_action as an element of reg_list
+ */
+static list
+append_reg_if_not_present(list reg_list, region reg)
+{
+    list new_reg_list;
+
+    pips_debug(4,"begin\n");
+
+
+/*
+  ifdebug(9)
+  {
+		    set_action_interpretation(ACTION_IN,ACTION_OUT);
+  pips_debug(9,"add:\n\t");
+  print_region(reg);
+  pips_debug(9,"to:\n\t");
+  print_inout_regions(reg_list);
+		    reset_action_interpretation();
+  }
+*/
+
+    if (!member(reg,reg_list))
+	new_reg_list = gen_nconc(reg_list,CONS(EFFECT,reg,NIL));
+    else
+	new_reg_list = reg_list;
+
+    pips_debug(4,"end\n");
+
+    return new_reg_list;
+}
+
+
 /* add a copy of each element in additional_list
  * not already present in initial_reg_list
  * to the end of initial_reg_list
+ * (ignoring the action)
  */
 static list
 union_lists(list initial_reg_list, list additional_list)
@@ -104,6 +237,7 @@ compare_other_list(region elem, list other_list)
 	    {
 		pips_debug(9,"exact\n");
 
+/* here, it doesn't matter whether the regions have the same action */
 		if ( same_reg_ignore_action(elem,other_elem) )
 		{
 		    pips_debug(9,"same\n");
@@ -235,7 +369,7 @@ unite_lists_containing_same_exact_region()
 		    l_lists);
 	}*/
 
-    if (l_lists != NIL) unite_lists_containing_same_exact_region();
+/*    if (l_lists != NIL) unite_lists_containing_same_exact_region(); */
     }
     pips_debug(4,"end\n");
 }
@@ -283,6 +417,12 @@ compare_heads_rest_lists(region head, list new_list)
 		    reset_action_interpretation();	    
 		}
 
+/* here, we don't need to account of the actions of the
+ * two regions: if a sub-program has the same IN and
+ * OUT regions for one array, then we will have
+ * created two alias lists which are identical except for
+ * the actions of the regions: now we get rid of one
+ */
 	    if ( same_reg_ignore_action(head,other_head) )
 	    {
 		pips_debug(9,"same\n");
