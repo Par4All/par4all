@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNULL,v $ (version $Revision$) 
-# $Date: 1996/07/13 11:53:57 $, 
+# $Date: 1996/07/13 18:18:48 $, 
 #
 # this file contains macro definitions 
 
@@ -11,14 +11,14 @@ CFLAGS	= -O2 -g -Wall -mv8 -pipe
 CPPFLAGS= -DVALUE_IS_LONGLONG -D__USE_FIXED_PROTOTYPES__ -I$(NEWGEN_INCDIR) -I$(LINEAR_INCDIR) -I$(PIPS_INCDIR) -I$(PIPS_EXTEDIR)
 LD	= $(CC) 
 LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)
-LEX	= lex
-LFLAGS	=
+LEX	= flex
+LFLAGS	= -l
 FC	= g77
 FFLAGS	= -O2 -g -Wimplicit -pipe
 LINT	= lint
 LINTFLAGS= -habxu
-YACC	= yacc
-YFLAGS	=
+YACC	= bison
+YFLAGS	= -y
 PROTOIZE= cproto -vcf2
 ETAGS	= etags
 TAR	= gtar
