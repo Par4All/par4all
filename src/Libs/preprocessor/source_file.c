@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.105  2003/08/18 08:55:13  coelho
+ * setjmp out.
+ *
  * Revision 1.104  2003/08/14 08:47:54  irigoin
  * Compatibility with LINUX for strdup() declaration
  *
@@ -81,7 +84,6 @@
 
 #include <sys/stat.h>
 #include <ctype.h>
-#include <setjmp.h>
 #include <unistd.h>
 #include <errno.h>
 
