@@ -1313,7 +1313,7 @@ reference obj;
     entity e = reference_variable(obj);
 
     pc = CHAIN_SWORD(pc, entity_local_name(e));
-    attach_something_to_last_word(pc, e);
+/*    attach_something_to_last_word(pc, e); */
     
     if (reference_indices(obj) != NIL) {
 	pc = CHAIN_SWORD(pc,"(");
@@ -1614,12 +1614,65 @@ int precedence;
 {
     cons *pc = NIL;
     cons *pcio = call_arguments(obj);
+    cons *pio_write;
+    boolean good_fmt, good_unit, iolist_reached;
 
-    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-    pc = CHAIN_SWORD(pc, " (");
-    /* FI: missing argument; I use "precedence" because I've no clue; see LZ */
-    pc = gen_nconc(pc, words_io_control(&pcio, precedence));
-    pc = CHAIN_SWORD(pc, ") ");
+    /* AP: I try to convert WRITE to PRINT. Three conditions must be
+       fullfilled. The first, and obvious, one, is that the function has
+       to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
+       "UNIT" has to be equal either to "*" or "6".  In such case,
+       "WRITE(*,*)" is replaced by "PRINT *,". */
+    good_fmt = FALSE;
+    good_unit = FALSE;
+    if (strcmp(entity_local_name(call_function(obj)), "WRITE") == 0) {
+      pio_write = pcio;
+      iolist_reached = FALSE;
+      while ((pio_write != NIL) && (!iolist_reached)) {
+	syntax s = expression_syntax(EXPRESSION(CAR(pio_write)));
+	call c;
+	expression arg = EXPRESSION(CAR(CDR(pio_write)));
+
+	if (! syntax_call_p(s)) {
+	    pips_error("words_io_inst", "call expected");
+	}
+
+	c = syntax_call(s);
+
+	if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
+	  if (strcmp(words_to_string(words_expression(arg)), "*") == 0)
+	    good_fmt= TRUE;
+	}
+
+	if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
+	  if ((strcmp(words_to_string(words_expression(arg)), "*") == 0) ||
+	      (strcmp(words_to_string(words_expression(arg)), "6") == 0))
+	    good_unit = TRUE;
+	}
+
+	if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
+	  iolist_reached = TRUE;
+	  pio_write = CDR(pio_write);
+	}
+	else
+	  pio_write = CDR(CDR(pio_write));
+      }
+    }
+
+    if (good_fmt && good_unit) {
+      /* AP: Allright for the substitution of WRITE by PRINT. For the
+         IOLIST prettyprint, we skip everything but elements following the
+         first "IOLIST=" keyword. */
+      pc = CHAIN_SWORD(pc, "PRINT *,");
+      pcio = pio_write;
+    }
+    else {
+      pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+      pc = CHAIN_SWORD(pc, " (");
+      /* FI: missing argument; I use "precedence" because I've no clue;
+         see LZ */
+      pc = gen_nconc(pc, words_io_control(&pcio, precedence));
+      pc = CHAIN_SWORD(pc, ") ");
+    }
 
     /* because the "IOLIST=" keyword is embedded in the list
        and because the first IOLIST= has already been skipped,
