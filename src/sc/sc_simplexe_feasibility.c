@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/07 13:41:19 $, 
+ * $Date: 1996/08/07 13:43:39 $, 
  */
 
 /* test du simplex : 
@@ -363,7 +363,7 @@ static int NB_INEQ = 0;
 #define MULTOFL(RES,A,B) RES=value_protected_mult(A,B)
 
 #define DIV(x,y,z) DIV_MACRO(x,y,z,value_mult)
-#define DIVOFL(x,y,z) DIV_MACRO(x,y,z,value_mult_ae)
+#define DIVOFL(x,y,z) DIV_MACRO(x,y,z,value_protected_mult)
 
 #define MUL(x,y,z) MUL_MACRO(x,y,z,value_mult)
 #define MULOFL(x,y,z) MUL_MACRO(x,y,z,value_protected_mult)
