@@ -787,6 +787,12 @@ print_statement(statement s)
     print_text(stderr, text_statement(entity_undefined,0,s));
     debug_off();
 }
+
+/* Mapping from statement number to statement 
+ *
+ * Warning: STATEMENT_NUMBER_UNDEFINED may be equal to HASH_ENTRY_FREE_FOR_PUT
+ * because integer keys are not well supported by the newgen hash package.
+ */
 
 static hash_table number_to_statement = hash_table_undefined;
 
@@ -797,6 +803,27 @@ statement s;
     if(statement_number(s)!=STATEMENT_NUMBER_UNDEFINED) {
 	hash_put(number_to_statement, (char *) statement_number(s), (char *) s);
     }
+}
+
+statement
+apply_number_to_statement(int n)
+{
+    /* This function used to be inline in prettyprinting functions for user views.
+     * It was assumed that all statements produced by the parser had a defined
+     * statement number. In order to keep a nice statement numbering scheme,
+     * GO TO statements are not (always) numbered. So n hasa to be tested.
+     */
+
+    statement s = STATEMENT_UNDEFINED;
+
+    if(n!=STATEMENT_NUMBER_UNDEFINED) {
+	s = (statement) hash_get(nts, (char *) n);
+	if (s == (statement) HASH_UNDEFINED_VALUE) {
+	    s= STATEMENT_UNDEFINED;
+	}
+    }
+
+    return s;
 }
 
 hash_table 
@@ -827,7 +854,8 @@ hash_table nts;
     }, nts);
 }
 
-hash_table allocate_number_to_statement()
+hash_table 
+allocate_number_to_statement()
 {
     hash_table nts = hash_table_undefined;
 
@@ -838,7 +866,7 @@ hash_table allocate_number_to_statement()
 
     return nts;
 }
-
+
 /* get rid of all labels in controlized code before duplication: all
  * labels have become useless and they cannot be freely duplicated.
  *
