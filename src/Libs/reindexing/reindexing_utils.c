@@ -607,68 +607,6 @@ void matrix_coef_mult(A, nb)
        value_product(MATRIX_ELEM(A,i,j), nb); 
 }
 
-/*=====================================================================*/
-/* void matrix_add(Pmatrix a, Pmatrix b, Pmatrix c): 
- * same as matrix_substract();
- * add rational matrix c from rational matrix b and store result
- * in matrix a
- *
- *      a is a (nxm) matrix, b a (nxm) and c a (nxm)
- *
- *      a = b + c ;
- *
- * Algorithm used is directly from definition, and space has to be
- * provided for output matrix a by caller. Matrix a is not necessarily
- * normalized: its denominator may divide all its elements
- * (see matrix_normalize()).
- *
- * Precondition:        n > 0; m > 0;
- * Note: aliasing between a and b or c is supported
- * 
- * AC 94/04/06
- */
-
-void matrix_add(a, b, c)
-
- Pmatrix  a;      /* output */
- Pmatrix  b, c;   /* input */
-{
-    Value     d1, d2;   /* denominators of b, c */
-    Value     lcm;     /* ppcm of b,c */
-    int     i, j;
-    
-    /* precondition */
-    int n= MATRIX_NB_LINES(a);
-    int m = MATRIX_NB_COLUMNS(a);
-    
-    d1 = MATRIX_DENOMINATOR(b);
-    d2 = MATRIX_DENOMINATOR(c);
-    
-    if (value_eq(d1,d2))
-    {
-	for (i = 1; i <= n; i++)
-	    for (j = 1; j <= m; j++) 
-	    {
-		Value t1 = MATRIX_ELEM(c,i,j), t2=MATRIX_ELEM(b,i,j);
-		MATRIX_ELEM(a,i,j) = t1+t2;
-	    }
-
-	MATRIX_DENOMINATOR(a) = d1;
-    }
-    else
-    {
-     lcm = ppcm(d1,d2);
-     d1 = value_div(lcm,d1);
-     d2 = value_div(lcm,d2);
-     for (i = 1; i <= n; i++)
-       for (j = 1; j <= m; j++) 
-         MATRIX_ELEM(a,i,j)=
-	     value_plus(value_mult(MATRIX_ELEM(b,i,j),d1),
-			value_mult(MATRIX_ELEM(c,i,j),d2));
-     MATRIX_DENOMINATOR(a) = lcm;
-    }
-}
-
 /*======================================================================*/
 /* void constraints_with_sym_cst_to_matrices(Pcontrainte pc,
  *      Pbase index_base const_base, matrice A B, int n m1 m2):
