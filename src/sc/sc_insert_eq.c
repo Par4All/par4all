@@ -69,4 +69,43 @@ Pcontrainte ineq;
     }
     sc->nb_ineq ++;
 }
+
+/* The basis of the constraint system is updated */
+Psysteme
+sc_equation_add(Psysteme sc, Pcontrainte c)
+{
+    sc = sc_constraint_add(sc, c, TRUE);
+    return sc;
+}
 
+Psysteme
+sc_inequality_add(Psysteme sc, Pcontrainte c)
+{
+    sc = sc_constraint_add(sc, c, FALSE);
+    return sc;
+}
+
+Psysteme
+sc_constraint_add(Psysteme sc, Pcontrainte c, boolean equality)
+{
+    Pbase old_basis;
+    Pbase new_basis;
+
+    if(equality)
+	sc_add_egalite(sc,c)
+    else
+	sc_add_inegalite(sc,c)
+
+    /* maintain consistency, although it's expensive; how about a
+       sc_update_base function? Or a proper sc_add_inegalite function? */
+    old_basis = sc->base;
+    sc->base = (Pbase) VECTEUR_NUL;
+    sc_creer_base(sc);
+    new_basis = sc->base;
+    sc->base = base_union(old_basis, new_basis);
+    sc->dimension = base_dimension(sc->base);
+    base_rm(new_basis);
+    base_rm(old_basis);
+
+    return sc;
+}
