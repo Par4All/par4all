@@ -36,8 +36,10 @@ Here is what we can attach to a word:
 file and {\tt end} the position of its end.
 
 The various objects that can be attached:
-\domain{attachee = entity + unknown:unit}
+\domain{attachee = persistant entity + unknown:unit}
 
+Persistance is need because we do not want the RI to be broken when
+the attachments are freed.
 
 \section{The mapping used to attach various internal informations}
 
