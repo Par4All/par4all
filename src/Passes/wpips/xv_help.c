@@ -143,5 +143,7 @@ create_help_menu()
    (void) xv_create(main_panel, PANEL_BUTTON,
                     PANEL_LABEL_STRING, "Help ",
                     PANEL_ITEM_MENU, menu,
+                    /* Align the Help button with the Quit button: */
+                    XV_X, xv_get(quit_button, XV_X),
                     0);
 }
