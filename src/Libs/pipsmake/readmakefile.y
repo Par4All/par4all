@@ -2,7 +2,7 @@
  * pipsmake/readmakefile.y pipsmake.h )
  *
  * $RCSfile: readmakefile.y,v $ (version $Revision$)
- * $Date: 1997/04/25 15:45:27 $, 
+ * $Date: 1997/08/25 16:39:00 $, 
  *
  * They only occure between following tags: 
  *
@@ -361,6 +361,7 @@ rule r;
 makefile open_makefile(string name)
 {
     FILE *fd;
+    char * mkf_name;
 
     if ( pipsmakefile!=makefile_undefined ) {
 	    free_makefile(pipsmakefile);
@@ -368,13 +369,17 @@ makefile open_makefile(string name)
 	    debug(1, "open_makefile", "current makefile erased\n");
 	}
 
-    if ((fd = fopen(build_pgm_makefile(name), "r")) == (FILE *)NULL ) {
+    mkf_name = build_pgm_makefile(name);
+
+    if ((fd = fopen(mkf_name, "r")) == (FILE *)NULL ) {
 	pipsmakefile = makefile_undefined;
     }
     else {
 	pipsmakefile = read_makefile(fd);
-	safe_fclose(fd, build_pgm_makefile(name));
+	safe_fclose(fd, mkf_name);
     }
+
+    free(mkf_name);
     return (pipsmakefile);
 }
 /**** End saved_makefile version ****/
@@ -385,14 +390,15 @@ bool close_makefile(string name)
 {
     bool status = TRUE;
     FILE *fd;
+    char * mkf_name = build_pgm_makefile(name);
 
-    fd = safe_fopen(build_pgm_makefile(name), "w");
+    fd = safe_fopen(mkf_name, "w");
     write_makefile(fd, pipsmakefile);
-    safe_fclose(fd, build_pgm_makefile(name));
-    debug(1, "close_makefile", "makefile written on %s\n", 
-	  build_pgm_makefile(name));
+    safe_fclose(fd, mkf_name);
+    pips_debug(1, "makefile written on %s\n", mkf_name);
 
     free_makefile(pipsmakefile);
+    free(mkf_name);
     pipsmakefile = makefile_undefined;
 
     return status;
