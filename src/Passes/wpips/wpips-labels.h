@@ -1,4 +1,4 @@
-/* 	%A% ($Date: 1995/09/26 09:18:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/17 16:28:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 /*#define REGULAR_VERSION "Regular Version"
   #define PARALLEL_VERSION "Parallel Version"
@@ -19,10 +19,13 @@
 #define ARRAY_DFG_VIEW "Array data flow graph View"
 #define TIME_BASE_VIEW "Scheduling View"
 #define PLACEMENT_VIEW "Placement View"
+/* A special view that gives the .f source mainly for edition: */
+#define EDIT_VIEW "Edit"
 
 /* Labels for menu Transform */
 #define PARALLELIZE_TRANSFORM "! Parallelize"
-#define PRIVATIZE_TRANSFORM "Privatize"
+#define PRIVATIZE_TRANSFORM "Privatize Scalars"
+#define ARRAY_PRIVATIZE_TRANSFORM "Privatize Scalars & Arrays"
 #define DISTRIBUTE_TRANSFORM "Distribute"
 #define PARTIAL_EVAL_TRANSFORM "Partial Eval"
 #define UNROLL_TRANSFORM "Loop Unroll"
