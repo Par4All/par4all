@@ -2,7 +2,7 @@
  *
  * these functions deal with HPF directives.
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/03/28 16:24:46 $, )
+ * $RCSfile: directives.c,v $ ($Date: 1995/04/03 17:00:36 $, )
  * version $Revision$,
  */
 
@@ -122,6 +122,15 @@ expression e;
     debug(3, "new_template", "entity is %s\n", entity_name(t));
 }
 
+static void new_dynamic(e)
+expression e;
+{
+    entity a = expression_to_entity(e);
+    set_entity_as_dynamic(a);
+
+    debug(3, "new_dynamic", "entity is %s\n", entity_name(a));
+}
+
 /*-----------------------------------------------------------------
  * one simple ALIGN directive is handled.
  * retrieve the alignment from references array and template
@@ -189,24 +198,22 @@ Value *prate, *pshift;
     return(FALSE);
 }
 
-static void one_align_directive(alignee, temp)
+/*  builds an align from the alignee and template references.
+ *  used by both align and realign management.
+ */
+static align extract_the_align(alignee, temp)
 reference alignee, temp;
 {
     list
-	aligns    = NIL,
-	align_src = reference_indices(alignee),
-	align_sub = reference_indices(temp);
-    entity 
-	template = reference_variable(temp),
-	array    = reference_variable(alignee);
-    int
-	array_dim,
-	template_dim = 1;
-    Value
-	rate, shift;
+	/* of alignments  */ aligns    = NIL,
+	/* of expressions */ align_src = reference_indices(alignee),
+	                     align_sub = reference_indices(temp);
+    entity template = reference_variable(temp);
+    int array_dim, template_dim = 1;
+    Value rate, shift;
 
     assert(entity_template_p(template));
-
+    
     /*  each array dimension is looked for a possible alignment
      */
     for(template_dim=1; !ENDP(align_sub); POP(align_sub), template_dim++)
@@ -220,12 +227,56 @@ reference alignee, temp;
 					 Value_to_expression(shift)),
 			  aligns);
     }
-    
-    set_array_as_distributed(array);
-    store_entity_align(array, make_align(aligns, template));
 
-    debug(3, "one_align_directive", "%s aligned with %s\n",
-	  entity_name(array), entity_name(template));
+    return(make_align(aligns, template)); /* built align is returned */
+}
+
+static void one_align_directive(alignee, temp, dynamic)
+reference alignee, temp;
+bool dynamic;
+{
+    entity 
+	template = reference_variable(temp),
+	array    = reference_variable(alignee);
+    align
+	a = extract_the_align(alignee, temp);
+    
+    debug(3, "one_align_directive", "%s %saligned with %s\n",
+	  entity_name(array), dynamic ? "re" : "", entity_name(template));
+
+    if (dynamic)
+    {
+	assert(array_distributed_p(array) && dynamic_entity_p(array));
+
+	/*  existing array? propagation? and so on...
+	 */
+	pips_error("one_align_directive", "dynamic not implemented yet");
+    }
+    else
+    {
+	set_array_as_distributed(array);
+	store_entity_align(array, a);
+    }       
+}
+
+static void handle_align_and_realign_directive(f, args, dynamic)
+entity f;
+list /* of expressions */ args;
+bool dynamic;
+{
+    list last=gen_last(args);
+    reference template;
+
+    /* last points to the last item of args, which should be the template
+     */
+    assert(gen_length(args)>=2);
+    template = expression_to_reference(EXPRESSION(CAR(last)));
+
+    gen_map(normalize_all_expressions_of, args);
+
+    for(; args!=last; POP(args))
+	one_align_directive(expression_to_reference(EXPRESSION(CAR(args))), 
+			    template, dynamic);
 }
 
 /*-----------------------------------------------------------------
@@ -239,9 +290,9 @@ expression e;
 list *pl;
 {
     syntax s = expression_syntax(e);
-    call c;
     entity function;
     string name;
+    call c;
 
     message_assert("invalid distribution format", syntax_call_p(s));
 
@@ -268,21 +319,20 @@ list *pl;
     return(-1); /* just to avoid a gcc warning */
 }
 
-static void one_distribute_directive(distributee, proc)
+/*  builds the distribute from the distributee and processor references.
+ */
+static distribute extract_the_distribute(distributee, proc)
 reference distributee, proc;
 {
     expression 
 	parameter = expression_undefined;
     entity
-	processor = reference_variable(proc),
-	template  = reference_variable(distributee);
+	processor = reference_variable(proc);
     list
 	lformat = reference_indices(distributee),
 	largs,
 	ldist = NIL;
     tag format;
-
-    assert(ENDP(reference_indices(proc))); /* no ... ONTO P(something) */
 
     /* the template arguments are scanned to build the distribution
      */
@@ -314,8 +364,52 @@ reference distributee, proc;
 		     ldist);
     }
     
-    store_entity_distribute(template, 
-			    make_distribute(gen_nreverse(ldist), processor));
+    return(make_distribute(gen_nreverse(ldist), processor));
+}
+
+static void one_distribute_directive(distributee, proc, dynamic)
+reference distributee, proc;
+bool dynamic;
+{
+    entity
+	processor = reference_variable(proc),
+	template  = reference_variable(distributee);
+    distribute
+	d = extract_the_distribute(distributee, proc);
+
+    assert(ENDP(reference_indices(proc))); /* no ... ONTO P(something) */
+
+    debug(3, "one_distribute_directive", "%s %sdistributed onto %s\n",
+	  entity_name(template), dynamic ? "re" : "", entity_name(processor));
+
+    if (dynamic)
+    {
+	/* existing template, and related arrays, renamming, propagation...
+	 */
+	pips_error("one_redistribute_directive", "not implemented yet");
+    }
+    else
+	store_entity_distribute(template, d);
+}
+
+static void handle_distribute_and_redistribute_directive(f, args, dynamic)
+entity f;
+list /* of expressions */ args;
+bool dynamic;
+{
+    list /* of expression */ last = gen_last(args);
+    reference proc;
+
+    /* last points to the last item of args, which should be the processors
+     */
+    assert(gen_length(args)>=2);
+    proc = expression_to_reference(EXPRESSION(CAR(last)));
+
+    gen_map(normalize_all_expressions_of, args);
+
+    for(; args!=last; POP(args))
+       one_distribute_directive(expression_to_reference(EXPRESSION(CAR(args))), 
+				proc, dynamic);
 }
 
 /*-----------------------------------------------------------------
@@ -362,41 +456,16 @@ list /* of expressions */ args;
  */
 static void handle_align_directive(f, args)
 entity f;
-list args;
+list /* of expressions */ args;
 {
-    list last=gen_last(args);
-    reference template;
-
-    /* last points to the last item of args, which should be the template
-     */
-    assert(gen_length(args)>=2);
-    template = expression_to_reference(EXPRESSION(CAR(last)));
-
-    gen_map(normalize_all_expressions_of, args);
-
-    for(; args!=last; POP(args))
-	one_align_directive(expression_to_reference(EXPRESSION(CAR(args))), 
-			    template);
-    
+    handle_align_and_realign_directive(f, args, FALSE);
 }
 
 static void handle_distribute_directive(f, args)
 entity f;
-list args;
+list /* of expressions */ args;
 {
-    list last=gen_last(args);
-    reference proc;
-
-    /* last points to the last item of args, which should be the processors
-     */
-    assert(gen_length(args)>=2);
-    proc = expression_to_reference(EXPRESSION(CAR(last)));
-
-    gen_map(normalize_all_expressions_of, args);
-
-    for(; args!=last; POP(args))
-       one_distribute_directive(expression_to_reference(EXPRESSION(CAR(args))), 
-				proc);
+    handle_distribute_and_redistribute_directive(f, args, FALSE);
 }
 
 /*-----------------------------------------------------------------
@@ -407,20 +476,23 @@ list args;
  */
 /* ??? I wait for the next statements in a particular order, what
  * should not be necessary. Means I should deal with independent 
- * directives on the PARSED_CODE rather than after the controlized.
+ * directives on the PARSED_CODE rather than after the CONTROLIZED.
  */
 static void handle_independent_directive(f, args)
 entity f;
 list /* of expressions */ args;
 {
     list /* of entities */ l = expression_list_to_entity_list(args);
-    statement s;
     instruction i;
-    loop o;
     entity index;
+    statement s;
+    loop o;
 
     debug(2, "handle_independent_directive", "%d index(es)\n", gen_length(l));
 
+    /*  travels thru the full control graph to find the loops 
+     *  and tag them as parallel.
+     */
     init_ctrl_graph_travel(current_stmt_head(), gen_true);
     
     while(next_ctrl_graph_travel(&s))
@@ -456,18 +528,16 @@ list /* of expressions */ args;
 		    return;
 		}
 	    }
-	    /*  else I should not be here ???
-	     */
 	}
     }
     
     close_ctrl_graph_travel();
-    pips_error("handle_independent_directive", "no loop!\n");
+    user_error("handle_independent_directive", "no loop found!\n");
 }
 
 static void handle_new_directive(f, args)
 entity f;
-list args;
+list /* of expressions */ args;
 {
     return; /* (that's indeed a first implementation:-) */
 }
@@ -476,27 +546,26 @@ list args;
  *
  * DYNAMIC HPF DIRECTIVES.
  *
- * these functions are not yet implemented in hpfc.
  */
 static void handle_dynamic_directive(f, args)
 entity f;
-list args;
+list /* of expressions */ args;
 {
-    handle_unexpected_directive(f, args);
+    gen_map(new_dynamic, args); /* see new_dynamic */
 }
 
 static void handle_realign_directive(f, args)
 entity f;
-list args;
+list /* of expressions */ args;
 {
-    handle_unexpected_directive(f, args);
+    handle_align_and_realign_directive(f, args, TRUE);
 }
 
 static void handle_redistribute_directive(f, args)
 entity f;
-list args;
+list /* of expressions */ args;
 {
-    handle_unexpected_directive(f, args);
+    handle_distribute_and_redistribute_directive(f, args, TRUE);
 }
 
 /*-----------------------------------------------------------------
@@ -507,8 +576,8 @@ list args;
  */
 struct DirectiveHandler 
 {
-  string name;      /* all names should start with the same prefix */
-  void (*handler)();
+  string name;       /* all names should start with the same prefix */
+  void (*handler)(); /* handler for directive "name" */
 };
 
 static struct DirectiveHandler handlers[] =
