@@ -211,7 +211,7 @@ loop_regions_normalize(list l_reg, entity index, range l_range,
 		{
 		    Psysteme sc_tmp;
 		    sc_tmp = sc_safe_append(*psc_loop, beta_sc);
-		    sc_projection_along_variable_ofl_ctrl(&sc_tmp,(Variable) index,
+		    sc_projection_along_variable_ofl_ctrl_timeout_ctrl(&sc_tmp,(Variable) index,
 							  FWD_OFL_CTRL); 
 		    sc_base_remove_variable(sc_tmp, (Variable) index);
 		    *psc_loop = sc_tmp;
@@ -995,7 +995,7 @@ void region_exact_projection_along_variable(region reg, entity var)
 		
 		if (gen_find_eq(var, l_phi_var) == chunk_undefined)
 		{
-		    sc_projection_along_variable_ofl_ctrl(&sc,(Variable) var,
+		    sc_projection_along_variable_ofl_ctrl_timeout_ctrl(&sc,(Variable) var,
 							  FWD_OFL_CTRL); 
 		    sc_base_remove_variable(sc, (Variable) var);
 		    sc = region_sc_normalize(sc,2);	
