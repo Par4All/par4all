@@ -29,7 +29,7 @@
 
 list /* of effect */ effects_filter(list l_effs)
 {
-  entity e_flt = global_name_to_entity("COXREP", "KMAX");
+  entity e_flt = global_name_to_entity("MAIN", "KMAX");
   if (!entity_undefined_p(e_flt)) {
     list l_flt = NIL;
     MAPL(l, {
