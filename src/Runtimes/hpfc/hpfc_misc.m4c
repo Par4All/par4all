@@ -3,7 +3,7 @@
  * Portability based on pvm m4 macros.
  *
  * $RCSfile: hpfc_misc.m4c,v $ version $Revision$
- * ($Date: 1996/10/17 14:27:35 $, )
+ * ($Date: 1997/01/14 16:28:56 $, )
  *
  * Fabien Coelho, 1993-1994-1995-1996
  */
@@ -52,13 +52,18 @@ host_name(
  */
 static struct pvmtaskinfo *
 which_task(
-    int ti_tid, /* the host number we are looking for */
+    int ti_tid, /* the task number we are looking for */
     int ntask,  /* the number of tasks */
     struct pvmtaskinfo *taskp)/* the struct in which the information is */
 {
     int i;
+    
     for(i=0 ; i<ntask ; i++)
-	if (taskp[i].ti_tid==ti_tid) return &taskp[i];
+    {
+	int tid = taskp[i].ti_tid;
+	_getpe(tid=pvm_get_PE(tid);)
+	if (tid==ti_tid) return &taskp[i];
+    }
 
     fprintf(stderr, "[hpfc.which_task] no task tid=0x%x among %d tasks\n", 
 	    ti_tid, ntask);
