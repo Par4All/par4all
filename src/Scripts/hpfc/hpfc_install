@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1996/08/25 16:47:22 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1996/08/30 15:24:11 $, )
 # version $Revision$
 #
 
@@ -103,7 +103,6 @@ then
   } > $DIRECTORY/Makefile
 
   cp $SRCDIR/hpfc_check.f \
-     $SRCDIR/hpfc_Makefile \
      $SRCDIR/hpfc_*.h \
      $SRCDIR/hpfc_architecture_m4_macros \
      $BASEDIR/*_host.f \
