@@ -207,7 +207,7 @@ complexity comp;
 void prp(pp)     /* for dbxtool: "print polynome" */
 Ppolynome pp;
 {
-    polynome_fprint(stderr, pp, variable_name, is_inferior_varval);
+    polynome_fprint(stderr, pp, variable_name, is_inferior_pvarval);
     fprintf(stderr, "\n");
 }
 
