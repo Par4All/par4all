@@ -1056,11 +1056,10 @@ Ptsg *gs,*gsop;
     Psysteme dep_syst2 = SC_UNDEFINED;
     Psysteme dep_syst_op = SC_UNDEFINED;
     Pbase b, tmp_base, coord;
-
+    
     int l, cl;
     list levels;
     Pvecteur DiIncNonCons = NULL;
-
 
     /* Elimination of loop indices from loop variants llv */
     /* We use n2 because we take care of variables modified in 
@@ -1175,6 +1174,7 @@ Ptsg *gs,*gsop;
 	syst_debug(dep_syst);
     }
     
+
     if (! sc_faisabilite_optim(dep_syst)) 
     {
 	debug(4,"TestDependence", "projected system not feasible\n");
@@ -1239,9 +1239,39 @@ Ptsg *gs,*gsop;
 	is_dep_cnst = TRUE;
 
     levels = TestDiVariables(dep_syst, cl, s1, ef1, s2, ef2);
-    /* if (levels == NIL) NbrTestDiVar++; */
-    *gs = dependence_cone_positive(dep_syst1);
-    
+    /* if (levels == NIL) NbrTestDiVar++;  Qui l'a enleve', pourquoi ? */
+    if (levels != NIL) 
+    {
+	*gs = dependence_cone_positive(dep_syst1);
+	/* if the cone is not feasible, there are no loop-carried dependences;
+	 * this was not found by the previous test when computing levels;
+	 * but the dependence cone construction does not consider non-loop
+	 * carried dependences; so we can only remove those levels that are
+	 * smaller than the number of common levels
+	 */
+	if (sg_empty(*gs))
+	{
+	    list l_tmp = levels;
+	    boolean ok = FALSE;
+	    
+	    pips_debug(5, "dependence cone not feasible\n");
+	    MAP(INT, ll, {if (ll == cl+1) ok = TRUE;}, l_tmp);
+	    
+	    if (ok)
+	    {
+		pips_debug(5, "innermost level found and kept\n");
+		levels = CONS(INT, cl+1, NIL);
+	    }
+	    else
+	    {
+		pips_debug(5, "innermost level not found, no dependences");
+		levels = NIL;
+	    }
+	    gen_free_list(l_tmp);
+	    sg_rm(*gs);
+	    *gs = SG_UNDEFINED;
+	}
+    }
 
     ifdebug(4) 
     {	
@@ -1281,9 +1311,36 @@ Ptsg *gs,*gsop;
 	dep_syst2->dimension = cl;
 
 	*levelsop = TestDiVariables(dep_syst_op, cl, s2, ef2, s1, ef1);
-	/* if (*levelsop == NIL) NbrTestDiVar++; */
-	*gsop = dependence_cone_positive(dep_syst2);
-    
+	if (*levelsop != NIL)
+	{
+	    /* if (*levelsop == NIL) NbrTestDiVar++;  Pourquoi? */
+	    *gsop = dependence_cone_positive(dep_syst2);	    
+	/* if the cone is not feasible, there are no loop-carried dependences;
+	 * this was not found by the previous test when computing levels;
+	 * but the dependence cone construction does not consider non-loop
+	 * carried dependences; so we can only remove those levels that are
+	 * smaller than the number of common levels
+	 */
+	    if (sg_empty(*gsop))
+	    {
+		list l_tmp = *levelsop;
+		boolean ok= FALSE;
+
+		MAP(INT, ll, {if (ll == cl+1) ok = TRUE;}, l_tmp);
+
+		if (ok)
+		{
+		    *levelsop = CONS(INT, cl+1, NIL);
+		}
+		else
+		{
+		    *levelsop = NIL;
+		}
+		gen_free_list(l_tmp);
+		sg_rm(*gsop);
+		*gsop = SG_UNDEFINED;
+	    }
+	}
 
 	ifdebug(4) 
 	{	
@@ -1709,42 +1766,28 @@ effect ef1, ef2;
 {
     list levels = NIL;
     int l;
+    boolean levels_found = FALSE;
 
-    for (l = 1; l <= cl; l++) 
+    pips_debug(7, "maximum common level (cl): %d\n", cl);
+
+    for (l = 1; !levels_found && l <= cl; l++) 
     {
 	Variable di = (Variable) GetDiVar(l);
-	int min, max, val;
+	int min, max;
 	int IsPositif, IsNegatif, IsNull, NotPositif;
 	Psysteme pss = (l==cl) ? ps : sc_dup(ps);
 
-	switch (dg_type)
+	ifdebug(7)
 	{
-	case DG_FAST :
-	{
-	    if (sc_value_of_variable(pss, di, &val) == TRUE) 
-	    {
-		min = val;
-		max = val;
-	    }
-	    else 
-	    {
-		max = MAXINT;
-		min = -MAXINT;
-	    }
-	    break;
+	    pips_debug(7, "current level: %d, variable: %s\n", 
+		       l, entity_local_name((entity) di));
 	}
 
-	case DG_FULL:
-	case DG_SEMANTICS :
+	if (sc_minmax_of_variable_optim(pss, di, &min, &max) == FALSE) 
 	{
-	    if (sc_minmax_of_variable_optim(pss, di, &min, &max) == FALSE) 
-	    {
-		return(levels);
-	    }
+	    pips_debug(7,"sc_minmax_of_variable_optim: non feasible system\n");
+	    levels_found = TRUE;
 	    break;
-	}
-	default:
-	    pips_error("TestDiVariables", "undefined dg type\n");
 	}
 
 	IsPositif = min > 0;
@@ -1753,34 +1796,61 @@ effect ef1, ef2;
 	NotPositif = (max == 0 && min <0);
 
 	ifdebug(7)
+	{	    
+	    debug(7, "TestDiVariables", 
+		  "min = %d   max = %d  ==> %s\n", 
+		  min, max, 
+		  IsPositif?"positive": 
+		  (IsNegatif? "negative" : (IsNull? "null":"undefined") ) );
+	}
+
+	if(IsNegatif) 
 	{
-	    debug(7, "TestDiVariables", 
-		  "level is %d - di variable is %s\n", l, 
-		  entity_local_name((entity) di));
-	    debug(7, "TestDiVariables", 
-		  "min = %d   max = %d   pos = %d   neg = %d   nul = %d\n", 
-		  min, max, IsPositif, IsNegatif, IsNull);
+	    levels_found = TRUE;
+	    break;
 	}
 
 	if(IsPositif) 
 	{
+	    pips_debug(7, "adding level %d\n", l);
 	    levels = gen_nconc(levels, CONS(INT, l, NIL));
-	    return(levels);
+	    levels_found = TRUE;
+	    break;
+	}
+	
+	if (!IsNull && !NotPositif)
+	{
+	    pips_debug(7, "adding level %d\n", l);
+	    levels = gen_nconc(levels, CONS(INT, l, NIL));	     
 	}
 
-	if(IsNegatif) 
-	    return(levels);
-
-	if (!IsNull && !NotPositif) 
-	    levels = gen_nconc(levels, CONS(INT, l, NIL));
-	
-	if (l <= cl-1) 
+	if (!levels_found && l <= cl-1) 
+	{
+	    pips_debug(7, "forcing variable %s to 0 (l < cl)\n", 
+		       entity_local_name((entity) di));
 	    sc_force_variable_to_zero(ps, di);
+	}
     }
-
-    if (s1 != s2 && statement_possible_less_p(s1, s2))
-	levels = gen_nconc(levels, CONS(INT, l, NIL));  
-
+    
+    /* If there is no dependence at a common loop level: since the system
+     * is feasible, it can be a dependence at the innermost level (inside the
+     * common loop nest).
+     *
+     * WARNING:
+     * If the source and target statements are identical, we do not add the 
+     * innermost level because the parallelization phase (rice) does not appreciate.
+     * In order to be correct, we should add this level 1) because the statement
+     * may be a call to an external routine, in which case we cannot be sure
+     * that all the writes are performed before the reads and 2) even in the case
+     * of a single assignement, the generated code must preserve the order of
+     * the write and read memory operations. BC.
+     */
+    if (!levels_found && s1 != s2 && statement_possible_less_p(s1, s2) ) 
+    {
+	pips_debug(7, "adding innermost level %d\n", l);
+	levels = gen_nconc(levels, CONS(INT, l, NIL));
+    }
+        
     return(levels);
 }
 
@@ -1829,7 +1899,7 @@ Psysteme dep_sc;
 	    syst_debug(sub_sc); 
 	}
 	
-	if (! sc_rational_feasibility_ofl_ctrl(sub_sc, NO_OFL_CTRL, TRUE))
+	if (! sc_integer_feasibility_ofl_ctrl(sub_sc, NO_OFL_CTRL, TRUE))
 	{ 
 	    debug(7,"dependence_cone_positive", 
 		  "sub lexico-positive dependence system not feasible\n");
