@@ -1,6 +1,6 @@
 /* Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1996/09/21 12:22:26 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1996/12/24 15:23:08 $, )
  * version $Revision$
  * 
  * Fabien Coelho, August 1993
@@ -647,7 +647,7 @@ bool bsend;
     
     /* comment generation to improve readibility of the code
      */
-    sprintf(buf, "c %s(", entity_local_name(processor));
+    sprintf(buf, "! %s(", entity_local_name(processor));
     buf += strlen(buf);
     sprint_lrange(buf, domain);
     buf += strlen(buf);
