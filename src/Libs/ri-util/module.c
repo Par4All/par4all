@@ -2,6 +2,9 @@
   * $Id$
   *
   * $Log: module.c,v $
+  * Revision 1.25  1997/11/22 16:17:42  coelho
+  * insure_global_declaration_coherency() hook for hpfc.
+  *
   * Revision 1.24  1997/11/10 10:24:43  coelho
   * clean declarations : do not include equiv of commons if not used...
   *
@@ -251,11 +254,8 @@ mark_referenced_entities(gen_chunk * p)
 	NULL);    
 }
 
-/*  the referenced_variable_map is global and must be made/freed
- *  before/after the call
- */
 void 
-insure_declaration_coherency(
+insure_global_declaration_coherency(
     entity module,          /* the module whose declarations are considered */
     statement stat,         /* the statement where to find references */
     list /* of entity */ le /* added entities, for includes... */)
@@ -266,7 +266,6 @@ insure_declaration_coherency(
     pips_debug(2, "Processing module %s\n", entity_name(module));
 
     init_declared_variables();
-    init_referenced_variables();
     referenced_variables_list = NIL;
 
     if (le) MAP(ENTITY, e, store_this_entity(e), le);
@@ -336,12 +335,22 @@ insure_declaration_coherency(
     /* the temporaries are cleaned
      */
     close_declared_variables();
-    close_referenced_variables();
     gen_free_list(decl);
     gen_free_list(referenced_variables_list),
     referenced_variables_list = NIL;
 
     debug_off();
+}
+
+void
+insure_declaration_coherency(
+    entity module,          /* the module whose declarations are considered */
+    statement stat,         /* the statement where to find references */
+    list /* of entity */ le /* added entities, for includes... */)
+{
+    init_referenced_variables();
+    insure_global_declaration_coherency(module, stat, le);
+    close_referenced_variables();
 }
 
 /*  to be called if the referenced map need not be shared between modules
