@@ -25,7 +25,8 @@ void (* pips_update_props_handler)() = default_update_props;
  * db_create_workspace() is useful to create the log file between
  * the two calls says RK
  */
-bool create_workspace(pargc, argv)
+bool 
+create_workspace(pargc, argv)
 int *pargc;
 char *argv[];
 {
@@ -67,7 +68,8 @@ char *argv[];
     return success;
 }
 
-bool open_module_if_unique()
+bool 
+open_module_if_unique()
 {
     char *module_list[ARGS_LENGTH];
     int  module_list_length = 0;
@@ -90,7 +92,8 @@ bool open_module_if_unique()
     return success;
 }
 
-bool open_module(name)
+bool 
+open_module(name)
 char *name;
 {
     bool success;
@@ -114,7 +117,8 @@ char *name;
 
 
 /* Do not open a module already opened : */
-bool lazy_open_module(name)
+bool 
+lazy_open_module(name)
 char *name;
 {
     bool success = TRUE;
@@ -191,7 +195,8 @@ free_any_non_up_to_date_resource_in_memory()
 
 
 /* should be: success (cf wpips.h) */
-bool open_workspace(name)
+bool 
+open_workspace(name)
 char *name;
 {
     bool success;
@@ -215,7 +220,8 @@ char *name;
     return success;
 }
 
-bool close_workspace()
+bool 
+close_workspace()
 {
     bool success;
 
@@ -228,7 +234,8 @@ bool close_workspace()
     /*clear_props();*/
 }
 
-bool delete_workspace(string wname)
+bool 
+delete_workspace(string wname)
 {
     int failure;
     
@@ -236,7 +243,7 @@ bool delete_workspace(string wname)
        about deleting the non-current workspace vs deleting the current
        workspace... */
 
-    if ((failure=safe_system_no_abort(concatenate("Delete -s ", wname, NULL))))
+    if ((failure=safe_system_no_abort(concatenate("Delete ", wname, NULL))))
 	pips_user_warning("exit code for Delete is %d\n", failure);
 
     return !failure;
