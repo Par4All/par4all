@@ -710,7 +710,7 @@ entity value_to_variable(val)
 entity val;
 {
     entity var = entity_undefined;
-    int l_suffix;
+    int l_suffix = -1; /* for gcc only! */
     string s = hash_get(hash_value_to_name, (char *) val);
     string var_name;
     extern entity get_current_module_entity();
@@ -722,7 +722,8 @@ entity val;
     else if(intermediate_value_entity_p(val))
 	l_suffix = strlen(INTERMEDIATE_VALUE_SUFFIX);
     else
-	pips_error("value_to_variable", "%s is not a value\n", entity_name(val));
+	pips_error("value_to_variable",
+		   "%s is not a value\n", entity_name(val));
 
     pips_assert("value_to_variable", s != HASH_UNDEFINED_VALUE);
 
