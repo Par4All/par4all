@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.8  1997/12/04 12:34:08  coelho
+ *  - words_basic: STRING*(n) -> CHARACTER*n
+ *  - does not redeclare the function variable FOO:FOO.
+ *
  * Revision 1.7  1997/12/02 12:19:07  coelho
  * too big parameter sorting dropped...
  *
@@ -185,9 +189,8 @@ words_basic(basic obj)
 	pc = CHAIN_IWORD(pc,basic_complex(obj));
     }
     else if (basic_string_p(obj)) {
-	pc = CHAIN_SWORD(pc,"STRING*(");
+	pc = CHAIN_SWORD(pc,"CHARACTER*");
 	pc = gen_nconc(pc, words_value(basic_string(obj)));
-	pc = CHAIN_SWORD(pc,")");
     }
     else {
 	pips_error("words_basic", "unexpected tag");
@@ -1007,6 +1010,8 @@ text_entity_declaration(
 	bool in_ram = storage_ram_p(entity_storage(e));
 	bool in_common = in_ram &&
 	    !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e))));
+	bool skip_it = same_string_p(entity_local_name(e),
+				     entity_local_name(module));
 	
 	pips_debug(3, "entity name is %s\n", entity_name(e));
 
@@ -1017,8 +1022,12 @@ text_entity_declaration(
 					     common_hook(module, e)),
 		     area_decl);
 	}
-	
-	if (!print_commons && (area_p || (var && in_common && pp_cinc)))
+
+	if (skip_it)
+	{
+	    pips_debug(5, "skipping function %s\n", entity_name(e));
+	}
+	else if (!print_commons && (area_p || (var && in_common && pp_cinc)))
 	{
 	    pips_debug(5, "skipping entity %s\n", entity_name(e));
 	}
