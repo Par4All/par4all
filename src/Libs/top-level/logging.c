@@ -3,6 +3,7 @@
 #include "genC.h"
 #include "misc.h"
 #include "database.h"
+#include "ri-util.h"
 #include "pipsdbm.h"
 #include "properties.h"
 
