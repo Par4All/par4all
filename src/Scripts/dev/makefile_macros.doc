@@ -1,0 +1,13 @@
+#
+# $Id$
+#
+# macros related to documentation generation.
+#
+
+LX2HTML	= latex2html
+L2HFLAGS= -link 8 -split 5
+LATEX	= latex
+BIBTEX	= bibtex
+RMAN	= rman
+MAKEIDX	= makeindex
+DVIPS	= dvips
