@@ -429,7 +429,7 @@ DeclareVariable(
     debug(8, "DeclareVariable", "%s\n", entity_name(e));
     pips_assert("DeclareVariable", t == type_undefined || type_variable_p(t));
 
-    if(et == type_undefined)
+    if(et == type_undefined) {
 	if(t == type_undefined) {
 	    entity_type(e) = ImplicitType(e);
 	    variable_dimensions(type_variable(entity_type(e))) = d;
@@ -441,6 +441,7 @@ DeclareVariable(
 		 d);
 	    entity_type(e) = nt;
 	}
+    }
     else
 	switch(type_tag(et)) {
 	case is_type_functional:
