@@ -5,10 +5,10 @@
 
    */
 
-/* 	%A% ($Date: 1998/04/14 19:34:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2003/08/02 13:37:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 1998/04/14 19:34:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_clean_up_sequences[] = "%A% ($Date: 2003/08/02 13:37:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -71,8 +71,11 @@ display_clean_up_sequences_statistics()
 static bool
 clean_up_sequences_filter(statement s)
 {
-    /* Just say to recurse... */
-    return TRUE;
+  /* Just say to recurse... */
+  /* gen_true() would be as good... and gcc would not complain. */
+  /* And the maintenance would be easier. */
+  pips_assert("", s==s);
+  return TRUE;
 }
 
 
