@@ -3,6 +3,11 @@
  * 
  * Fabien Coelho, May 1993
  *
+ * SCCS stuff
+ * $RCSfile: compiler.c,v $ ($Date: 1994/06/03 14:14:30 $, )
+ * version $Revision$
+ * got on %D%, %T%
+ * $Id$
  */
 
 /*
@@ -20,10 +25,13 @@ extern int fprintf();
 #include "hpf.h"
 #include "hpf_private.h"
 
+/* #include "compiler_parameters.h" */
+
 #include "misc.h"
 #include "ri-util.h"
 #include "control.h"     /* for CONTROL_MAP() */
 #include "text-util.h"
+#include "properties.h"
 #include "hpfc.h"
 #include "defines-local.h"
 
@@ -31,37 +39,13 @@ extern int fprintf();
  * global variables
  */
 
-int 
-    uniqueintegernumber,
-    uniquefloatnumber,
-    uniquelogicalnumber,
-    uniquecomplexnumber;
-
-list
-    distributedarrays,
-    templates,
-    processors;	
-
 entity 
-    hostmodule,
-    nodemodule;
-
-entity_mapping 
-    oldtonewhostvar,
-    oldtonewnodevar,
-    newtooldhostvar, 
-    newtooldnodevar,
-    hpfnumber,
-    hpfalign,
-    hpfdistribute;
+    host_module,
+    node_module;
 
 statement_mapping 
     hostgotos,
     nodegotos;
-
-/* define computer entity ???*/
-/* computer currentcomputer; */
-
 
 /*
  * Compiler
@@ -91,18 +75,15 @@ void hpfcompiler(stat, hoststatp, nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
-#ifdef HPFC_NEW_IO_COMPILATION
-    bool
-	only_io = (load_statement_only_io(stat)==TRUE);
-
-    if (only_io)
+    if (get_bool_property("HPFC_NEW_IO_COMPILATION") &&
+	load_statement_only_io(stat)==TRUE) /* necessary */
 	if (io_efficient_compilable_p(stat))
 	{
 	    io_efficient_compile(stat,  hoststatp, nodestatp);
 	    return;
 	}
+    
     /* else usual stuff */
-#endif
 
     switch(instruction_tag(statement_instruction(stat)))
     {
@@ -204,17 +185,17 @@ statement *hoststatp,*nodestatp;
     hpfcompiler(statfalse, &stathostfalse, &statnodefalse);
 
     instruction_test(statement_instruction(*hoststatp)) =
-	make_test(UpdateExpressionForModule(oldtonewhostvar,condition),
+	make_test(UpdateExpressionForModule(host_module,condition),
 		  stathosttrue,
 		  stathostfalse);
 
     instruction_test(statement_instruction(*nodestatp))=
-	make_test(UpdateExpressionForModule(oldtonewnodevar,condition),
+	make_test(UpdateExpressionForModule(node_module,condition),
 		  statnodetrue,
 		  statnodefalse);
 
-    IFDBPRINT(9,"hpfcompiletest",hostmodule,(*hoststatp));
-    IFDBPRINT(9,"hpfcompiletest",nodemodule,(*nodestatp));
+    IFDBPRINT(9,"hpfcompiletest",host_module,(*hoststatp));
+    IFDBPRINT(9,"hpfcompiletest",node_module,(*nodestatp));
 }
 
 /*
@@ -351,8 +332,8 @@ statement *hoststatp,*nodestatp;
     if (!call_ref_to_dist_array_p(c))
     {
 	list
-	    leh=lUpdateExpr(oldtonewhostvar,call_arguments(c)),
-	    len=lUpdateExpr(oldtonewnodevar,call_arguments(c));
+	    leh=lUpdateExpr(host_module,call_arguments(c)),
+	    len=lUpdateExpr(node_module,call_arguments(c));
 	
 	debug(7,"hpfcompilecall","no reference to distributed variable\n");
 
@@ -365,8 +346,8 @@ statement *hoststatp,*nodestatp;
 	instruction_call(statement_instruction((*nodestatp)))=
 	    make_call(call_function(c),len);
 
-	IFDBPRINT(8,"hpfcompilecall",hostmodule,(*hoststatp));
-	IFDBPRINT(8,"hpfcompilecall",nodemodule,(*nodestatp));
+	IFDBPRINT(8,"hpfcompilecall",host_module,(*hoststatp));
+	IFDBPRINT(8,"hpfcompilecall",node_module,(*nodestatp));
 
 	return;
     }
@@ -438,8 +419,8 @@ statement *hoststatp,*nodestatp;
 	instruction_block(statement_instruction(*hoststatp)) = lh;
 	instruction_block(statement_instruction(*nodestatp)) = ln;
 	
-	IFDBPRINT(8,"hpfcompilecall", hostmodule, (*hoststatp));
-	IFDBPRINT(8,"hpfcompilecall", nodemodule, (*nodestatp));
+	IFDBPRINT(8,"hpfcompilecall", host_module, (*hoststatp));
+	IFDBPRINT(8,"hpfcompilecall", node_module, (*nodestatp));
 	
 	return;
     }
@@ -607,8 +588,8 @@ statement stat, *hoststatp, *nodestatp;
     entity
 	label=loop_label(the_loop),
 	index=loop_index(the_loop),
-	nindex=NewVariableForModule(oldtonewnodevar,index),
-	hindex=NewVariableForModule(oldtonewhostvar,index);
+	nindex=NewVariableForModule(node_module,index),
+	hindex=NewVariableForModule(host_module,index);
     expression
 	lower=range_lower(r),
 	upper=range_upper(r),
@@ -632,25 +613,25 @@ statement stat, *hoststatp, *nodestatp;
 	(*hoststatp)=MakeStatementLike(stat,is_instruction_loop,hostgotos);
 	instruction_loop(statement_instruction(*hoststatp))=
 	    make_loop(hindex,
-		      make_range(UpdateExpressionForModule(oldtonewhostvar,lower),
-				 UpdateExpressionForModule(oldtonewhostvar,upper),
-				 UpdateExpressionForModule(oldtonewhostvar,increment)),
+		      make_range(UpdateExpressionForModule(host_module,lower),
+				 UpdateExpressionForModule(host_module,upper),
+				 UpdateExpressionForModule(host_module,increment)),
 		      hostbody,
 		      label,
 		      make_execution(is_execution_sequential,UU),
-		      lNewVariableForModule(oldtonewhostvar,locals));
+		      lNewVariableForModule(host_module,locals));
     }
     
     (*nodestatp)=MakeStatementLike(stat,is_instruction_loop,nodegotos);
     instruction_loop(statement_instruction(*nodestatp))=
 	make_loop(nindex,
-		  make_range(UpdateExpressionForModule(oldtonewnodevar,lower),
-			     UpdateExpressionForModule(oldtonewnodevar,upper),
-			     UpdateExpressionForModule(oldtonewnodevar,increment)),
+		  make_range(UpdateExpressionForModule(node_module,lower),
+			     UpdateExpressionForModule(node_module,upper),
+			     UpdateExpressionForModule(node_module,increment)),
 		  nodebody,
 		  label,
 		  make_execution(is_execution_sequential,UU),
-		  lNewVariableForModule(oldtonewnodevar,locals));
+		  lNewVariableForModule(node_module,locals));
 }
 
 
@@ -671,7 +652,7 @@ statement stat, *hoststatp, *nodestatp;
     entity
 	label=loop_label(the_loop),
 	index=loop_index(the_loop),
-	nindex=NewVariableForModule(oldtonewnodevar,index);
+	nindex=NewVariableForModule(node_module,index);
     range
 	r = loop_range(the_loop);
     expression
@@ -696,9 +677,9 @@ statement stat, *hoststatp, *nodestatp;
     (*nodestatp)=MakeStatementLike(stat,is_instruction_loop,nodegotos);
     instruction_loop(statement_instruction(*nodestatp))=
 	make_loop(nindex,
-		  make_range(UpdateExpressionForModule(oldtonewnodevar,lower),
-			     UpdateExpressionForModule(oldtonewnodevar,upper),
-			     UpdateExpressionForModule(oldtonewnodevar,increment)),
+		  make_range(UpdateExpressionForModule(node_module,lower),
+			     UpdateExpressionForModule(node_module,upper),
+			     UpdateExpressionForModule(node_module,increment)),
 		  nodebody,
 		  label,
 		  make_execution(is_execution_sequential,UU),
@@ -728,12 +709,12 @@ statement body, *hoststatp, *nodestatp;
     ls = FindDefinitionsOf(body, li);
 /*
     debug(7, "hpfcompileparallelloop", "new body:\n");
-    IFDBPRINT(7,"hpfcompileparallelloop",nodemodule,body);
-    MAPL(cs,{IFDBPRINT(7,"hpfcompileparallelloop",nodemodule,STATEMENT(CAR(cs)));},ls);
+    IFDBPRINT(7,"hpfcompileparallelloop",node_module,body);
+    MAPL(cs,{IFDBPRINT(7,"hpfcompileparallelloop",node_module,STATEMENT(CAR(cs)));},ls);
 */
     generate_parallel_body(body, &lbs, lw, lr);
 /*
-    MAPL(cs,{IFDBPRINT(7,"hpfcompileparallelloop",nodemodule,STATEMENT(CAR(cs)));},lbs);
+    MAPL(cs,{IFDBPRINT(7,"hpfcompileparallelloop",node_module,STATEMENT(CAR(cs)));},lbs);
 */
     (*hoststatp) = NULL;
     (*nodestatp) = make_block_statement(gen_nconc(ls, lbs));
