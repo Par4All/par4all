@@ -45,8 +45,6 @@ static bool variables_width_filter(reference r)
       default:
 	 return TRUE; /* don't know what to do with this... keep searching */
    }
-   printf( "Reference %s is %i bits wide\n",
-	   entity_name(reference_variable(r)), width );
    
    if (width > g_varwidth)
       g_varwidth = width;
