@@ -21,7 +21,6 @@
 #include "ri-util.h"
 #include "constants.h"
 #include "misc.h"
-#include "list.h"
 
 #include "graph.h"
 #include "dg.h"
