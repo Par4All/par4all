@@ -127,7 +127,7 @@ list_of_effects_generic_binary_op(list l1, list l2,
 list 
 proper_to_summary_effects(list l_effects)
 {
-        return(proper_effects_combine(l_effects, FALSE));
+    return proper_effects_combine(l_effects, FALSE);
 }
 
 
