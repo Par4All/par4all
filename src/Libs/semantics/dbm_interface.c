@@ -23,6 +23,9 @@
 /* $Id$
  * 
  * $Log: dbm_interface.c,v $
+ * Revision 1.44  2003/07/24 09:00:21  irigoin
+ * Normalization added before summary preconditions are stored in database.
+ *
  * Revision 1.43  2003/07/11 15:37:04  irigoin
  * Intermediate version. No core dump but a lot of problem related to
  * pipsmake.rc and interprocedurality.
@@ -525,6 +528,10 @@ bool summary_precondition(char * module_name)
   }
     
   pips_assert("t is defined", !transformer_undefined_p(t));
+
+  /* Try to put the summary precondition in a (partially) canonical form. */
+  t = transformer_normalize(t, 4);
+  t = transformer_normalize(t, 4);
 
   ifdebug(3) {
     pips_debug(1, "considering summary precondition for %s\n", module_name);
