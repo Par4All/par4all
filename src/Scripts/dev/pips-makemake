@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/10 21:20:25 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/10 21:21:52 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -369,7 +369,7 @@ INSTALL_EXE+=	$(RFILES)
 .quick-install: .runable $(RFILES)
 
 clean:
-    -$(RM) *~
+	-$(RM) *~
 
 %
 
