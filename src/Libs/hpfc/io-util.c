@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-util.c,v $
+ * Revision 1.34  1997/07/21 13:56:05  keryell
+ * Replaced %x format by %p.
+ *
  * Revision 1.33  1997/04/17 11:47:13  coelho
  * *** empty log message ***
  *
@@ -74,7 +77,7 @@ static void only_io_sequence(sequence q)
 	MAP(STATEMENT, s, is_io = (is_io & Load(s)), sequence_statements(q));
     }
 
-    pips_debug(5, "block 0x%x: %d\n", (unsigned int) q, is_io);
+    pips_debug(5, "block %p: %d\n", q, is_io);
     Store(current_statement_head(), is_io);
 }
 
@@ -82,14 +85,14 @@ static void only_io_test(test t)
 {
     int is_io=3;
     is_io = (Load(test_true(t)) & Load(test_false(t)));
-    pips_debug(5, "test 0x%x: %d\n", (unsigned int) t, is_io);
+    pips_debug(5, "test %p: %d\n", t, is_io);
     Store(current_statement_head(), is_io);
 }
 
 static void only_io_loop(loop l)
 {
     int is_io = Load(loop_body(l));
-    pips_debug(5, "loop 0x%x: %d\n", (unsigned int) l, is_io);
+    pips_debug(5, "loop %p: %d\n", l, is_io);
     Store(current_statement_head(), is_io);
 }
 
@@ -101,8 +104,7 @@ static void only_io_call(call c)
 		    hpfc_special_io(f) ||    /* declared with FCD */
 			hpfc_io_like_function(f);/* runtime managed */
 
-    pips_debug(5, "call 0x%x (%s): %d\n", (unsigned int) c, 
-	       entity_name(f), is_io);
+    pips_debug(5, "call %p (%s): %d\n", c, entity_name(f), is_io);
     Store(current_statement_head(), is_io);
 }
 
@@ -114,7 +116,7 @@ static void only_io_unstructured(unstructured u)
 
     CONTROL_MAP(ct, is_io = is_io & Load(control_statement(ct)), c, blocks);
     gen_free_list(blocks);
-    pips_debug(5, "unstructured 0x%x: %d\n", (unsigned int) u, is_io);
+    pips_debug(5, "unstructured %p: %d\n", , is_io);
     Store(current_statement_head(), is_io);
 }
 
