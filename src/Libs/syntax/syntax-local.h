@@ -11,6 +11,7 @@ extern FILE * syn_in; /* the file read in by the scanner */
 /* definition of implementation dependent constants */
 
 #include "constants.h"
+
 #define HASH_SIZE 1013
 #define FORMATLENGTH (4096)
 #define LOCAL static
@@ -26,3 +27,5 @@ extern FILE * syn_in; /* the file read in by the scanner */
 
 #define FatalError(f,m) \
 (pips_error(f,"Fatal error between lines %d and %d\n%s\n",line_b_I,line_e_I,m))
+
+extern char * strdup(const char *);
