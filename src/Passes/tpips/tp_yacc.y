@@ -725,6 +725,8 @@ list_of_owner_name: TK_NAME
 	{ $$ = CONS(STRING, strupper($1,$1), NIL); }
 	| list_of_owner_name TK_NAME
 	{ $$ = CONS(STRING, strupper($2,$2), $1); }
+	| list_of_owner_name TK_COMMA TK_NAME
+	{ $$ = CONS(STRING, strupper($3,$3), $1); }
 	;
 
 propname: TK_NAME
