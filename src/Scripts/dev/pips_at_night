@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/07/20 17:05:47 $, )
+# ($Date: 1996/07/20 17:26:06 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -11,7 +11,7 @@
 test -r $HOME/.profile && . $HOME/.profile
 test "$PIPS_DIR" || . /projects/Pips/pipsrc.sh
 
-unset no_cleaning no_newgen no_linear no_pips no_validation quiet
+unset no_cleaning no_newgen no_linear no_pips no_validation
 
 # use this mail (not /bin/mail...)
 mail=/usr/openwin/bin/mail
@@ -47,8 +47,9 @@ EOF
     exit $ret
 }
 
-# compile what[nlp] name[...] report[filename] arch...
-# only stderr is sent in the mail
+# compile n|l|p(=what) name file(=report) arch...
+# compile "what" for all architectures.
+# the detailed report is sent only on failures
 compile()
 {
     what=$1; name=$2; report=$3; shift 3
@@ -64,6 +65,8 @@ compile()
     } > $detailed 2>&1
     
     cat $summary >> $report
+
+    # send the detailed report if some failures occured
     grep 'failed$' $summary > /dev/null 2>&1 &&
 	$mail -s "$script: $name recompile report" $email \
 	< $detailed > /dev/null 2>&1
@@ -94,62 +97,76 @@ rm -f ${report}*
 # do the job
 
 {
-$verbose starting $script for $email 
-$verbose date: `date`
+    $verbose starting $script for $email 
+    $verbose date: `date`
+    
+    #
+    # CLEANING
 
-test "$no_cleaning" ||
-{
-  $verbose deleting old workspaces...
-  $verbose date: `date`
-  find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +7 -print | 
-    xargs ${PIPS_UTILDIR}/Delete
+    test "$no_cleaning" ||
+    {
+	$verbose deleting old workspaces...
+	$verbose date: `date`
+	find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +7 -print | 
+	    xargs ${PIPS_UTILDIR}/Delete
+	    
+	$verbose removing core files older than one week
+	find ${PIPS_HOME}/Pips -name core -mtime +7 -print | 
+	xargs rm -f
+    }
 
-  $verbose removing core files older than one week
-  find ${PIPS_HOME}/Pips -name core -mtime +7 -print | 
-    xargs rm -f
-}
+    #
+    # COMPILE
+    msg=""
 
-test "$no_newgen" ||
-{
-  $verbose recompiling NEWGEN - Production
-  $verbose date: `date`
-  compile n newgen $report $arch
-}
+    # 1: NEWGEN
+    test "$no_newgen" ||
+    {
+	$verbose recompiling NEWGEN - Production
+	$verbose date: `date`
+	msg="${msg} newgen"
+	compile n newgen $report $arch
+    }
+    
+    # 2: LINEAR
+    test "$no_linear" ||
+    {
+	$verbose recompiling LINEAR - Production
+	$verbose date: `date`
+	msg="${msg} linear"
+	compile l linear $report $arch
+    }
 
-test "$no_linear" ||
-{
-  $verbose recompiling LINEAR - Production
-  $verbose date: `date`
-  compile l linear $report $arch
-}
+    # 3: PIPS
+    test "$no_pips" ||
+    {
+	$verbose recompiling PIPS - Production
+	$verbose date: `date`
+	msg="${msg} pips"
+	compile p pips $report $arch
+    }
 
-test "$no_pips" ||
-{
-  $verbose recompiling PIPS - Production
-  $verbose date: `date`
-  compile p pips $report $arch
-}
+    # 4: SUMMARY
+    test "$no_newgen$no_linear$no_pips" -eq 111 ||
+    {
+	$verbose generating recompile summary
+	$verbose date: `date`
+	summary=SUCCEEDED
+	grep 'failed$' $report > $report.failed && summary=FAILED
+	$mail -s "$script: recompile${msg}: ${summary}" $email \
+	    < $report.failed > /dev/null 2>&1
+	rm -f $report*
+    }
 
-# summary
-test "$no_newgen$no_linear$no_pips" -eq 111 ||
-{
-  $verbose generating recompiled summary
-  $verbose date: `date`
-  summary=SUCCEEDED
-  grep 'failed$' $report > $report.failed && summary=FAILED
-  $mail -s "$script: recompile $summary" $email \
-	< $report.failed > /dev/null 2>&1
-  rm -f $report*
-}
+    #
+    # VALIDATE Pips
+    test "$no_validation" || 
+    {
+	$verbose Validating PIPS
+	$verbose date: `date` 
+	Validate -vti 50 -a ${email}
+    }
 
-# Validate Pips
-test "$no_validation" || 
-{
-  $verbose Validating PIPS
-  $verbose date: `date` 
-  Validate -vti 50 -a ${email}
-}
-
-$verbose date: `date`
-$verbose end of  $script for $email 
+    $verbose end of  $script for $email 
+    $verbose date: `date`
 } 2>&1 | $mail -s "$script: night report" ${email}
