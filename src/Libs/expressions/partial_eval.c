@@ -1255,6 +1255,20 @@ void recursiv_partial_eval(statement stmt)
 	      pips_assert("recursiv_partial_eval", gen_consistent_p(stmt));
 	  }
 	  break;
+      }      
+    case is_instruction_whileloop : {
+	  whileloop l = instruction_whileloop(inst);
+	  partial_eval_expression_and_regenerate(&whileloop_condition(l), 
+						 stmt_prec(stmt), 
+						 stmt_to_fx(stmt,fx_map));
+	
+	 recursiv_partial_eval(whileloop_body(l));
+	 
+	  if(get_debug_level()>=9) {
+	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	      pips_assert("recursiv_partial_eval", gen_consistent_p(stmt));
+	  }
+	  break;
       }
       case is_instruction_call : {
 	  partial_eval_call_and_regenerate(instruction_call(inst), 
