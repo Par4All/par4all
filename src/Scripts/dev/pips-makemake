@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/09 14:12:13 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/09 14:19:17 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -444,14 +444,14 @@ INC_CFILES += $(LIB_CFILES)
 #
 # a little bit rough...
 #
-$(TARGET): $(PIPS_LIBDIR)/*.a
+$(TARGET): $(PIPS_LIBDIR)/$(ARCH)/*.a
+$(TARGET): $(LINEAR_LIBDIR)/$(ARCH)/*.a
+$(TARGET): $(NEWGEN_LIBDIR)/$(ARCH)/*.a
 #
 CFILES=		$(LIB_CFILES)
 OBJECTS=	$(LIB_OBJECTS)
 INCLUDES=	$(LIB_HEADERS)
 SOURCES+= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES) $(DOCS)
-#
-# TARGET_DIR=	$(PIPS_BINSRCDIR)/$(TARGET)
 #
 
 $(PIPS_BINDIR):
