@@ -19,3 +19,9 @@
 
 #include "pipsdbm.h"
 #include "resources.h"
+
+bool 
+in_alias_pairs( string module_name )
+{
+    return TRUE;
+}
