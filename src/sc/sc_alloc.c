@@ -54,13 +54,13 @@ Pbase sc_to_minimal_basis(Psysteme ps)
 	for(eq = ps->egalites; eq!= NULL; eq=eq->succ) {
 	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
 		if (pv->var != TCST)
-		    vect_chg_coeff(&b,pv->var,1);
+		    vect_chg_coeff(&b,pv->var, VALUE_ONE);
 	}
 
 	for(eq = ps->inegalites; eq!= NULL; eq=eq->succ) {
 	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
 		if (pv->var != TCST)
-		    vect_chg_coeff(&b,pv->var,1);
+		    vect_chg_coeff(&b,pv->var, VALUE_ONE);
 	}
 
     return b;
@@ -216,7 +216,7 @@ Psysteme sc_empty(b)
 Pbase b;
 {
     Psysteme sc = SC_UNDEFINED;
-    Pvecteur v = vect_new(TCST, 1);
+    Pvecteur v = vect_new(TCST, VALUE_ONE);
     Pcontrainte eq = contrainte_make(v);
     sc = sc_make(eq, CONTRAINTE_UNDEFINED);
 
