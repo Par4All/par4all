@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1995/09/04 15:58:55 $, ) 
+# ($Date: 1995/09/04 16:29:08 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -39,9 +39,9 @@
 #    -l file: lock file to report at the end (default: a mail is sent)
 #  - source environment if necessary
 
-[ "$PIPSHOME" ] || . /home/users/pips/Pips/pipsrc.sh
+[ "$PIPS_HOME" ] || . /home/users/pips/Pips/pipsrc.sh
 
-pips_test_directory=$PIPS_VALIDDIR/Tests/Validation
+pips_test_directory={$PIPS_VALIDDIR}
 default_file=defaults
 RUNNER=`whoami`
 HOSTNAME=`hostname`
