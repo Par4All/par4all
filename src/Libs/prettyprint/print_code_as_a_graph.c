@@ -21,8 +21,9 @@
 #include "pipsdbm.h"
 #include "complexity_ri.h"
 #include "complexity.h"
-#include "effects.h"
-#include "regions.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 #include "semantics.h"
 #include "prettyprint.h"
 
