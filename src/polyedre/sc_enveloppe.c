@@ -1,0 +1,433 @@
+ /* package polyedre: enveloppe convexe de deux systemes lineaires
+  *
+  * Ce module est range dans le package polyedre bien qu'il soit utilisable
+  * en n'utilisant que des systemes lineaires (package sc) parce qu'il
+  * utilise lui-meme des routines sur les polyedres.
+  *
+  * Francois Irigoin, Janvier 1990
+  */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <setjmp.h>
+
+#include "assert.h"
+
+#include "boolean.h"
+#include "arithmetique.h"
+#include "vecteur.h"
+#include "contrainte.h"
+#include "sc.h"
+
+#include "sommet.h"
+#include "ray_dte.h"
+#include "sg.h"
+
+#include "polyedre.h"
+
+
+
+jmp_buf overflow_error;
+
+
+/* Psysteme sc_enveloppe(s1, s2): calcul d'une representation par systeme
+ * lineaire de l'enveloppe convexe des polyedres definis par les systemes
+ * lineaires s1 et s2
+ *
+ * s = enveloppe(s1, s2);
+ * return s;
+ *
+ * s1 et s2 ne sont pas modifies. Ils doivent tous les deux avoir au moins
+ * une base.
+ *
+ * Il faudrait traiter proprement les cas particuliers SC_RN et SC_EMPTY
+ */
+Psysteme sc_enveloppe(s1, s2)
+Psysteme s1;
+Psysteme s2;
+{
+    Pbase b;
+    Pvecteur coord;
+    Ppoly p1;
+    Ppoly p2;
+    Ppoly p;
+    Psysteme s;
+
+    assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
+
+    /* duplication de s1 et de s2 */
+    s1 = sc_dup(s1);
+    s2 = sc_dup(s2);
+
+    /* calcul d'une base unique pour s1 et s2 */
+    b = s1->base;
+    for(coord=s2->base; !VECTEUR_NUL_P(coord); coord = coord->succ) {
+	b = vect_add_variable(b, vecteur_var(coord));
+    }
+    vect_rm(s2->base);
+    s2->base = vect_dup(b);
+
+    if(SC_RN_P(s1)) {
+	s = s1;
+	sc_rm(s2);
+    }
+    else if(SC_RN_P(s2)) {
+	s = s2;
+	sc_rm(s1);
+    }
+    else if(SC_EMPTY_P(s1)) {
+	assert(FALSE);
+	s = s2;
+	sc_rm(s1);
+    }
+    else if(SC_EMPTY_P(s2)) {
+	assert(FALSE);
+	s = s1;
+	sc_rm(s2);
+    }
+    else {
+	/* cas general */
+	/* conversion en polyedres */
+	p1 = sc_to_poly(s1);
+	p2 = sc_to_poly(s2);
+
+	/* calcul de l'enveloppe convexe */
+	p = env(p1, p2);
+
+	/* recuperation du systeme lineaire et desallocation du polyedre */
+	s = p->sc;
+	p->sc = SC_UNDEFINED;
+	poly_rm(p);
+    }
+
+    return s;
+}
+
+
+/* Psysteme sc_enveloppe_chernikova_ofl_ctrl(Psysteme s1, s2, int ofl_ctrl)
+ * input    : 
+ * output   : 
+ * modifies : s1 and s2 are NOT modified.
+ * comment  : s1 and s2 must have a basis.
+ * 
+ * s = enveloppe(s1, s2);
+ * return s;
+ *
+ * calcul d'une representation par systeme
+ * lineaire de l'enveloppe convexe des polyedres definis par les systemes
+ * lineaires s1 et s2
+ */
+Psysteme sc_enveloppe_chernikova_ofl_ctrl(s1, s2, ofl_ctrl)
+Psysteme s1;
+Psysteme s2;
+int ofl_ctrl;
+{
+    Psysteme s = SC_UNDEFINED;
+  
+    assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
+
+    switch (ofl_ctrl) 
+    {
+    case OFL_CTRL :
+	ofl_ctrl = FWD_OFL_CTRL;
+	if (setjmp(overflow_error)) {
+	    /* 
+	     *   PLEASE do not remove this warning.
+	     *
+	     *   BC 24/07/95
+	     */
+	    fprintf(stderr, "[sc_enveloppe_chernikova_ofl_ctrl] "
+		    "arithmetic error\n" );
+	    s = sc_rn(base_dup(sc_base(s1)));
+	    break;
+	}		
+    default:
+    
+	if (SC_RN_P(s2) || sc_rn_p(s2) || sc_dimension(s2)==0
+	    || sc_empty_p(s1) || !sc_faisabilite_ofl(s1)) 
+	{
+	    Psysteme sc2 = sc_dup(s2);
+	    sc2 = sc_elim_redond(sc2);
+	    s = (SC_UNDEFINED_P(sc2)) ? sc_empty(base_dup(sc_base(s2))) : sc2;
+	}
+	else 
+	    if (SC_RN_P(s1) ||sc_rn_p(s1) || sc_dimension(s1)==0   
+		 || sc_empty_p(s2) || !sc_faisabilite_ofl(s2)) 
+	    {
+		Psysteme sc1 = sc_dup(s1);
+		sc1 = sc_elim_redond(sc1);
+		s = (SC_UNDEFINED_P(sc1)) ? sc_empty(base_dup(sc_base(s1))) : sc1;
+	    }
+	    else 
+	    {
+		/* calcul de l'enveloppe convexe */
+		s = sc_new();
+		s = sc_convex_hull(s1,s2);
+		/* printf("systeme final \n"); sc_dump(s);  */
+	    }
+    }
+    return s;
+}
+
+Psysteme sc_enveloppe_chernikova(s1, s2)
+Psysteme s1, s2;
+{
+
+    return(sc_enveloppe_chernikova_ofl_ctrl((s1), (s2), OFL_CTRL));
+} 
+
+
+/* Psysteme sc_fast_convex_hull(Psysteme s1, Psysteme s2):
+ *
+ * exploit constraints shared by s1 and s2 to decrease the space
+ * dimension and the number of constraints before calling the
+ * effective convex hull function.
+ *
+ * Simplified view of the algorithm (in fact equalities and inequalities
+ * are treated differently):
+ *
+ * Let s1 and s2 be sets of constraints
+ * Build s0 = intersection(s1, s2)
+ * Build s1' = s1 - s0
+ * Build s2' = s2 - s0
+ * Compute h' = convex_hull(s1', s2')
+ * Build h = intersection(h', s0)
+ * Free h', s1', s2'
+ * Return h
+ *
+ * Francois Irigoin, 9 August 1992
+ */
+Psysteme sc_fast_convex_hull(s1, s2)
+Psysteme s1;
+Psysteme s2;
+{
+    Psysteme s0 = sc_new();
+    Psysteme s1p = sc_new();
+    Psysteme s2p = sc_new();
+    Psysteme hp = SC_UNDEFINED;
+    Pcontrainte eq;
+    Pbase b;
+    int d;
+    extern char * dump_value_name();
+
+    assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
+
+    /* 
+    (void) fprintf(stderr, "sc_fast_convex_hull: begin\ns1:\n");
+    sc_fprint(stderr, s1, dump_value_name);
+    (void) fprintf(stderr, "s2:\n");
+    sc_fprint(stderr, s2, dump_value_name);
+    */
+
+    for(eq = sc_egalites(s1); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
+	if(egalite_in_liste(eq, sc_egalites(s2))) {
+	    sc_add_egalite(s0, contrainte_dup(eq));
+	}
+	else if(contrainte_in_liste(eq, sc_inegalites(s2))) {
+	    sc_add_inegalite(s0, contrainte_dup(eq));
+	}
+	else {
+	    sc_add_egalite(s1p, contrainte_dup(eq));
+	}
+    }
+
+    for(eq = sc_inegalites(s1); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
+	if(contrainte_in_liste(eq, sc_inegalites(s2)) ||
+	   contrainte_in_liste(eq, sc_egalites(s2))) {
+	    sc_add_inegalite(s0, contrainte_dup(eq));
+	}
+	else {
+	    sc_add_inegalite(s1p, contrainte_dup(eq));
+	}
+    }
+
+    for(eq = sc_egalites(s2); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
+	if(contrainte_in_liste(eq, sc_inegalites(s0)) ||
+	   egalite_in_liste(eq, sc_egalites(s0))) {
+	    ;
+	}
+	else {
+	    sc_add_egalite(s2p, contrainte_dup(eq));
+	}
+    }
+
+    for(eq = sc_inegalites(s2); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
+	if(contrainte_in_liste(eq, sc_inegalites(s0)) ||
+	   contrainte_in_liste(eq, sc_egalites(s0))) {
+	    ;
+	}
+	else {
+	    sc_add_inegalite(s2p, contrainte_dup(eq));
+	}
+    }
+
+    sc_creer_base(s1p);
+    sc_creer_base(s2p);
+    b = base_union(sc_base(s1p), sc_base(s2p));
+    d = base_dimension(b);
+    vect_rm(sc_base(s1p));
+    vect_rm(sc_base(s2p));
+    sc_base(s1p) = base_dup(b);
+    sc_dimension(s1p) = d;
+    sc_base(s2p) = b;
+    sc_dimension(s2p) = d;
+    sc_base(s0) = base_union(sc_base(s1), sc_base(s2));
+
+    /*
+    (void) fprintf(stderr, "sc_fast_convex_hull: new systems\ns1p:\n");
+    sc_fprint(stderr, s1p, dump_value_name);
+    (void) fprintf(stderr, "s2p:\n");
+    sc_fprint(stderr, s2p, dump_value_name);
+    (void) fprintf(stderr, "s0:\n");
+    sc_fprint(stderr, s0, dump_value_name);
+    */
+
+    hp = sc_enveloppe(s1p, s2p);
+
+    /*
+    (void) fprintf(stderr, "sc_fast_convex_hull: small enveloppe\nhp:\n");
+    sc_fprint(stderr, hp, dump_value_name);
+    */
+
+    hp = sc_append(hp, s0);
+
+    sc_rm(s0);
+    sc_rm(s1p);
+    sc_rm(s2p);
+
+    /*
+    (void) fprintf(stderr, "sc_fast_convex_hull: end\nreturn hp:\n");
+    sc_fprint(stderr, hp, dump_value_name);
+    */
+
+    return hp;
+}
+
+/* Psysteme sc_fast_convex_hull(Psysteme s1, Psysteme s2):
+ *
+ * exploit constraints shared by s1 and s2 to decrease the space
+ * dimension and the number of constraints before calling the
+ * effective convex hull function.
+ *
+ * Simplified view of the algorithm (in fact equalities and inequalities
+ * are treated differently):
+ *
+ * Let s1 and s2 be sets of constraints
+ * Build s0 = intersection(s1, s2)
+ * Build s1' = s1 - s0
+ * Build s2' = s2 - s0
+ * Compute h' = convex_hull(s1', s2')
+ * Build h = intersection(h', s0)
+ * Free h', s1', s2'
+ * Return h
+ *
+ * Francois Irigoin, 9 August 1992
+ */
+Psysteme sc_fast_enveloppe_chernikova_ofl_ctrl(s1, s2, ofl_ctrl)
+Psysteme s1;
+Psysteme s2;
+int ofl_ctrl;
+{
+    Psysteme s0 = sc_new();
+    Psysteme s1p = sc_new();
+    Psysteme s2p = sc_new();
+    Psysteme hp = SC_UNDEFINED;
+    Pcontrainte eq;
+    Pbase b;
+    int d;
+    extern char * dump_value_name();
+
+    assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
+
+    /* 
+    (void) fprintf(stderr, "sc_fast_enveloppe_chernikova: begin\ns1:\n");
+    sc_fprint(stderr, s1, dump_value_name);
+    (void) fprintf(stderr, "s2:\n");
+    sc_fprint(stderr, s2, dump_value_name);
+    */
+
+    for(eq = sc_egalites(s1); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
+	if(egalite_in_liste(eq, sc_egalites(s2))) {
+	    sc_add_egalite(s0, contrainte_dup(eq));
+	}
+	else if(contrainte_in_liste(eq, sc_inegalites(s2))) {
+	    sc_add_inegalite(s0, contrainte_dup(eq));
+	}
+	else {
+	    sc_add_egalite(s1p, contrainte_dup(eq));
+	}
+    }
+
+    for(eq = sc_inegalites(s1); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
+	if(contrainte_in_liste(eq, sc_inegalites(s2)) ||
+	   contrainte_in_liste(eq, sc_egalites(s2))) {
+	    sc_add_inegalite(s0, contrainte_dup(eq));
+	}
+	else {
+	    sc_add_inegalite(s1p, contrainte_dup(eq));
+	}
+    }
+
+    for(eq = sc_egalites(s2); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
+	if(contrainte_in_liste(eq, sc_inegalites(s0)) ||
+	   egalite_in_liste(eq, sc_egalites(s0))) {
+	    ;
+	}
+	else {
+	    sc_add_egalite(s2p, contrainte_dup(eq));
+	}
+    }
+
+    for(eq = sc_inegalites(s2); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
+	if(contrainte_in_liste(eq, sc_inegalites(s0)) ||
+	   contrainte_in_liste(eq, sc_egalites(s0))) {
+	    ;
+	}
+	else {
+	    sc_add_inegalite(s2p, contrainte_dup(eq));
+	}
+    }
+
+    sc_creer_base(s1p);
+    sc_creer_base(s2p);
+    b = base_union(sc_base(s1p), sc_base(s2p));
+    d = base_dimension(b);
+    vect_rm(sc_base(s1p));
+    vect_rm(sc_base(s2p));
+    sc_base(s1p) = base_dup(b);
+    sc_dimension(s1p) = d;
+    sc_base(s2p) = b;
+    sc_dimension(s2p) = d;
+    sc_base(s0) = base_union(sc_base(s1), sc_base(s2));
+    sc_dimension(s0) = vect_size(s0->base);
+
+    /*
+    (void) fprintf(stderr, "sc_fast_enveloppe_chernikova: new systems\ns1p:\n");
+    sc_fprint(stderr, s1p, dump_value_name);
+    (void) fprintf(stderr, "s2p:\n");
+    sc_fprint(stderr, s2p, dump_value_name);
+    (void) fprintf(stderr, "s0:\n");
+    sc_fprint(stderr, s0, dump_value_name);
+    */
+
+    hp = sc_enveloppe_chernikova_ofl_ctrl(s1p, s2p, ofl_ctrl);
+
+    /*
+    (void) fprintf(stderr, "sc_fast_enveloppe_chernikova: small enveloppe\nhp:\n");
+    sc_fprint(stderr, hp, dump_value_name);
+    */
+
+    hp = sc_safe_append(hp, s0);
+
+    sc_rm(s0);
+    sc_rm(s1p);
+    sc_rm(s2p);
+
+    /*
+    (void) fprintf(stderr, "sc_fast_enveloppe_chernikova: end\nreturn hp:\n");
+    sc_fprint(stderr, hp, dump_value_name);
+    */
+
+    return hp;
+}
