@@ -62,17 +62,17 @@ static text (*decoration)(string) = NULL;
 static void 
 append_icfg_file(text t, string module_name)
 {
-    string filename = NULL;
-    string localfilename = NULL;
+    string filename = NULL, localfilename = NULL, prefix;
     FILE *f_called;
-    char buf[MAX_LINE_LENGTH];
-    char textbuf[MAX_LINE_LENGTH];
+    string buf;
+    char textbuf[MAX_LINE_LENGTH]; /* argh... */
 
+    prefix = print_ifs ? ".icfgc" : print_do_loops ? ".icfgl" : ".icfg";
+       
     /* create filename */
+    /* should ask it to pipsdbm... */
     localfilename = 
-	strdup(concatenate(module_name,
-	       print_ifs ? ".icfgc" : print_do_loops ? ".icfgl" : ".icfg" ,
-			   NULL));
+        db_build_file_resource_name(DBR_ICFG_FILE, module_name, prefix);
     filename = 
 	strdup(concatenate(db_get_current_workspace_directory(), 
 			   "/", localfilename, NULL));
@@ -82,15 +82,19 @@ append_icfg_file(text t, string module_name)
     /* Get the Icfg from the callee */
     f_called = safe_fopen (filename, "r");
 
-    while (fgets (buf, MAX_LINE_LENGTH, f_called)) {
+    while ((buf=safe_readline(f_called))) {
 	/* add sentences ... */
-	sprintf(textbuf, "%*s%s", current_margin ,"",buf);
+        pips_assert("static buf length", 
+                    current_margin+strlen(buf)+1<MAX_LINE_LENGTH);
+	sprintf(textbuf, "%*s%s\n", current_margin ,"",buf);
+        free(buf);
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
     }
     
     /* push resulting text */
     safe_fclose (f_called, filename);
+    free(filename); free(localfilename);
 }
 
 /* STATEMENT
