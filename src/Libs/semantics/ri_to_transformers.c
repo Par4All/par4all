@@ -797,7 +797,7 @@ user_call_to_transformer(
 		      entity e_old = external_entity_to_old_value(e);
  ifdebug(8) {
 	debug(8, "user_call_to_transformer", 
-	      "entity=%s entity_old_value= %s",entity_local_name(e),entity_local_name(e_old));
+	      "entity=%s entity_old_value= %s\n",entity_local_name(e),entity_local_name(e_old));
 	
 	
     }
@@ -851,11 +851,12 @@ user_call_to_transformer(
 	
     }
 
-	/* formal new values left over are eliminated */
+	/* formal new and old values left over are eliminated */
 	MAPL(ce,{entity e = ENTITY(CAR(ce));
 		 entity e_new = external_entity_to_new_value(e);
-		     
-		 formals_new = CONS(ENTITY, e_new, formals_new);},
+		 entity e_old = external_entity_to_old_value(e);
+		 formals_new = CONS(ENTITY, e_new, formals_new);
+		 formals_new = CONS(ENTITY, e_old, formals_new);},
 	     formals);
 		 
 	t_caller = transformer_filter(t_caller, formals_new);
