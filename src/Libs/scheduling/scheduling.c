@@ -81,7 +81,7 @@ boolean print_bdt(module_name)
   if (get_debug_level() > 1)
     user_log("\n\n *** PRINTING BDT for %s\n", module_name);
 
-  the_bdt = db_get_memory_resource(DBR_BDT, module_name, TRUE);
+  the_bdt = (bdt) db_get_memory_resource(DBR_BDT, module_name, TRUE);
 
   localfilename = strdup(concatenate(module_name, BDT_EXT, NULL));
   filename = strdup(concatenate(db_get_current_workspace_directory(), 
