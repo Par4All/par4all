@@ -71,9 +71,14 @@ void lazy_open_module(name)
 char *name;
 {
     char *current_name = db_get_current_module_name();
-    if (current_name == NULL
-	|| strcmp(current_name, name) != 0)
-      open_module(name);
+
+    message_assert("cannot lazy_open no module", name != NULL);
+
+    if (current_name == NULL || strcmp(current_name, name) != 0) {
+	if (current_name != NULL)
+	    user_log ("Module %s already active\n", name);
+	open_module(name);
+    }
 }
      
 /* should be: success (cf wpips.h) */
