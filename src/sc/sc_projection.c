@@ -462,12 +462,12 @@ int ofl_ctrl;
     return(sc);
 }
 
-/* Psysteme sc_simple_variable_substitution_with_eq_ofl_ctrl(Psysteme sc, Pcontrainte def,
- *                                                    Variable v, int ofl_ctrl) 
+/* Psysteme sc_simple_variable_substitution_with_eq_ofl_ctrl
+ *     (Psysteme sc, Pcontrainte def, Variable v, int ofl_ctrl) 
  * input    : a system of contraints sc, a contraint eq that must belong to sc,
  *            and a variable v that appears in the constraint eq.
- * output   : a Psysteme which is the projection of sc along v using the equation
- *            eq.
+ * output   : a Psysteme which is the projection of sc along v using
+ *            equation eq.
  * modifies : sc.
  * comment  : The case ofl_ctrl == OFL_CTRL is not handled, because it would
  *            have no sense here.
@@ -481,7 +481,6 @@ Pcontrainte def;
 Variable v;
 int ofl_ctrl;
 {
-    /* Assume no aliasing between def and sc! */
     Pcontrainte eq = CONTRAINTE_UNDEFINED;
     Pcontrainte ineq = CONTRAINTE_UNDEFINED;
 
@@ -489,6 +488,7 @@ int ofl_ctrl;
 
     for(eq = sc_egalites(sc); !CONTRAINTE_UNDEFINED_P(eq);
 	eq = contrainte_succ(eq)){
+      if (eq!=def) /* skip if aliased! */
 	(void) contrainte_subst_ofl_ctrl(v, def, eq, TRUE, ofl_ctrl);
     }
 
@@ -498,7 +498,6 @@ int ofl_ctrl;
     }
     return sc;
 }
-
 
 /* boolean sc_fourier_motzkin_variable_elimination_ofl_ctrl(Psysteme sc, 
  *                     Variable v, 
@@ -947,5 +946,22 @@ void sc_extract_exact_common_equalities
 
       eq = neq; /* let's hope neq is still there... */
     }
+  }
+}
+
+/* make exact projection of simple equalities where possible,
+ * so as to simplify the system by avoiding X == Y and Y == 3.
+ * poor's man normalization;-) should use Hermite for better results?
+ * the result is not deterministic, we should iterate till stable,
+ * however no information is available from substitutions to tell
+ * whether the system was changed or not...
+ */
+void sc_project_very_simple_equalities(Psysteme s)
+{
+  Pcontrainte e;
+  for (e = sc_egalites(s); e; e = e->succ)
+  {
+    Variable v = contrainte_simple_equality(e);
+    if (v) SUBS(s, e, v);
   }
 }
