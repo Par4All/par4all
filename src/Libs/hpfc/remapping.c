@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/04/21 17:11:22 $, ) 
+ * ($Date: 1995/04/24 14:32:29 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -116,7 +116,7 @@ list /* of entities */ l_psi, l_oth;
 entity psi, oth, lid;
 entity  (*create_psi)(/* int */), (*create_oth)(/* int */);
 statement body;
-boolean sh; /* whether to shift the psi's */
+boolean sh; /* wether to shift the psi's */
 {
     entity divide = hpfc_name_to_entity(IDIVIDE);
     Psysteme condition, enumeration, known, simpler;
@@ -125,12 +125,21 @@ boolean sh; /* whether to shift the psi's */
 	compute_lid = hpfc_compute_lid(lid, oth, create_oth),
 	oth_loop, if_guard;
 
-    hpfc_algorithm_row_echelon(s, l_oth, &condition, &enumeration);
     known = sc_dup(entity_to_declaration_constraints(psi));
-    if (sh) shift_system_to_prime_variables(known);
+    if (sh) known = shift_system_to_prime_variables(known);
+
+    DEBUG_SYST(7, "initial system", s);
+    DEBUG_ELST(7, "loop indexes", l_oth);
+
+    hpfc_algorithm_row_echelon(s, l_oth, &condition, &enumeration);
+
+    DEBUG_SYST(7, "P condition", condition);
 
     simpler = extract_nredund_subsystem(condition, known);
     sc_rm(condition), sc_rm(known);
+
+    DEBUG_SYST(5, "P simpler", simpler);
+    DEBUG_SYST(5, "P enumeration", enumeration);
 
     oth_loop = systeme_to_loop_nest(enumeration, l_oth, 
 	       make_block_statement(CONS(STATEMENT, compute_lid,
