@@ -68,8 +68,8 @@ IN_STACK(gen_cp_, &Gen_cp_[MAX_NESTED_CONS], \
 	{cons* _map_list_cp = (_l) ; \
 	for(;_map_list_cp!=NIL;_map_list_cp=CDR(_map_list_cp)) _code;}
 
-/* Fonctions de list.c */
-
+/* Fonctions de list.c 
+ */
 extern cons *gen_append GEN_PROTO(( cons *, cons *)) ;
 extern cons *gen_concatenate GEN_PROTO(( cons *, cons * )) ;
 extern void gen_copy GEN_PROTO(( gen_chunk *, gen_chunk *)) ;
@@ -89,6 +89,7 @@ extern cons *gen_filter_tabulated GEN_PROTO(( int (*)(), int )) ;
 extern void gen_free_list GEN_PROTO(( cons *)) ;
 extern cons *gen_last GEN_PROTO(( cons * )) ;
 extern int gen_length GEN_PROTO(( cons * )) ;
+extern void gen_map GEN_PROTO(( void (*)(), list )) ;
 extern void gen_mapc_tabulated GEN_PROTO(( void (*)(), int )) ;
 extern void gen_mapl GEN_PROTO(( void (*)(), cons * )) ;
 extern cons *gen_nconc GEN_PROTO(( cons *, cons * )) ;
