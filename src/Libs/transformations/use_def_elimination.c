@@ -35,7 +35,12 @@ static hash_table ordering_to_dg_mapping;
 
 static set the_useful_statements;
 
-static hash_table statement_to_statement_father_mapping;
+/* Define the mapping to store the statements generating something
+   useful for a given statement and the functions used to deal
+   with. It is a mapping from a statement to a *set* of statements,
+   those that generate interesting use-def values.*/
+static hash_table statements_use_def_dependence;
+
 
 static bool
 use_def_true_filter(statement s)
@@ -45,16 +50,14 @@ use_def_true_filter(statement s)
 }
 
 
-static void
-use_def_rewrite_nothing(statement s)
-{
-   /* Just do nothing... */
-}
-
-
 /* Define a static stack and related functions to remember the current
    statement for build_statement_to_statement_father_mapping(): */
 DEFINE_LOCAL_STACK(current_statement, statement)
+
+
+/* Define the mapping to store the statement owning the statements and the
+   functions used to deal with: */
+GENERIC_LOCAL_FUNCTION(statement_father, persistant_statement_to_statement)
 
 
 static void
@@ -71,13 +74,13 @@ add_statement_to_the_statement_to_statement_father_mapping(statement s)
    /* Since statement_undefined == hash_undefined_value, we cannot put
       a statement_undefined in the hash_table... */
    if (current_statement_head() != statement_undefined)
-      hash_put(statement_to_statement_father_mapping,
-               (char *) s,
-               (char *) current_statement_head());
+      store_statement_father(s, current_statement_head());
 }
 
 
-GENERIC_LOCAL_FUNCTION(control_father, controlmap)
+/* Define the mapping to store the control fathers of the statements
+   and the functions used to deal with: */
+GENERIC_LOCAL_FUNCTION(control_father, persistant_statement_to_control)
 
 
 /* Build a mapping from a statement to its eventual control father. */
@@ -95,8 +98,6 @@ build_statement_to_statement_father_mapping(statement s)
       fprintf(stderr, "build_statement_to_statement_father_mapping statement %#x (%#x)\n",
               (int) s, statement_ordering(s));
 
-   statement_to_statement_father_mapping = hash_table_make(hash_pointer, 0);
-
    make_current_statement_stack();
    /* The first statement has no father: */
    current_statement_push(statement_undefined);
@@ -112,6 +113,88 @@ build_statement_to_statement_father_mapping(statement s)
                      NULL);
 
    free_current_statement_stack();
+}
+
+
+/* Build the mapping from each statement to the statements generating
+   something useful for it: */
+static void
+build_statement_to_statement_dependence_mapping(graph dependence_graph)
+{
+   statements_use_def_dependence = hash_table_make(hash_pointer, 0);
+   
+   MAP(VERTEX,
+       a_vertex,
+       {
+          statement s1 = vertex_to_statement(a_vertex);
+
+          debug(7, "build_statement_to_statement_dependence_mapping",
+                "\tSuccessor list: %#x for statement ordering %#x\n", 
+                (int) vertex_successors(a_vertex),
+                dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
+          MAP(SUCCESSOR, a_successor,
+              {
+                 vertex v2 = successor_vertex(a_successor);
+                 statement s2 = vertex_to_statement(v2);
+                 dg_arc_label an_arc_label = successor_arc_label(a_successor);
+                 ifdebug(7)
+                    fprintf(stderr, "\t%#x --> %#x with conflicts\n", 
+                            (int) s1, (int) s2);
+                 /* Try to find at least one of the use-def chains between
+                    s and a successor: */
+                 MAP(CONFLICT, a_conflict,
+                     {
+                        ifdebug(7) 
+                           {
+                              fprintf(stderr, "\t\tfrom ");
+                              print_words(stderr, words_effect(conflict_source(a_conflict)));
+                              fprintf(stderr, " to ");
+                              print_words(stderr, words_effect(conflict_sink(a_conflict)));
+                              fprintf(stderr, "\n");
+                           }
+                    
+                        /* Something is useful for the current statement if
+                           it writes something that is used in the current
+                           statement: */
+                        if (action_read_p(conflict_source(a_conflict))
+                            && action_write_p(conflict_sink(a_conflict))) {
+                           /* Mark that we will visit the node that defined a
+                              source for this statement, if not already
+                              visited: */
+                           set statements_set =
+                              (set) hash_get(statements_use_def_dependence,
+                                             (char *) s1);
+                                       
+                           if (statements_set == (set) HASH_UNDEFINED_VALUE) {
+                              /* It is the first dependence we found
+                                 for s1. Create the set: */
+                              statements_set = set_make(set_pointer);
+                              hash_put(statements_use_def_dependence,
+                                       (char *) s1,
+                                       (char *) statements_set);
+                           }
+
+                           /* Mark the fact that s2 create something
+                              useful for s1: */
+                           set_add_element(statements_set,
+                                           statements_set,
+                                           (char *) s2);
+
+                           ifdebug(6)
+                              fprintf(stderr, "\tstatement %#x (%#x) useful by use-def.\n",
+                                      (int) s2, statement_ordering(s2));
+  
+                           /* One use-def is enough for this variable
+                              couple: */
+                           break;
+                        }
+                     },
+                        dg_arc_label_conflicts(an_arc_label));
+              },
+                 vertex_successors(a_vertex));
+
+       },
+          graph_vertices(dependence_graph));
 }
 
 
@@ -160,7 +243,6 @@ static void
 iterate_through_the_predecessor_graph(statement s,
                                       set elements_to_visit)
 {
-   /* First mark the dependence graph predecessors: */
    /* Get the dependence list for this statement: */
    vertex the_statement_vertex = (vertex) hash_get(ordering_to_dg_mapping,
                                                    (char *) statement_ordering(s));
@@ -168,15 +250,38 @@ iterate_through_the_predecessor_graph(statement s,
    ifdebug(6)
       fprintf(stderr, "iterate_through_the_predecessor_graph, statement %#x (%#x).\n",
               (int) s, statement_ordering(s));
+
+   /* Mark the current statement as useful: */
+   set_add_element(the_useful_statements, the_useful_statements, (char *) s);
   
-   if (the_statement_vertex != (vertex) HASH_UNDEFINED_VALUE)
+   /* First mark the dependence graph predecessors: */
+   if (the_statement_vertex == (vertex) HASH_UNDEFINED_VALUE)
+      user_warning("iterate_through_the_predecessor_graph", "The statement %#x (%#x) does not have any dependance graph information\n", (int) s, statement_ordering(s));
+   else {
+      ifdebug(7)
+         fprintf(stderr, "\tSuccessor list: %#x\n", 
+                 (int) vertex_successors(the_statement_vertex));
+      
       MAP(SUCCESSOR, a_successor,
           {
+             vertex sv = successor_vertex(a_successor);
              dg_arc_label label = successor_arc_label(a_successor);
+             ifdebug(7)
+                fprintf(stderr, "\t%#x --> %#x with conflicts\n", 
+                        (int) s, (int) vertex_to_statement(sv));
              /* Try to find at least one of the use-def chains between
                 s and a successor: */
              MAP(CONFLICT, a_conflict,
                  {
+                    ifdebug(7) 
+                       {
+                          fprintf(stderr, "\t\tfrom ");
+                          print_words(stderr, words_effect(conflict_source(a_conflict)));
+                          fprintf(stderr, " to ");
+                          print_words(stderr, words_effect(conflict_sink(a_conflict)));
+                          fprintf(stderr, "\n");
+                       }
+                    
                     /* Something is useful for the current statement if
                        it writes something that is used in the current
                        statement: */
@@ -187,22 +292,30 @@ iterate_through_the_predecessor_graph(statement s,
                           visited: */
                        set_add_element(elements_to_visit,
                                        elements_to_visit,
-                                       (char *) ordering_to_statement(dg_vertex_label_statement(a_successor)));
-                       /* One use-def is enough: */
+                                       (char *) vertex_to_statement(sv));
+                       ifdebug(6)
+                          fprintf(stderr, "\tstatement %#x (%#x) useful by use-def.\n",
+                                  (int) vertex_to_statement(sv), statement_ordering(vertex_to_statement(sv)));
+  
+                       /* One use-def is enough for this variable
+                          couple: */
                        break;
                     }
                  },
                     dg_arc_label_conflicts(label));
           },
              vertex_successors(the_statement_vertex));
-
-   {
-      /* Mark the father too for control dependences: */
-      statement father =
-         (statement) hash_get(statement_to_statement_father_mapping, (char *) s);
-      if (father != (statement) HASH_UNDEFINED_VALUE)
-         set_add_element(elements_to_visit, elements_to_visit, (char *) father);
    }
+   
+   /* Mark the father too for control dependences: */
+   if (bound_statement_father_p(s)) {
+      statement father = load_statement_father(s);
+      set_add_element(elements_to_visit, elements_to_visit, (char *) father);
+      ifdebug(6)
+         fprintf(stderr, "\tstatement %#x (%#x) useful as the statement owner.\n",
+                 (int) father, statement_ordering(father));
+   }
+
    {
       /* And if the statement is in an unstructured, mark all the
          unstructured nodes predecessors as useful. It is quite
@@ -214,6 +327,9 @@ iterate_through_the_predecessor_graph(statement s,
                 set_add_element(elements_to_visit,
                                 elements_to_visit,
                                 (char *) control_statement(a_control));
+                ifdebug(6)
+                   fprintf(stderr, "\tstatement %#x (%#x) useful by control dependence.\n",
+                           (int) control_statement(a_control), statement_ordering(control_statement(a_control)));
              }, control_predecessors(control_father));
       }
    }            
@@ -246,15 +362,21 @@ use_def_deal_if_useful(statement s)
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 
+   if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
+      user_warning("use_def_deal_if_useful", "exited since it found a statement without ordering: statement %#x (%#x)\n", (int) s, statement_ordering(s));
+      return;
+   }
+   
    /* The possible reasons to have useful code: */
    /* - the statement does an I/O: */
    this_statement_has_an_io_effect = statement_io_effect_p(the_proper_effects, s);
    /* - the statement writes a procedure argument, so the value may be
       used by another procedure: */
+   /* Regions out should be more precise: */
    this_statement_writes_a_procedure_argument =
-      statement_write_argument_of_module_effect_p(s,
-                                                  get_current_module_entity(),
-                                                  the_proper_effects);
+      statement_has_a_module_formal_argument_write_effect_p(s,
+                                                            get_current_module_entity(),
+                                                            the_proper_effects);
 
    if (get_debug_level() >= 6) {
       if (this_statement_has_an_io_effect)
@@ -290,11 +412,17 @@ remove_this_statement_if_useless(statement s)
 void static
 remove_all_the_non_marked_statements(statement s)
 {
+   ifdebug(5)
+      fprintf(stderr, "Entering remove_all_the_non_marked_statements\n");
+   
    gen_recurse(s, statement_domain,
                /* Since statements can be nested, only remove in a
                   bottom-up way: */
                use_def_true_filter,
                remove_this_statement_if_useless);
+
+   ifdebug(5)
+      fprintf(stderr, "Exiting remove_all_the_non_marked_statements\n");
 }
 
 
@@ -303,11 +431,13 @@ use_def_elimination_on_a_statement(statement s)
 {
    the_useful_statements = set_make(set_pointer);
    init_control_father();
+   init_statement_father();
    
    /* pips_assert("use_def_elimination_on_a_statement", */
    ordering_to_dg_mapping = compute_ordering_to_dg_mapping(dependence_graph);
 
    build_statement_to_statement_father_mapping(s);
+   build_statement_to_statement_dependence_mapping(dependence_graph);
 
    /* Mark as useful the seed statements: */
    gen_recurse(s, statement_domain,
@@ -320,7 +450,8 @@ use_def_elimination_on_a_statement(statement s)
    remove_all_the_non_marked_statements(s);
 
    hash_table_free(ordering_to_dg_mapping);
-   hash_table_free(statement_to_statement_father_mapping);
+   hash_table_free(statements_use_def_dependence);
+   close_statement_father();
    close_control_father();
    set_free(the_useful_statements);
 }
@@ -338,6 +469,9 @@ use_def_elimination(char * module_name)
       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
    /* Get the data dependence graph: */
+   /* The dg is more precise than the chains, so I guess I should
+      remove more code with the dg, specially with array sections and
+      so on. */
    dependence_graph =
       (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
 
