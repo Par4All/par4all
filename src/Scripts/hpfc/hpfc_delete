@@ -1,0 +1,64 @@
+#! /bin/sh
+#
+# $RCSfile: hpfc_delete,v $ version $Revision$
+# $Date: 1994/11/02 21:32:52 $, 
+# got on %D%, %T%
+#
+
+script=`basename $0`
+VERBOSE=':'
+DEBUG=':'
+
+unset HPFFILE
+
+usage()
+{
+  cat 2>&1 <<-EOF
+	Usage: $script [-vDh] [ -w ws | -n n | file[.f]]
+	  -v: verbose
+	  -D: debug
+	  -h: help
+	  -w ws: workspace ws
+	  -n n: source number n
+	  file: source file
+	EOF
+  exit ${1:-1}
+}
+
+verbose()
+{
+  echo "$script: $@"
+}
+
+debug()
+{
+  echo "$script: $@" 1>&2
+}
+
+while getopts vDhn:w: OPT
+do
+  case $OPT in
+    v) VERBOSE='verbose' ;; 
+    w) WORKSPACE="$OPTARG" ;;
+    D) DEBUG='debug' ;;
+    n) HPFFILE="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
+    h|*) usage 1 ;;
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+[ "$#" -eq 1 ] && { HPFFILE=`basename $1 .f`.f ; shift; }
+[ "$#" -eq 0 ] || usage 2
+
+[ "$WORKSPACE" ] || WORKSPACE=`basename $HPFFILE .f`
+
+[ -d "$WORKSPACE.hpfc" ] && 
+{
+  $VERBOSE "deleting $WORKSPACE.hpfc"
+  rm -rf "$WORKSPACE.hpfc"
+}
+
+#
+# That is all
+#
