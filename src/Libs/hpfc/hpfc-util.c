@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: hpfc-util.c,v $
+ * Revision 1.55  1997/08/04 14:03:01  coelho
+ * new generic effects includes.
+ *
  * Revision 1.54  1997/07/25 22:26:50  keryell
  * Avoid to put comments on sequences.
  *
@@ -26,7 +29,8 @@
  */
 
 #include "defines-local.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 
 /* Predicates
  */
