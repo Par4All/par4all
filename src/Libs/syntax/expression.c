@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/03 22:27:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/10 13:55:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1997/02/03 22:27:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 1997/09/10 13:55:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -145,9 +145,15 @@ int HasParenthesis;
 			    storage_undefined, value_undefined);
 	}
 	else {
+	    type tr = ImplicitType(e);
+
 	    debug(2, "MakeAtom", "new user function: %s\n",
 		  entity_name(e));
-	    e = MakeExternalFunction(e, type_undefined);
+	    /* e = MakeExternalFunction(e, type_undefined); */
+	    e = MakeExternalFunction(e, tr);
+
+	    /* use expression list to compute argument types */
+	    update_functional_type_with_actual_arguments(e, indices);
 	}
     }
     else if (type_variable_p(te)) {
