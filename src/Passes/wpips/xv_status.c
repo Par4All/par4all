@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <varargs.h>
+#include <stdarg.h>
 
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -84,14 +84,16 @@ va_dcl
 }
 */
 
-void show_message(m)
-string m;
+void show_message(string message_buffer /*, ...*/)
 {
-  static char message_buffer[SMALL_BUFFER_LENGTH];
+   /* va_list some_arguments;
+   static char message_buffer[SMALL_BUFFER_LENGTH]; */
 
-  (void) vsprintf(message_buffer, m);
+   /* va_start(some_arguments, a_printf_format); */
 
-  xv_set(message, PANEL_VALUE, message_buffer, 0);
+   /* (void) vsprintf(message_buffer, a_printf_format, some_arguments);*/
+
+   xv_set(message, PANEL_VALUE, message_buffer, 0);
 }
 
 
