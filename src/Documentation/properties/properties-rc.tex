@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.171  2003/07/30 14:34:37  nguyen
+%% Add new property to prettyprint C code
+%%
 %% Revision 1.170  2003/06/16 14:05:52  coelho
 %% hop.
 %%
@@ -225,7 +228,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2003/06/16 14:05:52 $~$
+$~$Date: 2003/07/30 14:34:37 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2115,7 +2118,19 @@ ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
 \index{Prettyprinter (Code)}
 \index{Code Prettyprinter}
 
+\subsubsection{Language}
+\index{PRETTYPRINT\_C\_CODE}
 
+PIPS is now extended to deal with C programs, so the following property is
+used to tell the prettyprinter to print a C code or not. By default, the
+Fortran output is printed.
+
+\begin{verbatim}
+PRETTYPRINT_C_CODE FALSE
+\end{verbatim}
+
+However, this is not a good way to handle multi-target languages. To be
+replaced ... 
 \subsubsection{Layout}
 \index{Analysis}
 \index{PRETTYPRINT\_LOOSE}
