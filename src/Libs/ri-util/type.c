@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.34  1998/12/15 16:52:10  zory
+ * new functions included in the EOLE project (with TAGS)
+ *
  * Revision 1.33  1998/11/05 13:50:45  zory
  * new EOLE automatic inclusion tags added
  *
@@ -629,6 +632,12 @@ type_to_string(type t)
     return(string_undefined); /* just to avoid a gcc warning */
 }
 
+
+
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
 /*
  * returns the string to declare a basic type.
  */
@@ -711,6 +720,7 @@ basic b;
 
     return(string_undefined); /* just to avoid a gcc warning */
 }
+
 
 /* basic basic_of_expression(expression exp): Makes a basic of the same
  * basic as the expression "exp". Indeed, "exp" will be assigned to
@@ -898,6 +908,7 @@ basic_of_constant(call c)
     return(variable_basic(type_variable(return_type)));
 }
 
+
 /* basic basic_union(expression exp1 exp2): returns the basic of the
  * expression which has the most global basic. Then, between "int" and
  * "float", the most global is "float".
@@ -1029,6 +1040,8 @@ basic_union(expression exp1, expression exp2)
       return(b1);
     */
 }
+
+/* END_EOLE */
 
 bool 
 overloaded_type_p(type t)
