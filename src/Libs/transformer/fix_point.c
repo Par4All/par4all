@@ -72,7 +72,7 @@ transformer tf;
     transformer tf23;
     /* tf_star: transformer for one, two, three,... loop iterations
        should be called tf_plus by I do not use the one_trip flag */
-    transformer tf_star;
+    transformer tf_star = transformer_undefined;
 
     pips_error("transformer_halbwachs_fix_point","not implemented\n");
 
@@ -163,22 +163,25 @@ Pbase b_new;
 
 	    if( e != (entity) TCST )
 		if(new_value_entity_p(e)) {
-		    pips_assert("build_transfer_matrix", vecteur_val(t)==1);
+		    pips_assert("build_transfer_matrix", 
+				value_one_p(vecteur_val(t)));
 		}
 		else {
 		    entity ov = old_value_to_new_value(e);
 		    int ov_rank = rank_of_variable(b_new, (Variable) ov);
 		    debug(8,"build_transfer_matrix", "nv_rank=%d, ov_rank=%d\n",
 			  nv_rank, ov_rank);
-		    ACCESS(a, n_eq, nv_rank, ov_rank) = - vecteur_val(t);
+		    ACCESS(a, n_eq, nv_rank, ov_rank) = 
+			value_uminus(vecteur_val(t));
 		}
 	    else {
-		ACCESS(a, n_eq, nv_rank, n_eq) = - vecteur_val(t);
+		ACCESS(a, n_eq, nv_rank, n_eq) = 
+		    value_uminus(vecteur_val(t));
 	    }
 	}
     }
     /* add the homogeneous coordinate */
-    ACCESS(a, n_eq, n_eq, n_eq) = 1;
+    ACCESS(a, n_eq, n_eq, n_eq) = VALUE_ONE;
 
     *pa = a;
 }
@@ -257,16 +260,16 @@ transformer tf;
 
     /* Subtract the identity matrix */
     for(i=1; i<= n_eq; i++) {
-	ACCESS(a, n_eq, i, i) -= 1;
+	value_substract(ACCESS(a, n_eq, i, i),VALUE_ONE);
     }
 
     /* Compute the Smith normal form: H = P A Q */
     h = matrice_new(n_eq, n_eq);
     p = matrice_new(n_eq, n_eq);
     q = matrice_new(n_eq, n_eq);
-    DENOMINATOR(h) = 1;
-    DENOMINATOR(p) = 1;
-    DENOMINATOR(q) = 1;
+    DENOMINATOR(h) = VALUE_ONE;
+    DENOMINATOR(p) = VALUE_ONE;
+    DENOMINATOR(q) = VALUE_ONE;
     matrice_smith(a, n_eq, n_eq, p, h, q);
  
     ifdebug(8) {
@@ -279,7 +282,8 @@ transformer tf;
     }
 
     /* Find out the number of invariants n_inv */
-    for(i=1; i <= n_eq && ACCESS(h, n_eq, i, i) != 0 ; i++)
+    for(i=1; i <= n_eq && 
+	    value_notzero_p(ACCESS(h, n_eq, i, i)) ; i++)
 	;
     n_inv = n_eq - i + 1;
     debug(8, "transformer_equality_fix_point", "number of useful invariants: %d\n", n_inv-1);
@@ -292,21 +296,21 @@ transformer tf;
     for(i = n_eq - n_inv + 1 ; i <= n_eq; i++) {
 	int j;
 	/* is it a non-trivial invariant? */
-	for(j=1; j<= n_eq-1 && ACCESS(p, n_eq, i, j) == 0; j++)
+	for(j=1; j<= n_eq-1 && value_zero_p(ACCESS(p, n_eq, i, j)); j++)
 	    ;
 	if( j != n_eq) {
 	    Pvecteur v_inv = VECTEUR_NUL;
 	    Pcontrainte c_inv = CONTRAINTE_UNDEFINED;
 
 	    for(j = 1; j<= n_eq; j++) {
-		int coeff = ACCESS(p, n_eq, i, j);
+		Value coeff = ACCESS(p, n_eq, i, j);
 
-		if(coeff != 0) {
+		if(value_notzero_p(coeff)) {
 		    entity n_eb = (entity) variable_of_rank(b_new, j);
 		    entity o_eb = new_value_to_old_value(n_eb);
 
-		    vect_add_elem(&v_inv, (Variable) n_eb, (Value) coeff);
-		    vect_add_elem(&v_inv, (Variable) o_eb, - (Value) coeff);
+		    vect_add_elem(&v_inv, (Variable)n_eb, coeff);
+		    vect_add_elem(&v_inv, (Variable)o_eb, value_uminus(coeff));
 		}
 	    }
 	    c_inv = contrainte_make(v_inv);
@@ -467,7 +471,7 @@ Pvecteur eq;
 {
     Pvecteur t;
     int n_new = 0;
-    int coeff = 0; /* for gcc */
+    Value coeff = VALUE_ZERO;
 
     for(t=eq; !VECTEUR_UNDEFINED_P(t) && n_new <= 1; t = t->succ) {
 	entity e = (entity) vecteur_var(t);
@@ -478,7 +482,7 @@ Pvecteur eq;
 	}
     }
 
-    return (n_new==1) && (coeff==1 || coeff==-1);
+    return (n_new==1) && (value_one_p(coeff) || value_mone_p(coeff));
 }
 
 entity new_value_in_transfer_equation(eq)
@@ -486,23 +490,23 @@ Pvecteur eq;
 {
     Pvecteur t;
     int n_new = 0;
-    int coeff = 0; /* for gcc */
+    Value coeff = VALUE_ZERO; /* for gcc */
     entity new_value = entity_undefined;
 
     for(t=eq; !VECTEUR_UNDEFINED_P(t) && n_new <= 1; t = t->succ) {
 	entity e = (entity) vecteur_var(t);
 
 	if( e != (entity) TCST && new_value_entity_p(e) && 
-	   (vecteur_val(t)==1 || vecteur_val(t)==-1)) {
+	   (value_one_p(vecteur_val(t)) || value_mone_p(vecteur_val(t)))) {
 	    new_value = e;
 	    coeff = vecteur_val(t);
 	    n_new++;
 	}
     }
 
-    if(coeff == -1) {
+    if(value_mone_p(coeff)) {
 	for(t=eq; !VECTEUR_UNDEFINED_P(t) && n_new <= 1; t = t->succ) {
-	    vecteur_val(t) = -vecteur_val(t);
+	    value_oppose(vecteur_val(t));
 	}
     }
 
