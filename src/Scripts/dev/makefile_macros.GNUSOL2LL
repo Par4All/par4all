@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL2LL,v $ (version $Revision$)
-# $Date: 1996/08/08 20:11:35 $, 
+# $Date: 1996/08/10 16:16:24 $, 
 #
 # this file contains macro definitions 
 
@@ -13,7 +13,7 @@ LD	= $(CC)
 # gdb comes with some readline lib... but different headers...
 LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L/opt/FSFgdb/lib
 RANLIB	= ranlib
-LEX	= lex
+LEX	= flex
 LFLAGS	= 
 FC	= g77
 FFLAGS	= -O2 -g -Wimplicit -pipe
