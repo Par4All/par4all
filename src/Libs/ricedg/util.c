@@ -60,6 +60,11 @@ compute_ordering_to_dg_mapping(graph dependance_graph)
    MAP(VERTEX,
        a_vertex,
        {
+          debug(7, "compute_ordering_to_dg_mapping",
+                "\tSuccessor list: %#x for statement ordering %#x\n", 
+                (int) vertex_successors(a_vertex),
+                dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
+
           hash_put(ordering_to_dg_mapping,
                    (char *) dg_vertex_label_statement(vertex_vertex_label(a_vertex)),
                    (char *) a_vertex);
