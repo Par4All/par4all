@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.40  2001/07/03 15:28:04  irigoin
+ * Bug fix in basic_union(), introduction of basic_maximum(), bug fix in basic_of_intrinsic(),...
+ *
  * Revision 1.39  2001/06/22 09:43:19  irigoin
  * basic_of_external: call to pips_error() replaced by call to pips_user_error() when a subroutine is used as a function
  *
@@ -482,7 +485,7 @@ mode_equal_p(mode m1, mode m2)
     else 
 	return mode_tag(m1) == mode_tag(m2);
 }
-
+
 int 
 string_type_size(basic b)
 {
@@ -569,7 +572,7 @@ expression_basic(expression expr)
       	return(entity_basic(call_function(syntax_call(the_syntax))));
 	break;
     default:
-	pips_error("expression_basic", "unexpected syntax tag\n");
+	pips_internal_error("unexpected syntax tag\n");
 	break;
     }
 
@@ -881,51 +884,51 @@ basic_of_external(call c)
     return b;
 }
 
-/* basic basic_of_intrinsic(call c): returns the basic of the result given by
- * call to an intrinsic function. This basic must be computed with the
- * basic of the arguments of the intrinsic.
+/* basic basic_of_intrinsic(call c): returns the basic of the result given
+ * by call to an intrinsic function. This basic must be computed with the
+ * basic of the arguments of the intrinsic for overloaded operators.  It
+ * should be able to accomodate more than two arguments as for generic min
+ * and max operators.
  *
- * WARNING: returns a newly allocated basic object
- */
+ * WARNING: returns a newly allocated basic object */
 basic 
 basic_of_intrinsic(call c)
 {
-    basic rb;
-    entity call_func;
+  entity f = call_function(c);
+  type rt = functional_result(type_functional(entity_type(f)));
+  basic rb = copy_basic(variable_basic(type_variable(rt)));
+										       
+  pips_debug(7, "Intrinsic call to %s with result type %s\n",
+	     module_local_name(f),
+	     basic_to_string(rb));
 
-    debug(7, "basic_of_call", "Intrinsic call\n");
+  if(basic_overloaded_p(rb)) {
+    list args = call_arguments(c);
 
-    call_func = call_function(c);
+    if (ENDP(args)) {
+      /* I don't know the type since there is no arguments !
+	 Bug encountered with a FMT=* in a PRINT.
+	 RK, 21/02/1994 : */
+      /* leave it overloaded */
+      ;
+    }
+    else {
+      free_basic(rb);
+      rb = basic_of_expression(EXPRESSION(CAR(args)));
 
-    if(ENTITY_LOGICAL_OPERATOR_P(call_func))
-	rb = make_basic(is_basic_logical, UUINT(4));
-    else
-    {
-	list call_args = call_arguments(c);
+      MAP(EXPRESSION, arg, {
+	basic b = basic_of_expression(arg);
+	basic new_rb = basic_maximum(rb, b);
 
-	if (call_args == NIL) {
-	    /* I don't know the type since there is no arguments !
-	       Bug encountered with a FMT=* in a PRINT.
-	       RK, 21/02/1994 : */
-	    rb = make_basic(is_basic_overloaded, UU);
-	    /* rb = make_basic(is_basic_int, 4); */
-	}
-	else {
-	    expression arg1, arg2;
-
-	    arg1 = EXPRESSION(CAR(call_args));
-	    if(CDR(call_args) == NIL)
-		rb = basic_of_expression(arg1);
-	    else
-	    {
-		arg2 = EXPRESSION(CAR(CDR(call_args)));
-		rb = basic_union(arg1, arg2);
-	    }
-
-	}
+	free_basic(rb);
+	free_basic(b);
+	rb = new_rb;
+      }, CDR(args));
     }
 
-    return rb;
+  }
+
+  return rb;
 }
 
 /* basic basic_of_constant(call c): returns the basic of the call to a
@@ -966,124 +969,134 @@ basic_of_constant(call c)
 basic 
 basic_union(expression exp1, expression exp2)
 {
-    basic b1 = basic_of_expression(exp1);
-    basic b2 = basic_of_expression(exp2);
-    basic b = basic_undefined;
+  basic b1 = basic_of_expression(exp1);
+  basic b2 = basic_of_expression(exp2);
+  basic b = basic_maximum(b1, b2);
 
-    /* FI: I do not believe this is correct for all intrinsics! */
+  free_basic(b1);
+  free_basic(b2);
+  return b;
+}
 
-    debug(7, "basic_union", "Tags: tag exp1 = %d, tag exp2 = %d\n",
-	  basic_tag(b1), basic_tag(b2));
+basic 
+basic_maximum(basic b1, basic b2)
+{
+  basic b = basic_undefined;
+
+  /* FI: I do not believe this is correct for all intrinsics! */
+
+  pips_debug(7, "Tags: tag exp1 = %d, tag exp2 = %d\n",
+	     basic_tag(b1), basic_tag(b2));
 
 
-    if(basic_overloaded_p(b2)) {
-	b = copy_basic(b2);
-    }
-    else {
-	switch(basic_tag(b1)) {
+  if(basic_overloaded_p(b2)) {
+    b = copy_basic(b2);
+  }
+  else {
+    switch(basic_tag(b1)) {
 
-	case is_basic_overloaded:
-	    b = copy_basic(b1);
-	    break;
+    case is_basic_overloaded:
+      b = copy_basic(b1);
+      break;
 
-	case is_basic_string: 
-	    if(basic_string_p(b2)) {
-		int s1 = SizeOfElements(b1);
-		int s2 = SizeOfElements(b2);
+    case is_basic_string: 
+      if(basic_string_p(b2)) {
+	int s1 = SizeOfElements(b1);
+	int s2 = SizeOfElements(b2);
 
-		/* Type checking problem for ? : with gcc... */
-		if(s1>s2)
-		    b = copy_basic(b1);
-		else
-		    b = copy_basic(b2);
-	    }
-	    else
-		b = make_basic(is_basic_overloaded, UU);
-	    break;
-
-	case is_basic_logical:
-	    if(basic_logical_p(b2)) {
-		int s1 = basic_logical(b1);
-		int s2 = basic_logical(b2);
-
-		b = make_basic(is_basic_logical,UUINT(s1>s2?s1:s2));
-	    }
-	    else
-		b = make_basic(is_basic_overloaded, UU);
-	    break;
-
-	case is_basic_complex:
-	    if(basic_complex_p(b2) || basic_float_p(b2) || basic_int_p(b2)) {
-		int s1 = SizeOfElements(b1);
-		int s2 = SizeOfElements(b2);
-
-		b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
-	    }
-	    else
-		b = make_basic(is_basic_overloaded, UU);
-	    break;
-
-	case is_basic_float:
-	    if(basic_complex_p(b2)) {
-		int s1 = SizeOfElements(b1);
-		int s2 = SizeOfElements(b2);
-
-		b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
-	    }
-	    else if(basic_float_p(b2) || basic_int_p(b2)) {
-		int s1 = SizeOfElements(b1);
-		int s2 = SizeOfElements(b2);
-
-		b = make_basic(is_basic_float, UUINT(s1>s2?s1:s2));
-	    }
-	    else
-		b = make_basic(is_basic_overloaded, UU);
-	    break;
-
-	case is_basic_int:
-	    if(basic_complex_p(b2) || basic_float_p(b2)) {
-		int s1 = SizeOfElements(b1);
-		int s2 = SizeOfElements(b2);
-
-		b = make_basic(basic_tag(b2), UUINT(s1>s2?s1:s2));
-	    }
-	    else if(basic_int_p(b2)) {
-		int s1 = SizeOfElements(b1);
-		int s2 = SizeOfElements(b2);
-
-		b = make_basic(is_basic_int, UUINT(s1>s2?s1:s2));
-	    }
-	    else
-		b = make_basic(is_basic_overloaded, UU);
-	    break;
-
-	default: pips_error("basic_union", "Ill. basic tag %d\n", basic_tag(b1));
-	}
-    }
-
-    return b;
-
-    /*
-      if( (t1 != is_basic_complex) && (t1 != is_basic_float) &&
-      (t1 != is_basic_int) && (t2 != is_basic_complex) &&
-      (t2 != is_basic_float) && (t2 != is_basic_int) )
-      pips_error("basic_union",
-      "Bad basic tag for expression in numerical function");
-
-      if(t1 == is_basic_complex)
-      return(b1);
-      if(t2 == is_basic_complex)
-      return(b2);
-      if(t1 == is_basic_float) {
-      if( (t2 != is_basic_float) ||
-      (basic_float(b1) == DOUBLE_PRECISION_SIZE) )
-      return(b1);
-      return(b2);
+	/* Type checking problem for ? : with gcc... */
+	if(s1>s2)
+	  b = copy_basic(b1);
+	else
+	  b = copy_basic(b2);
       }
-      if(t2 == is_basic_float)
-      return(b2);
-      return(b1);
-    */
+      else
+	b = make_basic(is_basic_overloaded, UU);
+      break;
+
+    case is_basic_logical:
+      if(basic_logical_p(b2)) {
+	int s1 = basic_logical(b1);
+	int s2 = basic_logical(b2);
+
+	b = make_basic(is_basic_logical,UUINT(s1>s2?s1:s2));
+      }
+      else
+	b = make_basic(is_basic_overloaded, UU);
+      break;
+
+    case is_basic_complex:
+      if(basic_complex_p(b2) || basic_float_p(b2) || basic_int_p(b2)) {
+	int s1 = SizeOfElements(b1);
+	int s2 = SizeOfElements(b2);
+
+	b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
+      }
+      else
+	b = make_basic(is_basic_overloaded, UU);
+      break;
+
+    case is_basic_float:
+      if(basic_complex_p(b2)) {
+	int s1 = SizeOfElements(b1);
+	int s2 = SizeOfElements(b2);
+
+	b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
+      }
+      else if(basic_float_p(b2) || basic_int_p(b2)) {
+	int s1 = SizeOfElements(b1);
+	int s2 = SizeOfElements(b2);
+
+	b = make_basic(is_basic_float, UUINT(s1>s2?s1:s2));
+      }
+      else
+	b = make_basic(is_basic_overloaded, UU);
+      break;
+
+    case is_basic_int:
+      if(basic_complex_p(b2) || basic_float_p(b2)) {
+	int s1 = SizeOfElements(b1);
+	int s2 = SizeOfElements(b2);
+
+	b = make_basic(basic_tag(b2), UUINT(s1>s2?s1:s2));
+      }
+      else if(basic_int_p(b2)) {
+	int s1 = SizeOfElements(b1);
+	int s2 = SizeOfElements(b2);
+
+	b = make_basic(is_basic_int, UUINT(s1>s2?s1:s2));
+      }
+      else
+	b = make_basic(is_basic_overloaded, UU);
+      break;
+
+    default: pips_error("basic_union", "Ill. basic tag %d\n", basic_tag(b1));
+    }
+  }
+
+  return b;
+
+  /*
+    if( (t1 != is_basic_complex) && (t1 != is_basic_float) &&
+    (t1 != is_basic_int) && (t2 != is_basic_complex) &&
+    (t2 != is_basic_float) && (t2 != is_basic_int) )
+    pips_error("basic_union",
+    "Bad basic tag for expression in numerical function");
+
+    if(t1 == is_basic_complex)
+    return(b1);
+    if(t2 == is_basic_complex)
+    return(b2);
+    if(t1 == is_basic_float) {
+    if( (t2 != is_basic_float) ||
+    (basic_float(b1) == DOUBLE_PRECISION_SIZE) )
+    return(b1);
+    return(b2);
+    }
+    if(t2 == is_basic_float)
+    return(b2);
+    return(b1);
+  */
 }
 
 /* END_EOLE */
