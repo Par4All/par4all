@@ -153,7 +153,7 @@ pips_user_warning_function(
     va_list args;
     if (get_bool_property("NO_USER_WARNING")) return; /* FC */
     va_start(args, format);
-    (* pips_warning_handler)(not_known, format, &args);
+    (* pips_warning_handler)(pips_unknown_function, format, &args);
     va_end(args);
 }
 
@@ -164,7 +164,7 @@ pips_user_error_function(
 {
     va_list args;
     va_start(args, format);
-    (*pips_error_handler)(not_known, format, &args);
+    (*pips_error_handler)(pips_unknown_function, format, &args);
     va_end(args);
 }
 
@@ -174,7 +174,7 @@ pips_internal_error_function(
    ...)
 {
    va_list some_arguments;
-   (void) fprintf(stderr, "pips error in %s: ", not_known);
+   (void) fprintf(stderr, "pips error in %s: ", pips_unknown_function);
    va_start(some_arguments, format);
    (void) vfprintf(stderr, format, some_arguments); /* ??? */
    va_end(some_arguments);
