@@ -1,5 +1,5 @@
 /* 
- * $RCSfile: generate.c,v $ ($Date: 1995/03/14 14:43:15 $, )
+ * $RCSfile: generate.c,v $ ($Date: 1995/03/23 16:54:30 $, )
  * version $Revision$
  * got on %D%, %T%
  * 
@@ -202,7 +202,7 @@ list *lhp, *lnp;
      * then the updated statement is to be added to node:
      */
     ref = syntax_reference(expression_syntax(writtenexpr));
-    newarray  =  load_entity_node_new(reference_variable(ref));
+    newarray  =  load_new_node(reference_variable(ref));
     generate_compute_local_indices(ref, &lstat, &linds);
     newref = make_reference(newarray, linds);
     newreadexpr = 
@@ -331,7 +331,7 @@ list *lcompp, *lnotcompp;
     assert(array_distributed_p(var));
 
     AddEntityToHostAndNodeModules(temp);
-    tempn = load_entity_node_new(temp);
+    tempn = load_new_node(temp);
 
     statcompco = st_compute_current_owners(ref);
     statcompgv = st_get_value_for_computer(ref, make_reference(tempn, NIL));
@@ -391,8 +391,8 @@ list *lhp, *lnp;
     assert(array_distributed_p(var));
     
     AddEntityToHostAndNodeModules(temp);
-    temph = load_entity_host_new(temp); 
-    tempn = load_entity_node_new(temp);
+    temph = load_new_host(temp); 
+    tempn = load_new_node(temp);
 
     /*
      * the receive statement is built for host:
@@ -533,7 +533,7 @@ list *lstatp;
 	expr;
     entity 
 	array = reference_variable(ref),
- 	newarray = load_entity_node_new(array);
+ 	newarray = load_new_node(array);
     list 
 	ls = NIL,
 	newinds = NIL;
@@ -562,7 +562,7 @@ list *lstatp;
 	statsnd;
     entity 
 	array = reference_variable(ref),
- 	newarray = load_entity_node_new(array);
+ 	newarray = load_new_node(array);
     list 
 	ls = NIL,
 	newinds = NIL;
@@ -590,7 +590,7 @@ list *lstatp;
 	statrcv;
     entity 
 	array = reference_variable(ref), 
- 	newarray = load_entity_node_new(array);
+ 	newarray = load_new_node(array);
     list 
 	ls = NIL,
 	newinds = NIL;
@@ -673,7 +673,7 @@ list *lstatp, lw, lr;
 	     tempn ;
 
 	 AddEntityToHostAndNodeModules(temp);
-	 tempn = load_entity_node_new( temp);
+	 tempn = load_new_node( temp);
 
 	 if (comp == s)
 	 {
@@ -685,7 +685,7 @@ list *lstatp, lw, lr;
 	     list
 		 linds = NIL;
 	     entity
-		 newarray = load_entity_node_new(var);
+		 newarray = load_new_node(var);
 							
 
 	     generate_compute_local_indices(r, &lstat, &linds);
@@ -785,7 +785,7 @@ list *lscompp, *lsnotcompp;
 { 
     entity
 	array = reference_variable(ref),
-	newarray = load_entity_node_new(array);
+	newarray = load_new_node(array);
     statement
 	statif,
 	statcompif,
@@ -889,13 +889,13 @@ list *lhstatp, *lnstatp;
     assert(array_distributed_p(reference_variable(syntax_reference(s))));
 
     array    = reference_variable(r);
-    newarray = load_entity_node_new(array);
+    newarray = load_new_node(array);
 
     temp     = NewTemporaryVariable(get_current_module_entity(), 
 				    entity_basic(array));
 
     AddEntityToHostAndNodeModules(temp);
-    temph = load_entity_host_new(temp);
+    temph = load_new_host(temp);
 
     generate_compute_local_indices(r, &lnstat, &linds);
     stnrcv = st_receive_from_host(make_reference(newarray, linds));
@@ -932,8 +932,8 @@ list *lhstatp, *lnstatp;
 {
     entity
 	var  = reference_variable(syntax_reference(s)),
-	varn = load_entity_node_new(var),
-	varh = load_entity_host_new(var);
+	varn = load_new_node(var),
+	varh = load_new_host(var);
     
     assert(!array_distributed_p(reference_variable(syntax_reference(s))));
 
