@@ -3,7 +3,7 @@
  * these functions deal with HPF directives.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/05/05 16:42:38 $, )
+ * ($Date: 1995/06/09 16:53:19 $, )
  */
 
 #include "defines-local.h"
@@ -376,11 +376,10 @@ reference distributee, proc;
 	case is_style_cyclic:
 	    message_assert("invalid distribution", gen_length(largs)<=1);
 
-	    if (ENDP(largs))
-		parameter = expression_undefined;   /* implicit size */
-	    else
-		parameter = EXPRESSION(CAR(largs)), /* explicit size */
-		EXPRESSION(CAR(largs)) = expression_undefined;
+	    parameter = ENDP(largs) ? 
+		expression_undefined :                   /* implicit size */
+		copy_expression(EXPRESSION(CAR(largs))); /* explicit size */
+
 	    break;
 	case is_style_none:
 	    parameter = expression_undefined;
