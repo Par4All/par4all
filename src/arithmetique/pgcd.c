@@ -216,7 +216,7 @@ Value vecteur_bezout(Value u[], Value v[], int l)
 	    gcd = bezout(a1,gcd,p1,&x);
 	    /* printf("gcd = %d\n",gcd); */
 	    for (j=0;j<i;j++)
-		value_prod(v[j],x);
+		value_product(v[j],x);
 	} 
     }
 
