@@ -11,14 +11,12 @@ LIB_OBJECTS	= $(LIB_CFILES:.c=.o)
 #
 # linking fpips.
 
-LDFLAGS  +=	$(WPIPS_ADDED_LDFLAGS) \
-		$(PIPS_X11_ADDED_LDFLAGS)
+CPPFLAGS +=	$(FPIPS_ADDED_CPPFLAGS)
 
-TARGET_LIBS =	-lpips -ltpips -lwpips \
-		$(PIPS_LIBS) \
-		$(TPIPS_ADDED_LIBS) \
-		$(WPIPS_ADDED_LIBS) \
-		$(PIPS_X11_ADDED_LIBS)
+LDFLAGS  +=	$(FPIPS_ADDED_LDFLAGS)
+
+TARGET_LIBS =	$(FPIPS_ADDED_LIBS) \
+		$(PIPS_LIBS)
 
 #
 # real lings for the name
