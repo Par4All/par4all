@@ -14,8 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 2000/04/20 18:49:54 $, )
- * version $Revision$
+/* $Id$
  */
 
 #include <stdio.h>
@@ -220,8 +219,7 @@ hash_table htp;
 /* this function deletes a hash table that is no longer useful. unused
  memory is freed. */
 
-void hash_table_free(htp)
-hash_table htp;
+void hash_table_free(hash_table htp)
 {
   free(htp->hash_array);
   free(htp);
@@ -647,4 +645,51 @@ int hash_table_own_allocated_memory(hash_table htp)
 {
     return htp ? 
       sizeof(struct __hash_table) + sizeof(hash_entry)*(htp->hash_size) : 0 ;
+}
+
+/***************************************************************** MAP STUFF */
+
+void * hash_map_get(hash_table h, void * k)
+{
+  gen_chunk key;
+  key.e = k;
+  return hash_get(h, &key);
+}
+
+bool hash_map_defined_p(hash_table h, void * k)
+{
+  gen_chunk key;
+  key.e = k;
+  return hash_defined_p(h, &key);
+}
+
+void hash_map_put(hash_table h, void * k, void * v)
+{
+  gen_chunk
+    * key = (gen_chunk*) malloc(sizeof(gen_chunk)),
+    * val = (gen_chunk*) malloc(sizeof(gen_chunk));
+  key->e = k;
+  val->e = v;
+  hash_put(h, &key, &val);
+}
+
+void hash_map_update(hash_table h, void * k, void * v)
+{
+  gen_chunk key;
+  key.e = k;
+  hash_update(h, &key, v);
+}
+
+void * hash_map_del(hash_table h, void * k)
+{
+  gen_chunk key, * oldkeychunk, *val;
+  void * result;
+
+  key.e = k;
+  val = hash_delget(h, &key, (void**) &oldkeychunk);
+  result = val->e;
+
+  free(oldkeychunk);
+  free(val);
+  return result;
 }
