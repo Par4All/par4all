@@ -132,7 +132,7 @@ va_list * args;
     fmt=va_arg(* args, char *);
 
     /* print name of function causing warning */
-    (void) fprintf(stderr, "\nuser warning in %s: ", fct);
+    (void) fprintf(stderr, "user warning in %s: ", fct);
 
     /* print out remainder of message */
     (void) vfprintf(stderr, fmt, * args);
