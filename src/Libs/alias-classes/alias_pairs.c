@@ -155,28 +155,13 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
  * modifies global var: list_pairs
  */
 
-/* originally:
-static bool
+/static bool
 add_alias_pairs_for_this_call_site(call call_site)
 {
     transformer context;
     list real_args;
-*/
 
-static bool
-add_alias_pairs_for_this_call_site(statement call_statement)
-{
-    transformer context;
-    list real_args;
-    call call_site;
-
-    pips_debug(9,"begin for call_statement %03d\n",statement_number(call_statement));
-
-    pips_debug(9,"try set call_site\n");
-
-    call_site = instruction_call(statement_instruction(call_statement));
-
-    pips_debug(9,"test call_site\n");
+    pips_debug(9,"begin\n");
 
     if (call_function(call_site) != callee) return TRUE;
 
@@ -193,6 +178,12 @@ add_alias_pairs_for_this_call_site(statement call_statement)
     pips_debug(9,"try set_interprocedural_translation_context_sc\n");
 
     pips_debug(9,"\tfor callee %s\n",entity_name(callee));
+
+    ifdebug(1)
+	{
+	    pips_debug(1,"\tand args ");
+	    print_arguments(real_args);
+	}
 
     set_interprocedural_translation_context_sc(callee, real_args);
 
@@ -238,6 +229,15 @@ add_alias_pairs_for_this_caller( entity caller )
 
     caller_statement = get_current_module_statement();
 
+ *  gen_multi_recurse(obj,
+ *                   [domain, filter, rewrite,]*
+ *                    NULL);
+ *
+ *  recurse from object obj,
+ *  applies filter_i on encountered domain_i objects,
+ *  if true, recurses down from the domain_i object, 
+ *       and applies rewrite_i on exit from the object.
+ 
     gen_multi_recurse(caller_statement,
 		      statement_domain,
 		      stmt_filter,
