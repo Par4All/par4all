@@ -1,3 +1,7 @@
+/* $RCSfile: misc-local.h,v $ (version $Revision$)
+ * $Date: 1995/10/05 13:00:45 $, 
+ */
+
 /* hmmm...
  */
 #ifndef _STDARG_H
@@ -17,18 +21,18 @@
  */
 #ifdef __GNUC__
 #define pips_debug(level, format, args...)\
- ifdebug(level) fprintf(stderr, "[" __FUNCTION__  "] " format, ##args);
+ ifdebug(level) fprintf(stderr, "[%s] " format, __FUNCTION__, ##args);
 #define pips_user_warning(format, args...)\
   user_warning(__FUNCTION__, format, ##args)
 #define pips_user_error(format, args...)\
   user_error(__FUNCTION__, format, ##args)
+#define pips_internal_error(format, args...)\
+  pips_error(__FUNCTION__, "(%s:%d) " format, __FILE__, __LINE__, ##args)
 #define pips_assert(what, predicate)\
   if(!(predicate)){\
     (void) fprintf(stderr, \
-    "[%s] (%s:%d) assertion failed\n", __FUNCTION__, __FILE__, __LINE__);\
-    (void) fprintf(stderr, "\n %s not verified\n\n", what); abort();}
-#define pips_internal_error(format, args...)\
-  pips_error(__FUNCTION__, format, ##args)
+		   "[%s] (%s:%d) assertion failed\n\n '%s' not verified\n\n", \
+		   __FUNCTION__, __FILE__, __LINE__, what); abort();}
 #else
 #define pips_debug pips_debug_function
 #define pips_user_warning pips_user_warning_function
@@ -37,8 +41,8 @@
 #define pips_assert(what, predicate)\
   if(!(predicate)){\
     (void) fprintf(stderr, \
-    "(%s:%d) assertion failed\n", __FILE__, __LINE__);\
-    (void) fprintf(stderr, "\n %s not verified\n\n", what); abort();}
+		   "(%s:%d) assertion failed\n\n '%s' not verified\n\n", \
+		   __FILE__, __LINE__, what); abort();}
 #endif
 
 /* USE message_assert or assert instead, defined in newgen.
