@@ -134,7 +134,7 @@ list all_enclosed_scope_variables(statement stmt)
 	  break;
       }
       case is_instruction_unstructured : {
-	  list blocs;
+	  list blocs = NIL;
 
 	  CONTROL_MAP(ctl, {
 	      statement st = control_statement(ctl);
@@ -289,7 +289,7 @@ text text_vectorized_loop(entity module, int margin, statement lp_stt)
 
 text text_cray(entity module, int margin, statement stat)
 {
-    text txt;
+    text txt = text_undefined;
 
     if (instruction_loop_p(statement_instruction(stat))) {
 	loop lp = instruction_loop(statement_instruction(stat));
