@@ -26,6 +26,9 @@
 #include "graph.h"
 #include "dg.h"
 /* #include "loop_normalize.h" */
+#define NLC_PREFIX 			"NLC"
+#define ENTITY_NLC_P(e) (strncmp(entity_local_name(e), NLC_PREFIX, 3) == 0)
+
 #include "atomizer.h"
 
 
