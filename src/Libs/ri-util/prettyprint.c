@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/12/29 23:13:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/01/23 17:58:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/29 23:13:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/01/23 17:58:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -34,6 +34,7 @@ char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/29 23:13:38 $, ) ve
   *   can also be used as INPUT; in particular, variable declarations must appear
   *   before common declarations. BC.
   * - Also, EQUIVALENCE statements are not generated for the moment. BC.
+  * - neither are DATA statements (FI)
   */
 #include <stdlib.h>
 #include <stdio.h>
@@ -236,7 +237,7 @@ string label;
     cons *pc = NIL;
 
     if (strcmp(label, RETURN_LABEL_NAME) == 0) {
-	pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
+      pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
     }
     else {
 	pc = CHAIN_SWORD(pc, "GOTO ");
@@ -1326,8 +1327,24 @@ output_a_graph_view_of_the_unstructured(text r,
 
 
 /* TEXT_UNSTRUCTURED prettyprints the control graph CT (with label number
-   NUM) from the MODULE at the current LABEL. If CEXIT == CT, then there
-   is only one node and the goto+continue can be eliminated. */
+ * NUM) from the MODULE at the current LABEL. If CEXIT == CT, then there
+ * is only one node and the goto+continue can be eliminated.
+ *
+ * Modifications:
+ *  - re-use user-defined labels when possible (should be improved);
+ *    function statement_to_label() used instead of macro statement_label()
+ *  - do not jump out of a non-terminating node (e.g. no GO TO after STOP);
+ *    calls to statement_does_return()
+ *  - use fall-thru for the else successor, if fall-thru is not used
+ *    for the then successor; add_control_goto() tells if a GO TO was
+ *    generated or not
+ *  - bug fix: node label was not generated although jumped at
+ *  - do not generate empty ELSE branches
+ *
+ * Problems:
+ *  - the label of the first statement after the unstructured is not recovered
+ *    and a useless new label is generated if the exit node is a CONTINUE
+ */
 
 text
 text_unstructured(entity module,
@@ -1366,6 +1383,10 @@ text_unstructured(entity module,
 		   text_graph(module, margin, ct,
 			      &previous, trail, labels, cexit));
 
+       debug(2, "text_unstructured", "Continue with exit node %s\n",
+	     statement_identification(control_statement(cexit)));
+
+       /* Why is the trail re-initialized? And the new trail memory leaked? */
        MERGE_TEXTS(r, text_control(module, margin, cexit,
 				   &previous, set_make(set_pointer), labels,
 				   cexit)) ;
@@ -1408,8 +1429,14 @@ text_unstructured(entity module,
 }
 
 /* CONTROL_SLABEL returns a freshly allocated label name for the control
-node C in the module M. H maps controls to label names. Computes a new
-label name. */
+ *  node C in the module M. H maps controls to label names. Computes a new
+ * label name if necessary.
+ *
+ * There is no guarantee that a label generated here appears eventually
+ * in the text produced.
+ *
+ * There is no guarentee that a label generated here is jumped at.
+ */
 
 string control_slabel(m, c, h)
 entity m;
@@ -1417,17 +1444,25 @@ control c;
 hash_table h;
 {
     string l;
+    statement st = control_statement(c) ;
 
     if ((l = hash_get(h, (char *) c)) == HASH_UNDEFINED_VALUE) {
-	statement st = control_statement(c) ;
-	string label = entity_name( statement_label( st )) ;
+	string label = entity_name( statement_to_label( st )) ;
 
 	l = empty_label_p( label ) ? new_label_name(m) : label ;
+	debug(3, "control_slabel", "Associates label %s to stmt %s\n",
+	      l, statement_identification(st));
 	hash_put(h, (char *) c, strdup(l)) ;
     }
+    else {
+	debug(3, "control_slabel", "Retrieves label %s for stmt %s\n",
+	      l, statement_identification(st));
+    }
+
     pips_assert("control_slabel", strcmp(local_name(l), LABEL_PREFIX) != 0) ;
     pips_assert("control_slabel", strcmp(local_name(l), "") != 0) ;
     pips_assert("control_slabel", strcmp(local_name(l), "=") != 0) ;
+
     return(strdup(l));
 }
 
@@ -1435,9 +1470,9 @@ hash_table h;
 node SUCC from the current one OBJ in the MODULE and with a MARGIN.
 LABELS maps control nodes to label names and SEENS (that links the
 already prettyprinted node) is used to see whether a simple fall-through
-wouldn't do. */
+wouldn't do. If a go to is effectively added, TRUE is returned. */
 
-static void add_control_goto(module, margin, r, obj, 
+static bool add_control_goto(module, margin, r, obj, 
 			     succ, labels, seens, cexit )
 entity module;
 int margin;
@@ -1447,19 +1482,41 @@ hash_table labels;
 set seens ;
 {
     string label ;
+    bool added = FALSE;
 
     if( succ == (control)NULL ) {
-	return ;
+	return added;
     }
+
+    if(!statement_does_return(control_statement(obj))) {
+      return added;
+    }
+
     label = local_name(control_slabel(module, succ, labels))+
 	    strlen(LABEL_PREFIX);
 
-    if (strcmp(label, RETURN_LABEL_NAME) == 0 ||
-	seens == (set)NULL || 
-	(get_bool_property("PRETTYPRINT_INTERNAL_RETURN") && succ == cexit) ||
-	set_belong_p(seens, (char *)succ)) {
-	ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, margin, label));
+    /* FI: I broke a large conjunction and duplicated statements to
+     * simplify debugging
+     */
+    if ((strcmp(label, RETURN_LABEL_NAME) == 0 && 
+	 return_statement_p(control_statement(obj)))) {
+      ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, margin, label));
+      added = TRUE;
     }
+    else if(seens == (set)NULL) {
+      ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, margin, label));
+      added = TRUE;
+    }
+    else if((get_bool_property("PRETTYPRINT_INTERNAL_RETURN") &&
+	     succ == cexit)) {
+      ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, margin, label));
+      added = TRUE;
+    }
+    else if(set_belong_p(seens, (char *)succ)) {
+      ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, margin, label));
+      added = TRUE;
+    }
+    return added;
 }
 
 /* TEXT_CONTROL prettyprints the control node OBJ in the MODULE with a
@@ -1475,14 +1532,17 @@ set seens ;
 hash_table labels;
 {
     text r = make_text(NIL);
-    sentence s;
-    unformatted u ;
+    sentence s = sentence_undefined;
+    unformatted u = unformatted_undefined;
     statement st = control_statement(obj) ;
-    cons *succs, *preds ;
-    cons *pc;
-    string label;
-    string label_name ;
+    list succs = NIL;
+    list preds = NIL ;
+    list pc = NIL;
+    string label = NULL;
+    string label_name = NULL;
     string comments = statement_comments(st);
+    int npreds = 0;
+    bool reachable = FALSE;
 
     debug(2, "text_control", "Begin for statement %s\n",
 	  statement_identification(st));
@@ -1490,40 +1550,99 @@ hash_table labels;
     label = control_slabel(module, obj, labels);
     label_name = strdup(local_name(label)+strlen(LABEL_PREFIX)) ;
 
-    switch(gen_length(preds=control_predecessors(obj))) {
+    npreds = gen_length(preds=control_predecessors(obj));
+
+    switch(npreds) {
     case 0:
+      /* Should only happen for the entry node 
+       * Or for an unconnected exit node, since the exit node is explictly
+       * prettyprinted.
+       */
 	break ;
     case 1: 
-	if (*previous == CONTROL(CAR(preds)) &&
+      if(check_io_statement_p(control_statement(CONTROL(CAR(preds)))))
+	break;
+      else if (*previous == CONTROL(CAR(preds)) &&
 	    (obj != cexit || 
 	     !get_bool_property("PRETTYPRINT_INTERNAL_RETURN"))) {
+	  /* It is assumed that no GO TO has been generated because
+	   * it was not necessary; it's up to add_control_goto().
+	   * Note that the predecessor may have two successors... and
+	   * that only the first successor can fall through...
+	   */
+	  if(CONTROL(CAR(control_successors(*previous)))==obj)
 	    break ;
+	  /* Unless the first successor has been seen before, in which case
+	   * a GO TO was generated to reach it.
+	   */
+	  else if(set_belong_p(seens,
+			       (char *)CONTROL(CAR(control_successors(*previous)))))
+	    break;
+	  /* Unless the first successor of the previous control is a RETURN */
+	  else if(entity_return_label_p
+		  (statement_label
+		   (control_statement
+		    (CONTROL(CAR(control_successors(*previous)))))))
+	    break;
+	  /* Unless the predecessor does not return
+	   * should encompass previous case and be encompassed
+	   * by reachability test below
+	   */
+	  else if(!statement_does_return
+		  (control_statement
+		   (CONTROL(CAR(preds)))))
+	    break;
 	}
     default:
-	if( empty_label_p( entity_name( statement_label( st )))) {
+      /* The number of precedessors is not bounded but greater than one
+       * when this point is reached
+       */
+
+      /* break if no predecessor "returns" (i.e. continues) */
+      /* Useless, because one predecessor at least continues. */
+      /* More subtle information is needed to avoid the landing label 
+	 generation */
+      /*
+      reachable = FALSE;
+      MAPL(lc, {
+	statement ps = control_statement(CONTROL(CAR(lc)));
+	if(reachable = statement_does_return(ps)) {
+	  break;
+	}
+      }, preds);
+      if(!reachable)
+	break;
+	*/
+
+      /* Generate a new landing label if none is already available */
+      if( empty_label_p( entity_name( statement_to_label( st )))) {
 	    pc = CHAIN_SWORD(NIL,"CONTINUE") ;
 	    s = make_sentence(is_sentence_unformatted,
 			      make_unformatted(NULL, 0, margin, pc)) ;
 	    unformatted_label(sentence_unformatted(s)) = label_name ;
 	    ADD_SENTENCE_TO_TEXT(r, s);    
+	    debug(3, "text_control", "Label %s generated for stmt %s\n",
+		  label_name, statement_identification(st));
 	}
     }
+
     switch(gen_length(succs=control_successors(obj))) {
     case 0:
 	MERGE_TEXTS(r, text_statement(module, margin, st));
-	add_control_goto(module, margin, r, obj, 
+	(void) add_control_goto(module, margin, r, obj, 
 			 cexit, labels, seens, (control)NULL ) ;
 	break ;
     case 1:
 	MERGE_TEXTS(r, text_statement(module, margin, st));
-	add_control_goto(module, margin, r, obj, 
+	(void) add_control_goto(module, margin, r, obj, 
 			 CONTROL(CAR(succs)), labels, seens, cexit) ;
 	break;
     case 2: {
 	instruction i = statement_instruction(st);
-	test t;
+	test t = test_undefined;
+	bool added = FALSE;
 
-	assert(instruction_test_p(i));
+	pips_assert("text_control", instruction_test_p(i));
 
 	MERGE_TEXTS(r, init_text_statement(module, margin, st)) ;
 	if (! string_undefined_p(comments)) {
@@ -1541,16 +1660,38 @@ hash_table labels;
 	}
 	s = make_sentence(is_sentence_unformatted,u) ;
 	ADD_SENTENCE_TO_TEXT(r, s);
-	add_control_goto(module, margin+INDENTATION, r, obj, 
+
+	/* FI: PJ seems to assume that the true successors will be processed
+	 * first and that a GOTO may not be needed. But the first successor
+	 * may be the exit node which is not processed and the second
+	 * successor is going to believe that it does not need a label
+	 * because it is a direct successor.
+	 */
+	added = add_control_goto(module, margin+INDENTATION, r, obj, 
 			 CONTROL(CAR(succs)), labels, seens, cexit) ;
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-	add_control_goto(module, margin+INDENTATION, r, obj, 
-			 CONTROL(CAR(CDR(succs))), labels, (set)NULL, cexit) ;
+	/* PJ forces the generation of a GOTO for the ELSE branch because
+	 * he does not remember if the first branch fell thru or not
+	 */
+	if(added) {
+	  text g = make_text(NIL);
+	  bool else_goto_added =
+	    add_control_goto(module, margin+INDENTATION, g, obj, 
+			     CONTROL(CAR(CDR(succs))), labels, seens, cexit) ;
+	  if(else_goto_added) {
+	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+	  }
+	  MERGE_TEXTS(r, g);
+	}
+	else {
+	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+	  (void) add_control_goto(module, margin+INDENTATION, r, obj, 
+				  CONTROL(CAR(CDR(succs))), labels, (set)NULL, cexit) ;
+	}
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
 	break;
     }
     default:
-	pips_error("text_graph", "incorrect number of successors\n");
+	pips_error("text_control", "incorrect number of successors\n");
     }
 
     debug(2, "text_control", "End for statement %s\n",
@@ -1562,7 +1703,7 @@ hash_table labels;
 /* TEXT_GRAPH prettyprints the control graph OBJ in the MODULE with a
 MARGIN. SEENS is a trail that keeps track of already printed nodes and
 LABELS maps control nodes to label names. The previously printed control
-is in PREVIOUS. CEXIT is not printed, done latter. */
+is in PREVIOUS. CEXIT is not printed, done latter (FI: OK, but WHY?!? To make sure that the exit node is printed last? To recover extra-statements (according to PJ)). */
 
 text text_graph(module, margin, obj, previous, seens, labels, cexit)
 entity module;
@@ -1573,17 +1714,36 @@ hash_table labels;
 {
     text r ;
 
-    if(set_belong_p(seens, (char *)obj) || obj == cexit ) {
-	return( make_text( NIL )) ;
-    }
-    set_add_element(seens, seens, (char *)obj) ;
-    r = text_control(module, margin, obj, previous, seens, labels, cexit);
-     *previous = obj ;
+    debug(2, "text_graph", "Begin for statement %s\n",
+	  statement_identification(control_statement(obj)));
 
-    MAPL(ss, {
-	MERGE_TEXTS(r, text_graph(module, margin, CONTROL(CAR(ss)), 
-				  previous, seens, labels, cexit));
-    }, control_successors(obj));
+    if(set_belong_p(seens, (char *)obj) || obj == cexit ) {
+	r = make_text( NIL ) ;
+    }
+    else {
+      if(check_io_statement_p(control_statement(obj))) {
+	debug(2, "text_graph", "Skip check IO statement %s\n",
+	  statement_identification(control_statement(obj)));
+	/* Do not print the node because it is included in an IO statement */
+	/* Only follow the FALSE successor */
+	r = text_graph(module, margin,
+		       CONTROL(CAR(CDR(control_successors(obj)))), 
+		       previous, seens, labels, cexit);
+      }
+      else {
+	set_add_element(seens, seens, (char *)obj) ;
+	r = text_control(module, margin, obj, previous, seens, labels, cexit);
+	*previous = obj ;
+
+	MAPL(ss, {
+	  MERGE_TEXTS(r, text_graph(module, margin, CONTROL(CAR(ss)), 
+				    previous, seens, labels, cexit));
+	}, control_successors(obj));
+      }
+    }
+
+    debug(2, "text_graph", "End for statement %s\n",
+	  statement_identification(control_statement(obj)));
 
     return( r );
 }
