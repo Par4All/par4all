@@ -83,7 +83,7 @@ typedef dfg_arc_label arc_label;
 
 /* type cell that contains all information for the reindexation of */
 /* an instruction. Filled during function prepare_reindexing().    */
-typedef struct cell {
+typedef struct scell {
         int          statement; /* number of the node         */
         predicate    domain;    /* complete domain of the bdt */
         predicate    edge_dom;  /* predicate of the schedule  */
@@ -113,8 +113,8 @@ typedef struct cell {
 	Psyslist     t_bounds;   /* bounds of global time for the ins    */
 	Psyslist     p_topology; /* topology of the plc in function of t */
 
-        struct cell  *succ;
-                    } cell, *Pcell;
+        struct scell  *succ;
+                    } scell, *Pscell;
 
 /* type of a test, the same as the "normal" test except that the */
 /* condition field is not an expression but a Psysteme.          */
@@ -172,7 +172,7 @@ typedef struct newinst {
  */
 
 static Pbase include_time_in_base(pc, e)
-Pcell    pc;
+Pscell    pc;
 entity   e;
 {
   list     l;
@@ -295,14 +295,14 @@ static Pmytest add_ltest_to_ltest(l1, l2)
 /*=========================================================================*/
 /* void calculate_delay(exp, pcs, pcd)
  *
- * Calculates the delay if possible for the instruction of Pcell pcs that
+ * Calculates the delay if possible for the instruction of Pscell pcs that
  * is the instruction source.
  *
  * AC 94/06/29 */
 
 static void calculate_delay(exp, pcs, pcd, tau)
 expression  exp;
-Pcell       pcd, pcs;
+Pscell       pcd, pcs;
 entity      tau;
 {
   Psysteme    ps;
@@ -459,15 +459,15 @@ entity      tau;
 
 
 /*====================================================================*/
-/* static void prepare_array_bounds(Pcell pc):
+/* static void prepare_array_bounds(Pscell pc):
  *
- * Compute for the instruction corresponding to the cell "pc" the size
+ * Compute for the instruction corresponding to the scell "pc" the size
  * of all the dimensions of the array defined by this instruction.
  *
  * These sizes are memorized in the hash table "ht_ab".
  *
  * Parameters :
- *             pc: cell of the current instruction
+ *             pc: scell of the current instruction
  *
  * Note: On the time dimensions, these sizes are not the TRUE ones
  * because they correspond to the local time bounds, not the minor
@@ -476,11 +476,11 @@ entity      tau;
  *
  * AP 22/08/94 */
 static void prepare_array_bounds(pc)
-Pcell pc;
+Pscell pc;
 {
   extern hash_table ht_ab;
 
-  Pcell pc_aux;
+  Pscell pc_aux;
   int sn;
   list llp, llt;
   expression lower, upper;
@@ -684,7 +684,7 @@ void make_array_bounds(cv)
   basic ba;
   int type_decl;
   string num;
-  Pcell pc;
+  Pscell pc;
   boolean is_first;
 
   cn = dfg_vertex_label_statement(vertex_vertex_label(cv));
@@ -693,7 +693,7 @@ void make_array_bounds(cv)
   if (cn == EXIT_ORDER)
     return;
 
-  pc = (Pcell)hash_get(h_node, (char *)cn);
+  pc = (Pscell)hash_get(h_node, (char *)cn);
   lcr = (list) hash_get(ht_ab, (char *) cn);
   d = (int)hash_get(delay_table, (char *) cn);
 
@@ -773,7 +773,7 @@ void make_array_bounds(cv)
 
 /*========================================================================*/
 /* static Psysteme include_trans_on_LC_in_sc(ps, pc): transform the system
- * ps with the new variable we can find in the cell pc.
+ * ps with the new variable we can find in the scell pc.
  *
  * AC 94/05/10
  */
@@ -781,7 +781,7 @@ void make_array_bounds(cv)
 static Psysteme include_trans_on_LC_in_sc(ps, pc)
 
  Psysteme     ps;
- Pcell        pc;
+ Pscell        pc;
 {
  Pcontrainte  cont;
  Psysteme     int_ps;
@@ -804,7 +804,7 @@ static Psysteme include_trans_on_LC_in_sc(ps, pc)
 static reference include_trans_on_LC_in_ref(re, pc)
 
  reference    re;
- Pcell        pc;
+ Pscell        pc;
 {
  Pcontrainte  cont;
  Psysteme     int_ps;
@@ -890,7 +890,7 @@ static reference include_trans_on_LC_in_ref(re, pc)
 
 /*========================================================================*/
 /* static Psysteme include_trans_on_LC_in_sc2(ps, pc): transform the system
- * ps with the new variable we can find in the cell pc.
+ * ps with the new variable we can find in the scell pc.
  *
  * AC 94/05/10
  */
@@ -898,7 +898,7 @@ static reference include_trans_on_LC_in_ref(re, pc)
 static Psysteme include_trans_on_LC_in_sc2(ps, pc, b)
 
  Psysteme     ps;
- Pcell        pc;
+ Pscell        pc;
  Pbase        b;
 {
  Pcontrainte  cont;
@@ -915,7 +915,7 @@ static Psysteme include_trans_on_LC_in_sc2(ps, pc, b)
 /*========================================================================*/
 /* void prepare_reindexing(v, b, p)
  *
- * It associates to the vertex v a structure cell. First it changes the
+ * It associates to the vertex v a structure scell. First it changes the
  * base of the instruction from base (i,j,...) of loop counters to base
  * (t, p,...) given by the time function and the placement function. All
  * the results are put in matrix. Then we introduce a matrix called Q that
@@ -929,7 +929,7 @@ vertex       v;
 bdt          b;
 plc          p;
 {
-  Pcell        pc = NULL, pc_aux = NULL;
+  Pscell        pc = NULL, pc_aux = NULL;
   placement    pv;
   Psysteme ps_b, ps_p, ps_aux, old_ps, new_ps, int_ps, sys_p, pps, pcond,
   time_ps = SC_UNDEFINED;
@@ -1007,7 +1007,7 @@ plc          p;
       /* we write the equations t = f(i,j,...) and put them in system
        ps_b we have a double loop on the schedule because of possible
        predicate and posible multi-dimensionnal expression. We attach
-       a cell to each domain of the schedule.  */
+       a scell to each domain of the schedule.  */
       for (; !ENDP(bv); POP(bv)) {
 	schedule sched = SCHEDULE(CAR(bv));
 	predicate pred = schedule_predicate(sched);
@@ -1202,7 +1202,7 @@ plc          p;
 	/* the old variables by the new ones (t,p...). First we find    */
 	/* the expression of the old variables in function of the new   */
 	/* ones and put the result in int_ps, then make the replacement */
-	/* in old_ps. old_ps will be the "domain" of the cell.  */
+	/* in old_ps. old_ps will be the "domain" of the scell.  */
 
 	old_ps = sc_dup(predicate_to_system(dfg_vertex_label_exec_domain((dfg_vertex_label)vertex_vertex_label(v)))); 
 	old_ps = sc_append(old_ps, predicate_to_system(pred));
@@ -1331,7 +1331,7 @@ plc          p;
             sl_fprint(stderr, ltopo, entity_local_name);
 	  }
 
-	  /* for each system of ltime build a Pcell */
+	  /* for each system of ltime build a Pscell */
 	  for (lsys_aux = ltime; lsys_aux != NULL; lsys_aux =
 	       lsys_aux->succ) {
 	    qcount = 0;
@@ -1423,8 +1423,8 @@ plc          p;
 				       &sys_p, count_loop);
 	}
 
-	/* we fill the cell at last ! */
-	pc_aux = (Pcell)malloc(sizeof(cell));
+	/* we fill the scell at last ! */
+	pc_aux = (Pscell)malloc(sizeof(scell));
 	pc_aux->statement = cn;
 	pc_aux->domain = pred;
 	pc_aux->edge_dom = make_predicate(sc_dup(predicate_to_system(schedule_predicate(sched))));
@@ -1523,7 +1523,7 @@ plc          p;
 	  user_error("prepare reindexing",
 		     "Rational case not treated yet !");
 	
-	pc_aux = (Pcell)malloc(sizeof(cell));
+	pc_aux = (Pscell)malloc(sizeof(scell));
 	pc_aux->statement = cn;
 	pc_aux->domain = pred;
 	pc_aux->edge_dom = make_predicate(sc_dup(predicate_to_system(schedule_predicate(sched))));
@@ -1570,12 +1570,12 @@ plc          p;
  *
  * Tests if the domain on which we work, that is pcd->domain with the
  * conditions on the edge is included in the domain of the selectionned
- * cell pcs (we transform)
+ * scell pcs (we transform)
  *
  * AC 94/04/07 */
 
 static boolean compatible_pc_p(pcd, pcs, s, d)
-Pcell     pcd, pcs;
+Pscell     pcd, pcs;
 int       s;
 dataflow  d;
 {
@@ -1648,11 +1648,11 @@ static reference make_reindex(crt_df, crt_m, assign_i, pc)
 dataflow    crt_df;
 int         crt_m;
 instruction assign_i;
-Pcell       pc;
+Pscell       pc;
 {
   extern hash_table h_node;
   
-  Pcell       source_pc;
+  Pscell       source_pc;
   boolean     not_found = TRUE;
   reference   old_ref, new_ref;
   list        ltrans = dataflow_transformation(crt_df), lsub = NIL;
@@ -1667,7 +1667,7 @@ Pcell       pc;
   if (get_debug_level() > 6)
     fprintf(stderr,"\nMake reindex debut pour le noeud %d:\n", crt_m);
   
-  source_pc = (Pcell)hash_get(h_node, (char *)crt_m);
+  source_pc = (Pscell)hash_get(h_node, (char *)crt_m);
   old_ref = dataflow_reference(crt_df);
   
   if (get_debug_level() > 6) { 
@@ -1676,7 +1676,7 @@ Pcell       pc;
   }
 
   if (source_pc != NULL)   {
-    /* first, find the good cell we should work on */
+    /* first, find the good scell we should work on */
     for ( ; (source_pc != NULL) && not_found; ) {
       if (compatible_pc_p(pc, source_pc, crt_m, crt_df))
 	not_found = FALSE;
@@ -1689,7 +1689,7 @@ Pcell       pc;
 
     if(source_pc->var_base != NULL) {
       if (pc->var_base != NULL) {
-	/* gotcha the good cell, we build now the list of subscripts */
+	/* gotcha the good scell, we build now the list of subscripts */
 	/* that is gamma(rhs) = f(gamma(lhs))                        */
 	mA = pc->Rmat_inv;
 	mAC = pc->Smat_inv;
@@ -1799,7 +1799,7 @@ Pcell       pc;
 	}
       }
       else {
-	/* gotcha the good cell, we build now the list of subscripts */
+	/* gotcha the good scell, we build now the list of subscripts */
 	/* that is gamma(rhs) = f(gamma(lhs))                        */
 	mB = source_pc->Rmat;
 	mBC = source_pc->Smat;
@@ -2028,7 +2028,7 @@ list l_ind, l_exp;
  *             old_ref: current reference
  *             cls: current list of predecessors
  *             assign_i: current instruction
- *             pc: current Pcell
+ *             pc: current Pscell
  *             te:
  *             sc: current domain
  *             c: counter of the local time variables
@@ -2043,7 +2043,7 @@ static list
 build_third_comb(old_ref, cls, assign_i, pc, te, sc, c, linit, lmax)
 list         cls, *linit, *lmax;
 instruction  assign_i;
-Pcell        pc;
+Pscell        pc;
 reference    old_ref;
 Psysteme     sc, te;
 int          *c;
@@ -2318,13 +2318,13 @@ int          *c;
       with_t = (pc->ltau != NIL);
 	    
       if(with_t) {
-	/* The local time of the cell is split into as many local
+	/* The local time of the scell is split into as many local
 	 * time as there are dataflows. Each has its own bounds,
 	 * which are computed below. However, there relation with
 	 * the minor time remains the same, i.e.: t = omega*tau +
 	 * l, where "l" is the lower bound calculated before
 	 * (cf. prepare_reindexing) and saved into the field
-	 * "t_bounds" of the cell.*/
+	 * "t_bounds" of the scell.*/
 	ent = get_time_ent((pc->statement)-BASE_NODE_NUMBER,
 			   STRING_BDT, (*c));
 	(*c)++;
@@ -2525,7 +2525,7 @@ int          *c;
 	    /* HERE WE HAVE TO SUBSTITUTE minor time (tau) TO
 	     * local time (var) IN THE Ps LOOP BOUNDS : var =
 	     * omega*tau + l. "l" is the lower bound of the
-	     * local time of the current cell, NOT the lower
+	     * local time of the current scell, NOT the lower
 	     * bound of the local time of the current dataflow
 	     * (cf. above).  */
 	    vec_l =
@@ -2659,7 +2659,7 @@ int          *c;
  *             old_ref: current reference
  *             cls: current list of predecessors
  *             assign_i: current instruction
- *             pc: current Pcell
+ *             pc: current Pscell
  *             sc: current domain
  *
  * Result:
@@ -2669,7 +2669,7 @@ int          *c;
 static Pmytest build_third_subcomb(old_ref, cls, assign_i, pc, sc)
 list         cls;
 instruction  assign_i;
-Pcell        pc;
+Pscell        pc;
 reference    old_ref;
 Psysteme     sc;
 {
@@ -2756,7 +2756,7 @@ Psysteme     sc;
  * build_third_comb().
  *
  * Parameters:
- *             pc: current Pcell
+ *             pc: current Pscell
  *             clrhs: current list of rhs
  *             assign_i: current instruction
  *             cls: current list of predecessors
@@ -2769,7 +2769,7 @@ Psysteme     sc;
  * AC 94/04/28 */
 
 static list build_second_comb(pc, clrhs, assign_i, cls, sc, linit, lmax)
-Pcell        pc;
+Pscell        pc;
 list         clrhs, cls, *linit, *lmax;
 instruction  assign_i;
 Psysteme     sc;
@@ -2846,7 +2846,7 @@ Psysteme     sc;
 /* instruction build_first_comb(pc, ci, cls, cn, linit, lmax):
  *
  * Parameters:
- *             pc: Pcurrent Pcell
+ *             pc: Pcurrent Pscell
  *             ci: current instruction
  *             cls: list of the predecessors of the instruction
  *             cn: number of the instruction
@@ -2859,7 +2859,7 @@ Psysteme     sc;
  */
 
 static list build_first_comb(pc, ci, cls, cn, linit, lmax)
-Pcell        pc;
+Pscell        pc;
 instruction  ci;
 list         cls, *linit, *lmax;
 int          cn;
@@ -3075,7 +3075,7 @@ statement re_do_it(the_dfg, the_bdt, the_plc)
     statement   cs;
     instruction ci;
     list        cls;
-    Pcell       pc;
+    Pscell       pc;
 
     /* loop on vertices */
     if (cn != ENTRY_ORDER) { 
@@ -3091,7 +3091,7 @@ statement re_do_it(the_dfg, the_bdt, the_plc)
       /* cls is the list of predecessors of cv */
       cls = vertex_successors(cv);
 
-      pc = (Pcell)hash_get(h_node, (char *)cn);
+      pc = (Pscell)hash_get(h_node, (char *)cn);
 
       /* Do the reindexation */
       lins = build_first_comb(pc, ci, cls, cn, &linit, &lmax);
