@@ -48,21 +48,21 @@ typedef struct {
 
 /* functions declared in set.c */
 
-extern set set_add_element GEN_PROTO (( set, set, char *)) ;
-extern set set_del_element GEN_PROTO(( set, set, char *)) ;
+extern set set_add_element GEN_PROTO (( set, set, void *)) ;
+extern set set_del_element GEN_PROTO(( set, set, void *)) ;
 extern set set_assign GEN_PROTO(( set, set )) ;
-extern bool set_belong_p GEN_PROTO(( set, char *)) ;
+extern bool set_belong_p GEN_PROTO(( set, void *)) ;
 extern void set_clear GEN_PROTO(( set )) ;
 extern set set_difference GEN_PROTO(( set, set, set )) ;
 extern bool set_equal GEN_PROTO(( set, set )) ;
 extern void set_free GEN_PROTO(( set )) ;
 extern set set_intersection GEN_PROTO(( set, set, set )) ;
 extern set set_make GEN_PROTO(( set_type )) ;
-extern set set_singleton GEN_PROTO(( set_type, char * )) ;
+extern set set_singleton GEN_PROTO(( set_type, void * )) ;
 extern set set_union GEN_PROTO(( set, set, set )) ;
 extern bool set_empty_p GEN_PROTO(( set )) ;
-extern void gen_set_closure GEN_PROTO(( void(*)(char*,set), set )) ;
-extern void gen_set_closure_iterate GEN_PROTO((void(*)(char*,set), set, bool));
+extern void gen_set_closure GEN_PROTO(( void(*)(void*,set), set )) ;
+extern void gen_set_closure_iterate GEN_PROTO((void(*)(void*,set), set, bool));
 extern int set_own_allocated_memory GEN_PROTO((set));
 
 #endif
