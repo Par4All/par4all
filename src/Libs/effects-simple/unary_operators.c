@@ -12,7 +12,10 @@
 #include <string.h>
 
 #include "genC.h"
+#include "ri.h"
 
+#include "misc.h"
+#include "ri-util.h"
 #include "properties.h"
 
 #include "effects-generic.h"
