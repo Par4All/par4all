@@ -419,6 +419,13 @@ loop_to_transformer(loop l, list e) /* effects of loop l */
     return tf;
 }
 
+/* This function computes the effect of K loop iteration, with K positive.
+ * This function does not take the loop exit into account because its result
+ * is used to compute the precondition of the loop body.
+ * Hence the loop exit condition only is added when preconditions are computed.
+ * This is confusing when transformers are prettyprinted with the source code.
+ */
+
 static transformer 
 whileloop_to_transformer(whileloop l, list e) /* effects of whileloop l */
 {
@@ -438,13 +445,17 @@ whileloop_to_transformer(whileloop l, list e) /* effects of whileloop l */
 	/* If the while entry condition is usable, it must be added
 	 * on the old values
 	 */
-	tfb = transformer_add_condition_information(tfb, cond, FALSE);
+	tfb = transformer_add_condition_information(tfb, cond, TRUE);
 
 	/* translation function? */
 
 	/* compute tfb's fix point according to pips flags */
 	if(pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
 	    tf = transformer_halbwachs_fix_point(tfb);
+	}
+	else if (transformer_empty_p(tfb)) {
+	  /* The loop is never entered */
+	  tf = transformer_identity();
 	}
 	else {
 	    transformer ftf = 
@@ -454,6 +465,11 @@ whileloop_to_transformer(whileloop l, list e) /* effects of whileloop l */
 	    Psysteme fsc = predicate_system(transformer_relation(ftf));
 	    Psysteme sc = SC_UNDEFINED;
 	    
+	    /* Dirty looking fix for a fix point computation error:
+	     * sometimes, the basis is restricted to a subset of
+	     * the integer scalar variables. Should be useless with proper
+	     * fixpoint opertors.
+	     */
 	    tf = effects_to_transformer(e);
 	    sc = (Psysteme) predicate_system(transformer_relation(tf));
 
