@@ -10,7 +10,8 @@
  * The PIPS context stack pointer, pcsp, points to the top of the stack.
  * The empty stack is represented by pcsp == -1.
  *
- * Example: voir catch_user_error() in library pipmake
+ * Example: voir catch_user_error() in library pipmake, or a PIPS user
+ * interface such as wpips, tpips or pips
  */
 
 #include <stdio.h>
