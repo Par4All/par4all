@@ -56,6 +56,9 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.59  2002/04/23 12:11:46  coelho
+  * syntax error --
+  *
   * Revision 1.58  2002/04/23 12:07:25  coelho
   * syntax error--
   *
@@ -1229,7 +1232,7 @@ opt_lformalparameter:
 	    {
 		/* Too early: the current module is still unknown */
 		/* $$ = add_formal_return_code($2); */
-		$$ = $2
+	      $$ = $2;
 	    }
 	;
 
