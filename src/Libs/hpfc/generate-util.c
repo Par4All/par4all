@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: generate-util.c,v $
+ * Revision 1.19  1997/04/17 11:47:07  coelho
+ * *** empty log message ***
+ *
  * Revision 1.18  1997/03/20 10:25:10  coelho
  * RCS headers.
  *
@@ -367,6 +370,17 @@ hpfc_broadcast_buffers(
       (make_call(hpfc_ith_broadcast_function(nreplicated, avoid_twins), args));
 }
 
+/* CALL (pvmtype) HPFC {,UN}PACK
+ */
+statement 
+hpfc_packing_of_current__buffer(
+    entity array,
+    bool pack)
+{
+    return hpfc_make_call_statement
+	(hpfc_buffer_entity(array, pack? BUFPCK: BUFUPK), NIL);
+}
+
 statement 
 hpfc_broadcast_if_necessary(
     entity array, /* remapped source array */
@@ -380,7 +394,7 @@ hpfc_broadcast_if_necessary(
 
     not_empty = buffer_full_condition(array, TRUE, FALSE);
     send = hpfc_broadcast_buffers(array, trg, lid, proc);
-    pack = call_to_statement(make_call(hpfc_buffer_entity(array,BUFPCK), NIL));
+    pack = hpfc_packing_of_current__buffer(array, TRUE);
 
     if (is_lazy)
 	return test_to_statement
@@ -458,14 +472,15 @@ hpfc_lazy_buffer_packing(
 statement
 hpfc_buffer_initialization(
     bool is_send,
-    bool is_lazy)
+    bool is_lazy,
+    bool job_was_done)
 {
     statement buffindex, msgstate, other;
     list /* of statement */ l;
 
     buffindex = set_integer(hpfc_name_to_entity(BUFFER_INDEX), 0);
     msgstate = set_logical(hpfc_name_to_entity
-			   (is_send ? SND_NOT_INIT : RCV_NOT_PRF), TRUE);
+        (is_send ? SND_NOT_INIT : RCV_NOT_PRF), job_was_done);
     if (is_send)
 	other = make_continue_statement(entity_undefined);
     /* set_expression(hpfc_name_to_entity(BUFFER_ENCODING),
@@ -482,25 +497,6 @@ hpfc_buffer_initialization(
     return make_block_statement(l);
 }
 
-/* returns PVMF(un)pack(..., array(creation), 1, 1, HPFC_INFO)
- */
-statement 
-hpfc_pvm_packing(
-    entity array,
-    entity (*creation)(int), 
-    bool pack)
-
-{
-    return hpfc_make_call_statement
-	(hpfc_name_to_entity(pack ? PVM_PACK : PVM_UNPACK),
-	 CONS(EXPRESSION, pvm_what_option_expression(array),
-         CONS(EXPRESSION, make_reference_expression(array, creation),
-	 CONS(EXPRESSION, int_to_expression(1),
-	 CONS(EXPRESSION, int_to_expression(1),
-	 CONS(EXPRESSION, entity_to_expression(hpfc_name_to_entity(INFO)),
-	      NIL))))));
-}
-
 /* the lazy issues.
  * note that target processors should be known 
  * to generate the appropriate broadcast?
@@ -513,7 +509,7 @@ hpfc_lazy_packing(
     bool pack,
     bool lazy)
 {
-    statement pack_stmt = hpfc_pvm_packing(array, creation, pack);
+    statement pack_stmt = hpfc_buffer_packing(array, creation, pack);
 
     return lazy ? (pack ? make_block_statement
        (CONS(STATEMENT, pack_stmt,
