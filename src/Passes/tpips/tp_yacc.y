@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.84  1998/05/22 14:52:34  coelho
+ * missing cr added.
+ *
  * Revision 1.83  1998/05/22 14:37:17  coelho
  * jpips show + error if shell fails in scripts.
  *
@@ -350,7 +353,7 @@ static void tp_some_info(string about)
     else if (same_string_p(about, "directory"))
     {
 	char pathname[MAXPATHLEN];
-	fprintf(stdout, "%s", (char*) getcwd(pathname, MAXPATHLEN));
+	fprintf(stdout, "%s\n", (char*) getcwd(pathname, MAXPATHLEN));
 	if (jpips_is_running)
 	    jpips_tag2("directory", (char*) getcwd(pathname, MAXPATHLEN));
     }
