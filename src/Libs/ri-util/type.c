@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.44  2003/05/20 09:01:37  irigoin
+ * Update of basic_to_string() to fix bug for Francois Ferrand. Previous
+ * message in version log is a mistake. It's also an update of basic_to_string().
+ *
  * Revision 1.43  2003/05/20 08:57:24  irigoin
  * Handling of unknown constants in MakeValueSymbolic(). Added for Corinne
  * and EDF code to handle concatenation operator // in DATA constant strings.
@@ -709,7 +713,7 @@ basic b;
   case is_basic_int:
     switch(basic_int(b)) {
     case 1: pips_user_warning("Non-standard one-byte integer\n");
-      return("INTEGER*2") ;
+      return("INTEGER*1") ;
     case 2: return("INTEGER*2") ;
     case 4: return("INTEGER*4") ;
     case 8: return("INTEGER*8") ;
