@@ -160,6 +160,11 @@
   * $Id$
   *
   * $Log: value.c,v $
+  * Revision 1.25  2003/07/24 08:47:21  irigoin
+  * Function hash_value_to_name_undefined_p() added to be able to use some
+  * semantics and transformer functions when the mappings are not available,
+  * especially in interprocedural contexts.
+  *
   * Revision 1.24  2003/06/20 07:20:21  nguyen
   * Update calls to make_statement and make_variable with new RI for C
   *
@@ -612,9 +617,19 @@ bool new_value_entity_p(entity e)
 
 bool old_value_entity_p(entity e)
 {
-  string s = strstr(external_value_name(e), OLD_VALUE_SUFFIX);
+  /* Temporary values do not have an external name. */
+  /* OLD_VALUE_PREFIX is not used for global old values */
+  /* string s = strstr(external_value_name(e), OLD_VALUE_SUFFIX); */
+  /* string s = strstr(entity_local_name(e), OLD_VALUE_PREFIX); */
 
-  return s!=NULL;
+  if(!local_temporary_value_entity_p(e)) {
+    /* string s = strstr(external_value_name(e), OLD_VALUE_SUFFIX); */
+    string s1 = strstr(entity_local_name(e), OLD_VALUE_SUFFIX);
+    string s2 = strstr(entity_local_name(e), OLD_VALUE_PREFIX);
+    return s1!=NULL || s2!=NULL;
+  }
+  else
+    return FALSE;
 }
 
 bool intermediate_value_entity_p(entity e)
@@ -740,6 +755,10 @@ static void reset_value_mappings(void)
   hash_entity_to_old_value = hash_table_undefined;
   hash_entity_to_intermediate_value = hash_table_undefined;
   hash_value_to_name = hash_table_undefined;
+}
+
+bool hash_value_to_name_undefined_p()
+{ return hash_table_undefined_p(hash_value_to_name);
 }
 
 /* To be called by error handler only. Potential memory leak. */
