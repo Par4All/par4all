@@ -111,7 +111,7 @@ text_continuation(transformer cont, bool is_must)
 			       pips_user_value_name, FALSE);
 	}
       
-	close_current_line(crt_line, txt);
+	close_current_line(crt_line, txt,continuation);
     }
     /* else an empty text is returned. 
      */
