@@ -1,35 +1,15 @@
-/*
- * Overlap Analysis Module for HPFC
+/* Overlap Analysis Module for HPFC
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/03/22 10:57:01 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/04/10 18:49:40 $, )
  * version $Revision$
- * got on %D%, %T%
  */
 
-/*
- * included files, from C libraries, newgen and pips libraries.
- */
-
-#include <stdio.h>
-#include <string.h>
-
-extern int      fprintf();
-
-#include "genC.h"
-
-#include "ri.h"
-#include "hpf.h"
-#include "hpf_private.h"
-#include "message.h"
-
-#include "misc.h"
-#include "ri-util.h"
-#include "effects.h"
-#include "hpfc.h"
-#include "access_description.h"
 #include "defines-local.h"
+#include "access_description.h"
+
+#include "effects.h"
 
 entity CreateIntrinsic(string name); /* in syntax.h */
 
