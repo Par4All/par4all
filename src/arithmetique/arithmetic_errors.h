@@ -37,7 +37,7 @@ extern int  simplex_arithmetic_error;
 #endif
 
 #define exception_push(what) exception_debug("PUSH", what)
-#define exception_pop(what)  exception_pop("POP", what)
+#define exception_pop(what)  exception_debug("POP", what)
 
 #define EXCEPTION extern int
 
