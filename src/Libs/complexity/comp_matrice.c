@@ -56,7 +56,7 @@ int *pd;
 
     int i,j,k;
     float sum,dum;
-    int imax;
+    int imax = 0;
     float tiny = 0.000001;
     
     *pd = 1;
