@@ -1376,6 +1376,11 @@ list le;
     expression exp = EXPRESSION(CAR(lle));
     normalized nor;
 
+    ifdebug(9) {
+	pips_debug(9, "considering expression:\n");
+	print_expression(exp);
+    }
+
     nor = NORMALIZE_EXPRESSION(exp);
 
     if(normalized_tag(nor) == is_normalized_complex) {
