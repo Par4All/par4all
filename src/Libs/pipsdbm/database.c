@@ -72,7 +72,9 @@ bool db_open_pips_database(FILE * fd)
 
 void db_save_pips_database(FILE * fd)
 {
-    DB_OK; write_db_resources(fd, get_pips_database());
+    DB_OK; 
+    /* ??? check for required resources left over? */
+    write_db_resources(fd, get_pips_database());
 }
 
 void db_close_pips_database(void)
@@ -158,7 +160,7 @@ static db_resource get_db_resource(string rname, string oname)
 static db_resource get_real_db_resource(string rname, string oname)
 {
     db_resource r = get_db_resource(rname, oname);
-    if (db_resource_undefined_p(r))
+    if (db_resource_undefined_p(r) || db_resource_required_p(r))
 	pips_internal_error("no resource %s of %s\n", rname, oname);
     return r;
 }
@@ -253,6 +255,7 @@ void db_clean_all_required_resources(void)
       if (db_resource_required_p(r))
       {
 	pips_debug(1, "deleting %s of %s\n", rn, on);
+	dump_db_resource(rn, on, r);
 	db_delete_resource(rn, on);
       }
     },
@@ -425,14 +428,12 @@ void db_set_resource_as_required(string rname, string oname)
   s = db_resource_db_status(r);
   if (db_status_undefined_p(s))
     /* newly created db_resource... */
-    db_resource_db_status(r) = s = make_db_status(is_db_status_required, UU);
-  else
+    db_resource_db_status(r) = make_db_status(is_db_status_required, UU);
+  else if (db_status_loaded_p(s) && 
+	   !string_undefined_p(db_resource_pointer(r)))
   {
-    if (db_status_loaded_p(s) && !string_undefined_p(db_resource_pointer(r)))
-    {
-      dbll_free_resource(rname, oname, db_resource_pointer(r));
-      db_resource_pointer(r) = string_undefined;
-    }
+    dbll_free_resource(rname, oname, db_resource_pointer(r));
+    db_resource_pointer(r) = string_undefined;
   }
 
   db_status_tag(db_resource_db_status(r)) = is_db_status_required;
