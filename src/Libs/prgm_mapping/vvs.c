@@ -44,6 +44,7 @@
 /* Macro functions  	*/
 #define VV_VAR(x) var_val_variable(x)
 #define VV_COEFF(x) expression_to_int(var_val_value(x))
+#define VV_VAL_(x) normalized_linear_(expression_normalized(var_val_value(x)))
 #define VV_VAL(x) normalized_linear(expression_normalized(var_val_value(x)))
 #define MAKE_VV(var, coeff, val)  make_var_val(var, \
         make_expression(make_syntax(is_syntax_call, \
@@ -213,8 +214,8 @@ list vv1, vv2;
         if( (cc2 = vect_coeff((Variable) e1, pv2)) != 0 ) {
 	  g = pgcd(cc2, c1);
           vect_erase_var(&pv2, (Variable) e1);
-          VV_VAL(v2) = vect_cl2_ofl_ctrl((c1/g), pv2, (cc2/g), pv1,
-					 NO_OFL_CTRL);
+          VV_VAL_(v2) = newgen_Pvecteur
+	      (vect_cl2_ofl_ctrl((c1/g), pv2, (cc2/g), pv1, NO_OFL_CTRL));
 	}
       }
     }
@@ -311,8 +312,8 @@ list vv1, vv2;
         if( (cc2 = vect_coeff((Variable) e1, pv2)) != 0 ) {
 	  int g = pgcd(cc2, c1);
           vect_erase_var(&pv2, (Variable) e1);
-          VV_VAL(v2) = vect_cl2_ofl_ctrl((c1/g), pv2, (cc2/g), pv1,
-					 NO_OFL_CTRL);
+          VV_VAL_(v2) = newgen_Pvecteur
+	      (vect_cl2_ofl_ctrl((c1/g), pv2, (cc2/g), pv1, NO_OFL_CTRL));
 	}
         p2 = l2;
       }
@@ -336,8 +337,8 @@ list vv1, vv2;
 	if( (cc2 = vect_coeff((Variable) e1, pv2)) != 0 ) {
 	  int g = pgcd(cc2, c1);
 	  vect_erase_var(&pv2, (Variable) e1);
-	  VV_VAL(v2) = vect_cl2_ofl_ctrl((c1/g), pv2, (cc2/g), pv1,
-					 NO_OFL_CTRL);
+	  VV_VAL_(v2) = newgen_Pvecteur
+	      (vect_cl2_ofl_ctrl((c1/g), pv2, (cc2/g), pv1, NO_OFL_CTRL));
 	}
       }
     }
