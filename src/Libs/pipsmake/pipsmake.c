@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.72  2003/06/05 16:15:05  coelho
+ * recursion detection.
+ *
  * Revision 1.71  2002/04/05 15:36:59  coelho
  * hop.
  *
@@ -669,11 +672,14 @@ static bool make(string rname, string oname)
 
     dont_interrupt_pipsmake_asap();
     save_active_phases();
+    ifdebug(5)
+      db_print_all_required_resources(stderr);
 
     success_p = rmake(rname, oname);
 
     reset_make_cache();
     retrieve_active_phases();
+    db_clean_all_required_resources();
 
     pips_debug(1, "%s(%s) - %smade\n", 
 	       rname, oname, success_p? "": "could not be ");
@@ -681,6 +687,7 @@ static bool make(string rname, string oname)
     return success_p;
 }
 
+/* recursive make resource */
 static bool rmake(string rname, string oname)
 {
     rule ru;
@@ -689,73 +696,93 @@ static bool rmake(string rname, string oname)
     debug(2, "rmake", "%s(%s) - requested\n", rname, oname);
 
     /* is it up to date ? */
-    if (db_resource_p(rname, oname)) {
+    if (db_resource_p(rname, oname)) 
+    {
 	res = db_get_resource_id(rname, oname);
-	if(set_belong_p(up_to_date_resources, (char *) res)) {
-	    debug(5, "rmake", "resource %s(%s) found in up_to_date "
-		      "with time stamp %d\n",
-		      rname, oname, db_time_of_resource(rname, oname));
-	    return TRUE; /* YES, IT IS! */
+	if(set_belong_p(up_to_date_resources, (char *) res)) 
+	{
+	  pips_debug(5, "resource %s(%s) found up_to_date, time stamp %d\n",
+		     rname, oname, db_time_of_resource(rname, oname));
+	  return TRUE; /* YES, IT IS! */
 	}
 	else
-	    res = NULL; /* NO, IT IS NOT. */
+	{
+	  /* this resource exists but is maybe up-to-date? */
+	  res = NULL; /* NO, IT IS NOT. */
+	}
+    }
+    else if (db_resource_is_required_p(rname, oname))
+    {
+      /* the resource is already being required... this is bad */
+      db_print_all_required_resources(stderr); 
+      pips_user_error("recursion on resource %s of %s\n", rname, oname);
+    }
+    else
+    {
+      /* well, the resource does not exists, we have to build it */
+       db_set_resource_as_required(rname, oname);
     }
     
     /* we look for the active rule to produce this resource */
     if ((ru = find_rule_by_resource(rname)) == rule_undefined)
 	pips_internal_error("could not find a rule for %s\n", rname);
 
-    /* we recursively make the pre transformations */
+    /* we recursively make the pre transformations. */
     if (!make_pre_transformation(oname, ru))
 	return FALSE;
 
-    /* we recursively make required resources */
+    /* we recursively make required resources. */
     if (!make_required(oname, ru))
 	return FALSE;
 
     if (check_resource_up_to_date (rname, oname)) 
     {
-	pips_debug (8, "Resource %s(%s) becomes up-to-date after applying"
-		    "pre-transformations and building required resources\n",
-		    rname,oname);
-    } else {
-	bool success = FALSE;
-	list lr;
+      pips_debug (8, "Resource %s(%s) becomes up-to-date after applying"
+		  "pre-transformations and building required resources\n",
+		  rname,oname);
+    } 
+    else 
+    {
+      bool success = FALSE;
+      list lr;
+      
+      /* we build the resource */
+      db_set_resource_as_required(rname, oname);
 
-	/* we build the resource */
-	success = apply_a_rule(oname, ru);
-	if (!success) return FALSE;
-
-	lr = build_real_resources(oname, rule_produced(ru));
-
-	/* set up-to-date all the produced resources for that rule */
-	MAP(REAL_RESOURCE, rr,
+      success = apply_a_rule(oname, ru);
+      if (!success) return FALSE;
+      
+      lr = build_real_resources(oname, rule_produced(ru));
+      
+      /* set up-to-date all the produced resources for that rule */
+      MAP(REAL_RESOURCE, rr,
+      {
+	string rron = real_resource_owner_name(rr);
+	string rrrn = real_resource_resource_name(rr);
+	
+	if (db_resource_p(rrrn, rron)) 
 	{
-	    string rron = real_resource_owner_name(rr);
-	    string rrrn = real_resource_resource_name(rr);
-	    
-	    if (db_resource_p(rrrn, rron)) 
-	    {
-		res = db_get_resource_id(rrrn, rron);
-		pips_debug(5, "resource %s(%s) added to up_to_date "
-			   "with time stamp %d\n",
-			   rname, oname, db_time_of_resource(rrrn, rron));
-		set_add_element(up_to_date_resources, 
-				up_to_date_resources, res);
-	    }
-	    else {
-		pips_internal_error("resource %s(%s) just built not found!\n",
-				    rname, oname);
-	    }
-	}, 
-	    lr);
-
-	gen_full_free_list(lr);
+	  res = db_get_resource_id(rrrn, rron);
+	  pips_debug(5, "resource %s(%s) added to up_to_date "
+		     "with time stamp %d\n",
+		     rname, oname, db_time_of_resource(rrrn, rron));
+	  set_add_element(up_to_date_resources, 
+			  up_to_date_resources, res);
+	}
+	else {
+	  pips_internal_error("resource %s(%s) just built not found!\n",
+			      rname, oname);
+	}
+      }, 
+	  lr);
+      
+      gen_full_free_list(lr);
     }
+    
     return TRUE;
 }
-
-static bool apply(string pname, string oname)
+    
+    static bool apply(string pname, string oname)
 {
     bool success_p = TRUE;
 
