@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1994/04/12 10:59:18 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1994/04/12 12:03:15 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -49,8 +49,10 @@ shift `expr $OPTIND - 1`
 
 #
 
-$VERBOSE "copying files in $DIRECTORY"
+$VERBOSE "cleaning $DIRECTORY"
+rm -f $DIRECTORY/*
 
+$VERBOSE "copying files in $DIRECTORY"
 cp $SRCDIR/hpfc_*.h $SRCDIR/hpfc_*.f $DIRECTORY
 cp $SRCDIR/hpfc_Makefile $DIRECTORY/Makefile
 cp $PVM_ROOT/include/*.h $DIRECTORY
