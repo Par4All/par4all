@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: ri.tex,v $
+%% Revision 1.64  2002/06/20 07:43:55  irigoin
+%% Comments about constant data type increased
+%%
 %% Revision 1.63  2002/06/13 11:36:13  irigoin
 %% initializations field added to code
 %%
@@ -17,7 +20,7 @@
 \title{PIPS: Internal Representation of Fortran Code}
 \author{Fabien Coelho\\
   Béatrice Creusillet\\
-  Fran\c{c}ois Irigoin \\
+  François Irigoin \\
   Pierre Jouvelot \\
   Ronan Keryell \\
   Rémi Triolet\\
@@ -818,6 +821,16 @@ their \texttt{int} value, otherwise if possible the constant is
 represented as an \texttt{entity}, possibly itself if the constant is
 within the value of an entity, and finally if no entity can be thought of
 a \texttt{litteral} is chosen.
+
+For instance, a constant entity such as 123.45 has "123.45" as entity name
+and its initial \verb/value/ is a \verb/constant/ of type \verb/litteral/
+because its value is carried by its name. A floating point variable
+statically initialized with 123.45 as an initial value of type
+\verb/constant/ and of kind \verb/call/, since 123.45 is a nullary
+function.
+
+Logical constants are functions but they are also represented by integer 0
+and 1. The \verb/int/ kind of constant is used as for integer variables.
 
 \section{Code, Statements and Instructions}
 \label{code}
