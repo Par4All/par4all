@@ -1,4 +1,4 @@
-dnl	This file is an input file used by the GNU "autoconf" program to
+audnl	This file is an input file used by the GNU "autoconf" program to
 dnl	generate the file "configure", which is run to configure the
 dnl	Makefile in this directory.
 
@@ -99,16 +99,18 @@ esac
 dnl /*****************************************************************************/
 dnl See if the only goal is to create an 'int', 'longint', or 'longlongint' library
 
-if test "$target" = "i*-pc-cygwin"; then
+case "$target" in
+   i*-pc-cygwin)   
 	echo "setting sizes of int by hand:  int 4, long int 4, long long int 8 "
 	ac_cv_sizeof_int=4
 	ac_cv_sizeof_long_int=4
-	ac_cv_sizeof_long_long_int=8
-else
+	ac_cv_sizeof_long_long_int=8;;
+	*)
 	AC_CHECK_SIZEOF(int,1)
 	AC_CHECK_SIZEOF(long int,1)
-	AC_CHECK_SIZEOF(long long int,1)
-fi
+	AC_CHECK_SIZEOF(long long int,1);;
+esac
+
 
 
 AC_ARG_ENABLE(int-lib,[ --enable-int-lib         Enable that only an int library is constructed], only_int_lib=$enableval,only_int_lib=no)
@@ -294,11 +296,9 @@ dnl fi
 echo "Polylib will be built with " $LIBS_TO_BUILD "integer size"
 echo "---------------------------------------------------"
 echo "You can proceed with:"
-echo "make libs:         to build the libs"
-echo "make [execs]:      to build the libs and the executables"
-echo "make install:      to install them (default /usr/local)"
-echo "make tests:        to test the library"
-
+echo "make	         :to build the libs and the executables"
+echo "make tests         :to test the library"
+echo "make install       :to install them (default /usr/local)"
 echo "---------------------------------------------------"
 
 
