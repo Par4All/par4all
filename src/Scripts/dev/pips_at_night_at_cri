@@ -19,8 +19,8 @@ function usage()
     cat <<-EOF 
 	$0 [-a address] [-dDhnvV] [keyword]
 	    -a address: email address for messages
-	    -d: debug forwarded to pips_at_night
-	    -D: debug script (just do echo)
+	    -d: debug script (just do echo)
+	    -D: debug forwarded to pips_at_night
 	    -h: this help
 	    -v: verbose
 	    -V: verbose forwarded to pips_at_night
@@ -42,8 +42,8 @@ while getopts a:dDhvVn opt
 do
     case ${opt} in
         a) mailto=${OPTARG} ;;
-	d) more=${more}D ;;
-	D) script=echo ;;
+	d) script=echo ;;
+	D) more=${more}D ;;
 	h) usage 0 ;;
 	v) verb=verb ;;
 	V) more=${more}v ;;
