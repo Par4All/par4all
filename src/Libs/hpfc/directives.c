@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/08/29 09:48:53 $, )
+ * ($Date: 1995/09/04 18:10:02 $, )
  */
 
 #include "defines-local.h"
@@ -15,37 +15,53 @@
 #include "bootstrap.h"
 #include "control.h"
 
-/* Directive names encoding: HPF_PREFIX + one character.
- * This encoding is achieved thru a sed script that transforms directives 
- * into calls that can be parsed by the PIPS F77 parser. It's a hack but 
- * it greatly reduced the number of lines for directive analysis, and 
- * it allowed quite simply to figure out where the executable directives
- * are in the code.
- * However the syntax allowed in mapping directives is restricted to F77.
+/***************************************************************** UTILITIES */
+
+/* list of statements to be cleaned. the operation is delayed because
+ * the directives are needed in place to stop the dynamic updates.
  */
+static list /* of statements */ to_be_cleaned = NIL;
 
-#define HPF_PREFIX		"HPFC"
-
-#define BLOCK_SUFFIX		"K"
-#define CYCLIC_SUFFIX		"C"
-#define STAR_SUFFIX		"S"
-
-#define ALIGN_SUFFIX		"A"
-#define REALIGN_SUFFIX		"B"
-#define DISTRIBUTE_SUFFIX	"D"
-#define REDISTRIBUTE_SUFFIX	"E"
-#define INDEPENDENT_SUFFIX	"I"
-#define NEW_SUFFIX		"N"
-#define PROCESSORS_SUFFIX	"P"
-#define TEMPLATE_SUFFIX		"T"
-#define PURE_SUFFIX		"U"
-#define DYNAMIC_SUFFIX		"Y"
-
-/*-----------------------------------------------------------------
- *
- *   UTILITIES
- *
+/* the directive is freed and replaced by a continue call or
+ * a copy loop nest, depending on the renamings.
  */
+static void clean_statement(statement s)
+{
+    instruction i = statement_instruction(s);
+
+    assert(instruction_call_p(i));
+
+    free_call(instruction_call(i));
+    instruction_call(i) = call_undefined;
+
+    if (bound_renamings_p(s))
+    {
+	list /* of renamings */  lr = load_renamings(s),
+	     /* of statements */ block = NIL;
+	
+	MAP(RENAMING, r,
+	{
+	    entity o = renaming_old(r);
+	    entity n = renaming_new(r);
+	    
+	    block = CONS(STATEMENT, generate_copy_loop_nest(o, n), block);
+	},
+	    lr);
+
+	free_instruction(i);
+	statement_instruction(s) =
+	    make_instruction(is_instruction_block, block);
+    }
+    else
+	instruction_call(i) =
+	    make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME), NIL);
+}
+
+static void add_statement_to_clean(statement s)
+{
+    to_be_cleaned = CONS(STATEMENT, s, to_be_cleaned);
+}
+
 /* local primary dynamics
  */
 GENERIC_STATIC_STATUS(/**/, the_dynamics, list, NIL, gen_free_list)
@@ -85,6 +101,28 @@ bool redistribute_directive_p(entity f)
 {
     return top_level_entity_p(f) && 
 	same_string_p(HPF_PREFIX REDISTRIBUTE_SUFFIX, entity_local_name(f));
+}
+
+bool fcd_directive_string_p(string s)
+{
+    return same_string_p(s, HPF_PREFIX SYNCHRO_SUFFIX) ||
+	   same_string_p(s, HPF_PREFIX TIMEON_SUFFIX) ||
+	   same_string_p(s, HPF_PREFIX TIMEOFF_SUFFIX) ;
+}
+
+bool fcd_directive_p(entity f)
+{
+    return top_level_entity_p(f) &&
+	fcd_directive_string_p(entity_local_name(f));
+}
+
+/* whether an entity must be kept in the code.
+ * if so, a maybe fake source code must be supplied, 
+ * and the directive will be kept in the callee list.
+ */
+bool keep_directive_in_code_p(string s)
+{
+    return fcd_directive_string_p(s);
 }
 
 /* management of PROCESSORS and TEMPLATE directives.
@@ -242,6 +280,9 @@ static void initial_alignment(statement s)
 	get_the_dynamics());
 }
 
+/* handle a simple (re)align directive.
+ * store the mappings in internal data structures.
+ */
 static void 
 one_align_directive(reference alignee,
 		    reference temp,
@@ -277,6 +318,9 @@ one_align_directive(reference alignee,
     }       
 }
 
+/* handle a full (re)align directive. 
+ * just decompose into simple alignments...
+ */
 static void 
 handle_align_and_realign_directive(entity f,
 				   list /* of expressions */ args,
@@ -583,11 +627,28 @@ HANDLER_PROTOTYPE(redistribute)
     handle_distribute_and_redistribute_directive(f, args, TRUE);
 }
 
-/*-----------------------------------------------------------------
- *
- * DIRECTIVE HANDLING
- *
- * finds the handler for a given entity.
+/*********************************************** handlers for FCD directives */
+/* keep the mapping of FCD specials in the hpfc status.
+ * 
+ */
+
+HANDLER_PROTOTYPE(synchro)
+{
+    if (get_bool_property(FCD_IGNORE_PREFIX "SYNCHRO"))
+	add_statement_to_clean(current_stmt_head());
+}
+
+/* for both timeon and timeoff
+ */
+HANDLER_PROTOTYPE(time)
+{
+    if (get_bool_property(FCD_IGNORE_PREFIX "TIME"))
+	add_statement_to_clean(current_stmt_head());
+}
+
+/******************************************************** DIRECTIVE HANDLING */
+
+/* finds the handler for a given entity.
  * the link between directive names and handlers is stored in the
  * handlers static table. Some "directives" (BLOCK, CYCLIC) are 
  * unexpected because they cannot appear after the chpf$...
@@ -601,9 +662,14 @@ struct DirectiveHandler
 
 static struct DirectiveHandler handlers[] =
 { 
+  /* special functions for HPF keywords are not expected at this level
+   */
   {HPF_PREFIX BLOCK_SUFFIX,		HANDLER(unexpected) },
   {HPF_PREFIX CYCLIC_SUFFIX,		HANDLER(unexpected) },
   {HPF_PREFIX STAR_SUFFIX,		HANDLER(unexpected) },
+
+  /* HPF directives
+   */
   {HPF_PREFIX ALIGN_SUFFIX,		HANDLER(align) },
   {HPF_PREFIX REALIGN_SUFFIX,		HANDLER(realign) },
   {HPF_PREFIX DISTRIBUTE_SUFFIX,	HANDLER(distribute) },
@@ -614,6 +680,15 @@ static struct DirectiveHandler handlers[] =
   {HPF_PREFIX TEMPLATE_SUFFIX,		HANDLER(template) },
   {HPF_PREFIX DYNAMIC_SUFFIX,		HANDLER(dynamic) },
   {HPF_PREFIX PURE_SUFFIX,		HANDLER(pure) },
+
+  /* FCD directives
+   */
+  {HPF_PREFIX SYNCHRO_SUFFIX,		HANDLER(synchro) },
+  {HPF_PREFIX TIMEON_SUFFIX,		HANDLER(time) },
+  {HPF_PREFIX TIMEOFF_SUFFIX,		HANDLER(time) },
+
+  /* default issues an error
+   */
   { (string) NULL,			HANDLER(unexpected) }
 };
 
@@ -625,46 +700,6 @@ static void (*directive_handler(string name))(entity, list)
     struct DirectiveHandler *x=handlers;
     while (x->name && strcmp(name, x->name)) x++;
     return x->handler;
-}
-
-/* list of statements to be cleaned. the operation is delayed because
- * the directives are needed in place to stop the dynamic updates.
- */
-static list /* of statements */ to_be_cleaned = NIL;
-
-/* the directive is freed and replaced by a continue call or
- * a copy loop nest, depending on the renamings.
- */
-static void clean_statement(statement s)
-{
-    instruction i = statement_instruction(s);
-
-    assert(instruction_call_p(i));
-
-    free_call(instruction_call(i));
-    instruction_call(i) = call_undefined;
-
-    if (bound_renamings_p(s))
-    {
-	list /* of renamings */  lr = load_renamings(s),
-	     /* of statements */ block = NIL;
-	
-	MAP(RENAMING, r,
-	{
-	    entity o = renaming_old(r);
-	    entity n = renaming_new(r);
-	    
-	    block = CONS(STATEMENT, generate_copy_loop_nest(o, n), block);
-	},
-	    lr);
-
-	free_instruction(i);
-	statement_instruction(s) =
-	    make_instruction(is_instruction_block, block);
-    }
-    else
-	instruction_call(i) =
-	    make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME), NIL);
 }
 
 /* newgen recursion thru the IR.
@@ -683,7 +718,8 @@ static bool directive_filter(call c)
 	
 	/* the current statement will have to be cleaned.
 	 */
-	to_be_cleaned = CONS(STATEMENT, current_stmt_head(), to_be_cleaned);
+	if (!keep_directive_in_code_p(entity_local_name(f)))
+	    add_statement_to_clean(current_stmt_head());
     }
     
     return FALSE; /* no instructions within a call! */
