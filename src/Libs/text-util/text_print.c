@@ -106,10 +106,12 @@ print_sentence(FILE * fd,
 	    /* Keep track of the attachment against the padding: */
 	    deal_with_attachments_in_this_string(label,
 						 position_in_the_output);
-	    fprintf_sentence(fd,get_bool_property("PRETTYPRINT_C_CODE")?"%s":"%-5s ", label);
+	    /* In C, a label cannot begin with a number so "l" is added for this case*/
+	    fprintf_sentence(fd,get_bool_property("PRETTYPRINT_C_CODE")?
+			     (isdigit(label[0])?"l%s:":"%s"):"%-5s ", label);
 	}
 	else {
-	    fprintf_sentence(fd,get_bool_property("PRETTYPRINT_C_CODE")?"":"      ");
+	  fprintf_sentence(fd,get_bool_property("PRETTYPRINT_C_CODE")?"":"      ");
 	}
 	
 	/* FI: do not indent too much (9 June 1995) */
@@ -124,6 +126,11 @@ print_sentence(FILE * fd,
 	
 	MAP(STRING, w, 
 	{
+
+	  if (get_bool_property("PRETTYPRINT_C_CODE"))
+	    fprintf_sentence(fd, "%s", w);
+	  else {
+	    
 	    /* if the string fits on the current line: no problem */
 	    if (col + strlen(w) <= 70) {
 		deal_with_attachments_in_this_string(w,
@@ -214,6 +221,7 @@ print_sentence(FILE * fd,
 			col += ncar;
 		    }
 		}
+	  }
 	},
 	    lw);
 
