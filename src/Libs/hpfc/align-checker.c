@@ -10,6 +10,9 @@
  *
  * $Id$
  * $Log: align-checker.c,v $
+ * Revision 1.22  1997/04/15 16:07:07  coelho
+ * headers updated.
+ *
  * Revision 1.21  1997/03/20 10:22:37  coelho
  * RCS headers.
  *
@@ -17,6 +20,7 @@
 
 #include "defines-local.h"
 #include "access_description.h"
+#include "effects.h"
 #include "regions.h"
 
 GENERIC_STATIC_OBJECT(extern, hpfc_current_statement, statement)
