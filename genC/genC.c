@@ -32,6 +32,7 @@
      (an integer). The third is the component value. */
 
 #include <stdio.h>
+extern int printf();
 #include <ctype.h>
 #include <string.h>
 #include "newgen_include.h"
@@ -138,21 +139,25 @@ union domain *dp ;
       struct gen_binding *bp = dp->ba.constructand ;
       
       if( IS_INLINABLE( bp )) {
-	  sprintf( buffer, "" ) ;
+	  sprintf( buffer, "(%s)", bp->name ); /* was "", but pb with -> */
       }
       else if( IS_EXTERNAL( bp )) {
 	  sprintf( buffer, "(%s)", bp->name ) ;
       }
       else {
-	  sprintf( buffer, "" ) ;
+	  sprintf( buffer, "(%s)", bp->name ) ;/* was "", but pb with -> */
       }
       break ;
   }
   case EXTERNAL:
   case IMPORT:
+	  sprintf(buffer, "");
+	  break;
   case LIST:
+	  sprintf(buffer, "(list)");
+	  break;
   case SET:
-	  sprintf( buffer, "" ) ;
+	  sprintf( buffer, "(set)" ) ;
 	  break ;
   case ARRAY: 
     if( dp->ar.dimensions->cdr != NULL ) {
@@ -246,8 +251,6 @@ struct gen_binding *bp ;
 int size ;
 char *args ;
 {
-    extern int printf();
-
     (void) printf("#define %s_domain (%s+%d)\n",
 		  bp->name, start, TYPE( bp )) ;
     (void) printf("#define make_%s(%s) ", bp->name, args ) ;
@@ -326,17 +329,17 @@ struct gen_binding *bp ;
 
     (void) printf("#define apply_%s(hash, var) ", name ) ;
     (void) printf("(%sHASH_GET(%s,",
-		  primitive_cast(image), primitive_field(start)) ;
+		  primitive_cast(image) , primitive_field(start)) ;
     (void) printf("%s,(hash+%d)->h, (var)))\n",
 		  primitive_field(image), data) ;
 
     (void) printf("#define update_%s(hash, var, val) ", name ) ;
-    (void) printf("((%s)HASH_UPDATE(%s", name, primitive_field(start)) ;
+    (void) printf("(HASH_UPDATE(%s", primitive_field(start)) ;
     (void) printf(",%s,((hash)+%d)->h,(var),(val)))\n", 
 		  primitive_field(image), data ) ;
 
     (void) printf("#define extend_%s(hash, var, val) ", name ) ;
-    (void) printf("((%s)HASH_EXTEND(%s", name, primitive_field(start));
+    (void) printf("(HASH_EXTEND(%s", primitive_field(start));
     (void) printf(",%s,((hash)+%d)->h,(var),(val)))\n",
 		  primitive_field(image), data ) ;
 }
