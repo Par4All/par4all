@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <values.h>
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -17,12 +18,16 @@
  * 
  * Si une telle equation est trouvee et si elle est faisable,
  * sc_value_for_variable calcule la valeur de var pour ce systeme et
- * la retourne par pval. Sinon, la procedure aborte par sc_error.
+ * la retourne par pval. Sinon, la procedure renvoie la valeur FALSE.
  * 
  * Notes:
  *  - le vecteur representant l'equation est suppose correct: une variable 
  *    dont le coefficient est nul ne doit pas etre materialisee
  *  - ce n'est pas une fonction sur les systemes mais sur les listes d'egalites
+ *  - la valeur FALSE peut signifer que le systeme d'egalites de ps n'est pas
+ *    faisable ou qu'il n'y a pas d'equation satisfaisante; l'arret par sc_error()
+ *    en cas de non-faisabilite n'etait pas satisfaisant pour les procedures
+ *    appelantes
  */
 boolean sc_value_of_variable(ps, var, pval)
 Psysteme ps;
@@ -253,3 +258,329 @@ Variable var;
     }
 }
 
+
+/* void sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, *pmax):
+ * examine un systeme pour trouver le minimum et le maximum d'une variable
+ * apparaissant dans ce systeme par projection a la Fourier-Motzkin.
+ * la procedure retourne la valeur FALSE si le systeme est infaisable et
+ * TRUE sinon
+ *
+ * Le systeme ps est detruit et desalloue..
+ *
+ * L'algorithme utilise est different de celui de sc_minmax_of_variable(). 
+ * Les equations sont tout d'abord utilisees pour decomposer le systeme
+ * en un hyper-espace caracterise par un sous-ensemble des equations
+ * (par exemple les equations ayant moins de 2 variables) et un polyedre
+ * de cet hyperespace caracterise par les inegalites de ps et les egalites
+ * qui n'ont pas ete utilisees lors de la projection.
+ *
+ * Note:
+ *  - comme on ne teste pas la faisabilite en entiers, il se peut que
+ *    cette fonction renvoie TRUE et que les deux valeurs min et max
+ *    n'existent pas vraiment; il faut donc etre sur de la maniere dont
+ *    on utilise cette fonction; dans le cas de l'evaluation de la valeur
+ *    d'une variable en un point d'un programme, cela n'a pas d'importance
+ *    puisque la non-faisabilite (connue ou non) implique que le code est
+ *    mort. La substitution d'une variable par une valeur n'a donc pas
+ *    d'importance.
+ *  - on pourrait verifier que var appartient a la base de ps; comme il est
+ *    trivial mais pas forcement justifie, ce test est laisse a la charge
+ *    de l'appelant.
+ */
+boolean sc_minmax_of_variable2(Psysteme ps, Variable var, int * pmin, int * pmax)
+{
+/* Maximum number of variables in an equation used for the projection */
+#define level (2)
+
+#define if_debug_sc_minmax_of_variable2 if(FALSE)
+
+    boolean feasible_p = TRUE;
+
+    if_debug_sc_minmax_of_variable2 {
+	fprintf(stderr, "[sc_minmax_of_variable2]: Begin\n");
+    }
+
+    if(SC_UNDEFINED_P(ps)) {
+	if_debug_sc_minmax_of_variable2 {
+	    fprintf(stderr,
+		    "[sc_minmax_of_variable2]: Empty system as input\n");
+	}
+	feasible_p = FALSE;
+    }
+    else if(SC_EMPTY_P(ps = sc_normalize(ps))) {
+	if_debug_sc_minmax_of_variable2 {
+	    fprintf(stderr,
+		    "[sc_minmax_of_variable2]:"
+		    " Non-feasibility detected by first call to sc_normalize\n");
+	}
+	feasible_p = FALSE;
+    }
+    else { /* no obvious non-feasibility */
+	Pcontrainte eq = CONTRAINTE_UNDEFINED;
+	Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+	Pcontrainte next_eq = CONTRAINTE_UNDEFINED;
+	int nvar;
+	int neq = sc_nbre_egalites(ps);
+
+	if_debug_sc_minmax_of_variable2 {
+	    fprintf(stderr,
+		    "[sc_minmax_of_variable2]: After call to sc_normalize\n");
+	    fprintf(stderr, "[sc_minmax_of_variable2]: Input system %x\n",
+		    (unsigned int) ps);
+	    sc_dump(ps);
+	}
+
+	/* 
+	 * Solve the equalities (if any)
+	 *
+	 * Start with equalities with the smallest number of variables
+	 * and stop when all equalities have been used and or when
+	 * all equalities left have too many variables.
+	 *
+	 * Equalities with no variable are checked although nvar starts
+	 * with 1.
+	 */
+	for(nvar = 1;
+	    feasible_p && neq > 0 && nvar <= level /* && sc_nbre_egalites(ps) != 0 */;
+	    nvar++) {
+	    for(eq = sc_egalites(ps); 
+		feasible_p && !CONTRAINTE_UNDEFINED_P(eq);
+		eq = next_eq) {
+
+		/* eq might suffer in the substitution... */
+		next_eq = contrainte_succ(eq);
+
+		if(egalite_normalize(eq)) {
+		    if(CONTRAINTE_NULLE_P(eq)) {
+			/* eq is redundant */
+			;
+		    }
+		    else {
+			/* Equalities change because of substitutions.
+			 * Their dimensions may go under the present
+			 * required dimension, nvar. Hence the non-equality
+			 * test between d and nvar.
+			 */
+			int d = vect_dimension(contrainte_vecteur(eq));
+
+			if(d<=nvar) {
+			    Pcontrainte def = CONTRAINTE_UNDEFINED;
+			    Variable v = TCST;
+			    Variable v1 = TCST;
+			    Variable v2 = TCST;
+			    Variable nv = TCST;
+			    Pvecteur pv = contrainte_vecteur(eq);
+			    boolean value_found_p = FALSE;
+
+			    /* Does eq define var's value (and min==max)?
+			     * Let's keep track of this but go on to check
+			     * feasibility
+			     */
+			    if(d==1) {
+				if(!VECTEUR_UNDEFINED_P(pv->succ)) {
+				    /* remember eq was normalized... */
+				    if ((pv->var == var) && (pv->succ->var == TCST)) {
+					*pmin = - vecteur_val(vecteur_succ(pv))/vecteur_val(pv);
+					*pmax = *pmin;
+					value_found_p = TRUE;
+				    }
+				    else if ((pv->succ->var == var) && (pv->var == TCST)) {
+					*pmin = - vecteur_val(pv)/vecteur_val(vecteur_succ(pv));
+					*pmax = *pmin;
+					value_found_p = TRUE;
+				    }
+				    else {
+					value_found_p = FALSE;
+				    }
+				}
+				else {
+				    if (pv->var == var) {
+					*pmin = 0;
+					*pmax = *pmin;
+					value_found_p = TRUE;
+				    }
+				    else {
+					value_found_p = FALSE;
+				    }
+				}
+			    }
+			    /* Although the value might have been found, go on to
+			     * check feasibility. This could be optional because
+			     * it should not matter for any safe use of this
+			     * function. See Note in function's header.
+			     */
+			    if(value_found_p) {
+				/* do not touch ps any more */
+				/* sc_rm(new_ps); */
+				return TRUE;
+			    }
+
+			    /* keep eq */
+			    /* In fact, new_ps is not needed. we simply modify ps */
+			    /*
+			    new_eq = contrainte_dup(eq);
+			    sc_add_egalite(new_ps, new_eq);
+			    */
+
+			    /* use eq to eliminate a variable except if var value
+			     * is still unknown. We then do need this equation in ps.
+			     */
+
+			    /* Let's use a variable with coefficient 1 if
+			     * possible.
+			     */
+			    v1 = TCST;
+			    v2 = TCST;
+			    for( pv = contrainte_vecteur(eq);
+				!VECTEUR_NUL_P(pv);
+				pv = vecteur_succ(pv)) {
+				nv = vecteur_var(pv);
+				/* This test is not fully used in the curent
+				 * version since value_found_p==FALSE here.
+				 * That would change if feasibility had to
+				 * be checked better.
+				 */
+				if(nv!=TCST && (nv!=var||value_found_p)) {
+				    v2 = (v2==TCST)? nv : v2;
+				    if(vecteur_val(pv)==1) {
+					if(v1==TCST) {
+					    v1 = nv;
+					    break;
+					}
+				    }
+				}
+			    }
+			    v = (v1==TCST)? v2 : v1;
+			    /* because of the !CONTRAINTE_NULLE_P() test and because
+			     * of value_found_p */
+			    assert(v!=TCST);
+			    assert(v!=var||value_found_p);
+
+			    /* eq itself is going to be modified in ps.
+			     * use a copy!
+			     */
+			    def = contrainte_dup(eq);
+			    ps = 
+			    sc_simple_variable_substitution_with_eq_ofl_ctrl
+			    (ps, def, v, NO_OFL_CTRL);
+			    contrainte_rm(def);
+
+			    /* Print ps after projection.
+			     * This really generates a lot of output on real life systems!
+			     * But less than the next debug statement...
+			     */
+			    /*
+			       if_debug_sc_minmax_of_variable2 {
+			       fprintf(stderr,
+			       "Print the two systems at each elimination step:\n");
+			       fprintf(stderr, "[sc_minmax_of_variable2]: Input system %x\n",
+			       (unsigned int) ps);
+			       sc_dump(ps);
+			       }
+			       */
+			}
+			else {
+			    /* too early to use this equation eq */
+			    /* If there any hope to use it in the future?
+			     * Yes, if its dimension is no more than nvar+1
+			     * because one of its variable might be substituted.
+			     * If more variable are substituted, it's dimension
+			     * is going to go down and it will be counted later...
+			     * Well this is not true, it will be lost:-(
+			     */
+			    if(d<=nvar+1) {
+				neq++;
+			    }
+			    else {
+				/* to be on the safe side till I find a better idea... */
+				neq++;
+			    }
+			}
+		    }
+		}
+		else {
+		    /* The system is not feasible. Stop */
+		    feasible_p = FALSE;
+		    break;
+		}
+
+		/* This really generates a lot of output on real life system!
+		 * This is useless. Use previous debugging statement */
+		/*
+		if_debug_sc_minmax_of_variable2 {
+		    fprintf(stderr,
+			    "Print the two systems at each equation check:\n");
+		    fprintf(stderr, "[sc_minmax_of_variable2]: Input system %x\n",
+			    (unsigned int) ps);
+		    sc_dump(ps);
+		}
+		*/
+	    }
+
+	    if_debug_sc_minmax_of_variable2 {
+		fprintf(stderr,
+			"Print the two systems at each nvar=%d step:\n", nvar);
+		fprintf(stderr, "[sc_minmax_of_variable2]: Input system %x\n",
+			(unsigned int) ps);
+		sc_dump(ps);
+	    }
+	}
+
+	assert(!feasible_p ||
+	       (CONTRAINTE_UNDEFINED_P(eq) && CONTRAINTE_UNDEFINED_P(ineq)));
+
+	feasible_p = feasible_p && !SC_EMPTY_P(ps = sc_normalize(ps));
+
+	if(feasible_p) {
+	    /* Try to exploit the inequalities and the equalities left in ps */
+
+	    /* Exploit the reduction in size */
+	    base_rm(sc_base(ps));
+	    sc_base(ps) = BASE_UNDEFINED;
+	    sc_creer_base(ps);
+
+	    if_debug_sc_minmax_of_variable2 {
+		fprintf(stderr,
+			"Print System ps after projection and normalization:\n");
+		fprintf(stderr, "[sc_minmax_of_variable2]: Input system ps %x\n",
+			(unsigned int) ps);
+		sc_dump(ps);
+	    }
+
+	    if(base_contains_variable_p(sc_base(ps), var)) {
+		feasible_p = sc_minmax_of_variable(ps, var, pmin, pmax);
+		ps = SC_UNDEFINED;
+	    }
+	    else {
+		*pmin = -MAXINT;
+		*pmax = MAXINT;
+	    }
+	}
+    }
+
+    if(!feasible_p) {
+	*pmin = -MAXINT;
+	*pmax = MAXINT;
+    }
+    else {
+	/* I'm afraid of sc_minmax_of_variable() behavior... 
+	 * The guard should be useless
+	 */
+	if(!SC_UNDEFINED_P(ps)) {
+	    sc_rm(ps);
+	}
+    }
+
+    if_debug_sc_minmax_of_variable2 {
+	fprintf(stderr,
+		"[sc_minmax_of_variable2]: feasible=%d, min=%d, max=%d\n",
+		feasible_p, *pmin, *pmax);
+	fprintf(stderr, "[sc_minmax_of_variable2]: End\n");
+    }
+
+    return feasible_p;
+}
+
+/*
+ * That's all folks!
+ */
