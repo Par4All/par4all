@@ -37,7 +37,7 @@ SCRIPTS =	generate_pips_distributions
 SOURCES= $(HTML_AUTO) $(HTML_OTHERS) $(SCRIPTS)
 
 # Ask to make the html files:
-all: $(HTML_AUTO)
+all: $(HTMS)
 clean: local-clean
 
 INSTALL_HTM= $(HTMS)
