@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1997/04/30 00:28:10 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1997/04/30 15:23:14 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1997/04/30 00:28:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1997/04/30 15:23:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -14,8 +14,12 @@ char vcid_emacs[] = "%A% ($Date: 1997/04/30 00:28:10 $, ) version $Revision$, go
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/filio.h>
-#include <strings.h>
+#include <strings.h>  /* doubtful portability? */
 
+/* write/... */
+#include <sys/types.h>
+#include <sys/uio.h>
+ 
 #include <xview/xview.h>
 #include <xview/panel.h>
 #include <xview/notify.h>
