@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/10/13 13:06:08 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/10/13 13:18:37 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1092,33 +1092,36 @@ cons *gen_copy_list(old_l, dp)
 cons *old_l;
 union domain *dp ;
 {
-    cons *old_p, *new_p = NIL, *new_l, *pc;
-    bool inlinable, persistant;
+    list old_p, new_p = NIL, new_l, pc;
+    bool inlinable, persistant, tabulated;
 
     inlinable = IS_INLINABLE(dp->li.element);
     tabulated = IS_TABULATED(dp->li.element);
     persistant = dp->li.persistant;
     new_l = NIL;
 
-    for (old_p = old_l ; old_p != NIL ; old_p = old_p->cdr) {
-	pc = (cons *)alloc( sizeof(struct cons) ) ;
+    if (inlinable || persistant || tabulated)
+	return gen_copy_seq(old_l);
 
-	/* the cons cell is updated */
-	if (inlinable || persistant || tabulated)
-		pc->car = old_p->car;
-	else {
-	    pc->car.p = copy_hsearch( old_p->car.p ) ;
-	}
+    /* else the items must also be copied
+     */
+    for (old_p = old_l ; old_p != NIL ; old_p = old_p->cdr) 
+    {
+	pc = (list)alloc(sizeof(struct cons)) ;
+
+	pc->car.p = copy_hsearch(old_p->car.p) ;
 	pc->cdr = NIL;
 	
-	/* pc is linked to the new list */
+	/* pc is linked to the new list 
+	 */
 	if (new_l == NIL)
-		new_l = pc;
+	    new_l = pc;
 	else
-		new_p->cdr = pc;
+	    new_p->cdr = pc;
 	new_p = pc;
     }
-    return(new_l);
+
+    return new_l;
 }
 
 /* GEN_COPY_ARRAY duplicates an array. if array elements are inlinable,
