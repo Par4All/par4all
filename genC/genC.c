@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1996/07/16 09:19:06 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1996/08/08 19:04:20 $, )
  * version $Revision$
  */
 
@@ -184,9 +184,9 @@ union domain *dp ;
   {
       struct gen_binding *bp = dp->ba.constructand ;
       
-      if (IS_INLINABLE(bp))     sprintf( buffer, "");
+      if (IS_INLINABLE(bp))     sprintf( buffer, " ");
       else if (IS_EXTERNAL(bp)) sprintf( buffer, "(%s)", bp->name ) ;
-      else                      sprintf( buffer, "");
+      else                      sprintf( buffer, " ");
 
       break ;
   }
@@ -194,7 +194,7 @@ union domain *dp ;
   case IMPORT_DT:
   case LIST_DT:
   case SET_DT:
-	  sprintf(buffer, "");
+	  sprintf(buffer, " ");
 	  break ;
   case ARRAY_DT: 
     if( dp->ar.dimensions->cdr != NULL ) {
@@ -270,7 +270,7 @@ struct domainlist *dlp ;
 {
     static char buffer[ 1024 ] ;
 
-    for( sprintf( buffer, "" ) ; dlp->cdr != NULL ; dlp = dlp->cdr ) {
+    for( buffer[0]='\0'; dlp->cdr != NULL ; dlp = dlp->cdr ) {
 	strcat( buffer, gen_arg( dlp->domain )) ;
 	strcat( buffer, "," )  ;
     }
@@ -287,13 +287,13 @@ struct gen_binding *bp ;
 int size ;
 char *args ;
 {
-    (void) printf("#define %s_domain (%s+%d)\n",
+    printf("#define %s_domain (%s+%d)\n",
 		  bp->name, start, TYPE( bp )) ;
-    (void) printf("#define make_%s(%s) ", bp->name, args ) ;
-    (void) printf("(%s)gen_alloc(%d+%d*sizeof(gen_chunk),%s,%s_domain%s%s)\n", 
-		  bp->name, GEN_HEADER_SIZE, size+IS_TABULATED( bp ), 
-		  "GEN_CHECK_ALLOC", bp->name,
-		  (strlen(args) == (int)0) ? "" : ",",  args ) ;
+    printf("#define make_%s(%s) ", bp->name, args ) ;
+    printf("(%s)gen_alloc(%ld+%d*sizeof(gen_chunk),%s,%s_domain%s%s)\n", 
+	   bp->name, GEN_HEADER_SIZE, size+IS_TABULATED( bp ), 
+	   "GEN_CHECK_ALLOC", bp->name,
+	   (strlen(args) == (int)0) ? "" : ",",  args ) ;
 }
 
 /* GEN_AND generates the manipulation functions for an AND type BP. */
