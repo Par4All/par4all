@@ -2,7 +2,7 @@
  *
  * these functions deal with HPF directives.
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/04/10 18:49:46 $, )
+ * $RCSfile: directives.c,v $ ($Date: 1995/04/12 15:49:32 $, )
  * version $Revision$,
  */
 
@@ -625,6 +625,23 @@ statement s;
     (void) current_stmt_pop();
 }
 
+/* void handle_hpf_directives(s)
+ * statement s;
+ *
+ * what: handles the HPF directives in statement s.
+ * how: recurses thru the AST, looking for special "directive calls".
+ *      when found, a special handler is called for the given directive.
+ * input: the code statement s
+ * output: none
+ * side effects: (many)
+ *  - the special calls are freed and replaced by continues.
+ *  - the hpfc data structures are set/updated to store the hpf mapping.
+ *  - parallel loops are tagged parallel.
+ *  - a static stack is used to retrieve the current statement.
+ *  - the ctrl_graph travelling is used, so should be initialized.
+ * bugs or features:
+ *  - the "new" directive is not used to tag private variables.
+ */
 void handle_hpf_directives(s)
 statement s;
 {
