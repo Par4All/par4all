@@ -12,6 +12,10 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.112  1997/12/05 11:34:18  coelho
+%% PIPSMAKE_SAVE_RESOURCES added.
+%% GENERATE_MISSING_SOURCE_FILE dropped.
+%%
 %% Revision 1.111  1997/12/05 07:58:57  coelho
 %% PREPROCESSOR_MISSING_FILE_HANDLING added.
 %%
@@ -36,7 +40,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1997/12/05 07:58:57 $~$
+$~$Date: 1997/12/05 11:34:18 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -201,7 +205,7 @@ checking. See Newgen documentation\cite{JT89}\cite{JT90}.
 
 This library is external and offers an independent debugging system.
 
-\subsection{Pipsmake}
+\subsection{PipsMake}
 \index{Pipsmake}
 
 It is possible to log and report differences between the set of resources
@@ -220,7 +224,14 @@ non-consistent resources cannot be used by accident.
 ACTIVATE_DEL_DERIVED_RES TRUE
 \end{verbatim}
 
-\subsection{Pipsbdm}
+How often resources should be saved and freed. $0$ means never, and 
+a positive value means every $n$ requests. 
+
+\begin{verbatim}
+PIPSMAKE_SAVE_RESOURCES 0
+\end{verbatim}
+
+\subsection{PipsBDM}
 \index{Pipsdbm}
 
 Shell environment variables \verb+PIPSDBM_DEBUG_LEVEL+ can be set to ?
@@ -316,9 +327,6 @@ workspace.
 Valid settings: \verb|error generate query|.
 
 \begin{verbatim}
-GENERATE_MISSING_SOURCE_FILES FALSE
-
-
 PREPROCESSOR_MISSING_FILE_HANDLING "error"
 \end{verbatim}
 
@@ -782,10 +790,6 @@ SEMANTICS_STDOUT FALSE
 
 Debug level for semantics
 
-\begin{verbatim}
-SEMANTICS_DEBUG_LEVEL 0
-\end{verbatim}
-
 \subsection{Static Complexity Evaluation}
 \index{Complexity}
 
@@ -1045,10 +1049,6 @@ No property.
 
 \subsubsection{WP65 (PUMA Project)}
 \index{WP65}
-
-\begin{verbatim}
-WP65_DEBUG_LEVEL        0
-\end{verbatim}
 
 \subsubsection{HPFC {\em High Performance Fortran Compiler}}
 \index{HPF}
