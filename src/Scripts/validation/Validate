@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1994/03/23 16:35:36 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1994/03/23 16:43:21 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -207,7 +207,7 @@ do
   case $opt in
     d) DEBUG="debug" ;;
     D) DEBUG="debug"; DEBUG2="debug";  VALIDOPT="$VALIDOPT -d" ;;
-    t) PERFORMANCE="begin `local_date`" ;;
+    t) PERFORMANCE="begin `local_date`"; VALIDOPT="$VALIDOPT -t";;
     v) VERBOSE="echo" ;;
     V) VERBOSE="echo" ; VALIDOPT="$VALIDOPT -v";;
     s) VERBOSE=":" ;;
