@@ -83,3 +83,24 @@ Psysteme ps;
     return(ps);
 }
 
+/* Same as above, but the basis is preserved and sc_empty is returned is
+the system is not feasible. ps is assumed to be a consistent system of
+constraints.  */
+Psysteme sc_safe_elim_redund(ps)
+Psysteme ps;
+{
+  Pbase b = base_dup(sc_base(ps));
+
+  /* if (SC_UNDEFINED_P(ps)) return(ps); */
+
+  ps = sc_elim_redund(ps);
+
+  if(ps==NULL) {
+    ps = sc_empty(b);
+  }
+  else {
+    base_rm(b);
+  }
+
+  return(ps);
+}
