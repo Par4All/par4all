@@ -15,7 +15,6 @@
 #include <xview/textsw.h>
 #include <xview/notice.h> 
 #include <xview/xv_error.h>
-#include <setjmp.h>
 
 /* xview/newgen interaction
  */
@@ -115,8 +114,6 @@ insert_something_in_the_wpips_log_window(char * a_message)
 void
 wpips_user_error_message(char error_buffer[])
 {
-   jmp_buf * ljbp = NULL;
-
    log_on_file(error_buffer);
 
    if (wpips_emacs_mode) 
@@ -134,8 +131,7 @@ wpips_user_error_message(char error_buffer[])
    if(get_bool_property("ABORT_ON_USER_ERROR"))
       abort();
 
-   ljbp = top_pips_context_stack();
-   longjmp(*ljbp, 1);
+   THROW(user_exception_error);
       
    (void) exit(1);
 }
