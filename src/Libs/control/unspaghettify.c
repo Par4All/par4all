@@ -3,10 +3,10 @@
    Ronan Keryell, 1995.
    */
 
-/* 	%A% ($Date: 1995/11/10 11:48:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	@(#) unspaghettify.c 1.8@(#) (95/11/10, 11:48:44) version 1.8, got on 95/11/10, 11:48:48 [/a/chailly/export/users/export/users/pips/Pips/Development/Lib/control/SCCS/s.unspaghettify.c].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
- char vcid_unspaghettify[] = "%A% ($Date: 1995/11/10 11:48:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+ char vcid_unspaghettify[] = "@(#) unspaghettify.c 1.8@(#) (95/11/10, 11:48:44) version 1.8, got on 95/11/10, 11:48:48 [/a/chailly/export/users/export/users/pips/Pips/Development/Lib/control/SCCS/s.unspaghettify.c].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -553,7 +553,7 @@ take_out_the_exit_node_if_not_a_continue(statement s,
 }
 
 
-/* All the optimization to the unstructured during the bottom-up phase: */
+/* All optimizations for unstructured during the bottom-up phase */
 void
 unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
 {
@@ -563,22 +563,25 @@ unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
    
    remove_the_unreachable_controls_of_an_unstructured(u);
 
-   if (get_debug_level() > 0) {
-      fprintf(stderr, "unspaghettify_rewrite_unstructured after remove_the_unreachable_controls_of_an_unstructured\n");
+   ifdebug(9) {
+      debug(9, "unspaghettify_rewrite_unstructured",
+	      "after remove_the_unreachable_controls_of_an_unstructured\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 
    remove_useless_continue_or_empty_code_in_unstructured(u);
    
-   if (get_debug_level() > 0) {
-      fprintf(stderr, "unspaghettify_rewrite_unstructured after remove_useless_continue_or_empty_code_in_unstructured\n");
+   ifdebug(9) {
+      debug(9, "unspaghettify_rewrite_unstructured",
+	      "after remove_useless_continue_or_empty_code_in_unstructured\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
    
    fuse_sequences_in_unstructured(u);
 
-   if (get_debug_level() > 0) {
-      fprintf(stderr, "unspaghettify_rewrite_unstructured after fuse_sequences_in_unstructured\n");
+   ifdebug(9) {
+      debug(9, "unspaghettify_rewrite_unstructured",
+	      "after fuse_sequences_in_unstructured\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 
@@ -586,16 +589,17 @@ unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
       /* If take_out_the_entry_node_of_the_unstructured() has not been
          able to discard the unstructured, go on with some other
          optimizations: */
-      if (get_debug_level() > 0) {
-         fprintf(stderr, "unspaghettify_rewrite_unstructured after take_out_the_entry_node_of_the_unstructured\n");
+      ifdebug(9) {
+	  debug(9, "unspaghettify_rewrite_unstructured",
+		  "after take_out_the_entry_node_of_the_unstructured\n");
          print_text(stderr, text_statement(get_current_module_entity(), 0, s));
       }
 
       take_out_the_exit_node_if_not_a_continue(new_unstructured_statement, i, u);
    }
 
-   if (get_debug_level() > 0) {
-      fprintf(stderr, "unspaghettify_rewrite_unstructured exit:\n");
+   ifdebug(9) {
+       debug(9, "unspaghettify_rewrite_unstructured", "End:\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 }
