@@ -2,7 +2,7 @@
  * Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1994/12/22 16:52:23 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1995/03/13 15:37:07 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -20,7 +20,6 @@ extern int fprintf();
 
 #include "ri.h"
 #include "hpf.h"
-#include "hpf_private.h"
 #include "message.h"
 
 #include "misc.h"
