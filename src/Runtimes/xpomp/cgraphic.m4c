@@ -11,7 +11,7 @@
 #include <alloca.h>
 #include <math.h>
 #include "gr.h"
-#include "hpfc_graphic.h"
+#include "xpomp_graphic.h"
 
 static int is_shm = 0;
 int _NO_PROC;
@@ -37,17 +37,17 @@ X11
 };
 
 
-/* The color range when automatic color scaling in HPFC_show: */
+/* The color range when automatic color scaling in XPOMP_show: */
 enum {
-    min_scale_color = 20,
-    max_scale_color = 220
+    min_scale_color = 1,
+    max_scale_color = 254
 };
 
 
-static HPFC_display currentdisplay = -1;
+static XPOMP_display currentdisplay = -1;
 
 
-/* In HPFC graphic, there is no runtime synchronization or nroadcast
+/* In XPOMP graphic, there is no runtime synchronization or broadcast
    since it is already done by the HPFC compiler: */
 static void
 pc_synchro(void)
@@ -123,7 +123,7 @@ int pc_basic_opendisplay(int X,
 		argv[0] = "pompview";
 		break;
 	case X11 :
-		argv[0] = "xhpfc";
+		argv[0] = "xxpomp";
 		break;
 	case NONE :
 	default :
@@ -301,7 +301,7 @@ char *pc_basic_get_buf(screen,n)
 
 
 static void
-new_pc_basic_buf(HPFC_display screen,
+new_pc_basic_buf(XPOMP_display screen,
 		 unsigned char * data_array,
 		 int X_data_array_size,
 		 int Y_data_array_size,
@@ -329,7 +329,7 @@ new_pc_basic_buf(HPFC_display screen,
 
 /************************************************************************/
 
-int pc_basic_closedisplay(HPFC_display screen)
+int pc_basic_closedisplay(XPOMP_display screen)
 {
 	struct sh_header *sh;
 	if(!is_good_desc(&screen)) return -1;
@@ -466,8 +466,8 @@ int screen;
 
 
 /* The user function to open a new display window: */
-HPFC_display
-HPFC_open_display(int X_window_size,
+XPOMP_display
+XPOMP_open_display(int X_window_size,
 		  int Y_window_size)
 {
     return pc_basic_opendisplay(X_window_size, Y_window_size, 0);
@@ -476,23 +476,23 @@ HPFC_open_display(int X_window_size,
 
 /* Get the number of bit per pixel of the screen: */
 void
-HPFC_close_display(HPFC_display screen)
+XPOMP_close_display(XPOMP_display screen)
 {
     pc_basic_closedisplay(screen);
 }
 
 
-/* Get the current default HPFC display: */
+/* Get the current default XPOMP display: */
 int
-HPFC_get_current_default_display()
+XPOMP_get_current_default_display()
 {
     return pc_getcurrentdisplay();
 }
 
     
-/* Set the current default HPFC display and return the old one: */
+/* Set the current default XPOMP display and return the old one: */
 int
-HPFC_set_current_default_display(HPFC_display screen)
+XPOMP_set_current_default_display(XPOMP_display screen)
 {
     return pc_setcurrentdisplay(screen);
 }
@@ -500,7 +500,7 @@ HPFC_set_current_default_display(HPFC_display screen)
     
 /* Get the pixel bit width of a display window: */
 int
-HPFC_get_depth(HPFC_display screen)
+XPOMP_get_depth(XPOMP_display screen)
 {
     return pc_basicgetdepth(screen);
 }
@@ -509,7 +509,7 @@ HPFC_get_depth(HPFC_display screen)
 
 /* Select the color map: */
 int
-HPFC_set_color_map(HPFC_display screen,
+XPOMP_set_color_map(XPOMP_display screen,
 		   int pal,
 		   int cycle,
 		   int start,
@@ -532,7 +532,7 @@ HPFC_set_color_map(HPFC_display screen,
 
 /* Load a user defined colormap and select it: */
 int 
-HPFC_set_user_color_map(HPFC_display screen,
+XPOMP_set_user_color_map(XPOMP_display screen,
 			unsigned char * red,
 			unsigned char * green,
 			unsigned char * blue)
@@ -543,7 +543,7 @@ HPFC_set_user_color_map(HPFC_display screen,
 
 /* Wait for a mouse click: */
 int
-HPFC_wait_mouse(HPFC_display screen,
+XPOMP_wait_mouse(XPOMP_display screen,
 		int * X,
 		int * Y)
 {
@@ -553,7 +553,7 @@ HPFC_wait_mouse(HPFC_display screen,
 
 /* Just test for a mouse click: */
 int
-HPFC_is_mouse(HPFC_display screen,
+XPOMP_is_mouse(XPOMP_display screen,
 	      int * X,
 	      int * Y)
 {
@@ -565,7 +565,7 @@ HPFC_is_mouse(HPFC_display screen,
 /* The user interface to show something uncooked. Return -1 if it
    fails, 0 if not: */
 int
-HPFC_flash(HPFC_display screen,
+XPOMP_flash(XPOMP_display screen,
 	   unsigned char * data_array,
 	   int X_data_array_size,
 	   int Y_data_array_size,
@@ -593,9 +593,9 @@ HPFC_flash(HPFC_display screen,
 
 
 /* Show something: */
-#define HPFC_SHOW(TYPE)										\
+#define XPOMP_SHOW(TYPE)										\
 int												\
-HPFC_show_##TYPE(HPFC_display screen,								\
+XPOMP_show_##TYPE(XPOMP_display screen,								\
 		   const TYPE * data_array,							\
 		   const int X_data_array_size,							\
 		   const int Y_data_array_size,							\
@@ -634,7 +634,7 @@ HPFC_show_##TYPE(HPFC_display screen,								\
 	for(i = 0; i <= X_data_array_size*X_data_array_size; i++)				\
 	    flash_data[i] = 0;									\
 												\
-    return HPFC_flash(screen, flash_data, X_data_array_size, Y_data_array_size,			\
+    return XPOMP_flash(screen, flash_data, X_data_array_size, Y_data_array_size,			\
 		      X_offset, Y_offset, X_zoom_ratio, Y_zoom_ratio);				\
 }
 
@@ -642,34 +642,36 @@ HPFC_show_##TYPE(HPFC_display screen,								\
 /* Show a float array and interpolate color between min_value to
    max_value. If min_value = max_value = 0, automatically scale the
    colors: */
-HPFC_SHOW(float)
+XPOMP_SHOW(float)
 
 
 /* Show a double array and interpolate color between min_value to
    max_value. If min_value = max_value = 0, automatically scale the
    colors: */
-HPFC_SHOW(double)
+XPOMP_SHOW(double)
 
 
-/* Print out a small help about keyboard usage in xHPFC: */
+/* Print out a small help about keyboard usage in xPOMP: */
 void
-HPFC_show_usage()
+XPOMP_show_usage()
 {
-    fprintf(stderr, "xHPFC library keyboard usage:\n"
-	    "\tPalette typeselection:\n"
-	    "0: black and white\n"
-	    "1: rainbow color\n"
-	    "2: rainbow color with alternating half-tone\n"
-	    "3: color centered\n"
-	    "4: user defined\n"
-	    "\tPalette parameters:\n"
+    fprintf(stderr, "xPOMP library keyboard usage:\n"
+	    "\tColor Map typeselection:\n"
+	    "1: grey scale\n"
+	    "2: rainbow color\n"
+	    "3: rainbow color with alternating half-tone\n"
+	    "4: color centered\n"
+	    "0: application defined\n"
+	    "\tColor Map parameters:\n"
 	    "- or _: decrease cycling\n"
 	    "+ or =: increase cycling\n"
 	    "h: increase start value\n" 
 	    "l: decrease start value\n" 
 	    "j: decrease clipping level value\n" 
 	    "k: increase clipping level value\n"
-	    "?: print out the actual palette parameters\n"
+	    "H: combination of 'h' and 'j' keys\n" 
+	    "L: combination of 'k' and 'l' keys\n" 
+	    "?: print out the actual color map parameters\n"
 	    "\n"
 	    "q or ^D: quit.\n");	    
 }
@@ -689,83 +691,83 @@ HPFC_show_usage()
 #define FUNCTION_(name) name##_
 #define FUNCTION(name) name##_
 #endif
-HPFC_display
-FUNCTION_(hpfc_open_display)(int * X_window_size,
-			     int * Y_window_size)
+XPOMP_display
+FUNCTION_(xpomp_open_display)(int * X_window_size,
+			      int * Y_window_size)
 {
-    return HPFC_open_display(*X_window_size, *Y_window_size);
+    return XPOMP_open_display(*X_window_size, *Y_window_size);
 }
 
 
 void
-FUNCTION_(hpfc_close_display)(HPFC_display * screen)
+FUNCTION_(xpomp_close_display)(XPOMP_display * screen)
 {
-    HPFC_close_display(*screen);
+    XPOMP_close_display(*screen);
 }
 
 
 int
-FUNCTION_(hpfc_get_current_default_display)()
+FUNCTION_(xpomp_get_current_default_display)()
 {
-    return HPFC_get_current_default_display();
+    return XPOMP_get_current_default_display();
 }
 
 
 int
-FUNCTION_(hpfc_set_current_default_display)(HPFC_display * screen)
+FUNCTION_(xpomp_set_current_default_display)(XPOMP_display * screen)
 {
-    return HPFC_set_current_default_display(*screen);
-}
-
-
-void
-FUNCTION_(hpfc_get_depth)(HPFC_display * screen)
-{
-    HPFC_get_depth(*screen);
+    return XPOMP_set_current_default_display(*screen);
 }
 
 
 int
-FUNCTION_(hpfc_set_color_map)(HPFC_display * screen,
-		   int * pal,
-		   int * cycle,
-		   int * start,
-		   int * clip)
+FUNCTION_(xpomp_get_depth)(XPOMP_display * screen)
 {
-    return HPFC_set_color_map(*screen, *pal, *cycle, *start, *clip);
+    return XPOMP_get_depth(*screen);
 }
 
 
 int
-FUNCTION_(hpfc_set_user_color_map)(HPFC_display  * screen,
-			unsigned char * red,
-			unsigned char * green,
-			unsigned char * blue)
+FUNCTION_(xpomp_set_color_map)(XPOMP_display * screen,
+			       int * pal,
+			       int * cycle,
+			       int * start,
+			       int * clip)
 {
-    return HPFC_set_user_color_map(*screen, red, green, blue);
+    return XPOMP_set_color_map(*screen, *pal, *cycle, *start, *clip);
 }
 
 
 int
-FUNCTION_(hpfc_wait_mouse)(HPFC_display * screen,
-			   int * X,
-			   int * Y)
+FUNCTION_(xpomp_set_user_color_map)(XPOMP_display  * screen,
+				    unsigned char * red,
+				    unsigned char * green,
+				    unsigned char * blue)
 {
-    return HPFC_wait_mouse(*screen, X, Y);
+    return XPOMP_set_user_color_map(*screen, red, green, blue);
 }
 
 
 int
-FUNCTION_(hpfc_is_mouse)(HPFC_display * screen,
+FUNCTION_(xpomp_wait_mouse)(XPOMP_display * screen,
+			    int * X,
+			    int * Y)
+{
+    return XPOMP_wait_mouse(*screen, X, Y);
+}
+
+
+int
+FUNCTION_(xpomp_is_mouse)(XPOMP_display * screen,
 			int * X,
 			int * Y)
 {
-    return HPFC_is_mouse(*screen, X, Y);
+    return XPOMP_is_mouse(*screen, X, Y);
 }
 
 
 int
-FUNCTION_(hpfc_flash)(HPFC_display * screen,
+FUNCTION_(xpomp_flash)(XPOMP_display * screen,
 		      unsigned char * data_array,
 		      int * X_data_array_size,
 		      int * Y_data_array_size,
@@ -774,7 +776,7 @@ FUNCTION_(hpfc_flash)(HPFC_display * screen,
 		      int * X_zoom_ratio,
 		      int * Y_zoom_ratio)
 {
-    return HPFC_flash(*screen, data_array,
+    return XPOMP_flash(*screen, data_array,
 		      *X_data_array_size, *Y_data_array_size,
 		      *X_offset, *Y_offset,
 		      *X_zoom_ratio, *Y_zoom_ratio);
@@ -782,7 +784,7 @@ FUNCTION_(hpfc_flash)(HPFC_display * screen,
 
 
 int
-FUNCTION_(hpfc_show_real4)(HPFC_display * screen,
+FUNCTION_(xpomp_show_real4)(XPOMP_display * screen,
 			   float * data_array,
 			   int * X_data_array_size,
 			   int * Y_data_array_size,
@@ -793,7 +795,7 @@ FUNCTION_(hpfc_show_real4)(HPFC_display * screen,
 			   double * min_value,
 			   double * max_value)
 {
-    return HPFC_show_float(*screen, data_array,
+    return XPOMP_show_float(*screen, data_array,
 			   *X_data_array_size, *Y_data_array_size,
 			   *X_offset, *Y_offset,
 			   *X_zoom_ratio, *Y_zoom_ratio,
@@ -802,7 +804,7 @@ FUNCTION_(hpfc_show_real4)(HPFC_display * screen,
 
 
 int
-FUNCTION_(hpfc_show_real8)(HPFC_display * screen,
+FUNCTION_(xpomp_show_real8)(XPOMP_display * screen,
 			   double * data_array,
 			   int * X_data_array_size,
 			   int * Y_data_array_size,
@@ -813,7 +815,7 @@ FUNCTION_(hpfc_show_real8)(HPFC_display * screen,
 			   double * min_value,
 			   double * max_value)
 {
-    return HPFC_show_double(*screen, data_array,
+    return XPOMP_show_double(*screen, data_array,
 			    *X_data_array_size, *Y_data_array_size,
 			    *X_offset, *Y_offset,
 			    *X_zoom_ratio, *Y_zoom_ratio,
@@ -822,7 +824,7 @@ FUNCTION_(hpfc_show_real8)(HPFC_display * screen,
 
 
 void
-FUNCTION_(hpfc_show_usage)()
+FUNCTION_(xpomp_show_usage)()
 {
-    HPFC_show_usage();
+    XPOMP_show_usage();
 }
