@@ -498,9 +498,9 @@ graph dg;
 
     debug(8,"reference_conflicting_p","begin\n");
     ifdebug(8) {
-	(void) fprintf(stderr,"Reference 1 %p: ", (unsigned int) r1);
+	(void) fprintf(stderr,"Reference 1 %p: ", r1);
 	print_words(stderr, words_reference(r1));
-	(void) fprintf(stderr,"\nReference 2 %p: ", (unsigned int) r2);
+	(void) fprintf(stderr,"\nReference 2 %p: ", r2);
 	print_words(stderr, words_reference(r2));
 	(void) fputc('\n',stderr);
     }
