@@ -326,11 +326,11 @@ entity      tau;
     }
 
     if (pcs->lomega == NIL)	/* A cst Schedule for the source */
-      del = VALUE_CONST(INFINITY );
+      del = INFINITY;
     else {
       os = INT(CAR(pcs->lomega));
       if (pcd->lomega == NIL)	/* A cst schedule for the destination */
-	del = VALUE_CONST(INFINITY );
+	del = INFINITY;
       else {
 	od = INT(CAR(pcd->lomega));
 
