@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 #include "genC.h"
-#include "list.h"
 #include "ri.h"
 #include "constants.h"
 #include "ri-util.h"
@@ -41,7 +40,6 @@
 #include "graph.h"
 #include "paf_ri.h"
 #include "paf-util.h"
-#include "mapping.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "array_dfg.h"
@@ -172,17 +170,17 @@ boolean my_contrainte_normalize(c, is_egalite)
  boolean       is_egalite;
 {
  boolean       is_c_norm = TRUE;
- int           a, nb0 = 0;
+ Value        a, nb0 = VALUE_ZERO;
 
  if ((c != NULL) && (c->vecteur != NULL)
-        && (a = vect_pgcd_except(c->vecteur, TCST)) != 0)
+     && value_notzero_p(a = vect_pgcd_except(c->vecteur, TCST)))
     {
-     nb0 = abs(vect_coeff(TCST, c->vecteur)) % a;
+     nb0 = value_mod(value_abs(vect_coeff(TCST, c->vecteur)),a);
      if (is_egalite) 
 	{
-         if (nb0 == 0)
+         if (value_zero_p(nb0))
 	    {
-             (void) vect_div(c->vecteur, abs(a));
+             (void) vect_div(c->vecteur, value_abs(a));
              c->vecteur = vect_clean(c->vecteur);
             }
          else is_c_norm= FALSE;
@@ -190,14 +188,14 @@ boolean my_contrainte_normalize(c, is_egalite)
 
      else 
 	{
-         if (nb0 == 0) 
+         if (value_zero_p(nb0) )
 	    {
-             vect_chg_coeff(&(c->vecteur), TCST,\
-			    -vect_coeff(TCST, c->vecteur));
-             (void) vect_div(c->vecteur, abs(a));
+             vect_chg_coeff(&(c->vecteur), TCST,
+			    value_uminus(vect_coeff(TCST, c->vecteur)));
+             (void) vect_div(c->vecteur, value_abs(a));
              c->vecteur = vect_clean(c->vecteur);
-             vect_chg_coeff(&(c->vecteur), TCST,\
-			    -vect_coeff(TCST, c->vecteur));
+             vect_chg_coeff(&(c->vecteur), TCST,
+			    value_uminus(vect_coeff(TCST, c->vecteur)));
             }
         }
     }
@@ -505,7 +503,7 @@ void analyze_expression(e, d)
            else
               {
                vect1 = normalized_linear(expression_normalized(exp1));
-               val = (int)vect_pgcd_all(vect1);
+               val = VALUE_TO_INT(vect_pgcd_all(vect1));
                if ((val%d2) == 0)
                   {
                    vect1 = vect_div(vect1, d2);
@@ -537,7 +535,7 @@ void analyze_expression(e, d)
                    lexp2 = CDR(lexp2);
                    vect1 = normalized_linear(expression_normalized(exp_a));
                    vect1 = vect_multiply(vect1, val);
-                   val = (int)vect_pgcd_all(vect1);
+                   val = VALUE_TO_INT(vect_pgcd_all(vect1));
                    d2 = expression_to_int(exp1);
                    if ((val%d1) == 0)
                       {
@@ -596,7 +594,7 @@ void analyze_expression(e, d)
                    vect1 = normalized_linear(expression_normalized(exp_a));
                    vect1 = vect_multiply(vect1, val);
 
-                   val = (int)vect_pgcd_all(vect1);
+                   val = VALUE_TO_INT(vect_pgcd_all(vect1));
                    d2 = expression_to_int(exp2);
 
                    if ((val%d1) == 0)
@@ -647,7 +645,7 @@ void analyze_expression(e, d)
 	   /* case of + or - */
            analyze_expression(&exp1, &d1);
            analyze_expression(&exp2, &d2);
-           *d = ppcm(d1, d2);
+           *d = sol_ppcm(d1, d2);
 
            if ((d1 == 1) && (d2 != 1))
               {
@@ -665,7 +663,7 @@ void analyze_expression(e, d)
                     vect1 = vect_add(vect1, vect2);
                else vect1 = vect_substract(vect1, vect2);
 
-               val = (int)vect_pgcd_all(vect1);
+               val = VALUE_TO_INT(vect_pgcd_all(vect1));
                if ((val%(*d)) == 0)
                   {
                    vect1 = vect_div(vect1, d2);
@@ -699,7 +697,7 @@ void analyze_expression(e, d)
                     vect1 = vect_add(vect1, vect2);
                else vect1 = vect_substract(vect1, vect2);
 
-               val = (int)vect_pgcd_all(vect1);
+               val = VALUE_TO_INT(vect_pgcd_all(vect1));
                if ((val%(*d)) == 0)
                   {
                    vect1 = vect_div(vect1, d2);
@@ -735,7 +733,7 @@ void analyze_expression(e, d)
                      vect1 = vect_add(vect1, vect2);
                else  vect1 = vect_substract(vect1, vect2);
 
-               val = (int)vect_pgcd_all(vect1);
+               val = VALUE_TO_INT(vect_pgcd_all(vect1));
                if ((val%(*d)) == 0)
                   {
                    vect1 = vect_div(vect1, (*d));
