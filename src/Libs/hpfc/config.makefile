@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1995/03/29 09:25:24 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1995/04/19 10:47:37 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -42,6 +42,7 @@ MAIN=		main
 
 LIB_CFILES=	directives.c \
 		dynamic.c \
+		remapping.c \
 		hpfc.c \
 		debug-util.c \
 		hpfc-util.c \
