@@ -1,4 +1,4 @@
-/* $RCSfile: generate.c,v $ ($Date: 1995/10/05 11:32:28 $, )
+/* $RCSfile: generate.c,v $ ($Date: 1995/10/10 11:38:08 $, )
  * version $Revision$
  * 
  * Fabien Coelho, May 1993
@@ -6,9 +6,6 @@
 
 #include "defines-local.h"
 #include "bootstrap.h" 
-
-extern instruction MakeAssignInst(syntax l, expression r);
-extern entity CreateIntrinsic(string name); /* in syntax.h */
 
 /* ??? this should work (but that is not the case yet),
  * with every call with no write to distributed arrays. 
@@ -42,8 +39,8 @@ list *lhp, *lnp;
     
     pips_assert("reference",
 		syntax_reference_p(expression_syntax(w)) &&
-		(!array_distributed_p
-		 (reference_variable(syntax_reference(expression_syntax(w))))));
+	    (!array_distributed_p
+	     (reference_variable(syntax_reference(expression_syntax(w))))));
 
     /* references to distributed arrays:
      * w(A(I)) = B(I)
@@ -774,9 +771,8 @@ syntax *sp;
     (*sp)=make_syntax(is_syntax_reference, make_reference(temp, NIL));
 
     stat=make_stmt_of_instr
- 	(MakeAssignInst 	
-	 (make_syntax(is_syntax_reference, 		
-		      make_reference(temp, NIL)),
+ 	(make_assign_instruction
+	 (reference_to_expression(make_reference(temp, NIL)),
 	  expr_compute_local_index(array,
 				   i, 			
 				   UpdateExpressionForModule(node_module,
@@ -807,7 +803,7 @@ reference ref;
     expression
 	condition=((replicated_p(array))? 
 		   (MakeBinaryCall
-		    (CreateIntrinsic(AND_OPERATOR_NAME), 				
+		    (entity_intrinsic(AND_OPERATOR_NAME),
 		     condition_senderp(),
 		     condition_not_computer_in_owners())):
 		   (condition_senderp()));
