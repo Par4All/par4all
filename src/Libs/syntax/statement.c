@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/04 18:39:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/03/30 22:30:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_statement[] = "%A% ($Date: 1997/02/04 18:39:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_statement[] = "%A% ($Date: 1997/03/30 22:30:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -1129,6 +1129,20 @@ static int seen = FALSE;
 void reset_first_statement()
 {
     seen = FALSE;
+}
+
+bool
+first_executable_statement_seen()
+{
+    return seen;
+}
+
+void
+check_in_declarations()
+{
+    if(first_executable_statement_seen()) {
+	ParserError("Syntax", "Declaration appears after executable statement");
+    }
 }
 
 #define SIZE 32384
