@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/15 15:40:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/03 00:01:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/15 15:40:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/07/03 00:01:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -476,6 +476,7 @@ list ldecl;
 			 chars = CHAIN_SWORD(chars, " ");
 			 chars = gen_nconc(chars, 
 					   words_declaration(e, !from_hpfc));
+			 attach_declaration_size_type_to_words(chars, "CHARACTER", i);
 			 ADD_WORD_LIST_TO_TEXT(t_chars, chars);
 		     }
 		 }
@@ -485,8 +486,9 @@ list ldecl;
 			 chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
 			 chars = gen_nconc(chars, 
 					   words_declaration(e, !from_hpfc));
+			 attach_declaration_type_to_words(chars, "CHARACTER*(*)");
 			 ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		 }
+		     }
 		 else
 		     pips_internal_error("unexpected value\n");
 		 break;
@@ -501,12 +503,20 @@ list ldecl;
     r = make_text(gen_nconc(before, after_before));
 
     ADD_WORD_LIST_TO_TEXT(r, ph);
+    attach_declaration_type_to_words(ph, "INTEGER");
     ADD_WORD_LIST_TO_TEXT(r, pi);
+    attach_declaration_type_to_words(pi, "INTEGER");
     ADD_WORD_LIST_TO_TEXT(r, pf4);
+    /* Could use attach_declaration_size_type_to_words(): */
+    attach_declaration_type_to_words(pf4, "REAL*4");
     ADD_WORD_LIST_TO_TEXT(r, pf8);
+    attach_declaration_type_to_words(pf8, "REAL*8");
     ADD_WORD_LIST_TO_TEXT(r, pl);
+    attach_declaration_type_to_words(pl, "LOGICAL");
     ADD_WORD_LIST_TO_TEXT(r, pc);
+    attach_declaration_type_to_words(pc, "COMPLEX");
     ADD_WORD_LIST_TO_TEXT(r, ps);
+    attach_declaration_type_to_words(ps, "CHARACTER");
     MERGE_TEXTS(r, t_chars);
 
     return (r);
@@ -1482,30 +1492,30 @@ list words_declaration(
     bool prettyprint_common_variable_dimensions_p)
 {
     list pl = NIL;
-
     pl = CHAIN_SWORD(pl, entity_local_name(e));
 
-    if (!type_variable_p(entity_type(e))) return pl;
-
-    if (variable_in_common_p(e) && !prettyprint_common_variable_dimensions_p)
-	return pl;
-
-    if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
-    {
-	list dims = variable_dimensions(type_variable(entity_type(e)));
+    if (type_variable_p(entity_type(e))) {
+	if (!(variable_in_common_p(e) && !prettyprint_common_variable_dimensions_p)) {
+	    if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
+	    {
+		list dims = variable_dimensions(type_variable(entity_type(e)));
 	
-	pl = CHAIN_SWORD(pl, "(");
+		pl = CHAIN_SWORD(pl, "(");
 
-	MAPL(pd, 
-        {
-	    pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
-	    if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, ",");
-	}, 
-	    dims);
+		MAPL(pd, 
+		     {
+			 pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
+			 if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, ",");
+		     }, 
+		     dims);
 	
-	pl = CHAIN_SWORD(pl, ")");
+		pl = CHAIN_SWORD(pl, ")");
+	    }
+	}
     }
     
+    attach_declaration_to_words(pl, e);
+
     return(pl);
 }
 
