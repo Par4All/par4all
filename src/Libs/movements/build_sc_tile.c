@@ -20,28 +20,36 @@
 #include "tiling.h"
 
 
-Pvecteur make_loop_indice_equation(Pbase loop_indices,tiling  tile, Pvecteur tile_delay, 
-				      Pvecteur tile_indices,  Pvecteur tile_local_indices,int rank)
+Pvecteur 
+make_loop_indice_equation(
+    Pbase loop_indices,
+    tiling tile, 
+    Pvecteur tile_delay, 
+    Pvecteur tile_indices,
+    Pvecteur tile_local_indices,
+    int rank)
 { 
-    matrice P=(matrice) tiling_tile(tile);
+    matrice P= (matrice) tiling_tile(tile);
      Pvecteur to = (Pvecteur)tiling_origin(tile);
     Pvecteur pv; 
     Pvecteur lti,li,ti= tile_indices;
     int m = vect_size(loop_indices); 
     int n= m;
-    int i,j,val;
+    int i,j;
+    Value val;
     for (i=1,lti =tile_local_indices, li = loop_indices; i<rank;
 	 lti =lti->succ,li= li->succ, i++);
-    pv = vect_make(NULL,vecteur_var(lti),1,TCST,0);
+    pv = vect_make(NULL,vecteur_var(lti),1,TCST,VALUE_ZERO);
 
     for (j=1;j<=m; j++,ti = ti->succ) {
-	if (ACCESS(P,n,i,j)!= 999) { 
+	if (value_ne(ACCESS(P,n,i,j),VALUE_CONST(999))) { 
 	    vect_add_elem(&pv,vecteur_var(ti), ACCESS(P,n,i,j));
-	    if ((val = vect_coeff(li->var, tile_delay))) 
-		vect_add_elem(&pv,TCST,- val * ACCESS(P,n,i,j));
+	    if (value_notzero_p(val = vect_coeff(li->var, tile_delay)))
+		vect_add_elem(&pv,TCST,
+			      value_uminus(value_mult(val,ACCESS(P,n,i,j))));
 	} 
     }
-    if ((val = vect_coeff(li->var,to))) 
+    if (value_notzero_p(val = vect_coeff(li->var,to)))
 	vect_add_elem(&pv,TCST,val);
     ifdebug(8) {
 	fprintf(stderr, "Equation defining the tiling\n");
@@ -70,7 +78,8 @@ Pvecteur tile_indices, tile_local_indices;
     matrice P = (matrice) tiling_tile(t);
     Pcontrainte pc;
     Pvecteur li,to,lti,ti,td,pv;
-    int n,m,i,j,min,max,val;
+    int n,m,i,j;
+    Value min,max,val;
 
     debug_on("MOVEMENT_DEBUG_LEVEL");
     debug(8,"loop_bounds_to_tile_bounds","begin\n");
@@ -91,21 +100,22 @@ Pvecteur tile_indices, tile_local_indices;
 	 sc->dimension++,lti = lti->succ,li=li->succ) {
 	j=1;
 	ti = tile_indices;
-	pv = vect_new(vecteur_var(lti),1);
-	vect_add_elem(&pv,vecteur_var(li),-1);
+	pv = vect_new(vecteur_var(lti),VALUE_ONE);
+	vect_add_elem(&pv,vecteur_var(li),VALUE_MONE);
 	for (j=1;j<=m; j++,ti = ti->succ) {
-	    if (ACCESS(P,n,i,j)!= 999) { 
+	    if (value_ne(ACCESS(P,n,i,j),VALUE_CONST(999))) { 
 		vect_add_elem(&pv,vecteur_var(ti), ACCESS(P,n,i,j));
-		if ((val = vect_coeff(li->var,td))) 
-		    vect_add_elem(&pv,TCST,- val * ACCESS(P,n,i,j));
+		if (value_notzero_p(val = vect_coeff(li->var,td)))
+		    vect_add_elem(&pv,TCST,
+			value_uminus(value_mult(val,ACCESS(P,n,i,j))));
 	    }   else {
 		sc_force_variable_to_zero(sc,vecteur_var(ti));
 		sc_add_egalite(sc,
 			       contrainte_make(vect_new(vecteur_var(ti),
-							1)));
+							VALUE_ONE)));
 	    }
 	}
-	if ((val = vect_coeff(li->var,to))) 
+	if (value_notzero_p(val = vect_coeff(li->var,to))) 
 	    vect_add_elem(&pv,TCST,val);
 	pc= contrainte_make(pv);
 	sc_add_egalite(sc,pc);
@@ -118,22 +128,23 @@ Pvecteur tile_indices, tile_local_indices;
 	min = ACCESS(P,n,1,j);
 	max = ACCESS(P,n,1,j);
 	for (i=1;i<=n;i++) {
-	    min = ( ACCESS(P,n,i,j) < min) ? ACCESS(P,n,i,j) : min;
-	    max = ( ACCESS(P,n,i,j) > max) ? ACCESS(P,n,i,j) : max;
+	    Value a = ACCESS(P,n,i,j);
+	    value_minimum(min, a);
+	    value_maximum(max, a);
 	}
-	pv = vect_new(vecteur_var(lti), -1);
-	vect_add_elem(&pv,TCST,0);
+	pv = vect_new(vecteur_var(lti), VALUE_MONE);
+	vect_add_elem(&pv,TCST,VALUE_ZERO);
 	pc = contrainte_make(pv);
 	sc_add_ineg(sc,pc);
-	pv = vect_new(vecteur_var(lti), 1);
-	vect_add_elem(&pv,TCST,- max +1);
+	pv = vect_new(vecteur_var(lti), VALUE_ONE);
+	vect_add_elem(&pv,TCST,value_minus(VALUE_ONE, max));
 	pc = contrainte_make(pv);
 	sc_add_ineg(sc,pc);
     }
   
     /* build the constraints    0 <= ti  */
     for (ti =tile_indices; !VECTEUR_NUL_P(ti); ti = ti->succ) {
-	pv = vect_new(vecteur_var(ti), -1);
+	pv = vect_new(vecteur_var(ti), VALUE_MONE);
 	pc = contrainte_make(pv);
 	sc_add_ineg(sc,pc);
     }
