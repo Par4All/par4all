@@ -299,12 +299,12 @@ inst_spec: parameter_inst
 	| implicit_inst
 	| dimension_inst
 	| equivalence_inst
-	| full_common_inst
+	| common_inst {}
 	| type_inst
 	| external_inst
 	| intrinsic_inst
 	| save_inst
-	| full_data_inst
+	| data_inst {}
 	;
 
 inst_exec: format_inst
@@ -731,10 +731,6 @@ dim_tableau: expression
 	    }
 	;
 
-full_common_inst: common_inst
-	{}
-	;
-
 common_inst: common declaration
 	    { 
 		$$ = MakeCommon(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
@@ -812,10 +808,6 @@ dimension: TK_DIMENSION
 	    {
 		CurrentType = type_undefined;
 	    }
-	;
-
-full_data_inst: data_inst
-	    {}
 	;
 
 data_inst: TK_DATA ldatavar TK_SLASH ldataval TK_SLASH
