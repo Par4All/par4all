@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/10/05 11:32:33 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/02/16 12:02:19 $, )
  * version $Revision$
  */
 
@@ -481,8 +481,13 @@ remove_variables_from_system(
     Psysteme *ps,
     list /* of entity (Variable) */ *plv)
 {
-    MAP(ENTITY, e, sc_projection_along_variable_ofl_ctrl
-	(ps, (Variable) e, NO_OFL_CTRL), *plv);
+    MAP(ENTITY, e,
+    {
+	pips_debug(8, "removing variable %s\n", entity_local_name(e));
+	sc_projection_along_variable_ofl_ctrl(ps, (Variable) e, NO_OFL_CTRL);
+    },
+	*plv);
+
     gen_free_list(*plv), *plv=NIL;
 }
 
