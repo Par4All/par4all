@@ -282,7 +282,7 @@ static bool tp_close_the_workspace(string s)
 	{
 	    if (same_string_p(s, current))
 	    {
-		close_workspace ();
+		close_workspace(FALSE);
 		result = TRUE;
 	    }
 	    else
@@ -598,7 +598,7 @@ i_open:	TK_OPEN TK_NAME TK_ENDOFLINE
 		    pips_user_warning("Closing workspace %s "
 				      "before opening %s!\n",
 				      db_get_current_workspace_name(), $2);
-		    close_workspace();
+		    close_workspace(FALSE);
 		}
 		if (!workspace_exists_p($2))
 		    pips_user_error("No workspace %s to open!\n", $2);
@@ -641,7 +641,7 @@ i_create: TK_CREATE TK_NAME /* workspace name */
 		    {
 			if (!create_workspace($3))
 			{
-			    db_close_workspace();
+			    db_close_workspace(FALSE);
 			    user_log("Deleting workspace...\n");
 			    delete_workspace($2);
 			    pips_user_error("Could not create workspace %s\n", 
