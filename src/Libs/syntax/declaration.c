@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/26 11:15:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/26 11:16:42 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/04/26 11:15:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/04/26 11:16:42 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -967,7 +967,7 @@ entity m;
 	if(!ENDP(decls)) {
 	    (void) fprintf(stderr, "\nLayouts for areas (commons):\n\n");
 	}
-	MAPL(ENTITY, e, {
+	MAP(ENTITY, e, {
 	    if(type_area_p(entity_type(e))) {
 		ifdebug(1) {
 		    print_common_layout(e);
@@ -997,11 +997,9 @@ entity c;
 	(void) fprintf(stderr, "* empty area *\n\n");
     }
     else {
-	MAPL(cm, 
+	MAP(ENTITY, m, 
 	     {
-		 entity m = ENTITY(CAR(cm));
-	 
-		 pips_assert("print_common_layout",
+		 pips_assert("RAM storage",
 			     storage_ram_p(entity_storage(m)));
 		 (void) fprintf(stderr,
 				"\tVariable %s, offset = %d, size = %d\n", 
