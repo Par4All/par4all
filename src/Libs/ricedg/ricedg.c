@@ -800,15 +800,15 @@ set region;
 				if (pchead1 != NIL) 
 				{
 				    dg_arc_label_conflicts(dals2s1) = pchead1;
-				    successor_arc_label(s2su) = 
-					dals2s1;
+				    successor_arc_label_(s2su) = 
+					newgen_arc_label(dals2s1);
 				}
 				else 
 				{ 
 				    /* This successor has only one 
 				       conflict that has been killed.*/  
 				    successor_vertex(s2su) = vertex_undefined;
-				    successor_arc_label(s2su) = (char *) 
+				    successor_arc_label_(s2su) = (char *) 
 					dg_arc_label_undefined;
 				    gen_free(s2su);
 				    ps2su = CDR(ps2su);
