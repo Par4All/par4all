@@ -352,9 +352,6 @@ main(int argc,
    pips_update_props_handler = update_options;
    pips_request_handler = wpips_user_request;
 
-   /* Added for debug. RK, 8/06/93. */
-   malloc_debug(1);
-
    initialize_newgen();
    initialize_sc((char*(*)(Variable))entity_local_name);
 
