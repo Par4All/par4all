@@ -201,7 +201,7 @@ MakeComplexResult()
 type 
 MakeDoublecomplexResult()
 {
-    return MakeAnyScalarResult(is_basic_complex, DEFAULT_COMPLEX_TYPE_SIZE);
+    return MakeAnyScalarResult(is_basic_complex, DEFAULT_DOUBLECOMPLEX_TYPE_SIZE);
 }
 
 type 
