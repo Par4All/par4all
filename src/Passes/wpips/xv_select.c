@@ -4,6 +4,7 @@
 #include <sys/resource.h>
 #include <xview/xview.h>
 #include <xview/panel.h>
+#include <xview/notice.h>
 #include <xview/text.h>
 #include <types.h>
 #include <setjmp.h>
@@ -101,6 +102,25 @@ char *name;
 	    longjmp(pips_top_level, 1);
 	}
 	else {
+			/* Code added to confirm for a database destruction before
+				opening a database with the same name.
+					RK 18/05/1993. */
+		if (workspace_exists_p(name))
+		{
+			int result;
+			result = notice_prompt(xv_find(main_frame, WINDOW, 0),
+				NULL,
+				NOTICE_MESSAGE_STRINGS,
+				"The database", name, "already exists!",
+				"Do you really want to remove it?",
+				NULL,
+				NOTICE_BUTTON_YES,  "Yes, remove the database",
+				NOTICE_BUTTON_NO,   "No, cancel",
+				NULL);
+			if (result == NOTICE_NO)
+				return(FALSE);
+		}
+
 	    db_create_program(name);
 	    mchoose("Create Workspace", 
 		    fortran_list_length, fortran_list, 
@@ -272,6 +292,7 @@ void create_select_menu()
 			for ergonomic reasons. :-) RK, 19/02/1993. */
     pmenu = 
 	xv_create(NULL, MENU_COMMAND_MENU, 
+		  MENU_GEN_PIN_WINDOW, main_frame, "Workspace Menu",
 		  MENU_APPEND_ITEM, open_pgm,
 		  MENU_APPEND_ITEM, create_pgm,
 		  MENU_APPEND_ITEM, close_pgm,
@@ -282,6 +303,7 @@ void create_select_menu()
 			:-) RK, 19/02/1993. */
     menu = 
 	xv_create(NULL, MENU_COMMAND_MENU, 
+		  MENU_GEN_PIN_WINDOW, main_frame, "Selection Menu",
 		  MENU_APPEND_ITEM, module_item,
 		  MENU_PULLRIGHT_ITEM, "Workspace", pmenu,
 		  MENU_ACTION_ITEM, "Directory", start_directory_notify,
