@@ -31,6 +31,10 @@
  * TailleDeMaPile = Max number of nested (mem_spy_begin, mem_spy_end).
  * Please change this number accordingly to your needs. 
  *
+ * Modifications:
+ *  - verbosity parameter added
+ *  - sbrk(0) replaced by mallinfo() to obtain more precise information
+ *  - new function mem_spy_info() to print mallinfo
  */
 
 #include <stdio.h>
@@ -39,6 +43,10 @@
 #include <assert.h>
 
 extern int etext;
+
+#include "misc-local.h"
+
+#define ABS(x) ((x>0)?(x):-(x))
 
 /* My own stack (do not rely on any package!) */
 #define TailleDeMaPile 30
@@ -60,13 +68,23 @@ static MemSpyStack cumul_size_stack = NULL;
 */
 static int MemSpyUsed = 0;
 
-/* To control verbosity */
+/* To control verbosity: from 2, max, to -1, shut up */
 static int verbosity = 2;
 
-void mem_spy_init(int v)
+/* To control granularity: threshold in MB for reporting changes in memory 
+ * use. 0.004 is about one page.
+ */
+static double granularity = 0.;
+
+/* measurement chosen */
+static measurement_type measurement = NET_MEASURE;
+
+void mem_spy_init(int v, double g, measurement_type t)
 {
-    assert(0<=v && v<=2);
+    assert(-1<=v && v<=2);
     verbosity = v;
+    granularity = g;
+    measurement = t;
     MemSpyUsed = 1;
     current_size_stack = (MemSpyStack) malloc(sizeof(*current_size_stack));
     current_size_stack->index = -1;
@@ -93,13 +111,28 @@ void mem_spy_begin()
     /* Do nothing if not between <mem_spy_init> ... <mem_spy_reset> */
     if (MemSpyUsed == 1)
     {
+	struct mallinfo heap_info = mallinfo();
+	int memory_size = 0;
+
+	switch(measurement) {
+	case SBRK_MEASURE: memory_size = sbrk(0) - etext;
+	    break;
+	case NET_MEASURE: memory_size = heap_info.uordblks;
+	    break;
+	case GROSS_MEASURE: memory_size = heap_info.uordbytes;
+	    break;
+	default:
+	    abort();
+	}
+
 	/* Do not go beyond stack limits */
 	assert(current_size_stack->index < TailleDeMaPile-1);
 
 	/* Push the current memory size */
 	current_size_stack->index += 1;
+
 	current_size_stack->elt[current_size_stack->index] = 
-	    (double) ((sbrk(0) - etext)/(double)(1 << 20));
+	    (double) (measurement/(double)(1 << 20));
 
 	/* Push 0 on the cumul_size_stack, since there are currently
          * no nested guarded code fragment 
@@ -118,8 +151,22 @@ char * s;
     /* Do nothing if not between <mem_spy_init> ... <mem_spy_reset> */
     if (MemSpyUsed == 1)
     {
+	struct mallinfo heap_info = mallinfo();
+	int memory_size = 0;
+
+	switch(measurement) {
+	case SBRK_MEASURE: memory_size = sbrk(0) - etext;
+	    break;
+	case NET_MEASURE: memory_size = heap_info.uordblks;
+	    break;
+	case GROSS_MEASURE: memory_size = heap_info.uordbytes;
+	    break;
+	default:
+	    abort();
+	}
+
 	/* Pop memory size at entry of the code fragment */
-	current_end = (sbrk(0) - etext)/(double)(1 << 20);
+	current_end = measurement/(double)(1 << 20);
 	current_begin = current_size_stack->elt[current_size_stack->index];
 	current_size_stack->index -= 1;
 	
@@ -131,16 +178,24 @@ char * s;
 	diff = current_end - current_begin;
 	proper = diff - cumul; 
 	
+	/* if verbosity==-1, nothing is printed */
 	if(verbosity==2 ||
-	   (verbosity==1 && diff !=0) ||
-	   (verbosity==0 && proper != 0)) {
+	   (verbosity==1 && ABS(diff) >= granularity) ||
+	   (verbosity==0 && ABS(proper) >= granularity)) {
 	    /* Prettyprint the results */
 	    for (i=0; i<=current_size_stack->index; i++)
 		fprintf(stderr, "  ");
 
+	    /*
 	    fprintf(stderr, "MEM_SPY "
 		    "[%s] begin: %10.3fMB end: %10.3fMB diff: %10.3fMB "
 		    "proper: %10.3fMB\n",
+		    s, current_begin, current_end, diff, proper);
+		    */
+
+	    fprintf(stderr, "MEM_SPY "
+		    "[%s] begin: %10.6fMB end: %10.6fMB diff: %10.6fMB "
+		    "proper: %10.6fMB\n",
 		    s, current_begin, current_end, diff, proper);
 	}
 
@@ -150,4 +205,27 @@ char * s;
 	if (cumul_size_stack->index != -1)
 	    cumul_size_stack->elt[cumul_size_stack->index] += diff;
     }
+}
+
+/* To print mallinfo, for debugging memory leaks*/
+void mem_spy_info()
+{
+    struct mallinfo heap_info = mallinfo();
+
+    fprintf(stderr, "total space in arena: \t%d", heap_info.arena);
+    fprintf(stderr, "number of ordinary blocks: \t%d", heap_info.ordblks);
+    fprintf(stderr, "number of small blocks: \t%d", heap_info.smblks);
+    fprintf(stderr, "number of holding blocks: \t%d", heap_info.hblks);
+    fprintf(stderr, "space in holding block headers: \t%d", heap_info.hblkhd);
+    fprintf(stderr, "space in small blocks in use: \t%d", heap_info.usmblks);
+    fprintf(stderr, "space in free small blocks: \t%d", heap_info.fsmblks);
+    fprintf(stderr, "space in ordinary blocks in use: \t%d", heap_info.uordblks);
+    fprintf(stderr, "space in free ordinary blocks: \t%d", heap_info.fordblks);
+    fprintf(stderr, "cost of enabling keep option: \t%d", heap_info.keepcost);
+    fprintf(stderr, "max size of small blocks: \t%d", heap_info.mxfast);
+    fprintf(stderr, "number of small blocks in a holding block: \t%d", heap_info.nlblks);
+    fprintf(stderr, "small block rounding factor: \t%d", heap_info.grain);
+    fprintf(stderr, "space (including overhead) allocated in ord. blks: \t%d", heap_info.uordbytes);
+    fprintf(stderr, "number of ordinary blocks allocated: \t%d", heap_info.allocated);
+    fprintf(stderr, "bytes used in maintaining the free tree: \t%d", heap_info.treeoverhead);
 }
