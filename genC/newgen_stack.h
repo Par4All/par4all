@@ -1,7 +1,7 @@
 /*  STACK MANAGEMENT -- headers
  *  
  * $RCSfile: newgen_stack.h,v $ version $Revision$
- * $Date: 1995/02/03 09:49:00 $, 
+ * $Date: 1995/02/03 10:10:25 $, 
  * got on %D%, %T%
  *
  *  - a stack is declared with type stack (internals not visible from here!)
@@ -16,13 +16,16 @@
  *  - stack_iterator_{init,next_and_go,end} to iterate.
  *  - see STACK_MAP for instance.
  *
+ *  newgen_assert should be included before.
+ *
  *  Fabien COELHO 05/12/94
  */
+
 
 #ifndef STACK_INCLUDED
 #define STACK_INCLUDED
 
-#ifdef __STRICT_ANSI__
+#ifdef __STDC__
 #define _PROTO(x) x
 #else
 #define _PROTO(x) ()
@@ -50,7 +53,7 @@ typedef struct __stack_iterator *stack_iterator;
 /*   allocation
  */
 extern stack stack_make _PROTO((int, int, int)); /* type, bulk_size, policy */
-extern void stack_free _PROTO((stack));
+extern void stack_free _PROTO((stack*));
 
 /*   observers
  */
