@@ -105,7 +105,7 @@ static int
     unique_logical_number = 0,
     unique_complex_number = 0;
 
-void reset_unique_temporary_variable_numbers_numbers()
+void reset_unique_variable_numbers()
 {
     unique_integer_number=0;
     unique_float_number=0;
@@ -120,48 +120,45 @@ void reset_unique_temporary_variable_numbers_numbers()
 
 entity
 make_new_scalar_variable(entity module,
-                         tag variable_type)
+                         basic b)
 {
+   string module_name = entity_module_name(module);
    char buffer[20];
    entity e;
-
-   string module_name = entity_module_name(module);
    
-   basic base = MakeBasic(variable_type);
    do
    {
-      switch(basic_tag(base))
-      {
-	case is_basic_int:
-          sprintf(buffer,"%s%d", TMPINTPREFIX, unique_integer_number++);
-          break;
-	case is_basic_float:
-          sprintf(buffer,"%s%d", TMPFLOATPREFIX, unique_float_number++);
-          break;
-	case is_basic_logical:
-          sprintf(buffer,"%s%d", TMPLOGICALPREFIX, unique_logical_number++);
-          break;
-	case is_basic_complex:
-          sprintf(buffer,"%s%d", TMPCOMPLEXPREFIX, unique_complex_number++);
-          break;
-	default:
-          pips_error("make_new_scalar_variable",
-                     "unknown basic tag: %d\n",
-                     basic_tag(base));
-          break;
-      }
+       switch(basic_tag(b))
+       {
+       case is_basic_int:
+	   sprintf(buffer,"%s%d", TMPINTPREFIX, unique_integer_number++);
+	   break;
+       case is_basic_float:
+	   sprintf(buffer,"%s%d", TMPFLOATPREFIX, unique_float_number++);
+	   break;
+       case is_basic_logical:
+	   sprintf(buffer,"%s%d", TMPLOGICALPREFIX, unique_logical_number++);
+	   break;
+       case is_basic_complex:
+	   sprintf(buffer,"%s%d", TMPCOMPLEXPREFIX, unique_complex_number++);
+	   break;
+       default:
+	   pips_error("make_new_scalar_variable", "unknown basic tag: %d\n",
+		      basic_tag(b));
+	   break;
+       }
    }
    while(gen_find_tabulated(concatenate(module_name,
                                         MODULE_SEP_STRING,
                                         buffer,
                                         NULL),
                             entity_domain) != entity_undefined);
-
-   pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(base));
-
-   e = make_scalar_entity(buffer, module_name, base);
+   
+   pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(b));
+   
+   e = make_scalar_entity(buffer, module_name, b);
    AddEntityToDeclarations(e, module);
-    
+   
    return e;
 }
 
