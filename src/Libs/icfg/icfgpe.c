@@ -65,7 +65,8 @@ list effects_filter(list l_effs, entity e_flt)
     effect eff = EFFECT(CAR(ce));
     action ac = effect_action(eff);
     reference ref = effect_reference(eff);
-    if (entity_conflict_p(e_flt, reference_variable(ref)) && !action_read_p(ac))
+    entity ent = reference_varaible(ref);
+    if (entity_conflict_p(e_flt, ent) && !action_read_p(ac))
       l_flt = CONS(EFFECT, eff, l_flt);
   }, l_effs);
   return l_flt;
