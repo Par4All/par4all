@@ -33,20 +33,17 @@
  *
  * FC, Feb 21, 1994
  */
-
 #include "mapping.h"
 
-/*
-  special characters
-*/
+/*  special characters
+ */
 #define MODULE_SEP ':'
 #define MODULE_SEP_STRING ":"
 #define LABEL_PREFIX "@"
 #define MAIN_PREFIX "%"
 
-/*
-  constant names
-*/
+/*  constant names
+ */
 #define BLANK_COMMON_LOCAL_NAME "*BLANK*"
 #define DYNAMIC_AREA_LOCAL_NAME "DYNAMIC"
 #define EMPTY_LABEL_NAME LABEL_PREFIX
@@ -166,7 +163,7 @@
 #define INDENTATION 3
 #define MAXIMAL_MODULE_NAME_SIZE 36
 
-/* Default values
+/*   default values
  */
 #define STATEMENT_NUMBER_UNDEFINED (-1)
 #define STATEMENT_ORDERING_UNDEFINED (-1)
@@ -186,7 +183,6 @@
 
 /*   MISC: newgen shorthands
  */
-
 #define entity_declarations(e) (code_declarations(entity_code(e)))
 
 #define effect_system(e) \
@@ -203,8 +199,10 @@
 		  string_undefined, i)
 
 #define loop_to_instruction(l) make_instruction(is_instruction_loop, l)
+#define test_to_instruction(t) make_instruction(is_instruction_test, t)
 
 #define loop_to_statement(l) instruction_to_statement(loop_to_instruction(l))
+#define test_to_statement(t) instruction_to_statement(test_to_instruction(t))
 
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
