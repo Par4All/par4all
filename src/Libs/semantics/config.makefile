@@ -1,7 +1,7 @@
 # Semantics Analysis
 #
 # SCCS Stuff:
-# $RCSfile: config.makefile,v $ ($Date: 1996/06/29 18:25:08 $, ) version $Revision$
+# $RCSfile: config.makefile,v $ ($Date: 1997/06/23 07:46:43 $, ) version $Revision$
 # got on %D%, %T%
 # $Id$
 #
@@ -38,7 +38,7 @@
 # Do not include the main program source file.
 LIB_CFILES=	misc.c ri_to_transformers.c interprocedural.c\
 		ri_to_preconditions.c mappings.c dbm_interface.c \
-		prettyprint.c postcondition.c 
+		prettyprint.c postcondition.c utils.c
 LIB_HEADERS=	semantics-local.h
 LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
 
