@@ -138,48 +138,43 @@ statement s;
     }
 }
 
+/* returns the assignment statement is moved, or NULL if not.
+ */
+statement atomize_this_expression(entity (*create)(entity, basic),
+				  expression *pe)
+{
+  basic bofe;
+
+  /* it does not make sense to atomize a range...
+   */
+  if (syntax_range_p(expression_syntax(*pe))) return NULL;
+  
+  bofe = please_give_me_a_basic_for_an_expression(*pe);
+  if (!basic_overloaded_p(bofe))
+    {
+      entity newvar; 
+      expression rhs;
+      statement assign;
+
+      newvar = (*create)(get_current_module_entity(), bofe);
+      rhs = make_expression(expression_syntax(*pe), normalized_undefined);
+      normalize_all_expressions_of(rhs);
+      assign = make_assign_statement(entity_to_expression(newvar), rhs);
+	
+      *pe = make_expression(make_syntax(is_syntax_reference, 
+					make_reference(newvar, NIL)),
+			    expression_normalized(*pe));
+      return assign;
+    }
+  
+  free_basic(bofe);
+  return NULL;
+}
+
 static void compute_before_current_statement(expression *pe)
 {
-    entity new_variable;
-    statement stat;
-    expression rhs;
-    basic tmp;
-
-    assert(!syntax_range_p(expression_syntax(*pe)));
-
-    /*  The index is computed
-     */
-    /* tmp is assumed to be freshly allocated.
-     */
-    tmp = please_give_me_a_basic_for_an_expression(*pe);
-    
-    /* Atomization is not valid with overloaded expressions */
-    if (!basic_overloaded_p(tmp)) 
-      {
-	new_variable = 
-	  (*create_new_variable)(get_current_module_entity(), tmp);
-	
-	/*  The normalized field is kept as such, and will be used by
-	 *  the overlap analysis! ??? just a horrible hack.
-	 *
-	 *  stat: Variable = Expression
-	 *   *pe: Variable
-	 */
-	rhs = make_expression(expression_syntax(*pe), normalized_undefined);
-	normalize_all_expressions_of(rhs);
-	
-	stat = make_assign_statement(entity_to_expression(new_variable), rhs);
-	
-	*pe = make_expression(make_syntax(is_syntax_reference, 
-					  make_reference(new_variable, NIL)),
-			      expression_normalized(*pe));
-	
-	insert_before_current_statement(stat);
-      }
-    else 
-      {
-	free(tmp);
-      }
+    statement stat = atomize_this_expression(create_new_variable, pe);
+    if (stat) insert_before_current_statement(stat);
 }
 
 static void ref_rwt(r)
