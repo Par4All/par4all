@@ -47,7 +47,7 @@ DEFINE_LOCAL_STACK(current_stmt, statement)
 
 /* We store the text for all statement in a mapping 
    in order to print afterwards */
-GENERIC_LOCAL_MAPPING(stmt_map, bool, text)
+GENERIC_LOCAL_MAPPING(stmt_map, statement, text)
 
 static bool statement_filter(statement s)
 {
@@ -154,42 +154,57 @@ static void loop_rewrite (loop l)
 {
     text inside_the_loop = text_undefined;
     text inside_the_do = text_undefined;
-    bool print_do = get_bool_property(ICFG_DOs);
+    bool print_do = get_bool_property(ICFG_DOs), 
+         text_in_do_p, text_in_loop_p;
     text t = make_text (NIL);
     char textbuf[MAX_LINE_LENGTH];
 
     pips_debug (5,"Loop end\n");
 
     if (print_do) current_margin -= ICFG_SCAN_INDENT;
-    inside_the_do = (text) load_text_stmt_map (current_stmt_head());
-    inside_the_loop = (text) load_text_stmt_map (loop_body (l));
 
-    /* Print the DO */
-    if ((some_text_p(inside_the_loop) || 
-	 some_text_p(inside_the_do)) && print_do) 
+    inside_the_do = (text) load_text_stmt_map (current_stmt_head());
+    text_in_do_p = some_text_p(inside_the_do);
+
+    inside_the_loop = (text) load_text_stmt_map (loop_body (l));
+    text_in_loop_p = some_text_p(inside_the_loop);
+
+    /* Print the DO 
+     */
+    if ((text_in_loop_p || text_in_do_p) && print_do) 
     {
 	sprintf(textbuf, "%*sDO\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
     }
 
-    /* Print the text inside do expressions*/
-    if (some_text_p(inside_the_do)) {
+    /* Print the text inside do expressions
+     */
+    if (text_in_do_p) 
+    {
 	pips_debug(9, "something inside_the_do\n");
 	MERGE_TEXTS (t, inside_the_do);
-       	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-					      strdup("\n")));
+
+	/* a blank line. not very wellcome to xtree, but allows to 
+	 * separate DO and BODY calls...
+	 */
+	if (print_do)
+	{
+	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+						  strdup("\n"))); 
+	}
     }
 
-    /* Print the text inside */
-    if (some_text_p(inside_the_loop)) {
+    /* Print the text inside the loop
+     */
+    if (text_in_loop_p) {
 	pips_debug(9, "something inside_the_loop\n");
 	MERGE_TEXTS (t, inside_the_loop);
     }
 
-    /* Print the ENDDO */
-    if ((some_text_p(inside_the_loop) ||
-	 some_text_p(inside_the_do)) && print_do) 
+    /* Print the ENDDO 
+     */
+    if ((text_in_loop_p || text_in_do_p) && print_do) 
     {
 	sprintf(textbuf, "%*sENDDO\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
@@ -342,11 +357,6 @@ void print_module_icfg(entity module)
 
     current_margin = ICFG_SCAN_INDENT;
 
-    ifdebug(9) {
-	if ( gen_defined_p (s))
-	    pips_user_warning ("gen_defined_p failed\n");
-    }
-    
     gen_multi_recurse
 	(s,
 	 statement_domain, statement_filter, statement_rewrite,
