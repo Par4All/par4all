@@ -1,0 +1,124 @@
+<html>
+<head>
+<title>PIPS: Summary of features ($Date$)</title>
+</head>
+
+
+<body>
+<h2>PIPS: Summary of features</h2>
+<h2>Interprocedural Parallelizer for Scientific Programs</h2>
+
+<a href=/pips>PIPS</a> is an automatic parallelizer for scientific programs. It
+takes as input Fortran 77 codes and emphasizes interprocedural
+techniques for program analyses. PIPS specific interprocedural analyses
+are <a href="cnrs-nsf92/cnrs-nsf92.html">precondition</a> and <a
+href="regions.html">array region</a> computations.
+PIPS is based on linear algebra techniques for analyses, e.g. 
+dependence testing, as well as for code generation, e.g. loop
+interchange or tiling.
+
+<p>
+
+Analyses and transformations are driven by a make system, <a
+href="pipsmake.html"><em>(pipsmake)</em></a> which enforces consistency
+across analyses and modules, and results are stored for future
+interprocedural use in a database by a resource manager,
+<em>(pipsdbm)</em>. The compiler is made of phases that are called on
+demand to perform the analyses or transformations required by the user.
+
+<center>
+<IMG SRC=poster.gif><br>
+<b>PIPS Overall Structure</b>
+</center>
+
+<p>
+
+Three user interfaces are available: a Shell interface <a
+href="dret144/dret144.html"><em>(Pips)</em></a>, a line interface <a
+href="line-interface.html"><em>(Tpips)</em></a> and an X-window interface
+<a href="wpips.html"><em>(wpips)</em></a> to the parallelizer which is
+the best suited for users. Also use of Emacs for code vizualization is possible
+<em>(epips)</em>. 
+
+<p>
+
+Many <b>interprocedural</b> program <b>analyses</b> are implemented in PIPS.
+The result of these analyses can be displayed in various forms. For instance:
+<ul>
+  <li> Use-def chains, dependence graph
+  <li> Transformers, preconditions...
+  <li> Symbolic complexity.
+  <li> Effects (of instructions on data)... Array regions...
+  <li> call graph, interprocedural control flow graph...
+</ul>
+
+<p>
+
+Also many program <b>transformations</b> are available, such as:
+<ul>
+  <li> <b>parallelization</b> (shared memory oriented)
+  <li> scalar and <b>array</b> privatization
+  <li> loop unrolling, interchange, normalize, distribution, strip mining...
+  <li> dead code elimination, partial evaluation, atomizer...
+</ul>
+
+<p>
+PIPS Compilers:
+<ul>
+  <li> polyhedral method (Feautrier)
+       <ul>
+	 <li> Array Data Flow Graph computation.
+	 <li> Scheduling, mapping, and associated code generation.
+       </ul>
+  <li> PUMA/WP65: Share memory emulation
+  <li> HPFC: a prototype HPF Compiler.
+</ul>
+
+<p>
+
+<b>PIPS</b> is built on top of two tools. The first one is <a
+href="newgen-manual/newgen-manual.html"><em>Newgen</em></a> which
+manages data structures a la <em>IDL</em>. It provides basic
+manipulation functions for data structures described in a declaration
+file. It supports persistent data and type hierarchies.
+
+<p>
+
+The second tool is the <em>Linear C3</em> library which handles vectors,
+matrices, linear constraints and structures based on these such as
+polyhedrons. The algorithms used are designed for integer and/or
+rational coefficients. This library is extensively used for analyses
+such as dependence test, precondition and region computation, and for
+transformations, such as tiling. The <em>Linear C3</em> library is a
+joint project with IRISA and PRISM laboratories, partially funded by
+CNRS. IRISA contributed an implementation of Chernikova algorithm and
+PRISM a C implementation of PIP (Parametric Integer Programming).
+
+<p>
+
+Seven years after its inception, PIPS as a workbench is still alive and
+well. PIPS provides a robust infrastructure for new experiments in
+compilation, program analysis, optimisation, transformation and
+parallelization. PIPS can also be used as a reverse engineering tool.
+Region analyses provide useful summaries of procedure effects, while
+precondition-based partial evaluation and dead code elimination reduce
+code size. 
+
+<p>
+
+PIPS is written in (ANSI) C and developped under SUNOS 4.1.4.
+PIPS can also be used under SOLARIS 2.
+It is available on request.
+
+<p>
+
+<b>URL: </b> http://www.cri.ensmp.fr/pips
+
+</body>
+</html>
+
+
+
+
+
+
