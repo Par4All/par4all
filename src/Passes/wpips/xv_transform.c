@@ -72,46 +72,46 @@ transform_notify(Menu menu,
 
    if (modulename != NULL) {
       if (strcmp(label, PRIVATIZE_TRANSFORM) == 0) {
-         safe_apply(BUILDER_PRIVATIZE_MODULE, modulename);
+         (void) safe_apply(BUILDER_PRIVATIZE_MODULE, modulename);
       }
       else if (strcmp(label, DISTRIBUTE_TRANSFORM) == 0) {
-         safe_apply(BUILDER_DISTRIBUTER, modulename);
+         (void) safe_apply(BUILDER_DISTRIBUTER, modulename);
       }
       else if (strcmp(label, PARTIAL_EVAL_TRANSFORM) == 0) {
-         safe_apply(BUILDER_PARTIAL_EVAL, modulename);
+         (void) safe_apply(BUILDER_PARTIAL_EVAL, modulename);
       }
       else if (strcmp(label, FULL_UNROLL_TRANSFORM) == 0) {
-         safe_apply(BUILDER_FULL_UNROLL, modulename);
+         (void) safe_apply(BUILDER_FULL_UNROLL, modulename);
       }
       else if (strcmp(label, UNROLL_TRANSFORM) == 0) {
-         safe_apply(BUILDER_UNROLL, modulename);
+         (void) safe_apply(BUILDER_UNROLL, modulename);
       }
       else if (strcmp(label,STRIP_MINE_TRANSFORM) == 0) {
-         safe_apply(BUILDER_STRIP_MINE, modulename);
+         (void) safe_apply(BUILDER_STRIP_MINE, modulename);
       }
       else if (strcmp(label,LOOP_INTERCHANGE_TRANSFORM) == 0) {
-         safe_apply(BUILDER_LOOP_INTERCHANGE, modulename);
+         (void) safe_apply(BUILDER_LOOP_INTERCHANGE, modulename);
       }
       else if (strcmp(label,LOOP_NORMALIZE_TRANSFORM) == 0) {
-         safe_apply(BUILDER_LOOP_NORMALIZE, modulename);
+         (void) safe_apply(BUILDER_LOOP_NORMALIZE, modulename);
       }
       else if (strcmp(label, SUPPRESS_DEAD_CODE_TRANSFORM) == 0) {
-         safe_apply(BUILDER_SUPPRESS_DEAD_CODE, modulename);
+         (void) safe_apply(BUILDER_SUPPRESS_DEAD_CODE, modulename);
       }
       else if (strcmp(label, UNSPAGHETTIFY_TRANSFORM) == 0) {
-         safe_apply(BUILDER_UNSPAGHETTIFY, modulename);
+         (void) safe_apply(BUILDER_UNSPAGHETTIFY, modulename);
       }
       else if (strcmp(label, ATOMIZER_TRANSFORM) == 0) {
-         safe_apply(BUILDER_ATOMIZER, modulename);
+         (void) safe_apply(BUILDER_ATOMIZER, modulename);
       }
       else if (strcmp(label, NEW_ATOMIZER_TRANSFORM) == 0) {
-         safe_apply(BUILDER_NEW_ATOMIZER, modulename);
+         (void) safe_apply(BUILDER_NEW_ATOMIZER, modulename);
       }
       else if (strcmp(label, REDUCTIONS_TRANSFORM) == 0) {
-         safe_apply(BUILDER_REDUCTIONS, modulename);
+         (void) safe_apply(BUILDER_REDUCTIONS, modulename);
       }
       else if (strcmp(label, STF_TRANSFORM) == 0) {
-         safe_apply(BUILDER_STF, modulename);
+         (void) safe_apply(BUILDER_STF, modulename);
       }
       else {
          pips_error("transform_notify", "Bad choice");
