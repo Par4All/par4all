@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1995/09/12 16:30:41 $, ) 
+# ($Date: 1995/09/13 15:47:35 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -30,14 +30,6 @@
 #    Mainly, the $aspect variable was changed from a relative directory name
 #    into an absolute directory name
 #  - tmperr added
-#  - Options added
-#    -h: help
-#    -u: a new directory is used
-#    -t: performance
-#    -v: verbose; -s: silent; -d: debug;
-#    -x pips: pips to be used
-#    -r dir: directory where to run
-#    -l file: lock file to report at the end (default: a mail is sent)
 #  - source environment if necessary
 
 [ "$PIPS_HOME" ] || . /home/users/pips/Pips/pipsrc.sh
@@ -225,24 +217,6 @@ test_aspect()
      program=$name
      
      rm -f $tmpout $tmperr
-     
-     #
-     # .tpips case
-     
-     if [ -f $aspect/$name.tpips ]
-     then 
-       $DEBUG " || .tpips case"
-       $tpips_version $aspect/$name.tpips > $tmpout 2> $tmperr
-       STATUS=$?
-       [ -f core ] && rm -f core
-
-       report $STATUS \
-         "Execution of $aspect/$name.tpips failed with $tpips_version" || \
-         { $DEBUG " || error"; continue;}
-       
-       make_diff $aspect $name test
-       continue
-     fi
 
      #
      # .test case
