@@ -43,7 +43,8 @@
 /******************************************************************** UTILS */
 
 /* generate resource res_name for module mod_name with prefix file_ext
- * as the text provided.
+ * as the text provided. it should be made clear who is to free the
+ * texte structure. currently it looks like a massive memory leak.
  */
 bool 
 make_text_resource(
