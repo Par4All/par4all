@@ -15,6 +15,7 @@
  *
  * Indeed, we cannot switch easily to bignums that need constructors 
  * dans destructors... That would lead to too many modifications...
+ * C++ would make things easier and cleaner...
  *
  * Fabien COELHO
  */
