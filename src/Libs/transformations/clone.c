@@ -5,6 +5,10 @@
  * debug: CLONING_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.3  1997/11/03 09:45:33  coelho
+ * clone -> clone_on_argument
+ * and other clone pass.
+ *
  * Revision 1.2  1997/10/31 16:22:10  coelho
  * tmp install for corinne.
  *
@@ -46,6 +50,31 @@ build_new_top_level_entity_name(string prefix)
     return res;
 }
 
+/* build a new clone version. if argn is not null, generate a check.
+ */ 
+static statement
+build_statement_for_clone(
+    entity cloned, 
+    int argn, 
+    int val)
+{
+    entity param = find_ith_parameter(cloned, argn);
+    statement stat, check_arg_value;
+
+
+
+
+
+    
+
+    stat = make_block_statement(
+	CONS(STATEMENT, check_arg_value,
+	CONS(STATEMENT, copy_statement(get_current_module_statement()), 
+	     NIL)));
+
+    return stat;
+}
+
 /* create an clone, and returns the corresponding entity, 
  * which looks like a not yet parsed routine.
  * it puts the initial_file for the routine, and updates its user_file.
@@ -58,6 +87,7 @@ build_a_clone_for(
 {
     string name = entity_local_name(cloned), new_name;
     entity new_fun;
+    statement stat;
     text t;
 
     pips_debug(2, "building a version of %s with arg %d val=%d\n",
@@ -65,10 +95,18 @@ build_a_clone_for(
     
     new_name = build_new_top_level_entity_name(name);
     new_fun = make_empty_function(new_name, entity_type(cloned));
-    
-    make_text_resource(new_name, DBR_INITIAL_FILE, ".f_initial", t);
-    free(new_name);
 
+    /* builds some kind of module / statement for the clone.
+     */
+    stat = build_statement_for_clone(cloned, argn, val);
+    
+    t = text_module(new_fun, stat);
+    /* add somme comments before the code.
+     */
+    make_text_resource(new_name, DBR_INITIAL_FILE, ".f_initial", t);
+
+
+    free(new_name);
     pips_user_error("sorry, not implemented yet\n");
     return entity_undefined;
 }
@@ -105,7 +143,7 @@ static void
 close_clone(void)
 {
     INITIALIZED;
-    free(clones);
+    free(clones), clones = NULL;
     clones_size = 0;
     clones_index = 0;
 }
@@ -117,7 +155,7 @@ get_clone(entity the_ref, int argn, int val)
     INITIALIZED;
     for (i=0; i<clones_index; i++)
     {
-	if (clones[i].the_ref==the_ref &&
+	if (clones[i].the_ref == the_ref &&
 	    clones[i].argn == argn &&
 	    clones[i].val == val)
 	    return clones[i].the_clone;
@@ -163,7 +201,7 @@ do_clone_arg_val(
     if (new_clone==entity_undefined)
     {
 	new_clone = build_a_clone_for(cloned, argn, val);
-	set_clone(cloned, new_clone, argn, val);
+	if (argn!=0) set_clone(cloned, new_clone, argn, val);
     }
 
     call_function(c) = new_clone;
@@ -234,7 +272,7 @@ clone_rwt(call c)
  * formal parameter of module number argn must be an integer scalar.
  */
 static void
-clone_on_argument(
+perform_clone_on_argument(
     entity module      /* the module being cloned */,
     string caller_name /* the caller of interest */,
     int argn           /* the argument number to be cloned */)
@@ -273,31 +311,18 @@ clone_on_argument(
 }
 
 
-/******************************************************** PIPSMAKE INTERFACE */
+/******************************************************* PIPSMAKE INTERFACES */
 
-#define ARG_TO_CLONE "TRANSFORMATION_CLONE_ON_ARGUMENT"
-
-/* clone module name, on the argument specified by property
- * int TRANSFORMATION_CLONE_ON_ARGUMENT.
- *
- * clone 	> CALLERS.callees
- *       	> CALLERS.code
- *       < MODULE.code
- *       < MODULE.callers
- *       < CALLERS.callees
- *       < CALLERS.preconditions
- *       < CALLERS.code
- */
-bool 
-clone(string name)
+static void
+set_currents(string name)
 {
     entity module;
     statement stat;
-    callees callers; /* warf, warf */
-    int argn;
 
     debug_on("CLONING_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
+
+    init_clone();
 
     module = local_name_to_top_level_entity(name);
     pips_assert("is a function", type_functional_p(entity_type(module)));
@@ -305,9 +330,42 @@ clone(string name)
     
     stat = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
     set_current_module_statement(stat);
+}
 
+static void
+reset_currents(string name)
+{
+    close_clone();
+    reset_current_module_entity();
+    reset_current_module_statement();
+    pips_debug(1, "done with module %s\n", name);
+    debug_off();
+}
+
+#define ARG_TO_CLONE "TRANSFORMATION_CLONE_ON_ARGUMENT"
+
+/* clone module name, on the argument specified by property
+ * int TRANSFORMATION_CLONE_ON_ARGUMENT.
+ *
+ * clone_on_argument	> CALLERS.callees
+ *       		> CALLERS.code
+ *       < MODULE.code
+ *       < MODULE.callers
+ *	 < MODULE.user_file
+ *       < CALLERS.callees
+ *       < CALLERS.preconditions
+ *       < CALLERS.code
+ */
+bool 
+clone_on_argument(string name)
+{
+    entity module;
+    callees callers; /* warf, warf */
+    int argn;
+
+    set_currents(name);
+    module = get_current_module_entity();
     callers = (callees) db_get_memory_resource(DBR_CALLERS, name, TRUE);
-
     argn = get_int_property(ARG_TO_CLONE);
 
     if (argn==0)
@@ -339,17 +397,29 @@ clone(string name)
 	    pips_user_error("%s: %d formal not a scalar int\n", name, argn);
     }
 
-    init_clone();
-
     MAP(STRING, caller_name, 
-	clone_on_argument(module, caller_name, argn),
+	perform_clone_on_argument(module, caller_name, argn),
 	callees_callees(callers));    
 
-    close_clone();
-    reset_current_module_entity();
-    reset_current_module_statement();
-
-    pips_debug(1, "done with module %s\n", name);
-    debug_off();
+    reset_currents(name);
     return TRUE;
+}
+
+/* clone a routine in a caller. the user is requested the caller and
+ * ordering to perform the cloning of that instance.
+ *
+ * clone 	> CALLERS.code
+ * 		> CALLERS.callees
+ * 	< MODULE.code
+ *      < MODULE.user_file
+ *      < CALLERS.code
+ *	< CALLERS.callees
+ */
+bool
+clone(string name)
+{
+    set_currents(name);
+    pips_user_warning("not implemented yet\n");
+    reset_currents(name);
+    return FALSE;
 }
