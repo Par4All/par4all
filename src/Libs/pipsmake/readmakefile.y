@@ -44,7 +44,6 @@
 #include "top-level.h"
 #include "pipsmake.h"
 
-#include <sys/stdtypes.h>  /* for debug with dbmalloc */
 #include "malloc.h"
 
 extern void add_rule(rule);
