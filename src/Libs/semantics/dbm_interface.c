@@ -240,7 +240,7 @@ char * module_name;
     }
     else {
 	/* try to eliminate redundancy */
-	t = transformer_normalize(t);
+	t = transformer_normalize(t, 2);
     }
 
     DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
@@ -311,7 +311,7 @@ char *module_name;
 
     /* filter out local variables from the global intraprocedural effect */
     t_inter = transformer_intra_to_inter(t_intra, e_inter);
-    t_inter = transformer_normalize(t_inter);
+    t_inter = transformer_normalize(t_inter, 2);
     if(!transformer_consistency_p(t_inter)) {
 	(void) print_transformer(t_inter);
 	pips_error("module_name_to_transformers",
