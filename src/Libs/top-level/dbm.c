@@ -135,6 +135,12 @@ open_workspace(string name)
     if (db_get_current_workspace_name())
 	pips_user_error("Some current workspace, close it first!\n");
 
+    if (!workspace_exists_p(name))
+	pips_user_error("Workspace %s does not exist!\n", name);
+
+    if (!workspace_ok_p(name))
+	pips_user_error("Workspace %s not readable!\n", name);
+
     if (make_open_workspace(name) == NULL) {
 	/* should be show_message */
 	/* FI: what happens since log_file is not open? */
