@@ -160,8 +160,9 @@ make_new_scalar_variable_with_prefix(string prefix,
 	   }
        }
        else {
-	   /* There should be a check on b */
 	   sprintf(buffer,"%s%d", prefix, number++);
+	   pips_assert ("make_new_scalar_variable_with_prefix",
+			strlen (buffer) < 19);
        }
    }
    while(gen_find_tabulated(concatenate(module_name,
