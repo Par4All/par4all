@@ -291,13 +291,14 @@ char *module_name;
 	pips_error("module_name_to_transformers",
 		   "no statement for module %s\n", module_name);
 
-    set_proper_effects_map( effectsmap_to_listmap((statement_mapping) 
-	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE)));
+    /* Is it really useful? I could not find where it is used. bc. */
+    set_proper_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
 
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
+    set_cumulated_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
-    /* cumulated_effects_map_print(); */
+    /* cumulated_effects_map_print();*/
 
     e_inter = effects_to_list( (effects)
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
@@ -333,8 +334,8 @@ char *module_name;
     reset_current_module_entity();
     reset_current_module_statement();
     /* Two auxiliary hash tables allocated by effectsmap_to_listmap() */
-    free_proper_effects_map();
-    free_cumulated_effects_map();
+    reset_proper_rw_effects();
+    reset_cumulated_rw_effects();
     reset_transformer_map();
 
     debug_off();
@@ -367,8 +368,8 @@ char *module_name;
 		   "no statement for module %s\n", module_name);
 
     /* cumulated effects are used to compute the value mappings */
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
+    set_cumulated_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
     set_transformer_map( (statement_mapping) 
 	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE));
@@ -394,6 +395,7 @@ char *module_name;
        unavailable during interprocedural analysis; a module reference
        should be kept with the mappings to avoid useless recomputation,
        allocation and frees, including those due to the prettyprinter */
+    
     module_to_value_mappings( get_current_module_entity() );
 
     /* set the list of global values */
@@ -470,8 +472,7 @@ char *module_name;
     reset_current_module_statement();
     reset_transformer_map();
     reset_precondition_map();
-    /* auxiliary hash table allocated by effectsmap_to_listmap() */
-    free_cumulated_effects_map();
+    reset_cumulated_rw_effects();
 
     debug_off();
 
@@ -633,7 +634,7 @@ entity e;
     pips_assert("load_module_intraprocedural_effects", 
 		e == get_current_module_entity() );
 
-    t = load_statement_cumulated_effects( get_current_module_statement() );
+    t = load_cumulated_rw_effects_list( get_current_module_statement() );
 
     pips_assert("load_module_intraprocedural_effects", t != list_undefined);
 
@@ -648,13 +649,13 @@ void
 cumulated_effects_map_print()
 {
     FILE * f =stderr;
-    hash_table htp = get_cumulated_effects_map();
+    statement_effects htp = get_cumulated_rw_effects();
 
-    hash_table_print_header (htp,f);
+    /* hash_table_print_header (htp,f); */
 
-    HASH_MAP(k, v, {
+    STATEMENT_EFFECTS_MAP(k, v, {
 	fprintf(f, "\n\n%d", statement_ordering((statement) k));
-	print_effects((list) v);
+	print_effects( effects_effects(v));
     },
 	     htp);
 }
