@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/08/30 15:59:58 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/09/07 10:59:43 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -16,7 +16,7 @@ c this could be computed statically, where it is used...
 c
 c
       integer function HPFC_PROCDIM(an, ad)
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer an, ad
       integer tn, pn, i, it, ip
       tn = ATOT(an)
@@ -89,9 +89,9 @@ c
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
      & )
-      include ''`fpvm3.h''`
-      include ''`hpfc_commons.h''`
-      include ''`hpfc_rtsupport.h''`
+      include "fpvm3.h"
+      include "hpfc_commons.h"
+      include "hpfc_rtsupport.h"
       external HPFC_PROCDIM
       integer HPFC_PROCDIM
       TYPE 
@@ -143,8 +143,8 @@ c
 c HOST PART
 c
       TYPE function build_name(hred,LEVEL,PVMTYPE,NAME)()
-      include ''`fpvm3.h''`
-      include ''`hpfc_commons.h''`
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       TYPE result(MAXMAXSIZEOFPROCS), final
       integer i
 c
