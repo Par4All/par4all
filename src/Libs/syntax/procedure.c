@@ -306,7 +306,7 @@ cons *lfp;
     /* PushBlock(icf, (string) NULL); */
     PushBlock(icf, "INITIAL");
 
-    function_body = MakeStatement(MakeLabel(""), icf);
+    function_body = instruction_to_statement(icf);
     entity_initial(cf) = make_value(is_value_code, make_code(NIL, NULL));
 
     set_current_module_entity(cf);
