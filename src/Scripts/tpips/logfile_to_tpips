@@ -1,0 +1,19 @@
+#!/bin/sh
+
+#
+#
+#
+
+WS=${1:?"Please give me the workspace name to work with"}
+
+sed -n \
+-e 's/Registering file \(.*\)/create '$WS' \1/p' \
+-e 's/Module \(.*\) selected/module \1/p' \
+-e 's/Closing all modules./close/p' \
+-e 's/Workspace [^ ]* opened/open '$WS'/p' \
+-e 's/Directory \(.*\) selected/cd \1/p' \
+-e 's/Request: build resource \(.*\) for module \(.*\)./display \2.\1/p' \
+-e 's/Request: perform rule \(.*\) on module \(.*\)./apply \2.\1/p' \
+-e 's/Options: phase \(.*\) (\(.*\)) set on./activate \2 # \1/p' \
+$WS.database/LOGFILE
+
