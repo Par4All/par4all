@@ -96,6 +96,8 @@ while (<>)
 	    if $ligne =~ /^[^Cc\*!].*(function|subroutine)/i;
 	$insub = 1 
 	    if $ligne =~ /^[^Cc\*!].*(function|subroutine)[ \t]*$module/i;
+	$insub = 1 
+	    if $module eq '-';
 	
 	next if not $insub;
 
