@@ -161,10 +161,21 @@ boolean efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
       return FALSE;
     case 0: /* no result, try slow version. default is feasible. */
       {
+
+	/* NN: 25/09/2001, try to avoid overflows by using a smaller system: 
+	   only constraints transitively connected to a constraint referencing a variable
+	   of interest in v are taken from prec.
+	   sc_restricted_to_variables_transitive_closure(sc,vars) */
+	Psysteme s_dup = sc_dup(prec);
+	Pbase vars = make_base_from_vect(v);
+	Psysteme s_res = sc_restricted_to_variables_transitive_closure(s_dup,vars);
+
 	/* nofoverflows is used to save the number of overflows before the call
 	   to sc_integer_feasibility_ofl_ctrl*/ 
+
 	int nofoverflows = linear_number_of_exception_thrown;
-	Psysteme s = sc_dup(prec);
+	//	Psysteme s = sc_dup(prec);
+	Psysteme s = sc_dup(s_res);
 	ifdebug(3) 
 	  {	  
 	    fprintf(stderr, "\n Slow check of feasibility: ");    
