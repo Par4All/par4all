@@ -48,7 +48,7 @@ static char start[ 1024 ] ;
 
 static char *package ;
 
-struct binding *Tabulated_bp ;
+struct gen_binding *Tabulated_bp ;
 
 int Read_spec_mode ;			/* Unused in Lisp */
 
@@ -66,7 +66,7 @@ init_member( dp )
 
   switch( dp->ba.type ) {
   case BASIS: {
-    struct binding *bp = dp->ba.constructand ;
+    struct gen_binding *bp = dp->ba.constructand ;
 
     if( IS_INLINABLE( bp ))
 	    sprintf( buffer, "%s", bp->inlined->Lisp_value ) ;
@@ -105,7 +105,7 @@ init_member( dp )
 
 void
 gen_external( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     printf( "(lisp:defvar %s (lisp:+ %s %d))\n", bp->name, start, TYPE( bp )) ;
 }
@@ -122,7 +122,7 @@ union domain *dp ;
 int offset ;
 {
     if( dp->ba.type == BASIS ) {
-	struct binding *bp = dp->ba.constructand ;
+	struct gen_binding *bp = dp->ba.constructand ;
 	
 	if( !IS_INLINABLE( bp ) && IS_EXTERNAL( bp )) {
 	    printf( "(lisp:defun %s-%s (and)\n", bp->name, dp->ba.constructor ) ;
@@ -143,7 +143,7 @@ int offset ;
 
 static void
 gen_prelude( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     printf( "(lisp:setf (lisp:aref newgen::*gen-tabulated-alloc*" ) ;
     printf( " (lisp:+ %s %d)) %d)\n",
@@ -161,7 +161,7 @@ struct binding *bp ;
 
 static void
 gen_postlude( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     if( IS_TABULATED( bp )) {
 	printf( "(lisp:defvar old-make-%s)\n", bp->name ) ;
@@ -185,7 +185,7 @@ struct binding *bp ;
 /* GEN_TYPE generates the type member for potentially tabulated BP domain. 
  */
 static generate_type_member( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     printf( " (-type- `(:newgen ,(lisp:+ %s %d)))\n", start, TYPE( bp ) ) ;
 
@@ -199,7 +199,7 @@ struct binding *bp ;
 
 void
 gen_and( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     union domain *dom = bp->domain ;
     struct domainlist *dlp = dom->co.components ;
@@ -228,7 +228,7 @@ struct binding *bp ;
 
 void
 gen_or( bp )
-     struct binding *bp ;
+     struct gen_binding *bp ;
 {
     char *name = bp->name ;
     union domain *dom = bp->domain ;
@@ -280,7 +280,7 @@ gen_or( bp )
 
 void
 gen_list( bp )
-     struct binding *bp ;
+     struct gen_binding *bp ;
 {
     gen_prelude( bp ) ;
     printf( "(lisp:defstruct (%s (:type %s))\n", bp->name, NEWGEN_IMPL ) ;
@@ -293,7 +293,7 @@ gen_list( bp )
 
 void
 gen_array( bp )
-     struct binding *bp ;
+     struct gen_binding *bp ;
 {
     union domain *dom = bp->domain ;
 
@@ -309,7 +309,7 @@ gen_array( bp )
 
 void
 gen_set( bp )
-     struct binding *bp ;
+     struct gen_binding *bp ;
 {
     union domain *dom = bp->domain ;
 
@@ -326,7 +326,7 @@ gen_set( bp )
 
 void
 gen_domain( bp )
-     struct binding *bp ;
+     struct gen_binding *bp ;
 {
   union domain *dp = bp->domain ;
 
@@ -367,7 +367,7 @@ void
 gencode( file )
 char *file ;
 {
-    struct binding *bp ;
+    struct gen_binding *bp ;
     int domain_count = 0 ;
   
     or_counter = 0 ;
