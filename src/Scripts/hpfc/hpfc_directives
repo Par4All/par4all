@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/24 23:12:43 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/25 14:40:52 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -47,7 +47,6 @@
 # _y: dynamic
 # _#: number_of_processors()
 #
-# _o: temporary for logical
 # _X: special default processor arrangement
 #
 # missing: inherit
@@ -120,6 +119,7 @@ $SED 's,&[ ]*., ,g;
       s,[^ ], ,g' | 
 #
 # and back to a normal file
+# should be normalized again?
 #
 $TR '' '\012' | 
 #
@@ -143,8 +143,8 @@ $SED '//s,\([\,(]\)block\([\,()]\),\1k\2,g
       s, endlocal,      enddo,
       s, dynamic \(.*\),      y(\1),
       s, pure \(.*\),      u(\1),
-      s, template \(.*\),      o \1      t(\1),
-      s, processors \(.*\),      o \1      p(\1),
+      s, template \(.*\),      logical \1      t(\1),
+      s, processors \(.*\),      logical \1      p(\1),
       s, align \(.*\) with \(.*\),      a(\1\,\2),
       s, align with \(.*\)::\(.*\),      a(\2\,\1),
       s, realign \(.*\) with \(.*\),      b(\1\,\2),
@@ -161,7 +161,7 @@ $SED '//s,\([\,(]\)block\([\,()]\),\1k\2,g
       s, new,      n,
       s, reduction,      r,
       s, independent,      i,
-      s,\([12345abdeintpryou]\),call hpfc\1,g
+      s,\([12345abdeintpryu]\),call hpfc\1,g
       s,\([ck#s]\),hpfc\1,g' | 
 #
 # handles multi lines breaking (independent with new...)
@@ -183,6 +183,7 @@ $SED "s,hpfc#,$NOP,g;
 # (program and subroutine needed if none!)
 # (functions added for implicitely typed functions...)
 # (common also appear in the declaration part of the program...)
+# (parameter??? I should check)
 
 LINE=`
 $SED -n '/^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
@@ -194,8 +195,7 @@ $SED -n '/^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
          /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
          /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=
 	 /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\*]/=
-	 /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	\*]/=
-         /^[^Cc\*!].... call hpfco /=' $TMP.0 | 
+	 /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	\*]/=' $TMP.0 |
 $SED -n '$p'`
 
 [ "$LINE" ] || LINE=0
@@ -241,8 +241,7 @@ DEFAULT_USED=`$SED -n '/\,hpfcX)/p;/\,hpfcX)/q;' $TMP.0 $TMP.1`
 # first insert some marks, after comma or parenthesis
 # there should be no identifiers larger than 15 characters (55+15=70)
 #
-$SED '/^[^Cc\*!].... call hpfc.[( ].\{50,\}$/s/\([^]\{55\}[^,()]*[,()]\)/\1     x /g;
-      /^[^Cc\*!].... call hpfco /s,call hpfco,logical,' |
+$SED '/^[^Cc\*!].... call hpfc.[( ].\{50,\}$/s/\([^]\{55\}[^,()]*[,()]\)/\1     x /g' |
 #
 # later replaced by CR
 #
