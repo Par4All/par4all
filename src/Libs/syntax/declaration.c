@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.58  1999/05/21 12:02:12  irigoin
+ * Function DeclareIntrinsic() added
+ *
  * Revision 1.57  1998/12/24 11:04:33  irigoin
  * Improved warning in SafeSizeOfArray() because PIPS does not handle real
  * expressions in PARAMETER initializations.
@@ -699,6 +702,15 @@ DeclareVariable(
 	     */
 	}
     }
+}
+
+/* Intrinsic e is used in the current module */
+void 
+DeclareIntrinsic(entity e)
+{
+    pips_assert("entity is defined", e!=entity_undefined && intrinsic_entity_p(e));
+
+    AddEntityToDeclarations(e, get_current_module_entity());
 }
 
 /*
