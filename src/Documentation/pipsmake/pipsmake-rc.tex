@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.32  2004/02/25 13:44:59  guerin
+%% Update pipsmake-rc definition for PHRASE_DISTRIBUTOR_CONTROL_CODE
+%%
 %% Revision 1.31  2004/02/24 14:51:17  guerin
 %% New pipsmake-rc definition for PHRASE_DISTRIBUTOR_CONTROL_CODE
 %%
@@ -575,7 +578,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2004/02/24 14:51:17 $~$
+$~$Date: 2004/02/25 13:44:59 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -3428,6 +3431,9 @@ alias phrase_distributor_control_code 'PHRASE Distributor Control Code'
 phrase_distributor_control_code          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.dg
 \end{verbatim}
 
 \section{Program Transformations}
