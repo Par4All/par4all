@@ -103,6 +103,7 @@ typedef hash_table control_mapping;
 #define BLANK_COMMON_LOCAL_NAME 	"*BLANK*"
 #define DYNAMIC_AREA_LOCAL_NAME 	"*DYNAMIC*"
 #define STATIC_AREA_LOCAL_NAME 		"*STATIC*"
+#define HEAP_AREA_LOCAL_NAME 		"*HEAP*"
 
 #define EMPTY_LABEL_NAME LABEL_PREFIX
 #define LIST_DIRECTED_FORMAT_NAME 	"LIST-DIRECTED"
@@ -239,9 +240,12 @@ typedef hash_table control_mapping;
 					 ENTITY_NON_EQUAL_P(e) || \
 					 ENTITY_EQUAL_P(e) )
 
+/* Special areas are sometimes tested by top_level_entity_p() because they
+   are not top level entities whereas user commons are. */
 #define SPECIAL_AREA_P(e) \
     ((same_string_p(module_local_name(e), DYNAMIC_AREA_LOCAL_NAME)) || \
-     (same_string_p(module_local_name(e), STATIC_AREA_LOCAL_NAME)))
+     (same_string_p(module_local_name(e), STATIC_AREA_LOCAL_NAME)) || \
+     (same_string_p(module_local_name(e), HEAP_AREA_LOCAL_NAME)))
 
 #define SPECIAL_COMMON_P(e) SPECIAL_AREA_P(e)
 
