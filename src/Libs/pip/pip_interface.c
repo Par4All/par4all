@@ -52,10 +52,6 @@
 #include "pip.h"
 
 
-extern int fprintf();
-extern int fflush();
-
-
 /* Global variables 	*/
 Pbase 	base_var_ref, base_ref, old_base, old_base_var;
 int   	ind_min_max;
