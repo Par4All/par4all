@@ -16,6 +16,7 @@
 
 
 #include <stdio.h>
+extern int fprintf();
 #include <string.h>
 #include <stdlib.h>
 #include "newgen_types.h"
