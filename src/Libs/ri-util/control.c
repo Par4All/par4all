@@ -91,9 +91,9 @@ remove_a_control_from_a_list_and_relink(control c,
    MAPL(a_control_list,
         {
            list *the_dest_of_a_source_list;
-           list the_position_of_c;
-           list the_position_before_c;
-           list l;
+           list the_position_of_c = NIL;
+           list the_position_before_c = NIL;
+           list l = NIL;
            
            control a_dest_of_a_source = CONTROL(CAR(a_control_list));
            /* Now, find the corresponding dest in the source list
