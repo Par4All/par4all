@@ -294,23 +294,9 @@ static void instruction_rwt (instruction i)
     {
 	pips_debug (5,"dealing with a block, appending texts\n");
 
-	{
-	  list s_list = (list)(instruction_block(i));
-	  for(; s_list; POP(s_list)) {
-	    statement s = STATEMENT(CAR(s_list));
-	    {
-	      text _r_ = (t);
-	      text _t_ = load_statement_icfg(s);
-	      text_sentences(_r_) = gen_nconc(text_sentences(_r_), text_sentences(_t_));
-	      text_sentences(_t_) = NIL;
-	      free_text(_t_);
-	    }
-	  }
-	}
-	
-	/*MAP(STATEMENT, s, 
+	MAP(STATEMENT, s, 
 	    MERGE_TEXTS(t, load_statement_icfg(s)),
-	    instruction_block(i));*/
+	    instruction_block(i));
 
 	/* store it to the statement mapping */
 	update_statement_icfg (current_stmt_head (), t);
