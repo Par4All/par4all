@@ -18,29 +18,6 @@
 #include "ri.h"
 #include "ri-util.h"
 
-void 
-inegalite_debug(Pcontrainte c)
-{
-    inegalite_fprint(stderr, c, entity_local_name);
-}
-
-void 
-egalite_debug(Pcontrainte c)
-{
-    egalite_fprint(stderr, c, entity_local_name);
-}
-
-int
-contrainte_gen_allocated_memory(
-    Pcontrainte pc)
-{
-    int result = 0;
-    for(; pc; pc=pc->succ)
-	result += sizeof(Scontrainte) + 
-	    vect_gen_allocated_memory(pc->vecteur);
-    return result;
-}
-
 /******************************************** FOR PRETTYPRINTING CONSTRAINTS */
 
 static string
