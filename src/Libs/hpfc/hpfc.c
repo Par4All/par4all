@@ -1,43 +1,19 @@
-/*
- * HPFC module by Fabien COELHO
+/* HPFC module by Fabien COELHO
  *
- * SCCS stuff:
- * $RCSfile: hpfc.c,v $ ($Date: 1995/04/10 14:39:32 $, ) version $Revision$,
- * got on %D%, %T%
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/04/10 18:49:44 $, )
+ * version $Revision$
  */
  
-#include <stdio.h>
-#include <string.h> 
-extern fprintf();
-extern system();
+#include "defines-local.h"
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-
-#include "genC.h"
-
-#include "ri.h" 
-#include "database.h"
-#include "hpf.h" 
-#include "hpf_private.h"
-
-#include "ri-util.h" 
-#include "misc.h" 
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
-#include "properties.h"
 #include "resources.h"
 #include "pipsdbm.h"
 #include "control.h"
 
-#include "hpfc.h"
-#include "defines-local.h"
-
 #define NO_FILE "no file name"
-
 
 /*---------------------------------------------------------------------
  *
