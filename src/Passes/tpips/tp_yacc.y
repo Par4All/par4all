@@ -21,15 +21,14 @@
 %token OWNER_CALLEES
 %token MNAME
 %token WORKSPACE
-%token OPENBRACE
+%token OPENPAREN
 %token COMMA
-%token CLOSEBRACE
-%token DOT
+%token CLOSEPAREN
 %token PROPNAME
 %token FILE_NAME
 %token RESOURCENAME
 %token PHASENAME
-%token UNKNOW_CHAR
+%token UNKNOWN_CHAR
 
 %type <status> line
 %type <status> instruction
@@ -83,11 +82,15 @@
 extern char yytext[];
 extern FILE * yyin; 
 
-#define MORE_COMMAND "less "
+/* Default comand to print a file (if $PAGER is not set) */
+#define CAT_COMMAND "cat"
 
+/********************************************************** static functions */
 static void print_property(char*,property);
 
-t_file_list the_file_list;
+/********************************************************** static variables */
+static t_file_list the_file_list;
+static execution_mode = TRUE;
 
 %}
 
@@ -103,7 +106,7 @@ t_file_list the_file_list;
 
 line:
 	instruction
-	{ $$ = $1; return TRUE;}
+	{ $$ = $1; return $1;}
     ;
 
 instruction:
@@ -118,8 +121,7 @@ instruction:
 	| i_activate
 	| i_set
 	| i_get
-	| 
-      { $$ = FALSE; }
+	| error {$$ = FALSE;}
 	;
 
 i_open:
@@ -128,22 +130,28 @@ i_open:
 	WORKSPACE /* workspace name */
 	opt_sep_list
 	{
-		string main_module_name;
+	    string main_module_name;
 
-		debug(7,"tp_parse","reduce rule i_open\n");
+	    debug(7,"tp_parse","reduce rule i_open\n");
+
+	    if (execution_mode) {
 		if (db_get_current_program_name() != NULL)
-			close_program ();
+		    close_program ();
 		if (( $$ = open_program (yylval.name)))
 		{
-      
-			main_module_name = get_first_main_module();
-
-			if (!string_undefined_p(main_module_name)) {
-				/* Ok, we got it ! Now we select it: */
-				user_log("Main module PROGRAM \"%s\" found.\n", main_module_name);
-				lazy_open_module(main_module_name);
-			}
+		    main_module_name = get_first_main_module();
+		    
+		    if (!string_undefined_p(main_module_name)) {
+			/* Ok, we got it ! Now we select it: */
+			user_log("Main module PROGRAM \"%s\" found.\n",
+				 main_module_name);
+			lazy_open_module(main_module_name);
+		    }
 		}
+	    }
+/*
+	    free (yylval.name);
+*/
 	}
 	;
 
@@ -152,32 +160,41 @@ i_create:
 	sep_list
 	WORKSPACE /* workspace name */
 	{
-		$$ = (int) yylval.name;
-		the_file_list.argc = 0;
+	    $$ = (int) yylval.name;
+	    the_file_list.argc = 0;
 	}
 	sep_list
 	filename_list /* list of fortran files */
 	{
-		string main_module_name;
-
-		debug(7,"tp_parse","reduce rule i_create\n");
-
+	    string main_module_name;
+	    
+	    debug(7,"tp_parse","reduce rule i_create\n");
+	    
+	    if (execution_mode) {
 		if (workspace_exists_p($<name>4))
-		    user_error ("tp_parse", "the workspace %s exists\n",$<name>4);
+		    user_error ("tp_parse",
+				"the workspace %s exists\n",
+				$<name>4);
 		else {
 		    db_create_workspace ((string) $<name>4);
 		    free($<name>4);
 		    create_program (&the_file_list.argc, the_file_list.argv);
-		    
 		    main_module_name = get_first_main_module();
 		    
 		    if (!string_undefined_p(main_module_name)) {
 			/* Ok, we got it ! Now we select it: */
-			user_log("Main module PROGRAM \"%s\" found.\n", main_module_name);
+			user_log("Main module PROGRAM \"%s\" found.\n",
+				 main_module_name);
 			lazy_open_module(main_module_name);
-		    }		
+		    }
 		    $$ = TRUE;
 		}
+	    }
+/*
+	    while (the_file_list.argc--)
+		free (the_file_list.argv[the_file_list.argc]);
+	    free ($<name>4);
+*/
 	}
 	;
 
@@ -185,15 +202,18 @@ i_close:
 	CLOSE
 	opt_sep_list
 	{
-		debug(7,"tp_parse","reduce rule i_close\n");
+	    debug(7,"tp_parse","reduce rule i_close\n");
+
+	    if (execution_mode) {
 		if (db_get_current_program_name() != NULL) {
-			close_program ();
-			$$ = TRUE;
+		    close_program ();
+		    $$ = TRUE;
 		} else {
-			user_warning ("tp_parse","No workspace to close\n");
-			$$ = FALSE;
+		    user_warning ("tp_parse","No workspace to close\n");
+		    $$ = FALSE;
 		}	
 		$$ = TRUE;
+	    }
 	}
 	;
 
@@ -203,14 +223,23 @@ i_delete:
 	WORKSPACE /* workspace name */
 	opt_sep_list
 	{
-		debug(7,"tp_parse","reduce rule i_delete\n");
+	    char *t = yylval.name;
+
+	    debug(7,"tp_parse","reduce rule i_delete\n");
+
+	    if (execution_mode) {
 		if (db_get_current_program_name() == NULL) {
-			purge_directory (build_pgmwd ($<name>3));
-			$$ = TRUE;
+		    purge_directory (build_pgmwd (t));
+		    user_log ("Workspace %s deleted.\n", t);
+		    $$ = TRUE;
 		} else {
-			user_warning ("tp_parse","Workspace opened\n");
-			$$ = FALSE;
-		}	
+		    user_warning ("tp_parse","Workspace opened\n");
+		    $$ = FALSE;
+		}
+	    }
+/*
+	    free(t);
+*/
 	}
 	;
 
@@ -220,12 +249,18 @@ i_module:
 	WORKSPACE /* module name */
 	opt_sep_list
 	{
-		char *t = yylval.name;
+	    char *t = yylval.name;
 
+	    debug(7,"tp_parse","reduce rule i_module\n");
+
+	    if (execution_mode) {
 		debug(7,"tp_parse","reduce rule i_module\n");
 		lazy_open_module (strupper(t,t));
-		free(t);
 		$$ = TRUE;
+	    }
+/*
+	    free(t);
+*/
 	}
 	;
 
@@ -235,15 +270,21 @@ i_make:
 	resource_id
 	opt_sep_list
 	{
-		debug(7,"tp_parse","reduce rule i_make\n");
-		MAPL(e, {
-			if (safe_make_p ($3.the_name, STRING(CAR(e))) == FALSE) {
-				$$ = FALSE;
-				break;
-			}
-		}, $3.the_owners);
+	    debug(7,"tp_parse","reduce rule i_make\n");
 
+	    if (execution_mode) {
+		MAPL(e, {
+		    if (safe_make_p ($3.the_name, STRING(CAR(e))) == FALSE) {
+			$$ = FALSE;
+			break;
+		    }
+		}, $3.the_owners);
+		
 		$$ = TRUE;
+	    }
+/*	    free ($3.the_name);
+	    gen_free_list ($3.the_owners);
+*/
 	}
 	;
 
@@ -253,12 +294,18 @@ i_apply:
 	rule_id
 	opt_sep_list
 	{
-		debug(7,"tp_parse","reduce rule i_apply\n");
-		MAPL(e, {
-			safe_apply ($3.the_name, STRING(CAR(e)));
-		}, $3.the_owners);
+	    debug(7,"tp_parse","reduce rule i_apply\n");
 
+	    if (execution_mode) {
+		MAPL(e, {
+		    safe_apply ($3.the_name, STRING(CAR(e)));
+		}, $3.the_owners);
+		
 		$$ = TRUE;
+	    }
+/*	    free ($3.the_name);
+	    gen_free_list ($3.the_owners);
+*/
 	}
 	;
 
@@ -268,22 +315,27 @@ i_display:
 	resource_id
 	opt_sep_list
 	{
-		debug(7,"tp_parse","reduce rule i_display\n");
-	
+	    debug(7,"tp_parse","reduce rule i_display\n");
+
+	    if (execution_mode) {
+		string pager;
+
+		if (!(pager = getenv("PAGER")))
+		    pager = CAT_COMMAND;
+		
 		MAPL(e, {
-			string pager;
-
-			lazy_open_module (STRING(CAR(e)));
-			if (!(pager = getenv("PAGER")))
-				pager = MORE_COMMAND;
-
-			system(concatenate(pager,
-					build_view_file($3.the_name),
-					NULL));
-
+		    lazy_open_module (STRING(CAR(e)));
+		    system(concatenate(pager,
+				       " ",
+				       build_view_file($3.the_name),
+				       NULL));
 		}, $3.the_owners);
-
 		$$ = TRUE;
+	    }
+/*
+	    free ($3.the_name);
+	    gen_free_list ($3.the_owners);
+*/
 	}
 	;
 
@@ -293,9 +345,12 @@ i_activate:
 	rulename
 	opt_sep_list
 	{
-		debug(7,"tp_parse","reduce rule i_activate\n");
+	    debug(7,"tp_parse","reduce rule i_activate\n");
+
+	    if (execution_mode) {
 		activate ($3);
 		$$ = TRUE;
+	    }
 	}
 	;
 
@@ -308,52 +363,63 @@ i_set:
 	WORKSPACE
 	opt_sep_list
 	{
-		property p;
+	    property p ;
+	    bool status = TRUE;
+	    
+	    debug(7,"tp_parse","reduce rule i_set(%s,%s)\n",
+		  $<name>4,yylval.name);
 
+	    if (execution_mode) {
+	    
 		p = get_property ($<name>4);
-
 		strupper (yylval.name,yylval.name);
-
-		debug(7,"tp_parse","reduce rule i_set(%s,%s)\n",
-		      $<name>4,yylval.name);
-
+		
 		switch (property_tag(p))
 		{
 		case is_property_bool:
-			{
-				if (!strcmp ("TRUE",yylval.name))
-					set_bool_property ($<name>4, TRUE);
-				else if (!strcmp ("FALSE",yylval.name))
-					set_bool_property ($<name>4, FALSE);
-				else {
-					yyerror ("type mismatch");
-					$$ = FALSE;
-				    }
-				break;
-			}
-		case is_property_int:
-			{
-				char **ptr;
-				long l;
-
-				l = strtol (yylval.name, ptr, 0);
-				if (**ptr != '\0') {
-					yyerror ("type mismatch");
-					$$ = FALSE;
-				} else
-					set_int_property($<name>4, (int) l);
-				break;
-			}
-		case is_property_string:
-			{
-				set_string_property($<name>4, yylval.name);
-				break;
-			}
+		{
+		    if (!strcmp ("TRUE",yylval.name))
+			set_bool_property ($<name>4, TRUE);
+		    else if (!strcmp ("FALSE",yylval.name))
+			set_bool_property ($<name>4, FALSE);
+		    else {
+			yyerror ("type mismatch");
+			status = FALSE;
+		    }
+		    break;
 		}
-		print_property($<name>4,p);
-		$$ = TRUE;
+		case is_property_int:
+		{
+		    char **ptr;
+		    long l;
+		    
+		    l = strtol (yylval.name, ptr, 0);
+		    if (**ptr != '\0') {
+			yyerror ("type mismatch");
+			status = FALSE;
+		    } else
+			set_int_property($<name>4, (int) l);
+		    break;
+		}
+		case is_property_string:
+		{
+		    set_string_property($<name>4, yylval.name);
+		    break;
+		}
+		}
+		if (status)
+		{
+		    print_property($<name>4,p);
+		    $$ = TRUE;
+		} else
+		    $$ = FALSE;
+	    }
+/*
+	    free (yylval.name);
+	    free ($<name>4);
+*/
 	}
-
+	;
 
 i_get:
 	GET
@@ -361,24 +427,28 @@ i_get:
 	PROPNAME
 	opt_sep_list
 	{
-		property p;
+	    property p;
 
-		debug(7,"tp_parse","reduce rule i_get (%s)\n",
-		      yylval.name);
-
-		strupper (yylval.name,yylval.name);
+	    debug(7,"tp_parse","reduce rule i_get (%s)\n",
+		  yylval.name);
+	    
+	    if (execution_mode) {
 		p = get_property (yylval.name);
-
+	    
 		print_property(yylval.name, p);
 		$$ = TRUE;
+	    }
+/*
+	    free (yylval.name);
+*/
 	}
-
+	;
 
 rulename:
 	PHASENAME
 	{
- 		debug(7,"tp_parse","reduce rule rulename (%s)\n",yylval.name);
-		$$ = yylval.name;
+	    debug(7,"tp_parse","reduce rule rulename (%s)\n",yylval.name);
+	    $$ = yylval.name;
 	}
 	;
 
@@ -387,19 +457,26 @@ filename_list:
 	sep_list
 	filename_list
 	{
- 		debug(7,"tp_parse","reduce rule filename_list (%s)\n", $1);
-		if (the_file_list.argc < FILE_LIST_MAX_LENGTH)
+	    debug(7,"tp_parse","reduce rule filename_list (%s)\n", $1);
+
+	    if (the_file_list.argc < FILE_LIST_MAX_LENGTH) {
 		the_file_list.argv[the_file_list.argc] = $1;
 		the_file_list.argc++;
+	    } else
+		YYERROR;
+	    
 	}
 	|
 	filename
 	opt_sep_list
 	{
- 		debug(7,"tp_parse","reduce rule filename_list (%s)\n", $1);
-		if (the_file_list.argc < FILE_LIST_MAX_LENGTH)
+	    debug(7,"tp_parse","reduce rule filename_list (%s)\n", $1);
+
+	    if (the_file_list.argc < FILE_LIST_MAX_LENGTH) {
 		the_file_list.argv[the_file_list.argc] = $1;
 		the_file_list.argc++;
+	    } else
+		YYERROR;
 	}
 	;
 
@@ -410,155 +487,174 @@ filename:
 
 resource_id:
 	RESOURCENAME
+	{ $<name>$ = yylval.name;}
+	owner
 	{
- 		debug(7,"tp_parse","reduce rule resource_id (%s)\n",yylval.name);
-		$$.the_name = yylval.name;
-		$$.the_owners=CONS(STRING,db_get_current_module_name(),NIL);
-	}
-	|
-	owner RESOURCENAME
-	{
- 		debug(7,"tp_parse","reduce rule resource_id (%s)\n",yylval.name);
-		$$.the_name = yylval.name;
-		$$.the_owners = $1;
+	    debug(7,"tp_parse","reduce rule resource_id (%s)\n",$<name>2);
+
+	    $$.the_name = $<name>2;
+	    $$.the_owners = $3;
 	}
 	;
 
 rule_id:
 	PHASENAME
+	{ $<name>$ = yylval.name;}
+	owner
 	{
- 		debug(7,"tp_parse","reduce rule rule_id (%s)\n",yylval.name);
-		$$.the_name = yylval.name;
-		$$.the_owners=CONS(STRING,db_get_current_module_name(),NIL);
-	}
-	|
-	owner PHASENAME
-	{
- 		debug(7,"tp_parse","reduce rule rule_id (%s)\n",yylval.name);
-		$$.the_name = yylval.name;
-		$$.the_owners = $1;
+	    debug(7,"tp_parse","reduce rule rule_id (%s)\n",$<name>2);
+
+	    $$.the_name = $<name>2;
+	    $$.the_owners = $3;
 	}
 	;
 
 owner:
-	  OWNER_ALL
+	OPENPAREN
+	OWNER_ALL
+	CLOSEPAREN
 	{
 	    int nmodules = 0;
 	    char *module_list[ARGS_LENGTH];
 	    int i;
-		list result = NIL;
+	    list result = NIL;
 
- 		debug(7,"tp_parse","reduce rule owner (ALL)\n");
-	    db_get_module_list(&nmodules, module_list);
-	    pips_assert("tpips:yacc", nmodules>0);
-	    for(i=0; i<nmodules; i++) {
-		string on = module_list[i];
+	    debug(7,"tp_parse","reduce rule owner (ALL)\n");
 
-		result = gen_nconc(result, 
-				   CONS(STRING, on, NIL));
+	    if (execution_mode) {
+		db_get_module_list(&nmodules, module_list);
+		pips_assert("yyparse", nmodules>0);
+		for(i=0; i<nmodules; i++) {
+		    string on = module_list[i];
+
+		    result = gen_nconc(result, 
+				       CONS(STRING, on, NIL));
+		}
+		$$ = result;
 	    }
+	}
+	|
+	OPENPAREN
+	OWNER_PROGRAM
+	CLOSEPAREN
+	{
+	    debug(7,"tp_parse","reduce rule owner (PROGRAM)\n");
 
-		$$ = result;		
-	}
-	| OWNER_PROGRAM
-    {
- 		debug(7,"tp_parse","reduce rule owner (PROGRAM)\n");
+	    if (execution_mode) {
 		$$ = CONS(STRING, db_get_current_program_name (), NIL);
+	    }
 	}
-	| OWNER_MAIN
-    {
+	|
+	OPENPAREN
+	OWNER_MAIN
+	CLOSEPAREN
+	{
 	    int nmodules = 0;
 	    char *module_list[ARGS_LENGTH];
 	    int i;
 	    int number_of_main = 0;
 
- 		debug(7,"tp_parse","reduce rule owner (MAIN)\n");
-	    db_get_module_list(&nmodules, module_list);
-	    pips_assert("tpips:yacc", nmodules>0);
-	    for(i=0; i<nmodules; i++) {
-			string on = module_list[i];
+	    debug(7,"tp_parse","reduce rule owner (MAIN)\n");
 
-			if (entity_main_module_p(
-				local_name_to_top_level_entity(on)) == TRUE)
-			{
-				if (number_of_main)
-				pips_error("build_real_resources",
-					   "More the one main\n");
+	    if (execution_mode) {
+		db_get_module_list(&nmodules, module_list);
+		pips_assert("yyparse", nmodules>0);
+		for(i=0; i<nmodules; i++) {
+		    string on = module_list[i];
 
-				number_of_main++;
-				$$ = CONS(STRING, on, NIL);
-			}
+		    if (entity_main_module_p
+			(local_name_to_top_level_entity(on)) == TRUE)
+		    {
+			if (number_of_main)
+			    pips_error("build_real_resources",
+				       "More the one main\n");
+			
+			number_of_main++;
+			$$ = CONS(STRING, on, NIL);
+		    }
+		}
 	    }
 	}
-	| OWNER_MODULE
-    {
- 		debug(7,"tp_parse","reduce rule owner (MODULE)\n");
+	|
+	OPENPAREN
+	OWNER_MODULE
+	CLOSEPAREN
+	{
+	    debug(7,"tp_parse","reduce rule owner (MODULE)\n");
+
+	    if (execution_mode) {
 		$$ = CONS(STRING, db_get_current_module_name (), NIL);
+	    }
 	}
-	| OWNER_CALLEES
+	|
+	OPENPAREN
+	OWNER_CALLEES
+	CLOSEPAREN
 	{
 	    callees called_modules;
 	    list lcallees;
-		list ps;
-		list result = NIL;
+	    list ps;
+	    list result = NIL;
 
- 		debug(7,"tp_parse","reduce rule owner (CALLEES)\n");
-	    if (safe_make_p(DBR_CALLEES, db_get_current_module_name())
-			== FALSE)
-			YYERROR;	
+	    debug(7,"tp_parse","reduce rule owner (CALLEES)\n");
 
-	    called_modules = (callees) 
-		db_get_memory_resource(DBR_CALLEES, db_get_current_module_name(),TRUE);
-	    lcallees = callees_callees(called_modules);
+	    if (execution_mode) {
+		if (safe_make_p(DBR_CALLEES, db_get_current_module_name())
+		    == FALSE)
+		    YYERROR;	
 
-	    for (ps = lcallees; ps != NIL; ps = CDR(ps)) {
-		string on = STRING(CAR(ps));
+		called_modules = (callees) 
+		db_get_memory_resource(DBR_CALLEES,
+				       db_get_current_module_name(),TRUE);
+		lcallees = callees_callees(called_modules);
 
-		result = gen_nconc(result, 
-				   CONS(STRING, on, NIL));
-	    }
-
+		for (ps = lcallees; ps != NIL; ps = CDR(ps)) {
+		    string on = STRING(CAR(ps));
+		    result = gen_nconc(result, CONS(STRING, on, NIL));
+		}
 		$$ = result;
+	    }
 	}
-	| OWNER_CALLERS
+	|
+	OPENPAREN
+	OWNER_CALLERS
+	CLOSEPAREN
 	{
 	    callees caller_modules;
 	    list lcallers;
-		list ps;
-		list result = NIL;
+	    list ps;
+	    list result = NIL;
 
- 		debug(7,"tp_parse","reduce rule owner (CALLERS)\n");
-	    if (safe_make_p(DBR_CALLERS, db_get_current_module_name())
-			== FALSE)
-			YYERROR;	
+	    debug(7,"tp_parse","reduce rule owner (CALLERS)\n");
+	    if (execution_mode) {
+		if (safe_make_p(DBR_CALLERS, db_get_current_module_name())
+		    == FALSE)
+		    YYERROR;	
 
-	    caller_modules = (callees) 
-		db_get_memory_resource(DBR_CALLERS, db_get_current_module_name(),TRUE);
-	    lcallers = callees_callees(caller_modules);
+		caller_modules = (callees) 
+		    db_get_memory_resource(DBR_CALLERS,
+					   db_get_current_module_name(),TRUE);
+		lcallers = callees_callees(caller_modules);
 
-	    for (ps = lcallers; ps != NIL; ps = CDR(ps)) {
-		string on = STRING(CAR(ps));
-
-		result = gen_nconc(result, 
-				   CONS(STRING, on, NIL));
-	    }
-
+		for (ps = lcallers; ps != NIL; ps = CDR(ps)) {
+		    string on = STRING(CAR(ps));
+		    result = gen_nconc(result, CONS(STRING, on, NIL));
+		}
 		$$ = result;
+	    }
 	}
 	|
-	OWNER_NAME
-	{ $$ = yylval.name; }
-	DOT
-	{
-		char *c = $<name>2;
-
- 		debug(7,"tp_parse","reduce rule owner (name = %s)\n",c);
-		strupper (c, c);
-		$$ = CONS(STRING, c, NIL);
-	}
-	| OPENBRACE
+	OPENPAREN
 	list_of_owner_name
 	{ $$ = $2; }
+	|
+	{
+	    debug(7,"tp_parse","reduce rule owner (none)\n");
+
+	    if (execution_mode) {
+			$$ = CONS(STRING, db_get_current_module_name (), NIL);
+	    }
+	}
 	;
 
 list_of_owner_name:
@@ -567,24 +663,27 @@ list_of_owner_name:
 	COMMA
 	list_of_owner_name
 	{
-		char *c = $<name>2;
- 		debug(7,"tp_parse",
-			  "reduce rule owner list (name = %s)\n",c);
+	    debug(7,"tp_parse",
+		  "reduce rule owner list (name = %s)\n",$<name>2);
 
+	    if (execution_mode) {
+		char *c = $<name>2;
 		c[strlen(c) - 1] = '\0'; /* skip the comma */
 		$$ = gen_nconc($4,CONS(STRING, c, NIL));
+	    }
 	}
 	|
 	OWNER_NAME
 	{ $$ = yylval.name; }
-	CLOSEBRACE
-	DOT
+	CLOSEPAREN
 	{
-		char *c = $<name>2;
+	    debug(7,"tp_parse","reduce rule owner list(name = %s)\n",$<name>2);
 
- 		debug(7,"tp_parse","reduce rule owner list(name = %s)\n",c);
+	    if (execution_mode) {
+		char *c = $<name>2;
 		strupper (c, c);
 		$$ = CONS(STRING, c, NIL);
+	    }
 	}
 	;
 
@@ -602,8 +701,8 @@ sep_list:
 	|
 	SEPARATOR 
 	{
- 		debug(7,"tp_parse","reduce separator list\n");
-		$$ = 0;
+	    debug(7,"tp_parse","reduce separator list\n");
+	    $$ = 0;
 	}
 	;
 
@@ -613,14 +712,14 @@ void yyerror(s)
 char * s;
 {
     tpips_lex_print_pos(stderr);
-	user_error("[yyparse]"," %s\n", s);
+    user_error("[yyparse]"," %s\n", s);
 }
 
 void close_workspace_if_opened()
 {
     if (db_get_current_program_name() != NULL)
 	close_program ();
-}	
+}
 
 static void print_property(char* pname, property p)
 {
@@ -628,7 +727,7 @@ static void print_property(char* pname, property p)
     {
     case is_property_bool:
     {
-		printf ("%s = %s\n",
+		fprintf (stderr, "%s = %s\n",
 			pname,
 			get_bool_property (pname) == TRUE ?
 			"TRUE" : "FALSE");
@@ -636,17 +735,23 @@ static void print_property(char* pname, property p)
     }
     case is_property_int:
     {
-		printf ("%s = %d\n",
+		fprintf (stderr, "%s = %d\n",
 			pname,
 			get_int_property (pname));
 		break;
     }
     case is_property_string:
     {
-		printf ("%s = %s\n",
+		fprintf (stderr, "%s = %s\n",
 			pname,
 			get_string_property (pname));
 		break;
     }
     }
+}
+
+void init_execution_mode()
+{
+    execution_mode = get_bool_property("TPIPS_NO_EXECUTION_MODE") ?
+	FALSE : TRUE ;
 }
