@@ -38,7 +38,7 @@
 char *variable_name(var)
 Variable var;
 {
-    string s = malloc(10);
+    string s = (char*) malloc(10);
 
     if (var == TCST) 
 	s = strdup(TCST_NAME);
