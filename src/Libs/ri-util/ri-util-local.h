@@ -19,7 +19,7 @@
 #include "contrainte.h"
 #include "sc.h"
 #include "polynome.h"
-#include "matrice.h"
+#include "matrix.h"
 #include "word_attachment.h"
 
 #include "text.h"
