@@ -26,10 +26,8 @@ FILE *fopen(), *fdebug;
 struct initpb I; 
 struct problem Z;
 
-#define INT_TO_VALUE(i) (int_to_value(i))
 #define FTRACE fdebug
 //sc must be consistant
-//return TRUE if janus can handle, FALSE if not
 static boolean 
 sc_to_iproblem(Psysteme sc)
 {
@@ -37,7 +35,7 @@ sc_to_iproblem(Psysteme sc)
   // int nbrows, nbcolumns; // common temporary counter i,j 
   Pcontrainte peq;
   Pvecteur pv;
-  Value v;
+  //  Value v;
 
   //Janus 
   // int p6,p5,p4,p3,p2,p1;
@@ -87,23 +85,49 @@ sc_to_iproblem(Psysteme sc)
    tableau_janus(&I,&Z);
   }
   /**************** END print debug into structure ************************/
+
+/**************** BEGIN reset some parameters in the structures ************************/
+Z.negal=0;Z.icout=0;Z.minimum=0;Z.mx=0;Z.nx=0;Z.ic1=0;Z.tmax=0;Z.niter=0;Z.itdirect=0;Z.nredun=0;Z.numero=0;Z.numax=0;
+Z.lastfree=0;Z.nub= 0;Z.ntp = 0;Z.vdum = 0;Z.nturb = 0;
+/*
+for ( i=1;i<=MAXLIGNES+1; i++) { 
+   for (j=1; j<=MAXCOLONNES+1; j++)     
+	      value_assign(I.a[i][j],VALUE_ZERO);
+}
+for ( i=1 ; i <= MAXLIGNES +1 ; i++)  {      
+      value_assign(I.d[i],VALUE_ZERO);
+}
+for ( i=1 ; i <= MAXLIGNES +1 ; i++)  {
+ I.e[i]=0;
+}
+for ( i=1;i<=AKLIGNES; i++) { 
+   for (j=1; j<=AKCOLONNES; j++)     
+	      value_assign(Z.ak[i][j],VALUE_ZERO);
+}
+for ( i=1 ; i <= AKLIGNES ; i++)  { 
+      value_assign(Z.dk[i],VALUE_ZERO);
+}*/
+//There's a bug here: if we donot reinitialize these variables, then we'll have a wrong insertion
+//into the structure. And the order is important, when the parameter pointer gives errors after some iteration
+//DN 25/11/2002. We should use another way to do this. Need time to consider.
+
+/**************** END reset some parameters in the structures ************************/
+
   /**************** BEGIN to insert DIMENSION with tests into structure *************/
   // removed reading from file. replace by direct assign
   // we can chosse probleme janus ou simplexe entier classique or other in this section
  
   //fscanf(fh,"%d",&Z.nvar);   /* nombre total de variables */
   Z.nvar = sc->dimension; /* to be verified */
-  if (Z.nvar <= 0)   // let's forget this case for the moment. haven't seen the use yet.  
-    {
-      printf("number of variables <= 0");
-      return FALSE;
-      // put exception here saying Janus cannot handle this system of constraints
-    }
-  if (Z.nvar> MAXCOLONNES)
-    {
-      printf("Too many variables %3d > max=%3d\n",Z.nvar,MAXCOLONNES);
-      return FALSE;// put exception here saying Janus cannot handle this system of constraints
-    }
+  if (Z.nvar <= 0) { //sc given is not correct. 
+    printf("\nAttention: Number of variables <= 0 ");
+    return FALSE;
+    // put exception here saying Janus cannot handle this system of constraints
+  }
+  if (Z.nvar> MAXCOLONNES)    {
+    printf("Too many variables %3d > max=%3d\n",Z.nvar,MAXCOLONNES);
+    return FALSE;// put exception here saying Janus cannot handle this system of constraints
+  }
 
   //fscanf(fh,"%d",&Z.mcontr); /* nombre de contraintes */
   Z.mcontr = sc->nb_eq + sc->nb_ineq; /* to be verified*/
@@ -147,20 +171,16 @@ sc_to_iproblem(Psysteme sc)
     }
 
   //included constant (or rhs) here, which is the last element in the vector, donot change the sign of constant
-  //
+  // DN 6/11/02. use Marcos of Value. Needed Value in struct problem.
 
   //egalites coeffs, i for columns, j for rows
   for (peq = sc->egalites, i = 1; !CONTRAINTE_UNDEFINED_P(peq); peq=peq->succ, i++) 
     {      
       for (pv=sc->base,j=1; !VECTEUR_NUL_P(pv); pv=pv->succ,j++)
 	{     
-	  value_assign(v,value_uminus(vect_coeff(vecteur_var(pv),peq->vecteur)));
-	  I.a[i][j] = VALUE_TO_INT(v);
-	  if (value_ne(INT_TO_VALUE(I.a[i][j]),v)) {return FALSE;} //coeff exceeds the limit of type int
+	  value_assign(I.a[i][j],value_uminus(vect_coeff(vecteur_var(pv),peq->vecteur)));
 	}
-       value_assign(v,vect_coeff(TCST,peq->vecteur));
-       I.d[i]= VALUE_TO_INT(v);
-       if (value_ne(INT_TO_VALUE(I.d[i]),v)) {return FALSE;} //coeff exceeds the limit of type int
+      value_assign(I.d[i],vect_coeff(TCST,peq->vecteur));       
     }
 	
   //inegalites
@@ -168,13 +188,9 @@ sc_to_iproblem(Psysteme sc)
     {      
       for (pv=sc->base,j=1; !VECTEUR_NUL_P(pv); pv=pv->succ,j++)
 	{     
-	  value_assign(v,value_uminus(vect_coeff(vecteur_var(pv),peq->vecteur)));
-	  I.a[i][j] = VALUE_TO_INT(v);
-	  if (value_ne(INT_TO_VALUE(I.a[i][j]),v)) {return FALSE;} //coeff exceeds the limit of type int
+	  value_assign( I.a[i][j],value_uminus(vect_coeff(vecteur_var(pv),peq->vecteur)));
 	}
-       value_assign(v,vect_coeff(TCST,peq->vecteur));
-       I.d[i]= VALUE_TO_INT(v);
-       if (value_ne(INT_TO_VALUE(I.d[i]),v)) {return FALSE;} //coeff exceeds the limit of type int
+      value_assign(I.d[i],vect_coeff(TCST,peq->vecteur));
     }   
      
   /**************** END to insert MATRIX into structure *********************/ 
@@ -192,7 +208,9 @@ sc_janus_feasibility(Psysteme sc)
   
   /**************** BEGIN execution simplexe entier classique */
   if (ok) r = isolve(&I,&Z,0);
-  else return(9); //means Janus is not ready for this sc
+else r = 9;//DN janus should not be used here.
+  // the third parameter means test only one time
+  // only I is initialized. Z is still empty
   /*
   if (r==VRFIN) printf("solution finie\n") ;
   else if (r==VRVID) printf("polyedre vide\n") ;
