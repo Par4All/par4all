@@ -2,6 +2,9 @@
   $Id$
 
   $Log: TextDisplayer.java,v $
+  Revision 1.8  1998/11/12 17:21:36  coelho
+  smaller and buffer...
+
   Revision 1.7  1998/10/30 15:42:42  ancourt
   class extension moved in Displayer
 
@@ -241,27 +244,25 @@ public class TextDisplayer extends Displayer
   /** @return the text of a text file
     */
   public static String getText(File f)
+  {
+    try
     {
-      String s = new String();
-      char[] buff = new char[50000];
-      InputStream is;
-      InputStreamReader reader;
-      try
-        {
-	  reader = new FileReader(f);
-	  int nch;
-	  while ((nch = reader.read(buff, 0, buff.length)) != -1)
-	    {
-	      s = s + new String(buff, 0, nch);
-	    }
-	  return s;
-	}
-      catch (IOException e)
-        {
-	  System.out.println("Could not load file: " + f);
-	}
-      return null;
+      StringBuffer s = new StringBuffer();
+      char[] buff = new char[5000];
+      InputStreamReader reader = new FileReader(f);
+      int nch;
+      while ((nch = reader.read(buff, 0, buff.length)) != -1)
+      {
+	s.append(buff, 0, nch);
+      }
+      return s.toString();
     }
+    catch (IOException e)
+    {
+      System.out.println("Could not load file: " + f);
+    }
+    return null;
+  }
 
 
   /** Updates the panel.
