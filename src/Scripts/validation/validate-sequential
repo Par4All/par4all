@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1994/03/28 08:40:27 $, ) version $Revision$,
+# $RCSfile: validate-sequential,v $ ($Date: 1994/04/21 09:55:22 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -156,7 +156,7 @@ report()
 	cat $tmperr
 	echo "--";
       }
-      echo "Validate Message:"
+      echo "Validate Message from $HOSTNAME:"
       echo
       echo "$message" 
     } | mail -s "$subject" $user
