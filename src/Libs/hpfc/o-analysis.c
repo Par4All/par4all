@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/09/13 14:22:30 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/09/15 15:54:24 $, )
  * version $Revision$
  */
 
@@ -13,11 +13,9 @@
 
 entity CreateIntrinsic(string name); /* in syntax.h */
 
-static list
-    lblocks = NIL,
-    lloop  = NIL;
+static list lblocks = NIL, lloop  = NIL;
 
-GENERIC_LOCAL_MAPPING(variable_used, int, entity);
+GENERIC_LOCAL_MAPPING(variable_used, int, entity)
 
 /* Overlap_Analysis
  *
@@ -26,28 +24,12 @@ GENERIC_LOCAL_MAPPING(variable_used, int, entity);
 bool Overlap_Analysis(stat, pstat)
 statement stat, *pstat;
 {
-    list 
-	lw = NIL,
-	lr = NIL,
-	Ra = NIL,
-	Ro = NIL,
-	Rrt = NIL,
-	lWa = NIL,
-	lRa = NIL,
-	lRo = NIL, /* to keep the lkind and lvect computed */
-	W  = NIL,
-	Wa = NIL,
-	Wrt = NIL,
-	lvect = NIL,
-	lkind = NIL;
-    syntax
-	the_written_syntax = syntax_undefined;
-    reference
-	the_written_reference = reference_undefined;
-    statement
-	innerbody,
-	messages_stat, 
-	newloopnest;
+    list lw = NIL, lr = NIL, Ra = NIL, Ro = NIL, Rrt = NIL,
+	lWa = NIL, lRa = NIL, lRo = NIL, W  = NIL, Wa = NIL, 
+        Wrt = NIL, lvect = NIL, lkind = NIL;
+    syntax the_written_syntax = syntax_undefined;
+    reference the_written_reference = reference_undefined;
+    statement innerbody, messages_stat, newloopnest;
 
     DEBUG_STAT(9, "considering statement", stat);
 
@@ -388,24 +370,17 @@ list lvref, lkref;
     entity
 	e2 = reference_variable(r2),
 	template = array_to_template(e2);
-    list
-	lv = lvref,
-	lk = lkref;
-    bool
-	result = TRUE;
-    int
-	i = 1 ;
+    list lv = lvref, lk = lkref;
+    bool result = TRUE;
+    int i = 1 ;
 
-    debug(7, "aligned_p",
-	  "arrays %s and %s\n",
-	  entity_name(reference_variable(r1)), entity_name(e2));
+    pips_debug(7, "arrays %s and %s\n",
+	       entity_name(reference_variable(r1)), entity_name(e2));
 
-    for ( ; (lk!=NIL) ; lv=CDR(lv), lk=CDR(lk))
+    for ( ; (lk!=NIL) ; POP(lv), POP(lk))
     {
-	tag
-	    t = access_tag(INT(CAR(lk)));
-	Pvecteur
-	    v = PVECTOR(CAR(lv));
+	tag t = access_tag(INT(CAR(lk)));
+	Pvecteur v = (Pvecteur) PVECTOR(CAR(lv));
 	int
 	    p,
 	    tpldim = template_dimension_of_array_dimension(e2, i),
@@ -438,21 +413,17 @@ bool message_manageable_p(array, lpref, lkref)
 entity array;
 list lpref, lkref;
 {
-    list
-	lp = NIL,
-	lk = NIL;
-    int
-	i;
+    list lp = NIL, lk = NIL;
+    int	i;
 
     for(i=1, lk=lkref, lp=lpref ; lk!=NIL ; lk=CDR(lk), lp=CDR(lp))
     {
-	tag
-	    ta = access_tag(INT(CAR(lk)));
+	tag ta = access_tag(INT(CAR(lk)));
 	int
 	    p = 0,
-	    shift = vect_coeff(TSHIFTV, PVECTOR(CAR(lp))),
-	    dlt = vect_coeff(DELTAV, PVECTOR(CAR(lp))),
-	    t2 = vect_coeff(TEMPLATEV, PVECTOR(CAR(lp)));
+	    shift = vect_coeff(TSHIFTV, (Pvecteur) PVECTOR(CAR(lp))),
+	    dlt = vect_coeff(DELTAV, (Pvecteur) PVECTOR(CAR(lp))),
+	    t2 = vect_coeff(TEMPLATEV, (Pvecteur) PVECTOR(CAR(lp)));
 
 	if ((ta==not_aligned) ||
 	    (ta==local_star) ||
@@ -489,7 +460,7 @@ list lpref, lkref;
 	tag
 	    ta = access_tag(INT(CAR(lk)));
 	int
-	    shift = vect_coeff(TSHIFTV, PVECTOR(CAR(lp)));
+	    shift = vect_coeff(TSHIFTV, (Pvecteur) PVECTOR(CAR(lp)));
 
 	if ((ta==aligned_shift) && (shift!=0))
 	    set_overlap(array, 
@@ -917,14 +888,10 @@ list Ref, lRef;
 
     for ( ; (lr!=NIL) ; lr=CDR(lr), lkv=CDR(lkv))
     {
-	int 
-	    dim = 1;
-	syntax 
-	    s = SYNTAX(CAR(lr));
-	reference
-	    r = syntax_reference(s);
-	entity
-	    array = reference_variable(r);
+	int dim = 1;
+	syntax s = SYNTAX(CAR(lr));
+	reference r = syntax_reference(s);
+	entity array = reference_variable(r);
 	list
 	    l1 = CONSP(CAR(lkv)),
 	    lk = CONSP(CAR(l1)),
@@ -932,17 +899,13 @@ list Ref, lRef;
 	    lv = CONSP(CAR(CDR(l1))),
 	    li2 = NIL;
 
-	for ( ; (lk!=NIL) ; lk=CDR(lk), li=CDR(li), lv=CDR(lv))
+	for ( ; (lk!=NIL) ; POP(lk), POP(li), POP(lv))
 	{
-	    expression
-		indice = EXPRESSION(CAR(li));
-	    Pvecteur
-		v = PVECTOR(CAR(lv));
-	    access
-		ac = INT(CAR(lk));
+	    expression indice = EXPRESSION(CAR(li));
+	    Pvecteur v = (Pvecteur) PVECTOR(CAR(lv));
+	    access ac = INT(CAR(lk));
 
-	    /*
-	     * caution: only distributed dimensions indexes are modified
+	    /* caution: only distributed dimensions indexes are modified
 	     * other have to remain untouched...
 	     * ??? aligned star is missing
 	     */
