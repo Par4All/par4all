@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "newgen_types.h"
 #include "newgen_hash.h"
 
 #define GAP_BETWEEN_WORDS (0)
 
-main(argc, argv)
+int main(argc, argv)
 int argc;
 char *argv[];
 {
@@ -167,5 +168,5 @@ char *argv[];
 
     hash_table_clear(hwords);
 
-    exit(0);
+    return 0;
 }

@@ -8,7 +8,6 @@
 #include "spec.h"
 
 /* declarations des fonctions */
-char * getenv();
 personne lire_passager() ;
 personne lire_conducteur() ;
 lieu lire_lieu() ;
@@ -450,5 +449,5 @@ int main(void)
     }, CONS( INT, 1, CONS( INT, 2, NIL ))) ;
 
     fprintf(stderr,"\n");
-    exit(0);
+	return 0;
 }
