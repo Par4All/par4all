@@ -16,31 +16,32 @@ Value pgcd_slow(Value a, Value b)
 {
     Value m;
 
-    if (value_zero_p(a) && value_zero_p(b))
-	return VALUE_ONE;
-
     if (value_zero_p(a))
-	return value_abs(b);
+	if (value_zero_p(b))
+	    return VALUE_ONE;    /* a==0, b==0 */
+        else
+	    return value_abs(b); /* a==0, b!=0 */
+    else
+	if (value_zero_p(b))
+	    return value_abs(a); /* a!=0, b==0 */
 
-    if (value_zero_p(b))
-	return value_abs(a);
+    value_absolute(a);
+    value_absolute(b);
 
-    a = value_abs(a);
-    b = value_abs(b);
-    m = value_mod(a,b);
+    if (value_eq(a,b)) /* a==b */
+	return a;
 
-    if (value_ge(a,b)) { 
-	if (value_zero_p(m))
-	    return value_abs(b);
-	else 
-	    return pgcd(b,m);
-    }
-    else {
-	if (value_zero_p(m))
-	    return value_abs(a);
-	else
-	    return pgcd(a,m);
-    }
+    if (value_gt(b,a))
+	m = a, a = b, b = m; /* swap */
+
+    /* on entry in this loop, a > b > 0 is insured */
+    do {
+	m = value_mod(a,b);
+	a = b;
+	b = m;
+    } while(value_notzero_p(b));
+
+    return a;
 }
 
 /* int pgcd_fast(int a, int b): calcul iteratif du pgcd de deux entiers;
