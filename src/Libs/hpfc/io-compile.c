@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-compile.c,v $
+ * Revision 1.50  1997/09/26 10:52:34  coelho
+ * julien added in/out effects io optimizations.
+ *
  * Revision 1.49  1997/09/13 12:58:24  coelho
  * *** empty log message ***
  *
@@ -58,7 +61,9 @@ current_entity_is_used_later_p(statement stat, entity current_entity)
 
 
 /* get OUT Regions(Effects) list for the io statement */
-    list_out = load_statement_out_regions(stat);
+/*    list_out = load_statement_out_regions(stat);*/
+
+    list_out = load_out_effects_list(stat);
 
     ifdebug(2)
     {
@@ -91,7 +96,9 @@ current_entity_is_updated_before_p(statement stat, entity current_entity)
 	return TRUE;
 
 /* get IN Regions(Effects) list for the io statement */
-    list_in = load_statement_in_regions(stat);
+/*    list_in = load_statement_in_regions(stat);*/
+
+    list_in = load_in_effects_list(stat);
 
     ifdebug(2)
     {
