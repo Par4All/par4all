@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.51  1997/04/07 17:06:35  coelho
+ * test normalization...
+ *
  * Revision 1.50  1997/04/07 09:27:33  coelho
  * lattice extraction for the basic enumeration.
  *
@@ -1043,6 +1046,10 @@ hpf_remapping(
     scanners = gen_nconc(lo, left);
 
     DEBUG_SYST(4, "cleaned system", p);
+
+    /* normalize_system(&p);
+       DEBUG_SYST(4, "normalized system", p); */
+
     DEBUG_ELST(4, "scanners", scanners);
 
     /* processors/array elements separation.
