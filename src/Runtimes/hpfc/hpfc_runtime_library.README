@@ -1,9 +1,10 @@
-$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/09/26 22:22:39 $, 
+$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/09/27 18:33:34 $, 
 
  (c) Fabien Coelho, 1993-1995
 
 This file describes the content of the Hpfc Runtime Library.
 Don't expect anything from these sources, so you won't be disapointed.
+
 
 Introduction:
 -------------
@@ -14,6 +15,7 @@ distributed arrays, communications, shifts, broadcasts, and so on.
 It is based on PVM. Some never tested extensions tried to use the CMMD
 library of the CM5. Plans to switch to MPI. Most of the functions are
 generated thru m4 templates, that get rid of types and data dimensions.
+
 
 How to built the library:
 -------------------------
@@ -27,17 +29,27 @@ PIPS_M4 and HPFC_M4
   GNU m4 1.4 is okay.
 PVM_ROOT and PVM_ARCH
 HPFC_RUNTIME_M4_PARAMS:
- -D DEMO      (print some messages when launched)
- -D DIRECT    (use direct connexion)
- -D DEBUG     (verbose run)
- -D SYNC_EXIT (synchronize on exit)
- -D USE_PVMe  (for IBM's PVM. a PVM3_ROOT is expected if set)
+ -D DEMO          (print some messages when launched)
+ -D DIRECT        (use direct connexions)
+ -D DEBUG         (verbose run)
+ -D SYNC_EXIT     (synchronize on exit, needed by old PVM versions)
+ -D USE_PVMe      (for IBM's PVM. a PVM3_ROOT is expected if set)
+ -D FAKE_BUFFERS  (whether to generate fake broadcast/bufpck/bufupk
+                   subroutines. Were used to measure PVM overheads...)
 
 Then make (and hope:-)...
+
 
 Library content and organization:
 ---------------------------------
 
+Misc: Demo support. 
+Runtime: (rtsupport) everything to manage data distributions descriptors.
+Reductions: for stride-1 aligned block-distributed arrays.
+Broadcast: functions for partial broadcasts.
+Packing: (un)pack of borders...
+Shifts: for stride-1 aligned block-distributed arrays.
+Buffers: (bufmgr) intermediate to squeeze PVM inefficiency.
 
 
 Bugs:
