@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.134  1998/01/26 09:49:06  coelho
+# hop.
+#
 # Revision 1.133  1998/01/23 07:58:55  coelho
 # LINUXI86LL bin dir updated.
 #
@@ -82,7 +85,9 @@ test ${uname_s} = SunOS && expr ${uname_r} : '^4' > /dev/null && \
 test ${uname_s} = Linux && \
 	PIPS_ARCH="LINUXI86"
 
-
+# could use ll as a default on loreto.
+# test ${uname_s} = Linux -a $HOSTNAME = loreto.ensmp.fr && \
+#	PIPS_ARCH="LINUXI86LL"
 
 # 
 #         #    #  ######  #    #   ####   ######  #    #
