@@ -160,14 +160,17 @@
 { DBR_CALLERS, 			NEWGEN_METHODS },
 { DBR_CODE, 			NEWGEN_METHODS },
 
+/* Resource for alias analysis
+ */
+{ DBR_ALIAS_ASSOCIATIONS,       NEWGEN_METHODS },
+
 /* Misc files.
  */
 { DBR_CROUGH,			STRING_METHODS },
 { DBR_C,			STRING_METHODS },
 { DBR_NEW_DECLARATIONS,		STRING_METHODS },
 
-/* The resource DBR_NEW_DECLARATIONS is for the normalized declaration of array,
- * used by top_down_array_declaration_normalization*/
+/* The resource DBR_NEW_DECLARATIONS is used by top_down_array_resizing*/
 
 /* PROGRAM
  */
