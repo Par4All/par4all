@@ -125,6 +125,8 @@ int ofl_ctrl;
 {
     Psysteme s = SC_UNDEFINED;
   
+    /* mem_spy_begin(); */
+
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
 
     switch (ofl_ctrl) 
@@ -167,6 +169,7 @@ int ofl_ctrl;
 		/* printf("systeme final \n"); sc_dump(s);  */
 	    }
     }
+    /* mem_spy_end("sc_enveloppe_chernikova_ofl_ctrl"); */
     return s;
 }
 
