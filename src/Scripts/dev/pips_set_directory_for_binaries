@@ -1,0 +1,130 @@
+#! /bin/sh
+#
+# creates a subtree for pips (see PIPS_DIRECTORY_FOR_BINARIES)
+# in this subtree will be stored all binaries for a pips architecture.
+# this allows to move them on some other disk...
+# PIPS_ARCH and PIPS_DIRECTORY_FOR_BINARIES should be kept coherent...
+#
+# usage: x [-g group] [-h] [dir [arch]]
+#
+# $id$
+#
+# $Log: pips_set_directory_for_binaries,v $
+# Revision 1.1  1997/05/22 19:53:44  coelho
+# Initial revision
+#
+#
+
+script=`basename $0`
+
+unset group
+
+#
+# some functions
+
+verb()
+{
+    echo "[$script] $@"
+}
+
+error()
+{
+    echo "[$script] $@"
+    exit ${1:-1}
+}
+
+md()
+{
+    for d in "$@"
+    do 
+       verb 
+       test -d $d || mkdir $d ;
+    done
+}
+
+#
+# get options
+
+while getopts g:h opt
+do
+    case $opt in
+	h) usage ;;
+	g) group=${OPTARG} ;;
+        *) error 2 "invalid option";;
+    esac
+done
+
+shift `expr $OPTIND - 1`
+
+dir=${1:-`pwd`}
+arch=${2:-${PIPS_ARCH}}
+
+test "${arch}" || 
+	error 4 "some architecture expected"
+expr ${arch} : '^[A-Z]*$' > /dev/null || 
+	error 5 "invalid ${arch} architecture"
+
+#
+# make directories
+
+verb Making directories
+
+md 	${dir} \
+	${dir}/${arch} 
+
+for x in Prod Deve ; do
+    for s in PIPS NEWGEN LINEAR EXTERN ; do
+        for d in Bin Lib ; do
+            md ${dir}/${arch}/${x}/${s}/${d}
+        done
+    done
+    for d in Passes Libs Runtimes Scripts ; do
+        md ${dir}/${arch}/${x}/PIPS/${d}
+    done
+done
+
+#
+# owner and rights
+
+test "${group}" && {
+
+    verb Group ${group}
+    find ${dir}/${arch} -type d -print | chgrp ${group}
+
+    verb Rights rwxrwsr-x
+    find ${dir}/${arch} -type d -print | xargs chmod ug+rwx,g+s,o+rx-w 
+}
+
+#
+# make links
+
+verb Making links
+
+# ml dir link
+ml()
+{
+   d=${1}
+   lnk=${2}
+   test -d ${d} || error 3 "no ${d} directory"
+   test -d ${lnk} && { mv ${lnk}/* ${d}; rmdir ${lnk}; }
+   ln -s ${d} ${lnk}
+}
+
+# dir what
+make_all_links()
+{
+    targ=${1}
+    root=${2}
+    ml ${targ}/Lib ${root}/Lib/${arch}
+    ml ${targ}/Bin ${root}/Bin/${arch}
+}
+
+make_all_links ${dir}/${arch}/Prod/PIPS ${PIPS_ROOT}
+make_all_links ${dir}/${arch}/Prod/NEWGEN ${NEWGEN_ROOT}
+make_all_links ${dir}/${arch}/Prod/LINEAR ${LINEAR_ROOT}
+make_all_links ${dir}/${arch}/Prod/EXTERN ${EXTERN_ROOT}
+
+#
+# cleaning sources
+
+verb Clening sources from ${arch} direct
