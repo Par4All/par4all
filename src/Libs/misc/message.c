@@ -14,7 +14,6 @@
 #include <ctype.h>
 #include <setjmp.h>
 
-#include "types.h"
 #include "genC.h"
 #include "misc.h"
 
