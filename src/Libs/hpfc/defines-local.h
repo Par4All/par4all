@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1997/01/18 16:30:31 $, ) 
+ * ($Date: 1997/02/18 09:13:32 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -390,6 +390,9 @@ void fprint_entity_list(FILE *fp, list l);
 
 #define st_receive_mcast_from_host(goal) \
   hpfc_name_and_ref_to_stmt(RCV_FR_mCH, goal)
+
+
+#define primary_entity_p(a) (a==load_primary_entity(a))
 
 /*   WARNING
  */
