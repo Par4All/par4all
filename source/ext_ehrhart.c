@@ -682,19 +682,15 @@ Polyhedron *DMUnion(Enumeration *en, unsigned MR)  {
   }
 
 
-  void AffConstraints(Polyhedron *Poldisj) {
-      Polyhedron *p;
-  int i,j;
+void AffConstraints(Polyhedron *Poldisj)
+{
+	Polyhedron *p;
 
-       for(p=Poldisj;p;p=p->next){
-	  printf( "%d %d\n", p->NbConstraints, p->Dimension+2 );
-	    for(i=0;i<p->NbConstraints;i++) {
-	          for(j=0;j<p->Dimension+2;j++ )
-	          printf(P_VALUE_FMT,p->Constraint[i][j]);
-                  printf("\n");
-	    }
-	       printf("\n");
-  }
+	for(p=Poldisj;p;p=p->next)
+	{
+		Polyhedron_PrintConstraints( stdout, P_VALUE_FMT, p);
+		printf("\n");
+	}
 }
 int Degenerate (Enumeration *en) {
 	if(value_notzero_p(en->EP.d)) {
@@ -773,7 +769,10 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
 					if(value_zero_p(ev.d))
 						ev.x.p=ecopy(en2->EP.x.p);
 					else
+					{
+						value_init(ev.x.n);
 						value_assign( ev.x.n, en2->EP.x.n );
+					}
 
 					new_eadd(&en1->EP,&ev);
 					tmp = (Enumeration  *)malloc(sizeof(Enumeration));

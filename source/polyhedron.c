@@ -4347,7 +4347,7 @@ void Polyhedron_PrintConstraints(FILE *Dst,char *Format,Polyhedron *Pol)
 	for( i=0 ; i<Pol->NbConstraints ; i++ )
 	{
 		for( j=0 ; j<Pol->Dimension+2 ; j++ )
-			fprintf( Dst, Format, Pol->Constraint[i][j] );
+			value_print( stdout, Format, Pol->Constraint[i][j] );
 		fprintf( Dst, "\n" );
 	}
 
