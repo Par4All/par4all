@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1996/09/14 17:53:13 $, ) 
+ * ($Date: 1997/01/07 11:22:15 $, ) 
  */
 
 #include "defines-local.h"
@@ -463,9 +463,13 @@ hpfc_buffer_initialization(
     buffindex = set_integer(hpfc_name_to_entity(BUFFER_INDEX), 0);
     msgstate = set_logical(hpfc_name_to_entity
 			   (is_send ? SND_NOT_INIT : RCV_NOT_PRF), TRUE);
-    other = set_expression
-	(hpfc_name_to_entity(is_send ? BUFFER_ENCODING : BUFFER_RCV_SIZE),
-	 is_send ? pvm_encoding_option(2) : int_to_expression(0)); 
+    if (is_send)
+	other = make_continue_statement(entity_undefined);
+    /* set_expression(hpfc_name_to_entity(BUFFER_ENCODING),
+       pvm_encoding_option(2)) */
+    else
+	other = set_expression
+	    (hpfc_name_to_entity(BUFFER_RCV_SIZE), int_to_expression(0)); 
 
     l = CONS(STATEMENT, buffindex,
         CONS(STATEMENT, msgstate, 
