@@ -898,26 +898,26 @@ control c ;
 #define USE_REGIONS 2
 #define USE_IN_OUT_REGIONS 3
 
-void atomic_chains(module_name)
+bool atomic_chains(module_name)
 char *module_name;
 {
-    chains(module_name, USE_PROPER_EFFECTS);
+    return chains(module_name, USE_PROPER_EFFECTS);
 }
 
-void region_chains(module_name)
+bool region_chains(module_name)
 char *module_name;
 {
-    chains(module_name, USE_REGIONS);
+    return chains(module_name, USE_REGIONS);
 }
 
-void in_out_regions_chains(module_name)
+bool in_out_regions_chains(module_name)
 char *module_name;
 {
-    chains(module_name, USE_IN_OUT_REGIONS);
+    return(module_name, USE_IN_OUT_REGIONS);
 }
 
 
-void chains(module_name, use)
+bool chains(module_name, use)
 char *module_name;
 int use;
 {
@@ -955,6 +955,8 @@ int use;
     reset_enclosing_loops_map();
     reset_current_module_statement();
     reset_current_module_entity();
+
+    return TRUE;
 }
 
 
