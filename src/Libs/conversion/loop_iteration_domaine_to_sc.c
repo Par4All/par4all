@@ -91,7 +91,7 @@ Psysteme sc;
 
     }
     else
-	user_error("loop_iteration_domaine_to_sc","untractable loop bound");
+	user_error("loop_iteration_domaine_to_sc","untractable loop bound\n");
 
     if (normalized_linear_p(incr_norm)) 
 	pv_incr = (Pvecteur) normalized_linear(incr_norm);
