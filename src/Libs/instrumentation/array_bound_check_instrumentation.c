@@ -517,7 +517,7 @@ bool array_bound_check_instrumentation(char *module_name)
       debug(1, "Array bound check instrumentation","End for %s\n", module_name);
     }
   debug_off(); 
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name),module_statement);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE,module_name,module_statement);
   reset_ordering_to_statement();
   reset_current_module_statement();
   reset_current_module_entity();
