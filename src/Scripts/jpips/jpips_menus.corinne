@@ -1,0 +1,1704 @@
+#
+# $Id$
+#
+# Basic menus for jpips.
+#
+# $Log: jpips_menus.basic,v $
+# Revision 1.4  1998/07/03 22:15:15  coelho
+# new groups added.
+#
+# Revision 1.3  1998/07/03 16:37:29  coelho
+# new menus with ILABEL and IBUTTON _WITH_CHOICE...
+#
+# Revision 1.2  1998/07/03 11:54:58  coelho
+# new attemps with menus...
+#
+# Revision 1.1  1998/07/03 08:14:59  coelho
+# Initial revision
+#
+#
+
+
+TOP_MENU
+Options
+Options for program  analyses and transformations
+
+GROUP
+Parser Options
+set fortran parser options
+
+LABEL_WITH_CHOICE
+Statement Functions
+getproperty PARSER_EXPAND_STATEMENT_FUNCTIONS
+..
+what to do with statement functions
+
+	Error
+	setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS FALSE
+	FALSE
+
+	Expand
+	setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Missing Files
+getproperty PREPROCESSOR_MISSING_FILE_HANDLING
+..
+what to do if a source is missing
+
+	Error
+	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "error"
+	error
+
+	Generate
+	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+	generate
+
+	Query
+	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "query"
+	query
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Alternate Returns
+getproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS
+..
+what to do with alternate returns
+
+	Error
+	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
+	NO
+
+	Stop
+	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+	STOP
+
+	Substitute
+	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "RC"
+	RC
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Assigned Gotos
+getproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO
+..
+what to do with assigned gotos
+
+	Error
+	setproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO FALSE
+	FALSE
+
+	Substitute
+	setproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Entries substitution
+getproperty PARSER_SUBSTITUTE_ENTRIES
+..
+Handle Entries ?
+
+	Yes
+	setproperty PARSER_SUBSTITUTE_ENTRIES TRUE
+	TRUE
+
+	No
+	setproperty PARSER_SUBSTITUTE_ENTRIES FALSE
+	FALSE
+
+CLOSE
+
+##end of parser options
+CLOSE
+
+##
+## Prettyprint
+##
+
+GROUP
+Prettyprint Options
+Code display
+
+LABEL_WITH_CHOICE
+Statement Numbers
+getproperty PRETTYPRINT_STATEMENT_NUMBER
+..
+whether to print statement numbers
+
+	Yes
+	setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+	TRUE
+
+	No
+	setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+	FALSE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Declarations
+getproperty PRETTYPRINT_ALL_DECLARATIONS
+..
+whether to regenerate declarations
+
+	Reuse Initial
+	setproperty PRETTYPRINT_ALL_DECLARATIONS FALSE
+	FALSE
+
+	Regenerate
+	setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+	TRUE
+
+CLOSE
+
+## end of prettyprint options
+CLOSE
+
+##semantics stuff
+##
+
+GROUP
+Semantic Options
+Semantical analyses
+
+LABEL_WITH_CHOICE
+Fix Point
+getproperty SEMANTICS_FIX_POINT_OPERATOR
+..
+select the fix point version
+
+	Basic
+	setproperty SEMANTICS_FIX_POINT_OPERATOR "transfer"
+	transfer
+
+	Medium
+	setproperty SEMANTICS_FIX_POINT_OPERATOR "pattern"
+	pattern
+
+	Better?
+	setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+	derivative
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Transformers
+check activate TRANSFORMERS
+..
+select transformers computation algorithm
+
+	Quick Intra-Procedural
+	activate TRANSFORMERS_INTRA_FAST
+	TRANSFORMERS_INTRA_FAST
+
+	Full Intra-Procedural
+	activate TRANSFORMERS_INTRA_FULL
+	TRANSFORMERS_INTRA_FULL
+
+	Quick Inter-Procedural
+	activate TRANSFORMERS_INTER_FAST
+	TRANSFORMERS_INTER_FAST
+
+	Full Inter-Procedural
+	activate TRANSFORMERS_INTER_FULL
+	TRANSFORMERS_INTER_FULL
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Preconditions
+check activate PRECONDITIONS
+..
+select preconditions computation algorithm
+
+	Intra-Procedural
+	activate PRECONDITIONS_INTRA
+	PRECONDITIONS_INTRA
+
+	Quick Inter-Procedural
+	activate PRECONDITIONS_INTER_FAST
+	PRECONDITIONS_INTER_FAST
+
+	Full Inter-Procedural
+	activate PRECONDITIONS_INTER_FULL
+	PRECONDITIONS_INTER_FULL
+
+CLOSE
+
+## temporary place
+
+LABEL_WITH_CHOICE
+Array Bounds
+getproperty REGIONS_WITH_ARRAY_BOUNDS
+..
+whether to include array bounds when computing regions
+
+	Ignored
+	setproperty REGIONS_WITH_ARRAY_BOUNDS FALSE
+	FALSE
+
+	Included
+	setproperty REGIONS_WITH_ARRAY_BOUNDS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Regions Computation
+check activate REGIONS
+..
+precision of the region computations
+
+	Approximate
+	activate MAY_REGIONS
+	MAY_REGIONS
+
+	Try Exact
+	activate MUST_REGIONS
+	MUST_REGIONS
+
+CLOSE
+
+##end of semantics options
+CLOSE
+
+
+GROUP
+Parallelization Options
+Management of parallelization
+
+LABEL_WITH_CHOICE
+Use-Def Chains
+check activate CHAINS
+..
+select use-def chains generation
+
+	Standard
+	activate ATOMIC_CHAINS
+	ATOMIC_CHAINS
+
+	Regions
+	activate REGION_CHAINS
+	REGION_CHAINS
+
+	In-Out Regions
+	activate IN_OUT_REGIONS_CHAINS
+	IN_OUT_REGIONS_CHAINS
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Dependence Test
+check activate DG
+..
+select dependence test accuracy
+
+	Simple
+	activate RICE_FAST_DEPENDENCE_GRAPH
+	RICE_FAST_DEPENDENCE_GRAPH
+
+	with Loop Bounds
+	activate RICE_FULL_DEPENDENCE_GRAPH
+	RICE_FULL_DEPENDENCE_GRAPH
+
+	with Preconditions
+	activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+	RICE_SEMANTICS_DEPENDENCE_GRAPH
+
+	with Regions
+	activate RICE_REGIONS_DEPENDENCE_GRAPH
+	RICE_REGIONS_DEPENDENCE_GRAPH
+CLOSE
+
+LABEL_WITH_CHOICE
+Parallelization
+check activate PARALLELIZED_CODE
+..
+select parallelization algorithm
+	
+	using All Dependences
+	activate RICE_ALL_DEPENDENCE
+	RICE_ALL_DEPENDENCE
+
+	using True Dependences Only
+	activate RICE_DATA_DEPENDENCE
+	RICE_DATA_DEPENDENCE
+
+	Perfectly  Nested Loops
+	activate NEST_PARALLELIZATION
+	NEST_PARALLELIZATION
+
+	Coarse Grain
+	activate COARSE_GRAIN_PARALLELIZATION
+	COARSE_GRAIN_PARALLELIZATION
+
+CLOSE
+
+IBUTTON_WITH_CHOICE
+Privatize
+not used
+..
+privatization of variables or anything
+
+	Scalars
+	$TAGc_or_a PRIVATIZE_MODULE[$MODULES]
+	..
+
+	Scalars and Arrays
+	$TAGc_or_a ARRAY_PRIVATIZER[$MODULES]
+	..
+
+	Array Sections
+	$TAGc_or_a ARRAY_SECTION_PRIVATIZER[$MODULES]
+	..
+
+	Declarations
+	$TAGc_or_a DECLARATIONS_PRIVATIZER[$MODULES]
+	..
+
+CLOSE
+
+## end of parallelization options
+CLOSE
+
+GROUP
+Running Options
+set running options
+
+LABEL_WITH_CHOICE
+Checkpoints
+getproperty PIPSMAKE_CHECKPOINTS
+..
+Pipsmake backup frequency
+
+	0
+	setproperty PIPSMAKE_CHECKPOINTS 0
+	0
+
+	50
+	setproperty PIPSMAKE_CHECKPOINTS 50
+	50
+
+	500
+	setproperty PIPSMAKE_CHECKPOINTS 500
+	500
+
+	2000
+	setproperty PIPSMAKE_CHECKPOINTS 2000
+	2000
+
+CLOSE
+
+
+LABEL_WITH_CHOICE
+Deleted PIPSDBM Resources
+getproperty PIPSDBM_RESOURCES_TO_DELETE
+..
+Which Pipsdbm resources to delete
+
+	Old
+	setproperty PIPSDBM_RESOURCES_TO_DELETE "obsolete"
+	"obsolete"
+
+	All
+	setproperty PIPSDBM_RESOURCES_TO_DELETE "all"
+	"all"
+
+CLOSE
+
+
+LABEL_WITH_CHOICE
+Abort on User Error 
+getproperty ABORT_ON_USER_ERROR
+..
+Stop on user error
+
+	No
+	setproperty ABORT_ON_USER_ERROR FALSE
+	FALSE
+
+	Yes
+	setproperty ABORT_ON_USER_ERROR TRUE
+	TRUE
+
+CLOSE
+
+#end of running options
+CLOSE
+
+## end of top-menu Options
+CLOSE
+
+TOP_MENU
+Views & Transformations
+Views and Transformations  Panel
+
+GROUP
+Views
+Program information and views
+
+BUTTON_WITH_MENU
+Show Code with
+display PRINTED_FILE[$MODULES]
+display sequential code with selected decorations
+
+	RADIOBUTTONGROUP
+	check activate PRINTED_FILE
+
+		MENU
+		Misc
+			RADIOBUTTON
+			None
+			activate PRINT_CODE
+			PRINT_CODE
+
+			RADIOBUTTON
+			Complexities
+			activate PRINT_CODE_COMPLEXITIES
+			PRINT_CODE_COMPLEXITIES
+
+		CLOSE
+
+		MENU
+		Semantics
+
+			RADIOBUTTON
+			Transformers
+			activate PRINT_CODE_TRANSFORMERS
+			PRINT_CODE_TRANSFORMERS
+
+			RADIOBUTTON
+			Preconditions
+			activate PRINT_CODE_PRECONDITIONS
+			PRINT_CODE_PRECONDITIONS
+
+			RADIOBUTTON
+			Continuations
+			activate PRINT_CODE_CONTINUATION_CONDITIONS
+			PRINT_CODE_CONTINUATION_CONDITIONS
+
+		CLOSE
+
+		MENU
+		Regions
+
+			RADIOBUTTON
+			Proper R&W
+			activate PRINT_CODE_PROPER_REGIONS
+			PRINT_CODE_PROPER_REGIONS
+
+			RADIOBUTTON
+			Cumulated R&W
+			activate PRINT_CODE_REGIONS
+			PRINT_CODE_REGIONS
+
+			RADIOBUTTON
+			In
+			activate PRINT_CODE_IN_REGIONS
+			PRINT_CODE_IN_REGIONS
+
+			RADIOBUTTON
+			Out
+			activate PRINT_CODE_OUT_REGIONS
+			PRINT_CODE_OUT_REGIONS
+
+			RADIOBUTTON
+			Privatized
+			activate PRINT_CODE_PRIVATIZED_REGIONS
+			PRINT_CODE_PRIVATIZED_REGIONS
+
+		CLOSE
+
+		MENU
+		Effects
+
+			RADIOBUTTON
+			Proper
+			activate PRINT_CODE_PROPER_EFFECTS
+			PRINT_CODE_PROPER_EFFECTS
+		
+			RADIOBUTTON
+			Cumulated
+			activate PRINT_CODE_CUMULATED_EFFECTS
+			PRINT_CODE_CUMULATED_EFFECTS
+
+			RADIOBUTTON
+			In
+			activate PRINT_CODE_IN_EFFECTS
+			PRINT_CODE_IN_EFFECTS
+
+			RADIOBUTTON
+			Out
+			activate PRINT_CODE_OUT_EFFECTS
+			PRINT_CODE_OUT_EFFECTS
+
+		CLOSE
+
+		MENU
+		References
+
+			RADIOBUTTON
+			Proper
+			activate PRINT_CODE_PROPER_REFERENCES
+			PRINT_CODE_PROPER_REFERENCES
+
+			RADIOBUTTON
+			Cumulated
+			activate PRINT_CODE_CUMULATED_REFERENCES
+			PRINT_CODE_CUMULATED_REFERENCES
+
+		CLOSE
+
+		MENU
+		Reductions
+
+			RADIOBUTTON
+			Proper
+			activate PRINT_CODE_PROPER_REDUCTIONS
+			PRINT_CODE_PROPER_REDUCTIONS
+
+			RADIOBUTTON
+			Cumulated
+			activate PRINT_CODE_CUMULATED_REDUCTIONS
+			PRINT_CODE_CUMULATED_REDUCTIONS
+
+		CLOSE
+
+	CLOSE
+
+CLOSE
+
+
+## close Sequential
+
+##
+## ICFG
+##
+
+BUTTON_WITH_MENU
+Show ICFG with
+display ICFG_FILE[$MODULES]
+display interprocedural call graph with selected decorations
+
+	RADIOBUTTONGROUP
+	check activate ICFG_FILE
+
+		MENU
+		Simple
+
+			RADIOBUTTON
+			None
+			activate PRINT_ICFG
+			PRINT_ICFG
+
+			RADIOBUTTON
+			Preconditions
+			activate PRINT_ICFG_WITH_PRECONDITIONS
+			PRINT_ICFG_WITH_PRECONDITIONS
+
+			RADIOBUTTON
+			Transformers
+			activate PRINT_ICFG_WITH_TRANSFORMERS
+			PRINT_ICFG_WITH_TRANSFORMERS
+
+			RADIOBUTTON
+			Regions
+			activate PRINT_ICFG_WITH_REGIONS
+			PRINT_ICFG_WITH_REGIONS
+
+		CLOSE
+
+		MENU
+		Loops
+
+			RADIOBUTTON
+			None
+			activate PRINT_ICFG_WITH_LOOPS
+			PRINT_ICFG_WITH_LOOPS
+
+			RADIOBUTTON
+			Preconditions
+			activate PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
+			PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
+
+			RADIOBUTTON
+			Transformers
+			activate PRINT_ICFG_WITH_LOOPS_TRANSFORMERS
+			PRINT_ICFG_WITH_LOOPS_TRANSFORMERS
+
+			RADIOBUTTON
+			Regions
+			activate PRINT_ICFG_WITH_LOOPS_REGIONS
+			PRINT_ICFG_WITH_LOOPS_REGIONS
+
+		CLOSE
+
+		MENU
+		Control
+
+			RADIOBUTTON
+			None
+			activate PRINT_ICFG_WITH_CONTROL
+			PRINT_ICFG_WITH_CONTROL
+
+			RADIOBUTTON
+			Preconditions
+			activate PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
+			PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
+
+			RADIOBUTTON
+			Transformers
+			activate PRINT_ICFG_WITH_CONTROL_TRANSFORMERS
+			PRINT_ICFG_WITH_CONTROL_TRANSFORMERS
+
+			RADIOBUTTON
+			Regions
+			activate PRINT_ICFG_WITH_CONTROL_REGIONS
+			PRINT_ICFG_WITH_CONTROL_REGIONS
+
+		CLOSE
+
+	CLOSE
+
+CLOSE
+
+
+BUTTON_WITH_CHOICE
+Show Parallel Code
+display PARALLELPRINTED_FILE[$MODULES]
+check activate PARALLELPRINTED_FILE
+display parallel code using the selected syntax
+
+	in Fortran 77
+	activate PRINT_PARALLELIZED77_CODE
+	PRINT_PARALLELIZED77_CODE
+
+	with OMP Directives
+	activate PRINT_PARALLELIZEDOMP_CODE
+	PRINT_PARALLELIZEDOMP_CODE
+
+	with HPF Directives
+	activate PRINT_PARALLELIZEDHPF_CODE
+	PRINT_PARALLELIZEDHPF_CODE
+
+	with F90 Array Syntax
+	activate PRINT_PARALLELIZED90_CODE
+	PRINT_PARALLELIZED90_CODE
+
+	with CRAY Directives
+	activate PRINT_PARALLELIZEDCRAY_CODE
+	PRINT_PARALLELIZEDCRAY_CODE
+
+CLOSE
+
+IBUTTON_WITH_CHOICE
+Show  Call graph
+not used.
+..
+Show Text or Graphic  Call graph
+
+	Textual View
+	display CALLGRAPH_FILE[$MODULES]
+	display call graph using textual view
+
+	Graphical View
+	display  DVCG_FILE[$MODULES]
+	display call graph using Davinci
+	
+CLOSE
+
+
+BUTTON_WITH_CHOICE
+Show Control Graph
+display GRAPH_PRINTED_FILE[$MODULES]
+check activate PRINT_CODE_AS_A_GRAPH
+display Interproc. Control Graph with selected decorations
+
+	Simple
+	activate PRINT_CODE_AS_A_GRAPH
+	PRINT_ICFG
+
+	Transformers
+	activate PRINT_CODE_AS_A_GRAPH_TRANSFORMERS
+	PRINT_ICFG_WITH_TRANSFORMERS
+
+
+	Complexities
+	activate PRINT_CODE_AS_A_GRAPH_COMPLEXITIES
+	PRINT_ICFG_WITH_COMPLEXITIES
+
+	Preconditions
+	activate PRINT_CODE_AS_A_GRAPH_PRECONDITIONS
+	PRINT_ICFG_WITH_PRECONDITIONS
+
+
+	Regions
+	activate PRINT_CODE_AS_A_GRAPH_REGIONS
+	PRINT_ICFG_WITH_REGIONS
+
+
+	Regions IN
+	activate PRINT_CODE_AS_A_GRAPH_IN_REGIONS
+	PRINT_ICFG_WITH_IN_REGIONS
+
+	Regions OUT
+	activate PRINT_CODE_AS_A_GRAPH_OUT_REGIONS
+	PRINT_ICFG_WITH_OUT_REGIONS
+
+	Proper Effects
+	activate PRINT_CODE_AS_A_GRAPH_PROPER_EFFECTS
+	PRINT_ICFG_WITH_PROPER_EFFECTS
+
+	Cumulated Effects
+	activate PRINT_CODE_AS_A_GRAPH_CUMULATED_EFFECTS
+	PRINT_ICFG_WITH_CUMULATED_EFFECTS
+
+CLOSE
+
+BUTTON_WITH_CHOICE
+Show  Dependence Graph
+display DG_FILE[$MODULES]
+..
+Dependence levels, dependence cones or according to chains
+
+
+	Loop Level Dependences
+	activate PRINT_EFFECTIVE_DEPENDENCE_GRAPH
+	..
+
+	Loop Carried Dependences
+	activate PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
+	..
+
+	Full Dependence Graph 
+	activate PRINT_WHOLE_DEPENDENCE_GRAPH 
+	..
+
+	Chains Dependences 
+	activate PRINT_CHAINS_GRAPH
+	..
+
+CLOSE
+
+
+CLOSE
+
+
+GROUP
+Transformations
+Apply transformations on Program or Loop Nest 
+
+
+ILABEL_WITH_CHOICE
+Transformation Mode
+checking lc
+c_or_a
+whether to apply transformations of modules concurrently
+
+	Concurrent apply
+	capply
+	..
+
+	Simple apply
+	apply
+	..
+
+CLOSE
+
+SEPARATOR
+
+##
+## Restructure
+##
+
+# it does not work for several props...
+# should be able to force a set of instructions.
+# maybe with some marker where to insert an eol?
+ILABEL_WITH_CHOICE
+Formats after restructuration
+..
+..
+what to do with formats
+
+
+	In place
+	setproperty GATHER_FORMATS_AT_BEGINNING FALSE
+	..
+
+	At Beginning
+	setproperty GATHER_FORMATS_AT_BEGINNING TRUE
+	..
+
+	At End
+	setproperty GATHER_FORMATS_AT_END TRUE
+	..
+
+CLOSE
+
+SEPARATOR
+
+IBUTTON_WITH_CHOICE
+Program 
+not used
+..
+Apply a global transformation
+
+	Partial Evaluation
+	apply PARTIAL_EVAL[$MODULES]
+	..
+	Dead Code Elimination
+	capply SUPPRESS_DEAD_CODE[$MODULES]
+	..
+
+	Clean Declarations
+	capply CLEAN_DECLARATIONS[$MODULES]
+	..
+
+	Use-Def Elimination
+	capply USE_DEF_ELIMINATION[$MODULES]
+	..
+
+	Unspaghettify
+	capply UNSPAGHETTIFY[$MODULES]
+	..
+
+	Controlizer
+	capply RESTRUCTURE_CONTROL[$MODULES]
+	..
+	
+	Cloning 
+	capply CLONE[$MODULES]
+	..
+
+	Cloning by substitution
+	capply CLONE_SUBSTITUTE[$MODULES]
+	..
+
+	Cloning on Argument values
+	capply CLONE_ON_ARGUMENT[$MODULES]x
+	..
+
+	STF
+	capply STF[$MODULES]
+	..
+
+	Code regeneration
+	apply UNSPLIT
+	..
+CLOSE
+
+IBUTTON_WITH_CHOICE
+Loop Nest
+not used
+..
+Apply a loop nest transformation
+
+	Distribution
+	apply DISTRIBUTER[$MODULES]
+	..
+
+	Full Unroling
+	apply FULL_UNROLL[$MODULES]
+	..
+
+	Unroling
+	apply UNROLL[$MODULES]
+	..
+
+	Loop Interchange
+	apply LOOP_INTERCHANGE[$MODULES]
+	..
+	
+	Loop Hyperplane
+	apply LOOP_HYPERPLANE[$MODULES]
+	..
+
+	Loop Tiling
+	apply LOOP_TILING[$MODULES]
+	..
+	
+	
+	Loop Normalization
+	apply LOOP_NORMALIZE[$MODULES]
+	..
+	
+	Loop reduction
+	apply LOOP_REDUCTIONS[$MODULES]
+	..
+	
+	Strip-mining
+	apply STRIP_MINE[$MODULES]
+	..
+
+CLOSE	
+
+IBUTTON_WITH_CHOICE
+Privatization
+not used
+..
+Privatization of variables or anything
+
+	Scalars
+	$TAGc_or_a PRIVATIZE_MODULE[$MODULES]
+	..
+
+	Scalars and Arrays
+	$TAGc_or_a ARRAY_PRIVATIZER[$MODULES]
+	..
+
+	Array Sections
+	$TAGc_or_a ARRAY_SECTION_PRIVATIZER[$MODULES]
+	..
+
+	Declarations
+	$TAGc_or_a DECLARATIONS_PRIVATIZER[$MODULES]
+	..
+
+CLOSE
+
+##end group
+CLOSE
+
+## end Top-menu transformations
+CLOSE
+
+
+
+
+TOP_MENU
+Options ++
+Options for Pips developers
+
+GROUP
+Parser Options
+set unusual parser options
+
+ILABEL_WITH_CHOICE
+Check Fortran Syntax Before Pips
+getproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS
+..
+Choice for CHECK_FORTRAN_SYNTAX_BEFORE_PIPS
+
+	No
+	setproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS FALSE
+	FALSE
+
+	Yes
+	setproperty CHECK_FORTRAN_SYNTAX_BEFORE_PIPS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Type Check  at Call Sites
+getproperty PARSER_TYPE_CHECK_CALL_SITES
+..
+Choice for Type Checking  at Call Sites
+
+	No
+	setproperty PARSER_TYPE_CHECK_CALL_SITES FALSE
+	FALSE
+
+	Yes
+	setproperty PARSER_TYPE_CHECK_CALL_SITES TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Simplify Labelled Loop
+getproperty PARSER_SIMPLIFY_LABELLED_LOOP
+..
+Choice for PARSER_SIMPLIFY_LABELLED_LOOP
+
+	Yes
+	setproperty PARSER_SIMPLIFY_LABELLED_LOOP TRUE
+	TRUE
+
+	No
+	setproperty PARSER_SIMPLIFY_LABELLED_LOOP FALSE
+	FALSE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Dump Symbol Table
+getproperty PARSER_DUMP_SYMBOL_TABLE
+..
+Choice for PARSER_DUMP_SYMBOL_TABLE
+
+	No
+	setproperty PARSER_DUMP_SYMBOL_TABLE FALSE
+	FALSE
+
+	Yes
+	setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
+	TRUE
+
+CLOSE
+
+CLOSE
+
+GROUP
+Regions Options
+set Regions options
+
+LABEL_WITH_CHOICE
+Remove false dep. only by privatization
+getproperty ARRAY_PRIV_FALSE_DEP_ONLY
+..
+Choice for ARRAY_PRIV_FALSE_DEP_ONLY
+
+	Yes
+	setproperty ARRAY_PRIV_FALSE_DEP_ONLY TRUE
+	TRUE
+
+	No
+	setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+	FALSE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Privatize elements used afterwards
+getproperty ARRAY_SECTION_PRIV_COPY_OUT
+..
+Choice for ARRAY_SECTION_PRIV_COPY_OUT
+
+	Yes
+	setproperty ARRAY_SECTION_PRIV_COPY_OUT TRUE
+	TRUE
+
+	No
+	setproperty ARRAY_SECTION_PRIV_COPY_OUT FALSE
+	FALSE
+
+CLOSE
+
+CLOSE
+
+GROUP
+Chains Options
+set Chains options
+
+LABEL_WITH_CHOICE
+Keep Read Read Dependences
+getproperty KEEP_READ_READ_DEPENDENCE
+..
+Choice for KEEP_READ_READ_DEPENDENCE
+
+	No
+	setproperty KEEP_READ_READ_DEPENDENCE FALSE
+	FALSE
+
+	Yes
+	setproperty KEEP_READ_READ_DEPENDENCE TRUE
+	TRUE
+
+CLOSE
+
+
+LABEL_WITH_CHOICE
+Mask Effects on Local variables
+getproperty CHAINS_MASK_EFFECTS
+..
+Choice for CHAINS_MASK_EFFECTS
+
+	No
+	setproperty  CHAINS_MASK_EFFECTS FALSE
+	FALSE
+
+	Yes
+	setproperty CHAINS_MASK_EFFECTS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Dataflow Dependence Only
+getproperty CHAINS_DATAFLOW_DEPENDENCE_ONLY
+..
+Choice for CHAINS_DATAFLOW_DEPENDENCE_ONLY
+
+	No
+	setproperty CHAINS_DATAFLOW_DEPENDENCE_ONLY FALSE
+	FALSE
+
+	Yes
+	setproperty CHAINS_DATAFLOW_DEPENDENCE_ONLY TRUE
+	TRUE
+
+CLOSE
+
+
+
+LABEL_WITH_CHOICE
+Disambiguate Constant Subscripts
+getproperty CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS
+..
+Choice for CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS
+
+	No
+	setproperty CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS FALSE
+	FALSE
+
+	Yes
+	setproperty CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS TRUE
+	TRUE
+
+CLOSE
+CLOSE
+
+LABEL_WITH_CHOICE
+TPIPS is a SHELL
+getproperty TPIPS_IS_A_SHELL
+..
+Choice for TPIPS_IS_A_SHELL
+
+	No
+	setproperty TPIPS_IS_A_SHELL FALSE
+	FALSE
+
+	Yes
+	setproperty TPIPS_IS_A_SHELL TRUE
+	TRUE
+
+CLOSE
+
+CLOSE
+
+TOP_MENU
+Stat. & warning ++
+Stat. & warning options 
+
+GROUP
+Statistics Options
+set Statistics  options
+
+LABEL_WITH_CHOICE
+Ricedg Provides Statistics
+getproperty RICEDG_PROVIDE_STATISTICS
+..
+Choice for RICEDG_PROVIDE_STATISTICS
+
+	No
+	setproperty RICEDG_PROVIDE_STATISTICS FALSE
+	FALSE
+
+	Yes
+	setproperty RICEDG_PROVIDE_STATISTICS TRUE
+	TRUE
+
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Ricedg Statistics with calls
+getproperty RICEDG_STATISTICS_ALL_ARRAYS
+..
+Choice for RICEDG_STATISTICS_ALL_ARRAYS
+
+	No
+	setproperty RICEDG_STATISTICS_ALL_ARRAYS FALSE
+	FALSE
+
+	Yes
+	setproperty RICEDG_STATISTICS_ALL_ARRAYS TRUE
+	TRUE
+CLOSE
+
+LABEL_WITH_CHOICE
+Dead Code Display Statistics
+getproperty DEAD_CODE_DISPLAY_STATISTICS
+..
+Choice for DEAD_CODE_DISPLAY_STATISTICS
+
+	Yes
+	setproperty DEAD_CODE_DISPLAY_STATISTICS TRUE
+	TRUE
+
+	No
+	setproperty DEAD_CODE_DISPLAY_STATISTICS FALSE
+	FALSE
+CLOSE
+
+LABEL_WITH_CHOICE
+Unspaghettify Display Statistics
+getproperty UNSPAGHETTIFY_DISPLAY_STATISTICS
+..
+Choice for UNSPAGHETTIFY_DISPLAY_STATISTICS
+
+	Yes
+	setproperty UNSPAGHETTIFY_DISPLAY_STATISTICS TRUE
+	TRUE
+
+	No
+	setproperty UNSPAGHETTIFY_DISPLAY_STATISTICS FALSE
+	FALSE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Regions Operators Statistics
+getproperty REGIONS_OP_STATISTICS
+..
+Choice for REGIONS_OP_STATISTICS
+
+	No
+	setproperty REGIONS_OP_STATISTICS FALSE
+	FALSE
+
+	Yes
+	setproperty REGIONS_OP_STATISTICS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Clean Up Sequences Display Statistics
+getproperty CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS
+..
+Choice for CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS
+
+	No
+	setproperty CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS FALSE
+	FALSE
+
+	Yes
+	setproperty CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Regions Translation Statistics
+getproperty REGIONS_TRANSLATION_STATISTICS
+..
+Choice for REGIONS_TRANSLATION_STATISTICS
+
+	No
+	setproperty REGIONS_TRANSLATION_STATISTICS  FALSE
+	FALSE
+
+	Yes
+	setproperty REGIONS_TRANSLATION_STATISTICS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Parallelization Statistics
+getproperty PARALLELIZATION_STATISTICS
+..
+Choice for PARALLELIZATION_STATISTICS
+
+	No
+	setproperty PARALLELIZATION_STATISTICS FALSE
+	FALSE
+
+	Yes
+	setproperty PARALLELIZATION_STATISTICS TRUE
+	TRUE
+
+CLOSE
+
+CLOSE
+
+GROUP
+Log and Warning Options
+set debug options
+
+LABEL_WITH_CHOICE
+Timings
+getproperty LOG_TIMINGS
+..
+Choice for LOG_TIMING
+
+	No
+	setproperty LOG_TIMINGS FALSE
+	FALSE
+
+	Yes
+	setproperty LOG_TIMINGS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Memory Usage
+getproperty LOG_MEMORY_USAGE
+..
+Choice for LOG_MEMORY_USAGE
+
+	No
+	setproperty LOG_MEMORY_USAGE FALSE
+	FALSE
+
+	Yes
+	setproperty LOG_MEMORY_USAGE TRUE
+	TRUE
+
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Check Resource Usage
+getproperty CHECK_RESOURCE_USAGE
+..
+Choice for CHECK_RESOURCE_USAGE
+
+	No
+	setproperty CHECK_RESOURCE_USAGE FALSE
+	FALSE
+
+	Yes
+	setproperty CHECK_RESOURCE_USAGE TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+User Log
+getproperty USER_LOG_P
+..
+Choice for USER_LOG_P 
+
+	Yes
+	setproperty USER_LOG_P TRUE
+	TRUE
+
+	No
+	setproperty USER_LOG_P FALSE
+	FALSE
+
+CLOSE
+
+
+
+LABEL_WITH_CHOICE
+User Warning
+getproperty NO_USER_WARNING
+..
+Choice for NO_USER_WARNING
+
+	No
+	setproperty NO_USER_WARNING FALSE
+	FALSE
+
+	Yes
+	setproperty NO_USER_WARNING TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Warnings for columns 73 to 80
+checking PARSER_WARN_FOR_COLUMNS_73_80
+..
+Choice for PARSER_WARN_FOR_COLUMNS_73_80
+
+	Yes
+	setproperty PARSER_WARN_FOR_COLUMNS_73_80 TRUE
+	TRUE
+
+	No
+	setproperty PARSER_WARN_FOR_COLUMNS_73_80  FALSE
+	FALSE
+CLOSE
+
+LABEL_WITH_CHOICE
+Warning On Statistics Error
+getproperty WARNING_ON_STAT_ERROR
+..
+Choice for WARNING_ON_STAT_ERROR
+
+	Yes
+	setproperty WARNING_ON_STAT_ERROR TRUE
+	TRUE
+
+	No
+	setproperty WARNING_ON_STAT_ERROR FALSE
+	FALSE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Warning about Empty Sequences
+getproperty WARN_ABOUT_EMPTY_SEQUENCES
+..
+Choice for WARN_ABOUT_EMPTY_SEQUENCES
+
+	No
+	setproperty WARN_ABOUT_EMPTY_SEQUENCES FALSE
+	FALSE
+
+	Yes
+	setproperty WARN_ABOUT_EMPTY_SEQUENCES TRUE
+	TRUE
+
+CLOSE
+CLOSE
+CLOSE
+
+TOP_MENU
+Prettyprint ++
+Prettyprint options
+
+GROUP
+Prettyprint Options
+set prettyprint  options
+
+
+LABEL_WITH_CHOICE
+Add blank lines around comments
+getproperty PRETTYPRINT_LOOSE
+..
+Choice for PRETTYPRINT_LOOSE
+
+	Yes
+	setproperty PRETTYPRINT_LOOSE TRUE
+	TRUE
+
+	No
+	setproperty PRETTYPRINT_LOOSE FALSE
+	FALSE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Io_Effects
+getproperty PRETTYPRINT_IO_EFFECTS 
+..
+Choice for PRETTYPRINT_IO_EFFECTS
+
+	yes
+	setproperty  PRETTYPRINT_IO_EFFECTS  TRUE
+	TRUE
+
+	No
+	setproperty PRETTYPRINT_IO_EFFECTS  FALSE
+	FALSE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Scalar Regions
+getproperty PRETTYPRINT_SCALAR_REGIONS
+..
+Choice forPRETTYPRINT_SCALAR_REGIONS
+
+	No
+	setproperty PRETTYPRINT_SCALAR_REGIONS FALSE
+	FALSE
+
+	Yes
+	setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+	TRUE
+
+
+CLOSE
+LABEL_WITH_CHOICE
+Blocks
+getproperty PRETTYPRINT_BLOCKS
+..
+Choice for PRETTYPRINT_BLOCKS
+
+	No
+	setproperty PRETTYPRINT_BLOCKS FALSE
+	FALSE
+
+	Yes
+	setproperty PRETTYPRINT_BLOCKS TRUE
+	TRUE
+
+
+CLOSE
+LABEL_WITH_CHOICE
+Unstructured
+getproperty PRETTYPRINT_UNSTRUCTURED  
+..
+Choice for PPRETTYPRINT_UNSTRUCTURED
+
+	No
+	setproperty PRETTYPRINT_UNSTRUCTURED FALSE
+	FALSE
+
+	Yes
+	setproperty PRETTYPRINT_UNSTRUCTURED TRUE
+	TRUE
+
+
+CLOSE
+LABEL_WITH_CHOICE
+Empty Blocks
+getproperty PRETTYPRINT_EMPTY_BLOCKS
+..
+Choice for PRETTYPRINT_EMPTY_BLOCKS
+
+	No
+	setproperty PRETTYPRINT_EMPTY_BLOCKS FALSE
+	FALSE
+
+	Yes
+	setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+	TRUE
+
+
+CLOSE
+LABEL_WITH_CHOICE
+Statement Ordering
+getproperty PRETTYPRINT_STATEMENT_ORDERING 
+..
+Choice for PRETTYPRINT_STATEMENT_ORDERING
+
+	No
+	setproperty PRETTYPRINT_STATEMENT_ORDERING FALSE
+	FALSE
+
+	Yes
+	setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+	TRUE
+
+CLOSE
+LABEL_WITH_CHOICE
+All Labels
+getproperty PRETTYPRINT_ALL_LABELS 
+..
+Choice for PRETTYPRINT_ALL_LABELS
+
+	No
+	setproperty PRETTYPRINT_ALL_LABELS  FALSE
+	FALSE
+
+	Yes
+	setproperty PRETTYPRINT_ALL_LABELS  TRUE
+	TRUE
+
+
+CLOSE
+LABEL_WITH_CHOICE
+Do Label As Comment
+getproperty PRETTYPRINT_DO_LABEL_AS_COMMENT
+..
+Choice for PRETTYPRINT_DO_LABEL_AS_COMMENT
+
+	No
+	setproperty  PRETTYPRINT_DO_LABEL_AS_COMMENT FALSE
+	FALSE
+
+	Yes
+	setproperty  PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
+	TRUE
+
+CLOSE
+LABEL_WITH_CHOICE
+All Private Variables
+getproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES
+..
+Choice for PRETTYPRINT_ALL_PRIVATE_VARIABLES
+
+	No
+	setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES FALSE
+	FALSE
+
+	Yes
+	setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Internal Return
+getproperty PRETTYPRINT_INTERNAL_RETURN
+..
+Choice for PRETTYPRINT_INTERNAL_RETURN
+
+	Yes
+	setproperty PRETTYPRINT_INTERNAL_RETURN TRUE
+	TRUE
+
+	No
+	setproperty PRETTYPRINT_INTERNAL_RETURN FALSE
+	FALSE
+
+CLOSE
+
+
+LABEL_WITH_CHOICE
+Block IF Only
+getproperty PRETTYPRINT_BLOCK_IF_ONLY
+..
+Choice for PRETTYPRINT_BLOCK_IF_ONLY
+
+	No
+	setproperty PRETTYPRINT_BLOCK_IF_ONLY FALSE
+	FALSE
+
+	Yes
+	setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+	TRUE
+
+CLOSE
+
+
+LABEL_WITH_CHOICE
+Data Statements 
+getproperty PRETTYPRINT_DATA_STATEMENTS 
+..
+Choice for PRETTYPRINT_DATA_STATEMENTS
+
+	Yes
+	setproperty PRETTYPRINT_DATA_STATEMENTS TRUE
+	TRUE
+
+	
+	No
+	setproperty  PRETTYPRINT_DATA_STATEMENTS FALSE
+	FALSE
+
+CLOSE
+
+
+LABEL_WITH_CHOICE
+Final Return
+getproperty PRETTYPRINT_FINAL_RETURN
+..
+Choice for PRETTYPRINT_FINAL_RETURN
+
+	No
+	setproperty PRETTYPRINT_FINAL_RETURN FALSE
+	FALSE
+
+	Yes
+	setproperty PRETTYPRINT_FINAL_RETURN TRUE
+	TRUE
+
+CLOSE
+
+
+LABEL_WITH_CHOICE
+Header Comments
+getproperty PRETTYPRINT_HEADER_COMMENTS
+..
+Choice for PRETTYPRINT_HEADER_COMMENTS
+
+	No
+	setproperty PRETTYPRINT_HEADER_COMMENTS FALSE
+	FALSE
+
+	Yes
+	setproperty PRETTYPRINT_HEADER_COMMENTS TRUE
+	TRUE
+
+CLOSE
+
+CLOSE
+CLOSE
+
