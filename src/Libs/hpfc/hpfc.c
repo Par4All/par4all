@@ -2,6 +2,11 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.98  1997/07/22 13:16:28  keryell
+ * #include "makefile.h"
+ * #include "pipsmake.h"
+ * added.
+ *
  * Revision 1.97  1997/05/03 14:11:00  coelho
  * *** empty log message ***
  *
@@ -29,6 +34,8 @@
 #include "effects.h"
 #include "resources.h"
 #include "pipsdbm.h"
+#include "makefile.h"
+#include "pipsmake.h"
 #include "control.h"
 
 /*************************************************************** REDUCTIONS */
