@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1996/08/07 14:00:37 $, 
+ * date: $Date: 1996/09/20 18:08:59 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -210,7 +210,8 @@ Pbase b;
     {
 	/* only inequalities, reduce the explosion
 	 */
-	int i, (*t)[2] = malloc(2*size*sizeof(int));
+	int i;
+	two_int_infop t = (two_int_infop) malloc(2*size*sizeof(int));
 	Pbase tmp;
 	int min_new;
 
