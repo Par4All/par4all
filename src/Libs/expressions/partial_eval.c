@@ -486,8 +486,13 @@ struct eformat partial_eval_call(expression exp, Psysteme ps, effects fx)
 	else ef = eformat_undefined;
 	break;
       case is_value_symbolic:
-	/*ef = EvalConstant((symbolic_constant(value_symbolic(vinit))));*/
-	/*break;*/
+	if(integer_symbolic_constant_p(func, &ef.ishift)) {
+	    ef.icoef = 0;
+	    ef.expr = expression_undefined;
+	    ef.simpler = TRUE;
+	}
+	else ef = eformat_undefined;
+	break;
       case is_value_code:
 	ef = eformat_undefined;
 	break;
