@@ -27,7 +27,7 @@ string mod_name;
 }
 
 bool
-print_filtered_depedence_daVinci_graph(mod_name)
+print_filtered_dependence_daVinci_graph(mod_name)
 string mod_name;
 {
     fprintf(stderr, "print_filtered_depedence_daVinci_graph worked");
