@@ -47,7 +47,29 @@ DEFINE_CURRENT_MAPPING(complexity, complexity)
  *   can't be evaluated are replaced by the pseudo-variable UNKNOWN_VARIABLE,
  *   which will be given an arbitrary value at the end of the evaluation.
  */
-bool complexities(module_name)
+bool uniform_complexities(module_name)
+char *module_name;
+{
+    bool success = TRUE;
+
+    set_string_property("COMPLEXITY_COST_TABLE", "all_1");
+    success = any_complexities(module_name);
+
+    return success;
+}
+
+bool fp_complexities(module_name)
+char *module_name;
+{
+    bool success = TRUE;
+
+    set_string_property("COMPLEXITY_COST_TABLE", "fp_1");
+    success = any_complexities(module_name);
+
+    return success;
+}
+
+bool any_complexities(module_name)
 char *module_name;
 {
     transformer precond = transformer_undefined;
