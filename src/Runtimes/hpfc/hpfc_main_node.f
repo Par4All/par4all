@@ -1,10 +1,10 @@
 ! $RCSfile: hpfc_main_node.f,v $ (version $Revision$)
-! $Date: 1996/09/07 14:49:30 $, 
+! $Date: 1996/09/07 15:51:46 $, 
 !
 ! the main for the HPFC node program
 !
-      program main_node
-      call hpfc_init_host_node
+      program main node
+      call hpfc init host node
       call node
       end
 !
