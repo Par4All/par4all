@@ -5,36 +5,7 @@
 
    */
 
-#include <stdio.h> 
-#include <stdlib.h>
-#include "genC.h"
-#include "linear.h"
-#include "ri.h"
-#include "ri-util.h"
-#include "text-util.h"
-#include "misc.h"
-#include "control.h"
-#include "effects-generic.h"
-#include "effects-simple.h"
-#include "database.h"
-#include "pipsdbm.h"
-#include "resources.h"
-#include "graph.h"
-#include "dg.h"
-/* Instantiation of the dependence graph: */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-/* Just to be able to use ricedg.h: */
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "polyedre.h"
-/* */
-#include "ricedg.h"
-#include "semantics.h"
-#include "transformations.h"
-#include "flint.h"
-
+#include "local.h"
 
 static hash_table flint_statement_def_use_variables;
 static bool flint_no_uninitialized_variable_ouput_yet;
