@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/07 10:26:45 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/07 10:56:27 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -18,7 +18,7 @@ c on the template tn
 c
       subroutine HPFC_TEMPLATE(inda, an, indt, tn)
       integer inda(7), an, indt(7), tn
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer i, adim
       do i=1, NODIMT(tn)
          adim = ALIGN(an, i, 1)
@@ -53,7 +53,7 @@ c
       subroutine HPFC_PROCESSORS(indt, tn, indp, pn, replicated)
       integer indt(7), tn, indp(7), pn
       logical replicated
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer i, tdim, param
       replicated = .FALSE.
       do i=1, NODIMP(pn)
@@ -92,7 +92,7 @@ c
       subroutine HPFC_PROCLID(indp, pn, lid, replicated)
       integer indp(7), pn, lid
       logical replicated
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer i, t
       if (replicated) then
          lid = INTFLAG
@@ -116,7 +116,7 @@ c HPFC_CMPLID
 c
       integer function HPFC_CMPLID(pn, p1, p2, p3, p4, p5, p6, p7)
       integer pn, p1, p2, p3, p4, p5, p6, p7
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer lid, indp(7)
       indp(1)=p1
       indp(2)=p2
@@ -135,7 +135,7 @@ c HPFC_CMPPOS
 c
       subroutine HPFC_CMPPOS(pn, lid, indp)
       integer pn, lid, indp(7)
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer ndim, i, t, dim, size
       ndim = NODIMP(pn)
       t = lid-1
@@ -153,7 +153,7 @@ c HPFC_CMPOWNERS
 c
       subroutine HPFC_CMPOWNERS(an, i1, i2, i3, i4, i5, i6, i7)
       integer an, i1, i2, i3, i4, i5, i6, i7
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer inda(7), indt(7), indp(7), tn, i
       inda(1) = i1
       inda(2) = i2
@@ -192,7 +192,7 @@ c HPFC_CMPCOMPUTER
 c
       subroutine HPFC_CMPCOMPUTER(an, i1, i2, i3, i4, i5, i6, i7)
       integer an, i1, i2, i3, i4, i5, i6, i7
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer inda(7), indt(7), tn, i
       logical replicated
       inda(1) = i1
@@ -227,8 +227,8 @@ c given the delta switch in the linearised processors representation.
 c
       subroutine HPFC_CMPNEIGHBOUR(delta)
       integer delta
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid
       NLID = MYLID + DELTA
       NTID = NODETIDS(NLID)
@@ -244,7 +244,7 @@ c HPFC_OWNERP
 c
 c
       logical function HPFC_OWNERP()
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       logical result
       integer i
       if (OREPLICATED) then
@@ -265,7 +265,7 @@ c HPFC_SENDERP
 c
 c
       logical function HPFC_SENDERP()
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       HPFC_SENDERP = MYLID.EQ.SLID
       end
 c
@@ -275,7 +275,7 @@ c HPFC_COMPUTERP
 c
 c
       logical function HPFC_COMPUTERP()
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       HPFC_COMPUTERP = MYLID.EQ.CLID
       end
 c
@@ -285,7 +285,7 @@ c HPFC_COMPUTERINOWNERSP
 c
 c
       logical function HPFC_COMPUTERINOWNERSP()
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       logical result
       integer i
       if (OREPLICATED) then
@@ -327,8 +327,8 @@ c send to computer
 c
       subroutine HPFC_SNDTO_C(what, val)
       integer what, val
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
@@ -344,8 +344,8 @@ c send to host
 c
       subroutine HPFC_SNDTO_H(what, val)
       integer what, val
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
@@ -361,10 +361,10 @@ c send to owner, when there is just one
 c
       subroutine HPFC_SNDTO_O(what, val)
       integer what, val
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
-      debug(`print *, ''`sending to ''`, OLID')
+      debug(`print *, "sending to ", OLID')
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
       call pvmfsend(OWNERTID, NODECHANNELS(OLID), info)
@@ -379,8 +379,8 @@ c send to all nodes
 c
       subroutine HPFC_SNDTO_A(what, val)
       integer what, val
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
@@ -407,15 +407,15 @@ c host send to all nodes
 c
       subroutine HPFC_HSNDTO_A(what, val)
       integer what, val
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
-      debug(`print *, ''`sending to all nodes'')
+      debug(`print *, "sending to all nodes"')
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
       call pvmfmcast(NBOFTASKS, NODETIDS, MCASTHOST, info)
       MCASTHOST = MCASTHOST + 2
-      debug(print *, ''`sent!'')
+      debug(`print *, "sent!"')
       end
 c
 c-----------------
@@ -426,8 +426,8 @@ c send to host and all nodes, but not the sender.
 c
       subroutine HPFC_SNDTO_HA(what, val)
       integer what, val
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
@@ -456,14 +456,14 @@ c send to owners, by someone who is not in owners
 c
       subroutine HPFC_SNDTO_OS(what, val)
       integer what, val
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info, i
       integer i1, i2, i3, i4, i5, i6, i7
       integer lb(7), ub(7), indp(7), lid
       if (OREPLICATED) then
          do i=1, NODIMP(OPN)
-            debug(`print *, ''`i = ''`, i, ''` index is ''`, OINDP(i)')
+            debug(`print *, "i = ", i, " index is ", OINDP(i)')
             if (OINDP(i).EQ.INTFLAG) then
                lb(i) = RANGEP(OPN, i, 1)
                ub(i) = RANGEP(OPN, i, 2)
@@ -471,7 +471,7 @@ c
                lb(i) = OINDP(i)
                ub(i) = OINDP(i)
             endif
-            debug(`print *, ''`bounds ''`, lb(i), ub(i)')
+            debug(`print *, "bounds ", lb(i), ub(i)')
          enddo
          do i=(NODIMP(OPN)+1), 7
             lb(i) = 1
@@ -505,7 +505,7 @@ c
      $                             NODECHANNELS(lid), 
      $                             info)
                               NODECHANNELS(lid) = NODECHANNELS(lid) + 2
-                              debug(`print *, ''`sending to ''`, lid')
+                              debug(`print *, "sending to ", lid')
                            enddo
                         enddo
                      enddo
@@ -526,13 +526,13 @@ c send to other owners, if any
 c
       subroutine HPFC_SNDTO_OOS(what, val)
       integer what, val
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info,  i
       integer i1, i2, i3, i4, i5, i6, i7
       integer lb(7), ub(7), indp(7), lid
       do i=1, NODIMP(OPN)
-         debug(`print *, ''`i = ''`, i, ''` index is ''`, OINDP(i)')
+         debug(`print *, "i = ", i, " index is ", OINDP(i)')
          if (OINDP(i).EQ.INTFLAG) then
             lb(i) = RANGEP(OPN, i, 1)
             ub(i) = RANGEP(OPN, i, 2)
@@ -540,7 +540,7 @@ c
             lb(i) = OINDP(i)
             ub(i) = OINDP(i)
          endif
-         debug(`print *, ''`bounds ''`, lb(i), ub(i)')
+         debug(`print *, "bounds ", lb(i), ub(i)')
       enddo
       do i=(NODIMP(OPN)+1), 7
          lb(i) = 1
@@ -592,8 +592,8 @@ c send to not owners, when replicated...
 c
       subroutine HPFC_SNDTO_NO(what, val)
       integer what, val
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info, i, indp(7), ndim, lid
       logical result
       call pvmfinitsend(PVMRAW, bufid)
@@ -627,8 +627,8 @@ c send to host and not owners, when replicated
 c
       subroutine HPFC_SNDTO_HNO(what, val)
       integer what, val
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       call HPFC_SNDTO_H(what, val)
       call HPFC_SNDTO_NO(what, val)
       end
@@ -639,8 +639,8 @@ c HPFC_RCVFR_S
 c
       subroutine HPFC_RCVFR_S(what, goal)
       integer what, goal
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
       call pvmfrecv(SENDERTID, NODECHANNELS(SLID), bufid)
       call pvmfunpack(what, goal, 1, 1, info)
@@ -653,8 +653,8 @@ c HPFC_RCVFR_C
 c
       subroutine HPFC_RCVFR_C(what, goal)
       integer what, goal
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
       call pvmfrecv(COMPUTERTID, NODECHANNELS(CLID), bufid)
       call pvmfunpack(what, goal, 1, 1, info)
@@ -667,13 +667,13 @@ c HPFC_RCVFR_H
 c
       subroutine HPFC_RCVFR_H(what, goal)
       integer what, goal
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
       call pvmfrecv(HOSTTID, HOSTCHANNEL, bufid)
       call pvmfunpack(what, goal, 1, 1, info)
       HOSTCHANNEL = HOSTCHANNEL + 2
-      debug(`print *, MYLID, ''` receiving from host'')
+      debug(`print *, MYLID, " receiving from host"')
       end
 c
 c-----------------
@@ -682,8 +682,8 @@ c HPFC_RCVFR_mCS
 c
       subroutine HPFC_RCVFR_mCS(what, goal)
       integer what, goal
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
       call pvmfrecv(SENDERTID, MCASTNODES, bufid)
       call pvmfunpack(what, goal, 1, 1, info)
@@ -696,14 +696,14 @@ c HPFC_RCVFR_mCH
 c
       subroutine HPFC_RCVFR_mCH(what, goal)
       integer what, goal
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info
-      debug(`print *, ''`receiving from host'')
+      debug(`print *, "receiving from host"')
       call pvmfrecv(HOSTTID, MCASTHOST, bufid)
       call pvmfunpack(what, goal, 1, 1, info)
       MCASTHOST = MCASTHOST + 2
-      debug(`print *, ''`received!'')
+      debug(`print *, "received!"')
       end
 c
 c-----------------
@@ -715,7 +715,7 @@ c
 c
       integer function HPFC_LOCALINDGAMMA(an, dim, indice)
       integer an, dim, indice
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer n, sc, no, bmtm
       integer t, nc, ni
 c
@@ -743,7 +743,7 @@ c
 c
       integer function HPFC_LOCALINDDELTA(an, dim, indice)
       integer an, dim, indice
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer n, sc, no, bmtm, rate, chsz
       integer t, nc, ni
 c
@@ -771,7 +771,7 @@ c
 c
       integer function HPFC_LOCALIND(an, dim, indice)
       integer an, dim, indice
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
 c
 c I cannot include the .h because of the external declaration of the 
 c function itself...
@@ -818,8 +818,8 @@ c
 c HPFC_INIT_NODE
 c
       subroutine HPFC_INIT_NODE()
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer i, bufid, info, inum
 
       call hpfc_check()
@@ -840,8 +840,8 @@ c      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
       do i=1, NBOFPROCESSORS
          call HPFC_CMPPOS(i, MYLID, MYPOS(1, i))
       enddo
-      debug(print *, 'lid: ', MYLID, ' tid: ', MYTID)
-      call pvmfjoingroup('hpfc_group', inum)
+      debug(`print *, "lid: ", MYLID, " tid: ", MYTID')
+      call pvmfjoingroup(HPFC_GROUP_NAME, inum)
       debug(`call HPFC_SYNCHRO()')
       end
 c
@@ -850,7 +850,7 @@ c
 c HPFC_INIT_COMMON_PROCS
 c
       subroutine HPFC_INIT_COMMON_PROCS()
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer i
       do i=1, NBOFTASKS
          NODECHANNELS(i) = 2
@@ -875,8 +875,8 @@ c
 c HPFC_INIT_HOST
 c
       subroutine HPFC_INIT_HOST()
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer bufid, info, inum
       call hpfc_check()
       call pvmfmytid(MYTID)
@@ -896,7 +896,7 @@ c      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
      $     info)
 
       if (info.lt.0) then
-         call pvmfperror('initial spawning', info)
+         call pvmfperror("initial spawning", info)
          call pvmfexit(info)
          stop
       endif
@@ -910,7 +910,7 @@ c      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
 
       call HPFC_INIT_COMMON_PROCS()
 
-      call pvmfjoingroup('hpfc_group', inum)
+      call pvmfjoingroup(HPFC_GROUP_NAME, inum)
       debug(`call HPFC_SYNCHRO()')
 
       end
@@ -942,8 +942,8 @@ c
 c HPFC_RCVFR_N
 c
       subroutine HPFC_RCVFR_N()
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer info
       call pvmfrecv(NTID, NODECHANNELS(NLID), info)
       end
@@ -953,8 +953,8 @@ c
 c HPFC_SNDTO_N
 c
       subroutine HPFC_SNDTO_N()
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer info
       call pvmfsend(NTID, NODECHANNELS(NLID), info)
       end
@@ -966,7 +966,7 @@ c
       subroutine HPFC_REMOTE_LOOP_BOUNDS
      $     (nlb, nub, llb, lb, ub, an, dp, pos)
       integer nlb, nub, llb, lb, ub, an, dp, pos
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       integer d, n, tn, pn, b, dt, da
       if (dp.EQ.0) then
          nlb = lb
@@ -1004,11 +1004,11 @@ c onto dimension of processors dp of processors number pn.
 c 
       subroutine HPFC_LOOP_BOUNDS(nlb, nub, llb, lb, ub, an, dp)
       integer nlb, nub, llb, lb, ub, an, dp
-      include 'hpfc_commons.h'
+      include "hpfc_commons.h"
       call HPFC_REMOTE_LOOP_BOUNDS
      $     (nlb, nub, llb, lb, ub, an, dp, MYPOS(dp, TTOP(ATOT(an))))
-      debug(`print *, ''`initial global lower bound: ''`, llb,
-     $    ''` new lower bound: ''`, nlb,''` new upper bound: ''`, nub')
+      debug(`print *, "initial global lower bound: ", llb,
+     $    " new lower bound: ", nlb, " new upper bound: ", nub')
       end
 c
 c-----------------
@@ -1016,12 +1016,12 @@ c
 c HPFC_SYNCHRO
 c
       subroutine HPFC_SYNCHRO()
-      include 'fpvm3.h'
-      include 'hpfc_commons.h'
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       integer info
-      call pvmfbarrier('hpfc_group', NBOFTASKS+1, info)
+      call pvmfbarrier(HPFC_GROUP_NAME, NBOFTASKS+1, info)
       if (info.lt.0) then
-         call pvmfperror('hpfc_synchro', info)
+         call pvmfperror("hpfc_synchro", info)
          call pvmfexit(info)
          stop
       endif
