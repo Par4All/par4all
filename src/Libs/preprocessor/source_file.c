@@ -88,13 +88,25 @@ hpfc_get_file_list(int * file_number,
                    char * file_names[],
                    char ** hpfc_directory_name)
 {
-   static char hpfc_dir[MAXNAMLEN + 1];
-   int return_code;
-        
+    /* some static but dynamic buffer.
+     */
+    static int hpfc_bsz = 0;
+    static char * hpfc_dir = NULL;
+
+    int return_code, len;    
+    char * dir = build_pgmwd(db_get_current_workspace_name());
+
+    len = strlen(dir) + strlen(HPFC_COMPILED_FILE_DIR) + 5;
+
+    if (hpfc_bsz<len) {
+	if (hpfc_dir) free(hpfc_dir), hpfc_dir=NULL;
+	hpfc_bsz = len;
+	hpfc_dir = (char*) malloc(hpfc_bsz);
+	message_assert("malloc succeeded", hpfc_dir);
+    }
+
    /* Get the HPFC file name list: */
-   sprintf(hpfc_dir, "%s/%s",
-           build_pgmwd(db_get_current_workspace_name()),
-           HPFC_COMPILED_FILE_DIR);
+   sprintf(hpfc_dir, "%s/%s", dir, HPFC_COMPILED_FILE_DIR);
    
    return_code = safe_list_files_in_directory(file_number,
                                               file_names,
@@ -498,6 +510,12 @@ check_fortran_syntax_before_pips(
 	pips_user_warning("\n\n\tFortran syntax errors in file %s!\007\n\n", 
 			  file_name);
 }
+
+/* for Linux at least
+ */
+#ifndef MAXNAMLEN
+#define MAXNAMLEN (1024)
+#endif
 
 bool process_user_file(
     string file)
