@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/07/26 17:07:40 $, 
+ * $Date: 1995/08/01 11:21:41 $, 
  *
  * interactive interface to hpfc, based on the GNU realine library.
  */
@@ -19,7 +19,7 @@ extern int chdir();
 #define HPFC_PREFIX "hpfc"   /* forked shell script  */
 #define HIST ".hpfc.history" /* default history file */
 
-#define SHELL_ESCAPE "! "
+#define SHELL_ESCAPE "\"
 #define CHANGE_DIR   "cd "
 #define QUIT         "quit"
 
@@ -35,13 +35,13 @@ static char *default_hist_file_name()
 {
     char *home, *hist = getenv("HPFC_HISTORY");
 
-    if (hist) return(hist);
+    if (hist) return hist;
 
     /* else builds the default name.
      */
     home = getenv("HOME");
-    return(sprintf((char*) malloc(sizeof(char)*(strlen(home)+strlen(HIST)+2)),
-		   "%s/%s", home, HIST));
+    return sprintf((char*) malloc(sizeof(char)*(strlen(home)+strlen(HIST)+2)),
+		   "%s/%s", home, HIST);
 }
 
 /* main: interactive loop and history management.
@@ -57,7 +57,7 @@ int main()
     
     /*  interactive loop
      */
-    while ((line=readline(HPFC_PROMPT)))
+    while ((line = readline(HPFC_PROMPT)))
     {
 	if (PREFIX_EQUAL_P(line, QUIT)) 
 	    break;
@@ -101,7 +101,7 @@ int main()
     write_history(file_name);
     history_truncate_file(file_name, 100);
 
-    return(0);
+    return 0;
 }
 
 /*   that is all
