@@ -4,9 +4,6 @@
  *
  */
 
-#ifndef MATRICE_PACKAGE
-#define MATRICE_PACKAGE
-
 /* Les matrices sont des matrices pleines, a coefficients rationnels.
  *
  * Les matrices sont representes par des tableaux d'entiers mono-dimensionnels
@@ -42,14 +39,13 @@
  * a abort()
  */
 
-typedef int * matrice;
+typedef Value * matrice;
 
 #define MATRICE_UNDEFINED ((matrice) NULL)
 #define MATRICE_NULLE ((matrice) NULL)
 
 /* Allocation et desallocation d'une matrice */
-#define matrice_new(n,m) \
-                 ((matrice) malloc((unsigned) (sizeof(int)*((n)*(m)+1))))
+#define matrice_new(n,m) ((matrice) malloc(sizeof(Value)*((n*m)+1)))
 #define matrice_free(m) (free((char *) (m)))
 
 /* Macros d'acces aux elements d'une matrice */
@@ -96,5 +92,3 @@ typedef int * matrice;
 
 /* definition temporaire d'une vraie fonction pour dbx */
 /* #define matrice_print(a,n,m) matrice_fprint(stdout,a,n,m) */
-
-#endif /* MATRICE_PACKAGE */
