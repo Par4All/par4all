@@ -21,8 +21,14 @@
   - intrinsics are not properly typed
 
   $Log: bootstrap.c,v $
+  Revision 1.73  2002/06/13 13:13:13  irigoin
+  Pseudo-intrinsic REPEAT-VALUE added
+
   Revision 1.72  2002/06/10 12:00:37  irigoin
-  $Log$ added to keep track of changes
+  $Log: bootstrap.c,v $
+  Revision 1.73  2002/06/13 13:13:13  irigoin
+  Pseudo-intrinsic REPEAT-VALUE added
+ added to keep track of changes
 
 */
 
@@ -103,7 +109,7 @@ CreateArrays()
 			      make_functional(NIL,make_type(is_type_void,
 							    NIL))),
 		    make_storage(is_storage_rom, UU),
-		    make_value(is_value_code,make_code(NIL, strdup(""))));
+		    make_value(is_value_code,make_code(NIL, strdup(""), make_sequence(NIL))));
   
   set_current_module_entity(ent);
   
@@ -2281,6 +2287,13 @@ typing_buffer_inout(call c, type_context_p context)
   return basic_undefined;
 }
 
+static basic no_typing(call c, type_context_p context)
+{
+  basic bt = basic_undefined;
+  pips_internal_error("This should not be type-checked because it is not Fortran function\n");
+  return bt; /* To please the compiler */
+}
+
 static basic
 typing_implied_do(call c, type_context_p context)
 {
@@ -2860,7 +2873,7 @@ check_io_list(list /* of expression */ args,
 	!check_spec("END=", a_end, spec, cont, ctxt, 
 		    is_end_specifier) &&
 	!check_spec("IOLIST=", a_iolist, spec, cont, ctxt, 
-		    gen_true) &&
+		    (bool (*)(expression, type_context_p)) gen_true) &&
 	!check_spec("FILE=", a_file, spec, cont, ctxt, 
 		    is_file_specifier) &&
 	!check_spec("STATUS=", a_status, spec, cont, ctxt, 
@@ -3554,7 +3567,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"BUFFERIN", (INT_MAX), default_intrinsic_type, typing_buffer_inout, 0},
   {"BUFFEROUT", (INT_MAX), default_intrinsic_type, typing_buffer_inout, 0},
   {"ENDFILE", (INT_MAX), default_intrinsic_type, check_endfile, 0},
-  {"IMPLIED-DO", (INT_MAX), default_intrinsic_type, typing_implied_do, 0},
+  {IMPLIED_DO_NAME, (INT_MAX), default_intrinsic_type, typing_implied_do, 0},
+  {REPEAT_VALUE_NAME, 2, default_intrinsic_type, no_typing, 0},
   {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type, check_format, 0},
   {"INQUIRE", (INT_MAX), default_intrinsic_type, check_inquire, 0},
   
