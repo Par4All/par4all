@@ -247,7 +247,7 @@ void partial_eval_expression_and_regenerate(expression *ep, Psysteme ps, effects
 
     regenerate_expression(&ef, ep);
 
-    if(get_debug_level()>=5 && !gen_consistent_p(*ep)) {
+    if(get_debug_level()>=5 && !expression_consistent_p(*ep)) {
 	pips_error("partial_eval_expression_and_regenerate", "bad evaluation");
     }
 }
@@ -401,7 +401,7 @@ struct eformat partial_eval_reference(expression e, Psysteme ps, effects fx)
 			    debug(9, "partial_eval_reference", 
 			    "Constant replaced by expression: \n");
 			    print_expression(e);
-			    gen_consistent_p(e);
+			    expression_consistent_p(e);
 			    pips_assert("partial_eval_reference", 
 			    syntax_call_p(expression_syntax(e)));
 			    } */
@@ -1230,7 +1230,7 @@ void recursiv_partial_eval(statement stmt)
 	  recursiv_partial_eval(test_false(t));
 	  if(get_debug_level()>=9) {
 	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
-	      pips_assert("recursiv_partial_eval", gen_consistent_p(stmt));
+	      pips_assert("recursiv_partial_eval", statement_consistent_p(stmt));
 	  }
 	  break;
       }
@@ -1252,7 +1252,7 @@ void recursiv_partial_eval(statement stmt)
 
 	  if(get_debug_level()>=9) {
 	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
-	      pips_assert("recursiv_partial_eval", gen_consistent_p(stmt));
+	      pips_assert("recursiv_partial_eval", statement_consistent_p(stmt));
 	  }
 	  break;
       }      
@@ -1266,7 +1266,7 @@ void recursiv_partial_eval(statement stmt)
 	 
 	  if(get_debug_level()>=9) {
 	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
-	      pips_assert("recursiv_partial_eval", gen_consistent_p(stmt));
+	      pips_assert("recursiv_partial_eval", statement_consistent_p(stmt));
 	  }
 	  break;
       }
