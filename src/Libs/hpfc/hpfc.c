@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/10/06 14:05:19 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/10/06 14:17:10 $, )
  * version $Revision$
  */
  
@@ -384,6 +384,9 @@ bool hpfc_filter(string name)
 
     /* to be modified... */
     safe_system(concatenate("$HPFC_TOOLS/hpfc_filter ", 
+			    dir_name, "/", file_name, " ",
+			    dir_name, "/", new_name, 
+			    " ; cp ", dir_name, "/", new_name, " ",
 			    dir_name, "/", file_name, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_FILTERED_FILE, strdup(name), new_name);
