@@ -80,8 +80,14 @@ fprint_activated(FILE *fd)
     MAP(STRING, s, fprintf(fd, "%s\n", s), makefile_active_phases(m));
 }
 
-string 
-activate(string phase)
+/* return the phase which would be used to build a given resource.
+ */
+string active_phase_for_resource(string res)
+{
+    return rule_phase(find_rule_by_resource(res));
+}
+
+string activate(string phase)
 {
     rule r;
     virtual_resource res;
