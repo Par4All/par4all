@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/20 14:57:48 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/28 15:18:22 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -21,27 +21,31 @@ PREFIX void close_##name() { close(name);}
 /* The idea here is to have a static function the name of which is
  * name, and which is a newgen function (that is a ->).
  * It embeds the status of some function related to the manipulated
- * data, with the {init,set,reset,get,close} functions.
- * Plus the extend, update and apply operators. 
+ * data, with the {INIT,SET,RESET,GET,CLOSE} functions.
+ * Plus the STORE, UPDATE and LOAD operators. and BOUND_P predicate.
  * This could replace all generic_mappings in PIPS, if the mapping
  * types are declared to newgen. It would also ease the db management.
  */
 
-#define GENERIC_FUNCTION(PREFIX, name, type, ktype, vtype)\
+/* STORE and LOAD are prefered to extend and apply because it sounds
+ * like the generic mappings, and it feels as a status/static thing
+ */
+
+#define GENERIC_FUNCTION(PREFIX, name, type)\
 GENERIC_STATIC_STATUS(PREFIX, name, type, make_##type(), free_##type)\
-PREFIX void store_##name(k,v) ktype k; vtype v;\
+PREFIX void store_##name(k,v) type##_key_type k; type##_value_type v;\
        { extend_##type(name, k, v);}\
-PREFIX void update_##name(k,v) ktype k; vtype v;\
+PREFIX void update_##name(k,v) type##_key_type k; type##_value_type v;\
        { update_##type(name, k, v);}\
-PREFIX vtype load_##name(k) ktype k;\
+PREFIX type##_value_type load_##name(k) type##_key_type k;\
        { return(apply_##type(name, k));}\
-PREFIX bool bound_##name##_p(k) ktype k; \
+PREFIX bool bound_##name##_p(k) type##_key_type k; \
        { return(bound_##type##_p(name, k));}
 
-#define GENERIC_LOCAL_FUNCTION(name, type, ktype, vtype)\
-        GENERIC_FUNCTION(static, name, type, ktype, vtype)
+#define GENERIC_LOCAL_FUNCTION(name, type)\
+        GENERIC_FUNCTION(static, name, type)
 
-#define GENERIC_GLOBAL_FUNCTION(name, type, ktype, vtype)\
-        GENERIC_FUNCTION(/**/, name, type, ktype, vtype)
+#define GENERIC_GLOBAL_FUNCTION(name, type)\
+        GENERIC_FUNCTION(/**/, name, type)
 
 #endif
