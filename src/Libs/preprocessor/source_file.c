@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.95  1998/12/23 14:05:16  coelho
+ * zzz -> ###
+ *
  * Revision 1.94  1998/11/24 17:48:19  coelho
  * accept empty files. no big deal, just a warning.
  *
@@ -575,8 +578,8 @@ bool filter_file(string mod_name)
 
 static bool zzz_file_p(string s) /* .../zzz???.f */
 { int len = strlen(s)-1;
-  return len>=8 && s[len-8]=='/' && s[len-7]=='z' && s[len-6]=='z' && 
-      s[len-5]=='z' && s[len-1]=='.' && s[len]=='f'; }
+  return len>=8 && s[len-8]=='/' && s[len-7]=='#' && s[len-6]=='#' && 
+      s[len-5]=='#' && s[len-1]=='.' && s[len]=='f'; }
 static int cmp(const void * x1, const void * x2)
 { return strcmp(*(char**)x1, *(char**)x2);}
 static void sort_file(string name)
@@ -778,7 +781,7 @@ bool process_user_file(string file)
     /* if two modules have the same name, the first splitted wins
      * and the other one is hidden by the call since fsplit gives 
      * it a zzz00n.f name 
-     * Let's hope no user module is called zzz???.f 
+     * Let's hope no user module is called ###???.f 
      */
     file_list = strdup(concatenate(dir_name, "/.fsplit_file_list", 0));
     unlink(file_list);
