@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.65  1998/03/17 16:52:23  coelho
+ * clearer debug messages.
+ *
  * Revision 1.64  1998/02/18 12:06:24  coelho
  * cleaned log area.
  *
@@ -1335,7 +1338,7 @@ remapping_compile(
     list /* of statements */ l = NIL;
     
     debug_on("HPFC_REMAPPING_DEBUG_LEVEL");
-    pips_debug(1, "dealing with statement %p\n", s);
+    what_stat_debug(1, s);
 
     sc_set_row_echelon_redundancy
 	(get_bool_property("HPFC_REDUNDANT_SYSTEMS_FOR_REMAPS"));
@@ -1361,8 +1364,11 @@ remapping_compile(
 
     /* remapping codes (indirect thru include)
      */
+    pips_debug(7, "considering %d renamings\n", gen_length(load_renamings(s)));
     MAP(RENAMING, r,
     {
+	pips_debug(7, "remapping %s -> %s\n", entity_name(renaming_old(r)),
+		   entity_name(renaming_new(r)));
 	if (renaming_old(r)==renaming_new(r)) /* KILL => status update */
 	    l = CONS(STATEMENT, set_array_status_to_target(renaming_new(r)),
 		     l);
