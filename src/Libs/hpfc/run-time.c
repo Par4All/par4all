@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1997/01/14 13:35:48 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1997/01/18 16:25:30 $, )
  * version $Revision$,
  */
 
@@ -656,6 +656,8 @@ static RunTimeSupportDescriptor RTSTable[] =
     { NODE_TIMEON,			0, is_sub, no_basic, no_entity },
     { HOST_TIMEOFF,			0, is_sub, no_basic, no_entity },
     { NODE_TIMEOFF,			0, is_sub, no_basic, no_entity },
+    { HPFC_NTELL,			0, is_sub, no_basic, no_entity },
+    { HPFC_HTELL,			0, is_sub, no_basic, no_entity },
 
 /* special FCD calls needed for translation...
  */
@@ -664,6 +666,7 @@ static RunTimeSupportDescriptor RTSTable[] =
     { HPF_PREFIX TIMEOFF_SUFFIX, 	0, is_sub, no_basic, no_entity },
     { HPF_PREFIX RENAME_SUFFIX,  	0, is_sub, no_basic, no_entity },
     { HPF_PREFIX HOSTSECTION_SUFFIX,	0, is_sub, no_basic, no_entity },
+    { HPF_PREFIX TELL_SUFFIX,		0, is_sub, no_basic, no_entity },
 
 /* End
  */
