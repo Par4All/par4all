@@ -19,24 +19,24 @@
 static int display_width, display_height;
 
 
-    void
+void
 event_procedure(Xv_Window window, Event *event, Notify_arg arg)
 {
-  debug_on("WPIPS_EVENT_DEBUG_LEVEL");
-  debug(2,"event_procedure",
-	"Event_id %d, event_action %d\n",
-	event_id(event), event_action(event));
-  switch (event_id(event)) {
-  case LOC_WINENTER :
-    win_set_kbd_focus(window, xv_get(window, XV_XID));
-    debug(2,"event_procedure : LOC_WINENTER\n");
-    break;
-  }
-  debug_off();
+   debug_on("WPIPS_EVENT_DEBUG_LEVEL");
+   debug(2, "event_procedure",
+         "Event_id %d, event_action %d\n",
+         event_id(event), event_action(event));
+   switch (event_id(event)) {
+     case LOC_WINENTER :
+       win_set_kbd_focus(window, xv_get(window, XV_XID));
+       debug(2, "event_procedure", "LOC_WINENTER\n");
+       break;
+   }
+   debug_off();
 }
 
 
-    void
+void
 install_event_procedure(Xv_Window window)
 {
   xv_set(window,
