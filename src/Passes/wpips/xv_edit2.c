@@ -22,7 +22,12 @@
 
 #include "wpips.h"
 
-static Textsw edit_textsw[2];
+#define NO_TEXTSW_AVAILABLE -1 /* cannot be positive (i.e. a window number. */
+static Textsw edit_textsw[MAX_NUMBER_OF_WPIPS_WINDOWS];
+static Panel_item check_box[MAX_NUMBER_OF_WPIPS_WINDOWS];
+static bool dont_touch_window[MAX_NUMBER_OF_WPIPS_WINDOWS];
+int number_of_wpips_windows = INITIAL_NUMBER_OF_WPIPS_WINDOWS;
+
 static Menu_item current_selection_mi, 
                  edit, 
                  close;
@@ -32,29 +37,45 @@ void current_selection_notify(menu, menu_item)
 Menu menu;
 Menu_item menu_item;
 {
-    unhide_window(edit_frame[0]);
-    unhide_window(edit_frame[1]);
+  int i;
+  
+  for(i = 0; i < number_of_wpips_windows; i++)
+    unhide_window(edit_frame[i]);
 }
 
-#define NO_TEXTSW_AVAILABLE -1 /* cannot be 0 or 1 */
-static bool fixed[2] = {FALSE, FALSE};
+
+#define DONT_TOUCH_WINDOW_ADDRESS 0
+
+void dont_touch_window_notify(Panel_item item, int value, Event *event)
+{
+  bool *dont_touch_window = (bool *) xv_get(item, XV_KEY_DATA,
+					    DONT_TOUCH_WINDOW_ADDRESS);
+  *dont_touch_window = (bool) xv_get(item, PANEL_VALUE);
+}
+
 
 int alloc_first_initialized_window()
 {
-    static int next=0;
-    int other;
+  static int next = 0;
+  int i, candidate;
 
-    next=next % 2;
-    other=(next+1) % 2;
-
-    if (! ( (bool)xv_get(edit_textsw[next], TEXTSW_MODIFIED) 
-	|| fixed[next]) ) {
-	return (next++);
-    }
-    else if (! ( (bool)xv_get(edit_textsw[other], TEXTSW_MODIFIED) 
-	|| fixed[other]) )
-	return(other);
-    else return(NO_TEXTSW_AVAILABLE);
+  for(i = next; i < next + number_of_wpips_windows; i++) {
+    candidate = i % number_of_wpips_windows;
+    /* Skip windows with modified text inside : */
+    if ((bool)xv_get(edit_textsw[candidate], TEXTSW_MODIFIED))
+      continue;
+    /* Skip windows with a retain attribute : */
+    /*
+    check_box = (Panel_item) xv_get(edit_textsw[candidate],
+				    XV_KEY_DATA, PANEL_CHECK_BOX,
+				    NULL);
+				    */
+    if ((bool)xv_get(check_box[candidate], PANEL_VALUE))
+      continue;
+    next = candidate + 1;
+    return candidate;
+  }
+  return(NO_TEXTSW_AVAILABLE);
 }    
 
 void edit_notify(menu, menu_item)
@@ -73,7 +94,7 @@ Menu_item menu_item;
 
     /* Is there an available edit_textsw ? */
     if ( (win_nb=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
-		prompt_user("None of the 2 text-windows is available");
+		prompt_user("None of the text-windows is available");
 		return;
     }
 
@@ -105,6 +126,18 @@ Menu_item menu_item;
 }
 
 
+char *compute_title_string(int window_number)
+{
+  char title_string_beginning[] = "Xview Pips Display Facility # ";
+  static char title_string[sizeof(title_string_beginning) + 4];
+
+  (void) sprintf(title_string, "%s%d",
+		 title_string_beginning, window_number + 1);
+  /* xv_set will copy the string. */
+  return title_string;
+}
+
+
 void view_notify(menu, menu_item)
 Menu menu;
 Menu_item menu_item;
@@ -116,7 +149,7 @@ Menu_item menu_item;
   char *label = (char *) xv_get(menu_item, MENU_STRING);
   char *modulename = db_get_current_module_name();
   int win1, win2;
-  
+
   if (modulename == NULL) {
     prompt_user("No module selected");
     return;
@@ -124,11 +157,14 @@ Menu_item menu_item;
 
   /* Is there an available edit_textsw ? */
   if ( (win1=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
-    prompt_user("None of the 2 text-windows is available");
+    prompt_user("None of the text-windows is available");
     return;
   }
 
-  if (strcmp(label, SEQUENTIAL_VIEW) == 0) {
+  if (strcmp(label, USER_VIEW) == 0) {
+    print_type = DBR_PARSED_PRINTED_FILE;
+  }
+  else if (strcmp(label, SEQUENTIAL_VIEW) == 0) {
     print_type = DBR_PRINTED_FILE;
   }
   else if (strcmp(label, PARALLEL_VIEW) == 0) {
@@ -157,7 +193,7 @@ Menu_item menu_item;
   (void) sprintf(busy_label, busy_label_format, label);
   /* Display the file name and the module name. RK, 2/06/1993 : */
   sprintf(string_modulename, "Module: %s", modulename);
-  xv_set(edit_frame[win1], FRAME_LABEL, "Xview Pips Display Facility",
+  xv_set(edit_frame[win1], FRAME_LABEL, compute_title_string(win1),
 	 FRAME_SHOW_FOOTER, TRUE,
 	 FRAME_LEFT_FOOTER, busy_label,
 	 FRAME_RIGHT_FOOTER, string_modulename,
@@ -187,7 +223,7 @@ Menu_item menu_item;
     /* Display the file name and the module name. RK, 2/06/1993 : */
     (void) sprintf(bank_view_name, "%s (bank view)", label);
     (void) sprintf(busy_label, busy_label_format, bank_view_name);
-    xv_set(edit_frame[win2], FRAME_LABEL, "Xview Pips Display Facility",
+    xv_set(edit_frame[win2], FRAME_LABEL, compute_title_string(win2),
 	   FRAME_SHOW_FOOTER, TRUE,
 	   FRAME_LEFT_FOOTER, busy_label,
 	   FRAME_RIGHT_FOOTER, string_modulename,
@@ -221,48 +257,60 @@ void edit_close_notify(menu, menu_item)
      Menu menu;
 Menu_item menu_item;
 {
-    if (! (bool)xv_get(edit_textsw[0], TEXTSW_MODIFIED))
-	hide_window(edit_frame[0]);
-    if (! (bool)xv_get(edit_textsw[1], TEXTSW_MODIFIED))
-	hide_window(edit_frame[1]);
+  int i;
+  
+  for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
+    if (! (bool)xv_get(edit_textsw[i], TEXTSW_MODIFIED))
+      hide_window(edit_frame[i]);
 
-    if ((bool)xv_get(edit_textsw[0], TEXTSW_MODIFIED)
-	||(bool)xv_get(edit_textsw[1], TEXTSW_MODIFIED) ) {
-	prompt_user("File not saved in editor");
-	return;
+  for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
+    if ((bool)xv_get(edit_textsw[i], TEXTSW_MODIFIED)) {
+      unhide_window(edit_frame[i]);
+      prompt_user("File not saved in editor");
+      return;
     }
+  
+  xv_set(current_selection_mi, 
+	 MENU_STRING, "No Selection",
+	 MENU_INACTIVE, TRUE, NULL);
 
-    xv_set(current_selection_mi, 
-	   MENU_STRING, "No Selection",
-	   MENU_INACTIVE, TRUE, NULL);
+  xv_set(close, MENU_INACTIVE, TRUE, NULL);
 
-    xv_set(close, MENU_INACTIVE, TRUE, NULL);
-
-    hide_window(edit_frame[0]);
-    hide_window(edit_frame[1]);
+  for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
+    hide_window(edit_frame[i]);
 }
 
 
 
 void create_edit_window()
 {
-    /* Xv_Window window; */
-
-    edit_textsw[0] = xv_create(edit_frame[0], TEXTSW, 
-			    TEXTSW_DISABLE_CD, TRUE,
-			    TEXTSW_DISABLE_LOAD, TRUE,
-			    0);
-
-    edit_textsw[1] = xv_create(edit_frame[1], TEXTSW, 
-			    TEXTSW_DISABLE_CD, TRUE,
-			    TEXTSW_DISABLE_LOAD, TRUE,
-			    0);
-
-/*    window = (Xv_Window) xv_find(edit_frame, WINDOW, 0);
-
-    xv_set(window, 
-	   WIN_EVENT_PROC, default_win_interpose, 
-	   NULL);*/
+  /* Xv_Window window; */
+  int i;
+  
+  for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++) {
+    Panel panel;
+    
+    edit_textsw[i] = xv_create(edit_frame[i], TEXTSW, 
+			       TEXTSW_DISABLE_CD, TRUE,
+			       TEXTSW_DISABLE_LOAD, TRUE,
+			       0);
+    window_fit(edit_textsw[i]);
+    panel = xv_create(edit_frame[i], PANEL,
+		      WIN_ROW_GAP, 1,
+		      WIN_COLUMN_GAP, 1,
+		      NULL);
+    dont_touch_window[i] = FALSE;
+    check_box[i] = xv_create(panel, PANEL_CHECK_BOX,
+			     PANEL_CHOICE_STRINGS, "Retain this window", NULL,
+			     PANEL_VALUE, dont_touch_window[i],
+			     PANEL_ITEM_X_GAP, 1,
+			     PANEL_ITEM_Y_GAP, 1,
+			     PANEL_NOTIFY_PROC, dont_touch_window_notify,
+			     XV_KEY_DATA, DONT_TOUCH_WINDOW_ADDRESS, &dont_touch_window[i],
+			     NULL);
+    window_fit_height(panel);
+    window_fit(edit_frame[i]);
+  }
 }
 
 
@@ -298,11 +346,13 @@ void create_edit_menu()
 		  MENU_GEN_PIN_WINDOW, main_frame, "View & Edit Menu",
 		  MENU_APPEND_ITEM, current_selection_mi,
 		  MENU_APPEND_ITEM, edit,
+		  MENU_ACTION_ITEM, USER_VIEW, view_notify,
 		  MENU_ACTION_ITEM, SEQUENTIAL_VIEW, view_notify,
 		  MENU_ACTION_ITEM, CALLGRAPH_VIEW, view_notify,
 		  MENU_ACTION_ITEM, ICFG_VIEW, view_notify,
 		  MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
 		  MENU_ACTION_ITEM, DISTRIBUTED_VIEW, view_notify,
+	/*	  MENU_ACTION_ITEM, HPFC_VIEW, view_notify,*/
 		  MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
 		  MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
 		  MENU_APPEND_ITEM, close,
