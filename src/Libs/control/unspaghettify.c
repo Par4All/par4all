@@ -3,10 +3,10 @@
    Ronan Keryell, 1995.
    */
 
-/* 	%A% ($Date: 1995/10/14 15:55:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/07 23:09:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
- char vcid_unspaghettify[] = "%A% ($Date: 1995/10/14 15:55:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+ char vcid_unspaghettify[] = "%A% ($Date: 1995/11/07 23:09:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -52,20 +52,31 @@ remove_useless_continue_or_empty_code_in_unstructured(unstructured u)
                      CONTINUE afterward... */
                   if (c != exit_node && c != entry_node)
                      if (gen_length(control_successors(c)) == 1) {
-                        /* Deal any number of predecessor.
+                        /* Do not deal with any number of predecessor
+                           since we do not want to remove the node 100
+                           in :
+                           goto 100
+                           100 goto 200
+                           200 goto 100
 
                            There may be also some unreachable
                            continues, that are without predecessors
-                           (0)... We want to remove them also. */
-                     
-                        statement st = control_statement(c);
+                           (0)... We want to remove them also. 
 
-                        if (empty_statement_or_continue_p(st)) {
-                           /* It is some useless code, so put it in
-                              the remove list: */
-                           remove_continue_list = CONS(CONTROL,
-                                                       c,
-                                                       remove_continue_list);
+Well with this modification, I am not sure that this procedure is
+still useful...
+
+                           So only 0 or 1 predecessor: */
+                        if (gen_length(control_predecessors(c)) <= 1) {
+                           statement st = control_statement(c);
+
+                           if (empty_statement_or_continue_p(st)) {
+                              /* It is some useless code, so put it in
+                                 the remove list: */
+                              remove_continue_list = CONS(CONTROL,
+                                                          c,
+                                                          remove_continue_list);
+                           }
                         }
                      }
                },
@@ -150,24 +161,29 @@ fuse_sequences_in_unstructured(unstructured u)
 
                      number_of_successors_of_the_successor = gen_length(control_successors(the_successor));
                      number_of_predecessors_of_the_successor = gen_length(control_predecessors(the_successor));
-                     debug(3, "dead_rewrite_unstructured",
+                     debug(3, "fuse_sequences_in_unstructured",
                            "(gen_length(control_successors(c)) == 1), number_of_successors_of_the_successor = %d, number_of_predecessors_of_the_successor = %d\n",
                            number_of_successors_of_the_successor,
                            number_of_predecessors_of_the_successor);
                      if (number_of_successors_of_the_successor == 1 &&
-                         number_of_predecessors_of_the_successor == 1) {
+                         number_of_predecessors_of_the_successor == 1)
                         /* Ok, we have found a node in a sequence. */
-                        
-                        /* Put the control in the fuse list. Since no
-                           fusing occurs yet, the address of a control
-                           node is itself: */
-                        hash_put(controls_to_fuse_with_their_successors,
-                                 (char *) c,
-                                 (char *) c);
-                     }
+                        if (the_successor !=
+                            CONTROL(CAR(control_predecessors(c))))
+                           /* And it is not a loop with only one
+                              control node: */
+                           /* Put the control in the fuse
+                              list. Since no fusing occurs yet, the
+                              address of a control node is itself: */
+                           hash_put(controls_to_fuse_with_their_successors,
+                                    (char *) c,
+                                    (char *) c);
+                        else
+                           debug(3, "fuse_sequences_in_unstructured",
+                                 "\tA loop with only one control...\n");     
                   }
                   else {
-                     debug(3, "dead_rewrite_unstructured",
+                     debug(3, "fuse_sequences_in_unstructured",
                            "(gen_length(control_successors(c)) == %d)\n",
                            gen_length(control_successors(c)));
                   }
@@ -183,7 +199,7 @@ fuse_sequences_in_unstructured(unstructured u)
             {
                /* Just for fun, the following line gets CPP lost
                   macro `HASH_MAP' used with too many (6) args
-               control a_control_to_fuse, its_successor, the_third_successor; */
+                  control a_control_to_fuse, its_successor, the_third_successor; */
                control a_control_to_fuse;
                control its_successor;
                control the_third_successor;
@@ -265,8 +281,8 @@ fuse_sequences_in_unstructured(unstructured u)
                controls_to_fuse_with_their_successors);
 
    /* Update the potentially modified exit node: */
-                  /* Actually I think it cannot happend according to
-                     some previous conditions... */
+   /* Actually I think it cannot happend according to
+      some previous conditions... */
    unstructured_exit(u)= exit_node;
 
    hash_table_free(controls_to_fuse_with_their_successors);
@@ -545,21 +561,21 @@ unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
    remove_the_unreachable_controls_of_an_unstructured(u);
 
    if (get_debug_level() > 0) {
-      fprintf(stderr, "dead_rewrite_unstructured after remove_the_unreachable_controls_of_an_unstructured\n");
+      fprintf(stderr, "unspaghettify_rewrite_unstructured after remove_the_unreachable_controls_of_an_unstructured\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 
    remove_useless_continue_or_empty_code_in_unstructured(u);
    
    if (get_debug_level() > 0) {
-      fprintf(stderr, "dead_rewrite_unstructured after remove_useless_continue_or_empty_code_in_unstructured\n");
+      fprintf(stderr, "unspaghettify_rewrite_unstructured after remove_useless_continue_or_empty_code_in_unstructured\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
    
    fuse_sequences_in_unstructured(u);
 
    if (get_debug_level() > 0) {
-      fprintf(stderr, "dead_rewrite_unstructured after fuse_sequences_in_unstructured\n");
+      fprintf(stderr, "unspaghettify_rewrite_unstructured after fuse_sequences_in_unstructured\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 
@@ -568,7 +584,7 @@ unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
          able to discard the unstructured, go on with some other
          optimizations: */
       if (get_debug_level() > 0) {
-         fprintf(stderr, "dead_rewrite_unstructured after take_out_the_entry_node_of_the_unstructured\n");
+         fprintf(stderr, "unspaghettify_rewrite_unstructured after take_out_the_entry_node_of_the_unstructured\n");
          print_text(stderr, text_statement(get_current_module_entity(), 0, s));
       }
 
@@ -576,7 +592,7 @@ unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
    }
 
    if (get_debug_level() > 0) {
-      fprintf(stderr, "dead_rewrite_unstructured exit:\n");
+      fprintf(stderr, "unspaghettify_rewrite_unstructured exit:\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 }
