@@ -478,22 +478,42 @@ entity MakeCommon(e)
 entity e;
 {
     if (entity_type(e) == type_undefined) {
-	entity_type(e) = make_type(is_type_area, make_area(0, NIL));
-	entity_storage(e) = make_storage(is_storage_ram, 
-					 (make_ram(get_current_module_entity(),
-						   StaticArea, 0, NIL)));
-	entity_initial(e) = MakeValueUnknown();
-	AddEntityToDeclarations(e, get_current_module_entity());
+	/* Is the common name conflicting with the program name? */
+	entity module =
+	    gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
+					   MODULE_SEP_STRING,
+					   MAIN_PREFIX,
+					   entity_local_name(e),
+					   (char *) NULL),
+			       entity_domain);
+	if(module == entity_undefined) {
+	    entity_type(e) = make_type(is_type_area, make_area(0, NIL));
+	    entity_storage(e) = 
+		make_storage(is_storage_ram, 
+			     (make_ram(get_current_module_entity(),
+				       StaticArea, 0, NIL)));
+	    entity_initial(e) = MakeValueUnknown();
+	    AddEntityToDeclarations(e, get_current_module_entity());
+	}
+	else {
+	    user_warning("MakeCommon", "Conflicting usage of %s\n",
+			 entity_local_name(e));
+	    ParserError("MakeCommon",
+			"Conflicting name between main and common\n");
+	}
     }
     else if(!type_area_p(entity_type(e))) {
-	pips_error("MakeCommon",
-		   "name conflict for %s between common and entity (tag=%d)\n",
-		   entity_name(e), type_tag(entity_type(e)));
+	/* FI: user_warning is used to display the conflicting name */
+	user_warning("MakeCommon",
+		     "name conflict for %s between common "
+		     "and entity (tag=%d)\n",
+		     entity_name(e), type_tag(entity_type(e)));
 	ParserError("MakeCommon",
-		    "name conflict between common and variable\n");
+		    "name conflict between common and variable or module\n");
     }
     else {
-	/* common e may already exist because it was encountered in another module
+	/* common e may already exist because it was encountered
+	 * in another module
 	 * but not have been registered as known by the current module
 	 */
 	AddEntityToDeclarations(e, get_current_module_entity());
