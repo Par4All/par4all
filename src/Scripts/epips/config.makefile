@@ -1,7 +1,7 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
 
-SCRIPTS= 	epips
+SCRIPTS= 	epips jepips
 
 SOURCES =	$(SCRIPTS) epips.el 
 
