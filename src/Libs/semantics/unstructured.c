@@ -61,6 +61,10 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.5  2001/02/02 12:17:48  irigoin
+  * After bug fixes for tilt.f, before cleaning up and before bug fixes for
+  * spice and fppp
+  *
   * Revision 1.4  2000/12/04 16:36:13  irigoin
   * Comments added to explain the algorithm used
   *
@@ -1016,7 +1020,63 @@ static list control_set_to_control_cycle(list set)
   return path;
 }
 
-/* find begining of cycles in the scc containing h in cycle */
+/* This is an auxiliary function for the next one */
+static void recursive_subscc_to_cycle_heads(list scc, control h, list path, list * pcycle_heads)
+{
+  control last = CONTROL(CAR(path));
+
+  MAP(CONTROL, succ, {
+    if(gen_in_list_p(succ, scc) && succ != h) {
+      if(gen_in_list_p(succ, path)) {
+	if(!gen_in_list_p(succ, *pcycle_heads)) {
+	  * pcycle_heads = gen_append(* pcycle_heads, CONS(CONTROL, succ, NIL));
+	  ifdebug(6) {
+	    pips_debug(6, "Current path with %d nodes:\n",
+		       gen_length(path));
+	    print_control_nodes(path);
+	    pips_debug(6, "New cycle head %s", 
+		       statement_identification(control_statement(succ)));
+	  }
+	}
+      }
+      else {
+	list new_path = CONS(CONTROL, succ, path);
+
+	recursive_subscc_to_cycle_heads(scc, h, new_path, pcycle_heads);
+	CDR(new_path) = NIL;
+	gen_free_list(new_path);
+      }
+    }
+  }, control_successors(last));
+}
+
+/* Find heads for cycles in scc, cycles which do not contain h. Path is build backwards. */
+static list subscc_to_cycle_heads(list scc, control h)
+{
+  list cycle_heads = NIL;
+  list path = CONS(CONTROL, h, NIL);
+
+  ifdebug(6) {
+    pips_debug(6, "Begin for head %s", 
+	       statement_identification(control_statement(h)));
+    pips_debug(6, "scc contains %d nodes:\n", gen_length(scc));
+    print_control_nodes(scc);
+  }
+
+  recursive_subscc_to_cycle_heads(scc, h, path, &cycle_heads);
+
+  ifdebug(6) {
+    pips_debug(6, "Subcycle contains %d secondary entries:\n",
+	       gen_length(cycle_heads));
+    print_control_nodes(cycle_heads);
+  }
+
+  return cycle_heads;
+}
+
+/* find begining of cycles in the scc containing h in cycle. This
+   algorithm is wrong is several control paths lead to the same node. A
+   cycle will be assumed when it only is a join. */
 static list scc_to_secondary_entries(list cycle, control h)
 {
   list secondary_entries = NIL;
@@ -1031,10 +1091,13 @@ static list scc_to_secondary_entries(list cycle, control h)
     reached = 0;
     MAP(CONTROL,c ,{
       MAP(CONTROL, succ, {
+	ifdebug(6) {
+	  print_control_node(succ);
+	}
 	if(gen_in_list_p(succ, cycle)) {
 	  if(gen_in_list_p(succ, reached_nodes)
 	     || gen_in_list_p(succ, newly_reached_nodes)) {
-	    if(!gen_in_list_p(succ, secondary_entries)) {
+	    if(!gen_in_list_p(succ, secondary_entries) && succ!= h) {
 	      secondary_entries = CONS(CONTROL, succ, secondary_entries);
 	    }
 	  }
@@ -1054,21 +1117,22 @@ static list scc_to_secondary_entries(list cycle, control h)
 }
 
 /* Find the scc's containing h but not the first control node in cycle */
-static list head_to_subcycle(list cycle, control h, list secondary_entries)
+static list head_to_subcycle(list cycle, control h, list * new_secondary_entries)
 {
   list subcycle = list_undefined;
   list preds = NIL;
   list succs = NIL;
   control f = CONTROL(CAR(cycle));
   control outernode = control_undefined;
-  list new_secondary_entries = list_undefined;
+  /* list new_secondary_entries = list_undefined; */
 
   pips_debug(5, "Begin for head %s", 
 	     statement_identification(control_statement(h)));
 
   pips_assert("The subcycle head is in the cycle", gen_in_list_p(h, cycle));
 
-  new_secondary_entries = scc_to_secondary_entries(cycle, h);
+  /* *new_secondary_entries = scc_to_secondary_entries(cycle, h); */
+  *new_secondary_entries = subscc_to_cycle_heads(cycle, h);
 
   if(h!=f) {
     /* subcycle or more precisely, sub-scc for h is made of h predecessors
@@ -1153,6 +1217,9 @@ static list head_to_subcycle(list cycle, control h, list secondary_entries)
   ifdebug(5) {
     pips_debug(5, "Subcycle contains %d nodes:\n", gen_length(subcycle));
     print_control_nodes(subcycle);
+    pips_debug(5, "Subcycle contains %d secondary entries:\n",
+	       gen_length(*new_secondary_entries));
+    print_control_nodes(*new_secondary_entries);
   }
   return subcycle;
 }
@@ -1161,6 +1228,7 @@ static transformer subcycle_to_fixpoint
 (list cycle, control h, statement_mapping control_postcondition_map, list secondary_entries,
  statement_mapping statement_to_subcycle_fix_point_map)
 {
+  list new_secondary_entries = NIL;
   list subcycle = list_undefined;
   transformer fptf = transformer_undefined;
   list path = list_undefined;
@@ -1168,7 +1236,7 @@ static transformer subcycle_to_fixpoint
   pips_debug(5, "Begin for head %s", 
 	     statement_identification(control_statement(h)));
 
-  subcycle = head_to_subcycle(cycle, h, secondary_entries);
+  subcycle = head_to_subcycle(cycle, h, &new_secondary_entries);
 
   if(!ENDP(path = control_set_to_control_cycle(subcycle))) {
     gen_free_list(subcycle);
@@ -1184,7 +1252,7 @@ static transformer subcycle_to_fixpoint
 
     fptf = control_node_sequence_to_fix_point(subcycle,
 					      control_postcondition_map,
-					      secondary_entries,
+					      new_secondary_entries,
 					      statement_to_subcycle_fix_point_map);
 
     ifdebug(5) {
@@ -1210,7 +1278,7 @@ static transformer subcycle_to_fixpoint
 		&& CONTROL(CAR(subcycle))==h);
 
     fptf = control_node_set_to_fix_point(subcycle,
-					 secondary_entries,
+					 new_secondary_entries,
 					 statement_to_subcycle_fix_point_map );
 
     ifdebug(5) {
@@ -1368,7 +1436,8 @@ static void subcycle_to_postconditions(list cycle,
 				       list secondary_entries,
 				       statement_mapping control_postcondition_map)
 {
-  list subcycle = head_to_subcycle(cycle, h, secondary_entries);
+  list new_secondary_entries = NIL;
+  list subcycle = head_to_subcycle(cycle, h, &new_secondary_entries);
   list path = control_set_to_control_cycle(subcycle);
   list tail = list_undefined;
   transformer pre = transformer_undefined;
@@ -1460,7 +1529,10 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
   pips_debug(5, "Begin for cycle:\n");
   ifdebug(5) print_control_nodes(cycle);
 
-  ordered_secondary_entries = sort_secondary_entries(secondary_entries, cycle);
+  /* ordered_secondary_entries = sort_secondary_entries(secondary_entries, cycle); */
+  /* ordered_secondary_entries = gen_copy_list(secondary_entries); */
+  /* ordered_secondary_entries = gen_copy_seq(secondary_entries); */
+  ordered_secondary_entries = secondary_entries;
 
   /* compute a fix point for each sub-cycle head (i.e. secondary entry) */
   MAPL(hc, {
@@ -1478,7 +1550,7 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
 
       if(hash_get((hash_table) statement_to_subcycle_fix_point_map, (char *) s)
 	 == HASH_UNDEFINED_VALUE) {
-	transformer fptf = subcycle_to_fixpoint(cycle, h,
+	transformer fptf = subcycle_to_fixpoint(scc, h,
 						control_postcondition_map,
 						ordered_secondary_entries,
 						statement_to_subcycle_fix_point_map);
@@ -1653,7 +1725,7 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
   FREE_STATEMENT_MAPPING(statement_to_subcycle_fix_point_map);
   statement_to_subcycle_fix_point_map = NULL;
 
-  gen_free_list(ordered_secondary_entries);
+  /* gen_free_list(ordered_secondary_entries); */
 
   pips_debug(5, "End\n");
 }
