@@ -191,7 +191,7 @@ loop_regions_normalize(list l_reg, entity index, range l_range,
 		
 		ifdebug(6)
 		{
-		    pips_debug(6, "index system:\n"); syst_debug(beta_sc);
+		    pips_debug(6, "index system:\n"); sc_syst_debug(beta_sc);
 		}		
 		
 		/* eliminate the old index (which is no more a variable,
@@ -1285,7 +1285,7 @@ static Psysteme region_sc_minimal(Psysteme sc, boolean *p_sc_changed_p)
     ifdebug(8)
     {
 	pips_debug(8, "initial sc :\n");
-	syst_debug(sc);
+	sc_syst_debug(sc);
     }
 
     phi_first_sort_base(&sorted_base);
@@ -1333,7 +1333,7 @@ static Psysteme region_sc_minimal(Psysteme sc, boolean *p_sc_changed_p)
     ifdebug(8)
     {
 	pips_debug(8, "final sc :\n");
-	syst_debug(sc);
+	sc_syst_debug(sc);
     }
 
     return sc;
