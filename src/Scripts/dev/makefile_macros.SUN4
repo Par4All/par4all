@@ -1,6 +1,5 @@
 #
-# $RCSfile: makefile_macros.SUN4,v $ (version $Revision$)
-# $Date: 1997/05/03 10:26:55 $, 
+# $Id$
 #
 # this file contains macro definitions 
 
@@ -40,5 +39,5 @@ MAKEIDX	= makeindex
 DVIPS	= dvips
 RMAN	= rman
 
-# end of $RCSfile: makefile_macros.SUN4,v $
+# end of it
 #
