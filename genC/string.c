@@ -44,7 +44,7 @@ register string s; /* la chaine a copier */
 	}
 
 	/* recopie */
-	for (i = 0; i < n && s[i] != NULL; i += 1 )
+	for (i = 0; i < n && s[i] != '\0'; i += 1 )
 		r[i] = s[i];
 
 	/* padding */
@@ -70,7 +70,7 @@ register string s; /* la chaine a copier */
 	}
 
 	/* recopie */
-	for (i = 0; i < n && s[i] != NULL; i += 1 )
+	for (i = 0; i < n && s[i] != '\0'; i += 1 )
 		r[i] = s[i];
 
 	/* padding */
