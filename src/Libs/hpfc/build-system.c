@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1994/09/01 15:47:38 $, ) version $Revision$,
+ * $RCSfile: build-system.c,v $ ($Date: 1994/12/06 14:42:47 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -24,7 +24,6 @@ extern fprintf();
  * Psystems stuff
  */
 
-#include "types.h"
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
