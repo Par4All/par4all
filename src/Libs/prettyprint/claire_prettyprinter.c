@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.16  2004/07/05 08:41:46  hurbain
+   checkin pour install sur ciboure
+
    Revision 1.15  2004/06/24 14:12:13  hurbain
    Pre-holiday version.
    Stable, works (as far as I've tested ;) )
@@ -281,13 +284,12 @@ static string claire_dim_string(list ldim, string name)
       result = strdup(concatenate(result, TAB, dimensions, CLOSEPAREN, COMMA, NL, NULL));
       result = strdup(concatenate(result, TAB, datatype, NL, NL, NULL));
     }
-  printf("%s", result);
   return result;
 }
 
 static string this_entity_clairedeclaration(entity var)
 {
-  string result = NULL;
+  string result = strdup("");
   string name = entity_local_name(var);
   type t = entity_type(var);
   storage s = entity_storage(var);
@@ -295,7 +297,6 @@ static string this_entity_clairedeclaration(entity var)
   /*  Many possible combinations */
 
   if (strstr(name,TYPEDEF_PREFIX) != NULL)
-    /* This is a typedef name, what about typedef int myint[5] ???  */
     pips_user_error("Structs not supported");
 
   switch (type_tag(t)) {
@@ -306,9 +307,6 @@ static string this_entity_clairedeclaration(entity var)
       sd = claire_dim_string(variable_dimensions(v), name);
     
       result = strdup(concatenate(result, sd, NULL));
-      /* problems with order !*/
-      /*result = strdup(concatenate(sq, st, SPACE, svar, sd, NULL));
-       */
       break;
     }
   case is_type_struct:
@@ -330,7 +328,7 @@ static string this_entity_clairedeclaration(entity var)
     pips_user_error("Something not allowed here");
   }
  
-  return result? result: strdup("");
+  return result;
 }
 
 static string 
@@ -845,7 +843,7 @@ static string claire_tasks(statement stat){
     pips_user_error("Only a sequence can be here");
   }
   }
-  result = strdup(concatenate(result, NL, NL, "PRES:APPLICATION := APPLICATION(name = symbol!(", QUOTE, global_module_name, QUOTE, ", ", NL, TAB,NULL));
+  result = strdup(concatenate(result, NL, NL, "PRES:APPLICATION := APPLICATION(name = symbol!(", QUOTE, global_module_name, QUOTE, "), ", NL, TAB,NULL));
   result = strdup(concatenate(result, "tasks = list<TASK>(", NULL));
   for(j = 0; j<gen_array_nitems(tasks_names) - 1; j++){
     result = strdup(concatenate(result, *((string *)(gen_array_item(tasks_names, j))), ", ", NULL));
@@ -878,8 +876,6 @@ static string claire_code_string(entity module, statement stat)
   result = strdup(concatenate(decls, NL, tasks, NL, NULL));
 
   printf("%s", result);
-  free(decls);
-  free(tasks);
 
   return result;
 }
@@ -918,7 +914,7 @@ bool print_claire_code(string module_name)
 
   /* save to file */
   out = safe_fopen(filename, "w");
-  fprintf(out, "/* Claire pretty print for module %s. */\n%s", module_name, ppt);
+  fprintf(out, "// Claire pretty print for module %s. \n%s", module_name, ppt);
   safe_fclose(out, filename);
 
   free(ppt);
