@@ -1,3 +1,7 @@
+/* $RCSfile: file.c,v $ (version $Revision$)
+ * $Date: 1995/11/02 17:03:23 $, 
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,6 +15,11 @@
 
 #include "genC.h"
 #include "misc.h"
+
+/* hmmm. ???
+ */
+extern char *re_comp();
+extern int re_exec();
 
 /* Should be in stdlib.h or errno.h: */
 extern char * sys_errlist[];
