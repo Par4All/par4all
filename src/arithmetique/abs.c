@@ -1,11 +1,9 @@
 /* $RCSfile: abs.c,v $ (version $Revision$)
- * $Date: 1996/08/07 13:07:37 $, 
+ * $Date: 1996/08/07 13:50:08 $, 
  */
 
 #include <stdio.h>
-/* #include <values.h> */
 #include <limits.h>
-#include <setjmp.h>
 
 #include "arithmetique.h"
 #include "assert.h"
@@ -25,7 +23,6 @@ Value abs_ofl_ctrl(Value i, int ofl_ctrl)
 }
 
 /* int absval_ofl(int i): absolute value of i (SUN version)
- * Overflow control is made and returns to the last setjmp(overflow_error). 
  */
 Value absval_ofl(Value i)
 {
