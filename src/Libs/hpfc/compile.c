@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/03/10 09:17:54 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/03/10 12:28:58 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -69,7 +69,7 @@ char *module_name;
     debug(3,"hpfcompile","module: %s\n",module_name);
 
     set_current_module_entity(module);
-    make_hpfc_static_mappings();
+    make_hpfc_current_mappings();
 
 /*    CurrentFunction = module;  is that not necessary any more? */
     module_stat = (statement)
@@ -190,7 +190,7 @@ char *module_name;
     
     debug(4,"hpfcompile","end of procedure\n");
     reset_current_module_entity();
-    free_hpfc_static_mappings();
+    free_hpfc_current_mappings();
     debug_off();
 }
 
