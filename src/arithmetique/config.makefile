@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/09 19:13:50 $, 
+# $Date: 1996/07/09 19:14:55 $, 
 
 LIB_CFILES=	abs.c \
 		divide.c \
@@ -11,7 +11,8 @@ LIB_CFILES=	abs.c \
 
 OTHER_HEADERS=	assert.h boolean.h
 
-LIB_HEADERS=	arithmetique-local.h 
+LIB_HEADERS=	arithmetique-local.h \
+		$(OTHER_HEADERS)
 
 LIB_OBJECTS= $(LIB_CFILES:.c=.o) 
 
