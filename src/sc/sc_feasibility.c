@@ -285,10 +285,12 @@ static boolean internal_sc_feasibility
     if (method & SIMPLEX_METHOD)
     {
       ok = sc_simplexe_feasibility_ofl_ctrl(w? w: sc, ofl_ctrl);
+      fprintf(stderr,"SIMPLEX CHOSEN\n");
     }
     else 
     {
       ok = sc_fourier_motzkin_feasibility_ofl_ctrl(w? w: sc, int_p, ofl_ctrl);
+      fprintf(stderr,"FM CHOSEN\n"); 
     }
   }
   
