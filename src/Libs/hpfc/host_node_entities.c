@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1994/09/01 15:48:11 $, ) version $Revision$,
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1994/11/17 14:19:21 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -167,15 +167,14 @@ entity module;
 
     current_entity_map = hpfc_map_of_module(module);
 
-    gen_recurse(object, 
-		reference_domain, 
-		gen_true, 
-		update_reference_for_module_rewrite);
-
-    gen_recurse(object, 
-		call_domain, 
-		gen_true, 
-		update_call_for_module_rewrite);
+    gen_multi_recurse(object, 
+		      reference_domain, 
+		      gen_true, 
+		      update_reference_for_module_rewrite,
+		      call_domain, 
+		      gen_true, 
+		      update_call_for_module_rewrite,
+		      NULL);
 
     current_entity_map = saved;
 }
