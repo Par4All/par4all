@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/30 14:58:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/30 15:16:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_log[] = "%A% ($Date: 1997/04/30 14:58:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_log[] = "%A% ($Date: 1997/04/30 15:16:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -34,6 +34,8 @@ char vcid_xv_log[] = "%A% ($Date: 1997/04/30 14:58:27 $, ) version $Revision$, g
 #include "database.h"
 #include "pipsdbm.h"
 #include "top-level.h"
+
+#include "properties.h"
 
 #include "wpips.h"
 
