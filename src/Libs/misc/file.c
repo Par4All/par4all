@@ -214,13 +214,16 @@ FILE * stream;
   in directory 'dir' and with file_name_predicate() returning TRUE on
   the file name (for example use directory_exists_p to select
   directories, of file_exists_p to select regular files).  re has the
-  ed syntax.  */
-void
-list_files_in_directory(int * pargc,
-                        char * argv[],
-                        char * dir,
-                        char * re,
-                        bool (* file_name_predicate)(char *))
+  ed syntax.
+
+  Return 0 on success, -1 on directory openning error.
+  */
+int
+safe_list_files_in_directory(int * pargc,
+                             char * argv[],
+                             char * dir,
+                             char * re,
+                             bool (* file_name_predicate)(char *))
 {
    char complete_file_name[MAXNAMLEN + 1];
    list dir_list = NIL;
@@ -229,7 +232,7 @@ list_files_in_directory(int * pargc,
    char * re_comp_message;
    
 
-   pips_assert("list_files_in_directory", 
+   pips_assert("safe_list_files_in_directory", 
                strcmp(dir, "") != 0);
 
    re_comp_message = re_comp(re);
@@ -244,21 +247,45 @@ list_files_in_directory(int * pargc,
          while((dp = readdir(dirp)) != NULL) {
             if (re_exec(dp->d_name) == 1) {
                (void) sprintf(complete_file_name, "%s/%s", dir, dp->d_name);
-               if (file_name_predicate(dp->d_name))
+               if (file_name_predicate(complete_file_name))
                   dir_list = CONS(STRING, strdup(dp->d_name), dir_list);
             }
          }
          closedir(dirp);
       }
       else
-         user_error("list_files_in_directory",
-                    "opendir() failed on directory \"%s\", %s.\n",
-                    dir,  sys_errlist[errno]);
+         return -1;
    }
 
    /* Now sort the file list: */
    list_to_arg(dir_list, pargc, argv);
    args_sort(*pargc, argv);
+
+   return 0;
+}
+
+
+/* The same as the previous safe_list_files_in_directory() but with no
+   return code and a call to user error if it cannot open the
+   directory.
+   */
+void
+list_files_in_directory(int * pargc,
+                        char * argv[],
+                        char * dir,
+                        char * re,
+                        bool (* file_name_predicate)(char *))
+{
+   int return_code = safe_list_files_in_directory(pargc,
+                                                  argv,
+                                                  dir,
+                                                  re,
+                                                  file_name_predicate);
+   
+
+   user_error("list_files_in_directory",
+              "opendir() failed on directory \"%s\", %s.\n",
+              dir,  sys_errlist[errno]);
 }
 
 
