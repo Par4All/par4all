@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 2000/10/27 13:36:24 $, 
+ * $Date: 2000/10/27 14:03:27 $, 
  */
 
 #include <stdio.h>
@@ -185,6 +185,11 @@ int ofl_ctrl;
 	    sc->nb_ineq--;
 	}
     }
+
+    if (linear_number_of_exception_thrown-init_exception_thrown>=7)
+      fprintf(stderr, "[build_sc_nredund_1pass_ofl_ctrl] "
+	      "too many exceptions in redundancy elimination... function stopped.\n");
+
     sc_rm(ps);
     *psc = sc;
 } 
