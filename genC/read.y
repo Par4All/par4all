@@ -68,6 +68,7 @@ int allow_forward_ref = FALSE ;
 
 static char *read_external() ;
 static gen_chunk *make_def(), *make_ref() ;
+
 %}
 
 %token CHUNK_BEGIN
@@ -151,16 +152,18 @@ Shared_chunk
 		}
 	;
 
-Type	: Int	{
-		if( shared_number ) {
-			struct gen_binding *bp = &Domains[ $1 ] ;
-
-			shared_table[ shared_number-1 ] = 
-				(gen_chunk *)alloc(gen_size( bp )*
-					       sizeof( gen_chunk )) ;
-		}
-		$$ = $1 ;
-		}
+Type	: Int 
+	{
+	  int type_number = gen_type_translation_old_to_actual($1);
+	  if( shared_number ) {
+	    struct gen_binding *bp = &Domains[ type_number ] ;
+	    
+	    shared_table[ shared_number-1 ] = 
+	      (gen_chunk *)alloc(gen_size( bp )*
+				 sizeof( gen_chunk )) ;
+	  }
+	  $$ = type_number ;
+	}
 	;
 
 Datas	: Datas Data {	
