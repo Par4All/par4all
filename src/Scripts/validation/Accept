@@ -13,13 +13,13 @@
 # - several files may be piped simultaneously
 #
 # SCCS Stuff:
-# $RCSfile: Accept,v $ ($Date: 1997/02/19 09:01:31 $, ) version $Revision$,
+# $RCSfile: Accept,v $ ($Date: 1997/02/19 09:03:37 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
 
 header="Differences for"
-pips_test_directory="${$PIPS_ROOT/Validation}"
+pips_test_directory="${PIPS_ROOT}/Validation"
 
 sed -n "/^$header/s,^$header \([^ ]*\) in \([^ ]*\):,\1 \2,p" |
 while read module file
