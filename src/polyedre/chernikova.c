@@ -451,7 +451,7 @@ Ptsg  sc_to_sg_chernikova(Psysteme sc)
       sg = sg_new();
       nbrows = sc->nb_eq + sc->nb_ineq + 1;
       nbcolumns = sc->dimension +2;
-      sg->base = base_copy(sc->base);
+      sg->base = base_dup(sc->base);
       //replace base_dup, which changes the pointer given as parameter
       a = Matrix_Alloc(nbrows, nbcolumns);
       sc_to_matrix(sc,a);
@@ -491,7 +491,7 @@ Psysteme sg_to_sc_chernikova(Ptsg sg)
     {
 
     sc = sc_new();
-    sc->base = base_copy(sg->base);
+    sc->base = base_dup(sg->base);
     //replace base_dup, which changes the pointer given as parameter
     sc->dimension = vect_size(sc->base);
 
@@ -514,7 +514,7 @@ Psysteme sg_to_sc_chernikova(Ptsg sg)
 	if (sc == NULL) {
 	    Pcontrainte pc = contrainte_make(vect_new(TCST, VALUE_ONE));
 	    sc = sc_make(pc, CONTRAINTE_UNDEFINED);
-	    sc->base = base_copy(sg->base);
+	    sc->base = base_dup(sg->base);
 	    //replace base_dup, which changes the pointer given as parameter
 	    sc->dimension = vect_size(sc->base);	}
 
@@ -567,7 +567,7 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 
 	SC_CONVEX_HULL_timeout = FALSE;
 
-	fprintf(stderr,"\n *** * *** Timeout from polyedre/chernikova : sc_convex_hull !!! \n");
+	//fprintf(stderr,"\n *** * *** Timeout from polyedre/chernikova : sc_convex_hull !!! \n");
 	
 	//We can change to print to stderr by using sc_default_dump(sc). duong
 
@@ -586,7 +586,7 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	*/
       }
 
-      fprintf(stderr,"\nThis is an exception rethrown from sc_convex_hull(): \n ");
+      //fprintf(stderr,"\nThis is an exception rethrown from sc_convex_hull(): \n ");
       RETHROW();
     }
     TRY 
@@ -621,12 +621,7 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     nbcolumns2 = sc2->dimension +2;
     a2 = Matrix_Alloc(nbrows2, nbcolumns2);
     sc_to_matrix(sc2,a2);
-    /*duong
-    fprintf(stderr, "[sc_convex_hull]\na1 =");
-	Matrix_Print(stderr, "%4d",a1);
-	fprintf(stderr, "\na2 =");
-	Matrix_Print(stderr, "%4d",a2);
-    */
+   
     ifscdebug(8) {
 	fprintf(stderr, "[sc_convex_hull]\na1 =");
 	Matrix_Print(stderr, "%4d",a1);
@@ -636,18 +631,10 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 
     A1 = Constraints2Polyhedron(a1, MAX_NB_RAYS);
    
-    /*duong
-    fprintf(stderr, "[sc_convex_hull]\nA1 (%p %p)=", A1, a1);
-	Polyhedron_Print(stderr, "%4d",A1);	
-    */
     my_Matrix_Free(&a1); 
 
     A2 = Constraints2Polyhedron(a2, MAX_NB_RAYS);
-   
-    /*duong
-    fprintf(stderr, "[sc_convex_hull]\nA2 (%p %p)=", A2, a2);
-	Polyhedron_Print(stderr, "%4d",A2);
-    */
+      
     my_Matrix_Free(&a2);
 
     ifscdebug(8) {
@@ -658,7 +645,7 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     }
     
     sc = sc_new();
-    sc->base = base_copy(sc1->base);
+    sc->base = base_dup(sc1->base);
     //replace base_dup, which changes the pointer given as parameter
     sc->dimension = vect_size(sc->base);
 
@@ -741,7 +728,7 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     if (sc == NULL) {
 	Pcontrainte pc = contrainte_make(vect_new(TCST, VALUE_ONE));
 	sc = sc_make(pc, CONTRAINTE_UNDEFINED);
-	sc->base = base_copy(sc1->base);
+	sc->base = base_dup(sc1->base);
 	//replace base_dup, which changes the pointer given as parameter
 	sc->dimension = vect_size(sc->base);
     }
