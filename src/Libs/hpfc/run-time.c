@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: run-time.c,v $
+ * Revision 1.35  1997/06/10 09:15:52  coelho
+ * *** empty log message ***
+ *
  * Revision 1.34  1997/04/17 13:25:28  coelho
  * STRING buffer added.
  *
@@ -376,11 +379,7 @@ bool bsend;
      */
 
     return hpfc_make_call_statement
-	   (make_packing_function("HPFC", 
-				  len, 
-				  bsend, 
-				  entity_basic(array), 
-				  1+5*len),
+	   (make_packing_function(len, bsend, entity_basic(array), 1+5*len),
 	    larg);
 
 }
@@ -487,16 +486,15 @@ array_lower_upper_bounds_list(entity array)
  *
  * find or create an entity for the packing function...
  */
-entity make_packing_function(prefix, ndim, kind, base, nargs)
-string prefix;
+static entity make_packing_function(ndim, kind, base, nargs)
 int ndim;
 bool kind;
 basic base;
 int nargs;
 {
     char buffer[100], *buf = buffer;
-    sprintf(buf, "%s %s %s %d", 
-	    prefix, (kind ? "PACK" : "UNPACK"), pvm_what_options(base), ndim);
+    sprintf(buf, "%s %s %d", 
+	    pvm_what_options(base), (kind ? "PACK" : "UNPACK"), ndim);
     buf += strlen(buf);
 
     return MakeRunTimeSupportSubroutine(buffer, nargs);
