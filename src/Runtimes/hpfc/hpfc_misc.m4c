@@ -2,7 +2,7 @@
  * a set a functions to print the host and node status in PVM,
  * called from a Fortran subroutine.
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1994/09/08 13:54:25 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1994/09/21 17:23:06 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
