@@ -6,7 +6,9 @@
 
 #include <stdio.h>
 #include <malloc.h>
-#include <varargs.h>
+#include <stdarg.h>
+
+extern int fprintf();
 
 #include "boolean.h"
 #include "vecteur.h"
@@ -124,25 +126,26 @@ char *f;
  *
  * CAUTION: the initial vector is modified by the process!
  */
-Pvecteur vect_make(va_alist)
-va_dcl
-{
-    va_list ap = NULL;
-    Variable var = (Variable) NULL;
-    Value val = (Value) 0;
-    Pvecteur v = VECTEUR_UNDEFINED;
 
-    va_start (ap);
-    v = va_arg(ap, Pvecteur);
+Pvecteur 
+vect_make(Pvecteur v, ...)
+{
+    va_list the_args;
+    Variable var;
+    Value val;
+
+    va_start (the_args, v);
+
     do
     {
-	var = va_arg(ap, Variable);
-	val = va_arg(ap, Value);
+	var = va_arg(the_args, Variable);
+	val = va_arg(the_args, Value);
 
 	vect_add_elem(&v, var, val);
     }
-    while (var != (Variable)0)
-    va_end (ap);
+    while (var != (Variable)0);
+
+    va_end (the_args);
 
     return(v);
 }
@@ -151,10 +154,10 @@ va_dcl
 Pbase base_dup( b )
 Pbase b;
 {
-  Pvecteur v1, v2;
-
-  v2 = vect_dup((Pvecteur) b);
-  v1 = base_reversal(v2);
-  vect_rm(v2);                
-   return(v1);
+    Pvecteur v1, v2;
+    
+    v2 = vect_dup((Pvecteur) b);
+    v1 = base_reversal(v2);
+    vect_rm(v2);                
+    return(v1);
 }
