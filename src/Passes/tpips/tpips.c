@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/03/08 14:49:24 $, 
+ * $Date: 1997/04/01 18:13:57 $, 
  */
 
 #include <stdio.h>
@@ -572,6 +572,86 @@ static char * tpips_read_a_line(void)
     return line;
 }
 
+/* simple direct dynamic buffer management. FC.
+ */
+static char * sbuffer = NULL;
+static int sbufsize = 0;
+static void init_sbuffer(void)
+{ 
+    if (sbuffer) return;
+    sbufsize = 64; 
+    sbuffer = (char*) malloc(sbufsize); 
+}
+static int add_sbuffer_char(int pos, char c)
+{ 
+    if (pos>=sbufsize) { 
+	sbufsize*=2; 
+	sbuffer = realloc(sbuffer, sbufsize); 
+    }
+    sbuffer[pos] = c;
+    return pos+1;
+}
+static int add_sbuffer_string(int pos, char * word)
+{
+    while (word && *word) {
+	pos = add_sbuffer_char(pos, *word);
+	word++;
+    }
+    return pos;
+}
+/* looks for a {} enclosed name from env.
+ */
+static char * skip_env_name(char * line, char** name)
+{
+    char * s = line;
+
+    if (s && *s && (s[0]!='$' || s[1]!='{')) {
+	*name = NULL;
+	return s;
+    }
+    
+    s+=2; *name=s;
+
+    while (*s && *s!='}') s++;
+
+    if (*s=='}') {
+	*s = '\0'; return s+1;
+    } else {
+	*name = NULL; return line;
+    }
+}
+static char * substitute_variables(char * line)
+{
+    int pos=0;
+    init_sbuffer();
+    while (*line) {
+	if (*line!='$') {
+	    pos = add_sbuffer_char(pos, *line);
+	    line++;
+	} else {
+	    char * name, * nl;
+	    nl = skip_env_name(line, &name);
+	    if (nl==line) {
+		pos = add_sbuffer_char(pos, *line);
+		line++;
+	    } else {
+		line=nl;
+		if (name) {
+		    pips_debug(1, "substituting $%s\n", name);
+		    pos = add_sbuffer_string(pos, getenv(name));
+		}
+	    }
+	}
+    }
+    add_sbuffer_char(pos, '\0');
+
+    pips_debug(1, "returning: %s\n", sbuffer);
+
+    return strdup(sbuffer);
+}
+
+/* processing command line per line
+ */
 static void process_a_file()
 {
     char *last = NULL;
@@ -596,6 +676,8 @@ static void process_a_file()
 	    tp_restart(tp_in);
 	}
 	else {
+	    char * sline; /* after environment variable substitution */
+
 	    push_pips_context(&pips_top_level);
 	    /*   add to history if not the same as the last one.
 	     */
@@ -608,10 +690,11 @@ static void process_a_file()
 	    }
 	    /*   calls the appropriate handler.
 	     */
-	    pips_debug(2, "restating tpips scanner\n");
+	    pips_debug(2, "restarting tpips scanner\n");
 	    tp_restart(tp_in);
 	    skip_blanks(line);
-	    (find_handler(line))(line);
+	    sline = substitute_variables(line);
+	    (find_handler(sline))(sline);
 	}
 	pop_pips_context();
     }
