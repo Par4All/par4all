@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1995/10/12 13:33:14 $, 
+ * $Date: 1995/10/17 09:20:27 $, 
  */
 
 /* hmmm...
@@ -35,6 +35,12 @@
     (void) fprintf(stderr, \
 		   "[%s] (%s:%d) assertion failed\n\n '%s' not verified\n\n", \
 		   __FUNCTION__ , __FILE__ , __LINE__ , what); abort();}
+#define pips_user_assert(what, predicate)\
+  if(!(predicate)){\
+    (void) fprintf(stderr, \
+		   "[%s] (%s:%d) assertion failed\n\n '%s' not verified\n\n", \
+		   __FUNCTION__ , __FILE__ , __LINE__ , what); \
+    pips_user_error("this is a USER ERROR, I guess\n");}
 #else
 #define debug_on(env) debug_on_function(env, "unknown", __FILE__, __LINE__)
 #define debug_off() debug_off_function("unknown", __FILE__, __LINE__)
@@ -47,6 +53,12 @@
     (void) fprintf(stderr, \
 		   "(%s:%d) assertion failed\n\n '%s' not verified\n\n", \
 		   __FILE__ , __LINE__ , what); abort();}
+#define pips_user_assert(what, predicate)\
+  if(!(predicate)){\
+    (void) fprintf(stderr, \
+		   "(%s:%d) assertion failed\n\n '%s' not verified\n\n", \
+		   __FILE__ , __LINE__ , what); \
+    pips_user_error("this is a USER ERROR, I guess\n");}
 #endif
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
