@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1997/04/17 17:58:44 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1998/12/02 13:42:51 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -14,6 +14,8 @@ PREFIX bool name##_undefined_p(void){ return name##_object==type##_undefined;}\
 PREFIX void reset_##name(void) \
 { message_assert("must reset sg defined", !name##_undefined_p());\
   name##_object=type##_undefined;}\
+PREFIX void error_reset_##name(void) \
+{ name##_object=type##_undefined;}\
 PREFIX void set_##name(type o)\
 { message_assert("must set sg undefined", name##_undefined_p());\
   name##_object=o;}\
@@ -22,7 +24,7 @@ PREFIX type get_##name(void) \
   return name##_object;}\
 static int name##_generic_static_status_hack(void)\
 { return (int) reset_##name & (int) set_##name & \
-      (int) reset_##name & (int) get_##name & \
+      (int) error_reset_##name & (int) get_##name & \
       (int) name##_generic_static_status_hack;}
 
 #define GENERIC_STATIC_STATUS(PREFIX, name, type, init, cloze)\
@@ -68,6 +70,7 @@ PREFIX void store_or_update_##name(type##_key_type k, type##_value_type v)\
         GENERIC_FUNCTION(static, name, type)\
 static int name##_generic_local_function_hack(void)\
 { return (int) name##_undefined_p & (int) reset_##name & \
+         (int) error_reset_##name & \
 	 (int) set_##name & (int) get_##name & \
          (int) init_##name & (int) close_##name & \
 	 (int) update_##name & (int) load_##name & \
