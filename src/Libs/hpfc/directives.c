@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: directives.c,v $ ($Date: 1995/03/08 18:11:40 $, ) version $Revision$,
+ * $RCSfile: directives.c,v $ ($Date: 1995/03/10 09:19:11 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -60,7 +60,14 @@ entity e;
  * iterator init, next, close...
  */
 
-DEFINE_LOCAL_STACK(current_stmt, statement)
+/* I wanna put statement and controls in the stack... ???
+ * I will need 
+ * gen_type...
+ * to take care of already seen statements...
+ */
+DEFINE_LOCAL_STACK(current, statement) 
+
+
 
 /*  not yet
  */
@@ -345,7 +352,7 @@ list args;
 
     /* last points to the last item of args, which should be the template
      */
-    assert(!ENDP(last));
+    assert(gen_length(args)>=2);
     template = expression_to_reference(EXPRESSION(CAR(last)));
 
     for(; args!=last; args=CDR(args))
@@ -363,7 +370,7 @@ list args;
 
     /* last points to the last item of args, which should be the processors
      */
-    assert(!ENDP(last));
+    assert(gen_length(args)>=2);
     proc = expression_to_reference(EXPRESSION(CAR(last)));
 
     for(; args!=last; args=CDR(args))
@@ -429,9 +436,9 @@ static struct DirectiveHandler handlers[] =
   {HPF_PREFIX "P", handle_processors_directive },
   {HPF_PREFIX "T", handle_template_directive },
   {HPF_PREFIX "Y", handle_dynamic_directive },
-  {HPF_PREFIX BLOCK_SUFFIX, handle_unexpected_directive },
+  {HPF_PREFIX BLOCK_SUFFIX,  handle_unexpected_directive },
   {HPF_PREFIX CYCLIC_SUFFIX, handle_unexpected_directive },
-  {HPF_PREFIX STAR_SUFFIX, handle_unexpected_directive },
+  {HPF_PREFIX STAR_SUFFIX,   handle_unexpected_directive },
   { (string) 0, handle_unexpected_directive }
 };
 
